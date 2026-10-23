@@ -18,9 +18,9 @@ def einfeldtraeger(kennung: str = "r1", name: str = "T", material: str = "b1") -
     """
     Ein Einfeldträger von 6 m, Rechteck 300 × 600 mm, links gelenkig, rechts
     verschieblich, ein Lastfall mit 10 kN/m -- bis 2026-10-19 das neue System
-    der Oberfläche; das beginnt jetzt leer.
+    der Oberfläche. Gebaut ohne die Lastfälle, die ein neues System mitbringt.
     """
-    s = BalkensystemEintrag.neu(kennung, name)
+    s = BalkensystemEintrag(kennung=kennung, name=name)
     q = s.querschnitt("Rechteck 300×600", "rechteck", b=300.0, h=600.0)
     linie = s.linie((0.0, 0.0), (6.0, 0.0), querschnitt=q, material=material)
     s.lager_an((0.0, 0.0), "gelenkig")
@@ -71,11 +71,19 @@ class TestBeschreibung(unittest.TestCase):
         with self.assertRaises(ProjektFehler):
             p.bauteil("r7")
 
-    def test_neu_ist_leer(self):
-        """Ein neues System ist leer (Benutzer, 2026-10-19): nichts ist definiert."""
+    def test_neu_ohne_tragwerk_mit_lastfaellen(self):
+        """
+        Ein neues System hat kein Tragwerk (Benutzer, 2026-10-19), aber
+        Eigengewicht, Auflast und Nutzlast und die Kombinationen GZT und GZG
+        (Benutzer, 2026-10-23).
+        """
         s = BalkensystemEintrag.neu("r1", "Träger")
-        self.assertEqual((s.knoten, s.linien, s.lager, s.knotenlasten, s.querschnitte,
-                          s.lastfaelle, s.kombinationen), ([], [], [], [], [], [], []))
+        self.assertEqual((s.knoten, s.linien, s.lager, s.knotenlasten, s.querschnitte),
+                         ([], [], [], [], []))
+        self.assertEqual([(lf.name, lf.eigengewicht) for lf in s.lastfaelle],
+                         [("Eigengewicht", True), ("Auflast", False), ("Nutzlast", False)])
+        self.assertEqual([(k.name, list(k.faktoren.values())) for k in s.kombinationen],
+                         [("GZT", [1.35, 1.35, 1.5]), ("GZG", [1.0, 1.0, 1.0])])
 
     def test_der_einfeldtraeger_der_tests(self):
         s = einfeldtraeger("r1", "Träger", "b1")
@@ -130,9 +138,9 @@ class TestGleicheFallnamen(unittest.TestCase):
 
     def test_zwei_kombinationen(self):
         def zweite(s):
-            s.kombinationen.append(dataclasses.replace(s.kombinationen[0], kennung="LK2"))
+            s.kombinationen.append(dataclasses.replace(s.kombinationen[0], kennung="LK9"))
         daten = self.gerechnet(zweite)
-        self.assertTrue(any("Mehrere Kombinationen heissen «Tragsicherheit»" in t
+        self.assertTrue(any("Mehrere Kombinationen heissen «GZT»" in t
                             for t in self.meldungen(daten)))
 
 
@@ -549,3 +557,56 @@ class TestBearbeiten(unittest.TestCase):
             with self.subTest(rumpf=rumpf):
                 antwort = dienst.bearbeite("balkensystem_bearbeiten", {"projekt": d, **rumpf})
                 self.assertEqual(antwort.status, 400)
+
+
+class TestEigengewicht(unittest.TestCase):
+    """
+    Das Eigengewicht kommt von selbst: g_k = ρ · g · A je Stab, mit g = 10
+    m/s² und beim Beton der Dichte des Stahlbetons (Benutzer, 2026-10-23).
+    """
+
+    def system(self, material="b1", **masse):
+        p = Projekt(name="Träger")
+        p.beton("C30/37")
+        p.stahl("B500B")
+        s = BalkensystemEintrag.neu("r1", "Träger")
+        q = s.querschnitt("R", "rechteck", **(masse or {"b": 300.0, "h": 600.0}))
+        s.linie((0, 0), (6, 0), querschnitt=q, material=material)
+        s.lager_an((0, 0), "gelenkig")
+        s.lager_an((6, 0), "verschieblich")
+        p.balkensysteme.append(s)
+        return p
+
+    def lagerkraefte(self, p, fall):
+        f = p.rechnen().balkensystem("r1").ergebnis.fall(fall)
+        return [round(rz / 1e3, 6) for _, rz, _ in f.lagerkraefte.values()]
+
+    def test_stahlbeton_25_kn_pro_m3(self):
+        # 2500 kg/m³ · 10 m/s² · 0.18 m² = 4.5 kN/m, auf 6 m je Lager 13.5 kN.
+        p = self.system()
+        self.assertAlmostEqual(p.rechnen().loesung.werte["balkensystem.r1.Q1.b1.g_k"].groesse.si,
+                               4.5e3)
+        self.assertEqual(self.lagerkraefte(p, "Eigengewicht"), [13.5, 13.5])
+
+    def test_kombinationen(self):
+        p = self.system()
+        self.assertEqual(self.lagerkraefte(p, "GZT"), [18.225, 18.225])
+        self.assertEqual(self.lagerkraefte(p, "GZG"), [13.5, 13.5])
+
+    def test_stahl_mit_seiner_dichte(self):
+        # Ein Stahlstab 100 × 100 mm: 7850 · 10 · 0.01 = 785 N/m.
+        p = self.system(material="s1", b=100.0, h=100.0)
+        self.assertAlmostEqual(p.rechnen().loesung.werte["balkensystem.r1.Q1.s1.g_k"].groesse.si,
+                               785.0)
+
+    def test_eine_linie_ohne_querschnitt_wiegt_nichts(self):
+        p = self.system()
+        p.balkensysteme[0].linie((6, 0), (6, -1), quer="fest")
+        self.assertEqual(self.lagerkraefte(p, "Eigengewicht")[:2], [13.5, 13.5])
+
+    def test_nur_ein_lastfall_bekommt_es(self):
+        p = self.system()
+        p.balkensysteme[0].lastfaelle[1].eigengewicht = True
+        meldungen = [m for m in p.balkensysteme[0].modell().meldungen if m.fehler]
+        self.assertTrue(any("Eigengewicht" in m.text for m in meldungen))
+

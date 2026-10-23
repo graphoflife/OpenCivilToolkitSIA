@@ -1,10 +1,10 @@
 ---
-erzeugt: 2a2ae2fb7779
+erzeugt: 45b378213ab4
 art: thema
 tags: [thema]
 ---
 > [!abstract] Balkensysteme
-> 17 Formeln, in der Folge, in der gerechnet wird.
+> 18 Formeln, in der Folge, in der gerechnet wird.
 
 ## Formeln
 
@@ -12,19 +12,20 @@ tags: [thema]
 2. [[Flächenträgheitsmoment eines Rechtecks]]
 3. [[Dehnsteifigkeit]]
 4. [[Biegesteifigkeit]]
-5. [[Fläche eines Kreises]]
-6. [[Flächenträgheitsmoment eines Kreises]]
-7. [[Fläche eines Kreisrings]]
-8. [[Flächenträgheitsmoment eines Kreisrings]]
-9. [[Fläche eines Rechteckrohrs]]
-10. [[Flächenträgheitsmoment eines Rechteckrohrs]]
-11. [[Fläche eines T-Querschnitts]]
-12. [[Schwerpunkt eines T-Querschnitts]]
-13. [[Flächenträgheitsmoment eines T-Querschnitts]]
-14. [[Fläche eines Doppel-T-Querschnitts]]
-15. [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]]
-16. [[Fläche eines Trapezes]]
-17. [[Flächenträgheitsmoment eines Trapezes]]
+5. [[Eigengewicht eines Stabs]]
+6. [[Fläche eines Kreises]]
+7. [[Flächenträgheitsmoment eines Kreises]]
+8. [[Fläche eines Kreisrings]]
+9. [[Flächenträgheitsmoment eines Kreisrings]]
+10. [[Fläche eines Rechteckrohrs]]
+11. [[Flächenträgheitsmoment eines Rechteckrohrs]]
+12. [[Fläche eines T-Querschnitts]]
+13. [[Schwerpunkt eines T-Querschnitts]]
+14. [[Flächenträgheitsmoment eines T-Querschnitts]]
+15. [[Fläche eines Doppel-T-Querschnitts]]
+16. [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]]
+17. [[Fläche eines Trapezes]]
+18. [[Flächenträgheitsmoment eines Trapezes]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -43,7 +43,7 @@ def bauen(art: "Bauteilart", eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Ba
         name=eintrag.name, kennung=eintrag.kennung, praefix=f"{art.raum}.{eintrag.kennung}",
         system=modell.system, paare=modell.paare, meldungen=modell.meldungen,
         querschnitte=[_stabquerschnitt(q, aufbau, wo) for q in eintrag.querschnitte],
-        stoffe=stoffe)
+        stoffe=stoffe, eigengewicht=modell.eigengewicht)
     aufbau.balkensysteme[eintrag.kennung] = system
     system.ins_rechenwerk(aufbau.werk)
     return Bauteil(eintrag.kennung, eintrag.name, art, system,

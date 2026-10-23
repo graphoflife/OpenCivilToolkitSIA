@@ -1,5 +1,5 @@
 ---
-erzeugt: 62006ee3679b
+erzeugt: 4aa5f6a7083a
 art: modul
 tags: [modul]
 ---
@@ -205,9 +205,9 @@ def balkensystem(self, name: str, **felder: Any) -> BalkensystemEintrag
 Ein leeres Balkensystem, ein ebener Rahmen. Gezeichnet wird danach
 mit dem Baukasten des Eintrags -- `querschnitt`, `linie`,
 `lager_an`, `lastfall`, `stablast`, `knotenlast`,
-`kombination` --, Koordinaten in m. Leer und nicht wie in der
-Oberflaeche mit einem Einfeldtraeger: wer in Python zeichnet, zeichnet
-sein eigenes System.
+`kombination` --, Koordinaten in m. Leer, ohne die Lastfaelle und
+Kombinationen, die die Oberflaeche mitbringt: wer in Python zeichnet,
+zeichnet sein eigenes System.
 
 #### Projekt.grundbruch
 

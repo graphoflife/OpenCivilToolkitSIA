@@ -1,5 +1,5 @@
 ---
-erzeugt: cfdaf9655ac5
+erzeugt: 7d40f3b98b5a
 art: modul
 tags: [modul]
 ---
@@ -36,6 +36,14 @@ an ihnen: aendert sich deren Dicke, rechnet es neu.
 `E_cm` fuer Beton und `E_s` fuer Betonstahl ([[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]]), am
 ungerissenen Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am
 unverformten System. Die Herleitung sagt es, das TODO fuehrt es.
+
+
+## EIGENGEWICHT -- NACH VORGABE DES BENUTZERS (2026-10-23)
+
+Je Paar aus Querschnitt und Material `g_k = rho · g · A` in kN/m, mit
+`g = 10 m/s²` und beim Beton der Dichte des Stahlbetons ([[opencivil.stabwerk.rechnung#Konstanten|DICHTE]])
+-- ohne den Stahl noch dazu. Es kommt als Last senkrecht je Meter Stab in den
+Lastfall, den die Beschreibung dafuer nennt.
 
 
 ## DAS ERGEBNIS
@@ -79,6 +87,7 @@ Ein Paar aus Querschnitt und Material und die Wert-IDs seiner Steifigkeiten.
 - `material: str` – Die Kennung des Materials im Projekt.
 - `EA: str`
 - `EI: str`
+- `g_k: str = ''` – Das Eigengewicht je Meter -- leer, wenn kein Lastfall es bekommt.
 
 ### Lagerkraft
 
@@ -111,6 +120,7 @@ Falls rechnet [[opencivil.stabwerk.rechnung#Systembefund.verlaeufe|verlaeufe]] e
 
 - `gerechnet: System`
 - `ergebnis: Ergebnis`
+- `eigengewicht: Dict[str, float] = field(default_factory=dict)` – Je tragenden Stab sein Eigengewicht in N/m -- leer, wenn kein Lastfall es bekommt.
 - `_verlaeufe: Dict[str, Dict[str, Stabverlauf]] = field(default_factory=dict, repr=False)`
 
 #### Systembefund.verlaeufe
@@ -182,13 +192,31 @@ def _querschnitt(self, q: Stabquerschnitt, index: str) -> Tuple[str, str]
 
 Die Berechnungen fuer A und I eines Querschnitts -- und ihre Wert-IDs.
 
+#### Balkensystem._erdbeschleunigung
+
+```python
+def _erdbeschleunigung(self) -> str
+```
+
+`g` als Vorgabe des Systems -- seine Wert-ID.
+
 #### Balkensystem._steifigkeit
 
 ```python
-def _steifigkeit(self, q: str, material: str, index: str) -> Steifigkeit
+def _steifigkeit(self, q: str, material: str, index: str, g: Optional[str]=None) -> Steifigkeit
 ```
 
-EA und EI eines Paars aus Querschnitt und Material.
+EA und EI eines Paars aus Querschnitt und Material -- mit `g` dazu sein Eigengewicht.
+
+#### Balkensystem._eigengewicht
+
+```python
+def _eigengewicht(self, e: Eingaben) -> Dict[str, float]
+```
+
+Je tragenden Stab `g_k` in N/m -- es kommt senkrecht ueber seine
+ganze Laenge in den Lastfall des Eigengewichts, je Meter Stab und
+nicht je Meter Projektion. Leer ohne diesen Lastfall.
 
 #### Balkensystem.ins_rechenwerk
 
@@ -218,6 +246,8 @@ bleibt es bei ihr.
 ## Konstanten
 
 - `E_MODUL = {'beton': 'E_cm', 'betonstahl': 'E_s'}` – Welcher E-Modul in die Steifigkeit eingeht, je Art des Materials -- nach Vorgabe, nicht nachgeschlagen.
+- `DICHTE = {'beton': 'rho_sb', 'betonstahl': 'rho_s'}` – Welche Dichte ins Eigengewicht eingeht, je Art des Materials -- beim Beton die des Stahlbetons (Benutzer, 2026-10-23).
+- `ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)` – Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
 - `QUERSCHNITTE = 'Stabquerschnitte'` – Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.
 - `STEIFIGKEITSMETHODE = 'Steifigkeitsmethode'`
 
@@ -247,3 +277,4 @@ bleibt es bei ihr.
 
 - [[Biegesteifigkeit]] · `_biegesteifigkeit`
 - [[Dehnsteifigkeit]] · `_dehnsteifigkeit`
+- [[Eigengewicht eines Stabs]] · `_eigengewicht`

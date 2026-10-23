@@ -302,13 +302,20 @@ function lastfaelleGruppe(system) {
   const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
   const lastenVon = (lf) => system.linien.reduce((n, l) => n + l.lasten.filter((x) => x.lastfall === lf).length, 0)
     + system.knotenlasten.filter((x) => x.lastfall === lf).length;
+  // Das Eigengewicht kommt von selbst und bleibt: es lässt sich umbenennen,
+  // nicht löschen (Benutzer, 2026-10-23).
   const fall = (lf, i) => el('div.bs-fall', {}, [
     el('input', {
       type: 'text', value: lf.name, title: 'Name des Lastfalls -- so steht er im Bericht',
       on: { change: (e) => aendern((s) => { s.lastfaelle[i].name = e.target.value; }) },
     }),
-    el('span.bs-fall-zahl', { text: lastenText(lastenVon(lf.kennung)) }),
-    el('button.weg', {
+    el('span.bs-fall-zahl', {
+      text: lf.eigengewicht
+        ? `von selbst, ρ · g · A${lastenVon(lf.kennung) ? ` · dazu ${lastenText(lastenVon(lf.kennung))}` : ''}`
+        : lastenText(lastenVon(lf.kennung)),
+      title: lf.eigengewicht ? 'Je Stab Dichte mal g = 10 m/s² mal Fläche -- beim Beton die Dichte des Stahlbetons' : '',
+    }),
+    lf.eigengewicht ? el('span') : el('button.weg', {
       type: 'button', text: '×', title: 'Lastfall löschen',
       on: {
         click: () => {

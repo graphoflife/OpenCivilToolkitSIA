@@ -90,6 +90,8 @@ Kopie der Datei mit der Endung `.mjs`.
 - **M und N der Platte gelten je Streifen b**, in kNm und kN; V je Meter
   (2026-10-15 bestätigt). Bei b = 500 mm heisst M_Ed = 50 kNm also
   100 kNm/m. Nicht auf kNm/m umstellen.
+- **g = 10 m/s² beim Eigengewicht** (Benutzer, 2026-10-23): Stahlbeton wiegt
+  damit 25 kN/m³. Nicht auf 9.81 umstellen.
 - **Die Koordinaten des Balkensystems sind Meter** (2026-10-23): neben den
   Feldern im Zeichenfenster steht «m», im Querschnitt «mm».
 

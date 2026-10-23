@@ -1,5 +1,5 @@
 ---
-erzeugt: eb5527c694bf
+erzeugt: a60fdc9fc142
 art: formel
 tags: [formel]
 ---
@@ -30,6 +30,7 @@ $$
 ## Gebraucht von
 
 - [[Dehnsteifigkeit]]
+- [[Eigengewicht eines Stabs]]
 
 ## Im Code
 

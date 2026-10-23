@@ -256,6 +256,11 @@ class LastfallEintrag(Beschreibung):
 
     kennung: str = ""
     name: str = ""
+    eigengewicht: bool = False
+    """
+    Ob der Lastfall das Eigengewicht aller Staebe bekommt -- von selbst, aus
+    Dichte und Flaeche (Benutzer, 2026-10-23). Ein System hat einen davon.
+    """
 
 
 @dataclass
@@ -286,6 +291,9 @@ class Modell:
     """Je tragenden Stab die Kennungen seines Querschnitts und seines Materials."""
 
     meldungen: List[Meldung] = field(default_factory=list)
+
+    eigengewicht: Optional[str] = None
+    """Der Name des Lastfalls, der das Eigengewicht der Staebe bekommt -- oder keiner."""
 
     @property
     def gueltig(self) -> bool:
@@ -395,6 +403,10 @@ class BalkensystemEintrag(Beschreibung):
         for name in sorted(set(lastfaelle) & set(kombinationen)):
             melden(f"«{name}» heisst ein Lastfall und eine Kombination – die beiden wären "
                    f"nicht zu unterscheiden. Gerechnet wird erst mit verschiedenen Namen.")
+        eigen = [lf for lf in self.lastfaelle if lf.eigengewicht]
+        if len(eigen) > 1:
+            melden(f"Das Eigengewicht bekommen {', '.join(f'«{lf.name}»' for lf in eigen)} – "
+                   f"es gehört in einen Lastfall.", *[lf.kennung for lf in eigen])
         # Je Teil eine Kennung: an ihr haengen Staebe, Lasten und Verweise. Bis
         # 2026-10-16 fiel eine Last bei zwei gleichen Lastfall-Kennungen still
         # in beide.
@@ -497,7 +509,8 @@ class BalkensystemEintrag(Beschreibung):
             staebe=staebe, lager=lager,
             lastfaelle=[Lastfall(lf.name, lasten[lf.kennung]) for lf in self.lastfaelle],
             kombinationen=kombinationen)
-        return Modell(system=system, paare=paare, meldungen=meldungen)
+        return Modell(system=system, paare=paare, meldungen=meldungen,
+                      eigengewicht=eigen[0].name if eigen else None)
 
     # -- Zeichnen ohne Oberflaeche --------------------------------------------
 
@@ -572,8 +585,9 @@ class BalkensystemEintrag(Beschreibung):
         self.querschnitte.append(eintrag)
         return eintrag
 
-    def lastfall(self, name: str) -> LastfallEintrag:
-        eintrag = LastfallEintrag(kennung=self._neue_kennung(self.lastfaelle, "LF"), name=name)
+    def lastfall(self, name: str, *, eigengewicht: bool = False) -> LastfallEintrag:
+        eintrag = LastfallEintrag(kennung=self._neue_kennung(self.lastfaelle, "LF"), name=name,
+                                  eigengewicht=eigengewicht)
         self.lastfaelle.append(eintrag)
         return eintrag
 
@@ -681,9 +695,16 @@ class BalkensystemEintrag(Beschreibung):
     @classmethod
     def neu(cls, kennung: str, name: str) -> "BalkensystemEintrag":
         """
-        Ein frisches System, wie der Benutzer es angelegt bekommt: leer,
-        ohne Knoten, Linie, Lager, Querschnitt und Lastfall (Benutzer,
-        2026-10-19). Bis dahin kam es als Einfeldtraeger von 6 m mit einem
-        Lastfall von 10 kN/m.
+        Ein frisches System, wie der Benutzer es angelegt bekommt: ohne
+        Knoten, Linie, Lager und Querschnitt (Benutzer, 2026-10-19), aber mit
+        den Lastfaellen Eigengewicht -- es kommt von selbst --, Auflast und
+        Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
+        1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23).
         """
-        return cls(kennung=kennung, name=name)
+        s = cls(kennung=kennung, name=name)
+        g = s.lastfall("Eigengewicht", eigengewicht=True)
+        auflast = s.lastfall("Auflast")
+        nutzlast = s.lastfall("Nutzlast")
+        s.kombination("GZT", (g, 1.35), (auflast, 1.35), (nutzlast, 1.5))
+        s.kombination("GZG", (g, 1.0), (auflast, 1.0), (nutzlast, 1.0))
+        return s

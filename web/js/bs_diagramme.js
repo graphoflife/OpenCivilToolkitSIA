@@ -1,7 +1,8 @@
 /**
  * bs_diagramme.js -- die Ergebnisse eines Balkensystems, rechts.
  *
- * Unter «Diagramme» je System und gewähltem Fall:
+ * Unter «Diagramme» je System und gewählter Kombination -- ein Lastfall
+ * allein bekommt keine Bilder:
  *
  *   Verformung    das System verschoben, überhöht -- das unverformte blass;
  *   N, V, M       je Stab der Verlauf, quer zum Stab aufgetragen, positive
@@ -26,9 +27,9 @@
  */
 
 import { api } from './api.js';
-import { ARTEN } from './arten.js';
 import { karte } from './bausteine.js';
 import { kraftpfeil, momentSymbol } from './bs_symbole.js';
+import { abdruckVon } from './bs_zeichnung.js';
 import {
   auswahl, el, leerzustand, svgEl,
 } from './dom.js';
@@ -59,14 +60,6 @@ const fest = (x, n) => (Math.abs(x) < 0.5 * 10 ** -n ? 0 : x).toFixed(n);
 // Anfrage
 // ===========================================================================
 
-function abdruckVon(kennung) {
-  const system = zustand.projekt.balkensysteme?.find((s) => s.kennung === kennung);
-  const bezuege = (system?.querschnitte || []).map((q) => q.bezug).filter(Boolean);
-  const bauteile = ARTEN.flatMap((a) => zustand.projekt[a.liste] || [])
-    .filter((b) => bezuege.includes(b.kennung));
-  return JSON.stringify([system, zustand.projekt.materialien, bauteile]);
-}
-
 /** Fragt nach den Verläufen -- erst, wenn gerade nicht gerechnet wird: dann liegt das System im Speicher des Kerns. */
 function anfordern(kennung, eintrag, verzug = 500) {
   clearTimeout(eintrag.uhr);
@@ -88,9 +81,14 @@ function anfordern(kennung, eintrag, verzug = 500) {
   }, verzug);
 }
 
-/** Die Fälle eines Systems, wie die letzte Rechnung sie kennt -- Lastfälle zuerst. */
+/**
+ * Die Fälle, für die es Bilder gibt: die Kombinationen, wie die letzte
+ * Rechnung sie kennt -- ein Lastfall allein bekommt keine (Benutzer,
+ * 2026-10-23).
+ */
 function faelleVon(kennung) {
-  return (zustand.loesung?.balkensysteme?.[kennung]?.faelle || []).map((f) => f.name);
+  return (zustand.loesung?.balkensysteme?.[kennung]?.faelle || [])
+    .filter((f) => f.kombination).map((f) => f.name);
 }
 
 // ===========================================================================
@@ -320,7 +318,7 @@ function fallwahl(kennung, faelle, gewaehlt) {
   return auswahl({
     werte: faelle.map((f) => ({ wert: f, beschriftung: f })),
     gewaehlt,
-    titel: 'Welcher Lastfall oder welche Kombination gezeigt wird',
+    titel: 'Welche Kombination gezeigt wird',
     beiAenderung: (w) => {
       gezeigt.set(kennung, w);
       aendern({}, 'diagramm');
@@ -339,7 +337,10 @@ export function systemKarten(kennung) {
     return [karte(null, (uebersicht.meldungen || []).filter((m) => m.fehler)
       .map((m) => el('p.hinweis.hinweis-warnung', { text: m.text })))];
   }
-  if (!faelle.length) return [karte(null, [leerzustand('Kein Lastfall.')])];
+  if (!faelle.length) {
+    return [karte(null, [leerzustand('Keine Lastkombination.',
+      'Bilder gibt es je Kombination; anlegen unter «Lastfälle und Kombinationen».')])];
+  }
   const fall = faelle.includes(gezeigt.get(kennung)) ? gezeigt.get(kennung) : faelle[0];
   const abdruck = `${abdruckVon(kennung)}|${fall}`;
   let eintrag = vorrat.get(kennung);

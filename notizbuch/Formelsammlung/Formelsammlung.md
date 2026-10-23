@@ -1,5 +1,5 @@
 ---
-erzeugt: 6782bd91689f
+erzeugt: 6214cc4e18a8
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -38,7 +38,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Balkensysteme**
 
-- [[Stabquerschnitte]] · 17
+- [[Stabquerschnitte]] · 18
 - [[Steifigkeitsmethode]] · 7
 
 **Grundbruch**
@@ -103,6 +103,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Drehung in die Achsen des Stabs]]
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
 - [[Druckzonenhöhe bei reiner Biegung]] · $x$
+- [[Eigengewicht eines Stabs]] · $g_{k}$
 - [[Einflussfaktor der Rechtecklast]]
 - [[Einwirkung im normierten Diagramm]] · $\bar{E}_{d,x}$
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
@@ -242,7 +243,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-115 von 186 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+116 von 187 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -278,6 +279,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Drehung in die Achsen des Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
 - [[Druckzonenhöhe bei reiner Biegung]] · [[opencivil.nachweis.duktilitaet#Duktilitaet._protokoll_lage|Duktilitaet._protokoll_lage]]
+- [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#Balkensystem._eigengewicht|_eigengewicht]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Erfüllungsgrad]] · [[opencivil.core.berechnung#grad_formel|grad_formel]]
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]

@@ -34,6 +34,7 @@
  */
 
 import { api } from './api.js';
+import { ARTEN as BAUTEILARTEN } from './arten.js';
 import { wahlBlock, wahlSchalter } from './bausteine.js';
 import { nachBild, zahlText } from './cad_ansicht.js';
 import { imSpiel } from './cad_auswahl.js';
@@ -109,13 +110,18 @@ function lastart(wert) {
 // Das Fenster eines Systems
 // ===========================================================================
 
-/** Das Zeichenfenster eines Systems, samt der Liste darunter. Die Tafel ruft das bei jedem Neubau. */
+/**
+ * Das Zeichenfenster eines Systems, samt der Liste darunter. Die Tafel ruft
+ * das bei jedem Neubau -- dann fragt es auch den Kern, wenn sich nicht die
+ * Zeichnung geändert hat, aber ein Querschnitt oder Material.
+ */
 export function zeichenbereich(system, uebersichtBauen) {
   const a = fensterVon(system.kennung);
   const unten = el('div.qa-uebersicht-huelle');
   a.bs.uebersichtKnoten = unten;
   a.bs.uebersichtBauen = uebersichtBauen;
   const bereich = cadBereich(a, [unten]);
+  uebersichtHolen(a);
   uebersichtZeichnen(a);
   return bereich;
 }
@@ -159,14 +165,22 @@ export function lastfallWaehlen(kennung, lastfall) {
 /** Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu sehen ist. */
 export function passendeUebersicht(a) {
   const u = a.bs.uebersicht;
-  return u && u.abdruck === abdruck(eintragVon(a.bs.kennung)) ? u : null;
+  return u && u.abdruck === abdruckVon(a.bs.kennung) ? u : null;
 }
 
-/** Das System und welche Materialien es gibt: davon hängt die Antwort des Kerns ab. */
-function abdruck(system) {
-  if (!system) return '';
-  const stoffe = zustand.projekt.materialien.map((m) => [m.kennung, m.art]);
-  return JSON.stringify([system, stoffe]);
+/**
+ * Wovon jede Antwort des Kerns zu einem System abhängt: das System, die
+ * Materialien und die Bauteile, deren Querschnitt es nimmt. Ändert sich
+ * davon etwas -- etwa eine Dichte oder die Höhe einer Platte --, gilt sie
+ * nicht mehr: die Übersicht samt dem gezeichneten Eigengewicht hier, die
+ * Verläufe in den Diagrammen.
+ */
+export function abdruckVon(kennung) {
+  const system = eintragVon(kennung);
+  const bezuege = (system?.querschnitte || []).map((q) => q.bezug).filter(Boolean);
+  const bauteile = BAUTEILARTEN.flatMap((a) => zustand.projekt[a.liste] || [])
+    .filter((b) => bezuege.includes(b.kennung));
+  return JSON.stringify([system, zustand.projekt.materialien, bauteile]);
 }
 
 function uebersichtZeichnen(a) {
@@ -412,7 +426,7 @@ function umriss(system) {
 function uebersichtHolen(a) {
   const system = eintragVon(a.bs.kennung);
   if (!system) return;
-  const jetzt = abdruck(system);
+  const jetzt = abdruckVon(a.bs.kennung);
   if (a.bs.gefragt === jetzt) return;
   a.bs.gefragt = jetzt;
   api.balkensystemVerlauf(zustand.projekt, a.bs.kennung).then((antwort) => {
@@ -439,7 +453,7 @@ function uebersichtHolen(a) {
 function kernBearbeiten(a, auftraege, auswahlDanach = []) {
   if (!auftraege.length) return;
   const kennung = a.bs.kennung;
-  const vorher = abdruck(eintragVon(kennung));
+  const vorher = abdruckVon(kennung);
   const projekt = structuredClone(zustand.projekt);
   const neu = [];
   const schritt = (i) => {
@@ -452,7 +466,7 @@ function kernBearbeiten(a, auftraege, auswahlDanach = []) {
     });
   };
   schritt(0).then(() => {
-    if (abdruck(eintragVon(kennung)) !== vorher) {
+    if (abdruckVon(kennung) !== vorher) {
       melden('Die Zeichnung hat sich inzwischen geändert – bitte noch einmal.', true);
       return;
     }
@@ -561,7 +575,9 @@ function zeichnen(a, g) {
  * Einzellasten und Momente einzeln; an den Knoten Kräfte und Momente. Die
  * Pfeillänge der verteilten Lasten folgt ihrem Wert, je Art im Verhältnis
  * zur grössten. Je Last merkt sich das Fenster ihr Zeichen und seine Formen
- * zum Wählen (`a.bs.lastformen`); eine gewählte steht blau.
+ * zum Wählen (`a.bs.lastformen`); eine gewählte steht blau. Bekommt der
+ * Lastfall das Eigengewicht, steht es grau dabei -- je Stab vom Kern, nicht
+ * zu wählen und nicht zu löschen.
  */
 function lastenZeichnen(a, z, lf, lagen) {
   const g = svgEl('g', { class: 'bs-lasten' });
@@ -574,7 +590,9 @@ function lastenZeichnen(a, z, lf, lagen) {
     const mitte = [0, 1].map((i) => punkte.reduce((s, p) => s + p[i], 0) / punkte.length);
     formen.push({ kennung, knoten: zeichen, formen: zeichen.formen, mitte, text: zeichen.querySelector('text') });
   };
-  const groesste = { linienlast: 0, linienmoment: 0 };
+  const eigen = z.lastfaelle.find((x) => x.kennung === lf)?.eigengewicht
+    ? passendeUebersicht(a)?.eigengewicht || {} : {};
+  const groesste = { linienlast: Math.max(0, ...Object.values(eigen)), linienmoment: 0 };
   for (const l of z.linien) {
     for (const last of l.lasten) {
       if (last.lastfall !== lf || !(last.art in groesste)) continue;
@@ -588,6 +606,12 @@ function lastenZeichnen(a, z, lf, lagen) {
     if (!L) continue;
     const [c, s] = [(pb[0] - pa[0]) / L, (pb[1] - pa[1]) / L];
     const ort = (x) => nachBild(a.v, [pa[0] + c * x, pa[1] + s * x]);
+    const gk = eigen[l.kennung];
+    if (gk) {
+      const lang = (gk * GROESSE.pfeil) / (groesste.linienlast || 1);
+      g.append(streckenlast(ort(0), ort(L), imBild([0, -1]), lang, lang,
+        `g_k = ${wertText(gk, 'kN/m')}`, 'bs-last bs-eigengewicht'));
+    }
     for (const last of l.lasten) {
       if (last.lastfall !== lf) continue;
       const art = lastart(last.art);

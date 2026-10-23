@@ -280,7 +280,7 @@ class TestBilderAusDemSpeicher(unittest.TestCase):
 
     ANFRAGEN = [
         ("analysediagramme", {"kennung": "a1"}),
-        ("balkensystem_verlauf", {"kennung": "r1", "fall": "Tragsicherheit"}),
+        ("balkensystem_verlauf", {"kennung": "r1", "fall": "GZT"}),
     ]
 
     def test_warm_wie_kalt(self):

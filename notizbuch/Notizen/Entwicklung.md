@@ -44,6 +44,40 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Balkensystem: Eigengewicht von selbst, GZT und GZG
+
+Dritte Etappe des neuen Balkensystems. Wünsche des Benutzers: das
+Eigengewicht als eigener Lastfall, von selbst aus der Dichte; Bilder nur für
+die Kombinationen. Entschieden (Rückfrage): ein neues System bringt die
+Lastfälle Eigengewicht, Auflast und Nutzlast mit, dazu die Kombinationen GZT
+(1.35 / 1.35 / 1.5) und GZG (1.0 / 1.0 / 1.0); g = 10 m/s².
+
+- **Welcher Lastfall:** einer trägt das Zeichen `eigengewicht`, höchstens
+  einer -- zwei sind eine Meldung am System. Er lässt sich umbenennen, nicht
+  löschen; eigene Lasten darf er zusätzlich haben.
+- **Gerechnet im Kern:** je Paar aus Querschnitt und Material eine Formel
+  `g_k = ρ · g · A` (Formelsammlung «Eigengewicht eines Stabs»), beim Beton
+  mit ρ_sb, ohne den Stahl noch dazu. Vor dem Lösen kommt je tragenden Stab
+  eine Linienlast senkrecht über die ganze Länge in den Lastfall, je Meter
+  Stab, nicht projiziert. So steht sie in der Herleitung wie jede andere Last,
+  und Kombinationen nehmen sie mit ihrem Faktor.
+- **Gezeigt:** der Befund gibt das Eigengewicht je Stab mit
+  (`Systembefund.eigengewicht`), die Übersicht in kN/m. Das Zeichenfenster
+  zeichnet es grau im Lastfall, der es bekommt -- nicht zu wählen, nicht zu
+  löschen. Die Übersicht fragt neu, wenn sich ein Material oder eine
+  genommene Platte oder Analyse ändert, nicht nur die Zeichnung: sonst
+  stünde nach einer neuen Dichte das alte g_k da. Wovon eine Antwort des
+  Kerns abhängt, steht einmal (`abdruckVon` in `bs_zeichnung.js`) und gilt
+  für Zeichenfenster und Diagramme -- vorher hatte jedes seine eigene Regel,
+  die des Fensters enger. Gefragt wird bei jedem Neubau der Tafel; ist der
+  Abdruck derselbe, bleibt es bei der letzten Antwort.
+- **Bilder nur je Kombination:** die Wahl über den Bildern zeigt nur
+  Kombinationen; ohne eine sagt ein Satz, wo man sie anlegt. Gerechnet
+  werden die Lastfälle weiter -- die Kombinationen setzen sich aus ihnen
+  zusammen, und die Herleitung zeigt sie.
+
+---
+
 ## 2026-10-23 · Balkensystem: Lasten für sich, Linie und Knoten aufgeräumt
 
 Zweite Etappe des neuen Balkensystems. Wünsche des Benutzers: im Fenster

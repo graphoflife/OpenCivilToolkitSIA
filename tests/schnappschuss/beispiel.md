@@ -1,6 +1,6 @@
 # Beispiel
 
-104 Berechnungen ausgeführt, 170 Werte bestimmt.
+108 Berechnungen ausgeführt, 174 Werte bestimmt.
 
 ## Herleitung
 
@@ -684,6 +684,12 @@ $$
 
 $$
 f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Dichte des Stahlbetons**
+
+$$
+\rho_{sb} = 2500\,\mathrm{kg}/\mathrm{m}^{3}
 $$
 
 ### Betonstahl: B500B
@@ -1697,6 +1703,18 @@ $$
 EI_{\text{Q1}} = E_{cm} \cdot I_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 675\,\cdot 10^{6}\,\mathrm{mm}^{4} = 22693\,\mathrm{kNm}^{2}
 $$
 
+**Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)**
+
+$$
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+$$
+
+**Eigengewicht, «Stütze 300×300» aus C30/37**
+
+$$
+g_{k,\text{Q1}} = \rho_{sb} \cdot g \cdot A_{\text{Q1}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 90000\,\mathrm{mm}^{2} = 2.25\,\mathrm{kN}/\mathrm{m}
+$$
+
 **Dehnsteifigkeit, «Unterzug» aus C30/37**
 
 $$
@@ -1707,6 +1725,12 @@ $$
 
 $$
 EI_{\text{Q2}} = E_{cm} \cdot I_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5400\,\cdot 10^{6}\,\mathrm{mm}^{4} = 181547\,\mathrm{kNm}^{2}
+$$
+
+**Eigengewicht, «Unterzug» aus C30/37**
+
+$$
+g_{k,\text{Q2}} = \rho_{sb} \cdot g \cdot A_{\text{Q2}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 180000\,\mathrm{mm}^{2} = 4.5\,\mathrm{kN}/\mathrm{m}
 $$
 
 > **Annahme:** Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).
@@ -1795,7 +1819,7 @@ $$
 **Lastvektor (kN, kNm) und Lösung (m, rad)**
 
 $$
-\mathbf{F} = \begin{bmatrix} 0 \\ -75.00 \\ -75.00 \\ 0 \\ -75.00 \\ 75.00 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 0.002332 \\ -1.006 \cdot 10^{-4} \\ -0.001166 \\ 0.002332 \\ -9.769 \cdot 10^{-5} \\ 0.001203 \\ -5.830 \cdot 10^{-4} \\ -5.830 \cdot 10^{-4} \end{bmatrix}
+\mathbf{F} = \begin{bmatrix} 0 \\ -18.00 \\ -13.50 \\ 0 \\ -18.00 \\ 13.50 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 4.198 \cdot 10^{-4} \\ -2.406 \cdot 10^{-5} \\ -2.099 \cdot 10^{-4} \\ 4.198 \cdot 10^{-4} \\ -2.353 \cdot 10^{-5} \\ 2.166 \cdot 10^{-4} \\ -1.049 \cdot 10^{-4} \\ -1.049 \cdot 10^{-4} \end{bmatrix}
 $$
 
 **Verschiebungen der Knoten**
@@ -1803,51 +1827,110 @@ $$
 | Knoten | $u_x\ [\mathrm{mm}]$ | $u_z\ [\mathrm{mm}]$ | $\varphi\ [\mathrm{mrad}]$ |
 | ---: | ---: | ---: | ---: |
 | K1 | $0.00$ | $0.00$ | $0.000$ |
-| K2 | $2.33$ | $-0.10$ | $-1.166$ |
-| K3 | $2.33$ | $-0.10$ | $1.203$ |
-| K4 | $0.00$ | $0.00$ | $-0.583$ |
+| K2 | $0.42$ | $-0.02$ | $-0.210$ |
+| K3 | $0.42$ | $-0.02$ | $0.217$ |
+| K4 | $0.00$ | $0.00$ | $-0.105$ |
 
 **Schnittgrössen an den Stabenden**
 
 | Stab | $N_{a}\ [\mathrm{kN}]$ | $V_{a}\ [\mathrm{kN}]$ | $M_{a}\ [\mathrm{kNm}]$ | $N_{b}\ [\mathrm{kN}]$ | $V_{b}\ [\mathrm{kN}]$ | $M_{b}\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $-76.1$ | $0.0$ | $-6.6$ | $-76.1$ | $0.0$ | $-6.6$ |
-| L2 | $0.0$ | $76.1$ | $-6.6$ | $0.0$ | $-73.9$ | $0.0$ |
-| L3 | $-73.9$ | $0.0$ | $0.0$ | $-73.9$ | $0.0$ | $0.0$ |
+| L1 | $-22.7$ | $0.0$ | $-1.2$ | $-13.7$ | $0.0$ | $-1.2$ |
+| L2 | $0.0$ | $13.7$ | $-1.2$ | $0.0$ | $-13.3$ | $0.0$ |
+| L3 | $-13.3$ | $0.0$ | $0.0$ | $-22.3$ | $0.0$ | $0.0$ |
 
 **Lagerkräfte, auf das Tragwerk**
 
 | Lager | $R_x\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: |
-| A1 (K1) | $0.0$ | $76.1$ | $6.6$ |
-| A2 (K4) | $0.0$ | $73.9$ | $0.0$ |
+| A1 (K1) | $0.0$ | $22.7$ | $1.2$ |
+| A2 (K4) | $0.0$ | $22.3$ | $0.0$ |
 
 **Extremwerte**
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $-76.1\ \mathrm{kN}$ | $0.00$ | $-76.1\ \mathrm{kN}$ | $0.00$ |
+| L1 | $N$ | $-22.7\ \mathrm{kN}$ | $0.00$ | $-13.7\ \mathrm{kN}$ | $4.00$ |
 | L1 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L1 | $M$ | $-6.6\ \mathrm{kNm}$ | $0.00$ | $-6.6\ \mathrm{kNm}$ | $4.00$ |
-| L1 | $w$ | $-0.58\ \mathrm{mm}$ | $2.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L1 | $M$ | $-1.2\ \mathrm{kNm}$ | $0.00$ | $-1.2\ \mathrm{kNm}$ | $4.00$ |
+| L1 | $w$ | $-0.10\ \mathrm{mm}$ | $2.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L2 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L2 | $V$ | $-73.9\ \mathrm{kN}$ | $6.00$ | $76.1\ \mathrm{kN}$ | $0.00$ |
-| L2 | $M$ | $-6.6\ \mathrm{kNm}$ | $0.00$ | $109.2\ \mathrm{kNm}$ | $3.04$ |
-| L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $2.24\ \mathrm{mm}$ | $3.02$ |
-| L3 | $N$ | $-73.9\ \mathrm{kN}$ | $0.00$ | $-73.9\ \mathrm{kN}$ | $0.00$ |
+| L2 | $V$ | $-13.3\ \mathrm{kN}$ | $6.00$ | $13.7\ \mathrm{kN}$ | $0.00$ |
+| L2 | $M$ | $-1.2\ \mathrm{kNm}$ | $0.00$ | $19.7\ \mathrm{kNm}$ | $3.04$ |
+| L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.40\ \mathrm{mm}$ | $3.02$ |
+| L3 | $N$ | $-22.3\ \mathrm{kN}$ | $4.00$ | $-13.3\ \mathrm{kN}$ | $0.00$ |
 | L3 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L3 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $4.00$ |
+| L3 | $M$ | $0.0\ \mathrm{kNm}$ | $4.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 
-Grösste Durchbiegung gegen die Sehne: L2, w = 2.24 mm bei x = 3.02 m, L/w = 2676.
+Grösste Durchbiegung gegen die Sehne: L2, w = 0.40 mm bei x = 3.02 m, L/w = 14869.
 
 **Gleichgewichtsprobe (Moment um den Ursprung)**
 
 |  | Lasten | Lager | Summe |  |
 | ---: | ---: | ---: | ---: | ---: |
 | $\sum F_x$ | $0.000$ | $0.000$ | $0.000$ | kN |
-| $\sum F_z$ | $-150.000$ | $150.000$ | $0.000$ | kN |
-| $\sum M_0$ | $-450.000$ | $450.000$ | $0.000$ | kNm |
+| $\sum F_z$ | $-45.000$ | $45.000$ | $0.000$ | kN |
+| $\sum M_0$ | $-135.000$ | $135.000$ | $0.000$ | kNm |
+
+#### Lastfall «Auflast»
+
+**Lastvektor (kN, kNm) und Lösung (m, rad)**
+
+$$
+\mathbf{F} = \begin{bmatrix} 0 \\ -60.00 \\ -60.00 \\ 0 \\ -60.00 \\ 60.00 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 0.001866 \\ -8.048 \cdot 10^{-5} \\ -9.328 \cdot 10^{-4} \\ 0.001866 \\ -7.815 \cdot 10^{-5} \\ 9.627 \cdot 10^{-4} \\ -4.664 \cdot 10^{-4} \\ -4.664 \cdot 10^{-4} \end{bmatrix}
+$$
+
+**Verschiebungen der Knoten**
+
+| Knoten | $u_x\ [\mathrm{mm}]$ | $u_z\ [\mathrm{mm}]$ | $\varphi\ [\mathrm{mrad}]$ |
+| ---: | ---: | ---: | ---: |
+| K1 | $0.00$ | $0.00$ | $0.000$ |
+| K2 | $1.87$ | $-0.08$ | $-0.933$ |
+| K3 | $1.87$ | $-0.08$ | $0.963$ |
+| K4 | $0.00$ | $0.00$ | $-0.466$ |
+
+**Schnittgrössen an den Stabenden**
+
+| Stab | $N_{a}\ [\mathrm{kN}]$ | $V_{a}\ [\mathrm{kN}]$ | $M_{a}\ [\mathrm{kNm}]$ | $N_{b}\ [\mathrm{kN}]$ | $V_{b}\ [\mathrm{kN}]$ | $M_{b}\ [\mathrm{kNm}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| L1 | $-60.9$ | $0.0$ | $-5.3$ | $-60.9$ | $0.0$ | $-5.3$ |
+| L2 | $0.0$ | $60.9$ | $-5.3$ | $0.0$ | $-59.1$ | $0.0$ |
+| L3 | $-59.1$ | $0.0$ | $0.0$ | $-59.1$ | $0.0$ | $0.0$ |
+
+**Lagerkräfte, auf das Tragwerk**
+
+| Lager | $R_x\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| ---: | ---: | ---: | ---: |
+| A1 (K1) | $0.0$ | $60.9$ | $5.3$ |
+| A2 (K4) | $0.0$ | $59.1$ | $0.0$ |
+
+**Extremwerte**
+
+| Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| L1 | $N$ | $-60.9\ \mathrm{kN}$ | $0.00$ | $-60.9\ \mathrm{kN}$ | $0.00$ |
+| L1 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L1 | $M$ | $-5.3\ \mathrm{kNm}$ | $0.00$ | $-5.3\ \mathrm{kNm}$ | $4.00$ |
+| L1 | $w$ | $-0.47\ \mathrm{mm}$ | $2.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L2 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L2 | $V$ | $-59.1\ \mathrm{kN}$ | $6.00$ | $60.9\ \mathrm{kN}$ | $0.00$ |
+| L2 | $M$ | $-5.3\ \mathrm{kNm}$ | $0.00$ | $87.4\ \mathrm{kNm}$ | $3.04$ |
+| L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $1.79\ \mathrm{mm}$ | $3.02$ |
+| L3 | $N$ | $-59.1\ \mathrm{kN}$ | $0.00$ | $-59.1\ \mathrm{kN}$ | $0.00$ |
+| L3 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L3 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $4.00$ |
+| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+
+Grösste Durchbiegung gegen die Sehne: L2, w = 1.79 mm bei x = 3.02 m, L/w = 3345.
+
+**Gleichgewichtsprobe (Moment um den Ursprung)**
+
+|  | Lasten | Lager | Summe |  |
+| ---: | ---: | ---: | ---: | ---: |
+| $\sum F_x$ | $0.000$ | $0.000$ | $0.000$ | kN |
+| $\sum F_z$ | $-120.000$ | $120.000$ | $0.000$ | kN |
+| $\sum M_0$ | $-360.000$ | $360.000$ | $0.000$ | kNm |
 
 #### Lastfall «Wind»
 
@@ -1908,14 +1991,14 @@ Grösste Durchbiegung gegen die Sehne: L1, w = 0.15 mm bei x = 3.00 m, L/w = 265
 | $\sum F_z$ | $0.000$ | $0.000$ | $0.000$ | kN |
 | $\sum M_0$ | $-24.000$ | $24.000$ | $0.000$ | kNm |
 
-#### Kombination «Tragsicherheit»
+#### Kombination «GZT»
 
-1\.35 · Eigengewicht + 1.5 · Wind
+1\.35 · Eigengewicht + 1.35 · Auflast + 1.5 · Wind
 
 **Lastvektor (kN, kNm) und Lösung (m, rad)**
 
 $$
-\mathbf{F} = \begin{bmatrix} 9.000 \\ -101.2 \\ -95.25 \\ 0 \\ -101.3 \\ 101.3 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 0.005514 \\ -1.333 \cdot 10^{-4} \\ -0.001699 \\ 0.005514 \\ -1.344 \cdot 10^{-4} \\ 0.001686 \\ -0.001378 \\ -0.001378 \end{bmatrix}
+\mathbf{F} = \begin{bmatrix} 9.000 \\ -105.3 \\ -93.22 \\ 0 \\ -105.3 \\ 99.23 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 0.005451 \\ -1.386 \cdot 10^{-4} \\ -0.001668 \\ 0.005451 \\ -1.398 \cdot 10^{-4} \\ 0.001653 \\ -0.001363 \\ -0.001363 \end{bmatrix}
 $$
 
 **Verschiebungen der Knoten**
@@ -1923,51 +2006,112 @@ $$
 | Knoten | $u_x\ [\mathrm{mm}]$ | $u_z\ [\mathrm{mm}]$ | $\varphi\ [\mathrm{mrad}]$ |
 | ---: | ---: | ---: | ---: |
 | K1 | $0.00$ | $0.00$ | $0.000$ |
-| K2 | $5.51$ | $-0.13$ | $-1.699$ |
-| K3 | $5.51$ | $-0.13$ | $1.686$ |
-| K4 | $0.00$ | $0.00$ | $-1.378$ |
+| K2 | $5.45$ | $-0.14$ | $-1.668$ |
+| K3 | $5.45$ | $-0.14$ | $1.653$ |
+| K4 | $0.00$ | $0.00$ | $-1.363$ |
 
 **Schnittgrössen an den Stabenden**
 
 | Stab | $N_{a}\ [\mathrm{kN}]$ | $V_{a}\ [\mathrm{kN}]$ | $M_{a}\ [\mathrm{kNm}]$ | $N_{b}\ [\mathrm{kN}]$ | $V_{b}\ [\mathrm{kN}]$ | $M_{b}\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $-100.9$ | $18.0$ | $-33.6$ | $-100.9$ | $0.0$ | $2.4$ |
-| L2 | $0.0$ | $100.9$ | $2.4$ | $0.0$ | $-101.6$ | $0.0$ |
-| L3 | $-101.6$ | $0.0$ | $0.0$ | $-101.6$ | $0.0$ | $0.0$ |
+| L1 | $-111.0$ | $18.0$ | $-33.5$ | $-98.8$ | $0.0$ | $2.5$ |
+| L2 | $0.0$ | $98.8$ | $2.5$ | $0.0$ | $-99.6$ | $0.0$ |
+| L3 | $-99.6$ | $0.0$ | $0.0$ | $-111.8$ | $0.0$ | $0.0$ |
 
 **Lagerkräfte, auf das Tragwerk**
 
 | Lager | $R_x\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: |
-| A1 (K1) | $-18.0$ | $100.9$ | $33.6$ |
-| A2 (K4) | $0.0$ | $101.6$ | $0.0$ |
+| A1 (K1) | $-18.0$ | $111.0$ | $33.5$ |
+| A2 (K4) | $0.0$ | $111.8$ | $0.0$ |
 
 **Extremwerte**
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $-100.9\ \mathrm{kN}$ | $0.00$ | $-100.9\ \mathrm{kN}$ | $0.00$ |
+| L1 | $N$ | $-111.0\ \mathrm{kN}$ | $0.00$ | $-98.8\ \mathrm{kN}$ | $4.00$ |
 | L1 | $V$ | $0.0\ \mathrm{kN}$ | $4.00$ | $18.0\ \mathrm{kN}$ | $0.00$ |
-| L1 | $M$ | $-33.6\ \mathrm{kNm}$ | $0.00$ | $2.4\ \mathrm{kNm}$ | $4.00$ |
-| L1 | $w$ | $-0.81\ \mathrm{mm}$ | $1.38$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L1 | $M$ | $-33.5\ \mathrm{kNm}$ | $0.00$ | $2.5\ \mathrm{kNm}$ | $4.00$ |
+| L1 | $w$ | $-0.79\ \mathrm{mm}$ | $1.37$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L2 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L2 | $V$ | $-101.6\ \mathrm{kN}$ | $6.00$ | $100.9\ \mathrm{kN}$ | $0.00$ |
-| L2 | $M$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $153.1\ \mathrm{kNm}$ | $2.99$ |
-| L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $3.17\ \mathrm{mm}$ | $3.00$ |
-| L3 | $N$ | $-101.6\ \mathrm{kN}$ | $0.00$ | $-101.6\ \mathrm{kN}$ | $0.00$ |
+| L2 | $V$ | $-99.6\ \mathrm{kN}$ | $6.00$ | $98.8\ \mathrm{kN}$ | $0.00$ |
+| L2 | $M$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $150.1\ \mathrm{kNm}$ | $2.99$ |
+| L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $3.11\ \mathrm{mm}$ | $3.00$ |
+| L3 | $N$ | $-111.8\ \mathrm{kN}$ | $4.00$ | $-99.6\ \mathrm{kN}$ | $0.00$ |
 | L3 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L3 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $4.00$ |
-| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $2.44$ |
+| L3 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 
-Grösste Durchbiegung gegen die Sehne: L2, w = 3.17 mm bei x = 3.00 m, L/w = 1895.
+Grösste Durchbiegung gegen die Sehne: L2, w = 3.11 mm bei x = 3.00 m, L/w = 1932.
 
 **Gleichgewichtsprobe (Moment um den Ursprung)**
 
 |  | Lasten | Lager | Summe |  |
 | ---: | ---: | ---: | ---: | ---: |
 | $\sum F_x$ | $18.000$ | $-18.000$ | $0.000$ | kN |
-| $\sum F_z$ | $-202.500$ | $202.500$ | $0.000$ | kN |
-| $\sum M_0$ | $-643.500$ | $643.500$ | $0.000$ | kNm |
+| $\sum F_z$ | $-222.750$ | $222.750$ | $0.000$ | kN |
+| $\sum M_0$ | $-704.250$ | $704.250$ | $0.000$ | kNm |
+
+#### Kombination «GZG»
+
+1 · Eigengewicht + 1 · Auflast + 1 · Wind
+
+**Lastvektor (kN, kNm) und Lösung (m, rad)**
+
+$$
+\mathbf{F} = \begin{bmatrix} 6.000 \\ -78.00 \\ -69.50 \\ 0 \\ -78.00 \\ 73.50 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 0.003862 \\ -1.029 \cdot 10^{-4} \\ -0.001226 \\ 0.003862 \\ -1.033 \cdot 10^{-4} \\ 0.001220 \\ -9.656 \cdot 10^{-4} \\ -9.656 \cdot 10^{-4} \end{bmatrix}
+$$
+
+**Verschiebungen der Knoten**
+
+| Knoten | $u_x\ [\mathrm{mm}]$ | $u_z\ [\mathrm{mm}]$ | $\varphi\ [\mathrm{mrad}]$ |
+| ---: | ---: | ---: | ---: |
+| K1 | $0.00$ | $0.00$ | $0.000$ |
+| K2 | $3.86$ | $-0.10$ | $-1.226$ |
+| K3 | $3.86$ | $-0.10$ | $1.220$ |
+| K4 | $0.00$ | $0.00$ | $-0.966$ |
+
+**Schnittgrössen an den Stabenden**
+
+| Stab | $N_{a}\ [\mathrm{kN}]$ | $V_{a}\ [\mathrm{kN}]$ | $M_{a}\ [\mathrm{kNm}]$ | $N_{b}\ [\mathrm{kN}]$ | $V_{b}\ [\mathrm{kN}]$ | $M_{b}\ [\mathrm{kNm}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| L1 | $-82.3$ | $12.0$ | $-23.0$ | $-73.3$ | $0.0$ | $1.0$ |
+| L2 | $0.0$ | $73.3$ | $1.0$ | $0.0$ | $-73.7$ | $0.0$ |
+| L3 | $-73.7$ | $0.0$ | $0.0$ | $-82.7$ | $0.0$ | $0.0$ |
+
+**Lagerkräfte, auf das Tragwerk**
+
+| Lager | $R_x\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| ---: | ---: | ---: | ---: |
+| A1 (K1) | $-12.0$ | $82.3$ | $23.0$ |
+| A2 (K4) | $0.0$ | $82.7$ | $0.0$ |
+
+**Extremwerte**
+
+| Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| L1 | $N$ | $-82.3\ \mathrm{kN}$ | $0.00$ | $-73.3\ \mathrm{kN}$ | $4.00$ |
+| L1 | $V$ | $0.0\ \mathrm{kN}$ | $4.00$ | $12.0\ \mathrm{kN}$ | $0.00$ |
+| L1 | $M$ | $-23.0\ \mathrm{kNm}$ | $0.00$ | $1.0\ \mathrm{kNm}$ | $4.00$ |
+| L1 | $w$ | $-0.58\ \mathrm{mm}$ | $1.42$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L2 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L2 | $V$ | $-73.7\ \mathrm{kN}$ | $6.00$ | $73.3\ \mathrm{kN}$ | $0.00$ |
+| L2 | $M$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $110.8\ \mathrm{kNm}$ | $2.99$ |
+| L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $2.29\ \mathrm{mm}$ | $3.00$ |
+| L3 | $N$ | $-82.7\ \mathrm{kN}$ | $4.00$ | $-73.7\ \mathrm{kN}$ | $0.00$ |
+| L3 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L3 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $4.00$ |
+| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $2.19$ |
+
+Grösste Durchbiegung gegen die Sehne: L2, w = 2.29 mm bei x = 3.00 m, L/w = 2620.
+
+**Gleichgewichtsprobe (Moment um den Ursprung)**
+
+|  | Lasten | Lager | Summe |  |
+| ---: | ---: | ---: | ---: | ---: |
+| $\sum F_x$ | $12.000$ | $-12.000$ | $0.000$ | kN |
+| $\sum F_z$ | $-165.000$ | $165.000$ | $0.000$ | kN |
+| $\sum M_0$ | $-519.000$ | $519.000$ | $0.000$ | kNm |
 
 ## Verwendete Formeln
 
@@ -2647,6 +2791,12 @@ $$
 EI_{\text{Q1}} = E_{cm} \cdot I_{\text{Q1}}
 $$
 
+**Eigengewicht, «Stütze 300×300» aus C30/37**
+
+$$
+g_{k} = \rho_{sb} \cdot g \cdot A_{\text{Q1}}
+$$
+
 ### Steifigkeitsmethode
 
 **Steifigkeitsmatrix eines Stabs, in seinen Achsen**
@@ -2830,11 +2980,14 @@ Alle geführten Nachweise sind erfüllt.
 | Breite, Stütze 300×300 | $b_{\text{Q1}}$ | $300$ | mm | Vorgabe |
 | Dehnsteifigkeit, Stütze 300×300, C30/37 | $EA_{\text{Q1}}$ | $3026$ | MN | berechnet |
 | Biegesteifigkeit, Stütze 300×300, C30/37 | $EI_{\text{Q1}}$ | $22693$ | kNm² | berechnet |
+| Eigengewicht je Meter, Stütze 300×300, C30/37 | $g_{k,\text{Q1}}$ | $2.25$ | kN/m | berechnet |
 | Höhe, Stütze 300×300 | $h_{\text{Q1}}$ | $300$ | mm | Vorgabe |
 | Querschnittsfläche, Unterzug | $A_{\text{Q2}}$ | $180000$ | mm² | berechnet |
 | Flächenträgheitsmoment, Unterzug | $I_{\text{Q2}}$ | $5400$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Unterzug, C30/37 | $EA_{\text{Q2}}$ | $6052$ | MN | berechnet |
 | Biegesteifigkeit, Unterzug, C30/37 | $EI_{\text{Q2}}$ | $181547$ | kNm² | berechnet |
+| Eigengewicht je Meter, Unterzug, C30/37 | $g_{k,\text{Q2}}$ | $4.5$ | kN/m | berechnet |
+| Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Mittelwert des Elastizitätsmoduls | $E_{cm}$ | $33620$ | N/mm² | berechnet |
 | Dehnung am Ende des ansteigenden Astes | $\varepsilon_{c1d}$ | $2$ | ‰ | Vorgabe |
 | Bruchdehnung des Betons | $\varepsilon_{c2d}$ | $3.5$ | ‰ | Vorgabe |
@@ -2845,6 +2998,7 @@ Alle geführten Nachweise sind erfüllt.
 | Mittelwert der Zugfestigkeit | $f_{ctm}$ | $2.9$ | N/mm² | Vorgabe |
 | Teilsicherheitsbeiwert für Beton | $\gamma_c$ | $1.5$ |  | Vorgabe |
 | Beiwert für die Gesteinskörnung | $k_e$ | $10000$ |  | Vorgabe |
+| Dichte des Stahlbetons | $\rho_{sb}$ | $2500$ | kg/m³ | Vorgabe |
 | Bemessungswert der Schubspannungsgrenze | $\tau_{cd}$ | $1.1$ | N/mm² | berechnet |
 | Elastizitätsmodul des Betonstahls | $E_s$ | $200000$ | N/mm² | Vorgabe |
 | Bemessungswert der Dehnung bei Höchstlast | $\varepsilon_{ud}$ | $4.5$ | % | Vorgabe |

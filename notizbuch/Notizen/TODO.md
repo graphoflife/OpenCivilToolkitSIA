@@ -379,10 +379,15 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 ## Noch nicht gebaut
 
-- [ ] **Balkensysteme, nächste Schritte:** Eigengewicht aus Querschnitt und
-      Wichte, Umhüllende der Kombinationen, Theorie 2. Ordnung,
-      Schubverformung, schiefe Lager, und die Schnittgrössen eines Stabs als
-      Einwirkung einer Platte oder Querschnittsanalyse.
+- [ ] **Balkensysteme, nächste Schritte:** Umhüllende der Kombinationen,
+      Theorie 2. Ordnung, Schubverformung, schiefe Lager, und die
+      Schnittgrössen eines Stabs als Einwirkung einer Platte oder
+      Querschnittsanalyse.
+- [ ] **Balkensystem, Etappen 4 und 5** (Wunsch vom 2026-10-23): unter der
+      Zeichnung die Listen der Materialien und Querschnitte, der E-Modul als
+      Zahl, vom Material oder vom Querschnitt (E₀ oder E_eq bei gegebenem N
+      und M); das Material «gemäss Querschnitt»; die Kombinationen
+      übersichtlich wie das Panel des Querschnitts.
 
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
       Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit

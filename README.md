@@ -117,16 +117,17 @@ balken = r.linie((0, 4), (6, 4), querschnitt=riegel, material="b1")
 r.linie((6, 4), (6, 0), querschnitt=stuetze, material="b1", gelenk_anfang=True)
 r.lager_an((0, 0), "eingespannt")             # gelenkig, verschieblich oder je Richtung
 r.lager_an((6, 0), "gelenkig")
-g = r.lastfall("Eigengewicht")
+g = r.lastfall("Eigengewicht", eigengewicht=True)  # ρ · g · A je Stab, von selbst
+a = r.lastfall("Auflast")
 w = r.lastfall("Wind")
-r.stablast(g, balken, wert=25.0)              # kN/m, senkrecht nach unten positiv
+r.stablast(a, balken, wert=25.0)              # kN/m, senkrecht nach unten positiv
 r.stablast(w, links, wert=3.0, richtung="waagrecht")
 r.knotenlast(w, (0, 4), 10.0, richtung="waagrecht")          # kN
-r.kombination("Tragsicherheit", (g, 1.35), (w, 1.5))
+r.kombination("GZT", (g, 1.35), (a, 1.35), (w, 1.5))
 
 system = p.rechnen().balkensystem("Rahmen")
 system.ergebnis.meldungen                     # leer -- oder warum nicht gerechnet wird
-system.verlaeufe("Tragsicherheit")["L2"].extrem("M")         # in SI: Stelle, Wert
+system.verlaeufe("GZT")["L2"].extrem("M")     # in SI: Stelle, Wert
 ```
 
 Ein Flachfundament mit Grundbruch und Gleiten -- Winkel in Grad, Masse in m,
@@ -428,7 +429,11 @@ Linie, einzeln dort, wo geklickt wurde, in % der Linie --, eine Einzellast
 oder ein Moment auch an einen Knoten. Jede Last ist für sich zu wählen, an
 ihrem Pfeil, Band oder ihrer Zahl, und mit Entf zu löschen. Gezeigt werden
 die Lasten des Lastfalls, der über der Zeichnung gewählt ist; unter ihr
-stehen alle in einer Liste.
+stehen alle in einer Liste. Ein neues System bringt die Lastfälle
+Eigengewicht, Auflast und Nutzlast mit und die Kombinationen GZT (1.35 /
+1.35 / 1.5) und GZG (je 1.0). Das Eigengewicht kommt von selbst: je Stab
+ρ · g · A mit g = 10 m/s², beim Beton mit der Dichte des Stahlbetons --
+grau gezeichnet in seinem Lastfall.
 Anders als im Querschnitt hängt ein Rahmen an seinen Knoten: ein Klick an
 einem Knoten wählt ihn, ein verschobener Stab nimmt seine Knoten mit.
 Teilen und Umkehren rechnet der Kern -- dabei entstehen Lastwerte. Ist das
@@ -521,7 +526,7 @@ weisse Karten; ein Klick auf den Kopf klappt es zu.
   wählbaren Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert; ein
   Klick auf einen Lastfall legt den Schnitt durch ihn), dazu je Lastfall der
   Bruchzustand im Schnitt und der Schubfluss in den Wänden; bei einem
-  Balkensystem je Fall Verformung, N, V, M und Lagerkräfte -- mit der Maus
+  Balkensystem je Kombination Verformung, N, V, M und Lagerkräfte -- mit der Maus
   darüber (auf dem Telefon: tippen) der Wert an der Stelle, an einem Knoten
   seine Verschiebung; bei einem Grundbruch und einer Setzung die Situation
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle; je

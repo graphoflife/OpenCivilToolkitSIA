@@ -1,5 +1,5 @@
 ---
-erzeugt: fe413ffb807c
+erzeugt: c1032b2af907
 art: modul
 tags: [modul]
 ---
@@ -217,6 +217,7 @@ Ein Lastfall des Systems: eine Kennung, auf die die Lasten zeigen, und ein Name.
 
 - `kennung: str = ''`
 - `name: str = ''`
+- `eigengewicht: bool = False` – Ob der Lastfall das Eigengewicht aller Staebe bekommt -- von selbst, aus Dichte und Flaeche (Benutzer, 2026-10-23). Ein System hat einen davon.
 
 ### LastkombinationEintrag
 
@@ -246,6 +247,7 @@ uebersetzen laesst, steht in `meldungen`, wie die des Rechenkerns.
 - `system: System`
 - `paare: Dict[str, Tuple[str, str]] = field(default_factory=dict)` – Je tragenden Stab die Kennungen seines Querschnitts und seines Materials.
 - `meldungen: List[Meldung] = field(default_factory=list)`
+- `eigengewicht: Optional[str] = None` – Der Name des Lastfalls, der das Eigengewicht der Staebe bekommt -- oder keiner.
 
 #### Modell.gueltig
 
@@ -399,7 +401,7 @@ Ein Querschnitt mit Kennwerten von Hand -- A in mm², I in 10⁶ mm⁴.
 #### BalkensystemEintrag.lastfall
 
 ```python
-def lastfall(self, name: str) -> LastfallEintrag
+def lastfall(self, name: str, *, eigengewicht: bool=False) -> LastfallEintrag
 ```
 
 #### BalkensystemEintrag.kombination
@@ -457,10 +459,11 @@ Linie. Senkrecht, waagrecht und Momente aendern sich nicht.
 def neu(cls, kennung: str, name: str) -> 'BalkensystemEintrag'
 ```
 
-Ein frisches System, wie der Benutzer es angelegt bekommt: leer,
-ohne Knoten, Linie, Lager, Querschnitt und Lastfall (Benutzer,
-2026-10-19). Bis dahin kam es als Einfeldtraeger von 6 m mit einem
-Lastfall von 10 kN/m.
+Ein frisches System, wie der Benutzer es angelegt bekommt: ohne
+Knoten, Linie, Lager und Querschnitt (Benutzer, 2026-10-19), aber mit
+den Lastfaellen Eigengewicht -- es kommt von selbst --, Auflast und
+Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
+1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23).
 
 
 ## Konstanten

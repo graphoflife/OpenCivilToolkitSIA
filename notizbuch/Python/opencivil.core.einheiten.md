@@ -1,5 +1,5 @@
 ---
-erzeugt: 70074890b528
+erzeugt: d637c48644c1
 art: modul
 tags: [modul]
 ---
@@ -384,6 +384,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `KRAFT_PRO_LAENGE = KRAFT / LAENGE`
 - `MOMENT_PRO_LAENGE = MOMENT / LAENGE`
 - `DICHTE = MASSE / VOLUMEN`
+- `BESCHLEUNIGUNG = LAENGE / ZEIT ** 2`
 - `FLAECHE_PRO_LAENGE = FLAECHE / LAENGE`
 - `KRUEMMUNG = DIMENSIONSLOS / LAENGE`
 - `_HOCHGESTELLT = {'1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷'…` – Hochgestellte Ziffern, soweit es sie als eigenes Zeichen gibt.
@@ -424,6 +425,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `T = Einheit('t', MASSE, 1000.0)`
 - `KG_PRO_M3 = Einheit('kg/m^3', DICHTE, 1.0, latex='\\mathrm{kg}/\\mathrm{m}^{3}')`
 - `KN_PRO_M3 = Einheit('kN/m^3', KRAFT / VOLUMEN, 1000.0, latex='\\mathrm{kN}/\\math…`
+- `M_PRO_S2 = Einheit('m/s^2', BESCHLEUNIGUNG, 1.0, latex='\\mathrm{m}/\\mathrm{s}^…`
 - `S = Einheit('s', ZEIT, 1.0)`
 - `MIN = Einheit('min', ZEIT, 60.0)`
 - `H = Einheit('h', ZEIT, 3600.0)`

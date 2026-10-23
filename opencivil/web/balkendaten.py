@@ -51,6 +51,9 @@ def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
         "beweglich": list(e.beweglich),
         "unbekannte": len(e.unbekannte),
         "faelle": [_fall(befund, f) for f in e.faelle],
+        # Das Eigengewicht je Stab in kN/m -- das Zeichenfenster zeigt es im
+        # Lastfall, der es bekommt; gewaehlt und geloescht wird es nicht.
+        "eigengewicht": {stab: g * kN for stab, g in befund.eigengewicht.items()},
     }
 
 

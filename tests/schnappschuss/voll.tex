@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-379 Berechnungen ausgeführt, 634 Werte bestimmt.
+389 Berechnungen ausgeführt, 644 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -1313,6 +1313,10 @@ E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38} = 33620\,\mathrm{
 \begin{equation*}
 f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
+\noindent\textbf{Dichte des Stahlbetons}
+\begin{equation*}
+\rho_{sb} = 2500\,\mathrm{kg}/\mathrm{m}^{3}
+\end{equation*}
 \subsection{Betonstahl: B500B}
 \noindent\textbf{Elastizitätsmodul des Betonstahls} \hfill \normref{SIA 262:2025, 3.2.2.4}
 \begin{equation*}
@@ -1341,6 +1345,10 @@ f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}
 \noindent\textbf{Bemessungswert der Dehnung bei Höchstlast} \hfill \normref{SIA 262:2025, 4.2.2.1}
 \begin{equation*}
 \varepsilon_{ud} = 4.5\,\%
+\end{equation*}
+\noindent\textbf{Dichte des Stahls}
+\begin{equation*}
+\rho_s = 7850\,\mathrm{kg}/\mathrm{m}^{3}
 \end{equation*}
 \subsection{Plattenanalyse: Dach}
 \noindent\textbf{Plattendicke}
@@ -7171,6 +7179,14 @@ EA_{\text{Q1,C30/37}} = E_{cm} \cdot A_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{m
 \begin{equation*}
 EI_{\text{Q1,C30/37}} = E_{cm} \cdot I_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3125\,\cdot 10^{6}\,\mathrm{mm}^{4} = 105062\,\mathrm{kNm}^{2}
 \end{equation*}
+\noindent\textbf{Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)}
+\begin{equation*}
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+\end{equation*}
+\noindent\textbf{Eigengewicht, «Balken 300×500» aus C30/37}
+\begin{equation*}
+g_{k,\text{Q1,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q1}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 150000\,\mathrm{mm}^{2} = 3.75\,\mathrm{kN}/\mathrm{m}
+\end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Rundstütze» aus C30/37}
 \begin{equation*}
 EA_{\text{Q2,C30/37}} = E_{cm} \cdot A_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 125664\,\mathrm{mm}^{2} = 4225\,\mathrm{MN}
@@ -7178,6 +7194,10 @@ EA_{\text{Q2,C30/37}} = E_{cm} \cdot A_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{m
 \noindent\textbf{Biegesteifigkeit, «Rundstütze» aus C30/37}
 \begin{equation*}
 EI_{\text{Q2,C30/37}} = E_{cm} \cdot I_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 42248\,\mathrm{kNm}^{2}
+\end{equation*}
+\noindent\textbf{Eigengewicht, «Rundstütze» aus C30/37}
+\begin{equation*}
+g_{k,\text{Q2,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q2}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 125664\,\mathrm{mm}^{2} = 3.14\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Plattenbalken» aus C30/37}
 \begin{equation*}
@@ -7187,6 +7207,10 @@ EA_{\text{Q5,C30/37}} = E_{cm} \cdot A_{\text{Q5}} = 33620\,\mathrm{N}/\mathrm{m
 \begin{equation*}
 EI_{\text{Q5,C30/37}} = E_{cm} \cdot I_{\text{Q5}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 9600\,\cdot 10^{6}\,\mathrm{mm}^{4} = 322750\,\mathrm{kNm}^{2}
 \end{equation*}
+\noindent\textbf{Eigengewicht, «Plattenbalken» aus C30/37}
+\begin{equation*}
+g_{k,\text{Q5,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q5}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 360000\,\mathrm{mm}^{2} = 9\,\mathrm{kN}/\mathrm{m}
+\end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Rohr» aus B500B}
 \begin{equation*}
 EA_{\text{Q3,B500B}} = E_s \cdot A_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4973\,\mathrm{mm}^{2} = 995\,\mathrm{MN}
@@ -7194,6 +7218,10 @@ EA_{\text{Q3,B500B}} = E_s \cdot A_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^
 \noindent\textbf{Biegesteifigkeit, «Rohr» aus B500B}
 \begin{equation*}
 EI_{\text{Q3,B500B}} = E_s \cdot I_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3128\,\mathrm{kNm}^{2}
+\end{equation*}
+\noindent\textbf{Eigengewicht, «Rohr» aus B500B}
+\begin{equation*}
+g_{k,\text{Q3,B500B}} = \rho_s \cdot g \cdot A_{\text{Q3}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 4973\,\mathrm{mm}^{2} = 0.39\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Walzprofil» aus B500B}
 \begin{equation*}
@@ -7203,6 +7231,10 @@ EA_{\text{Q6,B500B}} = E_s \cdot A_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^
 \begin{equation*}
 EI_{\text{Q6,B500B}} = E_s \cdot I_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4} = 48374\,\mathrm{kNm}^{2}
 \end{equation*}
+\noindent\textbf{Eigengewicht, «Walzprofil» aus B500B}
+\begin{equation*}
+g_{k,\text{Q6,B500B}} = \rho_s \cdot g \cdot A_{\text{Q6}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 14282\,\mathrm{mm}^{2} = 1.12\,\mathrm{kN}/\mathrm{m}
+\end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Fundamentbalken» aus C30/37}
 \begin{equation*}
 EA_{\text{Q7,C30/37}} = E_{cm} \cdot A_{\text{Q7}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 250000\,\mathrm{mm}^{2} = 8405\,\mathrm{MN}
@@ -7211,6 +7243,10 @@ EA_{\text{Q7,C30/37}} = E_{cm} \cdot A_{\text{Q7}} = 33620\,\mathrm{N}/\mathrm{m
 \begin{equation*}
 EI_{\text{Q7,C30/37}} = E_{cm} \cdot I_{\text{Q7}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4} = 172768\,\mathrm{kNm}^{2}
 \end{equation*}
+\noindent\textbf{Eigengewicht, «Fundamentbalken» aus C30/37}
+\begin{equation*}
+g_{k,\text{Q7,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q7}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 250000\,\mathrm{mm}^{2} = 6.25\,\mathrm{kN}/\mathrm{m}
+\end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Hohlprofil» aus B500B}
 \begin{equation*}
 EA_{\text{Q4,B500B}} = E_s \cdot A_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 11875\,\mathrm{mm}^{2} = 2375\,\mathrm{MN}
@@ -7218,6 +7254,10 @@ EA_{\text{Q4,B500B}} = E_s \cdot A_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^
 \noindent\textbf{Biegesteifigkeit, «Hohlprofil» aus B500B}
 \begin{equation*}
 EI_{\text{Q4,B500B}} = E_s \cdot I_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 29342\,\mathrm{kNm}^{2}
+\end{equation*}
+\noindent\textbf{Eigengewicht, «Hohlprofil» aus B500B}
+\begin{equation*}
+g_{k,\text{Q4,B500B}} = \rho_s \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \hinweis{Annahme}{Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).}
 \noindent\textbf{Stäbe}
@@ -7286,10 +7326,10 @@ v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
 Knoten & $u_x\ [\mathrm{mm}]$ & $u_z\ [\mathrm{mm}]$ & $\varphi\ [\mathrm{mrad}]$ \\
 \hline
 \endhead
-K1 & $0.00$ & $-0.11$ & $-0.111$ \\
-K2 & $0.00$ & $-0.99$ & $-0.122$ \\
-K3 & $-0.11$ & $-0.99$ & $0.198$ \\
-K4 & $-0.59$ & $-0.04$ & $0.277$ \\
+K1 & $0.00$ & $-0.16$ & $-0.140$ \\
+K2 & $0.00$ & $-2.28$ & $-0.549$ \\
+K3 & $0.28$ & $-2.30$ & $0.364$ \\
+K4 & $-0.79$ & $-0.16$ & $0.687$ \\
 K5 & $0.00$ & $0.00$ & nicht bestimmbar \\
 K6 & $0.00$ & $0.00$ & $0.000$ \\
 K7 & $0.00$ & $0.00$ & $0.000$ \\
@@ -7302,13 +7342,13 @@ K9 & $0.00$ & $0.00$ & $0.000$ \\
 Stab & $N_{a}\ [\mathrm{kN}]$ & $V_{a}\ [\mathrm{kN}]$ & $M_{a}\ [\mathrm{kNm}]$ & $N_{b}\ [\mathrm{kN}]$ & $V_{b}\ [\mathrm{kN}]$ & $M_{b}\ [\mathrm{kNm}]$ \\
 \hline
 \endhead
-L1 & $0.0$ & $5.4$ & $-1.1$ & $0.0$ & $9.1$ & $4.5$ \\
-L2 & $-9.1$ & $0.0$ & $4.5$ & $-9.1$ & $0.0$ & $4.5$ \\
-L3 & $-4.1$ & $8.1$ & $-0.5$ & $3.9$ & $-7.9$ & $0.0$ \\
-L4 & $-8.8$ & $0.0$ & $0.0$ & $-8.8$ & $0.0$ & $0.0$ \\
-L5 & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
+L1 & $0.0$ & $7.9$ & $-1.4$ & $0.0$ & $36.5$ & $12.9$ \\
+L2 & $-36.5$ & $0.0$ & $12.9$ & $-27.1$ & $0.0$ & $12.9$ \\
+L3 & $-12.1$ & $24.2$ & $7.9$ & $13.9$ & $-27.8$ & $0.0$ \\
+L4 & $-31.0$ & $0.0$ & $0.0$ & $-33.0$ & $0.0$ & $0.0$ \\
+L5 & $0.0$ & $1.3$ & $0.0$ & $0.0$ & $-2.1$ & $-1.3$ \\
 L6 & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
-L8 & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
+L8 & $-1.9$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Lagerkräfte, auf das Tragwerk}
@@ -7317,12 +7357,12 @@ L8 & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
 Lager & $R_x\ [\mathrm{kN}]$ & $R_z\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
 \hline
 \endhead
-A1 (K1) & $0.0$ & $5.4$ & $1.1$ \\
-A2 (K5) & $0.0$ & $8.8$ & $0.0$ \\
-K6 & $0.0$ & $0.0$ & $0.0$ \\
+A1 (K1) & $0.0$ & $7.9$ & $1.4$ \\
+A2 (K5) & $0.0$ & $34.2$ & $0.0$ \\
+K6 & $0.0$ & $4.0$ & $-1.3$ \\
 K7 & $0.0$ & $0.0$ & $0.0$ \\
-L6: Lasten geradewegs ins Linienlager & $0.0$ & $20.0$ & $320.0$ \\
-L1: Bettung, Summe & $0.0$ & $83.7$ & $424.3$ \\
+L6: Lasten geradewegs ins Linienlager & $0.0$ & $32.5$ & $520.0$ \\
+L1: Bettung, Summe & $0.0$ & $138.6$ & $755.3$ \\
 \hline
 \end{longtable}
 Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
@@ -7333,37 +7373,37 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 Stab & Grösse & kleinst & $x\ [\mathrm{m}]$ & grösst & $x\ [\mathrm{m}]$ \\
 \hline
 \endhead
-L1 & $N$ & $0.0\ \mathrm{kN}$ & $4.00$ & $0.0\ \mathrm{kN}$ & $3.00$ \\
-L1 & $V$ & $0.7\ \mathrm{kN}$ & $3.76$ & $9.1\ \mathrm{kN}$ & $8.00$ \\
-L1 & $M$ & $-2.2\ \mathrm{kNm}$ & $5.69$ & $4.5\ \mathrm{kNm}$ & $8.00$ \\
-L1 & $w$ & $-0.05\ \mathrm{mm}$ & $5.28$ & $0.00\ \mathrm{mm}$ & $1.02$ \\
-L2 & $N$ & $-9.1\ \mathrm{kN}$ & $0.00$ & $-9.1\ \mathrm{kN}$ & $0.00$ \\
+L1 & $N$ & $0.0\ \mathrm{kN}$ & $3.00$ & $0.0\ \mathrm{kN}$ & $5.00$ \\
+L1 & $V$ & $-3.8\ \mathrm{kN}$ & $4.12$ & $36.5\ \mathrm{kN}$ & $8.00$ \\
+L1 & $M$ & $-15.9\ \mathrm{kNm}$ & $5.93$ & $12.9\ \mathrm{kNm}$ & $8.00$ \\
+L1 & $w$ & $-0.59\ \mathrm{mm}$ & $4.97$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
+L2 & $N$ & $-36.5\ \mathrm{kN}$ & $0.00$ & $-27.1\ \mathrm{kN}$ & $3.00$ \\
 L2 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
-L2 & $M$ & $4.5\ \mathrm{kNm}$ & $0.00$ & $4.5\ \mathrm{kNm}$ & $3.00$ \\
-L2 & $w$ & $0.00\ \mathrm{mm}$ & $3.00$ & $0.12\ \mathrm{mm}$ & $1.50$ \\
-L3 & $N$ & $-4.1\ \mathrm{kN}$ & $0.00$ & $3.9\ \mathrm{kN}$ & $4.47$ \\
-L3 & $V$ & $-7.9\ \mathrm{kN}$ & $4.47$ & $8.1\ \mathrm{kN}$ & $0.00$ \\
-L3 & $M$ & $-0.5\ \mathrm{kNm}$ & $0.00$ & $8.7\ \mathrm{kNm}$ & $2.27$ \\
-L3 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.06\ \mathrm{mm}$ & $2.25$ \\
-L4 & $N$ & $-8.8\ \mathrm{kN}$ & $0.00$ & $-8.8\ \mathrm{kN}$ & $0.00$ \\
+L2 & $M$ & $12.9\ \mathrm{kNm}$ & $0.00$ & $12.9\ \mathrm{kNm}$ & $3.00$ \\
+L2 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.34\ \mathrm{mm}$ & $1.50$ \\
+L3 & $N$ & $-12.1\ \mathrm{kN}$ & $0.00$ & $13.9\ \mathrm{kN}$ & $4.47$ \\
+L3 & $V$ & $-27.8\ \mathrm{kN}$ & $4.47$ & $24.2\ \mathrm{kN}$ & $0.00$ \\
+L3 & $M$ & $0.0\ \mathrm{kNm}$ & $4.47$ & $33.1\ \mathrm{kNm}$ & $2.09$ \\
+L3 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.22\ \mathrm{mm}$ & $2.19$ \\
+L4 & $N$ & $-33.0\ \mathrm{kN}$ & $5.00$ & $-31.0\ \mathrm{kN}$ & $0.00$ \\
 L4 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
-L4 & $M$ & $0.0\ \mathrm{kNm}$ & $5.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
-L4 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $3.52$ \\
+L4 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $5.00$ \\
+L4 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $3.00$ \\
 L5 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
-L5 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
-L5 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
-L5 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
+L5 & $V$ & $-2.1\ \mathrm{kN}$ & $3.00$ & $1.3\ \mathrm{kN}$ & $0.00$ \\
+L5 & $M$ & $-1.3\ \mathrm{kNm}$ & $3.00$ & $0.7\ \mathrm{kNm}$ & $1.12$ \\
+L5 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.01\ \mathrm{mm}$ & $1.26$ \\
 L6 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L6 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L6 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
 L6 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
-L8 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L8 & $N$ & $-1.9\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $2.00$ \\
 L8 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L8 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
 L8 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 \hline
 \end{longtable}
-Grösste Durchbiegung gegen die Sehne: L2, w = 0.12 mm bei x = 1.50 m, L/w = 24993.
+Grösste Durchbiegung gegen die Sehne: L1, w = -0.59 mm bei x = 4.97 m, L/w = 13476.
 
 \noindent\textbf{Gleichgewichtsprobe (Moment um den Ursprung)}
 \begin{longtable}{rrrrr}
@@ -7372,8 +7412,8 @@ Grösste Durchbiegung gegen die Sehne: L2, w = 0.12 mm bei x = 1.50 m, L/w = 249
 \hline
 \endhead
 $\sum F_x$ & $0.000$ & $0.000$ & $0.000$ & kN \\
-$\sum F_z$ & $-117.889$ & $117.889$ & $0.000$ & kN \\
-$\sum M_0$ & $-851.219$ & $851.219$ & $0.000$ & kNm \\
+$\sum F_z$ & $-217.242$ & $217.242$ & $0.000$ & kN \\
+$\sum M_0$ & $-1745.904$ & $1745.904$ & $0.000$ & kNm \\
 \hline
 \end{longtable}
 \subsubsection{Lastfall «Schnee und Wind»}
@@ -7481,10 +7521,10 @@ $\sum M_0$ & $-158.000$ & $158.000$ & $0.000$ & kNm \\
 Knoten & $u_x\ [\mathrm{mm}]$ & $u_z\ [\mathrm{mm}]$ & $\varphi\ [\mathrm{mrad}]$ \\
 \hline
 \endhead
-K1 & $0.00$ & $-0.15$ & $-0.125$ \\
-K2 & $0.04$ & $-1.97$ & $-0.756$ \\
-K3 & $1.99$ & $-1.98$ & $0.205$ \\
-K4 & $1.07$ & $-0.15$ & $0.633$ \\
+K1 & $0.00$ & $-0.22$ & $-0.163$ \\
+K2 & $0.04$ & $-3.71$ & $-1.332$ \\
+K3 & $2.52$ & $-3.74$ & $0.429$ \\
+K4 & $0.80$ & $-0.31$ & $1.186$ \\
 K5 & $0.00$ & $0.00$ & nicht bestimmbar \\
 K6 & $0.00$ & $0.00$ & $0.000$ \\
 K7 & $0.00$ & $0.00$ & $0.000$ \\
@@ -7497,13 +7537,13 @@ K9 & $0.00$ & $0.00$ & $0.000$ \\
 Stab & $N_{a}\ [\mathrm{kN}]$ & $V_{a}\ [\mathrm{kN}]$ & $M_{a}\ [\mathrm{kNm}]$ & $N_{b}\ [\mathrm{kN}]$ & $V_{b}\ [\mathrm{kN}]$ & $M_{b}\ [\mathrm{kNm}]$ \\
 \hline
 \endhead
-L1 & $27.0$ & $7.7$ & $-1.3$ & $27.0$ & $12.6$ & $-22.5$ \\
-L2 & $-12.6$ & $27.0$ & $-22.5$ & $-12.6$ & $15.0$ & $40.5$ \\
-L3 & $-5.6$ & $11.3$ & $33.8$ & $13.2$ & $-26.4$ & $0.0$ \\
-L4 & $-29.5$ & $0.0$ & $0.0$ & $-29.5$ & $0.0$ & $0.0$ \\
-L5 & $0.0$ & $2.2$ & $0.0$ & $0.0$ & $2.2$ & $0.8$ \\
+L1 & $27.0$ & $11.1$ & $-1.6$ & $27.0$ & $49.7$ & $-11.2$ \\
+L2 & $-49.7$ & $27.0$ & $-11.2$ & $-37.0$ & $15.0$ & $51.8$ \\
+L3 & $-16.5$ & $33.1$ & $45.1$ & $26.6$ & $-53.2$ & $0.0$ \\
+L4 & $-59.5$ & $0.0$ & $0.0$ & $-62.1$ & $0.0$ & $0.0$ \\
+L5 & $0.0$ & $4.0$ & $0.0$ & $0.0$ & $-0.6$ & $-1.0$ \\
 L6 & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
-L8 & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
+L8 & $-2.5$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Lagerkräfte, auf das Tragwerk}
@@ -7512,12 +7552,12 @@ L8 & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
 Lager & $R_x\ [\mathrm{kN}]$ & $R_z\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
 \hline
 \endhead
-A1 (K1) & $-27.0$ & $7.7$ & $1.3$ \\
-A2 (K5) & $0.0$ & $31.8$ & $0.0$ \\
-K6 & $0.0$ & $-2.2$ & $0.8$ \\
+A1 (K1) & $-27.0$ & $11.1$ & $1.6$ \\
+A2 (K5) & $0.0$ & $66.1$ & $0.0$ \\
+K6 & $0.0$ & $3.1$ & $-1.0$ \\
 K7 & $0.0$ & $0.0$ & $0.0$ \\
-L6: Lasten geradewegs ins Linienlager & $0.0$ & $27.0$ & $432.0$ \\
-L1: Bettung, Summe & $0.0$ & $113.0$ & $604.7$ \\
+L6: Lasten geradewegs ins Linienlager & $0.0$ & $43.9$ & $702.0$ \\
+L1: Bettung, Summe & $0.0$ & $187.2$ & $1051.6$ \\
 \hline
 \end{longtable}
 Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
@@ -7528,37 +7568,37 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 Stab & Grösse & kleinst & $x\ [\mathrm{m}]$ & grösst & $x\ [\mathrm{m}]$ \\
 \hline
 \endhead
-L1 & $N$ & $27.0\ \mathrm{kN}$ & $5.00$ & $27.0\ \mathrm{kN}$ & $2.00$ \\
-L1 & $V$ & $-5.4\ \mathrm{kN}$ & $5.59$ & $12.6\ \mathrm{kN}$ & $8.00$ \\
-L1 & $M$ & $-25.5\ \mathrm{kNm}$ & $7.34$ & $2.5\ \mathrm{kNm}$ & $1.63$ \\
-L1 & $w$ & $-0.62\ \mathrm{mm}$ & $5.48$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
-L2 & $N$ & $-12.6\ \mathrm{kN}$ & $0.00$ & $-12.6\ \mathrm{kN}$ & $0.00$ \\
+L1 & $N$ & $27.0\ \mathrm{kN}$ & $7.00$ & $27.0\ \mathrm{kN}$ & $3.00$ \\
+L1 & $V$ & $-10.4\ \mathrm{kN}$ & $4.79$ & $49.7\ \mathrm{kN}$ & $8.00$ \\
+L1 & $M$ & $-39.8\ \mathrm{kNm}$ & $6.55$ & $3.6\ \mathrm{kNm}$ & $1.31$ \\
+L1 & $w$ & $-1.34\ \mathrm{mm}$ & $5.17$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
+L2 & $N$ & $-49.7\ \mathrm{kN}$ & $0.00$ & $-37.0\ \mathrm{kN}$ & $3.00$ \\
 L2 & $V$ & $15.0\ \mathrm{kN}$ & $1.50$ & $27.0\ \mathrm{kN}$ & $0.00$ \\
-L2 & $M$ & $-22.5\ \mathrm{kNm}$ & $0.00$ & $40.5\ \mathrm{kNm}$ & $3.00$ \\
-L2 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.44\ \mathrm{mm}$ & $1.88$ \\
-L3 & $N$ & $-5.6\ \mathrm{kN}$ & $0.00$ & $13.2\ \mathrm{kN}$ & $4.47$ \\
-L3 & $V$ & $-26.4\ \mathrm{kN}$ & $4.47$ & $11.3\ \mathrm{kN}$ & $0.00$ \\
-L3 & $M$ & $0.0\ \mathrm{kNm}$ & $4.47$ & $41.4\ \mathrm{kNm}$ & $1.34$ \\
-L3 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.27\ \mathrm{mm}$ & $2.07$ \\
-L4 & $N$ & $-29.5\ \mathrm{kN}$ & $0.00$ & $-29.5\ \mathrm{kN}$ & $0.00$ \\
+L2 & $M$ & $-11.2\ \mathrm{kNm}$ & $0.00$ & $51.8\ \mathrm{kNm}$ & $3.00$ \\
+L2 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.72\ \mathrm{mm}$ & $1.75$ \\
+L3 & $N$ & $-16.5\ \mathrm{kN}$ & $0.00$ & $26.6\ \mathrm{kN}$ & $4.47$ \\
+L3 & $V$ & $-53.2\ \mathrm{kN}$ & $4.47$ & $33.1\ \mathrm{kN}$ & $0.00$ \\
+L3 & $M$ & $0.0\ \mathrm{kNm}$ & $4.47$ & $73.4\ \mathrm{kNm}$ & $1.71$ \\
+L3 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.49\ \mathrm{mm}$ & $2.12$ \\
+L4 & $N$ & $-62.1\ \mathrm{kN}$ & $5.00$ & $-59.5\ \mathrm{kN}$ & $0.00$ \\
 L4 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L4 & $M$ & $0.0\ \mathrm{kNm}$ & $5.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
-L4 & $w$ & $0.00\ \mathrm{mm}$ & $3.28$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
+L4 & $w$ & $0.00\ \mathrm{mm}$ & $2.44$ & $0.00\ \mathrm{mm}$ & $5.00$ \\
 L5 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
-L5 & $V$ & $2.2\ \mathrm{kN}$ & $0.00$ & $2.2\ \mathrm{kN}$ & $0.00$ \\
-L5 & $M$ & $-2.6\ \mathrm{kNm}$ & $1.50$ & $3.4\ \mathrm{kNm}$ & $1.50$ \\
-L5 & $w$ & $0.00\ \mathrm{mm}$ & $2.33$ & $0.02\ \mathrm{mm}$ & $1.00$ \\
+L5 & $V$ & $-0.6\ \mathrm{kN}$ & $3.00$ & $4.0\ \mathrm{kN}$ & $0.00$ \\
+L5 & $M$ & $-1.8\ \mathrm{kNm}$ & $1.50$ & $4.2\ \mathrm{kNm}$ & $1.50$ \\
+L5 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.03\ \mathrm{mm}$ & $1.08$ \\
 L6 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L6 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L6 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
 L6 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
-L8 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L8 & $N$ & $-2.5\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $2.00$ \\
 L8 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L8 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
 L8 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 \hline
 \end{longtable}
-Grösste Durchbiegung gegen die Sehne: L1, w = -0.62 mm bei x = 5.48 m, L/w = 12982.
+Grösste Durchbiegung gegen die Sehne: L1, w = -1.34 mm bei x = 5.17 m, L/w = 5987.
 
 \noindent\textbf{Gleichgewichtsprobe (Moment um den Ursprung)}
 \begin{longtable}{rrrrr}
@@ -7567,8 +7607,8 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -0.62 mm bei x = 5.48 m, L/w = 12
 \hline
 \endhead
 $\sum F_x$ & $27.000$ & $-27.000$ & $0.000$ & kN \\
-$\sum F_z$ & $-177.150$ & $177.150$ & $0.000$ & kN \\
-$\sum M_0$ & $-1386.145$ & $1386.145$ & $0.000$ & kNm \\
+$\sum F_z$ & $-311.277$ & $311.277$ & $0.000$ & kN \\
+$\sum M_0$ & $-2593.971$ & $2593.971$ & $0.000$ & kNm \\
 \hline
 \end{longtable}
 \subsection{Balkensystem: Beweglich}
@@ -8592,6 +8632,10 @@ EA_{\text{Q1,C30/37}} = E_{cm} \cdot A_{\text{Q1}}
 \begin{equation*}
 EI_{\text{Q1,C30/37}} = E_{cm} \cdot I_{\text{Q1}}
 \end{equation*}
+\noindent\textbf{Eigengewicht, «Balken 300×500» aus C30/37}
+\begin{equation*}
+g_{k} = \rho_{sb} \cdot g \cdot A_{\text{Q1}}
+\end{equation*}
 \subsection{Steifigkeitsmethode}
 \noindent\textbf{Steifigkeitsmatrix eines Stabs, in seinen Achsen}
 \begin{equation*}
@@ -9261,6 +9305,7 @@ Flächenträgheitsmoment, Balken 300×500 & $I_{\text{Q1}}$ & $3125$ & ·10⁶ m
 Breite, Balken 300×500 & $b_{\text{Q1}}$ & $300$ & mm & Vorgabe \\
 Dehnsteifigkeit, Balken 300×500, C30/37 & $EA_{\text{Q1,C30/37}}$ & $5043$ & MN & berechnet \\
 Biegesteifigkeit, Balken 300×500, C30/37 & $EI_{\text{Q1,C30/37}}$ & $105062$ & kNm² & berechnet \\
+Eigengewicht je Meter, Balken 300×500, C30/37 & $g_{k,\text{Q1,C30/37}}$ & $3.75$ & kN/m & berechnet \\
 Höhe, Balken 300×500 & $h_{\text{Q1}}$ & $500$ & mm & Vorgabe \\
 Querschnittsfläche, Kasten & $A_{\text{Q10}}$ & $330000$ & mm² & berechnet \\
 Flächenträgheitsmoment, Kasten & $I_{\text{Q10}}$ & $13275$ & ·10⁶ mm⁴ & berechnet \\
@@ -9268,12 +9313,14 @@ Querschnittsfläche, Rundstütze & $A_{\text{Q2}}$ & $125664$ & mm² & berechnet
 Flächenträgheitsmoment, Rundstütze & $I_{\text{Q2}}$ & $1256.64$ & ·10⁶ mm⁴ & berechnet \\
 Dehnsteifigkeit, Rundstütze, C30/37 & $EA_{\text{Q2,C30/37}}$ & $4225$ & MN & berechnet \\
 Biegesteifigkeit, Rundstütze, C30/37 & $EI_{\text{Q2,C30/37}}$ & $42248$ & kNm² & berechnet \\
+Eigengewicht je Meter, Rundstütze, C30/37 & $g_{k,\text{Q2,C30/37}}$ & $3.14$ & kN/m & berechnet \\
 Durchmesser, Rundstütze & $d_{\text{Q2}}$ & $400$ & mm & Vorgabe \\
 Querschnittsfläche, Rohr & $A_{\text{Q3}}$ & $4973$ & mm² & berechnet \\
 Aussendurchmesser, Rohr & $D_{\text{Q3}}$ & $168.3$ & mm & Vorgabe \\
 Flächenträgheitsmoment, Rohr & $I_{\text{Q3}}$ & $15.64$ & ·10⁶ mm⁴ & berechnet \\
 Dehnsteifigkeit, Rohr, B500B & $EA_{\text{Q3,B500B}}$ & $995$ & MN & berechnet \\
 Biegesteifigkeit, Rohr, B500B & $EI_{\text{Q3,B500B}}$ & $3128$ & kNm² & berechnet \\
+Eigengewicht je Meter, Rohr, B500B & $g_{k,\text{Q3,B500B}}$ & $0.39$ & kN/m & berechnet \\
 Wanddicke, Rohr & $t_{\text{Q3}}$ & $10$ & mm & Vorgabe \\
 Querschnittsfläche, Hohlprofil & $A_{\text{Q4}}$ & $11875$ & mm² & berechnet \\
 Flächenträgheitsmoment, Hohlprofil & $I_{\text{Q4}}$ & $146.71$ & ·10⁶ mm⁴ & berechnet \\
@@ -9281,12 +9328,14 @@ Breite, Hohlprofil & $b_{\text{Q4}}$ & $200$ & mm & Vorgabe \\
 Höhe, Hohlprofil & $h_{\text{Q4}}$ & $300$ & mm & Vorgabe \\
 Dehnsteifigkeit, Hohlprofil, B500B & $EA_{\text{Q4,B500B}}$ & $2375$ & MN & berechnet \\
 Biegesteifigkeit, Hohlprofil, B500B & $EI_{\text{Q4,B500B}}$ & $29342$ & kNm² & berechnet \\
+Eigengewicht je Meter, Hohlprofil, B500B & $g_{k,\text{Q4,B500B}}$ & $0.93$ & kN/m & berechnet \\
 Wanddicke, Hohlprofil & $t_{\text{Q4}}$ & $12.5$ & mm & Vorgabe \\
 Querschnittsfläche, Plattenbalken & $A_{\text{Q5}}$ & $360000$ & mm² & berechnet \\
 Flächenträgheitsmoment, Plattenbalken & $I_{\text{Q5}}$ & $9600$ & ·10⁶ mm⁴ & berechnet \\
 Flanschbreite, Plattenbalken & $b_{\text{Q5}}$ & $1200$ & mm & Vorgabe \\
 Dehnsteifigkeit, Plattenbalken, C30/37 & $EA_{\text{Q5,C30/37}}$ & $12103$ & MN & berechnet \\
 Biegesteifigkeit, Plattenbalken, C30/37 & $EI_{\text{Q5,C30/37}}$ & $322750$ & kNm² & berechnet \\
+Eigengewicht je Meter, Plattenbalken, C30/37 & $g_{k,\text{Q5,C30/37}}$ & $9$ & kN/m & berechnet \\
 Stegbreite, Plattenbalken & $b_{w,\text{Q5}}$ & $300$ & mm & Vorgabe \\
 Höhe, Plattenbalken & $h_{\text{Q5}}$ & $600$ & mm & Vorgabe \\
 Flanschdicke, Plattenbalken & $h_{f,\text{Q5}}$ & $200$ & mm & Vorgabe \\
@@ -9297,12 +9346,14 @@ Flanschbreite, Walzprofil & $b_{\text{Q6}}$ & $300$ & mm & Vorgabe \\
 Höhe, Walzprofil & $h_{\text{Q6}}$ & $300$ & mm & Vorgabe \\
 Dehnsteifigkeit, Walzprofil, B500B & $EA_{\text{Q6,B500B}}$ & $2856$ & MN & berechnet \\
 Biegesteifigkeit, Walzprofil, B500B & $EI_{\text{Q6,B500B}}$ & $48374$ & kNm² & berechnet \\
+Eigengewicht je Meter, Walzprofil, B500B & $g_{k,\text{Q6,B500B}}$ & $1.12$ & kN/m & berechnet \\
 Flanschdicke, Walzprofil & $t_{f,\text{Q6}}$ & $19$ & mm & Vorgabe \\
 Stegdicke, Walzprofil & $t_{w,\text{Q6}}$ & $11$ & mm & Vorgabe \\
 Querschnittsfläche, Fundamentbalken & $A_{\text{Q7}}$ & $250000$ & mm² & berechnet \\
 Flächenträgheitsmoment, Fundamentbalken & $I_{\text{Q7}}$ & $5138.89$ & ·10⁶ mm⁴ & berechnet \\
 Dehnsteifigkeit, Fundamentbalken, C30/37 & $EA_{\text{Q7,C30/37}}$ & $8405$ & MN & berechnet \\
 Biegesteifigkeit, Fundamentbalken, C30/37 & $EI_{\text{Q7,C30/37}}$ & $172768$ & kNm² & berechnet \\
+Eigengewicht je Meter, Fundamentbalken, C30/37 & $g_{k,\text{Q7,C30/37}}$ & $6.25$ & kN/m & berechnet \\
 Breite oben, Fundamentbalken & $b_{o,\text{Q7}}$ & $600$ & mm & Vorgabe \\
 Breite unten, Fundamentbalken & $b_{u,\text{Q7}}$ & $400$ & mm & Vorgabe \\
 Höhe, Fundamentbalken & $h_{\text{Q7}}$ & $500$ & mm & Vorgabe \\
@@ -9310,6 +9361,7 @@ Querschnittsfläche, Von Hand & $A_{\text{Q8}}$ & $15000$ & mm² & Eingabe \\
 Flächenträgheitsmoment, Von Hand & $I_{\text{Q8}}$ & $120$ & ·10⁶ mm⁴ & Eingabe \\
 Querschnittsfläche, Deckenstreifen & $A_{\text{Q9}}$ & $300000$ & mm² & berechnet \\
 Flächenträgheitsmoment, Deckenstreifen & $I_{\text{Q9}}$ & $2250$ & ·10⁶ mm⁴ & berechnet \\
+Erdbeschleunigung & $g$ & $10$ & m/s² & Vorgabe \\
 Querschnittsfläche, Rechteck & $A$ & $180000$ & mm² & berechnet \\
 Flächenträgheitsmoment, Rechteck & $I$ & $5400$ & ·10⁶ mm⁴ & berechnet \\
 Breite, Rechteck & $b$ & $300$ & mm & Vorgabe \\
@@ -9326,6 +9378,7 @@ Mittelwert der Zylinderdruckfestigkeit & $f_{cm}$ & $38$ & N/mm² & berechnet \\
 Mittelwert der Zugfestigkeit & $f_{ctm}$ & $2.9$ & N/mm² & Vorgabe \\
 Teilsicherheitsbeiwert für Beton & $\gamma_c$ & $1.5$ &  & Vorgabe \\
 Beiwert für die Gesteinskörnung & $k_e$ & $10000$ &  & Vorgabe \\
+Dichte des Stahlbetons & $\rho_{sb}$ & $2500$ & kg/m³ & Vorgabe \\
 Bemessungswert der Schubspannungsgrenze & $\tau_{cd}$ & $1.1$ & N/mm² & berechnet \\
 Elastizitätsmodul des Betonstahls & $E_s$ & $200000$ & N/mm² & Vorgabe \\
 Bemessungswert der Dehnung bei Höchstlast & $\varepsilon_{ud}$ & $4.5$ & \% & Vorgabe \\
@@ -9334,6 +9387,7 @@ Bemessungswert der Fliessgrenze auf Druck & $f_{yd}^{-}$ & $435$ & N/mm² & bere
 Charakteristische Fliessgrenze & $f_{yk}$ & $500$ & N/mm² & Vorgabe \\
 Charakteristische Fliessgrenze auf Druck & $f_{yk}^{-}$ & $500$ & N/mm² & Vorgabe \\
 Teilsicherheitsbeiwert für Betonstahl & $\gamma_s$ & $1.15$ &  & Vorgabe \\
+Dichte des Stahls & $\rho_s$ & $7850$ & kg/m³ & Vorgabe \\
 Länge des Fundaments & $L$ & $4$ & m & Vorgabe \\
 Neigung der Sohle & $\alpha$ & $5$ & ° & Vorgabe \\
 Breite des Fundaments & $b$ & $1.6$ & m & Vorgabe \\

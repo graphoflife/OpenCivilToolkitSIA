@@ -291,9 +291,9 @@ class Projekt(Beschreibung):
         Ein leeres Balkensystem, ein ebener Rahmen. Gezeichnet wird danach
         mit dem Baukasten des Eintrags -- ``querschnitt``, ``linie``,
         ``lager_an``, ``lastfall``, ``stablast``, ``knotenlast``,
-        ``kombination`` --, Koordinaten in m. Leer und nicht wie in der
-        Oberflaeche mit einem Einfeldtraeger: wer in Python zeichnet, zeichnet
-        sein eigenes System.
+        ``kombination`` --, Koordinaten in m. Leer, ohne die Lastfaelle und
+        Kombinationen, die die Oberflaeche mitbringt: wer in Python zeichnet,
+        zeichnet sein eigenes System.
         """
         eintrag = lesen(BalkensystemEintrag, felder, f"Balkensystem '{name}'",
                         BalkensystemEintrag(kennung=self.freie_kennung(BALKENSYSTEM.vorsilbe),
@@ -486,8 +486,8 @@ class Projekt(Beschreibung):
         unterzug.lastfall("Feld", M_y_Ed=150.0, V_z_Ed=150.0, T_Ed=15.0)
         # Ein Rahmen: zwei Stützen von 4 m und ein Riegel von 6 m mit dem
         # Querschnitt des Unterzugs. Links eingespannt, rechts eine
-        # Pendelstütze; Eigengewicht auf dem Riegel, Wind auf der linken
-        # Stütze, und beides kombiniert.
+        # Pendelstütze; das Eigengewicht von selbst, eine Auflast auf dem
+        # Riegel, Wind auf der linken Stütze -- kombiniert in GZT und GZG.
         rahmen = projekt.balkensystem("Rahmen")
         stuetze = rahmen.querschnitt("Stütze 300×300", "rechteck", b=300.0, h=300.0)
         riegel = rahmen.querschnitt_aus("Unterzug", "analyse", unterzug)
@@ -496,11 +496,13 @@ class Projekt(Beschreibung):
         rahmen.linie((6, 4), (6, 0), querschnitt=stuetze, material="b1", gelenk_anfang=True)
         rahmen.lager_an((0, 0), "eingespannt")
         rahmen.lager_an((6, 0), "gelenkig")
-        eigengewicht = rahmen.lastfall("Eigengewicht")
+        eigengewicht = rahmen.lastfall("Eigengewicht", eigengewicht=True)
+        auflast = rahmen.lastfall("Auflast")
         wind = rahmen.lastfall("Wind")
-        rahmen.stablast(eigengewicht, balken, wert=25.0)
+        rahmen.stablast(auflast, balken, wert=20.0)
         rahmen.stablast(wind, links, wert=3.0, richtung="waagrecht")
-        rahmen.kombination("Tragsicherheit", (eigengewicht, 1.35), (wind, 1.5))
+        rahmen.kombination("GZT", (eigengewicht, 1.35), (auflast, 1.35), (wind, 1.5))
+        rahmen.kombination("GZG", (eigengewicht, 1.0), (auflast, 1.0), (wind, 1.0))
         # Ein Einzelfundament 2.0 × 2.5 m, 1.2 m tief, das Grundwasser tiefer
         # als der Gleitkörper -- grün, wie der Rest.
         fundament = projekt.grundbruch("Fundament Stütze", phi_k=32.0, b=2.0, L=2.5,
@@ -737,7 +739,7 @@ class Projekt(Beschreibung):
         s.linie((15, 0), (15, 2), querschnitt=q["rechteckrohr"], material="s1")
         s.lager_an((0, 0), "gelenkig", z="feder", k_z=50000.0, phi="feder", k_phi=10000.0)
         s.lager_an((12, 0), "gelenkig")
-        g = s.lastfall("Eigengewicht")
+        g = s.lastfall("Eigengewicht", eigengewicht=True)
         w = s.lastfall("Schnee und Wind")
         s.stablast(g, gebettet, wert=5.0, wert_b=15.0)
         s.stablast(g, gebettet, art="linienmoment", wert=2.0)

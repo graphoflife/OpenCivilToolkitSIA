@@ -720,6 +720,17 @@
       ]
     },
     {
+      "name": "Eigengewicht eines Stabs",
+      "pfad": "Formelsammlung/Formeln/Eigengewicht eines Stabs.md",
+      "art": "formel",
+      "zeichen": [
+        "g_{k}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Einflussfaktor der Rechtecklast",
       "pfad": "Formelsammlung/Formeln/Einflussfaktor der Rechtecklast.md",
       "art": "formel",
@@ -4770,7 +4781,9 @@
         "Balkensystem.abschnitt",
         "Balkensystem.bezuege",
         "Balkensystem._querschnitt",
+        "Balkensystem._erdbeschleunigung",
         "Balkensystem._steifigkeit",
+        "Balkensystem._eigengewicht",
         "Balkensystem.ins_rechenwerk",
         "Balkensystem.ziele",
         "Balkensystem.rechnen_und_schreiben"

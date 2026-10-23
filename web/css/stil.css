@@ -2030,6 +2030,10 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-lastgruppe.ist-gewaehlt .bs-last:not(text) { stroke: var(--blau); stroke-width: 2; }
 .bs-lastgruppe.ist-gewaehlt .bs-spitze { fill: var(--blau); }
 .bs-lastgruppe.ist-gewaehlt text { fill: var(--blau); }
+/* Das Eigengewicht: grau, es kommt von selbst und ist nicht zu wählen. */
+.bs-eigengewicht:not(text) { stroke: var(--schrift-zart); }
+.bs-eigengewicht.bs-spitze { fill: var(--schrift-zart); }
+.bs-lasttext.bs-eigengewicht { fill: var(--schrift-matt); }
 .bs-unbestimmt circle { fill: none; stroke: var(--warn); stroke-width: 1.6; stroke-dasharray: 2 2; }
 .bs-unbestimmt-text { font-size: 12px; font-weight: 700; fill: var(--warn); }
 .bs-beweglich { fill: var(--schlecht); fill-opacity: .15; stroke: var(--schlecht); stroke-width: 1.6; }

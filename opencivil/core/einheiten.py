@@ -133,6 +133,7 @@ MOMENT = KRAFT * LAENGE                          # Nm
 KRAFT_PRO_LAENGE = KRAFT / LAENGE                # N/m
 MOMENT_PRO_LAENGE = MOMENT / LAENGE              # Nm/m
 DICHTE = MASSE / VOLUMEN                         # kg/m^3
+BESCHLEUNIGUNG = LAENGE / ZEIT**2                # m/s^2
 FLAECHE_PRO_LAENGE = FLAECHE / LAENGE            # m^2/m
 KRUEMMUNG = DIMENSIONSLOS / LAENGE               # 1/m
 
@@ -344,6 +345,10 @@ T = Einheit("t", MASSE, 1e3)
 KG_PRO_M3 = Einheit("kg/m^3", DICHTE, 1.0, latex=r"\mathrm{kg}/\mathrm{m}^{3}")
 KN_PRO_M3 = Einheit("kN/m^3", KRAFT / VOLUMEN, 1e3, latex=r"\mathrm{kN}/\mathrm{m}^{3}")
 
+# Beschleunigung -- die Erdbeschleunigung des Eigengewichts
+M_PRO_S2 = Einheit("m/s^2", BESCHLEUNIGUNG, 1.0, latex=r"\mathrm{m}/\mathrm{s}^{2}",
+                   beschriftung="m/s²")
+
 # Zeit
 S = Einheit("s", ZEIT, 1.0)
 MIN = Einheit("min", ZEIT, 60.0)
@@ -373,7 +378,7 @@ EINHEITEN: Dict[str, Einheit] = {
         NM, KNM, MNM,
         KN_PRO_M, KNM_PRO_M, MM2_PRO_M, PRO_M,
         KNM2, KNM_PRO_RAD,
-        KG, T, KG_PRO_M3, KN_PRO_M3,
+        KG, T, KG_PRO_M3, KN_PRO_M3, M_PRO_S2,
         S, MIN, H,
         RAD, GRAD, MRAD,
     )
