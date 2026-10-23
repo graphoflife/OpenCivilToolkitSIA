@@ -229,7 +229,7 @@ const ANALYSE = bauteil('querschnittsanalyse', {
 /** Leer, aus dem Kern (Benutzer, 2026-10-19) -- Beton braucht es für die Stäbe, die man zeichnet. */
 const SYSTEM = bauteil('balkensystem', {
   kurztext: (s) => {
-    const staebe = s.linien.filter((l) => l.stab).length;
+    const staebe = s.linien.filter((l) => l.querschnitt).length;
     return `${staebe} ${staebe === 1 ? 'Stab' : 'Stäbe'}`;
   },
   anlegen: (a) => nachVorlage(a, 'neues_balkensystem', {

@@ -78,6 +78,11 @@ export function treffer(a, bild) {
     }
     for (const x of [...ecken].sort(vorrang)) if (!liste.includes(x.schluessel)) liste.push(x.schluessel);
   }
+  // Die Anhänge der App -- die Pfeile der Lasten: nach den Knoten, vor
+  // Punkten, Linien und Flächen, denn sie liegen über ihnen.
+  for (const kennung of a.adapter.anhaenge?.treffer(a, bild) || []) {
+    if (!liste.includes(kennung)) liste.push(kennung);
+  }
 
   const punkte = [];
   const linien = [];
@@ -218,8 +223,11 @@ function auswahlRahmen(a) {
     const p = lagen.get(x.knoten);
     if (p && (a.auswahl.has(x.e.kennung) || a.auswahl.has(x.schluessel))) punkte.push(p);
   }
-  if (!punkte.length) return null;
   const bild = punkte.map((p) => nachBild(a.v, p));
+  // Gewählte Anhänge liegen dort, wo die App sie zeichnet.
+  const anhaenge = a.adapter.anhaenge?.rahmen?.(a);
+  if (anhaenge) bild.push([anhaenge[0], anhaenge[1]], [anhaenge[2], anhaenge[3]]);
+  if (!bild.length) return null;
   const xs = bild.map((p) => p[0]);
   const ys = bild.map((p) => p[1]);
   return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];

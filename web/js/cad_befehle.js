@@ -82,6 +82,37 @@ export function knotenBefehl(werkzeug) {
 }
 
 // ===========================================================================
+// Anhang -- ein Klick auf ein Element oder einen Knoten
+// ===========================================================================
+
+/**
+ * Hängt etwas an, wo geklickt wird -- eine Last an eine Linie oder einen
+ * Knoten. Was dort liegt und was entsteht, weiss die App
+ * (`anhangAnlegen(a, z, erg, werkzeug)` gibt die Kennung des Neuen zurück,
+ * oder null, wenn dort nichts ist, woran es hängen könnte). Das Werkzeug
+ * bleibt: ein Klick, ein Anhang.
+ */
+export function anhangBefehl(werkzeug) {
+  return {
+    name: werkzeug,
+    neu: werkzeug,
+    frage: (a) => `${a.adapter.neuText(a, werkzeug)}: auf eine Linie oder einen Knoten klicken`,
+    punkt(a, erg) {
+      let neu = null;
+      a.aendern((z) => {
+        neu = a.adapter.anhangAnlegen(a, z, erg, werkzeug);
+      }, { auswahl: () => (neu ? [neu] : [...a.auswahl]) });
+    },
+    vorschau(a, g) {
+      const f = a.zeiger?.fang;
+      if (f) a.adapter.anhangVorschau?.(a, g, f, werkzeug);
+    },
+    enter: () => false,
+    zurueck: () => false,
+  };
+}
+
+// ===========================================================================
 // Linie -- zwei Punkte, dann wieder ein neuer Anfang
 // ===========================================================================
 

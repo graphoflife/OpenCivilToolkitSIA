@@ -20,6 +20,16 @@
  * (`teilen`, `umkehren`, `linieTeilen`) -- etwa, weil der Kern dabei
  * Lastwerte rechnet.
  *
+ * ANHÄNGE:
+ * Was eine App an Elemente hängt und selbst zeichnet -- die Lasten des
+ * Balkensystems --, ist kein Element des Fensters. Wählen und löschen lässt
+ * es sich trotzdem, wenn der Adapter es sagt (`anhaenge`): was ein Klick
+ * trifft (`treffer`), ob eine Kennung dazugehört (`hat`), wie es gelöscht
+ * wird (`loeschen`) und wo es im Bild liegt (`rahmen`). Verschoben und
+ * kopiert wird es nicht; es geht mit seinem Element. Angelegt wird es mit
+ * einem Werkzeug der Form «anhang»: ein Klick auf ein Element oder einen
+ * Knoten (`anhangAnlegen`).
+ *
  * WENIGE KNÖPFE:
  * Oben stehen die Werkzeuge der App, je mit Zeichen (sinnbilder.js) -- im
  * Querschnitt Polygon, Bewehrung, Schubwand, Hilfslinie und Hilfspunkt, im
@@ -51,8 +61,8 @@ import {
   klickPunkt, taste as eingabeTaste,
 } from './cad_eingabe.js';
 import {
-  knotenBefehl, knotenEinfuegenBefehl, kopierenBefehl, linienBefehl, polygonBefehl,
-  verschiebenBefehl,
+  anhangBefehl, knotenBefehl, knotenEinfuegenBefehl, kopierenBefehl, linienBefehl,
+  polygonBefehl, verschiebenBefehl,
 } from './cad_befehle.js';
 import { klickWaehlen, leisteZeichnen, rahmenWaehlen, treffer } from './cad_auswahl.js';
 import { paletteBauen } from './cad_palette.js';
@@ -87,7 +97,9 @@ const VERLAUF = 100;
 const HOEHE = 'opencivil.cad.hoehe';
 
 /** Die Befehle hinter den Formen eines Werkzeugs. */
-const BEFEHLE = { knoten: knotenBefehl, linie: linienBefehl, polygon: polygonBefehl };
+const BEFEHLE = {
+  knoten: knotenBefehl, linie: linienBefehl, polygon: polygonBefehl, anhang: anhangBefehl,
+};
 
 /** Schlüssel -> Fenster. Keine Projektdaten: nichts davon wird abgelegt. */
 const fenster = new Map();
@@ -242,7 +254,25 @@ function aktualisieren(a) {
 function loeschen(a) {
   if (!a.auswahl.size) return;
   const weg = new Set(a.auswahl);
-  aendern(a, (z) => a.modell.loeschen(z, weg), { auswahl: () => [] });
+  aendern(a, (z) => {
+    a.modell.loeschen(z, weg);
+    a.adapter.anhaenge?.loeschen(z, weg);
+  }, { auswahl: () => [] });
+}
+
+/** Ob ein Schlüssel der Auswahl einen Anhang meint -- eine Last, kein Element. */
+function istAnhang(a, schluessel) {
+  return Boolean(a.adapter.anhaenge?.hat(a.adapter.zeichnung(), auswahlTeil(schluessel).kennung));
+}
+
+/**
+ * Vor dem Verschieben und Kopieren: die Auswahl ohne Anhänge -- sie gehen mit
+ * ihrem Element, und eine Last an einem Knoten nähme sonst den Knoten mit.
+ * Gibt zurück, ob danach etwas gewählt ist.
+ */
+function ohneAnhaenge(a) {
+  a.auswahl = new Set([...a.auswahl].filter((s) => !istAnhang(a, s)));
+  return a.auswahl.size > 0;
 }
 
 // ===========================================================================
@@ -309,9 +339,13 @@ function teilen(a) {
   });
 }
 
-/** Gibt es etwas zu kopieren -- ein ganzes Element oder einen Knoten? Einzelne Ecken kopiert es nicht. */
+/**
+ * Gibt es etwas zu kopieren -- ein ganzes Element oder einen Knoten?
+ * Einzelne Ecken kopiert es nicht, Anhänge auch nicht: sie gehen mit ihrem
+ * Element.
+ */
 function kopierbar(a) {
-  return [...a.auswahl].some((s) => auswahlTeil(s).i === null);
+  return [...a.auswahl].some((s) => auswahlTeil(s).i === null && !istAnhang(a, s));
 }
 
 /**
@@ -321,14 +355,20 @@ function kopierbar(a) {
 function aktionen(a) {
   const z = a.adapter.zeichnung();
   const m = a.modell;
+  // Nur Anhänge gewählt: verschieben, kopieren, teilen lässt sich da nichts.
+  if ([...a.auswahl].every((s) => istAnhang(a, s))) {
+    return [{ zeichen: '✕', text: 'Löschen', taste: 'Entf', tun: () => loeschen(a) }];
+  }
   const gewaehlt = [...m.elemente(z)].filter(({ e }) => a.auswahl.has(e.kennung));
   const nurLinien = gewaehlt.length > 0 && gewaehlt.length === a.auswahl.size
     && gewaehlt.every(({ art }) => art.form === 'linie');
   const einzeln = gewaehlt.length === 1 && a.auswahl.size === 1 ? gewaehlt[0] : null;
   const teilbar = (x) => x.art.form === 'flaeche' || (x.art.form === 'linie' && x.art.teilbar !== false);
   return [
-    { zeichen: '⇢', text: 'Verschieben', taste: 'V', tun: () => starten(a, verschiebenBefehl()) },
-    kopierbar(a) ? { zeichen: '⧉', text: 'Kopieren', taste: 'C', tun: () => starten(a, kopierenBefehl()) } : null,
+    { zeichen: '⇢', text: 'Verschieben', taste: 'V',
+      tun: () => { if (ohneAnhaenge(a)) starten(a, verschiebenBefehl()); } },
+    kopierbar(a) ? { zeichen: '⧉', text: 'Kopieren', taste: 'C',
+      tun: () => { if (ohneAnhaenge(a)) starten(a, kopierenBefehl()); } } : null,
     nurLinien && gewaehlt.every(teilbar) ? {
       zeichen: '⫶', text: 'Teilen', titel: 'In der Mitte teilen: zwei Linien mit denselben Eigenschaften',
       tun: () => teilen(a),
@@ -934,11 +974,11 @@ function taste(e) {
       allesZeigen(a);
       break;
     case 'v':
-      if (!a.auswahl.size) return;
+      if (!ohneAnhaenge(a)) return;
       starten(a, verschiebenBefehl());
       break;
     case 'c':
-      if (!kopierbar(a)) return;
+      if (!kopierbar(a) || !ohneAnhaenge(a)) return;
       starten(a, kopierenBefehl());
       break;
     case 't':

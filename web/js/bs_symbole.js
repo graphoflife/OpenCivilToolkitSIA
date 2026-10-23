@@ -13,6 +13,12 @@
  * Faser liegt rechts der Laufrichtung eines Stabs: in der Zeichnung bei
  * (s, −c), im Bild bei (−t_y, t_x) für seine Laufrichtung t im Bild. Dorthin
  * zeigt auch eine Last «quer», und dort liegt ein Linienlager.
+ *
+ * TREFFEN:
+ * Ein Lastzeichen trägt seine Formen im Bild mit (`formen` an der Gruppe):
+ * das Band einer verteilten Last, den Schaft eines Pfeils, den Bogen eines
+ * Moments. Daran wählt das Zeichenfenster eine Last -- die Formen stehen
+ * dort, wo das Zeichen entsteht, und nicht ein zweites Mal im Adapter.
  */
 
 import { text } from './cad_ansicht.js';
@@ -200,6 +206,8 @@ export function kraftpfeil(p, r, laenge, beschriftung, klasse = 'bs-last') {
   const g = svgEl('g');
   const anfang = [p[0] - r[0] * laenge, p[1] - r[1] * laenge];
   g.append(linie(anfang, p, klasse), spitze(p, r, klasse));
+  // Getroffen wird der Schaft, nicht die Spitze: dort liegt der Knoten oder Stab.
+  g.formen = [{ art: 'strecke', von: anfang, bis: [p[0] - r[0] * 7, p[1] - r[1] * 7] }];
   if (beschriftung) {
     g.append(text(anfang[0] - r[0] * 4 + (Math.abs(r[0]) < 0.5 ? 6 : 0),
       anfang[1] - r[1] * 4 + (Math.abs(r[1]) < 0.5 ? -5 : 4), beschriftung,
@@ -230,6 +238,7 @@ export function momentSymbol(p, wert, beschriftung, klasse = 'bs-last') {
   const tangente = wert >= 0 ? [Math.sin(w), Math.cos(w)] : [-Math.sin(w), -Math.cos(w)];
   g.append(spitze(e, tangente, klasse));
   if (beschriftung) g.append(text(x, y - r - 5, beschriftung, `bs-lasttext ${klasse}`));
+  g.formen = [{ art: 'bogen', mitte: p, r }];
   return g;
 }
 
@@ -256,6 +265,8 @@ export function streckenlast(a, b, r, la, lb, beschriftung, klasse = 'bs-last') 
   }
   g.append(pfadAus(umriss, `${klasse} bs-umriss`));
   g.append(linie(a, umriss[0], `${klasse} bs-lastpfeil`), linie(b, umriss[umriss.length - 1], `${klasse} bs-lastpfeil`));
+  // Getroffen wird das Band zwischen der Linie und den Enden der Pfeile.
+  g.formen = [{ art: 'band', linie: [a, b], punkte: [a, b, umriss[umriss.length - 1], umriss[0]] }];
   if (beschriftung) {
     const mitte = umriss[Math.floor(umriss.length / 2)];
     g.append(text(mitte[0] - r[0] * 6, mitte[1] - r[1] * 6 + (Math.abs(r[1]) > 0.5 ? (r[1] > 0 ? -2 : 10) : 4),
@@ -269,11 +280,14 @@ export function streckenmoment(a, b, wert, beschriftung, klasse = 'bs-last') {
   const g = svgEl('g');
   const l = Math.hypot(b[0] - a[0], b[1] - a[1]);
   const anzahl = Math.max(1, Math.min(8, Math.round(l / 40)));
+  const boegen = [];
   for (let i = 0; i < anzahl; i += 1) {
     const s = (i + 0.5) / anzahl;
-    g.append(momentSymbol([a[0] + (b[0] - a[0]) * s, a[1] + (b[1] - a[1]) * s], wert,
+    boegen.push(momentSymbol([a[0] + (b[0] - a[0]) * s, a[1] + (b[1] - a[1]) * s], wert,
       i === Math.floor(anzahl / 2) ? beschriftung : '', `${klasse} bs-klein`));
   }
+  g.append(...boegen);
+  g.formen = boegen.flatMap((x) => x.formen);
   return g;
 }
 

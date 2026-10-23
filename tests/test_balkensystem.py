@@ -200,40 +200,39 @@ class TestTeilen(unittest.TestCase):
         return self.s.stablast(self.lf, self.linie, **felder)
 
     def test_gleichlast_wird_zwei(self):
-        self.last(wert=10.0)
+        erste = self.last(wert=10.0)
         zweite = self.s.teilen("L1", 2.0)
         self.assertEqual(self.s.netz().lage(zweite.von), (2.0, 0.0))
         self.assertEqual(self.s.laenge(self.linie), 2.0)
         self.assertEqual(self.s.laenge(zweite), 4.0)
         for linie in (self.linie, zweite):
             (last,) = linie.lasten
-            self.assertEqual((last.von, last.bis, last.wert_a, last.wert_b), (0.0, None, 10.0, None))
+            self.assertEqual((last.wert_a, last.wert_b), (10.0, None))
+        # Die Last auf der zweiten Hälfte ist eine neue: mit eigener Kennung.
+        self.assertEqual(self.linie.lasten[0].kennung, erste.kennung)
+        self.assertNotEqual(zweite.lasten[0].kennung, erste.kennung)
 
     def test_trapez_mit_dem_wert_am_schnitt(self):
         """Von 0 auf 12 kN/m über 6 m, geteilt bei 2 m: 0 → 4 und 4 → 12."""
         self.last(wert=0.0, wert_b=12.0)
         zweite = self.s.teilen("L1", 2.0)
         a, b = self.linie.lasten[0], zweite.lasten[0]
-        self.assertEqual((a.von, a.bis, a.wert_a), (0.0, None, 0.0))
+        self.assertEqual(a.wert_a, 0.0)
         self.assertAlmostEqual(a.wert_b, 4.0)
-        self.assertEqual((b.von, b.bis, b.wert_b), (0.0, None, 12.0))
+        self.assertEqual(b.wert_b, 12.0)
         self.assertAlmostEqual(b.wert_a, 4.0)
 
-    def test_teilstrecke_und_einzellasten(self):
-        self.last(wert=5.0, von=1.0, bis=3.0)
-        self.last(art="einzellast", wert=20.0, von=4.0)
-        self.last(art="moment", wert=7.0, von=1.0)
+    def test_einzellasten_bleiben_wo_sie_stehen(self):
+        """Bei 3 m und 1.5 m auf 6 m, geteilt bei 2 m: 25 % der zweiten Hälfte, 75 % der ersten."""
+        einzel = self.last(art="einzellast", wert=20.0, stelle=50.0)
+        moment = self.last(art="moment", wert=7.0, stelle=25.0)
         zweite = self.s.teilen("L1", 2.0)
-        self.assertEqual([(l.art, l.von, l.bis) for l in self.linie.lasten],
-                         [("linienlast", 1.0, None), ("moment", 1.0, None)])
-        self.assertEqual([(l.art, l.von, l.bis) for l in zweite.lasten],
-                         [("linienlast", 0.0, 1.0), ("einzellast", 2.0, None)])
-
-    def test_eine_last_hinter_dem_ende_bleibt_hinter_dem_ende(self):
-        """Sie wird gemeldet, nicht beim Teilen still gekürzt."""
-        self.last(wert=5.0, von=1.0, bis=7.0)
-        zweite = self.s.teilen("L1", 2.0)
-        self.assertEqual(zweite.lasten[0].bis, 5.0)
+        self.assertEqual([(l.kennung, l.art) for l in self.linie.lasten],
+                         [(moment.kennung, "moment")])
+        self.assertAlmostEqual(self.linie.lasten[0].stelle, 75.0)
+        self.assertEqual([(l.kennung, l.art) for l in zweite.lasten],
+                         [(einzel.kennung, "einzellast")])
+        self.assertAlmostEqual(zweite.lasten[0].stelle, 25.0)
 
     def test_gelenk_am_ende_wandert_mit(self):
         self.linie.gelenk_anfang = self.linie.gelenk_ende = True
@@ -260,10 +259,10 @@ class TestUmkehren(unittest.TestCase):
         self.linie = self.s.linien[0]
         self.linie.lasten = []
         lf = self.s.lastfaelle[0]
-        self.s.stablast(lf, self.linie, wert=2.0, wert_b=8.0, von=1.0)
-        self.s.stablast(lf, self.linie, wert=3.0, richtung="quer", bis=4.0)
-        self.s.stablast(lf, self.linie, art="einzellast", wert=5.0, von=1.5, richtung="laengs")
-        self.s.stablast(lf, self.linie, art="moment", wert=7.0, von=2.0)
+        self.s.stablast(lf, self.linie, wert=2.0, wert_b=8.0)
+        self.s.stablast(lf, self.linie, wert=3.0, richtung="quer")
+        self.s.stablast(lf, self.linie, art="einzellast", wert=5.0, stelle=25.0, richtung="laengs")
+        self.s.stablast(lf, self.linie, art="moment", wert=7.0, stelle=40.0)
         self.linie.gelenk_anfang = True
 
     def test_lasten_bleiben_wo_sie_wirken(self):
@@ -272,11 +271,10 @@ class TestUmkehren(unittest.TestCase):
         self.assertEqual((self.linie.von, self.linie.bis), ("K2", "K1"))
         self.assertEqual((self.linie.gelenk_anfang, self.linie.gelenk_ende), (False, True))
         senkrecht, quer, einzel, moment = self.linie.lasten
-        self.assertEqual((senkrecht.von, senkrecht.bis, senkrecht.wert_a, senkrecht.wert_b),
-                         (0.0, 5.0, 8.0, 2.0))
-        self.assertEqual((quer.von, quer.bis, quer.wert_a, quer.wert_b), (2.0, None, -3.0, None))
-        self.assertEqual((einzel.von, einzel.wert_a), (4.5, -5.0))
-        self.assertEqual((moment.von, moment.wert_a), (4.0, 7.0))
+        self.assertEqual((senkrecht.wert_a, senkrecht.wert_b), (8.0, 2.0))
+        self.assertEqual((quer.wert_a, quer.wert_b), (-3.0, None))
+        self.assertEqual((einzel.stelle, einzel.wert_a), (75.0, -5.0))
+        self.assertEqual((moment.stelle, moment.wert_a), (60.0, 7.0))
         self.s.umkehren("L1")
         self.assertEqual([l.als_dict() for l in self.linie.lasten], vorher)
 
@@ -338,7 +336,7 @@ class TestModell(unittest.TestCase):
 
     def test_fehler_der_beschreibung(self):
         for aendern, wort, elemente in (
-                (lambda s: setattr(s.linien[0], "querschnitt", ""), "keinen Querschnitt", {"L1"}),
+                (lambda s: setattr(s.linien[0], "querschnitt", "Q9"), "keinen Querschnitt", {"L1"}),
                 (lambda s: setattr(s.linien[0], "material", ""), "kein Material", {"L1"}),
                 (lambda s: s.querschnitte[0].masse.__setitem__("h", 0.0), "Höhe",
                  {"Q1", "L1"})):
@@ -455,8 +453,9 @@ class TestTeilenUndUmkehrenRechnenGleich(unittest.TestCase):
     def test_teilen(self):
         p = rahmen()
         s = p.balkensysteme[0]
-        s.linien[1].lasten.append(StablastEintrag(lastfall="LF2", art="linienlast",
-                                                  wert_a=2.0, wert_b=8.0, von=1.0))
+        s.linien[1].lasten += [
+            StablastEintrag(kennung="P8", lastfall="LF2", art="linienlast", wert_a=2.0, wert_b=8.0),
+            StablastEintrag(kennung="P9", lastfall="LF2", art="einzellast", wert_a=5.0, stelle=70.0)]
         vorher = self.lagerkraefte(p)
         s.teilen("L2", 2.5)
         self.assertEqual(self.lagerkraefte(p), vorher)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 31c45a804010
+erzeugt: fe413ffb807c
 art: modul
 tags: [modul]
 ---
@@ -19,26 +19,30 @@ Lasten geschieht. Gerechnet wird in [[opencivil.stabwerk]].
 
 ## ZUERST GEOMETRIE
 
-Gezeichnet werden Knoten und Linien. Eine Linie wird zum Stab, sobald sie
-Querschnitt und Material hat (`stab`); sie kann daneben -- oder statt dessen
--- ein Linienlager sein, quer und laengs je frei, fest oder federnd. Ein
-Knoten wird zum Lager durch ein [[opencivil.projekt.balkensystem#LagerEintrag|LagerEintrag]] an ihm, nicht durch ein
-Feld am Knoten: das Zeichenfenster fuehrt Knoten zusammen und legt neue an,
-und ein Feld daran ginge dabei verloren.
+Gezeichnet werden Knoten und Linien. Eine Linie ist ein Stab, sobald sie
+einen Querschnitt hat; sie kann daneben -- oder statt dessen -- ein
+Linienlager sein, quer und laengs je frei, fest oder federnd. Ein Knoten
+wird zum Lager durch ein [[opencivil.projekt.balkensystem#LagerEintrag|LagerEintrag]] an ihm, nicht durch ein Feld
+am Knoten: das Zeichenfenster fuehrt Knoten zusammen und legt neue an, und
+ein Feld daran ginge dabei verloren.
 
 
 ## LASTEN AN IHREN ELEMENTEN
 
 Eine Last auf einem Stab steht an seiner Linie (`lasten`), mit dem
 Lastfall, zu dem sie gehoert. So bleibt sie bei der Linie, wenn diese
-kopiert, geloescht oder rueckgaengig gemacht wird. Eine Last an einem Knoten
-ist -- wie ein Lager -- ein eigener Eintrag an ihm.
+kopiert, geteilt, geloescht oder rueckgaengig gemacht wird. Eine Last an
+einem Knoten ist -- wie ein Lager -- ein eigener Eintrag an ihm. Jede Last
+hat eine eigene Kennung (`P1`): im Zeichenfenster laesst sie sich fuer sich
+waehlen und loeschen (Benutzer, 2026-10-23). Eine verteilte Last liegt immer
+auf der ganzen Linie, eine Einzellast und ein Einzelmoment an einer Stelle
+in Prozent der Linie ab ihrem Anfang.
 
 
 ## KOORDINATEN UND EINHEITEN
 
-x nach rechts, z nach oben, in m; Stellen auf einem Stab in m ab seinem
-Anfang. Querschnittsmasse in mm, A in mm², I in 10⁶ mm⁴. Lasten in kN, kN/m,
+x nach rechts, z nach oben, in m; Stellen auf einem Stab in % seiner Laenge
+ab seinem Anfang. Querschnittsmasse in mm, A in mm², I in 10⁶ mm⁴. Lasten in kN, kN/m,
 kNm und kNm/m; Federn in kN/m und kNm/rad, Bettung in kN/m². Umgerechnet
 wird beim Bauen.
 
@@ -72,17 +76,18 @@ class StablastEintrag(Beschreibung)
 ```
 
 Eine Last auf einem Stab, in einem Lastfall -- in der Einheit ihrer Art
-([[opencivil.projekt.balkensystem#Konstanten|EINHEIT_DER_LAST]]). `wert_b` gilt am Ende des belasteten
-Bereichs, leer: wie `wert_a`. `bis` leer: bis zum Ende des Stabs.
-Einzellast und Einzelmoment stehen bei `von`.
+([[opencivil.projekt.balkensystem#Konstanten|EINHEIT_DER_LAST]]). Eine verteilte liegt auf der ganzen Linie:
+`wert_a` am Anfang, `wert_b` am Ende, leer: wie `wert_a`.
+Einzellast und Einzelmoment stehen bei `stelle`, in % der Linie ab
+ihrem Anfang (Benutzer, 2026-10-23).
 
+- `kennung: str = ''`
 - `lastfall: str = ''`
 - `art: Lastart = Lastart.LINIENLAST`
 - `richtung: Lastrichtung = Lastrichtung.SENKRECHT`
 - `wert_a: float = 10.0`
 - `wert_b: Optional[float] = None`
-- `von: float = 0.0`
-- `bis: Optional[float] = None`
+- `stelle: float = bereich(50.0, heisst='Stelle', einheit=PROZENT, ab=0.0, bis=100.0)`
 - `projiziert: bool = False` – Senkrecht und waagrecht je Meter Projektion statt je Meter Stab.
 
 #### StablastEintrag.verteilt
@@ -99,14 +104,13 @@ def verteilt(self) -> bool
 class SystemlinieEintrag(Beschreibung)
 ```
 
-Eine Linie des Systems: ein Stab, wenn `stab`; dazu, oder ohne Stab,
-ein Linienlager quer und laengs.
+Eine Linie des Systems: ein Stab, wenn sie einen Querschnitt hat; dazu,
+oder ohne Stab, ein Linienlager quer und laengs.
 
 - `kennung: str = ''`
 - `von: str = ''`
 - `bis: str = ''`
-- `stab: bool = False`
-- `querschnitt: str = ''` – Kennung des Querschnitts im System (`Q1`).
+- `querschnitt: str = ''` – Kennung des Querschnitts im System (`Q1`); leer: kein Stab, nur eine Linie.
 - `material: str = ''` – Kennung des Materials im Projekt (`b1`).
 - `gelenk_anfang: bool = False`
 - `gelenk_ende: bool = False`
@@ -115,6 +119,15 @@ ein Linienlager quer und laengs.
 - `laengs: str = einer_von(HALT, 'frei')`
 - `k_laengs: float = 0.0`
 - `lasten: List[StablastEintrag] = field(default_factory=list)`
+
+#### SystemlinieEintrag.stab
+
+```python
+@property
+def stab(self) -> bool
+```
+
+Ob die Linie traegt -- sie hat einen Querschnitt.
 
 ### LagerEintrag
 
@@ -141,7 +154,8 @@ Ein Lager an einem Knoten: je Richtung frei, fest oder Feder.
 class KnotenlastEintrag(Beschreibung)
 ```
 
-Eine Last an einem Knoten, in einem Lastfall: eine Kraft mit Richtung oder ein Moment.
+Eine Last an einem Knoten, in einem Lastfall: eine Kraft mit Richtung
+oder ein Moment. Ihre Kennung zaehlt mit denen der Stablasten (`P1`).
 
 - `kennung: str = ''`
 - `knoten: str = ''`
@@ -285,6 +299,14 @@ def bezuege(self) -> List[str]
 
 Die Platten und Querschnittsanalysen, deren Querschnitt ein Stab nimmt.
 
+#### BalkensystemEintrag.alle_lasten
+
+```python
+def alle_lasten(self) -> List[Any]
+```
+
+Jede Last des Systems, auf den Linien und an den Knoten -- ihre Kennungen zaehlen zusammen.
+
 #### BalkensystemEintrag.linie_von
 
 ```python
@@ -410,10 +432,11 @@ def teilen(self, kennung: str, stelle: float) -> SystemlinieEintrag
 
 Teilt eine Linie bei `stelle` m ab ihrem Anfang: sie endet dort, und
 eine neue laeuft weiter zum alten Ende -- mit ihren Eigenschaften. Die
-Lasten gehen mit, je auf ihre Haelfte: eine Strecke ueber den Schnitt
-wird zwei, mit dem Wert an der Schnittstelle; eine Einzellast bleibt
-dort, wo sie steht. Das Gelenk am Ende wandert mit ans neue Ende; an
-der Schnittstelle ist die Linie durchlaufend.
+Lasten gehen mit: eine verteilte liegt danach auf beiden Haelften, mit
+dem Wert an der Schnittstelle, die auf der zweiten mit einer eigenen
+Kennung; eine Einzellast bleibt dort, wo sie steht, ihre Stelle in %
+der neuen Haelfte. Das Gelenk am Ende wandert mit ans neue Ende; an der
+Schnittstelle ist die Linie durchlaufend.
 
 #### BalkensystemEintrag.umkehren
 

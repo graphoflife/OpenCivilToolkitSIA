@@ -1640,6 +1640,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-zeile input[type="number"] { padding-block: 2px; }
 .cad-zeile .einheit { font-size: 11px; color: var(--schrift-zart); }
 .cad-neu { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid var(--rand); }
+/* Ein Knopf, der selten gebrauchte Felder auf- und zuklappt -- die Bettung einer Linie. */
+.cad-aufklapper {
+  align-self: flex-start; padding: 2px 0; border: none; background: none;
+  color: var(--schrift-matt); font: inherit; font-size: 12px; cursor: pointer;
+}
+.cad-aufklapper:hover { color: var(--blau-tief); }
 /* Die Schalter im Fenster -- die Bewehrung als Linie oder als Punkt, mit
    Zeichen, und ihre Verteilung: über den Feldern, so breit wie nötig. */
 .cad-wahl { align-self: flex-start; }
@@ -2019,6 +2025,11 @@ details.nb-callout > summary { cursor: pointer; }
   font-size: 11px; font-weight: 600; fill: var(--last);
   paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
 }
+/* Eine gewählte Last steht blau, wie jede Auswahl -- ihre Zahl behält den
+   weissen Rand. */
+.bs-lastgruppe.ist-gewaehlt .bs-last:not(text) { stroke: var(--blau); stroke-width: 2; }
+.bs-lastgruppe.ist-gewaehlt .bs-spitze { fill: var(--blau); }
+.bs-lastgruppe.ist-gewaehlt text { fill: var(--blau); }
 .bs-unbestimmt circle { fill: none; stroke: var(--warn); stroke-width: 1.6; stroke-dasharray: 2 2; }
 .bs-unbestimmt-text { font-size: 12px; font-weight: 700; fill: var(--warn); }
 .bs-beweglich { fill: var(--schlecht); fill-opacity: .15; stroke: var(--schlecht); stroke-width: 1.6; }

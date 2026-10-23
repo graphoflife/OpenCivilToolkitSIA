@@ -10,22 +10,26 @@ Oberflaeche zeichnet, und was beim Teilen und Umkehren einer Linie mit ihren
 Lasten geschieht. Gerechnet wird in :mod:`opencivil.stabwerk`.
 
 ZUERST GEOMETRIE:
-Gezeichnet werden Knoten und Linien. Eine Linie wird zum Stab, sobald sie
-Querschnitt und Material hat (``stab``); sie kann daneben -- oder statt dessen
--- ein Linienlager sein, quer und laengs je frei, fest oder federnd. Ein
-Knoten wird zum Lager durch ein :class:`LagerEintrag` an ihm, nicht durch ein
-Feld am Knoten: das Zeichenfenster fuehrt Knoten zusammen und legt neue an,
-und ein Feld daran ginge dabei verloren.
+Gezeichnet werden Knoten und Linien. Eine Linie ist ein Stab, sobald sie
+einen Querschnitt hat; sie kann daneben -- oder statt dessen -- ein
+Linienlager sein, quer und laengs je frei, fest oder federnd. Ein Knoten
+wird zum Lager durch ein :class:`LagerEintrag` an ihm, nicht durch ein Feld
+am Knoten: das Zeichenfenster fuehrt Knoten zusammen und legt neue an, und
+ein Feld daran ginge dabei verloren.
 
 LASTEN AN IHREN ELEMENTEN:
 Eine Last auf einem Stab steht an seiner Linie (``lasten``), mit dem
 Lastfall, zu dem sie gehoert. So bleibt sie bei der Linie, wenn diese
-kopiert, geloescht oder rueckgaengig gemacht wird. Eine Last an einem Knoten
-ist -- wie ein Lager -- ein eigener Eintrag an ihm.
+kopiert, geteilt, geloescht oder rueckgaengig gemacht wird. Eine Last an
+einem Knoten ist -- wie ein Lager -- ein eigener Eintrag an ihm. Jede Last
+hat eine eigene Kennung (``P1``): im Zeichenfenster laesst sie sich fuer sich
+waehlen und loeschen (Benutzer, 2026-10-23). Eine verteilte Last liegt immer
+auf der ganzen Linie, eine Einzellast und ein Einzelmoment an einer Stelle
+in Prozent der Linie ab ihrem Anfang.
 
 KOORDINATEN UND EINHEITEN:
-x nach rechts, z nach oben, in m; Stellen auf einem Stab in m ab seinem
-Anfang. Querschnittsmasse in mm, A in mm², I in 10⁶ mm⁴. Lasten in kN, kN/m,
+x nach rechts, z nach oben, in m; Stellen auf einem Stab in % seiner Laenge
+ab seinem Anfang. Querschnittsmasse in mm, A in mm², I in 10⁶ mm⁴. Lasten in kN, kN/m,
 kNm und kNm/m; Federn in kN/m und kNm/rad, Bettung in kN/m². Umgerechnet
 wird beim Bauen.
 
@@ -43,10 +47,10 @@ from dataclasses import dataclass, field, replace
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import (
-    KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, Groesse,
+    KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, PROZENT, Groesse,
 )
 from opencivil.projekt.eintraege import Beschreibung
-from opencivil.projekt.lesen import ProjektFehler, einer_von
+from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.stabwerk import querschnitte as qs
 from opencivil.stabwerk.modell import (
@@ -115,18 +119,19 @@ class SystemknotenEintrag(Beschreibung):
 class StablastEintrag(Beschreibung):
     """
     Eine Last auf einem Stab, in einem Lastfall -- in der Einheit ihrer Art
-    (:data:`EINHEIT_DER_LAST`). ``wert_b`` gilt am Ende des belasteten
-    Bereichs, leer: wie ``wert_a``. ``bis`` leer: bis zum Ende des Stabs.
-    Einzellast und Einzelmoment stehen bei ``von``.
+    (:data:`EINHEIT_DER_LAST`). Eine verteilte liegt auf der ganzen Linie:
+    ``wert_a`` am Anfang, ``wert_b`` am Ende, leer: wie ``wert_a``.
+    Einzellast und Einzelmoment stehen bei ``stelle``, in % der Linie ab
+    ihrem Anfang (Benutzer, 2026-10-23).
     """
 
+    kennung: str = ""
     lastfall: str = ""
     art: Lastart = Lastart.LINIENLAST
     richtung: Lastrichtung = Lastrichtung.SENKRECHT
     wert_a: float = 10.0
     wert_b: Optional[float] = None
-    von: float = 0.0
-    bis: Optional[float] = None
+    stelle: float = bereich(50.0, heisst="Stelle", einheit=PROZENT, ab=0.0, bis=100.0)
     projiziert: bool = False
     """Senkrecht und waagrecht je Meter Projektion statt je Meter Stab."""
 
@@ -138,16 +143,15 @@ class StablastEintrag(Beschreibung):
 @dataclass
 class SystemlinieEintrag(Beschreibung):
     """
-    Eine Linie des Systems: ein Stab, wenn ``stab``; dazu, oder ohne Stab,
-    ein Linienlager quer und laengs.
+    Eine Linie des Systems: ein Stab, wenn sie einen Querschnitt hat; dazu,
+    oder ohne Stab, ein Linienlager quer und laengs.
     """
 
     kennung: str = ""
     von: str = ""
     bis: str = ""
-    stab: bool = False
     querschnitt: str = ""
-    """Kennung des Querschnitts im System (``Q1``)."""
+    """Kennung des Querschnitts im System (``Q1``); leer: kein Stab, nur eine Linie."""
 
     material: str = ""
     """Kennung des Materials im Projekt (``b1``)."""
@@ -161,6 +165,11 @@ class SystemlinieEintrag(Beschreibung):
     laengs: str = einer_von(HALT, "frei")
     k_laengs: float = 0.0
     lasten: List[StablastEintrag] = field(default_factory=list)
+
+    @property
+    def stab(self) -> bool:
+        """Ob die Linie traegt -- sie hat einen Querschnitt."""
+        return bool(self.querschnitt)
 
 
 @dataclass
@@ -182,7 +191,10 @@ class LagerEintrag(Beschreibung):
 
 @dataclass
 class KnotenlastEintrag(Beschreibung):
-    """Eine Last an einem Knoten, in einem Lastfall: eine Kraft mit Richtung oder ein Moment."""
+    """
+    Eine Last an einem Knoten, in einem Lastfall: eine Kraft mit Richtung
+    oder ein Moment. Ihre Kennung zaehlt mit denen der Stablasten (``P1``).
+    """
 
     kennung: str = ""
     knoten: str = ""
@@ -325,6 +337,10 @@ class BalkensystemEintrag(Beschreibung):
         return sorted({q.bezug for q in self.querschnitte
                        if q.art in ("platte", "analyse") and q.bezug})
 
+    def alle_lasten(self) -> List[Any]:
+        """Jede Last des Systems, auf den Linien und an den Knoten -- ihre Kennungen zaehlen zusammen."""
+        return [last for l in self.linien for last in l.lasten] + list(self.knotenlasten)
+
     def linie_von(self, kennung: str) -> SystemlinieEintrag:
         for l in self.linien:
             if l.kennung == kennung:
@@ -383,7 +399,7 @@ class BalkensystemEintrag(Beschreibung):
         # 2026-10-16 fiel eine Last bei zwei gleichen Lastfall-Kennungen still
         # in beide.
         for was, liste in (("Knoten", self.knoten), ("Linien", self.linien),
-                           ("Lager", self.lager), ("Knotenlasten", self.knotenlasten),
+                           ("Lager", self.lager), ("Lasten", self.alle_lasten()),
                            ("Querschnitte", self.querschnitte), ("Lastfälle", self.lastfaelle),
                            ("Kombinationen", self.kombinationen)):
             kennungen = [e.kennung for e in liste]
@@ -441,15 +457,17 @@ class BalkensystemEintrag(Beschreibung):
         for l in self.linien:
             for last in l.lasten:
                 if last.lastfall not in name_von:
-                    melden(f"{l.kennung}: eine Last gehört zu keinem Lastfall – sie wird "
-                           f"nicht gerechnet.", l.kennung, fehler=False)
+                    melden(f"{last.kennung or l.kennung}: die Last gehört zu keinem Lastfall – "
+                           f"sie wird nicht gerechnet.", last.kennung or l.kennung, fehler=False)
                     continue
                 einheit = EINHEIT_DER_LAST[last.art]
+                # Verteilt ueber die ganze Linie, einzeln an ihrer Stelle.
+                von = 0.0 if last.verteilt else last.stelle / 100.0 * self.laenge(l)
                 lasten[last.lastfall].append(Stablast(
                     stab=l.kennung, art=last.art,
                     wert_a=Groesse(last.wert_a, einheit).si,
                     wert_b=None if last.wert_b is None else Groesse(last.wert_b, einheit).si,
-                    richtung=last.richtung, von=last.von, bis=last.bis,
+                    richtung=last.richtung, von=von, bis=None,
                     projiziert=last.projiziert))
         for p in self.knotenlasten:
             if p.lastfall not in name_von:
@@ -506,7 +524,6 @@ class BalkensystemEintrag(Beschreibung):
         eintrag = SystemlinieEintrag.aus_dict({
             "kennung": self._neue_kennung(self.linien, "L"),
             "von": self._knoten(netz, von), "bis": self._knoten(netz, bis),
-            "stab": querschnitt is not None,
             "querschnitt": _kennung_von(querschnitt) if querschnitt is not None else "",
             "material": _kennung_von(material) if material is not None else "", **felder},
             f"Balkensystem '{self.name}', linien")
@@ -571,7 +588,8 @@ class BalkensystemEintrag(Beschreibung):
     def stablast(self, lastfall: Any, linie: Any, art: Lastart = Lastart.LINIENLAST,
                  wert: float = 10.0, **felder: Any) -> StablastEintrag:
         """Eine Last auf einer Linie -- ``wert`` ist ``wert_a``; Felder wie :class:`StablastEintrag`."""
-        eintrag = StablastEintrag.aus_dict({"lastfall": _kennung_von(lastfall), "art": art,
+        eintrag = StablastEintrag.aus_dict({"kennung": self._neue_kennung(self.alle_lasten(), "P"),
+                                            "lastfall": _kennung_von(lastfall), "art": art,
                                             "wert_a": wert, **felder},
                                            f"Balkensystem '{self.name}', lasten")
         self.linie_von(_kennung_von(linie)).lasten.append(eintrag)
@@ -580,7 +598,7 @@ class BalkensystemEintrag(Beschreibung):
     def knotenlast(self, lastfall: Any, ort: Ort, wert: float = 10.0, *, art: str = "kraft",
                    richtung: Lastrichtung = Lastrichtung.SENKRECHT) -> KnotenlastEintrag:
         eintrag = KnotenlastEintrag.aus_dict({
-            "kennung": self._neue_kennung(self.knotenlasten, "P"),
+            "kennung": self._neue_kennung(self.alle_lasten(), "P"),
             "knoten": self._knoten(self.netz(), ort), "lastfall": _kennung_von(lastfall),
             "art": art, "richtung": richtung, "wert": wert},
             f"Balkensystem '{self.name}', knotenlasten")
@@ -593,10 +611,11 @@ class BalkensystemEintrag(Beschreibung):
         """
         Teilt eine Linie bei ``stelle`` m ab ihrem Anfang: sie endet dort, und
         eine neue laeuft weiter zum alten Ende -- mit ihren Eigenschaften. Die
-        Lasten gehen mit, je auf ihre Haelfte: eine Strecke ueber den Schnitt
-        wird zwei, mit dem Wert an der Schnittstelle; eine Einzellast bleibt
-        dort, wo sie steht. Das Gelenk am Ende wandert mit ans neue Ende; an
-        der Schnittstelle ist die Linie durchlaufend.
+        Lasten gehen mit: eine verteilte liegt danach auf beiden Haelften, mit
+        dem Wert an der Schnittstelle, die auf der zweiten mit einer eigenen
+        Kennung; eine Einzellast bleibt dort, wo sie steht, ihre Stelle in %
+        der neuen Haelfte. Das Gelenk am Ende wandert mit ans neue Ende; an der
+        Schnittstelle ist die Linie durchlaufend.
         """
         linie = self.linie_von(kennung)
         (xa, za), (xb, zb) = self.enden(linie)
@@ -610,31 +629,24 @@ class BalkensystemEintrag(Beschreibung):
         zweite.kennung = self._neue_kennung(self.linien, "L")
         zweite.von, zweite.gelenk_anfang = mitte, False
         linie.bis, linie.gelenk_ende = mitte, False
+        anteil = stelle / L
+        vergeben = {last.kennung for last in self.alle_lasten()}
         erste_lasten, zweite_lasten = [], []
         for last in linie.lasten:
             if not last.verteilt:
-                if last.von <= stelle:
-                    erste_lasten.append(last)
+                if last.stelle <= 100.0 * anteil:
+                    erste_lasten.append(replace(last, stelle=last.stelle / anteil))
                 else:
-                    zweite_lasten.append(replace(last, von=last.von - stelle))
+                    zweite_lasten.append(replace(
+                        last, stelle=(last.stelle - 100.0 * anteil) / (1.0 - anteil)))
                 continue
-            a, b = last.von, L if last.bis is None else last.bis
-            wb = last.wert_a if last.wert_b is None else last.wert_b
-
-            def wert(x: float) -> float:
-                return last.wert_a if b == a else last.wert_a + (wb - last.wert_a) * (x - a) / (b - a)
-
-            konstant = last.wert_b is None
-            if a < stelle:
-                ende = min(b, stelle)
-                erste_lasten.append(replace(
-                    last, bis=None if ende >= stelle else ende,
-                    wert_b=None if konstant else wert(ende)))
-            if b > stelle:
-                anfang = max(a, stelle)
-                zweite_lasten.append(replace(
-                    last, von=anfang - stelle, bis=None if last.bis is None else b - stelle,
-                    wert_a=wert(anfang), wert_b=None if konstant else wb))
+            mitte = None if last.wert_b is None else \
+                last.wert_a + (last.wert_b - last.wert_a) * anteil
+            kennung = naechste_kennung(vergeben, "P")
+            vergeben.add(kennung)
+            erste_lasten.append(replace(last, wert_b=mitte))
+            zweite_lasten.append(replace(last, kennung=kennung,
+                                         wert_a=last.wert_a if mitte is None else mitte))
         linie.lasten, zweite.lasten = erste_lasten, zweite_lasten
         self.linien.insert(self.linien.index(linie) + 1, zweite)
         return zweite
@@ -648,7 +660,6 @@ class BalkensystemEintrag(Beschreibung):
         Linie. Senkrecht, waagrecht und Momente aendern sich nicht.
         """
         linie = self.linie_von(kennung)
-        L = self.laenge(linie)
         linie.von, linie.bis = linie.bis, linie.von
         linie.gelenk_anfang, linie.gelenk_ende = linie.gelenk_ende, linie.gelenk_anfang
         neu = []
@@ -656,13 +667,12 @@ class BalkensystemEintrag(Beschreibung):
             vorzeichen = -1.0 if last.richtung in (Lastrichtung.QUER, Lastrichtung.LAENGS) \
                 and last.art.kraft else 1.0
             if not last.verteilt:
-                neu.append(replace(last, von=L - last.von, wert_a=vorzeichen * last.wert_a))
+                neu.append(replace(last, stelle=100.0 - last.stelle,
+                                   wert_a=vorzeichen * last.wert_a))
                 continue
-            a, b = last.von, L if last.bis is None else last.bis
             wb = last.wert_a if last.wert_b is None else last.wert_b
             neu.append(replace(
-                last, von=L - b, bis=None if a == 0.0 else L - a,
-                wert_a=vorzeichen * wb,
+                last, wert_a=vorzeichen * wb,
                 wert_b=None if last.wert_b is None else vorzeichen * last.wert_a))
         linie.lasten = neu
 

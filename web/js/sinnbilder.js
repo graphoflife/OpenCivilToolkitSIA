@@ -178,6 +178,12 @@ const ZEICHEN = {
     kreise: [[12, 12, 6]],
     voll: [[12, 12, 2.2]],
   },
+  // Eine Last: drei Pfeile auf einen Stab.
+  'cad-last': {
+    pfade: ['M3 19.5h18', 'M5 4.5h14',
+      'M6 4.5v10 M3.8 12.3L6 14.5l2.2-2.2', 'M12 4.5v10 M9.8 12.3L12 14.5l2.2-2.2',
+      'M18 4.5v10 M15.8 12.3L18 14.5l2.2-2.2'],
+  },
   'cad-rueckgaengig': {
     pfade: ['M8.5 5.5L4 10l4.5 4.5', 'M4 10h11a5 5 0 0 1 0 10h-4'],
   },

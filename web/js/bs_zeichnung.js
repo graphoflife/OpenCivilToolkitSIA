@@ -2,13 +2,21 @@
  * bs_zeichnung.js -- das Zeichenfenster eines Balkensystems: der Adapter.
  *
  * Gezeichnet werden Knoten und Linien, in Metern, x nach rechts und z nach
- * oben. Eine Linie ist ein Stab, sobald sie «Stab» ist und Querschnitt und
- * Material hat; daneben kann sie ein Linienlager sein, quer und längs. Lager
- * und Knotenlasten sind eigene Einträge an einem Knoten -- so überstehen sie
- * das Zusammenführen von Knoten --, gewählt wird aber der Knoten: das
- * schwebende Fenster zeigt an ihm sein Lager und die Lasten des gewählten
- * Lastfalls. Die Lasten auf einem Stab stehen an seiner Linie und gehen mit
- * ihr, wenn sie kopiert oder gelöscht wird.
+ * oben. Eine Linie ist ein Stab, sobald sie einen Querschnitt hat; daneben
+ * kann sie ein Linienlager sein, quer und längs (die Bettung, im Fenster
+ * eingeklappt). Lager sind eigene Einträge an einem Knoten -- so überstehen
+ * sie das Zusammenführen von Knoten --, gewählt wird aber der Knoten.
+ *
+ * LASTEN:
+ * Jede Last ist für sich zu wählen und zu löschen, ein Anhang des
+ * Zeichenfensters (`anhaenge`): ein Klick auf ihren Pfeil, ihr Band oder ihre
+ * Zahl (Benutzer, 2026-10-23). Angelegt wird sie mit dem Werkzeug «Last» --
+ * ein Klick auf eine Linie, eine Einzellast oder ein Moment auch an einen
+ * Knoten; eine Einzellast auf einer Linie steht dort, wo geklickt wurde, in
+ * % der Linie. Gezeigt werden die Lasten des gewählten Lastfalls. Die Lasten
+ * auf einem Stab stehen an seiner Linie und gehen mit ihr, wenn sie kopiert,
+ * geteilt oder gelöscht wird; die an einem Knoten sind eigene Einträge an
+ * ihm.
  *
  * VERBUNDEN:
  * Ein Rahmen hängt an seinen Knoten (`verbunden` im Zeichenfenster): ein
@@ -30,7 +38,10 @@ import { wahlBlock, wahlSchalter } from './bausteine.js';
 import { nachBild, zahlText } from './cad_ansicht.js';
 import { imSpiel } from './cad_auswahl.js';
 import { cadBereich, cadFenster, cadVergessen, cadWaehlen } from './cad_fenster.js';
-import { abstand, auswahlTeil } from './cad_modell.js';
+import { NAEHE } from './cad_eingabe.js';
+import {
+  abstand, aufStrecke, auswahlTeil, innen,
+} from './cad_modell.js';
 import {
   GROESSE, faserSymbol, gelenkSymbol, imBild, kraftpfeil, lagerSymbol, linienlagerSymbol,
   momentSymbol, streckenlast, streckenmoment, unbestimmtSymbol,
@@ -41,8 +52,9 @@ import {
 import { aendern, ausVorlage, projektAendern, zustand } from './zustand.js';
 
 /**
- * Die Arten des Systems. Gewählt werden nur Linien und Knoten: ein Lager und
- * eine Knotenlast gehören ihrem Knoten (`waehlbar`).
+ * Die Arten des Systems. Gewählt werden Linien und Knoten: ein Lager gehört
+ * seinem Knoten (`waehlbar`). Eine Knotenlast wählt man an ihrem Pfeil, wie
+ * jede Last (`anhaenge`).
  */
 const ARTEN = [
   { liste: 'linien', form: 'linie', vorsilbe: 'L', rang: 0 },
@@ -54,8 +66,10 @@ const ARTEN = [
 const EINSTELLUNG = {
   werkzeuge: [
     { name: 'linie', text: 'Linie', zeichen: 'cad-linie', taste: 'l', form: 'linie',
-      titel: 'Linie -- ein Stab, wenn im Fenster «Stab» an ist' },
+      titel: 'Linie -- ein Stab, sobald sie einen Querschnitt hat' },
     { name: 'knoten', text: 'Knoten', zeichen: 'cad-knoten', taste: 'k', form: 'knoten' },
+    { name: 'last', text: 'Last', zeichen: 'cad-last', taste: 'q', form: 'anhang',
+      titel: 'Last -- auf eine Linie klicken, eine Einzellast oder ein Moment auch an einen Knoten' },
   ],
   einheit: 'm',
   raster: { stufen: [0.05, 0.1, 0.25, 0.5, 1, 2], vorgabe: 0.5 },
@@ -89,10 +103,6 @@ function katalog() {
 
 function lastart(wert) {
   return katalog().lastarten.find((x) => x.wert === wert) || { beschriftung: wert, einheit: '' };
-}
-
-function richtungText(wert) {
-  return katalog().richtungen.find((x) => x.wert === wert)?.beschriftung || wert;
 }
 
 // ===========================================================================
@@ -180,9 +190,11 @@ function vorgabenNeu(system) {
   const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   return {
     linie: {
-      stab: true,
       querschnitt: system?.querschnitte?.[0]?.kennung || '',
       material: beton?.kennung || '',
+    },
+    last: {
+      art: 'linienlast', richtung: 'senkrecht', wert_a: 10, wert_b: null,
     },
   };
 }
@@ -206,8 +218,18 @@ function adapter(kennung) {
     neuText,
     punktAnlegen: () => null,
     linieAnlegen,
+    anhangAnlegen: lastAnlegen,
     zeichnen,
     waehlbar: (art) => art.liste === 'linien',
+    anhaenge: {
+      hat: (z, kennung) => Boolean(z && lastVon(z, kennung)),
+      treffer: lastenGetroffen,
+      // Knotenlasten sind Elemente des Fensters, die löscht es selbst.
+      loeschen: (z, weg) => {
+        for (const l of z.linien) l.lasten = l.lasten.filter((x) => !weg.has(x.kennung));
+      },
+      rahmen: lastenRahmen,
+    },
     umriss: () => umriss(eintragVon(kennung)),
     geaendert: uebersichtHolen,
     gezeichnet: auswahlMarkieren,
@@ -227,13 +249,15 @@ export function elementname(a, kennung) {
   if (/^K\d+$/.test(kennung)) return `Knoten ${kennung}`;
   if (/^L\d+$/.test(kennung)) {
     const l = eintragVon(a.bs.kennung)?.linien.find((x) => x.kennung === kennung);
-    return `${l?.stab ? 'Stab' : 'Linie'} ${kennung}`;
+    return `${l?.querschnitt ? 'Stab' : 'Linie'} ${kennung}`;
   }
+  if (/^P\d+$/.test(kennung)) return `Last ${kennung}`;
   return kennung;
 }
 
 function neuText(a, werkzeug) {
-  if (werkzeug === 'linie') return a.bs.vorgaben.linie.stab ? 'Stab' : 'Linie';
+  if (werkzeug === 'linie') return a.bs.vorgaben.linie.querschnitt ? 'Stab' : 'Linie';
+  if (werkzeug === 'last') return lastart(a.bs.vorgaben.last.art).beschriftung;
   return 'Knoten';
 }
 
@@ -242,9 +266,129 @@ function linieAnlegen(a, z, von, bis) {
   const v = a.bs.vorgaben.linie;
   z.linien.push({
     ...ausVorlage('systemlinie'), kennung, von, bis,
-    stab: v.stab, querschnitt: v.stab ? v.querschnitt : '', material: v.stab ? v.material : '',
+    querschnitt: v.querschnitt, material: v.querschnitt ? v.material : '',
   });
   return kennung;
+}
+
+// ===========================================================================
+// Lasten
+// ===========================================================================
+
+/** Jede Last des Systems -- auf den Linien und an den Knoten. */
+function alleLasten(z) {
+  return [...z.linien.flatMap((l) => l.lasten), ...z.knotenlasten];
+}
+
+/** Die Last zu einer Kennung -- `{last, linie}` oder `{last, knoten}` -- oder null. */
+function lastVon(z, kennung) {
+  for (const l of z.linien) {
+    const last = l.lasten.find((x) => x.kennung === kennung);
+    if (last) return { last, linie: l };
+  }
+  const p = z.knotenlasten.find((x) => x.kennung === kennung);
+  return p ? { last: p, knoten: p.knoten } : null;
+}
+
+/** Die nächste Kennung einer Last: die grösste plus eins, wie im Kern -- Stab- und Knotenlasten zählen zusammen. */
+function naechsteLast(z) {
+  const nummern = alleLasten(z).map((x) => Number(String(x.kennung).replace(/^P/, '')) || 0);
+  return `P${Math.max(0, ...nummern) + 1}`;
+}
+
+/**
+ * Eine Last, wo geklickt wurde -- im gewählten Lastfall, nach den Vorgaben
+ * des Werkzeugs. Eine Einzellast oder ein Moment an einem Knoten, wenn er
+ * getroffen ist; sonst auf der nächsten Linie: verteilt auf der ganzen,
+ * einzeln dort, wo geklickt wurde. Gibt die Kennung zurück, oder null.
+ */
+function lastAnlegen(a, z, erg) {
+  const lf = aktiverLastfall(a.bs.kennung);
+  if (!lf) {
+    melden('Für Lasten zuerst im Panel «Lastfälle» einen Lastfall anlegen.', true);
+    return null;
+  }
+  const v = a.bs.vorgaben.last;
+  const art = lastart(v.art);
+  const weit = NAEHE / a.v.massstab;
+  if (!art.verteilt) {
+    const knoten = erg.knoten || z.knoten.find((k) => abstand([k.x, k.z], erg.p) <= weit)?.kennung;
+    if (knoten) {
+      const kennung = naechsteLast(z);
+      z.knotenlasten.push({
+        ...ausVorlage('knotenlast'), kennung, knoten, lastfall: lf,
+        art: v.art === 'moment' ? 'moment' : 'kraft',
+        richtung: katalog().knotenrichtungen.includes(v.richtung) ? v.richtung : 'senkrecht',
+        wert: v.wert_a,
+      });
+      return kennung;
+    }
+  }
+  const lagen = a.modell.lagen(z);
+  let beste = null;
+  for (const l of z.linien) {
+    const [p, q] = [lagen.get(l.von), lagen.get(l.bis)];
+    if (!p || !q) continue;
+    const { q: fuss, t } = aufStrecke(erg.p, p, q);
+    const d = abstand(fuss, erg.p);
+    if (d <= weit && (!beste || d < beste.d)) beste = { l, t, d };
+  }
+  if (!beste) {
+    melden(art.verteilt ? 'Eine verteilte Last gehört auf eine Linie -- dort klicken.'
+      : 'Auf eine Linie oder einen Knoten klicken.');
+    return null;
+  }
+  const kennung = naechsteLast(z);
+  beste.l.lasten.push({
+    ...ausVorlage('stablast'), kennung, lastfall: lf, art: v.art, richtung: v.richtung,
+    wert_a: v.wert_a, wert_b: art.verteilt ? v.wert_b : null,
+    // In % der Linie, auf ein Zehntel -- dort, wo geklickt wurde.
+    ...(art.verteilt ? {} : { stelle: Math.round(beste.t * 1000) / 10 }),
+  });
+  return kennung;
+}
+
+/**
+ * Welche Lasten ein Klick trifft, die nächste zuerst: ihre Formen im Bild
+ * stehen vom letzten Zeichnen da (`a.bs.lastformen`), dazu ihre Zahl. Ein
+ * Band zählt nicht bis an seine Linie heran und ein Pfeil nicht bis an seine
+ * Spitze: dort soll ein Klick die Linie oder den Knoten treffen.
+ */
+function lastenGetroffen(a, bild) {
+  const ecke = a.teile.bild.getBoundingClientRect();
+  const treffer = [];
+  for (const f of a.bs.lastformen || []) {
+    let d = f.formen.reduce((m, x) => Math.min(m, formAbstand(x, bild)), Infinity);
+    const r = f.text?.isConnected ? f.text.getBoundingClientRect() : null;
+    if (r && bild[0] >= r.left - ecke.left - 2 && bild[0] <= r.right - ecke.left + 2
+        && bild[1] >= r.top - ecke.top - 2 && bild[1] <= r.bottom - ecke.top + 2) d = 0;
+    if (d <= 0) treffer.push({ kennung: f.kennung, d: abstand(bild, f.mitte) });
+  }
+  return treffer.sort((p, q) => p.d - q.d).map((x) => x.kennung);
+}
+
+/** Null, wenn der Bildpunkt die Form trifft -- sonst etwas Positives. */
+function formAbstand(form, p) {
+  if (form.art === 'band') {
+    const [a, b] = form.linie;
+    const vonLinie = abstand(p, aufStrecke(p, a, b).q);
+    return innen(p, form.punkte) && vonLinie >= 4 ? 0 : 1;
+  }
+  if (form.art === 'strecke') {
+    return abstand(p, aufStrecke(p, form.von, form.bis).q) <= 5 ? 0 : 1;
+  }
+  // Ein Bogen: auf dem Ring um seinen Mittelpunkt.
+  return Math.abs(abstand(p, form.mitte) - form.r) <= 5 ? 0 : 1;
+}
+
+/** Wo die gewählten Lasten im Bild liegen -- [x0, y0, x1, y1] oder null. */
+function lastenRahmen(a) {
+  const ecke = a.teile.bild.getBoundingClientRect();
+  const rahmen = (a.bs.lastformen || []).filter((f) => a.auswahl.has(f.kennung) && f.knoten.isConnected)
+    .map((f) => f.knoten.getBoundingClientRect());
+  if (!rahmen.length) return null;
+  return [Math.min(...rahmen.map((r) => r.left)) - ecke.left, Math.min(...rahmen.map((r) => r.top)) - ecke.top,
+    Math.max(...rahmen.map((r) => r.right)) - ecke.left, Math.max(...rahmen.map((r) => r.bottom)) - ecke.top];
 }
 
 /** Was im Bild sein soll: alle Knoten -- sonst ein Feld von 6 × 4 m. */
@@ -374,11 +518,11 @@ function zeichnen(a, g) {
     const [p, q] = [bild(l.von), bild(l.bis)];
     if (!p || !q) continue;
     if (l.quer !== 'frei' || l.laengs !== 'frei') zeichen.append(linienlagerSymbol(p, q, l.quer, l.laengs));
-    const klasse = [l.stab ? 'bs-stab' : 'bs-linie', fehler(l.kennung) || beweglich.has(l.kennung) ? 'ist-fehler' : ''].join(' ');
+    const klasse = [l.querschnitt ? 'bs-stab' : 'bs-linie', fehler(l.kennung) || beweglich.has(l.kennung) ? 'ist-fehler' : ''].join(' ');
     linien.append(mitTitel(svgEl('path', {
       d: `M${p[0].toFixed(1)} ${p[1].toFixed(1)} L${q[0].toFixed(1)} ${q[1].toFixed(1)}`, class: klasse,
     }), texte(l.kennung)));
-    if (!l.stab) continue;
+    if (!l.querschnitt) continue;
     const faser = faserSymbol(p, q);
     if (faser) zeichen.append(faser);
     const lang = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1;
@@ -396,6 +540,7 @@ function zeichnen(a, g) {
 
   // Die Lasten des gewählten Lastfalls.
   const lf = aktiverLastfall(a.bs.kennung);
+  a.bs.lastformen = [];
   if (lf) g.append(lastenZeichnen(a, z, lf, lagen));
 
   // Knoten ohne Drehsteifigkeit, bewegliche Knoten.
@@ -415,10 +560,20 @@ function zeichnen(a, g) {
  * Die Lasten eines Lastfalls: auf den Stäben die verteilten als Pfeilband,
  * Einzellasten und Momente einzeln; an den Knoten Kräfte und Momente. Die
  * Pfeillänge der verteilten Lasten folgt ihrem Wert, je Art im Verhältnis
- * zur grössten.
+ * zur grössten. Je Last merkt sich das Fenster ihr Zeichen und seine Formen
+ * zum Wählen (`a.bs.lastformen`); eine gewählte steht blau.
  */
 function lastenZeichnen(a, z, lf, lagen) {
   const g = svgEl('g', { class: 'bs-lasten' });
+  const formen = [];
+  const ablegen = (kennung, zeichen) => {
+    zeichen.classList.add('bs-lastgruppe');
+    if (a.auswahl.has(kennung)) zeichen.classList.add('ist-gewaehlt');
+    g.append(zeichen);
+    const punkte = zeichen.formen.flatMap((f) => f.punkte || (f.von ? [f.von, f.bis] : [f.mitte]));
+    const mitte = [0, 1].map((i) => punkte.reduce((s, p) => s + p[i], 0) / punkte.length);
+    formen.push({ kennung, knoten: zeichen, formen: zeichen.formen, mitte, text: zeichen.querySelector('text') });
+  };
   const groesste = { linienlast: 0, linienmoment: 0 };
   for (const l of z.linien) {
     for (const last of l.lasten) {
@@ -437,21 +592,22 @@ function lastenZeichnen(a, z, lf, lagen) {
       if (last.lastfall !== lf) continue;
       const art = lastart(last.art);
       const r = imBild(richtungVon(last.richtung, c, s));
+      // Eine verteilte Last liegt auf der ganzen Linie, eine einzelne an ihrer Stelle.
+      const stelle = ort((last.stelle / 100) * L);
       if (last.art === 'linienlast') {
-        const bis = last.bis ?? L;
         const wb = last.wert_b ?? last.wert_a;
         const massstab = GROESSE.pfeil / (groesste.linienlast || 1);
-        g.append(streckenlast(ort(last.von), ort(bis), r, last.wert_a * massstab, wb * massstab,
+        ablegen(last.kennung, streckenlast(ort(0), ort(L), r, last.wert_a * massstab, wb * massstab,
           last.wert_b === null || last.wert_b === undefined || last.wert_b === last.wert_a
             ? wertText(last.wert_a, art.einheit)
             : `${zahlText(last.wert_a, 2)} … ${wertText(wb, art.einheit)}`));
       } else if (last.art === 'einzellast') {
         const richtung = last.wert_a >= 0 ? r : [-r[0], -r[1]];
-        g.append(kraftpfeil(ort(last.von), richtung, 38, wertText(Math.abs(last.wert_a), art.einheit)));
+        ablegen(last.kennung, kraftpfeil(stelle, richtung, 38, wertText(Math.abs(last.wert_a), art.einheit)));
       } else if (last.art === 'moment') {
-        g.append(momentSymbol(ort(last.von), last.wert_a, wertText(last.wert_a, art.einheit)));
+        ablegen(last.kennung, momentSymbol(stelle, last.wert_a, wertText(last.wert_a, art.einheit)));
       } else {
-        g.append(streckenmoment(ort(last.von), ort(last.bis ?? L), last.wert_a, wertText(last.wert_a, art.einheit)));
+        ablegen(last.kennung, streckenmoment(ort(0), ort(L), last.wert_a, wertText(last.wert_a, art.einheit)));
       }
     }
   }
@@ -461,13 +617,14 @@ function lastenZeichnen(a, z, lf, lagen) {
     if (!q) continue;
     const ort = nachBild(a.v, q);
     if (p.art === 'moment') {
-      g.append(momentSymbol(ort, p.wert, wertText(p.wert, 'kNm'), 'bs-last bs-knotenlast'));
+      ablegen(p.kennung, momentSymbol(ort, p.wert, wertText(p.wert, 'kNm'), 'bs-last bs-knotenlast'));
     } else {
       const r = imBild(p.richtung === 'waagrecht' ? [1, 0] : [0, -1]);
       const richtung = p.wert >= 0 ? r : [-r[0], -r[1]];
-      g.append(kraftpfeil(ort, richtung, 40, wertText(Math.abs(p.wert), 'kN'), 'bs-last bs-knotenlast'));
+      ablegen(p.kennung, kraftpfeil(ort, richtung, 40, wertText(Math.abs(p.wert), 'kN'), 'bs-last bs-knotenlast'));
     }
   }
+  a.bs.lastformen = formen;
   return g;
 }
 
@@ -498,16 +655,13 @@ function haken(an, setzen, titel = '') {
   });
 }
 
-function knopf(text, titel, tun) {
-  return el('button.knopf.knopf-klein.bs-neu', {
-    type: 'button', text, title: titel, on: { click: (e) => { e.preventDefault(); tun(); } },
-  });
-}
-
+/** Die Querschnitte des Systems -- und «kein Stab»: dann ist die Linie nur eine Linie, etwa für eine Bettung. */
 function querschnittWahl(z, gewaehlt, setzen) {
-  const werte = (z.querschnitte || []).map((q) => ({ wert: q.kennung, beschriftung: q.name || q.kennung }));
-  if (!werte.length) werte.push({ wert: '', beschriftung: '– keiner –' });
-  return auswahl({ werte, gewaehlt, titel: 'Die Querschnitte stehen im Panel «Querschnitte»', beiAenderung: setzen });
+  const werte = [
+    { wert: '', beschriftung: '– kein Stab –' },
+    ...(z.querschnitte || []).map((q) => ({ wert: q.kennung, beschriftung: q.name || q.kennung })),
+  ];
+  return auswahl({ werte, gewaehlt, titel: 'Die Querschnitte stehen unter der Zeichnung', beiAenderung: setzen });
 }
 
 function materialWahl(gewaehlt, setzen) {
@@ -519,41 +673,106 @@ function materialWahl(gewaehlt, setzen) {
   });
 }
 
-/** Die Felder für das, was das Linienwerkzeug als Nächstes anlegt. */
+/**
+ * Der Lastfall, in den das Werkzeug zeichnet und dessen Lasten die
+ * Zeichnung zeigt -- eine Wahl aus dem Projekt, darum eine Liste.
+ */
+function lastfallWahl(a, z, gewaehlt, setzen, titel) {
+  if (!z.lastfaelle.length) {
+    return el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst im Panel «Lastfälle» einen Lastfall anlegen.' });
+  }
+  return zeile('Lastfall', auswahl({
+    werte: z.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })),
+    gewaehlt, titel, beiAenderung: setzen,
+  }));
+}
+
+/**
+ * Die Felder einer Last: Richtung, Wert -- verteilt Anfang und Ende --,
+ * die Stelle einer einzelnen in % der Linie, und ob eine verteilte je Meter
+ * Projektion zählt. `last` ist die Last oder die Vorgabe des Werkzeugs,
+ * `setzen(feld, wert)` schreibt; `aufLinie`: liegt sie auf einer Linie (sonst
+ * an einem Knoten oder noch nirgends).
+ */
+function lastFelder(last, setzen, { aufLinie = true, amKnoten = false } = {}) {
+  const art = amKnoten ? { kraft: last.art === 'kraft', verteilt: false, einheit: last.art === 'kraft' ? 'kN' : 'kNm' }
+    : lastart(last.art);
+  const richtungen = amKnoten
+    ? katalog().richtungen.filter((x) => katalog().knotenrichtungen.includes(x.wert))
+    : katalog().richtungen;
+  const wertFeld = amKnoten ? 'wert' : 'wert_a';
+  return [
+    art.kraft ? wahlBlock('Richtung', wahlSchalter({
+      werte: richtungen, gewaehlt: last.richtung, setzen: (w) => setzen('richtung', w),
+      titel: 'Positiv in Pfeilrichtung: senkrecht nach unten, quer zur gestrichelten Faser, längs vom Anfang zum Ende',
+      klasse: '.ist-wortlaut.ist-umbruch',
+    })) : null,
+    zeile(art.verteilt ? 'Anfang' : 'Wert', zahlfeld({
+      wert: last[wertFeld], schritt: 5,
+      titel: art.kraft ? 'Positiv in Pfeilrichtung' : 'Ein Moment positiv im Gegenuhrzeigersinn',
+      beiAenderung: (w) => setzen(wertFeld, w),
+    }), art.einheit),
+    art.verteilt ? zeile('Ende', zahlfeld({
+      wert: last.wert_b, schritt: 5, leer: null, platzhalter: 'wie Anfang',
+      titel: 'Wert am Ende der Linie -- leer: wie am Anfang', beiAenderung: (w) => setzen('wert_b', w),
+    }), art.einheit) : null,
+    !art.verteilt && aufLinie ? zeile('Stelle', zahlfeld({
+      wert: last.stelle, schritt: 5, min: 0, max: 100,
+      titel: 'Wo die Last steht: in % der Linie ab ihrem Anfang', beiAenderung: (w) => setzen('stelle', w),
+    }), '%') : null,
+    art.verteilt && art.kraft && ['senkrecht', 'waagrecht'].includes(last.richtung) && aufLinie
+      ? zeile('projiziert', haken(last.projiziert, (w) => setzen('projiziert', w)),
+        'je Meter Projektion statt je Meter Stab') : null,
+  ];
+}
+
+/** Die Felder für das, was ein Werkzeug als Nächstes anlegt. */
 function neuEigenschaften(a, werkzeug) {
   const z = eintragVon(a.bs.kennung);
-  const v = a.bs.vorgaben.linie;
   const neu = () => a.neuZeichnen();
   let inhalt = [];
   if (werkzeug === 'linie') {
+    const v = a.bs.vorgaben.linie;
     inhalt = [
-      zeile('Stab', haken(v.stab, (w) => { v.stab = w; neu(); }, 'Ein Stab trägt; sonst nur eine Linie, etwa für ein Linienlager')),
-      v.stab ? zeile('Querschnitt', querschnittWahl(z, v.querschnitt, (w) => { v.querschnitt = w; neu(); })) : null,
-      v.stab ? zeile('Material', materialWahl(v.material, (w) => { v.material = w; neu(); })) : null,
+      zeile('Querschnitt', querschnittWahl(z, v.querschnitt, (w) => { v.querschnitt = w; neu(); })),
+      v.querschnitt ? zeile('Material', materialWahl(v.material, (w) => { v.material = w; neu(); })) : null,
+    ];
+  } else if (werkzeug === 'last') {
+    const v = a.bs.vorgaben.last;
+    inhalt = [
+      lastfallWahl(a, z, aktiverLastfall(a.bs.kennung), (w) => lastfallWaehlen(a.bs.kennung, w),
+        'In diesen Lastfall kommt die Last -- die Zeichnung zeigt seine Lasten'),
+      wahlBlock('Art', wahlSchalter({
+        werte: katalog().lastarten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: `${x.beschriftung} in ${x.einheit}` })),
+        gewaehlt: v.art, setzen: (w) => { v.art = w; neu(); }, klasse: '.ist-wortlaut.ist-umbruch',
+        titel: 'Verteilt liegt eine Last auf der ganzen Linie; einzeln dort, wo geklickt wird, oder an einem Knoten',
+      })),
+      ...lastFelder(v, (feld, w) => { v[feld] = w; neu(); }, { aufLinie: false }),
     ];
   }
   return {
     inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...inhalt.filter(Boolean)],
-    schluessel: JSON.stringify([werkzeug, v]),
+    schluessel: JSON.stringify([werkzeug, a.bs.vorgaben, aktiverLastfall(a.bs.kennung)]),
   };
 }
 
 function eigenschaften(a) {
   const z = eintragVon(a.bs.kennung);
   const kennungen = [...a.auswahl].map((s) => auswahlTeil(s).kennung);
+  const lasten = kennungen.filter((k) => lastVon(z, k));
   const knoten = kennungen.filter((k) => z.knoten.some((x) => x.kennung === k));
   const linien = kennungen.filter((k) => z.linien.some((x) => x.kennung === k));
-  const lf = aktiverLastfall(a.bs.kennung);
-  const schluessel = JSON.stringify([lf, Boolean(passendeUebersicht(a))]);
-  if (knoten.length && linien.length) {
+  const schluessel = JSON.stringify([aktiverLastfall(a.bs.kennung), Boolean(passendeUebersicht(a)), a.bs.bettungOffen]);
+  if (lasten.length && lasten.length === kennungen.length) return { ...lastEigenschaften(a, z, lasten), schluessel };
+  if ((knoten.length && linien.length) || lasten.length) {
     return {
       titel: `${kennungen.length} gewählt`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Knoten und Linien zugleich -- verschieben mit V, löschen mit Entf.' })],
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedenes zugleich -- verschieben mit V, löschen mit Entf.' })],
       schluessel,
     };
   }
-  if (knoten.length) return { ...knotenEigenschaften(a, z, knoten, lf), schluessel };
-  if (linien.length) return { ...linienEigenschaften(a, z, linien, lf), schluessel };
+  if (knoten.length) return { ...knotenEigenschaften(a, z, knoten), schluessel };
+  if (linien.length) return { ...linienEigenschaften(a, z, linien), schluessel };
   return { titel: '', inhalt: [] };
 }
 
@@ -563,9 +782,6 @@ function meldungszeilen(a, kennungen) {
     .map((m) => el(m.fehler ? 'p.cad-meldung' : 'p.cad-hinweis-klein', { text: m.text }));
 }
 
-function lastfallName(z, lf) {
-  return z.lastfaelle.find((x) => x.kennung === lf)?.name || lf;
-}
 
 // -- Knoten ------------------------------------------------------------------
 
@@ -624,41 +840,7 @@ function lagerFelder(a, z, knoten) {
   return zeilen;
 }
 
-function knotenlastFelder(a, z, knoten, lf) {
-  if (!lf) return [el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst im Panel «Lastfälle» einen Lastfall anlegen.' })];
-  const zeilen = [el('div.cad-neu-titel', { text: `Lasten · ${lastfallName(z, lf)}` })];
-  if (knoten.length === 1) {
-    for (const p of z.knotenlasten.filter((x) => x.knoten === knoten[0] && x.lastfall === lf)) {
-      const setzen = (wert) => a.aendern((zz) => {
-        const da = zz.knotenlasten.find((x) => x.kennung === p.kennung);
-        if (da) da.wert = wert;
-      });
-      const weg = () => a.aendern((zz) => { zz.knotenlasten = zz.knotenlasten.filter((x) => x.kennung !== p.kennung); });
-      const beschriftung = p.art === 'moment' ? '↺ Moment' : richtungText(p.richtung);
-      zeilen.push(el('div.bs-lastzeile', {}, [
-        zeile(beschriftung, zahlfeld({ wert: p.wert, schritt: 5, titel: 'Positiv in Pfeilrichtung, ein Moment im Gegenuhrzeigersinn', beiAenderung: setzen }),
-          p.art === 'moment' ? 'kNm' : 'kN'),
-        el('button.weg', { type: 'button', text: '×', title: 'Last löschen', on: { click: weg } }),
-      ]));
-    }
-  }
-  const neu = (art, richtung) => () => a.aendern((zz) => {
-    for (const k of knoten) {
-      zz.knotenlasten.push({
-        ...ausVorlage('knotenlast'), kennung: a.modell.naechsteKennung(zz, 'P'), knoten: k,
-        lastfall: lf, art, richtung,
-      });
-    }
-  });
-  zeilen.push(el('div.bs-neue-lasten', {}, [
-    knopf('+ ↓ Kraft', 'Eine Kraft nach unten -- an jedem gewählten Knoten', neu('kraft', 'senkrecht')),
-    knopf('+ → Kraft', 'Eine Kraft nach rechts', neu('kraft', 'waagrecht')),
-    knopf('+ ↺ Moment', 'Ein Moment im Gegenuhrzeigersinn', neu('moment', 'senkrecht')),
-  ]));
-  return zeilen;
-}
-
-function knotenEigenschaften(a, z, knoten, lf) {
+function knotenEigenschaften(a, z, knoten) {
   const inhalt = [];
   if (knoten.length === 1) {
     const k = z.knoten.find((x) => x.kennung === knoten[0]);
@@ -673,7 +855,7 @@ function knotenEigenschaften(a, z, knoten, lf) {
       zeile('z', zahlfeld({ wert: k.z, schritt: a.raster, beiAenderung: lageSetzen(1) }), 'm'),
     );
   }
-  inhalt.push(...lagerFelder(a, z, knoten), ...knotenlastFelder(a, z, knoten, lf));
+  inhalt.push(...lagerFelder(a, z, knoten));
   const u = passendeUebersicht(a);
   for (const k of knoten) {
     if (u?.unbestimmt?.includes(k)) inhalt.push(el('p.cad-hinweis-klein', { text: `${k}: ${u.unbestimmt_text}.` }));
@@ -709,103 +891,36 @@ function lagerAnLinie(a, linien, e) {
 }
 
 /** Die Felder einer Last auf einem Stab -- je nach Art. */
-function stablastFelder(a, linie, i, last) {
-  const art = lastart(last.art);
-  const setzen = (feld) => (wert) => a.aendern((zz) => {
-    const l = zz.linien.find((x) => x.kennung === linie);
-    if (l?.lasten[i]) l.lasten[i][feld] = wert;
-  });
-  const weg = () => a.aendern((zz) => {
-    const l = zz.linien.find((x) => x.kennung === linie);
-    if (l) l.lasten.splice(i, 1);
-  });
-  const kopf = el('div.bs-lastkopf', {}, [
-    el('span', { text: art.beschriftung }),
-    el('button.weg', { type: 'button', text: '×', title: 'Last löschen', on: { click: weg } }),
-  ]);
-  const zeilen = [kopf];
-  if (art.kraft) {
-    zeilen.push(wahlBlock('Richtung', wahlSchalter({
-      werte: katalog().richtungen, gewaehlt: last.richtung,
-      titel: 'Positiv in Pfeilrichtung: senkrecht nach unten, quer zur gestrichelten Faser, längs vom Anfang zum Ende',
-      setzen: setzen('richtung'), klasse: '.ist-wortlaut.ist-umbruch',
-    })));
-  }
-  if (art.verteilt) {
-    zeilen.push(
-      zeile('Anfang', zahlfeld({ wert: last.wert_a, schritt: 5, titel: 'Wert am Anfang des belasteten Bereichs', beiAenderung: setzen('wert_a') }), art.einheit),
-      zeile('Ende', zahlfeld({
-        wert: last.wert_b, schritt: 5, leer: null, platzhalter: 'wie Anfang',
-        titel: 'Wert am Ende -- leer: wie am Anfang', beiAenderung: setzen('wert_b'),
-      }), art.einheit),
-      zeile('von', zahlfeld({ wert: last.von, schritt: 0.5, min: 0, titel: 'In m ab dem Anfang des Stabs', beiAenderung: setzen('von') }), 'm'),
-      zeile('bis', zahlfeld({
-        wert: last.bis, schritt: 0.5, min: 0, leer: null, platzhalter: 'Ende',
-        titel: 'In m ab dem Anfang -- leer: bis zum Ende', beiAenderung: setzen('bis'),
-      }), 'm'),
-    );
-    if (art.kraft && (last.richtung === 'senkrecht' || last.richtung === 'waagrecht')) {
-      zeilen.push(zeile('projiziert', haken(last.projiziert, setzen('projiziert'),
-        'Je Meter der Projektion statt je Meter Stab -- wie Schnee auf einem Dach')));
-    }
-  } else {
-    zeilen.push(
-      zeile('Wert', zahlfeld({ wert: last.wert_a, schritt: 5, beiAenderung: setzen('wert_a') }), art.einheit),
-      zeile('bei', zahlfeld({ wert: last.von, schritt: 0.5, min: 0, titel: 'In m ab dem Anfang des Stabs', beiAenderung: setzen('von') }), 'm'),
-    );
-  }
-  return el('div.bs-lastblock', {}, zeilen);
-}
-
-function stablastenFelder(a, z, linien, lf) {
-  if (!lf) return [el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst im Panel «Lastfälle» einen Lastfall anlegen.' })];
-  const zeilen = [el('div.cad-neu-titel', { text: `Lasten · ${lastfallName(z, lf)}` })];
-  if (linien.length === 1) {
-    const e = z.linien.find((x) => x.kennung === linien[0]);
-    e.lasten.forEach((last, i) => {
-      if (last.lastfall === lf) zeilen.push(stablastFelder(a, e.kennung, i, last));
-    });
-  } else {
-    const anzahl = z.linien.filter((l) => linien.includes(l.kennung))
-      .reduce((n, l) => n + l.lasten.filter((x) => x.lastfall === lf).length, 0);
-    zeilen.push(el('p.cad-hinweis-klein', { text: `${anzahl} Lasten auf den gewählten Linien -- einzeln bearbeiten.` }));
-  }
-  const neu = (art) => () => a.aendern((zz) => {
-    for (const l of zz.linien) {
-      if (linien.includes(l.kennung)) l.lasten.push({ ...ausVorlage('stablast'), lastfall: lf, art });
-    }
-  });
-  zeilen.push(el('div.bs-neue-lasten', {}, katalog().lastarten.map((x) => knopf(
-    `+ ${x.beschriftung}`, `${x.beschriftung} in ${x.einheit} -- auf jeder gewählten Linie`, neu(x.wert)))));
-  return zeilen;
-}
-
-function linienEigenschaften(a, z, linien, lf) {
+/**
+ * Eine Linie: Querschnitt -- «kein Stab» heisst nur eine Linie --, beim
+ * Stab das Material und die Gelenke. Die Bettung steht eingeklappt
+ * darunter: sie braucht man selten (Benutzer, 2026-10-23).
+ */
+function linienEigenschaften(a, z, linien) {
   const e = z.linien.find((x) => x.kennung === linien[0]);
   const setzen = (feld) => (wert) => a.aendern((zz) => {
-    for (const l of zz.linien) if (linien.includes(l.kennung)) l[feld] = wert;
+    for (const l of zz.linien) {
+      if (!linien.includes(l.kennung)) continue;
+      l[feld] = wert;
+      // Ein neuer Stab bekommt das Material, das das Werkzeug vorgibt -- sonst fehlte es ihm.
+      if (feld === 'querschnitt' && wert && !l.material) l.material = a.bs.vorgaben.linie.material;
+    }
   });
-  const inhalt = [
-    zeile('Stab', haken(e.stab, (w) => a.aendern((zz) => {
-      for (const l of zz.linien) {
-        if (!linien.includes(l.kennung)) continue;
-        l.stab = w;
-        // Ein neuer Stab bekommt, was das Werkzeug vorgibt -- sonst fehlte ihm beides.
-        if (w && !l.querschnitt) l.querschnitt = a.bs.vorgaben.linie.querschnitt;
-        if (w && !l.material) l.material = a.bs.vorgaben.linie.material;
-      }
-    }), 'Ein Stab trägt; sonst nur eine Linie, etwa für ein Linienlager')),
-  ];
-  if (e.stab) {
+  const inhalt = [zeile('Querschnitt', querschnittWahl(z, e.querschnitt, setzen('querschnitt')))];
+  if (e.querschnitt) {
     inhalt.push(
-      zeile('Querschnitt', querschnittWahl(z, e.querschnitt, setzen('querschnitt'))),
       zeile('Material', materialWahl(e.material, setzen('material'))),
       zeile('Gelenk Anfang', haken(e.gelenk_anfang, setzen('gelenk_anfang'), 'Kein Moment am Anfang')),
       zeile('Gelenk Ende', haken(e.gelenk_ende, setzen('gelenk_ende'), 'Kein Moment am Ende')),
     );
   }
-  inhalt.push(...lagerAnLinie(a, linien, e));
-  if (e.stab) inhalt.push(...stablastenFelder(a, z, linien, lf));
+  const gebettet = e.quer !== 'frei' || e.laengs !== 'frei';
+  inhalt.push(el('button.cad-aufklapper', {
+    type: 'button', text: `${a.bs.bettungOffen ? '▾' : '▸'} Bettung${gebettet ? ' · gesetzt' : ''}`,
+    title: 'Linienlager quer und längs: fest oder gebettet',
+    on: { click: () => { a.bs.bettungOffen = !a.bs.bettungOffen; a.neuZeichnen(); } },
+  }));
+  if (a.bs.bettungOffen) inhalt.push(...lagerAnLinie(a, linien, e));
   if (linien.length === 1) {
     const lagen = a.modell.lagen(z);
     const [p, q] = [lagen.get(e.von), lagen.get(e.bis)];
@@ -815,5 +930,41 @@ function linienEigenschaften(a, z, linien, lf) {
   return {
     titel: linien.length === 1 ? elementname(a, e.kennung) : `${linien.length} Linien`,
     inhalt: inhalt.filter(Boolean),
+  };
+}
+
+// -- Lasten ------------------------------------------------------------------
+
+/**
+ * Eine gewählte Last: ihr Lastfall und ihre Felder. Ändert man den
+ * Lastfall, zeigt die Zeichnung danach dessen Lasten -- sonst
+ * verschwände die Last unter dem Zeiger.
+ */
+function lastEigenschaften(a, z, kennungen) {
+  if (kennungen.length > 1) {
+    return {
+      titel: `${kennungen.length} Lasten`,
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Mehrere Lasten -- einzeln bearbeiten, löschen mit Entf.' })],
+    };
+  }
+  const [kennung] = kennungen;
+  const da = lastVon(z, kennung);
+  const amKnoten = Boolean(da.knoten);
+  const setzen = (feld, wert) => a.aendern((zz) => {
+    const neu = lastVon(zz, kennung);
+    if (neu) neu.last[feld] = wert;
+  });
+  const art = amKnoten ? (da.last.art === 'moment' ? 'Moment' : 'Kraft') : lastart(da.last.art).beschriftung;
+  return {
+    titel: `${elementname(a, kennung)} · ${art}`,
+    inhalt: [
+      lastfallWahl(a, z, da.last.lastfall, (w) => {
+        setzen('lastfall', w);
+        lastfallWaehlen(a.bs.kennung, w);
+      }, 'Zu welchem Lastfall die Last gehört'),
+      ...lastFelder(da.last, setzen, { amKnoten }),
+      el('p.cad-info', { text: amKnoten ? `an ${da.knoten}` : `auf ${elementname(a, da.linie.kennung)}` }),
+      ...meldungszeilen(a, [kennung]),
+    ].filter(Boolean),
   };
 }

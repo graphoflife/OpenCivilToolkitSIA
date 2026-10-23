@@ -6159,10 +6159,10 @@ Lastfall «Eigengewicht»
 Verschiebungen der Knoten
     Knoten  u_x\ [\mathrm{mm}]  u_z\ [\mathrm{mm}]  \varphi\ [\mathrm{mrad}]
     ------  ------------------  ------------------  ------------------------
-        K1                0.00               -0.09                    -0.129
-        K2                0.00               -1.03                    -0.151
-        K3               -0.08               -1.04                     0.207
-        K4               -0.58               -0.05                     0.290
+        K1                0.00               -0.11                    -0.111
+        K2                0.00               -0.99                    -0.122
+        K3               -0.11               -0.99                     0.198
+        K4               -0.59               -0.04                     0.277
         K5                0.00                0.00          nicht bestimmbar
         K6                0.00                0.00                     0.000
         K7                0.00                0.00                     0.000
@@ -6171,10 +6171,10 @@ Verschiebungen der Knoten
 Schnittgrössen an den Stabenden
     Stab  N_{a}\ [\mathrm{kN}]  V_{a}\ [\mathrm{kN}]  M_{a}\ [\mathrm{kNm}]  N_{b}\ [\mathrm{kN}]  V_{b}\ [\mathrm{kN}]  M_{b}\ [\mathrm{kNm}]
     ----  --------------------  --------------------  ---------------------  --------------------  --------------------  ---------------------
-      L1                   0.0                   4.4                   -1.3                   0.0                   8.9                    5.1
-      L2                  -8.9                   0.0                    5.1                  -8.9                   0.0                    5.1
-      L3                  -4.0                   8.0                    0.1                   4.0                  -8.0                    0.0
-      L4                  -9.0                   0.0                    0.0                  -9.0                   0.0                    0.0
+      L1                   0.0                   5.4                   -1.1                   0.0                   9.1                    4.5
+      L2                  -9.1                   0.0                    4.5                  -9.1                   0.0                    4.5
+      L3                  -4.1                   8.1                   -0.5                   3.9                  -7.9                    0.0
+      L4                  -8.8                   0.0                    0.0                  -8.8                   0.0                    0.0
       L5                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
       L6                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
       L8                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
@@ -6182,34 +6182,34 @@ Schnittgrössen an den Stabenden
 Lagerkräfte, auf das Tragwerk
                                     Lager  R_x\ [\mathrm{kN}]  R_z\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
     -------------------------------------  ------------------  ------------------  -----------------
-                                  A1 (K1)                 0.0                 4.4                1.3
-                                  A2 (K5)                 0.0                 9.0                0.0
+                                  A1 (K1)                 0.0                 5.4                1.1
+                                  A2 (K5)                 0.0                 8.8                0.0
                                        K6                 0.0                 0.0                0.0
                                        K7                 0.0                 0.0                0.0
     L6: Lasten geradewegs ins Linienlager                 0.0                20.0              320.0
-                       L1: Bettung, Summe                 0.0                84.5              430.4
+                       L1: Bettung, Summe                 0.0                83.7              424.3
 
 Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 Extremwerte
     Stab  Grösse             kleinst  x\ [\mathrm{m}]             grösst  x\ [\mathrm{m}]
     ----  ------  ------------------  ---------------  -----------------  ---------------
-      L1       N    0.0\ \mathrm{kN}             3.00   0.0\ \mathrm{kN}             4.00
-      L1       V   -0.1\ \mathrm{kN}             3.68   8.9\ \mathrm{kN}             8.00
-      L1       M  -4.1\ \mathrm{kNm}             6.00  5.1\ \mathrm{kNm}             8.00
-      L1       w  -0.09\ \mathrm{mm}             5.49  0.01\ \mathrm{mm}             1.37
-      L2       N   -8.9\ \mathrm{kN}             0.00  -8.9\ \mathrm{kN}             0.00
+      L1       N    0.0\ \mathrm{kN}             4.00   0.0\ \mathrm{kN}             3.00
+      L1       V    0.7\ \mathrm{kN}             3.76   9.1\ \mathrm{kN}             8.00
+      L1       M  -2.2\ \mathrm{kNm}             5.69  4.5\ \mathrm{kNm}             8.00
+      L1       w  -0.05\ \mathrm{mm}             5.28  0.00\ \mathrm{mm}             1.02
+      L2       N   -9.1\ \mathrm{kN}             0.00  -9.1\ \mathrm{kN}             0.00
       L2       V    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
-      L2       M   5.1\ \mathrm{kNm}             0.00  5.1\ \mathrm{kNm}             3.00
-      L2       w   0.00\ \mathrm{mm}             0.00  0.13\ \mathrm{mm}             1.50
-      L3       N   -4.0\ \mathrm{kN}             0.00   4.0\ \mathrm{kN}             4.47
-      L3       V   -8.0\ \mathrm{kN}             4.47   8.0\ \mathrm{kN}             0.00
-      L3       M   0.0\ \mathrm{kNm}             4.47  9.0\ \mathrm{kNm}             2.23
-      L3       w   0.00\ \mathrm{mm}             0.00  0.06\ \mathrm{mm}             2.23
-      L4       N   -9.0\ \mathrm{kN}             0.00  -9.0\ \mathrm{kN}             0.00
+      L2       M   4.5\ \mathrm{kNm}             0.00  4.5\ \mathrm{kNm}             3.00
+      L2       w   0.00\ \mathrm{mm}             3.00  0.12\ \mathrm{mm}             1.50
+      L3       N   -4.1\ \mathrm{kN}             0.00   3.9\ \mathrm{kN}             4.47
+      L3       V   -7.9\ \mathrm{kN}             4.47   8.1\ \mathrm{kN}             0.00
+      L3       M  -0.5\ \mathrm{kNm}             0.00  8.7\ \mathrm{kNm}             2.27
+      L3       w   0.00\ \mathrm{mm}             0.00  0.06\ \mathrm{mm}             2.25
+      L4       N   -8.8\ \mathrm{kN}             0.00  -8.8\ \mathrm{kN}             0.00
       L4       V    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
       L4       M   0.0\ \mathrm{kNm}             5.00  0.0\ \mathrm{kNm}             0.00
-      L4       w   0.00\ \mathrm{mm}             0.00  0.00\ \mathrm{mm}             2.52
+      L4       w   0.00\ \mathrm{mm}             0.00  0.00\ \mathrm{mm}             3.52
       L5       N    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
       L5       V    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
       L5       M   0.0\ \mathrm{kNm}             0.00  0.0\ \mathrm{kNm}             0.00
@@ -6223,14 +6223,14 @@ Extremwerte
       L8       M   0.0\ \mathrm{kNm}             0.00  0.0\ \mathrm{kNm}             0.00
       L8       w   0.00\ \mathrm{mm}             0.00  0.00\ \mathrm{mm}             0.00
 
-Grösste Durchbiegung gegen die Sehne: L2, w = 0.13 mm bei x = 1.50 m, L/w = 22301.
+Grösste Durchbiegung gegen die Sehne: L2, w = 0.12 mm bei x = 1.50 m, L/w = 24993.
 
 Gleichgewichtsprobe (Moment um den Ursprung)
                 Lasten    Lager  Summe
     --------  --------  -------  -----  ---
     \sum F_x     0.000    0.000  0.000   kN
     \sum F_z  -117.889  117.889  0.000   kN
-    \sum M_0  -859.219  859.219  0.000  kNm
+    \sum M_0  -851.219  851.219  0.000  kNm
 
 Lastfall «Schnee und Wind»
 --------------------------
@@ -6318,10 +6318,10 @@ Kombination «Tragsicherheit»
 Verschiebungen der Knoten
     Knoten  u_x\ [\mathrm{mm}]  u_z\ [\mathrm{mm}]  \varphi\ [\mathrm{mrad}]
     ------  ------------------  ------------------  ------------------------
-        K1                0.00               -0.13                    -0.150
-        K2                0.04               -2.04                    -0.796
-        K3                2.03               -2.05                     0.217
-        K4                1.08               -0.15                     0.651
+        K1                0.00               -0.15                    -0.125
+        K2                0.04               -1.97                    -0.756
+        K3                1.99               -1.98                     0.205
+        K4                1.07               -0.15                     0.633
         K5                0.00                0.00          nicht bestimmbar
         K6                0.00                0.00                     0.000
         K7                0.00                0.00                     0.000
@@ -6330,10 +6330,10 @@ Verschiebungen der Knoten
 Schnittgrössen an den Stabenden
     Stab  N_{a}\ [\mathrm{kN}]  V_{a}\ [\mathrm{kN}]  M_{a}\ [\mathrm{kNm}]  N_{b}\ [\mathrm{kN}]  V_{b}\ [\mathrm{kN}]  M_{b}\ [\mathrm{kNm}]
     ----  --------------------  --------------------  ---------------------  --------------------  --------------------  ---------------------
-      L1                  27.0                   6.4                   -1.5                  27.0                  12.4                  -21.7
-      L2                 -12.4                  27.0                  -21.7                 -12.4                  15.0                   41.3
-      L3                  -5.6                  11.1                   34.5                  13.3                 -26.6                    0.0
-      L4                 -29.7                   0.0                    0.0                 -29.7                   0.0                    0.0
+      L1                  27.0                   7.7                   -1.3                  27.0                  12.6                  -22.5
+      L2                 -12.6                  27.0                  -22.5                 -12.6                  15.0                   40.5
+      L3                  -5.6                  11.3                   33.8                  13.2                 -26.4                    0.0
+      L4                 -29.5                   0.0                    0.0                 -29.5                   0.0                    0.0
       L5                   0.0                   2.2                    0.0                   0.0                   2.2                    0.8
       L6                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
       L8                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
@@ -6341,12 +6341,12 @@ Schnittgrössen an den Stabenden
 Lagerkräfte, auf das Tragwerk
                                     Lager  R_x\ [\mathrm{kN}]  R_z\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
     -------------------------------------  ------------------  ------------------  -----------------
-                                  A1 (K1)               -27.0                 6.4                1.5
-                                  A2 (K5)                 0.0                32.0                0.0
+                                  A1 (K1)               -27.0                 7.7                1.3
+                                  A2 (K5)                 0.0                31.8                0.0
                                        K6                 0.0                -2.2                0.8
                                        K7                 0.0                 0.0                0.0
     L6: Lasten geradewegs ins Linienlager                 0.0                27.0              432.0
-                       L1: Bettung, Summe                 0.0               114.1              613.0
+                       L1: Bettung, Summe                 0.0               113.0              604.7
 
 Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
@@ -6354,21 +6354,21 @@ Extremwerte
     Stab  Grösse              kleinst  x\ [\mathrm{m}]              grösst  x\ [\mathrm{m}]
     ----  ------  -------------------  ---------------  ------------------  ---------------
       L1       N    27.0\ \mathrm{kN}             5.00   27.0\ \mathrm{kN}             2.00
-      L1       V    -6.6\ \mathrm{kN}             5.63   12.4\ \mathrm{kN}             8.00
-      L1       M  -26.3\ \mathrm{kNm}             7.18   4.5\ \mathrm{kNm}             2.00
-      L1       w   -0.66\ \mathrm{mm}             5.52   0.00\ \mathrm{mm}             0.00
-      L2       N   -12.4\ \mathrm{kN}             0.00  -12.4\ \mathrm{kN}             0.00
+      L1       V    -5.4\ \mathrm{kN}             5.59   12.6\ \mathrm{kN}             8.00
+      L1       M  -25.5\ \mathrm{kNm}             7.34   2.5\ \mathrm{kNm}             1.63
+      L1       w   -0.62\ \mathrm{mm}             5.48   0.00\ \mathrm{mm}             0.00
+      L2       N   -12.6\ \mathrm{kN}             0.00  -12.6\ \mathrm{kN}             0.00
       L2       V    15.0\ \mathrm{kN}             1.50   27.0\ \mathrm{kN}             0.00
-      L2       M  -21.7\ \mathrm{kNm}             0.00  41.3\ \mathrm{kNm}             3.00
-      L2       w    0.00\ \mathrm{mm}             0.00   0.46\ \mathrm{mm}             1.87
-      L3       N    -5.6\ \mathrm{kN}             0.00   13.3\ \mathrm{kN}             4.47
-      L3       V   -26.6\ \mathrm{kN}             4.47   11.1\ \mathrm{kN}             0.00
-      L3       M    0.0\ \mathrm{kNm}             4.47  41.9\ \mathrm{kNm}             1.32
+      L2       M  -22.5\ \mathrm{kNm}             0.00  40.5\ \mathrm{kNm}             3.00
+      L2       w    0.00\ \mathrm{mm}             0.00   0.44\ \mathrm{mm}             1.88
+      L3       N    -5.6\ \mathrm{kN}             0.00   13.2\ \mathrm{kN}             4.47
+      L3       V   -26.4\ \mathrm{kN}             4.47   11.3\ \mathrm{kN}             0.00
+      L3       M    0.0\ \mathrm{kNm}             4.47  41.4\ \mathrm{kNm}             1.34
       L3       w    0.00\ \mathrm{mm}             0.00   0.27\ \mathrm{mm}             2.07
-      L4       N   -29.7\ \mathrm{kN}             0.00  -29.7\ \mathrm{kN}             0.00
+      L4       N   -29.5\ \mathrm{kN}             0.00  -29.5\ \mathrm{kN}             0.00
       L4       V     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
-      L4       M    0.0\ \mathrm{kNm}             0.00   0.0\ \mathrm{kNm}             0.00
-      L4       w    0.00\ \mathrm{mm}             2.24   0.00\ \mathrm{mm}             0.00
+      L4       M    0.0\ \mathrm{kNm}             5.00   0.0\ \mathrm{kNm}             0.00
+      L4       w    0.00\ \mathrm{mm}             3.28   0.00\ \mathrm{mm}             0.00
       L5       N     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
       L5       V     2.2\ \mathrm{kN}             0.00    2.2\ \mathrm{kN}             0.00
       L5       M   -2.6\ \mathrm{kNm}             1.50   3.4\ \mathrm{kNm}             1.50
@@ -6382,14 +6382,14 @@ Extremwerte
       L8       M    0.0\ \mathrm{kNm}             0.00   0.0\ \mathrm{kNm}             0.00
       L8       w    0.00\ \mathrm{mm}             0.00   0.00\ \mathrm{mm}             0.00
 
-Grösste Durchbiegung gegen die Sehne: L1, w = -0.66 mm bei x = 5.52 m, L/w = 12114.
+Grösste Durchbiegung gegen die Sehne: L1, w = -0.62 mm bei x = 5.48 m, L/w = 12982.
 
 Gleichgewichtsprobe (Moment um den Ursprung)
                  Lasten     Lager  Summe
     --------  ---------  --------  -----  ---
     \sum F_x     27.000   -27.000  0.000   kN
     \sum F_z   -177.150   177.150  0.000   kN
-    \sum M_0  -1396.945  1396.945  0.000  kNm
+    \sum M_0  -1386.145  1386.145  0.000  kNm
 
 Balkensystem: Beweglich
 -----------------------

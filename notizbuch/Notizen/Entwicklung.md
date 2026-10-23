@@ -44,6 +44,42 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Balkensystem: Lasten für sich, Linie und Knoten aufgeräumt
+
+Zweite Etappe des neuen Balkensystems. Wünsche des Benutzers: im Fenster
+einer Linie und eines Knotens zu viel; Lasten für sich wählen und löschen,
+auf einer Linie oder an einem Knoten, eine Einzellast auch irgendwo auf der
+Linie, in % zwischen ihren Knoten. Entschieden (Rückfrage): Gelenke bleiben
+an der Linie, die Bettung eingeklappt; eine verteilte Last liegt immer auf
+der ganzen Linie, mit Anfangs- und Endwert.
+
+- **Beschreibung:** Jede Last hat eine Kennung (P1 …), Stab- und Knotenlasten
+  zählen zusammen. Eine Stablast hat `stelle` in % statt `von`/`bis` in m.
+  Das Feld `stab` der Linie ist weg: sie trägt, sobald sie einen Querschnitt
+  hat (`stab` bleibt als abgeleitete Eigenschaft). Teilen verteilt eine
+  verteilte Last auf beide Hälften, mit dem Wert am Schnitt, die zweite mit
+  neuer Kennung; Umkehren spiegelt die Stelle. Alte Speicherstände mit
+  Balkensystem öffnen sich nicht mehr -- das Programm legt sie beiseite.
+- **Gespeichert an der Linie:** die Lasten bleiben in `linie.lasten`. So
+  gehen sie mit ihr beim Kopieren, Teilen, Löschen und Rückgängig -- wie
+  bisher, ohne Pflege an zwei Stellen.
+- **Anhänge im Zeichenfenster:** was eine App an Elemente hängt und selbst
+  zeichnet, lässt sich wählen und löschen (`adapter.anhaenge`: `treffer`,
+  `hat`, `loeschen`, `rahmen`), aber nicht verschieben oder kopieren -- eine
+  Last am Knoten nähme sonst den Knoten mit. Ein Werkzeug der Form «anhang»
+  legt an, wo geklickt wird (`anhangBefehl`, `anhangAnlegen`).
+- **Treffen:** jedes Lastzeichen trägt seine Formen mit (`formen` in
+  `bs_symbole.js`): das Band einer verteilten Last ohne den Streifen an der
+  Linie, den Schaft eines Pfeils ohne die Spitze, den Bogen eines Moments,
+  dazu die Zahl. So trifft ein Klick auf den Balken den Balken.
+- **Fenster:** Linie -- Querschnitt («– kein Stab –»), Material, Gelenke,
+  «▸ Bettung». Knoten -- Lage und Lager. Last -- Lastfall, Richtung, Wert,
+  Stelle, projiziert. Werkzeug «Last» Q -- dazu die Art als Schalter. Unter
+  der Zeichnung eine Liste der Lasten; ein Klick wählt die Last und zeigt
+  ihren Lastfall.
+
+---
+
 ## 2026-10-23 · Dichte bei Beton und Stahl
 
 Erste Etappe des neuen Balkensystems (Wunsch des Benutzers): das

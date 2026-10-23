@@ -419,11 +419,16 @@ Diagramme stehen im Reiter Diagramme, im Panel des Querschnitts.
 
 **2D Balkensysteme:** unter der Querschnittsanalyse ein drittes Kapitel,
 ein ebener Rahmen nach der Steifigkeitsmethode. Gezeichnet wird mit
-demselben Fenster, in Metern: Linien werden Stäbe mit Querschnitt und
-Material, Knoten bekommen ein Lager (gelenkig, verschieblich, eingespannt
-oder je Richtung frei, fest, Feder), Stabenden ein Gelenk, Linien ein
-Linienlager oder eine Bettung. Die Lasten des Lastfalls, der über der
-Zeichnung gewählt ist, stehen in der Zeichnung und im schwebenden Fenster.
+demselben Fenster, in Metern: eine Linie ist ein Stab, sobald sie einen
+Querschnitt hat (dazu ihr Material und Gelenke an den Enden; eine Bettung
+eingeklappt darunter), Knoten bekommen ein Lager (gelenkig, verschieblich,
+eingespannt oder je Richtung frei, fest, Feder). Lasten zeichnet das
+Werkzeug «Last» Q: ein Klick auf eine Linie -- verteilt über die ganze
+Linie, einzeln dort, wo geklickt wurde, in % der Linie --, eine Einzellast
+oder ein Moment auch an einen Knoten. Jede Last ist für sich zu wählen, an
+ihrem Pfeil, Band oder ihrer Zahl, und mit Entf zu löschen. Gezeigt werden
+die Lasten des Lastfalls, der über der Zeichnung gewählt ist; unter ihr
+stehen alle in einer Liste.
 Anders als im Querschnitt hängt ein Rahmen an seinen Knoten: ein Klick an
 einem Knoten wählt ihn, ein verschobener Stab nimmt seine Knoten mit.
 Teilen und Umkehren rechnet der Kern -- dabei entstehen Lastwerte. Ist das

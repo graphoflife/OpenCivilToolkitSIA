@@ -61,7 +61,10 @@ function aendernAn(kennung, veraenderer) {
 // Unter der Zeichnung
 // ===========================================================================
 
-/** Meldungen des Kerns und je Linie und Lager eine Zeile -- ein Klick wählt im Fenster. */
+/**
+ * Meldungen des Kerns und je Linie, Lager und Last eine Zeile -- ein Klick
+ * wählt im Fenster; bei einer Last zeigt die Zeichnung dann ihren Lastfall.
+ */
 function uebersicht(a) {
   const z = eintragVon(a.bs.kennung);
   if (!z) return [];
@@ -90,15 +93,38 @@ function uebersicht(a) {
     const lager = [l.quer !== 'frei' ? `quer ${l.quer === 'feder' ? 'gebettet' : 'fest'}` : '',
       l.laengs !== 'frei' ? `längs ${l.laengs === 'feder' ? 'gebettet' : 'fest'}` : ''].filter(Boolean);
     return zeile(l.kennung, `${l.von} → ${l.bis}`, [
-      l.stab ? `${name(l.querschnitt)} · ${stoff(l.material)}` : 'kein Stab',
+      l.querschnitt ? `${name(l.querschnitt)} · ${stoff(l.material)}` : 'kein Stab',
       gelenke.length ? `Gelenk ${gelenke.join(', ')}` : '',
       ...lager,
     ].filter(Boolean).join(' · '));
   });
   const lager = z.lager.map((l) => zeile(l.kennung, `an ${l.knoten}`,
     `x ${l.x} · z ${l.z} · φ ${l.phi}`, l.knoten));
+  const lastfall = (lf) => z.lastfaelle.find((x) => x.kennung === lf)?.name || lf;
+  const lastzeile = (last, wo, text) => el('div.bs-element', {
+    dataset: { kennung: last.kennung },
+    on: {
+      click: () => {
+        lastfallWaehlen(a.bs.kennung, last.lastfall);
+        waehlen(a.bs.kennung, [last.kennung]);
+      },
+    },
+  }, [el('span.bs-element-name', { text: last.kennung }), el('span', { text: wo }),
+    el('span.bs-element-zusatz', { text: `${text} · ${lastfall(last.lastfall)}` })]);
+  const arten = zustand.katalog?.balkensystem?.lastarten || [];
+  const lasten = [
+    ...z.linien.flatMap((l) => l.lasten.map((last) => {
+      const art = arten.find((x) => x.wert === last.art);
+      const wert = last.wert_b === null || last.wert_b === undefined ? `${last.wert_a}` : `${last.wert_a} … ${last.wert_b}`;
+      const stelle = art?.verteilt ? '' : ` bei ${last.stelle} %`;
+      return lastzeile(last, `auf ${l.kennung}`, `${art?.beschriftung || last.art} ${wert} ${art?.einheit || ''}${stelle}`);
+    })),
+    ...z.knotenlasten.map((p) => lastzeile(p, `an ${p.knoten}`,
+      `${p.art === 'moment' ? 'Moment' : 'Kraft'} ${p.wert} ${p.art === 'moment' ? 'kNm' : 'kN'}`)),
+  ];
   if (linien.length) teile.push(el('div.bs-elemente', {}, [el('div.bs-elemente-titel', { text: 'Linien' }), ...linien]));
   if (lager.length) teile.push(el('div.bs-elemente', {}, [el('div.bs-elemente-titel', { text: 'Lager' }), ...lager]));
+  if (lasten.length) teile.push(el('div.bs-elemente', {}, [el('div.bs-elemente-titel', { text: 'Lasten' }), ...lasten]));
   return teile;
 }
 
@@ -180,7 +206,7 @@ function kennwerte(system, q) {
 function querschnittBlock(system, q, i) {
   const aendern = (veraenderer) => aendernAn(system.kennung, (s) => veraenderer(s.querschnitte[i], s));
   const setzen = (feldname) => (wert) => aendern((x) => { x[feldname] = wert; });
-  const benutzt = system.linien.filter((l) => l.stab && l.querschnitt === q.kennung).map((l) => l.kennung);
+  const benutzt = system.linien.filter((l) => l.querschnitt === q.kennung).map((l) => l.kennung);
   const weg = () => {
     if (benutzt.length) {
       melden(`«${q.name}» trägt noch ${benutzt.join(', ')}.`, true);
