@@ -44,6 +44,26 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Einheit neben den Koordinaten, Fenster hält die Oberkante
+
+Zwei Wünsche des Benutzers zum schwebenden Fenster:
+
+- **Rechts neben jedem Koordinatenfeld die Einheit** -- im Querschnitt mm,
+  im Balkensystem m, denn dessen Koordinaten sind Meter; beim Winkel °. Sie
+  kommt aus `feldeinheiten` neben `feldnamen` (`cad_eingabe.js`), aus der
+  Einheit der App. Das Winkelfeld heisst darum nur noch «α». Auch die Lage
+  des Zeigers in der Ruhe trägt die Einheit. Die Felder sind dafür 7 statt 8
+  Zeichen breit, sonst passte die Zeile nicht ins Fenster.
+- **Die Oberkante bleibt stehen**, wenn der Inhalt wechselt -- etwa beim
+  Umschalten der Bewehrung zwischen Linie und Punkt. Bisher hing das Fenster
+  an seiner Unterkante. Gemerkt wird jetzt der Abstand von oben rechts, und
+  es steht anfangs oben rechts. Reicht es über den unteren Rand, rückt es
+  hinauf, bis es ganz zu sehen ist, und kehrt zurück, wenn es schrumpft.
+  «Alles zeigen» hält darum oben oder unten frei, je nachdem, wo es steht
+  (`einpassen` nimmt `frei` als `{rechts, oben, unten}`).
+
+---
+
 ## 2026-10-23 · Die übrigen festen Listen werden Schalter
 
 Wunsch des Benutzers, nach der Empfehlung: jede feste Wahl als Schalter. Eine

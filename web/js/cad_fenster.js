@@ -47,7 +47,7 @@ import {
 } from './cad_ansicht.js';
 import { abstand, auswahlTeil, cadModell } from './cad_modell.js';
 import {
-  eingabeLeeren, eingabeNeu, fangen, feldnamen, felderLeeren, getipptPunkt, hilfenZeichnen, hilfstext,
+  eingabeLeeren, eingabeNeu, fangen, feldeinheiten, feldnamen, felderLeeren, getipptPunkt, hilfenZeichnen, hilfstext,
   klickPunkt, taste as eingabeTaste,
 } from './cad_eingabe.js';
 import {
@@ -354,21 +354,23 @@ function aktionen(a) {
 
 /**
  * Passt alles ins Bild -- und lässt dabei die Ecke frei, in der das
- * schwebende Fenster steht: daneben oder darüber, je nachdem, was weniger
- * Massstab kostet. So liegt nach «Alles zeigen» nichts darunter.
+ * schwebende Fenster steht: daneben oder darüber bzw. darunter, je nachdem,
+ * was weniger Massstab kostet. So liegt nach «Alles zeigen» nichts darunter.
  */
 function allesZeigen(a) {
   const umriss = a.adapter.umriss(a);
   const pal = a.teile.palette.knoten;
-  let frei = [0, 0];
+  let frei = {};
   if (pal.offsetWidth && a.v.breite) {
-    const breit = a.v.breite - pal.offsetLeft;
-    const hoch = a.v.hoehe - pal.offsetTop;
+    const seitlich = { rechts: a.v.breite - pal.offsetLeft };
+    // Steht das Fenster in der unteren Hälfte, bleibt unten frei, sonst oben.
+    const quer = pal.offsetTop + pal.offsetHeight / 2 > a.v.hoehe / 2
+      ? { unten: a.v.hoehe - pal.offsetTop } : { oben: pal.offsetTop + pal.offsetHeight };
     const massstab = (f) => {
       einpassen(a.v, umriss, { frei: f });
       return a.v.massstab;
     };
-    frei = massstab([breit, 0]) >= massstab([0, hoch]) ? [breit, 0] : [0, hoch];
+    frei = massstab(seitlich) >= massstab(quer) ? seitlich : quer;
   }
   einpassen(a.v, umriss, { frei });
   zeichnen(a);
@@ -494,14 +496,14 @@ function obenBald(a) {
 // Schwebendes Fenster, Knöpfe, Statuszeile
 // ===========================================================================
 
-/** Die Koordinaten des Zeigers -- in der Ruhe oben im schwebenden Fenster. */
+/** Die Koordinaten des Zeigers, mit Einheit -- in der Ruhe oben im schwebenden Fenster. */
 function lageZeichnen(a) {
   const ziel = a.teile.lage;
   if (!ziel) return;
   const f = a.zeiger?.fang || (a.zeiger?.bild && fangen(a, a.zeiger.bild));
   const [x, y] = a.adapter.achsen;
-  const s = a.einstellung.stellen;
-  ziel.textContent = f ? `${x} ${zahlText(f.p[0], s)}   ${y} ${zahlText(f.p[1], s)}` : '';
+  const { stellen: s, einheit: e } = a.einstellung;
+  ziel.textContent = f ? `${x} ${zahlText(f.p[0], s)} ${e}   ${y} ${zahlText(f.p[1], s)} ${e}` : '';
 }
 
 /** Ein Feld der Punkteingabe: schmal, rechtsbündig, ohne Pfeile. */
@@ -537,6 +539,7 @@ function hilfsknopf(a, zeichen, titel, tun, an = false) {
 function punkteingabe(a) {
   const pe = a.eingabe;
   const [n1, n2] = feldnamen(a);
+  const [e1, e2] = feldeinheiten(a);
   const modus = (wert, text, titel) => el('button.schalter-halb', {
     type: 'button', text, title: titel, class: pe.modus === wert ? 'ist-an' : '',
     on: { click: () => { pe.modus = wert; felderLeeren(pe); zeichnen(a); } },
@@ -558,8 +561,8 @@ function punkteingabe(a) {
         modus('polar', 'L∠', 'Länge und Winkel ab dem Bezugspunkt'),
       ]),
     el('div.cad-felder', {}, [
-      eingabefeld(a, 0, n1),
-      n2 ? eingabefeld(a, 1, n2) : null,
+      eingabefeld(a, 0, n1), el('span.einheit', { text: e1 }),
+      n2 ? eingabefeld(a, 1, n2) : null, n2 ? el('span.einheit', { text: e2 }) : null,
       el('button.knopf.knopf-klein', {
         type: 'button', text: '↵', title: 'Punkt setzen (Enter)',
         on: { click: () => getipptLiefern(a) },

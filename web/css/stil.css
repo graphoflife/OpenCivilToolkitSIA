@@ -1561,7 +1561,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 .cad-hinweis { text-align: right; }
 
-/* Das schwebende Fenster: unten rechts in der Zeichnung, am Kopf zu
+/* Das schwebende Fenster: oben rechts in der Zeichnung, am Kopf zu
    verschieben. Was darin steht, hängt davon ab, was gerade geschieht. */
 .cad-palette {
   position: absolute; z-index: 3; width: 224px; max-height: calc(100% - 4px);
@@ -1602,11 +1602,14 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 /* Die Punkteingabe: Modus, zwei Felder, die Hilfen R Y Z ∥ ⊥ M. */
 .cad-modus { align-self: flex-start; }
 .cad-modus .schalter-halb { text-transform: none; }
+/* Je Feld seine Einheit rechts daneben; damit alles in eine Zeile passt,
+   sind die Felder 7 Zeichen breit. */
 .cad-felder { display: flex; align-items: center; gap: 4px; }
 .cad-felder .cad-eingabe {
-  width: calc(8ch + 12px); padding: 3px 5px; font-size: 12px;
+  width: calc(7ch + 12px); padding: 3px 5px; font-size: 12px;
   text-align: right; font-variant-numeric: tabular-nums;
 }
+.cad-felder .einheit { min-width: 2ch; font-size: 11px; color: var(--schrift-zart); }
 .cad-hilfen { display: flex; flex-wrap: wrap; gap: 3px; }
 .cad-hilfe {
   min-width: 26px; height: 22px; padding: 0 5px;

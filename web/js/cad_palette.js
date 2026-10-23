@@ -1,10 +1,12 @@
 /**
  * cad_palette.js -- das schwebende Fenster im Zeichenfenster.
  *
- * Steht anfangs unten rechts in der Zeichnung und lässt sich an seinem Kopf
+ * Steht anfangs oben rechts in der Zeichnung und lässt sich an seinem Kopf
  * verschieben. Wohin man es gestellt hat, merkt sich der Browser -- als
- * Abstand von unten rechts, damit es beim Vergrössern dort bleibt. Es bleibt
- * immer ganz im Bild und lässt sich auf seinen Kopf zuklappen.
+ * Abstand von oben rechts: wechselt der Inhalt, bleibt die obere Kante
+ * stehen und nur die untere wandert (Benutzer, 2026-10-23; bis dahin war es
+ * umgekehrt). Es bleibt immer ganz im Bild und lässt sich auf seinen Kopf
+ * zuklappen.
  *
  * Was darin steht, setzt das Zeichenfenster je nach Lage: in Ruhe die
  * Koordinaten des Zeigers, während eines Befehls seine Frage und die
@@ -17,9 +19,9 @@ const ABLAGE = 'opencivil.cad.palette';
 
 function gemerkt() {
   try {
-    return { rechts: 10, unten: 10, zu: false, ...JSON.parse(localStorage.getItem(ABLAGE) || '{}') };
+    return { rechts: 10, oben: 10, zu: false, ...JSON.parse(localStorage.getItem(ABLAGE) || '{}') };
   } catch {
-    return { rechts: 10, unten: 10, zu: false };
+    return { rechts: 10, oben: 10, zu: false };
   }
 }
 
@@ -44,16 +46,16 @@ export function paletteBauen(flaeche) {
   const knoten = el('div.cad-palette', {}, [kopf, koerper]);
   flaeche.append(knoten);
 
+  // Reicht das Fenster über den unteren Rand, rückt es hinauf, bis es ganz zu
+  // sehen ist. Gemerkt bleibt die gewählte Lage: schrumpft der Inhalt wieder,
+  // kehrt es dorthin zurück.
+  const unterstes = () => Math.max(2, flaeche.clientHeight - knoten.offsetHeight - 2);
   const halten = () => {
     const b = flaeche.clientWidth;
-    const h = flaeche.clientHeight;
-    if (!b || !h) return;
-    const w = knoten.offsetWidth;
-    const hh = knoten.offsetHeight;
-    lage.rechts = Math.min(Math.max(2, lage.rechts), Math.max(2, b - w - 2));
-    lage.unten = Math.min(Math.max(2, lage.unten), Math.max(2, h - hh - 2));
+    if (!b || !flaeche.clientHeight) return;
+    lage.rechts = Math.min(Math.max(2, lage.rechts), Math.max(2, b - knoten.offsetWidth - 2));
     knoten.style.right = `${lage.rechts}px`;
-    knoten.style.bottom = `${lage.unten}px`;
+    knoten.style.top = `${Math.min(Math.max(2, lage.oben), unterstes())}px`;
   };
 
   const zuklappen = (wert) => {
@@ -70,10 +72,11 @@ export function paletteBauen(flaeche) {
   kopf.addEventListener('pointerdown', (start) => {
     if (start.target === zu || start.button !== 0) return;
     start.preventDefault();
-    const anfang = { ...lage };
+    // Von dort, wo es steht -- auch wenn es gerade hinaufgerückt ist.
+    const anfang = { ...lage, oben: knoten.offsetTop };
     const bewegen = (e) => {
       lage.rechts = anfang.rechts - (e.clientX - start.clientX);
-      lage.unten = anfang.unten - (e.clientY - start.clientY);
+      lage.oben = Math.min(Math.max(2, anfang.oben + (e.clientY - start.clientY)), unterstes());
       halten();
     };
     const los = () => {

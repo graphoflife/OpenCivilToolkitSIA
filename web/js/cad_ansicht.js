@@ -37,19 +37,20 @@ export function zoomen(v, faktor, bild) {
 
 /**
  * Passt das Rechteck `[[a0, b0], [a1, b1]]` ins Bild -- mit Rand für
- * Masslinien. `frei` hält zusätzlich eine Ecke frei, unten rechts, wo das
- * schwebende Fenster steht.
+ * Masslinien. `frei` hält zusätzlich einen Streifen frei, in px: `rechts`,
+ * `oben` oder `unten`, dort, wo das schwebende Fenster steht.
  */
-export function einpassen(v, [[a0, b0], [a1, b1]], { rand = 46, frei = [0, 0] } = {}) {
+export function einpassen(v, [[a0, b0], [a1, b1]], { rand = 46, frei = {} } = {}) {
   if (!v.breite || !v.hoehe) return;
+  const { rechts = 0, oben = 0, unten = 0 } = frei;
   const b = Math.max(a1 - a0, 1);
   const h = Math.max(b1 - b0, 1);
-  const nutzbreite = Math.max(40, v.breite - 2 * rand - frei[0]);
-  const nutzhoehe = Math.max(40, v.hoehe - 2 * rand - frei[1]);
+  const nutzbreite = Math.max(40, v.breite - 2 * rand - rechts);
+  const nutzhoehe = Math.max(40, v.hoehe - 2 * rand - oben - unten);
   v.massstab = Math.min(v.grenzen[1], Math.max(v.grenzen[0], Math.min(nutzbreite / b, nutzhoehe / h)));
   v.ursprung = [
     rand + nutzbreite / 2 - v.massstab * (a0 + a1) / 2,
-    rand + nutzhoehe / 2 + v.massstab * (b0 + b1) / 2,
+    oben + rand + nutzhoehe / 2 + v.massstab * (b0 + b1) / 2,
   ];
 }
 

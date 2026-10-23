@@ -313,8 +313,19 @@ export function feldnamen(a) {
   const [x, y] = a.adapter.achsen;
   if (a.eingabe.bindung) return ['Abstand', null];
   return {
-    rel: [`Δ${x}`, `Δ${y}`], abs: [x, y], polar: ['L', 'α°'],
+    rel: [`Δ${x}`, `Δ${y}`], abs: [x, y], polar: ['L', 'α'],
   }[a.eingabe.modus];
+}
+
+/**
+ * In welcher Einheit die Felder gemeint sind: Längen in der Einheit der App
+ * (mm im Querschnitt, m im Balkensystem), der Winkel in Grad. Sie steht
+ * rechts neben jedem Feld (Benutzer, 2026-10-23).
+ */
+export function feldeinheiten(a) {
+  const e = a.einstellung.einheit;
+  if (a.eingabe.bindung) return [e, null];
+  return a.eingabe.modus === 'polar' ? [e, '°'] : [e, e];
 }
 
 // ===========================================================================
