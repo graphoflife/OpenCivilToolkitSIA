@@ -110,11 +110,13 @@ Ein ebener Rahmen ebenso -- Koordinaten in m, x nach rechts, z nach oben:
 
 ```python
 r = p.balkensystem("Rahmen")                  # leer; gezeichnet wird wie beim Querschnitt
+beton = r.beton("b1")                         # ein Beton des Projekts: E_cm und ρ von ihm
+stahl = r.eigenes_material("Stahl", E=200000, rho=7850)       # E in N/mm², ρ in kg/m³
 stuetze = r.querschnitt("Stütze", "rechteck", b=300, h=300)   # Masse in mm
 riegel = r.querschnitt_aus("Unterzug", "analyse", u)          # A und I_y der Analyse
-links = r.linie((0, 0), (0, 4), querschnitt=stuetze, material="b1")
-balken = r.linie((0, 4), (6, 4), querschnitt=riegel, material="b1")
-r.linie((6, 4), (6, 0), querschnitt=stuetze, material="b1", gelenk_anfang=True)
+links = r.linie((0, 0), (0, 4), querschnitt=stuetze, material=beton)
+balken = r.linie((0, 4), (6, 4), querschnitt=riegel, material=beton)
+r.linie((6, 4), (6, 0), querschnitt=stuetze, material=beton, gelenk_anfang=True)
 r.lager_an((0, 0), "eingespannt")             # gelenkig, verschieblich oder je Richtung
 r.lager_an((6, 0), "gelenkig")
 g = r.lastfall("Eigengewicht", eigengewicht=True)  # ρ · g · A je Stab, von selbst
@@ -433,14 +435,17 @@ oder ein Moment auch an einen Knoten. Jede Last ist für sich zu wählen, an
 ihrem Pfeil, Band oder ihrer Zahl, und mit Entf zu löschen. Gezeigt werden
 die Lasten des Lastfalls, der in der Leiste neben «Last» gewählt ist -- zu
 Beginn das Eigengewicht, «– kein Lastfall –» zeigt keine; unter der
-Zeichnung stehen alle in einer Liste, je Gruppe aufklappbar. Darunter die Materialien des Projekts mit
-E-Modul und Dichte -- bei einem eigenen Material dort zu ändern, wie in der
-App «Materialien» --, die Querschnitte und die Lastfälle. Ein Querschnitt
-nimmt seinen E-Modul vom Material des Stabs, als Zahl oder -- aus einer
-Analyse -- als E_eq bei N und M, wie ihre Linie M–E_eq es dort hat; Zahl
-und E_eq gelten für jeden Stab mit ihm, für EA und EI. Eine Linie, deren
-Querschnitt aus einer Platte oder Analyse kommt, kann deren Beton nehmen
-(«gemäss Querschnitt»). Ein neues System bringt
+Zeichnung stehen alle in einer Liste, je Gruppe aufklappbar. Darunter die
+Materialien des Systems als Tabelle: ein Beton des Projekts -- E_cm und die
+Dichte des Stahlbetons, gesperrt -- oder ein eigenes Material mit E und ρ
+von Hand; Betonstahl ist keines. Ein neues System bekommt den ersten Beton
+des Projekts. Eine Linie nimmt eines davon oder -- kommt ihr Querschnitt
+aus einer Platte oder Analyse -- deren Beton («gemäss Querschnitt»); dann
+stehen an der Linie nur solche Querschnitte zur Wahl. Mit dem Material
+gemäss Querschnitt rechnet ein Stab mit E₀ = E_cm oder -- aus einer
+Analyse -- mit E_eq bei N und M, wie ihre Linie M–E_eq es dort hat, für EA
+und EI; der Schalter dafür steht am Querschnitt, sobald eine Linie ihn so
+nimmt. Darunter die Querschnitte und die Lastfälle. Ein neues System bringt
 die Lastfälle Eigengewicht, Auflast und Nutzlast mit und die Kombinationen
 GZT (1.35 / 1.35 / 1.5) und GZG (je 1.0). Das Eigengewicht kommt von
 selbst: je Stab ρ · g · A mit g = 10 m/s², beim Beton mit der Dichte des
@@ -458,9 +463,8 @@ System beweglich, sagt es eine Meldung und markiert, was sich bewegt; eine
 Drehung ohne Steifigkeit, an einem Knoten, an dem nur Gelenke hängen, ist
 gestrichen und trägt ein Fragezeichen. Die Querschnitte kommen aus einer
 Vorlage, von Hand, aus einer Platte oder aus einer Querschnittsanalyse; die
-Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm bzw. E_s -- oder der
-E-Modul von Hand oder E_eq -- am ungerissenen Bruttoquerschnitt, ohne
-Schubverformung, Theorie 1. Ordnung.
+Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm, E von Hand oder E_eq
+am ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie 1. Ordnung.
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch

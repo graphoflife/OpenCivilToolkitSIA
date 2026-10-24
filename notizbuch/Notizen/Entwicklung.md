@@ -44,6 +44,45 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: eigene Materialien als Tabelle
+
+Wunsch des Benutzers: im Panel «Materialien» zuerst Materialien anlegen,
+je Zeile eines -- ein Beton des Projekts, dessen E und Dichte man nicht
+ändern kann, oder ein Material mit E und Dichte von Hand; an der Linie nur
+diese und «gemäss Querschnitt»; am Querschnitt kein E mehr, nur noch die
+Wahl E₀ oder E_eq, wenn eine Linie sein Material nimmt.
+
+- **Beschreibung:** das System hat `stabmaterialien`
+  (`StabmaterialEintrag`, Kennung «M1»: `beton` mit Verweis auf einen Beton
+  des Projekts oder `eigen` mit `E` und `rho`). Eine Linie zeigt auf eines
+  davon oder auf «gemäss Querschnitt». `materialien()` -- die Liste, die das
+  Löschen im Projekt prüft -- nennt die Betone, auf die ein Material zeigt.
+- **Kein E am Querschnitt:** `E` und die Stellung «Zahl» sind weg; ein E von
+  Hand hat jetzt ein eigenes Material. `e_modul` heisst `e0` oder `e_eq` und
+  gilt nur für einen Stab mit dem Material des Querschnitts -- mit einem
+  Material des Systems nimmt er dessen E, auch bei einer Analyse.
+- **Rechnung:** der Aufbau löst jedes Material zu einem `Stabmaterial` auf
+  (Beton oder Zahlen von Hand); `Balkensystem` braucht keine Baustoffe mehr
+  daneben. Ein eigenes Material schreibt E und ρ als Eingaben in die
+  Herleitung, einmal je Material. Das Material des Querschnitts trägt im
+  Zeichen keinen Index: es kann wie ein Material des Systems heissen.
+- **Meldungen:** ein Material ohne Beton, eines, das auf Betonstahl zeigt,
+  und eine Linie mit einem Material, das es nicht gibt, halten das System
+  auf; ein Verweis auf einen Beton, den es nicht gibt, das Projekt -- wie
+  bisher bei Platte und Analyse.
+- **Oberfläche:** die Tabelle mit Kopf (Material, Art, E, ρ, trägt); E und ρ
+  eines Betons grau vom Kern. An der Linie die Materialien des Systems und
+  «gemäss Querschnitt», wenn der Querschnitt eines mitbringt -- und
+  umgekehrt bei «gemäss Querschnitt» nur solche Querschnitte. Ein neues
+  System bekommt den ersten Beton des Projekts; eine neue Linie das erste
+  Material.
+- **Beispiele:** im Prüfprojekt sind Stahl (E_s, ρ_s) und der weichere
+  Fundamentbeton (E = 15000) eigene Materialien -- jede Zahl des Berichts
+  bleibt, nur die Namen wechseln.
+- **Offen:** E_eq einer Platte (siehe [[TODO]]).
+
+---
+
 ## 2026-10-24 · Balkensystem: die Zugseite je Stab
 
 Wunsch des Benutzers: je Stab festlegen, welche Seite die Zugseite ist;

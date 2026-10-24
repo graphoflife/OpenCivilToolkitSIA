@@ -21,20 +21,25 @@ WOHER A UND I KOMMEN:
 Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu.
 
+MATERIALIEN:
+Ein Material der Staebe (:class:`Stabmaterial`) ist ein Beton des Projekts
+oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24). Ein Stab
+kann auch das Material seines Querschnitts nehmen, den Beton einer Platte
+oder Querschnittsanalyse.
+
 STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN:
-``E_cm`` fuer Beton und ``E_s`` fuer Betonstahl (:data:`E_MODUL`) -- oder
-je Querschnitt ein E von Hand oder das E_eq seiner Querschnittsanalyse bei
-N und M, fuer jeden Stab mit ihm (Benutzer, 2026-10-23) --, am
-ungerissenen Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am
-unverformten System. Die Herleitung sagt es, das TODO fuehrt es. Findet
-die Suche nach E_eq keinen Modul, sagt es eine Meldung, und das System
-rechnet nicht.
+``E_cm`` eines Betons (:data:`BETONKENNWERTE`) oder E von Hand -- und bei
+einem Stab mit dem Material seiner Querschnittsanalyse auf Wunsch deren
+E_eq bei N und M (Benutzer, 2026-10-23) --, am ungerissenen
+Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am unverformten
+System. Die Herleitung sagt es, das TODO fuehrt es. Findet die Suche nach
+E_eq keinen Modul, sagt es eine Meldung, und das System rechnet nicht.
 
 EIGENGEWICHT -- NACH VORGABE DES BENUTZERS (2026-10-23):
 Je Paar aus Querschnitt und Material ``g_k = rho · g · A`` in kN/m, mit
-``g = 10 m/s²`` und beim Beton der Dichte des Stahlbetons (:data:`DICHTE`)
--- ohne den Stahl noch dazu. Es kommt als Last senkrecht je Meter Stab in den
-Lastfall, den die Beschreibung dafuer nennt.
+``g = 10 m/s²`` und beim Beton der Dichte des Stahlbetons -- ohne den Stahl
+noch dazu. Es kommt als Last senkrecht je Meter Stab in den Lastfall, den
+die Beschreibung dafuer nennt.
 
 DAS ERGEBNIS:
 kommt als Befund in die Loesung (:class:`Systembefund`); Zusammenfassung,
@@ -52,7 +57,7 @@ from opencivil.core.berechnung import (
     Ausfuehrung, Befundbezug, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
 from opencivil.core.einheiten import (
-    KN_PRO_M, KNM2, M_PRO_S2, MIO_MM4, MM, MM2, MN, N_PRO_MM2, Groesse,
+    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MIO_MM4, MM, MM2, MN, N_PRO_MM2, Groesse,
 )
 from opencivil.core.latex import platzhalter_namen
 from opencivil.core.protokoll import Abschnitt, Protokoll
@@ -64,13 +69,10 @@ from opencivil.stabwerk.querschnitte import RECHTECK, Stabvorlage
 from opencivil.stabwerk.system import Ergebnis, Fall, Meldung, rechnen
 from opencivil.stabwerk.verlauf import Stabverlauf, verlaeufe
 
-#: Welcher E-Modul in die Steifigkeit eingeht, je Art des Materials -- nach
-#: Vorgabe, nicht nachgeschlagen.
-E_MODUL = {"beton": "E_cm", "betonstahl": "E_s"}
-
-#: Welche Dichte ins Eigengewicht eingeht, je Art des Materials -- beim Beton
-#: die des Stahlbetons (Benutzer, 2026-10-23).
-DICHTE = {"beton": "rho_sb", "betonstahl": "rho_s"}
+#: Welche Kennwerte eines Betons ein Stab aus ihm nimmt: ``E_cm`` -- nach
+#: Vorgabe, nicht nachgeschlagen -- und die Dichte des Stahlbetons
+#: (Benutzer, 2026-10-23).
+BETONKENNWERTE = {"E": "E_cm", "rho": "rho_sb"}
 
 #: Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des
 #: Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
@@ -79,6 +81,30 @@ ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)
 #: Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.
 QUERSCHNITTE = "Stabquerschnitte"
 STEIFIGKEITSMETHODE = "Steifigkeitsmethode"
+
+
+@dataclass(frozen=True)
+class Stabmaterial:
+    """
+    Ein Material der Staebe, aufgeloest: ein Beton -- E und Dichte von ihm --
+    oder ein eigenes mit E und Dichte von Hand.
+    """
+
+    kennung: str
+    """Im System, ``M1`` -- bei einem Stab mit dem Material seines Querschnitts dessen Zeichen."""
+
+    name: str
+    stoff: Optional[Baustoff] = None
+    """Der Beton -- ``None`` bei einem eigenen Material."""
+
+    E: float = 0.0
+    """Von Hand, N/mm² -- nur ohne ``stoff``."""
+
+    rho: float = 0.0
+    """Von Hand, kg/m³ -- nur ohne ``stoff``."""
+
+    vom_querschnitt: bool = False
+    """Das Material des Querschnitts: dann gilt dessen E_eq, wenn er eines hat."""
 
 
 @dataclass(frozen=True)
@@ -106,14 +132,12 @@ class Stabquerschnitt:
     fehler: str = ""
     """Was an seinen Massen nicht geht -- dann rechnet er nicht, und kein Stab mit ihm."""
 
-    E: Optional[float] = None
-    """Der E-Modul von Hand in N/mm² -- ``None``: der des Materials, :data:`E_MODUL`."""
-
     eq: Any = None
     """
     Die Frage nach dem E_eq seiner Analyse
-    (:class:`~opencivil.spannungsanalyse.modul.Modulfrage`) -- ``None``: E
-    vom Material oder von Hand. Sie baut ihre Berechnungen selbst ein.
+    (:class:`~opencivil.spannungsanalyse.modul.Modulfrage`) -- sie gilt fuer
+    die Staebe, die das Material des Querschnitts nehmen; ``None``: E_cm.
+    Sie baut ihre Berechnungen selbst ein.
     """
 
 
@@ -123,12 +147,15 @@ class Steifigkeit:
 
     querschnitt: str
     material: str
-    """Die Kennung des Materials im Projekt."""
+    """Die Kennung des :class:`Stabmaterial`."""
 
     EA: str
     EI: str
     g_k: str = ""
     """Das Eigengewicht je Meter -- leer, wenn kein Lastfall es bekommt."""
+
+    mit_eq: bool = False
+    """Ob E das E_eq des Querschnitts ist -- dann fehlen EA und EI, wo die Suche keines fand."""
 
 
 @dataclass(frozen=True)
@@ -219,14 +246,14 @@ class Balkensystem:
     """Ein Balkensystem, fertig fuer das Rechenwerk."""
 
     def __init__(self, *, name: str, kennung: str, praefix: str, system: System,
-                 paare: Mapping[str, Tuple[str, str]], meldungen: Sequence[Meldung],
+                 paare: Mapping[str, Tuple[str, Stabmaterial]], meldungen: Sequence[Meldung],
                  querschnitte: Sequence[Stabquerschnitt],
-                 stoffe: Mapping[str, Baustoff], eigengewicht: Optional[str] = None) -> None:
+                 eigengewicht: Optional[str] = None) -> None:
         """
         ``system`` ohne Steifigkeiten, wie die Beschreibung es baut;
-        ``paare`` je tragenden Stab Querschnitt und Material, ``stoffe`` die
-        Baustoffe dieser Materialien; ``eigengewicht`` der Lastfall, der das
-        Eigengewicht der Staebe bekommt.
+        ``paare`` je tragenden Stab die Kennung seines Querschnitts und sein
+        Material; ``eigengewicht`` der Lastfall, der das Eigengewicht der
+        Staebe bekommt.
         """
         self.name = name
         self.kennung = kennung
@@ -235,16 +262,20 @@ class Balkensystem:
         self.paare = dict(paare)
         self.meldungen = list(meldungen)
         self.querschnitte = list(querschnitte)
-        self.stoffe = dict(stoffe)
         self.eigengewicht = eigengewicht
         self.definitionen: Dict[str, WertDef] = {}
         self.berechnungen: List[Berechnung] = []
         self.flaechen: Dict[str, Tuple[str, str]] = {}
+        """Je Querschnitt die Wert-IDs von ``A`` und ``I``."""
+
         self.module: Dict[str, str] = {}
-        """Je Querschnitt mit eigenem E -- von Hand oder E_eq -- die Wert-ID dieses E."""
+        """Je Querschnitt mit E_eq die Wert-ID dieses E."""
+
         self.modulsuchen: Dict[str, str] = {}
         """Je Querschnitt mit E_eq die ID der Suche -- ihr Befund sagt, ob sie einen fand."""
-        """Je Querschnitt die Wert-IDs von ``A`` und ``I``."""
+
+        self.materialwerte: Dict[str, Tuple[str, str]] = {}
+        """Je eigenes Material die Wert-IDs von E und Dichte."""
 
         self.steifigkeiten: List[Steifigkeit] = []
         self._aufbauen()
@@ -272,9 +303,7 @@ class Balkensystem:
         for q in self.querschnitte:
             if not q.fehler:
                 self.flaechen[q.kennung] = self._querschnitt(q, q.kennung if index else "")
-                if q.E is not None:
-                    self.module[q.kennung] = self._modul(q, q.kennung if index else "")
-                elif q.eq is not None:
+                if q.eq is not None:
                     berechnungen, E, suche = q.eq.einbauen(
                         self._def, wo=f"{q.kennung}.", index=q.kennung if index else "",
                         name=q.name, abschnitt=self.abschnitt(QUERSCHNITTE))
@@ -296,16 +325,18 @@ class Balkensystem:
                 self.meldungen.append(Meldung(f"Querschnitt «{q.name}»: {q.fehler}",
                                               (q.kennung, *gestrichen[q.kennung]), True))
 
-        benutzt: List[Tuple[str, str]] = []
-        for paar in self.paare.values():
-            if paar not in benutzt:
-                benutzt.append(paar)
+        benutzt: Dict[Tuple[str, str], Stabmaterial] = {}
+        for q, m in self.paare.values():
+            benutzt.setdefault((q, m.kennung), m)
         mehrere_stoffe = len({m for _, m in benutzt}) > 1
         g = self._erdbeschleunigung() if self.eigengewicht and benutzt else None
-        for q, m in benutzt:
+        for (q, _), m in benutzt.items():
+            # Das Material des Querschnitts traegt keinen Index: je
+            # Querschnitt gibt es davon eines, und es kann wie ein Material
+            # des Systems heissen -- mit Index stuenden zwei gleiche Zeichen da.
             teile = [q] if index else []
-            if mehrere_stoffe:
-                teile.append(self.stoffe[m].name)
+            if mehrere_stoffe and not m.vom_querschnitt:
+                teile.append(m.name)
             self.steifigkeiten.append(self._steifigkeit(q, m, ",".join(teile), g))
 
         # Mit E_eq fehlen EA und EI, wo die Suche keinen Modul fand: dann
@@ -314,7 +345,7 @@ class Balkensystem:
         self.rechnung = SteifigkeitsmethodeProzedur(
             self, id=f"{self.id}.rechnung", ausgaben=[],
             bezuege=[Eingabebezug(f"{groesse}_{i}", getattr(s, groesse),
-                                  optional=groesse != "g_k" and s.querschnitt in self.modulsuchen)
+                                  optional=groesse != "g_k" and s.mit_eq)
                      for i, s in enumerate(self.steifigkeiten) for groesse in groessen],
             befunde=[Befundbezug(f"modul_{q}", suche) for q, suche in self.modulsuchen.items()],
             titel="Steifigkeitsmethode", abschnitt=self.abschnitt())
@@ -376,13 +407,27 @@ class Balkensystem:
             quellen[f.kurzname] = d.id
         return quellen["A"], quellen["I"]
 
-    def _modul(self, q: Stabquerschnitt, index: str) -> str:
-        """Der E-Modul von Hand eines Querschnitts -- er gilt fuer jeden Stab mit ihm."""
-        d = self._def(f"{q.kennung}.E", mit_index("E", index), N_PRO_MM2, f"E-Modul, {q.name}", 0)
-        self.berechnungen.append(Vorgabe(
-            id=d.id, ausgabe=d, groesse=Groesse(q.E, N_PRO_MM2), quelle=Quelle.EINGABE,
-            titel=f"E-Modul, «{q.name}» (von Hand)", abschnitt=self.abschnitt(QUERSCHNITTE)))
-        return d.id
+    def _kennwerte(self, m: Stabmaterial) -> Tuple[str, str]:
+        """
+        Die Wert-IDs von E und Dichte eines Materials: die seines Betons --
+        oder bei einem eigenen Vorgaben von Hand, einmal je Material.
+        """
+        if m.stoff is not None:
+            return m.stoff.id_von(BETONKENNWERTE["E"]), m.stoff.id_von(BETONKENNWERTE["rho"])
+        if m.kennung not in self.materialwerte:
+            ids = []
+            for kurz, symbol, einheit, wert, beschreibung in (
+                    ("E", "E", N_PRO_MM2, m.E, "E-Modul"),
+                    ("rho", r"\rho", KG_PRO_M3, m.rho, "Dichte")):
+                d = self._def(f"{m.kennung}.{kurz}", mit_index(symbol, m.name), einheit,
+                              f"{beschreibung}, {m.name}", 0)
+                self.berechnungen.append(Vorgabe(
+                    id=d.id, ausgabe=d, groesse=Groesse(wert, einheit), quelle=Quelle.EINGABE,
+                    titel=f"{beschreibung}, «{m.name}» (von Hand)",
+                    abschnitt=self.abschnitt(QUERSCHNITTE)))
+                ids.append(d.id)
+            self.materialwerte[m.kennung] = (ids[0], ids[1])
+        return self.materialwerte[m.kennung]
 
     def _erdbeschleunigung(self) -> str:
         """``g`` als Vorgabe des Systems -- seine Wert-ID."""
@@ -392,25 +437,26 @@ class Balkensystem:
             titel="Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)"))
         return d.id
 
-    def _steifigkeit(self, q: str, material: str, index: str,
+    def _steifigkeit(self, q: str, m: Stabmaterial, index: str,
                      g: Optional[str] = None) -> Steifigkeit:
         """
         EA und EI eines Paars aus Querschnitt und Material -- mit ``g`` dazu
-        sein Eigengewicht. E kommt vom Material, ausser der Querschnitt hat
-        eines von Hand; die Dichte immer vom Material.
+        sein Eigengewicht. E und Dichte kommen vom Material; nimmt der Stab
+        das Material seines Querschnitts und hat der ein E_eq, gilt dieses.
         """
         abschnitt = self.abschnitt(QUERSCHNITTE)
-        stoff = self.stoffe[material]
-        modul = self.module.get(q) or stoff.id_von(E_MODUL[stoff.art.value])
-        womit = ("mit E_eq" if q in self.modulsuchen
-                 else "mit E von Hand" if q in self.module else f"aus {stoff.name}")
+        modul, dichte = self._kennwerte(m)
+        mit_eq = m.vom_querschnitt and q in self.module
+        if mit_eq:
+            modul = self.module[q]
+        womit = "mit E_eq" if mit_eq else f"aus {m.name}"
         A, I = self.flaechen[q]
         name = next(x.name for x in self.querschnitte if x.kennung == q)
-        wo = f"{q}.{material}."
+        wo = f"{q}.{m.kennung}."
         d_EA = self._def(wo + "EA", mit_index("EA", index), MN,
-                         f"Dehnsteifigkeit, {name}, {stoff.name}", 0)
+                         f"Dehnsteifigkeit, {name}, {m.name}", 0)
         d_EI = self._def(wo + "EI", mit_index("EI", index), KNM2,
-                         f"Biegesteifigkeit, {name}, {stoff.name}", 0)
+                         f"Biegesteifigkeit, {name}, {m.name}", 0)
         self.berechnungen += [
             Formel(id=d_EA.id, ausgabe=d_EA, funktion=_dehnsteifigkeit,
                    vorlage=r"@E \cdot @A", eingaben={"E": modul, "A": A},
@@ -422,16 +468,17 @@ class Balkensystem:
                    abschnitt=abschnitt),
         ]
         if g is None:
-            return Steifigkeit(querschnitt=q, material=material, EA=d_EA.id, EI=d_EI.id)
+            return Steifigkeit(querschnitt=q, material=m.kennung, EA=d_EA.id, EI=d_EI.id,
+                               mit_eq=mit_eq)
         d_g = self._def(wo + "g_k", mit_index("g_k", index), KN_PRO_M,
-                        f"Eigengewicht je Meter, {name}, {stoff.name}", 2)
+                        f"Eigengewicht je Meter, {name}, {m.name}", 2)
         self.berechnungen.append(Formel(
             id=d_g.id, ausgabe=d_g, funktion=_eigengewicht,
-            vorlage=r"@rho \cdot @g \cdot @A",
-            eingaben={"rho": stoff.id_von(DICHTE[stoff.art.value]), "g": g, "A": A},
-            titel=f"Eigengewicht, «{name}» aus {stoff.name}", name="Eigengewicht eines Stabs",
+            vorlage=r"@rho \cdot @g \cdot @A", eingaben={"rho": dichte, "g": g, "A": A},
+            titel=f"Eigengewicht, «{name}» aus {m.name}", name="Eigengewicht eines Stabs",
             abschnitt=abschnitt))
-        return Steifigkeit(querschnitt=q, material=material, EA=d_EA.id, EI=d_EI.id, g_k=d_g.id)
+        return Steifigkeit(querschnitt=q, material=m.kennung, EA=d_EA.id, EI=d_EI.id,
+                           g_k=d_g.id, mit_eq=mit_eq)
 
     def _eigengewicht(self, e: Eingaben) -> Dict[str, float]:
         """
@@ -443,11 +490,11 @@ class Balkensystem:
             return {}
         g_k = {(s.querschnitt, s.material): e.g(f"g_k_{i}").si
                for i, s in enumerate(self.steifigkeiten)}
-        return {stab.name: g_k[self.paare[stab.name]]
-                for stab in self.system.staebe if stab.name in self.paare}
+        return {stab: g_k[q, m.kennung] for stab, (q, m) in self.paare.items()}
 
     def ins_rechenwerk(self, werk) -> "Balkensystem":
-        for stoff in self.stoffe.values():
+        betone = {id(m.stoff): m.stoff for _, m in self.paare.values() if m.stoff is not None}
+        for stoff in betone.values():
             stoff.ins_rechenwerk(werk)
         werk.definiere(*self.definitionen.values())
         werk.registriere(*self.berechnungen)
@@ -460,7 +507,6 @@ class Balkensystem:
         fehlt, wo sie keinen Modul fand.
         """
         return ([i for paar in self.flaechen.values() for i in paar]
-                + [E for q, E in self.module.items() if q not in self.modulsuchen]
                 + list(self.modulsuchen.values()) + [self.rechnung.id])
 
     # -- Rechnen ----------------------------------------------------------------
@@ -476,9 +522,9 @@ class Balkensystem:
                  for i, s in enumerate(self.steifigkeiten) if e.hat(f"EA_{i}")}
         staebe = []
         for stab in self.system.staebe:
-            paar = self.paare.get(stab.name)
-            if paar in steif:
-                EA, EI = steif[paar]
+            q, m = self.paare.get(stab.name, ("", None))
+            if m is not None and (q, m.kennung) in steif:
+                EA, EI = steif[q, m.kennung]
                 stab = replace(stab, EA=EA, EI=EI)
             staebe.append(stab)
         eigen = self._eigengewicht(e)
@@ -498,11 +544,15 @@ class Balkensystem:
         return Ausfuehrung({}, befund=befund)
 
     def _ohne_modul(self, e: Eingaben) -> List[Meldung]:
-        """Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab nimmt, eine Meldung."""
+        """
+        Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab mit
+        seinem Material nimmt, eine Meldung.
+        """
         meldungen = []
-        for q, _ in self.modulsuchen.items():
+        for q in self.modulsuchen:
             befund = e.befund(f"modul_{q}")
-            staebe = [stab for stab, (quer, _) in self.paare.items() if quer == q]
+            staebe = [stab for stab, (quer, m) in self.paare.items()
+                      if quer == q and m.vom_querschnitt]
             if befund.stelle is None and staebe:
                 name = next(x.name for x in self.querschnitte if x.kennung == q)
                 meldungen.append(Meldung(f"Querschnitt «{name}»: kein E_eq – {befund.grund}",

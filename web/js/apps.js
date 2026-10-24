@@ -226,7 +226,10 @@ const ANALYSE = bauteil('querschnittsanalyse', {
   fenster: analyseFenster,
 });
 
-/** Leer, aus dem Kern (Benutzer, 2026-10-19) -- Beton braucht es für die Stäbe, die man zeichnet. */
+/**
+ * Leer, aus dem Kern (Benutzer, 2026-10-19) -- bis auf ein Material: der
+ * erste Beton des Projekts, damit ein gezeichneter Stab gleich eines hat.
+ */
 const SYSTEM = bauteil('balkensystem', {
   kurztext: (s) => {
     const staebe = s.linien.filter((l) => l.querschnitt).length;
@@ -234,6 +237,12 @@ const SYSTEM = bauteil('balkensystem', {
   },
   anlegen: (a) => nachVorlage(a, 'neues_balkensystem', {
     braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.', vorher: systemfensterVergessen,
+    einrichten: (s, { beton }) => {
+      s.stabmaterialien = [{
+        ...structuredClone(zustand.katalog.neue_zeilen.stabmaterial),
+        kennung: 'M1', art: 'beton', beton: beton.kennung,
+      }];
+    },
   }),
   vergessen: systemfensterVergessen,
   editor: balkensystemEditor,

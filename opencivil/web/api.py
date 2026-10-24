@@ -67,7 +67,7 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
-from opencivil.stabwerk.rechnung import DICHTE, E_MODUL
+from opencivil.stabwerk.rechnung import BETONKENNWERTE
 from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.web import balkendaten, diagrammdaten, grundbruchdaten, setzungsdaten
 from opencivil.web.umschlag import endlich
@@ -171,6 +171,7 @@ def katalog() -> dict:
             "querschnittsanalyse": feldangaben(QuerschnittsanalyseEintrag),
             "flaeche": feldangaben(FlaecheEintrag),
             "spannungsfall": feldangaben(SpannungsfallEintrag),
+            "stabmaterial": feldangaben(bs.StabmaterialEintrag),
             "stabquerschnitt": feldangaben(bs.StabquerschnittEintrag),
             "modul": feldangaben(bs.ModulEintrag),
         },
@@ -209,6 +210,7 @@ def katalog() -> dict:
             "lager": bs.LagerEintrag().als_dict(),
             "knotenlast": bs.KnotenlastEintrag().als_dict(),
             "stablast": bs.StablastEintrag().als_dict(),
+            "stabmaterial": bs.StabmaterialEintrag().als_dict(),
             "stabquerschnitt": bs.StabquerschnittEintrag(
                 masse=stabquerschnitte.RECHTECK.vorgaben()).als_dict(),
             "lastfall": bs.LastfallEintrag().als_dict(),
@@ -278,22 +280,26 @@ def katalog() -> dict:
                      "kurz": "Analyse"},
                 )
             ],
-            # Woher der E-Modul eines Querschnitts kommt -- und bei welchen
-            # Arten eines Querschnitts: E_eq nur bei einer Analyse.
+            # Was ein Material des Systems ist: ein Beton des Projekts oder
+            # ein eigenes -- und welche Kennwerte des Betons ein Stab nimmt;
+            # die Tabelle der Materialien zeigt sie gesperrt.
+            "materialarten": [
+                {"wert": "beton", "beschriftung": "Beton",
+                 "titel": "Ein Beton des Projekts -- E_cm und die Dichte des Stahlbetons von ihm"},
+                {"wert": "eigen", "beschriftung": "eigenes",
+                 "titel": "E-Modul und Dichte von Hand"},
+            ],
+            "betonkennwerte": dict(BETONKENNWERTE),
+            # Welches E ein Stab hat, der das Material seines Querschnitts
+            # nimmt -- und bei welchen Arten: E_eq nur bei einer Analyse.
             "e_module": [
-                {"wert": "material", "beschriftung": "vom Material",
-                 "titel": "E_cm beim Beton, E_s beim Stahl -- je Stab sein Material",
-                 "arten": list(bs.QUERSCHNITTSARTEN)},
-                {"wert": "zahl", "beschriftung": "Zahl",
-                 "titel": "Ein E von Hand, für jeden Stab mit diesem Querschnitt",
-                 "arten": list(bs.QUERSCHNITTSARTEN)},
+                {"wert": "e0", "beschriftung": "E₀ = E_cm",
+                 "titel": "E_cm des Betons, den der Querschnitt mitbringt",
+                 "arten": list(bs.MIT_MATERIAL)},
                 {"wert": "e_eq", "beschriftung": "E_eq",
                  "titel": "Der äquivalente E-Modul der Querschnittsanalyse bei N und M",
                  "arten": list(bs.E_EQ_ARTEN)},
             ],
-            # Je Art eines Materials die Kennwerte, mit denen ein Stab
-            # rechnet: E-Modul und Dichte -- die Liste der Materialien zeigt sie.
-            "kennwerte": {art: [E_MODUL[art], DICHTE[art]] for art in E_MODUL},
             # Was als Material einer Linie heisst: das ihres Querschnitts.
             "material_des_querschnitts": bs.MATERIAL_DES_QUERSCHNITTS,
             # Was ein Diagramm der Statik-Analyse zeigt -- kurz im Schalter,
@@ -822,9 +828,7 @@ def zuordnung(aufbau: Aufbau) -> dict:
             for kennung, analyse in aufbau.querschnittsanalysen.items()
         },
         # Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus
-        # Querschnitt und Material EA und EI. Dazu je tragenden Stab sein
-        # Material, wie der Aufbau es aufgeloest hat: «gemäss Querschnitt» ist
-        # hier schon der Beton der Platte oder Analyse.
+        # Querschnitt und Material EA und EI.
         "balkensysteme": {
             kennung: {
                 "namensraum": system.id,
@@ -832,8 +836,7 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 "querschnitte": {q: {"A": A, "I": I} for q, (A, I) in system.flaechen.items()},
                 "steifigkeiten": [{"querschnitt": s.querschnitt, "material": s.material,
                                    "EA": s.EA, "EI": s.EI} for s in system.steifigkeiten],
-                "materialien": {stab: material for stab, (_, material) in system.paare.items()},
-                # Je Querschnitt mit eigenem E -- von Hand oder E_eq --, wo es steht.
+                # Je Querschnitt mit E_eq, wo es steht.
                 "module": dict(system.module),
             }
             for kennung, system in aufbau.balkensysteme.items()

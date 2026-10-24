@@ -2092,12 +2092,19 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-vz-faser { stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
 .bs-vz-text { font-size: 10px; fill: var(--schrift-matt); }
 
-/* Materialien, Querschnitte, Lastfälle, Kombinationen. Ein Material zeigt
-   die Zeilen der App «Materialien» -- ihr Stil gilt hier mit. */
-.bs-material { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
-.bs-material-kopf { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
-.bs-material-name { font-weight: 600; }
+/* Materialien, Querschnitte, Lastfälle, Kombinationen. Die Materialien als
+   Tabelle (Benutzer, 2026-10-24): ein Beton des Projekts mit gesperrten
+   Kennwerten, ein eigenes mit Feldern -- 200000 hat gerade Platz. */
+.bs-materialien { border-collapse: collapse; font-size: 12px; margin: 2px 0 6px; width: 100%; }
+.bs-materialien th { text-align: left; font-weight: 600; color: var(--schrift-matt); padding: 2px 4px; white-space: nowrap; }
+.bs-materialien th .einheit { font-weight: 400; color: var(--schrift-zart); }
+.bs-materialien td { padding: 2px 4px; }
+.bs-materialien select, .bs-materialien input[type="text"] { width: 100%; min-width: 6em; padding: 2px 4px; font-size: 12px; }
+.bs-materialien .zahlfeld { width: calc(3.6em + var(--pfeilspur) + 12px); }
+.bs-materialien .bs-benutzt { max-width: 7em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bs-material-art { font-size: 11px; color: var(--schrift-zart); }
+.bs-gesperrt { color: var(--schrift-matt); }
+.bs-knopfreihe { display: flex; flex-wrap: wrap; gap: 6px; }
 .bs-querschnitt { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
 .bs-querschnitt-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
 .bs-kennwerte { margin: 0; font-size: 12px; font-weight: 600; color: var(--stahl); }

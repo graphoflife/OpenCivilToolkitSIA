@@ -20,15 +20,17 @@ from opencivil.spannungsanalyse.schnitt import schnittpaar
 from opencivil.web import dienst
 
 
-def einfeldtraeger(kennung: str = "r1", name: str = "T", material: str = "b1") -> BalkensystemEintrag:
+def einfeldtraeger(kennung: str = "r1", name: str = "T", beton: str = "b1") -> BalkensystemEintrag:
     """
     Ein Einfeldträger von 6 m, Rechteck 300 × 600 mm, links gelenkig, rechts
     verschieblich, ein Lastfall mit 10 kN/m -- bis 2026-10-19 das neue System
     der Oberfläche. Gebaut ohne die Lastfälle, die ein neues System mitbringt.
+    Sein Material ist ``beton`` des Projekts; leer: keines.
     """
     s = BalkensystemEintrag(kennung=kennung, name=name)
     q = s.querschnitt("Rechteck 300×600", "rechteck", b=300.0, h=600.0)
-    linie = s.linie((0.0, 0.0), (6.0, 0.0), querschnitt=q, material=material)
+    linie = s.linie((0.0, 0.0), (6.0, 0.0), querschnitt=q,
+                    material=s.beton(beton) if beton else None)
     s.lager_an((0.0, 0.0), "gelenkig")
     s.lager_an((6.0, 0.0), "verschieblich")
     s.stablast(s.lastfall("Lastfall 1"), linie, wert=10.0)
@@ -40,10 +42,11 @@ def rahmen() -> Projekt:
     p = Projekt(name="Rahmen")
     p.beton("C30/37")
     s = p.balkensystem("Rahmen")
+    beton = s.beton("b1")
     q = s.querschnitt("Riegel", "rechteck", b=300.0, h=600.0)
-    links = s.linie((0, 0), (0, 4), querschnitt=q, material="b1")
-    riegel = s.linie((0, 4), (6, 4), querschnitt=q, material="b1")
-    rechts = s.linie((6, 4), (6, 0), querschnitt=q, material="b1", gelenk_anfang=True)
+    links = s.linie((0, 0), (0, 4), querschnitt=q, material=beton)
+    riegel = s.linie((0, 4), (6, 4), querschnitt=q, material=beton)
+    rechts = s.linie((6, 4), (6, 0), querschnitt=q, material=beton, gelenk_anfang=True)
     s.lager_an((0, 0), "eingespannt")
     s.lager_an((6, 0), "gelenkig")
     g = s.lastfall("Eigengewicht")
@@ -174,7 +177,7 @@ class TestLagerkraefteAmBildschirm(unittest.TestCase):
         p.beton("C30/37")
         s = p.balkensystem("Streifen")
         q = s.querschnitt("Balken", "rechteck", b=1000.0, h=400.0)
-        balken = s.linie((0, 0), (6, 0), querschnitt=q, material="b1",
+        balken = s.linie((0, 0), (6, 0), querschnitt=q, material=s.beton("b1"),
                          quer="feder", k_quer=20000.0)
         s.lager_an((0, 0), "gelenkig")
         g = s.lastfall("G")
@@ -321,7 +324,7 @@ def traeger(**masse) -> Projekt:
     p.stahl("B500B")
     s = p.balkensystem("Träger")
     q = s.querschnitt("R", "rechteck", **(masse or {"b": 300.0, "h": 600.0}))
-    linie = s.linie((0, 0), (6, 0), querschnitt=q, material="b1")
+    linie = s.linie((0, 0), (6, 0), querschnitt=q, material=s.beton("b1"))
     s.lager_an((0, 0), "gelenkig")
     s.lager_an((6, 0), "verschieblich")
     s.stablast(s.lastfall("G"), linie, wert=10.0)
@@ -339,8 +342,8 @@ class TestModell(unittest.TestCase):
         self.assertEqual((knotenlast.Fx, knotenlast.Fz), (10e3, 0.0))
         self.assertEqual(modell.system.kombinationen[0].faktoren,
                          {"Eigengewicht": 1.35, "Wind": 1.5})
-        self.assertEqual(modell.paare, {"L1": ("Q1", "b1"), "L2": ("Q1", "b1"),
-                                        "L3": ("Q1", "b1")})
+        self.assertEqual(modell.paare, {"L1": ("Q1", "M1"), "L2": ("Q1", "M1"),
+                                        "L3": ("Q1", "M1")})
 
     def test_senkrecht_zeigt_nach_unten(self):
         s = einfeldtraeger("r1", "T", "b1")
@@ -364,6 +367,8 @@ class TestModell(unittest.TestCase):
         for aendern, wort, elemente in (
                 (lambda s: setattr(s.linien[0], "querschnitt", "Q9"), "keinen Querschnitt", {"L1"}),
                 (lambda s: setattr(s.linien[0], "material", ""), "kein Material", {"L1"}),
+                (lambda s: setattr(s.linien[0], "material", "M9"), "im System nicht gibt",
+                 {"L1"}),
                 (lambda s: s.querschnitte[0].masse.__setitem__("h", 0.0), "Höhe",
                  {"Q1", "L1"})):
             with self.subTest(wort=wort):
@@ -394,18 +399,20 @@ class TestRechnen(unittest.TestCase):
         self.assertAlmostEqual(x, 3.0, places=9)
         self.assertAlmostEqual(M, 45e3, places=4)
         E = e.wert("beton.b1.E_cm").groesse.si
-        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.b1.EI").groesse.si,
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.M1.EI").groesse.si,
                                E * 0.3 * 0.6 ** 3 / 12, delta=1e-6 * E)
         self.assertEqual(len(system.ergebnis.unbekannte), 3)
 
-    def test_stahl_mit_E_s(self):
+    def test_eigenes_material(self):
+        """Ein Rundstab aus Stahl: E von Hand, als Eingabe im System."""
         p = traeger()
         s = p.balkensysteme[0]
         s.querschnitte[0].vorlage, s.querschnitte[0].masse = "kreis", {"d": 100.0}
-        s.linien[0].material = "s1"
+        s.linien[0].material = s.eigenes_material("Stahl", E=200000.0, rho=7850.0).kennung
         e = p.rechnen()
-        EA = e.wert("betonstahl.s1.E_s").groesse.si * math.pi * 0.05 ** 2
-        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.s1.EA").groesse.si, EA,
+        self.assertEqual(e.wert("balkensystem.r1.M2.E").groesse.si, 200000e6)
+        EA = 200000e6 * math.pi * 0.05 ** 2
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.M2.EA").groesse.si, EA,
                                delta=1e-12 * EA)
 
     def test_aus_platte_und_analyse(self):
@@ -415,8 +422,8 @@ class TestRechnen(unittest.TestCase):
         s = p.balkensysteme[0]
         aus_platte = s.querschnitt_aus("Streifen", "platte", decke)
         aus_analyse = s.querschnitt_aus("Unterzug", "analyse", unterzug)
-        s.linie((6, 0), (9, 0), querschnitt=aus_platte, material="b1")
-        s.linie((9, 0), (12, 0), querschnitt=aus_analyse, material="b1")
+        s.linie((6, 0), (9, 0), querschnitt=aus_platte, material="M1")
+        s.linie((9, 0), (12, 0), querschnitt=aus_analyse, material="M1")
         s.lager_an((12, 0), "verschieblich")
         e = p.rechnen()
         self.assertTrue(e.balkensystem("r1").ergebnis.gueltig,
@@ -451,8 +458,8 @@ class TestRechnen(unittest.TestCase):
         p = traeger()
         s = p.balkensysteme[0]
         q = s.querschnitte[0]
-        s.linie((0, 0), (3, 3), querschnitt=q, material="b1", gelenk_ende=True)
-        s.linie((6, 0), (3, 3), querschnitt=q, material="b1", gelenk_ende=True)
+        s.linie((0, 0), (3, 3), querschnitt=q, material="M1", gelenk_ende=True)
+        s.linie((6, 0), (3, 3), querschnitt=q, material="M1", gelenk_ende=True)
         e = p.rechnen()
         self.assertEqual(e.balkensystem("r1").ergebnis.unbestimmt(), ["K3"])
         antwort = dienst.bearbeite("balkensystem_verlauf",
@@ -583,12 +590,13 @@ class TestEigengewicht(unittest.TestCase):
     m/s² und beim Beton der Dichte des Stahlbetons (Benutzer, 2026-10-23).
     """
 
-    def system(self, material="b1", **masse):
+    def system(self, eigen=None, **masse):
+        """Der Träger aus dem Beton des Projekts -- oder mit ``eigen`` aus einem eigenen Material."""
         p = Projekt(name="Träger")
         p.beton("C30/37")
-        p.stahl("B500B")
         s = BalkensystemEintrag.neu("r1", "Träger")
         q = s.querschnitt("R", "rechteck", **(masse or {"b": 300.0, "h": 600.0}))
+        material = s.eigenes_material("Stahl", **eigen) if eigen else s.beton("b1")
         s.linie((0, 0), (6, 0), querschnitt=q, material=material)
         s.lager_an((0, 0), "gelenkig")
         s.lager_an((6, 0), "verschieblich")
@@ -602,7 +610,7 @@ class TestEigengewicht(unittest.TestCase):
     def test_stahlbeton_25_kn_pro_m3(self):
         # 2500 kg/m³ · 10 m/s² · 0.18 m² = 4.5 kN/m, auf 6 m je Lager 13.5 kN.
         p = self.system()
-        self.assertAlmostEqual(p.rechnen().loesung.werte["balkensystem.r1.Q1.b1.g_k"].groesse.si,
+        self.assertAlmostEqual(p.rechnen().loesung.werte["balkensystem.r1.Q1.M1.g_k"].groesse.si,
                                4.5e3)
         self.assertEqual(self.lagerkraefte(p, "Eigengewicht"), [13.5, 13.5])
 
@@ -611,10 +619,10 @@ class TestEigengewicht(unittest.TestCase):
         self.assertEqual(self.lagerkraefte(p, "GZT"), [18.225, 18.225])
         self.assertEqual(self.lagerkraefte(p, "GZG"), [13.5, 13.5])
 
-    def test_stahl_mit_seiner_dichte(self):
+    def test_eigenes_material_mit_seiner_dichte(self):
         # Ein Stahlstab 100 × 100 mm: 7850 · 10 · 0.01 = 785 N/m.
-        p = self.system(material="s1", b=100.0, h=100.0)
-        self.assertAlmostEqual(p.rechnen().loesung.werte["balkensystem.r1.Q1.s1.g_k"].groesse.si,
+        p = self.system(eigen={"E": 200000.0, "rho": 7850.0}, b=100.0, h=100.0)
+        self.assertAlmostEqual(p.rechnen().loesung.werte["balkensystem.r1.Q1.M1.g_k"].groesse.si,
                                785.0)
 
     def test_eine_linie_ohne_querschnitt_wiegt_nichts(self):
@@ -630,63 +638,90 @@ class TestEigengewicht(unittest.TestCase):
 
 
 
-class TestEModulVonHand(unittest.TestCase):
+class TestMaterialien(unittest.TestCase):
     """
-    Der E-Modul eines Querschnitts kommt vom Material seines Stabs oder steht
-    als Zahl da -- dann für jeden Stab mit ihm (Benutzer, 2026-10-23).
+    Die Materialien eines Systems (Benutzer, 2026-10-24): ein Beton des
+    Projekts -- E_cm und die Dichte des Stahlbetons von ihm -- oder ein
+    eigenes mit E und Dichte von Hand.
     """
 
-    def test_zahl_statt_material(self):
+    def meldungen(self, p):
+        return [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
+
+    def test_eigenes_material_rechnet_mit_seinem_e(self):
         p = traeger()
-        q = p.balkensysteme[0].querschnitte[0]
-        q.e_modul, q.E = "zahl", 10000.0
+        s = p.balkensysteme[0]
+        s.linien[0].material = s.eigenes_material("Weich", E=10000.0, rho=2500.0).kennung
         e = p.rechnen()
-        self.assertEqual(e.wert("balkensystem.r1.Q1.E").groesse.si, 10000e6)
         EI = 10000e6 * 0.3 * 0.6 ** 3 / 12
-        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.b1.EI").groesse.si, EI, delta=1e-9 * EI)
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.M2.EI").groesse.si, EI, delta=1e-9 * EI)
         # Die Durchbiegung in der Mitte, nach unten positiv: 5 q L⁴ / (384 EI).
         w = e.balkensystem("r1").verlaeufe("G")["L1"].extrem("w").groesst[1]
         self.assertAlmostEqual(w, 5 * 10e3 * 6 ** 4 / (384 * EI), delta=1e-6)
 
-    def test_vom_material_bleibt_beim_material(self):
-        """Die Zahl daneben zählt nicht, solange der Schalter auf «vom Material» steht."""
-        p = traeger()
-        p.balkensysteme[0].querschnitte[0].E = 1.0
-        e = p.rechnen()
-        self.assertNotIn("balkensystem.r1.Q1.E", e.loesung.werte)
-        self.assertEqual(e.wert("balkensystem.r1.Q1.b1.EA").groesse.si,
-                         e.wert("beton.b1.E_cm").groesse.si * 0.3 * 0.6)
-
-    def test_gilt_fuer_stahl_und_beton(self):
-        """Ein Querschnitt mit E von Hand ist aus jedem Material gleich steif -- er wiegt verschieden."""
+    def test_ein_querschnitt_aus_zwei_materialien(self):
+        """Derselbe Querschnitt aus Beton und aus Stahl: verschieden steif, verschieden schwer."""
         p = traeger()
         s = p.balkensysteme[0]
         s.lastfaelle[0].eigengewicht = True
-        q = s.querschnitt("Gleich", "rechteck", E=20000.0, b=100.0, h=100.0)
-        s.linie((6, 0), (8, 0), querschnitt=q, material="b1")
-        s.linie((8, 0), (10, 0), querschnitt=q, material="s1")
+        stahl = s.eigenes_material("Stahl", E=200000.0, rho=7850.0)
+        q = s.querschnitt("Gleich", "rechteck", b=100.0, h=100.0)
+        s.linie((6, 0), (8, 0), querschnitt=q, material="M1")
+        s.linie((8, 0), (10, 0), querschnitt=q, material=stahl)
         s.lager_an((10, 0), "verschieblich")
-        werte = p.rechnen().loesung.werte
-        for m in ("b1", "s1"):
-            self.assertAlmostEqual(werte[f"balkensystem.r1.Q2.{m}.EA"].groesse.si, 20000e6 * 0.01,
-                                   delta=1e-6)
-        self.assertNotEqual(werte["balkensystem.r1.Q2.b1.g_k"].groesse.si,
-                            werte["balkensystem.r1.Q2.s1.g_k"].groesse.si)
+        e = p.rechnen()
+        E_cm = e.wert("beton.b1.E_cm").groesse.si
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q2.M1.EA").groesse.si, E_cm * 0.01,
+                               delta=1e-9 * E_cm)
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q2.M2.EA").groesse.si, 200000e6 * 0.01,
+                               delta=1e-6)
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q2.M1.g_k").groesse.si, 250.0)
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q2.M2.g_k").groesse.si, 785.0)
 
     def test_baukasten_und_herleitung(self):
         s = BalkensystemEintrag(kennung="r1", name="T")
-        q = s.querschnitt("R", "rechteck", E=12000.0, b=300.0, h=500.0)
-        self.assertEqual((q.e_modul, q.E, q.masse), ("zahl", 12000.0, {"b": 300.0, "h": 500.0}))
+        beton = s.beton("b1")
+        self.assertIs(s.beton("b1"), beton)                    # einmal je Beton
+        holz = s.eigenes_material("Holz", E=11000.0, rho=500.0)
+        self.assertEqual([(m.kennung, m.art) for m in s.stabmaterialien],
+                         [("M1", "beton"), ("M2", "eigen")])
+        self.assertEqual((holz.name, holz.E, holz.rho), ("Holz", 11000.0, 500.0))
+        self.assertEqual(s.materialien(), ["b1"])
         p = traeger()
-        p.balkensysteme[0].querschnitte[0].e_modul = "zahl"
+        s = p.balkensysteme[0]
+        s.linien[0].material = s.eigenes_material("Holz", E=11000.0, rho=500.0).kennung
         text = str(p.rechnen().bericht())
-        self.assertIn("E-Modul, «R» (von Hand)", text)
-        self.assertIn("Biegesteifigkeit, «R» mit E von Hand", text)
+        self.assertIn("E-Modul, «Holz» (von Hand)", text)
+        self.assertIn("Biegesteifigkeit, «R» aus Holz", text)
+
+    def test_der_beton_ist_ein_verweis(self):
+        """Den Beton eines Materials löscht man nicht; zeigt es ins Leere, scheitert es hart."""
+        p = traeger()
+        self.assertEqual(p.verweise("b1"), [p.balkensysteme[0]])
+        p.balkensysteme[0].stabmaterialien[0].beton = "b7"
+        with self.assertRaisesRegex(ProjektFehler, "b7"):
+            p.aufbauen()
+
+    def test_betonstahl_ist_kein_material_der_staebe(self):
+        p = traeger()                                   # mit B500B als s1
+        p.balkensysteme[0].stabmaterialien[0].beton = "s1"
+        meldungen = self.meldungen(p)
+        self.assertEqual(len(meldungen), 1)
+        self.assertIn("L1 nimmt das Material M1", meldungen[0])
+        self.assertIn("ist kein Beton", meldungen[0])
+
+    def test_ohne_beton(self):
+        p = traeger()
+        p.balkensysteme[0].stabmaterialien[0].beton = ""
+        meldungen = self.meldungen(p)
+        self.assertEqual(len(meldungen), 1)
+        self.assertIn("kein Beton gewählt", meldungen[0])
 
     def test_null_ist_kein_e_modul(self):
         p = traeger()
-        q = p.balkensysteme[0].querschnitte[0]
-        q.e_modul, q.E = "zahl", 0.0
+        s = p.balkensysteme[0]
+        s.linien[0].material = s.eigenes_material("Weich", E=10000.0, rho=0.0).kennung
+        s.stabmaterialien[-1].E = 0.0
         with self.assertRaisesRegex(ProjektFehler, "E-Modul"):
             Projekt.aus_dict(p.als_dict()).rechnen()
 
@@ -719,10 +754,12 @@ class TestMaterialDesQuerschnitts(unittest.TestCase):
                 e = p.rechnen()
                 self.assertTrue(e.balkensystem("r1").ergebnis.gueltig,
                                 e.balkensystem("r1").ergebnis.meldungen)
-                self.assertEqual(e.aufbau.balkensysteme["r1"].paare["L2"], (q.kennung, "b2"))
+                quer, material = e.aufbau.balkensysteme["r1"].paare["L2"]
+                self.assertEqual((quer, material.stoff.name), (q.kennung, "C25/30"))
                 A = e.wert(f"balkensystem.r1.{q.kennung}.A").groesse.si
-                self.assertAlmostEqual(e.wert(f"balkensystem.r1.{q.kennung}.b2.EA").groesse.si,
-                                       e.wert("beton.b2.E_cm").groesse.si * A, delta=1e-3)
+                self.assertAlmostEqual(
+                    e.wert(f"balkensystem.r1.{q.kennung}.{MATERIAL_DES_QUERSCHNITTS}.EA").groesse.si,
+                    e.wert("beton.b2.E_cm").groesse.si * A, delta=1e-3)
 
     def test_eine_vorlage_bringt_keines(self):
         p = traeger()
@@ -756,11 +793,15 @@ class TestEeq(unittest.TestCase):
     """
 
     def projekt(self, **eq):
-        """Der Träger, sein Stab mit dem Querschnitt der Analyse «Unterzug» und E_eq."""
+        """
+        Der Träger, sein Stab mit dem Querschnitt der Analyse «Unterzug» und
+        ihrem Material -- E_eq gilt für einen Stab gemäss Querschnitt.
+        """
         p = traeger()
         s = p.balkensysteme[0]
         q = s.querschnitt_aus("Unterzug", "analyse", p.analyse("Unterzug"), E_eq=eq)
         s.linien[0].querschnitt = q.kennung
+        s.linien[0].material = MATERIAL_DES_QUERSCHNITTS
         return p, q
 
     def linie(self, e, q, N=0.0):
@@ -790,8 +831,18 @@ class TestEeq(unittest.TestCase):
         self.assertLess(E, self.linie(e, q).ungerissen)
         # Dasselbe E für EA und EI.
         A = e.wert(f"balkensystem.r1.{q.kennung}.A").groesse.si
-        self.assertAlmostEqual(e.wert(f"balkensystem.r1.{q.kennung}.b1.EA").groesse.si, E * A,
-                               delta=1e-6 * E * A)
+        self.assertAlmostEqual(
+            e.wert(f"balkensystem.r1.{q.kennung}.{MATERIAL_DES_QUERSCHNITTS}.EA").groesse.si,
+            E * A, delta=1e-6 * E * A)
+
+    def test_ein_material_des_systems_nimmt_sein_e(self):
+        """Mit dem Beton des Systems statt dem des Querschnitts gilt E_cm -- E_eq zählt nicht."""
+        p, q = self.projekt(M=80.0)
+        p.balkensysteme[0].linien[0].material = "M1"
+        e = p.rechnen()
+        A, E_cm = (e.wert(i).groesse.si for i in (f"balkensystem.r1.{q.kennung}.A", "beton.b1.E_cm"))
+        self.assertAlmostEqual(e.wert(f"balkensystem.r1.{q.kennung}.M1.EA").groesse.si,
+                               E_cm * A, delta=1e-9 * E_cm * A)
 
     def test_zu_grosses_moment_ist_eine_meldung(self):
         """Kein E_eq über dem Biegewiderstand: das System rechnet nicht und sagt warum."""

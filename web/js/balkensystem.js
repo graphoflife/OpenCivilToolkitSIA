@@ -28,15 +28,14 @@ import {
   erklaerung, feld, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
-  eintragVon, lastfallWaehlen, passendeUebersicht, waehlen, zeichenbereich,
+  eintragVon, lastfallWaehlen, materialname, passendeUebersicht, waehlen, zeichenbereich,
 } from './bs_zeichnung.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
-import { ART_TEXT, kennwertZeile } from './material.js';
 import { anfuegenKnopf, rechenwahlZeile } from './nachweise.js';
 import {
-  ausVorlage, feldangabe, naechsterName, projektAendern, zustand,
+  ausVorlage, feldangabe, kennwertId, naechsterName, projektAendern, zustand,
 } from './zustand.js';
 
 const HILFE = {
@@ -52,9 +51,10 @@ const HILFE = {
   },
   materialien: {
     zeilen: [
-      ['E', 'E_cm beim Beton, E_s beim Stahl -- ausser ein Querschnitt hat seinen E-Modul als Zahl'],
-      ['ρ', 'beim Beton die Dichte des Stahlbetons: die Bewehrung steckt darin'],
-      ['Ändern', 'bei einem eigenen Material hier oder in der App «Materialien» -- eine Normsorte bleibt, wie sie ist'],
+      ['Beton', 'einer aus dem Projekt: E = E_cm und ρ des Stahlbetons, die Bewehrung steckt darin -- zu ändern in der App «Materialien»'],
+      ['eigenes', 'E und ρ von Hand, etwa für Stahl oder Holz'],
+      ['ρ', 'für das Eigengewicht ρ · g · A, mit g = 10 m/s²'],
+      ['gemäss Querschnitt', 'wählt man an der Linie: der Beton ihrer Platte oder Analyse'],
     ],
     formel: 'g_k = ρ · g · A   g = 10 m/s²',
   },
@@ -63,7 +63,7 @@ const HILFE = {
       ['Vorlage', 'A und I nach den Formeln der Vorlage, Masse in mm'],
       ['Platte', 'ein Streifen b × h der gewählten Platte'],
       ['Analyse', 'A und I_y des Bruttoquerschnitts'],
-      ['E-Modul', 'vom Material des Stabs (E_cm bzw. E_s), als Zahl oder -- aus einer Analyse -- als E_eq bei N und M; Zahl und E_eq gelten für jeden Stab mit diesem Querschnitt, für EA und EI'],
+      ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, bei einer Analyse auf Wunsch E_eq bei N und M, für EA und EI'],
       ['E_eq', 'wie die Linie M–E_eq der Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten'],
       ['Steifigkeit', 'EA, EI am ungerissenen Bruttoquerschnitt -- nach Vorgabe'],
     ],
@@ -228,38 +228,84 @@ function systemGruppe(system) {
 // ===========================================================================
 
 /**
- * Jedes Material des Projekts mit dem, womit ein Stab aus ihm rechnet --
- * welche Kennwerte das sind, sagt der Katalog. Die Zeilen sind die der App
- * «Materialien»: bei einer Normsorte gesperrt, bei einem eigenen Material
- * hier wie dort zu ändern.
+ * Die Materialien der Stäbe als Tabelle (Benutzer, 2026-10-24): je Zeile
+ * ein Beton des Projekts -- E und ρ von ihm, gesperrt, gerechnet vom Kern
+ * -- oder ein eigenes mit E und ρ von Hand. Betonstahl steht nicht zur
+ * Wahl: aus ihm ist kein Stab. Daneben, welche Linien es nehmen.
  */
 function materialienGruppe(system) {
-  const relevant = zustand.katalog?.balkensystem?.kennwerte || {};
-  const staebe = zustand.loesung?.zuordnung?.balkensysteme?.[system.kennung]?.materialien || {};
-  const block = (m) => {
-    const vorlagen = (relevant[m.art] || [])
-      .map((kurz) => (zustand.katalog.kennwerte[m.art] || []).find((v) => v.kurzname === kurz))
-      .filter(Boolean);
-    // Welche Stäbe es trägt, sagt der Kern -- er kennt auch das Material
-    // einer Linie «gemäss Querschnitt».
-    const benutzt = Object.entries(staebe).filter(([, k]) => k === m.kennung).map(([stab]) => stab);
-    return el('div.bs-material', {}, [
-      el('div.bs-material-kopf', {}, [
-        el('span.bs-material-name', { text: m.name || m.sorte }),
-        el('span.bs-material-art', {
-          text: `${ART_TEXT[m.art] || m.art} · ${m.eigenstaendig ? 'eigenes Material' : 'Normsorte'}`,
-        }),
-      ]),
-      ...vorlagen.map((v) => kennwertZeile(m, v)),
-      el('p.bs-benutzt', { text: benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab' }),
+  const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
+  const betone = zustand.projekt.materialien.filter((m) => m.art === 'beton');
+  const kennwerte = zustand.katalog?.balkensystem?.betonkennwerte || {};
+  const angabe = (feldname) => feldangabe('stabmaterial', feldname);
+  const gesperrt = (beton, kurz) => {
+    const wert = beton ? zustand.loesung?.werte?.[kennwertId(beton, kennwerte[kurz])] : null;
+    return el('span.bs-gesperrt', { text: wert ? wert.wert : '–', title: 'Vom Beton des Projekts -- zu ändern in der App «Materialien»' });
+  };
+  const zeile = (m, i) => {
+    const setzen = (feldname) => (wert) => aendern((s) => { s.stabmaterialien[i][feldname] = wert; });
+    const benutzt = system.linien.filter((l) => l.material === m.kennung).map((l) => l.kennung);
+    const weg = () => {
+      if (benutzt.length) {
+        melden(`«${materialname(m)}» trägt noch ${benutzt.join(', ')}.`, true);
+        return;
+      }
+      aendern((s) => { s.stabmaterialien.splice(i, 1); });
+    };
+    const beton = betone.find((b) => b.kennung === m.beton);
+    const zellen = m.art === 'beton' ? [
+      auswahl({
+        werte: [...(beton ? [] : [{ wert: m.beton, beschriftung: '– Beton wählen –' }]),
+          ...betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte }))],
+        gewaehlt: m.beton, titel: 'Ein Beton des Projekts', beiAenderung: setzen('beton'),
+      }),
+      el('span.bs-material-art', { text: 'Beton' }),
+      gesperrt(beton, 'E'), gesperrt(beton, 'rho'),
+    ] : [
+      el('input', {
+        type: 'text', value: m.name, title: 'Name des Materials -- so steht es im Bericht',
+        on: { change: (e) => setzen('name')(e.target.value) },
+      }),
+      el('span.bs-material-art', { text: 'eigenes' }),
+      zahlfeld({ wert: m.E, schritt: 1000, angabe: angabe('E'), titel: 'E-Modul von Hand', beiAenderung: setzen('E') }),
+      zahlfeld({ wert: m.rho, schritt: 50, angabe: angabe('rho'), titel: 'Dichte für das Eigengewicht', beiAenderung: setzen('rho') }),
+    ];
+    return el('tr', {}, [
+      ...zellen.map((z) => el('td', {}, [z])),
+      el('td.bs-benutzt', { text: benutzt.join(', ') || '–', title: benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab' }),
+      el('td', {}, [el('button.weg', { type: 'button', text: '×', title: 'Material löschen', on: { click: weg } })]),
     ]);
   };
-  const materialien = zustand.projekt.materialien;
+  const neu = (art) => aendern((s) => {
+    s.stabmaterialien.push({
+      ...structuredClone(zustand.katalog.neue_zeilen.stabmaterial),
+      kennung: naechsteKennung(s.stabmaterialien, 'M'), art,
+      ...(art === 'beton' ? { beton: betone[0]?.kennung || '' }
+        : { name: naechsterName('Material', s.stabmaterialien) }),
+    });
+  });
+  const kopf = [['Material'], ['Art'], ['E', angabe('E').einheit], ['ρ', angabe('rho').einheit], ['trägt'], ['']];
   return panel({
     schluessel: 'balkensystem/Materialien', titel: 'Materialien',
-    zusatz: erklaerung(HILFE.materialien.zeilen, HILFE.materialien.formel),
-  }, materialien.length ? materialien.map(block)
-    : [el('p.bs-leer', { text: 'Noch kein Material -- links unter «Materialien» mit «+» anlegen.' })]);
+    zusatz: erklaerung(HILFE.materialien.zeilen),
+  }, [
+    system.stabmaterialien.length ? el('div.tabelle-huelle', {}, [el('table.bs-materialien', {}, [
+      el('thead', {}, [el('tr', {}, kopf.map(([text, einheit]) => el('th', {}, [
+        text, einheit ? el('span.einheit', { text: ` ${einheit}` }) : null,
+      ].filter(Boolean))))]),
+      el('tbody', {}, system.stabmaterialien.map(zeile)),
+    ])]) : el('p.bs-leer', { text: 'Noch kein Material -- ein Stab braucht eines.' }),
+    el('div.bs-knopfreihe', {}, [
+      el('button.knopf.knopf-klein', {
+        type: 'button', text: '+ Beton', title: 'Ein Beton aus dem Projekt',
+        disabled: !betone.length, on: { click: () => neu('beton') },
+      }),
+      el('button.knopf.knopf-klein', {
+        type: 'button', text: '+ eigenes Material', title: 'E-Modul und Dichte von Hand',
+        on: { click: () => neu('eigen') },
+      }),
+    ]),
+  ]);
 }
 
 // ===========================================================================
@@ -341,21 +387,21 @@ function querschnittBlock(system, q, i) {
       beiAenderung: setzen('bezug'),
     })));
   }
-  // Welche Stellungen es gibt, sagt der Katalog je Art -- E_eq nur aus einer
-  // Analyse. Die gewählte bleibt sichtbar, auch wo sie nicht mehr passt: die
-  // Meldung des Kerns sagt dann warum.
-  zeilen.push(wahlBlock('E-Modul', wahlSchalter({
-    werte: E_MODULE().filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul)
-      .map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
-    gewaehlt: q.e_modul, titel: 'Woher E kommt', setzen: setzen('e_modul'),
-  })));
-  if (q.e_modul === 'zahl') {
-    zeilen.push(feld('E', zahlfeld({
-      wert: q.E, schritt: 1000, min: 0,
-      titel: 'E-Modul von Hand -- für jeden Stab mit diesem Querschnitt, aus welchem Material auch immer',
-      beiAenderung: setzen('E'),
-    }), feldangabe('stabquerschnitt', 'E').einheit));
-  } else if (q.e_modul === 'e_eq') {
+  // Welches E ein Stab hat, der das Material dieses Querschnitts nimmt --
+  // nur, wenn einer das tut, und nur, wo es mehr als E₀ gibt: E_eq hat nur
+  // eine Analyse (Benutzer, 2026-10-24). Welche Stellungen es gibt, sagt der
+  // Katalog; die gewählte bleibt sichtbar, auch wo sie nicht mehr passt --
+  // die Meldung des Kerns sagt dann warum.
+  const eigenes = zustand.katalog?.balkensystem?.material_des_querschnitts;
+  const module = E_MODULE().filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul);
+  const mitEigenem = system.linien.some((l) => l.querschnitt === q.kennung && l.material === eigenes);
+  if (mitEigenem && module.length > 1) {
+    zeilen.push(wahlBlock('E-Modul', wahlSchalter({
+      werte: module.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
+      gewaehlt: q.e_modul, titel: 'Das E der Stäbe «gemäss Querschnitt»', setzen: setzen('e_modul'),
+    })));
+  }
+  if (mitEigenem && q.e_modul === 'e_eq') {
     const eq = (veraenderer) => aendern((x) => veraenderer(x.eq));
     const zahl = (name, schritt, titel) => feld(name, zahlfeld({
       wert: q.eq[name], schritt, leer: 0, titel,

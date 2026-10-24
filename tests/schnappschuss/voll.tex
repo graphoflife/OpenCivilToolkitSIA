@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-397 Berechnungen ausgeführt, 651 Werte bestimmt.
+399 Berechnungen ausgeführt, 653 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -1345,10 +1345,6 @@ f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}
 \noindent\textbf{Bemessungswert der Dehnung bei Höchstlast} \hfill \normref{SIA 262:2025, 4.2.2.1}
 \begin{equation*}
 \varepsilon_{ud} = 4.5\,\%
-\end{equation*}
-\noindent\textbf{Dichte des Stahls}
-\begin{equation*}
-\rho_s = 7850\,\mathrm{kg}/\mathrm{m}^{3}
 \end{equation*}
 \subsection{Plattenanalyse: Dach}
 \noindent\textbf{Plattendicke}
@@ -7209,10 +7205,6 @@ A_{\text{Q10}} = 330000\,\mathrm{mm}^{2}
 \begin{equation*}
 I_{\text{Q10}} = 13275\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{equation*}
-\noindent\textbf{E-Modul, «Fundamentbalken» (von Hand)}
-\begin{equation*}
-E_{\text{Q7}} = 15000\,\mathrm{N}/\mathrm{mm}^{2}
-\end{equation*}
 \noindent\textbf{Normalkraft für E\_eq, «Kasten»}
 \begin{equation*}
 N_{\text{Q10}} = -100\,\mathrm{kN}
@@ -7273,53 +7265,81 @@ EI_{\text{Q5,C30/37}} = E_{cm} \cdot I_{\text{Q5}} = 33620\,\mathrm{N}/\mathrm{m
 \begin{equation*}
 g_{k,\text{Q5,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q5}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 360000\,\mathrm{mm}^{2} = 9\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
-\noindent\textbf{Dehnsteifigkeit, «Rohr» aus B500B}
+\noindent\textbf{E-Modul, «Stahl» (von Hand)}
 \begin{equation*}
-EA_{\text{Q3,B500B}} = E_s \cdot A_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4973\,\mathrm{mm}^{2} = 995\,\mathrm{MN}
+E_{\text{Stahl}} = 200000\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Biegesteifigkeit, «Rohr» aus B500B}
+\noindent\textbf{Dehnsteifigkeit, «Rohr» aus Stahl}
 \begin{equation*}
-EI_{\text{Q3,B500B}} = E_s \cdot I_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3128\,\mathrm{kNm}^{2}
+EA_{\text{Q3,Stahl}} = E_{\text{Stahl}} \cdot A_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4973\,\mathrm{mm}^{2} = 995\,\mathrm{MN}
 \end{equation*}
-\noindent\textbf{Eigengewicht, «Rohr» aus B500B}
+\noindent\textbf{Biegesteifigkeit, «Rohr» aus Stahl}
 \begin{equation*}
-g_{k,\text{Q3,B500B}} = \rho_s \cdot g \cdot A_{\text{Q3}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 4973\,\mathrm{mm}^{2} = 0.39\,\mathrm{kN}/\mathrm{m}
+EI_{\text{Q3,Stahl}} = E_{\text{Stahl}} \cdot I_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3128\,\mathrm{kNm}^{2}
 \end{equation*}
-\noindent\textbf{Dehnsteifigkeit, «Walzprofil» aus B500B}
+\noindent\textbf{Dichte, «Stahl» (von Hand)}
 \begin{equation*}
-EA_{\text{Q6,B500B}} = E_s \cdot A_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14282\,\mathrm{mm}^{2} = 2856\,\mathrm{MN}
+\rho_{\text{Stahl}} = 7850\,\mathrm{kg}/\mathrm{m}^{3}
 \end{equation*}
-\noindent\textbf{Biegesteifigkeit, «Walzprofil» aus B500B}
+\noindent\textbf{Eigengewicht, «Rohr» aus Stahl}
 \begin{equation*}
-EI_{\text{Q6,B500B}} = E_s \cdot I_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4} = 48374\,\mathrm{kNm}^{2}
+g_{k,\text{Q3,Stahl}} = \rho_{\text{Stahl}} \cdot g \cdot A_{\text{Q3}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 4973\,\mathrm{mm}^{2} = 0.39\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
-\noindent\textbf{Eigengewicht, «Walzprofil» aus B500B}
+\noindent\textbf{Dehnsteifigkeit, «Walzprofil» aus Stahl}
 \begin{equation*}
-g_{k,\text{Q6,B500B}} = \rho_s \cdot g \cdot A_{\text{Q6}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 14282\,\mathrm{mm}^{2} = 1.12\,\mathrm{kN}/\mathrm{m}
+EA_{\text{Q6,Stahl}} = E_{\text{Stahl}} \cdot A_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14282\,\mathrm{mm}^{2} = 2856\,\mathrm{MN}
 \end{equation*}
-\noindent\textbf{Dehnsteifigkeit, «Fundamentbalken» mit E von Hand}
+\noindent\textbf{Biegesteifigkeit, «Walzprofil» aus Stahl}
 \begin{equation*}
-EA_{\text{Q7,C30/37}} = E_{\text{Q7}} \cdot A_{\text{Q7}} = 15000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 250000\,\mathrm{mm}^{2} = 3750\,\mathrm{MN}
+EI_{\text{Q6,Stahl}} = E_{\text{Stahl}} \cdot I_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4} = 48374\,\mathrm{kNm}^{2}
 \end{equation*}
-\noindent\textbf{Biegesteifigkeit, «Fundamentbalken» mit E von Hand}
+\noindent\textbf{Eigengewicht, «Walzprofil» aus Stahl}
 \begin{equation*}
-EI_{\text{Q7,C30/37}} = E_{\text{Q7}} \cdot I_{\text{Q7}} = 15000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4} = 77083\,\mathrm{kNm}^{2}
+g_{k,\text{Q6,Stahl}} = \rho_{\text{Stahl}} \cdot g \cdot A_{\text{Q6}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 14282\,\mathrm{mm}^{2} = 1.12\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
-\noindent\textbf{Eigengewicht, «Fundamentbalken» aus C30/37}
+\noindent\textbf{E-Modul, «Fundamentbeton» (von Hand)}
 \begin{equation*}
-g_{k,\text{Q7,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q7}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 250000\,\mathrm{mm}^{2} = 6.25\,\mathrm{kN}/\mathrm{m}
+E_{\text{Fundamentbeton}} = 15000\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Dehnsteifigkeit, «Hohlprofil» aus B500B}
+\noindent\textbf{Dehnsteifigkeit, «Fundamentbalken» aus Fundamentbeton}
 \begin{equation*}
-EA_{\text{Q4,B500B}} = E_s \cdot A_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 11875\,\mathrm{mm}^{2} = 2375\,\mathrm{MN}
+\begin{aligned}
+  EA_{\text{Q7,Fundamentbeton}} &= E_{\text{Fundamentbeton}} \cdot A_{\text{Q7}} \\
+  &= 15000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 250000\,\mathrm{mm}^{2} \\
+  &= 3750\,\mathrm{MN}
+\end{aligned}
 \end{equation*}
-\noindent\textbf{Biegesteifigkeit, «Hohlprofil» aus B500B}
+\noindent\textbf{Biegesteifigkeit, «Fundamentbalken» aus Fundamentbeton}
 \begin{equation*}
-EI_{\text{Q4,B500B}} = E_s \cdot I_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 29342\,\mathrm{kNm}^{2}
+\begin{aligned}
+  EI_{\text{Q7,Fundamentbeton}} &= E_{\text{Fundamentbeton}} \cdot I_{\text{Q7}} \\
+  &= 15000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4} \\
+  &= 77083\,\mathrm{kNm}^{2}
+\end{aligned}
 \end{equation*}
-\noindent\textbf{Eigengewicht, «Hohlprofil» aus B500B}
+\noindent\textbf{Dichte, «Fundamentbeton» (von Hand)}
 \begin{equation*}
-g_{k,\text{Q4,B500B}} = \rho_s \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
+\rho_{\text{Fundamentbeton}} = 2500\,\mathrm{kg}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Eigengewicht, «Fundamentbalken» aus Fundamentbeton}
+\begin{equation*}
+\begin{aligned}
+  g_{k,\text{Q7,Fundamentbeton}} &= \rho_{\text{Fundamentbeton}} \cdot g \cdot A_{\text{Q7}} \\
+  &= 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 250000\,\mathrm{mm}^{2} \\
+  &= 6.25\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Dehnsteifigkeit, «Hohlprofil» aus Stahl}
+\begin{equation*}
+EA_{\text{Q4,Stahl}} = E_{\text{Stahl}} \cdot A_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 11875\,\mathrm{mm}^{2} = 2375\,\mathrm{MN}
+\end{equation*}
+\noindent\textbf{Biegesteifigkeit, «Hohlprofil» aus Stahl}
+\begin{equation*}
+EI_{\text{Q4,Stahl}} = E_{\text{Stahl}} \cdot I_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 29342\,\mathrm{kNm}^{2}
+\end{equation*}
+\noindent\textbf{Eigengewicht, «Hohlprofil» aus Stahl}
+\begin{equation*}
+g_{k,\text{Q4,Stahl}} = \rho_{\text{Stahl}} \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \noindent\textbf{E-Modul, «Kasten» (E\_eq)}
 \begin{equation*}
@@ -7327,19 +7347,15 @@ E_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Kasten» mit E\_eq}
 \begin{equation*}
-EA_{\text{Q10,C30/37}} = E_{\text{Q10}} \cdot A_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm{mm}^{2} \cdot 330000\,\mathrm{mm}^{2} = 1796\,\mathrm{MN}
+EA_{\text{Q10}} = E_{\text{Q10}} \cdot A_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm{mm}^{2} \cdot 330000\,\mathrm{mm}^{2} = 1796\,\mathrm{MN}
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit, «Kasten» mit E\_eq}
 \begin{equation*}
-EI_{\text{Q10,C30/37}} = E_{\text{Q10}} \cdot I_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm{mm}^{2} \cdot 13275\,\cdot 10^{6}\,\mathrm{mm}^{4} = 72234\,\mathrm{kNm}^{2}
+EI_{\text{Q10}} = E_{\text{Q10}} \cdot I_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm{mm}^{2} \cdot 13275\,\cdot 10^{6}\,\mathrm{mm}^{4} = 72234\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Eigengewicht, «Kasten» aus C30/37}
 \begin{equation*}
-\begin{aligned}
-  g_{k,\text{Q10,C30/37}} &= \rho_{sb} \cdot g \cdot A_{\text{Q10}} \\
-  &= 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 330000\,\mathrm{mm}^{2} \\
-  &= 8.25\,\mathrm{kN}/\mathrm{m}
-\end{aligned}
+g_{k,\text{Q10}} = \rho_{sb} \cdot g \cdot A_{\text{Q10}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 330000\,\mathrm{mm}^{2} = 8.25\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
 \hinweis{Annahme}{Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt – je Querschnitt auch ein E von Hand oder das E\_eq seiner Querschnittsanalyse –, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).}
 \noindent\textbf{Stäbe}
@@ -9412,21 +9428,25 @@ Mindestens ein Nachweis ist nicht erfüllt.
 Bezeichnung & Symbol & Wert & Einheit & Herkunft \\
 \hline
 \endhead
+E-Modul, Stahl & $E_{\text{Stahl}}$ & $200000$ & N/mm² & Eingabe \\
+Dichte, Stahl & $\rho_{\text{Stahl}}$ & $7850$ & kg/m³ & Eingabe \\
+E-Modul, Fundamentbeton & $E_{\text{Fundamentbeton}}$ & $15000$ & N/mm² & Eingabe \\
+Dichte, Fundamentbeton & $\rho_{\text{Fundamentbeton}}$ & $2500$ & kg/m³ & Eingabe \\
 Querschnittsfläche, Balken 300×500 & $A_{\text{Q1}}$ & $150000$ & mm² & berechnet \\
 Flächenträgheitsmoment, Balken 300×500 & $I_{\text{Q1}}$ & $3125$ & ·10⁶ mm⁴ & berechnet \\
-Breite, Balken 300×500 & $b_{\text{Q1}}$ & $300$ & mm & Vorgabe \\
 Dehnsteifigkeit, Balken 300×500, C30/37 & $EA_{\text{Q1,C30/37}}$ & $5043$ & MN & berechnet \\
 Biegesteifigkeit, Balken 300×500, C30/37 & $EI_{\text{Q1,C30/37}}$ & $105062$ & kNm² & berechnet \\
 Eigengewicht je Meter, Balken 300×500, C30/37 & $g_{k,\text{Q1,C30/37}}$ & $3.75$ & kN/m & berechnet \\
+Breite, Balken 300×500 & $b_{\text{Q1}}$ & $300$ & mm & Vorgabe \\
 Höhe, Balken 300×500 & $h_{\text{Q1}}$ & $500$ & mm & Vorgabe \\
 Querschnittsfläche, Kasten & $A_{\text{Q10}}$ & $330000$ & mm² & berechnet \\
 E-Modul, Kasten & $E_{\text{Q10}}$ & $5441$ & N/mm² & berechnet \\
 Flächenträgheitsmoment, Kasten & $I_{\text{Q10}}$ & $13275$ & ·10⁶ mm⁴ & berechnet \\
 Moment für E\_eq, Kasten & $M_{\text{Q10}}$ & $200$ & kNm & Eingabe \\
 Normalkraft für E\_eq, Kasten & $N_{\text{Q10}}$ & $-100$ & kN & Eingabe \\
-Dehnsteifigkeit, Kasten, C30/37 & $EA_{\text{Q10,C30/37}}$ & $1796$ & MN & berechnet \\
-Biegesteifigkeit, Kasten, C30/37 & $EI_{\text{Q10,C30/37}}$ & $72234$ & kNm² & berechnet \\
-Eigengewicht je Meter, Kasten, C30/37 & $g_{k,\text{Q10,C30/37}}$ & $8.25$ & kN/m & berechnet \\
+Dehnsteifigkeit, Kasten, C30/37 & $EA_{\text{Q10}}$ & $1796$ & MN & berechnet \\
+Biegesteifigkeit, Kasten, C30/37 & $EI_{\text{Q10}}$ & $72234$ & kNm² & berechnet \\
+Eigengewicht je Meter, Kasten, C30/37 & $g_{k,\text{Q10}}$ & $8.25$ & kN/m & berechnet \\
 Querschnittsfläche, Rundstütze & $A_{\text{Q2}}$ & $125664$ & mm² & berechnet \\
 Flächenträgheitsmoment, Rundstütze & $I_{\text{Q2}}$ & $1256.64$ & ·10⁶ mm⁴ & berechnet \\
 Dehnsteifigkeit, Rundstütze, C30/37 & $EA_{\text{Q2,C30/37}}$ & $4225$ & MN & berechnet \\
@@ -9436,43 +9456,42 @@ Durchmesser, Rundstütze & $d_{\text{Q2}}$ & $400$ & mm & Vorgabe \\
 Querschnittsfläche, Rohr & $A_{\text{Q3}}$ & $4973$ & mm² & berechnet \\
 Aussendurchmesser, Rohr & $D_{\text{Q3}}$ & $168.3$ & mm & Vorgabe \\
 Flächenträgheitsmoment, Rohr & $I_{\text{Q3}}$ & $15.64$ & ·10⁶ mm⁴ & berechnet \\
-Dehnsteifigkeit, Rohr, B500B & $EA_{\text{Q3,B500B}}$ & $995$ & MN & berechnet \\
-Biegesteifigkeit, Rohr, B500B & $EI_{\text{Q3,B500B}}$ & $3128$ & kNm² & berechnet \\
-Eigengewicht je Meter, Rohr, B500B & $g_{k,\text{Q3,B500B}}$ & $0.39$ & kN/m & berechnet \\
+Dehnsteifigkeit, Rohr, Stahl & $EA_{\text{Q3,Stahl}}$ & $995$ & MN & berechnet \\
+Biegesteifigkeit, Rohr, Stahl & $EI_{\text{Q3,Stahl}}$ & $3128$ & kNm² & berechnet \\
+Eigengewicht je Meter, Rohr, Stahl & $g_{k,\text{Q3,Stahl}}$ & $0.39$ & kN/m & berechnet \\
 Wanddicke, Rohr & $t_{\text{Q3}}$ & $10$ & mm & Vorgabe \\
 Querschnittsfläche, Hohlprofil & $A_{\text{Q4}}$ & $11875$ & mm² & berechnet \\
 Flächenträgheitsmoment, Hohlprofil & $I_{\text{Q4}}$ & $146.71$ & ·10⁶ mm⁴ & berechnet \\
+Dehnsteifigkeit, Hohlprofil, Stahl & $EA_{\text{Q4,Stahl}}$ & $2375$ & MN & berechnet \\
+Biegesteifigkeit, Hohlprofil, Stahl & $EI_{\text{Q4,Stahl}}$ & $29342$ & kNm² & berechnet \\
+Eigengewicht je Meter, Hohlprofil, Stahl & $g_{k,\text{Q4,Stahl}}$ & $0.93$ & kN/m & berechnet \\
 Breite, Hohlprofil & $b_{\text{Q4}}$ & $200$ & mm & Vorgabe \\
 Höhe, Hohlprofil & $h_{\text{Q4}}$ & $300$ & mm & Vorgabe \\
-Dehnsteifigkeit, Hohlprofil, B500B & $EA_{\text{Q4,B500B}}$ & $2375$ & MN & berechnet \\
-Biegesteifigkeit, Hohlprofil, B500B & $EI_{\text{Q4,B500B}}$ & $29342$ & kNm² & berechnet \\
-Eigengewicht je Meter, Hohlprofil, B500B & $g_{k,\text{Q4,B500B}}$ & $0.93$ & kN/m & berechnet \\
 Wanddicke, Hohlprofil & $t_{\text{Q4}}$ & $12.5$ & mm & Vorgabe \\
 Querschnittsfläche, Plattenbalken & $A_{\text{Q5}}$ & $360000$ & mm² & berechnet \\
 Flächenträgheitsmoment, Plattenbalken & $I_{\text{Q5}}$ & $9600$ & ·10⁶ mm⁴ & berechnet \\
-Flanschbreite, Plattenbalken & $b_{\text{Q5}}$ & $1200$ & mm & Vorgabe \\
 Dehnsteifigkeit, Plattenbalken, C30/37 & $EA_{\text{Q5,C30/37}}$ & $12103$ & MN & berechnet \\
 Biegesteifigkeit, Plattenbalken, C30/37 & $EI_{\text{Q5,C30/37}}$ & $322750$ & kNm² & berechnet \\
 Eigengewicht je Meter, Plattenbalken, C30/37 & $g_{k,\text{Q5,C30/37}}$ & $9$ & kN/m & berechnet \\
+Flanschbreite, Plattenbalken & $b_{\text{Q5}}$ & $1200$ & mm & Vorgabe \\
 Stegbreite, Plattenbalken & $b_{w,\text{Q5}}$ & $300$ & mm & Vorgabe \\
 Höhe, Plattenbalken & $h_{\text{Q5}}$ & $600$ & mm & Vorgabe \\
 Flanschdicke, Plattenbalken & $h_{f,\text{Q5}}$ & $200$ & mm & Vorgabe \\
 Abstand des Schwerpunkts vom oberen Rand, Plattenbalken & $z_{S,\text{Q5}}$ & $200$ & mm & berechnet \\
 Querschnittsfläche, Walzprofil & $A_{\text{Q6}}$ & $14282$ & mm² & berechnet \\
 Flächenträgheitsmoment, Walzprofil & $I_{\text{Q6}}$ & $241.87$ & ·10⁶ mm⁴ & berechnet \\
+Dehnsteifigkeit, Walzprofil, Stahl & $EA_{\text{Q6,Stahl}}$ & $2856$ & MN & berechnet \\
+Biegesteifigkeit, Walzprofil, Stahl & $EI_{\text{Q6,Stahl}}$ & $48374$ & kNm² & berechnet \\
+Eigengewicht je Meter, Walzprofil, Stahl & $g_{k,\text{Q6,Stahl}}$ & $1.12$ & kN/m & berechnet \\
 Flanschbreite, Walzprofil & $b_{\text{Q6}}$ & $300$ & mm & Vorgabe \\
 Höhe, Walzprofil & $h_{\text{Q6}}$ & $300$ & mm & Vorgabe \\
-Dehnsteifigkeit, Walzprofil, B500B & $EA_{\text{Q6,B500B}}$ & $2856$ & MN & berechnet \\
-Biegesteifigkeit, Walzprofil, B500B & $EI_{\text{Q6,B500B}}$ & $48374$ & kNm² & berechnet \\
-Eigengewicht je Meter, Walzprofil, B500B & $g_{k,\text{Q6,B500B}}$ & $1.12$ & kN/m & berechnet \\
 Flanschdicke, Walzprofil & $t_{f,\text{Q6}}$ & $19$ & mm & Vorgabe \\
 Stegdicke, Walzprofil & $t_{w,\text{Q6}}$ & $11$ & mm & Vorgabe \\
 Querschnittsfläche, Fundamentbalken & $A_{\text{Q7}}$ & $250000$ & mm² & berechnet \\
-E-Modul, Fundamentbalken & $E_{\text{Q7}}$ & $15000$ & N/mm² & Eingabe \\
 Flächenträgheitsmoment, Fundamentbalken & $I_{\text{Q7}}$ & $5138.89$ & ·10⁶ mm⁴ & berechnet \\
-Dehnsteifigkeit, Fundamentbalken, C30/37 & $EA_{\text{Q7,C30/37}}$ & $3750$ & MN & berechnet \\
-Biegesteifigkeit, Fundamentbalken, C30/37 & $EI_{\text{Q7,C30/37}}$ & $77083$ & kNm² & berechnet \\
-Eigengewicht je Meter, Fundamentbalken, C30/37 & $g_{k,\text{Q7,C30/37}}$ & $6.25$ & kN/m & berechnet \\
+Dehnsteifigkeit, Fundamentbalken, Fundamentbeton & $EA_{\text{Q7,Fundamentbeton}}$ & $3750$ & MN & berechnet \\
+Biegesteifigkeit, Fundamentbalken, Fundamentbeton & $EI_{\text{Q7,Fundamentbeton}}$ & $77083$ & kNm² & berechnet \\
+Eigengewicht je Meter, Fundamentbalken, Fundamentbeton & $g_{k,\text{Q7,Fundamentbeton}}$ & $6.25$ & kN/m & berechnet \\
 Breite oben, Fundamentbalken & $b_{o,\text{Q7}}$ & $600$ & mm & Vorgabe \\
 Breite unten, Fundamentbalken & $b_{u,\text{Q7}}$ & $400$ & mm & Vorgabe \\
 Höhe, Fundamentbalken & $h_{\text{Q7}}$ & $500$ & mm & Vorgabe \\
@@ -9483,9 +9502,9 @@ Flächenträgheitsmoment, Deckenstreifen & $I_{\text{Q9}}$ & $2250$ & ·10⁶ mm
 Erdbeschleunigung & $g$ & $10$ & m/s² & Vorgabe \\
 Querschnittsfläche, Rechteck & $A$ & $180000$ & mm² & berechnet \\
 Flächenträgheitsmoment, Rechteck & $I$ & $5400$ & ·10⁶ mm⁴ & berechnet \\
-Breite, Rechteck & $b$ & $300$ & mm & Vorgabe \\
 Dehnsteifigkeit, Rechteck, C30/37 & $EA$ & $6052$ & MN & berechnet \\
 Biegesteifigkeit, Rechteck, C30/37 & $EI$ & $181547$ & kNm² & berechnet \\
+Breite, Rechteck & $b$ & $300$ & mm & Vorgabe \\
 Höhe, Rechteck & $h$ & $600$ & mm & Vorgabe \\
 Mittelwert des Elastizitätsmoduls & $E_{cm}$ & $33620$ & N/mm² & berechnet \\
 Dehnung am Ende des ansteigenden Astes & $\varepsilon_{c1d}$ & $2$ & ‰ & Vorgabe \\
@@ -9506,7 +9525,6 @@ Bemessungswert der Fliessgrenze auf Druck & $f_{yd}^{-}$ & $435$ & N/mm² & bere
 Charakteristische Fliessgrenze & $f_{yk}$ & $500$ & N/mm² & Vorgabe \\
 Charakteristische Fliessgrenze auf Druck & $f_{yk}^{-}$ & $500$ & N/mm² & Vorgabe \\
 Teilsicherheitsbeiwert für Betonstahl & $\gamma_s$ & $1.15$ &  & Vorgabe \\
-Dichte des Stahls & $\rho_s$ & $7850$ & kg/m³ & Vorgabe \\
 Länge des Fundaments & $L$ & $4$ & m & Vorgabe \\
 Neigung der Sohle & $\alpha$ & $5$ & ° & Vorgabe \\
 Breite des Fundaments & $b$ & $1.6$ & m & Vorgabe \\

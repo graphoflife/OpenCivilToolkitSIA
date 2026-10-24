@@ -368,12 +368,18 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 Im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
-- [ ] **Welche Steifigkeit?** Eingebaut: E_cm für Beton, E_s für Betonstahl
-      -- oder je Querschnitt ein E von Hand oder das E_eq seiner Analyse bei
-      N und M --, am ungerissenen Bruttoquerschnitt, ohne Schubverformung,
-      Theorie 1. Ordnung (`stabwerk/rechnung.py`, `E_MODUL`). Für Verformungen im
+- [ ] **Welche Steifigkeit?** Eingebaut: E_cm eines Betons, E von Hand
+      eines eigenen Materials -- oder mit dem Material gemäss Querschnitt das
+      E_eq seiner Analyse bei N und M --, am ungerissenen Bruttoquerschnitt,
+      ohne Schubverformung, Theorie 1. Ordnung (`stabwerk/rechnung.py`,
+      `BETONKENNWERTE`). Für Verformungen im
       Gebrauch ist ein gerissener Stahlbetonbalken weicher, unter Dauerlast
       kriecht er; die Schnittgrössen eines unbestimmten Systems hängen daran.
+- [ ] **E_eq einer Platte?** Ein Stab gemäss Querschnitt mit einer Platte
+      rechnet mit E₀ = E_cm; E_eq gibt es nur aus einer Querschnittsanalyse.
+      Für eine Platte bräuchte es die Richtung (x oder y) und eine Antwort,
+      wie ein negatives Moment gerechnet wird -- Entscheid des Benutzers
+      offen (gefragt 2026-10-24).
 - [ ] **Platte als Stabquerschnitt.** Eingebaut: ein Streifen b × h mit den
       Formeln des Rechtecks, ohne Bewehrung -- b ist die betrachtete Breite
       der Platte.

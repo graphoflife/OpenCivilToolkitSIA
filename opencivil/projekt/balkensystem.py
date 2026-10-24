@@ -3,7 +3,8 @@ opencivil/projekt/balkensystem.py -- ein 2D-Balkensystem, wie die Oberflaeche es
 
 VERANTWORTUNG:
 Der :class:`BalkensystemEintrag`: ein ebener Rahmen aus Knoten und Linien,
-Lagern und Lasten, mit seinen Querschnitten, Lastfaellen und Kombinationen
+Lagern und Lasten, mit seinen Materialien, Querschnitten, Lastfaellen und
+Kombinationen
 -- als speicherbare Datenklasse wie die Querschnittsanalyse
 (:mod:`opencivil.projekt.querschnittsanalyse`). Dazu der Baukasten, der ohne
 Oberflaeche zeichnet, und was beim Teilen und Umkehren einer Linie mit ihren
@@ -47,7 +48,8 @@ from dataclasses import dataclass, field, replace
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import (
-    KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, N_PRO_MM2, PROZENT, Groesse,
+    KG_PRO_M3, KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, N_PRO_MM2, PROZENT,
+    Groesse,
 )
 from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.projekt.eintraege import Beschreibung
@@ -88,10 +90,16 @@ QUERSCHNITTSARTEN = ("vorlage", "kennwerte", "platte", "analyse")
 #: Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
 KENNWERTE = ("A", "I")
 
-#: Woher der E-Modul eines Querschnitts kommt: vom Material des Stabs -- E_cm
-#: beim Beton, E_s beim Stahl --, als Zahl von Hand, unabhaengig vom Material,
-#: oder als E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-23).
-E_MODULE = ("material", "zahl", "e_eq")
+#: Was ein Material des Systems ist: ein Beton des Projekts -- E und Dichte
+#: von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand
+#: (Benutzer, 2026-10-24). Betonstahl ist keines: aus ihm ist kein Stab.
+STABMATERIALARTEN = ("beton", "eigen")
+
+#: Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀,
+#: das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der
+#: Querschnittsanalyse bei N und M (Benutzer, 2026-10-24). Einen E-Modul von
+#: Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
+E_MODULE = ("e0", "e_eq")
 
 #: Die Arten eines Querschnitts, die ein E_eq haben: nur der gezeichnete
 #: Querschnitt hat eine Momenten-Kruemmungs-Linie mit seiner Bewehrung.
@@ -99,7 +107,7 @@ E_EQ_ARTEN = ("analyse",)
 
 #: Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der
 #: Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine
-#: Kennung im Projekt sein -- die beginnen mit ihrer Vorsilbe und einer Zahl.
+#: Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
 MATERIAL_DES_QUERSCHNITTS = "querschnitt"
 
 #: Die Arten eines Querschnitts, die ein Material mitbringen: ein Bauteil des
@@ -180,7 +188,7 @@ class SystemlinieEintrag(Beschreibung):
 
     material: str = ""
     """
-    Kennung des Materials im Projekt (``b1``) -- oder
+    Kennung eines Materials des Systems (``M1``) -- oder
     :data:`MATERIAL_DES_QUERSCHNITTS`: das Material, das eine Platte oder
     Querschnittsanalyse als Querschnitt mitbringt.
     """
@@ -235,6 +243,29 @@ class KnotenlastEintrag(Beschreibung):
 
 
 @dataclass
+class StabmaterialEintrag(Beschreibung):
+    """
+    Ein Material der Staebe (Benutzer, 2026-10-24): ein Beton des Projekts
+    (``beton``) -- E_cm und die Dichte des Stahlbetons von ihm -- oder ein
+    eigenes mit ``E`` und ``rho`` von Hand.
+    """
+
+    kennung: str = ""
+    art: str = einer_von(STABMATERIALARTEN, "beton")
+    beton: str = ""
+    """Die Kennung des Betons im Projekt (``b1``) -- nur bei ``beton``."""
+
+    name: str = ""
+    """Wie ein eigenes heisst; ein Beton heisst wie im Projekt."""
+
+    E: float = bereich(200000.0, heisst="E-Modul E", einheit=N_PRO_MM2, ueber=0.0)
+    """N/mm² -- nur bei ``eigen``."""
+
+    rho: float = bereich(7850.0, heisst="Dichte ρ", einheit=KG_PRO_M3, ab=0.0)
+    """kg/m³, fuer das Eigengewicht -- nur bei ``eigen``."""
+
+
+@dataclass
 class ModulEintrag(Beschreibung):
     """
     Wie das E_eq eines Querschnitts aus einer Querschnittsanalyse entsteht:
@@ -261,9 +292,9 @@ class StabquerschnittEintrag(Beschreibung):
     """
     Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, mit Kennwerten
     von Hand (``A`` in mm², ``I`` in 10⁶ mm⁴), oder aus einer Platte oder
-    einer Querschnittsanalyse des Projekts (``bezug``). Sein E-Modul kommt
-    vom Material des Stabs oder steht als Zahl da -- dann gilt er fuer jeden
-    Stab mit diesem Querschnitt, aus welchem Material auch immer.
+    einer Querschnittsanalyse des Projekts (``bezug``). E kommt vom Material
+    des Stabs; nimmt der das Material des Querschnitts, sagt ``e_modul``,
+    welches E.
     """
 
     kennung: str = ""
@@ -272,22 +303,14 @@ class StabquerschnittEintrag(Beschreibung):
     vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)
     masse: Dict[str, float] = field(default_factory=dict)
     bezug: str = ""
-    e_modul: str = einer_von(E_MODULE, "material")
+    e_modul: str = einer_von(E_MODULE, "e0")
     """
-    Woher E kommt: ``material`` -- vom Material des Stabs --, ``zahl``, dann
-    ``E``, oder ``e_eq``, dann wie ``eq`` sagt.
+    Welches E ein Stab hat, der das Material dieses Querschnitts nimmt:
+    ``e0`` -- E_cm seines Betons -- oder ``e_eq``, wie ``eq`` sagt.
     """
-
-    E: float = bereich(30000.0, heisst="E-Modul E", einheit=N_PRO_MM2, ueber=0.0)
-    """Der E-Modul von Hand, N/mm² -- er gilt nur bei ``e_modul = "zahl"``."""
 
     eq: ModulEintrag = field(default_factory=ModulEintrag)
     """Wie das E_eq entsteht -- es gilt nur bei ``e_modul = "e_eq"``."""
-
-    @property
-    def E_von_hand(self) -> Optional[float]:
-        """Der E-Modul von Hand in N/mm² -- ``None``, wenn er vom Material kommt."""
-        return self.E if self.e_modul == "zahl" else None
 
     def stabvorlage(self) -> qs.Stabvorlage:
         return qs.vorlage(self.vorlage)
@@ -404,6 +427,7 @@ class BalkensystemEintrag(Beschreibung):
     linien: List[SystemlinieEintrag] = field(default_factory=list)
     lager: List[LagerEintrag] = field(default_factory=list)
     knotenlasten: List[KnotenlastEintrag] = field(default_factory=list)
+    stabmaterialien: List[StabmaterialEintrag] = field(default_factory=list)
     querschnitte: List[StabquerschnittEintrag] = field(default_factory=list)
     lastfaelle: List[LastfallEintrag] = field(default_factory=list)
     kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
@@ -415,16 +439,15 @@ class BalkensystemEintrag(Beschreibung):
 
     def materialien(self) -> List[str]:
         """
-        Jedes Material, auf das eine Linie zeigt. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
-        Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
-        naechste Aenderung machte daraus einen Fehler beim Rechnen.
-        Dazu gehoert eine Linie, die gerade kein Stab ist: wird sie wieder einer,
-        nimmt sie ihr Material mit.
+        Jeder Beton des Projekts, auf den ein Material des Systems zeigt --
+        auch eines, das gerade keinen Stab traegt: wer den Beton loescht,
+        liesse es ins Leere zeigen, und spaetestens die naechste Aenderung
+        machte daraus einen Fehler beim Rechnen.
         """
         gesehen: List[str] = []
-        for l in self.linien:
-            if l.material and l.material not in gesehen:
-                gesehen.append(l.material)
+        for m in self.stabmaterialien:
+            if m.art == "beton" and m.beton and m.beton not in gesehen:
+                gesehen.append(m.beton)
         return gesehen
 
     def bezuege(self) -> List[str]:
@@ -467,10 +490,12 @@ class BalkensystemEintrag(Beschreibung):
         """
         Das Stabwerk zum Rechnen, in SI (:mod:`opencivil.stabwerk.modell`).
 
-        Ein Stab ohne Querschnitt oder Material, ein Querschnitt mit
-        unmoeglichen Massen und eine Feder ohne Steifigkeit sind Fehler, die
-        die Meldungen nennen: gerechnet wird dann nicht -- und nicht etwa mit
-        einem Stab weniger. Eine Last, deren Lastfall es nicht gibt, und ein
+        Ein Stab ohne Querschnitt oder Material -- oder mit einem Material,
+        das es im System nicht gibt --, ein Querschnitt mit unmoeglichen
+        Massen und eine Feder ohne Steifigkeit sind Fehler, die die Meldungen
+        nennen: gerechnet wird dann nicht -- und nicht etwa mit einem Stab
+        weniger. Ob ein Material traegt, weiss erst der Aufbau: er kennt die
+        Betone des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
         Beiwert dafuer bleiben mit einem Hinweis weg.
         """
         meldungen: List[Meldung] = []
@@ -499,6 +524,7 @@ class BalkensystemEintrag(Beschreibung):
         # in beide.
         for was, liste in (("Knoten", self.knoten), ("Linien", self.linien),
                            ("Lager", self.lager), ("Lasten", self.alle_lasten()),
+                           ("Materialien", self.stabmaterialien),
                            ("Querschnitte", self.querschnitte), ("Lastfälle", self.lastfaelle),
                            ("Kombinationen", self.kombinationen)):
             kennungen = [e.kennung for e in liste]
@@ -517,6 +543,7 @@ class BalkensystemEintrag(Beschreibung):
             return Groesse(k, EINHEIT_DER_FEDER[feld]).si
 
         querschnitte = {q.kennung: q for q in self.querschnitte}
+        stoffe = {m.kennung for m in self.stabmaterialien} | {MATERIAL_DES_QUERSCHNITTS}
         unmoeglich = set()
         for q in self.querschnitte:
             grund = q.fehler()
@@ -537,6 +564,9 @@ class BalkensystemEintrag(Beschreibung):
                     pass
                 elif not l.material:
                     melden(f"{l.kennung} ist ein Stab, hat aber kein Material.", l.kennung)
+                elif l.material not in stoffe:
+                    melden(f"{l.kennung} nimmt das Material «{l.material}», das es im System "
+                           f"nicht gibt.", l.kennung)
                 else:
                     paare[l.kennung] = (q.kennung, l.material)
             staebe.append(Stab(
@@ -618,9 +648,9 @@ class BalkensystemEintrag(Beschreibung):
               **felder: Any) -> SystemlinieEintrag:
         """
         Eine Linie von ``von`` nach ``bis`` -- ein Stab, sobald ``querschnitt``
-        und ``material`` dastehen; als Material auch
-        :data:`MATERIAL_DES_QUERSCHNITTS`. Weitere Felder wie
-        :class:`SystemlinieEintrag`.
+        und ``material`` dastehen: ein Material des Systems (:meth:`beton`,
+        :meth:`eigenes_material`) oder :data:`MATERIAL_DES_QUERSCHNITTS`.
+        Weitere Felder wie :class:`SystemlinieEintrag`.
         """
         netz = self.netz()
         eintrag = SystemlinieEintrag.aus_dict({
@@ -645,29 +675,47 @@ class BalkensystemEintrag(Beschreibung):
         self.lager.append(eintrag)
         return eintrag
 
-    def querschnitt(self, name: str, vorlage: str = qs.RECHTECK.schluessel, *,
-                    E: Optional[float] = None, **masse: float) -> StabquerschnittEintrag:
+    def beton(self, beton: Any) -> StabmaterialEintrag:
         """
-        Ein Querschnitt nach Vorlage -- Masse in mm, was fehlt nach ihrer
-        Vorgabe. Mit ``E`` in N/mm² rechnet er mit diesem E-Modul statt dem
-        seines Materials; so auch bei den beiden anderen.
+        Das Material des Systems aus einem Beton des Projekts (Eintrag oder
+        Kennung) -- das schon da ist, sonst ein neues.
         """
+        kennung = _kennung_von(beton)
+        for m in self.stabmaterialien:
+            if m.art == "beton" and m.beton == kennung:
+                return m
+        eintrag = StabmaterialEintrag(kennung=self._neue_kennung(self.stabmaterialien, "M"),
+                                      art="beton", beton=kennung)
+        self.stabmaterialien.append(eintrag)
+        return eintrag
+
+    def eigenes_material(self, name: str, *, E: float, rho: float) -> StabmaterialEintrag:
+        """Ein eigenes Material des Systems -- E in N/mm², die Dichte in kg/m³."""
+        eintrag = StabmaterialEintrag.aus_dict({
+            "kennung": self._neue_kennung(self.stabmaterialien, "M"), "art": "eigen",
+            "name": name, "E": E, "rho": rho}, f"Balkensystem '{self.name}', stabmaterialien")
+        self.stabmaterialien.append(eintrag)
+        return eintrag
+
+    def querschnitt(self, name: str, vorlage: str = qs.RECHTECK.schluessel,
+                    **masse: float) -> StabquerschnittEintrag:
+        """Ein Querschnitt nach Vorlage -- Masse in mm, was fehlt nach ihrer Vorgabe."""
         try:
             qs.vorlage(vorlage)
         except KeyError as fehler:
             raise ProjektFehler(fehler.args[0]) from None
-        return self._querschnitt_dazu(StabquerschnittEintrag(
-            kennung=self._neue_kennung(self.querschnitte, "Q"),
-            name=name, vorlage=vorlage, masse=dict(masse)), E)
+        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
+                                         name=name, vorlage=vorlage, masse=dict(masse))
+        self.querschnitte.append(eintrag)
+        return eintrag
 
     def querschnitt_aus(self, name: str, art: str, bezug: Any, *,
-                        E: Optional[float] = None,
                         E_eq: Optional[Mapping[str, Any]] = None) -> StabquerschnittEintrag:
         """
         Ein Querschnitt aus einer Platte (``platte``) oder einer
-        Querschnittsanalyse (``analyse``). Bei einer Analyse rechnet er mit
-        ``E_eq`` -- Felder wie :class:`ModulEintrag`, etwa ``{"M": 80}`` --
-        mit ihrem aequivalenten E-Modul.
+        Querschnittsanalyse (``analyse``). Bei einer Analyse rechnet ein Stab
+        «gemäss Querschnitt» mit ``E_eq`` -- Felder wie :class:`ModulEintrag`,
+        etwa ``{"M": 80}`` -- mit ihrem aequivalenten E-Modul.
         """
         if art not in ("platte", "analyse"):
             raise ProjektFehler(f"Ein Querschnitt kommt aus einer «platte» oder einer «analyse», "
@@ -677,19 +725,14 @@ class BalkensystemEintrag(Beschreibung):
         if E_eq is not None:
             eintrag.e_modul = "e_eq"
             eintrag.eq = ModulEintrag.aus_dict(dict(E_eq), f"Querschnitt '{name}', E_eq")
-        return self._querschnitt_dazu(eintrag, E)
+        self.querschnitte.append(eintrag)
+        return eintrag
 
-    def querschnitt_mit_kennwerten(self, name: str, *, A: float, I: float,
-                                   E: Optional[float] = None) -> StabquerschnittEintrag:
+    def querschnitt_mit_kennwerten(self, name: str, *, A: float,
+                                   I: float) -> StabquerschnittEintrag:
         """Ein Querschnitt mit Kennwerten von Hand -- A in mm², I in 10⁶ mm⁴."""
-        return self._querschnitt_dazu(StabquerschnittEintrag(
-            kennung=self._neue_kennung(self.querschnitte, "Q"),
-            name=name, art="kennwerte", masse={"A": A, "I": I}), E)
-
-    def _querschnitt_dazu(self, eintrag: StabquerschnittEintrag,
-                          E: Optional[float]) -> StabquerschnittEintrag:
-        if E is not None:
-            eintrag.e_modul, eintrag.E = "zahl", float(E)
+        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
+                                         name=name, art="kennwerte", masse={"A": A, "I": I})
         self.querschnitte.append(eintrag)
         return eintrag
 

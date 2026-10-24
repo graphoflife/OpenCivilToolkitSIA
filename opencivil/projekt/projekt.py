@@ -492,11 +492,12 @@ class Projekt(Beschreibung):
         # Riegel, Wind auf der linken Stütze -- kombiniert in GZT und GZG,
         # dazu die Diagramme eines neuen Systems und die Lagerkräfte.
         rahmen = projekt.balkensystem("Rahmen")
+        beton = rahmen.beton("b1")
         stuetze = rahmen.querschnitt("Stütze 300×300", "rechteck", b=300.0, h=300.0)
         riegel = rahmen.querschnitt_aus("Unterzug", "analyse", unterzug)
-        links = rahmen.linie((0, 0), (0, 4), querschnitt=stuetze, material="b1")
-        balken = rahmen.linie((0, 4), (6, 4), querschnitt=riegel, material="b1")
-        rahmen.linie((6, 4), (6, 0), querschnitt=stuetze, material="b1", gelenk_anfang=True)
+        links = rahmen.linie((0, 0), (0, 4), querschnitt=stuetze, material=beton)
+        balken = rahmen.linie((0, 4), (6, 4), querschnitt=riegel, material=beton)
+        rahmen.linie((6, 4), (6, 0), querschnitt=stuetze, material=beton, gelenk_anfang=True)
         rahmen.lager_an((0, 0), "eingespannt")
         rahmen.lager_an((6, 0), "gelenkig")
         eigengewicht = rahmen.lastfall("Eigengewicht", eigengewicht=True)
@@ -713,13 +714,18 @@ class Projekt(Beschreibung):
                       analyse: QuerschnittsanalyseEintrag) -> None:
         """
         Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-        Querschnitt, einer mit E von Hand, einer mit E_eq; Beton und Stahl,
-        ein Stab mit dem Material gemäss Querschnitt; Gelenke und ein
-        Knoten, dessen Drehung keine Steifigkeit hat; Federn am Lager,
-        Bettung, feste Linienlager mit und ohne Stab; jede Lastart, auch
-        projiziert.
+        Querschnitt, einer mit E_eq; ein Beton des Projekts und zwei eigene
+        Materialien -- Stahl und ein weicherer Beton --, ein Stab mit dem
+        Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
+        keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager mit
+        und ohne Stab; jede Lastart, auch projiziert.
         """
         s = p.balkensystem("Alles einmal")
+        beton = s.beton("b1")
+        # E_s und die Dichte des Betonstahls -- Betonstahl selbst ist kein
+        # Material der Stäbe.
+        baustahl = s.eigenes_material("Stahl", E=200000.0, rho=7850.0)
+        weich = s.eigenes_material("Fundamentbeton", E=15000.0, rho=2500.0)
         q = {
             "rechteck": s.querschnitt("Balken 300×500", "rechteck", b=300.0, h=500.0),
             "kreis": s.querschnitt("Rundstütze", "kreis", d=400.0),
@@ -728,24 +734,23 @@ class Projekt(Beschreibung):
             "t": s.querschnitt("Plattenbalken", "t", b=1200.0, h=600.0, b_w=300.0, h_f=200.0),
             "doppel_t": s.querschnitt("Walzprofil", "doppel_t", b=300.0, h=300.0,
                                       t_f=19.0, t_w=11.0),
-            "trapez": s.querschnitt("Fundamentbalken", "trapez", E=15000.0,
-                                    b_o=600.0, b_u=400.0, h=500.0),
+            "trapez": s.querschnitt("Fundamentbalken", "trapez", b_o=600.0, b_u=400.0, h=500.0),
         }
         s.querschnitt_mit_kennwerten("Von Hand", A=15000.0, I=120.0)
         s.querschnitt_aus("Deckenstreifen", "platte", decke)
         kasten = s.querschnitt_aus("Kasten", "analyse", analyse, E_eq={"N": -100.0, "M": 200.0})
-        gebettet = s.linie((0, 0), (8, 0), querschnitt=q["rechteck"], material="b1",
+        gebettet = s.linie((0, 0), (8, 0), querschnitt=q["rechteck"], material=beton,
                            quer="feder", k_quer=20000.0)
-        stuetze = s.linie((8, 0), (8, 3), querschnitt=q["kreis"], material="b1")
-        sparren = s.linie((8, 3), (12, 5), querschnitt=q["t"], material="b1")
-        s.linie((12, 5), (12, 0), querschnitt=q["kreisring"], material="s1",
+        stuetze = s.linie((8, 0), (8, 3), querschnitt=q["kreis"], material=beton)
+        sparren = s.linie((8, 3), (12, 5), querschnitt=q["t"], material=beton)
+        s.linie((12, 5), (12, 0), querschnitt=q["kreisring"], material=baustahl,
                 gelenk_anfang=True, gelenk_ende=True)
-        stahl = s.linie((12, 0), (15, 0), querschnitt=q["doppel_t"], material="s1",
+        stahl = s.linie((12, 0), (15, 0), querschnitt=q["doppel_t"], material=baustahl,
                         gelenk_anfang=True)
-        aufgelegt = s.linie((15, 0), (17, 0), querschnitt=q["trapez"], material="b1",
+        aufgelegt = s.linie((15, 0), (17, 0), querschnitt=q["trapez"], material=weich,
                             quer="fest")
         s.linie((17, 0), (17, -1), quer="fest")
-        s.linie((15, 0), (15, 2), querschnitt=q["rechteckrohr"], material="s1")
+        s.linie((15, 0), (15, 2), querschnitt=q["rechteckrohr"], material=baustahl)
         s.linie((15, 2), (17, 2), querschnitt=kasten, material=MATERIAL_DES_QUERSCHNITTS)
         s.lager_an((0, 0), "gelenkig", z="feder", k_z=50000.0, phi="feder", k_phi=10000.0)
         s.lager_an((12, 0), "gelenkig")
@@ -771,7 +776,7 @@ class Projekt(Beschreibung):
         """Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt einer Zahl."""
         s = p.balkensystem("Beweglich")
         traeger = s.linie((0, 0), (5, 0), querschnitt=s.querschnitt("Rechteck", "rechteck"),
-                          material="b1")
+                          material=s.beton("b1"))
         s.lager_an((0, 0), "verschieblich")
         s.lager_an((5, 0), "verschieblich")
         s.stablast(s.lastfall("Last"), traeger, wert=10.0)

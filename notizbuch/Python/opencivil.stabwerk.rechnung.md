@@ -1,5 +1,5 @@
 ---
-erzeugt: ef794e87fb8c
+erzeugt: 5353058bbcdd
 art: modul
 tags: [modul]
 ---
@@ -31,23 +31,30 @@ Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu.
 
 
+## MATERIALIEN
+
+Ein Material der Staebe ([[opencivil.stabwerk.rechnung#Stabmaterial|Stabmaterial]]) ist ein Beton des Projekts
+oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24). Ein Stab
+kann auch das Material seines Querschnitts nehmen, den Beton einer Platte
+oder Querschnittsanalyse.
+
+
 ## STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN
 
-`E_cm` fuer Beton und `E_s` fuer Betonstahl ([[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]]) -- oder
-je Querschnitt ein E von Hand oder das E_eq seiner Querschnittsanalyse bei
-N und M, fuer jeden Stab mit ihm (Benutzer, 2026-10-23) --, am
-ungerissenen Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am
-unverformten System. Die Herleitung sagt es, das TODO fuehrt es. Findet
-die Suche nach E_eq keinen Modul, sagt es eine Meldung, und das System
-rechnet nicht.
+`E_cm` eines Betons ([[opencivil.stabwerk.rechnung#Konstanten|BETONKENNWERTE]]) oder E von Hand -- und bei
+einem Stab mit dem Material seiner Querschnittsanalyse auf Wunsch deren
+E_eq bei N und M (Benutzer, 2026-10-23) --, am ungerissenen
+Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am unverformten
+System. Die Herleitung sagt es, das TODO fuehrt es. Findet die Suche nach
+E_eq keinen Modul, sagt es eine Meldung, und das System rechnet nicht.
 
 
 ## EIGENGEWICHT -- NACH VORGABE DES BENUTZERS (2026-10-23)
 
 Je Paar aus Querschnitt und Material `g_k = rho · g · A` in kN/m, mit
-`g = 10 m/s²` und beim Beton der Dichte des Stahlbetons ([[opencivil.stabwerk.rechnung#Konstanten|DICHTE]])
--- ohne den Stahl noch dazu. Es kommt als Last senkrecht je Meter Stab in den
-Lastfall, den die Beschreibung dafuer nennt.
+`g = 10 m/s²` und beim Beton der Dichte des Stahlbetons -- ohne den Stahl
+noch dazu. Es kommt als Last senkrecht je Meter Stab in den Lastfall, den
+die Beschreibung dafuer nennt.
 
 
 ## DAS ERGEBNIS
@@ -58,6 +65,23 @@ nicht: sie ist Ziel unter ihrer ID. Ein bewegliches System ist ein Ergebnis
 mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 
 ## Inhalt
+
+### Stabmaterial
+
+```python
+@dataclass(frozen=True)
+class Stabmaterial
+```
+
+Ein Material der Staebe, aufgeloest: ein Beton -- E und Dichte von ihm --
+oder ein eigenes mit E und Dichte von Hand.
+
+- `kennung: str` – Im System, `M1` -- bei einem Stab mit dem Material seines Querschnitts dessen Zeichen.
+- `name: str`
+- `stoff: Optional[Baustoff] = None` – Der Beton -- `None` bei einem eigenen Material.
+- `E: float = 0.0` – Von Hand, N/mm² -- nur ohne `stoff`.
+- `rho: float = 0.0` – Von Hand, kg/m³ -- nur ohne `stoff`.
+- `vom_querschnitt: bool = False` – Das Material des Querschnitts: dann gilt dessen E_eq, wenn er eines hat.
 
 ### Stabquerschnitt
 
@@ -77,8 +101,7 @@ Ein Querschnitt der Staebe, aufgeloest: woher `A` und `I` kommen.
 - `bezug: str = ''` – Die Kennung der Platte oder Analyse, aus der er kommt.
 - `herkunft: str = ''` – Woher, in Worten -- «Rechteck», «von Hand», «Platte «Decke»».
 - `fehler: str = ''` – Was an seinen Massen nicht geht -- dann rechnet er nicht, und kein Stab mit ihm.
-- `E: Optional[float] = None` – Der E-Modul von Hand in N/mm² -- `None`: der des Materials, [[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]].
-- `eq: Any = None` – Die Frage nach dem E_eq seiner Analyse ([[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]) -- `None`: E vom Material oder von Hand. Sie baut ihre Berechnungen selbst ein.
+- `eq: Any = None` – Die Frage nach dem E_eq seiner Analyse ([[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]) -- sie gilt fuer die Staebe, die das Material des Querschnitts nehmen; `None`: E_cm. Sie baut ihre Berechnungen selbst ein.
 
 ### Steifigkeit
 
@@ -90,10 +113,11 @@ class Steifigkeit
 Ein Paar aus Querschnitt und Material und die Wert-IDs seiner Steifigkeiten.
 
 - `querschnitt: str`
-- `material: str` – Die Kennung des Materials im Projekt.
+- `material: str` – Die Kennung des [[opencivil.stabwerk.rechnung#Stabmaterial|Stabmaterial]].
 - `EA: str`
 - `EI: str`
 - `g_k: str = ''` – Das Eigengewicht je Meter -- leer, wenn kein Lastfall es bekommt.
+- `mit_eq: bool = False` – Ob E das E_eq des Querschnitts ist -- dann fehlen EA und EI, wo die Suche keines fand.
 
 ### Lagerkraft
 
@@ -198,13 +222,14 @@ def _querschnitt(self, q: Stabquerschnitt, index: str) -> Tuple[str, str]
 
 Die Berechnungen fuer A und I eines Querschnitts -- und ihre Wert-IDs.
 
-#### Balkensystem._modul
+#### Balkensystem._kennwerte
 
 ```python
-def _modul(self, q: Stabquerschnitt, index: str) -> str
+def _kennwerte(self, m: Stabmaterial) -> Tuple[str, str]
 ```
 
-Der E-Modul von Hand eines Querschnitts -- er gilt fuer jeden Stab mit ihm.
+Die Wert-IDs von E und Dichte eines Materials: die seines Betons --
+oder bei einem eigenen Vorgaben von Hand, einmal je Material.
 
 #### Balkensystem._erdbeschleunigung
 
@@ -217,12 +242,12 @@ def _erdbeschleunigung(self) -> str
 #### Balkensystem._steifigkeit
 
 ```python
-def _steifigkeit(self, q: str, material: str, index: str, g: Optional[str]=None) -> Steifigkeit
+def _steifigkeit(self, q: str, m: Stabmaterial, index: str, g: Optional[str]=None) -> Steifigkeit
 ```
 
 EA und EI eines Paars aus Querschnitt und Material -- mit `g` dazu
-sein Eigengewicht. E kommt vom Material, ausser der Querschnitt hat
-eines von Hand; die Dichte immer vom Material.
+sein Eigengewicht. E und Dichte kommen vom Material; nimmt der Stab
+das Material seines Querschnitts und hat der ein E_eq, gilt dieses.
 
 #### Balkensystem._eigengewicht
 
@@ -266,13 +291,13 @@ oder ein E_eq, das es nicht gibt --, bleibt es bei ihr.
 def _ohne_modul(self, e: Eingaben) -> List[Meldung]
 ```
 
-Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab nimmt, eine Meldung.
+Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab mit
+seinem Material nimmt, eine Meldung.
 
 
 ## Konstanten
 
-- `E_MODUL = {'beton': 'E_cm', 'betonstahl': 'E_s'}` – Welcher E-Modul in die Steifigkeit eingeht, je Art des Materials -- nach Vorgabe, nicht nachgeschlagen.
-- `DICHTE = {'beton': 'rho_sb', 'betonstahl': 'rho_s'}` – Welche Dichte ins Eigengewicht eingeht, je Art des Materials -- beim Beton die des Stahlbetons (Benutzer, 2026-10-23).
+- `BETONKENNWERTE = {'E': 'E_cm', 'rho': 'rho_sb'}` – Welche Kennwerte eines Betons ein Stab aus ihm nimmt: `E_cm` -- nach Vorgabe, nicht nachgeschlagen -- und die Dichte des Stahlbetons (Benutzer, 2026-10-23).
 - `ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)` – Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
 - `QUERSCHNITTE = 'Stabquerschnitte'` – Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.
 - `STEIFIGKEITSMETHODE = 'Steifigkeitsmethode'`

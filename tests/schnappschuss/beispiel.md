@@ -2977,10 +2977,10 @@ Alle geführten Nachweise sind erfüllt.
 | :--- | :--- | ---: | :--- | :--- |
 | Querschnittsfläche, Stütze 300×300 | $A_{\text{Q1}}$ | $90000$ | mm² | berechnet |
 | Flächenträgheitsmoment, Stütze 300×300 | $I_{\text{Q1}}$ | $675$ | ·10⁶ mm⁴ | berechnet |
-| Breite, Stütze 300×300 | $b_{\text{Q1}}$ | $300$ | mm | Vorgabe |
 | Dehnsteifigkeit, Stütze 300×300, C30/37 | $EA_{\text{Q1}}$ | $3026$ | MN | berechnet |
 | Biegesteifigkeit, Stütze 300×300, C30/37 | $EI_{\text{Q1}}$ | $22693$ | kNm² | berechnet |
 | Eigengewicht je Meter, Stütze 300×300, C30/37 | $g_{k,\text{Q1}}$ | $2.25$ | kN/m | berechnet |
+| Breite, Stütze 300×300 | $b_{\text{Q1}}$ | $300$ | mm | Vorgabe |
 | Höhe, Stütze 300×300 | $h_{\text{Q1}}$ | $300$ | mm | Vorgabe |
 | Querschnittsfläche, Unterzug | $A_{\text{Q2}}$ | $180000$ | mm² | berechnet |
 | Flächenträgheitsmoment, Unterzug | $I_{\text{Q2}}$ | $5400$ | ·10⁶ mm⁴ | berechnet |

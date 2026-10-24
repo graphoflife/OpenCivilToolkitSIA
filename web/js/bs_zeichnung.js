@@ -229,12 +229,16 @@ function auswahlMarkieren(a) {
 // Der Adapter
 // ===========================================================================
 
+/**
+ * Was die Werkzeuge als Nächstes anlegen. Das Material einer Linie: leer
+ * heisst das erste des Systems (`vorgabeMaterial`) -- auch eines, das erst
+ * nach dem Öffnen des Fensters dazukommt.
+ */
 function vorgabenNeu(system) {
-  const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   return {
     linie: {
       querschnitt: system?.querschnitte?.[0]?.kennung || '',
-      material: beton?.kennung || '',
+      material: '',
     },
     last: {
       art: 'linienlast', richtung: 'senkrecht', wert_a: 10, wert_b: null,
@@ -331,9 +335,14 @@ function linieAnlegen(a, z, von, bis) {
   if (['oben', 'rechts'].includes(zugseite(lagen.get(von), lagen.get(bis)))) [von, bis] = [bis, von];
   z.linien.push({
     ...ausVorlage('systemlinie'), kennung, von, bis,
-    querschnitt: v.querschnitt, material: v.querschnitt ? v.material : '',
+    querschnitt: v.querschnitt, material: v.querschnitt ? vorgabeMaterial(a, z) : '',
   });
   return kennung;
+}
+
+/** Das Material, das eine neue Linie bekommt: das gewählte, sonst das erste des Systems. */
+function vorgabeMaterial(a, z) {
+  return a.bs.vorgaben.linie.material || z.stabmaterialien?.[0]?.kennung || '';
 }
 
 // ===========================================================================
@@ -735,11 +744,23 @@ function haken(an, setzen, titel = '') {
   });
 }
 
-/** Die Querschnitte des Systems -- und «kein Stab»: dann ist die Linie nur eine Linie, etwa für eine Bettung. */
-function querschnittWahl(z, gewaehlt, setzen) {
+/** Ob ein Querschnitt ein Material mitbringt -- eine Platte oder Analyse; das sagt der Katalog. */
+function bringtMaterial(q) {
+  return Boolean(katalog().querschnittsarten?.find((x) => x.wert === q?.art)?.bringt_material);
+}
+
+/**
+ * Die Querschnitte des Systems -- und «kein Stab»: dann ist die Linie nur
+ * eine Linie, etwa für eine Bettung. Nimmt die Linie das Material ihres
+ * Querschnitts, stehen nur die da, die eines mitbringen (Benutzer,
+ * 2026-10-24) -- und der gewählte.
+ */
+function querschnittWahl(z, gewaehlt, setzen, material = '') {
+  const nurMitMaterial = material === katalog().material_des_querschnitts;
   const werte = [
     { wert: '', beschriftung: '– kein Stab –' },
-    ...(z.querschnitte || []).map((q) => ({ wert: q.kennung, beschriftung: q.name || q.kennung })),
+    ...(z.querschnitte || []).filter((q) => !nurMitMaterial || bringtMaterial(q) || q.kennung === gewaehlt)
+      .map((q) => ({ wert: q.kennung, beschriftung: q.name || q.kennung })),
   ];
   return auswahl({ werte, gewaehlt, titel: 'Die Querschnitte stehen unter der Zeichnung', beiAenderung: setzen });
 }
@@ -750,17 +771,25 @@ function querschnittWahl(z, gewaehlt, setzen) {
  */
 function materialWahl(z, querschnitt, gewaehlt, setzen) {
   const eigenes = katalog().material_des_querschnitts;
-  const art = z.querschnitte.find((q) => q.kennung === querschnitt)?.art;
-  const bringt = katalog().querschnittsarten?.find((x) => x.wert === art)?.bringt_material;
+  const werte = [
+    ...(z.stabmaterialien || []).map((m) => ({ wert: m.kennung, beschriftung: materialname(m) })),
+    ...(bringtMaterial(z.querschnitte.find((q) => q.kennung === querschnitt)) || gewaehlt === eigenes
+      ? [{ wert: eigenes, beschriftung: 'gemäss Querschnitt' }] : []),
+  ];
   return auswahl({
-    werte: [
-      ...(bringt || gewaehlt === eigenes ? [{ wert: eigenes, beschriftung: 'gemäss Querschnitt' }] : []),
-      ...zustand.projekt.materialien.map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
-    ],
+    werte: werte.some((x) => x.wert === gewaehlt) ? werte
+      : [{ wert: gewaehlt, beschriftung: '– Material wählen –' }, ...werte],
     gewaehlt,
-    titel: 'E_cm beim Beton, E_s beim Stahl -- «gemäss Querschnitt»: der Beton der Platte oder Analyse',
+    titel: 'Die Materialien stehen unter der Zeichnung -- «gemäss Querschnitt»: der Beton der Platte oder Analyse',
     beiAenderung: setzen,
   });
+}
+
+/** Wie ein Material des Systems heisst: ein Beton wie im Projekt, ein eigenes mit seinem Namen. */
+export function materialname(m) {
+  if (m.art !== 'beton') return m.name || m.kennung;
+  const beton = zustand.projekt.materialien.find((x) => x.kennung === m.beton);
+  return beton ? beton.name || beton.sorte : '– kein Beton –';
 }
 
 /**
@@ -824,8 +853,8 @@ function neuEigenschaften(a, werkzeug) {
   if (werkzeug === 'linie') {
     const v = a.bs.vorgaben.linie;
     inhalt = [
-      zeile('Querschnitt', querschnittWahl(z, v.querschnitt, (w) => { v.querschnitt = w; neu(); })),
-      v.querschnitt ? zeile('Material', materialWahl(z, v.querschnitt, v.material, (w) => { v.material = w; neu(); })) : null,
+      zeile('Querschnitt', querschnittWahl(z, v.querschnitt, (w) => { v.querschnitt = w; neu(); }, vorgabeMaterial(a, z))),
+      v.querschnitt ? zeile('Material', materialWahl(z, v.querschnitt, vorgabeMaterial(a, z), (w) => { v.material = w; neu(); })) : null,
     ];
   } else if (werkzeug === 'last') {
     const v = a.bs.vorgaben.last;
@@ -1018,10 +1047,10 @@ function linienEigenschaften(a, z, linien) {
       if (!linien.includes(l.kennung)) continue;
       l[feld] = wert;
       // Ein neuer Stab bekommt das Material, das das Werkzeug vorgibt -- sonst fehlte es ihm.
-      if (feld === 'querschnitt' && wert && !l.material) l.material = a.bs.vorgaben.linie.material;
+      if (feld === 'querschnitt' && wert && !l.material) l.material = vorgabeMaterial(a, zz);
     }
   });
-  const inhalt = [zeile('Querschnitt', querschnittWahl(z, e.querschnitt, setzen('querschnitt')))];
+  const inhalt = [zeile('Querschnitt', querschnittWahl(z, e.querschnitt, setzen('querschnitt'), e.material))];
   if (e.querschnitt) {
     inhalt.push(
       zeile('Material', materialWahl(z, e.querschnitt, e.material, setzen('material'))),

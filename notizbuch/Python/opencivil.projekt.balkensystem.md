@@ -1,5 +1,5 @@
 ---
-erzeugt: d93ea14a8954
+erzeugt: 6ffef6867a71
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Der [[opencivil.projekt.balkensystem#BalkensystemEintrag|BalkensystemEintrag]]: ein ebener Rahmen aus Knoten und Linien,
-Lagern und Lasten, mit seinen Querschnitten, Lastfaellen und Kombinationen
+Lagern und Lasten, mit seinen Materialien, Querschnitten, Lastfaellen und
+Kombinationen
 -- als speicherbare Datenklasse wie die Querschnittsanalyse
 ([[opencivil.projekt.querschnittsanalyse]]). Dazu der Baukasten, der ohne
 Oberflaeche zeichnet, und was beim Teilen und Umkehren einer Linie mit ihren
@@ -111,7 +112,7 @@ oder ohne Stab, ein Linienlager quer und laengs.
 - `von: str = ''`
 - `bis: str = ''`
 - `querschnitt: str = ''` – Kennung des Querschnitts im System (`Q1`); leer: kein Stab, nur eine Linie.
-- `material: str = ''` – Kennung des Materials im Projekt (`b1`) -- oder [[opencivil.projekt.balkensystem#Konstanten|MATERIAL_DES_QUERSCHNITTS]]: das Material, das eine Platte oder Querschnittsanalyse als Querschnitt mitbringt.
+- `material: str = ''` – Kennung eines Materials des Systems (`M1`) -- oder [[opencivil.projekt.balkensystem#Konstanten|MATERIAL_DES_QUERSCHNITTS]]: das Material, das eine Platte oder Querschnittsanalyse als Querschnitt mitbringt.
 - `gelenk_anfang: bool = False`
 - `gelenk_ende: bool = False`
 - `quer: str = einer_von(HALT, 'frei')`
@@ -164,6 +165,24 @@ oder ein Moment. Ihre Kennung zaehlt mit denen der Stablasten (`P1`).
 - `richtung: Lastrichtung = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT)`
 - `wert: float = 10.0` – kN oder kNm.
 
+### StabmaterialEintrag
+
+```python
+@dataclass
+class StabmaterialEintrag(Beschreibung)
+```
+
+Ein Material der Staebe (Benutzer, 2026-10-24): ein Beton des Projekts
+(`beton`) -- E_cm und die Dichte des Stahlbetons von ihm -- oder ein
+eigenes mit `E` und `rho` von Hand.
+
+- `kennung: str = ''`
+- `art: str = einer_von(STABMATERIALARTEN, 'beton')`
+- `beton: str = ''` – Die Kennung des Betons im Projekt (`b1`) -- nur bei `beton`.
+- `name: str = ''` – Wie ein eigenes heisst; ein Beton heisst wie im Projekt.
+- `E: float = bereich(200000.0, heisst='E-Modul E', einheit=N_PRO_MM2, ueber=0.0)` – N/mm² -- nur bei `eigen`.
+- `rho: float = bereich(7850.0, heisst='Dichte ρ', einheit=KG_PRO_M3, ab=0.0)` – kg/m³, fuer das Eigengewicht -- nur bei `eigen`.
+
 ### ModulEintrag
 
 ```python
@@ -199,9 +218,9 @@ class StabquerschnittEintrag(Beschreibung)
 
 Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, mit Kennwerten
 von Hand (`A` in mm², `I` in 10⁶ mm⁴), oder aus einer Platte oder
-einer Querschnittsanalyse des Projekts (`bezug`). Sein E-Modul kommt
-vom Material des Stabs oder steht als Zahl da -- dann gilt er fuer jeden
-Stab mit diesem Querschnitt, aus welchem Material auch immer.
+einer Querschnittsanalyse des Projekts (`bezug`). E kommt vom Material
+des Stabs; nimmt der das Material des Querschnitts, sagt `e_modul`,
+welches E.
 
 - `kennung: str = ''`
 - `name: str = ''`
@@ -209,18 +228,8 @@ Stab mit diesem Querschnitt, aus welchem Material auch immer.
 - `vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)`
 - `masse: Dict[str, float] = field(default_factory=dict)`
 - `bezug: str = ''`
-- `e_modul: str = einer_von(E_MODULE, 'material')` – Woher E kommt: `material` -- vom Material des Stabs --, `zahl`, dann `E`, oder `e_eq`, dann wie `eq` sagt.
-- `E: float = bereich(30000.0, heisst='E-Modul E', einheit=N_PRO_MM2, ueber=0.0)` – Der E-Modul von Hand, N/mm² -- er gilt nur bei `e_modul = "zahl"`.
+- `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt.
 - `eq: ModulEintrag = field(default_factory=ModulEintrag)` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
-
-#### StabquerschnittEintrag.E_von_hand
-
-```python
-@property
-def E_von_hand(self) -> Optional[float]
-```
-
-Der E-Modul von Hand in N/mm² -- `None`, wenn er vom Material kommt.
 
 #### StabquerschnittEintrag.stabvorlage
 
@@ -330,6 +339,7 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 - `linien: List[SystemlinieEintrag] = field(default_factory=list)`
 - `lager: List[LagerEintrag] = field(default_factory=list)`
 - `knotenlasten: List[KnotenlastEintrag] = field(default_factory=list)`
+- `stabmaterialien: List[StabmaterialEintrag] = field(default_factory=list)`
 - `querschnitte: List[StabquerschnittEintrag] = field(default_factory=list)`
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
@@ -342,11 +352,10 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 def materialien(self) -> List[str]
 ```
 
-Jedes Material, auf das eine Linie zeigt. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
-Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
-naechste Aenderung machte daraus einen Fehler beim Rechnen.
-Dazu gehoert eine Linie, die gerade kein Stab ist: wird sie wieder einer,
-nimmt sie ihr Material mit.
+Jeder Beton des Projekts, auf den ein Material des Systems zeigt --
+auch eines, das gerade keinen Stab traegt: wer den Beton loescht,
+liesse es ins Leere zeigen, und spaetestens die naechste Aenderung
+machte daraus einen Fehler beim Rechnen.
 
 #### BalkensystemEintrag.bezuege
 
@@ -400,10 +409,12 @@ def modell(self) -> Modell
 
 Das Stabwerk zum Rechnen, in SI ([[opencivil.stabwerk.modell]]).
 
-Ein Stab ohne Querschnitt oder Material, ein Querschnitt mit
-unmoeglichen Massen und eine Feder ohne Steifigkeit sind Fehler, die
-die Meldungen nennen: gerechnet wird dann nicht -- und nicht etwa mit
-einem Stab weniger. Eine Last, deren Lastfall es nicht gibt, und ein
+Ein Stab ohne Querschnitt oder Material -- oder mit einem Material,
+das es im System nicht gibt --, ein Querschnitt mit unmoeglichen
+Massen und eine Feder ohne Steifigkeit sind Fehler, die die Meldungen
+nennen: gerechnet wird dann nicht -- und nicht etwa mit einem Stab
+weniger. Ob ein Material traegt, weiss erst der Aufbau: er kennt die
+Betone des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
 Beiwert dafuer bleiben mit einem Hinweis weg.
 
 #### BalkensystemEintrag.netz
@@ -419,9 +430,9 @@ def linie(self, von: Ort, bis: Ort, *, querschnitt: Any=None, material: Any=None
 ```
 
 Eine Linie von `von` nach `bis` -- ein Stab, sobald `querschnitt`
-und `material` dastehen; als Material auch
-[[opencivil.projekt.balkensystem#Konstanten|MATERIAL_DES_QUERSCHNITTS]]. Weitere Felder wie
-[[opencivil.projekt.balkensystem#SystemlinieEintrag|SystemlinieEintrag]].
+und `material` dastehen: ein Material des Systems ([[opencivil.projekt.balkensystem#BalkensystemEintrag.beton|beton]],
+[[opencivil.projekt.balkensystem#BalkensystemEintrag.eigenes_material|eigenes_material]]) oder [[opencivil.projekt.balkensystem#Konstanten|MATERIAL_DES_QUERSCHNITTS]].
+Weitere Felder wie [[opencivil.projekt.balkensystem#SystemlinieEintrag|SystemlinieEintrag]].
 
 #### BalkensystemEintrag.lager_an
 
@@ -431,31 +442,46 @@ def lager_an(self, ort: Ort, art: str='gelenkig', **felder: Any) -> LagerEintrag
 
 Ein Lager -- `gelenkig`, `verschieblich` oder `eingespannt`, Felder darueber.
 
+#### BalkensystemEintrag.beton
+
+```python
+def beton(self, beton: Any) -> StabmaterialEintrag
+```
+
+Das Material des Systems aus einem Beton des Projekts (Eintrag oder
+Kennung) -- das schon da ist, sonst ein neues.
+
+#### BalkensystemEintrag.eigenes_material
+
+```python
+def eigenes_material(self, name: str, *, E: float, rho: float) -> StabmaterialEintrag
+```
+
+Ein eigenes Material des Systems -- E in N/mm², die Dichte in kg/m³.
+
 #### BalkensystemEintrag.querschnitt
 
 ```python
-def querschnitt(self, name: str, vorlage: str=qs.RECHTECK.schluessel, *, E: Optional[float]=None, **masse: float) -> StabquerschnittEintrag
+def querschnitt(self, name: str, vorlage: str=qs.RECHTECK.schluessel, **masse: float) -> StabquerschnittEintrag
 ```
 
-Ein Querschnitt nach Vorlage -- Masse in mm, was fehlt nach ihrer
-Vorgabe. Mit `E` in N/mm² rechnet er mit diesem E-Modul statt dem
-seines Materials; so auch bei den beiden anderen.
+Ein Querschnitt nach Vorlage -- Masse in mm, was fehlt nach ihrer Vorgabe.
 
 #### BalkensystemEintrag.querschnitt_aus
 
 ```python
-def querschnitt_aus(self, name: str, art: str, bezug: Any, *, E: Optional[float]=None, E_eq: Optional[Mapping[str, Any]]=None) -> StabquerschnittEintrag
+def querschnitt_aus(self, name: str, art: str, bezug: Any, *, E_eq: Optional[Mapping[str, Any]]=None) -> StabquerschnittEintrag
 ```
 
 Ein Querschnitt aus einer Platte (`platte`) oder einer
-Querschnittsanalyse (`analyse`). Bei einer Analyse rechnet er mit
-`E_eq` -- Felder wie [[opencivil.projekt.balkensystem#ModulEintrag|ModulEintrag]], etwa `{"M": 80}` --
-mit ihrem aequivalenten E-Modul.
+Querschnittsanalyse (`analyse`). Bei einer Analyse rechnet ein Stab
+«gemäss Querschnitt» mit `E_eq` -- Felder wie [[opencivil.projekt.balkensystem#ModulEintrag|ModulEintrag]],
+etwa `{"M": 80}` -- mit ihrem aequivalenten E-Modul.
 
 #### BalkensystemEintrag.querschnitt_mit_kennwerten
 
 ```python
-def querschnitt_mit_kennwerten(self, name: str, *, A: float, I: float, E: Optional[float]=None) -> StabquerschnittEintrag
+def querschnitt_mit_kennwerten(self, name: str, *, A: float, I: float) -> StabquerschnittEintrag
 ```
 
 Ein Querschnitt mit Kennwerten von Hand -- A in mm², I in 10⁶ mm⁴.
@@ -546,9 +572,10 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `QUERSCHNITTSARTEN = ('vorlage', 'kennwerte', 'platte', 'analyse')` – Woher ein Querschnitt kommt.
 - `KENNWERTE = ('A', 'I')` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
-- `E_MODULE = ('material', 'zahl', 'e_eq')` – Woher der E-Modul eines Querschnitts kommt: vom Material des Stabs -- E_cm beim Beton, E_s beim Stahl --, als Zahl von Hand, unabhaengig vom Material, oder als E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-23).
+- `STABMATERIALARTEN = ('beton', 'eigen')` – Was ein Material des Systems ist: ein Beton des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24). Betonstahl ist keines: aus ihm ist kein Stab.
+- `E_MODULE = ('e0', 'e_eq')` – Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀, das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-24). Einen E-Modul von Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
 - `E_EQ_ARTEN = ('analyse',)` – Die Arten eines Querschnitts, die ein E_eq haben: nur der gezeichnete Querschnitt hat eine Momenten-Kruemmungs-Linie mit seiner Bewehrung.
-- `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung im Projekt sein -- die beginnen mit ihrer Vorsilbe und einer Zahl.
+- `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
 - `MIT_MATERIAL = ('platte', 'analyse')` – Die Arten eines Querschnitts, die ein Material mitbringen: ein Bauteil des Projekts. Einer nach Vorlage oder von Hand ist nur eine Form.
 - `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.

@@ -3,7 +3,8 @@ opencivil/projekt/aufbau/balkensystem.py -- ein Balkensystem wird Rechnung.
 
 VERANTWORTUNG:
 Aus einem :class:`~opencivil.projekt.balkensystem.BalkensystemEintrag` das
-Stabwerk mit aufgeloesten Querschnitten (:func:`bauen`). Ein Querschnitt kann
+Stabwerk mit aufgeloesten Materialien und Querschnitten (:func:`bauen`). Ein
+Material ist ein Beton des Projekts oder ein eigenes. Ein Querschnitt kann
 eine Platte oder eine Querschnittsanalyse des Projekts nehmen; die muessen
 dann schon gebaut sein -- darum kommt das Balkensystem in
 :data:`~opencivil.projekt.aufbau.BAUTEILE` nach ihnen. Von dort kommt auch
@@ -13,16 +14,16 @@ der Analyse.
 
 from __future__ import annotations
 
-from dataclasses import replace
-from typing import TYPE_CHECKING, Dict, List, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 from opencivil.material.basis import Baustoff
 from opencivil.projekt.balkensystem import (
-    MATERIAL_DES_QUERSCHNITTS, MIT_MATERIAL, BalkensystemEintrag, Modell, StabquerschnittEintrag,
+    MATERIAL_DES_QUERSCHNITTS, MIT_MATERIAL, BalkensystemEintrag, Modell, StabmaterialEintrag,
+    StabquerschnittEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.spannungsanalyse.modul import Modulfrage
-from opencivil.stabwerk.rechnung import Balkensystem, Stabquerschnitt
+from opencivil.stabwerk.rechnung import Balkensystem, Stabmaterial, Stabquerschnitt
 from opencivil.stabwerk.system import Meldung
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil
@@ -33,26 +34,20 @@ if TYPE_CHECKING:
 
 def bauen(art: "Bauteilart", eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Bauteil:
     """
-    Ein Balkensystem: das Stabwerk der Beschreibung, seine Querschnitte
-    aufgeloest. Hart scheitert nur ein Verweis, den es nicht gibt -- ein
-    Material, eine Platte, eine Querschnittsanalyse --; was dem System selbst
-    fehlt, steht in seinen Meldungen, und der Rest des Projekts rechnet.
+    Ein Balkensystem: das Stabwerk der Beschreibung, seine Materialien und
+    Querschnitte aufgeloest. Hart scheitert nur ein Verweis, den es nicht
+    gibt -- ein Beton, eine Platte, eine Querschnittsanalyse --; was dem
+    System selbst fehlt, steht in seinen Meldungen, und der Rest des
+    Projekts rechnet.
     """
     wo = f"Balkensystem '{eintrag.name}'"
     modell = eintrag.modell()
-    querschnitte = [replace(_stabquerschnitt(q, aufbau, wo), E=q.E_von_hand)
-                    for q in eintrag.querschnitte]
-    paare, meldungen = _paare(eintrag, modell, aufbau)
-    stoffe: Dict[str, Baustoff] = {}
-    for _, material in paare.values():
-        stoff = aufbau.baustoffe.get(material)
-        if stoff is None:
-            raise ProjektFehler(f"{wo}: das Material '{material}' gibt es im Projekt nicht.")
-        stoffe[material] = stoff
+    querschnitte = [_stabquerschnitt(q, aufbau, wo) for q in eintrag.querschnitte]
+    paare, meldungen = _paare(eintrag, modell, aufbau, wo)
     system = Balkensystem(
         name=eintrag.name, kennung=eintrag.kennung, praefix=f"{art.raum}.{eintrag.kennung}",
         system=modell.system, paare=paare, meldungen=meldungen, querschnitte=querschnitte,
-        stoffe=stoffe, eigengewicht=modell.eigengewicht)
+        eigengewicht=modell.eigengewicht)
     aufbau.balkensysteme[eintrag.kennung] = system
     system.ins_rechenwerk(aufbau.werk)
     return Bauteil(eintrag.kennung, eintrag.name, art, system,
@@ -95,47 +90,81 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
                            if q.e_modul == "e_eq" else None)
 
 
-def _paare(eintrag: BalkensystemEintrag, modell: Modell,
-           aufbau: Aufbau) -> Tuple[Dict[str, Tuple[str, str]], List[Meldung]]:
+def _paare(eintrag: BalkensystemEintrag, modell: Modell, aufbau: Aufbau,
+           wo: str) -> Tuple[Dict[str, Tuple[str, Stabmaterial]], List[Meldung]]:
     """
-    Je tragenden Stab Querschnitt und Material -- «gemäss Querschnitt» wird
-    zum Material der Platte oder Analyse. Bringt der Querschnitt keines mit,
-    sagt es eine Meldung, und das System rechnet nicht.
+    Je tragenden Stab sein Querschnitt und sein Material, aufgeloest --
+    «gemäss Querschnitt» wird zum Beton der Platte oder Analyse. Traegt das
+    Material nicht, sagt es eine Meldung, und das System rechnet nicht.
     """
     querschnitte = {q.kennung: q for q in eintrag.querschnitte}
-    paare: Dict[str, Tuple[str, str]] = {}
+    materialien = {m.kennung: m for m in eintrag.stabmaterialien}
+    paare: Dict[str, Tuple[str, Stabmaterial]] = {}
     meldungen = list(modell.meldungen)
-    for stab, (q, material) in modell.paare.items():
-        if material == MATERIAL_DES_QUERSCHNITTS:
+    for stab, (q, kennung) in modell.paare.items():
+        if kennung == MATERIAL_DES_QUERSCHNITTS:
             material, grund = _material_des_querschnitts(querschnitte[q], aufbau)
             if grund:
-                meldungen.append(Meldung(f"{stab} nimmt das Material gemäss Querschnitt, aber {grund}",
-                                         (stab, q), True))
-                continue
+                grund = f"{stab} nimmt das Material gemäss Querschnitt, aber {grund}"
+        else:
+            material, grund = _stabmaterial(materialien[kennung], aufbau, wo)
+            if grund:
+                grund = f"{stab} nimmt das Material {kennung}, aber {grund}"
+        if material is None:
+            meldungen.append(Meldung(grund, (stab, q, kennung), True))
+            continue
         paare[stab] = (q, material)
     return paare, meldungen
 
 
-def _material_des_querschnitts(q: StabquerschnittEintrag, aufbau: Aufbau) -> Tuple[str, str]:
+def _beton(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff:
+    """Ein Beton des Projekts -- einen Verweis ins Leere gibt es nicht."""
+    stoff = aufbau.baustoffe.get(kennung)
+    if stoff is None:
+        raise ProjektFehler(f"{wo}: das Material '{kennung}' gibt es im Projekt nicht.")
+    return stoff
+
+
+def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau,
+                  wo: str) -> Tuple[Optional[Stabmaterial], str]:
     """
-    Die Kennung des Materials, das ein Querschnitt mitbringt: der Beton einer
-    Platte, das eine Material der Flaechen einer Analyse. Sonst leer, und
-    der zweite Teil sagt, warum.
+    Ein Material des Systems, aufgeloest: ein Beton des Projekts oder ein
+    eigenes. Traegt es nicht, ist es ``None``, und der zweite Teil sagt
+    warum -- klein beginnend, er folgt auf ein «aber».
+    """
+    if m.art == "eigen":
+        return Stabmaterial(m.kennung, m.name or m.kennung, E=m.E, rho=m.rho), ""
+    if not m.beton:
+        return None, "bei ihm ist kein Beton gewählt."
+    stoff = _beton(m.beton, aufbau, wo)
+    if stoff.art.value != "beton":
+        return None, (f"«{stoff.name}» ist kein Beton – ein Material des Systems ist ein "
+                      f"Beton des Projekts oder ein eigenes.")
+    return Stabmaterial(m.kennung, stoff.name, stoff=stoff), ""
+
+
+def _material_des_querschnitts(q: StabquerschnittEintrag,
+                               aufbau: Aufbau) -> Tuple[Optional[Stabmaterial], str]:
+    """
+    Das Material, das ein Querschnitt mitbringt: der Beton einer Platte, das
+    eine Material der Flaechen einer Analyse. Sonst ``None``, und der zweite
+    Teil sagt, warum.
     """
     if q.art not in MIT_MATERIAL:
-        return "", (f"«{q.name}» ist {'nach Vorlage' if q.art == 'vorlage' else 'von Hand'} und "
-                    f"bringt keines mit – das tut nur eine Platte oder Querschnittsanalyse.")
+        return None, (f"«{q.name}» ist {'nach Vorlage' if q.art == 'vorlage' else 'von Hand'} und "
+                      f"bringt keines mit – das tut nur eine Platte oder Querschnittsanalyse.")
     if q.art == "platte":
         platte = aufbau.querschnitte.get(q.bezug)
         stoffe = [platte.beton] if platte is not None else []
     else:
         analyse = aufbau.querschnittsanalysen.get(q.bezug)
         if analyse is None:
-            return "", f"die Querschnittsanalyse von «{q.name}» ist noch leer."
+            return None, f"die Querschnittsanalyse von «{q.name}» ist noch leer."
         stoffe = list({id(f.stoff): f.stoff for f in analyse.flaechen if f.stoff is not None}.values())
         if len(stoffe) > 1:
-            return "", (f"die Flächen von «{q.name}» sind aus "
-                        f"{' und '.join(s.name for s in stoffe)} – das Material von Hand wählen.")
+            return None, (f"die Flächen von «{q.name}» sind aus "
+                          f"{' und '.join(s.name for s in stoffe)} – das Material von Hand wählen.")
     if not stoffe:
-        return "", f"«{q.name}» bringt keines mit."
-    return next(k for k, s in aufbau.baustoffe.items() if s is stoffe[0]), ""
+        return None, f"«{q.name}» bringt keines mit."
+    return Stabmaterial(MATERIAL_DES_QUERSCHNITTS, stoffe[0].name, stoff=stoffe[0],
+                        vom_querschnitt=True), ""
