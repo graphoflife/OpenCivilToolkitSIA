@@ -74,6 +74,7 @@ const HILFE = {
       ['Fall', 'ein Lastfall oder eine Kombination -- gerechnet wird jeder Fall'],
       ['M, V, N', 'je Stab der Verlauf, positiv auf der Seite der gestrichelten Faser'],
       ['Verschiebung', 'das verschobene System, überhöht -- je Stab die grösste Durchbiegung gegen die Sehne'],
+      ['Verdrehung', 'je Stab die Verdrehung φ des Querschnitts in mrad, im Gegenuhrzeigersinn positiv'],
       ['Lager', 'die Lagerkräfte auf das Tragwerk'],
       ['Angeschrieben', 'die Werte an den Enden und je Stab die grössten, mit Punkt und Stelle'],
     ],

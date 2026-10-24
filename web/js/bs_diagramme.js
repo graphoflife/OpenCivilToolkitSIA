@@ -8,6 +8,8 @@
  *                 Werte auf der Seite der gestrichelten Faser -- das Moment
  *                 also auf der Zugseite;
  *   Verschiebung  das System verschoben, überhöht -- das unverformte blass;
+ *   Verdrehung    je Stab die Verdrehung φ des Querschnitts, aufgetragen wie
+ *                 ein Verlauf, im Gegenuhrzeigersinn positiv;
  *   Lagerkräfte   je Lager die Kräfte und das Moment auf das Tragwerk.
  *
  * Angeschrieben sind die Werte an den Enden und je Stab die grössten, an
@@ -38,16 +40,24 @@ import { el, leerzustand, svgEl } from './dom.js';
 import { aendern, zustand } from './zustand.js';
 
 const BREITE = 640;
-/** Platz rund um das System -- für die Ordinaten und die Beschriftung, in Bildpunkten. */
-const RAND = 58;
 /** Wie weit die grösste Ordinate vom Stab absteht, in Bildpunkten. */
 const AUSSCHLAG = 44;
+/**
+ * Platz rund um das System, in Bildpunkten: für die grösste Ordinate und
+ * dahinter ihren Wert mit Stelle -- bis 2026-10-24 waren es 58, und der Wert
+ * an einer äusseren Stütze war halb abgeschnitten.
+ */
+const RAND = AUSSCHLAG + 46;
 
-/** Die Verläufe: Feld in den Proben, Einheit, Stellen, Farbe -- der Titel kommt aus dem Katalog. */
+/**
+ * Die Verläufe: Feld in den Proben, Zeichen, Einheit, Stellen, Farbe -- der
+ * Titel kommt aus dem Katalog.
+ */
 const GROESSEN = {
-  N: { schluessel: 'N', einheit: 'kN', stellen: 1, klasse: 'bs-d-n' },
-  V: { schluessel: 'V', einheit: 'kN', stellen: 1, klasse: 'bs-d-v' },
-  M: { schluessel: 'M', einheit: 'kNm', stellen: 1, klasse: 'bs-d-m' },
+  N: { schluessel: 'N', zeichen: 'N', einheit: 'kN', stellen: 1, klasse: 'bs-d-n' },
+  V: { schluessel: 'V', zeichen: 'V', einheit: 'kN', stellen: 1, klasse: 'bs-d-v' },
+  M: { schluessel: 'M', zeichen: 'M', einheit: 'kNm', stellen: 1, klasse: 'bs-d-m' },
+  verdrehung: { schluessel: 'phi', zeichen: 'φ', einheit: 'mrad', stellen: 2, klasse: 'bs-d-phi' },
 };
 
 /** «Kennung|Fall» -> {abdruck, fall, daten, alt, fehler, uhr}: die letzte Antwort je System und Fall. */
@@ -419,7 +429,7 @@ function diagrammKarte(kennung, system, zeile) {
   } else {
     const g = GROESSEN[zeile.groesse];
     svg = verlaufsbild(r, daten, g, extreme);
-    zeilen = (s, x) => [`${g.schluessel} = ${fest(zwischen(s.proben, x, g.schluessel), g.stellen)} ${g.einheit}`];
+    zeilen = (s, x) => [`${g.zeichen} = ${fest(zwischen(s.proben, x, g.schluessel), g.stellen)} ${g.einheit}`];
   }
   const huelle = el('div.bs-diagramm-huelle', {}, [svg]);
   zeigerEinrichten(huelle, svg, r, daten, zeilen);

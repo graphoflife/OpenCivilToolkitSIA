@@ -2127,6 +2127,7 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-d-n.bs-d-flaeche { fill: #1f5fa8; } .bs-d-n.bs-d-kurve { stroke: #1f5fa8; }
 .bs-d-v.bs-d-flaeche { fill: #0d9488; } .bs-d-v.bs-d-kurve { stroke: #0d9488; }
 .bs-d-m.bs-d-flaeche { fill: var(--system); } .bs-d-m.bs-d-kurve { stroke: var(--system); }
+.bs-d-phi.bs-d-flaeche { fill: #b45309; } .bs-d-phi.bs-d-kurve { stroke: #b45309; }
 .bs-d-verformt { fill: none; stroke: var(--blau); stroke-width: 2; }
 .bs-d-knoten { fill: #fff; stroke: var(--blau); stroke-width: 1.2; }
 .bs-d-knoten.ist-unbestimmt { stroke: var(--warn); stroke-dasharray: 2 2; }
@@ -2140,6 +2141,7 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-d-n.bs-d-extrem { fill: #1f5fa8; }
 .bs-d-v.bs-d-extrem { fill: #0d9488; }
 .bs-d-m.bs-d-extrem { fill: var(--system); }
+.bs-d-phi.bs-d-extrem { fill: #b45309; }
 .bs-d-w.bs-d-extrem { fill: var(--blau); }
 .bs-d-stelle { font-size: 10.5px; fill: var(--schrift-matt); }
 .bs-d-marke { fill: var(--blau); stroke: #fff; stroke-width: 1.5; pointer-events: none; }

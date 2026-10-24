@@ -1,5 +1,5 @@
 ---
-erzeugt: 48d14bf9687c
+erzeugt: 766d58931d5e
 art: modul
 tags: [modul]
 ---
@@ -189,8 +189,9 @@ Wo ein Moment, eine Querkraft oder eine Normalkraft im Innern eines Stuecks extr
 def extrem(self, groesse: str) -> Extrem
 ```
 
-Kleinster und groesster Wert von `N`, `V`, `M` oder `w` (der
-Durchbiegung gegen die Sehne), mit Stelle.
+Kleinster und groesster Wert von `N`, `V`, `M`, `w` (der
+Durchbiegung gegen die Sehne) oder `phi` (der Verdrehung des
+Querschnitts, im Gegenuhrzeigersinn), mit Stelle.
 
 ### verlaeufe
 

@@ -107,8 +107,9 @@ MATERIAL_DES_QUERSCHNITTS = "querschnitt"
 MIT_MATERIAL = ("platte", "analyse")
 
 #: Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer
-#: Schnittgroesse, das verschobene System oder die Lagerkraefte.
-DIAGRAMMGROESSEN = ("M", "V", "N", "verschiebung", "lagerkraefte")
+#: Schnittgroesse oder der Verdrehung, das verschobene System oder die
+#: Lagerkraefte.
+DIAGRAMMGROESSEN = ("M", "V", "N", "verschiebung", "verdrehung", "lagerkraefte")
 
 #: Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 LAGERARTEN = {

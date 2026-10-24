@@ -44,6 +44,27 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: Verdrehung in der Statik-Analyse
+
+Wunsch des Benutzers: neben der Verschiebung auch die Verdrehung.
+
+- **Kern:** der Verlauf eines Stabs gibt je Stelle `phi`, die Verdrehung des
+  Querschnitts -- die Ableitung der Biegelinie, im Gegenuhrzeigersinn
+  positiv, für jeden Stab gleich, wie er auch liegt. Die grössten Werte je
+  Stab sucht `extrem("phi")` wie bei M: an den Enden und wo sich die
+  Verdrehung nicht ändert.
+- **Diagramm:** die Stellung «Verdrehung» im Schalter jeder Zeile; das Bild
+  trägt φ in mrad auf wie einen Verlauf, bernsteinfarben, mit den Werten an
+  den Enden und den grössten je Stab.
+- **Geprüft:** am Einfeldträger unter q an den Lagern ±qL³/24EI, in der
+  Mitte null.
+- **Nebenbei:** der Rand um jedes Diagramm war für die grösste Ordinate
+  und ihren Wert zu knapp -- an einer äusseren Stütze stand «.67» statt
+  «-1.67». Jetzt reicht er für beides, mit Stelle (`RAND` in
+  `bs_diagramme.js`).
+
+---
+
 ## 2026-10-24 · Balkensystem: der Lastfall in der Leiste
 
 Wunsch des Benutzers: im Zeichenfenster neben «Last» den Lastfall wählen,

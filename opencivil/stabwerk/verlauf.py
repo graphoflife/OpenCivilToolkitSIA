@@ -191,7 +191,7 @@ class Stabverlauf:
         u, v = teil.u(x), teil.v(x)
         return {"x": x, "N": teil.N(x), "V": teil.V(x), "M": teil.M(x), "u": u, "v": v,
                 "ux": self.c * u - self.s * v, "uz": self.s * u + self.c * v,
-                "w": -(v - self.sehne(x))}
+                "w": -(v - self.sehne(x)), "phi": teil.theta(x)}
 
     def sehne(self, x: float) -> float:
         """Die Querverschiebung der Sehne zwischen den Stabenden -- fuer die relative Durchbiegung."""
@@ -224,8 +224,9 @@ class Stabverlauf:
 
     def extrem(self, groesse: str) -> Extrem:
         """
-        Kleinster und groesster Wert von ``N``, ``V``, ``M`` oder ``w`` (der
-        Durchbiegung gegen die Sehne), mit Stelle.
+        Kleinster und groesster Wert von ``N``, ``V``, ``M``, ``w`` (der
+        Durchbiegung gegen die Sehne) oder ``phi`` (der Verdrehung des
+        Querschnitts, im Gegenuhrzeigersinn), mit Stelle.
         """
         werte = []
         neigung = (self.intervalle[-1].v(self.L) - self.intervalle[0].v(0.0)) / self.L
@@ -236,7 +237,7 @@ class Stabverlauf:
                     teil.theta - Polynom((neigung,))).nullstellen(teil.x0, teil.x1)
                 werte.extend((x, self._werte(teil, x)["w"]) for x in stellen)
                 continue
-            funktion = getattr(teil, groesse)
+            funktion = teil.theta if groesse == "phi" else getattr(teil, groesse)
             stellen = [teil.x0, teil.x1] + funktion.ableitung().nullstellen(teil.x0, teil.x1)
             werte.extend((x, funktion(x)) for x in stellen)
         return Extrem(kleinst=min(werte, key=lambda w: w[1]),

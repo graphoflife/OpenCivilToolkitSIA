@@ -61,7 +61,7 @@ def _fall(befund: Systembefund, fall: Fall) -> Dict[str, Any]:
     staebe = {}
     for name, v in befund.verlaeufe(fall.name).items():
         extrem = {}
-        for groesse, faktor in (("N", kN), ("V", kN), ("M", kN), ("w", mm)):
+        for groesse, faktor in (("N", kN), ("V", kN), ("M", kN), ("w", mm), ("phi", mrad)):
             e = v.extrem(groesse)
             extrem[groesse] = {"kleinst": [e.kleinst[0], e.kleinst[1] * faktor],
                                "groesst": [e.groesst[0], e.groesst[1] * faktor]}
@@ -87,7 +87,8 @@ def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]:
         staebe[stab] = {
             "L": v.L, "c": v.c, "s": v.s, "x_a": v.x_a, "z_a": v.z_a,
             "proben": [{"x": w["x"], "N": w["N"] * kN, "V": w["V"] * kN, "M": w["M"] * kN,
-                        "ux": w["ux"] * mm, "uz": w["uz"] * mm, "w": w["w"] * mm}
+                        "ux": w["ux"] * mm, "uz": w["uz"] * mm, "w": w["w"] * mm,
+                        "phi": w["phi"] * mrad}
                        for w in v.proben(PROBEN_JE_STAB)],
         }
     knoten = {}

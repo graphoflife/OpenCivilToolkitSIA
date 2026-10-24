@@ -90,7 +90,8 @@ _VERSCHMIERUNGEN = {
 #: dem Diagramm -- je Groesse, die die Beschreibung kennt.
 _DIAGRAMMGROESSEN = {
     "M": ("M", "Moment M"), "V": ("V", "Querkraft V"), "N": ("N", "Normalkraft N"),
-    "verschiebung": ("Verschiebung", "Verschiebung"), "lagerkraefte": ("Lager", "Lagerkräfte"),
+    "verschiebung": ("Verschiebung", "Verschiebung"), "verdrehung": ("Verdrehung", "Verdrehung φ"),
+    "lagerkraefte": ("Lager", "Lagerkräfte"),
 }
 #: Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche
 #: es gibt, steht am Feld der Werkstoffwahl.

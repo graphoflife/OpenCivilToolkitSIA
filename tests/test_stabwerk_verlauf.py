@@ -67,6 +67,14 @@ class TestEinfeldtraeger(unittest.TestCase):
     def test_die_biegelinie_trifft_das_ende(self):
         self.assertAlmostEqual(self.v.bei(L)["v"], 0.0, places=15)
 
+    def test_verdrehung(self):
+        """qL³/24EI an den Lagern, links im Uhrzeigersinn -- in der Mitte null."""
+        phi = self.v.extrem("phi")
+        self.assertAlmostEqual(phi.kleinst[1], -q * L ** 3 / (24 * EI), places=12)
+        self.assertAlmostEqual(phi.kleinst[0], 0.0, places=9)
+        self.assertAlmostEqual(phi.groesst[1], q * L ** 3 / (24 * EI), places=12)
+        self.assertAlmostEqual(self.v.bei(L / 2)["phi"], 0.0, places=12)
+
 
 class TestLasten(unittest.TestCase):
     def test_teilstrecke(self):

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5024c0c9e19f
+erzeugt: d93ea14a8954
 art: modul
 tags: [modul]
 ---
@@ -550,7 +550,7 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - `E_EQ_ARTEN = ('analyse',)` – Die Arten eines Querschnitts, die ein E_eq haben: nur der gezeichnete Querschnitt hat eine Momenten-Kruemmungs-Linie mit seiner Bewehrung.
 - `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung im Projekt sein -- die beginnen mit ihrer Vorsilbe und einer Zahl.
 - `MIT_MATERIAL = ('platte', 'analyse')` – Die Arten eines Querschnitts, die ein Material mitbringen: ein Bauteil des Projekts. Einer nach Vorlage oder von Hand ist nur eine Form.
-- `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse, das verschobene System oder die Lagerkraefte.
+- `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 - `Ort = Union[str, Sequence[float]]` – Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.
 
