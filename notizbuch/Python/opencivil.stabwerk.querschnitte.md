@@ -1,5 +1,5 @@
 ---
-erzeugt: d68bee6ab1cd
+erzeugt: c5b79bb070cf
 art: modul
 tags: [modul]
 ---
@@ -133,6 +133,7 @@ def vorlage(schluessel: str) -> Stabvorlage
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.api]]
+- [[opencivil.web.balkendaten]]
 
 ## Formeln aus diesem Modul
 

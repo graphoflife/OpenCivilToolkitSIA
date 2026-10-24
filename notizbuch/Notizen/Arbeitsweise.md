@@ -64,6 +64,8 @@ Kopie der Datei mit der Endung `.mjs`.
 - Keine Auswahllisten (Dropdowns) -- ausser für die Wahl eines Materials
   und eines Eintrags aus dem Projekt, etwa eines Lastfalls oder
   Querschnitts: deren Zahl wächst mit dem Projekt (Benutzer, 2026-10-23).
+  Ausdrücklich gewünscht auch für die Vorlage eines Stabquerschnitts im
+  Balkensystem, mit ihrem Bild daneben (Benutzer, 2026-10-24).
   Eine feste Wahl ist ein Schalter mit ihren Stellungen (`wahlSchalter`,
   `zweiSchalter`, `wahlBlock` in `bausteine.js`), eine Zahl ein Zahlenfeld.
   Ein Schalter steht nie in einem `label`: ein Klick auf dessen Text löste

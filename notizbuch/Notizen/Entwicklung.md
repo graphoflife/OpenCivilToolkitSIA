@@ -44,6 +44,34 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: Querschnitte als Zeilen mit Bild und Fenster
+
+Wunsch des Benutzers: jeder Querschnitt eine kompakte Zeile, links eine
+Vorschau, A und I in der Zeile; ein neuer und ein Klick auf die Vorschau
+öffnen ein Fenster, in dem man wählt, woher der Querschnitt kommt; die
+Vorlage als Auswahlliste mit kleiner Vorschau.
+
+- **Umriss vom Kern:** `balkendaten.umrisse` gibt je Querschnitt seine
+  Polygone in mm -- die Vorlage mit ihren Massen (`Stabvorlage.umriss`), den
+  Streifen b × h einer Platte mit ihren gerechneten Werten, die Polygone
+  einer Analyse samt Aussparungen; Kennwerte von Hand und ein Querschnitt,
+  der nicht geht, keine. Die Antwort `rechnen` trägt sie als `stabumrisse`,
+  auch wenn das System nicht rechnet. Die Oberfläche passt sie nur ins
+  Bild; gezeichnet wird gerade-ungerade, so bleiben Löcher Löcher.
+- **Zeile:** Bild (ein Knopf), Name, A und I vom Kern -- ohne sie die
+  Meldung des Kerns zum Querschnitt --, Herkunft mit Massen, «trägt».
+- **Fenster:** das Fenster über der mittleren Spalte, wie bei den Kapiteln
+  einer Platte (`fenster.js`, Schlüssel `querschnitt:Q1`); es wird mit dem
+  Editor neu gezeichnet und zeigt darum immer den Stand. Darin die Felder,
+  die vorher im Panel standen, die Vorlage als Auswahlliste mit Bild -- auf
+  Wunsch des Benutzers, in [[Arbeitsweise]] als Ausnahme vermerkt -- und
+  das E der Stäbe gemäss Querschnitt.
+- **Nebenbei behoben:** wer «A und I aus» auf Kennwerte stellte, behielt
+  die Masse der Vorlage, und der Kern meldete «einen Kennwert «b» gibt es
+  nicht». Jetzt bekommt eine Vorlage ihre Vorgaben, Kennwerte beginnen leer.
+
+---
+
 ## 2026-10-24 · Balkensystem: eigene Materialien als Tabelle
 
 Wunsch des Benutzers: im Panel «Materialien» zuerst Materialien anlegen,

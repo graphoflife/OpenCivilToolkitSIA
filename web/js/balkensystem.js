@@ -33,6 +33,7 @@ import {
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
+import { fenster, fensterOeffnen } from './fenster.js';
 import { anfuegenKnopf, rechenwahlZeile } from './nachweise.js';
 import {
   ausVorlage, feldangabe, kennwertId, naechsterName, projektAendern, zustand,
@@ -327,10 +328,66 @@ function kennwerte(system, q) {
   return `A = ${text(ids.A)} · I = ${text(ids.I)}${E ? ` · E = ${text(E)}` : ''}`;
 }
 
-function querschnittBlock(system, q, i) {
-  const aendern = (veraenderer) => aendernAn(system.kennung, (s) => veraenderer(s.querschnitte[i], s));
-  const setzen = (feldname) => (wert) => aendern((x) => { x[feldname] = wert; });
+/**
+ * Ein kleines Bild eines Querschnitts: sein Umriss vom Kern, in die Box
+ * eingepasst -- Aussparungen gerade-ungerade gefüllt. Ohne Umriss
+ * (Kennwerte von Hand, ein Querschnitt, der nicht geht) die Kennwerte als
+ * Zeichen.
+ */
+function umrissBild(system, q, breite, hoehe) {
+  const polygone = zustand.loesung?.stabumrisse?.[system.kennung]?.[q.kennung] || [];
+  const svg = svgEl('svg', { viewBox: `0 0 ${breite} ${hoehe}`, width: breite, height: hoehe, class: 'bs-umriss', 'aria-hidden': 'true' });
+  const punkte = polygone.flat();
+  if (!punkte.length) {
+    const t = svgEl('text', { x: breite / 2, y: hoehe / 2 + 4, class: 'bs-umriss-text' });
+    t.textContent = q.art === 'kennwerte' ? 'A, I' : '?';
+    svg.append(t);
+    return svg;
+  }
+  const ys = punkte.map((p) => p[0]);
+  const zs = punkte.map((p) => p[1]);
+  const [y0, y1, z0, z1] = [Math.min(...ys), Math.max(...ys), Math.min(...zs), Math.max(...zs)];
+  const rand = 3;
+  const m = Math.min((breite - 2 * rand) / Math.max(y1 - y0, 1e-9), (hoehe - 2 * rand) / Math.max(z1 - z0, 1e-9));
+  const [oy, oz] = [(breite - m * (y1 - y0)) / 2, (hoehe - m * (z1 - z0)) / 2];
+  const d = polygone.map((poly) => `M${poly.map(([y, z]) => `${(oy + m * (y - y0)).toFixed(1)} ${(hoehe - oz - m * (z - z0)).toFixed(1)}`).join(' L')} Z`).join(' ');
+  svg.append(svgEl('path', { d, 'fill-rule': 'evenodd', class: 'bs-umriss-flaeche' }));
+  return svg;
+}
+
+/** Die Masse einer Vorlage mit ihren Vorgaben, aus dem Katalog. */
+function vorgabenDer(schluessel) {
+  return Object.fromEntries((VORLAGEN().find((v) => v.schluessel === schluessel)?.masse || [])
+    .map((m) => [m.schluessel, m.vorgabe]));
+}
+
+/** Woher ein Querschnitt kommt, in Worten -- mit den Massen einer Vorlage. */
+function herkunftText(q) {
+  if (q.art === 'vorlage') {
+    const vorlage = VORLAGEN().find((v) => v.schluessel === q.vorlage);
+    const masse = (vorlage?.masse || []).map((m) => `${m.symbol} ${q.masse?.[m.schluessel] ?? m.vorgabe}`);
+    return `${vorlage?.name || q.vorlage} · ${masse.join(' · ')} mm`;
+  }
+  if (q.art === 'kennwerte') return 'Kennwerte von Hand';
+  const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
+  const bezug = liste.find((x) => x.kennung === q.bezug);
+  return `${q.art === 'platte' ? 'Platte' : 'Analyse'} ${bezug ? `«${bezug.name}»` : '– nicht gewählt –'}`;
+}
+
+/** Der Schlüssel des Fensters eines Querschnitts. */
+const fensterVon = (kennung) => `querschnitt:${kennung}`;
+
+/**
+ * Ein Querschnitt als kompakte Zeile (Benutzer, 2026-10-24): links das
+ * Bild -- ein Klick öffnet ihn im Fenster --, daneben Name, A und I und
+ * woher er kommt.
+ */
+function querschnittZeile(system, q, i) {
   const benutzt = system.linien.filter((l) => l.querschnitt === q.kennung).map((l) => l.kennung);
+  // Ohne A und I sagt die Meldung des Kerns, was dem Querschnitt fehlt.
+  const werte = kennwerte(system, q);
+  const fehler = (zustand.loesung?.balkensysteme?.[system.kennung]?.meldungen || [])
+    .find((m) => m.fehler && m.elemente.includes(q.kennung));
   const weg = () => {
     if (benutzt.length) {
       melden(`«${q.name}» trägt noch ${benutzt.join(', ')}.`, true);
@@ -338,34 +395,71 @@ function querschnittBlock(system, q, i) {
     }
     aendernAn(system.kennung, (s) => { s.querschnitte.splice(i, 1); });
   };
-  // Woher A und I kommen, als Schalter unter dem Namen: neben ihm fänden
-  // vier Stellungen keinen Platz.
-  const zeilen = [
-    el('div.bs-querschnitt-kopf', {}, [
-      el('input', {
+  return el('div.bs-qzeile', {}, [
+    el('button.bs-qbild', {
+      type: 'button', title: 'Bearbeiten: woher A und I kommen, Masse',
+      on: { click: () => fensterOeffnen(fensterVon(q.kennung)) },
+    }, [umrissBild(system, q, 44, 44)]),
+    el('div.bs-qmitte', {}, [
+      el('input.bs-qname', {
         type: 'text', value: q.name, title: 'Name des Querschnitts',
-        on: { change: (e) => setzen('name')(e.target.value) },
+        on: { change: (e) => aendernAn(system.kennung, (s) => { s.querschnitte[i].name = e.target.value; }) },
       }),
-      el('button.weg', { type: 'button', text: '×', title: 'Querschnitt löschen', on: { click: weg } }),
+      werte ? el('div.bs-kennwerte', { text: werte })
+        : el('div.bs-qfehler', { text: fehler?.text || 'A und I: –', title: fehler?.text || '' }),
+      el('div.bs-benutzt', { text: `${herkunftText(q)} · ${benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab'}` }),
     ]),
+    el('button.weg', { type: 'button', text: '×', title: 'Querschnitt löschen', on: { click: weg } }),
+  ]);
+}
+
+/**
+ * Das Fenster eines Querschnitts -- beim Anlegen und mit einem Klick auf
+ * sein Bild (Benutzer, 2026-10-24): woher A und I kommen, die Vorlage als
+ * Auswahlliste mit ihrem Bild und den Massen, die Kennwerte, die Platte
+ * oder Analyse -- und das E der Stäbe «gemäss Querschnitt».
+ */
+function querschnittFenster(system, kennung) {
+  const i = system.querschnitte.findIndex((x) => x.kennung === kennung);
+  if (i < 0) return null;
+  const q = system.querschnitte[i];
+  const aendern = (veraenderer) => aendernAn(system.kennung, (s) => veraenderer(s.querschnitte[i], s));
+  const setzen = (feldname) => (wert) => aendern((x) => { x[feldname] = wert; });
+  const zeilen = [
+    feld('Name', el('input', {
+      type: 'text', value: q.name, title: 'Name des Querschnitts',
+      on: { change: (e) => setzen('name')(e.target.value) },
+    })),
     wahlBlock('A und I aus', wahlSchalter({
       werte: QUERSCHNITTSARTEN().map((x) => ({ wert: x.wert, beschriftung: x.kurz, titel: x.beschriftung })),
-      gewaehlt: q.art, titel: 'Woher A und I kommen', setzen: setzen('art'),
+      gewaehlt: q.art, titel: 'Woher A und I kommen',
+      // Die Masse gehören zur Art: eine Vorlage bekommt ihre Vorgaben,
+      // Kennwerte beginnen leer -- bis 2026-10-24 blieben b und h stehen,
+      // und «einen Kennwert «b» gibt es nicht» war die Folge.
+      setzen: (w) => aendern((x) => {
+        x.art = w;
+        if (w === 'vorlage') x.masse = vorgabenDer(x.vorlage);
+        if (w === 'kennwerte') x.masse = {};
+      }),
     })),
   ];
   if (q.art === 'vorlage') {
     const vorlage = VORLAGEN().find((v) => v.schluessel === q.vorlage) || VORLAGEN()[0];
-    zeilen.push(wahlBlock('Vorlage', wahlSchalter({
-      werte: VORLAGEN().map((v) => ({ wert: v.schluessel, beschriftung: v.name })),
-      gewaehlt: q.vorlage,
-      klasse: '.ist-umbruch',
-      setzen: (w) => aendern((x) => {
-        x.vorlage = w;
-        // Die Masse der neuen Vorlage, mit ihren Vorgaben -- die alten passten nicht.
-        x.masse = Object.fromEntries((VORLAGEN().find((v) => v.schluessel === w)?.masse || [])
-          .map((m) => [m.schluessel, m.vorgabe]));
-      }),
-    })));
+    // Die Vorlage als Auswahlliste, daneben ihr Bild mit den Massen dieses
+    // Querschnitts (Benutzer, 2026-10-24).
+    zeilen.push(el('div.bs-qvorlage', {}, [
+      feld('Vorlage', auswahl({
+        werte: VORLAGEN().map((v) => ({ wert: v.schluessel, beschriftung: v.name })),
+        gewaehlt: q.vorlage,
+        titel: 'Die Form des Querschnitts',
+        beiAenderung: (w) => aendern((x) => {
+          x.vorlage = w;
+          // Die Masse der neuen Vorlage, mit ihren Vorgaben -- die alten passten nicht.
+          x.masse = vorgabenDer(w);
+        }),
+      })),
+      umrissBild(system, q, 120, 90),
+    ]));
     for (const m of vorlage?.masse || []) {
       zeilen.push(feld(m.beschriftung, zahlfeld({
         wert: q.masse?.[m.schluessel] ?? m.vorgabe, schritt: 10, min: 0,
@@ -381,11 +475,14 @@ function querschnittBlock(system, q, i) {
     zeilen.push(kennwert('A', 'Fläche A', 'mm²'), kennwert('I', 'Trägheitsmoment I', '10⁶ mm⁴'));
   } else {
     const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
-    zeilen.push(feld(q.art === 'platte' ? 'Platte' : 'Analyse', auswahl({
-      werte: [{ wert: '', beschriftung: '– wählen –' }, ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
-      gewaehlt: q.bezug,
-      beiAenderung: setzen('bezug'),
-    })));
+    zeilen.push(el('div.bs-qvorlage', {}, [
+      feld(q.art === 'platte' ? 'Platte' : 'Analyse', auswahl({
+        werte: [{ wert: '', beschriftung: '– wählen –' }, ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
+        gewaehlt: q.bezug,
+        beiAenderung: setzen('bezug'),
+      })),
+      umrissBild(system, q, 120, 90),
+    ]));
   }
   // Welches E ein Stab hat, der das Material dieses Querschnitts nimmt --
   // nur, wenn einer das tut, und nur, wo es mehr als E₀ gibt: E_eq hat nur
@@ -416,22 +513,37 @@ function querschnittBlock(system, q, i) {
   }
   const werte = kennwerte(system, q);
   if (werte) zeilen.push(el('p.bs-kennwerte', { text: werte }));
-  if (benutzt.length) zeilen.push(el('p.bs-benutzt', { text: `trägt ${benutzt.join(', ')}` }));
-  return el('div.bs-querschnitt', {}, zeilen);
+  return fenster({
+    titel: 'Querschnitt', zeichen: 'analyse', zusatz: `${system.name} · ${q.name}`,
+    hilfe: erklaerung(HILFE.querschnitte.zeilen, HILFE.querschnitte.formel),
+    inhalt: zeilen,
+  });
 }
 
+/** Die Fenster des Systems, nach ihrem Schlüssel -- bisher die der Querschnitte. */
+export function balkensystemFenster(system, schluessel) {
+  const [art, kennung] = String(schluessel).split(':');
+  return art === 'querschnitt' ? querschnittFenster(system, kennung) : null;
+}
+
+/** Je Querschnitt eine Zeile; ein neuer öffnet gleich sein Fenster. */
 function querschnitteGruppe(system) {
-  const neu = () => aendernAn(system.kennung, (s) => {
-    s.querschnitte.push({
-      ...structuredClone(zustand.katalog.neue_zeilen.stabquerschnitt),
-      kennung: naechsteKennung(s.querschnitte, 'Q'), name: naechsterName('Querschnitt', s.querschnitte),
+  const neu = () => {
+    const kennung = naechsteKennung(system.querschnitte, 'Q');
+    aendernAn(system.kennung, (s) => {
+      s.querschnitte.push({
+        ...structuredClone(zustand.katalog.neue_zeilen.stabquerschnitt),
+        kennung, name: naechsterName('Querschnitt', s.querschnitte),
+      });
     });
-  });
+    fensterOeffnen(fensterVon(kennung));
+  };
   return panel({
     schluessel: 'balkensystem/Querschnitte', titel: 'Querschnitte',
     zusatz: erklaerung(HILFE.querschnitte.zeilen, HILFE.querschnitte.formel),
   }, [
-    ...system.querschnitte.map((q, i) => querschnittBlock(system, q, i)),
+    ...(system.querschnitte.length ? system.querschnitte.map((q, i) => querschnittZeile(system, q, i))
+      : [el('p.bs-leer', { text: 'Noch kein Querschnitt.' })]),
     el('button.knopf.knopf-klein', { type: 'button', text: '+ Querschnitt', on: { click: neu } }),
   ]);
 }

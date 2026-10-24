@@ -785,6 +785,25 @@ class TestMaterialDesQuerschnitts(unittest.TestCase):
                         meldungen)
 
 
+class TestUmrisse(unittest.TestCase):
+    """Je Querschnitt sein Umriss für das Bildchen in seiner Zeile (Benutzer, 2026-10-24)."""
+
+    def test_vorlage_platte_analyse_und_kennwerte(self):
+        p = traeger()
+        s = p.balkensysteme[0]
+        s.querschnitt_aus("Streifen", "platte", p.platte("Decke", h=250))
+        s.querschnitt_aus("Unterzug", "analyse", p.analyse("Unterzug"))
+        s.querschnitt_mit_kennwerten("Von Hand", A=1000.0, I=10.0)
+        s.querschnitt("Unmöglich", "rechteck", h=0.0)
+        umrisse = dienst.bearbeite("rechnen", {"projekt": p.als_dict()}).daten["stabumrisse"]["r1"]
+        # Das Rechteck 300 × 600 mit seinen Massen, der Streifen 1000 × 250 der Platte.
+        self.assertEqual(umrisse["Q1"], [[[0.0, 0.0], [300.0, 0.0], [300.0, 600.0], [0.0, 600.0]]])
+        self.assertEqual(umrisse["Q2"], [[[0.0, 0.0], [1000.0, 0.0], [1000.0, 250.0], [0.0, 250.0]]])
+        self.assertEqual([len(polygon) for polygon in umrisse["Q3"]], [4])
+        # Kennwerte von Hand haben keine Form, ein unmöglicher Querschnitt auch nicht.
+        self.assertEqual((umrisse["Q4"], umrisse["Q5"]), ([], []))
+
+
 class TestEeq(unittest.TestCase):
     """
     E_eq aus einer Querschnittsanalyse bei N und M -- an derselben Stelle wie

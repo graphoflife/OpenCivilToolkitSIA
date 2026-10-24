@@ -2105,8 +2105,19 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-material-art { font-size: 11px; color: var(--schrift-zart); }
 .bs-gesperrt { color: var(--schrift-matt); }
 .bs-knopfreihe { display: flex; flex-wrap: wrap; gap: 6px; }
-.bs-querschnitt { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
-.bs-querschnitt-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+/* Ein Querschnitt als Zeile (Benutzer, 2026-10-24): links sein Bild --
+   ein Knopf, der ihn im Fenster öffnet --, daneben Name, A und I. */
+.bs-qzeile { display: grid; grid-template-columns: 48px minmax(0, 1fr) 22px; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--rand); }
+.bs-qbild { padding: 1px; width: 48px; height: 48px; border: 1px solid var(--rand); border-radius: 6px; background: var(--flaeche); cursor: pointer; }
+.bs-qbild:hover { border-color: var(--blau); background: var(--blau-hell); }
+.bs-qmitte { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bs-qname { font-weight: 600; }
+.bs-qmitte .bs-kennwerte, .bs-qmitte .bs-benutzt, .bs-qfehler { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bs-qfehler { font-size: 12px; color: var(--warn); }
+.bs-qvorlage { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.bs-umriss { display: block; }
+.bs-umriss-flaeche { fill: var(--blau-hell); stroke: var(--blau); stroke-width: 1.2; }
+.bs-umriss-text { font-size: 11px; fill: var(--schrift-matt); text-anchor: middle; }
 .bs-kennwerte { margin: 0; font-size: 12px; font-weight: 600; color: var(--stahl); }
 .bs-benutzt { margin: 0; font-size: 11px; color: var(--schrift-zart); }
 /* Die Spalten fest: so stehen die Namen gleich breit untereinander, auch

@@ -445,7 +445,11 @@ stehen an der Linie nur solche Querschnitte zur Wahl. Mit dem Material
 gemäss Querschnitt rechnet ein Stab mit E₀ = E_cm oder -- aus einer
 Analyse -- mit E_eq bei N und M, wie ihre Linie M–E_eq es dort hat, für EA
 und EI; der Schalter dafür steht am Querschnitt, sobald eine Linie ihn so
-nimmt. Darunter die Querschnitte und die Lastfälle. Ein neues System bringt
+nimmt. Darunter die Querschnitte, je einer eine Zeile: links sein Bild,
+daneben Name, A und I und woher er kommt. Ein Klick auf das Bild -- und ein
+neuer Querschnitt gleich -- öffnet sein Fenster: woher A und I kommen, die
+Vorlage als Auswahlliste mit ihrem Bild und den Massen, die Kennwerte, die
+Platte oder Analyse und, wo nötig, das E. Dann die Lastfälle. Ein neues System bringt
 die Lastfälle Eigengewicht, Auflast und Nutzlast mit und die Kombinationen
 GZT (1.35 / 1.35 / 1.5) und GZG (je 1.0). Das Eigengewicht kommt von
 selbst: je Stab ρ · g · A mit g = 10 m/s², beim Beton mit der Dichte des

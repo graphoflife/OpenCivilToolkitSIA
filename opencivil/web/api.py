@@ -586,6 +586,10 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
         ergebnis["balkensysteme"] = endlich({
             kennung: balkendaten.uebersicht(loesung.befunde.get(system.rechnung.id))
             for kennung, system in aufbau.balkensysteme.items()})
+        # Je Querschnitt eines Systems sein Umriss -- auch wenn es nicht rechnet.
+        ergebnis["stabumrisse"] = endlich({
+            kennung: balkendaten.umrisse(system, aufbau, loesung)
+            for kennung, system in aufbau.balkensysteme.items()})
         # Je Fundament, was die Situationszeichnung vom Kern braucht.
         ergebnis["grundbrueche"] = endlich(grundbruchdaten.situationen(aufbau, loesung))
         ergebnis["setzungen"] = endlich(setzungsdaten.situationen(aufbau, loesung))

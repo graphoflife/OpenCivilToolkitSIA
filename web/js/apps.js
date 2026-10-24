@@ -22,7 +22,7 @@ import { materialAnlegen, materialKopieren } from './materialwahl.js';
 import { materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
-import { balkensystemEditor } from './balkensystem.js';
+import { balkensystemEditor, balkensystemFenster } from './balkensystem.js';
 import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
 import { skriptZeichnen } from './python.js';
@@ -246,6 +246,7 @@ const SYSTEM = bauteil('balkensystem', {
   }),
   vergessen: systemfensterVergessen,
   editor: balkensystemEditor,
+  fenster: balkensystemFenster,
 });
 
 /** Ein Fundament mit den Vorgaben des Kerns und einer Kombination -- ohne Material. */
