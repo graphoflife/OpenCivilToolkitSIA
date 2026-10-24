@@ -44,6 +44,22 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Querschnitt: Materialien pastell
+
+Wunsch des Benutzers: im gezeichneten Querschnitt Beton pastellgrün,
+Betonstahl pastellrot, Schubwände pastellgelb, Baustahl pastellblau -- den
+es noch nicht gibt.
+
+- Eigene Farbmarken je Material, eine helle Fläche und eine kräftigere
+  Linie (`--mat-beton`, `--mat-stahl`, `--mat-wand`, `--mat-baustahl`, je
+  mit `-linie`). `--beton` und `--stahl` bleiben: sie färben auch die Köpfe
+  der Tafeln, und die sollen nicht grün und rot werden.
+- Gilt für Zeichnung und Vorlagen des Querschnitts, die Schraffur der
+  Zellen (gelb wie die Wände) und die Zeilen «Rechenwerte je Material» --
+  dort steht dasselbe Material in derselben Farbe.
+
+---
+
 ## 2026-10-24 · Balkensystem: E_eq der Querschnittsanalyse bei N und M
 
 Letzte Etappe des neuen Balkensystems. Entschieden (Rückfrage): E₀ ist E_cm

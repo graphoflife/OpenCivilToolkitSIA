@@ -3,7 +3,9 @@
 
    Ruhige Grundfläche, farbige Leisten. Die Farbe trägt eine Aussage: Beton
    grau, Betonstahl kupfer, Platte blau, Querschnittsanalyse türkis,
-   erfüllt grün, nicht erfüllt rot,
+   erfüllt grün, nicht erfüllt rot; die Materialien im gezeichneten
+   Querschnitt pastell -- Beton grün, Betonstahl rot, Schubwände gelb,
+   Baustahl blau;
    überschrieben ocker; Tragrichtung x orange, y gelb, beide und die Bügel
    violett; Ja/Nein-Schalter grün und rot. Wo nichts auszusagen ist, bleibt
    es unbunt.
@@ -50,6 +52,17 @@
 
   --beton:        #7b8794;
   --stahl:        #b8622a;
+  /* Die Materialien im gezeichneten Querschnitt (Benutzer, 2026-10-24):
+     je eine helle Fläche und eine kräftigere Linie derselben Farbe. Baustahl
+     gibt es noch nicht -- seine Farbe steht schon fest. */
+  --mat-beton:          #d5ebd1;
+  --mat-beton-linie:    #5e9b62;
+  --mat-stahl:          #f2a5a5;
+  --mat-stahl-linie:    #b5474a;
+  --mat-wand:           #fbe7a0;
+  --mat-wand-linie:     #c49a1c;
+  --mat-baustahl:       #c2daf3;
+  --mat-baustahl-linie: #4b7db5;
   --platte:       var(--blau);
   --analyse:      #0d9488;
   --system:       #7048e8;
@@ -1470,8 +1483,8 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   padding-left: 8px; border-left: 3px solid var(--rand-stark);
 }
 .werkstoffzeile > .schalter { justify-self: start; grid-column: 2; }
-.werkstoffzeile.ist-beton { border-left-color: var(--beton); }
-.werkstoffzeile.ist-stahl { border-left-color: var(--stahl); }
+.werkstoffzeile.ist-beton { border-left-color: var(--mat-beton-linie); }
+.werkstoffzeile.ist-stahl { border-left-color: var(--mat-stahl-linie); }
 .werkstoffname {
   font-size: 12.5px; font-weight: 600;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -1689,7 +1702,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 .cad-vorlagenskizze.ist-alt { opacity: .4; }
 .cad-skizze { display: block; max-width: 100%; height: auto; }
-.cad-skizze-wand { stroke: var(--beide); stroke-opacity: .3; }
+.cad-skizze-wand { stroke: var(--mat-wand-linie); stroke-opacity: .5; }
 .cad-wahlen { display: flex; flex-wrap: wrap; gap: 4px 14px; }
 .cad-wahl { display: inline-flex; align-items: center; gap: 5px; }
 
@@ -1713,34 +1726,35 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   padding: 0 3px; border: 1px solid var(--rand); border-radius: 3px;
 }
 
-/* Die Zeichnung. Farben wie überall: Beton grau, Stahl kupfer, Bügel und
-   Schubwände violett, gewählt blau, eine Meldung rot. Was beim Zeichnen
-   hilft -- Fang, Mitte, die gewählte Kante --, ist orange. */
+/* Die Zeichnung. Die Materialien pastell: Beton grün, Stahl rot,
+   Schubwände gelb (Benutzer, 2026-10-24); gewählt blau, eine Meldung rot.
+   Was beim Zeichnen hilft -- Fang, Mitte, die gewählte Kante --, ist
+   orange. */
 .cad-raster-fein { stroke: #f0f2f6; stroke-width: 1; }
 .cad-raster-grob { stroke: #e0e5ec; stroke-width: 1; }
 .cad-achse { stroke: #b9c3d1; stroke-width: 1; }
 .cad-achstext { font-size: 11px; font-weight: 600; fill: var(--schrift-zart); }
-.cad-beton { fill: #d8dde3; stroke: var(--beton); stroke-width: 1.3; }
-.cad-loch { fill: #fff; stroke: var(--beton); stroke-width: 1.3; stroke-dasharray: 6 3; }
+.cad-beton { fill: var(--mat-beton); stroke: var(--mat-beton-linie); stroke-width: 1.3; }
+.cad-loch { fill: #fff; stroke: var(--mat-beton-linie); stroke-width: 1.3; stroke-dasharray: 6 3; }
 .cad-zelle { stroke: none; }
-.cad-schraffurstrich { stroke: var(--beide); stroke-opacity: .35; stroke-width: 1.2; }
-.cad-wand { fill: var(--beide); fill-opacity: .16; stroke: var(--beide); stroke-opacity: .55; stroke-width: 1; }
-.cad-wandachse { fill: none; stroke: var(--beide); stroke-width: 1.6; stroke-dasharray: 9 3 2 3; }
+.cad-schraffurstrich { stroke: var(--mat-wand-linie); stroke-opacity: .5; stroke-width: 1.2; }
+.cad-wand { fill: var(--mat-wand); fill-opacity: .85; stroke: var(--mat-wand-linie); stroke-opacity: .8; stroke-width: 1; }
+.cad-wandachse { fill: none; stroke: var(--mat-wand-linie); stroke-width: 1.6; stroke-dasharray: 9 3 2 3; }
 .cad-hilfslinie { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 2 3; }
 /* Die Überdeckung: das gerückte Polygon, grün gepunktet -- eine Hilfe zum
    Zeichnen wie die Hilfslinie, aber von ihr zu unterscheiden. */
 .cad-ueberdeckung {
   fill: none; stroke: #2b8a3e; stroke-width: 1.6; stroke-dasharray: 1.5 3.5; stroke-linecap: round;
 }
-.cad-linie { fill: none; stroke: var(--stahl); stroke-width: 1; stroke-dasharray: 3 3; }
-.cad-linie-flaeche { fill: none; stroke: var(--stahl); stroke-width: 4; stroke-linecap: round; }
-.cad-stab { fill: var(--stahl); stroke: #7a3d14; stroke-width: .8; }
+.cad-linie { fill: none; stroke: var(--mat-stahl-linie); stroke-width: 1; stroke-dasharray: 3 3; }
+.cad-linie-flaeche { fill: none; stroke: var(--mat-stahl-linie); stroke-opacity: .75; stroke-width: 4; stroke-linecap: round; }
+.cad-stab { fill: var(--mat-stahl); stroke: var(--mat-stahl-linie); stroke-width: .8; }
 .cad-geist { opacity: .45; }
 .cad-beschriftung {
   font-size: 11px; fill: var(--schrift-matt);
   paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
 }
-.cad-linientext { fill: var(--stahl); font-weight: 600; }
+.cad-linientext { fill: var(--mat-stahl-linie); font-weight: 600; }
 .cad-mass { fill: none; stroke: var(--schrift-zart); stroke-width: 1; }
 .cad-masstext { font-size: 11px; fill: var(--schrift-matt); }
 .cad-schwerpunkt circle { fill: #fff; stroke: var(--schrift); stroke-width: 1.2; }

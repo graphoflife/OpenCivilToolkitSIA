@@ -387,7 +387,7 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
       Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit
-      eigenem G), Holz (wie spröd Zug und Druck sind, legen wir vorher fest),
+      eigenem G; in der Zeichnung pastellblau, `--mat-baustahl`), Holz (wie spröd Zug und Druck sind, legen wir vorher fest),
       weitere Nachweise (Wände ohne Bügel).
 - [ ] **Die genaue Linie der Platte über den neuen Fächer.** Die Platte hat
       noch ihren eigenen `dehnungsfaecher`; der Fächer der Analyse kann
