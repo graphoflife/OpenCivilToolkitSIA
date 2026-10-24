@@ -713,10 +713,11 @@ class Projekt(Beschreibung):
                       analyse: QuerschnittsanalyseEintrag) -> None:
         """
         Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-        Querschnitt, einer mit E von Hand; Beton und Stahl, ein Stab mit dem
-        Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
-        keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager
-        mit und ohne Stab; jede Lastart, auch projiziert.
+        Querschnitt, einer mit E von Hand, einer mit E_eq; Beton und Stahl,
+        ein Stab mit dem Material gemäss Querschnitt; Gelenke und ein
+        Knoten, dessen Drehung keine Steifigkeit hat; Federn am Lager,
+        Bettung, feste Linienlager mit und ohne Stab; jede Lastart, auch
+        projiziert.
         """
         s = p.balkensystem("Alles einmal")
         q = {
@@ -732,7 +733,7 @@ class Projekt(Beschreibung):
         }
         s.querschnitt_mit_kennwerten("Von Hand", A=15000.0, I=120.0)
         s.querschnitt_aus("Deckenstreifen", "platte", decke)
-        kasten = s.querschnitt_aus("Kasten", "analyse", analyse)
+        kasten = s.querschnitt_aus("Kasten", "analyse", analyse, E_eq={"N": -100.0, "M": 200.0})
         gebettet = s.linie((0, 0), (8, 0), querschnitt=q["rechteck"], material="b1",
                            quer="feder", k_quer=20000.0)
         stuetze = s.linie((8, 0), (8, 3), querschnitt=q["kreis"], material="b1")

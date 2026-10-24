@@ -44,6 +44,32 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: E_eq der Querschnittsanalyse bei N und M
+
+Letzte Etappe des neuen Balkensystems. Entschieden (Rückfrage): E₀ ist E_cm
+-- das gibt «vom Material» schon, eine eigene Stellung braucht es nicht;
+N und M stehen am Querschnitt; ein E für EA und EI.
+
+- **Beschreibung:** dritte Stellung `e_eq` am Querschnitt, nur bei einer
+  Analyse (`E_EQ_ARTEN`); dazu `eq` mit N, M und den Rechenwerten einer
+  Spannung-Dehnung-Analyse (φ, Werte, Rechenart).
+- **Gerechnet im Rechenwerk**, nicht in der Auswertung danach -- es geht in
+  die Rechnung ein. `modul_bei` in `spannungsanalyse/modul.py` nimmt das Paar
+  der Analyse (`schnittpaar`) und dieselbe Regel wie die Linie M–E_eq:
+  ungerissen bis M_Riss(N), darüber gerissen, gezählt ab χ₀; die Formel
+  selbst ist die der `Modullinie`. Ein Test hält es gegen die Linie: am
+  Anfang gleich, bei 80 kNm zwischen ihren beiden Punkten daneben.
+- **Scheitern ohne das Projekt aufzuhalten:** die Suche (`ModulProzedur`)
+  hat keine Ausgabe, nur einen Befund. E kommt aus ihm (`ModulAusBefund`)
+  und ist nur anwendbar, wo sie einen Modul fand; sonst fehlen E, EA und EI,
+  die Rechnung des Systems liest den Befund und meldet «kein E_eq – …».
+  Wie ein bewegliches System: das System rechnet nicht, der Rest schon.
+- **Generisch geblieben:** das Stabwerk kennt die Analyse nicht. Der Aufbau
+  hängt eine `Modulfrage` an den Querschnitt, sie baut ihre Berechnungen
+  selbst ein (`einbauen`).
+
+---
+
 ## 2026-10-23 · Balkensystem: Statik-Analyse mit «+ Diagramm»
 
 Wunsch des Benutzers: wie in der Spannung-Dehnung-Analyse eine

@@ -44,12 +44,14 @@ from __future__ import annotations
 import copy
 import math
 from dataclasses import dataclass, field, replace
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import (
     KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, N_PRO_MM2, PROZENT, Groesse,
 )
+from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.projekt.eintraege import Beschreibung
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.stabwerk import querschnitte as qs
@@ -87,9 +89,13 @@ QUERSCHNITTSARTEN = ("vorlage", "kennwerte", "platte", "analyse")
 KENNWERTE = ("A", "I")
 
 #: Woher der E-Modul eines Querschnitts kommt: vom Material des Stabs -- E_cm
-#: beim Beton, E_s beim Stahl -- oder als Zahl von Hand, unabhaengig vom
-#: Material (Benutzer, 2026-10-23).
-E_MODULE = ("material", "zahl")
+#: beim Beton, E_s beim Stahl --, als Zahl von Hand, unabhaengig vom Material,
+#: oder als E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-23).
+E_MODULE = ("material", "zahl", "e_eq")
+
+#: Die Arten eines Querschnitts, die ein E_eq haben: nur der gezeichnete
+#: Querschnitt hat eine Momenten-Kruemmungs-Linie mit seiner Bewehrung.
+E_EQ_ARTEN = ("analyse",)
 
 #: Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der
 #: Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine
@@ -228,6 +234,28 @@ class KnotenlastEintrag(Beschreibung):
 
 
 @dataclass
+class ModulEintrag(Beschreibung):
+    """
+    Wie das E_eq eines Querschnitts aus einer Querschnittsanalyse entsteht:
+    bei ``N`` und ``M``, Zug positiv und ``M > 0`` mit Zug unten -- auf der
+    gestrichelten Faser des Stabs. Gerechnet wie eine Momenten-Kruemmungs-
+    Linie der Analyse, mit Kriechzahl, Wertesatz und Rechenart wie dort
+    (Benutzer, 2026-10-23).
+    """
+
+    N: float = bereich(0.0, heisst="N für E_eq", einheit=KN)
+    M: float = bereich(0.0, heisst="M für E_eq", einheit=KNM)
+    kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
+    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)
+
+    @property
+    def wahl(self) -> Rechenwahl:
+        return Rechenwahl(kriechzahl=self.kriechzahl, satz=self.werkstoffsatz,
+                          art=self.rechenart)
+
+
+@dataclass
 class StabquerschnittEintrag(Beschreibung):
     """
     Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, mit Kennwerten
@@ -244,10 +272,16 @@ class StabquerschnittEintrag(Beschreibung):
     masse: Dict[str, float] = field(default_factory=dict)
     bezug: str = ""
     e_modul: str = einer_von(E_MODULE, "material")
-    """Woher E kommt: ``material`` -- vom Material des Stabs -- oder ``zahl``, dann ``E``."""
+    """
+    Woher E kommt: ``material`` -- vom Material des Stabs --, ``zahl``, dann
+    ``E``, oder ``e_eq``, dann wie ``eq`` sagt.
+    """
 
     E: float = bereich(30000.0, heisst="E-Modul E", einheit=N_PRO_MM2, ueber=0.0)
     """Der E-Modul von Hand, N/mm² -- er gilt nur bei ``e_modul = "zahl"``."""
+
+    eq: ModulEintrag = field(default_factory=ModulEintrag)
+    """Wie das E_eq entsteht -- es gilt nur bei ``e_modul = "e_eq"``."""
 
     @property
     def E_von_hand(self) -> Optional[float]:
@@ -267,6 +301,9 @@ class StabquerschnittEintrag(Beschreibung):
         Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
         2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
         """
+        if self.e_modul == "e_eq" and self.art not in E_EQ_ARTEN:
+            return ("ein E_eq gibt es nur bei einem Querschnitt aus einer "
+                    "Querschnittsanalyse – nur er hat eine Momenten-Krümmungs-Linie.")
         if self.art == "vorlage":
             vorlage = self.stabvorlage()
             fremd = [k for k in self.masse if k not in vorlage.vorgaben()]
@@ -623,14 +660,23 @@ class BalkensystemEintrag(Beschreibung):
             name=name, vorlage=vorlage, masse=dict(masse)), E)
 
     def querschnitt_aus(self, name: str, art: str, bezug: Any, *,
-                        E: Optional[float] = None) -> StabquerschnittEintrag:
-        """Ein Querschnitt aus einer Platte (``platte``) oder einer Querschnittsanalyse (``analyse``)."""
+                        E: Optional[float] = None,
+                        E_eq: Optional[Mapping[str, Any]] = None) -> StabquerschnittEintrag:
+        """
+        Ein Querschnitt aus einer Platte (``platte``) oder einer
+        Querschnittsanalyse (``analyse``). Bei einer Analyse rechnet er mit
+        ``E_eq`` -- Felder wie :class:`ModulEintrag`, etwa ``{"M": 80}`` --
+        mit ihrem aequivalenten E-Modul.
+        """
         if art not in ("platte", "analyse"):
             raise ProjektFehler(f"Ein Querschnitt kommt aus einer «platte» oder einer «analyse», "
                                 f"nicht aus «{art}».")
-        return self._querschnitt_dazu(StabquerschnittEintrag(
-            kennung=self._neue_kennung(self.querschnitte, "Q"),
-            name=name, art=art, bezug=_kennung_von(bezug)), E)
+        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
+                                         name=name, art=art, bezug=_kennung_von(bezug))
+        if E_eq is not None:
+            eintrag.e_modul = "e_eq"
+            eintrag.eq = ModulEintrag.aus_dict(dict(E_eq), f"Querschnitt '{name}', E_eq")
+        return self._querschnitt_dazu(eintrag, E)
 
     def querschnitt_mit_kennwerten(self, name: str, *, A: float, I: float,
                                    E: Optional[float] = None) -> StabquerschnittEintrag:

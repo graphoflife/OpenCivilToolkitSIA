@@ -164,6 +164,7 @@ def katalog() -> dict:
             "flaeche": feldangaben(FlaecheEintrag),
             "spannungsfall": feldangaben(SpannungsfallEintrag),
             "stabquerschnitt": feldangaben(bs.StabquerschnittEintrag),
+            "modul": feldangaben(bs.ModulEintrag),
         },
         # Ein Skript der App «Python», mit einem Diagramm darin.
         "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
@@ -266,12 +267,18 @@ def katalog() -> dict:
                      "kurz": "Analyse"},
                 )
             ],
-            # Woher der E-Modul eines Querschnitts kommt.
+            # Woher der E-Modul eines Querschnitts kommt -- und bei welchen
+            # Arten eines Querschnitts: E_eq nur bei einer Analyse.
             "e_module": [
                 {"wert": "material", "beschriftung": "vom Material",
-                 "titel": "E_cm beim Beton, E_s beim Stahl -- je Stab sein Material"},
+                 "titel": "E_cm beim Beton, E_s beim Stahl -- je Stab sein Material",
+                 "arten": list(bs.QUERSCHNITTSARTEN)},
                 {"wert": "zahl", "beschriftung": "Zahl",
-                 "titel": "Ein E von Hand, für jeden Stab mit diesem Querschnitt"},
+                 "titel": "Ein E von Hand, für jeden Stab mit diesem Querschnitt",
+                 "arten": list(bs.QUERSCHNITTSARTEN)},
+                {"wert": "e_eq", "beschriftung": "E_eq",
+                 "titel": "Der äquivalente E-Modul der Querschnittsanalyse bei N und M",
+                 "arten": list(bs.E_EQ_ARTEN)},
             ],
             # Je Art eines Materials die Kennwerte, mit denen ein Stab
             # rechnet: E-Modul und Dichte -- die Liste der Materialien zeigt sie.
@@ -814,6 +821,8 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 "steifigkeiten": [{"querschnitt": s.querschnitt, "material": s.material,
                                    "EA": s.EA, "EI": s.EI} for s in system.steifigkeiten],
                 "materialien": {stab: material for stab, (_, material) in system.paare.items()},
+                # Je Querschnitt mit eigenem E -- von Hand oder E_eq --, wo es steht.
+                "module": dict(system.module),
             }
             for kennung, system in aufbau.balkensysteme.items()
         },

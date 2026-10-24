@@ -34,7 +34,7 @@ import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import { ART_TEXT, kennwertZeile } from './material.js';
-import { anfuegenKnopf } from './nachweise.js';
+import { anfuegenKnopf, rechenwahlZeile } from './nachweise.js';
 import {
   ausVorlage, feldangabe, naechsterName, projektAendern, zustand,
 } from './zustand.js';
@@ -63,7 +63,8 @@ const HILFE = {
       ['Vorlage', 'A und I nach den Formeln der Vorlage, Masse in mm'],
       ['Platte', 'ein Streifen b × h der gewählten Platte'],
       ['Analyse', 'A und I_y des Bruttoquerschnitts'],
-      ['E-Modul', 'vom Material des Stabs (E_cm bzw. E_s) oder als Zahl -- dann für jeden Stab mit diesem Querschnitt'],
+      ['E-Modul', 'vom Material des Stabs (E_cm bzw. E_s), als Zahl oder -- aus einer Analyse -- als E_eq bei N und M; Zahl und E_eq gelten für jeden Stab mit diesem Querschnitt, für EA und EI'],
+      ['E_eq', 'wie die Linie M–E_eq der Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten'],
       ['Steifigkeit', 'EA, EI am ungerissenen Bruttoquerschnitt -- nach Vorgabe'],
     ],
     formel: 'EA = E · A   EI = E · I',
@@ -262,13 +263,15 @@ const QUERSCHNITTSARTEN = () => zustand.katalog?.balkensystem?.querschnittsarten
 const VORLAGEN = () => zustand.katalog?.balkensystem?.vorlagen || [];
 const E_MODULE = () => zustand.katalog?.balkensystem?.e_module || [];
 
-/** Was der Kern zu einem Querschnitt gerechnet hat: A und I, oder nichts. */
+/** Was der Kern zu einem Querschnitt gerechnet hat: A und I -- und sein eigenes E --, oder nichts. */
 function kennwerte(system, q) {
-  const ids = zustand.loesung?.zuordnung?.balkensysteme?.[system.kennung]?.querschnitte?.[q.kennung];
+  const zuordnung = zustand.loesung?.zuordnung?.balkensysteme?.[system.kennung];
+  const ids = zuordnung?.querschnitte?.[q.kennung];
   const werte = zustand.loesung?.werte || {};
   if (!ids) return null;
   const text = (id) => (werte[id] ? `${werte[id].wert} ${werte[id].einheit}` : '–');
-  return `A = ${text(ids.A)} · I = ${text(ids.I)}`;
+  const E = zuordnung.module?.[q.kennung];
+  return `A = ${text(ids.A)} · I = ${text(ids.I)}${E ? ` · E = ${text(E)}` : ''}`;
 }
 
 function querschnittBlock(system, q, i) {
@@ -331,8 +334,12 @@ function querschnittBlock(system, q, i) {
       beiAenderung: setzen('bezug'),
     })));
   }
+  // Welche Stellungen es gibt, sagt der Katalog je Art -- E_eq nur aus einer
+  // Analyse. Die gewählte bleibt sichtbar, auch wo sie nicht mehr passt: die
+  // Meldung des Kerns sagt dann warum.
   zeilen.push(wahlBlock('E-Modul', wahlSchalter({
-    werte: E_MODULE().map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
+    werte: E_MODULE().filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul)
+      .map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
     gewaehlt: q.e_modul, titel: 'Woher E kommt', setzen: setzen('e_modul'),
   })));
   if (q.e_modul === 'zahl') {
@@ -341,6 +348,18 @@ function querschnittBlock(system, q, i) {
       titel: 'E-Modul von Hand -- für jeden Stab mit diesem Querschnitt, aus welchem Material auch immer',
       beiAenderung: setzen('E'),
     }), feldangabe('stabquerschnitt', 'E').einheit));
+  } else if (q.e_modul === 'e_eq') {
+    const eq = (veraenderer) => aendern((x) => veraenderer(x.eq));
+    const zahl = (name, schritt, titel) => feld(name, zahlfeld({
+      wert: q.eq[name], schritt, leer: 0, titel,
+      beiAenderung: (w) => eq((x) => { x[name] = w; }),
+    }), feldangabe('modul', name).einheit);
+    zeilen.push(
+      zahl('N', 50, 'Normalkraft, bei der E_eq gilt -- Zug positiv'),
+      zahl('M', 10, 'Moment, bei dem E_eq gilt -- positiv zieht es unten, an der gestrichelten Faser'),
+      rechenwahlZeile('Rechenwerte wie in der Analyse', q.eq, eq,
+        { arten: 'faserarten', phiImmer: true }),
+    );
   }
   const werte = kennwerte(system, q);
   if (werte) zeilen.push(el('p.bs-kennwerte', { text: werte }));

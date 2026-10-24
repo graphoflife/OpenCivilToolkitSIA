@@ -21,6 +21,7 @@ from opencivil.projekt.balkensystem import (
     MATERIAL_DES_QUERSCHNITTS, MIT_MATERIAL, BalkensystemEintrag, Modell, StabquerschnittEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler
+from opencivil.spannungsanalyse.modul import Modulfrage
 from opencivil.stabwerk.rechnung import Balkensystem, Stabquerschnitt
 from opencivil.stabwerk.system import Meldung
 
@@ -89,7 +90,9 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
                             f"'{q.bezug}', die es im Projekt nicht gibt.")
     return Stabquerschnitt(q.kennung, q.name, q.art, bezug=q.bezug,
                            quelle={"A": analyse.id_von("A"), "I": analyse.id_von("I_y")},
-                           herkunft=f"Querschnittsanalyse «{analyse.name}»")
+                           herkunft=f"Querschnittsanalyse «{analyse.name}»",
+                           eq=Modulfrage(analyse, q.eq.N, q.eq.M, q.eq.wahl)
+                           if q.e_modul == "e_eq" else None)
 
 
 def _paare(eintrag: BalkensystemEintrag, modell: Modell,
@@ -121,7 +124,7 @@ def _material_des_querschnitts(q: StabquerschnittEintrag, aufbau: Aufbau) -> Tup
     """
     if q.art not in MIT_MATERIAL:
         return "", (f"«{q.name}» ist {'nach Vorlage' if q.art == 'vorlage' else 'von Hand'} und "
-                    f"bringt keines mit -- das tut nur eine Platte oder Querschnittsanalyse.")
+                    f"bringt keines mit – das tut nur eine Platte oder Querschnittsanalyse.")
     if q.art == "platte":
         platte = aufbau.querschnitte.get(q.bezug)
         stoffe = [platte.beton] if platte is not None else []
@@ -132,7 +135,7 @@ def _material_des_querschnitts(q: StabquerschnittEintrag, aufbau: Aufbau) -> Tup
         stoffe = list({id(f.stoff): f.stoff for f in analyse.flaechen if f.stoff is not None}.values())
         if len(stoffe) > 1:
             return "", (f"die Flächen von «{q.name}» sind aus "
-                        f"{' und '.join(s.name for s in stoffe)} -- das Material von Hand wählen.")
+                        f"{' und '.join(s.name for s in stoffe)} – das Material von Hand wählen.")
     if not stoffe:
         return "", f"«{q.name}» bringt keines mit."
     return next(k for k, s in aufbau.baustoffe.items() if s is stoffe[0]), ""

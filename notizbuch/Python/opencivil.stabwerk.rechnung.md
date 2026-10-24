@@ -1,5 +1,5 @@
 ---
-erzeugt: 0e9fa16dcb99
+erzeugt: ef794e87fb8c
 art: modul
 tags: [modul]
 ---
@@ -34,10 +34,12 @@ an ihnen: aendert sich deren Dicke, rechnet es neu.
 ## STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN
 
 `E_cm` fuer Beton und `E_s` fuer Betonstahl ([[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]]) -- oder
-je Querschnitt ein E von Hand, fuer jeden Stab mit ihm (Benutzer,
-2026-10-23) --, am ungerissenen Bruttoquerschnitt, ohne Schubverformung,
-Gleichgewicht am unverformten System. Die Herleitung sagt es, das TODO
-fuehrt es.
+je Querschnitt ein E von Hand oder das E_eq seiner Querschnittsanalyse bei
+N und M, fuer jeden Stab mit ihm (Benutzer, 2026-10-23) --, am
+ungerissenen Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am
+unverformten System. Die Herleitung sagt es, das TODO fuehrt es. Findet
+die Suche nach E_eq keinen Modul, sagt es eine Meldung, und das System
+rechnet nicht.
 
 
 ## EIGENGEWICHT -- NACH VORGABE DES BENUTZERS (2026-10-23)
@@ -76,6 +78,7 @@ Ein Querschnitt der Staebe, aufgeloest: woher `A` und `I` kommen.
 - `herkunft: str = ''` – Woher, in Worten -- «Rechteck», «von Hand», «Platte «Decke»».
 - `fehler: str = ''` – Was an seinen Massen nicht geht -- dann rechnet er nicht, und kein Stab mit ihm.
 - `E: Optional[float] = None` – Der E-Modul von Hand in N/mm² -- `None`: der des Materials, [[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]].
+- `eq: Any = None` – Die Frage nach dem E_eq seiner Analyse ([[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]) -- `None`: E vom Material oder von Hand. Sie baut ihre Berechnungen selbst ein.
 
 ### Steifigkeit
 
@@ -243,7 +246,9 @@ def ins_rechenwerk(self, werk) -> 'Balkensystem'
 def ziele(self) -> List[str]
 ```
 
-Was ein Lauf rechnen muss: jeder Querschnitt -- auch einer, den kein Stab nimmt -- und das System.
+Was ein Lauf rechnen muss: jeder Querschnitt -- auch einer, den kein
+Stab nimmt -- und das System. Von einem E_eq die Suche, nicht E: das
+fehlt, wo sie keinen Modul fand.
 
 #### Balkensystem.rechnen_und_schreiben
 
@@ -252,8 +257,16 @@ def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
 Die Steifigkeiten in die Staebe, das System gerechnet, die Herleitung
-geschrieben. Haelt eine Meldung der Beschreibung die Rechnung auf,
-bleibt es bei ihr.
+geschrieben. Haelt eine Meldung der Beschreibung die Rechnung auf --
+oder ein E_eq, das es nicht gibt --, bleibt es bei ihr.
+
+#### Balkensystem._ohne_modul
+
+```python
+def _ohne_modul(self, e: Eingaben) -> List[Meldung]
+```
+
+Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab nimmt, eine Meldung.
 
 
 ## Konstanten

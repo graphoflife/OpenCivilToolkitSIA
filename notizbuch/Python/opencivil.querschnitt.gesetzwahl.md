@@ -1,5 +1,5 @@
 ---
-erzeugt: 72a3974acc99
+erzeugt: 240e7275baec
 art: modul
 tags: [modul]
 ---
@@ -323,6 +323,7 @@ gezeichnete Querschnitt baute ihn hinter einem Schalter selbst.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
@@ -330,6 +331,7 @@ gezeichnete Querschnitt baute ihn hinter einem Schalter selbst.
 - [[opencivil.spannungsanalyse.bild]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]

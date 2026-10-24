@@ -13,6 +13,10 @@ from opencivil.projekt import (
     StablastEintrag,
 )
 from opencivil.projekt.balkensystem import MATERIAL_DES_QUERSCHNITTS
+from opencivil.querschnitt.zugseite import Zugseite
+from opencivil.spannungsanalyse.linie import moment_kruemmung
+from opencivil.spannungsanalyse.modul import aequivalenter_modul
+from opencivil.spannungsanalyse.schnitt import schnittpaar
 from opencivil.web import dienst
 
 
@@ -742,3 +746,73 @@ class TestMaterialDesQuerschnitts(unittest.TestCase):
         meldungen = self.meldungen(p)
         self.assertTrue(any("gemäss Querschnitt" in m and "noch leer" in m for m in meldungen),
                         meldungen)
+
+
+class TestEeq(unittest.TestCase):
+    """
+    E_eq aus einer Querschnittsanalyse bei N und M -- an derselben Stelle wie
+    ihre Linie M–E_eq, für EA und EI jedes Stabs mit dem Querschnitt
+    (Benutzer, 2026-10-23).
+    """
+
+    def projekt(self, **eq):
+        """Der Träger, sein Stab mit dem Querschnitt der Analyse «Unterzug» und E_eq."""
+        p = traeger()
+        s = p.balkensysteme[0]
+        q = s.querschnitt_aus("Unterzug", "analyse", p.analyse("Unterzug"), E_eq=eq)
+        s.linien[0].querschnitt = q.kennung
+        return p, q
+
+    def linie(self, e, q, N=0.0):
+        """Die Linie M–E_eq der Analyse selbst, gerechnet wie in ihrer Spannung-Dehnung-Analyse."""
+        werte = e.loesung.werte
+        paar = schnittpaar(e.aufbau.querschnittsanalysen["a1"], Zugseite.UNTEN,
+                           lambda kid: werte[kid].groesse.si, q.eq.wahl)
+        return aequivalenter_modul(moment_kruemmung(paar, N=N), I_c=paar.I_c, A_c=paar.A_c,
+                                   E_cm=paar.E_cm)
+
+    def test_ungerissen_wie_der_anfang_der_linie(self):
+        p, q = self.projekt(M=0.0)
+        e = p.rechnen()
+        E = e.wert(f"balkensystem.r1.{q.kennung}.E").groesse.si
+        self.assertAlmostEqual(E, self.linie(e, q).ungerissen, delta=1e-6 * E)
+
+    def test_gerissen_auf_der_linie(self):
+        """Bei 80 kNm gerissen: zwischen den beiden Punkten der Linie daneben, und weicher als ungerissen."""
+        p, q = self.projekt(M=80.0)
+        e = p.rechnen()
+        E = e.wert(f"balkensystem.r1.{q.kennung}.E").groesse.si
+        punkte = [pt for pt in self.linie(e, q).punkte if pt.gerissen and pt.modul is not None]
+        vor = max((pt for pt in punkte if pt.kraft <= 80e3), key=lambda pt: pt.kraft)
+        nach = min((pt for pt in punkte if pt.kraft >= 80e3), key=lambda pt: pt.kraft)
+        self.assertLessEqual(min(vor.modul, nach.modul), E)
+        self.assertLessEqual(E, max(vor.modul, nach.modul))
+        self.assertLess(E, self.linie(e, q).ungerissen)
+        # Dasselbe E für EA und EI.
+        A = e.wert(f"balkensystem.r1.{q.kennung}.A").groesse.si
+        self.assertAlmostEqual(e.wert(f"balkensystem.r1.{q.kennung}.b1.EA").groesse.si, E * A,
+                               delta=1e-6 * E * A)
+
+    def test_zu_grosses_moment_ist_eine_meldung(self):
+        """Kein E_eq über dem Biegewiderstand: das System rechnet nicht und sagt warum."""
+        p, q = self.projekt(M=1000.0)
+        ergebnis = p.rechnen().balkensystem("r1").ergebnis
+        self.assertFalse(ergebnis.gueltig)
+        meldungen = [m.text for m in ergebnis.meldungen if m.fehler]
+        self.assertEqual(len(meldungen), 1)
+        self.assertIn("kein E_eq", meldungen[0])
+        self.assertIn("Biegewiderstand", meldungen[0])
+
+    def test_nur_aus_einer_analyse(self):
+        p = traeger()
+        p.balkensysteme[0].querschnitte[0].e_modul = "e_eq"
+        meldungen = [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
+        self.assertTrue(any("nur bei einem Querschnitt aus einer Querschnittsanalyse" in m
+                            for m in meldungen), meldungen)
+
+    def test_herleitung(self):
+        p, q = self.projekt(M=80.0)
+        text = str(p.rechnen().bericht())
+        for wort in ("Äquivalenter E-Modul, «Unterzug»", "der Querschnitt gilt gerissen",
+                     "E-Modul, «Unterzug» (E_eq)", "Biegesteifigkeit, «Unterzug» mit E_eq"):
+            self.assertIn(wort, text)

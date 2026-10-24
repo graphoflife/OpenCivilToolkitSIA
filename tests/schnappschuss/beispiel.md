@@ -1733,7 +1733,7 @@ $$
 g_{k,\text{Q2}} = \rho_{sb} \cdot g \cdot A_{\text{Q2}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 180000\,\mathrm{mm}^{2} = 4.5\,\mathrm{kN}/\mathrm{m}
 $$
 
-> **Annahme:** Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).
+> **Annahme:** Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt – je Querschnitt auch ein E von Hand oder das E\_eq seiner Querschnittsanalyse –, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).
 
 **Stäbe**
 

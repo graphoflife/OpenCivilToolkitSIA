@@ -1,5 +1,5 @@
 ---
-erzeugt: ecdcca1993c3
+erzeugt: 5024c0c9e19f
 art: modul
 tags: [modul]
 ---
@@ -164,6 +164,32 @@ oder ein Moment. Ihre Kennung zaehlt mit denen der Stablasten (`P1`).
 - `richtung: Lastrichtung = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT)`
 - `wert: float = 10.0` – kN oder kNm.
 
+### ModulEintrag
+
+```python
+@dataclass
+class ModulEintrag(Beschreibung)
+```
+
+Wie das E_eq eines Querschnitts aus einer Querschnittsanalyse entsteht:
+bei `N` und `M`, Zug positiv und `M > 0` mit Zug unten -- auf der
+gestrichelten Faser des Stabs. Gerechnet wie eine Momenten-Kruemmungs-
+Linie der Analyse, mit Kriechzahl, Wertesatz und Rechenart wie dort
+(Benutzer, 2026-10-23).
+
+- `N: float = bereich(0.0, heisst='N für E_eq', einheit=KN)`
+- `M: float = bereich(0.0, heisst='M für E_eq', einheit=KNM)`
+- `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
+- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)`
+
+#### ModulEintrag.wahl
+
+```python
+@property
+def wahl(self) -> Rechenwahl
+```
+
 ### StabquerschnittEintrag
 
 ```python
@@ -183,8 +209,9 @@ Stab mit diesem Querschnitt, aus welchem Material auch immer.
 - `vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)`
 - `masse: Dict[str, float] = field(default_factory=dict)`
 - `bezug: str = ''`
-- `e_modul: str = einer_von(E_MODULE, 'material')` – Woher E kommt: `material` -- vom Material des Stabs -- oder `zahl`, dann `E`.
+- `e_modul: str = einer_von(E_MODULE, 'material')` – Woher E kommt: `material` -- vom Material des Stabs --, `zahl`, dann `E`, oder `e_eq`, dann wie `eq` sagt.
 - `E: float = bereich(30000.0, heisst='E-Modul E', einheit=N_PRO_MM2, ueber=0.0)` – Der E-Modul von Hand, N/mm² -- er gilt nur bei `e_modul = "zahl"`.
+- `eq: ModulEintrag = field(default_factory=ModulEintrag)` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
 
 #### StabquerschnittEintrag.E_von_hand
 
@@ -417,10 +444,13 @@ seines Materials; so auch bei den beiden anderen.
 #### BalkensystemEintrag.querschnitt_aus
 
 ```python
-def querschnitt_aus(self, name: str, art: str, bezug: Any, *, E: Optional[float]=None) -> StabquerschnittEintrag
+def querschnitt_aus(self, name: str, art: str, bezug: Any, *, E: Optional[float]=None, E_eq: Optional[Mapping[str, Any]]=None) -> StabquerschnittEintrag
 ```
 
-Ein Querschnitt aus einer Platte (`platte`) oder einer Querschnittsanalyse (`analyse`).
+Ein Querschnitt aus einer Platte (`platte`) oder einer
+Querschnittsanalyse (`analyse`). Bei einer Analyse rechnet er mit
+`E_eq` -- Felder wie [[opencivil.projekt.balkensystem#ModulEintrag|ModulEintrag]], etwa `{"M": 80}` --
+mit ihrem aequivalenten E-Modul.
 
 #### BalkensystemEintrag.querschnitt_mit_kennwerten
 
@@ -516,7 +546,8 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `QUERSCHNITTSARTEN = ('vorlage', 'kennwerte', 'platte', 'analyse')` – Woher ein Querschnitt kommt.
 - `KENNWERTE = ('A', 'I')` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
-- `E_MODULE = ('material', 'zahl')` – Woher der E-Modul eines Querschnitts kommt: vom Material des Stabs -- E_cm beim Beton, E_s beim Stahl -- oder als Zahl von Hand, unabhaengig vom Material (Benutzer, 2026-10-23).
+- `E_MODULE = ('material', 'zahl', 'e_eq')` – Woher der E-Modul eines Querschnitts kommt: vom Material des Stabs -- E_cm beim Beton, E_s beim Stahl --, als Zahl von Hand, unabhaengig vom Material, oder als E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-23).
+- `E_EQ_ARTEN = ('analyse',)` – Die Arten eines Querschnitts, die ein E_eq haben: nur der gezeichnete Querschnitt hat eine Momenten-Kruemmungs-Linie mit seiner Bewehrung.
 - `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung im Projekt sein -- die beginnen mit ihrer Vorsilbe und einer Zahl.
 - `MIT_MATERIAL = ('platte', 'analyse')` – Die Arten eines Querschnitts, die ein Material mitbringen: ein Bauteil des Projekts. Einer nach Vorlage oder von Hand ist nur eine Form.
 - `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse, das verschobene System oder die Lagerkraefte.
@@ -526,9 +557,11 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.system]]

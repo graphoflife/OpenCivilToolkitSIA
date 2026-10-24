@@ -1,5 +1,5 @@
 ---
-erzeugt: f80e8e26c338
+erzeugt: 266535fa90e5
 art: modul
 tags: [modul]
 ---
@@ -655,6 +655,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.diagrammdaten]]
 

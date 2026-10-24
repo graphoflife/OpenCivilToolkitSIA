@@ -1,5 +1,5 @@
 ---
-erzeugt: b96048b9831f
+erzeugt: f90ea76dc663
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,10 @@ tags: [modul]
 
 Die letzten zwei Fragen: eine Linie, umgerechnet in den Modul, den ein
 reiner, ungerissener, elastischer Betonquerschnitt braeuchte, um sich gleich
-stark zu kruemmen oder zu dehnen ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]).
+stark zu kruemmen oder zu dehnen ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]). Und derselbe Modul
+an einer Stelle der Linie, fuer die Staebe eines Balkensystems
+([[opencivil.spannungsanalyse.modul#modul_bei|modul_bei]], [[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]): dort geht er in die Rechnung ein,
+darum rechnet ihn das Rechenwerk, nicht die Auswertung danach.
 
 ## Inhalt
 
@@ -124,6 +127,123 @@ Die M-chi- oder N-eps-Linie als Linie des aequivalenten Moduls -- siehe
 Verformung ohne laufende Kraft. `I_c` und `A_c` sind der reine
 Betonquerschnitt, an dem sich der Modul misst.
 
+### Modulstelle
+
+```python
+@dataclass(frozen=True)
+class Modulstelle
+```
+
+Der aequivalente Modul bei N und M -- und woraus er folgt, fuer die Herleitung.
+
+- `N: float`
+- `M: float` – Das Moment, bei dem gerechnet wurde, zur Zugseite -- bei M = 0 das halbe Rissmoment.
+- `riss: float` – `M_Riss(N)`.
+- `gerissen: bool`
+- `chi_0: float` – Die Kruemmung ohne Moment -- ab ihr wird gezaehlt.
+- `chi: float`
+- `I_c: float`
+- `modul: float` – In Pa.
+
+### modul_bei
+
+```python
+def modul_bei(paar: Paar, *, N: float, M: float) -> Tuple[Optional[Modulstelle], str]
+```
+
+Der aequivalente E-Modul bei der Normalkraft `N` (Zug positiv) und dem
+Moment `M >= 0` zur Zugseite des Paars, in SI -- an derselben Stelle der
+M-E_eq-Linie ([[opencivil.spannungsanalyse.modul#aequivalenter_modul|aequivalenter_modul]] ueber
+[[opencivil.spannungsanalyse.linie#moment_kruemmung|moment_kruemmung]]): ungerissen
+bis `M_Riss(N)`, darueber gerissen, gezaehlt ab der Kruemmung ohne
+Moment. Bei `M = 0` der Wert, mit dem die Linie beginnt -- ungerissen
+ist der Querschnitt linear, das halbe Rissmoment gibt ihn genau.
+
+Ohne Gleichgewicht `None`, dazu der Satz, warum -- klein beginnend, er
+steht hinter einem Doppelpunkt.
+
+### Modulbefund
+
+```python
+@dataclass(frozen=True)
+class Modulbefund
+```
+
+Was die Suche nach E_eq fand: die Stelle -- oder warum es keine gibt.
+
+- `stelle: Optional[Modulstelle]`
+- `grund: str = ''`
+
+### Modulfrage
+
+```python
+@dataclass(frozen=True)
+class Modulfrage
+```
+
+Das E_eq eines gezeichneten Querschnitts bei `N` in kN (Zug positiv)
+und `M` in kNm (positiv mit Zug unten), fuer die Staebe eines
+Balkensystems mit ihm (Benutzer, 2026-10-23) -- gerechnet mit `wahl`
+wie eine Spannung-Dehnung-Analyse.
+
+- `analyse: Any` – Die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]].
+- `N: float`
+- `M: float`
+- `wahl: Rechenwahl`
+
+#### Modulfrage.einbauen
+
+```python
+def einbauen(self, definieren: Callable[..., WertDef], *, wo: str, index: str, name: str, abschnitt: Abschnitt) -> Tuple[List[Berechnung], str, str]
+```
+
+Die Berechnungen dazu, im Namensraum des Systems: N und M als
+Vorgaben, die Suche ([[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur]]) und E aus ihrem Befund
+([[opencivil.spannungsanalyse.modul#ModulAusBefund|ModulAusBefund]]). ``definieren(kurzname, symbol, einheit,
+beschreibung, stellen)`` legt einen Wert des Systems an. Zurueck die
+Berechnungen, die Wert-ID von E -- sie fehlt, wo die Suche keinen
+Modul fand -- und die ID der Suche.
+
+### ModulProzedur
+
+```python
+class ModulProzedur(Prozedur)
+```
+
+Sucht das E_eq einer [[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]: mit dem Paar der
+Spannung-Dehnung-Analyse in der Zugrichtung des Moments
+([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]), an der Stelle
+der M-E_eq-Linie ([[opencivil.spannungsanalyse.modul#modul_bei|modul_bei]]). Ohne Ausgabe -- ihr Befund ist der
+[[opencivil.spannungsanalyse.modul#Modulbefund|Modulbefund]], und die Herleitung sagt, was sie fand. So haelt
+ein Moment ueber dem Widerstand nur das System auf, nicht das Projekt.
+
+#### ModulProzedur.rechne
+
+```python
+def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
+```
+
+### ModulAusBefund
+
+```python
+class ModulAusBefund(Prozedur)
+```
+
+E aus dem Befund der Suche -- nur, wo sie einen Modul fand. Sonst ist sie
+nicht anwendbar: E fehlt, mit ihm EA und EI, und das System sagt warum.
+
+#### ModulAusBefund.anwendbar
+
+```python
+def anwendbar(self, e: Eingaben) -> Tuple[bool, str]
+```
+
+#### ModulAusBefund.rechne
+
+```python
+def rechne(self, e: Eingaben, p: Protokoll) -> dict
+```
+
 
 ## Konstanten
 
@@ -131,11 +251,24 @@ Betonquerschnitt, an dem sich der Modul misst.
 
 ## Braucht
 
+- [[opencivil.core.berechnung]]
+- [[opencivil.core.einheiten]]
+- [[opencivil.core.protokoll]]
+- [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
+- [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.art]]
 - [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.schnitt]]
 
 ## Gebraucht von
 
+- [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.herleitung]]
+
+## Formeln aus diesem Modul
+
+- [[Äquivalenter E-Modul eines Stabs]] · `ModulProzedur._schreiben`

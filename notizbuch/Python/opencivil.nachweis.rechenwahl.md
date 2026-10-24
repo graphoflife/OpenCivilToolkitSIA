@@ -1,5 +1,5 @@
 ---
-erzeugt: c2cc798fc427
+erzeugt: c3e78278a422
 art: modul
 tags: [modul]
 ---
@@ -291,6 +291,7 @@ ersten Lage.
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse.platte]]

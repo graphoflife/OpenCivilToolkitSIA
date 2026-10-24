@@ -181,6 +181,17 @@
       ]
     },
     {
+      "name": "Äquivalenter E-Modul eines Stabs",
+      "pfad": "Formelsammlung/Formeln/Äquivalenter E-Modul eines Stabs.md",
+      "art": "formel",
+      "zeichen": [
+        "E_{eq}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Äquivalenter E-Modul über dem Moment",
       "pfad": "Formelsammlung/Formeln/Äquivalenter E-Modul über dem Moment.md",
       "art": "formel",
@@ -3841,6 +3852,8 @@
         "SystemlinieEintrag.stab",
         "LagerEintrag",
         "KnotenlastEintrag",
+        "ModulEintrag",
+        "ModulEintrag.wahl",
         "StabquerschnittEintrag",
         "StabquerschnittEintrag.E_von_hand",
         "StabquerschnittEintrag.stabvorlage",
@@ -4625,7 +4638,17 @@
         "Modullinie.riss",
         "Modullinie.fliessen",
         "Modullinie.ende",
-        "aequivalenter_modul"
+        "aequivalenter_modul",
+        "Modulstelle",
+        "modul_bei",
+        "Modulbefund",
+        "Modulfrage",
+        "Modulfrage.einbauen",
+        "ModulProzedur",
+        "ModulProzedur.rechne",
+        "ModulAusBefund",
+        "ModulAusBefund.anwendbar",
+        "ModulAusBefund.rechne"
       ]
     },
     {
@@ -4792,7 +4815,8 @@
         "Balkensystem._eigengewicht",
         "Balkensystem.ins_rechenwerk",
         "Balkensystem.ziele",
-        "Balkensystem.rechnen_und_schreiben"
+        "Balkensystem.rechnen_und_schreiben",
+        "Balkensystem._ohne_modul"
       ]
     },
     {

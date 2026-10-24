@@ -1,5 +1,5 @@
 ---
-erzeugt: 6214cc4e18a8
+erzeugt: 7f131e474f4f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -38,7 +38,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Balkensysteme**
 
-- [[Stabquerschnitte]] · 18
+- [[Stabquerschnitte]] · 19
 - [[Steifigkeitsmethode]] · 7
 
 **Grundbruch**
@@ -54,6 +54,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 ## Formeln von A bis Z
 
 - [[Abstand des Grundwassers unter der Sohle]] · $T$
+- [[Äquivalenter E-Modul eines Stabs]] · $E_{eq}$
 - [[Äquivalenter E-Modul über dem Moment]]
 - [[Äquivalenter E-Modul über der Normalkraft]]
 - [[Arbeitsgleiche Knotenkräfte]]
@@ -243,8 +244,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-116 von 187 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+117 von 188 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
+- [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Arbeitsgleiche Knotenkräfte]] · [[opencivil.stabwerk.herleitung|_ansaetze]]

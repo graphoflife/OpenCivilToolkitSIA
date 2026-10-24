@@ -1,6 +1,6 @@
 # Voll
 
-393 Berechnungen ausgeführt, 648 Werte bestimmt.
+397 Berechnungen ausgeführt, 651 Werte bestimmt.
 
 ## Herleitung
 
@@ -9720,6 +9720,34 @@ $$
 E_{\text{Q7}} = 15000\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
+**Normalkraft für E\_eq, «Kasten»**
+
+$$
+N_{\text{Q10}} = -100\,\mathrm{kN}
+$$
+
+**Moment für E\_eq, «Kasten»**
+
+$$
+M_{\text{Q10}} = 200\,\mathrm{kNm}
+$$
+
+Querschnittsanalyse «Kastenträger», Zug unten, Präzise ohne Vereinfachung, φ = 0, Bemessung.
+
+**Rissmoment bei dieser Normalkraft**
+
+$$
+M_{Riss} = 130.1\,\mathrm{kNm}
+$$
+
+Das Moment liegt über dem Rissmoment: der Querschnitt gilt gerissen.
+
+**Äquivalenter E-Modul, «Kasten»**
+
+$$
+E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{200\,\mathrm{kNm}}{13275\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00281\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 5353\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
 **Dehnsteifigkeit, «Balken 300×500» aus C30/37**
 
 $$
@@ -9852,16 +9880,22 @@ $$
 g_{k,\text{Q4,B500B}} = \rho_s \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
 $$
 
-**Dehnsteifigkeit, «Kasten» aus C30/37**
+**E-Modul, «Kasten» (E\_eq)**
 
 $$
-EA_{\text{Q10,C30/37}} = E_{cm} \cdot A_{\text{Q10}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 330000\,\mathrm{mm}^{2} = 11095\,\mathrm{MN}
+E_{\text{Q10}} = 5353\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Biegesteifigkeit, «Kasten» aus C30/37**
+**Dehnsteifigkeit, «Kasten» mit E\_eq**
 
 $$
-EI_{\text{Q10,C30/37}} = E_{cm} \cdot I_{\text{Q10}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 13275\,\cdot 10^{6}\,\mathrm{mm}^{4} = 446302\,\mathrm{kNm}^{2}
+EA_{\text{Q10,C30/37}} = E_{\text{Q10}} \cdot A_{\text{Q10}} = 5353\,\mathrm{N}/\mathrm{mm}^{2} \cdot 330000\,\mathrm{mm}^{2} = 1767\,\mathrm{MN}
+$$
+
+**Biegesteifigkeit, «Kasten» mit E\_eq**
+
+$$
+EI_{\text{Q10,C30/37}} = E_{\text{Q10}} \cdot I_{\text{Q10}} = 5353\,\mathrm{N}/\mathrm{mm}^{2} \cdot 13275\,\cdot 10^{6}\,\mathrm{mm}^{4} = 71068\,\mathrm{kNm}^{2}
 $$
 
 **Eigengewicht, «Kasten» aus C30/37**
@@ -9874,7 +9908,7 @@ $$
 \end{aligned}
 $$
 
-> **Annahme:** Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).
+> **Annahme:** Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt – je Querschnitt auch ein E von Hand oder das E\_eq seiner Querschnittsanalyse –, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).
 
 **Stäbe**
 
@@ -9888,7 +9922,7 @@ $$
 | L6 | K6 – K7 | $2.000$ | $0.0$ | Fundamentbalken | $3750$ | $77083$ | – | quer fest |
 | L7 | K7 – K8 | $1.000$ | $-90.0$ | kein Stab | – | – | – | quer fest |
 | L8 | K6 – K9 | $2.000$ | $90.0$ | Hohlprofil | $2375$ | $29342$ | – | – |
-| L9 | K9 – K10 | $2.000$ | $0.0$ | Kasten | $11095$ | $446302$ | – | – |
+| L9 | K9 – K10 | $2.000$ | $0.0$ | Kasten | $1767$ | $71068$ | – | – |
 
 **Lager**
 
@@ -9959,7 +9993,7 @@ $$
 | K6 | $0.00$ | $0.00$ | $0.000$ |
 | K7 | $0.00$ | $0.00$ | $0.000$ |
 | K9 | $1.12$ | $-0.01$ | $-1.125$ |
-| K10 | $1.12$ | $-2.30$ | $-1.149$ |
+| K10 | $1.12$ | $-2.50$ | $-1.279$ |
 
 **Schnittgrössen an den Stabenden**
 
@@ -10022,7 +10056,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V$ | $0.0\ \mathrm{kN}$ | $2.00$ | $16.5\ \mathrm{kN}$ | $0.00$ |
 | L9 | $M$ | $-16.5\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
-| L9 | $w$ | $-0.01\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L9 | $w$ | $-0.04\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 
 Grösste Durchbiegung gegen die Sehne: L1, w = -0.59 mm bei x = 4.97 m, L/w = 13476.
 
@@ -10138,7 +10172,7 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -0.36 mm bei x = 5.53 m, L/w = 22
 | K6 | $0.00$ | $0.00$ | $0.000$ |
 | K7 | $0.00$ | $0.00$ | $0.000$ |
 | K9 | $1.52$ | $-0.02$ | $-1.518$ |
-| K10 | $1.52$ | $-3.11$ | $-1.552$ |
+| K10 | $1.52$ | $-3.37$ | $-1.727$ |
 
 **Schnittgrössen an den Stabenden**
 
@@ -10201,7 +10235,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V$ | $0.0\ \mathrm{kN}$ | $2.00$ | $22.3\ \mathrm{kN}$ | $0.00$ |
 | L9 | $M$ | $-22.3\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
-| L9 | $w$ | $-0.01\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L9 | $w$ | $-0.05\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 
 Grösste Durchbiegung gegen die Sehne: L1, w = -1.34 mm bei x = 5.17 m, L/w = 5987.
 
@@ -10239,7 +10273,7 @@ $$
 EI = E_{cm} \cdot I = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5400\,\cdot 10^{6}\,\mathrm{mm}^{4} = 181547\,\mathrm{kNm}^{2}
 $$
 
-> **Annahme:** Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).
+> **Annahme:** Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt – je Querschnitt auch ein E von Hand oder das E\_eq seiner Querschnittsanalyse –, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).
 
 **Stäbe**
 
@@ -11570,6 +11604,8 @@ $$
 
 ### Stabquerschnitte
 
+Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich stark zu krümmen wie der bewehrte. An derselben Stelle wie die Linie M–E\_eq der Querschnittsanalyse: ungerissen bis zum Rissmoment, darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA und EI jedes Stabs mit diesem Querschnitt.
+
 **Querschnittsfläche, «Balken 300×500» (Rechteck)**
 
 $$
@@ -11658,6 +11694,12 @@ $$
 
 $$
 I_{\text{Q7}} = \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o}\right)^{2} + 4 \cdot b_{o} \cdot b_{u} + \left(b_{u}\right)^{2}\right)}{36 \cdot \left(b_{o} + b_{u}\right)}
+$$
+
+**Äquivalenter E-Modul, «Kasten»**
+
+$$
+E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}
 $$
 
 **Dehnsteifigkeit, «Balken 300×500» aus C30/37**
@@ -12300,9 +12342,12 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Eigengewicht je Meter, Balken 300×500, C30/37 | $g_{k,\text{Q1,C30/37}}$ | $3.75$ | kN/m | berechnet |
 | Höhe, Balken 300×500 | $h_{\text{Q1}}$ | $500$ | mm | Vorgabe |
 | Querschnittsfläche, Kasten | $A_{\text{Q10}}$ | $330000$ | mm² | berechnet |
+| E-Modul, Kasten | $E_{\text{Q10}}$ | $5353$ | N/mm² | berechnet |
 | Flächenträgheitsmoment, Kasten | $I_{\text{Q10}}$ | $13275$ | ·10⁶ mm⁴ | berechnet |
-| Dehnsteifigkeit, Kasten, C30/37 | $EA_{\text{Q10,C30/37}}$ | $11095$ | MN | berechnet |
-| Biegesteifigkeit, Kasten, C30/37 | $EI_{\text{Q10,C30/37}}$ | $446302$ | kNm² | berechnet |
+| Moment für E\_eq, Kasten | $M_{\text{Q10}}$ | $200$ | kNm | Eingabe |
+| Normalkraft für E\_eq, Kasten | $N_{\text{Q10}}$ | $-100$ | kN | Eingabe |
+| Dehnsteifigkeit, Kasten, C30/37 | $EA_{\text{Q10,C30/37}}$ | $1767$ | MN | berechnet |
+| Biegesteifigkeit, Kasten, C30/37 | $EI_{\text{Q10,C30/37}}$ | $71068$ | kNm² | berechnet |
 | Eigengewicht je Meter, Kasten, C30/37 | $g_{k,\text{Q10,C30/37}}$ | $8.25$ | kN/m | berechnet |
 | Querschnittsfläche, Rundstütze | $A_{\text{Q2}}$ | $125664$ | mm² | berechnet |
 | Flächenträgheitsmoment, Rundstütze | $I_{\text{Q2}}$ | $1256.64$ | ·10⁶ mm⁴ | berechnet |

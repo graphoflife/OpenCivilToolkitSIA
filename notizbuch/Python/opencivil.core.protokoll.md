@@ -1,5 +1,5 @@
 ---
-erzeugt: de58d10e3f45
+erzeugt: 7c2d090ce2e0
 art: modul
 tags: [modul]
 ---
@@ -626,6 +626,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.stabwerk.herleitung]]

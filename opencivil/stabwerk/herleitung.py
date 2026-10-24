@@ -43,7 +43,8 @@ UNBEKANNTE_MIT_MATRIX = 12
 
 #: Was die Steifigkeit annimmt -- nach Vorgabe, nicht nachgeschlagen.
 ANNAHME = ("Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm für Beton und E_s für "
-           "Betonstahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung; "
+           "Betonstahl, am ungerissenen Bruttoquerschnitt – je Querschnitt auch ein E von "
+           "Hand oder das E_eq seiner Querschnittsanalyse –, ohne Schubverformung; "
            "Gleichgewicht am unverformten System (Theorie 1. Ordnung).")
 
 #: Das Gleichungssystem in Zeichen.
@@ -97,7 +98,8 @@ def _staebe(p: Protokoll, system: "Balkensystem", modell: System) -> None:
         L = math.hypot(b.x - a.x, b.z - a.z)
         alpha = math.degrees(math.atan2(b.z - a.z, b.x - a.x))
         paar = system.paare.get(stab.name)
-        steif = paar is not None and stab.traegt
+        # Ohne Steifigkeit steht ein Stab da, dem ein E_eq fehlt: EA bleibt null.
+        steif = paar is not None and stab.traegt and stab.EA > 0.0
         gelenke = {(True, True): "beide", (True, False): "Anfang",
                    (False, True): "Ende"}.get((stab.gelenk_a, stab.gelenk_b), "–")
         zeilen.append([

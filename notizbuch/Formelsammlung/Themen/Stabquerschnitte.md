@@ -1,10 +1,14 @@
 ---
-erzeugt: 45b378213ab4
+erzeugt: f04eac93ac44
 art: thema
 tags: [thema]
 ---
 > [!abstract] Balkensysteme
-> 18 Formeln, in der Folge, in der gerechnet wird.
+> 19 Formeln, in der Folge, in der gerechnet wird.
+
+## Was die Rechnung dazu sagt
+
+Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich stark zu krümmen wie der bewehrte. An derselben Stelle wie die Linie M–E\_eq der Querschnittsanalyse: ungerissen bis zum Rissmoment, darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA und EI jedes Stabs mit diesem Querschnitt.
 
 ## Formeln
 
@@ -26,6 +30,7 @@ tags: [thema]
 16. [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]]
 17. [[Fläche eines Trapezes]]
 18. [[Flächenträgheitsmoment eines Trapezes]]
+19. [[Äquivalenter E-Modul eines Stabs]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

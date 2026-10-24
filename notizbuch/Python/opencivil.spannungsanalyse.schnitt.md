@@ -1,5 +1,5 @@
 ---
-erzeugt: 27be3b88a9ba
+erzeugt: 1b9b1d36883d
 art: modul
 tags: [modul]
 ---
@@ -435,6 +435,7 @@ aus einer Loesung.
 
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.spannungsanalyse.analysen]]
+- [[opencivil.spannungsanalyse.modul]]
 
 ## Formeln aus diesem Modul
 

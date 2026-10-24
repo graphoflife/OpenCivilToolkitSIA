@@ -23,10 +23,12 @@ an ihnen: aendert sich deren Dicke, rechnet es neu.
 
 STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN:
 ``E_cm`` fuer Beton und ``E_s`` fuer Betonstahl (:data:`E_MODUL`) -- oder
-je Querschnitt ein E von Hand, fuer jeden Stab mit ihm (Benutzer,
-2026-10-23) --, am ungerissenen Bruttoquerschnitt, ohne Schubverformung,
-Gleichgewicht am unverformten System. Die Herleitung sagt es, das TODO
-fuehrt es.
+je Querschnitt ein E von Hand oder das E_eq seiner Querschnittsanalyse bei
+N und M, fuer jeden Stab mit ihm (Benutzer, 2026-10-23) --, am
+ungerissenen Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am
+unverformten System. Die Herleitung sagt es, das TODO fuehrt es. Findet
+die Suche nach E_eq keinen Modul, sagt es eine Meldung, und das System
+rechnet nicht.
 
 EIGENGEWICHT -- NACH VORGABE DES BENUTZERS (2026-10-23):
 Je Paar aus Querschnitt und Material ``g_k = rho · g · A`` in kN/m, mit
@@ -44,10 +46,10 @@ mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
+    Ausfuehrung, Befundbezug, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
 from opencivil.core.einheiten import (
     KN_PRO_M, KNM2, M_PRO_S2, MIO_MM4, MM, MM2, MN, N_PRO_MM2, Groesse,
@@ -106,6 +108,13 @@ class Stabquerschnitt:
 
     E: Optional[float] = None
     """Der E-Modul von Hand in N/mm² -- ``None``: der des Materials, :data:`E_MODUL`."""
+
+    eq: Any = None
+    """
+    Die Frage nach dem E_eq seiner Analyse
+    (:class:`~opencivil.spannungsanalyse.modul.Modulfrage`) -- ``None``: E
+    vom Material oder von Hand. Sie baut ihre Berechnungen selbst ein.
+    """
 
 
 @dataclass(frozen=True)
@@ -232,7 +241,9 @@ class Balkensystem:
         self.berechnungen: List[Berechnung] = []
         self.flaechen: Dict[str, Tuple[str, str]] = {}
         self.module: Dict[str, str] = {}
-        """Je Querschnitt mit E von Hand die Wert-ID dieses E."""
+        """Je Querschnitt mit eigenem E -- von Hand oder E_eq -- die Wert-ID dieses E."""
+        self.modulsuchen: Dict[str, str] = {}
+        """Je Querschnitt mit E_eq die ID der Suche -- ihr Befund sagt, ob sie einen fand."""
         """Je Querschnitt die Wert-IDs von ``A`` und ``I``."""
 
         self.steifigkeiten: List[Steifigkeit] = []
@@ -263,6 +274,13 @@ class Balkensystem:
                 self.flaechen[q.kennung] = self._querschnitt(q, q.kennung if index else "")
                 if q.E is not None:
                     self.module[q.kennung] = self._modul(q, q.kennung if index else "")
+                elif q.eq is not None:
+                    berechnungen, E, suche = q.eq.einbauen(
+                        self._def, wo=f"{q.kennung}.", index=q.kennung if index else "",
+                        name=q.name, abschnitt=self.abschnitt(QUERSCHNITTE))
+                    self.berechnungen += berechnungen
+                    self.module[q.kennung] = E
+                    self.modulsuchen[q.kennung] = suche
 
         # Ein Querschnitt, der erst beim Aufbau scheitert -- er nimmt eine
         # Querschnittsanalyse, die noch leer ist --, steht noch in den Paaren:
@@ -290,11 +308,15 @@ class Balkensystem:
                 teile.append(self.stoffe[m].name)
             self.steifigkeiten.append(self._steifigkeit(q, m, ",".join(teile), g))
 
+        # Mit E_eq fehlen EA und EI, wo die Suche keinen Modul fand: dann
+        # liest die Rechnung ihren Befund und sagt es.
         groessen = ("EA", "EI", "g_k") if g else ("EA", "EI")
         self.rechnung = SteifigkeitsmethodeProzedur(
             self, id=f"{self.id}.rechnung", ausgaben=[],
-            bezuege=[Eingabebezug(f"{groesse}_{i}", getattr(s, groesse))
+            bezuege=[Eingabebezug(f"{groesse}_{i}", getattr(s, groesse),
+                                  optional=groesse != "g_k" and s.querschnitt in self.modulsuchen)
                      for i, s in enumerate(self.steifigkeiten) for groesse in groessen],
+            befunde=[Befundbezug(f"modul_{q}", suche) for q, suche in self.modulsuchen.items()],
             titel="Steifigkeitsmethode", abschnitt=self.abschnitt())
         """Die Prozedur, die das System rechnet -- ihr Befund ist der :class:`Systembefund`."""
         self.berechnungen.append(self.rechnung)
@@ -380,7 +402,8 @@ class Balkensystem:
         abschnitt = self.abschnitt(QUERSCHNITTE)
         stoff = self.stoffe[material]
         modul = self.module.get(q) or stoff.id_von(E_MODUL[stoff.art.value])
-        womit = "mit E von Hand" if q in self.module else f"aus {stoff.name}"
+        womit = ("mit E_eq" if q in self.modulsuchen
+                 else "mit E von Hand" if q in self.module else f"aus {stoff.name}")
         A, I = self.flaechen[q]
         name = next(x.name for x in self.querschnitte if x.kennung == q)
         wo = f"{q}.{material}."
@@ -431,24 +454,30 @@ class Balkensystem:
         return self
 
     def ziele(self) -> List[str]:
-        """Was ein Lauf rechnen muss: jeder Querschnitt -- auch einer, den kein Stab nimmt -- und das System."""
-        return ([i for paar in self.flaechen.values() for i in paar] + list(self.module.values())
-                + [self.rechnung.id])
+        """
+        Was ein Lauf rechnen muss: jeder Querschnitt -- auch einer, den kein
+        Stab nimmt -- und das System. Von einem E_eq die Suche, nicht E: das
+        fehlt, wo sie keinen Modul fand.
+        """
+        return ([i for paar in self.flaechen.values() for i in paar]
+                + [E for q, E in self.module.items() if q not in self.modulsuchen]
+                + list(self.modulsuchen.values()) + [self.rechnung.id])
 
     # -- Rechnen ----------------------------------------------------------------
 
     def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         """
         Die Steifigkeiten in die Staebe, das System gerechnet, die Herleitung
-        geschrieben. Haelt eine Meldung der Beschreibung die Rechnung auf,
-        bleibt es bei ihr.
+        geschrieben. Haelt eine Meldung der Beschreibung die Rechnung auf --
+        oder ein E_eq, das es nicht gibt --, bleibt es bei ihr.
         """
+        meldungen = list(self.meldungen) + self._ohne_modul(e)
         steif = {(s.querschnitt, s.material): (e.g(f"EA_{i}").si, e.g(f"EI_{i}").si)
-                 for i, s in enumerate(self.steifigkeiten)}
+                 for i, s in enumerate(self.steifigkeiten) if e.hat(f"EA_{i}")}
         staebe = []
         for stab in self.system.staebe:
             paar = self.paare.get(stab.name)
-            if paar is not None:
+            if paar in steif:
                 EA, EI = steif[paar]
                 stab = replace(stab, EA=EA, EI=EI)
             staebe.append(stab)
@@ -459,14 +488,26 @@ class Balkensystem:
                                   for stab, g in eigen.items()), *lf.lasten])
             if lf.name == self.eigengewicht else lf
             for lf in self.system.lastfaelle])
-        if any(m.fehler for m in self.meldungen):
-            ergebnis = Ergebnis(meldungen=list(self.meldungen))
+        if any(m.fehler for m in meldungen):
+            ergebnis = Ergebnis(meldungen=meldungen)
         else:
             ergebnis = rechnen(gerechnet)
-            ergebnis.meldungen[:0] = self.meldungen
+            ergebnis.meldungen[:0] = meldungen
         befund = Systembefund(gerechnet, ergebnis, eigengewicht=eigen)
         herleitung.schreiben(p, self, befund)
         return Ausfuehrung({}, befund=befund)
+
+    def _ohne_modul(self, e: Eingaben) -> List[Meldung]:
+        """Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab nimmt, eine Meldung."""
+        meldungen = []
+        for q, _ in self.modulsuchen.items():
+            befund = e.befund(f"modul_{q}")
+            staebe = [stab for stab, (quer, _) in self.paare.items() if quer == q]
+            if befund.stelle is None and staebe:
+                name = next(x.name for x in self.querschnitte if x.kennung == q)
+                meldungen.append(Meldung(f"Querschnitt «{name}»: kein E_eq – {befund.grund}",
+                                         (q, *staebe), True))
+        return meldungen
 
 
 def _derselbe(wert: Groesse) -> Groesse:

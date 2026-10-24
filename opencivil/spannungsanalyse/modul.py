@@ -4,16 +4,29 @@ opencivil/spannungsanalyse/modul.py -- der aequivalente E-Modul.
 VERANTWORTUNG:
 Die letzten zwei Fragen: eine Linie, umgerechnet in den Modul, den ein
 reiner, ungerissener, elastischer Betonquerschnitt braeuchte, um sich gleich
-stark zu kruemmen oder zu dehnen (:class:`Modullinie`).
+stark zu kruemmen oder zu dehnen (:class:`Modullinie`). Und derselbe Modul
+an einer Stelle der Linie, fuer die Staebe eines Balkensystems
+(:func:`modul_bei`, :class:`Modulfrage`): dort geht er in die Rechnung ein,
+darum rechnet ihn das Rechenwerk, nicht die Auswertung danach.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any, Callable, List, Optional, Tuple
 
+from opencivil.core.berechnung import (
+    Ausfuehrung, Befundbezug, Berechnung, Eingabebezug, Eingaben, Prozedur, Vorgabe,
+)
+from opencivil.core.einheiten import KN, KNM, MIO_MM4, N_PRO_MM2, Groesse
+from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
+from opencivil.core.wert import Quelle, WertDef
+from opencivil.material.basis import mit_index
+from opencivil.querschnitt.gesetzwahl import Rechenwahl
+from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.art import Analyseart
-from opencivil.spannungsanalyse.linie import Linie
+from opencivil.spannungsanalyse.linie import Linie, Paar
+from opencivil.spannungsanalyse.schnitt import schnittpaar
 
 
 # ===========================================================================
@@ -158,3 +171,202 @@ def aequivalenter_modul(linie: Linie, *, I_c: float, A_c: float, E_cm: float) ->
             kraft=0.0, modul=naechster.modul, gerissen=False,
             modul_I=naechster.modul_I, modul_II=naechster.modul_II))
     return modul
+
+
+# ===========================================================================
+# Der Modul an einer Stelle -- fuer die Staebe eines Balkensystems
+# ===========================================================================
+
+
+@dataclass(frozen=True)
+class Modulstelle:
+    """Der aequivalente Modul bei N und M -- und woraus er folgt, fuer die Herleitung."""
+
+    N: float
+    M: float
+    """Das Moment, bei dem gerechnet wurde, zur Zugseite -- bei M = 0 das halbe Rissmoment."""
+
+    riss: float
+    """``M_Riss(N)``."""
+
+    gerissen: bool
+    chi_0: float
+    """Die Kruemmung ohne Moment -- ab ihr wird gezaehlt."""
+
+    chi: float
+    I_c: float
+    modul: float
+    """In Pa."""
+
+
+def modul_bei(paar: Paar, *, N: float, M: float) -> Tuple[Optional[Modulstelle], str]:
+    """
+    Der aequivalente E-Modul bei der Normalkraft ``N`` (Zug positiv) und dem
+    Moment ``M >= 0`` zur Zugseite des Paars, in SI -- an derselben Stelle der
+    M-E_eq-Linie (:func:`aequivalenter_modul` ueber
+    :func:`~opencivil.spannungsanalyse.linie.moment_kruemmung`): ungerissen
+    bis ``M_Riss(N)``, darueber gerissen, gezaehlt ab der Kruemmung ohne
+    Moment. Bei ``M = 0`` der Wert, mit dem die Linie beginnt -- ungerissen
+    ist der Querschnitt linear, das halbe Rissmoment gibt ihn genau.
+
+    Ohne Gleichgewicht ``None``, dazu der Satz, warum -- klein beginnend, er
+    steht hinter einem Doppelpunkt.
+    """
+    gerissen, ungerissen = paar.ebenen()
+    riss = paar.rissmoment_bei(N)
+    if M == 0.0:
+        if riss <= 0.0:
+            return None, ("schon die Normalkraft allein reisst den Querschnitt auf – "
+                          "ohne Moment gibt es kein E_eq.")
+        M = 0.5 * riss
+    null = (ungerissen if riss > 0.0 else gerissen).zu_kraeften(N, 0.0)
+    if null is None:
+        return None, ("schon ohne Moment gibt es keine Gleichgewichtslage – die "
+                      "Normalkraft allein übersteigt, was der Querschnitt aufnimmt.")
+    ist_gerissen = M > riss
+    ebene = (gerissen if ist_gerissen else ungerissen).zu_kraeften(N, M)
+    if ebene is None:
+        return None, ("bei diesem Moment gibt es keine Gleichgewichtslage – es "
+                      "übersteigt den Biegewiderstand bei dieser Normalkraft.")
+    linie = Modullinie(Analyseart.MOMENT_EMODUL, Linie(Analyseart.MOMENT_KRUEMMUNG, N, riss),
+                       paar.I_c, null.kruemmung, paar.E_cm)
+    modul = linie.modul(M, ebene.kruemmung)
+    if modul is None:
+        return None, "unter diesem Moment krümmt sich der Querschnitt nicht."
+    return Modulstelle(N=N, M=M, riss=riss, gerissen=ist_gerissen, chi_0=null.kruemmung,
+                       chi=ebene.kruemmung, I_c=paar.I_c, modul=modul), ""
+
+
+@dataclass(frozen=True)
+class Modulbefund:
+    """Was die Suche nach E_eq fand: die Stelle -- oder warum es keine gibt."""
+
+    stelle: Optional[Modulstelle]
+    grund: str = ""
+
+
+@dataclass(frozen=True)
+class Modulfrage:
+    """
+    Das E_eq eines gezeichneten Querschnitts bei ``N`` in kN (Zug positiv)
+    und ``M`` in kNm (positiv mit Zug unten), fuer die Staebe eines
+    Balkensystems mit ihm (Benutzer, 2026-10-23) -- gerechnet mit ``wahl``
+    wie eine Spannung-Dehnung-Analyse.
+    """
+
+    analyse: Any
+    """Die :class:`~opencivil.querschnitt.analyse.Querschnittsanalyse`."""
+
+    N: float
+    M: float
+    wahl: Rechenwahl
+
+    def einbauen(self, definieren: Callable[..., WertDef], *, wo: str, index: str, name: str,
+                 abschnitt: Abschnitt) -> Tuple[List[Berechnung], str, str]:
+        """
+        Die Berechnungen dazu, im Namensraum des Systems: N und M als
+        Vorgaben, die Suche (:class:`ModulProzedur`) und E aus ihrem Befund
+        (:class:`ModulAusBefund`). ``definieren(kurzname, symbol, einheit,
+        beschreibung, stellen)`` legt einen Wert des Systems an. Zurueck die
+        Berechnungen, die Wert-ID von E -- sie fehlt, wo die Suche keinen
+        Modul fand -- und die ID der Suche.
+        """
+        d_N = definieren(wo + "N_eq", mit_index("N", index), KN, f"Normalkraft für E_eq, {name}", 1)
+        d_M = definieren(wo + "M_eq", mit_index("M", index), KNM, f"Moment für E_eq, {name}", 1)
+        d_E = definieren(wo + "E", mit_index("E", index), N_PRO_MM2, f"E-Modul, {name}", 0)
+        suche = f"{d_E.id}_eq"
+        return [
+            Vorgabe(id=d_N.id, ausgabe=d_N, groesse=Groesse(self.N, KN), quelle=Quelle.EINGABE,
+                    titel=f"Normalkraft für E_eq, «{name}»", abschnitt=abschnitt),
+            Vorgabe(id=d_M.id, ausgabe=d_M, groesse=Groesse(self.M, KNM), quelle=Quelle.EINGABE,
+                    titel=f"Moment für E_eq, «{name}»", abschnitt=abschnitt),
+            ModulProzedur(self, id=suche, N_id=d_N.id, M_id=d_M.id, name=name,
+                          abschnitt=abschnitt),
+            ModulAusBefund(id=f"{d_E.id}_aus", ausgabe=d_E, suche=suche, name=name,
+                           abschnitt=abschnitt),
+        ], d_E.id, suche
+
+
+class ModulProzedur(Prozedur):
+    """
+    Sucht das E_eq einer :class:`Modulfrage`: mit dem Paar der
+    Spannung-Dehnung-Analyse in der Zugrichtung des Moments
+    (:func:`~opencivil.spannungsanalyse.schnitt.schnittpaar`), an der Stelle
+    der M-E_eq-Linie (:func:`modul_bei`). Ohne Ausgabe -- ihr Befund ist der
+    :class:`Modulbefund`, und die Herleitung sagt, was sie fand. So haelt
+    ein Moment ueber dem Widerstand nur das System auf, nicht das Projekt.
+    """
+
+    def __init__(self, frage: Modulfrage, *, id: str, N_id: str, M_id: str, name: str,
+                 abschnitt: Abschnitt) -> None:
+        analyse = frage.analyse
+        bezuege = [*analyse.grundbezuege(),
+                   *(Eingabebezug(k, analyse.id_von(k)) for k in ("A", "I_y", "I_z", "I_yz")),
+                   Eingabebezug("N", N_id), Eingabebezug("M", M_id)]
+        super().__init__(id, ausgaben=[], bezuege=bezuege, abschnitt=abschnitt,
+                         titel=f"Äquivalenter E-Modul, «{name}»")
+        self.frage = frage
+
+    def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
+        N, M = e.g("N").si, e.g("M").si
+        seite = Zugseite.UNTEN if M >= 0.0 else Zugseite.OBEN
+        paar = schnittpaar(self.frage.analyse, seite, e.si_nach_id(), self.frage.wahl)
+        if paar is None:
+            befund = Modulbefund(None, "der Querschnitt hat keine Bewehrung – ohne sie gibt "
+                                       "es keine Momenten-Krümmungs-Linie.")
+        else:
+            befund = Modulbefund(*modul_bei(paar, N=N, M=abs(M)))
+        self._schreiben(p, seite, befund)
+        return Ausfuehrung({}, befund=befund)
+
+    def _schreiben(self, p: Protokoll, seite: Zugseite, befund: Modulbefund) -> None:
+        p.erklaerung(
+            "Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, "
+            "ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich "
+            "stark zu krümmen wie der bewehrte. An derselben Stelle wie die Linie "
+            "M–E_eq der Querschnittsanalyse: ungerissen bis zum Rissmoment, darüber "
+            "gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA und EI "
+            "jedes Stabs mit diesem Querschnitt.")
+        p.text(f"Querschnittsanalyse «{self.frage.analyse.name}», {seite.beschriftung}, "
+               f"{self.frage.wahl.beschriftung}.")
+        s = befund.stelle
+        if s is None:
+            p.text(f"Kein E_eq: {befund.grund}")
+            return
+        w = Zwischenwerte(self.id)
+        p.wert(w.moment("M_r", r"M_{Riss}", s.riss, "Rissmoment bei dieser Normalkraft"))
+        p.text("Das Moment liegt über dem Rissmoment: der Querschnitt gilt gerissen."
+               if s.gerissen else "Das Moment liegt nicht über dem Rissmoment: der "
+                                  "Querschnitt gilt ungerissen.")
+        werte = {
+            "M": w.moment("M", "M", s.M, "Moment"),
+            "I_c": w.wert("I_c", "I_c", Groesse.aus_si(s.I_c, MIO_MM4), 1,
+                          "reiner Betonquerschnitt"),
+            "chi": w.kruemmung("chi", r"\chi", s.chi, "Krümmung bei M"),
+            "chi_0": w.kruemmung("chi_0", r"\chi_0", s.chi_0, "Krümmung ohne Moment"),
+        }
+        p.formel(w.spannung("E_eq", r"E_{eq}", s.modul, "Äquivalenter E-Modul"),
+                 r"\frac{@M}{@I_c \cdot \left(@chi - @chi_0\right)}", werte,
+                 titel=self.titel, name="Äquivalenter E-Modul eines Stabs")
+
+
+class ModulAusBefund(Prozedur):
+    """
+    E aus dem Befund der Suche -- nur, wo sie einen Modul fand. Sonst ist sie
+    nicht anwendbar: E fehlt, mit ihm EA und EI, und das System sagt warum.
+    """
+
+    def __init__(self, *, id: str, ausgabe: WertDef, suche: str, name: str,
+                 abschnitt: Abschnitt) -> None:
+        super().__init__(id, ausgaben=[ausgabe], befunde=[Befundbezug("suche", suche)],
+                         abschnitt=abschnitt, titel=f"E-Modul, «{name}» (E_eq)")
+        self.ausgabe = ausgabe
+
+    def anwendbar(self, e: Eingaben) -> Tuple[bool, str]:
+        befund = e.befund("suche")
+        return befund.stelle is not None, befund.grund
+
+    def rechne(self, e: Eingaben, p: Protokoll) -> dict:
+        wert = self.ausgabe.belegen(Groesse.aus_si(e.befund("suche").stelle.modul, N_PRO_MM2))
+        p.wert(wert, titel=self.titel)
+        return {self.ausgabe.id: wert.groesse}

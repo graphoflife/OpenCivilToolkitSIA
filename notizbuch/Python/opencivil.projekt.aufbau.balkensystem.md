@@ -1,5 +1,5 @@
 ---
-erzeugt: a75fe6fdc13f
+erzeugt: 783644c96fa1
 art: modul
 tags: [modul]
 ---
@@ -66,6 +66,7 @@ der zweite Teil sagt, warum.
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.system]]
 
