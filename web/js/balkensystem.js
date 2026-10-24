@@ -28,7 +28,7 @@ import {
   erklaerung, feld, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
-  aktiverLastfall, eintragVon, lastfallWaehlen, passendeUebersicht, waehlen, zeichenbereich,
+  eintragVon, lastfallWaehlen, passendeUebersicht, waehlen, zeichenbereich,
 } from './bs_zeichnung.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
@@ -199,21 +199,15 @@ function vorzeichenbild() {
 
 function systemGruppe(system) {
   const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
-  const lf = aktiverLastfall(system.kennung);
   return panel({
     schluessel: 'balkensystem/System', titel: 'System', zusatz: 'x nach rechts, z nach oben, m',
     breit: true,
   }, [
+    // Der Lastfall der Zeichnung steht in ihrer Leiste, neben «Last».
     feld('Bezeichnung', el('input', {
       type: 'text', value: system.name,
       on: { change: (e) => aendern((s) => { s.name = e.target.value; }) },
-    })),
-    feld('Lastfall', system.lastfaelle.length ? auswahl({
-      werte: system.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })),
-      gewaehlt: lf,
-      titel: 'Dessen Lasten zeigt und bearbeitet die Zeichnung',
-      beiAenderung: (w) => lastfallWaehlen(system.kennung, w),
-    }) : el('span.bs-leer', { text: 'kein Lastfall -- im Panel «Lastfälle» anlegen' }), erklaerung(HILFE.vorzeichen.zeilen, HILFE.vorzeichen.formel)),
+    }), erklaerung(HILFE.vorzeichen.zeilen, HILFE.vorzeichen.formel)),
     zeichenbereich(system, uebersicht),
     el('div.unterkapitel', {}, [
       el('details.bs-vorzeichen-huelle', {}, [el('summary', { text: 'Vorzeichen' }), vorzeichenbild()]),

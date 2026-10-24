@@ -2061,6 +2061,9 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-lastzeile { display: flex; align-items: center; gap: 4px; }
 .bs-lastzeile .cad-zeile { flex: 1; min-width: 0; }
 .bs-neue-lasten { display: flex; flex-wrap: wrap; gap: 4px; }
+/* Die Wahl des Lastfalls in der Leiste, gleich neben «Last». */
+.bs-lastfallwahl { align-self: center; }
+.bs-lastfallwahl select { max-width: 11em; font-size: 12px; padding: 2px 4px; }
 .bs-neue-lasten .knopf { padding: 2px 6px; font-size: 11.5px; }
 
 /* Unter der Zeichnung: je Linie, Lager und Last eine Zeile; ein Klick

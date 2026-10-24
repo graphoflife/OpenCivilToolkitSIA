@@ -123,6 +123,7 @@ export function zeichenbereich(system, uebersichtBauen) {
   const bereich = cadBereich(a, [unten]);
   uebersichtHolen(a);
   uebersichtZeichnen(a);
+  lastfallLeiste(a);
   return bereich;
 }
 
@@ -151,8 +152,30 @@ export function aktiverLastfall(kennung) {
   const a = fensterVon(kennung);
   const z = eintragVon(kennung);
   const faelle = z?.lastfaelle || [];
+  // «– kein Lastfall –»: die Zeichnung zeigt keine Lasten.
+  if (a.bs.lastfall === '') return null;
   if (faelle.some((lf) => lf.kennung === a.bs.lastfall)) return a.bs.lastfall;
-  return faelle[0]?.kennung || null;
+  // Zuerst das Eigengewicht (Benutzer, 2026-10-24).
+  return (faelle.find((lf) => lf.eigengewicht) || faelle[0])?.kennung || null;
+}
+
+/**
+ * Die Wahl des Lastfalls gleich neben dem Werkzeug «Last» (Benutzer,
+ * 2026-10-24): dessen Lasten zeigt und bearbeitet die Zeichnung -- oder
+ * «– kein Lastfall –». Neu bei jedem Neubau der Tafel, damit sie jeden
+ * Lastfall kennt.
+ */
+function lastfallLeiste(a) {
+  const huelle = a.bs.lastfallHuelle;
+  if (!huelle) return;
+  const faelle = eintragVon(a.bs.kennung)?.lastfaelle || [];
+  huelle.replaceChildren(auswahl({
+    werte: [{ wert: '', beschriftung: '– kein Lastfall –' },
+      ...faelle.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
+    gewaehlt: aktiverLastfall(a.bs.kennung) || '',
+    titel: 'Dessen Lasten zeigt und bearbeitet die Zeichnung',
+    beiAenderung: (w) => lastfallWaehlen(a.bs.kennung, w),
+  }));
 }
 
 export function lastfallWaehlen(kennung, lastfall) {
@@ -228,6 +251,10 @@ function adapter(kennung) {
     zeichnung: () => eintragVon(kennung),
     schreiben: (veraenderer) => schreiben(kennung, veraenderer),
     tafelNeu: () => aendern({}, 'zeichnung'),
+    leisteZusatz: () => {
+      bs.lastfallHuelle = el('span.bs-lastfallwahl');
+      return bs.lastfallHuelle;
+    },
     name: elementname,
     neuText,
     punktAnlegen: () => null,
@@ -319,7 +346,7 @@ function naechsteLast(z) {
 function lastAnlegen(a, z, erg) {
   const lf = aktiverLastfall(a.bs.kennung);
   if (!lf) {
-    melden('Für Lasten zuerst im Panel «Lastfälle» einen Lastfall anlegen.', true);
+    melden('Für eine Last zuerst oben neben «Last» einen Lastfall wählen.', true);
     return null;
   }
   const v = a.bs.vorgaben.last;
@@ -773,9 +800,11 @@ function neuEigenschaften(a, werkzeug) {
     ];
   } else if (werkzeug === 'last') {
     const v = a.bs.vorgaben.last;
+    // Der Lastfall steht oben neben «Last»; hier nur, wenn keiner gewählt ist.
     inhalt = [
-      lastfallWahl(a, z, aktiverLastfall(a.bs.kennung), (w) => lastfallWaehlen(a.bs.kennung, w),
-        'In diesen Lastfall kommt die Last -- die Zeichnung zeigt seine Lasten'),
+      aktiverLastfall(a.bs.kennung) ? null : el('p.cad-hinweis-klein', {
+        text: 'Kein Lastfall gewählt -- oben neben «Last» einen wählen.',
+      }),
       wahlBlock('Art', wahlSchalter({
         werte: katalog().lastarten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: `${x.beschriftung} in ${x.einheit}` })),
         gewaehlt: v.art, setzen: (w) => { v.art = w; neu(); }, klasse: '.ist-wortlaut.ist-umbruch',

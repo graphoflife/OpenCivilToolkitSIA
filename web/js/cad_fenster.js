@@ -739,8 +739,11 @@ function leisteBauen(a) {
   const alles = knopf('cad-alles', '', 'Alles zeigen (F)', () => allesZeigen(a));
   const gross = knopf('cad-vollbild', '', 'Vollbild', () => vollbildSetzen(a, !a.vollbild));
   a.teile.knoepfe = { werkzeuge, rueck, vor, gross };
+  // Was die App gleich neben ihre Werkzeuge stellt -- das Balkensystem die
+  // Wahl des Lastfalls. Sie füllt es selbst, so oft sich etwas ändert.
+  const zusatz = a.adapter.leisteZusatz?.(a) || null;
   return [
-    ...werkzeuge, vorlage, el('span.cad-luecke'),
+    ...werkzeuge, zusatz, vorlage, el('span.cad-luecke'),
     el('div.cad-ansicht', {}, [rueck, vor, alles, gross]),
   ];
 }

@@ -431,8 +431,9 @@ Werkzeug «Last» Q: ein Klick auf eine Linie -- verteilt über die ganze
 Linie, einzeln dort, wo geklickt wurde, in % der Linie --, eine Einzellast
 oder ein Moment auch an einen Knoten. Jede Last ist für sich zu wählen, an
 ihrem Pfeil, Band oder ihrer Zahl, und mit Entf zu löschen. Gezeigt werden
-die Lasten des Lastfalls, der über der Zeichnung gewählt ist; unter ihr
-stehen alle in einer Liste. Darunter die Materialien des Projekts mit
+die Lasten des Lastfalls, der in der Leiste neben «Last» gewählt ist -- zu
+Beginn das Eigengewicht, «– kein Lastfall –» zeigt keine; unter der
+Zeichnung stehen alle in einer Liste, je Gruppe aufklappbar. Darunter die Materialien des Projekts mit
 E-Modul und Dichte -- bei einem eigenen Material dort zu ändern, wie in der
 App «Materialien» --, die Querschnitte und die Lastfälle. Ein Querschnitt
 nimmt seinen E-Modul vom Material des Stabs, als Zahl oder -- aus einer

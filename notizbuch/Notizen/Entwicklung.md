@@ -44,6 +44,22 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: der Lastfall in der Leiste
+
+Wunsch des Benutzers: im Zeichenfenster neben «Last» den Lastfall wählen,
+auch «– kein Lastfall –»; zu Beginn das Eigengewicht.
+
+- Das Zeichenfenster hat einen Platz gleich neben den Werkzeugen
+  (`adapter.leisteZusatz`); die Leiste wird einmal gebaut, das
+  Balkensystem füllt ihn bei jedem Neubau der Tafel neu (`lastfallLeiste`),
+  damit er jeden Lastfall kennt.
+- «– kein Lastfall –» ist `''` im Zustand des Fensters; ohne Wahl gilt der
+  Lastfall mit dem Eigengewicht, sonst der erste (`aktiverLastfall`).
+- Die Liste «Lastfall» über der Zeichnung und im Fenster des Werkzeugs ist
+  weg; eine gewählte Last wechselt ihren Lastfall weiter in ihrem Fenster.
+
+---
+
 ## 2026-10-24 · Balkensystem: Kleinigkeiten der Oberfläche
 
 Wünsche des Benutzers, je eine Zeile:
