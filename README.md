@@ -373,7 +373,8 @@ weit nach innen gerückt da -- eine Aussparung nach aussen --, und an seinen
 Ecken fängt der Zeiger. «Überdeckung beachten» neben gewählter Bewehrung
 schiebt sie so, dass sie mit ihrem Radius gerade ganz darin liegt: ein Stab
 als Ganzes, eine Linie Ende für Ende. Eine verschmierte Linie gilt dafür als
-Stäbe im Abstand von 150 mm mit gleicher Fläche. Mitgerechnet wird c nicht.
+Stäbe im Abstand von 150 mm mit gleicher Fläche -- eine aus ⌀ und Teilung
+mit ihrem ⌀. Mitgerechnet wird c nicht.
 
 Das schwebende Fenster zeigt immer nur eine Art: beim Zeichnen die des
 Werkzeugs, bei der Auswahl die des Gewählten. Eine andere Art ist ein anderes
@@ -407,7 +408,7 @@ Querschnitt. Wie bei der Platte gibt es Riss bei Zwang, Stahlspannung
 quasi-ständig und Fliessen häufig; die Rissanforderung steht in jedem dieser
 drei Fenster und gilt für alle drei. Dabei hält jeder gezogene Stab gegen seine eigene Grenze, mit
 seinem Durchmesser; eine verschmierte Linie zählt, als lägen ihre Stäbe
-150 mm auseinander. Die Zwängung auf Normalkraft rechnet am ganzen
+150 mm auseinander -- eine aus ⌀ und Teilung mit ihrem ⌀. Die Zwängung auf Normalkraft rechnet am ganzen
 Querschnitt, die auf Biegung je Richtung; die Lastfälle unter Gebrauchslast
 tragen N, M_y und M_z, und bei schiefer Biegung dreht die Nulllinie.
 Knicken rechnet wie bei der Platte, je Fall zur gewählten Zugseite: die

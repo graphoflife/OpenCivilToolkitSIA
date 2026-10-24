@@ -688,9 +688,11 @@ def geometrie(eintrag, projekt) -> dict:
         return None if punkte is None else [list(p) for p in punkte]
 
     def linie_ueberdeckt(l):
-        if l["art"] == Linienart.FLAECHE:
+        # Verschmiert mit der Flaeche von Hand: Staebe mit 150 mm Teilung;
+        # aus ⌀ und Teilung: dieser ⌀ (Benutzer, 2026-10-24).
+        if l["art"] == Linienart.FLAECHE and l["verschmiert"] != "staebe":
             def radius(laenge):
-                return aequivalenter_durchmesser(linienflaeche(l, laenge, 0), laenge) / 2.0
+                return aequivalenter_durchmesser(l["flaeche"], laenge) / 2.0
         else:
             def radius(_laenge):
                 return l["durchmesser"] / 2.0

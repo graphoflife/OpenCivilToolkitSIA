@@ -1,5 +1,5 @@
 ---
-erzeugt: b8cb8b0a50f1
+erzeugt: 5f5d9659268b
 art: modul
 tags: [modul]
 ---
@@ -29,15 +29,17 @@ bilden eine Gruppe, die einmal hergeleitet wird
 
 ## DER FIKTIVE DURCHMESSER
 
-Eine verschmierte Linie hat keinen Durchmesser: sie bekommt einen fiktiven,
-als laegen ihre Staebe 150 mm auseinander (Annahme des Benutzers,
-2026-10-15). Die Regel steht in
+Eine verschmierte Linie mit der Flaeche von Hand hat keinen Durchmesser:
+sie bekommt einen fiktiven, als laegen ihre Staebe 150 mm auseinander
+(Annahme des Benutzers, 2026-10-15). Die Regel steht in
 [[opencivil.querschnitt.geometrie#aequivalenter_durchmesser|aequivalenter_durchmesser]] -- die
 Ueberdeckung braucht dieselbe:
 
 ```
 ⌀_fikt = sqrt(4/π · A_s/l · s)        s = 150 mm
 ```
+
+Kommt ihre Flaeche aus ⌀ und Teilung, gilt dieser ⌀ (Benutzer, 2026-10-24).
 
 Nach Vorgabe, nicht nachgeschlagen: die Grenze je Stab und der fiktive
 Durchmesser. Siehe `notizbuch/Notizen/TODO.md`.
@@ -62,7 +64,7 @@ Ein Stab -- oder ein Stueck einer verschmierten Linie --, wie die Nachweise ihn 
 - `lage: Punkt` – in m.
 - `flaeche: float` – in m².
 - `beton: Baustoff` – Der Beton, in dem er liegt: er gibt `f_ctm` fuer die Rissbreite.
-- `durchmesser: float` – in m -- bei einer verschmierten Linie der fiktive.
+- `durchmesser: float` – in m -- bei einer verschmierten Linie mit Flaeche von Hand der fiktive.
 
 #### Stabangabe.stahl
 
@@ -77,6 +79,15 @@ def stahl(self) -> Baustoff
 @property
 def verschmiert(self) -> bool
 ```
+
+#### Stabangabe.fiktiv
+
+```python
+@property
+def fiktiv(self) -> bool
+```
+
+Ob sein Durchmesser fiktiv ist: verschmiert, die Flaeche von Hand -- nicht aus ⌀ und s.
 
 #### Stabangabe.ort
 
@@ -154,7 +165,7 @@ Welche Elemente zu welcher Grenze gehoeren.
 ## Konstanten
 
 - `GRENZE_JE_STAB = 'Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durch…` – Wie die Grenze aus der Rissbreite hier gemessen wird.
-- `FIKTIV = 'Eine verschmierte Linie hat keinen Durchmesser – sie bekommt einen f…` – Woher eine verschmierte Linie ihren Durchmesser hat.
+- `FIKTIV = 'Eine verschmierte Linie mit ihrer Fläche von Hand hat keinen Durchme…` – Woher eine verschmierte Linie ihren Durchmesser hat.
 
 ## Braucht
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 774edf0045bb
+erzeugt: 701c98ef8f0b
 art: thema
 tags: [thema]
 ---
@@ -12,7 +12,7 @@ Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Di
 
 Eine aufgezwungene Verkürzung zieht den ganzen Querschnitt: es reisst der ganze Beton, und alle Stäbe teilen sich seine Risskraft, jeder bis zu seiner zulässigen Spannung. Die rissaktive Dicke t ist die kleinere Abmessung des Betons.
 
-Eine verschmierte Linie hat keinen Durchmesser – sie bekommt einen fiktiven, als lägen ihre Stäbe 150 mm auseinander (Annahme).
+Eine verschmierte Linie mit ihrer Fläche von Hand hat keinen Durchmesser – sie bekommt einen fiktiven, als lägen ihre Stäbe 150 mm auseinander (Annahme). Eine aus ⌀ und Teilung behält ihren ⌀.
 
 ## Formeln
 

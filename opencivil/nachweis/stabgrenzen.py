@@ -18,13 +18,15 @@ bilden eine Gruppe, die einmal hergeleitet wird
 (:class:`~opencivil.nachweis.spannungsgrenzen.Grenzgruppe`).
 
 DER FIKTIVE DURCHMESSER:
-Eine verschmierte Linie hat keinen Durchmesser: sie bekommt einen fiktiven,
-als laegen ihre Staebe 150 mm auseinander (Annahme des Benutzers,
-2026-10-15). Die Regel steht in
+Eine verschmierte Linie mit der Flaeche von Hand hat keinen Durchmesser:
+sie bekommt einen fiktiven, als laegen ihre Staebe 150 mm auseinander
+(Annahme des Benutzers, 2026-10-15). Die Regel steht in
 :func:`~opencivil.querschnitt.geometrie.aequivalenter_durchmesser` -- die
 Ueberdeckung braucht dieselbe::
 
     ⌀_fikt = sqrt(4/π · A_s/l · s)        s = 150 mm
+
+Kommt ihre Flaeche aus ⌀ und Teilung, gilt dieser ⌀ (Benutzer, 2026-10-24).
 
 Nach Vorgabe, nicht nachgeschlagen: die Grenze je Stab und der fiktive
 Durchmesser. Siehe ``notizbuch/Notizen/TODO.md``.
@@ -72,7 +74,7 @@ class Stabangabe:
     """Der Beton, in dem er liegt: er gibt ``f_ctm`` fuer die Rissbreite."""
 
     durchmesser: float
-    """in m -- bei einer verschmierten Linie der fiktive."""
+    """in m -- bei einer verschmierten Linie mit Flaeche von Hand der fiktive."""
 
     @property
     def stahl(self) -> Baustoff:
@@ -81,6 +83,11 @@ class Stabangabe:
     @property
     def verschmiert(self) -> bool:
         return self.element.art == Linienart.FLAECHE.value
+
+    @property
+    def fiktiv(self) -> bool:
+        """Ob sein Durchmesser fiktiv ist: verschmiert, die Flaeche von Hand -- nicht aus ⌀ und s."""
+        return self.verschmiert and self.element.aus_staeben is None
 
     @property
     def ort(self) -> str:
@@ -104,11 +111,11 @@ def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt,
     """Je Bewehrung des Querschnitts ihre Angaben -- in derselben Reihenfolge wie dort."""
     angaben = []
     for b, element in zip(q.bewehrung, herkunft):
-        verschmiert = element.art == Linienart.FLAECHE.value
+        fiktiv = element.art == Linienart.FLAECHE.value and element.aus_staeben is None
         angaben.append(Stabangabe(
             element=element, lage=b.lage, flaeche=b.flaeche,
             beton=analyse.beton_an((b.lage[0] * 1e3, b.lage[1] * 1e3)),
-            durchmesser=(fiktiver_durchmesser(element) if verschmiert
+            durchmesser=(fiktiver_durchmesser(element) if fiktiv
                          else element.durchmesser * 1e-3)))
     return angaben
 
@@ -142,7 +149,7 @@ def grenzen_aus_rissbreite(analyse: Querschnittsanalyse, e: Eingaben,
     def schluessel(s: Stabangabe) -> tuple:
         if not mit_rissbreite:
             return (s.stahl.id,)
-        return (s.stahl.id, s.beton.id, s.verschmiert, round(s.durchmesser, 9))
+        return (s.stahl.id, s.beton.id, s.fiktiv, round(s.durchmesser, 9))
 
     def bilden(s: Stabangabe) -> Grenzgruppe:
         sigma = zulaessige_stahlspannung(
@@ -160,8 +167,9 @@ GRENZE_JE_STAB = (
     "der Stab mit dem kleinsten Erfüllungsgrad.")
 
 #: Woher eine verschmierte Linie ihren Durchmesser hat.
-FIKTIV = ("Eine verschmierte Linie hat keinen Durchmesser – sie bekommt einen "
-          "fiktiven, als lägen ihre Stäbe 150 mm auseinander (Annahme).")
+FIKTIV = ("Eine verschmierte Linie mit ihrer Fläche von Hand hat keinen Durchmesser – "
+          "sie bekommt einen fiktiven, als lägen ihre Stäbe 150 mm auseinander "
+          "(Annahme). Eine aus ⌀ und Teilung behält ihren ⌀.")
 
 
 def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
@@ -177,7 +185,7 @@ def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnitt
     fiktiv: Dict[str, Wert] = {}
     for gruppe in grenzen.gruppen:
         s = gruppe.stab
-        if s is not None and s.verschmiert and s.element.kennung not in fiktiv:
+        if s is not None and s.fiktiv and s.element.kennung not in fiktiv:
             if not fiktiv:
                 p.erklaerung(FIKTIV)
             fiktiv[s.element.kennung] = _protokoll_fiktiv(p, s, basis)
@@ -192,7 +200,7 @@ def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnitt
         beton = (s or staebe[gruppe.stellen[0]]).beton
         if s is None:
             durchmesser = w.laenge("dm", r"\varnothing", 0.0)
-        elif s.verschmiert:
+        elif s.fiktiv:
             durchmesser = fiktiv[s.element.kennung]
         else:
             durchmesser = w.laenge("dm", r"\varnothing", s.durchmesser, stellen=0)

@@ -24,7 +24,7 @@ from opencivil.projekt.lesen import wahl_von
 from opencivil.projekt.querschnittsanalyse import (
     QAGebrauchsfallEintrag, QuerschnittsanalyseEintrag,
 )
-from opencivil.nachweis.stabgrenzen import fiktiver_durchmesser
+from opencivil.nachweis.stabgrenzen import fiktiver_durchmesser, stabangaben
 from opencivil.querschnitt.interaktion import Querschnitt
 
 #: Die Kennwerte von C30/37 und B500B, wie das Rechenwerk sie liefert.
@@ -78,6 +78,20 @@ class TestFiktiverDurchmesser(unittest.TestCase):
         linie = aufbau.querschnittsanalysen["a1"].gruppen[0]
         self.assertAlmostEqual(fiktiver_durchmesser(linie) * 1e3,
                                math.sqrt(4.0 / math.pi * 150.0), places=9)
+
+    def test_aus_durchmesser_und_teilung_gilt_der_durchmesser(self):
+        """Verschmiert aus ⌀12 @ 200: die Grenze je Stab rechnet mit ⌀12, nicht fiktiv (Benutzer, 2026-10-24)."""
+        p, a = rechteck(unten=())
+        a.stablinie([50, 50], [250, 50], art="flaeche", verschmiert="staebe", durchmesser=12.0,
+                    teilung=200.0, stahl="s1")
+        aufbau, loesung = rechnen(p)
+        analyse = aufbau.querschnittsanalysen["a1"]
+        q, herkunft, _ = analyse.querschnitt(lambda kid: loesung.werte[kid].groesse.si, VORGABE)
+        angaben = stabangaben(analyse, q, herkunft)
+        self.assertTrue(angaben)
+        for s in angaben:
+            self.assertFalse(s.fiktiv)
+            self.assertAlmostEqual(s.durchmesser, 0.012)
 
 
 class TestVerfehlteEbene(unittest.TestCase):

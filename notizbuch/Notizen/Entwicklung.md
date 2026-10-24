@@ -61,9 +61,10 @@ Fläche steht grau darunter.
 - **Herleitung:** in der Tabelle «Bewehrung» «verschmiert: ⌀10 @ 200 auf
   300», darüber der Ansatz A_s = L/s · π⌀²/4 (Formelsammlung «Verschmierte
   Stahlfläche aus Stäben»).
-- **Offen:** Stahlspannung je Stab und Überdeckung nehmen für jede
-  verschmierte Linie weiter den fiktiven Durchmesser bei s = 150 mm -- auch
-  wo ⌀ und s nun bekannt sind (TODO).
+- **Mit ihrem ⌀** (Benutzer, Rückfrage 2026-10-24): die Grenze der
+  Stahlspannung je Stab und «Überdeckung beachten» nehmen bei einer Linie
+  aus ⌀ und Teilung deren ⌀; fiktiv (Stäbe alle 150 mm) bleibt nur die mit
+  der Fläche von Hand (`Stabangabe.fiktiv`).
 - **Nebenbei behoben:** die Normalkraft-Dehnungs-Linie stürzte ab, wenn die
   Suche nach dem Fliessbeginn auf eine Stelle ohne Gleichgewicht fiel -- sie
   hielt «keine Ebene» für «fliesst noch nicht» (`linie.py`). Getroffen hat
