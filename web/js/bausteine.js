@@ -174,6 +174,22 @@ export function wahlSchalter({ werte, gewaehlt, setzen, titel = '', klasse = '' 
 }
 
 /**
+ * Eine Gruppe einer Liste, die auf- und zuklappt -- zu Beginn zu (Benutzer,
+ * 2026-10-24). `offen` merkt sich die Titel der aufgeklappten; das ist
+ * Ansichtssache, nicht Teil des Projekts. `klasse` gibt die Namen: die
+ * Gruppe, ihr `-titel` und ihre `-zeilen`.
+ */
+export function klappgruppe(titel, zeilen, offen, klasse) {
+  const gruppe = el(`details.${klasse}`, {}, [
+    el(`summary.${klasse}-titel`, { text: `${titel} (${zeilen.length})` }),
+    el(`div.${klasse}-zeilen`, {}, zeilen),
+  ]);
+  gruppe.open = offen.has(titel);
+  gruppe.addEventListener('toggle', () => { if (gruppe.open) offen.add(titel); else offen.delete(titel); });
+  return gruppe;
+}
+
+/**
  * Ein Schalter mit vielen oder langen Stellungen unter seiner Beschriftung
  * -- neben ihr fände er keinen Platz, und seine Stellungen brechen um. Ein
  * «div», kein «label»: ein Klick auf den Text löste sonst die erste

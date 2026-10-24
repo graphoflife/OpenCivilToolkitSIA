@@ -399,7 +399,8 @@ erst ohne Punkt endet das Werkzeug. Alle Eigenschaften stehen im
 schwebenden Fenster in der Zeichnung. Mit T kommt eine Vorlage dazu --
 Rechteck, T-Balken, Hohlkasten oder Kreis, die Skizze ändert sich beim
 Tippen der Masse. Rückgängig mit Strg+Z, Vollbild.
-Darunter eine Liste: Meldungen, Querschnittswerte, je Element eine Zeile.
+Darunter eine Liste: Meldungen, Querschnittswerte, je Element eine Zeile --
+je Art eine Gruppe, die auf- und zuklappt, zu Beginn zu.
 Was die Rechnung braucht -- die Stäbe einer Linie samt tatsächlicher
 Teilung, Schwerpunkt, Zellen, Meldungen am Element -- kommt vom Kern. Darunter
 die Kapitel als Knöpfe mit Fenster, wie bei der Platte. Im Fenster der
@@ -436,7 +437,8 @@ oder ein Moment auch an einen Knoten. Jede Last ist für sich zu wählen, an
 ihrem Pfeil, Band oder ihrer Zahl, und mit Entf zu löschen. Gezeigt werden
 die Lasten des Lastfalls, der in der Leiste neben «Last» gewählt ist -- zu
 Beginn das Eigengewicht, «– kein Lastfall –» zeigt keine; unter der
-Zeichnung stehen alle in einer Liste, je Gruppe aufklappbar. Darunter vier
+Zeichnung stehen alle in einer Liste, je Gruppe aufklappbar, zu Beginn zu.
+Darunter vier
 Knöpfe wie die Kapitel einer Querschnittsanalyse -- Material, Querschnitte,
 Lastfälle, Lastkombinationen --, je mit einem Fenster und darunter klein,
 wie viele es gibt. Unter «Material» die

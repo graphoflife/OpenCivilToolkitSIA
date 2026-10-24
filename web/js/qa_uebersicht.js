@@ -5,13 +5,15 @@
  *
  *   Meldungen          was der Kern an der Zeichnung beanstandet
  *   Querschnitt        A, y_S, z_S und I_y, I_z, I_yz, brutto
- *   Elemente           je Art eine Gruppe, je Element eine Zeile
+ *   Elemente           je Art eine Gruppe, je Element eine Zeile -- jede
+ *                      klappt auf und zu, zu Beginn zu
  *
  * Ein Klick auf eine Meldung oder eine Zeile wählt das Element im Fenster.
  * Jede Zahl steht so in der Eingabe oder kommt vom Kern; gerechnet wird hier
  * nichts.
  */
 
+import { klappgruppe } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
 import { imSpiel } from './cad_auswahl.js';
 import { el } from './dom.js';
@@ -35,10 +37,6 @@ function zeile(a, fehler, kennung, was, wert = '') {
   ]);
 }
 
-function gruppe(titel, zeilen) {
-  if (!zeilen.length) return null;
-  return el('div.qa-gruppe', {}, [el('div.qa-gruppentitel', { text: titel }), ...zeilen]);
-}
 
 /** Die Werte des Bruttoquerschnitts in zwei Spalten, die Ziffern untereinander. */
 function werte(b) {
@@ -81,6 +79,10 @@ export function uebersicht(a) {
   }
   if (g?.brutto) teile.push(werte(g.brutto));
 
+  // Je Art eine Gruppe, die auf- und zuklappt -- zu Beginn zu (Benutzer,
+  // 2026-10-24).
+  const offen = a.qa.aufgeklappt || (a.qa.aufgeklappt = new Set());
+  const gruppe = (titel, zeilen) => (zeilen.length ? klappgruppe(titel, zeilen, offen, 'qa-gruppe') : null);
   const gruppen = [
     gruppe('Flächen', z.flaechen.map((f) => zeile(a, fehler, f.kennung,
       f.material ? stoffname(f.material) : 'nimmt Fläche weg', `${f.knoten.length} Ecken`))),

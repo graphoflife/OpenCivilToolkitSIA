@@ -1844,10 +1844,10 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .qa-wert-zahl { text-align: right; font-variant-numeric: tabular-nums; }
 .qa-wert-einheit { font-size: 11px; color: var(--schrift-zart); }
 .qa-elemente { display: flex; flex-direction: column; gap: 6px; }
-.qa-gruppe { display: flex; flex-direction: column; }
-.qa-gruppentitel {
+.qa-gruppe-zeilen { display: flex; flex-direction: column; }
+.qa-gruppe-titel {
   padding: 0 6px 2px; font-size: 10.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .4px; color: var(--schrift-zart);
+  text-transform: uppercase; letter-spacing: .4px; color: var(--schrift-zart); cursor: pointer;
 }
 .qa-element {
   display: grid; grid-template-columns: 13ch minmax(0, 1fr) auto; gap: 8px; align-items: baseline;
@@ -2067,7 +2067,7 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-neue-lasten .knopf { padding: 2px 6px; font-size: 11.5px; }
 
 /* Unter der Zeichnung: je Linie, Lager und Last eine Zeile; ein Klick
-   wählt. Jede Gruppe klappt auf und zu. */
+   wählt. Jede Gruppe klappt auf und zu, zu Beginn zu. */
 .bs-elemente { font-size: 12px; }
 .bs-elemente-zeilen { display: flex; flex-direction: column; gap: 1px; }
 .bs-elemente-titel {

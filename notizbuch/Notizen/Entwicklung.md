@@ -44,6 +44,22 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Listen unter der Zeichnung zu Beginn zugeklappt
+
+Wunsch des Benutzers: im Balkensystem die Liste der Linien und Lager zu
+Beginn zugeklappt -- in der Querschnittsanalyse ebenso die Flächen und die
+Bewehrung unter der Zeichnung.
+
+- **Eine Stelle:** `klappgruppe` in `bausteine.js` baut die Gruppe beider
+  Listen; offen bleibt, was man aufgeklappt hat (`aufgeklappt` am Fenster,
+  Ansichtssache). Vorher merkte sich das Balkensystem die zugeklappten,
+  und die Analyse klappte gar nicht.
+- **Analyse:** Flächen, Stäbe, Bewehrung, Schubwände und Hilfslinien klappen
+  je für sich, mit ihrer Zahl im Titel; Meldungen und Querschnittswerte
+  bleiben offen.
+
+---
+
 ## 2026-10-24 · Balkensystem: vier Knöpfe mit Fenstern
 
 Wunsch des Benutzers: im Balkensystem vier schöne Knöpfe -- Material,

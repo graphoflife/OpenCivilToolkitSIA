@@ -22,7 +22,7 @@
  */
 
 import {
-  erklaerung, feld, panel, wahlBlock, wahlSchalter,
+  erklaerung, feld, klappgruppe, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
   eintragVon, lastfallWaehlen, materialname, passendeUebersicht, waehlen, zeichenbereich,
@@ -151,20 +151,10 @@ function uebersicht(a) {
     ...z.knotenlasten.map((p) => lastzeile(p, `an ${p.knoten}`,
       `${p.art === 'moment' ? 'Moment' : 'Kraft'} ${p.wert} ${p.art === 'moment' ? 'kNm' : 'kN'}`)),
   ];
-  // Jede Gruppe klappt auf und zu (Benutzer, 2026-10-24); zu bleibt, was man
-  // zugeklappt hat -- Ansichtssache, nicht Teil des Projekts.
-  const zu = a.bs.zugeklappt || (a.bs.zugeklappt = new Set());
-  const gruppe = (titel, zeilen) => {
-    const d = el('details.bs-elemente', {}, [
-      el('summary.bs-elemente-titel', { text: `${titel} (${zeilen.length})` }),
-      el('div.bs-elemente-zeilen', {}, zeilen),
-    ]);
-    d.open = !zu.has(titel);
-    d.addEventListener('toggle', () => { if (d.open) zu.delete(titel); else zu.add(titel); });
-    return d;
-  };
+  // Jede Gruppe klappt auf und zu, zu Beginn zu (Benutzer, 2026-10-24).
+  const offen = a.bs.aufgeklappt || (a.bs.aufgeklappt = new Set());
   for (const [titel, zeilen] of [['Linien', linien], ['Lager', lager], ['Lasten', lasten]]) {
-    if (zeilen.length) teile.push(gruppe(titel, zeilen));
+    if (zeilen.length) teile.push(klappgruppe(titel, zeilen, offen, 'bs-elemente'));
   }
   return teile;
 }
