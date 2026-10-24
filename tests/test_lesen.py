@@ -337,11 +337,10 @@ class TestNichtsStill(unittest.TestCase):
         p.querschnittsanalysen[0].stablinien[0].stahl = ""
         self.assertIn("Linie 1 hat kein Material", self.fehler(p))
 
-    def test_buegel_ohne_stahl_nehmen_nicht_den_ersten(self):
+    def test_eine_platte_ohne_stahl_nimmt_nicht_den_ersten(self):
         p = Projekt.beispiel()
-        buegel = p.querschnitt("q1").querkraftbewehrung
-        buegel.durchmesser, buegel.stahl = 10.0, ""
-        self.assertIn("Querkraftbewehrung von 'Decke über EG' hat kein Material", self.fehler(p))
+        p.querschnitt("q1").stahl = ""
+        self.assertIn("Bewehrung von 'Decke über EG' hat kein Material", self.fehler(p))
 
     def test_ein_stahl_ist_kein_beton(self):
         p = Projekt.beispiel()

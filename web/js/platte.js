@@ -166,9 +166,10 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
 
 /**
  * Die Bügel -- ein Raster über die ganze Platte, unterhalb der Lagen, und
- * gebaut wie eine Lage: zwei Zeilen, links der Name, rechts der Stahl.
+ * gebaut wie eine Lage: zwei Zeilen, links der Name. Ihr Stahl ist der der
+ * Platte, oben unter dem Beton (Benutzer, 2026-10-24).
  *
- *     Bügel  ×  x  ⌀ [10] @ [200] mm    [B500B]
+ *     Bügel  ×  x  ⌀ [10] @ [200] mm
  *                y         @ [200] mm
  *
  * Die Neigung der Druckdiagonalen und k_c stehen im Fenster der
@@ -180,9 +181,8 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
  * x-Richtung -- der Nachweis sagt es dann selbst.
  */
 function querkraftBlock(querschnitt) {
-  const staehle = materialien('betonstahl');
   // Vollständig: jede Platte kommt durch den Kern, und der setzt die Bügel
-  // mit allen Feldern. Bügel ohne Stahl meldet der Kern beim Rechnen.
+  // mit allen Feldern.
   const buegel = querschnitt.querkraftbewehrung;
   const ueberAbstand = buegel.art_y === 'teilung';
   const leer = !(buegel.durchmesser > 0);
@@ -217,14 +217,7 @@ function querkraftBlock(querschnitt) {
         beiAenderung: (v) => aendern((x) => { x.abstand_x = v; }),
       }),
       el('span.einheit', { text: 'mm' }),
-      el('select.stahlwahl', {
-        title: 'Betonstahl der Bügel',
-        on: {
-          change: (e) => aendern((x) => { x.stahl = e.target.value; }),
-        },
-      }, staehle.map((s) => el('option', {
-        value: s.kennung, text: s.name || s.sorte, selected: buegel.stahl === s.kennung,
-      }))),
+      el('span'),
     ]),
     el('div.postenzeile', { class: leer ? 'ist-leer' : '' }, [
       el('span'),
@@ -287,12 +280,11 @@ export function plattenEditor(querschnitt) {
           gewaehlt: querschnitt.beton,
           beiAenderung: (v) => aendern((q) => { q.beton = v; }),
         })),
-        // Ein Stahl für alle vier Lagen (Benutzer, 2026-10-24); die Bügel
-        // wählen ihren unten bei sich.
+        // Ein Stahl für die ganze Platte, Lagen und Bügel (Benutzer, 2026-10-24).
         feld('Stahl', auswahl({
           werte: staehle.map((s) => ({ wert: s.kennung, beschriftung: s.name || s.sorte })),
           gewaehlt: querschnitt.stahl,
-          titel: 'Betonstahl aller Lagen',
+          titel: 'Betonstahl der Platte -- aller Lagen und der Bügel',
           beiAenderung: (v) => aendern((q) => { q.stahl = v; }),
         })),
         feld('Dicke h', zahlfeld({

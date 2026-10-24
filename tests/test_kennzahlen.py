@@ -97,7 +97,7 @@ class TestQuerkraft(unittest.TestCase):
     def test_mit_buegeln_bei_der_guenstigsten_neigung(self):
         projekt = Projekt.beispiel()
         b = projekt.querschnitte[0].querkraftbewehrung
-        b.durchmesser, b.stahl, b.abstand_x, b.abstand_y = 10.0, "s1", 200.0, 200.0
+        b.durchmesser, b.abstand_x, b.abstand_y = 10.0, 200.0, 200.0
         aufbau, loesung = rechnen(projekt)
         kz = aufbau.kennzahlen["q1"]
         self.assertNotIn("V_Rd_max", kz.d)

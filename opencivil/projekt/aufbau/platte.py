@@ -193,9 +193,10 @@ def _querschnitt(
     eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str
 ) -> Plattenquerschnitt:
     beton_stoff = material(baustoffe, eintrag.beton, "beton", f"Platte '{eintrag.name}'")
-    # Ein Stahl fuer alle Lagen (Benutzer, 2026-10-24) -- auch fuer eine leere:
-    # ihr Stahl erscheint nur, wo die Mindestbewehrung sie als leer meldet.
-    stahl = material(baustoffe, eintrag.stahl, "betonstahl", f"Die Lagen von '{eintrag.name}'")
+    # Ein Stahl fuer die ganze Platte, Lagen und Buegel (Benutzer, 2026-10-24)
+    # -- auch fuer eine leere Lage: ihr Stahl erscheint nur, wo die
+    # Mindestbewehrung sie als leer meldet.
+    stahl = material(baustoffe, eintrag.stahl, "betonstahl", f"Die Bewehrung von '{eintrag.name}'")
 
     lagen: List[Bewehrungslage] = []
     for nummer, lage in enumerate(eintrag.lagen, start=1):
@@ -214,10 +215,6 @@ def _querschnitt(
             f"Widerstand bestimmen.")
 
     buegel = eintrag.querkraftbewehrung
-    if buegel.vorhanden:
-        buegelstahl = material(baustoffe, buegel.stahl, "betonstahl",
-                             f"Die Querkraftbewehrung von '{eintrag.name}'")
-
     return Plattenquerschnitt(
         name=eintrag.name,
         h=Groesse(eintrag.h, MM),
@@ -229,7 +226,7 @@ def _querschnitt(
         d_max=Groesse(eintrag.d_max, MM),
         einlagenhoehe=Groesse(eintrag.einlagenhoehe, MM),
         k_c=Groesse(eintrag.k_c, EINHEITSLOS),
-        querkraftbewehrung=buegel.als_bewehrung(buegelstahl) if buegel.vorhanden else None,
+        querkraftbewehrung=buegel.als_bewehrung(stahl) if buegel.vorhanden else None,
         praefix=praefix,
     )
 

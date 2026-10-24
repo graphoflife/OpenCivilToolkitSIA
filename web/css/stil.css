@@ -699,7 +699,6 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .gunst-knopf.ist-guenstig { background: var(--blau); border-color: var(--blau); color: #fff; }
 
 /* Der Stahl einer Seite, klein am Ende der Zeile der Grundbewehrung. */
-.stahlwahl { width: auto; max-width: 100%; padding: 1px 4px; font-size: 11px; }
 
 .neigungszeile {
   display: flex; align-items: center; gap: 6px; margin-top: 4px;

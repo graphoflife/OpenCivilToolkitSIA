@@ -202,7 +202,6 @@ const PLATTE = bauteil('querschnitt', {
     einrichten: (platte, { beton, betonstahl }) => {
       platte.beton = beton.kennung;
       platte.stahl = betonstahl.kennung;
-      platte.querkraftbewehrung.stahl = betonstahl.kennung;
     },
   }),
   editor: plattenEditor,

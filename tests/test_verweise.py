@@ -21,18 +21,11 @@ class TestVerweise(unittest.TestCase):
                 self.assertTrue(callable(getattr(art.eintrag, "materialien", None)))
                 self.assertTrue(callable(getattr(art.eintrag, "bezuege", None)))
 
-    def test_der_buegelstahl_zaehlt(self):
+    def test_der_stahl_der_platte_zaehlt(self):
+        """Er gilt für Lagen und Bügel (Benutzer, 2026-10-24)."""
         p = Projekt.beispiel()
         zweiter = p.eigener_stahl()
-        p.querschnitte[0].querkraftbewehrung.stahl = zweiter.kennung
-        self.assertEqual([e.kennung for e in p.verweise(zweiter.kennung)], ["q1"])
-
-    def test_auch_ein_verweis_ohne_traglast_zaehlt(self):
-        """Ein Bügel ohne Durchmesser trägt nichts -- sein Stahl gelöscht, zeigte er ins Leere."""
-        p = Projekt.beispiel()
-        zweiter = p.eigener_stahl()
-        buegel = p.querschnitte[0].querkraftbewehrung
-        buegel.durchmesser, buegel.stahl = 0.0, zweiter.kennung
+        p.querschnitte[0].stahl = zweiter.kennung
         self.assertEqual([e.kennung for e in p.verweise(zweiter.kennung)], ["q1"])
 
     def test_ein_system_zeigt_auf_seine_querschnitte(self):

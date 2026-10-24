@@ -135,7 +135,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     knicken_wahl_widerstand=KnickWiderstandswahl(
                         kriechzahl=0.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
-                        durchmesser=10.0, stahl="s1", abstand_x=250.0,
+                        durchmesser=10.0, abstand_x=250.0,
                         art_y="anzahl", anzahl_y=4.0,
                         alpha_min=35, alpha_max=42),
                     richtung_lage1="x", richtung_lage4="x",
@@ -469,7 +469,6 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         """Was die Oberfläche einfügt, muss der Kern auch wieder annehmen."""
         vorlage = dict(api.katalog()["neue_platte"])
         vorlage.update(kennung="q9", name="Platte 9", beton="b1", stahl="s1")
-        vorlage["querkraftbewehrung"]["stahl"] = "s1"
 
         d = Projekt.beispiel().als_dict()
         d["querschnitte"].append(vorlage)

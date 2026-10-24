@@ -44,6 +44,19 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Platte: auch die Bügel aus dem Stahl der Platte
+
+Entscheid des Benutzers: der Bügelstahl ist derselbe wie der übrige Stahl;
+rückwärts verträglich muss es nicht sein.
+
+- `QuerkraftbewehrungEintrag` hat keinen Stahl mehr; der Aufbau gibt den
+  Bügeln den der Platte. Die Auswahl neben den Bügeln ist weg, die Platte
+  zeigt nur noch auf Beton und Stahl (`materialien`).
+- Eine ältere Datei mit `querkraftbewehrung.stahl` öffnet sich nicht mehr --
+  wie gewünscht.
+
+---
+
 ## 2026-10-24 · Listen unter der Zeichnung zu Beginn zugeklappt
 
 Wunsch des Benutzers: im Balkensystem die Liste der Linien und Lager zu

@@ -460,7 +460,6 @@ def projekt_mit_buegeln(**abweichungen) -> Projekt:
     projekt = projekt_mit_querkraft()
     buegel = projekt.querschnitte[0].querkraftbewehrung
     buegel.durchmesser = 10.0
-    buegel.stahl = "s1"
     buegel.abstand_x = 200.0
     buegel.abstand_y = 200.0
     for name, wert in abweichungen.items():

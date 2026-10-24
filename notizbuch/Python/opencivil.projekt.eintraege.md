@@ -1,5 +1,5 @@
 ---
-erzeugt: 8922d109e8b6
+erzeugt: 72206366fa5d
 art: modul
 tags: [modul]
 ---
@@ -289,6 +289,7 @@ class QuerkraftbewehrungEintrag(Beschreibung)
 ```
 
 Die Bügel einer Platte -- ein Raster, ein Durchmesser, zwei Teilungen.
+Ihr Stahl ist der der Platte (Benutzer, 2026-10-24).
 
 In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
 stehen; in x nicht. Siehe
@@ -296,7 +297,6 @@ stehen; in x nicht. Siehe
 eigenes Feld, wie beim [[opencivil.projekt.eintraege#PostenEintrag|PostenEintrag]]; welches gilt, sagt `art_y`.
 
 - `durchmesser: float = bereich(0.0, heisst='Bügeldurchmesser', einheit=MM, ab=0.0)` – in mm; 0 bedeutet: keine Querkraftbewehrung.
-- `stahl: str = ''`
 - `abstand_x: float = 200.0`
 - `abstand_y: float = 200.0`
 - `anzahl_y: float = 5.0`

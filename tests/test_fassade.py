@@ -134,7 +134,7 @@ class TestAnlegen(unittest.TestCase):
         Fassade mit. Hier nur, dass es wirklich über sie entsteht.
         """
         q = Projekt.beispiel().querschnitte[0]
-        self.assertEqual(q.querkraftbewehrung.stahl, "s1")
+        self.assertEqual(q.stahl, "s1")
         self.assertEqual([k.name for k in q.kombinationen],
                          ["Feld", "Feld mit Druck", "Stütze"])
 

@@ -283,8 +283,8 @@ Material mit einer Sorte als Vorlage: es heisst BE1, BE2 … (Betonstahl S1 …)
 trägt «eigen», und seine Kennwerte sind änderbar.
 
 **Platte:** drei Panels -- die Platte selbst mit Beton und dem einen Stahl
-aller Lagen, die Bewehrung (vier Lagen mit Grund und Zulage, darunter die
-Bügel mit ihrem Stahl) und «Nachweise und Analysen». Dort steht
+für Lagen und Bügel, die Bewehrung (vier Lagen mit Grund und Zulage,
+darunter die Bügel) und «Nachweise und Analysen». Dort steht
 jedes Kapitel als Knopf: die acht Nachweise, die sechs
 Spannung-Dehnung-Analysen und die Suche nach der Bewehrung, darunter klein,
 was eingestellt ist («3 Einwirkungen», «aus»). Ein Klick öffnet die Eingaben

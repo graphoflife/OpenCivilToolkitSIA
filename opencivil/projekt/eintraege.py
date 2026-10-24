@@ -317,6 +317,7 @@ class ObergrenzeEintrag(Beschreibung):
 class QuerkraftbewehrungEintrag(Beschreibung):
     """
     Die Bügel einer Platte -- ein Raster, ein Durchmesser, zwei Teilungen.
+    Ihr Stahl ist der der Platte (Benutzer, 2026-10-24).
 
     In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
     stehen; in x nicht. Siehe
@@ -327,7 +328,6 @@ class QuerkraftbewehrungEintrag(Beschreibung):
     durchmesser: float = bereich(0.0, heisst="Bügeldurchmesser", einheit=MM, ab=0.0)
     """in mm; 0 bedeutet: keine Querkraftbewehrung."""
 
-    stahl: str = ""
     abstand_x: float = 200.0
     abstand_y: float = 200.0
     anzahl_y: float = 5.0

@@ -42,8 +42,8 @@ class QuerschnittEintrag(Querschnittsangaben):
     beton: str
     stahl: str = ""
     """
-    Der Betonstahl aller vier Lagen -- einer für alle (Benutzer,
-    2026-10-24); die Bügel haben ihren eigenen.
+    Der Betonstahl der Platte: aller vier Lagen und der Bügel -- einer für
+    alle (Benutzer, 2026-10-24).
     """
 
     h: float = bereich(300.0, heisst="Dicke h", einheit=MM, ueber=0.0)
@@ -170,15 +170,15 @@ class QuerschnittEintrag(Querschnittsangaben):
 
     def materialien(self) -> List[str]:
         """
-        Jedes Material, auf das die Platte zeigt -- Beton, Stahl der Lagen,
-        Buegelstahl --, je einmal. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
+        Jedes Material, auf das die Platte zeigt -- Beton und Stahl --, je
+        einmal. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
         Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
         naechste Aenderung machte daraus einen Fehler beim Rechnen.
         Bis 2026-10-17 kannte der Loeschschutz der Oberflaeche den Buegelstahl
         nicht.
         """
         gesehen: List[str] = []
-        for kennung in (self.beton, self.stahl, self.querkraftbewehrung.stahl):
+        for kennung in (self.beton, self.stahl):
             if kennung and kennung not in gesehen:
                 gesehen.append(kennung)
         return gesehen
@@ -323,7 +323,6 @@ class QuerschnittEintrag(Querschnittsangaben):
             # nach innen. Sie leer zu lassen hiesse, mit einer Hoehe zu
             # rechnen, die es auf der Baustelle nicht gibt.
             lagen=[lage(durchmesser) for _ in range(LAGENZAHL)],
-            querkraftbewehrung=QuerkraftbewehrungEintrag(
-                durchmesser=0.0, stahl=stahl),
+            querkraftbewehrung=QuerkraftbewehrungEintrag(durchmesser=0.0),
             kombinationen=[KombinationEintrag(name="Tragsicherheit 1")],
         )
