@@ -789,7 +789,7 @@ function querschnittWahl(z, gewaehlt, setzen, material = '') {
     ...(z.querschnitte || []).filter((q) => !nurMitMaterial || bringtMaterial(q) || q.kennung === gewaehlt)
       .map((q) => ({ wert: q.kennung, beschriftung: q.name || q.kennung })),
   ];
-  return auswahl({ werte: mitVar(werte, gewaehlt), gewaehlt, titel: 'Die Querschnitte stehen unter der Zeichnung', beiAenderung: setzen });
+  return auswahl({ werte: mitVar(werte, gewaehlt), gewaehlt, titel: 'Die Querschnitte: Knopf «Querschnitte» unter der Zeichnung', beiAenderung: setzen });
 }
 
 /**
@@ -806,7 +806,7 @@ function materialWahl(z, bringt, gewaehlt, setzen) {
     werte: gewaehlt === VAR || werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
       : [{ wert: gewaehlt, beschriftung: '– Material wählen –' }, ...werte],
     gewaehlt,
-    titel: 'Die Materialien stehen unter der Zeichnung -- «gemäss Querschnitt»: der Beton der Platte oder Analyse',
+    titel: 'Die Materialien: Knopf «Material» unter der Zeichnung -- «gemäss Querschnitt»: der Beton der Platte oder Analyse',
     beiAenderung: setzen,
   });
 }
@@ -824,7 +824,7 @@ export function materialname(m) {
  */
 function lastfallWahl(a, z, gewaehlt, setzen, titel) {
   if (!z.lastfaelle.length) {
-    return el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst im Panel «Lastfälle» einen Lastfall anlegen.' });
+    return el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst unter «Lastfälle» einen Lastfall anlegen.' });
   }
   return zeile('Lastfall', auswahl({
     werte: mitVar(z.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })), gewaehlt),

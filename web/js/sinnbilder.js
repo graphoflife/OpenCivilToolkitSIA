@@ -128,6 +128,22 @@ const ZEICHEN = {
     pfade: ['M3 4.5h18v15H3z', 'M6.5 9l3 3-3 3', 'M11.5 15.5h5'],
   },
 
+  // -- Die Knöpfe des Balkensystems -------------------------------------------
+
+  // Ein Walzprofil im Schnitt.
+  querschnitte: {
+    pfade: ['M5 4h14v3.2h-5.4v9.6H19V20H5v-3.2h5.4V7.2H5z'],
+  },
+  // Ein Balken, darauf drei Lasten.
+  lastfaelle: {
+    pfade: ['M3 17h18', 'M6 4v9 M4.5 11.2L6 13l1.5-1.8', 'M12 4v9 M10.5 11.2L12 13l1.5-1.8',
+      'M18 4v9 M16.5 11.2L18 13l1.5-1.8'],
+  },
+  // Das Summenzeichen: Lastfälle mal Beiwert, zusammengezählt.
+  kombinationen: {
+    pfade: ['M17.5 5H7l5.5 7L7 19h10.5'],
+  },
+
   // -- Die Werkzeuge des Zeichenfensters -----------------------------------
 
   // Ein Umriss mit seinen Ecken.

@@ -436,7 +436,10 @@ oder ein Moment auch an einen Knoten. Jede Last ist für sich zu wählen, an
 ihrem Pfeil, Band oder ihrer Zahl, und mit Entf zu löschen. Gezeigt werden
 die Lasten des Lastfalls, der in der Leiste neben «Last» gewählt ist -- zu
 Beginn das Eigengewicht, «– kein Lastfall –» zeigt keine; unter der
-Zeichnung stehen alle in einer Liste, je Gruppe aufklappbar. Darunter die
+Zeichnung stehen alle in einer Liste, je Gruppe aufklappbar. Darunter vier
+Knöpfe wie die Kapitel einer Querschnittsanalyse -- Material, Querschnitte,
+Lastfälle, Lastkombinationen --, je mit einem Fenster und darunter klein,
+wie viele es gibt. Unter «Material» die
 Materialien des Systems als Tabelle: ein Beton des Projekts -- E_cm und die
 Dichte des Stahlbetons, gesperrt -- oder ein eigenes Material mit E und ρ
 von Hand; Betonstahl ist keines. Ein neues System bekommt den ersten Beton
@@ -446,7 +449,8 @@ stehen an der Linie nur solche Querschnitte zur Wahl. Mit dem Material
 gemäss Querschnitt rechnet ein Stab mit E₀ = E_cm oder mit E_eq bei N und
 M, wie die Linie M–E_eq der Analyse oder Platte es dort hat -- bei einer
 Platte immer in x-Richtung mit Zug unten --, für EA und EI; der Schalter
-dafür steht am Querschnitt, sobald eine Linie ihn so nimmt. Darunter die Querschnitte, je einer eine Zeile: links sein Bild,
+dafür steht am Querschnitt, sobald eine Linie ihn so nimmt. Unter
+«Querschnitte» je einer eine Zeile: links sein Bild,
 daneben Name, A und I und woher er kommt. Ein Klick auf das Bild -- und ein
 neuer Querschnitt gleich -- öffnet sein Fenster: woher A und I kommen, die
 Vorlage als Auswahlliste mit ihrem Bild und den Massen, die Kennwerte, die

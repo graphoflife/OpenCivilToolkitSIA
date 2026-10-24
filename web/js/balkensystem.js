@@ -3,14 +3,11 @@
  *
  * Von oben nach unten:
  *
- *     System          Bezeichnung, Lastfall der Zeichnung, Zeichnung samt
- *                     Liste, Beschreibung
- *     Materialien     je Material des Projekts sein E-Modul und seine Dichte
- *                     -- die Zeilen der App «Materialien»
- *     Querschnitte    je Querschnitt: Vorlage mit Massen, Kennwerte von Hand,
- *                     aus einer Platte oder aus einer Querschnittsanalyse;
- *                     sein E-Modul vom Material oder als Zahl
- *     Lastfälle       die Fälle und ihre Kombinationen mit Beiwerten
+ *     System          Bezeichnung, Zeichnung samt Liste, Beschreibung
+ *     Eingaben        vier Knöpfe, je mit einem Fenster (`KAPITEL`):
+ *                     Material -- die Materialien als Tabelle --,
+ *                     Querschnitte -- je einer eine Zeile mit Bild, jeder
+ *                     mit eigenem Fenster --, Lastfälle, Lastkombinationen
  *     Statik-Analyse  die Diagramme rechts: je Zeile ein Fall und eine
  *                     Grösse, wie in der Spannung-Dehnung-Analyse
  *
@@ -34,6 +31,7 @@ import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import { fenster, fensterOeffnen } from './fenster.js';
+import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { anfuegenKnopf, rechenwahlZeile } from './nachweise.js';
 import {
   ausVorlage, feldangabe, kennwertId, naechsterName, projektAendern, zustand,
@@ -234,7 +232,7 @@ function systemGruppe(system) {
  * -- oder ein eigenes mit E und ρ von Hand. Betonstahl steht nicht zur
  * Wahl: aus ihm ist kein Stab. Daneben, welche Linien es nehmen.
  */
-function materialienGruppe(system) {
+function materialienInhalt(system) {
   const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
   const betone = zustand.projekt.materialien.filter((m) => m.art === 'beton');
   const kennwerte = zustand.katalog?.balkensystem?.betonkennwerte || {};
@@ -286,10 +284,7 @@ function materialienGruppe(system) {
     });
   });
   const kopf = [['Material'], ['Art'], ['E', angabe('E').einheit], ['ρ', angabe('rho').einheit], ['trägt'], ['']];
-  return panel({
-    schluessel: 'balkensystem/Materialien', titel: 'Materialien',
-    zusatz: erklaerung(HILFE.materialien.zeilen),
-  }, [
+  return [
     system.stabmaterialien.length ? el('div.tabelle-huelle', {}, [el('table.bs-materialien', {}, [
       el('thead', {}, [el('tr', {}, kopf.map(([text, einheit]) => el('th', {}, [
         text, einheit ? el('span.einheit', { text: ` ${einheit}` }) : null,
@@ -306,7 +301,7 @@ function materialienGruppe(system) {
         on: { click: () => neu('eigen') },
       }),
     ]),
-  ]);
+  ];
 }
 
 // ===========================================================================
@@ -516,20 +511,19 @@ function querschnittFenster(system, kennung) {
   const werte = kennwerte(system, q);
   if (werte) zeilen.push(el('p.bs-kennwerte', { text: werte }));
   return fenster({
-    titel: 'Querschnitt', zeichen: 'analyse', zusatz: `${system.name} · ${q.name}`,
+    titel: 'Querschnitt', zeichen: 'querschnitte', zusatz: `${system.name} · ${q.name}`,
     hilfe: erklaerung(HILFE.querschnitte.zeilen, HILFE.querschnitte.formel),
-    inhalt: zeilen,
+    inhalt: [
+      el('button.knopf.knopf-klein.bs-zurueck', {
+        type: 'button', text: '← alle Querschnitte', on: { click: () => fensterOeffnen('querschnitte') },
+      }),
+      ...zeilen,
+    ],
   });
 }
 
-/** Die Fenster des Systems, nach ihrem Schlüssel -- bisher die der Querschnitte. */
-export function balkensystemFenster(system, schluessel) {
-  const [art, kennung] = String(schluessel).split(':');
-  return art === 'querschnitt' ? querschnittFenster(system, kennung) : null;
-}
-
 /** Je Querschnitt eine Zeile; ein neuer öffnet gleich sein Fenster. */
-function querschnitteGruppe(system) {
+function querschnitteInhalt(system) {
   const neu = () => {
     const kennung = naechsteKennung(system.querschnitte, 'Q');
     aendernAn(system.kennung, (s) => {
@@ -540,14 +534,11 @@ function querschnitteGruppe(system) {
     });
     fensterOeffnen(fensterVon(kennung));
   };
-  return panel({
-    schluessel: 'balkensystem/Querschnitte', titel: 'Querschnitte',
-    zusatz: erklaerung(HILFE.querschnitte.zeilen, HILFE.querschnitte.formel),
-  }, [
+  return [
     ...(system.querschnitte.length ? system.querschnitte.map((q, i) => querschnittZeile(system, q, i))
       : [el('p.bs-leer', { text: 'Noch kein Querschnitt.' })]),
     el('button.knopf.knopf-klein', { type: 'button', text: '+ Querschnitt', on: { click: neu } }),
-  ]);
+  ];
 }
 
 // ===========================================================================
@@ -563,7 +554,7 @@ function naechsteKennung(liste, vorsilbe) {
 
 const lastenText = (n) => `${n} ${n === 1 ? 'Last' : 'Lasten'}`;
 
-function lastfaelleGruppe(system) {
+function lastfaelleInhalt(system) {
   const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
   const lastenVon = (lf) => system.linien.reduce((n, l) => n + l.lasten.filter((x) => x.lastfall === lf).length, 0)
     + system.knotenlasten.filter((x) => x.lastfall === lf).length;
@@ -597,6 +588,19 @@ function lastfaelleGruppe(system) {
       },
     }),
   ]);
+  const neuerFall = () => aendern((s) => {
+    const kennung = naechsteKennung(s.lastfaelle, 'LF');
+    s.lastfaelle.push({ kennung, name: naechsterName('Lastfall', s.lastfaelle) });
+  });
+  return [
+    ...system.lastfaelle.map(fall),
+    el('button.knopf.knopf-klein', { type: 'button', text: '+ Lastfall', on: { click: neuerFall } }),
+  ];
+}
+
+/** Je Kombination eine Zeile: je Lastfall ein Beiwert, von Hand. */
+function kombinationenInhalt(system) {
+  const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
   const kombination = (k, i) => el('tr', {}, [
     el('td', {}, [el('input', {
       type: 'text', value: k.name,
@@ -612,10 +616,6 @@ function lastfaelleGruppe(system) {
       on: { click: () => aendern((s) => { s.kombinationen.splice(i, 1); }) },
     })]),
   ]);
-  const neuerFall = () => aendern((s) => {
-    const kennung = naechsteKennung(s.lastfaelle, 'LF');
-    s.lastfaelle.push({ kennung, name: naechsterName('Lastfall', s.lastfaelle) });
-  });
   const neueKombination = () => aendern((s) => {
     s.kombinationen.push({
       kennung: naechsteKennung(s.kombinationen, 'LK'),
@@ -623,9 +623,8 @@ function lastfaelleGruppe(system) {
       faktoren: Object.fromEntries(s.lastfaelle.map((lf) => [lf.kennung, 1.0])),
     });
   });
-  return panel({ schluessel: 'balkensystem/Lastfälle', titel: 'Lastfälle und Kombinationen' }, [
-    ...system.lastfaelle.map(fall),
-    el('button.knopf.knopf-klein', { type: 'button', text: '+ Lastfall', on: { click: neuerFall } }),
+  if (!system.lastfaelle.length) return [el('p.bs-leer', { text: 'Zuerst einen Lastfall anlegen.' })];
+  return [
     system.kombinationen.length ? el('div.tabelle-huelle', {}, [el('table.bs-kombinationen', {}, [
       el('thead', {}, [el('tr', {}, [
         el('th', { text: 'Kombination' }),
@@ -633,11 +632,57 @@ function lastfaelleGruppe(system) {
         el('th'),
       ])]),
       el('tbody', {}, system.kombinationen.map(kombination)),
-    ])]) : null,
-    system.lastfaelle.length
-      ? el('button.knopf.knopf-klein', { type: 'button', text: '+ Kombination', on: { click: neueKombination } })
-      : null,
-  ]);
+    ])]) : el('p.bs-leer', { text: 'Noch keine Kombination.' }),
+    el('button.knopf.knopf-klein', { type: 'button', text: '+ Kombination', on: { click: neueKombination } }),
+  ];
+}
+
+// ===========================================================================
+// Die Knöpfe der Eingaben
+// ===========================================================================
+
+/**
+ * Material, Querschnitte, Lastfälle und Kombinationen als Knöpfe, jeder
+ * mit seinem Fenster -- wie die Kapitel der Querschnittsanalyse (Benutzer,
+ * 2026-10-24). Unter dem Namen klein, wie viele es gibt.
+ */
+const KAPITEL = [
+  {
+    titel: 'Tragwerk',
+    kapitel: [
+      {
+        schluessel: 'material', name: 'Material', titel: 'Materialien', hilfe: HILFE.materialien,
+        inhalt: materialienInhalt,
+        stand: (s) => zeilenstand(s.stabmaterialien, 'Material', 'Materialien', 'kein Material'),
+      },
+      {
+        schluessel: 'querschnitte', name: 'Querschnitte', titel: 'Querschnitte', hilfe: HILFE.querschnitte,
+        inhalt: querschnitteInhalt,
+        stand: (s) => zeilenstand(s.querschnitte, 'Querschnitt', 'Querschnitte', 'kein Querschnitt'),
+      },
+    ],
+  },
+  {
+    titel: 'Lasten',
+    kapitel: [
+      {
+        schluessel: 'lastfaelle', name: 'Lastfälle', titel: 'Lastfälle', inhalt: lastfaelleInhalt,
+        stand: (s) => zeilenstand(s.lastfaelle, 'Lastfall', 'Lastfälle', 'kein Lastfall'),
+      },
+      {
+        schluessel: 'kombinationen', name: 'Lastkombi\u00adnationen', titel: 'Lastkombinationen',
+        inhalt: kombinationenInhalt,
+        stand: (s) => zeilenstand(s.kombinationen, 'Kombination', 'Kombinationen', 'keine'),
+      },
+    ],
+  },
+];
+
+/** Die Fenster des Systems, nach ihrem Schlüssel: die Kapitel und je Querschnitt seines. */
+export function balkensystemFenster(system, schluessel) {
+  const [art, kennung] = String(schluessel).split(':');
+  return art === 'querschnitt' && kennung ? querschnittFenster(system, kennung)
+    : kapitelFenster(system, KAPITEL, schluessel);
 }
 
 // ===========================================================================
@@ -696,6 +741,7 @@ function statikGruppe(system) {
 // ===========================================================================
 
 export function balkensystemEditor(system) {
-  return [systemGruppe(system), materialienGruppe(system), querschnitteGruppe(system),
-    lastfaelleGruppe(system), statikGruppe(system)];
+  return [systemGruppe(system),
+    kapitelPanel(system, KAPITEL, { schluessel: 'balkensystem/Eingaben', titel: 'Eingaben' }),
+    statikGruppe(system)];
 }

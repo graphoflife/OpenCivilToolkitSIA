@@ -44,6 +44,27 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: vier Knöpfe mit Fenstern
+
+Wunsch des Benutzers: im Balkensystem vier schöne Knöpfe -- Material,
+Querschnitt, Lastfälle, Lastkombinationen --, die je ein Fenster öffnen,
+wie bei der Querschnittsanalyse.
+
+- **Dieselben Kacheln:** `kapitelPanel` und `kapitelFenster` aus
+  `kapitel.js`, wie Platte und Analyse; je Knopf sein Zeichen, sein Name und
+  darunter klein, wie viele es gibt («2 Querschnitte»). Zwei Gruppen:
+  Tragwerk (Material, Querschnitte) und Lasten (Lastfälle,
+  Lastkombinationen). Neue Zeichen: ein Walzprofil, ein Balken mit drei
+  Lasten, das Summenzeichen.
+- **Die Inhalte** der bisherigen Panels sind die der Fenster
+  (`materialienInhalt` ...); Lastfälle und Kombinationen sind zwei.
+- **Ein Querschnitt** öffnet sein Fenster wie bisher; darin führt «← alle
+  Querschnitte» zurück -- es gibt nur ein Fenster zugleich.
+- Die Statik-Analyse bleibt ein Panel: sie sagt, welche Diagramme rechts
+  stehen, und man ändert sie im Blick auf sie.
+
+---
+
 ## 2026-10-24 · Balkensystem: mehrere zugleich ändern, mit «Var»
 
 Wunsch des Benutzers: sind mehrere Elemente gewählt, ändert das Fenster

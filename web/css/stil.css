@@ -2114,6 +2114,7 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-qname { font-weight: 600; }
 .bs-qmitte .bs-kennwerte, .bs-qmitte .bs-benutzt, .bs-qfehler { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bs-qfehler { font-size: 12px; color: var(--warn); }
+.bs-zurueck { align-self: flex-start; margin-bottom: 4px; }
 .bs-qvorlage { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
 .bs-umriss { display: block; }
 .bs-umriss-flaeche { fill: var(--blau-hell); stroke: var(--blau); stroke-width: 1.2; }
