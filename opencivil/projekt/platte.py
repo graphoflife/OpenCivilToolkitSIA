@@ -40,6 +40,12 @@ class QuerschnittEintrag(Querschnittsangaben):
     BEZEICHNUNG = "Platte"
 
     beton: str
+    stahl: str = ""
+    """
+    Der Betonstahl aller vier Lagen -- einer für alle (Benutzer,
+    2026-10-24); die Bügel haben ihren eigenen.
+    """
+
     h: float = bereich(300.0, heisst="Dicke h", einheit=MM, ueber=0.0)
     b: float = bereich(1000.0, heisst="Breite b", einheit=MM, ueber=0.0)
     ueberdeckung_unten: float = bereich(30.0, heisst="Überdeckung unten", einheit=MM, ab=0.0)
@@ -164,7 +170,7 @@ class QuerschnittEintrag(Querschnittsangaben):
 
     def materialien(self) -> List[str]:
         """
-        Jedes Material, auf das die Platte zeigt -- Beton, Stahl jeder Lage,
+        Jedes Material, auf das die Platte zeigt -- Beton, Stahl der Lagen,
         Buegelstahl --, je einmal. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
         Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
         naechste Aenderung machte daraus einen Fehler beim Rechnen.
@@ -172,8 +178,7 @@ class QuerschnittEintrag(Querschnittsangaben):
         nicht.
         """
         gesehen: List[str] = []
-        for kennung in (self.beton, *(l.stahl for l in self.lagen),
-                        self.querkraftbewehrung.stahl):
+        for kennung in (self.beton, self.stahl, self.querkraftbewehrung.stahl):
             if kennung and kennung not in gesehen:
                 gesehen.append(kennung)
         return gesehen
@@ -301,7 +306,6 @@ class QuerschnittEintrag(Querschnittsangaben):
         """
         def lage(d: float) -> LageEintrag:
             return LageEintrag(
-                stahl=stahl,
                 grund=PostenEintrag(durchmesser=d, abstand=150.0),
                 # Auch die leere Zulage wird ueber die Teilung gefuehrt --
                 # das ist der Regelfall bei Platten.
@@ -312,6 +316,7 @@ class QuerschnittEintrag(Querschnittsangaben):
             kennung=kennung,
             name=name,
             beton=beton,
+            stahl=stahl,
             # Alle vier Lagen bewehrt. Nachgewiesen wird nur x -- das sind
             # die beiden inneren --, aber die aeusseren y-Lagen liegen
             # darunter und darueber und druecken die statische Hoehe von x

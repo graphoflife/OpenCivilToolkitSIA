@@ -277,9 +277,8 @@ class PostenEintrag(Beschreibung):
 
 @dataclass
 class LageEintrag(Beschreibung):
-    """Eine der vier Lagen."""
+    """Eine der vier Lagen -- ihr Stahl ist der der Platte."""
 
-    stahl: str = ""
     grund: PostenEintrag = field(default_factory=PostenEintrag)
     zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))
 

@@ -74,11 +74,11 @@ class TestVollstaendigeAblage(unittest.TestCase):
         beispiele = {
             MaterialEintrag: MaterialEintrag("b1", "beton", "C30/37", "C30/37"),
             PostenEintrag: PostenEintrag(durchmesser=16.0, abstand=150.0),
-            LageEintrag: LageEintrag(stahl="s1"),
+            LageEintrag: LageEintrag(unguenstig=False),
             KombinationEintrag: KombinationEintrag("Feld", M_Ed=100.0),
             QuerkraftbewehrungEintrag: QuerkraftbewehrungEintrag(durchmesser=10.0),
             GebrauchsfallEintrag: GebrauchsfallEintrag("Gebrauch", M_Ed=70.0),
-            QuerschnittEintrag: QuerschnittEintrag("q1", "Platte", "b1"),
+            QuerschnittEintrag: QuerschnittEintrag("q1", "Platte", "b1", stahl="s1"),
         }
         for klasse, beispiel in beispiele.items():
             with self.subTest(klasse=klasse.__name__):
@@ -103,7 +103,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
             ],
             querschnitte=[
                 QuerschnittEintrag(
-                    "q1", "Decke", "b1", h=280.0, b=900.0,
+                    "q1", "Decke", "b1", stahl="s2", h=280.0, b=900.0,
                     ueberdeckung_unten=25.0, ueberdeckung_oben=35.0,
                     d_max=16.0, einlagenhoehe=40.0, k_c=0.6,
                     rissanforderung="hoch", beschreibung="Unter dem Dach",
@@ -141,14 +141,11 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     richtung_lage1="x", richtung_lage4="x",
                     lagen=[
                         LageEintrag(
-                            stahl="s1",
                             grund=PostenEintrag(durchmesser=20.0, abstand=125.0),
                             zulage=PostenEintrag(durchmesser=14.0, anzahl=6.0)),
-                        LageEintrag(stahl="s2",
-                                    grund=PostenEintrag(durchmesser=12.0, abstand=200.0)),
-                        LageEintrag(stahl="s1"),
-                        LageEintrag(stahl="s2",
-                                    grund=PostenEintrag(durchmesser=10.0, abstand=150.0)),
+                        LageEintrag(grund=PostenEintrag(durchmesser=12.0, abstand=200.0)),
+                        LageEintrag(unguenstig=False),
+                        LageEintrag(grund=PostenEintrag(durchmesser=10.0, abstand=150.0)),
                     ],
                     kombinationen=[
                         KombinationEintrag("Feld", 120.0, -50.0, 80.0,
@@ -157,9 +154,8 @@ class TestVollstaendigeAblage(unittest.TestCase):
                                            art="naechster_Punkt"),
                     ]),
                 QuerschnittEintrag(
-                    "q2", "Wand", "b2", h=200.0, b=1000.0,
-                    lagen=[LageEintrag(stahl="s2",
-                                       grund=PostenEintrag(durchmesser=10.0, abstand=100.0))],
+                    "q2", "Wand", "b2", stahl="s1", h=200.0, b=1000.0,
+                    lagen=[LageEintrag(grund=PostenEintrag(durchmesser=10.0, abstand=100.0))],
                     kombinationen=[KombinationEintrag("Wind", 30.0, -400.0)]),
             ])
 
@@ -177,7 +173,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
         self.assertEqual(kopie.querschnitt("q1").lagen[0].zulage.anzahl, 6.0)
         self.assertEqual(kopie.querschnitt("q1").kombinationen[1].art, "naechster_Punkt")
         self.assertEqual(kopie.querschnitt("q1").kombinationen[0].V_Ed, 80.0)
-        self.assertEqual(kopie.querschnitt("q2").lagen[0].stahl, "s2")
+        self.assertEqual(kopie.querschnitt("q2").stahl, "s1")
         buegel = kopie.querschnitt("q1").querkraftbewehrung
         self.assertEqual((buegel.durchmesser, buegel.abstand_x), (10.0, 250.0))
         self.assertEqual((buegel.art_y, buegel.anzahl_y), (Linienart.ANZAHL, 4.0))
@@ -339,9 +335,8 @@ class TestVollstaendigeAblage(unittest.TestCase):
                 MaterialEintrag("s1", "betonstahl", "B500B", "B500B"),
             ],
             querschnitte=[QuerschnittEintrag(
-                "q1", "ohne Lasten", "b1",
-                lagen=[LageEintrag(stahl="s1",
-                                   grund=PostenEintrag(durchmesser=16.0, abstand=150.0))])])
+                "q1", "ohne Lasten", "b1", stahl="s1",
+                lagen=[LageEintrag(grund=PostenEintrag(durchmesser=16.0, abstand=150.0))])])
         aufbau = projekt.aufbauen()
         self.assertTrue(aufbau.warnungen)
         # Der M-N-Nachweis entsteht (er liefert die Eckwerte), faellt aber
@@ -369,7 +364,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
         Sonst stünde das Feld in der Oberfläche auf 'Anzahl' -- bei einer
         Platte ist die Teilung der Regelfall.
         """
-        lage = LageEintrag.aus_dict({"stahl": "s1", "grund": {"durchmesser": 16.0}})
+        lage = LageEintrag.aus_dict({"grund": {"durchmesser": 16.0}})
         self.assertEqual(lage.zulage.abstand, 150.0)
         self.assertIs(lage.zulage.art, Linienart.TEILUNG)
         self.assertFalse(lage.zulage.vorhanden)   # ohne Durchmesser trotzdem leer
@@ -473,9 +468,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
     def test_sie_laesst_sich_ohne_nacharbeit_rechnen(self):
         """Was die Oberfläche einfügt, muss der Kern auch wieder annehmen."""
         vorlage = dict(api.katalog()["neue_platte"])
-        vorlage.update(kennung="q9", name="Platte 9", beton="b1")
-        for lage in vorlage["lagen"]:
-            lage["stahl"] = "s1"
+        vorlage.update(kennung="q9", name="Platte 9", beton="b1", stahl="s1")
         vorlage["querkraftbewehrung"]["stahl"] = "s1"
 
         d = Projekt.beispiel().als_dict()

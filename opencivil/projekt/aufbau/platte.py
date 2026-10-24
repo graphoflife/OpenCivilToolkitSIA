@@ -193,20 +193,12 @@ def _querschnitt(
     eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str
 ) -> Plattenquerschnitt:
     beton_stoff = material(baustoffe, eintrag.beton, "beton", f"Platte '{eintrag.name}'")
+    # Ein Stahl fuer alle Lagen (Benutzer, 2026-10-24) -- auch fuer eine leere:
+    # ihr Stahl erscheint nur, wo die Mindestbewehrung sie als leer meldet.
+    stahl = material(baustoffe, eintrag.stahl, "betonstahl", f"Die Lagen von '{eintrag.name}'")
 
     lagen: List[Bewehrungslage] = []
     for nummer, lage in enumerate(eintrag.lagen, start=1):
-        if lage.vorhanden:
-            stahl = material(baustoffe, lage.stahl, "betonstahl",
-                           f"Die {nummer}. Lage von '{eintrag.name}'")
-        else:
-            # Eine leere Lage traegt nichts; ihr Stahl erscheint nur, wo die
-            # Mindestbewehrung sie als leer meldet. Steht kein Stahl da, der
-            # erste im Projekt.
-            stahl = baustoffe.get(lage.stahl)
-            if stahl is None or stahl.art.value != "betonstahl":
-                stahl = next((s for s in baustoffe.values() if s.art.value == "betonstahl"),
-                             None)
         lagen.append(Bewehrungslage(
             nummer=nummer,
             richtung=eintrag.richtung_von(nummer),

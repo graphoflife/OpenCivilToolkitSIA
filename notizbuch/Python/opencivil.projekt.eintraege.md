@@ -1,5 +1,5 @@
 ---
-erzeugt: a9716aba51aa
+erzeugt: 8922d109e8b6
 art: modul
 tags: [modul]
 ---
@@ -241,9 +241,8 @@ Breite; bei einer Stabzahl liegen die Staebe auf der Breite `b` (mm).
 class LageEintrag(Beschreibung)
 ```
 
-Eine der vier Lagen.
+Eine der vier Lagen -- ihr Stahl ist der der Platte.
 
-- `stahl: str = ''`
 - `grund: PostenEintrag = field(default_factory=PostenEintrag)`
 - `zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))`
 - `unguenstig: bool = True` – Ob die inneren Kanten von Grundbewehrung und Zulage fluchten -- siehe [[opencivil.querschnitt.platte#Bewehrungslage|opencivil.querschnitt.platte.Bewehrungslage]].

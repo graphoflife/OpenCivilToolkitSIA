@@ -65,7 +65,7 @@ class TestAnlegen(unittest.TestCase):
         zweite = q.lagen[1]
         self.assertEqual((zweite.grund.durchmesser, zweite.grund.abstand), (18.0, 200.0))
         self.assertEqual((zweite.zulage.durchmesser, zweite.zulage.abstand), (12.0, 200.0))
-        self.assertTrue(all(l.stahl == "s1" for l in q.lagen))
+        self.assertEqual(q.stahl, "s1")                 # einer für alle Lagen
 
     def test_ohne_startlast(self):
         """Die Vorlage der Oberfläche bringt «Feld» mit -- die Fassade nicht."""

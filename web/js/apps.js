@@ -201,8 +201,8 @@ const PLATTE = bauteil('querschnitt', {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
     einrichten: (platte, { beton, betonstahl }) => {
       platte.beton = beton.kennung;
+      platte.stahl = betonstahl.kennung;
       platte.querkraftbewehrung.stahl = betonstahl.kennung;
-      platte.lagen.forEach((l) => { l.stahl = betonstahl.kennung; });
     },
   }),
   editor: plattenEditor,

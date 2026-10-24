@@ -98,35 +98,20 @@ function einheitsSchalter(ueberAbstand, bezug, umschalten) {
 
 function lagenBlock(querschnitt, nummer) {
   const lage = querschnitt.lagen[nummer - 1];
-  const staehle = materialien('betonstahl');
   const richtung = richtungVon(querschnitt, nummer);
   const partner = partnerVon(nummer);
   const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
 
   // Zwei Zeilen je Lage, Grund und Zulage. Was die Lage selbst angeht, steht
-  // am Rand: links Nummer und Richtung, rechts der Stahl und die Lage der
-  // Stäbe zueinander.
+  // am Rand: links Nummer und Richtung, rechts die Lage der Stäbe
+  // zueinander. Der Stahl gilt für alle Lagen und steht oben bei der Platte
+  // (Benutzer, 2026-10-24).
   return el('div.lage', { class: `lage-${richtung} ${leer ? 'ist-leer' : ''}` }, [
     el('div.lage-kopf', {}, [
       el('span.lage-name', { text: `${nummer}. Lage` }),
       richtungsSchalter(querschnitt, nummer, richtung, partner),
     ]),
-    // Gewählt wird der Stahl nur an der x-Lage; die y-Lage derselben Seite
-    // bekommt ihn mit. Nachgewiesen wird nur x -- eine eigene Wahl in y
-    // stünde da, ohne dass ein Nachweis nach ihr fragt, und eine verborgene
-    // könnte unbemerkt vom Rest abweichen.
-    postenZeile(querschnitt, nummer, 'grund', 'Grund', richtung === 'x' ? el('select.stahlwahl', {
-      title: 'Betonstahl dieser Seite – x- und y-Lage',
-      on: {
-        change: (e) => projektAendern((p) => {
-          const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-          q.lagen[nummer - 1].stahl = e.target.value;
-          q.lagen[partner - 1].stahl = e.target.value;
-        }),
-      },
-    }, staehle.map((s) => el('option', {
-      value: s.kennung, text: s.name || s.sorte, selected: lage.stahl === s.kennung,
-    }))) : null),
+    postenZeile(querschnitt, nummer, 'grund', 'Grund'),
     postenZeile(querschnitt, nummer, 'zulage', 'Zulage', lageSchalter(querschnitt, nummer, lage)),
   ]);
 }
@@ -283,6 +268,7 @@ function ueberdeckungsBlock(querschnitt, welche) {
 
 export function plattenEditor(querschnitt) {
   const betone = materialien('beton');
+  const staehle = materialien('betonstahl');
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
   });
@@ -300,6 +286,14 @@ export function plattenEditor(querschnitt) {
           werte: betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte })),
           gewaehlt: querschnitt.beton,
           beiAenderung: (v) => aendern((q) => { q.beton = v; }),
+        })),
+        // Ein Stahl für alle vier Lagen (Benutzer, 2026-10-24); die Bügel
+        // wählen ihren unten bei sich.
+        feld('Stahl', auswahl({
+          werte: staehle.map((s) => ({ wert: s.kennung, beschriftung: s.name || s.sorte })),
+          gewaehlt: querschnitt.stahl,
+          titel: 'Betonstahl aller Lagen',
+          beiAenderung: (v) => aendern((q) => { q.stahl = v; }),
         })),
         feld('Dicke h', zahlfeld({
           wert: querschnitt.h, schritt: 10, min: 10,

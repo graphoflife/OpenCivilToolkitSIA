@@ -962,13 +962,17 @@ class TestSortenindex(unittest.TestCase):
         self.assertIn(r"\varepsilon_{c2d,\text{C30/37}}", text)
 
     def test_mit_index_bei_zwei_staehlen(self):
+        import copy
+
         from opencivil.projekt import MaterialEintrag, Projekt
 
         projekt = Projekt.beispiel()
         projekt.materialien.append(MaterialEintrag("s2", "betonstahl", "B500A", "B500A"))
-        # Eine Lage in x -- nur dort wird gerechnet, und nur was gerechnet
-        # wird, steht in der Mitschrift.
-        projekt.querschnitt("q1").lagen[2].stahl = "s2"
+        # Eine zweite Platte aus dem zweiten Stahl -- eine Platte hat einen
+        # Stahl für alle Lagen (Benutzer, 2026-10-24).
+        zweite = copy.deepcopy(projekt.querschnitt("q1"))
+        zweite.kennung, zweite.name, zweite.stahl = "q9", "Zweite", "s2"
+        projekt.querschnitte.append(zweite)
         text = self.mitschrift(projekt)
         self.assertIn(r"f_{yd,\text{B500B}}", text)
         self.assertIn(r"f_{yd,\text{B500A}}", text)

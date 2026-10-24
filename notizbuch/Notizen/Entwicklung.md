@@ -44,6 +44,25 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Platte: ein Stahl für alle Lagen
+
+Wunsch des Benutzers: den Stahl nicht je Lage wählen, sondern einen für alle
+Lagen, oben im Panel der Platte unter dem Beton.
+
+- **Beschreibung:** `QuerschnittEintrag.stahl`; `LageEintrag` hat keinen
+  Stahl mehr. Die Bügel behalten ihren eigenen -- sie sind keine Lage.
+- **Rechnung unverändert:** der Aufbau gibt jeder `Bewehrungslage` den Stahl
+  der Platte; die Nachweise rechnen weiter je Lage mit ihrem Stahl, es ist
+  nur immer derselbe. Ohne Stahl scheitert die Platte mit einer Meldung --
+  vorher bekam eine leere Lage still den ersten Stahl des Projekts.
+- **Tests:** der Index bei zwei Stählen kommt jetzt aus einer zweiten Platte
+  mit dem zweiten Stahl. Die Prüfungen, dass in einer Platte mit B700B unten
+  und B500B oben jede Lage mit ihrem Stahl rechnet (2026-10-12), sind weg --
+  eine solche Platte lässt sich nicht mehr beschreiben. Geblieben ist die
+  des Lösers, der je Seite den Stahl ihrer Lagen behält.
+
+---
+
 ## 2026-10-24 · Balkensystem: E_eq auch aus einer Platte
 
 Entscheid des Benutzers: E_eq gibt es auch für einen Querschnitt aus einer
