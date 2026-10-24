@@ -44,6 +44,23 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: Kleinigkeiten der Oberfläche
+
+Wünsche des Benutzers, je eine Zeile:
+
+- **Kombinationen:** die Zahlenfelder so schmal, dass 999.99 gerade Platz
+  hat -- in em gemessen (sechs Zeichen JetBrains Mono zu 0.6 em); «6ch»
+  löste sich im Rahmen schmaler auf als im Feld.
+- **Lastfälle:** die Namen gleich breit untereinander -- die Spalte daneben
+  hat eine feste Breite, auch beim längeren Satz des Eigengewichts.
+- **Liste unter der Zeichnung:** Linien, Lager und Lasten klappen je auf und
+  zu; zu bleibt, was man zugeklappt hat (Ansicht, nicht Projekt).
+- **Lagerkräfte lesbar:** die Regel `.bs-reaktion` färbte auch den weissen
+  Rand der Zahlen grün; jetzt nur noch die Striche, und im Diagramm stehen
+  die Zahlen so gross wie dessen übrige.
+
+---
+
 ## 2026-10-24 · Querschnitt: verschmierte Linie aus ⌀, Teilung und Länge
 
 Wunsch des Benutzers: bei verschmierter Bewehrung entweder die Stahlfläche

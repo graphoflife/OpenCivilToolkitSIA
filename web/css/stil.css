@@ -2063,11 +2063,13 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-neue-lasten { display: flex; flex-wrap: wrap; gap: 4px; }
 .bs-neue-lasten .knopf { padding: 2px 6px; font-size: 11.5px; }
 
-/* Unter der Zeichnung: je Linie und Lager eine Zeile; ein Klick wählt. */
-.bs-elemente { display: flex; flex-direction: column; gap: 1px; font-size: 12px; }
+/* Unter der Zeichnung: je Linie, Lager und Last eine Zeile; ein Klick
+   wählt. Jede Gruppe klappt auf und zu. */
+.bs-elemente { font-size: 12px; }
+.bs-elemente-zeilen { display: flex; flex-direction: column; gap: 1px; }
 .bs-elemente-titel {
   font-size: 11px; font-weight: 700; color: var(--schrift-zart);
-  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px;
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; cursor: pointer;
 }
 .bs-element {
   display: grid; grid-template-columns: 34px auto minmax(0, 1fr); gap: 8px;
@@ -2097,12 +2099,17 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-querschnitt-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
 .bs-kennwerte { margin: 0; font-size: 12px; font-weight: 600; color: var(--stahl); }
 .bs-benutzt { margin: 0; font-size: 11px; color: var(--schrift-zart); }
-.bs-fall { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; margin-bottom: 4px; }
-.bs-fall-zahl { font-size: 11px; color: var(--schrift-zart); }
+/* Die Spalten fest: so stehen die Namen gleich breit untereinander, auch
+   neben dem längeren Satz des Eigengewichts. */
+.bs-fall { display: grid; grid-template-columns: minmax(0, 1fr) 11.5em 22px; gap: 6px; align-items: center; margin-bottom: 4px; }
+.bs-fall-zahl { font-size: 11px; color: var(--schrift-zart); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bs-kombinationen { border-collapse: collapse; font-size: 12px; margin: 6px 0; }
 .bs-kombinationen th { text-align: left; font-weight: 600; color: var(--schrift-matt); padding: 2px 4px; }
 .bs-kombinationen td { padding: 2px 4px; }
-.bs-kombinationen .zahlfeld { width: 84px; }
+/* Ein Beiwert wie 999.99 hat gerade Platz (Benutzer, 2026-10-24): sechs
+   Zeichen JetBrains Mono zu 0.6 em, dazu Innenabstand, Rand und Pfeile.
+   Mit «ch» war es schmaler -- es löst sich im Rahmen anders auf. */
+.bs-kombinationen .zahlfeld { width: calc(3.6em + var(--pfeilspur) + 12px); }
 /* Die Statik-Analyse: je Zeile oben der Fall, darunter die Grösse. */
 .bs-diagrammzeile { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
 .bs-diagrammzeile-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
@@ -2133,7 +2140,11 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-d-w.bs-d-extrem { fill: var(--blau); }
 .bs-d-stelle { font-size: 10.5px; fill: var(--schrift-matt); }
 .bs-d-marke { fill: var(--blau); stroke: #fff; stroke-width: 1.5; pointer-events: none; }
-.bs-reaktion { stroke: #16794a; }
+/* Die Lagerkräfte grün -- nur ihre Striche: die Zahl behält ihren weissen
+   Rand, sonst verschwimmt sie (bis 2026-10-24 bekam auch er die Farbe). Im
+   verkleinerten Diagramm so gross wie dessen übrige Zahlen. */
+.bs-reaktion:not(text) { stroke: #16794a; }
+.bs-diagramm .bs-lasttext { font-size: 13px; }
 .bs-reaktion.bs-spitze { fill: #16794a; }
 .bs-reaktion.bs-lasttext { fill: #16794a; }
 .bs-zettel {

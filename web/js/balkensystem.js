@@ -151,9 +151,21 @@ function uebersicht(a) {
     ...z.knotenlasten.map((p) => lastzeile(p, `an ${p.knoten}`,
       `${p.art === 'moment' ? 'Moment' : 'Kraft'} ${p.wert} ${p.art === 'moment' ? 'kNm' : 'kN'}`)),
   ];
-  if (linien.length) teile.push(el('div.bs-elemente', {}, [el('div.bs-elemente-titel', { text: 'Linien' }), ...linien]));
-  if (lager.length) teile.push(el('div.bs-elemente', {}, [el('div.bs-elemente-titel', { text: 'Lager' }), ...lager]));
-  if (lasten.length) teile.push(el('div.bs-elemente', {}, [el('div.bs-elemente-titel', { text: 'Lasten' }), ...lasten]));
+  // Jede Gruppe klappt auf und zu (Benutzer, 2026-10-24); zu bleibt, was man
+  // zugeklappt hat -- Ansichtssache, nicht Teil des Projekts.
+  const zu = a.bs.zugeklappt || (a.bs.zugeklappt = new Set());
+  const gruppe = (titel, zeilen) => {
+    const d = el('details.bs-elemente', {}, [
+      el('summary.bs-elemente-titel', { text: `${titel} (${zeilen.length})` }),
+      el('div.bs-elemente-zeilen', {}, zeilen),
+    ]);
+    d.open = !zu.has(titel);
+    d.addEventListener('toggle', () => { if (d.open) zu.delete(titel); else zu.add(titel); });
+    return d;
+  };
+  for (const [titel, zeilen] of [['Linien', linien], ['Lager', lager], ['Lasten', lasten]]) {
+    if (zeilen.length) teile.push(gruppe(titel, zeilen));
+  }
   return teile;
 }
 
