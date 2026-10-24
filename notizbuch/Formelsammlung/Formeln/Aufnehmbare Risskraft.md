@@ -1,5 +1,5 @@
 ---
-erzeugt: b6ed13b748e0
+erzeugt: 8b09920f2b0d
 art: formel
 tags: [formel]
 ---
@@ -15,7 +15,7 @@ $$
 *In der Herleitung: «Aufnehmbare Risskraft»*
 
 $$
-N_{s,adm} = A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4}
+N_{s,adm} = A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} + A_{s,5} \cdot \sigma_{s,adm,5}
 $$
 
 *In der Herleitung: «Aufnehmbare Risskraft»*
@@ -38,6 +38,8 @@ $$
 | $\sigma_{s,adm,3}$ | Widerstand | N/mm² | [[Zulässige Stahlspannung (Rissbreite w_nom)]] |
 | $A_{s,4}$ | – | mm² | Zwischenwert |
 | $\sigma_{s,adm,4}$ | Widerstand | N/mm² | [[Zulässige Stahlspannung (Rissbreite w_nom)]] |
+| $A_{s,5}$ | – | mm² | Zwischenwert |
+| $\sigma_{s,adm,5}$ | Widerstand | N/mm² | [[Zulässige Stahlspannung (Rissbreite w_nom)]] |
 | $A_s$ | – | mm² | Zwischenwert |
 | $\sigma_{s,adm}$ | Widerstand | N/mm² | [[Zulässige Stahlspannung (normale Anforderung)]] |
 
@@ -57,9 +59,9 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
 \begin{aligned}
-  N_{s,adm} &= A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} \\
-  &= 314\,\mathrm{mm}^{2} \cdot 361\,\mathrm{N}/\mathrm{mm}^{2} + 1206\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 452\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} + 400\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 973.5\,\mathrm{kN} \quad \ge \quad N_{Riss} = 765.6\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
+  N_{s,adm} &= A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} + A_{s,5} \cdot \sigma_{s,adm,5} \\
+  &= 314\,\mathrm{mm}^{2} \cdot 361\,\mathrm{N}/\mathrm{mm}^{2} + 1206\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 452\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} + 400\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 118\,\mathrm{mm}^{2} \cdot 500\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= 1032.4\,\mathrm{kN} \quad \ge \quad N_{Riss} = 765.6\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
 \end{aligned}
 $$
 

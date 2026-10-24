@@ -1,5 +1,5 @@
 ---
-erzeugt: 35f74b4a9256
+erzeugt: 85a4c92b7416
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-x/d = \frac{x}{d} = \frac{64.8\,\mathrm{mm}}{560.3\,\mathrm{mm}} = 0.116 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{75.5\,\mathrm{mm}}{572.3\,\mathrm{mm}} = 0.132 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ## Im Code

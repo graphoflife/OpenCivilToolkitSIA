@@ -1,5 +1,5 @@
 ---
-erzeugt: 3dc44faca293
+erzeugt: 72a2ee5e7138
 art: formel
 tags: [formel]
 ---
@@ -41,8 +41,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   \chi_{u} &= \frac{\varepsilon_{unten} - \varepsilon_{oben}}{h_{\vartheta}} \cdot \cos\left(\vartheta\right) \\
-  &= \frac{17.55\,\text{‰} - \left(-3.5\,\text{‰}\right)}{846.7\,\mathrm{mm}} \cdot \cos\left(-4.7{}^{\circ}\right) \\
-  &= 0.02477\,\mathrm{m}^{-1}
+  &= \frac{17.08\,\text{‰} - \left(-3.5\,\text{‰}\right)}{845.1\,\mathrm{mm}} \cdot \cos\left(-4.6{}^{\circ}\right) \\
+  &= 0.02427\,\mathrm{m}^{-1}
 \end{aligned}
 $$
 

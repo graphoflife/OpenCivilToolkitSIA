@@ -1,5 +1,5 @@
 ---
-erzeugt: 4d9311f96236
+erzeugt: a7e4726f5b6d
 art: formel
 tags: [formel]
 ---
@@ -26,8 +26,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   \varepsilon_{m,u} &= \varepsilon_{oben} + \left(\varepsilon_{unten} - \varepsilon_{oben}\right) \cdot \frac{v_o}{h_{\vartheta}} \\
-  &= 49.35\,\text{‰} + \left(-2.24\,\text{‰} - 49.35\,\text{‰}\right) \cdot \frac{302\,\mathrm{mm}}{604\,\mathrm{mm}} \\
-  &= 23.56\,\text{‰}
+  &= 49.44\,\text{‰} + \left(-2.42\,\text{‰} - 49.44\,\text{‰}\right) \cdot \frac{304.2\,\mathrm{mm}}{608.4\,\mathrm{mm}} \\
+  &= 23.51\,\text{‰}
 \end{aligned}
 $$
 

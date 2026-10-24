@@ -114,6 +114,9 @@ class Stabgruppe:
     gewaehlt: Optional[float] = None
     """Bei einer Linie nach Teilung der eingegebene Abstand."""
 
+    aus_staeben: Optional[Tuple[float, float, float]] = None
+    """Bei verschmierten Staeben ⌀, s und L in mm, aus denen die Flaeche kommt."""
+
 
 @dataclass(frozen=True)
 class Wandangabe:
@@ -257,7 +260,18 @@ class Zeichnung:
         """Die aufgeloeste Linie -- auch wenn ein Stab danebenliegt, fuer die Zeichnung."""
         name, kennung = l["name"], l["kennung"]
         art = Linienart(l["art"])
-        wert = {Linienart.FLAECHE: l["flaeche"], Linienart.ANZAHL: l["anzahl"],
+        if art is Linienart.FLAECHE and l["verschmiert"] == "staebe":
+            for feld, was in (("durchmesser", "der Durchmesser"), ("teilung", "die Teilung")):
+                if l[feld] <= 0:
+                    self._melden(f"{name}: {was} der verschmierten Stäbe muss grösser als "
+                                 f"null sein.", kennung)
+                    return None
+            if l["laenge"] is not None and l["laenge"] <= 0:
+                self._melden(f"{name}: die Länge der verschmierten Stäbe muss grösser als "
+                             f"null sein – leer gilt die der Linie.", kennung)
+                return None
+        laenge = math.hypot(l["bis"][0] - l["von"][0], l["bis"][1] - l["von"][1])
+        wert = {Linienart.FLAECHE: geo.linienflaeche(l, laenge, 0), Linienart.ANZAHL: l["anzahl"],
                 Linienart.TEILUNG: l["teilung"]}[art]
         try:
             linie = geo.stablinie(tuple(l["von"]), tuple(l["bis"]), art, wert,
@@ -405,13 +419,15 @@ class Querschnittsanalyse:
                 flaeche=math.pi * durchmesser ** 2 / 4.0, von=lage, bis=lage))
         for l, linie in zip(linien, self.zeichnung.linien):
             art = Linienart(l["art"])
-            flaeche = (l["flaeche"] if art is Linienart.FLAECHE
-                       else len(linie.punkte) * math.pi * l["durchmesser"] ** 2 / 4.0)
+            aus_staeben = art is Linienart.FLAECHE and l["verschmiert"] == "staebe"
             gruppen.append(Stabgruppe(
                 name=l["name"], kennung=l["kennung"], art=art.value, stahl=l["stahl"],
-                durchmesser=l["durchmesser"], punkte=linie.punkte, flaeche=flaeche,
+                durchmesser=l["durchmesser"], punkte=linie.punkte,
+                flaeche=geo.linienflaeche(l, linie.laenge, len(linie.punkte)),
                 von=tuple(l["von"]), bis=tuple(l["bis"]), linie=linie,
-                gewaehlt=l["teilung"] if art is Linienart.TEILUNG else None))
+                gewaehlt=l["teilung"] if art is Linienart.TEILUNG else None,
+                aus_staeben=((l["durchmesser"], l["teilung"], l["laenge"] or linie.laenge)
+                             if aus_staeben else None)))
         return gruppen
 
     def _waende(self, waende) -> List[Wandangabe]:
@@ -557,6 +573,10 @@ class Querschnittsanalyse:
             return 0.0
         p.ansatz(r"s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)",
                  titel="Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet")
+        if any(g.aus_staeben for g in self.gruppen):
+            p.ansatz(r"A_s = \frac{L}{s} \cdot \frac{\pi\, \varnothing^2}{4}",
+                     titel="Verschmierte Stäbe: ⌀ im Abstand s über die Länge L",
+                     name="Verschmierte Stahlfläche aus Stäben")
         zeilen = []
         for g in self.gruppen:
             if g.art == "stab":
@@ -565,7 +585,11 @@ class Querschnittsanalyse:
             else:
                 lage = Mathe(f"({g.von[0]:g};\\ {g.von[1]:g}) \\rightarrow "
                              f"({g.bis[0]:g};\\ {g.bis[1]:g})")
-                if g.art == Linienart.FLAECHE.value:
+                if g.aus_staeben:
+                    d, s, L = g.aus_staeben
+                    menge = Mathe(rf"\text{{verschmiert: }} \varnothing {d:g}\ @\ {s:g}"
+                                  rf"\ \text{{auf}}\ {L:.0f}")
+                elif g.art == Linienart.FLAECHE.value:
                     menge = "verschmiert"
                 else:
                     n = len(g.punkte)

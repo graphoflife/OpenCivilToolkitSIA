@@ -1,5 +1,5 @@
 ---
-erzeugt: 752306c11657
+erzeugt: 14121d360192
 art: modul
 tags: [modul]
 ---
@@ -361,6 +361,28 @@ Teilung s:  m = runde(L / s), kaufmaennisch; tatsaechlich L / m
 Bei 1000 mm und s = 150 sind das sieben Felder zu 142.9 mm, mit beiden
 Enden acht Staebe. Bei einer Flaeche gibt es keine Einzelstaebe.
 
+### verschmierte_flaeche
+
+```python
+def verschmierte_flaeche(durchmesser: float, teilung: float, laenge: float) -> float
+```
+
+Staebe `durchmesser` im Abstand `teilung` ueber `laenge`, verschmiert
+-- in mm²: `A_s = L/s · π⌀²/4`. Bei ⌀12 @ 150 auf 1000 mm sind das 754 mm².
+
+### linienflaeche
+
+```python
+def linienflaeche(linie: Mapping[str, Any], laenge: float, staebe: int) -> float
+```
+
+Die ganze Stahlflaeche einer Stablinie in mm² -- die eine Stelle dafuer.
+Verschmiert die Flaeche von Hand oder aus Staeben
+([[opencivil.querschnitt.geometrie#verschmierte_flaeche|verschmierte_flaeche]], ohne eigene Laenge ueber `laenge`, die
+der Linie); sonst ihre `staebe` Staebe. `linie` ist die Beschreibung,
+wie [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.elemente|elemente]] sie
+liefert.
+
 ### aequivalenter_durchmesser
 
 ```python
@@ -483,6 +505,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - `NULL = Flaechenwerte(A=0.0, y_S=0.0, z_S=0.0, I_y=0.0, I_z=0.0, I_yz=0.0)` – Ein Querschnitt ohne Flaeche -- der Anfang jeder Summe.
 - `WANDPROBE = 5.0` – Abstand der Proben entlang einer Wandlinie, in der Einheit der Punkte.
 - `TEILUNG_VERSCHMIERT = 150.0` – Mit welcher Teilung eine verschmierte Stablinie als Staebe gilt, wo sie einen Durchmesser braucht: fuer die Grenze der Stahlspannung je Stab ([[opencivil.nachweis.stabgrenzen]], Annahme des Benutzers, 2026-10-15) und fuer die Ueberdeckung (Benutzer, 2026-10-23). In mm.
+- `VERSCHMIERT = ('flaeche', 'staebe')` – Wie die Flaeche einer verschmierten Stablinie angegeben ist: die Flaeche selbst -- oder Staebe mit Durchmesser und Teilung ueber eine Laenge, verschmiert (Benutzer, 2026-10-24).
 
 ## Braucht
 

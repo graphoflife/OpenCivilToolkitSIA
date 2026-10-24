@@ -791,6 +791,8 @@ class Projekt(Beschreibung):
         a.stablinie([60, 550], [740, 550], art="anzahl", durchmesser=12, anzahl=4,
                     starteisen=False, endeisen=False, stahl="s1")
         a.stablinie([40, 150], [40, 450], art="flaeche", flaeche=400, stahl="s1")
+        a.stablinie([110, 150], [110, 450], art="flaeche", verschmiert="staebe",
+                    durchmesser=10, teilung=200, stahl="s1")
         a.stab(760, 300, durchmesser=20, stahl="s1")
         for e, f in (([75, 75], [725, 75]), ([725, 75], [725, 525]),
                      ([725, 525], [75, 525]), ([75, 525], [75, 75])):

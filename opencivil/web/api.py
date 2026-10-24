@@ -55,7 +55,8 @@ from opencivil.projekt.querschnittsanalyse import (
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import (
-    Linienart, aequivalenter_durchmesser, linie_in_ueberdeckung, stab_in_ueberdeckung,
+    VERSCHMIERT, Linienart, aequivalenter_durchmesser, linie_in_ueberdeckung, linienflaeche,
+    stab_in_ueberdeckung,
     ueberdeckungspolygon,
 )
 from opencivil.querschnitt.vorlagen import VORLAGEN
@@ -79,6 +80,12 @@ _WERKSTOFFSAETZE = [
     {"wert": s.value, "beschriftung": s.beschriftung, "kurz": s.kurz}
     for s in Werkstoffsatz
 ]
+#: Wie die Angaben einer verschmierten Stablinie heissen: kurz im Schalter,
+#: lang in seinem Titel -- je Angabe, die die Beschreibung kennt.
+_VERSCHMIERUNGEN = {
+    "flaeche": ("Stahlfläche", "Die Stahlfläche der ganzen Linie, von Hand"),
+    "staebe": ("⌀ und Teilung", "Stäbe ⌀ im Abstand s über die Länge L, verschmiert: L/s · π⌀²/4"),
+}
 #: Wie die Diagramme der Statik-Analyse heissen: kurz im Schalter, lang ueber
 #: dem Diagramm -- je Groesse, die die Beschreibung kennt.
 _DIAGRAMMGROESSEN = {
@@ -225,6 +232,9 @@ def katalog() -> dict:
                 {"wert": Linienart.ANZAHL.value, "beschriftung": "Anzahl"},
                 {"wert": Linienart.TEILUNG.value, "beschriftung": "Teilung"},
             ],
+            # Wie die Flaeche einer verschmierten Linie angegeben ist.
+            "verschmierungen": [{"wert": wert, "beschriftung": _VERSCHMIERUNGEN[wert][0],
+                                 "titel": _VERSCHMIERUNGEN[wert][1]} for wert in VERSCHMIERT],
             "werkstoffsaetze": _WERKSTOFFSAETZE,
             "betongesetze": _BETONGESETZE,
             "schnitte": list(SCHNITTE),
@@ -680,7 +690,7 @@ def geometrie(eintrag, projekt) -> dict:
     def linie_ueberdeckt(l):
         if l["art"] == Linienart.FLAECHE:
             def radius(laenge):
-                return aequivalenter_durchmesser(l["flaeche"], laenge) / 2.0
+                return aequivalenter_durchmesser(linienflaeche(l, laenge, 0), laenge) / 2.0
         else:
             def radius(_laenge):
                 return l["durchmesser"] / 2.0
@@ -694,8 +704,7 @@ def geometrie(eintrag, projekt) -> dict:
                            "felder": 0, "flaeche": 0.0, "je_meter": 0.0, "laenge": 0.0,
                            "ueberdeckt": None})
             continue
-        flaeche = (l["flaeche"] if l["art"] == "flaeche"
-                   else len(linie.punkte) * math.pi * l["durchmesser"] ** 2 / 4.0)
+        flaeche = linienflaeche(l, linie.laenge, len(linie.punkte))
         linien.append({
             **kopf,
             "punkte": [list(p) for p in linie.punkte],

@@ -44,6 +44,34 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Querschnitt: verschmierte Linie aus ⌀, Teilung und Länge
+
+Wunsch des Benutzers: bei verschmierter Bewehrung entweder die Stahlfläche
+eingeben oder Durchmesser, Teilung und Länge -- daraus L/s · π⌀²/4, und die
+Fläche steht grau darunter.
+
+- **Beschreibung:** an der Stablinie `verschmiert` (`flaeche` | `staebe`,
+  `VERSCHMIERT` in `querschnitt/geometrie.py`) und `laenge` (leer: die der
+  Linie). ⌀ und s sind die Felder, die die Linie nach Teilung auch hat --
+  wer die Art wechselt, findet seine Zahlen noch vor.
+- **Eine Stelle:** `linienflaeche` in der Geometrie bestimmt die Fläche jeder
+  Stablinie. Vorher stand die Regel zweimal, in der Analyse und in der
+  Antwort für das Zeichenfenster (`api.geometrie`). Die graue Zahl im
+  Fenster ist die Fläche dieser Antwort.
+- **Herleitung:** in der Tabelle «Bewehrung» «verschmiert: ⌀10 @ 200 auf
+  300», darüber der Ansatz A_s = L/s · π⌀²/4 (Formelsammlung «Verschmierte
+  Stahlfläche aus Stäben»).
+- **Offen:** Stahlspannung je Stab und Überdeckung nehmen für jede
+  verschmierte Linie weiter den fiktiven Durchmesser bei s = 150 mm -- auch
+  wo ⌀ und s nun bekannt sind (TODO).
+- **Nebenbei behoben:** die Normalkraft-Dehnungs-Linie stürzte ab, wenn die
+  Suche nach dem Fliessbeginn auf eine Stelle ohne Gleichgewicht fiel -- sie
+  hielt «keine Ebene» für «fliesst noch nicht» (`linie.py`). Getroffen hat
+  es der Kastenträger des Prüfprojekts mit der neuen Linie; ohne sie ändert
+  die Korrektur keine Zahl.
+
+---
+
 ## 2026-10-24 · Querschnitt: Materialien pastell
 
 Wunsch des Benutzers: im gezeichneten Querschnitt Beton pastellgrün,

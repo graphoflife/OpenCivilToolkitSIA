@@ -2021,6 +2021,15 @@
       ]
     },
     {
+      "name": "Verschmierte Stahlfläche aus Stäben",
+      "pfad": "Formelsammlung/Formeln/Verschmierte Stahlfläche aus Stäben.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
       "name": "Was die Zellen tragen",
       "pfad": "Formelsammlung/Formeln/Was die Zellen tragen.md",
       "art": "formel",
@@ -4259,6 +4268,8 @@
         "Stablinie",
         "_halb_auf",
         "stablinie",
+        "verschmierte_flaeche",
+        "linienflaeche",
         "aequivalenter_durchmesser",
         "_schnitt_der_geraden",
         "versetzt",

@@ -4039,6 +4039,10 @@ I_{yz} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \begin{equation*}
 s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)
 \end{equation*}
+\noindent\textbf{Verschmierte Stäbe: ⌀ im Abstand s über die Länge L}
+\begin{equation*}
+A_s = \frac{L}{s} \cdot \frac{\pi\, \varnothing^2}{4}
+\end{equation*}
 \noindent\textbf{Bewehrung}
 \begin{longtable}{lllrr}
 \hline
@@ -4049,11 +4053,12 @@ Stab 1 & $(760;\ 300)$ & $\varnothing 20$ & B500B & $314$ \\
 Linie 1 & $(50;\ 50) \rightarrow (750;\ 50)$ & $6 \varnothing 16\ @\ 140.0\ (\text{gewählt } 150)$ & B500B & $1206$ \\
 Linie 2 & $(60;\ 550) \rightarrow (740;\ 550)$ & $4 \varnothing 12\ @\ 136.0$ & B500B & $452$ \\
 Linie 3 & $(40;\ 150) \rightarrow (40;\ 450)$ & verschmiert & B500B & $400$ \\
+Linie 4 & $(110;\ 150) \rightarrow (110;\ 450)$ & $\text{verschmiert: } \varnothing 10\ @\ 200\ \text{auf}\ 300$ & B500B & $118$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Stahlfläche der Bewehrung}
 \begin{equation*}
-A_{s,tot} = 2373\,\mathrm{mm}^{2}
+A_{s,tot} = 2491\,\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Bügelquerschnitt je Länge einer Schubwand (n Schnitte)}
 \begin{equation*}
@@ -4252,8 +4257,8 @@ f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mat
 Grenze & Wert \\
 \hline
 \endhead
-reiner Zug, gleichmässig & $N_{Rd}^{+} = 1031.7\,\mathrm{kN}$ \\
-reiner Druck, gleichmässig & $N_{Rd}^{-} = -7501.7\,\mathrm{kN}$ \\
+reiner Zug, gleichmässig & $N_{Rd}^{+} = 1082.9\,\mathrm{kN}$ \\
+reiner Druck, gleichmässig & $N_{Rd}^{-} = -7546.5\,\mathrm{kN}$ \\
 \hline
 \end{longtable}
 \subsubsection{Feld}
@@ -4274,7 +4279,7 @@ M\_y (nachgewiesen) & $300.0$ & kNm \\
 M\_z (nachgewiesen) & $-52.0$ & kNm \\
 \hline
 \end{longtable}
-Bruchzustand: Zugrichtung n = (0.046; -0.999), -87.3° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 272.7 mm auf der Druckseite des Schwerpunkts.
+Bruchzustand: Zugrichtung n = (0.065; -0.998), -86.3° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 270.1 mm auf der Druckseite des Schwerpunkts.
 
 \noindent\textbf{Dehnungsebene}
 \begin{longtable}{rr}
@@ -4282,7 +4287,7 @@ Bruchzustand: Zugrichtung n = (0.046; -0.999), -87.3° gegen die y-Achse. Die Nu
 $\varepsilon_0\ [\text{‰}]$ & $\kappa\ [\mathrm{1/m}]$ \\
 \hline
 \endhead
-$20.965$ & $0.07689$ \\
+$17.117$ & $0.06337$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Kräfte im Bruchzustand -- Beton als Resultierende, Bewehrung je Element}
@@ -4291,11 +4296,12 @@ $20.965$ & $0.07689$ \\
 Teil & $F\ [\mathrm{kN}]$ & $y\ [\mathrm{mm}]$ & $z\ [\mathrm{mm}]$ & $\varepsilon\ [\text{‰}]$ & $\sigma\ [\mathrm{N/mm^2}]$ \\
 \hline
 \endhead
-C30/37 & $-323.4$ & $277.4$ & $587.0$ & – & – \\
-Stab 1 & $136.6$ & $760.0$ & $300.0$ & $22.25$ & $435$ \\
-Linie 1 & $524.5$ & $400.0$ & $50.0$ & $38.92 \ldots 41.41$ & $435$ \\
-Linie 2 & $152.4$ & $439.3$ & $550.0$ & $1.04 \ldots 2.49$ & $207 \ldots 435$ \\
-Linie 3 & $173.9$ & $40.0$ & $300.0$ & $8.88 \ldots 30.49$ & $435$ \\
+C30/37 & $-340.6$ & $241.3$ & $584.3$ & – & – \\
+Stab 1 & $136.6$ & $760.0$ & $300.0$ & $18.60$ & $435$ \\
+Linie 1 & $524.5$ & $400.0$ & $50.0$ & $31.49 \ldots 34.37$ & $435$ \\
+Linie 2 & $118.3$ & $472.7$ & $550.0$ & $0.47 \ldots 2.15$ & $94 \ldots 429$ \\
+Linie 3 & $173.9$ & $40.0$ & $300.0$ & $6.74 \ldots 24.53$ & $435$ \\
+Linie 4 & $51.2$ & $110.0$ & $300.0$ & $7.03 \ldots 24.82$ & $435$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Probe: Normalkraft}
@@ -4304,19 +4310,19 @@ N_{Rd} = \sum F_i = 664\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Probe: Moment um y}
 \begin{equation*}
-M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 185.9\,\mathrm{kNm}
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 198.4\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Probe: Moment um z}
 \begin{equation*}
-M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = -32.2\,\mathrm{kNm}
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = -34.4\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Widerstand in der Richtung der Einwirkung}
 \begin{equation*}
-M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(185.9\,\mathrm{kNm}\right)^{2} + \left(-32.2\,\mathrm{kNm}\right)^{2}} = 188.6\,\mathrm{kNm}
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(198.4\,\mathrm{kNm}\right)^{2} + \left(-34.4\,\mathrm{kNm}\right)^{2}} = 201.3\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{188.6\,\mathrm{kNm}}{304.5\,\mathrm{kNm}} = 0.62 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{201.3\,\mathrm{kNm}}{304.5\,\mathrm{kNm}} = 0.66 \quad \Rightarrow \quad \text{NICHT erfüllt}
 \end{equation*}
 \subsubsection{Schief}
 \noindent\textbf{Einwirkung}
@@ -4336,7 +4342,7 @@ M\_y (nachgewiesen) & $250.0$ & kNm \\
 M\_z (nachgewiesen) & $150.0$ & kNm \\
 \hline
 \end{longtable}
-Bruchzustand: Zugrichtung n = (-0.333; -0.943), -109.4° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 120.3 mm auf der Druckseite des Schwerpunkts.
+Bruchzustand: Zugrichtung n = (-0.326; -0.945), -109.0° gegen die y-Achse. Die Nulllinie steht senkrecht zur Zugrichtung, 117.5 mm auf der Druckseite des Schwerpunkts.
 
 \noindent\textbf{Dehnungsebene}
 \begin{longtable}{rr}
@@ -4344,7 +4350,7 @@ Bruchzustand: Zugrichtung n = (-0.333; -0.943), -109.4° gegen die y-Achse. Die 
 $\varepsilon_0\ [\text{‰}]$ & $\kappa\ [\mathrm{1/m}]$ \\
 \hline
 \endhead
-$1.424$ & $0.01184$ \\
+$1.386$ & $0.01180$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Kräfte im Bruchzustand -- Beton als Resultierende, Bewehrung je Element}
@@ -4353,11 +4359,12 @@ $1.424$ & $0.01184$ \\
 Teil & $F\ [\mathrm{kN}]$ & $y\ [\mathrm{mm}]$ & $z\ [\mathrm{mm}]$ & $\varepsilon\ [\text{‰}]$ & $\sigma\ [\mathrm{N/mm^2}]$ \\
 \hline
 \endhead
-C30/37 & $-1898.5$ & $545.7$ & $516.1$ & – & – \\
-Stab 1 & $0.4$ & $760.0$ & $300.0$ & $0.01$ & $1$ \\
-Linie 1 & $524.5$ & $400.0$ & $50.0$ & $2.84 \ldots 5.59$ & $435$ \\
-Linie 2 & $-115.0$ & $470.8$ & $550.0$ & $-2.17 \ldots -0.56$ & $-434 \ldots -113$ \\
-Linie 3 & $161.8$ & $40.0$ & $291.1$ & $1.27 \ldots 4.41$ & $255 \ldots 435$ \\
+C30/37 & $-1938.8$ & $539.6$ & $516.3$ & – & – \\
+Stab 1 & $0.0$ & $760.0$ & $300.0$ & $0.00$ & $0$ \\
+Linie 1 & $524.5$ & $400.0$ & $50.0$ & $2.83 \ldots 5.52$ & $435$ \\
+Linie 2 & $-117.5$ & $468.0$ & $550.0$ & $-2.19 \ldots -0.62$ & $-435 \ldots -123$ \\
+Linie 3 & $160.1$ & $40.0$ & $289.9$ & $1.20 \ldots 4.34$ & $241 \ldots 435$ \\
+Linie 4 & $44.9$ & $110.0$ & $284.5$ & $0.93 \ldots 4.07$ & $187 \ldots 435$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Probe: Normalkraft}
@@ -4366,19 +4373,19 @@ N_{Rd} = \sum F_i = -1326.8\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Probe: Moment um y}
 \begin{equation*}
-M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 571.6\,\mathrm{kNm}
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 582.2\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Probe: Moment um z}
 \begin{equation*}
-M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 343\,\mathrm{kNm}
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 349.3\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Widerstand in der Richtung der Einwirkung}
 \begin{equation*}
-M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(571.6\,\mathrm{kNm}\right)^{2} + \left(343\,\mathrm{kNm}\right)^{2}} = 666.6\,\mathrm{kNm}
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(582.2\,\mathrm{kNm}\right)^{2} + \left(349.3\,\mathrm{kNm}\right)^{2}} = 679\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,\text{Schief}} = \frac{M_{Rd}}{M_{Ed}} = \frac{666.6\,\mathrm{kNm}}{291.5\,\mathrm{kNm}} = 2.29 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\text{Schief}} = \frac{M_{Rd}}{M_{Ed}} = \frac{679\,\mathrm{kNm}}{291.5\,\mathrm{kNm}} = 2.33 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Duktilität} \hfill \normref{SIA 262:2025, 4.1.4.2.5}
 \begin{equation*}
@@ -4387,38 +4394,38 @@ M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(571.6\,\mathrm{kNm}\ri
 \subsubsection{Zug unten}
 \noindent\textbf{Bezogene Druckzonenhöhe bei reiner Biegung}
 \begin{equation*}
-x/d = \frac{x}{d} = \frac{64.8\,\mathrm{mm}}{560.3\,\mathrm{mm}} = 0.116 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{75.5\,\mathrm{mm}}{572.3\,\mathrm{mm}} = 0.132 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,x/d,\text{Zug unten}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.116} = 3.02
+\alpha_{eff,x/d,\text{Zug unten}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.132} = 2.65
 \end{equation*}
 \subsubsection{Zug oben}
 \noindent\textbf{Bezogene Druckzonenhöhe bei reiner Biegung}
 \begin{equation*}
-x/d = \frac{x}{d} = \frac{47.4\,\mathrm{mm}}{554.1\,\mathrm{mm}} = 0.086 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{52.8\,\mathrm{mm}}{559.5\,\mathrm{mm}} = 0.094 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,x/d,\text{Zug oben}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.086} = 4.09
+\alpha_{eff,x/d,\text{Zug oben}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.094} = 3.71
 \end{equation*}
 \subsubsection{Zug links}
 \noindent\textbf{Bezogene Druckzonenhöhe bei reiner Biegung}
 \begin{equation*}
-x/d = \frac{x}{d} = \frac{109\,\mathrm{mm}}{807.7\,\mathrm{mm}} = 0.135 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{112.7\,\mathrm{mm}}{807.1\,\mathrm{mm}} = 0.14 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,x/d,\text{Zug links}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.135} = 2.59
+\alpha_{eff,x/d,\text{Zug links}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.14} = 2.51
 \end{equation*}
 \subsubsection{Zug rechts}
 \noindent\textbf{Bezogene Druckzonenhöhe bei reiner Biegung}
 \begin{equation*}
-x/d = \frac{x}{d} = \frac{103.5\,\mathrm{mm}}{789.9\,\mathrm{mm}} = 0.131 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{105\,\mathrm{mm}}{789.4\,\mathrm{mm}} = 0.133 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,x/d,\text{Zug rechts}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.131} = 2.67
+\alpha_{eff,x/d,\text{Zug rechts}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.133} = 2.63
 \end{equation*}
 Massgebend: Zug links (kleinster Erfüllungsgrad).
 
@@ -4455,11 +4462,11 @@ M_{Riss} = f_{ct,eff} \cdot W = 2.64\,\mathrm{N}/\mathrm{mm}^{2} \cdot 44.25\,\c
 \end{equation*}
 \noindent\textbf{Biegewiderstand bei N = 0 in dieser Richtung}
 \begin{equation*}
-M_{Rd} = 359.8\,\mathrm{kNm}
+M_{Rd} = 372.3\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,Riss,\text{Zug unten}} = \frac{M_{Rd}}{M_{Riss}} = \frac{359.8\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 3.08
+\alpha_{eff,Riss,\text{Zug unten}} = \frac{M_{Rd}}{M_{Riss}} = \frac{372.3\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 3.19
 \end{equation*}
 \subsubsection{Zug oben}
 Gezogenster Betonpunkt: y = 800 mm, z = 600 mm (C30/37).
@@ -4486,11 +4493,11 @@ M_{Riss} = f_{ct,eff} \cdot W = 2.64\,\mathrm{N}/\mathrm{mm}^{2} \cdot 44.25\,\c
 \end{equation*}
 \noindent\textbf{Biegewiderstand bei N = 0 in dieser Richtung}
 \begin{equation*}
-M_{Rd} = 194.7\,\mathrm{kNm}
+M_{Rd} = 207.6\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,Riss,\text{Zug oben}} = \frac{M_{Rd}}{M_{Riss}} = \frac{194.7\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.67
+\alpha_{eff,Riss,\text{Zug oben}} = \frac{M_{Rd}}{M_{Riss}} = \frac{207.6\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.78
 \end{equation*}
 \subsubsection{Zug links}
 Gezogenster Betonpunkt: y = 0 mm, z = 0 mm (C30/37).
@@ -4517,11 +4524,11 @@ M_{Riss} = f_{ct,eff} \cdot W = 2.56\,\mathrm{N}/\mathrm{mm}^{2} \cdot 56.19\,\c
 \end{equation*}
 \noindent\textbf{Biegewiderstand bei N = 0 in dieser Richtung}
 \begin{equation*}
-M_{Rd} = 388.5\,\mathrm{kNm}
+M_{Rd} = 421.1\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,Riss,\text{Zug links}} = \frac{M_{Rd}}{M_{Riss}} = \frac{388.5\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 2.70
+\alpha_{eff,Riss,\text{Zug links}} = \frac{M_{Rd}}{M_{Riss}} = \frac{421.1\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 2.93
 \end{equation*}
 \subsubsection{Zug rechts}
 Gezogenster Betonpunkt: y = 800 mm, z = 0 mm (C30/37).
@@ -4548,11 +4555,11 @@ M_{Riss} = f_{ct,eff} \cdot W = 2.56\,\mathrm{N}/\mathrm{mm}^{2} \cdot 56.19\,\c
 \end{equation*}
 \noindent\textbf{Biegewiderstand bei N = 0 in dieser Richtung}
 \begin{equation*}
-M_{Rd} = 362.5\,\mathrm{kNm}
+M_{Rd} = 364.4\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,Riss,\text{Zug rechts}} = \frac{M_{Rd}}{M_{Riss}} = \frac{362.5\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 2.52
+\alpha_{eff,Riss,\text{Zug rechts}} = \frac{M_{Rd}}{M_{Riss}} = \frac{364.4\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 2.53
 \end{equation*}
 Massgebend: Zug oben (kleinster Erfüllungsgrad).
 
@@ -4576,6 +4583,10 @@ N_{Riss} = A_c \cdot f_{ct,eff} = 330000\,\mathrm{mm}^{2} \cdot 2.32\,\mathrm{N}
 \noindent\textbf{Linie 3: verschmiert, als Stäbe mit 150 mm Teilung}
 \begin{equation*}
 \varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{400\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 16\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Linie 4: verschmiert, als Stäbe mit 150 mm Teilung}
+\begin{equation*}
+\varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{118\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 8.7\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)} \hfill \normref{SIA 262:2025, 4.4.2}
 \begin{equation*}
@@ -4609,6 +4620,14 @@ N_{Riss} = A_c \cdot f_{ct,eff} = 330000\,\mathrm{mm}^{2} \cdot 2.32\,\mathrm{N}
   &= 404\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 \end{equation*}
+\noindent\textbf{Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)} \hfill \normref{SIA 262:2025, 4.4.2}
+\begin{equation*}
+\begin{aligned}
+  \sigma_{s,adm,5} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{fikt}}};\ f_{yk}\right] \\
+  &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{8.7\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 500\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+\end{equation*}
 \noindent\textbf{Welche Stäbe welche Grenze haben}
 \begin{longtable}{llr}
 \hline
@@ -4619,19 +4638,20 @@ $\sigma_{s,adm,1}$ & Stab 1 & $361$ \\
 $\sigma_{s,adm,2}$ & Linie 1 & $404$ \\
 $\sigma_{s,adm,3}$ & Linie 2 & $466$ \\
 $\sigma_{s,adm,4}$ & Linie 3 & $404$ \\
+$\sigma_{s,adm,5}$ & Linie 4 & $500$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Aufnehmbare Risskraft}
 \begin{equation*}
 \begin{aligned}
-  N_{s,adm} &= A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} \\
-  &= 314\,\mathrm{mm}^{2} \cdot 361\,\mathrm{N}/\mathrm{mm}^{2} + 1206\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 452\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} + 400\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 973.5\,\mathrm{kN} \quad \ge \quad N_{Riss} = 765.6\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
+  N_{s,adm} &= A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} + A_{s,5} \cdot \sigma_{s,adm,5} \\
+  &= 314\,\mathrm{mm}^{2} \cdot 361\,\mathrm{N}/\mathrm{mm}^{2} + 1206\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 452\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} + 400\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 118\,\mathrm{mm}^{2} \cdot 500\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= 1032.4\,\mathrm{kN} \quad \ge \quad N_{Riss} = 765.6\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,NR} = \frac{N_{s,adm}}{N_{Riss}} = \frac{973.5\,\mathrm{kN}}{765.6\,\mathrm{kN}} = 1.27
+\alpha_{eff,NR} = \frac{N_{s,adm}}{N_{Riss}} = \frac{1032.4\,\mathrm{kN}}{765.6\,\mathrm{kN}} = 1.35
 \end{equation*}
 \subsection{Zwängung auf Biegung}
 \noindent\textbf{Zwängung auf Biegung, je Stab} \hfill \normref{SIA 262:2025, 4.4.2}
@@ -4670,6 +4690,10 @@ f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mat
 \begin{equation*}
 \varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{400\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 16\,\mathrm{mm}
 \end{equation*}
+\noindent\textbf{Linie 4: verschmiert, als Stäbe mit 150 mm Teilung}
+\begin{equation*}
+\varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{118\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 8.7\,\mathrm{mm}
+\end{equation*}
 \noindent\textbf{Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)} \hfill \normref{SIA 262:2025, 4.4.2}
 \begin{equation*}
 \begin{aligned}
@@ -4702,6 +4726,14 @@ f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mat
   &= 404\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 \end{equation*}
+\noindent\textbf{Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)} \hfill \normref{SIA 262:2025, 4.4.2}
+\begin{equation*}
+\begin{aligned}
+  \sigma_{s,adm,5} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{fikt}}};\ f_{yk}\right] \\
+  &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{8.7\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 500\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+\end{equation*}
 \noindent\textbf{Welche Stäbe welche Grenze haben}
 \begin{longtable}{llr}
 \hline
@@ -4712,6 +4744,7 @@ $\sigma_{s,adm,1}$ & Stab 1 & $361$ \\
 $\sigma_{s,adm,2}$ & Linie 1 & $404$ \\
 $\sigma_{s,adm,3}$ & Linie 2 & $466$ \\
 $\sigma_{s,adm,4}$ & Linie 3 & $404$ \\
+$\sigma_{s,adm,5}$ & Linie 4 & $500$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Dehnungsebene und innere Kräfte}
@@ -4743,15 +4776,15 @@ M_{Riss} = f_{ct,eff} \cdot W = 2.64\,\mathrm{N}/\mathrm{mm}^{2} \cdot 44.25\,\c
 \end{equation*}
 \noindent\textbf{Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht}
 \begin{equation*}
-M_{s,adm} = 277.4\,\mathrm{kNm}
+M_{s,adm} = 280.2\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung}
 \begin{equation*}
-\psi = -89.7^\circ \qquad \varepsilon_0 = 0.8065\,\text{‰} \qquad \kappa = 0.00481\,\mathrm{m}^{-1}
+\psi = -89.1^\circ \qquad \varepsilon_0 = 0.7958\,\text{‰} \qquad \kappa = 0.00479\,\mathrm{m}^{-1}
 \end{equation*}
 \noindent\textbf{Probe: die Ebene erzeugt die Einwirkung}
 \begin{equation*}
-N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 277.4\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 280.2\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
 \end{equation*}
 \noindent\textbf{An der Grenze: Linie 1 (y = 750 mm, z = 50 mm)}
 \begin{equation*}
@@ -4759,11 +4792,11 @@ N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 277.4\,\mathrm{kNm} \;\
 \end{equation*}
 \noindent\textbf{Zwängung auf Biegung}
 \begin{equation*}
-M_{s,adm} = 277.4\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{s,adm} = 280.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,ZB,\text{Zug unten}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{277.4\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 2.38
+\alpha_{eff,ZB,\text{Zug unten}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{280.2\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 2.40
 \end{equation*}
 \subsubsection{Zug oben}
 Gezogenster Betonpunkt: y = 800 mm, z = 600 mm (C30/37).
@@ -4790,15 +4823,15 @@ M_{Riss} = f_{ct,eff} \cdot W = 2.64\,\mathrm{N}/\mathrm{mm}^{2} \cdot 44.25\,\c
 \end{equation*}
 \noindent\textbf{Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht}
 \begin{equation*}
-M_{s,adm} = 151.1\,\mathrm{kNm}
+M_{s,adm} = 156.6\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung}
 \begin{equation*}
-\psi = 89.5^\circ \qquad \varepsilon_0 = 1.0465\,\text{‰} \qquad \kappa = 0.0051\,\mathrm{m}^{-1}
+\psi = 88.7^\circ \qquad \varepsilon_0 = 1.0333\,\text{‰} \qquad \kappa = 0.0051\,\mathrm{m}^{-1}
 \end{equation*}
 \noindent\textbf{Probe: die Ebene erzeugt die Einwirkung}
 \begin{equation*}
-N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = -151.1\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = -156.6\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
 \end{equation*}
 \noindent\textbf{An der Grenze: Linie 2 (y = 604 mm, z = 550 mm)}
 \begin{equation*}
@@ -4806,11 +4839,11 @@ N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = -151.1\,\mathrm{kNm} \;
 \end{equation*}
 \noindent\textbf{Zwängung auf Biegung}
 \begin{equation*}
-M_{s,adm} = 151.1\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{s,adm} = 156.6\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{151.1\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.30
+\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{156.6\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.34
 \end{equation*}
 \subsubsection{Zug links}
 Gezogenster Betonpunkt: y = 0 mm, z = 0 mm (C30/37).
@@ -4837,15 +4870,15 @@ M_{Riss} = f_{ct,eff} \cdot W = 2.56\,\mathrm{N}/\mathrm{mm}^{2} \cdot 56.19\,\c
 \end{equation*}
 \noindent\textbf{Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht}
 \begin{equation*}
-M_{s,adm} = 248.3\,\mathrm{kNm}
+M_{s,adm} = 273.3\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung}
 \begin{equation*}
-\psi = 172.1^\circ \qquad \varepsilon_0 = 0.7986\,\text{‰} \qquad \kappa = 0.00325\,\mathrm{m}^{-1}
+\psi = 172.5^\circ \qquad \varepsilon_0 = 0.7871\,\text{‰} \qquad \kappa = 0.00329\,\mathrm{m}^{-1}
 \end{equation*}
 \noindent\textbf{Probe: die Ebene erzeugt die Einwirkung}
 \begin{equation*}
-N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 248.3\,\mathrm{kNm} \;\checkmark
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 273.3\,\mathrm{kNm} \;\checkmark
 \end{equation*}
 \noindent\textbf{An der Grenze: Linie 3 (y = 40 mm, z = 441 mm)}
 \begin{equation*}
@@ -4853,11 +4886,11 @@ N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\chec
 \end{equation*}
 \noindent\textbf{Zwängung auf Biegung}
 \begin{equation*}
-M_{s,adm} = 248.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{s,adm} = 273.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,ZB,\text{Zug links}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{248.3\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.73
+\alpha_{eff,ZB,\text{Zug links}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{273.3\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.90
 \end{equation*}
 \subsubsection{Zug rechts}
 Gezogenster Betonpunkt: y = 800 mm, z = 0 mm (C30/37).
@@ -4888,7 +4921,7 @@ M_{s,adm} = 208.2\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung}
 \begin{equation*}
-\psi = 8.4^\circ \qquad \varepsilon_0 = 0.7479\,\text{‰} \qquad \kappa = 0.00297\,\mathrm{m}^{-1}
+\psi = 8.4^\circ \qquad \varepsilon_0 = 0.7486\,\text{‰} \qquad \kappa = 0.00297\,\mathrm{m}^{-1}
 \end{equation*}
 \noindent\textbf{Probe: die Ebene erzeugt die Einwirkung}
 \begin{equation*}
@@ -4916,6 +4949,10 @@ Massgebend: Zug oben (kleinster Erfüllungsgrad).
 \noindent\textbf{Linie 3: verschmiert, als Stäbe mit 150 mm Teilung}
 \begin{equation*}
 \varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{400\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 16\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Linie 4: verschmiert, als Stäbe mit 150 mm Teilung}
+\begin{equation*}
+\varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{118\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 8.7\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)} \hfill \normref{SIA 262:2025, 4.4.2}
 \begin{equation*}
@@ -4949,6 +4986,14 @@ Massgebend: Zug oben (kleinster Erfüllungsgrad).
   &= 404\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
 \end{equation*}
+\noindent\textbf{Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)} \hfill \normref{SIA 262:2025, 4.4.2}
+\begin{equation*}
+\begin{aligned}
+  \sigma_{s,adm,5} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{fikt}}};\ f_{yk}\right] \\
+  &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{8.7\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 500\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+\end{equation*}
 \noindent\textbf{Welche Stäbe welche Grenze haben}
 \begin{longtable}{llr}
 \hline
@@ -4959,6 +5004,7 @@ $\sigma_{s,adm,1}$ & Stab 1 & $361$ \\
 $\sigma_{s,adm,2}$ & Linie 1 & $404$ \\
 $\sigma_{s,adm,3}$ & Linie 2 & $466$ \\
 $\sigma_{s,adm,4}$ & Linie 3 & $404$ \\
+$\sigma_{s,adm,5}$ & Linie 4 & $500$ \\
 \hline
 \end{longtable}
 \subsubsection{Welche Werte angesetzt werden}
@@ -4994,7 +5040,7 @@ N_{Ed,\text{quasi-ständig}} = 0.0\ \mathrm{kN} \qquad M_{y,Ed,\text{quasi-stän
 \end{equation*}
 \noindent\textbf{Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung}
 \begin{equation*}
-\psi = -89.7^\circ \qquad \varepsilon_0 = 0.5609\,\text{‰} \qquad \kappa = 0.0028\,\mathrm{m}^{-1}
+\psi = -89.3^\circ \qquad \varepsilon_0 = 0.5474\,\text{‰} \qquad \kappa = 0.00275\,\mathrm{m}^{-1}
 \end{equation*}
 \noindent\textbf{Probe: die Ebene erzeugt die Einwirkung}
 \begin{equation*}
@@ -5006,20 +5052,21 @@ N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 180\,\mathrm{kNm} \;\ch
 Element & $\varepsilon_s\ [‰]$ & $\sigma_s\ [\mathrm{N/mm^2}]$ & $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ \\
 \hline
 \endhead
-Stab 1 & $0.566$ & $113$ & $361$ \\
-Linie 1 & $1.266$ & $253$ & $404$ \\
-Linie 3 & $0.950$ & $190$ & $404$ \\
+Stab 1 & $0.560$ & $112$ & $361$ \\
+Linie 1 & $1.248$ & $250$ & $404$ \\
+Linie 3 & $0.922$ & $184$ & $404$ \\
+Linie 4 & $0.924$ & $185$ & $500$ \\
 \hline
 \end{longtable}
 Massgebend: Linie 1 (y = 750 mm, z = 50 mm).
 
 \noindent\textbf{Grösste Zugspannung in der Bewehrung}
 \begin{equation*}
-\sigma_s = 253\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_s = 250\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,\sigma,w,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{253\,\mathrm{N}/\mathrm{mm}^{2}} = 1.60
+\alpha_{eff,\sigma,w,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{250\,\mathrm{N}/\mathrm{mm}^{2}} = 1.62
 \end{equation*}
 \subsubsection{Quasi-ständiger Lastfall – Schief (60 \%)}
 \noindent\textbf{Einwirkung}
@@ -5028,7 +5075,7 @@ N_{Ed,\text{quasi-ständig}} = -900.0\ \mathrm{kN} \qquad M_{y,Ed,\text{quasi-st
 \end{equation*}
 \noindent\textbf{Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung}
 \begin{equation*}
-\psi = -110.9^\circ \qquad \varepsilon_0 = -0.0703\,\text{‰} \qquad \kappa = 0.00041\,\mathrm{m}^{-1}
+\psi = -110.9^\circ \qquad \varepsilon_0 = -0.0702\,\text{‰} \qquad \kappa = 0.00041\,\mathrm{m}^{-1}
 \end{equation*}
 \noindent\textbf{Probe: die Ebene erzeugt die Einwirkung}
 \begin{equation*}
@@ -5042,6 +5089,7 @@ Element & $\varepsilon_s\ [‰]$ & $\sigma_s\ [\mathrm{N/mm^2}]$ & $\sigma_{s,ad
 \endhead
 Linie 1 & $0.076$ & $15$ & $404$ \\
 Linie 3 & $0.036$ & $7$ & $404$ \\
+Linie 4 & $0.026$ & $5$ & $500$ \\
 \hline
 \end{longtable}
 Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
@@ -5052,7 +5100,7 @@ Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,\sigma,w,\text{Schief (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{15\,\mathrm{N}/\mathrm{mm}^{2}} = 26.63
+\alpha_{eff,\sigma,w,\text{Schief (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{15\,\mathrm{N}/\mathrm{mm}^{2}} = 26.55
 \end{equation*}
 \subsubsection{Quasi-ständiger Lastfall – Dauer}
 \noindent\textbf{Einwirkung}
@@ -5061,7 +5109,7 @@ N_{Ed,\text{quasi-ständig}} = -300.0\ \mathrm{kN} \qquad M_{y,Ed,\text{quasi-st
 \end{equation*}
 \noindent\textbf{Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung}
 \begin{equation*}
-\psi = -102.7^\circ \qquad \varepsilon_0 = 0.1279\,\text{‰} \qquad \kappa = 0.001\,\mathrm{m}^{-1}
+\psi = -102.5^\circ \qquad \varepsilon_0 = 0.1237\,\text{‰} \qquad \kappa = 0.00098\,\mathrm{m}^{-1}
 \end{equation*}
 \noindent\textbf{Probe: die Ebene erzeugt die Einwirkung}
 \begin{equation*}
@@ -5073,20 +5121,21 @@ N_{int} = -300\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 120\,\mathrm{kNm} \;
 Element & $\varepsilon_s\ [‰]$ & $\sigma_s\ [\mathrm{N/mm^2}]$ & $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ \\
 \hline
 \endhead
-Stab 1 & $0.049$ & $10$ & $361$ \\
-Linie 1 & $0.449$ & $90$ & $404$ \\
-Linie 3 & $0.344$ & $69$ & $404$ \\
+Stab 1 & $0.047$ & $9$ & $361$ \\
+Linie 1 & $0.439$ & $88$ & $404$ \\
+Linie 3 & $0.336$ & $67$ & $404$ \\
+Linie 4 & $0.321$ & $64$ & $500$ \\
 \hline
 \end{longtable}
 Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 
 \noindent\textbf{Grösste Zugspannung in der Bewehrung}
 \begin{equation*}
-\sigma_s = 90\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_s = 88\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{90\,\mathrm{N}/\mathrm{mm}^{2}} = 4.50
+\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{88\,\mathrm{N}/\mathrm{mm}^{2}} = 4.60
 \end{equation*}
 \subsection{Stahlspannung unter häufiger Einwirkung}
 \noindent\textbf{Rechenwahl}
@@ -5130,7 +5179,7 @@ N_{Ed,häufig} = -500.0\ \mathrm{kN} \qquad M_{y,Ed,häufig} = 200.0\ \mathrm{kN
 \end{equation*}
 \noindent\textbf{Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung}
 \begin{equation*}
-\psi = -102.7^\circ \qquad \varepsilon_0 = 0.2131\,\text{‰} \qquad \kappa = 0.00167\,\mathrm{m}^{-1}
+\psi = -102.5^\circ \qquad \varepsilon_0 = 0.2061\,\text{‰} \qquad \kappa = 0.00164\,\mathrm{m}^{-1}
 \end{equation*}
 \noindent\textbf{Probe: die Ebene erzeugt die Einwirkung}
 \begin{equation*}
@@ -5142,66 +5191,67 @@ N_{int} = -500\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 200\,\mathrm{kNm} \;
 Element & $\varepsilon_s\ [‰]$ & $\sigma_s\ [\mathrm{N/mm^2}]$ & $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ \\
 \hline
 \endhead
-Stab 1 & $0.081$ & $16$ & $355$ \\
-Linie 1 & $0.748$ & $150$ & $355$ \\
-Linie 3 & $0.574$ & $115$ & $355$ \\
+Stab 1 & $0.078$ & $16$ & $355$ \\
+Linie 1 & $0.731$ & $146$ & $355$ \\
+Linie 3 & $0.559$ & $112$ & $355$ \\
+Linie 4 & $0.534$ & $107$ & $355$ \\
 \hline
 \end{longtable}
 Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 
 \noindent\textbf{Grösste Zugspannung in der Bewehrung}
 \begin{equation*}
-\sigma_s = 150\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_s = 146\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,\sigma,\text{Häufig schief}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{150\,\mathrm{N}/\mathrm{mm}^{2}} = 2.37
+\alpha_{eff,\sigma,\text{Häufig schief}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{146\,\mathrm{N}/\mathrm{mm}^{2}} = 2.43
 \end{equation*}
 \subsection{Kennzahlen}
 \noindent\textbf{Bewehrungsmass je Kubikmeter Beton, ohne Bügel}
 \begin{equation*}
-\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A} = \frac{2373\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{330000\,\mathrm{mm}^{2}} = 56\,\mathrm{kg}/\mathrm{m}^{3}
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A} = \frac{2491\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{330000\,\mathrm{mm}^{2}} = 59\,\mathrm{kg}/\mathrm{m}^{3}
 \end{equation*}
 \subsubsection{Biegung und Normalkraft}
 \noindent\textbf{Momentenwiderstand bei N\_Ed = 0, Zug unten}
 \begin{equation*}
-M_{y,Rd}^{+}(N_{Ed} = 0) = 359.8\,\mathrm{kNm}
+M_{y,Rd}^{+}(N_{Ed} = 0) = 372.3\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten}
 \begin{equation*}
-\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{64.8\,\mathrm{mm}}{560.3\,\mathrm{mm}} = 0.116
+\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{75.5\,\mathrm{mm}}{572.3\,\mathrm{mm}} = 0.132
 \end{equation*}
 \noindent\textbf{Momentenwiderstand bei N\_Ed = 0, Zug oben}
 \begin{equation*}
-M_{y,Rd}^{-}(N_{Ed} = 0) = -194.7\,\mathrm{kNm}
+M_{y,Rd}^{-}(N_{Ed} = 0) = -207.6\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben}
 \begin{equation*}
-\left(x/d\right)_{y}^{-} = \frac{x}{d} = \frac{47.4\,\mathrm{mm}}{554.1\,\mathrm{mm}} = 0.086
+\left(x/d\right)_{y}^{-} = \frac{x}{d} = \frac{52.8\,\mathrm{mm}}{559.5\,\mathrm{mm}} = 0.094
 \end{equation*}
 \noindent\textbf{Momentenwiderstand bei N\_Ed = 0, Zug links}
 \begin{equation*}
-M_{z,Rd}^{+}(N_{Ed} = 0) = 388.5\,\mathrm{kNm}
+M_{z,Rd}^{+}(N_{Ed} = 0) = 421.1\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links}
 \begin{equation*}
-\left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{109\,\mathrm{mm}}{807.7\,\mathrm{mm}} = 0.135
+\left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{112.7\,\mathrm{mm}}{807.1\,\mathrm{mm}} = 0.14
 \end{equation*}
 \noindent\textbf{Momentenwiderstand bei N\_Ed = 0, Zug rechts}
 \begin{equation*}
-M_{z,Rd}^{-}(N_{Ed} = 0) = -362.5\,\mathrm{kNm}
+M_{z,Rd}^{-}(N_{Ed} = 0) = -364.4\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts}
 \begin{equation*}
-\left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{103.5\,\mathrm{mm}}{789.9\,\mathrm{mm}} = 0.131
+\left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{105\,\mathrm{mm}}{789.4\,\mathrm{mm}} = 0.133
 \end{equation*}
 \noindent\textbf{Reiner Zug, gleichmässig gedehnt}
 \begin{equation*}
-N_{Rd}^{+} = 1031.7\,\mathrm{kN}
+N_{Rd}^{+} = 1082.9\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Reiner Druck, gleichmässig gedehnt}
 \begin{equation*}
-N_{Rd}^{-} = -7501.7\,\mathrm{kN}
+N_{Rd}^{-} = -7546.5\,\mathrm{kN}
 \end{equation*}
 \subsubsection{Querkraft und Torsion der Schubwände}
 \noindent\textbf{Querkraftwiderstand in z: je Wand}
@@ -7193,7 +7243,7 @@ Das Moment liegt über dem Rissmoment: der Querschnitt gilt gerissen.
 
 \noindent\textbf{Äquivalenter E-Modul, «Kasten»}
 \begin{equation*}
-E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{200\,\mathrm{kNm}}{13275\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00281\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 5353\,\mathrm{N}/\mathrm{mm}^{2}
+E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{200\,\mathrm{kNm}}{13275\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00277\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 5441\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Balken 300×500» aus C30/37}
 \begin{equation*}
@@ -7285,15 +7335,15 @@ g_{k,\text{Q4,B500B}} = \rho_s \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\
 \end{equation*}
 \noindent\textbf{E-Modul, «Kasten» (E\_eq)}
 \begin{equation*}
-E_{\text{Q10}} = 5353\,\mathrm{N}/\mathrm{mm}^{2}
+E_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Kasten» mit E\_eq}
 \begin{equation*}
-EA_{\text{Q10,C30/37}} = E_{\text{Q10}} \cdot A_{\text{Q10}} = 5353\,\mathrm{N}/\mathrm{mm}^{2} \cdot 330000\,\mathrm{mm}^{2} = 1767\,\mathrm{MN}
+EA_{\text{Q10,C30/37}} = E_{\text{Q10}} \cdot A_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm{mm}^{2} \cdot 330000\,\mathrm{mm}^{2} = 1796\,\mathrm{MN}
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit, «Kasten» mit E\_eq}
 \begin{equation*}
-EI_{\text{Q10,C30/37}} = E_{\text{Q10}} \cdot I_{\text{Q10}} = 5353\,\mathrm{N}/\mathrm{mm}^{2} \cdot 13275\,\cdot 10^{6}\,\mathrm{mm}^{4} = 71068\,\mathrm{kNm}^{2}
+EI_{\text{Q10,C30/37}} = E_{\text{Q10}} \cdot I_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm{mm}^{2} \cdot 13275\,\cdot 10^{6}\,\mathrm{mm}^{4} = 72234\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Eigengewicht, «Kasten» aus C30/37}
 \begin{equation*}
@@ -7318,7 +7368,7 @@ L5 & K5 – K6 & $3.000$ & $0.0$ & Walzprofil & $2856$ & $48374$ & Anfang & – 
 L6 & K6 – K7 & $2.000$ & $0.0$ & Fundamentbalken & $3750$ & $77083$ & – & quer fest \\
 L7 & K7 – K8 & $1.000$ & $-90.0$ & kein Stab & – & – & – & quer fest \\
 L8 & K6 – K9 & $2.000$ & $90.0$ & Hohlprofil & $2375$ & $29342$ & – & – \\
-L9 & K9 – K10 & $2.000$ & $0.0$ & Kasten & $1767$ & $71068$ & – & – \\
+L9 & K9 – K10 & $2.000$ & $0.0$ & Kasten & $1796$ & $72234$ & – & – \\
 \hline
 \end{longtable}
 \noindent\textbf{Lager}
@@ -7379,7 +7429,7 @@ K5 & $0.00$ & $0.00$ & nicht bestimmbar \\
 K6 & $0.00$ & $0.00$ & $0.000$ \\
 K7 & $0.00$ & $0.00$ & $0.000$ \\
 K9 & $1.12$ & $-0.01$ & $-1.125$ \\
-K10 & $1.12$ & $-2.50$ & $-1.279$ \\
+K10 & $1.12$ & $-2.49$ & $-1.277$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Schnittgrössen an den Stabenden}
@@ -7446,7 +7496,7 @@ L6 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
 L6 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 L8 & $N$ & $-18.4\ \mathrm{kN}$ & $0.00$ & $-16.5\ \mathrm{kN}$ & $2.00$ \\
 L8 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
-L8 & $M$ & $-16.5\ \mathrm{kNm}$ & $0.00$ & $-16.5\ \mathrm{kNm}$ & $2.00$ \\
+L8 & $M$ & $-16.5\ \mathrm{kNm}$ & $2.00$ & $-16.5\ \mathrm{kNm}$ & $0.00$ \\
 L8 & $w$ & $-0.28\ \mathrm{mm}$ & $1.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 L9 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L9 & $V$ & $0.0\ \mathrm{kN}$ & $2.00$ & $16.5\ \mathrm{kN}$ & $0.00$ \\
@@ -7586,7 +7636,7 @@ K5 & $0.00$ & $0.00$ & nicht bestimmbar \\
 K6 & $0.00$ & $0.00$ & $0.000$ \\
 K7 & $0.00$ & $0.00$ & $0.000$ \\
 K9 & $1.52$ & $-0.02$ & $-1.518$ \\
-K10 & $1.52$ & $-3.37$ & $-1.727$ \\
+K10 & $1.52$ & $-3.36$ & $-1.724$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Schnittgrössen an den Stabenden}
@@ -7653,7 +7703,7 @@ L6 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
 L6 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 L8 & $N$ & $-24.8\ \mathrm{kN}$ & $0.00$ & $-22.3\ \mathrm{kN}$ & $2.00$ \\
 L8 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
-L8 & $M$ & $-22.3\ \mathrm{kNm}$ & $0.00$ & $-22.3\ \mathrm{kNm}$ & $2.00$ \\
+L8 & $M$ & $-22.3\ \mathrm{kNm}$ & $2.00$ & $-22.3\ \mathrm{kNm}$ & $0.00$ \\
 L8 & $w$ & $-0.38\ \mathrm{mm}$ & $1.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 L9 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
 L9 & $V$ & $0.0\ \mathrm{kN}$ & $2.00$ & $22.3\ \mathrm{kN}$ & $0.00$ \\
@@ -8058,7 +8108,7 @@ N_{Riss} = A_c \cdot f_{ct,eff}
 \end{equation*}
 \noindent\textbf{Aufnehmbare Risskraft}
 \begin{equation*}
-N_{s,adm} = A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4}
+N_{s,adm} = A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} + A_{s,5} \cdot \sigma_{s,adm,5}
 \end{equation*}
 \noindent\textbf{Rissaktive Dicke: die kleinere Abmessung}
 \begin{equation*}
@@ -8284,6 +8334,10 @@ I_y = \frac{1}{12} \sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\, c_i - A\, z_S^2\qq
 \noindent\textbf{Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet}
 \begin{equation*}
 s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)
+\end{equation*}
+\noindent\textbf{Verschmierte Stäbe: ⌀ im Abstand s über die Länge L}
+\begin{equation*}
+A_s = \frac{L}{s} \cdot \frac{\pi\, \varnothing^2}{4}
 \end{equation*}
 \noindent\textbf{Bügelquerschnitt je Länge einer Schubwand (n Schnitte)}
 \begin{equation*}
@@ -9066,6 +9120,7 @@ Stab 1 & $\varnothing 20$ & B500B \\
 Linie 1 & $6 \varnothing 16$ & B500B \\
 Linie 2 & $4 \varnothing 12$ & B500B \\
 Linie 3 & $400\,\mathrm{mm}^2$ & B500B \\
+Linie 4 & $118\,\mathrm{mm}^2$ & B500B \\
 Wand 1 & $b_w = 150,\ 1 \times \varnothing 10\ @\ 150$ & B500B \\
 Wand 2 & $b_w = 150,\ 1 \times \varnothing 10\ @\ 150$ & B500B \\
 Wand 3 & $b_w = 150,\ 1 \times \varnothing 10\ @\ 150$ & B500B \\
@@ -9079,16 +9134,16 @@ Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
 \endhead
 Querkraft und Torsion & Feld & $v_{Rd} = 394.3\,\mathrm{kN}/\mathrm{m}$ & $q_{Ed} = 380.3\,\mathrm{kN}/\mathrm{m}$ & $1.04$ \\
 Querkraft und Torsion & Schief & $v_{Rd} = 394.3\,\mathrm{kN}/\mathrm{m}$ & $q_{Ed} = 76.9\,\mathrm{kN}/\mathrm{m}$ & $5.13$ \\
-Biegung und Normalkraft & Feld & $M_{Rd} = 188.6\,\mathrm{kNm}$ & $M_{Ed} = 304.5\,\mathrm{kNm}$ & $0.62$ \\
-Biegung und Normalkraft & Schief & $M_{Rd} = 666.6\,\mathrm{kNm}$ & $M_{Ed} = 291.5\,\mathrm{kNm}$ & $2.29$ \\
-Duktilität & Zug links & $\left(x/d\right)_{max} = 0.35$ & $x/d = 0.135$ & $2.59$ \\
-Sprödes Versagen & Zug oben & $M_{Rd} = 194.7\,\mathrm{kNm}$ & $M_{Riss} = 116.7\,\mathrm{kNm}$ & $1.67$ \\
-Risse: Zwängung Normalkraft & ganzer Querschnitt & $N_{s,adm} = 973.5\,\mathrm{kN}$ & $N_{Riss} = 765.6\,\mathrm{kN}$ & $1.27$ \\
-Risse: Zwängung Biegung & Zug oben & $M_{s,adm} = 151.1\,\mathrm{kNm}$ & $M_{Riss} = 116.7\,\mathrm{kNm}$ & $1.30$ \\
-Risse: Quasi-ständige Lastfälle & Feld (60 \%) & $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_s = 253\,\mathrm{N}/\mathrm{mm}^{2}$ & $1.60$ \\
-Risse: Quasi-ständige Lastfälle & Schief (60 \%) & $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_s = 15\,\mathrm{N}/\mathrm{mm}^{2}$ & $26.63$ \\
-Risse: Quasi-ständige Lastfälle & Dauer & $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_s = 90\,\mathrm{N}/\mathrm{mm}^{2}$ & $4.50$ \\
-Risse: Häufige Lastfälle & Häufig schief & $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_s = 150\,\mathrm{N}/\mathrm{mm}^{2}$ & $2.37$ \\
+Biegung und Normalkraft & Feld & $M_{Rd} = 201.3\,\mathrm{kNm}$ & $M_{Ed} = 304.5\,\mathrm{kNm}$ & $0.66$ \\
+Biegung und Normalkraft & Schief & $M_{Rd} = 679.0\,\mathrm{kNm}$ & $M_{Ed} = 291.5\,\mathrm{kNm}$ & $2.33$ \\
+Duktilität & Zug links & $\left(x/d\right)_{max} = 0.35$ & $x/d = 0.140$ & $2.51$ \\
+Sprödes Versagen & Zug oben & $M_{Rd} = 207.6\,\mathrm{kNm}$ & $M_{Riss} = 116.7\,\mathrm{kNm}$ & $1.78$ \\
+Risse: Zwängung Normalkraft & ganzer Querschnitt & $N_{s,adm} = 1032.4\,\mathrm{kN}$ & $N_{Riss} = 765.6\,\mathrm{kN}$ & $1.35$ \\
+Risse: Zwängung Biegung & Zug oben & $M_{s,adm} = 156.6\,\mathrm{kNm}$ & $M_{Riss} = 116.7\,\mathrm{kNm}$ & $1.34$ \\
+Risse: Quasi-ständige Lastfälle & Feld (60 \%) & $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_s = 250\,\mathrm{N}/\mathrm{mm}^{2}$ & $1.62$ \\
+Risse: Quasi-ständige Lastfälle & Schief (60 \%) & $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_s = 15\,\mathrm{N}/\mathrm{mm}^{2}$ & $26.55$ \\
+Risse: Quasi-ständige Lastfälle & Dauer & $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_s = 88\,\mathrm{N}/\mathrm{mm}^{2}$ & $4.60$ \\
+Risse: Häufige Lastfälle & Häufig schief & $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_s = 146\,\mathrm{N}/\mathrm{mm}^{2}$ & $2.43$ \\
 \hline
 \end{xltabular}
 \hinweis{Warnung}{Biegung und Normalkraft – Feld: nicht erfüllt. Bei N\_Ed = 664.0 kN, in der Richtung des Moments.}
@@ -9098,17 +9153,17 @@ Risse: Häufige Lastfälle & Häufig schief & $\sigma_{s,adm} = 355\,\mathrm{N}/
 Kennzahl & Zeichen & Wert \\
 \hline
 \endhead
-Bewehrungsmass & $\mu_s$ & $56\,\mathrm{kg}/\mathrm{m}^{3}$ \\
-Momentenwiderstand, Zug unten & $M_{y,Rd}^{+}(N_{Ed} = 0)$ & $359.8\,\mathrm{kNm}$ \\
-Momentenwiderstand, Zug oben & $M_{y,Rd}^{-}(N_{Ed} = 0)$ & $-194.7\,\mathrm{kNm}$ \\
-Momentenwiderstand, Zug links & $M_{z,Rd}^{+}(N_{Ed} = 0)$ & $388.5\,\mathrm{kNm}$ \\
-Momentenwiderstand, Zug rechts & $M_{z,Rd}^{-}(N_{Ed} = 0)$ & $-362.5\,\mathrm{kNm}$ \\
-Zugwiderstand & $N_{Rd}^{+}$ & $1031.7\,\mathrm{kN}$ \\
-Druckwiderstand & $N_{Rd}^{-}$ & $-7501.7\,\mathrm{kN}$ \\
-Bezogene Druckzonenhöhe, Zug unten & $\left(x/d\right)_{y}^{+}$ & $0.116$ \\
-Bezogene Druckzonenhöhe, Zug oben & $\left(x/d\right)_{y}^{-}$ & $0.086$ \\
-Bezogene Druckzonenhöhe, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.135$ \\
-Bezogene Druckzonenhöhe, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.131$ \\
+Bewehrungsmass & $\mu_s$ & $59\,\mathrm{kg}/\mathrm{m}^{3}$ \\
+Momentenwiderstand, Zug unten & $M_{y,Rd}^{+}(N_{Ed} = 0)$ & $372.3\,\mathrm{kNm}$ \\
+Momentenwiderstand, Zug oben & $M_{y,Rd}^{-}(N_{Ed} = 0)$ & $-207.6\,\mathrm{kNm}$ \\
+Momentenwiderstand, Zug links & $M_{z,Rd}^{+}(N_{Ed} = 0)$ & $421.1\,\mathrm{kNm}$ \\
+Momentenwiderstand, Zug rechts & $M_{z,Rd}^{-}(N_{Ed} = 0)$ & $-364.4\,\mathrm{kNm}$ \\
+Zugwiderstand & $N_{Rd}^{+}$ & $1082.9\,\mathrm{kN}$ \\
+Druckwiderstand & $N_{Rd}^{-}$ & $-7546.5\,\mathrm{kN}$ \\
+Bezogene Druckzonenhöhe, Zug unten & $\left(x/d\right)_{y}^{+}$ & $0.132$ \\
+Bezogene Druckzonenhöhe, Zug oben & $\left(x/d\right)_{y}^{-}$ & $0.094$ \\
+Bezogene Druckzonenhöhe, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.14$ \\
+Bezogene Druckzonenhöhe, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.133$ \\
 Querkraftwiderstand in z & $V_{z,Rd}$ & $354.9\,\mathrm{kN}$ \\
 Querkraftwiderstand in y & $V_{y,Rd}$ & $512.6\,\mathrm{kN}$ \\
 Torsionswiderstand & $T_{Rd}$ & $230.7\,\mathrm{kNm}$ \\
@@ -9377,12 +9432,12 @@ Biegesteifigkeit, Balken 300×500, C30/37 & $EI_{\text{Q1,C30/37}}$ & $105062$ &
 Eigengewicht je Meter, Balken 300×500, C30/37 & $g_{k,\text{Q1,C30/37}}$ & $3.75$ & kN/m & berechnet \\
 Höhe, Balken 300×500 & $h_{\text{Q1}}$ & $500$ & mm & Vorgabe \\
 Querschnittsfläche, Kasten & $A_{\text{Q10}}$ & $330000$ & mm² & berechnet \\
-E-Modul, Kasten & $E_{\text{Q10}}$ & $5353$ & N/mm² & berechnet \\
+E-Modul, Kasten & $E_{\text{Q10}}$ & $5441$ & N/mm² & berechnet \\
 Flächenträgheitsmoment, Kasten & $I_{\text{Q10}}$ & $13275$ & ·10⁶ mm⁴ & berechnet \\
 Moment für E\_eq, Kasten & $M_{\text{Q10}}$ & $200$ & kNm & Eingabe \\
 Normalkraft für E\_eq, Kasten & $N_{\text{Q10}}$ & $-100$ & kN & Eingabe \\
-Dehnsteifigkeit, Kasten, C30/37 & $EA_{\text{Q10,C30/37}}$ & $1767$ & MN & berechnet \\
-Biegesteifigkeit, Kasten, C30/37 & $EI_{\text{Q10,C30/37}}$ & $71068$ & kNm² & berechnet \\
+Dehnsteifigkeit, Kasten, C30/37 & $EA_{\text{Q10,C30/37}}$ & $1796$ & MN & berechnet \\
+Biegesteifigkeit, Kasten, C30/37 & $EI_{\text{Q10,C30/37}}$ & $72234$ & kNm² & berechnet \\
 Eigengewicht je Meter, Kasten, C30/37 & $g_{k,\text{Q10,C30/37}}$ & $8.25$ & kN/m & berechnet \\
 Querschnittsfläche, Rundstütze & $A_{\text{Q2}}$ & $125664$ & mm² & berechnet \\
 Flächenträgheitsmoment, Rundstütze & $I_{\text{Q2}}$ & $1256.64$ & ·10⁶ mm⁴ & berechnet \\
@@ -9904,46 +9959,46 @@ Erfüllungsgrad Zwängung auf Biegung – 3. Lage x & $\alpha_{eff,ZB,3,x}$ & $2
 Vergrösserungsfaktor der Durchbiegung, Zug oben & $\omega_w'$ & $8.05$ &  & berechnet \\
 Vergrösserungsfaktor der Durchbiegung, Zug unten & $\omega_w$ & $11.77$ &  & berechnet \\
 Fläche des Bruttoquerschnitts & $A$ & $330000$ & mm² & berechnet \\
-Stahlfläche der Bewehrung & $A_{s,tot}$ & $2373$ & mm² & berechnet \\
+Stahlfläche der Bewehrung & $A_{s,tot}$ & $2491$ & mm² & berechnet \\
 Trägheitsmoment um y & $I_y$ & $13275$ & ·10⁶ mm⁴ & berechnet \\
 Deviationsmoment & $I_{yz}$ & $0$ & ·10⁶ mm⁴ & berechnet \\
 Trägheitsmoment um z & $I_z$ & $22475$ & ·10⁶ mm⁴ & berechnet \\
 Grösste Neigung der Druckdiagonalen & $\alpha_{max}$ & $45$ & ° & Vorgabe \\
 Kleinste Neigung der Druckdiagonalen & $\alpha_{min}$ & $30$ & ° & Vorgabe \\
 Abminderung der Betondruckfestigkeit in der Druckdiagonalen & $k_c$ & $0.55$ &  & Vorgabe \\
-Momentenwiderstand bei N\_Ed = 0, Zug links & $M_{z,Rd}^{+}(N_{Ed} = 0)$ & $388.5$ & kNm & berechnet \\
-Momentenwiderstand bei N\_Ed = 0, Zug oben & $M_{y,Rd}^{-}(N_{Ed} = 0)$ & $-194.7$ & kNm & berechnet \\
-Momentenwiderstand bei N\_Ed = 0, Zug rechts & $M_{z,Rd}^{-}(N_{Ed} = 0)$ & $-362.5$ & kNm & berechnet \\
-Momentenwiderstand bei N\_Ed = 0, Zug unten & $M_{y,Rd}^{+}(N_{Ed} = 0)$ & $359.8$ & kNm & berechnet \\
-Druckwiderstand bei gleichmässiger Dehnung & $N_{Rd}^{-}$ & $-7501.7$ & kN & berechnet \\
-Zugwiderstand bei gleichmässiger Dehnung & $N_{Rd}^{+}$ & $1031.7$ & kN & berechnet \\
+Momentenwiderstand bei N\_Ed = 0, Zug links & $M_{z,Rd}^{+}(N_{Ed} = 0)$ & $421.1$ & kNm & berechnet \\
+Momentenwiderstand bei N\_Ed = 0, Zug oben & $M_{y,Rd}^{-}(N_{Ed} = 0)$ & $-207.6$ & kNm & berechnet \\
+Momentenwiderstand bei N\_Ed = 0, Zug rechts & $M_{z,Rd}^{-}(N_{Ed} = 0)$ & $-364.4$ & kNm & berechnet \\
+Momentenwiderstand bei N\_Ed = 0, Zug unten & $M_{y,Rd}^{+}(N_{Ed} = 0)$ & $372.3$ & kNm & berechnet \\
+Druckwiderstand bei gleichmässiger Dehnung & $N_{Rd}^{-}$ & $-7546.5$ & kN & berechnet \\
+Zugwiderstand bei gleichmässiger Dehnung & $N_{Rd}^{+}$ & $1082.9$ & kN & berechnet \\
 Torsionswiderstand der Schubwände, allein & $T_{Rd}$ & $230.7$ & kNm & berechnet \\
 Querkraftwiderstand in y der Schubwände, allein & $V_{y,Rd}$ & $512.6$ & kN & berechnet \\
 Querkraftwiderstand in z der Schubwände, allein & $V_{z,Rd}$ & $354.9$ & kN & berechnet \\
-Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $56$ & kg/m³ & berechnet \\
-Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.135$ &  & berechnet \\
-Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben & $\left(x/d\right)_{y}^{-}$ & $0.086$ &  & berechnet \\
-Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.131$ &  & berechnet \\
-Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten & $\left(x/d\right)_{y}^{+}$ & $0.116$ &  & berechnet \\
-Erfüllungsgrad Duktilität – Zug links & $\alpha_{eff,x/d,\text{Zug links}}$ & $2.59$ &  & berechnet \\
-Erfüllungsgrad Duktilität – Zug oben & $\alpha_{eff,x/d,\text{Zug oben}}$ & $4.09$ &  & berechnet \\
-Erfüllungsgrad Duktilität – Zug rechts & $\alpha_{eff,x/d,\text{Zug rechts}}$ & $2.67$ &  & berechnet \\
-Erfüllungsgrad Duktilität – Zug unten & $\alpha_{eff,x/d,\text{Zug unten}}$ & $3.02$ &  & berechnet \\
-Erfüllungsgrad Biegung und Normalkraft – Feld & $\alpha_{eff,\text{Feld}}$ & $0.62$ &  & berechnet \\
-Grösste aufnehmbare Druckkraft & $N_{Rd}^{-}$ & $-7501.7$ & kN & berechnet \\
-Grösste aufnehmbare Zugkraft & $N_{Rd}^{+}$ & $1031.7$ & kN & berechnet \\
-Erfüllungsgrad Biegung und Normalkraft – Schief & $\alpha_{eff,\text{Schief}}$ & $2.29$ &  & berechnet \\
-Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt & $\alpha_{eff,NR}$ & $1.27$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung gegen Fliessen – Feld (70 \%) & $\alpha_{eff,\sigma,\text{Feld (70 \%)}}$ & $1.20$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung gegen Fliessen – Häufig schief & $\alpha_{eff,\sigma,\text{Häufig schief}}$ & $2.37$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung gegen Fliessen – Schief (70 \%) & $\alpha_{eff,\sigma,\text{Schief (70 \%)}}$ & $20.05$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer & $\alpha_{eff,\sigma,w,\text{Dauer}}$ & $4.50$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 \%) & $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ & $1.60$ &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite – Schief (60 \%) & $\alpha_{eff,\sigma,w,\text{Schief (60 \%)}}$ & $26.63$ &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – Zug links & $\alpha_{eff,Riss,\text{Zug links}}$ & $2.70$ &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – Zug oben & $\alpha_{eff,Riss,\text{Zug oben}}$ & $1.67$ &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – Zug rechts & $\alpha_{eff,Riss,\text{Zug rechts}}$ & $2.52$ &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – Zug unten & $\alpha_{eff,Riss,\text{Zug unten}}$ & $3.08$ &  & berechnet \\
+Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $59$ & kg/m³ & berechnet \\
+Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.14$ &  & berechnet \\
+Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben & $\left(x/d\right)_{y}^{-}$ & $0.094$ &  & berechnet \\
+Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.133$ &  & berechnet \\
+Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten & $\left(x/d\right)_{y}^{+}$ & $0.132$ &  & berechnet \\
+Erfüllungsgrad Duktilität – Zug links & $\alpha_{eff,x/d,\text{Zug links}}$ & $2.51$ &  & berechnet \\
+Erfüllungsgrad Duktilität – Zug oben & $\alpha_{eff,x/d,\text{Zug oben}}$ & $3.71$ &  & berechnet \\
+Erfüllungsgrad Duktilität – Zug rechts & $\alpha_{eff,x/d,\text{Zug rechts}}$ & $2.63$ &  & berechnet \\
+Erfüllungsgrad Duktilität – Zug unten & $\alpha_{eff,x/d,\text{Zug unten}}$ & $2.65$ &  & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Feld & $\alpha_{eff,\text{Feld}}$ & $0.66$ &  & berechnet \\
+Grösste aufnehmbare Druckkraft & $N_{Rd}^{-}$ & $-7546.5$ & kN & berechnet \\
+Grösste aufnehmbare Zugkraft & $N_{Rd}^{+}$ & $1082.9$ & kN & berechnet \\
+Erfüllungsgrad Biegung und Normalkraft – Schief & $\alpha_{eff,\text{Schief}}$ & $2.33$ &  & berechnet \\
+Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt & $\alpha_{eff,NR}$ & $1.35$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung gegen Fliessen – Feld (70 \%) & $\alpha_{eff,\sigma,\text{Feld (70 \%)}}$ & $1.22$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung gegen Fliessen – Häufig schief & $\alpha_{eff,\sigma,\text{Häufig schief}}$ & $2.43$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung gegen Fliessen – Schief (70 \%) & $\alpha_{eff,\sigma,\text{Schief (70 \%)}}$ & $19.99$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer & $\alpha_{eff,\sigma,w,\text{Dauer}}$ & $4.60$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 \%) & $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ & $1.62$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite – Schief (60 \%) & $\alpha_{eff,\sigma,w,\text{Schief (60 \%)}}$ & $26.55$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – Zug links & $\alpha_{eff,Riss,\text{Zug links}}$ & $2.93$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – Zug oben & $\alpha_{eff,Riss,\text{Zug oben}}$ & $1.78$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – Zug rechts & $\alpha_{eff,Riss,\text{Zug rechts}}$ & $2.53$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – Zug unten & $\alpha_{eff,Riss,\text{Zug unten}}$ & $3.19$ &  & berechnet \\
 Moment der Längszugkraft um y – Feld & $\Delta M_y$ & $0$ & kNm & berechnet \\
 Moment der Längszugkraft um z – Feld & $\Delta M_z$ & $-52$ & kNm & berechnet \\
 Längszugkraft aus Querkraft und Torsion – Feld & $\Delta N$ & $664$ & kN & berechnet \\
@@ -9952,10 +10007,10 @@ Moment der Längszugkraft um y – Schief & $\Delta M_y$ & $0$ & kNm & berechnet
 Moment der Längszugkraft um z – Schief & $\Delta M_z$ & $0$ & kNm & berechnet \\
 Längszugkraft aus Querkraft und Torsion – Schief & $\Delta N$ & $173.2$ & kN & berechnet \\
 Erfüllungsgrad Querkraft und Torsion – Schief & $\alpha_{eff,V,\text{Schief}}$ & $5.13$ &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – Zug links & $\alpha_{eff,ZB,\text{Zug links}}$ & $1.73$ &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – Zug oben & $\alpha_{eff,ZB,\text{Zug oben}}$ & $1.30$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – Zug links & $\alpha_{eff,ZB,\text{Zug links}}$ & $1.90$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – Zug oben & $\alpha_{eff,ZB,\text{Zug oben}}$ & $1.34$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – Zug rechts & $\alpha_{eff,ZB,\text{Zug rechts}}$ & $1.45$ &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – Zug unten & $\alpha_{eff,ZB,\text{Zug unten}}$ & $2.38$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – Zug unten & $\alpha_{eff,ZB,\text{Zug unten}}$ & $2.40$ &  & berechnet \\
 Schwerpunkt, y & $y_S$ & $400$ & mm & berechnet \\
 Schwerpunkt, z & $z_S$ & $300$ & mm & berechnet \\
 Fläche des Bruttoquerschnitts & $A$ & $160000$ & mm² & berechnet \\

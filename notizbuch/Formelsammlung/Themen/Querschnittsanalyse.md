@@ -1,10 +1,10 @@
 ---
-erzeugt: b534418e6376
+erzeugt: 26567113793c
 art: thema
 tags: [thema]
 ---
 > [!abstract] Querschnittsanalyse
-> 4 Formeln, in der Folge, in der gerechnet wird.
+> 5 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -16,6 +16,7 @@ Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein P
 2. [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]]
 3. [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]]
 4. [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]]
+5. [[Verschmierte Stahlfläche aus Stäben]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

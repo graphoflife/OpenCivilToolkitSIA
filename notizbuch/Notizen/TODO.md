@@ -385,6 +385,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Schnittgrössen eines Stabs als Einwirkung einer Platte oder
       Querschnittsanalyse.
 
+- [ ] **Verschmierte Stäbe mit ihrem eigenen Durchmesser?** Seit 2026-10-24
+      kann eine verschmierte Linie aus ⌀, s und L kommen. Die Grenze der
+      Stahlspannung je Stab (`nachweis/stabgrenzen.py`) und «Überdeckung
+      beachten» nehmen trotzdem den fiktiven Durchmesser bei s = 150 mm.
+      Vorschlag: dort ⌀ und s der Eingabe -- Entscheid des Benutzers offen.
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
       Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit
       eigenem G; in der Zeichnung pastellblau, `--mat-baustahl`), Holz (wie spröd Zug und Druck sind, legen wir vorher fest),

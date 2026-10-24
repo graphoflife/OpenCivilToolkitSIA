@@ -1,5 +1,5 @@
 ---
-erzeugt: 035bb5dcf2a6
+erzeugt: 0a9396af99d9
 art: modul
 tags: [modul]
 ---
@@ -120,10 +120,12 @@ zurueck, findet seine Zahl noch vor. Welche gilt, sagt `art`.
 - `von: str = ''`
 - `bis: str = ''` – Anfang und Ende als Knoten.
 - `art: Linienart = Linienart.TEILUNG`
-- `durchmesser: float = 16.0` – Bei Anzahl und Teilung der Stabdurchmesser in mm.
-- `flaeche: float = 1000.0` – Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm².
+- `durchmesser: float = 16.0` – Bei Anzahl und Teilung -- und bei verschmierten Staeben -- der Stabdurchmesser in mm.
+- `flaeche: float = 1000.0` – Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm² -- von Hand.
+- `verschmiert: str = einer_von(VERSCHMIERT, 'flaeche')` – Bei Art «Fläche», wie die Stahlflaeche angegeben ist: `flaeche` von Hand -- oder `staebe`: Staebe `durchmesser` im Abstand `teilung` ueber `laenge`, verschmiert (Benutzer, 2026-10-24).
+- `laenge: Optional[float] = None` – Bei verschmierten Staeben die Laenge in mm, ueber die sie liegen -- leer: die der Linie.
 - `anzahl: float = 5.0`
-- `teilung: float = 150.0` – Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der aufgeht.
+- `teilung: float = 150.0` – Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der aufgeht; bei verschmierten Staeben ihr Abstand, wie er ist.
 - `starteisen: bool = True`
 - `endeisen: bool = True`
 - `stahl: str = ''`

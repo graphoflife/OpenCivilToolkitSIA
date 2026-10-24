@@ -1,5 +1,5 @@
 ---
-erzeugt: 7f131e474f4f
+erzeugt: 82f44f0c8728
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -30,7 +30,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Querschnittsanalyse**
 
-- [[Querschnittsanalyse]] · 4
+- [[Querschnittsanalyse]] · 5
 - [[Schiefe Biegung]] · 11
 - [[Querkraft und Torsion]] · 6
 - [[Duktilität je Richtung]] · 3
@@ -220,6 +220,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Ungewollte Ausmitte – allgemein]]
 - [[Vergrösserungsfaktor der Durchbiegung]] · $\omega_w$
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · $\Delta T$
+- [[Verschmierte Stahlfläche aus Stäben]]
 - [[Was die Zellen tragen]] · $T_{Zellen}$
 - [[Wertigkeit im gerissenen Zustand]] · $n$
 - [[Widerstand bei festgehaltenem M_Ed]] · $N_{Rd}^{+}(M_{Ed} = 0)$
@@ -244,7 +245,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-117 von 188 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+118 von 189 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -347,6 +348,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Torsion in den Zellen (Bredt, mehrzellig)]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
+- [[Verschmierte Stahlfläche aus Stäben]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Was die Zellen tragen]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
 - [[Wertigkeit im gerissenen Zustand]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_ansatz]]
 - [[Widerstand bei festgehaltenem M_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]

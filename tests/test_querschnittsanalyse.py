@@ -846,3 +846,57 @@ class TestLeereAnalyse(unittest.TestCase):
         self.assertTrue(a.leer)
         a.polygon([[0, 0], [300, 0], [300, 600], [0, 600]], material="b1")
         self.assertFalse(a.leer)
+
+
+class TestVerschmierteStaebe(unittest.TestCase):
+    """
+    Eine verschmierte Linie aus ⌀, Teilung und Länge: A_s = L/s · π⌀²/4 --
+    ohne eigene Länge über die der Linie (Benutzer, 2026-10-24).
+    """
+
+    def projekt(self, **felder):
+        p = projekt()
+        p.querschnittsanalysen[0].stablinie([50, 300], [250, 300], art="flaeche",
+                                            verschmiert="staebe", stahl="s1",
+                                            **{"durchmesser": 12.0, "teilung": 150.0, **felder})
+        return p
+
+    def flaeche(self, p):
+        return p.rechnen().aufbau.querschnittsanalysen["a1"].gruppen[-1].flaeche
+
+    def test_ueber_die_linie(self):
+        # 200 mm Linie: 200/150 · π · 12²/4 = 150.8 mm².
+        self.assertAlmostEqual(self.flaeche(self.projekt()), 200 / 150 * math.pi * 12 ** 2 / 4)
+
+    def test_ueber_eine_eigene_laenge(self):
+        # Ein Meter: 1000/150 · π · 12²/4 = 754 mm², verteilt über die 200 mm der Linie.
+        self.assertAlmostEqual(self.flaeche(self.projekt(laenge=1000.0)),
+                               1000 / 150 * math.pi * 12 ** 2 / 4)
+
+    def test_die_zeichnung_zeigt_dieselbe(self):
+        """Die graue Zahl im Fenster: die Fläche, mit der gerechnet wird."""
+        p = self.projekt(laenge=1000.0)
+        linie = api.geometrie(p.querschnittsanalysen[0], p)["linien"][-1]
+        self.assertAlmostEqual(linie["flaeche"], self.flaeche(p))
+
+    def test_die_flaeche_von_hand_bleibt(self):
+        """Die Fläche von Hand zählt nur, solange der Schalter auf «Stahlfläche» steht."""
+        p = self.projekt(flaeche=999.0)
+        self.assertAlmostEqual(self.flaeche(p), 200 / 150 * math.pi * 12 ** 2 / 4)
+        p.querschnittsanalysen[0].stablinien[-1].verschmiert = "flaeche"
+        self.assertEqual(self.flaeche(p), 999.0)
+
+    def test_falsche_zahlen(self):
+        for felder, text in (({"teilung": 0.0}, "die Teilung"),
+                             ({"durchmesser": 0.0}, "der Durchmesser"),
+                             ({"laenge": -1.0}, "die Länge")):
+            with self.subTest(felder=felder):
+                with self.assertRaises(ProjektFehler) as fehler:
+                    self.projekt(**felder).rechnen()
+                # Die Vorlage hat zwei Linien -- diese ist die dritte.
+                self.assertIn(f"Linie 3: {text} der verschmierten Stäbe", str(fehler.exception))
+
+    def test_herleitung(self):
+        text = str(self.projekt().rechnen().bericht())
+        self.assertIn("Verschmierte Stäbe: ⌀ im Abstand s über die Länge L", text)
+        self.assertIn(r"\text{verschmiert: } \varnothing 12\ @\ 150\ \text{auf}\ 200", text)

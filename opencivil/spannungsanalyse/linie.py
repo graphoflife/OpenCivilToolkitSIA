@@ -441,11 +441,19 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
         if nach_riss is not None:
             anfang, risskraft = nach_riss, riss
 
+    def vor_dem_fliessen(verformung: float) -> bool:
+        # Nur wo es eine Ebene gibt: sonst hielte die Suche «kein
+        # Gleichgewicht» fuer «fliesst noch nicht» und endete dort, wo es
+        # nichts zu lesen gibt (am Kastentraeger mit einer Linie mehr, 2026-10-24).
+        e = weg.ebene(verformung)
+        return e is not None and not e.fliesst
+
     stellen: List[float] = []
-    if not fliesst(anfang) and fliesst(ende):
-        bei = _grenze(lambda v: not fliesst(v), anfang, ende)
-        e = weg.ebene(bei)
-        linie.fliessen = Eckpunkt(kraft=weg.kraft(e), verformung=bei)
+    bei = (_grenze(vor_dem_fliessen, anfang, ende)
+           if not fliesst(anfang) and fliesst(ende) else None)
+    am_fliessen = weg.ebene(bei) if bei is not None else None
+    if am_fliessen is not None:
+        linie.fliessen = Eckpunkt(kraft=weg.kraft(am_fliessen), verformung=bei)
         vorher = KURVENPUNKTE // 3
         stellen = ([anfang + (bei - anfang) * i / vorher for i in range(vorher)]
                    + [bei + (ende - bei) * i / (KURVENPUNKTE - vorher)

@@ -582,9 +582,11 @@ function materialwahl(art, gewaehlt, setzen, mitLoch = false) {
 /**
  * Die Felder einer Elementart. `werte` ist das Element (oder die Vorgabe),
  * `setzen(feld, wert)` schreibt -- beim gewählten Element ins Projekt, bei
- * der Vorgabe in die Ansicht.
+ * der Vorgabe in die Ansicht. `info` ist, was der Kern zu einer gewählten
+ * Linie weiss: ihre Stahlfläche steht grau unter den Stäben, aus denen sie
+ * kommt -- gerechnet wird sie dort, nicht hier.
  */
-function felderVon(liste, werte, setzen) {
+function felderVon(liste, werte, setzen, info = null) {
   const durchmesser = zustand.katalog?.durchmesser;
   const zahl = (feld, titel, optionen = {}) => zahlfeld({
     wert: werte[feld], titel, schritt: 1, min: 0, ...optionen,
@@ -599,7 +601,10 @@ function felderVon(liste, werte, setzen) {
   }
   if (liste === 'stablinien') {
     const arten = zustand.katalog?.querschnittsanalyse?.linienarten || [];
+    const verschmierungen = zustand.katalog?.querschnittsanalyse?.verschmierungen || [];
     const art = werte.art;
+    // Verschmiert: die Fläche von Hand -- oder aus ⌀, s und L (Benutzer, 2026-10-24).
+    const ausStaeben = art === 'flaeche' && werte.verschmiert === 'staebe';
     const erklaert = {
       flaeche: 'Eine Stahlfläche, über die Linie verschmiert',
       anzahl: 'n Stäbe, gleich verteilt',
@@ -611,10 +616,23 @@ function felderVon(liste, werte, setzen) {
         gewaehlt: art, setzen: (w) => setzen('art', w),
         titel: 'Wie die Stäbe auf der Linie verteilt sind', klasse: '.cad-wahl',
       }),
-      art === 'flaeche' ? zeile('A_s', zahl('flaeche', 'Stahlfläche der ganzen Linie', { schritt: 100 }), 'mm²') : null,
+      art === 'flaeche' ? wahlSchalter({
+        werte: verschmierungen.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
+        gewaehlt: werte.verschmiert, setzen: (w) => setzen('verschmiert', w),
+        titel: 'Wie die Stahlfläche angegeben ist', klasse: '.cad-wahl',
+      }) : null,
+      art === 'flaeche' && !ausStaeben ? zeile('A_s', zahl('flaeche', 'Stahlfläche der ganzen Linie', { schritt: 100 }), 'mm²') : null,
       art === 'anzahl' ? zeile('n', zahl('anzahl', 'Anzahl Stäbe', { min: 1 })) : null,
       art === 'teilung' ? zeile('s', zahl('teilung', 'Gewünschte Teilung', { schritt: 25, min: 1 }), 'mm') : null,
-      art !== 'flaeche' ? zeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm') : null,
+      art !== 'flaeche' || ausStaeben ? zeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm') : null,
+      ausStaeben ? zeile('s', zahl('teilung', 'Abstand der Stäbe', { schritt: 25, min: 1 }), 'mm') : null,
+      ausStaeben ? zeile('L', zahl('laenge', 'Länge, über die die Stäbe liegen -- leer: die der Linie', {
+        schritt: 100, leer: null, platzhalter: 'Linie',
+      }), 'mm') : null,
+      ausStaeben ? zeile('A_s', zahlfeld({
+        wert: info?.punkte ? Math.round(info.flaeche) : null, readonly: true,
+        titel: 'Die verschmierte Stahlfläche L/s · π⌀²/4 -- vom Kern gerechnet',
+      }), 'mm²') : null,
       art !== 'flaeche' ? haken('Starteisen', 'starteisen') : null,
       art !== 'flaeche' ? haken('Endeisen', 'endeisen') : null,
       stahl(),
@@ -784,7 +802,8 @@ function eigenschaften(a) {
       ],
     };
   }
-  const inhalt = [...felderVon(liste, e, setzen)];
+  const info = mehrere ? null : passendeGeometrie(a)?.linien?.find((x) => x.kennung === e.kennung);
+  const inhalt = [...felderVon(liste, e, setzen, info)];
   if (!mehrere) inhalt.push(...infozeilen(a, liste, e));
   // Neu, sobald die Antwort des Kerns da ist: die Zeilen darunter kommen von ihm.
   return { titel, inhalt: inhalt.filter(Boolean), schluessel: Boolean(passendeGeometrie(a)) };

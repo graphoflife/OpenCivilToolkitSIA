@@ -361,7 +361,9 @@ Querschnitt wird gezeichnet wie in einem kleinen CAD, und oben steht je Art
 ein Knopf mit Zeichen:
 * *Polygon* P -- eine Fläche aus Beton oder eine Aussparung;
 * *Bewehrung* B -- als Linie (nach Anzahl, Teilung oder verschmiert) oder als
-  einzelner Stab, umgestellt mit dem Schalter «Linie | Punkt» im Fenster;
+  einzelner Stab, umgestellt mit dem Schalter «Linie | Punkt» im Fenster; die
+  Fläche einer verschmierten Linie von Hand oder aus ⌀, Teilung s und Länge
+  L (leer: die der Linie) als L/s · π⌀²/4 -- sie steht dann grau darunter;
 * *Schubwand* W -- eine Wand mit Bügeln;
 * *Hilfspunkt* K und *Hilfslinie* H -- zum Konstruieren, sie rechnen nicht
   mit; geschlossene Hilfslinien werden auf Wunsch eine Fläche.

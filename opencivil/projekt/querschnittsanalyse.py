@@ -39,7 +39,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import FASERSPANNUNGSARTEN
-from opencivil.querschnitt.geometrie import Linienart
+from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.zugseite import Zugseite
@@ -134,14 +134,27 @@ class StablinieEintrag(Beschreibung):
 
     art: Linienart = Linienart.TEILUNG
     durchmesser: float = 16.0
-    """Bei Anzahl und Teilung der Stabdurchmesser in mm."""
+    """Bei Anzahl und Teilung -- und bei verschmierten Staeben -- der Stabdurchmesser in mm."""
 
     flaeche: float = 1000.0
-    """Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm²."""
+    """Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm² -- von Hand."""
+
+    verschmiert: str = einer_von(VERSCHMIERT, "flaeche")
+    """
+    Bei Art «Fläche», wie die Stahlflaeche angegeben ist: ``flaeche`` von Hand
+    -- oder ``staebe``: Staebe ``durchmesser`` im Abstand ``teilung`` ueber
+    ``laenge``, verschmiert (Benutzer, 2026-10-24).
+    """
+
+    laenge: Optional[float] = None
+    """Bei verschmierten Staeben die Laenge in mm, ueber die sie liegen -- leer: die der Linie."""
 
     anzahl: float = 5.0
     teilung: float = 150.0
-    """Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der aufgeht."""
+    """
+    Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der
+    aufgeht; bei verschmierten Staeben ihr Abstand, wie er ist.
+    """
 
     starteisen: bool = True
     endeisen: bool = True
@@ -478,9 +491,9 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
             if ende is not None:
                 linien.append(benannt(
                     name, l.kennung, von=ende[0], bis=ende[1], art=l.art,
-                    durchmesser=l.durchmesser, flaeche=l.flaeche, anzahl=l.anzahl,
-                    teilung=l.teilung, starteisen=l.starteisen, endeisen=l.endeisen,
-                    stahl=l.stahl))
+                    durchmesser=l.durchmesser, flaeche=l.flaeche, verschmiert=l.verschmiert,
+                    laenge=l.laenge, anzahl=l.anzahl, teilung=l.teilung,
+                    starteisen=l.starteisen, endeisen=l.endeisen, stahl=l.stahl))
         for i, w in enumerate(self.schubwaende, start=1):
             name = f"Wand {i}"
             ende = orte(name, w.kennung, w.von, w.bis)

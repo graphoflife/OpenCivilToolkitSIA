@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f1ec13acda9
+erzeugt: bf7f86238fe1
 art: modul
 tags: [modul]
 ---
@@ -98,6 +98,7 @@ Ein Bewehrungselement der Zeichnung: ein Einzelstab oder eine Stablinie.
 - `bis: Punkt`
 - `linie: Optional[geo.Stablinie] = None`
 - `gewaehlt: Optional[float] = None` – Bei einer Linie nach Teilung der eingegebene Abstand.
+- `aus_staeben: Optional[Tuple[float, float, float]] = None` – Bei verschmierten Staeben ⌀, s und L in mm, aus denen die Flaeche kommt.
 
 ### Wandangabe
 
@@ -474,3 +475,4 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]] · `Querschnittsanalyse.aufbau_protokollieren`
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · `Querschnittsanalyse._bewehrung_protokollieren`
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · `Querschnittsanalyse.aufbau_protokollieren`
+- [[Verschmierte Stahlfläche aus Stäben]] · `Querschnittsanalyse._bewehrung_protokollieren`

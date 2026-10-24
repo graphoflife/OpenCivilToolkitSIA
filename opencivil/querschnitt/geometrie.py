@@ -36,7 +36,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import Any, Callable, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.wahl import Wahl
 
@@ -572,6 +572,37 @@ def stablinie(
 #: (:mod:`opencivil.nachweis.stabgrenzen`, Annahme des Benutzers,
 #: 2026-10-15) und fuer die Ueberdeckung (Benutzer, 2026-10-23). In mm.
 TEILUNG_VERSCHMIERT = 150.0
+
+
+#: Wie die Flaeche einer verschmierten Stablinie angegeben ist: die Flaeche
+#: selbst -- oder Staebe mit Durchmesser und Teilung ueber eine Laenge,
+#: verschmiert (Benutzer, 2026-10-24).
+VERSCHMIERT = ("flaeche", "staebe")
+
+
+def verschmierte_flaeche(durchmesser: float, teilung: float, laenge: float) -> float:
+    """
+    Staebe ``durchmesser`` im Abstand ``teilung`` ueber ``laenge``, verschmiert
+    -- in mm²: ``A_s = L/s · π⌀²/4``. Bei ⌀12 @ 150 auf 1000 mm sind das 754 mm².
+    """
+    return laenge / teilung * math.pi * durchmesser ** 2 / 4.0
+
+
+def linienflaeche(linie: Mapping[str, Any], laenge: float, staebe: int) -> float:
+    """
+    Die ganze Stahlflaeche einer Stablinie in mm² -- die eine Stelle dafuer.
+    Verschmiert die Flaeche von Hand oder aus Staeben
+    (:func:`verschmierte_flaeche`, ohne eigene Laenge ueber ``laenge``, die
+    der Linie); sonst ihre ``staebe`` Staebe. ``linie`` ist die Beschreibung,
+    wie :meth:`~opencivil.projekt.QuerschnittsanalyseEintrag.elemente` sie
+    liefert.
+    """
+    if Linienart(linie["art"]) is not Linienart.FLAECHE:
+        return staebe * math.pi * linie["durchmesser"] ** 2 / 4.0
+    if linie["verschmiert"] == "staebe":
+        return verschmierte_flaeche(linie["durchmesser"], linie["teilung"],
+                                    linie["laenge"] or laenge)
+    return linie["flaeche"]
 
 
 def aequivalenter_durchmesser(flaeche: float, laenge: float,
