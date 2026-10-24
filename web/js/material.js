@@ -17,8 +17,8 @@ import { el, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { kennwertId, projektAendern, zustand } from './zustand.js';
 
-/** Wie die Arten über dem Editor heissen -- und in der Liste eines Balkensystems. */
-export const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
+/** Wie die Arten über dem Editor heissen. */
+const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
 
 function gerechnet(id) {
   return zustand.loesung?.werte?.[id] || null;
@@ -26,10 +26,9 @@ function gerechnet(id) {
 
 /**
  * Ein Kennwert eines Materials als Zeile: bei einer Normsorte gesperrt, bei
- * einem eigenen änderbar, ein gerechneter mit Haken zum Überschreiben. Auch
- * die Liste der Materialien im Balkensystem baut ihre Zeilen hiermit.
+ * einem eigenen änderbar, ein gerechneter mit Haken zum Überschreiben.
  */
-export function kennwertZeile(material, vorlage) {
+function kennwertZeile(material, vorlage) {
   const gesperrt = !material.eigenstaendig;
   const wert = gerechnet(kennwertId(material, vorlage.kurzname));
   const istUeberschrieben = vorlage.kurzname in material.ueberschreibungen;
