@@ -143,6 +143,10 @@ const ZEICHEN = {
   kombinationen: {
     pfade: ['M17.5 5H7l5.5 7L7 19h10.5'],
   },
+  // Ein Träger auf zwei Lagern, darunter sein Moment.
+  statik: {
+    pfade: ['M3 7h18', 'M3 7l-1.6 2.6h3.2z M21 7l-1.6 2.6h3.2z', 'M3 7Q12 25 21 7'],
+  },
 
   // -- Die Werkzeuge des Zeichenfensters -----------------------------------
 

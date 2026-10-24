@@ -44,6 +44,20 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: auch die Statik-Analyse ein Knopf
+
+Wunsch des Benutzers: die Statik-Analyse soll ebenfalls ein Knopf sein.
+
+- Ein fünftes Kapitel in eigener Gruppe «Analyse», mit dem Zeichen eines
+  Trägers auf zwei Lagern und seinem Moment; darunter klein «4 Diagramme».
+  Das Fenster zeigt die Zeilen, die vorher im Panel standen, samt «+
+  Diagramm».
+- Unter den Eingaben steht damit kein Panel mehr, nur die Knöpfe -- anders
+  als noch beim Eintrag «vier Knöpfe mit Fenstern», wo die Statik-Analyse
+  bewusst ein Panel blieb.
+
+---
+
 ## 2026-10-24 · Aufgeräumt: das Zeichenfenster des Balkensystems in drei Dateien
 
 Auftrag des Benutzers, nach dem Vorschlag im Bericht: `bs_zeichnung.js` war

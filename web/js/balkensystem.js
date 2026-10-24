@@ -4,12 +4,13 @@
  * Von oben nach unten:
  *
  *     System          Bezeichnung, Zeichnung samt Liste, Beschreibung
- *     Eingaben        vier Knöpfe, je mit einem Fenster (`KAPITEL`):
+ *     Eingaben        fünf Knöpfe, je mit einem Fenster (`KAPITEL`):
  *                     Material -- die Materialien als Tabelle --,
  *                     Querschnitte -- je einer eine Zeile mit Bild, jeder
  *                     mit eigenem Fenster --, Lastfälle, Lastkombinationen
- *     Statik-Analyse  die Diagramme rechts: je Zeile ein Fall und eine
- *                     Grösse, wie in der Spannung-Dehnung-Analyse
+ *                     und die Statik-Analyse -- die Diagramme rechts, je
+ *                     Zeile ein Fall und eine Grösse, wie in der
+ *                     Spannung-Dehnung-Analyse
  *
  * Gerechnet wird nichts: A und I, die Steifigkeiten und alles Weitere bildet
  * der Kern; hier stehen nur seine Zahlen.
@@ -633,9 +634,10 @@ function kombinationenInhalt(system) {
 // ===========================================================================
 
 /**
- * Material, Querschnitte, Lastfälle und Kombinationen als Knöpfe, jeder
- * mit seinem Fenster -- wie die Kapitel der Querschnittsanalyse (Benutzer,
- * 2026-10-24). Unter dem Namen klein, wie viele es gibt.
+ * Material, Querschnitte, Lastfälle, Kombinationen und die Statik-Analyse
+ * als Knöpfe, jeder mit seinem Fenster -- wie die Kapitel der
+ * Querschnittsanalyse (Benutzer, 2026-10-24). Unter dem Namen klein, wie
+ * viele es gibt.
  */
 const KAPITEL = [
   {
@@ -667,6 +669,16 @@ const KAPITEL = [
       },
     ],
   },
+  {
+    titel: 'Analyse',
+    kapitel: [
+      {
+        schluessel: 'statik', name: 'Statik-Analyse', titel: 'Statik-Analyse', hilfe: HILFE.statik,
+        inhalt: statikInhalt,
+        stand: (s) => zeilenstand(s.diagramme, 'Diagramm', 'Diagramme', 'kein Diagramm'),
+      },
+    ],
+  },
 ];
 
 /** Die Fenster des Systems, nach ihrem Schlüssel: die Kapitel und je Querschnitt seines. */
@@ -687,9 +699,10 @@ const DIAGRAMMGROESSEN = () => zustand.katalog?.balkensystem?.diagrammgroessen |
  * Zeile ein Fall, Lastfall oder Kombination, und was das Diagramm von ihm
  * zeigt (Benutzer, 2026-10-23). Gerechnet wird damit nichts, das System
  * rechnet jeden Fall. Ein Fall, den es nicht mehr gibt, steht als «– Fall
- * wählen –» da.
+ * wählen –» da. Ein Knopf mit Fenster wie die Eingaben (Benutzer,
+ * 2026-10-24).
  */
-function statikGruppe(system) {
+function statikInhalt(system) {
   const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
   const faelle = [
     ...system.lastfaelle.map((lf) => ({ wert: lf.kennung, beschriftung: lf.name })),
@@ -715,10 +728,7 @@ function statikGruppe(system) {
       setzen: (w) => aendern((s) => { s.diagramme[i].groesse = w; }),
     }),
   ]);
-  return panel({
-    schluessel: 'balkensystem/Statik', titel: 'Statik-Analyse',
-    zusatz: erklaerung(HILFE.statik.zeilen),
-  }, [
+  return [
     ...(system.diagramme.length ? system.diagramme.map(zeile)
       : [el('div.leer', { text: 'Noch kein Diagramm.' })]),
     anfuegenKnopf('Diagramm', () => aendern((s) => {
@@ -726,13 +736,12 @@ function statikGruppe(system) {
         fall: s.kombinationen[0]?.kennung || s.lastfaelle[0]?.kennung || '',
       }));
     })),
-  ]);
+  ];
 }
 
 // ===========================================================================
 
 export function balkensystemEditor(system) {
   return [systemGruppe(system),
-    kapitelPanel(system, KAPITEL, { schluessel: 'balkensystem/Eingaben', titel: 'Eingaben' }),
-    statikGruppe(system)];
+    kapitelPanel(system, KAPITEL, { schluessel: 'balkensystem/Eingaben', titel: 'Eingaben' })];
 }

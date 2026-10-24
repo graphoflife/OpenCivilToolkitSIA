@@ -439,10 +439,9 @@ ihrem Pfeil, Band oder ihrer Zahl, und mit Entf zu löschen. Gezeigt werden
 die Lasten des Lastfalls, der in der Leiste neben «Last» gewählt ist -- zu
 Beginn das Eigengewicht, «– kein Lastfall –» zeigt keine; unter der
 Zeichnung stehen alle in einer Liste, je Gruppe aufklappbar, zu Beginn zu.
-Darunter vier
-Knöpfe wie die Kapitel einer Querschnittsanalyse -- Material, Querschnitte,
-Lastfälle, Lastkombinationen --, je mit einem Fenster und darunter klein,
-wie viele es gibt. Unter «Material» die
+Darunter fünf Knöpfe wie die Kapitel einer Querschnittsanalyse -- Material,
+Querschnitte, Lastfälle, Lastkombinationen und Statik-Analyse --, je mit
+einem Fenster und darunter klein, wie viele es gibt. Unter «Material» die
 Materialien des Systems als Tabelle: ein Beton des Projekts -- E_cm und die
 Dichte des Stahlbetons, gesperrt -- oder ein eigenes Material mit E und ρ
 von Hand; Betonstahl ist keines. Ein neues System bekommt den ersten Beton
@@ -461,8 +460,8 @@ Platte oder Analyse und, wo nötig, das E. Dann die Lastfälle. Ein neues System
 die Lastfälle Eigengewicht, Auflast und Nutzlast mit und die Kombinationen
 GZT (1.35 / 1.35 / 1.5) und GZG (je 1.0). Das Eigengewicht kommt von
 selbst: je Stab ρ · g · A mit g = 10 m/s², beim Beton mit der Dichte des
-Stahlbetons -- grau gezeichnet in seinem Lastfall. Zuunterst die
-Statik-Analyse, wie die Spannung-Dehnung-Analyse: je Zeile ein Lastfall
+Stahlbetons -- grau gezeichnet in seinem Lastfall. Der fünfte Knopf ist
+die Statik-Analyse, wie die Spannung-Dehnung-Analyse: je Zeile ein Lastfall
 oder eine Kombination und was ihr Diagramm zeigt, M, V, N, Verschiebung,
 Verdrehung oder Lager; weitere mit «+ Diagramm». Ein neues System bringt M, V und N
 der GZT und die Verschiebung der GZG mit.

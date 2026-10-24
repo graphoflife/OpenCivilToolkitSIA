@@ -397,7 +397,7 @@ function diagrammKarte(kennung, system, zeile) {
   const fall = fallname(system, zeile.fall);
   if (fall === null) {
     return karte(titel, [leerzustand('Kein Fall gewählt.',
-      'Im Panel «Statik-Analyse» einen Lastfall oder eine Kombination wählen.')]);
+      'Unter «Statik-Analyse» einen Lastfall oder eine Kombination wählen.')]);
   }
   const eintrag = antwortZu(kennung, fall);
   if (eintrag.fehler) return karte(`${titel} – ${fall}`, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })]);
@@ -450,7 +450,7 @@ export function systemKarten(kennung) {
   }
   if (!system?.diagramme?.length) {
     return [karte(null, [leerzustand('Noch kein Diagramm.',
-      'Anlegen im Panel «Statik-Analyse» mit «+ Diagramm».')])];
+      'Anlegen unter «Statik-Analyse» mit «+ Diagramm».')])];
   }
   return system.diagramme.map((zeile) => diagrammKarte(kennung, system, zeile));
 }
