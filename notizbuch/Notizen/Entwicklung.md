@@ -44,6 +44,29 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Aufgeräumt: das Zeichenfenster des Balkensystems in drei Dateien
+
+Auftrag des Benutzers, nach dem Vorschlag im Bericht: `bs_zeichnung.js` war
+über 1100 Zeilen lang.
+
+- **`bs_eigenschaften.js`** (rund 460 Zeilen): das schwebende Fenster --
+  was ein Werkzeug als Nächstes anlegt, die Felder von Knoten, Linien und
+  Lasten, mehrere zugleich mit «Var».
+- **`bs_teile.js`** (50 Zeilen): was Zeichnung, Fenster und Panels gemeinsam
+  brauchen -- Katalog, Lastart, die Last zu einer Kennung, die Zugseite
+  einer Linie, der Name eines Materials.
+- **`bs_zeichnung.js`** (rund 680 Zeilen): Fenster, Adapter, Lasten anlegen
+  und treffen, Kern, Zeichnen.
+- **Keine Abhängigkeit im Kreis:** das schwebende Fenster kennt vom
+  Zeichenfenster nur `a`; was es vom System braucht -- die Zeichnung, den
+  Lastfall, die Übersicht des Kerns, das Umkehren --, gibt ihm der Adapter.
+  `umkehren` nimmt dafür, was danach gewählt bleibt.
+- Für den Benutzer ändert sich nichts; im Browser geprüft: Fenster eines
+  Stabs, zweier Stäbe mit «Var» und Zugseite, eines Knotens, einer Last, die
+  Vorgaben der Werkzeuge Linie und Last.
+
+---
+
 ## 2026-10-24 · Platte: auch die Bügel aus dem Stahl der Platte
 
 Entscheid des Benutzers: der Bügelstahl ist derselbe wie der übrige Stahl;

@@ -24,8 +24,9 @@
 import {
   erklaerung, feld, klappgruppe, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
+import { materialname } from './bs_teile.js';
 import {
-  eintragVon, lastfallWaehlen, materialname, passendeUebersicht, waehlen, zeichenbereich,
+  eintragVon, lastfallWaehlen, passendeUebersicht, waehlen, zeichenbereich,
 } from './bs_zeichnung.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
