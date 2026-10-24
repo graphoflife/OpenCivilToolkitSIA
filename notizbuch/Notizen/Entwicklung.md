@@ -44,6 +44,29 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: mehrere zugleich ändern, mit «Var»
+
+Wunsch des Benutzers: sind mehrere Elemente gewählt, ändert das Fenster
+alle zugleich; was sie gemeinsam haben, steht da, sonst «Var» -- auch bei
+den Gelenken; eine Änderung gilt dann für alle.
+
+- **Eine Regel:** `gemeinsam(werte)` gibt den gemeinsamen Wert oder `VAR`;
+  `mitVar` setzt «Var» vor die Stellungen eines Schalters oder einer Liste,
+  `zahlfeldMitVar` lässt das Feld leer mit «Var» darin. Gesetzt wurde schon
+  vorher für alle -- nur zeigte das Fenster die Werte des ersten.
+- **Linien:** Querschnitt, Material, Zugseite, Gelenke, Bettung. «gemäss
+  Querschnitt» steht nur, wenn jeder Querschnitt der gewählten Stäbe eines
+  mitbringt.
+- **Knoten:** x und z -- eine getippte Lage gilt für alle, sie stehen
+  danach in einer Flucht --, das Lager und je Richtung sein Halt; die
+  Richtungen nur, wenn alle ein Lager haben.
+- **Lasten:** der Lastfall immer, die Felder, wenn alle von derselben Art
+  sind (bisher: «einzeln bearbeiten»).
+- **Gelenke und «projiziert»** sind Schalter «ja | nein» statt Haken --
+  ein Haken hätte kein «Var» zeigen können.
+
+---
+
 ## 2026-10-24 · Platte: ein Stahl für alle Lagen
 
 Wunsch des Benutzers: den Stahl nicht je Lage wählen, sondern einen für alle

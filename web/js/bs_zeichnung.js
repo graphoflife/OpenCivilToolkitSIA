@@ -733,14 +733,41 @@ function richtungszeile(beschriftung, schalter) {
 }
 
 /** Wie `zeile`, für einen Schalter -- ebenso ein «div», kein «label». */
-function schalterzeile(beschriftung, schalter) {
-  return el('div.cad-zeile', {}, [el('span', { text: beschriftung }), schalter, el('span')]);
+function schalterzeile(beschriftung, schalter, zusatz = '') {
+  return el('div.cad-zeile', {}, [
+    el('span', { text: beschriftung }), schalter, zusatz ? el('span.einheit', { text: zusatz }) : el('span'),
+  ]);
 }
 
-function haken(an, setzen, titel = '') {
-  return el('input', {
-    type: 'checkbox', checked: !!an, title: titel,
-    on: { change: (e) => setzen(e.target.checked) },
+/**
+ * Mehrere zugleich (Benutzer, 2026-10-24): was die gewählten gemeinsam
+ * haben, steht da -- unterscheiden sie sich, steht «Var», und was man dann
+ * wählt oder tippt, gilt für alle.
+ */
+const VAR = '*var*';
+
+/** Der gemeinsame Wert der gewählten -- oder VAR. */
+function gemeinsam(werte) {
+  return werte.every((w) => w === werte[0]) ? werte[0] : VAR;
+}
+
+/** Die Stellungen eines Schalters oder einer Liste -- bei VAR mit «Var» vorneweg. */
+function mitVar(werte, gewaehlt) {
+  return gewaehlt === VAR ? [{
+    wert: VAR, beschriftung: 'Var', titel: 'Die gewählten unterscheiden sich -- was man wählt, gilt für alle',
+  }, ...werte] : werte;
+}
+
+/** Ein Zahlenfeld, auch für mehrere: bei VAR leer, mit «Var» darin. */
+function zahlfeldMitVar({ wert, platzhalter, ...rest }) {
+  return zahlfeld({ ...rest, wert: wert === VAR ? null : wert, platzhalter: wert === VAR ? 'Var' : platzhalter });
+}
+
+/** Ja oder nein als Schalter -- auch für mehrere, dann mit «Var». */
+function jaNein(wert, setzen, titel) {
+  return wahlSchalter({
+    werte: mitVar([{ wert: true, beschriftung: 'ja' }, { wert: false, beschriftung: 'nein' }], wert),
+    gewaehlt: wert === VAR ? VAR : Boolean(wert), setzen, titel,
   });
 }
 
@@ -762,22 +789,21 @@ function querschnittWahl(z, gewaehlt, setzen, material = '') {
     ...(z.querschnitte || []).filter((q) => !nurMitMaterial || bringtMaterial(q) || q.kennung === gewaehlt)
       .map((q) => ({ wert: q.kennung, beschriftung: q.name || q.kennung })),
   ];
-  return auswahl({ werte, gewaehlt, titel: 'Die Querschnitte stehen unter der Zeichnung', beiAenderung: setzen });
+  return auswahl({ werte: mitVar(werte, gewaehlt), gewaehlt, titel: 'Die Querschnitte stehen unter der Zeichnung', beiAenderung: setzen });
 }
 
 /**
- * Das Material einer Linie: eines aus dem Projekt -- oder «gemäss
- * Querschnitt», wenn ihr Querschnitt eines mitbringt (Platte, Analyse).
+ * Das Material einer Linie: eines des Systems -- oder «gemäss Querschnitt»,
+ * wenn ihr Querschnitt eines mitbringt (`bringt`: Platte, Analyse).
  */
-function materialWahl(z, querschnitt, gewaehlt, setzen) {
+function materialWahl(z, bringt, gewaehlt, setzen) {
   const eigenes = katalog().material_des_querschnitts;
   const werte = [
     ...(z.stabmaterialien || []).map((m) => ({ wert: m.kennung, beschriftung: materialname(m) })),
-    ...(bringtMaterial(z.querschnitte.find((q) => q.kennung === querschnitt)) || gewaehlt === eigenes
-      ? [{ wert: eigenes, beschriftung: 'gemäss Querschnitt' }] : []),
+    ...(bringt || gewaehlt === eigenes ? [{ wert: eigenes, beschriftung: 'gemäss Querschnitt' }] : []),
   ];
   return auswahl({
-    werte: werte.some((x) => x.wert === gewaehlt) ? werte
+    werte: gewaehlt === VAR || werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
       : [{ wert: gewaehlt, beschriftung: '– Material wählen –' }, ...werte],
     gewaehlt,
     titel: 'Die Materialien stehen unter der Zeichnung -- «gemäss Querschnitt»: der Beton der Platte oder Analyse',
@@ -801,7 +827,7 @@ function lastfallWahl(a, z, gewaehlt, setzen, titel) {
     return el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst im Panel «Lastfälle» einen Lastfall anlegen.' });
   }
   return zeile('Lastfall', auswahl({
-    werte: z.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })),
+    werte: mitVar(z.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })), gewaehlt),
     gewaehlt, titel, beiAenderung: setzen,
   }));
 }
@@ -809,9 +835,10 @@ function lastfallWahl(a, z, gewaehlt, setzen, titel) {
 /**
  * Die Felder einer Last: Richtung, Wert -- verteilt Anfang und Ende --,
  * die Stelle einer einzelnen in % der Linie, und ob eine verteilte je Meter
- * Projektion zählt. `last` ist die Last oder die Vorgabe des Werkzeugs,
- * `setzen(feld, wert)` schreibt; `aufLinie`: liegt sie auf einer Linie (sonst
- * an einem Knoten oder noch nirgends).
+ * Projektion zählt. `last` ist die Last, die Vorgabe des Werkzeugs oder das
+ * Gemeinsame mehrerer Lasten derselben Art (mit VAR, wo sie sich
+ * unterscheiden); `setzen(feld, wert)` schreibt; `aufLinie`: liegt sie auf
+ * einer Linie (sonst an einem Knoten oder noch nirgends).
  */
 function lastFelder(last, setzen, { aufLinie = true, amKnoten = false } = {}) {
   const art = amKnoten ? { kraft: last.art === 'kraft', verteilt: false, einheit: last.art === 'kraft' ? 'kN' : 'kNm' }
@@ -822,26 +849,26 @@ function lastFelder(last, setzen, { aufLinie = true, amKnoten = false } = {}) {
   const wertFeld = amKnoten ? 'wert' : 'wert_a';
   return [
     art.kraft ? wahlBlock('Richtung', wahlSchalter({
-      werte: richtungen, gewaehlt: last.richtung, setzen: (w) => setzen('richtung', w),
+      werte: mitVar(richtungen, last.richtung), gewaehlt: last.richtung, setzen: (w) => setzen('richtung', w),
       titel: 'Positiv in Pfeilrichtung: senkrecht nach unten, quer zur gestrichelten Faser, längs vom Anfang zum Ende',
       klasse: '.ist-wortlaut.ist-umbruch',
     })) : null,
-    zeile(art.verteilt ? 'Anfang' : 'Wert', zahlfeld({
+    zeile(art.verteilt ? 'Anfang' : 'Wert', zahlfeldMitVar({
       wert: last[wertFeld], schritt: 5,
       titel: art.kraft ? 'Positiv in Pfeilrichtung' : 'Ein Moment positiv im Gegenuhrzeigersinn',
       beiAenderung: (w) => setzen(wertFeld, w),
     }), art.einheit),
-    art.verteilt ? zeile('Ende', zahlfeld({
+    art.verteilt ? zeile('Ende', zahlfeldMitVar({
       wert: last.wert_b, schritt: 5, leer: null, platzhalter: 'wie Anfang',
       titel: 'Wert am Ende der Linie -- leer: wie am Anfang', beiAenderung: (w) => setzen('wert_b', w),
     }), art.einheit) : null,
-    !art.verteilt && aufLinie ? zeile('Stelle', zahlfeld({
+    !art.verteilt && aufLinie ? zeile('Stelle', zahlfeldMitVar({
       wert: last.stelle, schritt: 5, min: 0, max: 100,
       titel: 'Wo die Last steht: in % der Linie ab ihrem Anfang', beiAenderung: (w) => setzen('stelle', w),
     }), '%') : null,
     art.verteilt && art.kraft && ['senkrecht', 'waagrecht'].includes(last.richtung) && aufLinie
-      ? zeile('projiziert', haken(last.projiziert, (w) => setzen('projiziert', w)),
-        'je Meter Projektion statt je Meter Stab') : null,
+      ? schalterzeile('projiziert', jaNein(last.projiziert, (w) => setzen('projiziert', w),
+        'Senkrecht und waagrecht je Meter Projektion statt je Meter Stab'), 'je m Projektion') : null,
   ];
 }
 
@@ -854,7 +881,8 @@ function neuEigenschaften(a, werkzeug) {
     const v = a.bs.vorgaben.linie;
     inhalt = [
       zeile('Querschnitt', querschnittWahl(z, v.querschnitt, (w) => { v.querschnitt = w; neu(); }, vorgabeMaterial(a, z))),
-      v.querschnitt ? zeile('Material', materialWahl(z, v.querschnitt, vorgabeMaterial(a, z), (w) => { v.material = w; neu(); })) : null,
+      v.querschnitt ? zeile('Material', materialWahl(z, bringtMaterial(z.querschnitte.find((q) => q.kennung === v.querschnitt)),
+        vorgabeMaterial(a, z), (w) => { v.material = w; neu(); })) : null,
     ];
   } else if (werkzeug === 'last') {
     const v = a.bs.vorgaben.last;
@@ -927,33 +955,31 @@ function lagerSetzen(a, z, knoten, art) {
 
 function lagerFelder(a, z, knoten) {
   const lager = knoten.map((k) => z.lager.find((l) => l.knoten === k) || null);
-  const arten = new Set(lager.map(lagerart));
-  const gemeinsam = arten.size === 1 ? [...arten][0] : '';
-  const setzen = (art) => a.aendern((zz) => { for (const k of knoten) lagerSetzen(a, zz, k, art); });
-  // Haben die gewählten Knoten verschiedene Lager, steht keine Stellung an.
+  const art = gemeinsam(lager.map(lagerart));
+  const setzen = (w) => a.aendern((zz) => { for (const k of knoten) lagerSetzen(a, zz, k, w); });
   const werte = [
     { wert: 'kein', beschriftung: 'kein', titel: 'Kein Lager' },
     ...katalog().lagerarten.map((x) => ({ wert: x.wert, beschriftung: x.wert })),
     { wert: 'eigen', beschriftung: 'je Richtung', titel: 'Je Richtung frei, fest oder eine Feder' },
   ];
   const zeilen = [wahlBlock('Lager', wahlSchalter({
-    werte, gewaehlt: gemeinsam, setzen, klasse: '.ist-umbruch',
-    titel: gemeinsam ? 'Lager des Knotens' : 'Die gewählten Knoten haben verschiedene Lager',
+    werte: mitVar(werte, art), gewaehlt: art, setzen, klasse: '.ist-umbruch', titel: 'Lager des Knotens',
   }))];
-  const erstes = lager.find(Boolean);
-  if (!erstes || gemeinsam === 'kein') return zeilen;
+  // Je Richtung nur, wenn alle gewählten ein Lager haben -- sonst stünde da,
+  // was nur für einige gilt.
+  if (lager.some((l) => !l)) return zeilen;
   const einheiten = katalog().federeinheiten;
   const richtungSetzen = (feld) => (wert) => a.aendern((zz) => {
     for (const l of zz.lager) if (knoten.includes(l.knoten)) l[feld] = wert;
   });
   for (const [feld, name] of [['x', 'x'], ['z', 'z'], ['phi', 'φ']]) {
-    const halt = erstes[feld];
+    const halt = gemeinsam(lager.map((l) => l[feld]));
     zeilen.push(richtungszeile(name, wahlSchalter({
-      werte: HALT, gewaehlt: halt, setzen: richtungSetzen(feld), titel: `Halt in ${name}`,
+      werte: mitVar(HALT, halt), gewaehlt: halt, setzen: richtungSetzen(feld), titel: `Halt in ${name}`,
     })));
     if (halt === 'feder') {
-      zeilen.push(zeile(`  k_${name}`, zahlfeld({
-        wert: erstes[`k_${feld}`], schritt: 1000, min: 0,
+      zeilen.push(zeile(`  k_${name}`, zahlfeldMitVar({
+        wert: gemeinsam(lager.map((l) => l[`k_${feld}`])), schritt: 1000, min: 0,
         titel: `Federsteifigkeit in ${name}`, beiAenderung: richtungSetzen(`k_${feld}`),
       }), einheiten[`k_${feld}`] || ''));
     }
@@ -962,20 +988,18 @@ function lagerFelder(a, z, knoten) {
 }
 
 function knotenEigenschaften(a, z, knoten) {
-  const inhalt = [];
-  if (knoten.length === 1) {
-    const k = z.knoten.find((x) => x.kennung === knoten[0]);
-    const lageSetzen = (i) => (w) => a.aendern((zz) => {
-      const da = zz.knoten.find((x) => x.kennung === k.kennung);
-      if (!da) return;
-      const d = i === 0 ? [w - da.x, 0] : [0, w - da.z];
-      a.modell.verschieben(zz, new Set([k.kennung]), d);
-    });
-    inhalt.push(
-      zeile('x', zahlfeld({ wert: k.x, schritt: a.raster, beiAenderung: lageSetzen(0) }), 'm'),
-      zeile('z', zahlfeld({ wert: k.z, schritt: a.raster, beiAenderung: lageSetzen(1) }), 'm'),
-    );
-  }
+  const gewaehlt = z.knoten.filter((x) => knoten.includes(x.kennung));
+  // Eine getippte Lage gilt für alle gewählten -- so stehen sie danach in
+  // einer Flucht.
+  const lageSetzen = (feld) => (w) => a.aendern((zz) => {
+    for (const kennung of knoten) {
+      const da = zz.knoten.find((x) => x.kennung === kennung);
+      if (da) a.modell.verschieben(zz, new Set([kennung]), feld === 'x' ? [w - da.x, 0] : [0, w - da.z]);
+    }
+  });
+  const inhalt = ['x', 'z'].map((feld) => zeile(feld, zahlfeldMitVar({
+    wert: gemeinsam(gewaehlt.map((k) => k[feld])), schritt: a.raster, beiAenderung: lageSetzen(feld),
+  }), 'm'));
   inhalt.push(...lagerFelder(a, z, knoten));
   const u = passendeUebersicht(a);
   for (const k of knoten) {
@@ -990,20 +1014,21 @@ function knotenEigenschaften(a, z, knoten) {
 
 // -- Linien ------------------------------------------------------------------
 
-function lagerAnLinie(a, linien, e) {
+function lagerAnLinie(a, linien, wert) {
   const einheiten = katalog().federeinheiten;
-  const setzen = (feld) => (wert) => a.aendern((zz) => {
-    for (const l of zz.linien) if (linien.includes(l.kennung)) l[feld] = wert;
+  const setzen = (feld) => (w) => a.aendern((zz) => {
+    for (const l of zz.linien) if (linien.includes(l.kennung)) l[feld] = w;
   });
   const werte = HALT.map((x) => (x.wert === 'feder' ? { ...x, beschriftung: 'Bettung' } : x));
   const zeilen = [];
   for (const [feld, name, titel] of [
     ['quer', 'Lager quer', 'Quer zur Linie, auf der Seite der gestrichelten Faser: fest -- der Stab biegt sich nicht --, oder gebettet'],
     ['laengs', 'Lager längs', 'Längs der Linie: fest oder gebettet']]) {
-    zeilen.push(wahlBlock(name, wahlSchalter({ werte, gewaehlt: e[feld], titel, setzen: setzen(feld) })));
-    if (e[feld] === 'feder') {
-      zeilen.push(zeile(`  k_${feld === 'quer' ? '⊥' : '∥'}`, zahlfeld({
-        wert: e[`k_${feld}`], schritt: 1000, min: 0, titel: 'Bettungsziffer je Meter Stab',
+    const halt = wert(feld);
+    zeilen.push(wahlBlock(name, wahlSchalter({ werte: mitVar(werte, halt), gewaehlt: halt, titel, setzen: setzen(feld) })));
+    if (halt === 'feder') {
+      zeilen.push(zeile(`  k_${feld === 'quer' ? '⊥' : '∥'}`, zahlfeldMitVar({
+        wert: wert(`k_${feld}`), schritt: 1000, min: 0, titel: 'Bettungsziffer je Meter Stab',
         beiAenderung: setzen(`k_${feld}`),
       }), einheiten[`k_${feld}`] || ''));
     }
@@ -1024,10 +1049,10 @@ function zugseitenzeile(a, z, linien) {
   const stellungen = [['unten', 'oben'], ['links', 'rechts']]
     .find((paar) => [...seiten.values()].every((s) => paar.includes(s)));
   if (!stellungen) return null;
-  const verschieden = new Set(seiten.values()).size > 1;
+  const seite = gemeinsam([...seiten.values()]);
   return schalterzeile('Zugseite', wahlSchalter({
-    werte: stellungen.map((s) => ({ wert: s, beschriftung: s })),
-    gewaehlt: verschieden ? '' : [...seiten.values()][0],
+    werte: mitVar(stellungen.map((s) => ({ wert: s, beschriftung: s })), seite),
+    gewaehlt: seite,
     titel: 'Die gestrichelte Faser: dort zieht ein positives Moment',
     setzen: (w) => kernBearbeiten(a, [{
       aktion: 'umkehren', linien: linien.filter((k) => seiten.get(k) !== w),
@@ -1041,39 +1066,45 @@ function zugseitenzeile(a, z, linien) {
  * eingeklappt darunter: sie braucht man selten (Benutzer, 2026-10-23).
  */
 function linienEigenschaften(a, z, linien) {
-  const e = z.linien.find((x) => x.kennung === linien[0]);
-  const setzen = (feld) => (wert) => a.aendern((zz) => {
+  const gewaehlt = z.linien.filter((x) => linien.includes(x.kennung));
+  const wert = (feld) => gemeinsam(gewaehlt.map((l) => l[feld]));
+  const setzen = (feld) => (w) => a.aendern((zz) => {
     for (const l of zz.linien) {
       if (!linien.includes(l.kennung)) continue;
-      l[feld] = wert;
+      l[feld] = w;
       // Ein neuer Stab bekommt das Material, das das Werkzeug vorgibt -- sonst fehlte es ihm.
-      if (feld === 'querschnitt' && wert && !l.material) l.material = vorgabeMaterial(a, zz);
+      if (feld === 'querschnitt' && w && !l.material) l.material = vorgabeMaterial(a, zz);
     }
   });
-  const inhalt = [zeile('Querschnitt', querschnittWahl(z, e.querschnitt, setzen('querschnitt'), e.material))];
-  if (e.querschnitt) {
+  const staebe = gewaehlt.filter((l) => l.querschnitt);
+  const material = gemeinsam(staebe.map((l) => l.material));
+  const inhalt = [zeile('Querschnitt', querschnittWahl(z, wert('querschnitt'), setzen('querschnitt'), material))];
+  if (staebe.length) {
+    // «gemäss Querschnitt» nur, wenn jeder Querschnitt der gewählten Stäbe eines mitbringt.
+    const bringt = staebe.every((l) => bringtMaterial(z.querschnitte.find((q) => q.kennung === l.querschnitt)));
     inhalt.push(
-      zeile('Material', materialWahl(z, e.querschnitt, e.material, setzen('material'))),
+      zeile('Material', materialWahl(z, bringt, material, setzen('material'))),
       zugseitenzeile(a, z, linien),
-      zeile('Gelenk Anfang', haken(e.gelenk_anfang, setzen('gelenk_anfang'), 'Kein Moment am Anfang')),
-      zeile('Gelenk Ende', haken(e.gelenk_ende, setzen('gelenk_ende'), 'Kein Moment am Ende')),
+      schalterzeile('Gelenk Anfang', jaNein(wert('gelenk_anfang'), setzen('gelenk_anfang'), 'Kein Moment am Anfang')),
+      schalterzeile('Gelenk Ende', jaNein(wert('gelenk_ende'), setzen('gelenk_ende'), 'Kein Moment am Ende')),
     );
   }
-  const gebettet = e.quer !== 'frei' || e.laengs !== 'frei';
+  const gebettet = gewaehlt.some((l) => l.quer !== 'frei' || l.laengs !== 'frei');
   inhalt.push(el('button.cad-aufklapper', {
     type: 'button', text: `${a.bs.bettungOffen ? '▾' : '▸'} Bettung${gebettet ? ' · gesetzt' : ''}`,
     title: 'Linienlager quer und längs: fest oder gebettet',
     on: { click: () => { a.bs.bettungOffen = !a.bs.bettungOffen; a.neuZeichnen(); } },
   }));
-  if (a.bs.bettungOffen) inhalt.push(...lagerAnLinie(a, linien, e));
-  if (linien.length === 1) {
+  if (a.bs.bettungOffen) inhalt.push(...lagerAnLinie(a, linien, wert));
+  if (gewaehlt.length === 1) {
+    const [e] = gewaehlt;
     const lagen = a.modell.lagen(z);
     const [p, q] = [lagen.get(e.von), lagen.get(e.bis)];
     if (p && q) inhalt.push(el('p.cad-info', { text: `L = ${zahlText(abstand(p, q), 3)} m · ${e.von} → ${e.bis}` }));
   }
   inhalt.push(...meldungszeilen(a, linien));
   return {
-    titel: linien.length === 1 ? elementname(a, e.kennung) : `${linien.length} Linien`,
+    titel: gewaehlt.length === 1 ? elementname(a, gewaehlt[0].kennung) : `${gewaehlt.length} Linien`,
     inhalt: inhalt.filter(Boolean),
   };
 }
@@ -1081,35 +1112,39 @@ function linienEigenschaften(a, z, linien) {
 // -- Lasten ------------------------------------------------------------------
 
 /**
- * Eine gewählte Last: ihr Lastfall und ihre Felder. Ändert man den
- * Lastfall, zeigt die Zeichnung danach dessen Lasten -- sonst
- * verschwände die Last unter dem Zeiger.
+ * Die gewählten Lasten: ihr Lastfall und -- sind sie von derselben Art --
+ * ihre Felder, mit «Var», wo sie sich unterscheiden. Ändert man den
+ * Lastfall, zeigt die Zeichnung danach dessen Lasten -- sonst verschwände
+ * die Last unter dem Zeiger.
  */
 function lastEigenschaften(a, z, kennungen) {
-  if (kennungen.length > 1) {
-    return {
-      titel: `${kennungen.length} Lasten`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Mehrere Lasten -- einzeln bearbeiten, löschen mit Entf.' })],
-    };
-  }
-  const [kennung] = kennungen;
-  const da = lastVon(z, kennung);
-  const amKnoten = Boolean(da.knoten);
+  const da = kennungen.map((k) => lastVon(z, k));
   const setzen = (feld, wert) => a.aendern((zz) => {
-    const neu = lastVon(zz, kennung);
-    if (neu) neu.last[feld] = wert;
+    for (const k of kennungen) {
+      const neu = lastVon(zz, k);
+      if (neu) neu.last[feld] = wert;
+    }
   });
-  const art = amKnoten ? (da.last.art === 'moment' ? 'Moment' : 'Kraft') : lastart(da.last.art).beschriftung;
+  const amKnoten = gemeinsam(da.map((d) => Boolean(d.knoten)));
+  const art = gemeinsam(da.map((d) => d.last.art));
+  const inhalt = [lastfallWahl(a, z, gemeinsam(da.map((d) => d.last.lastfall)), (w) => {
+    setzen('lastfall', w);
+    lastfallWaehlen(a.bs.kennung, w);
+  }, 'Zu welchem Lastfall die Lasten gehören')];
+  if (amKnoten !== VAR && art !== VAR) {
+    const felder = Object.fromEntries(Object.keys(da[0].last)
+      .map((feld) => [feld, gemeinsam(da.map((d) => d.last[feld]))]));
+    inhalt.push(...lastFelder(felder, setzen, { amKnoten }));
+  } else {
+    inhalt.push(el('p.cad-hinweis-klein', { text: 'Verschiedene Arten -- ihre Werte einzeln bearbeiten.' }));
+  }
+  if (da.length === 1) {
+    inhalt.push(el('p.cad-info', { text: da[0].knoten ? `an ${da[0].knoten}` : `auf ${elementname(a, da[0].linie.kennung)}` }));
+  }
+  inhalt.push(...meldungszeilen(a, kennungen));
+  const artText = amKnoten ? (da[0].last.art === 'moment' ? 'Moment' : 'Kraft') : lastart(da[0].last.art).beschriftung;
   return {
-    titel: `${elementname(a, kennung)} · ${art}`,
-    inhalt: [
-      lastfallWahl(a, z, da.last.lastfall, (w) => {
-        setzen('lastfall', w);
-        lastfallWaehlen(a.bs.kennung, w);
-      }, 'Zu welchem Lastfall die Last gehört'),
-      ...lastFelder(da.last, setzen, { amKnoten }),
-      el('p.cad-info', { text: amKnoten ? `an ${da.knoten}` : `auf ${elementname(a, da.linie.kennung)}` }),
-      ...meldungszeilen(a, [kennung]),
-    ].filter(Boolean),
+    titel: da.length === 1 ? `${elementname(a, kennungen[0])} · ${artText}` : `${da.length} Lasten`,
+    inhalt: inhalt.filter(Boolean),
   };
 }

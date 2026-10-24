@@ -460,7 +460,11 @@ oder eine Kombination und was ihr Diagramm zeigt, M, V, N, Verschiebung,
 Verdrehung oder Lager; weitere mit «+ Diagramm». Ein neues System bringt M, V und N
 der GZT und die Verschiebung der GZG mit.
 Anders als im Querschnitt hängt ein Rahmen an seinen Knoten: ein Klick an
-einem Knoten wählt ihn, ein verschobener Stab nimmt seine Knoten mit.
+einem Knoten wählt ihn, ein verschobener Stab nimmt seine Knoten mit. Sind
+mehrere Linien, Knoten oder Lasten gewählt, ändert das Fenster alle
+zugleich: was sie gemeinsam haben, steht da, sonst «Var» -- etwa beim
+Querschnitt, Material, den Gelenken (Schalter «ja | nein») oder dem Lager;
+was man dann wählt oder tippt, gilt für alle.
 Die Zugseite eines neuen Stabs liegt unten, bei einem senkrechten links;
 der Schalter «Zugseite» im Fenster legt sie auf die andere Seite.
 Teilen und Umkehren rechnet der Kern -- dabei entstehen Lastwerte. Ist das
