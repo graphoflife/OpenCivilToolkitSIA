@@ -7,6 +7,12 @@
  * eingeklappt). Lager sind eigene Einträge an einem Knoten -- so überstehen
  * sie das Zusammenführen von Knoten --, gewählt wird aber der Knoten.
  *
+ * ZUGSEITE:
+ * Die gestrichelte Faser liegt rechts der Laufrichtung einer Linie. Eine
+ * neue Linie läuft darum nach rechts, eine senkrechte nach unten: ihre
+ * Zugseite liegt unten bzw. links (Benutzer, 2026-10-24). Der Schalter
+ * «Zugseite» im Fenster kehrt die Linie um, wie «Umkehren».
+ *
  * LASTEN:
  * Jede Last ist für sich zu wählen und zu löschen, ein Anhang des
  * Zeichenfensters (`anhaenge`): ein Klick auf ihren Pfeil, ihr Band oder ihre
@@ -302,9 +308,27 @@ function neuText(a, werkzeug) {
   return 'Knoten';
 }
 
+/**
+ * Wo die gestrichelte Faser einer Linie von p nach q liegt, ihre Zugseite:
+ * rechts der Laufrichtung -- 'unten' oder 'oben', an einer senkrechten
+ * 'links' oder 'rechts'. Lagen [x, z] der Zeichnung.
+ */
+function zugseite(p, q) {
+  const [dx, dz] = [q[0] - p[0], q[1] - p[1]];
+  if (Math.abs(dx) <= 1e-9 * Math.hypot(dx, dz)) return dz > 0 ? 'rechts' : 'links';
+  return dx > 0 ? 'unten' : 'oben';
+}
+
+/**
+ * Eine neue Linie mit den Vorgaben des Werkzeugs. Ihre Zugseite liegt
+ * unten, an einer senkrechten links (Benutzer, 2026-10-24): sie läuft dafür
+ * nach rechts bzw. nach unten, wie herum man sie auch zeichnet.
+ */
 function linieAnlegen(a, z, von, bis) {
   const kennung = a.modell.naechsteKennung(z, 'L');
   const v = a.bs.vorgaben.linie;
+  const lagen = a.modell.lagen(z);
+  if (['oben', 'rechts'].includes(zugseite(lagen.get(von), lagen.get(bis)))) [von, bis] = [bis, von];
   z.linien.push({
     ...ausVorlage('systemlinie'), kennung, von, bis,
     querschnitt: v.querschnitt, material: v.querschnitt ? v.material : '',
@@ -699,6 +723,11 @@ function richtungszeile(beschriftung, schalter) {
   return el('div.cad-zeile.ist-richtung', {}, [el('span', { text: beschriftung }), schalter]);
 }
 
+/** Wie `zeile`, für einen Schalter -- ebenso ein «div», kein «label». */
+function schalterzeile(beschriftung, schalter) {
+  return el('div.cad-zeile', {}, [el('span', { text: beschriftung }), schalter, el('span')]);
+}
+
 function haken(an, setzen, titel = '') {
   return el('input', {
     type: 'checkbox', checked: !!an, title: titel,
@@ -953,11 +982,34 @@ function lagerAnLinie(a, linien, e) {
   return zeilen;
 }
 
-/** Die Felder einer Last auf einem Stab -- je nach Art. */
+/**
+ * Die Zugseite der gewählten Linien als Schalter -- solange sie alle
+ * senkrecht oder alle nicht senkrecht liegen. Umschalten kehrt eine Linie
+ * im Kern um: die Faser wechselt die Seite, die Lasten bleiben, wo sie
+ * wirken, und die Gelenke an ihren Knoten.
+ */
+function zugseitenzeile(a, z, linien) {
+  const lagen = a.modell.lagen(z);
+  const seiten = new Map(z.linien.filter((l) => linien.includes(l.kennung))
+    .map((l) => [l.kennung, zugseite(lagen.get(l.von), lagen.get(l.bis))]));
+  const stellungen = [['unten', 'oben'], ['links', 'rechts']]
+    .find((paar) => [...seiten.values()].every((s) => paar.includes(s)));
+  if (!stellungen) return null;
+  const verschieden = new Set(seiten.values()).size > 1;
+  return schalterzeile('Zugseite', wahlSchalter({
+    werte: stellungen.map((s) => ({ wert: s, beschriftung: s })),
+    gewaehlt: verschieden ? '' : [...seiten.values()][0],
+    titel: 'Die gestrichelte Faser: dort zieht ein positives Moment',
+    setzen: (w) => kernBearbeiten(a, [{
+      aktion: 'umkehren', linien: linien.filter((k) => seiten.get(k) !== w),
+    }], linien),
+  }));
+}
+
 /**
  * Eine Linie: Querschnitt -- «kein Stab» heisst nur eine Linie --, beim
- * Stab das Material und die Gelenke. Die Bettung steht eingeklappt
- * darunter: sie braucht man selten (Benutzer, 2026-10-23).
+ * Stab das Material, die Zugseite und die Gelenke. Die Bettung steht
+ * eingeklappt darunter: sie braucht man selten (Benutzer, 2026-10-23).
  */
 function linienEigenschaften(a, z, linien) {
   const e = z.linien.find((x) => x.kennung === linien[0]);
@@ -973,6 +1025,7 @@ function linienEigenschaften(a, z, linien) {
   if (e.querschnitt) {
     inhalt.push(
       zeile('Material', materialWahl(z, e.querschnitt, e.material, setzen('material'))),
+      zugseitenzeile(a, z, linien),
       zeile('Gelenk Anfang', haken(e.gelenk_anfang, setzen('gelenk_anfang'), 'Kein Moment am Anfang')),
       zeile('Gelenk Ende', haken(e.gelenk_ende, setzen('gelenk_ende'), 'Kein Moment am Ende')),
     );

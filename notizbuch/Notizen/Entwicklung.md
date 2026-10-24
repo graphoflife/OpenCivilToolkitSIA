@@ -44,6 +44,29 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: die Zugseite je Stab
+
+Wunsch des Benutzers: je Stab festlegen, welche Seite die Zugseite ist;
+von selbst unten, bei einer senkrechten Linie links, und umzuschalten.
+
+- **Kein neues Feld:** die Zugseite ist die gestrichelte Faser, und die
+  liegt schon immer rechts der Laufrichtung; «Umkehren» legte sie auf die
+  andere Seite. Ein eigenes Feld hätte die Laufrichtung bedeutungslos
+  gemacht, und jede Stelle, die die Faser zeichnet oder rechnet -- Lasten
+  quer, Linienlager, Diagramme, Herleitung --, hätte es kennen müssen.
+- **Von selbst:** eine neu gezeichnete Linie läuft nach rechts, eine
+  senkrechte nach unten -- wie herum man sie auch zeichnet
+  (`linieAnlegen`). Die Beispiele behalten ihre Richtung: im Rahmen liegt
+  die Faser innen.
+- **Schalter:** «Zugseite» im Fenster eines Stabs, mit den Stellungen unten
+  | oben, bei einem senkrechten links | rechts. Er kehrt die Linie im Kern
+  um, wie «Umkehren»: die Lasten bleiben, wo sie wirken -- eine Last quer
+  zum Stab wechselt dabei ihr Vorzeichen --, die Gelenke an ihren Knoten.
+  Bei mehreren gewählten Linien steht er, solange alle senkrecht oder alle
+  nicht senkrecht liegen.
+
+---
+
 ## 2026-10-24 · Balkensystem: Verdrehung in der Statik-Analyse
 
 Wunsch des Benutzers: neben der Verschiebung auch die Verdrehung.

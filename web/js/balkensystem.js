@@ -46,7 +46,7 @@ const HILFE = {
       ['Drehung', 'im Gegenuhrzeigersinn positiv, ebenso Momentlasten'],
       ['Lasten', 'positiv in Pfeilrichtung: senkrecht nach unten, waagrecht nach rechts, quer zur gestrichelten Faser, längs vom Anfang zum Ende'],
       ['N, V, M', 'nach Baustatik: N > 0 Zug, M > 0 zieht an der gestrichelten Faser, dM/dx = V − m'],
-      ['Faser', 'rechts der Laufrichtung -- «Umkehren» legt sie auf die andere Seite'],
+      ['Faser', 'die Zugseite: an einer neuen Linie unten, an einer senkrechten links -- im Fenster des Stabs umzuschalten; die Lasten bleiben dabei, wo sie wirken'],
     ],
     formel: 'Lagerkraft nach oben positiv',
   },
@@ -192,7 +192,7 @@ function vorzeichenbild() {
     svgEl('path', { d: 'M135 51 H255', class: 'bs-vz-faser' }),
     text(120, 36, 'Anfang'), text(240, 36, 'Ende'),
     pfeil('M195 14 V40 M191 34 L195 40 L199 34'), text(201, 22, 'Last ↓ positiv'),
-    text(150, 68, 'gestrichelte Faser: rechts der Laufrichtung'),
+    text(150, 68, 'gestrichelte Faser: die Zugseite'),
     text(150, 84, 'M > 0 zieht dort · N > 0 ist Zug'),
   );
   return s;

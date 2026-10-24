@@ -451,6 +451,8 @@ Verdrehung oder Lager; weitere mit «+ Diagramm». Ein neues System bringt M, V 
 der GZT und die Verschiebung der GZG mit.
 Anders als im Querschnitt hängt ein Rahmen an seinen Knoten: ein Klick an
 einem Knoten wählt ihn, ein verschobener Stab nimmt seine Knoten mit.
+Die Zugseite eines neuen Stabs liegt unten, bei einem senkrechten links;
+der Schalter «Zugseite» im Fenster legt sie auf die andere Seite.
 Teilen und Umkehren rechnet der Kern -- dabei entstehen Lastwerte. Ist das
 System beweglich, sagt es eine Meldung und markiert, was sich bewegt; eine
 Drehung ohne Steifigkeit, an einem Knoten, an dem nur Gelenke hängen, ist
@@ -700,6 +702,9 @@ Im Balkensystem:
 * Schnittgrössen nach Baustatik: `N > 0` Zug, `M > 0` zieht an der
   gestrichelten Faser -- rechts der Laufrichtung, bei einem Stab von links
   nach rechts also unten --, `dM/dx = V − m`
+* Die gestrichelte Faser ist die Zugseite: eine gezeichnete Linie läuft
+  nach rechts, eine senkrechte nach unten, die Zugseite liegt also unten
+  bzw. links; im Fenster des Stabs umzuschalten (`r.umkehren`)
 * Querschnittsmasse in mm, Lasten in kN, kN/m, kNm, kNm/m; Federn in kN/m und
   kNm/rad, Bettung in kN/m²
 
