@@ -714,7 +714,7 @@ class Projekt(Beschreibung):
                       analyse: QuerschnittsanalyseEintrag) -> None:
         """
         Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-        Querschnitt, einer mit E_eq; ein Beton des Projekts und zwei eigene
+        Querschnitt, beide mit E_eq; ein Beton des Projekts und zwei eigene
         Materialien -- Stahl und ein weicherer Beton --, ein Stab mit dem
         Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
         keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager mit
@@ -737,7 +737,8 @@ class Projekt(Beschreibung):
             "trapez": s.querschnitt("Fundamentbalken", "trapez", b_o=600.0, b_u=400.0, h=500.0),
         }
         s.querschnitt_mit_kennwerten("Von Hand", A=15000.0, I=120.0)
-        s.querschnitt_aus("Deckenstreifen", "platte", decke)
+        # E_eq der Platte -- in x, Zug unten --, auch ohne Stab gesucht und hergeleitet.
+        s.querschnitt_aus("Deckenstreifen", "platte", decke, E_eq={"M": 20.0})
         kasten = s.querschnitt_aus("Kasten", "analyse", analyse, E_eq={"N": -100.0, "M": 200.0})
         gebettet = s.linie((0, 0), (8, 0), querschnitt=q["rechteck"], material=beton,
                            quer="feder", k_quer=20000.0)

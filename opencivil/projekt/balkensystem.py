@@ -101,9 +101,10 @@ STABMATERIALARTEN = ("beton", "eigen")
 #: Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
 E_MODULE = ("e0", "e_eq")
 
-#: Die Arten eines Querschnitts, die ein E_eq haben: nur der gezeichnete
-#: Querschnitt hat eine Momenten-Kruemmungs-Linie mit seiner Bewehrung.
-E_EQ_ARTEN = ("analyse",)
+#: Die Arten eines Querschnitts, die ein E_eq haben: eine Platte -- immer in
+#: x-Richtung, Zug unten (Benutzer, 2026-10-24) -- und eine Querschnittsanalyse;
+#: nur sie haben eine Momenten-Kruemmungs-Linie mit ihrer Bewehrung.
+E_EQ_ARTEN = ("platte", "analyse")
 
 #: Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der
 #: Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine
@@ -268,11 +269,12 @@ class StabmaterialEintrag(Beschreibung):
 @dataclass
 class ModulEintrag(Beschreibung):
     """
-    Wie das E_eq eines Querschnitts aus einer Querschnittsanalyse entsteht:
-    bei ``N`` und ``M``, Zug positiv und ``M > 0`` mit Zug unten -- auf der
-    gestrichelten Faser des Stabs. Gerechnet wie eine Momenten-Kruemmungs-
-    Linie der Analyse, mit Kriechzahl, Wertesatz und Rechenart wie dort
-    (Benutzer, 2026-10-23).
+    Wie das E_eq eines Querschnitts aus einer Platte oder Querschnittsanalyse
+    entsteht: bei ``N`` und ``M``, Zug positiv und ``M > 0`` mit Zug unten --
+    auf der gestrichelten Faser des Stabs; bei einer Platte immer in
+    x-Richtung, und ``M`` zieht unten (Benutzer, 2026-10-24). Gerechnet wie
+    eine Momenten-Kruemmungs-Linie ihrer Spannung-Dehnung-Analyse, mit
+    Kriechzahl, Wertesatz und Rechenart wie dort (Benutzer, 2026-10-23).
     """
 
     N: float = bereich(0.0, heisst="N für E_eq", einheit=KN)
@@ -326,8 +328,8 @@ class StabquerschnittEintrag(Beschreibung):
         2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
         """
         if self.e_modul == "e_eq" and self.art not in E_EQ_ARTEN:
-            return ("ein E_eq gibt es nur bei einem Querschnitt aus einer "
-                    "Querschnittsanalyse – nur er hat eine Momenten-Krümmungs-Linie.")
+            return ("ein E_eq gibt es nur bei einem Querschnitt aus einer Platte oder "
+                    "Querschnittsanalyse – nur sie haben eine Momenten-Krümmungs-Linie.")
         if self.art == "vorlage":
             vorlage = self.stabvorlage()
             fremd = [k for k in self.masse if k not in vorlage.vorgaben()]

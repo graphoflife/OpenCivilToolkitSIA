@@ -1,5 +1,5 @@
 ---
-erzeugt: f98b619bb383
+erzeugt: 254cb156b204
 art: modul
 tags: [modul]
 ---
@@ -39,6 +39,14 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
 ```
 
 Woher A und I eines Querschnitts kommen -- die Platte oder Analyse dazu muss es geben.
+
+### _modulfrage
+
+```python
+def _modulfrage(q: StabquerschnittEintrag, quelle) -> Optional[Modulfrage]
+```
+
+Die Frage nach dem E_eq eines Querschnitts -- nur, wenn er es nehmen soll.
 
 ### _paare
 

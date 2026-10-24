@@ -375,11 +375,6 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `BETONKENNWERTE`). Für Verformungen im
       Gebrauch ist ein gerissener Stahlbetonbalken weicher, unter Dauerlast
       kriecht er; die Schnittgrössen eines unbestimmten Systems hängen daran.
-- [ ] **E_eq einer Platte?** Ein Stab gemäss Querschnitt mit einer Platte
-      rechnet mit E₀ = E_cm; E_eq gibt es nur aus einer Querschnittsanalyse.
-      Für eine Platte bräuchte es die Richtung (x oder y) und eine Antwort,
-      wie ein negatives Moment gerechnet wird -- Entscheid des Benutzers
-      offen (gefragt 2026-10-24).
 - [ ] **Platte als Stabquerschnitt.** Eingebaut: ein Streifen b × h mit den
       Formeln des Rechtecks, ohne Bewehrung -- b ist die betrachtete Breite
       der Platte.

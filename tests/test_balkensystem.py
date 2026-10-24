@@ -13,9 +13,11 @@ from opencivil.projekt import (
     StablastEintrag,
 )
 from opencivil.projekt.balkensystem import MATERIAL_DES_QUERSCHNITTS
+from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.linie import moment_kruemmung
 from opencivil.spannungsanalyse.modul import aequivalenter_modul
+from opencivil.spannungsanalyse.platte import loeserpaar
 from opencivil.spannungsanalyse.schnitt import schnittpaar
 from opencivil.web import dienst
 
@@ -873,12 +875,12 @@ class TestEeq(unittest.TestCase):
         self.assertIn("kein E_eq", meldungen[0])
         self.assertIn("Biegewiderstand", meldungen[0])
 
-    def test_nur_aus_einer_analyse(self):
+    def test_nur_aus_platte_oder_analyse(self):
         p = traeger()
         p.balkensysteme[0].querschnitte[0].e_modul = "e_eq"
         meldungen = [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
-        self.assertTrue(any("nur bei einem Querschnitt aus einer Querschnittsanalyse" in m
-                            for m in meldungen), meldungen)
+        self.assertTrue(any("nur bei einem Querschnitt aus einer Platte oder Querschnittsanalyse"
+                            in m for m in meldungen), meldungen)
 
     def test_herleitung(self):
         p, q = self.projekt(M=80.0)
@@ -886,3 +888,60 @@ class TestEeq(unittest.TestCase):
         for wort in ("Äquivalenter E-Modul, «Unterzug»", "der Querschnitt gilt gerissen",
                      "E-Modul, «Unterzug» (E_eq)", "Biegesteifigkeit, «Unterzug» mit E_eq"):
             self.assertIn(wort, text)
+
+
+class TestEeqPlatte(unittest.TestCase):
+    """
+    E_eq aus einer Platte: immer in x-Richtung, Zug unten (Benutzer,
+    2026-10-24) -- an derselben Stelle wie die Linie M–E_eq der Platte.
+    """
+
+    def projekt(self, **eq):
+        """Der Träger mit dem Streifen der Platte «Decke» (h = 250 mm, M_Riss = 29 kNm)."""
+        p = traeger()
+        s = p.balkensysteme[0]
+        q = s.querschnitt_aus("Streifen", "platte", p.platte("Decke", h=250), E_eq=eq)
+        s.linien[0].querschnitt = q.kennung
+        s.linien[0].material = MATERIAL_DES_QUERSCHNITTS
+        return p, q
+
+    def linie(self, e, q):
+        """Die Linie M–E_eq der Platte in x, gerechnet wie in ihrer Spannung-Dehnung-Analyse."""
+        werte = e.loesung.werte
+        paar = loeserpaar(e.aufbau.querschnitte["q1"], Richtung.X,
+                          lambda kid: werte[kid].groesse.si, q.eq.wahl)
+        return aequivalenter_modul(moment_kruemmung(paar, N=0.0), I_c=paar.I_c, A_c=paar.A_c,
+                                   E_cm=paar.E_cm)
+
+    def test_ungerissen_wie_der_anfang_der_linie(self):
+        p, q = self.projekt(M=20.0)
+        e = p.rechnen()
+        E = e.wert(f"balkensystem.r1.{q.kennung}.E").groesse.si
+        self.assertAlmostEqual(E, self.linie(e, q).ungerissen, delta=1e-6 * E)
+
+    def test_gerissen_auf_der_linie(self):
+        p, q = self.projekt(M=40.0)
+        e = p.rechnen()
+        E = e.wert(f"balkensystem.r1.{q.kennung}.E").groesse.si
+        punkte = [pt for pt in self.linie(e, q).punkte if pt.gerissen and pt.modul is not None]
+        vor = max((pt for pt in punkte if pt.kraft <= 40e3), key=lambda pt: pt.kraft)
+        nach = min((pt for pt in punkte if pt.kraft >= 40e3), key=lambda pt: pt.kraft)
+        self.assertLessEqual(min(vor.modul, nach.modul), E)
+        self.assertLessEqual(E, max(vor.modul, nach.modul))
+        A = e.wert(f"balkensystem.r1.{q.kennung}.A").groesse.si
+        self.assertAlmostEqual(
+            e.wert(f"balkensystem.r1.{q.kennung}.{MATERIAL_DES_QUERSCHNITTS}.EA").groesse.si,
+            E * A, delta=1e-6 * E * A)
+
+    def test_ein_negatives_moment_hat_keines(self):
+        p, q = self.projekt(M=-10.0)
+        meldungen = [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
+        self.assertEqual(len(meldungen), 1)
+        self.assertIn("negatives Moment hat keines", meldungen[0])
+
+    def test_herleitung(self):
+        p, q = self.projekt(M=40.0)
+        text = str(p.rechnen().bericht())
+        self.assertIn("Platte «Decke», x-Richtung, Zug unten", text)
+        self.assertIn("der Querschnitt gilt gerissen", text)
+

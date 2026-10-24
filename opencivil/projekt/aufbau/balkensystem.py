@@ -22,7 +22,7 @@ from opencivil.projekt.balkensystem import (
     StabquerschnittEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler
-from opencivil.spannungsanalyse.modul import Modulfrage
+from opencivil.spannungsanalyse.modul import ModulAusAnalyse, ModulAusPlatte, Modulfrage
 from opencivil.stabwerk.rechnung import Balkensystem, Stabmaterial, Stabquerschnitt
 from opencivil.stabwerk.system import Meldung
 
@@ -71,7 +71,8 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
                                 f"'{q.bezug}', die es im Projekt nicht gibt.")
         return Stabquerschnitt(q.kennung, q.name, q.art, bezug=q.bezug,
                                quelle={"b": platte.id_von("b"), "h": platte.id_von("h")},
-                               herkunft=f"Platte «{platte.name}»")
+                               herkunft=f"Platte «{platte.name}»",
+                               eq=_modulfrage(q, ModulAusPlatte(platte)))
     analyse = aufbau.querschnittsanalysen.get(q.bezug)
     if analyse is None and q.bezug in aufbau.leere_analysen:
         # Eine leere Analyse gibt es, nur traegt sie noch nichts: der Stab
@@ -86,8 +87,12 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
     return Stabquerschnitt(q.kennung, q.name, q.art, bezug=q.bezug,
                            quelle={"A": analyse.id_von("A"), "I": analyse.id_von("I_y")},
                            herkunft=f"Querschnittsanalyse «{analyse.name}»",
-                           eq=Modulfrage(analyse, q.eq.N, q.eq.M, q.eq.wahl)
-                           if q.e_modul == "e_eq" else None)
+                           eq=_modulfrage(q, ModulAusAnalyse(analyse)))
+
+
+def _modulfrage(q: StabquerschnittEintrag, quelle) -> Optional[Modulfrage]:
+    """Die Frage nach dem E_eq eines Querschnitts -- nur, wenn er es nehmen soll."""
+    return Modulfrage(quelle, q.eq.N, q.eq.M, q.eq.wahl) if q.e_modul == "e_eq" else None
 
 
 def _paare(eintrag: BalkensystemEintrag, modell: Modell, aufbau: Aufbau,

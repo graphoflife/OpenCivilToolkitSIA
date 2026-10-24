@@ -1,5 +1,5 @@
 ---
-erzeugt: c3e78278a422
+erzeugt: 600f3d91776d
 art: modul
 tags: [modul]
 ---
@@ -294,5 +294,6 @@ ersten Lage.
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.web.api]]

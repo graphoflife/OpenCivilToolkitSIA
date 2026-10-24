@@ -1,5 +1,5 @@
 ---
-erzeugt: f90ea76dc663
+erzeugt: 8911fa51fa11
 art: modul
 tags: [modul]
 ---
@@ -14,7 +14,9 @@ reiner, ungerissener, elastischer Betonquerschnitt braeuchte, um sich gleich
 stark zu kruemmen oder zu dehnen ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]). Und derselbe Modul
 an einer Stelle der Linie, fuer die Staebe eines Balkensystems
 ([[opencivil.spannungsanalyse.modul#modul_bei|modul_bei]], [[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]): dort geht er in die Rechnung ein,
-darum rechnet ihn das Rechenwerk, nicht die Auswertung danach.
+darum rechnet ihn das Rechenwerk, nicht die Auswertung danach. Gefragt wird
+eine Querschnittsanalyse ([[opencivil.spannungsanalyse.modul#ModulAusAnalyse|ModulAusAnalyse]]) oder eine Platte
+([[opencivil.spannungsanalyse.modul#ModulAusPlatte|ModulAusPlatte]]).
 
 ## Inhalt
 
@@ -174,6 +176,79 @@ Was die Suche nach E_eq fand: die Stelle -- oder warum es keine gibt.
 - `stelle: Optional[Modulstelle]`
 - `grund: str = ''`
 
+### ModulAusAnalyse
+
+```python
+@dataclass(frozen=True)
+class ModulAusAnalyse
+```
+
+Woher das E_eq kommt: eine Querschnittsanalyse -- das Paar ihrer
+Spannung-Dehnung-Analyse in der Zugrichtung des Moments
+([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]).
+
+- `analyse: Any` – Die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]].
+
+#### ModulAusAnalyse.text
+
+```python
+@property
+def text(self) -> str
+```
+
+#### ModulAusAnalyse.bezuege
+
+```python
+def bezuege(self, wahl: Rechenwahl) -> List[Eingabebezug]
+```
+
+Was das Paar liest: Schwerpunkt, Werkstoffe, Flaeche und Traegheitsmomente.
+
+#### ModulAusAnalyse.paar
+
+```python
+def paar(self, M: float, wert: Callable[[str], float], wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]
+```
+
+Das Paar zur Zugseite von `M`, wie sie heisst -- ohne Paar warum.
+
+### ModulAusPlatte
+
+```python
+@dataclass(frozen=True)
+class ModulAusPlatte
+```
+
+Woher das E_eq kommt: eine Platte -- immer in x-Richtung und mit Zug
+unten (Benutzer, 2026-10-24), das Paar ihrer Spannung-Dehnung-Analyse
+([[opencivil.spannungsanalyse.platte#loeserpaar|loeserpaar]]). Ein negatives
+Moment hat darum kein E_eq: es zoege oben.
+
+- `platte: Any` – Der [[opencivil.querschnitt.platte#Plattenquerschnitt|Plattenquerschnitt]].
+
+#### ModulAusPlatte.text
+
+```python
+@property
+def text(self) -> str
+```
+
+#### ModulAusPlatte.bezuege
+
+```python
+def bezuege(self, wahl: Rechenwahl) -> List[Eingabebezug]
+```
+
+Was das Paar liest: Dicke und Breite in x, der Beton, die Lagen in x.
+
+#### ModulAusPlatte.paar
+
+```python
+def paar(self, M: float, wert: Callable[[str], float], wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]
+```
+
+Das Paar in x mit Zug unten -- ohne Paar warum.
+
 ### Modulfrage
 
 ```python
@@ -181,12 +256,12 @@ Was die Suche nach E_eq fand: die Stelle -- oder warum es keine gibt.
 class Modulfrage
 ```
 
-Das E_eq eines gezeichneten Querschnitts bei `N` in kN (Zug positiv)
-und `M` in kNm (positiv mit Zug unten), fuer die Staebe eines
-Balkensystems mit ihm (Benutzer, 2026-10-23) -- gerechnet mit `wahl`
-wie eine Spannung-Dehnung-Analyse.
+Das E_eq eines Querschnitts bei `N` in kN (Zug positiv) und `M` in
+kNm (positiv mit Zug unten), fuer die Staebe eines Balkensystems mit
+ihm (Benutzer, 2026-10-23) -- gerechnet mit `wahl` wie eine
+Spannung-Dehnung-Analyse ihrer `quelle`.
 
-- `analyse: Any` – Die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]].
+- `quelle: Any` – [[opencivil.spannungsanalyse.modul#ModulAusAnalyse|ModulAusAnalyse]] oder [[opencivil.spannungsanalyse.modul#ModulAusPlatte|ModulAusPlatte]].
 - `N: float`
 - `M: float`
 - `wahl: Rechenwahl`
@@ -210,12 +285,11 @@ Modul fand -- und die ID der Suche.
 class ModulProzedur(Prozedur)
 ```
 
-Sucht das E_eq einer [[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]: mit dem Paar der
-Spannung-Dehnung-Analyse in der Zugrichtung des Moments
-([[opencivil.spannungsanalyse.schnitt#schnittpaar|schnittpaar]]), an der Stelle
-der M-E_eq-Linie ([[opencivil.spannungsanalyse.modul#modul_bei|modul_bei]]). Ohne Ausgabe -- ihr Befund ist der
-[[opencivil.spannungsanalyse.modul#Modulbefund|Modulbefund]], und die Herleitung sagt, was sie fand. So haelt
-ein Moment ueber dem Widerstand nur das System auf, nicht das Projekt.
+Sucht das E_eq einer [[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]: mit dem Paar ihrer Quelle, an
+der Stelle der M-E_eq-Linie ([[opencivil.spannungsanalyse.modul#modul_bei|modul_bei]]). Ohne Ausgabe -- ihr
+Befund ist der [[opencivil.spannungsanalyse.modul#Modulbefund|Modulbefund]], und die Herleitung sagt, was sie
+fand. So haelt ein Moment ueber dem Widerstand nur das System auf, nicht
+das Projekt.
 
 #### ModulProzedur.rechne
 
@@ -248,6 +322,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> dict
 ## Konstanten
 
 - `NULLKRAFT = 1e-06` – Unter diesem Anteil der groessten Kraft der Linie gilt eine Kraft als null -- der erste Punkt einer gerissen beginnenden Linie traegt null bis auf die Schranke des Loesers.
+- `OHNE_BEWEHRUNG = 'ohne sie gibt es keine Momenten-Krümmungs-Linie.'` – Was eine Suche ohne Bewehrung sagt -- in der Analyse und in der Platte.
 
 ## Braucht
 
@@ -256,10 +331,13 @@ def rechne(self, e: Eingaben, p: Protokoll) -> dict
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.art]]
 - [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.schnitt]]
 
 ## Gebraucht von

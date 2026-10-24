@@ -1,12 +1,12 @@
 ---
-erzeugt: d0a905a84b2f
+erzeugt: c2cef0f407bd
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «Äquivalenter E-Modul, «Kasten»»*
+*In der Herleitung: «Äquivalenter E-Modul, «Deckenstreifen»»*
 
 $$
 E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}
@@ -26,7 +26,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{200\,\mathrm{kNm}}{13275\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00277\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 5441\,\mathrm{N}/\mathrm{mm}^{2}
+E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{20\,\mathrm{kNm}}{2250\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00025\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 35903\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ## Im Code

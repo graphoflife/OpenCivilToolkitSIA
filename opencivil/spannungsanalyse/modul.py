@@ -7,7 +7,9 @@ reiner, ungerissener, elastischer Betonquerschnitt braeuchte, um sich gleich
 stark zu kruemmen oder zu dehnen (:class:`Modullinie`). Und derselbe Modul
 an einer Stelle der Linie, fuer die Staebe eines Balkensystems
 (:func:`modul_bei`, :class:`Modulfrage`): dort geht er in die Rechnung ein,
-darum rechnet ihn das Rechenwerk, nicht die Auswertung danach.
+darum rechnet ihn das Rechenwerk, nicht die Auswertung danach. Gefragt wird
+eine Querschnittsanalyse (:class:`ModulAusAnalyse`) oder eine Platte
+(:class:`ModulAusPlatte`).
 """
 
 from __future__ import annotations
@@ -22,10 +24,13 @@ from opencivil.core.einheiten import KN, KNM, MIO_MM4, N_PRO_MM2, Groesse
 from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wert import Quelle, WertDef
 from opencivil.material.basis import mit_index
+from opencivil.nachweis.rechenwahl import betonbezuege, lagenbezuege
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
+from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.art import Analyseart
 from opencivil.spannungsanalyse.linie import Linie, Paar
+from opencivil.spannungsanalyse.platte import loeserpaar
 from opencivil.spannungsanalyse.schnitt import schnittpaar
 
 
@@ -245,17 +250,85 @@ class Modulbefund:
     grund: str = ""
 
 
+#: Was eine Suche ohne Bewehrung sagt -- in der Analyse und in der Platte.
+OHNE_BEWEHRUNG = "ohne sie gibt es keine Momenten-Krümmungs-Linie."
+
+
 @dataclass(frozen=True)
-class Modulfrage:
+class ModulAusAnalyse:
     """
-    Das E_eq eines gezeichneten Querschnitts bei ``N`` in kN (Zug positiv)
-    und ``M`` in kNm (positiv mit Zug unten), fuer die Staebe eines
-    Balkensystems mit ihm (Benutzer, 2026-10-23) -- gerechnet mit ``wahl``
-    wie eine Spannung-Dehnung-Analyse.
+    Woher das E_eq kommt: eine Querschnittsanalyse -- das Paar ihrer
+    Spannung-Dehnung-Analyse in der Zugrichtung des Moments
+    (:func:`~opencivil.spannungsanalyse.schnitt.schnittpaar`).
     """
 
     analyse: Any
     """Die :class:`~opencivil.querschnitt.analyse.Querschnittsanalyse`."""
+
+    @property
+    def text(self) -> str:
+        return f"Querschnittsanalyse «{self.analyse.name}»"
+
+    def bezuege(self, wahl: Rechenwahl) -> List[Eingabebezug]:
+        """Was das Paar liest: Schwerpunkt, Werkstoffe, Flaeche und Traegheitsmomente."""
+        return [*self.analyse.grundbezuege(),
+                *(Eingabebezug(k, self.analyse.id_von(k)) for k in ("A", "I_y", "I_z", "I_yz"))]
+
+    def paar(self, M: float, wert: Callable[[str], float],
+             wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]:
+        """Das Paar zur Zugseite von ``M``, wie sie heisst -- ohne Paar warum."""
+        seite = Zugseite.UNTEN if M >= 0.0 else Zugseite.OBEN
+        paar = schnittpaar(self.analyse, seite, wert, wahl)
+        grund = "" if paar else f"der Querschnitt hat keine Bewehrung – {OHNE_BEWEHRUNG}"
+        return paar, seite.beschriftung, grund
+
+
+@dataclass(frozen=True)
+class ModulAusPlatte:
+    """
+    Woher das E_eq kommt: eine Platte -- immer in x-Richtung und mit Zug
+    unten (Benutzer, 2026-10-24), das Paar ihrer Spannung-Dehnung-Analyse
+    (:func:`~opencivil.spannungsanalyse.platte.loeserpaar`). Ein negatives
+    Moment hat darum kein E_eq: es zoege oben.
+    """
+
+    platte: Any
+    """Der :class:`~opencivil.querschnitt.platte.Plattenquerschnitt`."""
+
+    @property
+    def text(self) -> str:
+        return f"Platte «{self.platte.name}»"
+
+    def bezuege(self, wahl: Rechenwahl) -> List[Eingabebezug]:
+        """Was das Paar liest: Dicke und Breite in x, der Beton, die Lagen in x."""
+        beton = self.platte.beton
+        return [Eingabebezug("h", self.platte.id_von("h")),
+                Eingabebezug("b", self.platte.id_breite(Richtung.X)),
+                *betonbezuege(wahl.satz, beton), Eingabebezug("f_ctm", beton.id_von("f_ctm")),
+                *lagenbezuege(self.platte.posten_in_richtung(Richtung.X), wahl.satz)]
+
+    def paar(self, M: float, wert: Callable[[str], float],
+             wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]:
+        """Das Paar in x mit Zug unten -- ohne Paar warum."""
+        seite = "x-Richtung, Zug unten"
+        if M < 0.0:
+            return None, seite, ("bei einer Platte zieht das Moment für E_eq unten – ein "
+                                 "negatives Moment hat keines.")
+        paar = loeserpaar(self.platte, Richtung.X, wert, wahl)
+        return paar, seite, "" if paar else f"in x-Richtung liegt keine Bewehrung – {OHNE_BEWEHRUNG}"
+
+
+@dataclass(frozen=True)
+class Modulfrage:
+    """
+    Das E_eq eines Querschnitts bei ``N`` in kN (Zug positiv) und ``M`` in
+    kNm (positiv mit Zug unten), fuer die Staebe eines Balkensystems mit
+    ihm (Benutzer, 2026-10-23) -- gerechnet mit ``wahl`` wie eine
+    Spannung-Dehnung-Analyse ihrer ``quelle``.
+    """
+
+    quelle: Any
+    """:class:`ModulAusAnalyse` oder :class:`ModulAusPlatte`."""
 
     N: float
     M: float
@@ -289,19 +362,16 @@ class Modulfrage:
 
 class ModulProzedur(Prozedur):
     """
-    Sucht das E_eq einer :class:`Modulfrage`: mit dem Paar der
-    Spannung-Dehnung-Analyse in der Zugrichtung des Moments
-    (:func:`~opencivil.spannungsanalyse.schnitt.schnittpaar`), an der Stelle
-    der M-E_eq-Linie (:func:`modul_bei`). Ohne Ausgabe -- ihr Befund ist der
-    :class:`Modulbefund`, und die Herleitung sagt, was sie fand. So haelt
-    ein Moment ueber dem Widerstand nur das System auf, nicht das Projekt.
+    Sucht das E_eq einer :class:`Modulfrage`: mit dem Paar ihrer Quelle, an
+    der Stelle der M-E_eq-Linie (:func:`modul_bei`). Ohne Ausgabe -- ihr
+    Befund ist der :class:`Modulbefund`, und die Herleitung sagt, was sie
+    fand. So haelt ein Moment ueber dem Widerstand nur das System auf, nicht
+    das Projekt.
     """
 
     def __init__(self, frage: Modulfrage, *, id: str, N_id: str, M_id: str, name: str,
                  abschnitt: Abschnitt) -> None:
-        analyse = frage.analyse
-        bezuege = [*analyse.grundbezuege(),
-                   *(Eingabebezug(k, analyse.id_von(k)) for k in ("A", "I_y", "I_z", "I_yz")),
+        bezuege = [*frage.quelle.bezuege(frage.wahl),
                    Eingabebezug("N", N_id), Eingabebezug("M", M_id)]
         super().__init__(id, ausgaben=[], bezuege=bezuege, abschnitt=abschnitt,
                          titel=f"Äquivalenter E-Modul, «{name}»")
@@ -309,26 +379,21 @@ class ModulProzedur(Prozedur):
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         N, M = e.g("N").si, e.g("M").si
-        seite = Zugseite.UNTEN if M >= 0.0 else Zugseite.OBEN
-        paar = schnittpaar(self.frage.analyse, seite, e.si_nach_id(), self.frage.wahl)
-        if paar is None:
-            befund = Modulbefund(None, "der Querschnitt hat keine Bewehrung – ohne sie gibt "
-                                       "es keine Momenten-Krümmungs-Linie.")
-        else:
-            befund = Modulbefund(*modul_bei(paar, N=N, M=abs(M)))
+        paar, seite, grund = self.frage.quelle.paar(M, e.si_nach_id(), self.frage.wahl)
+        befund = (Modulbefund(None, grund) if paar is None
+                  else Modulbefund(*modul_bei(paar, N=N, M=abs(M))))
         self._schreiben(p, seite, befund)
         return Ausfuehrung({}, befund=befund)
 
-    def _schreiben(self, p: Protokoll, seite: Zugseite, befund: Modulbefund) -> None:
+    def _schreiben(self, p: Protokoll, seite: str, befund: Modulbefund) -> None:
         p.erklaerung(
             "Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, "
             "ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich "
             "stark zu krümmen wie der bewehrte. An derselben Stelle wie die Linie "
-            "M–E_eq der Querschnittsanalyse: ungerissen bis zum Rissmoment, darüber "
-            "gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA und EI "
-            "jedes Stabs mit diesem Querschnitt.")
-        p.text(f"Querschnittsanalyse «{self.frage.analyse.name}», {seite.beschriftung}, "
-               f"{self.frage.wahl.beschriftung}.")
+            "M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, "
+            "darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA "
+            "und EI jedes Stabs mit diesem Querschnitt und seinem Material.")
+        p.text(f"{self.frage.quelle.text}, {seite}, {self.frage.wahl.beschriftung}.")
         s = befund.stelle
         if s is None:
             p.text(f"Kein E_eq: {befund.grund}")

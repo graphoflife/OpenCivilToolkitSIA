@@ -1,6 +1,6 @@
 # Voll
 
-399 Berechnungen ausgeführt, 653 Werte bestimmt.
+402 Berechnungen ausgeführt, 655 Werte bestimmt.
 
 ## Herleitung
 
@@ -9754,6 +9754,34 @@ $$
 I_{\text{Q10}} = 13275\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
+**Normalkraft für E\_eq, «Deckenstreifen»**
+
+$$
+N_{\text{Q9}} = 0\,\mathrm{kN}
+$$
+
+**Moment für E\_eq, «Deckenstreifen»**
+
+$$
+M_{\text{Q9}} = 20\,\mathrm{kNm}
+$$
+
+Platte «Decke», x-Richtung, Zug unten, Präzise ohne Vereinfachung, φ = 0, Bemessung.
+
+**Rissmoment bei dieser Normalkraft**
+
+$$
+M_{Riss} = 41.4\,\mathrm{kNm}
+$$
+
+Das Moment liegt nicht über dem Rissmoment: der Querschnitt gilt ungerissen.
+
+**Äquivalenter E-Modul, «Deckenstreifen»**
+
+$$
+E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{20\,\mathrm{kNm}}{2250\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00025\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 35903\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
 **Normalkraft für E\_eq, «Kasten»**
 
 $$
@@ -11676,7 +11704,7 @@ $$
 
 ### Stabquerschnitte
 
-Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich stark zu krümmen wie der bewehrte. An derselben Stelle wie die Linie M–E\_eq der Querschnittsanalyse: ungerissen bis zum Rissmoment, darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA und EI jedes Stabs mit diesem Querschnitt.
+Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich stark zu krümmen wie der bewehrte. An derselben Stelle wie die Linie M–E\_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA und EI jedes Stabs mit diesem Querschnitt und seinem Material.
 
 **Querschnittsfläche, «Balken 300×500» (Rechteck)**
 
@@ -11768,7 +11796,7 @@ $$
 I_{\text{Q7}} = \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o}\right)^{2} + 4 \cdot b_{o} \cdot b_{u} + \left(b_{u}\right)^{2}\right)}{36 \cdot \left(b_{o} + b_{u}\right)}
 $$
 
-**Äquivalenter E-Modul, «Kasten»**
+**Äquivalenter E-Modul, «Deckenstreifen»**
 
 $$
 E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}
@@ -12478,6 +12506,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Flächenträgheitsmoment, Von Hand | $I_{\text{Q8}}$ | $120$ | ·10⁶ mm⁴ | Eingabe |
 | Querschnittsfläche, Deckenstreifen | $A_{\text{Q9}}$ | $300000$ | mm² | berechnet |
 | Flächenträgheitsmoment, Deckenstreifen | $I_{\text{Q9}}$ | $2250$ | ·10⁶ mm⁴ | berechnet |
+| Moment für E\_eq, Deckenstreifen | $M_{\text{Q9}}$ | $20$ | kNm | Eingabe |
+| Normalkraft für E\_eq, Deckenstreifen | $N_{\text{Q9}}$ | $0$ | kN | Eingabe |
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Querschnittsfläche, Rechteck | $A$ | $180000$ | mm² | berechnet |
 | Flächenträgheitsmoment, Rechteck | $I$ | $5400$ | ·10⁶ mm⁴ | berechnet |

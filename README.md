@@ -442,10 +442,10 @@ von Hand; Betonstahl ist keines. Ein neues System bekommt den ersten Beton
 des Projekts. Eine Linie nimmt eines davon oder -- kommt ihr Querschnitt
 aus einer Platte oder Analyse -- deren Beton («gemäss Querschnitt»); dann
 stehen an der Linie nur solche Querschnitte zur Wahl. Mit dem Material
-gemäss Querschnitt rechnet ein Stab mit E₀ = E_cm oder -- aus einer
-Analyse -- mit E_eq bei N und M, wie ihre Linie M–E_eq es dort hat, für EA
-und EI; der Schalter dafür steht am Querschnitt, sobald eine Linie ihn so
-nimmt. Darunter die Querschnitte, je einer eine Zeile: links sein Bild,
+gemäss Querschnitt rechnet ein Stab mit E₀ = E_cm oder mit E_eq bei N und
+M, wie die Linie M–E_eq der Analyse oder Platte es dort hat -- bei einer
+Platte immer in x-Richtung mit Zug unten --, für EA und EI; der Schalter
+dafür steht am Querschnitt, sobald eine Linie ihn so nimmt. Darunter die Querschnitte, je einer eine Zeile: links sein Bild,
 daneben Name, A und I und woher er kommt. Ein Klick auf das Bild -- und ein
 neuer Querschnitt gleich -- öffnet sein Fenster: woher A und I kommen, die
 Vorlage als Auswahlliste mit ihrem Bild und den Massen, die Kennwerte, die

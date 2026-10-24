@@ -65,7 +65,7 @@ const HILFE = {
       ['Platte', 'ein Streifen b × h der gewählten Platte'],
       ['Analyse', 'A und I_y des Bruttoquerschnitts'],
       ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, bei einer Analyse auf Wunsch E_eq bei N und M, für EA und EI'],
-      ['E_eq', 'wie die Linie M–E_eq der Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten'],
+      ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten -- bei einer Platte immer in x-Richtung, Zug unten'],
       ['Steifigkeit', 'EA, EI am ungerissenen Bruttoquerschnitt -- nach Vorgabe'],
     ],
     formel: 'EA = E · A   EI = E · I',
@@ -506,7 +506,9 @@ function querschnittFenster(system, kennung) {
     }), feldangabe('modul', name).einheit);
     zeilen.push(
       zahl('N', 50, 'Normalkraft, bei der E_eq gilt -- Zug positiv'),
-      zahl('M', 10, 'Moment, bei dem E_eq gilt -- positiv zieht es unten, an der gestrichelten Faser'),
+      zahl('M', 10, q.art === 'platte'
+        ? 'Moment, bei dem E_eq gilt -- bei einer Platte in x-Richtung mit Zug unten, nicht negativ'
+        : 'Moment, bei dem E_eq gilt -- positiv zieht es unten, an der gestrichelten Faser'),
       rechenwahlZeile('Rechenwerte wie in der Analyse', q.eq, eq,
         { arten: 'faserarten', phiImmer: true }),
     );

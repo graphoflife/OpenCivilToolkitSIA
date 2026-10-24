@@ -44,6 +44,26 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-24 · Balkensystem: E_eq auch aus einer Platte
+
+Entscheid des Benutzers: E_eq gibt es auch für einen Querschnitt aus einer
+Platte -- immer in x-Richtung, Zug unten.
+
+- **Eine Suche, zwei Quellen:** die Frage nach E_eq (`Modulfrage`) hat eine
+  Quelle: `ModulAusAnalyse` -- das Paar der Analyse zur Zugseite des
+  Moments, wie bisher -- oder `ModulAusPlatte`, das Paar der Platte in x
+  (`loeserpaar`). Jede Quelle sagt, was sie liest (die Bezüge im
+  Rechenwerk) und welches Paar gilt; Suche, Herleitung und E aus dem
+  Befund sind dieselben.
+- **Negatives Moment:** bei der Platte zieht es unten, nach Vorgabe; ein
+  negatives M hat darum kein E_eq, und das System sagt es -- still mit |M|
+  zu rechnen, hiesse die Zahl umzudeuten.
+- **Prüfprojekt:** der Deckenstreifen bekommt ein E_eq bei 20 kNm, ohne
+  Stab -- gesucht und hergeleitet wird es trotzdem, keine Zahl des Systems
+  ändert sich.
+
+---
+
 ## 2026-10-24 · Balkensystem: Querschnitte als Zeilen mit Bild und Fenster
 
 Wunsch des Benutzers: jeder Querschnitt eine kompakte Zeile, links eine
@@ -107,7 +127,6 @@ Wahl E₀ oder E_eq, wenn eine Linie sein Material nimmt.
 - **Beispiele:** im Prüfprojekt sind Stahl (E_s, ρ_s) und der weichere
   Fundamentbeton (E = 15000) eigene Materialien -- jede Zahl des Berichts
   bleibt, nur die Namen wechseln.
-- **Offen:** E_eq einer Platte (siehe [[TODO]]).
 
 ---
 
