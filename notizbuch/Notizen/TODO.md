@@ -84,6 +84,82 @@ gelernt wurde, steht in [[Entwicklung]].
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
 
+## Umbau: Befunde der Strukturdurchsicht vom 2026-10-25
+
+Vier Durchsichten über das ganze Repo, jeder Punkt am Code nachgeprüft.
+Behoben sind 1.1 (eine Zuweisung an ein fehlendes Feld) und 1.2 (Doppeltes
+im Balkensystem), siehe [[Entwicklung]]. Was in den Abschnitten darunter
+schon steht, steht hier nicht noch einmal: die Grundlage der Apps mit
+Zeichenfenster, die `Fallauswertung`, der Posten als `Postenbezug`, die
+Dateien über 1000 Zeilen, «fest» als `math.inf`, `Unterprotokoll`.
+
+- [ ] **Das Urteil jedes Nachweises ist von Hand gebaut** (22-mal
+      `NachweisUrteil(`). Es ist schon auseinandergelaufen: «unbeschränkt»
+      heisst sonst ∞, aber `1e9` in `richtungsnachweise.py` und
+      `schubwandnachweis.py`; bei Biegung und Normalkraft zeigen Tabelle und
+      Herleitung verschiedene Einwirkungen (Vorzeichen gegen Betrag); «nicht
+      führbar» wird auf vier Arten behandelt. Besser: der `Vergleich` aus
+      `spannungsbegrenzung.py` in den Kern, mit Grad, ∞-Regel, Satz und
+      Zeile der Herleitung, dazu `Nachweis.urteil(…)` und
+      `nicht_fuehrbar(…)`. Ersetzt «neun Nachweise bauen ihr Urteil je
+      selbst» unten.
+- [ ] **Sechs eigene Zwischenspeicher für Nebenanfragen** (`qa_zeichnung.js`,
+      `bs_zeichnung.js`, `qa_diagramme.js`, `bs_diagramme.js`, `app.js`,
+      `bericht.js`) mit drei Regeln für Fehler: ohne Antwort des Kerns
+      bleibt die Querschnittsanalyse still ohne Geometrie, das
+      Balkensystem zeigt den Fehler. Besser `nachgefragt(schluessel,
+      abdruck, holen)` mit `{daten, alt, fehler}` -- gehört zur Grundlage
+      der Apps mit Zeichenfenster unten.
+- [ ] **Der Adapter des Zeichenfensters ist ein Sammelsurium:** 32 Glieder,
+      14 davon braucht nur eine App. Das Fenster gibt den Namen des
+      Werkzeugs weiter, und die App verzweigt danach erneut. Besser: das
+      Verhalten an die Tabellen der Werkzeuge und Arten hängen, die das
+      Fenster ohnehin durchläuft; ebenfalls Teil von `cadApp`.
+- [ ] **Arten als Text oder Schalter statt als eigener Typ**, an fünf Orten:
+      - `einachsig` steht 50-mal in den Nachweisen, die Regel ist viermal
+        kopiert. Besser einmal in der Analyse auflösen: `UmY` oder `Schief`.
+      - Querkraft: zwei Nachweise hinter `buegel is None` (`querkraft.py`);
+        der Befund trägt beide Hälften als «vielleicht leer» bis in
+        `diagrammdaten.py`. Besser `QuerkraftOhneBuegel` und
+        `QuerkraftMitBuegeln`.
+      - Bewehrung der Querschnittsanalyse: lose Datensätze mit der Art als
+        Text, rund zwei Dutzend Weichen in fünf Modulen. Besser: die
+        Zeichnung macht jedes Element einmal zu Einzelstab, Stablinie oder
+        verschmierter Linie, mit `flaeche` und `als_bewehrung()`.
+      - Art des Stabquerschnitts: verzweigt in Beschreibung, Aufbau,
+        `rechnung.py` (zwei fast gleiche Zweige), `balkendaten.py` und
+        zehnmal im JS. Besser `Querschnittsart` als Wahl mit
+        `bringt_material` und `hat_e_eq`, je Art ein Objekt mit
+        `berechnungen()` und `umriss()`.
+      - M–χ oder N–ε als Ja/Nein, rund 12-mal in der Spannungsanalyse.
+        Besser ein Wert `Linienart`.
+- [ ] **Webschicht und Oberfläche rechnen nach, neu dazugekommen** (zum
+      Punkt «Keine Rechnung und keine Norm in der Oberfläche» unten):
+      `api.py` rechnet Wandlänge und a_sw/s nach, obwohl die Formel in
+      `analyse.py` steht; `diagrammdaten.py` den Erfüllungsgrad der
+      Schubwand; `bs_zeichnung.js` kopiert die Lastrichtungen aus dem Kern;
+      Einheiten und Stellen der Diagramme stehen in `bs_diagramme.js` neben
+      `balkendaten.py`; `plattenkapitel.js` wiederholt «x/d ≤ 0.35», «L/350»
+      und eine Normstelle.
+- [ ] **«Eine neue Bauteilart kommt nur in BAUTEILE» stimmt nicht mehr.** Die
+      Setzung berührte rund elf Stellen ausserhalb ihrer zwei Module. Der
+      Aufbau führt dieselbe Sache in drei Registern (`aufbau/kern.py`), die
+      `zuordnung` ist je Art von Hand geschrieben, zwei Blöcke wortgleich
+      (`api.py`); `bericht.js` lässt eine fehlende Art still weg,
+      `bericht/zusammenfassung.py` findet die Art durch Probieren. Besser:
+      der Aufbau führt nur die Bauteile, die `zuordnung` entsteht in einer
+      Schleife, `angaben` wird ein Feld der Bauteilart.
+- [ ] **Der Katalog listet Felder von Hand** (`api.py`): 11 von 25 Klassen mit
+      Einheiten, die übrigen schreibt die Oberfläche selbst («M_Ed [kNm]»
+      in `plattenkapitel.js`). Besser ein Durchgang über den Baum der
+      Beschreibung, wie `lesen.py` ihn abläuft.
+- [ ] **Kleineres:** zwei Kataloge von Querschnittsvorlagen
+      (`querschnitt/vorlagen.py`, `stabwerk/querschnitte.py`), die Prüfung
+      des T-Querschnitts läuft auseinander (`>=` gegen `>`) · die Regel für
+      den Namen eines Stahlkennwerts steht zweimal (`stahlname`,
+      `Querschnittsanalyse._name`) · sieben Helfer bauen SVG-Pfade, und die
+      Diagramme kennen zwei Regime für Farben.
+
 ## Umbau: liegen geblieben bei der Durchsicht vom 2026-10-18
 
 Vier Durchsichten (Wiederverwendung, Vereinfachung, Effizienz, Wurzel) über
@@ -212,8 +288,10 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
       `querkraft.py` (zwei Nachweise hinter `if self.buegel is not None`:
       Fachwerk, ohne Bügel, mit Bügeln; die Regel für d_v steht in Kurve und
-      Nachweis je einmal), `stil.css` (ein Blatt je App). Stand 2026-10-17:
-      stil.css 2248 Zeilen, cad_fenster.js 1066, querkraft.py 1131.
+      Nachweis je einmal), `stil.css` (ein Blatt je App). Stand 2026-10-25:
+      stil.css 2348 Zeilen, querkraft.py 1188, cad_fenster.js 1138, dazu
+      `querschnitt/platte.py` mit 1003 (die Helfer der Posten und
+      `Lagenaufbau` in ein eigenes Modul, zusammen mit dem `Postenbezug`).
       `nachweise.js`, `spannungsanalyse.py` und `aufbau.py` sind geteilt,
       `querschnittsloeser.py` liegt bei 914.
 - [ ] **Der Posten als `Postenbezug` statt als 5-Tupel.** Ein
