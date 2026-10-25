@@ -261,8 +261,11 @@ class Paar(Protocol):
                                    bruch: "Grenzzustand", oben: "Wert", unten: "Wert",
                                    h: "Wert") -> None: ...
 
-    def herleitung_bezug(self, p: "Protokoll", w: "Zwischenwerte", momente: bool,
-                         ein: Callable[[str], "Wert"], h: "Wert") -> "Wert": ...
+    def herleitung_traegheit(self, p: "Protokoll", w: "Zwischenwerte",
+                             ein: Callable[[str], "Wert"], h: "Wert") -> "Wert": ...
+
+    def herleitung_flaeche(self, p: "Protokoll", w: "Zwischenwerte",
+                           ein: Callable[[str], "Wert"], h: "Wert") -> "Wert": ...
 
 
 # ===========================================================================

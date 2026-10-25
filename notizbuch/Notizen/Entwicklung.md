@@ -44,6 +44,19 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Spannung-Dehnung-Analyse: Moment oder Normalkraft ohne Schalter
+
+Aus der Strukturdurchsicht: ob eine Linie über dem Moment läuft (M–χ und
+der Modul darüber) oder über der Normalkraft, reisten die Herleitungen als
+Ja/Nein `momente` weiter, bis in das Paar der Platte und des gezeichneten
+Querschnitts, das den reinen Betonquerschnitt je nach Schalter als I_c
+oder A_c schrieb. Jetzt hat das Paar dafür zwei Methoden
+(`herleitung_traegheit`, `herleitung_flaeche`), und wer fragt, fragt die
+Art der Analyse (`Analyseart.ueber_moment`) statt sie mit einer Konstanten
+zu vergleichen. Für den Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Vorlagen: Rechteck, T und Kreis einmal gezeichnet
 
 Aus der Strukturdurchsicht: die Vorlagen der Querschnittsanalyse

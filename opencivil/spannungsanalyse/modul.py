@@ -140,7 +140,7 @@ def aequivalenter_modul(linie: Linie, *, I_c: float, A_c: float, E_cm: float) ->
     Verformung ohne laufende Kraft. ``I_c`` und ``A_c`` sind der reine
     Betonquerschnitt, an dem sich der Modul misst.
     """
-    momente = linie.art is Analyseart.MOMENT_KRUEMMUNG
+    momente = linie.art.ueber_moment
     art = Analyseart.MOMENT_EMODUL if momente else Analyseart.NORMALKRAFT_EMODUL
     bezug = I_c if momente else A_c
     if not linie.punkte:

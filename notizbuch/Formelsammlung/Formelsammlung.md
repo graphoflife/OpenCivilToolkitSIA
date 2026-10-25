@@ -1,5 +1,5 @@
 ---
-erzeugt: 4f726d63fa1b
+erzeugt: d9ee3d9caf73
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -291,7 +291,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fläche eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
-- [[Fläche eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bezug|Loeserpaar.herleitung_bezug]], [[opencivil.stabwerk.querschnitte]]
+- [[Fläche eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_flaeche|Loeserpaar.herleitung_flaeche]], [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
@@ -299,7 +299,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
-- [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bezug|Loeserpaar.herleitung_bezug]], [[opencivil.stabwerk.querschnitte]]
+- [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_traegheit|Loeserpaar.herleitung_traegheit]], [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
 - [[Gewollte Ausmitte]] · [[opencivil.nachweis.knicken#Knickverfahren|Knickverfahren._protokoll_fall]]

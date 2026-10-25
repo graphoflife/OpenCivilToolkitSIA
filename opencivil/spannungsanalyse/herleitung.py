@@ -21,7 +21,6 @@ from opencivil.material.basis import mit_index
 from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz, betongesetz, wirksamer_modul
 from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen
-from opencivil.spannungsanalyse.art import Analyseart
 from opencivil.spannungsanalyse.linie import Linie, Paar
 from opencivil.spannungsanalyse.modul import Modullinie
 
@@ -49,11 +48,11 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
     Querschnitts. Was nur die Art des Bauteils weiss -- die Tiefe, der Riss,
     die Dehnung am Ende, der reine Betonquerschnitt --, schreibt es selbst
     (``tiefe``, ``herleitung_riss``, ``herleitung_dehnung_am_ende``,
-    ``herleitung_bezug``); der Rest ist derselbe Text.
+    ``herleitung_traegheit`` und ``herleitung_flaeche``); der Rest ist
+    derselbe Text.
     """
     ab = len(p.bloecke)
     w = Zwischenwerte(f"{raum}.analyse.{re.sub(r'[^0-9A-Za-z]+', '_', fall.name)}")
-    momente = linie.art is Analyseart.MOMENT_KRUEMMUNG
 
     def ein(name: str) -> "Wert":
         return werte[paar.ids[name]]
@@ -153,7 +152,7 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
             tiefe = w.laenge("h_theta", r"h_{\vartheta}", b.ebene.loeser.h,
                              "Tiefe des Betons senkrecht zur Nulllinie")
             zeichen = r" \cdot \cos\left(@theta\right)"
-        if momente:
+        if linie.art.ueber_moment:
             p.formel(w.kruemmung("chi_u", r"\chi_{u}", b.verformung),
                      r"\frac{@eps_unten - @eps_oben}{@h}" + zeichen,
                      {"eps_unten": unten, "eps_oben": oben, "h": tiefe,
@@ -163,22 +162,18 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
             paar.herleitung_dehnung_am_ende(p, w, b, oben, unten, tiefe)
         p.text(f"Massgebend: {b.massgebend}.")
     if modul is not None:
-        _herleitung_modul(p, w, modul,
-                          bezug=lambda: paar.herleitung_bezug(p, w, momente, ein, h),
-                          bezugsort=paar.bezugsort)
+        _herleitung_modul(p, w, modul, paar, ein, h)
     p.herkunft_stempeln(THEMA, ab=ab)
 
 
-def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
-                      bezug: Callable[[], "Wert"], bezugsort: str) -> None:
+def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, paar: Paar,
+                      ein: Callable[[str], "Wert"], h: "Wert") -> None:
     """
     Der aequivalente Modul: der reine Betonquerschnitt, die Formel und der
     Modul an den Ecken der Linie -- jede Zeile mit Kraft und Verformung, also
-    von Hand nachzurechnen. ``bezug`` schreibt den reinen Betonquerschnitt
-    hin, wie ihn die Art des Bauteils kennt, und gibt ihn zurueck;
-    ``bezugsort`` sagt, wo die Mitteldehnung gilt.
+    von Hand nachzurechnen. Den reinen Betonquerschnitt schreibt das Paar
+    hin, wie die Art des Bauteils ihn kennt.
     """
-    momente = modul.art is Analyseart.MOMENT_EMODUL
     p.erklaerung(
         "Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt "
         "bräuchte – ungerissen, ohne Stahl, elastisch –, um sich unter der laufenden "
@@ -186,8 +181,8 @@ def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
         "ab dem Zustand ohne laufende Kraft: was die festgehaltene Kraft allein "
         "verformt, kann ein solcher Querschnitt nicht abbilden. Ist sie null, ist es "
         "genau M = E·I·χ bzw. N = E·A·ε.")
-    if momente:
-        bezug()
+    if modul.art.ueber_moment:
+        paar.herleitung_traegheit(p, w, ein, h)
         p.ansatz(r"E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}",
                  titel="Äquivalenter E-Modul über dem Moment")
         p.wert(w.kruemmung("chi_0", r"\chi_0", modul.null),
@@ -195,11 +190,11 @@ def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
         kopf = [Mathe(r"M\ [\mathrm{kNm}]"), Mathe(r"\chi - \chi_0\ [\mathrm{m}^{-1}]")]
         verformung = lambda v: f"{v - modul.null:.5f}"
     else:
-        bezug()
+        paar.herleitung_flaeche(p, w, ein, h)
         p.ansatz(r"E_{eq} = \frac{N}{A_c \cdot \left(\varepsilon_m - \varepsilon_0\right)}",
                  titel="Äquivalenter E-Modul über der Normalkraft")
         p.wert(w.dehnung("eps_0", r"\varepsilon_0", modul.null, stellen=4),
-               titel=f"Dehnung {bezugsort} ohne Normalkraft, unter dem festen Moment")
+               titel=f"Dehnung {paar.bezugsort} ohne Normalkraft, unter dem festen Moment")
         kopf = [Mathe(r"N\ [\mathrm{kN}]"), Mathe(r"\varepsilon_m - \varepsilon_0\ [‰]")]
         verformung = lambda v: f"{(v - modul.null) * 1e3:.4f}"
 

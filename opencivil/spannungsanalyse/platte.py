@@ -21,7 +21,6 @@ from opencivil.nachweis.rissgroessen import (
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.platte import Richtung
-from opencivil.spannungsanalyse.art import Analyseart
 from opencivil.spannungsanalyse.linie import (
     SUCHE_DER_ANALYSEN, FesteNulllinie, Grenzzustand, Linie, Zustaende,
 )
@@ -138,7 +137,7 @@ class Loeserpaar:
     def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: Linie,
                         ein: Callable[[str], "Wert"], h: "Wert") -> None:
         """Wo die Linie reisst: das Rissmoment bei N, oder die Rissnormalkraft bei M."""
-        if linie.art is Analyseart.MOMENT_KRUEMMUNG:
+        if linie.art.ueber_moment:
             p.erklaerung(
                 "Am Bruttoquerschnitt reisst der Rand, wenn N/A + M/W = f_ct,eff. Mit "
                 "A = b·h und W = b·h²/6 hebt Druck das Rissmoment, Zug senkt es. Beim "
@@ -173,16 +172,19 @@ class Loeserpaar:
                  {"eps_oben": oben, "eps_unten": unten},
                  titel="Grösste Dehnung auf halber Höhe")
 
-    def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool,
-                         ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
-        """Der reine Betonquerschnitt des aequivalenten Moduls -- ein Rechteck b·h."""
-        if momente:
-            bezug = w.wert("I_c", "I_c", Groesse.aus_si(self.I_c, MIO_MM4), stellen=1)
-            p.formel(bezug, r"\frac{@b \cdot \left(@h\right)^{3}}{12}",
-                     {"b": ein("b"), "h": h},
-                     titel="Reiner Betonquerschnitt: Flächenmoment",
-                     name="Flächenträgheitsmoment eines Rechtecks")
-            return bezug
+    def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte,
+                             ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
+        """Der reine Betonquerschnitt des Moduls ueber dem Moment -- ein Rechteck b·h."""
+        bezug = w.wert("I_c", "I_c", Groesse.aus_si(self.I_c, MIO_MM4), stellen=1)
+        p.formel(bezug, r"\frac{@b \cdot \left(@h\right)^{3}}{12}",
+                 {"b": ein("b"), "h": h},
+                 titel="Reiner Betonquerschnitt: Flächenmoment",
+                 name="Flächenträgheitsmoment eines Rechtecks")
+        return bezug
+
+    def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte,
+                           ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
+        """Der reine Betonquerschnitt des Moduls ueber der Normalkraft -- ein Rechteck b·h."""
         bezug = w.flaeche("A_c", "A_c", self.A_c)
         p.formel(bezug, r"@b \cdot @h", {"b": ein("b"), "h": h},
                  titel="Reiner Betonquerschnitt: Fläche", name="Fläche eines Rechtecks")

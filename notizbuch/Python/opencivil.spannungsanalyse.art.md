@@ -1,5 +1,5 @@
 ---
-erzeugt: 558a7b274dcc
+erzeugt: 557b115a5113
 art: modul
 tags: [modul]
 ---
@@ -56,6 +56,17 @@ def linie(self) -> Optional['Analyseart']
 Die Linie, auf der diese Frage laeuft: M-chi oder N-eps -- der Modul
 ist dieselbe Linie, umgerechnet. `None` fuer die beiden Bilder.
 
+#### Analyseart.ueber_moment
+
+```python
+@property
+def ueber_moment(self) -> bool
+```
+
+Ob die Linie ueber dem Moment laeuft -- die M-chi-Linie und der Modul
+ueber ihr; sonst ueber der Normalkraft. Fuer die Linien gefragt, nicht
+fuer die beiden Bilder.
+
 #### Analyseart.eingaben
 
 ```python
@@ -85,8 +96,5 @@ Ob gefragt ist, welchen E-Modul ein reiner Betonquerschnitt braeuchte.
 
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.spannungsanalyse.analysen]]
-- [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.modul]]
-- [[opencivil.spannungsanalyse.platte]]
-- [[opencivil.spannungsanalyse.schnitt]]

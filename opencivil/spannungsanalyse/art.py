@@ -61,6 +61,15 @@ class Analyseart(Wahl):
         }.get(self)
 
     @property
+    def ueber_moment(self) -> bool:
+        """
+        Ob die Linie ueber dem Moment laeuft -- die M-chi-Linie und der Modul
+        ueber ihr; sonst ueber der Normalkraft. Fuer die Linien gefragt, nicht
+        fuer die beiden Bilder.
+        """
+        return self.linie is Analyseart.MOMENT_KRUEMMUNG
+
+    @property
     def eingaben(self) -> Tuple[str, ...]:
         """
         Die Felder des Falls, die diese Frage braucht, in der Folge der Maske:
@@ -71,7 +80,7 @@ class Analyseart(Wahl):
             return ("N_Ed", "M_Ed")
         if self is Analyseart.DEHNUNGEN:
             return ("eps_oben", "eps_unten")
-        return ("N_Ed",) if self.linie is Analyseart.MOMENT_KRUEMMUNG else ("M_Ed",)
+        return ("N_Ed",) if self.ueber_moment else ("M_Ed",)
 
     @property
     def modul(self) -> bool:

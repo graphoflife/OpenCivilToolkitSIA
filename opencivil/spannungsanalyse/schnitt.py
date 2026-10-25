@@ -94,7 +94,6 @@ from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.interaktion import Querschnitt
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
-from opencivil.spannungsanalyse.art import Analyseart
 from opencivil.spannungsanalyse.linie import (
     SUCHE_DER_ANALYSEN, Dehnungsebene, FesteNulllinie, Grenzzustand, Linie, Zustaende,
 )
@@ -489,7 +488,6 @@ class Schnittpaar:
                         ein: Callable[[str], "Wert"], h: "Wert") -> None:
         """Der Riss am Bruttoquerschnitt: Widerstandsmoment, Zugfestigkeit, Risskraft."""
         A, I = ein("A"), ein("I")
-        momente = linie.art is Analyseart.MOMENT_KRUEMMUNG
         if self.einachsig:
             oben, unten = self.seite.raender
             v = w.laenge("v_z", "v_z", self.gerissen.unten,
@@ -511,7 +509,7 @@ class Schnittpaar:
                 "Zugfestigkeit zuerst erreicht – bei einem unsymmetrischen Querschnitt eine "
                 "Ecke, nicht der ganze Rand.")
             protokoll_spannung_ungerissen(p, self.brutto.biegung)
-        if momente:
+        if linie.art.ueber_moment:
             ecke = self.riss.ecke
             if not self.einachsig:
                 protokoll_ecke(p, ecke)
@@ -580,14 +578,17 @@ class Schnittpaar:
                   "h": h},
                  titel="Grösste Dehnung im Schwerpunkt")
 
-    def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool,
-                         ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
-        """Der reine Betonquerschnitt des aequivalenten Moduls: der Bruttoquerschnitt."""
-        if not momente:
-            bezug = w.flaeche("A_c", "A_c", self.A)
-            p.erklaerung("Der reine Betonquerschnitt ist der Bruttoquerschnitt: A_c = A.")
-            p.wert(bezug, titel="Reiner Betonquerschnitt")
-            return bezug
+    def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte,
+                           ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
+        """Der reine Betonquerschnitt des Moduls ueber der Normalkraft: der Bruttoquerschnitt."""
+        bezug = w.flaeche("A_c", "A_c", self.A)
+        p.erklaerung("Der reine Betonquerschnitt ist der Bruttoquerschnitt: A_c = A.")
+        p.wert(bezug, titel="Reiner Betonquerschnitt")
+        return bezug
+
+    def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte,
+                             ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
+        """Der reine Betonquerschnitt des Moduls ueber dem Moment: der Bruttoquerschnitt."""
         bezug = w.wert("I_c", "I_c", Groesse.aus_si(self.I_c, MIO_MM4), stellen=1)
         if self.einachsig:
             p.erklaerung(f"Der reine Betonquerschnitt ist der Bruttoquerschnitt, um die "

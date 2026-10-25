@@ -4672,6 +4672,7 @@
         "Analyseart.beschriftung",
         "Analyseart.kurz",
         "Analyseart.linie",
+        "Analyseart.ueber_moment",
         "Analyseart.eingaben",
         "Analyseart.modul"
       ]
@@ -4736,7 +4737,8 @@
         "Paar.tiefe",
         "Paar.herleitung_riss",
         "Paar.herleitung_dehnung_am_ende",
-        "Paar.herleitung_bezug",
+        "Paar.herleitung_traegheit",
+        "Paar.herleitung_flaeche",
         "Linienpunkt",
         "Eckpunkt",
         "Grenzzustand",
@@ -4800,7 +4802,8 @@
         "Loeserpaar.tiefe",
         "Loeserpaar.herleitung_riss",
         "Loeserpaar.herleitung_dehnung_am_ende",
-        "Loeserpaar.herleitung_bezug",
+        "Loeserpaar.herleitung_traegheit",
+        "Loeserpaar.herleitung_flaeche",
         "loeserpaar"
       ]
     },
@@ -4836,7 +4839,8 @@
         "Schnittpaar.tiefe",
         "Schnittpaar.herleitung_riss",
         "Schnittpaar.herleitung_dehnung_am_ende",
-        "Schnittpaar.herleitung_bezug",
+        "Schnittpaar.herleitung_flaeche",
+        "Schnittpaar.herleitung_traegheit",
         "schnittpaar"
       ]
     },

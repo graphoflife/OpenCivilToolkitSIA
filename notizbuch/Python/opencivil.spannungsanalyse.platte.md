@@ -1,5 +1,5 @@
 ---
-erzeugt: 451caaa40ce6
+erzeugt: 999ab96b2118
 art: modul
 tags: [modul]
 ---
@@ -134,13 +134,21 @@ def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: 'Gre
 
 Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe.
 
-#### Loeserpaar.herleitung_bezug
+#### Loeserpaar.herleitung_traegheit
 
 ```python
-def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
 ```
 
-Der reine Betonquerschnitt des aequivalenten Moduls -- ein Rechteck b·h.
+Der reine Betonquerschnitt des Moduls ueber dem Moment -- ein Rechteck b·h.
+
+#### Loeserpaar.herleitung_flaeche
+
+```python
+def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+```
+
+Der reine Betonquerschnitt des Moduls ueber der Normalkraft -- ein Rechteck b·h.
 
 ### loeserpaar
 
@@ -169,7 +177,6 @@ nach -- er pruefte seine Kopie statt der echten.
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
-- [[opencivil.spannungsanalyse.art]]
 - [[opencivil.spannungsanalyse.linie]]
 
 ## Gebraucht von
@@ -180,8 +187,8 @@ nach -- er pruefte seine Kopie statt der echten.
 
 ## Formeln aus diesem Modul
 
-- [[Fläche eines Rechtecks]] · `Loeserpaar.herleitung_bezug`
-- [[Flächenträgheitsmoment eines Rechtecks]] · `Loeserpaar.herleitung_bezug`
+- [[Fläche eines Rechtecks]] · `Loeserpaar.herleitung_flaeche`
+- [[Flächenträgheitsmoment eines Rechtecks]] · `Loeserpaar.herleitung_traegheit`
 - [[Grösste Dehnung auf halber Höhe]] · `Loeserpaar.herleitung_dehnung_am_ende`
 - [[Rissmoment bei der Normalkraft]] · `Loeserpaar.herleitung_riss`
 - [[Rissnormalkraft beim Moment]] · `Loeserpaar.herleitung_riss`

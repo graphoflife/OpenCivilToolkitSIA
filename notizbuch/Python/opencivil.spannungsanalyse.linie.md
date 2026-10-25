@@ -1,5 +1,5 @@
 ---
-erzeugt: b6beac02ac7c
+erzeugt: fc1396e906cf
 art: modul
 tags: [modul]
 ---
@@ -276,10 +276,16 @@ def herleitung_riss(self, p: 'Protokoll', w: 'Zwischenwerte', linie: 'Linie', ei
 def herleitung_dehnung_am_ende(self, p: 'Protokoll', w: 'Zwischenwerte', bruch: 'Grenzzustand', oben: 'Wert', unten: 'Wert', h: 'Wert') -> None
 ```
 
-#### Paar.herleitung_bezug
+#### Paar.herleitung_traegheit
 
 ```python
-def herleitung_bezug(self, p: 'Protokoll', w: 'Zwischenwerte', momente: bool, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+def herleitung_traegheit(self, p: 'Protokoll', w: 'Zwischenwerte', ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+```
+
+#### Paar.herleitung_flaeche
+
+```python
+def herleitung_flaeche(self, p: 'Protokoll', w: 'Zwischenwerte', ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
 ```
 
 ### Linienpunkt

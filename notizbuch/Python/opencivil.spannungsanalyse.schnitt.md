@@ -1,5 +1,5 @@
 ---
-erzeugt: bb777b7668ce
+erzeugt: 871b750109e2
 art: modul
 tags: [modul]
 ---
@@ -388,13 +388,21 @@ def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: Gren
 
 Die Dehnung im Schwerpunkt am Ende -- dort greift N an; `h` senkrecht zur Nulllinie.
 
-#### Schnittpaar.herleitung_bezug
+#### Schnittpaar.herleitung_flaeche
 
 ```python
-def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
 ```
 
-Der reine Betonquerschnitt des aequivalenten Moduls: der Bruttoquerschnitt.
+Der reine Betonquerschnitt des Moduls ueber der Normalkraft: der Bruttoquerschnitt.
+
+#### Schnittpaar.herleitung_traegheit
+
+```python
+def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+```
+
+Der reine Betonquerschnitt des Moduls ueber dem Moment: der Bruttoquerschnitt.
 
 ### schnittpaar
 
@@ -429,7 +437,6 @@ aus einer Loesung.
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]
-- [[opencivil.spannungsanalyse.art]]
 - [[opencivil.spannungsanalyse.linie]]
 
 ## Gebraucht von
