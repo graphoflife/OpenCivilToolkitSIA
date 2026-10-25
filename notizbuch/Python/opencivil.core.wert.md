@@ -1,5 +1,5 @@
 ---
-erzeugt: c80204ece52e
+erzeugt: 5b93bb77c13b
 art: modul
 tags: [modul]
 ---
@@ -315,6 +315,8 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querkraft_buegel]]
+- [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]

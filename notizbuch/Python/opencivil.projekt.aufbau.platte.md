@@ -1,5 +1,5 @@
 ---
-erzeugt: bedbb0471a4b
+erzeugt: 12ae0ebcdf8e
 art: modul
 tags: [modul]
 ---
@@ -95,6 +95,8 @@ Eine Einwirkung -- welche Massstaebe es gibt, prueft ihr Feld.
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querkraft_buegel]]
+- [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.verformung]]

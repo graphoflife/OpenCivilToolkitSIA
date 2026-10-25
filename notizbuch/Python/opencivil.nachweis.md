@@ -1,5 +1,5 @@
 ---
-erzeugt: 5b18b83abd10
+erzeugt: c52148a42b9e
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,9 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
 - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
 - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
-- [[opencivil.nachweis.querkraft]] – Querkraftnachweis.
+- [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
+- [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.
+- [[opencivil.nachweis.querkraft_ohne_buegel]] – Querkraft ohne Querkraftbewehrung.
 - [[opencivil.nachweis.querschnittsloeser]] – Dehnungsebene zu gegebenen Schnittgrössen.
 - [[opencivil.nachweis.rechenwahl]] – womit ein Kapitel rechnet.
 - [[opencivil.nachweis.resistenzlinie]] – die Linie, gegen die der M-N-Nachweis haelt.

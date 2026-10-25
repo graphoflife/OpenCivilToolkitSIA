@@ -1,5 +1,5 @@
 ---
-erzeugt: 48c9c9650b35
+erzeugt: 944c86605c07
 art: formel
 tags: [formel]
 ---
@@ -37,7 +37,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.querkraft#protokoll_mit_buegeln|protokoll_mit_buegeln]]
+- [[opencivil.nachweis.querkraft_buegel#protokoll_mit_buegeln|protokoll_mit_buegeln]]
 
 ## Themen
 

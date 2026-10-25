@@ -33,12 +33,12 @@ Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
 zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung (dasselbe
 Muster wie das Knicken). Die Querkraft rechnet und schreibt mit den
-Funktionen ihres Nachweises: :func:`~opencivil.nachweis.querkraft.beiwert_k_g`,
-:func:`~opencivil.nachweis.querkraft.widerstand`,
-:func:`~opencivil.nachweis.querkraft.neigungen`, dazu
+Funktionen ihres Nachweises: :func:`~opencivil.nachweis.querkraft_ohne_buegel.beiwert_k_g`,
+:func:`~opencivil.nachweis.querkraft_ohne_buegel.widerstand`,
+:func:`~opencivil.nachweis.querkraft_buegel.neigungen`, dazu
 :func:`~opencivil.nachweis.querkraft.protokoll_hoehen`,
-:func:`~opencivil.nachweis.querkraft.protokoll_ohne_buegel` und
-:func:`~opencivil.nachweis.querkraft.protokoll_mit_buegeln`. Bis 2026-10-18
+:func:`~opencivil.nachweis.querkraft_ohne_buegel.protokoll_ohne_buegel` und
+:func:`~opencivil.nachweis.querkraft_buegel.protokoll_mit_buegeln`. Bis 2026-10-18
 standen ihre Zeilen hier ein zweites Mal.
 
 WAS DIE GRENZEN BEDEUTEN:
@@ -59,9 +59,12 @@ from opencivil.nachweis import linie as geo
 from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
 )
-from opencivil.nachweis.querkraft import (
-    Kurvenbeiwerte, beiwert_k_g, buegelteilung_y, lagen_von, neigungen, protokoll_hoehen,
-    protokoll_mit_buegeln, protokoll_ohne_buegel, tau_cd_wert, widerstand, zuglage,
+from opencivil.nachweis.querkraft import lagen_von, protokoll_hoehen, zuglage
+from opencivil.nachweis.querkraft_buegel import (
+    buegelteilung_y, neigungen, protokoll_mit_buegeln,
+)
+from opencivil.nachweis.querkraft_ohne_buegel import (
+    Kurvenbeiwerte, beiwert_k_g, protokoll_ohne_buegel, tau_cd_wert, widerstand,
 )
 from opencivil.querschnitt.fachwerk import beste_neigung
 from opencivil.nachweis.rechenwahl import bezuege_vereinen, stahlname

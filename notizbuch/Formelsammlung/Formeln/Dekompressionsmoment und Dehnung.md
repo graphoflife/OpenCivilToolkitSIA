@@ -1,5 +1,5 @@
 ---
-erzeugt: 6df3825dd76c
+erzeugt: dfb689f6fe2d
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_ansatz]]
+- [[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel|QuerkraftOhneBuegel._protokoll_ansatz]]
 
 ## Themen
 

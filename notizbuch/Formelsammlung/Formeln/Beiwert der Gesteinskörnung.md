@@ -1,5 +1,5 @@
 ---
-erzeugt: 721b3f731d03
+erzeugt: c3a191587147
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1"
@@ -36,7 +36,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.querkraft#beiwert_k_g|beiwert_k_g]]
+- [[opencivil.nachweis.querkraft_ohne_buegel#beiwert_k_g|beiwert_k_g]]
 
 ## Themen
 

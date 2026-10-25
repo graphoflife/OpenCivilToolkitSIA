@@ -44,6 +44,27 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Querkraft: zwei Nachweise, zwei Klassen
+
+Befund 3 der Strukturdurchsicht, zweiter Teil, und die längste Datei des
+Kerns: `querkraft.py` hatte 1188 Zeilen, und darin steckten zwei Nachweise
+hinter einem `buegel is None` -- der Ansatz ohne Bügel und das
+Fachwerkmodell. Ihr Befund trug beide Hälften als «vielleicht leer», das
+Fallergebnis die Zwischenwerte beider Ansätze.
+
+- **Drei Module:** `querkraft.py` hält, was beide teilen -- die Fälle, die
+  statische Höhe der gezogenen Bewehrung, die Ausgaben, das Urteil, die
+  letzte Zeile der Herleitung (335 Zeilen). `querkraft_ohne_buegel.py` hat
+  `QuerkraftOhneBuegel` mit der Kurve über dem Moment,
+  `querkraft_buegel.py` hat `QuerkraftMitBuegeln` mit dem Verlauf über der
+  Neigung -- je mit eigenem Befund und Fallergebnis.
+- **Gewählt wird im Aufbau der Platte**, einmal: Bügel oder nicht. Was ein
+  Ansatz liest, sagt er selbst (`_ansatzbezuege`); der Code ist sonst
+  wortgleich umgezogen.
+- Für den Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Die Art eines Stabquerschnitts als eigene Klasse
 
 Befund 3 der Strukturdurchsicht, erster Teil: Woher A und I eines Stabs

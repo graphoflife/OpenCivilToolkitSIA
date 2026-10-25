@@ -106,13 +106,10 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`, `Unterprotokoll`.
       Verhalten an die Tabellen der Werkzeuge und Arten hängen, die das
       Fenster ohnehin durchläuft; ebenfalls Teil von `cadApp`.
 - [ ] **Arten als Text oder Schalter statt als eigener Typ**, an fünf Orten
-      (die Art des Stabquerschnitts ist seit 2026-10-25 behoben):
+      (die Art des Stabquerschnitts und die Querkraft sind seit 2026-10-25
+      behoben):
       - `einachsig` steht 50-mal in den Nachweisen, die Regel ist viermal
         kopiert. Besser einmal in der Analyse auflösen: `UmY` oder `Schief`.
-      - Querkraft: zwei Nachweise hinter `buegel is None` (`querkraft.py`);
-        der Befund trägt beide Hälften als «vielleicht leer» bis in
-        `diagrammdaten.py`. Besser `QuerkraftOhneBuegel` und
-        `QuerkraftMitBuegeln`.
       - Bewehrung der Querschnittsanalyse: lose Datensätze mit der Art als
         Text, rund zwei Dutzend Weichen in fünf Modulen. Besser: die
         Zeichnung macht jedes Element einmal zu Einzelstab, Stablinie oder
@@ -272,12 +269,11 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 - [ ] **Dateien über 1000 Zeilen**, je entlang einer Naht, die schon da ist:
       `cad_fenster.js` (Bedienung, Rückgängig, Punkteingabe auslagern; die
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
-      `querkraft.py` (zwei Nachweise hinter `if self.buegel is not None`:
-      Fachwerk, ohne Bügel, mit Bügeln; die Regel für d_v steht in Kurve und
-      Nachweis je einmal), `stil.css` (ein Blatt je App). Stand 2026-10-25:
-      stil.css 2348 Zeilen, querkraft.py 1188, cad_fenster.js 1138, dazu
-      `querschnitt/platte.py` mit 1003 (die Helfer der Posten und
-      `Lagenaufbau` in ein eigenes Modul, zusammen mit dem `Postenbezug`).
+      `stil.css` (ein Blatt je App). Stand 2026-10-25: stil.css 2348 Zeilen,
+      cad_fenster.js 1138, dazu `querschnitt/platte.py` mit 1003 (die Helfer
+      der Posten und `Lagenaufbau` in ein eigenes Modul, zusammen mit dem
+      `Postenbezug`). `querkraft.py` ist geteilt (2026-10-25); die Regel für
+      d_v steht in Kurve und Nachweis ohne Bügel noch je einmal.
       `nachweise.js`, `spannungsanalyse.py` und `aufbau.py` sind geteilt,
       `querschnittsloeser.py` liegt bei 914.
 - [ ] **Der Posten als `Postenbezug` statt als 5-Tupel.** Ein

@@ -26,6 +26,8 @@ from opencivil.nachweis.verformung import Vergroesserungsfaktor, Verformung, Ver
 from opencivil.nachweis.kennzahlen import Plattenkennzahlen
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
+from opencivil.nachweis.querkraft_buegel import QuerkraftMitBuegeln
+from opencivil.nachweis.querkraft_ohne_buegel import QuerkraftOhneBuegel
 from opencivil.querschnitt.platte import Bewehrungslage, Plattenquerschnitt, Richtung
 from opencivil.projekt.eintraege import KombinationEintrag, VerformungsfallEintrag
 from opencivil.projekt.lesen import ProjektFehler
@@ -107,7 +109,9 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
                 faktor=faktor))
 
         # Auch ohne V_Ed: dann still, nur fuer das Diagramm und die Kennzahlen.
-        querkraft = Querkraft(
+        # Welcher Ansatz gilt, entscheidet allein, ob die Platte Buegel traegt.
+        ansatz = QuerkraftMitBuegeln if querschnitt.hat_buegel else QuerkraftOhneBuegel
+        querkraft = ansatz(
             querschnitt,
             [Querkraftfall(name=k.name,
                            V_Ed=Groesse(k.V_Ed, KN_PRO_M),

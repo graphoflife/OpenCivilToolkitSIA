@@ -3,7 +3,7 @@
 import unittest
 
 from opencivil.core.einheiten import EINHEITSLOS, KNM, KN_PRO_M
-from opencivil.nachweis import querkraft
+from opencivil.nachweis import querkraft_buegel, querkraft_ohne_buegel
 from opencivil.querschnitt import fachwerk
 from opencivil.projekt import Projekt
 
@@ -61,7 +61,7 @@ class TestQuerkraft(unittest.TestCase):
         hebt das auf 1.20 und senkt damit k_d -- er liegt auf der sicheren
         Seite.
         """
-        from opencivil.nachweis.querkraft import K_G_MINDEST
+        from opencivil.nachweis.querkraft_ohne_buegel import K_G_MINDEST
 
         # Der Beiwert steckt in k_d; rückgerechnet muss er den Riegel treffen.
         erg = querkraftbefund(projekt_mit_querkraft()).ergebnisse[0]
@@ -322,7 +322,7 @@ class TestQuerkraftkurve(unittest.TestCase):
         Fünfzig gleichmässige Stützstellen, dazu die beiden Seiten des Sprungs
         bei m_Rd -- ohne die stünde an der Marke der Wert des Nachbarpunkts.
         """
-        from opencivil.nachweis.querkraft import KURVENPUNKTE, KURVENZUGABE
+        from opencivil.nachweis.querkraft_ohne_buegel import KURVENPUNKTE, KURVENZUGABE
 
         ast = self.ast(self.befund().kurve(0.0), True)
         self.assertEqual(len(ast["punkte"]), KURVENPUNKTE + 2)
@@ -347,7 +347,7 @@ class TestQuerkraftkurve(unittest.TestCase):
 
         d, d_v = qk.beiwerte.hoehen(True)
         f_yd, E_s = qk.beiwerte.zugstahl[True]
-        punkt = querkraft.widerstand(
+        punkt = querkraft_ohne_buegel.widerstand(
             M_Ed=erg.fall.M_Ed.si, N_Ed=erg.fall.N_Ed.si, h=qk.beiwerte.h,
             d=d, d_v=d_v, tau_cd=qk.beiwerte.tau_cd, f_yd=f_yd,
             E_s=E_s, k_g=qk.beiwerte.k_g, m_Rd=abs(ast["m_Rd"]))
@@ -370,7 +370,7 @@ class TestQuerkraftkurve(unittest.TestCase):
 
     def test_der_plastische_wert_folgt_der_fliessdehnung(self):
         """eps_v = 1.5 · f_yd/E_s, von Hand nachgerechnet."""
-        from opencivil.nachweis.querkraft import PLASTISCH
+        from opencivil.nachweis.querkraft_ohne_buegel import PLASTISCH
 
         qk = self.befund()
         ast = self.ast(qk.kurve(0.0), True)
@@ -480,7 +480,7 @@ class TestBuegelformeln(unittest.TestCase):
                = 1.9635e-3 · 0.2349 · 434.78e6 · 1.7321
                = 347.3 kN/m
         """
-        q = querkraft.buegelwiderstand(alpha=30, **self.werte)
+        q = querkraft_buegel.buegelwiderstand(alpha=30, **self.werte)
         self.assertAlmostEqual(q.V_Rd_s / 1e3, 347.3, delta=0.2)
 
     def test_druckdiagonale_von_hand(self):
@@ -492,16 +492,16 @@ class TestBuegelformeln(unittest.TestCase):
 
         Je Laufmeter, wie V_Ed -- die betrachtete Breite steht nicht darin.
         """
-        q = querkraft.buegelwiderstand(alpha=30, **self.werte)
+        q = querkraft_buegel.buegelwiderstand(alpha=30, **self.werte)
         self.assertAlmostEqual(q.V_Rd_c / 1e3, 1118.9, delta=0.5)
 
     def test_massgebend_ist_das_kleinere(self):
-        q = querkraft.buegelwiderstand(alpha=30, **self.werte)
+        q = querkraft_buegel.buegelwiderstand(alpha=30, **self.werte)
         self.assertAlmostEqual(q.V_Rd, min(q.V_Rd_s, q.V_Rd_c))
 
     def test_der_buegelanteil_faellt_mit_steilerer_diagonale(self):
-        flach = querkraft.buegelwiderstand(alpha=30, **self.werte)
-        steil = querkraft.buegelwiderstand(alpha=45, **self.werte)
+        flach = querkraft_buegel.buegelwiderstand(alpha=30, **self.werte)
+        steil = querkraft_buegel.buegelwiderstand(alpha=45, **self.werte)
         self.assertGreater(flach.V_Rd_s, steil.V_Rd_s)
         self.assertLess(flach.V_Rd_c, steil.V_Rd_c)
 
@@ -510,7 +510,7 @@ class TestBuegelformeln(unittest.TestCase):
         Der Widerstand ist das Kleinere von beiden; gesucht ist dessen
         Höchstwert. Von Hand: das Maximum über alle ganzen Grade.
         """
-        punkte = querkraft.neigungen(alpha_min=25, alpha_max=60, **self.werte)
+        punkte = querkraft_buegel.neigungen(alpha_min=25, alpha_max=60, **self.werte)
         beste = fachwerk.beste_neigung(punkte)
         self.assertAlmostEqual(beste.V_Rd, max(q.V_Rd for q in punkte))
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 562183f201d3
+erzeugt: d4ffb008d276
 art: modul
 tags: [modul]
 ---
@@ -607,6 +607,8 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querkraft_buegel]]
+- [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]

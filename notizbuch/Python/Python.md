@@ -1,5 +1,5 @@
 ---
-erzeugt: 6157f4708ba4
+erzeugt: 187420524e21
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -54,7 +54,9 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
     - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
     - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
-    - [[opencivil.nachweis.querkraft]] – Querkraftnachweis.
+    - [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
+    - [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.
+    - [[opencivil.nachweis.querkraft_ohne_buegel]] – Querkraft ohne Querkraftbewehrung.
     - [[opencivil.nachweis.querschnittsloeser]] – Dehnungsebene zu gegebenen Schnittgrössen.
     - [[opencivil.nachweis.rechenwahl]] – womit ein Kapitel rechnet.
     - [[opencivil.nachweis.resistenzlinie]] – die Linie, gegen die der M-N-Nachweis haelt.

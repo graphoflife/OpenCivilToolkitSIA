@@ -1,5 +1,5 @@
 ---
-erzeugt: e9708991c12a
+erzeugt: af9e6259b1c6
 art: modul
 tags: [modul]
 ---
@@ -768,6 +768,8 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querkraft_buegel]]
+- [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]

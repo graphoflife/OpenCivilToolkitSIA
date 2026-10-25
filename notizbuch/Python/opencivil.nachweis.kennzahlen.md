@@ -1,5 +1,5 @@
 ---
-erzeugt: c8798a22894e
+erzeugt: 6c12ae7e474c
 art: modul
 tags: [modul]
 ---
@@ -44,12 +44,12 @@ Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
 zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung (dasselbe
 Muster wie das Knicken). Die Querkraft rechnet und schreibt mit den
-Funktionen ihres Nachweises: [[opencivil.nachweis.querkraft#beiwert_k_g|beiwert_k_g]],
-[[opencivil.nachweis.querkraft#widerstand|widerstand]],
-[[opencivil.nachweis.querkraft#neigungen|neigungen]], dazu
+Funktionen ihres Nachweises: [[opencivil.nachweis.querkraft_ohne_buegel#beiwert_k_g|beiwert_k_g]],
+[[opencivil.nachweis.querkraft_ohne_buegel#widerstand|widerstand]],
+[[opencivil.nachweis.querkraft_buegel#neigungen|neigungen]], dazu
 [[opencivil.nachweis.querkraft#protokoll_hoehen|protokoll_hoehen]],
-[[opencivil.nachweis.querkraft#protokoll_ohne_buegel|protokoll_ohne_buegel]] und
-[[opencivil.nachweis.querkraft#protokoll_mit_buegeln|protokoll_mit_buegeln]]. Bis 2026-10-18
+[[opencivil.nachweis.querkraft_ohne_buegel#protokoll_ohne_buegel|protokoll_ohne_buegel]] und
+[[opencivil.nachweis.querkraft_buegel#protokoll_mit_buegeln|protokoll_mit_buegeln]]. Bis 2026-10-18
 standen ihre Zeilen hier ein zweites Mal.
 
 
@@ -132,6 +132,8 @@ Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querkraft_buegel]]
+- [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.gesetzwahl]]

@@ -5,7 +5,7 @@ VERANTWORTUNG:
 Was ein Steg mit Buegeln bei einer Neigung der Druckdiagonalen aufnimmt
 (:func:`fachwerk`), und welche Neigung den groessten Widerstand gibt
 (:func:`beste_neigung`) -- fuer die Buegel einer Platte
-(:mod:`opencivil.nachweis.querkraft`) wie fuer eine Schubwand des
+(:mod:`opencivil.nachweis.querkraft_buegel`) wie fuer eine Schubwand des
 gezeichneten Querschnitts (:mod:`opencivil.querschnitt.schubwaende`). Zwei
 reine Funktionen, darum im Querschnitt: bis 2026-10-17 standen sie beim
 Querkraftnachweis, und die Schubwaende holten sie von dort.

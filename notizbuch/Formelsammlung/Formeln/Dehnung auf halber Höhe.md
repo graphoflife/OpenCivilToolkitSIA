@@ -1,5 +1,5 @@
 ---
-erzeugt: eb620ec75b15
+erzeugt: eb44d8daeb4e
 art: formel
 tags: [formel]
 ---
@@ -48,7 +48,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
+- [[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel._protokoll_fall|QuerkraftOhneBuegel._protokoll_fall]]
 
 ## Themen
 

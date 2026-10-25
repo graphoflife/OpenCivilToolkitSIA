@@ -1,5 +1,5 @@
 ---
-erzeugt: 041fb57d4eb8
+erzeugt: c7dd722d31e3
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Was ein Steg mit Buegeln bei einer Neigung der Druckdiagonalen aufnimmt
 ([[opencivil.querschnitt.fachwerk#fachwerk|fachwerk]]), und welche Neigung den groessten Widerstand gibt
 ([[opencivil.querschnitt.fachwerk#beste_neigung|beste_neigung]]) -- fuer die Buegel einer Platte
-([[opencivil.nachweis.querkraft]]) wie fuer eine Schubwand des
+([[opencivil.nachweis.querkraft_buegel]]) wie fuer eine Schubwand des
 gezeichneten Querschnitts ([[opencivil.querschnitt.schubwaende]]). Zwei
 reine Funktionen, darum im Querschnitt: bis 2026-10-17 standen sie beim
 Querkraftnachweis, und die Schubwaende holten sie von dort.
@@ -79,5 +79,5 @@ steilere Neigung, weil sie die Druckdiagonale weniger beansprucht.
 ## Gebraucht von
 
 - [[opencivil.nachweis.kennzahlen]]
-- [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.querschnitt.schubwaende]]

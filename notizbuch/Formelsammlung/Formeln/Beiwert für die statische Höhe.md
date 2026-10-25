@@ -1,5 +1,5 @@
 ---
-erzeugt: 09715cde2677
+erzeugt: 1988cd585382
 art: formel
 tags: [formel]
 ---
@@ -32,7 +32,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.querkraft#protokoll_ohne_buegel|protokoll_ohne_buegel]]
+- [[opencivil.nachweis.querkraft_ohne_buegel#protokoll_ohne_buegel|protokoll_ohne_buegel]]
 
 ## Themen
 

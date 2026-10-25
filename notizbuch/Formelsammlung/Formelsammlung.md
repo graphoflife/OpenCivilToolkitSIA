@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a5af39c87f5
+erzeugt: 7e984596ba19
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -255,7 +255,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Aufnehmbares Moment der Bewehrung]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_lage]]
 - [[Beide Lagen fliessen auf Zug]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Beiwert der Parabel]] · [[opencivil.querschnitt.werkstoffgesetz#Betongesetz.protokoll|Betongesetz.protokoll]]
-- [[Beiwert für die statische Höhe]] · [[opencivil.nachweis.querkraft#protokoll_ohne_buegel|protokoll_ohne_buegel]]
+- [[Beiwert für die statische Höhe]] · [[opencivil.nachweis.querkraft_ohne_buegel#protokoll_ohne_buegel|protokoll_ohne_buegel]]
 - [[Bemessungswert der Kohäsion]] · [[opencivil.geotechnik.grundbruch|_c_eff]]
 - [[Beton linear, ohne Zug]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Beton ungerissen, in Druck und Zug]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
@@ -273,11 +273,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegesteifigkeit]] · [[opencivil.stabwerk.rechnung|_biegesteifigkeit]]
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._waende_protokollieren]]
 - [[Dehnsteifigkeit]] · [[opencivil.stabwerk.rechnung|_dehnsteifigkeit]]
-- [[Dehnung auf halber Höhe]] · [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
+- [[Dehnung auf halber Höhe]] · [[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel._protokoll_fall|QuerkraftOhneBuegel._protokoll_fall]]
 - [[Dehnung der Zugbewehrung]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Dehnungsebene und innere Kräfte]] · [[opencivil.nachweis.querschnittsloeser#protokoll_verfahren|protokoll_verfahren]], [[opencivil.nachweis.schiefe_biegung#protokoll_dehnungsebene|protokoll_dehnungsebene]]
-- [[Dekompressionsmoment]] · [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
-- [[Dekompressionsmoment und Dehnung]] · [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_ansatz]]
+- [[Dekompressionsmoment]] · [[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel._protokoll_fall|QuerkraftOhneBuegel._protokoll_fall]]
+- [[Dekompressionsmoment und Dehnung]] · [[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel|QuerkraftOhneBuegel._protokoll_ansatz]]
 - [[Dickster Stab der Lage]] · [[opencivil.nachweis.mindestbewehrung#_protokoll_stahlspannung|_protokoll_stahlspannung]]
 - [[Drehung in die Achsen des Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
@@ -344,7 +344,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Statische Höhe]] · [[opencivil.querschnitt.platte#protokoll_statische_hoehe|protokoll_statische_hoehe]]
 - [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
-- [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_ansatz_buegel]]
+- [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]
 - [[Torsion in den Zellen (Bredt, mehrzellig)]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
@@ -353,8 +353,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wertigkeit im gerissenen Zustand]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_ansatz]]
 - [[Widerstand bei festgehaltenem M_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
 - [[Widerstand bei festgehaltenem N_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
-- [[Widerstand der Bügel]] · [[opencivil.nachweis.querkraft#protokoll_mit_buegeln|protokoll_mit_buegeln]]
-- [[Widerstand der Druckdiagonalen]] · [[opencivil.nachweis.querkraft#protokoll_mit_buegeln|protokoll_mit_buegeln]]
+- [[Widerstand der Bügel]] · [[opencivil.nachweis.querkraft_buegel#protokoll_mit_buegeln|protokoll_mit_buegeln]]
+- [[Widerstand der Druckdiagonalen]] · [[opencivil.nachweis.querkraft_buegel#protokoll_mit_buegeln|protokoll_mit_buegeln]]
 - [[Widerstand im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Widerstand in der Richtung der Einwirkung]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._ein_fall]]
 - [[Widerstandsmoment zum gezogenen Rand]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]

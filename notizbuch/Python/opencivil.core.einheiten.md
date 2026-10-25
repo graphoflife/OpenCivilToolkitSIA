@@ -1,5 +1,5 @@
 ---
-erzeugt: 49fe1a5de2e6
+erzeugt: c25f5a0e1a07
 art: modul
 tags: [modul]
 ---
@@ -457,6 +457,8 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querkraft_buegel]]
+- [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.rissgroessen]]

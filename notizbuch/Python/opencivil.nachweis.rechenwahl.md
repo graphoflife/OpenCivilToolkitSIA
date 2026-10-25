@@ -1,5 +1,5 @@
 ---
-erzeugt: 600f3d91776d
+erzeugt: 2e1d909e415c
 art: modul
 tags: [modul]
 ---
@@ -287,7 +287,7 @@ ersten Lage.
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
-- [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]

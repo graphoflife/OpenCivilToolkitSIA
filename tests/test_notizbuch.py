@@ -455,10 +455,10 @@ class TestBibliothek(unittest.TestCase):
         self.assertIn("## VORZEICHEN\n\n```\nN > 0   Zug\n", seite)
 
     def test_schwanz_einer_ueberschrift_beginnt_den_absatz(self):
-        seite = self.seiten["opencivil.nachweis.querkraft"]
+        seite = self.seiten["opencivil.nachweis.querkraft_buegel"]
         self.assertIn("## MIT BUEGELN\n\nFachwerkmodell, siehe "
-                      "[[opencivil.nachweis.querkraft#buegelwiderstand|buegelwiderstand]]:\n\n```\n",
-                      seite)
+                      "[[opencivil.nachweis.querkraft_buegel#buegelwiderstand|buegelwiderstand]]:"
+                      "\n\n```\n", seite)
 
     def test_eingerueckt_nach_text_setzt_den_absatz_fort(self):
         seite = self.seiten["opencivil.core.rechenwerk"]
@@ -472,7 +472,7 @@ class TestBibliothek(unittest.TestCase):
 
     def test_nur_python_ist_python(self):
         """Formeln in einem Docstring sind kein Python, ein Aufruf schon."""
-        querkraft = self.seiten["opencivil.nachweis.querkraft"]
+        querkraft = self.seiten["opencivil.nachweis.querkraft_ohne_buegel"]
         self.assertIn("## OHNE BUEGEL\n\n\n```\nV_Rd = k_d", querkraft)
         self.assertIn("```python\nwerk = Rechenwerk()", self.seiten["opencivil.core.rechenwerk"])
 
