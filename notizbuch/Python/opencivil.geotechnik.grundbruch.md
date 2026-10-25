@@ -1,5 +1,5 @@
 ---
-erzeugt: 38b59845796f
+erzeugt: 9e3ded1fef24
 art: modul
 tags: [modul]
 ---
@@ -169,7 +169,7 @@ Eine Spalte der Tragfähigkeitsformel: N, s, d, g und b' -- i hängt am Fall.
 
 ```python
 @dataclass
-class Fallergebnis
+class Fallergebnis(Fallausgang)
 ```
 
 Was der Grundbruch bei einer Kombination ergibt.
@@ -179,10 +179,8 @@ Was der Grundbruch bei einer Kombination ergibt.
 - `i: Dict[str, Optional[float]] = field(default_factory=dict)` – Die Lastneigungsfaktoren je Spalte -- `None`, wo es keinen gibt.
 - `sigma_f: float = 0.0`
 - `N_Rd: float = 0.0`
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
+- `ausgang: Ausgang = NICHT_FUEHRBAR`
 - `begruendung: str = ''`
-- `hinweis: str = ''`
 
 ### Grundbruchbefund
 

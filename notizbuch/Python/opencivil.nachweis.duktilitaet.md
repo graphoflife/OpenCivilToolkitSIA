@@ -1,5 +1,5 @@
 ---
-erzeugt: d4998c5d5f20
+erzeugt: a6dffa2d0a3d
 art: modul
 tags: [modul]
 ---
@@ -67,7 +67,7 @@ muss.
 
 ```python
 @dataclass
-class Lagenergebnis
+class Lagenergebnis(Fallausgang)
 ```
 
 Was der Nachweis fuer eine Lage gefunden hat.
@@ -79,17 +79,8 @@ Was der Nachweis fuer eine Lage gefunden hat.
 - `f_sd: float = 0.0` – Stahlspannung im Gleichgewicht -- die fliessende Bewehrung, in Pa.
 - `x: float = 0.0` – Druckzonenhoehe bei M_Ed = 0, in m.
 - `verhaeltnis: float = 0.0`
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
+- `ausgang: Ausgang = NICHT_FUEHRBAR` – x/d gegen (x/d)_max -- nicht fuehrbar ohne Bewehrung in der Lage.
 - `begruendung: str = ''`
-- `hinweis: str = ''`
-
-#### Lagenergebnis.machbar
-
-```python
-@property
-def machbar(self) -> bool
-```
 
 ### druckzonenhoehe
 
@@ -121,6 +112,7 @@ Querschnitt; welche Lagen er ansieht, sagt der Aufbau, und wie tief die
 Druckzone reichen darf, `grenze`.
 
 - `THEMA = 'Duktilität'`
+- `ART = 'D'`
 
 #### Duktilitaet.pruefe
 

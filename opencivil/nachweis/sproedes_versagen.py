@@ -37,10 +37,9 @@ from dataclasses import dataclass
 from typing import Dict, List, Sequence
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Fallbefund, Nachweis, NachweisUrteil, grad_def,
-    grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Fallbefund,
+    Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
@@ -51,21 +50,15 @@ from opencivil.querschnitt.platte import Bewehrungslage, Richtung
 
 
 @dataclass
-class Lagenergebnis:
-    """Was der Nachweis fuer eine Lage gefunden hat."""
+class Lagenergebnis(Fallausgang):
+    """Was der Nachweis fuer eine Lage gefunden hat: M_Rd gegen M_Riss."""
 
     lage: Bewehrungslage
     M_Rd: float = 0.0
     """Biegewiderstand bei N_Ed = 0 auf der Seite dieser Lage, in Nm (Betrag)."""
 
-    erfuellungsgrad: float = 0.0
-    erfuellt: bool = False
+    ausgang: Ausgang = NICHT_FUEHRBAR
     begruendung: str = ""
-    hinweis: str = ""
-
-    @property
-    def machbar(self) -> bool:
-        return self.M_Rd > 0.0
 
 
 class SproedesVersagen(Nachweis):
@@ -82,6 +75,7 @@ class SproedesVersagen(Nachweis):
     """
 
     THEMA = "Sprödes Versagen"
+    ART = "SV"
 
     def __init__(
         self,
@@ -147,35 +141,31 @@ class SproedesVersagen(Nachweis):
         groessen = rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm)
         self._protokoll_ansatz(p, e, groessen)
 
-        ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         befund = Fallbefund()
+        M_Riss = rissmoment_wert(self.id, groessen)
 
         for lage in self.lagen:
             erg = Lagenergebnis(lage=lage)
             erg.M_Rd = abs(e.g(f"M_Rd_{lage.nummer}").si)
-            M_Riss = groessen.M_Riss
 
             if erg.M_Rd <= 0.0:
-                erg.begruendung = erg.hinweis = (
+                erg.begruendung = (
                     f"{lage.nummer}. Lage ({lage.seite}) ohne Bewehrung → kein "
                     f"Biegewiderstand, kein Nachweis.")
             else:
-                erg.erfuellungsgrad = (float("inf") if M_Riss == 0
-                                       else erg.M_Rd / M_Riss)
-                erg.erfuellt = erg.M_Rd >= M_Riss
+                erg.ausgang = v = Vergleich(M_Riss, self._m_rd(erg))
                 erg.begruendung = (
                     f"M_{self.mn.wahl.index}(N_Ed = 0) = {erg.M_Rd / 1e3:.1f} kNm "
-                    f"{'≥' if erg.erfuellt else '<'} M_Riss = {M_Riss / 1e3:.1f} kNm.")
+                    f"{'≥' if v.erfuellt else '<'} M_Riss = {groessen.M_Riss / 1e3:.1f} kNm.")
 
             befund.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg, groessen)
-            ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
-                erg.erfuellungsgrad, EINHEITSLOS)
-            urteile.append(self._urteil(erg, groessen))
+            self._protokoll_lage(p, erg)
+            urteile.append(self.urteil(self.d_ausnutzung[lage.nummer], f"{lage.nummer}. Lage",
+                                       erg.ausgang, erg.begruendung))
 
         self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
+        return Ausfuehrung({}, self.teilurteile(urteile), befund)
 
     def _m_rd(self, erg: Lagenergebnis) -> Wert:
         """Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung."""
@@ -183,20 +173,6 @@ class SproedesVersagen(Nachweis):
         return Zwischenwerte(f"{self.id}.lage{nummer}").moment(
             "M_Rd", rf"M_{{{self.mn.wahl.index},{r}}}(N_{{Ed}} = 0)_{{{nummer}}}", erg.M_Rd,
             "Widerstand")
-
-    def _urteil(self, erg: Lagenergebnis, groessen: Rissgroessen) -> NachweisUrteil:
-        nummer = erg.lage.nummer
-        return NachweisUrteil(
-            art="SV",
-            ziel=self.d_ausnutzung[nummer].id,
-            fall=f"{nummer}. Lage",
-            erfuellt=erg.erfuellt,
-            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-            begruendung=erg.begruendung,
-            hinweis=erg.hinweis,
-            einwirkung=rissmoment_wert(self.id, groessen) if erg.machbar else None,
-            widerstand=self._m_rd(erg) if erg.machbar else None,
-        )
 
     # -- Mitschrift ---------------------------------------------------------
 
@@ -211,8 +187,7 @@ class SproedesVersagen(Nachweis):
         protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id,
                                       referenz="SIA 262:2025, 4.4.1.3")
 
-    def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis,
-                        groessen: Rissgroessen) -> None:
+    def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis) -> None:
         nummer = erg.lage.nummer
         r = self.richtung.value
         p.titel(f"Sprödes Versagen – {nummer}. Lage {r}", ebene=3)
@@ -221,8 +196,7 @@ class SproedesVersagen(Nachweis):
             p.text(erg.begruendung)
             return
 
-        m_rd, m_riss = self._m_rd(erg), rissmoment_wert(self.id, groessen)
-        p.gleichung(bedingung(angabe(m_rd), r"\ge", angabe(m_riss), erg.erfuellt),
+        v = erg.ausgang
+        p.gleichung(bedingung(angabe(v.widerstand), r"\ge", angabe(v.einwirkung), v.erfuellt),
                     titel="Biegewiderstand gegen Rissmoment")
-        grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
-                    m_rd, m_riss, erg.erfuellt)
+        v.zeile(p, self.d_ausnutzung[nummer])

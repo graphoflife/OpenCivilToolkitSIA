@@ -1,5 +1,5 @@
 ---
-erzeugt: 36a3474194e3
+erzeugt: ceff094ba895
 art: modul
 tags: [modul]
 ---
@@ -456,7 +456,6 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
-- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]
@@ -465,7 +464,6 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
-- [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]

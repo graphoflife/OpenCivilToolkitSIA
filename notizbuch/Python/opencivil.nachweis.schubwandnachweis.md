@@ -1,5 +1,5 @@
 ---
-erzeugt: 5d9988aa993d
+erzeugt: 3f33587c9079
 art: modul
 tags: [modul]
 ---
@@ -34,13 +34,14 @@ class Schubbefund
 
 Was der Nachweis im Lauf fand: die Waende und ihre Zellen, je Lastfall
 die Verteilung des Schubflusses und je Wand den Widerstand bei der
-gewaehlten Neigung -- fuer die Diagramme. Ein Lastfall ohne Verteilung
-(keine Last, keine Wand) fehlt in beiden.
+gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
+Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in allen dreien.
 
 - `waende: List[sw.Wand]`
 - `modell: sw.Zellenmodell`
 - `verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)`
 - `widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)`
+- `vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)` – Je Wand ihr staerkster Schubfluss gegen ihren Widerstand.
 
 ### Schubwandnachweis
 
@@ -51,6 +52,7 @@ class Schubwandnachweis(Nachweis)
 Querkraft und Torsion, je Lastfall auf die Schubwaende verteilt.
 
 - `THEMA = 'Querkraft und Torsion'`
+- `ART = 'V+T'`
 
 #### Schubwandnachweis.pruefe
 

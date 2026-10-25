@@ -44,6 +44,52 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Das Urteil der Nachweise aus einer Hand
+
+Befund 2.1 der Strukturdurchsicht: Erfüllungsgrad, «erfüllt», die Regel für
+«unbeschränkt» und das Urteil baute jeder Nachweis selbst (22-mal
+`NachweisUrteil(`), und das war auseinandergelaufen.
+
+- **`Vergleich`** im Kern (`core/berechnung.py`): Einwirkung gegen
+  Widerstand. Er besitzt die Regeln: Grad = R/E; wirkt nichts in der
+  Richtung, die der Widerstand begrenzt -- E ist null oder wirkt ihr
+  entgegen, etwa ein gedrückter Stahl --, ist er ∞; erfüllt ab eins. Dazu
+  seine Zeilen der Herleitung (`zeile`, `bedingung`). Biegung mit
+  Normalkraft gibt ihr Urteil selbst vor (`entscheid`): dort entscheidet, ob
+  die Einwirkung innerhalb der Resistenzlinie liegt, wie es ihr Dateikopf
+  seit jeher sagt -- der Grad misst nur, wie weit.
+- **Ohne Vergleich** zwei feste Ausgänge: `NICHT_FUEHRBAR` (Grad 0, nicht
+  erfüllt, etwa eine Lage ohne Bewehrung) und `UNBESCHRAENKT` (∞, erfüllt,
+  etwa ohne Druck beim Knicken).
+- **`Nachweis.urteil(ziel, fall, ausgang, begruendung)`** baut das Urteil;
+  ohne Vergleich kommt der Grund als Hinweis in die Zusammenfassung. Den
+  Grad als Ausgabe stempelt `Nachweis.rechne` aus dem Urteil -- vorher
+  nannte jeder Nachweis ihn zweimal. Das Kurzzeichen steht als `ART` an der
+  Klasse.
+- **Die Fallergebnisse** (elf Klassen) tragen ihren `ausgang` statt
+  `erfuellt` und `erfuellungsgrad` und lesen beides daraus ab
+  (`Fallausgang`). Die `_urteil`-Methoden sind weg, ebenso der eigene
+  `Vergleich` der Spannungsbegrenzung.
+- **Was sich zeigt:**
+  - Die Duktilität je Richtung und die Schubwände der Querschnittsanalyse
+    zeigen ∞ statt «1000000000.00».
+  - Bei Biegung mit Normalkraft zeigt die Herleitung jetzt wie die Tabelle
+    das Vorzeichen: ein eingegebenes M_Ed = −50 kNm steht nirgends als
+    50 kNm. Ein Betrag hätte die Zahl des Benutzers still umgedeutet. Die
+    Zeichen in der Herleitung bleiben kurz, die Tabelle zeigt den Widerstand
+    mit seiner Bedingung (`Vergleich.benannt`: dieselben Zahlen, andere
+    Zeichen).
+  - «Nicht führbar» steht überall gleich da: Striche statt Zahlen und der
+    Grund als Hinweis -- jetzt auch bei der Querkraft, beim Grundbruch «zu
+    schräg» und bei Biegung mit Normalkraft ohne Schnitt mit der Linie (dort
+    stand M_Ed = 0 statt der Einwirkung). Nur «ohne Bewehrung» zeigt weiter
+    die Einwirkung neben dem Widerstand null.
+  - Die Tabelle der Schubwände setzt den Grad wie überall
+    (`grad_als_text`), und das Diagramm liest ihn aus dem Befund, statt ihn
+    nachzurechnen.
+
+---
+
 ## 2026-10-25 · Eine gewählte Last auf einer Linie bleibt beim Ändern gewählt
 
 Gefunden beim Prüfen des Eintrags darunter: Wer im schwebenden Fenster den

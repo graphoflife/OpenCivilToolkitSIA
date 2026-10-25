@@ -43,11 +43,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, Prozedur, grad_def,
-    grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Nachweis,
+    NachweisUrteil, Prozedur, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
-from opencivil.core.latex import als_text, angabe, bedingung
+from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
 from opencivil.querschnitt.platte import Richtung, lage_aus_posten, protokoll_lage
@@ -88,16 +88,12 @@ class Verformungsfall:
 
 
 @dataclass
-class Fallergebnis:
-    """Was ein Fall ergibt -- fuer Urteil und Herleitung."""
+class Fallergebnis(Fallausgang):
+    """Was ein Fall ergibt -- fuer Urteil und Herleitung: w_eff gegen w_max."""
 
     fall: Verformungsfall
-    w_eff: Optional[Wert] = None
-    w_max: Optional[Wert] = None
-    erfuellungsgrad: float = 0.0
-    erfuellt: bool = False
+    ausgang: Ausgang = NICHT_FUEHRBAR
     begruendung: str = ""
-    hinweis: str = ""
 
 
 class Vergroesserungsfaktor(Prozedur):
@@ -226,6 +222,7 @@ class Verformung(Nachweis):
     """
 
     THEMA = "Verformung"
+    ART = "w"
 
     def __init__(self, querschnitt, faelle: Sequence[Verformungsfall], *,
                  faktor: Vergroesserungsfaktor) -> None:
@@ -259,21 +256,19 @@ class Verformung(Nachweis):
     def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         self._protokoll_ansatz(p)
         omega = {seite: e[f"omega_{seite}"] for seite in self.seiten}
-        ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for fall in self.faelle:
             erg = self._einen_fall(p, fall, omega.get(fall.zugseite))
-            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
-                erg.erfuellungsgrad, EINHEITSLOS)
-            urteile.append(self._urteil(erg))
-        return Ausfuehrung(ergebnis, urteile)
+            urteile.append(self.urteil(self.d_ausnutzung[fall.name], fall.name, erg.ausgang,
+                                       erg.begruendung))
+        return Ausfuehrung({}, urteile)
 
     def _einen_fall(self, p: Protokoll, fall: Verformungsfall,
                     omega: Optional[Wert]) -> Fallergebnis:
         erg = Fallergebnis(fall=fall)
         p.titel(f"Verformung – {fall.name}", ebene=3)
         if omega is None:
-            erg.begruendung = erg.hinweis = (
+            erg.begruendung = (
                 f"Zug {fall.zugseite} ohne x-Bewehrung → kein Vergrösserungsfaktor, "
                 f"kein Nachweis.")
             p.text(erg.begruendung)
@@ -292,33 +287,14 @@ class Verformung(Nachweis):
                  titel="Grenzwert der Durchbiegung, nach Vorgabe",
                  name="Grenzwert der Durchbiegung")
 
-        erg.w_eff, erg.w_max = w_eff, w_max
-        erg.erfuellt = w_eff.groesse.si <= w_max.groesse.si
-        erg.erfuellungsgrad = (float("inf") if w_eff.groesse.si == 0.0
-                               else w_max.groesse.si / w_eff.groesse.si)
+        erg.ausgang = v = Vergleich(w_eff, w_max)
         erg.begruendung = (
             f"w_eff = ω_w · w = {omega.groesse.si:.2f} · {w.formatiert()} mm = "
-            f"{w_eff.formatiert()} mm {'≤' if erg.erfuellt else '>'} "
+            f"{w_eff.formatiert()} mm {'≤' if v.erfuellt else '>'} "
             f"w_max = L/{GRENZE:g} = {w_max.formatiert()} mm.")
-        p.gleichung(bedingung(angabe(w_eff), r"\le", angabe(w_max), erg.erfuellt,
-                              mit_urteil=False),
-                    titel="Durchbiegung gegen Grenzwert")
-        grad_formel(p, self.d_ausnutzung[fall.name], erg.erfuellungsgrad, w_max, w_eff,
-                    erg.erfuellt, mit_urteil=True)
+        v.bedingung(p, "Durchbiegung gegen Grenzwert")
+        v.zeile(p, self.d_ausnutzung[fall.name], mit_urteil=True)
         return erg
-
-    def _urteil(self, erg: Fallergebnis) -> NachweisUrteil:
-        return NachweisUrteil(
-            art="w",
-            ziel=self.d_ausnutzung[erg.fall.name].id,
-            fall=erg.fall.name,
-            erfuellt=erg.erfuellt,
-            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-            begruendung=erg.begruendung,
-            hinweis=erg.hinweis,
-            einwirkung=erg.w_eff,
-            widerstand=erg.w_max,
-        )
 
     # -- Mitschrift ---------------------------------------------------------
 

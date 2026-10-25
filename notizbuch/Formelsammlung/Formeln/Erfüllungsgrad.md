@@ -1,5 +1,5 @@
 ---
-erzeugt: a139bf4efc09
+erzeugt: 020b1fd4b0bb
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.core.berechnung#grad_formel|grad_formel]]
+- [[opencivil.core.berechnung#Vergleich.zeile|Vergleich.zeile]]
 
 ## Themen
 

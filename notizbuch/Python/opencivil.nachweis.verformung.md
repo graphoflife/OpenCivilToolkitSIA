@@ -1,5 +1,5 @@
 ---
-erzeugt: 862b01d5116c
+erzeugt: 42f922b3e3c9
 art: modul
 tags: [modul]
 ---
@@ -78,18 +78,14 @@ def kennung(self) -> str
 
 ```python
 @dataclass
-class Fallergebnis
+class Fallergebnis(Fallausgang)
 ```
 
-Was ein Fall ergibt -- fuer Urteil und Herleitung.
+Was ein Fall ergibt -- fuer Urteil und Herleitung: w_eff gegen w_max.
 
 - `fall: Verformungsfall`
-- `w_eff: Optional[Wert] = None`
-- `w_max: Optional[Wert] = None`
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
+- `ausgang: Ausgang = NICHT_FUEHRBAR`
 - `begruendung: str = ''`
-- `hinweis: str = ''`
 
 ### Vergroesserungsfaktor
 
@@ -133,6 +129,7 @@ Vergroesserungsfaktor der Seite, die der Fall zieht
 ([[opencivil.nachweis.verformung#Vergroesserungsfaktor|Vergroesserungsfaktor]]).
 
 - `THEMA = 'Verformung'`
+- `ART = 'w'`
 
 #### Verformung.pruefe
 

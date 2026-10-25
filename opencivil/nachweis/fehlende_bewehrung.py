@@ -27,8 +27,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Sequence
 
-from opencivil.core.berechnung import Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, grad_def
-from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
+from opencivil.core.berechnung import (
+    Ausfuehrung, Eingaben, KeinVergleich, Nachweis, NachweisUrteil, grad_def,
+)
+from opencivil.core.einheiten import Einheit, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
@@ -111,21 +113,14 @@ class FehlendeBewehrung(Nachweis):
         p.titel(f"Ohne Bewehrung – {self.richtung.beschriftung}")
         p.text(self.grund)
 
-        ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for fall in self.faelle:
-            ergebnis[self.d_ausnutzung[fall.kennung].id] = Groesse(0.0, EINHEITSLOS)
-            urteile.append(NachweisUrteil(
-                art=fall.art,
-                ziel=self.d_ausnutzung[fall.kennung].id,
-                langname=fall.langname,
-                fall=fall.fall,
-                erfuellt=False,
-                erfuellungsgrad=Groesse(0.0, EINHEITSLOS),
-                begruendung=self.grund,
-                hinweis=self.grund,
-                # Die Einwirkung steht da: sie wurde ja angegeben, und ohne sie
-                # bliebe unklar, wogegen der Widerstand null nicht ausreicht.
+            # Nicht fuehrbar, und doch mit Zahlen: die Einwirkung wurde ja
+            # angegeben, und ohne sie bliebe unklar, wogegen der Widerstand
+            # null nicht ausreicht. Auch eine Einwirkung von null geht nicht
+            # auf -- es fehlt die Bewehrung, nicht die Last.
+            ausgang = KeinVergleich(
+                0.0, False,
                 einwirkung=WertDef(
                     id=f"{self.id}.{fall.kennung}.Ed",
                     symbol=fall.einwirkung_symbol,
@@ -135,6 +130,7 @@ class FehlendeBewehrung(Nachweis):
                     id=f"{self.id}.{fall.kennung}.Rd",
                     symbol=fall.symbol,
                     einheit=fall.einheit, beschreibung="Widerstand", stellen=1,
-                ).belegen(Groesse(0.0, fall.einheit)),
-            ))
-        return Ausfuehrung(ergebnis, urteile)
+                ).belegen(Groesse(0.0, fall.einheit)))
+            urteile.append(self.urteil(self.d_ausnutzung[fall.kennung], fall.fall, ausgang,
+                                       self.grund, art=fall.art, langname=fall.langname))
+        return Ausfuehrung({}, urteile)

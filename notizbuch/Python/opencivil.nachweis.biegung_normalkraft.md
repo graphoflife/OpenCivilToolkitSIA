@@ -1,5 +1,5 @@
 ---
-erzeugt: dfa5841949dc
+erzeugt: e6be2447e645
 art: modul
 tags: [modul]
 ---
@@ -124,14 +124,13 @@ nicht von Momenten.
 
 ```python
 @dataclass
-class Auswertung
+class Auswertung(Fallausgang)
 ```
 
 Ergebnis der Prüfung einer Kombination.
 
 - `schnittgroessen: Schnittgroessen`
-- `innerhalb: bool`
-- `erfuellungsgrad: float` – Widerstand/Einwirkung -- ab 1 erfuellt. Unendlich, wenn nichts einwirkt.
+- `innerhalb: bool` – Ob die Einwirkung innerhalb der massgebenden Linie liegt -- das Urteil.
 - `widerstand: Optional[Tuple[float, float]]` – Der massgebende Punkt auf der Linie als (N, M) in N bzw. Nm.
 - `begruendung: str = ''`
 - `achse: geo.Achse = geo.MOMENT` – Auf welcher Achse verglichen wird. Haengt vom Massstab ab.
@@ -141,6 +140,7 @@ Ergebnis der Prüfung einer Kombination.
 - `treffer: Optional[Treffer] = None` – Wo auf der Linie der Widerstand liegt -- zwischen welchen Stuetzpunkten, bei der Ebenenlinie auch auf welcher Ebene. Fuer die Mitschrift, damit dort nicht bloss das Ergebnis steht.
 - `linie: Optional[Widerstandslinie] = None` – Die Linie, die ihn geliefert hat -- sie schreibt, wie.
 - `normierung: Optional[Normierung] = None` – Nur beim kuerzesten Abstand: dort ist der Grad kein Verhaeltnis von Momenten, sondern von Laengen im normierten Diagramm.
+- `ausgang: Ausgang = NICHT_FUEHRBAR` – Einwirkung gegen Widerstand im gewaehlten Massstab -- nicht fuehrbar ohne Schnitt mit der Linie. Das Urteil sagt [[opencivil.nachweis.biegung_normalkraft#Auswertung|innerhalb]].
 
 ### MNBefund
 
@@ -215,6 +215,7 @@ wird gegen die Linie der Wahl ([[opencivil.nachweis.biegung_normalkraft#MNBefund
 ([[opencivil.nachweis.biegung_normalkraft#MNBefund|MNBefund.vergleich]]) steht im Diagramm daneben.
 
 - `THEMA = 'Biegung und Normalkraft'`
+- `ART = 'M-N'`
 
 #### BiegungNormalkraft.pruefe
 
@@ -230,6 +231,15 @@ def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslini
 
 Die Resistenzlinie einer Wahl -- und ihre Herleitung in `p`.
 
+#### BiegungNormalkraft._verglichen
+
+```python
+def _verglichen(self, auswertung: Auswertung) -> Auswertung
+```
+
+Die Auswertung samt ihrem Vergleich -- fuer Tabelle und Herleitung
+derselbe. Ob erfuellt, sagt die Linie ([[opencivil.nachweis.biegung_normalkraft#Auswertung|Auswertung.innerhalb]]).
+
 #### BiegungNormalkraft._als_wert
 
 ```python
@@ -243,6 +253,11 @@ Welche Groesse verglichen wird, haengt vom Massstab ab -- bei
 Das Urteil traegt deshalb Symbol und Einheit selbst mit sich. Beim
 kuerzesten Abstand sind es Laengen im normierten Diagramm -- sonst
 stuenden zwei Momente da, deren Quotient nicht der Grad ist.
+
+Beide mit ihrem Vorzeichen, in Tabelle und Herleitung: es sagt die
+Seite, und ein eingegebenes M_Ed = -50 kNm steht nicht als 50 kNm da.
+Der Grad ist derselbe ([[opencivil.core.berechnung#Vergleich|Vergleich]]). Bis 2026-10-25 stand in der
+Herleitung der Betrag.
 
 #### BiegungNormalkraft._auswerten
 
@@ -301,7 +316,7 @@ Einwirkung und Widerstand im normierten Diagramm -- fuer Tabelle und Herleitung.
 #### BiegungNormalkraft._protokoll_naechster
 
 ```python
-def _protokoll_naechster(self, p: Protokoll, auswertung: Auswertung, eckwerte: Mapping[str, float], basis: str) -> Tuple[Wert, Wert]
+def _protokoll_naechster(self, p: Protokoll, auswertung: Auswertung, eckwerte: Mapping[str, float], basis: str) -> None
 ```
 
 Der kuerzeste Abstand, Schritt fuer Schritt -- und daraus Einwirkung und

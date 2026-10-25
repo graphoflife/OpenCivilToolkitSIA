@@ -28,7 +28,7 @@ import math
 from typing import Dict, List
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text, vergleich
@@ -75,6 +75,7 @@ class DuktilitaetQA(Nachweis):
 
     THEMA = "Duktilität je Richtung"
     LANGNAME = "Duktilität"
+    ART = "x/d"
 
     def __init__(self, analyse: Querschnittsanalyse, *, grenze: float) -> None:
         self.analyse = analyse
@@ -112,23 +113,16 @@ class DuktilitaetQA(Nachweis):
                 ergebnis[d_grad.id] = Groesse(math.inf, EINHEITSLOS)
                 continue
             verhaeltnis = x / d
-            erfuellt = verhaeltnis <= self.grenze
             x_d = werte.zahl("x_d", "x/d", verhaeltnis)
-            grenze = werte.zahl("grenze", r"\left(x/d\right)_{max}", self.grenze, stellen=2)
+            v = Vergleich(x_d, werte.zahl("grenze", r"\left(x/d\right)_{max}", self.grenze,
+                                          stellen=2))
             p.formel(x_d, r"\frac{@x}{@d}",
                      {"x": werte.laenge("x", "x", x), "d": werte.laenge("d", "d", d)},
                      titel="Bezogene Druckzonenhöhe bei reiner Biegung",
-                     nachsatz=vergleich(r"\le", f"{self.grenze:g}", erfuellt))
-            grad = self.grenze / verhaeltnis if verhaeltnis > 0 else math.inf
-            if math.isinf(grad):
-                grad = 1e9
-            grad_formel(p, d_grad, grad, grenze, x_d, erfuellt)
-            ergebnis[d_grad.id] = Groesse(grad, EINHEITSLOS)
-            urteile.append(NachweisUrteil(
-                art="x/d", ziel=d_grad.id, fall=name, erfuellt=erfuellt,
-                erfuellungsgrad=Groesse(grad, EINHEITSLOS),
-                begruendung=f"x/d = {verhaeltnis:.3f} gegen {self.grenze:g}.",
-                einwirkung=x_d, widerstand=grenze))
+                     nachsatz=vergleich(r"\le", f"{self.grenze:g}", v.erfuellt))
+            v.zeile(p, d_grad)
+            urteile.append(self.urteil(d_grad, name, v,
+                                       f"x/d = {verhaeltnis:.3f} gegen {self.grenze:g}."))
         self.protokoll_massgebend(p, urteile)
         return Ausfuehrung(ergebnis, self.teilurteile(urteile))
 
@@ -138,6 +132,7 @@ class SproedesVersagenQA(Nachweis):
 
     THEMA = "Sprödes Versagen je Richtung"
     LANGNAME = "Sprödes Versagen"
+    ART = "Riss"
 
     def __init__(self, analyse: Querschnittsanalyse) -> None:
         self.analyse = analyse
@@ -184,14 +179,8 @@ class SproedesVersagenQA(Nachweis):
             M_Rd_si = abs(punkt.M_y) if self.analyse.einachsig else punkt.moment
             M_Rd = werte.moment("M_Rd", "M_{Rd}", M_Rd_si)
             p.wert(M_Rd, titel="Biegewiderstand bei N = 0 in dieser Richtung")
-            grad = M_Rd_si / riss.M_Riss
-            erfuellt = grad >= 1.0
-            grad_formel(p, d_grad, grad, M_Rd, M_Riss, erfuellt)
-            ergebnis[d_grad.id] = Groesse(grad, EINHEITSLOS)
-            urteile.append(NachweisUrteil(
-                art="Riss", ziel=d_grad.id, fall=name, erfuellt=erfuellt,
-                erfuellungsgrad=Groesse(grad, EINHEITSLOS),
-                begruendung="M_Rd bei N = 0 gegen das Rissmoment.",
-                einwirkung=M_Riss, widerstand=M_Rd))
+            v = Vergleich(M_Riss, M_Rd)
+            v.zeile(p, d_grad)
+            urteile.append(self.urteil(d_grad, name, v, "M_Rd bei N = 0 gegen das Rissmoment."))
         self.protokoll_massgebend(p, urteile)
         return Ausfuehrung(ergebnis, self.teilurteile(urteile))

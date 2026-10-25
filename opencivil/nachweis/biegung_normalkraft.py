@@ -47,9 +47,10 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Nachweis,
+    NachweisUrteil, Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
+from opencivil.core.einheiten import KN, KNM, Groesse
 from opencivil.core.latex import als_text, angabe
 from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
 from opencivil.core.wahl import Wahl
@@ -141,13 +142,12 @@ class Normierung:
 
 
 @dataclass
-class Auswertung:
+class Auswertung(Fallausgang):
     """Ergebnis der Prüfung einer Kombination."""
 
     schnittgroessen: Schnittgroessen
     innerhalb: bool
-    erfuellungsgrad: float
-    """Widerstand/Einwirkung -- ab 1 erfuellt. Unendlich, wenn nichts einwirkt."""
+    """Ob die Einwirkung innerhalb der massgebenden Linie liegt -- das Urteil."""
 
     widerstand: Optional[Tuple[float, float]]
     """Der massgebende Punkt auf der Linie als (N, M) in N bzw. Nm."""
@@ -177,6 +177,10 @@ class Auswertung:
     normierung: Optional[Normierung] = None
     """Nur beim kuerzesten Abstand: dort ist der Grad kein Verhaeltnis von
     Momenten, sondern von Laengen im normierten Diagramm."""
+
+    ausgang: Ausgang = NICHT_FUEHRBAR
+    """Einwirkung gegen Widerstand im gewaehlten Massstab -- nicht fuehrbar
+    ohne Schnitt mit der Linie. Das Urteil sagt :attr:`innerhalb`."""
 
 
 #: Welche Achse ein Massstab sucht. Die einzige Stelle, an der die beiden
@@ -265,6 +269,7 @@ class BiegungNormalkraft(Nachweis):
     """
 
     THEMA = "Biegung und Normalkraft"
+    ART = "M-N"
 
     def __init__(
         self,
@@ -401,27 +406,14 @@ class BiegungNormalkraft(Nachweis):
             auswertung = self._auswerten(linie, kombination, eckwerte)
             befund.auswertungen.append(auswertung)
             self._protokoll_kombination(p, auswertung, eckwerte)
-            ergebnis[self.d_ausnutzung[kombination.name].id] = Groesse(
-                auswertung.erfuellungsgrad, EINHEITSLOS
-            )
             # Unabhaengig vom gewaehlten Massstab: der Momentenwiderstand bei
             # dieser Normalkraft, denn der Querkraftnachweis rechnet damit.
             bei_n = self._messen(linie, kombination, geo.MOMENT, auswertung.innerhalb)
             befund.bei_normalkraft[kombination.name] = bei_n
             ergebnis[self.d_m_rd[kombination.name].id] = Groesse.aus_si(
                 abs(bei_n.rd) if bei_n else 0.0, KNM)
-            urteile.append(
-                NachweisUrteil(
-                    art="M-N",
-                    ziel=self.d_ausnutzung[kombination.name].id,
-                    fall=kombination.name,
-                    erfuellt=auswertung.innerhalb,
-                    erfuellungsgrad=Groesse(auswertung.erfuellungsgrad, EINHEITSLOS),
-                    begruendung=auswertung.begruendung,
-                    einwirkung=self._als_wert(auswertung, "Ed"),
-                    widerstand=self._als_wert(auswertung, "Rd"),
-                )
-            )
+            urteile.append(self.urteil(self.d_ausnutzung[kombination.name], kombination.name,
+                                       auswertung.ausgang, auswertung.begruendung))
         return Ausfuehrung(ergebnis, urteile, befund)
 
     def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslinie:
@@ -429,6 +421,16 @@ class BiegungNormalkraft(Nachweis):
         return resistenzlinie(wahl, e, p, querschnitt=self.querschnitt, posten=self.posten,
                               richtung=self.richtung, basis=self.id,
                               schritte=self.schritte, fasern=self.fasern)
+
+    def _verglichen(self, auswertung: Auswertung) -> Auswertung:
+        """
+        Die Auswertung samt ihrem Vergleich -- fuer Tabelle und Herleitung
+        derselbe. Ob erfuellt, sagt die Linie (:attr:`Auswertung.innerhalb`).
+        """
+        auswertung.ausgang = Vergleich(self._als_wert(auswertung, "Ed"),
+                                       self._als_wert(auswertung, "Rd"),
+                                       entscheid=auswertung.innerhalb)
+        return auswertung
 
     def _als_wert(self, auswertung: Auswertung, seite: str):
         """
@@ -439,6 +441,11 @@ class BiegungNormalkraft(Nachweis):
         Das Urteil traegt deshalb Symbol und Einheit selbst mit sich. Beim
         kuerzesten Abstand sind es Laengen im normierten Diagramm -- sonst
         stuenden zwei Momente da, deren Quotient nicht der Grad ist.
+
+        Beide mit ihrem Vorzeichen, in Tabelle und Herleitung: es sagt die
+        Seite, und ein eingegebenes M_Ed = -50 kNm steht nicht als 50 kNm da.
+        Der Grad ist derselbe (:class:`Vergleich`). Bis 2026-10-25 stand in der
+        Herleitung der Betrag.
         """
         if auswertung.normierung is not None:
             einwirkung, widerstand = self._normiert(auswertung)
@@ -502,7 +509,7 @@ class BiegungNormalkraft(Nachweis):
         gueltig = [g for g in gemessen if g is not None]
         if not gueltig:
             return Auswertung(
-                kombination, innerhalb, 0.0, None,
+                kombination, innerhalb, None,
                 "Kein Schnitt mit der Resistenzlinie → Einwirkung ausserhalb.",
                 massstab=(Erfuellungsart.NORMALKRAFT_KONSTANT
                           if art is Erfuellungsart.AUTOMATISCH else art))
@@ -528,15 +535,14 @@ class BiegungNormalkraft(Nachweis):
             return None
         rd = treffer.wert
 
-        grad = float("inf") if gesucht == 0 else abs(rd) / abs(gesucht)
-        return Auswertung(
-            kombination, innerhalb, grad,
+        return self._verglichen(Auswertung(
+            kombination, innerhalb,
             widerstand=(ed.N, rd) if achse is geo.MOMENT else (rd, ed.M),
             begruendung=(f"{achse.name}_{self.wahl.index} = {_in(rd, achse)} bei "
                          f"{achse.gegen.name}_Ed = {_in(fest, achse.gegen)}."),
             achse=achse, ed=gesucht, rd=rd,
             massstab=MASSSTAB[achse.name],
-            treffer=treffer, linie=linie)
+            treffer=treffer, linie=linie))
 
     def _naechster(
         self, linie: Widerstandslinie, kombination: Schnittgroessen,
@@ -555,14 +561,13 @@ class BiegungNormalkraft(Nachweis):
             N_Ed, M_Ed, linie.punkte, N_ref, M_ref)
         laenge = math.hypot(N_Ed / N_ref, M_Ed / M_ref)
         rand = max(laenge + abstand if innerhalb else laenge - abstand, 0.0)
-        grad = float("inf") if laenge == 0 else rand / laenge
-        return Auswertung(
-            kombination, innerhalb, grad, stelle,
+        return self._verglichen(Auswertung(
+            kombination, innerhalb, stelle,
             f"Kürzester Abstand (normiert) a = {abstand:.3f}; nächster Punkt "
             f"N = {_in(stelle[0], geo.NORMALKRAFT)}, M = {_in(stelle[1], geo.MOMENT)}.",
             achse=geo.MOMENT, ed=M_Ed, rd=stelle[1],
             massstab=Erfuellungsart.NAECHSTER_PUNKT,
-            normierung=Normierung(N_ref, M_ref, laenge, abstand, rand))
+            normierung=Normierung(N_ref, M_ref, laenge, abstand, rand)))
 
     # -- Mitschrift ---------------------------------------------------------
 
@@ -585,22 +590,27 @@ class BiegungNormalkraft(Nachweis):
             titel="Einwirkung",
         )
         basis = f"{self.id}.{k.kennung}"
+        if not auswertung.machbar:
+            protokoll_widerstand(p, auswertung, basis=basis)
+            p.text(auswertung.begruendung)
+            return
+        v = auswertung.ausgang
         if auswertung.normierung is not None:
-            ed, rd = self._protokoll_naechster(p, auswertung, eckwerte, basis)
+            self._protokoll_naechster(p, auswertung, eckwerte, basis)
         else:
             protokoll_widerstand(p, auswertung, basis=basis)
+            # Kurz, ohne die Bedingung im Zeichen: sie steht in der Zeile darueber.
             werte, achse = Zwischenwerte(basis), auswertung.achse
-            rd, ed = (werte.wert(name, f"{achse.name}_{{{zeichen}}}",
-                                 Groesse.aus_si(abs(si), achse.einheit))
-                      for name, zeichen, si in (("Rd", self.wahl.index, auswertung.rd),
-                                                ("Ed", "Ed", auswertung.ed)))
-        grad_formel(p, self.d_ausnutzung[k.name], auswertung.erfuellungsgrad,
-                    rd, ed, auswertung.innerhalb, mit_urteil=True)
+            v = v.benannt(
+                widerstand=werte.wert("Rd", f"{achse.name}_{{{self.wahl.index}}}",
+                                      v.widerstand.groesse),
+                einwirkung=werte.wert("Ed", f"{achse.name}_{{Ed}}", v.einwirkung.groesse))
+        v.zeile(p, self.d_ausnutzung[k.name], mit_urteil=True)
 
     def _protokoll_naechster(
         self, p: Protokoll, auswertung: Auswertung, eckwerte: Mapping[str, float],
         basis: str,
-    ) -> Tuple[Wert, Wert]:
+    ) -> None:
         """
         Der kuerzeste Abstand, Schritt fuer Schritt -- und daraus Einwirkung und
         Widerstand im normierten Diagramm, deren Quotient der Grad ist.
@@ -619,7 +629,7 @@ class BiegungNormalkraft(Nachweis):
                  {"a": eck["M_Rd_max"], "b": eck["M_Rd_min"]},
                  titel="Bezugsgrösse des Moments")
 
-        einwirkung, widerstand = self._normiert(auswertung)
+        einwirkung, widerstand = auswertung.ausgang.einwirkung, auswertung.ausgang.widerstand
         N_Ed = werte.kraft("N_Ed", "N_{Ed}", k.N_Ed.si)
         M_Ed = werte.moment("M_Ed", "M_{Ed}", k.M_Ed.si)
         p.formel(einwirkung,
@@ -643,7 +653,6 @@ class BiegungNormalkraft(Nachweis):
         vorlage = "@E + @a" if auswertung.innerhalb else r"\max\left(@E - @a;\ 0\right)"
         p.formel(widerstand, vorlage, {"E": einwirkung, "a": abstand},
                  titel="Widerstand im normierten Diagramm")
-        return einwirkung, widerstand
 
 
 def linienbezuege(querschnitt: Plattenquerschnitt, posten, richtung: Richtung,

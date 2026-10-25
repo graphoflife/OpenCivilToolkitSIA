@@ -1,5 +1,5 @@
 ---
-erzeugt: e643c3360c8f
+erzeugt: b7455ab17bb6
 art: modul
 tags: [modul]
 ---
@@ -119,25 +119,6 @@ seinen [[opencivil.querschnitt.analyse#Lastfall|Lastfall]].
 @property
 def kennung(self) -> str
 ```
-
-### Vergleich
-
-```python
-@dataclass(frozen=True)
-class Vergleich
-```
-
-Was in der Tabelle gegeneinander steht -- und wie es im Satz heisst.
-
-Spannungen, solange der Stahl elastisch bleibt. Fliesst er, Dehnungen:
-sonst stuende `f_yk` neben `f_yk` und daneben «nicht erfuellt» --
-richtig gerechnet und doch nicht zu lesen. Entschieden wird das einmal,
-in [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung|Spannungsbegrenzung._einen_fall]]; Urteil und Begruendung lesen
-es nur noch ab.
-
-- `einwirkung: Wert`
-- `widerstand: Wert`
-- `satz: str`
 
 ### protokoll_festlegungen
 
@@ -329,7 +310,7 @@ Die gefundene Ebene, ihre Probe und was der Ort dazu sagt.
 
 ```python
 @dataclass
-class Fallergebnis
+class Fallergebnis(Fallausgang)
 ```
 
 Was der Nachweis fuer einen Lastfall gefunden hat.
@@ -344,12 +325,10 @@ Was der Nachweis fuer einen Lastfall gefunden hat.
 - `eps_s_adm: float = 0.0` – `sigma_s_adm / E_s` -- dagegen wird gemessen, wenn der Stahl fliesst.
 - `eps_y: float = 0.0` – Die Fliessdehnung `f_s / E_s`.
 - `stahl: Optional[Baustoff] = None` – Der Stahl der massgebenden Stelle -- seine Grenze, sein `E_s` und seine Fliessdehnung gelten. Mit verschiedenen Staehlen ist massgebend die gezogene Stelle mit dem kleinsten Erfuellungsgrad, nicht die am staerksten gedehnte.
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
 - `konvergiert: bool = True`
-- `vergleich: Optional[Vergleich] = None` – Fehlt nur, wenn sich keine Gleichgewichtslage fand.
+- `ausgang: Ausgang = NICHT_FUEHRBAR` – Was gegeneinander steht: Spannungen, solange der Stahl elastisch bleibt. Fliesst er, Dehnungen -- sonst stuende `f_yk` neben `f_yk` und daneben «nicht erfuellt», richtig gerechnet und doch nicht zu lesen. Entschieden wird das einmal, in [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._vergleich|Spannungsbegrenzung._vergleich]]. Nicht fuehrbar ohne Bewehrung und ohne Gleichgewichtslage.
+- `satz: str = ''` – Der Vergleich als Satz, fuer die Begruendung.
 - `begruendung: str = ''`
-- `hinweis: str = ''`
 
 #### Fallergebnis.fliesst
 
@@ -533,13 +512,19 @@ def _vergleich(self, erg: Fallergebnis, grenzen: Grenzen) -> Vergleich
 
 Spannungen oder Dehnungen -- die eine Stelle, die das entscheidet.
 
-#### Spannungsbegrenzung._urteil
+Gemessen wird an der Dehnung, siehe Dateikopf: elastisch ist
+`E_s * eps_s` dieselbe Zahl wie `sigma_s` -- Bit fuer Bit, denn das
+Gesetz rechnet dort genau dieses Produkt. Ohne Zug steht null da, und
+es gibt nichts zu begrenzen.
+
+#### Spannungsbegrenzung._satz
 
 ```python
-def _urteil(self, erg: Fallergebnis, *, still: bool=False) -> NachweisUrteil
+@staticmethod
+def _satz(erg: Fallergebnis) -> str
 ```
 
-Das Urteil eines Falls -- was gegeneinander steht, sagt der Vergleich.
+Der Vergleich als Satz -- in der Groesse, die verglichen wurde.
 
 #### Spannungsbegrenzung._protokoll_ansatz
 

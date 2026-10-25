@@ -1,5 +1,5 @@
 ---
-erzeugt: fda14ca5953a
+erzeugt: 167c63020061
 art: modul
 tags: [modul]
 ---
@@ -407,7 +407,7 @@ def kennung(self) -> str
 
 ```python
 @dataclass
-class Querkraftergebnis
+class Querkraftergebnis(Fallausgang)
 ```
 
 Alle Zwischenwerte eines Falls, damit die Herleitung vollstaendig ist.
@@ -423,10 +423,8 @@ Alle Zwischenwerte eines Falls, damit die Herleitung vollstaendig ist.
 - `m_Rd: float = 0.0` – Momentenwiderstand bei der wirkenden Normalkraft, in Nm.
 - `v_Rd: float = 0.0` – in N/m.
 - `plastisch: bool = False` – `m_Ed` liegt ueber dem Momentenwiderstand -- siehe [[opencivil.nachweis.querkraft#widerstand|widerstand]].
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
+- `ausgang: Ausgang = NICHT_FUEHRBAR` – \|V_Ed\| gegen v_Rd -- nicht fuehrbar, wo sich kein Widerstand bestimmen liess.
 - `begruendung: str = ''`
-- `hinweis: str = ''` – Gesetzt, wenn sich gar kein Widerstand bestimmen liess -- siehe [[opencivil.core.berechnung#NachweisUrteil|opencivil.core.berechnung.NachweisUrteil.hinweis]].
 - `punkte: Tuple[Buegelpunkt, ...] = ()` – Der Widerstand je ganzem Grad zwischen den beiden Grenzwinkeln.
 - `massgebend: Optional[Buegelpunkt] = None` – Der Punkt mit dem groessten Widerstand -- daraus stammt `v_Rd`.
 - `alpha_min: int = 0`
@@ -456,6 +454,7 @@ Welcher gilt, entscheidet allein, ob die Platte eine Querkraftbewehrung
 traegt -- nicht eine Einstellung daneben.
 
 - `THEMA = 'Querkraft'`
+- `ART = 'V'`
 
 #### Querkraft.pruefe
 
@@ -526,7 +525,9 @@ def _widerstandssymbol(self, fall: Querkraftfall) -> str
 def _protokoll_grad(self, p: Protokoll, erg: Querkraftergebnis) -> None
 ```
 
-Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe.
+Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe. Der
+Widerstand steht hier kurz: seine Bedingung steht in der Zeile, die ihn
+herleitet.
 
 #### Querkraft._protokoll_fall
 

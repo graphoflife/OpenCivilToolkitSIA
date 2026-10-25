@@ -1,5 +1,5 @@
 ---
-erzeugt: 54f4b480990b
+erzeugt: a546f2488376
 art: modul
 tags: [modul]
 ---
@@ -128,27 +128,18 @@ Widerstand und Erfuellungsgrad in der Tabelle.
 
 ```python
 @dataclass
-class Lagenergebnis
+class Lagenergebnis(Fallausgang)
 ```
 
-Was der Nachweis fuer eine Lage gefunden hat.
+Was der Nachweis fuer eine Lage gefunden hat: N_s,adm gegen N_Riss.
 
 - `lage: Bewehrungslage`
 - `a_s: float = 0.0`
 - `durchmesser: float = 0.0` – Der groesste Stabdurchmesser der Lage, in m -- er bestimmt die Rissbreite.
 - `sigma_s_adm: float = 0.0`
 - `N_s_adm: float = 0.0`
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
+- `ausgang: Ausgang = NICHT_FUEHRBAR`
 - `begruendung: str = ''`
-- `hinweis: str = ''`
-
-#### Lagenergebnis.machbar
-
-```python
-@property
-def machbar(self) -> bool
-```
 
 ### Rissnormalkraft
 
@@ -165,6 +156,7 @@ steht die ungünstigere der beiden; die Urteile sind als Teile derselben
 Frage gestempelt (siehe `Nachweis.teilurteile`).
 
 - `THEMA = 'Zwängung auf Normalkraft'`
+- `ART = 'N_Riss'`
 - `LANGNAME = 'Risse: Zwängung Normalkraft'`
 
 #### Rissnormalkraft.pruefe
@@ -193,7 +185,7 @@ Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung.
 
 ```python
 @dataclass
-class Momentlagenergebnis
+class Momentlagenergebnis(Fallausgang)
 ```
 
 Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat.
@@ -209,17 +201,8 @@ Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat.
 - `x: float = 0.0`
 - `hebelarm: float = 0.0`
 - `M_s_adm: float = 0.0`
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
+- `ausgang: Ausgang = NICHT_FUEHRBAR` – M_s,adm gegen M_Riss -- nicht fuehrbar ohne Bewehrung in der Lage.
 - `begruendung: str = ''`
-- `hinweis: str = ''`
-
-#### Momentlagenergebnis.machbar
-
-```python
-@property
-def machbar(self) -> bool
-```
 
 ### Biegezwang
 
@@ -241,6 +224,7 @@ fast nur weitergereicht (Benutzer, 2026-10-17).
 - `THEMA = 'Zwängung auf Biegung'`
 - `LANGNAME = 'Risse: Zwängung Biegung'`
 - `REFERENZ = 'SIA 262:2025, 4.4.2'`
+- `ART = 'ZB'`
 - `EINLEITUNG = 'Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das die…` – Der erste Satz der Herleitung.
 
 ### ZwaengungBiegung

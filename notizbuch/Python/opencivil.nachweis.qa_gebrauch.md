@@ -1,5 +1,5 @@
 ---
-erzeugt: da8d364f7dea
+erzeugt: 4d520db0fd54
 art: modul
 tags: [modul]
 ---
@@ -203,6 +203,7 @@ Der ganze Querschnitt reisst: seine Risskraft gegen alle Staebe zusammen.
 
 - `THEMA = 'Zwängung auf Normalkraft'`
 - `LANGNAME = 'Risse: Zwängung Normalkraft'`
+- `ART = 'N_Riss'`
 
 #### RissnormalkraftQA.pruefe
 

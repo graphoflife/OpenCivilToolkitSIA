@@ -346,7 +346,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{79.9\,\mathrm{kNm}}{60\,\mathrm{kNm}} = 1.33 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{-79.9\,\mathrm{kNm}}{-60\,\mathrm{kNm}} = 1.33 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Bügeldurchmesser**
@@ -3956,7 +3956,7 @@ Massgebend: Beton im Punkt C auf der Grenzdehnung.
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,x,\text{Rand}} = \frac{N_{Rd}}{N_{Ed}} = \frac{4649.2\,\mathrm{kN}}{100\,\mathrm{kN}} = 46.49 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Rand}} = \frac{N_{Rd}}{N_{Ed}} = \frac{-4649.2\,\mathrm{kN}}{-100\,\mathrm{kN}} = 46.49 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Querkraft – x-Richtung
@@ -12346,7 +12346,7 @@ $$
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
 | Grundbruch | Normal | $N_{Rd} = 508.0\,\mathrm{kN}$ | $N_{Ed} = 300.0\,\mathrm{kN}$ | $1.69$ |
-| Grundbruch | Zu schräg | $N_{Rd} = 0.0\,\mathrm{kN}$ | $N_{Ed} = 300.0\,\mathrm{kN}$ | $0.00$ |
+| Grundbruch | Zu schräg | – | – | $0.00$ |
 | Gleiten | Normal | $T_{Rd} = 0.0\,\mathrm{kN}$ | $T_{Ed} = 40.0\,\mathrm{kN}$ | $0.00$ |
 | Gleiten | Zu schräg | $T_{Rd} = 0.0\,\mathrm{kN}$ | $T_{Ed} = 200.0\,\mathrm{kN}$ | $0.00$ |
 

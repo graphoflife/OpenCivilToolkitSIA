@@ -1,5 +1,5 @@
 ---
-erzeugt: 593a73c592cf
+erzeugt: 5a927888d292
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,7 @@ class DuktilitaetQA(Nachweis)
 
 - `THEMA = 'Duktilität je Richtung'`
 - `LANGNAME = 'Duktilität'`
+- `ART = 'x/d'`
 
 #### DuktilitaetQA.pruefe
 
@@ -77,6 +78,7 @@ class SproedesVersagenQA(Nachweis)
 
 - `THEMA = 'Sprödes Versagen je Richtung'`
 - `LANGNAME = 'Sprödes Versagen'`
+- `ART = 'Riss'`
 
 #### SproedesVersagenQA.pruefe
 

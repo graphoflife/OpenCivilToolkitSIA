@@ -55,11 +55,10 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, Vorgabe,
-    grad_def, grad_formel,
+    Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Nachweis, Vergleich, Vorgabe, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN_PRO_M2, M, MM, MN_PRO_M2, Groesse
-from opencivil.core.latex import Mathe, Zelle, als_text, angabe, bedingung, fest
+from opencivil.core.einheiten import KN_PRO_M2, M, MM, MN_PRO_M2, Groesse
+from opencivil.core.latex import Mathe, Zelle, als_text, angabe, fest
 from opencivil.core.protokoll import (
     Abschnitt, GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte,
 )
@@ -481,18 +480,13 @@ class Setzung(Nachweis):
         p.formel(s, "@s_W + @s_E", {"s_W": s_W, "s_E": s_E}, titel="Setzung",
                  referenz=KAP_PRINZIP, name="Gesamtsetzung")
         s_zul = e["s_zul"]
-        erfuellt = s.groesse.si <= s_zul.groesse.si
-        grad = float("inf") if s.groesse.si == 0.0 else s_zul.groesse.si / s.groesse.si
-        p.gleichung(bedingung(angabe(s), r"\le", angabe(s_zul), erfuellt, mit_urteil=False),
-                    titel="Setzung gegen zulässige Setzung")
-        grad_formel(p, self.d_grad, grad, s_zul, s, erfuellt, mit_urteil=True)
-        urteil = NachweisUrteil(
-            art=self.ART, ziel=self.d_grad.id, fall=self._fall, erfuellt=erfuellt,
-            erfuellungsgrad=Groesse(grad, EINHEITSLOS),
-            begruendung=(f"s = {s.formatiert()} mm {'≤' if erfuellt else '>'} "
-                         f"s_zul = {s_zul.formatiert()} mm."),
-            einwirkung=s, widerstand=s_zul)
-        return Ausfuehrung({self.d_grad.id: Groesse(grad, EINHEITSLOS)}, [urteil], befund)
+        v = Vergleich(s, s_zul)
+        v.bedingung(p, "Setzung gegen zulässige Setzung")
+        v.zeile(p, self.d_grad, mit_urteil=True)
+        urteil = self.urteil(self.d_grad, self._fall, v,
+                             f"s = {s.formatiert()} mm {'≤' if v.erfuellt else '>'} "
+                             f"s_zul = {s_zul.formatiert()} mm.")
+        return Ausfuehrung({}, [urteil], befund)
 
     @property
     def _fall(self) -> str:

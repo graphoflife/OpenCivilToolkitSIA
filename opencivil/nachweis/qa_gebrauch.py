@@ -61,7 +61,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple, Type
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    Vergleich, grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
 from opencivil.core.latex import Mathe, angabe, bedingung, fest, vergleich
@@ -172,7 +173,7 @@ class AnalyseStellen(Stahlspannungsort):
                 + " → nicht aufnehmbar.")
 
     def begruendung(self, zustand: _Analysezustand, erg: Fallergebnis) -> str:
-        return f"{zustand.staebe[erg.stelle].element.name}: {erg.vergleich.satz}"
+        return f"{zustand.staebe[erg.stelle].element.name}: {erg.satz}"
 
     def dehnungsgrenze(self, basis: str, werte: Zwischenwerte, erg: Fallergebnis) -> Wert:
         return werte.dehnung("eps_s_adm", r"\varepsilon_{s,adm}", erg.eps_s_adm, "Widerstand")
@@ -259,6 +260,7 @@ class RissnormalkraftQA(Nachweis):
 
     THEMA = "Zwängung auf Normalkraft"
     LANGNAME = "Risse: Zwängung Normalkraft"
+    ART = "N_Riss"
 
     def __init__(self, analyse: Querschnittsanalyse, *, anforderung: Rissanforderung,
                  begrenzt: bool) -> None:
@@ -293,7 +295,7 @@ class RissnormalkraftQA(Nachweis):
         staebe = stabangaben(a, q, herkunft)
         if not staebe:
             p.text("Ohne Bewehrung → kein Nachweis.")
-            return self._ergebnis(0.0, False, "Ohne Bewehrung → kein Nachweis.", N_Riss, None)
+            return self._ergebnis(NICHT_FUEHRBAR, "Ohne Bewehrung → kein Nachweis.")
         grenzen = grenzen_aus_rissbreite(a, e, staebe, self.anforderung)
         protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id,
                                      referenz="SIA 262:2025, 4.4.2")
@@ -306,18 +308,16 @@ class RissnormalkraftQA(Nachweis):
             glieder.append((A_s, gruppe.wert))
         N_s_adm_si = sum(A.groesse.si * s.groesse.si for A, s in glieder)
         N_s_adm = werte.kraft("N_s_adm", r"N_{s,adm}", N_s_adm_si, "Widerstand")
-        erfuellt = N_s_adm_si >= N_Riss.groesse.si
+        v = Vergleich(N_Riss, N_s_adm)
         p.formel(N_s_adm, " + ".join(f"@A{i} \\cdot @s{i}" for i in range(len(glieder))),
                  {**{f"A{i}": A for i, (A, _) in enumerate(glieder)},
                   **{f"s{i}": s for i, (_, s) in enumerate(glieder)}},
                  titel="Aufnehmbare Risskraft", name="Aufnehmbare Risskraft",
-                 nachsatz=vergleich(r"\ge", angabe(N_Riss), erfuellt))
-        grad = math.inf if N_Riss.groesse.si == 0.0 else N_s_adm_si / N_Riss.groesse.si
-        grad_formel(p, self.d_grad, grad, N_s_adm, N_Riss, erfuellt)
+                 nachsatz=vergleich(r"\ge", angabe(N_Riss), v.erfuellt))
+        v.zeile(p, self.d_grad)
         return self._ergebnis(
-            grad, erfuellt,
-            f"N_s,adm = {N_s_adm_si / 1e3:.1f} kN {'≥' if erfuellt else '<'} "
-            f"N_Riss = {N_Riss.groesse.si / 1e3:.1f} kN.", N_Riss, N_s_adm)
+            v, f"N_s,adm = {N_s_adm_si / 1e3:.1f} kN {'≥' if v.erfuellt else '<'} "
+               f"N_Riss = {N_Riss.groesse.si / 1e3:.1f} kN.")
 
     def _risskraft(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) -> Wert:
         """Rissaktive Dicke, wirksame Zugfestigkeit je Beton und die Risskraft."""
@@ -354,15 +354,9 @@ class RissnormalkraftQA(Nachweis):
                  name="Risskraft des ganzen Querschnitts")
         return N_Riss
 
-    def _ergebnis(self, grad: float, erfuellt: bool, begruendung: str, N_Riss: Wert,
-                  N_s_adm: Optional[Wert]) -> Ausfuehrung:
-        ohne = N_s_adm is None
-        urteil = NachweisUrteil(
-            art="N_Riss", ziel=self.d_grad.id, fall="ganzer Querschnitt", erfuellt=erfuellt,
-            erfuellungsgrad=Groesse(grad, EINHEITSLOS), begruendung=begruendung,
-            hinweis=begruendung if ohne else "",
-            einwirkung=None if ohne else N_Riss, widerstand=N_s_adm)
-        return Ausfuehrung({self.d_grad.id: Groesse(grad, EINHEITSLOS)}, [urteil])
+    def _ergebnis(self, ausgang: Ausgang, begruendung: str) -> Ausfuehrung:
+        return Ausfuehrung({}, [self.urteil(self.d_grad, "ganzer Querschnitt", ausgang,
+                                            begruendung)])
 
 
 # ===========================================================================
@@ -424,20 +418,16 @@ class ZwaengungBiegungQA(Biegezwang):
             sigma_s = werte.spannung("sigma_s", r"\sigma_s", ebene.sigma_s[stab])
             p.gleichung(rf"{angabe(sigma_s)} = {angabe(gruppe.wert)}",
                         titel=f"An der Grenze: {staebe[stab].ort}")
-            erfuellt = M_s_adm_si >= riss.M_Riss
-            p.gleichung(bedingung(angabe(M_s_adm), r"\ge", angabe(M_Riss), erfuellt),
+            v = Vergleich(M_Riss, M_s_adm)
+            p.gleichung(bedingung(angabe(M_s_adm), r"\ge", angabe(M_Riss), v.erfuellt),
                         titel=self.THEMA)
-            grad = M_s_adm_si / riss.M_Riss
-            grad_formel(p, d_grad, grad, M_s_adm, M_Riss, erfuellt)
-            ergebnis[d_grad.id] = Groesse(grad, EINHEITSLOS)
-            urteile.append(NachweisUrteil(
-                art="ZB", ziel=d_grad.id, fall=name, erfuellt=erfuellt,
-                erfuellungsgrad=Groesse(grad, EINHEITSLOS),
-                begruendung=(f"{staebe[stab].element.name} erreicht σ_s,adm = "
-                             f"{gruppe.sigma / 1e6:.0f} N/mm² bei M_s,adm = "
-                             f"{M_s_adm_si / 1e3:.1f} kNm {'≥' if erfuellt else '<'} "
-                             f"M_Riss = {riss.M_Riss / 1e3:.1f} kNm."),
-                einwirkung=M_Riss, widerstand=M_s_adm))
+            v.zeile(p, d_grad)
+            urteile.append(self.urteil(
+                d_grad, name, v,
+                f"{staebe[stab].element.name} erreicht σ_s,adm = "
+                f"{gruppe.sigma / 1e6:.0f} N/mm² bei M_s,adm = "
+                f"{M_s_adm_si / 1e3:.1f} kNm {'≥' if v.erfuellt else '<'} "
+                f"M_Riss = {riss.M_Riss / 1e3:.1f} kNm."))
         self.protokoll_massgebend(p, urteile)
         return Ausfuehrung(ergebnis, self.teilurteile(urteile))
 

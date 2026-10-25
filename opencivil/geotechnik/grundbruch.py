@@ -58,8 +58,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Formel, Nachweis, NachweisUrteil,
-    Vorgabe, grad_def, grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Berechnung, Eingabebezug, Eingaben, Fallausgang,
+    Formel, Nachweis, NachweisUrteil, Vergleich, Vorgabe, grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, GRAD, KN, KN_PRO_M3, KPA, M, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text, angabe, bedingung
@@ -254,7 +254,7 @@ class Faktoren:
 
 
 @dataclass
-class Fallergebnis:
+class Fallergebnis(Fallausgang):
     """Was der Grundbruch bei einer Kombination ergibt."""
 
     kombination: Kombination
@@ -266,10 +266,8 @@ class Fallergebnis:
 
     sigma_f: float = 0.0
     N_Rd: float = 0.0
-    erfuellungsgrad: float = 0.0
-    erfuellt: bool = False
+    ausgang: Ausgang = NICHT_FUEHRBAR
     begruendung: str = ""
-    hinweis: str = ""
 
 
 @dataclass
@@ -329,9 +327,9 @@ class Grundbruch(Nachweis):
             befund = self._undrainiert(e, p)
         else:
             befund = self._drainiert(e, p)
-        ergebnis = {self.d_ausnutzung[r.kombination.name].id:
-                    Groesse(r.erfuellungsgrad, EINHEITSLOS) for r in befund.ergebnisse}
-        return Ausfuehrung(ergebnis, [self._urteil(r, e) for r in befund.ergebnisse], befund)
+        return Ausfuehrung({}, [self.urteil(self.d_ausnutzung[r.kombination.name],
+                                            r.kombination.name, r.ausgang, r.begruendung)
+                                for r in befund.ergebnisse], befund)
 
     # -- Drainiert ----------------------------------------------------------
 
@@ -683,7 +681,7 @@ class Grundbruch(Nachweis):
         if x > 1.0:
             # Ohne Lösung: die Wurzel des Lastneigungsfaktors wird negativ.
             erg.i = {"c": None}
-            erg.begruendung = erg.hinweis = (
+            erg.begruendung = (
                 "T_Ed > s_u · b · L: die Last ist zu stark geneigt, der "
                 "Lastneigungsfaktor ist nicht bestimmt -- kein Grundbruchwiderstand.")
             p.text(erg.begruendung)
@@ -717,27 +715,12 @@ class Grundbruch(Nachweis):
                  titel="Grundbruchwiderstand", referenz=KAP_FORMEL,
                  name="Grundbruchwiderstand")
         erg.N_Rd = N_Rd.groesse.si
-        erg.erfuellt = N.groesse.si <= erg.N_Rd
-        erg.erfuellungsgrad = (float("inf") if N.groesse.si == 0.0
-                               else erg.N_Rd / N.groesse.si)
+        erg.ausgang = v = Vergleich(N, N_Rd)
         erg.begruendung = (f"N_Rd = {N_Rd.formatiert()} kN "
-                           f"{'≥' if erg.erfuellt else '<'} N_Ed = {N.formatiert()} kN.")
-        p.gleichung(bedingung(angabe(N), r"\le", angabe(N_Rd), erg.erfuellt, mit_urteil=False),
-                    titel="Einwirkung gegen Widerstand")
-        grad_formel(p, self.d_ausnutzung[erg.kombination.name], erg.erfuellungsgrad, N_Rd, N,
-                    erg.erfuellt, mit_urteil=True)
+                           f"{'≥' if v.erfuellt else '<'} N_Ed = {N.formatiert()} kN.")
+        v.bedingung(p, "Einwirkung gegen Widerstand")
+        v.zeile(p, self.d_ausnutzung[erg.kombination.name], mit_urteil=True)
         return erg
-
-    def _urteil(self, erg: Fallergebnis, e: Eingaben) -> NachweisUrteil:
-        werte = Zwischenwerte(f"{self.id}.{erg.kombination.kennung}")
-        einwirkung = werte.kraft("N_Ed", "N_{Ed}", erg.kombination.N_Ed.si, "Einwirkung")
-        widerstand = werte.kraft("N_Rd", "N_{Rd}", erg.N_Rd, "Widerstand")
-        return NachweisUrteil(
-            art=self.ART, ziel=self.d_ausnutzung[erg.kombination.name].id,
-            fall=erg.kombination.name, erfuellt=erg.erfuellt,
-            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-            begruendung=erg.begruendung, hinweis=erg.hinweis,
-            einwirkung=einwirkung, widerstand=widerstand)
 
 
 def gleitkoerper(b: float, phi: float, schritte: int = 24) -> List[Tuple[float, float]]:
@@ -827,7 +810,6 @@ class Gleiten(Nachweis):
         if phi.groesse.si <= 0.0:
             p.text("Mit φ = 0 gibt die Reibung in der Sohle keinen Widerstand; eine "
                    "Haftung zählt nach dem Kapitel nicht.")
-        ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for k in self.kombinationen:
             zw = Zwischenwerte(f"{self.id}.{k.kennung}")
@@ -838,20 +820,14 @@ class Gleiten(Nachweis):
                             "Widerstand")
             p.formel(T_Rd, r"@N \cdot \tan @delta", {"N": N, "delta": delta},
                      titel="Gleitwiderstand", referenz=KAP_GLEITEN, name="Gleitwiderstand")
-            erfuellt = T.groesse.si <= T_Rd.groesse.si
-            grad_wert = float("inf") if T.groesse.si == 0.0 else T_Rd.groesse.si / T.groesse.si
-            p.gleichung(bedingung(angabe(T), r"\le", angabe(T_Rd), erfuellt, mit_urteil=False),
-                        titel="Einwirkung gegen Widerstand")
-            grad_formel(p, self.d_ausnutzung[k.name], grad_wert, T_Rd, T, erfuellt,
-                        mit_urteil=True)
-            ergebnis[self.d_ausnutzung[k.name].id] = Groesse(grad_wert, EINHEITSLOS)
-            urteile.append(NachweisUrteil(
-                art=self.ART, ziel=self.d_ausnutzung[k.name].id, fall=k.name,
-                erfuellt=erfuellt, erfuellungsgrad=Groesse(grad_wert, EINHEITSLOS),
-                begruendung=(f"T_Rd = {T_Rd.formatiert()} kN {'≥' if erfuellt else '<'} "
-                             f"T_Ed = {T.formatiert()} kN."),
-                einwirkung=T, widerstand=T_Rd))
-        return Ausfuehrung(ergebnis, urteile)
+            v = Vergleich(T, T_Rd)
+            v.bedingung(p, "Einwirkung gegen Widerstand")
+            v.zeile(p, self.d_ausnutzung[k.name], mit_urteil=True)
+            urteile.append(self.urteil(
+                self.d_ausnutzung[k.name], k.name, v,
+                f"T_Rd = {T_Rd.formatiert()} kN {'≥' if v.erfuellt else '<'} "
+                f"T_Ed = {T.formatiert()} kN."))
+        return Ausfuehrung({}, urteile)
 
 
 # ===========================================================================

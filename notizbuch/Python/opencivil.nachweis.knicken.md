@@ -1,5 +1,5 @@
 ---
-erzeugt: 7a06ac8b622f
+erzeugt: 1bb404334970
 art: modul
 tags: [modul]
 ---
@@ -184,7 +184,7 @@ Was bei einer Probekraft herauskommt.
 
 ```python
 @dataclass
-class Knickergebnis
+class Knickergebnis(Fallausgang)
 ```
 
 Alle Zwischenwerte eines Knickfalls.
@@ -207,8 +207,7 @@ Alle Zwischenwerte eines Knickfalls.
 - `M_bei_N_Rd: float = 0.0` – Das Moment am verformten System bei `N_Rd`, in Nm. Dort liegt der Stab an seiner Grenze, also ist es zugleich sein Momentenwiderstand bei dieser Normalkraft -- der Punkt sitzt damit auf der Interaktionslinie. Im M-N-Diagramm ist das der Widerstandspunkt des Knicknachweises.
 - `schritte: List[Durchlauf] = field(default_factory=list)` – Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile.
 - `halbierungen: int = 0`
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
+- `ausgang: Ausgang = NICHT_FUEHRBAR` – \|N_Ed\| gegen N_Rd -- ohne Druck gibt es nichts zu begrenzen.
 - `begruendung: str = ''`
 - `hinweis: str = ''`
 
@@ -262,6 +261,7 @@ Der Nachweis ist erfüllt, wenn die Ausmitten-Iteration einläuft **und**
 der Querschnitt das Moment zweiter Ordnung aufnimmt.
 
 - `THEMA = 'Knicken'`
+- `ART = 'K'`
 - `widerstand: Rechenwahl`
 - `schnell: bool = False`
 
@@ -297,6 +297,20 @@ Die groesste getragene Druckkraft, durch Halbieren.
 Bei `N = 0` traegt der Stab immer: mit der Last verschwindet auch
 das Moment, denn `e_1d` ist fest. Das ist die untere Schranke, die
 das Halbieren braucht -- sie muss nicht gesucht werden.
+
+#### Knickverfahren._n_ed
+
+```python
+def _n_ed(self, erg: Knickergebnis) -> Wert
+```
+
+Die Druckkraft -- die Einwirkung in Tabelle und Herleitung.
+
+Verglichen werden Normalkraefte: N_Rd ist die groesste Druckkraft, die
+noch eine Gleichgewichtslage hat. Das Moment zweiter Ordnung steht in
+der Herleitung -- in der Tabelle waere es die Groesse, die beim Knicken
+gerade verschwindet. Beide als Betrag: ein Widerstand mit umgekehrtem
+Vorzeichen neben seiner Einwirkung liest sich wie ein Fehler.
 
 #### Knickverfahren._n_rd
 

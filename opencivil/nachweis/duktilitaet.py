@@ -51,8 +51,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Fallbefund, Nachweis, NachweisUrteil, grad_def,
-    grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Fallbefund,
+    Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich
@@ -76,7 +76,7 @@ HOECHSTENS = 0.5
 
 
 @dataclass
-class Lagenergebnis:
+class Lagenergebnis(Fallausgang):
     """Was der Nachweis fuer eine Lage gefunden hat."""
 
     lage: Bewehrungslage
@@ -96,14 +96,10 @@ class Lagenergebnis:
     """Druckzonenhoehe bei M_Ed = 0, in m."""
 
     verhaeltnis: float = 0.0
-    erfuellungsgrad: float = 0.0
-    erfuellt: bool = False
-    begruendung: str = ""
-    hinweis: str = ""
+    ausgang: Ausgang = NICHT_FUEHRBAR
+    """x/d gegen (x/d)_max -- nicht fuehrbar ohne Bewehrung in der Lage."""
 
-    @property
-    def machbar(self) -> bool:
-        return self.a_s > 0.0
+    begruendung: str = ""
 
 
 def druckzonenhoehe(*, a_s: float, f_sd: float, b: float, f_cd: float) -> float:
@@ -132,6 +128,7 @@ class Duktilitaet(Nachweis):
     """
 
     THEMA = "Duktilität"
+    ART = "D"
 
     def __init__(
         self,
@@ -238,11 +235,10 @@ class Duktilitaet(Nachweis):
             befund.ergebnisse.append(erg)
             self._protokoll_lage(p, e, erg, breite)
 
-            ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
-                erg.erfuellungsgrad, EINHEITSLOS)
             ergebnis[self.d_verhaeltnis[lage.nummer].id] = Groesse(
                 erg.verhaeltnis, EINHEITSLOS)
-            urteile.append(self._urteil(erg))
+            urteile.append(self.urteil(self.d_ausnutzung[lage.nummer], f"{lage.nummer}. Lage",
+                                       erg.ausgang, erg.begruendung))
 
         self.protokoll_massgebend(p, urteile)
         return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
@@ -253,7 +249,7 @@ class Duktilitaet(Nachweis):
         erg = Lagenergebnis(lage=lage)
         erg.a_s, z, d = lage_aus_posten(e, self.posten_je_lage[lage.nummer])
         if erg.a_s <= 0.0:
-            erg.begruendung = erg.hinweis = self.ohne_bewehrung(lage.nummer)
+            erg.begruendung = self.ohne_bewehrung(lage.nummer)
             return erg
         erg.z, erg.d = z, d
 
@@ -262,34 +258,13 @@ class Duktilitaet(Nachweis):
         erg.f_sd = e.g(f"f_yd__{kennung_aus(lage.stahl.id)}").si
         erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=erg.f_sd, b=b, f_cd=f_cd)
         erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")
-        erg.erfuellt = erg.verhaeltnis <= self.grenze
-        erg.erfuellungsgrad = (
-            float("inf") if erg.verhaeltnis == 0 else self.grenze / erg.verhaeltnis)
+        erg.ausgang = v = Vergleich(
+            self.d_verhaeltnis[lage.nummer].belegen(Groesse(erg.verhaeltnis, EINHEITSLOS)),
+            self._grenze(lage.nummer))
         erg.begruendung = (
             f"x/d = {erg.x * 1e3:.1f} mm / {erg.d * 1e3:.1f} mm = "
-            f"{erg.verhaeltnis:.3f} {'≤' if erg.erfuellt else '>'} {self.grenze:.2f}.")
+            f"{erg.verhaeltnis:.3f} {'≤' if v.erfuellt else '>'} {self.grenze:.2f}.")
         return erg
-
-    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
-        nummer = erg.lage.nummer
-        einwirkung = WertDef(
-            id=self.d_verhaeltnis[nummer].id,
-            symbol=rf"\left(x/d\right)_{{{nummer}}}",
-            einheit=EINHEITSLOS, beschreibung="Einwirkung", stellen=3,
-        ).belegen(Groesse(erg.verhaeltnis, EINHEITSLOS))
-        return NachweisUrteil(
-            art="D",
-            ziel=self.d_ausnutzung[nummer].id,
-            fall=f"{nummer}. Lage",
-            erfuellt=erg.erfuellt,
-            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-            begruendung=erg.begruendung,
-            hinweis=erg.hinweis,
-            # Ohne Bewehrung gibt es kein Verhaeltnis -- dann steht dort ein
-            # Strich und daneben der Hinweis, warum.
-            einwirkung=einwirkung if erg.machbar else None,
-            widerstand=self._grenze(nummer) if erg.machbar else None,
-        )
 
     def _grenze(self, nummer: int) -> Wert:
         """Die zulaessige bezogene Druckzonenhoehe -- Widerstand und Herleitung."""
@@ -357,11 +332,8 @@ class Duktilitaet(Nachweis):
                  "f_sd", mit_index("f_{sd}", erg.lage.stahl.symbol_index), erg.f_sd)},
             titel="Druckzonenhöhe bei reiner Biegung")
 
-        verhaeltnis = self.d_verhaeltnis[nummer].belegen(
-            Groesse(erg.verhaeltnis, EINHEITSLOS))
-        grenze = self._grenze(nummer)
-        p.formel(verhaeltnis, r"\frac{@x}{@d}", {"x": x, "d": d},
+        v = erg.ausgang
+        p.formel(v.einwirkung, r"\frac{@x}{@d}", {"x": x, "d": d},
                  titel="Bezogene Druckzonenhöhe",
-                 nachsatz=vergleich(r"\le", angabe(grenze), erg.erfuellt))
-        grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
-                    grenze, verhaeltnis, erg.erfuellt)
+                 nachsatz=vergleich(r"\le", angabe(v.widerstand), v.erfuellt))
+        v.zeile(p, self.d_ausnutzung[nummer])

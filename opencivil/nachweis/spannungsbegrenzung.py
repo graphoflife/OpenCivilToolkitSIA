@@ -83,10 +83,10 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Protocol, Sequence, Tuple, Type
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Fallbefund, Nachweis, NachweisUrteil, grad_def,
-    grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Fallbefund,
+    Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
+from opencivil.core.einheiten import KN, KNM, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung, vergleich
 from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
@@ -133,23 +133,6 @@ class Gebrauchsfall:
     @property
     def kennung(self) -> str:
         return kennung_aus(self.name)
-
-
-@dataclass(frozen=True)
-class Vergleich:
-    """
-    Was in der Tabelle gegeneinander steht -- und wie es im Satz heisst.
-
-    Spannungen, solange der Stahl elastisch bleibt. Fliesst er, Dehnungen:
-    sonst stuende ``f_yk`` neben ``f_yk`` und daneben «nicht erfuellt» --
-    richtig gerechnet und doch nicht zu lesen. Entschieden wird das einmal,
-    in :meth:`Spannungsbegrenzung._einen_fall`; Urteil und Begruendung lesen
-    es nur noch ab.
-    """
-
-    einwirkung: Wert
-    widerstand: Wert
-    satz: str
 
 
 # ===========================================================================
@@ -327,7 +310,7 @@ class Stahlspannungsort(ABC):
 
 
 @dataclass
-class Fallergebnis:
+class Fallergebnis(Fallausgang):
     """Was der Nachweis fuer einen Lastfall gefunden hat."""
 
     fall: object
@@ -361,14 +344,20 @@ class Fallergebnis:
     staerksten gedehnte.
     """
 
-    erfuellungsgrad: float = 0.0
-    erfuellt: bool = False
     konvergiert: bool = True
-    vergleich: Optional[Vergleich] = None
-    """Fehlt nur, wenn sich keine Gleichgewichtslage fand."""
+    ausgang: Ausgang = NICHT_FUEHRBAR
+    """
+    Was gegeneinander steht: Spannungen, solange der Stahl elastisch bleibt.
+    Fliesst er, Dehnungen -- sonst stuende ``f_yk`` neben ``f_yk`` und
+    daneben «nicht erfuellt», richtig gerechnet und doch nicht zu lesen.
+    Entschieden wird das einmal, in :meth:`Spannungsbegrenzung._vergleich`.
+    Nicht fuehrbar ohne Bewehrung und ohne Gleichgewichtslage.
+    """
+
+    satz: str = ""
+    """Der Vergleich als Satz, fuer die Begruendung."""
 
     begruendung: str = ""
-    hinweis: str = ""
 
     @property
     def fliesst(self) -> bool:
@@ -504,7 +493,7 @@ class PlattenStellen(Stahlspannungsort):
 
     def begruendung(self, zustand: Stahlzustand, erg: Fallergebnis) -> str:
         return (f"ε_m = {erg.ebene.eps_m * 1e3:.4f} ‰, χ = {erg.ebene.chi:.5f} 1/m. "
-                f"{erg.vergleich.satz}")
+                f"{erg.satz}")
 
     def dehnungsgrenze(self, basis: str, werte: Zwischenwerte, erg: Fallergebnis) -> Wert:
         name, symbol = je_stahl("eps_s_adm", r"\varepsilon_{s,adm}", erg.stahl, self.staehle)
@@ -653,16 +642,15 @@ class Spannungsbegrenzung(Nachweis):
             befund.ergebnisse.append(erg)
             if not leise:
                 self._protokoll_fall(p, e, zustand, grenzen, erg)
-            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
-                erg.erfuellungsgrad, EINHEITSLOS)
-            urteile.append(self._urteil(erg, still=leise))
-        return Ausfuehrung(ergebnis, urteile, befund)
+            urteile.append(self.urteil(self.d_ausnutzung[fall.name], fall.name, erg.ausgang,
+                                       erg.begruendung, art=self.grenze.art, still=leise))
+        return Ausfuehrung({}, urteile, befund)
 
     def _einen_fall(self, zustand: Stahlzustand, grenzen: Grenzen, fall) -> Fallergebnis:
         erg = Fallergebnis(fall=fall)
         stellen = zustand.stellen
         if not stellen:
-            erg.begruendung = erg.hinweis = "Ohne Bewehrung gibt es keine Stahlspannung."
+            erg.begruendung = "Ohne Bewehrung gibt es keine Stahlspannung."
             return erg
         erg.ebene = ebene = self.ort.ebene(zustand, fall)
         # Nur gezogene Bewehrung: eine gedrueckte Stelle hat keine
@@ -684,53 +672,44 @@ class Spannungsbegrenzung(Nachweis):
             erg.eps_s, erg.sigma_s = ebene.eps_s[i], ebene.sigma_s[i]
         erg.konvergiert = ebene.konvergiert
         if not ebene.konvergiert:
-            erg.begruendung = erg.hinweis = (
+            erg.begruendung = (
                 self.wahl.art.ohne_ebene if ebene.verfehlt else self.ort.keine_ebene(fall))
             return erg
 
-        # An der Dehnung gemessen, siehe Dateikopf. Elastisch ist E_s * eps_s
-        # dieselbe Zahl wie sigma_s -- Bit fuer Bit, denn das Gesetz rechnet
-        # dort genau dieses Produkt.
-        gedehnt = stelle.E_s * erg.eps_s
-        erg.erfuellungsgrad = float("inf") if gedehnt <= 0.0 else grenze / gedehnt
-        erg.erfuellt = gedehnt <= grenze
-        erg.vergleich = self._vergleich(erg, grenzen)
+        erg.ausgang = self._vergleich(erg, grenzen)
+        erg.satz = self._satz(erg)
         erg.begruendung = self.ort.begruendung(zustand, erg)
         return erg
 
     def _vergleich(self, erg: Fallergebnis, grenzen: Grenzen) -> Vergleich:
-        """Spannungen oder Dehnungen -- die eine Stelle, die das entscheidet."""
+        """
+        Spannungen oder Dehnungen -- die eine Stelle, die das entscheidet.
+
+        Gemessen wird an der Dehnung, siehe Dateikopf: elastisch ist
+        ``E_s * eps_s`` dieselbe Zahl wie ``sigma_s`` -- Bit fuer Bit, denn das
+        Gesetz rechnet dort genau dieses Produkt. Ohne Zug steht null da, und
+        es gibt nichts zu begrenzen.
+        """
         werte = Zwischenwerte(f"{self.id}.{erg.fall.kennung}")
         index = self.ort.stahlindex
         if erg.fliesst:
             return Vergleich(
-                einwirkung=werte.dehnung(
-                    "eps_s", rf"\varepsilon_{index}", erg.eps_s, "Einwirkung"),
-                widerstand=self.ort.dehnungsgrenze(self.id, werte, erg),
-                satz=(f"Stahl fliesst (ε_s = {erg.eps_s * 1e3:.2f} ‰ > ε_y = "
-                      f"{erg.eps_y * 1e3:.2f} ‰): ε_s {'≤' if erg.erfuellt else '>'} "
-                      f"ε_s,adm = {erg.eps_s_adm * 1e3:.2f} ‰."))
+                werte.dehnung("eps_s", rf"\varepsilon_{index}", erg.eps_s, "Einwirkung"),
+                self.ort.dehnungsgrenze(self.id, werte, erg))
         return Vergleich(
-            einwirkung=werte.spannung("sigma_s", rf"\sigma_{index}", erg.sigma_s, "Einwirkung"),
-            widerstand=grenzen.gruppe(erg.stelle).wert,
-            satz=(f"σ_s = {erg.sigma_s / 1e6:.0f} N/mm² {'≤' if erg.erfuellt else '>'} "
-                  f"σ_s,adm = {erg.sigma_s_adm / 1e6:.0f} N/mm²."))
+            werte.spannung("sigma_s", rf"\sigma_{index}", erg.sigma_s, "Einwirkung"),
+            grenzen.gruppe(erg.stelle).wert)
 
-    def _urteil(self, erg: Fallergebnis, *, still: bool = False) -> NachweisUrteil:
-        """Das Urteil eines Falls -- was gegeneinander steht, sagt der Vergleich."""
-        vergleich = erg.vergleich
-        return NachweisUrteil(
-            art=self.grenze.art,
-            ziel=self.d_ausnutzung[erg.fall.name].id,
-            fall=erg.fall.name,
-            erfuellt=erg.erfuellt,
-            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-            begruendung=erg.begruendung,
-            hinweis=erg.hinweis,
-            einwirkung=vergleich.einwirkung if vergleich else None,
-            widerstand=vergleich.widerstand if vergleich else None,
-            still=still,
-        )
+    @staticmethod
+    def _satz(erg: Fallergebnis) -> str:
+        """Der Vergleich als Satz -- in der Groesse, die verglichen wurde."""
+        zeichen = "≤" if erg.erfuellt else ">"
+        if erg.fliesst:
+            return (f"Stahl fliesst (ε_s = {erg.eps_s * 1e3:.2f} ‰ > ε_y = "
+                    f"{erg.eps_y * 1e3:.2f} ‰): ε_s {zeichen} "
+                    f"ε_s,adm = {erg.eps_s_adm * 1e3:.2f} ‰.")
+        return (f"σ_s = {erg.sigma_s / 1e6:.0f} N/mm² {zeichen} "
+                f"σ_s,adm = {erg.sigma_s_adm / 1e6:.0f} N/mm².")
 
     # -- Mitschrift ---------------------------------------------------------
 
@@ -755,20 +734,19 @@ class Spannungsbegrenzung(Nachweis):
         fall = erg.fall
         p.titel(f"{self.grenze.fallwort} – {fall.name}", ebene=3)
         self.ort.protokoll_einwirkung(p, fall, self.grenze.lastindex)
-        if erg.vergleich is None:
+        if not erg.machbar:
             p.text(erg.begruendung)
             return
 
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
         self.ort.protokoll_ebene(p, werte, zustand, grenzen, erg)
-        wirkt, grenze = erg.vergleich.einwirkung, erg.vergleich.widerstand
+        wirkt, grenze = erg.ausgang.einwirkung, erg.ausgang.widerstand
         if erg.fliesst:
             self._protokoll_fliessen(p, e, erg, grenzen, werte, wirkt, grenze)
         else:
             p.gleichung(bedingung(angabe(wirkt), r"\le", angabe(grenze), erg.erfuellt),
                         titel="Grösste Zugspannung in der Bewehrung")
-        grad_formel(p, self.d_ausnutzung[fall.name], erg.erfuellungsgrad,
-                    grenze, wirkt, erg.erfuellt)
+        erg.ausgang.zeile(p, self.d_ausnutzung[fall.name])
 
     def _protokoll_fliessen(self, p: Protokoll, e: Eingaben, erg: Fallergebnis,
                             grenzen: Grenzen, werte: Zwischenwerte, wirkt: Wert,

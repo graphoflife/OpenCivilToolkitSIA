@@ -275,10 +275,12 @@ class TestUndrainiert(unittest.TestCase):
         self.assertIsNone(fall.i["c"])
         self.assertFalse(fall.erfuellt)
         self.assertEqual(fall.N_Rd, 0.0)
-        self.assertIn("kein Grundbruchwiderstand", fall.hinweis)
+        self.assertIn("kein Grundbruchwiderstand", fall.begruendung)
         urteil = next(u for u in loesung.urteile if u.art == "GB")
         self.assertFalse(urteil.erfuellt)
-        self.assertEqual(urteil.hinweis, fall.hinweis)
+        # Nicht fuehrbar: der Grund steht als Hinweis da, statt eines Widerstands null.
+        self.assertEqual(urteil.hinweis, fall.begruendung)
+        self.assertIsNone(urteil.widerstand)
 
 
 class TestGleiten(unittest.TestCase):

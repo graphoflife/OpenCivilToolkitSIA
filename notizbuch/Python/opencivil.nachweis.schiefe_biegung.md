@@ -1,5 +1,5 @@
 ---
-erzeugt: c4fcb7f598dc
+erzeugt: f4065998ccc7
 art: modul
 tags: [modul]
 ---
@@ -49,7 +49,7 @@ N > 0 Zug; M_y > 0 zieht unten, M_z > 0 links.
 
 ```python
 @dataclass
-class Fallergebnis
+class Fallergebnis(Fallausgang)
 ```
 
 Was ein Lastfall ergab -- fuer die Diagramme nach dem Lauf.
@@ -59,7 +59,7 @@ Was ein Lastfall ergab -- fuer die Diagramme nach dem Lauf.
 - `M_y: float`
 - `M_z: float` – Die Einwirkung, wie nachgewiesen -- mit Laengszugkraft, wo zugeschaltet.
 - `punkt: Optional[Bruchpunkt]`
-- `erfuellungsgrad: float`
+- `ausgang: Ausgang`
 
 ### Bruchbefund
 
@@ -94,6 +94,7 @@ Biegung und Normalkraft, je Lastfall gegen den Dehnungsfaecher.
 
 - `THEMA = 'Schiefe Biegung'` – In der Formelsammlung ein eigenes Thema: gerechnet wird anders als bei der Platte, gegen den Dehnungsfaecher statt gegen eine Handrechnung. In der Zusammenfassung heisst er wie dort.
 - `LANGNAME = 'Biegung und Normalkraft'`
+- `ART = 'M-N'`
 
 #### SchiefeBiegung.pruefe
 

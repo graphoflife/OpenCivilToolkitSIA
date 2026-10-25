@@ -603,7 +603,7 @@ def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
                 "art_text": a.schnittgroessen.art.beschriftung,
                 "innerhalb": a.innerhalb,
                 "erfuellungsgrad": a.erfuellungsgrad,
-                "grad_text": grad_als_text(a.erfuellungsgrad, a.innerhalb),
+                "grad_text": grad_als_text(a.erfuellungsgrad, a.erfuellt),
                 "groesse": a.achse.name,
                 "massstab": a.massstab.value,
                 "massstab_text": a.massstab.beschriftung,
@@ -661,15 +661,14 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
 
     faelle = []
     for erg in (gebogen.ergebnisse if gebogen is not None else []):
-        erfuellt = erg.erfuellungsgrad >= 1.0
         p = erg.punkt
         faelle.append({
             "name": erg.fall.name,
             "N_Ed": erg.N / 1e3,
             "M_y_Ed": erg.M_y / 1e3,
             "M_z_Ed": erg.M_z / 1e3,
-            "erfuellt": erfuellt,
-            "grad_text": grad_als_text(erg.erfuellungsgrad, erfuellt),
+            "erfuellt": erg.erfuellt,
+            "grad_text": grad_als_text(erg.erfuellungsgrad, erg.erfuellt),
             # Der Bruchzustand, gegen den der Nachweis misst -- bei N_Ed, in
             # der Richtung des Moments. Ohne Moment gibt es keinen.
             "widerstand": None if p is None else _als_kn([(p.N, p.M_y, p.M_z)])[0],
@@ -824,19 +823,15 @@ def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
     v = schub.verteilungen.get(fall.name)
     if v is None:
         return None
-    widerstaende = schub.widerstaende[fall.name]
     stuecke = [{"wand": schub.waende[s.wand].name,
                 "von": [s.von[0] * 1e3, s.von[1] * 1e3],
                 "bis": [s.bis[0] * 1e3, s.bis[1] * 1e3],
                 "q": fluss / 1e3}
                for s, fluss in zip(schub.modell.stuecke, v.fluss)]
-    waende = []
-    for i, (w, r) in enumerate(zip(schub.waende, widerstaende)):
-        q_max = max((abs(f) for s, f in zip(schub.modell.stuecke, v.fluss) if s.wand == i),
-                    default=0.0)
-        grad = r.v_Rd / q_max if q_max > 1e-6 else math.inf
-        waende.append({"name": w.name, "q_max": q_max / 1e3, "v_Rd": r.v_Rd / 1e3,
-                       "alpha": r.alpha, "erfuellt": grad >= 1.0,
-                       "grad_text": grad_als_text(grad, grad >= 1.0)})
+    waende = [{"name": w.name, "q_max": vergleich.einwirkung.groesse.si / 1e3,
+               "v_Rd": r.v_Rd / 1e3, "alpha": r.alpha, "erfuellt": vergleich.erfuellt,
+               "grad_text": grad_als_text(vergleich.grad, vergleich.erfuellt)}
+              for w, r, vergleich in zip(schub.waende, schub.widerstaende[fall.name],
+                                         schub.vergleiche[fall.name])]
     return {"stuecke": stuecke, "waende": waende,
             "zellen": [q_k / 1e3 for q_k in v.zellenfluss]}

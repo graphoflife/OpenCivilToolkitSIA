@@ -1,5 +1,5 @@
 ---
-erzeugt: 266535fa90e5
+erzeugt: 1720f7812085
 art: modul
 tags: [modul]
 ---
@@ -417,18 +417,127 @@ Frueher legte jeder Nachweis seine eigene an, mit eigener Stellenzahl, und
 die Werttabelle rundete an [[opencivil.core.wert#grad_als_text|grad_als_text]] vorbei: dort stand 0.996
 als «1», neben «nicht erfuellt».
 
-### grad_formel
+### Vergleich
 
 ```python
-def grad_formel(p: Protokoll, definition: WertDef, grad: float, widerstand: Wert, einwirkung: Wert, erfuellt: bool, *, mit_urteil: bool=False) -> None
+@dataclass(frozen=True)
+class Vergleich
+```
+
+Was ein Nachweis gegeneinander haelt: die Einwirkung gegen den Widerstand.
+
+Die Regeln dazu stehen hier, fuer jeden Nachweis dieselben. Der
+Erfuellungsgrad ist R / E: um welchen Faktor die Einwirkung noch wachsen
+duerfte. Der Widerstand gibt die Richtung vor, in der begrenzt wird; wirkt
+nichts in dieser Richtung -- E ist null oder wirkt ihr entgegen, etwa ein
+gedrueckter Stahl unter der Grenze seiner Zugspannung --, ist der Grad
+unbeschraenkt, ∞. Erfuellt ist ein Grad ab eins.
+
+Bis 2026-10-25 schrieb jeder Nachweis beides selbst; zwei setzten statt ∞
+eine 1e9, und in der Zusammenfassung stand «1000000000.00».
+
+- `einwirkung: Wert`
+- `widerstand: Wert`
+- `entscheid: Optional[bool] = None` – Das Urteil, wo nicht der Grad entscheidet, sondern die Geometrie: bei Biegung mit Normalkraft, ob die Einwirkung innerhalb der Resistenzlinie liegt -- der Grad misst dort nur, wie weit. Sonst `None`.
+
+#### Vergleich.grad
+
+```python
+@property
+def grad(self) -> float
+```
+
+#### Vergleich.erfuellt
+
+```python
+@property
+def erfuellt(self) -> bool
+```
+
+#### Vergleich.benannt
+
+```python
+def benannt(self, *, einwirkung: Optional[Wert]=None, widerstand: Optional[Wert]=None) -> 'Vergleich'
+```
+
+Derselbe Vergleich unter anderen Zeichen -- in der Tabelle steht der
+Widerstand mit seiner Bedingung, `M_Rd,x(N_Ed = -300 kN)`, in der
+Herleitung kurz. Die Zahlen bleiben; wer andere unterschiebt, bekommt
+einen Fehler.
+
+#### Vergleich.bedingung
+
+```python
+def bedingung(self, p: Protokoll, titel: str) -> None
+```
+
+«E ≤ R» als Zeile, ohne Urteil -- das steht in der Zeile des Grads ([[opencivil.core.berechnung#Vergleich.zeile|zeile]]).
+
+#### Vergleich.zeile
+
+```python
+def zeile(self, p: Protokoll, definition: WertDef, *, mit_urteil: bool=False) -> None
 ```
 
 Die Zeile mit dem Erfuellungsgrad -- in jedem Nachweis dieselbe Form,
 Widerstand durch Einwirkung.
 
-Der Grad setzt sich selbst ([[opencivil.core.wert#grad_als_text|grad_als_text]]). Stuende im Nenner eine
-Null, bleibt es bei den Symbolen. Ohne Normverweis -- den traegt die
-Zeile, aus der Widerstand und Einwirkung kommen.
+Der Grad setzt sich selbst ([[opencivil.core.wert#grad_als_text|grad_als_text]]). Stuende im Nenner
+eine Null, bleibt es bei den Symbolen. Ohne Normverweis -- den traegt
+die Zeile, aus der Widerstand und Einwirkung kommen.
+
+### KeinVergleich
+
+```python
+@dataclass(frozen=True)
+class KeinVergleich
+```
+
+Der Ausgang eines Falls, in dem nichts gegeneinander steht: der Nachweis
+liess sich nicht fuehren ([[opencivil.core.berechnung#Konstanten|NICHT_FUEHRBAR]]) -- es fehlt der
+Widerstand, etwa an einer Lage ohne Bewehrung --, oder es gibt nichts zu
+begrenzen ([[opencivil.core.berechnung#Konstanten|UNBESCHRAENKT]]), etwa ohne Druck beim Knicken. Was sich
+trotzdem zeigen laesst, darf mitkommen.
+
+- `grad: float`
+- `erfuellt: bool`
+- `einwirkung: Optional[Wert] = None`
+- `widerstand: Optional[Wert] = None`
+
+### Fallausgang
+
+```python
+class Fallausgang
+```
+
+Was ein Fallergebnis aus seinem Ausgang liest -- fuer Herleitung,
+Diagramme und Urteil dieselben Zahlen. Wer erbt, fuehrt das Feld
+`ausgang` mit der Vorgabe [[opencivil.core.berechnung#Konstanten|NICHT_FUEHRBAR]].
+
+- `ausgang: Ausgang`
+
+#### Fallausgang.machbar
+
+```python
+@property
+def machbar(self) -> bool
+```
+
+Ob etwas gegeneinander steht.
+
+#### Fallausgang.erfuellt
+
+```python
+@property
+def erfuellt(self) -> bool
+```
+
+#### Fallausgang.erfuellungsgrad
+
+```python
+@property
+def erfuellungsgrad(self) -> float
+```
 
 ### NachweisUrteil
 
@@ -503,6 +612,7 @@ Nachweis, die Loesung haelt fest, wie er ausging.
 
 - `still: bool = False` – Ob der Nachweis mitrechnet, ohne in die Herleitung zu kommen. Ausgeschaltete Nachweise verschwinden nicht, sie werden still: gerechnet wird weiter, in der Zusammenfassung stehen sie nicht, und wenn einer von ihnen nicht aufgeht, steht darunter ein Hinweis. Das ist der Unterschied zwischen «interessiert mich gerade nicht» und «gilt nicht» -- und nur das erste trifft auf einen Schalter zu, den jemand umgelegt hat.
 - `LANGNAME: str = ''` – Wie der Nachweis in der Zusammenfassung heisst, Spalte «Nachweis». Leer: sein Thema. Getrennt vom Thema, weil beide anders ordnen. Die Formelsammlung ordnet nach dem, was gerechnet wird -- «Zwängung auf Biegung». Die Zusammenfassung ordnet nach der Frage, die beantwortet wird -- «Risse: Zwängung Biegung», bei den anderen Rissnachweisen.
+- `ART: str = ''` – Das Kurzzeichen der Nachweisart in jedem Urteil -- siehe [[opencivil.core.berechnung#NachweisUrteil|NachweisUrteil.art]].
 - `richtung = None` – Die Tragrichtung, in der nachgewiesen wird -- `None`, wo es keine gibt.
 
 #### Nachweis.langname
@@ -550,6 +660,20 @@ Welcher Teil entscheidet, wo es mehrere gibt -- etwa zwei Lagen.
 In der Zusammenfassung steht nur der schlechteste; ohne diese Zeile
 muesste man die Zahlen der Herleitung selbst vergleichen, um zu wissen,
 welcher dort gelandet ist.
+
+#### Nachweis.urteil
+
+```python
+def urteil(self, ziel: WertDef, fall: str, ausgang: Ausgang, begruendung: str, *, hinweis: str='', art: str='', langname: str='', still: bool=False) -> NachweisUrteil
+```
+
+Das Urteil eines Falls aus seinem Ausgang: erfuellt, Grad, Einwirkung
+und Widerstand. `ziel` ist der Erfuellungsgrad, der es traegt.
+
+Steht nichts gegeneinander, kommt der Grund als Hinweis in die
+Zusammenfassung -- dort fehlen sonst die Zahlen, und ein Strich
+erklaert sich nicht von selbst. Bis 2026-10-25 baute jeder Nachweis
+sein Urteil selbst, und «nicht fuehrbar» stand auf vier Arten da.
 
 #### Nachweis.ohne_bewehrung
 
@@ -615,6 +739,9 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ## Konstanten
 
 - `FormelFunktion = Callable[..., Union[Groesse, EmpirischesErgebnis]]` – Eine Rechenfunktion bekommt die Eingaben als Groessen unter ihren lokalen Namen und liefert eine Groesse -- oder ein EmpirischesErgebnis, wenn die Normformel dimensionell inhomogen ist.
+- `NICHT_FUEHRBAR = KeinVergleich(0.0, False)`
+- `UNBESCHRAENKT = KeinVergleich(math.inf, True)`
+- `Ausgang = Union[Vergleich, KeinVergleich]` – Wie ein Fall ausgeht: verglichen, oder ohne Vergleich.
 
 ## Braucht
 
@@ -661,4 +788,4 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 
 ## Formeln aus diesem Modul
 
-- [[Erfüllungsgrad]] · `grad_formel`
+- [[Erfüllungsgrad]] · `Vergleich.zeile`

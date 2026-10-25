@@ -104,10 +104,10 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Befundbezug, Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
-    grad_def, grad_formel,
+    NICHT_FUEHRBAR, UNBESCHRAENKT, Ausfuehrung, Ausgang, Befundbezug, Eingabebezug, Eingaben,
+    Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, Groesse
+from opencivil.core.einheiten import KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import ILLINOIS, Suche
@@ -220,7 +220,7 @@ class Gleichgewicht:
 
 
 @dataclass
-class Knickergebnis:
+class Knickergebnis(Fallausgang):
     """Alle Zwischenwerte eines Knickfalls."""
 
     fall: Knickfall
@@ -260,8 +260,9 @@ class Knickergebnis:
     """Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile."""
 
     halbierungen: int = 0
-    erfuellungsgrad: float = 0.0
-    erfuellt: bool = False
+    ausgang: Ausgang = NICHT_FUEHRBAR
+    """|N_Ed| gegen N_Rd -- ohne Druck gibt es nichts zu begrenzen."""
+
     begruendung: str = ""
     hinweis: str = ""
 
@@ -319,6 +320,7 @@ class Knickverfahren(Nachweis):
     """
 
     THEMA = "Knicken"
+    ART = "K"
     widerstand: Rechenwahl
     schnell: bool = False
 
@@ -339,9 +341,8 @@ class Knickverfahren(Nachweis):
         l_cr = fall.knicklaenge.si
 
         if N_Ed >= 0.0:
-            erg.begruendung = erg.hinweis = "N_Ed ≥ 0, kein Druck → kein Knicknachweis."
-            erg.erfuellungsgrad = float("inf")
-            erg.erfuellt = True
+            erg.ausgang = UNBESCHRAENKT
+            erg.begruendung = "N_Ed ≥ 0, kein Druck → kein Knicknachweis."
             return erg
 
         # Die statische Hoehe -- daraus die Mindestausmitte.
@@ -376,8 +377,9 @@ class Knickverfahren(Nachweis):
             # verformten System *ist* dort der Widerstand.
             grenze = self._gleichgewicht(stab, erg.N_Rd, erg, l_cr)
             erg.M_bei_N_Rd = abs(grenze.M_ges) if grenze.stabil else grenze.M_Rd
-        erg.erfuellungsgrad = erg.N_Rd / abs(N_Ed)
-        erg.erfuellt = bei_N_Ed.traegt
+        # Getragen ist N_Ed genau dann, wenn N_Rd mindestens so gross ist: die
+        # Suche beginnt bei N_Ed, oben, wenn es traegt, sonst darunter.
+        erg.ausgang = Vergleich(self._n_ed(erg), self._n_rd(erg))
         erg.begruendung = self._begruendung(erg, bei_N_Ed)
         if not bei_N_Ed.stabil:
             erg.hinweis = (
@@ -476,27 +478,21 @@ class Knickverfahren(Nachweis):
         return unten
 
     def _urteil(self, erg: Knickergebnis) -> NachweisUrteil:
-        # Verglichen werden Normalkraefte: N_Rd ist die groesste Druckkraft,
-        # die noch eine Gleichgewichtslage hat. Das Moment zweiter Ordnung
-        # steht in der Herleitung -- in der Tabelle waere es die Groesse, die
-        # beim Knicken gerade verschwindet.
-        machbar = erg.fall.N_Ed.si < 0.0
-        # Beide Zahlen als Betrag: ein Widerstand mit umgekehrtem Vorzeichen
-        # neben seiner Einwirkung liest sich wie ein Fehler.
-        einwirkung = Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
+        return self.urteil(self.d_ausnutzung[erg.fall.name], erg.fall.name, erg.ausgang,
+                           erg.begruendung, hinweis=erg.hinweis)
+
+    def _n_ed(self, erg: Knickergebnis) -> Wert:
+        """
+        Die Druckkraft -- die Einwirkung in Tabelle und Herleitung.
+
+        Verglichen werden Normalkraefte: N_Rd ist die groesste Druckkraft, die
+        noch eine Gleichgewichtslage hat. Das Moment zweiter Ordnung steht in
+        der Herleitung -- in der Tabelle waere es die Groesse, die beim Knicken
+        gerade verschwindet. Beide als Betrag: ein Widerstand mit umgekehrtem
+        Vorzeichen neben seiner Einwirkung liest sich wie ein Fehler.
+        """
+        return Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
             "N_Ed", "N_{Ed}", abs(erg.fall.N_Ed.si), "Einwirkung")
-        widerstand = self._n_rd(erg)
-        return NachweisUrteil(
-            art="K",
-            ziel=self.d_ausnutzung[erg.fall.name].id,
-            fall=erg.fall.name,
-            erfuellt=erg.erfuellt,
-            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-            begruendung=erg.begruendung,
-            hinweis=erg.hinweis,
-            einwirkung=einwirkung if machbar else None,
-            widerstand=widerstand if machbar else None,
-        )
 
     def _n_rd(self, erg: Knickergebnis) -> Wert:
         """Die Grenzkraft -- der Widerstand in Tabelle und Herleitung."""
@@ -642,7 +638,6 @@ class Knickverfahren(Nachweis):
         eine eigene Ausmitten-Iteration nach sich; die alle abzudrucken hiesse,
         dreissig Tabellen fuer eine einzige Zahl zu zeigen.
         """
-        N_Ed = abs(erg.fall.N_Ed.si)
         p.erklaerung(
             "Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die "
             "gewollte Ausmitte e_1d bleibt dabei fest – sie gehört zum System "
@@ -650,14 +645,13 @@ class Knickverfahren(Nachweis):
             "Stab immer; von dort aus wird das Fenster halbiert, bis "
             "getragene und nicht getragene Kraft zusammenfallen."
         )
-        n_rd = self._n_rd(erg)
-        n_ed = Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
-            "N_Ed_betrag", r"\left|N_{Ed}\right|", N_Ed)
-        p.gleichung(bedingung(angabe(n_rd), r"\ge", angabe(n_ed), erg.erfuellt,
+        # In der Herleitung mit Betragsstrichen: darueber steht N_Ed mit Vorzeichen.
+        v = erg.ausgang.benannt(einwirkung=Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
+            "N_Ed_betrag", r"\left|N_{Ed}\right|", erg.ausgang.einwirkung.groesse.si))
+        p.gleichung(bedingung(angabe(v.widerstand), r"\ge", angabe(v.einwirkung), v.erfuellt,
                               mit_urteil=False),
                     titel="Grenzkraft des Stabes")
-        grad_formel(p, self.d_ausnutzung[erg.fall.name], erg.erfuellungsgrad,
-                    n_rd, n_ed, erg.erfuellt, mit_urteil=True)
+        v.zeile(p, self.d_ausnutzung[erg.fall.name], mit_urteil=True)
 
 
 class Knicken(Knickverfahren):
@@ -803,7 +797,6 @@ class Knicken(Knickverfahren):
             p.text("Dieselbe Wahl wie die Tragsicherheit: der Momentenwiderstand bei "
                    "der Druckkraft kommt aus deren Resistenzlinie.")
 
-        ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
 
         stab = self.stab(loeser, linie)
@@ -811,11 +804,9 @@ class Knicken(Knickverfahren):
             erg = self._einen_fall(stab, fall)
             befund.ergebnisse.append(erg)
             self._protokoll_fall(p, erg)
-            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
-                erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
-        return Ausfuehrung(ergebnis, urteile, befund)
+        return Ausfuehrung({}, urteile, befund)
 
     # -- Mitschrift ---------------------------------------------------------
 

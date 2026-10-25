@@ -1,5 +1,5 @@
 ---
-erzeugt: e52b2ac4ef0a
+erzeugt: 07e590653ff1
 art: modul
 tags: [modul]
 ---
@@ -49,24 +49,15 @@ die halbe Hoehe wie beim Zwang (SIA 262:2025, 4.4.1.3).
 
 ```python
 @dataclass
-class Lagenergebnis
+class Lagenergebnis(Fallausgang)
 ```
 
-Was der Nachweis fuer eine Lage gefunden hat.
+Was der Nachweis fuer eine Lage gefunden hat: M_Rd gegen M_Riss.
 
 - `lage: Bewehrungslage`
 - `M_Rd: float = 0.0` – Biegewiderstand bei N_Ed = 0 auf der Seite dieser Lage, in Nm (Betrag).
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
+- `ausgang: Ausgang = NICHT_FUEHRBAR`
 - `begruendung: str = ''`
-- `hinweis: str = ''`
-
-#### Lagenergebnis.machbar
-
-```python
-@property
-def machbar(self) -> bool
-```
 
 ### SproedesVersagen
 
@@ -85,6 +76,7 @@ als mitgegebene Zahl, damit die Abhängigkeit im Graphen steht und die
 Rückverfolgung sie zeigt.
 
 - `THEMA = 'Sprödes Versagen'`
+- `ART = 'SV'`
 
 #### SproedesVersagen.pruefe
 
@@ -104,7 +96,6 @@ Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
 ## Braucht
 
 - [[opencivil.core.berechnung]]
-- [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]

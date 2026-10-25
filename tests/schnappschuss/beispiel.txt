@@ -236,7 +236,7 @@ Widerstand bei N_Ed = 0.0 kN – ein Eckpunkt liegt genau dort
     M_{Rd} = M_{Rd}(N_{Ed}=0)^{-} = -79.9\,\mathrm{kNm}
 
 Erfüllungsgrad
-    \alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{79.9\,\mathrm{kNm}}{50\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
+    \alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{-79.9\,\mathrm{kNm}}{-50\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
 
 Vergrösserungsfaktor der Durchbiegung
 -------------------------------------

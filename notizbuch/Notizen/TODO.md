@@ -87,22 +87,12 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-10-25
 
 Vier Durchsichten über das ganze Repo, jeder Punkt am Code nachgeprüft.
-Behoben sind 1.1 (eine Zuweisung an ein fehlendes Feld) und 1.2 (Doppeltes
-im Balkensystem), siehe [[Entwicklung]]. Was in den Abschnitten darunter
+Behoben sind 1.1 (eine Zuweisung an ein fehlendes Feld), 1.2 (Doppeltes
+im Balkensystem) und 2.1 (das Urteil der Nachweise), siehe [[Entwicklung]]. Was in den Abschnitten darunter
 schon steht, steht hier nicht noch einmal: die Grundlage der Apps mit
 Zeichenfenster, die `Fallauswertung`, der Posten als `Postenbezug`, die
 Dateien über 1000 Zeilen, «fest» als `math.inf`, `Unterprotokoll`.
 
-- [ ] **Das Urteil jedes Nachweises ist von Hand gebaut** (22-mal
-      `NachweisUrteil(`). Es ist schon auseinandergelaufen: «unbeschränkt»
-      heisst sonst ∞, aber `1e9` in `richtungsnachweise.py` und
-      `schubwandnachweis.py`; bei Biegung und Normalkraft zeigen Tabelle und
-      Herleitung verschiedene Einwirkungen (Vorzeichen gegen Betrag); «nicht
-      führbar» wird auf vier Arten behandelt. Besser: der `Vergleich` aus
-      `spannungsbegrenzung.py` in den Kern, mit Grad, ∞-Regel, Satz und
-      Zeile der Herleitung, dazu `Nachweis.urteil(…)` und
-      `nicht_fuehrbar(…)`. Ersetzt «neun Nachweise bauen ihr Urteil je
-      selbst» unten.
 - [ ] **Sechs eigene Zwischenspeicher für Nebenanfragen** (`qa_zeichnung.js`,
       `bs_zeichnung.js`, `qa_diagramme.js`, `bs_diagramme.js`, `app.js`,
       `bericht.js`) mit drei Regeln für Fehler: ohne Antwort des Kerns
@@ -136,8 +126,8 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`, `Unterprotokoll`.
 - [ ] **Webschicht und Oberfläche rechnen nach, neu dazugekommen** (zum
       Punkt «Keine Rechnung und keine Norm in der Oberfläche» unten):
       `api.py` rechnet Wandlänge und a_sw/s nach, obwohl die Formel in
-      `analyse.py` steht; `diagrammdaten.py` den Erfüllungsgrad der
-      Schubwand; `bs_zeichnung.js` kopiert die Lastrichtungen aus dem Kern;
+      `analyse.py` steht; `bs_zeichnung.js` kopiert die Lastrichtungen aus
+      dem Kern;
       Einheiten und Stellen der Diagramme stehen in `bs_diagramme.js` neben
       `balkendaten.py`; `plattenkapitel.js` wiederholt «x/d ≤ 0.35», «L/350»
       und eine Normstelle.
@@ -225,7 +215,8 @@ Kennzahlen, und Phase 5, die Oberfläche (beide 2026-10-18, siehe
       - Aus dem früheren Punkt C2 ist «je Rechenart eine Tabellenzeile»
         nicht gemacht.
       - Grundbruch: Das Nachweisgerüst steht zweimal, und im Zweig «zu
-        schräg» kommt N_Rd = 0 aus den Vorgaben der Datenklasse.
+        schräg» steht im Befund N_Rd = 0 aus den Vorgaben der Datenklasse
+        (das Urteil zeigt dort seit 2026-10-25 Striche und den Hinweis).
       - Die Summe von Grundbewehrung und Zulage hat zwei Formelseiten:
         [[Bewehrung der Lage]] (`protokoll_lage`, auch die Verformung) und
         [[Bewehrungsquerschnitt der zusammengefassten Lage]] (Handrechnung).
@@ -307,9 +298,8 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       Bildschirm lässt unbekannte Blockarten still weg (`bericht.js`) ·
       `Unterprotokoll` ruft keine Rechnung auf, sein `tiefe` läuft durch 24
       Darstellungsfunktionen · `BEREICHE.get(…, "")` legt eine neue Art
-      still unter «Weitere» · neun Nachweise bauen ihr Urteil je selbst und
-      nennen jeden Erfüllungsgrad zweimal · der Schalter `schnell` bündelt
-      vier Verhalten für zwei Nutzer.
+      still unter «Weitere» · der Schalter `schnell` bündelt vier Verhalten
+      für zwei Nutzer.
 
 ## Offene Normfragen — deine Fragen, unbeantwortet
 

@@ -34,6 +34,7 @@ Ursache erhalten.
 
 from __future__ import annotations
 
+import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, replace
 from typing import (
@@ -621,25 +622,126 @@ def grad_def(id: str, symbol: str, beschreibung: str, referenz: str = "") -> Wer
                    erfuellungsgrad=True)
 
 
-def grad_formel(
-    p: Protokoll, definition: WertDef, grad: float, widerstand: Wert,
-    einwirkung: Wert, erfuellt: bool, *, mit_urteil: bool = False,
-) -> None:
+@dataclass(frozen=True)
+class Vergleich:
     """
-    Die Zeile mit dem Erfuellungsgrad -- in jedem Nachweis dieselbe Form,
-    Widerstand durch Einwirkung.
+    Was ein Nachweis gegeneinander haelt: die Einwirkung gegen den Widerstand.
 
-    Der Grad setzt sich selbst (:func:`grad_als_text`). Stuende im Nenner eine
-    Null, bleibt es bei den Symbolen. Ohne Normverweis -- den traegt die
-    Zeile, aus der Widerstand und Einwirkung kommen.
+    Die Regeln dazu stehen hier, fuer jeden Nachweis dieselben. Der
+    Erfuellungsgrad ist R / E: um welchen Faktor die Einwirkung noch wachsen
+    duerfte. Der Widerstand gibt die Richtung vor, in der begrenzt wird; wirkt
+    nichts in dieser Richtung -- E ist null oder wirkt ihr entgegen, etwa ein
+    gedrueckter Stahl unter der Grenze seiner Zugspannung --, ist der Grad
+    unbeschraenkt, ∞. Erfuellt ist ein Grad ab eins.
+
+    Bis 2026-10-25 schrieb jeder Nachweis beides selbst; zwei setzten statt ∞
+    eine 1e9, und in der Zusammenfassung stand «1000000000.00».
     """
-    if einwirkung.formatiert() == "0":
-        vorlage, eingaben = rf"\frac{{{widerstand.symbol}}}{{{einwirkung.symbol}}}", {}
-    else:
-        vorlage, eingaben = r"\frac{@R}{@E}", {"R": widerstand, "E": einwirkung}
-    p.formel(definition.belegen(Groesse(grad, EINHEITSLOS)), vorlage, eingaben,
-             titel="Erfüllungsgrad", referenz="",
-             nachsatz=tex.folgerung(erfuellt) if mit_urteil else "")
+
+    einwirkung: Wert
+    widerstand: Wert
+
+    entscheid: Optional[bool] = None
+    """
+    Das Urteil, wo nicht der Grad entscheidet, sondern die Geometrie: bei
+    Biegung mit Normalkraft, ob die Einwirkung innerhalb der Resistenzlinie
+    liegt -- der Grad misst dort nur, wie weit. Sonst ``None``.
+    """
+
+    @property
+    def grad(self) -> float:
+        e, r = self.einwirkung.groesse.si, self.widerstand.groesse.si
+        if e == 0.0 or e * r < 0.0:
+            return math.inf
+        return abs(r) / abs(e)
+
+    @property
+    def erfuellt(self) -> bool:
+        return self.grad >= 1.0 if self.entscheid is None else self.entscheid
+
+    def benannt(self, *, einwirkung: Optional[Wert] = None,
+                widerstand: Optional[Wert] = None) -> "Vergleich":
+        """
+        Derselbe Vergleich unter anderen Zeichen -- in der Tabelle steht der
+        Widerstand mit seiner Bedingung, ``M_Rd,x(N_Ed = -300 kN)``, in der
+        Herleitung kurz. Die Zahlen bleiben; wer andere unterschiebt, bekommt
+        einen Fehler.
+        """
+        neu = replace(self, einwirkung=einwirkung or self.einwirkung,
+                      widerstand=widerstand or self.widerstand)
+        if (neu.einwirkung.groesse.si, neu.widerstand.groesse.si) != (
+                self.einwirkung.groesse.si, self.widerstand.groesse.si):
+            raise ValueError("Ein Vergleich unter anderen Zeichen behält seine Zahlen.")
+        return neu
+
+    def bedingung(self, p: Protokoll, titel: str) -> None:
+        """«E ≤ R» als Zeile, ohne Urteil -- das steht in der Zeile des Grads (:meth:`zeile`)."""
+        p.gleichung(tex.bedingung(tex.angabe(self.einwirkung), r"\le", tex.angabe(self.widerstand),
+                                  self.erfuellt, mit_urteil=False), titel=titel)
+
+    def zeile(self, p: Protokoll, definition: WertDef, *, mit_urteil: bool = False) -> None:
+        """
+        Die Zeile mit dem Erfuellungsgrad -- in jedem Nachweis dieselbe Form,
+        Widerstand durch Einwirkung.
+
+        Der Grad setzt sich selbst (:func:`grad_als_text`). Stuende im Nenner
+        eine Null, bleibt es bei den Symbolen. Ohne Normverweis -- den traegt
+        die Zeile, aus der Widerstand und Einwirkung kommen.
+        """
+        widerstand, einwirkung = self.widerstand, self.einwirkung
+        if einwirkung.formatiert() == "0":
+            vorlage, eingaben = rf"\frac{{{widerstand.symbol}}}{{{einwirkung.symbol}}}", {}
+        else:
+            vorlage, eingaben = r"\frac{@R}{@E}", {"R": widerstand, "E": einwirkung}
+        p.formel(definition.belegen(Groesse(self.grad, EINHEITSLOS)), vorlage, eingaben,
+                 titel="Erfüllungsgrad", referenz="",
+                 nachsatz=tex.folgerung(self.erfuellt) if mit_urteil else "")
+
+
+@dataclass(frozen=True)
+class KeinVergleich:
+    """
+    Der Ausgang eines Falls, in dem nichts gegeneinander steht: der Nachweis
+    liess sich nicht fuehren (:data:`NICHT_FUEHRBAR`) -- es fehlt der
+    Widerstand, etwa an einer Lage ohne Bewehrung --, oder es gibt nichts zu
+    begrenzen (:data:`UNBESCHRAENKT`), etwa ohne Druck beim Knicken. Was sich
+    trotzdem zeigen laesst, darf mitkommen.
+    """
+
+    grad: float
+    erfuellt: bool
+    einwirkung: Optional[Wert] = None
+    widerstand: Optional[Wert] = None
+
+
+NICHT_FUEHRBAR = KeinVergleich(0.0, False)
+UNBESCHRAENKT = KeinVergleich(math.inf, True)
+
+#: Wie ein Fall ausgeht: verglichen, oder ohne Vergleich.
+Ausgang = Union[Vergleich, KeinVergleich]
+
+
+class Fallausgang:
+    """
+    Was ein Fallergebnis aus seinem Ausgang liest -- fuer Herleitung,
+    Diagramme und Urteil dieselben Zahlen. Wer erbt, fuehrt das Feld
+    ``ausgang`` mit der Vorgabe :data:`NICHT_FUEHRBAR`.
+    """
+
+    ausgang: Ausgang
+
+    @property
+    def machbar(self) -> bool:
+        """Ob etwas gegeneinander steht."""
+        return isinstance(self.ausgang, Vergleich)
+
+    @property
+    def erfuellt(self) -> bool:
+        return self.ausgang.erfuellt
+
+    @property
+    def erfuellungsgrad(self) -> float:
+        return self.ausgang.grad
 
 
 
@@ -827,6 +929,9 @@ class Nachweis(Berechnung):
     def langname(self) -> str:
         return self.LANGNAME or self.thema
 
+    ART: str = ""
+    """Das Kurzzeichen der Nachweisart in jedem Urteil -- siehe :attr:`NachweisUrteil.art`."""
+
     richtung = None
     """Die Tragrichtung, in der nachgewiesen wird -- ``None``, wo es keine gibt."""
 
@@ -881,6 +986,26 @@ class Nachweis(Berechnung):
         massgebend = self.massgebend(urteile)
         if len(urteile) >= 2 and massgebend:
             p.text(f"Massgebend: {massgebend[0].fall} (kleinster Erfüllungsgrad).")
+
+    def urteil(self, ziel: WertDef, fall: str, ausgang: Ausgang, begruendung: str, *,
+               hinweis: str = "", art: str = "", langname: str = "",
+               still: bool = False) -> NachweisUrteil:
+        """
+        Das Urteil eines Falls aus seinem Ausgang: erfuellt, Grad, Einwirkung
+        und Widerstand. ``ziel`` ist der Erfuellungsgrad, der es traegt.
+
+        Steht nichts gegeneinander, kommt der Grund als Hinweis in die
+        Zusammenfassung -- dort fehlen sonst die Zahlen, und ein Strich
+        erklaert sich nicht von selbst. Bis 2026-10-25 baute jeder Nachweis
+        sein Urteil selbst, und «nicht fuehrbar» stand auf vier Arten da.
+        """
+        if not hinweis and isinstance(ausgang, KeinVergleich):
+            hinweis = begruendung
+        return NachweisUrteil(
+            erfuellt=ausgang.erfuellt, erfuellungsgrad=Groesse(ausgang.grad, EINHEITSLOS),
+            ziel=ziel.id, fall=fall, art=art or self.ART, langname=langname,
+            begruendung=begruendung, hinweis=hinweis,
+            einwirkung=ausgang.einwirkung, widerstand=ausgang.widerstand, still=still)
 
     @staticmethod
     def ohne_bewehrung(nummer: int) -> str:
@@ -951,7 +1076,10 @@ class Nachweis(Berechnung):
                 u, raum=self.id, langname=langname,
                 name=u.name or self.urteilsname(langname, u.fall),
                 still=self.still or u.still))
-        return replace(pruefung, urteile=tuple(urteile))
+        # Der Grad eines Urteils ist zugleich die Ausgabe, die es traegt: die
+        # Pruefung nennt ihn einmal, im Urteil. Vorher schrieb sie ihn zweimal.
+        ausgaben = {**pruefung.ausgaben, **{u.ziel: u.erfuellungsgrad for u in urteile if u.ziel}}
+        return replace(pruefung, ausgaben=ausgaben, urteile=tuple(urteile))
 
     # Ein `alle_erfuellt` gab es hier einmal. Es hatte keinen Aufrufer und
     # zaehlte die stillen Urteile mit -- also das Gegenteil von dem, was

@@ -56,8 +56,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Befundbezug, Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
-    grad_def, grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Befundbezug, Eingabebezug, Eingaben, Fallausgang,
+    Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KN, KN_PRO_M, KNM, MM, N_PRO_MM2,
@@ -572,7 +572,7 @@ OHNE_EINWIRKUNG = Querkraftfall(name="ohne Einwirkung", V_Ed=Groesse(0.0, KN_PRO
 
 
 @dataclass
-class Querkraftergebnis:
+class Querkraftergebnis(Fallausgang):
     """Alle Zwischenwerte eines Falls, damit die Herleitung vollstaendig ist."""
 
     fall: Querkraftfall
@@ -594,13 +594,10 @@ class Querkraftergebnis:
     plastisch: bool = False
     """``m_Ed`` liegt ueber dem Momentenwiderstand -- siehe :func:`widerstand`."""
 
-    erfuellungsgrad: float = 0.0
-    erfuellt: bool = False
-    begruendung: str = ""
+    ausgang: Ausgang = NICHT_FUEHRBAR
+    """|V_Ed| gegen v_Rd -- nicht fuehrbar, wo sich kein Widerstand bestimmen liess."""
 
-    hinweis: str = ""
-    """Gesetzt, wenn sich gar kein Widerstand bestimmen liess -- siehe
-    :attr:`opencivil.core.berechnung.NachweisUrteil.hinweis`."""
+    begruendung: str = ""
 
     # -- nur mit Buegeln ----------------------------------------------------
 
@@ -637,6 +634,7 @@ class Querkraft(Nachweis):
     """
 
     THEMA = "Querkraft"
+    ART = "V"
 
     def __init__(
         self,
@@ -811,19 +809,8 @@ class Querkraft(Nachweis):
         """
         fall = erg.fall
         ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
-        ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
-            erg.erfuellungsgrad, EINHEITSLOS)
-        urteile.append(NachweisUrteil(
-            art="V",
-            ziel=self.d_ausnutzung[fall.name].id,
-            fall=fall.name,
-            erfuellt=erg.erfuellt,
-            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-            begruendung=erg.begruendung,
-            hinweis=erg.hinweis,
-            einwirkung=self._einwirkung(fall),
-            widerstand=self._widerstand(erg),
-        ))
+        urteile.append(self.urteil(self.d_ausnutzung[fall.name], fall.name, erg.ausgang,
+                                   erg.begruendung))
 
     def _einwirkung(self, fall: Querkraftfall) -> Wert:
         """
@@ -905,13 +892,13 @@ class Querkraft(Nachweis):
         s_y: float, f_yd: float, f_cd: float, k_c: float, ueber_teilung: bool,
     ) -> Querkraftergebnis:
         erg = Querkraftergebnis(fall=fall)
-        M_Ed, N_Ed, V_Ed = fall.M_Ed.si, fall.N_Ed.si, fall.V_Ed.si
+        M_Ed, N_Ed = fall.M_Ed.si, fall.N_Ed.si
 
         # Eine Stabzahl in y bezieht sich auf die betrachtete Breite. In
         # x-Richtung ergibt das eine Teilung; in y-Richtung liefe die Breite
         # laengs der Traglinie mit und die Formel haette keinen Bezug mehr.
         if not ueber_teilung and self.richtung is Richtung.Y:
-            erg.begruendung = erg.hinweis = (
+            erg.begruendung = (
                 "Bügel in y als Stabzahl → kein Widerstand in y. Für y: Teilung "
                 "in mm.")
             return erg
@@ -919,7 +906,7 @@ class Querkraft(Nachweis):
         erg.zuglage = zuglage(lagen, M_Ed >= 0)
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
-            erg.begruendung = erg.hinweis = _ohne_zugbewehrung(M_Ed)
+            erg.begruendung = _ohne_zugbewehrung(M_Ed)
             return erg
         erg.d = erg.d_v = hoehen
 
@@ -932,8 +919,7 @@ class Querkraft(Nachweis):
         erg.massgebend = beste_neigung(erg.punkte)
         erg.v_Rd = erg.massgebend.V_Rd
 
-        erg.erfuellungsgrad = float("inf") if V_Ed == 0 else abs(erg.v_Rd) / abs(V_Ed)
-        erg.erfuellt = erg.erfuellungsgrad >= 1.0
+        erg.ausgang = Vergleich(self._einwirkung(fall), self._widerstand(erg))
         massgebend = ("Bügel" if erg.massgebend.V_Rd_s <= erg.massgebend.V_Rd_c
                       else "Druckdiagonale")
         erg.begruendung = (
@@ -957,7 +943,7 @@ class Querkraft(Nachweis):
         m_Rd: float, lagen: Sequence[Tuple[float, bool]],
     ) -> Querkraftergebnis:
         erg = Querkraftergebnis(fall=fall)
-        M_Ed, N_Ed, V_Ed = fall.M_Ed.si, fall.N_Ed.si, fall.V_Ed.si
+        M_Ed, N_Ed = fall.M_Ed.si, fall.N_Ed.si
         erg.m_Rd = m_Rd
 
         # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und ohne d
@@ -966,9 +952,7 @@ class Querkraft(Nachweis):
         erg.zuglage = zuglage(lagen, M_Ed >= 0)
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
-            erg.erfuellungsgrad = 0.0
-            erg.erfuellt = False
-            erg.begruendung = erg.hinweis = _ohne_zugbewehrung(M_Ed)
+            erg.begruendung = _ohne_zugbewehrung(M_Ed)
             return erg
         erg.d = hoehen
         erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d
@@ -989,13 +973,10 @@ class Querkraft(Nachweis):
         erg.plastisch = punkt.plastisch
 
         if punkt.grund:
-            erg.erfuellungsgrad = 0.0
-            erg.erfuellt = False
-            erg.begruendung = erg.hinweis = punkt.grund
+            erg.begruendung = punkt.grund
             return erg
 
-        erg.erfuellungsgrad = float("inf") if V_Ed == 0 else abs(erg.v_Rd) / abs(V_Ed)
-        erg.erfuellt = erg.erfuellungsgrad >= 1.0
+        erg.ausgang = Vergleich(self._einwirkung(fall), self._widerstand(erg))
         erg.begruendung = (
             f"V_Rd = k_d · τ_cd · d_v = {erg.k_d:.4f} · "
             f"{tau_cd.formatiert(4, N_PRO_MM2)} N/mm² · "
@@ -1068,11 +1049,15 @@ class Querkraft(Nachweis):
             titel="Einwirkung")
 
     def _protokoll_grad(self, p: Protokoll, erg: Querkraftergebnis) -> None:
-        """Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe."""
+        """
+        Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe. Der
+        Widerstand steht hier kurz: seine Bedingung steht in der Zeile, die ihn
+        herleitet.
+        """
         name = erg.fall.name
-        widerstand = self.d_v_rd[name].belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M))
-        grad_formel(p, self.d_ausnutzung[name], erg.erfuellungsgrad, widerstand,
-                    self._einwirkung(erg.fall), erg.erfuellt, mit_urteil=True)
+        kurz = erg.ausgang.benannt(widerstand=self.d_v_rd[name].belegen(
+            erg.ausgang.widerstand.groesse))
+        kurz.zeile(p, self.d_ausnutzung[name], mit_urteil=True)
 
     # -- Mitschrift ohne Bügel -------------------------------------------------
 
@@ -1143,7 +1128,7 @@ class Querkraft(Nachweis):
                  {"N_Ed": werte.kraft("N_Ed", "N_{Ed}", N_Ed), "h": e["h"]},
                  titel="Dekompressionsmoment")
 
-        if erg.v_Rd == 0.0 and erg.begruendung:
+        if not erg.machbar:
             p.text(erg.begruendung)
             return
 

@@ -17,17 +17,16 @@ ist die schwaechste Wand.
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Sequence
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    NICHT_FUEHRBAR, Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
+from opencivil.core.einheiten import KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import WertDef
+from opencivil.core.wert import WertDef, grad_als_text
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 
@@ -37,20 +36,23 @@ class Schubbefund:
     """
     Was der Nachweis im Lauf fand: die Waende und ihre Zellen, je Lastfall
     die Verteilung des Schubflusses und je Wand den Widerstand bei der
-    gewaehlten Neigung -- fuer die Diagramme. Ein Lastfall ohne Verteilung
-    (keine Last, keine Wand) fehlt in beiden.
+    gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
+    Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in allen dreien.
     """
 
     waende: List[sw.Wand]
     modell: sw.Zellenmodell
     verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)
     widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)
+    vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)
+    """Je Wand ihr staerkster Schubfluss gegen ihren Widerstand."""
 
 
 class Schubwandnachweis(Nachweis):
     """Querkraft und Torsion, je Lastfall auf die Schubwaende verteilt."""
 
     THEMA = "Querkraft und Torsion"
+    ART = "V+T"
 
     def __init__(self, analyse: Querschnittsanalyse, lastfaelle: Sequence[Lastfall],
                  *, mit_laengszug: bool) -> None:
@@ -106,9 +108,7 @@ class Schubwandnachweis(Nachweis):
                 self._laengszug_null(ergebnis, fall)
                 continue
             p.titel(fall.name, ebene=3)
-            urteil, grad, laengs = self._ein_fall(
-                p, befund, fall, V_y, bezug, alpha_min, alpha_max)
-            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(grad, EINHEITSLOS)
+            urteil, laengs = self._ein_fall(p, befund, fall, V_y, bezug, alpha_min, alpha_max)
             urteile.append(urteil)
             if self.mit_laengszug:
                 d = self.d_laengszug[fall.name]
@@ -125,11 +125,7 @@ class Schubwandnachweis(Nachweis):
 
     def _ohne(self, p: Protokoll, fall: Lastfall, grund: str):
         p.warnung(grund)
-        d = self.d_ausnutzung[fall.name]
-        return NachweisUrteil(
-            art="V+T", ziel=d.id, fall=fall.name, erfuellt=False,
-            erfuellungsgrad=Groesse(0.0, EINHEITSLOS), begruendung=grund,
-            hinweis=grund), 0.0, None
+        return self.urteil(self.d_ausnutzung[fall.name], fall.name, NICHT_FUEHRBAR, grund), None
 
     def _ein_fall(self, p: Protokoll, befund: Schubbefund, fall: Lastfall, V_y: float,
                   bezug, alpha_min: int, alpha_max: int):
@@ -172,26 +168,28 @@ class Schubwandnachweis(Nachweis):
         # -- Je Wand: staerkstes Stueck gegen den Widerstand ---------------------
         zugkraft = fall.N > 0.0
         zeilen = []
-        bester: Optional[tuple] = None
         neigungen: List[int] = []
         widerstaende: List[sw.Wandwiderstand] = []
+        vergleiche: List[Vergleich] = []
         befund.widerstaende[fall.name] = widerstaende
+        befund.vergleiche[fall.name] = vergleiche
         for i, w in enumerate(befund.waende):
             fluss = [abs(q) for s, q in zip(befund.modell.stuecke, v.fluss) if s.wand == i]
-            q_ed = max(fluss) if fluss else 0.0
+            # Ein Fluss unter einem Millionstel N/m ist Rundungsrauschen der
+            # Verteilung, keine Beanspruchung -- dort steht ∞, nicht 8·10¹⁶.
+            q_ed = max(fluss) if fluss and max(fluss) > 1e-6 else 0.0
             r = sw.widerstand(w, alpha_min=alpha_min, alpha_max=alpha_max, zugkraft=zugkraft)
             widerstaende.append(r)
             neigungen.append(r.alpha)
-            # Ein Fluss unter einem Millionstel N/m ist Rundungsrauschen der
-            # Verteilung, keine Beanspruchung -- dort steht ∞, nicht 8·10¹⁶.
-            grad_w = (r.v_Rd / q_ed) if q_ed > 1e-6 else math.inf
+            wand = Vergleich(
+                werte.wert(f"q_Ed_{i + 1}", r"q_{Ed}", Groesse.aus_si(q_ed, KN_PRO_M), 1),
+                werte.wert(f"v_Rd_{i + 1}", r"v_{Rd}", Groesse.aus_si(r.v_Rd, KN_PRO_M), 1))
+            vergleiche.append(wand)
             zeilen.append([w.name, Mathe(fest(v.aus_querkraft[i] / 1e3, 1)),
                            Mathe(fest(q_ed / 1e3, 1)), Mathe(f"{r.alpha}"),
                            Mathe(fest(r.v_Rd_s / 1e3, 1)), Mathe(fest(r.v_Rd_c / 1e3, 1)),
                            Mathe(fest(r.v_Rd / 1e3, 1)),
-                           Mathe("\\infty" if math.isinf(grad_w) else fest(grad_w, 2))])
-            if bester is None or grad_w < bester[0]:
-                bester = (grad_w, w, q_ed, r)
+                           Mathe(grad_als_text(wand.grad, wand.erfuellt, latex=True))])
         p.tabelle(
             kopf=["Wand", Mathe(r"V_i\ [\mathrm{kN}]"), Mathe(r"|q_{Ed}|\ [\mathrm{kN/m}]"),
                   Mathe(r"\alpha\ [{}^{\circ}]"), Mathe(r"v_{Rd,s}\ [\mathrm{kN/m}]"),
@@ -202,15 +200,10 @@ class Schubwandnachweis(Nachweis):
         if zugkraft:
             p.text("Normalzug: die Druckdiagonalen steilen sich auf, α mindestens 40°.")
 
-        grad, w, q_ed, r = bester
-        einwirkung = werte.wert("q_Ed", r"q_{Ed}", Groesse.aus_si(q_ed, KN_PRO_M), 1)
-        widerstand = werte.wert("v_Rd", r"v_{Rd}", Groesse.aus_si(r.v_Rd, KN_PRO_M), 1)
-        if math.isinf(grad):
-            grad = 1e9
-        erfuellt = grad >= 1.0
+        i = min(range(len(vergleiche)), key=lambda k: vergleiche[k].grad)
+        w, r, massgebend = befund.waende[i], widerstaende[i], vergleiche[i]
         p.text(f"Massgebend: {w.name}.")
-        grad_formel(p, self.d_ausnutzung[fall.name], grad, widerstand, einwirkung,
-                    erfuellt, mit_urteil=True)
+        massgebend.zeile(p, self.d_ausnutzung[fall.name], mit_urteil=True)
 
         laengs = None
         if self.mit_laengszug:
@@ -224,11 +217,8 @@ class Schubwandnachweis(Nachweis):
             ], titel="Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte",
                 ausrichtung="lrl")
 
-        return NachweisUrteil(
-            art="V+T", ziel=self.d_ausnutzung[fall.name].id, fall=fall.name,
-            erfuellt=erfuellt, erfuellungsgrad=Groesse(grad, EINHEITSLOS),
-            begruendung=f"Massgebend {w.name}, α = {r.alpha}°.",
-            einwirkung=einwirkung, widerstand=widerstand), grad, laengs
+        return self.urteil(self.d_ausnutzung[fall.name], fall.name, massgebend,
+                           f"Massgebend {w.name}, α = {r.alpha}°."), laengs
 
     # -- Mitschrift ----------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 82f44f0c8728
+erzeugt: 3a5af39c87f5
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -284,7 +284,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Druckzonenhöhe bei reiner Biegung]] · [[opencivil.nachweis.duktilitaet#Duktilitaet._protokoll_lage|Duktilitaet._protokoll_lage]]
 - [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#Balkensystem._eigengewicht|_eigengewicht]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
-- [[Erfüllungsgrad]] · [[opencivil.core.berechnung#grad_formel|grad_formel]]
+- [[Erfüllungsgrad]] · [[opencivil.core.berechnung#Vergleich.zeile|Vergleich.zeile]]
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · [[opencivil.nachweis.stabgrenzen#_protokoll_fiktiv|_protokoll_fiktiv]]
 - [[Fläche eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]

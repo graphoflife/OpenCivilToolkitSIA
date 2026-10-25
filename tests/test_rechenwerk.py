@@ -5,12 +5,14 @@ Gerechnet wird hier mit einem kleinen erfundenen Beispiel, damit die Tests die
 Mechanik pruefen und nicht die Norminhalte -- die haben eigene Tests.
 """
 
+import math
 import unittest
 from typing import Mapping
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Befundbezug, Berechnung, BerechnungsFehler, Eingabebezug, Eingaben, Formel,
-    Nachweis, NachweisUrteil, Prozedur, Vorgabe, grad_def,
+    NICHT_FUEHRBAR, UNBESCHRAENKT, Ausfuehrung, Befundbezug, Berechnung, BerechnungsFehler,
+    Eingabebezug, Eingaben, Formel, Nachweis, NachweisUrteil, Prozedur, Vergleich, Vorgabe,
+    grad_def,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, M, MM, MM2, MPA, N_PRO_MM2, DimensionsFehler, Groesse,
@@ -21,7 +23,7 @@ from opencivil.core.latex import (
 )
 from opencivil.core.protokoll import GleichungBlock, Protokoll, StillesProtokoll, TabellenBlock
 from opencivil.core.rechenwerk import Rechenwerk, RechenwerkFehler, ZyklusFehler
-from opencivil.core.wert import Quelle, WertDef
+from opencivil.core.wert import Quelle, Wert, WertDef
 
 # ---------------------------------------------------------------------------
 # Gemeinsame Definitionen
@@ -743,27 +745,66 @@ class TestBerechnungAlsZiel(unittest.TestCase):
         self.assertEqual(len(gezaehlt), 1)
 
 
+def _wert(si: float, name: str = "x") -> Wert:
+    """Ein Wert in kNm aus einer Zahl in SI -- fuer die Vergleiche unten."""
+    return WertDef(f"v.{name}", name, KNM, name, stellen=1).belegen(Groesse.aus_si(si, KNM))
+
+
+class TestVergleich(unittest.TestCase):
+    """Die Regeln jedes Nachweises, an einer Stelle (2026-10-25)."""
+
+    def test_der_grad_ist_widerstand_durch_einwirkung(self):
+        v = Vergleich(_wert(120e3), _wert(150e3))
+        self.assertAlmostEqual(v.grad, 1.25)
+        self.assertTrue(v.erfuellt)
+        self.assertFalse(Vergleich(_wert(200e3), _wert(150e3)).erfuellt)
+
+    def test_genau_eins_ist_erfuellt(self):
+        self.assertTrue(Vergleich(_wert(150e3), _wert(150e3)).erfuellt)
+
+    def test_ohne_einwirkung_ist_der_grad_unbeschraenkt(self):
+        """Statt 1e9, wie zwei Nachweise es schrieben -- dort stand «1000000000.00»."""
+        v = Vergleich(_wert(0.0), _wert(150e3))
+        self.assertTrue(math.isinf(v.grad))
+        self.assertTrue(v.erfuellt)
+
+    def test_entgegen_dem_widerstand_ist_nichts_zu_begrenzen(self):
+        """Ein gedrueckter Stahl unter der Grenze seiner Zugspannung."""
+        self.assertTrue(math.isinf(Vergleich(_wert(-50e3), _wert(300e3)).grad))
+
+    def test_gleiche_vorzeichen_zaehlen_als_betrag(self):
+        """Druck gegen den Druckwiderstand."""
+        self.assertAlmostEqual(Vergleich(_wert(-3000e3), _wert(-5000e3)).grad, 5 / 3)
+
+    def test_ohne_widerstand_ist_der_grad_null(self):
+        v = Vergleich(_wert(100e3), _wert(0.0))
+        self.assertEqual(v.grad, 0.0)
+        self.assertFalse(v.erfuellt)
+
+    def test_wo_die_geometrie_entscheidet_gilt_ihr_urteil(self):
+        v = Vergleich(_wert(120e3), _wert(150e3), entscheid=False)
+        self.assertAlmostEqual(v.grad, 1.25)
+        self.assertFalse(v.erfuellt)
+
+    def test_ohne_vergleich(self):
+        self.assertEqual((NICHT_FUEHRBAR.grad, NICHT_FUEHRBAR.erfuellt), (0.0, False))
+        self.assertEqual((UNBESCHRAENKT.grad, UNBESCHRAENKT.erfuellt), (math.inf, True))
+
+
 class TestNachweis(unittest.TestCase):
     def test_urteil_wird_gesammelt(self):
-        d_ausn = WertDef("n.grad", r"\alpha_{eff}", EINHEITSLOS, "Erfüllungsgrad", stellen=2)
+        d_ausn = grad_def("n.grad", r"\alpha_{eff}", "Erfüllungsgrad")
         d_m_ed = WertDef("n.M_Ed", "M_{Ed}", KNM, "Bemessungsmoment", stellen=1)
         d_m_rd = WertDef("n.M_Rd", "M_{Rd}", KNM, "Momentenwiderstand", stellen=1)
 
         class Biegenachweis(Nachweis):
+            ART = "M"
+
             def pruefe(self, e, p):
-                m_ed, m_rd = e.g("M_Ed"), e.g("M_Rd")
-                grad = m_rd / m_ed
-                erfuellt = grad >= Groesse(1.0, EINHEITSLOS)
-                p.formel(d_ausn.belegen(grad), r"\frac{@M_Rd}{@M_Ed}", e)
-                return Ausfuehrung({d_ausn.id: grad}, (
-                    NachweisUrteil(
-                        name="Biegewiderstand",
-                        erfuellt=erfuellt,
-                        erfuellungsgrad=grad,
-                        einwirkung=e["M_Ed"],
-                        widerstand=e["M_Rd"],
-                    ),
-                ))
+                v = Vergleich(e["M_Ed"], e["M_Rd"])
+                v.zeile(p, d_ausn)
+                # Den Grad nennt das Urteil; als Ausgabe stempelt ihn der Nachweis.
+                return Ausfuehrung({}, [self.urteil(d_ausn, "Feld", v, "M_Rd gegen M_Ed.")])
 
         werk = Rechenwerk()
         werk.definiere(d_m_ed, d_m_rd)
@@ -780,10 +821,31 @@ class TestNachweis(unittest.TestCase):
 
         self.assertEqual(len(loesung.urteile), 1)
         self.assertTrue(loesung.alle_nachweise_erfuellt)
-        self.assertAlmostEqual(loesung.urteile[0].erfuellungsgrad.si, 1.25)
+        urteil = loesung.urteile[0]
+        self.assertAlmostEqual(urteil.erfuellungsgrad.si, 1.25)
+        self.assertEqual((urteil.art, urteil.fall, urteil.ziel), ("M", "Feld", d_ausn.id))
+        self.assertEqual(urteil.einwirkung.id, d_m_ed.id)
+        self.assertAlmostEqual(loesung.groesse(d_ausn.id).si, 1.25)
 
         werk.setze(d_m_ed.id, Groesse(200, KNM))
         self.assertFalse(werk.loese(d_ausn.id).alle_nachweise_erfuellt)
+
+    def test_ohne_vergleich_steht_der_grund_als_hinweis_da(self):
+        d_ausn = grad_def("n.grad", r"\alpha_{eff}", "Erfüllungsgrad")
+
+        class Leer(Nachweis):
+            def pruefe(self, e, p):
+                return Ausfuehrung({}, [self.urteil(d_ausn, "Lage", NICHT_FUEHRBAR,
+                                                    "Ohne Bewehrung → kein Nachweis.")])
+
+        werk = Rechenwerk()
+        werk.registriere(Leer("n.leer", ausgaben=[d_ausn], bezuege=[]))
+        loesung = werk.loese(d_ausn.id)
+        urteil = loesung.urteile[0]
+        self.assertFalse(urteil.erfuellt)
+        self.assertEqual(urteil.hinweis, "Ohne Bewehrung → kein Nachweis.")
+        self.assertIsNone(urteil.einwirkung)
+        self.assertEqual(loesung.groesse(d_ausn.id).si, 0.0)
 
 
 class TestHinweisReihenfolge(unittest.TestCase):

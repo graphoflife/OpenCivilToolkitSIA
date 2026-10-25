@@ -346,7 +346,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{79.9\,\mathrm{kNm}}{50\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{-79.9\,\mathrm{kNm}}{-50\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Vergrösserungsfaktor der Durchbiegung
