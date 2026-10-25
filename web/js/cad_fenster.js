@@ -245,7 +245,10 @@ function aktualisieren(a) {
     a.stand = jetzt;
     a.version += 1;
     const z = a.adapter.zeichnung() || {};
-    a.auswahl = new Set([...a.auswahl].filter((k) => a.modell.gibt(z, k)));
+    // Ein Anhang ist kein Element des Modells; ob es ihn noch gibt, weiss
+    // die App. Bis 2026-10-25 fiel er hier weg: jede Änderung an einer Last
+    // auf einer Linie schloss ihr Fenster.
+    a.auswahl = new Set([...a.auswahl].filter((k) => a.modell.gibt(z, k) || istAnhang(a, k)));
     a.adapter.geaendert?.(a);
   }
   zeichnen(a);

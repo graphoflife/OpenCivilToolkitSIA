@@ -44,6 +44,22 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Eine gewählte Last auf einer Linie bleibt beim Ändern gewählt
+
+Gefunden beim Prüfen des Eintrags darunter: Wer im schwebenden Fenster den
+Wert einer Last auf einer Linie änderte, verlor danach ihre Auswahl -- das
+Fenster ging nach jeder Eingabe zu.
+
+- Nach jeder Änderung räumt das Zeichenfenster die Auswahl auf und fragte
+  dafür nur sein Modell, ob es das Gewählte noch gibt. Eine Last auf einer
+  Linie ist aber kein Element des Modells, sondern ein Anhang der App (seit
+  2026-10-23); eine Last an einem Knoten ist beides und war darum nicht
+  betroffen.
+- Jetzt fragt es bei einem Anhang die App (`istAnhang`), wie es das beim
+  Löschen und Verschieben schon tat.
+
+---
+
 ## 2026-10-25 · Aufgeräumt: Doppeltes im Balkensystem, ein Weg zum Ändern
 
 Befund 1.2 der Strukturdurchsicht vom 2026-10-25: Reste aus den Tagen davor.
