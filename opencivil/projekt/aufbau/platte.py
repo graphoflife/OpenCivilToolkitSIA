@@ -51,7 +51,6 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
     hatte.
     """
     querschnitt = _querschnitt(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
-    aufbau.querschnitte[eintrag.kennung] = querschnitt
     querschnitt.ins_rechenwerk(aufbau.werk)
     # Bewehrungsmass und Distanzhalter stehen als Kennzahlen da, auch bei
     # einer Platte ohne Nachweis -- ihr Lagenaufbau rechnet darum immer.

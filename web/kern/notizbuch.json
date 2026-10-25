@@ -3824,6 +3824,12 @@
       "kurz": "was alle Bauteilarten beim Bauen teilen.",
       "stichworte": [
         "Aufbau",
+        "Aufbau.objekte",
+        "Aufbau.querschnitte",
+        "Aufbau.querschnittsanalysen",
+        "Aufbau.balkensysteme",
+        "Aufbau.grundbrueche",
+        "Aufbau.setzungen",
         "Aufbau.nachweise_je_feld",
         "Aufbau.alle_nachweise",
         "Aufbau.alle_nachweisziele",

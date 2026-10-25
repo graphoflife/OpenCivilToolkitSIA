@@ -36,7 +36,6 @@ def bauen(art: "Bauteilart", eintrag: SetzungEintrag, aufbau: Aufbau) -> Bauteil
                            M_E_strich=als_groesse(s, "M_E_strich"))
                    for s in eintrag.schichten],
         praefix=f"{art.raum}.{eintrag.kennung}")
-    aufbau.setzungen[eintrag.kennung] = fundament
     fundament.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag.kennung, eintrag.name, art, fundament)
     if eintrag.schichten:

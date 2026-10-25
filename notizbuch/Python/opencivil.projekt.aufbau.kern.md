@@ -1,5 +1,5 @@
 ---
-erzeugt: 74b81041ec7c
+erzeugt: 8c2b1a3b8904
 art: modul
 tags: [modul]
 ---
@@ -38,7 +38,6 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `schnell: bool = False` – Fuer die Bewehrungssuche gebaut -- siehe [[opencivil.projekt.aufbau#aufbauen|aufbauen]].
 - `teile: Dict[str, 'Bauteil'] = field(default_factory=dict)` – Jedes Bauteil nach Kennung, in der Reihenfolge von [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] und der Beschreibung.
 - `baustoffe: Dict[str, Baustoff] = field(default_factory=dict)`
-- `querschnitte: Dict[str, Plattenquerschnitt] = field(default_factory=dict)`
 - `nachweise: Dict[str, BiegungNormalkraft] = field(default_factory=dict)` – Schluessel ist `<querschnitt>.x`. Die Richtung steht noch im Schluessel, obwohl es nur eine gibt -- sie sagt dem Leser einer Wert-ID, welcher Querschnitt gemeint ist, und die Wert-IDs in abgelegten Berichten sollen nicht bei jeder Umstellung wechseln.
 - `querkraft: Dict[str, Querkraft] = field(default_factory=dict)`
 - `duktilitaet: Dict[str, Duktilitaet] = field(default_factory=dict)` – Schluessel ist die Querschnittskennung -- ein Nachweis je Platte.
@@ -52,7 +51,6 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `knicken: Dict[str, Knicken] = field(default_factory=dict)` – Nachweis am verformten System, je Querschnitt -- nur in x-Richtung.
 - `fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)` – Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind. Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine Zeile mit Erfuellungsgrad null steht statt gar nichts.
 - `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
-- `querschnittsanalysen: Dict[str, Any] = field(default_factory=dict)` – Die gezeichneten Querschnitte, nach Kennung -- Bauteile wie die Platten.
 - `leere_analysen: Dict[str, str] = field(default_factory=dict)` – Je Querschnittsanalyse, in der noch nichts gezeichnet ist, ihr Name. Sie wird kein Bauteil -- es gibt nichts zu rechnen --, aber wer auf sie zeigt, soll hoeren, dass sie leer ist, und nicht, es gebe sie nicht.
 - `qa_biegung: Dict[str, SchiefeBiegung] = field(default_factory=dict)` – Biegung und Normalkraft je Querschnittsanalyse, nach ihrer Kennung.
 - `qa_schub: Dict[str, Schubwandnachweis] = field(default_factory=dict)` – Querkraft und Torsion je Querschnittsanalyse.
@@ -63,14 +61,64 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `qa_spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)`
 - `qa_spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte.
 - `qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)` – Knicken je Querschnittsanalyse -- je Fall in seiner Richtung.
-- `balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)` – Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
-- `grundbrueche: Dict[str, Fundament] = field(default_factory=dict)` – Die Fundamente der Grundbruchnachweise, nach Kennung.
 - `grundbruch: Dict[str, Grundbruch] = field(default_factory=dict)`
 - `gleiten: Dict[str, Gleiten] = field(default_factory=dict)` – Grundbruch und Gleiten je Fundament.
-- `setzungen: Dict[str, Setzungsfundament] = field(default_factory=dict)` – Die Fundamente der Setzungsberechnungen, nach Kennung.
 - `setzung: Dict[str, Setzung] = field(default_factory=dict)` – Die Setzung je Fundament.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]).
+
+#### Aufbau.objekte
+
+```python
+def objekte(self, art: str) -> Dict[str, Any]
+```
+
+Die gebauten Objekte einer Bauteilart nach Kennung -- `art` ist ihr Name.
+
+#### Aufbau.querschnitte
+
+```python
+@property
+def querschnitte(self) -> Dict[str, Plattenquerschnitt]
+```
+
+Die Plattenquerschnitte, nach Kennung.
+
+#### Aufbau.querschnittsanalysen
+
+```python
+@property
+def querschnittsanalysen(self) -> Dict[str, Any]
+```
+
+Die gezeichneten Querschnitte, nach Kennung.
+
+#### Aufbau.balkensysteme
+
+```python
+@property
+def balkensysteme(self) -> Dict[str, Balkensystem]
+```
+
+Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
+
+#### Aufbau.grundbrueche
+
+```python
+@property
+def grundbrueche(self) -> Dict[str, Fundament]
+```
+
+Die Fundamente der Grundbruchnachweise, nach Kennung.
+
+#### Aufbau.setzungen
+
+```python
+@property
+def setzungen(self) -> Dict[str, Setzungsfundament]
+```
+
+Die Fundamente der Setzungsberechnungen, nach Kennung.
 
 #### Aufbau.nachweise_je_feld
 

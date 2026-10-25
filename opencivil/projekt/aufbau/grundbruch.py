@@ -39,7 +39,6 @@ def bauen(art: "Bauteilart", eintrag: GrundbruchEintrag, aufbau: Aufbau) -> Baut
         t1=g("t1"), t=g("t"), alpha=g("alpha"), beta=g("beta"),
         delta_faktor=g("delta_faktor"),
         praefix=f"{art.raum}.{eintrag.kennung}")
-    aufbau.grundbrueche[eintrag.kennung] = fundament
     fundament.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag.kennung, eintrag.name, art, fundament)
     kombinationen = [Kombination(name=k.name, N_Ed=als_groesse(k, "N_Ed"),

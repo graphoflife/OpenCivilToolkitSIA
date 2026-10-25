@@ -44,6 +44,17 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Aufbau: die Objekte je Art nur noch im Bauteil
+
+Aus der Strukturdurchsicht: jede Baufunktion legte ihr Objekt zweimal
+ab -- im Bauteil und in einem Wörterbuch ihrer Art (`querschnitte`,
+`querschnittsanalysen`, `balkensysteme`, `grundbrueche`, `setzungen`).
+Jetzt steht es nur im Bauteil, und die fünf Wörterbücher sind Sichten
+darauf (`Aufbau.objekte`). Wer sie liest, merkt nichts. Für den Benutzer
+ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Katalog: die Feldangaben jeder Klasse von Einträgen
 
 Aus der Strukturdurchsicht: welche Einheit, Grenzen und Ganzzahligkeit ein

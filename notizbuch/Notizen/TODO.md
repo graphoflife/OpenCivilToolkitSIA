@@ -121,11 +121,11 @@ Dateien über 1000 Zeilen.
       und eine Normstelle.
 - [ ] **«Eine neue Bauteilart kommt nur in BAUTEILE» stimmt nicht mehr.** Die
       Setzung berührte rund elf Stellen ausserhalb ihrer zwei Module. Der
-      Aufbau führt dieselbe Sache in drei Registern (`aufbau/kern.py`): das
-      Bauteil mit Objekt und Nachweisen, je Art ein Wörterbuch der Objekte
-      (`querschnitte`, `grundbrueche` …) und je Nachweisfeld eines der
-      Nachweise -- rund 180 Lesestellen. Besser: der Aufbau führt nur die
+      Aufbau führt die Nachweise zweimal (`aufbau/kern.py`): beim Bauteil und
+      je Nachweisfeld in einem eigenen Wörterbuch, das fast nur die Tests
+      lesen (rund 80 Stellen). Besser: auch diese als Sicht auf die
       Bauteile. `bericht.js` lässt eine fehlende Art still weg. (Die
+      Objekte je Art -- `querschnitte`, `grundbrueche` … --, die
       `zuordnung` und die Angaben über der Tabelle laufen seit 2026-10-25
       über die Bauteile.)
 - [ ] **Einheiten nicht an jedem Feld.** Der Katalog bringt seit 2026-10-25

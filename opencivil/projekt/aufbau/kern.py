@@ -79,7 +79,6 @@ class Aufbau:
     """
 
     baustoffe: Dict[str, Baustoff] = field(default_factory=dict)
-    querschnitte: Dict[str, Plattenquerschnitt] = field(default_factory=dict)
     nachweise: Dict[str, BiegungNormalkraft] = field(default_factory=dict)
     """
     Schluessel ist ``<querschnitt>.x``.
@@ -134,9 +133,6 @@ class Aufbau:
     anderes brauchen koennte, und nichts haengt von ihnen ab.
     """
 
-    querschnittsanalysen: Dict[str, Any] = field(default_factory=dict)
-    """Die gezeichneten Querschnitte, nach Kennung -- Bauteile wie die Platten."""
-
     leere_analysen: Dict[str, str] = field(default_factory=dict)
     """
     Je Querschnittsanalyse, in der noch nichts gezeichnet ist, ihr Name. Sie
@@ -161,18 +157,9 @@ class Aufbau:
     qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)
     """Knicken je Querschnittsanalyse -- je Fall in seiner Richtung."""
 
-    balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)
-    """Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
-
-    grundbrueche: Dict[str, Fundament] = field(default_factory=dict)
-    """Die Fundamente der Grundbruchnachweise, nach Kennung."""
-
     grundbruch: Dict[str, Grundbruch] = field(default_factory=dict)
     gleiten: Dict[str, Gleiten] = field(default_factory=dict)
     """Grundbruch und Gleiten je Fundament."""
-
-    setzungen: Dict[str, Setzungsfundament] = field(default_factory=dict)
-    """Die Fundamente der Setzungsberechnungen, nach Kennung."""
 
     setzung: Dict[str, Setzung] = field(default_factory=dict)
     """Die Setzung je Fundament."""
@@ -190,6 +177,40 @@ class Aufbau:
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
                       "qa_spannung", "qa_knicken", "grundbruch", "gleiten", "setzung")
+
+    # -- Die Objekte je Bauteilart: Sichten auf die Bauteile --------------
+    #
+    # Bis 2026-10-25 legte jede Baufunktion ihr Objekt ein zweites Mal ab, in
+    # einem Woerterbuch je Art. Jetzt steht es nur im Bauteil.
+
+    def objekte(self, art: str) -> Dict[str, Any]:
+        """Die gebauten Objekte einer Bauteilart nach Kennung -- ``art`` ist ihr Name."""
+        return {k: t.objekt for k, t in self.teile.items() if t.art.name == art}
+
+    @property
+    def querschnitte(self) -> Dict[str, Plattenquerschnitt]:
+        """Die Plattenquerschnitte, nach Kennung."""
+        return self.objekte("platte")
+
+    @property
+    def querschnittsanalysen(self) -> Dict[str, Any]:
+        """Die gezeichneten Querschnitte, nach Kennung."""
+        return self.objekte("querschnittsanalyse")
+
+    @property
+    def balkensysteme(self) -> Dict[str, Balkensystem]:
+        """Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
+        return self.objekte("balkensystem")
+
+    @property
+    def grundbrueche(self) -> Dict[str, Fundament]:
+        """Die Fundamente der Grundbruchnachweise, nach Kennung."""
+        return self.objekte("grundbruch")
+
+    @property
+    def setzungen(self) -> Dict[str, Setzungsfundament]:
+        """Die Fundamente der Setzungsberechnungen, nach Kennung."""
+        return self.objekte("setzung")
 
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""

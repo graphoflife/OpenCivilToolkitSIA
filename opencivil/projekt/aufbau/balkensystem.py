@@ -53,7 +53,6 @@ def bauen(art: "Bauteilart", eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Ba
         name=eintrag.name, kennung=eintrag.kennung, praefix=f"{art.raum}.{eintrag.kennung}",
         system=modell.system, paare=paare, meldungen=meldungen, querschnitte=querschnitte,
         eigengewicht=modell.eigengewicht)
-    aufbau.balkensysteme[eintrag.kennung] = system
     system.ins_rechenwerk(aufbau.werk)
     return Bauteil(eintrag.kennung, eintrag.name, art, system,
                    weitere_ziele=system.ziele(), bezuege=tuple(system.bezuege))

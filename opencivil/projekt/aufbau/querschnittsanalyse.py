@@ -57,7 +57,6 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
             f"Querschnittsanalyse '{eintrag.name}': noch nichts gezeichnet → nichts zu rechnen.")
         return None
     analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
-    aufbau.querschnittsanalysen[eintrag.kennung] = analyse
     analyse.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag.kennung, eintrag.name, art, analyse)
 
