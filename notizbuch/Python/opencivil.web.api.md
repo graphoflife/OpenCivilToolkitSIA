@@ -1,5 +1,5 @@
 ---
-erzeugt: 0e00d0f5de70
+erzeugt: 056740861bc5
 art: modul
 tags: [modul]
 ---
@@ -114,7 +114,25 @@ wissen. Ebenso ein Verweis auf einen Knoten, den es nicht gibt.
 def zuordnung(aufbau: Aufbau) -> dict
 ```
 
-Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
+Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks:
+die Materialien und je Bauteilart unter ihrer Liste die Bauteile -- je
+Namensraum, Name und was [[opencivil.web.api#Konstanten|_ZUORDNUNG]] fuer ihre Art sagt.
+
+### _werte
+
+```python
+def _werte(teil) -> dict
+```
+
+Wo die Werte eines Bauteils stehen, nach Kurzname.
+
+### _systemzuordnung
+
+```python
+def _systemzuordnung(teil) -> dict
+```
+
+Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt und Material EA und EI.
 
 
 ## Konstanten
@@ -124,6 +142,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - `_DIAGRAMMGROESSEN = {'M': ('M', 'Moment M'), 'V': ('V', 'Querkraft V'), 'N': ('N', 'Norma…` – Wie die Diagramme der Statik-Analyse heissen: kurz im Schalter, lang ueber dem Diagramm -- je Groesse, die die Beschreibung kennt.
 - `_BETONGESETZE = [{'wert': a.value, 'beschriftung': a.beschriftung, 'kurz': a.kurz} fo…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche es gibt, steht am Feld der Werkstoffwahl.
 - `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.
+- `_ZUORDNUNG = {'platte': _plattenzuordnung, 'balkensystem': _systemzuordnung}` – Was eine Bauteilart in der Zuordnung mehr hat als Namensraum und Name -- ohne Eintrag ihre Werte ([[opencivil.web.api#_werte|_werte]]). Bis 2026-10-25 stand die Zuordnung je Art von Hand da, zwei Bloecke wortgleich.
 
 ## Braucht
 

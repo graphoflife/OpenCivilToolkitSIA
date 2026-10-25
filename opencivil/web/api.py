@@ -16,7 +16,7 @@ erfinden, sonst laufen Bericht und Bildschirm auseinander.
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from opencivil.bewehrungssuche import DURCHMESSER, Suchmodus
 from opencivil.core.einheiten import MM
@@ -39,7 +39,7 @@ from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import (
-    Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
+    BAUTEILE, Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
     GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
     QuerkraftbewehrungEintrag, QuerschnittEintrag, SchichtEintrag, SetzungEintrag,
     SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
@@ -751,8 +751,12 @@ def geometrie(eintrag, projekt) -> dict:
 
 
 def zuordnung(aufbau: Aufbau) -> dict:
-    """Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks."""
-    return {
+    """
+    Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks:
+    die Materialien und je Bauteilart unter ihrer Liste die Bauteile -- je
+    Namensraum, Name und was :data:`_ZUORDNUNG` fuer ihre Art sagt.
+    """
+    ergebnis: Dict[str, Any] = {
         "materialien": {
             kennung: {
                 "namensraum": stoff.id,
@@ -765,84 +769,74 @@ def zuordnung(aufbau: Aufbau) -> dict:
             }
             for kennung, stoff in aufbau.baustoffe.items()
         },
-        "querschnitte": {
-            kennung: {
-                "namensraum": qs.id,
-                "name": qs.name,
-                # Der Beton gehoert zur Platte und steht darum bei ihren
-                # Abmessungen, nicht nur in der Materialliste.
-                "beton": qs.beton.name,
-                "werte": {
-                    kurzname: definition.id
-                    for kurzname, definition in qs.definitionen.items()
-                },
-                "nachweise": {
-                    nw.richtung.value: {
-                        "ziele": {n: d.id for n, d in nw.d_ausnutzung.items()},
-                        "eckwerte": {n: d.id for n, d in nw.d_eckwerte.items()},
-                    }
-                    for nw in aufbau.bauteil(kennung).im_feld("nachweise")
-                },
-                # Durchmesser, Teilung und Stabzahl als Zahlen, nicht nur als
-                # Text: das Querschnittsbild soll die tatsaechliche Teilung
-                # zeichnen und nicht eine erfundene Stabzahl.
-                "bewehrung": [
-                    {
-                        "lage": q.lage.nummer,
-                        "art": q.art.value,
-                        "richtung": q.lage.richtung.value,
-                        "stahl": q.lage.stahl.name if q.lage.stahl else "",
-                        "menge": q.posten.menge_text(),
-                        "phi": q.posten.durchmesser.in_einheit(MM),
-                        "abstand": (q.posten.abstand.in_einheit(MM)
-                                    if q.posten.abstand is not None else None),
-                        # anzahl ist eine blanke Zahl, keine Groesse -- Staebe
-                        # haben keine Einheit.
-                        "anzahl": q.posten.anzahl,
-                        "a_s_id": q.as_def.id,
-                        "z_id": q.z_def.id,
-                    }
-                    for q in qs.posten
-                ],
-            }
-            for kennung, qs in aufbau.querschnitte.items()
-        },
-        "querschnittsanalysen": {
-            kennung: {
-                "namensraum": analyse.id,
-                "name": analyse.name,
-                "werte": {k: d.id for k, d in analyse.definitionen.items()},
-            }
-            for kennung, analyse in aufbau.querschnittsanalysen.items()
-        },
-        # Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus
-        # Querschnitt und Material EA und EI.
-        "balkensysteme": {
-            kennung: {
-                "namensraum": system.id,
-                "name": system.name,
-                "querschnitte": {q: {"A": A, "I": I} for q, (A, I) in system.flaechen.items()},
-                "steifigkeiten": [{"querschnitt": s.querschnitt, "material": s.material,
-                                   "EA": s.EA, "EI": s.EI} for s in system.steifigkeiten],
-                # Je Querschnitt mit E_eq, wo es steht.
-                "module": dict(system.module),
-            }
-            for kennung, system in aufbau.balkensysteme.items()
-        },
-        "grundbrueche": {
-            kennung: {
-                "namensraum": fundament.id,
-                "name": fundament.name,
-                "werte": {k: d.id for k, d in fundament.definitionen.items()},
-            }
-            for kennung, fundament in aufbau.grundbrueche.items()
-        },
-        "setzungen": {
-            kennung: {
-                "namensraum": fundament.id,
-                "name": fundament.name,
-                "werte": {k: d.id for k, d in fundament.definitionen.items()},
-            }
-            for kennung, fundament in aufbau.setzungen.items()
-        },
+        **{art.liste: {} for art in BAUTEILE},
     }
+    for teil in aufbau.bauteile():
+        ergebnis[teil.art.liste][teil.kennung] = {
+            "namensraum": teil.objekt.id, "name": teil.objekt.name,
+            **_ZUORDNUNG.get(teil.art.name, _werte)(teil)}
+    return ergebnis
+
+
+def _werte(teil) -> dict:
+    """Wo die Werte eines Bauteils stehen, nach Kurzname."""
+    return {"werte": {k: d.id for k, d in teil.objekt.definitionen.items()}}
+
+
+def _plattenzuordnung(teil) -> dict:
+    qs = teil.objekt
+    return {
+        # Der Beton gehoert zur Platte und steht darum bei ihren
+        # Abmessungen, nicht nur in der Materialliste.
+        "beton": qs.beton.name,
+        **_werte(teil),
+        "nachweise": {
+            nw.richtung.value: {
+                "ziele": {n: d.id for n, d in nw.d_ausnutzung.items()},
+                "eckwerte": {n: d.id for n, d in nw.d_eckwerte.items()},
+            }
+            for nw in teil.im_feld("nachweise")
+        },
+        # Durchmesser, Teilung und Stabzahl als Zahlen, nicht nur als
+        # Text: das Querschnittsbild soll die tatsaechliche Teilung
+        # zeichnen und nicht eine erfundene Stabzahl.
+        "bewehrung": [
+            {
+                "lage": q.lage.nummer,
+                "art": q.art.value,
+                "richtung": q.lage.richtung.value,
+                "stahl": q.lage.stahl.name if q.lage.stahl else "",
+                "menge": q.posten.menge_text(),
+                "phi": q.posten.durchmesser.in_einheit(MM),
+                "abstand": (q.posten.abstand.in_einheit(MM)
+                            if q.posten.abstand is not None else None),
+                # anzahl ist eine blanke Zahl, keine Groesse -- Staebe
+                # haben keine Einheit.
+                "anzahl": q.posten.anzahl,
+                "a_s_id": q.as_def.id,
+                "z_id": q.z_def.id,
+            }
+            for q in qs.posten
+        ],
+    }
+
+
+def _systemzuordnung(teil) -> dict:
+    """Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt und Material EA und EI."""
+    system = teil.objekt
+    return {
+        "querschnitte": {q: {"A": A, "I": I} for q, (A, I) in system.flaechen.items()},
+        "steifigkeiten": [{"querschnitt": s.querschnitt, "material": s.material,
+                           "EA": s.EA, "EI": s.EI} for s in system.steifigkeiten],
+        # Je Querschnitt mit E_eq, wo es steht.
+        "module": dict(system.module),
+    }
+
+
+#: Was eine Bauteilart in der Zuordnung mehr hat als Namensraum und Name --
+#: ohne Eintrag ihre Werte (:func:`_werte`). Bis 2026-10-25 stand die
+#: Zuordnung je Art von Hand da, zwei Bloecke wortgleich.
+_ZUORDNUNG: Dict[str, Callable[[Any], dict]] = {
+    "platte": _plattenzuordnung,
+    "balkensystem": _systemzuordnung,
+}

@@ -121,12 +121,13 @@ Dateien über 1000 Zeilen.
       und eine Normstelle.
 - [ ] **«Eine neue Bauteilart kommt nur in BAUTEILE» stimmt nicht mehr.** Die
       Setzung berührte rund elf Stellen ausserhalb ihrer zwei Module. Der
-      Aufbau führt dieselbe Sache in drei Registern (`aufbau/kern.py`), die
-      `zuordnung` ist je Art von Hand geschrieben, zwei Blöcke wortgleich
-      (`api.py`); `bericht.js` lässt eine fehlende Art still weg,
-      `bericht/zusammenfassung.py` findet die Art durch Probieren. Besser:
-      der Aufbau führt nur die Bauteile, die `zuordnung` entsteht in einer
-      Schleife, `angaben` wird ein Feld der Bauteilart.
+      Aufbau führt dieselbe Sache in drei Registern (`aufbau/kern.py`): das
+      Bauteil mit Objekt und Nachweisen, je Art ein Wörterbuch der Objekte
+      (`querschnitte`, `grundbrueche` …) und je Nachweisfeld eines der
+      Nachweise -- rund 180 Lesestellen. Besser: der Aufbau führt nur die
+      Bauteile. `bericht.js` lässt eine fehlende Art still weg. (Die
+      `zuordnung` und die Angaben über der Tabelle laufen seit 2026-10-25
+      über die Bauteile.)
 - [ ] **Der Katalog listet Felder von Hand** (`api.py`): 11 von 25 Klassen mit
       Einheiten, die übrigen schreibt die Oberfläche selbst («M_Ed [kNm]»
       in `plattenkapitel.js`). Besser ein Durchgang über den Baum der

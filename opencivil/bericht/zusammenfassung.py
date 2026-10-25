@@ -25,7 +25,7 @@ was unter der Tabelle steht, steht jetzt hier und nur hier.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.einheiten import MM, Groesse
@@ -230,32 +230,56 @@ def stiller_hinweis(zeile: Zeile) -> str:
 # ===========================================================================
 
 
-def angaben(aufbau: "Aufbau", kennung: str,
-            loesung: Loesung) -> Tuple[GleichungBlock, Optional[TabellenBlock]]:
+Angaben = Tuple[GleichungBlock, Optional[TabellenBlock]]
+
+
+def angaben(aufbau: "Aufbau", kennung: str, loesung: Loesung) -> Angaben:
     """
     Was ueber der Nachweistabelle eines Bauteils steht: eine Zeile mit den
     Angaben und eine Tabelle -- bei der Platte ihre Lagen, bei der
     Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
     Faktoren der Tragfaehigkeitsformel, bei der Setzung die Schichten mit
     ihrem Anteil. Die stehen erst nach dem Rechnen fest; darum die Loesung.
+    Was je Art, sagt :data:`ANGABEN` -- bis 2026-10-25 wurde die Art durch
+    Probieren gefunden, ein Register nach dem anderen.
     """
-    platte = aufbau.querschnitte.get(kennung)
-    if platte is not None:
-        return plattenangaben(platte), bewehrungsuebersicht(platte, loesung.werte)
-    fundament = aufbau.grundbrueche.get(kennung)
-    if fundament is not None:
-        nachweis = aufbau.grundbruch.get(kennung)
-        befund = loesung.befunde.get(nachweis.id) if nachweis is not None else None
-        return (grundbruch.angaben(fundament, loesung.werte),
-                grundbruch.faktortabelle(befund) if befund is not None else None)
-    baugrund = aufbau.setzungen.get(kennung)
-    if baugrund is not None:
-        nachweis = aufbau.setzung.get(kennung)
-        befund = loesung.befunde.get(nachweis.id) if nachweis is not None else None
-        return (setzung.angaben(baugrund, loesung.werte),
-                setzung.schichttabelle(baugrund, loesung.werte, befund)
-                if befund is not None else None)
-    return aufbau.querschnittsanalysen[kennung].angaben()
+    teil = aufbau.bauteil(kennung)
+    try:
+        je_art = ANGABEN[teil.art.name]
+    except KeyError:
+        raise KeyError(f"Fuer die Bauteilart '{teil.art.name}' steht in ANGABEN nicht, "
+                       f"was ueber ihrer Nachweistabelle steht.") from None
+    return je_art(teil, loesung)
+
+
+def _befund(teil, feld: str, loesung: Loesung):
+    """Der Befund seines Nachweises in diesem Feld -- ``None``, wenn der Lauf ihn nicht hat."""
+    nachweise = teil.im_feld(feld)
+    return loesung.befunde.get(nachweise[0].id) if nachweise else None
+
+
+def _grundbruchangaben(teil, loesung: Loesung) -> Angaben:
+    befund = _befund(teil, "grundbruch", loesung)
+    return (grundbruch.angaben(teil.objekt, loesung.werte),
+            grundbruch.faktortabelle(befund) if befund is not None else None)
+
+
+def _setzungsangaben(teil, loesung: Loesung) -> Angaben:
+    befund = _befund(teil, "setzung", loesung)
+    return (setzung.angaben(teil.objekt, loesung.werte),
+            setzung.schichttabelle(teil.objekt, loesung.werte, befund)
+            if befund is not None else None)
+
+
+#: Je Bauteilart mit Nachweisen, was ueber ihrer Tabelle steht -- nach dem
+#: Namen der Art. Ein Balkensystem hat keine Nachweise und keine Tabelle.
+ANGABEN: Dict[str, Callable[[Any, Loesung], Angaben]] = {
+    "platte": lambda teil, loesung: (plattenangaben(teil.objekt),
+                                     bewehrungsuebersicht(teil.objekt, loesung.werte)),
+    "querschnittsanalyse": lambda teil, loesung: teil.objekt.angaben(),
+    "grundbruch": _grundbruchangaben,
+    "setzung": _setzungsangaben,
+}
 
 
 def kennzahlen(aufbau: "Aufbau", kennung: str,

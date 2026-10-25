@@ -44,6 +44,20 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Bauteilarten: Zuordnung und Angaben über die Bauteile
+
+Aus der Strukturdurchsicht: die Zuordnung der Kennungen der Oberfläche zu
+den Wert-IDs (`api.zuordnung`) stand je Bauteilart von Hand da, Grundbruch
+und Setzung wortgleich; was über einer Nachweistabelle steht
+(`zusammenfassung.angaben`), fand die Art durch Probieren, ein Register
+nach dem anderen. Jetzt gehen beide über die Bauteile: die Zuordnung gibt
+jedem Namensraum, Name und seine Werte, und was eine Art mehr hat, steht
+in `_ZUORDNUNG`; die Angaben stehen je Art in `ANGABEN`. Eine neue Art
+bekommt die Zuordnung von selbst, und ohne Angaben meldet sie sich laut.
+Für den Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Balkensystem: frei, fest oder Feder als ein Wert
 
 Aus der Strukturdurchsicht: wie ein Lager oder ein Linienlager eine

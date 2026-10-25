@@ -1,5 +1,5 @@
 ---
-erzeugt: a425df50645d
+erzeugt: 7b6e55abca23
 art: modul
 tags: [modul]
 ---
@@ -161,7 +161,7 @@ darum das Einzige, was sagt, woran es fehlt.
 ### angaben
 
 ```python
-def angaben(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> Tuple[GleichungBlock, Optional[TabellenBlock]]
+def angaben(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> Angaben
 ```
 
 Was ueber der Nachweistabelle eines Bauteils steht: eine Zeile mit den
@@ -169,6 +169,16 @@ Angaben und eine Tabelle -- bei der Platte ihre Lagen, bei der
 Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
 Faktoren der Tragfaehigkeitsformel, bei der Setzung die Schichten mit
 ihrem Anteil. Die stehen erst nach dem Rechnen fest; darum die Loesung.
+Was je Art, sagt [[opencivil.bericht.zusammenfassung#Konstanten|ANGABEN]] -- bis 2026-10-25 wurde die Art durch
+Probieren gefunden, ein Register nach dem anderen.
+
+### _befund
+
+```python
+def _befund(teil, feld: str, loesung: Loesung)
+```
+
+Der Befund seines Nachweises in diesem Feld -- `None`, wenn der Lauf ihn nicht hat.
 
 ### kennzahlen
 
@@ -228,6 +238,7 @@ hoch, beide, getrennt durch `/`.
 - `GRAD_SPALTE = 4` – Welche Spalte den Erfuellungsgrad traegt. Die Oberflaeche hinterlegt genau sie -- zaehlen statt raten, sonst haenge die Einfaerbung an der Reihenfolge der Kopfzeile.
 - `STAPEL_SPALTEN = (2, 3)` – Widerstand und Einwirkung: die Oberflaeche setzt sie uebereinander in eine Zelle, der Bericht behaelt beide Spalten.
 - `AUSRICHTUNG = 'LLrrr'` – Nachweis und Bezeichnung duerfen umbrechen: mit zwei Formeln daneben liefe die Tabelle im Bericht sonst ueber den Rand.
+- `ANGABEN = {'platte': lambda teil, loesung: (plattenangaben(teil.objekt), bewehr…` – Je Bauteilart mit Nachweisen, was ueber ihrer Tabelle steht -- nach dem Namen der Art. Ein Balkensystem hat keine Nachweise und keine Tabelle.
 
 ## Braucht
 

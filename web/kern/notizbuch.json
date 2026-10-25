@@ -2396,6 +2396,7 @@
         "hinweise",
         "stiller_hinweis",
         "angaben",
+        "_befund",
         "kennzahlen",
         "kennzahlentabelle",
         "plattenangaben",
@@ -5090,7 +5091,9 @@
         "loesung_dict",
         "zusammenfassungen",
         "geometrie",
-        "zuordnung"
+        "zuordnung",
+        "_werte",
+        "_systemzuordnung"
       ]
     },
     {
