@@ -88,8 +88,8 @@ gelernt wurde, steht in [[Entwicklung]].
 
 Vier Durchsichten über das ganze Repo, jeder Punkt am Code nachgeprüft.
 Behoben sind 1.1 (eine Zuweisung an ein fehlendes Feld), 1.2 (Doppeltes
-im Balkensystem), 2.1 (das Urteil der Nachweise) und das
-`Unterprotokoll`, siehe [[Entwicklung]]. Was in den Abschnitten darunter
+im Balkensystem), 2.1 (das Urteil der Nachweise), das `Unterprotokoll`
+und der doppelte Bügelgehalt, siehe [[Entwicklung]]. Was in den Abschnitten darunter
 schon steht, steht hier nicht noch einmal: die Grundlage der Apps mit
 Zeichenfenster, die `Fallauswertung`, der Posten als `Postenbezug`, die
 Dateien über 1000 Zeilen, «fest» als `math.inf`.
@@ -115,12 +115,10 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`.
         verschmierter Linie, mit `flaeche` und `als_bewehrung()`.
       - M–χ oder N–ε als Ja/Nein, rund 12-mal in der Spannungsanalyse.
         Besser ein Wert `Linienart`.
-- [ ] **Webschicht und Oberfläche rechnen nach, neu dazugekommen** (zum
+- [ ] **Die Oberfläche wiederholt Kern-Wissen, neu dazugekommen** (zum
       Punkt «Keine Rechnung und keine Norm in der Oberfläche» unten):
-      `api.py` rechnet Wandlänge und a_sw/s nach, obwohl die Formel in
-      `analyse.py` steht; `bs_zeichnung.js` kopiert die Lastrichtungen aus
-      dem Kern;
-      Einheiten und Stellen der Diagramme stehen in `bs_diagramme.js` neben
+      `bs_zeichnung.js` kopiert die Lastrichtungen aus dem Kern; Einheiten
+      und Stellen der Diagramme stehen in `bs_diagramme.js` neben
       `balkendaten.py`; `plattenkapitel.js` wiederholt «x/d ≤ 0.35», «L/350»
       und eine Normstelle.
 - [ ] **«Eine neue Bauteilart kommt nur in BAUTEILE» stimmt nicht mehr.** Die

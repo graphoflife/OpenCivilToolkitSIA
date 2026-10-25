@@ -1,5 +1,5 @@
 ---
-erzeugt: 14121d360192
+erzeugt: 0893859dceb3
 art: modul
 tags: [modul]
 ---
@@ -369,6 +369,16 @@ def verschmierte_flaeche(durchmesser: float, teilung: float, laenge: float) -> f
 
 Staebe `durchmesser` im Abstand `teilung` ueber `laenge`, verschmiert
 -- in mm²: `A_s = L/s · π⌀²/4`. Bei ⌀12 @ 150 auf 1000 mm sind das 754 mm².
+
+### buegelgehalt
+
+```python
+def buegelgehalt(schnitte: int, durchmesser: float, teilung: float) -> float
+```
+
+Der Buegelquerschnitt einer Schubwand je Laenge, `n · π⌀²/4 / s`, in
+mm²/mm -- ohne Buegel null. Fuer den Nachweis und fuer die Liste unter
+der Zeichnung.
 
 ### linienflaeche
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e7ffc8e2580
+erzeugt: 335225a90550
 art: modul
 tags: [modul]
 ---
@@ -134,7 +134,7 @@ def laenge(self) -> float
 def a_sw_s(self) -> float
 ```
 
-Buegelquerschnitt je Laenge, `n · π⌀²/4 / s`, in mm²/mm.
+Buegelquerschnitt je Laenge, in mm²/mm ([[opencivil.querschnitt.geometrie#buegelgehalt|buegelgehalt]]).
 
 ### Meldung
 

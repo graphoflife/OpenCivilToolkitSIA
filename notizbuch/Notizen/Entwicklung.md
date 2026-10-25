@@ -44,6 +44,16 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Schubwand: der Bügelgehalt an einer Stelle
+
+Aus der Strukturdurchsicht: den Bügelquerschnitt einer Schubwand je Länge,
+n · π⌀²/4 / s, rechneten der Nachweis (`Wandangabe.a_sw_s`) und die Liste
+unter der Zeichnung (`api.py`) je für sich. Jetzt steht die Formel einmal,
+`geometrie.buegelgehalt`; die Liste rechnet nur noch in mm²/m um. Für den
+Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Aufgeräumt: die eingeschachtelte Mitschrift entfällt
 
 Befund 6 der Strukturdurchsicht: `Protokoll.unterprotokoll` öffnete eine

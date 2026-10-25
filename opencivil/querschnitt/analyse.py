@@ -136,14 +136,12 @@ class Wandangabe:
 
     @property
     def laenge(self) -> float:
-        return math.hypot(self.bis[0] - self.von[0], self.bis[1] - self.von[1])
+        return math.dist(self.von, self.bis)
 
     @property
     def a_sw_s(self) -> float:
-        """Buegelquerschnitt je Laenge, ``n · π⌀²/4 / s``, in mm²/mm."""
-        if self.durchmesser <= 0 or self.teilung <= 0:
-            return 0.0
-        return self.schnitte * math.pi * self.durchmesser ** 2 / 4.0 / self.teilung
+        """Buegelquerschnitt je Laenge, in mm²/mm (:func:`~opencivil.querschnitt.geometrie.buegelgehalt`)."""
+        return geo.buegelgehalt(self.schnitte, self.durchmesser, self.teilung)
 
 
 @dataclass(frozen=True)

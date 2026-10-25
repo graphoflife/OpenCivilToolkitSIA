@@ -55,9 +55,8 @@ from opencivil.projekt.querschnittsanalyse import (
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import (
-    VERSCHMIERT, Linienart, aequivalenter_durchmesser, linie_in_ueberdeckung, linienflaeche,
-    stab_in_ueberdeckung,
-    ueberdeckungspolygon,
+    VERSCHMIERT, Linienart, aequivalenter_durchmesser, buegelgehalt, linie_in_ueberdeckung,
+    linienflaeche, stab_in_ueberdeckung, ueberdeckungspolygon,
 )
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
@@ -737,10 +736,9 @@ def geometrie(eintrag, projekt) -> dict:
         "linien": linien,
         "waende": [
             {"element": w["name"], "kennung": w["kennung"], "gut": gut,
-             "laenge": math.hypot(w["bis"][0] - w["von"][0], w["bis"][1] - w["von"][1]),
-             "a_sw_s": (w["schnitte"] * math.pi * w["durchmesser"] ** 2 / 4.0
-                        / w["teilung"] * 1000.0
-                        if w["durchmesser"] > 0 and w["teilung"] > 0 else 0.0)}
+             "laenge": math.dist(w["von"], w["bis"]),
+             # In mm²/m, wie die Liste ihn zeigt.
+             "a_sw_s": buegelgehalt(w["schnitte"], w["durchmesser"], w["teilung"]) * 1000.0}
             for w, gut in zip(elemente.waende, z.waende)],
         "zellen": [{"punkte": [list(p) for p in ecken], "flaeche": flaeche}
                    for ecken, flaeche in z.zellen],

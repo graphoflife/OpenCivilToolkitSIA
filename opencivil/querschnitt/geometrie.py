@@ -588,6 +588,17 @@ def verschmierte_flaeche(durchmesser: float, teilung: float, laenge: float) -> f
     return laenge / teilung * math.pi * durchmesser ** 2 / 4.0
 
 
+def buegelgehalt(schnitte: int, durchmesser: float, teilung: float) -> float:
+    """
+    Der Buegelquerschnitt einer Schubwand je Laenge, ``n · π⌀²/4 / s``, in
+    mm²/mm -- ohne Buegel null. Fuer den Nachweis und fuer die Liste unter
+    der Zeichnung.
+    """
+    if durchmesser <= 0 or teilung <= 0:
+        return 0.0
+    return schnitte * math.pi * durchmesser ** 2 / 4.0 / teilung
+
+
 def linienflaeche(linie: Mapping[str, Any], laenge: float, staebe: int) -> float:
     """
     Die ganze Stahlflaeche einer Stablinie in mm² -- die eine Stelle dafuer.
