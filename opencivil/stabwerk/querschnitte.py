@@ -22,15 +22,20 @@ Formeln des Rechtecks) und der Bruttoquerschnitt einer Querschnittsanalyse
 
 EINHEITEN:
 Masse in mm, ``A`` in mm², ``I`` in 10⁶ mm⁴ -- wie in der Querschnittsanalyse.
+
+Die Umrisse von Rechteck, T und Kreis und was an einem T nicht geht, teilen
+sich die Vorlagen hier mit denen der Querschnittsanalyse
+(:mod:`opencivil.querschnitt.vorlagen`).
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Mapping, Optional, Tuple
 
 from opencivil.core.einheiten import MIO_MM4, MM, MM2, Einheit, Groesse
+from opencivil.querschnitt.vorlagen import kreispunkte, rechteckpunkte, t_punkte, t_pruefen
 
 Masse = Mapping[str, float]
 
@@ -101,16 +106,6 @@ def _namen(vorlage: str) -> List[str]:
     return platzhalter_namen(vorlage)
 
 
-def _rechteck(b: float, h: float, x: float = 0.0, z: float = 0.0) -> List[Tuple[float, float]]:
-    return [(x, z), (x + b, z), (x + b, z + h), (x, z + h)]
-
-
-def _kreis(d: float, mitte: Tuple[float, float], ecken: int = 48) -> List[Tuple[float, float]]:
-    r = d / 2.0
-    return [(mitte[0] + r * math.cos(2 * math.pi * i / ecken),
-             mitte[1] + r * math.sin(2 * math.pi * i / ecken)) for i in range(ecken)]
-
-
 def _flaeche(name: str, vorlage: str, funktion) -> Kennformel:
     return Kennformel("A", "A", MM2, 0, "Querschnittsfläche", vorlage, funktion,
                       f"Fläche eines {name}")
@@ -131,7 +126,7 @@ RECHTECK = Stabvorlage(
                    lambda b, h: b * h ** 3 / 12.0),
     ),
     pruefung=lambda m: None,
-    umriss=lambda m: [_rechteck(m["b"], m["h"])],
+    umriss=lambda m: [rechteckpunkte(m["b"], m["h"])],
 )
 
 #: Kreis: Durchmesser d.
@@ -145,7 +140,7 @@ KREIS = Stabvorlage(
                    lambda d: math.pi * d ** 4 / 64.0),
     ),
     pruefung=lambda m: None,
-    umriss=lambda m: [_kreis(m["d"], (m["d"] / 2, m["d"] / 2))],
+    umriss=lambda m: [kreispunkte((m["d"] / 2, m["d"] / 2), m["d"] / 2)],
 )
 
 #: Kreisring: aussen D, Wand t.
@@ -162,8 +157,8 @@ KREISRING = Stabvorlage(
     ),
     pruefung=lambda m: (None if 2.0 * m["t"] < m["D"]
                         else "Die Wand t ist zu dick: 2·t muss kleiner als D sein."),
-    umriss=lambda m: [_kreis(m["D"], (m["D"] / 2, m["D"] / 2)),
-                      _kreis(m["D"] - 2 * m["t"], (m["D"] / 2, m["D"] / 2))],
+    umriss=lambda m: [kreispunkte((m["D"] / 2, m["D"] / 2), m["D"] / 2),
+                      kreispunkte((m["D"] / 2, m["D"] / 2), m["D"] / 2 - m["t"])],
 )
 
 #: Rechteckrohr: b breit, h hoch, Wand t ringsum.
@@ -182,8 +177,8 @@ RECHTECKROHR = Stabvorlage(
     ),
     pruefung=lambda m: (None if 2.0 * m["t"] < min(m["b"], m["h"])
                         else "Die Wand t ist zu dick: 2·t muss kleiner als b und h sein."),
-    umriss=lambda m: [_rechteck(m["b"], m["h"]),
-                      _rechteck(m["b"] - 2 * m["t"], m["h"] - 2 * m["t"], m["t"], m["t"])],
+    umriss=lambda m: [rechteckpunkte(m["b"], m["h"]),
+                      rechteckpunkte(m["b"] - 2 * m["t"], m["h"] - 2 * m["t"], m["t"], m["t"])],
 )
 
 #: T-Querschnitt, Flansch oben: b breit, h hoch, Steg b_w, Flansch h_f.
@@ -209,14 +204,8 @@ T_QUERSCHNITT = Stabvorlage(
                                          + b_w * (h - h_f) ** 3 / 12.0
                                          + b_w * (h - h_f) * ((h + h_f) / 2.0 - z_S) ** 2)),
     ),
-    pruefung=lambda m: (
-        "Der Steg b_w ist breiter als der Flansch b." if m["b_w"] > m["b"]
-        else "Der Flansch h_f muss dünner sein als die Höhe h." if m["h_f"] >= m["h"]
-        else None),
-    umriss=lambda m: [[((m["b"] - m["b_w"]) / 2, 0.0), ((m["b"] + m["b_w"]) / 2, 0.0),
-                       ((m["b"] + m["b_w"]) / 2, m["h"] - m["h_f"]), (m["b"], m["h"] - m["h_f"]),
-                       (m["b"], m["h"]), (0.0, m["h"]), (0.0, m["h"] - m["h_f"]),
-                       ((m["b"] - m["b_w"]) / 2, m["h"] - m["h_f"])]],
+    pruefung=lambda m: t_pruefen(m["b"], m["h"], m["b_w"], m["h_f"]),
+    umriss=lambda m: [t_punkte(m["b"], m["h"], m["b_w"], m["h_f"])],
 )
 
 #: Doppel-T, symmetrisch: b breit, h hoch, Flansche t_f, Steg t_w.

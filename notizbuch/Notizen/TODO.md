@@ -133,10 +133,8 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`.
       Einheiten, die übrigen schreibt die Oberfläche selbst («M_Ed [kNm]»
       in `plattenkapitel.js`). Besser ein Durchgang über den Baum der
       Beschreibung, wie `lesen.py` ihn abläuft.
-- [ ] **Kleineres:** zwei Kataloge von Querschnittsvorlagen
-      (`querschnitt/vorlagen.py`, `stabwerk/querschnitte.py`), die Prüfung
-      des T-Querschnitts läuft auseinander (`>=` gegen `>`) · sieben Helfer
-      bauen SVG-Pfade, und die Diagramme kennen zwei Regime für Farben.
+- [ ] **Kleineres:** sieben Helfer bauen SVG-Pfade, und die Diagramme
+      kennen zwei Regime für Farben.
 
 ## Umbau: liegen geblieben bei der Durchsicht vom 2026-10-18
 

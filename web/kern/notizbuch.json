@@ -4565,6 +4565,9 @@
         "Teile",
         "Teile.als_dict",
         "kreispunkte",
+        "rechteckpunkte",
+        "t_punkte",
+        "t_pruefen",
         "Vorlage",
         "Vorlage.bauen",
         "vorlage"

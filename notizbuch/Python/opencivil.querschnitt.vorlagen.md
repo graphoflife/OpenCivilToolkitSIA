@@ -1,5 +1,5 @@
 ---
-erzeugt: 62cd621e4c66
+erzeugt: 50a1b7493f23
 art: modul
 tags: [modul]
 ---
@@ -22,6 +22,16 @@ Einsetzen. Vorher stand das Rechteck zweimal da, in Python und in JS.
 Was eine Vorlage nicht sagt, kommt aus den Vorgaben der Eintraege -- der
 Stahl, die Buegel einer Schubwand, ihre Schnitte. Eine Vorlage ist ein
 Anfang, kein Entwurf.
+
+
+## DIE UMRISSE
+
+Rechteck, T und Kreis zeichnet auch das Balkensystem fuer seine
+Stabquerschnitte ([[opencivil.stabwerk.querschnitte]]). Ihre Umrisse und
+was an einem T nicht geht, stehen darum hier, einmal fuer beide
+([[opencivil.querschnitt.vorlagen#rechteckpunkte|rechteckpunkte]], [[opencivil.querschnitt.vorlagen#t_punkte|t_punkte]], [[opencivil.querschnitt.vorlagen#t_pruefen|t_pruefen]],
+[[opencivil.querschnitt.vorlagen#kreispunkte|kreispunkte]]). Bis 2026-10-25 standen sie in beiden Katalogen, und
+ein Steg so breit wie der Flansch galt im einen als T, im anderen nicht.
 
 ## Inhalt
 
@@ -67,6 +77,32 @@ def kreispunkte(mitte: Punkt, radius: float) -> List[Punkt]
 
 Ein Kreis als Vieleck mit [[opencivil.querschnitt.vorlagen#Konstanten|KREISECKEN]] Ecken, auf Tausendstel gerundet.
 
+### rechteckpunkte
+
+```python
+def rechteckpunkte(b: float, h: float, y: float=0.0, z: float=0.0) -> List[Punkt]
+```
+
+Ein Rechteck `b` breit und `h` hoch, die Ecke unten links in `(y, z)`.
+
+### t_punkte
+
+```python
+def t_punkte(b: float, h: float, b_w: float, h_f: float) -> List[Punkt]
+```
+
+Ein T, der Flansch oben und mittig ueber dem Steg -- der Ursprung unten links.
+
+### t_pruefen
+
+```python
+def t_pruefen(b: float, h: float, b_w: float, h_f: float) -> Optional[str]
+```
+
+Was an einem T nicht geht -- `None`, wenn alles geht. Ein Steg so breit
+wie der Flansch gaebe ein Rechteck mit doppelten Ecken: dafuer gibt es das
+Rechteck.
+
 ### Vorlage
 
 ```python
@@ -111,5 +147,6 @@ Die Vorlage zu einem Schluessel -- `ValueError`, wenn es sie nicht gibt.
 ## Gebraucht von
 
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.web.api]]
 - [[opencivil.web.dienst]]

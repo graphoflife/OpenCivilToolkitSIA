@@ -1,5 +1,5 @@
 ---
-erzeugt: e4ba7536e439
+erzeugt: d649c9e15cac
 art: modul
 tags: [modul]
 ---
@@ -33,6 +33,10 @@ Formeln des Rechtecks) und der Bruttoquerschnitt einer Querschnittsanalyse
 ## EINHEITEN
 
 Masse in mm, `A` in mm², `I` in 10⁶ mm⁴ -- wie in der Querschnittsanalyse.
+
+Die Umrisse von Rechteck, T und Kreis und was an einem T nicht geht, teilen
+sich die Vorlagen hier mit denen der Querschnittsanalyse
+([[opencivil.querschnitt.vorlagen]]).
 
 ## Inhalt
 
@@ -128,6 +132,7 @@ def vorlage(schluessel: str) -> Stabvorlage
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
+- [[opencivil.querschnitt.vorlagen]]
 
 ## Gebraucht von
 

@@ -49,7 +49,10 @@ class TestPruefen(unittest.TestCase):
         for schluessel, masse, wort in (
                 ("kreisring", {"D": 100.0, "t": 60.0}, "zu dick"),
                 ("rechteckrohr", {"b": 100.0, "h": 200.0, "t": 50.0}, "zu dick"),
-                ("t", {"b": 200.0, "h": 600.0, "b_w": 300.0, "h_f": 100.0}, "breiter"),
+                ("t", {"b": 200.0, "h": 600.0, "b_w": 300.0, "h_f": 100.0}, "schmaler"),
+                # Ein Steg so breit wie der Flansch: dafuer gibt es das Rechteck --
+                # dieselbe Regel wie in der Querschnittsanalyse.
+                ("t", {"b": 300.0, "h": 600.0, "b_w": 300.0, "h_f": 100.0}, "schmaler"),
                 ("doppel_t", {"b": 200.0, "h": 30.0, "t_f": 16.0, "t_w": 9.0}, "dicker"),
                 ("rechteck", {"b": 0.0, "h": 600.0}, "grösser als null")):
             with self.subTest(vorlage=schluessel):

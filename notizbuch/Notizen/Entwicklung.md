@@ -44,6 +44,25 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Vorlagen: Rechteck, T und Kreis einmal gezeichnet
+
+Aus der Strukturdurchsicht: die Vorlagen der Querschnittsanalyse
+(`querschnitt/vorlagen.py`) und die der Stabquerschnitte im Balkensystem
+(`stabwerk/querschnitte.py`) zeichneten Rechteck, T und Kreis je für sich,
+und ein Steg so breit wie der Flansch galt im einen als T, im anderen
+nicht. Die Umrisse und die Prüfung des T stehen jetzt einmal, in
+`querschnitt/vorlagen.py`; das Balkensystem nimmt sie von dort.
+
+Die beiden Kataloge bleiben getrennt: der eine baut die Teile einer
+Zeichnung mit Bewehrung und Schubwänden, der andere Formeln für A und I
+samt Herleitung.
+
+Für den Benutzer: ein T im Balkensystem mit b_w = b gilt nicht mehr --
+«Der Steg b_w muss schmaler sein als der Flansch b.» Dafür gibt es das
+Rechteck. Die Meldungen des T lauten in beiden Apps gleich.
+
+---
+
 ## 2026-10-25 · Aufgeräumt: der Name eines Kennwerts an einer Stelle
 
 Aus der Strukturdurchsicht: unter welchem Namen ein Nachweis einen
