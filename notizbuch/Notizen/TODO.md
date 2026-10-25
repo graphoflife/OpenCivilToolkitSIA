@@ -87,12 +87,12 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-10-25
 
 Vier Durchsichten über das ganze Repo, jeder Punkt am Code nachgeprüft.
-Behoben sind 1.1 (eine Zuweisung an ein fehlendes Feld), 1.2 (Doppeltes
-im Balkensystem), 2.1 (das Urteil der Nachweise), das `Unterprotokoll`,
-der doppelte Bügelgehalt und der Posten als Tupel, siehe [[Entwicklung]].
-Was in den Abschnitten darunter schon steht, steht hier nicht noch einmal:
-die Grundlage der Apps mit Zeichenfenster, die `Fallauswertung`, die
-Dateien über 1000 Zeilen.
+Die Punkte im Rechenkern sind am 2026-10-25 behoben, siehe [[Entwicklung]]
+-- bis auf zwei, die auch die Oberfläche betreffen: die Stablinie vor dem
+Bauen und die Einheiten am Feld. Offen sind sonst die Punkte der
+Oberfläche. Was in den Abschnitten darunter schon steht, steht hier nicht
+noch einmal: die Grundlage der Apps mit Zeichenfenster, die
+`Fallauswertung`, die Dateien über 1000 Zeilen.
 
 - [ ] **Sechs eigene Zwischenspeicher für Nebenanfragen** (`qa_zeichnung.js`,
       `bs_zeichnung.js`, `qa_diagramme.js`, `bs_diagramme.js`, `app.js`,
