@@ -3866,6 +3866,10 @@
       "art": "modul",
       "kurz": "ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.",
       "stichworte": [
+        "Querschnittsart",
+        "Querschnittsart.beschriftung",
+        "Querschnittsart.kurz",
+        "Querschnittsart.aus_bauteil",
         "SystemknotenEintrag",
         "StablastEintrag",
         "StablastEintrag.verteilt",
@@ -4833,7 +4837,6 @@
       "kurz": "das Balkensystem im Rechenwerk.",
       "stichworte": [
         "Stabmaterial",
-        "Stabquerschnitt",
         "Steifigkeit",
         "Lagerkraft",
         "Systembefund",
@@ -4844,7 +4847,6 @@
         "Balkensystem",
         "Balkensystem.abschnitt",
         "Balkensystem.bezuege",
-        "Balkensystem._querschnitt",
         "Balkensystem._kennwerte",
         "Balkensystem._erdbeschleunigung",
         "Balkensystem._steifigkeit",
@@ -4876,6 +4878,35 @@
         "Punkt",
         "aufteilen",
         "knotenlasten"
+      ]
+    },
+    {
+      "name": "opencivil.stabwerk.stabquerschnitt",
+      "pfad": "Python/opencivil.stabwerk.stabquerschnitt.md",
+      "art": "modul",
+      "kurz": "woher A und I eines Stabs kommen.",
+      "stichworte": [
+        "Stabquerschnitt",
+        "Stabquerschnitt.bauteil",
+        "Stabquerschnitt.modulfrage",
+        "Stabquerschnitt.flaechenwerte",
+        "Stabquerschnitt.umriss",
+        "Stabquerschnitt._formeln",
+        "Stabquerschnitt._a_und_i",
+        "NachVorlage",
+        "NachVorlage.flaechenwerte",
+        "NachVorlage.umriss",
+        "VonHand",
+        "VonHand.flaechenwerte",
+        "AusBauteil",
+        "AusBauteil.bauteil",
+        "AusBauteil.modulfrage",
+        "AusPlatte",
+        "AusPlatte.flaechenwerte",
+        "AusPlatte.umriss",
+        "AusAnalyse",
+        "AusAnalyse.flaechenwerte",
+        "AusAnalyse.umriss"
       ]
     },
     {

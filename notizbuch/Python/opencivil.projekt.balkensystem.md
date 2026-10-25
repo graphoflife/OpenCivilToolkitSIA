@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e862c9aa234
+erzeugt: 5bdc6ed00e30
 art: modul
 tags: [modul]
 ---
@@ -55,6 +55,51 @@ Eine Kraftlast ist positiv in ihrer Richtung: «senkrecht» nach unten,
 zum Ende. Momente drehen im Gegenuhrzeigersinn ([[opencivil.stabwerk.modell]]).
 
 ## Inhalt
+
+### Querschnittsart
+
+```python
+class Querschnittsart(Wahl)
+```
+
+Woher `A` und `I` eines Stabquerschnitts kommen. Aufgeloest wird die
+Art einmal, im Aufbau: je Art eine Klasse
+([[opencivil.stabwerk.stabquerschnitt]]).
+
+- `VORLAGE = 'vorlage'`
+- `KENNWERTE = 'kennwerte'`
+- `PLATTE = 'platte'`
+- `ANALYSE = 'analyse'`
+
+#### Querschnittsart.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Querschnittsart.kurz
+
+```python
+@property
+def kurz(self) -> str
+```
+
+Fuer den Schalter -- der lange Name steht in seinem Titel.
+
+#### Querschnittsart.aus_bauteil
+
+```python
+@property
+def aus_bauteil(self) -> bool
+```
+
+Ob er ein Bauteil des Projekts nimmt, eine Platte oder eine
+Querschnittsanalyse. Nur dann bringt er ein Material mit, den Beton
+des Bauteils, und nur dann hat er ein E_eq -- eine
+Momenten-Kruemmungs-Linie mit ihrer Bewehrung, bei einer Platte immer
+in x-Richtung, Zug unten (Benutzer, 2026-10-24). Einer nach Vorlage
+oder von Hand ist nur eine Form.
 
 ### SystemknotenEintrag
 
@@ -225,7 +270,7 @@ welches E.
 
 - `kennung: str = ''`
 - `name: str = ''`
-- `art: str = einer_von(QUERSCHNITTSARTEN, 'vorlage')`
+- `art: Querschnittsart = einer_von(tuple(Querschnittsart), Querschnittsart.VORLAGE)`
 - `vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)`
 - `masse: Dict[str, float] = field(default_factory=dict)`
 - `bezug: str = ''`
@@ -571,11 +616,9 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - `EINHEIT_DER_FEDER = {'k_x': KN_PRO_M, 'k_z': KN_PRO_M, 'k_phi': KNM_PRO_RAD, 'k_quer': KN…` – Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad, Bettung in kN/m je m Stab.
 - `KNOTENLASTEN = ('kraft', 'moment')` – Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede [[opencivil.stabwerk.modell#Lastart|Lastart]].
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
-- `QUERSCHNITTSARTEN = ('vorlage', 'kennwerte', 'platte', 'analyse')` – Woher ein Querschnitt kommt.
 - `KENNWERTE = ('A', 'I')` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
 - `STABMATERIALARTEN = ('beton', 'eigen')` – Was ein Material des Systems ist: ein Beton des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24). Betonstahl ist keines: aus ihm ist kein Stab.
 - `E_MODULE = ('e0', 'e_eq')` – Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀, das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-24). Einen E-Modul von Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
-- `AUS_BAUTEIL = ('platte', 'analyse')` – Die Arten eines Querschnitts, die ein Bauteil des Projekts nehmen: eine Platte oder eine Querschnittsanalyse. Nur sie bringen ein Material mit, den Beton des Bauteils, und nur sie haben ein E_eq -- eine Momenten-Kruemmungs- Linie mit ihrer Bewehrung, bei einer Platte immer in x-Richtung, Zug unten (Benutzer, 2026-10-24). Einer nach Vorlage oder von Hand ist nur eine Form.
 - `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
 - `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
@@ -584,6 +627,7 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.core.wahl]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]

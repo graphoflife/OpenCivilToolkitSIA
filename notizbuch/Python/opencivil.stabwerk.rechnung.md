@@ -1,5 +1,5 @@
 ---
-erzeugt: 5353058bbcdd
+erzeugt: b5601805591c
 art: modul
 tags: [modul]
 ---
@@ -19,16 +19,9 @@ das System nach der Steifigkeitsmethode rechnet
 
 ## WOHER A UND I KOMMEN
 
-* nach Vorlage -- die Formeln der Vorlage
-  ([[opencivil.stabwerk.querschnitte|querschnitte]]), die Masse als Vorgaben;
-* von Hand -- A und I als Eingaben;
-* aus einer Platte -- die Formeln des Rechtecks mit `b` und `h` der
-  Platte;
-* aus einer Querschnittsanalyse -- `A` und `I_y` ihres
-  Bruttoquerschnitts.
-
-Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
-an ihnen: aendert sich deren Dicke, rechnet es neu.
+sagt jeder Querschnitt selbst ([[opencivil.stabwerk.stabquerschnitt|stabquerschnitt]]):
+nach Vorlage, von Hand, aus einer Platte oder aus einer
+Querschnittsanalyse.
 
 
 ## MATERIALIEN
@@ -82,26 +75,6 @@ oder ein eigenes mit E und Dichte von Hand.
 - `E: float = 0.0` – Von Hand, N/mm² -- nur ohne `stoff`.
 - `rho: float = 0.0` – Von Hand, kg/m³ -- nur ohne `stoff`.
 - `vom_querschnitt: bool = False` – Das Material des Querschnitts: dann gilt dessen E_eq, wenn er eines hat.
-
-### Stabquerschnitt
-
-```python
-@dataclass(frozen=True)
-class Stabquerschnitt
-```
-
-Ein Querschnitt der Staebe, aufgeloest: woher `A` und `I` kommen.
-
-- `kennung: str`
-- `name: str`
-- `art: str` – `vorlage`, `kennwerte`, `platte` oder `analyse`.
-- `vorlage: Optional[Stabvorlage] = None`
-- `masse: Mapping[str, float] = field(default_factory=dict)` – Die Masse der Vorlage in mm -- bei Kennwerten `A` in mm² und `I` in 10⁶ mm⁴.
-- `quelle: Mapping[str, str] = field(default_factory=dict)` – Die Wert-IDs, aus denen er rechnet: `b` und `h` einer Platte, `A` und `I` einer Analyse.
-- `bezug: str = ''` – Die Kennung der Platte oder Analyse, aus der er kommt.
-- `herkunft: str = ''` – Woher, in Worten -- «Rechteck», «von Hand», «Platte «Decke»».
-- `fehler: str = ''` – Was an seinen Massen nicht geht -- dann rechnet er nicht, und kein Stab mit ihm.
-- `eq: Any = None` – Die Frage nach dem E_eq seiner Analyse ([[opencivil.spannungsanalyse.modul#Modulfrage|Modulfrage]]) -- sie gilt fuer die Staebe, die das Material des Querschnitts nehmen; `None`: E_cm. Sie baut ihre Berechnungen selbst ein.
 
 ### Steifigkeit
 
@@ -214,14 +187,6 @@ def bezuege(self) -> List[str]
 
 Die Platten und Analysen, deren Werte das System liest.
 
-#### Balkensystem._querschnitt
-
-```python
-def _querschnitt(self, q: Stabquerschnitt, index: str) -> Tuple[str, str]
-```
-
-Die Berechnungen fuer A und I eines Querschnitts -- und ihre Wert-IDs.
-
 #### Balkensystem._kennwerte
 
 ```python
@@ -306,13 +271,12 @@ seinem Material nimmt, eine Meldung.
 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
-- [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.modell]]
-- [[opencivil.stabwerk.querschnitte]]
+- [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk.verlauf]]
 

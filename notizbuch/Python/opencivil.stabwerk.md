@@ -1,5 +1,5 @@
 ---
-erzeugt: c9b5829e6a27
+erzeugt: d89cea6ef566
 art: modul
 tags: [modul]
 ---
@@ -34,5 +34,6 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 - [[opencivil.stabwerk.querschnitte]] – die Querschnitte der Staebe, nach Vorlage.
 - [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
 - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
+- [[opencivil.stabwerk.stabquerschnitt]] – woher A und I eines Stabs kommen.
 - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
 - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 1fa54de08fc1
+erzeugt: d0d18333849d
 art: modul
 tags: [modul]
 ---
@@ -36,6 +36,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.rissanforderung]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]

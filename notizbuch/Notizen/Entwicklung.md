@@ -44,6 +44,28 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Die Art eines Stabquerschnitts als eigene Klasse
+
+Befund 3 der Strukturdurchsicht, erster Teil: Woher A und I eines Stabs
+kommen, war ein Text («vorlage», «kennwerte», «platte», «analyse»), und vier
+Schichten fragten ihn je für sich ab -- die Beschreibung, der Aufbau, das
+Rechenwerk (dort zwei fast gleiche Zweige) und das Bildchen einer Zeile.
+«Platte oder Analyse» stand zweimal als Tupel da und einmal wörtlich.
+
+- **`Querschnittsart`** ist eine Wahl wie die Rechenart: Name, kurzer Name
+  und `aus_bauteil` -- nur ein Querschnitt aus einer Platte oder Analyse
+  bringt ein Material mit und hat ein E_eq. Der Katalog liest das aus ihr,
+  statt die Arten von Hand zu listen.
+- **Je Art eine Klasse** (`stabwerk/stabquerschnitt.py`): `NachVorlage`,
+  `VonHand`, `AusPlatte`, `AusAnalyse`. Jede meldet ihre Berechnungen für A
+  und I selbst an und kennt ihren Umriss; was Platte und Analyse gemeinsam
+  haben, das Bauteil und das E_eq, steht in `AusBauteil`. Der Aufbau löst
+  die Art einmal auf, Rechenwerk und Bildchen fragen sie nicht mehr.
+- Für den Benutzer ändert sich nichts. Im JavaScript bleiben die Masken je
+  Art -- sie sind verschieden, weil die Eingaben verschieden sind.
+
+---
+
 ## 2026-10-25 · Das Urteil der Nachweise aus einer Hand
 
 Befund 2.1 der Strukturdurchsicht: Erfüllungsgrad, «erfüllt», die Regel für

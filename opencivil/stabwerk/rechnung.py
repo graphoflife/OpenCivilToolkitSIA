@@ -10,16 +10,9 @@ das System nach der Steifigkeitsmethode rechnet
 (:mod:`~opencivil.stabwerk.herleitung`).
 
 WOHER A UND I KOMMEN:
-* nach Vorlage -- die Formeln der Vorlage
-  (:mod:`~opencivil.stabwerk.querschnitte`), die Masse als Vorgaben;
-* von Hand -- A und I als Eingaben;
-* aus einer Platte -- die Formeln des Rechtecks mit ``b`` und ``h`` der
-  Platte;
-* aus einer Querschnittsanalyse -- ``A`` und ``I_y`` ihres
-  Bruttoquerschnitts.
-
-Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
-an ihnen: aendert sich deren Dicke, rechnet es neu.
+sagt jeder Querschnitt selbst (:mod:`~opencivil.stabwerk.stabquerschnitt`):
+nach Vorlage, von Hand, aus einer Platte oder aus einer
+Querschnittsanalyse.
 
 MATERIALIEN:
 Ein Material der Staebe (:class:`Stabmaterial`) ist ein Beton des Projekts
@@ -51,21 +44,20 @@ mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
     Ausfuehrung, Befundbezug, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
 from opencivil.core.einheiten import (
-    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MIO_MM4, MM, MM2, MN, N_PRO_MM2, Groesse,
+    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MN, N_PRO_MM2, Groesse,
 )
-from opencivil.core.latex import platzhalter_namen
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.wert import Quelle, WertDef
 from opencivil.material.basis import Baustoff, mit_index
 from opencivil.stabwerk import herleitung
 from opencivil.stabwerk.modell import Lastart, Lastrichtung, Stablast, System
-from opencivil.stabwerk.querschnitte import RECHTECK, Stabvorlage
+from opencivil.stabwerk.stabquerschnitt import Stabquerschnitt
 from opencivil.stabwerk.system import Ergebnis, Fall, Meldung, rechnen
 from opencivil.stabwerk.verlauf import Stabverlauf, verlaeufe
 
@@ -105,40 +97,6 @@ class Stabmaterial:
 
     vom_querschnitt: bool = False
     """Das Material des Querschnitts: dann gilt dessen E_eq, wenn er eines hat."""
-
-
-@dataclass(frozen=True)
-class Stabquerschnitt:
-    """Ein Querschnitt der Staebe, aufgeloest: woher ``A`` und ``I`` kommen."""
-
-    kennung: str
-    name: str
-    art: str
-    """``vorlage``, ``kennwerte``, ``platte`` oder ``analyse``."""
-
-    vorlage: Optional[Stabvorlage] = None
-    masse: Mapping[str, float] = field(default_factory=dict)
-    """Die Masse der Vorlage in mm -- bei Kennwerten ``A`` in mm² und ``I`` in 10⁶ mm⁴."""
-
-    quelle: Mapping[str, str] = field(default_factory=dict)
-    """Die Wert-IDs, aus denen er rechnet: ``b`` und ``h`` einer Platte, ``A`` und ``I`` einer Analyse."""
-
-    bezug: str = ""
-    """Die Kennung der Platte oder Analyse, aus der er kommt."""
-
-    herkunft: str = ""
-    """Woher, in Worten -- «Rechteck», «von Hand», «Platte «Decke»»."""
-
-    fehler: str = ""
-    """Was an seinen Massen nicht geht -- dann rechnet er nicht, und kein Stab mit ihm."""
-
-    eq: Any = None
-    """
-    Die Frage nach dem E_eq seiner Analyse
-    (:class:`~opencivil.spannungsanalyse.modul.Modulfrage`) -- sie gilt fuer
-    die Staebe, die das Material des Querschnitts nehmen; ``None``: E_cm.
-    Sie baut ihre Berechnungen selbst ein.
-    """
 
 
 @dataclass(frozen=True)
@@ -296,15 +254,18 @@ class Balkensystem:
     @property
     def bezuege(self) -> List[str]:
         """Die Platten und Analysen, deren Werte das System liest."""
-        return sorted({q.bezug for q in self.querschnitte if q.bezug})
+        return sorted({q.bauteil for q in self.querschnitte if q.bauteil})
 
     def _aufbauen(self) -> None:
         index = len(self.querschnitte) > 1
         for q in self.querschnitte:
             if not q.fehler:
-                self.flaechen[q.kennung] = self._querschnitt(q, q.kennung if index else "")
-                if q.eq is not None:
-                    berechnungen, E, suche = q.eq.einbauen(
+                berechnungen, A, I = q.flaechenwerte(self._def, self.abschnitt(QUERSCHNITTE),
+                                                     q.kennung if index else "")
+                self.berechnungen += berechnungen
+                self.flaechen[q.kennung] = (A, I)
+                if q.modulfrage is not None:
+                    berechnungen, E, suche = q.modulfrage.einbauen(
                         self._def, wo=f"{q.kennung}.", index=q.kennung if index else "",
                         name=q.name, abschnitt=self.abschnitt(QUERSCHNITTE))
                     self.berechnungen += berechnungen
@@ -351,61 +312,6 @@ class Balkensystem:
             titel="Steifigkeitsmethode", abschnitt=self.abschnitt())
         """Die Prozedur, die das System rechnet -- ihr Befund ist der :class:`Systembefund`."""
         self.berechnungen.append(self.rechnung)
-
-    def _querschnitt(self, q: Stabquerschnitt, index: str) -> Tuple[str, str]:
-        """Die Berechnungen fuer A und I eines Querschnitts -- und ihre Wert-IDs."""
-        abschnitt = self.abschnitt(QUERSCHNITTE)
-        wo = f"{q.kennung}."
-        if q.art == "kennwerte":
-            ids = []
-            for kurz, einheit, stellen, beschreibung in (
-                    ("A", MM2, 0, "Querschnittsfläche"),
-                    ("I", MIO_MM4, 2, "Flächenträgheitsmoment")):
-                d = self._def(wo + kurz, mit_index(kurz, index), einheit,
-                              f"{beschreibung}, {q.name}", stellen)
-                self.berechnungen.append(Vorgabe(
-                    id=d.id, ausgabe=d, groesse=Groesse(q.masse.get(kurz, 0.0), einheit),
-                    quelle=Quelle.EINGABE, titel=f"{beschreibung}, «{q.name}» (von Hand)",
-                    abschnitt=abschnitt))
-                ids.append(d.id)
-            return ids[0], ids[1]
-        if q.art == "analyse":
-            ids = []
-            for kurz, einheit, stellen, beschreibung in (
-                    ("A", MM2, 0, "Querschnittsfläche"),
-                    ("I", MIO_MM4, 2, "Flächenträgheitsmoment")):
-                d = self._def(wo + kurz, mit_index(kurz, index), einheit,
-                              f"{beschreibung}, {q.name}", stellen)
-                self.berechnungen.append(Formel(
-                    id=d.id, ausgabe=d, funktion=_derselbe, eingaben={"wert": q.quelle[kurz]},
-                    titel=f"{beschreibung}, «{q.name}» (Bruttoquerschnitt der {q.herkunft})",
-                    abschnitt=abschnitt))
-                ids.append(d.id)
-            return ids[0], ids[1]
-
-        # Nach Vorlage oder aus einer Platte: die Formeln der Vorlage.
-        vorlage = q.vorlage if q.art == "vorlage" else RECHTECK
-        quellen = dict(q.quelle)
-        if q.art == "vorlage":
-            for mass in vorlage.masse:
-                wert = q.masse[mass.schluessel]
-                d = self._def(wo + mass.schluessel, mit_index(mass.symbol, index), MM,
-                              f"{mass.beschriftung}, {q.name}",
-                              0 if float(wert).is_integer() else 1)
-                self.berechnungen.append(Vorgabe(
-                    id=d.id, ausgabe=d, groesse=Groesse(wert, MM), abschnitt=abschnitt,
-                    stumm=True))
-                quellen[mass.schluessel] = d.id
-        for f in vorlage.formeln:
-            d = self._def(wo + f.kurzname, mit_index(f.symbol, index), f.einheit,
-                          f"{f.beschreibung}, {q.name}", f.stellen)
-            self.berechnungen.append(Formel(
-                id=d.id, ausgabe=d, funktion=f.funktion, vorlage=f.vorlage,
-                eingaben={n: quellen[n] for n in platzhalter_namen(f.vorlage)},
-                titel=f"{f.beschreibung}, «{q.name}» ({q.herkunft})", name=f.name,
-                abschnitt=abschnitt))
-            quellen[f.kurzname] = d.id
-        return quellen["A"], quellen["I"]
 
     def _kennwerte(self, m: Stabmaterial) -> Tuple[str, str]:
         """
@@ -558,10 +464,6 @@ class Balkensystem:
                 meldungen.append(Meldung(f"Querschnitt «{name}»: kein E_eq – {befund.grund}",
                                          (q, *staebe), True))
         return meldungen
-
-
-def _derselbe(wert: Groesse) -> Groesse:
-    return wert
 
 
 def _eigengewicht(rho: Groesse, g: Groesse, A: Groesse) -> Groesse:

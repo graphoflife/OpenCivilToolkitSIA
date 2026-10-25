@@ -25,7 +25,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from opencivil.stabwerk.querschnitte import RECHTECK
 from opencivil.stabwerk.rechnung import Balkensystem, Systembefund
 from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Fall
 
@@ -112,29 +111,13 @@ def faelle(befund: Optional[Systembefund]) -> List[str]:
     return [f.name for f in befund.ergebnis.faelle] if befund is not None else []
 
 
-def umrisse(system: Balkensystem, aufbau: Any, loesung: Any) -> Dict[str, List[List[List[float]]]]:
+def umrisse(system: Balkensystem, loesung: Any) -> Dict[str, List[List[List[float]]]]:
     """
     Je Querschnitt eines Systems sein Umriss in mm, fuer das Bildchen in
-    seiner Zeile (Benutzer, 2026-10-24): die Vorlage mit ihren Massen, der
-    Streifen b × h einer Platte, die Polygone einer Analyse -- Aussparungen
-    mit, das Bild fuellt gerade-ungerade. Kennwerte von Hand haben keinen,
-    ebenso ein Querschnitt, der nicht geht oder dessen Werte fehlen.
+    seiner Zeile (Benutzer, 2026-10-24) -- ihn kennt jeder Querschnitt selbst
+    (:meth:`~opencivil.stabwerk.stabquerschnitt.Stabquerschnitt.umriss`).
+    Ein Querschnitt, der nicht geht, hat keinen.
     """
-    ergebnis = {}
-    for q in system.querschnitte:
-        polygone: List[Any] = []
-        if q.fehler:
-            pass
-        elif q.art == "vorlage":
-            polygone = q.vorlage.umriss(q.masse)
-        elif q.art == "platte":
-            werte = [loesung.werte.get(q.quelle[k]) for k in ("b", "h")]
-            if all(werte):
-                b, h = (w.groesse.si * mm for w in werte)
-                polygone = RECHTECK.umriss({"b": b, "h": h})
-        elif q.art == "analyse":
-            analyse = aufbau.querschnittsanalysen.get(q.bezug)
-            if analyse is not None:
-                polygone = [f.punkte for f in analyse.flaechen]
-        ergebnis[q.kennung] = [[[round(y, 1), round(z, 1)] for y, z in p] for p in polygone]
-    return ergebnis
+    return {q.kennung: [[[round(y, 1), round(z, 1)] for y, z in p]
+                        for p in ([] if q.fehler else q.umriss(loesung))]
+            for q in system.querschnitte}

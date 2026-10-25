@@ -271,14 +271,9 @@ def katalog() -> dict:
             # Schalter, der lange in seinem Titel; ob die Art ein Material
             # mitbringt, sagt, ob eine Linie es «gemäss Querschnitt» nehmen kann.
             "querschnittsarten": [
-                {**x, "bringt_material": x["wert"] in bs.AUS_BAUTEIL} for x in (
-                    {"wert": "vorlage", "beschriftung": "nach Vorlage", "kurz": "Vorlage"},
-                    {"wert": "kennwerte", "beschriftung": "Kennwerte von Hand",
-                     "kurz": "Kennwerte"},
-                    {"wert": "platte", "beschriftung": "aus einer Platte", "kurz": "Platte"},
-                    {"wert": "analyse", "beschriftung": "aus einer Querschnittsanalyse",
-                     "kurz": "Analyse"},
-                )
+                {"wert": a.value, "beschriftung": a.beschriftung, "kurz": a.kurz,
+                 "bringt_material": a.aus_bauteil}
+                for a in bs.Querschnittsart
             ],
             # Was ein Material des Systems ist: ein Beton des Projekts oder
             # ein eigenes -- und welche Kennwerte des Betons ein Stab nimmt;
@@ -295,10 +290,10 @@ def katalog() -> dict:
             "e_module": [
                 {"wert": "e0", "beschriftung": "E₀ = E_cm",
                  "titel": "E_cm des Betons, den der Querschnitt mitbringt",
-                 "arten": list(bs.AUS_BAUTEIL)},
+                 "arten": [a.value for a in bs.Querschnittsart if a.aus_bauteil]},
                 {"wert": "e_eq", "beschriftung": "E_eq",
                  "titel": "Der äquivalente E-Modul der Platte oder Querschnittsanalyse bei N und M",
-                 "arten": list(bs.AUS_BAUTEIL)},
+                 "arten": [a.value for a in bs.Querschnittsart if a.aus_bauteil]},
             ],
             # Was als Material einer Linie heisst: das ihres Querschnitts.
             "material_des_querschnitts": bs.MATERIAL_DES_QUERSCHNITTS,
@@ -588,7 +583,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
             for kennung, system in aufbau.balkensysteme.items()})
         # Je Querschnitt eines Systems sein Umriss -- auch wenn es nicht rechnet.
         ergebnis["stabumrisse"] = endlich({
-            kennung: balkendaten.umrisse(system, aufbau, loesung)
+            kennung: balkendaten.umrisse(system, loesung)
             for kennung, system in aufbau.balkensysteme.items()})
         # Je Fundament, was die Situationszeichnung vom Kern braucht.
         ergebnis["grundbrueche"] = endlich(grundbruchdaten.situationen(aufbau, loesung))

@@ -51,6 +51,7 @@ from opencivil.core.einheiten import (
     KG_PRO_M3, KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, N_PRO_MM2, PROZENT,
     Groesse,
 )
+from opencivil.core.wahl import Wahl
 from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
@@ -84,8 +85,48 @@ KNOTENLASTEN = ("kraft", "moment")
 #: Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)
 
-#: Woher ein Querschnitt kommt.
-QUERSCHNITTSARTEN = ("vorlage", "kennwerte", "platte", "analyse")
+class Querschnittsart(Wahl):
+    """
+    Woher ``A`` und ``I`` eines Stabquerschnitts kommen. Aufgeloest wird die
+    Art einmal, im Aufbau: je Art eine Klasse
+    (:mod:`opencivil.stabwerk.stabquerschnitt`).
+    """
+
+    VORLAGE = "vorlage"
+    KENNWERTE = "kennwerte"
+    PLATTE = "platte"
+    ANALYSE = "analyse"
+
+    @property
+    def beschriftung(self) -> str:
+        return {
+            Querschnittsart.VORLAGE: "nach Vorlage",
+            Querschnittsart.KENNWERTE: "Kennwerte von Hand",
+            Querschnittsart.PLATTE: "aus einer Platte",
+            Querschnittsart.ANALYSE: "aus einer Querschnittsanalyse",
+        }[self]
+
+    @property
+    def kurz(self) -> str:
+        """Fuer den Schalter -- der lange Name steht in seinem Titel."""
+        return {
+            Querschnittsart.VORLAGE: "Vorlage",
+            Querschnittsart.KENNWERTE: "Kennwerte",
+            Querschnittsart.PLATTE: "Platte",
+            Querschnittsart.ANALYSE: "Analyse",
+        }[self]
+
+    @property
+    def aus_bauteil(self) -> bool:
+        """
+        Ob er ein Bauteil des Projekts nimmt, eine Platte oder eine
+        Querschnittsanalyse. Nur dann bringt er ein Material mit, den Beton
+        des Bauteils, und nur dann hat er ein E_eq -- eine
+        Momenten-Kruemmungs-Linie mit ihrer Bewehrung, bei einer Platte immer
+        in x-Richtung, Zug unten (Benutzer, 2026-10-24). Einer nach Vorlage
+        oder von Hand ist nur eine Form.
+        """
+        return self in (Querschnittsart.PLATTE, Querschnittsart.ANALYSE)
 
 #: Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
 KENNWERTE = ("A", "I")
@@ -100,13 +141,6 @@ STABMATERIALARTEN = ("beton", "eigen")
 #: Querschnittsanalyse bei N und M (Benutzer, 2026-10-24). Einen E-Modul von
 #: Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
 E_MODULE = ("e0", "e_eq")
-
-#: Die Arten eines Querschnitts, die ein Bauteil des Projekts nehmen: eine
-#: Platte oder eine Querschnittsanalyse. Nur sie bringen ein Material mit, den
-#: Beton des Bauteils, und nur sie haben ein E_eq -- eine Momenten-Kruemmungs-
-#: Linie mit ihrer Bewehrung, bei einer Platte immer in x-Richtung, Zug unten
-#: (Benutzer, 2026-10-24). Einer nach Vorlage oder von Hand ist nur eine Form.
-AUS_BAUTEIL = ("platte", "analyse")
 
 #: Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der
 #: Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine
@@ -299,7 +333,7 @@ class StabquerschnittEintrag(Beschreibung):
 
     kennung: str = ""
     name: str = ""
-    art: str = einer_von(QUERSCHNITTSARTEN, "vorlage")
+    art: Querschnittsart = einer_von(tuple(Querschnittsart), Querschnittsart.VORLAGE)
     vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)
     masse: Dict[str, float] = field(default_factory=dict)
     bezug: str = ""
@@ -325,17 +359,17 @@ class StabquerschnittEintrag(Beschreibung):
         Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
         2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
         """
-        if self.e_modul == "e_eq" and self.art not in AUS_BAUTEIL:
+        if self.e_modul == "e_eq" and not self.art.aus_bauteil:
             return ("ein E_eq gibt es nur bei einem Querschnitt aus einer Platte oder "
                     "Querschnittsanalyse – nur sie haben eine Momenten-Krümmungs-Linie.")
-        if self.art == "vorlage":
+        if self.art is Querschnittsart.VORLAGE:
             vorlage = self.stabvorlage()
             fremd = [k for k in self.masse if k not in vorlage.vorgaben()]
             if fremd:
                 return (f"ein Mass «{fremd[0]}» gibt es bei «{vorlage.name}» nicht. "
                         f"Möglich sind: {', '.join(vorlage.vorgaben())}.")
             return vorlage.pruefen(self.masse_mit_vorgaben())
-        if self.art == "kennwerte":
+        if self.art is Querschnittsart.KENNWERTE:
             fremd = [k for k in self.masse if k not in KENNWERTE]
             if fremd:
                 return (f"einen Kennwert «{fremd[0]}» gibt es nicht. "
@@ -452,8 +486,7 @@ class BalkensystemEintrag(Beschreibung):
 
     def bezuege(self) -> List[str]:
         """Die Platten und Querschnittsanalysen, deren Querschnitt ein Stab nimmt."""
-        return sorted({q.bezug for q in self.querschnitte
-                       if q.art in ("platte", "analyse") and q.bezug})
+        return sorted({q.bezug for q in self.querschnitte if q.art.aus_bauteil and q.bezug})
 
     def alle_lasten(self) -> List[Any]:
         """Jede Last des Systems, auf den Linien und an den Knoten -- ihre Kennungen zaehlen zusammen."""

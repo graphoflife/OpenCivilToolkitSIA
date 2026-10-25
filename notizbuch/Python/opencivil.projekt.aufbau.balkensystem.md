@@ -1,5 +1,5 @@
 ---
-erzeugt: 254cb156b204
+erzeugt: 1fe41a890c1e
 art: modul
 tags: [modul]
 ---
@@ -11,9 +11,11 @@ tags: [modul]
 
 Aus einem [[opencivil.projekt.balkensystem#BalkensystemEintrag|BalkensystemEintrag]] das
 Stabwerk mit aufgeloesten Materialien und Querschnitten ([[opencivil.projekt.aufbau.balkensystem#bauen|bauen]]). Ein
-Material ist ein Beton des Projekts oder ein eigenes. Ein Querschnitt kann
-eine Platte oder eine Querschnittsanalyse des Projekts nehmen; die muessen
-dann schon gebaut sein -- darum kommt das Balkensystem in
+Material ist ein Beton des Projekts oder ein eigenes. Die Art eines
+Querschnitts wird hier aufgeloest, einmal: je Art eine Klasse
+([[opencivil.stabwerk.stabquerschnitt|stabquerschnitt]]). Ein Querschnitt kann eine
+Platte oder eine Querschnittsanalyse des Projekts nehmen; die muessen dann
+schon gebaut sein -- darum kommt das Balkensystem in
 [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] nach ihnen. Von dort kommt auch
 das Material einer Linie «gemäss Querschnitt»: der Beton der Platte oder
 der Analyse.
@@ -38,7 +40,8 @@ Projekts rechnet.
 def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stabquerschnitt
 ```
 
-Woher A und I eines Querschnitts kommen -- die Platte oder Analyse dazu muss es geben.
+Woher A und I eines Querschnitts kommen -- hier wird seine Art
+aufgeloest. Die Platte oder Analyse dazu muss es geben.
 
 ### _modulfrage
 
@@ -96,6 +99,7 @@ Teil sagt, warum.
 - [[opencivil.projekt.lesen]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.stabwerk.system]]
 
 ## Gebraucht von

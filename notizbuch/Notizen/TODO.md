@@ -105,7 +105,8 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`, `Unterprotokoll`.
       Werkzeugs weiter, und die App verzweigt danach erneut. Besser: das
       Verhalten an die Tabellen der Werkzeuge und Arten hängen, die das
       Fenster ohnehin durchläuft; ebenfalls Teil von `cadApp`.
-- [ ] **Arten als Text oder Schalter statt als eigener Typ**, an fünf Orten:
+- [ ] **Arten als Text oder Schalter statt als eigener Typ**, an fünf Orten
+      (die Art des Stabquerschnitts ist seit 2026-10-25 behoben):
       - `einachsig` steht 50-mal in den Nachweisen, die Regel ist viermal
         kopiert. Besser einmal in der Analyse auflösen: `UmY` oder `Schief`.
       - Querkraft: zwei Nachweise hinter `buegel is None` (`querkraft.py`);
@@ -116,11 +117,6 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`, `Unterprotokoll`.
         Text, rund zwei Dutzend Weichen in fünf Modulen. Besser: die
         Zeichnung macht jedes Element einmal zu Einzelstab, Stablinie oder
         verschmierter Linie, mit `flaeche` und `als_bewehrung()`.
-      - Art des Stabquerschnitts: verzweigt in Beschreibung, Aufbau,
-        `rechnung.py` (zwei fast gleiche Zweige), `balkendaten.py` und
-        zehnmal im JS. Besser `Querschnittsart` als Wahl mit
-        `bringt_material` und `hat_e_eq`, je Art ein Objekt mit
-        `berechnungen()` und `umriss()`.
       - M–χ oder N–ε als Ja/Nein, rund 12-mal in der Spannungsanalyse.
         Besser ein Wert `Linienart`.
 - [ ] **Webschicht und Oberfläche rechnen nach, neu dazugekommen** (zum
@@ -264,10 +260,9 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       Meldung am System, nicht mehr als Fehler des ganzen Projekts. «Fest»
       reist als `math.inf` und wird in
       `system.py` an 17 Stellen zurückübersetzt; Stäbe und Lasten werden in
-      vier Durchgängen aufgelöst, mit einem Schalter `melden`; die
-      Querschnittsart wird in drei Schichten verzweigt. Besser: LF1/LK1 als
-      Identität, `Halt(fest, feder)`, Lasten einmal je Fall auflösen,
-      `_stabquerschnitt` liefert Eingaben und Formeln.
+      vier Durchgängen aufgelöst, mit einem Schalter `melden`. Besser:
+      LF1/LK1 als Identität, `Halt(fest, feder)`, Lasten einmal je Fall
+      auflösen.
 - [ ] **Varianten im Kern -- deine Entscheidung.** `prioritaet`,
       `bedingung`, `anwendbar`, `verworfene_varianten` benutzt ausserhalb des
       Kerns niemand. Wer zwei Berechnungen für denselben Wert anmeldet

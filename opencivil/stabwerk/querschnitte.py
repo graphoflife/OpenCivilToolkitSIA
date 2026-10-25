@@ -17,7 +17,8 @@ Schwerpunkt; ``h`` ist die Hoehe in der Ebene des Rahmens.
 Daneben: Kennwerte von Hand, der Streifen einer Platte (``b × h``, mit den
 Formeln des Rechtecks) und der Bruttoquerschnitt einer Querschnittsanalyse
 (``A`` und ``I_y``). Das waehlt die Beschreibung
-(:mod:`opencivil.projekt.balkensystem`); hier stehen nur die Formeln.
+(:mod:`opencivil.projekt.balkensystem`), je Art eine Klasse rechnet es
+(:mod:`opencivil.stabwerk.stabquerschnitt`); hier stehen nur die Formeln.
 
 EINHEITEN:
 Masse in mm, ``A`` in mm², ``I`` in 10⁶ mm⁴ -- wie in der Querschnittsanalyse.

@@ -1,5 +1,5 @@
 ---
-erzeugt: c5b79bb070cf
+erzeugt: e4ba7536e439
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,8 @@ Schwerpunkt; `h` ist die Hoehe in der Ebene des Rahmens.
 Daneben: Kennwerte von Hand, der Streifen einer Platte (`b × h`, mit den
 Formeln des Rechtecks) und der Bruttoquerschnitt einer Querschnittsanalyse
 (`A` und `I_y`). Das waehlt die Beschreibung
-([[opencivil.projekt.balkensystem]]); hier stehen nur die Formeln.
+([[opencivil.projekt.balkensystem]]), je Art eine Klasse rechnet es
+([[opencivil.stabwerk.stabquerschnitt]]); hier stehen nur die Formeln.
 
 
 ## EINHEITEN
@@ -131,9 +132,8 @@ def vorlage(schluessel: str) -> Stabvorlage
 ## Gebraucht von
 
 - [[opencivil.projekt.balkensystem]]
-- [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.web.api]]
-- [[opencivil.web.balkendaten]]
 
 ## Formeln aus diesem Modul
 

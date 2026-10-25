@@ -1,5 +1,5 @@
 ---
-erzeugt: 30c0e0e9e3f4
+erzeugt: 6157f4708ba4
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -121,6 +121,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.querschnitte]] – die Querschnitte der Staebe, nach Vorlage.
     - [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
+    - [[opencivil.stabwerk.stabquerschnitt]] – woher A und I eines Stabs kommen.
     - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
     - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.

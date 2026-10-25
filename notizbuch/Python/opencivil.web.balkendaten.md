@@ -1,5 +1,5 @@
 ---
-erzeugt: 84888b6294ee
+erzeugt: b2ada2807c8d
 art: modul
 tags: [modul]
 ---
@@ -57,14 +57,13 @@ Die Namen der gerechneten Faelle, Lastfaelle zuerst.
 ### umrisse
 
 ```python
-def umrisse(system: Balkensystem, aufbau: Any, loesung: Any) -> Dict[str, List[List[List[float]]]]
+def umrisse(system: Balkensystem, loesung: Any) -> Dict[str, List[List[List[float]]]]
 ```
 
 Je Querschnitt eines Systems sein Umriss in mm, fuer das Bildchen in
-seiner Zeile (Benutzer, 2026-10-24): die Vorlage mit ihren Massen, der
-Streifen b × h einer Platte, die Polygone einer Analyse -- Aussparungen
-mit, das Bild fuellt gerade-ungerade. Kennwerte von Hand haben keinen,
-ebenso ein Querschnitt, der nicht geht oder dessen Werte fehlen.
+seiner Zeile (Benutzer, 2026-10-24) -- ihn kennt jeder Querschnitt selbst
+([[opencivil.stabwerk.stabquerschnitt#Stabquerschnitt.umriss|umriss]]).
+Ein Querschnitt, der nicht geht, hat keinen.
 
 
 ## Konstanten
@@ -73,7 +72,6 @@ ebenso ein Querschnitt, der nicht geht oder dessen Werte fehlen.
 
 ## Braucht
 
-- [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.system]]
 

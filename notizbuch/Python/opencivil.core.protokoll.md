@@ -1,5 +1,5 @@
 ---
-erzeugt: 7c2d090ce2e0
+erzeugt: 562183f201d3
 art: modul
 tags: [modul]
 ---
@@ -631,4 +631,5 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.web.api]]

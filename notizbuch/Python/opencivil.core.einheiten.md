@@ -1,5 +1,5 @@
 ---
-erzeugt: ceff094ba895
+erzeugt: 49fe1a5de2e6
 art: modul
 tags: [modul]
 ---
@@ -482,5 +482,6 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
