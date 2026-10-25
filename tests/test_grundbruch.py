@@ -28,7 +28,7 @@ def rechnen(kombinationen=(("K", 1000.0, 0.0),), **felder):
         g.kombination(name, N_Ed=N, T_Ed=T)
     aufbau = p.aufbauen()
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    return aufbau, loesung, loesung.befunde[aufbau.grundbruch["g1"].id]
+    return aufbau, loesung, loesung.befunde[aufbau.feld("grundbruch")["g1"].id]
 
 
 def faktoren(**felder):
@@ -380,8 +380,8 @@ class TestEintrag(unittest.TestCase):
         g = p.grundbruch("F")
         g.kombination("A", N_Ed=500.0).aktiv = False
         aufbau = p.aufbauen()
-        self.assertEqual(aufbau.grundbruch, {})
-        self.assertEqual(aufbau.gleiten, {})
+        self.assertEqual(aufbau.feld("grundbruch"), {})
+        self.assertEqual(aufbau.feld("gleiten"), {})
         self.assertIn("Grundbruch 'F': keine Kombination → kein Nachweis.", aufbau.warnungen)
 
     def test_namen_eindeutig(self):

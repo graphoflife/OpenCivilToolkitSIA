@@ -39,7 +39,7 @@ def linien(aufbau: Aufbau, loesung: Loesung) -> dict:
     return {
         kennung: {**linie(nachweis, loesung, aufbau),
                   "bauteil": aufbau.bauteil_von(nachweis).kennung}
-        for kennung, nachweis in aufbau.nachweise.items()
+        for kennung, nachweis in aufbau.feld("nachweise").items()
         if nachweis.id in loesung.befunde
     }
 
@@ -68,7 +68,7 @@ def querkraftkurven(
     gewaehlt = gewaehlt or {}
     kurven: Dict[str, Any] = {}
 
-    for kennung, nachweis in aufbau.querkraft.items():
+    for kennung, nachweis in aufbau.feld("querkraft").items():
         befund = loesung.befunde.get(nachweis.id)
         # Mit Buegeln haengt der Widerstand nicht mehr am Moment, sondern an
         # der Neigung der Druckdiagonalen. Dann steht dort das andere Bild --
@@ -151,7 +151,7 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
     """
     kurven: Dict[str, Any] = {}
 
-    for kennung, nachweis in aufbau.querkraft.items():
+    for kennung, nachweis in aufbau.feld("querkraft").items():
         befund = loesung.befunde.get(nachweis.id)
         if nachweis.buegel is None or befund is None:
             continue
@@ -652,8 +652,8 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
     Querkraft und Torsion, wo sie zugeschaltet ist.
     """
     bauteil = aufbau.querschnittsanalysen[kennung]
-    biegung = aufbau.qa_biegung.get(kennung)
-    schub = aufbau.qa_schub.get(kennung)
+    biegung = aufbau.feld("qa_biegung").get(kennung)
+    schub = aufbau.feld("qa_schub").get(kennung)
     # Ohne Befund lief der Nachweis nicht -- etwa, weil ein Baustoff fehlt.
     gebogen = loesung.befunde.get(biegung.id) if biegung is not None else None
     geschoben = loesung.befunde.get(schub.id) if schub is not None else None

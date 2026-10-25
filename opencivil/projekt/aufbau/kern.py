@@ -29,29 +29,17 @@ from opencivil.core.wert import Kennzahl
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import beton
 from opencivil.material.betonstahl import betonstahl
-from opencivil.nachweis.biegung_normalkraft import BiegungNormalkraft
-from opencivil.nachweis.duktilitaet import Duktilitaet
-from opencivil.nachweis.knicken import Knickfall, Knicken
-from opencivil.nachweis.fehlende_bewehrung import FehlendeBewehrung
-from opencivil.nachweis.mindestbewehrung import Rissnormalkraft, ZwaengungBiegung
+from opencivil.nachweis.knicken import Knickfall
 from opencivil.nachweis.spannungsbegrenzung import Spannungsbegrenzung, Stahlspannungsort
 from opencivil.nachweis.spannungsgrenzen import GrenzeAusRissbreite, GrenzeGegenFliessen
-from opencivil.nachweis.verformung import Verformung
 from opencivil.nachweis.kennzahlen import Plattenkennzahlen
-from opencivil.nachweis.sproedes_versagen import SproedesVersagen
-from opencivil.nachweis.querkraft import Querkraft
 from opencivil.querschnitt.platte import Plattenquerschnitt
 from opencivil.projekt.eintraege import (
     Gebrauchsliste, KnickEintrag, MaterialEintrag, SpannungsfallEintrag, abgeleiteter_fallname,
 )
-from opencivil.geotechnik.grundbruch import Fundament, Gleiten, Grundbruch
-from opencivil.geotechnik.setzung import Setzung, Setzungsfundament
+from opencivil.geotechnik.grundbruch import Fundament
+from opencivil.geotechnik.setzung import Setzungsfundament
 from opencivil.projekt.lesen import ProjektFehler
-from opencivil.nachweis.qa_gebrauch import RissnormalkraftQA, ZwaengungBiegungQA
-from opencivil.nachweis.qa_knicken import KnickenQA
-from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
-from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
-from opencivil.nachweis.schubwandnachweis import Schubwandnachweis
 from opencivil.stabwerk.rechnung import Balkensystem
 
 if TYPE_CHECKING:
@@ -79,51 +67,8 @@ class Aufbau:
     """
 
     baustoffe: Dict[str, Baustoff] = field(default_factory=dict)
-    nachweise: Dict[str, BiegungNormalkraft] = field(default_factory=dict)
-    """
-    Schluessel ist ``<querschnitt>.x``.
-
-    Die Richtung steht noch im Schluessel, obwohl es nur eine gibt -- sie sagt
-    dem Leser einer Wert-ID, welcher Querschnitt gemeint ist, und die
-    Wert-IDs in abgelegten Berichten sollen nicht bei jeder Umstellung
-    wechseln.
-    """
-
-    querkraft: Dict[str, Querkraft] = field(default_factory=dict)
-    duktilitaet: Dict[str, Duktilitaet] = field(default_factory=dict)
-    """Schluessel ist die Querschnittskennung -- ein Nachweis je Platte."""
-
-    rissnormalkraft: Dict[str, Rissnormalkraft] = field(default_factory=dict)
-    """Schluessel ist ``<querschnitt>.x``."""
-
-    sproede: Dict[str, SproedesVersagen] = field(default_factory=dict)
-    """Mindestbewehrung gegen sproedes Versagen, je ``<querschnitt>.x``."""
-
-    zwaengung_biegung: Dict[str, ZwaengungBiegung] = field(default_factory=dict)
-    """Zwaengung auf Biegung, je ``<querschnitt>.x``."""
-
-    spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
-    """Stahlspannung gegen Fliessen unter haeufiger Einwirkung, je ``<querschnitt>.x``."""
-
-    spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
-    """Stahlspannung aus der Rissbreite unter quasi-staendiger Einwirkung, je ``<querschnitt>.x``."""
-
-    verformung: Dict[str, Verformung] = field(default_factory=dict)
-    """Die Durchbiegung je Verformungsfall, je Querschnitt -- nur in x-Richtung."""
-
     kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)
     """Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet."""
-
-    knicken: Dict[str, Knicken] = field(default_factory=dict)
-    """Nachweis am verformten System, je Querschnitt -- nur in x-Richtung."""
-
-    fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)
-    """
-    Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind.
-
-    Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine
-    Zeile mit Erfuellungsgrad null steht statt gar nichts.
-    """
 
     spannungsfaelle: Dict[str, List["SpannungsfallEintrag"]] = field(
         default_factory=dict)
@@ -140,37 +85,17 @@ class Aufbau:
     zeigt, soll hoeren, dass sie leer ist, und nicht, es gebe sie nicht.
     """
 
-    qa_biegung: Dict[str, SchiefeBiegung] = field(default_factory=dict)
-    """Biegung und Normalkraft je Querschnittsanalyse, nach ihrer Kennung."""
-
-    qa_schub: Dict[str, Schubwandnachweis] = field(default_factory=dict)
-    """Querkraft und Torsion je Querschnittsanalyse."""
-
-    qa_duktilitaet: Dict[str, DuktilitaetQA] = field(default_factory=dict)
-    qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)
-    qa_rissnormalkraft: Dict[str, RissnormalkraftQA] = field(default_factory=dict)
-    qa_zwaengung_biegung: Dict[str, ZwaengungBiegungQA] = field(default_factory=dict)
-    qa_spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
-    qa_spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
-    """Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte."""
-
-    qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)
-    """Knicken je Querschnittsanalyse -- je Fall in seiner Richtung."""
-
-    grundbruch: Dict[str, Grundbruch] = field(default_factory=dict)
-    gleiten: Dict[str, Gleiten] = field(default_factory=dict)
-    """Grundbruch und Gleiten je Fundament."""
-
-    setzung: Dict[str, Setzung] = field(default_factory=dict)
-    """Die Setzung je Fundament."""
-
     warnungen: List[str] = field(default_factory=list)
 
     #: Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der
     #: ein neuer Nachweis eingetragen wird. Alle sind nach Kennung
-    #: geschluesselt (``q1`` oder ``q1.x``) und alle tragen Nachweise mit
-    #: ``d_ausnutzung``. Ihre Reihenfolge ist die der Herleitung: in ihr
-    #: rechnet ein Bauteil seine Nachweise (:meth:`Bauteil.ziele`).
+    #: geschluesselt (``q1`` oder ``q1.x`` -- die Richtung steht noch im
+    #: Schluessel der Platte, damit Wert-IDs in abgelegten Berichten nicht
+    #: wechseln) und alle tragen Nachweise mit ``d_ausnutzung``. Ihre
+    #: Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine
+    #: Nachweise (:meth:`Bauteil.ziele`). ``fehlende`` rechnet nichts: eine
+    #: Richtung ohne Bewehrung mit Einwirkungen bekommt so eine Zeile mit
+    #: Erfuellungsgrad null statt gar keiner.
     NACHWEISFELDER = ("nachweise", "querkraft", "duktilitaet", "fehlende",
                       "rissnormalkraft", "sproede", "zwaengung_biegung",
                       "spannung_riss", "spannung", "verformung", "knicken",
@@ -212,10 +137,20 @@ class Aufbau:
         """Die Fundamente der Setzungsberechnungen, nach Kennung."""
         return self.objekte("setzung")
 
+    def feld(self, feld: str) -> Dict[str, Nachweis]:
+        """
+        Die Nachweise eines Feldes, nach ihrem Schluessel -- eine Sicht auf
+        die Bauteile, in ihrer Folge. Bis 2026-10-25 stand jedes Feld als
+        eigenes Woerterbuch im Aufbau, neben den Nachweisen der Bauteile.
+        """
+        if feld not in self.NACHWEISFELDER:
+            raise ValueError(f"'{feld}' steht nicht in Aufbau.NACHWEISFELDER.")
+        return {s: n for teil in self.teile.values() for f, s, n in teil.nachweise if f == feld}
+
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""
         for feld in self.NACHWEISFELDER:
-            yield feld, getattr(self, feld)
+            yield feld, self.feld(feld)
 
     def alle_nachweise(self):
         """Jeden Nachweis einmal, in derselben Reihenfolge wie im Protokoll."""
@@ -229,8 +164,9 @@ class Aufbau:
     def eintragen(self, teil: "Bauteil", feld: str, schluessel: str,
                   nachweis: Nachweis) -> None:
         """
-        Einen Nachweis anmelden: im Rechenwerk, in seinem Feld und bei seinem
-        Bauteil -- ausser er ist ganz still, und es wird schnell gerechnet.
+        Einen Nachweis anmelden: im Rechenwerk und bei seinem Bauteil, mit
+        Feld und Schluessel -- ausser er ist ganz still, und es wird schnell
+        gerechnet.
 
         Den schnellen Weg nimmt nur die Bewehrungssuche, und die zaehlt
         stille Urteile nicht (:func:`bewehrungssuche.bewerte`). Ein ganz
@@ -251,8 +187,7 @@ class Aufbau:
         if self.schnell and nachweis.still:
             return
         self.werk.registriere(nachweis)
-        getattr(self, feld)[schluessel] = nachweis
-        teil.nachweise.append((feld, nachweis))
+        teil.nachweise.append((feld, schluessel, nachweis))
 
     def bauteile(self) -> List["Bauteil"]:
         """
@@ -274,7 +209,7 @@ class Aufbau:
     def bauteil_von(self, nachweis: Nachweis) -> "Bauteil":
         """Das Bauteil, bei dem ein Nachweis angemeldet ist."""
         for teil in self.teile.values():
-            if any(n is nachweis for _, n in teil.nachweise):
+            if any(n is nachweis for _, _, n in teil.nachweise):
                 return teil
         raise ProjektFehler(f"Der Nachweis '{nachweis.id}' gehoert zu keinem Bauteil.")
 
@@ -322,7 +257,7 @@ class Aufbau:
         Nicht am Namen: den Anzeigetext zu zerlegen hat schon einmal die
         Nachweise mehrerer Platten in dieselbe Tabelle gepackt.
         """
-        eigene = {n.id for _, n in self.bauteil(kennung).nachweise}
+        eigene = {n.id for _, _, n in self.bauteil(kennung).nachweise}
         return [u for u in urteile if u.raum in eigene]
 
     def materialziele(self) -> List[str]:
@@ -357,8 +292,8 @@ class Bauteil:
     objekt: Any
     """Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem."""
 
-    nachweise: List[Tuple[str, Nachweis]] = field(default_factory=list)
-    """Feld im :class:`Aufbau` und Nachweis, angemeldet ueber :meth:`Aufbau.eintragen`."""
+    nachweise: List[Tuple[str, str, Nachweis]] = field(default_factory=list)
+    """Feld, Schluessel und Nachweis, angemeldet ueber :meth:`Aufbau.eintragen`."""
 
     weitere_ziele: List[str] = field(default_factory=list)
     """Was es ausser seinen Nachweisen rechnet -- ein Balkensystem seine Querschnitte und sich."""
@@ -379,7 +314,7 @@ class Bauteil:
 
     def im_feld(self, feld: str) -> List[Nachweis]:
         """Seine Nachweise in einem Feld des :class:`Aufbau`, in der Folge der Anmeldung."""
-        return [n for f, n in self.nachweise if f == feld]
+        return [n for f, _, n in self.nachweise if f == feld]
 
     def ziele(self) -> List[str]:
         """
@@ -387,7 +322,7 @@ class Bauteil:
         von :attr:`Aufbau.NACHWEISFELDER`, dann die weiteren Ziele.
         """
         folge = {feld: i for i, feld in enumerate(Aufbau.NACHWEISFELDER)}
-        return ([n.id for _, n in sorted(self.nachweise, key=lambda e: folge[e[0]])]
+        return ([n.id for _, _, n in sorted(self.nachweise, key=lambda e: folge[e[0]])]
                 + self.weitere_ziele)
 
 

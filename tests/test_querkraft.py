@@ -28,7 +28,7 @@ def querkraftbefund(projekt: Projekt):
     """Der Befund der Querkraft in x -- aus dem Lauf, nicht vom Nachweis."""
     aufbau = projekt.aufbauen()
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    return loesung.befund(aufbau.querkraft["q1.x"])
+    return loesung.befund(aufbau.feld("querkraft")["q1.x"])
 
 
 class TestQuerkraft(unittest.TestCase):
@@ -113,9 +113,9 @@ class TestQuerkraft(unittest.TestCase):
         projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
         aufbau = projekt.aufbauen()
         erg = aufbau.werk.loese(*aufbau.alle_nachweisziele()).befund(
-            aufbau.querkraft["q1.x"]).ergebnisse[0]
+            aufbau.feld("querkraft")["q1.x"]).ergebnisse[0]
 
-        nachweis = aufbau.nachweise["q1.x"]
+        nachweis = aufbau.feld("nachweise")["q1.x"]
         loesung = aufbau.werk.loese(
             nachweis.d_m_rd[erg.fall.name].id,
             nachweis.d_eckwerte["M_Rd_N0_pos"].id)
@@ -146,7 +146,7 @@ class TestQuerkraft(unittest.TestCase):
         projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        erg = loesung.befund(aufbau.querkraft["q1.x"]).ergebnisse[0]
+        erg = loesung.befund(aufbau.feld("querkraft")["q1.x"]).ergebnisse[0]
 
         # Nur der Abschnitt des Querkraftnachweises, ab seinem ersten Fall.
         bloecke = loesung.protokoll.nach_abschnitten()
@@ -237,7 +237,7 @@ class TestQuerkraft(unittest.TestCase):
             aufbau = projekt.aufbauen()
             loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
             with self.subTest(bild=bild.__name__):
-                nachweis = aufbau.querkraft["q1.x"]
+                nachweis = aufbau.feld("querkraft")["q1.x"]
                 self.assertTrue(nachweis.still)
                 self.assertFalse([u for u in loesung.gefuehrte_urteile if u.art == "V"])
                 # Ohne Fall keine Ausgabe: gerechnet wird er als Ziel unter
@@ -262,14 +262,14 @@ class TestQuerkraft(unittest.TestCase):
                 q.lagen[nummer - 1].zulage.durchmesser = 0.0
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        self.assertTrue(aufbau.querkraft["q1.x"].still)
+        self.assertTrue(aufbau.feld("querkraft")["q1.x"].still)
         self.assertFalse([u for u in loesung.urteile if u.art == "V"])
 
     def test_erfuellungsgrad_ist_widerstand_durch_einwirkung(self):
         aufbau = projekt_mit_querkraft().aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         urteil = next(u for u in loesung.urteile if u.name == "Querkraft x – Feld")
-        erg = loesung.befund(aufbau.querkraft["q1.x"]).ergebnisse[0]
+        erg = loesung.befund(aufbau.feld("querkraft")["q1.x"]).ergebnisse[0]
         self.assertAlmostEqual(
             urteil.erfuellungsgrad.in_einheit(EINHEITSLOS), erg.v_Rd / 120e3, places=6)
 
@@ -424,7 +424,7 @@ class TestVorzeichenDerQuerkraft(unittest.TestCase):
         projekt.querschnitte[0].kombinationen[0].V_Ed = V_Ed
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        erg = loesung.befund(aufbau.querkraft["q1.x"]).ergebnisse[0]
+        erg = loesung.befund(aufbau.feld("querkraft")["q1.x"]).ergebnisse[0]
         urteil = next(u for u in loesung.urteile
                       if u.name == f"Querkraft x – {erg.fall.name}")
         return erg, urteil

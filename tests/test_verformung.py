@@ -105,7 +105,7 @@ class TestFaktor(unittest.TestCase):
     def test_beide_seiten_immer_auch_ohne_fall(self):
         """Einmal je bewehrte Seite, als Kennzahl -- auch ohne Verformungsfall."""
         aufbau, loesung = rechnen(beispiel())
-        self.assertEqual(aufbau.verformung, {})
+        self.assertEqual(aufbau.feld("verformung"), {})
         self.assertAlmostEqual(faktor(loesung, "q1", "unten"),
                                faktor(self.loesung, "q1", "unten"), places=12)
         self.assertAlmostEqual(faktor(loesung, "q1", "oben"),
@@ -146,7 +146,7 @@ class TestFaktor(unittest.TestCase):
     def test_ohne_x_kein_nachweis_aber_eine_warnung(self):
         projekt, platte = platte_mit([0, 0], ("Feld", 2.0, 5.0, "unten"))
         aufbau, _ = rechnen(projekt)
-        self.assertEqual(aufbau.verformung, {})
+        self.assertEqual(aufbau.feld("verformung"), {})
         self.assertIn("Platte 'Platte': ohne x-Bewehrung kein Verformungsnachweis.",
                       aufbau.warnungen)
 
@@ -200,7 +200,7 @@ class TestNachweis(unittest.TestCase):
         projekt = beispiel(("Feld", 3.5, 6.0, "unten"))
         projekt.querschnitte[0].verformung.faelle[0].aktiv = False
         aufbau, _ = rechnen(projekt)
-        self.assertEqual(aufbau.verformung, {})
+        self.assertEqual(aufbau.feld("verformung"), {})
 
     def test_die_vorgabe_steht_in_der_herleitung(self):
         """L/350 ist nach Vorgabe eingebaut -- das steht da, nicht nur im Code."""

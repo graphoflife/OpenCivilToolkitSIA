@@ -28,7 +28,7 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertEqual(len(aufbau.baustoffe), 2)
         self.assertEqual(len(aufbau.querschnitte), 1)
         self.assertEqual(len(aufbau.querschnittsanalysen), 1)
-        self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
+        self.assertEqual(sorted(aufbau.feld("nachweise")), ["q1.x"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
         # Gefuehrt werden bei der Platte die 3 M-N-Nachweise und die
@@ -649,7 +649,7 @@ class TestMehrfachverwendung(unittest.TestCase):
         zweite.kennung, zweite.name = "q2", "Zweite Platte"
         projekt.querschnitte.append(zweite)
         aufbau = projekt.aufbauen()
-        self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q2.x"])
+        self.assertEqual(sorted(aufbau.feld("nachweise")), ["q1.x", "q2.x"])
         self.assertTrue(aufbau.werk.loese(*aufbau.alle_nachweisziele()).vollstaendig)
 
 
@@ -700,7 +700,7 @@ class TestNurDieTragrichtungX(unittest.TestCase):
         aufbau = Projekt.beispiel().aufbauen()
         for feld in Aufbau.NACHWEISFELDER:
             with self.subTest(feld=feld):
-                self.assertFalse([s for s in getattr(aufbau, feld)
+                self.assertFalse([s for s in aufbau.feld(feld)
                                   if s.endswith(".y")])
 
     def test_eine_richtung_am_lastfall_gibt_es_nicht_mehr(self):
@@ -727,8 +727,8 @@ class TestNurDieTragrichtungX(unittest.TestCase):
         projekt = Projekt.beispiel()
         projekt.querschnitt("q1").kombinationen = []
         aufbau = projekt.aufbauen()
-        self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
-        self.assertEqual(aufbau.nachweise["q1.x"].kombinationen, [])
+        self.assertEqual(sorted(aufbau.feld("nachweise")), ["q1.x"])
+        self.assertEqual(aufbau.feld("nachweise")["q1.x"].kombinationen, [])
         # Eine Warnung gibt es -- dass ohne Schnittgrössen kein
         # Tragsicherheitsnachweis läuft. Das ist keine Aussage über die
         # Richtung, und genau darum geht es hier nicht.
@@ -807,7 +807,7 @@ class TestNachweisfelder(unittest.TestCase):
         self.assertTrue(systeme)
         self.assertEqual(sorted(je_bauteil), sorted(aufbau.alle_nachweisziele() + systeme))
         for b in aufbau.bauteile():
-            for _, nachweis in b.nachweise:
+            for _, _, nachweis in b.nachweise:
                 self.assertIs(aufbau.bauteil_von(nachweis), b)
 
 
@@ -850,7 +850,7 @@ class TestAusgeschaltetHeisstStill(unittest.TestCase):
     def _still(self, projekt, schalter, feld, art, anzahl):
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        nachweise = getattr(aufbau, feld).values()
+        nachweise = aufbau.feld(feld).values()
         with self.subTest(schalter=schalter, feld=feld):
             self.assertTrue(nachweise and all(n.still for n in nachweise))
             urteile = [u for u in loesung.urteile
@@ -876,7 +876,7 @@ class TestEinUrteilJeLagennachweis(unittest.TestCase):
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         for schalter, (feld, art) in TestAusgeschaltetHeisstStill.SCHALTER.items():
             with self.subTest(schalter=schalter):
-                nachweis, = getattr(aufbau, feld).values()
+                nachweis, = aufbau.feld(feld).values()
                 lagen = loesung.befund(nachweis).ergebnisse
                 self.assertEqual(len(lagen), 2)                     # beide x-Lagen
                 laut = [u for u in loesung.gefuehrte_urteile if u.art == art]

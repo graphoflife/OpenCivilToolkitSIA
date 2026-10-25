@@ -35,7 +35,7 @@ def urteile(projekt: Projekt):
     """
     aufbau = projekt.aufbauen()
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    return (loesung.befund(aufbau.duktilitaet["q1"]).ergebnisse,
+    return (loesung.befund(aufbau.feld("duktilitaet")["q1"]).ergebnisse,
             {u.name: u for u in loesung.gefuehrte_urteile})
 
 
@@ -200,7 +200,7 @@ class TestHerleitungAusVorlagen(unittest.TestCase):
         loesung = cls.aufbau.werk.loese(*cls.aufbau.alle_nachweisziele())
         cls.bloecke = [b for b in loesung.protokoll.alle_bloecke()
                        if isinstance(b, GleichungBlock)]
-        cls.nachweis = next(iter(cls.aufbau.duktilitaet.values()))
+        cls.nachweis = next(iter(cls.aufbau.feld("duktilitaet").values()))
         cls.befund = loesung.befund(cls.nachweis)
 
     def block(self, wert_id):

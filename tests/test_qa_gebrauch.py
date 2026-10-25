@@ -132,7 +132,7 @@ class TestVerfehlteEbene(unittest.TestCase):
         a.quasistaendig.wahl = QAGebrauchswahl(rechenart="block")
         a.quasistaendig.lastfall("Wenig Moment", N_Ed=-600.0, M_y_Ed=10.0)
         aufbau, loesung = rechnen(p)
-        urteil = urteil_zu(loesung, aufbau.qa_spannung_riss["a1"], "Wenig Moment")
+        urteil = urteil_zu(loesung, aufbau.feld("qa_spannung_riss")["a1"], "Wenig Moment")
         self.assertFalse(urteil.erfuellt)
         self.assertEqual(urteil.begruendung,
                          "Mit der 0.85·x-Vereinfachung gibt es zu dieser Einwirkung keine "
@@ -193,7 +193,7 @@ class TestStahlspannung(unittest.TestCase):
         p, a = rechteck(unten=((50, 12, 3), (51, 26, 2)), rissanforderung="erhoeht")
         a.quasistaendig.lastfall("Dauer", M_y_Ed=60.0)
         aufbau, loesung = rechnen(p)
-        urteil = urteil_zu(loesung, aufbau.qa_spannung_riss["a1"], "Dauer")
+        urteil = urteil_zu(loesung, aufbau.feld("qa_spannung_riss")["a1"], "Dauer")
         grenze = zulaessige_stahlspannung(anforderung=Rissanforderung.ERHOEHT, f_yk=F_YK, E_s=E_S,
                                           f_ctm=F_CTM, durchmesser=0.026)
         self.assertIn("Linie 2", urteil.begruendung)
@@ -203,22 +203,22 @@ class TestStahlspannung(unittest.TestCase):
         p, a = rechteck()
         a.haeufig.lastfall("Häufig", M_y_Ed=60.0)
         aufbau, _ = rechnen(p)
-        self.assertEqual(aufbau.qa_spannung, {})
+        self.assertEqual(aufbau.feld("qa_spannung"), {})
         a.rissanforderung = "erhoeht"
         aufbau, loesung = rechnen(p)
-        urteil = urteil_zu(loesung, aufbau.qa_spannung["a1"], "Häufig")
+        urteil = urteil_zu(loesung, aufbau.feld("qa_spannung")["a1"], "Häufig")
         self.assertAlmostEqual(urteil.widerstand.groesse.si, F_YD - 80e6, delta=1.0)
 
     def test_abgeleitet_aus_der_tragsicherheit(self):
         """«Feld (60 %)»: 60 % des Lastfalls der Tragsicherheit, still, bis man ihn führt."""
         p, a = rechteck()
         aufbau, loesung = rechnen(p)
-        [urteil] = urteile(loesung, aufbau.qa_spannung_riss["a1"])
+        [urteil] = urteile(loesung, aufbau.feld("qa_spannung_riss")["a1"])
         self.assertEqual(urteil.fall, "Feld (60 %)")
         self.assertTrue(urteil.still)
         a.quasistaendig.aus_tragsicherheit = True
         aufbau, loesung = rechnen(p)
-        [urteil] = urteile(loesung, aufbau.qa_spannung_riss["a1"])
+        [urteil] = urteile(loesung, aufbau.feld("qa_spannung_riss")["a1"])
         self.assertFalse(urteil.still)
         # Bei normaler Anforderung ist die Grenze f_yk.
         self.assertAlmostEqual(urteil.widerstand.groesse.si, F_YK, delta=1.0)
@@ -227,7 +227,7 @@ class TestStahlspannung(unittest.TestCase):
         p, a = rechteck()
         a.quasistaendig.lastfall("Druck", N_Ed=-500.0)
         aufbau, loesung = rechnen(p)
-        urteil = next(u for u in urteile(loesung, aufbau.qa_spannung_riss["a1"])
+        urteil = next(u for u in urteile(loesung, aufbau.feld("qa_spannung_riss")["a1"])
                       if u.fall == "Druck")
         self.assertTrue(urteil.erfuellt)
         self.assertTrue(math.isinf(urteil.erfuellungsgrad.si))
@@ -238,7 +238,7 @@ class TestRissnormalkraft(unittest.TestCase):
         """N_Riss = b·h·k_t·f_ctm mit t = min(b; h); dagegen alle Stäbe bei f_yk."""
         p, _ = rechteck(oben=((50, 12, 2),), zwaengung=True)
         aufbau, loesung = rechnen(p)
-        [urteil] = urteile(loesung, aufbau.qa_rissnormalkraft["a1"])
+        [urteil] = urteile(loesung, aufbau.feld("qa_rissnormalkraft")["a1"])
         k_t = 1.0 / (1.0 + 0.5 * 0.3)
         self.assertAlmostEqual(urteil.einwirkung.groesse.si, 0.3 * 0.5 * k_t * F_CTM,
                                delta=10.0)
@@ -248,7 +248,7 @@ class TestRissnormalkraft(unittest.TestCase):
     def test_begrenzt_auf_500_mm(self):
         p, _ = rechteck(b=800, h=600, zwaengung=True, zwaengung_begrenzt=True)
         aufbau, loesung = rechnen(p)
-        [urteil] = urteile(loesung, aufbau.qa_rissnormalkraft["a1"])
+        [urteil] = urteile(loesung, aufbau.feld("qa_rissnormalkraft")["a1"])
         self.assertAlmostEqual(urteil.einwirkung.groesse.si,
                                0.8 * 0.6 / (1.0 + 0.5 * 0.5) * F_CTM, delta=10.0)
 
@@ -258,13 +258,13 @@ class TestZwaengungBiegung(unittest.TestCase):
         """Stäbe nur unten: M_s,adm = σ_s,adm · A_s · (d − x/3), gegen dasselbe M_Riss."""
         p, _ = rechteck(zwaengung_biegung=True, einachsig=True)
         aufbau, loesung = rechnen(p)
-        unten, *rest = urteile(loesung, aufbau.qa_zwaengung_biegung["a1"])
+        unten, *rest = urteile(loesung, aufbau.feld("qa_zwaengung_biegung")["a1"])
         a_s = 3 * math.pi * 0.016 ** 2 / 4
         riss = gerissen(n=E_S / E_CM, a_s=a_s, b=0.3, d=0.45)
         self.assertEqual(unten.fall, "Zug unten")
         self.assertAlmostEqual(unten.widerstand.groesse.si / (F_YK * a_s * riss.z), 1.0,
                                delta=5e-4)
-        sproede = next(u for u in urteile(loesung, aufbau.qa_sproede["a1"])
+        sproede = next(u for u in urteile(loesung, aufbau.feld("qa_sproede")["a1"])
                        if u.fall == "Zug unten")
         self.assertEqual(unten.einwirkung.groesse.si, sproede.einwirkung.groesse.si)
         # Oben liegt kein Stab: dort gibt es keinen Nachweis.
@@ -277,7 +277,7 @@ class TestZwaengungBiegung(unittest.TestCase):
             p, _ = rechteck(zwaengung_biegung=True, einachsig=True,
                             zwaengung_biegung_kriechzahl=phi)
             aufbau, loesung = rechnen(p)
-            momente.append(urteile(loesung, aufbau.qa_zwaengung_biegung["a1"])[0]
+            momente.append(urteile(loesung, aufbau.feld("qa_zwaengung_biegung")["a1"])[0]
                            .widerstand.groesse.si)
         self.assertLess(momente[1], momente[0])
 

@@ -674,7 +674,7 @@ class TestSchnellerKnicknachweis(unittest.TestCase):
                 genau = projekt.aufbauen()
                 kurz = projekt.aufbauen(schnell=True)
                 erfuellt = [aufbau.werk.loese(*aufbau.alle_nachweisziele()).befund(
-                    aufbau.knicken["q1"]).ergebnisse[0].erfuellt for aufbau in (genau, kurz)]
+                    aufbau.feld("knicken")["q1"]).ergebnisse[0].erfuellt for aufbau in (genau, kurz)]
                 self.assertEqual(erfuellt[0], erfuellt[1])
 
 

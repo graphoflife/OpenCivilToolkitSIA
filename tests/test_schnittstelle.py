@@ -87,7 +87,7 @@ class TestSpannungsnachweisNurWoGefordert(unittest.TestCase):
             q.rissanforderung = eintrag["wert"]
             q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0)]
             with self.subTest(anforderung=eintrag["wert"]):
-                self.assertEqual(bool(projekt.aufbauen().spannung),
+                self.assertEqual(bool(projekt.aufbauen().feld("spannung")),
                                  eintrag["fliessnachweis"])
 
 

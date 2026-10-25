@@ -378,7 +378,7 @@ class TestGegenDieHandrechnung(unittest.TestCase):
 
     def widerstand(self, projekt, art=Rechenart.BLOCK):
         aufbau, loesung = rechnen(projekt)
-        eckwert = aufbau.nachweise["q1.x"].d_eckwerte["M_Rd_N0_pos"]
+        eckwert = aufbau.feld("nachweise")["q1.x"].d_eckwerte["M_Rd_N0_pos"]
         paar = sa.loeserpaar(aufbau.querschnitte["q1"], Richtung.X,
                              lambda kid: loesung.werte[kid].groesse.si,
                              wahl=Rechenwahl(art=art))
@@ -405,7 +405,7 @@ class TestGegenDieHandrechnung(unittest.TestCase):
             projekt = Projekt.beispiel()
             projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(rechenart=rechenart)
             aufbau, loesung = rechnen(projekt)
-            eckwert = aufbau.nachweise["q1.x"].d_eckwerte["M_Rd_N0_neg"]
+            eckwert = aufbau.feld("nachweise")["q1.x"].d_eckwerte["M_Rd_N0_neg"]
             return -loesung.werte[eckwert.id].groesse.si / 1e3
         hand, block = m_rd_negativ("handrechnung"), m_rd_negativ("block")
         self.assertAlmostEqual(hand, 79.9, delta=0.1)
@@ -460,7 +460,7 @@ class TestEndeIstTragwiderstand(unittest.TestCase):
     def test_m_rd_ist_das_ende_der_m_chi_linie(self):
         for kennung, art, phi, satz in self.wahlen:
             with self.subTest(art=art, phi=phi, satz=satz):
-                nachweis = self.aufbau.nachweise[f"{kennung}.x"]
+                nachweis = self.aufbau.feld("nachweise")[f"{kennung}.x"]
                 m_rd = self.loesung.werte[nachweis.d_m_rd["Druck"].id].groesse.si
                 linie = self.analysen[kennung][0].kurve
                 self.assertAlmostEqual(linie.bruch.kraft / m_rd, 1.0, delta=0.001)
@@ -476,7 +476,7 @@ class TestEndeIstTragwiderstand(unittest.TestCase):
         """
         for kennung, art, phi, satz in self.wahlen:
             with self.subTest(art=art, phi=phi, satz=satz):
-                nachweis = self.aufbau.nachweise[f"{kennung}.x"]
+                nachweis = self.aufbau.feld("nachweise")[f"{kennung}.x"]
                 urteil = next(u for u in self.loesung.urteile
                               if u.raum == nachweis.id and u.fall == "Zug")
                 linie = self.analysen[kennung][1].kurve

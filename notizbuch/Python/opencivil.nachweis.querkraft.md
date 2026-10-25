@@ -1,5 +1,5 @@
 ---
-erzeugt: 10c1dcbcaf0c
+erzeugt: 6f9193648b22
 art: modul
 tags: [modul]
 ---
@@ -253,7 +253,6 @@ herleitet.
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
-- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 
 ## Formeln aus diesem Modul

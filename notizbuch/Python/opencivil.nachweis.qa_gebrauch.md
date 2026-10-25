@@ -1,5 +1,5 @@
 ---
-erzeugt: 4d520db0fd54
+erzeugt: 5f1030d4ac06
 art: modul
 tags: [modul]
 ---
@@ -282,7 +282,6 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 
 ## Gebraucht von
 
-- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 
 ## Formeln aus diesem Modul

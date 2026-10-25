@@ -38,8 +38,8 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
     sie nur das Fundament, ohne Gleitkörper und ohne Kräfte.
     """
     fundament = aufbau.grundbrueche[kennung]
-    nachweis = aufbau.grundbruch.get(kennung)
-    gleiten = aufbau.gleiten.get(kennung)
+    nachweis = aufbau.feld("grundbruch").get(kennung)
+    gleiten = aufbau.feld("gleiten").get(kennung)
     befund: Optional[grundbruch.Grundbruchbefund] = (
         loesung.befunde.get(nachweis.id) if nachweis is not None else None)
     drainiert = befund is not None and not befund.undrainiert

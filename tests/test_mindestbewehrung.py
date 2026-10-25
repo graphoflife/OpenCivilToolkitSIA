@@ -38,7 +38,7 @@ def befund(projekt: Projekt, nachweise: str):
     """
     aufbau = projekt.aufbauen()
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    return loesung.befund(getattr(aufbau, nachweise)["q1.x"])
+    return loesung.befund(aufbau.feld(nachweise)["q1.x"])
 
 
 def alle_urteile(projekt: Projekt):
@@ -436,7 +436,7 @@ class TestSproedesVersagen(unittest.TestCase):
         projekt = Projekt.beispiel()
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        nachweis = aufbau.sproede["q1.x"]
+        nachweis = aufbau.feld("sproede")["q1.x"]
         erg = loesung.befund(nachweis).ergebnisse[0]
         self.assertEqual(erg.lage.nummer, x_lagen(projekt)[0])
         self.assertAlmostEqual(erg.M_Rd / 1e3, 235.9, delta=0.5)
@@ -460,7 +460,7 @@ class TestSproedesVersagen(unittest.TestCase):
         """Die Resistenzlinie gehört dem Querschnitt, nicht der Einwirkung."""
         projekt = projekt_sproede(kombinationen=[])
         aufbau, gefunden = urteile(projekt)
-        self.assertIn("q1.x", aufbau.sproede)
+        self.assertIn("q1.x", aufbau.feld("sproede"))
         self.assertTrue([n for n, u in gefunden.items()
                          if n.startswith("Sprödes Versagen") and not u.still])
 

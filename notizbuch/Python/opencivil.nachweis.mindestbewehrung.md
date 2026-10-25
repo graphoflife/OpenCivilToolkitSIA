@@ -1,5 +1,5 @@
 ---
-erzeugt: d70499e65d0a
+erzeugt: a920ee27cf64
 art: modul
 tags: [modul]
 ---
@@ -290,7 +290,6 @@ Lagen einen Stahl traegt.
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.stabgrenzen]]
-- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 
 ## Formeln aus diesem Modul

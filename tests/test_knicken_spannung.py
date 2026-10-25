@@ -72,7 +72,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
 
     def nachweis(self, projekt):
         aufbau, loesung = rechnen(projekt)
-        return Gelaufen(aufbau.spannung["q1.x"], loesung)
+        return Gelaufen(aufbau.feld("spannung")["q1.x"], loesung)
 
     def test_bei_normaler_anforderung_entfaellt_er(self):
         """
@@ -81,7 +81,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         prüft seine eigene Klasse.
         """
         aufbau, gefunden = urteile(self.projekt("normal"))
-        self.assertEqual(aufbau.spannung, {})
+        self.assertEqual(aufbau.feld("spannung"), {})
         self.assertFalse([u for u in gefunden.values()
                           if u.langname == "Risse: Häufige Lastfälle"])
 
@@ -92,21 +92,21 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         in die Tabelle zu stellen hiesse, sie zur Norm zu erklären.
         """
         aufbau, gefunden = urteile(self.projekt("erhoeht"))
-        self.assertEqual(sorted(aufbau.spannung), ["q1.x"])
+        self.assertEqual(sorted(aufbau.feld("spannung")), ["q1.x"])
         # Am Kürzel und nicht am Namen: den liest man, das Kürzel bleibt.
         self.assertTrue([u for u in gefunden.values() if u.art == "σ_s"])
-        self.assertTrue(all(n.still for n in aufbau.spannung.values()))
+        self.assertTrue(all(n.still for n in aufbau.feld("spannung").values()))
 
     def test_mit_den_siebzig_prozent_wird_er_laut(self):
         aufbau, loesung = rechnen(
             self.projekt("erhoeht", haeufig__aus_tragsicherheit=True))
-        laut = [u.fall for u in Gelaufen(aufbau.spannung["q1.x"], loesung).urteile
+        laut = [u.fall for u in Gelaufen(aufbau.feld("spannung")["q1.x"], loesung).urteile
                 if not u.still]
         self.assertIn("Feld (70 %)", laut)
 
     def test_die_grenze_ist_f_yd_minus_80(self):
         aufbau, loesung = rechnen(self.projekt("hoch"))
-        urteil = Gelaufen(aufbau.spannung["q1.x"], loesung).urteile[0]
+        urteil = Gelaufen(aufbau.feld("spannung")["q1.x"], loesung).urteile[0]
         # B500B: f_yd = 434.8, minus 80 -> 354.8 N/mm²
         self.assertAlmostEqual(urteil.widerstand.groesse.si / 1e6, 354.8, delta=0.5)
 
@@ -138,7 +138,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         q.haeufig.aus_tragsicherheit = False
         q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=60.0, N_Ed=0.0)]
         aufbau, loesung = rechnen(projekt)
-        spannung = Gelaufen(aufbau.spannung["q1.x"], loesung)
+        spannung = Gelaufen(aufbau.feld("spannung")["q1.x"], loesung)
         self.assertEqual([u.fall for u in spannung.urteile if not u.still],
                          ["Gebrauch"])
         self.assertIn("Feld (70 %)", [e.fall.name for e in spannung.ergebnisse])
@@ -185,7 +185,7 @@ class TestVerfehlteEbene(unittest.TestCase):
         wand.quasistaendig.lastfall("Mehr Moment", M_Ed=80, N_Ed=-600)
         wand.quasistaendig.wahl = Gebrauchswahl(rechenart=rechenart)
         aufbau, loesung = rechnen(projekt)
-        return Gelaufen(aufbau.spannung_riss["q1.x"], loesung)
+        return Gelaufen(aufbau.feld("spannung_riss")["q1.x"], loesung)
 
     def test_statt_der_probe_steht_die_wahl(self):
         for rechenart, wort in (("block", "der 0.85·x-Vereinfachung"),
@@ -233,7 +233,7 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
 
     def nachweis(self, projekt):
         aufbau, loesung = rechnen(projekt)
-        return Gelaufen(aufbau.spannung_riss["q1.x"], loesung)
+        return Gelaufen(aufbau.feld("spannung_riss")["q1.x"], loesung)
 
     def test_er_laeuft_auch_bei_normaler_anforderung(self):
         """Dort ist die Grenze f_yk -- auch dann darf nichts fliessen."""
@@ -268,7 +268,7 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
         projekt = self.projekt("hoch", haeufig__anteil=80.0)
         aufbau, loesung = rechnen(projekt)
         faelle = {e.fall.name: e.fall
-                  for e in Gelaufen(aufbau.spannung["q1.x"], loesung).ergebnisse}
+                  for e in Gelaufen(aufbau.feld("spannung")["q1.x"], loesung).ergebnisse}
         self.assertAlmostEqual(faelle["Feld (80 %)"].M_Ed.si / 1e3, 80.0)
 
     def test_ohne_schalter_still_mit_schalter_laut(self):
@@ -297,8 +297,8 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
         namen = {u.langname for u in gefunden.values() if not u.still}
         self.assertIn("Risse: Häufige Lastfälle", namen)
         self.assertIn("Risse: Quasi-ständige Lastfälle", namen)
-        self.assertNotEqual(aufbau.spannung["q1.x"].id,
-                            aufbau.spannung_riss["q1.x"].id)
+        self.assertNotEqual(aufbau.feld("spannung")["q1.x"].id,
+                            aufbau.feld("spannung_riss")["q1.x"].id)
 
     def test_elastisch_ist_es_der_spannungsvergleich(self):
         erg = self.nachweis(self.projekt("hoch")).ergebnisse[0]
@@ -383,7 +383,7 @@ class TestFallnamenInSymbolen(unittest.TestCase):
     def test_der_name_steht_als_text_da(self):
         aufbau = Projekt.beispiel().aufbauen()
         symbole = [d.symbol for d in
-                   aufbau.spannung_riss["q1.x"].d_ausnutzung.values()]
+                   aufbau.feld("spannung_riss")["q1.x"].d_ausnutzung.values()]
         self.assertIn(r"\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}", symbole)
 
 
@@ -417,7 +417,7 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
         q.haeufig.faelle = [GebrauchsfallEintrag("Dauer", M_Ed=50.0)]
         q.quasistaendig.faelle = [GebrauchsfallEintrag("Dauer", M_Ed=40.0)]
         aufbau, loesung = rechnen(projekt)
-        for nachweis in (aufbau.spannung["q1.x"], aufbau.spannung_riss["q1.x"]):
+        for nachweis in (aufbau.feld("spannung")["q1.x"], aufbau.feld("spannung_riss")["q1.x"]):
             self.assertIn("Dauer", [e.fall.name
                                     for e in Gelaufen(nachweis, loesung).ergebnisse])
 
@@ -541,7 +541,7 @@ class TestKnicken(unittest.TestCase):
             KnickEintrag("überlastet", N_Ed=-8000.0, M_Ed_1=30.0,
                          laenge=3.0, knicklaenge=3.0)))
         cls.gefunden = {u.name: u for u in loesung.urteile}
-        cls.befund = loesung.befund(cls.aufbau.knicken["q1"])
+        cls.befund = loesung.befund(cls.aufbau.feld("knicken")["q1"])
         cls.stabil, cls.instabil = cls.befund.ergebnisse
 
     def test_gedrungen_und_maessig_belastet_ist_stabil(self):
@@ -561,7 +561,7 @@ class TestKnicken(unittest.TestCase):
         stuetze = KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0, laenge=4.0,
                                knicklaenge=4.0)
         aufbau = self.projekt(stuetze).aufbauen()
-        ziel = aufbau.knicken["q1"].d_ausnutzung["Stütze"].id
+        ziel = aufbau.feld("knicken")["q1"].d_ausnutzung["Stütze"].id
         teil = aufbau.werk.loese(ziel)
         self.assertAlmostEqual(teil.werte[ziel].groesse.si,
                                self.gefunden["Knicken x – Stütze"].erfuellungsgrad.si)
@@ -596,7 +596,7 @@ class TestKnicken(unittest.TestCase):
 
     def test_die_grenzkraft_traegt_und_ein_bisschen_mehr_nicht(self):
         """Die Probe auf die Halbierung: bei N_Rd steht er, knapp darüber nicht."""
-        nachweis, erg, befund = self.aufbau.knicken["q1"], self.stabil, self.befund
+        nachweis, erg, befund = self.aufbau.feld("knicken")["q1"], self.stabil, self.befund
         stab = nachweis.stab(befund.loeser, befund.linie)
         self.assertTrue(nachweis._gleichgewicht(stab, erg.N_Rd * 0.999, erg, 4.0).traegt)
         self.assertFalse(nachweis._gleichgewicht(stab, erg.N_Rd * 1.02, erg, 4.0).traegt)
@@ -623,7 +623,7 @@ class TestKnicken(unittest.TestCase):
                 "k", N_Ed=-800.0, M_Ed_1=20.0, laenge=laenge,
                 knicklaenge=laenge)).aufbauen(schnell=True)
             loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(), ohne_herleitung=True)
-            return loesung.befund(aufbau.knicken["q1"]).ergebnisse[0].e_2d
+            return loesung.befund(aufbau.feld("knicken")["q1"]).ergebnisse[0].e_2d
 
         self.assertLess(e_2d(3.0), e_2d(7.0))
 
@@ -636,5 +636,5 @@ class TestKnicken(unittest.TestCase):
 
     def test_ohne_knickfall_laeuft_er_nicht(self):
         aufbau, gefunden = urteile(Projekt.beispiel())
-        self.assertEqual(aufbau.knicken, {})
+        self.assertEqual(aufbau.feld("knicken"), {})
         self.assertFalse([n for n in gefunden if n.startswith("Knicken")])

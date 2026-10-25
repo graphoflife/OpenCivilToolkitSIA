@@ -119,15 +119,10 @@ Dateien über 1000 Zeilen.
       und Stellen der Diagramme stehen in `bs_diagramme.js` neben
       `balkendaten.py`; `plattenkapitel.js` wiederholt «x/d ≤ 0.35», «L/350»
       und eine Normstelle.
-- [ ] **«Eine neue Bauteilart kommt nur in BAUTEILE» stimmt nicht mehr.** Die
-      Setzung berührte rund elf Stellen ausserhalb ihrer zwei Module. Der
-      Aufbau führt die Nachweise zweimal (`aufbau/kern.py`): beim Bauteil und
-      je Nachweisfeld in einem eigenen Wörterbuch, das fast nur die Tests
-      lesen (rund 80 Stellen). Besser: auch diese als Sicht auf die
-      Bauteile. `bericht.js` lässt eine fehlende Art still weg. (Die
-      Objekte je Art -- `querschnitte`, `grundbrueche` … --, die
-      `zuordnung` und die Angaben über der Tabelle laufen seit 2026-10-25
-      über die Bauteile.)
+- [ ] **Eine fehlende Bauteilart fällt in der Oberfläche still weg**
+      (`bericht.js`). Im Kern führt der Aufbau seit 2026-10-25 nur noch
+      die Bauteile; Objekte und Nachweise je Art und Feld sind Sichten
+      darauf, und Zuordnung und Angaben laufen über die Bauteile.
 - [ ] **Einheiten nicht an jedem Feld.** Der Katalog bringt seit 2026-10-25
       die Feldangaben jeder Klasse von Einträgen, aus einem Durchgang über
       den Baum der Beschreibung. Viele Felder tragen ihre Einheit aber

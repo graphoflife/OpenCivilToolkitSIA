@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c2b1a3b8904
+erzeugt: ce64fc52f22b
 art: modul
 tags: [modul]
 ---
@@ -38,34 +38,11 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `schnell: bool = False` – Fuer die Bewehrungssuche gebaut -- siehe [[opencivil.projekt.aufbau#aufbauen|aufbauen]].
 - `teile: Dict[str, 'Bauteil'] = field(default_factory=dict)` – Jedes Bauteil nach Kennung, in der Reihenfolge von [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] und der Beschreibung.
 - `baustoffe: Dict[str, Baustoff] = field(default_factory=dict)`
-- `nachweise: Dict[str, BiegungNormalkraft] = field(default_factory=dict)` – Schluessel ist `<querschnitt>.x`. Die Richtung steht noch im Schluessel, obwohl es nur eine gibt -- sie sagt dem Leser einer Wert-ID, welcher Querschnitt gemeint ist, und die Wert-IDs in abgelegten Berichten sollen nicht bei jeder Umstellung wechseln.
-- `querkraft: Dict[str, Querkraft] = field(default_factory=dict)`
-- `duktilitaet: Dict[str, Duktilitaet] = field(default_factory=dict)` – Schluessel ist die Querschnittskennung -- ein Nachweis je Platte.
-- `rissnormalkraft: Dict[str, Rissnormalkraft] = field(default_factory=dict)` – Schluessel ist `<querschnitt>.x`.
-- `sproede: Dict[str, SproedesVersagen] = field(default_factory=dict)` – Mindestbewehrung gegen sproedes Versagen, je `<querschnitt>.x`.
-- `zwaengung_biegung: Dict[str, ZwaengungBiegung] = field(default_factory=dict)` – Zwaengung auf Biegung, je `<querschnitt>.x`.
-- `spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Stahlspannung gegen Fliessen unter haeufiger Einwirkung, je `<querschnitt>.x`.
-- `spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Stahlspannung aus der Rissbreite unter quasi-staendiger Einwirkung, je `<querschnitt>.x`.
-- `verformung: Dict[str, Verformung] = field(default_factory=dict)` – Die Durchbiegung je Verformungsfall, je Querschnitt -- nur in x-Richtung.
 - `kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)` – Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet.
-- `knicken: Dict[str, Knicken] = field(default_factory=dict)` – Nachweis am verformten System, je Querschnitt -- nur in x-Richtung.
-- `fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)` – Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind. Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine Zeile mit Erfuellungsgrad null steht statt gar nichts.
 - `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
 - `leere_analysen: Dict[str, str] = field(default_factory=dict)` – Je Querschnittsanalyse, in der noch nichts gezeichnet ist, ihr Name. Sie wird kein Bauteil -- es gibt nichts zu rechnen --, aber wer auf sie zeigt, soll hoeren, dass sie leer ist, und nicht, es gebe sie nicht.
-- `qa_biegung: Dict[str, SchiefeBiegung] = field(default_factory=dict)` – Biegung und Normalkraft je Querschnittsanalyse, nach ihrer Kennung.
-- `qa_schub: Dict[str, Schubwandnachweis] = field(default_factory=dict)` – Querkraft und Torsion je Querschnittsanalyse.
-- `qa_duktilitaet: Dict[str, DuktilitaetQA] = field(default_factory=dict)`
-- `qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)`
-- `qa_rissnormalkraft: Dict[str, RissnormalkraftQA] = field(default_factory=dict)`
-- `qa_zwaengung_biegung: Dict[str, ZwaengungBiegungQA] = field(default_factory=dict)`
-- `qa_spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)`
-- `qa_spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte.
-- `qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)` – Knicken je Querschnittsanalyse -- je Fall in seiner Richtung.
-- `grundbruch: Dict[str, Grundbruch] = field(default_factory=dict)`
-- `gleiten: Dict[str, Gleiten] = field(default_factory=dict)` – Grundbruch und Gleiten je Fundament.
-- `setzung: Dict[str, Setzung] = field(default_factory=dict)` – Die Setzung je Fundament.
 - `warnungen: List[str] = field(default_factory=list)`
-- `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]).
+- `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x` -- die Richtung steht noch im Schluessel der Platte, damit Wert-IDs in abgelegten Berichten nicht wechseln) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]). `fehlende` rechnet nichts: eine Richtung ohne Bewehrung mit Einwirkungen bekommt so eine Zeile mit Erfuellungsgrad null statt gar keiner.
 
 #### Aufbau.objekte
 
@@ -120,6 +97,16 @@ def setzungen(self) -> Dict[str, Setzungsfundament]
 
 Die Fundamente der Setzungsberechnungen, nach Kennung.
 
+#### Aufbau.feld
+
+```python
+def feld(self, feld: str) -> Dict[str, Nachweis]
+```
+
+Die Nachweise eines Feldes, nach ihrem Schluessel -- eine Sicht auf
+die Bauteile, in ihrer Folge. Bis 2026-10-25 stand jedes Feld als
+eigenes Woerterbuch im Aufbau, neben den Nachweisen der Bauteile.
+
 #### Aufbau.nachweise_je_feld
 
 ```python
@@ -150,8 +137,9 @@ Jeden Nachweis als Ziel -- auch einen ohne Lastfall, der nur fuer sein Bild rech
 def eintragen(self, teil: 'Bauteil', feld: str, schluessel: str, nachweis: Nachweis) -> None
 ```
 
-Einen Nachweis anmelden: im Rechenwerk, in seinem Feld und bei seinem
-Bauteil -- ausser er ist ganz still, und es wird schnell gerechnet.
+Einen Nachweis anmelden: im Rechenwerk und bei seinem Bauteil, mit
+Feld und Schluessel -- ausser er ist ganz still, und es wird schnell
+gerechnet.
 
 Den schnellen Weg nimmt nur die Bewehrungssuche, und die zaehlt
 stille Urteile nicht ([[opencivil.projekt.aufbau.kern#Aufbau|bewehrungssuche.bewerte]]). Ein ganz
@@ -273,7 +261,7 @@ steht hier -- niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 - `name: str`
 - `art: 'Bauteilart'`
 - `objekt: Any` – Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem.
-- `nachweise: List[Tuple[str, Nachweis]] = field(default_factory=list)` – Feld im [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau]] und Nachweis, angemeldet ueber [[opencivil.projekt.aufbau.kern#Aufbau.eintragen|Aufbau.eintragen]].
+- `nachweise: List[Tuple[str, str, Nachweis]] = field(default_factory=list)` – Feld, Schluessel und Nachweis, angemeldet ueber [[opencivil.projekt.aufbau.kern#Aufbau.eintragen|Aufbau.eintragen]].
 - `weitere_ziele: List[str] = field(default_factory=list)` – Was es ausser seinen Nachweisen rechnet -- ein Balkensystem seine Querschnitte und sich.
 - `kennzahlen: List[Kennzahl] = field(default_factory=list)` – Was es beschreibt, gleich welche Lastfaelle es gibt, in der Folge der Zusammenfassung -- jede so, wie ihr Erzeuger sie nennt.
 - `bezuege: Tuple[str, ...] = ()` – Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt.
@@ -405,22 +393,10 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
-- [[opencivil.nachweis.biegung_normalkraft]]
-- [[opencivil.nachweis.duktilitaet]]
-- [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
-- [[opencivil.nachweis.mindestbewehrung]]
-- [[opencivil.nachweis.qa_gebrauch]]
-- [[opencivil.nachweis.qa_knicken]]
-- [[opencivil.nachweis.querkraft]]
-- [[opencivil.nachweis.richtungsnachweise]]
-- [[opencivil.nachweis.schiefe_biegung]]
-- [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
-- [[opencivil.nachweis.sproedes_versagen]]
-- [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]

@@ -35,7 +35,7 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
     Nachweis und keinen Befund -- dann zeichnet sie nur das Fundament.
     """
     fundament = aufbau.setzungen[kennung]
-    nachweis = aufbau.setzung.get(kennung)
+    nachweis = aufbau.feld("setzung").get(kennung)
     befund: Optional[setzung.Setzungsbefund] = (
         loesung.befunde.get(nachweis.id) if nachweis is not None else None)
     if befund is None:

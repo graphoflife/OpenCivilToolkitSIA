@@ -29,7 +29,7 @@ def gerechnet(*, verformung=None, widerstand=None, tragsicherheit=None):
     q.knicken_wahl_widerstand = widerstand or q.knicken_wahl_widerstand
     q.tragsicherheit_wahl = tragsicherheit or q.tragsicherheit_wahl
     aufbau = projekt.aufbauen()
-    knicken = aufbau.knicken["q1"]
+    knicken = aufbau.feld("knicken")["q1"]
     loesung = aufbau.werk.loese(knicken.d_ausnutzung["Stütze"].id)
     return aufbau, knicken, loesung
 
@@ -37,7 +37,7 @@ def gerechnet(*, verformung=None, widerstand=None, tragsicherheit=None):
 def diagramm(aufbau) -> dict:
     """Das M-N-Bild der Platte -- nach einem ganzen Lauf, wie in der Oberflaeche."""
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    return diagrammdaten.linie(aufbau.nachweise["q1.x"], loesung, aufbau)
+    return diagrammdaten.linie(aufbau.feld("nachweise")["q1.x"], loesung, aufbau)
 
 
 def text(loesung) -> str:
@@ -88,7 +88,7 @@ class TestGeteilteLinie(unittest.TestCase):
     def test_der_widerstand_ist_die_linie_der_tragsicherheit(self):
         self.assertFalse(self.knicken.eigene_linie)
         self.assertIs(self.loesung.befund(self.knicken).linie,
-                      self.loesung.befund(self.aufbau.nachweise["q1.x"]).massgebend)
+                      self.loesung.befund(self.aufbau.feld("nachweise")["q1.x"]).massgebend)
         self.assertIn("Dieselbe Wahl wie die Tragsicherheit", text(self.loesung))
 
     def test_im_diagramm_keine_eigene_linie(self):

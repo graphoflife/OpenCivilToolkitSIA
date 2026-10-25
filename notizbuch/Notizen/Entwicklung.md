@@ -44,6 +44,17 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Aufbau: die Nachweise nur noch beim Bauteil
+
+Aus der Strukturdurchsicht, der Rest: jeder Nachweis stand zweimal im
+Aufbau -- beim Bauteil und in einem von 23 Wörterbüchern je Nachweisfeld
+(`aufbau.querkraft`, `aufbau.knicken` …), die fast nur die Tests lasen.
+Jetzt steht er nur beim Bauteil, mit Feld und Schlüssel, und
+`aufbau.feld("knicken")` ist die Sicht darauf. Die rund 90 Lesestellen
+fragen so. Für den Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Aufbau: die Objekte je Art nur noch im Bauteil
 
 Aus der Strukturdurchsicht: jede Baufunktion legte ihr Objekt zweimal

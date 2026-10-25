@@ -32,7 +32,7 @@ class TestHandrechnung(unittest.TestCase):
 
     def test_die_eckwerte_der_tragsicherheit(self):
         """Dieselbe Linie wie die Tragsicherheit -- ihr Befund, nicht noch einmal."""
-        mn = self.aufbau.nachweise["q1.x"]
+        mn = self.aufbau.feld("nachweise")["q1.x"]
         linie = self.loesung.befunde[mn.id].massgebend
         eck = linie.eckwerte()
         self.assertAlmostEqual(wert(self.aufbau, self.loesung, "M_Rd_pos"), eck["M_Rd_N0_pos"])

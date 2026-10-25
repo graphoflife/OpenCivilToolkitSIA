@@ -1,5 +1,5 @@
 ---
-erzeugt: 758cca074037
+erzeugt: 6bea7acfafbe
 art: modul
 tags: [modul]
 ---
@@ -84,7 +84,6 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Gebraucht von
 
-- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.web.diagrammdaten]]
 

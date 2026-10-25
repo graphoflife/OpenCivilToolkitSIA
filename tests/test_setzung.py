@@ -25,7 +25,7 @@ def rechnen(schichten=(("Ton", 4.0, 10.0, 30.0),), **felder):
         s.schicht(name, d=d, M_E=M_E, M_E_strich=M_E_strich)
     aufbau = p.aufbauen()
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    nachweis = aufbau.setzung["w1"]
+    nachweis = aufbau.feld("setzung")["w1"]
     urteil = next(u for u in loesung.urteile if u.raum == nachweis.id)
     return aufbau, loesung, loesung.befunde[nachweis.id], urteil
 
@@ -204,7 +204,7 @@ class TestNachweis(unittest.TestCase):
         p = Projekt(name="Probe")
         p.setzung("Leer", q_E=100.0)
         aufbau = p.aufbauen()
-        self.assertEqual(aufbau.setzung, {})
+        self.assertEqual(aufbau.feld("setzung"), {})
         self.assertIn("Setzung 'Leer': keine Schicht → kein Nachweis.", aufbau.warnungen)
 
 

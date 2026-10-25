@@ -39,7 +39,7 @@ def text(loesung) -> str:
 class TestVorgabe(unittest.TestCase):
     def test_handrechnung_mit_bemessungswerten(self):
         aufbau, loesung = gerechnet()
-        mn = aufbau.nachweise[KENNUNG]
+        mn = aufbau.feld("nachweise")[KENNUNG]
         self.assertEqual(mn.wahl, Rechenwahl())
         befund = loesung.befund(mn)
         self.assertIsInstance(befund.massgebend, Handlinie)
@@ -57,7 +57,7 @@ class TestCharakteristisch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.aufbau, cls.loesung = gerechnet(werkstoffsatz="charakteristisch")
-        cls.mn = cls.aufbau.nachweise[KENNUNG]
+        cls.mn = cls.aufbau.feld("nachweise")[KENNUNG]
 
     def test_reiner_druck_mit_f_ck(self):
         """Die Handrechnung: N_R^- = -b·h·f_ck, ohne Bewehrung."""
@@ -80,7 +80,7 @@ class TestCharakteristisch(unittest.TestCase):
     def test_querkraft_und_sproedes_versagen_folgen(self):
         t = text(self.loesung)
         self.assertIn("m_{Rk}(N_{Ed})", t)
-        sv = self.aufbau.sproede[KENNUNG]
+        sv = self.aufbau.feld("sproede")[KENNUNG]
         M = self.loesung.werte[f"{BASIS}.M_Rd_N0_pos"].groesse.si
         unten = next(e for e in self.loesung.befund(sv).ergebnisse if e.lage.von_unten)
         self.assertEqual(unten.M_Rd, M)
@@ -93,7 +93,7 @@ class TestGenaueLinie(unittest.TestCase):
             for satz in ("bemessung", "charakteristisch"):
                 with self.subTest(art=art, satz=satz):
                     aufbau, loesung = gerechnet(art, satz)
-                    mn = loesung.befund(aufbau.nachweise[KENNUNG])
+                    mn = loesung.befund(aufbau.feld("nachweise")[KENNUNG])
                     self.assertIs(mn.massgebend.wahl.art, Rechenart(art))
                     # Die Vergleichslinie: Parabel neben der Hand, sonst die Hand.
                     erwartet = Rechenart.PARABEL if art == "handrechnung" else Rechenart.HANDRECHNUNG
@@ -141,8 +141,8 @@ class TestGenaueLinie(unittest.TestCase):
 
     def test_querkraft_liest_aus_derselben_linie(self):
         aufbau, loesung = gerechnet("parabel")
-        mn = loesung.befund(aufbau.nachweise[KENNUNG])
-        qk = loesung.befund(aufbau.querkraft[KENNUNG])
+        mn = loesung.befund(aufbau.feld("nachweise")[KENNUNG])
+        qk = loesung.befund(aufbau.feld("querkraft")[KENNUNG])
         self.assertIs(qk.mn, mn)
         self.assertEqual(qk.mn.moment_bei(-300e3, True), mn.massgebend.moment_bei(-300e3, True))
 

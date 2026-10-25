@@ -46,7 +46,7 @@ class TestWieDiePlatte(unittest.TestCase):
         platte.knickfall("Stütze", N_Ed=-1500.0, M_Ed_1=30.0, laenge=4.0)
         a.knickfall("Stütze", N_Ed=-1500.0, M_Ed_1=30.0, laenge=4.0)
         aufbau = p.aufbauen()
-        loesung = aufbau.werk.loese(aufbau.knicken["q1"].id, aufbau.qa_knicken["a1"].id)
+        loesung = aufbau.werk.loese(aufbau.feld("knicken")["q1"].id, aufbau.feld("qa_knicken")["a1"].id)
         n_rd = [u.widerstand.groesse.si for u in loesung.urteile]
         self.assertEqual(len(n_rd), 2)
         self.assertAlmostEqual(n_rd[1] / n_rd[0], 1.0, delta=1e-3)
@@ -57,7 +57,7 @@ class TestJeRichtung(unittest.TestCase):
         p, a = stuetze()
         a.knickfall("unten", N_Ed=-1500.0, M_Ed_1=30.0, laenge=4.0)
         a.knickfall("oben", N_Ed=-1500.0, M_Ed_1=30.0, laenge=4.0, richtung="oben")
-        _, gefunden = urteile(p, lambda au: au.qa_knicken["a1"])
+        _, gefunden = urteile(p, lambda au: au.feld("qa_knicken")["a1"])
         self.assertAlmostEqual(gefunden["unten"].widerstand.groesse.si,
                                gefunden["oben"].widerstand.groesse.si, delta=1.0)
 
@@ -66,7 +66,7 @@ class TestJeRichtung(unittest.TestCase):
         p, a = stuetze(b=300, h=500)
         a.knickfall("K", N_Ed=-500.0)
         aufbau = p.aufbauen()
-        loesung = aufbau.werk.loese(aufbau.qa_knicken["a1"].id)
+        loesung = aufbau.werk.loese(aufbau.feld("qa_knicken")["a1"].id)
         q, _, _ = aufbau.querschnittsanalysen["a1"].querschnitt(
             lambda kid: loesung.werte[kid].groesse.si, VERFORMUNG)
         for seite, d in ((Zugseite.UNTEN, 0.45), (Zugseite.OBEN, 0.45),
@@ -78,14 +78,14 @@ class TestJeRichtung(unittest.TestCase):
         p, a = stuetze()
         a.knickfall("kurz", N_Ed=-1500.0, M_Ed_1=30.0, laenge=3.0)
         a.knickfall("lang", N_Ed=-1500.0, M_Ed_1=30.0, laenge=9.0)
-        _, gefunden = urteile(p, lambda au: au.qa_knicken["a1"])
+        _, gefunden = urteile(p, lambda au: au.feld("qa_knicken")["a1"])
         self.assertLess(gefunden["lang"].widerstand.groesse.si,
                         gefunden["kurz"].widerstand.groesse.si)
 
     def test_ohne_druck_kein_nachweis(self):
         p, a = stuetze()
         a.knickfall("Zug", N_Ed=200.0)
-        _, gefunden = urteile(p, lambda au: au.qa_knicken["a1"])
+        _, gefunden = urteile(p, lambda au: au.feld("qa_knicken")["a1"])
         self.assertTrue(gefunden["Zug"].erfuellt)
         self.assertTrue(math.isinf(gefunden["Zug"].erfuellungsgrad.si))
 
@@ -104,7 +104,7 @@ class TestBeschreibung(unittest.TestCase):
     def test_ausgeschaltet_kein_nachweis(self):
         p, a = stuetze()
         a.knickfall("K", N_Ed=-800.0).aktiv = False
-        self.assertEqual(p.aufbauen().qa_knicken, {})
+        self.assertEqual(p.aufbauen().feld("qa_knicken"), {})
 
     def test_vorgaben_wie_bei_der_platte(self):
         _, a = stuetze()

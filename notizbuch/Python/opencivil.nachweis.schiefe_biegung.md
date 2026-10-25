@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c0d7eb386f7
+erzeugt: 6b706c882206
 art: modul
 tags: [modul]
 ---
@@ -129,7 +129,6 @@ Die Einwirkung, wie nachgewiesen: mit der Laengszugkraft, wo sie zaehlt.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
-- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 
 ## Formeln aus diesem Modul
