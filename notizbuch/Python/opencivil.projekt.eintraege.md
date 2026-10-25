@@ -1,5 +1,5 @@
 ---
-erzeugt: 72206366fa5d
+erzeugt: a27897841780
 art: modul
 tags: [modul]
 ---
@@ -19,6 +19,15 @@ Die Platte, die diese Teile zusammenhaelt, steht in
 [[opencivil.projekt.projekt]].
 
 ## Inhalt
+
+### _feldnamen
+
+```python
+@functools.lru_cache(maxsize=None)
+def _feldnamen(klasse: type) -> frozenset
+```
+
+Die Namen der Felder einer Beschreibungsklasse -- je Klasse einmal gesucht.
 
 ### Beschreibung
 

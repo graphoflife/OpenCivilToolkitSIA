@@ -538,9 +538,8 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         q = p.querschnitt("q1")
         for k in q.kombinationen:
             k.V_Ed = 150.0
-            k.richtung = "x"
         b = q.querkraftbewehrung
-        b.durchmesser, b.stahl = 10.0, "s1"
+        b.durchmesser = 10.0
         b.abstand_x, b.abstand_y = 200.0, 200.0
         for name, wert in buegel.items():
             setattr(b, name, wert)
@@ -634,7 +633,7 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         q.kombinationen[0].V_Ed = 150.0
         q.kombinationen[0].N_Ed = 400.0
         b = q.querkraftbewehrung
-        b.durchmesser, b.stahl = 10.0, "s1"
+        b.durchmesser = 10.0
         b.abstand_x, b.abstand_y = 200.0, 200.0
         b.alpha_min, b.alpha_max = 30, 50
 
@@ -745,7 +744,7 @@ class TestGradzeichen(unittest.TestCase):
     def test_in_der_herleitung_steht_es_richtig(self):
         projekt = Projekt.beispiel()
         b = projekt.querschnitt("q1").querkraftbewehrung
-        b.durchmesser, b.stahl = 10.0, "s1"
+        b.durchmesser = 10.0
         b.abstand_x = b.abstand_y = 300.0
         for k in projekt.querschnitt("q1").kombinationen:
             k.V_Ed = 100.0
@@ -764,7 +763,7 @@ class TestGradzeichen(unittest.TestCase):
         """
         projekt = Projekt.beispiel()
         b = projekt.querschnitt("q1").querkraftbewehrung
-        b.durchmesser, b.stahl = 10.0, "s1"
+        b.durchmesser = 10.0
         b.abstand_x = b.abstand_y = 300.0
         for k in projekt.querschnitt("q1").kombinationen:
             k.V_Ed = 100.0

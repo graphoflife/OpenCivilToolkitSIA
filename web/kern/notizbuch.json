@@ -3910,6 +3910,7 @@
       "art": "modul",
       "kurz": "die Teile einer Projektbeschreibung.",
       "stichworte": [
+        "_feldnamen",
         "Beschreibung",
         "Beschreibung.regeln",
         "Beschreibung.si",
@@ -3991,6 +3992,7 @@
         "als_groesse",
         "feldangaben",
         "sorten",
+        "unbekanntes_feld",
         "lesen",
         "_wert_lesen",
         "_zahl_lesen",

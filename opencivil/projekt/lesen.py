@@ -186,6 +186,17 @@ def sorten(art: str) -> Mapping[str, Any]:
 _KEINE = object()
 
 
+def unbekanntes_feld(wo: str, name: Any, felder: Iterable[str]) -> ProjektFehler:
+    """
+    Der Fehler zu einem Feld, das es nicht gibt -- mit dem ähnlichsten, das
+    es gibt. Beim Lesen einer Datei und bei einer Zuweisung aus Python
+    derselbe Satz.
+    """
+    aehnlich = difflib.get_close_matches(str(name), list(felder), n=1)
+    return ProjektFehler(f"{wo}: ein Feld '{name}' gibt es nicht."
+                         + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
+
+
 def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
     """
     Ein Eintrag der Klasse ``cls`` aus ``roh``, einem Woerterbuch aus der Datei.
@@ -206,10 +217,7 @@ def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
     felder = {f.name: f for f in dataclasses.fields(cls) if f.init}
     for schluessel in roh:
         if schluessel not in felder:
-            aehnlich = difflib.get_close_matches(str(schluessel), felder, n=1)
-            raise ProjektFehler(
-                f"{wo}: ein Feld '{schluessel}' gibt es nicht."
-                + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
+            raise unbekanntes_feld(wo, schluessel, felder)
     typen = _typen(cls)
     werte: Dict[str, Any] = {}
     for name, f in felder.items():

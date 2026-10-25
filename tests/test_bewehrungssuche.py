@@ -359,7 +359,7 @@ class TestDuktilitaetBleibtDraussen(unittest.TestCase):
         """
         projekt = platte(h=220.0)
         for k in projekt.querschnitt("q1").kombinationen:
-            k.M_Ed, k.richtung = 150.0, "x"
+            k.M_Ed = 150.0
         return projekt
 
     def test_die_suche_findet_auch_wenn_die_duktilitaet_nicht_aufgeht(self):

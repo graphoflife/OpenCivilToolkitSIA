@@ -166,10 +166,21 @@ class TestEineTuer(unittest.TestCase):
         p.stahl("B500B")
         s = p.balkensystem("Rahmen")
         q = s.querschnitt("Rechteck", "rechteck")
-        s.linie((0, 0), (5, 0), querschnitt=q, material="b1", **linie)
+        s.linie((0, 0), (5, 0), querschnitt=q, material=s.beton("b1"), **linie)
         s.lager_an((0, 0), "gelenkig")
         s.lager_an((5, 0), "verschieblich")
         return p
+
+    def test_ein_feld_das_es_nicht_gibt_scheitert_laut(self):
+        """
+        Auch bei einer Zuweisung: ein Tippfehler oder ein entferntes Feld
+        legte bis 2026-10-25 still ein neues Attribut an.
+        """
+        q = Projekt.beispiel().querschnitte[0]
+        with self.assertRaisesRegex(ProjektFehler, "ein Feld 'knicklange' gibt es nicht"):
+            q.knicklange = 4.0
+        with self.assertRaisesRegex(ProjektFehler, "Gemeint ist vielleicht 'kombinationen'"):
+            q.kombinatione = []
 
     def test_festt_wird_nicht_zur_feder(self):
         """An der Zeile, in der es steht -- und von Hand gesetzt beim Rechnen."""

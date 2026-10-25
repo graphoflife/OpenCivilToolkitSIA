@@ -14,8 +14,9 @@ Die Platte, die diese Teile zusammenhaelt, steht in
 
 from __future__ import annotations
 
+import functools
 import math
-from dataclasses import KW_ONLY, asdict, dataclass, field
+from dataclasses import KW_ONLY, asdict, dataclass, field, fields
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import GRAD, KN, KNM, M, MM, MM2, PROMILLE, PROZENT, Groesse
@@ -27,7 +28,8 @@ from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
 from opencivil.projekt.lesen import (
-    ProjektFehler, als_groesse, bereich, einer_von, lesen, ort, sorten, wahl_aus_text,
+    ProjektFehler, als_groesse, bereich, einer_von, lesen, ort, sorten, unbekanntes_feld,
+    wahl_aus_text,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
@@ -43,6 +45,12 @@ from opencivil.spannungsanalyse import Analyseart
 # ===========================================================================
 # Material
 # ===========================================================================
+
+
+@functools.lru_cache(maxsize=None)
+def _feldnamen(klasse: type) -> frozenset:
+    """Die Namen der Felder einer Beschreibungsklasse -- je Klasse einmal gesucht."""
+    return frozenset(f.name for f in fields(klasse))
 
 
 @dataclass
@@ -83,6 +91,12 @@ class Beschreibung:
     """
 
     def __setattr__(self, name: str, wert: Any) -> None:
+        # Nur Felder (2026-10-25): eine Zuweisung an einen Namen, den es nicht
+        # gibt, legte still ein neues Attribut an -- ein Tippfehler im
+        # Baukasten blieb ohne Wirkung, und drei Tests setzten Felder, die es
+        # nicht mehr gab, und prüften nichts mehr.
+        if name not in _feldnamen(type(self)):
+            raise unbekanntes_feld(type(self).__name__, name, _feldnamen(type(self)))
         super().__setattr__(name, wahl_aus_text(type(self), name, wert))
 
     def regeln(self, wo: str) -> None:

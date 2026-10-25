@@ -15,7 +15,6 @@ def projekt_mit_querkraft(**abweichungen) -> Projekt:
         setattr(q, name, wert)
     for k in q.kombinationen:
         k.V_Ed = 120.0
-        k.richtung = "x"
     return projekt
 
 

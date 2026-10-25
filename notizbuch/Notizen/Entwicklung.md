@@ -44,6 +44,26 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Eine Zuweisung an ein Feld, das es nicht gibt, scheitert laut
+
+Befund 1.1 der Strukturdurchsicht vom 2026-10-25: `Beschreibung.__setattr__`
+nahm jeden Namen an. Eine Zuweisung an ein Feld, das es nicht gibt, legte
+still ein neues Attribut an.
+
+- **Gefunden hat es drei Tests, die nichts mehr prüften oder Totes
+  setzten:** `richtung` an einer Kombination (in den Hilfen von
+  `test_querkraft`, `test_schnittstelle`, `test_bewehrungssuche`), `stahl`
+  an den Bügeln (das Feld fiel am 2026-10-24 weg) und `kriechzahl` an der
+  Platte -- «das φ der Platte spielt keine Rolle» prüfte seit dem
+  Verformungsnachweis nichts. Er prüft jetzt, dass das φ der Tragsicherheit
+  und das der Verformung die Zwängung nicht ändern.
+- **Jetzt:** ein Name, der kein Feld ist, wirft `ProjektFehler` mit dem
+  ähnlichsten Feld, mit demselben Satz wie beim Lesen einer Datei
+  (`unbekanntes_feld` in `lesen.py`, beide nehmen ihn). Ein Tippfehler im
+  Baukasten (`q.knicklange = 4`) bleibt nicht mehr ohne Wirkung.
+
+---
+
 ## 2026-10-24 · Balkensystem: auch die Statik-Analyse ein Knopf
 
 Wunsch des Benutzers: die Statik-Analyse soll ebenfalls ein Knopf sein.

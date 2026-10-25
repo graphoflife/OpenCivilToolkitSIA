@@ -1,5 +1,5 @@
 ---
-erzeugt: 852dce16657f
+erzeugt: 4c5465350576
 art: modul
 tags: [modul]
 ---
@@ -165,6 +165,16 @@ def sorten(art: str) -> Mapping[str, Any]
 ```
 
 Die Normsorten einer Materialart.
+
+### unbekanntes_feld
+
+```python
+def unbekanntes_feld(wo: str, name: Any, felder: Iterable[str]) -> ProjektFehler
+```
+
+Der Fehler zu einem Feld, das es nicht gibt -- mit dem ähnlichsten, das
+es gibt. Beim Lesen einer Datei und bei einer Zuweisung aus Python
+derselbe Satz.
 
 ### lesen
 

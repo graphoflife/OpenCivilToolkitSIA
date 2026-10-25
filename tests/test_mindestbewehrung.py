@@ -361,9 +361,18 @@ class TestZwaengungBiegung(unittest.TestCase):
         self.assertGreater(trocken.erfuellungsgrad, kriechend.erfuellungsgrad)
 
     def test_das_phi_der_platte_spielt_keine_rolle(self):
-        """Seit 2026-10-09 hat die Zwängung ihr eigenes φ."""
-        a = befund(projekt_zwang_biegung(kriechzahl=0.0), "zwaengung_biegung")
-        b = befund(projekt_zwang_biegung(kriechzahl=5.0), "zwaengung_biegung")
+        """
+        Seit 2026-10-09 hat die Zwängung ihr eigenes φ: das der Tragsicherheit
+        und das der Verformung ändern sie nicht. Bis 2026-10-25 setzte der
+        Test ein Feld «kriechzahl», das es seit dem Verformungsnachweis nicht
+        mehr gab -- und prüfte nichts.
+        """
+        anders = projekt_zwang_biegung()
+        q = anders.querschnitte[0]
+        q.tragsicherheit_wahl.kriechzahl = 5.0
+        q.verformung.kriechzahl = 5.0
+        a = befund(projekt_zwang_biegung(), "zwaengung_biegung")
+        b = befund(anders, "zwaengung_biegung")
         self.assertEqual(a.ergebnisse[0].erfuellungsgrad, b.ergebnisse[0].erfuellungsgrad)
 
     def test_eine_leere_lage_wird_nicht_nachgewiesen(self):
