@@ -1,5 +1,5 @@
 ---
-erzeugt: 15bc58bc723b
+erzeugt: 9e862c9aa234
 art: modul
 tags: [modul]
 ---
@@ -575,9 +575,8 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - `KENNWERTE = ('A', 'I')` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
 - `STABMATERIALARTEN = ('beton', 'eigen')` – Was ein Material des Systems ist: ein Beton des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24). Betonstahl ist keines: aus ihm ist kein Stab.
 - `E_MODULE = ('e0', 'e_eq')` – Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀, das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-24). Einen E-Modul von Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
-- `E_EQ_ARTEN = ('platte', 'analyse')` – Die Arten eines Querschnitts, die ein E_eq haben: eine Platte -- immer in x-Richtung, Zug unten (Benutzer, 2026-10-24) -- und eine Querschnittsanalyse; nur sie haben eine Momenten-Kruemmungs-Linie mit ihrer Bewehrung.
+- `AUS_BAUTEIL = ('platte', 'analyse')` – Die Arten eines Querschnitts, die ein Bauteil des Projekts nehmen: eine Platte oder eine Querschnittsanalyse. Nur sie bringen ein Material mit, den Beton des Bauteils, und nur sie haben ein E_eq -- eine Momenten-Kruemmungs- Linie mit ihrer Bewehrung, bei einer Platte immer in x-Richtung, Zug unten (Benutzer, 2026-10-24). Einer nach Vorlage oder von Hand ist nur eine Form.
 - `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
-- `MIT_MATERIAL = ('platte', 'analyse')` – Die Arten eines Querschnitts, die ein Material mitbringen: ein Bauteil des Projekts. Einer nach Vorlage oder von Hand ist nur eine Form.
 - `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 - `Ort = Union[str, Sequence[float]]` – Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.

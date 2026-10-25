@@ -28,7 +28,7 @@ import {
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
-import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
+import { ausVorlage, eintragAendern, feldangabe, naechsterName, zustand } from './zustand.js';
 
 const HILFE = {
   situation: {
@@ -53,15 +53,10 @@ const HILFE = {
   },
 };
 
-/** Ändert den Grundbruch mit dieser Kennung -- der eine Weg, auf dem hier etwas geändert wird. */
-function aendernAn(kennung, veraenderer) {
-  projektAendern((p) => veraenderer(p.grundbrueche.find((g) => g.kennung === kennung)));
-}
-
 /** Eine Zahl des Eintrags als Feld: Beschriftung mit Symbol, Einheit, Schrittweite. */
 function zahlzeile(g, schluessel, text, symbol, { schritt = 1, titel } = {}) {
   return feldzeile('grundbruch', g, schluessel, text, symbol, {
-    schritt, titel, aendern: (veraenderer) => aendernAn(g.kennung, veraenderer),
+    schritt, titel, aendern: (veraenderer) => eintragAendern('grundbrueche', g.kennung, veraenderer),
   });
 }
 
@@ -78,7 +73,7 @@ function bemessungswerte(g) {
 }
 
 function situationPanel(g) {
-  const aendern = (veraenderer) => aendernAn(g.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern('grundbrueche', g.kennung, veraenderer);
   return panel({
     schluessel: 'grundbruch/Situation', titel: 'Grundbruch Situation',
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
@@ -136,7 +131,8 @@ function situationPanel(g) {
 
 function kombinationZeile(g, i) {
   const k = g.kombinationen[i];
-  const aendern = (veraenderer) => aendernAn(g.kennung, (x) => veraenderer(x.kombinationen[i]));
+  const aendern = (veraenderer) => eintragAendern('grundbrueche', g.kennung,
+    (x) => veraenderer(x.kombinationen[i]));
   const zahl = (schluessel, titel) => zahlfeld({
     wert: k[schluessel], schritt: 10, angabe: feldangabe('grundbruchkombination', schluessel),
     titel, leer: 0, beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
@@ -146,12 +142,12 @@ function kombinationZeile(g, i) {
     zahlen: [zahl('N_Ed', 'Normal zur Sohle, Druck positiv'),
       zahl('T_Ed', 'In der Sohle, zur Seite, auf der das Gelände abfällt')],
     entfernenTitel: 'Kombination entfernen',
-    entfernen: () => aendernAn(g.kennung, (x) => { x.kombinationen.splice(i, 1); }),
+    entfernen: () => eintragAendern('grundbrueche', g.kennung, (x) => { x.kombinationen.splice(i, 1); }),
   });
 }
 
 function einwirkungenPanel(g) {
-  const neu = () => aendernAn(g.kennung, (x) => {
+  const neu = () => eintragAendern('grundbrueche', g.kennung, (x) => {
     x.kombinationen.push(ausVorlage('grundbruchkombination',
       { name: naechsterName('Kombination', x.kombinationen) }));
   });

@@ -9,13 +9,17 @@
  *
  * Vom Zeichenfenster kennt es nur `a`: den Zustand (`a.bs`), das Modell
  * (`a.modell`) und den Adapter (`a.adapter`), über den es die Zeichnung
- * liest, den Lastfall wählt, nach der Übersicht des Kerns fragt und Linien
- * umkehrt. So hängt `bs_zeichnung.js` an dieser Datei und nicht umgekehrt.
+ * liest und Linien umkehrt. Den Lastfall und die Antwort des Kerns liest es
+ * wie das Zeichenfenster über `bs_teile.js`. So hängt `bs_zeichnung.js` an
+ * dieser Datei und nicht umgekehrt.
  * Gerechnet wird hier nichts.
  */
 
 import { wahlBlock, wahlSchalter } from './bausteine.js';
-import { katalog, lastart, lastVon, materialname, zugseite } from './bs_teile.js';
+import {
+  aktiverLastfall, katalog, lastart, lastfallWaehlen, lastVon, materialname, passendeUebersicht,
+  zugseite,
+} from './bs_teile.js';
 import { zahlText } from './cad_ansicht.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
 import { auswahl, el, zahlfeld } from './dom.js';
@@ -198,7 +202,7 @@ export function neuEigenschaften(a, werkzeug) {
     const v = a.bs.vorgaben.last;
     // Der Lastfall steht oben neben «Last»; hier nur, wenn keiner gewählt ist.
     inhalt = [
-      a.adapter.lastfall() ? null : el('p.cad-hinweis-klein', {
+      aktiverLastfall(a) ? null : el('p.cad-hinweis-klein', {
         text: 'Kein Lastfall gewählt -- oben neben «Last» einen wählen.',
       }),
       wahlBlock('Art', wahlSchalter({
@@ -211,7 +215,7 @@ export function neuEigenschaften(a, werkzeug) {
   }
   return {
     inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...inhalt.filter(Boolean)],
-    schluessel: JSON.stringify([werkzeug, a.bs.vorgaben, a.adapter.lastfall()]),
+    schluessel: JSON.stringify([werkzeug, a.bs.vorgaben, aktiverLastfall(a)]),
   };
 }
 
@@ -221,7 +225,7 @@ export function eigenschaften(a) {
   const lasten = kennungen.filter((k) => lastVon(z, k));
   const knoten = kennungen.filter((k) => z.knoten.some((x) => x.kennung === k));
   const linien = kennungen.filter((k) => z.linien.some((x) => x.kennung === k));
-  const schluessel = JSON.stringify([a.adapter.lastfall(), Boolean(a.adapter.passendeUebersicht()), a.bs.bettungOffen]);
+  const schluessel = JSON.stringify([aktiverLastfall(a), Boolean(passendeUebersicht(a)), a.bs.bettungOffen]);
   if (lasten.length && lasten.length === kennungen.length) return { ...lastEigenschaften(a, z, lasten), schluessel };
   if ((knoten.length && linien.length) || lasten.length) {
     return {
@@ -236,7 +240,7 @@ export function eigenschaften(a) {
 }
 
 function meldungszeilen(a, kennungen) {
-  const u = a.adapter.passendeUebersicht();
+  const u = passendeUebersicht(a);
   return (u?.meldungen || []).filter((m) => m.elemente.some((k) => kennungen.includes(k)))
     .map((m) => el(m.fehler ? 'p.cad-meldung' : 'p.cad-hinweis-klein', { text: m.text }));
 }
@@ -311,7 +315,7 @@ function knotenEigenschaften(a, z, knoten) {
     wert: gemeinsam(gewaehlt.map((k) => k[feld])), schritt: a.raster, beiAenderung: lageSetzen(feld),
   }), 'm'));
   inhalt.push(...lagerFelder(a, z, knoten));
-  const u = a.adapter.passendeUebersicht();
+  const u = passendeUebersicht(a);
   for (const k of knoten) {
     if (u?.unbestimmt?.includes(k)) inhalt.push(el('p.cad-hinweis-klein', { text: `${k}: ${u.unbestimmt_text}.` }));
   }
@@ -437,7 +441,7 @@ function lastEigenschaften(a, z, kennungen) {
   const art = gemeinsam(da.map((d) => d.last.art));
   const inhalt = [lastfallWahl(a, z, gemeinsam(da.map((d) => d.last.lastfall)), (w) => {
     setzen('lastfall', w);
-    a.adapter.lastfallWaehlen(w);
+    lastfallWaehlen(a, w);
   }, 'Zu welchem Lastfall die Lasten gehören')];
   if (amKnoten !== VAR && art !== VAR) {
     const felder = Object.fromEntries(Object.keys(da[0].last)

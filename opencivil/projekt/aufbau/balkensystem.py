@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 from opencivil.material.basis import Baustoff
 from opencivil.projekt.balkensystem import (
-    MATERIAL_DES_QUERSCHNITTS, MIT_MATERIAL, BalkensystemEintrag, Modell, StabmaterialEintrag,
+    AUS_BAUTEIL, MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag, Modell, StabmaterialEintrag,
     StabquerschnittEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler
@@ -155,7 +155,7 @@ def _material_des_querschnitts(q: StabquerschnittEintrag,
     eine Material der Flaechen einer Analyse. Sonst ``None``, und der zweite
     Teil sagt, warum.
     """
-    if q.art not in MIT_MATERIAL:
+    if q.art not in AUS_BAUTEIL:
         return None, (f"«{q.name}» ist {'nach Vorlage' if q.art == 'vorlage' else 'von Hand'} und "
                       f"bringt keines mit – das tut nur eine Platte oder Querschnittsanalyse.")
     if q.art == "platte":

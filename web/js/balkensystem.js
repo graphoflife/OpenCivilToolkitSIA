@@ -25,10 +25,10 @@
 import {
   erklaerung, feld, klappgruppe, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
-import { materialname } from './bs_teile.js';
 import {
-  eintragVon, lastfallWaehlen, passendeUebersicht, waehlen, zeichenbereich,
-} from './bs_zeichnung.js';
+  eintragVon, lastfallWaehlen, materialname, passendeUebersicht,
+} from './bs_teile.js';
+import { waehlen, zeichenbereich } from './bs_zeichnung.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
@@ -36,7 +36,7 @@ import { fenster, fensterOeffnen } from './fenster.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { anfuegenKnopf, rechenwahlZeile } from './nachweise.js';
 import {
-  ausVorlage, feldangabe, kennwertId, naechsterName, projektAendern, zustand,
+  ausVorlage, eintragAendern, feldangabe, kennwertId, naechsterName, zustand,
 } from './zustand.js';
 
 const HILFE = {
@@ -81,11 +81,6 @@ const HILFE = {
     ],
   },
 };
-
-/** Ändert das System mit dieser Kennung -- der eine Weg, auf dem hier etwas geändert wird. */
-function aendernAn(kennung, veraenderer) {
-  projektAendern((p) => veraenderer(p.balkensysteme.find((s) => s.kennung === kennung)));
-}
 
 // ===========================================================================
 // Unter der Zeichnung
@@ -136,7 +131,7 @@ function uebersicht(a) {
     dataset: { kennung: last.kennung },
     on: {
       click: () => {
-        lastfallWaehlen(a.bs.kennung, last.lastfall);
+        lastfallWaehlen(a, last.lastfall);
         waehlen(a.bs.kennung, [last.kennung]);
       },
     },
@@ -190,7 +185,7 @@ function vorzeichenbild() {
 }
 
 function systemGruppe(system) {
-  const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern('balkensysteme', system.kennung, veraenderer);
   return panel({
     schluessel: 'balkensystem/System', titel: 'System', zusatz: 'x nach rechts, z nach oben, m',
     breit: true,
@@ -225,7 +220,7 @@ function systemGruppe(system) {
  * Wahl: aus ihm ist kein Stab. Daneben, welche Linien es nehmen.
  */
 function materialienInhalt(system) {
-  const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern('balkensysteme', system.kennung, veraenderer);
   const betone = zustand.projekt.materialien.filter((m) => m.art === 'beton');
   const kennwerte = zustand.katalog?.balkensystem?.betonkennwerte || {};
   const angabe = (feldname) => feldangabe('stabmaterial', feldname);
@@ -380,7 +375,7 @@ function querschnittZeile(system, q, i) {
       melden(`«${q.name}» trägt noch ${benutzt.join(', ')}.`, true);
       return;
     }
-    aendernAn(system.kennung, (s) => { s.querschnitte.splice(i, 1); });
+    eintragAendern('balkensysteme', system.kennung, (s) => { s.querschnitte.splice(i, 1); });
   };
   return el('div.bs-qzeile', {}, [
     el('button.bs-qbild', {
@@ -390,7 +385,11 @@ function querschnittZeile(system, q, i) {
     el('div.bs-qmitte', {}, [
       el('input.bs-qname', {
         type: 'text', value: q.name, title: 'Name des Querschnitts',
-        on: { change: (e) => aendernAn(system.kennung, (s) => { s.querschnitte[i].name = e.target.value; }) },
+        on: {
+          change: (e) => eintragAendern('balkensysteme', system.kennung, (s) => {
+            s.querschnitte[i].name = e.target.value;
+          }),
+        },
       }),
       werte ? el('div.bs-kennwerte', { text: werte })
         : el('div.bs-qfehler', { text: fehler?.text || 'A und I: –', title: fehler?.text || '' }),
@@ -410,7 +409,8 @@ function querschnittFenster(system, kennung) {
   const i = system.querschnitte.findIndex((x) => x.kennung === kennung);
   if (i < 0) return null;
   const q = system.querschnitte[i];
-  const aendern = (veraenderer) => aendernAn(system.kennung, (s) => veraenderer(s.querschnitte[i], s));
+  const aendern = (veraenderer) => eintragAendern('balkensysteme', system.kennung,
+    (s) => veraenderer(s.querschnitte[i], s));
   const setzen = (feldname) => (wert) => aendern((x) => { x[feldname] = wert; });
   const zeilen = [
     feld('Name', el('input', {
@@ -473,7 +473,8 @@ function querschnittFenster(system, kennung) {
   }
   // Welches E ein Stab hat, der das Material dieses Querschnitts nimmt --
   // nur, wenn einer das tut, und nur, wo es mehr als E₀ gibt: E_eq hat nur
-  // eine Analyse (Benutzer, 2026-10-24). Welche Stellungen es gibt, sagt der
+  // einer aus einer Platte oder Analyse (Benutzer, 2026-10-24). Welche
+  // Stellungen es gibt, sagt der
   // Katalog; die gewählte bleibt sichtbar, auch wo sie nicht mehr passt --
   // die Meldung des Kerns sagt dann warum.
   const eigenes = zustand.katalog?.balkensystem?.material_des_querschnitts;
@@ -518,7 +519,7 @@ function querschnittFenster(system, kennung) {
 function querschnitteInhalt(system) {
   const neu = () => {
     const kennung = naechsteKennung(system.querschnitte, 'Q');
-    aendernAn(system.kennung, (s) => {
+    eintragAendern('balkensysteme', system.kennung, (s) => {
       s.querschnitte.push({
         ...structuredClone(zustand.katalog.neue_zeilen.stabquerschnitt),
         kennung, name: naechsterName('Querschnitt', s.querschnitte),
@@ -547,7 +548,7 @@ function naechsteKennung(liste, vorsilbe) {
 const lastenText = (n) => `${n} ${n === 1 ? 'Last' : 'Lasten'}`;
 
 function lastfaelleInhalt(system) {
-  const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern('balkensysteme', system.kennung, veraenderer);
   const lastenVon = (lf) => system.linien.reduce((n, l) => n + l.lasten.filter((x) => x.lastfall === lf).length, 0)
     + system.knotenlasten.filter((x) => x.lastfall === lf).length;
   // Das Eigengewicht kommt von selbst und bleibt: es lässt sich umbenennen,
@@ -592,7 +593,7 @@ function lastfaelleInhalt(system) {
 
 /** Je Kombination eine Zeile: je Lastfall ein Beiwert, von Hand. */
 function kombinationenInhalt(system) {
-  const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern('balkensysteme', system.kennung, veraenderer);
   const kombination = (k, i) => el('tr', {}, [
     el('td', {}, [el('input', {
       type: 'text', value: k.name,
@@ -703,7 +704,7 @@ const DIAGRAMMGROESSEN = () => zustand.katalog?.balkensystem?.diagrammgroessen |
  * 2026-10-24).
  */
 function statikInhalt(system) {
-  const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern('balkensysteme', system.kennung, veraenderer);
   const faelle = [
     ...system.lastfaelle.map((lf) => ({ wert: lf.kennung, beschriftung: lf.name })),
     ...system.kombinationen.map((k) => ({ wert: k.kennung, beschriftung: `${k.name} (Kombination)` })),

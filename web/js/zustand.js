@@ -189,6 +189,19 @@ export function projektAendern(veraenderer, anlass = 'projekt') {
   aendern({ ungespeichert: true }, anlass);
 }
 
+/**
+ * Ändert den Eintrag mit dieser Kennung in einer Liste des Projekts -- der
+ * eine Weg, auf dem eine App ihren Eintrag ändert. Gibt es ihn nicht mehr,
+ * etwa wenn ein verzögertes Speichern erst nach dem Löschen kommt, ändert
+ * sich nichts.
+ */
+export function eintragAendern(liste, kennung, veraenderer, anlass = 'projekt') {
+  projektAendern((p) => {
+    const eintrag = (p[liste] || []).find((x) => x.kennung === kennung);
+    if (eintrag) veraenderer(eintrag);
+  }, anlass);
+}
+
 // -- Zugriffshilfen ---------------------------------------------------------
 
 export function materialien(art) {

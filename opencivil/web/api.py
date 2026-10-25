@@ -271,7 +271,7 @@ def katalog() -> dict:
             # Schalter, der lange in seinem Titel; ob die Art ein Material
             # mitbringt, sagt, ob eine Linie es «gemäss Querschnitt» nehmen kann.
             "querschnittsarten": [
-                {**x, "bringt_material": x["wert"] in bs.MIT_MATERIAL} for x in (
+                {**x, "bringt_material": x["wert"] in bs.AUS_BAUTEIL} for x in (
                     {"wert": "vorlage", "beschriftung": "nach Vorlage", "kurz": "Vorlage"},
                     {"wert": "kennwerte", "beschriftung": "Kennwerte von Hand",
                      "kurz": "Kennwerte"},
@@ -291,14 +291,14 @@ def katalog() -> dict:
             ],
             "betonkennwerte": dict(BETONKENNWERTE),
             # Welches E ein Stab hat, der das Material seines Querschnitts
-            # nimmt -- und bei welchen Arten: E_eq nur bei einer Analyse.
+            # nimmt -- und bei welchen Arten: bei einem aus einem Bauteil.
             "e_module": [
                 {"wert": "e0", "beschriftung": "E₀ = E_cm",
                  "titel": "E_cm des Betons, den der Querschnitt mitbringt",
-                 "arten": list(bs.MIT_MATERIAL)},
+                 "arten": list(bs.AUS_BAUTEIL)},
                 {"wert": "e_eq", "beschriftung": "E_eq",
-                 "titel": "Der äquivalente E-Modul der Querschnittsanalyse bei N und M",
-                 "arten": list(bs.E_EQ_ARTEN)},
+                 "titel": "Der äquivalente E-Modul der Platte oder Querschnittsanalyse bei N und M",
+                 "arten": list(bs.AUS_BAUTEIL)},
             ],
             # Was als Material einer Linie heisst: das ihres Querschnitts.
             "material_des_querschnitts": bs.MATERIAL_DES_QUERSCHNITTS,

@@ -18,7 +18,7 @@ import {
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
-import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
+import { ausVorlage, eintragAendern, feldangabe, naechsterName, zustand } from './zustand.js';
 
 const HILFE = {
   situation: {
@@ -45,13 +45,8 @@ const HILFE = {
   },
 };
 
-/** Ändert die Setzung mit dieser Kennung -- der eine Weg, auf dem hier etwas geändert wird. */
-function aendernAn(kennung, veraenderer) {
-  projektAendern((p) => veraenderer(p.setzungen.find((s) => s.kennung === kennung)));
-}
-
 function situationPanel(s) {
-  const aendern = (veraenderer) => aendernAn(s.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern('setzungen', s.kennung, veraenderer);
   const zahl = (schluessel, text, symbol, mehr = {}) =>
     zahlzeile('setzung', s, schluessel, text, symbol, { ...mehr, aendern });
   return panel({
@@ -104,7 +99,7 @@ function situationPanel(s) {
 
 function schichtZeile(s, i) {
   const schicht = s.schichten[i];
-  const aendern = (veraenderer) => aendernAn(s.kennung, (x) => veraenderer(x.schichten[i]));
+  const aendern = (veraenderer) => eintragAendern('setzungen', s.kennung, (x) => veraenderer(x.schichten[i]));
   const zahl = (schluessel, schritt, titel) => zahlfeld({
     wert: schicht[schluessel], schritt, angabe: feldangabe('schicht', schluessel), titel,
     beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
@@ -116,7 +111,7 @@ function schichtZeile(s, i) {
       zahl('M_E', 1, 'M_E-Wert der Erstbelastung'),
       zahl('M_E_strich', 1, 'M_E-Wert der Wiederbelastung')],
     entfernenTitel: 'Schicht entfernen',
-    entfernen: () => aendernAn(s.kennung, (x) => { x.schichten.splice(i, 1); }),
+    entfernen: () => eintragAendern('setzungen', s.kennung, (x) => { x.schichten.splice(i, 1); }),
   });
 }
 
@@ -126,7 +121,7 @@ function kopf(schluessel, symbol) {
 }
 
 function schichtenPanel(s) {
-  const neu = () => aendernAn(s.kennung, (x) => {
+  const neu = () => eintragAendern('setzungen', s.kennung, (x) => {
     x.schichten.push(ausVorlage('schicht', { name: naechsterName('Schicht', x.schichten) }));
   });
   return panel({

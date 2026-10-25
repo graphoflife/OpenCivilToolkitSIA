@@ -101,19 +101,17 @@ STABMATERIALARTEN = ("beton", "eigen")
 #: Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
 E_MODULE = ("e0", "e_eq")
 
-#: Die Arten eines Querschnitts, die ein E_eq haben: eine Platte -- immer in
-#: x-Richtung, Zug unten (Benutzer, 2026-10-24) -- und eine Querschnittsanalyse;
-#: nur sie haben eine Momenten-Kruemmungs-Linie mit ihrer Bewehrung.
-E_EQ_ARTEN = ("platte", "analyse")
+#: Die Arten eines Querschnitts, die ein Bauteil des Projekts nehmen: eine
+#: Platte oder eine Querschnittsanalyse. Nur sie bringen ein Material mit, den
+#: Beton des Bauteils, und nur sie haben ein E_eq -- eine Momenten-Kruemmungs-
+#: Linie mit ihrer Bewehrung, bei einer Platte immer in x-Richtung, Zug unten
+#: (Benutzer, 2026-10-24). Einer nach Vorlage oder von Hand ist nur eine Form.
+AUS_BAUTEIL = ("platte", "analyse")
 
 #: Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der
 #: Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine
 #: Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
 MATERIAL_DES_QUERSCHNITTS = "querschnitt"
-
-#: Die Arten eines Querschnitts, die ein Material mitbringen: ein Bauteil des
-#: Projekts. Einer nach Vorlage oder von Hand ist nur eine Form.
-MIT_MATERIAL = ("platte", "analyse")
 
 #: Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer
 #: Schnittgroesse oder der Verdrehung, das verschobene System oder die
@@ -327,7 +325,7 @@ class StabquerschnittEintrag(Beschreibung):
         Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
         2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
         """
-        if self.e_modul == "e_eq" and self.art not in E_EQ_ARTEN:
+        if self.e_modul == "e_eq" and self.art not in AUS_BAUTEIL:
             return ("ein E_eq gibt es nur bei einem Querschnitt aus einer Platte oder "
                     "Querschnittsanalyse – nur sie haben eine Momenten-Krümmungs-Linie.")
         if self.art == "vorlage":

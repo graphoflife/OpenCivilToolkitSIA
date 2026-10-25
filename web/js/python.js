@@ -17,7 +17,7 @@ import { panel } from './bausteine.js';
 import { el, ersetzen } from './dom.js';
 import { abbrechen, ausfuehren, konsole, leeren, neuStarten } from './konsole.js';
 import { bildZeichnen } from './zeichnen.js';
-import { projektAendern, zustand } from './zustand.js';
+import { eintragAendern, zustand } from './zustand.js';
 
 /** So viel wird eingerückt -- wie in PEP 8. */
 const EINZUG = '    ';
@@ -33,19 +33,12 @@ function skriptVon(kennung) {
   return (zustand.projekt?.skripte || []).find((s) => s.kennung === kennung) || null;
 }
 
-/** Ändert das Skript im Projekt -- als «skript»: das rechnet nichts neu, ein Skript geht in keine Rechnung. */
-function aendernAn(kennung, veraenderer, anlass) {
-  projektAendern((p) => {
-    const s = (p.skripte || []).find((x) => x.kennung === kennung);
-    if (s) veraenderer(s);
-  }, anlass);
-}
-
 function codeSpeichern(kennung, code) {
   clearTimeout(speichernNach);
   speichernNach = null;
   if (skriptVon(kennung)?.code === code) return;
-  aendernAn(kennung, (s) => { s.code = code; }, 'skript');
+  // Als «skript»: das rechnet nichts neu, ein Skript geht in keine Rechnung.
+  eintragAendern('skripte', kennung, (s) => { s.code = code; }, 'skript');
 }
 
 function laufen(kennung) {
@@ -196,7 +189,9 @@ function aufbauen(skript) {
   const name = el('input', {
     type: 'text', value: skript.name || '', title: 'Name des Skripts',
     on: {
-      change: (e) => aendernAn(kennung, (s) => { s.name = e.target.value.trim() || s.name; }, 'skript'),
+      change: (e) => eintragAendern('skripte', kennung, (s) => {
+        s.name = e.target.value.trim() || s.name;
+      }, 'skript'),
     },
   });
   const ausfuehrenKnopf = el('button.knopf.knopf-haupt', {

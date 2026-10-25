@@ -35,7 +35,7 @@
 import { api } from './api.js';
 import { karte } from './bausteine.js';
 import { kraftpfeil, momentSymbol } from './bs_symbole.js';
-import { abdruckVon } from './bs_zeichnung.js';
+import { abdruckVon } from './bs_teile.js';
 import { el, leerzustand, svgEl } from './dom.js';
 import { aendern, zustand } from './zustand.js';
 

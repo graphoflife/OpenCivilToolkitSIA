@@ -44,6 +44,27 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Aufgeräumt: Doppeltes im Balkensystem, ein Weg zum Ändern
+
+Befund 1.2 der Strukturdurchsicht vom 2026-10-25: Reste aus den Tagen davor.
+
+- **`AUS_BAUTEIL`** statt `E_EQ_ARTEN` und `MIT_MATERIAL`: zwei Namen für
+  dasselbe Tupel. Ein Querschnitt aus einer Platte oder Analyse bringt ein
+  Material mit und hat ein E_eq -- beides, weil er ein Bauteil mit Bewehrung
+  nimmt.
+- **Kein Umweg mehr über den Adapter:** `aktiverLastfall`, `lastfallWaehlen`
+  und `passendeUebersicht` nehmen das Zeichenfenster `a` statt der Kennung
+  und stehen mit `eintragVon` und `abdruckVon` in `bs_teile.js`. Das
+  schwebende Fenster liest sie dort wie das Zeichenfenster; die drei Glieder
+  des Adapters, die nur dafür da waren, sind weg.
+- **`eintragAendern(liste, kennung, veraenderer)`** in `zustand.js`: dieselbe
+  Funktion stand siebenmal da, als `aendernAn` oder `schreiben`, je App und
+  im Balkensystem zweimal. Gibt es den Eintrag nicht mehr, ändert sich
+  nichts -- das tat bisher nur die Kopie in `python.js`, deren Speichern
+  verzögert kommt.
+
+---
+
 ## 2026-10-25 · Eine Zuweisung an ein Feld, das es nicht gibt, scheitert laut
 
 Befund 1.1 der Strukturdurchsicht vom 2026-10-25: `Beschreibung.__setattr__`

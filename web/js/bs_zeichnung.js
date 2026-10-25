@@ -8,8 +8,8 @@
  * sie das Zusammenführen von Knoten --, gewählt wird aber der Knoten.
  *
  * Das schwebende Fenster mit den Feldern des Gewählten steht in
- * `bs_eigenschaften.js`, was beide brauchen in `bs_teile.js`; der Adapter
- * gibt dem Fenster, was es vom System wissen muss.
+ * `bs_eigenschaften.js`, was beide brauchen in `bs_teile.js`: auch der
+ * Lastfall, den das Fenster zeigt, und die Antwort des Kerns.
  *
  * ZUGSEITE:
  * Die gestrichelte Faser liegt rechts der Laufrichtung einer Linie. Eine
@@ -44,7 +44,6 @@
  */
 
 import { api } from './api.js';
-import { ARTEN as BAUTEILARTEN } from './arten.js';
 import { eigenschaften, neuEigenschaften, vorgabeMaterial } from './bs_eigenschaften.js';
 import { nachBild, zahlText } from './cad_ansicht.js';
 import { imSpiel } from './cad_auswahl.js';
@@ -55,11 +54,14 @@ import {
   GROESSE, faserSymbol, gelenkSymbol, imBild, kraftpfeil, lagerSymbol, linienlagerSymbol,
   momentSymbol, streckenlast, streckenmoment, unbestimmtSymbol,
 } from './bs_symbole.js';
-import { katalog, lastart, lastVon, zugseite } from './bs_teile.js';
+import {
+  abdruckVon, aktiverLastfall, eintragVon, katalog, lastart, lastfallWaehlen, lastVon,
+  passendeUebersicht, zugseite,
+} from './bs_teile.js';
 import {
   auswahl, el, melden, svgEl,
 } from './dom.js';
-import { aendern, ausVorlage, projektAendern, zustand } from './zustand.js';
+import { aendern, ausVorlage, eintragAendern, zustand } from './zustand.js';
 
 /**
  * Die Arten des Systems. Gewählt werden Linien und Knoten: ein Lager gehört
@@ -87,15 +89,6 @@ const EINSTELLUNG = {
   massstab: [0.2, 20000],
   verbunden: true,
 };
-
-export function eintragVon(kennung) {
-  return zustand.projekt?.balkensysteme?.find((x) => x.kennung === kennung) || null;
-}
-
-/** Ändert das System -- der eine Weg, auf dem das Fenster ins Projekt schreibt. */
-function schreiben(kennung, veraenderer) {
-  projektAendern((p) => veraenderer(p.balkensysteme.find((x) => x.kennung === kennung)));
-}
 
 // ===========================================================================
 // Das Fenster eines Systems
@@ -135,22 +128,6 @@ export function waehlen(kennung, kennungen) {
 }
 
 /**
- * Der Lastfall, dessen Lasten das Fenster zeigt und bearbeitet -- der
- * gewählte, solange es ihn gibt, sonst der erste. Ansichtssache, nicht Teil
- * des Projekts.
- */
-export function aktiverLastfall(kennung) {
-  const a = fensterVon(kennung);
-  const z = eintragVon(kennung);
-  const faelle = z?.lastfaelle || [];
-  // «– kein Lastfall –»: die Zeichnung zeigt keine Lasten.
-  if (a.bs.lastfall === '') return null;
-  if (faelle.some((lf) => lf.kennung === a.bs.lastfall)) return a.bs.lastfall;
-  // Zuerst das Eigengewicht (Benutzer, 2026-10-24).
-  return (faelle.find((lf) => lf.eigengewicht) || faelle[0])?.kennung || null;
-}
-
-/**
  * Die Wahl des Lastfalls gleich neben dem Werkzeug «Last» (Benutzer,
  * 2026-10-24): dessen Lasten zeigt und bearbeitet die Zeichnung -- oder
  * «– kein Lastfall –». Neu bei jedem Neubau der Tafel, damit sie jeden
@@ -163,38 +140,10 @@ function lastfallLeiste(a) {
   huelle.replaceChildren(auswahl({
     werte: [{ wert: '', beschriftung: '– kein Lastfall –' },
       ...faelle.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
-    gewaehlt: aktiverLastfall(a.bs.kennung) || '',
+    gewaehlt: aktiverLastfall(a) || '',
     titel: 'Dessen Lasten zeigt und bearbeitet die Zeichnung',
-    beiAenderung: (w) => lastfallWaehlen(a.bs.kennung, w),
+    beiAenderung: (w) => lastfallWaehlen(a, w),
   }));
-}
-
-export function lastfallWaehlen(kennung, lastfall) {
-  const a = fensterVon(kennung);
-  a.bs.lastfall = lastfall;
-  a.neuZeichnen();
-  aendern({}, 'zeichnung');
-}
-
-/** Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu sehen ist. */
-export function passendeUebersicht(a) {
-  const u = a.bs.uebersicht;
-  return u && u.abdruck === abdruckVon(a.bs.kennung) ? u : null;
-}
-
-/**
- * Wovon jede Antwort des Kerns zu einem System abhängt: das System, die
- * Materialien und die Bauteile, deren Querschnitt es nimmt. Ändert sich
- * davon etwas -- etwa eine Dichte oder die Höhe einer Platte --, gilt sie
- * nicht mehr: die Übersicht samt dem gezeichneten Eigengewicht hier, die
- * Verläufe in den Diagrammen.
- */
-export function abdruckVon(kennung) {
-  const system = eintragVon(kennung);
-  const bezuege = (system?.querschnitte || []).map((q) => q.bezug).filter(Boolean);
-  const bauteile = BAUTEILARTEN.flatMap((a) => zustand.projekt[a.liste] || [])
-    .filter((b) => bezuege.includes(b.kennung));
-  return JSON.stringify([system, zustand.projekt.materialien, bauteile]);
 }
 
 function uebersichtZeichnen(a) {
@@ -244,7 +193,7 @@ function adapter(kennung) {
     arten: ARTEN,
     gilt: () => zustand.projekt === projekt,
     zeichnung: () => eintragVon(kennung),
-    schreiben: (veraenderer) => schreiben(kennung, veraenderer),
+    schreiben: (veraenderer) => eintragAendern('balkensysteme', kennung, veraenderer),
     tafelNeu: () => aendern({}, 'zeichnung'),
     leisteZusatz: () => {
       bs.lastfallHuelle = el('span.bs-lastfallwahl');
@@ -271,10 +220,6 @@ function adapter(kennung) {
     gezeichnet: auswahlMarkieren,
     eigenschaften,
     neuEigenschaften,
-    // Was das schwebende Fenster vom System braucht (bs_eigenschaften.js).
-    lastfall: () => aktiverLastfall(kennung),
-    lastfallWaehlen: (lastfall) => lastfallWaehlen(kennung, lastfall),
-    passendeUebersicht: () => passendeUebersicht(fensterVon(kennung)),
     teilen: (a, kennungen) => kernBearbeiten(a, kennungen
       .filter((k) => k.startsWith('L'))
       .map((linie) => ({ aktion: 'teilen', linie, anteil: 0.5 })), kennungen),
@@ -341,7 +286,7 @@ function naechsteLast(z) {
  * einzeln dort, wo geklickt wurde. Gibt die Kennung zurück, oder null.
  */
 function lastAnlegen(a, z, erg) {
-  const lf = aktiverLastfall(a.bs.kennung);
+  const lf = aktiverLastfall(a);
   if (!lf) {
     melden('Für eine Last zuerst oben neben «Last» einen Lastfall wählen.', true);
     return null;
@@ -577,7 +522,7 @@ function zeichnen(a, g) {
   }
 
   // Die Lasten des gewählten Lastfalls.
-  const lf = aktiverLastfall(a.bs.kennung);
+  const lf = aktiverLastfall(a);
   a.bs.lastformen = [];
   if (lf) g.append(lastenZeichnen(a, z, lf, lagen));
 

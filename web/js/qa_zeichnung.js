@@ -42,7 +42,7 @@ import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import {
-  aendern, ausVorlage, feldangabe, materialien, projektAendern, zustand,
+  aendern, ausVorlage, eintragAendern, feldangabe, materialien, zustand,
 } from './zustand.js';
 
 /**
@@ -94,11 +94,6 @@ const LINIE_VON = { bewehrung: 'stablinien', schubwand: 'schubwaende', hilfslini
 
 function eintragVon(kennung) {
   return zustand.projekt?.querschnittsanalysen?.find((x) => x.kennung === kennung) || null;
-}
-
-/** Ändert die Analyse -- der eine Weg, auf dem das Fenster ins Projekt schreibt. */
-function schreiben(kennung, veraenderer) {
-  projektAendern((p) => veraenderer(p.querschnittsanalysen.find((x) => x.kennung === kennung)));
 }
 
 // ===========================================================================
@@ -214,7 +209,7 @@ function adapter(kennung) {
     arten: ARTEN,
     gilt: () => zustand.projekt === projekt,
     zeichnung: () => eintragVon(kennung),
-    schreiben: (veraenderer) => schreiben(kennung, veraenderer),
+    schreiben: (veraenderer) => eintragAendern('querschnittsanalysen', kennung, veraenderer),
     tafelNeu: () => aendern({}, 'zeichnung'),
     name: elementname,
     neuText: (a, werkzeug) => neuText(a.qa, werkzeug),
