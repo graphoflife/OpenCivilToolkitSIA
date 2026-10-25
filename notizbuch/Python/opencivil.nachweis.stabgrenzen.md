@@ -1,5 +1,5 @@
 ---
-erzeugt: 5f5d9659268b
+erzeugt: c44d9d45d61b
 art: modul
 tags: [modul]
 ---
@@ -60,24 +60,17 @@ class Stabangabe
 
 Ein Stab -- oder ein Stueck einer verschmierten Linie --, wie die Nachweise ihn sehen.
 
-- `element: Stabgruppe` – Das Element der Zeichnung, aus dem er stammt.
+- `element: Bewehrungselement` – Das Element der Zeichnung, aus dem er stammt.
 - `lage: Punkt` – in m.
 - `flaeche: float` – in m².
 - `beton: Baustoff` – Der Beton, in dem er liegt: er gibt `f_ctm` fuer die Rissbreite.
-- `durchmesser: float` – in m -- bei einer verschmierten Linie mit Flaeche von Hand der fiktive.
+- `durchmesser: float` – in m -- der seines Elements ([[opencivil.querschnitt.bewehrungselemente#Bewehrungselement.rissdurchmesser|rissdurchmesser]]), bei einer verschmierten Linie mit Flaeche von Hand der fiktive.
 
 #### Stabangabe.stahl
 
 ```python
 @property
 def stahl(self) -> Baustoff
-```
-
-#### Stabangabe.verschmiert
-
-```python
-@property
-def verschmiert(self) -> bool
 ```
 
 #### Stabangabe.fiktiv
@@ -98,20 +91,10 @@ def ort(self) -> str
 
 Wie er in einem Satz heisst: Element und Lage, in mm.
 
-### fiktiver_durchmesser
-
-```python
-def fiktiver_durchmesser(element: Stabgruppe) -> float
-```
-
-Der Durchmesser einer verschmierten Linie, in m: ihre Stahlflaeche je
-Laenge, auf Staebe im Abstand
-[[opencivil.querschnitt.geometrie#Konstanten|TEILUNG_VERSCHMIERT]] verteilt.
-
 ### stabangaben
 
 ```python
-def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt, herkunft: Sequence[Stabgruppe]) -> List[Stabangabe]
+def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt, herkunft: Sequence[Bewehrungselement]) -> List[Stabangabe]
 ```
 
 Je Bewehrung des Querschnitts ihre Angaben -- in derselben Reihenfolge wie dort.
@@ -178,6 +161,7 @@ Welche Elemente zu welcher Grenze gehoeren.
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.interaktion]]
 

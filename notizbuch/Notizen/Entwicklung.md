@@ -44,6 +44,22 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Querschnittsanalyse: drei Arten Bewehrung
+
+Aus der Strukturdurchsicht: ein Bewehrungselement der Querschnittsanalyse
+war ein Datensatz mit der Art als Text («stab», «flaeche», «anzahl»,
+«teilung»), und ein Dutzend Weichen in fünf Modulen fragten sie ab -- für
+die Tabellen der Herleitung, die Angaben über den Nachweisen, die Fasern
+des Querschnitts, den Durchmesser der Rissbreite und die Bilder. Jetzt ist
+es ein `Einzelstab`, eine `Stabreihe` oder eine `VerschmierteLinie`
+(`querschnitt/bewehrungselemente.py`), und jede Art sagt selbst, wo ihre
+Stäbe liegen, wie sie in den Tabellen steht, wie sie in den Querschnitt
+eingeht und welcher Durchmesser ihre Rissbreite bestimmt. Welche Art eine
+Beschreibung ist, wird einmal entschieden, beim Bauen. Für den Benutzer
+ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Platte: ein Bewehrungsposten in einer Gestalt
 
 Rest von Befund 1 der Strukturdurchsicht: Ein Bewehrungsposten der Platte

@@ -107,14 +107,14 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`.
       Verhalten an die Tabellen der Werkzeuge und Arten hängen, die das
       Fenster ohnehin durchläuft; ebenfalls Teil von `cadApp`.
 - [ ] **Arten als Text oder Schalter statt als eigener Typ**, an fünf Orten
-      (die Art des Stabquerschnitts, die Querkraft und «einachsig» sind seit
-      2026-10-25 behoben):
-      - Bewehrung der Querschnittsanalyse: lose Datensätze mit der Art als
-        Text, rund zwei Dutzend Weichen in fünf Modulen. Besser: die
-        Zeichnung macht jedes Element einmal zu Einzelstab, Stablinie oder
-        verschmierter Linie, mit `flaeche` und `als_bewehrung()`.
+      (die Art des Stabquerschnitts, die Querkraft, «einachsig» und die
+      Bewehrung der Querschnittsanalyse sind seit 2026-10-25 behoben):
       - M–χ oder N–ε als Ja/Nein, rund 12-mal in der Spannungsanalyse.
         Besser ein Wert `Linienart`.
+      - Die Beschreibung einer Stablinie fragen vor dem Bauen noch die
+        Prüfung der Zeichnung, `geometrie.linienflaeche` und die Liste unter
+        der Zeichnung (`api.geometrie`) je nach Art ab -- dort ist der Stahl
+        noch eine Kennung, kein Baustoff.
 - [ ] **Die Oberfläche wiederholt Kern-Wissen, neu dazugekommen** (zum
       Punkt «Keine Rechnung und keine Norm in der Oberfläche» unten):
       `bs_zeichnung.js` kopiert die Lastrichtungen aus dem Kern; Einheiten

@@ -1,5 +1,5 @@
 ---
-erzeugt: 335225a90550
+erzeugt: 06f52aa6c2b4
 art: modul
 tags: [modul]
 ---
@@ -74,31 +74,6 @@ Ein Polygon der Zeichnung -- Ecken in mm, ohne Material eine Aussparung.
 - `kennung: str`
 - `punkte: Tuple[Punkt, ...]`
 - `stoff: Optional[Baustoff]`
-
-### Stabgruppe
-
-```python
-@dataclass(frozen=True)
-class Stabgruppe
-```
-
-Ein Bewehrungselement der Zeichnung: ein Einzelstab oder eine Stablinie.
-
-`punkte` sind die Stabmitten in mm, bei einer verschmierten Flaeche leer.
-`flaeche` ist die ganze Stahlflaeche des Elements in mm².
-
-- `name: str`
-- `kennung: str`
-- `art: str` – `stab` oder eine [[opencivil.querschnitt.geometrie#Linienart|Linienart]].
-- `stahl: Baustoff`
-- `durchmesser: float`
-- `punkte: Tuple[Punkt, ...]`
-- `flaeche: float`
-- `von: Punkt`
-- `bis: Punkt`
-- `linie: Optional[geo.Stablinie] = None`
-- `gewaehlt: Optional[float] = None` – Bei einer Linie nach Teilung der eingegebene Abstand.
-- `aus_staeben: Optional[Tuple[float, float, float]] = None` – Bei verschmierten Staeben ⌀, s und L in mm, aus denen die Flaeche kommt.
 
 ### Wandangabe
 
@@ -340,7 +315,7 @@ selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
 #### Querschnittsanalyse.querschnitt
 
 ```python
-def querschnitt(self, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[Querschnitt, List['Stabgruppe'], Dict[int, Stahlgesetz]]
+def querschnitt(self, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[Querschnitt, List[Bewehrungselement], Dict[int, Stahlgesetz]]
 ```
 
 Der Querschnitt mit den Gesetzen einer Rechenwahl, fuer jeden Werkstoff
@@ -370,7 +345,7 @@ Was jeder Nachweis der Analyse liest: den Schwerpunkt und die Werkstoffe.
 #### Querschnittsanalyse.interaktion
 
 ```python
-def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[Stabgruppe]]
+def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[Bewehrungselement]]
 ```
 
 Der Querschnitt im Bruchzustand, mit den gewaehlten Werkstoffgesetzen
@@ -380,7 +355,7 @@ Bewehrung das Element, aus dem sie stammt.
 #### Querschnittsanalyse.geometrie
 
 ```python
-def geometrie(self, index_von: Callable[[Baustoff], int]) -> Tuple[List[Teil], List[Bewehrung], List[Stabgruppe]]
+def geometrie(self, index_von: Callable[[Baustoff], int]) -> Tuple[List[Teil], List[Bewehrung], List[Bewehrungselement]]
 ```
 
 Polygone und Bewehrung in Metern, mit den Werkstoffen als Index --
@@ -444,6 +419,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.geometrie]]

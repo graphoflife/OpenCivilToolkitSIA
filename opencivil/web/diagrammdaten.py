@@ -728,9 +728,9 @@ def _zeichnung(bauteil) -> dict:
              "tiefe": _tiefe(bauteil.eltern, i)}
             for i, f in enumerate(bauteil.flaechen)],
         "staebe": [{"y": p[0], "z": p[1], "d": g.durchmesser}
-                   for g in bauteil.gruppen if g.art != "flaeche" for p in g.punkte],
+                   for g in bauteil.bewehrungselemente for p in g.punkte],
         "flaechenlinien": [{"von": list(g.von), "bis": list(g.bis)}
-                           for g in bauteil.gruppen if g.art == "flaeche"],
+                           for g in bauteil.bewehrungselemente if g.verschmiert],
         "waende": [{"name": w.name, "von": list(w.von), "bis": list(w.bis), "dicke": w.dicke}
                    for w in bauteil.waende],
         "schwerpunkt": [bauteil.brutto.y_S, bauteil.brutto.z_S],
@@ -807,7 +807,7 @@ def _bruch(q, bauteil, punkt) -> dict:
         "staebe": [
             {"y": p[0], "z": p[1], "d": g.durchmesser,
              "eps": q.dehnung(punkt, (p[0] * 1e-3, p[1] * 1e-3)) * 1e3}
-            for g in bauteil.gruppen if g.art != "flaeche" for p in g.punkte],
+            for g in bauteil.bewehrungselemente for p in g.punkte],
         "x": x * 1e3,
         "d": d * 1e3,
         "neigung": math.degrees(punkt.psi),

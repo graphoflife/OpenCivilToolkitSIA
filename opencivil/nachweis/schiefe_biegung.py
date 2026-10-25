@@ -43,7 +43,8 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
-from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse, Stabgruppe
+from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
+from opencivil.querschnitt.bewehrungselemente import Bewehrungselement
 from opencivil.querschnitt.interaktion import Bruchpunkt, Kraftanteil, Querschnitt
 
 #: Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es
@@ -182,7 +183,7 @@ class SchiefeBiegung(Nachweis):
         return (N, *self.analyse.biegung.wirkt(M_y, M_z))
 
     def _ein_fall(self, p: Protokoll, e: Eingaben, q: Querschnitt,
-                  herkunft: Sequence[Stabgruppe],
+                  herkunft: Sequence[Bewehrungselement],
                   fall: Lastfall, zug: float, druck: float
                   ) -> Tuple[Optional[NachweisUrteil], Fallergebnis]:
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
@@ -282,7 +283,7 @@ class SchiefeBiegung(Nachweis):
                   titel="Einwirkung", ausrichtung="lrl")
 
     def _protokoll_bruchzustand(self, p: Protokoll, werte: Zwischenwerte, q: Querschnitt,
-                                punkt: Bruchpunkt, herkunft: Sequence[Stabgruppe]) -> None:
+                                punkt: Bruchpunkt, herkunft: Sequence[Bewehrungselement]) -> None:
         n = punkt.zugrichtung
         richtung = math.degrees(math.atan2(n[1], n[0]))
         if punkt.chi > 0.0:

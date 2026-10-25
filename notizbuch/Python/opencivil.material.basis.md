@@ -1,5 +1,5 @@
 ---
-erzeugt: a52bf676ef9e
+erzeugt: 4d7cfac659f0
 art: modul
 tags: [modul]
 ---
@@ -234,6 +234,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.modul]]

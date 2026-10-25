@@ -862,7 +862,7 @@ class TestVerschmierteStaebe(unittest.TestCase):
         return p
 
     def flaeche(self, p):
-        return p.rechnen().aufbau.querschnittsanalysen["a1"].gruppen[-1].flaeche
+        return p.rechnen().aufbau.querschnittsanalysen["a1"].bewehrungselemente[-1].flaeche
 
     def test_ueber_die_linie(self):
         # 200 mm Linie: 200/150 · π · 12²/4 = 150.8 mm².

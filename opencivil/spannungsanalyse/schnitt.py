@@ -87,7 +87,8 @@ from opencivil.nachweis.rissgroessen import (
     protokoll_widerstandsmoment, protokoll_zugfestigkeit, rissaktive_dicke, rissmoment,
     rissnormalkraft,
 )
-from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
+from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.bewehrungselemente import Bewehrungselement
 from opencivil.querschnitt.fasern import Faserquerschnitt, Stab
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.interaktion import Querschnitt
@@ -130,7 +131,7 @@ def _betonspannung(r, gesetze: Mapping[int, Callable[[float], float]]
     return spannung
 
 
-def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe],
+def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Bewehrungselement],
             staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *,
             suche: Suche) -> Faserloeser:
     """
@@ -175,7 +176,7 @@ class _Zerlegung:
     """Ein Zustand des gezeichneten Querschnitts -- in jeder Zugrichtung zu haben."""
 
     querschnitt: Querschnitt
-    herkunft: Tuple[Stabgruppe, ...]
+    herkunft: Tuple[Bewehrungselement, ...]
     """Je Bewehrung das Element, aus dem sie stammt -- fuer die Namen der Lagen."""
 
     staehle: Mapping[int, Stahlgesetz]
@@ -616,7 +617,7 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     ``None`` ohne Bewehrung. ``wert`` liefert zu einer Wert-ID die Zahl in SI,
     aus einer Loesung.
     """
-    if not analyse.gruppen:
+    if not analyse.bewehrungselemente:
         return None
     zerlegungen = []
     for ungerissen in (False, True):
@@ -639,7 +640,7 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     quer = [p[0 if seite.um_y else 1] for p, _ in analyse.beton_ecken]
     breite = (max(quer) - min(quer)) * 1e-3
     t_zug = rissaktive_dicke(h=gerissen.loeser.h, b=breite, zug=True)
-    stahlstoffe = tuple({g.stahl.id: g.stahl for g in analyse.gruppen}.values())
+    stahlstoffe = tuple({g.stahl.id: g.stahl for g in analyse.bewehrungselemente}.values())
     return Schnittpaar(
         gerissen=gerissen.loeser, ungerissen=ungerissen.loeser, seite=seite, wahl=wahl,
         querschnitt=q, zerlegungen=tuple(zerlegungen),

@@ -37,11 +37,10 @@ from opencivil.core.protokoll import Abschnitt, GleichungBlock, Protokoll, Tabel
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.querschnitt import geometrie as geo
+from opencivil.querschnitt.bewehrungselemente import Bewehrungselement, aus_linie, aus_stab
 from opencivil.querschnitt.biegung import SCHIEF, Biegung
 from opencivil.querschnitt.geometrie import GeometrieFehler, Linienart, Punkt
-from opencivil.querschnitt.interaktion import (
-    Bewehrung, Querschnitt, Teil, Werkstoff, linie_als_bewehrung,
-)
+from opencivil.querschnitt.interaktion import Bewehrung, Querschnitt, Teil, Werkstoff
 from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN
@@ -89,34 +88,6 @@ class Flaechenteil:
     kennung: str
     punkte: Tuple[Punkt, ...]
     stoff: Optional[Baustoff]
-
-
-@dataclass(frozen=True)
-class Stabgruppe:
-    """
-    Ein Bewehrungselement der Zeichnung: ein Einzelstab oder eine Stablinie.
-
-    ``punkte`` sind die Stabmitten in mm, bei einer verschmierten Flaeche leer.
-    ``flaeche`` ist die ganze Stahlflaeche des Elements in mm².
-    """
-
-    name: str
-    kennung: str
-    art: str
-    """``stab`` oder eine :class:`Linienart`."""
-
-    stahl: Baustoff
-    durchmesser: float
-    punkte: Tuple[Punkt, ...]
-    flaeche: float
-    von: Punkt
-    bis: Punkt
-    linie: Optional[geo.Stablinie] = None
-    gewaehlt: Optional[float] = None
-    """Bei einer Linie nach Teilung der eingegebene Abstand."""
-
-    aus_staeben: Optional[Tuple[float, float, float]] = None
-    """Bei verschmierten Staeben ⌀, s und L in mm, aus denen die Flaeche kommt."""
 
 
 @dataclass(frozen=True)
@@ -394,7 +365,9 @@ class Querschnittsanalyse:
             raise GeometrieFehler(erste.text, erste.elemente)
         self.eltern = self.zeichnung.eltern
         self.brutto = self.zeichnung.brutto
-        self.gruppen: List[Stabgruppe] = self._bewehrung(staebe, linien)
+        self.bewehrungselemente: List[Bewehrungselement] = (
+            [aus_stab(s) for s in staebe]
+            + [aus_linie(l, linie) for l, linie in zip(linien, self.zeichnung.linien)])
         self.waende: List[Wandangabe] = self._waende(waende)
         self._aufbauen(alpha_min, alpha_max, k_c)
 
@@ -407,27 +380,6 @@ class Querschnittsanalyse:
         """Der Werkstoff des innersten Polygons an dieser Stelle."""
         innen = self.zeichnung.innerstes(p)
         return None if innen is None else self.flaechen[innen].stoff
-
-    def _bewehrung(self, staebe, linien) -> List[Stabgruppe]:
-        gruppen: List[Stabgruppe] = []
-        for s in staebe:
-            lage, durchmesser = tuple(s["lage"]), s["durchmesser"]
-            gruppen.append(Stabgruppe(
-                name=s["name"], kennung=s["kennung"], art="stab", stahl=s["stahl"],
-                durchmesser=durchmesser, punkte=(lage,),
-                flaeche=math.pi * durchmesser ** 2 / 4.0, von=lage, bis=lage))
-        for l, linie in zip(linien, self.zeichnung.linien):
-            art = Linienart(l["art"])
-            aus_staeben = art is Linienart.FLAECHE and l["verschmiert"] == "staebe"
-            gruppen.append(Stabgruppe(
-                name=l["name"], kennung=l["kennung"], art=art.value, stahl=l["stahl"],
-                durchmesser=l["durchmesser"], punkte=linie.punkte,
-                flaeche=geo.linienflaeche(l, linie.laenge, len(linie.punkte)),
-                von=tuple(l["von"]), bis=tuple(l["bis"]), linie=linie,
-                gewaehlt=l["teilung"] if art is Linienart.TEILUNG else None,
-                aus_staeben=((l["durchmesser"], l["teilung"], l["laenge"] or linie.laenge)
-                             if aus_staeben else None)))
-        return gruppen
 
     def _waende(self, waende) -> List[Wandangabe]:
         ergebnis: List[Wandangabe] = []
@@ -502,7 +454,7 @@ class Querschnittsanalyse:
         """Jeder Baustoff, den die Analyse benutzt: erst die der Flaechen, dann die Staehle."""
         gesehen: Dict[str, Baustoff] = {}
         for stoff in ([f.stoff for f in self.flaechen]
-                      + [g.stahl for g in self.gruppen]
+                      + [g.stahl for g in self.bewehrungselemente]
                       + [w.stahl for w in self.waende]):
             if stoff is not None:
                 gesehen.setdefault(stoff.id, stoff)
@@ -563,41 +515,21 @@ class Querschnittsanalyse:
         return {self.d_brutto[k].id: g for k, g in werte.items()}
 
     def _bewehrung_protokollieren(self, p: Protokoll) -> float:
-        if not self.gruppen:
+        if not self.bewehrungselemente:
             p.text("Keine Bewehrung gezeichnet.")
             return 0.0
         p.ansatz(r"s = \frac{L}{m} \qquad m = \mathrm{runde}\left(\frac{L}{s_{gewählt}}\right)",
                  titel="Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet")
-        if any(g.aus_staeben for g in self.gruppen):
+        if any(g.verschmiert and not g.fiktiv for g in self.bewehrungselemente):
             p.ansatz(r"A_s = \frac{L}{s} \cdot \frac{\pi\, \varnothing^2}{4}",
                      titel="Verschmierte Stäbe: ⌀ im Abstand s über die Länge L",
                      name="Verschmierte Stahlfläche aus Stäben")
-        zeilen = []
-        for g in self.gruppen:
-            if g.art == "stab":
-                menge = Mathe(rf"\varnothing {g.durchmesser:g}")
-                lage = Mathe(f"({g.von[0]:g};\\ {g.von[1]:g})")
-            else:
-                lage = Mathe(f"({g.von[0]:g};\\ {g.von[1]:g}) \\rightarrow "
-                             f"({g.bis[0]:g};\\ {g.bis[1]:g})")
-                if g.aus_staeben:
-                    d, s, L = g.aus_staeben
-                    menge = Mathe(rf"\text{{verschmiert: }} \varnothing {d:g}\ @\ {s:g}"
-                                  rf"\ \text{{auf}}\ {L:.0f}")
-                elif g.art == Linienart.FLAECHE.value:
-                    menge = "verschmiert"
-                else:
-                    n = len(g.punkte)
-                    teilung = f"{g.linie.teilung:.1f}" if g.linie else ""
-                    menge = Mathe(rf"{n} \varnothing {g.durchmesser:g}"
-                                  + (rf"\ @\ {teilung}" if n > 1 else "")
-                                  + (rf"\ (\text{{gewählt }} {g.gewaehlt:g})"
-                                     if g.gewaehlt is not None else ""))
-            zeilen.append([g.name, lage, menge, g.stahl.name, Mathe(f"{g.flaeche:.0f}")])
+        zeilen = [[g.name, g.lage, g.menge, g.stahl.name, Mathe(f"{g.flaeche:.0f}")]
+                  for g in self.bewehrungselemente]
         p.tabelle(kopf=["Element", Mathe(r"\text{Lage}\ [\mathrm{mm}]"), "Bewehrung",
                         "Stahl", Mathe(r"A_s\ [\mathrm{mm}^2]")],
                   zeilen=zeilen, titel="Bewehrung", ausrichtung="lllr" + "r")
-        return sum(g.flaeche for g in self.gruppen)
+        return sum(g.flaeche for g in self.bewehrungselemente)
 
     def _waende_protokollieren(self, p: Protokoll) -> None:
         p.ansatz(r"\frac{A_{sw}}{s} = \frac{n \cdot \pi\, \varnothing^2 / 4}{s}",
@@ -626,15 +558,7 @@ class Querschnittsanalyse:
         latex = (rf"{als_text(', '.join(betone))} \qquad A = {b.A:.0f}\,\mathrm{{mm}}^2"
                  rf" \qquad y_S = {b.y_S:.1f}\,\mathrm{{mm}} \qquad z_S = {b.z_S:.1f}\,\mathrm{{mm}}")
         kopf = GleichungBlock(latex=latex, titel="Angaben zum Querschnitt")
-        zeilen = []
-        for g in self.gruppen:
-            if g.art == "stab":
-                menge = Mathe(rf"\varnothing {g.durchmesser:g}")
-            elif g.art == Linienart.FLAECHE.value:
-                menge = Mathe(rf"{g.flaeche:.0f}\,\mathrm{{mm}}^2")
-            else:
-                menge = Mathe(rf"{len(g.punkte)} \varnothing {g.durchmesser:g}")
-            zeilen.append([g.name, menge, g.stahl.name])
+        zeilen = [[g.name, g.kurzmenge, g.stahl.name] for g in self.bewehrungselemente]
         for w in self.waende:
             zeilen.append([w.name, Mathe(
                 rf"b_w = {w.dicke:g},\ {w.schnitte} \times \varnothing {w.durchmesser:g}"
@@ -705,7 +629,7 @@ class Querschnittsanalyse:
 
     def querschnitt(self, wert: Callable[[str], float], wahl: Rechenwahl, *,
                     ungerissen: bool = False,
-                    ) -> Tuple[Querschnitt, List["Stabgruppe"], Dict[int, Stahlgesetz]]:
+                    ) -> Tuple[Querschnitt, List[Bewehrungselement], Dict[int, Stahlgesetz]]:
         """
         Der Querschnitt mit den Gesetzen einer Rechenwahl, fuer jeden Werkstoff
         dieselbe -- dazu je Bewehrung ihr Element und je Stahl sein Gesetz,
@@ -743,7 +667,7 @@ class Querschnittsanalyse:
                  Eingabebezug("z_S", self.id_von("z_S"))]
                 + self.werkstoffbezuege())
 
-    def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[Stabgruppe]]:
+    def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[Bewehrungselement]]:
         """
         Der Querschnitt im Bruchzustand, mit den gewaehlten Werkstoffgesetzen
         und dem Schwerpunkt aus dem Rechenwerk als Bezugspunkt -- dazu je
@@ -763,7 +687,7 @@ class Querschnittsanalyse:
     # -- Fuer die Nachweise: Geometrie in Metern ------------------------------------
 
     def geometrie(self, index_von: Callable[[Baustoff], int],
-                  ) -> Tuple[List[Teil], List[Bewehrung], List[Stabgruppe]]:
+                  ) -> Tuple[List[Teil], List[Bewehrung], List[Bewehrungselement]]:
         """
         Polygone und Bewehrung in Metern, mit den Werkstoffen als Index --
         dazu je Bewehrung das Element, aus dem sie stammt: sein Name steht in
@@ -774,27 +698,17 @@ class Querschnittsanalyse:
                       werkstoff=index_von(f.stoff) if f.stoff is not None else None,
                       eltern=self.eltern[i])
                  for i, f in enumerate(self.flaechen)]
+
+        def verdraengt(p: Punkt) -> Optional[int]:
+            beton = self.beton_an(p)
+            return index_von(beton) if beton is not None else None
+
         bewehrung: List[Bewehrung] = []
-        herkunft: List[Stabgruppe] = []
-        for g in self.gruppen:
-            stahl = index_von(g.stahl)
-            if g.art == Linienart.FLAECHE.value:
-                mitte = ((g.von[0] + g.bis[0]) / 2.0, (g.von[1] + g.bis[1]) / 2.0)
-                beton = self.beton_an(mitte)
-                stuecke = linie_als_bewehrung(
-                    (g.von[0] * mm, g.von[1] * mm), (g.bis[0] * mm, g.bis[1] * mm),
-                    g.flaeche * mm * mm, stahl,
-                    index_von(beton) if beton is not None else None)
-                bewehrung += stuecke
-                herkunft += [g] * len(stuecke)
-                continue
-            einzeln = math.pi * g.durchmesser ** 2 / 4.0 * mm * mm
-            for p in g.punkte:
-                beton = self.beton_an(p)
-                bewehrung.append(Bewehrung(
-                    lage=(p[0] * mm, p[1] * mm), flaeche=einzeln, werkstoff=stahl,
-                    verdraengt=index_von(beton) if beton is not None else None))
-                herkunft.append(g)
+        herkunft: List[Bewehrungselement] = []
+        for g in self.bewehrungselemente:
+            stuecke = g.als_bewehrung(index_von(g.stahl), verdraengt)
+            bewehrung += stuecke
+            herkunft += [g] * len(stuecke)
         return teile, bewehrung, herkunft
 
     def schubwaende(self, f_sd: Callable[[Wandangabe], float],

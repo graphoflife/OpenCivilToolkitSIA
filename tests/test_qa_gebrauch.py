@@ -24,7 +24,7 @@ from opencivil.projekt.lesen import wahl_von
 from opencivil.projekt.querschnittsanalyse import (
     QAGebrauchsfallEintrag, QuerschnittsanalyseEintrag,
 )
-from opencivil.nachweis.stabgrenzen import fiktiver_durchmesser, stabangaben
+from opencivil.nachweis.stabgrenzen import stabangaben
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.interaktion import Querschnitt
 
@@ -76,9 +76,9 @@ class TestFiktiverDurchmesser(unittest.TestCase):
         p, a = rechteck(unten=())
         a.stablinie([50, 50], [250, 50], art="flaeche", flaeche=200.0, stahl="s1")
         aufbau, _ = rechnen(p)
-        linie = aufbau.querschnittsanalysen["a1"].gruppen[0]
-        self.assertAlmostEqual(fiktiver_durchmesser(linie) * 1e3,
-                               math.sqrt(4.0 / math.pi * 150.0), places=9)
+        linie = aufbau.querschnittsanalysen["a1"].bewehrungselemente[0]
+        self.assertTrue(linie.fiktiv)
+        self.assertAlmostEqual(linie.rissdurchmesser, math.sqrt(4.0 / math.pi * 150.0), places=9)
 
     def test_aus_durchmesser_und_teilung_gilt_der_durchmesser(self):
         """Verschmiert aus ⌀12 @ 200: die Grenze je Stab rechnet mit ⌀12, nicht fiktiv (Benutzer, 2026-10-24)."""

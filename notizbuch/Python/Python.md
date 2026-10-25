@@ -1,5 +1,5 @@
 ---
-erzeugt: b59dfa60e005
+erzeugt: c14b2976a4ab
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -97,6 +97,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
     - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
+    - [[opencivil.querschnitt.bewehrungselemente]] – die gezeichnete Bewehrung, je nach Art.
     - [[opencivil.querschnitt.biegung]] – wie ein gezeichneter Querschnitt biegt.
     - [[opencivil.querschnitt.fachwerk]] – das Fachwerk mit veraenderlicher Neigung.
     - [[opencivil.querschnitt.fasern]] – Der Querschnitt als Summe von Fasern.

@@ -51,17 +51,16 @@ from opencivil.nachweis.mindestbewehrung import (
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.spannungsgrenzen import Grenzen, Grenzgruppe
-from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
-from opencivil.querschnitt.geometrie import (
-    TEILUNG_VERSCHMIERT, Linienart, Punkt, aequivalenter_durchmesser,
-)
+from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.bewehrungselemente import Bewehrungselement
+from opencivil.querschnitt.geometrie import TEILUNG_VERSCHMIERT, Punkt
 from opencivil.querschnitt.interaktion import Querschnitt
 
 @dataclass(frozen=True)
 class Stabangabe:
     """Ein Stab -- oder ein Stueck einer verschmierten Linie --, wie die Nachweise ihn sehen."""
 
-    element: Stabgruppe
+    element: Bewehrungselement
     """Das Element der Zeichnung, aus dem er stammt."""
 
     lage: Punkt
@@ -74,20 +73,20 @@ class Stabangabe:
     """Der Beton, in dem er liegt: er gibt ``f_ctm`` fuer die Rissbreite."""
 
     durchmesser: float
-    """in m -- bei einer verschmierten Linie mit Flaeche von Hand der fiktive."""
+    """
+    in m -- der seines Elements
+    (:attr:`~opencivil.querschnitt.bewehrungselemente.Bewehrungselement.rissdurchmesser`),
+    bei einer verschmierten Linie mit Flaeche von Hand der fiktive.
+    """
 
     @property
     def stahl(self) -> Baustoff:
         return self.element.stahl
 
     @property
-    def verschmiert(self) -> bool:
-        return self.element.art == Linienart.FLAECHE.value
-
-    @property
     def fiktiv(self) -> bool:
         """Ob sein Durchmesser fiktiv ist: verschmiert, die Flaeche von Hand -- nicht aus ⌀ und s."""
-        return self.verschmiert and self.element.aus_staeben is None
+        return self.element.fiktiv
 
     @property
     def ort(self) -> str:
@@ -96,28 +95,13 @@ class Stabangabe:
                 f"z = {self.lage[1] * 1e3:.0f} mm)")
 
 
-def fiktiver_durchmesser(element: Stabgruppe) -> float:
-    """
-    Der Durchmesser einer verschmierten Linie, in m: ihre Stahlflaeche je
-    Laenge, auf Staebe im Abstand
-    :data:`~opencivil.querschnitt.geometrie.TEILUNG_VERSCHMIERT` verteilt.
-    """
-    laenge = math.hypot(element.bis[0] - element.von[0], element.bis[1] - element.von[1])
-    return aequivalenter_durchmesser(element.flaeche, laenge) * 1e-3
-
-
 def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt,
-                herkunft: Sequence[Stabgruppe]) -> List[Stabangabe]:
+                herkunft: Sequence[Bewehrungselement]) -> List[Stabangabe]:
     """Je Bewehrung des Querschnitts ihre Angaben -- in derselben Reihenfolge wie dort."""
-    angaben = []
-    for b, element in zip(q.bewehrung, herkunft):
-        fiktiv = element.art == Linienart.FLAECHE.value and element.aus_staeben is None
-        angaben.append(Stabangabe(
-            element=element, lage=b.lage, flaeche=b.flaeche,
-            beton=analyse.beton_an((b.lage[0] * 1e3, b.lage[1] * 1e3)),
-            durchmesser=(fiktiver_durchmesser(element) if fiktiv
-                         else element.durchmesser * 1e-3)))
-    return angaben
+    return [Stabangabe(element=element, lage=b.lage, flaeche=b.flaeche,
+                       beton=analyse.beton_an((b.lage[0] * 1e3, b.lage[1] * 1e3)),
+                       durchmesser=element.rissdurchmesser * 1e-3)
+            for b, element in zip(q.bewehrung, herkunft)]
 
 
 def _gruppieren(staebe: Sequence[Stabangabe], schluessel: Callable[[Stabangabe], tuple],

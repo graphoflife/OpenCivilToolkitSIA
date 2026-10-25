@@ -167,7 +167,7 @@ class KennzahlenQA(Prozedur):
         """
         b = self.analyse.brutto
         n = (math.cos(seite.psi), math.sin(seite.psi))
-        punkte = [p for g in self.analyse.gruppen for p in (g.punkte or (g.von, g.bis))]
+        punkte = [p for g in self.analyse.bewehrungselemente for p in (g.punkte or (g.von, g.bis))]
         return any((p[0] - b.y_S) * n[0] + (p[1] - b.z_S) * n[1] > 0.0 for p in punkte)
 
     # -- Rechnen ------------------------------------------------------------

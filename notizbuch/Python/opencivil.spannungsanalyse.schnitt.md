@@ -1,5 +1,5 @@
 ---
-erzeugt: 1b9b1d36883d
+erzeugt: bb777b7668ce
 art: modul
 tags: [modul]
 ---
@@ -100,7 +100,7 @@ Tiefe, zeigt das Bild den, der dort ueberwiegt.
 ### _loeser
 
 ```python
-def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe], staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *, suche: Suche) -> Faserloeser
+def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Bewehrungselement], staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *, suche: Suche) -> Faserloeser
 ```
 
 Der Querschnitt in der Zugrichtung `psi` als [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
@@ -122,7 +122,7 @@ class _Zerlegung
 Ein Zustand des gezeichneten Querschnitts -- in jeder Zugrichtung zu haben.
 
 - `querschnitt: Querschnitt`
-- `herkunft: Tuple[Stabgruppe, ...]` – Je Bewehrung das Element, aus dem sie stammt -- fuer die Namen der Lagen.
+- `herkunft: Tuple[Bewehrungselement, ...]` – Je Bewehrung das Element, aus dem sie stammt -- fuer die Namen der Lagen.
 - `staehle: Mapping[int, Stahlgesetz]`
 - `namen: Mapping[int, str]`
 
@@ -423,6 +423,7 @@ aus einer Loesung.
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
