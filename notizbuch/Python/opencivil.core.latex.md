@@ -1,5 +1,5 @@
 ---
-erzeugt: f971177b930e
+erzeugt: fc71da2032ca
 art: modul
 tags: [modul]
 ---
@@ -442,7 +442,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.querschnitt.analyse]]
-- [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.stabwerk.herleitung]]

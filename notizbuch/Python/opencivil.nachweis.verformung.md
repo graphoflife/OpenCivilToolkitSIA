@@ -1,5 +1,5 @@
 ---
-erzeugt: 42f922b3e3c9
+erzeugt: 8909d82ba752
 art: modul
 tags: [modul]
 ---
@@ -114,7 +114,7 @@ def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) ->
 Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
 Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
 Gehalt als rho'. Querschnitt, Schwerpunkt und Hoehe der Lage schreibt
-[[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]], wie in den
+[[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]], wie in den
 Nachweisen der Lagen: dieselbe Hoehe heisst ueberall gleich, etwa
 d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
 
@@ -151,6 +151,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]
 

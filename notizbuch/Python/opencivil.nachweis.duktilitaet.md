@@ -1,5 +1,5 @@
 ---
-erzeugt: a6dffa2d0a3d
+erzeugt: 3825b69905e6
 art: modul
 tags: [modul]
 ---
@@ -152,6 +152,7 @@ Symbolen da, die Fassung mit Zahlen und Einheiten entsteht daraus.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 

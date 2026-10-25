@@ -1,5 +1,5 @@
 ---
-erzeugt: 5fb860842f29
+erzeugt: 870cf36df862
 art: modul
 tags: [modul]
 ---
@@ -7,7 +7,8 @@ tags: [modul]
 > die Querschnitte: die Platte und der gezeichnete.
 > Paket [[opencivil]] · [Quelltext](../../opencivil/querschnitt/__init__.py)
 
-Der Plattenquerschnitt mit seinem Lagenaufbau ([[opencivil.querschnitt.platte]]),
+Der Plattenquerschnitt ([[opencivil.querschnitt.platte]]) mit seinem
+Lagenaufbau ([[opencivil.querschnitt.lagenaufbau]]),
 die Werkstoffgesetze, Fasern und Dehnungsgrenzen, und der gezeichnete
 Querschnitt der Querschnittsanalyse: Geometrie, Bruchzustand auch bei
 schiefer Biegung, Querkraft und Torsion auf Schubwaende.
@@ -21,6 +22,7 @@ schiefer Biegung, Querkraft und Torsion auf Schubwaende.
 - [[opencivil.querschnitt.geometrie]] – Ebene Geometrie eines gezeichneten Querschnitts.
 - [[opencivil.querschnitt.gesetzwahl]] – womit ein Querschnitt rechnet.
 - [[opencivil.querschnitt.interaktion]] – Bruchzustand gezeichneter Querschnitte, auch schief.
+- [[opencivil.querschnitt.lagenaufbau]] – wo die Bewehrung einer Platte liegt.
 - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
 - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
 - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.

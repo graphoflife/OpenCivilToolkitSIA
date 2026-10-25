@@ -1,5 +1,5 @@
 ---
-erzeugt: 46d93f2ef781
+erzeugt: 10c1dcbcaf0c
 art: modul
 tags: [modul]
 ---
@@ -244,6 +244,7 @@ herleitet.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]
 

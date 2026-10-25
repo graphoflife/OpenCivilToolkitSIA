@@ -1,5 +1,5 @@
 ---
-erzeugt: 4d3dc109fc96
+erzeugt: 1fc5a6d57450
 art: formel
 tags: [formel]
 ---
@@ -28,7 +28,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.platte#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
+- [[opencivil.querschnitt.lagenaufbau#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: cd8412bbc05b
+erzeugt: 2f13518d6be7
 art: formel
 tags: [formel]
 ---
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.platte#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
+- [[opencivil.querschnitt.lagenaufbau#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
 
 ## Themen
 

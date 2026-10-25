@@ -1,5 +1,5 @@
 ---
-erzeugt: 5b93bb77c13b
+erzeugt: 176367f14c42
 art: modul
 tags: [modul]
 ---
@@ -332,6 +332,7 @@ def beschreibung(self) -> str
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.herleitung]]

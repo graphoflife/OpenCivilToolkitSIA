@@ -52,7 +52,8 @@ from opencivil.nachweis import dehnungsfaecher
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
-from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Gesetz, Spannungsblock, Stahlgesetz
+from opencivil.querschnitt.lagenaufbau import Postenbezug
+from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 
 
 #: Was die Tragsicherheit anbietet.
@@ -115,9 +116,9 @@ def betonbezuege(satz: Werkstoffsatz, beton) -> List[Eingabebezug]:
     ]
 
 
-def staehle(posten) -> List:
+def staehle(posten: Sequence[Postenbezug]) -> List:
     """Die Staehle der Posten, jeder einmal, in der Reihenfolge der Posten."""
-    return list({lage.stahl.id: lage.stahl for lage, *_ in posten}.values())
+    return list({q.lage.stahl.id: q.lage.stahl for q in posten}.values())
 
 
 def stahlname(kennwert: str, stahl) -> str:
@@ -125,25 +126,23 @@ def stahlname(kennwert: str, stahl) -> str:
     return f"{kennwert}__{kennung_aus(stahl.id)}"
 
 
-def stahlbezuege(posten, kennwerte: Sequence[str]) -> List[Eingabebezug]:
+def stahlbezuege(posten: Sequence[Postenbezug], kennwerte: Sequence[str]) -> List[Eingabebezug]:
     """Je Stahl der Posten diese Kennwerte, unter :func:`stahlname`."""
     return [Eingabebezug(stahlname(kennwert, stahl), stahl.id_von(kennwert))
             for stahl in staehle(posten) for kennwert in kennwerte]
 
 
-def lagenbezuege(posten, satz: Werkstoffsatz) -> List[Eingabebezug]:
+def lagenbezuege(posten: Sequence[Postenbezug], satz: Werkstoffsatz) -> List[Eingabebezug]:
     """
     Was :func:`stahllagen` liest: je Posten Flaeche und Tiefe, je Stahl
     seine Kennwerte im Wertesatz der Wahl.
     """
-    bezuege = []
-    for lage, art, _, as_id, z_id in posten:
-        marke = f"{lage.nummer}{art.kuerzel}"
-        bezuege += [Eingabebezug(f"a_s_{marke}", as_id), Eingabebezug(f"z_{marke}", z_id)]
+    bezuege = [b for q in posten for b in q.bezuege("a_s", "z")]
     return bezuege + stahlbezuege(posten, ("E_s", satz.stahl, satz.stahl_druck, "eps_ud"))
 
 
-def stahllagen(posten, satz: Werkstoffsatz, wert: Callable[[str], float]) -> List[Stahllage]:
+def stahllagen(posten: Sequence[Postenbezug], satz: Werkstoffsatz,
+               wert: Callable[[str], float]) -> List[Stahllage]:
     """
     Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage im Wertesatz der
     Wahl -- die eine Stelle, die Lagen baut.
@@ -154,8 +153,8 @@ def stahllagen(posten, satz: Werkstoffsatz, wert: Callable[[str], float]) -> Lis
     """
     gesetze: Dict[str, Stahlgesetz] = {}
     lagen = []
-    for lage, art, _, as_id, z_id in posten:
-        stahl = lage.stahl
+    for q in posten:
+        stahl = q.lage.stahl
         if stahl.id not in gesetze:
             gesetze[stahl.id] = Stahlgesetz(
                 E_s=wert(stahl.id_von("E_s")),
@@ -163,9 +162,9 @@ def stahllagen(posten, satz: Werkstoffsatz, wert: Callable[[str], float]) -> Lis
                 f_yd_druck=abs(wert(stahl.id_von(satz.stahl_druck))),
                 eps_ud=abs(wert(stahl.id_von("eps_ud"))))
         lagen.append(Stahllage(
-            a_s=wert(as_id), z=wert(z_id), stahl=gesetze[stahl.id],
-            sorte=kennung_aus(stahl.id), nummer=lage.nummer, von_unten=lage.von_unten,
-            text=f"{lage.nummer}. Lage {art.beschriftung}"))
+            a_s=wert(q.as_def.id), z=wert(q.z_def.id), stahl=gesetze[stahl.id],
+            sorte=kennung_aus(stahl.id), nummer=q.lage.nummer, von_unten=q.lage.von_unten,
+            text=q.bezeichnung))
     return lagen
 
 

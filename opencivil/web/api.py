@@ -788,21 +788,21 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 # zeichnen und nicht eine erfundene Stabzahl.
                 "bewehrung": [
                     {
-                        "lage": lage.nummer,
-                        "art": art.value,
-                        "richtung": lage.richtung.value,
-                        "stahl": lage.stahl.name if lage.stahl else "",
-                        "menge": posten.menge_text(),
-                        "phi": posten.durchmesser.in_einheit(MM),
-                        "abstand": (posten.abstand.in_einheit(MM)
-                                    if posten.abstand is not None else None),
+                        "lage": q.lage.nummer,
+                        "art": q.art.value,
+                        "richtung": q.lage.richtung.value,
+                        "stahl": q.lage.stahl.name if q.lage.stahl else "",
+                        "menge": q.posten.menge_text(),
+                        "phi": q.posten.durchmesser.in_einheit(MM),
+                        "abstand": (q.posten.abstand.in_einheit(MM)
+                                    if q.posten.abstand is not None else None),
                         # anzahl ist eine blanke Zahl, keine Groesse -- Staebe
                         # haben keine Einheit.
-                        "anzahl": posten.anzahl,
-                        "a_s_id": as_id,
-                        "z_id": z_id,
+                        "anzahl": q.posten.anzahl,
+                        "a_s_id": q.as_def.id,
+                        "z_id": q.z_def.id,
                     }
-                    for lage, art, posten, as_id, z_id in qs.posten_ids
+                    for q in qs.posten
                 ],
             }
             for kennung, qs in aufbau.querschnitte.items()

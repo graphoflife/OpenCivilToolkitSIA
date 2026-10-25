@@ -41,7 +41,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
     NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Fallbefund,
@@ -58,9 +58,8 @@ from opencivil.nachweis.rissgroessen import (
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
-from opencivil.querschnitt.platte import (
-    Bewehrungslage, Richtung, lage_aus_posten, protokoll_lage,
-)
+from opencivil.querschnitt.lagenaufbau import Postenbezug, lage_aus_posten, protokoll_lage
+from opencivil.querschnitt.platte import Bewehrungslage, Richtung
 
 
 @dataclass(frozen=True)
@@ -141,7 +140,7 @@ def protokoll_zulaessige_stahlspannung(
 
 def _protokoll_stahlspannung(
     p: Protokoll, e: Eingaben, werte: Zwischenwerte, erg, *,
-    eintraege: Sequence[Tuple], anforderung: Rissanforderung,
+    posten: Sequence[Postenbezug], anforderung: Rissanforderung,
 ) -> Wert:
     """
     ``sigma_s,adm`` einer Lage -- fuer beide Zwängungen dieselbe Herleitung.
@@ -151,8 +150,8 @@ def _protokoll_stahlspannung(
     Die Spannung gehoert der ganzen Lage und traegt deren Index, wie
     Widerstand und Erfuellungsgrad in der Tabelle.
     """
-    lage = f"{erg.lage.nummer},{erg.lage.richtung.value}"
-    staebe = [e[f"phi_{erg.lage.nummer}{art.kuerzel}"] for _, art, *_ in eintraege]
+    lage = erg.lage.index
+    staebe = [e[q.name("phi")] for q in posten]
     if len(staebe) == 1:
         durchmesser = staebe[0]
     else:
@@ -219,10 +218,8 @@ class Rissnormalkraft(Nachweis):
         # Genau zwei Lagen je Richtung -- auch die leeren, denn gerade sie
         # fallen durch und sollen es sichtbar tun.
         self.lagen = [l for l in querschnitt.lagen if l.richtung is richtung]
-        self.posten_je_lage: Dict[int, List[Tuple]] = {
-            l.nummer: [e for e in querschnitt.posten_ids if e[0].nummer == l.nummer]
-            for l in self.lagen
-        }
+        self.posten_je_lage: Dict[int, List[Postenbezug]] = {
+            l.nummer: querschnitt.posten_der_lage(l) for l in self.lagen}
 
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.rissnormalkraft.{r}"
@@ -242,14 +239,9 @@ class Rissnormalkraft(Nachweis):
             Eingabebezug("b", querschnitt.id_breite(richtung)),
             Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
         ]
-        for nummer, eintraege in self.posten_je_lage.items():
-            for lage, art, _, as_id, _ in eintraege:
-                marke = f"{nummer}{art.kuerzel}"
-                bezuege += [
-                    Eingabebezug(f"a_s_{marke}", as_id),
-                    Eingabebezug(f"phi_{marke}",
-                                 querschnitt.id_von(f"lage.{marke}.phi")),
-                ]
+        for posten in self.posten_je_lage.values():
+            for q in posten:
+                bezuege += q.bezuege("a_s", "phi")
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
             kurz = kennung_aus(stahl.id)
             bezuege += [
@@ -293,17 +285,16 @@ class Rissnormalkraft(Nachweis):
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *,
                    f_ctm: float, groessen: Rissgroessen) -> Lagenergebnis:
         erg = Lagenergebnis(lage=lage)
-        eintraege = self.posten_je_lage[lage.nummer]
-        marken = [f"{lage.nummer}{art.kuerzel}" for _, art, _, _, _ in eintraege]
+        posten = self.posten_je_lage[lage.nummer]
 
-        erg.a_s = sum(e.g(f"a_s_{m}").si for m in marken)
+        erg.a_s = sum(e.g(q.name("a_s")).si for q in posten)
         if erg.a_s <= 0.0:
             erg.begruendung = self.ohne_bewehrung(lage.nummer)
             return erg
 
         # Der dickste Stab bestimmt die Rissbreite: er verteilt den Riss auf
         # die wenigsten Stäbe und bekommt damit die grösste Spannung.
-        erg.durchmesser = max(e.g(f"phi_{m}").si for m in marken)
+        erg.durchmesser = max(e.g(q.name("phi")).si for q in posten)
         kurz = kennung_aus(lage.stahl.id)
         E_s = e.g(f"E_s__{kurz}").si
         erg.sigma_s_adm = zulaessige_stahlspannung(
@@ -365,10 +356,10 @@ class Rissnormalkraft(Nachweis):
             p.text(erg.begruendung)
             return
 
-        eintraege = self.posten_je_lage[nummer]
+        posten = self.posten_je_lage[nummer]
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")
-        a_s, _ = protokoll_lage(p, e, werte, eintraege, a_s=erg.a_s)
-        sigma = _protokoll_stahlspannung(p, e, werte, erg, eintraege=eintraege,
+        a_s, _ = protokoll_lage(p, e, werte, posten, a_s=erg.a_s)
+        sigma = _protokoll_stahlspannung(p, e, werte, erg, posten=posten,
                                          anforderung=self.anforderung)
 
         v = erg.ausgang
@@ -477,10 +468,8 @@ class ZwaengungBiegung(Biegezwang):
             raise ValueError(
                 f"Querschnitt '{querschnitt.name}': in "
                 f"{richtung.beschriftung} ist keine der gewählten Lagen vorhanden.")
-        self.posten_je_lage: Dict[int, List[Tuple]] = {
-            l.nummer: [e for e in querschnitt.posten_ids if e[0].nummer == l.nummer]
-            for l in self.lagen
-        }
+        self.posten_je_lage: Dict[int, List[Postenbezug]] = {
+            l.nummer: querschnitt.posten_der_lage(l) for l in self.lagen}
 
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.zwang_biegung.{r}"
@@ -500,15 +489,9 @@ class ZwaengungBiegung(Biegezwang):
             Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
             Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
         ]
-        for nummer, eintraege in self.posten_je_lage.items():
-            for lage, art, _, as_id, z_id in eintraege:
-                marke = f"{nummer}{art.kuerzel}"
-                bezuege += [
-                    Eingabebezug(f"a_s_{marke}", as_id),
-                    Eingabebezug(f"z_{marke}", z_id),
-                    Eingabebezug(f"phi_{marke}",
-                                 querschnitt.id_von(f"lage.{marke}.phi")),
-                ]
+        for posten in self.posten_je_lage.values():
+            for q in posten:
+                bezuege += q.bezuege("a_s", "z", "phi")
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
             kurz = kennung_aus(stahl.id)
             bezuege += [
@@ -556,15 +539,14 @@ class ZwaengungBiegung(Biegezwang):
                    b: float, f_ctm: float, E_cm: float, phi: float,
                    M_Riss: Wert) -> Momentlagenergebnis:
         erg = Momentlagenergebnis(lage=lage)
-        eintraege = self.posten_je_lage[lage.nummer]
-        marken = [f"{lage.nummer}{art.kuerzel}" for _, art, _, _, _ in eintraege]
+        posten = self.posten_je_lage[lage.nummer]
 
-        erg.a_s, z, d = lage_aus_posten(e, eintraege)
+        erg.a_s, z, d = lage_aus_posten(e, posten)
         if erg.a_s <= 0.0:
             erg.begruendung = self.ohne_bewehrung(lage.nummer)
             return erg
         erg.z_s, erg.d = z, d
-        erg.durchmesser = max(e.g(f"phi_{m}").si for m in marken)
+        erg.durchmesser = max(e.g(q.name("phi")).si for q in posten)
 
         kurz = kennung_aus(lage.stahl.id)
         E_s = e.g(f"E_s__{kurz}").si
@@ -631,10 +613,10 @@ class ZwaengungBiegung(Biegezwang):
             p.text(erg.begruendung)
             return
 
-        eintraege = self.posten_je_lage[nummer]
+        posten = self.posten_je_lage[nummer]
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")
-        a_s, d = protokoll_lage(p, e, werte, eintraege, a_s=erg.a_s, z=erg.z_s, d=erg.d)
-        sigma = _protokoll_stahlspannung(p, e, werte, erg, eintraege=eintraege,
+        a_s, d = protokoll_lage(p, e, werte, posten, a_s=erg.a_s, z=erg.z_s, d=erg.d)
+        sigma = _protokoll_stahlspannung(p, e, werte, erg, posten=posten,
                                          anforderung=self.anforderung)
 
         rho = werte.laenge("rho", r"\rho", erg.rho, stellen=2)

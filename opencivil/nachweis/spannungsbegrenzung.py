@@ -413,7 +413,6 @@ class PlattenStellen(Stahlspannungsort):
         Die Staehle dieser Richtung -- je Seite einer, der Editor laesst sie
         verschieden waehlen. Jeder bekommt seine eigene Grenze.
         """
-        self.marken = [f"{lage.nummer}{art.kuerzel}" for lage, art, _, _, _ in self.posten]
         self.name = querschnitt.name
         self.abschnitt = querschnitt.abschnitt
         r = richtung.value
@@ -446,10 +445,7 @@ class PlattenStellen(Stahlspannungsort):
     def rissbreitenbezuege(self) -> List[Eingabebezug]:
         return stahlbezuege(self.posten, ("f_yk", "E_s")) + [
             Eingabebezug("f_ctm", self.querschnitt.beton.id_von("f_ctm")),
-        ] + [
-            Eingabebezug(f"dm_{m}", self.querschnitt.id_von(f"lage.{m}.phi"))
-            for m in self.marken
-        ]
+        ] + [b for q in self.posten for b in q.bezuege("phi")]
 
     def zustand(self, e: Eingaben, wahl: Rechenwahl) -> _Plattenzustand:
         w = Betonkennwerte.aus_eingaben(e, wahl.satz)
@@ -464,7 +460,7 @@ class PlattenStellen(Stahlspannungsort):
     def aus_rissbreite(self, zustand: Stahlzustand, e: Eingaben, p: Protokoll,
                        anforderung: Rissanforderung, basis: str) -> Grenzen:
         f_ctm = e.g("f_ctm").si
-        durchmesser = max(e.g(f"dm_{m}").si for m in self.marken)
+        durchmesser = max(e.g(q.name("phi")).si for q in self.posten)
         werte = Zwischenwerte(basis)
         dm = werte.laenge("dm_max", r"\varnothing_{max}", durchmesser, stellen=0)
         if anforderung.rissbreite is not None:

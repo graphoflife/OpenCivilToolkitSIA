@@ -1,5 +1,5 @@
 ---
-erzeugt: 50374e91b6d5
+erzeugt: 545d8faff82e
 art: formel
 tags: [formel]
 ---
@@ -35,7 +35,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
+- [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]
 
 ## Themen
 

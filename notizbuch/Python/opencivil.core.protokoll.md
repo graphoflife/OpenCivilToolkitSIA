@@ -1,5 +1,5 @@
 ---
-erzeugt: e796092d4a32
+erzeugt: 08743d44b0bb
 art: modul
 tags: [modul]
 ---
@@ -597,6 +597,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.analysen]]

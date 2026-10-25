@@ -314,9 +314,9 @@ def bewehrungsuebersicht(qs: Plattenquerschnitt, werte: Dict[str, Wert]) -> Tabe
     """
     strich = "–"
     tiefen: Dict[int, List[float]] = {}
-    for lage, _, _, _, z_id in qs.posten_ids:
-        if z_id in werte:
-            tiefen.setdefault(lage.nummer, []).append(werte[z_id].groesse.si)
+    for q in qs.posten:
+        if q.z_def.id in werte:
+            tiefen.setdefault(q.lage.nummer, []).append(werte[q.z_def.id].groesse.si)
 
     def hoehe(nummer: int) -> Zelle:
         zahlen = [Groesse.aus_si(qs.h.si - z, MM).formatiert(1) for z in tiefen.get(nummer, [])]

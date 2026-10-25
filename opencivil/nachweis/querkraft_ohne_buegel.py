@@ -370,7 +370,7 @@ class QuerkraftOhneBuegel(Querkraft):
         for positiv in (True, False):
             i = zuglage(lagen, positiv)
             if i is not None:
-                stahl = self.posten[i][0].stahl
+                stahl = self.posten[i].lage.stahl
                 zugstahl[positiv] = (e.g(stahlname("f_yd", stahl)).si,
                                      e.g(stahlname("E_s", stahl)).si)
 
@@ -525,7 +525,7 @@ class QuerkraftOhneBuegel(Querkraft):
         idx = self.mn.wahl.index
         m_Rd = werte.moment("m_Rd", f"m_{{{idx}}}(N_{{Ed}})", erg.m_Rd)
         eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
-        zugseite = self.posten[erg.zuglage][0].stahl
+        zugseite = self.posten[erg.zuglage].lage.stahl
         stahl = {"f_yd": e[stahlname("f_yd", zugseite)], "E_s": e[stahlname("E_s", zugseite)]}
         if erg.eps_v == 0.0:
             p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "

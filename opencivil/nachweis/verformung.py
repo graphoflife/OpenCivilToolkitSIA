@@ -50,7 +50,8 @@ from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
-from opencivil.querschnitt.platte import Richtung, lage_aus_posten, protokoll_lage
+from opencivil.querschnitt.lagenaufbau import Postenbezug, lage_aus_posten, protokoll_lage
+from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 
 #: Vorgabe der Kriechzahl phi im Vergroesserungsfaktor -- Klima und
@@ -110,9 +111,8 @@ class Vergroesserungsfaktor(Prozedur):
         posten = querschnitt.posten_in_richtung(Richtung.X)
         #: Je Seite ihre x-Posten: eine Lage, mit Grundbewehrung und Zulage --
         #: die x-Lage unten ist die 1. oder 2., die oben die 3. oder 4.
-        self.posten_je_seite: Dict[Zugseite, List[Tuple]] = {
-            seite: [eintrag for eintrag in posten if eintrag[0].seite is seite]
-            for seite in UM_Y}
+        self.posten_je_seite: Dict[Zugseite, List[Postenbezug]] = {
+            seite: [q for q in posten if q.lage.seite is seite] for seite in UM_Y}
         basis = f"{querschnitt.id}.vergroesserung"
         self.d_omega: Dict[Zugseite, WertDef] = {
             seite: WertDef(
@@ -130,10 +130,8 @@ class Vergroesserungsfaktor(Prozedur):
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(Richtung.X)),
         ]
-        for lage, art, _, as_id, z_id in posten:
-            marke = f"{lage.nummer}{art.kuerzel}"
-            bezuege += [Eingabebezug(f"a_s_{marke}", as_id),
-                        Eingabebezug(f"z_{marke}", z_id)]
+        for q in posten:
+            bezuege += q.bezuege("a_s", "z")
         super().__init__(
             basis, ausgaben=list(self.d_omega.values()), bezuege=bezuege,
             titel="Vergrösserungsfaktor der Durchbiegung",
@@ -193,7 +191,7 @@ class Vergroesserungsfaktor(Prozedur):
         Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
         Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
         Gehalt als rho'. Querschnitt, Schwerpunkt und Hoehe der Lage schreibt
-        :func:`~opencivil.querschnitt.platte.protokoll_lage`, wie in den
+        :func:`~opencivil.querschnitt.lagenaufbau.protokoll_lage`, wie in den
         Nachweisen der Lagen: dieselbe Hoehe heisst ueberall gleich, etwa
         d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
         """

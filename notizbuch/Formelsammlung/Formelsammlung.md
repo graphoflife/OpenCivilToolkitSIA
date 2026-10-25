@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e984596ba19
+erzeugt: 4f726d63fa1b
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -261,10 +261,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beton ungerissen, in Druck und Zug]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Betonstahl nur auf Zug]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
-- [[Bewehrung der Lage]] · [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
+- [[Bewehrung der Lage]] · [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]
 - [[Bewehrungsgehalt]] · [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]]
 - [[Bewehrungsmass des gezeichneten Querschnitts]] · [[opencivil.nachweis.qa_kennzahlen#KennzahlenQA|KennzahlenQA._bewehrungsmass]]
-- [[Bewehrungsmass je Kubikmeter Beton]] · [[opencivil.querschnitt.platte#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
+- [[Bewehrungsmass je Kubikmeter Beton]] · [[opencivil.querschnitt.lagenaufbau#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
 - [[Bewehrungsquerschnitt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
 - [[Bezogene Druckzonenhöhe bei reiner Biegung]] · [[opencivil.nachweis.richtungsnachweise#DuktilitaetQA.pruefe|DuktilitaetQA.pruefe]]
 - [[Bezugsgrösse der Normalkraft]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
@@ -312,7 +312,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Grösste Dehnung im Schwerpunkt]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_dehnung_am_ende|Schnittpaar.herleitung_dehnung_am_ende]]
 - [[Grösste Krümmung]] · [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
 - [[Hilfsgrösse der Nulllinie]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_lage]]
-- [[Höhe der Distanzhalter]] · [[opencivil.querschnitt.platte#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
+- [[Höhe der Distanzhalter]] · [[opencivil.querschnitt.lagenaufbau#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
 - [[Innerer Hebelarm]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_lage]]
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Kräftegleichgewicht]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
@@ -335,13 +335,13 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Schnittgrössen aus der Spannungsverteilung]] · [[opencivil.nachweis.resistenzlinie#Ebenenlinie.protokoll_ansatz|Ebenenlinie.protokoll_ansatz]]
 - [[Schnittgrössen längs eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
-- [[Schwerpunkt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]], [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
+- [[Schwerpunkt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]], [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]
 - [[Schwerpunkt eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Spannung im ungerissenen Querschnitt]] · [[opencivil.nachweis.rissgroessen#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
 - [[Spannungsblock des Betons]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Stahlspannung, höchstens die Fliessgrenze]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
-- [[Statische Höhe]] · [[opencivil.querschnitt.platte#protokoll_statische_hoehe|protokoll_statische_hoehe]]
+- [[Statische Höhe]] · [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]
 - [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]

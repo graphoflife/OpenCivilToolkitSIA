@@ -48,7 +48,7 @@ muss.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Sequence, Tuple
+from typing import Dict, List, Sequence
 
 from opencivil.core.berechnung import (
     NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Fallbefund,
@@ -60,9 +60,8 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
-from opencivil.querschnitt.platte import (
-    Bewehrungslage, Richtung, lage_aus_posten, protokoll_lage,
-)
+from opencivil.querschnitt.lagenaufbau import Postenbezug, lage_aus_posten, protokoll_lage
+from opencivil.querschnitt.platte import Bewehrungslage
 
 #: Groesste zulaessige bezogene Druckzonenhoehe -- die Vorgabe.
 GRENZE = 0.35
@@ -155,11 +154,8 @@ class Duktilitaet(Nachweis):
         self.lagen = [l for l in querschnitt.lagen if l.nummer in gewaehlt]
 
         # Je Lage ihre Posten -- Grundbewehrung und Zulage, soweit vorhanden.
-        self.posten_je_lage: Dict[int, List[Tuple]] = {
-            l.nummer: [eintrag for eintrag in querschnitt.posten_ids
-                       if eintrag[0].nummer == l.nummer]
-            for l in self.lagen
-        }
+        self.posten_je_lage: Dict[int, List[Postenbezug]] = {
+            l.nummer: querschnitt.posten_der_lage(l) for l in self.lagen}
 
         basis = f"{querschnitt.id}.nachweis.duktilitaet"
         self.d_ausnutzung: Dict[int, WertDef] = {
@@ -193,13 +189,9 @@ class Duktilitaet(Nachweis):
             Eingabebezug("b_y", querschnitt.id_von("b_y")),
             Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
         ]
-        for nummer, eintraege in self.posten_je_lage.items():
-            for lage, art, _, as_id, z_id in eintraege:
-                marke = f"{nummer}{art.kuerzel}"
-                bezuege += [
-                    Eingabebezug(f"a_s_{marke}", as_id),
-                    Eingabebezug(f"z_{marke}", z_id),
-                ]
+        for posten in self.posten_je_lage.values():
+            for q in posten:
+                bezuege += q.bezuege("a_s", "z")
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
             bezuege.append(
                 Eingabebezug(f"f_yd__{kennung_aus(stahl.id)}", stahl.id_von("f_yd")))
@@ -230,7 +222,7 @@ class Duktilitaet(Nachweis):
 
         for lage in self.lagen:
             # Die Breite in der Richtung der Lage.
-            breite = "b" if lage.richtung is Richtung.X else "b_y"
+            breite = lage.richtung.breite
             erg = self._eine_lage(e, lage, b=e.g(breite).si, f_cd=f_cd)
             befund.ergebnisse.append(erg)
             self._protokoll_lage(p, e, erg, breite)

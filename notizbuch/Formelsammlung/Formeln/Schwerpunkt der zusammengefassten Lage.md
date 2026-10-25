@@ -1,5 +1,5 @@
 ---
-erzeugt: 14cc911f97cd
+erzeugt: 400d6ed67d2b
 art: formel
 tags: [formel]
 ---
@@ -40,7 +40,7 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
-- [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
+- [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]
 
 ## Themen
 

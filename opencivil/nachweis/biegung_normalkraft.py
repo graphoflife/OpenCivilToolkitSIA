@@ -68,9 +68,7 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.nachweis.resistenzlinie import (
     Ebenenlinie, Handlinie, Treffer, Widerstandslinie,
 )
-from opencivil.querschnitt.platte import (
-    Plattenquerschnitt, Richtung, posten_index,
-)
+from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 
 
 class Erfuellungsart(Wahl):
@@ -699,10 +697,9 @@ def resistenzlinie(
         # siehe lagen_zusammenfassen().
         seiten = lagen_zusammenfassen([
             HandPosten(a_s=l.a_s, z=l.z, f_yd=l.stahl.f_yd, E_s=l.stahl.E_s, text=l.text,
-                       index=posten_index(lage, art),
-                       stahl_index=lage.stahl.symbol_index,
-                       von_unten=lage.von_unten, satz=satz)
-            for l, (lage, art, *_) in zip(lagen, posten)
+                       index=q.index, stahl_index=q.lage.stahl.symbol_index,
+                       von_unten=q.lage.von_unten, satz=satz)
+            for l, q in zip(lagen, posten)
         ])
         handrechnung = Handrechnung(
             h=h, b=b, f_cd=f_c, eps_c2d=eps_c2d,

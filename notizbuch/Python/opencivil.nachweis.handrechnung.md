@@ -1,5 +1,5 @@
 ---
-erzeugt: d79d790ab752
+erzeugt: 4f31b0717b7e
 art: modul
 tags: [modul]
 ---
@@ -319,7 +319,7 @@ Schwerpunkts fiel still aus, weil sie `len(teile) > 1` verlangt.
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.querschnitt.gesetzwahl]]
-- [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]
 

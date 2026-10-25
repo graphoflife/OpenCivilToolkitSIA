@@ -1,5 +1,5 @@
 ---
-erzeugt: 840940da98e2
+erzeugt: c13b571fb495
 art: formel
 tags: [formel]
 ---
@@ -58,7 +58,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.platte#protokoll_statische_hoehe|protokoll_statische_hoehe]]
+- [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]
 
 ## Themen
 

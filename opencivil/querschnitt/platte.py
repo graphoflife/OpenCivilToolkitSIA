@@ -3,7 +3,9 @@ opencivil/querschnitt/platte.py -- Stahlbeton-Plattenquerschnitt.
 
 VERANTWORTUNG:
 Beschreibt die Geometrie einer Platte und erzeugt daraus die Berechnungen fuer
-Bewehrungsquerschnitte und statische Hoehen.
+Bewehrungsquerschnitte und statische Hoehen. Wie der Lagenaufbau Tiefe und
+Querschnitt je Posten rechnet und wie ein Posten zu den Nachweisen reist,
+steht in :mod:`opencivil.querschnitt.lagenaufbau`.
 
 AUFBAU -- VIER LAGEN:
 Eine Platte hat vier Bewehrungslagen, von unten nach oben durchgezaehlt::
@@ -27,9 +29,10 @@ Deshalb liefert :meth:`Plattenquerschnitt.lagen_in_richtung` die Lagen je
 Richtung, und der Nachweis wird je Richtung eigens gefuehrt.
 
 Z-ACHSE:
-``z`` wird von der Oberkante nach unten gemessen, 0 <= z <= h. Die statische
-Hoehe einer Bewehrung ist ihr ``z``. Damit gilt fuer alle Lagen dieselbe
-Rechnung, und die Interaktionsrechnung braucht keine Sonderfaelle.
+``z`` wird von der Oberkante nach unten gemessen, 0 <= z <= h. Damit gilt fuer
+alle Lagen dieselbe Rechnung, und die Interaktionsrechnung braucht keine
+Sonderfaelle. Die statische Hoehe einer unteren Lage ist ihr ``z``, die einer
+oberen ``h - z`` (:func:`~opencivil.querschnitt.lagenaufbau.statische_hoehe`).
 """
 
 from __future__ import annotations
@@ -37,20 +40,18 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
-from opencivil.core.berechnung import (
-    Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
-)
+from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel, Vorgabe
 from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KG_PRO_M3, MM, MM2, Groesse,
 )
-from opencivil.core.latex import Mathe
-from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
+from opencivil.core.protokoll import Abschnitt
 from opencivil.core.wahl import Wahl
-from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
+from opencivil.core.wert import Kennzahl, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 from opencivil.material.betonstahl import STAHLDICHTE
+from opencivil.querschnitt.lagenaufbau import Lagenaufbau, Postenbezug
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je
@@ -77,6 +78,14 @@ class Richtung(Wahl):
     @property
     def beschriftung(self) -> str:
         return "x-Richtung" if self is Richtung.X else "y-Richtung"
+
+    @property
+    def breite(self) -> str:
+        """
+        Der Name der Breite, je die in dieser Richtung gerechnet wird: ``b``
+        in x, ``b_y`` in y -- in y stets je Laufmeter (:data:`BREITE_Y_MM`).
+        """
+        return "b" if self is Richtung.X else "b_y"
 
 
 class Postenart(str, Enum):
@@ -211,6 +220,11 @@ class Bewehrungslage:
     def beschriftung(self) -> str:
         return f"{self.nummer}. Lage ({self.seite.value}, {self.richtung.beschriftung})"
 
+    @property
+    def index(self) -> str:
+        """Der Symbolindex der Lage, z.B. ``1,x`` -- der eines Postens haengt die Art an."""
+        return f"{self.nummer},{self.richtung.value}"
+
 
 #: Vorgabe fuer die Neigung der Druckdiagonalen, in Grad.
 ALPHA_MIN = 30
@@ -297,7 +311,7 @@ def druckfeldgrenzen(alpha_min: int, alpha_max: int, zugkraft: bool) -> Tuple[in
 
 
 # ===========================================================================
-# Lagenaufbau
+# Plattenquerschnitt
 # ===========================================================================
 
 
@@ -310,363 +324,6 @@ UEBERDECKUNGEN = "Überdeckungen"
 
 def _abmessungen(beton_name: str) -> str:
     return f"Abmessungen – Beton {beton_name}" if beton_name else "Abmessungen"
-
-
-def posten_index(lage: "Bewehrungslage", art: Postenart) -> str:
-    """
-    Der Symbolindex eines Bewehrungspostens, z.B. ``1,x,g``.
-
-    Lage, Richtung, Art -- in dieser Reihenfolge, und immer alle drei. Damit ist
-    jedes Symbol eindeutig, auch wenn zwei Lagen dieselbe Richtung tragen.
-
-    Steht hier und nirgends sonst: die Handrechnung braucht denselben Index für
-    ihre zusammengefassten Lagen, und zwei Stellen mit derselben Formel laufen
-    früher oder später auseinander.
-    """
-    return f"{lage.nummer},{lage.richtung.value},{art.kuerzel}"
-
-
-def lagenindex(eintraege: Sequence[Tuple]) -> str:
-    """
-    Der Symbolindex einer Lage aus ihren Posten -- ``1,x`` statt ``1,x,g``.
-
-    Gerechnet wird mit der ganzen Lage, nicht mit einem Posten; ein
-    Postenindex am Symbol behauptete etwas anderes. Hat die Lage nur einen
-    Posten, ist dessen Index auch ihrer -- dann heisst ``A_s`` so wie in der
-    Tabelle der Platte. ``eintraege`` sind Zeilen aus ``posten_ids``.
-    """
-    if not eintraege:
-        return ""
-    lage, art, *_ = eintraege[0]
-    if len(eintraege) == 1:
-        return posten_index(lage, art)
-    return f"{lage.nummer},{lage.richtung.value}"
-
-
-def statische_hoehe(z: float, h: float, seite: Zugseite) -> float:
-    """
-    Die statische Hoehe einer Lage in der Tiefe ``z`` unter der Oberkante,
-    gemessen ab dem gedrueckten Rand: unten ``d = z``, oben ``d = h - z`` --
-    die Zahl zur Zeile von :func:`protokoll_statische_hoehe`. Wer ``z``
-    stehen liesse, bekaeme bei den oberen Lagen eine Zahl, die keine
-    statische Hoehe ist.
-    """
-    return z if seite is Zugseite.UNTEN else h - z
-
-
-def lage_aus_posten(
-    e: Eingaben, eintraege: Sequence[Tuple],
-) -> Tuple[float, Optional[float], Optional[float]]:
-    """
-    Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe einer Lage aus
-    ihren Posten -- die Zahlen, die :func:`protokoll_lage` herleitet.
-    Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen, gehoeren
-    aber zur selben Lage: es zaehlt ihr gemeinsamer Schwerpunkt. Ohne Stahl
-    gibt es weder Schwerpunkt noch Hoehe, beide ``None``. Bis 2026-10-18
-    rechneten drei Nachweise das je fuer sich.
-    """
-    flaechen = [(e.g(f"a_s_{lage.nummer}{art.kuerzel}").si,
-                 e.g(f"z_{lage.nummer}{art.kuerzel}").si)
-                for lage, art, *_ in eintraege]
-    a_s = sum(a for a, _ in flaechen)
-    if a_s <= 0.0:
-        return a_s, None, None
-    z = sum(a * t for a, t in flaechen) / a_s
-    return a_s, z, statische_hoehe(z, e.g("h").si, eintraege[0][0].seite)
-
-
-def protokoll_lage(
-    p: Protokoll, e: Eingaben, werte: Zwischenwerte, eintraege: Sequence[Tuple],
-    *, a_s: float, z: Optional[float] = None, d: float = 0.0,
-) -> Tuple[Wert, Optional[Wert]]:
-    """
-    Querschnitt und statische Hoehe einer Lage, aus ihren Posten hergeleitet.
-
-    ``eintraege`` sind die Zeilen der Lage aus ``posten_ids``; die Eingaben
-    der Posten heissen ``a_s_<marke>`` und ``z_<marke>`` (Tiefe ab
-    Oberkante), die Dicke ``h``. Liegen Grundbewehrung und Zulage in der Lage,
-    stehen Summe und gemeinsamer Schwerpunkt da -- sonst fiele der
-    Schwerpunkt vom Himmel. Ohne ``z`` nur der Querschnitt. Zurueck kommen
-    ``A_s`` und ``d`` fuer die Formeln danach.
-    """
-    lage = eintraege[0][0]
-    index = lagenindex(eintraege)
-    marken = [f"{lage.nummer}{art.kuerzel}" for _, art, *_ in eintraege]
-    eingaben = {f"a{i}": e[f"a_s_{m}"] for i, m in enumerate(marken)}
-    summe = " + ".join(f"@{name}" for name in eingaben)
-    flaeche = werte.flaeche("A_s", f"A_{{s,{index}}}", a_s)
-    if len(marken) > 1:
-        p.formel(flaeche, summe, eingaben, titel="Bewehrung der Lage")
-    if z is None:
-        return flaeche, None
-
-    if len(marken) > 1:
-        tiefe = werte.laenge("z", f"z_{{{index}}}", z)
-        eingaben.update({f"z{i}": e[f"z_{m}"] for i, m in enumerate(marken)})
-        momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(marken)))
-        p.formel(tiefe, rf"\frac{{{momente}}}{{{summe}}}", eingaben,
-                 titel="Gemeinsamer Schwerpunkt der Lage",
-                 name="Schwerpunkt der zusammengefassten Lage")
-    else:
-        tiefe = e[f"z_{marken[0]}"]
-    hoehe = werte.laenge("d", f"d_{{{index}}}", d)
-    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=tiefe, seite=lage.seite)
-    return flaeche, hoehe
-
-
-def protokoll_statische_hoehe(
-    p: Protokoll, d: Wert, *, h: Wert, z: Wert, seite: Zugseite,
-) -> None:
-    """
-    Die statische Hoehe einer gezogenen Lage, gemessen ab dem gedrueckten Rand.
-
-    Eine untere Lage misst ab der Oberkante, ``d = z``; eine obere ab der
-    Unterkante, ``d = h - z``. Mehrere Nachweise brauchen diese Zeile -- steht
-    sie an einer Stelle, sagt «unten» in allen dasselbe.
-    """
-    rand, gezogen = seite.raender
-    vorlage, eingaben = (("@z", {"z": z}) if seite is Zugseite.UNTEN
-                         else ("@h - @z", {"h": h, "z": z}))
-    p.formel(d, vorlage, eingaben,
-             titel=f"Statische Höhe der Lage {gezogen}, ab dem gedrückten Rand {rand}",
-             name="Statische Höhe")
-
-
-@dataclass(frozen=True)
-class Postenbezug:
-    """Ein Bewehrungsposten samt der Werte, die der Lagenaufbau fuer ihn liefert."""
-
-    lage: Bewehrungslage
-    art: Postenart
-    posten: Bewehrungsposten
-    marke: str
-    """Kurzform fuer die Eingabenamen, z.B. ``1g``."""
-
-    z_def: WertDef
-    as_def: WertDef
-
-
-class Lagenaufbau(Prozedur):
-    """
-    Bestimmt statische Hoehe und Bewehrungsquerschnitt aller Posten.
-
-    Beides in einem Zug und in einer Tabelle. Frueher stand fuer jeden Posten
-    eine eigene Flaechenformel in der Herleitung -- fuenf Lagen ergaben fuenf
-    gleich aussehende Bloecke, in denen sich nur die Zahlen unterschieden. Die
-    Formel steht jetzt einmal da, die Ergebnisse stehen in der Tabelle.
-
-    STAPELUNG:
-    Die Lagen werden je Seite von aussen nach innen gestapelt. Die Huelle einer
-    Lage beginnt bei der Ueberdeckung und waechst um den groessten Durchmesser
-    der davorliegenden Lage. ``d`` wird von der gezogenen Randfaser aus
-    gemessen -- bei den unteren Lagen von der Unterkante, bei den oberen von
-    der Oberkante.
-
-    Wie Grundbewehrung und Zulage innerhalb einer Lage zueinander liegen, sagt
-    :attr:`Bewehrungslage.unguenstig`.
-    """
-
-    def __init__(
-        self,
-        id: str,
-        *,
-        ausgaben: Sequence[WertDef],
-        bezuege: Sequence[Eingabebezug],
-        posten: Sequence["Postenbezug"],
-        d_bewehrungsmass: WertDef,
-        d_distanzhalter: WertDef,
-        titel: str = "Bewehrungslagen",
-        abschnitt: Optional[Abschnitt] = None,
-    ) -> None:
-        super().__init__(id, ausgaben=ausgaben, bezuege=bezuege, titel=titel,
-                         referenz="SIA 262:2025, 5.2.2", abschnitt=abschnitt)
-        self.posten = list(posten)
-        self.d_bewehrungsmass = d_bewehrungsmass
-        self.d_distanzhalter = d_distanzhalter
-
-    def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
-        h = e.g("h")
-        b = e.g("b")
-        b_y = e.g("b_y")
-        # Die Teilung einer y-Lage ist auf den Laufmeter bezogen, die einer
-        # x-Lage auf die eingegebene Breite. Wer hier eine einzige Breite
-        # nimmt, rechnet bei b != 1000 mm die halbe oder doppelte y-Bewehrung.
-        breite_von = lambda r: b if r is Richtung.X else b_y
-        breiten: Dict[str, Groesse] = {}
-        # Ohne erklaerende Vorrede: die Lagentabelle zeigt Randabstand und Tiefe
-        # je Posten, und wie beides zustande kommt, steht in der Klassendoku.
-        ueber_abstand = any(q.posten.ueber_abstand for q in self.posten)
-        ueber_anzahl = any(not q.posten.ueber_abstand for q in self.posten)
-        # Nur wenn alle Posten dieselbe Art der Mengenangabe verwenden, darf die
-        # Grösse in die Kopfzeile. Sonst muss sie in jeder Zelle stehen.
-        einheitlich = not (ueber_abstand and ueber_anzahl)
-        if ueber_abstand:
-            p.ansatz(
-                r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}",
-                titel="Bewehrungsquerschnitt über die Breite b",
-                referenz="SIA 262:2025, 5.5.2")
-        if ueber_anzahl:
-            p.ansatz(
-                r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot n",
-                titel="Bewehrungsquerschnitt aus der Stabzahl",
-                referenz="SIA 262:2025, 5.5.2")
-
-        # Huellen je Seite, von aussen nach innen. Jede Lage kommt nur einmal
-        # vor, auch wenn sie zwei Posten traegt -- nach Nummer entdoppelt, weil
-        # Bewehrungslage als veraenderliche Datenklasse nicht hashbar ist.
-        huelle = {True: e.g("c_nom_unten"), False: e.g("c_nom_oben")}
-        lagen_nach_nummer = {q.lage.nummer: q.lage for q in self.posten}
-        raender: Dict[Tuple[bool, int], Groesse] = {}
-        for lage in sorted(lagen_nach_nummer.values(),
-                           key=lambda l: (not l.von_unten, l.stapelrang)):
-            schluessel = (lage.von_unten, lage.stapelrang)
-            raender[schluessel] = huelle[lage.von_unten]
-            huelle[lage.von_unten] = huelle[lage.von_unten] + lage.groesster_durchmesser
-
-        # Der dickste Stab je Lage bestimmt, wo die innere Kante liegt.
-        dickster: Dict[int, Groesse] = {}
-        for q in self.posten:
-            phi = e.g(f"phi_{q.marke}")
-            vorher = dickster.get(q.lage.nummer)
-            if vorher is None or phi.si > vorher.si:
-                dickster[q.lage.nummer] = phi
-
-        # Die Breite je Zeile nur, wo sie sich unterscheidet: x gilt je b, y
-        # je Laufmeter. Bei b = 1000 mm stuende in jeder Zeile dieselbe Zahl.
-        mit_breite = len({breite_von(q.lage.richtung).si for q in self.posten}) > 1
-
-        ergebnis: Dict[str, Groesse] = {}
-        zeilen: List[List[str]] = []
-        #: Je Lagennummer die Ober- und Unterkante des Stahls, in m ab Oberkante.
-        kanten: Dict[int, Tuple[float, float]] = {}
-        for q in self.posten:
-            phi = e.g(f"phi_{q.marke}")
-            huellebene = raender[(q.lage.von_unten, q.lage.stapelrang)]
-            if q.lage.unguenstig:
-                # Innere Kanten fluchten: der dünnere Stab rückt zur Mitte.
-                rand = huellebene + dickster[q.lage.nummer] - phi / 2.0
-            else:
-                # Äussere Kanten fluchten, jeder um seinen eigenen Halbmesser.
-                rand = huellebene + phi / 2.0
-            z = h - rand if q.lage.von_unten else rand
-
-            oben, unten = z.si - phi.si / 2.0, z.si + phi.si / 2.0
-            vorher = kanten.get(q.lage.nummer)
-            kanten[q.lage.nummer] = (
-                (min(oben, vorher[0]), max(unten, vorher[1])) if vorher
-                else (oben, unten))
-
-            b_q = breite_von(q.lage.richtung)
-            breiten[q.as_def.id] = b_q
-            if q.posten.ueber_abstand:
-                s = e.g(f"s_{q.marke}")
-                a_s = Groesse.aus_si(
-                    math.pi * phi.si * phi.si / 4.0 * (b_q.si / s.si), MM2)
-                # Bei gemischter Angabe muss in jeder Zelle stehen, um welche
-                # Grösse es geht -- sonst liest man 150 und 7 in derselben
-                # Spalte und weiss nicht, was gemeint ist.
-                menge = Mathe(s.formatiert(0, MM) if einheitlich
-                              else rf"s = {s.als_latex(0, MM)}")
-            else:
-                anzahl = float(q.posten.anzahl)
-                a_s = Groesse.aus_si(math.pi * phi.si * phi.si / 4.0 * anzahl, MM2)
-                menge = Mathe(f"{anzahl:g}" if einheitlich else f"n = {anzahl:g}")
-
-            ergebnis[q.z_def.id] = z
-            ergebnis[q.as_def.id] = a_s
-            zeilen.append([
-                f"{q.lage.nummer}. Lage {q.art.beschriftung}",
-                q.lage.richtung.value,
-                q.lage.stahl.name if q.lage.stahl else "–",
-                Mathe(phi.formatiert(0, MM)),
-                menge,
-                *([Mathe(b_q.formatiert(0, MM))] if mit_breite else []),
-                Mathe(rand.formatiert(1, MM)),
-                Mathe(z.formatiert(1, MM)),
-                Mathe(a_s.formatiert(0, MM2)),
-            ])
-
-        ergebnis.update(self._kennzahlen(p, e, h, b, ergebnis, kanten, breiten))
-
-        if not einheitlich:
-            mengenkopf = "Menge"
-        elif ueber_abstand:
-            mengenkopf = Mathe(r"s\ [\mathrm{mm}]")
-        else:
-            mengenkopf = Mathe("n")
-
-        kopf = ["Bewehrung", "Richtung", "Stahl",
-                Mathe(r"\varnothing\ [\mathrm{mm}]"), mengenkopf,
-                *([Mathe(r"b\ [\mathrm{mm}]")] if mit_breite else []),
-                "Randabstand [mm]",
-                Mathe(r"z\ [\mathrm{mm}]"), Mathe(r"A_s\ [\mathrm{mm}^2]")]
-        p.tabelle(
-            kopf=kopf,
-            zeilen=zeilen,
-            titel="Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte",
-            ausrichtung="lll" + "r" * (len(kopf) - 3),
-        )
-        return ergebnis
-
-    def _kennzahlen(
-        self, p: Protokoll, e: Eingaben, h: Groesse, b: Groesse,
-        flaechen: Mapping[str, Groesse], kanten: Mapping[int, Tuple[float, float]],
-        breiten: Mapping[str, Groesse],
-    ) -> Dict[str, Groesse]:
-        """
-        Bewehrungsmass und Hoehe der Distanzhalter.
-
-        Beides sind Angaben fuer die Ausfuehrung, keine Nachweisgroessen -- sie
-        gehoeren aber in den Kern und nicht in die Oberflaeche, damit sie in der
-        Herleitung stehen und sich zurueckverfolgen lassen.
-        """
-        ergebnis: Dict[str, Groesse] = {}
-        werte = Zwischenwerte(self.id)
-
-        # Auf b bezogen: eine y-Lage steht je Laufmeter da, eine x-Lage je b.
-        # Das Verhaeltnis b/b_q rechnet sie auf denselben Streifen um; sind alle
-        # Breiten gleich, ist es die schlichte Summe.
-        a_s_gesamt = sum(
-            (flaechen[q.as_def.id].si * (b.si / breiten[q.as_def.id].si)
-             for q in self.posten), 0.0)
-        # Stahlvolumen je Betonvolumen: A_s * L * rho / (b * L * h) -- die Laenge
-        # kuerzt sich heraus.
-        mass = a_s_gesamt * STAHLDICHTE / (b.si * h.si)
-        ergebnis[self.d_bewehrungsmass.id] = Groesse(mass, KG_PRO_M3)
-        p.formel(
-            self.d_bewehrungsmass.belegen(Groesse(mass, KG_PRO_M3)),
-            rf"\frac{{@A_s \cdot {STAHLDICHTE:g}\,\mathrm{{kg}}/\mathrm{{m}}^{{3}}}}"
-            rf"{{@b \cdot @h}}",
-            {"A_s": werte.flaeche("A_s_gesamt", "A_{s,tot}", a_s_gesamt),
-             "b": e["b"], "h": e["h"]},
-            titel="Bewehrungsmass je Kubikmeter Beton",
-        )
-
-        # Die Distanzhalter stehen zwischen der innersten unteren und der
-        # innersten oberen Lage. Fehlt die innere, gilt die aeussere.
-        unten = kanten.get(2) or kanten.get(1)
-        oben = kanten.get(3) or kanten.get(4)
-        if unten is None or oben is None:
-            # Eine deklarierte Ausgabe muss immer entstehen, sonst bricht der
-            # Loeser ab. Ohne Bewehrung auf beiden Seiten gibt es nichts
-            # abzustuetzen -- null ist hier die richtige Antwort, nicht "fehlt".
-            ergebnis[self.d_distanzhalter.id] = Groesse(0, MM)
-            p.text("Bewehrung nur auf einer Seite → keine Distanzhalter.")
-            return ergebnis
-
-        hoehe = unten[0] - oben[1]
-        ergebnis[self.d_distanzhalter.id] = Groesse.aus_si(hoehe, MM)
-        p.formel(
-            self.d_distanzhalter.belegen(Groesse.aus_si(hoehe, MM)), "@OK - @UK",
-            {"OK": werte.laenge("OK", r"\text{OK innere untere Lage}", unten[0]),
-             "UK": werte.laenge("UK", r"\text{UK innere obere Lage}", oben[1])},
-            titel="Höhe der Distanzhalter")
-        return ergebnis
-
-
-# ===========================================================================
-# Plattenquerschnitt
-# ===========================================================================
 
 
 @dataclass
@@ -701,10 +358,8 @@ class Plattenquerschnitt:
 
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
     berechnungen: List[Berechnung] = field(default_factory=list, init=False)
-    posten_ids: List[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, str, str]] = field(
-        default_factory=list, init=False
-    )
-    """Je vorhandenem Posten: (Lage, Art, Posten, ID der Fläche, ID von z)."""
+    posten: List[Postenbezug] = field(default_factory=list, init=False)
+    """Die vorhandenen Posten, von der 1. Lage an, je Lage erst die Grundbewehrung."""
 
     def __post_init__(self) -> None:
         if len(self.lagen) != LAGENZAHL:
@@ -753,15 +408,17 @@ class Plattenquerschnitt:
         laesst, bekommt bei b != 1000 mm in y einen Widerstand, der zur
         eingegebenen Bewehrung nicht passt.
         """
-        return self.id_von("b" if richtung is Richtung.X else "b_y")
+        return self.id_von(richtung.breite)
 
     def lagen_in_richtung(self, richtung: Richtung) -> List[Bewehrungslage]:
         return [l for l in self.lagen if l.richtung is richtung and l.vorhanden]
 
-    def posten_in_richtung(
-        self, richtung: Richtung
-    ) -> List[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, str, str]]:
-        return [e for e in self.posten_ids if e[0].richtung is richtung]
+    def posten_in_richtung(self, richtung: Richtung) -> List[Postenbezug]:
+        return [q for q in self.posten if q.lage.richtung is richtung]
+
+    def posten_der_lage(self, lage: Bewehrungslage) -> List[Postenbezug]:
+        """Grundbewehrung und Zulage der Lage, soweit vorhanden."""
+        return [q for q in self.posten if q.lage.nummer == lage.nummer]
 
     @property
     def richtungen_mit_bewehrung(self) -> List[Richtung]:
@@ -770,8 +427,8 @@ class Plattenquerschnitt:
     @property
     def staehle(self) -> List[Baustoff]:
         gesehen: Dict[str, Baustoff] = {}
-        for lage, _, _, _, _ in self.posten_ids:
-            gesehen.setdefault(lage.stahl.id, lage.stahl)
+        for q in self.posten:
+            gesehen.setdefault(q.lage.stahl.id, q.lage.stahl)
         return list(gesehen.values())
 
     def ins_rechenwerk(self, werk) -> "Plattenquerschnitt":
@@ -856,7 +513,6 @@ class Plattenquerschnitt:
         ]
 
         aufbau_ausgaben: List[WertDef] = [self.d_bewehrungsmass, self.d_distanzhalter]
-        aufbau_posten: List[Postenbezug] = []
         aufbau_bezuege = [
             Eingabebezug("h", d_h.id),
             Eingabebezug("b", d_b.id),
@@ -870,7 +526,7 @@ class Plattenquerschnitt:
                 if not posten.vorhanden:
                     continue
                 marke = f"{lage.nummer}{art.kuerzel}"
-                index = posten_index(lage, art)
+                index = f"{lage.index},{art.kuerzel}"
                 bezeichnung = f"{lage.nummer}. Lage {art.beschriftung}"
 
                 # Durchmesser und Teilung stehen in der Lagentabelle, Spalte
@@ -884,7 +540,6 @@ class Plattenquerschnitt:
                     Vorgabe(id=f"{self.id}.lage.{marke}.phi", ausgabe=d_phi,
                             groesse=posten.durchmesser, abschnitt=abschnitt,
                             stumm=True))
-                aufbau_bezuege.append(Eingabebezug(f"phi_{marke}", d_phi.id))
 
                 if posten.ueber_abstand:
                     d_s = self._def(f"lage.{marke}.s", f"s_{{{index}}}", MM,
@@ -893,7 +548,6 @@ class Plattenquerschnitt:
                         Vorgabe(id=f"{self.id}.lage.{marke}.s", ausgabe=d_s,
                                 groesse=posten.abstand, abschnitt=abschnitt,
                                 stumm=True))
-                    aufbau_bezuege.append(Eingabebezug(f"s_{marke}", d_s.id))
 
                 d_as = self._def(
                     f"lage.{marke}.a_s", f"A_{{s,{index}}}", MM2,
@@ -906,16 +560,20 @@ class Plattenquerschnitt:
                     f"lage.{marke}.z", f"z_{{{index}}}", MM,
                     f"Tiefe {bezeichnung} ab Oberkante", 1)
 
+                q = Postenbezug(lage, art, posten, marke=marke, index=index,
+                                bezeichnung=bezeichnung, phi_def=d_phi, as_def=d_as, z_def=d_z)
+                aufbau_bezuege += q.bezuege("phi")
+                if posten.ueber_abstand:
+                    aufbau_bezuege.append(Eingabebezug(q.name("s"), d_s.id))
                 aufbau_ausgaben += [d_z, d_as]
-                aufbau_posten.append(Postenbezug(lage, art, posten, marke, d_z, d_as))
-                self.posten_ids.append((lage, art, posten, d_as.id, d_z.id))
+                self.posten.append(q)
 
         self.berechnungen.append(
             Lagenaufbau(
                 id=f"{self.id}.lagenaufbau",
                 ausgaben=aufbau_ausgaben,
                 bezuege=aufbau_bezuege,
-                posten=aufbau_posten,
+                posten=self.posten,
                 d_bewehrungsmass=self.d_bewehrungsmass,
                 d_distanzhalter=self.d_distanzhalter,
                 abschnitt=abschnitt,
@@ -1000,4 +658,4 @@ class Plattenquerschnitt:
 
     def __repr__(self) -> str:
         return (f"Plattenquerschnitt({self.name!r}, h={self.h}, b={self.b}, "
-                f"{len(self.posten_ids)} Bewehrungsposten)")
+                f"{len(self.posten)} Bewehrungsposten)")

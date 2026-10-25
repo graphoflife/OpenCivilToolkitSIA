@@ -44,6 +44,23 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Platte: ein Bewehrungsposten in einer Gestalt
+
+Rest von Befund 1 der Strukturdurchsicht: Ein Bewehrungsposten der Platte
+reiste als Tupel `(Lage, Art, Posten, ID von A_s, ID von z)` und wurde rund
+zwanzigmal nach Stelle zerlegt. Seine Marke «1g» entstand an neun Stellen
+neu, die Breite je Richtung (b oder b_y) an drei, die Bezeichnung «1. Lage
+Grundbewehrung» an drei. Jetzt reist er als `Postenbezug`, mit Marke,
+Index, Bezeichnung und seinen Werten; unter welchem Namen ein Nachweis
+diese liest, sagt er selbst (`name`, `bezuege`). Die Breite je Richtung
+sagt `Richtung.breite`, den Index einer Lage `Bewehrungslage.index`.
+
+Der Lagenaufbau und die Helfer für die Posten einer Lage zogen dafür in
+ein eigenes Modul, `querschnitt/lagenaufbau.py`; `platte.py` sinkt von
+1003 auf 661 Zeilen. Für den Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Schubwand: der Bügelgehalt an einer Stelle
 
 Aus der Strukturdurchsicht: den Bügelquerschnitt einer Schubwand je Länge,

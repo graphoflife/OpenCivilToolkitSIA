@@ -1,5 +1,5 @@
 ---
-erzeugt: 04bf54620d02
+erzeugt: e138f13d6573
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 5.5.2"
@@ -13,7 +13,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.platte#Lagenaufbau.rechne|Lagenaufbau.rechne]]
+- [[opencivil.querschnitt.lagenaufbau#Lagenaufbau.rechne|Lagenaufbau.rechne]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 2e1d909e415c
+erzeugt: f43a6608e0c2
 art: modul
 tags: [modul]
 ---
@@ -84,7 +84,7 @@ Werte in der Herleitung der Baustoffe erscheinen.
 ### staehle
 
 ```python
-def staehle(posten) -> List
+def staehle(posten: Sequence[Postenbezug]) -> List
 ```
 
 Die Staehle der Posten, jeder einmal, in der Reihenfolge der Posten.
@@ -100,7 +100,7 @@ Der Name, unter dem ein Kennwert dieses Stahls eingeht: `E_s__s1`.
 ### stahlbezuege
 
 ```python
-def stahlbezuege(posten, kennwerte: Sequence[str]) -> List[Eingabebezug]
+def stahlbezuege(posten: Sequence[Postenbezug], kennwerte: Sequence[str]) -> List[Eingabebezug]
 ```
 
 Je Stahl der Posten diese Kennwerte, unter [[opencivil.nachweis.rechenwahl#stahlname|stahlname]].
@@ -108,7 +108,7 @@ Je Stahl der Posten diese Kennwerte, unter [[opencivil.nachweis.rechenwahl#stahl
 ### lagenbezuege
 
 ```python
-def lagenbezuege(posten, satz: Werkstoffsatz) -> List[Eingabebezug]
+def lagenbezuege(posten: Sequence[Postenbezug], satz: Werkstoffsatz) -> List[Eingabebezug]
 ```
 
 Was [[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]] liest: je Posten Flaeche und Tiefe, je Stahl
@@ -117,7 +117,7 @@ seine Kennwerte im Wertesatz der Wahl.
 ### stahllagen
 
 ```python
-def stahllagen(posten, satz: Werkstoffsatz, wert: Callable[[str], float]) -> List[Stahllage]
+def stahllagen(posten: Sequence[Postenbezug], satz: Werkstoffsatz, wert: Callable[[str], float]) -> List[Stahllage]
 ```
 
 Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage im Wertesatz der
@@ -278,6 +278,7 @@ ersten Lage.
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von

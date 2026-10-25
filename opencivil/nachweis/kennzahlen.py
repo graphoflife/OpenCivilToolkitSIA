@@ -114,7 +114,7 @@ class Plattenkennzahlen(Prozedur):
         dazu("N_Rd_druck", r"N_{Rd}^{-}(M_{Ed} = 0)", KN,
              "Druckwiderstand bei M_Ed = 0", "Druckwiderstand")
         # Ein x/d nur, wo Zug auf Bewehrung trifft: ohne sie gibt es kein d.
-        gezogen = {lage.seite for lage, _, _, _, _ in self.posten}
+        gezogen = {q.lage.seite for q in self.posten}
         for seite in UM_Y:
             if seite in gezogen:
                 dazu(f"x_d_{seite.marke}", rf"\left(x/d\right)^{{{seite.zeichen}}}",
@@ -277,7 +277,7 @@ class Plattenkennzahlen(Prozedur):
                 continue
             d, d_v = hoehen
             # Der Stahl der aeussersten gezogenen Lage, wie im Querkraftnachweis.
-            stahl = self.posten[zuglage(beiwerte.lagen, seite.positiv)][0].stahl
+            stahl = self.posten[zuglage(beiwerte.lagen, seite.positiv)].lage.stahl
             f_yd, E_s = e[stahlname("f_yd", stahl)], e[stahlname("E_s", stahl)]
 
             null = widerstand(M_Ed=0.0, N_Ed=0.0, h=beiwerte.h, d=d.groesse.si,

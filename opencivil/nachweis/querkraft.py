@@ -42,7 +42,8 @@ from opencivil.core.einheiten import KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
-from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung, protokoll_statische_hoehe
+from opencivil.querschnitt.lagenaufbau import protokoll_statische_hoehe
+from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 
 def _statische_hoehe(
@@ -76,8 +77,7 @@ def lagen_von(e: Eingaben, posten) -> Tuple[Tuple[float, bool], ...]:
     -- ohne das laesst sich die gezogene Bewehrung nicht von der gedrueckten
     trennen. Fuer den Nachweis und die Kennzahlen.
     """
-    return tuple((e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
-                 for l, a, _, _, _ in posten)
+    return tuple((e.g(q.name("z")).si, q.lage.von_unten) for q in posten)
 
 
 def zuglage(
@@ -116,10 +116,8 @@ def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zu
     dort ein «d_v = d (Einlage nicht massgebend)», weil sie die Hoehen ohne
     Buegel mit einer Einlage null mitbenutzten.
     """
-    lage, art = posten[zuglage][:2]
     hoehe = werte.laenge(*_hoch("d", "d", zeichen), d)
-    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=e[f"z_{lage.nummer}{art.kuerzel}"],
-                              seite=seite)
+    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=e[posten[zuglage].name("z")], seite=seite)
     if d_v is None:
         return hoehe, None
     wirksam = werte.laenge(*_hoch("d_v", "d_v", zeichen), d_v)
@@ -242,8 +240,8 @@ class Querkraft(Nachweis):
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
         ]
-        for lage, art, _, as_id, z_id in self.posten:
-            bezuege.append(Eingabebezug(f"z_{lage.nummer}{art.kuerzel}", z_id))
+        for q in self.posten:
+            bezuege += q.bezuege("z")
 
         super().__init__(
             basis,

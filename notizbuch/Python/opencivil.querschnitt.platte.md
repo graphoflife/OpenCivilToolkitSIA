@@ -1,5 +1,5 @@
 ---
-erzeugt: a187a037229d
+erzeugt: c0a73fc0f46c
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,9 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Beschreibt die Geometrie einer Platte und erzeugt daraus die Berechnungen fuer
-Bewehrungsquerschnitte und statische Hoehen.
+Bewehrungsquerschnitte und statische Hoehen. Wie der Lagenaufbau Tiefe und
+Querschnitt je Posten rechnet und wie ein Posten zu den Nachweisen reist,
+steht in [[opencivil.querschnitt.lagenaufbau]].
 
 
 ## AUFBAU -- VIER LAGEN
@@ -42,9 +44,10 @@ Richtung, und der Nachweis wird je Richtung eigens gefuehrt.
 
 ## Z-ACHSE
 
-`z` wird von der Oberkante nach unten gemessen, 0 \<= z \<= h. Die statische
-Hoehe einer Bewehrung ist ihr `z`. Damit gilt fuer alle Lagen dieselbe
-Rechnung, und die Interaktionsrechnung braucht keine Sonderfaelle.
+`z` wird von der Oberkante nach unten gemessen, 0 \<= z \<= h. Damit gilt fuer
+alle Lagen dieselbe Rechnung, und die Interaktionsrechnung braucht keine
+Sonderfaelle. Die statische Hoehe einer unteren Lage ist ihr `z`, die einer
+oberen `h - z` ([[opencivil.querschnitt.lagenaufbau#statische_hoehe|statische_hoehe]]).
 
 ## Inhalt
 
@@ -72,6 +75,16 @@ def gegenrichtung(self) -> 'Richtung'
 @property
 def beschriftung(self) -> str
 ```
+
+#### Richtung.breite
+
+```python
+@property
+def breite(self) -> str
+```
+
+Der Name der Breite, je die in dieser Richtung gerechnet wird: `b`
+in x, `b_y` in y -- in y stets je Laufmeter ([[opencivil.querschnitt.platte#Konstanten|BREITE_Y_MM]]).
 
 ### Postenart
 
@@ -217,6 +230,15 @@ def benannte_posten(self) -> Iterator[Tuple[Postenart, Bewehrungsposten]]
 def beschriftung(self) -> str
 ```
 
+#### Bewehrungslage.index
+
+```python
+@property
+def index(self) -> str
+```
+
+Der Symbolindex der Lage, z.B. `1,x` -- der eines Postens haengt die Art an.
+
 ### Querkraftbewehrung
 
 ```python
@@ -297,144 +319,6 @@ Bei Normalzug steilt sich die Druckdiagonale auf: `alpha_min` wird auf
 40° gesetzt und `alpha_max` notfalls mitgehoben, damit der Bereich
 nicht leer wird.
 
-### posten_index
-
-```python
-def posten_index(lage: 'Bewehrungslage', art: Postenart) -> str
-```
-
-Der Symbolindex eines Bewehrungspostens, z.B. `1,x,g`.
-
-Lage, Richtung, Art -- in dieser Reihenfolge, und immer alle drei. Damit ist
-jedes Symbol eindeutig, auch wenn zwei Lagen dieselbe Richtung tragen.
-
-Steht hier und nirgends sonst: die Handrechnung braucht denselben Index für
-ihre zusammengefassten Lagen, und zwei Stellen mit derselben Formel laufen
-früher oder später auseinander.
-
-### lagenindex
-
-```python
-def lagenindex(eintraege: Sequence[Tuple]) -> str
-```
-
-Der Symbolindex einer Lage aus ihren Posten -- `1,x` statt `1,x,g`.
-
-Gerechnet wird mit der ganzen Lage, nicht mit einem Posten; ein
-Postenindex am Symbol behauptete etwas anderes. Hat die Lage nur einen
-Posten, ist dessen Index auch ihrer -- dann heisst `A_s` so wie in der
-Tabelle der Platte. `eintraege` sind Zeilen aus `posten_ids`.
-
-### statische_hoehe
-
-```python
-def statische_hoehe(z: float, h: float, seite: Zugseite) -> float
-```
-
-Die statische Hoehe einer Lage in der Tiefe `z` unter der Oberkante,
-gemessen ab dem gedrueckten Rand: unten `d = z`, oben `d = h - z` --
-die Zahl zur Zeile von [[opencivil.querschnitt.platte#protokoll_statische_hoehe|protokoll_statische_hoehe]]. Wer `z`
-stehen liesse, bekaeme bei den oberen Lagen eine Zahl, die keine
-statische Hoehe ist.
-
-### lage_aus_posten
-
-```python
-def lage_aus_posten(e: Eingaben, eintraege: Sequence[Tuple]) -> Tuple[float, Optional[float], Optional[float]]
-```
-
-Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe einer Lage aus
-ihren Posten -- die Zahlen, die [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]] herleitet.
-Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen, gehoeren
-aber zur selben Lage: es zaehlt ihr gemeinsamer Schwerpunkt. Ohne Stahl
-gibt es weder Schwerpunkt noch Hoehe, beide `None`. Bis 2026-10-18
-rechneten drei Nachweise das je fuer sich.
-
-### protokoll_lage
-
-```python
-def protokoll_lage(p: Protokoll, e: Eingaben, werte: Zwischenwerte, eintraege: Sequence[Tuple], *, a_s: float, z: Optional[float]=None, d: float=0.0) -> Tuple[Wert, Optional[Wert]]
-```
-
-Querschnitt und statische Hoehe einer Lage, aus ihren Posten hergeleitet.
-
-`eintraege` sind die Zeilen der Lage aus `posten_ids`; die Eingaben
-der Posten heissen `a_s_<marke>` und `z_<marke>` (Tiefe ab
-Oberkante), die Dicke `h`. Liegen Grundbewehrung und Zulage in der Lage,
-stehen Summe und gemeinsamer Schwerpunkt da -- sonst fiele der
-Schwerpunkt vom Himmel. Ohne `z` nur der Querschnitt. Zurueck kommen
-`A_s` und `d` fuer die Formeln danach.
-
-### protokoll_statische_hoehe
-
-```python
-def protokoll_statische_hoehe(p: Protokoll, d: Wert, *, h: Wert, z: Wert, seite: Zugseite) -> None
-```
-
-Die statische Hoehe einer gezogenen Lage, gemessen ab dem gedrueckten Rand.
-
-Eine untere Lage misst ab der Oberkante, `d = z`; eine obere ab der
-Unterkante, `d = h - z`. Mehrere Nachweise brauchen diese Zeile -- steht
-sie an einer Stelle, sagt «unten» in allen dasselbe.
-
-### Postenbezug
-
-```python
-@dataclass(frozen=True)
-class Postenbezug
-```
-
-Ein Bewehrungsposten samt der Werte, die der Lagenaufbau fuer ihn liefert.
-
-- `lage: Bewehrungslage`
-- `art: Postenart`
-- `posten: Bewehrungsposten`
-- `marke: str` – Kurzform fuer die Eingabenamen, z.B. `1g`.
-- `z_def: WertDef`
-- `as_def: WertDef`
-
-### Lagenaufbau
-
-```python
-class Lagenaufbau(Prozedur)
-```
-
-Bestimmt statische Hoehe und Bewehrungsquerschnitt aller Posten.
-
-Beides in einem Zug und in einer Tabelle. Frueher stand fuer jeden Posten
-eine eigene Flaechenformel in der Herleitung -- fuenf Lagen ergaben fuenf
-gleich aussehende Bloecke, in denen sich nur die Zahlen unterschieden. Die
-Formel steht jetzt einmal da, die Ergebnisse stehen in der Tabelle.
-
-**STAPELUNG**
-
-Die Lagen werden je Seite von aussen nach innen gestapelt. Die Huelle einer
-Lage beginnt bei der Ueberdeckung und waechst um den groessten Durchmesser
-der davorliegenden Lage. `d` wird von der gezogenen Randfaser aus
-gemessen -- bei den unteren Lagen von der Unterkante, bei den oberen von
-der Oberkante.
-
-Wie Grundbewehrung und Zulage innerhalb einer Lage zueinander liegen, sagt
-[[opencivil.querschnitt.platte#Bewehrungslage|Bewehrungslage.unguenstig]].
-
-#### Lagenaufbau.rechne
-
-```python
-def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
-```
-
-#### Lagenaufbau._kennzahlen
-
-```python
-def _kennzahlen(self, p: Protokoll, e: Eingaben, h: Groesse, b: Groesse, flaechen: Mapping[str, Groesse], kanten: Mapping[int, Tuple[float, float]], breiten: Mapping[str, Groesse]) -> Dict[str, Groesse]
-```
-
-Bewehrungsmass und Hoehe der Distanzhalter.
-
-Beides sind Angaben fuer die Ausfuehrung, keine Nachweisgroessen -- sie
-gehoeren aber in den Kern und nicht in die Oberflaeche, damit sie in der
-Herleitung stehen und sich zurueckverfolgen lassen.
-
 ### Plattenquerschnitt
 
 ```python
@@ -461,7 +345,7 @@ alle Schnittgroessen Werte pro Laufmeter.
 - `praefix: Optional[str] = None`
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
 - `berechnungen: List[Berechnung] = field(default_factory=list, init=False)`
-- `posten_ids: List[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, str, str]] = field(default_factory=list, init=False)` – Je vorhandenem Posten: (Lage, Art, Posten, ID der Fläche, ID von z).
+- `posten: List[Postenbezug] = field(default_factory=list, init=False)` – Die vorhandenen Posten, von der 1. Lage an, je Lage erst die Grundbewehrung.
 
 #### Plattenquerschnitt.id_von
 
@@ -491,8 +375,16 @@ def lagen_in_richtung(self, richtung: Richtung) -> List[Bewehrungslage]
 #### Plattenquerschnitt.posten_in_richtung
 
 ```python
-def posten_in_richtung(self, richtung: Richtung) -> List[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, str, str]]
+def posten_in_richtung(self, richtung: Richtung) -> List[Postenbezug]
 ```
+
+#### Plattenquerschnitt.posten_der_lage
+
+```python
+def posten_der_lage(self, lage: Bewehrungslage) -> List[Postenbezug]
+```
+
+Grundbewehrung und Zulage der Lage, soweit vorhanden.
 
 #### Plattenquerschnitt.richtungen_mit_bewehrung
 
@@ -561,12 +453,12 @@ Rechnung sehen statt nur die Zahl.
 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
-- [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
@@ -577,7 +469,6 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
-- [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
@@ -592,6 +483,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
@@ -599,10 +491,4 @@ Rechnung sehen statt nur die Zahl.
 
 ## Formeln aus diesem Modul
 
-- [[Bewehrung der Lage]] · `protokoll_lage`
-- [[Bewehrungsmass je Kubikmeter Beton]] · `Lagenaufbau._kennzahlen`
-- [[Bewehrungsquerschnitt über die Breite b]] · `Lagenaufbau.rechne`
-- [[Höhe der Distanzhalter]] · `Lagenaufbau._kennzahlen`
 - [[Querschnitt eines Bügelschenkels]] · `Plattenquerschnitt._querkraftbewehrung_aufbauen`
-- [[Schwerpunkt der zusammengefassten Lage]] · `protokoll_lage`
-- [[Statische Höhe]] · `protokoll_statische_hoehe`

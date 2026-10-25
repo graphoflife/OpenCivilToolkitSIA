@@ -486,7 +486,7 @@ class TestBibliothek(unittest.TestCase):
         alle = {s.name: s.rumpf for s in bruecke.notizbuch_seiten()}
         self.assertIn("[[Bemessungswert der Betondruckfestigkeit]]",
                       alle["opencivil.material.beton"])
-        self.assertIn("[[opencivil.querschnitt.platte#protokoll_statische_hoehe|"
+        self.assertIn("[[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|"
                       "protokoll_statische_hoehe]]", alle["Statische Höhe"])
 
 

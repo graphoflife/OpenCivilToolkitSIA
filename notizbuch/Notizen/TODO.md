@@ -88,10 +88,10 @@ gelernt wurde, steht in [[Entwicklung]].
 
 Vier Durchsichten über das ganze Repo, jeder Punkt am Code nachgeprüft.
 Behoben sind 1.1 (eine Zuweisung an ein fehlendes Feld), 1.2 (Doppeltes
-im Balkensystem), 2.1 (das Urteil der Nachweise), das `Unterprotokoll`
-und der doppelte Bügelgehalt, siehe [[Entwicklung]]. Was in den Abschnitten darunter
-schon steht, steht hier nicht noch einmal: die Grundlage der Apps mit
-Zeichenfenster, die `Fallauswertung`, der Posten als `Postenbezug`, die
+im Balkensystem), 2.1 (das Urteil der Nachweise), das `Unterprotokoll`,
+der doppelte Bügelgehalt und der Posten als Tupel, siehe [[Entwicklung]].
+Was in den Abschnitten darunter schon steht, steht hier nicht noch einmal:
+die Grundlage der Apps mit Zeichenfenster, die `Fallauswertung`, die
 Dateien über 1000 Zeilen, «fest» als `math.inf`.
 
 - [ ] **Sechs eigene Zwischenspeicher für Nebenanfragen** (`qa_zeichnung.js`,
@@ -267,18 +267,11 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       `cad_fenster.js` (Bedienung, Rückgängig, Punkteingabe auslagern; die
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
       `stil.css` (ein Blatt je App). Stand 2026-10-25: stil.css 2348 Zeilen,
-      cad_fenster.js 1138, dazu `querschnitt/platte.py` mit 1003 (die Helfer
-      der Posten und `Lagenaufbau` in ein eigenes Modul, zusammen mit dem
-      `Postenbezug`). `querkraft.py` ist geteilt (2026-10-25); die Regel für
-      d_v steht in Kurve und Nachweis ohne Bügel noch je einmal.
+      cad_fenster.js 1138. `querkraft.py` und `querschnitt/platte.py` sind
+      geteilt (2026-10-25); die Regel für d_v steht in Kurve und Nachweis
+      ohne Bügel noch je einmal.
       `nachweise.js`, `spannungsanalyse.py` und `aufbau.py` sind geteilt,
       `querschnittsloeser.py` liegt bei 914.
-- [ ] **Der Posten als `Postenbezug` statt als 5-Tupel.** Ein
-      Bewehrungsposten reist als `(Lage, Art, Posten, ID von A_s, ID von z)`
-      und wird rund zwanzigmal nach Position zerlegt; die Marke
-      `f"{lage.nummer}{art.kuerzel}"` wird an neun Stellen neu gebaut, obwohl
-      `Postenbezug` daneben schon entsteht (`platte.py`, `_aufbauen`). Rest von
-      Befund 1 -- der Stahl je Lage ist behoben, die Gestalt des Postens nicht.
 - [ ] **Kleineres:** `print(ergebnis)` hat eine
       dritte, abweichende Zusammenfassung (`konsole.py`) · die Herleitung am
       Bildschirm lässt unbekannte Blockarten still weg (`bericht.js`) ·
