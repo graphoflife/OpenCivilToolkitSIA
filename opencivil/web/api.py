@@ -29,7 +29,7 @@ from opencivil.bericht.zusammenfassung import (
 from opencivil.core.latex import Mathe, Zelle
 from opencivil.core.protokoll import (
     GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel, TextBlock,
-    TitelBlock, UnterprotokollBlock, darstellen,
+    TitelBlock, darstellen,
 )
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
@@ -418,16 +418,16 @@ def wert_dict(wert: Wert) -> dict:
     }
 
 
-def _titel_dict(block: TitelBlock, tiefe: int) -> dict:
+def _titel_dict(block: TitelBlock) -> dict:
     return {"art": "titel", "text": block.text, "ebene": block.ebene,
             "raum": block.raum}
 
 
-def _text_dict(block: TextBlock, tiefe: int) -> dict:
+def _text_dict(block: TextBlock) -> dict:
     return {"art": "text", "text": block.text}
 
 
-def _gleichung_dict(block: GleichungBlock, tiefe: int) -> dict:
+def _gleichung_dict(block: GleichungBlock) -> dict:
     eintrag = {
         "art": "gleichung",
         "latex": block.latex,
@@ -444,7 +444,7 @@ def _gleichung_dict(block: GleichungBlock, tiefe: int) -> dict:
     return eintrag
 
 
-def _tabelle_dict(block: TabellenBlock, tiefe: int) -> dict:
+def _tabelle_dict(block: TabellenBlock) -> dict:
     return {
         "art": "tabelle",
         "titel": block.titel,
@@ -456,20 +456,12 @@ def _tabelle_dict(block: TabellenBlock, tiefe: int) -> dict:
     }
 
 
-def _hinweis_dict(block: HinweisBlock, tiefe: int) -> dict:
+def _hinweis_dict(block: HinweisBlock) -> dict:
     return {
         "art": "hinweis",
         "text": block.text,
         "hinweisart": block.art.value,
         "beschriftung": block.art.beschriftung,
-    }
-
-
-def _unterprotokoll_dict(block: UnterprotokollBlock, tiefe: int) -> dict:
-    return {
-        "art": "unterprotokoll",
-        "titel": block.titel,
-        "bloecke": darstellen(block.protokoll, TAFEL, tiefe + 1),
     }
 
 
@@ -480,7 +472,6 @@ TAFEL: Tafel[dict] = {
     GleichungBlock: _gleichung_dict,
     TabellenBlock: _tabelle_dict,
     HinweisBlock: _hinweis_dict,
-    UnterprotokollBlock: _unterprotokoll_dict,
 }
 
 
@@ -644,8 +635,8 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "latex": tabelle.als_latex(),
             "markdown": block_markdown(tabelle),
             "hinweise": hinweise(platte),
-            "angaben": _gleichung_dict(kopf_angaben, 0),
-            "bewehrung": _tabelle_dict(bewehrung, 0) if bewehrung is not None else None,
+            "angaben": _gleichung_dict(kopf_angaben),
+            "bewehrung": _tabelle_dict(bewehrung) if bewehrung is not None else None,
             # Der Grad kommt fertig gesetzt: welche Stelle noetig ist, damit
             # er dem Wort «nicht erfuellt» nicht widerspricht, weiss hier
             # dieselbe Stelle wie fuer die Tabelle.

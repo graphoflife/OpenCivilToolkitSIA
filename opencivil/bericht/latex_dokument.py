@@ -37,7 +37,7 @@ from opencivil.bericht.gliederung import bericht
 from opencivil.core.latex import tabelle, text_latex
 from opencivil.core.protokoll import (
     GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel, TextBlock,
-    TitelBlock, UnterprotokollBlock, darstellen,
+    TitelBlock, darstellen,
 )
 from opencivil.core.rechenwerk import Loesung
 
@@ -101,8 +101,8 @@ class Ausgabeergebnis:
 # ===========================================================================
 
 
-def _protokoll_tex(protokoll: Protokoll, tiefe: int = 0) -> List[str]:
-    return [zeile for teil in darstellen(protokoll, TAFEL, tiefe) for zeile in teil]
+def _protokoll_tex(protokoll: Protokoll) -> List[str]:
+    return [zeile for teil in darstellen(protokoll, TAFEL) for zeile in teil]
 
 
 _STUFEN = ("section", "subsection", "subsubsection", "paragraph")
@@ -113,15 +113,15 @@ def _stufe(nummer: int) -> str:
     return _STUFEN[min(max(nummer, 0), len(_STUFEN) - 1)]
 
 
-def _titel(block: TitelBlock, tiefe: int) -> List[str]:
+def _titel(block: TitelBlock) -> List[str]:
     return [rf"\{_stufe(block.ebene - 1)}{{{text_latex(block.text)}}}"]
 
 
-def _text(block: TextBlock, tiefe: int) -> List[str]:
+def _text(block: TextBlock) -> List[str]:
     return [text_latex(block.text), ""]
 
 
-def _gleichung(block: GleichungBlock, tiefe: int) -> List[str]:
+def _gleichung(block: GleichungBlock) -> List[str]:
     zeilen = []
     if block.titel:
         referenz = (rf" \hfill \normref{{{text_latex(block.referenz)}}}"
@@ -130,20 +130,15 @@ def _gleichung(block: GleichungBlock, tiefe: int) -> List[str]:
     return zeilen + [r"\begin{equation*}", block.latex, r"\end{equation*}"]
 
 
-def _tabelle(block: TabellenBlock, tiefe: int) -> List[str]:
+def _tabelle(block: TabellenBlock) -> List[str]:
     zeilen = ([rf"\noindent\textbf{{{text_latex(block.titel)}}}"]
               if block.titel else [])
     return zeilen + [tabelle(block.kopf, block.zeilen, block.ausrichtung, lang=True)]
 
 
-def _hinweis(block: HinweisBlock, tiefe: int) -> List[str]:
+def _hinweis(block: HinweisBlock) -> List[str]:
     return [rf"\hinweis{{{text_latex(block.art.beschriftung)}}}"
             rf"{{{text_latex(block.text)}}}"]
-
-
-def _unterprotokoll(block: UnterprotokollBlock, tiefe: int) -> List[str]:
-    return ([rf"\{_stufe(tiefe + 2)}{{{text_latex(block.titel)}}}"]
-            + _protokoll_tex(block.protokoll, tiefe + 1))
 
 
 #: Je Blockart, wie das LaTeX-Dokument sie setzt -- jede als Zeilen.
@@ -153,7 +148,6 @@ TAFEL: Tafel[List[str]] = {
     GleichungBlock: _gleichung,
     TabellenBlock: _tabelle,
     HinweisBlock: _hinweis,
-    UnterprotokollBlock: _unterprotokoll,
 }
 
 

@@ -88,10 +88,11 @@ gelernt wurde, steht in [[Entwicklung]].
 
 Vier Durchsichten über das ganze Repo, jeder Punkt am Code nachgeprüft.
 Behoben sind 1.1 (eine Zuweisung an ein fehlendes Feld), 1.2 (Doppeltes
-im Balkensystem) und 2.1 (das Urteil der Nachweise), siehe [[Entwicklung]]. Was in den Abschnitten darunter
+im Balkensystem), 2.1 (das Urteil der Nachweise) und das
+`Unterprotokoll`, siehe [[Entwicklung]]. Was in den Abschnitten darunter
 schon steht, steht hier nicht noch einmal: die Grundlage der Apps mit
 Zeichenfenster, die `Fallauswertung`, der Posten als `Postenbezug`, die
-Dateien über 1000 Zeilen, «fest» als `math.inf`, `Unterprotokoll`.
+Dateien über 1000 Zeilen, «fest» als `math.inf`.
 
 - [ ] **Sechs eigene Zwischenspeicher für Nebenanfragen** (`qa_zeichnung.js`,
       `bs_zeichnung.js`, `qa_diagramme.js`, `bs_diagramme.js`, `app.js`,
@@ -283,8 +284,7 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 - [ ] **Kleineres:** `print(ergebnis)` hat eine
       dritte, abweichende Zusammenfassung (`konsole.py`) · die Herleitung am
       Bildschirm lässt unbekannte Blockarten still weg (`bericht.js`) ·
-      `Unterprotokoll` ruft keine Rechnung auf, sein `tiefe` läuft durch 24
-      Darstellungsfunktionen · `BEREICHE.get(…, "")` legt eine neue Art
+      `BEREICHE.get(…, "")` legt eine neue Art
       still unter «Weitere» · der Schalter `schnell` bündelt vier Verhalten
       für zwei Nutzer.
 

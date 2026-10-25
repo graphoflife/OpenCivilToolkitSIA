@@ -1,5 +1,5 @@
 ---
-erzeugt: d4ffb008d276
+erzeugt: e796092d4a32
 art: modul
 tags: [modul]
 ---
@@ -158,18 +158,6 @@ class HinweisBlock(Block)
 - `text: str`
 - `art: HinweisArt = HinweisArt.INFO`
 
-### UnterprotokollBlock
-
-```python
-@dataclass
-class UnterprotokollBlock(Block)
-```
-
-Eingeschachtelte Mitschrift, z.B. ein Iterationsdurchlauf.
-
-- `titel: str`
-- `protokoll: 'Protokoll'`
-
 ### Protokoll
 
 ```python
@@ -291,21 +279,13 @@ Haelt eine getroffene Annahme fest.
 Dafuer gedacht, dass empirische Normformeln ihre Einheiten-Konvention
 offenlegen (siehe `einheiten.empirisch`).
 
-#### Protokoll.unterprotokoll
-
-```python
-def unterprotokoll(self, titel: str) -> 'Protokoll'
-```
-
-Oeffnet eine eingeschachtelte Mitschrift und gibt sie zurueck.
-
 #### Protokoll.herkunft_stempeln
 
 ```python
 def herkunft_stempeln(self, thema: str, ab: int=0) -> None
 ```
 
-Das Thema auf die Bloecke ab `ab` -- auch eingeschachtelte.
+Das Thema auf die Bloecke ab `ab`.
 
 Das Rechenwerk ruft das nach jeder Berechnung fuer das, was sie
 geschrieben hat. Die Formelsammlung ordnet danach; die Berechnung
@@ -325,7 +305,7 @@ def ist_leer(self) -> bool
 def alle_bloecke(self) -> List[Block]
 ```
 
-Alle Bloecke, auch die eingeschachtelten -- als Liste.
+Alle Bloecke -- als Liste.
 
 Als Liste und nicht als Generator: der Name verspricht eine Sammlung,
 und wer eine Sammlung zweimal durchlaeuft, erwartet zweimal dasselbe.
@@ -458,12 +438,6 @@ def wert(self, *_, **__) -> None
 def tabelle(self, *_, **__) -> None
 ```
 
-#### StillesProtokoll.unterprotokoll
-
-```python
-def unterprotokoll(self, titel: str) -> 'Protokoll'
-```
-
 #### StillesProtokoll.ist_leer
 
 ```python
@@ -552,7 +526,7 @@ def zahl(self, name: str, symbol: str, zahl: float, beschreibung: str='', *, ste
 ### darstellen
 
 ```python
-def darstellen(protokoll: Protokoll, tafel: Tafel[T], tiefe: int=0) -> List[T]
+def darstellen(protokoll: Protokoll, tafel: Tafel[T]) -> List[T]
 ```
 
 Setzt jeden Block eines Protokolls mit der Funktion seiner Art.
@@ -574,7 +548,7 @@ Oberflaeche und alle Berichte gehen.
 ## Konstanten
 
 - `T = TypeVar('T')`
-- `Tafel = Mapping[Type[Block], Callable[[Any, int], T]]` – Wie eine Darstellung die Bloecke setzt: je Blockart eine Funktion, die den Block und seine Tiefe bekommt -- die Zahl der Unterprotokolle, in denen er steht.
+- `Tafel = Mapping[Type[Block], Callable[[Any], T]]` – Wie eine Darstellung die Bloecke setzt: je Blockart eine Funktion, die den Block bekommt. Bis 2026-10-25 bekam sie auch seine Tiefe -- die Zahl der eingeschachtelten Mitschriften, in denen er stand; die schrieb da keine Rechnung mehr.
 
 ## Braucht
 

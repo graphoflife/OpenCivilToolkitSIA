@@ -210,14 +210,6 @@ class HinweisBlock(Block):
     art: HinweisArt = HinweisArt.INFO
 
 
-@dataclass
-class UnterprotokollBlock(Block):
-    """Eingeschachtelte Mitschrift, z.B. ein Iterationsdurchlauf."""
-
-    titel: str
-    protokoll: "Protokoll"
-
-
 # ===========================================================================
 # Protokoll
 # ===========================================================================
@@ -365,15 +357,9 @@ class Protokoll:
         """
         self._anfuegen(HinweisBlock(text=text, art=HinweisArt.ANNAHME))
 
-    def unterprotokoll(self, titel: str) -> "Protokoll":
-        """Oeffnet eine eingeschachtelte Mitschrift und gibt sie zurueck."""
-        unter = Protokoll(titel=titel)
-        self._anfuegen(UnterprotokollBlock(titel=titel, protokoll=unter))
-        return unter
-
     def herkunft_stempeln(self, thema: str, ab: int = 0) -> None:
         """
-        Das Thema auf die Bloecke ab ``ab`` -- auch eingeschachtelte.
+        Das Thema auf die Bloecke ab ``ab``.
 
         Das Rechenwerk ruft das nach jeder Berechnung fuer das, was sie
         geschrieben hat. Die Formelsammlung ordnet danach; die Berechnung
@@ -383,8 +369,6 @@ class Protokoll:
         for block in self.bloecke[ab:]:
             if isinstance(block, (GleichungBlock, TextBlock)):
                 block.thema = block.thema or thema
-            elif isinstance(block, UnterprotokollBlock):
-                block.protokoll.herkunft_stempeln(thema)
 
     # -- Auswerten ----------------------------------------------------------
 
@@ -394,7 +378,7 @@ class Protokoll:
 
     def alle_bloecke(self) -> List[Block]:
         """
-        Alle Bloecke, auch die eingeschachtelten -- als Liste.
+        Alle Bloecke -- als Liste.
 
         Als Liste und nicht als Generator: der Name verspricht eine Sammlung,
         und wer eine Sammlung zweimal durchlaeuft, erwartet zweimal dasselbe.
@@ -403,12 +387,7 @@ class Protokoll:
         Die Blockzahl ist die eines Berichts; sie in eine Liste zu legen
         kostet nichts.
         """
-        heraus: List[Block] = []
-        for block in self.bloecke:
-            heraus.append(block)
-            if isinstance(block, UnterprotokollBlock):
-                heraus.extend(block.protokoll.alle_bloecke())
-        return heraus
+        return list(self.bloecke)
 
     def nach_abschnitten(self) -> List[Block]:
         """
@@ -534,9 +513,6 @@ class StillesProtokoll(Protokoll):
     def tabelle(self, *_, **__) -> None:
         pass
 
-    def unterprotokoll(self, titel: str) -> "Protokoll":
-        return self
-
     @property
     def ist_leer(self) -> bool:
         return True
@@ -617,12 +593,13 @@ class Zwischenwerte:
 T = TypeVar("T")
 
 #: Wie eine Darstellung die Bloecke setzt: je Blockart eine Funktion, die den
-#: Block und seine Tiefe bekommt -- die Zahl der Unterprotokolle, in denen er
-#: steht.
-Tafel = Mapping[Type[Block], Callable[[Any, int], T]]
+#: Block bekommt. Bis 2026-10-25 bekam sie auch seine Tiefe -- die Zahl der
+#: eingeschachtelten Mitschriften, in denen er stand; die schrieb da keine
+#: Rechnung mehr.
+Tafel = Mapping[Type[Block], Callable[[Any], T]]
 
 
-def darstellen(protokoll: Protokoll, tafel: Tafel[T], tiefe: int = 0) -> List[T]:
+def darstellen(protokoll: Protokoll, tafel: Tafel[T]) -> List[T]:
     """
     Setzt jeden Block eines Protokolls mit der Funktion seiner Art.
 
@@ -647,5 +624,5 @@ def darstellen(protokoll: Protokoll, tafel: Tafel[T], tiefe: int = 0) -> List[T]
         if setzen is None:
             raise TypeError(
                 f"Diese Darstellung kennt keine {type(block).__name__}.")
-        heraus.append(setzen(block, tiefe))
+        heraus.append(setzen(block))
     return heraus

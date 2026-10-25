@@ -171,9 +171,6 @@ function bloeckeZeichnen(rohbloecke) {
         el('b', { text: `${block.beschriftung}: ` }),
         block.text,
       ]));
-    } else if (block.art === 'unterprotokoll') {
-      knoten.push(el('div.b-untertitel.ist-tief', { text: block.titel }));
-      knoten.push(...bloeckeZeichnen(block.bloecke));
     }
   }
   return knoten;

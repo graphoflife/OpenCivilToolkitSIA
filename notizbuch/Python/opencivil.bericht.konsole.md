@@ -1,5 +1,5 @@
 ---
-erzeugt: a80f70f3fab5
+erzeugt: f799fc612928
 art: modul
 tags: [modul]
 ---
@@ -39,18 +39,10 @@ Bricht Fliesstext auf die Terminalbreite um.
 ### protokoll_zeilen
 
 ```python
-def protokoll_zeilen(protokoll: Protokoll, tiefe: int=0) -> List[str]
+def protokoll_zeilen(protokoll: Protokoll) -> List[str]
 ```
 
 Wandelt eine Mitschrift in Konsolenzeilen um.
-
-### _vorspann
-
-```python
-def _vorspann(tiefe: int) -> str
-```
-
-Ein Unterprotokoll steht je Stufe zwei Zeichen weiter innen.
 
 ### _tabelle_zeilen
 

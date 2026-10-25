@@ -44,6 +44,16 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Aufgeräumt: die eingeschachtelte Mitschrift entfällt
+
+Befund 6 der Strukturdurchsicht: `Protokoll.unterprotokoll` öffnete eine
+eingeschachtelte Mitschrift. Keine Rechnung rief es mehr auf, und doch nahm
+jede Darstellung -- Konsole, LaTeX, Markdown, Oberfläche -- je Block eine
+«Tiefe» mit, durch 28 Funktionen. Beides ist weg: eine Darstellung bekommt
+nur noch den Block. Für den Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Querschnittsanalyse: die Biegung als eigene Wahl
 
 Befund 3 der Strukturdurchsicht, dritter Teil: Ob der gezeichnete

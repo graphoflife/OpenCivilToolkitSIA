@@ -12,7 +12,7 @@ from opencivil.bericht.latex_dokument import (
 from opencivil.core.einheiten import EINHEITSLOS, N_PRO_MM2, Groesse
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import (
-    Block, Protokoll, TextBlock, TitelBlock, UnterprotokollBlock, darstellen,
+    Block, Protokoll, TextBlock, TitelBlock, darstellen,
 )
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import WertDef
@@ -553,7 +553,6 @@ class TestTafeln(unittest.TestCase):
                 yield from unterklassen(unter)
 
         arten = set(unterklassen(Block))
-        self.assertIn(UnterprotokollBlock, arten)
         for name, tafel in self.tafeln().items():
             with self.subTest(darstellung=name):
                 self.assertEqual(set(tafel), arten)
@@ -563,18 +562,7 @@ class TestTafeln(unittest.TestCase):
         p.titel("Titel")
         p.text("Text")
         with self.assertRaisesRegex(TypeError, "TextBlock"):
-            darstellen(p, {TitelBlock: lambda block, tiefe: block.text})
-
-    def test_die_tiefe_zaehlt_die_unterprotokolle(self):
-        p = Protokoll()
-        p.text("aussen")
-        p.unterprotokoll("Durchlauf").text("innen")
-        tafel = {
-            TextBlock: lambda block, tiefe: (block.text, tiefe),
-            UnterprotokollBlock:
-                lambda block, tiefe: darstellen(block.protokoll, tafel, tiefe + 1),
-        }
-        self.assertEqual(darstellen(p, tafel), [("aussen", 0), [("innen", 1)]])
+            darstellen(p, {TitelBlock: lambda block: block.text})
 
 
 class TestJedesUrteilHatEinenLangnamen(unittest.TestCase):

@@ -1,5 +1,5 @@
 ---
-erzeugt: 571acad23f02
+erzeugt: ef425f26acc9
 art: modul
 tags: [modul]
 ---
@@ -78,7 +78,7 @@ Markdown kennt sechs Stufen; tiefer bleibt es bei der sechsten.
 ### protokoll_zeilen
 
 ```python
-def protokoll_zeilen(protokoll: Protokoll, tiefe: int=0) -> List[str]
+def protokoll_zeilen(protokoll: Protokoll) -> List[str]
 ```
 
 ### block_markdown

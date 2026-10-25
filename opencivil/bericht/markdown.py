@@ -27,7 +27,7 @@ from opencivil.bericht.gliederung import bericht
 from opencivil.core.latex import Mathe, Zelle
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel,
-    TextBlock, TitelBlock, UnterprotokollBlock, darstellen,
+    TextBlock, TitelBlock, darstellen,
 )
 from opencivil.core.rechenwerk import Loesung
 
@@ -81,16 +81,16 @@ def _ueberschrift(stufe: int, text: str) -> List[str]:
     return [f"{'#' * min(stufe, 6)} {text_markdown(text)}", ""]
 
 
-def _titel(block: TitelBlock, tiefe: int) -> List[str]:
+def _titel(block: TitelBlock) -> List[str]:
     # Stufe 1 ist der Kopftitel des Berichts, die Abschnitte beginnen darunter.
     return _ueberschrift(block.ebene + 1, block.text)
 
 
-def _text(block: TextBlock, tiefe: int) -> List[str]:
+def _text(block: TextBlock) -> List[str]:
     return [absatz_markdown(block.text), ""]
 
 
-def _gleichung(block: GleichungBlock, tiefe: int) -> List[str]:
+def _gleichung(block: GleichungBlock) -> List[str]:
     zeilen = []
     if block.titel:
         referenz = f" *({text_markdown(block.referenz)})*" if block.referenz else ""
@@ -98,7 +98,7 @@ def _gleichung(block: GleichungBlock, tiefe: int) -> List[str]:
     return zeilen + ["$$", block.latex, "$$", ""]
 
 
-def _tabelle(block: TabellenBlock, tiefe: int) -> List[str]:
+def _tabelle(block: TabellenBlock) -> List[str]:
     spalten = block.ausrichtung or "r" * len(block.kopf)
     zeilen = [f"**{text_markdown(block.titel)}**", ""] if block.titel else []
     zeilen.append("| " + " | ".join(_zelle(z) for z in block.kopf) + " |")
@@ -108,14 +108,8 @@ def _tabelle(block: TabellenBlock, tiefe: int) -> List[str]:
     return zeilen + [""]
 
 
-def _hinweis(block: HinweisBlock, tiefe: int) -> List[str]:
+def _hinweis(block: HinweisBlock) -> List[str]:
     return [f"> **{block.art.beschriftung}:** {text_markdown(block.text)}", ""]
-
-
-def _unterprotokoll(block: UnterprotokollBlock, tiefe: int) -> List[str]:
-    # Wie im LaTeX-Dokument eine Stufe unter den Zwischentiteln der Herleitung.
-    return (_ueberschrift(tiefe + 4, block.titel)
-            + protokoll_zeilen(block.protokoll, tiefe + 1))
 
 
 #: Je Blockart, wie Markdown sie setzt -- jede als Zeilen, mit Leerzeile danach.
@@ -125,12 +119,11 @@ TAFEL: Tafel[List[str]] = {
     GleichungBlock: _gleichung,
     TabellenBlock: _tabelle,
     HinweisBlock: _hinweis,
-    UnterprotokollBlock: _unterprotokoll,
 }
 
 
-def protokoll_zeilen(protokoll: Protokoll, tiefe: int = 0) -> List[str]:
-    return [zeile for teil in darstellen(protokoll, TAFEL, tiefe) for zeile in teil]
+def protokoll_zeilen(protokoll: Protokoll) -> List[str]:
+    return [zeile for teil in darstellen(protokoll, TAFEL) for zeile in teil]
 
 
 def block_markdown(block: Block) -> str:
@@ -139,7 +132,7 @@ def block_markdown(block: Block) -> str:
     Kopierknopf an diesem Block. Aus derselben Tafel, damit Knopf und
     Dokument dasselbe liefern.
     """
-    return "\n".join(TAFEL[type(block)](block, 0)).strip("\n")
+    return "\n".join(TAFEL[type(block)](block)).strip("\n")
 
 
 def als_markdown(
