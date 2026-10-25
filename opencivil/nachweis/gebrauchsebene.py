@@ -41,8 +41,8 @@ from opencivil.core.latex import angabe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import ILLINOIS, illinois
 from opencivil.nachweis.querschnittsloeser import Faserloeser, probenschranken, wie_gesucht
+from opencivil.querschnitt.biegung import Biegung
 from opencivil.querschnitt.interaktion import Querschnitt, Richtung
-from opencivil.querschnitt.zugseite import Zugseite
 
 #: Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der
 #: entfernen darf, die bei Symmetrie gaelte -- nach jeder Seite, in Grad.
@@ -223,11 +223,13 @@ def _rand(abweichung: Callable[[float], Tuple[float, Optional[E]]], mit: float,
 
 
 def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
-                   einachsig: bool, start: Optional[float] = None) -> Gebrauchsebene:
+                   biegung: Biegung, start: Optional[float] = None) -> Gebrauchsebene:
     """
     Die Dehnungsebene, die ``N``, ``M_y`` und ``M_z`` im Gleichgewicht haelt.
 
-    Einachsig mit waagrechter Nulllinie, ``M_z`` zaehlt nicht. Sonst wird die
+    Steht die Zugrichtung fest -- einachsig, mit waagrechter Nulllinie
+    (:meth:`~opencivil.querschnitt.biegung.Biegung.neigung`) --, auf ihr, und
+    was nicht zaehlt, ist null. Sonst wird die
     Neigung gesucht, bei der auch das Moment entlang der Nulllinie stimmt
     (:func:`neigung_suchen`) -- von ``start`` aus oder von der, die bei
     Symmetrie gaelte; bei einem symmetrischen Querschnitt trifft schon sie.
@@ -236,8 +238,9 @@ def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
     Ohne Ebene :data:`KEINE` -- oder :data:`VERFEHLT`, wo die Suche an einem
     Sprung haengen blieb.
     """
-    if einachsig:
-        return _bei_neigung(q, Zugseite.aus_moment(M_y).psi, N, M_y, 0.0)[0]
+    psi = biegung.neigung(M_y)
+    if psi is not None:
+        return _bei_neigung(q, psi, N, *biegung.wirkt(M_y, M_z))[0]
 
     schranke = QUER_SCHRANKE * max(abs(M_y), abs(M_z), abs(N) * 1.0, 1.0)
     # Was am Ende ohne Ebene dasteht: verfehlt, sobald eine Neigung an einem
@@ -285,13 +288,16 @@ def suche_der_ebene(q: Querschnitt) -> str:
         f"Moment, bei einem unsymmetrischen nicht. Nachgewiesen wird das "
         f"Ergebnis: die Probe, dass die Ebene die Einwirkung erzeugt.")
 
-#: Dasselbe, einachsig.
-EINACHSIG = ("Einachsig bleibt die Nulllinie waagrecht, und M_z zählt nicht – wie "
-             "in der Tragsicherheit.")
+def verfahren_der_ebene(q: Querschnitt, biegung: Biegung) -> str:
+    """Wie die Ebene unter Gebrauchslast gefunden wird -- einachsig ohne Suche der Zugrichtung."""
+    if biegung.einachsig:
+        return ("Einachsig bleibt die Nulllinie waagrecht, und M_z zählt nicht – wie in "
+                "der Tragsicherheit.")
+    return suche_der_ebene(q)
 
 
 def protokoll_ebene(p: Protokoll, werte: Zwischenwerte, ebene: Gebrauchsebene,
-                     einachsig: bool) -> None:
+                     biegung: Biegung) -> None:
     """Die gefundene Ebene und ihre Probe."""
     eps = werte.dehnung("eps_0", r"\varepsilon_0", ebene.eps_m, stellen=4)
     kappa = werte.kruemmung("kappa", r"\kappa", ebene.chi)
@@ -299,9 +305,8 @@ def protokoll_ebene(p: Protokoll, werte: Zwischenwerte, ebene: Gebrauchsebene,
                 rf" \qquad {angabe(kappa)}",
                 titel="Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, "
                       "Krümmung")
-    probe = [werte.kraft("N_int", "N_{int}", ebene.N),
-             werte.moment("M_y_int", "M_{y,int}", ebene.M_y)]
-    if not einachsig:
-        probe.append(werte.moment("M_z_int", "M_{z,int}", ebene.M_z))
+    probe = [werte.kraft("N_int", "N_{int}", ebene.N)] + [
+        werte.moment(f"M_{a}_int", f"M_{{{a},int}}", m)
+        for a, m in biegung.momente(ebene.M_y, ebene.M_z)]
     p.gleichung(r" \qquad ".join(rf"{angabe(w)} \;\checkmark" for w in probe),
                 titel="Probe: die Ebene erzeugt die Einwirkung")

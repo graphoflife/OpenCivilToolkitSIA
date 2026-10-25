@@ -16,6 +16,7 @@ from opencivil.nachweis.rissgroessen import (
     DICKENGRENZE, Bruttoquerschnitt, Ecke, beiwert_dicke, rissaktive_dicke, rissmoment,
     rissmoment_rechteck,
 )
+from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 
 
 def rechteck(b: float, h: float, f_ctm: float = 2.9e6) -> Bruttoquerschnitt:
@@ -57,13 +58,13 @@ class TestRissmoment(unittest.TestCase):
                 analyse = aufbau.querschnittsanalysen[eintrag.kennung]
                 loesung = aufbau.werk.loese(*aufbau.ziele_von(eintrag.kennung))
                 brutto = bruttoquerschnitt(analyse, lambda kid: loesung.werte[kid].groesse.si)
-                self.assertIs(brutto.einachsig, einachsig)
+                self.assertIs(brutto.biegung.einachsig, einachsig)
 
     def test_am_rechteck_wie_bei_der_platte(self):
         q = rechteck(0.3, 0.5)
-        for einachsig in (False, True):
-            with self.subTest(einachsig=einachsig):
-                riss = rissmoment(dataclasses.replace(q, einachsig=einachsig), 1.0, 0.0)
+        for biegung in (SCHIEF, EINACHSIG):
+            with self.subTest(einachsig=biegung.einachsig):
+                riss = rissmoment(dataclasses.replace(q, biegung=biegung), 1.0, 0.0)
                 self.assertAlmostEqual(
                     riss.M_Riss, rissmoment_rechteck(h=0.5, b=0.3, f_ctm=2.9e6).M_Riss,
                     delta=1e-6)
@@ -75,7 +76,7 @@ class TestRissmoment(unittest.TestCase):
         schief = Bruttoquerschnitt(I_y=q.I_y, I_z=q.I_z, I_yz=0.4 * math.sqrt(q.I_y * q.I_z),
                                    ecken=q.ecken)
         gekippt = rissmoment(schief, 1.0, 0.0)
-        waagrecht = rissmoment(dataclasses.replace(schief, einachsig=True), 1.0, 0.0)
+        waagrecht = rissmoment(dataclasses.replace(schief, biegung=EINACHSIG), 1.0, 0.0)
         self.assertAlmostEqual(waagrecht.W, q.I_y / 0.25, delta=1e-12)
         self.assertLess(gekippt.M_Riss, waagrecht.M_Riss)
 
@@ -86,7 +87,7 @@ class TestRissmoment(unittest.TestCase):
         schwach = Ecke(y=0.0, z=-0.2, punkt=(150.0, 50.0), stoff="schwach", f_ctm=1.0e6)
         q = Bruttoquerschnitt(I_y=q.I_y, I_z=q.I_z, I_yz=0.0,
                               ecken=(unten_links, unten_rechts, schwach) + q.ecken[2:],
-                              einachsig=True)
+                              biegung=EINACHSIG)
         riss = rissmoment(q, 1.0, 0.0)
         self.assertEqual(riss.ecke.stoff, "schwach")
         self.assertAlmostEqual(riss.W, q.I_y / 0.2, delta=1e-12)

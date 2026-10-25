@@ -37,6 +37,7 @@ from opencivil.core.protokoll import Abschnitt, GleichungBlock, Protokoll, Tabel
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.querschnitt import geometrie as geo
+from opencivil.querschnitt.biegung import SCHIEF, Biegung
 from opencivil.querschnitt.geometrie import GeometrieFehler, Linienart, Punkt
 from opencivil.querschnitt.interaktion import (
     Bewehrung, Querschnitt, Teil, Werkstoff, linie_als_bewehrung,
@@ -46,7 +47,7 @@ from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN
 from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
-from opencivil.querschnitt.zugseite import UM_Y, Zugseite
+from opencivil.querschnitt.zugseite import Zugseite
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
 #: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus ``E_cm``
@@ -362,7 +363,7 @@ class Querschnittsanalyse:
         linien: Sequence[Mapping],
         waende: Sequence[Mapping],
         alpha_min: int, alpha_max: int, k_c: float,
-        wahl: Mapping[str, Rechenwahl], einachsig: bool = False,
+        wahl: Mapping[str, Rechenwahl], biegung: Biegung = SCHIEF,
     ) -> None:
         """
         ``staebe``, ``linien`` und ``waende`` wie bei :class:`Zeichnung`, je
@@ -371,13 +372,13 @@ class Querschnittsanalyse:
         """
         self.name = name
         self.id = praefix
-        self.einachsig = einachsig
+        self.biegung = biegung
         """
-        Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt unter
-        reiner Biegung zu kippen. Die Spannung-Dehnung-Analyse und jeder
-        Nachweis lesen es hier, der Bruttoquerschnitt traegt es weiter
-        (:func:`~opencivil.nachweis.rissgroessen.bruttoquerschnitt`). Bis
-        2026-10-18 bekamen die Nachweise es einzeln, durch elf Signaturen.
+        Ob die Nulllinie unter reiner Biegung kippt oder «einachsig» waagrecht
+        bleibt -- und was davon abhaengt (:mod:`~opencivil.querschnitt.biegung`).
+        Die Spannung-Dehnung-Analyse und jeder Nachweis lesen es hier, der
+        Bruttoquerschnitt traegt es weiter
+        (:func:`~opencivil.nachweis.rissgroessen.bruttoquerschnitt`).
         """
         self.wahl = dict(wahl)
         """Je Baustoff-ID der Wertesatz und beim Beton die Rechenart -- ohne Kriechen."""
@@ -443,12 +444,8 @@ class Querschnittsanalyse:
 
     @property
     def zugseiten(self) -> Tuple[Zugseite, ...]:
-        """
-        Die Seiten, die je ein Nachweis ziehen laesst -- einachsig nur unten
-        und oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten»,
-        sind die der Faelle; die Kennungen «Zug_unten».
-        """
-        return UM_Y if self.einachsig else tuple(Zugseite)
+        """Die Seiten, die je ein Nachweis ziehen laesst (:attr:`Biegung.zugseiten`)."""
+        return self.biegung.zugseiten
 
     # -- Rechenwerk -----------------------------------------------------------
 

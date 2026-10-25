@@ -1,5 +1,5 @@
 ---
-erzeugt: bf7f86238fe1
+erzeugt: 8e7ffc8e2580
 art: modul
 tags: [modul]
 ---
@@ -247,9 +247,7 @@ Der Werkstoff des innersten Polygons an dieser Stelle.
 def zugseiten(self) -> Tuple[Zugseite, ...]
 ```
 
-Die Seiten, die je ein Nachweis ziehen laesst -- einachsig nur unten
-und oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten»,
-sind die der Faelle; die Kennungen «Zug_unten».
+Die Seiten, die je ein Nachweis ziehen laesst ([[opencivil.querschnitt.biegung#Biegung|Biegung.zugseiten]]).
 
 #### Querschnittsanalyse.abschnitt
 
@@ -446,6 +444,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]

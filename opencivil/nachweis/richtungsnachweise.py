@@ -40,15 +40,6 @@ from opencivil.nachweis.rissgroessen import (
     rissmoment,
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse
-from opencivil.querschnitt.interaktion import Bruchpunkt, Querschnitt
-from opencivil.querschnitt.zugseite import Zugseite
-
-
-def bei_reiner_biegung(q: Querschnitt, seite: Zugseite, einachsig: bool) -> Bruchpunkt:
-    """Der Bruchzustand bei N = 0, der diese Seite zieht -- einachsig mit waagrechter Nulllinie."""
-    if einachsig:
-        return q.bei_normalkraft(seite.psi, 0.0)
-    return q.in_richtung(0.0, *seite.moment)
 
 
 # ===========================================================================
@@ -105,7 +96,7 @@ class DuktilitaetQA(Nachweis):
             name = seite.beschriftung
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             d_grad = self.d_ausnutzung[name]
-            punkt = bei_reiner_biegung(q, seite, self.analyse.einachsig)
+            punkt = self.analyse.biegung.bei_reiner_biegung(q, seite)
             x, d = q.druckzone(punkt)
             p.titel(name, ebene=3)
             if d <= 0.0 or not q.zugseite_bewehrt(punkt):
@@ -153,7 +144,7 @@ class SproedesVersagenQA(Nachweis):
             "Rissmoment. Das Rissmoment gehört dem ungerissenen "
             "Bruttoquerschnitt; bei unsymmetrischer Form mit dem "
             "Deviationsmoment.")
-        protokoll_spannung_ungerissen(p, einachsig=self.analyse.einachsig)
+        protokoll_spannung_ungerissen(p, self.analyse.biegung)
         p.ansatz(r"M_{Rd}(N = 0) \ge M_{Riss} = f_{ct,eff} \cdot W",
                  titel="Sprödes Versagen", referenz="SIA 262:2025, 4.4.1.3",
                  name="Bedingung gegen sprödes Versagen")
@@ -166,7 +157,7 @@ class SproedesVersagenQA(Nachweis):
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             d_grad = self.d_ausnutzung[name]
             p.titel(name, ebene=3)
-            punkt = bei_reiner_biegung(q, seite, self.analyse.einachsig)
+            punkt = self.analyse.biegung.bei_reiner_biegung(q, seite)
             _, d = q.druckzone(punkt)
             if d <= 0.0 or not q.zugseite_bewehrt(punkt):
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
@@ -176,7 +167,7 @@ class SproedesVersagenQA(Nachweis):
             riss = rissmoment(brutto, M_y, M_z)
             M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, brutto, riss, M_y, M_z,
                                           referenz="SIA 262:2025, 4.4.1.3")
-            M_Rd_si = abs(punkt.M_y) if self.analyse.einachsig else punkt.moment
+            M_Rd_si = self.analyse.biegung.betrag(punkt.M_y, punkt.M_z)
             M_Rd = werte.moment("M_Rd", "M_{Rd}", M_Rd_si)
             p.wert(M_Rd, titel="Biegewiderstand bei N = 0 in dieser Richtung")
             v = Vergleich(M_Riss, M_Rd)

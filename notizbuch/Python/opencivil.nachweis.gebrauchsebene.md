@@ -1,5 +1,5 @@
 ---
-erzeugt: 3b7b88f661a7
+erzeugt: 2e8ae11ebc01
 art: modul
 tags: [modul]
 ---
@@ -125,12 +125,14 @@ als Ebene, wo sich ausser `mit` selbst keine findet.
 ### gebrauchsebene
 
 ```python
-def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float, einachsig: bool, start: Optional[float]=None) -> Gebrauchsebene
+def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float, biegung: Biegung, start: Optional[float]=None) -> Gebrauchsebene
 ```
 
 Die Dehnungsebene, die `N`, `M_y` und `M_z` im Gleichgewicht haelt.
 
-Einachsig mit waagrechter Nulllinie, `M_z` zaehlt nicht. Sonst wird die
+Steht die Zugrichtung fest -- einachsig, mit waagrechter Nulllinie
+([[opencivil.querschnitt.biegung#Biegung.neigung|neigung]]) --, auf ihr, und
+was nicht zaehlt, ist null. Sonst wird die
 Neigung gesucht, bei der auch das Moment entlang der Nulllinie stimmt
 ([[opencivil.nachweis.gebrauchsebene#neigung_suchen|neigung_suchen]]) -- von `start` aus oder von der, die bei
 Symmetrie gaelte; bei einem symmetrischen Querschnitt trifft schon sie.
@@ -150,10 +152,18 @@ mit der Suche, mit der [[opencivil.nachweis.gebrauchsebene#_bei_neigung|_bei_nei
 wirklich sucht: der Loeser sagt sie selbst. Bis 2026-10-17 stand hier
 «zwei geschachtelte Halbierungen», auch wo mit Illinois gesucht wurde.
 
+### verfahren_der_ebene
+
+```python
+def verfahren_der_ebene(q: Querschnitt, biegung: Biegung) -> str
+```
+
+Wie die Ebene unter Gebrauchslast gefunden wird -- einachsig ohne Suche der Zugrichtung.
+
 ### protokoll_ebene
 
 ```python
-def protokoll_ebene(p: Protokoll, werte: Zwischenwerte, ebene: Gebrauchsebene, einachsig: bool) -> None
+def protokoll_ebene(p: Protokoll, werte: Zwischenwerte, ebene: Gebrauchsebene, biegung: Biegung) -> None
 ```
 
 Die gefundene Ebene und ihre Probe.
@@ -167,7 +177,6 @@ Die gefundene Ebene und ihre Probe.
 - `RANDSCHRITTE = 20` – Wie oft zwischen einer Neigung mit Ebene und einer ohne halbiert wird, um den Rand des Gleichgewichts zu finden -- auf ein Millionstel des Schritts.
 - `KEINE = Gebrauchsebene(psi=0.0, eps_m=0.0, chi=0.0, N=0.0, M_y=0.0, M_z=0.0, …` – Wenn sich keine Ebene findet.
 - `VERFEHLT = replace(KEINE, verfehlt=True)` – Wenn die Suche ihre Ebene verfehlt -- mit dem Spannungsblock bei viel Druck und wenig Moment.
-- `EINACHSIG = 'Einachsig bleibt die Nulllinie waagrecht, und M_z zählt nicht – wie …` – Dasselbe, einachsig.
 
 ## Braucht
 
@@ -175,8 +184,8 @@ Die gefundene Ebene und ihre Probe.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.suche]]
 - [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.interaktion]]
-- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

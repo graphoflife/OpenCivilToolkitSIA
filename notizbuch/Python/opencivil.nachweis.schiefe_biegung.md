@@ -1,5 +1,5 @@
 ---
-erzeugt: f4065998ccc7
+erzeugt: 838ce6391b1c
 art: modul
 tags: [modul]
 ---
@@ -102,6 +102,14 @@ Biegung und Normalkraft, je Lastfall gegen den Dehnungsfaecher.
 def pruefe(self, e: Eingaben, p: Protokoll)
 ```
 
+#### SchiefeBiegung._einwirkung
+
+```python
+def _einwirkung(self, e: Eingaben, fall: Lastfall) -> Tuple[float, float, float]
+```
+
+Die Einwirkung, wie nachgewiesen: mit der Laengszugkraft, wo sie zaehlt.
+
 
 ## Konstanten
 
@@ -116,7 +124,6 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.wert]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.interaktion]]
-- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

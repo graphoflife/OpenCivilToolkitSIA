@@ -28,7 +28,7 @@ Querkraft nur, was als Schubwand gezeichnet ist.
 NICHTS ZWEIMAL:
 Gerechnet wird mit der Rechenwahl der Tragsicherheit, am selben
 Bruchzustand wie Duktilitaet und sproedes Versagen
-(:func:`~opencivil.nachweis.richtungsnachweise.bei_reiner_biegung`); x und d
+(:meth:`~opencivil.querschnitt.biegung.Biegung.bei_reiner_biegung`); x und d
 misst :meth:`~opencivil.querschnitt.interaktion.Querschnitt.druckzone`, die
 Grenzen der Normalkraft
 :meth:`~opencivil.querschnitt.interaktion.Querschnitt.normalkraft_grenzen`.
@@ -48,9 +48,9 @@ from opencivil.core.latex import Mathe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef
 from opencivil.material.betonstahl import STAHLDICHTE
-from opencivil.nachweis.richtungsnachweise import bei_reiner_biegung
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.biegung import Biegung
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Woher die Widerstaende stammen -- ihre Erklaerung unter dem Querschnitt.
@@ -84,19 +84,24 @@ def _getragen(analyse: Querschnittsanalyse) -> List[str]:
     bezug = (analyse.brutto.y_S * 1e-3, analyse.brutto.z_S * 1e-3)
     getragen = []
     for _, last, _, _, _ in SCHUB:
-        if last == "V_y" and analyse.einachsig:
+        einheit = _einheit(last, analyse.biegung)
+        if not any(einheit.values()):
             continue
         try:
-            sw.verteilen(waende, modell, **_einheit(last), bezug=bezug)
+            sw.verteilen(waende, modell, **einheit, bezug=bezug)
         except sw.WandFehler:
             continue
         getragen.append(last)
     return getragen
 
 
-def _einheit(last: str) -> Dict[str, float]:
-    """Eine Einheitslast in dieser Richtung -- 1 N oder 1 Nm, die anderen null."""
-    return {k: (1.0 if k == last else 0.0) for k in ("V_y", "V_z", "T")}
+def _einheit(last: str, biegung: Biegung) -> Dict[str, float]:
+    """
+    Eine Einheitslast in dieser Richtung -- 1 N oder 1 Nm, die anderen null;
+    so, wie sie wirkt: einachsig ist ``V_y`` null.
+    """
+    einheit = {k: (1.0 if k == last else 0.0) for k in ("V_y", "V_z", "T")}
+    return {**einheit, "V_y": biegung.querkraft_y(einheit["V_y"])}
 
 
 class KennzahlenQA(Prozedur):
@@ -204,9 +209,8 @@ class KennzahlenQA(Prozedur):
                  q) -> None:
         p.titel("Biegung und Normalkraft", ebene=3)
         for seite in self.analyse.zugseiten:
-            punkt = bei_reiner_biegung(q, seite, self.analyse.einachsig)
-            betrag = 0.0 if punkt is None else (
-                abs(punkt.M_y) if self.analyse.einachsig else punkt.moment)
+            punkt = self.analyse.biegung.bei_reiner_biegung(q, seite)
+            betrag = 0.0 if punkt is None else self.analyse.biegung.betrag(punkt.M_y, punkt.M_z)
             p.wert(self._belegen(ergebnis, f"M_Rd_{seite.value}",
                                  betrag if seite.positiv else -betrag),
                    titel=f"Momentenwiderstand bei N_Ed = 0, {seite.beschriftung}")
@@ -247,7 +251,8 @@ class KennzahlenQA(Prozedur):
         for kurz, last, symbol, einheit, beschriftung in SCHUB:
             if last not in self.getragen:
                 continue
-            v = sw.verteilen(waende, modell, **_einheit(last), bezug=bezug)
+            v = sw.verteilen(waende, modell, **_einheit(last, self.analyse.biegung),
+                             bezug=bezug)
             self._eine_last(p, ergebnis, kurz, symbol, einheit, beschriftung,
                             waende, modell, v, widerstaende)
 

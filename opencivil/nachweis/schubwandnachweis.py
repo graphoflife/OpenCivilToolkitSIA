@@ -29,6 +29,16 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef, grad_als_text
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
+from opencivil.querschnitt.biegung import Biegung
+
+
+def schub_belastet(biegung: Biegung, fall: Lastfall) -> bool:
+    """
+    Ob ein Lastfall die Schubwaende belastet -- einachsig zaehlt ``V_y``
+    nicht. Fuer den Nachweis und fuer den Aufbau, der fragt, ob es ihn
+    braucht.
+    """
+    return bool(fall.V_z or fall.T or biegung.querkraft_y(fall.V_y))
 
 
 @dataclass
@@ -66,7 +76,7 @@ class Schubwandnachweis(Nachweis):
                              rf"\alpha_{{eff,V,{als_text(f.name)}}}",
                              f"Erfüllungsgrad Querkraft und Torsion – {f.name}",
                              "SIA 262:2025, 4.3.3")
-            for f in self.lastfaelle if self._belastet(f)
+            for f in self.lastfaelle if schub_belastet(analyse.biegung, f)
         }
         self.d_laengszug: Dict[str, Dict[str, WertDef]] = {}
         if mit_laengszug:
@@ -88,9 +98,6 @@ class Schubwandnachweis(Nachweis):
             titel=f"Querkraft und Torsion – {analyse.name}",
             referenz="SIA 262:2025, 4.3.3", abschnitt=analyse.abschnitt)
 
-    def _belastet(self, fall: Lastfall) -> bool:
-        return bool(fall.V_z or fall.T or (fall.V_y and not self.analyse.einachsig))
-
     # -- Pruefen ----------------------------------------------------------------
 
     def pruefe(self, e: Eingaben, p: Protokoll):
@@ -103,8 +110,8 @@ class Schubwandnachweis(Nachweis):
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for fall in self.lastfaelle:
-            V_y = 0.0 if self.analyse.einachsig else fall.V_y
-            if not self._belastet(fall):
+            V_y = self.analyse.biegung.querkraft_y(fall.V_y)
+            if not schub_belastet(self.analyse.biegung, fall):
                 self._laengszug_null(ergebnis, fall)
                 continue
             p.titel(fall.name, ebene=3)

@@ -427,7 +427,7 @@ class Schnittpaar:
     @property
     def einachsig(self) -> bool:
         """Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt zu kippen -- wie die Analyse."""
-        return self.brutto.einachsig
+        return self.brutto.biegung.einachsig
 
     def ebenen(self) -> Zustaende:
         """Die Ebenen beider Zustaende: kippend, «einachsig» mit fester Nulllinie."""
@@ -509,7 +509,7 @@ class Schnittpaar:
                 "auch vom Deviationsmoment I_yz ab, und es reisst die Ecke zuerst, die ihre "
                 "Zugfestigkeit zuerst erreicht – bei einem unsymmetrischen Querschnitt eine "
                 "Ecke, nicht der ganze Rand.")
-            protokoll_spannung_ungerissen(p, einachsig=False)
+            protokoll_spannung_ungerissen(p, self.brutto.biegung)
         if momente:
             ecke = self.riss.ecke
             if not self.einachsig:

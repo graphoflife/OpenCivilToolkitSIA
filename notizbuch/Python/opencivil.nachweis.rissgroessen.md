@@ -1,5 +1,5 @@
 ---
-erzeugt: 8871e16e2e4a
+erzeugt: 08969e1353ef
 art: modul
 tags: [modul]
 ---
@@ -150,7 +150,7 @@ Schwerpunkt und die Ecken des Betons -- in SI.
 - `I_z: float`
 - `I_yz: float`
 - `ecken: Tuple[Ecke, ...]`
-- `einachsig: bool = False` – Ob die Nulllinie parallel zur Achse der Biegung bleibt -- wie die Analyse rechnet.
+- `biegung: Biegung = SCHIEF` – Ob die Nulllinie kippt oder waagrecht bleibt -- wie die Analyse rechnet.
 
 #### Bruttoquerschnitt.ausdehnung
 
@@ -168,7 +168,7 @@ def einheitsspannung(self, ecke: Ecke, M_y: float, M_z: float) -> float
 
 Die Spannung an der Ecke beim Moment `(M_y, M_z)`, Zug positiv -- bei
 einem Moment von eins in dieser Richtung die Einheitsspannung.
-`einachsig` bleibt die Nulllinie parallel zur Achse der Biegung, ohne
+Einachsig bleibt die Nulllinie parallel zur Achse der Biegung, ohne
 `I_yz`.
 
 ### rissbezuege
@@ -246,7 +246,7 @@ rissaktive Dicke unter Zug ([[opencivil.nachweis.rissgroessen#rissaktive_dicke|r
 ### protokoll_spannung_ungerissen
 
 ```python
-def protokoll_spannung_ungerissen(p: Protokoll, *, einachsig: bool) -> None
+def protokoll_spannung_ungerissen(p: Protokoll, biegung: Biegung) -> None
 ```
 
 Wie der ungerissene Querschnitt Spannung traegt -- der Ansatz des Rissmoments.
@@ -297,6 +297,7 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.biegung]]
 
 ## Gebraucht von
 

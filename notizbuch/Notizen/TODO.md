@@ -106,10 +106,8 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`, `Unterprotokoll`.
       Verhalten an die Tabellen der Werkzeuge und Arten hängen, die das
       Fenster ohnehin durchläuft; ebenfalls Teil von `cadApp`.
 - [ ] **Arten als Text oder Schalter statt als eigener Typ**, an fünf Orten
-      (die Art des Stabquerschnitts und die Querkraft sind seit 2026-10-25
-      behoben):
-      - `einachsig` steht 50-mal in den Nachweisen, die Regel ist viermal
-        kopiert. Besser einmal in der Analyse auflösen: `UmY` oder `Schief`.
+      (die Art des Stabquerschnitts, die Querkraft und «einachsig» sind seit
+      2026-10-25 behoben):
       - Bewehrung der Querschnittsanalyse: lose Datensätze mit der Art als
         Text, rund zwei Dutzend Weichen in fünf Modulen. Besser: die
         Zeichnung macht jedes Element einmal zu Einzelstab, Stablinie oder
@@ -282,9 +280,7 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       `f"{lage.nummer}{art.kuerzel}"` wird an neun Stellen neu gebaut, obwohl
       `Postenbezug` daneben schon entsteht (`platte.py`, `_aufbauen`). Rest von
       Befund 1 -- der Stahl je Lage ist behoben, die Gestalt des Postens nicht.
-- [ ] **Kleineres:** die Regel für einachsige Biegung steht in drei Modulen
-      und ist auseinandergelaufen (`M_y > 0` in `richtungsnachweise.py`,
-      `M_y >= 0` in `schiefe_biegung.py`) · `print(ergebnis)` hat eine
+- [ ] **Kleineres:** `print(ergebnis)` hat eine
       dritte, abweichende Zusammenfassung (`konsole.py`) · die Herleitung am
       Bildschirm lässt unbekannte Blockarten still weg (`bericht.js`) ·
       `Unterprotokoll` ruft keine Rechnung auf, sein `tiefe` läuft durch 24

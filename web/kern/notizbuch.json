@@ -3121,6 +3121,7 @@
         "_rand",
         "gebrauchsebene",
         "suche_der_ebene",
+        "verfahren_der_ebene",
         "protokoll_ebene"
       ]
     },
@@ -3458,7 +3459,6 @@
       "art": "modul",
       "kurz": "Duktilitaet und sproedes Versagen des gezeichneten Querschnitts.",
       "stichworte": [
-        "bei_reiner_biegung",
         "grade_je_seite",
         "DuktilitaetQA",
         "DuktilitaetQA.pruefe",
@@ -3518,7 +3518,8 @@
         "Bruchbefund",
         "protokoll_dehnungsebene",
         "SchiefeBiegung",
-        "SchiefeBiegung.pruefe"
+        "SchiefeBiegung.pruefe",
+        "SchiefeBiegung._einwirkung"
       ]
     },
     {
@@ -3527,6 +3528,7 @@
       "art": "modul",
       "kurz": "Querkraft und Torsion am gezeichneten Querschnitt.",
       "stichworte": [
+        "schub_belastet",
         "Schubbefund",
         "Schubwandnachweis",
         "Schubwandnachweis.pruefe"
@@ -4245,6 +4247,30 @@
         "Querschnittsanalyse.neigungsgrenzen",
         "Querschnittsanalyse.schubbezuege",
         "Querschnittsanalyse.beton_ecken"
+      ]
+    },
+    {
+      "name": "opencivil.querschnitt.biegung",
+      "pfad": "Python/opencivil.querschnitt.biegung.md",
+      "art": "modul",
+      "kurz": "wie ein gezeichneter Querschnitt biegt.",
+      "stichworte": [
+        "Biegung",
+        "Biegung.momente",
+        "Biegung.wirkt",
+        "Biegung.betrag",
+        "Biegung.querkraft_y",
+        "Biegung.neigung",
+        "Biegung.bruchpunkt",
+        "Biegung.bei_reiner_biegung",
+        "Schief",
+        "Schief.momente",
+        "Schief.querkraft_y",
+        "Schief.neigung",
+        "Einachsig",
+        "Einachsig.momente",
+        "Einachsig.querkraft_y",
+        "Einachsig.neigung"
       ]
     },
     {

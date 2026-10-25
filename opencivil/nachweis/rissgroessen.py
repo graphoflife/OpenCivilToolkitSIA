@@ -46,6 +46,7 @@ from opencivil.core.einheiten import M, MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.biegung import SCHIEF, Biegung
 
 #: Teiler der Hoehe in Biegerichtung im Beiwert. Unter Biegung reisst der
 #: Randbereich, nicht die halbe Hoehe wie beim Zwang. SIA 262:2025, 4.4.1.3.
@@ -179,8 +180,8 @@ class Bruttoquerschnitt:
     I_z: float
     I_yz: float
     ecken: Tuple[Ecke, ...]
-    einachsig: bool = False
-    """Ob die Nulllinie parallel zur Achse der Biegung bleibt -- wie die Analyse rechnet."""
+    biegung: Biegung = SCHIEF
+    """Ob die Nulllinie kippt oder waagrecht bleibt -- wie die Analyse rechnet."""
 
     def ausdehnung(self, um_y: bool) -> Tuple[float, float]:
         """Die Hoehe in Biegerichtung und die Breite quer dazu, in m -- aus der Zeichnung."""
@@ -192,10 +193,10 @@ class Bruttoquerschnitt:
         """
         Die Spannung an der Ecke beim Moment ``(M_y, M_z)``, Zug positiv -- bei
         einem Moment von eins in dieser Richtung die Einheitsspannung.
-        ``einachsig`` bleibt die Nulllinie parallel zur Achse der Biegung, ohne
+        Einachsig bleibt die Nulllinie parallel zur Achse der Biegung, ohne
         ``I_yz``.
         """
-        if self.einachsig:
+        if self.biegung.einachsig:
             return -(M_y * ecke.z / self.I_y + M_z * ecke.y / self.I_z)
         nenner = self.I_y * self.I_z - self.I_yz * self.I_yz
         return -(M_y * (self.I_z * ecke.z - self.I_yz * ecke.y)
@@ -222,7 +223,7 @@ def bruttoquerschnitt(analyse: Querschnittsanalyse,
         ecken=tuple(Ecke(y=p[0] * 1e-3 - y_S, z=p[1] * 1e-3 - z_S, punkt=p, stoff=stoff,
                          f_ctm=abs(wert(stoff.id_von("f_ctm"))))
                     for p, stoff in analyse.beton_ecken),
-        einachsig=analyse.einachsig)
+        biegung=analyse.biegung)
 
 
 @dataclass(frozen=True)
@@ -295,9 +296,9 @@ def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *,
     return Rissnormalkraft(ecke=ecke, sigma_M=sigma, f_ct_eff=f_ct_eff, N_Riss=N_Riss)
 
 
-def protokoll_spannung_ungerissen(p: Protokoll, *, einachsig: bool) -> None:
+def protokoll_spannung_ungerissen(p: Protokoll, biegung: Biegung) -> None:
     """Wie der ungerissene Querschnitt Spannung traegt -- der Ansatz des Rissmoments."""
-    if einachsig:
+    if biegung.einachsig:
         p.ansatz(r"\sigma(z) = -\frac{M_y \cdot z'}{I_y} \qquad z' = z - z_S",
                  titel="Spannung im ungerissenen Querschnitt, Nulllinie waagrecht")
         return
@@ -321,7 +322,7 @@ def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoque
     """
     W = werte.wert("W", "W", Groesse.aus_si(W, MIO_MM3), 2)
     I_y = werte.wert("Iy", "I_y", Groesse.aus_si(q.I_y, MIO_MM4), 1)
-    if q.einachsig:
+    if q.biegung.einachsig:
         p.formel(W, r"\frac{@Iy}{@v}", {
             "Iy": I_y,
             "v": werte.laenge("v", "v", -M_y * ecke.z, "Abstand des gezogenen Rands vom Schwerpunkt"),

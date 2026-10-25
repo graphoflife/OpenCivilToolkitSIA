@@ -22,8 +22,9 @@ from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
-from opencivil.nachweis.schubwandnachweis import Schubwandnachweis
+from opencivil.nachweis.schubwandnachweis import Schubwandnachweis, schub_belastet
 from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsanalyse
+from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.geometrie import GeometrieFehler
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, knickfall, material, spannungsnachweise
@@ -67,7 +68,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         for l in eintrag.lastfaelle if l.aktiv]
 
     schub = None
-    if any(l.V_z or l.T or (l.V_y and not analyse.einachsig) for l in lastfaelle) \
+    if any(schub_belastet(analyse.biegung, l) for l in lastfaelle) \
             or (eintrag.laengszugkraft and lastfaelle):
         schub = Schubwandnachweis(analyse, lastfaelle, mit_laengszug=eintrag.laengszugkraft)
         aufbau.eintragen(teil, "qa_schub", eintrag.kennung, schub)
@@ -152,6 +153,6 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
             name=eintrag.name, praefix=praefix,
             flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,
             alpha_min=eintrag.alpha_min, alpha_max=eintrag.alpha_max, k_c=eintrag.k_c,
-            wahl=wahl, einachsig=eintrag.einachsig)
+            wahl=wahl, biegung=EINACHSIG if eintrag.einachsig else SCHIEF)
     except GeometrieFehler as fehler:
         raise ProjektFehler(f"{wo}: {fehler}") from None

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f33587c9079
+erzeugt: 758cca074037
 art: modul
 tags: [modul]
 ---
@@ -24,6 +24,16 @@ Je Wand `v_Rd / |q_Ed|`, gemessen am staerksten Stueck der Wand; massgebend
 ist die schwaechste Wand.
 
 ## Inhalt
+
+### schub_belastet
+
+```python
+def schub_belastet(biegung: Biegung, fall: Lastfall) -> bool
+```
+
+Ob ein Lastfall die Schubwaende belastet -- einachsig zaehlt `V_y`
+nicht. Fuer den Nachweis und fuer den Aufbau, der fragt, ob es ihn
+braucht.
 
 ### Schubbefund
 
@@ -69,6 +79,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.schubwaende]]
 
 ## Gebraucht von

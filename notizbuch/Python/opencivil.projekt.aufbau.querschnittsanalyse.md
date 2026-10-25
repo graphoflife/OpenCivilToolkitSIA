@@ -1,5 +1,5 @@
 ---
-erzeugt: 29933a31d029
+erzeugt: 94b2c1902116
 art: modul
 tags: [modul]
 ---
@@ -63,6 +63,7 @@ einen Satz, der die Analyse nennt.
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.geometrie]]
 
 ## Gebraucht von

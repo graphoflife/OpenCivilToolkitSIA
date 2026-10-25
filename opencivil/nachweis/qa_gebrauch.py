@@ -71,7 +71,7 @@ from opencivil.core.suche import illinois
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
 from opencivil.nachweis.gebrauchsebene import (
-    EINACHSIG, Gebrauchsebene, gebrauchsebene, protokoll_ebene, suche_der_ebene,
+    Gebrauchsebene, gebrauchsebene, protokoll_ebene, verfahren_der_ebene,
 )
 from opencivil.nachweis.mindestbewehrung import Biegezwang
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
@@ -164,13 +164,12 @@ class AnalyseStellen(Stahlspannungsort):
 
     def ebene(self, zustand: _Analysezustand, fall: Lastfall) -> Gebrauchsebene:
         return gebrauchsebene(zustand.querschnitt, N=fall.N, M_y=fall.M_y, M_z=fall.M_z,
-                              einachsig=self.analyse.einachsig)
+                              biegung=self.analyse.biegung)
 
     def keine_ebene(self, fall: Lastfall) -> str:
-        return (f"Keine Dehnungsebene für N = {fall.N / 1e3:.1f} kN, "
-                f"M_y = {fall.M_y / 1e3:.1f} kNm"
-                + ("" if self.analyse.einachsig else f", M_z = {fall.M_z / 1e3:.1f} kNm")
-                + " → nicht aufnehmbar.")
+        momente = ", ".join(f"M_{a} = {m / 1e3:.1f} kNm"
+                            for a, m in self.analyse.biegung.momente(fall.M_y, fall.M_z))
+        return f"Keine Dehnungsebene für N = {fall.N / 1e3:.1f} kN, {momente} → nicht aufnehmbar."
 
     def begruendung(self, zustand: _Analysezustand, erg: Fallergebnis) -> str:
         return f"{zustand.staebe[erg.stelle].element.name}: {erg.satz}"
@@ -186,20 +185,18 @@ class AnalyseStellen(Stahlspannungsort):
     def protokoll_verfahren(self, p: Protokoll, zustand: _Analysezustand,
                             wahl: Rechenwahl) -> None:
         protokoll_dehnungsebene(p)
-        p.erklaerung(EINACHSIG if self.analyse.einachsig
-                     else suche_der_ebene(zustand.querschnitt))
+        p.erklaerung(verfahren_der_ebene(zustand.querschnitt, self.analyse.biegung))
         p.erklaerung(VERFEHLTE_EBENE)
 
     def protokoll_einwirkung(self, p: Protokoll, fall: Lastfall, index: str) -> None:
-        teile = [rf"N_{{Ed,{index}}} = {fest(fall.N / 1e3, 1)}\ \mathrm{{kN}}",
-                 rf"M_{{y,Ed,{index}}} = {fest(fall.M_y / 1e3, 1)}\ \mathrm{{kNm}}"]
-        if not self.analyse.einachsig:
-            teile.append(rf"M_{{z,Ed,{index}}} = {fest(fall.M_z / 1e3, 1)}\ \mathrm{{kNm}}")
+        teile = [rf"N_{{Ed,{index}}} = {fest(fall.N / 1e3, 1)}\ \mathrm{{kN}}"] + [
+            rf"M_{{{a},Ed,{index}}} = {fest(m / 1e3, 1)}\ \mathrm{{kNm}}"
+            for a, m in self.analyse.biegung.momente(fall.M_y, fall.M_z)]
         p.gleichung(r" \qquad ".join(teile), titel="Einwirkung")
 
     def protokoll_ebene(self, p: Protokoll, werte: Zwischenwerte, zustand: _Analysezustand,
                         grenzen: Grenzen, erg: Fallergebnis) -> None:
-        protokoll_ebene(p, werte, erg.ebene, self.analyse.einachsig)
+        protokoll_ebene(p, werte, erg.ebene, self.analyse.biegung)
         if erg.eps_s <= 0.0:
             p.text("Kein Stab ist gezogen – es gibt keine Zugspannung zu begrenzen.")
             return
@@ -392,7 +389,7 @@ class ZwaengungBiegungQA(Biegezwang):
         protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id,
                                      referenz=self.REFERENZ)
         protokoll_dehnungsebene(p)
-        p.erklaerung(EINACHSIG if self.analyse.einachsig else suche_der_ebene(q))
+        p.erklaerung(verfahren_der_ebene(q, self.analyse.biegung))
 
         brutto = bruttoquerschnitt(a, e.si_nach_id())
         ergebnis: Dict[str, Groesse] = {}
@@ -413,7 +410,7 @@ class ZwaengungBiegungQA(Biegezwang):
                                           referenz=self.REFERENZ)
             M_s_adm = werte.moment("M_s_adm", r"M_{s,adm}", M_s_adm_si, "Widerstand")
             p.wert(M_s_adm, titel="Moment, bei dem der erste gezogene Stab σ_s,adm erreicht")
-            protokoll_ebene(p, werte, ebene, self.analyse.einachsig)
+            protokoll_ebene(p, werte, ebene, self.analyse.biegung)
             gruppe = grenzen.gruppe(stab)
             sigma_s = werte.spannung("sigma_s", r"\sigma_s", ebene.sigma_s[stab])
             p.gleichung(rf"{angabe(sigma_s)} = {angabe(gruppe.wert)}",
@@ -450,7 +447,7 @@ class ZwaengungBiegungQA(Biegezwang):
         def auswertung(M: float):
             # Linear bleibt die Neigung beim Dreisatz dieselbe: von ihr aus.
             ebene = gebrauchsebene(q, N=0.0, M_y=M * M_y, M_z=M * M_z,
-                                   einachsig=self.analyse.einachsig, start=neigung[0])
+                                   biegung=self.analyse.biegung, start=neigung[0])
             if ebene.konvergiert:
                 neigung[0] = ebene.psi
             if not ebene.konvergiert:
@@ -503,7 +500,7 @@ class ZwaengungBiegungQA(Biegezwang):
                  r"\qquad M_{s,adm} \ge M_{Riss}",
                  titel=f"{self.THEMA}, je Stab", referenz=self.REFERENZ,
                  name="Moment der Bewehrung bei zulässiger Stahlspannung")
-        protokoll_spannung_ungerissen(p, einachsig=self.analyse.einachsig)
+        protokoll_spannung_ungerissen(p, self.analyse.biegung)
         protokoll_rechenwahl(p, self.wahl, self.id)
         protokoll_gesetze_nach_wahl(p, e, self.analyse, self.wahl, self.id,
                           titel="Werkstoffgesetze im gerissenen Zustand")

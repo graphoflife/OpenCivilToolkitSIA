@@ -675,7 +675,7 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
             "bruch": _bruch(q, bauteil, p) if p is not None else None,
             "schub": _schubfluss(geschoben, erg.fall) if geschoben is not None else None,
         })
-    einachsig = bauteil.einachsig
+    einachsig = bauteil.biegung.einachsig
     return {
         "kennung": kennung,
         "name": bauteil.name,

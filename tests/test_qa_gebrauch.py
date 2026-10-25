@@ -25,6 +25,7 @@ from opencivil.projekt.querschnittsanalyse import (
     QAGebrauchsfallEintrag, QuerschnittsanalyseEintrag,
 )
 from opencivil.nachweis.stabgrenzen import fiktiver_durchmesser, stabangaben
+from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.interaktion import Querschnitt
 
 #: Die Kennwerte von C30/37 und B500B, wie das Rechenwerk sie liefert.
@@ -110,17 +111,17 @@ class TestVerfehlteEbene(unittest.TestCase):
     def test_die_ebene_ist_verfehlt(self):
         p, _ = self.stuetze()
         q = querschnitt(p, self.BLOCK)
-        for N, M_y, M_z, einachsig in ((-600e3, 10e3, 0.0, True),
-                                       (-1500e3, 10e3, 5e3, False)):
-            with self.subTest(N=N, einachsig=einachsig):
-                ebene = gebrauchsebene(q, N=N, M_y=M_y, M_z=M_z, einachsig=einachsig)
+        for N, M_y, M_z, biegung in ((-600e3, 10e3, 0.0, EINACHSIG),
+                                     (-1500e3, 10e3, 5e3, SCHIEF)):
+            with self.subTest(N=N, einachsig=biegung.einachsig):
+                ebene = gebrauchsebene(q, N=N, M_y=M_y, M_z=M_z, biegung=biegung)
                 self.assertFalse(ebene.konvergiert)
                 self.assertTrue(ebene.verfehlt)
 
     def test_mit_mehr_moment_gibt_es_sie(self):
         p, _ = self.stuetze()
         ebene = gebrauchsebene(querschnitt(p, self.BLOCK), N=-600e3, M_y=120e3, M_z=60e3,
-                               einachsig=False)
+                               biegung=SCHIEF)
         self.assertTrue(ebene.konvergiert)
         self.assertAlmostEqual(ebene.N, -600e3, delta=1.0)
         self.assertAlmostEqual(ebene.M_y, 120e3, delta=1.0)
@@ -144,7 +145,7 @@ class TestDieEbene(unittest.TestCase):
         p, _ = rechteck()
         q = querschnitt(p)
         M = 60e3
-        ebene = gebrauchsebene(q, N=0.0, M_y=M, M_z=0.0, einachsig=True)
+        ebene = gebrauchsebene(q, N=0.0, M_y=M, M_z=0.0, biegung=EINACHSIG)
         a_s = 3 * math.pi * 0.016 ** 2 / 4
         riss = gerissen(n=E_S / E_CM, a_s=a_s, b=0.3, d=0.45)
         self.assertTrue(ebene.konvergiert)
@@ -157,7 +158,7 @@ class TestDieEbene(unittest.TestCase):
         a.stab(50, 250, durchmesser=16, stahl="s1")
         a.stab(450, 250, durchmesser=16, stahl="s1")
         q = querschnitt(p)
-        ebene = gebrauchsebene(q, N=-100e3, M_y=50e3, M_z=50e3, einachsig=False)
+        ebene = gebrauchsebene(q, N=-100e3, M_y=50e3, M_z=50e3, biegung=SCHIEF)
         self.assertTrue(ebene.konvergiert)
         self.assertAlmostEqual(math.remainder(ebene.psi + 0.75 * math.pi, 2 * math.pi), 0.0,
                                delta=1e-6)
@@ -177,7 +178,7 @@ class TestDieEbene(unittest.TestCase):
         a.stablinie([50, 100], [50, 550], art="anzahl", anzahl=4, durchmesser=16, stahl="s1")
         p.querschnittsanalysen.append(a)
         q = querschnitt(p)
-        ebene = gebrauchsebene(q, N=-50e3, M_y=80e3, M_z=-30e3, einachsig=False)
+        ebene = gebrauchsebene(q, N=-50e3, M_y=80e3, M_z=-30e3, biegung=SCHIEF)
         self.assertTrue(ebene.konvergiert)
         self.assertAlmostEqual(ebene.N, -50e3, delta=1.0)
         self.assertAlmostEqual(ebene.M_y, 80e3, delta=1.0)

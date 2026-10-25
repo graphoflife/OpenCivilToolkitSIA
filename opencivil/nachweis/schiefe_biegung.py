@@ -45,7 +45,6 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.interaktion import Bruchpunkt, Kraftanteil, Querschnitt
-from opencivil.querschnitt.zugseite import Zugseite
 
 #: Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es
 #: reine Normalkraft -- eine Richtung des Moments gibt es dann nicht.
@@ -174,13 +173,13 @@ class SchiefeBiegung(Nachweis):
         return Ausfuehrung(ergebnis, urteile, befund)
 
     def _einwirkung(self, e: Eingaben, fall: Lastfall) -> Tuple[float, float, float]:
-        N, M_y, M_z = fall.N, fall.M_y, 0.0 if self.analyse.einachsig else fall.M_z
+        """Die Einwirkung, wie nachgewiesen: mit der Laengszugkraft, wo sie zaehlt."""
+        N, M_y, M_z = fall.N, fall.M_y, fall.M_z
         if self.laengszug is not None:
             N += e.g(f"dN_{fall.kennung}").si
             M_y += e.g(f"dM_y_{fall.kennung}").si
-            if not self.analyse.einachsig:
-                M_z += e.g(f"dM_z_{fall.kennung}").si
-        return N, M_y, M_z
+            M_z += e.g(f"dM_z_{fall.kennung}").si
+        return (N, *self.analyse.biegung.wirkt(M_y, M_z))
 
     def _ein_fall(self, p: Protokoll, e: Eingaben, q: Querschnitt,
                   herkunft: Sequence[Stabgruppe],
@@ -192,7 +191,8 @@ class SchiefeBiegung(Nachweis):
         p.titel(fall.name, ebene=3)
         self._protokoll_einwirkung(p, e, werte, fall, N, M_y, M_z)
 
-        moment = abs(M_y) if self.analyse.einachsig else math.hypot(M_y, M_z)
+        biegung = self.analyse.biegung
+        moment = biegung.betrag(M_y, M_z)
         N_Ed = werte.kraft("N_Ed_wirk", "N_{Ed}", N)
 
         # -- Ohne Moment: reine Normalkraft ---------------------------------
@@ -224,16 +224,12 @@ class SchiefeBiegung(Nachweis):
                     Fallergebnis(fall, N, M_y, M_z, None, v))
 
         # -- Der Bruchzustand -------------------------------------------------
-        if self.analyse.einachsig:
-            punkt = q.bei_normalkraft(Zugseite.aus_moment(M_y).psi, N)
-            M_Rd_si = abs(punkt.M_y)
-        else:
-            punkt = q.in_richtung(N, M_y, M_z)
-            M_Rd_si = punkt.moment
+        punkt = biegung.bruchpunkt(q, N, M_y, M_z)
+        M_Rd_si = biegung.betrag(punkt.M_y, punkt.M_z)
         self._protokoll_bruchzustand(p, werte, q, punkt, herkunft)
 
         M_Rd = werte.moment("M_Rd", "M_{Rd}", M_Rd_si)
-        if self.analyse.einachsig:
+        if biegung.einachsig:
             # Nur sagen, was zutrifft: beim symmetrischen Querschnitt entsteht
             # gar kein M_z, das man uebergehen koennte.
             if abs(punkt.M_z) > 1e-3 * max(M_Rd_si, 1.0):
@@ -269,22 +265,19 @@ class SchiefeBiegung(Nachweis):
 
     def _protokoll_einwirkung(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte,
                               fall: Lastfall, N: float, M_y: float, M_z: float) -> None:
-        zeilen = [["N_Ed", Mathe(fest(fall.N / 1e3, 1)), "kN"],
-                  ["M_y,Ed", Mathe(fest(fall.M_y / 1e3, 1)), "kNm"]]
-        if not self.analyse.einachsig:
-            zeilen.append(["M_z,Ed", Mathe(fest(fall.M_z / 1e3, 1)), "kNm"])
+        # Je Moment, das zaehlt, eine Zeile -- einachsig nur M_y.
+        momente = self.analyse.biegung.momente
+        zeilen = [["N_Ed", Mathe(fest(fall.N / 1e3, 1)), "kN"]]
+        zeilen += [[f"M_{a},Ed", Mathe(fest(m / 1e3, 1)), "kNm"]
+                   for a, m in momente(fall.M_y, fall.M_z)]
         if self.laengszug is not None:
             dN = e.g(f"dN_{fall.kennung}").si
-            dMy = e.g(f"dM_y_{fall.kennung}").si
-            zeilen += [["ΔN aus Querkraft und Torsion", Mathe(fest(dN / 1e3, 1)), "kN"],
-                       ["ΔM_y", Mathe(fest(dMy / 1e3, 1)), "kNm"]]
-            if not self.analyse.einachsig:
-                zeilen.append(["ΔM_z", Mathe(fest(e.g(f"dM_z_{fall.kennung}").si / 1e3, 1)),
-                               "kNm"])
-            zeilen += [["N (nachgewiesen)", Mathe(fest(N / 1e3, 1)), "kN"],
-                       ["M_y (nachgewiesen)", Mathe(fest(M_y / 1e3, 1)), "kNm"]]
-            if not self.analyse.einachsig:
-                zeilen.append(["M_z (nachgewiesen)", Mathe(fest(M_z / 1e3, 1)), "kNm"])
+            dM = [e.g(f"dM_{a}_{fall.kennung}").si for a in ("y", "z")]
+            zeilen.append(["ΔN aus Querkraft und Torsion", Mathe(fest(dN / 1e3, 1)), "kN"])
+            zeilen += [[f"ΔM_{a}", Mathe(fest(m / 1e3, 1)), "kNm"] for a, m in momente(*dM)]
+            zeilen.append(["N (nachgewiesen)", Mathe(fest(N / 1e3, 1)), "kN"])
+            zeilen += [[f"M_{a} (nachgewiesen)", Mathe(fest(m / 1e3, 1)), "kNm"]
+                       for a, m in momente(M_y, M_z)]
         p.tabelle(kopf=["Einwirkung", "Wert", ""], zeilen=zeilen,
                   titel="Einwirkung", ausrichtung="lrl")
 
@@ -341,10 +334,11 @@ class SchiefeBiegung(Nachweis):
         y_S, z_S = q.bezug
         p.formel(werte.kraft("N_int", "N_{Rd}", sum(a.N for a in anteile)), r"\sum F_i", {},
                  titel="Probe: Normalkraft")
-        p.formel(werte.moment("M_y_int", "M_{y,Rd}",
-                              sum(-a.N * (a.z - z_S) for a in anteile)),
-                 r"-\sum F_i \cdot (z_i - z_S)", {}, titel="Probe: Moment um y")
-        if not self.analyse.einachsig:
-            p.formel(werte.moment("M_z_int", "M_{z,Rd}",
-                                  sum(-a.N * (a.y - y_S) for a in anteile)),
-                     r"-\sum F_i \cdot (y_i - y_S)", {}, titel="Probe: Moment um z")
+        # Je Moment, das zaehlt, seine Probe: um y mit den Abstaenden in z, um z mit denen in y.
+        M_int = (sum(-a.N * (a.z - z_S) for a in anteile),
+                 sum(-a.N * (a.y - y_S) for a in anteile))
+        for achse, M in self.analyse.biegung.momente(*M_int):
+            quer = "z" if achse == "y" else "y"
+            p.formel(werte.moment(f"M_{achse}_int", f"M_{{{achse},Rd}}", M),
+                     rf"-\sum F_i \cdot ({quer}_i - {quer}_S)", {},
+                     titel=f"Probe: Moment um {achse}")

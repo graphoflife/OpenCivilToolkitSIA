@@ -44,6 +44,27 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Querschnittsanalyse: die Biegung als eigene Wahl
+
+Befund 3 der Strukturdurchsicht, dritter Teil: Ob der gezeichnete
+Querschnitt «einachsig» rechnet, fragten 17 Dateien als Ja/Nein ab, 80-mal.
+Die Regel für den Bruchzustand zu einer Einwirkung stand dreimal da, der
+Betrag des Moments viermal, «V_y zählt einachsig nicht» dreimal.
+
+- **`Biegung`** (`querschnitt/biegung.py`) mit zwei Stellungen, `SCHIEF` und
+  `EINACHSIG`. Sie sagt je einmal, welche Momente und Querkräfte zählen, wie
+  gross das Moment ist, welche Seiten ein Nachweis ziehen lässt, ob die
+  Zugrichtung feststeht und welcher Bruchzustand zu einer Einwirkung gehört.
+  Der Aufbau wählt sie einmal, aus dem Schalter der Beschreibung.
+- **Die Herleitungen** schreiben je Moment, das zählt, eine Zeile -- statt
+  an sechs Stellen «wenn nicht einachsig, auch M_z». Wo eine Herleitung je
+  Art ganz anders lautet (die Spannung am ungerissenen Querschnitt, der Riss
+  der Spannung-Dehnung-Analyse), fragt sie `biegung.einachsig`, je an einer
+  Stelle.
+- Für den Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Querkraft: zwei Nachweise, zwei Klassen
 
 Befund 3 der Strukturdurchsicht, zweiter Teil, und die längste Datei des

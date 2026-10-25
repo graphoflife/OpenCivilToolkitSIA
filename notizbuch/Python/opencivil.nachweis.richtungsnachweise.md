@@ -1,5 +1,5 @@
 ---
-erzeugt: 5a927888d292
+erzeugt: 1b2686670a77
 art: modul
 tags: [modul]
 ---
@@ -31,14 +31,6 @@ die Zwaengung auf Biegung ([[opencivil.nachweis.qa_gebrauch]]) haelt
 dasselbe Rissmoment gegen ihre Bewehrung.
 
 ## Inhalt
-
-### bei_reiner_biegung
-
-```python
-def bei_reiner_biegung(q: Querschnitt, seite: Zugseite, einachsig: bool) -> Bruchpunkt
-```
-
-Der Bruchzustand bei N = 0, der diese Seite zieht -- einachsig mit waagrechter Nulllinie.
 
 ### grade_je_seite
 
@@ -97,13 +89,10 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.analyse]]
-- [[opencivil.querschnitt.interaktion]]
-- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
-- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 

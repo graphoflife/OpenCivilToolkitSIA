@@ -1,5 +1,5 @@
 ---
-erzeugt: 68863cf10184
+erzeugt: 09d5a6a575dc
 art: modul
 tags: [modul]
 ---
@@ -39,7 +39,7 @@ Querkraft nur, was als Schubwand gezeichnet ist.
 
 Gerechnet wird mit der Rechenwahl der Tragsicherheit, am selben
 Bruchzustand wie Duktilitaet und sproedes Versagen
-([[opencivil.nachweis.richtungsnachweise#bei_reiner_biegung|bei_reiner_biegung]]); x und d
+([[opencivil.querschnitt.biegung#Biegung.bei_reiner_biegung|bei_reiner_biegung]]); x und d
 misst [[opencivil.querschnitt.interaktion#Querschnitt.druckzone|druckzone]], die
 Grenzen der Normalkraft
 [[opencivil.querschnitt.interaktion#Querschnitt.normalkraft_grenzen|normalkraft_grenzen]].
@@ -71,10 +71,11 @@ einem Punkt treffen. Einachsig zaehlt V_y nicht.
 ### _einheit
 
 ```python
-def _einheit(last: str) -> Dict[str, float]
+def _einheit(last: str, biegung: Biegung) -> Dict[str, float]
 ```
 
-Eine Einheitslast in dieser Richtung -- 1 N oder 1 Nm, die anderen null.
+Eine Einheitslast in dieser Richtung -- 1 N oder 1 Nm, die anderen null;
+so, wie sie wirkt: einachsig ist `V_y` null.
 
 ### KennzahlenQA
 
@@ -116,8 +117,8 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.betonstahl]]
-- [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.biegung]]
 - [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.querschnitt.zugseite]]
 
