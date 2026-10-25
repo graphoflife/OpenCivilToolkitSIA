@@ -1,5 +1,5 @@
 ---
-erzeugt: 4c5465350576
+erzeugt: 2ee31d5d9ee6
 art: modul
 tags: [modul]
 ---
@@ -157,6 +157,17 @@ die Wahllisten des Katalogs, mit Beschriftung.
 Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
 des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
 und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
+
+### eintragsklassen
+
+```python
+def eintragsklassen(cls: type) -> List[type]
+```
+
+Jede Klasse von Eintraegen, die unter `cls` vorkommt, `cls` zuerst --
+gefunden auf dem Weg, auf dem [[opencivil.projekt.lesen#lesen|lesen]] eine Datei ablaeuft: durch
+Felder, Listen, Zuordnungen und Optionale. Fuer den Katalog der
+Feldangaben ([[opencivil.projekt.lesen#feldangaben|feldangaben]]).
 
 ### sorten
 

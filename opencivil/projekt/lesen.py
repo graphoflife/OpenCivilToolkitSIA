@@ -60,7 +60,7 @@ import enum
 import functools
 import math
 import typing
-from typing import Any, Dict, Iterable, Mapping, Optional
+from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.material.beton import BETONSORTEN
@@ -170,6 +170,31 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
         if angabe:
             angaben[f.name] = angabe
     return angaben
+
+
+def eintragsklassen(cls: type) -> List[type]:
+    """
+    Jede Klasse von Eintraegen, die unter ``cls`` vorkommt, ``cls`` zuerst --
+    gefunden auf dem Weg, auf dem :func:`lesen` eine Datei ablaeuft: durch
+    Felder, Listen, Zuordnungen und Optionale. Fuer den Katalog der
+    Feldangaben (:func:`feldangaben`).
+    """
+    gefunden: Dict[type, None] = {}
+
+    def durch(k: type) -> None:
+        if k in gefunden:
+            return
+        gefunden[k] = None
+        typen = _typen(k)
+        for f in dataclasses.fields(k):
+            art, innen = _art(typen[f.name])
+            while art in ("optional", "liste", "zuordnung"):
+                art, innen = _art(innen)
+            if art == "eintrag":
+                durch(innen)
+
+    durch(cls)
+    return list(gefunden)
 
 
 def sorten(art: str) -> Mapping[str, Any]:

@@ -4024,6 +4024,7 @@
         "bereich",
         "als_groesse",
         "feldangaben",
+        "eintragsklassen",
         "sorten",
         "unbekanntes_feld",
         "lesen",
@@ -5083,6 +5084,7 @@
       "kurz": "Uebersetzung der Rechenergebnisse nach JSON.",
       "stichworte": [
         "_rechenarten",
+        "_felder",
         "katalog",
         "obergrenzen",
         "wert_dict",

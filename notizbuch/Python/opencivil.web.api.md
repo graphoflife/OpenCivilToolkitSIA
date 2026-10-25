@@ -1,5 +1,5 @@
 ---
-erzeugt: 056740861bc5
+erzeugt: 44c11f07fafc
 art: modul
 tags: [modul]
 ---
@@ -28,6 +28,17 @@ def _rechenarten(arten) -> list
 ```
 
 Die Rechenarten mit Beschriftung -- und ob die Kriechzahl bei ihnen wirkt.
+
+### _felder
+
+```python
+def _felder() -> Dict[str, Dict[str, Dict[str, Any]]]
+```
+
+Die Feldangaben jeder Klasse von Eintraegen unter dem Projekt
+([[opencivil.projekt.lesen#feldangaben|feldangaben]]), unter ihrem Namen ohne
+«Eintrag», klein: `grundbruch`, `schicht`, `stabmaterial`. Bis
+2026-10-25 standen elf von 49 Klassen von Hand da.
 
 ### katalog
 
@@ -166,6 +177,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]

@@ -128,10 +128,14 @@ Dateien über 1000 Zeilen.
       Bauteile. `bericht.js` lässt eine fehlende Art still weg. (Die
       `zuordnung` und die Angaben über der Tabelle laufen seit 2026-10-25
       über die Bauteile.)
-- [ ] **Der Katalog listet Felder von Hand** (`api.py`): 11 von 25 Klassen mit
-      Einheiten, die übrigen schreibt die Oberfläche selbst («M_Ed [kNm]»
-      in `plattenkapitel.js`). Besser ein Durchgang über den Baum der
-      Beschreibung, wie `lesen.py` ihn abläuft.
+- [ ] **Einheiten nicht an jedem Feld.** Der Katalog bringt seit 2026-10-25
+      die Feldangaben jeder Klasse von Einträgen, aus einem Durchgang über
+      den Baum der Beschreibung. Viele Felder tragen ihre Einheit aber
+      nicht -- `KombinationEintrag.M_Ed` und Co. --, und die Oberfläche
+      schreibt sie darum selbst («M_Ed [kNm]» in `plattenkapitel.js`).
+      Besser: die Einheit ans Feld (`bereich(einheit=…)`), dann liest die
+      Maske sie aus dem Katalog -- zusammen mit «Einheiten der Platte beim
+      Bauen ein zweites Mal» unten.
 - [ ] **Kleineres:** sieben Helfer bauen SVG-Pfade, und die Diagramme
       kennen zwei Regime für Farben.
 

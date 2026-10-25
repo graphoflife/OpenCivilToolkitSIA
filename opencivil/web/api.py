@@ -41,12 +41,13 @@ from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import (
     BAUTEILE, Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
     GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
-    QuerkraftbewehrungEintrag, QuerschnittEintrag, SchichtEintrag, SetzungEintrag,
+    QuerschnittEintrag, SchichtEintrag, SetzungEintrag,
     SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
 )
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import EIGENE_VORSILBE
-from opencivil.projekt.lesen import feldangaben, wahl_von
+from opencivil.projekt.lesen import eintragsklassen, feldangaben, wahl_von
+from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.querschnittsanalyse import (
     SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
     QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
@@ -111,6 +112,22 @@ def _rechenarten(arten) -> list:
 # ===========================================================================
 
 
+def _felder() -> Dict[str, Dict[str, Dict[str, Any]]]:
+    """
+    Die Feldangaben jeder Klasse von Eintraegen unter dem Projekt
+    (:func:`~opencivil.projekt.lesen.feldangaben`), unter ihrem Namen ohne
+    «Eintrag», klein: ``grundbruch``, ``schicht``, ``stabmaterial``. Bis
+    2026-10-25 standen elf von 49 Klassen von Hand da.
+    """
+    felder: Dict[str, Dict[str, Dict[str, Any]]] = {}
+    for cls in eintragsklassen(Projekt):
+        name = cls.__name__.removesuffix("Eintrag").lower()
+        if name in felder:
+            raise ValueError(f"Zwei Klassen von Eintraegen hiessen im Katalog «{name}».")
+        felder[name] = feldangaben(cls)
+    return felder
+
+
 def katalog() -> dict:
     """Alles, was die Oberflaeche zum Aufbau ihrer Auswahlfelder braucht."""
     return {
@@ -161,19 +178,7 @@ def katalog() -> dict:
         # Je Feld, was der Kern ueber seine Zahl weiss: die Einheit, in der
         # sie gemeint ist, die Grenzen und ob sie ganz sein muss -- zuerst
         # beim Grundbruch, dessen Einheiten die Maske selbst trug.
-        "felder": {
-            "grundbruch": feldangaben(GrundbruchEintrag),
-            "grundbruchkombination": feldangaben(GrundbruchkombinationEintrag),
-            "setzung": feldangaben(SetzungEintrag),
-            "schicht": feldangaben(SchichtEintrag),
-            "querkraftbewehrung": feldangaben(QuerkraftbewehrungEintrag),
-            "querschnittsanalyse": feldangaben(QuerschnittsanalyseEintrag),
-            "flaeche": feldangaben(FlaecheEintrag),
-            "spannungsfall": feldangaben(SpannungsfallEintrag),
-            "stabmaterial": feldangaben(bs.StabmaterialEintrag),
-            "stabquerschnitt": feldangaben(bs.StabquerschnittEintrag),
-            "modul": feldangaben(bs.ModulEintrag),
-        },
+        "felder": _felder(),
         # Ein Skript der App «Python», mit einem Diagramm darin.
         "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
         # Dasselbe fuer jede Zeile, die man anfuegt. Eine neue Zeile bringt

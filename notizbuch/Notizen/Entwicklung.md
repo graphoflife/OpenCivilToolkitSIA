@@ -44,6 +44,18 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Katalog: die Feldangaben jeder Klasse von Einträgen
+
+Aus der Strukturdurchsicht: welche Einheit, Grenzen und Ganzzahligkeit ein
+Feld hat, gab der Katalog der Oberfläche für elf Klassen von Einträgen, von
+Hand aufgezählt. Jetzt geht er den Baum der Beschreibung ab, auf dem Weg,
+auf dem auch das Lesen einer Datei ihn abläuft (`lesen.eintragsklassen`),
+und bringt alle 49, je unter ihrem Namen ohne «Eintrag». Die elf alten
+Angaben sind unverändert. Für den Benutzer ändert sich nichts; die
+Einheiten, die noch nicht am Feld stehen, stehen in [[TODO]].
+
+---
+
 ## 2026-10-25 · Bauteilarten: Zuordnung und Angaben über die Bauteile
 
 Aus der Strukturdurchsicht: die Zuordnung der Kennungen der Oberfläche zu

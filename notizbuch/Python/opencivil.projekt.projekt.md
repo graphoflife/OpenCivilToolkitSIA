@@ -1,5 +1,5 @@
 ---
-erzeugt: 8ef798a6e655
+erzeugt: 8e82a2e0722a
 art: modul
 tags: [modul]
 ---
@@ -434,3 +434,4 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.web.api]]
