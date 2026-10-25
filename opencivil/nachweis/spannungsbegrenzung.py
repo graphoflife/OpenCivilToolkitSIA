@@ -101,7 +101,7 @@ from opencivil.nachweis.querschnittsloeser import (
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, betonbezuege, bezuege_vereinen, gesetze, lagenbezuege, protokoll_gesetze,
-    protokoll_rechenwahl, staehle, stahlbezuege, stahllagen, stahlname,
+    protokoll_rechenwahl, staehle, stahlbezuege, stahllagen,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.spannungsgrenzen import (
@@ -467,15 +467,15 @@ class PlattenStellen(Stahlspannungsort):
             p.wert(dm, titel="Dickster Stab der Tragrichtung")
 
         grenzen = nach_stahl(zustand, lambda stahl: zulaessige_stahlspannung(
-            anforderung=anforderung, f_yk=e.g(stahlname("f_yk", stahl)).si,
-            E_s=e.g(stahlname("E_s", stahl)).si, f_ctm=f_ctm, durchmesser=durchmesser))
+            anforderung=anforderung, f_yk=e.g(stahl.eingabename("f_yk")).si,
+            E_s=e.g(stahl.eingabename("E_s")).si, f_ctm=f_ctm, durchmesser=durchmesser))
         for gruppe in grenzen.gruppen:
             stahl = gruppe.stahl
             name, symbol = je_stahl("sigma_s_adm", r"\sigma_{s,adm}", stahl, self.staehle)
             gruppe.wert = Zwischenwerte(basis).spannung(name, symbol, gruppe.sigma, "Widerstand")
             protokoll_zulaessige_stahlspannung(
-                p, gruppe.wert, anforderung=anforderung, f_yk=e[stahlname("f_yk", stahl)],
-                E_s=e[stahlname("E_s", stahl)], f_ctm=e["f_ctm"], durchmesser=dm,
+                p, gruppe.wert, anforderung=anforderung, f_yk=e[stahl.eingabename("f_yk")],
+                E_s=e[stahl.eingabename("E_s")], f_ctm=e["f_ctm"], durchmesser=dm,
                 basis=basis if len(self.staehle) == 1 else f"{basis}.{kennung_aus(stahl.id)}",
                 referenz=GrenzeAusRissbreite.referenz)
         return grenzen
@@ -748,11 +748,11 @@ class Spannungsbegrenzung(Nachweis):
                             grenzen: Grenzen, werte: Zwischenwerte, wirkt: Wert,
                             grenze: Wert) -> None:
         """Der Fall, in dem die Spannung am Plateau stehen bleibt."""
-        E_s = e[stahlname("E_s", erg.stahl)]
+        E_s = e[erg.stahl.eingabename("E_s")]
         p.text(f"Stahl fliesst (σ_s = {erg.sigma_s / 1e6:.0f} N/mm²) → "
                f"Vergleich über die Dehnung.")
         p.formel(werte.dehnung("eps_y", r"\varepsilon_y", erg.eps_y),
-                 r"\frac{@f_s}{@E_s}", {"f_s": e[stahlname(self.wahl.satz.stahl, erg.stahl)],
+                 r"\frac{@f_s}{@E_s}", {"f_s": e[erg.stahl.eingabename(self.wahl.satz.stahl)],
                                         "E_s": E_s},
                  titel="Grösste Zugdehnung in der Bewehrung", name=FLIESSDEHNUNG,
                  nachsatz=rf"\quad < \quad {angabe(wirkt)}")

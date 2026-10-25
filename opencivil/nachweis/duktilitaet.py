@@ -57,7 +57,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.core.wert import Wert, WertDef
 from opencivil.material.basis import mit_index
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 from opencivil.querschnitt.lagenaufbau import Postenbezug, lage_aus_posten, protokoll_lage
@@ -193,8 +193,7 @@ class Duktilitaet(Nachweis):
             for q in posten:
                 bezuege += q.bezuege("a_s", "z")
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
-            bezuege.append(
-                Eingabebezug(f"f_yd__{kennung_aus(stahl.id)}", stahl.id_von("f_yd")))
+            bezuege.append(stahl.bezug("f_yd"))
 
 
         super().__init__(
@@ -247,7 +246,7 @@ class Duktilitaet(Nachweis):
 
         # Eine Lage traegt genau einen Stahl -- eine schwaechere Sorte unter
         # ihren Posten gibt es nicht.
-        erg.f_sd = e.g(f"f_yd__{kennung_aus(lage.stahl.id)}").si
+        erg.f_sd = e.g(lage.stahl.eingabename("f_yd")).si
         erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=erg.f_sd, b=b, f_cd=f_cd)
         erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")
         erg.ausgang = v = Vergleich(

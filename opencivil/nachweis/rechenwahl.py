@@ -12,7 +12,8 @@ seine Gesetze oder Lagen selbst.
 JEDE LAGE MIT IHREM STAHL:
 Der Editor laesst je Seite einen eigenen Stahl waehlen. Jede Lage traegt
 darum ihren Stahl (:class:`Stahllage`), angemeldet wird je Sorte unter
-``{kennwert}__{sorte}`` (:func:`lagenbezuege`), gebaut von
+``{kennwert}__{sorte}`` (:func:`lagenbezuege`,
+:meth:`~opencivil.material.basis.Baustoff.eingabename`), gebaut von
 :func:`stahllagen`. Bis 2026-10-12 nahmen Stahlspannung, Knicken, Querkraft
 und Analyse den Stahl der ersten Lage fuer alle.
 
@@ -121,15 +122,9 @@ def staehle(posten: Sequence[Postenbezug]) -> List:
     return list({q.lage.stahl.id: q.lage.stahl for q in posten}.values())
 
 
-def stahlname(kennwert: str, stahl) -> str:
-    """Der Name, unter dem ein Kennwert dieses Stahls eingeht: ``E_s__s1``."""
-    return f"{kennwert}__{kennung_aus(stahl.id)}"
-
-
 def stahlbezuege(posten: Sequence[Postenbezug], kennwerte: Sequence[str]) -> List[Eingabebezug]:
-    """Je Stahl der Posten diese Kennwerte, unter :func:`stahlname`."""
-    return [Eingabebezug(stahlname(kennwert, stahl), stahl.id_von(kennwert))
-            for stahl in staehle(posten) for kennwert in kennwerte]
+    """Je Stahl der Posten diese Kennwerte, unter seinem :meth:`~opencivil.material.basis.Baustoff.eingabename`."""
+    return [stahl.bezug(kennwert) for stahl in staehle(posten) for kennwert in kennwerte]
 
 
 def lagenbezuege(posten: Sequence[Postenbezug], satz: Werkstoffsatz) -> List[Eingabebezug]:
@@ -291,7 +286,7 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
     gesetz_von = {l.sorte: l.stahl for l in stahllagen(posten, satz, e.si_nach_id())}
     for stahl in sorten:
         g.stahl(gesetz_von[kennung_aus(stahl.id)]).protokoll(
-            p, {rolle: e[stahlname(name, stahl)] for rolle, name in satz.stahlkennwerte.items()},
+            p, {rolle: e[stahl.eingabename(name)] for rolle, name in satz.stahlkennwerte.items()},
             titel=titel if len(sorten) == 1 else f"{titel}, {stahl.name}")
 
 
@@ -312,14 +307,14 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
     for stoff in analyse.baustoffe:
         unter = f"{basis}.{kennung_aus(stoff.id)}"
         if stoff.art is Baustoffart.BETON:
-            werte = {rolle: e[analyse._name(stoff, name)]
+            werte = {rolle: e[stoff.eingabename(name)]
                      for rolle, name in satz.betonkennwerte.items()}
             if wahl.art.mit_kriechzahl:
                 protokoll_wirksamer_modul(p, werte["E_c"], phi, unter,
                                           titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
             werte["E_c"] = wirksamer_modul_wert(werte["E_c"], wahl.kriechzahl, unter)
         else:
-            werte = {rolle: e[analyse._name(stoff, name)]
+            werte = {rolle: e[stoff.eingabename(name)]
                      for rolle, name in satz.stahlkennwerte.items()}
         werkstoffe[index(stoff)].gesetz.protokoll(p, werte, titel=f"{titel}, {stoff.name}",
                                                   basis=unter)

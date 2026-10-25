@@ -25,7 +25,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Berechnung, Formel, FormelFunktion, Vorgabe
+from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel, FormelFunktion, Vorgabe
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.latex import text_latex
 from opencivil.core.protokoll import Abschnitt
@@ -195,6 +195,18 @@ class Baustoff:
                 f"Bekannt: {sorted(self.definitionen)}."
             )
         return self.definitionen[kurzname].id
+
+    def eingabename(self, kurzname: str) -> str:
+        """
+        Der Name, unter dem ein Nachweis einen Kennwert dieses Baustoffs
+        liest, z.B. ``E_s__B500B`` -- mit der Kennung des Baustoffs, weil ein
+        Nachweis die Kennwerte mehrerer Baustoffe nebeneinander lesen kann.
+        """
+        return f"{kurzname}__{kennung_aus(self.id)}"
+
+    def bezug(self, kurzname: str) -> Eingabebezug:
+        """Ein Kennwert als Eingabe eines Nachweises, unter :meth:`eingabename`."""
+        return Eingabebezug(self.eingabename(kurzname), self.id_von(kurzname))
 
     def definition(self, kurzname: str) -> WertDef:
         return self.definitionen[self.kurzname_pruefen(kurzname)]

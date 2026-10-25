@@ -44,6 +44,16 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Aufgeräumt: der Name eines Kennwerts an einer Stelle
+
+Aus der Strukturdurchsicht: unter welchem Namen ein Nachweis einen
+Kennwert eines Baustoffs liest, etwa «f_yk__B500B», bauten `stahlname` in
+`rechenwahl.py`, `Querschnittsanalyse._name` und zwei Nachweise von Hand je
+für sich. Jetzt sagt es der Baustoff selbst (`Baustoff.eingabename`, die
+Eingabe dazu `Baustoff.bezug`). Für den Benutzer ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Querschnittsanalyse: drei Arten Bewehrung
 
 Aus der Strukturdurchsicht: ein Bewehrungselement der Querschnittsanalyse

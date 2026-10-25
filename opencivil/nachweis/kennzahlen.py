@@ -67,7 +67,7 @@ from opencivil.nachweis.querkraft_ohne_buegel import (
     Kurvenbeiwerte, beiwert_k_g, protokoll_ohne_buegel, tau_cd_wert, widerstand,
 )
 from opencivil.querschnitt.fachwerk import beste_neigung
-from opencivil.nachweis.rechenwahl import bezuege_vereinen, stahlname
+from opencivil.nachweis.rechenwahl import bezuege_vereinen
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
@@ -278,7 +278,7 @@ class Plattenkennzahlen(Prozedur):
             d, d_v = hoehen
             # Der Stahl der aeussersten gezogenen Lage, wie im Querkraftnachweis.
             stahl = self.posten[zuglage(beiwerte.lagen, seite.positiv)].lage.stahl
-            f_yd, E_s = e[stahlname("f_yd", stahl)], e[stahlname("E_s", stahl)]
+            f_yd, E_s = e[stahl.eingabename("f_yd")], e[stahl.eingabename("E_s")]
 
             null = widerstand(M_Ed=0.0, N_Ed=0.0, h=beiwerte.h, d=d.groesse.si,
                               d_v=d_v.groesse.si, tau_cd=beiwerte.tau_cd,

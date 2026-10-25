@@ -190,8 +190,8 @@ def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnitt
             durchmesser = w.laenge("dm", r"\varnothing", s.durchmesser, stellen=0)
         protokoll_zulaessige_stahlspannung(
             p, gruppe.wert, anforderung=anforderung,
-            f_yk=e[analyse._name(gruppe.stahl, "f_yk")],
-            E_s=e[analyse._name(gruppe.stahl, "E_s")], f_ctm=e[analyse._name(beton, "f_ctm")],
+            f_yk=e[gruppe.stahl.eingabename("f_yk")],
+            E_s=e[gruppe.stahl.eingabename("E_s")], f_ctm=e[beton.eingabename("f_ctm")],
             durchmesser=durchmesser, basis=w.basis, referenz=referenz)
     if mehrere:
         _tabelle_grenzen(p, staebe, grenzen)

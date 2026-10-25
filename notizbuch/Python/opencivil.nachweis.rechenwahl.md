@@ -1,5 +1,5 @@
 ---
-erzeugt: f43a6608e0c2
+erzeugt: 76362735db79
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,8 @@ seine Gesetze oder Lagen selbst.
 
 Der Editor laesst je Seite einen eigenen Stahl waehlen. Jede Lage traegt
 darum ihren Stahl ([[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage]]), angemeldet wird je Sorte unter
-`{kennwert}__{sorte}` ([[opencivil.nachweis.rechenwahl#lagenbezuege|lagenbezuege]]), gebaut von
+`{kennwert}__{sorte}` ([[opencivil.nachweis.rechenwahl#lagenbezuege|lagenbezuege]],
+[[opencivil.material.basis#Baustoff.eingabename|eingabename]]), gebaut von
 [[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]]. Bis 2026-10-12 nahmen Stahlspannung, Knicken, Querkraft
 und Analyse den Stahl der ersten Lage fuer alle.
 
@@ -89,21 +90,13 @@ def staehle(posten: Sequence[Postenbezug]) -> List
 
 Die Staehle der Posten, jeder einmal, in der Reihenfolge der Posten.
 
-### stahlname
-
-```python
-def stahlname(kennwert: str, stahl) -> str
-```
-
-Der Name, unter dem ein Kennwert dieses Stahls eingeht: `E_s__s1`.
-
 ### stahlbezuege
 
 ```python
 def stahlbezuege(posten: Sequence[Postenbezug], kennwerte: Sequence[str]) -> List[Eingabebezug]
 ```
 
-Je Stahl der Posten diese Kennwerte, unter [[opencivil.nachweis.rechenwahl#stahlname|stahlname]].
+Je Stahl der Posten diese Kennwerte, unter seinem [[opencivil.material.basis#Baustoff.eingabename|eingabename]].
 
 ### lagenbezuege
 
@@ -291,7 +284,6 @@ ersten Lage.
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
-- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]

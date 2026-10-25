@@ -574,17 +574,12 @@ class Querschnittsanalyse:
         """Womit dieser Baustoff rechnet -- der Aufbau gibt jedem seine Wahl mit."""
         return self.wahl[stoff.id]
 
-    @staticmethod
-    def _name(stoff: Baustoff, kennwert: str) -> str:
-        return f"{kennwert}__{kennung_aus(stoff.id)}"
-
     def werkstoffbezuege(self) -> List[Eingabebezug]:
         """Die Kennwerte jedes Baustoffs der Analyse, als Eingaben der Nachweise."""
-        return [Eingabebezug(self._name(stoff, k), stoff.id_von(k))
-                for stoff in self.baustoffe for k in KENNWERTE[stoff.art]]
+        return [stoff.bezug(k) for stoff in self.baustoffe for k in KENNWERTE[stoff.art]]
 
     def kennwert(self, e: Eingaben, stoff: Baustoff, kennwert: str) -> float:
-        return e.g(self._name(stoff, kennwert)).si
+        return e.g(stoff.eingabename(kennwert)).si
 
     def werkstoffe(self, wert: Callable[[str], float],
                    wahl: Callable[[Baustoff], Rechenwahl], *, ungerissen: bool = False,
@@ -657,7 +652,7 @@ class Querschnittsanalyse:
             kennwerte = (satz.betonkennwerte if stoff.art is Baustoffart.BETON
                          else satz.stahlkennwerte)
             werkstoffe[index(stoff)].gesetz.protokoll(
-                p, {rolle: e[self._name(stoff, name)] for rolle, name in kennwerte.items()},
+                p, {rolle: e[stoff.eingabename(name)] for rolle, name in kennwerte.items()},
                 titel=f"Werkstoffgesetz {stoff.name}, {satz.beschriftung}",
                 basis=f"{basis}.{kennung_aus(stoff.id)}")
 

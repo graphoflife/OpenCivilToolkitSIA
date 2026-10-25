@@ -347,7 +347,7 @@ def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse
     h = werte.laenge("h", "h", riss.hoehe)
     f_ct_eff = protokoll_zugfestigkeit(
         p, werte, k_t=riss.k_t, f_ct_eff=riss.f_ct_eff, h=h,
-        f_ctm=e[analyse._name(ecke.stoff, "f_ctm")], teiler=MOMENTENTEILER,
+        f_ctm=e[ecke.stoff.eingabename("f_ctm")], teiler=MOMENTENTEILER,
         referenz=referenz, titel="Beiwert für die Höhe in Biegerichtung")
     W = protokoll_widerstandsmoment(p, werte, q, ecke, riss.W, M_y, M_z)
     M_Riss = werte.moment("M_Riss", "M_{Riss}", riss.M_Riss)

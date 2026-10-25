@@ -1,5 +1,5 @@
 ---
-erzeugt: 4d7cfac659f0
+erzeugt: ea8baa2e9d1a
 art: modul
 tags: [modul]
 ---
@@ -147,6 +147,24 @@ def id_von(self, kurzname: str) -> str
 ```
 
 Globale Wert-ID zu einem Kurznamen, z.B. `f_cd` -> `beton.C30_37.f_cd`.
+
+#### Baustoff.eingabename
+
+```python
+def eingabename(self, kurzname: str) -> str
+```
+
+Der Name, unter dem ein Nachweis einen Kennwert dieses Baustoffs
+liest, z.B. `E_s__B500B` -- mit der Kennung des Baustoffs, weil ein
+Nachweis die Kennwerte mehrerer Baustoffe nebeneinander lesen kann.
+
+#### Baustoff.bezug
+
+```python
+def bezug(self, kurzname: str) -> Eingabebezug
+```
+
+Ein Kennwert als Eingabe eines Nachweises, unter [[opencivil.material.basis#Baustoff.eingabename|eingabename]].
 
 #### Baustoff.definition
 

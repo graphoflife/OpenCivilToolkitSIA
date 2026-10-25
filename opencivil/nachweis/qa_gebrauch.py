@@ -335,7 +335,7 @@ class RissnormalkraftQA(Nachweis):
         glieder = []
         for stoff, A_c in betonflaechen(self.analyse):
             unter = Zwischenwerte(f"{self.id}.{kennung_aus(stoff.id)}")
-            f_ctm = e[self.analyse._name(stoff, "f_ctm")]
+            f_ctm = e[stoff.eingabename("f_ctm")]
             f_ct_eff = protokoll_zugfestigkeit(
                 p, unter, k_t=k_t, f_ct_eff=k_t * abs(f_ctm.groesse.si), h=t, f_ctm=f_ctm,
                 teiler=1, referenz="SIA 262:2025, 4.4.2",

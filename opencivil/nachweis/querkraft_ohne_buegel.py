@@ -48,7 +48,7 @@ from opencivil.nachweis.querkraft import (
     Querkraft, Querkraftergebnis, Querkraftfall, _ohne_zugbewehrung, _hoch, _statische_hoehe,
     lagen_von, protokoll_hoehen, zuglage,
 )
-from opencivil.nachweis.rechenwahl import stahlbezuege, stahlname, staehle
+from opencivil.nachweis.rechenwahl import stahlbezuege, staehle
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
@@ -371,8 +371,8 @@ class QuerkraftOhneBuegel(Querkraft):
             i = zuglage(lagen, positiv)
             if i is not None:
                 stahl = self.posten[i].lage.stahl
-                zugstahl[positiv] = (e.g(stahlname("f_yd", stahl)).si,
-                                     e.g(stahlname("E_s", stahl)).si)
+                zugstahl[positiv] = (e.g(stahl.eingabename("f_yd")).si,
+                                     e.g(stahl.eingabename("E_s")).si)
 
         self._protokoll_ansatz(p, e)
 
@@ -452,7 +452,7 @@ class QuerkraftOhneBuegel(Querkraft):
         # welcher gilt, steht bei jedem Fall.
         s = {"tau_cd": e["tau_cd"].symbol}
         for kennwert, allgemein in (("f_yd", "f_{yd}"), ("E_s", "E_s")):
-            zeichen = {e[stahlname(kennwert, st)].symbol for st in staehle(self.posten)}
+            zeichen = {e[st.eingabename(kennwert)].symbol for st in staehle(self.posten)}
             s[kennwert] = zeichen.pop() if len(zeichen) == 1 else allgemein
         p.ansatz(
             rf"V_{{Rd}} = k_d \cdot {s['tau_cd']} \cdot d_v \qquad "
@@ -526,7 +526,7 @@ class QuerkraftOhneBuegel(Querkraft):
         m_Rd = werte.moment("m_Rd", f"m_{{{idx}}}(N_{{Ed}})", erg.m_Rd)
         eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
         zugseite = self.posten[erg.zuglage].lage.stahl
-        stahl = {"f_yd": e[stahlname("f_yd", zugseite)], "E_s": e[stahlname("E_s", zugseite)]}
+        stahl = {"f_yd": e[zugseite.eingabename("f_yd")], "E_s": e[zugseite.eingabename("E_s")]}
         if erg.eps_v == 0.0:
             p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "
                    f"≤ m_Dd = {m_Dd.formatiert()} kNm → ungerissen, ε_v = 0.")

@@ -50,7 +50,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.core.wert import Wert, WertDef
 from opencivil.nachweis.rissgroessen import (
     DICKENGRENZE, Rissgroessen as Momentgroessen, beiwert_dicke,
     protokoll_rissmoment_rechteck, protokoll_zugfestigkeit, rissaktive_dicke,
@@ -162,12 +162,12 @@ def _protokoll_stahlspannung(
             p.formel(durchmesser, rf"\max\left[{glieder}\right]",
                      {f"d{i}": s for i, s in enumerate(staebe)},
                      titel="Dickster Stab der Lage")
-    kurz = kennung_aus(erg.lage.stahl.id)
+    stahl = erg.lage.stahl
     sigma = werte.spannung("sigma_s_adm", rf"\sigma_{{s,adm,{lage}}}",
                            erg.sigma_s_adm)
     protokoll_zulaessige_stahlspannung(
-        p, sigma, anforderung=anforderung, f_yk=e[f"f_yk__{kurz}"],
-        E_s=e[f"E_s__{kurz}"], f_ctm=e["f_ctm"], durchmesser=durchmesser,
+        p, sigma, anforderung=anforderung, f_yk=e[stahl.eingabename("f_yk")],
+        E_s=e[stahl.eingabename("E_s")], f_ctm=e["f_ctm"], durchmesser=durchmesser,
         basis=werte.basis, referenz="SIA 262:2025, 4.4.2")
     return sigma
 
@@ -243,11 +243,7 @@ class Rissnormalkraft(Nachweis):
             for q in posten:
                 bezuege += q.bezuege("a_s", "phi")
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
-            kurz = kennung_aus(stahl.id)
-            bezuege += [
-                Eingabebezug(f"f_yk__{kurz}", stahl.id_von("f_yk")),
-                Eingabebezug(f"E_s__{kurz}", stahl.id_von("E_s")),
-            ]
+            bezuege += [stahl.bezug("f_yk"), stahl.bezug("E_s")]
 
         super().__init__(
             basis,
@@ -295,11 +291,10 @@ class Rissnormalkraft(Nachweis):
         # Der dickste Stab bestimmt die Rissbreite: er verteilt den Riss auf
         # die wenigsten Stäbe und bekommt damit die grösste Spannung.
         erg.durchmesser = max(e.g(q.name("phi")).si for q in posten)
-        kurz = kennung_aus(lage.stahl.id)
-        E_s = e.g(f"E_s__{kurz}").si
+        E_s = e.g(lage.stahl.eingabename("E_s")).si
         erg.sigma_s_adm = zulaessige_stahlspannung(
             anforderung=self.anforderung,
-            f_yk=e.g(f"f_yk__{kurz}").si, E_s=E_s, f_ctm=f_ctm,
+            f_yk=e.g(lage.stahl.eingabename("f_yk")).si, E_s=E_s, f_ctm=f_ctm,
             durchmesser=erg.durchmesser)
         erg.N_s_adm = erg.a_s * erg.sigma_s_adm
 
@@ -493,11 +488,7 @@ class ZwaengungBiegung(Biegezwang):
             for q in posten:
                 bezuege += q.bezuege("a_s", "z", "phi")
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
-            kurz = kennung_aus(stahl.id)
-            bezuege += [
-                Eingabebezug(f"f_yk__{kurz}", stahl.id_von("f_yk")),
-                Eingabebezug(f"E_s__{kurz}", stahl.id_von("E_s")),
-            ]
+            bezuege += [stahl.bezug("f_yk"), stahl.bezug("E_s")]
 
         super().__init__(
             basis,
@@ -548,11 +539,10 @@ class ZwaengungBiegung(Biegezwang):
         erg.z_s, erg.d = z, d
         erg.durchmesser = max(e.g(q.name("phi")).si for q in posten)
 
-        kurz = kennung_aus(lage.stahl.id)
-        E_s = e.g(f"E_s__{kurz}").si
+        E_s = e.g(lage.stahl.eingabename("E_s")).si
         erg.sigma_s_adm = zulaessige_stahlspannung(
             anforderung=self.anforderung,
-            f_yk=e.g(f"f_yk__{kurz}").si, E_s=E_s, f_ctm=f_ctm,
+            f_yk=e.g(lage.stahl.eingabename("f_yk")).si, E_s=E_s, f_ctm=f_ctm,
             durchmesser=erg.durchmesser)
 
         erg.n = wertigkeit(E_s=E_s, E_cm=E_cm, phi=phi)
@@ -654,5 +644,5 @@ def _erster_E_s(e: Eingaben, lagen: Sequence[Bewehrungslage]) -> Optional[Wert]:
     """
     for lage in lagen:
         if lage.stahl:
-            return e[f"E_s__{kennung_aus(lage.stahl.id)}"]
+            return e[lage.stahl.eingabename("E_s")]
     return None

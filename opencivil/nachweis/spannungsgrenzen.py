@@ -31,7 +31,6 @@ from opencivil.core.einheiten import N_PRO_MM2, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
-from opencivil.nachweis.rechenwahl import stahlname
 from opencivil.nachweis.rissanforderung import Rissanforderung
 
 if TYPE_CHECKING:
@@ -140,13 +139,13 @@ def gegen_fliessen(zustand: Stahlzustand, e: Eingaben, p: Protokoll, basis: str)
     ``f_yd - 80 N/mm²`` je Stahl, hergeleitet -- fuer jede Geometrie dasselbe:
     der Durchmesser zaehlt hier nicht. Setzt :attr:`Grenzgruppe.wert`.
     """
-    grenzen = nach_stahl(zustand, lambda s: abs(e.g(stahlname("f_yd", s)).si) - FLIESSABSTAND)
+    grenzen = nach_stahl(zustand, lambda s: abs(e.g(s.eingabename("f_yd")).si) - FLIESSABSTAND)
     # Die 80 N/mm² haben kein Zeichen -- sie stehen als Zahl in der Formel.
     abstand = Groesse.aus_si(FLIESSABSTAND, N_PRO_MM2).als_latex(0)
     for gruppe in grenzen.gruppen:
         name, symbol = je_stahl("sigma_s_adm", r"\sigma_{s,adm}", gruppe.stahl, zustand.staehle)
         gruppe.wert = Zwischenwerte(basis).spannung(name, symbol, gruppe.sigma, "Widerstand")
-        p.formel(gruppe.wert, f"@f_yd - {abstand}", {"f_yd": e[stahlname("f_yd", gruppe.stahl)]},
+        p.formel(gruppe.wert, f"@f_yd - {abstand}", {"f_yd": e[gruppe.stahl.eingabename("f_yd")]},
                  titel="Zulässige Stahlspannung", referenz=GrenzeGegenFliessen.referenz)
     return grenzen
 

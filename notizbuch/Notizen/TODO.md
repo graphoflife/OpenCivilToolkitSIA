@@ -135,10 +135,8 @@ Dateien über 1000 Zeilen, «fest» als `math.inf`.
       Beschreibung, wie `lesen.py` ihn abläuft.
 - [ ] **Kleineres:** zwei Kataloge von Querschnittsvorlagen
       (`querschnitt/vorlagen.py`, `stabwerk/querschnitte.py`), die Prüfung
-      des T-Querschnitts läuft auseinander (`>=` gegen `>`) · die Regel für
-      den Namen eines Stahlkennwerts steht zweimal (`stahlname`,
-      `Querschnittsanalyse._name`) · sieben Helfer bauen SVG-Pfade, und die
-      Diagramme kennen zwei Regime für Farben.
+      des T-Querschnitts läuft auseinander (`>=` gegen `>`) · sieben Helfer
+      bauen SVG-Pfade, und die Diagramme kennen zwei Regime für Farben.
 
 ## Umbau: liegen geblieben bei der Durchsicht vom 2026-10-18
 
