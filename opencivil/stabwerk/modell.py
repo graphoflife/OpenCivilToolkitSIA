@@ -22,21 +22,46 @@ waagrechte Lasten gelten je Meter Stab -- oder, mit ``projiziert``, je Meter
 der Projektion, wie Schnee auf einem geneigten Dach.
 
 HALT:
-Ein Lager haelt je Richtung fest (:data:`FEST`), federnd (eine Zahl) oder
-gar nicht (``None``) -- dieselbe Wahl fuer die Linienlager eines Stabs, quer
-und laengs. Eine Feder in N/m bzw. Nm/rad, eine Bettung in N/m je m Stab.
+Ein Lager haelt je Richtung fest (:data:`FEST`), federnd (:func:`feder`)
+oder gar nicht (:data:`FREI`) -- dieselbe Wahl fuer die Linienlager eines
+Stabs, quer und laengs (:class:`Halt`). Eine Feder in N/m bzw. Nm/rad, eine
+Bettung in N/m je m Stab. Bis 2026-10-25 war «fest» eine unendliche
+Federzahl und «frei» ``None``, und das System uebersetzte beides an 17
+Stellen zurueck.
 """
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field, replace
 from typing import Dict, List, Optional, Tuple, Union
 
 from opencivil.core.wahl import Wahl
 
+@dataclass(frozen=True)
+class Halt:
+    """Wie eine Richtung gehalten ist: frei, fest oder mit einer Feder -- siehe Dateikopf."""
+
+    fest: bool = False
+    """Ob sie sich nicht verschiebt."""
+
+    feder: float = 0.0
+    """Die Steifigkeit der Feder, die sie haelt -- frei und fest null."""
+
+    @property
+    def frei(self) -> bool:
+        return not self.fest and self.feder == 0.0
+
+
+#: Nicht gehalten.
+FREI = Halt()
+
 #: Fest gehalten -- eine Richtung ohne Verschiebung.
-FEST = math.inf
+FEST = Halt(fest=True)
+
+
+def feder(steifigkeit: float) -> Halt:
+    """Von einer Feder gehalten, mit dieser Steifigkeit."""
+    return Halt(feder=steifigkeit)
 
 
 class Lastrichtung(Wahl):
@@ -117,21 +142,17 @@ class Knoten:
     z: float
 
 
-Halt = Optional[float]
-"""``None`` frei, :data:`FEST` fest, sonst eine Federsteifigkeit."""
-
-
 @dataclass(frozen=True)
 class Lager:
     """Ein Lager an einem Knoten -- je Richtung frei, fest oder Feder."""
 
     name: str
     knoten: str
-    x: Halt = None
+    x: Halt = FREI
     """In N/m, wenn Feder."""
 
-    z: Halt = None
-    phi: Halt = None
+    z: Halt = FREI
+    phi: Halt = FREI
     """In Nm/rad, wenn Feder."""
 
 
@@ -156,8 +177,8 @@ class Stab:
     traegt: bool = True
     gelenk_a: bool = False
     gelenk_b: bool = False
-    quer: Halt = None
-    laengs: Halt = None
+    quer: Halt = FREI
+    laengs: Halt = FREI
 
 
 @dataclass(frozen=True)

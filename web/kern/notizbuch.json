@@ -4892,6 +4892,9 @@
       "art": "modul",
       "kurz": "was gerechnet wird: das ebene Stabwerk in SI.",
       "stichworte": [
+        "Halt",
+        "Halt.frei",
+        "feder",
         "Lastrichtung",
         "Lastrichtung.beschriftung",
         "Lastrichtung.im_system",

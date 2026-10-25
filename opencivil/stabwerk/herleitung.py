@@ -29,7 +29,7 @@ from opencivil.core.latex import Mathe, fest, text_latex
 from opencivil.core.protokoll import Protokoll
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import dicht
-from opencivil.stabwerk.modell import FEST, Stablast, System
+from opencivil.stabwerk.modell import Halt, Stablast, System
 from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Ergebnis, Fall
 
 if TYPE_CHECKING:
@@ -116,17 +116,17 @@ def _staebe(p: Protokoll, system: "Balkensystem", modell: System) -> None:
                    "Gelenk", "Linienlager"], zeilen, titel="Stäbe")
 
 
-def _halt(wert, einheit: str, faktor: float = 1e3) -> str:
-    if wert is None:
-        return "frei"
-    if wert == FEST:
+def _halt(halt: Halt, einheit: str, faktor: float = 1e3) -> str:
+    if halt.fest:
         return "fest"
-    return f"Feder {wert / faktor:g} {einheit}"
+    if halt.frei:
+        return "frei"
+    return f"Feder {halt.feder / faktor:g} {einheit}"
 
 
-def _linienlager(quer, laengs) -> str:
-    teile = [f"{richtung} {_halt(wert, 'kN/m²').replace('Feder', 'Bettung')}"
-             for richtung, wert in (("quer", quer), ("längs", laengs)) if wert is not None]
+def _linienlager(quer: Halt, laengs: Halt) -> str:
+    teile = [f"{richtung} {_halt(halt, 'kN/m²').replace('Feder', 'Bettung')}"
+             for richtung, halt in (("quer", quer), ("längs", laengs)) if not halt.frei]
     return ", ".join(teile) or "–"
 
 

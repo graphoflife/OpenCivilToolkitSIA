@@ -92,7 +92,7 @@ im Balkensystem), 2.1 (das Urteil der Nachweise), das `Unterprotokoll`,
 der doppelte Bügelgehalt und der Posten als Tupel, siehe [[Entwicklung]].
 Was in den Abschnitten darunter schon steht, steht hier nicht noch einmal:
 die Grundlage der Apps mit Zeichenfenster, die `Fallauswertung`, die
-Dateien über 1000 Zeilen, «fest» als `math.inf`.
+Dateien über 1000 Zeilen.
 
 - [ ] **Sechs eigene Zwischenspeicher für Nebenanfragen** (`qa_zeichnung.js`,
       `bs_zeichnung.js`, `qa_diagramme.js`, `bs_diagramme.js`, `app.js`,
@@ -245,12 +245,10 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       Katalog.
 - [ ] **Balkensystem: Kennung statt Name.** Ein Fall wird an seinem Namen
       erkannt, gleiche Namen sind darum verboten -- seit 2026-10-15 als
-      Meldung am System, nicht mehr als Fehler des ganzen Projekts. «Fest»
-      reist als `math.inf` und wird in
-      `system.py` an 17 Stellen zurückübersetzt; Stäbe und Lasten werden in
-      vier Durchgängen aufgelöst, mit einem Schalter `melden`. Besser:
-      LF1/LK1 als Identität, `Halt(fest, feder)`, Lasten einmal je Fall
-      auflösen.
+      Meldung am System, nicht mehr als Fehler des ganzen Projekts. Stäbe
+      und Lasten werden in vier Durchgängen aufgelöst, mit einem Schalter
+      `melden`. Besser: LF1/LK1 als Identität, Lasten einmal je Fall
+      auflösen. («Fest» als `math.inf` ist seit 2026-10-25 ein `Halt`.)
 - [ ] **Varianten im Kern -- deine Entscheidung.** `prioritaet`,
       `bedingung`, `anwendbar`, `verworfene_varianten` benutzt ausserhalb des
       Kerns niemand. Wer zwei Berechnungen für denselben Wert anmeldet

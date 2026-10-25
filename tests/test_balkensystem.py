@@ -360,8 +360,8 @@ class TestModell(unittest.TestCase):
         s.lager[1].x, s.lager[1].k_x = "feder", 5000.0
         s.linien[0].quer, s.linien[0].k_quer = "feder", 2000.0
         modell = s.modell()
-        self.assertEqual(modell.system.lager[1].x, 5e6)
-        self.assertEqual(modell.system.staebe[0].quer, 2e6)
+        self.assertEqual(modell.system.lager[1].x.feder, 5e6)
+        self.assertEqual(modell.system.staebe[0].quer.feder, 2e6)
         s.lager[1].k_x = 0.0
         self.assertFalse(s.modell().gueltig)
 

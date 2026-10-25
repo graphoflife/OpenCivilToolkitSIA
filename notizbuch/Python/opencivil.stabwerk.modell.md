@@ -1,5 +1,5 @@
 ---
-erzeugt: b43b18bcb08d
+erzeugt: 11f5a9e87966
 art: modul
 tags: [modul]
 ---
@@ -35,11 +35,41 @@ der Projektion, wie Schnee auf einem geneigten Dach.
 
 ## HALT
 
-Ein Lager haelt je Richtung fest ([[opencivil.stabwerk.modell#Konstanten|FEST]]), federnd (eine Zahl) oder
-gar nicht (`None`) -- dieselbe Wahl fuer die Linienlager eines Stabs, quer
-und laengs. Eine Feder in N/m bzw. Nm/rad, eine Bettung in N/m je m Stab.
+Ein Lager haelt je Richtung fest ([[opencivil.stabwerk.modell#Konstanten|FEST]]), federnd ([[opencivil.stabwerk.modell#feder|feder]])
+oder gar nicht ([[opencivil.stabwerk.modell#Konstanten|FREI]]) -- dieselbe Wahl fuer die Linienlager eines
+Stabs, quer und laengs ([[opencivil.stabwerk.modell#Halt|Halt]]). Eine Feder in N/m bzw. Nm/rad, eine
+Bettung in N/m je m Stab. Bis 2026-10-25 war «fest» eine unendliche
+Federzahl und «frei» `None`, und das System uebersetzte beides an 17
+Stellen zurueck.
 
 ## Inhalt
+
+### Halt
+
+```python
+@dataclass(frozen=True)
+class Halt
+```
+
+Wie eine Richtung gehalten ist: frei, fest oder mit einer Feder -- siehe Dateikopf.
+
+- `fest: bool = False` – Ob sie sich nicht verschiebt.
+- `feder: float = 0.0` – Die Steifigkeit der Feder, die sie haelt -- frei und fest null.
+
+#### Halt.frei
+
+```python
+@property
+def frei(self) -> bool
+```
+
+### feder
+
+```python
+def feder(steifigkeit: float) -> Halt
+```
+
+Von einer Feder gehalten, mit dieser Steifigkeit.
 
 ### Lastrichtung
 
@@ -144,9 +174,9 @@ Ein Lager an einem Knoten -- je Richtung frei, fest oder Feder.
 
 - `name: str`
 - `knoten: str`
-- `x: Halt = None` – In N/m, wenn Feder.
-- `z: Halt = None`
-- `phi: Halt = None` – In Nm/rad, wenn Feder.
+- `x: Halt = FREI` – In N/m, wenn Feder.
+- `z: Halt = FREI`
+- `phi: Halt = FREI` – In Nm/rad, wenn Feder.
 
 ### Stab
 
@@ -168,8 +198,8 @@ Bettung in N/m². Die Gelenke gelten fuer das Moment am Ende.
 - `traegt: bool = True`
 - `gelenk_a: bool = False`
 - `gelenk_b: bool = False`
-- `quer: Halt = None`
-- `laengs: Halt = None`
+- `quer: Halt = FREI`
+- `laengs: Halt = FREI`
 
 ### Stablast
 
@@ -266,7 +296,8 @@ Beiwerten gewichteten Lastfaelle.
 
 ## Konstanten
 
-- `FEST = math.inf` – Fest gehalten -- eine Richtung ohne Verschiebung.
+- `FREI = Halt()` – Nicht gehalten.
+- `FEST = Halt(fest=True)` – Fest gehalten -- eine Richtung ohne Verschiebung.
 
 ## Braucht
 

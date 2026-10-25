@@ -59,8 +59,8 @@ from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.stabwerk import querschnitte as qs
 from opencivil.stabwerk.modell import (
-    FEST, Kombination, Knoten, Knotenlast, Lager, Lastart, Lastfall, Lastrichtung, Stab,
-    Stablast, System,
+    FEST, FREI, Halt, Kombination, Knoten, Knotenlast, Lager, Lastart, Lastfall, Lastrichtung,
+    Stab, Stablast, System, feder,
 )
 from opencivil.stabwerk.system import Meldung
 
@@ -565,15 +565,15 @@ class BalkensystemEintrag(Beschreibung):
                 melden(f"Mehrere {was} haben die Kennung «{kennung}» – sie wären nicht zu "
                        f"unterscheiden. Gerechnet wird erst mit verschiedenen.", kennung)
 
-        def halt(art: str, k: float, feld: str, wo: str) -> Optional[float]:
+        def halt(art: str, k: float, feld: str, wo: str) -> Halt:
             if art == "frei":
-                return None
+                return FREI
             if art == "fest":
                 return FEST
             if k <= 0.0:
                 melden(f"{wo}: eine Feder braucht eine Steifigkeit grösser als null.", wo)
-                return None
-            return Groesse(k, EINHEIT_DER_FEDER[feld]).si
+                return FREI
+            return feder(Groesse(k, EINHEIT_DER_FEDER[feld]).si)
 
         querschnitte = {q.kennung: q for q in self.querschnitte}
         stoffe = {m.kennung for m in self.stabmaterialien} | {MATERIAL_DES_QUERSCHNITTS}

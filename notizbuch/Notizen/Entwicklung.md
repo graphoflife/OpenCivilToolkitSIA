@@ -44,6 +44,18 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-25 · Balkensystem: frei, fest oder Feder als ein Wert
+
+Aus der Strukturdurchsicht: wie ein Lager oder ein Linienlager eine
+Richtung hält, reiste als Zahl -- «fest» als unendliche Federzahl, «frei»
+als `None` --, und das System übersetzte beides an 17 Stellen zurück, etwa
+`wert not in (None, FEST)`. Jetzt ist es ein `Halt` mit `fest` und
+`feder` (`FREI`, `FEST`, `feder(k)` in `stabwerk/modell.py`), und das
+System liest nur noch `halt.fest` und `halt.feder`. Für den Benutzer
+ändert sich nichts.
+
+---
+
 ## 2026-10-25 · Spannung-Dehnung-Analyse: Moment oder Normalkraft ohne Schalter
 
 Aus der Strukturdurchsicht: ob eine Linie über dem Moment läuft (M–χ und

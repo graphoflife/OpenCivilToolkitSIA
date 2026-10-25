@@ -64,7 +64,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import Profilmatrix, Zerlegung, nummerierung
 from opencivil.stabwerk.modell import (
-    FEST, Knotenlast, Lastart, Lastfall, Stab, Stablast, System,
+    Knotenlast, Lastart, Lastfall, Stab, Stablast, System,
 )
 
 #: Wie nahe ein Knoten an einem Stab liegen muss, um mit ihm verbunden zu
@@ -377,8 +377,8 @@ class _Rechnung:
                     continue
                 tragende.append(stab_)
             else:
-                for wert in (stab_.quer, stab_.laengs):
-                    if wert is not None and wert != FEST and wert > 0.0:
+                for halt in (stab_.quer, stab_.laengs):
+                    if halt.feder > 0.0:
                         self._melden(f"{stab_.name}: ein federndes Linienlager braucht einen "
                                      f"Stab, der darauf liegt.", stab_.name)
         if not tragende and self.ergebnis.gueltig:
@@ -410,8 +410,7 @@ class _Rechnung:
                 if t is not None:
                     stellen.append((t, self._ort(k.name)))
             stellen.sort(key=lambda e: e[0])
-            k_quer = stab_.quer if stab_.quer not in (None, FEST) else 0.0
-            k_laengs = stab_.laengs if stab_.laengs not in (None, FEST) else 0.0
+            k_quer, k_laengs = stab_.quer.feder, stab_.laengs.feder
             nummer = 0
             for (x0, o0), (x1, o1) in zip(stellen, stellen[1:]):
                 teile = 1
@@ -438,7 +437,7 @@ class _Rechnung:
                     self.ergebnis.teilstaebe.append(Teilstab(
                         stab=stab_, nummer=nummer, x0=p0, x1=p1, a=q0, b=q1, c=c, s=s,
                         L_stab=L, k_quer=k_quer, k_laengs=k_laengs,
-                        biegung=stab_.quer != FEST, laengs=stab_.laengs != FEST,
+                        biegung=not stab_.quer.fest, laengs=not stab_.laengs.fest,
                         gelenk_a=stab_.gelenk_a and p0 == 0.0,
                         gelenk_b=stab_.gelenk_b and p1 == L))
                     nummer += 1
@@ -460,21 +459,18 @@ class _Rechnung:
                 self._melden(f"{lager.name} am Knoten {lager.knoten}: dort ist kein Stab – das "
                              f"Lager hält nichts.", lager.name, fehler=False)
                 continue
-            for wert, richtung in ((lager.x, (1.0, 0.0)), (lager.z, (0.0, 1.0))):
-                if wert == FEST:
+            for halt, richtung in ((lager.x, (1.0, 0.0)), (lager.z, (0.0, 1.0))):
+                if halt.fest:
                     ort.zwang.append(richtung)
-            if lager.x not in (None, FEST):
-                ort.feder_x += lager.x
-            if lager.z not in (None, FEST):
-                ort.feder_z += lager.z
-            if lager.phi == FEST:
+            ort.feder_x += lager.x.feder
+            ort.feder_z += lager.z.feder
+            ort.feder_phi += lager.phi.feder
+            if lager.phi.fest:
                 ort.dreh_fest = True
-            elif lager.phi is not None:
-                ort.feder_phi += lager.phi
         # Feste Linienlager: an jedem Ort des Stabs, oder -- ohne Stab -- an
         # jedem Ort, der auf der Linie liegt.
         for stab_ in self.system.staebe:
-            if FEST not in (stab_.quer, stab_.laengs):
+            if not (stab_.quer.fest or stab_.laengs.fest):
                 continue
             a, b = self.knoten.get(stab_.a), self.knoten.get(stab_.b)
             if a is None or b is None:
@@ -487,9 +483,9 @@ class _Rechnung:
                          if o.stab == stab_.name or o.knoten in (stab_.a, stab_.b)
                          or (o.knoten and _stelle_auf(a, b, o) is not None)]
             for ort in betroffen:
-                if stab_.quer == FEST:
+                if stab_.quer.fest:
                     ort.zwang.append((-s, c))
-                if stab_.laengs == FEST:
+                if stab_.laengs.fest:
                     ort.zwang.append((c, s))
         for ort in orte.values():
             ort.fest, ort.frei = _basis(ort.zwang)
@@ -620,7 +616,7 @@ class _Rechnung:
             if isinstance(teil, str):
                 melde(f"{stab_.name}, Lastfall «{fall.name}»: {teil}", stab_.name)
                 continue
-            if not stab_.traegt and stab_.quer != FEST and stab_.laengs != FEST:
+            if not stab_.traegt and not (stab_.quer.fest or stab_.laengs.fest):
                 melde(f"{stab_.name} ist kein Stab: eine Last darauf trägt nichts. Die "
                       f"Linie braucht Querschnitt und Material.", stab_.name)
                 continue
@@ -773,7 +769,7 @@ class _Rechnung:
             if not isinstance(last, Stablast):
                 continue
             stab_ = staebe.get(last.stab)
-            if stab_ is None or FEST not in (stab_.quer, stab_.laengs):
+            if stab_ is None or not (stab_.quer.fest or stab_.laengs.fest):
                 continue
             a, b = self.knoten[stab_.a], self.knoten[stab_.b]
             L = _laenge(a, b)
@@ -781,8 +777,8 @@ class _Rechnung:
             teil = _lokal(last, L, c, s)
             if isinstance(teil, str):
                 continue
-            quer = stab_.quer == FEST or not stab_.traegt
-            laengs = stab_.laengs == FEST or not stab_.traegt
+            quer = stab_.quer.fest or not stab_.traegt
+            laengs = stab_.laengs.fest or not stab_.traegt
             fx, fz, m = _resultierende(teil, a, c, s, quer=quer, laengs=laengs,
                                        moment=quer)
             summe = heraus.setdefault(stab_.name, [0.0, 0.0, 0.0])

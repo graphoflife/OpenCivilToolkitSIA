@@ -17,7 +17,7 @@ import unittest
 
 from opencivil.stabwerk.modell import (
     FEST, Kombination, Knoten, Knotenlast, Lager, Lastart, Lastfall, Lastrichtung,
-    Stab, Stablast, System,
+    Stab, Stablast, System, feder,
 )
 from opencivil.stabwerk.system import UNBESTIMMT, rechnen
 
@@ -237,7 +237,7 @@ class TestFedern(Rechnung):
         k = 2e6
         e = self.gerechnet(system(
             [("K1", 0, 0), ("K2", 4, 0)], [stab("L1", "K1", "K2")],
-            [gelenkig("A1", "K1"), Lager("A2", "K2", z=k)],
+            [gelenkig("A1", "K1"), Lager("A2", "K2", z=feder(k))],
             Lastfall("P", [Knotenlast("K2", Fz=-P)])))
         self.assertAlmostEqual(e.faelle[0].verschiebungen["K2"][1], -P / k, places=12)
         self.assertAlmostEqual(e.faelle[0].lagerkraefte["K2"][1], P, places=6)
@@ -245,7 +245,7 @@ class TestFedern(Rechnung):
     def test_drehfeder_haelt_einen_gelenkknoten(self):
         s = system([("A", 0, 0), ("C", 2, 0), ("E", 4, 0)],
                    [stab("L1", "A", "C", gelenk_b=True), stab("L2", "C", "E", gelenk_a=True)],
-                   [eingespannt("A1", "A"), eingespannt("A2", "E"), Lager("A3", "C", phi=1e5)],
+                   [eingespannt("A1", "A"), eingespannt("A2", "E"), Lager("A3", "C", phi=feder(1e5))],
                    Lastfall("M", [Knotenlast("C", M=5e3)]))
         e = self.gerechnet(s)
         self.assertAlmostEqual(e.faelle[0].verschiebungen["C"][2], 5e3 / 1e5, places=12)
@@ -293,7 +293,7 @@ class TestBettung(Rechnung):
         """Ohne Lager, auf Bettung, unter Gleichlast: überall w = q/k."""
         k = 5e6
         e = self.gerechnet(system(
-            [("K1", 0, 0), ("K2", 10, 0)], [stab("L1", "K1", "K2", quer=k)],
+            [("K1", 0, 0), ("K2", 10, 0)], [stab("L1", "K1", "K2", quer=feder(k))],
             [Lager("A1", "K1", x=FEST)], Lastfall("q", [linienlast("L1")])))
         f = e.faelle[0]
         for name, (ux, uz, phi) in f.verschiebungen.items():
@@ -307,7 +307,7 @@ class TestBettung(Rechnung):
         beta = (k / (4 * EI)) ** 0.25
         e = self.gerechnet(system(
             [("K1", 0, 0), ("K2", L / 2, 0), ("K3", L, 0)],
-            [stab("L1", "K1", "K2", quer=k), stab("L2", "K2", "K3", quer=k)],
+            [stab("L1", "K1", "K2", quer=feder(k)), stab("L2", "K2", "K3", quer=feder(k))],
             [Lager("A1", "K1", x=FEST)], Lastfall("P", [Knotenlast("K2", Fz=-P)])))
         w = -e.faelle[0].verschiebungen["K2"][1]
         self.assertAlmostEqual(w / (P * beta / (2 * k)), 1.0, delta=1e-3)

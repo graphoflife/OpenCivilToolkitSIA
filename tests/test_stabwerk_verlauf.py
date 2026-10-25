@@ -9,7 +9,7 @@ import math
 import unittest
 
 from opencivil.stabwerk.modell import (
-    FEST, Knoten, Knotenlast, Lager, Lastart, Lastfall, Stab, Stablast, System,
+    FEST, Knoten, Knotenlast, Lager, Lastart, Lastfall, Stab, Stablast, System, feder,
 )
 from opencivil.stabwerk.system import rechnen
 from opencivil.stabwerk.verlauf import Polynom, verlaeufe
@@ -137,7 +137,7 @@ class TestBettung(unittest.TestCase):
         k = 5e6
         s = System(
             knoten=[Knoten("K1", 0, 0), Knoten("K2", 10, 0)],
-            staebe=[Stab("L1", "K1", "K2", EA=EA, EI=EI, quer=k)],
+            staebe=[Stab("L1", "K1", "K2", EA=EA, EI=EI, quer=feder(k))],
             lager=[Lager("A1", "K1", x=FEST)],
             lastfaelle=[Lastfall("q", [Stablast("L1", Lastart.LINIENLAST, q)])])
         v = verlaeufe(rechnen(s).faelle[0])["L1"]
