@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b6a4b7c9d3d
+erzeugt: 0524bfe9c6e5
 art: modul
 tags: [modul]
 ---
@@ -41,7 +41,9 @@ Was der Grundriss einer Stelle braucht -- `None`, wenn ihr Nachweis nicht gelauf
 def _bewehrung(b: Optional[Bewehrungsbefund]) -> Optional[Dict[str, Any]]
 ```
 
-Die Leisten mit ihren Ankern, der äussere Schnitt und die Zahlen der Legende -- in mm, kN.
+Was die Bemessung vorschlägt, in mm und kN: die Leisten mit ihren Ankern
+und der äussere Schnitt um sie, der Stahlpilz mit seinen Stegen und dem
+Schnitt um ihn -- was es davon gibt --, und die Zahlen der Legende.
 
 
 ## Braucht

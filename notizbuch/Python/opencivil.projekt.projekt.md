@@ -1,5 +1,5 @@
 ---
-erzeugt: bd65de00ecf4
+erzeugt: 8bb7c3728aaf
 art: modul
 tags: [modul]
 ---
@@ -389,7 +389,8 @@ Stufe 1, die ohne Durchstanzbewehrung aufgeht; eine lange Ovalstütze in
 einer Bodenplatte, mit Momenten von Hand und einer Aussparung neben der
 Ecke; ein Wandende und eine Wandecke, an denen Stufe 2 wie Stufe 1
 rechnet und für die es noch keinen Vorschlag gibt. Innen-, Rand- und
-Ovalstütze brauchen Durchstanzbewehrung.
+Ovalstütze brauchen Durchstanzbewehrung; eine zweite Innenstütze trägt
+so viel, dass es einen Stahlpilz braucht.
 
 #### Projekt._grundbrueche
 

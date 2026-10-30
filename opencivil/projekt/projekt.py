@@ -697,11 +697,13 @@ class Projekt(Beschreibung):
         einer Bodenplatte, mit Momenten von Hand und einer Aussparung neben der
         Ecke; ein Wandende und eine Wandecke, an denen Stufe 2 wie Stufe 1
         rechnet und für die es noch keinen Vorschlag gibt. Innen-, Rand- und
-        Ovalstütze brauchen Durchstanzbewehrung.
+        Ovalstütze brauchen Durchstanzbewehrung; eine zweite Innenstütze trägt
+        so viel, dass es einen Stahlpilz braucht.
         """
         beton, stahl = (next(m.kennung for m in p.materialien if m.art == art)
                         for art in ("beton", "betonstahl"))
         p.durchstanzen("Innenstütze", beton, stahl, b_x=400, b_y=400, V_d=900.0, q_d=14.0)
+        p.durchstanzen("Mit Stahlpilz", beton, stahl, b_x=400, b_y=400, V_d=1000.0)
         p.durchstanzen("Randstütze", beton, stahl, lage="rand", form="rund", D=450, a_y=100,
                        h=300, ke="exzentrizitaet", e_y=80, V_d=500.0, q_d=12.0)
         p.durchstanzen("Eckstütze", beton, stahl, lage="ecke", stufe="1", V_d=80.0)

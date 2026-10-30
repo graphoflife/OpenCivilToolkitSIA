@@ -176,6 +176,14 @@ class Stahlpilz:
         return (f"ZEUS {self.art} {round(self.s * 1e3)} × {round(self.s * 1e3)} mm, "
                 f"h = {round(self.h * 1e3)} mm{g}")
 
+    def stege(self) -> Tuple[Tuple[Tuple[float, float], Tuple[float, float]], ...]:
+        """Die Stege als Strecken im Grundriss -- fürs Bild: beim Kreuz zwei, sonst vier."""
+        a = self.s / 2.0
+        if not self.g:
+            return (((-a, 0.0), (a, 0.0)), ((0.0, -a), (0.0, a)))
+        b = self.g / 2.0
+        return (((-a, -b), (a, -b)), ((-a, b), (a, b)), ((-b, -a), (-b, a)), ((b, -a), (b, a)))
+
     def armenden(self) -> Tuple[Tuple[float, float], ...]:
         """
         Wo die Stege enden, von der Stützenachse aus: beim Kreuz die vier
@@ -222,3 +230,8 @@ STAHLPILZE: Tuple[Stahlpilz, ...] = tuple(sorted(
 #: die Vorgaben der AncoTech-Software (Theorie 2010, S. 11, aus dem Bild).
 PILZ_UNTEN = 0.020
 PILZ_OBEN = 0.050
+
+#: So weit müssen die Stege mindestens über die Stütze hinausreichen, sonst
+#: vergrössert der Pilz die gestützte Fläche kaum (nach Vorgabe, nicht
+#: nachgeschlagen).
+PILZ_UEBERSTAND = 0.050

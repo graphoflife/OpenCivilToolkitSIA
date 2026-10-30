@@ -1,5 +1,5 @@
 ---
-erzeugt: 785a8cdcd08b
+erzeugt: 8670db31d7fb
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.3"
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
+- [[opencivil.durchstanzen.mit_bewehrung#_umfang|_umfang]]
 
 ## Themen
 

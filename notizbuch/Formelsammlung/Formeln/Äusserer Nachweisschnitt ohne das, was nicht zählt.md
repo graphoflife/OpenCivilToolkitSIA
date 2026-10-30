@@ -1,5 +1,5 @@
 ---
-erzeugt: a19f36c74ca5
+erzeugt: 705c267e5210
 art: formel
 tags: [formel]
 ---
@@ -36,7 +36,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-u_{out,red} = u_{out,0} - \Delta u_{out} = 5624\,\mathrm{mm} - 446\,\mathrm{mm} = 5178\,\mathrm{mm}
+u_{out,red} = u_{out,0} - \Delta u_{out} = 10905\,\mathrm{mm} - 3768\,\mathrm{mm} = 7137\,\mathrm{mm}
 $$
 
 ## Gebraucht von
@@ -45,7 +45,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
+- [[opencivil.durchstanzen.mit_bewehrung#_umfang|_umfang]]
 
 ## Themen
 

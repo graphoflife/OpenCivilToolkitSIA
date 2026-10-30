@@ -312,6 +312,9 @@ sie hier notiert; keine davon ist nachgeschlagen.
       Schnitt (aus der Exzentrizität wäre es aussen grösser).
 - [ ] **Stufe 3 an Rand- und Eckstützen: r_s ≥ 2/3·b_sr (4.3.6.4.8).** Noch
       nicht geprüft: r_s wird genommen, wie eingegeben.
+- [ ] **Stahlpilz: d_v = d − 20 mm und die gestützte Fläche bis an die Stege.**
+      Gelesen aus 4.3.6.2.1, Figur 21 und 4.3.6.6.2; 20 mm unten und 50 mm
+      oben aus der Software von AncoTech. Nicht nachgeschlagen.
 - [ ] **Die Grenze des Nachweises gegen Fliessen.** Eingebaut `f_yd − 80 MPa`,
       weil Tabelle 17 ausdrücklich `f_yd` nennt — mit charakteristischen
       Werten in der Rechnung mischt das zwei Niveaus, ist aber die strengere
@@ -455,8 +458,8 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 ## Noch nicht gebaut
 
-- [ ] **Durchstanzen, nächste Schritte:** Stahlpilze (ZEUS), wenn die erste
-      Betondruckdiagonale versagt; Durchstanzbewehrung an Wandende und
+- [ ] **Durchstanzen, nächste Schritte:** Stahlpilze an Rand und Ecke
+      (der Katalog hat nur ganze Pilze); Durchstanzbewehrung an Wandende und
       Wandecke; weitere Produkte (DURA-Körbe und S-Elemente, HDB, FIDECA);
       Sicherung gegen Totaleinsturz (4.3.6.7).
 

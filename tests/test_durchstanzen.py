@@ -145,11 +145,16 @@ class TestDurchstanzbewehrung(unittest.TestCase):
         self.assertNotIn("ohne Durchstanzbewehrung", self.urteile)
 
     def test_zu_viel_last_bricht_die_druckdiagonale(self):
-        """Mehr Bewehrung hilft nicht mehr: (70) geht nicht auf, und die Herleitung sagt es."""
-        _, loesung, _, _ = rechnen(projekt(b_x=400, b_y=400, V_d=1600.0))
+        """
+        Mehr Bewehrung hilft nicht mehr: (70) geht nicht auf, auch kein Stahlpilz
+        reicht, und die Herleitung sagt beides.
+        """
+        _, loesung, befund, _ = rechnen(projekt(b_x=400, b_y=400, V_d=1600.0))
         urteile = {u.fall: u for u in loesung.urteile}
         self.assertFalse(urteile["Betondruckdiagonale"].erfuellt)
-        self.assertIn("Betondruckdiagonale an der Stütze bricht", texte(loesung))
+        self.assertIsNone(befund.bewehrung.pilz)
+        self.assertIn("Betondruckdiagonale an der gestützten Fläche bricht", texte(loesung))
+        self.assertIn("Auch kein ZEUS-Stahlpilz reicht", texte(loesung))
 
     def test_genug_beton_braucht_keine_bewehrung(self):
         """Ein Urteil ohne Bewehrung; die Grade mit Bewehrung unbeschränkt."""
@@ -174,6 +179,42 @@ class TestDurchstanzbewehrung(unittest.TestCase):
         anker = [p for l in v.leisten for p in l.anker(v.radien)]
         self.assertTrue(anker)
         self.assertTrue(all(p[1] >= -0.15 + 0.030 - 1e-9 for p in anker))
+
+
+class TestStahlpilz(unittest.TestCase):
+    """V_d = 1000 kN: die Druckdiagonale an der Stütze bricht, ein ZEUS mit Leisten hält."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.aufbau, cls.loesung, cls.befund, _ = rechnen(projekt(b_x=400, b_y=400, V_d=1000.0))
+        cls.b = cls.befund.bewehrung
+
+    def test_der_kleinste_pilz_der_reicht(self):
+        pilz = self.b.pilz.pilz
+        self.assertEqual((pilz.art, pilz.s, pilz.g), ("Doppelkreuz", 0.730, 0.150))
+        self.assertLessEqual(pilz.h, 0.280 - produkte.PILZ_OBEN - produkte.PILZ_UNTEN)
+
+    def test_vier_nachweise_um_den_pilz(self):
+        """4.3.6.6.2: ausserhalb des Pilzes die Nachweise nach 4.3.6.3 bis 4.3.6.5."""
+        faelle = [u.fall for u in self.loesung.urteile]
+        self.assertEqual(faelle, ["mit Durchstanzbewehrung um den Stahlpilz",
+                                  "Verformungsvermögen um den Stahlpilz",
+                                  "Betondruckdiagonale um den Stahlpilz",
+                                  "ausserhalb der Durchstanzbewehrung um den Stahlpilz"])
+        self.assertTrue(all(u.erfuellt for u in self.loesung.urteile))
+
+    def test_gestuetzte_flaeche_bis_an_die_stege(self):
+        """Die Fläche des Pilzes reicht bis an die Enden der Stege; d_v bis zu seiner Unterkante."""
+        umriss = self.b.pilz.umriss
+        self.assertAlmostEqual(max(x for x, _ in umriss), 0.365)
+        self.assertAlmostEqual(self.b.pilz.d_v, 0.234 - produkte.PILZ_UNTEN)
+        self.assertIn("bestätigt der Hersteller", texte(self.loesung))
+
+    def test_leisten_um_den_pilz(self):
+        v = self.b.vorschlag
+        self.assertTrue(v.reicht)
+        wurzeln = [l.wurzel for l in v.leisten]
+        self.assertTrue(all(max(abs(x), abs(y)) >= 0.2 for x, y in wurzeln))
 
 
 class TestAnordnung(unittest.TestCase):

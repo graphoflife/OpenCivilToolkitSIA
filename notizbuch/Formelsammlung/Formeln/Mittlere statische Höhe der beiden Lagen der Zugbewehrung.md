@@ -1,5 +1,5 @@
 ---
-erzeugt: 9f5aa7ddba23
+erzeugt: ee8d0d725ee6
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.1"
@@ -32,6 +32,7 @@ $$
 - [[Plattenrotation]]
 - [[Spannung in der Durchstanzbewehrung]]
 - [[Wirksame statische Höhe im äusseren Nachweisschnitt]]
+- [[Wirksame statische Höhe um den Stahlpilz]]
 
 ## Im Code
 

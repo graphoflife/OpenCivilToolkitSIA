@@ -1811,6 +1811,17 @@
       ]
     },
     {
+      "name": "Querkraft im Schnitt um den Stahlpilz",
+      "pfad": "Formelsammlung/Formeln/Querkraft im Schnitt um den Stahlpilz.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{d,P}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Querkraft über die Federn der Wände",
       "pfad": "Formelsammlung/Formeln/Querkraft über die Federn der Wände.md",
       "art": "formel",
@@ -1998,6 +2009,17 @@
       ],
       "themen": [
         "Knicken"
+      ]
+    },
+    {
+      "name": "Schnitt um den Stahlpilz ohne das, was nicht zählt",
+      "pfad": "Formelsammlung/Formeln/Schnitt um den Stahlpilz ohne das, was nicht zählt.md",
+      "art": "formel",
+      "zeichen": [
+        "u_{P,red}"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -2586,6 +2608,17 @@
       ]
     },
     {
+      "name": "Wirksame statische Höhe um den Stahlpilz",
+      "pfad": "Formelsammlung/Formeln/Wirksame statische Höhe um den Stahlpilz.md",
+      "art": "formel",
+      "zeichen": [
+        "d_{v,P}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Wirksame Zugfestigkeit",
       "pfad": "Formelsammlung/Formeln/Wirksame Zugfestigkeit.md",
       "art": "formel",
@@ -2633,6 +2666,17 @@
       "art": "formel",
       "zeichen": [
         "u"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Wirksamer Umfang des Schnitts um den Stahlpilz",
+      "pfad": "Formelsammlung/Formeln/Wirksamer Umfang des Schnitts um den Stahlpilz.md",
+      "art": "formel",
+      "zeichen": [
+        "u_{P}"
       ],
       "themen": [
         "Durchstanzen"
@@ -3226,14 +3270,27 @@
       "name": "opencivil.durchstanzen.mit_bewehrung",
       "pfad": "Python/opencivil.durchstanzen.mit_bewehrung.md",
       "art": "modul",
-      "kurz": "der Nachweis mit Durchstanzbewehrung (SIA 262:2025, 4.3.6.5).",
+      "kurz": "der Nachweis mit Durchstanzbewehrung und Stahlpilz.",
       "stichworte": [
         "Grundlage",
+        "Ort",
+        "Pilzbefund",
         "Bewehrungsbefund",
         "spannung",
-        "widerstand_aussen",
+        "widerstand",
+        "druckdiagonale",
+        "_Werte",
+        "_Werte.sigma",
+        "_Werte.flaechenlast",
         "nachweisen",
-        "_querkraft_aussen"
+        "_suchen",
+        "_mit_leisten",
+        "_umfang",
+        "_querkraft",
+        "_pilzflaeche",
+        "_pilz_suchen",
+        "_pilzort",
+        "_mit_pilz"
       ]
     },
     {
@@ -3278,6 +3335,7 @@
         "typname",
         "Stahlpilz",
         "Stahlpilz.name",
+        "Stahlpilz.stege",
         "Stahlpilz.armenden"
       ]
     },

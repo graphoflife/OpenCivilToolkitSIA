@@ -13,6 +13,7 @@ dem Befund des Nachweises (:mod:`opencivil.durchstanzen.nachweis`).
 
 from __future__ import annotations
 
+import math
 from typing import Any, Dict, Optional
 
 from opencivil.core.rechenwerk import Loesung
@@ -63,22 +64,42 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
 
 
 def _bewehrung(b: Optional[Bewehrungsbefund]) -> Optional[Dict[str, Any]]:
-    """Die Leisten mit ihren Ankern, der äussere Schnitt und die Zahlen der Legende -- in mm, kN."""
+    """
+    Was die Bemessung vorschlägt, in mm und kN: die Leisten mit ihren Ankern
+    und der äussere Schnitt um sie, der Stahlpilz mit seinen Stegen und dem
+    Schnitt um ihn -- was es davon gibt --, und die Zahlen der Legende.
+    """
     if b is None:
         return None
-    v = b.vorschlag
-    return {
-        "name": v.name,
-        "durchmesser": v.typ.durchmesser * mm,
-        "leisten": [{"wurzel": _punkte([l.wurzel])[0], "anker": _punkte(l.anker(v.radien))}
-                    for l in v.leisten],
-        "aussen": [{"punkte": _punkte(l.punkte), "zaehlt": l.zaehlt} for l in v.aussen.massgebend.linien],
-        "abstaende": [x * mm for x in v.abstaende],
+    v, pilz = b.vorschlag, b.pilz
+    daten: Dict[str, Any] = {
+        "name": v.name if v is not None else "",
+        "leisten": [], "aussen": [], "abstaende": [], "durchmesser": 0.0,
+        "pilz": None,
         "d_v_out": b.d_v_out * mm,
         "u_out": b.u_out * mm,
         "V_Rd_s": b.V_Rd_s / 1e3,
-        "V_Rd_max": b.V_Rd_max / 1e3,
+        "V_Rd_max": b.V_Rd_max / 1e3 if math.isfinite(b.V_Rd_max) else None,
         "V_d_out": b.V_d_out / 1e3,
         "V_Rd_c_out": b.V_Rd_c_out / 1e3,
-        "reicht": v.reicht,
+        "reicht": v.reicht if v is not None else True,
     }
+    if v is not None:
+        daten.update({
+            "durchmesser": v.typ.durchmesser * mm,
+            "leisten": [{"wurzel": _punkte([l.wurzel])[0], "anker": _punkte(l.anker(v.radien))}
+                        for l in v.leisten],
+            "aussen": [{"punkte": _punkte(l.punkte), "zaehlt": l.zaehlt}
+                       for l in v.aussen.massgebend.linien],
+            "abstaende": [x * mm for x in v.abstaende],
+        })
+    if pilz is not None:
+        daten["pilz"] = {
+            "name": pilz.pilz.name,
+            "umriss": _punkte(pilz.umriss),
+            "stege": [_punkte(steg) for steg in pilz.pilz.stege()],
+            "schnitt": [{"punkte": _punkte(l.punkte), "zaehlt": l.zaehlt}
+                        for l in pilz.schnitt.massgebend.linien],
+            "d_v": pilz.d_v * mm,
+        }
+    return daten

@@ -1,5 +1,5 @@
 ---
-erzeugt: cfb38473a098
+erzeugt: 8d31b660784d
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -29,7 +29,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
     - [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.
-    - [[opencivil.durchstanzen.mit_bewehrung]] – der Nachweis mit Durchstanzbewehrung (SIA 262:2025, 4.3.6.5).
+    - [[opencivil.durchstanzen.mit_bewehrung]] – der Nachweis mit Durchstanzbewehrung und Stahlpilz.
     - [[opencivil.durchstanzen.nachweis]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
     - [[opencivil.durchstanzen.produkte]] – Durchstanzbewehrung und Stahlpilze, wie man sie kaufen kann.
     - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 45679a98bc18
+erzeugt: 842dec3c3ad0
 art: modul
 tags: [modul]
 ---
@@ -133,6 +133,14 @@ def name(self) -> str
 
 «ZEUS Kreuz 650 × 650, h = 160 mm».
 
+#### Stahlpilz.stege
+
+```python
+def stege(self) -> Tuple[Tuple[Tuple[float, float], Tuple[float, float]], ...]
+```
+
+Die Stege als Strecken im Grundriss -- fürs Bild: beim Kreuz zwei, sonst vier.
+
 #### Stahlpilz.armenden
 
 ```python
@@ -164,6 +172,7 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 - `STAHLPILZE = tuple(sorted(_pilze('Kreuz', 470, (100, 120)) + _pilze('Kreuz', 530, …` – Die ZEUS-Pilze der Preisliste, kleinste zuerst. Die Sondertypen (Rechteck) und der Doppelkreuz ohne g sind weggelassen.
 - `PILZ_UNTEN = 0.02` – Unter dem Pilz bleiben 20 mm Beton, über ihm 50 mm bis zur Oberfläche -- die Vorgaben der AncoTech-Software (Theorie 2010, S. 11, aus dem Bild).
 - `PILZ_OBEN = 0.05`
+- `PILZ_UEBERSTAND = 0.05` – So weit müssen die Stege mindestens über die Stütze hinausreichen, sonst vergrössert der Pilz die gestützte Fläche kaum (nach Vorgabe, nicht nachgeschlagen).
 
 ## Gebraucht von
 

@@ -1,10 +1,10 @@
 ---
-erzeugt: 6330d38671d6
+erzeugt: d3aac51d47d9
 art: thema
 tags: [thema]
 ---
 > [!abstract] Durchstanzen
-> 39 Formeln, in der Folge, in der gerechnet wird.
+> 43 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -14,7 +14,7 @@ Bei regelmässig gestützten Flachdecken mit gleichmässigen angrenzenden Spannw
 
 Näherungsstufe 2: die mittleren Momente im Stützstreifen nach den Gleichungen (62) bis (65).
 
-Der Beton allein reicht nicht. Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 -- je Leiste 5 Anker ⌀10 mit h\_A = 215 mm, vom Rand der Stütze 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 -- je Leiste 5 Anker ⌀10 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützten Fläche: 2 je Leiste.
 
@@ -22,13 +22,23 @@ Die Faktoren 2 und 3.5 in Gleichung (70) dürfen erhöht werden, wenn Versuche e
 
 Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker. Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens 1.5·d\_v,out von jedem Ende (Figur 26).
 
+Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 -- je Leiste 9 Anker ⌀16 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+
+Ein Stahlpilz vergrössert die gestützte Fläche. Gewählt ist der kleinste, der zwischen die Überdeckungen passt -- unten 20 mm, oben 50 mm, die Vorgaben der Software von AncoTech -- und mit dem die Platte ausserhalb hält: ZEUS Doppelkreuz 730 × 730 mm, h = 120 mm, g = 150 mm (AncoTech, Preisliste ZEUS 12.2018). Seine gestützte Fläche reicht bis an die Enden der Stege (4.3.6.6.2). Den Widerstand des Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.
+
+Um den Pilz reicht der Beton allein nicht: dazu kommen Leisten, bündig an den Pilz, mit den vier Nachweisen der Durchstanzbewehrung.
+
+Vorgeschlagen wird ancoPLUS von AncoTech um den Stahlpilz: 20 × ancoPLUS DX6-0215 -- je Leiste 6 Anker ⌀10 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+
+Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützten Fläche: 1 je Leiste.
+
 Randstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
 Der Schnitt endet am Plattenrand: so ist er kürzer als der geschlossene (Figur 22d). Was jenseits des Rands läge, zählt nicht.
 
 e\_u ist der Abstand zwischen der Resultierenden der Auflagerkraft -- in der Stützenachse, verschoben um die Exzentrizität e\_x, e\_y -- und dem Schwerpunkt der zählenden Teile des Nachweisschnitts.
 
-Der Beton allein reicht nicht. Vorgeschlagen wird ancoPLUS von AncoTech: 5 × ancoPLUS DX3-0235 -- je Leiste 3 Anker ⌀10 mit h\_A = 235 mm, vom Rand der Stütze 95 / 150 / 150 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 5 × ancoPLUS DX3-0235 -- je Leiste 3 Anker ⌀10 mit h\_A = 235 mm, vom Rand der gestützten Fläche 95 / 150 / 150 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Eckstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
@@ -40,7 +50,7 @@ Hinter einer Aussparung, die näher als 5·d\_v am Schnitt liegt, zählt nicht, 
 
 Näherungsstufe 3: r\_s und die mittleren Momente im Stützstreifen aus einer Berechnung nach der Elastizitätstheorie; 1.2 statt 1.5 vor der Klammer.
 
-Der Beton allein reicht nicht. Vorgeschlagen wird ancoPLUS von AncoTech: 10 × ancoPLUS DB2-0325 -- je Leiste 2 Anker ⌀14 mit h\_A = 325 mm, vom Rand der Stütze 125 / 200 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 10 × ancoPLUS DB2-0325 -- je Leiste 2 Anker ⌀14 mit h\_A = 325 mm, vom Rand der gestützten Fläche 125 / 200 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Wandende einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
@@ -82,11 +92,15 @@ Wandecke einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche a
 32. [[Wirksamer Umfang des äusseren Nachweisschnitts]]
 33. [[Querkraft im äusseren Nachweisschnitt]]
 34. [[Durchstanzwiderstand im äusseren Nachweisschnitt]]
-35. [[Durchmesser des flächengleichen Kreises]]
-36. [[Beiwert der Momentenübertragung]]
-37. [[Breite des Stützstreifens am Plattenrand]]
-38. [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]]
-39. [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]]
+35. [[Wirksame statische Höhe um den Stahlpilz]]
+36. [[Schnitt um den Stahlpilz ohne das, was nicht zählt]]
+37. [[Wirksamer Umfang des Schnitts um den Stahlpilz]]
+38. [[Querkraft im Schnitt um den Stahlpilz]]
+39. [[Durchmesser des flächengleichen Kreises]]
+40. [[Beiwert der Momentenübertragung]]
+41. [[Breite des Stützstreifens am Plattenrand]]
+42. [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]]
+43. [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -114,3 +128,9 @@ Druckdiagonale an der Stütze hält
 ([[Widerstand der ersten Betondruckdiagonale]]); und ausserhalb der
 Bewehrung reicht wieder der Beton
 ([[Durchstanzwiderstand im äusseren Nachweisschnitt]]).
+
+Bricht an einer Innenstütze die erste Druckdiagonale, wählt das Werkzeug den
+kleinsten ZEUS-Stahlpilz, der in die Platte passt und mit dem die Platte
+ausserhalb hält (4.3.6.6.2) -- wo nötig mit Leisten um ihn
+([[Schnitt um den Stahlpilz ohne das, was nicht zählt]]). Den Widerstand des
+Pilzes selbst bestätigt der Hersteller.

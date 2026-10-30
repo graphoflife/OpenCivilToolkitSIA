@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-498 Berechnungen ausgeführt, 775 Werte bestimmt.
+515 Berechnungen ausgeführt, 796 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -5099,7 +5099,7 @@ Wirksame statische Höhe bis zu den Köpfen der Anker   [SIA 262:2025, 4.3.6.5.1
 Wirksamer Umfang des äusseren Nachweisschnitts, mit k_e von innen   [SIA 262:2025, 4.3.6.2.3]
     u_{out} = k_e \cdot u_{out,red} = 0.9 \cdot 6619\,\mathrm{mm} = 5957\,\mathrm{mm}
 
-Fläche innerhalb des äusseren Nachweisschnitts, ohne Aussparungen
+Fläche innerhalb des Schnitts, ohne Aussparungen
     A_{out} = 3.392\,\mathrm{m}^{2}
 
 Querkraft im äusseren Nachweisschnitt   [SIA 262:2025, 4.3.6.2.6]
@@ -5117,6 +5117,404 @@ Querkraft gegen den Widerstand ausserhalb der Bewehrung
 
 Erfüllungsgrad
     \alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{959.3\,\mathrm{kN}}{852.5\,\mathrm{kN}} = 1.13 \quad \Rightarrow \quad \text{erfüllt}
+
+Durchstanzen: Mit Stahlpilz
+---------------------------
+
+Plattendicke
+    h = 280\,\mathrm{mm}
+
+Überdeckung der Zugbewehrung oben
+    c_{nom} = 30\,\mathrm{mm}
+
+Überdeckung der Durchstanzbewehrung unten
+    c_v = 30\,\mathrm{mm}
+
+Grösstkorndurchmesser
+    D_{max} = 32\,\mathrm{mm}
+
+Stabdurchmesser in x
+    \varnothing_x = 16\,\mathrm{mm}
+
+Stababstand in x
+    s_x = 150\,\mathrm{mm}
+
+Stabdurchmesser in y
+    \varnothing_y = 16\,\mathrm{mm}
+
+Stababstand in y
+    s_y = 150\,\mathrm{mm}
+
+Abmessung der Stütze in x
+    b_x = 400\,\mathrm{mm}
+
+Abmessung der Stütze in y
+    b_y = 400\,\mathrm{mm}
+
+Bemessungswert der Auflagerkraft
+    V_d = 1000\,\mathrm{kN}
+
+Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast
+    q_d = 0\,\mathrm{kN}/\mathrm{m}^{2}
+
+Spannweite in x
+    l_x = 7\,\mathrm{m}
+
+Spannweite in y
+    l_y = 7\,\mathrm{m}
+
+Exzentrizität der Auflagerkraft in x
+    e_x = 0\,\mathrm{mm}
+
+Exzentrizität der Auflagerkraft in y
+    e_y = 0\,\mathrm{mm}
+
+Durchstanzen
+------------
+
+Statische Höhe der Lage in x (aussen)
+    d_x = h - c_{nom} - \frac{\varnothing_x}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 242\,\mathrm{mm}
+
+Statische Höhe der Lage in y (innen)
+    d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 226\,\mathrm{mm}
+
+Mittlere statische Höhe der beiden Lagen der Zugbewehrung   [SIA 262:2025, 4.3.6.2.1]
+    d = \frac{d_x + d_y}{2} = \frac{242\,\mathrm{mm} + 226\,\mathrm{mm}}{2} = 234\,\mathrm{mm}
+
+Wirksame statische Höhe: die gestützte Fläche reicht nicht in die Platte   [SIA 262:2025, 4.3.6.2.1, Figur 21]
+    d_v = d = 234\,\mathrm{mm}
+
+Nachweisschnitt
+---------------
+
+Nachweisschnitt im Abstand d_v/2   [SIA 262:2025, 4.3.6.2.2, Figur 22b]
+    u_0 = 2 \cdot \left(b_x + b_y\right) + \pi \cdot d_v = 2 \cdot \left(400\,\mathrm{mm} + 400\,\mathrm{mm}\right) + \pi \cdot 234\,\mathrm{mm} = 2335\,\mathrm{mm}
+
+Nichts mindert den Schnitt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0 = 2335\,\mathrm{mm}
+
+Momentenübertragung
+-------------------
+
+Näherung für Innenstützen   [SIA 262:2025, 4.3.6.2.5]
+    k_e = 0.9
+
+Wirksamer Umfang des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.3]
+    u = k_e \cdot u_{red} = 0.9 \cdot 2335\,\mathrm{mm} = 2102\,\mathrm{mm}
+
+Bemessungswert der Querkraft
+----------------------------
+
+Keine Flächenlast im Schnitt abgezogen   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d = 1000\,\mathrm{kN}
+
+Plattenrotation
+---------------
+
+Abstand zum Momentennullpunkt in x   [SIA 262:2025, 4.3.6.4.4]
+    r_{sx} = 0.22 \cdot l_x = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Abstand zum Momentennullpunkt in y   [SIA 262:2025, 4.3.6.4.4]
+    r_{sy} = 0.22 \cdot l_y = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Bewehrung in x je Meter
+    a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+
+Druckzonenhöhe in x, je Meter
+    x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+
+Biegewiderstand im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.5]
+    \begin{aligned}
+      m_{Rd,x} &= a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right) \\
+      &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(242\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+      &= 132.5\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Bewehrung in y je Meter
+    a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+
+Druckzonenhöhe in y, je Meter
+    x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+
+Biegewiderstand im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.5]
+    \begin{aligned}
+      m_{Rd,y} &= a_{s,y} \cdot f_{yd} \cdot \left(d_y - \frac{0.85 \cdot x_y}{2}\right) \\
+      &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(226\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+      &= 123.2\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Breite des Stützstreifens   [SIA 262:2025, 4.3.6.4.6, (61)]
+    \begin{aligned}
+      b_s &= \min\left[1.5 \cdot \sqrt{r_{sx} \cdot r_{sy}};\ l_{min}\right] \\
+      &= \min\left[1.5 \cdot \sqrt{1540\,\mathrm{mm} \cdot 1540\,\mathrm{mm}};\ 7000\,\mathrm{mm}\right] \\
+      &= 2310\,\mathrm{mm}
+    \end{aligned}
+
+Mittleres Moment im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.7, (62)]
+    m_{sd,x} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right) = 1000\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 125\,\mathrm{kNm}/\mathrm{m}
+
+Mittleres Moment im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.7, (62)]
+    m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{2 \cdot b_s}\right) = 1000\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 125\,\mathrm{kNm}/\mathrm{m}
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \begin{aligned}
+      \psi_x &= 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
+      &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{125\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+      &= 0.0197
+    \end{aligned}
+
+Plattenrotation in y   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \begin{aligned}
+      \psi_y &= 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,y}}{m_{Rd,y}}\right)^{3/2} \\
+      &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{125\,\mathrm{kNm}/\mathrm{m}}{123.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+      &= 0.0219
+    \end{aligned}
+[i] Hinweis: m_sd > m_Rd in y: die Biegebewehrung im Stützstreifen genügt nicht -- der Biegenachweis
+gehört dazu.
+
+Massgebende Plattenrotation: die grössere   [SIA 262:2025, 4.3.6.4.1]
+    \psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0197;\ 0.0219\right] = 0.0219
+
+Durchstanzwiderstand
+--------------------
+
+Beiwert der Gesteinskörnung   [SIA 262:2025, 4.3.3.2.1]
+    \begin{aligned}
+      k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+      &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+      &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+    \end{aligned}
+
+Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn   [SIA 262:2025, 4.3.6.3.2, (59)]
+    \begin{aligned}
+      k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
+      &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0219 \cdot 234 \cdot 1.2}\right] \\
+      &= 0.642 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+    \end{aligned}
+
+Durchstanzwiderstand ohne Durchstanzbewehrung   [SIA 262:2025, 4.3.6.3.1]
+    \begin{aligned}
+      V_{Rd,c} &= k_r \cdot \tau_{cd} \cdot d_v \cdot u \\
+      &= 0.642 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 2102\,\mathrm{mm} \\
+      &= 345.7\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen Durchstanzwiderstand
+    V_{d,red} = 1000\,\mathrm{kN} \quad > \quad V_{Rd,c} = 345.7\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{345.7\,\mathrm{kN}}{1000\,\mathrm{kN}} = 0.35 \quad \Rightarrow \quad \text{NICHT erfüllt}
+
+Durchstanzbewehrung
+-------------------
+
+Platz für die Anker zwischen den Überdeckungen
+    h_{frei} = h - c_{nom} - c_v = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 30\,\mathrm{mm} = 220\,\mathrm{mm}
+
+Höhe der Anker: auf eine lieferbare Höhe abgerundet, die auf 5 mm endet
+    h_A = 215\,\mathrm{mm}
+[i] Hinweis: Kein ancoPLUS erfüllt alle Bedingungen; gerechnet ist der stärkste Versuch.
+
+Spannung in der Durchstanzbewehrung   [SIA 262:2025, 4.3.6.5.4, (69)]
+    \begin{aligned}
+      \sigma_{sd} &= \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right] \\
+      &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0219}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{16\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
+
+Anrechenbare Durchstanzbewehrung   [SIA 262:2025, 4.3.6.5.4]
+    \sum A_{sw} = n_L \cdot n_A \cdot \frac{\pi \cdot \varnothing_{sw}^{2}}{4} = 20 \cdot 2 \cdot \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4} = 8042\,\mathrm{mm}^{2}
+
+Beitrag der Durchstanzbewehrung   [SIA 262:2025, 4.3.6.5.4, (68)]
+    V_{Rd,s} = \sum A_{sw} \cdot k_e \cdot \sigma_{sd} = 8042\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 3147.1\,\mathrm{kN}
+
+Querkraft für die Durchstanzbewehrung   [SIA 262:2025, 4.3.6.5.2, (66)]
+    V_{d,s} = V_{d,red} - V_{Rd,c} = 1000\,\mathrm{kN} - 345.7\,\mathrm{kN} = 654.3\,\mathrm{kN}
+
+Querkraft für die Bewehrung gegen ihren Beitrag
+    V_{d,s} = 654.3\,\mathrm{kN} \quad \le \quad V_{Rd,s} = 3147.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS,s} = \frac{V_{Rd,s}}{V_{d,s}} = \frac{3147.1\,\mathrm{kN}}{654.3\,\mathrm{kN}} = 4.81 \quad \Rightarrow \quad \text{erfüllt}
+
+Die halbe Querkraft   [SIA 262:2025, 4.3.6.5.3, (67)]
+    V_d / 2 = \frac{V_{d,red}}{2} = \frac{1000\,\mathrm{kN}}{2} = 500\,\mathrm{kN}
+
+Durchstanzbewehrung an der Fliessgrenze   [SIA 262:2025, 4.3.6.5.3, (67)]
+    V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 8042\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 3147.1\,\mathrm{kN}
+
+Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung
+    V_d / 2 = 500\,\mathrm{kN} \quad \le \quad V_{Rd,v} = 3147.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS,v} = \frac{V_{Rd,v}}{V_d / 2} = \frac{3147.1\,\mathrm{kN}}{500\,\mathrm{kN}} = 6.29 \quad \Rightarrow \quad \text{erfüllt}
+
+Faktor des Produkts: c_v = 30 mm, d/10 = 23 mm, d/6 = 39 mm
+    k_{sys} = 2.58
+
+Widerstand der ersten Betondruckdiagonale an der gestützten Fläche   [SIA 262:2025, 4.3.6.5.8, (70)]
+    \begin{aligned}
+      V_{Rd,max} &= \min\left[k_{sys} \cdot k_r;\ 3.5\right] \cdot \tau_{cd} \cdot d_v \cdot u \\
+      &= \min\left[2.58 \cdot 0.642;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 2102\,\mathrm{mm} \\
+      &= 890.9\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen die erste Betondruckdiagonale
+    V_{d,red} = 1000\,\mathrm{kN} \quad > \quad V_{Rd,max} = 890.9\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS,max} = \frac{V_{Rd,max}}{V_{d,red}} = \frac{890.9\,\mathrm{kN}}{1000\,\mathrm{kN}} = 0.89 \quad \Rightarrow \quad \text{NICHT erfüllt}
+[i] Hinweis: Die erste Betondruckdiagonale an der gestützten Fläche bricht vor der Bewehrung: mehr
+Durchstanzbewehrung hilft nicht.
+
+Ausserhalb der Durchstanzbewehrung
+----------------------------------
+
+Wirksame statische Höhe bis zu den Köpfen der Anker   [SIA 262:2025, 4.3.6.5.10, Figur 26]
+    d_{v,out} = d - c_v = 234\,\mathrm{mm} - 30\,\mathrm{mm} = 204\,\mathrm{mm}
+
+Äusserer Nachweisschnitt, soweit er in der Platte liegt   [SIA 262:2025, 4.3.6.5.10, Figur 26]
+    u_{out,0} = 10905\,\mathrm{mm}
+
+Was neben den Ecken und hinter Aussparungen nicht zählt   [SIA 262:2025, Figur 23a, 23d und 26]
+    \Delta u_{out} = 3768\,\mathrm{mm}
+
+Äusserer Nachweisschnitt ohne das, was nicht zählt
+    u_{out,red} = u_{out,0} - \Delta u_{out} = 10905\,\mathrm{mm} - 3768\,\mathrm{mm} = 7137\,\mathrm{mm}
+
+Wirksamer Umfang des äusseren Nachweisschnitts, mit k_e von innen   [SIA 262:2025, 4.3.6.2.3]
+    u_{out} = k_e \cdot u_{out,red} = 0.9 \cdot 7137\,\mathrm{mm} = 6423\,\mathrm{mm}
+
+Querkraft im äusseren Nachweisschnitt: keine Flächenlast   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,out} = V_d = 1000\,\mathrm{kN}
+
+Durchstanzwiderstand im äusseren Nachweisschnitt   [SIA 262:2025, 4.3.6.5.10, (58)]
+    \begin{aligned}
+      V_{Rd,c,out} &= k_r \cdot \tau_{cd} \cdot d_{v,out} \cdot u_{out} \\
+      &= 0.642 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 204\,\mathrm{mm} \cdot 6423\,\mathrm{mm} \\
+      &= 921.1\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen den Widerstand ausserhalb der Bewehrung
+    V_{d,out} = 1000\,\mathrm{kN} \quad > \quad V_{Rd,c,out} = 921.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{921.1\,\mathrm{kN}}{1000\,\mathrm{kN}} = 0.92 \quad \Rightarrow \quad \text{NICHT erfüllt}
+
+Stahlpilz
+---------
+
+Beton unter dem Pilz
+    c_P = 20\,\mathrm{mm}
+
+Wirksame statische Höhe bis zur Unterkante des Pilzes   [SIA 262:2025, 4.3.6.6.2]
+    d_{v,P} = d - c_P = 234\,\mathrm{mm} - 20\,\mathrm{mm} = 214\,\mathrm{mm}
+
+Schnitt um den Stahlpilz, soweit er in der Platte liegt   [SIA 262:2025, 4.3.6.6.2]
+    u_{P,0} = 2913\,\mathrm{mm}
+
+Schnitt um den Stahlpilz ohne das, was nicht zählt
+    u_{P,red} = u_{P,0} = 2913\,\mathrm{mm}
+
+Wirksamer Umfang des Schnitts um den Stahlpilz, mit k_e von innen   [SIA 262:2025, 4.3.6.2.3]
+    u_{P} = k_e \cdot u_{P,red} = 0.9 \cdot 2913\,\mathrm{mm} = 2622\,\mathrm{mm}
+
+Querkraft im Schnitt um den Stahlpilz: keine Flächenlast   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,P} = V_d = 1000\,\mathrm{kN}
+
+Durchstanzwiderstand um den Stahlpilz, ohne Bewehrung   [SIA 262:2025, 4.3.6.6.2]
+    \begin{aligned}
+      V_{Rd,c,P} &= k_r \cdot \tau_{cd} \cdot d_{v,P} \cdot u_{P} \\
+      &= 0.642 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 214\,\mathrm{mm} \cdot 2622\,\mathrm{mm} \\
+      &= 394.4\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen den Widerstand um den Stahlpilz
+    V_{d,P} = 1000\,\mathrm{kN} \quad > \quad V_{Rd,c,P} = 394.4\,\mathrm{kN}
+
+Spannung in der Durchstanzbewehrung   [SIA 262:2025, 4.3.6.5.4, (69)]
+    \begin{aligned}
+      \sigma_{sd} &= \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right] \\
+      &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0219}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
+
+Anrechenbare Durchstanzbewehrung   [SIA 262:2025, 4.3.6.5.4]
+    \sum A_{sw} = n_L \cdot n_A \cdot \frac{\pi \cdot \varnothing_{sw}^{2}}{4} = 20 \cdot 1 \cdot \frac{\pi \cdot \left(10\,\mathrm{mm}\right)^{2}}{4} = 1571\,\mathrm{mm}^{2}
+
+Beitrag der Durchstanzbewehrung   [SIA 262:2025, 4.3.6.5.4, (68)]
+    V_{Rd,s} = \sum A_{sw} \cdot k_e \cdot \sigma_{sd} = 1571\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 614.7\,\mathrm{kN}
+
+Querkraft für die Durchstanzbewehrung   [SIA 262:2025, 4.3.6.5.2, (66)]
+    V_{d,s} = V_{d,P} - V_{Rd,c,P} = 1000\,\mathrm{kN} - 394.4\,\mathrm{kN} = 605.6\,\mathrm{kN}
+
+Querkraft für die Bewehrung gegen ihren Beitrag
+    V_{d,s} = 605.6\,\mathrm{kN} \quad \le \quad V_{Rd,s} = 614.7\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS,s} = \frac{V_{Rd,s}}{V_{d,s}} = \frac{614.7\,\mathrm{kN}}{605.6\,\mathrm{kN}} = 1.01 \quad \Rightarrow \quad \text{erfüllt}
+
+Die halbe Querkraft   [SIA 262:2025, 4.3.6.5.3, (67)]
+    V_d / 2 = \frac{V_{d,P}}{2} = \frac{1000\,\mathrm{kN}}{2} = 500\,\mathrm{kN}
+
+Durchstanzbewehrung an der Fliessgrenze   [SIA 262:2025, 4.3.6.5.3, (67)]
+    V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 1571\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 614.7\,\mathrm{kN}
+
+Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung
+    V_d / 2 = 500\,\mathrm{kN} \quad \le \quad V_{Rd,v} = 614.7\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS,v} = \frac{V_{Rd,v}}{V_d / 2} = \frac{614.7\,\mathrm{kN}}{500\,\mathrm{kN}} = 1.23 \quad \Rightarrow \quad \text{erfüllt}
+
+Faktor des Produkts: c_v = 30 mm, d/10 = 23 mm, d/6 = 39 mm
+    k_{sys} = 2.58
+
+Widerstand der ersten Betondruckdiagonale an der gestützten Fläche   [SIA 262:2025, 4.3.6.5.8, (70)]
+    \begin{aligned}
+      V_{Rd,max} &= \min\left[k_{sys} \cdot k_r;\ 3.5\right] \cdot \tau_{cd} \cdot d_{v,P} \cdot u_{P} \\
+      &= \min\left[2.58 \cdot 0.642;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 214\,\mathrm{mm} \cdot 2622\,\mathrm{mm} \\
+      &= 1016.3\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen die erste Betondruckdiagonale
+    V_{d,P} = 1000\,\mathrm{kN} \quad \le \quad V_{Rd,max} = 1016.3\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS,max} = \frac{V_{Rd,max}}{V_{d,P}} = \frac{1016.3\,\mathrm{kN}}{1000\,\mathrm{kN}} = 1.02 \quad \Rightarrow \quad \text{erfüllt}
+
+Ausserhalb der Durchstanzbewehrung um den Stahlpilz
+---------------------------------------------------
+
+Wirksame statische Höhe bis zu den Köpfen der Anker   [SIA 262:2025, 4.3.6.5.10, Figur 26]
+    d_{v,out} = d - c_v = 234\,\mathrm{mm} - 30\,\mathrm{mm} = 204\,\mathrm{mm}
+
+Äusserer Nachweisschnitt, soweit er in der Platte liegt   [SIA 262:2025, 4.3.6.5.10, Figur 26]
+    u_{out,0} = 8331\,\mathrm{mm}
+
+Was neben den Ecken und hinter Aussparungen nicht zählt   [SIA 262:2025, Figur 23a, 23d und 26]
+    \Delta u_{out} = 559\,\mathrm{mm}
+
+Äusserer Nachweisschnitt ohne das, was nicht zählt
+    u_{out,red} = u_{out,0} - \Delta u_{out} = 8331\,\mathrm{mm} - 559\,\mathrm{mm} = 7771\,\mathrm{mm}
+
+Wirksamer Umfang des äusseren Nachweisschnitts, mit k_e von innen   [SIA 262:2025, 4.3.6.2.3]
+    u_{out} = k_e \cdot u_{out,red} = 0.9 \cdot 7771\,\mathrm{mm} = 6994\,\mathrm{mm}
+
+Querkraft im äusseren Nachweisschnitt: keine Flächenlast   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,out} = V_d = 1000\,\mathrm{kN}
+
+Durchstanzwiderstand im äusseren Nachweisschnitt   [SIA 262:2025, 4.3.6.5.10, (58)]
+    \begin{aligned}
+      V_{Rd,c,out} &= k_r \cdot \tau_{cd} \cdot d_{v,out} \cdot u_{out} \\
+      &= 0.642 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 204\,\mathrm{mm} \cdot 6994\,\mathrm{mm} \\
+      &= 1003\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen den Widerstand ausserhalb der Bewehrung
+    V_{d,out} = 1000\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 1003\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{1003\,\mathrm{kN}}{1000\,\mathrm{kN}} = 1.00 \quad \Rightarrow \quad \text{erfüllt}
 
 Durchstanzen: Randstütze
 ------------------------
@@ -5403,7 +5801,7 @@ Wirksame statische Höhe bis zu den Köpfen der Anker   [SIA 262:2025, 4.3.6.5.1
 Wirksamer Umfang des äusseren Nachweisschnitts, mit k_e von innen   [SIA 262:2025, 4.3.6.2.3]
     u_{out} = k_e \cdot u_{out,red} = 0.999 \cdot 2900\,\mathrm{mm} = 2896\,\mathrm{mm}
 
-Fläche innerhalb des äusseren Nachweisschnitts, ohne Aussparungen
+Fläche innerhalb des Schnitts, ohne Aussparungen
     A_{out} = 1.252\,\mathrm{m}^{2}
 
 Querkraft im äusseren Nachweisschnitt   [SIA 262:2025, 4.3.6.2.6]
@@ -5801,7 +6199,7 @@ Wirksame statische Höhe bis zu den Köpfen der Anker   [SIA 262:2025, 4.3.6.5.1
 Äusserer Nachweisschnitt, soweit er in der Platte liegt   [SIA 262:2025, 4.3.6.5.10, Figur 26]
     u_{out,0} = 5624\,\mathrm{mm}
 
-Was zwischen den Ankern und hinter Aussparungen nicht zählt   [SIA 262:2025, Figur 23d und 26]
+Was neben den Ecken und hinter Aussparungen nicht zählt   [SIA 262:2025, Figur 23a, 23d und 26]
     \Delta u_{out} = 446\,\mathrm{mm}
 
 Äusserer Nachweisschnitt ohne das, was nicht zählt
@@ -5810,7 +6208,7 @@ Was zwischen den Ankern und hinter Aussparungen nicht zählt   [SIA 262:2025, Fi
 Wirksamer Umfang des äusseren Nachweisschnitts, mit k_e von innen   [SIA 262:2025, 4.3.6.2.3]
     u_{out} = k_e \cdot u_{out,red} = 0.7 \cdot 5178\,\mathrm{mm} = 3625\,\mathrm{mm}
 
-Fläche innerhalb des äusseren Nachweisschnitts, ohne Aussparungen
+Fläche innerhalb des Schnitts, ohne Aussparungen
     A_{out} = 2.201\,\mathrm{m}^{2}
 
 Querkraft im äusseren Nachweisschnitt   [SIA 262:2025, 4.3.6.2.6]
@@ -8583,12 +8981,12 @@ k_e näherungsweise angenommen werden.
 
 Näherungsstufe 2: die mittleren Momente im Stützstreifen nach den Gleichungen (62) bis (65).
 
-Der Beton allein reicht nicht. Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 --
-je Leiste 5 Anker ⌀10 mit h_A = 215 mm, vom Rand der Stütze 85 / 140 / 140 / 175 / 175 mm. Die
-Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis
-zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d
-auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS,
-nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 -- je Leiste 5 Anker ⌀10 mit h_A =
+215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der
+Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d,
+danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech,
+Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht
+nachgeschlagen).
 
 Angerechnet werden die Anker zwischen 0.35·d_v und d_v vom Rand der gestützten Fläche: 2 je Leiste.
 
@@ -8599,6 +8997,31 @@ Eckstützen bleibt es bei 2·k_r. Die Obergrenze bleibt 3.5.
 
 Der äussere Schnitt läuft im Abstand 0.5·d_v,out um die äussersten Anker. Von einer Geraden zwischen
 zwei äussersten Ankern zählen höchstens 1.5·d_v,out von jedem Ende (Figur 26).
+
+Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 -- je Leiste 9 Anker ⌀16 mit h_A =
+215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 / 175 / 175 / 175 mm. Die
+Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis
+zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d
+auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS,
+nach Vorgabe, nicht nachgeschlagen).
+
+Ein Stahlpilz vergrössert die gestützte Fläche. Gewählt ist der kleinste, der zwischen die
+Überdeckungen passt -- unten 20 mm, oben 50 mm, die Vorgaben der Software von AncoTech -- und mit
+dem die Platte ausserhalb hält: ZEUS Doppelkreuz 730 × 730 mm, h = 120 mm, g = 150 mm (AncoTech,
+Preisliste ZEUS 12.2018). Seine gestützte Fläche reicht bis an die Enden der Stege (4.3.6.6.2). Den
+Widerstand des Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.
+
+Um den Pilz reicht der Beton allein nicht: dazu kommen Leisten, bündig an den Pilz, mit den vier
+Nachweisen der Durchstanzbewehrung.
+
+Vorgeschlagen wird ancoPLUS von AncoTech um den Stahlpilz: 20 × ancoPLUS DX6-0215 -- je Leiste 6
+Anker ⌀10 mit h_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 mm. Die
+Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis
+zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d
+auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS,
+nach Vorgabe, nicht nachgeschlagen).
+
+Angerechnet werden die Anker zwischen 0.35·d_v und d_v vom Rand der gestützten Fläche: 1 je Leiste.
 
 Randstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu;
 ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die
@@ -8611,12 +9034,11 @@ des Rands läge, zählt nicht.
 e_u ist der Abstand zwischen der Resultierenden der Auflagerkraft -- in der Stützenachse, verschoben
 um die Exzentrizität e_x, e_y -- und dem Schwerpunkt der zählenden Teile des Nachweisschnitts.
 
-Der Beton allein reicht nicht. Vorgeschlagen wird ancoPLUS von AncoTech: 5 × ancoPLUS DX3-0235 -- je
-Leiste 3 Anker ⌀10 mit h_A = 235 mm, vom Rand der Stütze 95 / 150 / 150 mm. Die Abstände sind die
-der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d,
-danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech,
-Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht
-nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 5 × ancoPLUS DX3-0235 -- je Leiste 3 Anker ⌀10 mit h_A =
+235 mm, vom Rand der gestützten Fläche 95 / 150 / 150 mm. Die Abstände sind die der Typen «D» nach
+dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei
+Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni /
+Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Eckstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu;
 ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die
@@ -8637,12 +9059,11 @@ Strahlen von der Stützenachse an ihr vorbei liegt.
 Näherungsstufe 3: r_s und die mittleren Momente im Stützstreifen aus einer Berechnung nach der
 Elastizitätstheorie; 1.2 statt 1.5 vor der Klammer.
 
-Der Beton allein reicht nicht. Vorgeschlagen wird ancoPLUS von AncoTech: 10 × ancoPLUS DB2-0325 --
-je Leiste 2 Anker ⌀14 mit h_A = 325 mm, vom Rand der Stütze 125 / 200 mm. Die Abstände sind die der
-Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d,
-danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech,
-Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht
-nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 10 × ancoPLUS DB2-0325 -- je Leiste 2 Anker ⌀14 mit h_A =
+325 mm, vom Rand der gestützten Fläche 125 / 200 mm. Die Abstände sind die der Typen «D» nach dem
+Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei
+Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni /
+Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Wandende einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu;
 ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die
@@ -8747,6 +9168,27 @@ Querkraft im äusseren Nachweisschnitt   [SIA 262:2025, 4.3.6.2.6]
 Durchstanzwiderstand im äusseren Nachweisschnitt   [SIA 262:2025, 4.3.6.5.10, (58)]
     V_{Rd,c,out} = k_r \cdot \tau_{cd} \cdot d_{v,out} \cdot u_{out}
 
+Keine Flächenlast im Schnitt abgezogen   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d
+
+Äusserer Nachweisschnitt ohne das, was nicht zählt
+    u_{out,red} = u_{out,0} - \Delta u_{out}
+
+Querkraft im äusseren Nachweisschnitt: keine Flächenlast   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,out} = V_d
+
+Wirksame statische Höhe bis zur Unterkante des Pilzes   [SIA 262:2025, 4.3.6.6.2]
+    d_{v,P} = d - c_P
+
+Schnitt um den Stahlpilz ohne das, was nicht zählt
+    u_{P,red} = u_{P,0}
+
+Wirksamer Umfang des Schnitts um den Stahlpilz, mit k_e von innen   [SIA 262:2025, 4.3.6.2.3]
+    u_{P} = k_e \cdot u_{P,red}
+
+Querkraft im Schnitt um den Stahlpilz: keine Flächenlast   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,P} = V_d
+
 Durchmesser des flächengleichen Kreises   [SIA 262:2025, 4.3.6.2.4]
     b = \sqrt{\frac{4 \cdot A_u}{\pi}}
 
@@ -8762,9 +9204,6 @@ Breite des Stützstreifens in y, durch den Plattenrand begrenzt   [SIA 262:2025,
 Mittleres Moment im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.7, (64)]
     m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{sr,y}}\right)
 
-Keine Flächenlast im Schnitt abgezogen   [SIA 262:2025, 4.3.6.2.6]
-    V_{d,red} = V_d
-
 Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
     \psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s}
 
@@ -8773,9 +9212,6 @@ Nachweisschnitt ohne das, was nicht zählt   [SIA 262:2025, 4.3.6.2.3]
 
 Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
     \psi_x = 1.2 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2}
-
-Äusserer Nachweisschnitt ohne das, was nicht zählt
-    u_{out,red} = u_{out,0} - \Delta u_{out}
 
 Nachweisschnitt um das Wandende: 1.5·d_v entlang der Wand   [SIA 262:2025, 4.3.6.2.3, Figur 23b und c]
     u_0 = t + 3 \cdot d_v + \frac{\pi \cdot d_v}{2}
@@ -9469,6 +9905,37 @@ Durchstanzen
     Durchstanzen  Betondruckdiagonale                  V_{Rd,max} = 1000.4\,\mathrm{kN}  V_{d,red} = 894.5\,\mathrm{kN}          1.12
     Durchstanzen  ausserhalb der Durchstanzbewehrung  V_{Rd,c,out} = 959.3\,\mathrm{kN}  V_{d,out} = 852.5\,\mathrm{kN}          1.13
 
+Mit Stahlpilz
+-------------
+
+Angaben zur Durchstanzstelle
+    \text{Innenstütze, Decke, Beton C30/37} \qquad h = 280\,\mathrm{mm} \qquad b_x = 400\,\mathrm{mm} \qquad b_y = 400\,\mathrm{mm}
+
+Durchstanzen
+    Grösse                               Zeichen                                                        Wert  Einheit
+    -----------------------------------  ------------  -----------------------------------------------------  -------
+    Wirksame statische Höhe              d_v                                                             234  mm
+    Nachweisschnitt, wirksam             u                                                              2102  mm
+    Momentenübertragung                  k_e                                                           0.900  –
+    Plattenrotation                      \psi                                                         0.0219  –
+    Beiwert                              k_r                                                           0.642  –
+    Querkraft im Schnitt                 V_d                                                          1000.0  kN
+    Widerstand ohne Durchstanzbewehrung  V_{Rd,c}                                                      345.7  kN
+    Stahlpilz                                          ZEUS Doppelkreuz 730 × 730 mm, h = 120 mm, g = 150 mm
+    Durchstanzbewehrung                                                               20 × ancoPLUS DX6-0215
+    Abstände ab Pilz                     s                                  85 / 140 / 140 / 175 / 175 / 175  mm
+    Beitrag der Bewehrung                V_{Rd,s}                                                      614.7  kN
+    Erste Betondruckdiagonale            V_{Rd,max}                                                   1016.3  kN
+    Querkraft ausserhalb                 V_{d,out}                                                    1000.0  kN
+    Widerstand ausserhalb                V_{Rd,c,out}                                                 1003.0  kN
+
+    Nachweis      Bezeichnung                                                                  Widerstand                       Einwirkung  \alpha_{eff}
+    ------------  ---------------------------------------------------  ----------------------------------  -------------------------------  ------------
+    Durchstanzen  mit Durchstanzbewehrung um den Stahlpilz                  V_{Rd,s} = 614.7\,\mathrm{kN}     V_{d,s} = 605.6\,\mathrm{kN}          1.01
+    Durchstanzen  Verformungsvermögen um den Stahlpilz                      V_{Rd,v} = 614.7\,\mathrm{kN}     V_d / 2 = 500.0\,\mathrm{kN}          1.23
+    Durchstanzen  Betondruckdiagonale um den Stahlpilz                   V_{Rd,max} = 1016.3\,\mathrm{kN}    V_{d,P} = 1000.0\,\mathrm{kN}          1.02
+    Durchstanzen  ausserhalb der Durchstanzbewehrung um den Stahlpilz  V_{Rd,c,out} = 1003.0\,\mathrm{kN}  V_{d,out} = 1000.0\,\mathrm{kN}          1.00
+
 Randstütze
 ----------
 
@@ -9877,6 +10344,27 @@ Werte
     Stabdurchmesser in x                                                            \varnothing_x                                               16  mm        Vorgabe
     Stabdurchmesser in y                                                            \varnothing_y                                               16  mm        Vorgabe
     Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast                       q_d                                                         14  kN/m²     Vorgabe
+    Stababstand in x                                                                s_x                                                        150  mm        Vorgabe
+    Stababstand in y                                                                s_y                                                        150  mm        Vorgabe
+    Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
+    Bemessungswert der Auflagerkraft                                                V_d                                                       1000  kN        Vorgabe
+    Abmessung der Stütze in x                                                       b_x                                                        400  mm        Vorgabe
+    Abmessung der Stütze in y                                                       b_y                                                        400  mm        Vorgabe
+    Überdeckung der Zugbewehrung oben                                               c_{nom}                                                     30  mm        Vorgabe
+    Überdeckung der Durchstanzbewehrung unten                                       c_v                                                         30  mm        Vorgabe
+    Exzentrizität der Auflagerkraft in x                                            e_x                                                          0  mm        Vorgabe
+    Exzentrizität der Auflagerkraft in y                                            e_y                                                          0  mm        Vorgabe
+    Plattendicke                                                                    h                                                          280  mm        Vorgabe
+    Spannweite in x                                                                 l_x                                                          7  m         Vorgabe
+    Spannweite in y                                                                 l_y                                                          7  m         Vorgabe
+    Erfüllungsgrad ausserhalb der Durchstanzbewehrung                               \alpha_{eff,DS,out}                                       1.00            berechnet
+    Erfüllungsgrad erste Betondruckdiagonale                                        \alpha_{eff,DS,max}                                       1.02            berechnet
+    Erfüllungsgrad der Durchstanzbewehrung                                          \alpha_{eff,DS,s}                                         1.01            berechnet
+    Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung                            \alpha_{eff,DS}                                           0.35            berechnet
+    Erfüllungsgrad Verformungsvermögen                                              \alpha_{eff,DS,v}                                         1.23            berechnet
+    Stabdurchmesser in x                                                            \varnothing_x                                               16  mm        Vorgabe
+    Stabdurchmesser in y                                                            \varnothing_y                                               16  mm        Vorgabe
+    Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast                       q_d                                                          0  kN/m²     Vorgabe
     Stababstand in x                                                                s_x                                                        150  mm        Vorgabe
     Stababstand in y                                                                s_y                                                        150  mm        Vorgabe
     Durchmesser der Stütze                                                          D                                                          450  mm        Vorgabe

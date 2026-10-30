@@ -2271,6 +2271,10 @@ details.nb-callout > summary { cursor: pointer; }
 .ds-anker { fill: var(--schrift); stroke: #fff; stroke-width: .8; }
 .ds-aussen { fill: none; stroke: var(--last); stroke-width: 1.8; stroke-linejoin: round; }
 .ds-aussen-nicht { fill: none; stroke: var(--last); stroke-width: 1.1; stroke-dasharray: 5 4; opacity: .7; }
+.ds-pilzflaeche { fill: rgba(73, 80, 87, .08); stroke: var(--schrift-zart); stroke-width: 1; stroke-dasharray: 3 3; }
+.ds-steg { fill: none; stroke: #495057; stroke-width: 4; stroke-linecap: square; }
+.ds-pilzschnitt { fill: none; stroke: var(--system); stroke-width: 1.8; stroke-linejoin: round; }
+.ds-pilzschnitt-nicht { fill: none; stroke: var(--system); stroke-width: 1.1; stroke-dasharray: 5 4; opacity: .7; }
 
 /* --------------------------------------------------------------- Python -- */
 

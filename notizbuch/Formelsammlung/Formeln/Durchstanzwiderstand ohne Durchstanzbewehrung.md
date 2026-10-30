@@ -1,11 +1,11 @@
 ---
-erzeugt: 9145ca22590e
+erzeugt: f132b559dc6b
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.6.3.1"
+normstelle: ["SIA 262:2025, 4.3.6.3.1", "SIA 262:2025, 4.3.6.6.2"]
 ---
-> [!info] Normstelle
-> SIA 262:2025, 4.3.6.3.1
+> [!info] Normstellen
+> SIA 262:2025, 4.3.6.3.1 · SIA 262:2025, 4.3.6.6.2
 
 $$
 V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u
@@ -38,6 +38,7 @@ $$
 
 ## Im Code
 
+- [[opencivil.durchstanzen.mit_bewehrung#_mit_pilz|_mit_pilz]]
 - [[opencivil.durchstanzen.nachweis#Durchstanzen.pruefe|Durchstanzen.pruefe]]
 
 ## Themen

@@ -44,6 +44,20 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-30 · Durchstanzen: Stahlpilze ZEUS
+
+Bricht an einer Innenstütze die erste Betondruckdiagonale (70), wählt das
+Werkzeug den kleinsten ZEUS von AncoTech (Kreuz, Doppelkreuz, H-Kreuz;
+Preisliste 12.2018), der zwischen die Überdeckungen passt (unten 20 mm,
+oben 50 mm) und mit dem die Platte ausserhalb hält (4.3.6.6.2): ohne Leisten,
+sonst mit ancoPLUS um den Pilz -- dieselben vier Nachweise, mit dem Pilz als
+gestützter Fläche bis an die Enden der Stege. d_v um den Pilz ist d − 20 mm
+(gelesen). Den Widerstand des Pilzes selbst bestätigt der Hersteller; seine
+Profile sind nicht veröffentlicht. Die Suche verwirft einen Pilz schon an
+einer oberen Schranke seines Umfangs, bevor sie den Schnitt rechnet.
+
+---
+
 ## 2026-10-30 · Durchstanzen: Durchstanzbewehrung mit ancoPLUS
 
 Reicht der Beton allein nicht, schlägt das Werkzeug jetzt eine

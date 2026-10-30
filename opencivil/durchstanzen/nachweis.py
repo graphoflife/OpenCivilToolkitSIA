@@ -204,10 +204,10 @@ class Durchstanzen(Nachweis):
             raender=tuple(((h.c * h.n[0], h.c * h.n[1]), math.atan2(-h.n[1], -h.n[0]))
                           for h in s.raender(masse)))
         if not v.erfuellt and not s.lage.wand:
-            urteile, bewehrung = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
+            urteile, bewehrung, grade = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
                 d=d, d_v=d_v, k_e=k_e, k_r=k_r, tau_cd=tau_cd, u=u, psi=psi, V_d=V_d,
                 V_Rd_c=V_Rd_c, masse=masse, umriss=umriss))
-            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS)}, urteile,
+            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS), **grade}, urteile,
                                replace(befund, bewehrung=bewehrung))
         if not v.erfuellt:
             p.hinweis(f"Für {_mehrzahl(s.lage)} schlägt das Werkzeug noch keine "
@@ -640,15 +640,25 @@ def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock:
         zeile("Widerstand ohne Durchstanzbewehrung", "V_{Rd,c}", f"{befund.V_Rd_c / 1e3:.1f}", "kN"),
     ]
     b = befund.bewehrung
-    if b is not None:
+    if b is not None and b.pilz is not None:
+        zeilen.append(["Stahlpilz", "", b.pilz.pilz.name, ""])
+    if b is not None and b.vorschlag is not None:
         v = b.vorschlag
         zeilen += [
             ["Durchstanzbewehrung", "", v.name, ""],
-            zeile("Abstände ab Stütze", "s", " / ".join(f"{a * 1e3:.0f}" for a in v.abstaende), "mm"),
+            zeile("Abstände ab Stütze" if b.pilz is None else "Abstände ab Pilz", "s",
+                  " / ".join(f"{a * 1e3:.0f}" for a in v.abstaende), "mm"),
             zeile("Beitrag der Bewehrung", "V_{Rd,s}", f"{b.V_Rd_s / 1e3:.1f}", "kN"),
             zeile("Erste Betondruckdiagonale", "V_{Rd,max}", f"{b.V_Rd_max / 1e3:.1f}", "kN"),
-            zeile("Querkraft ausserhalb", "V_{d,out}", f"{b.V_d_out / 1e3:.1f}", "kN"),
-            zeile("Widerstand ausserhalb", "V_{Rd,c,out}", f"{b.V_Rd_c_out / 1e3:.1f}", "kN"),
+        ]
+    if b is not None:
+        aussen = "ausserhalb" if b.vorschlag is not None else "um den Stahlpilz"
+        zeilen += [
+            zeile(f"Querkraft {aussen}", "V_{d,out}" if b.vorschlag is not None else "V_{d,P}",
+                  f"{b.V_d_out / 1e3:.1f}", "kN"),
+            zeile(f"Widerstand {aussen}",
+                  "V_{Rd,c,out}" if b.vorschlag is not None else "V_{Rd,c,P}",
+                  f"{b.V_Rd_c_out / 1e3:.1f}", "kN"),
         ]
     return TabellenBlock(kopf=["Grösse", "Zeichen", "Wert", "Einheit"], zeilen=zeilen,
                          titel="Durchstanzen", ausrichtung="llrl")
