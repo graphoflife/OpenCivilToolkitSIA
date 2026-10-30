@@ -1,5 +1,5 @@
 ---
-erzeugt: 16cd7b7be25c
+erzeugt: ce5791d5624b
 art: modul
 tags: [modul]
 ---
@@ -98,6 +98,7 @@ Längen in m, Kräfte in N.
 - `umriss: Tuple[Punkt, ...]`
 - `aussparungen: Tuple[Tuple[Punkt, ...], ...]`
 - `raender: Tuple[Tuple[Punkt, float], ...]` – Je Plattenrand ein Punkt auf ihm und die Richtung, in die die Platte liegt (rad).
+- `bewehrung: Optional[Bewehrungsbefund] = None` – Die vorgeschlagene Durchstanzbewehrung -- `None`, wo der Beton allein reicht.
 
 ### Durchstanzen
 
@@ -110,6 +111,23 @@ Der Durchstanznachweis an einer Durchstanzstelle -- siehe Dateikopf.
 - `THEMA = 'Durchstanzen'`
 - `ART = 'DS'`
 - `LANGNAME = 'Durchstanzen'`
+
+#### Durchstanzen.mit_graden
+
+```python
+@property
+def mit_graden(self) -> Tuple[WertDef, ...]
+```
+
+Die Grade der vier Nachweise mit Durchstanzbewehrung (4.3.6.5.1).
+
+#### Durchstanzen.nicht_fuehrbar
+
+```python
+def nicht_fuehrbar(self, grund: str) -> List[NachweisUrteil]
+```
+
+Die vier Urteile mit Durchstanzbewehrung, wo sich keine finden liess.
 
 #### Durchstanzen.pruefe
 
@@ -221,7 +239,8 @@ Was über der Tabelle steht: Lage, Platte, Beton und die Masse, wie gerechnet.
 def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock
 ```
 
-Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse.
+Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse. Mit
+Durchstanzbewehrung dazu das Produkt und die Widerstände mit ihm.
 
 
 ## Konstanten
@@ -237,6 +256,7 @@ Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
@@ -246,6 +266,7 @@ Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse.
 ## Gebraucht von
 
 - [[opencivil.bericht.zusammenfassung]]
+- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.web.durchstanzdaten]]
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: ba6f4a45a6ad
+erzeugt: 3afebd44e216
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -53,21 +53,24 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Durchstanzen**
 
-- [[Durchstanzen]] · 26
+- [[Durchstanzen]] · 39
 
 ## Formeln von A bis Z
 
 - [[Abstand des Grundwassers unter der Sohle]] · $T$
 - [[Abstand zum Momentennullpunkt]] · $r_{sx}$
+- [[Anrechenbare Durchstanzbewehrung]] · $\sum A_{sw}$
 - [[Äquivalenter E-Modul eines Stabs]] · $E_{eq}$
 - [[Äquivalenter E-Modul über dem Moment]]
 - [[Äquivalenter E-Modul über der Normalkraft]]
 - [[Arbeitsgleiche Knotenkräfte]]
 - [[Aufnehmbare Risskraft]] · $N_{s,adm,2,x}$
 - [[Aufnehmbares Moment der Bewehrung]] · $M_{s,adm,2,x}$
+- [[Äusserer Nachweisschnitt ohne das, was nicht zählt]] · $u_{out,red}$
 - [[Bedingung der Duktilität]]
 - [[Bedingung gegen sprödes Versagen]]
 - [[Beide Lagen fliessen auf Zug]] · $N_{Rd}^{+}$
+- [[Beitrag der Durchstanzbewehrung]] · $V_{Rd,s}$
 - [[Beiwert der Gesteinskörnung]] · $k_g$
 - [[Beiwert der Momentenübertragung]] · $k_e$
 - [[Beiwert der Parabel]] · $k_{\sigma}$
@@ -118,6 +121,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Druckzonenhöhe bei reiner Biegung]] · $x$
 - [[Druckzonenhöhe im Stützstreifen]] · $x_x$
 - [[Durchmesser des flächengleichen Kreises]] · $b$
+- [[Durchstanzbewehrung an der Fliessgrenze]] · $V_{Rd,v}$
+- [[Durchstanzwiderstand im äusseren Nachweisschnitt]] · $V_{Rd,c,out}$
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · $V_{Rd,c}$
 - [[Eigengewicht eines Stabs]] · $g_{k}$
 - [[Einflussfaktor der Rechtecklast]]
@@ -160,6 +165,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Grösste Dehnung im Schwerpunkt]] · $\varepsilon_{m,u}$
 - [[Grösste Krümmung]] · $\chi_{u}$
 - [[Grundbruchwiderstand]] · $N_{Rd}$
+- [[Halbe Querkraft für das Verformungsvermögen]] · $V_d / 2$
 - [[Hilfsgrösse der Nulllinie]] · $\rho$
 - [[Höhe der Distanzhalter]] · $h_{Dist}$
 - [[Innerer Hebelarm]] · $z$
@@ -192,9 +198,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nulllinie des gerissenen Querschnitts]] · $x$
 - [[Parabel-Rechteck-Beziehung des Betons]]
 - [[Plattenrotation]] · $\psi_x$
+- [[Platz für die Durchstanzbewehrung]] · $h_{frei}$
 - [[Probe – Moment um y]] · $M_{y,Rd}$
 - [[Probe – Moment um z]] · $M_{z,Rd}$
 - [[Probe – Normalkraft]] · $N_{Rd}$
+- [[Querkraft für die Durchstanzbewehrung]] · $V_{d,s}$
+- [[Querkraft im äusseren Nachweisschnitt]] · $V_{d,out}$
 - [[Querkraft über die Federn der Wände]]
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]] · $V_{Rd}^{+}(M_{Ed} = 0)$
@@ -224,6 +233,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Sohlneigungsfaktor b_γ]] · $b_{\gamma}$
 - [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · $\sigma_M$
 - [[Spannung im ungerissenen Querschnitt]]
+- [[Spannung in der Durchstanzbewehrung]] · $\sigma_{sd}$
 - [[Spannungsblock des Betons]]
 - [[Stahlspannung, höchstens die Fliessgrenze]] · $\sigma_{sd}$
 - [[Statische Höhe]] · $d_{2,x}$
@@ -253,6 +263,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand bei festgehaltenem N_Ed]] · $M_{Rd}$
 - [[Widerstand der Bügel]] · $V_{Rd,s}$
 - [[Widerstand der Druckdiagonalen]] · $V_{Rd,c}$
+- [[Widerstand der ersten Betondruckdiagonale]] · $V_{Rd,max}$
 - [[Widerstand im normierten Diagramm]] · $\bar{R}_{d,x}$
 - [[Widerstand in der Richtung der Einwirkung]] · $M_{Rd}$
 - [[Widerstand je Länge einer Wand (Fachwerk)]]
@@ -262,8 +273,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wirksame Durchbiegung]] · $w_{eff}$
 - [[Wirksame Höhe ohne Abzug]] · $d_v^{+}$
 - [[Wirksame Höhe, um die Einlage vermindert]] · $d_v$
+- [[Wirksame statische Höhe im äusseren Nachweisschnitt]] · $d_{v,out}$
 - [[Wirksame Zugfestigkeit]] · $f_{ct,eff}$
 - [[Wirksamer Elastizitätsmodul]] · $E_{c,eff}$
+- [[Wirksamer Umfang des äusseren Nachweisschnitts]] · $u_{out}$
 - [[Wirksamer Umfang des Nachweisschnitts]] · $u$
 - [[Zulässige Dehnung]] · $\varepsilon_{s,adm}$
 - [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
@@ -272,7 +285,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-121 von 212 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+123 von 225 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -280,6 +293,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Arbeitsgleiche Knotenkräfte]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Aufnehmbare Risskraft]] · [[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft._protokoll_lage]], [[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA.pruefe|RissnormalkraftQA.pruefe]]
 - [[Aufnehmbares Moment der Bewehrung]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_lage]]
+- [[Äusserer Nachweisschnitt ohne das, was nicht zählt]] · [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
 - [[Beide Lagen fliessen auf Zug]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Beiwert der Parabel]] · [[opencivil.querschnitt.werkstoffgesetz#Betongesetz.protokoll|Betongesetz.protokoll]]
 - [[Beiwert für die statische Höhe]] · [[opencivil.nachweis.querkraft_ohne_buegel#protokoll_ohne_buegel|protokoll_ohne_buegel]]
@@ -350,6 +364,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Momentenwiderstand bei reiner Biegung]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
 - [[Nulllinie auf halber Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Nulllinie des gerissenen Querschnitts]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_lage]]
+- [[Platz für die Durchstanzbewehrung]] · [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
 - [[Probe – Moment um y]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Moment um z]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]

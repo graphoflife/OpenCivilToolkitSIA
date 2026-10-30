@@ -5,7 +5,8 @@
  * die Plattenränder -- was jenseits liegt, grau --, die Aussparungen mit
  * einem Kreuz und der Nachweisschnitt im Abstand d_v/2. Was von ihm zählt,
  * ist ausgezogen, was nicht zählt, gestrichelt: neben den Ecken grosser
- * Stützen und im Schatten der Aussparungen.
+ * Stützen und im Schatten der Aussparungen. Braucht es Durchstanzbewehrung,
+ * stehen ihre Leisten mit den Ankern da und der äussere Schnitt um sie.
  *
  * Alles kommt aus der Lösung, wie der Kern es gerechnet hat
  * (opencivil/web/durchstanzdaten.py) -- auch der Umriss der Stütze. Steht im
@@ -76,8 +77,27 @@ export function grundrissTeile(s, bild, sicht, aussparungen = s.aussparungen) {
   }
   for (const a of aussparungen) teile.push(...aussparungTeile(px(a)));
   teile.push(svgEl('path', { d: pfadVon(px(s.umriss), true), class: 'ds-stuetze' }));
+  if (s.bewehrung) teile.push(...bewehrungTeile(s.bewehrung, px));
   for (const l of s.schnitt) {
     teile.push(linie(px(l.punkte), l.zaehlt ? 'ds-schnitt' : 'ds-schnitt-nicht'));
+  }
+  return teile;
+}
+
+/**
+ * Die Durchstanzbewehrung: je Leiste eine Linie vom Rand der Stütze bis zum
+ * letzten Anker, die Anker als Punkte, und der äussere Schnitt um sie
+ * (Figur 26) -- was nicht zählt, gestrichelt.
+ */
+function bewehrungTeile(b, px) {
+  const teile = [];
+  for (const l of b.aussen) teile.push(linie(px(l.punkte), l.zaehlt ? 'ds-aussen' : 'ds-aussen-nicht'));
+  for (const l of b.leisten) {
+    const punkte = px([l.wurzel, ...l.anker]);
+    teile.push(linie(punkte, 'ds-leiste'));
+    for (const [x, y] of punkte.slice(1)) {
+      teile.push(svgEl('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: 2.6, class: 'ds-anker' }));
+    }
   }
   return teile;
 }
@@ -97,9 +117,10 @@ export function aussparungTeile(punkte, klasse = '') {
   ];
 }
 
-/** Was im Bild sein soll, in mm: Stütze, Schnitt und Aussparungen, mit Rand. */
+/** Was im Bild sein soll, in mm: Stütze, Schnitte, Bewehrung und Aussparungen, mit Rand. */
 export function grundrissUmfang(s) {
-  const punkte = [...s.umriss, ...s.schnitt.flatMap((l) => l.punkte), ...s.aussparungen.flat()];
+  const punkte = [...s.umriss, ...s.schnitt.flatMap((l) => l.punkte), ...s.aussparungen.flat(),
+    ...(s.bewehrung?.aussen || []).flatMap((l) => l.punkte)];
   const xs = punkte.map((p) => p[0]);
   const ys = punkte.map((p) => p[1]);
   const rand = Math.max(s.d_v, 0.08 * Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)));
@@ -129,16 +150,32 @@ function grundrissBild(s) {
   return svg;
 }
 
-/** Die Zeilen unter dem Bild: der Schnitt, was nicht zählt, das Ergebnis. */
+/** Die Zeilen unter dem Bild: der Schnitt, was nicht zählt, die Bewehrung, das Ergebnis. */
 function legende(s) {
-  return el('div.gb-legende', {}, [
+  const b = s.bewehrung;
+  const zeilen = [
     `Nachweisschnitt im Abstand d_v/2 = ${zahl(s.d_v / 2, 0)} mm um die gestützte Fläche; `
       + `wirksam u = k_e · u_red = ${zahl(s.u, 0)} mm mit k_e = ${zahl(s.k_e, 2)}.`,
     'Gestrichelt, was nicht zählt: weiter als 1.5·d_v von den Ecken grosser Stützen und entlang '
       + 'von Wänden, und was hinter Aussparungen liegt.',
-    `V_d = ${zahl(s.V_d, 1)} kN ${s.erfuellt ? '≤' : '>'} V_Rd,c = ${zahl(s.V_Rd_c, 1)} kN – `
-      + `${s.erfuellt ? 'erfüllt' : 'nicht erfüllt'}, α = ${s.grad}.`,
-  ].map((z) => el('p', { text: z })));
+  ];
+  if (!b) {
+    zeilen.push(`V_d = ${zahl(s.V_d, 1)} kN ${s.erfuellt ? '≤' : '>'} V_Rd,c = ${zahl(s.V_Rd_c, 1)} kN – `
+      + `${s.erfuellt ? 'erfüllt' : 'nicht erfüllt'}, α = ${s.grad}.`);
+  } else {
+    zeilen.push(
+      `Ohne Bewehrung V_Rd,c = ${zahl(s.V_Rd_c, 1)} kN < V_d = ${zahl(s.V_d, 1)} kN. `
+        + `Durchstanzbewehrung: ${b.name}, Anker ⌀${zahl(b.durchmesser, 0)} im Abstand `
+        + `${b.abstaende.map((a) => zahl(a, 0)).join(' / ')} mm vom Rand der Stütze.`,
+      `Äusserer Schnitt im Abstand 0.5·d_v,out = ${zahl(b.d_v_out / 2, 0)} mm um die äussersten Anker: `
+        + `u_out = ${zahl(b.u_out, 0)} mm, V_d,out = ${zahl(b.V_d_out, 1)} kN, `
+        + `V_Rd,c,out = ${zahl(b.V_Rd_c_out, 1)} kN.`,
+      `V_Rd,s = ${zahl(b.V_Rd_s, 1)} kN, V_Rd,max = ${zahl(b.V_Rd_max, 1)} kN – `
+        + `${s.erfuellt ? 'alle Nachweise erfüllt' : 'nicht alle Nachweise erfüllt'}, `
+        + `kleinstes α = ${s.grad}.`,
+    );
+  }
+  return el('div.gb-legende', {}, zeilen.map((z) => el('p', { text: z })));
 }
 
 /** Die Karte einer Durchstanzstelle im Reiter «Diagramme». Das Panel darum baut bericht.js. */

@@ -44,6 +44,43 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-30 · Durchstanzen: Durchstanzbewehrung mit ancoPLUS
+
+Reicht der Beton allein nicht, schlägt das Werkzeug jetzt eine
+Durchstanzbewehrung vor und weist sie nach. Das Produkt ist ancoPLUS von
+AncoTech: Doppelkopfanker auf Leisten mit 2 bis 9 Ankern, ⌀10 bis 28 mm,
+Höhen 125–455 mm. Die Typen «D» haben ungleiche Abstände: 0.375·d bis zum
+ersten Anker, bis zum dritten 0.60·d, danach 0.75·d. So wünschte es der
+Benutzer («Abstand zwischen 1. und 2. und 3. Eisen nicht konstant»). Die
+Regeln stammen aus dem Gutachten Muttoni / Fernández Ruiz 2007 und der
+Preisliste; das neuere Gutachten zu SIA 262:2025 war nicht lesbar.
+Recherchiert sind ausserdem DURA-Körbe und S-Elemente (Leviat), HDB, FIDECA
+und Peikko. Vorerst eingebaut ist nur ancoPLUS.
+
+Die Suche (`durchstanzen/bewehrung.py`) stellt die Leisten senkrecht auf den
+Rand der gestützten Fläche, an Ecken und Rundungen radial, beim zweiten
+Anker höchstens 1.5·d auseinander. Sie nimmt den kleinsten Durchmesser, der
+die Bewehrung (66) und das Verformungsvermögen (67) erfüllt, und dazu die
+kleinste Zahl Anker je Leiste, mit der der äussere Schnitt nach Figur 26
+aufgeht. Erst wenn kein Durchmesser reicht, stehen die Leisten dichter.
+Nachgewiesen wird viermal (`durchstanzen/mit_bewehrung.py`, 4.3.6.5.1):
+Bewehrung, Verformungsvermögen, erste Betondruckdiagonale (70) mit dem Faktor
+des Gutachtens, und ausserhalb der Bewehrung. Das Urteil ohne Bewehrung
+fällt dann nicht mehr; sein Grad steht als Wert in der Herleitung.
+
+Der äussere Schnitt ist der Schnitt um eine «Stütze», deren Kern die Hülle
+der äussersten Anker ist: von jeder Geraden zwischen zwei Ankern zählen
+1.5·d_v,out von jedem Ende. Das ist dieselbe Regel wie an den Ecken grosser
+Stützen (Figur 23a), also derselbe Code.
+
+Neu ist eine Eingabe: die Überdeckung c_v der Anker auf der Druckseite. Sie
+bestimmt d_v,out = d − c_v und den Faktor k_sys des Gutachtens.
+
+Für Wandende und Wandecke gibt es noch keinen Vorschlag; die Herleitung
+sagt es. Ebenso fehlen noch die Stahlpilze.
+
+---
+
 ## 2026-10-30 · Durchstanzen: Aussparungen im Zeichenfenster
 
 Die Aussparungen einer Durchstanzstelle entstehen jetzt in einem

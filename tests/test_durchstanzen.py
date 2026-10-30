@@ -1,16 +1,23 @@
 """
-Der Durchstanznachweis ohne Durchstanzbewehrung (opencivil.durchstanzen.nachweis).
+Der Durchstanznachweis (opencivil.durchstanzen.nachweis und .mit_bewehrung).
 
 Eine Innenstütze gegen die Gleichungen (58) bis (60) von Hand, die Näherungen
 für k_e je Lage, die Ovalstütze, Decke und Bodenplatte, die Wand in
-Näherungsstufe 2, Aussparungen aus Knoten, die Prüfungen der Eingabe und was
-die Oberflaeche davon zu sehen bekommt.
+Näherungsstufe 2, Aussparungen aus Knoten; die Durchstanzbewehrung mit
+ancoPLUS -- Höhe, Abstände, Leisten, die Gleichungen (66) bis (70) und der
+äussere Schnitt nach Figur 26 --, die Prüfungen der Eingabe und was die
+Oberflaeche davon zu sehen bekommt.
 """
 
 import math
 import unittest
+from itertools import accumulate
 
 from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammenfassen
+from opencivil.durchstanzen import produkte
+from opencivil.durchstanzen.bewehrung import aeussere_kandidaten, anrechenbar, leisten_anordnen
+from opencivil.durchstanzen.mit_bewehrung import spannung
+from opencivil.durchstanzen.schnitt import Stuetzenflaeche, kandidaten_stuetze, nachweisschnitt
 from opencivil.projekt import DurchstanzEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
 from opencivil.web.api import katalog
@@ -75,11 +82,155 @@ class TestInnenstuetzeVonHand(unittest.TestCase):
         V_Rd = k_r * TAU_CD * 234.0 * 0.9 * (1600.0 + math.pi * 234.0)
         self.assertAlmostEqual(self.befund.V_Rd_c, V_Rd, delta=1.0)
 
-    def test_urteil(self):
-        """Der Erfüllungsgrad ist der Widerstand durch die Querkraft -- hier nicht erfüllt."""
-        self.assertFalse(self.urteil.erfuellt)
-        self.assertAlmostEqual(self.urteil.erfuellungsgrad.si, self.befund.V_Rd_c / 800e3, places=6)
-        self.assertEqual(self.urteil.name, "Durchstanzen – ohne Durchstanzbewehrung")
+    def test_grad_ohne_bewehrung(self):
+        """Der Erfüllungsgrad ist der Widerstand durch die Querkraft -- hier unter eins."""
+        grad = next(w.groesse.si for k, w in self.loesung.werte.items()
+                    if k.endswith("ohne.erfuellungsgrad"))
+        self.assertAlmostEqual(grad, self.befund.V_Rd_c / 800e3, places=6)
+        self.assertLess(grad, 1.0)
+
+
+class TestDurchstanzbewehrung(unittest.TestCase):
+    """Dieselbe Innenstütze mit V_d = 800 kN: der Beton allein reicht nicht."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.aufbau, cls.loesung, cls.befund, _ = rechnen(projekt(b_x=400, b_y=400, V_d=800.0))
+        cls.urteile = {u.fall: u for u in cls.loesung.urteile}
+        cls.b = cls.befund.bewehrung
+
+    def test_vier_nachweise_statt_einem(self):
+        """4.3.6.5.1: Bewehrung, Verformungsvermögen, Betondruckdiagonale, ausserhalb."""
+        self.assertEqual(set(self.urteile), {"mit Durchstanzbewehrung", "Verformungsvermögen",
+                                             "Betondruckdiagonale",
+                                             "ausserhalb der Durchstanzbewehrung"})
+        self.assertTrue(all(u.erfuellt for u in self.urteile.values()))
+
+    def test_vorschlag(self):
+        """Typ «D», ⌀10, h_A = 280 − 30 − 30 auf …5 mm abgerundet, Abstände ab 0.375·d."""
+        v = self.b.vorschlag
+        self.assertTrue(v.reicht)
+        self.assertEqual(v.typ.buchstabe, "X")
+        self.assertAlmostEqual(v.h_A, 0.215)
+        self.assertEqual(v.abstaende[:3], (0.085, 0.14, 0.14))
+        self.assertRegex(v.name, r"^\d+ × ancoPLUS DX\d-0215$")
+
+    def test_beitrag_der_bewehrung_von_hand(self):
+        """(68) und (69): V_Rd,s = ΣA_sw · k_e · σ_sd, zwei Anker je Leiste im Bereich."""
+        v = self.b.vorschlag
+        f_ctm = 2.9
+        sigma = min(E_S * self.befund.psi / 6 * (1 + f_ctm / F_YD * 234.0 / 10.0), F_YD)
+        self.assertAlmostEqual(self.b.sigma_sd / 1e6, sigma, places=3)
+        A_sw = len(v.leisten) * 2 * math.pi * 10.0 ** 2 / 4
+        self.assertEqual(v.anrechenbar, 2)
+        self.assertAlmostEqual(self.b.V_Rd_s, A_sw * 0.9 * sigma, delta=1.0)
+
+    def test_druckdiagonale_mit_dem_faktor_des_produkts(self):
+        """(70) mit k_sys zwischen 3.0 (c_v ≤ d/10) und 2.0 (c_v ≥ d/6): c_v = 30 mm, d = 234 mm."""
+        k_sys = 3.0 + (0.030 - 0.0234) / (0.234 / 6 - 0.0234) * (2.0 - 3.0)
+        self.assertAlmostEqual(self.b.k_sys, k_sys, places=6)
+        self.assertAlmostEqual(self.b.V_Rd_max, min(k_sys * self.befund.k_r, 3.5) * TAU_CD
+                               * 234.0 * self.befund.u * 1e3, delta=1.0)
+
+    def test_ausserhalb_mit_d_v_out(self):
+        """4.3.6.5.10: d_v,out = d − c_v; V_Rd,c,out = k_r · τ_cd · d_v,out · u_out."""
+        self.assertAlmostEqual(self.b.d_v_out, 0.234 - 0.030)
+        self.assertAlmostEqual(self.b.V_Rd_c_out, self.befund.k_r * TAU_CD * 204.0
+                               * self.b.u_out * 1e3, delta=1.0)
+
+    def test_ohne_bewehrung_steht_als_grad_da(self):
+        """Der Grad ohne Bewehrung bleibt als Wert, ein Urteil fällt er nicht mehr."""
+        grad = next(w for k, w in self.loesung.werte.items() if k.endswith("ohne.erfuellungsgrad"))
+        self.assertAlmostEqual(grad.groesse.si, self.befund.V_Rd_c / self.befund.V_d_red)
+        self.assertNotIn("ohne Durchstanzbewehrung", self.urteile)
+
+    def test_zu_viel_last_bricht_die_druckdiagonale(self):
+        """Mehr Bewehrung hilft nicht mehr: (70) geht nicht auf, und die Herleitung sagt es."""
+        _, loesung, _, _ = rechnen(projekt(b_x=400, b_y=400, V_d=1600.0))
+        urteile = {u.fall: u for u in loesung.urteile}
+        self.assertFalse(urteile["Betondruckdiagonale"].erfuellt)
+        self.assertIn("Betondruckdiagonale an der Stütze bricht", texte(loesung))
+
+    def test_genug_beton_braucht_keine_bewehrung(self):
+        """Ein Urteil ohne Bewehrung; die Grade mit Bewehrung unbeschränkt."""
+        _, loesung, befund, urteil = rechnen(projekt(V_d=100.0))
+        self.assertIsNone(befund.bewehrung)
+        self.assertEqual([u.fall for u in loesung.urteile], ["ohne Durchstanzbewehrung"])
+        grade = [w.groesse.si for k, w in loesung.werte.items()
+                 if k.endswith(("mit.erfuellungsgrad", "aussen.erfuellungsgrad"))]
+        self.assertTrue(grade and all(math.isinf(g) for g in grade))
+        self.assertIn("Sicherung gegen Totaleinsturz", texte(loesung))
+
+    def test_an_der_wand_noch_kein_vorschlag(self):
+        _, loesung, befund, urteil = rechnen(projekt(lage="wandende", V_d=500.0))
+        self.assertIsNone(befund.bewehrung)
+        self.assertFalse(urteil.erfuellt)
+        self.assertIn("schlägt das Werkzeug noch keine Durchstanzbewehrung vor", texte(loesung))
+
+    def test_am_rand_nur_leisten_in_der_platte(self):
+        """Keine Leiste ragt über den Rand: jeder Anker liegt um c_nom innerhalb."""
+        befund = rechnen(projekt(lage="rand", a_y=0, V_d=300.0))[2]
+        v = befund.bewehrung.vorschlag
+        anker = [p for l in v.leisten for p in l.anker(v.radien)]
+        self.assertTrue(anker)
+        self.assertTrue(all(p[1] >= -0.15 + 0.030 - 1e-9 for p in anker))
+
+
+class TestAnordnung(unittest.TestCase):
+    """Die Regeln von ancoPLUS (produkte.py) und die Leisten um die Stütze (bewehrung.py)."""
+
+    def test_ankerhoehe_wie_die_beispiele_von_ancotech(self):
+        """h 300, c 25/25 → 245 mm; h 350 → 295 mm; h 280, c 30/30 → 215 mm."""
+        self.assertAlmostEqual(produkte.ankerhoehe(0.300, 0.025, 0.025), 0.245)
+        self.assertAlmostEqual(produkte.ankerhoehe(0.350, 0.025, 0.025), 0.295)
+        self.assertAlmostEqual(produkte.ankerhoehe(0.280, 0.030, 0.030), 0.215)
+
+    def test_abstaende_nicht_konstant(self):
+        """0.375·d, bis zum dritten Anker 0.60·d, danach 0.75·d -- auf 5 mm abgerundet."""
+        self.assertEqual(produkte.abstaende(0.234, 5), (0.085, 0.14, 0.14, 0.175, 0.175))
+
+    def test_anrechenbar_zwischen_0_35_und_1_d_v(self):
+        radien = tuple(accumulate(produkte.abstaende(0.234, 4)))
+        self.assertEqual(anrechenbar(radien, 0.234), 2)
+
+    def test_acht_leisten_um_eine_stuetze_300(self):
+        """Wie im Beispiel von AncoTech: 8 Leisten, je zwei an den Enden jeder Seite."""
+        d = 0.259
+        radien = tuple(accumulate(produkte.abstaende(d, 2)))
+        stuetze = Stuetzenflaeche(((-0.15, -0.15), (0.15, -0.15), (0.15, 0.15), (-0.15, 0.15)))
+        leisten = leisten_anordnen(kandidaten_stuetze(stuetze, radien[1], 1e9)[0].stuecke,
+                                   radien[1], 1.5 * d)
+        self.assertEqual(len(leisten), 8)
+
+    def test_leisten_beim_zweiten_anker_hoechstens_1_5_d_auseinander(self):
+        d = 0.234
+        radien = tuple(accumulate(produkte.abstaende(d, 2)))
+        rund = Stuetzenflaeche(((0.0, 0.0),), 0.25)
+        leisten = leisten_anordnen(kandidaten_stuetze(rund, radien[1], 1e9)[0].stuecke,
+                                   radien[1], 1.5 * d)
+        zweite = [l.anker(radien)[1] for l in leisten]
+        abstaende = [math.dist(zweite[i - 1], zweite[i]) for i in range(len(zweite))]
+        self.assertLessEqual(max(abstaende), 1.5 * d + 1e-9)
+
+    def test_aeusserer_schnitt_zaehlt_zwischen_ankern_hoechstens_3_d_v_out(self):
+        """
+        Figur 26: vier Leisten im Kreuz um eine dünne Stütze -- von jeder der
+        vier langen Geraden zwischen den äussersten Ankern zählen 2 × 1.5·d_v,out,
+        dazu die vier Viertelkreise um die Anker.
+        """
+        d_v_out = 0.2
+        radien = (0.1, 0.25, 0.4, 0.55, 0.7, 0.85)
+        stuetze = Stuetzenflaeche(((0.0, 0.0),), 0.01)
+        r_2 = stuetze.radius + radien[1]
+        leisten = leisten_anordnen(kandidaten_stuetze(stuetze, radien[1], 1e9)[0].stuecke,
+                                   radien[1], 1.42 * r_2)
+        self.assertEqual(len(leisten), 4)
+        schnitt = nachweisschnitt(aeussere_kandidaten(leisten, radien, stuetze.umriss(), (), d_v_out),
+                                  d_v=d_v_out, achse=(0.0, 0.0))
+        self.assertAlmostEqual(schnitt.u, 4 * 2 * 1.5 * d_v_out + math.pi * d_v_out, delta=0.01)
+
+    def test_spannung_hoechstens_f_yd(self):
+        self.assertEqual(spannung(200e9, 0.1, 2.9e6, 435e6, 0.234, 0.010), 435e6)
 
 
 class TestFormenUndLagen(unittest.TestCase):
@@ -234,7 +385,11 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         self.assertIn("Randstütze, Decke", kopf.latex)
         self.assertEqual(tabelle.zeilen[0][0], "Wirksame statische Höhe")
         self.assertEqual([z[:2] for z in nachweistabelle(teil).zeilen],
-                         [["Durchstanzen", "ohne Durchstanzbewehrung"]])
+                         [["Durchstanzen", "mit Durchstanzbewehrung"],
+                          ["Durchstanzen", "Verformungsvermögen"],
+                          ["Durchstanzen", "Betondruckdiagonale"],
+                          ["Durchstanzen", "ausserhalb der Durchstanzbewehrung"]])
+        self.assertIn("Durchstanzbewehrung", [z[0] for z in tabelle.zeilen])
 
 
 if __name__ == "__main__":

@@ -2267,6 +2267,10 @@ details.nb-callout > summary { cursor: pointer; }
 .ds-schnitt { fill: none; stroke: var(--system); stroke-width: 2.2; stroke-linejoin: round; }
 .ds-schnitt-nicht { fill: none; stroke: var(--system); stroke-width: 1.2; stroke-dasharray: 5 4; opacity: .7; }
 .ds-achse { fill: none; stroke: var(--schrift-matt); stroke-width: 1.2; }
+.ds-leiste { fill: none; stroke: var(--schrift); stroke-width: 2.4; stroke-linecap: round; opacity: .55; }
+.ds-anker { fill: var(--schrift); stroke: #fff; stroke-width: .8; }
+.ds-aussen { fill: none; stroke: var(--last); stroke-width: 1.8; stroke-linejoin: round; }
+.ds-aussen-nicht { fill: none; stroke: var(--last); stroke-width: 1.1; stroke-dasharray: 5 4; opacity: .7; }
 
 /* --------------------------------------------------------------- Python -- */
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: c1c0e7ab8256
+erzeugt: 7abf0ca06acf
 art: modul
 tags: [modul]
 ---
@@ -301,6 +301,7 @@ def beschreibung(self) -> str
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.ergebnis]]

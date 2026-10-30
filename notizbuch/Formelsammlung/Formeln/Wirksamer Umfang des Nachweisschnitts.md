@@ -1,5 +1,5 @@
 ---
-erzeugt: d3898a5e937e
+erzeugt: dd1eb1bd1bfc
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.3"
@@ -29,6 +29,7 @@ $$
 ## Gebraucht von
 
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]]
+- [[Widerstand der ersten Betondruckdiagonale]]
 
 ## Im Code
 

@@ -43,16 +43,19 @@ SI-Basis; wo die Norm in mm rechnet (59), sagt es die Herleitung.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Dict, List, Optional, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, Vergleich, grad_def,
+    NICHT_FUEHRBAR, Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, Vergleich,
+    grad_def,
 )
-from opencivil.core.einheiten import KNM_PRO_M, M2, MM, MM2_PRO_M, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KNM_PRO_M, M2, MM, MM2_PRO_M, Groesse
 from opencivil.core.latex import Mathe, als_text, angabe
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
+from opencivil.durchstanzen import mit_bewehrung
+from opencivil.durchstanzen.mit_bewehrung import Bewehrungsbefund, Grundlage
 from opencivil.durchstanzen.schnitt import Auswertung, Nachweisschnitt, Punkt, nachweisschnitt
 from opencivil.durchstanzen.stelle import (
     Durchstanzstelle, KeArt, Lage, Naeherungsstufe, Stuetzenform,
@@ -106,6 +109,9 @@ class Durchstanzbefund:
     raender: Tuple[Tuple[Punkt, float], ...]
     """Je Plattenrand ein Punkt auf ihm und die Richtung, in die die Platte liegt (rad)."""
 
+    bewehrung: Optional[Bewehrungsbefund] = None
+    """Die vorgeschlagene Durchstanzbewehrung -- ``None``, wo der Beton allein reicht."""
+
 
 class Durchstanzen(Nachweis):
     """Der Durchstanznachweis an einer Durchstanzstelle -- siehe Dateikopf."""
@@ -120,12 +126,37 @@ class Durchstanzen(Nachweis):
         self.d_ohne: WertDef = grad_def(
             f"{basis}.ohne.erfuellungsgrad", r"\alpha_{eff,DS}",
             "Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung", "SIA 262:2025, 4.3.6.3")
+        # Die Grade mit Durchstanzbewehrung (4.3.6.5.1). Braucht es keine, sind
+        # sie unbeschränkt; an einer Wand, für die nichts vorgeschlagen wird, null.
+        self.d_mit: WertDef = grad_def(
+            f"{basis}.mit.erfuellungsgrad", r"\alpha_{eff,DS,s}",
+            "Erfüllungsgrad der Durchstanzbewehrung", "SIA 262:2025, 4.3.6.5.2")
+        self.d_verformung: WertDef = grad_def(
+            f"{basis}.verformung.erfuellungsgrad", r"\alpha_{eff,DS,v}",
+            "Erfüllungsgrad Verformungsvermögen", "SIA 262:2025, 4.3.6.5.3")
+        self.d_diagonale: WertDef = grad_def(
+            f"{basis}.diagonale.erfuellungsgrad", r"\alpha_{eff,DS,max}",
+            "Erfüllungsgrad erste Betondruckdiagonale", "SIA 262:2025, 4.3.6.5.8")
+        self.d_aussen: WertDef = grad_def(
+            f"{basis}.aussen.erfuellungsgrad", r"\alpha_{eff,DS,out}",
+            "Erfüllungsgrad ausserhalb der Durchstanzbewehrung", "SIA 262:2025, 4.3.6.5.10")
         bezuege = [Eingabebezug(n, stelle.id_von(n)) for n in stelle.eingaben()]
-        bezuege += [stelle.beton.bezug(k) for k in ("f_ck", "f_cd", "tau_cd")]
+        bezuege += [stelle.beton.bezug(k) for k in ("f_ck", "f_ctm", "f_cd", "tau_cd")]
         bezuege += [stelle.stahl.bezug(k) for k in ("f_yd", "E_s")]
-        super().__init__(basis, ausgaben=[self.d_ohne], bezuege=bezuege,
+        super().__init__(basis, ausgaben=[self.d_ohne, *self.mit_graden], bezuege=bezuege,
                          titel=f"Durchstanzen – {stelle.name}", referenz="SIA 262:2025, 4.3.6",
                          abschnitt=stelle.abschnitt)
+
+    @property
+    def mit_graden(self) -> Tuple[WertDef, ...]:
+        """Die Grade der vier Nachweise mit Durchstanzbewehrung (4.3.6.5.1)."""
+        return (self.d_mit, self.d_verformung, self.d_diagonale, self.d_aussen)
+
+    def nicht_fuehrbar(self, grund: str) -> List[NachweisUrteil]:
+        """Die vier Urteile mit Durchstanzbewehrung, wo sich keine finden liess."""
+        return [self.urteil(d, fall, NICHT_FUEHRBAR, grund) for d, fall in zip(
+            self.mit_graden, ("mit Durchstanzbewehrung", "Verformungsvermögen",
+                              "Betondruckdiagonale", "ausserhalb der Durchstanzbewehrung"))]
 
     # -- Rechnen ------------------------------------------------------------
 
@@ -164,24 +195,40 @@ class Durchstanzen(Nachweis):
         v = Vergleich(V_d, V_Rd_c)
         v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
         v.zeile(p, self.d_ohne, mit_urteil=True)
-        if psi.groesse.si <= ROTATION_MINDEST:
+        umriss = tuple(s.umriss(masse, dv))
+        befund = Durchstanzbefund(
+            d=d.groesse.si, d_v=d_v.groesse.si, schnitt=schnitt, k_e=k_e.groesse.si,
+            u=u.groesse.si, V_d=e.g("V_d").si, V_d_red=V_d.groesse.si, rotationen=rotationen,
+            psi=psi.groesse.si, k_r=k_r.groesse.si, V_Rd_c=V_Rd_c.groesse.si,
+            umriss=umriss, aussparungen=tuple(s.aussparungen),
+            raender=tuple(((h.c * h.n[0], h.c * h.n[1]), math.atan2(-h.n[1], -h.n[0]))
+                          for h in s.raender(masse)))
+        if not v.erfuellt and not s.lage.wand:
+            urteile, bewehrung = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
+                d=d, d_v=d_v, k_e=k_e, k_r=k_r, tau_cd=tau_cd, u=u, psi=psi, V_d=V_d,
+                V_Rd_c=V_Rd_c, masse=masse, umriss=umriss))
+            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS)}, urteile,
+                               replace(befund, bewehrung=bewehrung))
+        if not v.erfuellt:
+            p.hinweis(f"Für {_mehrzahl(s.lage)} schlägt das Werkzeug noch keine "
+                      f"Durchstanzbewehrung vor.")
+        elif psi.groesse.si <= ROTATION_MINDEST:
             p.hinweis(
                 f"ψ = {psi.formatiert()} ≤ {ROTATION_MINDEST:.3f}: das Verformungsvermögen ist "
                 f"ohne Durchstanzbewehrung nach Gleichung (67) nicht nachgewiesen -- sonst "
                 f"sind die aufgezwungenen Verformungen nach 4.1.2 zu berücksichtigen "
                 f"(4.3.6.1.2).")
+        if v.erfuellt:
+            p.hinweis("Ohne Durchstanzbewehrung, die Bedingung (67) erfüllt, braucht es eine "
+                      "Sicherung gegen Totaleinsturz nach 4.3.6.7 (4.3.6.1.3).")
         urteil = self.urteil(
             self.d_ohne, "ohne Durchstanzbewehrung", v,
             f"V_d = {V_d.formatiert()} kN {'≤' if v.erfuellt else '>'} "
             f"V_Rd,c = {V_Rd_c.formatiert()} kN.")
-        befund = Durchstanzbefund(
-            d=d.groesse.si, d_v=d_v.groesse.si, schnitt=schnitt, k_e=k_e.groesse.si,
-            u=u.groesse.si, V_d=e.g("V_d").si, V_d_red=V_d.groesse.si, rotationen=rotationen,
-            psi=psi.groesse.si, k_r=k_r.groesse.si, V_Rd_c=V_Rd_c.groesse.si,
-            umriss=tuple(s.umriss(masse, dv)), aussparungen=tuple(s.aussparungen),
-            raender=tuple(((h.c * h.n[0], h.c * h.n[1]), math.atan2(-h.n[1], -h.n[0]))
-                          for h in s.raender(masse)))
-        return Ausfuehrung({}, [urteil], befund)
+        # Braucht es keine Bewehrung, sind die Grade mit ihr unbeschränkt; an einer
+        # Wand, für die keine vorgeschlagen wird, null.
+        grad = Groesse(math.inf if v.erfuellt else 0.0, EINHEITSLOS)
+        return Ausfuehrung({d.id: grad for d in self.mit_graden}, [urteil], befund)
 
     # -- Statische Höhe -----------------------------------------------------
 
@@ -577,16 +624,31 @@ def angaben(stelle: Durchstanzstelle, werte: Dict[str, Wert]) -> GleichungBlock:
 
 
 def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock:
-    """Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse."""
+    """
+    Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse. Mit
+    Durchstanzbewehrung dazu das Produkt und die Widerstände mit ihm.
+    """
+    def zeile(text: str, zeichen: str, wert: str, einheit: str) -> list:
+        return [text, Mathe(zeichen), Mathe(wert), einheit]
     zeilen = [
-        ["Wirksame statische Höhe", Mathe("d_v"), Mathe(f"{befund.d_v * 1e3:.0f}"), "mm"],
-        ["Nachweisschnitt, wirksam", Mathe("u"), Mathe(f"{befund.u * 1e3:.0f}"), "mm"],
-        ["Momentenübertragung", Mathe("k_e"), Mathe(f"{befund.k_e:.3f}"), "–"],
-        ["Plattenrotation", Mathe(r"\psi"), Mathe(f"{befund.psi:.4f}"), "–"],
-        ["Beiwert", Mathe("k_r"), Mathe(f"{befund.k_r:.3f}"), "–"],
-        ["Querkraft im Schnitt", Mathe("V_d"), Mathe(f"{befund.V_d_red / 1e3:.1f}"), "kN"],
-        ["Widerstand ohne Durchstanzbewehrung", Mathe("V_{Rd,c}"),
-         Mathe(f"{befund.V_Rd_c / 1e3:.1f}"), "kN"],
+        zeile("Wirksame statische Höhe", "d_v", f"{befund.d_v * 1e3:.0f}", "mm"),
+        zeile("Nachweisschnitt, wirksam", "u", f"{befund.u * 1e3:.0f}", "mm"),
+        zeile("Momentenübertragung", "k_e", f"{befund.k_e:.3f}", "–"),
+        zeile("Plattenrotation", r"\psi", f"{befund.psi:.4f}", "–"),
+        zeile("Beiwert", "k_r", f"{befund.k_r:.3f}", "–"),
+        zeile("Querkraft im Schnitt", "V_d", f"{befund.V_d_red / 1e3:.1f}", "kN"),
+        zeile("Widerstand ohne Durchstanzbewehrung", "V_{Rd,c}", f"{befund.V_Rd_c / 1e3:.1f}", "kN"),
     ]
+    b = befund.bewehrung
+    if b is not None:
+        v = b.vorschlag
+        zeilen += [
+            ["Durchstanzbewehrung", "", v.name, ""],
+            zeile("Abstände ab Stütze", "s", " / ".join(f"{a * 1e3:.0f}" for a in v.abstaende), "mm"),
+            zeile("Beitrag der Bewehrung", "V_{Rd,s}", f"{b.V_Rd_s / 1e3:.1f}", "kN"),
+            zeile("Erste Betondruckdiagonale", "V_{Rd,max}", f"{b.V_Rd_max / 1e3:.1f}", "kN"),
+            zeile("Querkraft ausserhalb", "V_{d,out}", f"{b.V_d_out / 1e3:.1f}", "kN"),
+            zeile("Widerstand ausserhalb", "V_{Rd,c,out}", f"{b.V_Rd_c_out / 1e3:.1f}", "kN"),
+        ]
     return TabellenBlock(kopf=["Grösse", "Zeichen", "Wert", "Einheit"], zeilen=zeilen,
                          titel="Durchstanzen", ausrichtung="llrl")

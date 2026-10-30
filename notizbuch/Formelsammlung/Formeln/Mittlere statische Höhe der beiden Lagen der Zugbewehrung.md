@@ -1,5 +1,5 @@
 ---
-erzeugt: f5bf1f6dd74c
+erzeugt: 9f5aa7ddba23
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.1"
@@ -30,6 +30,8 @@ $$
 
 - [[Beiwert k_r]]
 - [[Plattenrotation]]
+- [[Spannung in der Durchstanzbewehrung]]
+- [[Wirksame statische Höhe im äusseren Nachweisschnitt]]
 
 ## Im Code
 

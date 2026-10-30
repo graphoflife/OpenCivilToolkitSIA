@@ -1,5 +1,5 @@
 ---
-erzeugt: 4793c9a6a29b
+erzeugt: be7acccfc8b6
 art: modul
 tags: [modul]
 ---
@@ -76,6 +76,7 @@ Eine Durchstanzstelle -- siehe Dateikopf.
 - `stahl: str = ''` – Kennung des Betonstahls der Biegebewehrung.
 - `h: float = bereich(280.0, heisst='Plattendicke h', einheit=MM, ueber=0.0)`
 - `c: float = bereich(30.0, heisst='Überdeckung c_nom', einheit=MM, ab=0.0)` – Die Überdeckung auf der Zugseite: oben bei der Decke, unten bei der Bodenplatte.
+- `c_v: float = bereich(30.0, heisst='Überdeckung c_v', einheit=MM, ab=0.0)` – Die Überdeckung der Durchstanzbewehrung auf der Druckseite (SIA 262:2025, Figur 26).
 - `D_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)`
 - `phi_x: float = bereich(16.0, heisst='Stabdurchmesser ⌀_x', einheit=MM, ueber=0.0)`
 - `s_x: float = bereich(150.0, heisst='Stababstand s_x', einheit=MM, ueber=0.0)`

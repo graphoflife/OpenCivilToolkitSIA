@@ -1,5 +1,5 @@
 ---
-erzeugt: 060bca77eff3
+erzeugt: 2204a1a5dacf
 art: modul
 tags: [modul]
 ---
@@ -525,6 +525,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 
 - [[opencivil.bewehrungssuche.buegel]]
 - [[opencivil.bewehrungssuche.laengs]]
+- [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.stabgrenzen]]

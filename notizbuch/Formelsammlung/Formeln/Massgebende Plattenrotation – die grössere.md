@@ -1,5 +1,5 @@
 ---
-erzeugt: 802390b66138
+erzeugt: 74eff9526403
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.1"
@@ -31,6 +31,7 @@ $$
 ## Gebraucht von
 
 - [[Beiwert k_r]]
+- [[Spannung in der Durchstanzbewehrung]]
 
 ## Im Code
 

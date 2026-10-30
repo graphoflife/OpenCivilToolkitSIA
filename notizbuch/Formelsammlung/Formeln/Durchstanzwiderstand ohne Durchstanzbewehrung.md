@@ -1,5 +1,5 @@
 ---
-erzeugt: 9abb06900bf2
+erzeugt: 9145ca22590e
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.3.1"
@@ -31,6 +31,10 @@ $$
   &= 388.2\,\mathrm{kN}
 \end{aligned}
 $$
+
+## Gebraucht von
+
+- [[Querkraft für die Durchstanzbewehrung]]
 
 ## Im Code
 

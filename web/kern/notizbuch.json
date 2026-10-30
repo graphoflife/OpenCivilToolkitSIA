@@ -198,6 +198,17 @@
       ]
     },
     {
+      "name": "Anrechenbare Durchstanzbewehrung",
+      "pfad": "Formelsammlung/Formeln/Anrechenbare Durchstanzbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sum A_{sw}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Äquivalenter E-Modul eines Stabs",
       "pfad": "Formelsammlung/Formeln/Äquivalenter E-Modul eines Stabs.md",
       "art": "formel",
@@ -259,6 +270,17 @@
       ]
     },
     {
+      "name": "Äusserer Nachweisschnitt ohne das, was nicht zählt",
+      "pfad": "Formelsammlung/Formeln/Äusserer Nachweisschnitt ohne das, was nicht zählt.md",
+      "art": "formel",
+      "zeichen": [
+        "u_{out,red}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Bedingung der Duktilität",
       "pfad": "Formelsammlung/Formeln/Bedingung der Duktilität.md",
       "art": "formel",
@@ -287,6 +309,17 @@
       "themen": [
         "Biegung und Normalkraft",
         "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Beitrag der Durchstanzbewehrung",
+      "pfad": "Formelsammlung/Formeln/Beitrag der Durchstanzbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,s}"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -848,6 +881,28 @@
       ]
     },
     {
+      "name": "Durchstanzbewehrung an der Fliessgrenze",
+      "pfad": "Formelsammlung/Formeln/Durchstanzbewehrung an der Fliessgrenze.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,v}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Durchstanzwiderstand im äusseren Nachweisschnitt",
+      "pfad": "Formelsammlung/Formeln/Durchstanzwiderstand im äusseren Nachweisschnitt.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,c,out}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Durchstanzwiderstand ohne Durchstanzbewehrung",
       "pfad": "Formelsammlung/Formeln/Durchstanzwiderstand ohne Durchstanzbewehrung.md",
       "art": "formel",
@@ -1322,6 +1377,17 @@
       ]
     },
     {
+      "name": "Halbe Querkraft für das Verformungsvermögen",
+      "pfad": "Formelsammlung/Formeln/Halbe Querkraft für das Verformungsvermögen.md",
+      "art": "formel",
+      "zeichen": [
+        "V_d / 2"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Hilfsgrösse der Nulllinie",
       "pfad": "Formelsammlung/Formeln/Hilfsgrösse der Nulllinie.md",
       "art": "formel",
@@ -1679,6 +1745,17 @@
       ]
     },
     {
+      "name": "Platz für die Durchstanzbewehrung",
+      "pfad": "Formelsammlung/Formeln/Platz für die Durchstanzbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "h_{frei}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Probe – Moment um y",
       "pfad": "Formelsammlung/Formeln/Probe – Moment um y.md",
       "art": "formel",
@@ -1709,6 +1786,28 @@
       ],
       "themen": [
         "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Querkraft für die Durchstanzbewehrung",
+      "pfad": "Formelsammlung/Formeln/Querkraft für die Durchstanzbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{d,s}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Querkraft im äusseren Nachweisschnitt",
+      "pfad": "Formelsammlung/Formeln/Querkraft im äusseren Nachweisschnitt.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{d,out}"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -2032,6 +2131,17 @@
       ]
     },
     {
+      "name": "Spannung in der Durchstanzbewehrung",
+      "pfad": "Formelsammlung/Formeln/Spannung in der Durchstanzbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{sd}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Spannungsblock des Betons",
       "pfad": "Formelsammlung/Formeln/Spannungsblock des Betons.md",
       "art": "formel",
@@ -2352,6 +2462,17 @@
       ]
     },
     {
+      "name": "Widerstand der ersten Betondruckdiagonale",
+      "pfad": "Formelsammlung/Formeln/Widerstand der ersten Betondruckdiagonale.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,max}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Widerstand im normierten Diagramm",
       "pfad": "Formelsammlung/Formeln/Widerstand im normierten Diagramm.md",
       "art": "formel",
@@ -2454,6 +2575,17 @@
       ]
     },
     {
+      "name": "Wirksame statische Höhe im äusseren Nachweisschnitt",
+      "pfad": "Formelsammlung/Formeln/Wirksame statische Höhe im äusseren Nachweisschnitt.md",
+      "art": "formel",
+      "zeichen": [
+        "d_{v,out}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Wirksame Zugfestigkeit",
       "pfad": "Formelsammlung/Formeln/Wirksame Zugfestigkeit.md",
       "art": "formel",
@@ -2482,6 +2614,17 @@
         "Biegung und Normalkraft",
         "Zwängung auf Biegung",
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Wirksamer Umfang des äusseren Nachweisschnitts",
+      "pfad": "Formelsammlung/Formeln/Wirksamer Umfang des äusseren Nachweisschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "u_{out}"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -3060,6 +3203,40 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.durchstanzen.bewehrung",
+      "pfad": "Python/opencivil.durchstanzen.bewehrung.md",
+      "art": "modul",
+      "kurz": "wo die Durchstanzbewehrung liegt, und welche reicht.",
+      "stichworte": [
+        "Leiste",
+        "Leiste.anker",
+        "_normale",
+        "leisten_anordnen",
+        "in_der_platte",
+        "aeussere_kandidaten",
+        "Vorschlag",
+        "Vorschlag.radien",
+        "Vorschlag.A_sw",
+        "Vorschlag.name",
+        "anrechenbar",
+        "bemessen"
+      ]
+    },
+    {
+      "name": "opencivil.durchstanzen.mit_bewehrung",
+      "pfad": "Python/opencivil.durchstanzen.mit_bewehrung.md",
+      "art": "modul",
+      "kurz": "der Nachweis mit Durchstanzbewehrung (SIA 262:2025, 4.3.6.5).",
+      "stichworte": [
+        "Grundlage",
+        "Bewehrungsbefund",
+        "spannung",
+        "widerstand_aussen",
+        "nachweisen",
+        "_querkraft_aussen"
+      ]
+    },
+    {
       "name": "opencivil.durchstanzen.nachweis",
       "pfad": "Python/opencivil.durchstanzen.nachweis.md",
       "art": "modul",
@@ -3068,6 +3245,8 @@
         "Rotation",
         "Durchstanzbefund",
         "Durchstanzen",
+        "Durchstanzen.mit_graden",
+        "Durchstanzen.nicht_fuehrbar",
         "Durchstanzen.pruefe",
         "Durchstanzen._statische_hoehe",
         "Durchstanzen._nachweisschnitt",
@@ -3082,6 +3261,24 @@
         "_mehrzahl",
         "angaben",
         "kennwerttabelle"
+      ]
+    },
+    {
+      "name": "opencivil.durchstanzen.produkte",
+      "pfad": "Python/opencivil.durchstanzen.produkte.md",
+      "art": "modul",
+      "kurz": "Durchstanzbewehrung und Stahlpilze, wie man sie kaufen kann.",
+      "stichworte": [
+        "Ankertyp",
+        "Ankertyp.flaeche",
+        "groesster_durchmesser",
+        "ankerhoehe",
+        "k_sys",
+        "abstaende",
+        "typname",
+        "Stahlpilz",
+        "Stahlpilz.name",
+        "Stahlpilz.armenden"
       ]
     },
     {
@@ -3141,6 +3338,7 @@
         "Plattenart.beschriftung",
         "Plattenart.last",
         "Plattenart.zugseite",
+        "Plattenart.druckseite",
         "Stuetzenform",
         "Stuetzenform.beschriftung",
         "Lage",
@@ -5625,7 +5823,8 @@
       "kurz": "was die Oberflaeche von einer Durchstanzstelle zeichnet.",
       "stichworte": [
         "situationen",
-        "situation"
+        "situation",
+        "_bewehrung"
       ]
     },
     {

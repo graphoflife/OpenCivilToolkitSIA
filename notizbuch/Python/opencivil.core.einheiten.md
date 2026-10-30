@@ -1,5 +1,5 @@
 ---
-erzeugt: 9635a1bfd988
+erzeugt: c97288423f79
 art: modul
 tags: [modul]
 ---
@@ -442,6 +442,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.geotechnik.grundbruch]]

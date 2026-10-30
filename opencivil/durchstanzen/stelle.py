@@ -67,6 +67,11 @@ class Plattenart(Wahl):
         """Wo die Zugbewehrung über der gestützten Fläche liegt."""
         return "oben" if self is Plattenart.DECKE else "unten"
 
+    @property
+    def druckseite(self) -> str:
+        """Die andere Seite -- dort liegen die unteren Köpfe der Durchstanzbewehrung."""
+        return "unten" if self is Plattenart.DECKE else "oben"
+
 
 class Stuetzenform(Wahl):
     """
@@ -163,6 +168,9 @@ class Durchstanzstelle:
     c: Groesse
     """Die Überdeckung auf der Zugseite."""
 
+    c_v: Groesse
+    """Die Überdeckung der Durchstanzbewehrung auf der Druckseite (Figur 26)."""
+
     D_max: Groesse
     phi_x: Groesse
     s_x: Groesse
@@ -239,7 +247,8 @@ class Durchstanzstelle:
 
     def eingaben(self) -> Tuple[str, ...]:
         """Die Kurznamen, die der Nachweis liest."""
-        namen = ("h", "c", "D_max", "phi_x", "s_x", "phi_y", "s_y", *self.masse(), "V_d", "q_d")
+        namen = ("h", "c", "c_v", "D_max", "phi_x", "s_x", "phi_y", "s_y", *self.masse(), "V_d",
+                 "q_d")
         if self.stufe is Naeherungsstufe.DREI:
             namen += ("r_sx", "r_sy", "m_sdx", "m_sdy")
         else:
@@ -257,6 +266,8 @@ class Durchstanzstelle:
                 ("h", "h", MM, "Plattendicke", 0, self.h),
                 ("c", "c_{nom}", MM, f"Überdeckung der Zugbewehrung {self.plattenart.zugseite}",
                  0, self.c),
+                ("c_v", "c_v", MM, f"Überdeckung der Durchstanzbewehrung {self.plattenart.druckseite}",
+                 0, self.c_v),
                 ("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0, self.D_max),
             )),
             ("Biegebewehrung", (

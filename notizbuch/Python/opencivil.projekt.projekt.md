@@ -1,5 +1,5 @@
 ---
-erzeugt: e3185f49258e
+erzeugt: bd65de00ecf4
 art: modul
 tags: [modul]
 ---
@@ -385,9 +385,11 @@ def _durchstanzstellen(p: 'Projekt') -> None
 Jede Lage der gestützten Fläche, jede Form der Stütze, jede
 Näherungsstufe und beide Wege zu k_e: eine Innenstütze mit Flächenlast;
 eine Rundstütze am Rand, k_e aus der Exzentrizität; eine Eckstütze in
-Stufe 1, die als einzige aufgeht; eine lange Ovalstütze in einer Bodenplatte, mit Momenten von
-Hand und einer Aussparung neben der Ecke; ein Wandende und eine
-Wandecke, an denen Stufe 2 wie Stufe 1 rechnet.
+Stufe 1, die ohne Durchstanzbewehrung aufgeht; eine lange Ovalstütze in
+einer Bodenplatte, mit Momenten von Hand und einer Aussparung neben der
+Ecke; ein Wandende und eine Wandecke, an denen Stufe 2 wie Stufe 1
+rechnet und für die es noch keinen Vorschlag gibt. Innen-, Rand- und
+Ovalstütze brauchen Durchstanzbewehrung.
 
 #### Projekt._grundbrueche
 

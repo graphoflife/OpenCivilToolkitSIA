@@ -1,5 +1,5 @@
 ---
-erzeugt: b722242ec72f
+erzeugt: ba0b79aefcad
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.5"
@@ -31,8 +31,10 @@ $$
 - [[Biegewiderstand im Stützstreifen]]
 - [[Dehnung auf halber Höhe]]
 - [[Druckzonenhöhe im Stützstreifen]]
+- [[Durchstanzbewehrung an der Fliessgrenze]]
 - [[Fliessdehnung]]
 - [[Plattenrotation]]
+- [[Spannung in der Durchstanzbewehrung]]
 - [[Widerstand der Bügel]]
 - [[Zulässige Stahlspannung]]
 

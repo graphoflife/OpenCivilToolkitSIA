@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ac02a225166
+erzeugt: 377f83411444
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.6"
@@ -42,7 +42,9 @@ $$
 
 ## Gebraucht von
 
+- [[Halbe Querkraft für das Verformungsvermögen]]
 - [[Mittleres Moment im Stützstreifen]]
+- [[Querkraft für die Durchstanzbewehrung]]
 
 ## Im Code
 

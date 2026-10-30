@@ -153,6 +153,11 @@ function plattenPanel(d) {
       zahlzeile(d, 'c', bodenplatte ? 'Überdeckung unten' : 'Überdeckung oben', 'c_{nom}', {
         schritt: 5, titel: 'Die Überdeckung der Zugbewehrung',
       }),
+      zahlzeile(d, 'c_v', bodenplatte ? 'Überdeckung der Anker oben' : 'Überdeckung der Anker unten',
+        'c_v', {
+          schritt: 5,
+          titel: 'Wie tief die Köpfe der Durchstanzbewehrung auf der Druckseite liegen (Figur 26)',
+        }),
       zahlzeile(d, 'D_max', 'Grösstkorn', 'D_{max}', { schritt: 1 }),
       materialfeld(d, 'beton', 'beton', 'Beton'),
       materialfeld(d, 'stahl', 'betonstahl', 'Betonstahl'),

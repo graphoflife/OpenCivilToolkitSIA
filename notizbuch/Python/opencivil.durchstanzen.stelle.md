@@ -1,5 +1,5 @@
 ---
-erzeugt: c0a127d72da3
+erzeugt: a9059987a6df
 art: modul
 tags: [modul]
 ---
@@ -77,6 +77,15 @@ def zugseite(self) -> str
 ```
 
 Wo die Zugbewehrung über der gestützten Fläche liegt.
+
+#### Plattenart.druckseite
+
+```python
+@property
+def druckseite(self) -> str
+```
+
+Die andere Seite -- dort liegen die unteren Köpfe der Durchstanzbewehrung.
 
 ### Stuetzenform
 
@@ -203,6 +212,7 @@ b_x, eine Innenstütze keinen Randabstand.
 - `stahl: Baustoff` – Der Stahl der Biegebewehrung.
 - `h: Groesse`
 - `c: Groesse` – Die Überdeckung auf der Zugseite.
+- `c_v: Groesse` – Die Überdeckung der Durchstanzbewehrung auf der Druckseite (Figur 26).
 - `D_max: Groesse`
 - `phi_x: Groesse`
 - `s_x: Groesse`
@@ -323,6 +333,7 @@ Der Umriss der gestützten Fläche fürs Bild -- eine Wand 4·d_v weit, etwas
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.durchstanzen]]

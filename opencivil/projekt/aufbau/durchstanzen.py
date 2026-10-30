@@ -59,7 +59,7 @@ def bauen(art: "Bauteilart", eintrag: DurchstanzEintrag, aufbau: Aufbau) -> Baut
         plattenart=eintrag.plattenart,
         beton=material(aufbau.baustoffe, eintrag.beton, "beton", wo),
         stahl=material(aufbau.baustoffe, eintrag.stahl, "betonstahl", wo),
-        h=g("h"), c=g("c"), D_max=g("D_max"),
+        h=g("h"), c=g("c"), c_v=g("c_v"), D_max=g("D_max"),
         phi_x=g("phi_x"), s_x=g("s_x"), phi_y=g("phi_y"), s_y=g("s_y"), aussen=eintrag.aussen,
         form=eintrag.form, lage=eintrag.lage, b_x=g("b_x"), b_y=g("b_y"), D=g("D"), t=g("t"),
         a_x=g("a_x"), a_y=g("a_y"), l_x=g("l_x"), l_y=g("l_y"), stufe=eintrag.stufe,

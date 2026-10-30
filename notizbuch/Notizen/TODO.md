@@ -296,6 +296,22 @@ sie hier notiert; keine davon ist nachgeschlagen.
 - [ ] **Durchstanzen, Ovalstütze.** Eingebaut: ihre geraden Seiten zählen wie
       die einer Rechteckstütze 1.5·d_v von jedem Ende her. Der Name kommt aus
       der Software von Leviat. Offen: ob du diese Form gemeint hast.
+- [ ] **Durchstanzbewehrung: die Regeln von ancoPLUS.** Eingebaut nach dem
+      Gutachten Muttoni / Fernández Ruiz 2007 (zu SIA 262:2003):
+      Abstände 0.375·d / 0.60·d bis zum dritten Anker / danach 0.75·d,
+      Leisten beim zweiten Anker höchstens 1.5·d auseinander, ⌀ je nach d
+      (Tabelle 1), k_sys = 3.0 bei c_v ≤ d/10 und 2.0 bei c_v ≥ d/6
+      (dazwischen linear) für Innenstützen und Wandenden, 2.0 am Rand und an
+      der Ecke, Obergrenze 3.5. Die Höhe h_A = h − c_nom − c_v auf …5 mm
+      abgerundet stammt aus der Zulassung ETA-13/0196 und zwei Beispielen. Zu
+      prüfen gegen das Gutachten zu SIA 262:2025, das nicht lesbar war, und
+      gegen die Konstruktionsregeln 5.5.3.7 bis 5.5.3.12 der Norm, die nicht
+      vorliegen.
+- [ ] **Durchstanzbewehrung: d_v,out und k_e im äusseren Schnitt.**
+      Eingebaut: d_v,out = d − c_v (aus Figur 26 gelesen), k_e wie im inneren
+      Schnitt (aus der Exzentrizität wäre es aussen grösser).
+- [ ] **Stufe 3 an Rand- und Eckstützen: r_s ≥ 2/3·b_sr (4.3.6.4.8).** Noch
+      nicht geprüft: r_s wird genommen, wie eingegeben.
 - [ ] **Die Grenze des Nachweises gegen Fliessen.** Eingebaut `f_yd − 80 MPa`,
       weil Tabelle 17 ausdrücklich `f_yd` nennt — mit charakteristischen
       Werten in der Rechnung mischt das zwei Niveaus, ist aber die strengere
@@ -438,6 +454,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       der Platte.
 
 ## Noch nicht gebaut
+
+- [ ] **Durchstanzen, nächste Schritte:** Stahlpilze (ZEUS), wenn die erste
+      Betondruckdiagonale versagt; Durchstanzbewehrung an Wandende und
+      Wandecke; weitere Produkte (DURA-Körbe und S-Elemente, HDB, FIDECA);
+      Sicherung gegen Totaleinsturz (4.3.6.7).
 
 - [ ] **Balkensysteme, nächste Schritte:** Umhüllende der Kombinationen,
       Theorie 2. Ordnung, Schubverformung, schiefe Lager, und die

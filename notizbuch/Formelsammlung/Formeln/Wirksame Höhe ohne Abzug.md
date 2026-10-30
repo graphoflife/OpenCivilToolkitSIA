@@ -1,5 +1,5 @@
 ---
-erzeugt: da497d3fd255
+erzeugt: fb0db215e10f
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.1, Figur 21"
@@ -35,6 +35,7 @@ $$
 - [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]]
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]]
 - [[Querkraftwiderstand ohne Querkraftbewehrung]]
+- [[Widerstand der ersten Betondruckdiagonale]]
 
 ## Im Code
 

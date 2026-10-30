@@ -1,5 +1,5 @@
 ---
-erzeugt: d6f802355252
+erzeugt: 28aef6a91ca6
 art: modul
 tags: [modul]
 ---
@@ -16,9 +16,18 @@ tags: [modul]
 * [[opencivil.durchstanzen.nachweis|nachweis]] -- der Nachweis: statische Höhe,
   k_e, die Lasten im Schnitt, die Plattenrotation und der Widerstand ohne
   Durchstanzbewehrung.
+* [[opencivil.durchstanzen.mit_bewehrung|mit_bewehrung]] -- reicht der Beton nicht:
+  die vier Nachweise mit Durchstanzbewehrung (4.3.6.5).
+* [[opencivil.durchstanzen.bewehrung|bewehrung]] -- wo die Leisten liegen, der
+  äussere Schnitt (Figur 26) und die Suche nach der kleinsten, die reicht.
+* [[opencivil.durchstanzen.produkte|produkte]] -- ancoPLUS und ZEUS von AncoTech:
+  Typen, Höhen, Abstände und die Faktoren ihrer Gutachten.
 
 ## Module
 
+- [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.
+- [[opencivil.durchstanzen.mit_bewehrung]] – der Nachweis mit Durchstanzbewehrung (SIA 262:2025, 4.3.6.5).
 - [[opencivil.durchstanzen.nachweis]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
+- [[opencivil.durchstanzen.produkte]] – Durchstanzbewehrung und Stahlpilze, wie man sie kaufen kann.
 - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
 - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
