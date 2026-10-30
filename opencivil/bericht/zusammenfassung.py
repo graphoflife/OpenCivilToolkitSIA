@@ -33,6 +33,7 @@ from opencivil.core.latex import Mathe, Zelle, als_text
 from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Kennzahl, Wert
+from opencivil.durchstanzen import nachweis as durchstanzen
 from opencivil.geotechnik import grundbruch, setzung
 from opencivil.querschnitt.platte import BREITE_Y_MM, Plattenquerschnitt
 
@@ -264,6 +265,12 @@ def _grundbruchangaben(teil, loesung: Loesung) -> Angaben:
             grundbruch.faktortabelle(befund) if befund is not None else None)
 
 
+def _durchstanzangaben(teil, loesung: Loesung) -> Angaben:
+    befund = _befund(teil, "durchstanzen", loesung)
+    return (durchstanzen.angaben(teil.objekt, loesung.werte),
+            durchstanzen.kennwerttabelle(befund) if befund is not None else None)
+
+
 def _setzungsangaben(teil, loesung: Loesung) -> Angaben:
     befund = _befund(teil, "setzung", loesung)
     return (setzung.angaben(teil.objekt, loesung.werte),
@@ -277,6 +284,7 @@ ANGABEN: Dict[str, Callable[[Any, Loesung], Angaben]] = {
     "platte": lambda teil, loesung: (plattenangaben(teil.objekt),
                                      bewehrungsuebersicht(teil.objekt, loesung.werte)),
     "querschnittsanalyse": lambda teil, loesung: teil.objekt.angaben(),
+    "durchstanzen": _durchstanzangaben,
     "grundbruch": _grundbruchangaben,
     "setzung": _setzungsangaben,
 }

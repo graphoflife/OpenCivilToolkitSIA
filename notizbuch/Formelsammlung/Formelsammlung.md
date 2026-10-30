@@ -1,5 +1,5 @@
 ---
-erzeugt: d9ee3d9caf73
+erzeugt: ba6f4a45a6ad
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -51,9 +51,14 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Setzung]] · 8
 
+**Durchstanzen**
+
+- [[Durchstanzen]] · 26
+
 ## Formeln von A bis Z
 
 - [[Abstand des Grundwassers unter der Sohle]] · $T$
+- [[Abstand zum Momentennullpunkt]] · $r_{sx}$
 - [[Äquivalenter E-Modul eines Stabs]] · $E_{eq}$
 - [[Äquivalenter E-Modul über dem Moment]]
 - [[Äquivalenter E-Modul über der Normalkraft]]
@@ -64,14 +69,17 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bedingung gegen sprödes Versagen]]
 - [[Beide Lagen fliessen auf Zug]] · $N_{Rd}^{+}$
 - [[Beiwert der Gesteinskörnung]] · $k_g$
+- [[Beiwert der Momentenübertragung]] · $k_e$
 - [[Beiwert der Parabel]] · $k_{\sigma}$
 - [[Beiwert für die Dicke]] · $k_t$
 - [[Beiwert für die statische Höhe]] · $k_d^{+}$
+- [[Beiwert k_r]] · $k_r$
 - [[Beiwert zur Berücksichtigung der Festigkeitsminderung]] · $\eta_{fc}$
 - [[Bemessungswert der Betondruckfestigkeit]] · $f_{cd}$
 - [[Bemessungswert der Fliessgrenze]] · $f_{yd}$
 - [[Bemessungswert der Fliessgrenze auf Druck]] · $f_{yd}^{-}$
 - [[Bemessungswert der Kohäsion]] · $c_{eff}$
+- [[Bemessungswert der Querkraft im Nachweisschnitt]] · $V_{d,red}$
 - [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
@@ -89,9 +97,13 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bezogene Druckzonenhöhe bei reiner Biegung]] · $x/d$
 - [[Bezugsgrösse der Normalkraft]] · $N_{ref}$
 - [[Bezugsgrösse des Moments]] · $M_{ref}$
+- [[Biegebewehrung im Stützstreifen je Meter]] · $a_{s,x}$
 - [[Biegelinie eines Stabs]]
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
+- [[Biegewiderstand im Stützstreifen]] · $m_{Rd,x}$
 - [[Bilineare Beziehung des Betonstahls]]
+- [[Breite des Stützstreifens]] · $b_s$
+- [[Breite des Stützstreifens am Plattenrand]] · $b_{sr,y}$
 - [[Bruchspannung in der Sohle]] · $\sigma_f$
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]]
 - [[Dehnsteifigkeit]] · $EA_{\text{Q1}}$
@@ -104,6 +116,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Drehung in die Achsen des Stabs]]
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
 - [[Druckzonenhöhe bei reiner Biegung]] · $x$
+- [[Druckzonenhöhe im Stützstreifen]] · $x_x$
+- [[Durchmesser des flächengleichen Kreises]] · $b$
+- [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · $V_{Rd,c}$
 - [[Eigengewicht eines Stabs]] · $g_{k}$
 - [[Einflussfaktor der Rechtecklast]]
 - [[Einwirkung im normierten Diagramm]] · $\bar{E}_{d,x}$
@@ -119,6 +134,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fläche eines T-Querschnitts]] · $A_{\text{Q5}}$
 - [[Fläche eines Trapezes]] · $A_{\text{Q7}}$
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]]
+- [[Flächenlast innerhalb des Nachweisschnitts]] · $\Delta V_d$
 - [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]] · $I_{\text{Q6}}$
 - [[Flächenträgheitsmoment eines Kreises]] · $I_{\text{Q2}}$
 - [[Flächenträgheitsmoment eines Kreisrings]] · $I_{\text{Q3}}$
@@ -159,15 +175,23 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Lastneigungsfaktor i_c]] · $i_c$
 - [[Lastneigungsfaktor i_q]] · $i_q$
 - [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
+- [[Massgebende Plattenrotation – die grössere]] · $\psi$
 - [[Mittelwert der Zylinderdruckfestigkeit]] · $f_{cm}$
 - [[Mittelwert des Elastizitätsmoduls]] · $E_{cm}$
+- [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · $d$
+- [[Mittleres Moment im Stützstreifen]] · $m_{sd,x}$
 - [[Moment der Bewehrung bei zulässiger Stahlspannung]]
 - [[Momentengleichgewicht um die halbe Höhe]] · $M_{Rd}^{+}$
 - [[Momentenwiderstand bei reiner Biegung]] · $M_{Rd}(N_{Ed}=0)^{+}$
+- [[Nachweisschnitt im Abstand d_v∕2]] · $u_0$
+- [[Nachweisschnitt ohne das, was nicht zählt]] · $u_{red}$
+- [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]] · $u_0$
+- [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]] · $u_0$
 - [[Neigung der Last]] · $\delta_R$
 - [[Nulllinie auf halber Höhe]] · $x^{+}$
 - [[Nulllinie des gerissenen Querschnitts]] · $x$
 - [[Parabel-Rechteck-Beziehung des Betons]]
+- [[Plattenrotation]] · $\psi_x$
 - [[Probe – Moment um y]] · $M_{y,Rd}$
 - [[Probe – Moment um z]] · $M_{z,Rd}$
 - [[Probe – Normalkraft]] · $N_{Rd}$
@@ -203,6 +227,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Spannungsblock des Betons]]
 - [[Stahlspannung, höchstens die Fliessgrenze]] · $\sigma_{sd}$
 - [[Statische Höhe]] · $d_{2,x}$
+- [[Statische Höhe der äusseren Lage]] · $d_x$
+- [[Statische Höhe der inneren Lage]] · $d_y$
 - [[Steifigkeitsmatrix eines Stabs]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]]
 - [[Teilung in y aus der Stabzahl]] · $s_{V,y}$
@@ -234,10 +260,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · $W$
 - [[Winkel der Einbindetiefe]] · $\vartheta_t$
 - [[Wirksame Durchbiegung]] · $w_{eff}$
-- [[Wirksame Höhe (Einlage nicht massgebend)]] · $d_v^{+}$
+- [[Wirksame Höhe ohne Abzug]] · $d_v^{+}$
 - [[Wirksame Höhe, um die Einlage vermindert]] · $d_v$
 - [[Wirksame Zugfestigkeit]] · $f_{ct,eff}$
 - [[Wirksamer Elastizitätsmodul]] · $E_{c,eff}$
+- [[Wirksamer Umfang des Nachweisschnitts]] · $u$
 - [[Zulässige Dehnung]] · $\varepsilon_{s,adm}$
 - [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
 - [[Zulässige Stahlspannung (normale Anforderung)]] · $\sigma_{s,adm}$
@@ -245,7 +272,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-118 von 189 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+121 von 212 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -269,6 +296,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bezogene Druckzonenhöhe bei reiner Biegung]] · [[opencivil.nachweis.richtungsnachweise#DuktilitaetQA.pruefe|DuktilitaetQA.pruefe]]
 - [[Bezugsgrösse der Normalkraft]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Bezugsgrösse des Moments]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
+- [[Biegebewehrung im Stützstreifen je Meter]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
 - [[Biegelinie eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Biegesteifigkeit]] · [[opencivil.stabwerk.rechnung|_biegesteifigkeit]]
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._waende_protokollieren]]
@@ -282,6 +310,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Drehung in die Achsen des Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
 - [[Druckzonenhöhe bei reiner Biegung]] · [[opencivil.nachweis.duktilitaet#Duktilitaet._protokoll_lage|Duktilitaet._protokoll_lage]]
+- [[Druckzonenhöhe im Stützstreifen]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
 - [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#Balkensystem._eigengewicht|_eigengewicht]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Erfüllungsgrad]] · [[opencivil.core.berechnung#Vergleich.zeile|Vergleich.zeile]]
@@ -342,6 +371,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Spannungsblock des Betons]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Stahlspannung, höchstens die Fliessgrenze]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Statische Höhe]] · [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]
+- [[Statische Höhe der äusseren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
+- [[Statische Höhe der inneren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
 - [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]
@@ -360,7 +391,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstandsmoment zum gezogenen Rand]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · [[opencivil.nachweis.rissgroessen#protokoll_widerstandsmoment|protokoll_widerstandsmoment]]
 - [[Wirksame Durchbiegung]] · [[opencivil.nachweis.verformung#Verformung|Verformung._einen_fall]]
-- [[Wirksame Höhe (Einlage nicht massgebend)]] · [[opencivil.nachweis.querkraft#protokoll_hoehen|protokoll_hoehen]]
 - [[Wirksame Höhe, um die Einlage vermindert]] · [[opencivil.nachweis.querkraft#protokoll_hoehen|protokoll_hoehen]]
 - [[Wirksame Zugfestigkeit]] · [[opencivil.nachweis.rissgroessen#protokoll_zugfestigkeit|protokoll_zugfestigkeit]]
 - [[Wirksamer Elastizitätsmodul]] · [[opencivil.nachweis.querschnittsloeser#protokoll_wirksamer_modul|protokoll_wirksamer_modul]], [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]

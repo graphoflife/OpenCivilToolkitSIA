@@ -2255,6 +2255,19 @@ details.nb-callout > summary { cursor: pointer; }
 .sz-punkt { fill: var(--system); stroke: #fff; stroke-width: 1.2; }
 .sz-punkttext { fill: var(--system); font-weight: 700; }
 
+/* ---------------------------------------------------------- Durchstanzen -- */
+
+/* Der Grundriss: Stütze, Plattenrand, Aussparungen, Nachweisschnitt. Was
+   nicht zählt, gestrichelt (ds_grundriss.js) -- auch im Zeichenfenster. */
+.ds-jenseits { fill: var(--flaeche-2); stroke: none; }
+.ds-rand { fill: none; stroke: var(--schrift); stroke-width: 1.8; }
+.ds-stuetze { fill: #dfe3e8; stroke: var(--schrift); stroke-width: 1.8; stroke-linejoin: round; }
+.ds-aussparung { fill: #fff; stroke: var(--schrift); stroke-width: 1.4; stroke-linejoin: round; }
+.ds-aussparung-kreuz { fill: none; stroke: var(--schrift-zart); stroke-width: 1; pointer-events: none; }
+.ds-schnitt { fill: none; stroke: var(--system); stroke-width: 2.2; stroke-linejoin: round; }
+.ds-schnitt-nicht { fill: none; stroke: var(--system); stroke-width: 1.2; stroke-dasharray: 5 4; opacity: .7; }
+.ds-achse { fill: none; stroke: var(--schrift-matt); stroke-width: 1.2; }
+
 /* --------------------------------------------------------------- Python -- */
 
 /* Name und Knöpfe in einer Zeile über dem Code und unter der Konsole. */

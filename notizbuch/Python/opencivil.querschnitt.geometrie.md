@@ -1,5 +1,5 @@
 ---
-erzeugt: 75bf78320fa3
+erzeugt: 060bca77eff3
 art: modul
 tags: [modul]
 ---
@@ -528,6 +528,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.stabgrenzen]]
+- [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.projekt]]

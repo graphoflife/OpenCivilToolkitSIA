@@ -1,5 +1,5 @@
 ---
-erzeugt: bffc012fb38f
+erzeugt: d1415e8cca0a
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -28,7 +28,9 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.wahl]] – was ein Wahlfeld annehmen kann.
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
+    - [[opencivil.durchstanzen.nachweis]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
     - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
+    - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
     - [[opencivil.geotechnik.grundbruch]] – Grundbruch und Gleiten eines Flachfundaments.
@@ -82,12 +84,14 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
   - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
       - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
+      - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
       - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
       - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
       - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
       - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
       - [[opencivil.projekt.aufbau.setzung]] – eine Setzungsberechnung wird Rechnung.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
+    - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
@@ -137,6 +141,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.
     - [[opencivil.web.diagrammdaten]] – was die Oberflaeche zeichnet, als JSON.
     - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
+    - [[opencivil.web.durchstanzdaten]] – was die Oberflaeche von einer Durchstanzstelle zeichnet.
     - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
     - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
     - [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.

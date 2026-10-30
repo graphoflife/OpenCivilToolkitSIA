@@ -125,7 +125,8 @@ def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zu
         p.formel(wirksam, "@d - @e", {"d": hoehe, "e": e["einlagenhoehe"]},
                  titel="Wirksame Höhe, um die Einlage vermindert")
     else:
-        p.formel(wirksam, "@d", {"d": hoehe}, titel="Wirksame Höhe (Einlage nicht massgebend)")
+        p.formel(wirksam, "@d", {"d": hoehe}, titel="Wirksame Höhe (Einlage nicht massgebend)",
+                 name="Wirksame Höhe ohne Abzug")
     return hoehe, wirksam
 
 

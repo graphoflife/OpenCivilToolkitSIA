@@ -1,5 +1,5 @@
 ---
-erzeugt: 44c11f07fafc
+erzeugt: 2736858b8788
 art: modul
 tags: [modul]
 ---
@@ -166,6 +166,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.stelle]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
@@ -190,6 +191,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
+- [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.umschlag]]

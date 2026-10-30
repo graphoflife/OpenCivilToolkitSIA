@@ -1,5 +1,5 @@
 ---
-erzeugt: 3744d12e9dc9
+erzeugt: 0871de8cf511
 art: thema
 tags: [thema]
 ---
@@ -32,7 +32,7 @@ Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim Dekompressionsmom
 12. [[Widerstand bei festgehaltenem N_Ed]]
 13. [[Dehnung auf halber Höhe]]
 14. [[Beiwert für die statische Höhe]]
-15. [[Wirksame Höhe (Einlage nicht massgebend)]]
+15. [[Wirksame Höhe ohne Abzug]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

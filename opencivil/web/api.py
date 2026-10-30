@@ -38,8 +38,10 @@ from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsort
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
+from opencivil.durchstanzen.stelle import KeArt, Lage, Naeherungsstufe, Plattenart, Stuetzenform
 from opencivil.projekt import (
-    BAUTEILE, Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
+    BAUTEILE, AussparungEintrag, Aufbau, DurchstanzEintrag, GebrauchsfallEintrag,
+    GrundbruchEintrag, GrundrissknotenEintrag,
     GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
     QuerschnittEintrag, SchichtEintrag, SetzungEintrag,
     SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
@@ -69,7 +71,9 @@ from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.stabwerk.rechnung import BETONKENNWERTE
 from opencivil.geotechnik.setzung import Steifigkeit
-from opencivil.web import balkendaten, diagrammdaten, grundbruchdaten, setzungsdaten
+from opencivil.web import (
+    balkendaten, diagrammdaten, durchstanzdaten, grundbruchdaten, setzungsdaten,
+)
 from opencivil.web.umschlag import endlich
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
@@ -175,6 +179,9 @@ def katalog() -> dict:
         # Eine Setzung ohne Pressung und mit einer Schicht. Die Oberflaeche
         # setzt Kennung und Name.
         "neue_setzung": SetzungEintrag.neu(kennung="", name="").als_dict(),
+        # Eine Durchstanzstelle ohne Einwirkung und ohne Aussparung. Die
+        # Oberflaeche setzt Kennung, Name, Beton und Stahl.
+        "neue_durchstanzstelle": DurchstanzEintrag.neu(kennung="", name="").als_dict(),
         # Je Feld, was der Kern ueber seine Zahl weiss: die Einheit, in der
         # sie gemeint ist, die Grenzen und ob sie ganz sein muss -- zuerst
         # beim Grundbruch, dessen Einheiten die Maske selbst trug.
@@ -224,6 +231,16 @@ def katalog() -> dict:
             "grundbruchkombination": GrundbruchkombinationEintrag(name="").als_dict(),
             # Eine Schicht unter einem Fundament der Setzung.
             "schicht": SchichtEintrag(name="").als_dict(),
+            # Knoten und Aussparung im Grundriss einer Durchstanzstelle.
+            "grundrissknoten": GrundrissknotenEintrag().als_dict(),
+            "aussparung": AussparungEintrag().als_dict(),
+        },
+        # Die Wahlen einer Durchstanzstelle, mit Beschriftung -- je ein Schalter.
+        "durchstanzen": {
+            name: [{"wert": w.value, "beschriftung": w.beschriftung} for w in wahl]
+            for name, wahl in (("plattenarten", Plattenart), ("lagen", Lage),
+                               ("formen", Stuetzenform), ("stufen", Naeherungsstufe),
+                               ("ke", KeArt))
         },
         # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
         "setzung": {
@@ -583,6 +600,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
         # Je Fundament, was die Situationszeichnung vom Kern braucht.
         ergebnis["grundbrueche"] = endlich(grundbruchdaten.situationen(aufbau, loesung))
         ergebnis["setzungen"] = endlich(setzungsdaten.situationen(aufbau, loesung))
+        ergebnis["durchstanzstellen"] = endlich(durchstanzdaten.situationen(aufbau, loesung))
         # Je Platte und je gezeichneten Querschnitt die Kennzahlen -- auch
         # ohne Lastfall, darum nicht in der Zusammenfassung, die es nur mit
         # Urteilen gibt.

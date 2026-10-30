@@ -1,5 +1,5 @@
 ---
-erzeugt: c3a191587147
+erzeugt: 99a2faa31ea1
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1"
@@ -33,6 +33,7 @@ $$
 ## Gebraucht von
 
 - [[Beiwert für die statische Höhe]]
+- [[Beiwert k_r]]
 
 ## Im Code
 
@@ -42,6 +43,7 @@ $$
 
 - [[Kennzahlen]]
 - [[Querkraft]]
+- [[Durchstanzen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -12,6 +12,7 @@ die beiden Stahlspannungen (:func:`spannungsnachweise`) und den Knickfall
 Was nur eine Art braucht, steht bei ihr: :mod:`~opencivil.projekt.aufbau.platte`,
 :mod:`~opencivil.projekt.aufbau.querschnittsanalyse`,
 :mod:`~opencivil.projekt.aufbau.balkensystem`,
+:mod:`~opencivil.projekt.aufbau.durchstanzen`,
 :mod:`~opencivil.projekt.aufbau.grundbruch` und
 :mod:`~opencivil.projekt.aufbau.setzung`. Bis 2026-10-17 stand alles in
 einer Datei ``aufbau.py`` von ueber tausend Zeilen.
@@ -101,7 +102,8 @@ class Aufbau:
                       "spannung_riss", "spannung", "verformung", "knicken",
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
-                      "qa_spannung", "qa_knicken", "grundbruch", "gleiten", "setzung")
+                      "qa_spannung", "qa_knicken", "durchstanzen", "grundbruch", "gleiten",
+                      "setzung")
 
     # -- Die Objekte je Bauteilart: Sichten auf die Bauteile --------------
     #

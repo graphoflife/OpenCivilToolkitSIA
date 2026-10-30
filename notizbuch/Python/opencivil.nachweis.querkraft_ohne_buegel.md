@@ -1,5 +1,5 @@
 ---
-erzeugt: aed7d9cc7ec7
+erzeugt: a99c8d583a8b
 art: modul
 tags: [modul]
 ---
@@ -270,6 +270,7 @@ nicht nachrechnen konnte.
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.projekt.aufbau.platte]]
 

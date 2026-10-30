@@ -1,5 +1,5 @@
 ---
-erzeugt: ea8baa2e9d1a
+erzeugt: a7da7b0d3bbf
 art: modul
 tags: [modul]
 ---
@@ -237,6 +237,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.stelle]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.duktilitaet]]

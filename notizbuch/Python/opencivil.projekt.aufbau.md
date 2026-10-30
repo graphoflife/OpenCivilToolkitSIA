@@ -1,5 +1,5 @@
 ---
-erzeugt: 7d2fee5b8302
+erzeugt: d654f12e76a1
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,8 @@ ohne Bewehrung.
 
 ## DIE BAUTEILARTEN
 
-Platte, Querschnittsanalyse, Balkensystem, Grundbruch und Setzung haben je einen Steckbrief
+Platte, Querschnittsanalyse, Balkensystem, Durchstanzen, Grundbruch und Setzung haben je
+einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch; eine neue Art kommt dort dazu
@@ -38,6 +39,7 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion `bauen`
 ([[opencivil.projekt.aufbau.platte|platte]],
 [[opencivil.projekt.aufbau.querschnittsanalyse|querschnittsanalyse]],
 [[opencivil.projekt.aufbau.balkensystem|balkensystem]],
+[[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]],
 [[opencivil.projekt.aufbau.setzung|setzung]]); was mehr als eine braucht, im
 Kern ([[opencivil.projekt.aufbau.kern|kern]]): der Aufbau, das Bauteil, die
@@ -47,6 +49,7 @@ in einer Datei von ueber tausend Zeilen.
 ## Module
 
 - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
+- [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
 - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
 - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
 - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
@@ -101,18 +104,21 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - `BALKENSYSTEM = Bauteilart('balkensystem', 'balkensysteme', BalkensystemEintrag, 'r',…`
 - `GRUNDBRUCH = Bauteilart('grundbruch', 'grundbrueche', GrundbruchEintrag, 'g', 'gru…`
 - `SETZUNG = Bauteilart('setzung', 'setzungen', SetzungEintrag, 'w', 'setzung', 'S…` – Die Kennungen w1, w2 ...: «s» tragen schon die Betonstaehle.
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, GRUNDBRUCH, SETZUNG)` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Grundbruch und Setzung lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `DURCHSTANZEN = Bauteilart('durchstanzen', 'durchstanzstellen', DurchstanzEintrag, 'd…`
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, DURCHSTANZEN, GRUNDBRUCH, SETZUNG)` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Durchstanzen, Grundbruch und Setzung lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
@@ -124,6 +130,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]

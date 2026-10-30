@@ -112,6 +112,11 @@ const ZEICHEN = {
     pfade: ['M6 18V6h12v12', 'M3.5 18h5 M3.5 20l1-2 M5.5 20l1-2 M7.5 20l1-2',
       'M18 18l-2 3h4z'],
   },
+  // Eine Platte auf einer Stütze, darin gestrichelt der Kegel, der durchstanzt.
+  durchstanzen: {
+    pfade: ['M2.5 7h19v5h-19z', 'M10 12h4v9h-4z'],
+    strich: ['M6 7l4 5 M18 7l-4 5'],
+  },
   // Ein Fundament im Boden, darauf die Last, darunter gestrichelt der
   // Gleitkörper bis ins Gelände daneben.
   grundbruch: {

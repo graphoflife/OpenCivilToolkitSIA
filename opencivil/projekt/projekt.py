@@ -39,8 +39,10 @@ from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.projekt.setzung import SetzungEintrag
+from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BAUTEILE, GRUNDBRUCH, PLATTE, SETZUNG, Aufbau, aufbauen,
+    ANALYSE, BALKENSYSTEM, BAUTEILE, DURCHSTANZEN, GRUNDBRUCH, PLATTE, SETZUNG, Aufbau,
+    aufbauen,
 )
 
 
@@ -60,6 +62,9 @@ class Projekt(Beschreibung):
 
     balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)
     """Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle."""
+
+    durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)
+    """Stützen und Wände, an denen das Durchstanzen nachgewiesen wird."""
 
     grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)
     """Flachfundamente mit Grundbruch und Gleiten."""
@@ -301,6 +306,21 @@ class Projekt(Beschreibung):
                         BalkensystemEintrag(kennung=self.freie_kennung(BALKENSYSTEM.vorsilbe),
                                             name=name))
         self.balkensysteme.append(eintrag)
+        return eintrag
+
+    def durchstanzen(self, name: str, beton: str, stahl: str, **felder: Any) -> DurchstanzEintrag:
+        """
+        Ein Durchstanznachweis mit den Vorgaben der Oberflaeche. ``beton`` und
+        ``stahl`` sind Kennungen von Materialien; alles Weitere -- ``h``,
+        ``lage``, ``V_d`` ... -- geht als Stichwort an den Eintrag: Masse der
+        Platte und der Stütze in mm, Spannweiten in m, Kräfte in kN.
+        Aussparungen mit :meth:`~opencivil.projekt.durchstanzen.DurchstanzEintrag.aussparung`.
+        """
+        eintrag = lesen(DurchstanzEintrag, {"beton": beton, "stahl": stahl, **felder},
+                        f"Durchstanzen '{name}'",
+                        DurchstanzEintrag(kennung=self.freie_kennung(DURCHSTANZEN.vorsilbe),
+                                          name=name))
+        self.durchstanzstellen.append(eintrag)
         return eintrag
 
     def grundbruch(self, name: str, **felder: Any) -> GrundbruchEintrag:
@@ -658,12 +678,38 @@ class Projekt(Beschreibung):
         p.querschnittsanalysen.append(cls._stuetze(p.freie_kennung("a")))
 
         # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
-        # sich nicht rechnen lässt. Dazu jede Spielart des Grundbruchs.
+        # sich nicht rechnen lässt. Dazu jede Lage beim Durchstanzen und jede
+        # Spielart des Grundbruchs.
         cls._alles_einmal(p, decke, p.querschnittsanalysen[0])
         cls._beweglich(p)
+        cls._durchstanzstellen(p)
         cls._grundbrueche(p)
         cls._setzungen(p)
         return p
+
+    @staticmethod
+    def _durchstanzstellen(p: "Projekt") -> None:
+        """
+        Jede Lage der gestützten Fläche, jede Form der Stütze, jede
+        Näherungsstufe und beide Wege zu k_e: eine Innenstütze mit Flächenlast;
+        eine Rundstütze am Rand, k_e aus der Exzentrizität; eine Eckstütze in
+        Stufe 1, die als einzige aufgeht; eine lange Ovalstütze in einer Bodenplatte, mit Momenten von
+        Hand und einer Aussparung neben der Ecke; ein Wandende und eine
+        Wandecke, an denen Stufe 2 wie Stufe 1 rechnet.
+        """
+        beton, stahl = (next(m.kennung for m in p.materialien if m.art == art)
+                        for art in ("beton", "betonstahl"))
+        p.durchstanzen("Innenstütze", beton, stahl, b_x=400, b_y=400, V_d=900.0, q_d=14.0)
+        p.durchstanzen("Randstütze", beton, stahl, lage="rand", form="rund", D=450, a_y=100,
+                       h=300, ke="exzentrizitaet", e_y=80, V_d=500.0, q_d=12.0)
+        p.durchstanzen("Eckstütze", beton, stahl, lage="ecke", stufe="1", V_d=80.0)
+        oval = p.durchstanzen("Ovalstütze", beton, stahl, plattenart="bodenplatte", form="oval",
+                              b_x=1200, b_y=300, h=400, c=40, phi_x=20, phi_y=20, stufe="3",
+                              r_sx=2.0, r_sy=1.6, m_sdx=180.0, m_sdy=150.0, V_d=1400.0,
+                              q_d=150.0)
+        oval.aussparung([[700, 300], [1000, 300], [1000, 600], [700, 600]])
+        p.durchstanzen("Wandende", beton, stahl, lage="wandende", t=250, V_d=400.0)
+        p.durchstanzen("Wandecke", beton, stahl, lage="wandecke", t=250, V_d=300.0)
 
     @staticmethod
     def _grundbrueche(p: "Projekt") -> None:

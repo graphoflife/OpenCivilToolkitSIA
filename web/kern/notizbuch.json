@@ -164,6 +164,12 @@
       "bereich": "Querschnittsanalyse"
     },
     {
+      "name": "Durchstanzen",
+      "pfad": "Formelsammlung/Themen/Durchstanzen.md",
+      "art": "thema",
+      "bereich": "Durchstanzen"
+    },
+    {
       "name": "Spannung-Dehnung-Analyse",
       "pfad": "Formelsammlung/Themen/Spannung-Dehnung-Analyse.md",
       "art": "thema",
@@ -178,6 +184,17 @@
       ],
       "themen": [
         "Grundbruch"
+      ]
+    },
+    {
+      "name": "Abstand zum Momentennullpunkt",
+      "pfad": "Formelsammlung/Formeln/Abstand zum Momentennullpunkt.md",
+      "art": "formel",
+      "zeichen": [
+        "r_{sx}"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -281,7 +298,19 @@
       ],
       "themen": [
         "Kennzahlen",
-        "Querkraft"
+        "Querkraft",
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Beiwert der Momentenübertragung",
+      "pfad": "Formelsammlung/Formeln/Beiwert der Momentenübertragung.md",
+      "art": "formel",
+      "zeichen": [
+        "k_e"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -325,6 +354,17 @@
       "themen": [
         "Kennzahlen",
         "Querkraft"
+      ]
+    },
+    {
+      "name": "Beiwert k_r",
+      "pfad": "Formelsammlung/Formeln/Beiwert k_r.md",
+      "art": "formel",
+      "zeichen": [
+        "k_r"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -380,6 +420,17 @@
       ],
       "themen": [
         "Fundament"
+      ]
+    },
+    {
+      "name": "Bemessungswert der Querkraft im Nachweisschnitt",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Querkraft im Nachweisschnitt.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{d,red}"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -566,6 +617,17 @@
       ]
     },
     {
+      "name": "Biegebewehrung im Stützstreifen je Meter",
+      "pfad": "Formelsammlung/Formeln/Biegebewehrung im Stützstreifen je Meter.md",
+      "art": "formel",
+      "zeichen": [
+        "a_{s,x}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Biegelinie eines Stabs",
       "pfad": "Formelsammlung/Formeln/Biegelinie eines Stabs.md",
       "art": "formel",
@@ -586,6 +648,17 @@
       ]
     },
     {
+      "name": "Biegewiderstand im Stützstreifen",
+      "pfad": "Formelsammlung/Formeln/Biegewiderstand im Stützstreifen.md",
+      "art": "formel",
+      "zeichen": [
+        "m_{Rd,x}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Bilineare Beziehung des Betonstahls",
       "pfad": "Formelsammlung/Formeln/Bilineare Beziehung des Betonstahls.md",
       "art": "formel",
@@ -597,6 +670,28 @@
         "Knicken",
         "Biegung und Normalkraft",
         "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Breite des Stützstreifens",
+      "pfad": "Formelsammlung/Formeln/Breite des Stützstreifens.md",
+      "art": "formel",
+      "zeichen": [
+        "b_s"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Breite des Stützstreifens am Plattenrand",
+      "pfad": "Formelsammlung/Formeln/Breite des Stützstreifens am Plattenrand.md",
+      "art": "formel",
+      "zeichen": [
+        "b_{sr,y}"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -731,6 +826,39 @@
       ]
     },
     {
+      "name": "Druckzonenhöhe im Stützstreifen",
+      "pfad": "Formelsammlung/Formeln/Druckzonenhöhe im Stützstreifen.md",
+      "art": "formel",
+      "zeichen": [
+        "x_x"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Durchmesser des flächengleichen Kreises",
+      "pfad": "Formelsammlung/Formeln/Durchmesser des flächengleichen Kreises.md",
+      "art": "formel",
+      "zeichen": [
+        "b"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Durchstanzwiderstand ohne Durchstanzbewehrung",
+      "pfad": "Formelsammlung/Formeln/Durchstanzwiderstand ohne Durchstanzbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,c}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Eigengewicht eines Stabs",
       "pfad": "Formelsammlung/Formeln/Eigengewicht eines Stabs.md",
       "art": "formel",
@@ -785,7 +913,8 @@
         "Stahlspannung gegen Fliessen",
         "Knicken",
         "Duktilität je Richtung",
-        "Sprödes Versagen je Richtung"
+        "Sprödes Versagen je Richtung",
+        "Durchstanzen"
       ]
     },
     {
@@ -904,6 +1033,17 @@
       "zeichen": [],
       "themen": [
         "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Flächenlast innerhalb des Nachweisschnitts",
+      "pfad": "Formelsammlung/Formeln/Flächenlast innerhalb des Nachweisschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "\\Delta V_d"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -1347,6 +1487,17 @@
       ]
     },
     {
+      "name": "Massgebende Plattenrotation – die grössere",
+      "pfad": "Formelsammlung/Formeln/Massgebende Plattenrotation – die grössere.md",
+      "art": "formel",
+      "zeichen": [
+        "\\psi"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Mittelwert der Zylinderdruckfestigkeit",
       "pfad": "Formelsammlung/Formeln/Mittelwert der Zylinderdruckfestigkeit.md",
       "art": "formel",
@@ -1366,6 +1517,29 @@
       ],
       "themen": [
         "Beton"
+      ]
+    },
+    {
+      "name": "Mittlere statische Höhe der beiden Lagen der Zugbewehrung",
+      "pfad": "Formelsammlung/Formeln/Mittlere statische Höhe der beiden Lagen der Zugbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "d"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Mittleres Moment im Stützstreifen",
+      "pfad": "Formelsammlung/Formeln/Mittleres Moment im Stützstreifen.md",
+      "art": "formel",
+      "zeichen": [
+        "m_{sd,x}",
+        "m_{sd,y}"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -1399,6 +1573,50 @@
       "themen": [
         "Biegung und Normalkraft",
         "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Nachweisschnitt im Abstand d_v∕2",
+      "pfad": "Formelsammlung/Formeln/Nachweisschnitt im Abstand d_v∕2.md",
+      "art": "formel",
+      "zeichen": [
+        "u_0"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Nachweisschnitt ohne das, was nicht zählt",
+      "pfad": "Formelsammlung/Formeln/Nachweisschnitt ohne das, was nicht zählt.md",
+      "art": "formel",
+      "zeichen": [
+        "u_{red}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand",
+      "pfad": "Formelsammlung/Formeln/Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand.md",
+      "art": "formel",
+      "zeichen": [
+        "u_0"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände",
+      "pfad": "Formelsammlung/Formeln/Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände.md",
+      "art": "formel",
+      "zeichen": [
+        "u_0"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -1447,6 +1665,17 @@
         "Stahlspannung gegen Fliessen",
         "Stahlspannung aus Rissbreite",
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Plattenrotation",
+      "pfad": "Formelsammlung/Formeln/Plattenrotation.md",
+      "art": "formel",
+      "zeichen": [
+        "\\psi_x"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -1845,6 +2074,28 @@
       ]
     },
     {
+      "name": "Statische Höhe der äusseren Lage",
+      "pfad": "Formelsammlung/Formeln/Statische Höhe der äusseren Lage.md",
+      "art": "formel",
+      "zeichen": [
+        "d_x"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Statische Höhe der inneren Lage",
+      "pfad": "Formelsammlung/Formeln/Statische Höhe der inneren Lage.md",
+      "art": "formel",
+      "zeichen": [
+        "d_y"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Steifigkeitsmatrix eines Stabs",
       "pfad": "Formelsammlung/Formeln/Steifigkeitsmatrix eines Stabs.md",
       "art": "formel",
@@ -2178,15 +2429,16 @@
       ]
     },
     {
-      "name": "Wirksame Höhe (Einlage nicht massgebend)",
-      "pfad": "Formelsammlung/Formeln/Wirksame Höhe (Einlage nicht massgebend).md",
+      "name": "Wirksame Höhe ohne Abzug",
+      "pfad": "Formelsammlung/Formeln/Wirksame Höhe ohne Abzug.md",
       "art": "formel",
       "zeichen": [
         "d_v^{+}"
       ],
       "themen": [
         "Kennzahlen",
-        "Querkraft"
+        "Querkraft",
+        "Durchstanzen"
       ]
     },
     {
@@ -2230,6 +2482,17 @@
         "Biegung und Normalkraft",
         "Zwängung auf Biegung",
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Wirksamer Umfang des Nachweisschnitts",
+      "pfad": "Formelsammlung/Formeln/Wirksamer Umfang des Nachweisschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "u"
+      ],
+      "themen": [
+        "Durchstanzen"
       ]
     },
     {
@@ -2797,6 +3060,31 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.durchstanzen.nachweis",
+      "pfad": "Python/opencivil.durchstanzen.nachweis.md",
+      "art": "modul",
+      "kurz": "der Durchstanznachweis nach SIA 262:2025, 4.3.6.",
+      "stichworte": [
+        "Rotation",
+        "Durchstanzbefund",
+        "Durchstanzen",
+        "Durchstanzen.pruefe",
+        "Durchstanzen._statische_hoehe",
+        "Durchstanzen._nachweisschnitt",
+        "Durchstanzen._exzentrizitaet",
+        "Durchstanzen._k_e",
+        "Durchstanzen._lasten",
+        "Durchstanzen._rotation",
+        "Durchstanzen._m_Rd",
+        "Durchstanzen._m_sd",
+        "Durchstanzen._b_sr",
+        "Durchstanzen._k_r",
+        "_mehrzahl",
+        "angaben",
+        "kennwerttabelle"
+      ]
+    },
+    {
       "name": "opencivil.durchstanzen.schnitt",
       "pfad": "Python/opencivil.durchstanzen.schnitt.md",
       "art": "modul",
@@ -2841,6 +3129,40 @@
         "Nachweisschnitt",
         "Nachweisschnitt.u",
         "nachweisschnitt"
+      ]
+    },
+    {
+      "name": "opencivil.durchstanzen.stelle",
+      "pfad": "Python/opencivil.durchstanzen.stelle.md",
+      "art": "modul",
+      "kurz": "die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.",
+      "stichworte": [
+        "Plattenart",
+        "Plattenart.beschriftung",
+        "Plattenart.last",
+        "Plattenart.zugseite",
+        "Stuetzenform",
+        "Stuetzenform.beschriftung",
+        "Lage",
+        "Lage.beschriftung",
+        "Lage.wand",
+        "Lage.k_e",
+        "Naeherungsstufe",
+        "Naeherungsstufe.beschriftung",
+        "Naeherungsstufe.faktor",
+        "KeArt",
+        "KeArt.beschriftung",
+        "Durchstanzstelle",
+        "Durchstanzstelle.abschnitt",
+        "Durchstanzstelle.id_von",
+        "Durchstanzstelle.ins_rechenwerk",
+        "Durchstanzstelle.masse",
+        "Durchstanzstelle.eingaben",
+        "Durchstanzstelle.stuetze",
+        "Durchstanzstelle.raender",
+        "Durchstanzstelle.achse",
+        "Durchstanzstelle.kandidaten",
+        "Durchstanzstelle.umriss"
       ]
     },
     {
@@ -3863,6 +4185,16 @@
       ]
     },
     {
+      "name": "opencivil.projekt.aufbau.durchstanzen",
+      "pfad": "Python/opencivil.projekt.aufbau.durchstanzen.md",
+      "art": "modul",
+      "kurz": "eine Durchstanzstelle wird Rechnung.",
+      "stichworte": [
+        "aussparungen",
+        "bauen"
+      ]
+    },
+    {
       "name": "opencivil.projekt.aufbau.grundbruch",
       "pfad": "Python/opencivil.projekt.aufbau.grundbruch.md",
       "art": "modul",
@@ -3996,6 +4328,22 @@
         "BalkensystemEintrag.teilen",
         "BalkensystemEintrag.umkehren",
         "BalkensystemEintrag.neu"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.durchstanzen",
+      "pfad": "Python/opencivil.projekt.durchstanzen.md",
+      "art": "modul",
+      "kurz": "ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.",
+      "stichworte": [
+        "GrundrissknotenEintrag",
+        "AussparungEintrag",
+        "DurchstanzEintrag",
+        "DurchstanzEintrag.neu",
+        "DurchstanzEintrag.materialien",
+        "DurchstanzEintrag.bezuege",
+        "DurchstanzEintrag.netz",
+        "DurchstanzEintrag.aussparung"
       ]
     },
     {
@@ -4164,6 +4512,7 @@
         "Projekt.platte",
         "Projekt.analyse",
         "Projekt.balkensystem",
+        "Projekt.durchstanzen",
         "Projekt.grundbruch",
         "Projekt.setzung",
         "Projekt.skript",
@@ -4177,6 +4526,7 @@
         "Projekt.laden",
         "Projekt.beispiel",
         "Projekt.jeder_nachweis",
+        "Projekt._durchstanzstellen",
         "Projekt._grundbrueche",
         "Projekt._setzungen",
         "Projekt._alles_einmal",
@@ -5266,6 +5616,16 @@
         "vorlage_einsetzen",
         "bearbeite",
         "bearbeite_json"
+      ]
+    },
+    {
+      "name": "opencivil.web.durchstanzdaten",
+      "pfad": "Python/opencivil.web.durchstanzdaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einer Durchstanzstelle zeichnet.",
+      "stichworte": [
+        "situationen",
+        "situation"
       ]
     },
     {

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f9193648b22
+erzeugt: 4ccd50171b3a
 art: modul
 tags: [modul]
 ---
@@ -257,5 +257,5 @@ herleitet.
 
 ## Formeln aus diesem Modul
 
-- [[Wirksame Höhe (Einlage nicht massgebend)]] · `protokoll_hoehen`
+- [[Wirksame Höhe ohne Abzug]] · `protokoll_hoehen`
 - [[Wirksame Höhe, um die Einlage vermindert]] · `protokoll_hoehen`

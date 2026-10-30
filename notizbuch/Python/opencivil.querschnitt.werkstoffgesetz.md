@@ -1,5 +1,5 @@
 ---
-erzeugt: 50cbe1ec083d
+erzeugt: d669fc86a082
 art: modul
 tags: [modul]
 ---
@@ -522,6 +522,7 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.handrechnung]]

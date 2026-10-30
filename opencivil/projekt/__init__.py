@@ -21,6 +21,9 @@ Aufgabe ein Modul::
     balkensystem.py
                    ein ebener Rahmen: Knoten, Linien als Staebe und
                    Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
+    durchstanzen.py
+                   eine Stütze oder Wand in einer Platte: Platte,
+                   Biegebewehrung, gestützte Fläche, Einwirkung, Aussparungen
     grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                    und Einwirkungen fuer Grundbruch und Gleiten
     setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
@@ -74,6 +77,9 @@ from opencivil.projekt.querschnittsanalyse import (
 from opencivil.projekt.skript import SkriptEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag, GrundbruchkombinationEintrag
 from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
+from opencivil.projekt.durchstanzen import (
+    AussparungEintrag, DurchstanzEintrag, GrundrissknotenEintrag,
+)
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
 
@@ -95,5 +101,6 @@ __all__ = [
     "VerformungEintrag", "VerformungsfallEintrag", "abgeleiteter_fallname",
     "GrundbruchEintrag", "GrundbruchkombinationEintrag",
     "SchichtEintrag", "SetzungEintrag",
+    "AussparungEintrag", "DurchstanzEintrag", "GrundrissknotenEintrag",
     "aufbauen", "sorten",
 ]

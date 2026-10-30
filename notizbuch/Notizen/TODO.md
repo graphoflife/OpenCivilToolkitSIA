@@ -281,6 +281,21 @@ sie hier notiert; keine davon ist nachgeschlagen.
       der gestützten Fläche und entlang einer Wand von ihrem Ende her; eine
       Strecke, die von einer Ecke zum freien Plattenrand läuft (Figur 22d),
       zählt ganz.
+- [ ] **Durchstanzen, Breite b_sr der Stützstreifen am Rand (Figur 25).**
+      Eingebaut: die Breite, die zwei Linien unter 45° von den inneren Ecken
+      der Stütze am Plattenrand einschliessen -- `b_sr = b_x + 2·(b_y + a_y)`
+      für den Streifen in y, entsprechend in x, höchstens b_s. Aus dem Bild
+      gelesen, nicht nachgeschlagen.
+- [ ] **Durchstanzen, Näherungsstufe 2 an Wandende und Wandecke.**
+      4.3.6.4.7 nennt Momente nur für Innen-, Rand- und Eckstützen. Eingebaut:
+      dort rechnet Stufe 2 wie Stufe 1 (m_sd/m_Rd = 1), und die Herleitung
+      sagt es.
+- [ ] **Durchstanzen, «grosse Aussparungen» für k_e = 0.7 (4.3.6.2.5).**
+      Eingebaut: eine Innenstütze bekommt 0.7, sobald eine Aussparung den
+      Nachweisschnitt mindert (Figur 23d) -- wie gross sie ist, zählt nicht.
+- [ ] **Durchstanzen, Ovalstütze.** Eingebaut: ihre geraden Seiten zählen wie
+      die einer Rechteckstütze 1.5·d_v von jedem Ende her. Der Name kommt aus
+      der Software von Leviat. Offen: ob du diese Form gemeint hast.
 - [ ] **Die Grenze des Nachweises gegen Fliessen.** Eingebaut `f_yd − 80 MPa`,
       weil Tabelle 17 ausdrücklich `f_yd` nennt — mit charakteristischen
       Werten in der Rechnung mischt das zwei Niveaus, ist aber die strengere

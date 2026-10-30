@@ -1,5 +1,5 @@
 ---
-erzeugt: de89bbcd3df7
+erzeugt: 4169897e210f
 art: modul
 tags: [modul]
 ---
@@ -19,6 +19,7 @@ Browser laedt, samt dem Notizbuch.
 - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.
 - [[opencivil.web.diagrammdaten]] – was die Oberflaeche zeichnet, als JSON.
 - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
+- [[opencivil.web.durchstanzdaten]] – was die Oberflaeche von einer Durchstanzstelle zeichnet.
 - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
 - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
 - [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.

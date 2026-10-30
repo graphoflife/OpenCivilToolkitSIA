@@ -1,5 +1,5 @@
 ---
-erzeugt: c0a73fc0f46c
+erzeugt: e7be24e09240
 art: modul
 tags: [modul]
 ---
@@ -466,6 +466,8 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.bewehrungssuche.bewertung]]
 - [[opencivil.bewehrungssuche.laengs]]
+- [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stelle]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
@@ -479,6 +481,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
+- [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]

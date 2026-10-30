@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c8172bf1e21
+erzeugt: d868417863f6
 art: modul
 tags: [modul]
 ---
@@ -31,6 +31,9 @@ querschnittsanalyse.py
 balkensystem.py
                ein ebener Rahmen: Knoten, Linien als Staebe und
                Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
+durchstanzen.py
+               eine Stütze oder Wand in einer Platte: Platte,
+               Biegebewehrung, gestützte Fläche, Einwirkung, Aussparungen
 grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                und Einwirkungen fuer Grundbruch und Gleiten
 setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
@@ -70,6 +73,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 
 - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
 - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
+- [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
@@ -84,6 +88,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
@@ -108,6 +113,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]
+- [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.speicher]]

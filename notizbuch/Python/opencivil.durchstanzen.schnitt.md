@@ -1,5 +1,5 @@
 ---
-erzeugt: fce4ef4a37b5
+erzeugt: 5a5c83f24679
 art: modul
 tags: [modul]
 ---
@@ -398,7 +398,10 @@ nicht hinter einer Aussparung, die näher als 5·d_v liegt.
 def _vereinfacht(punkte: Sequence[Punkt], toleranz: float=0.0002) -> List[Punkt]
 ```
 
-Fast gerade Folgen von Punkten auf ihre Ecken gekürzt -- fürs Bild genügt das.
+Fast gerade Folgen von Punkten auf ihre Ecken gekürzt -- fürs Bild genügt
+das. Nach Douglas und Peucker: kein weggelassener Punkt liegt weiter als
+`toleranz` von der Linie, die bleibt. Bis 2026-10-30 wurde nur mit dem
+nächsten Punkt verglichen, und ein Bogen wurde zum Vieleck.
 
 ### _ueberlappung
 
@@ -448,3 +451,8 @@ er nach dem, der zum Rand läuft.
 ## Braucht
 
 - [[opencivil.querschnitt.geometrie]]
+
+## Gebraucht von
+
+- [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stelle]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: c13b571fb495
+erzeugt: 026623e1df4b
 art: formel
 tags: [formel]
 ---
@@ -53,7 +53,7 @@ $$
 - [[Vergrösserungsfaktor der Durchbiegung]]
 - [[Widerstand der Bügel]]
 - [[Widerstand der Druckdiagonalen]]
-- [[Wirksame Höhe (Einlage nicht massgebend)]]
+- [[Wirksame Höhe ohne Abzug]]
 - [[Wirksame Höhe, um die Einlage vermindert]]
 
 ## Im Code

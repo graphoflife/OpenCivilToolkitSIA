@@ -550,16 +550,29 @@ def auswerten(kandidat: Kandidat, *, d_v: float, achse: Punkt,
 
 
 def _vereinfacht(punkte: Sequence[Punkt], toleranz: float = 2e-4) -> List[Punkt]:
-    """Fast gerade Folgen von Punkten auf ihre Ecken gekürzt -- fürs Bild genügt das."""
+    """
+    Fast gerade Folgen von Punkten auf ihre Ecken gekürzt -- fürs Bild genügt
+    das. Nach Douglas und Peucker: kein weggelassener Punkt liegt weiter als
+    ``toleranz`` von der Linie, die bleibt. Bis 2026-10-30 wurde nur mit dem
+    nächsten Punkt verglichen, und ein Bogen wurde zum Vieleck.
+    """
     punkte = list(punkte)
     if len(punkte) <= 2:
         return punkte
-    ergebnis = [punkte[0]]
-    for i in range(1, len(punkte) - 1):
-        if abstand_zur_strecke(punkte[i], ergebnis[-1], punkte[i + 1]) > toleranz:
-            ergebnis.append(punkte[i])
-    ergebnis.append(punkte[-1])
-    return ergebnis
+    behalten = [False] * len(punkte)
+    behalten[0] = behalten[-1] = True
+    offen = [(0, len(punkte) - 1)]
+    while offen:
+        a, b = offen.pop()
+        weitester, j = toleranz, None
+        for i in range(a + 1, b):
+            d = abstand_zur_strecke(punkte[i], punkte[a], punkte[b])
+            if d > weitester:
+                weitester, j = d, i
+        if j is not None:
+            behalten[j] = True
+            offen += [(a, j), (j, b)]
+    return [p for p, ja in zip(punkte, behalten) if ja]
 
 
 def _ueberlappung(aussparung: Sequence[Punkt], umschlossen: Sequence[Punkt]) -> float:

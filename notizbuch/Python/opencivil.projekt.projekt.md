@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e82a2e0722a
+erzeugt: e3185f49258e
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `querschnitte: List[QuerschnittEintrag] = field(default_factory=list)`
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
 - `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
+- `durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)` – Stützen und Wände, an denen das Durchstanzen nachgewiesen wird.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
@@ -209,6 +210,18 @@ mit dem Baukasten des Eintrags -- `querschnitt`, `linie`,
 Kombinationen, die die Oberflaeche mitbringt: wer in Python zeichnet,
 zeichnet sein eigenes System.
 
+#### Projekt.durchstanzen
+
+```python
+def durchstanzen(self, name: str, beton: str, stahl: str, **felder: Any) -> DurchstanzEintrag
+```
+
+Ein Durchstanznachweis mit den Vorgaben der Oberflaeche. `beton` und
+`stahl` sind Kennungen von Materialien; alles Weitere -- `h`,
+`lage`, `V_d` ... -- geht als Stichwort an den Eintrag: Masse der
+Platte und der Stütze in mm, Spannweiten in m, Kräfte in kN.
+Aussparungen mit [[opencivil.projekt.durchstanzen#DurchstanzEintrag.aussparung|aussparung]].
+
 #### Projekt.grundbruch
 
 ```python
@@ -362,6 +375,20 @@ gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
 x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python
 täte.
 
+#### Projekt._durchstanzstellen
+
+```python
+@staticmethod
+def _durchstanzstellen(p: 'Projekt') -> None
+```
+
+Jede Lage der gestützten Fläche, jede Form der Stütze, jede
+Näherungsstufe und beide Wege zu k_e: eine Innenstütze mit Flächenlast;
+eine Rundstütze am Rand, k_e aus der Exzentrizität; eine Eckstütze in
+Stufe 1, die als einzige aufgeht; eine lange Ovalstütze in einer Bodenplatte, mit Momenten von
+Hand und einer Aussparung neben der Ecke; ein Wandende und eine
+Wandecke, an denen Stufe 2 wie Stufe 1 rechnet.
+
 #### Projekt._grundbrueche
 
 ```python
@@ -418,6 +445,7 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 - [[opencivil.ergebnis]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]

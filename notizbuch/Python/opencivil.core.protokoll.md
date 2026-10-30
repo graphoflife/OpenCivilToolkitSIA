@@ -1,5 +1,5 @@
 ---
-erzeugt: 08743d44b0bb
+erzeugt: 61fcb1ac2517
 art: modul
 tags: [modul]
 ---
@@ -566,6 +566,8 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stelle]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]

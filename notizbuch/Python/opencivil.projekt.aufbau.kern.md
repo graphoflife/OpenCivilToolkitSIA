@@ -1,5 +1,5 @@
 ---
-erzeugt: ce64fc52f22b
+erzeugt: 479e03b8b67c
 art: modul
 tags: [modul]
 ---
@@ -19,6 +19,7 @@ die beiden Stahlspannungen ([[opencivil.projekt.aufbau.kern#spannungsnachweise|s
 Was nur eine Art braucht, steht bei ihr: [[opencivil.projekt.aufbau.platte|platte]],
 [[opencivil.projekt.aufbau.querschnittsanalyse|querschnittsanalyse]],
 [[opencivil.projekt.aufbau.balkensystem|balkensystem]],
+[[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]] und
 [[opencivil.projekt.aufbau.setzung|setzung]]. Bis 2026-10-17 stand alles in
 einer Datei `aufbau.py` von ueber tausend Zeilen.
@@ -408,6 +409,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]

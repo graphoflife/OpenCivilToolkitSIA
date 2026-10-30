@@ -1,5 +1,5 @@
 ---
-erzeugt: 176367f14c42
+erzeugt: c1c0e7ab8256
 art: modul
 tags: [modul]
 ---
@@ -301,6 +301,8 @@ def beschreibung(self) -> str
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.stelle]]
 - [[opencivil.ergebnis]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]

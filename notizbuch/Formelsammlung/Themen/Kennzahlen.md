@@ -1,5 +1,5 @@
 ---
-erzeugt: 50831a51d002
+erzeugt: df4ba767f7e6
 art: thema
 tags: [thema]
 ---
@@ -25,7 +25,7 @@ Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α
 3. [[Widerstand bei festgehaltenem M_Ed]]
 4. [[Beiwert der Gesteinskörnung]]
 5. [[Statische Höhe]]
-6. [[Wirksame Höhe (Einlage nicht massgebend)]]
+6. [[Wirksame Höhe ohne Abzug]]
 7. [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]]
 8. [[Fliessdehnung]]
 9. [[Beiwert für die statische Höhe]]

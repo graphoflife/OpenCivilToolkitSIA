@@ -30,6 +30,7 @@ import {
 } from './diagramm.js';
 import { analyseKarten } from './qa_diagramme.js';
 import { systemKarten, systemZusammenfassung } from './bs_diagramme.js';
+import { durchstanzKarten } from './ds_grundriss.js';
 import { situationKarten } from './gb_zeichnung.js';
 import { setzungKarten } from './sz_zeichnung.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
@@ -543,6 +544,7 @@ const DIAGRAMME = {
   querschnittsanalyse: (kennung, eintrag, loesung) => [
     ...analyseKarten(kennung), ...spannungskarten(kennung, loesung)],
   balkensystem: systemKarten,
+  durchstanzen: durchstanzKarten,
   grundbruch: situationKarten,
   setzung: setzungKarten,
 };

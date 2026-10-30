@@ -1,5 +1,5 @@
 ---
-erzeugt: f58e7e41c404
+erzeugt: 0d4251c53f46
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.3"
@@ -31,6 +31,7 @@ $$
 
 - [[Beiwert der Parabel]]
 - [[Druckzonenhöhe bei reiner Biegung]]
+- [[Druckzonenhöhe im Stützstreifen]]
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]
 - [[Widerstand der Druckdiagonalen]]
 

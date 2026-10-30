@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-402 Berechnungen ausgeführt, 655 Werte bestimmt.
+492 Berechnungen ausgeführt, 745 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -4834,6 +4834,962 @@ Reiner Zug, gleichmässig gedehnt
 Reiner Druck, gleichmässig gedehnt
     N_{Rd}^{-} = -5497.4\,\mathrm{kN}
 
+Durchstanzen: Innenstütze
+-------------------------
+
+Plattendicke
+    h = 280\,\mathrm{mm}
+
+Überdeckung der Zugbewehrung oben
+    c_{nom} = 30\,\mathrm{mm}
+
+Grösstkorndurchmesser
+    D_{max} = 32\,\mathrm{mm}
+
+Stabdurchmesser in x
+    \varnothing_x = 16\,\mathrm{mm}
+
+Stababstand in x
+    s_x = 150\,\mathrm{mm}
+
+Stabdurchmesser in y
+    \varnothing_y = 16\,\mathrm{mm}
+
+Stababstand in y
+    s_y = 150\,\mathrm{mm}
+
+Abmessung der Stütze in x
+    b_x = 400\,\mathrm{mm}
+
+Abmessung der Stütze in y
+    b_y = 400\,\mathrm{mm}
+
+Bemessungswert der Auflagerkraft
+    V_d = 900\,\mathrm{kN}
+
+Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast
+    q_d = 14\,\mathrm{kN}/\mathrm{m}^{2}
+
+Spannweite in x
+    l_x = 7\,\mathrm{m}
+
+Spannweite in y
+    l_y = 7\,\mathrm{m}
+
+Exzentrizität der Auflagerkraft in x
+    e_x = 0\,\mathrm{mm}
+
+Exzentrizität der Auflagerkraft in y
+    e_y = 0\,\mathrm{mm}
+
+Durchstanzen
+------------
+
+Statische Höhe der Lage in x (aussen)
+    d_x = h - c_{nom} - \frac{\varnothing_x}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 242\,\mathrm{mm}
+
+Statische Höhe der Lage in y (innen)
+    d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 226\,\mathrm{mm}
+
+Mittlere statische Höhe der beiden Lagen der Zugbewehrung   [SIA 262:2025, 4.3.6.2.1]
+    d = \frac{d_x + d_y}{2} = \frac{242\,\mathrm{mm} + 226\,\mathrm{mm}}{2} = 234\,\mathrm{mm}
+
+Wirksame statische Höhe: die gestützte Fläche reicht nicht in die Platte   [SIA 262:2025, 4.3.6.2.1, Figur 21]
+    d_v = d = 234\,\mathrm{mm}
+
+Nachweisschnitt
+---------------
+
+Nachweisschnitt im Abstand d_v/2   [SIA 262:2025, 4.3.6.2.2, Figur 22b]
+    u_0 = 2 \cdot \left(b_x + b_y\right) + \pi \cdot d_v = 2 \cdot \left(400\,\mathrm{mm} + 400\,\mathrm{mm}\right) + \pi \cdot 234\,\mathrm{mm} = 2335\,\mathrm{mm}
+
+Nichts mindert den Schnitt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0 = 2335\,\mathrm{mm}
+
+Momentenübertragung
+-------------------
+
+Näherung für Innenstützen   [SIA 262:2025, 4.3.6.2.5]
+    k_e = 0.9
+
+Wirksamer Umfang des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.3]
+    u = k_e \cdot u_{red} = 0.9 \cdot 2335\,\mathrm{mm} = 2102\,\mathrm{mm}
+
+Bemessungswert der Querkraft
+----------------------------
+
+Fläche innerhalb des Nachweisschnitts, ohne Aussparungen
+    A_q = 0.39\,\mathrm{m}^{2}
+
+Eigengewicht und Nutzlast innerhalb des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.6]
+    \Delta V_d = q_d \cdot A_q = 14\,\mathrm{kN}/\mathrm{m}^{2} \cdot 0.39\,\mathrm{m}^{2} = 5.5\,\mathrm{kN}
+
+Bemessungswert der Querkraft im Nachweisschnitt   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d - \Delta V_d = 900\,\mathrm{kN} - 5.5\,\mathrm{kN} = 894.5\,\mathrm{kN}
+
+Plattenrotation
+---------------
+
+Abstand zum Momentennullpunkt in x   [SIA 262:2025, 4.3.6.4.4]
+    r_{sx} = 0.22 \cdot l_x = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Abstand zum Momentennullpunkt in y   [SIA 262:2025, 4.3.6.4.4]
+    r_{sy} = 0.22 \cdot l_y = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Bewehrung in x je Meter
+    a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+
+Druckzonenhöhe in x, je Meter
+    x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+
+Biegewiderstand im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.5]
+    \begin{aligned}
+      m_{Rd,x} &= a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right) \\
+      &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(242\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+      &= 132.5\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Bewehrung in y je Meter
+    a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+
+Druckzonenhöhe in y, je Meter
+    x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+
+Biegewiderstand im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.5]
+    \begin{aligned}
+      m_{Rd,y} &= a_{s,y} \cdot f_{yd} \cdot \left(d_y - \frac{0.85 \cdot x_y}{2}\right) \\
+      &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(226\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+      &= 123.2\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Breite des Stützstreifens   [SIA 262:2025, 4.3.6.4.6, (61)]
+    \begin{aligned}
+      b_s &= \min\left[1.5 \cdot \sqrt{r_{sx} \cdot r_{sy}};\ l_{min}\right] \\
+      &= \min\left[1.5 \cdot \sqrt{1540\,\mathrm{mm} \cdot 1540\,\mathrm{mm}};\ 7000\,\mathrm{mm}\right] \\
+      &= 2310\,\mathrm{mm}
+    \end{aligned}
+
+Mittleres Moment im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.7, (62)]
+    m_{sd,x} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right) = 894.5\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 111.8\,\mathrm{kNm}/\mathrm{m}
+
+Mittleres Moment im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.7, (62)]
+    m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{2 \cdot b_s}\right) = 894.5\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right) = 111.8\,\mathrm{kNm}/\mathrm{m}
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \begin{aligned}
+      \psi_x &= 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
+      &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{111.8\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+      &= 0.0166
+    \end{aligned}
+
+Plattenrotation in y   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \begin{aligned}
+      \psi_y &= 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,y}}{m_{Rd,y}}\right)^{3/2} \\
+      &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{111.8\,\mathrm{kNm}/\mathrm{m}}{123.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+      &= 0.0186
+    \end{aligned}
+
+Massgebende Plattenrotation: die grössere   [SIA 262:2025, 4.3.6.4.1]
+    \psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0166;\ 0.0186\right] = 0.0186
+
+Durchstanzwiderstand
+--------------------
+
+Beiwert der Gesteinskörnung   [SIA 262:2025, 4.3.3.2.1]
+    \begin{aligned}
+      k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+      &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+      &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+    \end{aligned}
+
+Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn   [SIA 262:2025, 4.3.6.3.2, (59)]
+    \begin{aligned}
+      k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
+      &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0186 \cdot 234 \cdot 1.2}\right] \\
+      &= 0.721 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+    \end{aligned}
+
+Durchstanzwiderstand ohne Durchstanzbewehrung   [SIA 262:2025, 4.3.6.3.1]
+    \begin{aligned}
+      V_{Rd,c} &= k_r \cdot \tau_{cd} \cdot d_v \cdot u \\
+      &= 0.721 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 2102\,\mathrm{mm} \\
+      &= 388.2\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen Durchstanzwiderstand
+    V_{d,red} = 894.5\,\mathrm{kN} \quad > \quad V_{Rd,c} = 388.2\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{388.2\,\mathrm{kN}}{894.5\,\mathrm{kN}} = 0.43 \quad \Rightarrow \quad \text{NICHT erfüllt}
+[i] Hinweis: ψ = 0.0186 ≤ 0.020: das Verformungsvermögen ist ohne Durchstanzbewehrung nach Gleichung
+(67) nicht nachgewiesen -- sonst sind die aufgezwungenen Verformungen nach 4.1.2 zu berücksichtigen
+(4.3.6.1.2).
+
+Durchstanzen: Randstütze
+------------------------
+
+Plattendicke
+    h = 300\,\mathrm{mm}
+
+Überdeckung der Zugbewehrung oben
+    c_{nom} = 30\,\mathrm{mm}
+
+Grösstkorndurchmesser
+    D_{max} = 32\,\mathrm{mm}
+
+Stabdurchmesser in x
+    \varnothing_x = 16\,\mathrm{mm}
+
+Stababstand in x
+    s_x = 150\,\mathrm{mm}
+
+Stabdurchmesser in y
+    \varnothing_y = 16\,\mathrm{mm}
+
+Stababstand in y
+    s_y = 150\,\mathrm{mm}
+
+Durchmesser der Stütze
+    D = 450\,\mathrm{mm}
+
+Abstand vom Plattenrand in y
+    a_y = 100\,\mathrm{mm}
+
+Bemessungswert der Auflagerkraft
+    V_d = 500\,\mathrm{kN}
+
+Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast
+    q_d = 12\,\mathrm{kN}/\mathrm{m}^{2}
+
+Spannweite in x
+    l_x = 7\,\mathrm{m}
+
+Spannweite in y
+    l_y = 7\,\mathrm{m}
+
+Exzentrizität der Auflagerkraft in x
+    e_x = 0\,\mathrm{mm}
+
+Exzentrizität der Auflagerkraft in y
+    e_y = 80\,\mathrm{mm}
+
+Durchstanzen
+------------
+
+Statische Höhe der Lage in x (aussen)
+    d_x = h - c_{nom} - \frac{\varnothing_x}{2} = 300\,\mathrm{mm} - 30\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 262\,\mathrm{mm}
+
+Statische Höhe der Lage in y (innen)
+    d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 300\,\mathrm{mm} - 30\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 246\,\mathrm{mm}
+
+Mittlere statische Höhe der beiden Lagen der Zugbewehrung   [SIA 262:2025, 4.3.6.2.1]
+    d = \frac{d_x + d_y}{2} = \frac{262\,\mathrm{mm} + 246\,\mathrm{mm}}{2} = 254\,\mathrm{mm}
+
+Wirksame statische Höhe: die gestützte Fläche reicht nicht in die Platte   [SIA 262:2025, 4.3.6.2.1, Figur 21]
+    d_v = d = 254\,\mathrm{mm}
+
+Nachweisschnitt
+---------------
+
+Nachweisschnitt im Abstand d_v/2, soweit er in der Platte liegt   [SIA 262:2025, 4.3.6.2.2, Figur 22]
+    u_0 = 1756\,\mathrm{mm}
+
+Nichts mindert den Schnitt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0 = 1756\,\mathrm{mm}
+
+Momentenübertragung
+-------------------
+
+Fläche innerhalb des Nachweisschnitts   [SIA 262:2025, Figur 22]
+    A_u = 0.423\,\mathrm{m}^{2}
+
+Durchmesser des flächengleichen Kreises   [SIA 262:2025, 4.3.6.2.4]
+    b = \sqrt{\frac{4 \cdot A_u}{\pi}} = \sqrt{\frac{4 \cdot 0.423\,\mathrm{m}^{2}}{\pi}} = 734\,\mathrm{mm}
+
+Exzentrizität zum Schwerpunkt des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.4]
+    e_u = 1\,\mathrm{mm}
+
+Beiwert der Momentenübertragung   [SIA 262:2025, 4.3.6.2.4, (57)]
+    k_e = \frac{1}{1 + \frac{e_u}{b}} = \frac{1}{1 + \frac{1\,\mathrm{mm}}{734\,\mathrm{mm}}} = 0.999
+
+Wirksamer Umfang des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.3]
+    u = k_e \cdot u_{red} = 0.999 \cdot 1756\,\mathrm{mm} = 1754\,\mathrm{mm}
+
+Bemessungswert der Querkraft
+----------------------------
+
+Fläche innerhalb des Nachweisschnitts, ohne Aussparungen
+    A_q = 0.423\,\mathrm{m}^{2}
+
+Eigengewicht und Nutzlast innerhalb des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.6]
+    \Delta V_d = q_d \cdot A_q = 12\,\mathrm{kN}/\mathrm{m}^{2} \cdot 0.423\,\mathrm{m}^{2} = 5.1\,\mathrm{kN}
+
+Bemessungswert der Querkraft im Nachweisschnitt   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d - \Delta V_d = 500\,\mathrm{kN} - 5.1\,\mathrm{kN} = 494.9\,\mathrm{kN}
+
+Plattenrotation
+---------------
+
+Abstand zum Momentennullpunkt in x   [SIA 262:2025, 4.3.6.4.4]
+    r_{sx} = 0.22 \cdot l_x = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Abstand zum Momentennullpunkt in y   [SIA 262:2025, 4.3.6.4.4]
+    r_{sy} = 0.22 \cdot l_y = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Bewehrung in x je Meter
+    a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+
+Druckzonenhöhe in x, je Meter
+    x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+
+Biegewiderstand im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.5]
+    \begin{aligned}
+      m_{Rd,x} &= a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right) \\
+      &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(262\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+      &= 144.2\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Bewehrung in y je Meter
+    a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+
+Druckzonenhöhe in y, je Meter
+    x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+
+Biegewiderstand im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.5]
+    \begin{aligned}
+      m_{Rd,y} &= a_{s,y} \cdot f_{yd} \cdot \left(d_y - \frac{0.85 \cdot x_y}{2}\right) \\
+      &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(246\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+      &= 134.9\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Breite des Stützstreifens   [SIA 262:2025, 4.3.6.4.6, (61)]
+    \begin{aligned}
+      b_s &= \min\left[1.5 \cdot \sqrt{r_{sx} \cdot r_{sy}};\ l_{min}\right] \\
+      &= \min\left[1.5 \cdot \sqrt{1540\,\mathrm{mm} \cdot 1540\,\mathrm{mm}};\ 7000\,\mathrm{mm}\right] \\
+      &= 2310\,\mathrm{mm}
+    \end{aligned}
+
+Mittleres Moment im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.7, (63)]
+    \begin{aligned}
+      m_{sd,x} &= \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right);\ 0.25 \cdot V_{d,red}\right] \\
+      &= \max\left[494.9\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{0\,\mathrm{mm}}{2 \cdot 2310\,\mathrm{mm}}\right);\ 0.25 \cdot 494.9\,\mathrm{kN}\right] \\
+      &= 123.7\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Breite des Stützstreifens in y, durch den Plattenrand begrenzt   [SIA 262:2025, 4.3.6.4.6, Figur 25]
+    \begin{aligned}
+      b_{sr,y} &= \min\left[b_s;\ D + 2 \cdot \left(D + a_y\right)\right] \\
+      &= \min\left[2310\,\mathrm{mm};\ 450\,\mathrm{mm} + 2 \cdot \left(450\,\mathrm{mm} + 100\,\mathrm{mm}\right)\right] \\
+      &= 1550\,\mathrm{mm}
+    \end{aligned}
+
+Mittleres Moment im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.7, (64)]
+    m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{sr,y}}\right) = 494.9\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{1\,\mathrm{mm}}{1550\,\mathrm{mm}}\right) = 62.2\,\mathrm{kNm}/\mathrm{m}
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \begin{aligned}
+      \psi_x &= 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
+      &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{254\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{123.7\,\mathrm{kNm}/\mathrm{m}}{144.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+      &= 0.0157
+    \end{aligned}
+
+Plattenrotation in y   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \begin{aligned}
+      \psi_y &= 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,y}}{m_{Rd,y}}\right)^{3/2} \\
+      &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{254\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{62.2\,\mathrm{kNm}/\mathrm{m}}{134.9\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+      &= 0.0062
+    \end{aligned}
+
+Massgebende Plattenrotation: die grössere   [SIA 262:2025, 4.3.6.4.1]
+    \psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0157;\ 0.0062\right] = 0.0157
+
+Durchstanzwiderstand
+--------------------
+
+Beiwert der Gesteinskörnung   [SIA 262:2025, 4.3.3.2.1]
+    \begin{aligned}
+      k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+      &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+      &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+    \end{aligned}
+
+Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn   [SIA 262:2025, 4.3.6.3.2, (59)]
+    \begin{aligned}
+      k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
+      &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0157 \cdot 254 \cdot 1.2}\right] \\
+      &= 0.762 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+    \end{aligned}
+
+Durchstanzwiderstand ohne Durchstanzbewehrung   [SIA 262:2025, 4.3.6.3.1]
+    \begin{aligned}
+      V_{Rd,c} &= k_r \cdot \tau_{cd} \cdot d_v \cdot u \\
+      &= 0.762 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 254\,\mathrm{mm} \cdot 1754\,\mathrm{mm} \\
+      &= 371.8\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen Durchstanzwiderstand
+    V_{d,red} = 494.9\,\mathrm{kN} \quad > \quad V_{Rd,c} = 371.8\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{371.8\,\mathrm{kN}}{494.9\,\mathrm{kN}} = 0.75 \quad \Rightarrow \quad \text{NICHT erfüllt}
+[i] Hinweis: ψ = 0.0157 ≤ 0.020: das Verformungsvermögen ist ohne Durchstanzbewehrung nach Gleichung
+(67) nicht nachgewiesen -- sonst sind die aufgezwungenen Verformungen nach 4.1.2 zu berücksichtigen
+(4.3.6.1.2).
+
+Durchstanzen: Eckstütze
+-----------------------
+
+Plattendicke
+    h = 280\,\mathrm{mm}
+
+Überdeckung der Zugbewehrung oben
+    c_{nom} = 30\,\mathrm{mm}
+
+Grösstkorndurchmesser
+    D_{max} = 32\,\mathrm{mm}
+
+Stabdurchmesser in x
+    \varnothing_x = 16\,\mathrm{mm}
+
+Stababstand in x
+    s_x = 150\,\mathrm{mm}
+
+Stabdurchmesser in y
+    \varnothing_y = 16\,\mathrm{mm}
+
+Stababstand in y
+    s_y = 150\,\mathrm{mm}
+
+Abmessung der Stütze in x
+    b_x = 300\,\mathrm{mm}
+
+Abmessung der Stütze in y
+    b_y = 300\,\mathrm{mm}
+
+Abstand vom Plattenrand in x
+    a_x = 0\,\mathrm{mm}
+
+Abstand vom Plattenrand in y
+    a_y = 0\,\mathrm{mm}
+
+Bemessungswert der Auflagerkraft
+    V_d = 80\,\mathrm{kN}
+
+Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast
+    q_d = 0\,\mathrm{kN}/\mathrm{m}^{2}
+
+Spannweite in x
+    l_x = 7\,\mathrm{m}
+
+Spannweite in y
+    l_y = 7\,\mathrm{m}
+
+Durchstanzen
+------------
+
+Statische Höhe der Lage in x (aussen)
+    d_x = h - c_{nom} - \frac{\varnothing_x}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 242\,\mathrm{mm}
+
+Statische Höhe der Lage in y (innen)
+    d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 226\,\mathrm{mm}
+
+Mittlere statische Höhe der beiden Lagen der Zugbewehrung   [SIA 262:2025, 4.3.6.2.1]
+    d = \frac{d_x + d_y}{2} = \frac{242\,\mathrm{mm} + 226\,\mathrm{mm}}{2} = 234\,\mathrm{mm}
+
+Wirksame statische Höhe: die gestützte Fläche reicht nicht in die Platte   [SIA 262:2025, 4.3.6.2.1, Figur 21]
+    d_v = d = 234\,\mathrm{mm}
+
+Nachweisschnitt
+---------------
+
+Nachweisschnitt im Abstand d_v/2, soweit er in der Platte liegt   [SIA 262:2025, 4.3.6.2.2, Figur 22]
+    u_0 = 784\,\mathrm{mm}
+
+Nichts mindert den Schnitt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0 = 784\,\mathrm{mm}
+
+Momentenübertragung
+-------------------
+
+Näherung für Eckstützen   [SIA 262:2025, 4.3.6.2.5]
+    k_e = 0.65
+
+Wirksamer Umfang des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.3]
+    u = k_e \cdot u_{red} = 0.65 \cdot 784\,\mathrm{mm} = 509\,\mathrm{mm}
+
+Bemessungswert der Querkraft
+----------------------------
+
+Keine Flächenlast im Schnitt abgezogen   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d = 80\,\mathrm{kN}
+
+Plattenrotation
+---------------
+
+Abstand zum Momentennullpunkt in x   [SIA 262:2025, 4.3.6.4.4]
+    r_{sx} = 0.22 \cdot l_x = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Abstand zum Momentennullpunkt in y   [SIA 262:2025, 4.3.6.4.4]
+    r_{sy} = 0.22 \cdot l_y = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+
+Plattenrotation in y   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_y = 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+
+Massgebende Plattenrotation: die grössere   [SIA 262:2025, 4.3.6.4.1]
+    \psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0215;\ 0.0215\right] = 0.0215
+
+Durchstanzwiderstand
+--------------------
+
+Beiwert der Gesteinskörnung   [SIA 262:2025, 4.3.3.2.1]
+    \begin{aligned}
+      k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+      &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+      &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+    \end{aligned}
+
+Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn   [SIA 262:2025, 4.3.6.3.2, (59)]
+    \begin{aligned}
+      k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
+      &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0215 \cdot 234 \cdot 1.2}\right] \\
+      &= 0.652 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+    \end{aligned}
+
+Durchstanzwiderstand ohne Durchstanzbewehrung   [SIA 262:2025, 4.3.6.3.1]
+    V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 0.652 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 509\,\mathrm{mm} = 85.1\,\mathrm{kN}
+
+Querkraft gegen Durchstanzwiderstand
+    V_{d,red} = 80\,\mathrm{kN} \quad \le \quad V_{Rd,c} = 85.1\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{85.1\,\mathrm{kN}}{80\,\mathrm{kN}} = 1.06 \quad \Rightarrow \quad \text{erfüllt}
+
+Durchstanzen: Ovalstütze
+------------------------
+
+Plattendicke
+    h = 400\,\mathrm{mm}
+
+Überdeckung der Zugbewehrung unten
+    c_{nom} = 40\,\mathrm{mm}
+
+Grösstkorndurchmesser
+    D_{max} = 32\,\mathrm{mm}
+
+Stabdurchmesser in x
+    \varnothing_x = 20\,\mathrm{mm}
+
+Stababstand in x
+    s_x = 150\,\mathrm{mm}
+
+Stabdurchmesser in y
+    \varnothing_y = 20\,\mathrm{mm}
+
+Stababstand in y
+    s_y = 150\,\mathrm{mm}
+
+Abmessung der Stütze in x
+    b_x = 1200\,\mathrm{mm}
+
+Abmessung der Stütze in y
+    b_y = 300\,\mathrm{mm}
+
+Bemessungswert der Auflagerkraft
+    V_d = 1400\,\mathrm{kN}
+
+Flächenlast im Nachweisschnitt: Bodenpressung
+    q_d = 150\,\mathrm{kN}/\mathrm{m}^{2}
+
+Abstand zum Momentennullpunkt in x
+    r_{sx} = 2\,\mathrm{m}
+
+Abstand zum Momentennullpunkt in y
+    r_{sy} = 1.6\,\mathrm{m}
+
+Mittleres Moment im Stützstreifen, x
+    m_{sd,x} = 180\,\mathrm{kNm}/\mathrm{m}
+
+Mittleres Moment im Stützstreifen, y
+    m_{sd,y} = 150\,\mathrm{kNm}/\mathrm{m}
+
+Durchstanzen
+------------
+
+Statische Höhe der Lage in x (aussen)
+    d_x = h - c_{nom} - \frac{\varnothing_x}{2} = 400\,\mathrm{mm} - 40\,\mathrm{mm} - \frac{20\,\mathrm{mm}}{2} = 350\,\mathrm{mm}
+
+Statische Höhe der Lage in y (innen)
+    d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 400\,\mathrm{mm} - 40\,\mathrm{mm} - 20\,\mathrm{mm} - \frac{20\,\mathrm{mm}}{2} = 330\,\mathrm{mm}
+
+Mittlere statische Höhe der beiden Lagen der Zugbewehrung   [SIA 262:2025, 4.3.6.2.1]
+    d = \frac{d_x + d_y}{2} = \frac{350\,\mathrm{mm} + 330\,\mathrm{mm}}{2} = 340\,\mathrm{mm}
+
+Wirksame statische Höhe: die gestützte Fläche reicht nicht in die Platte   [SIA 262:2025, 4.3.6.2.1, Figur 21]
+    d_v = d = 340\,\mathrm{mm}
+
+Nachweisschnitt
+---------------
+
+Nachweisschnitt im Abstand d_v/2, soweit er in der Platte liegt   [SIA 262:2025, 4.3.6.2.2, Figur 22]
+    u_0 = 3811\,\mathrm{mm}
+
+Was hinter Aussparungen nicht zählt   [SIA 262:2025, 4.3.6.2.3, Figur 23d]
+    \Delta u_A = 353\,\mathrm{mm}
+
+Nachweisschnitt ohne das, was nicht zählt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0 - \Delta u_A = 3811\,\mathrm{mm} - 353\,\mathrm{mm} = 3458\,\mathrm{mm}
+
+Momentenübertragung
+-------------------
+
+Näherung für Innenstützen mit grossen Aussparungen in Stützennähe   [SIA 262:2025, 4.3.6.2.5]
+    k_e = 0.7
+
+Wirksamer Umfang des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.3]
+    u = k_e \cdot u_{red} = 0.7 \cdot 3458\,\mathrm{mm} = 2420\,\mathrm{mm}
+
+Bemessungswert der Querkraft
+----------------------------
+
+Fläche innerhalb des Nachweisschnitts, ohne Aussparungen
+    A_q = 0.898\,\mathrm{m}^{2}
+
+Bodenpressung innerhalb des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.6]
+    \Delta V_d = q_d \cdot A_q = 150\,\mathrm{kN}/\mathrm{m}^{2} \cdot 0.898\,\mathrm{m}^{2} = 134.7\,\mathrm{kN}
+
+Bemessungswert der Querkraft im Nachweisschnitt   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d - \Delta V_d = 1400\,\mathrm{kN} - 134.7\,\mathrm{kN} = 1265.3\,\mathrm{kN}
+
+Plattenrotation
+---------------
+
+Bewehrung in x je Meter
+    a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(20\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 2094\,\mathrm{mm}^{2}/\mathrm{m}
+
+Druckzonenhöhe in x, je Meter
+    x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{2094\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 53.6\,\mathrm{mm}
+
+Biegewiderstand im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.5]
+    \begin{aligned}
+      m_{Rd,x} &= a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right) \\
+      &= 2094\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(350\,\mathrm{mm} - \frac{0.85 \cdot 53.6\,\mathrm{mm}}{2}\right) \\
+      &= 298\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Bewehrung in y je Meter
+    a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(20\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 2094\,\mathrm{mm}^{2}/\mathrm{m}
+
+Druckzonenhöhe in y, je Meter
+    x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{2094\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 53.6\,\mathrm{mm}
+
+Biegewiderstand im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.5]
+    \begin{aligned}
+      m_{Rd,y} &= a_{s,y} \cdot f_{yd} \cdot \left(d_y - \frac{0.85 \cdot x_y}{2}\right) \\
+      &= 2094\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(330\,\mathrm{mm} - \frac{0.85 \cdot 53.6\,\mathrm{mm}}{2}\right) \\
+      &= 279.8\,\mathrm{kNm}/\mathrm{m}
+    \end{aligned}
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \begin{aligned}
+      \psi_x &= 1.2 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
+      &= 1.2 \cdot \frac{2\,\mathrm{m}}{340\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{180\,\mathrm{kNm}/\mathrm{m}}{298\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+      &= 0.0072
+    \end{aligned}
+
+Plattenrotation in y   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \begin{aligned}
+      \psi_y &= 1.2 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,y}}{m_{Rd,y}}\right)^{3/2} \\
+      &= 1.2 \cdot \frac{1.6\,\mathrm{m}}{340\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{150\,\mathrm{kNm}/\mathrm{m}}{279.8\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+      &= 0.0048
+    \end{aligned}
+
+Massgebende Plattenrotation: die grössere   [SIA 262:2025, 4.3.6.4.1]
+    \psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0072;\ 0.0048\right] = 0.0072
+
+Durchstanzwiderstand
+--------------------
+
+Beiwert der Gesteinskörnung   [SIA 262:2025, 4.3.3.2.1]
+    \begin{aligned}
+      k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+      &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+      &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+    \end{aligned}
+
+Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn   [SIA 262:2025, 4.3.6.3.2, (59)]
+    \begin{aligned}
+      k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
+      &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0072 \cdot 340 \cdot 1.2}\right] \\
+      &= 1.021 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+    \end{aligned}
+
+Durchstanzwiderstand ohne Durchstanzbewehrung   [SIA 262:2025, 4.3.6.3.1]
+    \begin{aligned}
+      V_{Rd,c} &= k_r \cdot \tau_{cd} \cdot d_v \cdot u \\
+      &= 1.021 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 340\,\mathrm{mm} \cdot 2420\,\mathrm{mm} \\
+      &= 920.8\,\mathrm{kN}
+    \end{aligned}
+
+Querkraft gegen Durchstanzwiderstand
+    V_{d,red} = 1265.3\,\mathrm{kN} \quad > \quad V_{Rd,c} = 920.8\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{920.8\,\mathrm{kN}}{1265.3\,\mathrm{kN}} = 0.73 \quad \Rightarrow \quad \text{NICHT erfüllt}
+[i] Hinweis: ψ = 0.0072 ≤ 0.020: das Verformungsvermögen ist ohne Durchstanzbewehrung nach Gleichung
+(67) nicht nachgewiesen -- sonst sind die aufgezwungenen Verformungen nach 4.1.2 zu berücksichtigen
+(4.3.6.1.2).
+
+Durchstanzen: Wandende
+----------------------
+
+Plattendicke
+    h = 280\,\mathrm{mm}
+
+Überdeckung der Zugbewehrung oben
+    c_{nom} = 30\,\mathrm{mm}
+
+Grösstkorndurchmesser
+    D_{max} = 32\,\mathrm{mm}
+
+Stabdurchmesser in x
+    \varnothing_x = 16\,\mathrm{mm}
+
+Stababstand in x
+    s_x = 150\,\mathrm{mm}
+
+Stabdurchmesser in y
+    \varnothing_y = 16\,\mathrm{mm}
+
+Stababstand in y
+    s_y = 150\,\mathrm{mm}
+
+Dicke der Wand
+    t = 250\,\mathrm{mm}
+
+Bemessungswert der Auflagerkraft
+    V_d = 400\,\mathrm{kN}
+
+Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast
+    q_d = 0\,\mathrm{kN}/\mathrm{m}^{2}
+
+Spannweite in x
+    l_x = 7\,\mathrm{m}
+
+Spannweite in y
+    l_y = 7\,\mathrm{m}
+
+Durchstanzen
+------------
+
+Statische Höhe der Lage in x (aussen)
+    d_x = h - c_{nom} - \frac{\varnothing_x}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 242\,\mathrm{mm}
+
+Statische Höhe der Lage in y (innen)
+    d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 226\,\mathrm{mm}
+
+Mittlere statische Höhe der beiden Lagen der Zugbewehrung   [SIA 262:2025, 4.3.6.2.1]
+    d = \frac{d_x + d_y}{2} = \frac{242\,\mathrm{mm} + 226\,\mathrm{mm}}{2} = 234\,\mathrm{mm}
+
+Wirksame statische Höhe: die gestützte Fläche reicht nicht in die Platte   [SIA 262:2025, 4.3.6.2.1, Figur 21]
+    d_v = d = 234\,\mathrm{mm}
+
+Nachweisschnitt
+---------------
+
+Nachweisschnitt um das Wandende: 1.5·d_v entlang der Wand   [SIA 262:2025, 4.3.6.2.3, Figur 23b und c]
+    u_0 = t + 3 \cdot d_v + \frac{\pi \cdot d_v}{2} = 250\,\mathrm{mm} + 3 \cdot 234\,\mathrm{mm} + \frac{\pi \cdot 234\,\mathrm{mm}}{2} = 1320\,\mathrm{mm}
+
+Nichts mindert den Schnitt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0 = 1320\,\mathrm{mm}
+
+Momentenübertragung
+-------------------
+
+Näherung für Wandenden   [SIA 262:2025, 4.3.6.2.5]
+    k_e = 0.75
+
+Wirksamer Umfang des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.3]
+    u = k_e \cdot u_{red} = 0.75 \cdot 1320\,\mathrm{mm} = 990\,\mathrm{mm}
+
+Bemessungswert der Querkraft
+----------------------------
+
+Keine Flächenlast im Schnitt abgezogen   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d = 400\,\mathrm{kN}
+
+Plattenrotation
+---------------
+[i] Hinweis: Für Wandenden nennt 4.3.6.4.7 keine Momente im Stützstreifen: gerechnet wie in
+Näherungsstufe 1, mit m_sd/m_Rd = 1.
+
+Abstand zum Momentennullpunkt in x   [SIA 262:2025, 4.3.6.4.4]
+    r_{sx} = 0.22 \cdot l_x = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Abstand zum Momentennullpunkt in y   [SIA 262:2025, 4.3.6.4.4]
+    r_{sy} = 0.22 \cdot l_y = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+
+Plattenrotation in y   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_y = 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+
+Massgebende Plattenrotation: die grössere   [SIA 262:2025, 4.3.6.4.1]
+    \psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0215;\ 0.0215\right] = 0.0215
+
+Durchstanzwiderstand
+--------------------
+
+Beiwert der Gesteinskörnung   [SIA 262:2025, 4.3.3.2.1]
+    \begin{aligned}
+      k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+      &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+      &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+    \end{aligned}
+
+Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn   [SIA 262:2025, 4.3.6.3.2, (59)]
+    \begin{aligned}
+      k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
+      &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0215 \cdot 234 \cdot 1.2}\right] \\
+      &= 0.652 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+    \end{aligned}
+
+Durchstanzwiderstand ohne Durchstanzbewehrung   [SIA 262:2025, 4.3.6.3.1]
+    V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 0.652 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 990\,\mathrm{mm} = 165.3\,\mathrm{kN}
+
+Querkraft gegen Durchstanzwiderstand
+    V_{d,red} = 400\,\mathrm{kN} \quad > \quad V_{Rd,c} = 165.3\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{165.3\,\mathrm{kN}}{400\,\mathrm{kN}} = 0.41 \quad \Rightarrow \quad \text{NICHT erfüllt}
+
+Durchstanzen: Wandecke
+----------------------
+
+Plattendicke
+    h = 280\,\mathrm{mm}
+
+Überdeckung der Zugbewehrung oben
+    c_{nom} = 30\,\mathrm{mm}
+
+Grösstkorndurchmesser
+    D_{max} = 32\,\mathrm{mm}
+
+Stabdurchmesser in x
+    \varnothing_x = 16\,\mathrm{mm}
+
+Stababstand in x
+    s_x = 150\,\mathrm{mm}
+
+Stabdurchmesser in y
+    \varnothing_y = 16\,\mathrm{mm}
+
+Stababstand in y
+    s_y = 150\,\mathrm{mm}
+
+Dicke der Wand
+    t = 250\,\mathrm{mm}
+
+Bemessungswert der Auflagerkraft
+    V_d = 300\,\mathrm{kN}
+
+Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast
+    q_d = 0\,\mathrm{kN}/\mathrm{m}^{2}
+
+Spannweite in x
+    l_x = 7\,\mathrm{m}
+
+Spannweite in y
+    l_y = 7\,\mathrm{m}
+
+Durchstanzen
+------------
+
+Statische Höhe der Lage in x (aussen)
+    d_x = h - c_{nom} - \frac{\varnothing_x}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 242\,\mathrm{mm}
+
+Statische Höhe der Lage in y (innen)
+    d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 226\,\mathrm{mm}
+
+Mittlere statische Höhe der beiden Lagen der Zugbewehrung   [SIA 262:2025, 4.3.6.2.1]
+    d = \frac{d_x + d_y}{2} = \frac{242\,\mathrm{mm} + 226\,\mathrm{mm}}{2} = 234\,\mathrm{mm}
+
+Wirksame statische Höhe: die gestützte Fläche reicht nicht in die Platte   [SIA 262:2025, 4.3.6.2.1, Figur 21]
+    d_v = d = 234\,\mathrm{mm}
+
+Nachweisschnitt
+---------------
+
+Nachweisschnitt um die Wandecke: je 1.5·d_v entlang der Wände   [SIA 262:2025, 4.3.6.2.3, Figur 23b und c]
+    u_0 = 3 \cdot d_v + \frac{\pi \cdot d_v}{4} = 3 \cdot 234\,\mathrm{mm} + \frac{\pi \cdot 234\,\mathrm{mm}}{4} = 886\,\mathrm{mm}
+
+Nichts mindert den Schnitt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0 = 886\,\mathrm{mm}
+
+Momentenübertragung
+-------------------
+
+Näherung für Wandecken   [SIA 262:2025, 4.3.6.2.5]
+    k_e = 0.75
+
+Wirksamer Umfang des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.3]
+    u = k_e \cdot u_{red} = 0.75 \cdot 886\,\mathrm{mm} = 664\,\mathrm{mm}
+
+Bemessungswert der Querkraft
+----------------------------
+
+Keine Flächenlast im Schnitt abgezogen   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d = 300\,\mathrm{kN}
+
+Plattenrotation
+---------------
+[i] Hinweis: Für Wandecken nennt 4.3.6.4.7 keine Momente im Stützstreifen: gerechnet wie in
+Näherungsstufe 1, mit m_sd/m_Rd = 1.
+
+Abstand zum Momentennullpunkt in x   [SIA 262:2025, 4.3.6.4.4]
+    r_{sx} = 0.22 \cdot l_x = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Abstand zum Momentennullpunkt in y   [SIA 262:2025, 4.3.6.4.4]
+    r_{sy} = 0.22 \cdot l_y = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+
+Plattenrotation in y   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_y = 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+
+Massgebende Plattenrotation: die grössere   [SIA 262:2025, 4.3.6.4.1]
+    \psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0215;\ 0.0215\right] = 0.0215
+
+Durchstanzwiderstand
+--------------------
+
+Beiwert der Gesteinskörnung   [SIA 262:2025, 4.3.3.2.1]
+    \begin{aligned}
+      k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+      &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+      &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+    \end{aligned}
+
+Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn   [SIA 262:2025, 4.3.6.3.2, (59)]
+    \begin{aligned}
+      k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
+      &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0215 \cdot 234 \cdot 1.2}\right] \\
+      &= 0.652 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+    \end{aligned}
+
+Durchstanzwiderstand ohne Durchstanzbewehrung   [SIA 262:2025, 4.3.6.3.1]
+    V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 0.652 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 664\,\mathrm{mm} = 111\,\mathrm{kN}
+
+Querkraft gegen Durchstanzwiderstand
+    V_{d,red} = 300\,\mathrm{kN} \quad > \quad V_{Rd,c} = 111\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{111\,\mathrm{kN}}{300\,\mathrm{kN}} = 0.37 \quad \Rightarrow \quad \text{NICHT erfüllt}
+
 Grundbruch: Hang
 ----------------
 
@@ -7318,6 +8274,147 @@ Widerstandsmoment zum gezogensten Betonpunkt
 Widerstandsmoment zum gezogensten Betonpunkt
     W = \frac{I_y \cdot I_z - I_{yz}^{2}}{I_y \cdot y' - I_{yz} \cdot z'}
 
+Durchstanzen
+------------
+
+Innenstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu;
+ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die
+Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss
+und desto kleiner k_r.
+
+Bei regelmässig gestützten Flachdecken mit gleichmässigen angrenzenden Spannweiten und biegesteif
+angeschlossenen Stützen, die nicht für die Aufnahme horizontaler Einwirkungen ausgelegt sind, darf
+k_e näherungsweise angenommen werden.
+
+Näherungsstufe 2: die mittleren Momente im Stützstreifen nach den Gleichungen (62) bis (65).
+
+Randstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu;
+ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die
+Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss
+und desto kleiner k_r.
+
+Der Schnitt endet am Plattenrand: so ist er kürzer als der geschlossene (Figur 22d). Was jenseits
+des Rands läge, zählt nicht.
+
+e_u ist der Abstand zwischen der Resultierenden der Auflagerkraft -- in der Stützenachse, verschoben
+um die Exzentrizität e_x, e_y -- und dem Schwerpunkt der zählenden Teile des Nachweisschnitts.
+
+Eckstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu;
+ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die
+Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss
+und desto kleiner k_r.
+
+Näherungsstufe 1: für regelmässig gestützte Flachdecken mit 0.5 ≤ l_x/l_y ≤ 2 ohne grosse
+Umlagerung: m_sd/m_Rd = 1.
+
+Innenstütze einer Bodenplatte. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen
+Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark
+sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische
+Schubriss und desto kleiner k_r.
+
+Hinter einer Aussparung, die näher als 5·d_v am Schnitt liegt, zählt nicht, was zwischen den beiden
+Strahlen von der Stützenachse an ihr vorbei liegt.
+
+Näherungsstufe 3: r_s und die mittleren Momente im Stützstreifen aus einer Berechnung nach der
+Elastizitätstheorie; 1.2 statt 1.5 vor der Klammer.
+
+Wandende einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu;
+ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die
+Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss
+und desto kleiner k_r.
+
+Wandecke einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu;
+ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die
+Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss
+und desto kleiner k_r.
+
+Statische Höhe der Lage in x (aussen)
+    d_x = h - c_{nom} - \frac{\varnothing_x}{2}
+
+Statische Höhe der Lage in y (innen)
+    d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2}
+
+Mittlere statische Höhe der beiden Lagen der Zugbewehrung   [SIA 262:2025, 4.3.6.2.1]
+    d = \frac{d_x + d_y}{2}
+
+Nachweisschnitt im Abstand d_v/2   [SIA 262:2025, 4.3.6.2.2, Figur 22b]
+    u_0 = 2 \cdot \left(b_x + b_y\right) + \pi \cdot d_v
+
+Nichts mindert den Schnitt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0
+
+Wirksamer Umfang des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.3]
+    u = k_e \cdot u_{red}
+
+Eigengewicht und Nutzlast innerhalb des Nachweisschnitts   [SIA 262:2025, 4.3.6.2.6]
+    \Delta V_d = q_d \cdot A_q
+
+Bemessungswert der Querkraft im Nachweisschnitt   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d - \Delta V_d
+
+Abstand zum Momentennullpunkt in x   [SIA 262:2025, 4.3.6.4.4]
+    r_{sx} = 0.22 \cdot l_x
+
+Bewehrung in x je Meter
+    a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x}
+
+Druckzonenhöhe in x, je Meter
+    x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}}
+
+Biegewiderstand im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.5]
+    m_{Rd,x} = a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right)
+
+Breite des Stützstreifens   [SIA 262:2025, 4.3.6.4.6, (61)]
+    b_s = \min\left[1.5 \cdot \sqrt{r_{sx} \cdot r_{sy}};\ l_{min}\right]
+
+Mittleres Moment im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.7, (62)]
+    m_{sd,x} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right)
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2}
+
+Massgebende Plattenrotation: die grössere   [SIA 262:2025, 4.3.6.4.1]
+    \psi = \max\left[\psi_x;\ \psi_y\right]
+
+Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn   [SIA 262:2025, 4.3.6.3.2, (59)]
+    k_r = \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+
+Durchstanzwiderstand ohne Durchstanzbewehrung   [SIA 262:2025, 4.3.6.3.1]
+    V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u
+
+Durchmesser des flächengleichen Kreises   [SIA 262:2025, 4.3.6.2.4]
+    b = \sqrt{\frac{4 \cdot A_u}{\pi}}
+
+Beiwert der Momentenübertragung   [SIA 262:2025, 4.3.6.2.4, (57)]
+    k_e = \frac{1}{1 + \frac{e_u}{b}}
+
+Mittleres Moment im Stützstreifen in x   [SIA 262:2025, 4.3.6.4.7, (63)]
+    m_{sd,x} = \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right);\ 0.25 \cdot V_{d,red}\right]
+
+Breite des Stützstreifens in y, durch den Plattenrand begrenzt   [SIA 262:2025, 4.3.6.4.6, Figur 25]
+    b_{sr,y} = \min\left[b_s;\ D + 2 \cdot \left(D + a_y\right)\right]
+
+Mittleres Moment im Stützstreifen in y   [SIA 262:2025, 4.3.6.4.7, (64)]
+    m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{sr,y}}\right)
+
+Keine Flächenlast im Schnitt abgezogen   [SIA 262:2025, 4.3.6.2.6]
+    V_{d,red} = V_d
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s}
+
+Nachweisschnitt ohne das, was nicht zählt   [SIA 262:2025, 4.3.6.2.3]
+    u_{red} = u_0 - \Delta u_A
+
+Plattenrotation in x   [SIA 262:2025, 4.3.6.4.1, (60)]
+    \psi_x = 1.2 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2}
+
+Nachweisschnitt um das Wandende: 1.5·d_v entlang der Wand   [SIA 262:2025, 4.3.6.2.3, Figur 23b und c]
+    u_0 = t + 3 \cdot d_v + \frac{\pi \cdot d_v}{2}
+
+Nachweisschnitt um die Wandecke: je 1.5·d_v entlang der Wände   [SIA 262:2025, 4.3.6.2.3, Figur 23b und c]
+    u_0 = 3 \cdot d_v + \frac{\pi \cdot d_v}{4}
+
 Fundament
 ---------
 
@@ -7974,6 +9071,141 @@ Kennzahlen
     Bezogene Druckzonenhöhe, Zug unten  \left(x/d\right)_{y}^{+}                           0.139
     Bezogene Druckzonenhöhe, Zug oben   \left(x/d\right)_{y}^{-}                           0.139
 
+Innenstütze
+-----------
+
+Angaben zur Durchstanzstelle
+    \text{Innenstütze, Decke, Beton C30/37} \qquad h = 280\,\mathrm{mm} \qquad b_x = 400\,\mathrm{mm} \qquad b_y = 400\,\mathrm{mm}
+
+Durchstanzen
+    Grösse                               Zeichen     Wert  Einheit
+    -----------------------------------  --------  ------  -------
+    Wirksame statische Höhe              d_v          234  mm
+    Nachweisschnitt, wirksam             u           2102  mm
+    Momentenübertragung                  k_e        0.900  –
+    Plattenrotation                      \psi      0.0186  –
+    Beiwert                              k_r        0.721  –
+    Querkraft im Schnitt                 V_d        894.5  kN
+    Widerstand ohne Durchstanzbewehrung  V_{Rd,c}   388.2  kN
+
+    Nachweis      Bezeichnung                                  Widerstand                      Einwirkung  \alpha_{eff}
+    ------------  ------------------------  -----------------------------  ------------------------------  ------------
+    Durchstanzen  ohne Durchstanzbewehrung  V_{Rd,c} = 388.2\,\mathrm{kN}  V_{d,red} = 894.5\,\mathrm{kN}          0.43
+[!] Warnung: Durchstanzen – ohne Durchstanzbewehrung: nicht erfüllt. V_d = 894.5 kN > V_Rd,c = 388.2
+kN.
+
+Randstütze
+----------
+
+Angaben zur Durchstanzstelle
+    \text{Randstütze, Decke, Beton C30/37} \qquad h = 300\,\mathrm{mm} \qquad D = 450\,\mathrm{mm} \qquad a_y = 100\,\mathrm{mm}
+
+Durchstanzen
+    Grösse                               Zeichen     Wert  Einheit
+    -----------------------------------  --------  ------  -------
+    Wirksame statische Höhe              d_v          254  mm
+    Nachweisschnitt, wirksam             u           1754  mm
+    Momentenübertragung                  k_e        0.999  –
+    Plattenrotation                      \psi      0.0157  –
+    Beiwert                              k_r        0.762  –
+    Querkraft im Schnitt                 V_d        494.9  kN
+    Widerstand ohne Durchstanzbewehrung  V_{Rd,c}   371.8  kN
+
+    Nachweis      Bezeichnung                                  Widerstand                      Einwirkung  \alpha_{eff}
+    ------------  ------------------------  -----------------------------  ------------------------------  ------------
+    Durchstanzen  ohne Durchstanzbewehrung  V_{Rd,c} = 371.8\,\mathrm{kN}  V_{d,red} = 494.9\,\mathrm{kN}          0.75
+[!] Warnung: Durchstanzen – ohne Durchstanzbewehrung: nicht erfüllt. V_d = 494.9 kN > V_Rd,c = 371.8
+kN.
+
+Eckstütze
+---------
+
+Angaben zur Durchstanzstelle
+    \text{Eckstütze, Decke, Beton C30/37} \qquad h = 280\,\mathrm{mm} \qquad b_x = 300\,\mathrm{mm} \qquad b_y = 300\,\mathrm{mm} \qquad a_x = 0\,\mathrm{mm} \qquad a_y = 0\,\mathrm{mm}
+
+Durchstanzen
+    Grösse                               Zeichen     Wert  Einheit
+    -----------------------------------  --------  ------  -------
+    Wirksame statische Höhe              d_v          234  mm
+    Nachweisschnitt, wirksam             u            509  mm
+    Momentenübertragung                  k_e        0.650  –
+    Plattenrotation                      \psi      0.0215  –
+    Beiwert                              k_r        0.652  –
+    Querkraft im Schnitt                 V_d         80.0  kN
+    Widerstand ohne Durchstanzbewehrung  V_{Rd,c}    85.1  kN
+
+    Nachweis      Bezeichnung                                 Widerstand                     Einwirkung  \alpha_{eff}
+    ------------  ------------------------  ----------------------------  -----------------------------  ------------
+    Durchstanzen  ohne Durchstanzbewehrung  V_{Rd,c} = 85.1\,\mathrm{kN}  V_{d,red} = 80.0\,\mathrm{kN}          1.06
+
+Ovalstütze
+----------
+
+Angaben zur Durchstanzstelle
+    \text{Innenstütze, Bodenplatte, Beton C30/37} \qquad h = 400\,\mathrm{mm} \qquad b_x = 1200\,\mathrm{mm} \qquad b_y = 300\,\mathrm{mm}
+
+Durchstanzen
+    Grösse                               Zeichen     Wert  Einheit
+    -----------------------------------  --------  ------  -------
+    Wirksame statische Höhe              d_v          340  mm
+    Nachweisschnitt, wirksam             u           2420  mm
+    Momentenübertragung                  k_e        0.700  –
+    Plattenrotation                      \psi      0.0072  –
+    Beiwert                              k_r        1.021  –
+    Querkraft im Schnitt                 V_d       1265.3  kN
+    Widerstand ohne Durchstanzbewehrung  V_{Rd,c}   920.8  kN
+
+    Nachweis      Bezeichnung                                  Widerstand                       Einwirkung  \alpha_{eff}
+    ------------  ------------------------  -----------------------------  -------------------------------  ------------
+    Durchstanzen  ohne Durchstanzbewehrung  V_{Rd,c} = 920.8\,\mathrm{kN}  V_{d,red} = 1265.3\,\mathrm{kN}          0.73
+[!] Warnung: Durchstanzen – ohne Durchstanzbewehrung: nicht erfüllt. V_d = 1265.3 kN > V_Rd,c =
+920.8 kN.
+
+Wandende
+--------
+
+Angaben zur Durchstanzstelle
+    \text{Wandende, Decke, Beton C30/37} \qquad h = 280\,\mathrm{mm} \qquad t = 250\,\mathrm{mm}
+
+Durchstanzen
+    Grösse                               Zeichen     Wert  Einheit
+    -----------------------------------  --------  ------  -------
+    Wirksame statische Höhe              d_v          234  mm
+    Nachweisschnitt, wirksam             u            990  mm
+    Momentenübertragung                  k_e        0.750  –
+    Plattenrotation                      \psi      0.0215  –
+    Beiwert                              k_r        0.652  –
+    Querkraft im Schnitt                 V_d        400.0  kN
+    Widerstand ohne Durchstanzbewehrung  V_{Rd,c}   165.3  kN
+
+    Nachweis      Bezeichnung                                  Widerstand                      Einwirkung  \alpha_{eff}
+    ------------  ------------------------  -----------------------------  ------------------------------  ------------
+    Durchstanzen  ohne Durchstanzbewehrung  V_{Rd,c} = 165.3\,\mathrm{kN}  V_{d,red} = 400.0\,\mathrm{kN}          0.41
+[!] Warnung: Durchstanzen – ohne Durchstanzbewehrung: nicht erfüllt. V_d = 400 kN > V_Rd,c = 165.3
+kN.
+
+Wandecke
+--------
+
+Angaben zur Durchstanzstelle
+    \text{Wandecke, Decke, Beton C30/37} \qquad h = 280\,\mathrm{mm} \qquad t = 250\,\mathrm{mm}
+
+Durchstanzen
+    Grösse                               Zeichen     Wert  Einheit
+    -----------------------------------  --------  ------  -------
+    Wirksame statische Höhe              d_v          234  mm
+    Nachweisschnitt, wirksam             u            664  mm
+    Momentenübertragung                  k_e        0.750  –
+    Plattenrotation                      \psi      0.0215  –
+    Beiwert                              k_r        0.652  –
+    Querkraft im Schnitt                 V_d        300.0  kN
+    Widerstand ohne Durchstanzbewehrung  V_{Rd,c}   111.0  kN
+
+    Nachweis      Bezeichnung                                  Widerstand                      Einwirkung  \alpha_{eff}
+    ------------  ------------------------  -----------------------------  ------------------------------  ------------
+    Durchstanzen  ohne Durchstanzbewehrung  V_{Rd,c} = 111.0\,\mathrm{kN}  V_{d,red} = 300.0\,\mathrm{kN}          0.37
+[!] Warnung: Durchstanzen – ohne Durchstanzbewehrung: nicht erfüllt. V_d = 300 kN > V_Rd,c = 111 kN.
+
 Hang
 ----
 
@@ -8237,6 +9469,96 @@ Werte
     Charakteristische Fliessgrenze                                                  f_{yk}                                                     500  N/mm²     Vorgabe
     Charakteristische Fliessgrenze auf Druck                                        f_{yk}^{-}                                                 500  N/mm²     Vorgabe
     Teilsicherheitsbeiwert für Betonstahl                                           \gamma_s                                                  1.15            Vorgabe
+    Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
+    Bemessungswert der Auflagerkraft                                                V_d                                                        900  kN        Vorgabe
+    Abmessung der Stütze in x                                                       b_x                                                        400  mm        Vorgabe
+    Abmessung der Stütze in y                                                       b_y                                                        400  mm        Vorgabe
+    Überdeckung der Zugbewehrung oben                                               c_{nom}                                                     30  mm        Vorgabe
+    Exzentrizität der Auflagerkraft in x                                            e_x                                                          0  mm        Vorgabe
+    Exzentrizität der Auflagerkraft in y                                            e_y                                                          0  mm        Vorgabe
+    Plattendicke                                                                    h                                                          280  mm        Vorgabe
+    Spannweite in x                                                                 l_x                                                          7  m         Vorgabe
+    Spannweite in y                                                                 l_y                                                          7  m         Vorgabe
+    Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung                            \alpha_{eff,DS}                                           0.43            berechnet
+    Stabdurchmesser in x                                                            \varnothing_x                                               16  mm        Vorgabe
+    Stabdurchmesser in y                                                            \varnothing_y                                               16  mm        Vorgabe
+    Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast                       q_d                                                         14  kN/m²     Vorgabe
+    Stababstand in x                                                                s_x                                                        150  mm        Vorgabe
+    Stababstand in y                                                                s_y                                                        150  mm        Vorgabe
+    Durchmesser der Stütze                                                          D                                                          450  mm        Vorgabe
+    Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
+    Bemessungswert der Auflagerkraft                                                V_d                                                        500  kN        Vorgabe
+    Abstand vom Plattenrand in y                                                    a_y                                                        100  mm        Vorgabe
+    Überdeckung der Zugbewehrung oben                                               c_{nom}                                                     30  mm        Vorgabe
+    Exzentrizität der Auflagerkraft in x                                            e_x                                                          0  mm        Vorgabe
+    Exzentrizität der Auflagerkraft in y                                            e_y                                                         80  mm        Vorgabe
+    Plattendicke                                                                    h                                                          300  mm        Vorgabe
+    Spannweite in x                                                                 l_x                                                          7  m         Vorgabe
+    Spannweite in y                                                                 l_y                                                          7  m         Vorgabe
+    Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung                            \alpha_{eff,DS}                                           0.75            berechnet
+    Stabdurchmesser in x                                                            \varnothing_x                                               16  mm        Vorgabe
+    Stabdurchmesser in y                                                            \varnothing_y                                               16  mm        Vorgabe
+    Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast                       q_d                                                         12  kN/m²     Vorgabe
+    Stababstand in x                                                                s_x                                                        150  mm        Vorgabe
+    Stababstand in y                                                                s_y                                                        150  mm        Vorgabe
+    Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
+    Bemessungswert der Auflagerkraft                                                V_d                                                         80  kN        Vorgabe
+    Abstand vom Plattenrand in x                                                    a_x                                                          0  mm        Vorgabe
+    Abstand vom Plattenrand in y                                                    a_y                                                          0  mm        Vorgabe
+    Abmessung der Stütze in x                                                       b_x                                                        300  mm        Vorgabe
+    Abmessung der Stütze in y                                                       b_y                                                        300  mm        Vorgabe
+    Überdeckung der Zugbewehrung oben                                               c_{nom}                                                     30  mm        Vorgabe
+    Plattendicke                                                                    h                                                          280  mm        Vorgabe
+    Spannweite in x                                                                 l_x                                                          7  m         Vorgabe
+    Spannweite in y                                                                 l_y                                                          7  m         Vorgabe
+    Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung                            \alpha_{eff,DS}                                           1.06            berechnet
+    Stabdurchmesser in x                                                            \varnothing_x                                               16  mm        Vorgabe
+    Stabdurchmesser in y                                                            \varnothing_y                                               16  mm        Vorgabe
+    Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast                       q_d                                                          0  kN/m²     Vorgabe
+    Stababstand in x                                                                s_x                                                        150  mm        Vorgabe
+    Stababstand in y                                                                s_y                                                        150  mm        Vorgabe
+    Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
+    Bemessungswert der Auflagerkraft                                                V_d                                                       1400  kN        Vorgabe
+    Abmessung der Stütze in x                                                       b_x                                                       1200  mm        Vorgabe
+    Abmessung der Stütze in y                                                       b_y                                                        300  mm        Vorgabe
+    Überdeckung der Zugbewehrung unten                                              c_{nom}                                                     40  mm        Vorgabe
+    Plattendicke                                                                    h                                                          400  mm        Vorgabe
+    Mittleres Moment im Stützstreifen, x                                            m_{sd,x}                                                   180  kNm/m     Vorgabe
+    Mittleres Moment im Stützstreifen, y                                            m_{sd,y}                                                   150  kNm/m     Vorgabe
+    Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung                            \alpha_{eff,DS}                                           0.73            berechnet
+    Stabdurchmesser in x                                                            \varnothing_x                                               20  mm        Vorgabe
+    Stabdurchmesser in y                                                            \varnothing_y                                               20  mm        Vorgabe
+    Flächenlast im Nachweisschnitt: Bodenpressung                                   q_d                                                        150  kN/m²     Vorgabe
+    Abstand zum Momentennullpunkt in x                                              r_{sx}                                                       2  m         Vorgabe
+    Abstand zum Momentennullpunkt in y                                              r_{sy}                                                     1.6  m         Vorgabe
+    Stababstand in x                                                                s_x                                                        150  mm        Vorgabe
+    Stababstand in y                                                                s_y                                                        150  mm        Vorgabe
+    Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
+    Bemessungswert der Auflagerkraft                                                V_d                                                        400  kN        Vorgabe
+    Überdeckung der Zugbewehrung oben                                               c_{nom}                                                     30  mm        Vorgabe
+    Plattendicke                                                                    h                                                          280  mm        Vorgabe
+    Spannweite in x                                                                 l_x                                                          7  m         Vorgabe
+    Spannweite in y                                                                 l_y                                                          7  m         Vorgabe
+    Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung                            \alpha_{eff,DS}                                           0.41            berechnet
+    Stabdurchmesser in x                                                            \varnothing_x                                               16  mm        Vorgabe
+    Stabdurchmesser in y                                                            \varnothing_y                                               16  mm        Vorgabe
+    Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast                       q_d                                                          0  kN/m²     Vorgabe
+    Stababstand in x                                                                s_x                                                        150  mm        Vorgabe
+    Stababstand in y                                                                s_y                                                        150  mm        Vorgabe
+    Dicke der Wand                                                                  t                                                          250  mm        Vorgabe
+    Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
+    Bemessungswert der Auflagerkraft                                                V_d                                                        300  kN        Vorgabe
+    Überdeckung der Zugbewehrung oben                                               c_{nom}                                                     30  mm        Vorgabe
+    Plattendicke                                                                    h                                                          280  mm        Vorgabe
+    Spannweite in x                                                                 l_x                                                          7  m         Vorgabe
+    Spannweite in y                                                                 l_y                                                          7  m         Vorgabe
+    Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung                            \alpha_{eff,DS}                                           0.37            berechnet
+    Stabdurchmesser in x                                                            \varnothing_x                                               16  mm        Vorgabe
+    Stabdurchmesser in y                                                            \varnothing_y                                               16  mm        Vorgabe
+    Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast                       q_d                                                          0  kN/m²     Vorgabe
+    Stababstand in x                                                                s_x                                                        150  mm        Vorgabe
+    Stababstand in y                                                                s_y                                                        150  mm        Vorgabe
+    Dicke der Wand                                                                  t                                                          250  mm        Vorgabe
     Länge des Fundaments                                                            L                                                            4  m         Vorgabe
     Neigung der Sohle                                                               \alpha                                                       5  °         Vorgabe
     Breite des Fundaments                                                           b                                                          1.6  m         Vorgabe

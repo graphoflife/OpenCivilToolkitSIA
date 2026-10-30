@@ -1,5 +1,5 @@
 ---
-erzeugt: fa69099c1f4f
+erzeugt: e3b226073a03
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1"
@@ -18,7 +18,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $\tau_{cd}$ | – | N/mm² | Zwischenwert |
-| $d_v^{+}$ | – | mm | [[Wirksame Höhe (Einlage nicht massgebend)]], [[Wirksame Höhe, um die Einlage vermindert]] |
+| $d_v^{+}$ | – | mm | [[Wirksame Höhe ohne Abzug]], [[Wirksame Höhe, um die Einlage vermindert]] |
 
 ## Beispiel
 

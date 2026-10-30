@@ -44,6 +44,46 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-30 · Durchstanzen: die App, noch ohne Durchstanzbewehrung
+
+Die neue App «Durchstanzen» (Kennungen d1, d2 …): Decke oder Bodenplatte,
+Innen-, Rand- und Eckstütze, Wandende und Wandecke; Rechteck-, Rund- und
+Ovalstütze; Plattendicke, Überdeckung der Zugbewehrung, Grösstkorn, Beton
+und Betonstahl; die Biegebewehrung je Richtung mit der Lage, die aussen
+liegt; die Plattenrotation in den Näherungsstufen 1 bis 3; die Auflagerkraft,
+die Flächenlast im Schnitt und k_e aus der Näherung oder aus der
+Exzentrizität. Gerechnet wird der Widerstand ohne Durchstanzbewehrung
+(`durchstanzen/nachweis.py`, Gleichungen (57) bis (65)), mit Herleitung,
+Zusammenfassung und einem Grundriss im Reiter «Diagramme»: Stütze,
+Plattenrand, Aussparungen und der Schnitt -- was nicht zählt, gestrichelt.
+
+Die **Ovalstütze** ist ein Rechteck mit halbrunden Enden, b_x × b_y über
+alles. So heisst sie in der Software von Leviat; der Benutzer sprach von
+«halbrunden Stützen mit speziellem Namen». Der Kern einer Stütze ist ohnehin
+ein konvexer Kern mit Radius, die Ovalstütze ist also eine Strecke mit Radius.
+Ihre geraden Seiten zählen wie die einer Rechteckstütze 1.5·d_v von jedem
+Ende her.
+
+**Decke und Bodenplatte** rechnen gleich. Verschieden ist nur, was im
+Schnitt abgezogen wird (4.3.6.2.6): Eigengewicht und Nutzlast bzw. die
+Bodenpressung, beide als Bemessungswert q_d. Ausserdem wechselt die
+Zugbewehrung ihre Seite (oben bzw. unten), und mit ihr die Überdeckung.
+
+Die **Aussparungen** verweisen auf Knoten im Grundriss, wie die Flächen der
+Querschnittsanalyse. Gezeichnet werden sie im nächsten Schritt in einem
+Zeichenfenster. Danach kommen die Durchstanzbewehrung (Produkte von
+AncoTech und Leviat) und die Stahlpilze.
+
+Gelesen, wo die Norm es offen lässt (in [[TODO]]): die Breite b_sr nach
+Figur 25; Stufe 2 an Wänden rechnet wie Stufe 1, weil 4.3.6.4.7 dort keine
+Momente nennt; jede Aussparung im Schatten gilt als «gross» für k_e = 0.7.
+
+Nebenbei: die Linien des Schnitts für das Bild wurden zu grob gekürzt -- es
+wurde nur mit dem nächsten Punkt verglichen, und ein Bogen wurde zum
+Vieleck. Jetzt nach Douglas und Peucker.
+
+---
+
 ## 2026-10-30 · Durchstanzen, erster Baustein: der Nachweisschnitt
 
 Wunsch des Benutzers: eine App für den Durchstanznachweis nach SIA 262:2025,

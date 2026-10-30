@@ -1,5 +1,5 @@
 ---
-erzeugt: 020b1fd4b0bb
+erzeugt: ee746274587b
 art: formel
 tags: [formel]
 ---
@@ -48,6 +48,7 @@ $$
 - [[Knicken]]
 - [[Duktilität je Richtung]]
 - [[Sprödes Versagen je Richtung]]
+- [[Durchstanzen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

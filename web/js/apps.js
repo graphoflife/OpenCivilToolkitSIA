@@ -1,7 +1,7 @@
 /**
  * apps.js -- die Apps der linken Tafel, je eine Zeile.
  *
- * Eine App hat links einen Knopf: die Materialien, die fünf Bauteilarten
+ * Eine App hat links einen Knopf: die Materialien, die sechs Bauteilarten
  * (ARTEN, arten.js) und Python. Was Baum, Editor und rechte Tafel von ihr
  * wissen müssen, steht in ihrer Zeile: ihre Liste im Projekt und die Gruppen
  * unter dem Knopf, wie ein Eintrag heisst und was rechts in ihm steht, wie er
@@ -23,6 +23,7 @@ import { materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor, balkensystemFenster } from './balkensystem.js';
+import { durchstanzEditor } from './durchstanzen.js';
 import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
 import { skriptZeichnen } from './python.js';
@@ -248,6 +249,25 @@ const SYSTEM = bauteil('balkensystem', {
   fenster: balkensystemFenster,
 });
 
+/**
+ * Eine Innenstütze mit den Vorgaben des Kerns, ohne Einwirkung -- Beton und
+ * Betonstahl die ersten des Projekts, wie bei der Platte.
+ */
+const DURCHSTANZEN = bauteil('durchstanzen', {
+  kurztext: (d) => {
+    if (d.lage === 'wandende' || d.lage === 'wandecke') return `Wand ${d.t} mm`;
+    return d.form === 'rund' ? `⌀${d.D} mm` : `${d.b_x}×${d.b_y} mm`;
+  },
+  anlegen: (a) => nachVorlage(a, 'neue_durchstanzstelle', {
+    braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
+    einrichten: (d, { beton, betonstahl }) => {
+      d.beton = beton.kennung;
+      d.stahl = betonstahl.kennung;
+    },
+  }),
+  editor: durchstanzEditor,
+});
+
 /** Ein Fundament mit den Vorgaben des Kerns und einer Kombination -- ohne Material. */
 const GRUNDBRUCH = bauteil('grundbruch', {
   kurztext: (g) => `${g.b}×${g.L} m`,
@@ -288,7 +308,7 @@ const SKRIPT = {
 };
 
 /** Die Apps, in der Folge ihrer Knöpfe: das Material, die Bauteilarten wie ARTEN, Python. */
-export const APPS = [MATERIAL, PLATTE, ANALYSE, SYSTEM, GRUNDBRUCH, SETZUNG, SKRIPT];
+export const APPS = [MATERIAL, PLATTE, ANALYSE, SYSTEM, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, SKRIPT];
 
 /** Die App, wie die Auswahl sie nennt: 'material', 'skript' oder eine Bauteilart. */
 export function appVon(name) {
