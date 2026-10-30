@@ -276,6 +276,11 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 Diese Punkte sind **nicht** entschieden. Ich habe je eine Annahme eingebaut und
 sie hier notiert; keine davon ist nachgeschlagen.
 
+- [ ] **Durchstanzen, Begrenzung auf 1.5·d_v (Figur 23a bis c).** Eingebaut:
+      eine gerade Strecke des Nachweisschnitts zählt 1.5·d_v von jeder Ecke
+      der gestützten Fläche und entlang einer Wand von ihrem Ende her; eine
+      Strecke, die von einer Ecke zum freien Plattenrand läuft (Figur 22d),
+      zählt ganz.
 - [ ] **Die Grenze des Nachweises gegen Fliessen.** Eingebaut `f_yd − 80 MPa`,
       weil Tabelle 17 ausdrücklich `f_yd` nennt — mit charakteristischen
       Werten in der Rechnung mischt das zwei Niveaus, ist aber die strengere

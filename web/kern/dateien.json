@@ -23,6 +23,8 @@
     "opencivil/core/suche.py": "4c028717991f",
     "opencivil/core/wahl.py": "008cf530557e",
     "opencivil/core/wert.py": "e57d148c8aed",
+    "opencivil/durchstanzen/__init__.py": "d9cd66cb6e4e",
+    "opencivil/durchstanzen/schnitt.py": "2092bf30fa22",
     "opencivil/ergebnis.py": "e09b30f5e5e6",
     "opencivil/geotechnik/__init__.py": "fcd9f17873f7",
     "opencivil/geotechnik/grundbruch.py": "aefcb9f630ab",

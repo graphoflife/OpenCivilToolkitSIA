@@ -1,5 +1,5 @@
 ---
-erzeugt: c14b2976a4ab
+erzeugt: bffc012fb38f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -27,6 +27,8 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.suche]] – wo eine steigende Funktion null wird.
     - [[opencivil.core.wahl]] – was ein Wahlfeld annehmen kann.
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
+- [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
+    - [[opencivil.durchstanzen.schnitt]] – der Nachweisschnitt um die gestützte Fläche.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
     - [[opencivil.geotechnik.grundbruch]] – Grundbruch und Gleiten eines Flachfundaments.

@@ -44,6 +44,31 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-30 · Durchstanzen, erster Baustein: der Nachweisschnitt
+
+Wunsch des Benutzers: eine App für den Durchstanznachweis nach SIA 262:2025,
+4.3.6, im Stil der AncoTech-Software. Die Normstellen 4.3.6.1 bis 4.3.6.7
+(S. 60–66) hat er als PDF geliefert.
+
+Der erste Baustein ist die Geometrie (`durchstanzen/schnitt.py`): der
+Nachweisschnitt im Abstand d_v/2 um die gestützte Fläche (Figur 22) und was
+von ihm nicht zählt (Figur 23, kumulativ) -- an grossen Stützen die geraden
+Stücke weiter als 1.5·d_v von einer Ecke, jenseits des Plattenrands, und
+hinter einer Aussparung, die näher als 5·d_v liegt. Am Rand werden der
+geschlossene Schnitt und die zum Rand gerechnet; es gilt der kürzere
+(Figur 22d). Eine Stütze ist ein konvexer Kern mit einem Radius (Rechteck,
+Rundstütze); Wandende und Wandecke haben ihren eigenen Schnitt (Figur 23b
+und c). Gerechnet wird mit Teilstücken von 1 mm, die je zählen oder nicht;
+so braucht kein Zusammentreffen von Rand, Ecke und Aussparung eine eigene
+Formel. Die Tests prüfen die Fälle der Figuren gegen ihre Formeln von Hand.
+
+Gelesen, wo die Norm es offen lässt (nicht nachgeschlagen, in [[TODO]]):
+eine Strecke, die von einer Ecke zum freien Plattenrand läuft, zählt ganz
+-- die Begrenzung auf 1.5·d_v gilt zwischen zwei Ecken und entlang einer
+Wand.
+
+---
+
 ## 2026-10-25 · Aufbau: die Nachweise nur noch beim Bauteil
 
 Aus der Strukturdurchsicht, der Rest: jeder Nachweis stand zweimal im
