@@ -44,6 +44,19 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-30 · Durchstanzen: Aussparungen im Zeichenfenster
+
+Die Aussparungen einer Durchstanzstelle entstehen jetzt in einem
+Zeichenfenster unter «Durchstanzstelle», wie die Flächen der
+Querschnittsanalyse: das Werkzeug «Aussparung» zeichnet ein Polygon, ein
+«Hilfspunkt» setzt einen Knoten zum Fangen; Ecken und Knoten verschiebt man
+mit V oder in den Feldern des schwebenden Fensters. Darunter liegt, was der
+Kern zuletzt gerechnet hat: Stütze oder Wand, Plattenrand und
+Nachweisschnitt, gezeichnet von derselben Funktion wie das Bild im Reiter
+«Diagramme» (`ds_grundriss.js`). Die Ecken der Stütze fangen den Zeiger.
+
+---
+
 ## 2026-10-30 · Durchstanzen: die App, noch ohne Durchstanzbewehrung
 
 Die neue App «Durchstanzen» (Kennungen d1, d2 …): Decke oder Bodenplatte,

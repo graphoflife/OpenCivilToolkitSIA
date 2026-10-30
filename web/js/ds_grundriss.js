@@ -12,7 +12,8 @@
  * Bild etwas anderes als in den Eingaben, ist die Rechnung noch nicht
  * zurück. Zwei Bilder zeichnen damit: die Karte im Reiter «Diagramme» und
  * das Zeichenfenster, in dem die Aussparungen entstehen (ds_zeichnung.js) --
- * beide über `grundrissTeile`.
+ * beide über `grundrissTeile`; das Zeichenfenster gibt ihm die Aussparungen,
+ * wie sie gerade gezeichnet sind.
  */
 
 import { karte } from './bausteine.js';
@@ -55,10 +56,10 @@ function jenseits([[x0, y0], [x1, y1]], { punkt, richtung }) {
 /**
  * Die Teile des Grundrisses als SVG, für ein Bild mit der Abbildung `bild`
  * (mm -> px) und dem sichtbaren Ausschnitt `sicht` in mm -- bis dorthin
- * reichen die Plattenränder. `aussparungen: false` lässt die Aussparungen
- * weg: das Zeichenfenster zeichnet sie selbst, wie sie gerade gezeichnet sind.
+ * reichen die Plattenränder. `aussparungen` in mm, unter Stütze und Schnitt:
+ * die der Lösung, oder im Zeichenfenster die, wie sie gerade gezeichnet sind.
  */
-export function grundrissTeile(s, bild, sicht, { aussparungen = true } = {}) {
+export function grundrissTeile(s, bild, sicht, aussparungen = s.aussparungen) {
   const px = (punkte) => punkte.map(bild);
   const teile = [];
   for (const r of s.raender) {
@@ -73,9 +74,7 @@ export function grundrissTeile(s, bild, sicht, { aussparungen = true } = {}) {
       [r.punkt[0] + weit * t[0], r.punkt[1] + weit * t[1]],
     ]), 'ds-rand'));
   }
-  if (aussparungen) {
-    for (const a of s.aussparungen) teile.push(...aussparungTeile(px(a)));
-  }
+  for (const a of aussparungen) teile.push(...aussparungTeile(px(a)));
   teile.push(svgEl('path', { d: pfadVon(px(s.umriss), true), class: 'ds-stuetze' }));
   for (const l of s.schnitt) {
     teile.push(linie(px(l.punkte), l.zaehlt ? 'ds-schnitt' : 'ds-schnitt-nicht'));

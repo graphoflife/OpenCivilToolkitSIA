@@ -24,6 +24,7 @@ import { plattenEditor, plattenFenster } from './platte.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor, balkensystemFenster } from './balkensystem.js';
 import { durchstanzEditor } from './durchstanzen.js';
+import { fensterVergessen as durchstanzfensterVergessen } from './ds_zeichnung.js';
 import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
 import { skriptZeichnen } from './python.js';
@@ -260,11 +261,13 @@ const DURCHSTANZEN = bauteil('durchstanzen', {
   },
   anlegen: (a) => nachVorlage(a, 'neue_durchstanzstelle', {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
+    vorher: durchstanzfensterVergessen,
     einrichten: (d, { beton, betonstahl }) => {
       d.beton = beton.kennung;
       d.stahl = betonstahl.kennung;
     },
   }),
+  vergessen: durchstanzfensterVergessen,
   editor: durchstanzEditor,
 });
 

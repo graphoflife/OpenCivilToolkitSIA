@@ -5,6 +5,7 @@
  *
  *     Durchstanzstelle   Bezeichnung; Decke oder Bodenplatte; Lage der
  *                        gestützten Fläche, Form und Masse, Randabstände
+ *     Grundriss          das Zeichenfenster: Aussparungen (ds_zeichnung.js)
  *     Platte             Dicke, Überdeckung, Grösstkorn, Beton und Stahl
  *     Biegebewehrung     ⌀ und Abstand je Richtung, welche Lage aussen liegt
  *     Plattenrotation    Näherungsstufe; Spannweiten oder r_s und m_sd
@@ -20,6 +21,7 @@ import {
   erklaerung, feld, karte, panel, wahlBlock, wahlSchalter, zahlzeile as feldzeile,
 } from './bausteine.js';
 import { auswahl, el } from './dom.js';
+import { zeichenbereich } from './ds_zeichnung.js';
 import { eintragAendern, materialien, zustand } from './zustand.js';
 
 const HILFE = {
@@ -135,6 +137,14 @@ function stellePanel(d) {
   ]);
 }
 
+/** Das Zeichenfenster: Aussparungen zeichnen, darunter Stütze, Rand und Schnitt der letzten Rechnung. */
+function grundrissPanel(d) {
+  return panel({
+    schluessel: 'durchstanzen/Grundriss', titel: 'Grundriss und Aussparungen',
+    zusatz: 'x nach rechts, y nach oben, mm', breit: true,
+  }, [zeichenbereich(d)]);
+}
+
 function plattenPanel(d) {
   const bodenplatte = d.plattenart === 'bodenplatte';
   return panel({ schluessel: 'durchstanzen/Platte', titel: 'Platte' }, [
@@ -226,5 +236,6 @@ function einwirkungPanel(d) {
 }
 
 export function durchstanzEditor(d) {
-  return [stellePanel(d), plattenPanel(d), bewehrungPanel(d), rotationPanel(d), einwirkungPanel(d)];
+  return [stellePanel(d), grundrissPanel(d), plattenPanel(d), bewehrungPanel(d), rotationPanel(d),
+    einwirkungPanel(d)];
 }
