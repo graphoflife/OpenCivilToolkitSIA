@@ -77,29 +77,30 @@ export function grundrissTeile(s, bild, sicht, aussparungen = s.aussparungen) {
   }
   for (const a of aussparungen) teile.push(...aussparungTeile(px(a)));
   teile.push(svgEl('path', { d: pfadVon(px(s.umriss), true), class: 'ds-stuetze' }));
-  if (s.bewehrung) teile.push(...bewehrungTeile(s.bewehrung, px));
+  if (s.pilz) teile.push(...pilzTeile(s.pilz, px));
+  if (s.leisten) teile.push(...leistenTeile(s.leisten, px));
   for (const l of s.schnitt) {
     teile.push(linie(px(l.punkte), l.zaehlt ? 'ds-schnitt' : 'ds-schnitt-nicht'));
   }
   return teile;
 }
 
+/** Der Stahlpilz: seine Stege, seine gestützte Fläche und der Schnitt um sie. */
+function pilzTeile(pilz, px) {
+  return [
+    svgEl('path', { d: pfadVon(px(pilz.umriss), true), class: 'ds-pilzflaeche' }),
+    ...pilz.stege.map((steg) => linie(px(steg), 'ds-steg')),
+    ...pilz.schnitt.map((l) => linie(px(l.punkte), l.zaehlt ? 'ds-pilzschnitt' : 'ds-pilzschnitt-nicht')),
+  ];
+}
+
 /**
- * Die Durchstanzbewehrung: der Stahlpilz mit seinen Stegen und dem Schnitt um
- * ihn, je Leiste eine Linie vom Rand der gestützten Fläche bis zum letzten
- * Anker, die Anker als Punkte, und der äussere Schnitt um sie (Figur 26) --
- * was nicht zählt, gestrichelt.
+ * Die Durchstanzbewehrung: je Leiste eine Linie vom Rand der gestützten Fläche
+ * bis zum letzten Anker, die Anker als Punkte, und der äussere Schnitt um sie
+ * (Figur 26) -- was nicht zählt, gestrichelt.
  */
-function bewehrungTeile(b, px) {
-  const teile = [];
-  if (b.pilz) {
-    teile.push(svgEl('path', { d: pfadVon(px(b.pilz.umriss), true), class: 'ds-pilzflaeche' }));
-    for (const steg of b.pilz.stege) teile.push(linie(px(steg), 'ds-steg'));
-    for (const l of b.pilz.schnitt) {
-      teile.push(linie(px(l.punkte), l.zaehlt ? 'ds-pilzschnitt' : 'ds-pilzschnitt-nicht'));
-    }
-  }
-  for (const l of b.aussen) teile.push(linie(px(l.punkte), l.zaehlt ? 'ds-aussen' : 'ds-aussen-nicht'));
+function leistenTeile(b, px) {
+  const teile = b.aussen.map((l) => linie(px(l.punkte), l.zaehlt ? 'ds-aussen' : 'ds-aussen-nicht'));
   for (const l of b.leisten) {
     const punkte = px([l.wurzel, ...l.anker]);
     teile.push(linie(punkte, 'ds-leiste'));
@@ -128,8 +129,8 @@ export function aussparungTeile(punkte, klasse = '') {
 /** Was im Bild sein soll, in mm: Stütze, Schnitte, Bewehrung, Pilz und Aussparungen, mit Rand. */
 export function grundrissUmfang(s) {
   const punkte = [...s.umriss, ...s.schnitt.flatMap((l) => l.punkte), ...s.aussparungen.flat(),
-    ...(s.bewehrung?.aussen || []).flatMap((l) => l.punkte),
-    ...(s.bewehrung?.pilz?.schnitt || []).flatMap((l) => l.punkte)];
+    ...(s.leisten ? s.leisten.aussen.flatMap((l) => l.punkte) : []),
+    ...(s.pilz ? s.pilz.schnitt.flatMap((l) => l.punkte) : [])];
   const xs = punkte.map((p) => p[0]);
   const ys = punkte.map((p) => p[1]);
   const rand = Math.max(s.d_v, 0.08 * Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)));
@@ -159,42 +160,43 @@ function grundrissBild(s) {
   return svg;
 }
 
-/** Die Zeilen unter dem Bild: der Schnitt, was nicht zählt, die Bewehrung, das Ergebnis. */
+/** Die Zeilen unter dem Bild: der Schnitt, was nicht zählt, Pilz und Bewehrung, das Ergebnis. */
 function legende(s) {
-  const b = s.bewehrung;
+  const { leisten: b, pilz } = s;
   const zeilen = [
     `Nachweisschnitt im Abstand d_v/2 = ${zahl(s.d_v / 2, 0)} mm um die gestützte Fläche; `
       + `wirksam u = k_e · u_red = ${zahl(s.u, 0)} mm mit k_e = ${zahl(s.k_e, 2)}.`,
     'Gestrichelt, was nicht zählt: weiter als 1.5·d_v von den Ecken grosser Stützen und entlang '
       + 'von Wänden, und was hinter Aussparungen liegt.',
   ];
-  if (!b) {
+  if (!b && !pilz) {
     zeilen.push(`V_d = ${zahl(s.V_d, 1)} kN ${s.erfuellt ? '≤' : '>'} V_Rd,c = ${zahl(s.V_Rd_c, 1)} kN – `
       + `${s.erfuellt ? 'erfüllt' : 'nicht erfüllt'}, α = ${s.grad}.`);
-  } else {
-    zeilen.push(`Ohne Bewehrung V_Rd,c = ${zahl(s.V_Rd_c, 1)} kN < V_d = ${zahl(s.V_d, 1)} kN.`);
-    if (b.pilz) {
-      zeilen.push(`Stahlpilz: ${b.pilz.name}. Seine gestützte Fläche reicht bis an die Enden der `
-        + `Stege; der Schnitt um sie (violett) liegt d_v,P/2 = ${zahl(b.pilz.d_v / 2, 0)} mm weit `
-        + 'aussen. Den Widerstand des Pilzes selbst bestätigt der Hersteller.');
-    }
-    if (b.leisten.length) {
-      zeilen.push(
-        `Durchstanzbewehrung: ${b.name}, Anker ⌀${zahl(b.durchmesser, 0)} im Abstand `
-          + `${b.abstaende.map((a) => zahl(a, 0)).join(' / ')} mm vom Rand `
-          + `${b.pilz ? 'des Pilzes' : 'der Stütze'}.`,
-        `Äusserer Schnitt (orange) im Abstand 0.5·d_v,out = ${zahl(b.d_v_out / 2, 0)} mm um die `
-          + `äussersten Anker: u_out = ${zahl(b.u_out, 0)} mm, V_d,out = ${zahl(b.V_d_out, 1)} kN, `
-          + `V_Rd,c,out = ${zahl(b.V_Rd_c_out, 1)} kN.`,
-        `V_Rd,s = ${zahl(b.V_Rd_s, 1)} kN, V_Rd,max = ${zahl(b.V_Rd_max, 1)} kN.`,
-      );
-    } else if (b.pilz) {
-      zeilen.push(`Um den Pilz: V_d,P = ${zahl(b.V_d_out, 1)} kN ≤ V_Rd,c,P = ${zahl(b.V_Rd_c_out, 1)} kN `
-        + '-- ohne Durchstanzbewehrung.');
-    }
-    zeilen.push(`${s.erfuellt ? 'Alle Nachweise erfüllt' : 'Nicht alle Nachweise erfüllt'}, `
-      + `kleinstes α = ${s.grad}.`);
+    return el('div.gb-legende', {}, zeilen.map((z) => el('p', { text: z })));
   }
+  zeilen.push(`Ohne Bewehrung V_Rd,c = ${zahl(s.V_Rd_c, 1)} kN < V_d = ${zahl(s.V_d, 1)} kN.`);
+  if (pilz) {
+    zeilen.push(
+      `Stahlpilz: ${pilz.name}. Seine gestützte Fläche reicht bis an die Enden der Stege; der `
+        + `Schnitt um sie (violett) liegt d_v,P/2 = ${zahl(pilz.d_v / 2, 0)} mm weit aussen. Den `
+        + 'Widerstand des Pilzes selbst bestätigt der Hersteller.',
+      `Um den Pilz ohne Bewehrung: V_d,P = ${zahl(pilz.V_d, 1)} kN, `
+        + `V_Rd,c,P = ${zahl(pilz.V_Rd_c, 1)} kN.`,
+    );
+  }
+  if (b) {
+    zeilen.push(
+      `Durchstanzbewehrung: ${b.name}, Anker ⌀${zahl(b.durchmesser, 0)} im Abstand `
+        + `${b.abstaende.map((a) => zahl(a, 0)).join(' / ')} mm vom Rand `
+        + `${pilz ? 'des Pilzes' : 'der Stütze'}.`,
+      `Äusserer Schnitt (orange) im Abstand 0.5·d_v,out = ${zahl(b.d_v_out / 2, 0)} mm um die `
+        + `äussersten Anker: u_out = ${zahl(b.u_out, 0)} mm, V_d,out = ${zahl(b.V_d_out, 1)} kN, `
+        + `V_Rd,c,out = ${zahl(b.V_Rd_c_out, 1)} kN.`,
+      `V_Rd,s = ${zahl(b.V_Rd_s, 1)} kN, V_Rd,max = ${zahl(b.V_Rd_max, 1)} kN.`,
+    );
+  }
+  zeilen.push(`${s.erfuellt ? 'Alle Nachweise erfüllt' : 'Nicht alle Nachweise erfüllt'}, `
+    + `kleinstes α = ${s.grad}.`);
   return el('div.gb-legende', {}, zeilen.map((z) => el('p', { text: z })));
 }
 

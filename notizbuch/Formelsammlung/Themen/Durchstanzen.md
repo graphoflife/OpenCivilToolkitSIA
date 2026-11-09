@@ -1,10 +1,10 @@
 ---
-erzeugt: 19b93f59ccc1
+erzeugt: 3cf3e7c16fd4
 art: thema
 tags: [thema]
 ---
 > [!abstract] Durchstanzen
-> 43 Formeln, in der Folge, in der gerechnet wird.
+> 36 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -20,9 +20,11 @@ Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützt
 
 Die Faktoren 2 und 3.5 in Gleichung (70) dürfen erhöht werden, wenn Versuche es belegen (4.3.6.5.9). Das Gutachten von ancoPLUS lässt für Innenstützen und Wandenden 3·k\_r zu, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt wieder 2·k\_r, dazwischen linear. Für Rand- und Eckstützen bleibt es bei 2·k\_r. Die Obergrenze bleibt 3.5.
 
-Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker. Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens 1.5·d\_v,out von jedem Ende (Figur 26).
+Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker.
 
 Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 -- Anker ⌀16 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+
+Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens 1.5·d\_v,out von jedem Ende (Figur 26).
 
 Ein Stahlpilz vergrössert die gestützte Fläche. Gewählt ist der kleinste, der zwischen die Überdeckungen passt -- unten 20 mm, oben 50 mm, die Vorgaben der Software von AncoTech -- und mit dem die Platte ausserhalb hält: ZEUS Doppelkreuz 730 × 730 mm, h = 120 mm, g = 150 mm (AncoTech, Preisliste ZEUS 12.2018). Seine gestützte Fläche reicht bis an die Enden der Stege (4.3.6.6.2). Den Widerstand des Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.
 
@@ -90,19 +92,12 @@ Wandecke einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche a
 28. [[Durchstanzbewehrung an der Fliessgrenze]]
 29. [[Widerstand der ersten Betondruckdiagonale]]
 30. [[Wirksame statische Höhe im äusseren Nachweisschnitt]]
-31. [[Äusserer Nachweisschnitt ohne das, was nicht zählt]]
-32. [[Wirksamer Umfang des äusseren Nachweisschnitts]]
-33. [[Querkraft im äusseren Nachweisschnitt]]
-34. [[Durchstanzwiderstand im äusseren Nachweisschnitt]]
-35. [[Wirksame statische Höhe um den Stahlpilz]]
-36. [[Schnitt um den Stahlpilz ohne das, was nicht zählt]]
-37. [[Wirksamer Umfang des Schnitts um den Stahlpilz]]
-38. [[Querkraft im Schnitt um den Stahlpilz]]
-39. [[Durchmesser des flächengleichen Kreises]]
-40. [[Beiwert der Momentenübertragung]]
-41. [[Breite des Stützstreifens am Plattenrand]]
-42. [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]]
-43. [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]]
+31. [[Wirksame statische Höhe um den Stahlpilz]]
+32. [[Durchmesser des flächengleichen Kreises]]
+33. [[Beiwert der Momentenübertragung]]
+34. [[Breite des Stützstreifens am Plattenrand]]
+35. [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]]
+36. [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -128,11 +123,12 @@ Bewehrung trägt, was der Beton nicht trägt
 die halbe Querkraft ([[Durchstanzbewehrung an der Fliessgrenze]]); die erste
 Druckdiagonale an der Stütze hält
 ([[Widerstand der ersten Betondruckdiagonale]]); und ausserhalb der
-Bewehrung reicht wieder der Beton
-([[Durchstanzwiderstand im äusseren Nachweisschnitt]]).
+Bewehrung reicht wieder der Beton allein, im äusseren Schnitt um die Anker
+([[Durchstanzwiderstand ohne Durchstanzbewehrung]]).
 
 Bricht an einer Innenstütze die erste Druckdiagonale, wählt das Werkzeug den
 kleinsten ZEUS-Stahlpilz, der in die Platte passt und mit dem die Platte
-ausserhalb hält (4.3.6.6.2) -- wo nötig mit Leisten um ihn
-([[Schnitt um den Stahlpilz ohne das, was nicht zählt]]). Den Widerstand des
-Pilzes selbst bestätigt der Hersteller.
+ausserhalb hält (4.3.6.6.2) -- wo nötig mit Leisten um ihn. Um den Pilz
+gelten dieselben Schritte wie um die Stütze
+([[Nachweisschnitt ohne das, was nicht zählt]]). Den Widerstand des Pilzes
+selbst bestätigt der Hersteller.

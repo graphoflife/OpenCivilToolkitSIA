@@ -1,5 +1,5 @@
 ---
-erzeugt: dd1eb1bd1bfc
+erzeugt: 2e5ec437f627
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.3"
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen.pruefe|Durchstanzen.pruefe]]
+- [[opencivil.durchstanzen.herleitung#wirksam|wirksam]]
 
 ## Themen
 
@@ -47,3 +47,8 @@ Der Umfang, mit dem der Widerstand rechnet: der
 [[Nachweisschnitt ohne das, was nicht zählt]], um
 [[Beiwert der Momentenübertragung|k_e]] gemindert. So geht eine ungleich
 verteilte Querkraft als kürzerer Schnitt ein.
+
+Der äussere Schnitt um die Anker und der Schnitt um einen Stahlpilz werden
+mit dem $k_e$ des Schnitts um die Stütze gemindert. Aus der Näherung ist es
+dasselbe; aus der Exzentrizität wäre es aussen grösser, der Wert von innen
+liegt auf der sicheren Seite.

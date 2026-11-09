@@ -1,5 +1,5 @@
 ---
-erzeugt: 193472f16c09
+erzeugt: b5df2689e349
 art: modul
 tags: [modul]
 ---
@@ -9,21 +9,17 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Was der Durchstanznachweis rechnet, wenn der Beton allein nicht reicht:
-welches ancoPLUS es braucht ([[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]]), und die vier
-Nachweise mit ihm, je mit Herleitung und Urteil (SIA 262:2025, 4.3.6.5.1):
+Was der Durchstanznachweis tut, wenn der Beton allein nicht reicht: das
+kleinste ancoPLUS suchen ([[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]]) und die vier Nachweise
+mit ihm schreiben (SIA 262:2025, 4.3.6.5.1) -- Bewehrung (66), (68), (69),
+Verformungsvermögen (67), erste Betondruckdiagonale (70) und ausserhalb der
+Bewehrung (4.3.6.5.10, Figur 26). Gerechnet wird jede Bedingung einmal, in
+[[opencivil.durchstanzen.pruefung|.pruefung]]; die Suche fragt die Prüfung, die Herleitung schreibt
+dieselben Zahlen.
 
-```
-Bewehrung        V_d − V_Rd,c ≤ V_Rd,s = ΣA_sw · k_e · σ_sd        (66), (68), (69)
-Verformung       V_d / 2 ≤ ΣA_sw · k_e · f_yd                       (67)
-Druckdiagonale   V_d ≤ min[k_sys · k_r; 3.5] · τ_cd · d_v · u        (70), 4.3.6.5.9
-ausserhalb       V_d,out ≤ k_r · τ_cd · d_v,out · u_out             4.3.6.5.10, Figur 26
-```
-
-Die Anker stehen senkrecht (β = 90°, sin β = 1). Der Stahl der Anker ist
-der der Biegebewehrung -- ancoPLUS ist aus B500B. k_sys ist der Faktor aus
-dem Gutachten des Produkts anstelle der 2 in (70), wie 4.3.6.5.9 es zulässt
-([[opencivil.durchstanzen.produkte#k_sys|.produkte.k_sys]]).
+Der Stahl der Anker ist der der Biegebewehrung -- ancoPLUS ist aus B500B.
+k_sys ist der Faktor aus dem Gutachten des Produkts anstelle der 2 in (70),
+wie 4.3.6.5.9 es zulässt ([[opencivil.durchstanzen.produkte#k_sys|.produkte.k_sys]]).
 
 
 ## IM ÄUSSEREN SCHNITT
@@ -40,11 +36,11 @@ innerhalb des äusseren Schnitts (4.3.6.2.6).
 Bricht an einer Innenstütze die erste Betondruckdiagonale, hilft mehr
 Bewehrung nicht. Dann wird der kleinste ZEUS gewählt, der zwischen die
 Überdeckungen passt und mit dem die Platte ausserhalb seiner Stege hält:
-ohne Leisten, sonst mit Leisten um ihn -- dieselben vier Nachweise, mit dem
-Pilz als gestützter Fläche (4.3.6.6.2). Seine Fläche reicht bis an die Enden
-der Stege; die wirksame Höhe reicht von der Zugbewehrung bis zur Unterkante
-des Pilzes, d_v = d − 20 mm (gelesen, nicht nachgeschlagen). Den Widerstand
-des Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.
+ohne Leisten, sonst mit Leisten um ihn -- dieselben Schritte wie an der
+Stütze, mit dem Pilz als gestützter Fläche (4.3.6.6.2). Seine Fläche reicht
+bis an die Enden der Stege; die wirksame Höhe reicht von der Zugbewehrung bis
+zur Unterkante des Pilzes, d_v = d − 20 mm (gelesen, nicht nachgeschlagen).
+Den Widerstand des Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.
 
 
 ## EINHEITEN
@@ -60,8 +56,11 @@ SI-Basis; Kräfte in N.
 class Grundlage
 ```
 
-Was der Nachweis ohne Bewehrung schon gerechnet hat -- der mit Bewehrung baut darauf.
+Was der Nachweis ohne Bewehrung schon gerechnet hat -- als Prüfung des
+Schnitts um die Stütze und als die Werte, mit denen seine Herleitung sie
+zeigt.
 
+- `innen: Schnittpruefung`
 - `d: Wert`
 - `d_v: Wert`
 - `k_e: Wert`
@@ -69,11 +68,10 @@ Was der Nachweis ohne Bewehrung schon gerechnet hat -- der mit Bewehrung baut da
 - `tau_cd: Wert`
 - `u: Wert`
 - `psi: Wert`
-- `V_d: Wert` – Die Querkraft im inneren Schnitt, die Flächenlast darin abgezogen.
+- `V_d: Wert` – Die Querkraft im Schnitt um die Stütze, die Flächenlast darin abgezogen.
 - `V_Rd_c: Wert`
 - `masse: Dict[str, float]`
 - `umriss: Tuple[Punkt, ...]`
-- `schnitt: Nachweisschnitt` – Der innere Nachweisschnitt -- an ihm werfen die Aussparungen ihren Schatten.
 
 ### Ort
 
@@ -82,79 +80,21 @@ Was der Nachweis ohne Bewehrung schon gerechnet hat -- der mit Bewehrung baut da
 class Ort
 ```
 
-Wo die Leisten ansetzen: an der Stütze, oder um den Stahlpilz (4.3.6.6.2).
+Wo die Leisten ansetzen: an der Stütze oder um den Stahlpilz (4.3.6.6.2) --
+die gestützte Fläche, der Schnitt um sie und die Werte, mit denen die
+Herleitung ihn zeigt.
 
 - `zusatz: str` – Was hinter dem Namen eines Urteils steht: leer, oder «um den Stahlpilz».
-- `kurz: str` – Die Vorsilbe der Zwischenwerte, damit Stütze und Pilz nebeneinander stehen können.
+- `vorsilbe: str` – Die Vorsilbe der Zwischenwerte, damit Stütze und Pilz nebeneinander stehen können.
 - `umriss: Tuple[Punkt, ...]`
 - `r_zu: Callable[[float], Sequence[Stueck]]` – Der geschlossene Schnitt im Abstand r um die gestützte Fläche.
-- `d_v: Wert`
-- `u: Wert`
-- `V_d: Wert`
-- `V_Rd_c: Wert`
+- `pruefung: Schnittpruefung`
 - `ausnahme: bool` – Ob der Faktor des Gutachtens erhöht ist -- Innenstütze und Wandende.
 - `schatten: Tuple[Schatten, ...]` – Die Schatten der Aussparungen am Schnitt um diese Fläche: dort liegt keine Leiste.
-
-### Pilzbefund
-
-```python
-@dataclass(frozen=True)
-class Pilzbefund
-```
-
-Der gewählte Stahlpilz: welcher, seine gestützte Fläche und der Schnitt um sie. m.
-
-- `pilz: Stahlpilz`
-- `umriss: Tuple[Punkt, ...]`
-- `schnitt: Nachweisschnitt`
-- `d_v: float`
-
-### Bewehrungsbefund
-
-```python
-@dataclass(frozen=True)
-class Bewehrungsbefund
-```
-
-Was die Bemessung vorschlägt und was es trägt -- fürs Bild und die
-Zusammenfassung. Leisten an der Stütze, ein Pilz ohne Leisten, oder ein
-Pilz mit Leisten um ihn. Der äussere Nachweis ist der um die Leisten,
-ohne Leisten der um den Pilz. N, m.
-
-- `vorschlag: Optional[Vorschlag]`
-- `pilz: Optional[Pilzbefund]`
-- `sigma_sd: float`
-- `V_Rd_s: float`
-- `V_Rd_max: float`
-- `k_sys: float`
-- `d_v_out: float`
-- `u_out: float`
-- `V_d_out: float`
-- `V_Rd_c_out: float`
-
-### spannung
-
-```python
-def spannung(E_s: float, psi: float, f_ctm: float, f_yd: float, d: float, phi: float) -> float
-```
-
-σ_sd nach Gleichung (69).
-
-### widerstand
-
-```python
-def widerstand(k_r: float, tau_cd: float, d_v: float, u: float) -> float
-```
-
-V_Rd,c nach (58) -- im äusseren Schnitt mit d_v,out (4.3.6.5.10), am Pilz mit seinem d_v.
-
-### druckdiagonale
-
-```python
-def druckdiagonale(k_sys: float, k_r: float, tau_cd: float, d_v: float, u: float) -> float
-```
-
-V_Rd,max nach (70), mit dem Faktor des Gutachtens (4.3.6.5.9).
+- `d_v: Optional[Wert] = None`
+- `u: Optional[Wert] = None`
+- `V_d: Optional[Wert] = None`
+- `V_Rd_c: Optional[Wert] = None` – Wie die Herleitung den Schnitt zeigt -- fehlt nur in der stummen Suche nach dem Pilz.
 
 ### _Werte
 
@@ -174,76 +114,52 @@ Was jede Rechnung mit Bewehrung braucht, als Zahlen und als Werte der Herleitung
 - `h_A: Wert`
 - `d_v_out: Wert`
 
-#### _Werte.sigma
-
-```python
-def sigma(self, phi: float) -> float
-```
-
-#### _Werte.flaechenlast
-
-```python
-def flaechenlast(self, flaeche: float) -> float
-```
-
 ### nachweisen
 
 ```python
-def nachweisen(n: 'Durchstanzen', e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage) -> Tuple[List[NachweisUrteil], Optional[Bewehrungsbefund], Dict[str, Groesse]]
+def nachweisen(n: 'Durchstanzen', e: Eingaben, p: Protokoll, w: Zwischenwerte, g: Grundlage) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung], Optional[Pilzbefund]]
 ```
 
 Die Durchstanzbewehrung suchen und mit ihr nachweisen -- und wo die erste
 Druckdiagonale an einer Innenstütze bricht, einen Stahlpilz. Zurück kommen
-die Urteile, der Befund und die Grade, die ohne Urteil bleiben (ein Pilz,
-der ohne Leisten auskommt, braucht keine Bewehrung).
+die Urteile, die Leisten und der Pilz, so weit es sie gibt.
 
 ### _suchen
 
 ```python
-def _suchen(n: 'Durchstanzen', werte: _Werte, ort: Ort) -> Optional[Vorschlag]
+def _suchen(n: 'Durchstanzen', werte: _Werte, ort: Ort) -> Optional[Leistenpruefung]
 ```
 
-Das kleinste ancoPLUS für diesen Ort -- siehe [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]].
+Das kleinste ancoPLUS für diesen Ort, mit seiner Prüfung -- siehe [[opencivil.durchstanzen.bewehrung#bemessen|.bewehrung.bemessen]].
 
-### _mit_leisten
+### _leisten_schreiben
 
 ```python
-def _mit_leisten(n: 'Durchstanzen', p: Protokoll, w: Zwischenwerte, werte: _Werte, ort: Ort, vorschlag: Vorschlag, pilz: Optional[Pilzbefund]=None) -> Tuple[List[NachweisUrteil], Bewehrungsbefund, bool]
+def _leisten_schreiben(n: 'Durchstanzen', p: Protokoll, w: Zwischenwerte, werte: _Werte, ort: Ort, pruefung: Leistenpruefung) -> List[NachweisUrteil]
 ```
 
-Die vier Nachweise mit diesen Leisten, mit Herleitung. Zurück: die Urteile,
-der Befund und ob die erste Druckdiagonale bricht.
+Die vier Nachweise mit diesen Leisten, wie die Prüfung sie gerechnet hat.
 
-### _umfang
+### _pilz_pruefen
 
 ```python
-def _umfang(p: Protokoll, w: Zwischenwerte, g: Grundlage, a: Auswertung, name: str, index: str, genitiv: str, nominativ: str, referenz: str) -> Wert
+def _pilz_pruefen(n: 'Durchstanzen', werte: _Werte, pilz: Stahlpilz) -> Pilzbefund
 ```
 
-Ein Schnitt, wie er zählt: in der Platte, ohne was nicht zählt, mit k_e --
-für den äusseren Schnitt (`index` «out») und den um den Pilz («P»).
+Die gestützte Fläche des Pilzes und der Schnitt im Abstand d_v/2 um sie, geprüft ohne Leisten.
 
-### _querkraft
+### _pilzort
 
 ```python
-def _querkraft(e: Eingaben, p: Protokoll, w: Zwischenwerte, flaeche: float, name: str, symbol: str, name_A: str, symbol_A: str, wo: str, index: str) -> Wert
+def _pilzort(n: 'Durchstanzen', werte: _Werte, befund: Pilzbefund, d_v: Optional[Wert]=None, u: Optional[Wert]=None, V_d: Optional[Wert]=None, V_Rd_c: Optional[Wert]=None) -> Ort
 ```
 
-V_d in einem Schnitt ausserhalb: die Flächenlast darin abgezogen
-(4.3.6.2.6). Die Platzhalter tragen den Index, wie in [[opencivil.durchstanzen.mit_bewehrung#_umfang|_umfang]].
-
-### _pilzflaeche
-
-```python
-def _pilzflaeche(werte: _Werte, n: 'Durchstanzen', pilz: Stahlpilz) -> Tuple[Tuple[Punkt, ...], Nachweisschnitt, float]
-```
-
-Die gestützte Fläche des Pilzes, der Schnitt im Abstand d_v/2 um sie und sein d_v.
+Der Pilz als Ort der Leisten: seine Fläche, der Schnitt um ihn und dessen Schatten.
 
 ### _pilz_suchen
 
 ```python
-def _pilz_suchen(n: 'Durchstanzen', werte: _Werte) -> Optional[Tuple[Pilzbefund, Optional[Vorschlag]]]
+def _pilz_suchen(n: 'Durchstanzen', werte: _Werte) -> Optional[Tuple[Pilzbefund, Optional[Leistenpruefung]]]
 ```
 
 Der kleinste ZEUS, der zwischen die Überdeckungen passt, über die Stütze
@@ -254,21 +170,14 @@ Ein Pilz, dessen Druckdiagonale nicht einmal mit dem ganzen Umfang um ihn
 hielte -- der Hülle samt dem Bogen d_v/2 rundum, ohne Abzüge --, fällt
 weg, bevor sein Schnitt gerechnet wird: so bleibt die Suche schnell.
 
-### _pilzort
-
-```python
-def _pilzort(n: 'Durchstanzen', werte: _Werte, befund: Pilzbefund, d_v: Wert, u: Wert, V_d: Wert, V_Rd_c: Wert) -> Ort
-```
-
-Der Pilz als Ort der Leisten: seine Fläche, sein d_v, der Schnitt um ihn und dessen Schatten.
-
 ### _mit_pilz
 
 ```python
-def _mit_pilz(n: 'Durchstanzen', p: Protokoll, w: Zwischenwerte, werte: _Werte, befund: Pilzbefund, vorschlag: Optional[Vorschlag]) -> Tuple[List[NachweisUrteil], Bewehrungsbefund, Dict[str, Groesse]]
+def _mit_pilz(n: 'Durchstanzen', p: Protokoll, w: Zwischenwerte, werte: _Werte, befund: Pilzbefund, leisten: Optional[Leistenpruefung]) -> Tuple[List[NachweisUrteil], Optional[Leistenpruefung], Pilzbefund]
 ```
 
-Die Herleitung mit dem gewählten Pilz: die Platte ausserhalb, ohne oder mit Leisten.
+Die Herleitung mit dem gewählten Pilz: der Schnitt um ihn mit denselben
+Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 
 
 ## Braucht
@@ -278,33 +187,26 @@ Die Herleitung mit dem gewählten Pilz: die Platte ausserhalb, ohne oder mit Lei
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.durchstanzen.bewehrung]]
+- [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.produkte]]
+- [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 
 ## Gebraucht von
 
 - [[opencivil.durchstanzen.nachweis]]
-- [[opencivil.web.durchstanzdaten]]
 
 ## Formeln aus diesem Modul
 
-- [[Anrechenbare Durchstanzbewehrung]] · `_mit_leisten`
-- [[Äusserer Nachweisschnitt ohne das, was nicht zählt]] · `_umfang`
-- [[Beitrag der Durchstanzbewehrung]] · `_mit_leisten`
-- [[Durchstanzbewehrung an der Fliessgrenze]] · `_mit_leisten`
-- [[Durchstanzwiderstand im äusseren Nachweisschnitt]] · `_mit_leisten`
-- [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · `_mit_pilz`
-- [[Halbe Querkraft für das Verformungsvermögen]] · `_mit_leisten`
+- [[Anrechenbare Durchstanzbewehrung]] · `_leisten_schreiben`
+- [[Beitrag der Durchstanzbewehrung]] · `_leisten_schreiben`
+- [[Durchstanzbewehrung an der Fliessgrenze]] · `_leisten_schreiben`
+- [[Halbe Querkraft für das Verformungsvermögen]] · `_leisten_schreiben`
 - [[Platz für die Durchstanzbewehrung]] · `nachweisen`
-- [[Querkraft für die Durchstanzbewehrung]] · `_mit_leisten`
-- [[Querkraft im äusseren Nachweisschnitt]] · `_querkraft`
-- [[Querkraft im Schnitt um den Stahlpilz]] · `_querkraft`
-- [[Schnitt um den Stahlpilz ohne das, was nicht zählt]] · `_umfang`
-- [[Spannung in der Durchstanzbewehrung]] · `_mit_leisten`
-- [[Widerstand der ersten Betondruckdiagonale]] · `_mit_leisten`
-- [[Wirksame statische Höhe im äusseren Nachweisschnitt]] · `_mit_leisten`
+- [[Querkraft für die Durchstanzbewehrung]] · `_leisten_schreiben`
+- [[Spannung in der Durchstanzbewehrung]] · `_leisten_schreiben`
+- [[Widerstand der ersten Betondruckdiagonale]] · `_leisten_schreiben`
+- [[Wirksame statische Höhe im äusseren Nachweisschnitt]] · `_leisten_schreiben`
 - [[Wirksame statische Höhe um den Stahlpilz]] · `_mit_pilz`
-- [[Wirksamer Umfang des äusseren Nachweisschnitts]] · `_umfang`
-- [[Wirksamer Umfang des Schnitts um den Stahlpilz]] · `_umfang`

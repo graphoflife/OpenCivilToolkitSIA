@@ -64,7 +64,7 @@ from opencivil.core.berechnung import (
     NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
     Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
+from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import Mathe, angabe, bedingung, fest, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import illinois
@@ -392,7 +392,6 @@ class ZwaengungBiegungQA(Biegezwang):
         p.erklaerung(verfahren_der_ebene(q, self.analyse.biegung))
 
         brutto = bruttoquerschnitt(a, e.si_nach_id())
-        ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for seite in self.analyse.zugseiten:
             name, (M_y, M_z) = seite.beschriftung, seite.moment
@@ -403,7 +402,6 @@ class ZwaengungBiegungQA(Biegezwang):
             gefunden = self._an_der_grenze(q, staebe, grenzen, M_y, M_z, riss.M_Riss)
             if gefunden is None:
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
-                ergebnis[d_grad.id] = Groesse(math.inf, EINHEITSLOS)
                 continue
             M_s_adm_si, ebene, stab = gefunden
             M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z,
@@ -426,7 +424,7 @@ class ZwaengungBiegungQA(Biegezwang):
                 f"{M_s_adm_si / 1e3:.1f} kNm {'≥' if v.erfuellt else '<'} "
                 f"M_Riss = {riss.M_Riss / 1e3:.1f} kNm."))
         self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
+        return Ausfuehrung({}, self.teilurteile(urteile))
 
     def _an_der_grenze(self, q: Querschnitt, staebe: Sequence[Stabangabe], grenzen: Grenzen,
                        M_y: float, M_z: float, M_start: float

@@ -91,38 +91,13 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. Empfohlene Reihenfolge: zuerst 1 und 2, dann 4, 6 und 7
-als ein Umbau des Zustands der Oberfläche, danach 3 vor einem vierten
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt (siehe
+[[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 4, 6 und 7 als ein
+Umbau des Zustands der Oberfläche, danach 3 vor einem vierten
 Zeichenfenster und 5 vor der nächsten Bauteilart.
 
 **Neu seit dem 2026-10-25, alles im Durchstanzen:**
 
-- [ ] **1. Derselbe Schnittnachweis dreimal, jede Bedingung zweimal.** Um die
-      Stütze (`nachweis.py`), aussen um die Leisten und um den Pilz
-      (`mit_bewehrung.py`) läuft dieselbe Folge -- Schnitt, Abzüge, k_e,
-      V_d − q_d·A, V_Rd,c --, mit drei Werkzeugen: Gleichung (58) steht in
-      nachweis.py:189 und mit_bewehrung.py:150, der Abzug 4.3.6.2.6 dreimal
-      (`_lasten`, `_querkraft`, `_Werte.flaechenlast`). Die Suche prüft
-      (66), (67) und den äusseren Schnitt stumm (mit_bewehrung.py:239-245),
-      die Herleitung noch einmal laut (313-378); beim Pilz ebenso
-      (499-511 und 561-568). Ändert sich eine Bedingung an einer Stelle,
-      weicht der Vorschlag still vom Nachweis ab. Die Formelseiten liessen
-      sich nur mit Platzhaltern wie `@roh_{index}` trennen. Besser: eine
-      reine `Schnittpruefung` und eine reine `Leistenpruefung`, je einmal
-      gerechnet; die Suche fragt ihr Ergebnis, die Herleitung schreibt es.
-- [ ] **2. Platzhalter statt Zustand.** Fünf feste Grade für eine
-      wechselnde Zahl Urteile, gefüllt auf drei Wegen, mit 0 und ∞ für
-      «nicht gerechnet» (nachweis.py:206-231, mit_bewehrung.py:577-581).
-      Der Befund trägt `V_Rd_max=math.inf`, `k_sys=0.0`, `sigma_sd=0.0`,
-      und `V_d_out` heisst je nach Fall «ausserhalb der Leisten» oder «um
-      den Pilz»; Tabelle, Zeichendaten und Legende verzweigen darum
-      (nachweis.py:643-661, durchstanzdaten.py:74-100,
-      ds_grundriss.js:176-189). Denselben Kniff -- ∞ von Hand, ohne Urteil
-      -- haben vier Nachweise im Kern (richtungsnachweise.py:104 und 164,
-      qa_gebrauch.py:406, schiefe_biegung.py:169-173). Besser:
-      `Nachweis.rechne` füllt jeden Grad, den kein Urteil trägt; der Befund
-      wird `leisten: Optional[Leistenbefund]` und `pilz:
-      Optional[Pilzbefund]`, jedes mit seinen eigenen Zahlen.
 - [ ] **3. Der dritte Adapter des Zeichenfensters ist wieder kopiert**
       (ds_zeichnung.js:44-147: `eintragVon`, `fensterVon`/`fensterVergessen`,
       `gilt`/`zeichnung`/`schreiben`, Knotennamen, `umriss`, Lagefelder).
@@ -189,7 +164,7 @@ Zeichenfenster und 5 vor der nächsten Bauteilart.
       und `kN = 1e-3` (balkendaten.py:34) bedeutet das Gegenteil von
       `kN = 1e3` (aufbau/querschnittsanalyse.py:63). Legende und Urteil der
       Situationsbilder baut das JS selbst (gb_zeichnung.js:253-271,
-      sz_zeichnung.js:212-233, ds_grundriss.js:163-199). Besser: `_Groesse`
+      sz_zeichnung.js:212-233, ds_grundriss.js:164-201). Besser: `_Groesse`
       als gemeinsames Modul, die Legende als Zellen aus den *daten.py.
 - [ ] **11. Dateien:** core/berechnung.py hat 1087 Zeilen (Naht in Zeile
       607: der Nachweis nach core/nachweis.py); diagramm.js (959) ist das
@@ -686,6 +661,12 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkte 1 und 2: ein
+Schnittnachweis für Stütze, Anker und Pilz, jede Bedingung einmal gerechnet
+und einmal geschrieben · ein Grad ohne Urteil ist unbeschränkt, das setzt
+der Kern für jeden Nachweis · Leisten und Pilz getrennt im Befund, ohne
+Platzhalter ·
 
 Vier Fehler der Durchsicht (2026-10-17): ein unlesbarer Stand im Browser
 bleibt erhalten · die Konsole hängt nicht mehr bei NaN, ein Umschlag für

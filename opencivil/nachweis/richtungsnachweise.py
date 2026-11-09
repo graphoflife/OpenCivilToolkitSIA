@@ -24,13 +24,11 @@ dasselbe Rissmoment gegen ihre Bewehrung.
 
 from __future__ import annotations
 
-import math
 from typing import Dict, List
 
 from opencivil.core.berechnung import (
     Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef, kennung_aus
@@ -90,7 +88,6 @@ class DuktilitaetQA(Nachweis):
         p.ansatz(r"\frac{x}{d} \le \left(\frac{x}{d}\right)_{max}",
                  titel="Duktilität", referenz="SIA 262:2025, 4.1.4.2.5",
                  name=DUKTILITAETSBEDINGUNG)
-        ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for seite in self.analyse.zugseiten:
             name = seite.beschriftung
@@ -101,7 +98,6 @@ class DuktilitaetQA(Nachweis):
             p.titel(name, ebene=3)
             if d <= 0.0 or not q.zugseite_bewehrt(punkt):
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
-                ergebnis[d_grad.id] = Groesse(math.inf, EINHEITSLOS)
                 continue
             verhaeltnis = x / d
             x_d = werte.zahl("x_d", "x/d", verhaeltnis)
@@ -115,7 +111,7 @@ class DuktilitaetQA(Nachweis):
             urteile.append(self.urteil(d_grad, name, v,
                                        f"x/d = {verhaeltnis:.3f} gegen {self.grenze:g}."))
         self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
+        return Ausfuehrung({}, self.teilurteile(urteile))
 
 
 class SproedesVersagenQA(Nachweis):
@@ -150,7 +146,6 @@ class SproedesVersagenQA(Nachweis):
                  name="Bedingung gegen sprödes Versagen")
 
         brutto = bruttoquerschnitt(self.analyse, e.si_nach_id())
-        ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for seite in self.analyse.zugseiten:
             name, (M_y, M_z) = seite.beschriftung, seite.moment
@@ -161,7 +156,6 @@ class SproedesVersagenQA(Nachweis):
             _, d = q.druckzone(punkt)
             if d <= 0.0 or not q.zugseite_bewehrt(punkt):
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
-                ergebnis[d_grad.id] = Groesse(math.inf, EINHEITSLOS)
                 continue
 
             riss = rissmoment(brutto, M_y, M_z)
@@ -174,4 +168,4 @@ class SproedesVersagenQA(Nachweis):
             v.zeile(p, d_grad)
             urteile.append(self.urteil(d_grad, name, v, "M_Rd bei N = 0 gegen das Rissmoment."))
         self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
+        return Ausfuehrung({}, self.teilurteile(urteile))

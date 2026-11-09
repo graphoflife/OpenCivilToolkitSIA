@@ -1,5 +1,5 @@
 ---
-erzeugt: 014f2765a919
+erzeugt: dd7dd454dd72
 art: modul
 tags: [modul]
 ---
@@ -126,16 +126,16 @@ Die Kandidaten des äusseren Schnitts (Figur 26) -- siehe Dateikopf.
 class Vorschlag
 ```
 
-Eine Durchstanzbewehrung, die alle Bedingungen erfüllt -- oder die stärkste,
-die sich finden liess (`reicht` falsch). Kräfte in N.
+Eine Durchstanzbewehrung: Typ, Höhe, Abstände, die Leisten und der
+äussere Schnitt um sie. Ob sie reicht, sagt ihre Prüfung
+([[opencivil.durchstanzen.pruefung#Leistenpruefung|Leistenpruefung]]).
 
 - `typ: produkte.Ankertyp`
 - `h_A: float`
 - `abstaende: Tuple[float, ...]`
 - `leisten: Tuple[Leiste, ...]`
 - `anrechenbar: int` – Wie viele Anker je Leiste zwischen 0.35·d_v und d_v liegen (Gleichung (68)).
-- `aussen: Nachweisschnitt`
-- `reicht: bool`
+- `aussen: Nachweisschnitt` – Der äussere Schnitt um die äussersten Anker (Figur 26), mit d_v,out.
 
 #### Vorschlag.radien
 
@@ -193,22 +193,22 @@ und wenigstens so viele, wie die kürzeste lieferbare Leiste hat.
 ### bemessen
 
 ```python
-def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float, r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float, noetig: Callable[[produkte.Ankertyp, float], bool], aussen_reicht: Callable[[Nachweisschnitt], bool]) -> Optional[Vorschlag]
+def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float, r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float, pruefen: Callable[[Vorschlag], 'Leistenpruefung']) -> Optional['Leistenpruefung']
 ```
 
-Das kleinste ancoPLUS, das reicht: der kleinste Durchmesser, mit dem die
-Bewehrung im Bereich `noetig` erfüllt, und dazu die kleinste Zahl Anker
-je Leiste, mit der der äussere Schnitt `aussen_reicht`. Erst wenn kein
-Durchmesser genügt, stehen die Leisten dichter ([[opencivil.durchstanzen.bewehrung#Konstanten|DICHTEN]]).
-`noetig(typ, A_sw)` und `aussen_reicht(schnitt)` rechnet der
-Nachweis; `r_2_zu(r)` gibt den geschlossenen Schnitt im Abstand r um die
-gestützte Fläche; `schatten` sind die Schatten der Aussparungen am
-inneren Schnitt ([[opencivil.durchstanzen.schnitt#schatten_am_schnitt|schatten_am_schnitt]]).
+Das kleinste ancoPLUS, das reicht, mit seiner Prüfung: der kleinste
+Durchmesser, mit dem die Bewehrung trägt (66, 67), und dazu die kleinste
+Zahl Anker je Leiste, mit der der äussere Schnitt hält. Erst wenn kein
+Durchmesser trägt, stehen die Leisten dichter ([[opencivil.durchstanzen.bewehrung#Konstanten|DICHTEN]]).
+`pruefen` rechnet die Prüfung eines Vorschlags ([[opencivil.durchstanzen.mit_bewehrung|.mit_bewehrung]]);
+`r_2_zu(r)` gibt den geschlossenen Schnitt im Abstand r um die gestützte
+Fläche; `schatten` sind die Schatten der Aussparungen am inneren Schnitt
+([[opencivil.durchstanzen.schnitt#schatten_am_schnitt|schatten_am_schnitt]]).
 
-Reicht nichts, kommt der stärkste Versuch mit `reicht` falsch zurück --
-die dichtesten Leisten mit dem grössten Durchmesser und neun Ankern.
-`None` nur, wo es kein ancoPLUS gibt: die Platte ist zu dünn, keine
-Höhe ist lieferbar, oder keine Leiste findet Platz.
+Reicht nichts, kommt der stärkste Versuch zurück -- die dichtesten Leisten
+mit dem grössten Durchmesser und neun Ankern --, und seine Prüfung sagt,
+was fehlt. `None` nur, wo es kein ancoPLUS gibt: die Platte ist zu dünn,
+keine Höhe ist lieferbar, oder keine Leiste findet Platz.
 
 
 ## Konstanten
@@ -220,9 +220,11 @@ Höhe ist lieferbar, oder keine Leiste findet Platz.
 ## Braucht
 
 - [[opencivil.durchstanzen.produkte]]
+- [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.querschnitt.geometrie]]
 
 ## Gebraucht von
 
 - [[opencivil.durchstanzen.mit_bewehrung]]
+- [[opencivil.durchstanzen.pruefung]]

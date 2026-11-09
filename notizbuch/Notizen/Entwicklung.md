@@ -44,6 +44,45 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-09 · Durchstanzen: ein Schnittnachweis für alle drei Schnitte
+
+Aus der Strukturdurchsicht vom selben Tag, Punkte 1 und 2. Für den Benutzer
+ändern sich keine Zahlen.
+
+- Um die Stütze, aussen um die Anker und um einen Stahlpilz läuft dieselbe
+  Folge: der Schnitt, was von ihm nicht zählt, k_e, V_d − q_d·A und
+  V_Rd,c nach (58). Sie stand dreimal da, mit drei Werkzeugen, und die
+  Suche nach Leisten und Pilz prüfte (66), (67) und den äusseren Schnitt
+  stumm, die Herleitung noch einmal laut. Änderte sich eine Bedingung an
+  einer Stelle, wich der Vorschlag still vom Nachweis ab. Jetzt rechnet
+  `pruefung.py` jede Bedingung einmal (`Schnittpruefung`,
+  `Leistenpruefung`, `Pilzbefund`), ohne Herleitung; die Suche fragt ihr
+  Ergebnis, die Herleitung schreibt dieselben Zahlen, für alle drei
+  Schnitte mit denselben Schritten (`herleitung.py`).
+- Damit sind die Formeln an allen drei Schnitten dieselben: sieben Seiten
+  der Formelsammlung («Äusserer Nachweisschnitt ohne das, was nicht zählt»,
+  «Querkraft im Schnitt um den Stahlpilz» …) gingen in die fünf Seiten des
+  Schnitts um die Stütze auf, ihr Theorietext steht jetzt dort. Die
+  Zeichen tragen den Index des Schnitts zuletzt: u_{red,out}, u_{0,P}. Die
+  Flächenlast aussen und um den Pilz ist ein eigener Schritt,
+  ΔV_{d,out} = q_d·A_{q,out}, wie um die Stütze.
+- Ein Erfüllungsgrad, den kein Urteil trägt, ist unbeschränkt: das setzt
+  jetzt `Nachweis.rechne` für jeden Nachweis. Bis dahin schrieb jeder
+  Nachweis ∞ selbst, auf drei Arten -- vier Nachweise im Kern, das
+  Durchstanzen mit Wörterbüchern voller 0 und ∞. Sichtbar wird es an
+  Wandende und Wandecke, wo das Werkzeug noch keine Bewehrung vorschlägt:
+  die vier Grade mit Bewehrung stehen in der Wertetabelle als ∞ statt 0,
+  denn gerechnet wurden sie nicht. Das Urteil «nicht erfüllt» kommt wie
+  bisher aus dem Nachweis ohne Bewehrung.
+- Der Befund trägt Leisten und Pilz getrennt (`leisten`, `pilz`), jedes mit
+  seinen eigenen Zahlen, statt eines Befunds mit Platzhaltern
+  (`V_Rd_max = ∞`, `k_sys = 0`) und einem `V_d_out`, das je nach Fall
+  aussen um die Leisten oder um den Pilz hiess. Tabelle, Zeichendaten und
+  Legende fragen sie ohne Weichen; die Kennwerttabelle zeigt beim Pilz
+  jetzt auch Querkraft und Widerstand um ihn.
+
+---
+
 ## 2026-11-09 · Durchstanzen: Leisten an Aussparungen
 
 Gemeldet vom Benutzer: eine Leiste lief durch eine Aussparung, solange

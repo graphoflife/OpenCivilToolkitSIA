@@ -18,7 +18,7 @@ from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.bewehrung import (
     Leiste, Vorschlag, aeussere_kandidaten, anrechenbar, leisten_anordnen, setzen,
 )
-from opencivil.durchstanzen.mit_bewehrung import spannung
+from opencivil.durchstanzen.pruefung import spannung
 from opencivil.durchstanzen.schnitt import (
     Schatten, Stuetzenflaeche, kandidaten_stuetze, nachweisschnitt, schatten_am_schnitt,
 )
@@ -67,12 +67,12 @@ class TestInnenstuetzeVonHand(unittest.TestCase):
     def test_statische_hoehe(self):
         """d_x = 280 − 30 − 8, d_y = 280 − 30 − 16 − 8; d ist ihr Mittel, d_v = d."""
         self.assertAlmostEqual(self.befund.d, (0.242 + 0.226) / 2)
-        self.assertAlmostEqual(self.befund.d_v, self.befund.d)
+        self.assertAlmostEqual(self.befund.innen.d_v, self.befund.d)
 
     def test_nachweisschnitt_mit_k_e(self):
         """u = k_e · (2·(b_x + b_y) + π·d_v), k_e = 0.9 für Innenstützen."""
-        self.assertEqual(self.befund.k_e, 0.9)
-        self.assertAlmostEqual(self.befund.u, 0.9 * (1.6 + math.pi * 0.234), places=4)
+        self.assertEqual(self.befund.innen.k_e, 0.9)
+        self.assertAlmostEqual(self.befund.innen.u, 0.9 * (1.6 + math.pi * 0.234), places=4)
 
     def test_rotation_in_stufe_1(self):
         """ψ = 1.5 · r_s/d · f_yd/E_s mit r_s = 0.22 · l (60)."""
@@ -102,7 +102,7 @@ class TestDurchstanzbewehrung(unittest.TestCase):
     def setUpClass(cls):
         cls.aufbau, cls.loesung, cls.befund, _ = rechnen(projekt(b_x=400, b_y=400, V_d=800.0))
         cls.urteile = {u.fall: u for u in cls.loesung.urteile}
-        cls.b = cls.befund.bewehrung
+        cls.b = cls.befund.leisten
 
     def test_vier_nachweise_statt_einem(self):
         """4.3.6.5.1: Bewehrung, Verformungsvermögen, Betondruckdiagonale, ausserhalb."""
@@ -114,7 +114,8 @@ class TestDurchstanzbewehrung(unittest.TestCase):
     def test_vorschlag(self):
         """Typ «D», ⌀10, h_A = 280 − 30 − 30 auf …5 mm abgerundet, Abstände ab 0.375·d."""
         v = self.b.vorschlag
-        self.assertTrue(v.reicht)
+        self.assertTrue(self.b.reicht)
+        self.assertIsNone(self.befund.pilz)
         self.assertEqual(v.typ.buchstabe, "X")
         self.assertAlmostEqual(v.h_A, 0.215)
         self.assertEqual(v.abstaende[:3], (0.085, 0.14, 0.14))
@@ -135,18 +136,18 @@ class TestDurchstanzbewehrung(unittest.TestCase):
         k_sys = 3.0 + (0.030 - 0.0234) / (0.234 / 6 - 0.0234) * (2.0 - 3.0)
         self.assertAlmostEqual(self.b.k_sys, k_sys, places=6)
         self.assertAlmostEqual(self.b.V_Rd_max, min(k_sys * self.befund.k_r, 3.5) * TAU_CD
-                               * 234.0 * self.befund.u * 1e3, delta=1.0)
+                               * 234.0 * self.befund.innen.u * 1e3, delta=1.0)
 
     def test_ausserhalb_mit_d_v_out(self):
         """4.3.6.5.10: d_v,out = d − c_v; V_Rd,c,out = k_r · τ_cd · d_v,out · u_out."""
-        self.assertAlmostEqual(self.b.d_v_out, 0.234 - 0.030)
-        self.assertAlmostEqual(self.b.V_Rd_c_out, self.befund.k_r * TAU_CD * 204.0
-                               * self.b.u_out * 1e3, delta=1.0)
+        self.assertAlmostEqual(self.b.aussen.d_v, 0.234 - 0.030)
+        self.assertAlmostEqual(self.b.V_Rd_c_aussen, self.befund.k_r * TAU_CD * 204.0
+                               * self.b.aussen.u * 1e3, delta=1.0)
 
     def test_ohne_bewehrung_steht_als_grad_da(self):
         """Der Grad ohne Bewehrung bleibt als Wert, ein Urteil fällt er nicht mehr."""
         grad = next(w for k, w in self.loesung.werte.items() if k.endswith("ohne.erfuellungsgrad"))
-        self.assertAlmostEqual(grad.groesse.si, self.befund.V_Rd_c / self.befund.V_d_red)
+        self.assertAlmostEqual(grad.groesse.si, self.befund.V_Rd_c / self.befund.innen.V_d_red)
         self.assertNotIn("ohne Durchstanzbewehrung", self.urteile)
 
     def test_zu_viel_last_bricht_die_druckdiagonale(self):
@@ -157,14 +158,16 @@ class TestDurchstanzbewehrung(unittest.TestCase):
         _, loesung, befund, _ = rechnen(projekt(b_x=400, b_y=400, V_d=1600.0))
         urteile = {u.fall: u for u in loesung.urteile}
         self.assertFalse(urteile["Betondruckdiagonale"].erfuellt)
-        self.assertIsNone(befund.bewehrung.pilz)
+        self.assertFalse(befund.leisten.diagonale_haelt)
+        self.assertIsNone(befund.pilz)
         self.assertIn("Betondruckdiagonale an der gestützten Fläche bricht", texte(loesung))
         self.assertIn("Auch kein ZEUS-Stahlpilz reicht", texte(loesung))
 
     def test_genug_beton_braucht_keine_bewehrung(self):
         """Ein Urteil ohne Bewehrung; die Grade mit Bewehrung unbeschränkt."""
         _, loesung, befund, urteil = rechnen(projekt(V_d=100.0))
-        self.assertIsNone(befund.bewehrung)
+        self.assertIsNone(befund.leisten)
+        self.assertIsNone(befund.pilz)
         self.assertEqual([u.fall for u in loesung.urteile], ["ohne Durchstanzbewehrung"])
         grade = [w.groesse.si for k, w in loesung.werte.items()
                  if k.endswith(("mit.erfuellungsgrad", "aussen.erfuellungsgrad"))]
@@ -173,14 +176,15 @@ class TestDurchstanzbewehrung(unittest.TestCase):
 
     def test_an_der_wand_noch_kein_vorschlag(self):
         _, loesung, befund, urteil = rechnen(projekt(lage="wandende", V_d=500.0))
-        self.assertIsNone(befund.bewehrung)
+        self.assertIsNone(befund.leisten)
+        self.assertIsNone(befund.pilz)
         self.assertFalse(urteil.erfuellt)
         self.assertIn("schlägt das Werkzeug noch keine Durchstanzbewehrung vor", texte(loesung))
 
     def test_am_rand_nur_leisten_in_der_platte(self):
         """Keine Leiste ragt über den Rand: jeder Anker liegt um c_nom innerhalb."""
         befund = rechnen(projekt(lage="rand", a_y=0, V_d=300.0))[2]
-        v = befund.bewehrung.vorschlag
+        v = befund.leisten.vorschlag
         anker = [p for l in v.leisten for p in l.anker(v.radien)]
         self.assertTrue(anker)
         self.assertTrue(all(p[1] >= -0.15 + 0.030 - 1e-9 for p in anker))
@@ -227,13 +231,13 @@ class TestLeistenAnAussparungen(unittest.TestCase):
         p = projekt(b_x=400, b_y=400, V_d=700.0)
         p.durchstanzstellen[0].aussparung([[-60, 330], [60, 330], [60, 360], [-60, 360]])
         befund = rechnen(p)[2]
-        v = befund.bewehrung.vorschlag
+        v = befund.leisten.vorschlag
         schlitz = [(-0.06, 0.33), (0.06, 0.33), (0.06, 0.36), (-0.06, 0.36)]
         for l in v.leisten:
             self.assertGreaterEqual(abstand_strecke_polygon(l.wurzel, l.anker(v.radien)[-1], schlitz),
                                     0.03 - 1e-9)
-        schatten = schatten_am_schnitt([schlitz], befund.schnitt.massgebend.kandidat.stuecke,
-                                       d_v=befund.d_v, achse=(0.0, 0.0))
+        schatten = schatten_am_schnitt([schlitz], befund.innen.auswertung.kandidat.stuecke,
+                                       d_v=befund.innen.d_v, achse=(0.0, 0.0))
         self.assertEqual(len(schatten), 1)
         for l in v.leisten:
             for x, y in l.anker(v.radien)[:2]:
@@ -243,7 +247,7 @@ class TestLeistenAnAussparungen(unittest.TestCase):
         """Verschieden lange Leisten sind verschiedene Typen: «… + 1 × … DX2-0215»."""
         typ = produkte.ANKERTYPEN[0]
         leisten = (Leiste((0, 0), (1, 0), 3), Leiste((0, 0), (0, 1), 3), Leiste((0, 0), (-1, 0), 2))
-        v = Vorschlag(typ, 0.215, (0.085, 0.14, 0.14), leisten, 2, None, True)
+        v = Vorschlag(typ, 0.215, (0.085, 0.14, 0.14), leisten, 2, None)
         self.assertEqual(v.name, "2 × ancoPLUS DX3-0215 + 1 × ancoPLUS DX2-0215")
 
 
@@ -253,10 +257,9 @@ class TestStahlpilz(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.aufbau, cls.loesung, cls.befund, _ = rechnen(projekt(b_x=400, b_y=400, V_d=1000.0))
-        cls.b = cls.befund.bewehrung
 
     def test_der_kleinste_pilz_der_reicht(self):
-        pilz = self.b.pilz.pilz
+        pilz = self.befund.pilz.pilz
         self.assertEqual((pilz.art, pilz.s, pilz.g), ("Doppelkreuz", 0.730, 0.150))
         self.assertLessEqual(pilz.h, 0.280 - produkte.PILZ_OBEN - produkte.PILZ_UNTEN)
 
@@ -271,14 +274,17 @@ class TestStahlpilz(unittest.TestCase):
 
     def test_gestuetzte_flaeche_bis_an_die_stege(self):
         """Die Fläche des Pilzes reicht bis an die Enden der Stege; d_v bis zu seiner Unterkante."""
-        umriss = self.b.pilz.umriss
+        umriss = self.befund.pilz.umriss
         self.assertAlmostEqual(max(x for x, _ in umriss), 0.365)
-        self.assertAlmostEqual(self.b.pilz.d_v, 0.234 - produkte.PILZ_UNTEN)
+        self.assertAlmostEqual(self.befund.pilz.pruefung.d_v, 0.234 - produkte.PILZ_UNTEN)
         self.assertIn("bestätigt der Hersteller", texte(self.loesung))
 
     def test_leisten_um_den_pilz(self):
-        v = self.b.vorschlag
-        self.assertTrue(v.reicht)
+        """Die Leisten wurzeln am Rand des Pilzes; ihr innerer Schnitt ist der um ihn."""
+        leisten = self.befund.leisten
+        self.assertTrue(leisten.reicht)
+        self.assertIs(leisten.innen, self.befund.pilz.pruefung)
+        v = leisten.vorschlag
         wurzeln = [l.wurzel for l in v.leisten]
         self.assertTrue(all(max(abs(x), abs(y)) >= 0.2 for x, y in wurzeln))
 
@@ -347,24 +353,24 @@ class TestFormenUndLagen(unittest.TestCase):
         for lage, k_e in (("innen", 0.9), ("rand", 0.7), ("ecke", 0.65),
                           ("wandende", 0.75), ("wandecke", 0.75)):
             with self.subTest(lage=lage):
-                self.assertEqual(rechnen(projekt(lage=lage, V_d=100.0))[2].k_e, k_e)
+                self.assertEqual(rechnen(projekt(lage=lage, V_d=100.0))[2].innen.k_e, k_e)
 
     def test_ovalstuetze(self):
         """Zwei Geraden b_x − b_y und zwei Halbkreise mit dem Radius b_y/2 + d_v/2."""
         befund = rechnen(projekt(form="oval", b_x=900, b_y=300, V_d=100.0))[2]
-        soll = 2 * 0.6 + math.pi * (0.3 + befund.d_v)
-        self.assertAlmostEqual(befund.schnitt.massgebend.in_der_platte, soll, places=3)
-        self.assertAlmostEqual(befund.u, 0.9 * soll, places=3)
+        soll = 2 * 0.6 + math.pi * (0.3 + befund.innen.d_v)
+        self.assertAlmostEqual(befund.innen.auswertung.in_der_platte, soll, places=3)
+        self.assertAlmostEqual(befund.innen.u, 0.9 * soll, places=3)
 
     def test_rundstuetze(self):
         befund = rechnen(projekt(form="rund", D=400, V_d=100.0))[2]
-        self.assertAlmostEqual(befund.u, 0.9 * math.pi * (0.4 + befund.d_v), places=3)
+        self.assertAlmostEqual(befund.innen.u, 0.9 * math.pi * (0.4 + befund.innen.d_v), places=3)
 
     def test_bodenplatte_zieht_die_bodenpressung_ab(self):
         """4.3.6.2.6: V_d,red = V_d − q_d · A im Schnitt; die Zugbewehrung liegt unten."""
         _, loesung, befund, _ = rechnen(projekt(plattenart="bodenplatte", V_d=1000.0, q_d=200.0))
-        A = befund.schnitt.massgebend.flaeche
-        self.assertAlmostEqual(befund.V_d_red, 1000e3 - 200e3 * A, places=3)
+        A = befund.innen.flaeche
+        self.assertAlmostEqual(befund.innen.V_d_red, 1000e3 - 200e3 * A, places=3)
         self.assertIn("Bodenpressung innerhalb des Nachweisschnitts", texte(loesung))
         self.assertIn("Überdeckung der Zugbewehrung unten", texte(loesung))
 
@@ -393,8 +399,8 @@ class TestAussparungen(unittest.TestCase):
         p = projekt(V_d=500.0)
         p.durchstanzstellen[0].aussparung([[250, -100], [450, -100], [450, 100], [250, 100]])
         befund = rechnen(p)[2]
-        self.assertGreater(befund.schnitt.massgebend.hinter_aussparungen, 0.1)
-        self.assertEqual(befund.k_e, 0.7)
+        self.assertGreater(befund.innen.auswertung.hinter_aussparungen, 0.1)
+        self.assertEqual(befund.innen.k_e, 0.7)
         self.assertEqual(len(befund.aussparungen), 1)
 
     def test_gleiche_ecken_sind_ein_knoten(self):

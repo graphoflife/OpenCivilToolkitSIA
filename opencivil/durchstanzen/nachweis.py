@@ -54,9 +54,11 @@ from opencivil.core.einheiten import EINHEITSLOS, KNM_PRO_M, M2, MM, MM2_PRO_M, 
 from opencivil.core.latex import Mathe, als_text, angabe
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
-from opencivil.durchstanzen import mit_bewehrung
-from opencivil.durchstanzen.mit_bewehrung import Bewehrungsbefund, Grundlage
-from opencivil.durchstanzen.schnitt import Auswertung, Nachweisschnitt, Punkt, nachweisschnitt
+from opencivil.durchstanzen import herleitung, mit_bewehrung
+from opencivil.durchstanzen.herleitung import STUETZE
+from opencivil.durchstanzen.mit_bewehrung import Grundlage
+from opencivil.durchstanzen.pruefung import Leistenpruefung, Pilzbefund, Schnittpruefung
+from opencivil.durchstanzen.schnitt import Auswertung, Punkt, nachweisschnitt
 from opencivil.durchstanzen.stelle import (
     Durchstanzstelle, KeArt, Lage, Naeherungsstufe, Stuetzenform,
 )
@@ -90,16 +92,14 @@ class Rotation:
 class Durchstanzbefund:
     """
     Was der Nachweis gefunden hat -- für die Zusammenfassung und das Bild.
-    Längen in m, Kräfte in N.
+    Längen in m, Kräfte in N. Leisten und Stahlpilz stehen nur da, wo es sie
+    braucht; jedes mit seinen eigenen Zahlen.
     """
 
     d: float
-    d_v: float
-    schnitt: Nachweisschnitt
-    k_e: float
-    u: float
-    V_d: float
-    V_d_red: float
+    innen: Schnittpruefung
+    """Der Schnitt um die gestützte Fläche."""
+
     rotationen: Tuple[Rotation, ...]
     psi: float
     k_r: float
@@ -109,8 +109,11 @@ class Durchstanzbefund:
     raender: Tuple[Tuple[Punkt, float], ...]
     """Je Plattenrand ein Punkt auf ihm und die Richtung, in die die Platte liegt (rad)."""
 
-    bewehrung: Optional[Bewehrungsbefund] = None
-    """Die vorgeschlagene Durchstanzbewehrung -- ``None``, wo der Beton allein reicht."""
+    leisten: Optional[Leistenpruefung] = None
+    """Die vorgeschlagene Durchstanzbewehrung mit ihren vier Nachweisen."""
+
+    pilz: Optional[Pilzbefund] = None
+    """Der gewählte Stahlpilz; mit ``leisten`` stehen die Leisten um ihn."""
 
 
 class Durchstanzen(Nachweis):
@@ -175,40 +178,41 @@ class Durchstanzen(Nachweis):
         dv = d_v.groesse.si
         schnitt = nachweisschnitt(s.kandidaten(masse, dv / 2.0, dv), d_v=dv,
                                   achse=s.achse(masse), aussparungen=s.aussparungen)
-        u_red = self._nachweisschnitt(e, p, w, schnitt, masse, d_v)
-        e_u = self._exzentrizitaet(e, schnitt.massgebend, masse)
-        k_e = self._k_e(e, p, w, schnitt.massgebend, e_u)
-        u = w.laenge("u", "u", k_e.groesse.si * u_red.groesse.si, stellen=0)
-        p.formel(u, r"@k_e \cdot @u_red", {"k_e": k_e, "u_red": u_red},
-                 titel="Wirksamer Umfang des Nachweisschnitts", referenz="SIA 262:2025, 4.3.6.2.3")
-        V_d = self._lasten(e, p, w, schnitt.massgebend)
+        a = schnitt.massgebend
+        u_red = self._nachweisschnitt(e, p, w, a, d_v)
+        e_u = self._exzentrizitaet(e, a, masse)
+        k_e = self._k_e(e, p, w, a, e_u)
+        innen = Schnittpruefung(schnitt, dv, k_e.groesse.si, e.g("V_d").si, e.g("q_d").si)
+        u = herleitung.wirksam(p, w, k_e, u_red, ix=STUETZE,
+                               titel="Wirksamer Umfang des Nachweisschnitts")
+        p.titel("Bemessungswert der Querkraft", ebene=3)
+        V_d = herleitung.querkraft(p, w, e, innen, ix=STUETZE,
+                                   titel_last=f"{s.plattenart.last} innerhalb des Nachweisschnitts",
+                                   titel="Bemessungswert der Querkraft im Nachweisschnitt")
         rotationen, psi = self._rotation(e, p, w, d, hoehen, V_d, e_u, masse)
         k_r = self._k_r(e, p, w, psi, d)
         tau = e[s.beton.eingabename("tau_cd")]
         tau_cd = w.wert("tau_cd", tau.symbol, tau.groesse, 4)
-        V_Rd_c = w.kraft("V_Rd_c", "V_{Rd,c}", k_r.groesse.si * tau_cd.groesse.si * d_v.groesse.si
-                         * u.groesse.si, "Durchstanzwiderstand ohne Durchstanzbewehrung")
-        p.formel(V_Rd_c, r"@k_r \cdot @tau_cd \cdot @d_v \cdot @u",
-                 {"k_r": k_r, "tau_cd": tau_cd, "d_v": d_v, "u": u},
-                 titel="Durchstanzwiderstand ohne Durchstanzbewehrung",
-                 referenz="SIA 262:2025, 4.3.6.3.1", name="Durchstanzwiderstand ohne Durchstanzbewehrung")
+        V_Rd_c = herleitung.widerstand(p, w, innen, ix=STUETZE, k_r=k_r, tau_cd=tau_cd, d_v=d_v,
+                                       u=u, titel="Durchstanzwiderstand ohne Durchstanzbewehrung",
+                                       referenz="SIA 262:2025, 4.3.6.3.1")
         v = Vergleich(V_d, V_Rd_c)
         v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
         v.zeile(p, self.d_ohne, mit_urteil=True)
         umriss = tuple(s.umriss(masse, dv))
         befund = Durchstanzbefund(
-            d=d.groesse.si, d_v=d_v.groesse.si, schnitt=schnitt, k_e=k_e.groesse.si,
-            u=u.groesse.si, V_d=e.g("V_d").si, V_d_red=V_d.groesse.si, rotationen=rotationen,
-            psi=psi.groesse.si, k_r=k_r.groesse.si, V_Rd_c=V_Rd_c.groesse.si,
-            umriss=umriss, aussparungen=tuple(s.aussparungen),
+            d=d.groesse.si, innen=innen, rotationen=rotationen, psi=psi.groesse.si,
+            k_r=k_r.groesse.si, V_Rd_c=V_Rd_c.groesse.si, umriss=umriss,
+            aussparungen=tuple(s.aussparungen),
             raender=tuple(((h.c * h.n[0], h.c * h.n[1]), math.atan2(-h.n[1], -h.n[0]))
                           for h in s.raender(masse)))
         if not v.erfuellt and not s.lage.wand:
-            urteile, bewehrung, grade = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
-                d=d, d_v=d_v, k_e=k_e, k_r=k_r, tau_cd=tau_cd, u=u, psi=psi, V_d=V_d,
-                V_Rd_c=V_Rd_c, masse=masse, umriss=umriss, schnitt=schnitt))
-            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS), **grade}, urteile,
-                               replace(befund, bewehrung=bewehrung))
+            urteile, leisten, pilz = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
+                innen=innen, d=d, d_v=d_v, k_e=k_e, k_r=k_r, tau_cd=tau_cd, u=u, psi=psi,
+                V_d=V_d, V_Rd_c=V_Rd_c, masse=masse, umriss=umriss))
+            # Der Grad ohne Bewehrung bleibt ein Wert der Herleitung, ohne Urteil.
+            return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS)}, urteile,
+                               replace(befund, leisten=leisten, pilz=pilz))
         if not v.erfuellt:
             p.hinweis(f"Für {_mehrzahl(s.lage)} schlägt das Werkzeug noch keine "
                       f"Durchstanzbewehrung vor.")
@@ -225,10 +229,7 @@ class Durchstanzen(Nachweis):
             self.d_ohne, "ohne Durchstanzbewehrung", v,
             f"V_d = {V_d.formatiert()} kN {'≤' if v.erfuellt else '>'} "
             f"V_Rd,c = {V_Rd_c.formatiert()} kN.")
-        # Braucht es keine Bewehrung, sind die Grade mit ihr unbeschränkt; an einer
-        # Wand, für die keine vorgeschlagen wird, null.
-        grad = Groesse(math.inf if v.erfuellt else 0.0, EINHEITSLOS)
-        return Ausfuehrung({d.id: grad for d in self.mit_graden}, [urteil], befund)
+        return Ausfuehrung({}, [urteil], befund)
 
     # -- Statische Höhe -----------------------------------------------------
 
@@ -266,11 +267,14 @@ class Durchstanzen(Nachweis):
 
     # -- Nachweisschnitt ----------------------------------------------------
 
-    def _nachweisschnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte,
-                         schnitt: Nachweisschnitt, masse: Dict[str, float], d_v: Wert) -> Wert:
-        """Der Nachweisschnitt und was von ihm nicht zählt: ``u_red``, noch ohne k_e."""
+    def _nachweisschnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung,
+                         d_v: Wert) -> Wert:
+        """
+        Der Nachweisschnitt und was von ihm nicht zählt: ``u_red``, noch ohne
+        k_e. Um einfache Flächen steht u_0 als Formel, sonst als Länge in der
+        Platte; die Abzüge schreibt :mod:`.herleitung`, wie an jedem Schnitt.
+        """
         s = self.stelle
-        a = schnitt.massgebend
         p.titel("Nachweisschnitt", ebene=3)
         referenz = "SIA 262:2025, 4.3.6.2.2"
         einfach = (s.lage is Lage.INNEN and a.an_ecken < 1e-6
@@ -278,30 +282,26 @@ class Durchstanzen(Nachweis):
         if s.lage.wand:
             # Entlang der Wand zählt der Schnitt 1.5·d_v; was dahinter läuft, gehört nicht dazu.
             if s.lage is Lage.WANDENDE:
-                u_0 = w.laenge("u_0", "u_0", masse["t"] + 3.0 * d_v.groesse.si
+                u_0 = w.laenge("u_0", "u_0", e.g("t").si + 3.0 * d_v.groesse.si
                                + math.pi * d_v.groesse.si / 2.0, stellen=0)
                 vorlage, eingaben = r"@t + 3 \cdot @d_v + \frac{\pi \cdot @d_v}{2}", {"t": e["t"]}
+                titel = "Nachweisschnitt um das Wandende: 1.5·d_v entlang der Wand"
             else:
                 u_0 = w.laenge("u_0", "u_0", 3.0 * d_v.groesse.si + math.pi * d_v.groesse.si / 4.0,
                                stellen=0)
                 vorlage, eingaben = r"3 \cdot @d_v + \frac{\pi \cdot @d_v}{4}", {}
-            titel = ("Nachweisschnitt um das Wandende: 1.5·d_v entlang der Wand"
-                     if s.lage is Lage.WANDENDE
-                     else "Nachweisschnitt um die Wandecke: je 1.5·d_v entlang der Wände")
+                titel = "Nachweisschnitt um die Wandecke: je 1.5·d_v entlang der Wände"
             p.formel(u_0, vorlage, {**eingaben, "d_v": d_v}, titel=titel,
                      referenz="SIA 262:2025, 4.3.6.2.3, Figur 23b und c")
-            abzug_ecken = 0.0
         elif einfach and s.form is Stuetzenform.RECHTECK:
             u_0 = w.laenge("u_0", "u_0", a.in_der_platte, stellen=0)
             p.formel(u_0, r"2 \cdot \left(@b_x + @b_y\right) + \pi \cdot @d_v",
                      {"b_x": e["b_x"], "b_y": e["b_y"], "d_v": d_v},
                      titel="Nachweisschnitt im Abstand d_v/2", referenz=f"{referenz}, Figur 22b")
-            abzug_ecken = 0.0
         elif einfach and s.form is Stuetzenform.RUND:
             u_0 = w.laenge("u_0", "u_0", a.in_der_platte, stellen=0)
             p.formel(u_0, r"\pi \cdot \left(@D + @d_v\right)", {"D": e["D"], "d_v": d_v},
                      titel="Nachweisschnitt im Abstand d_v/2", referenz=f"{referenz}, Figur 22a")
-            abzug_ecken = 0.0
         elif einfach:
             u_0 = w.laenge("u_0", "u_0", a.in_der_platte, stellen=0)
             p.formel(u_0, r"2 \cdot \left|@b_x - @b_y\right| + \pi \cdot "
@@ -309,45 +309,20 @@ class Durchstanzen(Nachweis):
                      {"b_x": e["b_x"], "b_y": e["b_y"], "d_v": d_v},
                      titel="Nachweisschnitt im Abstand d_v/2: zwei Geraden und zwei Halbkreise",
                      referenz=f"{referenz}, Figur 22", name="Nachweisschnitt im Abstand d_v/2")
-            abzug_ecken = 0.0
         else:
             if a.kandidat.raender:
                 p.erklaerung(
                     "Der Schnitt endet am Plattenrand: so ist er kürzer als der geschlossene "
                     "(Figur 22d). Was jenseits des Rands läge, zählt nicht.")
-            u_0 = w.laenge("u_0", "u_0", a.in_der_platte, stellen=0)
-            p.wert(u_0, titel="Nachweisschnitt im Abstand d_v/2, soweit er in der Platte liegt",
-                   referenz=f"{referenz}, Figur 22")
-            abzug_ecken = a.an_ecken
-        teile = [("u_0", u_0)]
-        if abzug_ecken > 1e-6:
-            du_e = w.laenge("du_E", r"\Delta u_E", abzug_ecken, stellen=0)
-            p.erklaerung(
-                "An den Ecken grosser gestützter Flächen ballt sich die Querkraft: von einer "
-                "geraden Strecke des Schnitts zählt nur, was höchstens 1.5·d_v von einer Ecke "
-                "entfernt liegt.")
-            p.wert(du_e, titel="Was neben den Ecken nicht zählt",
-                   referenz="SIA 262:2025, 4.3.6.2.3, Figur 23a")
-            teile.append(("du_E", du_e))
-        if a.hinter_aussparungen > 1e-6:
-            du_a = w.laenge("du_A", r"\Delta u_A", a.hinter_aussparungen, stellen=0)
-            p.erklaerung(
-                "Hinter einer Aussparung, die näher als 5·d_v am Schnitt liegt, zählt nicht, "
-                "was zwischen den beiden Strahlen von der Stützenachse an ihr vorbei liegt.")
-            p.wert(du_a, titel="Was hinter Aussparungen nicht zählt",
-                   referenz="SIA 262:2025, 4.3.6.2.3, Figur 23d")
-            teile.append(("du_A", du_a))
-        u_red_si = u_0.groesse.si - sum(t.groesse.si for _, t in teile[1:])
-        u_red = w.laenge("u_red", "u_{red}", u_red_si, stellen=0)
-        if len(teile) > 1:
-            p.formel(u_red, " - ".join(f"@{n}" for n, _ in teile), dict(teile),
-                     titel="Nachweisschnitt ohne das, was nicht zählt",
-                     referenz="SIA 262:2025, 4.3.6.2.3")
-        else:
-            p.formel(u_red, "@u_0", {"u_0": u_0}, titel="Nichts mindert den Schnitt",
-                     referenz="SIA 262:2025, 4.3.6.2.3",
-                     name="Nachweisschnitt ohne das, was nicht zählt")
-        return u_red
+            u_0 = herleitung.rand(p, w, a, ix=STUETZE,
+                                  titel="Nachweisschnitt im Abstand d_v/2, soweit er in der Platte liegt",
+                                  referenz=f"{referenz}, Figur 22")
+        return herleitung.abzuege(
+            p, w, a, u_0, ix=STUETZE, ecken=not s.lage.wand,
+            ecken_text="An den Ecken grosser gestützter Flächen ballt sich die Querkraft: von "
+                       "einer geraden Strecke des Schnitts zählt nur, was höchstens 1.5·d_v von "
+                       "einer Ecke entfernt liegt.",
+            ecken_referenz="SIA 262:2025, 4.3.6.2.3, Figur 23a")
 
     def _exzentrizitaet(self, e: Eingaben, a: Auswertung,
                         masse: Dict[str, float]) -> Tuple[float, float]:
@@ -398,32 +373,6 @@ class Durchstanzen(Nachweis):
         p.formel(k_e, r"\frac{1}{1 + \frac{@e_u}{@b}}", {"e_u": e_u_w, "b": b},
                  titel="Beiwert der Momentenübertragung", referenz="SIA 262:2025, 4.3.6.2.4, (57)")
         return k_e
-
-    # -- Lasten im Schnitt --------------------------------------------------
-
-    def _lasten(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung) -> Wert:
-        """Der Bemessungswert der Querkraft, ohne die Flächenlast innerhalb des Schnitts (4.3.6.2.6)."""
-        s = self.stelle
-        p.titel("Bemessungswert der Querkraft", ebene=3)
-        V_d, q_d = e["V_d"], e["q_d"]
-        if q_d.groesse.si <= 0.0:
-            ergebnis = w.kraft("V_d_red", r"V_{d,red}", V_d.groesse.si)
-            p.formel(ergebnis, "@V_d", {"V_d": V_d}, titel="Keine Flächenlast im Schnitt abgezogen",
-                     referenz="SIA 262:2025, 4.3.6.2.6",
-                     name="Bemessungswert der Querkraft im Nachweisschnitt")
-            return ergebnis
-        A = w.wert("A_q", "A_q", Groesse.aus_si(a.flaeche_ohne_aussparungen, M2), 3,
-                   "Fläche innerhalb des Nachweisschnitts, ohne Aussparungen")
-        p.wert(A, titel="Fläche innerhalb des Nachweisschnitts, ohne Aussparungen")
-        dV = w.kraft("dV", r"\Delta V_d", q_d.groesse.si * A.groesse.si)
-        p.formel(dV, r"@q_d \cdot @A_q", {"q_d": q_d, "A_q": A},
-                 titel=f"{s.plattenart.last} innerhalb des Nachweisschnitts",
-                 referenz="SIA 262:2025, 4.3.6.2.6", name="Flächenlast innerhalb des Nachweisschnitts")
-        ergebnis = w.kraft("V_d_red", r"V_{d,red}", V_d.groesse.si - dV.groesse.si)
-        p.formel(ergebnis, r"@V_d - @dV", {"V_d": V_d, "dV": dV},
-                 titel="Bemessungswert der Querkraft im Nachweisschnitt",
-                 referenz="SIA 262:2025, 4.3.6.2.6")
-        return ergebnis
 
     # -- Plattenrotation ----------------------------------------------------
 
@@ -626,39 +575,41 @@ def angaben(stelle: Durchstanzstelle, werte: Dict[str, Wert]) -> GleichungBlock:
 def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock:
     """
     Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse. Mit
-    Durchstanzbewehrung dazu das Produkt und die Widerstände mit ihm.
+    Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
     """
     def zeile(text: str, zeichen: str, wert: str, einheit: str) -> list:
         return [text, Mathe(zeichen), Mathe(wert), einheit]
+
+    def kraft(x: float) -> str:
+        return f"{x / 1e3:.1f}"
+
+    innen = befund.innen
     zeilen = [
-        zeile("Wirksame statische Höhe", "d_v", f"{befund.d_v * 1e3:.0f}", "mm"),
-        zeile("Nachweisschnitt, wirksam", "u", f"{befund.u * 1e3:.0f}", "mm"),
-        zeile("Momentenübertragung", "k_e", f"{befund.k_e:.3f}", "–"),
+        zeile("Wirksame statische Höhe", "d_v", f"{innen.d_v * 1e3:.0f}", "mm"),
+        zeile("Nachweisschnitt, wirksam", "u", f"{innen.u * 1e3:.0f}", "mm"),
+        zeile("Momentenübertragung", "k_e", f"{innen.k_e:.3f}", "–"),
         zeile("Plattenrotation", r"\psi", f"{befund.psi:.4f}", "–"),
         zeile("Beiwert", "k_r", f"{befund.k_r:.3f}", "–"),
-        zeile("Querkraft im Schnitt", "V_d", f"{befund.V_d_red / 1e3:.1f}", "kN"),
-        zeile("Widerstand ohne Durchstanzbewehrung", "V_{Rd,c}", f"{befund.V_Rd_c / 1e3:.1f}", "kN"),
+        zeile("Querkraft im Schnitt", "V_d", kraft(innen.V_d_red), "kN"),
+        zeile("Widerstand ohne Durchstanzbewehrung", "V_{Rd,c}", kraft(befund.V_Rd_c), "kN"),
     ]
-    b = befund.bewehrung
-    if b is not None and b.pilz is not None:
-        zeilen.append(["Stahlpilz", "", b.pilz.pilz.name, ""])
-    if b is not None and b.vorschlag is not None:
-        v = b.vorschlag
+    pilz, leisten = befund.pilz, befund.leisten
+    if pilz is not None:
+        zeilen += [
+            ["Stahlpilz", "", pilz.pilz.name, ""],
+            zeile("Querkraft um den Stahlpilz", "V_{d,P}", kraft(pilz.pruefung.V_d_red), "kN"),
+            zeile("Widerstand um den Stahlpilz", "V_{Rd,c,P}", kraft(pilz.V_Rd_c), "kN"),
+        ]
+    if leisten is not None:
+        v = leisten.vorschlag
         zeilen += [
             ["Durchstanzbewehrung", "", v.name, ""],
-            zeile("Abstände ab Stütze" if b.pilz is None else "Abstände ab Pilz", "s",
+            zeile("Abstände ab Stütze" if pilz is None else "Abstände ab Pilz", "s",
                   " / ".join(f"{a * 1e3:.0f}" for a in v.abstaende), "mm"),
-            zeile("Beitrag der Bewehrung", "V_{Rd,s}", f"{b.V_Rd_s / 1e3:.1f}", "kN"),
-            zeile("Erste Betondruckdiagonale", "V_{Rd,max}", f"{b.V_Rd_max / 1e3:.1f}", "kN"),
-        ]
-    if b is not None:
-        aussen = "ausserhalb" if b.vorschlag is not None else "um den Stahlpilz"
-        zeilen += [
-            zeile(f"Querkraft {aussen}", "V_{d,out}" if b.vorschlag is not None else "V_{d,P}",
-                  f"{b.V_d_out / 1e3:.1f}", "kN"),
-            zeile(f"Widerstand {aussen}",
-                  "V_{Rd,c,out}" if b.vorschlag is not None else "V_{Rd,c,P}",
-                  f"{b.V_Rd_c_out / 1e3:.1f}", "kN"),
+            zeile("Beitrag der Bewehrung", "V_{Rd,s}", kraft(leisten.V_Rd_s), "kN"),
+            zeile("Erste Betondruckdiagonale", "V_{Rd,max}", kraft(leisten.V_Rd_max), "kN"),
+            zeile("Querkraft ausserhalb", "V_{d,out}", kraft(leisten.aussen.V_d_red), "kN"),
+            zeile("Widerstand ausserhalb", "V_{Rd,c,out}", kraft(leisten.V_Rd_c_aussen), "kN"),
         ]
     return TabellenBlock(kopf=["Grösse", "Zeichen", "Wert", "Einheit"], zeilen=zeilen,
                          titel="Durchstanzen", ausrichtung="llrl")

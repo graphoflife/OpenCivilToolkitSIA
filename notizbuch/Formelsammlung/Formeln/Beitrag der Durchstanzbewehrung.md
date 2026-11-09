@@ -1,5 +1,5 @@
 ---
-erzeugt: 40d35ef24f48
+erzeugt: a1dcde3dc8f5
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.5.4, (68)"
@@ -29,7 +29,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.mit_bewehrung#_mit_leisten|_mit_leisten]]
+- [[opencivil.durchstanzen.mit_bewehrung#_leisten_schreiben|_leisten_schreiben]]
 
 ## Themen
 

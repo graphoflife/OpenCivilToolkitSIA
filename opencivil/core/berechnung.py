@@ -1079,6 +1079,14 @@ class Nachweis(Berechnung):
         # Der Grad eines Urteils ist zugleich die Ausgabe, die es traegt: die
         # Pruefung nennt ihn einmal, im Urteil. Vorher schrieb sie ihn zweimal.
         ausgaben = {**pruefung.ausgaben, **{u.ziel: u.erfuellungsgrad for u in urteile if u.ziel}}
+        # Ein Grad, den kein Urteil traegt, ist unbeschraenkt: sein Fall kam in
+        # dieser Rechnung nicht vor -- eine Seite ohne Bewehrung, ein Lastfall
+        # ohne Last, eine Durchstanzstelle, die keine Bewehrung braucht. Bis
+        # 2026-11-09 schrieb das jede Pruefung selbst, auf drei Arten.
+        unbeschraenkt = Groesse(math.inf, EINHEITSLOS)
+        for d in self.ausgaben:
+            if d.erfuellungsgrad and d.id not in ausgaben:
+                ausgaben[d.id] = unbeschraenkt
         return replace(pruefung, ausgaben=ausgaben, urteile=tuple(urteile))
 
     # Ein `alle_erfuellt` gab es hier einmal. Es hatte keinen Aufrufer und

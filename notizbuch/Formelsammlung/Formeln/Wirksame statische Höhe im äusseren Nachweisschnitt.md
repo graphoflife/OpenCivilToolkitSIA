@@ -1,5 +1,5 @@
 ---
-erzeugt: 676ccd20ddcf
+erzeugt: 87c47012e3e5
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.5.10, Figur 26"
@@ -28,13 +28,9 @@ $$
 d_{v,out} = d - c_v = 234\,\mathrm{mm} - 30\,\mathrm{mm} = 204\,\mathrm{mm}
 $$
 
-## Gebraucht von
-
-- [[Durchstanzwiderstand im äusseren Nachweisschnitt]]
-
 ## Im Code
 
-- [[opencivil.durchstanzen.mit_bewehrung#_mit_leisten|_mit_leisten]]
+- [[opencivil.durchstanzen.mit_bewehrung#_leisten_schreiben|_leisten_schreiben]]
 
 ## Themen
 

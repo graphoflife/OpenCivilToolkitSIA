@@ -1,5 +1,5 @@
 ---
-erzeugt: 0524bfe9c6e5
+erzeugt: 670907ca580e
 art: modul
 tags: [modul]
 ---
@@ -11,9 +11,9 @@ tags: [modul]
 
 Je Durchstanzstelle der Grundriss, wie der Kern ihn gerechnet hat, in mm:
 der Umriss der gestützten Fläche, die Plattenränder, die Aussparungen und
-der Nachweisschnitt -- je Stück, ob es zählt --, und wo es eine braucht, die
-Durchstanzbewehrung: die Leisten mit ihren Ankern und der äussere Schnitt.
-Dazu die Zahlen der Legende.
+der Nachweisschnitt -- je Stück, ob es zählt --, und wo es sie braucht, die
+Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
+Stegen und dem Schnitt um ihn, je für sich. Dazu die Zahlen der Legende.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises ([[opencivil.durchstanzen.nachweis]]).
 
@@ -35,22 +35,37 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[s
 
 Was der Grundriss einer Stelle braucht -- `None`, wenn ihr Nachweis nicht gelaufen ist.
 
-### _bewehrung
+### _linien
 
 ```python
-def _bewehrung(b: Optional[Bewehrungsbefund]) -> Optional[Dict[str, Any]]
+def _linien(schnitt: Nachweisschnitt) -> list
 ```
 
-Was die Bemessung vorschlägt, in mm und kN: die Leisten mit ihren Ankern
-und der äussere Schnitt um sie, der Stahlpilz mit seinen Stegen und dem
-Schnitt um ihn -- was es davon gibt --, und die Zahlen der Legende.
+Die Stücke eines Schnitts fürs Bild, je mit der Angabe, ob es zählt.
+
+### _leisten
+
+```python
+def _leisten(b: Optional[Leistenpruefung]) -> Optional[Dict[str, Any]]
+```
+
+Die Leisten mit ihren Ankern, der äussere Schnitt um sie und ihre Zahlen -- in mm, kN.
+
+### _pilz
+
+```python
+def _pilz(b: Optional[Pilzbefund]) -> Optional[Dict[str, Any]]
+```
+
+Der Stahlpilz mit seinen Stegen, seiner Fläche und dem Schnitt um sie -- in mm, kN.
 
 
 ## Braucht
 
 - [[opencivil.core.rechenwerk]]
-- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.pruefung]]
+- [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.projekt]]
 
 ## Gebraucht von

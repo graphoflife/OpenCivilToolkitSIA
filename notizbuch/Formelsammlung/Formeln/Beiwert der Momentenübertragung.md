@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d5be6d54368
+erzeugt: b3cdeec5d7c1
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.4, (57)"
@@ -30,7 +30,6 @@ $$
 
 - [[Beitrag der Durchstanzbewehrung]]
 - [[Durchstanzbewehrung an der Fliessgrenze]]
-- [[Wirksamer Umfang des äusseren Nachweisschnitts]]
 - [[Wirksamer Umfang des Nachweisschnitts]]
 
 ## Im Code

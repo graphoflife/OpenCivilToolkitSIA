@@ -1,5 +1,5 @@
 ---
-erzeugt: ea8418e80905
+erzeugt: ffd5d4bdb3bf
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -53,7 +53,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Durchstanzen**
 
-- [[Durchstanzen]] · 43
+- [[Durchstanzen]] · 36
 
 ## Formeln von A bis Z
 
@@ -66,7 +66,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Arbeitsgleiche Knotenkräfte]]
 - [[Aufnehmbare Risskraft]] · $N_{s,adm,2,x}$
 - [[Aufnehmbares Moment der Bewehrung]] · $M_{s,adm,2,x}$
-- [[Äusserer Nachweisschnitt ohne das, was nicht zählt]] · $u_{out,red}$
 - [[Bedingung der Duktilität]]
 - [[Bedingung gegen sprödes Versagen]]
 - [[Beide Lagen fliessen auf Zug]] · $N_{Rd}^{+}$
@@ -122,7 +121,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Druckzonenhöhe im Stützstreifen]] · $x_x$
 - [[Durchmesser des flächengleichen Kreises]] · $b$
 - [[Durchstanzbewehrung an der Fliessgrenze]] · $V_{Rd,v}$
-- [[Durchstanzwiderstand im äusseren Nachweisschnitt]] · $V_{Rd,c,out}$
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · $V_{Rd,c}$
 - [[Eigengewicht eines Stabs]] · $g_{k}$
 - [[Einflussfaktor der Rechtecklast]]
@@ -203,8 +201,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Probe – Moment um z]] · $M_{z,Rd}$
 - [[Probe – Normalkraft]] · $N_{Rd}$
 - [[Querkraft für die Durchstanzbewehrung]] · $V_{d,s}$
-- [[Querkraft im äusseren Nachweisschnitt]] · $V_{d,out}$
-- [[Querkraft im Schnitt um den Stahlpilz]] · $V_{d,P}$
 - [[Querkraft über die Federn der Wände]]
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]] · $V_{Rd}^{+}(M_{Ed} = 0)$
@@ -222,7 +218,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Rissmoment des ungerissenen Querschnitts]] · $M_{Riss}$
 - [[Rissnormalkraft beim Moment]] · $N_{Riss}(M)$
 - [[Schiefstellung]] · $\alpha_i$
-- [[Schnitt um den Stahlpilz ohne das, was nicht zählt]] · $u_{P,red}$
 - [[Schnittgrössen aus der Spannungsverteilung]]
 - [[Schnittgrössen längs eines Stabs]]
 - [[Schwerpunkt der zusammengefassten Lage]] · $z_{2,x}$
@@ -279,9 +274,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wirksame statische Höhe um den Stahlpilz]] · $d_{v,P}$
 - [[Wirksame Zugfestigkeit]] · $f_{ct,eff}$
 - [[Wirksamer Elastizitätsmodul]] · $E_{c,eff}$
-- [[Wirksamer Umfang des äusseren Nachweisschnitts]] · $u_{out}$
 - [[Wirksamer Umfang des Nachweisschnitts]] · $u$
-- [[Wirksamer Umfang des Schnitts um den Stahlpilz]] · $u_{P}$
 - [[Zulässige Dehnung]] · $\varepsilon_{s,adm}$
 - [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
 - [[Zulässige Stahlspannung (normale Anforderung)]] · $\sigma_{s,adm}$
@@ -289,7 +282,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-124 von 229 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+122 von 222 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -297,7 +290,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Arbeitsgleiche Knotenkräfte]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Aufnehmbare Risskraft]] · [[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft._protokoll_lage]], [[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA.pruefe|RissnormalkraftQA.pruefe]]
 - [[Aufnehmbares Moment der Bewehrung]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_lage]]
-- [[Äusserer Nachweisschnitt ohne das, was nicht zählt]] · [[opencivil.durchstanzen.mit_bewehrung#_umfang|_umfang]]
 - [[Beide Lagen fliessen auf Zug]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Beiwert der Parabel]] · [[opencivil.querschnitt.werkstoffgesetz#Betongesetz.protokoll|Betongesetz.protokoll]]
 - [[Beiwert für die statische Höhe]] · [[opencivil.nachweis.querkraft_ohne_buegel#protokoll_ohne_buegel|protokoll_ohne_buegel]]
@@ -381,7 +373,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Rissmoment bei der Normalkraft]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Rissmoment des ungerissenen Querschnitts]] · [[opencivil.nachweis.rissgroessen#protokoll_rissmoment|protokoll_rissmoment]], [[opencivil.nachweis.rissgroessen#protokoll_rissmoment_rechteck|protokoll_rissmoment_rechteck]]
 - [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
-- [[Schnitt um den Stahlpilz ohne das, was nicht zählt]] · [[opencivil.durchstanzen.mit_bewehrung#_umfang|_umfang]]
 - [[Schnittgrössen aus der Spannungsverteilung]] · [[opencivil.nachweis.resistenzlinie#Ebenenlinie.protokoll_ansatz|Ebenenlinie.protokoll_ansatz]]
 - [[Schnittgrössen längs eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Schwerpunkt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]], [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]

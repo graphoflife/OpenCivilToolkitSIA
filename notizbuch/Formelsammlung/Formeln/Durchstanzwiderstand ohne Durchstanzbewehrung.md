@@ -1,11 +1,11 @@
 ---
-erzeugt: f132b559dc6b
+erzeugt: e404d8ba0036
 art: formel
 tags: [formel]
-normstelle: ["SIA 262:2025, 4.3.6.3.1", "SIA 262:2025, 4.3.6.6.2"]
+normstelle: ["SIA 262:2025, 4.3.6.3.1", "SIA 262:2025, 4.3.6.5.10, (58)", "SIA 262:2025, 4.3.6.6.2"]
 ---
 > [!info] Normstellen
-> SIA 262:2025, 4.3.6.3.1 · SIA 262:2025, 4.3.6.6.2
+> SIA 262:2025, 4.3.6.3.1 · SIA 262:2025, 4.3.6.5.10, (58) · SIA 262:2025, 4.3.6.6.2
 
 $$
 V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u
@@ -38,8 +38,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.mit_bewehrung#_mit_pilz|_mit_pilz]]
-- [[opencivil.durchstanzen.nachweis#Durchstanzen.pruefe|Durchstanzen.pruefe]]
+- [[opencivil.durchstanzen.herleitung#widerstand|widerstand]]
 
 ## Themen
 
@@ -54,3 +53,12 @@ Ohne Durchstanzbewehrung trägt der Beton allein: $\tau_{cd}$ mal
 Umfang ist der wirksame, um $k_e$ gemindert
 ([[Wirksamer Umfang des Nachweisschnitts]]). Gehalten wird der Widerstand
 gegen die [[Bemessungswert der Querkraft im Nachweisschnitt|Querkraft im Schnitt]].
+
+Ausserhalb der Durchstanzbewehrung trägt wieder der Beton allein
+($V_{Rd,c,out}$, 4.3.6.5.10): mit $k_r$ von innen, aber mit der wirksamen
+Höhe bis zu den Köpfen der Anker
+([[Wirksame statische Höhe im äusseren Nachweisschnitt]]) und dem Umfang
+des äusseren Schnitts. Reicht er nicht, braucht es längere Leisten oder mehr
+davon. Um einen Stahlpilz ($V_{Rd,c,P}$, 4.3.6.6.2) gilt die wirksame Höhe
+bis zu seiner Unterkante ([[Wirksame statische Höhe um den Stahlpilz]]); wo
+der Beton um ihn nicht reicht, kommen Leisten um den Pilz dazu.

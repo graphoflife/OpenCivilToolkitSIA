@@ -39,7 +39,7 @@ from opencivil.core.berechnung import (
     UNBESCHRAENKT, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Nachweis,
     NachweisUrteil, Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, Groesse
+from opencivil.core.einheiten import KN, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
@@ -168,9 +168,6 @@ class SchiefeBiegung(Nachweis):
             befund.ergebnisse.append(erg)
             if urteil is not None:
                 urteile.append(urteil)
-            else:
-                ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(erg.erfuellungsgrad,
-                                                                    EINHEITSLOS)
         return Ausfuehrung(ergebnis, urteile, befund)
 
     def _einwirkung(self, e: Eingaben, fall: Lastfall) -> Tuple[float, float, float]:

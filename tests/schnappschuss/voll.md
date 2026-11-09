@@ -7823,7 +7823,7 @@ $$
 
 #### Bemessungswert der Querkraft
 
-**Fläche innerhalb des Nachweisschnitts, ohne Aussparungen**
+**Fläche innerhalb des Schnitts, ohne Aussparungen**
 
 $$
 A_q = 0.39\,\mathrm{m}^{2}
@@ -8108,31 +8108,37 @@ $$
 **Äusserer Nachweisschnitt, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-u_{out,0} = 6619\,\mathrm{mm}
+u_{0,out} = 6619\,\mathrm{mm}
 $$
 
-**Äusserer Nachweisschnitt ohne das, was nicht zählt**
+**Nichts mindert den Schnitt** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out,red} = u_{out,0} = 6619\,\mathrm{mm}
+u_{red,out} = u_{0,out} = 6619\,\mathrm{mm}
 $$
 
 **Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out} = k_e \cdot u_{out,red} = 0.9 \cdot 6619\,\mathrm{mm} = 5957\,\mathrm{mm}
+u_{out} = k_e \cdot u_{red,out} = 0.9 \cdot 6619\,\mathrm{mm} = 5957\,\mathrm{mm}
 $$
 
 **Fläche innerhalb des Schnitts, ohne Aussparungen**
 
 $$
-A_{out} = 3.392\,\mathrm{m}^{2}
+A_{q,out} = 3.392\,\mathrm{m}^{2}
+$$
+
+**Eigengewicht und Nutzlast innerhalb des äusseren Schnitts** *(SIA 262:2025, 4.3.6.2.6)*
+
+$$
+\Delta V_{d,out} = q_d \cdot A_{q,out} = 14\,\mathrm{kN}/\mathrm{m}^{2} \cdot 3.392\,\mathrm{m}^{2} = 47.5\,\mathrm{kN}
 $$
 
 **Querkraft im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
-V_{d,out} = V_d - q_d \cdot A_{out} = 900\,\mathrm{kN} - 14\,\mathrm{kN}/\mathrm{m}^{2} \cdot 3.392\,\mathrm{m}^{2} = 852.5\,\mathrm{kN}
+V_{d,out} = V_d - \Delta V_{d,out} = 900\,\mathrm{kN} - 47.5\,\mathrm{kN} = 852.5\,\mathrm{kN}
 $$
 
 **Durchstanzwiderstand im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.5.10, (58))*
@@ -8311,7 +8317,7 @@ $$
 
 #### Bemessungswert der Querkraft
 
-**Keine Flächenlast im Schnitt abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Bemessungswert der Querkraft im Nachweisschnitt: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 1000\,\mathrm{kN}
@@ -8590,28 +8596,28 @@ $$
 **Äusserer Nachweisschnitt, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-u_{out,0} = 10905\,\mathrm{mm}
+u_{0,out} = 10905\,\mathrm{mm}
 $$
 
-**Was neben den Ecken und hinter Aussparungen nicht zählt** *(SIA 262:2025, Figur 23a, 23d und 26)*
+**Was neben den Ecken nicht zählt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-\Delta u_{out} = 3768\,\mathrm{mm}
+\Delta u_{E,out} = 3768\,\mathrm{mm}
 $$
 
-**Äusserer Nachweisschnitt ohne das, was nicht zählt**
+**Nachweisschnitt ohne das, was nicht zählt** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out,red} = u_{out,0} - \Delta u_{out} = 10905\,\mathrm{mm} - 3768\,\mathrm{mm} = 7137\,\mathrm{mm}
+u_{red,out} = u_{0,out} - \Delta u_{E,out} = 10905\,\mathrm{mm} - 3768\,\mathrm{mm} = 7137\,\mathrm{mm}
 $$
 
 **Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out} = k_e \cdot u_{out,red} = 0.9 \cdot 7137\,\mathrm{mm} = 6423\,\mathrm{mm}
+u_{out} = k_e \cdot u_{red,out} = 0.9 \cdot 7137\,\mathrm{mm} = 6423\,\mathrm{mm}
 $$
 
-**Querkraft im äusseren Nachweisschnitt: keine Flächenlast** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im äusseren Nachweisschnitt: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,out} = V_d = 1000\,\mathrm{kN}
@@ -8656,22 +8662,22 @@ $$
 **Schnitt um den Stahlpilz, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.6.2)*
 
 $$
-u_{P,0} = 2913\,\mathrm{mm}
+u_{0,P} = 2913\,\mathrm{mm}
 $$
 
-**Schnitt um den Stahlpilz ohne das, was nicht zählt**
+**Nichts mindert den Schnitt** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{P,red} = u_{P,0} = 2913\,\mathrm{mm}
+u_{red,P} = u_{0,P} = 2913\,\mathrm{mm}
 $$
 
 **Wirksamer Umfang des Schnitts um den Stahlpilz, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{P} = k_e \cdot u_{P,red} = 0.9 \cdot 2913\,\mathrm{mm} = 2622\,\mathrm{mm}
+u_P = k_e \cdot u_{red,P} = 0.9 \cdot 2913\,\mathrm{mm} = 2622\,\mathrm{mm}
 $$
 
-**Querkraft im Schnitt um den Stahlpilz: keine Flächenlast** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im Schnitt um den Stahlpilz: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,P} = V_d = 1000\,\mathrm{kN}
@@ -8681,7 +8687,7 @@ $$
 
 $$
 \begin{aligned}
-  V_{Rd,c,P} &= k_r \cdot \tau_{cd} \cdot d_{v,P} \cdot u_{P} \\
+  V_{Rd,c,P} &= k_r \cdot \tau_{cd} \cdot d_{v,P} \cdot u_P \\
   &= 0.642 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 214\,\mathrm{mm} \cdot 2622\,\mathrm{mm} \\
   &= 394.4\,\mathrm{kN}
 \end{aligned}
@@ -8767,7 +8773,7 @@ $$
 
 $$
 \begin{aligned}
-  V_{Rd,max} &= \min\left[k_{sys} \cdot k_r;\ 3.5\right] \cdot \tau_{cd} \cdot d_{v,P} \cdot u_{P} \\
+  V_{Rd,max} &= \min\left[k_{sys} \cdot k_r;\ 3.5\right] \cdot \tau_{cd} \cdot d_{v,P} \cdot u_P \\
   &= \min\left[2.58 \cdot 0.642;\ 3.5\right] \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 214\,\mathrm{mm} \cdot 2622\,\mathrm{mm} \\
   &= 1016.3\,\mathrm{kN}
 \end{aligned}
@@ -8796,28 +8802,28 @@ $$
 **Äusserer Nachweisschnitt, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-u_{out,0} = 8331\,\mathrm{mm}
+u_{0,out} = 8331\,\mathrm{mm}
 $$
 
-**Was neben den Ecken und hinter Aussparungen nicht zählt** *(SIA 262:2025, Figur 23a, 23d und 26)*
+**Was neben den Ecken nicht zählt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-\Delta u_{out} = 559\,\mathrm{mm}
+\Delta u_{E,out} = 559\,\mathrm{mm}
 $$
 
-**Äusserer Nachweisschnitt ohne das, was nicht zählt**
+**Nachweisschnitt ohne das, was nicht zählt** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out,red} = u_{out,0} - \Delta u_{out} = 8331\,\mathrm{mm} - 559\,\mathrm{mm} = 7771\,\mathrm{mm}
+u_{red,out} = u_{0,out} - \Delta u_{E,out} = 8331\,\mathrm{mm} - 559\,\mathrm{mm} = 7771\,\mathrm{mm}
 $$
 
 **Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out} = k_e \cdot u_{out,red} = 0.9 \cdot 7771\,\mathrm{mm} = 6994\,\mathrm{mm}
+u_{out} = k_e \cdot u_{red,out} = 0.9 \cdot 7771\,\mathrm{mm} = 6994\,\mathrm{mm}
 $$
 
-**Querkraft im äusseren Nachweisschnitt: keine Flächenlast** *(SIA 262:2025, 4.3.6.2.6)*
+**Querkraft im äusseren Nachweisschnitt: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,out} = V_d = 1000\,\mathrm{kN}
@@ -9017,7 +9023,7 @@ $$
 
 #### Bemessungswert der Querkraft
 
-**Fläche innerhalb des Nachweisschnitts, ohne Aussparungen**
+**Fläche innerhalb des Schnitts, ohne Aussparungen**
 
 $$
 A_q = 0.423\,\mathrm{m}^{2}
@@ -9316,31 +9322,37 @@ $$
 **Äusserer Nachweisschnitt, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-u_{out,0} = 2900\,\mathrm{mm}
+u_{0,out} = 2900\,\mathrm{mm}
 $$
 
-**Äusserer Nachweisschnitt ohne das, was nicht zählt**
+**Nichts mindert den Schnitt** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out,red} = u_{out,0} = 2900\,\mathrm{mm}
+u_{red,out} = u_{0,out} = 2900\,\mathrm{mm}
 $$
 
 **Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out} = k_e \cdot u_{out,red} = 0.999 \cdot 2900\,\mathrm{mm} = 2896\,\mathrm{mm}
+u_{out} = k_e \cdot u_{red,out} = 0.999 \cdot 2900\,\mathrm{mm} = 2896\,\mathrm{mm}
 $$
 
 **Fläche innerhalb des Schnitts, ohne Aussparungen**
 
 $$
-A_{out} = 1.252\,\mathrm{m}^{2}
+A_{q,out} = 1.252\,\mathrm{m}^{2}
+$$
+
+**Eigengewicht und Nutzlast innerhalb des äusseren Schnitts** *(SIA 262:2025, 4.3.6.2.6)*
+
+$$
+\Delta V_{d,out} = q_d \cdot A_{q,out} = 12\,\mathrm{kN}/\mathrm{m}^{2} \cdot 1.252\,\mathrm{m}^{2} = 15\,\mathrm{kN}
 $$
 
 **Querkraft im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
-V_{d,out} = V_d - q_d \cdot A_{out} = 500\,\mathrm{kN} - 12\,\mathrm{kN}/\mathrm{m}^{2} \cdot 1.252\,\mathrm{m}^{2} = 485\,\mathrm{kN}
+V_{d,out} = V_d - \Delta V_{d,out} = 500\,\mathrm{kN} - 15\,\mathrm{kN} = 485\,\mathrm{kN}
 $$
 
 **Durchstanzwiderstand im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.5.10, (58))*
@@ -9519,7 +9531,7 @@ $$
 
 #### Bemessungswert der Querkraft
 
-**Keine Flächenlast im Schnitt abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Bemessungswert der Querkraft im Nachweisschnitt: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 80\,\mathrm{kN}
@@ -9759,7 +9771,7 @@ $$
 
 #### Bemessungswert der Querkraft
 
-**Fläche innerhalb des Nachweisschnitts, ohne Aussparungen**
+**Fläche innerhalb des Schnitts, ohne Aussparungen**
 
 $$
 A_q = 0.898\,\mathrm{m}^{2}
@@ -10010,37 +10022,43 @@ $$
 **Äusserer Nachweisschnitt, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-u_{out,0} = 5592\,\mathrm{mm}
+u_{0,out} = 5592\,\mathrm{mm}
 $$
 
-**Was neben den Ecken und hinter Aussparungen nicht zählt** *(SIA 262:2025, Figur 23a, 23d und 26)*
+**Was hinter Aussparungen nicht zählt** *(SIA 262:2025, 4.3.6.2.3, Figur 23d)*
 
 $$
-\Delta u_{out} = 491\,\mathrm{mm}
+\Delta u_{A,out} = 491\,\mathrm{mm}
 $$
 
-**Äusserer Nachweisschnitt ohne das, was nicht zählt**
+**Nachweisschnitt ohne das, was nicht zählt** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out,red} = u_{out,0} - \Delta u_{out} = 5592\,\mathrm{mm} - 491\,\mathrm{mm} = 5102\,\mathrm{mm}
+u_{red,out} = u_{0,out} - \Delta u_{A,out} = 5592\,\mathrm{mm} - 491\,\mathrm{mm} = 5102\,\mathrm{mm}
 $$
 
 **Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out} = k_e \cdot u_{out,red} = 0.7 \cdot 5102\,\mathrm{mm} = 3571\,\mathrm{mm}
+u_{out} = k_e \cdot u_{red,out} = 0.7 \cdot 5102\,\mathrm{mm} = 3571\,\mathrm{mm}
 $$
 
 **Fläche innerhalb des Schnitts, ohne Aussparungen**
 
 $$
-A_{out} = 2.15\,\mathrm{m}^{2}
+A_{q,out} = 2.15\,\mathrm{m}^{2}
+$$
+
+**Bodenpressung innerhalb des äusseren Schnitts** *(SIA 262:2025, 4.3.6.2.6)*
+
+$$
+\Delta V_{d,out} = q_d \cdot A_{q,out} = 150\,\mathrm{kN}/\mathrm{m}^{2} \cdot 2.15\,\mathrm{m}^{2} = 322.5\,\mathrm{kN}
 $$
 
 **Querkraft im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
-V_{d,out} = V_d - q_d \cdot A_{out} = 1400\,\mathrm{kN} - 150\,\mathrm{kN}/\mathrm{m}^{2} \cdot 2.15\,\mathrm{m}^{2} = 1077.5\,\mathrm{kN}
+V_{d,out} = V_d - \Delta V_{d,out} = 1400\,\mathrm{kN} - 322.5\,\mathrm{kN} = 1077.5\,\mathrm{kN}
 $$
 
 **Durchstanzwiderstand im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.5.10, (58))*
@@ -10201,7 +10219,7 @@ $$
 
 #### Bemessungswert der Querkraft
 
-**Keine Flächenlast im Schnitt abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Bemessungswert der Querkraft im Nachweisschnitt: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 400\,\mathrm{kN}
@@ -10419,7 +10437,7 @@ $$
 
 #### Bemessungswert der Querkraft
 
-**Keine Flächenlast im Schnitt abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Bemessungswert der Querkraft im Nachweisschnitt: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d = 300\,\mathrm{kN}
@@ -14190,9 +14208,11 @@ Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützt
 
 Die Faktoren 2 und 3.5 in Gleichung (70) dürfen erhöht werden, wenn Versuche es belegen (4.3.6.5.9). Das Gutachten von ancoPLUS lässt für Innenstützen und Wandenden 3·k\_r zu, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt wieder 2·k\_r, dazwischen linear. Für Rand- und Eckstützen bleibt es bei 2·k\_r. Die Obergrenze bleibt 3.5.
 
-Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker. Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens 1.5·d\_v,out von jedem Ende (Figur 26).
+Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker.
 
 Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 -- Anker ⌀16 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+
+Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens 1.5·d\_v,out von jedem Ende (Figur 26).
 
 Ein Stahlpilz vergrössert die gestützte Fläche. Gewählt ist der kleinste, der zwischen die Überdeckungen passt -- unten 20 mm, oben 50 mm, die Vorgaben der Software von AncoTech -- und mit dem die Platte ausserhalb hält: ZEUS Doppelkreuz 730 × 730 mm, h = 120 mm, g = 150 mm (AncoTech, Preisliste ZEUS 12.2018). Seine gestützte Fläche reicht bis an die Enden der Stege (4.3.6.6.2). Den Widerstand des Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.
 
@@ -14390,70 +14410,22 @@ $$
 d_{v,out} = d - c_v
 $$
 
-**Äusserer Nachweisschnitt ohne das, was nicht zählt**
-
-$$
-u_{out,red} = u_{out,0}
-$$
-
-**Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
-
-$$
-u_{out} = k_e \cdot u_{out,red}
-$$
-
-**Querkraft im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.2.6)*
-
-$$
-V_{d,out} = V_d - q_d \cdot A_{out}
-$$
-
-**Durchstanzwiderstand im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.5.10, (58))*
-
-$$
-V_{Rd,c,out} = k_r \cdot \tau_{cd} \cdot d_{v,out} \cdot u_{out}
-$$
-
-**Keine Flächenlast im Schnitt abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+**Bemessungswert der Querkraft im Nachweisschnitt: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
 V_{d,red} = V_d
 $$
 
-**Äusserer Nachweisschnitt ohne das, was nicht zählt**
+**Nachweisschnitt ohne das, was nicht zählt** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out,red} = u_{out,0} - \Delta u_{out}
-$$
-
-**Querkraft im äusseren Nachweisschnitt: keine Flächenlast** *(SIA 262:2025, 4.3.6.2.6)*
-
-$$
-V_{d,out} = V_d
+u_{red,out} = u_{0,out} - \Delta u_{E,out}
 $$
 
 **Wirksame statische Höhe bis zur Unterkante des Pilzes** *(SIA 262:2025, 4.3.6.6.2)*
 
 $$
 d_{v,P} = d - c_P
-$$
-
-**Schnitt um den Stahlpilz ohne das, was nicht zählt**
-
-$$
-u_{P,red} = u_{P,0}
-$$
-
-**Wirksamer Umfang des Schnitts um den Stahlpilz, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
-
-$$
-u_{P} = k_e \cdot u_{P,red}
-$$
-
-**Querkraft im Schnitt um den Stahlpilz: keine Flächenlast** *(SIA 262:2025, 4.3.6.2.6)*
-
-$$
-V_{d,P} = V_d
 $$
 
 **Durchmesser des flächengleichen Kreises** *(SIA 262:2025, 4.3.6.2.4)*
@@ -15467,6 +15439,8 @@ $$
 | Querkraft im Schnitt | $V_d$ | $1000.0$ | kN |
 | Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $345.7$ | kN |
 | Stahlpilz |  | ZEUS Doppelkreuz 730 × 730 mm, h = 120 mm, g = 150 mm |  |
+| Querkraft um den Stahlpilz | $V_{d,P}$ | $1000.0$ | kN |
+| Widerstand um den Stahlpilz | $V_{Rd,c,P}$ | $394.4$ | kN |
 | Durchstanzbewehrung |  | 20 × ancoPLUS DX6-0215 |  |
 | Abstände ab Pilz | $s$ | $85 / 140 / 140 / 175 / 175 / 175$ | mm |
 | Beitrag der Bewehrung | $V_{Rd,s}$ | $614.7$ | kN |
@@ -16027,11 +16001,11 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $0.00$ |  | berechnet |
-| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $0.00$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.41$ |  | berechnet |
-| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $\infty$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |
 | Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast | $q_d$ | $0$ | kN/m² | Vorgabe |
@@ -16045,11 +16019,11 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $0.00$ |  | berechnet |
-| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $0.00$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.37$ |  | berechnet |
-| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $0.00$ |  | berechnet |
+| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $\infty$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |
 | Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast | $q_d$ | $0$ | kN/m² | Vorgabe |

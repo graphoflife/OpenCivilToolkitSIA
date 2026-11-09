@@ -50,7 +50,7 @@ import math
 from collections import Counter
 from dataclasses import dataclass, replace
 from itertools import accumulate
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Callable, List, Optional, Sequence, Tuple
 
 from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.schnitt import (
@@ -58,6 +58,9 @@ from opencivil.durchstanzen.schnitt import (
     Stueck, konvexe_huelle, kandidaten_stuetze, nachweisschnitt,
 )
 from opencivil.querschnitt.geometrie import abstand_strecke_polygon
+
+if TYPE_CHECKING:
+    from opencivil.durchstanzen.pruefung import Leistenpruefung
 
 #: Angerechnet wird die Durchstanzbewehrung zwischen 0.35·d_v und d_v vom Rand
 #: der gestützten Fläche (SIA 262:2025, 4.3.6.5.4, Gleichung (68)).
@@ -175,8 +178,9 @@ def aeussere_kandidaten(leisten: Sequence[Leiste], radien: Sequence[float],
 @dataclass(frozen=True)
 class Vorschlag:
     """
-    Eine Durchstanzbewehrung, die alle Bedingungen erfüllt -- oder die stärkste,
-    die sich finden liess (``reicht`` falsch). Kräfte in N.
+    Eine Durchstanzbewehrung: Typ, Höhe, Abstände, die Leisten und der
+    äussere Schnitt um sie. Ob sie reicht, sagt ihre Prüfung
+    (:class:`~.pruefung.Leistenpruefung`).
     """
 
     typ: produkte.Ankertyp
@@ -187,7 +191,7 @@ class Vorschlag:
     """Wie viele Anker je Leiste zwischen 0.35·d_v und d_v liegen (Gleichung (68))."""
 
     aussen: Nachweisschnitt
-    reicht: bool
+    """Der äussere Schnitt um die äussersten Anker (Figur 26), mit d_v,out."""
 
     @property
     def radien(self) -> Tuple[float, ...]:
@@ -230,22 +234,21 @@ def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float,
              r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt],
              raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]],
              schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float,
-             noetig: Callable[[produkte.Ankertyp, float], bool],
-             aussen_reicht: Callable[[Nachweisschnitt], bool]) -> Optional[Vorschlag]:
+             pruefen: Callable[[Vorschlag], "Leistenpruefung"]) -> Optional["Leistenpruefung"]:
     """
-    Das kleinste ancoPLUS, das reicht: der kleinste Durchmesser, mit dem die
-    Bewehrung im Bereich ``noetig`` erfüllt, und dazu die kleinste Zahl Anker
-    je Leiste, mit der der äussere Schnitt ``aussen_reicht``. Erst wenn kein
-    Durchmesser genügt, stehen die Leisten dichter (:data:`DICHTEN`).
-    ``noetig(typ, A_sw)`` und ``aussen_reicht(schnitt)`` rechnet der
-    Nachweis; ``r_2_zu(r)`` gibt den geschlossenen Schnitt im Abstand r um die
-    gestützte Fläche; ``schatten`` sind die Schatten der Aussparungen am
-    inneren Schnitt (:func:`~.schnitt.schatten_am_schnitt`).
+    Das kleinste ancoPLUS, das reicht, mit seiner Prüfung: der kleinste
+    Durchmesser, mit dem die Bewehrung trägt (66, 67), und dazu die kleinste
+    Zahl Anker je Leiste, mit der der äussere Schnitt hält. Erst wenn kein
+    Durchmesser trägt, stehen die Leisten dichter (:data:`DICHTEN`).
+    ``pruefen`` rechnet die Prüfung eines Vorschlags (:mod:`.mit_bewehrung`);
+    ``r_2_zu(r)`` gibt den geschlossenen Schnitt im Abstand r um die gestützte
+    Fläche; ``schatten`` sind die Schatten der Aussparungen am inneren Schnitt
+    (:func:`~.schnitt.schatten_am_schnitt`).
 
-    Reicht nichts, kommt der stärkste Versuch mit ``reicht`` falsch zurück --
-    die dichtesten Leisten mit dem grössten Durchmesser und neun Ankern.
-    ``None`` nur, wo es kein ancoPLUS gibt: die Platte ist zu dünn, keine
-    Höhe ist lieferbar, oder keine Leiste findet Platz.
+    Reicht nichts, kommt der stärkste Versuch zurück -- die dichtesten Leisten
+    mit dem grössten Durchmesser und neun Ankern --, und seine Prüfung sagt,
+    was fehlt. ``None`` nur, wo es kein ancoPLUS gibt: die Platte ist zu dünn,
+    keine Höhe ist lieferbar, oder keine Leiste findet Platz.
     """
     groesster = produkte.groesster_durchmesser(d)
     typen = [t for t in produkte.ANKERTYPEN
@@ -266,33 +269,31 @@ def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float,
                 d_v=d_v_out, achse=achse, aussparungen=aussparungen)
         return gerechnet[schluessel]
 
-    def versuch(alle: Sequence[Leiste], typ: produkte.Ankertyp, anzahl: int,
-                pruefen: bool) -> Optional[Vorschlag]:
+    def versuch(alle: Sequence[Leiste], typ: produkte.Ankertyp,
+                anzahl: int) -> Optional["Leistenpruefung"]:
         folge = produkte.abstaende(d, anzahl)
         radien = tuple(accumulate(folge))
         leisten = tuple(setzen(alle, radien, mindestens(radien, d_v), raender=raender,
                                aussparungen=aussparungen, schatten=schatten, achse=achse,
                                ueberdeckung=ueberdeckung))
-        im_bereich = anrechenbar(radien, d_v)
-        if not leisten or (pruefen and not noetig(typ, len(leisten) * im_bereich * typ.flaeche)):
+        if not leisten:
             return None
-        schnitt = aussen(leisten, radien)
-        return Vorschlag(typ, h_A, folge, leisten, im_bereich, schnitt,
-                         pruefen and aussen_reicht(schnitt))
+        return pruefen(Vorschlag(typ, h_A, folge, leisten, anrechenbar(radien, d_v),
+                                 aussen(leisten, radien)))
 
-    bester: Optional[Vorschlag] = None
+    bester = None
     for dichte in DICHTEN:
         alle = leisten_anordnen(r_2_zu(r_2), r_2, dichte * produkte.TANGENTIAL * d)
         for typ in typen:
             for anzahl in produkte.ANKER_JE_LEISTE:
-                vorschlag = versuch(alle, typ, anzahl, pruefen=True)
-                if vorschlag is None:
+                pruefung = versuch(alle, typ, anzahl)
+                if pruefung is None or not pruefung.traegt:
                     # Mehr Anker heben den Bereich nicht -- der nächste Durchmesser.
                     break
-                if vorschlag.reicht:
-                    return vorschlag
-                bester = vorschlag
+                if pruefung.aussen_reicht:
+                    return pruefung
+                bester = pruefung
     if bester is not None:
         return bester
     dichteste = leisten_anordnen(r_2_zu(r_2), r_2, DICHTEN[-1] * produkte.TANGENTIAL * d)
-    return versuch(dichteste, typen[-1], produkte.ANKER_JE_LEISTE[-1], pruefen=False)
+    return versuch(dichteste, typen[-1], produkte.ANKER_JE_LEISTE[-1])

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5d1c601ecd8d
+erzeugt: 4fe024c6a341
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.6"
@@ -13,7 +13,7 @@ $$
 V_{d,red} = V_d - \Delta V_d
 $$
 
-*In der Herleitung: «Keine Flächenlast im Schnitt abgezogen»*
+*In der Herleitung: «Bemessungswert der Querkraft im Nachweisschnitt: keine Flächenlast abgezogen»*
 
 $$
 V_{d,red} = V_d
@@ -48,7 +48,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._lasten|Durchstanzen._lasten]]
+- [[opencivil.durchstanzen.herleitung#querkraft|querkraft]]
 
 ## Themen
 
@@ -63,3 +63,7 @@ Stütze, ohne den Schnitt zu kreuzen. Es darf darum von der Auflagerkraft
 abgezogen werden (4.3.6.2.6), siehe
 [[Flächenlast innerhalb des Nachweisschnitts]]. Ohne Flächenlast ist
 $V_{d,red} = V_d$.
+
+Am äusseren Schnitt um die Anker ($V_{d,out}$) und am Schnitt um einen
+Stahlpilz ($V_{d,P}$) ebenso, nur über die grössere Fläche innerhalb dieser
+Schnitte.

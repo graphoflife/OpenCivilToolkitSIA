@@ -270,17 +270,6 @@
       ]
     },
     {
-      "name": "Äusserer Nachweisschnitt ohne das, was nicht zählt",
-      "pfad": "Formelsammlung/Formeln/Äusserer Nachweisschnitt ohne das, was nicht zählt.md",
-      "art": "formel",
-      "zeichen": [
-        "u_{out,red}"
-      ],
-      "themen": [
-        "Durchstanzen"
-      ]
-    },
-    {
       "name": "Bedingung der Duktilität",
       "pfad": "Formelsammlung/Formeln/Bedingung der Duktilität.md",
       "art": "formel",
@@ -886,17 +875,6 @@
       "art": "formel",
       "zeichen": [
         "V_{Rd,v}"
-      ],
-      "themen": [
-        "Durchstanzen"
-      ]
-    },
-    {
-      "name": "Durchstanzwiderstand im äusseren Nachweisschnitt",
-      "pfad": "Formelsammlung/Formeln/Durchstanzwiderstand im äusseren Nachweisschnitt.md",
-      "art": "formel",
-      "zeichen": [
-        "V_{Rd,c,out}"
       ],
       "themen": [
         "Durchstanzen"
@@ -1657,7 +1635,8 @@
       "pfad": "Formelsammlung/Formeln/Nachweisschnitt ohne das, was nicht zählt.md",
       "art": "formel",
       "zeichen": [
-        "u_{red}"
+        "u_{red}",
+        "u_{red,out}"
       ],
       "themen": [
         "Durchstanzen"
@@ -1794,28 +1773,6 @@
       "art": "formel",
       "zeichen": [
         "V_{d,s}"
-      ],
-      "themen": [
-        "Durchstanzen"
-      ]
-    },
-    {
-      "name": "Querkraft im äusseren Nachweisschnitt",
-      "pfad": "Formelsammlung/Formeln/Querkraft im äusseren Nachweisschnitt.md",
-      "art": "formel",
-      "zeichen": [
-        "V_{d,out}"
-      ],
-      "themen": [
-        "Durchstanzen"
-      ]
-    },
-    {
-      "name": "Querkraft im Schnitt um den Stahlpilz",
-      "pfad": "Formelsammlung/Formeln/Querkraft im Schnitt um den Stahlpilz.md",
-      "art": "formel",
-      "zeichen": [
-        "V_{d,P}"
       ],
       "themen": [
         "Durchstanzen"
@@ -2009,17 +1966,6 @@
       ],
       "themen": [
         "Knicken"
-      ]
-    },
-    {
-      "name": "Schnitt um den Stahlpilz ohne das, was nicht zählt",
-      "pfad": "Formelsammlung/Formeln/Schnitt um den Stahlpilz ohne das, was nicht zählt.md",
-      "art": "formel",
-      "zeichen": [
-        "u_{P,red}"
-      ],
-      "themen": [
-        "Durchstanzen"
       ]
     },
     {
@@ -2650,33 +2596,11 @@
       ]
     },
     {
-      "name": "Wirksamer Umfang des äusseren Nachweisschnitts",
-      "pfad": "Formelsammlung/Formeln/Wirksamer Umfang des äusseren Nachweisschnitts.md",
-      "art": "formel",
-      "zeichen": [
-        "u_{out}"
-      ],
-      "themen": [
-        "Durchstanzen"
-      ]
-    },
-    {
       "name": "Wirksamer Umfang des Nachweisschnitts",
       "pfad": "Formelsammlung/Formeln/Wirksamer Umfang des Nachweisschnitts.md",
       "art": "formel",
       "zeichen": [
         "u"
-      ],
-      "themen": [
-        "Durchstanzen"
-      ]
-    },
-    {
-      "name": "Wirksamer Umfang des Schnitts um den Stahlpilz",
-      "pfad": "Formelsammlung/Formeln/Wirksamer Umfang des Schnitts um den Stahlpilz.md",
-      "art": "formel",
-      "zeichen": [
-        "u_{P}"
       ],
       "themen": [
         "Durchstanzen"
@@ -3269,6 +3193,23 @@
       ]
     },
     {
+      "name": "opencivil.durchstanzen.herleitung",
+      "pfad": "Python/opencivil.durchstanzen.herleitung.md",
+      "art": "modul",
+      "kurz": "wie ein Nachweisschnitt in der Herleitung steht.",
+      "stichworte": [
+        "Index",
+        "Index.name",
+        "Index.unten",
+        "Index.symbol",
+        "rand",
+        "abzuege",
+        "wirksam",
+        "querkraft",
+        "widerstand"
+      ]
+    },
+    {
       "name": "opencivil.durchstanzen.mit_bewehrung",
       "pfad": "Python/opencivil.durchstanzen.mit_bewehrung.md",
       "art": "modul",
@@ -3276,22 +3217,13 @@
       "stichworte": [
         "Grundlage",
         "Ort",
-        "Pilzbefund",
-        "Bewehrungsbefund",
-        "spannung",
-        "widerstand",
-        "druckdiagonale",
         "_Werte",
-        "_Werte.sigma",
-        "_Werte.flaechenlast",
         "nachweisen",
         "_suchen",
-        "_mit_leisten",
-        "_umfang",
-        "_querkraft",
-        "_pilzflaeche",
-        "_pilz_suchen",
+        "_leisten_schreiben",
+        "_pilz_pruefen",
         "_pilzort",
+        "_pilz_suchen",
         "_mit_pilz"
       ]
     },
@@ -3311,7 +3243,6 @@
         "Durchstanzen._nachweisschnitt",
         "Durchstanzen._exzentrizitaet",
         "Durchstanzen._k_e",
-        "Durchstanzen._lasten",
         "Durchstanzen._rotation",
         "Durchstanzen._m_Rd",
         "Durchstanzen._m_sd",
@@ -3339,6 +3270,40 @@
         "Stahlpilz.name",
         "Stahlpilz.stege",
         "Stahlpilz.armenden"
+      ]
+    },
+    {
+      "name": "opencivil.durchstanzen.pruefung",
+      "pfad": "Python/opencivil.durchstanzen.pruefung.md",
+      "art": "modul",
+      "kurz": "was der Durchstanznachweis rechnet, ohne Herleitung.",
+      "stichworte": [
+        "widerstand",
+        "druckdiagonale",
+        "spannung",
+        "Schnittpruefung",
+        "Schnittpruefung.auswertung",
+        "Schnittpruefung.u_red",
+        "Schnittpruefung.u",
+        "Schnittpruefung.flaeche",
+        "Schnittpruefung.V_d_red",
+        "Schnittpruefung.V_Rd_c",
+        "Schnittpruefung.V_Rd_max",
+        "Leistenpruefung",
+        "Leistenpruefung.A_sw",
+        "Leistenpruefung.V_Rd_c",
+        "Leistenpruefung.V_d_s",
+        "Leistenpruefung.V_Rd_s",
+        "Leistenpruefung.V_halb",
+        "Leistenpruefung.V_Rd_v",
+        "Leistenpruefung.V_Rd_max",
+        "Leistenpruefung.V_Rd_c_aussen",
+        "Leistenpruefung.traegt",
+        "Leistenpruefung.aussen_reicht",
+        "Leistenpruefung.diagonale_haelt",
+        "Leistenpruefung.reicht",
+        "Pilzbefund",
+        "Pilzbefund.reicht"
       ]
     },
     {
@@ -5886,7 +5851,9 @@
       "stichworte": [
         "situationen",
         "situation",
-        "_bewehrung"
+        "_linien",
+        "_leisten",
+        "_pilz"
       ]
     },
     {

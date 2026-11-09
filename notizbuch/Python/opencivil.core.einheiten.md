@@ -1,5 +1,5 @@
 ---
-erzeugt: c97288423f79
+erzeugt: 0863e22a8b35
 art: modul
 tags: [modul]
 ---
@@ -442,6 +442,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
@@ -463,7 +464,6 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.resistenzlinie]]
-- [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]

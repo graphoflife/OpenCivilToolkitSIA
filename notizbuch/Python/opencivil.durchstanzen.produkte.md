@@ -1,5 +1,5 @@
 ---
-erzeugt: 842dec3c3ad0
+erzeugt: 1e76377440f6
 art: modul
 tags: [modul]
 ---
@@ -178,3 +178,4 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
+- [[opencivil.durchstanzen.pruefung]]

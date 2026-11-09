@@ -1,5 +1,5 @@
 ---
-erzeugt: 5708fec4f716
+erzeugt: d3af2a2ceba0
 art: modul
 tags: [modul]
 ---
@@ -465,6 +465,9 @@ er nach dem, der zum Rand läuft.
 ## Gebraucht von
 
 - [[opencivil.durchstanzen.bewehrung]]
+- [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.web.durchstanzdaten]]

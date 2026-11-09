@@ -1,5 +1,5 @@
 ---
-erzeugt: ca7a453331c4
+erzeugt: 25f2391c839c
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.6"
@@ -18,7 +18,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $q_d$ | Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast | kN/m² | Vorgabe |
-| $A_q$ | Fläche innerhalb des Nachweisschnitts, ohne Aussparungen | m² | Zwischenwert |
+| $A_q$ | Fläche innerhalb des Schnitts, ohne Aussparungen | m² | Zwischenwert |
 
 ## Beispiel
 
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._lasten|Durchstanzen._lasten]]
+- [[opencivil.durchstanzen.herleitung#querkraft|querkraft]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: ce5791d5624b
+erzeugt: 8884064e5ad6
 art: modul
 tags: [modul]
 ---
@@ -82,15 +82,11 @@ class Durchstanzbefund
 ```
 
 Was der Nachweis gefunden hat -- für die Zusammenfassung und das Bild.
-Längen in m, Kräfte in N.
+Längen in m, Kräfte in N. Leisten und Stahlpilz stehen nur da, wo es sie
+braucht; jedes mit seinen eigenen Zahlen.
 
 - `d: float`
-- `d_v: float`
-- `schnitt: Nachweisschnitt`
-- `k_e: float`
-- `u: float`
-- `V_d: float`
-- `V_d_red: float`
+- `innen: Schnittpruefung` – Der Schnitt um die gestützte Fläche.
 - `rotationen: Tuple[Rotation, ...]`
 - `psi: float`
 - `k_r: float`
@@ -98,7 +94,8 @@ Längen in m, Kräfte in N.
 - `umriss: Tuple[Punkt, ...]`
 - `aussparungen: Tuple[Tuple[Punkt, ...], ...]`
 - `raender: Tuple[Tuple[Punkt, float], ...]` – Je Plattenrand ein Punkt auf ihm und die Richtung, in die die Platte liegt (rad).
-- `bewehrung: Optional[Bewehrungsbefund] = None` – Die vorgeschlagene Durchstanzbewehrung -- `None`, wo der Beton allein reicht.
+- `leisten: Optional[Leistenpruefung] = None` – Die vorgeschlagene Durchstanzbewehrung mit ihren vier Nachweisen.
+- `pilz: Optional[Pilzbefund] = None` – Der gewählte Stahlpilz; mit `leisten` stehen die Leisten um ihn.
 
 ### Durchstanzen
 
@@ -146,10 +143,12 @@ Die statischen Höhen der beiden Lagen, ihr Mittel d und die wirksame d_v (4.3.6
 #### Durchstanzen._nachweisschnitt
 
 ```python
-def _nachweisschnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, schnitt: Nachweisschnitt, masse: Dict[str, float], d_v: Wert) -> Wert
+def _nachweisschnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung, d_v: Wert) -> Wert
 ```
 
-Der Nachweisschnitt und was von ihm nicht zählt: `u_red`, noch ohne k_e.
+Der Nachweisschnitt und was von ihm nicht zählt: `u_red`, noch ohne
+k_e. Um einfache Flächen steht u_0 als Formel, sonst als Länge in der
+Platte; die Abzüge schreibt [[opencivil.durchstanzen.herleitung|.herleitung]], wie an jedem Schnitt.
 
 #### Durchstanzen._exzentrizitaet
 
@@ -167,14 +166,6 @@ def _k_e(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung, e_u: 
 ```
 
 Der Beiwert k_e: aus der Näherung (4.3.6.2.5) oder aus der Exzentrizität (57).
-
-#### Durchstanzen._lasten
-
-```python
-def _lasten(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung) -> Wert
-```
-
-Der Bemessungswert der Querkraft, ohne die Flächenlast innerhalb des Schnitts (4.3.6.2.6).
 
 #### Durchstanzen._rotation
 
@@ -240,7 +231,7 @@ def kennwerttabelle(befund: Durchstanzbefund) -> TabellenBlock
 ```
 
 Die Grössen, aus denen der Widerstand entsteht -- eine Zeile je Grösse. Mit
-Durchstanzbewehrung dazu das Produkt und die Widerstände mit ihm.
+Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
 
 
 ## Konstanten
@@ -256,7 +247,9 @@ Durchstanzbewehrung dazu das Produkt und die Widerstände mit ihm.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
+- [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
@@ -275,24 +268,19 @@ Durchstanzbewehrung dazu das Produkt und die Widerstände mit ihm.
 - [[Abstand zum Momentennullpunkt]] · `Durchstanzen._rotation`
 - [[Beiwert der Momentenübertragung]] · `Durchstanzen._k_e`
 - [[Beiwert k_r]] · `Durchstanzen._k_r`
-- [[Bemessungswert der Querkraft im Nachweisschnitt]] · `Durchstanzen._lasten`
 - [[Biegebewehrung im Stützstreifen je Meter]] · `Durchstanzen._m_Rd`
 - [[Biegewiderstand im Stützstreifen]] · `Durchstanzen._m_Rd`
 - [[Breite des Stützstreifens]] · `Durchstanzen._m_sd`
 - [[Breite des Stützstreifens am Plattenrand]] · `Durchstanzen._b_sr`
 - [[Druckzonenhöhe im Stützstreifen]] · `Durchstanzen._m_Rd`
 - [[Durchmesser des flächengleichen Kreises]] · `Durchstanzen._k_e`
-- [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · `Durchstanzen.pruefe`
-- [[Flächenlast innerhalb des Nachweisschnitts]] · `Durchstanzen._lasten`
 - [[Massgebende Plattenrotation – die grössere]] · `Durchstanzen._rotation`
 - [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · `Durchstanzen._statische_hoehe`
 - [[Mittleres Moment im Stützstreifen]] · `Durchstanzen._m_sd`
 - [[Nachweisschnitt im Abstand d_v∕2]] · `Durchstanzen._nachweisschnitt`
-- [[Nachweisschnitt ohne das, was nicht zählt]] · `Durchstanzen._nachweisschnitt`
 - [[Nachweisschnitt um das Wandende – 1.5·d_v entlang der Wand]] · `Durchstanzen._nachweisschnitt`
 - [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]] · `Durchstanzen._nachweisschnitt`
 - [[Plattenrotation]] · `Durchstanzen._rotation`
 - [[Statische Höhe der äusseren Lage]] · `Durchstanzen._statische_hoehe`
 - [[Statische Höhe der inneren Lage]] · `Durchstanzen._statische_hoehe`
 - [[Wirksame Höhe ohne Abzug]] · `Durchstanzen._statische_hoehe`
-- [[Wirksamer Umfang des Nachweisschnitts]] · `Durchstanzen.pruefe`
