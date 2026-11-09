@@ -16,9 +16,20 @@ e_max auseinander, als Sehne gemessen. Auf jeder geraden Seite steht an
 beiden Enden eine Leiste und dazwischen gleichmässig so viele wie nötig, auf
 den Rundungen ebenso. Das ist der Grundriss der Herstellerunterlagen, die
 Regeln dazu sind die des Produkts (:mod:`.produkte`) -- nach Vorgabe, nicht
-nachgeschlagen. Eine Leiste, deren Anker nicht mindestens die Überdeckung
-tief in der Platte liegen, fällt weg; ebenso eine, deren Anker in eine
-Aussparung fallen.
+nachgeschlagen.
+
+AN RÄNDERN UND AUSSPARUNGEN (:func:`setzen`):
+Eine Leiste ist ein Stahlstück vom Rand der gestützten Fläche bis zu ihrem
+letzten Anker: sie darf weder über den Plattenrand noch durch eine
+Aussparung laufen, auch zwischen zwei Ankern nicht, und hält zu beiden die
+Überdeckung c_nom (nach Vorgabe, nicht nachgeschlagen). Stösst sie an, endet
+sie mit dem letzten Anker davor; behält sie die angerechneten Anker nicht
+(Gleichung (68)), fällt sie weg. Ebenso fällt eine Leiste weg, deren
+angerechnete Anker im Schatten einer Aussparung liegen, die näher als 5·d_v
+am Nachweisschnitt ist: dort zählt der Schnitt nicht (Figur 23d), und
+Bewehrung, die ihn quert, trägt nichts zur Stütze. Bis 2026-11-09 zählten nur
+die Anker selbst, und eine Leiste konnte durch eine Aussparung laufen
+(Benutzer).
 
 DER ÄUSSERE SCHNITT (Figur 26):
 Er läuft im Abstand 0.5·d_v,out um die äussersten Anker; von einer geraden
@@ -36,16 +47,17 @@ SI-Basis, Längen in m, Kräfte in N.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from collections import Counter
+from dataclasses import dataclass, replace
 from itertools import accumulate
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.schnitt import (
-    Bogen, Halbebene, Kandidat, Nachweisschnitt, Punkt, Strecke, Stuetzenflaeche, Stueck,
-    konvexe_huelle, kandidaten_stuetze, nachweisschnitt,
+    Bogen, Halbebene, Kandidat, Nachweisschnitt, Punkt, Schatten, Strecke, Stuetzenflaeche,
+    Stueck, konvexe_huelle, kandidaten_stuetze, nachweisschnitt,
 )
-from opencivil.querschnitt.geometrie import lage
+from opencivil.querschnitt.geometrie import abstand_strecke_polygon
 
 #: Angerechnet wird die Durchstanzbewehrung zwischen 0.35·d_v und d_v vom Rand
 #: der gestützten Fläche (SIA 262:2025, 4.3.6.5.4, Gleichung (68)).
@@ -62,15 +74,19 @@ DICHTEN = (1.0, 0.75, 0.5)
 
 @dataclass(frozen=True)
 class Leiste:
-    """Eine Leiste: wo sie am Rand der gestützten Fläche ansetzt und wohin sie läuft."""
+    """
+    Eine Leiste: wo sie am Rand der gestützten Fläche ansetzt, wohin sie läuft
+    und wie viele Anker sie trägt -- null heisst: so viele, wie es Abstände gibt.
+    """
 
     wurzel: Punkt
     richtung: Punkt
+    anzahl: int = 0
 
     def anker(self, radien: Sequence[float]) -> List[Punkt]:
-        """Die Anker im Abstand ``radien`` vom Rand der gestützten Fläche."""
+        """Die Anker im Abstand ``radien`` vom Rand der gestützten Fläche, so viele sie trägt."""
         return [(self.wurzel[0] + r * self.richtung[0], self.wurzel[1] + r * self.richtung[1])
-                for r in radien]
+                for r in (radien[:self.anzahl] if self.anzahl else radien)]
 
 
 def _normale(a: Punkt, b: Punkt) -> Punkt:
@@ -109,13 +125,36 @@ def leisten_anordnen(stuecke: Sequence[Stueck], r_2: float, e_max: float) -> Lis
     return leisten
 
 
-def in_der_platte(leisten: Sequence[Leiste], radien: Sequence[float], raender: Sequence[Halbebene],
-                  aussparungen: Sequence[Sequence[Punkt]], ueberdeckung: float) -> List[Leiste]:
-    """Nur die Leisten, deren Anker alle um die Überdeckung in der Platte liegen und keine Aussparung treffen."""
-    def gut(p: Punkt) -> bool:
+def setzen(leisten: Sequence[Leiste], radien: Sequence[float], angerechnet: int, *,
+           raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]],
+           schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float) -> List[Leiste]:
+    """
+    Die Leisten, wie sie liegen dürfen (siehe Dateikopf): jede so lang, wie sie
+    die Überdeckung zum Plattenrand und zu jeder Aussparung hält -- mit ihren
+    Ankern und mit dem Stahl dazwischen. Wer nicht wenigstens die ersten
+    ``angerechnet`` Anker behält oder mit ihnen im Schatten einer Aussparung
+    liegt (Figur 23d), fällt weg.
+    """
+    def frei(p: Punkt, wurzel: Punkt) -> bool:
         return (all(h.n[0] * p[0] + h.n[1] * p[1] <= h.c - ueberdeckung for h in raender)
-                and not any(lage(p, a) >= 0 for a in aussparungen))
-    return [l for l in leisten if all(gut(p) for p in l.anker(radien))]
+                and all(abstand_strecke_polygon(wurzel, p, a) >= ueberdeckung - 1e-9
+                        for a in aussparungen))
+
+    def verdeckt(p: Punkt) -> bool:
+        return any(s.enthaelt(math.atan2(p[1] - achse[1], p[0] - achse[0])) for s in schatten)
+
+    gesetzt: List[Leiste] = []
+    for l in leisten:
+        anker = l.anker(radien)
+        anzahl = 0
+        for p in anker:
+            if not frei(p, l.wurzel):
+                break
+            anzahl += 1
+        if anzahl < angerechnet or any(verdeckt(p) for p in anker[:angerechnet]):
+            continue
+        gesetzt.append(replace(l, anzahl=anzahl))
+    return gesetzt
 
 
 def aeussere_kandidaten(leisten: Sequence[Leiste], radien: Sequence[float],
@@ -161,10 +200,16 @@ class Vorschlag:
         return len(self.leisten) * self.anrechenbar * self.typ.flaeche
 
     @property
+    def gruppen(self) -> List[Tuple[int, int]]:
+        """Je Länge der Leisten -- Anker je Leiste -- wie viele es sind; die längsten zuerst."""
+        return sorted(Counter(len(l.anker(self.radien)) for l in self.leisten).items(),
+                      reverse=True)
+
+    @property
     def name(self) -> str:
-        """«12 × ancoPLUS DA3-0215»."""
-        return (f"{len(self.leisten)} × ancoPLUS "
-                f"{produkte.typname(self.typ, len(self.abstaende), self.h_A)}")
+        """«12 × ancoPLUS DA3-0215», mit gekürzten Leisten «… + 2 × ancoPLUS DA2-0215»."""
+        return " + ".join(f"{n} × ancoPLUS {produkte.typname(self.typ, anzahl, self.h_A)}"
+                          for anzahl, n in self.gruppen)
 
 
 def anrechenbar(radien: Sequence[float], d_v: float) -> int:
@@ -172,10 +217,20 @@ def anrechenbar(radien: Sequence[float], d_v: float) -> int:
     return sum(1 for r in radien if BEREICH_VON * d_v - 1e-9 <= r <= d_v + 1e-9)
 
 
+def mindestens(radien: Sequence[float], d_v: float) -> int:
+    """
+    So viele Anker muss eine Leiste behalten: bis zum letzten angerechneten,
+    und wenigstens so viele, wie die kürzeste lieferbare Leiste hat.
+    """
+    bis = max((i + 1 for i, r in enumerate(radien) if r <= d_v + 1e-9), default=0)
+    return max(bis, produkte.ANKER_JE_LEISTE[0])
+
+
 def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float,
              r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt],
-             raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], achse: Punkt,
-             ueberdeckung: float, noetig: Callable[[produkte.Ankertyp, float], bool],
+             raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]],
+             schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float,
+             noetig: Callable[[produkte.Ankertyp, float], bool],
              aussen_reicht: Callable[[Nachweisschnitt], bool]) -> Optional[Vorschlag]:
     """
     Das kleinste ancoPLUS, das reicht: der kleinste Durchmesser, mit dem die
@@ -184,7 +239,8 @@ def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float,
     Durchmesser genügt, stehen die Leisten dichter (:data:`DICHTEN`).
     ``noetig(typ, A_sw)`` und ``aussen_reicht(schnitt)`` rechnet der
     Nachweis; ``r_2_zu(r)`` gibt den geschlossenen Schnitt im Abstand r um die
-    gestützte Fläche.
+    gestützte Fläche; ``schatten`` sind die Schatten der Aussparungen am
+    inneren Schnitt (:func:`~.schnitt.schatten_am_schnitt`).
 
     Reicht nichts, kommt der stärkste Versuch mit ``reicht`` falsch zurück --
     die dichtesten Leisten mit dem grössten Durchmesser und neun Ankern.
@@ -214,7 +270,9 @@ def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float,
                 pruefen: bool) -> Optional[Vorschlag]:
         folge = produkte.abstaende(d, anzahl)
         radien = tuple(accumulate(folge))
-        leisten = tuple(in_der_platte(alle, radien, raender, aussparungen, ueberdeckung))
+        leisten = tuple(setzen(alle, radien, mindestens(radien, d_v), raender=raender,
+                               aussparungen=aussparungen, schatten=schatten, achse=achse,
+                               ueberdeckung=ueberdeckung))
         im_bereich = anrechenbar(radien, d_v)
         if not leisten or (pruefen and not noetig(typ, len(leisten) * im_bereich * typ.flaeche)):
             return None

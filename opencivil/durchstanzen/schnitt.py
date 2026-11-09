@@ -448,6 +448,17 @@ def schatten(aussparung: Sequence[Punkt], achse: Punkt) -> Schatten:
     return Schatten(von, bis)
 
 
+def schatten_am_schnitt(aussparungen: Sequence[Sequence[Punkt]], stuecke: Sequence[Stueck], *,
+                        d_v: float, achse: Punkt) -> List[Schatten]:
+    """
+    Die Schatten der Aussparungen, die näher als 5·d_v am Schnitt liegen --
+    nur sie mindern ihn (Figur 23d). Dort zählt auch keine
+    Durchstanzbewehrung (:mod:`.bewehrung`).
+    """
+    return [schatten(a, achse) for a in aussparungen
+            if abstand_zum_schnitt(a, stuecke) < AUSSPARUNGSABSTAND * d_v]
+
+
 def abstand_zum_schnitt(aussparung: Sequence[Punkt], stuecke: Sequence[Stueck]) -> float:
     """Der kleinste Abstand zwischen der Aussparung und dem Schnitt -- auf 1 cm genau genügt."""
     kanten = list(zip(aussparung, list(aussparung[1:]) + list(aussparung[:1])))
@@ -504,9 +515,7 @@ def auswerten(kandidat: Kandidat, *, d_v: float, achse: Punkt,
     Welche Teile des Kandidaten zählen -- in der Platte, neben einer Ecke und
     nicht hinter einer Aussparung, die näher als 5·d_v liegt.
     """
-    nahe = [a for a in aussparungen
-            if abstand_zum_schnitt(a, kandidat.stuecke) < AUSSPARUNGSABSTAND * d_v]
-    schatten_ = [schatten(a, achse) for a in nahe]
+    schatten_ = schatten_am_schnitt(aussparungen, kandidat.stuecke, d_v=d_v, achse=achse)
     in_platte = an_ecken = hinter = 0.0
     sx = sy = s_l = 0.0
     linien: List[Linienzug] = []

@@ -206,7 +206,7 @@ class Durchstanzen(Nachweis):
         if not v.erfuellt and not s.lage.wand:
             urteile, bewehrung, grade = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
                 d=d, d_v=d_v, k_e=k_e, k_r=k_r, tau_cd=tau_cd, u=u, psi=psi, V_d=V_d,
-                V_Rd_c=V_Rd_c, masse=masse, umriss=umriss))
+                V_Rd_c=V_Rd_c, masse=masse, umriss=umriss, schnitt=schnitt))
             return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS), **grade}, urteile,
                                replace(befund, bewehrung=bewehrung))
         if not v.erfuellt:

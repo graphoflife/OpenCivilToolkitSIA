@@ -1,5 +1,5 @@
 ---
-erzeugt: 2204a1a5dacf
+erzeugt: 1384b87738d7
 art: modul
 tags: [modul]
 ---
@@ -172,6 +172,15 @@ Erst der Rand mit Toleranz, dann ein Strahl nach rechts: jede Kante, die er
 kreuzt, wechselt zwischen innen und aussen. Halb offene Kanten (unten
 eingeschlossen, oben nicht), damit ein Strahl durch eine Ecke nicht doppelt
 zaehlt.
+
+### abstand_strecke_polygon
+
+```python
+def abstand_strecke_polygon(a: Punkt, b: Punkt, punkte: Sequence[Punkt]) -> float
+```
+
+Der kuerzeste Abstand der Strecke `a`–`b` vom Polygon -- null, wo sie
+es kreuzt, beruehrt oder in ihm liegt.
 
 ### echt_geschnitten
 

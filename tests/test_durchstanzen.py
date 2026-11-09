@@ -15,9 +15,14 @@ from itertools import accumulate
 
 from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammenfassen
 from opencivil.durchstanzen import produkte
-from opencivil.durchstanzen.bewehrung import aeussere_kandidaten, anrechenbar, leisten_anordnen
+from opencivil.durchstanzen.bewehrung import (
+    Leiste, Vorschlag, aeussere_kandidaten, anrechenbar, leisten_anordnen, setzen,
+)
 from opencivil.durchstanzen.mit_bewehrung import spannung
-from opencivil.durchstanzen.schnitt import Stuetzenflaeche, kandidaten_stuetze, nachweisschnitt
+from opencivil.durchstanzen.schnitt import (
+    Schatten, Stuetzenflaeche, kandidaten_stuetze, nachweisschnitt, schatten_am_schnitt,
+)
+from opencivil.querschnitt.geometrie import abstand_strecke_polygon
 from opencivil.projekt import DurchstanzEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
 from opencivil.web.api import katalog
@@ -179,6 +184,67 @@ class TestDurchstanzbewehrung(unittest.TestCase):
         anker = [p for l in v.leisten for p in l.anker(v.radien)]
         self.assertTrue(anker)
         self.assertTrue(all(p[1] >= -0.15 + 0.030 - 1e-9 for p in anker))
+
+
+class TestLeistenAnAussparungen(unittest.TestCase):
+    """
+    Eine Leiste ist Stahl vom Rand der Stütze bis zum letzten Anker: sie läuft
+    durch keine Aussparung, auch nicht zwischen zwei Ankern, und hält die
+    Überdeckung. Im Schatten einer Aussparung liegt keine (Figur 23d).
+    """
+
+    #: Eine Leiste an der Oberkante einer Stütze 400 × 400, nach oben.
+    LEISTE = Leiste((0.0, 0.2), (0.0, 1.0))
+    RADIEN = (0.085, 0.225, 0.365, 0.54)
+
+    def gesetzt(self, aussparung, angerechnet=2, schatten=()):
+        return setzen([self.LEISTE], self.RADIEN, angerechnet, raender=(),
+                      aussparungen=[aussparung], schatten=schatten, achse=(0.0, 0.0),
+                      ueberdeckung=0.03)
+
+    def test_nicht_durch_einen_schlitz_zwischen_zwei_ankern(self):
+        """Kein Anker liegt im Schlitz, die Leiste liefe trotzdem hindurch."""
+        schlitz = [(-0.06, 0.33), (0.06, 0.33), (0.06, 0.36), (-0.06, 0.36)]
+        self.assertEqual(self.gesetzt(schlitz), [])
+        kurz = self.gesetzt(schlitz, angerechnet=1)
+        self.assertEqual([l.anzahl for l in kurz], [1])
+
+    def test_endet_vor_der_aussparung(self):
+        """Die Leiste behält die Anker, die die Überdeckung zur Aussparung halten."""
+        weiter = [(-0.05, 0.70), (0.05, 0.70), (0.05, 0.80), (-0.05, 0.80)]
+        (leiste,) = self.gesetzt(weiter)
+        self.assertEqual(leiste.anzahl, 3)
+        self.assertEqual(len(leiste.anker(self.RADIEN)), 3)
+
+    def test_nicht_im_schatten(self):
+        weit_weg = [(5.0, 5.0), (5.1, 5.0), (5.1, 5.1)]
+        self.assertEqual(len(self.gesetzt(weit_weg)), 1)
+        oben = Schatten(math.radians(80), math.radians(100))
+        self.assertEqual(self.gesetzt(weit_weg, schatten=[oben]), [])
+
+    def test_ganze_stelle(self):
+        """Ein Schlitz quer vor der Stütze: keine Leiste kommt ihm näher als c_nom."""
+        p = projekt(b_x=400, b_y=400, V_d=700.0)
+        p.durchstanzstellen[0].aussparung([[-60, 330], [60, 330], [60, 360], [-60, 360]])
+        befund = rechnen(p)[2]
+        v = befund.bewehrung.vorschlag
+        schlitz = [(-0.06, 0.33), (0.06, 0.33), (0.06, 0.36), (-0.06, 0.36)]
+        for l in v.leisten:
+            self.assertGreaterEqual(abstand_strecke_polygon(l.wurzel, l.anker(v.radien)[-1], schlitz),
+                                    0.03 - 1e-9)
+        schatten = schatten_am_schnitt([schlitz], befund.schnitt.massgebend.kandidat.stuecke,
+                                       d_v=befund.d_v, achse=(0.0, 0.0))
+        self.assertEqual(len(schatten), 1)
+        for l in v.leisten:
+            for x, y in l.anker(v.radien)[:2]:
+                self.assertFalse(schatten[0].enthaelt(math.atan2(y, x)))
+
+    def test_name_mit_gekuerzten_leisten(self):
+        """Verschieden lange Leisten sind verschiedene Typen: «… + 1 × … DX2-0215»."""
+        typ = produkte.ANKERTYPEN[0]
+        leisten = (Leiste((0, 0), (1, 0), 3), Leiste((0, 0), (0, 1), 3), Leiste((0, 0), (-1, 0), 2))
+        v = Vorschlag(typ, 0.215, (0.085, 0.14, 0.14), leisten, 2, None, True)
+        self.assertEqual(v.name, "2 × ancoPLUS DX3-0215 + 1 × ancoPLUS DX2-0215")
 
 
 class TestStahlpilz(unittest.TestCase):

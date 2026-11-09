@@ -9920,13 +9920,13 @@ $$
 **Anrechenbare Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4)*
 
 $$
-\sum A_{sw} = n_L \cdot n_A \cdot \frac{\pi \cdot \varnothing_{sw}^{2}}{4} = 10 \cdot 2 \cdot \frac{\pi \cdot \left(14\,\mathrm{mm}\right)^{2}}{4} = 3079\,\mathrm{mm}^{2}
+\sum A_{sw} = n_L \cdot n_A \cdot \frac{\pi \cdot \varnothing_{sw}^{2}}{4} = 9 \cdot 2 \cdot \frac{\pi \cdot \left(14\,\mathrm{mm}\right)^{2}}{4} = 2771\,\mathrm{mm}^{2}
 $$
 
 **Beitrag der Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4, (68))*
 
 $$
-V_{Rd,s} = \sum A_{sw} \cdot k_e \cdot \sigma_{sd} = 3079\,\mathrm{mm}^{2} \cdot 0.7 \cdot 279\,\mathrm{N}/\mathrm{mm}^{2} = 601.4\,\mathrm{kN}
+V_{Rd,s} = \sum A_{sw} \cdot k_e \cdot \sigma_{sd} = 2771\,\mathrm{mm}^{2} \cdot 0.7 \cdot 279\,\mathrm{N}/\mathrm{mm}^{2} = 541.2\,\mathrm{kN}
 $$
 
 **Querkraft für die Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.2, (66))*
@@ -9938,13 +9938,13 @@ $$
 **Querkraft für die Bewehrung gegen ihren Beitrag**
 
 $$
-V_{d,s} = 344.6\,\mathrm{kN} \quad \le \quad V_{Rd,s} = 601.4\,\mathrm{kN}
+V_{d,s} = 344.6\,\mathrm{kN} \quad \le \quad V_{Rd,s} = 541.2\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,s} = \frac{V_{Rd,s}}{V_{d,s}} = \frac{601.4\,\mathrm{kN}}{344.6\,\mathrm{kN}} = 1.75 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,s} = \frac{V_{Rd,s}}{V_{d,s}} = \frac{541.2\,\mathrm{kN}}{344.6\,\mathrm{kN}} = 1.57 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Die halbe Querkraft** *(SIA 262:2025, 4.3.6.5.3, (67))*
@@ -9956,19 +9956,19 @@ $$
 **Durchstanzbewehrung an der Fliessgrenze** *(SIA 262:2025, 4.3.6.5.3, (67))*
 
 $$
-V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 3079\,\mathrm{mm}^{2} \cdot 0.7 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 937\,\mathrm{kN}
+V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 2771\,\mathrm{mm}^{2} \cdot 0.7 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 843.3\,\mathrm{kN}
 $$
 
 **Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung**
 
 $$
-V_d / 2 = 632.7\,\mathrm{kN} \quad \le \quad V_{Rd,v} = 937\,\mathrm{kN}
+V_d / 2 = 632.7\,\mathrm{kN} \quad \le \quad V_{Rd,v} = 843.3\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,v} = \frac{V_{Rd,v}}{V_d / 2} = \frac{937\,\mathrm{kN}}{632.7\,\mathrm{kN}} = 1.48 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,v} = \frac{V_{Rd,v}}{V_d / 2} = \frac{843.3\,\mathrm{kN}}{632.7\,\mathrm{kN}} = 1.33 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Faktor des Produkts: c\_v = 30 mm, d/10 = 34 mm, d/6 = 57 mm**
@@ -10010,37 +10010,37 @@ $$
 **Äusserer Nachweisschnitt, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-u_{out,0} = 5624\,\mathrm{mm}
+u_{out,0} = 5592\,\mathrm{mm}
 $$
 
 **Was neben den Ecken und hinter Aussparungen nicht zählt** *(SIA 262:2025, Figur 23a, 23d und 26)*
 
 $$
-\Delta u_{out} = 446\,\mathrm{mm}
+\Delta u_{out} = 491\,\mathrm{mm}
 $$
 
 **Äusserer Nachweisschnitt ohne das, was nicht zählt**
 
 $$
-u_{out,red} = u_{out,0} - \Delta u_{out} = 5624\,\mathrm{mm} - 446\,\mathrm{mm} = 5178\,\mathrm{mm}
+u_{out,red} = u_{out,0} - \Delta u_{out} = 5592\,\mathrm{mm} - 491\,\mathrm{mm} = 5102\,\mathrm{mm}
 $$
 
 **Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{out} = k_e \cdot u_{out,red} = 0.7 \cdot 5178\,\mathrm{mm} = 3625\,\mathrm{mm}
+u_{out} = k_e \cdot u_{out,red} = 0.7 \cdot 5102\,\mathrm{mm} = 3571\,\mathrm{mm}
 $$
 
 **Fläche innerhalb des Schnitts, ohne Aussparungen**
 
 $$
-A_{out} = 2.201\,\mathrm{m}^{2}
+A_{out} = 2.15\,\mathrm{m}^{2}
 $$
 
 **Querkraft im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
-V_{d,out} = V_d - q_d \cdot A_{out} = 1400\,\mathrm{kN} - 150\,\mathrm{kN}/\mathrm{m}^{2} \cdot 2.201\,\mathrm{m}^{2} = 1069.8\,\mathrm{kN}
+V_{d,out} = V_d - q_d \cdot A_{out} = 1400\,\mathrm{kN} - 150\,\mathrm{kN}/\mathrm{m}^{2} \cdot 2.15\,\mathrm{m}^{2} = 1077.5\,\mathrm{kN}
 $$
 
 **Durchstanzwiderstand im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.5.10, (58))*
@@ -10048,21 +10048,21 @@ $$
 $$
 \begin{aligned}
   V_{Rd,c,out} &= k_r \cdot \tau_{cd} \cdot d_{v,out} \cdot u_{out} \\
-  &= 1.021 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 310\,\mathrm{mm} \cdot 3625\,\mathrm{mm} \\
-  &= 1257.2\,\mathrm{kN}
+  &= 1.021 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 310\,\mathrm{mm} \cdot 3571\,\mathrm{mm} \\
+  &= 1238.6\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Querkraft gegen den Widerstand ausserhalb der Bewehrung**
 
 $$
-V_{d,out} = 1069.8\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 1257.2\,\mathrm{kN}
+V_{d,out} = 1077.5\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 1238.6\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{1257.2\,\mathrm{kN}}{1069.8\,\mathrm{kN}} = 1.18 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{1238.6\,\mathrm{kN}}{1077.5\,\mathrm{kN}} = 1.15 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Durchstanzen: Wandende
@@ -14184,7 +14184,7 @@ Bei regelmässig gestützten Flachdecken mit gleichmässigen angrenzenden Spannw
 
 Näherungsstufe 2: die mittleren Momente im Stützstreifen nach den Gleichungen (62) bis (65).
 
-Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 -- je Leiste 5 Anker ⌀10 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 -- Anker ⌀10 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützten Fläche: 2 je Leiste.
 
@@ -14192,13 +14192,13 @@ Die Faktoren 2 und 3.5 in Gleichung (70) dürfen erhöht werden, wenn Versuche e
 
 Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker. Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens 1.5·d\_v,out von jedem Ende (Figur 26).
 
-Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 -- je Leiste 9 Anker ⌀16 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 -- Anker ⌀16 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Ein Stahlpilz vergrössert die gestützte Fläche. Gewählt ist der kleinste, der zwischen die Überdeckungen passt -- unten 20 mm, oben 50 mm, die Vorgaben der Software von AncoTech -- und mit dem die Platte ausserhalb hält: ZEUS Doppelkreuz 730 × 730 mm, h = 120 mm, g = 150 mm (AncoTech, Preisliste ZEUS 12.2018). Seine gestützte Fläche reicht bis an die Enden der Stege (4.3.6.6.2). Den Widerstand des Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.
 
 Um den Pilz reicht der Beton allein nicht: dazu kommen Leisten, bündig an den Pilz, mit den vier Nachweisen der Durchstanzbewehrung.
 
-Vorgeschlagen wird ancoPLUS von AncoTech um den Stahlpilz: 20 × ancoPLUS DX6-0215 -- je Leiste 6 Anker ⌀10 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech um den Stahlpilz: 20 × ancoPLUS DX6-0215 -- Anker ⌀10 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützten Fläche: 1 je Leiste.
 
@@ -14208,7 +14208,7 @@ Der Schnitt endet am Plattenrand: so ist er kürzer als der geschlossene (Figur 
 
 e\_u ist der Abstand zwischen der Resultierenden der Auflagerkraft -- in der Stützenachse, verschoben um die Exzentrizität e\_x, e\_y -- und dem Schwerpunkt der zählenden Teile des Nachweisschnitts.
 
-Vorgeschlagen wird ancoPLUS von AncoTech: 5 × ancoPLUS DX3-0235 -- je Leiste 3 Anker ⌀10 mit h\_A = 235 mm, vom Rand der gestützten Fläche 95 / 150 / 150 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 5 × ancoPLUS DX3-0235 -- Anker ⌀10 mit h\_A = 235 mm, vom Rand der gestützten Fläche 95 / 150 / 150 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
 
 Eckstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
@@ -14220,7 +14220,9 @@ Hinter einer Aussparung, die näher als 5·d\_v am Schnitt liegt, zählt nicht, 
 
 Näherungsstufe 3: r\_s und die mittleren Momente im Stützstreifen aus einer Berechnung nach der Elastizitätstheorie; 1.2 statt 1.5 vor der Klammer.
 
-Vorgeschlagen wird ancoPLUS von AncoTech: 10 × ancoPLUS DB2-0325 -- je Leiste 2 Anker ⌀14 mit h\_A = 325 mm, vom Rand der gestützten Fläche 125 / 200 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 9 × ancoPLUS DB2-0325 -- Anker ⌀14 mit h\_A = 325 mm, vom Rand der gestützten Fläche 125 / 200 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+
+Keine Leiste läuft über den Plattenrand oder durch eine Aussparung, auch nicht zwischen zwei Ankern; zu beiden hält sie die Überdeckung c\_nom, sonst endet sie mit dem Anker davor. Im Schatten einer Aussparung zählt der Nachweisschnitt nicht (Figur 23d) -- dort liegt auch keine Leiste: Bewehrung, die diesen Teil quert, trüge nichts zur gestützten Fläche.
 
 Wandende einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
@@ -15555,19 +15557,19 @@ $$
 | Beiwert | $k_r$ | $1.021$ | – |
 | Querkraft im Schnitt | $V_d$ | $1265.3$ | kN |
 | Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $920.8$ | kN |
-| Durchstanzbewehrung |  | 10 × ancoPLUS DB2-0325 |  |
+| Durchstanzbewehrung |  | 9 × ancoPLUS DB2-0325 |  |
 | Abstände ab Stütze | $s$ | $125 / 200$ | mm |
-| Beitrag der Bewehrung | $V_{Rd,s}$ | $601.4$ | kN |
+| Beitrag der Bewehrung | $V_{Rd,s}$ | $541.2$ | kN |
 | Erste Betondruckdiagonale | $V_{Rd,max}$ | $2762.3$ | kN |
-| Querkraft ausserhalb | $V_{d,out}$ | $1069.8$ | kN |
-| Widerstand ausserhalb | $V_{Rd,c,out}$ | $1257.2$ | kN |
+| Querkraft ausserhalb | $V_{d,out}$ | $1077.5$ | kN |
+| Widerstand ausserhalb | $V_{Rd,c,out}$ | $1238.6$ | kN |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
-| Durchstanzen | mit Durchstanzbewehrung | $V_{Rd,s} = 601.4\,\mathrm{kN}$ | $V_{d,s} = 344.6\,\mathrm{kN}$ | $1.75$ |
-| Durchstanzen | Verformungsvermögen | $V_{Rd,v} = 937.0\,\mathrm{kN}$ | $V_d / 2 = 632.7\,\mathrm{kN}$ | $1.48$ |
+| Durchstanzen | mit Durchstanzbewehrung | $V_{Rd,s} = 541.2\,\mathrm{kN}$ | $V_{d,s} = 344.6\,\mathrm{kN}$ | $1.57$ |
+| Durchstanzen | Verformungsvermögen | $V_{Rd,v} = 843.3\,\mathrm{kN}$ | $V_d / 2 = 632.7\,\mathrm{kN}$ | $1.33$ |
 | Durchstanzen | Betondruckdiagonale | $V_{Rd,max} = 2762.3\,\mathrm{kN}$ | $V_{d,red} = 1265.3\,\mathrm{kN}$ | $2.18$ |
-| Durchstanzen | ausserhalb der Durchstanzbewehrung | $V_{Rd,c,out} = 1257.2\,\mathrm{kN}$ | $V_{d,out} = 1069.8\,\mathrm{kN}$ | $1.18$ |
+| Durchstanzen | ausserhalb der Durchstanzbewehrung | $V_{Rd,c,out} = 1238.6\,\mathrm{kN}$ | $V_{d,out} = 1077.5\,\mathrm{kN}$ | $1.15$ |
 
 ### Wandende
 
@@ -16006,11 +16008,11 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $400$ | mm | Vorgabe |
 | Mittleres Moment im Stützstreifen, x | $m_{sd,x}$ | $180$ | kNm/m | Vorgabe |
 | Mittleres Moment im Stützstreifen, y | $m_{sd,y}$ | $150$ | kNm/m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $1.18$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $1.15$ |  | berechnet |
 | Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $2.18$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $1.75$ |  | berechnet |
+| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $1.57$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.73$ |  | berechnet |
-| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $1.48$ |  | berechnet |
+| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $1.33$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $20$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $20$ | mm | Vorgabe |
 | Flächenlast im Nachweisschnitt: Bodenpressung | $q_d$ | $150$ | kN/m² | Vorgabe |

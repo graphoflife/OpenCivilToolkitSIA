@@ -312,6 +312,12 @@ sie hier notiert; keine davon ist nachgeschlagen.
       Schnitt (aus der Exzentrizität wäre es aussen grösser).
 - [ ] **Stufe 3 an Rand- und Eckstützen: r_s ≥ 2/3·b_sr (4.3.6.4.8).** Noch
       nicht geprüft: r_s wird genommen, wie eingegeben.
+- [ ] **Durchstanzbewehrung an Aussparungen.** Eingebaut: eine Leiste hält
+      zur Aussparung die Überdeckung c_nom, wie zum Plattenrand (nach Vorgabe,
+      nicht nachgeschlagen), und im Schatten einer Aussparung nach Figur 23d
+      liegt keine Leiste (gelesen: dort zählt der Schnitt nicht, also auch
+      keine Bewehrung, die ihn quert). Die Konstruktionsregeln 5.5.3.7 bis
+      5.5.3.12 liegen nicht vor.
 - [ ] **Stahlpilz: d_v = d − 20 mm und die gestützte Fläche bis an die Stege.**
       Gelesen aus 4.3.6.2.1, Figur 21 und 4.3.6.6.2; 20 mm unten und 50 mm
       oben aus der Software von AncoTech. Nicht nachgeschlagen.

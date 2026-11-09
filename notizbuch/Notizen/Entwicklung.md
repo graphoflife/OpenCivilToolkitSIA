@@ -44,6 +44,27 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-09 · Durchstanzen: Leisten an Aussparungen
+
+Gemeldet vom Benutzer: eine Leiste lief durch eine Aussparung, solange
+keiner ihrer Anker darin lag. Geprüft wurden nur die Anker, nicht der Stahl
+dazwischen. Jetzt gilt (`bewehrung.setzen`):
+
+- Eine Leiste ist Stahl vom Rand der gestützten Fläche bis zum letzten
+  Anker. Sie läuft weder über den Plattenrand noch durch eine Aussparung
+  und hält zu beiden die Überdeckung c_nom. Stösst sie an, endet sie mit
+  dem Anker davor; behält sie die angerechneten Anker nicht, fällt sie weg.
+  Verschieden lange Leisten sind verschiedene Typen: «14 × DX5 + 2 × DX3».
+- Im Schatten einer Aussparung, die näher als 5·d_v am Nachweisschnitt
+  liegt, zählt der Schnitt nicht (Figur 23d). Dort liegt auch keine Leiste:
+  Bewehrung, die diesen Teil des Schnitts quert, trägt nichts zur Stütze.
+  Welche Aussparungen einen Schatten werfen, steht jetzt an einer Stelle
+  (`schnitt.schatten_am_schnitt`), für den Schnitt und für die Leisten.
+
+Im Prüfprojekt verliert die Ovalstütze neben ihrer Aussparung eine Leiste.
+
+---
+
 ## 2026-10-30 · Durchstanzen: Stahlpilze ZEUS
 
 Bricht an einer Innenstütze die erste Betondruckdiagonale (70), wählt das

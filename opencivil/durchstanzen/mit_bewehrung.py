@@ -51,8 +51,8 @@ from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.bewehrung import Vorschlag, bemessen
 from opencivil.durchstanzen.produkte import Stahlpilz
 from opencivil.durchstanzen.schnitt import (
-    ECKENBEREICH, Auswertung, Nachweisschnitt, Punkt, Stueck, Stuetzenflaeche, kandidaten_stuetze,
-    konvexe_huelle, nachweisschnitt,
+    ECKENBEREICH, Auswertung, Nachweisschnitt, Punkt, Schatten, Stueck, Stuetzenflaeche,
+    kandidaten_stuetze, konvexe_huelle, nachweisschnitt, schatten_am_schnitt,
 )
 from opencivil.durchstanzen.stelle import Lage
 
@@ -77,6 +77,8 @@ class Grundlage:
     V_Rd_c: Wert
     masse: Dict[str, float]
     umriss: Tuple[Punkt, ...]
+    schnitt: Nachweisschnitt
+    """Der innere Nachweisschnitt -- an ihm werfen die Aussparungen ihren Schatten."""
 
 
 @dataclass(frozen=True)
@@ -99,6 +101,9 @@ class Ort:
     V_Rd_c: Wert
     ausnahme: bool
     """Ob der Faktor des Gutachtens erhöht ist -- Innenstütze und Wandende."""
+
+    schatten: Tuple[Schatten, ...]
+    """Die Schatten der Aussparungen am Schnitt um diese Fläche: dort liegt keine Leiste."""
 
 
 @dataclass(frozen=True)
@@ -200,7 +205,9 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte,
                    e[s.beton.eingabename("f_ctm")], c_v, h_A,
                    w.laenge("d_v_out", r"d_{v,out}", g.d.groesse.si - c_v))
     stuetze = Ort("", "", g.umriss, lambda r: s.kandidaten(g.masse, r, g.d_v.groesse.si)[0].stuecke,
-                  g.d_v, g.u, g.V_d, g.V_Rd_c, s.lage in (Lage.INNEN, Lage.WANDENDE))
+                  g.d_v, g.u, g.V_d, g.V_Rd_c, s.lage in (Lage.INNEN, Lage.WANDENDE),
+                  tuple(schatten_am_schnitt(s.aussparungen, g.schnitt.massgebend.kandidat.stuecke,
+                                            d_v=g.d_v.groesse.si, achse=s.achse(g.masse))))
     vorschlag = _suchen(n, werte, stuetze)
     if vorschlag is not None:
         urteile, befund, bricht = _mit_leisten(n, p, w, werte, stuetze, vorschlag)
@@ -240,8 +247,8 @@ def _suchen(n: "Durchstanzen", werte: _Werte, ort: Ort) -> Optional[Vorschlag]:
     return bemessen(
         d=g.d.groesse.si, d_v=ort.d_v.groesse.si, d_v_out=d_v_out, h_A=werte.h_A.groesse.si,
         r_2_zu=ort.r_zu, umriss=ort.umriss, raender=s.raender(g.masse),
-        aussparungen=s.aussparungen, achse=s.achse(g.masse), ueberdeckung=werte.e.g("c").si,
-        noetig=noetig, aussen_reicht=aussen_reicht)
+        aussparungen=s.aussparungen, schatten=ort.schatten, achse=s.achse(g.masse),
+        ueberdeckung=werte.e.g("c").si, noetig=noetig, aussen_reicht=aussen_reicht)
 
 
 def _mit_leisten(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte, ort: Ort,
@@ -257,12 +264,19 @@ def _mit_leisten(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Wert
     typ = vorschlag.typ
     p.erklaerung(
         f"Vorgeschlagen wird ancoPLUS von AncoTech{ort.zusatz and ' ' + ort.zusatz}: "
-        f"{vorschlag.name} -- je Leiste {len(vorschlag.abstaende)} Anker ⌀{typ.durchmesser * 1e3:.0f} "
-        f"mit h_A = {werte.h_A.formatiert()} mm, vom Rand der gestützten Fläche "
+        f"{vorschlag.name} -- Anker ⌀{typ.durchmesser * 1e3:.0f} mit h_A = "
+        f"{werte.h_A.formatiert()} mm, vom Rand der gestützten Fläche "
         f"{' / '.join(f'{a * 1e3:.0f}' for a in vorschlag.abstaende)} mm. Die Abstände sind die "
         f"der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum "
         f"dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens "
         f"1.5·d auseinander ({produkte.QUELLE_ANCOPLUS}, nach Vorgabe, nicht nachgeschlagen).")
+    if ort.schatten or len(vorschlag.gruppen) > 1:
+        p.erklaerung(
+            "Keine Leiste läuft über den Plattenrand oder durch eine Aussparung, auch nicht "
+            "zwischen zwei Ankern; zu beiden hält sie die Überdeckung c_nom, sonst endet sie mit "
+            "dem Anker davor. Im Schatten einer Aussparung zählt der Nachweisschnitt nicht "
+            "(Figur 23d) -- dort liegt auch keine Leiste: Bewehrung, die diesen Teil quert, "
+            "trüge nichts zur gestützten Fläche.")
     if not vorschlag.reicht:
         p.hinweis("Kein ancoPLUS erfüllt alle Bedingungen; gerechnet ist der stärkste Versuch.")
 
@@ -498,7 +512,7 @@ def _pilz_suchen(n: "Durchstanzen", werte: _Werte
             continue
         # Nur für die Suche: Werte, die in keine Herleitung kommen.
         w = Zwischenwerte("suche")
-        ort = _pilzort(befund, w.laenge("d_v", "d_v", d_v), w.laenge("u", "u", u),
+        ort = _pilzort(n, werte, befund, w.laenge("d_v", "d_v", d_v), w.laenge("u", "u", u),
                        w.kraft("V_d", "V_d", V_d), w.kraft("V_Rd_c", "V_Rd_c", V_Rd_c))
         vorschlag = _suchen(n, werte, ort)
         if vorschlag is not None and vorschlag.reicht:
@@ -506,12 +520,16 @@ def _pilz_suchen(n: "Durchstanzen", werte: _Werte
     return None
 
 
-def _pilzort(befund: Pilzbefund, d_v: Wert, u: Wert, V_d: Wert, V_Rd_c: Wert) -> Ort:
-    """Der Pilz als Ort der Leisten: seine Fläche, sein d_v, der Schnitt um ihn."""
+def _pilzort(n: "Durchstanzen", werte: _Werte, befund: Pilzbefund, d_v: Wert, u: Wert, V_d: Wert,
+             V_Rd_c: Wert) -> Ort:
+    """Der Pilz als Ort der Leisten: seine Fläche, sein d_v, der Schnitt um ihn und dessen Schatten."""
+    s = n.stelle
     huelle = befund.umriss
     return Ort("um den Stahlpilz", "P_", huelle,
                lambda r: kandidaten_stuetze(Stuetzenflaeche(huelle), r, math.inf)[0].stuecke,
-               d_v, u, V_d, V_Rd_c, True)
+               d_v, u, V_d, V_Rd_c, True,
+               tuple(schatten_am_schnitt(s.aussparungen, befund.schnitt.massgebend.kandidat.stuecke,
+                                         d_v=befund.d_v, achse=s.achse(werte.g.masse))))
 
 
 def _mit_pilz(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte,
@@ -563,6 +581,7 @@ def _mit_pilz(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte,
             d.id: unbeschraenkt for d in (n.d_mit, n.d_verformung, n.d_diagonale)}
     p.erklaerung("Um den Pilz reicht der Beton allein nicht: dazu kommen Leisten, bündig an "
                  "den Pilz, mit den vier Nachweisen der Durchstanzbewehrung.")
-    urteile, bewehrungsbefund, _ = _mit_leisten(n, p, w, werte, _pilzort(befund, d_v, u, V_d, V_Rd_c),
+    urteile, bewehrungsbefund, _ = _mit_leisten(n, p, w, werte,
+                                                _pilzort(n, werte, befund, d_v, u, V_d, V_Rd_c),
                                                 vorschlag, befund)
     return urteile, bewehrungsbefund, {}

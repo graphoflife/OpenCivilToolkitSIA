@@ -1,5 +1,5 @@
 ---
-erzeugt: d7f46923ce9b
+erzeugt: 014f2765a919
 art: modul
 tags: [modul]
 ---
@@ -25,9 +25,22 @@ e_max auseinander, als Sehne gemessen. Auf jeder geraden Seite steht an
 beiden Enden eine Leiste und dazwischen gleichmässig so viele wie nötig, auf
 den Rundungen ebenso. Das ist der Grundriss der Herstellerunterlagen, die
 Regeln dazu sind die des Produkts ([[opencivil.durchstanzen.produkte|.produkte]]) -- nach Vorgabe, nicht
-nachgeschlagen. Eine Leiste, deren Anker nicht mindestens die Überdeckung
-tief in der Platte liegen, fällt weg; ebenso eine, deren Anker in eine
-Aussparung fallen.
+nachgeschlagen.
+
+
+## AN RÄNDERN UND AUSSPARUNGEN ([[opencivil.durchstanzen.bewehrung#setzen|setzen]])
+
+Eine Leiste ist ein Stahlstück vom Rand der gestützten Fläche bis zu ihrem
+letzten Anker: sie darf weder über den Plattenrand noch durch eine
+Aussparung laufen, auch zwischen zwei Ankern nicht, und hält zu beiden die
+Überdeckung c_nom (nach Vorgabe, nicht nachgeschlagen). Stösst sie an, endet
+sie mit dem letzten Anker davor; behält sie die angerechneten Anker nicht
+(Gleichung (68)), fällt sie weg. Ebenso fällt eine Leiste weg, deren
+angerechnete Anker im Schatten einer Aussparung liegen, die näher als 5·d_v
+am Nachweisschnitt ist: dort zählt der Schnitt nicht (Figur 23d), und
+Bewehrung, die ihn quert, trägt nichts zur Stütze. Bis 2026-11-09 zählten nur
+die Anker selbst, und eine Leiste konnte durch eine Aussparung laufen
+(Benutzer).
 
 
 ## DER ÄUSSERE SCHNITT (Figur 26)
@@ -54,10 +67,12 @@ SI-Basis, Längen in m, Kräfte in N.
 class Leiste
 ```
 
-Eine Leiste: wo sie am Rand der gestützten Fläche ansetzt und wohin sie läuft.
+Eine Leiste: wo sie am Rand der gestützten Fläche ansetzt, wohin sie läuft
+und wie viele Anker sie trägt -- null heisst: so viele, wie es Abstände gibt.
 
 - `wurzel: Punkt`
 - `richtung: Punkt`
+- `anzahl: int = 0`
 
 #### Leiste.anker
 
@@ -65,7 +80,7 @@ Eine Leiste: wo sie am Rand der gestützten Fläche ansetzt und wohin sie läuft
 def anker(self, radien: Sequence[float]) -> List[Punkt]
 ```
 
-Die Anker im Abstand `radien` vom Rand der gestützten Fläche.
+Die Anker im Abstand `radien` vom Rand der gestützten Fläche, so viele sie trägt.
 
 ### _normale
 
@@ -84,13 +99,17 @@ def leisten_anordnen(stuecke: Sequence[Stueck], r_2: float, e_max: float) -> Lis
 Die Leisten um eine gestützte Fläche -- `stuecke` ist der geschlossene
 Schnitt im Abstand `r_2` um sie (siehe Dateikopf).
 
-### in_der_platte
+### setzen
 
 ```python
-def in_der_platte(leisten: Sequence[Leiste], radien: Sequence[float], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], ueberdeckung: float) -> List[Leiste]
+def setzen(leisten: Sequence[Leiste], radien: Sequence[float], angerechnet: int, *, raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float) -> List[Leiste]
 ```
 
-Nur die Leisten, deren Anker alle um die Überdeckung in der Platte liegen und keine Aussparung treffen.
+Die Leisten, wie sie liegen dürfen (siehe Dateikopf): jede so lang, wie sie
+die Überdeckung zum Plattenrand und zu jeder Aussparung hält -- mit ihren
+Ankern und mit dem Stahl dazwischen. Wer nicht wenigstens die ersten
+`angerechnet` Anker behält oder mit ihnen im Schatten einer Aussparung
+liegt (Figur 23d), fällt weg.
 
 ### aeussere_kandidaten
 
@@ -136,6 +155,15 @@ def A_sw(self) -> float
 
 Die anrechenbare Durchstanzbewehrung: Leisten mal Anker im Bereich mal Fläche.
 
+#### Vorschlag.gruppen
+
+```python
+@property
+def gruppen(self) -> List[Tuple[int, int]]
+```
+
+Je Länge der Leisten -- Anker je Leiste -- wie viele es sind; die längsten zuerst.
+
 #### Vorschlag.name
 
 ```python
@@ -143,7 +171,7 @@ Die anrechenbare Durchstanzbewehrung: Leisten mal Anker im Bereich mal Fläche.
 def name(self) -> str
 ```
 
-«12 × ancoPLUS DA3-0215».
+«12 × ancoPLUS DA3-0215», mit gekürzten Leisten «… + 2 × ancoPLUS DA2-0215».
 
 ### anrechenbar
 
@@ -153,10 +181,19 @@ def anrechenbar(radien: Sequence[float], d_v: float) -> int
 
 Die Anker zwischen 0.35·d_v und d_v vom Rand der gestützten Fläche (Gleichung (68)).
 
+### mindestens
+
+```python
+def mindestens(radien: Sequence[float], d_v: float) -> int
+```
+
+So viele Anker muss eine Leiste behalten: bis zum letzten angerechneten,
+und wenigstens so viele, wie die kürzeste lieferbare Leiste hat.
+
 ### bemessen
 
 ```python
-def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float, r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], achse: Punkt, ueberdeckung: float, noetig: Callable[[produkte.Ankertyp, float], bool], aussen_reicht: Callable[[Nachweisschnitt], bool]) -> Optional[Vorschlag]
+def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float, r_2_zu: Callable[[float], Sequence[Stueck]], umriss: Sequence[Punkt], raender: Sequence[Halbebene], aussparungen: Sequence[Sequence[Punkt]], schatten: Sequence[Schatten], achse: Punkt, ueberdeckung: float, noetig: Callable[[produkte.Ankertyp, float], bool], aussen_reicht: Callable[[Nachweisschnitt], bool]) -> Optional[Vorschlag]
 ```
 
 Das kleinste ancoPLUS, das reicht: der kleinste Durchmesser, mit dem die
@@ -165,7 +202,8 @@ je Leiste, mit der der äussere Schnitt `aussen_reicht`. Erst wenn kein
 Durchmesser genügt, stehen die Leisten dichter ([[opencivil.durchstanzen.bewehrung#Konstanten|DICHTEN]]).
 `noetig(typ, A_sw)` und `aussen_reicht(schnitt)` rechnet der
 Nachweis; `r_2_zu(r)` gibt den geschlossenen Schnitt im Abstand r um die
-gestützte Fläche.
+gestützte Fläche; `schatten` sind die Schatten der Aussparungen am
+inneren Schnitt ([[opencivil.durchstanzen.schnitt#schatten_am_schnitt|schatten_am_schnitt]]).
 
 Reicht nichts, kommt der stärkste Versuch mit `reicht` falsch zurück --
 die dichtesten Leisten mit dem grössten Durchmesser und neun Ankern.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7393a0a2d01a
+erzeugt: 5708fec4f716
 art: modul
 tags: [modul]
 ---
@@ -334,6 +334,16 @@ def schatten(aussparung: Sequence[Punkt], achse: Punkt) -> Schatten
 
 Der Winkelbereich, den die Aussparung von der Achse aus verdeckt: der
 kleinste Bogen, der die Richtungen zu allen ihren Ecken enthält.
+
+### schatten_am_schnitt
+
+```python
+def schatten_am_schnitt(aussparungen: Sequence[Sequence[Punkt]], stuecke: Sequence[Stueck], *, d_v: float, achse: Punkt) -> List[Schatten]
+```
+
+Die Schatten der Aussparungen, die näher als 5·d_v am Schnitt liegen --
+nur sie mindern ihn (Figur 23d). Dort zählt auch keine
+Durchstanzbewehrung ([[opencivil.durchstanzen.bewehrung|.bewehrung]]).
 
 ### abstand_zum_schnitt
 

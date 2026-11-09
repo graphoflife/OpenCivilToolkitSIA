@@ -223,6 +223,20 @@ def lage(p: Punkt, punkte: Sequence[Punkt]) -> int:
     return 1 if innen else -1
 
 
+def abstand_strecke_polygon(a: Punkt, b: Punkt, punkte: Sequence[Punkt]) -> float:
+    """
+    Der kuerzeste Abstand der Strecke ``a``–``b`` vom Polygon -- null, wo sie
+    es kreuzt, beruehrt oder in ihm liegt.
+    """
+    if lage(a, punkte) >= 0 or lage(b, punkte) >= 0:
+        return 0.0
+    if any(echt_geschnitten(a, b, p, q) for p, q in _kanten(punkte)):
+        return 0.0
+    return min(min(abstand_zur_strecke(a, p, q), abstand_zur_strecke(b, p, q),
+                   abstand_zur_strecke(p, a, b), abstand_zur_strecke(q, a, b))
+               for p, q in _kanten(punkte))
+
+
 def echt_geschnitten(a1: Punkt, a2: Punkt, b1: Punkt, b2: Punkt) -> bool:
     """
     Ob sich zwei Strecken im Innern beider kreuzen.

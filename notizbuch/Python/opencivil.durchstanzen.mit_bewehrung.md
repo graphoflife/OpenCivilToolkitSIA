@@ -1,5 +1,5 @@
 ---
-erzeugt: 44ebc6c65d8c
+erzeugt: 193472f16c09
 art: modul
 tags: [modul]
 ---
@@ -73,6 +73,7 @@ Was der Nachweis ohne Bewehrung schon gerechnet hat -- der mit Bewehrung baut da
 - `V_Rd_c: Wert`
 - `masse: Dict[str, float]`
 - `umriss: Tuple[Punkt, ...]`
+- `schnitt: Nachweisschnitt` – Der innere Nachweisschnitt -- an ihm werfen die Aussparungen ihren Schatten.
 
 ### Ort
 
@@ -92,6 +93,7 @@ Wo die Leisten ansetzen: an der Stütze, oder um den Stahlpilz (4.3.6.6.2).
 - `V_d: Wert`
 - `V_Rd_c: Wert`
 - `ausnahme: bool` – Ob der Faktor des Gutachtens erhöht ist -- Innenstütze und Wandende.
+- `schatten: Tuple[Schatten, ...]` – Die Schatten der Aussparungen am Schnitt um diese Fläche: dort liegt keine Leiste.
 
 ### Pilzbefund
 
@@ -255,10 +257,10 @@ weg, bevor sein Schnitt gerechnet wird: so bleibt die Suche schnell.
 ### _pilzort
 
 ```python
-def _pilzort(befund: Pilzbefund, d_v: Wert, u: Wert, V_d: Wert, V_Rd_c: Wert) -> Ort
+def _pilzort(n: 'Durchstanzen', werte: _Werte, befund: Pilzbefund, d_v: Wert, u: Wert, V_d: Wert, V_Rd_c: Wert) -> Ort
 ```
 
-Der Pilz als Ort der Leisten: seine Fläche, sein d_v, der Schnitt um ihn.
+Der Pilz als Ort der Leisten: seine Fläche, sein d_v, der Schnitt um ihn und dessen Schatten.
 
 ### _mit_pilz
 
