@@ -84,6 +84,137 @@ gelernt wurde, steht in [[Entwicklung]].
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
 
+## Umbau: Befunde der Strukturdurchsicht vom 2026-11-09
+
+Vier Durchsichten über das ganze Repo (Rechenkern; Projekt, Dienst und
+Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
+Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
+Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
+Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
+schon dreifach da. Empfohlene Reihenfolge: zuerst 1 und 2, dann 4, 6 und 7
+als ein Umbau des Zustands der Oberfläche, danach 3 vor einem vierten
+Zeichenfenster und 5 vor der nächsten Bauteilart.
+
+**Neu seit dem 2026-10-25, alles im Durchstanzen:**
+
+- [ ] **1. Derselbe Schnittnachweis dreimal, jede Bedingung zweimal.** Um die
+      Stütze (`nachweis.py`), aussen um die Leisten und um den Pilz
+      (`mit_bewehrung.py`) läuft dieselbe Folge -- Schnitt, Abzüge, k_e,
+      V_d − q_d·A, V_Rd,c --, mit drei Werkzeugen: Gleichung (58) steht in
+      nachweis.py:189 und mit_bewehrung.py:150, der Abzug 4.3.6.2.6 dreimal
+      (`_lasten`, `_querkraft`, `_Werte.flaechenlast`). Die Suche prüft
+      (66), (67) und den äusseren Schnitt stumm (mit_bewehrung.py:239-245),
+      die Herleitung noch einmal laut (313-378); beim Pilz ebenso
+      (499-511 und 561-568). Ändert sich eine Bedingung an einer Stelle,
+      weicht der Vorschlag still vom Nachweis ab. Die Formelseiten liessen
+      sich nur mit Platzhaltern wie `@roh_{index}` trennen. Besser: eine
+      reine `Schnittpruefung` und eine reine `Leistenpruefung`, je einmal
+      gerechnet; die Suche fragt ihr Ergebnis, die Herleitung schreibt es.
+- [ ] **2. Platzhalter statt Zustand.** Fünf feste Grade für eine
+      wechselnde Zahl Urteile, gefüllt auf drei Wegen, mit 0 und ∞ für
+      «nicht gerechnet» (nachweis.py:206-231, mit_bewehrung.py:577-581).
+      Der Befund trägt `V_Rd_max=math.inf`, `k_sys=0.0`, `sigma_sd=0.0`,
+      und `V_d_out` heisst je nach Fall «ausserhalb der Leisten» oder «um
+      den Pilz»; Tabelle, Zeichendaten und Legende verzweigen darum
+      (nachweis.py:643-661, durchstanzdaten.py:74-100,
+      ds_grundriss.js:176-189). Denselben Kniff -- ∞ von Hand, ohne Urteil
+      -- haben vier Nachweise im Kern (richtungsnachweise.py:104 und 164,
+      qa_gebrauch.py:406, schiefe_biegung.py:169-173). Besser:
+      `Nachweis.rechne` füllt jeden Grad, den kein Urteil trägt; der Befund
+      wird `leisten: Optional[Leistenbefund]` und `pilz:
+      Optional[Pilzbefund]`, jedes mit seinen eigenen Zahlen.
+- [ ] **3. Der dritte Adapter des Zeichenfensters ist wieder kopiert**
+      (ds_zeichnung.js:44-147: `eintragVon`, `fensterVon`/`fensterVergessen`,
+      `gilt`/`zeichnung`/`schreiben`, Knotennamen, `umriss`, Lagefelder).
+      Damit steht der Punkt «Eine Grundlage für die Apps mit Zeichenfenster»
+      (2026-10-12) dreifach da. Vor einem vierten Zeichenfenster erledigen.
+- [ ] **4. Lage und Form als Textwahl, 28 Weichen.** In stelle.py,
+      nachweis.py und mit_bewehrung.py; die Maske wiederholt `masse()` und
+      `eingaben()` (durchstanzen.js:104-120, 192, 214-215; apps.js:259).
+      Besser: die gestützte Fläche als Typ -- Stütze mit Form und Rändern,
+      Wandende, Wandecke --, der Masse, Kandidaten, Umriss, Achse, Ränder,
+      k_e-Näherung, m_sd-Gleichung und die Formel für u_0 kennt; der
+      Katalog liefert die Felder je Wahl als Daten.
+
+**Im übrigen Repo, neu gefunden:**
+
+- [ ] **5. Eine Bauteilart ist an rund 15 Stellen verdrahtet, und sieben
+      schweigen, wenn eine fehlt.** Der Steckbrief verspricht «nirgends
+      sonst» (aufbau/__init__.py:118-121). Daneben stehen: `ANGABEN` nach
+      Namen (zusammenfassung.py:283), je Art ein Ergebnisschlüssel
+      (api.py:593-603), Kennzahlen nur für Platte und Analyse (api.py:612),
+      `objekte("…")` per Text (kern.py:113), die Vorlagen des Katalogs von
+      Hand (api.py:169-237; dieselbe Klasse heisst dort «einwirkung», in
+      `felder` «kombination»), dazu die Karten in bericht.js und die
+      Sinnbilder. Still bleiben: die Zeichendaten (leeres Bild), die
+      Kennzahlen, die Karten, das Sinnbild, `neue_<art>` (dann erscheint
+      «Katalog noch nicht geladen», sonst unerreichbar) und nackte Zeilen.
+      Besser: `angaben`, `zeichendaten` und `kennzahlen` als Felder am
+      Steckbrief, ein Schlüssel `zeichendaten[kennung]`, die Vorlagen im
+      selben Durchgang wie `felder`. Im JS werden die Karten Felder der
+      Zeilen von apps.js, sobald die Bilder der Platte aus diagramm.js und
+      bericht.js ausziehen (siehe 11).
+- [ ] **6. Einträge werden über ihren Listennamen gesucht**, an rund 70
+      Stellen, mit zwei Fehlerregeln: `eintragAendern` tut bei falschem
+      Namen still nichts, legt aber ab und rechnet (zustand.js:198-203);
+      die Handfassungen werfen. Kennungen sind im Projekt eindeutig.
+      Besser: `eintragVon(kennung)` und `eintragAendern(kennung, v)` über
+      alle Listen; das Listenargument, `anBauteil` und acht eigene Leser
+      fallen weg.
+- [ ] **7. Zustand der Oberfläche:** Der Katalog wird behandelt, als könnte
+      er fehlen (35 Stellen `zustand.katalog?.…`, 29 mit `|| []`); ein
+      umbenannter Schlüssel ergibt still einen leeren Schalter. Was
+      veraltet ist, entscheiden drei Abdrücke von Hand (qa_zeichnung.js:159,
+      qa_diagramme.js:88, bs_teile.js:69) und die Schlüssel des
+      schwebenden Fensters. Ansichtsspeicher je Kennung vergessen nie
+      (qa_diagramme.js, bs_diagramme.js, gb_zeichnung.js): wer a1 löscht
+      und neu anlegt, sieht kurz die alten Diagramme. Besser: ein Zugriff
+      `katalog(…)`, der mit dem Pfad wirft; eine Fassungsnummer in
+      `projektAendern` statt der Abdrücke; ein Speicher `ansichtVon(kennung)`,
+      geleert beim Anlegen und Löschen.
+- [ ] **8. Der Lagennachweis steht viermal** (duktilitaet.py:132-331,
+      mindestbewehrung.py:205-364 und 445-633, sproedes_versagen.py:80-202)
+      mit eigener Lagenwahl, Stahl-Entdoppelung, Gradkennung und
+      Sammelschleife; der allgemeine `Nachweis` trägt dafür
+      `ohne_bewehrung` (berechnung.py:1010), in drei der vier ein toter
+      Zweig. Besser: `Lagennachweis` als Schablone.
+- [ ] **9. «Je Seite eine Lage im Schwerpunkt» steht zweimal, mit
+      verschiedenen Regeln** (querschnittsloeser.py:153-178 gegen
+      handrechnung.py:565-627: welche Seite, zwei Stähle auf einer Seite,
+      leere Seite), obwohl gesetzwahl.py:17-21 «derselbe Querschnitt»
+      verspricht; den Schwerpunkt rechnet lagenaufbau.py:113-132 ein
+      drittes Mal. Besser: eine Funktion `je_seite(lagen, h)`.
+- [ ] **10. Einheiten der Anzeige auf drei Wegen.** `_Groesse` dient nur den
+      Linien (diagrammdaten.py:258-276), sonst stehen nackte Faktoren da,
+      und `kN = 1e-3` (balkendaten.py:34) bedeutet das Gegenteil von
+      `kN = 1e3` (aufbau/querschnittsanalyse.py:63). Legende und Urteil der
+      Situationsbilder baut das JS selbst (gb_zeichnung.js:253-271,
+      sz_zeichnung.js:212-233, ds_grundriss.js:163-199). Besser: `_Groesse`
+      als gemeinsames Modul, die Legende als Zellen aus den *daten.py.
+- [ ] **11. Dateien:** core/berechnung.py hat 1087 Zeilen (Naht in Zeile
+      607: der Nachweis nach core/nachweis.py); diagramm.js (959) ist das
+      Bilderbuch der Platte -- auslagern, das erfüllt die Vorbedingung von
+      5; projekt.py (897): die Prüfprojekte nach projekt/beispiele.py;
+      projekt/balkensystem.py (906): das Modell nach aufbau/balkensystem.py.
+- [ ] **12. Kleineres:** `Stahlgesetz.nur_zug` ist ein Typ im Kleid eines
+      Schalters (werkstoffgesetz.py:380-446) · der Dienst fängt vier Mal,
+      was `bearbeite` schon fängt (dienst.py:402-451) · `materialien()` und
+      `bezuege()` sind ungeschriebene Verträge, sieben Rechenobjekte bauen
+      `id_von`/`ins_rechenwerk` von Hand · tot oder nur geschrieben:
+      `Rechenwerk.erzeuger`, `Protokoll.warnungen`, `Knickergebnis.halbierungen`
+      und `.durchlaeufe`, `Baustoff.eingabewerte`,
+      `Durchstanzbefund.rotationen`, `rechnetImBrowser`, `anhangVorschau`,
+      CSS `.bs-lastblock` und Co. · `_mehrzahl(lage)` gehört an `Lage`.
+
+**Stand der früheren Befunde:** fast alle offen. Teilweise behoben: die
+Grenze x/d kommt aus dem Katalog (nachweise.js), editor.js nennt keine
+Normstelle mehr, Meldungen nennen das Feld, `print(ergebnis)` nutzt
+`zusammenfassen`. Behoben: die d_v-Regel steht einmal
+(`Kurvenbeiwerte.hoehen`). Gewachsen: die Halbierungen (dazu dicke.py und
+qa_gebrauch.py), die Materiallisten im JS (dazu durchstanzen.js), die
+Grundlage der Zeichenfenster (siehe 3) und das Kern-Wissen im JS (dazu
+durchstanzen.js).
+
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-10-25
 
 Vier Durchsichten über das ganze Repo, jeder Punkt am Code nachgeprüft.
