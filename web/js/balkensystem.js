@@ -34,7 +34,7 @@ import { fenster, fensterOeffnen } from './fenster.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { anfuegenKnopf, rechenwahlZeile } from './nachweise.js';
 import {
-  ausVorlage, eintragAendern, eintragVon, feldangabe, kennwertId, naechsterName, zustand,
+  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsterName, zustand,
 } from './zustand.js';
 
 const HILFE = {
@@ -104,7 +104,7 @@ function uebersicht(a) {
   }
   const name = (q) => z.querschnitte.find((x) => x.kennung === q)?.name || q || '–';
   const stoff = (m) => {
-    if (m === zustand.katalog?.balkensystem?.material_des_querschnitts) return 'gemäss Querschnitt';
+    if (m === katalog('balkensystem', 'material_des_querschnitts')) return 'gemäss Querschnitt';
     const da = eintragVon(m);
     return da ? (da.name || da.sorte) : '–';
   };
@@ -135,7 +135,7 @@ function uebersicht(a) {
     },
   }, [el('span.bs-element-name', { text: last.kennung }), el('span', { text: wo }),
     el('span.bs-element-zusatz', { text: `${text} · ${lastfall(last.lastfall)}` })]);
-  const arten = zustand.katalog?.balkensystem?.lastarten || [];
+  const arten = katalog('balkensystem', 'lastarten');
   const lasten = [
     ...z.linien.flatMap((l) => l.lasten.map((last) => {
       const art = arten.find((x) => x.wert === last.art);
@@ -220,7 +220,7 @@ function systemGruppe(system) {
 function materialienInhalt(system) {
   const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
   const betone = zustand.projekt.materialien.filter((m) => m.art === 'beton');
-  const kennwerte = zustand.katalog?.balkensystem?.betonkennwerte || {};
+  const kennwerte = katalog('balkensystem', 'betonkennwerte');
   const angabe = (feldname) => feldangabe('stabmaterial', feldname);
   const gesperrt = (beton, kurz) => {
     const wert = beton ? zustand.loesung?.werte?.[kennwertId(beton, kennwerte[kurz])] : null;
@@ -262,7 +262,7 @@ function materialienInhalt(system) {
   };
   const neu = (art) => aendern((s) => {
     s.stabmaterialien.push({
-      ...structuredClone(zustand.katalog.neue_zeilen.stabmaterial),
+      ...structuredClone(katalog('neue_zeilen', 'stabmaterial')),
       kennung: naechsteKennung(s.stabmaterialien, 'M'), art,
       ...(art === 'beton' ? { beton: betone[0]?.kennung || '' }
         : { name: naechsterName('Material', s.stabmaterialien) }),
@@ -293,9 +293,9 @@ function materialienInhalt(system) {
 // Querschnitte
 // ===========================================================================
 
-const QUERSCHNITTSARTEN = () => zustand.katalog?.balkensystem?.querschnittsarten || [];
-const VORLAGEN = () => zustand.katalog?.balkensystem?.vorlagen || [];
-const E_MODULE = () => zustand.katalog?.balkensystem?.e_module || [];
+const QUERSCHNITTSARTEN = () => katalog('balkensystem', 'querschnittsarten');
+const VORLAGEN = () => katalog('balkensystem', 'vorlagen');
+const E_MODULE = () => katalog('balkensystem', 'e_module');
 
 /** Was der Kern zu einem Querschnitt gerechnet hat: A und I -- und sein eigenes E --, oder nichts. */
 function kennwerte(system, q) {
@@ -474,7 +474,7 @@ function querschnittFenster(system, kennung) {
   // Stellungen es gibt, sagt der
   // Katalog; die gewählte bleibt sichtbar, auch wo sie nicht mehr passt --
   // die Meldung des Kerns sagt dann warum.
-  const eigenes = zustand.katalog?.balkensystem?.material_des_querschnitts;
+  const eigenes = katalog('balkensystem', 'material_des_querschnitts');
   const module = E_MODULE().filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul);
   const mitEigenem = system.linien.some((l) => l.querschnitt === q.kennung && l.material === eigenes);
   if (mitEigenem && module.length > 1) {
@@ -518,7 +518,7 @@ function querschnitteInhalt(system) {
     const kennung = naechsteKennung(system.querschnitte, 'Q');
     eintragAendern(system.kennung, (s) => {
       s.querschnitte.push({
-        ...structuredClone(zustand.katalog.neue_zeilen.stabquerschnitt),
+        ...structuredClone(katalog('neue_zeilen', 'stabquerschnitt')),
         kennung, name: naechsterName('Querschnitt', s.querschnitte),
       });
     });
@@ -690,7 +690,7 @@ export function balkensystemFenster(system, schluessel) {
 // Statik-Analyse
 // ===========================================================================
 
-const DIAGRAMMGROESSEN = () => zustand.katalog?.balkensystem?.diagrammgroessen || [];
+const DIAGRAMMGROESSEN = () => katalog('balkensystem', 'diagrammgroessen');
 
 /**
  * Welche Diagramme rechts stehen -- wie in der Spannung-Dehnung-Analyse: je

@@ -19,15 +19,12 @@ import { auswahl, el, svgEl } from './dom.js';
 import {
   BREITE, bogen, linie, mass, pfeil, schraffur, text, zahl,
 } from './gb_skizze.js';
-import { aendern, eintragVon, zustand } from './zustand.js';
+import { aendern, ansichtVon, eintragVon, zustand } from './zustand.js';
 
 const RAND = 36;
 /** Wie lang die Resultierende gezeichnet wird, in px. */
 const PFEIL = 120;
 const GRAD = Math.PI / 180;
-
-/** Welche Kombination je Grundbruch gezeigt wird -- ohne Wahl die massgebende. */
-const gezeigt = new Map();
 
 /**
  * Der Umriss des Gleitkörpers, soweit er im Boden liegt. Er ist für
@@ -279,7 +276,9 @@ export function situationKarten(kennung) {
   if (!g) return [];
   const s = zustand.loesung?.grundbrueche?.[kennung];
   const faelle = s?.faelle || [];
-  const name = faelle.some((f) => f.name === gezeigt.get(kennung)) ? gezeigt.get(kennung) : s?.massgebend;
+  // Welche Kombination die Ansicht zeigt (`ansichtVon`) -- ohne Wahl die massgebende.
+  const ansicht = ansichtVon(kennung);
+  const name = faelle.some((f) => f.name === ansicht.gezeigt) ? ansicht.gezeigt : s?.massgebend;
   const fall = faelle.find((f) => f.name === name) || null;
   const wahl = faelle.length > 1 ? auswahl({
     werte: faelle.map((f) => ({
@@ -288,7 +287,7 @@ export function situationKarten(kennung) {
     gewaehlt: fall?.name,
     titel: 'Deren Kräfte zeigt das Bild',
     beiAenderung: (w) => {
-      gezeigt.set(kennung, w);
+      ansicht.gezeigt = w;
       aendern({}, 'diagramm');
     },
   }) : null;

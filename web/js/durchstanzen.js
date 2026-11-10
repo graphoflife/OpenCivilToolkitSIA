@@ -23,7 +23,7 @@ import {
 } from './bausteine.js';
 import { auswahl, el } from './dom.js';
 import { zeichenbereich } from './ds_zeichnung.js';
-import { eintragAendern, materialien, zustand } from './zustand.js';
+import { eintragAendern, katalog, materialien } from './zustand.js';
 
 const HILFE = {
   stelle: {
@@ -79,7 +79,7 @@ const MASSE = {
 
 /** Die Lage der Stelle, wie der Katalog sie beschreibt. */
 function lageVon(d) {
-  return zustand.katalog.durchstanzen.lagen.find((l) => l.wert === d.lage);
+  return katalog('durchstanzen', 'lagen').find((l) => l.wert === d.lage);
 }
 
 /**
@@ -89,7 +89,7 @@ function lageVon(d) {
  */
 function gelesen(d) {
   const lage = lageVon(d);
-  const ke = zustand.katalog.durchstanzen.ke.find((k) => k.wert === d.ke);
+  const ke = katalog('durchstanzen', 'ke').find((k) => k.wert === d.ke);
   return new Set([...lage.masse[d.form], ...lage.stufen[d.stufe], ...ke.eingaben]);
 }
 
@@ -107,7 +107,7 @@ function zahlzeile(d, schluessel, text, symbol, { schritt = 1, titel } = {}) {
 /** Ein Schalter mit den Stellungen aus dem Katalog. */
 function schalter(d, schluessel, liste, titel = '') {
   return wahlSchalter({
-    werte: (zustand.katalog?.durchstanzen?.[liste] || []).map((w) => ({
+    werte: katalog('durchstanzen', liste).map((w) => ({
       wert: w.wert, beschriftung: w.beschriftung, titel: w.beschriftung,
     })),
     gewaehlt: d[schluessel],

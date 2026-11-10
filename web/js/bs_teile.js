@@ -2,28 +2,20 @@
  * bs_teile.js -- was Zeichnung, schwebendes Fenster und Panels eines
  * Balkensystems gemeinsam brauchen.
  *
- * Der Katalog des Kerns zum Balkensystem und die Art einer Last darin, die
- * Last zu einer Kennung, die Zugseite einer Linie und der Name eines
- * Materials. Dazu das System selbst, die Antwort des Kerns, solange sie zur
- * Zeichnung passt, und der Lastfall, den ein Zeichenfenster zeigt: was ein
- * Fenster betrifft, nimmt das Fenster `a` (bs_zeichnung.js), nicht seine
- * Kennung -- so liest das schwebende Fenster es ohne Umweg über den Adapter.
+ * Die Art einer Last nach dem Katalog des Kerns, die Last zu einer
+ * Kennung, die Zugseite einer Linie und der Name eines Materials. Dazu die
+ * Antwort des Kerns, solange sie zur Fassung des Projekts passt, und der
+ * Lastfall, den ein Zeichenfenster zeigt: was ein Fenster betrifft, nimmt
+ * das Fenster `a` (bs_zeichnung.js), nicht seine Kennung -- so liest das
+ * schwebende Fenster es ohne Umweg über den Adapter.
  * Nichts davon rechnet: es liest die Beschreibung, den Katalog und die
  * Materialien des Projekts.
  */
 
-import { ARTEN as BAUTEILARTEN } from './arten.js';
-import { aendern, eintragVon, zustand } from './zustand.js';
-
-/** Was der Katalog zum Balkensystem weiss: Lastarten, Richtungen, Lagerarten, Einheiten. */
-export function katalog() {
-  return zustand.katalog?.balkensystem || {
-    lastarten: [], richtungen: [], knotenrichtungen: [], lagerarten: [], federeinheiten: {},
-  };
-}
+import { aendern, eintragVon, katalog, zustand } from './zustand.js';
 
 export function lastart(wert) {
-  return katalog().lastarten.find((x) => x.wert === wert) || { beschriftung: wert, einheit: '' };
+  return katalog('balkensystem', 'lastarten').find((x) => x.wert === wert) || { beschriftung: wert, einheit: '' };
 }
 
 /** Die Last zu einer Kennung -- `{last, linie}` oder `{last, knoten}` -- oder null. */
@@ -54,25 +46,10 @@ export function materialname(m) {
   return beton ? beton.name || beton.sorte : '– kein Beton –';
 }
 
-/**
- * Wovon jede Antwort des Kerns zu einem System abhängt: das System, die
- * Materialien und die Bauteile, deren Querschnitt es nimmt. Ändert sich
- * davon etwas -- etwa eine Dichte oder die Höhe einer Platte --, gilt sie
- * nicht mehr: die Übersicht samt dem gezeichneten Eigengewicht, die
- * Verläufe in den Diagrammen.
- */
-export function abdruckVon(kennung) {
-  const system = eintragVon(kennung);
-  const bezuege = (system?.querschnitte || []).map((q) => q.bezug).filter(Boolean);
-  const bauteile = BAUTEILARTEN.flatMap((a) => zustand.projekt[a.liste] || [])
-    .filter((b) => bezuege.includes(b.kennung));
-  return JSON.stringify([system, zustand.projekt.materialien, bauteile]);
-}
-
 /** Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu sehen ist. */
 export function passendeUebersicht(a) {
   const u = a.bs.uebersicht;
-  return u && u.abdruck === abdruckVon(a.bs.kennung) ? u : null;
+  return u && u.fassung === zustand.fassung ? u : null;
 }
 
 /**

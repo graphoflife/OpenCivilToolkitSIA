@@ -26,6 +26,15 @@ function zugeklappteLesen() {
 
 export const zustand = {
   projekt: null,
+  /**
+   * Die Fassung des Projekts: zählt jede Änderung (`projektAendern`) und
+   * jedes neue Projekt (`projektSetzen`). Wer eine Antwort des Kerns
+   * aufbewahrt, merkt sich die Fassung, zu der er gefragt hat; stimmt sie
+   * nicht mehr, fragt er neu. Ob sich für ihn etwas geändert hat, weiss der
+   * Kern (speicher.py) -- bis 2026-11-10 entschieden das hier drei Abdrücke
+   * von Hand, jeder mit seiner eigenen Liste dessen, wovon er abhängt.
+   */
+  fassung: 0,
   katalog: null,
   loesung: null,
   /**
@@ -186,7 +195,36 @@ export function aendern(teil, anlass = 'allgemein') {
 export function projektAendern(veraenderer, anlass = 'projekt') {
   veraenderer(zustand.projekt);
   ablegen(zustand.projekt);
-  aendern({ ungespeichert: true }, anlass);
+  aendern({ ungespeichert: true, fassung: zustand.fassung + 1 }, anlass);
+}
+
+/**
+ * Ein neues Projekt -- beim Start und beim Öffnen einer Datei. `weiteres`
+ * setzt, was dazugehört: den Katalog, ob es gespeichert ist, die Auswahl.
+ * Keine Ansicht weiss danach noch etwas vom vorigen (`ansichtVon`).
+ */
+export function projektSetzen(projekt, weiteres = {}) {
+  ansichten.clear();
+  aendern({ projekt, fassung: zustand.fassung + 1, ...weiteres }, 'start');
+}
+
+/** Je Kennung, was sich die Ansichten merken -- siehe `ansichtVon`. */
+const ansichten = new Map();
+
+/**
+ * Was sich die Ansichten zu einem Eintrag merken: den gezeigten Fall, den
+ * Schnitt eines Diagramms, die letzte Antwort des Kerns. Ansichtssache, nicht
+ * Teil des Projekts. Wer einen Eintrag anlegt, kopiert oder löscht, vergisst
+ * es (`ansichtVergessen`) -- ein neuer Eintrag mit einer Kennung, die es
+ * schon gab, zeigt nichts vom alten.
+ */
+export function ansichtVon(kennung) {
+  if (!ansichten.has(kennung)) ansichten.set(kennung, {});
+  return ansichten.get(kennung);
+}
+
+export function ansichtVergessen(kennung) {
+  ansichten.delete(kennung);
 }
 
 /**
@@ -234,11 +272,30 @@ export function freieKennung(vorsilbe) {
 }
 
 /**
+ * Was der Kern im Katalog unter diesem Pfad sagt: `katalog('balkensystem',
+ * 'lastarten')`. Der Katalog kommt beim Start mit dem Projekt (app.js), wer
+ * ein Projekt vor sich hat, hat auch ihn. Fehlt ein Schlüssel, passen Kern
+ * und Oberfläche nicht zusammen: das meldet sich mit dem Pfad, statt still
+ * einen leeren Schalter zu zeigen. Welche Pfade es gibt, prüft
+ * test_katalog_js.py.
+ */
+export function katalog(...pfad) {
+  let wert = zustand.katalog;
+  if (!wert) throw new Error('Der Katalog ist noch nicht geladen.');
+  for (const [i, schluessel] of pfad.entries()) {
+    wert = wert[schluessel];
+    if (wert === undefined) throw new Error(`Im Katalog fehlt ${pfad.slice(0, i + 1).join('.')}.`);
+  }
+  return wert;
+}
+
+/**
  * Was der Kern über ein Feld weiss (`katalog.felder`): Einheit, Grenzen, ob
- * ganz -- `{}`, solange der Katalog fehlt. Für `zahlfeld({angabe})`.
+ * ganz. Ein Feld ohne Angabe -- ein Text, eine Kennung -- gibt `{}`. Für
+ * `zahlfeld({angabe})`.
  */
 export function feldangabe(art, feld) {
-  return zustand.katalog?.felder?.[art]?.[feld] || {};
+  return katalog('felder', art)[feld] || {};
 }
 
 /**
@@ -247,7 +304,7 @@ export function feldangabe(art, feld) {
  * Vorlage selbst: sonst teilten sich zwei Materialien dieselben Abweichungen.
  */
 export function ausVorlage(art, felder) {
-  return { ...structuredClone(zustand.katalog.neue_zeilen[art]), ...felder };
+  return { ...structuredClone(katalog('neue_zeilen', art)), ...felder };
 }
 
 /**

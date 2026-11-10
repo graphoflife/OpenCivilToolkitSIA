@@ -55,14 +55,13 @@ import {
   momentSymbol, streckenlast, streckenmoment, unbestimmtSymbol,
 } from './bs_symbole.js';
 import {
-  abdruckVon, aktiverLastfall, katalog, lastart, lastfallWaehlen, lastVon, passendeUebersicht,
-  zugseite,
+  aktiverLastfall, lastart, lastfallWaehlen, lastVon, passendeUebersicht, zugseite,
 } from './bs_teile.js';
 import {
   auswahl, el, melden, svgEl,
 } from './dom.js';
 import {
-  aendern, ausVorlage, eintragAendern, eintragVon, zustand,
+  aendern, ausVorlage, eintragAendern, eintragVon, katalog, zustand,
 } from './zustand.js';
 
 /**
@@ -303,7 +302,7 @@ function lastAnlegen(a, z, erg) {
       z.knotenlasten.push({
         ...ausVorlage('knotenlast'), kennung, knoten, lastfall: lf,
         art: v.art === 'moment' ? 'moment' : 'kraft',
-        richtung: katalog().knotenrichtungen.includes(v.richtung) ? v.richtung : 'senkrecht',
+        richtung: katalog('balkensystem', 'knotenrichtungen').includes(v.richtung) ? v.richtung : 'senkrecht',
         wert: v.wert_a,
       });
       return kennung;
@@ -397,19 +396,19 @@ function umriss(system) {
 function uebersichtHolen(a) {
   const system = eintragVon(a.bs.kennung);
   if (!system) return;
-  const jetzt = abdruckVon(a.bs.kennung);
+  const jetzt = zustand.fassung;
   if (a.bs.gefragt === jetzt) return;
   a.bs.gefragt = jetzt;
   api.balkensystemVerlauf(zustand.projekt, a.bs.kennung).then((antwort) => {
     if (a.bs.gefragt !== jetzt) return;
-    a.bs.uebersicht = { ...antwort.uebersicht, abdruck: jetzt };
+    a.bs.uebersicht = { ...antwort.uebersicht, fassung: jetzt };
     a.neuZeichnen();
     uebersichtZeichnen(a);
   }).catch((fehler) => {
     if (a.bs.gefragt !== jetzt) return;
     // Ein Verweis, den es nicht gibt, hält das ganze Projekt auf -- dann
     // steht der Satz des Kerns unter der Zeichnung.
-    a.bs.uebersicht = { fehler: fehler.message, meldungen: [], abdruck: jetzt };
+    a.bs.uebersicht = { fehler: fehler.message, meldungen: [], fassung: jetzt };
     a.neuZeichnen();
     uebersichtZeichnen(a);
   });
@@ -424,7 +423,7 @@ function uebersichtHolen(a) {
 function kernBearbeiten(a, auftraege, auswahlDanach = []) {
   if (!auftraege.length) return;
   const kennung = a.bs.kennung;
-  const vorher = abdruckVon(kennung);
+  const vorher = zustand.fassung;
   const projekt = structuredClone(zustand.projekt);
   const neu = [];
   const schritt = (i) => {
@@ -437,7 +436,7 @@ function kernBearbeiten(a, auftraege, auswahlDanach = []) {
     });
   };
   schritt(0).then(() => {
-    if (abdruckVon(kennung) !== vorher) {
+    if (zustand.fassung !== vorher) {
       melden('Die Zeichnung hat sich inzwischen geändert – bitte noch einmal.', true);
       return;
     }

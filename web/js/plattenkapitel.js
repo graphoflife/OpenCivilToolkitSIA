@@ -29,9 +29,7 @@ import { span } from './mathe.js';
 import {
   analysenKapitel, anfuegenKnopf, nachweisKapitel, rechenwahlZeile,
 } from './nachweise.js';
-import {
-  ausVorlage, eintragAendern, feldangabe, naechsterName, zustand,
-} from './zustand.js';
+import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
 
 /**
  * Was hinter den Fragezeichen der Platte steht: Rechenweg, Werte (Bemessung
@@ -340,7 +338,7 @@ function verformungsZeile(querschnitt, index) {
   const aendern = (veraenderer) => eintragAendern(querschnitt.kennung, (q) => {
     veraenderer(q.verformung.faelle[index]);
   });
-  const seiten = zustand.katalog?.verformung?.zugseiten || [];
+  const seiten = katalog('verformung', 'zugseiten');
   return fallzeile({
     fall: k, aendern, was: 'Verformungsfall', nameTitel: 'Bezeichnung des Verformungsfalls',
     zahlen: [

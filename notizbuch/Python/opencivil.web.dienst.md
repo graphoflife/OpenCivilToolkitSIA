@@ -1,5 +1,5 @@
 ---
-erzeugt: 4e66a22c54d5
+erzeugt: b5aabd907c2d
 art: modul
 tags: [modul]
 ---
@@ -270,7 +270,8 @@ Anfrage, wie die M-V-Kurven.
 
 Die Nachweise selbst rechnen nicht noch einmal, wenn der Zwischenspeicher
 sie zu genau dieser Beschreibung noch hat -- nach einer Rechnung ist das
-der Fall. Sonst wird das eine Bauteil gerechnet.
+der Fall. Sonst wird das eine Bauteil gerechnet. Die Diagramme selbst
+kommen aus [[opencivil.web.dienst#Konstanten|DIAGRAMME]], solange Abdruck und Schnitt dieselben sind.
 
 ### balkensystem_verlauf
 
@@ -369,6 +370,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 
 - `SPEICHER = speicher.Ergebnisspeicher()` – Das Gedaechtnis zwischen zwei Anfragen -- siehe [[opencivil.web.speicher]]. Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser der offene Reiter.
 - `ANALYSEN = speicher.Ergebnisspeicher()` – Dasselbe fuer die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil unter demselben Abdruck wie seine Loesung ([[opencivil.web.dienst#_analysen|_analysen]]).
+- `DIAGRAMME = speicher.Ergebnisspeicher()` – Und fuer die Diagramme einer Querschnittsanalyse, unter ihrem Abdruck und dem Schnitt ([[opencivil.web.dienst#analysediagramme|analysediagramme]]). Die Oberflaeche fragt nach jeder Aenderung am Projekt neu, gleich wo; ob sich fuer diese Analyse etwas geaendert hat, entscheidet erst der Abdruck hier.
 - `KENNFELDER = ('name', 'materialien', *(art.liste for art in BAUTEILE))` – Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
 - `ANFRAGEN = {'katalog': katalog, 'beispiel': beispiel, 'pruefen': pruefen, 'verwe…` – Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 

@@ -18,7 +18,7 @@ import {
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
-import { ausVorlage, eintragAendern, feldangabe, naechsterName, zustand } from './zustand.js';
+import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
 
 const HILFE = {
   situation: {
@@ -63,7 +63,7 @@ function situationPanel(s) {
       zahl('B', 'Breite', 'B', { schritt: 0.1 }),
       zahl('L', 'Länge', 'L', { schritt: 0.1 }),
       feld('Steifigkeit', wahlSchalter({
-        werte: (zustand.katalog?.setzung?.steifigkeiten || []).map((x) => ({
+        werte: katalog('setzung', 'steifigkeiten').map((x) => ({
           wert: x.wert, beschriftung: x.wert, titel: x.beschriftung,
         })),
         gewaehlt: s.steifigkeit,

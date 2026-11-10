@@ -30,7 +30,8 @@ import { setzungEditor } from './setzung.js';
 import { skriptZeichnen } from './python.js';
 import { variablenZeichnen } from './variablen.js';
 import {
-  eintragVon, freieKennung, naechsterName, projektAendern, waehlen, zustand,
+  ansichtVergessen, eintragVon, freieKennung, katalog, naechsterName, projektAendern, waehlen,
+  zustand,
 } from './zustand.js';
 
 // ===========================================================================
@@ -58,12 +59,9 @@ function nachVorlage(a, schluessel, {
     melden(fehlt, true);
     return;
   }
-  const vorlage = zustand.katalog?.[schluessel];
-  if (!vorlage) {
-    melden('Katalog noch nicht geladen.', true);
-    return;
-  }
+  const vorlage = katalog(schluessel);
   const kennung = freieKennung(a.vorsilbe);
+  ansichtVergessen(kennung);
   vorher(kennung);
   projektAendern((p) => {
     p[a.liste] = p[a.liste] || [];
@@ -103,6 +101,7 @@ async function loeschenWennFrei(liste, eintrag, satz) {
  */
 function kopieren(a, eintrag, { vorher = () => {} } = {}) {
   const kennung = freieKennung(a.vorsilbe);
+  ansichtVergessen(kennung);
   vorher(kennung);
   projektAendern((p) => {
     const liste = p[a.liste];
@@ -122,8 +121,12 @@ function kopieName(name, eintraege) {
   return kandidat;
 }
 
-/** Einen Eintrag aus einer Liste des Projekts -- und aus der Auswahl, wenn er gewählt war. */
+/**
+ * Einen Eintrag aus einer Liste des Projekts -- und aus der Auswahl, wenn er
+ * gewählt war. Was sich die Ansichten zu ihm merkten, geht mit.
+ */
 function entfernen(liste, eintrag) {
+  ansichtVergessen(eintrag.kennung);
   projektAendern((p) => {
     p[liste] = p[liste].filter((x) => x.kennung !== eintrag.kennung);
   });
@@ -242,7 +245,7 @@ const SYSTEM = bauteil('balkensystem', {
     braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.', vorher: systemfensterVergessen,
     einrichten: (s, { beton }) => {
       s.stabmaterialien = [{
-        ...structuredClone(zustand.katalog.neue_zeilen.stabmaterial),
+        ...structuredClone(katalog('neue_zeilen', 'stabmaterial')),
         kennung: 'M1', art: 'beton', beton: beton.kennung,
       }];
     },
@@ -258,7 +261,7 @@ const SYSTEM = bauteil('balkensystem', {
  * nach der Vorlage des Katalogs für ihre Lage und Form: «⌀{D} mm».
  */
 const DURCHSTANZEN = bauteil('durchstanzen', {
-  kurztext: (d) => zustand.katalog.durchstanzen.lagen.find((l) => l.wert === d.lage)
+  kurztext: (d) => katalog('durchstanzen', 'lagen').find((l) => l.wert === d.lage)
     .kurz[d.form].replace(/\{(\w+)\}/g, (_, k) => d[k]),
   anlegen: (a) => nachVorlage(a, 'neue_durchstanzstelle', {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',

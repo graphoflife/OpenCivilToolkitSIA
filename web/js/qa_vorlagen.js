@@ -18,10 +18,11 @@
 import { api } from './api.js';
 import { pfad } from './cad_ansicht.js';
 import { el, melden, svgEl, zahlfeld } from './dom.js';
-import { zustand } from './zustand.js';
+import { katalog, zustand } from './zustand.js';
 
-function katalog() {
-  return zustand.katalog?.querschnittsanalyse?.vorlagen || [];
+/** Die Vorlagen, wie der Kern sie kennt. */
+function vorlagen() {
+  return katalog('querschnittsanalyse', 'vorlagen');
 }
 
 /** Was zuletzt eingestellt war -- je Analyse in der Ansicht, nicht im Projekt. */
@@ -145,7 +146,7 @@ export function vorlageOeffnen(a) {
     a.dialog.schliessen();
     return;
   }
-  if (!katalog().length) return;
+  if (!vorlagen().length) return;
   const knoten = el('div.cad-dialog', { role: 'dialog', 'aria-label': 'Vorlage' });
   const schliessen = () => {
     knoten.remove();
@@ -158,7 +159,7 @@ export function vorlageOeffnen(a) {
 
 function vorlageZeichnen(a, knoten) {
   const w = wahlVon(a);
-  const v = katalog().find((x) => x.schluessel === w.art) || katalog()[0];
+  const v = vorlagen().find((x) => x.schluessel === w.art) || vorlagen()[0];
   w.art = v.schluessel;
   const neu = () => vorlageZeichnen(a, knoten);
 
@@ -203,7 +204,7 @@ function vorlageZeichnen(a, knoten) {
         type: 'button', text: '×', title: 'Schliessen (Esc)', on: { click: () => a.dialog?.schliessen() },
       }),
     ]),
-    el('div.cad-vorlagen', {}, katalog().map((x) => el('button.cad-vorlagenknopf', {
+    el('div.cad-vorlagen', {}, vorlagen().map((x) => el('button.cad-vorlagenknopf', {
       type: 'button', title: x.name, class: x.schluessel === v.schluessel ? 'ist-an' : '',
       on: { click: () => { w.art = x.schluessel; neu(); } },
     }, [skizze(x.skizze, 52, 36, { masse: false }), el('span', { text: x.name })]))),

@@ -25,9 +25,7 @@ import { erklaerung, feld, hakenSchalter, wahlSchalter } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { gebrauchsstand, schalter, zeilenstand } from './kapitel.js';
-import {
-  ausVorlage, eintragAendern, feldangabe, naechsterName, zustand,
-} from './zustand.js';
+import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
 
 // ===========================================================================
 // Die Kapitel -- je ein Knopf, die Eingaben im Fenster (kapitel.js)
@@ -129,7 +127,7 @@ export function nachweisKapitel(ort) {
  * der Name auf dem Knopf kurz, über dem Fenster lang.
  */
 export function analysenKapitel(ort) {
-  return (zustand.katalog?.spannungsanalyse?.arten || []).map((a) => ({
+  return katalog('spannungsanalyse', 'arten').map((a) => ({
     schluessel: a.wert,
     name: a.beschriftung, titel: a.titel,
     bezug: (e) => `Spannung-Dehnung-Analyse · ${ort.bezug(e)}`,
@@ -207,9 +205,9 @@ function duktilitaetInhalt(eintrag, ort) {
       // bleibt der bisherige Wert -- eine Grenze von null gäbe es nicht.
       zusatz: zahlfeld({
         wert: eintrag.x_d_max, schritt: 0.05, min: 0.05,
-        max: zustand.katalog?.duktilitaet?.hoechstens,
+        max: katalog('duktilitaet', 'hoechstens'),
         titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
-          zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
+          katalog('duktilitaet', 'hoechstens')}`,
         beiAenderung: (v) => eintragAendern(eintrag.kennung, (e) => { e.x_d_max = v; }),
       }),
     }),
@@ -294,7 +292,7 @@ function knickZeile(eintrag, ort, index) {
  */
 function rissanforderungZeile(eintrag, ort) {
   return feld('Rissanforderung', wahlSchalter({
-    werte: (zustand.katalog?.rissanforderungen || []).map((r) => ({
+    werte: katalog('rissanforderungen').map((r) => ({
       wert: r.wert, beschriftung: r.beschriftung,
     })),
     gewaehlt: eintrag.rissanforderung || 'normal',
@@ -309,7 +307,7 @@ function rissanforderungZeile(eintrag, ort) {
 
 /** Die gewählte Rissanforderung aus dem Katalog -- oder nichts, wenn er fehlt. */
 function anforderung(querschnitt) {
-  return (zustand.katalog?.rissanforderungen || [])
+  return katalog('rissanforderungen')
     .find((r) => r.wert === (querschnitt.rissanforderung || 'normal'));
 }
 
@@ -512,8 +510,8 @@ export function mitKopf(kopf, eingabe, formel = false) {
  * bei jeder Art.
  */
 function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = false } = {}) {
-  const katalog = zustand.katalog?.rechenwahl || {};
-  const liste = katalog[arten] || [];
+  const wahlen = katalog('rechenwahl');
+  const liste = wahlen[arten] || [];
   const art = liste.find((a) => a.wert === ziel.rechenart);
   // Im Schalter stehen die kurzen Namen, der lange im Titel der Stellung.
   const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung }));
@@ -528,7 +526,7 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
   return [
     phi,
     mitKopf('Werte', wahlSchalter({
-      werte: kurz(katalog.werkstoffsaetze),
+      werte: kurz(wahlen.werkstoffsaetze),
       gewaehlt: ziel.werkstoffsatz,
       titel: 'Bemessungswerte (f_cd, f_yd) oder charakteristische (f_ck, f_yk)',
       setzen: (v) => aendern((x) => { x.werkstoffsatz = v; }),
@@ -578,7 +576,7 @@ function spannungsZeile(eintrag, index, ort) {
   // die Zeilen untereinander dieselbe Gestalt behalten: eine Linie hat nur die
   // festgehaltene Zahl, daneben steht, wie weit sie läuft. Bis 2026-10-18 stand
   // je Art ein eigener Bauplan hier, mit den Einheiten darin.
-  const frage = (zustand.katalog?.spannungsanalyse?.arten || []).find((a) => a.wert === k.art);
+  const frage = katalog('spannungsanalyse', 'arten').find((a) => a.wert === k.art);
   const linie = frage?.groessen;
   const FELDER = {
     N_Ed: { kopf: 'N_Ed', schritt: 50, titel: (e) => `Normalkraft in ${e} – Zug positiv` },

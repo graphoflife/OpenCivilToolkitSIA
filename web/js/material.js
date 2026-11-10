@@ -15,7 +15,7 @@
 import { feld, panel } from './bausteine.js';
 import { el, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
-import { eintragAendern, kennwertId, zustand } from './zustand.js';
+import { eintragAendern, katalog, kennwertId, zustand } from './zustand.js';
 
 /** Wie die Arten über dem Editor heissen. */
 const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
@@ -96,7 +96,7 @@ function kennwertZeile(material, vorlage) {
 }
 
 export function materialEditor(material) {
-  const vorlagen = zustand.katalog.kennwerte[material.art] || [];
+  const vorlagen = katalog('kennwerte', material.art);
   const gesperrt = !material.eigenstaendig;
   const anzahlUeberschrieben = Object.keys(material.ueberschreibungen).length;
 

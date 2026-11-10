@@ -288,14 +288,66 @@ class TestBilderAusDemSpeicher(unittest.TestCase):
         for art, rumpf in self.ANFRAGEN:
             rumpf = {"projekt": beschreibung, **rumpf}
             dienst.SPEICHER.leeren()
+            dienst.DIAGRAMME.leeren()
             kalt = dienst.bearbeite(art, copy.deepcopy(rumpf))
             rechnen(beschreibung, frisch=True)
+            dienst.DIAGRAMME.leeren()
             dienst.SPEICHER.treffer = 0
             warm = dienst.bearbeite(art, copy.deepcopy(rumpf))
             with self.subTest(anfrage=art):
                 self.assertEqual(dienst.SPEICHER.treffer, 1)    # wirklich aus dem Speicher
                 self.assertEqual(kalt.status, 200)
                 self.assertEqual(als_text(warm), als_text(kalt))
+
+
+class TestDiagrammeAusDemSpeicher(unittest.TestCase):
+    """
+    Die Oberfläche fragt nach jeder Änderung am Projekt neu nach den
+    Diagrammen einer Querschnittsanalyse, gleich wo sie war. Ob sich für die
+    Analyse etwas geändert hat, sagt erst ihr Abdruck: eine andere Platte
+    nicht, ihr Lastfall, der Schnitt und ein Material schon.
+    """
+
+    def fragen(self, beschreibung, schnitt=None):
+        rumpf = {"projekt": copy.deepcopy(beschreibung), "kennung": "a1"}
+        if schnitt:
+            rumpf["schnitt"] = schnitt
+        antwort = dienst.bearbeite("analysediagramme", rumpf)
+        self.assertEqual(antwort.status, 200, antwort.daten)
+        return antwort
+
+    def zaehlen(self, aendern, schnitt=None):
+        """Warm gefragt, geändert, nochmals: Treffer und Fehlgriffe des Speichers beim zweiten Mal."""
+        beschreibung = projekt_mit_zwei_platten()
+        dienst.DIAGRAMME.leeren()
+        self.fragen(beschreibung)
+        dienst.DIAGRAMME.treffer = dienst.DIAGRAMME.fehlgriffe = 0
+        aendern(beschreibung)
+        self.fragen(beschreibung, schnitt)
+        return dienst.DIAGRAMME.treffer, dienst.DIAGRAMME.fehlgriffe
+
+    def test_eine_andere_platte_aendert_nichts(self):
+        self.assertEqual(self.zaehlen(lambda d: d["querschnitte"][1].__setitem__("h", 320)), (1, 0))
+
+    def test_ein_lastfall_der_analyse_fragt_neu(self):
+        def aendern(d):
+            d["querschnittsanalysen"][0]["lastfaelle"][0]["N_Ed"] -= 10.0
+        self.assertEqual(self.zaehlen(aendern), (0, 1))
+
+    def test_ein_anderer_schnitt_fragt_neu(self):
+        self.assertEqual(self.zaehlen(lambda d: None, {"fest": "M_z", "wert": 5.0}), (0, 1))
+
+    def test_ein_material_fragt_neu(self):
+        def aendern(d):
+            d["materialien"][0].update(sorte="C25/30", name="C25/30")
+        self.assertEqual(self.zaehlen(aendern), (0, 1))
+
+    def test_aus_dem_speicher_wie_frisch(self):
+        beschreibung = projekt_mit_zwei_platten()
+        dienst.DIAGRAMME.leeren()
+        kalt = self.fragen(beschreibung)
+        warm = self.fragen(beschreibung)
+        self.assertEqual(als_text(warm), als_text(kalt))
 
 
 class TestAbdruck(unittest.TestCase):

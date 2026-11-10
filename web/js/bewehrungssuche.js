@@ -11,9 +11,7 @@
 import { api } from './api.js';
 import { feld, hakenSchalter, wahlSchalter } from './bausteine.js';
 import { el, melden, zahlfeld } from './dom.js';
-import {
-  aendern, eintragAendern, projektAendern, zustand,
-} from './zustand.js';
+import { aendern, eintragAendern, katalog, projektAendern, zustand } from './zustand.js';
 
 /**
  * Welche Platte gerade durchsucht wird.
@@ -76,7 +74,7 @@ function automatikInhalt(querschnitt) {
   // untereinander, ohne Beschriftung davor -- der längste braucht die Zeile.
   return [el('div.automatik', {}, [
     wahlSchalter({
-      werte: zustand.katalog?.suchmodi || [],
+      werte: katalog('suchmodi'),
       gewaehlt: querschnitt.automatik_modus,
       titel: 'Modus. Ohne Kräfte: Duktilität, sprödes Versagen, Riss unter Zwang',
       setzen: (v) => aendern((q) => { q.automatik_modus = v; }),
@@ -100,7 +98,7 @@ function automatikInhalt(querschnitt) {
     // hiesse einen Stab, den es nicht gibt.
     feld('Mindestdurchmesser', zahlfeld({
       wert: querschnitt.automatik_mindestdurchmesser || null,
-      stufen: zustand.katalog.durchmesser, min: 0,
+      stufen: katalog('durchmesser'), min: 0,
       titel: 'Grundbew. jeder Lage mindestens mit diesem ⌀; leer: Lage darf leer bleiben',
       leer: 0,
       beiAenderung: (v) => aendern((q) => { q.automatik_mindestdurchmesser = v; }),
@@ -135,7 +133,7 @@ function obergrenze(querschnitt, aendern) {
       el('span.postenname', { text: name }),
       el('span.zeichen', { text: '⌀' }),
       zahlfeld({
-        wert: posten.durchmesser || null, stufen: zustand.katalog.durchmesser, min: 0,
+        wert: posten.durchmesser || null, stufen: katalog('durchmesser'), min: 0,
         titel: '⌀ in mm; Grund und Zulage leer: keine Obergrenze',
         leer: 0,
         beiAenderung: (v) => setzen('durchmesser', v),

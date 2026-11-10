@@ -17,9 +17,7 @@
 import { karte } from './bausteine.js';
 import { auswahl, el, melden } from './dom.js';
 import { sinnbild } from './sinnbilder.js';
-import {
-  ausVorlage, freieKennung, projektAendern, waehlen, zustand,
-} from './zustand.js';
+import { ausVorlage, freieKennung, katalog, projektAendern, waehlen, zustand } from './zustand.js';
 
 const ART = {
   beton: { titel: 'Neuer Beton', eigen: 'Eigener Beton', kennung: 'b' },
@@ -28,7 +26,7 @@ const ART = {
 
 /** Der erste freie Name eines eigenen Materials -- BE1, BE2 ... */
 function eigenerName(art) {
-  const vorsilbe = zustand.katalog?.anlegen?.eigen?.[art] || 'M';
+  const vorsilbe = katalog('anlegen', 'eigen', art);
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
   let i = 1;
   while (vergeben.has(`${vorsilbe}${i}`)) i += 1;
@@ -69,11 +67,7 @@ export function materialKopieren(material) {
 
 /** Öffnet das Fenster für ein neues Material dieser Art: 'beton' oder 'betonstahl'. */
 export function materialAnlegen(art) {
-  const sorten = zustand.katalog?.anlegen?.[art];
-  if (!sorten) {
-    melden('Katalog noch nicht geladen.', true);
-    return;
-  }
+  const sorten = katalog('anlegen', art);
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
   const frei = sorten.filter((s) => !vergeben.has(s));
   let norm = frei[0];

@@ -50,6 +50,12 @@ SPEICHER: speicher.Ergebnisspeicher[Loesung] = speicher.Ergebnisspeicher()
 #: unter demselben Abdruck wie seine Loesung (:func:`_analysen`).
 ANALYSEN: speicher.Ergebnisspeicher[list] = speicher.Ergebnisspeicher()
 
+#: Und fuer die Diagramme einer Querschnittsanalyse, unter ihrem Abdruck und
+#: dem Schnitt (:func:`analysediagramme`). Die Oberflaeche fragt nach jeder
+#: Aenderung am Projekt neu, gleich wo; ob sich fuer diese Analyse etwas
+#: geaendert hat, entscheidet erst der Abdruck hier.
+DIAGRAMME: speicher.Ergebnisspeicher[dict] = speicher.Ergebnisspeicher()
+
 
 class DienstFehler(Exception):
     """Fehler mit vorgegebenem Status, etwa fuer eine unbekannte Anfrage."""
@@ -417,7 +423,8 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
     Die Nachweise selbst rechnen nicht noch einmal, wenn der Zwischenspeicher
     sie zu genau dieser Beschreibung noch hat -- nach einer Rechnung ist das
-    der Fall. Sonst wird das eine Bauteil gerechnet.
+    der Fall. Sonst wird das eine Bauteil gerechnet. Die Diagramme selbst
+    kommen aus :data:`DIAGRAMME`, solange Abdruck und Schnitt dieselben sind.
     """
     projekt = _projekt(rumpf)
     kennung = str(rumpf.get("kennung") or "")
@@ -439,8 +446,13 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     if kennung in aufbau.leere_analysen:
         raise DienstFehler(400, f"Querschnittsanalyse '{aufbau.leere_analysen[kennung]}': "
                                 f"noch nichts gezeichnet.")
-    loesung = _bauteil_rechnen(projekt, aufbau, kennung)
-    return {"diagramme": endlich(diagrammdaten.analyse(aufbau, loesung, kennung, (fest, wert)))}
+    stempel = f"{_abdruck(projekt.als_dict(), aufbau, kennung)}|{fest}|{wert!r}"
+    daten = DIAGRAMME.hole(kennung, stempel)
+    if daten is None:
+        loesung = _bauteil_rechnen(projekt, aufbau, kennung)
+        daten = endlich(diagrammdaten.analyse(aufbau, loesung, kennung, (fest, wert)))
+        DIAGRAMME.merken(kennung, stempel, daten)
+    return {"diagramme": daten}
 
 
 def _balkensystem(projekt: Projekt, rumpf: Mapping[str, Any]) -> BalkensystemEintrag:

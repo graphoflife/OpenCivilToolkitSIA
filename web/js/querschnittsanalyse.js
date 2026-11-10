@@ -29,7 +29,7 @@ import { analysenKapitel, mitKopf, nachweisKapitel } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { materialienVon, zeichenbereich } from './qa_zeichnung.js';
 import {
-  ausVorlage, eintragAendern, eintragVon, feldangabe, naechsterName, zustand,
+  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, naechsterName,
 } from './zustand.js';
 
 /**
@@ -162,8 +162,8 @@ function querschnittGruppe(analyse) {
  */
 function werkstoffwahl(analyse) {
   const kennungen = materialienVon(analyse.kennung);
-  const wahlen = zustand.katalog?.querschnittsanalyse || {};
-  const vorgabe = zustand.katalog?.neue_zeilen?.werkstoffwahl || {};
+  const wahlen = katalog('querschnittsanalyse');
+  const vorgabe = katalog('neue_zeilen', 'werkstoffwahl');
 
   const setzen = (material, feldname, wert) => eintragAendern(analyse.kennung, (a) => {
     let w = a.werkstoffwahl.find((x) => x.material === material);
@@ -415,7 +415,7 @@ const TRAGSICHERHEIT = {
 
 /** Die Zugseiten einer Analyse aus dem Katalog -- und wie dann ihre Ränder heissen. */
 function zugseite(wert) {
-  return (zustand.katalog?.querschnittsanalyse?.zugseiten || []).find((z) => z.wert === wert);
+  return katalog('querschnittsanalyse', 'zugseiten').find((z) => z.wert === wert);
 }
 
 /**
@@ -426,7 +426,7 @@ function zugseite(wert) {
  */
 function zugseitenWahl(gewaehlt, setzen, titel) {
   return wahlSchalter({
-    werte: (zustand.katalog?.querschnittsanalyse?.zugseiten || [])
+    werte: katalog('querschnittsanalyse', 'zugseiten')
       .map((z) => ({ wert: z.wert, beschriftung: z.pfeil, titel: z.beschriftung })),
     gewaehlt, titel, setzen, klasse: '.ist-pfeile',
   });

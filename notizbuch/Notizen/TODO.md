@@ -91,10 +91,9 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 4 und 6 am
-2026-11-10 (siehe [[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 7,
-danach 3 vor einem vierten Zeichenfenster und 5 vor der nächsten
-Bauteilart.
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 4, 6 und 7 am
+2026-11-10 (siehe [[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 3
+vor einem vierten Zeichenfenster und 5 vor der nächsten Bauteilart.
 
 **Neu seit dem 2026-10-25, alles im Durchstanzen:**
 
@@ -121,17 +120,6 @@ Bauteilart.
       selben Durchgang wie `felder`. Im JS werden die Karten Felder der
       Zeilen von apps.js, sobald die Bilder der Platte aus diagramm.js und
       bericht.js ausziehen (siehe 11).
-- [ ] **7. Zustand der Oberfläche:** Der Katalog wird behandelt, als könnte
-      er fehlen (35 Stellen `zustand.katalog?.…`, 29 mit `|| []`); ein
-      umbenannter Schlüssel ergibt still einen leeren Schalter. Was
-      veraltet ist, entscheiden drei Abdrücke von Hand (qa_zeichnung.js:159,
-      qa_diagramme.js:88, bs_teile.js:69) und die Schlüssel des
-      schwebenden Fensters. Ansichtsspeicher je Kennung vergessen nie
-      (qa_diagramme.js, bs_diagramme.js, gb_zeichnung.js): wer a1 löscht
-      und neu anlegt, sieht kurz die alten Diagramme. Besser: ein Zugriff
-      `katalog(…)`, der mit dem Pfad wirft; eine Fassungsnummer in
-      `projektAendern` statt der Abdrücke; ein Speicher `ansichtVon(kennung)`,
-      geleert beim Anlegen und Löschen.
 - [ ] **8. Der Lagennachweis steht viermal** (duktilitaet.py:132-331,
       mindestbewehrung.py:205-364 und 445-633, sproedes_versagen.py:80-202)
       mit eigener Lagenwahl, Stahl-Entdoppelung, Gradkennung und
@@ -646,6 +634,13 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 7: der Katalog über
+`katalog(…)`, das einen fehlenden Schlüssel mit seinem Pfad meldet, und ein
+Test, der jeden Pfad der Oberfläche im Kern nachschlägt · eine Fassung des
+Projekts statt dreier Abdrücke von Hand, und der Kern merkt sich die
+Diagramme einer Analyse unter ihrem Abdruck · ein Speicher der Ansichten je
+Kennung, geleert beim Anlegen, Kopieren, Löschen und Öffnen ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 6: ein Eintrag wird über
 seine Kennung gefunden und geändert (`eintragVon`, `eintragAendern`),

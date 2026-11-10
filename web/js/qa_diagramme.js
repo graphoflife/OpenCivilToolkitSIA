@@ -32,7 +32,7 @@ import { karte, wahlSchalter } from './bausteine.js';
 import {
   el, leerzustand, svgEl, zahlfeld,
 } from './dom.js';
-import { aendern, eintragVon, zustand } from './zustand.js';
+import { aendern, ansichtVon, zustand } from './zustand.js';
 
 const BREITE = 640;
 const HOEHE = 470;
@@ -43,12 +43,6 @@ const DRUCK = '#1f5fa8';
 const GUT = '#1a7f45';
 const SCHLECHT = '#b3261e';
 const VIOLETT = '#8b5cf6';
-
-/** Kennung -> {abdruck, daten, alt, fehler, uhr}: die letzte Antwort je Analyse. */
-const vorrat = new Map();
-
-/** Kennung -> Name des gezeigten Lastfalls. Ansichtssache, nicht Teil des Projekts. */
-const gezeigt = new Map();
 
 /** Die drei Grössen des Interaktionsdiagramms: Achsentitel, Einheit, Feld im Lastfall. */
 const GROESSE = {
@@ -65,28 +59,27 @@ const GROESSE = {
  */
 const IN_DER_EBENE = 1e-3;
 
-/**
- * Kennung -> was das Interaktionsdiagramm zeigt: die Achsen und je Grösse
- * ihr Wert, wenn sie die feste ist. Ein Wert bleibt stehen, wenn die Achsen
- * wechseln -- wer zurückschaltet, findet ihn wieder.
+/*
+ * Was sich die Ansicht je Analyse merkt (`ansichtVon`): `diagramme`, die
+ * letzte Antwort {frage, fassung, schnitt, daten, alt, fehler, uhr};
+ * `gezeigt`, der Name des gezeigten Lastfalls; `schnitt`, was das
+ * Interaktionsdiagramm zeigt.
  */
-const schnittwahl = new Map();
 
+/**
+ * Was das Interaktionsdiagramm zeigt: die Achsen und je Grösse ihr Wert,
+ * wenn sie die feste ist. Ein Wert bleibt stehen, wenn die Achsen wechseln
+ * -- wer zurückschaltet, findet ihn wieder.
+ */
 function wahlVon(kennung) {
-  if (!schnittwahl.has(kennung)) {
-    schnittwahl.set(kennung, { x: 'M_y', y: 'N', werte: { N: 0, M_y: 0, M_z: 0 } });
-  }
-  return schnittwahl.get(kennung);
+  const ansicht = ansichtVon(kennung);
+  ansicht.schnitt ??= { x: 'M_y', y: 'N', werte: { N: 0, M_y: 0, M_z: 0 } };
+  return ansicht.schnitt;
 }
 
 /** Die Grösse, die auf keiner Achse steht. */
 function festVon(wahl) {
   return Object.keys(GROESSE).find((g) => g !== wahl.x && g !== wahl.y);
-}
-
-/** Woran die Diagramme hängen: die Analyse und die Materialien. */
-function abdruckVon(kennung) {
-  return JSON.stringify([eintragVon(kennung), zustand.projekt.materialien]);
 }
 
 /**
@@ -97,17 +90,17 @@ function abdruckVon(kennung) {
 function anfordern(kennung, eintrag, verzug = 600) {
   clearTimeout(eintrag.uhr);
   eintrag.uhr = setTimeout(() => {
-    if (vorrat.get(kennung) !== eintrag) return;
+    if (ansichtVon(kennung).diagramme !== eintrag) return;
     if (zustand.rechnetGerade) {
       anfordern(kennung, eintrag);
       return;
     }
     api.analysediagramme(zustand.projekt, kennung, eintrag.schnitt).then((antwort) => {
-      if (vorrat.get(kennung) !== eintrag) return;
+      if (ansichtVon(kennung).diagramme !== eintrag) return;
       eintrag.daten = antwort.diagramme;
       aendern({}, 'diagramm');
     }).catch((fehler) => {
-      if (vorrat.get(kennung) !== eintrag) return;
+      if (ansichtVon(kennung).diagramme !== eintrag) return;
       eintrag.fehler = fehler.message;
       aendern({}, 'diagramm');
     });
@@ -463,29 +456,30 @@ function fallwahl(kennung, faelle, name) {
   if (faelle.length < 2) return null;
   return el('span.schalter.qa-fallwahl', { title: 'Lastfall wählen' }, faelle.map((f) => el('button.schalter-halb', {
     type: 'button', text: f.name, class: f.name === name ? 'ist-an' : '',
-    on: { click: () => { gezeigt.set(kennung, f.name); aendern({}, 'diagramm'); } },
+    on: { click: () => { ansichtVon(kennung).gezeigt = f.name; aendern({}, 'diagramm'); } },
   })));
 }
 
 /**
  * Die Karten einer Analyse für den Reiter «Diagramme» -- das Panel darum
- * baut bericht.js. Fragt nach, wenn die gezeigten Daten nicht mehr zur
- * Eingabe passen.
+ * baut bericht.js. Fragt nach, wenn sich das Projekt oder der Schnitt seit
+ * der letzten Frage geändert hat; ob sich für diese Analyse etwas geändert
+ * hat, weiss der Kern.
  */
 export function analyseKarten(kennung) {
+  const ansicht = ansichtVon(kennung);
   const wahl = wahlVon(kennung);
   const schnitt = { fest: festVon(wahl), wert: wahl.werte[festVon(wahl)] };
-  const projektabdruck = abdruckVon(kennung);
-  const abdruck = `${projektabdruck}|${schnitt.fest}|${schnitt.wert}`;
-  let eintrag = vorrat.get(kennung);
-  if (!eintrag || eintrag.abdruck !== abdruck) {
+  const frage = `${zustand.fassung}|${schnitt.fest}|${schnitt.wert}`;
+  let eintrag = ansicht.diagramme;
+  if (!eintrag || eintrag.frage !== frage) {
     // Nur der Schnitt geändert: gleich fragen -- gerechnet ist schon alles.
-    const nurSchnitt = eintrag?.projektabdruck === projektabdruck;
+    const nurSchnitt = eintrag?.fassung === zustand.fassung;
     const alt = eintrag?.daten || eintrag?.alt || null;
     eintrag = {
-      abdruck, projektabdruck, schnitt, daten: null, alt, fehler: null, uhr: null,
+      frage, fassung: zustand.fassung, schnitt, daten: null, alt, fehler: null, uhr: null,
     };
-    vorrat.set(kennung, eintrag);
+    ansicht.diagramme = eintrag;
     anfordern(kennung, eintrag, nurSchnitt ? 80 : 600);
   }
   const daten = eintrag.daten || eintrag.alt;
@@ -498,7 +492,7 @@ export function analyseKarten(kennung) {
     return [interaktion, karte('Lastfall', [leerzustand('Kein Lastfall.')])];
   }
 
-  const gewaehlt = daten.faelle.find((f) => f.name === gezeigt.get(kennung)) || daten.faelle[0];
+  const gewaehlt = daten.faelle.find((f) => f.name === ansicht.gezeigt) || daten.faelle[0];
   const veraltet = !eintrag.daten;
   const bild = (t, inhalt) => karte(`${t} – ${gewaehlt.name}`, [inhalt],
     { klasse: veraltet ? 'ist-veraltet' : '' });

@@ -42,7 +42,7 @@ import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import {
-  aendern, ausVorlage, eintragAendern, eintragVon, feldangabe, materialien, zustand,
+  aendern, ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, materialien, zustand,
 } from './zustand.js';
 
 /**
@@ -138,24 +138,16 @@ export function materialienVon(kennung) {
 
 /**
  * Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu
- * sehen ist. Passt sie nicht, wird gefragt, einmal je Abdruck: die Antwort
- * hängt auch an den Materialien des Projekts (`abdruck`), und die ändern sich
- * anderswo. Bis 2026-10-18 fragte nur eine Änderung der Zeichnung; kam
- * anderswo ein Material dazu, wartete die Werkstoffwahl auf eine Antwort,
- * die nie kam.
+ * sehen ist. Passt sie nicht, wird gefragt, einmal je Fassung des Projekts:
+ * die Antwort hängt auch an den Materialien, und die ändern sich anderswo.
+ * Bis 2026-10-18 fragte nur eine Änderung der Zeichnung; kam anderswo ein
+ * Material dazu, wartete die Werkstoffwahl auf eine Antwort, die nie kam.
  */
 export function passendeGeometrie(a) {
   const g = a.qa.geometrie;
-  if (g && g.abdruck === abdruck(eintragVon(a.qa.kennung))) return g;
+  if (g && g.fassung === zustand.fassung) return g;
   geometrieHolen(a);
   return null;
-}
-
-/** Die Zeichnung und welche Materialien es gibt: davon hängt die Antwort des Kerns ab. */
-function abdruck(analyse) {
-  if (!analyse) return '';
-  const stoffe = zustand.projekt.materialien.map((m) => [m.kennung, m.art]);
-  return JSON.stringify([...ARTEN.map((x) => analyse[x.liste] || []), analyse.knoten || [], stoffe]);
 }
 
 function uebersichtZeichnen(a) {
@@ -307,12 +299,12 @@ function umriss(analyse) {
 function geometrieHolen(a) {
   const analyse = eintragVon(a.qa.kennung);
   if (!analyse) return;
-  const jetzt = abdruck(analyse);
+  const jetzt = zustand.fassung;
   if (a.qa.gefragt === jetzt) return;
   a.qa.gefragt = jetzt;
   api.geometrie(zustand.projekt, a.qa.kennung).then((antwort) => {
     if (a.qa.gefragt !== jetzt) return;
-    a.qa.geometrie = { ...antwort, abdruck: jetzt };
+    a.qa.geometrie = { ...antwort, fassung: jetzt };
     const namen = new Map();
     for (const liste of [antwort.polygone, antwort.staebe, antwort.linien, antwort.waende, antwort.hilfslinien]) {
       for (const x of liste || []) namen.set(x.kennung, x.element);
@@ -578,7 +570,7 @@ function materialwahl(art, gewaehlt, setzen, mitLoch = false) {
  * kommt -- gerechnet wird sie dort, nicht hier.
  */
 function felderVon(liste, werte, setzen, info = null) {
-  const durchmesser = zustand.katalog?.durchmesser;
+  const durchmesser = katalog('durchmesser');
   const zahl = (feld, titel, optionen = {}) => zahlfeld({
     wert: werte[feld], titel, schritt: 1, min: 0, ...optionen,
     beiAenderung: (w) => setzen(feld, w),
@@ -591,8 +583,8 @@ function felderVon(liste, werte, setzen, info = null) {
     return [zeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm'), stahl()];
   }
   if (liste === 'stablinien') {
-    const arten = zustand.katalog?.querschnittsanalyse?.linienarten || [];
-    const verschmierungen = zustand.katalog?.querschnittsanalyse?.verschmierungen || [];
+    const arten = katalog('querschnittsanalyse', 'linienarten');
+    const verschmierungen = katalog('querschnittsanalyse', 'verschmierungen');
     const art = werte.art;
     // Verschmiert: die Fläche von Hand -- oder aus ⌀, s und L (Benutzer, 2026-10-24).
     const ausStaeben = art === 'flaeche' && werte.verschmiert === 'staebe';
@@ -630,7 +622,7 @@ function felderVon(liste, werte, setzen, info = null) {
     ];
   }
   if (liste === 'schubwaende') {
-    const schnitte = zustand.katalog?.querschnittsanalyse?.schnitte || [1, 2, 3, 4, 5, 6, 7, 8];
+    const schnitte = katalog('querschnittsanalyse', 'schnitte');
     return [
       zeile('b_w', zahl('dicke', 'Dicke der Schubwand', { schritt: 10, min: 1 }), 'mm'),
       zeile('Bügel ⌀', zahl('durchmesser', 'Bügeldurchmesser; 0: ohne Bügel', { stufen: durchmesser }), 'mm'),

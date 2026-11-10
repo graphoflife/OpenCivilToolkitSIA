@@ -17,13 +17,12 @@
 
 import { wahlBlock, wahlSchalter } from './bausteine.js';
 import {
-  aktiverLastfall, katalog, lastart, lastfallWaehlen, lastVon, materialname, passendeUebersicht,
-  zugseite,
+  aktiverLastfall, lastart, lastfallWaehlen, lastVon, materialname, passendeUebersicht, zugseite,
 } from './bs_teile.js';
 import { zahlText } from './cad_ansicht.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
 import { auswahl, el, zahlfeld } from './dom.js';
-import { ausVorlage } from './zustand.js';
+import { ausVorlage, katalog } from './zustand.js';
 
 /** Was ein Lager je Richtung kann -- die Feder heisst an einer Linie Bettung. */
 const HALT = [
@@ -94,7 +93,7 @@ function jaNein(wert, setzen, titel) {
 
 /** Ob ein Querschnitt ein Material mitbringt -- eine Platte oder Analyse; das sagt der Katalog. */
 function bringtMaterial(q) {
-  return Boolean(katalog().querschnittsarten?.find((x) => x.wert === q?.art)?.bringt_material);
+  return Boolean(katalog('balkensystem', 'querschnittsarten').find((x) => x.wert === q?.art)?.bringt_material);
 }
 
 /**
@@ -104,7 +103,7 @@ function bringtMaterial(q) {
  * 2026-10-24) -- und der gewählte.
  */
 function querschnittWahl(z, gewaehlt, setzen, material = '') {
-  const nurMitMaterial = material === katalog().material_des_querschnitts;
+  const nurMitMaterial = material === katalog('balkensystem', 'material_des_querschnitts');
   const werte = [
     { wert: '', beschriftung: '– kein Stab –' },
     ...(z.querschnitte || []).filter((q) => !nurMitMaterial || bringtMaterial(q) || q.kennung === gewaehlt)
@@ -118,7 +117,7 @@ function querschnittWahl(z, gewaehlt, setzen, material = '') {
  * wenn ihr Querschnitt eines mitbringt (`bringt`: Platte, Analyse).
  */
 function materialWahl(z, bringt, gewaehlt, setzen) {
-  const eigenes = katalog().material_des_querschnitts;
+  const eigenes = katalog('balkensystem', 'material_des_querschnitts');
   const werte = [
     ...(z.stabmaterialien || []).map((m) => ({ wert: m.kennung, beschriftung: materialname(m) })),
     ...(bringt || gewaehlt === eigenes ? [{ wert: eigenes, beschriftung: 'gemäss Querschnitt' }] : []),
@@ -158,8 +157,8 @@ function lastFelder(last, setzen, { aufLinie = true, amKnoten = false } = {}) {
   const art = amKnoten ? { kraft: last.art === 'kraft', verteilt: false, einheit: last.art === 'kraft' ? 'kN' : 'kNm' }
     : lastart(last.art);
   const richtungen = amKnoten
-    ? katalog().richtungen.filter((x) => katalog().knotenrichtungen.includes(x.wert))
-    : katalog().richtungen;
+    ? katalog('balkensystem', 'richtungen').filter((x) => katalog('balkensystem', 'knotenrichtungen').includes(x.wert))
+    : katalog('balkensystem', 'richtungen');
   const wertFeld = amKnoten ? 'wert' : 'wert_a';
   return [
     art.kraft ? wahlBlock('Richtung', wahlSchalter({
@@ -206,7 +205,7 @@ export function neuEigenschaften(a, werkzeug) {
         text: 'Kein Lastfall gewählt -- oben neben «Last» einen wählen.',
       }),
       wahlBlock('Art', wahlSchalter({
-        werte: katalog().lastarten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: `${x.beschriftung} in ${x.einheit}` })),
+        werte: katalog('balkensystem', 'lastarten').map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: `${x.beschriftung} in ${x.einheit}` })),
         gewaehlt: v.art, setzen: (w) => { v.art = w; neu(); }, klasse: '.ist-wortlaut.ist-umbruch',
         titel: 'Verteilt liegt eine Last auf der ganzen Linie; einzeln dort, wo geklickt wird, oder an einem Knoten',
       })),
@@ -251,7 +250,7 @@ function meldungszeilen(a, kennungen) {
 /** Welche Vorwahl ein Lager trifft -- 'kein', eine der Lagerarten oder 'eigen'. */
 function lagerart(lager) {
   if (!lager) return 'kein';
-  const treffer = katalog().lagerarten.find((x) => x.x === lager.x && x.z === lager.z && x.phi === lager.phi);
+  const treffer = katalog('balkensystem', 'lagerarten').find((x) => x.x === lager.x && x.z === lager.z && x.phi === lager.phi);
   return treffer ? treffer.wert : 'eigen';
 }
 
@@ -263,7 +262,7 @@ function lagerSetzen(a, z, knoten, art) {
     lager = { ...ausVorlage('lager'), kennung: a.modell.naechsteKennung(z, 'A'), knoten };
     z.lager.push(lager);
   }
-  const vorwahl = katalog().lagerarten.find((x) => x.wert === art);
+  const vorwahl = katalog('balkensystem', 'lagerarten').find((x) => x.wert === art);
   if (vorwahl) Object.assign(lager, { x: vorwahl.x, z: vorwahl.z, phi: vorwahl.phi });
 }
 
@@ -273,7 +272,7 @@ function lagerFelder(a, z, knoten) {
   const setzen = (w) => a.aendern((zz) => { for (const k of knoten) lagerSetzen(a, zz, k, w); });
   const werte = [
     { wert: 'kein', beschriftung: 'kein', titel: 'Kein Lager' },
-    ...katalog().lagerarten.map((x) => ({ wert: x.wert, beschriftung: x.wert })),
+    ...katalog('balkensystem', 'lagerarten').map((x) => ({ wert: x.wert, beschriftung: x.wert })),
     { wert: 'eigen', beschriftung: 'je Richtung', titel: 'Je Richtung frei, fest oder eine Feder' },
   ];
   const zeilen = [wahlBlock('Lager', wahlSchalter({
@@ -282,7 +281,7 @@ function lagerFelder(a, z, knoten) {
   // Je Richtung nur, wenn alle gewählten ein Lager haben -- sonst stünde da,
   // was nur für einige gilt.
   if (lager.some((l) => !l)) return zeilen;
-  const einheiten = katalog().federeinheiten;
+  const einheiten = katalog('balkensystem', 'federeinheiten');
   const richtungSetzen = (feld) => (wert) => a.aendern((zz) => {
     for (const l of zz.lager) if (knoten.includes(l.knoten)) l[feld] = wert;
   });
@@ -329,7 +328,7 @@ function knotenEigenschaften(a, z, knoten) {
 // -- Linien ------------------------------------------------------------------
 
 function lagerAnLinie(a, linien, wert) {
-  const einheiten = katalog().federeinheiten;
+  const einheiten = katalog('balkensystem', 'federeinheiten');
   const setzen = (feld) => (w) => a.aendern((zz) => {
     for (const l of zz.linien) if (linien.includes(l.kennung)) l[feld] = w;
   });

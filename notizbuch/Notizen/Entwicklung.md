@@ -44,6 +44,40 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Oberfläche: Katalog, Fassung und Ansichten
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 7.
+
+- **Der Katalog.** Die Oberfläche las ihn, als könnte er fehlen
+  (`zustand.katalog?.a?.b || []`, an 35 Stellen): ein umbenannter
+  Schlüssel im Kern ergab still einen leeren Schalter. Er kommt aber beim
+  Start mit dem Projekt. Jetzt liest jede Stelle über `katalog('a', 'b')`
+  (zustand.js), und ein fehlender Schlüssel meldet sich mit seinem Pfad.
+  `test_katalog_js.py` liest die Aufrufe aus dem Quelltext und schlägt jeden
+  Pfad im Katalog des Kerns nach -- ein umbenannter Schlüssel fällt im Test
+  auf, nicht beim Klicken. Die eigenen Zugriffe in bs_teile.js und
+  qa_vorlagen.js mit ihren Ersatzwerten sind weg.
+- **Was veraltet ist.** Ob eine Antwort des Kerns noch zur Eingabe passt,
+  entschieden drei Abdrücke von Hand (Geometrie der Querschnittsanalyse,
+  ihre Diagramme, Übersicht und Verläufe des Balkensystems), jeder mit
+  seiner eigenen Liste dessen, wovon er abhängt. Jetzt zählt
+  `projektAendern` eine Fassung des Projekts hoch, und eine Antwort gilt
+  für die Fassung, zu der gefragt wurde. Das fragt öfter: nach einer
+  Änderung an der Platte auch nach den Diagrammen der Analyse. Ob sich für
+  sie etwas geändert hat, entscheidet der Kern mit dem Abdruck, den er
+  schon hatte (speicher.py, mit den Bezügen des Bauteils); die Diagramme
+  einer Analyse merkt er sich jetzt darunter (`dienst.DIAGRAMME`). Im
+  Browser: 16 ms statt 429 ms für die zweite Frage.
+- **Was sich die Ansichten merken.** Gezeigter Fall, Schnitt des
+  Interaktionsdiagramms und letzte Antwort lagen in drei Wörterbüchern je
+  Kennung, die nie vergassen: wer a1 löschte und neu anlegte, sah kurz die
+  alten Diagramme. Jetzt liegt das in `ansichtVon(kennung)`, geleert beim
+  Anlegen, Kopieren und Löschen; ein neues Projekt (`projektSetzen`, beim
+  Start und beim Öffnen) leert alles. Die Zeichenfenster haben noch ihr
+  eigenes Gedächtnis -- das gehört zu Punkt 3.
+
+---
+
 ## 2026-11-10 · Oberfläche: Einträge über ihre Kennung
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 6. Für den Benutzer ändert

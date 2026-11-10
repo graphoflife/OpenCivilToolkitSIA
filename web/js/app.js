@@ -11,7 +11,7 @@
 
 import { api, kernBereitstellen, KernFehler } from './api.js';
 import {
-  ablageEinrichten, aendern, horchen, projektAendern, zustand,
+  ablageEinrichten, aendern, horchen, projektAendern, projektSetzen, zustand,
 } from './zustand.js';
 import {
   alsDateiSichern, ausDateiLaden, gerettete, geretteteHerunterladen, geretteteVerwerfen,
@@ -177,14 +177,13 @@ async function oeffnen() {
     knoten.projektname.value = projekt.name;
     // Kommt aus einer Datei, liegt also bereits auf der Platte.
     imBrowserAblegen(projekt, true);
-    aendern({
-      projekt,
+    projektSetzen(projekt, {
       ungespeichert: false,
       auswahl: null,
       fenster: null,
       loesung: null,
       verfolgung: null,
-    }, 'start');
+    });
     melden(`Projekt «${projekt.name}» geöffnet.`);
     await rechnen();
   } catch (fehler) {
@@ -604,12 +603,11 @@ async function starten() {
     const [katalog, abgelegt] = await Promise.all([api.katalog(), projektHolen()]);
 
     knoten.projektname.value = abgelegt.projekt.name;
-    aendern({
+    projektSetzen(abgelegt.projekt, {
       katalog,
-      projekt: abgelegt.projekt,
       ungespeichert: !abgelegt.gesichert,
       gerettet: gerettete(),
-    }, 'start');
+    });
     await rechnen();
   } catch (fehler) {
     ladeanzeige('');

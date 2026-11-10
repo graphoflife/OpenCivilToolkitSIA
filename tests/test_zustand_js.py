@@ -1,7 +1,9 @@
 """
-Der Zugriff der Oberflaeche auf die Eintraege des Projekts (``web/js/zustand.js``):
-ein Eintrag wird ueber seine Kennung gefunden und geaendert, gleich in welcher
-Liste er steht -- und gibt es ihn nicht mehr, geschieht nichts.
+Der Zustand der Oberflaeche (``web/js/zustand.js``): ein Eintrag wird ueber
+seine Kennung gefunden und geaendert, gleich in welcher Liste er steht -- und
+gibt es ihn nicht mehr, geschieht nichts. Jede Aenderung zaehlt die Fassung
+des Projekts, ein neues Projekt leert, was sich die Ansichten merkten, und
+der Katalog nennt einen fehlenden Schluessel mit seinem Pfad.
 
 Das Modul wird node als ``data:``-Adresse gegeben, wie in
 ``test_arten_js.py``. Ohne node wird uebersprungen.
@@ -32,9 +34,24 @@ const ergebnis = {
   gefunden: [z.eintragVon('b1')?.name, z.eintragVon('d1')?.V_d, z.eintragVon('x9')],
 };
 z.eintragAendern('d1', (d) => { d.V_d = 500; });
-ergebnis.geaendert = [z.zustand.projekt.durchstanzstellen[0].V_d, abgelegt.length, anlaesse];
+ergebnis.geaendert = [z.zustand.projekt.durchstanzstellen[0].V_d, abgelegt.length, [...anlaesse]];
 z.eintragAendern('x9', () => { throw new Error('nie gerufen'); });
 ergebnis.ohne = [abgelegt.length, anlaesse.length];
+
+const f0 = z.zustand.fassung;
+z.eintragAendern('d1', (d) => { d.V_d = 600; });
+z.ansichtVon('d1').gezeigt = 'LF1';
+z.ansichtVon('b1').gezeigt = 'LF2';
+z.ansichtVergessen('b1');
+const vorNeuem = [z.zustand.fassung - f0, z.ansichtVon('d1').gezeigt ?? null,
+                  z.ansichtVon('b1').gezeigt ?? null];
+z.projektSetzen({ name: 'Neu', materialien: [] }, { katalog: { a: { b: [1] } } });
+ergebnis.fassung = [...vorNeuem, z.zustand.fassung - f0, z.ansichtVon('d1').gezeigt ?? null,
+                    z.zustand.projekt.name];
+
+const meldung = (f) => { try { f(); return null; } catch (e) { return e.message; } };
+ergebnis.katalog = [z.katalog('a', 'b'), meldung(() => z.katalog('a', 'c')),
+                    meldung(() => z.katalog('x'))];
 process.stdout.write(JSON.stringify(ergebnis));
 """
 
@@ -59,6 +76,17 @@ class TestEintraegeUeberIhreKennung(unittest.TestCase):
     def test_ohne_eintrag_geschieht_nichts(self):
         """Weder abgelegt noch gerechnet -- etwa ein verzögertes Speichern nach dem Löschen."""
         self.assertEqual(self.ergebnis["ohne"], [1, 1])
+
+    def test_fassung_und_ansichten(self):
+        """
+        Eine Änderung zählt die Fassung um eins; vergessen ist vergessen; ein
+        neues Projekt zählt weiter und leert jede Ansicht.
+        """
+        self.assertEqual(self.ergebnis["fassung"], [1, "LF1", None, 2, None, "Neu"])
+
+    def test_katalog_nennt_den_fehlenden_pfad(self):
+        self.assertEqual(self.ergebnis["katalog"], [[1], "Im Katalog fehlt a.c.",
+                                                    "Im Katalog fehlt x."])
 
 
 if __name__ == "__main__":

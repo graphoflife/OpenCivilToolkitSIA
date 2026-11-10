@@ -19,7 +19,7 @@ import { span } from './mathe.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import { plattenKapitel } from './plattenkapitel.js';
-import { eintragAendern, materialien, zustand } from './zustand.js';
+import { eintragAendern, katalog, materialien } from './zustand.js';
 
 
 /**
@@ -56,7 +56,7 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
     el('span.postenname', { text: beschriftung }),
     el('span.zeichen', { text: '⌀' }),
     zahlfeld({
-      wert: posten.durchmesser || null, stufen: zustand.katalog.durchmesser, min: 0,
+      wert: posten.durchmesser || null, stufen: katalog('durchmesser'), min: 0,
       titel: '⌀ in mm; leer oder 0: keine Bewehrung',
       leer: 0,
       beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),
@@ -197,7 +197,7 @@ function querkraftBlock(querschnitt) {
       el('span.postenname', { text: 'x' }),
       el('span.zeichen', { text: '⌀' }),
       zahlfeld({
-        wert: buegel.durchmesser || null, stufen: zustand.katalog.durchmesser, min: 0,
+        wert: buegel.durchmesser || null, stufen: katalog('durchmesser'), min: 0,
         titel: 'Bügel-⌀ in mm; leer oder 0: keine Bügel',
         leer: 0,
         beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),

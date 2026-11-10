@@ -142,7 +142,7 @@
     "opencivil/web/balkendaten.py": "6afdcdc69892",
     "opencivil/web/bruecke.py": "90bfc12ccd5e",
     "opencivil/web/diagrammdaten.py": "fdd7e0503ae6",
-    "opencivil/web/dienst.py": "9c7c1210c508",
+    "opencivil/web/dienst.py": "3af1a3a41c89",
     "opencivil/web/durchstanzdaten.py": "eb14058a54b8",
     "opencivil/web/grundbruchdaten.py": "4ce517bcbd64",
     "opencivil/web/server.py": "d04c60ebcb9e",

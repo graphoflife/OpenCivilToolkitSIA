@@ -17,7 +17,7 @@ import { panel } from './bausteine.js';
 import { el, ersetzen } from './dom.js';
 import { abbrechen, ausfuehren, konsole, leeren, neuStarten } from './konsole.js';
 import { bildZeichnen } from './zeichnen.js';
-import { eintragAendern, eintragVon, zustand } from './zustand.js';
+import { eintragAendern, eintragVon } from './zustand.js';
 
 /** So viel wird eingerückt -- wie in PEP 8. */
 const EINZUG = '    ';
