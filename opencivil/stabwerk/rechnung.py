@@ -53,6 +53,7 @@ from opencivil.core.einheiten import (
     KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MN, N_PRO_MM2, Groesse,
 )
 from opencivil.core.protokoll import Abschnitt, Protokoll
+from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wert import Quelle, WertDef
 from opencivil.material.basis import Baustoff, mit_index
 from opencivil.stabwerk import herleitung
@@ -200,8 +201,10 @@ class SteifigkeitsmethodeProzedur(Prozedur):
         return self.system.rechnen_und_schreiben(e, p)
 
 
-class Balkensystem:
+class Balkensystem(Rechenobjekt):
     """Ein Balkensystem, fertig fuer das Rechenwerk."""
+
+    WAS = "Balkensystem"
 
     def __init__(self, *, name: str, kennung: str, praefix: str, system: System,
                  paare: Mapping[str, Tuple[str, Stabmaterial]], meldungen: Sequence[Meldung],
@@ -398,13 +401,11 @@ class Balkensystem:
                for i, s in enumerate(self.steifigkeiten)}
         return {stab: g_k[q, m.kennung] for stab, (q, m) in self.paare.items()}
 
-    def ins_rechenwerk(self, werk) -> "Balkensystem":
-        betone = {id(m.stoff): m.stoff for _, m in self.paare.values() if m.stoff is not None}
-        for stoff in betone.values():
-            stoff.ins_rechenwerk(werk)
-        werk.definiere(*self.definitionen.values())
-        werk.registriere(*self.berechnungen)
-        return self
+    @property
+    def baustoffe(self) -> List[Baustoff]:
+        """Die Betone der Stäbe, jeder einmal -- eigene Materialien bringen ihre Werte selbst."""
+        return list({id(m.stoff): m.stoff for _, m in self.paare.values()
+                     if m.stoff is not None}.values())
 
     def ziele(self) -> List[str]:
         """

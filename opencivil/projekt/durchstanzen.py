@@ -30,7 +30,7 @@ from typing import List, Sequence
 from opencivil.core.einheiten import KN, KN_PRO_M2, KNM_PRO_M, M, MM
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart
-from opencivil.projekt.eintraege import Beschreibung
+from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.lesen import bereich
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.querschnitt.platte import Richtung
@@ -54,7 +54,7 @@ class AussparungEintrag(Beschreibung):
 
 
 @dataclass
-class DurchstanzEintrag(Beschreibung):
+class DurchstanzEintrag(BauteilEintrag):
     """Eine Durchstanzstelle -- siehe Dateikopf."""
 
     BEZEICHNUNG = "Durchstanzen"
@@ -134,10 +134,6 @@ class DurchstanzEintrag(Beschreibung):
     def materialien(self) -> List[str]:
         """Die Materialien, auf die die Stelle zeigt: Beton und Betonstahl."""
         return [k for k in (self.beton, self.stahl) if k]
-
-    def bezuege(self) -> List[str]:
-        """Die Bauteile, deren Querschnitt die Stelle nimmt -- keine."""
-        return []
 
     def netz(self) -> Netz:
         """Die Knoten, mit dem Zusammenführen gleicher Koordinaten -- wie im Zeichenfenster."""

@@ -61,6 +61,7 @@ from opencivil.core.latex import Mathe, Zelle, als_text, angabe, fest
 from opencivil.core.protokoll import (
     Abschnitt, GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte,
 )
+from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef
 
@@ -165,12 +166,14 @@ class Schicht:
 
 
 @dataclass
-class Setzungsfundament:
+class Setzungsfundament(Rechenobjekt):
     """
     Ein Flachfundament auf geschichtetem Baugrund: die Eingaben als Vorgaben
     im Rechenwerk. ``B`` und ``L`` sind die Seiten der Lastfläche; die
     Schichten liegen von der Sohle an nach unten, z wird ab der Sohle gemessen.
     """
+
+    WAS = "Setzung"
 
     name: str
     B: Groesse
@@ -194,14 +197,6 @@ class Setzungsfundament:
     def abschnitt(self) -> Abschnitt:
         """Ueberschrift, unter der das Fundament in der Herleitung steht."""
         return Abschnitt(f"Setzung: {self.name}", self.id, thema="Setzung")
-
-    def id_von(self, kurzname: str) -> str:
-        return self.definitionen[kurzname].id
-
-    def ins_rechenwerk(self, werk) -> "Setzungsfundament":
-        werk.definiere(*self.definitionen.values())
-        werk.registriere(*self.berechnungen)
-        return self
 
     def _aufbauen(self) -> None:
         # Je Gruppe ein Kasten in der Herleitung, je Schicht einer -- wie beim Grundbruch.

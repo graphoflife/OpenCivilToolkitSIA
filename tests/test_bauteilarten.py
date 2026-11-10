@@ -13,7 +13,10 @@ import unittest
 from pathlib import Path
 
 from opencivil.bericht.zusammenfassung import ANGABEN
+from opencivil.core.rechenobjekt import Rechenobjekt
+from opencivil.projekt import Projekt
 from opencivil.projekt.aufbau import BAUTEILE
+from opencivil.projekt.eintraege import BauteilEintrag
 from opencivil.web.zeichendaten import ZEICHENDATEN
 
 WURZEL = Path(__file__).resolve().parents[1]
@@ -27,6 +30,29 @@ class TestJedeArtIstVerzeichnet(unittest.TestCase):
 
     def test_was_die_oberflaeche_zeichnet(self):
         self.assertEqual(set(ZEICHENDATEN), {a.name for a in BAUTEILE})
+
+
+class TestVertraege(unittest.TestCase):
+    """Was jede Art kann, steht in einer Klasse -- nicht in jeder Art von Hand."""
+
+    def test_jeder_eintrag_sagt_worauf_er_zeigt(self):
+        for art in BAUTEILE:
+            with self.subTest(art=art.name):
+                self.assertTrue(issubclass(art.eintrag, BauteilEintrag))
+
+    def test_jedes_gebaute_bauteil_und_jeder_baustoff_ist_ein_rechenobjekt(self):
+        aufbau = Projekt.jeder_nachweis().aufbauen()
+        self.assertEqual({t.art.name for t in aufbau.teile.values()}, {a.name for a in BAUTEILE})
+        for kennung, teil in aufbau.teile.items():
+            with self.subTest(teil=kennung):
+                self.assertIsInstance(teil.objekt, Rechenobjekt)
+        for baustoff in aufbau.baustoffe.values():
+            self.assertIsInstance(baustoff, Rechenobjekt)
+
+    def test_ein_unbekannter_kurzname_nennt_die_bekannten(self):
+        teil = Projekt.beispiel().aufbauen().teile["g1"].objekt
+        with self.assertRaisesRegex(KeyError, r"Grundbruch '.*' kennt keinen Wert 'x'\. Bekannt: "):
+            teil.id_von("x")
 
 
 class TestSinnbilder(unittest.TestCase):

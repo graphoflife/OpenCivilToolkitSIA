@@ -29,6 +29,7 @@ from typing import Dict, List, Sequence, Tuple
 from opencivil.core.berechnung import Berechnung, Vorgabe
 from opencivil.core.einheiten import KN, KN_PRO_M2, KNM_PRO_M, M, MM, Groesse
 from opencivil.core.protokoll import Abschnitt
+from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef
 from opencivil.durchstanzen.flaeche import GestuetzteFlaeche
@@ -130,13 +131,15 @@ def eingaben_fuer(flaeche: GestuetzteFlaeche, stufe: Naeherungsstufe, ke: KeArt)
 
 
 @dataclass
-class Durchstanzstelle:
+class Durchstanzstelle(Rechenobjekt):
     """
     Platte, gestützte Fläche, Bewehrung und Einwirkung eines Durchstanznachweises
     -- als Vorgaben im Rechenwerk. Die Masse der gestützten Fläche, die für die
     Form und die Lage nicht gelten, gehen nicht ein: eine Rundstütze hat kein
     b_x, eine Innenstütze keinen Randabstand.
     """
+
+    WAS = "Durchstanzstelle"
 
     name: str
     praefix: str
@@ -205,14 +208,6 @@ class Durchstanzstelle:
     @property
     def abschnitt(self) -> Abschnitt:
         return Abschnitt(f"Durchstanzen: {self.name}", self.id, thema="Durchstanzen")
-
-    def id_von(self, kurzname: str) -> str:
-        return self.definitionen[kurzname].id
-
-    def ins_rechenwerk(self, werk) -> "Durchstanzstelle":
-        werk.definiere(*self.definitionen.values())
-        werk.registriere(*self.berechnungen)
-        return self
 
     def eingaben(self) -> Tuple[str, ...]:
         """Die Kurznamen, die der Nachweis liest -- siehe :func:`eingaben_fuer`."""

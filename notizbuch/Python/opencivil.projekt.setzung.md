@@ -1,5 +1,5 @@
 ---
-erzeugt: 9569c8cedda0
+erzeugt: 2449825097de
 art: modul
 tags: [modul]
 ---
@@ -45,7 +45,7 @@ Eine Schicht des Baugrunds, von der Sohle an nach unten: Dicke und M_E-Werte.
 
 ```python
 @dataclass
-class SetzungEintrag(Beschreibung)
+class SetzungEintrag(BauteilEintrag)
 ```
 
 Ein Flachfundament auf geschichtetem Baugrund, mit seinen Pressungen.
@@ -71,22 +71,6 @@ def neu(cls, kennung: str, name: str) -> 'SetzungEintrag'
 ```
 
 Eine frische Berechnung, wie die Oberflaeche sie anlegt: mit einer Schicht.
-
-#### SetzungEintrag.materialien
-
-```python
-def materialien(self) -> List[str]
-```
-
-Die Materialien, auf die das Fundament zeigt -- keine: der Boden steht im Eintrag.
-
-#### SetzungEintrag.bezuege
-
-```python
-def bezuege(self) -> List[str]
-```
-
-Die Bauteile, deren Querschnitt das Fundament nimmt -- keine.
 
 #### SetzungEintrag.schicht
 

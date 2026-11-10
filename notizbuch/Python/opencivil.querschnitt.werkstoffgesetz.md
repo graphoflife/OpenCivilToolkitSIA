@@ -1,5 +1,5 @@
 ---
-erzeugt: d669fc86a082
+erzeugt: 10216115ecfd
 art: modul
 tags: [modul]
 ---
@@ -118,36 +118,6 @@ def spannung(self, eps: float) -> float
 ```
 
 Spannung in N/m^2 zur Dehnung `eps`. Zug positiv.
-
-#### Gesetz.seite
-
-```python
-@property
-def seite(self) -> str
-```
-
-Die Seite im Notizbuch.
-
-#### Gesetz.wort
-
-```python
-@property
-def wort(self) -> str
-```
-
-#### Gesetz.referenz
-
-```python
-@property
-def referenz(self) -> str
-```
-
-#### Gesetz.rollen
-
-```python
-@property
-def rollen(self) -> Tuple[str, ...]
-```
 
 #### Gesetz.formel
 
@@ -301,8 +271,8 @@ class Stahlgesetz(Gesetz)
 Bilineare Beziehung ohne Verfestigung nach SIA 262:2025, 4.2.2.4.
 
 Zug und Druck werden getrennt begrenzt, weil `f_yd` und `f_yd^-` in der
-Sortentabelle unterschiedlich sein duerfen. `nur_zug`: der gedrueckte
-Stahl traegt nichts -- so laesst die Handrechnung die Druckbewehrung weg.
+Sortentabelle unterschiedlich sein duerfen. Den Stahl, der gedrueckt
+nichts traegt, rechnet [[opencivil.querschnitt.werkstoffgesetz#StahlNurZug|StahlNurZug]].
 
 - `NAME = 'Bilineare Beziehung des Betonstahls'`
 - `WORT = 'Stahl, bilinear'`
@@ -313,41 +283,12 @@ Stahl traegt nichts -- so laesst die Handrechnung die Druckbewehrung weg.
 - `f_yd: float` – Fliessgrenze auf Zug in N/m^2 -- je nach Werkstoffsatz `f_yd` oder `f_yk`.
 - `f_yd_druck: float` – Fliessgrenze auf Druck in N/m^2 (positiver Betrag).
 - `eps_ud: float` – Grenzdehnung (positiver Betrag).
-- `nur_zug: bool = False` – Der gedrueckte Stahl traegt nichts.
 
 #### Stahlgesetz.eps_yd
 
 ```python
 @property
 def eps_yd(self) -> float
-```
-
-#### Stahlgesetz.seite
-
-```python
-@property
-def seite(self) -> str
-```
-
-#### Stahlgesetz.wort
-
-```python
-@property
-def wort(self) -> str
-```
-
-#### Stahlgesetz.referenz
-
-```python
-@property
-def referenz(self) -> str
-```
-
-#### Stahlgesetz.rollen
-
-```python
-@property
-def rollen(self) -> Tuple[str, ...]
 ```
 
 #### Stahlgesetz.formel
@@ -364,10 +305,50 @@ def latex(self, zug: str='f_{yd}', druck: str='f_{yd}^{-}') -> str
 
 Als Formel -- `zug` und `druck` sind die Zeichen der Plateaus.
 
+### StahlNurZug
+
+```python
+@dataclass(frozen=True)
+class StahlNurZug(Stahlgesetz)
+```
+
+Der Stahl der Handrechnung: gedrueckt traegt er nichts -- so laesst sie
+die Druckbewehrung weg. Er hat seine eigene Seite, keine Normstelle und
+kein Plateau auf Druck. Bis 2026-11-10 war er ein Schalter `nur_zug`
+am [[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], nach dem sechs Stellen fragten.
+
+- `NAME = STAHL_NUR_ZUG`
+- `WORT = 'Stahl, nur auf Zug'`
+- `REFERENZ = ''`
+- `ROLLEN = ('f_s', 'E_s', 'eps_ud')`
+
+#### StahlNurZug.aus
+
+```python
+@classmethod
+def aus(cls, stahl: Stahlgesetz) -> 'StahlNurZug'
+```
+
+Derselbe Stahl, nur auf Zug.
+
+#### StahlNurZug.formel
+
+```python
+def formel(self, werte: Werte) -> str
+```
+
+#### StahlNurZug.latex
+
+```python
+def latex(self, zug: str='f_{yd}', druck: str='') -> str
+```
+
+Als Formel -- `zug` ist das Zeichen des Plateaus; ein Druckplateau gibt es nicht.
+
 ### _stahlfunktion
 
 ```python
-def _stahlfunktion(E_s: float, f: float, f_druck: float, eps_ud: float, *, nur_zug: bool) -> Funktion
+def _stahlfunktion(E_s: float, f: float, f_druck: float, eps_ud: float) -> Funktion
 ```
 
 Die Funktion des Stahls, je Fall eine eigene: in der Schleife entscheidet

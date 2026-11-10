@@ -1,5 +1,5 @@
 ---
-erzeugt: 06f52aa6c2b4
+erzeugt: 1009c2cbbce1
 art: modul
 tags: [modul]
 ---
@@ -202,10 +202,12 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
 ### Querschnittsanalyse
 
 ```python
-class Querschnittsanalyse
+class Querschnittsanalyse(Rechenobjekt)
 ```
 
 Ein gezeichneter Querschnitt, fertig fuer das Rechenwerk und die Nachweise.
+
+- `WAS = 'Querschnittsanalyse'`
 
 #### Querschnittsanalyse.beton_an
 
@@ -229,18 +231,6 @@ Die Seiten, die je ein Nachweis ziehen laesst ([[opencivil.querschnitt.biegung#B
 ```python
 @property
 def abschnitt(self) -> Abschnitt
-```
-
-#### Querschnittsanalyse.id_von
-
-```python
-def id_von(self, kurzname: str) -> str
-```
-
-#### Querschnittsanalyse.ins_rechenwerk
-
-```python
-def ins_rechenwerk(self, werk) -> 'Querschnittsanalyse'
 ```
 
 #### Querschnittsanalyse.baustoffe
@@ -417,6 +407,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.querschnitt.bewehrungselemente]]

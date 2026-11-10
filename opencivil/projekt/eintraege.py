@@ -126,6 +126,28 @@ EIGENE_VORSILBE = {"beton": "BE", "betonstahl": "S"}
 
 
 @dataclass
+class BauteilEintrag(Beschreibung):
+    """
+    Was jedes Bauteil eines Projekts sagt -- eine Platte, eine Analyse, ein
+    Fundament --: worauf es zeigt. Danach fragt das Projekt, bevor etwas
+    geloescht wird (:meth:`~opencivil.projekt.projekt.Projekt.verweise`).
+    Ohne eigene Angabe zeigt es auf nichts.
+
+    Bis 2026-11-10 stand dieser Vertrag in keiner Klasse: jede Art schrieb
+    beide Methoden selbst, viermal ``return []``, und eine neue Art, die sie
+    vergass, fiel erst beim Loeschen eines Materials auf.
+    """
+
+    def materialien(self) -> List[str]:
+        """Die Kennungen der Materialien, auf die das Bauteil zeigt."""
+        return []
+
+    def bezuege(self) -> List[str]:
+        """Die Kennungen der Bauteile, deren Querschnitt es nimmt."""
+        return []
+
+
+@dataclass
 class MaterialEintrag(Beschreibung):
     """
     Ein Baustoff, wie ihn die Oberflaeche beschreibt: eine Normsorte nach SIA,
@@ -739,7 +761,7 @@ class Gebrauchsliste(Beschreibung):
 
 
 @dataclass
-class Querschnittsangaben(Beschreibung):
+class Querschnittsangaben(BauteilEintrag):
     """
     Was die Platte (:class:`~opencivil.projekt.platte.QuerschnittEintrag`) und
     der gezeichnete Querschnitt

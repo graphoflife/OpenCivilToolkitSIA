@@ -26,7 +26,7 @@ from typing import List
 
 from opencivil.core.einheiten import KN_PRO_M2, M, MM, MN_PRO_M2
 from opencivil.geotechnik.setzung import Steifigkeit
-from opencivil.projekt.eintraege import Beschreibung
+from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.lesen import bereich
 
 
@@ -46,7 +46,7 @@ class SchichtEintrag(Beschreibung):
 
 
 @dataclass
-class SetzungEintrag(Beschreibung):
+class SetzungEintrag(BauteilEintrag):
     """Ein Flachfundament auf geschichtetem Baugrund, mit seinen Pressungen."""
 
     BEZEICHNUNG = "Setzung"
@@ -87,14 +87,6 @@ class SetzungEintrag(Beschreibung):
     def neu(cls, kennung: str, name: str) -> "SetzungEintrag":
         """Eine frische Berechnung, wie die Oberflaeche sie anlegt: mit einer Schicht."""
         return cls(kennung=kennung, name=name, schichten=[SchichtEintrag(name="Schicht 1")])
-
-    def materialien(self) -> List[str]:
-        """Die Materialien, auf die das Fundament zeigt -- keine: der Boden steht im Eintrag."""
-        return []
-
-    def bezuege(self) -> List[str]:
-        """Die Bauteile, deren Querschnitt das Fundament nimmt -- keine."""
-        return []
 
     def schicht(self, name: str, *, d: float, M_E: float, M_E_strich: float) -> SchichtEintrag:
         """Eine Schicht unten anfügen -- Dicke in m, M_E-Werte in MN/m²."""

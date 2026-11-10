@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KPA, M
-from opencivil.projekt.eintraege import Beschreibung, eindeutig
+from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung, eindeutig
 from opencivil.projekt.lesen import ProjektFehler, bereich
 
 
@@ -36,7 +36,7 @@ class GrundbruchkombinationEintrag(Beschreibung):
 
 
 @dataclass
-class GrundbruchEintrag(Beschreibung):
+class GrundbruchEintrag(BauteilEintrag):
     """Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen."""
 
     BEZEICHNUNG = "Grundbruch"
@@ -96,14 +96,6 @@ class GrundbruchEintrag(Beschreibung):
         """Ein frischer Grundbruch, wie die Oberflaeche ihn anlegt: mit einer Kombination."""
         return cls(kennung=kennung, name=name,
                    kombinationen=[GrundbruchkombinationEintrag(name="Kombination 1")])
-
-    def materialien(self) -> List[str]:
-        """Die Materialien, auf die das Fundament zeigt -- keine: der Boden steht im Eintrag."""
-        return []
-
-    def bezuege(self) -> List[str]:
-        """Die Bauteile, deren Querschnitt das Fundament nimmt -- keine."""
-        return []
 
     def kombination(self, name: str, *, N_Ed: float, T_Ed: float = 0.0
                     ) -> GrundbruchkombinationEintrag:

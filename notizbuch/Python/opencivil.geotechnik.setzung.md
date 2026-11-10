@@ -1,5 +1,5 @@
 ---
-erzeugt: 782dae60afc4
+erzeugt: 5503c1a47c56
 art: modul
 tags: [modul]
 ---
@@ -153,13 +153,14 @@ Eine Schicht des Baugrunds, von der Sohle an nach unten gezählt.
 
 ```python
 @dataclass
-class Setzungsfundament
+class Setzungsfundament(Rechenobjekt)
 ```
 
 Ein Flachfundament auf geschichtetem Baugrund: die Eingaben als Vorgaben
 im Rechenwerk. `B` und `L` sind die Seiten der Lastfläche; die
 Schichten liegen von der Sohle an nach unten, z wird ab der Sohle gemessen.
 
+- `WAS = 'Setzung'`
 - `name: str`
 - `B: Groesse`
 - `L: Groesse`
@@ -181,18 +182,6 @@ def abschnitt(self) -> Abschnitt
 ```
 
 Ueberschrift, unter der das Fundament in der Herleitung steht.
-
-#### Setzungsfundament.id_von
-
-```python
-def id_von(self, kurzname: str) -> str
-```
-
-#### Setzungsfundament.ins_rechenwerk
-
-```python
-def ins_rechenwerk(self, werk) -> 'Setzungsfundament'
-```
 
 ### Teilschicht
 
@@ -370,6 +359,7 @@ Die Schichten, wie man sie im Schnitt sieht: Tiefe, M_E-Werte und ihr Beitrag zu
 - [[opencivil.core.latex]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 

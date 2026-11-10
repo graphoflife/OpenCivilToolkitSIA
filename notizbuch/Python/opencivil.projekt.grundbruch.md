@@ -1,5 +1,5 @@
 ---
-erzeugt: d7dcd1280db0
+erzeugt: be94a2c62be5
 art: modul
 tags: [modul]
 ---
@@ -39,7 +39,7 @@ Eine Einwirkung auf das Fundament: N normal zur Sohle, T in ihrer Richtung, in k
 
 ```python
 @dataclass
-class GrundbruchEintrag(Beschreibung)
+class GrundbruchEintrag(BauteilEintrag)
 ```
 
 Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen.
@@ -72,22 +72,6 @@ def neu(cls, kennung: str, name: str) -> 'GrundbruchEintrag'
 ```
 
 Ein frischer Grundbruch, wie die Oberflaeche ihn anlegt: mit einer Kombination.
-
-#### GrundbruchEintrag.materialien
-
-```python
-def materialien(self) -> List[str]
-```
-
-Die Materialien, auf die das Fundament zeigt -- keine: der Boden steht im Eintrag.
-
-#### GrundbruchEintrag.bezuege
-
-```python
-def bezuege(self) -> List[str]
-```
-
-Die Bauteile, deren Querschnitt das Fundament nimmt -- keine.
 
 #### GrundbruchEintrag.kombination
 

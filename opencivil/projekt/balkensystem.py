@@ -52,7 +52,7 @@ from opencivil.core.einheiten import (
 )
 from opencivil.core.wahl import Wahl
 from opencivil.nachweis.rechenwahl import FASERARTEN
-from opencivil.projekt.eintraege import Beschreibung
+from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
@@ -421,7 +421,7 @@ class StatikdiagrammEintrag(Beschreibung):
 
 
 @dataclass
-class BalkensystemEintrag(Beschreibung):
+class BalkensystemEintrag(BauteilEintrag):
     """
     Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen.
 

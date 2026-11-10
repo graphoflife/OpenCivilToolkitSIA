@@ -47,6 +47,7 @@ from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KG_PRO_M3, MM, MM2, Groesse,
 )
 from opencivil.core.protokoll import Abschnitt
+from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Kennzahl, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
@@ -327,13 +328,15 @@ def _abmessungen(beton_name: str) -> str:
 
 
 @dataclass
-class Plattenquerschnitt:
+class Plattenquerschnitt(Rechenobjekt):
     """
     Stahlbeton-Platte mit vier Bewehrungslagen.
 
     ``b`` ist die betrachtete Breite; bei Platten ueblicherweise 1 m, dann sind
     alle Schnittgroessen Werte pro Laufmeter.
     """
+
+    WAS = "Querschnitt"
 
     name: str
     h: Groesse
@@ -391,14 +394,6 @@ class Plattenquerschnitt:
 
     # -- Zugriff ------------------------------------------------------------
 
-    def id_von(self, kurzname: str) -> str:
-        if kurzname not in self.definitionen:
-            raise KeyError(
-                f"Querschnitt '{self.name}' kennt '{kurzname}' nicht. "
-                f"Bekannt: {sorted(self.definitionen)}."
-            )
-        return self.definitionen[kurzname].id
-
     def id_breite(self, richtung: Richtung) -> str:
         """
         Kennung der Breite, die fuer diese Tragrichtung gilt.
@@ -431,13 +426,10 @@ class Plattenquerschnitt:
             gesehen.setdefault(q.lage.stahl.id, q.lage.stahl)
         return list(gesehen.values())
 
-    def ins_rechenwerk(self, werk) -> "Plattenquerschnitt":
-        self.beton.ins_rechenwerk(werk)
-        for stahl in self.staehle:
-            stahl.ins_rechenwerk(werk)
-        werk.definiere(*self.definitionen.values())
-        werk.registriere(*self.berechnungen)
-        return self
+    @property
+    def baustoffe(self) -> List[Baustoff]:
+        """Beton und Staehle -- angemeldet vor der Platte."""
+        return [self.beton, *self.staehle]
 
     # -- Aufbau -------------------------------------------------------------
 

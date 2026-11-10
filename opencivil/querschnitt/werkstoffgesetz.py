@@ -151,23 +151,6 @@ class Gesetz:
 
     __call__ = spannung
 
-    @property
-    def seite(self) -> str:
-        """Die Seite im Notizbuch."""
-        return self.NAME
-
-    @property
-    def wort(self) -> str:
-        return self.WORT
-
-    @property
-    def referenz(self) -> str:
-        return self.REFERENZ
-
-    @property
-    def rollen(self) -> Tuple[str, ...]:
-        return self.ROLLEN
-
     def formel(self, werte: Werte) -> str:
         """Das Gesetz als Formel, mit den Zeichen von ``werte``."""
         raise NotImplementedError
@@ -178,9 +161,9 @@ class Gesetz:
         Zeichen von ``werte`` und danach diese Werte. ``basis`` ordnet die
         Zwischenwerte zu, wo ein Gesetz welche hat.
         """
-        p.ansatz(self.formel(werte), titel=f"{titel}: {self.wort}", referenz=self.referenz,
-                 name=self.seite)
-        p.gleichung(r" \quad ".join(angabe(werte[r]) for r in self.rollen),
+        p.ansatz(self.formel(werte), titel=f"{titel}: {self.WORT}", referenz=self.REFERENZ,
+                 name=self.NAME)
+        p.gleichung(r" \quad ".join(angabe(werte[r]) for r in self.ROLLEN),
                     titel=f"{titel}: {self.WERTTITEL}")
 
 
@@ -355,8 +338,8 @@ class Stahlgesetz(Gesetz):
     Bilineare Beziehung ohne Verfestigung nach SIA 262:2025, 4.2.2.4.
 
     Zug und Druck werden getrennt begrenzt, weil ``f_yd`` und ``f_yd^-`` in der
-    Sortentabelle unterschiedlich sein duerfen. ``nur_zug``: der gedrueckte
-    Stahl traegt nichts -- so laesst die Handrechnung die Druckbewehrung weg.
+    Sortentabelle unterschiedlich sein duerfen. Den Stahl, der gedrueckt
+    nichts traegt, rechnet :class:`StahlNurZug`.
     """
 
     NAME = "Bilineare Beziehung des Betonstahls"
@@ -377,50 +360,18 @@ class Stahlgesetz(Gesetz):
     eps_ud: float
     """Grenzdehnung (positiver Betrag)."""
 
-    nur_zug: bool = False
-    """Der gedrueckte Stahl traegt nichts."""
-
     def __post_init__(self) -> None:
-        _gebaut(self, _stahlfunktion(self.E_s, self.f_yd, self.f_yd_druck, self.eps_ud,
-                                     nur_zug=self.nur_zug))
+        _gebaut(self, _stahlfunktion(self.E_s, self.f_yd, self.f_yd_druck, self.eps_ud))
 
     @property
     def eps_yd(self) -> float:
         return self.f_yd / self.E_s
 
-    # Der Stahl nur auf Zug hat seine eigene Seite, keine Normstelle -- so
-    # laesst ihn die Handrechnung weg -- und kein Plateau auf Druck.
-
-    @property
-    def seite(self) -> str:
-        return STAHL_NUR_ZUG if self.nur_zug else self.NAME
-
-    @property
-    def wort(self) -> str:
-        return "Stahl, nur auf Zug" if self.nur_zug else self.WORT
-
-    @property
-    def referenz(self) -> str:
-        return "" if self.nur_zug else self.REFERENZ
-
-    @property
-    def rollen(self) -> Tuple[str, ...]:
-        return tuple(r for r in self.ROLLEN if not (self.nur_zug and r == "f_s_druck"))
-
     def formel(self, werte: Werte) -> str:
-        druck = werte.get("f_s_druck")
-        return self.latex(werte["f_s"].symbol, druck.symbol if druck else "f_{yd}^{-}")
+        return self.latex(werte["f_s"].symbol, werte["f_s_druck"].symbol)
 
     def latex(self, zug: str = "f_{yd}", druck: str = "f_{yd}^{-}") -> str:
         """Als Formel -- ``zug`` und ``druck`` sind die Zeichen der Plateaus."""
-        if self.nur_zug:
-            return (
-                r"\sigma_s(\varepsilon_s) = \begin{cases}"
-                rf" \min(E_s\,\varepsilon_s;\ {zug}) & 0 < \varepsilon_s \le \varepsilon_{{ud}} \\[1ex]"
-                r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
-                r" \\[1ex] 0 & \varepsilon_s > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung})"
-                r" \end{cases}"
-            )
         return (
             r"\sigma_s(\varepsilon_s) = \begin{cases}"
             rf" \min(E_s\,\varepsilon_s;\ {zug}) & 0 \le \varepsilon_s \le \varepsilon_{{ud}} \\[1ex]"
@@ -430,20 +381,56 @@ class Stahlgesetz(Gesetz):
         )
 
 
-def _stahlfunktion(E_s: float, f: float, f_druck: float, eps_ud: float, *,
-                   nur_zug: bool) -> Funktion:
+@dataclass(frozen=True)
+class StahlNurZug(Stahlgesetz):
+    """
+    Der Stahl der Handrechnung: gedrueckt traegt er nichts -- so laesst sie
+    die Druckbewehrung weg. Er hat seine eigene Seite, keine Normstelle und
+    kein Plateau auf Druck. Bis 2026-11-10 war er ein Schalter ``nur_zug``
+    am :class:`Stahlgesetz`, nach dem sechs Stellen fragten.
+    """
+
+    NAME = STAHL_NUR_ZUG
+    WORT = "Stahl, nur auf Zug"
+    REFERENZ = ""
+    ROLLEN = ("f_s", "E_s", "eps_ud")
+
+    @classmethod
+    def aus(cls, stahl: Stahlgesetz) -> "StahlNurZug":
+        """Derselbe Stahl, nur auf Zug."""
+        return cls(E_s=stahl.E_s, f_yd=stahl.f_yd, f_yd_druck=stahl.f_yd_druck,
+                   eps_ud=stahl.eps_ud)
+
+    def __post_init__(self) -> None:
+        E_s, f, grenze = self.E_s, self.f_yd, self.eps_ud + RUNDUNG
+
+        def sigma_zug(eps: float) -> float:
+            if eps <= 0.0 or eps > grenze:
+                return 0.0
+            return min(eps * E_s, f)
+        _gebaut(self, sigma_zug)
+
+    def formel(self, werte: Werte) -> str:
+        return self.latex(werte["f_s"].symbol)
+
+    def latex(self, zug: str = "f_{yd}", druck: str = "") -> str:
+        """Als Formel -- ``zug`` ist das Zeichen des Plateaus; ein Druckplateau gibt es nicht."""
+        return (
+            r"\sigma_s(\varepsilon_s) = \begin{cases}"
+            rf" \min(E_s\,\varepsilon_s;\ {zug}) & 0 < \varepsilon_s \le \varepsilon_{{ud}} \\[1ex]"
+            r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
+            r" \\[1ex] 0 & \varepsilon_s > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung})"
+            r" \end{cases}"
+        )
+
+
+def _stahlfunktion(E_s: float, f: float, f_druck: float, eps_ud: float) -> Funktion:
     """
     Die Funktion des Stahls, je Fall eine eigene: in der Schleife entscheidet
     sie nichts, was schon beim Bauen feststeht. Sind beide Plateaus gleich --
     bei den Normsorten --, rechnet sie mit dem Betrag.
     """
     grenze = eps_ud + RUNDUNG
-    if nur_zug:
-        def sigma_zug(eps: float) -> float:
-            if eps <= 0.0 or eps > grenze:
-                return 0.0
-            return min(eps * E_s, f)
-        return sigma_zug
     if f_druck == f:
         def sigma(eps: float) -> float:
             if abs(eps) > grenze:

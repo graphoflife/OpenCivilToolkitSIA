@@ -91,8 +91,8 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 11 am
-2026-11-10 (siehe [[Entwicklung]]). Offen ist 12.
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 12 am
+2026-11-10 (siehe [[Entwicklung]]). Offen ist nur, was darunter steht.
 
 **Im übrigen Repo, neu gefunden:**
 
@@ -100,12 +100,6 @@ schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 11 am
       tausend, schon vor der Durchsicht (bei Punkt 11 übersehen). Nähte an
       den Abschnitten: Ändern und Rückgängig, Befehle, Zeichnen,
       schwebendes Fenster mit Knöpfen, Bedienen, Aufbau.
-- [ ] **12. Kleineres:** `Stahlgesetz.nur_zug` ist ein Typ im Kleid eines
-      Schalters (werkstoffgesetz.py:380-446) · `materialien()` und
-      `bezuege()` sind ungeschriebene Verträge, sieben Rechenobjekte bauen
-      `id_von`/`ins_rechenwerk` von Hand. (Das Tote und die doppelten
-      Fänge im Dienst sind am 2026-11-10 weg. `Durchstanzbefund.rotationen`
-      bleibt: ein Test prüft die Rotation daran.)
 
 **Stand der früheren Befunde:** fast alle offen. Teilweise behoben: die
 Grenze x/d kommt aus dem Katalog (nachweise.js), editor.js nennt keine
@@ -588,6 +582,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 12 zu Ende: der Stahl nur
+auf Zug als eigene Art (`StahlNurZug`) · eine Grundlage der Rechenobjekte
+(`Rechenobjekt`: `id_von`, `ins_rechenwerk`) · der Vertrag der Bauteile
+(`BauteilEintrag`: `materialien`, `bezuege`), mit einem Test ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 12 zum Teil: Totes und
 nur Geschriebenes weg, im Kern, im JS und im Stilblatt · der Dienst fängt

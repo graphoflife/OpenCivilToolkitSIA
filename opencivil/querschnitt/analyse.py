@@ -34,6 +34,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, GRAD, MIO_MM4, MM, MM2, Groesse
 from opencivil.core.latex import Mathe, als_text
 from opencivil.core.protokoll import Abschnitt, GleichungBlock, Protokoll, TabellenBlock
+from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.querschnitt import geometrie as geo
@@ -322,8 +323,10 @@ class QuerschnittsaufbauProzedur(Prozedur):
         return self.analyse.aufbau_protokollieren(p)
 
 
-class Querschnittsanalyse:
+class Querschnittsanalyse(Rechenobjekt):
     """Ein gezeichneter Querschnitt, fertig fuer das Rechenwerk und die Nachweise."""
+
+    WAS = "Querschnittsanalyse"
 
     def __init__(
         self, *, name: str, praefix: str,
@@ -411,9 +414,6 @@ class Querschnittsanalyse:
         self.definitionen[kurzname] = d
         return d
 
-    def id_von(self, kurzname: str) -> str:
-        return self.definitionen[kurzname].id
-
     def _aufbauen(self, alpha_min: int, alpha_max: int, k_c: float) -> None:
         self.d_brutto = {
             "A": self._def("A", "A", MM2, "Fläche des Bruttoquerschnitts", 0),
@@ -441,13 +441,6 @@ class Querschnittsanalyse:
             self.berechnungen.append(Vorgabe(
                 id=d.id, ausgabe=d, groesse=groesse, abschnitt=abschnitt,
                 gruppe=gruppe, stumm=True))
-
-    def ins_rechenwerk(self, werk) -> "Querschnittsanalyse":
-        for stoff in self.baustoffe:
-            stoff.ins_rechenwerk(werk)
-        werk.definiere(*self.definitionen.values())
-        werk.registriere(*self.berechnungen)
-        return self
 
     @property
     def baustoffe(self) -> List[Baustoff]:

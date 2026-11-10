@@ -1,5 +1,5 @@
 ---
-erzeugt: fc498e62821d
+erzeugt: 3fc104dbd081
 art: modul
 tags: [modul]
 ---
@@ -323,7 +323,7 @@ nicht leer wird.
 
 ```python
 @dataclass
-class Plattenquerschnitt
+class Plattenquerschnitt(Rechenobjekt)
 ```
 
 Stahlbeton-Platte mit vier Bewehrungslagen.
@@ -331,6 +331,7 @@ Stahlbeton-Platte mit vier Bewehrungslagen.
 `b` ist die betrachtete Breite; bei Platten ueblicherweise 1 m, dann sind
 alle Schnittgroessen Werte pro Laufmeter.
 
+- `WAS = 'Querschnitt'`
 - `name: str`
 - `h: Groesse`
 - `b: Groesse`
@@ -346,12 +347,6 @@ alle Schnittgroessen Werte pro Laufmeter.
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
 - `berechnungen: List[Berechnung] = field(default_factory=list, init=False)`
 - `posten: List[Postenbezug] = field(default_factory=list, init=False)` – Die vorhandenen Posten, von der 1. Lage an, je Lage erst die Grundbewehrung.
-
-#### Plattenquerschnitt.id_von
-
-```python
-def id_von(self, kurzname: str) -> str
-```
 
 #### Plattenquerschnitt.id_breite
 
@@ -400,11 +395,14 @@ def richtungen_mit_bewehrung(self) -> List[Richtung]
 def staehle(self) -> List[Baustoff]
 ```
 
-#### Plattenquerschnitt.ins_rechenwerk
+#### Plattenquerschnitt.baustoffe
 
 ```python
-def ins_rechenwerk(self, werk) -> 'Plattenquerschnitt'
+@property
+def baustoffe(self) -> List[Baustoff]
 ```
+
+Beton und Staehle -- angemeldet vor der Platte.
 
 #### Plattenquerschnitt.abschnitt
 
@@ -454,6 +452,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]

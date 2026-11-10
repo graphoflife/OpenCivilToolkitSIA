@@ -1,5 +1,5 @@
 ---
-erzeugt: 83c632467a77
+erzeugt: 4c48d5abb427
 art: modul
 tags: [modul]
 ---
@@ -81,7 +81,7 @@ Ein Winkel in Grad -- so gehen alpha, beta und arctan(t/b) in die Faktoren ein.
 
 ```python
 @dataclass
-class Fundament
+class Fundament(Rechenobjekt)
 ```
 
 Ein Flachfundament auf seinem Baugrund: die Eingaben als Vorgaben im
@@ -90,6 +90,7 @@ Rechenwerk, dazu phi_eff, c_eff und gamma'.
 `b` ist die Breite, die kürzere Seite, `L` die Länge; ein
 Streifenfundament ist ein sehr langes.
 
+- `WAS = 'Grundbruch'`
 - `name: str`
 - `phi_k: Groesse`
 - `gamma_phi: Groesse`
@@ -117,18 +118,6 @@ def abschnitt(self) -> Abschnitt
 ```
 
 Ueberschrift, unter der das Fundament in der Herleitung steht.
-
-#### Fundament.id_von
-
-```python
-def id_von(self, kurzname: str) -> str
-```
-
-#### Fundament.ins_rechenwerk
-
-```python
-def ins_rechenwerk(self, werk) -> 'Fundament'
-```
 
 ### Kombination
 
@@ -322,6 +311,7 @@ die Spalte der Kohäsion.
 - [[opencivil.core.latex]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
 
 ## Gebraucht von

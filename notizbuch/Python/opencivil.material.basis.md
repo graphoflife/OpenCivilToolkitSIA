@@ -1,5 +1,5 @@
 ---
-erzeugt: c9d8c0d72e24
+erzeugt: 50df079eccde
 art: modul
 tags: [modul]
 ---
@@ -117,7 +117,7 @@ def definition(self, praefix: str, symbol_index: str='') -> WertDef
 
 ```python
 @dataclass
-class Baustoff
+class Baustoff(Rechenobjekt)
 ```
 
 Ein konkretes Material im Modell: eigener Namensraum, eigene Berechnungen.
@@ -131,6 +131,7 @@ werk.setze(c30.id_von("f_ck"), Groesse(32, MPA))   # abweichender Wert
 loesung = werk.loese(c30.id_von("f_cd"))
 ```
 
+- `WAS = 'Baustoff'`
 - `id: str` – Namensraum, z.B. `beton.C30_37`.
 - `name: str` – Anzeigename, z.B. `C30/37`.
 - `art: Baustoffart`
@@ -138,14 +139,6 @@ loesung = werk.loese(c30.id_von("f_cd"))
 - `symbol_index: str = ''` – Index, der an die Symbole dieses Baustoffs gehaengt wird -- leer, solange es nur einen seiner Art gibt. Steht hier, damit auch die Nachweise ihn erreichen. Sie bauen Symbole wie `f_{cd}` selbst, und ohne den Index waere bei zwei Betonen nicht zu sehen, welcher gemeint ist. Vergeben wird er beim Aufbau des Projekts, wo sich zaehlen laesst, wie viele Baustoffe einer Art vorkommen.
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict)`
 - `berechnungen: List[Berechnung] = field(default_factory=list)`
-
-#### Baustoff.id_von
-
-```python
-def id_von(self, kurzname: str) -> str
-```
-
-Globale Wert-ID zu einem Kurznamen, z.B. `f_cd` -> `beton.C30_37.f_cd`.
 
 #### Baustoff.eingabename
 
@@ -231,6 +224,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 

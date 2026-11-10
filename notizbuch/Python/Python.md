@@ -1,5 +1,5 @@
 ---
-erzeugt: 8890d9fe4f62
+erzeugt: 40170a7fa399
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -24,6 +24,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.latex]] – Bausteine fuer die LaTeX-Ausgabe von Berechnungen.
     - [[opencivil.core.nachweis]] – der Nachweis: Einwirkung gegen Widerstand, mit Urteil.
     - [[opencivil.core.protokoll]] – Mitschrift einer Berechnung.
+    - [[opencivil.core.rechenobjekt]] – was ein Bauteil im Rechenwerk ist.
     - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
     - [[opencivil.core.suche]] – wo eine steigende Funktion null wird.
     - [[opencivil.core.wahl]] – was ein Wahlfeld annehmen kann.

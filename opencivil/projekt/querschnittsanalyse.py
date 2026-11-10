@@ -422,10 +422,6 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
                 gesehen.append(kennung)
         return gesehen
 
-    def bezuege(self) -> List[str]:
-        """Die Bauteile, deren Querschnitt die Analyse nimmt -- keine."""
-        return []
-
     @property
     def leer(self) -> bool:
         """

@@ -1,5 +1,5 @@
 ---
-erzeugt: b5601805591c
+erzeugt: c4eca56c6243
 art: modul
 tags: [modul]
 ---
@@ -165,10 +165,12 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ### Balkensystem
 
 ```python
-class Balkensystem
+class Balkensystem(Rechenobjekt)
 ```
 
 Ein Balkensystem, fertig fuer das Rechenwerk.
+
+- `WAS = 'Balkensystem'`
 
 #### Balkensystem.abschnitt
 
@@ -224,11 +226,14 @@ Je tragenden Stab `g_k` in N/m -- es kommt senkrecht ueber seine
 ganze Laenge in den Lastfall des Eigengewichts, je Meter Stab und
 nicht je Meter Projektion. Leer ohne diesen Lastfall.
 
-#### Balkensystem.ins_rechenwerk
+#### Balkensystem.baustoffe
 
 ```python
-def ins_rechenwerk(self, werk) -> 'Balkensystem'
+@property
+def baustoffe(self) -> List[Baustoff]
 ```
+
+Die Betone der Stäbe, jeder einmal -- eigene Materialien bringen ihre Werte selbst.
 
 #### Balkensystem.ziele
 
@@ -272,6 +277,7 @@ seinem Material nimmt, eine Meldung.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.stabwerk.herleitung]]

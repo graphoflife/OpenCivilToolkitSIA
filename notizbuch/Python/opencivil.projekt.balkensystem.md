@@ -1,5 +1,5 @@
 ---
-erzeugt: a7001bbb5a68
+erzeugt: 3632e5101350
 art: modul
 tags: [modul]
 ---
@@ -354,7 +354,7 @@ Fall; die Liste sagt nur, welche Diagramme rechts stehen.
 
 ```python
 @dataclass
-class BalkensystemEintrag(Beschreibung)
+class BalkensystemEintrag(BauteilEintrag)
 ```
 
 Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen.

@@ -1,5 +1,5 @@
 ---
-erzeugt: e7cd2a4256a4
+erzeugt: 6fad9bdafcba
 art: modul
 tags: [modul]
 ---
@@ -63,7 +63,7 @@ Eine Aussparung in der Platte: ihre Ecken als Kennungen von Knoten, der Reihe na
 
 ```python
 @dataclass
-class DurchstanzEintrag(Beschreibung)
+class DurchstanzEintrag(BauteilEintrag)
 ```
 
 Eine Durchstanzstelle -- siehe Dateikopf.
@@ -123,14 +123,6 @@ def materialien(self) -> List[str]
 ```
 
 Die Materialien, auf die die Stelle zeigt: Beton und Betonstahl.
-
-#### DurchstanzEintrag.bezuege
-
-```python
-def bezuege(self) -> List[str]
-```
-
-Die Bauteile, deren Querschnitt die Stelle nimmt -- keine.
 
 #### DurchstanzEintrag.netz
 

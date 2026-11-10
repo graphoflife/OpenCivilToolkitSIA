@@ -44,6 +44,29 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Verträge, die in einer Klasse stehen
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 12, zweiter Teil. Für den
+Benutzer ändert sich nichts; Berichte und Zahlen sind dieselben.
+
+- **Der Stahl nur auf Zug ist eine eigene Art** (`StahlNurZug`). Bis dahin
+  war er ein Schalter `nur_zug` am `Stahlgesetz`, nach dem sechs Stellen
+  fragten -- Seite, Wort, Normstelle, Rollen, Formel und Funktion. Jetzt
+  stehen die vier Namen als Klassenwerte da, und die Eigenschaften des
+  `Gesetz`, die sie nur durchreichten, sind weg. Die Handrechnung nimmt
+  `StahlNurZug.aus(stahl)`.
+- **Eine Grundlage der Rechenobjekte** (`core/rechenobjekt.py`): die Kennung
+  eines Werts nach Kurzname (`id_von`) und das Anmelden im Rechenwerk, nach
+  den Baustoffen (`ins_rechenwerk`, `baustoffe`). Sieben Klassen schrieben
+  beides von Hand; zwei nannten bei einem unbekannten Kurznamen die
+  bekannten, die übrigen nicht. Der Baustoff behält sein eigenes Anmelden,
+  das zweimal Anmelden verträgt.
+- **Der Vertrag der Bauteile** (`BauteilEintrag`): worauf ein Bauteil zeigt,
+  Materialien und Querschnitte. Danach fragt das Projekt vor dem Löschen.
+  Bis dahin schrieb ihn jede Art selbst, viermal `return []`, und eine neue
+  Art, die ihn vergass, fiel erst beim Löschen auf. Ein Test prüft jetzt
+  jede Art und jedes gebaute Objekt.
+
 ## 2026-11-10 · Aufgeräumt: Totes und doppelt Gefangenes
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 12, erster Teil. Für den

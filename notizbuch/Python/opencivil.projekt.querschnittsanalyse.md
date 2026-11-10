@@ -1,5 +1,5 @@
 ---
-erzeugt: e791a5d45357
+erzeugt: 7e64ec6ba23d
 art: modul
 tags: [modul]
 ---
@@ -357,14 +357,6 @@ Jedes Material, auf das die Analyse zeigt, in der Reihenfolge des
 ersten Auftretens. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
 Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
 naechste Aenderung machte daraus einen Fehler beim Rechnen.
-
-#### QuerschnittsanalyseEintrag.bezuege
-
-```python
-def bezuege(self) -> List[str]
-```
-
-Die Bauteile, deren Querschnitt die Analyse nimmt -- keine.
 
 #### QuerschnittsanalyseEintrag.leer
 

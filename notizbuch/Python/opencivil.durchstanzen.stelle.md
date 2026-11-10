@@ -1,5 +1,5 @@
 ---
-erzeugt: 699c5fb2e01a
+erzeugt: 065b7b6b967f
 art: modul
 tags: [modul]
 ---
@@ -164,7 +164,7 @@ was die wirksame Stufe liest und was k_e liest -- je ohne Doppel.
 
 ```python
 @dataclass
-class Durchstanzstelle
+class Durchstanzstelle(Rechenobjekt)
 ```
 
 Platte, gestützte Fläche, Bewehrung und Einwirkung eines Durchstanznachweises
@@ -172,6 +172,7 @@ Platte, gestützte Fläche, Bewehrung und Einwirkung eines Durchstanznachweises
 Form und die Lage nicht gelten, gehen nicht ein: eine Rundstütze hat kein
 b_x, eine Innenstütze keinen Randabstand.
 
+- `WAS = 'Durchstanzstelle'`
 - `name: str`
 - `praefix: str`
 - `plattenart: Plattenart`
@@ -216,18 +217,6 @@ b_x, eine Innenstütze keinen Randabstand.
 def abschnitt(self) -> Abschnitt
 ```
 
-#### Durchstanzstelle.id_von
-
-```python
-def id_von(self, kurzname: str) -> str
-```
-
-#### Durchstanzstelle.ins_rechenwerk
-
-```python
-def ins_rechenwerk(self, werk) -> 'Durchstanzstelle'
-```
-
 #### Durchstanzstelle.eingaben
 
 ```python
@@ -247,6 +236,7 @@ Die Kurznamen, die der Nachweis liest -- siehe [[opencivil.durchstanzen.stelle#e
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.durchstanzen.flaeche]]

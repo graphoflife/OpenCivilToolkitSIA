@@ -68,6 +68,7 @@ from opencivil.core.latex import Mathe, Zelle, als_text, angabe, bedingung
 from opencivil.core.protokoll import (
     Abschnitt, GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte,
 )
+from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 
 #: Der Beiwert der undrainierten Tragfähigkeitsformel, Kap. 9.2.17 -- 5.1,
@@ -101,7 +102,7 @@ def grad(winkel: Groesse) -> float:
 
 
 @dataclass
-class Fundament:
+class Fundament(Rechenobjekt):
     """
     Ein Flachfundament auf seinem Baugrund: die Eingaben als Vorgaben im
     Rechenwerk, dazu phi_eff, c_eff und gamma'.
@@ -109,6 +110,8 @@ class Fundament:
     ``b`` ist die Breite, die kürzere Seite, ``L`` die Länge; ein
     Streifenfundament ist ein sehr langes.
     """
+
+    WAS = "Grundbruch"
 
     name: str
     phi_k: Groesse
@@ -138,14 +141,6 @@ class Fundament:
     def abschnitt(self) -> Abschnitt:
         """Ueberschrift, unter der das Fundament in der Herleitung steht."""
         return Abschnitt(f"Grundbruch: {self.name}", self.id, thema="Fundament")
-
-    def id_von(self, kurzname: str) -> str:
-        return self.definitionen[kurzname].id
-
-    def ins_rechenwerk(self, werk) -> "Fundament":
-        werk.definiere(*self.definitionen.values())
-        werk.registriere(*self.berechnungen)
-        return self
 
     def _def(self, kurzname: str, symbol: str, einheit, beschreibung: str,
              stellen: int = 2, referenz: str = "") -> WertDef:

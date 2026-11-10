@@ -15,7 +15,9 @@ from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsat
 from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, bezuege_vereinen, gesetze,
 )
-from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Spannungsblock, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import (
+    BetonUngerissen, Spannungsblock, Stahlgesetz, StahlNurZug,
+)
 
 W = Betonkennwerte(f_c=20e6, E_cm=33.6e9, eps_c1d=0.002, eps_c2d=0.0035)
 STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
@@ -118,8 +120,7 @@ class TestStahl(unittest.TestCase):
             self.assertEqual(gesetz(eps), getrennt)
 
     def test_nur_zug(self):
-        gesetz = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045,
-                             nur_zug=True)
+        gesetz = StahlNurZug(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
         self.assertEqual(gesetz(-0.001), 0.0)
         self.assertAlmostEqual(gesetz(0.001), 200e6)
         self.assertAlmostEqual(gesetz(0.01), 435e6)

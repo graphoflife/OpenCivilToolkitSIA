@@ -37,7 +37,7 @@ N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Callable, Dict, List, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
@@ -54,7 +54,7 @@ from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
 from opencivil.querschnitt.lagenaufbau import Postenbezug
-from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz, StahlNurZug
 
 
 #: Was die Tragsicherheit anbietet.
@@ -196,7 +196,7 @@ class Gesetze:
 
     def stahl(self, s: Stahlgesetz) -> Stahlgesetz:
         """Der Stahl einer Lage, wie der Loeser ihn rechnet -- in der Handrechnung nur auf Zug."""
-        return replace(s, nur_zug=self.wahl.art is Rechenart.HANDRECHNUNG)
+        return StahlNurZug.aus(s) if self.wahl.art is Rechenart.HANDRECHNUNG else s
 
     @property
     def verdraengt(self) -> bool:

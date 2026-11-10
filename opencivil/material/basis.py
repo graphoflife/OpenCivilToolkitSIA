@@ -29,6 +29,7 @@ from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel, FormelFu
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.latex import text_latex
 from opencivil.core.protokoll import Abschnitt
+from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Quelle, WertDef, kennung_aus
 
@@ -150,7 +151,7 @@ class KennwertVorlage:
 
 
 @dataclass
-class Baustoff:
+class Baustoff(Rechenobjekt):
     """
     Ein konkretes Material im Modell: eigener Namensraum, eigene Berechnungen.
 
@@ -161,6 +162,8 @@ class Baustoff:
         werk.setze(c30.id_von("f_ck"), Groesse(32, MPA))   # abweichender Wert
         loesung = werk.loese(c30.id_von("f_cd"))
     """
+
+    WAS = "Baustoff"
 
     id: str
     """Namensraum, z.B. ``beton.C30_37``."""
@@ -184,15 +187,6 @@ class Baustoff:
 
     definitionen: Dict[str, WertDef] = field(default_factory=dict)
     berechnungen: List[Berechnung] = field(default_factory=list)
-
-    def id_von(self, kurzname: str) -> str:
-        """Globale Wert-ID zu einem Kurznamen, z.B. ``f_cd`` -> ``beton.C30_37.f_cd``."""
-        if kurzname not in self.definitionen:
-            raise KeyError(
-                f"Baustoff '{self.name}' kennt keinen Kennwert '{kurzname}'. "
-                f"Bekannt: {sorted(self.definitionen)}."
-            )
-        return self.definitionen[kurzname].id
 
     def eingabename(self, kurzname: str) -> str:
         """
