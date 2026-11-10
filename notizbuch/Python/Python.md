@@ -1,5 +1,5 @@
 ---
-erzeugt: 5e58e7184fcf
+erzeugt: 1250cfc5f10f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -98,6 +98,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
       - [[opencivil.projekt.aufbau.setzung]] – eine Setzungsberechnung wird Rechnung.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
+    - [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».
     - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.

@@ -672,3 +672,8 @@ export function spannungsfallZeichnen(fall) {
     : `${fall.name} – ${fall.titel}`;
   return karte(titel, inhalt(fall));
 }
+
+/** Die Spannung-Dehnung-Analysen eines Bauteils, je eine Karte. */
+export function spannungskarten(kennung, loesung) {
+  return ((loesung.spannungsanalysen || {})[kennung] || []).map(spannungsfallZeichnen);
+}

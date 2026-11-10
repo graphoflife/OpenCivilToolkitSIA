@@ -1,5 +1,5 @@
 ---
-erzeugt: 1fe41a890c1e
+erzeugt: 966c1f45d22a
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Aus einem [[opencivil.projekt.balkensystem#BalkensystemEintrag|BalkensystemEintrag]] das
-Stabwerk mit aufgeloesten Materialien und Querschnitten ([[opencivil.projekt.aufbau.balkensystem#bauen|bauen]]). Ein
+Stabwerk in SI mit seinen Meldungen ([[opencivil.projekt.aufbau.balkensystem#modell_von|modell_von]]) und daraus die
+Rechnung mit aufgeloesten Materialien und Querschnitten ([[opencivil.projekt.aufbau.balkensystem#bauen|bauen]]). Ein
 Material ist ein Beton des Projekts oder ein eigenes. Die Art eines
 Querschnitts wird hier aufgeloest, einmal: je Art eine Klasse
 ([[opencivil.stabwerk.stabquerschnitt|stabquerschnitt]]). Ein Querschnitt kann eine
@@ -21,6 +22,46 @@ das Material einer Linie «gemäss Querschnitt»: der Beton der Platte oder
 der Analyse.
 
 ## Inhalt
+
+### Modell
+
+```python
+@dataclass
+class Modell
+```
+
+Das Stabwerk der Beschreibung, in N, m und rad -- noch ohne
+Steifigkeiten: `EA` und `EI` jedes Stabs kommen aus dem Rechenwerk,
+je Paar aus Querschnitt und Material (`paare`). Was sich nicht
+uebersetzen laesst, steht in `meldungen`, wie die des Rechenkerns.
+
+- `system: System`
+- `paare: Dict[str, Tuple[str, str]] = field(default_factory=dict)` – Je tragenden Stab die Kennungen seines Querschnitts und seines Materials.
+- `meldungen: List[Meldung] = field(default_factory=list)`
+- `eigengewicht: Optional[str] = None` – Der Name des Lastfalls, der das Eigengewicht der Staebe bekommt -- oder keiner.
+
+#### Modell.gueltig
+
+```python
+@property
+def gueltig(self) -> bool
+```
+
+### modell_von
+
+```python
+def modell_von(eintrag: BalkensystemEintrag) -> Modell
+```
+
+Das Stabwerk zum Rechnen, in SI ([[opencivil.stabwerk.modell]]).
+
+Ein Stab ohne Querschnitt oder Material -- oder mit einem Material,
+das es im System nicht gibt --, ein Querschnitt mit unmoeglichen
+Massen und eine Feder ohne Steifigkeit sind Fehler, die die Meldungen
+nennen: gerechnet wird dann nicht -- und nicht etwa mit einem Stab
+weniger. Ob ein Material traegt, weiss erst der Aufbau: er kennt die
+Betone des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
+Beiwert dafuer bleiben mit einem Hinweis weg.
 
 ### bauen
 
@@ -92,12 +133,14 @@ Teil sagt, warum.
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
 - [[opencivil.material.basis]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.spannungsanalyse.modul]]
+- [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.stabwerk.system]]

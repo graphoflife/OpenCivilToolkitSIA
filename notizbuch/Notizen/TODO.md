@@ -92,8 +92,8 @@ Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
 schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3, 4, 6 und 7 am
-2026-11-10 (siehe [[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 5
-vor der nächsten Bauteilart.
+2026-11-10, ebenso 11 (siehe [[Entwicklung]]). Empfohlene Reihenfolge für
+den Rest: 5 vor der nächsten Bauteilart.
 
 **Im übrigen Repo, neu gefunden:**
 
@@ -132,11 +132,10 @@ vor der nächsten Bauteilart.
       Situationsbilder baut das JS selbst (gb_zeichnung.js:253-271,
       sz_zeichnung.js:212-233, ds_grundriss.js:164-201). Besser: `_Groesse`
       als gemeinsames Modul, die Legende als Zellen aus den *daten.py.
-- [ ] **11. Dateien:** ~~core/berechnung.py hat 1087 Zeilen (Naht in Zeile
-      607: der Nachweis nach core/nachweis.py)~~ erledigt 2026-11-10; diagramm.js (959) ist das
-      Bilderbuch der Platte -- auslagern, das erfüllt die Vorbedingung von
-      5; projekt.py (897): die Prüfprojekte nach projekt/beispiele.py;
-      projekt/balkensystem.py (906): das Modell nach aufbau/balkensystem.py.
+- [ ] **cad_fenster.js hat 1138 Zeilen** -- die einzige Datei über
+      tausend, schon vor der Durchsicht (bei Punkt 11 übersehen). Nähte an
+      den Abschnitten: Ändern und Rückgängig, Befehle, Zeichnen,
+      schwebendes Fenster mit Knöpfen, Bedienen, Aufbau.
 - [ ] **12. Kleineres:** `Stahlgesetz.nur_zug` ist ein Typ im Kleid eines
       Schalters (werkstoffgesetz.py:380-446) · der Dienst fängt vier Mal,
       was `bearbeite` schon fängt (dienst.py:402-451) · `materialien()` und
@@ -629,6 +628,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 11: der Nachweis in
+core/nachweis.py · die Prüfprojekte in projekt/beispiele.py · das Modell
+des Balkensystems in aufbau/balkensystem.py · die Bilder der Platte und
+ihre Karten in platte_bilder.js ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 3: eine Grundlage für die
 Apps mit Zeichenfenster (`cad_app.js`) -- Lesen, Schreiben, Fenster je

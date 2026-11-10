@@ -1,5 +1,5 @@
 ---
-erzeugt: e57feba97e23
+erzeugt: a088e6bb30a0
 art: modul
 tags: [modul]
 ---
@@ -471,6 +471,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.verformung]]
+- [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.balkensystem]]

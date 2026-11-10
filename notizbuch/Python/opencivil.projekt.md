@@ -1,5 +1,5 @@
 ---
-erzeugt: d868417863f6
+erzeugt: 895f0fb8c2cc
 art: modul
 tags: [modul]
 ---
@@ -73,6 +73,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 
 - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
 - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
+- [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».
 - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.

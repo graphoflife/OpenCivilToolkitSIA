@@ -1,5 +1,5 @@
 ---
-erzeugt: 5bdc6ed00e30
+erzeugt: 9a1f978feefc
 art: modul
 tags: [modul]
 ---
@@ -341,30 +341,6 @@ Fall; die Liste sagt nur, welche Diagramme rechts stehen.
 - `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
 - `groesse: str = einer_von(DIAGRAMMGROESSEN, 'M')`
 
-### Modell
-
-```python
-@dataclass
-class Modell
-```
-
-Das Stabwerk der Beschreibung, in N, m und rad -- noch ohne
-Steifigkeiten: `EA` und `EI` jedes Stabs kommen aus dem Rechenwerk,
-je Paar aus Querschnitt und Material (`paare`). Was sich nicht
-uebersetzen laesst, steht in `meldungen`, wie die des Rechenkerns.
-
-- `system: System`
-- `paare: Dict[str, Tuple[str, str]] = field(default_factory=dict)` – Je tragenden Stab die Kennungen seines Querschnitts und seines Materials.
-- `meldungen: List[Meldung] = field(default_factory=list)`
-- `eigengewicht: Optional[str] = None` – Der Name des Lastfalls, der das Eigengewicht der Staebe bekommt -- oder keiner.
-
-#### Modell.gueltig
-
-```python
-@property
-def gueltig(self) -> bool
-```
-
 ### BalkensystemEintrag
 
 ```python
@@ -376,7 +352,7 @@ Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Komb
 
 Ohne Regeln, die das ganze Projekt aufhielten: was an einem System nicht
 stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
-([[opencivil.projekt.balkensystem#BalkensystemEintrag.modell|modell]]), und die anderen Bauteile rechnen weiter.
+([[opencivil.projekt.balkensystem#BalkensystemEintrag|modell]]), und die anderen Bauteile rechnen weiter.
 
 - `BEZEICHNUNG = 'Balkensystem'`
 - `kennung: str`
@@ -446,22 +422,6 @@ def stelle_auf(self, kennung: str, punkt: Sequence[float]) -> float
 ```
 
 Wo ein Punkt auf einer Linie liegt, in m ab ihrem Anfang -- auf die Linie gelotet.
-
-#### BalkensystemEintrag.modell
-
-```python
-def modell(self) -> Modell
-```
-
-Das Stabwerk zum Rechnen, in SI ([[opencivil.stabwerk.modell]]).
-
-Ein Stab ohne Querschnitt oder Material -- oder mit einem Material,
-das es im System nicht gibt --, ein Querschnitt mit unmoeglichen
-Massen und eine Feder ohne Steifigkeit sind Fehler, die die Meldungen
-nennen: gerechnet wird dann nicht -- und nicht etwa mit einem Stab
-weniger. Ob ein Material traegt, weiss erst der Aufbau: er kennt die
-Betone des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
-Beiwert dafuer bleiben mit einem Hinweis weg.
 
 #### BalkensystemEintrag.netz
 
@@ -635,12 +595,12 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.querschnitte]]
-- [[opencivil.stabwerk.system]]
 
 ## Gebraucht von
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]

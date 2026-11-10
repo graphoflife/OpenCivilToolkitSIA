@@ -20,21 +20,18 @@
  */
 
 import { karte, panel } from './bausteine.js';
-import { el, ersetzen, leerzustand, melden, svgEl, zahlfeld } from './dom.js';
+import { el, ersetzen, leerzustand, svgEl } from './dom.js';
 import { setzen, span } from './mathe.js';
 import { werkzeugleiste } from './kopierleiste.js';
 import { adresse, seiteVorhanden } from './notizbuch.js';
-import {
-  diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
-  querkraftkurveZeichnen, querschnittZeichnen,
-} from './diagramm.js';
+import { kurveZeichnen } from './diagramm.js';
+import { plattenkarten } from './platte_bilder.js';
 import { analyseKarten } from './qa_diagramme.js';
 import { systemKarten, systemZusammenfassung } from './bs_diagramme.js';
 import { durchstanzKarten } from './ds_grundriss.js';
 import { situationKarten } from './gb_zeichnung.js';
 import { setzungKarten } from './sz_zeichnung.js';
-import { spannungsfallZeichnen } from './spannungsbild.js';
-import { api } from './api.js';
+import { spannungskarten } from './spannungsbild.js';
 import { ARTEN } from './arten.js';
 import { aendern, eintragVon, namensraum, zustand } from './zustand.js';
 
@@ -514,26 +511,6 @@ function kennzahlenliste(kennung, loesung) {
 }
 
 /**
- * Die Karten einer Platte: ihr Querschnitt, die Interaktionslinien, die
- * Querkraftkurven und die Spannung-Dehnung-Analysen.
- */
-function plattenkarten(kennung, eintrag, loesung) {
-  const eigene = Object.values(loesung.linien || {}).filter((linie) => linie.bauteil === kennung);
-  return [
-    karte('Querschnitt', [querschnittZeichnen(eintrag, loesung.werte || {})]),
-    ...eigene.map((linie) => karte('M-N-Interaktionsdiagramm', [diagrammZeichnen(linie)])),
-    ...querkraftkurven(loesung, kennung),
-    ...neigungskurven(loesung, kennung),
-    ...spannungskarten(kennung, loesung),
-  ];
-}
-
-/** Die Spannung-Dehnung-Analysen eines Bauteils, je eine Karte. */
-function spannungskarten(kennung, loesung) {
-  return ((loesung.spannungsanalysen || {})[kennung] || []).map(spannungsfallZeichnen);
-}
-
-/**
  * Die Karten je Bauteilart (ARTEN, arten.js). Die Diagramme der
  * Querschnittsanalysen und der Balkensysteme kommen aus eigenen Anfragen,
  * siehe qa_diagramme.js und bs_diagramme.js; die Spannung-Dehnung-Analysen
@@ -681,91 +658,6 @@ function vorschauknopf(e, aktiv, mitGruppe) {
     mitGruppe ? el('span.vorschau-gruppe', { text: e.gruppe.name }) : null,
     el('span.vorschau-titel', { text: name }),
   ]);
-}
-
-/**
- * Stellt eine Kurve auf eine andere Normalkraft um.
- *
- * Gerechnet wird im Kern, nicht hier: `v_Rd` hängt über `m_Rd(N_Ed)` an der
- * Resistenzlinie, und die Formel steht im Querkraftnachweis. Die Oberfläche
- * fragt nach und zeichnet, was zurückkommt.
- */
-async function normalkraftWaehlen(kennung, N_Ed) {
-  const gewaehlt = { ...zustand.kurvenNormalkraft, [kennung]: N_Ed };
-  aendern({ kurvenNormalkraft: gewaehlt }, 'kurve');
-  try {
-    const antwort = await api.querkraftkurven(zustand.projekt, gewaehlt);
-    // Wer zweimal kurz hintereinander weiterstellt, hat zwei Anfragen
-    // unterwegs -- und die ältere darf die jüngere nicht überholen. Sonst
-    // stünde unter der Kurve die eine Normalkraft und gezeichnet wäre die
-    // andere.
-    if (zustand.kurvenNormalkraft[kennung] !== N_Ed) return;
-    // In die vorhandene Lösung einsetzen statt sie zu ersetzen: alles andere
-    // -- Herleitung, Werte, Urteile -- gilt unverändert weiter.
-    aendern({
-      loesung: { ...zustand.loesung, querkraftkurven: antwort.querkraftkurven },
-    }, 'kurve');
-  } catch (fehler) {
-    melden(fehler.message, true);
-  }
-}
-
-/**
- * Die M-V-Kurven einer Platte -- bis zu vier.
- *
- * Je Tragrichtung und Momentenvorzeichen eine, aber nur dort, wo auch ein
- * Querkraftnachweis geführt wurde. Der Kern sagt selbst, welche es gibt; hier
- * wird nichts abgeleitet.
- *
- * Unter jeder Kurve steht die Normalkraft, für die sie gilt. Ändert man sie,
- * rechnet der Kern die Kurve neu -- die Formel bleibt dort, wo sie hingehört.
- */
-function querkraftkurven(loesung, querschnitt) {
-  const alle = Object.entries(loesung.querkraftkurven || {})
-    .filter(([, k]) => k.querschnitt === querschnitt);
-
-  return alle.map(([kennung, kurve]) => karte(`Querkraft über Moment – ${kurve.name}`, [
-    querkraftkurveZeichnen(kurve),
-    el('div.kurvenfuss', {}, [
-      el('span.kurvenfuss-name', { text: 'gilt für N_Ed =' }),
-      zahlfeld({
-        wert: kurve.N_Ed, schritt: 50,
-        titel: 'N in kN, Zug positiv. Nur Punkte mit genau diesem N liegen auf der Kurve.',
-        leer: 0,
-        beiAenderung: (v) => normalkraftWaehlen(kennung, v),
-      }),
-      el('span.einheit', { text: 'kN' }),
-      el('span.kurvenhinweis', {
-        text: 'Blass: Punkte mit anderem N.',
-      }),
-    ]),
-  ]));
-}
-
-/**
- * Die Neigungskurven einer Platte -- nur mit Querkraftbewehrung.
- *
- * Dann hängt der Widerstand nicht mehr am Moment, sondern an der Neigung der
- * Druckdiagonalen; an die Stelle der M-V-Kurve tritt dieses Bild. Ein Bild je
- * statischer Höhe und Neigungsbereich -- beides hängt am einzelnen Fall, und
- * der Kern sagt selbst, welche Bilder es gibt.
- */
-function neigungskurven(loesung, querschnitt) {
-  const alle = Object.entries(loesung.neigungskurven || {})
-    .filter(([, k]) => k.querschnitt === querschnitt);
-
-  return alle.map(([, kurve]) => karte(`Querkraft über Neigung – ${kurve.name}`, [
-    neigungskurveZeichnen(kurve),
-    el('div.kurvenfuss', {}, [
-      el('span.kurvenfuss-name', { text: `d = ${kurve.d.toFixed(1)} mm` }),
-      el('span.kurvenhinweis', {
-        text: kurve.zug
-          ? `Normalzug: α_min ist auf ${kurve.alpha_min}° angehoben. `
-            + 'Ausserhalb der Grenzen ist die Kurve blass gezeichnet.'
-          : 'Ausserhalb von α_min und α_max ist die Kurve blass gezeichnet.',
-      }),
-    ]),
-  ]));
 }
 
 /**

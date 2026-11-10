@@ -44,6 +44,34 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Dateien unter tausend Zeilen
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 11. Für den Benutzer
+ändert sich nichts; der Bericht ist derselbe.
+
+- **core/berechnung.py** (1095 Zeilen): der Nachweis mit Vergleich, Urteil,
+  `grad_def` und `Fallbefund` steht in `core/nachweis.py`; berechnung.py
+  behält, was eine Berechnung allgemein ist (594).
+- **projekt/projekt.py** (897): das Beispiel und «Jeder Nachweis» stehen in
+  `projekt/beispiele.py`. `Projekt.beispiel()` und
+  `Projekt.jeder_nachweis()` bleiben als Zugang -- die Anleitung nennt sie.
+- **projekt/balkensystem.py** (906): wie der Eintrag zum Stabwerk in SI
+  wird, mit seinen Meldungen, steht beim Aufbau
+  (`aufbau/balkensystem.modell_von`). Der Eintrag beschreibt, der Aufbau
+  übersetzt -- wie bei jeder anderen Bauteilart.
+- **diagramm.js** (959): die Bilder der Platte -- Querschnitt,
+  M-N-Interaktionsdiagramm, M-V- und Neigungskurven -- und ihre Karten aus
+  bericht.js stehen in `platte_bilder.js`. diagramm.js behält die Kurve
+  eines Werkstoffgesetzes und das Entzerren von Beschriftungen;
+  `spannungskarten` steht bei den Spannung-Dehnung-Bildern
+  (spannungsbild.js). Damit ist die Vorbedingung von Punkt 5 erfüllt:
+  bericht.js kennt keine Bilder einer Bauteilart mehr selbst.
+
+Übersehen hatte die Durchsicht cad_fenster.js mit 1138 Zeilen; das steht
+in [[TODO]].
+
+---
+
 ## 2026-11-10 · Oberfläche: eine Grundlage für die Zeichenfenster
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 3. Für den Benutzer ändert

@@ -63,9 +63,7 @@ import {
 import {
   auswahl, el, melden, svgEl,
 } from './dom.js';
-import {
-  aendern, ausVorlage, eintragVon, katalog, zustand,
-} from './zustand.js';
+import { ausVorlage, eintragVon, katalog, zustand } from './zustand.js';
 
 /**
  * Die Arten des Systems. Gewählt werden Linien und Knoten: ein Lager gehört

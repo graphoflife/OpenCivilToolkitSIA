@@ -1,5 +1,5 @@
 ---
-erzeugt: 882f39ad3f10
+erzeugt: 797148a73dbb
 art: modul
 tags: [modul]
 ---
@@ -200,4 +200,5 @@ Kraft: eine neue Zeile bringt keine Einwirkung mit (Benutzer,
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.platte]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.projekt]]

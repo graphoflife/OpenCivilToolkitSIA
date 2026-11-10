@@ -1,5 +1,5 @@
 ---
-erzeugt: 701f04adc918
+erzeugt: 988cb9874912
 art: modul
 tags: [modul]
 ---
@@ -54,4 +54,5 @@ Ein neues Skript, mit der [[opencivil.projekt.skript#Konstanten|VORLAGE]] darin.
 ## Gebraucht von
 
 - [[opencivil.projekt]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.projekt]]

@@ -12,6 +12,7 @@ from opencivil.projekt import (
     BAUTEILE, BalkensystemEintrag, Projekt, ProjektFehler, QuerschnittsanalyseEintrag,
     StablastEintrag,
 )
+from opencivil.projekt.aufbau.balkensystem import modell_von
 from opencivil.projekt.balkensystem import MATERIAL_DES_QUERSCHNITTS
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
@@ -336,7 +337,7 @@ def traeger(**masse) -> Projekt:
 class TestModell(unittest.TestCase):
     def test_einheiten_und_richtungen(self):
         p = rahmen()
-        modell = p.balkensysteme[0].modell()
+        modell = modell_von(p.balkensysteme[0])
         self.assertTrue(modell.gueltig, modell.meldungen)
         g, w = modell.system.lastfaelle
         self.assertEqual(g.lasten[0].wert_a, 25e3)
@@ -351,7 +352,7 @@ class TestModell(unittest.TestCase):
         s = einfeldtraeger("r1", "T", "b1")
         s.knotenlast(s.lastfaelle[0], (6, 0), 5.0)
         s.knotenlast(s.lastfaelle[0], (6, 0), 2.0, art="moment")
-        lasten = s.modell().system.lastfaelle[0].lasten
+        lasten = modell_von(s).system.lastfaelle[0].lasten
         self.assertEqual(lasten[-2].Fz, -5e3)
         self.assertEqual(lasten[-1].M, 2e3)
 
@@ -359,11 +360,11 @@ class TestModell(unittest.TestCase):
         s = einfeldtraeger("r1", "T", "b1")
         s.lager[1].x, s.lager[1].k_x = "feder", 5000.0
         s.linien[0].quer, s.linien[0].k_quer = "feder", 2000.0
-        modell = s.modell()
+        modell = modell_von(s)
         self.assertEqual(modell.system.lager[1].x.feder, 5e6)
         self.assertEqual(modell.system.staebe[0].quer.feder, 2e6)
         s.lager[1].k_x = 0.0
-        self.assertFalse(s.modell().gueltig)
+        self.assertFalse(modell_von(s).gueltig)
 
     def test_fehler_der_beschreibung(self):
         for aendern, wort, elemente in (
@@ -376,7 +377,7 @@ class TestModell(unittest.TestCase):
             with self.subTest(wort=wort):
                 s = einfeldtraeger("r1", "T", "b1")
                 aendern(s)
-                modell = s.modell()
+                modell = modell_von(s)
                 fehler = [m for m in modell.meldungen if m.fehler]
                 self.assertEqual(len(fehler), 1)
                 self.assertIn(wort, fehler[0].text)
@@ -386,7 +387,7 @@ class TestModell(unittest.TestCase):
     def test_last_ohne_lastfall_bleibt_mit_hinweis_weg(self):
         s = einfeldtraeger("r1", "T", "b1")
         s.linien[0].lasten[0].lastfall = "LF9"
-        modell = s.modell()
+        modell = modell_von(s)
         self.assertTrue(modell.gueltig)
         self.assertIn("keinem Lastfall", modell.meldungen[0].text)
         self.assertEqual(modell.system.lastfaelle[0].lasten, [])
@@ -635,7 +636,7 @@ class TestEigengewicht(unittest.TestCase):
     def test_nur_ein_lastfall_bekommt_es(self):
         p = self.system()
         p.balkensysteme[0].lastfaelle[1].eigengewicht = True
-        meldungen = [m for m in p.balkensysteme[0].modell().meldungen if m.fehler]
+        meldungen = [m for m in modell_von(p.balkensysteme[0]).meldungen if m.fehler]
         self.assertTrue(any("Eigengewicht" in m.text for m in meldungen))
 
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8bb7c3728aaf
+erzeugt: 8b8c0bf911fe
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,8 @@ Das [[opencivil.projekt.projekt#Projekt|Projekt]] haelt Materialien und Bauteile
 gespeichert, geoeffnet und gerechnet wird. Hier stehen der Zugriff auf die
 Teile, die Methoden fuer das Rechnen ohne Oberflaeche, die Pruefungen ueber
 mehrere Teile hinweg (eindeutige Kennungen und Materialnamen), Speichern und
-Laden -- und das Beispiel, mit dem die Oberflaeche startet.
+Laden. Das Beispiel, mit dem die Oberflaeche startet, und das Pruefprojekt
+«Jeder Nachweis» baut [[opencivil.projekt.beispiele]].
 
 Gebaut wird in [[opencivil.projekt.aufbau]]; [[opencivil.projekt.projekt#Projekt.aufbauen|Projekt.aufbauen]]
 reicht nur weiter.
@@ -342,12 +343,7 @@ def laden(cls, pfad: str | Path) -> 'Projekt'
 def beispiel(cls) -> 'Projekt'
 ```
 
-Ein lauffähiges Beispiel, damit die Oberfläche nicht leer startet.
-
-Gebaut über dieselben Methoden, die man ohne Oberfläche benutzt. So
-steht die Fassade an einer Stelle vorgeführt -- und der
-Schnappschuss-Test prüft sie mit: baute sie etwas anderes als die
-Einträge von Hand, die hier vorher standen, änderte sich der Bericht.
+Das Beispiel, mit dem die Oberflaeche startet -- gebaut in [[opencivil.projekt.beispiele|.beispiele]].
 
 #### Projekt.jeder_nachweis
 
@@ -356,91 +352,7 @@ Einträge von Hand, die hier vorher standen, änderte sich der Bericht.
 def jeder_nachweis(cls) -> 'Projekt'
 ```
 
-Jeder Nachweis einmal laut -- und die Fälle, die das Beispiel nie zeigt.
-
-Zusammen mit [[opencivil.projekt.projekt#Projekt.beispiel|beispiel]] führt es jeden Nachweis einmal laut; ein
-Test wacht darüber. Aus den beiden stammen der Schnappschuss des
-Berichts und die Formelsammlung der Oberfläche -- darum steht es hier
-und nicht bei den Tests.
-
-Erhöhte Anforderung mit allen Schaltern und begrenzter rissaktiver
-Dicke, häufige und quasi-ständige Lastfälle abgeleitet und eigene, Bügel
-mit Stabzahl in y, ein Knickfall, die Verformung im Feld und am
-Kragarm; eine zweite Platte mit x aussen und b = 500 mm, die im Feld
-nicht aufgeht, auch nicht in der Durchbiegung, und deren Stahl unter
-Dauerlast fliesst, dazu Querkraft ohne Bügel -- einmal über m_Rd,
-einmal darunter, mit Einlage; eine dritte ohne x-Bewehrung; eine vierte mit
-Querkraft ohne Einlage, einer Einwirkung, die am kürzesten Abstand
-gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
-x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python
-täte.
-
-#### Projekt._durchstanzstellen
-
-```python
-@staticmethod
-def _durchstanzstellen(p: 'Projekt') -> None
-```
-
-Jede Lage der gestützten Fläche, jede Form der Stütze, jede
-Näherungsstufe und beide Wege zu k_e: eine Innenstütze mit Flächenlast;
-eine Rundstütze am Rand, k_e aus der Exzentrizität; eine Eckstütze in
-Stufe 1, die ohne Durchstanzbewehrung aufgeht; eine lange Ovalstütze in
-einer Bodenplatte, mit Momenten von Hand und einer Aussparung neben der
-Ecke; ein Wandende und eine Wandecke, an denen Stufe 2 wie Stufe 1
-rechnet und für die es noch keinen Vorschlag gibt. Innen-, Rand- und
-Ovalstütze brauchen Durchstanzbewehrung; eine zweite Innenstütze trägt
-so viel, dass es einen Stahlpilz braucht.
-
-#### Projekt._grundbrueche
-
-```python
-@staticmethod
-def _grundbrueche(p: 'Projekt') -> None
-```
-
-Jede Lage des Grundwassers und beide Arten des Bodens: drainiert mit
-Kohäsion, geneigter Sohle, geneigtem Gelände, Auflast und dem
-Wasser im Gleitkörper, dazu eine Last, so schräg, dass die Klammer
-eines Lastneigungsfaktors unter null fällt; das Wasser über der Sohle
-und auf ihrer Höhe, dort ein langer Streifen; undrainiert flach und
-tief eingebunden, einmal so schräg belastet, dass es keinen
-Widerstand gibt.
-
-#### Projekt._setzungen
-
-```python
-@staticmethod
-def _setzungen(p: 'Projekt') -> None
-```
-
-Das Beispiel der Tabelle 8.4 des Kapitels -- ein Bauwerk 15 × 8 m, starr,
-auf Kiessand über Ton; der Kiessand setzt sich dort nicht, hier fast
-nicht --, das mit 20 mm nicht aufgeht; dazu ein schlaffer Damm mit
-Wiederbelastung, und eine Berechnung ohne Schicht.
-
-#### Projekt._alles_einmal
-
-```python
-@staticmethod
-def _alles_einmal(p: 'Projekt', decke: QuerschnittEintrag, analyse: QuerschnittsanalyseEintrag) -> None
-```
-
-Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-Querschnitt, beide mit E_eq; ein Beton des Projekts und zwei eigene
-Materialien -- Stahl und ein weicherer Beton --, ein Stab mit dem
-Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
-keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager mit
-und ohne Stab; jede Lastart, auch projiziert.
-
-#### Projekt._beweglich
-
-```python
-@staticmethod
-def _beweglich(p: 'Projekt') -> None
-```
-
-Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt einer Zahl.
+Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele]].
 
 
 ## Braucht
@@ -448,6 +360,7 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 - [[opencivil.ergebnis]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]
@@ -456,8 +369,6 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.skript]]
-- [[opencivil.querschnitt.geometrie]]
-- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von
@@ -465,4 +376,5 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.web.api]]

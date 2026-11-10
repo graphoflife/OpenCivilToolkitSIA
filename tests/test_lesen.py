@@ -19,6 +19,7 @@ from opencivil.projekt.querschnittsanalyse import SchubwandEintrag
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import Bereich, felder_pruefen
 from opencivil.web import dienst
+from opencivil.projekt.aufbau.balkensystem import modell_von
 
 
 def platte_roh(**aenderung) -> dict:
@@ -382,7 +383,7 @@ class TestNichtsStill(unittest.TestCase):
         p = Projekt.beispiel()
         rahmen = p.balkensysteme[0]
         rahmen.lastfaelle[1].kennung = rahmen.lastfaelle[0].kennung
-        meldungen = [m.text for m in rahmen.modell().meldungen if m.fehler]
+        meldungen = [m.text for m in modell_von(rahmen).meldungen if m.fehler]
         self.assertTrue(any("Mehrere Lastfälle haben die Kennung" in m for m in meldungen))
 
     def test_ein_unbekanntes_mass_eines_stabquerschnitts(self):

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4edfff507c67
+erzeugt: 5527acbd404a
 art: modul
 tags: [modul]
 ---
@@ -341,7 +341,6 @@ Alle Lasten des Falls als Kraft auf das Tragwerk und Moment um den Ursprung.
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau.balkensystem]]
-- [[opencivil.projekt.balkensystem]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.balkendaten]]

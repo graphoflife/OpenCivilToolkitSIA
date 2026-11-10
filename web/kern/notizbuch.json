@@ -4460,6 +4460,9 @@
       "art": "modul",
       "kurz": "ein Balkensystem wird Rechnung.",
       "stichworte": [
+        "Modell",
+        "Modell.gueltig",
+        "modell_von",
         "bauen",
         "_stabquerschnitt",
         "_modulfrage",
@@ -4586,8 +4589,6 @@
         "LastfallEintrag",
         "LastkombinationEintrag",
         "StatikdiagrammEintrag",
-        "Modell",
-        "Modell.gueltig",
         "BalkensystemEintrag",
         "BalkensystemEintrag.materialien",
         "BalkensystemEintrag.bezuege",
@@ -4596,7 +4597,6 @@
         "BalkensystemEintrag.enden",
         "BalkensystemEintrag.laenge",
         "BalkensystemEintrag.stelle_auf",
-        "BalkensystemEintrag.modell",
         "BalkensystemEintrag.netz",
         "BalkensystemEintrag.linie",
         "BalkensystemEintrag.lager_an",
@@ -4613,6 +4613,21 @@
         "BalkensystemEintrag.teilen",
         "BalkensystemEintrag.umkehren",
         "BalkensystemEintrag.neu"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.beispiele",
+      "pfad": "Python/opencivil.projekt.beispiele.md",
+      "art": "modul",
+      "kurz": "die Prüfprojekte: das Beispiel und «Jeder Nachweis».",
+      "stichworte": [
+        "beispiel",
+        "jeder_nachweis",
+        "_durchstanzstellen",
+        "_grundbrueche",
+        "_setzungen",
+        "_alles_einmal",
+        "_beweglich"
       ]
     },
     {
@@ -4810,12 +4825,7 @@
         "Projekt.speichern",
         "Projekt.laden",
         "Projekt.beispiel",
-        "Projekt.jeder_nachweis",
-        "Projekt._durchstanzstellen",
-        "Projekt._grundbrueche",
-        "Projekt._setzungen",
-        "Projekt._alles_einmal",
-        "Projekt._beweglich"
+        "Projekt.jeder_nachweis"
       ]
     },
     {
