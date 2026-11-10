@@ -223,8 +223,19 @@ export function ansichtVon(kennung) {
   return ansichten.get(kennung);
 }
 
+/**
+ * Wer zu einer Kennung ausserhalb von `ansichtVon` etwas aufbewahrt -- die
+ * Zeichenfenster (cad_app.js) --, meldet hier, wie er es vergisst.
+ */
+const vergesser = [];
+
+export function beimVergessen(rueckruf) {
+  vergesser.push(rueckruf);
+}
+
 export function ansichtVergessen(kennung) {
   ansichten.delete(kennung);
+  for (const rueckruf of vergesser) rueckruf(kennung);
 }
 
 /**

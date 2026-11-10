@@ -20,6 +20,7 @@ import {
   aktiverLastfall, lastart, lastfallWaehlen, lastVon, materialname, passendeUebersicht, zugseite,
 } from './bs_teile.js';
 import { zahlText } from './cad_ansicht.js';
+import { cadZeile } from './cad_app.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
 import { auswahl, el, zahlfeld } from './dom.js';
 import { ausVorlage, katalog } from './zustand.js';
@@ -34,12 +35,6 @@ const HALT = [
 /** Das Material, das eine neue Linie bekommt: das gewählte, sonst das erste des Systems. */
 export function vorgabeMaterial(a, z) {
   return a.bs.vorgaben.linie.material || z.stabmaterialien?.[0]?.kennung || '';
-}
-
-function zeile(beschriftung, eingabe, einheit = '') {
-  return el('label.cad-zeile', {}, [
-    el('span', { text: beschriftung }), eingabe, einheit ? el('span.einheit', { text: einheit }) : el('span'),
-  ]);
 }
 
 /**
@@ -139,7 +134,7 @@ function lastfallWahl(a, z, gewaehlt, setzen, titel) {
   if (!z.lastfaelle.length) {
     return el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst unter «Lastfälle» einen Lastfall anlegen.' });
   }
-  return zeile('Lastfall', auswahl({
+  return cadZeile('Lastfall', auswahl({
     werte: mitVar(z.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })), gewaehlt),
     gewaehlt, titel, beiAenderung: setzen,
   }));
@@ -166,16 +161,16 @@ function lastFelder(last, setzen, { aufLinie = true, amKnoten = false } = {}) {
       titel: 'Positiv in Pfeilrichtung: senkrecht nach unten, quer zur gestrichelten Faser, längs vom Anfang zum Ende',
       klasse: '.ist-wortlaut.ist-umbruch',
     })) : null,
-    zeile(art.verteilt ? 'Anfang' : 'Wert', zahlfeldMitVar({
+    cadZeile(art.verteilt ? 'Anfang' : 'Wert', zahlfeldMitVar({
       wert: last[wertFeld], schritt: 5,
       titel: art.kraft ? 'Positiv in Pfeilrichtung' : 'Ein Moment positiv im Gegenuhrzeigersinn',
       beiAenderung: (w) => setzen(wertFeld, w),
     }), art.einheit),
-    art.verteilt ? zeile('Ende', zahlfeldMitVar({
+    art.verteilt ? cadZeile('Ende', zahlfeldMitVar({
       wert: last.wert_b, schritt: 5, leer: null, platzhalter: 'wie Anfang',
       titel: 'Wert am Ende der Linie -- leer: wie am Anfang', beiAenderung: (w) => setzen('wert_b', w),
     }), art.einheit) : null,
-    !art.verteilt && aufLinie ? zeile('Stelle', zahlfeldMitVar({
+    !art.verteilt && aufLinie ? cadZeile('Stelle', zahlfeldMitVar({
       wert: last.stelle, schritt: 5, min: 0, max: 100,
       titel: 'Wo die Last steht: in % der Linie ab ihrem Anfang', beiAenderung: (w) => setzen('stelle', w),
     }), '%') : null,
@@ -193,8 +188,8 @@ export function neuEigenschaften(a, werkzeug) {
   if (werkzeug === 'linie') {
     const v = a.bs.vorgaben.linie;
     inhalt = [
-      zeile('Querschnitt', querschnittWahl(z, v.querschnitt, (w) => { v.querschnitt = w; neu(); }, vorgabeMaterial(a, z))),
-      v.querschnitt ? zeile('Material', materialWahl(z, bringtMaterial(z.querschnitte.find((q) => q.kennung === v.querschnitt)),
+      cadZeile('Querschnitt', querschnittWahl(z, v.querschnitt, (w) => { v.querschnitt = w; neu(); }, vorgabeMaterial(a, z))),
+      v.querschnitt ? cadZeile('Material', materialWahl(z, bringtMaterial(z.querschnitte.find((q) => q.kennung === v.querschnitt)),
         vorgabeMaterial(a, z), (w) => { v.material = w; neu(); })) : null,
     ];
   } else if (werkzeug === 'last') {
@@ -291,7 +286,7 @@ function lagerFelder(a, z, knoten) {
       werte: mitVar(HALT, halt), gewaehlt: halt, setzen: richtungSetzen(feld), titel: `Halt in ${name}`,
     })));
     if (halt === 'feder') {
-      zeilen.push(zeile(`  k_${name}`, zahlfeldMitVar({
+      zeilen.push(cadZeile(`  k_${name}`, zahlfeldMitVar({
         wert: gemeinsam(lager.map((l) => l[`k_${feld}`])), schritt: 1000, min: 0,
         titel: `Federsteifigkeit in ${name}`, beiAenderung: richtungSetzen(`k_${feld}`),
       }), einheiten[`k_${feld}`] || ''));
@@ -310,7 +305,7 @@ function knotenEigenschaften(a, z, knoten) {
       if (da) a.modell.verschieben(zz, new Set([kennung]), feld === 'x' ? [w - da.x, 0] : [0, w - da.z]);
     }
   });
-  const inhalt = ['x', 'z'].map((feld) => zeile(feld, zahlfeldMitVar({
+  const inhalt = ['x', 'z'].map((feld) => cadZeile(feld, zahlfeldMitVar({
     wert: gemeinsam(gewaehlt.map((k) => k[feld])), schritt: a.raster, beiAenderung: lageSetzen(feld),
   }), 'm'));
   inhalt.push(...lagerFelder(a, z, knoten));
@@ -340,7 +335,7 @@ function lagerAnLinie(a, linien, wert) {
     const halt = wert(feld);
     zeilen.push(wahlBlock(name, wahlSchalter({ werte: mitVar(werte, halt), gewaehlt: halt, titel, setzen: setzen(feld) })));
     if (halt === 'feder') {
-      zeilen.push(zeile(`  k_${feld === 'quer' ? '⊥' : '∥'}`, zahlfeldMitVar({
+      zeilen.push(cadZeile(`  k_${feld === 'quer' ? '⊥' : '∥'}`, zahlfeldMitVar({
         wert: wert(`k_${feld}`), schritt: 1000, min: 0, titel: 'Bettungsziffer je Meter Stab',
         beiAenderung: setzen(`k_${feld}`),
       }), einheiten[`k_${feld}`] || ''));
@@ -389,12 +384,12 @@ function linienEigenschaften(a, z, linien) {
   });
   const staebe = gewaehlt.filter((l) => l.querschnitt);
   const material = gemeinsam(staebe.map((l) => l.material));
-  const inhalt = [zeile('Querschnitt', querschnittWahl(z, wert('querschnitt'), setzen('querschnitt'), material))];
+  const inhalt = [cadZeile('Querschnitt', querschnittWahl(z, wert('querschnitt'), setzen('querschnitt'), material))];
   if (staebe.length) {
     // «gemäss Querschnitt» nur, wenn jeder Querschnitt der gewählten Stäbe eines mitbringt.
     const bringt = staebe.every((l) => bringtMaterial(z.querschnitte.find((q) => q.kennung === l.querschnitt)));
     inhalt.push(
-      zeile('Material', materialWahl(z, bringt, material, setzen('material'))),
+      cadZeile('Material', materialWahl(z, bringt, material, setzen('material'))),
       zugseitenzeile(a, z, linien),
       schalterzeile('Gelenk Anfang', jaNein(wert('gelenk_anfang'), setzen('gelenk_anfang'), 'Kein Moment am Anfang')),
       schalterzeile('Gelenk Ende', jaNein(wert('gelenk_ende'), setzen('gelenk_ende'), 'Kein Moment am Ende')),

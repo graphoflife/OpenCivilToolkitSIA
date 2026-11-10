@@ -16,15 +16,12 @@
 import { ARTEN, artVon } from './arten.js';
 import { el, ersetzen, melden } from './dom.js';
 import { api } from './api.js';
-import { fensterVergessen } from './qa_zeichnung.js';
-import { fensterVergessen as systemfensterVergessen } from './bs_zeichnung.js';
 import { materialAnlegen, materialKopieren } from './materialwahl.js';
 import { materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor, balkensystemFenster } from './balkensystem.js';
 import { durchstanzEditor } from './durchstanzen.js';
-import { fensterVergessen as durchstanzfensterVergessen } from './ds_zeichnung.js';
 import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
 import { skriptZeichnen } from './python.js';
@@ -51,7 +48,7 @@ import {
  * sich alle neuen Platten dieselben Lagen, und die zweite änderte die erste mit.
  */
 function nachVorlage(a, schluessel, {
-  braucht = [], fehlt = '', einrichten = () => {}, vorher = () => {}, anlass,
+  braucht = [], fehlt = '', einrichten = () => {}, anlass,
 } = {}) {
   const stoffe = Object.fromEntries(braucht.map((art) => [
     art, zustand.projekt.materialien.find((m) => m.art === art)]));
@@ -62,7 +59,6 @@ function nachVorlage(a, schluessel, {
   const vorlage = katalog(schluessel);
   const kennung = freieKennung(a.vorsilbe);
   ansichtVergessen(kennung);
-  vorher(kennung);
   projektAendern((p) => {
     p[a.liste] = p[a.liste] || [];
     const neu = { ...structuredClone(vorlage), kennung, name: naechsterName(a.stamm, p[a.liste]) };
@@ -96,13 +92,12 @@ async function loeschenWennFrei(liste, eintrag, satz) {
 /**
  * Eine Kopie gleich hinter dem Original: alles wie dort, nur Kennung und Name
  * neu -- «Decke über EG (Kopie)» (Benutzer, 2026-10-19). Kopiert, nicht
- * verwiesen: sonst änderte die Kopie das Original mit. `vorher` wie beim
- * Anlegen: ein Zeichenfenster, das diese Kennung schon kannte, vergisst sie.
+ * verwiesen: sonst änderte die Kopie das Original mit. Wie beim Anlegen
+ * vergessen die Ansichten, was sie von einer früheren Kennung wussten.
  */
-function kopieren(a, eintrag, { vorher = () => {} } = {}) {
+function kopieren(a, eintrag) {
   const kennung = freieKennung(a.vorsilbe);
   ansichtVergessen(kennung);
-  vorher(kennung);
   projektAendern((p) => {
     const liste = p[a.liste];
     const i = liste.findIndex((x) => x.kennung === eintrag.kennung);
@@ -143,10 +138,9 @@ const einsetzen = (editor) => (behaelter, eintrag) => ersetzen(behaelter, ...edi
 /**
  * Die Zeile einer Bauteilart (ARTEN): Knopf, Liste und Wörter aus arten.js,
  * dazu was nur die Oberfläche kennt. Ein Bauteil geht nur weg, wenn kein
- * Balkensystem mehr seinen Querschnitt nimmt. `vergessen` lässt das
- * Zeichenfenster einer neuen Kennung vergessen, was es von früher weiss.
+ * Balkensystem mehr seinen Querschnitt nimmt.
  */
-function bauteil(name, { kurztext, anlegen, editor, fenster = null, vergessen = () => {} }) {
+function bauteil(name, { kurztext, anlegen, editor, fenster = null }) {
   const a = artVon(name);
   const zeile = {
     app: a.art, liste: a.liste, knopf: a.knopf, zeichen: a.zeichen,
@@ -158,7 +152,7 @@ function bauteil(name, { kurztext, anlegen, editor, fenster = null, vergessen = 
     name: (e) => e.name,
     kurztext,
     loeschen: (e) => loeschenWennFrei(a.liste, e, `„${e.name}" ist Querschnitt in`),
-    kopieren: (e) => kopieren(zeile, e, { vorher: vergessen }),
+    kopieren: (e) => kopieren(zeile, e),
     hinweis: () => a.bezeichnung,
     editor: einsetzen(editor),
     fenster,
@@ -225,9 +219,7 @@ const ANALYSE = bauteil('querschnittsanalyse', {
   kurztext: umriss,
   anlegen: (a) => nachVorlage(a, 'neue_querschnittsanalyse', {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
-    vorher: fensterVergessen,
   }),
-  vergessen: fensterVergessen,
   editor: analyseEditor,
   fenster: analyseFenster,
 });
@@ -242,7 +234,7 @@ const SYSTEM = bauteil('balkensystem', {
     return `${staebe} ${staebe === 1 ? 'Stab' : 'Stäbe'}`;
   },
   anlegen: (a) => nachVorlage(a, 'neues_balkensystem', {
-    braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.', vorher: systemfensterVergessen,
+    braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.',
     einrichten: (s, { beton }) => {
       s.stabmaterialien = [{
         ...structuredClone(katalog('neue_zeilen', 'stabmaterial')),
@@ -250,7 +242,6 @@ const SYSTEM = bauteil('balkensystem', {
       }];
     },
   }),
-  vergessen: systemfensterVergessen,
   editor: balkensystemEditor,
   fenster: balkensystemFenster,
 });
@@ -265,13 +256,11 @@ const DURCHSTANZEN = bauteil('durchstanzen', {
     .kurz[d.form].replace(/\{(\w+)\}/g, (_, k) => d[k]),
   anlegen: (a) => nachVorlage(a, 'neue_durchstanzstelle', {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
-    vorher: durchstanzfensterVergessen,
     einrichten: (d, { beton, betonstahl }) => {
       d.beton = beton.kennung;
       d.stahl = betonstahl.kennung;
     },
   }),
-  vergessen: durchstanzfensterVergessen,
   editor: durchstanzEditor,
 });
 

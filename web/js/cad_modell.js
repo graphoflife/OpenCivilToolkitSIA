@@ -51,6 +51,14 @@ export function auswahlTeil(schluessel) {
   return { kennung, i: i === undefined ? null : Number(i) };
 }
 
+/** Die Vorsilbe der Knoten: K1, K2 … -- in jeder Zeichnung dieselbe. */
+const KNOTEN = 'K';
+
+/** «Knoten K3»: ein Knoten heisst in jeder Zeichnung nach seiner Kennung -- für anderes null. */
+export function knotenname(kennung) {
+  return nummer(kennung, KNOTEN) === null ? null : `Knoten ${kennung}`;
+}
+
 /** Die Zahl hinter der Vorsilbe -- oder null. */
 function nummer(kennung, vorsilbe) {
   if (typeof kennung !== 'string' || !kennung.startsWith(vorsilbe)) return null;
@@ -127,7 +135,7 @@ export function cadModell({ arten, achsen, verbunden = false }) {
 
   function naechsteKennung(z, vorsilbe) {
     let groesste = 0;
-    const listen = vorsilbe === 'K' ? [z.knoten || []]
+    const listen = vorsilbe === KNOTEN ? [z.knoten || []]
       : arten.filter((x) => x.vorsilbe === vorsilbe).map((x) => z[x.liste] || []);
     for (const liste of listen) {
       for (const e of liste) groesste = Math.max(groesste, nummer(e.kennung, vorsilbe) ?? 0);
@@ -140,7 +148,7 @@ export function cadModell({ arten, achsen, verbunden = false }) {
     const [u, w] = [rund(p[0]), rund(p[1])];
     const da = (z.knoten || []).find((k) => k[a] === u && k[b] === w);
     if (da) return da.kennung;
-    const kennung = naechsteKennung(z, 'K');
+    const kennung = naechsteKennung(z, KNOTEN);
     z.knoten = z.knoten || [];
     z.knoten.push({ kennung, [a]: u, [b]: w });
     return kennung;
@@ -261,7 +269,7 @@ export function cadModell({ arten, achsen, verbunden = false }) {
         bewegt.add(k);
         continue;
       }
-      const eigener = { ...k, kennung: naechsteKennung(z, 'K') };
+      const eigener = { ...k, kennung: naechsteKennung(z, KNOTEN) };
       z.knoten.push(eigener);
       ecke.forEach((x) => verweisSetzen(x.art, x.e, x.i, eigener.kennung));
       bewegt.add(eigener);

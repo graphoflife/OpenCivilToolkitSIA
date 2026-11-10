@@ -17,12 +17,13 @@
  * wie weit ihr Schatten reicht und ob sie gültig ist, sagt der Kern.
  */
 
+import { cadApp, lagefelder, umrissVon } from './cad_app.js';
 import { nachBild, nachWelt } from './cad_ansicht.js';
-import { cadBereich, cadFenster, cadVergessen } from './cad_fenster.js';
-import { auswahlTeil } from './cad_modell.js';
-import { el, zahlfeld } from './dom.js';
+import { cadBereich } from './cad_fenster.js';
+import { auswahlTeil, knotenname } from './cad_modell.js';
+import { el } from './dom.js';
 import { aussparungTeile, grundrissTeile, grundrissUmfang } from './ds_grundriss.js';
-import { aendern, eintragAendern, eintragVon, zustand } from './zustand.js';
+import { eintragVon, zustand } from './zustand.js';
 
 /** Eine Art: die Aussparung, eine Fläche aus Knoten. */
 const ARTEN = [{ liste: 'aussparungen', form: 'flaeche', vorsilbe: 'A', rang: 0 }];
@@ -48,31 +49,18 @@ function situationVon(kennung) {
 
 /** Das Zeichenfenster einer Stelle, samt einer Zeile darunter. Die Tafel ruft das bei jedem Neubau. */
 export function zeichenbereich(stelle) {
-  return cadBereich(fensterVon(stelle.kennung), [el('p.cad-hinweis-klein', {
+  return cadBereich(STELLEN.fensterVon(stelle.kennung), [el('p.cad-hinweis-klein', {
     text: 'Ausgezogen, was vom Nachweisschnitt zählt; gestrichelt, was nicht zählt. '
       + 'Der Schnitt kommt aus der letzten Rechnung.',
   })]);
 }
 
-function fensterVon(kennung) {
-  return cadFenster(`ds:${kennung}`, () => adapter(kennung));
-}
-
-/** Für eine neu angelegte Stelle: nichts von einer früheren mit derselben Kennung. */
-export function fensterVergessen(kennung) {
-  cadVergessen(`ds:${kennung}`);
-}
-
+/** Was der Adapter einer Stelle über die gemeinsame Grundlage hinaus weiss (cad_app.js). */
 function adapter(kennung) {
-  const projekt = zustand.projekt;
   return {
     einstellung: EINSTELLUNG,
     achsen: ['x', 'y'],
     arten: ARTEN,
-    gilt: () => zustand.projekt === projekt,
-    zeichnung: () => eintragVon(kennung),
-    schreiben: (veraenderer) => eintragAendern(kennung, veraenderer),
-    tafelNeu: () => aendern({}, 'zeichnung'),
     name: elementname,
     neuText: (a, werkzeug) => (werkzeug === 'aussparung' ? 'Aussparung' : 'Hilfspunkt'),
     // Ein Hilfspunkt ist der Knoten selbst und legt nichts an.
@@ -89,11 +77,12 @@ function adapter(kennung) {
   };
 }
 
+/** Die Zeichenfenster der Durchstanzstellen, je Kennung eines. */
+const STELLEN = cadApp('ds', adapter);
+
 /** «Aussparung A1», «Knoten K3». */
 function elementname(a, kennung) {
-  if (/^K\d+$/.test(kennung)) return `Knoten ${kennung}`;
-  if (/^A\d+$/.test(kennung)) return `Aussparung ${kennung}`;
-  return kennung;
+  return knotenname(kennung) ?? (/^A\d+$/.test(kennung) ? `Aussparung ${kennung}` : kennung);
 }
 
 /**
@@ -121,25 +110,7 @@ function umriss(kennung) {
   const s = situationVon(kennung);
   const punkte = (eintragVon(kennung)?.knoten || []).map((k) => [k.x, k.y]);
   if (s) punkte.push(...grundrissUmfang(s));
-  if (!punkte.length) return [[-1000, -1000], [1000, 1000]];
-  const xs = punkte.map((p) => p[0]);
-  const ys = punkte.map((p) => p[1]);
-  return [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]];
-}
-
-function zeile(beschriftung, eingabe) {
-  return el('label.cad-zeile', {}, [el('span', { text: beschriftung }), eingabe, el('span', { text: 'mm' })]);
-}
-
-/** Zwei Felder für die Lage eines Punktes; geändert wird nur, was gewählt ist. */
-function lagefelder(a, p, schluessel) {
-  const setzen = (achse) => (w) => a.aendern((zz) => {
-    a.modell.verschieben(zz, new Set([schluessel]), achse === 0 ? [w - p[0], 0] : [0, w - p[1]]);
-  });
-  return [
-    zeile('x', zahlfeld({ wert: p[0], schritt: a.raster, beiAenderung: setzen(0) })),
-    zeile('y', zahlfeld({ wert: p[1], schritt: a.raster, beiAenderung: setzen(1) })),
-  ];
+  return umrissVon(punkte, [[-1000, -1000], [1000, 1000]]);
 }
 
 /**

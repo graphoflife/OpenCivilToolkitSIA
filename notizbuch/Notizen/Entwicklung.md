@@ -44,6 +44,26 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Oberfläche: eine Grundlage für die Zeichenfenster
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 3. Für den Benutzer ändert
+sich nichts.
+
+Querschnittsanalyse, Balkensystem und Durchstanzen haben je ein
+Zeichenfenster, und jedes trug denselben Adapter: das Fenster je Kennung
+und sein Vergessen, ob es noch gilt, Lesen und Schreiben des Eintrags, das
+Wählen von aussen, die Liste unter dem Fenster mit ihrer Markierung, den
+Titel mit den Meldungen des Kerns, die Lagefelder eines Punktes, den Umriss
+für «Alles zeigen» und den Namen eines Knotens. Das steht jetzt einmal in
+`cad_app.js` (`cadApp`, `cadBereichMitListe`, `cadZeile`, `lagefelder`,
+`umrissVon`, `mitTitel`) und in `cad_modell.js` (`knotenname`); die Apps
+geben nur dazu, was sie selbst wissen. Ein Zeichenfenster vergisst seine
+Kennung jetzt mit `ansichtVergessen` -- die drei Haken `vergessen` in
+apps.js sind weg. Zwischen den Adaptern der Analyse und des Systems sind
+statt rund 150 nur noch Abschnittsüberschriften gleich.
+
+---
+
 ## 2026-11-10 · Oberfläche: Katalog, Fassung und Ansichten
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 7.

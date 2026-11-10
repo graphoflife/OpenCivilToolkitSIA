@@ -46,10 +46,13 @@
 import { api } from './api.js';
 import { eigenschaften, neuEigenschaften, vorgabeMaterial } from './bs_eigenschaften.js';
 import { nachBild, zahlText } from './cad_ansicht.js';
-import { imSpiel } from './cad_auswahl.js';
-import { cadBereich, cadFenster, cadVergessen, cadWaehlen } from './cad_fenster.js';
+import {
+  cadApp, cadBereichMitListe, listeZeichnen, mitTitel, umrissVon,
+} from './cad_app.js';
 import { NAEHE } from './cad_eingabe.js';
-import { abstand, aufStrecke, innen } from './cad_modell.js';
+import {
+  abstand, aufStrecke, innen, knotenname,
+} from './cad_modell.js';
 import {
   GROESSE, faserSymbol, gelenkSymbol, imBild, kraftpfeil, lagerSymbol, linienlagerSymbol,
   momentSymbol, streckenlast, streckenmoment, unbestimmtSymbol,
@@ -61,7 +64,7 @@ import {
   auswahl, el, melden, svgEl,
 } from './dom.js';
 import {
-  aendern, ausVorlage, eintragAendern, eintragVon, katalog, zustand,
+  aendern, ausVorlage, eintragVon, katalog, zustand,
 } from './zustand.js';
 
 /**
@@ -100,33 +103,22 @@ const EINSTELLUNG = {
  * das bei jedem Neubau -- dann fragt es auch den Kern, wenn sich nicht die
  * Zeichnung geändert hat, aber ein Querschnitt oder Material.
  */
-export function zeichenbereich(system, uebersichtBauen) {
+export function zeichenbereich(system, listeBauen) {
   const a = fensterVon(system.kennung);
-  const unten = el('div.qa-uebersicht-huelle');
-  a.bs.uebersichtKnoten = unten;
-  a.bs.uebersichtBauen = uebersichtBauen;
-  const bereich = cadBereich(a, [unten]);
+  const bereich = cadBereichMitListe(a, listeBauen);
   uebersichtHolen(a);
-  uebersichtZeichnen(a);
   lastfallLeiste(a);
   return bereich;
 }
 
-export function fensterVon(kennung) {
-  const a = cadFenster(`bs:${kennung}`, () => adapter(kennung));
-  a.bs = a.adapter.bs;
-  return a;
-}
-
-/** Für ein neu angelegtes System: nichts von einem früheren mit derselben Kennung. */
-export function fensterVergessen(kennung) {
-  cadVergessen(`bs:${kennung}`);
-}
-
-/** Wählt Elemente von aussen -- aus der Liste oder einer Meldung. */
-export function waehlen(kennung, kennungen) {
-  cadWaehlen(fensterVon(kennung), kennungen);
-}
+/**
+ * Die Zeichenfenster der Systeme, je Kennung eines (cad_app.js). Was das
+ * System an der Ansicht braucht -- Vorgaben, Antwort des Kerns, Lastfall --,
+ * hängt als `a.bs` am Fenster.
+ */
+const SYSTEME = cadApp('bs', adapter, (a) => { a.bs = a.adapter.bs; });
+const fensterVon = SYSTEME.fensterVon;
+export const waehlen = SYSTEME.waehlen;
 
 /**
  * Die Wahl des Lastfalls gleich neben dem Werkzeug «Last» (Benutzer,
@@ -145,19 +137,6 @@ function lastfallLeiste(a) {
     titel: 'Dessen Lasten zeigt und bearbeitet die Zeichnung',
     beiAenderung: (w) => lastfallWaehlen(a, w),
   }));
-}
-
-function uebersichtZeichnen(a) {
-  const ziel = a.bs.uebersichtKnoten;
-  if (ziel && a.bs.uebersichtBauen) ziel.replaceChildren(...a.bs.uebersichtBauen(a));
-}
-
-/** Markiert in der Liste, was im Fenster gewählt ist -- ohne sie neu zu bauen. */
-function auswahlMarkieren(a) {
-  const spiel = imSpiel(a);
-  for (const z of a.bs.uebersichtKnoten?.querySelectorAll('[data-kennung]') || []) {
-    z.classList.toggle('ist-gewaehlt', spiel.has(z.dataset.kennung));
-  }
 }
 
 // ===========================================================================
@@ -181,8 +160,8 @@ function vorgabenNeu(system) {
   };
 }
 
+/** Was der Adapter eines Systems über die gemeinsame Grundlage hinaus weiss (cad_app.js). */
 function adapter(kennung) {
-  const projekt = zustand.projekt;
   const bs = {
     kennung, vorgaben: vorgabenNeu(eintragVon(kennung)), uebersicht: null, gefragt: null,
     lastfall: null,
@@ -192,10 +171,6 @@ function adapter(kennung) {
     einstellung: EINSTELLUNG,
     achsen: ['x', 'z'],
     arten: ARTEN,
-    gilt: () => zustand.projekt === projekt,
-    zeichnung: () => eintragVon(kennung),
-    schreiben: (veraenderer) => eintragAendern(kennung, veraenderer),
-    tafelNeu: () => aendern({}, 'zeichnung'),
     leisteZusatz: () => {
       bs.lastfallHuelle = el('span.bs-lastfallwahl');
       return bs.lastfallHuelle;
@@ -218,7 +193,6 @@ function adapter(kennung) {
     },
     umriss: () => umriss(eintragVon(kennung)),
     geaendert: uebersichtHolen,
-    gezeichnet: auswahlMarkieren,
     eigenschaften,
     neuEigenschaften,
     teilen: (a, kennungen) => kernBearbeiten(a, kennungen
@@ -233,7 +207,7 @@ function adapter(kennung) {
 /** Wie ein Element heisst: nach seiner Kennung, mit der Art davor. */
 export function elementname(a, kennung) {
   if (!kennung) return '';
-  if (/^K\d+$/.test(kennung)) return `Knoten ${kennung}`;
+  if (knotenname(kennung)) return knotenname(kennung);
   if (/^L\d+$/.test(kennung)) {
     const l = eintragVon(a.bs.kennung)?.linien.find((x) => x.kennung === kennung);
     return `${l?.querschnitt ? 'Stab' : 'Linie'} ${kennung}`;
@@ -377,11 +351,7 @@ function lastenRahmen(a) {
 
 /** Was im Bild sein soll: alle Knoten -- sonst ein Feld von 6 × 4 m. */
 function umriss(system) {
-  const k = system?.knoten || [];
-  if (!k.length) return [[0, 0], [6, 4]];
-  const xs = k.map((x) => x.x);
-  const zs = k.map((x) => x.z);
-  return [[Math.min(...xs), Math.min(...zs)], [Math.max(...xs), Math.max(...zs)]];
+  return umrissVon((system?.knoten || []).map((k) => [k.x, k.z]), [[0, 0], [6, 4]]);
 }
 
 // ===========================================================================
@@ -403,14 +373,14 @@ function uebersichtHolen(a) {
     if (a.bs.gefragt !== jetzt) return;
     a.bs.uebersicht = { ...antwort.uebersicht, fassung: jetzt };
     a.neuZeichnen();
-    uebersichtZeichnen(a);
+    listeZeichnen(a);
   }).catch((fehler) => {
     if (a.bs.gefragt !== jetzt) return;
     // Ein Verweis, den es nicht gibt, hält das ganze Projekt auf -- dann
     // steht der Satz des Kerns unter der Zeichnung.
     a.bs.uebersicht = { fehler: fehler.message, meldungen: [], fassung: jetzt };
     a.neuZeichnen();
-    uebersichtZeichnen(a);
+    listeZeichnen(a);
   });
 }
 
@@ -454,15 +424,6 @@ function meldungenJe(u) {
     for (const k of m.elemente) je.set(k, [...(je.get(k) || []), m]);
   }
   return je;
-}
-
-function mitTitel(knoten, texte) {
-  if (texte?.length) {
-    const t = svgEl('title');
-    t.textContent = texte.join('\n');
-    knoten.append(t);
-  }
-  return knoten;
 }
 
 // ===========================================================================

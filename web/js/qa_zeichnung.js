@@ -34,15 +34,18 @@ import { sinnbild } from './sinnbilder.js';
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
-import { imSpiel } from './cad_auswahl.js';
-import { cadBereich, cadFenster, cadVergessen, cadWaehlen } from './cad_fenster.js';
-import { abstand, auswahlTeil, eckeSchluessel } from './cad_modell.js';
+import {
+  cadApp, cadBereichMitListe, cadZeile, lagefelder, listeZeichnen, mitTitel, umrissVon,
+} from './cad_app.js';
+import {
+  abstand, auswahlTeil, eckeSchluessel, knotenname,
+} from './cad_modell.js';
 import { vorlageOeffnen } from './qa_vorlagen.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import {
-  aendern, ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, materialien, zustand,
+  aendern, ausVorlage, eintragVon, feldangabe, katalog, materialien, zustand,
 } from './zustand.js';
 
 /**
@@ -100,32 +103,18 @@ const LINIE_VON = { bewehrung: 'stablinien', schubwand: 'schubwaende', hilfslini
  * Das Zeichenfenster einer Analyse, samt der Liste darunter. Die Tafel ruft
  * das bei jedem Neubau.
  */
-export function zeichenbereich(analyse, uebersichtBauen) {
-  const a = fensterVon(analyse.kennung);
-  const unten = el('div.qa-uebersicht-huelle');
-  a.qa.uebersichtKnoten = unten;
-  a.qa.uebersichtBauen = uebersichtBauen;
-  const bereich = cadBereich(a, [unten]);
-  uebersichtZeichnen(a);
-  return bereich;
+export function zeichenbereich(analyse, listeBauen) {
+  return cadBereichMitListe(fensterVon(analyse.kennung), listeBauen);
 }
 
-function fensterVon(kennung) {
-  const a = cadFenster(`qa:${kennung}`, () => adapter(kennung));
-  // Was die Analyse an der Ansicht braucht: Vorgaben, Antwort des Kerns, Namen.
-  a.qa = a.adapter.qa;
-  return a;
-}
-
-/** Für eine neu angelegte Analyse: nichts von einer früheren mit derselben Kennung. */
-export function fensterVergessen(kennung) {
-  cadVergessen(`qa:${kennung}`);
-}
-
-/** Wählt Elemente von aussen -- aus der Liste oder einer Meldung. */
-export function waehlen(kennung, kennungen) {
-  cadWaehlen(fensterVon(kennung), kennungen);
-}
+/**
+ * Die Zeichenfenster der Analysen, je Kennung eines (cad_app.js). Was die
+ * Analyse an der Ansicht braucht -- Vorgaben, Antwort des Kerns, Namen --,
+ * hängt als `a.qa` am Fenster.
+ */
+const ANALYSEN = cadApp('qa', adapter, (a) => { a.qa = a.adapter.qa; });
+const fensterVon = ANALYSEN.fensterVon;
+export const waehlen = ANALYSEN.waehlen;
 
 /**
  * Die Materialien, auf die die Analyse zeigt, wie der Kern sie zählt
@@ -150,19 +139,6 @@ export function passendeGeometrie(a) {
   return null;
 }
 
-function uebersichtZeichnen(a) {
-  const ziel = a.qa.uebersichtKnoten;
-  if (ziel && a.qa.uebersichtBauen) ziel.replaceChildren(...a.qa.uebersichtBauen(a));
-}
-
-/** Markiert in der Liste, was im Fenster gewählt ist -- ohne sie neu zu bauen. */
-function auswahlMarkieren(a) {
-  const spiel = imSpiel(a);
-  for (const z of a.qa.uebersichtKnoten?.querySelectorAll('[data-kennung]') || []) {
-    z.classList.toggle('ist-gewaehlt', spiel.has(z.dataset.kennung));
-  }
-}
-
 // ===========================================================================
 // Der Adapter
 // ===========================================================================
@@ -185,8 +161,8 @@ function vorgabenNeu() {
   };
 }
 
+/** Was der Adapter einer Analyse über die gemeinsame Grundlage hinaus weiss (cad_app.js). */
 function adapter(kennung) {
-  const projekt = zustand.projekt;
   const qa = {
     kennung, vorgaben: vorgabenNeu(), geometrie: null, gefragt: null,
   };
@@ -195,10 +171,6 @@ function adapter(kennung) {
     einstellung: { werkzeuge: WERKZEUGE },
     achsen: ['y', 'z'],
     arten: ARTEN,
-    gilt: () => zustand.projekt === projekt,
-    zeichnung: () => eintragVon(kennung),
-    schreiben: (veraenderer) => eintragAendern(kennung, veraenderer),
-    tafelNeu: () => aendern({}, 'zeichnung'),
     name: elementname,
     neuText: (a, werkzeug) => neuText(a.qa, werkzeug),
     punktAnlegen,
@@ -221,7 +193,6 @@ function adapter(kennung) {
     },
     umriss: () => umriss(eintragVon(kennung)),
     geaendert: geometrieHolen,
-    gezeichnet: auswahlMarkieren,
     eigenschaften,
     neuEigenschaften,
     aktionen,
@@ -232,8 +203,7 @@ function adapter(kennung) {
 /** Der Name eines Elements, wie er im Bericht steht -- vom Kern. Knoten heissen nach ihrer Kennung. */
 export function elementname(a, kennung) {
   if (!kennung) return '';
-  if (/^K\d+$/.test(kennung)) return `Knoten ${kennung}`;
-  return a.qa.namen?.get(kennung) || kennung;
+  return knotenname(kennung) ?? (a.qa.namen?.get(kennung) || kennung);
 }
 
 export function stoffname(kennung) {
@@ -280,11 +250,7 @@ function flaecheAnlegen(a, z, knoten) {
 
 /** Was im Bild sein soll: alle Knoten -- sonst ein Meter im Quadrat. */
 function umriss(analyse) {
-  const k = analyse?.knoten || [];
-  if (!k.length) return [[0, 0], [1000, 1000]];
-  const ys = k.map((x) => x.y);
-  const zs = k.map((x) => x.z);
-  return [[Math.min(...ys), Math.min(...zs)], [Math.max(...ys), Math.max(...zs)]];
+  return umrissVon((analyse?.knoten || []).map((k) => [k.y, k.z]), [[0, 0], [1000, 1000]]);
 }
 
 // ===========================================================================
@@ -311,7 +277,7 @@ function geometrieHolen(a) {
     }
     a.qa.namen = namen;
     a.neuZeichnen();
-    uebersichtZeichnen(a);
+    listeZeichnen(a);
     // Ein offenes Fenster zeigt vielleicht, was erst jetzt feststeht: die
     // Materialien der Werkstoffwahl (`materialienVon`).
     if (zustand.fenster && zustand.auswahl?.kennung === a.qa.kennung) aendern({}, 'fenster');
@@ -327,15 +293,6 @@ function fehlerhafte(g) {
     for (const k of m.elemente) je.set(k, [...(je.get(k) || []), m.text]);
   }
   return je;
-}
-
-function mitMeldung(knoten, texte) {
-  if (texte?.length) {
-    const t = svgEl('title');
-    t.textContent = texte.join('\n');
-    knoten.append(t);
-  }
-  return knoten;
 }
 
 // ===========================================================================
@@ -420,7 +377,7 @@ function zeichnen(a, g) {
   for (const f of flaechen) {
     const punkte = f.knoten.map(ort);
     if (punkte.length < 2 || punkte.some((p) => !p)) continue;
-    g.append(mitMeldung(svgEl('path', {
+    g.append(mitTitel(svgEl('path', {
       d: pfad(a.v, punkte), class: klassen(f.kennung, f.material ? 'cad-beton' : 'cad-loch'),
     }), fehler.get(f.kennung)));
   }
@@ -442,7 +399,7 @@ function zeichnen(a, g) {
     if (!p || !q) continue;
     const ecken = band(p, q, Math.max(w.dicke, 0));
     if (ecken) {
-      g.append(mitMeldung(svgEl('path', { d: pfad(a.v, ecken), class: klassen(w.kennung, 'cad-wand') }),
+      g.append(mitTitel(svgEl('path', { d: pfad(a.v, ecken), class: klassen(w.kennung, 'cad-wand') }),
         fehler.get(w.kennung)));
     }
     g.append(svgEl('path', { d: pfad(a.v, [p, q], false), class: klassen(w.kennung, 'cad-wandachse') }));
@@ -458,7 +415,7 @@ function zeichnen(a, g) {
     const [p, q] = [ort(l.von), ort(l.bis)];
     if (!p || !q) continue;
     const flaechig = l.art === 'flaeche';
-    g.append(mitMeldung(svgEl('path', {
+    g.append(mitTitel(svgEl('path', {
       d: pfad(a.v, [p, q], false),
       class: klassen(l.kennung, flaechig ? 'cad-linie-flaeche' : 'cad-linie'),
     }), fehler.get(l.kennung)));
@@ -480,7 +437,7 @@ function zeichnen(a, g) {
 
   for (const s of z.staebe) {
     const p = ort(s.knoten);
-    if (p) g.append(mitMeldung(stabKreis(a, p, s.durchmesser, klassen(s.kennung, 'cad-stab')), fehler.get(s.kennung)));
+    if (p) g.append(mitTitel(stabKreis(a, p, s.durchmesser, klassen(s.kennung, 'cad-stab')), fehler.get(s.kennung)));
   }
 
   const masse = masseZeichnen(a, z, ort);
@@ -544,12 +501,6 @@ function linienVorschau(a, g, p, q, werkzeug) {
 // Felder im schwebenden Fenster
 // ===========================================================================
 
-function zeile(beschriftung, eingabe, einheit = '') {
-  return el('label.cad-zeile', {}, [
-    el('span', { text: beschriftung }), eingabe, einheit ? el('span.einheit', { text: einheit }) : el('span'),
-  ]);
-}
-
 function materialwahl(art, gewaehlt, setzen, mitLoch = false) {
   return auswahl({
     werte: [
@@ -575,12 +526,12 @@ function felderVon(liste, werte, setzen, info = null) {
     wert: werte[feld], titel, schritt: 1, min: 0, ...optionen,
     beiAenderung: (w) => setzen(feld, w),
   });
-  const stahl = () => zeile('Stahl', materialwahl('betonstahl', werte.stahl, (w) => setzen('stahl', w)));
+  const stahl = () => cadZeile('Stahl', materialwahl('betonstahl', werte.stahl, (w) => setzen('stahl', w)));
   const haken = (text, feld) => el('div.cad-zeile', {}, [
     el('span', { text }), hakenSchalter(werte[feld] !== false, (w) => setzen(feld, w), text), el('span'),
   ]);
   if (liste === 'staebe') {
-    return [zeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm'), stahl()];
+    return [cadZeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm'), stahl()];
   }
   if (liste === 'stablinien') {
     const arten = katalog('querschnittsanalyse', 'linienarten');
@@ -604,15 +555,15 @@ function felderVon(liste, werte, setzen, info = null) {
         gewaehlt: werte.verschmiert, setzen: (w) => setzen('verschmiert', w),
         titel: 'Wie die Stahlfläche angegeben ist', klasse: '.cad-wahl',
       }) : null,
-      art === 'flaeche' && !ausStaeben ? zeile('A_s', zahl('flaeche', 'Stahlfläche der ganzen Linie', { schritt: 100 }), 'mm²') : null,
-      art === 'anzahl' ? zeile('n', zahl('anzahl', 'Anzahl Stäbe', { min: 1 })) : null,
-      art === 'teilung' ? zeile('s', zahl('teilung', 'Gewünschte Teilung', { schritt: 25, min: 1 }), 'mm') : null,
-      art !== 'flaeche' || ausStaeben ? zeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm') : null,
-      ausStaeben ? zeile('s', zahl('teilung', 'Abstand der Stäbe', { schritt: 25, min: 1 }), 'mm') : null,
-      ausStaeben ? zeile('L', zahl('laenge', 'Länge, über die die Stäbe liegen -- leer: die der Linie', {
+      art === 'flaeche' && !ausStaeben ? cadZeile('A_s', zahl('flaeche', 'Stahlfläche der ganzen Linie', { schritt: 100 }), 'mm²') : null,
+      art === 'anzahl' ? cadZeile('n', zahl('anzahl', 'Anzahl Stäbe', { min: 1 })) : null,
+      art === 'teilung' ? cadZeile('s', zahl('teilung', 'Gewünschte Teilung', { schritt: 25, min: 1 }), 'mm') : null,
+      art !== 'flaeche' || ausStaeben ? cadZeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm') : null,
+      ausStaeben ? cadZeile('s', zahl('teilung', 'Abstand der Stäbe', { schritt: 25, min: 1 }), 'mm') : null,
+      ausStaeben ? cadZeile('L', zahl('laenge', 'Länge, über die die Stäbe liegen -- leer: die der Linie', {
         schritt: 100, leer: null, platzhalter: 'Linie',
       }), 'mm') : null,
-      ausStaeben ? zeile('A_s', zahlfeld({
+      ausStaeben ? cadZeile('A_s', zahlfeld({
         wert: info?.punkte ? Math.round(info.flaeche) : null, readonly: true,
         titel: 'Die verschmierte Stahlfläche L/s · π⌀²/4 -- vom Kern gerechnet',
       }), 'mm²') : null,
@@ -624,10 +575,10 @@ function felderVon(liste, werte, setzen, info = null) {
   if (liste === 'schubwaende') {
     const schnitte = katalog('querschnittsanalyse', 'schnitte');
     return [
-      zeile('b_w', zahl('dicke', 'Dicke der Schubwand', { schritt: 10, min: 1 }), 'mm'),
-      zeile('Bügel ⌀', zahl('durchmesser', 'Bügeldurchmesser; 0: ohne Bügel', { stufen: durchmesser }), 'mm'),
-      zeile('s', zahl('teilung', 'Bügelteilung in Längsrichtung', { schritt: 25, min: 1 }), 'mm'),
-      zeile('Schnitte', zahl('schnitte', 'Wie viele Bügelschenkel die Wand kreuzen', {
+      cadZeile('b_w', zahl('dicke', 'Dicke der Schubwand', { schritt: 10, min: 1 }), 'mm'),
+      cadZeile('Bügel ⌀', zahl('durchmesser', 'Bügeldurchmesser; 0: ohne Bügel', { stufen: durchmesser }), 'mm'),
+      cadZeile('s', zahl('teilung', 'Bügelteilung in Längsrichtung', { schritt: 25, min: 1 }), 'mm'),
+      cadZeile('Schnitte', zahl('schnitte', 'Wie viele Bügelschenkel die Wand kreuzen', {
         min: schnitte[0], max: schnitte.at(-1), angabe: { ganz: true },
       })),
       stahl(),
@@ -635,8 +586,8 @@ function felderVon(liste, werte, setzen, info = null) {
   }
   if (liste === 'flaechen') {
     return [
-      zeile('Material', materialwahl('beton', werte.material, (w) => setzen('material', w), true)),
-      zeile('c', zahl('ueberdeckung', 'Überdeckung c: das Polygon erscheint so weit nach innen gerückt '
+      cadZeile('Material', materialwahl('beton', werte.material, (w) => setzen('material', w), true)),
+      cadZeile('c', zahl('ueberdeckung', 'Überdeckung c: das Polygon erscheint so weit nach innen gerückt '
         + '-- eine Aussparung nach aussen --, mit Ecken zum Fangen. 0: nicht. Rechnet nicht mit.', {
         schritt: 5, angabe: feldangabe('flaeche', 'ueberdeckung'),
       }), 'mm'),
@@ -720,16 +671,10 @@ function eckenEigenschaften(a, z, teile) {
   const da = finden(z, kennung);
   const p = da && a.modell.lagen(z).get(a.modell.verweise(a.modell.artVon.get(da.liste), da.e)[i]);
   if (!p) return { titel: '', inhalt: [] };
-  const schluessel = [...a.auswahl][0];
-  const lageSetzen = (achse) => (w) => a.aendern((zz) => {
-    const d = achse === 0 ? [w - p[0], 0] : [0, w - p[1]];
-    a.modell.verschieben(zz, new Set([schluessel]), d);
-  });
   return {
     titel: `${elementname(a, kennung)} · ${eckeName(da.liste, i)}`,
     inhalt: [
-      zeile('y', zahlfeld({ wert: p[0], schritt: a.raster, beiAenderung: lageSetzen(0) }), 'mm'),
-      zeile('z', zahlfeld({ wert: p[1], schritt: a.raster, beiAenderung: lageSetzen(1) }), 'mm'),
+      ...lagefelder(a, p, [...a.auswahl][0]),
       el('p.cad-hinweis-klein', { text: 'Nur diese Ecke -- was sonst an diesem Punkt liegt, bleibt.' }),
     ],
   };
@@ -770,19 +715,10 @@ function eigenschaften(a) {
   else if (liste === 'knoten') titel = elementname(a, e.kennung);
 
   if (liste === 'knoten') {
-    const lageSetzen = (i) => (w) => a.aendern((zz) => {
-      const ziele = new Set(kennungen);
-      const k = zz.knoten.find((x) => ziele.has(x.kennung));
-      if (!k) return;
-      const d = i === 0 ? [w - k.y, 0] : [0, w - k.z];
-      a.modell.verschieben(zz, ziele, d);
-    });
     return {
       titel,
-      inhalt: mehrere ? [el('p.cad-hinweis-klein', { text: 'Mehrere Knoten: verschieben mit V.' })] : [
-        zeile('y', zahlfeld({ wert: e.y, schritt: a.raster, beiAenderung: lageSetzen(0) }), 'mm'),
-        zeile('z', zahlfeld({ wert: e.z, schritt: a.raster, beiAenderung: lageSetzen(1) }), 'mm'),
-      ],
+      inhalt: mehrere ? [el('p.cad-hinweis-klein', { text: 'Mehrere Knoten: verschieben mit V.' })]
+        : lagefelder(a, [e.y, e.z], e.kennung),
     };
   }
   const info = mehrere ? null : passendeGeometrie(a)?.linien?.find((x) => x.kennung === e.kennung);

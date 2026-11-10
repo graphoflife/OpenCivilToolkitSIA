@@ -91,17 +91,10 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 4, 6 und 7 am
-2026-11-10 (siehe [[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 3
-vor einem vierten Zeichenfenster und 5 vor der nächsten Bauteilart.
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3, 4, 6 und 7 am
+2026-11-10 (siehe [[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 5
+vor der nächsten Bauteilart.
 
-**Neu seit dem 2026-10-25, alles im Durchstanzen:**
-
-- [ ] **3. Der dritte Adapter des Zeichenfensters ist wieder kopiert**
-      (ds_zeichnung.js:44-147: `eintragVon`, `fensterVon`/`fensterVergessen`,
-      `gilt`/`zeichnung`/`schreiben`, Knotennamen, `umriss`, Lagefelder).
-      Damit steht der Punkt «Eine Grundlage für die Apps mit Zeichenfenster»
-      (2026-10-12) dreifach da. Vor einem vierten Zeichenfenster erledigen.
 **Im übrigen Repo, neu gefunden:**
 
 - [ ] **5. Eine Bauteilart ist an rund 15 Stellen verdrahtet, und sieben
@@ -301,15 +294,17 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 «Ein Steckbrief je Bauteilart», «Eingaben an einer Stelle prüfen» und
 «Ein Modell der Werkstoffgesetze» (siehe [[Entwicklung]]).
 
-- [ ] **Eine Grundlage für die Apps mit Zeichenfenster.** `bs_zeichnung.js`
-      ist aus `qa_zeichnung.js` kopiert, rund 150 Zeilen wortgleich bis auf
-      `a.qa`/`a.bs`, und läuft schon auseinander (Fehler des Kerns: kurze
-      Meldung gegen Text unter der Zeichnung). Dazu vier selbstgebaute
-      Zwischenspeicher für Nebenanfragen mit vier Fehlerregeln
-      (`bs_diagramme.js`, `qa_diagramme.js`, `app.js`, `bericht.js`).
-      Besser: `cadApp({…})` liefert Lesen, Schreiben, Fenster, Liste,
-      Markierung und eine `kernAntwort`; `nachgefragt(schluessel, holen)`
-      merkt sich Antworten bis zur nächsten Lösung.
+- [ ] **Eine Grundlage für die Nebenanfragen.** Die Zeichenfenster haben
+      seit 2026-11-10 eine (`cadApp` in `cad_app.js`: Lesen, Schreiben,
+      Fenster, Liste, Markierung, Vergessen). Offen ist der zweite Teil:
+      selbstgebaute Zwischenspeicher für Nebenanfragen mit eigenen
+      Fehlerregeln (`bs_diagramme.js`, `qa_diagramme.js`, `app.js`,
+      `bericht.js`). Die beiden Diagramme hängen seit 2026-11-10 an der
+      Fassung des Projekts und an `ansichtVon`, ihre Anfrage mit Uhr und
+      Verzug steht aber noch zweimal da; die Geometrie der Analyse und die
+      Übersicht des Systems fragen je auf ihre Art. Besser:
+      `nachgefragt(schluessel, holen)` merkt sich Antworten bis zur
+      nächsten Fassung.
 - [ ] **Keine Rechnung und keine Norm in der Oberfläche.** Beim
       Darüberfahren verbindet `bs_diagramme.js` zwei Proben gerade, obwohl
       der Kern den Wert genau kennt; Grenzwerte und grösste Durchbiegung
@@ -634,6 +629,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 3: eine Grundlage für die
+Apps mit Zeichenfenster (`cad_app.js`) -- Lesen, Schreiben, Fenster je
+Kennung, Wählen von aussen, Vergessen, die Liste darunter, Lagefelder,
+Umriss, Knotennamen ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 7: der Katalog über
 `katalog(…)`, das einen fehlenden Schlüssel mit seinem Pfad meldet, und ein
