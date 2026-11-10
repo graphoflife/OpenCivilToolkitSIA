@@ -22,7 +22,7 @@
 import { karte } from './bausteine.js';
 import { el, svgEl } from './dom.js';
 import {
-  BREITE, linie, mass, pfeil, schraffur, text, zahl,
+  BREITE, legende, linie, mass, pfeil, schraffur, text, textzeile, zahl,
 } from './gb_skizze.js';
 import { eintragVon, zustand } from './zustand.js';
 
@@ -208,28 +208,15 @@ function situationsbild(s, d) {
   return svg;
 }
 
-/** Die Zeilen unter dem Bild: der Punkt, die Setzung gegen die zulässige, was J zeigt. */
-function legende(s, d) {
-  const zeilen = [];
-  if (!d) {
-    zeilen.push('Noch nicht gerechnet.');
-  } else if (!d.lage) {
-    zeilen.push('Ohne Schicht keine Setzung.');
-  } else {
-    zeilen.push(d.punkt === 'Mitte'
-      ? 'Schlaff: gerechnet unter der Mitte – dort ist die Setzung am grössten (Kap. 8.10).'
-      : `Starr: gerechnet im Punkt K, ${zahl(d.lage[0], 2)} m längs L und ${zahl(d.lage[1], 2)} m `
-        + 'längs B von einer Ecke – seine Setzung ist die mittlere des Fundaments (Bild 8.15).');
-    zeilen.push(`s = s_W + s_E = ${zahl(d.s_W, 1)} + ${zahl(d.s_E, 1)} = ${zahl(d.s, 1)} mm `
-      + `${d.erfuellt ? '≤' : '>'} s_zul = ${zahl(d.s_zul, 1)} mm – `
-      + `${d.erfuellt ? 'erfüllt' : 'nicht erfüllt'}, α = ${d.grad}`);
-    zeilen.push("Die Linie zeigt J über die Tiefe: Δσ'_z = J · q. Am Fuss der untersten Schicht "
-      + `noch J = ${zahl(d.J_fuss, 3)}; darunter gilt der Baugrund als unzusammendrückbar.`);
-  }
+/**
+ * Die Zeilen unter dem Bild aus dem Kern: der Punkt, die Setzung gegen die
+ * zulässige, was J zeigt. Dazu, was nur das Bild weiss: wie es überhöht ist.
+ */
+function legendeVon(s, d) {
+  const zeilen = d ? [...d.legende] : [textzeile('Noch nicht gerechnet.')];
   const { ueberhoehung } = massstab(s);
-  if (ueberhoehung > 1.05) zeilen.push(`Tiefen ${zahl(ueberhoehung, 1)}-fach überhöht.`);
-  zeilen.push(`Länge des Fundaments L = ${zahl(s.L, 2)} m, senkrecht zum Schnitt.`);
-  return el('div.gb-legende', {}, zeilen.map((z) => el('p', { text: z })));
+  if (ueberhoehung > 1.05) zeilen.push(textzeile(`Tiefen ${zahl(ueberhoehung, 1)}-fach überhöht.`));
+  return legende(zeilen);
 }
 
 /** Die Karte einer Setzung im Reiter «Diagramme». Das Panel darum baut bericht.js. */
@@ -239,6 +226,6 @@ export function setzungKarten(kennung) {
   const d = zustand.loesung?.zeichendaten?.[kennung];
   return [karte('Situation', [
     el('div.gb-bildhuelle', {}, [situationsbild(s, d)]),
-    legende(s, d),
+    legendeVon(s, d),
   ], { klasse: 'ist-breit' })];
 }

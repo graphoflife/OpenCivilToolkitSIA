@@ -19,7 +19,7 @@
 
 import { karte } from './bausteine.js';
 import { el, svgEl } from './dom.js';
-import { BREITE, linie, text, zahl } from './gb_skizze.js';
+import { BREITE, legende, linie, text } from './gb_skizze.js';
 import { zustand } from './zustand.js';
 
 /** So hoch wird das Bild höchstens und mindestens, in px. */
@@ -160,50 +160,10 @@ function grundrissBild(s) {
   return svg;
 }
 
-/** Die Zeilen unter dem Bild: der Schnitt, was nicht zählt, Pilz und Bewehrung, das Ergebnis. */
-function legende(s) {
-  const { leisten: b, pilz } = s;
-  const zeilen = [
-    `Nachweisschnitt im Abstand d_v/2 = ${zahl(s.d_v / 2, 0)} mm um die gestützte Fläche; `
-      + `wirksam u = k_e · u_red = ${zahl(s.u, 0)} mm mit k_e = ${zahl(s.k_e, 2)}.`,
-    'Gestrichelt, was nicht zählt: weiter als 1.5·d_v von den Ecken grosser Stützen und entlang '
-      + 'von Wänden, und was hinter Aussparungen liegt.',
-  ];
-  if (!b && !pilz) {
-    zeilen.push(`V_d = ${zahl(s.V_d, 1)} kN ${s.erfuellt ? '≤' : '>'} V_Rd,c = ${zahl(s.V_Rd_c, 1)} kN – `
-      + `${s.erfuellt ? 'erfüllt' : 'nicht erfüllt'}, α = ${s.grad}.`);
-    return el('div.gb-legende', {}, zeilen.map((z) => el('p', { text: z })));
-  }
-  zeilen.push(`Ohne Bewehrung V_Rd,c = ${zahl(s.V_Rd_c, 1)} kN < V_d = ${zahl(s.V_d, 1)} kN.`);
-  if (pilz) {
-    zeilen.push(
-      `Stahlpilz: ${pilz.name}. Seine gestützte Fläche reicht bis an die Enden der Stege; der `
-        + `Schnitt um sie (violett) liegt d_v,P/2 = ${zahl(pilz.d_v / 2, 0)} mm weit aussen. Den `
-        + 'Widerstand des Pilzes selbst bestätigt der Hersteller.',
-      `Um den Pilz ohne Bewehrung: V_d,P = ${zahl(pilz.V_d, 1)} kN, `
-        + `V_Rd,c,P = ${zahl(pilz.V_Rd_c, 1)} kN.`,
-    );
-  }
-  if (b) {
-    zeilen.push(
-      `Durchstanzbewehrung: ${b.name}, Anker ⌀${zahl(b.durchmesser, 0)} im Abstand `
-        + `${b.abstaende.map((a) => zahl(a, 0)).join(' / ')} mm vom Rand `
-        + `${pilz ? 'des Pilzes' : 'der Stütze'}.`,
-      `Äusserer Schnitt (orange) im Abstand 0.5·d_v,out = ${zahl(b.d_v_out / 2, 0)} mm um die `
-        + `äussersten Anker: u_out = ${zahl(b.u_out, 0)} mm, V_d,out = ${zahl(b.V_d_out, 1)} kN, `
-        + `V_Rd,c,out = ${zahl(b.V_Rd_c_out, 1)} kN.`,
-      `V_Rd,s = ${zahl(b.V_Rd_s, 1)} kN, V_Rd,max = ${zahl(b.V_Rd_max, 1)} kN.`,
-    );
-  }
-  zeilen.push(`${s.erfuellt ? 'Alle Nachweise erfüllt' : 'Nicht alle Nachweise erfüllt'}, `
-    + `kleinstes α = ${s.grad}.`);
-  return el('div.gb-legende', {}, zeilen.map((z) => el('p', { text: z })));
-}
-
 /** Die Karte einer Durchstanzstelle im Reiter «Diagramme». Das Panel darum baut bericht.js. */
 export function durchstanzKarten(kennung) {
   const s = zustand.loesung?.zeichendaten?.[kennung];
   if (!s) return [karte('Grundriss', [el('p.karte-hinweis', { text: 'Noch nicht gerechnet.' })])];
-  return [karte('Grundriss', [el('div.gb-bildhuelle', {}, [grundrissBild(s)]), legende(s)],
+  return [karte('Grundriss', [el('div.gb-bildhuelle', {}, [grundrissBild(s)]), legende(s.legende)],
     { klasse: 'ist-breit' })];
 }

@@ -1,5 +1,5 @@
 ---
-erzeugt: 655696b5c81c
+erzeugt: 5ae82ed713d4
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,8 @@ Je Durchstanzstelle der Grundriss, wie der Kern ihn gerechnet hat, in mm:
 der Umriss der gestützten Fläche, die Plattenränder, die Aussparungen und
 der Nachweisschnitt -- je Stück, ob es zählt --, und wo es sie braucht, die
 Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
-Stegen und dem Schnitt um ihn, je für sich. Dazu die Zahlen der Legende.
+Stegen und dem Schnitt um ihn, je für sich. Dazu die Legende unter dem Bild
+([[opencivil.web.anzeige]]): die Schnitte mit ihren Zahlen und das Urteil.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises ([[opencivil.durchstanzen.nachweis]]).
 
@@ -52,32 +53,36 @@ def _linien(schnitt: Nachweisschnitt) -> list
 
 Die Stücke eines Schnitts fürs Bild, je mit der Angabe, ob es zählt.
 
-### _leisten
+### _legende
 
 ```python
-def _leisten(b: Optional[Leistenpruefung]) -> Optional[Dict[str, Any]]
+def _legende(befund: Durchstanzbefund, urteile) -> List[list]
 ```
 
-Die Leisten mit ihren Ankern, der äussere Schnitt um sie und ihre Zahlen -- in mm, kN.
+Die Zeilen unter dem Bild: der Schnitt und was von ihm nicht zählt; ohne
+Bewehrung der Vergleich mit seinem Urteil, sonst was ohne sie fehlt, der
+Pilz und die Leisten mit ihren Schnitten -- und das Urteil über alle.
 
-### _pilz
+### _kraft
 
 ```python
-def _pilz(b: Optional[Pilzbefund]) -> Optional[Dict[str, Any]]
+def _kraft(si_wert: float) -> str
 ```
 
-Der Stahlpilz mit seinen Stegen, seiner Fläche und dem Schnitt um sie -- in mm, kN.
+Eine Kraft der Legende: kN mit einer Stelle.
 
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
+- [[opencivil.core.latex]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.nachweis]]
-- [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.projekt]]
+- [[opencivil.web.anzeige]]
 
 ## Gebraucht von
 

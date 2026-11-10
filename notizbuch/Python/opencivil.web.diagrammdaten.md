@@ -1,5 +1,5 @@
 ---
-erzeugt: 99da880aab91
+erzeugt: 33893d1f378d
 art: modul
 tags: [modul]
 ---
@@ -92,35 +92,6 @@ Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt
 
 Gerechnet wird in [[opencivil.spannungsanalyse.analysen]]; hier wird
 nur in Zeichengroessen abgebildet.
-
-### _Groesse
-
-```python
-@dataclass(frozen=True)
-class _Groesse
-```
-
-Eine Groesse einer Linie, wie sie in den Zeichendaten steht: Zeichen und Einheit.
-
-- `zeichen: str`
-- `einheit: Einheit`
-- `latex: str = ''`
-- `stellen: int = 1`
-- `am_bezugsort: bool = False` – Ob sie an einem Ort des Querschnitts gilt -- die Mitteldehnung, nicht die Kruemmung.
-
-#### _Groesse.zahl
-
-```python
-def zahl(self, si: Optional[float]) -> Optional[float]
-```
-
-Ein Wert in SI, in der Einheit dieser Groesse.
-
-#### _Groesse.als_dict
-
-```python
-def als_dict(self) -> dict
-```
 
 ### liniengroessen
 
@@ -365,9 +336,9 @@ gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
 
 - `NEIGUNG_VON = 25` – Wie weit die Neigungskurve mindestens reicht, in Grad. Die beiden Grenzen des Benutzers liegen normalerweise darin; gehen sie darueber hinaus, waechst die Achse mit -- ein abgeschnittener Ast waere schlimmer als eine breite Achse.
 - `NEIGUNG_BIS = 45`
-- `_LINIENGROESSEN = {spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (_Groesse('M', KNM), _…` – Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die festgehaltene und die Verformung. Massstab und Beschriftung an einer Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
-- `_MODUL = _Groesse('E_eq', N_PRO_MM2, 'E_{eq}', 0)` – Der aequivalente Modul, ueber der laufenden Kraft.
-- `_RANDDEHNUNG = _Groesse('ε', PROMILLE, '\\varepsilon', 2)` – Die Randdehnungen beim Bruch.
+- `_LINIENGROESSEN = {spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (Anzeigegroesse('M', K…` – Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die festgehaltene und die Verformung. Massstab und Beschriftung an einer Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
+- `_MODUL = Anzeigegroesse('E_eq', N_PRO_MM2, 'E_{eq}', 0)` – Der aequivalente Modul, ueber der laufenden Kraft.
+- `_RANDDEHNUNG = Anzeigegroesse('ε', PROMILLE, '\\varepsilon', 2)` – Die Randdehnungen beim Bruch.
 
 ## Braucht
 
@@ -380,6 +351,7 @@ gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse]]
+- [[opencivil.web.anzeige]]
 
 ## Gebraucht von
 

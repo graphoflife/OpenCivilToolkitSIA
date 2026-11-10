@@ -422,7 +422,6 @@ class Setzung(Nachweis):
                                          ds_E=J * q_E * (z_u - z_o) / M_E))
                 J_o = J_u
             oben += d
-        mm = 1e3
         # Die M_E-Werte stehen je Schicht in der Tabelle danach -- hier hätten
         # sie die Tabelle breiter gemacht als die Tafel.
         p.tabelle(
@@ -431,7 +430,7 @@ class Setzung(Nachweis):
                   Mathe(r"\Delta s_W\ [\mathrm{mm}]"), Mathe(r"\Delta s_E\ [\mathrm{mm}]")],
             zeilen=[[f.schichten[t.schicht].name, Mathe(fest(t.z_o, 2)), Mathe(fest(t.z_u, 2)),
                      Mathe(fest(t.J_o, 3)), Mathe(fest(t.J_u, 3)), Mathe(fest(t.J, 3)),
-                     Mathe(fest(t.ds_W * mm, 2)), Mathe(fest(t.ds_E * mm, 2))]
+                     Mathe(fest(t.ds_W / MM.faktor, 2)), Mathe(fest(t.ds_E / MM.faktor, 2))]
                     for t in teile],
             titel="Setzung je Teilschicht", ausrichtung="lrrrrrrr")
         return teile

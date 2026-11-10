@@ -44,6 +44,35 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Die Anzeige: Einheiten an einer Stelle, Legenden aus dem Kern
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 10.
+
+**Für den Benutzer:** Unter den Bildern von Grundbruch, Setzung und
+Durchstanzen stehen die Zeichen jetzt als Formeln, wie in der Herleitung --
+vorher «N_Ed = 500.0 kN» als Text, jetzt N mit tiefgestelltem Ed und
+«500 kN», die Zahlen gerundet wie im Bericht. Der Gleitkörper heisst H_Gl
+und L_Gl wie in der Herleitung, nicht mehr H und L wie das Fundament. Beim
+Setzungsbild steht die Länge des Fundaments vor «Tiefen überhöht».
+
+**Die Legenden kommen aus dem Kern.** Bis dahin baute das JS sie aus den
+Zahlen der Zeichendaten, samt Vergleich, Urteil und Literaturstelle
+(«Kap. 8.10», «Bild 8.15»). Jetzt schreiben `grundbruchdaten`,
+`setzungsdaten` und `durchstanzdaten` die Zeilen, als Zellen aus Text und
+Formeln -- dieselben wie in den Tabellen der Herleitung --, und
+`gb_skizze.legende` setzt sie nur. In der Oberfläche bleibt, was nur sie
+weiss: dass noch nichts gerechnet ist, welche Kombination gezeigt wird und
+wie stark das Bild überhöht. Zahlen, die nur der Legende dienten, fallen
+aus den Zeichendaten weg.
+
+**Die Einheiten der Anzeige an einer Stelle** (`web/anzeige.py`): `zahl`
+rechnet von SI in eine Einheit des Kerns, `si` zurück; die Linien der
+Diagramme tragen ihre `Anzeigegroesse`. Bis dahin stand das auf drei Wegen
+da -- als Grösse nur für die Linien, sonst als nackte Faktoren `* 1e3`
+und `/ 1e6`, und `kN = 1e-3` in den Bildern hiess das Gegenteil von
+`kN = 1e3` beim Bauen. Wo der Kern selbst umrechnet, heisst der Faktor
+jetzt nach der Einheit (`KN.faktor`, `MM.faktor`).
+
 ## 2026-11-10 · Je Seite eine Lage: eine Regel für Löser und Handrechnung
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 9. An den Zahlen ändert

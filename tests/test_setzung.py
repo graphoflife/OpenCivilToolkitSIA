@@ -266,10 +266,15 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         self.assertEqual(s["lage"], [K * 2.5, K * 2.0])
         self.assertEqual([x["name"] for x in s["schichten"]],
                          ["Kies, sandig", "Silt, tonig", "Moräne"])
-        self.assertAlmostEqual(s["s"], sum(x["s"] for x in s["schichten"]), places=9)
         self.assertEqual(s["linie"][0], [0.0, 1.0])
         self.assertAlmostEqual(s["linie"][-1][0], 9.0)
-        self.assertTrue(s["erfuellt"])
+        # Die Legende aus dem Kern: der Punkt, die Setzung mit ihrem Urteil,
+        # was J zeigt, die Länge.
+        zeilen = ["".join(z.get("text") or z["mathe"] for z in zeile) for zeile in s["legende"]]
+        self.assertTrue(zeilen[0].startswith("Starr: gerechnet im Punkt K"))
+        self.assertIn(r"\le s_{zul} = 25\,\mathrm{mm} – erfüllt", zeilen[1])
+        self.assertIn("J = ", zeilen[2])
+        self.assertTrue(zeilen[3].startswith("Länge des Fundaments L = 2.5"))
 
     def test_zusammenfassung_mit_den_schichten(self):
         p = Projekt.beispiel()

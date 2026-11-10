@@ -17,7 +17,7 @@
 import { karte } from './bausteine.js';
 import { auswahl, el, svgEl } from './dom.js';
 import {
-  BREITE, bogen, linie, mass, pfeil, schraffur, text, zahl,
+  BREITE, bogen, legende, linie, mass, pfeil, schraffur, text, textzeile, zahl,
 } from './gb_skizze.js';
 import { aendern, ansichtVon, eintragVon, zustand } from './zustand.js';
 
@@ -246,25 +246,14 @@ function situationsbild(g, s, fall) {
 // Die Karte
 // ===========================================================================
 
-/** Die Zeilen unter dem Bild: Kräfte, Grundwasser, Gleitkörper. */
-function legende(g, s, fall) {
-  const zeilen = [];
-  if (fall) {
-    zeilen.push(`${fall.name}: N_Ed = ${zahl(fall.N_Ed, 1)} kN · T_Ed = ${zahl(fall.T_Ed, 1)} kN`
-      + ` · δ_R = ${zahl(fall.delta_R, 1)}° – die Kräfte im Verhältnis zueinander, nicht im Massstab der Längen`);
-  } else {
-    zeilen.push(g.kombinationen.some((k) => k.aktiv !== false)
-      ? 'Noch nicht gerechnet.' : 'Keine Kombination eingeschaltet – ohne Kräfte.');
-  }
-  if (s?.grundwasser) zeilen.push(s.grundwasser);
-  if (s?.umriss?.length) {
-    zeilen.push(`Gleitkörper nach Prandtl: H = ${zahl(s.H_gl, 2)} m unter der Sohle, L = `
-      + `${zahl(s.L_gl, 2)} m neben ihr${g.alpha || g.beta ? ' – gezeichnet für α = β = 0' : ''}`);
-  } else if (s?.undrainiert) {
-    zeilen.push('Undrainiert, φ = 0: kein Gleitkörper gezeichnet.');
-  }
-  zeilen.push(`Länge des Fundaments L = ${zahl(g.L, 2)} m, senkrecht zum Bild.`);
-  return el('div.gb-legende', {}, zeilen.map((z) => el('p', { text: z })));
+/**
+ * Die Zeilen unter dem Bild: die der gezeigten Kombination, dann was für alle
+ * gilt -- beides aus dem Kern. Ohne Kombination sagt die Oberfläche, warum.
+ */
+function legendeVon(g, s, fall) {
+  const kopf = fall ? fall.legende : textzeile(g.kombinationen.some((k) => k.aktiv !== false)
+    ? 'Noch nicht gerechnet.' : 'Keine Kombination eingeschaltet – ohne Kräfte.');
+  return legende([kopf, ...(s?.legende || [])]);
 }
 
 /**
@@ -293,6 +282,6 @@ export function situationKarten(kennung) {
   }) : null;
   return [karte('Situation', [
     el('div.gb-bildhuelle', {}, [situationsbild(g, s, fall)]),
-    legende(g, s, fall),
+    legendeVon(g, s, fall),
   ], { zusatz: wahl, klasse: 'ist-breit' })];
 }

@@ -1,5 +1,5 @@
 ---
-erzeugt: 94b2c1902116
+erzeugt: 7014f3483ace
 art: modul
 tags: [modul]
 ---
@@ -51,6 +51,7 @@ einen Satz, der die Analyse nennt.
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]

@@ -25,13 +25,16 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, MRAD
 from opencivil.stabwerk.rechnung import Balkensystem, Systembefund
 from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Fall
+from opencivil.web.anzeige import zahl
 
 #: Wie viele Stuecke ein Stab im Bild mindestens hat -- dazu jede Grenze und jeder Extremwert.
 PROBEN_JE_STAB = 24
 
-kN, mm, mrad = 1e-3, 1e3, 1e3
+#: Die Einheit der Anzeige je Groesse eines Verlaufs.
+EINHEITEN = {"N": KN, "V": KN, "M": KNM, "w": MM, "ux": MM, "uz": MM, "phi": MRAD}
 
 
 def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
@@ -55,7 +58,7 @@ def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
         "faelle": [_fall(befund, f) for f in e.faelle],
         # Das Eigengewicht je Stab in kN/m -- das Zeichenfenster zeigt es im
         # Lastfall, der es bekommt; gewaehlt und geloescht wird es nicht.
-        "eigengewicht": {stab: g * kN for stab, g in befund.eigengewicht.items()},
+        "eigengewicht": {stab: zahl(g, KN_PRO_M) for stab, g in befund.eigengewicht.items()},
     }
 
 
@@ -63,10 +66,10 @@ def _fall(befund: Systembefund, fall: Fall) -> Dict[str, Any]:
     staebe = {}
     for name, v in befund.verlaeufe(fall.name).items():
         extrem = {}
-        for groesse, faktor in (("N", kN), ("V", kN), ("M", kN), ("w", mm), ("phi", mrad)):
-            e = v.extrem(groesse)
-            extrem[groesse] = {"kleinst": [e.kleinst[0], e.kleinst[1] * faktor],
-                               "groesst": [e.groesst[0], e.groesst[1] * faktor]}
+        for groesse in ("N", "V", "M", "w", "phi"):
+            e, einheit = v.extrem(groesse), EINHEITEN[groesse]
+            extrem[groesse] = {"kleinst": [e.kleinst[0], zahl(e.kleinst[1], einheit)],
+                               "groesst": [e.groesst[0], zahl(e.groesst[1], einheit)]}
         staebe[name] = extrem
     return {
         "name": fall.name,
@@ -76,7 +79,7 @@ def _fall(befund: Systembefund, fall: Fall) -> Dict[str, Any]:
         # Linienlager und Bettung, sonst gingen die Kraefte nicht auf.
         "lagerkraefte": [
             {"wo": k.wo, "knoten": k.knoten, "summe": k.summe,
-             "R_x": k.R_x * kN, "R_z": k.R_z * kN, "M": k.M * kN}
+             "R_x": zahl(k.R_x, KN), "R_z": zahl(k.R_z, KN), "M": zahl(k.M, KNM)}
             for k in befund.lagerkraefte(fall)],
     }
 
@@ -88,9 +91,7 @@ def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]:
     for stab, v in befund.verlaeufe(name).items():
         staebe[stab] = {
             "L": v.L, "c": v.c, "s": v.s, "x_a": v.x_a, "z_a": v.z_a,
-            "proben": [{"x": w["x"], "N": w["N"] * kN, "V": w["V"] * kN, "M": w["M"] * kN,
-                        "ux": w["ux"] * mm, "uz": w["uz"] * mm, "w": w["w"] * mm,
-                        "phi": w["phi"] * mrad}
+            "proben": [{"x": w["x"], **{g: zahl(w[g], e) for g, e in EINHEITEN.items()}}
                        for w in v.proben(PROBEN_JE_STAB)],
         }
     knoten = {}
@@ -99,8 +100,8 @@ def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]:
             continue
         ux, uz, phi = fall.verschiebungen[ort.name]
         unbestimmt = ort.drehung == "unbestimmt"
-        knoten[ort.knoten] = {"x": ort.x, "z": ort.z, "ux": ux * mm, "uz": uz * mm,
-                              "phi": None if unbestimmt else phi * mrad,
+        knoten[ort.knoten] = {"x": ort.x, "z": ort.z, "ux": zahl(ux, MM), "uz": zahl(uz, MM),
+                              "phi": None if unbestimmt else zahl(phi, MRAD),
                               "unbestimmt": unbestimmt}
     return {"fall": name, "kombination": fall.kombination, "staebe": staebe,
             "knoten": knoten, "unbestimmt_text": UNBESTIMMT}

@@ -688,7 +688,7 @@ class Querschnittsanalyse:
         dazu je Bewehrung das Element, aus dem sie stammt: sein Name steht in
         der Probe, sein Durchmesser bestimmt die Rissbreite.
         """
-        mm = 1e-3
+        mm = MM.faktor   # was in mm steht, in m
         teile = [Teil(punkte=tuple((y * mm, z * mm) for y, z in f.punkte),
                       werkstoff=index_von(f.stoff) if f.stoff is not None else None,
                       eltern=self.eltern[i])
@@ -709,7 +709,7 @@ class Querschnittsanalyse:
     def schubwaende(self, f_sd: Callable[[Wandangabe], float],
                     f_cd: Callable[[Wandangabe], float], k_c: float) -> List[Wand]:
         """Die Schubwaende in Metern, mit den Festigkeiten, die der Nachweis waehlt."""
-        mm = 1e-3
+        mm = MM.faktor   # was in mm steht, in m
         return [Wand(name=w.name, von=(w.von[0] * mm, w.von[1] * mm),
                      bis=(w.bis[0] * mm, w.bis[1] * mm), b_w=w.dicke * mm,
                      a_sw_s=w.a_sw_s * mm, f_sd=f_sd(w), f_cd=f_cd(w), k_c=k_c)

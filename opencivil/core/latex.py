@@ -483,6 +483,11 @@ def angabe(wert: Wert) -> str:
 _GEGENTEIL = {r"\le": ">", r"\ge": "<", "<": r"\ge", ">": r"\le"}
 
 
+def vergleichszeichen(soll: str, erfuellt: bool) -> str:
+    """Das Zeichen eines Vergleichs: ``soll``, wenn er aufgeht, sonst sein Gegenteil."""
+    return soll if erfuellt else _GEGENTEIL[soll]
+
+
 def folgerung(erfuellt: bool) -> str:
     """``⇒ erfüllt`` am Ende einer Zeile -- ein Wortlaut fuer alle."""
     return rf"\quad \Rightarrow \quad {urteil(erfuellt)}"
@@ -499,8 +504,7 @@ def vergleich(soll: str, rechts: str, erfuellt: bool, *,
     ``soll`` ist das Zeichen, das gelten muss; geht der Vergleich nicht auf,
     steht sein Gegenteil da -- im Beispiel ``<``.
     """
-    zeichen = soll if erfuellt else _GEGENTEIL[soll]
-    nachsatz = rf"\quad {zeichen} \quad {rechts}"
+    nachsatz = rf"\quad {vergleichszeichen(soll, erfuellt)} \quad {rechts}"
     return f"{nachsatz} {folgerung(erfuellt)}" if mit_urteil else nachsatz
 
 

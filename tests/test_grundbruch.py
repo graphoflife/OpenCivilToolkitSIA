@@ -465,6 +465,8 @@ class TestZusammenfassung(unittest.TestCase):
         s = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["g1"]
         self.assertEqual((s["umriss"], s["faelle"], s["H_gl"], s["massgebend"]),
                          ([], [], None, None))
+        # In der Legende nur, was ohne Rechnung gilt: die Länge.
+        self.assertEqual(len(s["legende"]), 1)
 
     def test_der_dienst_liefert_die_situation(self):
         p = Projekt(name="Probe")
@@ -473,11 +475,13 @@ class TestZusammenfassung(unittest.TestCase):
         g.kombination("Schwer", N_Ed=3000.0, T_Ed=400.0)
         antwort = dienst.rechnen({"projekt": p.als_dict()})
         s = antwort["zeichendaten"]["g1"]
-        self.assertFalse(s["undrainiert"])
-        self.assertTrue(s["grundwasser"].startswith("Lage 1"))
+        zeilen = ["".join(z.get("text") or z["mathe"] for z in zeile) for zeile in s["legende"]]
+        self.assertTrue(zeilen[0].startswith("Lage 1"), "das Grundwasser, wie eingeordnet")
+        self.assertTrue(zeilen[1].startswith("Gleitkörper nach Prandtl"), "drainiert")
         self.assertAlmostEqual(s["umriss"][-1][0], s["L_gl"])
         self.assertEqual([f["name"] for f in s["faelle"]], ["Leicht", "Schwer"])
-        self.assertAlmostEqual(s["faelle"][1]["delta_R"], math.degrees(math.atan(400 / 3000)))
+        # Die Neigung der Last steht in der Zeile ihrer Kombination: atan(400/3000) = 7.59°.
+        self.assertIn({"mathe": r"\delta_R = 7.6{}^{\circ}"}, s["faelle"][1]["legende"])
         grade = {f["name"]: min(f["grad_grundbruch"], f["grad_gleiten"]) for f in s["faelle"]}
         self.assertEqual(s["massgebend"], min(grade, key=grade.get))
         zuordnung = antwort["zuordnung"]["grundbrueche"]["g1"]

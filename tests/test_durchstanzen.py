@@ -511,9 +511,25 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         self.assertEqual(s["aussparungen"], [[[300.0, 200.0], [500.0, 200.0], [500.0, 400.0],
                                               [300.0, 400.0]]])
         self.assertTrue(any(not l["zaehlt"] for l in s["schnitt"]))
-        self.assertAlmostEqual(s["u"], 1e3 * s["k_e"] * (
+        # Was ausgezogen ist, ist der Umfang, mit dem der Kern rechnet.
+        aufbau = self.projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        innen = loesung.befunde[aufbau.feld("durchstanzen")["d1"].id].innen
+        self.assertAlmostEqual(innen.u * 1e3, innen.k_e * (
             sum(math.dist(p, q) for l in s["schnitt"] if l["zaehlt"]
-                for p, q in zip(l["punkte"], l["punkte"][1:])) / 1e3), delta=2.0)
+                for p, q in zip(l["punkte"], l["punkte"][1:]))), delta=2.0)
+
+    def test_legende_aus_dem_kern(self):
+        """
+        Zahlen, Vergleich und Urteil der Legende schreibt der Kern, Text und
+        Formeln getrennt -- die Oberfläche setzt sie nur. Hier reicht der
+        Beton allein nicht.
+        """
+        zeilen = self.antwort.daten["zeichendaten"]["d1"]["legende"]
+        self.assertTrue(all(set(z) in ({"text"}, {"mathe"}) for zeile in zeilen for z in zeile))
+        self.assertIn({"mathe": r"1.5 \cdot d_v"}, zeilen[1])
+        letzte = "".join(z.get("text", "") for z in zeilen[-1])
+        self.assertIn("Nachweise erfüllt, kleinstes", letzte)
 
     def test_zusammenfassung(self):
         aufbau = self.projekt.aufbauen()

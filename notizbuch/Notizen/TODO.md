@@ -91,18 +91,11 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 9 und 11 am
-2026-11-10 (siehe [[Entwicklung]]). Offen sind 10 und 12.
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 11 am
+2026-11-10 (siehe [[Entwicklung]]). Offen ist 12.
 
 **Im übrigen Repo, neu gefunden:**
 
-- [ ] **10. Einheiten der Anzeige auf drei Wegen.** `_Groesse` dient nur den
-      Linien (diagrammdaten.py:258-276), sonst stehen nackte Faktoren da,
-      und `kN = 1e-3` (balkendaten.py:34) bedeutet das Gegenteil von
-      `kN = 1e3` (aufbau/querschnittsanalyse.py:63). Legende und Urteil der
-      Situationsbilder baut das JS selbst (gb_zeichnung.js:253-271,
-      sz_zeichnung.js:212-233, ds_grundriss.js:164-201). Besser: `_Groesse`
-      als gemeinsames Modul, die Legende als Zellen aus den *daten.py.
 - [ ] **cad_fenster.js hat 1138 Zeilen** -- die einzige Datei über
       tausend, schon vor der Durchsicht (bei Punkt 11 übersehen). Nähte an
       den Abschnitten: Ändern und Rückgängig, Befehle, Zeichnen,
@@ -599,6 +592,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 10: die Einheiten der
+Anzeige an einer Stelle (`web/anzeige.py`), mit den Einheiten des Kerns
+statt nackter Faktoren · die Legenden der Situationsbilder von Grundbruch,
+Setzung und Durchstanzen aus dem Kern, als Zeilen aus Text und Formeln ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 9: je Seite eine Lage im
 Schwerpunkt nach einer Regel (`je_seite`), für den Löser in der

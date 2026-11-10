@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Mapping, Optional
 
+from opencivil.core.einheiten import KN, KNM
 from opencivil.material.basis import Baustoff
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
@@ -60,7 +61,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     analyse.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag.kennung, eintrag.name, art, analyse)
 
-    kN, kNm = 1e3, 1e3
+    # Die Lastfaelle in kN und kNm, wie eingetippt -- gerechnet wird in SI.
+    kN, kNm = KN.faktor, KNM.faktor
     lastfaelle = [
         Lastfall(name=l.name, N=l.N_Ed * kN, M_y=l.M_y_Ed * kNm, M_z=l.M_z_Ed * kNm,
                  V_y=l.V_y_Ed * kN, V_z=l.V_z_Ed * kN, T=l.T_Ed * kNm)
@@ -89,11 +91,10 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
                                  kriechzahl=eintrag.zwaengung_biegung_kriechzahl)
     biegung.still = not eintrag.zwaengung_biegung
     aufbau.eintragen(teil, "qa_zwaengung_biegung", eintrag.kennung, biegung)
-    kN = 1e3
     spannungsnachweise(
         eintrag, AnalyseStellen(analyse), eintrag.lastfaelle,
         lambda name, l, faktor: Lastfall(name=name, N=faktor * l.N_Ed * kN,
-                                         M_y=faktor * l.M_y_Ed * kN, M_z=faktor * l.M_z_Ed * kN),
+                                         M_y=faktor * l.M_y_Ed * kNm, M_z=faktor * l.M_z_Ed * kNm),
         praefix="qa_", kennung=eintrag.kennung, aufbau=aufbau, teil=teil)
 
     knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]

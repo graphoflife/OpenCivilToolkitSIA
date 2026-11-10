@@ -1,5 +1,5 @@
 ---
-erzeugt: 81f71fd68882
+erzeugt: 8890d9fe4f62
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -145,6 +145,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
     - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
+    - [[opencivil.web.anzeige]] – Zahlen und Zeilen, wie die Oberflaeche sie zeigt.
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.
     - [[opencivil.web.balkendaten]] – was die Oberflaeche von einem Balkensystem zeigt.
     - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.

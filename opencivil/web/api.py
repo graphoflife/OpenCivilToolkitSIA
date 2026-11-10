@@ -28,7 +28,6 @@ from opencivil.bericht.zusammenfassung import (
     GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, kennzahlen, nachweistabelle,
     stiller_hinweis, zusammenfassen,
 )
-from opencivil.core.latex import Mathe, Zelle
 from opencivil.core.protokoll import (
     GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel, TextBlock,
     TitelBlock, darstellen,
@@ -63,6 +62,7 @@ from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.stabwerk.rechnung import BETONKENNWERTE
 from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.web import diagrammdaten, durchstanzdaten
+from opencivil.web.anzeige import zelle_dict
 from opencivil.web.umschlag import endlich
 from opencivil.web.zeichendaten import zeichendaten
 
@@ -436,17 +436,6 @@ TAFEL: Tafel[dict] = {
     TabellenBlock: _tabelle_dict,
     HinweisBlock: _hinweis_dict,
 }
-
-
-def zelle_dict(zelle: Zelle) -> dict:
-    """
-    Eine Tabellenzelle fuer die Oberflaeche: ``{"text": ...}`` oder
-    ``{"mathe": ...}``. Die Oberflaeche setzt nur Formeln mit KaTeX -- Text
-    aus LaTeX zurueckzulesen, wie sie es frueher musste, entfaellt.
-    """
-    if isinstance(zelle, Mathe):
-        return {"mathe": zelle.latex}
-    return {"text": zelle}
 
 
 def protokoll_liste(protokoll: Protokoll) -> List[dict]:

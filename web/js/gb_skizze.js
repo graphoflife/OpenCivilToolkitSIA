@@ -7,13 +7,28 @@
  * gb_zeichnung.js; die Setzung (sz_zeichnung.js) zeichnet mit denselben.
  */
 
-import { svgEl } from './dom.js';
+import { el, svgEl } from './dom.js';
+import { span } from './mathe.js';
 
 /** Wie breit die Bilder gezeichnet werden, in px -- die Hülle skaliert sie. */
 export const BREITE = 720;
 
 /** Eine Zahl mit fester Stellenzahl, für die Beschriftung. */
 export const zahl = (x, n) => Number(x).toFixed(n);
+
+/**
+ * Die Legende unter einem Bild: Zeilen aus Zellen, wie der Kern sie schreibt
+ * (opencivil/web/anzeige.py) -- Text als Text, Formeln mit KaTeX. Zahlen,
+ * Vergleich und Urteil kommen aus dem Kern; hier wird nur gesetzt. Bis
+ * 2026-11-10 baute jedes Bild seine Legende selbst, samt Urteil.
+ */
+export function legende(zeilen) {
+  return el('div.gb-legende', {}, zeilen.map((zellen) => el('p', {}, zellen.map(
+    (z) => (z.mathe !== undefined ? span(z.mathe) : z.text)))));
+}
+
+/** Eine Zeile der Legende, die nur die Oberfläche kennt -- etwa, dass noch nichts gerechnet ist. */
+export const textzeile = (text) => [{ text }];
 
 /** Eine Gruppe -- `svgEl` nimmt keine Kinder. Fehlende (null) bleiben weg. */
 export function gruppe(klasse, kinder) {

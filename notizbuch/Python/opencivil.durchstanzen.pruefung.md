@@ -1,5 +1,5 @@
 ---
-erzeugt: 541a65550058
+erzeugt: 9ad4be3f34ec
 art: modul
 tags: [modul]
 ---
@@ -286,4 +286,3 @@ def reicht(self) -> bool
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
-- [[opencivil.web.durchstanzdaten]]

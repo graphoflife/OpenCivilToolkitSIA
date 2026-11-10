@@ -1,5 +1,5 @@
 ---
-erzeugt: 984b4cd2f689
+erzeugt: 6ee01fa2fa7a
 art: modul
 tags: [modul]
 ---
@@ -277,6 +277,14 @@ def angabe(wert: Wert) -> str
 
 `Symbol = Zahl Einheit` -- ein Wert, wie er in einem Vergleich steht.
 
+### vergleichszeichen
+
+```python
+def vergleichszeichen(soll: str, erfuellt: bool) -> str
+```
+
+Das Zeichen eines Vergleichs: `soll`, wenn er aufgeht, sonst sein Gegenteil.
+
 ### folgerung
 
 ```python
@@ -450,4 +458,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.stabquerschnitt]]
-- [[opencivil.web.api]]
+- [[opencivil.web.anzeige]]
+- [[opencivil.web.durchstanzdaten]]
+- [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.setzungsdaten]]

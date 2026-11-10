@@ -19,15 +19,14 @@ from typing import Any, Callable, Collection, Dict, List, Mapping, Optional, Seq
 
 from opencivil import spannungsanalyse
 from opencivil.core.wert import grad_als_text
-from dataclasses import dataclass
-
-from opencivil.core.einheiten import KN, KNM, KN_PRO_M, N_PRO_MM2, PRO_M, PROMILLE, Einheit
+from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, MM2, N_PRO_MM2, PRO_M, PROMILLE
 from opencivil.core.rechenwerk import Loesung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
 from opencivil.nachweis.resistenzlinie import Handlinie
 from opencivil.nachweis.schubwandnachweis import Schubbefund
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
+from opencivil.web.anzeige import Anzeigegroesse, si, zahl
 
 
 def linien(aufbau: Aufbau, loesung: Loesung) -> dict:
@@ -82,7 +81,7 @@ def querkraftkurven(
             # Die Normalkraft des ersten Falls -- ohne Fall N = 0.
             n_ed = (befund.ergebnisse[0].fall.N_Ed.in_einheit(KN)
                     if befund.ergebnisse else 0.0)
-        kurve = befund.kurve(n_ed * 1e3)
+        kurve = befund.kurve(si(n_ed, KN))
 
         kurven[kennung] = {
             "querschnitt": teil.kennung,
@@ -96,10 +95,10 @@ def querkraftkurven(
             "aeste": [
                 {
                     "moment_positiv": ast["moment_positiv"],
-                    "m_Rd": ast["m_Rd"] / 1e3,
-                    "d": ast["d"] * 1e3,
+                    "m_Rd": zahl(ast["m_Rd"], KNM),
+                    "d": zahl(ast["d"], MM),
                     "punkte": [
-                        {"M_Ed": M / 1e3, "v_Rd": v / 1e3, "plastisch": pl}
+                        {"M_Ed": zahl(M, KNM), "v_Rd": zahl(v, KN_PRO_M), "plastisch": pl}
                         for M, v, pl in ast["punkte"]
                     ],
                 }
@@ -114,7 +113,7 @@ def querkraftkurven(
                     "M_Ed": erg.fall.M_Ed.in_einheit(KNM),
                     "N_Ed": erg.fall.N_Ed.in_einheit(KN),
                     "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
-                    "v_Rd": erg.v_Rd / 1e3,
+                    "v_Rd": zahl(erg.v_Rd, KN_PRO_M),
                     "erfuellt": erg.erfuellt,
                     "plastisch": erg.plastisch,
                     "begruendung": erg.begruendung,
@@ -176,15 +175,15 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
                 "namensraum": teil.raum,
                 "name": teil.name,
                 "richtung": nachweis.richtung.value,
-                "d": d * 1e3,
+                "d": zahl(d, MM),
                 "alpha_min": a_min,
                 "alpha_max": a_max,
                 "zug": gruppe[0].zug_hebt_alpha,
                 "punkte": [
                     {"alpha": q.alpha,
-                     "V_Rd_s": q.V_Rd_s / 1e3,
-                     "V_Rd_c": q.V_Rd_c / 1e3,
-                     "V_Rd": q.V_Rd / 1e3,
+                     "V_Rd_s": zahl(q.V_Rd_s, KN_PRO_M),
+                     "V_Rd_c": zahl(q.V_Rd_c, KN_PRO_M),
+                     "V_Rd": zahl(q.V_Rd, KN_PRO_M),
                      "im_bereich": a_min <= q.alpha <= a_max}
                     for q in punkte
                 ],
@@ -193,7 +192,7 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
                         "name": erg.fall.name,
                         "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
                         "alpha": erg.massgebend.alpha,
-                        "V_Rd": erg.v_Rd / 1e3,
+                        "V_Rd": zahl(erg.v_Rd, KN_PRO_M),
                         "erfuellt": erg.erfuellt,
                         "begruendung": erg.begruendung,
                     }
@@ -206,16 +205,16 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
 def _bild_dict(bild) -> dict:
     """Ein Querschnittsbild in Zeichengroessen: mm, Promille, N/mm², kN."""
     return {
-        "eps_m": bild.eps_m * 1e3, "chi": bild.chi,
-        "N": bild.N / 1e3, "M": bild.M / 1e3,
-        "h": bild.h * 1e3,
-        "nulllinie": (bild.nulllinie * 1e3
-                      if bild.nulllinie is not None else None),
-        "beton": [{"z": f.z * 1e3, "eps": f.eps * 1e3, "sigma": f.sigma / 1e6}
+        "eps_m": zahl(bild.eps_m, PROMILLE), "chi": bild.chi,
+        "N": zahl(bild.N, KN), "M": zahl(bild.M, KNM),
+        "h": zahl(bild.h, MM),
+        "nulllinie": zahl(bild.nulllinie, MM),
+        "beton": [{"z": zahl(f.z, MM), "eps": zahl(f.eps, PROMILLE),
+                   "sigma": zahl(f.sigma, N_PRO_MM2)}
                   for f in bild.beton],
-        "stahl": [{"z": s.z * 1e3, "eps": s.eps * 1e3, "sigma": s.sigma / 1e6,
-                   "nummer": s.nummer, "name": s.name, "a_s": s.a_s * 1e6,
-                   "kraft": s.kraft / 1e3}
+        "stahl": [{"z": zahl(s.z, MM), "eps": zahl(s.eps, PROMILLE),
+                   "sigma": zahl(s.sigma, N_PRO_MM2), "nummer": s.nummer, "name": s.name,
+                   "a_s": zahl(s.a_s, MM2), "kraft": zahl(s.kraft, KN)}
                   for s in bild.stahl],
         "konvergiert": bild.konvergiert, "hinweis": bild.hinweis,
     }
@@ -255,41 +254,20 @@ def _analyse_dict(analyse) -> dict:
     return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild)}
 
 
-@dataclass(frozen=True)
-class _Groesse:
-    """Eine Groesse einer Linie, wie sie in den Zeichendaten steht: Zeichen und Einheit."""
-
-    zeichen: str
-    einheit: Einheit
-    latex: str = ""
-    stellen: int = 1
-    am_bezugsort: bool = False
-    """Ob sie an einem Ort des Querschnitts gilt -- die Mitteldehnung, nicht die Kruemmung."""
-
-    def zahl(self, si: Optional[float]) -> Optional[float]:
-        """Ein Wert in SI, in der Einheit dieser Groesse."""
-        return None if si is None else si / self.einheit.faktor
-
-    def als_dict(self) -> dict:
-        return {"zeichen": self.zeichen, "latex": self.latex or self.zeichen,
-                "einheit": self.einheit.beschriftung, "stellen": self.stellen,
-                "am_bezugsort": self.am_bezugsort}
-
-
 #: Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die
 #: festgehaltene und die Verformung. Massstab und Beschriftung an einer
 #: Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js
 #: schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
-_LINIENGROESSEN: Dict[Any, Tuple[_Groesse, _Groesse, _Groesse]] = {
+_LINIENGROESSEN: Dict[Any, Tuple[Anzeigegroesse, Anzeigegroesse, Anzeigegroesse]] = {
     spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (
-        _Groesse("M", KNM), _Groesse("N", KN), _Groesse("χ", PRO_M, r"\chi", 4)),
+        Anzeigegroesse("M", KNM), Anzeigegroesse("N", KN), Anzeigegroesse("χ", PRO_M, r"\chi", 4)),
     spannungsanalyse.Analyseart.NORMALKRAFT_DEHNUNG: (
-        _Groesse("N", KN), _Groesse("M", KNM),
-        _Groesse("ε_m", PROMILLE, r"\varepsilon_{m}", 2, am_bezugsort=True)),
+        Anzeigegroesse("N", KN), Anzeigegroesse("M", KNM),
+        Anzeigegroesse("ε_m", PROMILLE, r"\varepsilon_{m}", 2, am_bezugsort=True)),
 }
 
 #: Der aequivalente Modul, ueber der laufenden Kraft.
-_MODUL = _Groesse("E_eq", N_PRO_MM2, "E_{eq}", 0)
+_MODUL = Anzeigegroesse("E_eq", N_PRO_MM2, "E_{eq}", 0)
 
 
 def liniengroessen(art) -> Optional[dict]:
@@ -305,7 +283,7 @@ def liniengroessen(art) -> Optional[dict]:
             "verformung": verformung.als_dict()}
 
 #: Die Randdehnungen beim Bruch.
-_RANDDEHNUNG = _Groesse("ε", PROMILLE, r"\varepsilon", 2)
+_RANDDEHNUNG = Anzeigegroesse("ε", PROMILLE, r"\varepsilon", 2)
 
 
 def _linie_dict(linie) -> dict:
@@ -437,7 +415,7 @@ def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
     punkte = []
     for i in range(schritte + 1):
         eps = -abs(eps_c2d) * i / schritte
-        punkte.append({"eps": eps * 1e3, "sigma": gesetz.spannung(eps) / 1e6})
+        punkte.append({"eps": zahl(eps, PROMILLE), "sigma": zahl(gesetz.spannung(eps), N_PRO_MM2)})
 
     return {
         "punkte": punkte,
@@ -446,8 +424,10 @@ def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
         "titel": "Beton – Parabel-Rechteck-Beziehung",
         "referenz": "SIA 262:2025, 4.2.1.6",
         "marken": [
-            {"eps": -abs(eps_c1d) * 1e3, "sigma": -abs(f_cd) / 1e6, "text": "ε_c1d"},
-            {"eps": -abs(eps_c2d) * 1e3, "sigma": -abs(f_cd) / 1e6, "text": "ε_c2d"},
+            {"eps": zahl(-abs(eps_c1d), PROMILLE), "sigma": zahl(-abs(f_cd), N_PRO_MM2),
+             "text": "ε_c1d"},
+            {"eps": zahl(-abs(eps_c2d), PROMILLE), "sigma": zahl(-abs(f_cd), N_PRO_MM2),
+             "text": "ε_c2d"},
         ],
         "vereinfacht": _spannungsblock(abs(f_cd), abs(eps_c2d)),
     }
@@ -471,7 +451,7 @@ def _spannungsblock(f_cd: float, eps_c2d: float) -> dict:
         (-eps_c2d, -block.f_cd),
     ]
     return {
-        "punkte": [{"eps": e * 1e3, "sigma": s / 1e6} for e, s in ecken],
+        "punkte": [{"eps": zahl(e, PROMILLE), "sigma": zahl(s, N_PRO_MM2)} for e, s in ecken],
         "titel": "vereinfacht (Spannungsblock)",
         "beschreibung": (
             f"σ = 0 bis {1 - BLOCKANTEIL:.2f}·ε_c2d, darüber f_cd. "
@@ -501,14 +481,14 @@ def _stahlkurve(stoff, wert) -> Optional[dict]:
         (abs(eps_ud), f_yd),
     ]
     return {
-        "punkte": [{"eps": e * 1e3, "sigma": s / 1e6} for e, s in ecken],
+        "punkte": [{"eps": zahl(e, PROMILLE), "sigma": zahl(s, N_PRO_MM2)} for e, s in ecken],
         "x_titel": "ε [‰]",
         "y_titel": "σ [N/mm²]",
         "titel": "Betonstahl – bilineare Beziehung",
         "referenz": "SIA 262:2025, 4.2.2.4",
         "marken": [
-            {"eps": eps_yd * 1e3, "sigma": f_yd / 1e6, "text": "ε_yd"},
-            {"eps": abs(eps_ud) * 1e3, "sigma": f_yd / 1e6, "text": "ε_ud"},
+            {"eps": zahl(eps_yd, PROMILLE), "sigma": zahl(f_yd, N_PRO_MM2), "text": "ε_yd"},
+            {"eps": zahl(abs(eps_ud), PROMILLE), "sigma": zahl(f_yd, N_PRO_MM2), "text": "ε_ud"},
         ],
     }
 
@@ -536,9 +516,9 @@ def _knickpunkte(aufbau, nachweis, loesung) -> list:
             "name": erg.fall.name,
             "N_Ed": erg.fall.N_Ed.in_einheit(KN),
             "M_Ed_1": abs(erg.fall.M_Ed_1.in_einheit(KNM)),
-            "M_Ed_II": abs(erg.M_ges) / 1e3,
-            "N_Rd": erg.N_Rd / 1e3,
-            "M_bei_N_Rd": erg.M_bei_N_Rd / 1e3,
+            "M_Ed_II": zahl(abs(erg.M_ges), KNM),
+            "N_Rd": zahl(erg.N_Rd, KN),
+            "M_bei_N_Rd": zahl(erg.M_bei_N_Rd, KNM),
             "erfuellungsgrad": erg.erfuellungsgrad,
             "grad_text": grad_als_text(erg.erfuellungsgrad, erg.erfuellt),
             "erfuellt": erg.erfuellt,
@@ -568,7 +548,8 @@ def _linienzug(linie) -> Optional[dict]:
     return {
         "beschriftung": linie.beschriftung,
         "ecken": ecken,
-        "punkte": [{"N": p.N / 1e3, "M": p.M / 1e3, **({"name": p.name} if ecken else {})}
+        "punkte": [{"N": zahl(p.N, KN), "M": zahl(p.M, KNM),
+                    **({"name": p.name} if ecken else {})}
                    for p in linie.punkte],
     }
 
@@ -608,7 +589,7 @@ def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
                 "massstab": a.massstab.value,
                 "massstab_text": a.massstab.beschriftung,
                 "widerstand": (
-                    {"N": a.widerstand[0] / 1e3, "M": a.widerstand[1] / 1e3}
+                    {"N": zahl(a.widerstand[0], KN), "M": zahl(a.widerstand[1], KNM)}
                     if a.widerstand
                     else None
                 ),
@@ -664,9 +645,9 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
         p = erg.punkt
         faelle.append({
             "name": erg.fall.name,
-            "N_Ed": erg.N / 1e3,
-            "M_y_Ed": erg.M_y / 1e3,
-            "M_z_Ed": erg.M_z / 1e3,
+            "N_Ed": zahl(erg.N, KN),
+            "M_y_Ed": zahl(erg.M_y, KNM),
+            "M_z_Ed": zahl(erg.M_z, KNM),
             "erfuellt": erg.erfuellt,
             "grad_text": grad_als_text(erg.erfuellungsgrad, erg.erfuellt),
             # Der Bruchzustand, gegen den der Nachweis misst -- bei N_Ed, in
@@ -689,7 +670,8 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
 
 def _als_kn(punkte) -> List[dict]:
     """Punkte ``(N, M_y, M_z)`` in N und Nm -- fuer die Oberflaeche in kN und kNm."""
-    return [{"N": N / 1e3, "M_y": M_y / 1e3, "M_z": M_z / 1e3} for N, M_y, M_z in punkte]
+    return [{"N": zahl(N, KN), "M_y": zahl(M_y, KNM), "M_z": zahl(M_z, KNM)}
+            for N, M_y, M_z in punkte]
 
 
 def _faecherpaar(q, psi: float):
@@ -709,7 +691,8 @@ def _interaktion(q, einachsig: bool, fest: str, wert: float) -> dict:
     if einachsig:
         return {"fest": None, "wert": None,
                 "punkte": _als_kn((p.N, p.M_y, p.M_z) for p in _faecherpaar(q, -math.pi / 2.0))}
-    return {"fest": fest, "wert": wert, "punkte": _als_kn(q.schnitt(fest, wert * 1e3))}
+    return {"fest": fest, "wert": wert,
+            "punkte": _als_kn(q.schnitt(fest, si(wert, KN if fest == "N" else KNM)))}
 
 
 def _tiefe(eltern: Sequence[Optional[int]], i: int) -> int:
@@ -780,7 +763,7 @@ def _bruch(q, bauteil, punkt) -> dict:
     Gedrueckt ist die Seite kleiner v: die Kruemmung zeigt nie gegen die
     Zugrichtung. Ohne Kruemmung ist alles gedrueckt oder nichts.
     """
-    sy, sz = q.bezug[0] * 1e3, q.bezug[1] * 1e3
+    sy, sz = zahl(q.bezug[0], MM), zahl(q.bezug[1], MM)
     n = punkt.zugrichtung
     punkte = [p for f in bauteil.flaechen for p in f.punkte]
     rahmen = (min(p[0] for p in punkte), max(p[0] for p in punkte),
@@ -790,7 +773,7 @@ def _bruch(q, bauteil, punkt) -> dict:
         return n[0] * (p[0] - sy) + n[1] * (p[1] - sz)
 
     if punkt.chi > 0.0:
-        v0 = -punkt.eps_m / punkt.chi * 1e3
+        v0 = zahl(-punkt.eps_m / punkt.chi, MM)
         nulllinie = _gerade_im_rahmen((sy + v0 * n[0], sz + v0 * n[1]), (-n[1], n[0]), rahmen)
         druckzone = [_halbebene(f.punkte, lambda p, v0=v0: v(p) - v0) for f in bauteil.flaechen]
     else:
@@ -806,10 +789,10 @@ def _bruch(q, bauteil, punkt) -> dict:
             for i, (f, zone) in enumerate(zip(bauteil.flaechen, druckzone)) if zone],
         "staebe": [
             {"y": p[0], "z": p[1], "d": g.durchmesser,
-             "eps": q.dehnung(punkt, (p[0] * 1e-3, p[1] * 1e-3)) * 1e3}
+             "eps": zahl(q.dehnung(punkt, (si(p[0], MM), si(p[1], MM))), PROMILLE)}
             for g in bauteil.bewehrungselemente for p in g.punkte],
-        "x": x * 1e3,
-        "d": d * 1e3,
+        "x": zahl(x, MM),
+        "d": zahl(d, MM),
         "neigung": math.degrees(punkt.psi),
     }
 
@@ -824,14 +807,14 @@ def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
     if v is None:
         return None
     stuecke = [{"wand": schub.waende[s.wand].name,
-                "von": [s.von[0] * 1e3, s.von[1] * 1e3],
-                "bis": [s.bis[0] * 1e3, s.bis[1] * 1e3],
-                "q": fluss / 1e3}
+                "von": [zahl(s.von[0], MM), zahl(s.von[1], MM)],
+                "bis": [zahl(s.bis[0], MM), zahl(s.bis[1], MM)],
+                "q": zahl(fluss, KN_PRO_M)}
                for s, fluss in zip(schub.modell.stuecke, v.fluss)]
-    waende = [{"name": w.name, "q_max": vergleich.einwirkung.groesse.si / 1e3,
-               "v_Rd": r.v_Rd / 1e3, "alpha": r.alpha, "erfuellt": vergleich.erfuellt,
+    waende = [{"name": w.name, "q_max": zahl(vergleich.einwirkung.groesse.si, KN_PRO_M),
+               "v_Rd": zahl(r.v_Rd, KN_PRO_M), "alpha": r.alpha, "erfuellt": vergleich.erfuellt,
                "grad_text": grad_als_text(vergleich.grad, vergleich.erfuellt)}
               for w, r, vergleich in zip(schub.waende, schub.widerstaende[fall.name],
                                          schub.vergleiche[fall.name])]
     return {"stuecke": stuecke, "waende": waende,
-            "zellen": [q_k / 1e3 for q_k in v.zellenfluss]}
+            "zellen": [zahl(q_k, KN_PRO_M) for q_k in v.zellenfluss]}

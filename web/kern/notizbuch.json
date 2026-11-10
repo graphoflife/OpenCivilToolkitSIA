@@ -2960,6 +2960,7 @@
         "fest",
         "urteil",
         "angabe",
+        "vergleichszeichen",
         "folgerung",
         "vergleich",
         "bedingung",
@@ -5808,6 +5809,25 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.web.anzeige",
+      "pfad": "Python/opencivil.web.anzeige.md",
+      "art": "modul",
+      "kurz": "Zahlen und Zeilen, wie die Oberflaeche sie zeigt.",
+      "stichworte": [
+        "zahl",
+        "si",
+        "punkte",
+        "Anzeigegroesse",
+        "Anzeigegroesse.zahl",
+        "Anzeigegroesse.als_dict",
+        "zelle_dict",
+        "zeile",
+        "masszahl",
+        "zahlformel",
+        "urteil"
+      ]
+    },
+    {
       "name": "opencivil.web.api",
       "pfad": "Python/opencivil.web.api.md",
       "art": "modul",
@@ -5819,7 +5839,6 @@
         "katalog",
         "obergrenzen",
         "wert_dict",
-        "zelle_dict",
         "protokoll_liste",
         "loesung_dict",
         "zusammenfassungen",
@@ -5878,9 +5897,6 @@
         "neigungskurven",
         "_bild_dict",
         "spannungsanalysen",
-        "_Groesse",
-        "_Groesse.zahl",
-        "_Groesse.als_dict",
         "liniengroessen",
         "_linie_dict",
         "_modul_dict",
@@ -5947,8 +5963,8 @@
         "wahlen",
         "situation",
         "_linien",
-        "_leisten",
-        "_pilz"
+        "_legende",
+        "_kraft"
       ]
     },
     {
@@ -5957,7 +5973,8 @@
       "art": "modul",
       "kurz": "was die Oberflaeche von einem Grundbruch zeichnet.",
       "stichworte": [
-        "situation"
+        "situation",
+        "_legende"
       ]
     },
     {
@@ -5981,7 +5998,8 @@
       "art": "modul",
       "kurz": "was die Oberflaeche von einer Setzung zeichnet.",
       "stichworte": [
-        "situation"
+        "situation",
+        "_legende"
       ]
     },
     {

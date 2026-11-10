@@ -1,5 +1,5 @@
 ---
-erzeugt: 1123d934cb08
+erzeugt: 4ce3172c3a58
 art: modul
 tags: [modul]
 ---
@@ -69,11 +69,14 @@ Ein Querschnitt, der nicht geht, hat keinen.
 ## Konstanten
 
 - `PROBEN_JE_STAB = 24` – Wie viele Stuecke ein Stab im Bild mindestens hat -- dazu jede Grenze und jeder Extremwert.
+- `EINHEITEN = {'N': KN, 'V': KN, 'M': KNM, 'w': MM, 'ux': MM, 'uz': MM, 'phi': MRAD}` – Die Einheit der Anzeige je Groesse eines Verlaufs.
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.system]]
+- [[opencivil.web.anzeige]]
 
 ## Gebraucht von
 

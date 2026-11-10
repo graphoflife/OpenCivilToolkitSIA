@@ -1,5 +1,5 @@
 ---
-erzeugt: f582cadb79d1
+erzeugt: 6c9ad95fbf0f
 art: modul
 tags: [modul]
 ---
@@ -73,16 +73,6 @@ ohne selbst zu rechnen.
 ```python
 def wert_dict(wert: Wert) -> dict
 ```
-
-### zelle_dict
-
-```python
-def zelle_dict(zelle: Zelle) -> dict
-```
-
-Eine Tabellenzelle fuer die Oberflaeche: `{"text": ...}` oder
-`{"mathe": ...}`. Die Oberflaeche setzt nur Formeln mit KaTeX -- Text
-aus LaTeX zurueckzulesen, wie sie es frueher musste, entfaellt.
 
 ### protokoll_liste
 
@@ -172,7 +162,6 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.bewehrungssuche]]
 - [[opencivil.core.einheiten]]
-- [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
@@ -198,6 +187,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.web.anzeige]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.umschlag]]

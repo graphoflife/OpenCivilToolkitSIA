@@ -1,5 +1,5 @@
 ---
-erzeugt: 41d03e9f8c87
+erzeugt: 98f31a9c7142
 art: modul
 tags: [modul]
 ---
@@ -475,6 +475,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
@@ -493,5 +494,10 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
+- [[opencivil.web.anzeige]]
 - [[opencivil.web.api]]
+- [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
+- [[opencivil.web.durchstanzdaten]]
+- [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.setzungsdaten]]

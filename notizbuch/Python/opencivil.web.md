@@ -1,5 +1,5 @@
 ---
-erzeugt: 342374673979
+erzeugt: a648a9c1edf6
 art: modul
 tags: [modul]
 ---
@@ -14,6 +14,7 @@ Browser laedt, samt dem Notizbuch.
 
 ## Module
 
+- [[opencivil.web.anzeige]] – Zahlen und Zeilen, wie die Oberflaeche sie zeigt.
 - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.
 - [[opencivil.web.balkendaten]] – was die Oberflaeche von einem Balkensystem zeigt.
 - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.

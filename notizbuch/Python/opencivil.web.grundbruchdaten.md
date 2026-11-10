@@ -1,5 +1,5 @@
 ---
-erzeugt: aeda31323fe0
+erzeugt: 9f750c812387
 art: modul
 tags: [modul]
 ---
@@ -10,11 +10,13 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Je Fundament die Zahlen der Situationszeichnung, in den Einheiten der
-Anzeige -- m, kN, Grad: wie tief und wie weit der Gleitkoerper reicht, sein
-Umriss, die Lage des Grundwassers, wie die Rechnung sie eingeordnet hat, und
-je Kombination die Kraefte, die Neigung der Last und die beiden
-Erfuellungsgrade. Die Abmessungen selbst liest die Oberflaeche aus dem
-Eintrag; was der Kern daraus macht, kommt von hier.
+Anzeige -- m, kN: wie tief und wie weit der Gleitkoerper reicht, sein
+Umriss und je Kombination die Kraefte und die beiden Erfuellungsgrade. Dazu
+die Legende unter dem Bild ([[opencivil.web.anzeige]]): je Kombination
+ihre Zeile mit der Neigung der Last, darunter das Grundwasser, wie die
+Rechnung es eingeordnet hat, der Gleitkoerper und die Laenge. Die
+Abmessungen selbst liest die Oberflaeche aus dem Eintrag; was der Kern
+daraus macht, kommt von hier.
 
 Gerechnet wird hier nichts, was nicht der Kern schon weiss: der Umriss kommt
 aus [[opencivil.geotechnik.grundbruch#gleitkoerper|opencivil.geotechnik.grundbruch.gleitkoerper]], mit denselben
@@ -32,12 +34,26 @@ Was die Zeichnung eines Fundaments braucht. Ohne eingeschaltete
 Kombination gibt es keinen Nachweis und keinen Befund -- dann zeichnet
 sie nur das Fundament, ohne Gleitkörper und ohne Kräfte.
 
+### _legende
+
+```python
+def _legende(fundament: grundbruch.Fundament, befund: Optional[grundbruch.Grundbruchbefund], *, gezeichnet: bool) -> List[list]
+```
+
+Die Zeilen unter dem Bild, die fuer jede Kombination gelten: das
+Grundwasser, der Gleitkoerper -- gezeichnet ist er ohne die Neigungen --
+und die Laenge senkrecht zum Bild. Die Zeile der gezeigten Kombination
+steht bei ihr.
+
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
+- [[opencivil.core.latex]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.projekt]]
+- [[opencivil.web.anzeige]]
 
 ## Gebraucht von
 
