@@ -1,5 +1,5 @@
 ---
-erzeugt: a9059987a6df
+erzeugt: 699c5fb2e01a
 art: modul
 tags: [modul]
 ---
@@ -11,11 +11,11 @@ tags: [modul]
 
 Was einen Durchstanznachweis beschreibt, als Vorgaben im Rechenwerk
 ([[opencivil.durchstanzen.stelle#Durchstanzstelle|Durchstanzstelle]]), und die Wahlen dazu: Decke oder Bodenplatte
-([[opencivil.durchstanzen.stelle#Plattenart|Plattenart]]), Form und Lage der gestützten Fläche
-([[opencivil.durchstanzen.stelle#Stuetzenform|Stuetzenform]], [[opencivil.durchstanzen.stelle#Lage|Lage]]), die Näherungsstufe der
-Plattenrotation ([[opencivil.durchstanzen.stelle#Naeherungsstufe|Naeherungsstufe]]) und wie k_e bestimmt wird
-([[opencivil.durchstanzen.stelle#KeArt|KeArt]]). Aus ihren Massen baut sie die Kandidaten des
-Nachweisschnitts ([[opencivil.durchstanzen.stelle#Durchstanzstelle.kandidaten|Durchstanzstelle.kandidaten]]).
+([[opencivil.durchstanzen.stelle#Plattenart|Plattenart]]), die Näherungsstufe der Plattenrotation
+([[opencivil.durchstanzen.stelle#Naeherungsstufe|Naeherungsstufe]]) und wie k_e bestimmt wird ([[opencivil.durchstanzen.stelle#KeArt|KeArt]]). Was
+Lage und Form der gestützten Fläche heissen, steht in [[opencivil.durchstanzen.flaeche|.flaeche]].
+Welche Felder der Nachweis liest, sagt [[opencivil.durchstanzen.stelle#eingaben_fuer|eingaben_fuer]] -- dieselben Teile
+bekommt die Maske über den Katalog, damit sie nichts davon nachbaut.
 
 
 ## DECKE UND BODENPLATTE
@@ -25,15 +25,6 @@ Bodenplatte unten -- die Bodenpressung drückt sie von unten gegen die Stütze.
 Gerechnet wird gleich; anders heisst nur, was an Flächenlast innerhalb des
 Nachweisschnitts abgezogen wird (4.3.6.2.6): bei der Decke Eigengewicht und
 Nutzlast, bei der Bodenplatte die Bodenpressung.
-
-
-## KOORDINATEN
-
-In der Ebene der Platte, in m. Eine Stütze steht mit ihrer Achse im
-Ursprung; der Plattenrand einer Randstütze liegt unten (y negativ), bei der
-Eckstütze liegt ein zweiter links (x negativ). Ein Wandende liegt im
-Ursprung, die Wand läuft nach +x; eine Wandecke liegt mit ihrer äusseren
-Ecke im Ursprung, die Wände laufen nach +x und +y, die Platte liegt aussen.
 
 
 ## EINHEITEN
@@ -87,66 +78,6 @@ def druckseite(self) -> str
 
 Die andere Seite -- dort liegen die unteren Köpfe der Durchstanzbewehrung.
 
-### Stuetzenform
-
-```python
-class Stuetzenform(Wahl)
-```
-
-Die Form einer Stütze im Grundriss. Die Ovalstütze ist ein Rechteck mit
-halbrunden Enden, b_x × b_y über alles -- so heisst sie in der Software von
-Leviat (DURA); der Name ist nicht aus der Norm.
-
-- `RECHTECK = 'rechteck'`
-- `RUND = 'rund'`
-- `OVAL = 'oval'`
-
-#### Stuetzenform.beschriftung
-
-```python
-@property
-def beschriftung(self) -> str
-```
-
-### Lage
-
-```python
-class Lage(Wahl)
-```
-
-Wo die gestützte Fläche in der Platte liegt.
-
-- `INNEN = 'innen'`
-- `RAND = 'rand'`
-- `ECKE = 'ecke'`
-- `WANDENDE = 'wandende'`
-- `WANDECKE = 'wandecke'`
-
-#### Lage.beschriftung
-
-```python
-@property
-def beschriftung(self) -> str
-```
-
-#### Lage.wand
-
-```python
-@property
-def wand(self) -> bool
-```
-
-#### Lage.k_e
-
-```python
-@property
-def k_e(self) -> float
-```
-
-Die Näherung für k_e nach SIA 262:2025, 4.3.6.2.5 -- für Innenstützen
-mit grossen Aussparungen in Stützennähe gilt 0.7 wie am Rand
-([[opencivil.durchstanzen.stelle#Durchstanzstelle|Durchstanzstelle.k_e_naeherung]]).
-
 ### Naeherungsstufe
 
 ```python
@@ -175,6 +106,16 @@ def faktor(self) -> float
 
 Der Vorfaktor in Gleichung (60): 1.5, in Stufe 3 mit Momenten aus der Elastizitätstheorie 1.2.
 
+#### Naeherungsstufe.eingaben
+
+```python
+@property
+def eingaben(self) -> Tuple[str, ...]
+```
+
+Was die Stufe liest: die Spannweiten, in Stufe 2 dazu die Exzentrizität
+für die Momente im Stützstreifen, in Stufe 3 statt beidem r_s und m_sd.
+
 ### KeArt
 
 ```python
@@ -192,6 +133,32 @@ Woher k_e kommt: aus der Näherung (4.3.6.2.5) oder aus der Exzentrizität (57).
 @property
 def beschriftung(self) -> str
 ```
+
+#### KeArt.eingaben
+
+```python
+@property
+def eingaben(self) -> Tuple[str, ...]
+```
+
+### wirksame_stufe
+
+```python
+def wirksame_stufe(flaeche: GestuetzteFlaeche, stufe: Naeherungsstufe) -> Naeherungsstufe
+```
+
+Die Stufe, mit der gerechnet wird: Stufe 2 braucht die Momente im
+Stützstreifen -- wo 4.3.6.4.7 keine nennt, an Wänden, rechnet sie wie
+Stufe 1.
+
+### eingaben_fuer
+
+```python
+def eingaben_fuer(flaeche: GestuetzteFlaeche, stufe: Naeherungsstufe, ke: KeArt) -> Tuple[str, ...]
+```
+
+Die Kurznamen, die der Nachweis liest: die Masse der gestützten Fläche,
+was die wirksame Stufe liest und was k_e liest -- je ohne Doppel.
 
 ### Durchstanzstelle
 
@@ -219,8 +186,7 @@ b_x, eine Innenstütze keinen Randabstand.
 - `phi_y: Groesse`
 - `s_y: Groesse`
 - `aussen: Richtung` – Welche Lage der Zugbewehrung aussen liegt, näher am Rand.
-- `form: Stuetzenform`
-- `lage: Lage`
+- `flaeche: GestuetzteFlaeche`
 - `b_x: Groesse`
 - `b_y: Groesse`
 - `D: Groesse`
@@ -262,63 +228,19 @@ def id_von(self, kurzname: str) -> str
 def ins_rechenwerk(self, werk) -> 'Durchstanzstelle'
 ```
 
-#### Durchstanzstelle.masse
-
-```python
-def masse(self) -> Tuple[str, ...]
-```
-
-Die Masse der gestützten Fläche, die für Form und Lage gelten.
-
 #### Durchstanzstelle.eingaben
 
 ```python
 def eingaben(self) -> Tuple[str, ...]
 ```
 
-Die Kurznamen, die der Nachweis liest.
+Die Kurznamen, die der Nachweis liest -- siehe [[opencivil.durchstanzen.stelle#eingaben_fuer|eingaben_fuer]].
 
-#### Durchstanzstelle.stuetze
 
-```python
-def stuetze(self, masse: Dict[str, float]) -> Stuetzenflaeche
-```
+## Konstanten
 
-Die Stütze aus ihren Massen in m, mit der Achse im Ursprung.
-
-#### Durchstanzstelle.raender
-
-```python
-def raender(self, masse: Dict[str, float]) -> Tuple[Halbebene, ...]
-```
-
-Die Plattenränder: unten am Rand, unten und links an der Ecke.
-
-#### Durchstanzstelle.achse
-
-```python
-def achse(self, masse: Dict[str, float]) -> Punkt
-```
-
-Die Achse der gestützten Fläche -- von ihr gehen die Strahlen an Aussparungen vorbei.
-
-#### Durchstanzstelle.kandidaten
-
-```python
-def kandidaten(self, masse: Dict[str, float], abstand: float, d_v: float) -> List[Kandidat]
-```
-
-Die möglichen Nachweisschnitte im Abstand `abstand` -- siehe [[opencivil.durchstanzen.schnitt|.schnitt]].
-
-#### Durchstanzstelle.umriss
-
-```python
-def umriss(self, masse: Dict[str, float], d_v: float) -> List[Punkt]
-```
-
-Der Umriss der gestützten Fläche fürs Bild -- eine Wand 4·d_v weit, etwas
-über den Schnitt hinaus, der entlang der Wand 3.5·d_v weit reicht.
-
+- `VOR_DEN_MASSEN = ('h', 'c', 'c_v', 'D_max', 'phi_x', 's_x', 'phi_y', 's_y')` – Was der Nachweis an jeder Stelle liest -- vor den Massen der gestützten Fläche und danach.
+- `NACH_DEN_MASSEN = ('V_d', 'q_d')`
 
 ## Braucht
 
@@ -327,14 +249,14 @@ Der Umriss der gestützten Fläche fürs Bild -- eine Wand 4·d_v weit, etwas
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.material.basis]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von
 
-- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.durchstanzen]]
-- [[opencivil.web.api]]
+- [[opencivil.web.durchstanzdaten]]

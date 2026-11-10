@@ -1,5 +1,5 @@
 ---
-erzeugt: b5df2689e349
+erzeugt: 3bc2637b6336
 art: modul
 tags: [modul]
 ---
@@ -192,7 +192,6 @@ Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 - [[opencivil.durchstanzen.produkte]]
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
-- [[opencivil.durchstanzen.stelle]]
 
 ## Gebraucht von
 

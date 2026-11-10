@@ -9,6 +9,12 @@ Leisten mit ihren Ankern und dem äusseren Schnitt und der Stahlpilz mit seinen
 Stegen und dem Schnitt um ihn, je für sich. Dazu die Zahlen der Legende.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises (:mod:`opencivil.durchstanzen.nachweis`).
+
+Für den Katalog die Wahlen der Maske (:func:`wahlen`): je Stellung ihre
+Beschriftung, und welche Felder der Nachweis mit ihr liest -- die Masse je
+Lage und Form, die Felder je Näherungsstufe und Lage, die von k_e. Die Maske
+zeigt die Vereinigung, so baut sie die Regel nicht nach
+(:func:`opencivil.durchstanzen.stelle.eingaben_fuer`).
 """
 
 from __future__ import annotations
@@ -16,9 +22,11 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from opencivil.core.rechenwerk import Loesung
+from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.nachweis import Durchstanzbefund
 from opencivil.durchstanzen.pruefung import Leistenpruefung, Pilzbefund
 from opencivil.durchstanzen.schnitt import Nachweisschnitt
+from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart, wirksame_stufe
 from opencivil.projekt import Aufbau
 
 mm = 1e3
@@ -26,6 +34,38 @@ mm = 1e3
 
 def _punkte(punkte) -> list:
     return [[p[0] * mm, p[1] * mm] for p in punkte]
+
+
+def wahlen() -> Dict[str, Any]:
+    """
+    Die Schalter einer Durchstanzstelle mit ihren Stellungen -- und je Lage
+    ihre Art: wie die Maske ihre Masse überschreibt, ob sie eine Form hat,
+    welche Masse sie je Form liest, was die Liste von ihr zeigt und welche
+    Felder jede Näherungsstufe an ihr liest.
+    """
+    def stellungen(wahl) -> list:
+        return [{"wert": w.value, "beschriftung": w.beschriftung} for w in wahl]
+
+    def lage(l: Lage) -> Dict[str, Any]:
+        arten = {form: l.flaeche(form) for form in Stuetzenform}
+        # Titel, Form und Stufen hängen an der Lage, nicht an der Form.
+        art = arten[Stuetzenform.RECHTECK]
+        return {
+            "wert": l.value, "beschriftung": l.beschriftung, "titel": art.titel,
+            "hat_form": art.hat_form,
+            "masse": {form.value: list(a.masse) for form, a in arten.items()},
+            "kurz": {form.value: a.kurz for form, a in arten.items()},
+            "stufen": {st.value: list(wirksame_stufe(art, st).eingaben) for st in Naeherungsstufe},
+        }
+
+    return {
+        "plattenarten": stellungen(Plattenart),
+        "lagen": [lage(l) for l in Lage],
+        "formen": stellungen(Stuetzenform),
+        "stufen": stellungen(Naeherungsstufe),
+        "ke": [{"wert": k.value, "beschriftung": k.beschriftung, "eingaben": list(k.eingaben)}
+               for k in KeArt],
+    }
 
 
 def situationen(aufbau: Aufbau, loesung: Loesung) -> Dict[str, Any]:

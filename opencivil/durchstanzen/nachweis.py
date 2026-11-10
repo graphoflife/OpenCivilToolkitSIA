@@ -56,11 +56,12 @@ from opencivil.core.protokoll import GleichungBlock, Protokoll, TabellenBlock, Z
 from opencivil.core.wert import Wert, WertDef
 from opencivil.durchstanzen import herleitung, mit_bewehrung
 from opencivil.durchstanzen.herleitung import STUETZE
+from opencivil.durchstanzen.flaeche import Randbreite
 from opencivil.durchstanzen.mit_bewehrung import Grundlage
 from opencivil.durchstanzen.pruefung import Leistenpruefung, Pilzbefund, Schnittpruefung
 from opencivil.durchstanzen.schnitt import Auswertung, Punkt, nachweisschnitt
 from opencivil.durchstanzen.stelle import (
-    Durchstanzstelle, KeArt, Lage, Naeherungsstufe, Stuetzenform,
+    Durchstanzstelle, KeArt, Naeherungsstufe, wirksame_stufe,
 )
 from opencivil.nachweis.querkraft_ohne_buegel import beiwert_k_g
 from opencivil.querschnitt.platte import Richtung
@@ -129,8 +130,9 @@ class Durchstanzen(Nachweis):
         self.d_ohne: WertDef = grad_def(
             f"{basis}.ohne.erfuellungsgrad", r"\alpha_{eff,DS}",
             "Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung", "SIA 262:2025, 4.3.6.3")
-        # Die Grade mit Durchstanzbewehrung (4.3.6.5.1). Braucht es keine, sind
-        # sie unbeschränkt; an einer Wand, für die nichts vorgeschlagen wird, null.
+        # Die Grade mit Durchstanzbewehrung (4.3.6.5.1). Braucht es keine, oder
+        # schlägt das Werkzeug keine vor, fällt kein Urteil, und der Kern setzt
+        # sie unbeschränkt.
         self.d_mit: WertDef = grad_def(
             f"{basis}.mit.erfuellungsgrad", r"\alpha_{eff,DS,s}",
             "Erfüllungsgrad der Durchstanzbewehrung", "SIA 262:2025, 4.3.6.5.2")
@@ -164,20 +166,20 @@ class Durchstanzen(Nachweis):
     # -- Rechnen ------------------------------------------------------------
 
     def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
-        s = self.stelle
+        s, f = self.stelle, self.stelle.flaeche
         w = Zwischenwerte(self.id)
         p.titel("Durchstanzen")
         p.erklaerung(
-            f"{s.lage.beschriftung} einer {s.plattenart.beschriftung}. Die Querkraft "
+            f"{f.lage.beschriftung} einer {s.plattenart.beschriftung}. Die Querkraft "
             f"fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne "
             f"Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, "
             f"wie stark sich die Platte über der Stütze verdreht: je grösser die "
             f"Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k_r.")
-        masse = {k: e.g(k).si for k in s.masse()}
+        masse = {k: e.g(k).si for k in f.masse}
         d, d_v, hoehen = self._statische_hoehe(e, p, w)
         dv = d_v.groesse.si
-        schnitt = nachweisschnitt(s.kandidaten(masse, dv / 2.0, dv), d_v=dv,
-                                  achse=s.achse(masse), aussparungen=s.aussparungen)
+        schnitt = nachweisschnitt(f.kandidaten(masse, dv / 2.0, dv), d_v=dv,
+                                  achse=f.achse(masse), aussparungen=s.aussparungen)
         a = schnitt.massgebend
         u_red = self._nachweisschnitt(e, p, w, a, d_v)
         e_u = self._exzentrizitaet(e, a, masse)
@@ -199,14 +201,14 @@ class Durchstanzen(Nachweis):
         v = Vergleich(V_d, V_Rd_c)
         v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
         v.zeile(p, self.d_ohne, mit_urteil=True)
-        umriss = tuple(s.umriss(masse, dv))
+        umriss = tuple(f.umriss(masse, dv))
         befund = Durchstanzbefund(
             d=d.groesse.si, innen=innen, rotationen=rotationen, psi=psi.groesse.si,
             k_r=k_r.groesse.si, V_Rd_c=V_Rd_c.groesse.si, umriss=umriss,
             aussparungen=tuple(s.aussparungen),
             raender=tuple(((h.c * h.n[0], h.c * h.n[1]), math.atan2(-h.n[1], -h.n[0]))
-                          for h in s.raender(masse)))
-        if not v.erfuellt and not s.lage.wand:
+                          for h in f.raender(masse)))
+        if not v.erfuellt and f.vorschlag:
             urteile, leisten, pilz = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
                 innen=innen, d=d, d_v=d_v, k_e=k_e, k_r=k_r, tau_cd=tau_cd, u=u, psi=psi,
                 V_d=V_d, V_Rd_c=V_Rd_c, masse=masse, umriss=umriss))
@@ -214,7 +216,7 @@ class Durchstanzen(Nachweis):
             return Ausfuehrung({self.d_ohne.id: Groesse(v.grad, EINHEITSLOS)}, urteile,
                                replace(befund, leisten=leisten, pilz=pilz))
         if not v.erfuellt:
-            p.hinweis(f"Für {_mehrzahl(s.lage)} schlägt das Werkzeug noch keine "
+            p.hinweis(f"Für {f.lage.mehrzahl} schlägt das Werkzeug noch keine "
                       f"Durchstanzbewehrung vor.")
         elif psi.groesse.si <= ROTATION_MINDEST:
             p.hinweis(
@@ -271,44 +273,17 @@ class Durchstanzen(Nachweis):
                          d_v: Wert) -> Wert:
         """
         Der Nachweisschnitt und was von ihm nicht zählt: ``u_red``, noch ohne
-        k_e. Um einfache Flächen steht u_0 als Formel, sonst als Länge in der
-        Platte; die Abzüge schreibt :mod:`.herleitung`, wie an jedem Schnitt.
+        k_e. Wo die gestützte Fläche eine Formel für u_0 kennt, steht sie da,
+        sonst die Länge in der Platte; die Abzüge schreibt :mod:`.herleitung`,
+        wie an jedem Schnitt.
         """
-        s = self.stelle
+        f = self.stelle.flaeche
         p.titel("Nachweisschnitt", ebene=3)
-        referenz = "SIA 262:2025, 4.3.6.2.2"
-        einfach = (s.lage is Lage.INNEN and a.an_ecken < 1e-6
-                   and a.hinter_aussparungen < 1e-6)
-        if s.lage.wand:
-            # Entlang der Wand zählt der Schnitt 1.5·d_v; was dahinter läuft, gehört nicht dazu.
-            if s.lage is Lage.WANDENDE:
-                u_0 = w.laenge("u_0", "u_0", e.g("t").si + 3.0 * d_v.groesse.si
-                               + math.pi * d_v.groesse.si / 2.0, stellen=0)
-                vorlage, eingaben = r"@t + 3 \cdot @d_v + \frac{\pi \cdot @d_v}{2}", {"t": e["t"]}
-                titel = "Nachweisschnitt um das Wandende: 1.5·d_v entlang der Wand"
-            else:
-                u_0 = w.laenge("u_0", "u_0", 3.0 * d_v.groesse.si + math.pi * d_v.groesse.si / 4.0,
-                               stellen=0)
-                vorlage, eingaben = r"3 \cdot @d_v + \frac{\pi \cdot @d_v}{4}", {}
-                titel = "Nachweisschnitt um die Wandecke: je 1.5·d_v entlang der Wände"
-            p.formel(u_0, vorlage, {**eingaben, "d_v": d_v}, titel=titel,
-                     referenz="SIA 262:2025, 4.3.6.2.3, Figur 23b und c")
-        elif einfach and s.form is Stuetzenform.RECHTECK:
-            u_0 = w.laenge("u_0", "u_0", a.in_der_platte, stellen=0)
-            p.formel(u_0, r"2 \cdot \left(@b_x + @b_y\right) + \pi \cdot @d_v",
-                     {"b_x": e["b_x"], "b_y": e["b_y"], "d_v": d_v},
-                     titel="Nachweisschnitt im Abstand d_v/2", referenz=f"{referenz}, Figur 22b")
-        elif einfach and s.form is Stuetzenform.RUND:
-            u_0 = w.laenge("u_0", "u_0", a.in_der_platte, stellen=0)
-            p.formel(u_0, r"\pi \cdot \left(@D + @d_v\right)", {"D": e["D"], "d_v": d_v},
-                     titel="Nachweisschnitt im Abstand d_v/2", referenz=f"{referenz}, Figur 22a")
-        elif einfach:
-            u_0 = w.laenge("u_0", "u_0", a.in_der_platte, stellen=0)
-            p.formel(u_0, r"2 \cdot \left|@b_x - @b_y\right| + \pi \cdot "
-                          r"\left(\min\left[@b_x;\ @b_y\right] + @d_v\right)",
-                     {"b_x": e["b_x"], "b_y": e["b_y"], "d_v": d_v},
-                     titel="Nachweisschnitt im Abstand d_v/2: zwei Geraden und zwei Halbkreise",
-                     referenz=f"{referenz}, Figur 22", name="Nachweisschnitt im Abstand d_v/2")
+        formel = f.umfang(e, d_v, a)
+        if formel is not None:
+            u_0 = w.laenge("u_0", "u_0", formel.wert, stellen=0)
+            p.formel(u_0, formel.vorlage, formel.eingaben, titel=formel.titel,
+                     referenz=formel.referenz, name=formel.name)
         else:
             if a.kandidat.raender:
                 p.erklaerung(
@@ -316,9 +291,9 @@ class Durchstanzen(Nachweis):
                     "(Figur 22d). Was jenseits des Rands läge, zählt nicht.")
             u_0 = herleitung.rand(p, w, a, ix=STUETZE,
                                   titel="Nachweisschnitt im Abstand d_v/2, soweit er in der Platte liegt",
-                                  referenz=f"{referenz}, Figur 22")
+                                  referenz="SIA 262:2025, 4.3.6.2.2, Figur 22")
         return herleitung.abzuege(
-            p, w, a, u_0, ix=STUETZE, ecken=not s.lage.wand,
+            p, w, a, u_0, ix=STUETZE, ecken=f.ecken_abziehen,
             ecken_text="An den Ecken grosser gestützter Flächen ballt sich die Querkraft: von "
                        "einer geraden Strecke des Schnitts zählt nur, was höchstens 1.5·d_v von "
                        "einer Ecke entfernt liegt.",
@@ -330,8 +305,7 @@ class Durchstanzen(Nachweis):
         e_u: von dem Schwerpunkt der zählenden Teile des Schnitts zur Resultierenden
         der Auflagerkraft -- je Komponente, in m.
         """
-        s = self.stelle
-        ax, ay = s.achse(masse)
+        ax, ay = self.stelle.flaeche.achse(masse)
         ex = e.g("e_x").si if e.hat("e_x") else 0.0
         ey = e.g("e_y").si if e.hat("e_y") else 0.0
         return (ax + ex - a.schwerpunkt[0], ay + ey - a.schwerpunkt[1])
@@ -342,18 +316,14 @@ class Durchstanzen(Nachweis):
         s = self.stelle
         p.titel("Momentenübertragung", ebene=3)
         if s.ke is KeArt.NAEHERUNG:
-            grosse_aussparung = s.lage is Lage.INNEN and a.hinter_aussparungen > 1e-6
-            k = 0.7 if grosse_aussparung else s.lage.k_e
+            k, titel = s.flaeche.k_e_naeherung(a)
             k_e = w.zahl("k_e", "k_e", k, stellen=2)
             p.erklaerung(
                 "Bei regelmässig gestützten Flachdecken mit gleichmässigen angrenzenden "
                 "Spannweiten und biegesteif angeschlossenen Stützen, die nicht für die "
                 "Aufnahme horizontaler Einwirkungen ausgelegt sind, darf k_e näherungsweise "
                 "angenommen werden.")
-            p.wert(k_e, titel=("Näherung für Innenstützen mit grossen Aussparungen in "
-                               "Stützennähe" if grosse_aussparung
-                               else f"Näherung für {_mehrzahl(s.lage)}"),
-                   referenz="SIA 262:2025, 4.3.6.2.5")
+            p.wert(k_e, titel=titel, referenz="SIA 262:2025, 4.3.6.2.5")
             return k_e
         A = w.wert("A_u", "A_u", Groesse.aus_si(a.flaeche, M2), 3,
                    "Fläche innerhalb des Nachweisschnitts")
@@ -382,11 +352,10 @@ class Durchstanzen(Nachweis):
         """ψ je Richtung und die massgebende -- die grössere (4.3.6.4.1)."""
         s = self.stelle
         p.titel("Plattenrotation", ebene=3)
-        stufe = s.stufe
-        if stufe is Naeherungsstufe.ZWEI and s.lage.wand:
-            p.hinweis(f"Für {_mehrzahl(s.lage)} nennt 4.3.6.4.7 keine Momente im Stützstreifen: "
-                      f"gerechnet wie in Näherungsstufe 1, mit m_sd/m_Rd = 1.")
-            stufe = Naeherungsstufe.EINS
+        stufe = wirksame_stufe(s.flaeche, s.stufe)
+        if stufe is not s.stufe:
+            p.hinweis(f"Für {s.flaeche.lage.mehrzahl} nennt 4.3.6.4.7 keine Momente im "
+                      f"Stützstreifen: gerechnet wie in {stufe.beschriftung}, mit m_sd/m_Rd = 1.")
         p.erklaerung(
             f"{stufe.beschriftung}: "
             + {Naeherungsstufe.EINS: "für regelmässig gestützte Flachdecken mit "
@@ -490,46 +459,36 @@ class Durchstanzen(Nachweis):
         for r, e_i in ((Richtung.X, e_u[0]), (Richtung.Y, e_u[1])):
             k = r.value
             e_w = w.laenge(f"e_u{k}", f"e_{{u,{k}}}", abs(e_i), stellen=0)
-            breite, gleichung, teiler, mindest = b_s, "(62)", 2.0, 0.0
-            if s.lage is Lage.RAND and r is Richtung.X:
-                gleichung, mindest = "(63)", 0.25
-            elif s.lage is Lage.RAND:
-                breite, gleichung, teiler = self._b_sr(p, w, r, b_s, masse), "(64)", 1.0
-            elif s.lage is Lage.ECKE:
-                breite, gleichung, teiler, mindest = self._b_sr(p, w, r, b_s, masse), "(65)", 1.0, 0.5
-            m_si = max(V * (1.0 / 8.0 + abs(e_i) / (teiler * breite.groesse.si)), mindest * V)
+            g = s.flaeche.momentengleichung(r, masse)
+            breite = b_s if g.rand is None else self._b_sr(p, w, r, b_s, g.rand)
+            m_si = max(V * (1.0 / 8.0 + abs(e_i) / (g.teiler * breite.groesse.si)), g.mindest * V)
             m = w.wert(f"m_sd{k}", f"m_{{sd,{k}}}", Groesse.aus_si(m_si, KNM_PRO_M), 1)
-            nenner = r"2 \cdot @b" if teiler == 2.0 else "@b"
+            nenner = r"2 \cdot @b" if g.teiler == 2.0 else "@b"
             vorlage = rf"@V_d \cdot \left(\frac{{1}}{{8}} + \frac{{@e}}{{{nenner}}}\right)"
-            if mindest:
-                vorlage = rf"\max\left[{vorlage};\ {mindest:g} \cdot @V_d\right]"
+            if g.mindest:
+                vorlage = rf"\max\left[{vorlage};\ {g.mindest:g} \cdot @V_d\right]"
             p.formel(m, vorlage, {"V_d": V_d, "e": e_w, "b": breite},
                      titel=f"Mittleres Moment im Stützstreifen in {k}",
-                     referenz=f"SIA 262:2025, 4.3.6.4.7, {gleichung}",
+                     referenz=f"SIA 262:2025, 4.3.6.4.7, {g.nummer}",
                      name="Mittleres Moment im Stützstreifen")
             ergebnis[r] = m
         return ergebnis
 
     def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert,
-              masse: Dict[str, float]) -> Wert:
+              rand: Randbreite) -> Wert:
         """
         Die Breite eines Streifens senkrecht zum Rand oder eines Randstreifens an
         der Ecke (Figur 25) -- siehe Dateikopf.
         """
-        s = self.stelle
-        rund = s.form is Stuetzenform.RUND
-        b = {"x": masse["D"] if rund else masse["b_x"], "y": masse["D"] if rund else masse["b_y"]}
-        quer, laengs = ("x", "y") if r is Richtung.Y else ("y", "x")
-        abstand = f"a_{laengs}"
-        breite_si = b[quer] + 2.0 * (b[laengs] + masse[abstand])
+        quer, laengs, a = rand.quer, rand.laengs, rand.abstand
+        breite_si = quer.wert + 2.0 * (laengs.wert + a.wert)
         b_sr = w.laenge(f"b_sr{r.value}", f"b_{{sr,{r.value}}}", min(b_s.groesse.si, breite_si),
                         stellen=0)
         p.formel(b_sr, r"\min\left[@b_s;\ @quer + 2 \cdot \left(@laengs + @a\right)\right]",
                  {"b_s": b_s,
-                  "quer": w.laenge(f"b_{quer}", "D" if rund else f"b_{quer}", b[quer], stellen=0),
-                  "laengs": w.laenge(f"b_{laengs}", "D" if rund else f"b_{laengs}", b[laengs],
-                                     stellen=0),
-                  "a": w.laenge(abstand, abstand, masse[abstand], stellen=0)},
+                  "quer": w.laenge(quer.name, quer.zeichen, quer.wert, stellen=0),
+                  "laengs": w.laenge(laengs.name, laengs.zeichen, laengs.wert, stellen=0),
+                  "a": w.laenge(a.name, a.zeichen, a.wert, stellen=0)},
                  titel=f"Breite des Stützstreifens in {r.value}, durch den Plattenrand begrenzt",
                  referenz="SIA 262:2025, 4.3.6.4.6, Figur 25",
                  name="Breite des Stützstreifens am Plattenrand")
@@ -552,12 +511,6 @@ class Durchstanzen(Nachweis):
         return k_r
 
 
-def _mehrzahl(lage: Lage) -> str:
-    """«Innenstützen», «Wandenden» -- wie die Näherung von 4.3.6.2.5 sie nennt."""
-    return {Lage.INNEN: "Innenstützen", Lage.RAND: "Randstützen", Lage.ECKE: "Eckstützen",
-            Lage.WANDENDE: "Wandenden", Lage.WANDECKE: "Wandecken"}[lage]
-
-
 # ===========================================================================
 # Für die Zusammenfassung
 # ===========================================================================
@@ -565,9 +518,9 @@ def _mehrzahl(lage: Lage) -> str:
 
 def angaben(stelle: Durchstanzstelle, werte: Dict[str, Wert]) -> GleichungBlock:
     """Was über der Tabelle steht: Lage, Platte, Beton und die Masse, wie gerechnet."""
-    teile = [als_text(f"{stelle.lage.beschriftung}, {stelle.plattenart.beschriftung}, "
+    teile = [als_text(f"{stelle.flaeche.lage.beschriftung}, {stelle.plattenart.beschriftung}, "
                       f"Beton {stelle.beton.name}")]
-    teile += [angabe(werte[stelle.id_von(n)]) for n in ("h", *stelle.masse())
+    teile += [angabe(werte[stelle.id_von(n)]) for n in ("h", *stelle.flaeche.masse)
               if stelle.id_von(n) in werte]
     return GleichungBlock(latex=r" \qquad ".join(teile), titel="Angaben zur Durchstanzstelle")
 

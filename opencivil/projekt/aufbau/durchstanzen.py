@@ -61,7 +61,7 @@ def bauen(art: "Bauteilart", eintrag: DurchstanzEintrag, aufbau: Aufbau) -> Baut
         stahl=material(aufbau.baustoffe, eintrag.stahl, "betonstahl", wo),
         h=g("h"), c=g("c"), c_v=g("c_v"), D_max=g("D_max"),
         phi_x=g("phi_x"), s_x=g("s_x"), phi_y=g("phi_y"), s_y=g("s_y"), aussen=eintrag.aussen,
-        form=eintrag.form, lage=eintrag.lage, b_x=g("b_x"), b_y=g("b_y"), D=g("D"), t=g("t"),
+        flaeche=eintrag.lage.flaeche(eintrag.form), b_x=g("b_x"), b_y=g("b_y"), D=g("D"), t=g("t"),
         a_x=g("a_x"), a_y=g("a_y"), l_x=g("l_x"), l_y=g("l_y"), stufe=eintrag.stufe,
         r_sx=g("r_sx"), r_sy=g("r_sy"), m_sdx=g("m_sdx"), m_sdy=g("m_sdy"),
         V_d=g("V_d"), q_d=g("q_d"), ke=eintrag.ke, e_x=g("e_x"), e_y=g("e_y"),

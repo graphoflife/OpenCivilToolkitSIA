@@ -56,7 +56,6 @@ from opencivil.durchstanzen.schnitt import (
     ECKENBEREICH, Punkt, Schatten, Stueck, Stuetzenflaeche, kandidaten_stuetze, konvexe_huelle,
     nachweisschnitt, schatten_am_schnitt,
 )
-from opencivil.durchstanzen.stelle import Lage
 
 if TYPE_CHECKING:
     from opencivil.durchstanzen.nachweis import Durchstanzen
@@ -156,10 +155,11 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g
     werte = _Werte(e, g, e[s.stahl.eingabename("f_yd")], e[s.stahl.eingabename("E_s")],
                    e[s.beton.eingabename("f_ctm")], c_v, h_A,
                    w.laenge("d_v_out", r"d_{v,out}", g.d.groesse.si - c_v))
-    stuetze = Ort("", "", g.umriss, lambda r: s.kandidaten(g.masse, r, g.d_v.groesse.si)[0].stuecke,
-                  g.innen, s.lage in (Lage.INNEN, Lage.WANDENDE),
+    f = s.flaeche
+    stuetze = Ort("", "", g.umriss, lambda r: f.kandidaten(g.masse, r, g.d_v.groesse.si)[0].stuecke,
+                  g.innen, f.k_sys_erhoeht,
                   tuple(schatten_am_schnitt(s.aussparungen, g.innen.auswertung.kandidat.stuecke,
-                                            d_v=g.innen.d_v, achse=s.achse(g.masse))),
+                                            d_v=g.innen.d_v, achse=f.achse(g.masse))),
                   g.d_v, g.u, g.V_d, g.V_Rd_c)
     leisten = _suchen(n, werte, stuetze)
     if leisten is not None:
@@ -170,7 +170,7 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g
         p.hinweis("Für diese Platte gibt es kein ancoPLUS: sie ist zu dünn (d < 160 mm), "
                   "keine lieferbare Höhe passt, oder keine Leiste findet Platz.")
         urteile = n.nicht_fuehrbar("Kein ancoPLUS passt in diese Platte.")
-    if s.lage is not Lage.INNEN:
+    if not f.stahlpilz:
         p.hinweis("Stahlpilze sind im Katalog nur für Innenstützen. Eine grössere Stütze, eine "
                   "dickere Platte oder ein besserer Beton.")
         return urteile, leisten, None
@@ -199,8 +199,9 @@ def _suchen(n: "Durchstanzen", werte: _Werte, ort: Ort) -> Optional[Leistenpruef
 
     return bemessen(
         d=g.d.groesse.si, d_v=ort.pruefung.d_v, d_v_out=werte.d_v_out.groesse.si,
-        h_A=werte.h_A.groesse.si, r_2_zu=ort.r_zu, umriss=ort.umriss, raender=s.raender(g.masse),
-        aussparungen=s.aussparungen, schatten=ort.schatten, achse=s.achse(g.masse),
+        h_A=werte.h_A.groesse.si, r_2_zu=ort.r_zu, umriss=ort.umriss,
+        raender=s.flaeche.raender(g.masse), aussparungen=s.aussparungen, schatten=ort.schatten,
+        achse=s.flaeche.achse(g.masse),
         ueberdeckung=e.g("c").si, pruefen=pruefen)
 
 
@@ -356,8 +357,9 @@ def _pilz_pruefen(n: "Durchstanzen", werte: _Werte, pilz: Stahlpilz) -> Pilzbefu
     umriss = tuple(konvexe_huelle(list(g.umriss) + list(pilz.armenden())))
     d_v = g.d.groesse.si - produkte.PILZ_UNTEN
     schnitt = nachweisschnitt(
-        kandidaten_stuetze(Stuetzenflaeche(umriss), d_v / 2.0, ECKENBEREICH * d_v, s.raender(g.masse)),
-        d_v=d_v, achse=s.achse(g.masse), aussparungen=s.aussparungen)
+        kandidaten_stuetze(Stuetzenflaeche(umriss), d_v / 2.0, ECKENBEREICH * d_v,
+                           s.flaeche.raender(g.masse)),
+        d_v=d_v, achse=s.flaeche.achse(g.masse), aussparungen=s.aussparungen)
     pruefung = Schnittpruefung(schnitt, d_v, g.k_e.groesse.si, e.g("V_d").si, e.g("q_d").si)
     return Pilzbefund(pilz, umriss, pruefung,
                       pruefung.V_Rd_c(g.k_r.groesse.si, g.tau_cd.groesse.si))
@@ -373,7 +375,8 @@ def _pilzort(n: "Durchstanzen", werte: _Werte, befund: Pilzbefund, d_v: Optional
                lambda r: kandidaten_stuetze(Stuetzenflaeche(huelle), r, math.inf)[0].stuecke,
                befund.pruefung, True,
                tuple(schatten_am_schnitt(s.aussparungen, befund.pruefung.auswertung.kandidat.stuecke,
-                                         d_v=befund.pruefung.d_v, achse=s.achse(werte.g.masse))),
+                                         d_v=befund.pruefung.d_v,
+                                         achse=s.flaeche.achse(werte.g.masse))),
                d_v, u, V_d, V_Rd_c)
 
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: afd9352c9307
+erzeugt: 6f298a117a7d
 art: modul
 tags: [modul]
 ---
@@ -754,6 +754,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]

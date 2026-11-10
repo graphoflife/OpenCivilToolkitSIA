@@ -11,16 +11,20 @@ Oberflaeche davon zu sehen bekommt.
 
 import math
 import unittest
-from itertools import accumulate
+from itertools import accumulate, product
 
 from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammenfassen
 from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.bewehrung import (
     Leiste, Vorschlag, aeussere_kandidaten, anrechenbar, leisten_anordnen, setzen,
 )
+from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.pruefung import spannung
 from opencivil.durchstanzen.schnitt import (
     Schatten, Stuetzenflaeche, kandidaten_stuetze, nachweisschnitt, schatten_am_schnitt,
+)
+from opencivil.durchstanzen.stelle import (
+    NACH_DEN_MASSEN, VOR_DEN_MASSEN, KeArt, Naeherungsstufe, eingaben_fuer,
 )
 from opencivil.querschnitt.geometrie import abstand_strecke_polygon
 from opencivil.projekt import DurchstanzEintrag, Projekt, ProjektFehler
@@ -474,6 +478,28 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
                          ["rechteck", "rund", "oval"])
         self.assertEqual([f["wert"] for f in k["durchstanzen"]["lagen"]],
                          ["innen", "rand", "ecke", "wandende", "wandecke"])
+
+    def test_die_maske_liest_dieselben_felder_wie_der_kern(self):
+        """
+        Die Maske zeigt die Vereinigung dessen, was der Katalog je Wahl nennt;
+        das ist für jede Wahl, was der Nachweis liest -- ohne die festen Felder.
+        """
+        k = katalog()["durchstanzen"]
+        fest = set(VOR_DEN_MASSEN) | set(NACH_DEN_MASSEN)
+        for lage, form, stufe, ke in product(Lage, Stuetzenform, Naeherungsstufe, KeArt):
+            eintrag = next(l for l in k["lagen"] if l["wert"] == lage.value)
+            ke_eintrag = next(x for x in k["ke"] if x["wert"] == ke.value)
+            maske = (set(eintrag["masse"][form.value]) | set(eintrag["stufen"][stufe.value])
+                     | set(ke_eintrag["eingaben"]))
+            with self.subTest(lage=lage, form=form, stufe=stufe, ke=ke):
+                self.assertEqual(maske, set(eingaben_fuer(lage.flaeche(form), stufe, ke)) - fest)
+
+    def test_kurztext_der_liste(self):
+        lagen = {l["wert"]: l for l in katalog()["durchstanzen"]["lagen"]}
+        self.assertEqual(lagen["rand"]["kurz"]["rund"], "⌀{D} mm")
+        self.assertEqual(lagen["wandecke"]["kurz"]["rechteck"], "Wand {t} mm")
+        self.assertFalse(lagen["wandende"]["hat_form"])
+        self.assertEqual(lagen["ecke"]["masse"]["oval"], ["b_x", "b_y", "a_x", "a_y"])
 
     def test_grundriss_in_mm(self):
         self.assertEqual(self.antwort.status, 200)

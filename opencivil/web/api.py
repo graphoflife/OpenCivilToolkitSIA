@@ -38,7 +38,6 @@ from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsort
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.durchstanzen.stelle import KeArt, Lage, Naeherungsstufe, Plattenart, Stuetzenform
 from opencivil.projekt import (
     BAUTEILE, AussparungEintrag, Aufbau, DurchstanzEintrag, GebrauchsfallEintrag,
     GrundbruchEintrag, GrundrissknotenEintrag,
@@ -235,13 +234,9 @@ def katalog() -> dict:
             "grundrissknoten": GrundrissknotenEintrag().als_dict(),
             "aussparung": AussparungEintrag().als_dict(),
         },
-        # Die Wahlen einer Durchstanzstelle, mit Beschriftung -- je ein Schalter.
-        "durchstanzen": {
-            name: [{"wert": w.value, "beschriftung": w.beschriftung} for w in wahl]
-            for name, wahl in (("plattenarten", Plattenart), ("lagen", Lage),
-                               ("formen", Stuetzenform), ("stufen", Naeherungsstufe),
-                               ("ke", KeArt))
-        },
+        # Die Wahlen einer Durchstanzstelle -- je ein Schalter -- und welche
+        # Felder der Nachweis mit jeder Stellung liest.
+        "durchstanzen": durchstanzdaten.wahlen(),
         # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
         "setzung": {
             "steifigkeiten": [{"wert": s.value, "beschriftung": s.beschriftung}

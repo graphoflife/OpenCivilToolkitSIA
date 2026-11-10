@@ -13,7 +13,7 @@ Wie im gezeichneten Querschnitt tragen die Aussparungen keine eigenen
 Koordinaten, sie verweisen auf Knoten (:class:`GrundrissknotenEintrag`). Im
 Grundriss, in mm, mit der Achse der Stütze im Ursprung: x nach rechts, y
 nach oben. Der Plattenrand einer Randstütze liegt unten, an der Ecke dazu
-links (:mod:`opencivil.durchstanzen.stelle`).
+links (:mod:`opencivil.durchstanzen.flaeche`).
 
 DIE VORGABEN:
 Eine neue Stelle bringt keine Einwirkung mit, wie ein neuer Lastfall
@@ -28,7 +28,8 @@ from dataclasses import dataclass, field
 from typing import List, Sequence
 
 from opencivil.core.einheiten import KN, KN_PRO_M2, KNM_PRO_M, M, MM
-from opencivil.durchstanzen.stelle import KeArt, Lage, Naeherungsstufe, Plattenart, Stuetzenform
+from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
+from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.lesen import bereich
 from opencivil.projekt.netz import Netz, naechste_kennung

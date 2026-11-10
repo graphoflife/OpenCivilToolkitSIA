@@ -1,5 +1,5 @@
 ---
-erzeugt: eb50b2608bed
+erzeugt: cd3838af6b35
 art: modul
 tags: [modul]
 ---
@@ -26,6 +26,7 @@ tags: [modul]
 ## Module
 
 - [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.
+- [[opencivil.durchstanzen.flaeche]] – die gestützte Fläche: was Lage und Form für den Nachweis heissen.
 - [[opencivil.durchstanzen.herleitung]] – wie ein Nachweisschnitt in der Herleitung steht.
 - [[opencivil.durchstanzen.mit_bewehrung]] – der Nachweis mit Durchstanzbewehrung und Stahlpilz.
 - [[opencivil.durchstanzen.nachweis]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.

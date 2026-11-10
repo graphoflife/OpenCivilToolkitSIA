@@ -4,11 +4,11 @@ opencivil/durchstanzen/stelle.py -- die Durchstanzstelle: Platte, gestützte Fl�
 VERANTWORTUNG:
 Was einen Durchstanznachweis beschreibt, als Vorgaben im Rechenwerk
 (:class:`Durchstanzstelle`), und die Wahlen dazu: Decke oder Bodenplatte
-(:class:`Plattenart`), Form und Lage der gestützten Fläche
-(:class:`Stuetzenform`, :class:`Lage`), die Näherungsstufe der
-Plattenrotation (:class:`Naeherungsstufe`) und wie k_e bestimmt wird
-(:class:`KeArt`). Aus ihren Massen baut sie die Kandidaten des
-Nachweisschnitts (:meth:`Durchstanzstelle.kandidaten`).
+(:class:`Plattenart`), die Näherungsstufe der Plattenrotation
+(:class:`Naeherungsstufe`) und wie k_e bestimmt wird (:class:`KeArt`). Was
+Lage und Form der gestützten Fläche heissen, steht in :mod:`.flaeche`.
+Welche Felder der Nachweis liest, sagt :func:`eingaben_fuer` -- dieselben Teile
+bekommt die Maske über den Katalog, damit sie nichts davon nachbaut.
 
 DECKE UND BODENPLATTE:
 Bei einer Decke liegt die Zugbewehrung über der Stütze oben, bei einer
@@ -16,13 +16,6 @@ Bodenplatte unten -- die Bodenpressung drückt sie von unten gegen die Stütze.
 Gerechnet wird gleich; anders heisst nur, was an Flächenlast innerhalb des
 Nachweisschnitts abgezogen wird (4.3.6.2.6): bei der Decke Eigengewicht und
 Nutzlast, bei der Bodenplatte die Bodenpressung.
-
-KOORDINATEN:
-In der Ebene der Platte, in m. Eine Stütze steht mit ihrer Achse im
-Ursprung; der Plattenrand einer Randstütze liegt unten (y negativ), bei der
-Eckstütze liegt ein zweiter links (x negativ). Ein Wandende liegt im
-Ursprung, die Wand läuft nach +x; eine Wandecke liegt mit ihrer äusseren
-Ecke im Ursprung, die Wände laufen nach +x und +y, die Platte liegt aussen.
 
 EINHEITEN:
 SI-Basis.
@@ -38,12 +31,14 @@ from opencivil.core.einheiten import KN, KN_PRO_M2, KNM_PRO_M, M, MM, Groesse
 from opencivil.core.protokoll import Abschnitt
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef
-from opencivil.durchstanzen.schnitt import (
-    Halbebene, Kandidat, Punkt, Stuetzenflaeche, kandidat_wandecke, kandidat_wandende,
-    kandidaten_stuetze,
-)
+from opencivil.durchstanzen.flaeche import GestuetzteFlaeche
+from opencivil.durchstanzen.schnitt import Punkt
 from opencivil.material.basis import Baustoff
 from opencivil.querschnitt.platte import Richtung
+
+#: Was der Nachweis an jeder Stelle liest -- vor den Massen der gestützten Fläche und danach.
+VOR_DEN_MASSEN = ("h", "c", "c_v", "D_max", "phi_x", "s_x", "phi_y", "s_y")
+NACH_DEN_MASSEN = ("V_d", "q_d")
 
 
 class Plattenart(Wahl):
@@ -73,52 +68,6 @@ class Plattenart(Wahl):
         return "unten" if self is Plattenart.DECKE else "oben"
 
 
-class Stuetzenform(Wahl):
-    """
-    Die Form einer Stütze im Grundriss. Die Ovalstütze ist ein Rechteck mit
-    halbrunden Enden, b_x × b_y über alles -- so heisst sie in der Software von
-    Leviat (DURA); der Name ist nicht aus der Norm.
-    """
-
-    RECHTECK = "rechteck"
-    RUND = "rund"
-    OVAL = "oval"
-
-    @property
-    def beschriftung(self) -> str:
-        return {Stuetzenform.RECHTECK: "Rechteckstütze", Stuetzenform.RUND: "Rundstütze",
-                Stuetzenform.OVAL: "Ovalstütze"}[self]
-
-
-class Lage(Wahl):
-    """Wo die gestützte Fläche in der Platte liegt."""
-
-    INNEN = "innen"
-    RAND = "rand"
-    ECKE = "ecke"
-    WANDENDE = "wandende"
-    WANDECKE = "wandecke"
-
-    @property
-    def beschriftung(self) -> str:
-        return {Lage.INNEN: "Innenstütze", Lage.RAND: "Randstütze", Lage.ECKE: "Eckstütze",
-                Lage.WANDENDE: "Wandende", Lage.WANDECKE: "Wandecke"}[self]
-
-    @property
-    def wand(self) -> bool:
-        return self in (Lage.WANDENDE, Lage.WANDECKE)
-
-    @property
-    def k_e(self) -> float:
-        """
-        Die Näherung für k_e nach SIA 262:2025, 4.3.6.2.5 -- für Innenstützen
-        mit grossen Aussparungen in Stützennähe gilt 0.7 wie am Rand
-        (:meth:`Durchstanzstelle.k_e_naeherung`).
-        """
-        return {Lage.INNEN: 0.9, Lage.RAND: 0.7, Lage.ECKE: 0.65,
-                Lage.WANDENDE: 0.75, Lage.WANDECKE: 0.75}[self]
-
-
 class Naeherungsstufe(Wahl):
     """Wie die Plattenrotation geschätzt wird (SIA 262:2025, 4.3.6.4.2)."""
 
@@ -135,6 +84,16 @@ class Naeherungsstufe(Wahl):
         """Der Vorfaktor in Gleichung (60): 1.5, in Stufe 3 mit Momenten aus der Elastizitätstheorie 1.2."""
         return 1.2 if self is Naeherungsstufe.DREI else 1.5
 
+    @property
+    def eingaben(self) -> Tuple[str, ...]:
+        """
+        Was die Stufe liest: die Spannweiten, in Stufe 2 dazu die Exzentrizität
+        für die Momente im Stützstreifen, in Stufe 3 statt beidem r_s und m_sd.
+        """
+        return {Naeherungsstufe.EINS: ("l_x", "l_y"),
+                Naeherungsstufe.ZWEI: ("l_x", "l_y", "e_x", "e_y"),
+                Naeherungsstufe.DREI: ("r_sx", "r_sy", "m_sdx", "m_sdy")}[self]
+
 
 class KeArt(Wahl):
     """Woher k_e kommt: aus der Näherung (4.3.6.2.5) oder aus der Exzentrizität (57)."""
@@ -146,6 +105,28 @@ class KeArt(Wahl):
     def beschriftung(self) -> str:
         return ("Näherung nach 4.3.6.2.5" if self is KeArt.NAEHERUNG
                 else "aus der Exzentrizität, Gleichung (57)")
+
+    @property
+    def eingaben(self) -> Tuple[str, ...]:
+        return ("e_x", "e_y") if self is KeArt.EXZENTRIZITAET else ()
+
+
+def wirksame_stufe(flaeche: GestuetzteFlaeche, stufe: Naeherungsstufe) -> Naeherungsstufe:
+    """
+    Die Stufe, mit der gerechnet wird: Stufe 2 braucht die Momente im
+    Stützstreifen -- wo 4.3.6.4.7 keine nennt, an Wänden, rechnet sie wie
+    Stufe 1.
+    """
+    return Naeherungsstufe.EINS if stufe is Naeherungsstufe.ZWEI and not flaeche.momente else stufe
+
+
+def eingaben_fuer(flaeche: GestuetzteFlaeche, stufe: Naeherungsstufe, ke: KeArt) -> Tuple[str, ...]:
+    """
+    Die Kurznamen, die der Nachweis liest: die Masse der gestützten Fläche,
+    was die wirksame Stufe liest und was k_e liest -- je ohne Doppel.
+    """
+    return tuple(dict.fromkeys((*VOR_DEN_MASSEN, *flaeche.masse, *NACH_DEN_MASSEN,
+                                *wirksame_stufe(flaeche, stufe).eingaben, *ke.eingaben)))
 
 
 @dataclass
@@ -179,8 +160,7 @@ class Durchstanzstelle:
     aussen: Richtung
     """Welche Lage der Zugbewehrung aussen liegt, näher am Rand."""
 
-    form: Stuetzenform
-    lage: Lage
+    flaeche: GestuetzteFlaeche
     b_x: Groesse
     b_y: Groesse
     D: Groesse
@@ -234,33 +214,12 @@ class Durchstanzstelle:
         werk.registriere(*self.berechnungen)
         return self
 
-    def masse(self) -> Tuple[str, ...]:
-        """Die Masse der gestützten Fläche, die für Form und Lage gelten."""
-        if self.lage.wand:
-            return ("t",)
-        masse = ("D",) if self.form is Stuetzenform.RUND else ("b_x", "b_y")
-        if self.lage is Lage.RAND:
-            masse += ("a_y",)
-        elif self.lage is Lage.ECKE:
-            masse += ("a_x", "a_y")
-        return masse
-
     def eingaben(self) -> Tuple[str, ...]:
-        """Die Kurznamen, die der Nachweis liest."""
-        namen = ("h", "c", "c_v", "D_max", "phi_x", "s_x", "phi_y", "s_y", *self.masse(), "V_d",
-                 "q_d")
-        if self.stufe is Naeherungsstufe.DREI:
-            namen += ("r_sx", "r_sy", "m_sdx", "m_sdy")
-        else:
-            namen += ("l_x", "l_y")
-        # Stufe 2 braucht e_u für die Momente im Stützstreifen -- nicht an
-        # Wänden, dort rechnet sie wie Stufe 1 (siehe :mod:`.nachweis`).
-        if self.ke is KeArt.EXZENTRIZITAET or (self.stufe is Naeherungsstufe.ZWEI
-                                                and not self.lage.wand):
-            namen += ("e_x", "e_y")
-        return namen
+        """Die Kurznamen, die der Nachweis liest -- siehe :func:`eingaben_fuer`."""
+        return eingaben_fuer(self.flaeche, self.stufe, self.ke)
 
     def _aufbauen(self) -> None:
+        gelesen = self.eingaben()
         gruppen = [
             ("Platte", (
                 ("h", "h", MM, "Plattendicke", 0, self.h),
@@ -276,14 +235,14 @@ class Durchstanzstelle:
                 ("phi_y", r"\varnothing_y", MM, "Stabdurchmesser in y", 0, self.phi_y),
                 ("s_y", "s_y", MM, "Stababstand in y", 0, self.s_y),
             )),
-            ("Gestützte Fläche", tuple(e for e in (
+            ("Gestützte Fläche", (
                 ("b_x", "b_x", MM, "Abmessung der Stütze in x", 0, self.b_x),
                 ("b_y", "b_y", MM, "Abmessung der Stütze in y", 0, self.b_y),
                 ("D", "D", MM, "Durchmesser der Stütze", 0, self.D),
                 ("t", "t", MM, "Dicke der Wand", 0, self.t),
                 ("a_x", "a_x", MM, "Abstand vom Plattenrand in x", 0, self.a_x),
                 ("a_y", "a_y", MM, "Abstand vom Plattenrand in y", 0, self.a_y),
-            ) if e[0] in self.masse())),
+            )),
             ("Plattenrotation", (
                 ("r_sx", "r_{sx}", M, "Abstand zum Momentennullpunkt in x", 2, self.r_sx),
                 ("r_sy", "r_{sy}", M, "Abstand zum Momentennullpunkt in y", 2, self.r_sy),
@@ -291,75 +250,23 @@ class Durchstanzstelle:
                  self.m_sdx),
                 ("m_sdy", "m_{sd,y}", KNM_PRO_M, "Mittleres Moment im Stützstreifen, y", 1,
                  self.m_sdy),
-            ) if self.stufe is Naeherungsstufe.DREI else (
                 ("l_x", "l_x", M, "Spannweite in x", 2, self.l_x),
                 ("l_y", "l_y", M, "Spannweite in y", 2, self.l_y),
             )),
-            ("Einwirkung", tuple(e for e in (
+            ("Einwirkung", (
                 ("V_d", "V_d", KN, "Bemessungswert der Auflagerkraft", 1, self.V_d),
                 ("q_d", "q_d", KN_PRO_M2, f"Flächenlast im Nachweisschnitt: {self.plattenart.last}",
                  1, self.q_d),
                 ("e_x", "e_x", MM, "Exzentrizität der Auflagerkraft in x", 0, self.e_x),
                 ("e_y", "e_y", MM, "Exzentrizität der Auflagerkraft in y", 0, self.e_y),
-            ) if e[0] in self.eingaben())),
+            )),
         ]
         for gruppe, eintraege in gruppen:
             for kurz, symbol, einheit, beschreibung, stellen, groesse in eintraege:
+                if kurz not in gelesen:
+                    continue
                 d = WertDef(id=f"{self.id}.{kurz}", symbol=symbol, einheit=einheit,
                             beschreibung=beschreibung, stellen=stellen)
                 self.definitionen[kurz] = d
                 self.berechnungen.append(Vorgabe(id=d.id, ausgabe=d, groesse=groesse,
                                                  abschnitt=self.abschnitt, gruppe=gruppe))
-
-    # -- Geometrie ----------------------------------------------------------
-
-    def stuetze(self, masse: Dict[str, float]) -> Stuetzenflaeche:
-        """Die Stütze aus ihren Massen in m, mit der Achse im Ursprung."""
-        if self.form is Stuetzenform.RUND:
-            return Stuetzenflaeche(((0.0, 0.0),), masse["D"] / 2.0)
-        bx, by = masse["b_x"] / 2.0, masse["b_y"] / 2.0
-        if self.form is Stuetzenform.OVAL:
-            # Die Strecke zwischen den Mitten der Halbkreise, mit dem halben
-            # kürzeren Mass darum -- bei b_x = b_y ein Kreis.
-            r = min(bx, by)
-            kern = ((-(bx - r), -(by - r)), (bx - r, by - r))
-            return Stuetzenflaeche(kern if kern[0] != kern[1] else ((0.0, 0.0),), r)
-        return Stuetzenflaeche(((-bx, -by), (bx, -by), (bx, by), (-bx, by)))
-
-    def raender(self, masse: Dict[str, float]) -> Tuple[Halbebene, ...]:
-        """Die Plattenränder: unten am Rand, unten und links an der Ecke."""
-        if self.lage not in (Lage.RAND, Lage.ECKE):
-            return ()
-        x0, y0, _, _ = self.stuetze(masse).grenzen()
-        raender = [Halbebene((0.0, -1.0), -(y0 - masse["a_y"]))]
-        if self.lage is Lage.ECKE:
-            raender.append(Halbebene((-1.0, 0.0), -(x0 - masse["a_x"])))
-        return tuple(raender)
-
-    def achse(self, masse: Dict[str, float]) -> Punkt:
-        """Die Achse der gestützten Fläche -- von ihr gehen die Strahlen an Aussparungen vorbei."""
-        if self.lage is Lage.WANDENDE:
-            return (masse["t"] / 2.0, 0.0)
-        if self.lage is Lage.WANDECKE:
-            return (masse["t"] / 2.0, masse["t"] / 2.0)
-        return (0.0, 0.0)
-
-    def kandidaten(self, masse: Dict[str, float], abstand: float, d_v: float) -> List[Kandidat]:
-        """Die möglichen Nachweisschnitte im Abstand ``abstand`` -- siehe :mod:`.schnitt`."""
-        if self.lage is Lage.WANDENDE:
-            return [kandidat_wandende(masse["t"], abstand, d_v)]
-        if self.lage is Lage.WANDECKE:
-            return [kandidat_wandecke(masse["t"], abstand, d_v)]
-        return kandidaten_stuetze(self.stuetze(masse), abstand, 1.5 * d_v, self.raender(masse))
-
-    def umriss(self, masse: Dict[str, float], d_v: float) -> List[Punkt]:
-        """
-        Der Umriss der gestützten Fläche fürs Bild -- eine Wand 4·d_v weit, etwas
-        über den Schnitt hinaus, der entlang der Wand 3.5·d_v weit reicht.
-        """
-        t, L = masse.get("t", 0.0), 4.0 * d_v
-        if self.lage is Lage.WANDENDE:
-            return [(0.0, -t / 2), (L, -t / 2), (L, t / 2), (0.0, t / 2)]
-        if self.lage is Lage.WANDECKE:
-            return [(0.0, 0.0), (L, 0.0), (L, t), (t, t), (t, L), (0.0, L)]
-        return self.stuetze(masse).umriss()

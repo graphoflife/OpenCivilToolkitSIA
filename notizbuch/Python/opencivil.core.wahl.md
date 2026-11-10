@@ -1,5 +1,5 @@
 ---
-erzeugt: 9400596a9496
+erzeugt: 9a6855ae5db4
 art: modul
 tags: [modul]
 ---
@@ -32,6 +32,7 @@ Eine Wahl: das Mitglied ist sein Text.
 ## Gebraucht von
 
 - [[opencivil.bewehrungssuche.laengs]]
+- [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]

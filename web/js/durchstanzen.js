@@ -14,7 +14,8 @@
  * Gerechnet wird nichts: Nachweisschnitt, Rotation und Widerstand stehen
  * rechts in der Zusammenfassung, der Grundriss unter «Diagramme». Einheiten
  * und Grenzen kommen aus dem Katalog (`katalog.felder.durchstanz`), die
- * Stellungen der Schalter ebenso (`katalog.durchstanzen`).
+ * Stellungen der Schalter ebenso (`katalog.durchstanzen`) -- und mit ihnen,
+ * welche Felder der Kern je Stellung liest: die Maske zeigt genau die.
  */
 
 import {
@@ -66,6 +67,32 @@ const HILFE = {
   },
 };
 
+/** Text und Zeichen der Masse; welche gelten, sagt der Katalog je Lage und Form. */
+const MASSE = {
+  b_x: ['Abmessung in x', 'b_x'],
+  b_y: ['Abmessung in y', 'b_y'],
+  D: ['Durchmesser', 'D'],
+  t: ['Wanddicke', 't'],
+  a_x: ['Abstand zum linken Rand', 'a_x'],
+  a_y: ['Abstand zum unteren Rand', 'a_y'],
+};
+
+/** Die Lage der Stelle, wie der Katalog sie beschreibt. */
+function lageVon(d) {
+  return zustand.katalog.durchstanzen.lagen.find((l) => l.wert === d.lage);
+}
+
+/**
+ * Was der Kern an dieser Stelle liest, soweit es von den Wahlen abhängt: die
+ * Masse der Lage in ihrer Form, die Felder der Näherungsstufe an dieser Lage
+ * und die von k_e -- je aus dem Katalog.
+ */
+function gelesen(d) {
+  const lage = lageVon(d);
+  const ke = zustand.katalog.durchstanzen.ke.find((k) => k.wert === d.ke);
+  return new Set([...lage.masse[d.form], ...lage.stufen[d.stufe], ...ke.eingaben]);
+}
+
 function aenderer(d) {
   return (veraenderer) => eintragAendern('durchstanzstellen', d.kennung, veraenderer);
 }
@@ -101,24 +128,10 @@ function materialfeld(d, schluessel, art, text) {
 }
 
 function stellePanel(d) {
-  const wand = d.lage === 'wandende' || d.lage === 'wandecke';
-  const masse = [];
-  if (wand) {
-    masse.push(zahlzeile(d, 't', 'Wanddicke', 't', { schritt: 10 }));
-  } else {
-    masse.push(feld('Form', schalter(d, 'form', 'formen', 'Die Form der Stütze im Grundriss'), ''));
-    if (d.form === 'rund') {
-      masse.push(zahlzeile(d, 'D', 'Durchmesser', 'D', { schritt: 10 }));
-    } else {
-      masse.push(zahlzeile(d, 'b_x', 'Abmessung in x', 'b_x', { schritt: 10 }),
-        zahlzeile(d, 'b_y', 'Abmessung in y', 'b_y', { schritt: 10 }));
-    }
-    if (d.lage === 'ecke') {
-      masse.push(zahlzeile(d, 'a_x', 'Abstand zum linken Rand', 'a_x', { schritt: 10 }));
-    }
-    if (d.lage === 'rand' || d.lage === 'ecke') {
-      masse.push(zahlzeile(d, 'a_y', 'Abstand zum unteren Rand', 'a_y', { schritt: 10 }));
-    }
+  const lage = lageVon(d);
+  const masse = lage.masse[d.form].map((k) => zahlzeile(d, k, MASSE[k][0], MASSE[k][1], { schritt: 10 }));
+  if (lage.hat_form) {
+    masse.unshift(feld('Form', schalter(d, 'form', 'formen', 'Die Form der Stütze im Grundriss'), ''));
   }
   return panel({
     schluessel: 'durchstanzen/Stelle', titel: 'Durchstanzstelle',
@@ -133,7 +146,7 @@ function stellePanel(d) {
         'Decke: Zug oben -- Bodenplatte: Zug unten, gegen die Bodenpressung'), ''),
     ]),
     wahlBlock('Lage', schalter(d, 'lage', 'lagen', 'Wo die gestützte Fläche in der Platte liegt')),
-    karte(wand ? 'Wand' : 'Stütze', masse),
+    karte(lage.titel, masse),
   ]);
 }
 
@@ -188,16 +201,20 @@ function bewehrungPanel(d) {
   ]);
 }
 
+/** Die Felder der Plattenrotation; welche die Stufe liest, sagt der Katalog. */
+const ROTATION = [
+  ['r_sx', 'Abstand zum Momentennullpunkt in x', 'r_{sx}', 0.1],
+  ['r_sy', 'Abstand zum Momentennullpunkt in y', 'r_{sy}', 0.1],
+  ['m_sdx', 'Moment im Stützstreifen in x', 'm_{sd,x}', 5],
+  ['m_sdy', 'Moment im Stützstreifen in y', 'm_{sd,y}', 5],
+  ['l_x', 'Spannweite in x', 'l_x', 0.1],
+  ['l_y', 'Spannweite in y', 'l_y', 0.1],
+];
+
 function rotationPanel(d) {
-  const inhalt = d.stufe === '3' ? [
-    zahlzeile(d, 'r_sx', 'Abstand zum Momentennullpunkt in x', 'r_{sx}', { schritt: 0.1 }),
-    zahlzeile(d, 'r_sy', 'Abstand zum Momentennullpunkt in y', 'r_{sy}', { schritt: 0.1 }),
-    zahlzeile(d, 'm_sdx', 'Moment im Stützstreifen in x', 'm_{sd,x}', { schritt: 5 }),
-    zahlzeile(d, 'm_sdy', 'Moment im Stützstreifen in y', 'm_{sd,y}', { schritt: 5 }),
-  ] : [
-    zahlzeile(d, 'l_x', 'Spannweite in x', 'l_x', { schritt: 0.1 }),
-    zahlzeile(d, 'l_y', 'Spannweite in y', 'l_y', { schritt: 0.1 }),
-  ];
+  const felder = gelesen(d);
+  const inhalt = ROTATION.filter(([k]) => felder.has(k))
+    .map(([k, text, symbol, schritt]) => zahlzeile(d, k, text, symbol, { schritt }));
   return panel({
     schluessel: 'durchstanzen/Rotation', titel: 'Plattenrotation',
     zusatz: erklaerung(HILFE.rotation.zeilen, HILFE.rotation.formel),
@@ -209,10 +226,7 @@ function rotationPanel(d) {
 
 function einwirkungPanel(d) {
   const bodenplatte = d.plattenart === 'bodenplatte';
-  // Wann der Kern e_x und e_y liest, sagt `Durchstanzstelle.eingaben`: für
-  // k_e aus der Exzentrizität und für die Momente in Stufe 2, ausser an Wänden.
-  const wand = d.lage === 'wandende' || d.lage === 'wandecke';
-  const exzentrisch = d.ke === 'exzentrizitaet' || (d.stufe === '2' && !wand);
+  const exzentrisch = gelesen(d).has('e_x');
   return panel({
     schluessel: 'durchstanzen/Einwirkung', titel: 'Einwirkung',
     zusatz: erklaerung(HILFE.einwirkung.zeilen, HILFE.einwirkung.formel),

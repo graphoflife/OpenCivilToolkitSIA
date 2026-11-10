@@ -91,9 +91,9 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt (siehe
-[[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 4, 6 und 7 als ein
-Umbau des Zustands der Oberfläche, danach 3 vor einem vierten
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 4 am 2026-11-10
+(siehe [[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 6 und 7 als
+ein Umbau des Zustands der Oberfläche, danach 3 vor einem vierten
 Zeichenfenster und 5 vor der nächsten Bauteilart.
 
 **Neu seit dem 2026-10-25, alles im Durchstanzen:**
@@ -103,14 +103,6 @@ Zeichenfenster und 5 vor der nächsten Bauteilart.
       `gilt`/`zeichnung`/`schreiben`, Knotennamen, `umriss`, Lagefelder).
       Damit steht der Punkt «Eine Grundlage für die Apps mit Zeichenfenster»
       (2026-10-12) dreifach da. Vor einem vierten Zeichenfenster erledigen.
-- [ ] **4. Lage und Form als Textwahl, 28 Weichen.** In stelle.py,
-      nachweis.py und mit_bewehrung.py; die Maske wiederholt `masse()` und
-      `eingaben()` (durchstanzen.js:104-120, 192, 214-215; apps.js:259).
-      Besser: die gestützte Fläche als Typ -- Stütze mit Form und Rändern,
-      Wandende, Wandecke --, der Masse, Kandidaten, Umriss, Achse, Ränder,
-      k_e-Näherung, m_sd-Gleichung und die Formel für u_0 kennt; der
-      Katalog liefert die Felder je Wahl als Daten.
-
 **Im übrigen Repo, neu gefunden:**
 
 - [ ] **5. Eine Bauteilart ist an rund 15 Stellen verdrahtet, und sieben
@@ -179,7 +171,7 @@ Zeichenfenster und 5 vor der nächsten Bauteilart.
       `Rechenwerk.erzeuger`, `Protokoll.warnungen`, `Knickergebnis.halbierungen`
       und `.durchlaeufe`, `Baustoff.eingabewerte`,
       `Durchstanzbefund.rotationen`, `rechnetImBrowser`, `anhangVorschau`,
-      CSS `.bs-lastblock` und Co. · `_mehrzahl(lage)` gehört an `Lage`.
+      CSS `.bs-lastblock` und Co.
 
 **Stand der früheren Befunde:** fast alle offen. Teilweise behoben: die
 Grenze x/d kommt aus dem Katalog (nachweise.js), editor.js nennt keine
@@ -661,6 +653,10 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 4: Lage und Form der
+gestützten Fläche als Art, die weiss, was der Nachweis braucht · die Maske
+zeigt die Felder, die der Katalog je Wahl nennt ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkte 1 und 2: ein
 Schnittnachweis für Stütze, Anker und Pilz, jede Bedingung einmal gerechnet

@@ -1,5 +1,5 @@
 ---
-erzeugt: 670907ca580e
+erzeugt: eff2c53674bb
 art: modul
 tags: [modul]
 ---
@@ -17,7 +17,24 @@ Stegen und dem Schnitt um ihn, je für sich. Dazu die Zahlen der Legende.
 Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises ([[opencivil.durchstanzen.nachweis]]).
 
+Für den Katalog die Wahlen der Maske ([[opencivil.web.durchstanzdaten#wahlen|wahlen]]): je Stellung ihre
+Beschriftung, und welche Felder der Nachweis mit ihr liest -- die Masse je
+Lage und Form, die Felder je Näherungsstufe und Lage, die von k_e. Die Maske
+zeigt die Vereinigung, so baut sie die Regel nicht nach
+([[opencivil.durchstanzen.stelle#eingaben_fuer|opencivil.durchstanzen.stelle.eingaben_fuer]]).
+
 ## Inhalt
+
+### wahlen
+
+```python
+def wahlen() -> Dict[str, Any]
+```
+
+Die Schalter einer Durchstanzstelle mit ihren Stellungen -- und je Lage
+ihre Art: wie die Maske ihre Masse überschreibt, ob sie eine Form hat,
+welche Masse sie je Form liest, was die Liste von ihr zeigt und welche
+Felder jede Näherungsstufe an ihr liest.
 
 ### situationen
 
@@ -63,9 +80,11 @@ Der Stahlpilz mit seinen Stegen, seiner Fläche und dem Schnitt um sie -- in mm,
 ## Braucht
 
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
+- [[opencivil.durchstanzen.stelle]]
 - [[opencivil.projekt]]
 
 ## Gebraucht von

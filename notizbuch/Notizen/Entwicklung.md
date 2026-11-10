@@ -44,6 +44,29 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Durchstanzen: die gestützte Fläche als Art
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 4. Für den Benutzer ändert
+sich nichts; der Bericht ist Zeichen für Zeichen derselbe.
+
+- Lage und Form waren Textwahlen, nach denen Stelle, Nachweis, Bewehrung
+  und Maske an 28 Stellen fragten. Jetzt macht `Lage.flaeche(form)` daraus
+  einmal eine Art -- Innen-, Rand- und Eckstütze mit ihrer Form, Wandende,
+  Wandecke (`flaeche.py`) --, und die weiss, was der Nachweis von ihr
+  braucht: Masse, Umriss, Achse, Ränder, die Kandidaten des Schnitts, u_0
+  als Formel, die Näherung für k_e, die Gleichungen (62) bis (65) und ob es
+  Durchstanzbewehrung und Stahlpilze gibt.
+- Welche Felder der Nachweis liest, steht einmal
+  (`stelle.eingaben_fuer`). Der Katalog gibt der Maske dieselben Teile je
+  Wahl -- die Masse je Lage und Form, die Felder je Näherungsstufe an
+  dieser Lage, die von k_e --, und die Maske zeigt ihre Vereinigung.
+  Bisher baute sie die Regel nach: welche Masse, wann r_s und m_sd, wann
+  e_x und e_y. Auch den Kurztext der Liste («⌀450 mm», «Wand 250 mm») gibt
+  der Katalog, als Vorlage mit den Namen der Masse.
+- Ein Test hält Maske und Kern für alle 90 Wahlen gleich.
+
+---
+
 ## 2026-11-09 · Durchstanzen: ein Schnittnachweis für alle drei Schnitte
 
 Aus der Strukturdurchsicht vom selben Tag, Punkte 1 und 2. Für den Benutzer

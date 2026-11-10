@@ -252,13 +252,12 @@ const SYSTEM = bauteil('balkensystem', {
 
 /**
  * Eine Innenstütze mit den Vorgaben des Kerns, ohne Einwirkung -- Beton und
- * Betonstahl die ersten des Projekts, wie bei der Platte.
+ * Betonstahl die ersten des Projekts, wie bei der Platte. Die Liste nennt sie
+ * nach der Vorlage des Katalogs für ihre Lage und Form: «⌀{D} mm».
  */
 const DURCHSTANZEN = bauteil('durchstanzen', {
-  kurztext: (d) => {
-    if (d.lage === 'wandende' || d.lage === 'wandecke') return `Wand ${d.t} mm`;
-    return d.form === 'rund' ? `⌀${d.D} mm` : `${d.b_x}×${d.b_y} mm`;
-  },
+  kurztext: (d) => zustand.katalog.durchstanzen.lagen.find((l) => l.wert === d.lage)
+    .kurz[d.form].replace(/\{(\w+)\}/g, (_, k) => d[k]),
   anlegen: (a) => nachVorlage(a, 'neue_durchstanzstelle', {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
     vorher: durchstanzfensterVergessen,

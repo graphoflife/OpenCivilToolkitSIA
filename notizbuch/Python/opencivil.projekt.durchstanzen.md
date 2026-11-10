@@ -1,5 +1,5 @@
 ---
-erzeugt: be7acccfc8b6
+erzeugt: e7cd2a4256a4
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,7 @@ Wie im gezeichneten Querschnitt tragen die Aussparungen keine eigenen
 Koordinaten, sie verweisen auf Knoten ([[opencivil.projekt.durchstanzen#GrundrissknotenEintrag|GrundrissknotenEintrag]]). Im
 Grundriss, in mm, mit der Achse der Stütze im Ursprung: x nach rechts, y
 nach oben. Der Plattenrand einer Randstütze liegt unten, an der Ecke dazu
-links ([[opencivil.durchstanzen.stelle]]).
+links ([[opencivil.durchstanzen.flaeche]]).
 
 
 ## DIE VORGABEN
@@ -152,6 +152,7 @@ Eine Aussparung aus ihren Ecken `[x, y]` in mm.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]

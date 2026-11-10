@@ -1,5 +1,5 @@
 ---
-erzeugt: 8884064e5ad6
+erzeugt: db4c29527093
 art: modul
 tags: [modul]
 ---
@@ -147,8 +147,9 @@ def _nachweisschnitt(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswe
 ```
 
 Der Nachweisschnitt und was von ihm nicht zählt: `u_red`, noch ohne
-k_e. Um einfache Flächen steht u_0 als Formel, sonst als Länge in der
-Platte; die Abzüge schreibt [[opencivil.durchstanzen.herleitung|.herleitung]], wie an jedem Schnitt.
+k_e. Wo die gestützte Fläche eine Formel für u_0 kennt, steht sie da,
+sonst die Länge in der Platte; die Abzüge schreibt [[opencivil.durchstanzen.herleitung|.herleitung]],
+wie an jedem Schnitt.
 
 #### Durchstanzen._exzentrizitaet
 
@@ -194,7 +195,7 @@ Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7).
 #### Durchstanzen._b_sr
 
 ```python
-def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert, masse: Dict[str, float]) -> Wert
+def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert, rand: Randbreite) -> Wert
 ```
 
 Die Breite eines Streifens senkrecht zum Rand oder eines Randstreifens an
@@ -207,14 +208,6 @@ def _k_r(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, psi: Wert, d: Wert) 
 ```
 
 Der Beiwert k_r (59), mit k_g nach 4.3.3.2.1.
-
-### _mehrzahl
-
-```python
-def _mehrzahl(lage: Lage) -> str
-```
-
-«Innenstützen», «Wandenden» -- wie die Näherung von 4.3.6.2.5 sie nennt.
 
 ### angaben
 
@@ -247,6 +240,7 @@ Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.pruefung]]
