@@ -20,9 +20,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Sequence
 
-from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, Vergleich, grad_def,
-)
+from opencivil.core.berechnung import Ausfuehrung, Eingaben
+from opencivil.core.nachweis import NICHT_FUEHRBAR, Nachweis, NachweisUrteil, Vergleich, grad_def
 from opencivil.core.einheiten import KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte

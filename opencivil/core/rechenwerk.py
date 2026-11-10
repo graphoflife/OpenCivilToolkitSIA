@@ -43,9 +43,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
 
-from opencivil.core.berechnung import (
-    Berechnung, Eingaben, NachweisUrteil,
-)
+from opencivil.core.berechnung import Berechnung, Eingaben
+from opencivil.core.nachweis import NachweisUrteil
 from opencivil.core.einheiten import Groesse
 from opencivil.core.protokoll import Protokoll, StillesProtokoll
 from opencivil.core.wert import FehlendeEingabe, Quelle, Wert, WertDef

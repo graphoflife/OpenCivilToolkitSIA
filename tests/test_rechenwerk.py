@@ -10,9 +10,11 @@ import unittest
 from typing import Mapping
 
 from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, UNBESCHRAENKT, Ausfuehrung, Befundbezug, Berechnung, BerechnungsFehler,
-    Eingabebezug, Eingaben, Formel, Nachweis, NachweisUrteil, Prozedur, Vergleich, Vorgabe,
-    grad_def,
+    Ausfuehrung, Befundbezug, Berechnung, BerechnungsFehler, Eingabebezug, Eingaben, Formel,
+    Prozedur, Vorgabe,
+)
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, UNBESCHRAENKT, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, M, MM, MM2, MPA, N_PRO_MM2, DimensionsFehler, Groesse,
@@ -904,7 +906,7 @@ class TestStillstellen(unittest.TestCase):
     """
 
     def nachweis(self):
-        from opencivil.core.berechnung import Nachweis
+        from opencivil.core.nachweis import Nachweis
         from opencivil.core.einheiten import EINHEITSLOS
         from opencivil.core.wert import WertDef
 

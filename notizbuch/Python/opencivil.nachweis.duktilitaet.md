@@ -1,5 +1,5 @@
 ---
-erzeugt: 0200240dab1c
+erzeugt: 87b26d7ee4f7
 art: modul
 tags: [modul]
 ---
@@ -29,7 +29,7 @@ Bewehrungslage. Gerechnet werden die beiden Lagen der Tragrichtung -- die
 untere traegt das Feld-, die obere das Stuetzmoment. In der Zusammenfassung
 steht die unguenstigere: geht die auf, gehen beide auf. Die Urteile sind
 dafuer als Teile derselben Frage gestempelt (siehe
-[[opencivil.core.berechnung#Nachweis.teilurteile|teilurteile]]); gezaehlt werden
+[[opencivil.core.nachweis#Nachweis.teilurteile|teilurteile]]); gezaehlt werden
 trotzdem beide, denn die Bewehrungssuche misst ihren Fortschritt an der Summe
 der Rueckstaende.
 
@@ -149,6 +149,7 @@ Symbolen da, die Fassung mit Zahlen und Einheiten entsteht daraus.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]

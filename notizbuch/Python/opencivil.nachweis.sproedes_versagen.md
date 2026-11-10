@@ -1,5 +1,5 @@
 ---
-erzeugt: 611e4dd72910
+erzeugt: a4b62adbacdc
 art: modul
 tags: [modul]
 ---
@@ -97,6 +97,7 @@ Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.latex]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.rissgroessen]]

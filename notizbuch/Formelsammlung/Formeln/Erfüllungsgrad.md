@@ -1,5 +1,5 @@
 ---
-erzeugt: ee746274587b
+erzeugt: 846c4bf66e94
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.core.berechnung#Vergleich.zeile|Vergleich.zeile]]
+- [[opencivil.core.nachweis#Vergleich.zeile|Vergleich.zeile]]
 
 ## Themen
 

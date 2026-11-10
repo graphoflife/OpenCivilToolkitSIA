@@ -177,7 +177,7 @@ class TestStilleNachweise(unittest.TestCase):
         Eine Funktion, die immer LaTeX lieferte, schrieb im Hinweis wörtlich
         «α_eff = \\infty».
         """
-        from opencivil.core.berechnung import NachweisUrteil
+        from opencivil.core.nachweis import NachweisUrteil
         from opencivil.core.einheiten import EINHEITSLOS, Groesse
 
         unendlich = NachweisUrteil(

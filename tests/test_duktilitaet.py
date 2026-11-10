@@ -218,7 +218,7 @@ class TestHerleitungAusVorlagen(unittest.TestCase):
 
     def test_der_grad_folgt_der_regel_fuer_erfuellungsgrade(self):
         """Gesetzt wie in der Tabelle -- nicht mit der Stellenzahl des Werts."""
-        from opencivil.core.berechnung import grad_als_text
+        from opencivil.core.wert import grad_als_text
 
         for erg in self.befund.ergebnisse:
             grad = self.block(self.nachweis.d_ausnutzung[erg.lage.nummer].id)

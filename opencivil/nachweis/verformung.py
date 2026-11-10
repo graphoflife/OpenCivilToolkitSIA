@@ -42,9 +42,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Nachweis,
-    NachweisUrteil, Prozedur, Vergleich, grad_def,
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, Prozedur
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text

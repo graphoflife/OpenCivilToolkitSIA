@@ -82,9 +82,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Protocol, Sequence, Tuple, Type
 
-from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Fallbefund,
-    Nachweis, NachweisUrteil, Vergleich, grad_def,
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, Ausgang, Fallausgang, Fallbefund, Nachweis, NachweisUrteil, Vergleich,
+    grad_def,
 )
 from opencivil.core.einheiten import KN, KNM, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung, vergleich

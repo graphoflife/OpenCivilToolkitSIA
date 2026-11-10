@@ -18,7 +18,7 @@ import math
 from typing import Any, Callable, Collection, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil import spannungsanalyse
-from opencivil.core.berechnung import grad_als_text
+from opencivil.core.wert import grad_als_text
 from dataclasses import dataclass
 
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, N_PRO_MM2, PRO_M, PROMILLE, Einheit

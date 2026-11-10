@@ -23,7 +23,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, NachweisUrteil, Vergleich
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
+from opencivil.core.nachweis import NachweisUrteil, Vergleich
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert

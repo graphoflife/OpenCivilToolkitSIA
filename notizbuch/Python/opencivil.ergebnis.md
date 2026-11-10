@@ -1,5 +1,5 @@
 ---
-erzeugt: 768d1b614dd7
+erzeugt: e726fc269974
 art: modul
 tags: [modul]
 ---
@@ -166,7 +166,7 @@ was auf dem Rechner an TeX liegt, und das ist nicht ueberall etwas.
 - [[opencivil.bericht.latex_dokument]]
 - [[opencivil.bericht.markdown]]
 - [[opencivil.bericht.zusammenfassung]]
-- [[opencivil.core.berechnung]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
 - [[opencivil.projekt]]

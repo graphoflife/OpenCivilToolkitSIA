@@ -103,9 +103,10 @@ import math
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Sequence
 
-from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, UNBESCHRAENKT, Ausfuehrung, Ausgang, Befundbezug, Eingabebezug, Eingaben,
-    Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
+from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, UNBESCHRAENKT, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich,
+    grad_def,
 )
 from opencivil.core.einheiten import KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung

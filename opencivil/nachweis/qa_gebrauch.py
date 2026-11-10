@@ -60,9 +60,9 @@ import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple, Type
 
-from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
-    Vergleich, grad_def,
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, Ausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import Mathe, angabe, bedingung, fest, vergleich

@@ -37,9 +37,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Tuple
 
-from opencivil.core.berechnung import (
-    Ausfuehrung, Befundbezug, Eingabebezug, Eingaben, NachweisUrteil, Vergleich,
-)
+from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
+from opencivil.core.nachweis import NachweisUrteil, Vergleich
 from opencivil.core.einheiten import EINHEITSLOS, KNM, MM, N_PRO_MM2, Groesse, empirisch
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert

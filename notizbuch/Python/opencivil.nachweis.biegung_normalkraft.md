@@ -1,5 +1,5 @@
 ---
-erzeugt: d58807573b30
+erzeugt: 063a19a081fd
 art: modul
 tags: [modul]
 ---
@@ -256,7 +256,7 @@ stuenden zwei Momente da, deren Quotient nicht der Grad ist.
 
 Beide mit ihrem Vorzeichen, in Tabelle und Herleitung: es sagt die
 Seite, und ein eingegebenes M_Ed = -50 kNm steht nicht als 50 kNm da.
-Der Grad ist derselbe ([[opencivil.core.berechnung#Vergleich|Vergleich]]). Bis 2026-10-25 stand in der
+Der Grad ist derselbe ([[opencivil.core.nachweis#Vergleich|Vergleich]]). Bis 2026-10-25 stand in der
 Herleitung der Betrag.
 
 #### BiegungNormalkraft._auswerten
@@ -387,6 +387,7 @@ Ein SI-Wert in der Einheit seiner Achse, mit Einheitenzeichen.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]

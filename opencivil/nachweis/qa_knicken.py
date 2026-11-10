@@ -39,7 +39,8 @@ import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
 
-from opencivil.core.berechnung import Ausfuehrung, Eingaben, NachweisUrteil, grad_def
+from opencivil.core.berechnung import Ausfuehrung, Eingaben
+from opencivil.core.nachweis import NachweisUrteil, grad_def
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.suche import ILLINOIS

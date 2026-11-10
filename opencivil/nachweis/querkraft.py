@@ -34,9 +34,9 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, Ausgang, Befundbezug, Eingabebezug, Eingaben, Fallausgang, Nachweis,
-    NachweisUrteil, grad_def,
+from opencivil.core.berechnung import Befundbezug, Eingabebezug, Eingaben
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, NachweisUrteil, grad_def,
 )
 from opencivil.core.einheiten import KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.latex import als_text

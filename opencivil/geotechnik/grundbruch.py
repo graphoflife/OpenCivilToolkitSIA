@@ -58,8 +58,10 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Berechnung, Eingabebezug, Eingaben, Fallausgang,
-    Formel, Nachweis, NachweisUrteil, Vergleich, Vorgabe, grad_def,
+    Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Formel, Vorgabe,
+)
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, GRAD, KN, KN_PRO_M3, KPA, M, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text, angabe, bedingung

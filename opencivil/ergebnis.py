@@ -32,7 +32,7 @@ from opencivil.bericht import konsole
 from opencivil.bericht.latex_dokument import Ausgabeergebnis, schreibe
 from opencivil.bericht.markdown import als_markdown
 from opencivil.bericht.zusammenfassung import zusammenfassen
-from opencivil.core.berechnung import NachweisUrteil
+from opencivil.core.nachweis import NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
 from opencivil.spannungsanalyse import Analyse

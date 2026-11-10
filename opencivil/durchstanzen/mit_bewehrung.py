@@ -41,7 +41,8 @@ import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Eingaben, NachweisUrteil, Vergleich
+from opencivil.core.berechnung import Eingaben
+from opencivil.core.nachweis import NachweisUrteil, Vergleich
 from opencivil.core.einheiten import MM2, N_PRO_MM2, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert

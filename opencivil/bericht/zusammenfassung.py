@@ -27,7 +27,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import NachweisUrteil
+from opencivil.core.nachweis import NachweisUrteil
 from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text
 from opencivil.core.protokoll import GleichungBlock, TabellenBlock

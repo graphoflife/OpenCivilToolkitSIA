@@ -18,7 +18,7 @@ Bewehrungslage. Gerechnet werden die beiden Lagen der Tragrichtung -- die
 untere traegt das Feld-, die obere das Stuetzmoment. In der Zusammenfassung
 steht die unguenstigere: geht die auf, gehen beide auf. Die Urteile sind
 dafuer als Teile derselben Frage gestempelt (siehe
-:meth:`~opencivil.core.berechnung.Nachweis.teilurteile`); gezaehlt werden
+:meth:`~opencivil.core.nachweis.Nachweis.teilurteile`); gezaehlt werden
 trotzdem beide, denn die Bewehrungssuche misst ihren Fortschritt an der Summe
 der Rueckstaende.
 
@@ -50,9 +50,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Sequence
 
-from opencivil.core.berechnung import (
-    NICHT_FUEHRBAR, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Fallbefund,
-    Nachweis, NachweisUrteil, Vergleich, grad_def,
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, Ausgang, Fallausgang, Fallbefund, Nachweis, NachweisUrteil, Vergleich,
+    grad_def,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich

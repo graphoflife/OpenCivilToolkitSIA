@@ -1,5 +1,5 @@
 ---
-erzeugt: cf5e3e568c75
+erzeugt: 4c7f263d0599
 art: modul
 tags: [modul]
 ---
@@ -187,7 +187,7 @@ mit, damit ein Hinweis stehen kann, wenn er nicht aufgeht -- gefuehrt
 hat ihn niemand.
 
 Und je Nachweis, der seine Faelle als Teile derselben Frage stempelt
-(siehe [[opencivil.core.berechnung#NachweisUrteil|NachweisUrteil.sammel]]), nur das schlechteste. Vier
+(siehe [[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.sammel]]), nur das schlechteste. Vier
 Zeilen fuer eine Frage waren drei zuviel; beantwortet wird sie von
 der schlechtesten Lage.
 
@@ -452,6 +452,7 @@ def abschliessen(self) -> Loesung
 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 

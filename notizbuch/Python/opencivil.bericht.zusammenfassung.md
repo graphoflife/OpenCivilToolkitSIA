@@ -1,5 +1,5 @@
 ---
-erzeugt: eb822355880f
+erzeugt: 369fa3501f93
 art: modul
 tags: [modul]
 ---
@@ -142,7 +142,7 @@ def hinweise(bauteil: Bauteil) -> List[str]
 Was unter der Tabelle stehen muss, nach Grund gebuendelt.
 
 Nur was eine Pruefung ausdruecklich meldet (siehe
-[[opencivil.core.berechnung#NachweisUrteil|NachweisUrteil.hinweis]]): ein Widerstand von null erklaert sich
+[[opencivil.core.nachweis#NachweisUrteil|NachweisUrteil.hinweis]]): ein Widerstand von null erklaert sich
 nicht von selbst. Eine ganze Tragrichtung ohne Bewehrung laesst aber jeden
 ihrer Nachweise aus demselben Grund ausfallen -- sechsmal derselbe Satz
 waere keine Erklaerung, sondern eine Wand.
@@ -242,9 +242,9 @@ hoch, beide, getrennt durch `/`.
 
 ## Braucht
 
-- [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]

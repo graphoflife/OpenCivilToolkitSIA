@@ -35,9 +35,9 @@ import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import (
-    UNBESCHRAENKT, Ausfuehrung, Ausgang, Eingabebezug, Eingaben, Fallausgang, Nachweis,
-    NachweisUrteil, Vergleich, grad_def,
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
+from opencivil.core.nachweis import (
+    UNBESCHRAENKT, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import KN, Groesse
 from opencivil.core.latex import Mathe, als_text, fest

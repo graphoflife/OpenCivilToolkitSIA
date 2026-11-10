@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Sequence, Tuple
 
 from opencivil.core.einheiten import KN, KNM, M, Groesse
-from opencivil.core.berechnung import Nachweis, NachweisUrteil
+from opencivil.core.nachweis import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import Kennzahl
 from opencivil.material.basis import Baustoff

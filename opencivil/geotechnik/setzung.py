@@ -54,9 +54,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
-from opencivil.core.berechnung import (
-    Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Nachweis, Vergleich, Vorgabe, grad_def,
-)
+from opencivil.core.berechnung import Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Vorgabe
+from opencivil.core.nachweis import Nachweis, Vergleich, grad_def
 from opencivil.core.einheiten import KN_PRO_M2, M, MM, MN_PRO_M2, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text, angabe, fest
 from opencivil.core.protokoll import (

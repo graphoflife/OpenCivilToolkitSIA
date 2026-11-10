@@ -1,5 +1,5 @@
 ---
-erzeugt: b48d03bff317
+erzeugt: 81003d189af4
 art: modul
 tags: [modul]
 ---
@@ -299,6 +299,7 @@ def beschreibung(self) -> str
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.latex]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.durchstanzen.flaeche]]
@@ -348,3 +349,4 @@ def beschreibung(self) -> str
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.web.api]]
+- [[opencivil.web.diagrammdaten]]

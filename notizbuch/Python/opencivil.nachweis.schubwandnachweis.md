@@ -1,5 +1,5 @@
 ---
-erzeugt: 6bea7acfafbe
+erzeugt: 9b45afe66227
 art: modul
 tags: [modul]
 ---
@@ -76,6 +76,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
+- [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.querschnitt.analyse]]

@@ -132,8 +132,8 @@ vor der nächsten Bauteilart.
       Situationsbilder baut das JS selbst (gb_zeichnung.js:253-271,
       sz_zeichnung.js:212-233, ds_grundriss.js:164-201). Besser: `_Groesse`
       als gemeinsames Modul, die Legende als Zellen aus den *daten.py.
-- [ ] **11. Dateien:** core/berechnung.py hat 1087 Zeilen (Naht in Zeile
-      607: der Nachweis nach core/nachweis.py); diagramm.js (959) ist das
+- [ ] **11. Dateien:** ~~core/berechnung.py hat 1087 Zeilen (Naht in Zeile
+      607: der Nachweis nach core/nachweis.py)~~ erledigt 2026-11-10; diagramm.js (959) ist das
       Bilderbuch der Platte -- auslagern, das erfüllt die Vorbedingung von
       5; projekt.py (897): die Prüfprojekte nach projekt/beispiele.py;
       projekt/balkensystem.py (906): das Modell nach aufbau/balkensystem.py.

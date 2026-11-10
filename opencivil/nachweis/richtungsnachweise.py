@@ -26,9 +26,8 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from opencivil.core.berechnung import (
-    Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, Vergleich, grad_def,
-)
+from opencivil.core.berechnung import Ausfuehrung, Eingaben
+from opencivil.core.nachweis import Nachweis, NachweisUrteil, Vergleich, grad_def
 from opencivil.core.latex import als_text, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef, kennung_aus

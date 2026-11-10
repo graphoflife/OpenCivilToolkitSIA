@@ -1,5 +1,5 @@
 ---
-erzeugt: 8ce807626892
+erzeugt: 5e58e7184fcf
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -22,6 +22,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.berechnung]] – Berechnungen als Objekte.
     - [[opencivil.core.einheiten]] – Dimensionen, Einheiten und Groessen.
     - [[opencivil.core.latex]] – Bausteine fuer die LaTeX-Ausgabe von Berechnungen.
+    - [[opencivil.core.nachweis]] – der Nachweis: Einwirkung gegen Widerstand, mit Urteil.
     - [[opencivil.core.protokoll]] – Mitschrift einer Berechnung.
     - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
     - [[opencivil.core.suche]] – wo eine steigende Funktion null wird.
