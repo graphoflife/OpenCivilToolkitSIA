@@ -91,10 +91,10 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 4 am 2026-11-10
-(siehe [[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 6 und 7 als
-ein Umbau des Zustands der Oberfläche, danach 3 vor einem vierten
-Zeichenfenster und 5 vor der nächsten Bauteilart.
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 4 und 6 am
+2026-11-10 (siehe [[Entwicklung]]). Empfohlene Reihenfolge für den Rest: 7,
+danach 3 vor einem vierten Zeichenfenster und 5 vor der nächsten
+Bauteilart.
 
 **Neu seit dem 2026-10-25, alles im Durchstanzen:**
 
@@ -121,13 +121,6 @@ Zeichenfenster und 5 vor der nächsten Bauteilart.
       selben Durchgang wie `felder`. Im JS werden die Karten Felder der
       Zeilen von apps.js, sobald die Bilder der Platte aus diagramm.js und
       bericht.js ausziehen (siehe 11).
-- [ ] **6. Einträge werden über ihren Listennamen gesucht**, an rund 70
-      Stellen, mit zwei Fehlerregeln: `eintragAendern` tut bei falschem
-      Namen still nichts, legt aber ab und rechnet (zustand.js:198-203);
-      die Handfassungen werfen. Kennungen sind im Projekt eindeutig.
-      Besser: `eintragVon(kennung)` und `eintragAendern(kennung, v)` über
-      alle Listen; das Listenargument, `anBauteil` und acht eigene Leser
-      fallen weg.
 - [ ] **7. Zustand der Oberfläche:** Der Katalog wird behandelt, als könnte
       er fehlen (35 Stellen `zustand.katalog?.…`, 29 mit `|| []`); ein
       umbenannter Schlüssel ergibt still einen leeren Schalter. Was
@@ -653,6 +646,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 6: ein Eintrag wird über
+seine Kennung gefunden und geändert (`eintragVon`, `eintragAendern`),
+gleich in welcher Liste -- ohne Listennamen, ohne `anBauteil` und ohne
+acht eigene Leser ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 4: Lage und Form der
 gestützten Fläche als Art, die weiss, was der Nachweis braucht · die Maske

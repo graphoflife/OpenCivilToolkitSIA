@@ -11,7 +11,9 @@
 import { api } from './api.js';
 import { feld, hakenSchalter, wahlSchalter } from './bausteine.js';
 import { el, melden, zahlfeld } from './dom.js';
-import { aendern, projektAendern, zustand } from './zustand.js';
+import {
+  aendern, eintragAendern, projektAendern, zustand,
+} from './zustand.js';
 
 /**
  * Welche Platte gerade durchsucht wird.
@@ -48,9 +50,7 @@ export const SUCHE = {
  * weiter unten steuern damit unmittelbar, wonach gesucht wird.
  */
 function automatikInhalt(querschnitt) {
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
-  });
+  const aendern = (veraenderer) => eintragAendern(querschnitt.kennung, veraenderer);
   const quer = querschnitt.automatik_querkraft === true;
   const dicke = querschnitt.automatik_dicke === true;
 

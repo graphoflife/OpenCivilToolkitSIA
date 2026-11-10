@@ -55,13 +55,15 @@ import {
   momentSymbol, streckenlast, streckenmoment, unbestimmtSymbol,
 } from './bs_symbole.js';
 import {
-  abdruckVon, aktiverLastfall, eintragVon, katalog, lastart, lastfallWaehlen, lastVon,
-  passendeUebersicht, zugseite,
+  abdruckVon, aktiverLastfall, katalog, lastart, lastfallWaehlen, lastVon, passendeUebersicht,
+  zugseite,
 } from './bs_teile.js';
 import {
   auswahl, el, melden, svgEl,
 } from './dom.js';
-import { aendern, ausVorlage, eintragAendern, zustand } from './zustand.js';
+import {
+  aendern, ausVorlage, eintragAendern, eintragVon, zustand,
+} from './zustand.js';
 
 /**
  * Die Arten des Systems. Gewählt werden Linien und Knoten: ein Lager gehört
@@ -193,7 +195,7 @@ function adapter(kennung) {
     arten: ARTEN,
     gilt: () => zustand.projekt === projekt,
     zeichnung: () => eintragVon(kennung),
-    schreiben: (veraenderer) => eintragAendern('balkensysteme', kennung, veraenderer),
+    schreiben: (veraenderer) => eintragAendern(kennung, veraenderer),
     tafelNeu: () => aendern({}, 'zeichnung'),
     leisteZusatz: () => {
       bs.lastfallHuelle = el('span.bs-lastfallwahl');

@@ -29,7 +29,7 @@ import { analysenKapitel, mitKopf, nachweisKapitel } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { materialienVon, zeichenbereich } from './qa_zeichnung.js';
 import {
-  ausVorlage, eintragAendern, feldangabe, naechsterName, zustand,
+  ausVorlage, eintragAendern, eintragVon, feldangabe, naechsterName, zustand,
 } from './zustand.js';
 
 /**
@@ -125,7 +125,7 @@ function spalten(analyse) {
 // ===========================================================================
 
 function querschnittGruppe(analyse) {
-  const aendern = (veraenderer) => eintragAendern('querschnittsanalysen', analyse.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
   return panel({
     schluessel: 'analyse/Querschnitt', titel: 'Querschnitt', zusatz: 'y nach rechts, z nach oben, mm',
     breit: true,
@@ -165,7 +165,7 @@ function werkstoffwahl(analyse) {
   const wahlen = zustand.katalog?.querschnittsanalyse || {};
   const vorgabe = zustand.katalog?.neue_zeilen?.werkstoffwahl || {};
 
-  const setzen = (material, feldname, wert) => eintragAendern('querschnittsanalysen', analyse.kennung, (a) => {
+  const setzen = (material, feldname, wert) => eintragAendern(analyse.kennung, (a) => {
     let w = a.werkstoffwahl.find((x) => x.material === material);
     if (!w) {
       w = ausVorlage('werkstoffwahl', { material });
@@ -175,7 +175,7 @@ function werkstoffwahl(analyse) {
   });
 
   const zeile = (kennung) => {
-    const material = zustand.projekt.materialien.find((m) => m.kennung === kennung);
+    const material = eintragVon(kennung);
     if (!material) return null;
     const wahl = analyse.werkstoffwahl.find((w) => w.material === kennung) || vorgabe;
     const istBeton = material.art === 'beton';
@@ -214,7 +214,7 @@ function werkstoffwahl(analyse) {
  * und mit ihnen die Längszugkraft, wenn sie zählt.
  */
 function schubwandAngaben(analyse) {
-  const aendern = (veraenderer) => eintragAendern('querschnittsanalysen', analyse.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [el('span', { text: 'Querkraft und Torsion: Fachwerk je Wand' }),
       erklaerung(HILFE.schubwaende.zeilen, HILFE.schubwaende.formel)]),
@@ -254,7 +254,7 @@ function schubwandAngaben(analyse) {
  * Torsion brauchen.
  */
 function tragsicherheitInhalt(analyse) {
-  const aendern = (veraenderer) => eintragAendern('querschnittsanalysen', analyse.kennung, veraenderer);
+  const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
   const faelle = analyse.lastfaelle;
   return [
     ...werkstoffwahl(analyse),
@@ -308,8 +308,7 @@ function lastfallKopf(analyse) {
 
 function lastfallZeile(analyse, index) {
   const fall = analyse.lastfaelle[index];
-  const aendern = (veraenderer) => eintragAendern('querschnittsanalysen', analyse.kennung,
-    (a) => veraenderer(a.lastfaelle[index]));
+  const aendern = (veraenderer) => eintragAendern(analyse.kennung, (a) => veraenderer(a.lastfaelle[index]));
   return fallzeile({
     fall, aendern, was: 'Lastfall', nameTitel: 'Bezeichnung des Lastfalls',
     zahlen: spalten(analyse).map((s) => zahlfeld({
@@ -319,7 +318,7 @@ function lastfallZeile(analyse, index) {
     })),
     spalten: JE_ZEILE,
     entfernenTitel: 'Lastfall entfernen',
-    entfernen: () => eintragAendern('querschnittsanalysen', analyse.kennung, (a) => {
+    entfernen: () => eintragAendern(analyse.kennung, (a) => {
       a.lastfaelle.splice(index, 1);
     }),
   });
@@ -440,7 +439,6 @@ function zugseitenWahl(gewaehlt, setzen, titel) {
  * gegenüber.
  */
 const ORT = {
-  liste: 'querschnittsanalysen',
   vorlage: 'qa_analyse',
   richtung: (k, setzen) => mitKopf('Zug', zugseitenWahl(
     k.richtung, setzen, 'Zugseite: die Seite, die ein positives Moment zieht')),

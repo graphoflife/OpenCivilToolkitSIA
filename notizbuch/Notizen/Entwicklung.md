@@ -44,6 +44,24 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Oberfläche: Einträge über ihre Kennung
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 6. Für den Benutzer ändert
+sich nichts.
+
+Die Oberfläche suchte einen Eintrag an rund 70 Stellen über den Namen
+seiner Liste (`eintragAendern('querschnitte', k, …)`, `p.materialien.find(…)`),
+mit zwei Regeln für einen falschen Namen: `eintragAendern` tat still nichts,
+legte aber ab und rechnete; die Fassungen von Hand warfen. Kennungen sind im
+Projekt eindeutig, darum genügt jetzt die Kennung: `eintragVon(kennung)`
+findet den Eintrag in jeder Liste, `eintragAendern(kennung, v)` ändert ihn,
+und gibt es ihn nicht mehr, geschieht nichts -- weder abgelegt noch
+gerechnet. Weg sind das Listenargument, `anBauteil` mit dem Feld `liste` der
+Orte und acht eigene Leser in den Zeichenfenstern und Diagrammen. Listen
+nennen nur noch, wer eine Liste braucht: Anlegen, Kopieren, Löschen.
+
+---
+
 ## 2026-11-10 · Durchstanzen: die gestützte Fläche als Art
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 4. Für den Benutzer ändert

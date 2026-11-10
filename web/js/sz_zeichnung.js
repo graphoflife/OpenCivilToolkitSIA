@@ -24,7 +24,7 @@ import { el, svgEl } from './dom.js';
 import {
   BREITE, linie, mass, pfeil, schraffur, text, zahl,
 } from './gb_skizze.js';
-import { zustand } from './zustand.js';
+import { eintragVon, zustand } from './zustand.js';
 
 const RAND = 16;
 /** Links Platz für die Tiefen, oben für Pressung und Grundriss, unten für die Schraffur, in px. */
@@ -234,7 +234,7 @@ function legende(s, d) {
 
 /** Die Karte einer Setzung im Reiter «Diagramme». Das Panel darum baut bericht.js. */
 export function setzungKarten(kennung) {
-  const s = (zustand.projekt?.setzungen || []).find((x) => x.kennung === kennung);
+  const s = eintragVon(kennung);
   if (!s) return [];
   const d = zustand.loesung?.setzungen?.[kennung];
   return [karte('Situation', [

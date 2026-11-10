@@ -25,7 +25,9 @@ import { erklaerung, feld, hakenSchalter, wahlSchalter } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { gebrauchsstand, schalter, zeilenstand } from './kapitel.js';
-import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
+import {
+  ausVorlage, eintragAendern, feldangabe, naechsterName, zustand,
+} from './zustand.js';
 
 // ===========================================================================
 // Die Kapitel -- je ein Knopf, die Eingaben im Fenster (kapitel.js)
@@ -154,16 +156,6 @@ export function anfuegenKnopf(text, tun) {
 }
 
 /**
- * Ändert das Bauteil im Projekt -- für die Fenster, die an ihm schreiben.
- * `ort.liste` sagt, in welcher Liste des Projekts es steht.
- */
-export function anBauteil(eintrag, ort) {
-  return (veraenderer) => projektAendern((p) => {
-    veraenderer(p[ort.liste].find((x) => x.kennung === eintrag.kennung));
-  });
-}
-
-/**
  * Die Zeile eines Nachweises mit *einem* Schalter: Duktilität, sprödes
  * Versagen und die Zeilen der Zwängung. Vorne der Schalter, dann die Marke,
  * die der Ort davor setzt (`ort.marke`: bei der Platte die Tragrichtung x),
@@ -189,7 +181,7 @@ function schalterZeile(eintrag, ort, {
   const art = vorne ? (zusatz ? '.mit-feld' : '') : (zusatz ? '.mit-grenze' : '.ist-breit');
   return el(`div.duktilitaetszeile${art}`, {}, [
     hakenSchalter(!!eintrag[feld],
-      (wert) => anBauteil(eintrag, ort)((e) => { e[feld] = wert; }), was),
+      (wert) => eintragAendern(eintrag.kennung, (e) => { e[feld] = wert; }), was),
     vorne,
     el('span.postenname', { text: name }),
     zusatz,
@@ -218,7 +210,7 @@ function duktilitaetInhalt(eintrag, ort) {
         max: zustand.katalog?.duktilitaet?.hoechstens,
         titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
           zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
-        beiAenderung: (v) => anBauteil(eintrag, ort)((e) => { e.x_d_max = v; }),
+        beiAenderung: (v) => eintragAendern(eintrag.kennung, (e) => { e.x_d_max = v; }),
       }),
     }),
     rechenwerteSatz(ort),
@@ -245,7 +237,7 @@ function sproedeInhalt(eintrag, ort) {
  */
 function knickInhalt(eintrag, ort) {
   const faelle = eintrag.knickfaelle || [];
-  const aendern = anBauteil(eintrag, ort);
+  const aendern = (veraenderer) => eintragAendern(eintrag.kennung, veraenderer);
   const knick = ort.knick;
 
   return [
@@ -273,7 +265,7 @@ function knickInhalt(eintrag, ort) {
 
 function knickZeile(eintrag, ort, index) {
   const k = (eintrag.knickfaelle || [])[index];
-  const aendern = (veraenderer) => anBauteil(eintrag, ort)((e) => veraenderer(e.knickfaelle[index]));
+  const aendern = (veraenderer) => eintragAendern(eintrag.kennung, (e) => veraenderer(e.knickfaelle[index]));
   const titel = ort.knick.titel;
   // Eine Länge null gibt es nicht -- geleert bleibt der bisherige Wert.
   const zahl = (feld, schritt) => zahlfeld({
@@ -289,7 +281,7 @@ function knickZeile(eintrag, ort, index) {
     oben: richtung ? richtung(k, (wert) => aendern((x) => { x.richtung = wert; })) : null,
     zahlen: [zahl('N_Ed', 50), zahl('M_Ed_1', 10), zahl('laenge', 0.5), zahl('knicklaenge', 0.5)],
     entfernenTitel: 'Knicknachweis entfernen',
-    entfernen: () => anBauteil(eintrag, ort)((e) => { e.knickfaelle.splice(index, 1); }),
+    entfernen: () => eintragAendern(eintrag.kennung, (e) => { e.knickfaelle.splice(index, 1); }),
   });
 }
 
@@ -307,7 +299,7 @@ function rissanforderungZeile(eintrag, ort) {
     })),
     gewaehlt: eintrag.rissanforderung || 'normal',
     titel: 'Bestimmt σ_s,adm (Tab. 17)',
-    setzen: (v) => anBauteil(eintrag, ort)((e) => { e.rissanforderung = v; }),
+    setzen: (v) => eintragAendern(eintrag.kennung, (e) => { e.rissanforderung = v; }),
   }), erklaerung([
     ['Gilt für', 'alle Rissnachweise: Riss bei Zwang, Stahlspannung quasi-ständig '
       + 'und Fliessen häufig. Hier geändert, ändert sie sich in allen dreien.'],
@@ -349,7 +341,7 @@ function zwangInhalt(eintrag, ort) {
         zahlfeld({
           wert: eintrag.zwaengung_biegung_kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
           titel: 'Kriechzahl φ der Zwängung auf Biegung: E_c,eff = E_cm / (1 + φ)',
-          beiAenderung: (v) => anBauteil(eintrag, ort)((e) => {
+          beiAenderung: (v) => eintragAendern(eintrag.kennung, (e) => {
             e.zwaengung_biegung_kriechzahl = v;
           }),
         }),
@@ -413,7 +405,7 @@ function gebrauchsKapitel(eintrag, ort, {
   const liste = eintrag[feld];
   const abgeleitet = !!liste.aus_tragsicherheit;
   const faelle = liste.faelle;
-  const aendern = (veraenderer) => anBauteil(eintrag, ort)((e) => veraenderer(e[feld]));
+  const aendern = (veraenderer) => eintragAendern(eintrag.kennung, (e) => veraenderer(e[feld]));
   const spalten = ort.gebrauch.spalten(eintrag);
 
   return [
@@ -457,7 +449,7 @@ function gebrauchsKapitel(eintrag, ort, {
 /** Ein Lastfall unter Gebrauchslast auf einer Zeile -- wie eine Einwirkung, ohne Querkraft. */
 function gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, index) {
   const k = eintrag[feld].faelle[index];
-  const aendern = (veraenderer) => anBauteil(eintrag, ort)((e) => veraenderer(e[feld].faelle[index]));
+  const aendern = (veraenderer) => eintragAendern(eintrag.kennung, (e) => veraenderer(e[feld].faelle[index]));
 
   return fallzeile({
     fall: k, aendern, was: 'Lastfall', nameTitel: `Bezeichnung des ${wort}en Lastfalls`,
@@ -466,7 +458,7 @@ function gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, index) {
       beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
     })),
     entfernenTitel: `${wort[0].toUpperCase()}${wort.slice(1)}en Lastfall entfernen`,
-    entfernen: () => anBauteil(eintrag, ort)((e) => { e[feld].faelle.splice(index, 1); }),
+    entfernen: () => eintragAendern(eintrag.kennung, (e) => { e[feld].faelle.splice(index, 1); }),
   });
 }
 
@@ -491,8 +483,7 @@ function analyseInhalt(eintrag, art, ort) {
     ...(stellen.length
       ? stellen.map((i) => spannungsZeile(eintrag, i, ort))
       : [el('div.leer', { text: 'Noch kein Diagramm.' })]),
-    anfuegenKnopf('Diagramm', () => projektAendern((p) => {
-      const e = p[ort.liste].find((x) => x.kennung === eintrag.kennung);
+    anfuegenKnopf('Diagramm', () => eintragAendern(eintrag.kennung, (e) => {
       e.spannungsfaelle = e.spannungsfaelle || [];
       e.spannungsfaelle.push(
         ausVorlage(ort.vorlage, { name: naechsterName('Diagramm', e.spannungsfaelle), art }));
@@ -573,8 +564,8 @@ export function rechenwahlZeile(titel, ziel, aendern, optionen) {
  */
 function spannungsZeile(eintrag, index, ort) {
   const k = (eintrag.spannungsfaelle || [])[index];
-  const liste = (p) => p[ort.liste].find((x) => x.kennung === eintrag.kennung).spannungsfaelle;
-  const aendern = (veraenderer) => projektAendern((p) => veraenderer(liste(p)[index]));
+  const aendern = (veraenderer) => eintragAendern(eintrag.kennung,
+    (e) => veraenderer(e.spannungsfaelle[index]));
   const [oben, unten] = ort.raender(k);
   const zahl = (feld, titel, schritt) => zahlfeld({
     wert: k[feld], schritt, titel, leer: 0,
@@ -616,7 +607,7 @@ function spannungsZeile(eintrag, index, ort) {
     zahlen: [...spalten, phi, ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; }))],
     unten: [werte, rechenart],
     entfernenTitel: 'Analyse entfernen',
-    entfernen: () => projektAendern((p) => { liste(p).splice(index, 1); }),
+    entfernen: () => eintragAendern(eintrag.kennung, (e) => { e.spannungsfaelle.splice(index, 1); }),
     klasse: '.ist-spannung',
   });
 }

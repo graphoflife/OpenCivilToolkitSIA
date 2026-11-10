@@ -36,7 +36,7 @@ import { setzungKarten } from './sz_zeichnung.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
 import { ARTEN } from './arten.js';
-import { aendern, namensraum, zustand } from './zustand.js';
+import { aendern, eintragVon, namensraum, zustand } from './zustand.js';
 
 // ===========================================================================
 // Bausteine
@@ -777,7 +777,7 @@ function raumDerAuswahl() {
   const wahl = zustand.auswahl;
   if (!wahl) return null;
   if (wahl.art === 'material') {
-    const m = zustand.projekt.materialien.find((x) => x.kennung === wahl.kennung);
+    const m = eintragVon(wahl.kennung);
     return m ? namensraum(m.art, m.kennung) : null;
   }
   return namensraum(wahl.art, wahl.kennung);

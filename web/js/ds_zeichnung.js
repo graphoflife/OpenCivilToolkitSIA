@@ -22,7 +22,7 @@ import { cadBereich, cadFenster, cadVergessen } from './cad_fenster.js';
 import { auswahlTeil } from './cad_modell.js';
 import { el, zahlfeld } from './dom.js';
 import { aussparungTeile, grundrissTeile, grundrissUmfang } from './ds_grundriss.js';
-import { aendern, eintragAendern, zustand } from './zustand.js';
+import { aendern, eintragAendern, eintragVon, zustand } from './zustand.js';
 
 /** Eine Art: die Aussparung, eine Fläche aus Knoten. */
 const ARTEN = [{ liste: 'aussparungen', form: 'flaeche', vorsilbe: 'A', rang: 0 }];
@@ -40,10 +40,6 @@ const EINSTELLUNG = {
   stellen: 0,
   massstab: [0.01, 20],
 };
-
-function eintragVon(kennung) {
-  return zustand.projekt?.durchstanzstellen?.find((x) => x.kennung === kennung) || null;
-}
 
 /** Was der Kern zuletzt zu dieser Stelle gerechnet hat -- oder null. */
 function situationVon(kennung) {
@@ -75,7 +71,7 @@ function adapter(kennung) {
     arten: ARTEN,
     gilt: () => zustand.projekt === projekt,
     zeichnung: () => eintragVon(kennung),
-    schreiben: (veraenderer) => eintragAendern('durchstanzstellen', kennung, veraenderer),
+    schreiben: (veraenderer) => eintragAendern(kennung, veraenderer),
     tafelNeu: () => aendern({}, 'zeichnung'),
     name: elementname,
     neuText: (a, werkzeug) => (werkzeug === 'aussparung' ? 'Aussparung' : 'Hilfspunkt'),

@@ -190,16 +190,27 @@ export function projektAendern(veraenderer, anlass = 'projekt') {
 }
 
 /**
- * Ändert den Eintrag mit dieser Kennung in einer Liste des Projekts -- der
- * eine Weg, auf dem eine App ihren Eintrag ändert. Gibt es ihn nicht mehr,
- * etwa wenn ein verzögertes Speichern erst nach dem Löschen kommt, ändert
- * sich nichts.
+ * Der Eintrag mit dieser Kennung, in welcher Liste des Projekts er auch
+ * steht -- oder null. Kennungen sind im Projekt eindeutig (`freieKennung`),
+ * darum braucht es den Namen der Liste nicht.
  */
-export function eintragAendern(liste, kennung, veraenderer, anlass = 'projekt') {
-  projektAendern((p) => {
-    const eintrag = (p[liste] || []).find((x) => x.kennung === kennung);
-    if (eintrag) veraenderer(eintrag);
-  }, anlass);
+export function eintragVon(kennung) {
+  for (const liste of Object.values(zustand.projekt || {})) {
+    const eintrag = Array.isArray(liste) && liste.find((e) => e?.kennung === kennung);
+    if (eintrag) return eintrag;
+  }
+  return null;
+}
+
+/**
+ * Ändert den Eintrag mit dieser Kennung -- der eine Weg, auf dem eine App
+ * ihren Eintrag ändert. Gibt es ihn nicht mehr, etwa wenn ein verzögertes
+ * Speichern erst nach dem Löschen kommt, geschieht nichts: weder abgelegt
+ * noch gerechnet.
+ */
+export function eintragAendern(kennung, veraenderer, anlass = 'projekt') {
+  const eintrag = eintragVon(kennung);
+  if (eintrag) projektAendern(() => veraenderer(eintrag), anlass);
 }
 
 // -- Zugriffshilfen ---------------------------------------------------------

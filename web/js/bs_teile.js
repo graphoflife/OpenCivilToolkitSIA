@@ -13,7 +13,7 @@
  */
 
 import { ARTEN as BAUTEILARTEN } from './arten.js';
-import { aendern, zustand } from './zustand.js';
+import { aendern, eintragVon, zustand } from './zustand.js';
 
 /** Was der Katalog zum Balkensystem weiss: Lastarten, Richtungen, Lagerarten, Einheiten. */
 export function katalog() {
@@ -50,13 +50,8 @@ export function zugseite(p, q) {
 /** Wie ein Material des Systems heisst: ein Beton wie im Projekt, ein eigenes mit seinem Namen. */
 export function materialname(m) {
   if (m.art !== 'beton') return m.name || m.kennung;
-  const beton = zustand.projekt.materialien.find((x) => x.kennung === m.beton);
+  const beton = eintragVon(m.beton);
   return beton ? beton.name || beton.sorte : '– kein Beton –';
-}
-
-/** Das System mit dieser Kennung, wie es gerade im Projekt steht -- oder null. */
-export function eintragVon(kennung) {
-  return zustand.projekt?.balkensysteme?.find((x) => x.kennung === kennung) || null;
 }
 
 /**

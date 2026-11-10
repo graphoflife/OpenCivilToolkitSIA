@@ -17,7 +17,7 @@ import { panel } from './bausteine.js';
 import { el, ersetzen } from './dom.js';
 import { abbrechen, ausfuehren, konsole, leeren, neuStarten } from './konsole.js';
 import { bildZeichnen } from './zeichnen.js';
-import { eintragAendern, zustand } from './zustand.js';
+import { eintragAendern, eintragVon, zustand } from './zustand.js';
 
 /** So viel wird eingerückt -- wie in PEP 8. */
 const EINZUG = '    ';
@@ -28,23 +28,18 @@ let ansicht = null;
 /** Wartet, bis das Tippen eine Weile ruht, und speichert dann. */
 let speichernNach = null;
 
-/** Das Skript, wie es gerade im Projekt steht -- die Ansicht hält nur seine Kennung. */
-function skriptVon(kennung) {
-  return (zustand.projekt?.skripte || []).find((s) => s.kennung === kennung) || null;
-}
-
 function codeSpeichern(kennung, code) {
   clearTimeout(speichernNach);
   speichernNach = null;
-  if (skriptVon(kennung)?.code === code) return;
+  if (eintragVon(kennung)?.code === code) return;
   // Als «skript»: das rechnet nichts neu, ein Skript geht in keine Rechnung.
-  eintragAendern('skripte', kennung, (s) => { s.code = code; }, 'skript');
+  eintragAendern(kennung, (s) => { s.code = code; }, 'skript');
 }
 
 function laufen(kennung) {
   const code = ansicht.code.value;
   codeSpeichern(kennung, code);
-  const skript = skriptVon(kennung);
+  const skript = eintragVon(kennung);
   ausfuehren(code, { name: skript?.name || kennung });
 }
 
@@ -189,7 +184,7 @@ function aufbauen(skript) {
   const name = el('input', {
     type: 'text', value: skript.name || '', title: 'Name des Skripts',
     on: {
-      change: (e) => eintragAendern('skripte', kennung, (s) => {
+      change: (e) => eintragAendern(kennung, (s) => {
         s.name = e.target.value.trim() || s.name;
       }, 'skript'),
     },

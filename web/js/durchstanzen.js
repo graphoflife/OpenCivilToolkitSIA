@@ -94,7 +94,7 @@ function gelesen(d) {
 }
 
 function aenderer(d) {
-  return (veraenderer) => eintragAendern('durchstanzstellen', d.kennung, veraenderer);
+  return (veraenderer) => eintragAendern(d.kennung, veraenderer);
 }
 
 /** Eine Zahl des Eintrags als Feld: Beschriftung mit Symbol, Einheit aus dem Katalog. */

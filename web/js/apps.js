@@ -29,7 +29,9 @@ import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
 import { skriptZeichnen } from './python.js';
 import { variablenZeichnen } from './variablen.js';
-import { freieKennung, naechsterName, projektAendern, waehlen, zustand } from './zustand.js';
+import {
+  eintragVon, freieKennung, naechsterName, projektAendern, waehlen, zustand,
+} from './zustand.js';
 
 // ===========================================================================
 // Entstehen und Weggehen -- für alle Apps gleich
@@ -325,7 +327,6 @@ if (ohneZeile.length) throw new Error(`apps.js: keine Zeile für ${ohneZeile.joi
 /** Der gewählte Eintrag samt seiner App -- `{app, eintrag}`, oder null. */
 export function gewaehlt() {
   const app = appVon(zustand.auswahl?.art);
-  const eintrag = app && (zustand.projekt?.[app.liste] || []).find(
-    (e) => e.kennung === zustand.auswahl.kennung);
+  const eintrag = app && eintragVon(zustand.auswahl.kennung);
   return eintrag ? { app, eintrag } : null;
 }

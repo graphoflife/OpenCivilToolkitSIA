@@ -42,7 +42,7 @@ import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import {
-  aendern, ausVorlage, eintragAendern, feldangabe, materialien, zustand,
+  aendern, ausVorlage, eintragAendern, eintragVon, feldangabe, materialien, zustand,
 } from './zustand.js';
 
 /**
@@ -91,10 +91,6 @@ const WERKZEUGE = [
 
 /** Welche Liste eine Linie des Werkzeugs füllt. */
 const LINIE_VON = { bewehrung: 'stablinien', schubwand: 'schubwaende', hilfslinie: 'hilfslinien' };
-
-function eintragVon(kennung) {
-  return zustand.projekt?.querschnittsanalysen?.find((x) => x.kennung === kennung) || null;
-}
 
 // ===========================================================================
 // Das Fenster einer Analyse
@@ -209,7 +205,7 @@ function adapter(kennung) {
     arten: ARTEN,
     gilt: () => zustand.projekt === projekt,
     zeichnung: () => eintragVon(kennung),
-    schreiben: (veraenderer) => eintragAendern('querschnittsanalysen', kennung, veraenderer),
+    schreiben: (veraenderer) => eintragAendern(kennung, veraenderer),
     tafelNeu: () => aendern({}, 'zeichnung'),
     name: elementname,
     neuText: (a, werkzeug) => neuText(a.qa, werkzeug),
@@ -249,7 +245,7 @@ export function elementname(a, kennung) {
 }
 
 export function stoffname(kennung) {
-  const m = zustand.projekt.materialien.find((x) => x.kennung === kennung);
+  const m = eintragVon(kennung);
   return m ? (m.name || m.sorte) : '–';
 }
 

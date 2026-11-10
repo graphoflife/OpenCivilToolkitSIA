@@ -37,7 +37,7 @@ import { karte } from './bausteine.js';
 import { kraftpfeil, momentSymbol } from './bs_symbole.js';
 import { abdruckVon } from './bs_teile.js';
 import { el, leerzustand, svgEl } from './dom.js';
-import { aendern, zustand } from './zustand.js';
+import { aendern, eintragVon, zustand } from './zustand.js';
 
 const BREITE = 640;
 /** Wie weit die grösste Ordinate vom Stab absteht, in Bildpunkten. */
@@ -442,7 +442,7 @@ function diagrammKarte(kennung, system, zeile) {
  * Panel darum baut bericht.js.
  */
 export function systemKarten(kennung) {
-  const system = zustand.projekt.balkensysteme?.find((s) => s.kennung === kennung);
+  const system = eintragVon(kennung);
   const uebersicht = zustand.loesung?.balkensysteme?.[kennung];
   if (uebersicht && !uebersicht.gueltig) {
     return [karte(null, (uebersicht.meldungen || []).filter((m) => m.fehler)

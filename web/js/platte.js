@@ -19,7 +19,7 @@ import { span } from './mathe.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import { plattenKapitel } from './plattenkapitel.js';
-import { materialien, projektAendern, zustand } from './zustand.js';
+import { eintragAendern, materialien, zustand } from './zustand.js';
 
 
 /**
@@ -42,10 +42,8 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
   const ueberAbstand = posten.art === 'teilung';
   const leer = !(posten.durchmesser > 0);
 
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-      .lagen[nummer - 1][welcher]);
-  });
+  const aendern = (veraenderer) => eintragAendern(querschnitt.kennung,
+    (q) => veraenderer(q.lagen[nummer - 1][welcher]));
 
   return el('div.postenzeile', { class: leer ? 'ist-leer' : '' }, [
     el('button.weg', {
@@ -127,9 +125,8 @@ function lagenBlock(querschnitt, nummer) {
 function lageSchalter(querschnitt, nummer, lage) {
   if (!(lage.grund?.durchmesser > 0 && lage.zulage?.durchmesser > 0)) return null;
 
-  const setzen = (unguenstig) => projektAendern((p) => {
-    p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-      .lagen[nummer - 1].unguenstig = unguenstig;
+  const setzen = (unguenstig) => eintragAendern(querschnitt.kennung, (q) => {
+    q.lagen[nummer - 1].unguenstig = unguenstig;
   });
   const ist = lage.unguenstig !== false;
   const untere = nummer <= 2;
@@ -151,10 +148,7 @@ function lageSchalter(querschnitt, nummer, lage) {
 function richtungsSchalter(querschnitt, nummer, richtung, partner) {
   // Beide Schalter eines Paars zeigen dasselbe Paar, nur von der anderen
   // Seite -- wie gespeichert wird, weiss lagen.js.
-  const setzen = (wert) => projektAendern((p) => {
-    richtungSetzen(p.querschnitte.find((x) => x.kennung === querschnitt.kennung),
-      nummer, wert);
-  });
+  const setzen = (wert) => eintragAendern(querschnitt.kennung, (q) => richtungSetzen(q, nummer, wert));
 
   return zweiSchalter({
     stellungen: [['x', 'x', 'ist-x'], ['y', 'y', 'ist-y']], gewaehlt: richtung, setzen,
@@ -187,10 +181,8 @@ function querkraftBlock(querschnitt) {
   const ueberAbstand = buegel.art_y === 'teilung';
   const leer = !(buegel.durchmesser > 0);
 
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-      .querkraftbewehrung);
-  });
+  const aendern = (veraenderer) => eintragAendern(querschnitt.kennung,
+    (q) => veraenderer(q.querkraftbewehrung));
 
   return el('div.lage.lage-querkraft', { class: leer ? 'ist-leer' : '' }, [
     el('div.lage-kopf', {}, [el('span.lage-name', { text: 'Bügel' })]),
@@ -246,8 +238,7 @@ function querkraftBlock(querschnitt) {
 
 function ueberdeckungsBlock(querschnitt, welche) {
   const unten = welche === 'unten';
-  const aendern = (v) => projektAendern((p) => {
-    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+  const aendern = (v) => eintragAendern(querschnitt.kennung, (q) => {
     if (unten) q.ueberdeckung_unten = v;
     else q.ueberdeckung_oben = v;
   });
@@ -262,9 +253,7 @@ function ueberdeckungsBlock(querschnitt, welche) {
 export function plattenEditor(querschnitt) {
   const betone = materialien('beton');
   const staehle = materialien('betonstahl');
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
-  });
+  const aendern = (veraenderer) => eintragAendern(querschnitt.kennung, veraenderer);
 
   return [
     panel({ schluessel: 'platte/Platte', titel: 'Platte' }, [

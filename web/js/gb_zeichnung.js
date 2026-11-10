@@ -19,7 +19,7 @@ import { auswahl, el, svgEl } from './dom.js';
 import {
   BREITE, bogen, linie, mass, pfeil, schraffur, text, zahl,
 } from './gb_skizze.js';
-import { aendern, zustand } from './zustand.js';
+import { aendern, eintragVon, zustand } from './zustand.js';
 
 const RAND = 36;
 /** Wie lang die Resultierende gezeichnet wird, in px. */
@@ -275,7 +275,7 @@ function legende(g, s, fall) {
  * die Wahl der Kombination. Das Panel darum baut bericht.js.
  */
 export function situationKarten(kennung) {
-  const g = (zustand.projekt?.grundbrueche || []).find((x) => x.kennung === kennung);
+  const g = eintragVon(kennung);
   if (!g) return [];
   const s = zustand.loesung?.grundbrueche?.[kennung];
   const faelle = s?.faelle || [];

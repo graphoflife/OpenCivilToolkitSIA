@@ -15,7 +15,7 @@
 import { feld, panel } from './bausteine.js';
 import { el, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
-import { kennwertId, projektAendern, zustand } from './zustand.js';
+import { eintragAendern, kennwertId, zustand } from './zustand.js';
 
 /** Wie die Arten über dem Editor heissen. */
 const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
@@ -52,8 +52,7 @@ function kennwertZeile(material, vorlage) {
       : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet. Haken setzen zum Überschreiben.' : ''),
     // Leer: die eigene Zahl weg, der Wert der Sorte gilt wieder.
     leer: null,
-    beiAenderung: (neu) => projektAendern((p) => {
-      const m = p.materialien.find((x) => x.kennung === material.kennung);
+    beiAenderung: (neu) => eintragAendern(material.kennung, (m) => {
       const topf = vorlage.berechnet ? m.ueberschreibungen : m.abweichungen;
       if (neu === null) delete topf[vorlage.kurzname];
       else topf[vorlage.kurzname] = neu;
@@ -65,8 +64,7 @@ function kennwertZeile(material, vorlage) {
       type: 'checkbox', checked: istUeberschrieben, disabled: gesperrt,
       title: gesperrt ? 'Normsorte nach SIA – nicht änderbar' : 'Von Hand überschreiben',
       on: {
-        change: (e) => projektAendern((p) => {
-          const m = p.materialien.find((x) => x.kennung === material.kennung);
+        change: (e) => eintragAendern(material.kennung, (m) => {
           if (e.target.checked) m.ueberschreibungen[vorlage.kurzname] = anzeige ?? 0;
           else delete m.ueberschreibungen[vorlage.kurzname];
         }),
@@ -78,9 +76,8 @@ function kennwertZeile(material, vorlage) {
     ? el('button.knopf.knopf-zart', {
       text: '↺', title: 'Sortenwert zurücksetzen',
       on: {
-        click: () => projektAendern((p) => {
-          delete p.materialien.find((x) => x.kennung === material.kennung)
-            .abweichungen[vorlage.kurzname];
+        click: () => eintragAendern(material.kennung, (m) => {
+          delete m.abweichungen[vorlage.kurzname];
         }),
       },
     })
@@ -144,9 +141,7 @@ export function materialEditor(material) {
         ? el('button.knopf.knopf-zart', {
           text: `${anzahlUeberschrieben} überschrieben — zurücksetzen`,
           on: {
-            click: () => projektAendern((p) => {
-              p.materialien.find((x) => x.kennung === material.kennung).ueberschreibungen = {};
-            }),
+            click: () => eintragAendern(material.kennung, (m) => { m.ueberschreibungen = {}; }),
           },
         })
         : (gesperrt ? 'gesperrt' : 'Haken setzen zum Überschreiben'),
@@ -165,9 +160,7 @@ function nameAendern(material, wunsch, feldKnoten) {
     feldKnoten.value = material.name;
     return;
   }
-  projektAendern((p) => {
-    p.materialien.find((x) => x.kennung === material.kennung).name = name;
-  });
+  eintragAendern(material.kennung, (m) => { m.name = name; });
 }
 
 /** Was über dem Editor steht: die Art, und ob es eine Normsorte ist. */

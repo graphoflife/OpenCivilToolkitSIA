@@ -27,9 +27,11 @@ import { zeilenstand } from './kapitel.js';
 import { xLagen } from './lagen.js';
 import { span } from './mathe.js';
 import {
-  analysenKapitel, anBauteil, anfuegenKnopf, nachweisKapitel, rechenwahlZeile,
+  analysenKapitel, anfuegenKnopf, nachweisKapitel, rechenwahlZeile,
 } from './nachweise.js';
-import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
+import {
+  ausVorlage, eintragAendern, feldangabe, naechsterName, zustand,
+} from './zustand.js';
 
 /**
  * Was hinter den Fragezeichen der Platte steht: Rechenweg, Werte (Bemessung
@@ -150,7 +152,6 @@ const VERFORMUNG = {
  * Bauteil anders zeigen.
  */
 export const PLATTE = {
-  liste: 'querschnitte',
   vorlage: 'analyse',
   richtung: (k, setzen) => richtungsWahl(k.richtung || 'x', setzen, ['x', 'y']),
   raender: () => ['oben', 'unten'],
@@ -213,17 +214,12 @@ function jeB(querschnitt) {
   return `M, N je b = ${querschnitt.b} mm`;
 }
 
-/** Dasselbe für die Platte. */
-function anPlatte(querschnitt) {
-  return anBauteil(querschnitt, PLATTE);
-}
-
 /**
  * Tragsicherheit: Rechenwahl, die Einwirkungen und die Angaben, die allein
  * die Querkraft braucht.
  */
 function tragsicherheitInhalt(querschnitt) {
-  const aendernAn = anPlatte(querschnitt);
+  const aendernAn = (veraenderer) => eintragAendern(querschnitt.kennung, veraenderer);
   return [
     rechenwahlZeile('Rechenwahl', querschnitt.tragsicherheit_wahl,
       (veraenderer) => aendernAn((q) => veraenderer(q.tragsicherheit_wahl))),
@@ -247,7 +243,7 @@ function tragsicherheitInhalt(querschnitt) {
  * spielen sie eine Rolle.
  */
 function querkraftAngaben(querschnitt) {
-  const aendernAn = anPlatte(querschnitt);
+  const aendernAn = (veraenderer) => eintragAendern(querschnitt.kennung, veraenderer);
   const buegel = querschnitt.querkraftbewehrung;
   const aendernBuegel = (veraenderer) => aendernAn((q) => veraenderer(q.querkraftbewehrung));
   return el('div.unterkapitel', {}, [
@@ -285,9 +281,8 @@ function querkraftAngaben(querschnitt) {
 
 function einwirkungZeile(querschnitt, index) {
   const k = querschnitt.kombinationen[index];
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung).kombinationen[index]);
-  });
+  const aendern = (veraenderer) => eintragAendern(querschnitt.kennung,
+    (q) => veraenderer(q.kombinationen[index]));
 
   // Eine Last, die man leert, ist keine Last.
   const zahl = (feld, titel, schritt = 10) => zahlfeld({
@@ -303,10 +298,7 @@ function einwirkungZeile(querschnitt, index) {
       zahl('V_Ed', 'Querkraft in kN/m – 0 heisst: kein Querkraftnachweis'),
     ],
     entfernenTitel: 'Einwirkung entfernen',
-    entfernen: () => projektAendern((p) => {
-      p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-        .kombinationen.splice(index, 1);
-    }),
+    entfernen: () => eintragAendern(querschnitt.kennung, (q) => { q.kombinationen.splice(index, 1); }),
   });
 }
 
@@ -320,7 +312,7 @@ function einwirkungZeile(querschnitt, index) {
  * 2026-10-16). Vorher stand φ oben bei der Platte, nur für diesen Faktor.
  */
 function verformungInhalt(querschnitt) {
-  const aendern = (veraenderer) => anPlatte(querschnitt)((q) => veraenderer(q.verformung));
+  const aendern = (veraenderer) => eintragAendern(querschnitt.kennung, (q) => veraenderer(q.verformung));
   const { kriechzahl, faelle } = querschnitt.verformung;
   return [
     feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
@@ -345,7 +337,7 @@ function verformungInhalt(querschnitt) {
 /** Ein Verformungsfall auf einer Zeile: w, L und die gezogene Seite. */
 function verformungsZeile(querschnitt, index) {
   const k = querschnitt.verformung.faelle[index];
-  const aendern = (veraenderer) => anPlatte(querschnitt)((q) => {
+  const aendern = (veraenderer) => eintragAendern(querschnitt.kennung, (q) => {
     veraenderer(q.verformung.faelle[index]);
   });
   const seiten = zustand.katalog?.verformung?.zugseiten || [];
@@ -373,6 +365,6 @@ function verformungsZeile(querschnitt, index) {
         : el('span'),
     ],
     entfernenTitel: 'Verformungsfall entfernen',
-    entfernen: () => anPlatte(querschnitt)((q) => { q.verformung.faelle.splice(index, 1); }),
+    entfernen: () => eintragAendern(querschnitt.kennung, (q) => { q.verformung.faelle.splice(index, 1); }),
   });
 }

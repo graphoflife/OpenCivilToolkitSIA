@@ -32,7 +32,7 @@ import { karte, wahlSchalter } from './bausteine.js';
 import {
   el, leerzustand, svgEl, zahlfeld,
 } from './dom.js';
-import { aendern, zustand } from './zustand.js';
+import { aendern, eintragVon, zustand } from './zustand.js';
 
 const BREITE = 640;
 const HOEHE = 470;
@@ -86,8 +86,7 @@ function festVon(wahl) {
 
 /** Woran die Diagramme hängen: die Analyse und die Materialien. */
 function abdruckVon(kennung) {
-  const analyse = zustand.projekt.querschnittsanalysen?.find((a) => a.kennung === kennung);
-  return JSON.stringify([analyse, zustand.projekt.materialien]);
+  return JSON.stringify([eintragVon(kennung), zustand.projekt.materialien]);
 }
 
 /**
