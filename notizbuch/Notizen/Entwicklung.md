@@ -44,6 +44,37 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Je Seite eine Lage: eine Regel für Löser und Handrechnung
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 9. An den Zahlen ändert
+sich nichts.
+
+Die Rechenart «Handrechnung» verspricht im Löser denselben Querschnitt wie
+die Resistenzlinie aus Handrechnung: je Seite eine Lage im Schwerpunkt.
+Gerechnet wurde das zweimal, und die Antworten gingen auseinander -- ohne
+Angabe der Seite entschied im Löser die Tiefe, in der Handrechnung nie; bei
+zwei Stählen auf einer Seite meldete der Löser einen Fehler, die
+Handrechnung nahm den schwächeren; eine leere Seite fiel im Löser weg und
+stand in der Handrechnung mit ihrer Höhe. Den Schwerpunkt mehrerer Flächen
+rechnete dazu `lage_aus_posten` ein drittes Mal.
+
+Jetzt fasst `querschnittsloeser.je_seite` zusammen, und beide fragen dort:
+
+- **Die Seite sagt die Lage**, nicht die Tiefe -- eine Lage ohne Seite ist
+  ein Fehler. Gebaut werden die Lagen ohnehin nur in `stahllagen`, und die
+  kennt die Seite immer.
+- **Je Seite ein Stahl**, sonst ein Fehler. Seit eine Platte einen Stahl für
+  alle Lagen hat (Benutzer, 2026-10-24), kann es zwei gar nicht geben; die
+  Regel «der schwächere zählt» lief nie.
+- **Eine Seite ohne Stahl fehlt.** Die Handrechnung setzt sie mit null
+  Fläche ein, damit ihre Formeln gelten; der Löser lässt sie weg.
+- **Die zusammengefasste Lage behält ihre Teile**, ihren Index und einen
+  Namen aus den Teilen. Ihre eigenen Posten (`handrechnung.Posten`)
+  braucht die Handrechnung darum nicht mehr.
+
+Den Schwerpunkt mehrerer Flächen rechnet `lagenaufbau.schwerpunkt`, für die
+Posten einer Lage wie für die Lagen einer Seite.
+
 ## 2026-11-10 · Die Nachweise je Lage auf einer Schablone
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 8. Für den Benutzer ändert

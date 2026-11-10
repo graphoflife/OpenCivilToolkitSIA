@@ -16,7 +16,8 @@ Nachweisen.
 DIE RECHENARTEN:
 * **Handrechnung** -- im Loeser derselbe Querschnitt wie in der
   Resistenzlinie aus Handrechnung: der Spannungsblock, die Bewehrung nur auf
-  Zug, je Seite zu einer Lage im Schwerpunkt zusammengefasst, und der Beton
+  Zug, je Seite zu einer Lage im Schwerpunkt zusammengefasst -- beide mit
+  :func:`~opencivil.nachweis.querschnittsloeser.je_seite` --, und der Beton
   auch dort gezaehlt, wo der Stahl liegt. Die gedrueckte Bewehrung zaehlt
   nicht -- in keiner anderen Rechenart fehlt sie.
 * **0.85·x-Vereinfachung** -- derselbe Spannungsblock, ueber die Hoehe

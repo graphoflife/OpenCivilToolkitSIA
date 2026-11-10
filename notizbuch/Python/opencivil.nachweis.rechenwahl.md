@@ -1,5 +1,5 @@
 ---
-erzeugt: 76362735db79
+erzeugt: e5e34dd09fb0
 art: modul
 tags: [modul]
 ---
@@ -165,10 +165,10 @@ Die Handrechnung zaehlt den Beton auch, wo der Stahl liegt.
 #### Gesetze.lagen
 
 ```python
-def lagen(self, lagen: Sequence[Stahllage], h: float) -> List[Stahllage]
+def lagen(self, lagen: Sequence[Stahllage]) -> List[Stahllage]
 ```
 
-Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine.
+Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]).
 
 #### Gesetze.grenzen
 

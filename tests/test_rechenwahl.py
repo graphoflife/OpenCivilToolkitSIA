@@ -10,7 +10,7 @@ und die Altdatei, die vor dem Umbau festgehalten wurde.
 import unittest
 
 from opencivil.core.berechnung import Eingabebezug
-from opencivil.nachweis.querschnittsloeser import Stahllage, lagen_je_seite
+from opencivil.nachweis.querschnittsloeser import Stahllage, je_seite
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, bezuege_vereinen, gesetze,
@@ -68,7 +68,7 @@ class TestGesetze(unittest.TestCase):
         self.assertAlmostEqual(g.stahl(STAHL)(0.01), 435e6)
         self.assertIsNotNone(g.beton.mittel, "der Block springt: über jede Faser gemittelt")
         self.assertFalse(g.verdraengt)
-        lagen = g.lagen(LAGEN, 0.3)
+        lagen = g.lagen(LAGEN)
         self.assertEqual(len(lagen), 2)
         self.assertAlmostEqual(lagen[0].a_s, 2450e-6)
         self.assertAlmostEqual(lagen[0].z, (1696 * 0.249 + 754 * 0.243) / 2450)
@@ -79,7 +79,7 @@ class TestGesetze(unittest.TestCase):
         self.assertAlmostEqual(g.stahl(STAHL)(-0.01), -435e6)
         self.assertIsNotNone(g.beton.mittel, "der Block springt: über jede Faser gemittelt")
         self.assertTrue(g.verdraengt)
-        self.assertEqual(g.lagen(LAGEN, 0.3), LAGEN)
+        self.assertEqual(g.lagen(LAGEN), LAGEN)
 
     def test_parabel_und_elastisch(self):
         parabel = gesetze(Rechenwahl(art=Rechenart.PARABEL), W)
@@ -125,11 +125,21 @@ class TestStahl(unittest.TestCase):
         self.assertAlmostEqual(gesetz(0.01), 435e6)
         self.assertEqual(gesetz(0.05), 0.0)
 
-    def test_je_seite_eine_lage_auch_ohne_angabe_der_seite(self):
-        """Ohne ``von_unten`` entscheidet die Tiefe gegen h/2."""
-        lagen = lagen_je_seite([Stahllage(a_s=1e-3, z=0.25, stahl=STAHL),
-                                Stahllage(a_s=5e-4, z=0.05, stahl=STAHL)], 0.3)
-        self.assertEqual([l.von_unten for l in lagen], [True, False])
+    def test_je_seite_nur_mit_bekannter_seite(self):
+        """
+        Die Seite sagt die Lage, nicht die Tiefe -- ohne ``von_unten`` ist
+        es ein Fehler. Bis 2026-11-10 entschied dann die Tiefe gegen h/2,
+        die Handrechnung aber nie.
+        """
+        with self.assertRaisesRegex(ValueError, "ihre Seite"):
+            je_seite([Stahllage(a_s=1e-3, z=0.25, stahl=STAHL),
+                      Stahllage(a_s=5e-4, z=0.05, stahl=STAHL)])
+
+    def test_je_seite_mit_namen_und_teilen(self):
+        seiten = je_seite(LAGEN)
+        self.assertEqual(list(seiten), [True, False])
+        self.assertEqual(seiten[True].teile, tuple(LAGEN[:2]))
+        self.assertEqual(seiten[False].teile, (LAGEN[2],))
 
 
 class TestBezuege(unittest.TestCase):

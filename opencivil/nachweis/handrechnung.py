@@ -43,52 +43,18 @@ Dehnung hergibt: ``sigma_sd = min(E_s * eps_s; f_yd)``.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.material.basis import mit_index
+from opencivil.nachweis.querschnittsloeser import Stahllage, je_seite
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 from opencivil.querschnitt.lagenaufbau import protokoll_statische_hoehe, statische_hoehe
 from opencivil.querschnitt.zugseite import Zugseite
 # Der Anteil des Spannungsblocks steht beim Gesetz; hier wird er nur benutzt.
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
-
-
-@dataclass(frozen=True)
-class Posten:
-    """Ein einzelner Bewehrungsposten, so wie er in die Handrechnung eingeht."""
-
-    a_s: float
-    """Querschnittsflaeche in m^2, fuer die betrachtete Breite b."""
-
-    z: float
-    """Schwerpunkt in m, ab Oberkante."""
-
-    f_yd: float
-    """Bemessungswert der Fliessgrenze in Pa."""
-
-    E_s: float
-    """Elastizitaetsmodul in Pa."""
-
-    text: str = ""
-    index: str = ""
-    """Index des Symbols, z.B. ``1,x,g``."""
-
-    stahl_index: str = ""
-    """Index der Stahlsorte -- leer, solange es nur eine gibt."""
-
-    von_unten: bool = True
-
-    satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
-    """Ob ``f_yd`` die Bemessungs- oder die charakteristische Fliessgrenze ist."""
-
-    @property
-    def symbol_f_yd(self) -> str:
-        """``f_{yd,\text{B500B}}`` -- die Posten einer Lage koennen sich
-        unterscheiden, darum je Posten."""
-        return mit_index(self.satz.stahl_zeichen, self.stahl_index)
 
 
 @dataclass(frozen=True)
@@ -105,13 +71,14 @@ class Lage:
 
     stahl_index: str = ""
     """
-    Index der massgebenden Stahlsorte -- die mit dem kleinsten ``f_yd``.
+    Index der Stahlsorte ihrer Seite -- leer, solange es nur eine gibt.
 
-    Ohne ihn stuende bei zwei Sorten zweimal ``f_yd`` mit verschiedenen Zahlen
-    im selben Bericht, und niemand koennte sagen, welche Sorte gemeint ist.
+    Ohne ihn stuende bei zwei Platten aus verschiedenen Sorten zweimal
+    ``f_yd`` mit verschiedenen Zahlen im selben Bericht, und niemand koennte
+    sagen, welche Sorte gemeint ist.
     """
 
-    teile: Tuple[Posten, ...] = ()
+    teile: Tuple[Stahllage, ...] = ()
     """Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift."""
 
     satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
@@ -293,9 +260,10 @@ class Handrechnung:
         Schreibt, wie Tiefe und Querschnitt einer Lage aus mehreren Posten
         entstehen.
 
-        Nach Flaechen gewichtet, wie :func:`lagen_zusammenfassen` rechnet: die Lage
-        traegt die Fliessgrenze ihrer schwaechsten Sorte, also stehen alle
-        Posten unter derselben Spannung.
+        Nach Flaechen gewichtet, wie
+        :func:`~opencivil.querschnitt.lagenaufbau.schwerpunkt` rechnet. Je
+        Seite gibt es einen Stahl, also stehen alle Posten unter derselben
+        Spannung.
         """
         eingaben = {}
         for i, t in enumerate(lage.teile):
@@ -549,79 +517,25 @@ class Handrechnung:
         )
 
 
-
-def gemeinsamer_index(teile: Sequence[Posten]) -> str:
+def seiten(lagen: Sequence[Stahllage], *, satz: Werkstoffsatz,
+           stahl_index: Mapping[str, str]) -> Tuple[Lage, Lage]:
     """
-    Der Index der zusammengefassten Lage: das, was ihre Teile gemein haben.
+    Die beiden Seiten der Handrechnung, unten und oben: je Seite eine Lage im
+    Schwerpunkt, nach derselben Regel wie der Loeser in der Handrechnung
+    (:func:`~opencivil.nachweis.querschnittsloeser.je_seite`). ``stahl_index``
+    gibt je Sorte (:attr:`~opencivil.nachweis.querschnittsloeser.Stahllage.sorte`)
+    den Index ihrer Symbole.
 
-    Grundbewehrung und Zulage einer Lage heissen ``1,x,g`` und ``1,x,z`` --
-    zusammengefasst also ``1,x``. Gehen die Teile auseinander, bleibt der Index
-    leer; eine erfundene Bezeichnung waere schlimmer als gar keine.
+    Ist nur eine Seite bewehrt, zaehlt die andere mit null Flaeche, damit die
+    Formeln unveraendert gelten -- mit den Kennwerten des Stahls der anderen.
     """
-    staemme = {t.index.rsplit(",", 1)[0] for t in teile if t.index}
-    return staemme.pop() if len(staemme) == 1 else ""
-
-
-def lagen_zusammenfassen(posten: Sequence[Posten]) -> Dict[str, Lage]:
-    """
-    Fasst die Bewehrungsposten einer Richtung zu zwei Lagen zusammen.
-
-    Je Richtung liegen genau zwei Bewehrungslagen, jede davon aus Grund-
-    bewehrung und Zulage. Fuer die Handrechnung zaehlt je Seite nur die Summe
-    der Flaechen und ihr gemeinsamer Schwerpunkt.
-
-    Gruppiert wird nach ``von_unten``, also nach der Zugehoerigkeit zur unteren
-    oder oberen Lage -- **nicht** nach der Hoehenlage. Grundbewehrung und Zulage
-    derselben Lage liegen naemlich auf leicht verschiedenen Hoehen, weil ihre
-    Durchmesser verschieden sind. Wer nach z gruppiert, bekommt drei Gruppen
-    statt zwei und verliert stillschweigend eine davon.
-
-    Die entstandene Lage behaelt ihre Teile (:attr:`Lage.teile`) und ihren
-    Index. Frueher kamen hier blanke Tupel an, in denen beides fehlte: die
-    Mitschrift schrieb dann ``A_{s,}`` mit leerem Index, und die Herleitung des
-    Schwerpunkts fiel still aus, weil sie ``len(teile) > 1`` verlangt.
-    """
-    if not posten:
+    gefunden = je_seite(lagen)
+    if not gefunden:
         raise ValueError("Ohne Bewehrung lässt sich nichts von Hand rechnen.")
-
-    gruppen: Dict[bool, List[Posten]] = {}
-    for eintrag in posten:
-        gruppen.setdefault(eintrag.von_unten, []).append(eintrag)
-
-    def buendeln(gruppe: List[Posten]) -> Lage:
-        flaeche = sum(t.a_s for t in gruppe)
-        beteiligt = tuple(t for t in gruppe if t.a_s > 0.0)
-        if flaeche <= 0.0:
-            # Ohne Flaeche gibt es keinen Schwerpunkt -- die Hoehenlage genuegt.
-            erster = gruppe[0]
-            return Lage(0.0, erster.z, erster.f_yd, erster.E_s, erster.text,
-                        index=erster.index, stahl_index=erster.stahl_index,
-                        teile=(erster,), satz=erster.satz)
-        schwerpunkt = sum(t.a_s * t.z for t in gruppe) / flaeche
-        # Bei verschiedenen Stahlsorten in einer Lage zaehlt die schwaechere --
-        # sonst rechnete man mit einer Festigkeit, die ein Teil nicht hat. Der
-        # Index gehoert derselben Sorte, sonst stuende ein fremder Name an der
-        # Zahl.
-        massgebend = min(gruppe, key=lambda t: t.f_yd)
-        return Lage(
-            flaeche,
-            schwerpunkt,
-            massgebend.f_yd,
-            min(t.E_s for t in gruppe),
-            " + ".join(t.text for t in beteiligt),
-            index=gemeinsamer_index(beteiligt),
-            stahl_index=massgebend.stahl_index,
-            teile=beteiligt,
-            satz=massgebend.satz,
-        )
-
-    if True not in gruppen or False not in gruppen:
-        # Nur eine Seite bewehrt -- die andere zaehlt mit null Flaeche, damit
-        # die Formeln unveraendert gelten.
-        vorhanden = buendeln(next(iter(gruppen.values())))
-        leer = Lage(0.0, 0.0, vorhanden.f_yd, vorhanden.E_s, "keine",
-                    satz=vorhanden.satz)
-        return ({"unten": vorhanden, "oben": leer} if True in gruppen
-                else {"unten": leer, "oben": vorhanden})
-
-    return {"unten": buendeln(gruppen[True]), "oben": buendeln(gruppen[False])}
+    gebaut = {
+        unten: Lage(s.a_s, s.z, s.stahl.f_yd, s.stahl.E_s, s.text, index=s.index,
+                    stahl_index=stahl_index[s.sorte], teile=s.teile, satz=satz)
+        for unten, s in gefunden.items()}
+    eine = next(iter(gebaut.values()))
+    leer = Lage(0.0, 0.0, eine.f_yd, eine.E_s, "keine", satz=satz)
+    return gebaut.get(True, leer), gebaut.get(False, leer)

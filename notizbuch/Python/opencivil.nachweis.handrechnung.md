@@ -1,5 +1,5 @@
 ---
-erzeugt: 4f31b0717b7e
+erzeugt: a08447b8729a
 art: modul
 tags: [modul]
 ---
@@ -60,35 +60,6 @@ Dehnung hergibt: `sigma_sd = min(E_s * eps_s; f_yd)`.
 
 ## Inhalt
 
-### Posten
-
-```python
-@dataclass(frozen=True)
-class Posten
-```
-
-Ein einzelner Bewehrungsposten, so wie er in die Handrechnung eingeht.
-
-- `a_s: float` – Querschnittsflaeche in m^2, fuer die betrachtete Breite b.
-- `z: float` – Schwerpunkt in m, ab Oberkante.
-- `f_yd: float` – Bemessungswert der Fliessgrenze in Pa.
-- `E_s: float` – Elastizitaetsmodul in Pa.
-- `text: str = ''`
-- `index: str = ''` – Index des Symbols, z.B. `1,x,g`.
-- `stahl_index: str = ''` – Index der Stahlsorte -- leer, solange es nur eine gibt.
-- `von_unten: bool = True`
-- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG` – Ob `f_yd` die Bemessungs- oder die charakteristische Fliessgrenze ist.
-
-#### Posten.symbol_f_yd
-
-```python
-@property
-def symbol_f_yd(self) -> str
-```
-
-`f_{yd,        ext{B500B}}` -- die Posten einer Lage koennen sich
-unterscheiden, darum je Posten.
-
 ### Lage
 
 ```python
@@ -104,8 +75,8 @@ Die zu einer Seite zusammengefasste Bewehrung.
 - `E_s: float`
 - `text: str = ''`
 - `index: str = ''` – Index der zusammengefassten Lage, z.B. `1,x`.
-- `stahl_index: str = ''` – Index der massgebenden Stahlsorte -- die mit dem kleinsten `f_yd`. Ohne ihn stuende bei zwei Sorten zweimal `f_yd` mit verschiedenen Zahlen im selben Bericht, und niemand koennte sagen, welche Sorte gemeint ist.
-- `teile: Tuple[Posten, ...] = ()` – Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift.
+- `stahl_index: str = ''` – Index der Stahlsorte ihrer Seite -- leer, solange es nur eine gibt. Ohne ihn stuende bei zwei Platten aus verschiedenen Sorten zweimal `f_yd` mit verschiedenen Zahlen im selben Bericht, und niemand koennte sagen, welche Sorte gemeint ist.
+- `teile: Tuple[Stahllage, ...] = ()` – Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift.
 - `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
 
 #### Lage.symbol_flaeche
@@ -210,9 +181,10 @@ def _schwerpunkt(self, p: Protokoll, lage: Lage) -> None
 Schreibt, wie Tiefe und Querschnitt einer Lage aus mehreren Posten
 entstehen.
 
-Nach Flaechen gewichtet, wie [[opencivil.nachweis.handrechnung#lagen_zusammenfassen|lagen_zusammenfassen]] rechnet: die Lage
-traegt die Fliessgrenze ihrer schwaechsten Sorte, also stehen alle
-Posten unter derselben Spannung.
+Nach Flaechen gewichtet, wie
+[[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]] rechnet. Je
+Seite gibt es einen Stahl, also stehen alle Posten unter derselben
+Spannung.
 
 #### Handrechnung._groesste_druckkraft
 
@@ -276,40 +248,20 @@ schob dem Polygon ein Moment unter, das aus nichts stammte: eine
 Platte nur mit unterer Bewehrung wies so ein negatives Moment von
 220 kNm nach.
 
-### gemeinsamer_index
+### seiten
 
 ```python
-def gemeinsamer_index(teile: Sequence[Posten]) -> str
+def seiten(lagen: Sequence[Stahllage], *, satz: Werkstoffsatz, stahl_index: Mapping[str, str]) -> Tuple[Lage, Lage]
 ```
 
-Der Index der zusammengefassten Lage: das, was ihre Teile gemein haben.
+Die beiden Seiten der Handrechnung, unten und oben: je Seite eine Lage im
+Schwerpunkt, nach derselben Regel wie der Loeser in der Handrechnung
+([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]). `stahl_index`
+gibt je Sorte ([[opencivil.nachweis.querschnittsloeser#Stahllage|sorte]])
+den Index ihrer Symbole.
 
-Grundbewehrung und Zulage einer Lage heissen `1,x,g` und `1,x,z` --
-zusammengefasst also `1,x`. Gehen die Teile auseinander, bleibt der Index
-leer; eine erfundene Bezeichnung waere schlimmer als gar keine.
-
-### lagen_zusammenfassen
-
-```python
-def lagen_zusammenfassen(posten: Sequence[Posten]) -> Dict[str, Lage]
-```
-
-Fasst die Bewehrungsposten einer Richtung zu zwei Lagen zusammen.
-
-Je Richtung liegen genau zwei Bewehrungslagen, jede davon aus Grund-
-bewehrung und Zulage. Fuer die Handrechnung zaehlt je Seite nur die Summe
-der Flaechen und ihr gemeinsamer Schwerpunkt.
-
-Gruppiert wird nach `von_unten`, also nach der Zugehoerigkeit zur unteren
-oder oberen Lage -- **nicht** nach der Hoehenlage. Grundbewehrung und Zulage
-derselben Lage liegen naemlich auf leicht verschiedenen Hoehen, weil ihre
-Durchmesser verschieden sind. Wer nach z gruppiert, bekommt drei Gruppen
-statt zwei und verliert stillschweigend eine davon.
-
-Die entstandene Lage behaelt ihre Teile ([[opencivil.nachweis.handrechnung#Lage|Lage.teile]]) und ihren
-Index. Frueher kamen hier blanke Tupel an, in denen beides fehlte: die
-Mitschrift schrieb dann `A_{s,}` mit leerem Index, und die Herleitung des
-Schwerpunkts fiel still aus, weil sie `len(teile) > 1` verlangt.
+Ist nur eine Seite bewehrt, zaehlt die andere mit null Flaeche, damit die
+Formeln unveraendert gelten -- mit den Kennwerten des Stahls der anderen.
 
 
 ## Braucht
@@ -318,6 +270,7 @@ Schwerpunkts fiel still aus, weil sie `len(teile) > 1` verlangt.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.werkstoffgesetz]]

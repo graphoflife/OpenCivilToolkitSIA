@@ -72,7 +72,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from functools import cached_property
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
 from opencivil.core.suche import HALBIEREN, Suche, eingrenzen
@@ -80,6 +80,7 @@ from opencivil.querschnitt.fasern import (
     FASERN, Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
 from opencivil.querschnitt.gesetzwahl import wirksamer_modul
+from opencivil.querschnitt.lagenaufbau import schwerpunkt
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 
 #: Obergrenze der Schritte, mit denen :meth:`Faserloeser._rand` den Rand des
@@ -142,39 +143,79 @@ class Stahllage:
     von_unten: Optional[bool] = None
     """
     Ob die Lage zur unteren Seite gehoert -- bei der Platte die 1. und 2.
-    Lage (:attr:`Bewehrungslage.von_unten`). Die Handrechnung fasst je Seite
-    zusammen (:func:`lagen_je_seite`); ohne Angabe entscheidet die Tiefe.
+    Lage (:attr:`Bewehrungslage.von_unten`). Ohne Angabe laesst sie sich
+    nicht je Seite zusammenfassen (:func:`je_seite`).
     """
 
     text: str = ""
     """Wie die Lage in Tabellen heisst -- «2. Lage Grundbewehrung»."""
 
-
-def lagen_je_seite(lagen: Sequence[Stahllage], h: float) -> List[Stahllage]:
+    index: str = ""
     """
-    Je Seite eine Lage, im Schwerpunkt ihrer Flaechen -- wie die Handrechnung.
-
-    Die Seite sagt :attr:`Stahllage.von_unten`, sonst die Tiefe gegen
-    ``h/2``. Unten zuerst; eine Seite ohne Flaeche faellt weg. Die
-    zusammengefasste Lage behaelt den Stahl ihrer Seite. Zwei verschiedene
-    Staehle auf einer Seite liessen sich nicht zu einer Lage machen -- die
-    Platte hat sie nicht, je Seite und Richtung liegt eine Lage, und Grund-
-    und Zulage teilen ihren Stahl.
+    Ihr Index in den Symbolen -- ``1,x,g``
+    (:attr:`~opencivil.querschnitt.lagenaufbau.Postenbezug.index`), die
+    zusammengefasste Lage den ihrer Teile, ``1,x`` (:func:`gemeinsamer_index`).
     """
-    heraus = []
+
+    teile: Tuple["Stahllage", ...] = ()
+    """Woraus sie zusammengefasst ist (:func:`je_seite`) -- fuer die Herleitung ihres Schwerpunkts."""
+
+
+def gemeinsamer_index(teile: Sequence[Stahllage]) -> str:
+    """
+    Der Index der zusammengefassten Lage: das, was ihre Teile gemein haben.
+
+    Grundbewehrung und Zulage einer Lage heissen ``1,x,g`` und ``1,x,z`` --
+    zusammengefasst also ``1,x``. Gehen die Teile auseinander, bleibt der Index
+    leer; eine erfundene Bezeichnung waere schlimmer als gar keine.
+    """
+    staemme = {t.index.rsplit(",", 1)[0] for t in teile if t.index}
+    return staemme.pop() if len(staemme) == 1 else ""
+
+
+def je_seite(lagen: Sequence[Stahllage]) -> Dict[bool, Stahllage]:
+    """
+    Je Seite eine Lage im Schwerpunkt ihrer Flaechen, unter
+    :attr:`Stahllage.von_unten` -- die eine Regel fuer den Loeser in der
+    Handrechnung (:meth:`~opencivil.nachweis.rechenwahl.Gesetze.lagen`) und die
+    Resistenzlinie aus Handrechnung (:func:`~opencivil.nachweis.handrechnung.seiten`).
+    So rechnen beide «derselbe Querschnitt», wie
+    :mod:`~opencivil.querschnitt.gesetzwahl` es verspricht.
+
+    - **Die Seite sagt die Lage, nicht die Tiefe.** Grundbewehrung und
+      Zulage derselben Lage liegen auf leicht verschiedenen Hoehen, weil ihre
+      Durchmesser verschieden sind. Eine Lage ohne Seite ist ein Fehler.
+    - **Eine Seite ohne Flaeche fehlt.** Unten zuerst.
+    - **Je Seite ein Stahl.** Zwei liessen sich nicht zu einer Lage machen;
+      die Platte hat sie nicht, sie hat einen Stahl fuer alle Lagen
+      (Benutzer, 2026-10-24).
+
+    Die zusammengefasste Lage behaelt ihre Teile, den Stahl ihrer Seite und
+    den gemeinsamen Index; ihr Name nennt die Teile. Bis 2026-11-10 stand die
+    Regel zweimal da und antwortete verschieden: ohne Seite entschied hier
+    die Tiefe, in der Handrechnung galt bei zwei Staehlen der schwaechere,
+    und eine leere Seite fiel hier weg, dort stand sie mit ihrer Hoehe. Die
+    zusammengefasste Lage des Loesers hatte keinen Namen.
+    """
+    ohne = [l.nummer for l in lagen if l.von_unten is None]
+    if ohne:
+        raise ValueError(
+            f"Je Seite zusammenfassen geht nur mit Lagen, die ihre Seite kennen -- "
+            f"{len(ohne)} kennen sie nicht.")
+    heraus: Dict[bool, Stahllage] = {}
     for unten in (True, False):
-        seite = [l for l in lagen
-                 if (l.von_unten if l.von_unten is not None else l.z > h / 2.0) is unten]
-        a_s = sum(l.a_s for l in seite)
-        if a_s <= 0.0:
+        teile = tuple(l for l in lagen if l.von_unten is unten and l.a_s > 0.0)
+        if not teile:
             continue
-        if any(l.stahl != seite[0].stahl for l in seite):
+        if any(l.stahl != teile[0].stahl for l in teile):
             raise ValueError(
                 f"Auf der {'unteren' if unten else 'oberen'} Seite liegen verschiedene "
                 f"Stähle -- je Seite eine Lage im Schwerpunkt gibt es nur mit einem.")
-        heraus.append(Stahllage(a_s=a_s, z=sum(l.a_s * l.z for l in seite) / a_s,
-                                stahl=seite[0].stahl, sorte=seite[0].sorte,
-                                nummer=seite[0].nummer, von_unten=unten))
+        a_s, z = schwerpunkt((l.a_s, l.z) for l in teile)
+        heraus[unten] = Stahllage(
+            a_s=a_s, z=z, stahl=teile[0].stahl, sorte=teile[0].sorte, nummer=teile[0].nummer,
+            von_unten=unten, text=" + ".join(l.text for l in teile),
+            index=gemeinsamer_index(teile), teile=teile)
     return heraus
 
 

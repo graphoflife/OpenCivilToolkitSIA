@@ -47,7 +47,7 @@ from opencivil.core.suche import HALBIEREN, Suche
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.material.basis import Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, lagen_je_seite, protokoll_wirksamer_modul, wirksamer_modul_wert,
+    Querschnittsloeser, Stahllage, je_seite, protokoll_wirksamer_modul, wirksamer_modul_wert,
 )
 from opencivil.nachweis import dehnungsfaecher
 from opencivil.querschnitt.analyse import Querschnittsanalyse
@@ -159,7 +159,7 @@ def stahllagen(posten: Sequence[Postenbezug], satz: Werkstoffsatz,
         lagen.append(Stahllage(
             a_s=wert(q.as_def.id), z=wert(q.z_def.id), stahl=gesetze[stahl.id],
             sorte=kennung_aus(stahl.id), nummer=q.lage.nummer, von_unten=q.lage.von_unten,
-            text=q.bezeichnung))
+            text=q.bezeichnung, index=q.index))
     return lagen
 
 
@@ -203,10 +203,10 @@ class Gesetze:
         """Die Handrechnung zaehlt den Beton auch, wo der Stahl liegt."""
         return self.wahl.art is not Rechenart.HANDRECHNUNG
 
-    def lagen(self, lagen: Sequence[Stahllage], h: float) -> List[Stahllage]:
-        """Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine."""
+    def lagen(self, lagen: Sequence[Stahllage]) -> List[Stahllage]:
+        """Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine (:func:`je_seite`)."""
         if self.wahl.art is Rechenart.HANDRECHNUNG:
-            return lagen_je_seite(lagen, h)
+            return list(je_seite(lagen).values())
         return list(lagen)
 
     def grenzen(self, lagen: Sequence[Stahllage], h: float) -> List[Dehnungsgrenze]:
@@ -225,7 +225,7 @@ class Gesetze:
         """
         return dehnungsfaecher.grenzen(
             h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.nummer}. Lage")
-                for l in self.lagen(lagen, h)],
+                for l in self.lagen(lagen)],
             eps_c1d=self.kennwerte.eps_c1d, eps_c2d=self.kennwerte.eps_c2d)
 
     def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage],
@@ -236,7 +236,7 @@ class Gesetze:
         :data:`~opencivil.core.suche.ILLINOIS`.
         """
         return Querschnittsloeser(
-            h=h, b=b, lagen=self.lagen(lagen, h), beton=self.beton,
+            h=h, b=b, lagen=self.lagen(lagen), beton=self.beton,
             stahl=self.stahl, verdraengt=self.verdraengt, suche=suche,
             grenzen=self.grenzen(lagen, h))
 

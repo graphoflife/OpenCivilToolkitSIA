@@ -1,5 +1,5 @@
 ---
-erzeugt: 3954396941b1
+erzeugt: 20bfb62a6245
 art: modul
 tags: [modul]
 ---
@@ -108,23 +108,50 @@ wird sie an einer Stelle,
 - `stahl: Stahlgesetz` – Der Stahl dieser Lage, mit den Festigkeiten des Wertesatzes -- `f_yd` oder `f_yk` im Feld `f_yd`. Jede Lage traegt ihren eigenen: der Editor laesst je Seite einen anderen Stahl waehlen. Bis 2026-10-12 bekam der Loeser einen einzigen, den der ersten Lage, und unten B700B mit oben B500B rechnete die obere Lage mit f_yd = 609 statt 435 N/mm².
 - `sorte: str = ''` – Die Kennung des Stahls (`s1`) -- unter ihr heissen seine Eingaben.
 - `nummer: int = 0` – Nur zur Zuordnung in der Mitschrift.
-- `von_unten: Optional[bool] = None` – Ob die Lage zur unteren Seite gehoert -- bei der Platte die 1. und 2. Lage ([[opencivil.nachweis.querschnittsloeser#Stahllage|Bewehrungslage.von_unten]]). Die Handrechnung fasst je Seite zusammen ([[opencivil.nachweis.querschnittsloeser#lagen_je_seite|lagen_je_seite]]); ohne Angabe entscheidet die Tiefe.
+- `von_unten: Optional[bool] = None` – Ob die Lage zur unteren Seite gehoert -- bei der Platte die 1. und 2. Lage ([[opencivil.nachweis.querschnittsloeser#Stahllage|Bewehrungslage.von_unten]]). Ohne Angabe laesst sie sich nicht je Seite zusammenfassen ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]).
 - `text: str = ''` – Wie die Lage in Tabellen heisst -- «2. Lage Grundbewehrung».
+- `index: str = ''` – Ihr Index in den Symbolen -- `1,x,g` ([[opencivil.querschnitt.lagenaufbau#Postenbezug|index]]), die zusammengefasste Lage den ihrer Teile, `1,x` ([[opencivil.nachweis.querschnittsloeser#gemeinsamer_index|gemeinsamer_index]]).
+- `teile: Tuple['Stahllage', ...] = ()` – Woraus sie zusammengefasst ist ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]) -- fuer die Herleitung ihres Schwerpunkts.
 
-### lagen_je_seite
+### gemeinsamer_index
 
 ```python
-def lagen_je_seite(lagen: Sequence[Stahllage], h: float) -> List[Stahllage]
+def gemeinsamer_index(teile: Sequence[Stahllage]) -> str
 ```
 
-Je Seite eine Lage, im Schwerpunkt ihrer Flaechen -- wie die Handrechnung.
+Der Index der zusammengefassten Lage: das, was ihre Teile gemein haben.
 
-Die Seite sagt [[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage.von_unten]], sonst die Tiefe gegen
-`h/2`. Unten zuerst; eine Seite ohne Flaeche faellt weg. Die
-zusammengefasste Lage behaelt den Stahl ihrer Seite. Zwei verschiedene
-Staehle auf einer Seite liessen sich nicht zu einer Lage machen -- die
-Platte hat sie nicht, je Seite und Richtung liegt eine Lage, und Grund-
-und Zulage teilen ihren Stahl.
+Grundbewehrung und Zulage einer Lage heissen `1,x,g` und `1,x,z` --
+zusammengefasst also `1,x`. Gehen die Teile auseinander, bleibt der Index
+leer; eine erfundene Bezeichnung waere schlimmer als gar keine.
+
+### je_seite
+
+```python
+def je_seite(lagen: Sequence[Stahllage]) -> Dict[bool, Stahllage]
+```
+
+Je Seite eine Lage im Schwerpunkt ihrer Flaechen, unter
+[[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage.von_unten]] -- die eine Regel fuer den Loeser in der
+Handrechnung ([[opencivil.nachweis.rechenwahl#Gesetze.lagen|lagen]]) und die
+Resistenzlinie aus Handrechnung ([[opencivil.nachweis.handrechnung#seiten|seiten]]).
+So rechnen beide «derselbe Querschnitt», wie
+[[opencivil.querschnitt.gesetzwahl|gesetzwahl]] es verspricht.
+
+- **Die Seite sagt die Lage, nicht die Tiefe.** Grundbewehrung und
+  Zulage derselben Lage liegen auf leicht verschiedenen Hoehen, weil ihre
+  Durchmesser verschieden sind. Eine Lage ohne Seite ist ein Fehler.
+- **Eine Seite ohne Flaeche fehlt.** Unten zuerst.
+- **Je Seite ein Stahl.** Zwei liessen sich nicht zu einer Lage machen;
+  die Platte hat sie nicht, sie hat einen Stahl fuer alle Lagen
+  (Benutzer, 2026-10-24).
+
+Die zusammengefasste Lage behaelt ihre Teile, den Stahl ihrer Seite und
+den gemeinsamen Index; ihr Name nennt die Teile. Bis 2026-11-10 stand die
+Regel zweimal da und antwortete verschieden: ohne Seite entschied hier
+die Tiefe, in der Handrechnung galt bei zwei Staehlen der schwaechere,
+und eine leere Seite fiel hier weg, dort stand sie mit ihrer Hoehe. Die
+zusammengefasste Lage des Loesers hatte keinen Namen.
 
 ### Ebene
 
@@ -489,11 +516,13 @@ Rechenzeit.
 - [[opencivil.core.suche]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von
 
 - [[opencivil.nachweis.gebrauchsebene]]
+- [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]

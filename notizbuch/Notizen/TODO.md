@@ -91,17 +91,11 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 8 und 11 am
-2026-11-10 (siehe [[Entwicklung]]). Offen sind 9, 10 und 12.
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 9 und 11 am
+2026-11-10 (siehe [[Entwicklung]]). Offen sind 10 und 12.
 
 **Im übrigen Repo, neu gefunden:**
 
-- [ ] **9. «Je Seite eine Lage im Schwerpunkt» steht zweimal, mit
-      verschiedenen Regeln** (querschnittsloeser.py:153-178 gegen
-      handrechnung.py:565-627: welche Seite, zwei Stähle auf einer Seite,
-      leere Seite), obwohl gesetzwahl.py:17-21 «derselbe Querschnitt»
-      verspricht; den Schwerpunkt rechnet lagenaufbau.py:113-132 ein
-      drittes Mal. Besser: eine Funktion `je_seite(lagen, h)`.
 - [ ] **10. Einheiten der Anzeige auf drei Wegen.** `_Groesse` dient nur den
       Linien (diagrammdaten.py:258-276), sonst stehen nackte Faktoren da,
       und `kN = 1e-3` (balkendaten.py:34) bedeutet das Gegenteil von
@@ -605,6 +599,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 9: je Seite eine Lage im
+Schwerpunkt nach einer Regel (`je_seite`), für den Löser in der
+Handrechnung und die Resistenzlinie aus Handrechnung · der Schwerpunkt
+mehrerer Flächen an einer Stelle (`schwerpunkt`) ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 8: die vier Nachweise je
 Lage der Platte auf einer Schablone (`Lagennachweis`) -- Lagenwahl, Grade,

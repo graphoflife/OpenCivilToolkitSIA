@@ -784,8 +784,8 @@ class TestHandrechnungSymbole(unittest.TestCase):
     """
     Die zusammengefassten Lagen tragen ihren Index und ihre Teile.
 
-    Beides ging verloren, als die Posten als blanke Tupel an
-    ``lagen_zusammenfassen`` gingen: die Mitschrift schrieb ``A_{s,}`` mit
+    Beides ging verloren, als die Posten als blanke Tupel an die
+    Handrechnung gingen: die Mitschrift schrieb ``A_{s,}`` mit
     leerem Index, und die Herleitung des Schwerpunkts fiel still aus, weil sie
     ``len(teile) > 1`` verlangt.
     """
@@ -977,25 +977,29 @@ class TestSortenindex(unittest.TestCase):
         self.assertIn(r"f_{yd,\text{B500B}}", text)
         self.assertIn(r"f_{yd,\text{B500A}}", text)
 
-    def test_die_lage_traegt_den_index_ihrer_massgebenden_sorte(self):
+    def test_eine_seite_aus_grund_und_zulage(self):
         """
-        Zusammengefasst zählt die schwächere Sorte -- und der Index gehört
-        derselben, sonst stünde ein fremder Name an der Zahl.
+        Je Seite eine Lage im Schwerpunkt, nach der Regel des Lösers
+        (``je_seite``): Index und Name aus den Teilen, die Teile für die
+        Herleitung, der Index des Stahls nach seiner Sorte. Eine Seite ohne
+        Stahl zählt mit null Fläche und den Kennwerten der anderen.
         """
-        from opencivil.nachweis.handrechnung import Posten, lagen_zusammenfassen
+        from opencivil.nachweis.handrechnung import seiten
+        from opencivil.nachweis.querschnittsloeser import Stahllage
+        from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 
-        seiten = lagen_zusammenfassen([
-            Posten(a_s=1e-3, z=0.26, f_yd=500e6, E_s=205e9, text="stark",
-                   index="1,x,g", stahl_index="B500B", von_unten=True),
-            Posten(a_s=1e-3, z=0.25, f_yd=435e6, E_s=205e9, text="schwach",
-                   index="1,x,z", stahl_index="B500A", von_unten=True),
-            Posten(a_s=1e-3, z=0.04, f_yd=435e6, E_s=205e9, text="oben",
-                   index="4,x,g", stahl_index="B500A", von_unten=False),
-        ])
-        unten = seiten["unten"]
-        self.assertAlmostEqual(unten.f_yd, 435e6)
-        self.assertEqual(unten.stahl_index, "B500A")
+        stahl = Stahlgesetz(E_s=205e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
+        teile = [Stahllage(a_s=1e-3, z=0.26, stahl=stahl, sorte="s2", von_unten=True,
+                           text="Grund", index="1,x,g"),
+                 Stahllage(a_s=1e-3, z=0.25, stahl=stahl, sorte="s2", von_unten=True,
+                           text="Zulage", index="1,x,z")]
+        unten, oben = seiten(teile, satz=Werkstoffsatz.BEMESSUNG,
+                             stahl_index={"s2": "B500A"})
+        self.assertAlmostEqual(unten.z, 0.255)
+        self.assertEqual((unten.index, unten.text), ("1,x", "Grund + Zulage"))
+        self.assertEqual(len(unten.teile), 2)
         self.assertEqual(unten.symbol_f_yd, r"f_{yd,\text{B500A}}")
+        self.assertEqual((oben.a_s, oben.text, oben.f_yd), (0.0, "keine", 435e6))
 
 
 if __name__ == "__main__":

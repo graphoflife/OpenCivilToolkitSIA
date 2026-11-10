@@ -58,9 +58,7 @@ from opencivil.core.wert import Wert, WertDef
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher, linie as geo
 from opencivil.nachweis.dehnungsfaecher import Linienpunkt
-from opencivil.nachweis.handrechnung import (
-    Eckpunkt, Handrechnung, Posten as HandPosten, lagen_zusammenfassen,
-)
+from opencivil.nachweis.handrechnung import Eckpunkt, Handrechnung, seiten
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
 from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, betonbezuege, lagenbezuege, protokoll_rechenwahl, stahllagen,
@@ -692,18 +690,11 @@ def resistenzlinie(
     lagen = stahllagen(posten, satz, e.si_nach_id())
 
     if hand:
-        # Die Zugehoerigkeit zur unteren oder oberen Lage kommt aus dem
-        # Modell (Lagen 1 und 2 liegen unten), nicht aus der Hoehenlage --
-        # siehe lagen_zusammenfassen().
-        seiten = lagen_zusammenfassen([
-            HandPosten(a_s=l.a_s, z=l.z, f_yd=l.stahl.f_yd, E_s=l.stahl.E_s, text=l.text,
-                       index=q.index, stahl_index=q.lage.stahl.symbol_index,
-                       von_unten=q.lage.von_unten, satz=satz)
-            for l, q in zip(lagen, posten)
-        ])
+        unten, oben = seiten(
+            lagen, satz=satz,
+            stahl_index={kennung_aus(s.id): s.symbol_index for s in querschnitt.staehle})
         handrechnung = Handrechnung(
-            h=h, b=b, f_cd=f_c, eps_c2d=eps_c2d,
-            unten=seiten["unten"], oben=seiten["oben"], basis=basis,
+            h=h, b=b, f_cd=f_c, eps_c2d=eps_c2d, unten=unten, oben=oben, basis=basis,
             beton_index=querschnitt.beton.symbol_index, satz=satz,
         )
         return Handlinie(wahl, handrechnung.rechnen(p))

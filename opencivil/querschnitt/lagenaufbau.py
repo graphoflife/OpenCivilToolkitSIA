@@ -6,7 +6,9 @@ Der Lagenaufbau (:class:`Lagenaufbau`) rechnet je Bewehrungsposten seine
 Tiefe ab Oberkante und seinen Querschnitt, dazu Bewehrungsmass und
 Distanzhalter. Die Nachweise fassen die Posten einer Lage mit den Helfern
 hier zusammen: Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe
-(:func:`lage_aus_posten`, :func:`protokoll_lage`).
+(:func:`lage_aus_posten`, :func:`protokoll_lage`). Den Schwerpunkt mehrerer
+Flaechen rechnet :func:`schwerpunkt` -- fuer die Posten einer Lage wie fuer
+die Lagen einer Seite.
 
 EIN POSTEN, EINE GESTALT:
 Ein Posten reist als :class:`Postenbezug` -- Lage, Art, Posten und seine
@@ -20,7 +22,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben, Prozedur
 from opencivil.core.einheiten import KG_PRO_M3, MM, MM2, Groesse
@@ -110,6 +112,23 @@ def statische_hoehe(z: float, h: float, seite: Zugseite) -> float:
     return z if seite is Zugseite.UNTEN else h - z
 
 
+def schwerpunkt(flaechen: Iterable[Tuple[float, float]]) -> Tuple[float, Optional[float]]:
+    """
+    Querschnitt und gemeinsamer Schwerpunkt mehrerer Flaechen ``(a_s, z)``,
+    nach Flaechen gewichtet. Ohne Flaeche gibt es keinen Schwerpunkt: ``None``.
+
+    Die eine Stelle dieser Regel: fuer die Posten einer Lage
+    (:func:`lage_aus_posten`) wie fuer die Lagen einer Seite
+    (:func:`~opencivil.nachweis.querschnittsloeser.je_seite`). Bis 2026-11-10
+    stand sie dreimal da.
+    """
+    flaechen = list(flaechen)
+    a_s = sum(a for a, _ in flaechen)
+    if a_s <= 0.0:
+        return a_s, None
+    return a_s, sum(a * z for a, z in flaechen) / a_s
+
+
 def lage_aus_posten(
     e: Eingaben, posten: Sequence[Postenbezug],
 ) -> Tuple[float, Optional[float], Optional[float]]:
@@ -124,11 +143,9 @@ def lage_aus_posten(
     gibt es weder Schwerpunkt noch Hoehe, beide ``None``. Bis 2026-10-18
     rechneten drei Nachweise das je fuer sich.
     """
-    flaechen = [(e.g(q.name("a_s")).si, e.g(q.name("z")).si) for q in posten]
-    a_s = sum(a for a, _ in flaechen)
-    if a_s <= 0.0:
+    a_s, z = schwerpunkt((e.g(q.name("a_s")).si, e.g(q.name("z")).si) for q in posten)
+    if z is None:
         return a_s, None, None
-    z = sum(a * t for a, t in flaechen) / a_s
     return a_s, z, statische_hoehe(z, e.g("h").si, posten[0].lage.seite)
 
 

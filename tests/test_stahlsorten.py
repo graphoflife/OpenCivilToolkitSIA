@@ -10,7 +10,7 @@ Stahl ihrer Lagen behaelt -- er ist unabhaengig von der Platte.
 
 import unittest
 
-from opencivil.nachweis.querschnittsloeser import Stahllage, lagen_je_seite
+from opencivil.nachweis.querschnittsloeser import Stahllage, je_seite
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 
 #: Bemessungswerte der Fliessgrenze, in Pa.
@@ -25,18 +25,17 @@ class TestHandrechnungImLoeser(unittest.TestCase):
     B700B = Stahlgesetz(E_s=200e9, f_yd=F_YD_B700B, f_yd_druck=F_YD_B700B, eps_ud=0.045)
 
     def test_jede_seite_behaelt_ihren_stahl(self):
-        lagen = lagen_je_seite([
+        lagen = je_seite([
             Stahllage(a_s=1e-3, z=0.25, stahl=self.B700B, von_unten=True),
             Stahllage(a_s=5e-4, z=0.24, stahl=self.B700B, von_unten=True),
-            Stahllage(a_s=5e-4, z=0.05, stahl=self.B500B, von_unten=False)], 0.3)
-        self.assertEqual([l.stahl for l in lagen], [self.B700B, self.B500B])
+            Stahllage(a_s=5e-4, z=0.05, stahl=self.B500B, von_unten=False)])
+        self.assertEqual([l.stahl for l in lagen.values()], [self.B700B, self.B500B])
 
     def test_zwei_staehle_auf_einer_seite_sind_ein_fehler(self):
         """Die Platte kann das nicht -- je Seite und Richtung liegt eine Lage."""
         with self.assertRaises(ValueError):
-            lagen_je_seite([Stahllage(a_s=1e-3, z=0.25, stahl=self.B700B, von_unten=True),
-                            Stahllage(a_s=5e-4, z=0.24, stahl=self.B500B, von_unten=True)],
-                           0.3)
+            je_seite([Stahllage(a_s=1e-3, z=0.25, stahl=self.B700B, von_unten=True),
+                      Stahllage(a_s=5e-4, z=0.24, stahl=self.B500B, von_unten=True)])
 
 
 if __name__ == "__main__":

@@ -3792,8 +3792,6 @@
       "art": "modul",
       "kurz": "Eckpunkte der Resistenzlinie von Hand.",
       "stichworte": [
-        "Posten",
-        "Posten.symbol_f_yd",
         "Lage",
         "Lage.symbol_flaeche",
         "Lage.symbol_f_yd",
@@ -3810,8 +3808,7 @@
         "Handrechnung._seite",
         "Handrechnung._bei_n_null",
         "Handrechnung._halbe_hoehe",
-        "gemeinsamer_index",
-        "lagen_zusammenfassen"
+        "seiten"
       ]
     },
     {
@@ -4047,7 +4044,8 @@
       "kurz": "Dehnungsebene zu gegebenen Schnittgrössen.",
       "stichworte": [
         "Stahllage",
-        "lagen_je_seite",
+        "gemeinsamer_index",
+        "je_seite",
         "Ebene",
         "Ebene.bei",
         "wirksamer_modul_wert",
@@ -5196,6 +5194,7 @@
         "Postenbezug.bezuege",
         "lagenindex",
         "statische_hoehe",
+        "schwerpunkt",
         "lage_aus_posten",
         "protokoll_lage",
         "protokoll_statische_hoehe",

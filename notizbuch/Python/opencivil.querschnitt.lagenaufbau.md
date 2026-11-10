@@ -1,5 +1,5 @@
 ---
-erzeugt: 683ad3f4134f
+erzeugt: d9d41e65e2b2
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,9 @@ Der Lagenaufbau ([[opencivil.querschnitt.lagenaufbau#Lagenaufbau|Lagenaufbau]]) 
 Tiefe ab Oberkante und seinen Querschnitt, dazu Bewehrungsmass und
 Distanzhalter. Die Nachweise fassen die Posten einer Lage mit den Helfern
 hier zusammen: Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe
-([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]], [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]).
+([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]], [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]). Den Schwerpunkt mehrerer
+Flaechen rechnet [[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]] -- fuer die Posten einer Lage wie fuer
+die Lagen einer Seite.
 
 
 ## EIN POSTEN, EINE GESTALT
@@ -92,6 +94,20 @@ gemessen ab dem gedrueckten Rand: unten `d = z`, oben `d = h - z` --
 die Zahl zur Zeile von [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]. Wer `z`
 stehen liesse, bekaeme bei den oberen Lagen eine Zahl, die keine
 statische Hoehe ist.
+
+### schwerpunkt
+
+```python
+def schwerpunkt(flaechen: Iterable[Tuple[float, float]]) -> Tuple[float, Optional[float]]
+```
+
+Querschnitt und gemeinsamer Schwerpunkt mehrerer Flaechen `(a_s, z)`,
+nach Flaechen gewichtet. Ohne Flaeche gibt es keinen Schwerpunkt: `None`.
+
+Die eine Stelle dieser Regel: fuer die Posten einer Lage
+([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]]) wie fuer die Lagen einer Seite
+([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]). Bis 2026-11-10
+stand sie dreimal da.
 
 ### lage_aus_posten
 
@@ -194,6 +210,7 @@ Herleitung stehen und sich zurueckverfolgen lassen.
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.querschnitt.platte]]
