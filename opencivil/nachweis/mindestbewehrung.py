@@ -41,17 +41,15 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Optional, Sequence
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
-from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, Ausgang, Fallausgang, Fallbefund, Nachweis, NachweisUrteil, Vergleich,
-    grad_def,
-)
+from opencivil.core.berechnung import Eingabebezug, Eingaben
+from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, Vergleich
 from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert, WertDef
+from opencivil.core.wert import Wert
+from opencivil.nachweis.lagennachweis import Lagennachweis
 from opencivil.nachweis.rissgroessen import (
     DICKENGRENZE, Rissgroessen as Momentgroessen, beiwert_dicke,
     protokoll_rissmoment_rechteck, protokoll_zugfestigkeit, rissaktive_dicke,
@@ -188,9 +186,9 @@ class Lagenergebnis(Fallausgang):
     begruendung: str = ""
 
 
-class Rissnormalkraft(Nachweis):
+class Rissnormalkraft(Lagennachweis):
     """
-    Sprödes Versagen unter Normalkraft-Zwängung.
+    Sprödes Versagen unter Normalkraft-Zwängung (:class:`~.lagennachweis.Lagennachweis`).
 
     Ein Urteil je Lage der Tragrichtung: die untere und die obere müssen beide
     die Risskraft aufnehmen können -- ein Zwang kennt keine Zugseite, er
@@ -202,6 +200,12 @@ class Rissnormalkraft(Nachweis):
     THEMA = "Zwängung auf Normalkraft"
     ART = "N_Riss"
     LANGNAME = "Risse: Zwängung Normalkraft"
+    KUERZEL = "NR"
+    BENENNUNG = "Rissnormalkraft"
+    REFERENZ = "SIA 262:2025, 4.4.2"
+    # Genau zwei Lagen je Richtung -- auch die leeren, denn gerade sie
+    # fallen durch und sollen es sichtbar tun.
+    NUR_MIT_STAHL = False
 
     def __init__(
         self,
@@ -211,76 +215,32 @@ class Rissnormalkraft(Nachweis):
         anforderung: Rissanforderung,
         begrenzt: bool,
     ) -> None:
-        self.querschnitt = querschnitt
-        self.richtung = richtung
         self.anforderung = anforderung
         self.begrenzt = begrenzt
-
-        # Genau zwei Lagen je Richtung -- auch die leeren, denn gerade sie
-        # fallen durch und sollen es sichtbar tun.
-        self.lagen = [l for l in querschnitt.lagen if l.richtung is richtung]
-        self.posten_je_lage: Dict[int, List[Postenbezug]] = {
-            l.nummer: querschnitt.posten_der_lage(l) for l in self.lagen}
-
-        r = richtung.value
-        basis = f"{querschnitt.id}.nachweis.rissnormalkraft.{r}"
-        self.d_ausnutzung: Dict[int, WertDef] = {
-            l.nummer: grad_def(
-                f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                rf"\alpha_{{eff,NR,{l.nummer},{r}}}",
-                (f"Erfüllungsgrad Rissnormalkraft – "
-                 f"{l.nummer}. Lage {r}"),
-                "SIA 262:2025, 4.4.2",
-            )
-            for l in self.lagen
-        }
-
-        bezuege = [
-            Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_breite(richtung)),
-            Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
-        ]
-        for posten in self.posten_je_lage.values():
-            for q in posten:
-                bezuege += q.bezuege("a_s", "phi")
-        for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
-            bezuege += [stahl.bezug("f_yk"), stahl.bezug("E_s")]
-
         super().__init__(
-            basis,
-            ausgaben=list(self.d_ausnutzung.values()),
-            bezuege=bezuege,
+            querschnitt, [l for l in querschnitt.lagen if l.richtung is richtung],
+            richtung=richtung,
+            basis=f"{querschnitt.id}.nachweis.rissnormalkraft.{richtung.value}",
             titel=(f"Sprödes Versagen unter Zwängung {richtung.beschriftung} – "
                    f"{querschnitt.name}"),
-            referenz="SIA 262:2025, 4.4.2",
-            abschnitt=querschnitt.abschnitt,
-        )
+            bezuege=[
+                Eingabebezug("h", querschnitt.id_von("h")),
+                Eingabebezug("b", querschnitt.id_breite(richtung)),
+                Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
+            ],
+            posten=("a_s", "phi"), stahl=("f_yk", "E_s"))
 
     # -- Rechnen ------------------------------------------------------------
 
-    def pruefe(self, e: Eingaben, p: Protokoll):
-        h = e.g("h").si
-        b = e.g("b").si
-        f_ctm = e.g("f_ctm").si
-
-        groessen = rissnormalkraft(h=h, b=b, f_ctm=f_ctm, begrenzt=self.begrenzt)
+    def ansatz(self, e: Eingaben, p: Protokoll) -> Rissgroessen:
+        """Die Risskraft der gezogenen Querschnittshälfte -- und ihre Herleitung."""
+        groessen = rissnormalkraft(h=e.g("h").si, b=e.g("b").si, f_ctm=e.g("f_ctm").si,
+                                   begrenzt=self.begrenzt)
         self._protokoll_ansatz(p, e, groessen)
+        return groessen
 
-        urteile: List[NachweisUrteil] = []
-        befund = Fallbefund()
-
-        for lage in self.lagen:
-            erg = self._eine_lage(e, lage, f_ctm=f_ctm, groessen=groessen)
-            befund.ergebnisse.append(erg)
-            self._protokoll_lage(p, e, erg)
-            urteile.append(self.urteil(self.d_ausnutzung[lage.nummer], f"{lage.nummer}. Lage",
-                                       erg.ausgang, erg.begruendung))
-
-        self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung({}, self.teilurteile(urteile), befund)
-
-    def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *,
-                   f_ctm: float, groessen: Rissgroessen) -> Lagenergebnis:
+    def eine_lage(self, e: Eingaben, lage: Bewehrungslage,
+                  ansatz: Rissgroessen) -> Lagenergebnis:
         erg = Lagenergebnis(lage=lage)
         posten = self.posten_je_lage[lage.nummer]
 
@@ -295,15 +255,15 @@ class Rissnormalkraft(Nachweis):
         E_s = e.g(lage.stahl.eingabename("E_s")).si
         erg.sigma_s_adm = zulaessige_stahlspannung(
             anforderung=self.anforderung,
-            f_yk=e.g(lage.stahl.eingabename("f_yk")).si, E_s=E_s, f_ctm=f_ctm,
+            f_yk=e.g(lage.stahl.eingabename("f_yk")).si, E_s=E_s, f_ctm=e.g("f_ctm").si,
             durchmesser=erg.durchmesser)
         erg.N_s_adm = erg.a_s * erg.sigma_s_adm
 
-        erg.ausgang = v = Vergleich(self._n_riss(groessen), self._n_s_adm(erg))
+        erg.ausgang = v = Vergleich(self._n_riss(ansatz), self._n_s_adm(erg))
         erg.begruendung = (
             f"N_s,adm = {erg.a_s * 1e6:.0f} mm² · {erg.sigma_s_adm / 1e6:.0f} N/mm² "
             f"= {erg.N_s_adm / 1e3:.1f} kN {'≥' if v.erfuellt else '<'} "
-            f"N_Riss = {groessen.N_Riss / 1e3:.1f} kN.")
+            f"N_Riss = {ansatz.N_Riss / 1e3:.1f} kN.")
         return erg
 
     def _n_riss(self, groessen: Rissgroessen) -> Wert:
@@ -344,7 +304,8 @@ class Rissnormalkraft(Nachweis):
                  {"h_eff": h_eff, "b": e["b"], "f_ct_eff": f_ct_eff},
                  titel="Risskraft der gezogenen Querschnittshälfte")
 
-    def _protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis) -> None:
+    def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis,
+                       ansatz: Rissgroessen) -> None:
         nummer = erg.lage.nummer
         p.titel(f"Rissnormalkraft – {nummer}. Lage {self.richtung.value}", ebene=3)
 
@@ -429,7 +390,7 @@ class Biegezwang(Nachweis):
     )
 
 
-class ZwaengungBiegung(Biegezwang):
+class ZwaengungBiegung(Biegezwang, Lagennachweis):
     """
     Zwängung auf Biegung, je gewählter Lage.
 
@@ -443,6 +404,9 @@ class ZwaengungBiegung(Biegezwang):
     Druckzone gibt es in diesem Augenblick nicht.
     """
 
+    KUERZEL = "ZB"
+    BENENNUNG = Biegezwang.THEMA
+
     def __init__(
         self,
         querschnitt,
@@ -452,102 +416,43 @@ class ZwaengungBiegung(Biegezwang):
         anforderung: Rissanforderung,
         kriechzahl: float,
     ) -> None:
-        self.querschnitt = querschnitt
-        self.richtung = richtung
         self.anforderung = anforderung
         self.kriechzahl = kriechzahl
-
-        gewaehlt = sorted(set(lagen))
-        self.lagen = [l for l in querschnitt.lagen
-                      if l.richtung is richtung and l.nummer in gewaehlt]
-        if not self.lagen:
-            raise ValueError(
-                f"Querschnitt '{querschnitt.name}': in "
-                f"{richtung.beschriftung} ist keine der gewählten Lagen vorhanden.")
-        self.posten_je_lage: Dict[int, List[Postenbezug]] = {
-            l.nummer: querschnitt.posten_der_lage(l) for l in self.lagen}
-
-        r = richtung.value
-        basis = f"{querschnitt.id}.nachweis.zwang_biegung.{r}"
-        self.d_ausnutzung: Dict[int, WertDef] = {
-            l.nummer: grad_def(
-                f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                rf"\alpha_{{eff,ZB,{l.nummer},{r}}}",
-                f"Erfüllungsgrad {self.THEMA} – {l.nummer}. Lage {r}",
-                self.REFERENZ,
-            )
-            for l in self.lagen
-        }
-
-        bezuege = [
-            Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_breite(richtung)),
-            Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
-            Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
-        ]
-        for posten in self.posten_je_lage.values():
-            for q in posten:
-                bezuege += q.bezuege("a_s", "z", "phi")
-        for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
-            bezuege += [stahl.bezug("f_yk"), stahl.bezug("E_s")]
-
         super().__init__(
-            basis,
-            ausgaben=list(self.d_ausnutzung.values()),
-            bezuege=bezuege,
+            querschnitt, self.lagen_waehlen(querschnitt, richtung, lagen), richtung=richtung,
+            basis=f"{querschnitt.id}.nachweis.zwang_biegung.{richtung.value}",
             titel=f"{self.THEMA} {richtung.beschriftung} – {querschnitt.name}",
-            referenz=self.REFERENZ,
-            abschnitt=querschnitt.abschnitt,
-        )
+            bezuege=[
+                Eingabebezug("h", querschnitt.id_von("h")),
+                Eingabebezug("b", querschnitt.id_breite(richtung)),
+                Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
+                Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
+            ],
+            posten=("a_s", "z", "phi"), stahl=("f_yk", "E_s"))
 
     # -- Rechnen ------------------------------------------------------------
 
-    def pruefe(self, e: Eingaben, p: Protokoll):
-        h = e.g("h").si
-        b = e.g("b").si
-        f_ctm = e.g("f_ctm").si
-        E_cm = e.g("E_cm").si
-        phi = self.kriechzahl
-
-        groessen = rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm)
+    def ansatz(self, e: Eingaben, p: Protokoll) -> Wert:
+        """Das Rissmoment des Rechtecks -- und seine Herleitung."""
+        groessen = rissmoment_rechteck(h=e.g("h").si, b=e.g("b").si, f_ctm=e.g("f_ctm").si)
         self._protokoll_ansatz(p, e, groessen)
+        return rissmoment_wert(self.id, groessen)
 
-        urteile: List[NachweisUrteil] = []
-        befund = Fallbefund()
-        M_Riss = rissmoment_wert(self.id, groessen)
-
-        for lage in self.lagen:
-            erg = self._eine_lage(e, lage, b=b, f_ctm=f_ctm, E_cm=E_cm, phi=phi,
-                                  M_Riss=M_Riss)
-            befund.ergebnisse.append(erg)
-            self._protokoll_lage(p, e, erg)
-            urteile.append(self.urteil(self.d_ausnutzung[lage.nummer], f"{lage.nummer}. Lage",
-                                       erg.ausgang, erg.begruendung))
-
-        self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung({}, self.teilurteile(urteile), befund)
-
-    def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *,
-                   b: float, f_ctm: float, E_cm: float, phi: float,
-                   M_Riss: Wert) -> Momentlagenergebnis:
+    def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: Wert) -> Momentlagenergebnis:
+        M_Riss = ansatz
         erg = Momentlagenergebnis(lage=lage)
         posten = self.posten_je_lage[lage.nummer]
-
-        erg.a_s, z, d = lage_aus_posten(e, posten)
-        if erg.a_s <= 0.0:
-            erg.begruendung = self.ohne_bewehrung(lage.nummer)
-            return erg
-        erg.z_s, erg.d = z, d
+        erg.a_s, erg.z_s, erg.d = lage_aus_posten(e, posten)
         erg.durchmesser = max(e.g(q.name("phi")).si for q in posten)
 
         E_s = e.g(lage.stahl.eingabename("E_s")).si
         erg.sigma_s_adm = zulaessige_stahlspannung(
             anforderung=self.anforderung,
-            f_yk=e.g(lage.stahl.eingabename("f_yk")).si, E_s=E_s, f_ctm=f_ctm,
+            f_yk=e.g(lage.stahl.eingabename("f_yk")).si, E_s=E_s, f_ctm=e.g("f_ctm").si,
             durchmesser=erg.durchmesser)
 
-        erg.n = wertigkeit(E_s=E_s, E_cm=E_cm, phi=phi)
-        riss = gerissen(n=erg.n, a_s=erg.a_s, b=b, d=erg.d)
+        erg.n = wertigkeit(E_s=E_s, E_cm=e.g("E_cm").si, phi=self.kriechzahl)
+        riss = gerissen(n=erg.n, a_s=erg.a_s, b=e.g("b").si, d=erg.d)
         erg.rho = riss.rho
         erg.x = riss.x
         erg.hebelarm = riss.z
@@ -596,13 +501,10 @@ class ZwaengungBiegung(Biegezwang):
             "Hebelarm und liegt auf der sicheren Seite."
         )
 
-    def _protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Momentlagenergebnis) -> None:
+    def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Momentlagenergebnis,
+                       ansatz: Wert) -> None:
         nummer = erg.lage.nummer
         p.titel(f"{self.THEMA} – {nummer}. Lage {self.richtung.value}", ebene=3)
-
-        if not erg.machbar:
-            p.text(erg.begruendung)
-            return
 
         posten = self.posten_je_lage[nummer]
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")

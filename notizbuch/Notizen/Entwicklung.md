@@ -44,6 +44,29 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Die Nachweise je Lage auf einer Schablone
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 8. Für den Benutzer ändert
+sich nichts; Kennungen, Zeichen, Texte und Herleitungen sind dieselben.
+
+Duktilität, sprödes Versagen und die beiden Zwängungen der Platte prüfen je
+Lage. Jeder der vier wählte seine Lagen selbst, entdoppelte die Stähle,
+baute die Kennung seiner Grade und lief seine eigene Schleife über die
+Lagen; der allgemeine `Nachweis` trug für sie `ohne_bewehrung` mit. Jetzt
+steht das einmal, in `nachweis/lagennachweis.py`, und jeder Nachweis sagt
+nur noch, was bei ihm anders ist: was alle Lagen brauchen (`ansatz`), die
+eine Lage (`eine_lage`) und ihre Herleitung (`protokoll_lage`).
+
+- **Eine leere Lage meldet sich.** Drei der vier lassen sie weg (Benutzer,
+  2026-10-19), der Aufbau gibt sie ihnen gar nicht. Ihr Zweig «ohne
+  Bewehrung → kein Nachweis» lief darum nie. Er ist weg; bekommt einer
+  doch eine leere Lage, ist das ein Fehler des Aufbaus und kein Urteil, das
+  still als nicht erfüllt zählte (`NUR_MIT_STAHL`). Nur die Zwängung auf
+  Normalkraft prüft jede Lage, auch die leere.
+- **Die Zwängung auf Biegung erbt zweimal:** vom `Biegezwang`, den sie mit
+  dem gezeichneten Querschnitt teilt (Name, Normstelle, Einleitung), und von
+  der Schablone.
+
 ## 2026-11-10 · Eine Bauteilart: wo sie steht und dass sie überall steht
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 5. Für den Benutzer ändert

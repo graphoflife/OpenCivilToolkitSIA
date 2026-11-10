@@ -1,5 +1,5 @@
 ---
-erzeugt: 56568ba5a241
+erzeugt: ccfbf3c2604f
 art: modul
 tags: [modul]
 ---
@@ -306,15 +306,6 @@ Zusammenfassung -- dort fehlen sonst die Zahlen, und ein Strich
 erklaert sich nicht von selbst. Bis 2026-10-25 baute jeder Nachweis
 sein Urteil selbst, und «nicht fuehrbar» stand auf vier Arten da.
 
-#### Nachweis.ohne_bewehrung
-
-```python
-@staticmethod
-def ohne_bewehrung(nummer: int) -> str
-```
-
-Die Begruendung einer Lage ohne Stahl -- in jedem Lagennachweis dieselbe.
-
 #### Nachweis.teilurteile
 
 ```python
@@ -395,6 +386,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]

@@ -48,20 +48,18 @@ muss.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Sequence
+from typing import Dict, Sequence
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
-from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, Ausgang, Fallausgang, Fallbefund, Nachweis, NachweisUrteil, Vergleich,
-    grad_def,
-)
+from opencivil.core.berechnung import Eingabebezug, Eingaben
+from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, Fallausgang, Vergleich
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.material.basis import mit_index
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
-from opencivil.querschnitt.lagenaufbau import Postenbezug, lage_aus_posten, protokoll_lage
+from opencivil.querschnitt.lagenaufbau import lage_aus_posten, protokoll_lage
+from opencivil.nachweis.lagennachweis import Lagennachweis
 from opencivil.querschnitt.platte import Bewehrungslage
 
 #: Groesste zulaessige bezogene Druckzonenhoehe -- die Vorgabe.
@@ -97,7 +95,7 @@ class Lagenergebnis(Fallausgang):
 
     verhaeltnis: float = 0.0
     ausgang: Ausgang = NICHT_FUEHRBAR
-    """x/d gegen (x/d)_max -- nicht fuehrbar ohne Bewehrung in der Lage."""
+    """x/d gegen (x/d)_max."""
 
     begruendung: str = ""
 
@@ -114,9 +112,9 @@ def druckzonenhoehe(*, a_s: float, f_sd: float, b: float, f_cd: float) -> float:
     return a_s * f_sd / (BLOCKANTEIL * b * f_cd)
 
 
-class Duktilitaet(Nachweis):
+class Duktilitaet(Lagennachweis):
     """
-    Duktilitaetsnachweis je Bewehrungslage.
+    Duktilitaetsnachweis je Bewehrungslage (:class:`~.lagennachweis.Lagennachweis`).
 
     Ein Nachweis fuer die ganze Platte, ein Urteil je Lage. Die Lagen einer
     Platte gehoeren zusammen und stehen darum unter einer Ueberschrift; sie auf
@@ -129,6 +127,9 @@ class Duktilitaet(Nachweis):
 
     THEMA = "Duktilität"
     ART = "D"
+    KUERZEL = "D"
+    BENENNUNG = "Duktilität"
+    REFERENZ = "SIA 262:2025, 4.1.4.2.5"
 
     def __init__(
         self,
@@ -151,104 +152,50 @@ class Duktilitaet(Nachweis):
                 f"Querschnitt '{querschnitt.name}': die Lagen "
                 f"{', '.join(str(n) for n in unbekannt)} gibt es nicht.")
 
-        self.querschnitt = querschnitt
-        self.lagen = [l for l in querschnitt.lagen if l.nummer in gewaehlt]
-
-        # Je Lage ihre Posten -- Grundbewehrung und Zulage, soweit vorhanden.
-        self.posten_je_lage: Dict[int, List[Postenbezug]] = {
-            l.nummer: querschnitt.posten_der_lage(l) for l in self.lagen}
-
         basis = f"{querschnitt.id}.nachweis.duktilitaet"
-        self.d_ausnutzung: Dict[int, WertDef] = {
-            l.nummer: grad_def(
-                f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                rf"\alpha_{{eff,D,{l.nummer}}}",
-                f"Erfüllungsgrad Duktilität – {l.nummer}. Lage",
-                "SIA 262:2025, 4.1.4.2.5",
-            )
-            for l in self.lagen
-        }
+        lagen_ = [l for l in querschnitt.lagen if l.nummer in gewaehlt]
         self.d_verhaeltnis: Dict[int, WertDef] = {
             l.nummer: WertDef(
                 id=f"{basis}.lage{l.nummer}.x_zu_d",
                 symbol=rf"\left(x/d\right)_{{{l.nummer}}}",
                 einheit=EINHEITSLOS,
                 beschreibung=f"Bezogene Druckzonenhöhe – {l.nummer}. Lage",
-                referenz="SIA 262:2025, 4.1.4.2.5",
+                referenz=self.REFERENZ,
                 stellen=3,
             )
-            for l in self.lagen
+            for l in lagen_
         }
-
-        bezuege = [
-            Eingabebezug("h", querschnitt.id_von("h")),
-            # Zwei Breiten, weil zwei Lagen verschiedene Richtungen tragen
-            # koennen. x/d bliebe zwar unveraendert, wenn man A_s und b beide
-            # verwechselte -- aber nur dann; hier stammt A_s aus dem
-            # Lagenaufbau und kennt seine Richtung bereits.
-            Eingabebezug("b", querschnitt.id_von("b")),
-            Eingabebezug("b_y", querschnitt.id_von("b_y")),
-            Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
-        ]
-        for posten in self.posten_je_lage.values():
-            for q in posten:
-                bezuege += q.bezuege("a_s", "z")
-        for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
-            bezuege.append(stahl.bezug("f_yd"))
-
-
         super().__init__(
-            basis,
-            ausgaben=(list(self.d_ausnutzung.values())
-                      + list(self.d_verhaeltnis.values())),
-            bezuege=bezuege,
+            querschnitt, lagen_, basis=basis,
             titel=f"Duktilitätsnachweis – {querschnitt.name}",
-            referenz="SIA 262:2025, 4.1.4.2.5",
-            # Wie bei den anderen Nachweisen: ohne Abschnitt stuende er unter
-            # der Ueberschrift, die die Rechenreihenfolge zufaellig offen liess.
-            abschnitt=querschnitt.abschnitt,
-        )
+            bezuege=[
+                Eingabebezug("h", querschnitt.id_von("h")),
+                # Zwei Breiten, weil zwei Lagen verschiedene Richtungen tragen
+                # koennen. x/d bliebe zwar unveraendert, wenn man A_s und b
+                # beide verwechselte -- aber nur dann; hier stammt A_s aus dem
+                # Lagenaufbau und kennt seine Richtung bereits.
+                Eingabebezug("b", querschnitt.id_von("b")),
+                Eingabebezug("b_y", querschnitt.id_von("b_y")),
+                Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
+            ],
+            posten=("a_s", "z"), stahl=("f_yd",),
+            weitere_ausgaben=list(self.d_verhaeltnis.values()))
 
     # -- Rechnen ------------------------------------------------------------
 
-    def pruefe(self, e: Eingaben, p: Protokoll):
-        f_cd = e.g("f_cd").si
-
+    def ansatz(self, e: Eingaben, p: Protokoll) -> float:
+        """f_cd -- und die Herleitung des Ansatzes."""
         self._protokoll_ansatz(p, e)
+        return e.g("f_cd").si
 
-        ergebnis: Dict[str, Groesse] = {}
-        urteile: List[NachweisUrteil] = []
-        befund = Fallbefund()
-
-        for lage in self.lagen:
-            # Die Breite in der Richtung der Lage.
-            breite = lage.richtung.breite
-            erg = self._eine_lage(e, lage, b=e.g(breite).si, f_cd=f_cd)
-            befund.ergebnisse.append(erg)
-            self._protokoll_lage(p, e, erg, breite)
-
-            ergebnis[self.d_verhaeltnis[lage.nummer].id] = Groesse(
-                erg.verhaeltnis, EINHEITSLOS)
-            urteile.append(self.urteil(self.d_ausnutzung[lage.nummer], f"{lage.nummer}. Lage",
-                                       erg.ausgang, erg.begruendung))
-
-        self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
-
-    def _eine_lage(
-        self, e: Eingaben, lage: Bewehrungslage, *, b: float, f_cd: float,
-    ) -> Lagenergebnis:
+    def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: float) -> Lagenergebnis:
         erg = Lagenergebnis(lage=lage)
-        erg.a_s, z, d = lage_aus_posten(e, self.posten_je_lage[lage.nummer])
-        if erg.a_s <= 0.0:
-            erg.begruendung = self.ohne_bewehrung(lage.nummer)
-            return erg
-        erg.z, erg.d = z, d
-
+        erg.a_s, erg.z, erg.d = lage_aus_posten(e, self.posten_je_lage[lage.nummer])
         # Eine Lage traegt genau einen Stahl -- eine schwaechere Sorte unter
-        # ihren Posten gibt es nicht.
+        # ihren Posten gibt es nicht. Die Breite ist die in ihrer Richtung.
         erg.f_sd = e.g(lage.stahl.eingabename("f_yd")).si
-        erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=erg.f_sd, b=b, f_cd=f_cd)
+        erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=erg.f_sd, b=e.g(lage.richtung.breite).si,
+                                f_cd=ansatz)
         erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")
         erg.ausgang = v = Vergleich(
             self.d_verhaeltnis[lage.nummer].belegen(Groesse(erg.verhaeltnis, EINHEITSLOS)),
@@ -257,6 +204,9 @@ class Duktilitaet(Nachweis):
             f"x/d = {erg.x * 1e3:.1f} mm / {erg.d * 1e3:.1f} mm = "
             f"{erg.verhaeltnis:.3f} {'≤' if v.erfuellt else '>'} {self.grenze:.2f}.")
         return erg
+
+    def ausgaben_der_lage(self, erg: Lagenergebnis) -> Dict[str, Groesse]:
+        return {self.d_verhaeltnis[erg.lage.nummer].id: Groesse(erg.verhaeltnis, EINHEITSLOS)}
 
     def _grenze(self, nummer: int) -> Wert:
         """Die zulaessige bezogene Druckzonenhoehe -- Widerstand und Herleitung."""
@@ -297,19 +247,14 @@ class Duktilitaet(Nachweis):
             "Schwerpunkt."
         )
 
-    def _protokoll_lage(
-        self, p: Protokoll, e: Eingaben, erg: Lagenergebnis, breite: str,
-    ) -> None:
+    def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis,
+                       ansatz: float) -> None:
         """
         Die Herleitung einer Lage, aus Vorlagen: jede Formel steht einmal mit
         Symbolen da, die Fassung mit Zahlen und Einheiten entsteht daraus.
         """
-        nummer = erg.lage.nummer
+        nummer, breite = erg.lage.nummer, erg.lage.richtung.breite
         p.titel(f"Duktilität – {nummer}. Lage", ebene=3)
-
-        if not erg.machbar:
-            p.text(erg.begruendung)
-            return
 
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")
         a_s, d = protokoll_lage(p, e, werte, self.posten_je_lage[nummer],

@@ -2998,7 +2998,6 @@
         "Nachweis.massgebend",
         "Nachweis.protokoll_massgebend",
         "Nachweis.urteil",
-        "Nachweis.ohne_bewehrung",
         "Nachweis.teilurteile",
         "Nachweis.stillstellen",
         "Nachweis.pruefe",
@@ -3750,9 +3749,11 @@
         "Lagenergebnis",
         "druckzonenhoehe",
         "Duktilitaet",
-        "Duktilitaet.pruefe",
+        "Duktilitaet.ansatz",
+        "Duktilitaet.eine_lage",
+        "Duktilitaet.ausgaben_der_lage",
         "Duktilitaet._grenze",
-        "Duktilitaet._protokoll_lage"
+        "Duktilitaet.protokoll_lage"
       ]
     },
     {
@@ -3856,6 +3857,22 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.lagennachweis",
+      "pfad": "Python/opencivil.nachweis.lagennachweis.md",
+      "art": "modul",
+      "kurz": "ein Nachweis je Platte, ein Urteil je Bewehrungslage.",
+      "stichworte": [
+        "Lagennachweis",
+        "Lagennachweis.lagen_waehlen",
+        "Lagennachweis.ohne_bewehrung",
+        "Lagennachweis.pruefe",
+        "Lagennachweis.ansatz",
+        "Lagennachweis.eine_lage",
+        "Lagennachweis.protokoll_lage",
+        "Lagennachweis.ausgaben_der_lage"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.linie",
       "pfad": "Python/opencivil.nachweis.linie.md",
       "art": "modul",
@@ -3887,14 +3904,18 @@
         "_protokoll_stahlspannung",
         "Lagenergebnis",
         "Rissnormalkraft",
-        "Rissnormalkraft.pruefe",
+        "Rissnormalkraft.ansatz",
+        "Rissnormalkraft.eine_lage",
         "Rissnormalkraft._n_riss",
         "Rissnormalkraft._n_s_adm",
+        "Rissnormalkraft.protokoll_lage",
         "Momentlagenergebnis",
         "Biegezwang",
         "ZwaengungBiegung",
-        "ZwaengungBiegung.pruefe",
+        "ZwaengungBiegung.ansatz",
+        "ZwaengungBiegung.eine_lage",
         "ZwaengungBiegung._m_s_adm",
+        "ZwaengungBiegung.protokoll_lage",
         "_erster_E_s"
       ]
     },
@@ -4289,8 +4310,10 @@
       "stichworte": [
         "Lagenergebnis",
         "SproedesVersagen",
-        "SproedesVersagen.pruefe",
-        "SproedesVersagen._m_rd"
+        "SproedesVersagen.ansatz",
+        "SproedesVersagen.eine_lage",
+        "SproedesVersagen._m_rd",
+        "SproedesVersagen.protokoll_lage"
       ]
     },
     {

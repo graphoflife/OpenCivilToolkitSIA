@@ -1,5 +1,5 @@
 ---
-erzeugt: c52148a42b9e
+erzeugt: 558034f39377
 art: modul
 tags: [modul]
 ---
@@ -23,6 +23,7 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.handrechnung]] – Eckpunkte der Resistenzlinie von Hand.
 - [[opencivil.nachweis.kennzahlen]] – was eine Platte aufnimmt, ohne Einwirkung.
 - [[opencivil.nachweis.knicken]] – Nachweis am verformten System.
+- [[opencivil.nachweis.lagennachweis]] – ein Nachweis je Platte, ein Urteil je Bewehrungslage.
 - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
 - [[opencivil.nachweis.mindestbewehrung]] – Nachweise gegen sprödes Versagen.
 - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.

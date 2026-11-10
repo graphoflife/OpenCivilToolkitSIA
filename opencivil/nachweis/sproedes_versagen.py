@@ -34,16 +34,14 @@ die halbe Hoehe wie beim Zwang (SIA 262:2025, 4.4.1.3).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Sequence
+from typing import Sequence, Tuple
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
-from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, Ausgang, Fallausgang, Fallbefund, Nachweis, NachweisUrteil, Vergleich,
-    grad_def,
-)
+from opencivil.core.berechnung import Eingabebezug, Eingaben
+from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, Fallausgang, Vergleich
 from opencivil.core.latex import angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert, WertDef
+from opencivil.core.wert import Wert
+from opencivil.nachweis.lagennachweis import Lagennachweis
 from opencivil.nachweis.rissgroessen import (
     Rissgroessen, protokoll_rissmoment_rechteck, rissmoment_rechteck, rissmoment_wert,
 )
@@ -62,9 +60,9 @@ class Lagenergebnis(Fallausgang):
     begruendung: str = ""
 
 
-class SproedesVersagen(Nachweis):
+class SproedesVersagen(Lagennachweis):
     """
-    Mindestbewehrung gegen sprödes Versagen.
+    Mindestbewehrung gegen sprödes Versagen (:class:`~.lagennachweis.Lagennachweis`).
 
     Ein Nachweis je Platte, ein Urteil je Lage der Tragrichtung. In der
     Zusammenfassung steht die ungünstigere der beiden -- geht die auf, geht
@@ -77,6 +75,9 @@ class SproedesVersagen(Nachweis):
 
     THEMA = "Sprödes Versagen"
     ART = "SV"
+    KUERZEL = "SV"
+    BENENNUNG = "sprödes Versagen"
+    REFERENZ = "SIA 262:2025, 4.4.1.3"
 
     def __init__(
         self,
@@ -85,88 +86,41 @@ class SproedesVersagen(Nachweis):
         lagen: Sequence[int],
         mn_nachweis,
     ) -> None:
-        gewaehlt = sorted(set(lagen))
-        self.lagen = [l for l in querschnitt.lagen
-                      if l.richtung is richtung and l.nummer in gewaehlt]
-        if not self.lagen:
-            raise ValueError(
-                f"Querschnitt '{querschnitt.name}': in {richtung.beschriftung} "
-                f"ist keine der gewählten Lagen vorhanden.")
-
-        self.querschnitt = querschnitt
-        self.richtung = richtung
         self.mn = mn_nachweis
-
-        r = richtung.value
-        basis = f"{querschnitt.id}.nachweis.sproede.{r}"
-        self.d_ausnutzung: Dict[int, WertDef] = {
-            l.nummer: grad_def(
-                f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                rf"\alpha_{{eff,SV,{l.nummer},{r}}}",
-                (f"Erfüllungsgrad sprödes Versagen – "
-                 f"{l.nummer}. Lage {r}"),
-                "SIA 262:2025, 4.4.1.3",
-            )
-            for l in self.lagen
-        }
-
-        bezuege = [
-            Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_breite(richtung)),
-            Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
-        ]
-        # Je Seite der passende Eckwert: die untere Lage traegt das positive
-        # Moment, die obere das negative.
-        for lage in self.lagen:
-            bezuege.append(Eingabebezug(
-                f"M_Rd_{lage.nummer}",
-                mn_nachweis.d_eckwerte[f"M_Rd_N0_{lage.seite.marke}"].id))
-
+        gewaehlt = self.lagen_waehlen(querschnitt, richtung, lagen)
         super().__init__(
-            basis,
-            ausgaben=list(self.d_ausnutzung.values()),
-            bezuege=bezuege,
-            titel=(f"Sprödes Versagen {richtung.beschriftung} – "
-                   f"{querschnitt.name}"),
-            referenz="SIA 262:2025, 4.4.1.3",
-            abschnitt=querschnitt.abschnitt,
-        )
+            querschnitt, gewaehlt, richtung=richtung,
+            basis=f"{querschnitt.id}.nachweis.sproede.{richtung.value}",
+            titel=f"Sprödes Versagen {richtung.beschriftung} – {querschnitt.name}",
+            bezuege=[
+                Eingabebezug("h", querschnitt.id_von("h")),
+                Eingabebezug("b", querschnitt.id_breite(richtung)),
+                Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
+                # Je Seite der passende Eckwert: die untere Lage traegt das
+                # positive Moment, die obere das negative.
+                *[Eingabebezug(f"M_Rd_{lage.nummer}",
+                               mn_nachweis.d_eckwerte[f"M_Rd_N0_{lage.seite.marke}"].id)
+                  for lage in gewaehlt],
+            ])
 
     # -- Rechnen ------------------------------------------------------------
 
-    def pruefe(self, e: Eingaben, p: Protokoll):
-        h = e.g("h").si
-        b = e.g("b").si
-        f_ctm = e.g("f_ctm").si
-
-        groessen = rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm)
+    def ansatz(self, e: Eingaben, p: Protokoll) -> Tuple[Rissgroessen, Wert]:
+        """Das Rissmoment des Rechtecks -- und seine Herleitung."""
+        groessen = rissmoment_rechteck(h=e.g("h").si, b=e.g("b").si, f_ctm=e.g("f_ctm").si)
         self._protokoll_ansatz(p, e, groessen)
+        return groessen, rissmoment_wert(self.id, groessen)
 
-        urteile: List[NachweisUrteil] = []
-        befund = Fallbefund()
-        M_Riss = rissmoment_wert(self.id, groessen)
-
-        for lage in self.lagen:
-            erg = Lagenergebnis(lage=lage)
-            erg.M_Rd = abs(e.g(f"M_Rd_{lage.nummer}").si)
-
-            if erg.M_Rd <= 0.0:
-                erg.begruendung = (
-                    f"{lage.nummer}. Lage ({lage.seite}) ohne Bewehrung → kein "
-                    f"Biegewiderstand, kein Nachweis.")
-            else:
-                erg.ausgang = v = Vergleich(M_Riss, self._m_rd(erg))
-                erg.begruendung = (
-                    f"M_{self.mn.wahl.index}(N_Ed = 0) = {erg.M_Rd / 1e3:.1f} kNm "
-                    f"{'≥' if v.erfuellt else '<'} M_Riss = {groessen.M_Riss / 1e3:.1f} kNm.")
-
-            befund.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg)
-            urteile.append(self.urteil(self.d_ausnutzung[lage.nummer], f"{lage.nummer}. Lage",
-                                       erg.ausgang, erg.begruendung))
-
-        self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung({}, self.teilurteile(urteile), befund)
+    def eine_lage(self, e: Eingaben, lage: Bewehrungslage,
+                  ansatz: Tuple[Rissgroessen, Wert]) -> Lagenergebnis:
+        groessen, M_Riss = ansatz
+        erg = Lagenergebnis(lage=lage)
+        erg.M_Rd = abs(e.g(f"M_Rd_{lage.nummer}").si)
+        erg.ausgang = v = Vergleich(M_Riss, self._m_rd(erg))
+        erg.begruendung = (
+            f"M_{self.mn.wahl.index}(N_Ed = 0) = {erg.M_Rd / 1e3:.1f} kNm "
+            f"{'≥' if v.erfuellt else '<'} M_Riss = {groessen.M_Riss / 1e3:.1f} kNm.")
+        return erg
 
     def _m_rd(self, erg: Lagenergebnis) -> Wert:
         """Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung."""
@@ -188,14 +142,11 @@ class SproedesVersagen(Nachweis):
         protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id,
                                       referenz="SIA 262:2025, 4.4.1.3")
 
-    def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis) -> None:
+    def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis,
+                       ansatz: Tuple[Rissgroessen, Wert]) -> None:
         nummer = erg.lage.nummer
         r = self.richtung.value
         p.titel(f"Sprödes Versagen – {nummer}. Lage {r}", ebene=3)
-
-        if not erg.machbar:
-            p.text(erg.begruendung)
-            return
 
         v = erg.ausgang
         p.gleichung(bedingung(angabe(v.widerstand), r"\ge", angabe(v.einwirkung), v.erfuellt),

@@ -1,5 +1,5 @@
 ---
-erzeugt: 52874a772305
+erzeugt: d5d99007396c
 art: modul
 tags: [modul]
 ---
@@ -581,6 +581,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]

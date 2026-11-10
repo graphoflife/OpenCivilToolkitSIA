@@ -1,5 +1,5 @@
 ---
-erzeugt: 5b91b46f33c7
+erzeugt: f95b3b837ce9
 art: modul
 tags: [modul]
 ---
@@ -144,10 +144,10 @@ Was der Nachweis fuer eine Lage gefunden hat: N_s,adm gegen N_Riss.
 ### Rissnormalkraft
 
 ```python
-class Rissnormalkraft(Nachweis)
+class Rissnormalkraft(Lagennachweis)
 ```
 
-Sprödes Versagen unter Normalkraft-Zwängung.
+Sprödes Versagen unter Normalkraft-Zwängung ([[opencivil.nachweis.lagennachweis#Lagennachweis|Lagennachweis]]).
 
 Ein Urteil je Lage der Tragrichtung: die untere und die obere müssen beide
 die Risskraft aufnehmen können -- ein Zwang kennt keine Zugseite, er
@@ -158,11 +158,23 @@ Frage gestempelt (siehe `Nachweis.teilurteile`).
 - `THEMA = 'Zwängung auf Normalkraft'`
 - `ART = 'N_Riss'`
 - `LANGNAME = 'Risse: Zwängung Normalkraft'`
+- `KUERZEL = 'NR'`
+- `BENENNUNG = 'Rissnormalkraft'`
+- `REFERENZ = 'SIA 262:2025, 4.4.2'`
+- `NUR_MIT_STAHL = False`
 
-#### Rissnormalkraft.pruefe
+#### Rissnormalkraft.ansatz
 
 ```python
-def pruefe(self, e: Eingaben, p: Protokoll)
+def ansatz(self, e: Eingaben, p: Protokoll) -> Rissgroessen
+```
+
+Die Risskraft der gezogenen Querschnittshälfte -- und ihre Herleitung.
+
+#### Rissnormalkraft.eine_lage
+
+```python
+def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: Rissgroessen) -> Lagenergebnis
 ```
 
 #### Rissnormalkraft._n_riss
@@ -180,6 +192,12 @@ def _n_s_adm(self, erg: Lagenergebnis) -> Wert
 ```
 
 Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung.
+
+#### Rissnormalkraft.protokoll_lage
+
+```python
+def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis, ansatz: Rissgroessen) -> None
+```
 
 ### Momentlagenergebnis
 
@@ -230,7 +248,7 @@ fast nur weitergereicht (Benutzer, 2026-10-17).
 ### ZwaengungBiegung
 
 ```python
-class ZwaengungBiegung(Biegezwang)
+class ZwaengungBiegung(Biegezwang, Lagennachweis)
 ```
 
 Zwängung auf Biegung, je gewählter Lage.
@@ -244,10 +262,21 @@ unmittelbar nach dem Riss ist der Querschnitt genau dort, und die
 Spannungen sind Gebrauchsspannungen, also elastisch. Eine plastische
 Druckzone gibt es in diesem Augenblick nicht.
 
-#### ZwaengungBiegung.pruefe
+- `KUERZEL = 'ZB'`
+- `BENENNUNG = Biegezwang.THEMA`
+
+#### ZwaengungBiegung.ansatz
 
 ```python
-def pruefe(self, e: Eingaben, p: Protokoll)
+def ansatz(self, e: Eingaben, p: Protokoll) -> Wert
+```
+
+Das Rissmoment des Rechtecks -- und seine Herleitung.
+
+#### ZwaengungBiegung.eine_lage
+
+```python
+def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: Wert) -> Momentlagenergebnis
 ```
 
 #### ZwaengungBiegung._m_s_adm
@@ -257,6 +286,12 @@ def _m_s_adm(self, erg: Momentlagenergebnis) -> Wert
 ```
 
 Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung.
+
+#### ZwaengungBiegung.protokoll_lage
+
+```python
+def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Momentlagenergebnis, ansatz: Wert) -> None
+```
 
 ### _erster_E_s
 
@@ -280,6 +315,7 @@ Lagen einen Stahl traegt.
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.zustand2]]
@@ -295,12 +331,12 @@ Lagen einen Stahl traegt.
 
 ## Formeln aus diesem Modul
 
-- [[Aufnehmbare Risskraft]] · `Rissnormalkraft._protokoll_lage`
-- [[Aufnehmbares Moment der Bewehrung]] · `ZwaengungBiegung._protokoll_lage`
+- [[Aufnehmbare Risskraft]] · `Rissnormalkraft.protokoll_lage`
+- [[Aufnehmbares Moment der Bewehrung]] · `ZwaengungBiegung.protokoll_lage`
 - [[Dickster Stab der Lage]] · `_protokoll_stahlspannung`
-- [[Hilfsgrösse der Nulllinie]] · `ZwaengungBiegung._protokoll_lage`
-- [[Innerer Hebelarm]] · `ZwaengungBiegung._protokoll_lage`
-- [[Nulllinie des gerissenen Querschnitts]] · `ZwaengungBiegung._protokoll_lage`
+- [[Hilfsgrösse der Nulllinie]] · `ZwaengungBiegung.protokoll_lage`
+- [[Innerer Hebelarm]] · `ZwaengungBiegung.protokoll_lage`
+- [[Nulllinie des gerissenen Querschnitts]] · `ZwaengungBiegung.protokoll_lage`
 - [[Rissaktive Plattendicke]] · `Rissnormalkraft._protokoll_ansatz`
 - [[Risskraft der gezogenen Querschnittshälfte]] · `Rissnormalkraft._protokoll_ansatz`
 - [[Wertigkeit im gerissenen Zustand]] · `ZwaengungBiegung._protokoll_ansatz`

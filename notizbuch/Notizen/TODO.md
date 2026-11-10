@@ -91,17 +91,11 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 7 und 11 am
-2026-11-10 (siehe [[Entwicklung]]). Offen sind 8, 9, 10 und 12.
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 8 und 11 am
+2026-11-10 (siehe [[Entwicklung]]). Offen sind 9, 10 und 12.
 
 **Im übrigen Repo, neu gefunden:**
 
-- [ ] **8. Der Lagennachweis steht viermal** (duktilitaet.py:132-331,
-      mindestbewehrung.py:205-364 und 445-633, sproedes_versagen.py:80-202)
-      mit eigener Lagenwahl, Stahl-Entdoppelung, Gradkennung und
-      Sammelschleife; der allgemeine `Nachweis` trägt dafür
-      `ohne_bewehrung` (berechnung.py:1010), in drei der vier ein toter
-      Zweig. Besser: `Lagennachweis` als Schablone.
 - [ ] **9. «Je Seite eine Lage im Schwerpunkt» steht zweimal, mit
       verschiedenen Regeln** (querschnittsloeser.py:153-178 gegen
       handrechnung.py:565-627: welche Seite, zwei Stähle auf einer Seite,
@@ -611,6 +605,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 8: die vier Nachweise je
+Lage der Platte auf einer Schablone (`Lagennachweis`) -- Lagenwahl, Grade,
+Bezüge und Schleife einmal; eine leere Lage, wo keine hingehört, meldet
+sich ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 5: die Zeichendaten aller
 Bauteile unter einem Schlüssel, je Art an einer Stelle · Kennzahlen für

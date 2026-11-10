@@ -1,5 +1,5 @@
 ---
-erzeugt: 87b26d7ee4f7
+erzeugt: 4708947bebc3
 art: modul
 tags: [modul]
 ---
@@ -79,7 +79,7 @@ Was der Nachweis fuer eine Lage gefunden hat.
 - `f_sd: float = 0.0` – Stahlspannung im Gleichgewicht -- die fliessende Bewehrung, in Pa.
 - `x: float = 0.0` – Druckzonenhoehe bei M_Ed = 0, in m.
 - `verhaeltnis: float = 0.0`
-- `ausgang: Ausgang = NICHT_FUEHRBAR` – x/d gegen (x/d)_max -- nicht fuehrbar ohne Bewehrung in der Lage.
+- `ausgang: Ausgang = NICHT_FUEHRBAR` – x/d gegen (x/d)_max.
 - `begruendung: str = ''`
 
 ### druckzonenhoehe
@@ -98,10 +98,10 @@ anderen Zweck hat, aber es ist dieselbe Gleichgewichtsbedingung.
 ### Duktilitaet
 
 ```python
-class Duktilitaet(Nachweis)
+class Duktilitaet(Lagennachweis)
 ```
 
-Duktilitaetsnachweis je Bewehrungslage.
+Duktilitaetsnachweis je Bewehrungslage ([[opencivil.nachweis.lagennachweis#Lagennachweis|Lagennachweis]]).
 
 Ein Nachweis fuer die ganze Platte, ein Urteil je Lage. Die Lagen einer
 Platte gehoeren zusammen und stehen darum unter einer Ueberschrift; sie auf
@@ -113,11 +113,28 @@ Druckzone reichen darf, `grenze`.
 
 - `THEMA = 'Duktilität'`
 - `ART = 'D'`
+- `KUERZEL = 'D'`
+- `BENENNUNG = 'Duktilität'`
+- `REFERENZ = 'SIA 262:2025, 4.1.4.2.5'`
 
-#### Duktilitaet.pruefe
+#### Duktilitaet.ansatz
 
 ```python
-def pruefe(self, e: Eingaben, p: Protokoll)
+def ansatz(self, e: Eingaben, p: Protokoll) -> float
+```
+
+f_cd -- und die Herleitung des Ansatzes.
+
+#### Duktilitaet.eine_lage
+
+```python
+def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: float) -> Lagenergebnis
+```
+
+#### Duktilitaet.ausgaben_der_lage
+
+```python
+def ausgaben_der_lage(self, erg: Lagenergebnis) -> Dict[str, Groesse]
 ```
 
 #### Duktilitaet._grenze
@@ -128,10 +145,10 @@ def _grenze(self, nummer: int) -> Wert
 
 Die zulaessige bezogene Druckzonenhoehe -- Widerstand und Herleitung.
 
-#### Duktilitaet._protokoll_lage
+#### Duktilitaet.protokoll_lage
 
 ```python
-def _protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis, breite: str) -> None
+def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis, ansatz: float) -> None
 ```
 
 Die Herleitung einer Lage, aus Vorlagen: jede Formel steht einmal mit
@@ -153,6 +170,7 @@ Symbolen da, die Fassung mit Zahlen und Einheiten entsteht daraus.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
@@ -167,6 +185,6 @@ Symbolen da, die Fassung mit Zahlen und Einheiten entsteht daraus.
 ## Formeln aus diesem Modul
 
 - [[Bedingung der Duktilität]] · `Duktilitaet._protokoll_ansatz`
-- [[Bezogene Druckzonenhöhe]] · `Duktilitaet._protokoll_lage`
-- [[Druckzonenhöhe bei reiner Biegung]] · `Duktilitaet._protokoll_lage`
+- [[Bezogene Druckzonenhöhe]] · `Duktilitaet.protokoll_lage`
+- [[Druckzonenhöhe bei reiner Biegung]] · `Duktilitaet.protokoll_lage`
 - [[Kräftegleichgewicht bei M_Ed = 0]] · `Duktilitaet._protokoll_ansatz`

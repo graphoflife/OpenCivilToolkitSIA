@@ -439,11 +439,6 @@ class Nachweis(Berechnung):
             einwirkung=ausgang.einwirkung, widerstand=ausgang.widerstand, still=still)
 
     @staticmethod
-    def ohne_bewehrung(nummer: int) -> str:
-        """Die Begruendung einer Lage ohne Stahl -- in jedem Lagennachweis dieselbe."""
-        return f"{nummer}. Lage ohne Bewehrung → kein Nachweis."
-
-    @staticmethod
     def teilurteile(
         urteile: Sequence[NachweisUrteil],
     ) -> List[NachweisUrteil]:

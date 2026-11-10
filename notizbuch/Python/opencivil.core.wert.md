@@ -1,5 +1,5 @@
 ---
-erzeugt: 81003d189af4
+erzeugt: 478122149dc1
 art: modul
 tags: [modul]
 ---
@@ -317,6 +317,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]

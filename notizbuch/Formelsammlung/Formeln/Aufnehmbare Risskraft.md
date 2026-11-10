@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b09920f2b0d
+erzeugt: 2172dfa46e49
 art: formel
 tags: [formel]
 ---
@@ -77,7 +77,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft._protokoll_lage]]
+- [[opencivil.nachweis.mindestbewehrung#Rissnormalkraft.protokoll_lage|Rissnormalkraft.protokoll_lage]]
 - [[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA.pruefe|RissnormalkraftQA.pruefe]]
 
 ## Themen

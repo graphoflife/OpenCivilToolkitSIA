@@ -168,6 +168,22 @@ class TestNachweis(unittest.TestCase):
         self.assertNotIn(f"Duktilität – {untere}. Lage", gefunden)
         self.assertIsNotNone(gefunden[f"Duktilität – {obere}. Lage"].einwirkung)
 
+    def test_bekommt_er_trotzdem_eine_leere_lage_meldet_er_sich(self):
+        """
+        Die leere Lage lässt schon der Aufbau weg. Gibt er sie doch weiter,
+        ist das sein Fehler -- und kein Urteil «ohne Bewehrung», das als
+        nicht erfüllt zählte.
+        """
+        projekt = projekt_mit()
+        untere, obere = x_lagen(projekt)
+        lage = projekt.querschnitte[0].lagen[untere - 1]
+        lage.grund.durchmesser = 0.0
+        lage.zulage.durchmesser = 0.0
+        querschnitt = projekt.aufbauen().feld("duktilitaet")["q1"].querschnitt
+
+        with self.assertRaisesRegex(ValueError, f"die {untere}. Lage hat keinen"):
+            duktilitaet.Duktilitaet(querschnitt, [untere, obere])
+
     def test_die_herleitung_zeigt_die_rechnung(self):
         from opencivil.core.protokoll import GleichungBlock
 

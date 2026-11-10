@@ -1,5 +1,5 @@
 ---
-erzeugt: a4b62adbacdc
+erzeugt: c7a1aeec5fe9
 art: modul
 tags: [modul]
 ---
@@ -62,10 +62,10 @@ Was der Nachweis fuer eine Lage gefunden hat: M_Rd gegen M_Riss.
 ### SproedesVersagen
 
 ```python
-class SproedesVersagen(Nachweis)
+class SproedesVersagen(Lagennachweis)
 ```
 
-Mindestbewehrung gegen sprödes Versagen.
+Mindestbewehrung gegen sprödes Versagen ([[opencivil.nachweis.lagennachweis#Lagennachweis|Lagennachweis]]).
 
 Ein Nachweis je Platte, ein Urteil je Lage der Tragrichtung. In der
 Zusammenfassung steht die ungünstigere der beiden -- geht die auf, geht
@@ -77,11 +77,22 @@ Rückverfolgung sie zeigt.
 
 - `THEMA = 'Sprödes Versagen'`
 - `ART = 'SV'`
+- `KUERZEL = 'SV'`
+- `BENENNUNG = 'sprödes Versagen'`
+- `REFERENZ = 'SIA 262:2025, 4.4.1.3'`
 
-#### SproedesVersagen.pruefe
+#### SproedesVersagen.ansatz
 
 ```python
-def pruefe(self, e: Eingaben, p: Protokoll)
+def ansatz(self, e: Eingaben, p: Protokoll) -> Tuple[Rissgroessen, Wert]
+```
+
+Das Rissmoment des Rechtecks -- und seine Herleitung.
+
+#### SproedesVersagen.eine_lage
+
+```python
+def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: Tuple[Rissgroessen, Wert]) -> Lagenergebnis
 ```
 
 #### SproedesVersagen._m_rd
@@ -92,6 +103,12 @@ def _m_rd(self, erg: Lagenergebnis) -> Wert
 
 Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
 
+#### SproedesVersagen.protokoll_lage
+
+```python
+def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis, ansatz: Tuple[Rissgroessen, Wert]) -> None
+```
+
 
 ## Braucht
 
@@ -100,6 +117,7 @@ Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.platte]]
 

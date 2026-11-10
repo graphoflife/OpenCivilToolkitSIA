@@ -1,5 +1,5 @@
 ---
-erzeugt: 50a486ca5d72
+erzeugt: fc498e62821d
 art: modul
 tags: [modul]
 ---
@@ -474,6 +474,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]

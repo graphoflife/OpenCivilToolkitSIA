@@ -1,5 +1,5 @@
 ---
-erzeugt: 05cd9e3c97cf
+erzeugt: 81f71fd68882
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -60,6 +60,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.handrechnung]] – Eckpunkte der Resistenzlinie von Hand.
     - [[opencivil.nachweis.kennzahlen]] – was eine Platte aufnimmt, ohne Einwirkung.
     - [[opencivil.nachweis.knicken]] – Nachweis am verformten System.
+    - [[opencivil.nachweis.lagennachweis]] – ein Nachweis je Platte, ein Urteil je Bewehrungslage.
     - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
     - [[opencivil.nachweis.mindestbewehrung]] – Nachweise gegen sprödes Versagen.
     - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
