@@ -1,5 +1,5 @@
 ---
-erzeugt: d654f12e76a1
+erzeugt: 511fd71fcb25
 art: modul
 tags: [modul]
 ---
@@ -27,9 +27,16 @@ Platte, Querschnittsanalyse, Balkensystem, Durchstanzen, Grundbruch und Setzung 
 einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
-Bauteile durchgeht, geht diese Liste durch; eine neue Art kommt dort dazu
-und nirgends sonst. Gebaut wird je Eintrag ein [[opencivil.projekt.aufbau.kern#Bauteil|Bauteil]], das seine
-Nachweise, Ziele und Bezuege selbst fuehrt.
+Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
+[[opencivil.projekt.aufbau.kern#Bauteil|Bauteil]], das seine Nachweise, Ziele und Bezuege selbst fuehrt.
+
+Was Bericht und Oberflaeche je Art brauchen, kennt der Kern nicht; es steht
+in ihren Schichten, je an einer Stelle: was ueber der Nachweistabelle steht
+([[opencivil.bericht.zusammenfassung#Konstanten|ANGABEN]]), was gezeichnet wird
+([[opencivil.web.zeichendaten#Konstanten|ZEICHENDATEN]]), in der Oberflaeche ihr
+Eintrag in arten.js und ihre Zeile in apps.js mit Editor und Karten. Fehlt
+eine neue Art dort, meldet es sich -- beim Laden oder in
+tests/test_bauteilarten.py; ihre Vorlage im Katalog entsteht von selbst.
 
 
 ## WO WAS STEHT
@@ -84,9 +91,10 @@ das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
 class Bauteilart
 ```
 
-Der Steckbrief einer Bauteilart: was ausserhalb ihres Eintrags und ihrer
-Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
-[[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] dazu und nirgends sonst.
+Der Steckbrief einer Bauteilart: was der Kern ausserhalb ihres Eintrags
+und ihrer Baufunktion von ihr wissen muss. Eine neue Art kommt in
+[[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] dazu -- und in die Verzeichnisse von Bericht und
+Oberflaeche, siehe Dateikopf.
 
 - `name: str` – Wie sie im Aufbau, im Bericht und in der Oberflaeche heisst: `platte`.
 - `liste: str` – Ihre Liste im [[opencivil.projekt.projekt#Projekt|Projekt]] und in der Datei: `querschnitte`.
@@ -137,3 +145,4 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.web.zeichendaten]]

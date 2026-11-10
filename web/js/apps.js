@@ -26,6 +26,13 @@ import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
 import { skriptZeichnen } from './python.js';
 import { variablenZeichnen } from './variablen.js';
+import { plattenkarten } from './platte_bilder.js';
+import { analyseKarten } from './qa_diagramme.js';
+import { spannungskarten } from './spannungsbild.js';
+import { systemKarten, systemZusammenfassung } from './bs_diagramme.js';
+import { durchstanzKarten } from './ds_grundriss.js';
+import { situationKarten } from './gb_zeichnung.js';
+import { setzungKarten } from './sz_zeichnung.js';
 import {
   ansichtVergessen, eintragVon, freieKennung, katalog, naechsterName, projektAendern, waehlen,
   zustand,
@@ -36,7 +43,7 @@ import {
 // ===========================================================================
 
 /**
- * Ein neuer Eintrag nach der Vorlage des Kerns (`katalog[schluessel]`).
+ * Ein neuer Eintrag nach der Vorlage des Kerns für seine Liste (`katalog.neu`).
  *
  * Gesetzt wird nur, was der Kern nicht wissen kann: die Kennung, der Name
  * und, mit `einrichten`, die Materialien des Projekts -- `braucht` nennt die
@@ -47,7 +54,7 @@ import {
  * überall sonst aus waren. Kopiert, nicht die Vorlage selbst: sonst teilten
  * sich alle neuen Platten dieselben Lagen, und die zweite änderte die erste mit.
  */
-function nachVorlage(a, schluessel, {
+function nachVorlage(a, {
   braucht = [], fehlt = '', einrichten = () => {}, anlass,
 } = {}) {
   const stoffe = Object.fromEntries(braucht.map((art) => [
@@ -56,7 +63,7 @@ function nachVorlage(a, schluessel, {
     melden(fehlt, true);
     return;
   }
-  const vorlage = katalog(schluessel);
+  const vorlage = katalog('neu', a.liste);
   const kennung = freieKennung(a.vorsilbe);
   ansichtVergessen(kennung);
   projektAendern((p) => {
@@ -137,11 +144,21 @@ const einsetzen = (editor) => (behaelter, eintrag) => ersetzen(behaelter, ...edi
 
 /**
  * Die Zeile einer Bauteilart (ARTEN): Knopf, Liste und Wörter aus arten.js,
- * dazu was nur die Oberfläche kennt. Ein Bauteil geht nur weg, wenn kein
- * Balkensystem mehr seinen Querschnitt nimmt.
+ * dazu was nur die Oberfläche kennt -- auch ihre Karten im Reiter
+ * «Diagramme» (`karten(kennung, eintrag, loesung)`) und, wo sie keine
+ * Nachweise führt, was die Zusammenfassung statt der Tabelle zeigt
+ * (`uebersicht(kennung)`). Fehlt eines davon, meldet sich das beim Laden.
+ * Ein Bauteil geht nur weg, wenn kein Balkensystem mehr seinen Querschnitt
+ * nimmt.
  */
-function bauteil(name, { kurztext, anlegen, editor, fenster = null }) {
+function bauteil(name, {
+  kurztext, anlegen, editor, karten, uebersicht = null, fenster = null,
+}) {
   const a = artVon(name);
+  if (!karten) throw new Error(`apps.js: «${name}» hat keine Karten für die Diagramme.`);
+  if (!a.nachweise && !uebersicht) {
+    throw new Error(`apps.js: «${name}» führt keine Nachweise und hat keine Übersicht.`);
+  }
   const zeile = {
     app: a.art, liste: a.liste, knopf: a.knopf, zeichen: a.zeichen,
     vorsilbe: a.vorsilbe, stamm: a.stamm,
@@ -156,6 +173,8 @@ function bauteil(name, { kurztext, anlegen, editor, fenster = null }) {
     hinweis: () => a.bezeichnung,
     editor: einsetzen(editor),
     fenster,
+    karten,
+    uebersicht,
   };
   return zeile;
 }
@@ -198,7 +217,7 @@ function umriss(analyse) {
 
 const PLATTE = bauteil('querschnitt', {
   kurztext: (q) => `${q.h}×${q.b} mm`,
-  anlegen: (a) => nachVorlage(a, 'neue_platte', {
+  anlegen: (a) => nachVorlage(a, {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
     einrichten: (platte, { beton, betonstahl }) => {
       platte.beton = beton.kennung;
@@ -206,6 +225,7 @@ const PLATTE = bauteil('querschnitt', {
     },
   }),
   editor: plattenEditor,
+  karten: plattenkarten,
   fenster: plattenFenster,
 });
 
@@ -217,10 +237,12 @@ const PLATTE = bauteil('querschnitt', {
  */
 const ANALYSE = bauteil('querschnittsanalyse', {
   kurztext: umriss,
-  anlegen: (a) => nachVorlage(a, 'neue_querschnittsanalyse', {
+  anlegen: (a) => nachVorlage(a, {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
   }),
   editor: analyseEditor,
+  karten: (kennung, eintrag, loesung) => [
+    ...analyseKarten(kennung), ...spannungskarten(kennung, loesung)],
   fenster: analyseFenster,
 });
 
@@ -233,16 +255,18 @@ const SYSTEM = bauteil('balkensystem', {
     const staebe = s.linien.filter((l) => l.querschnitt).length;
     return `${staebe} ${staebe === 1 ? 'Stab' : 'Stäbe'}`;
   },
-  anlegen: (a) => nachVorlage(a, 'neues_balkensystem', {
+  anlegen: (a) => nachVorlage(a, {
     braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.',
     einrichten: (s, { beton }) => {
       s.stabmaterialien = [{
-        ...structuredClone(katalog('neue_zeilen', 'stabmaterial')),
+        ...structuredClone(katalog('vorlagen', 'stabmaterial')),
         kennung: 'M1', art: 'beton', beton: beton.kennung,
       }];
     },
   }),
   editor: balkensystemEditor,
+  karten: systemKarten,
+  uebersicht: systemZusammenfassung,
   fenster: balkensystemFenster,
 });
 
@@ -254,7 +278,7 @@ const SYSTEM = bauteil('balkensystem', {
 const DURCHSTANZEN = bauteil('durchstanzen', {
   kurztext: (d) => katalog('durchstanzen', 'lagen').find((l) => l.wert === d.lage)
     .kurz[d.form].replace(/\{(\w+)\}/g, (_, k) => d[k]),
-  anlegen: (a) => nachVorlage(a, 'neue_durchstanzstelle', {
+  anlegen: (a) => nachVorlage(a, {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
     einrichten: (d, { beton, betonstahl }) => {
       d.beton = beton.kennung;
@@ -262,20 +286,23 @@ const DURCHSTANZEN = bauteil('durchstanzen', {
     },
   }),
   editor: durchstanzEditor,
+  karten: durchstanzKarten,
 });
 
 /** Ein Fundament mit den Vorgaben des Kerns und einer Kombination -- ohne Material. */
 const GRUNDBRUCH = bauteil('grundbruch', {
   kurztext: (g) => `${g.b}×${g.L} m`,
-  anlegen: (a) => nachVorlage(a, 'neuer_grundbruch'),
+  anlegen: (a) => nachVorlage(a),
   editor: grundbruchEditor,
+  karten: situationKarten,
 });
 
 /** Ein Fundament ohne Pressung, mit einer Schicht aus dem Kern -- ohne Material. */
 const SETZUNG = bauteil('setzung', {
   kurztext: (s) => `${s.B}×${s.L} m`,
-  anlegen: (a) => nachVorlage(a, 'neue_setzung'),
+  anlegen: (a) => nachVorlage(a),
   editor: setzungEditor,
+  karten: setzungKarten,
 });
 
 /**
@@ -289,7 +316,7 @@ const SKRIPT = {
   vorsilbe: 'p', stamm: 'Skript',
   gruppen: (p) => [{
     titel: 'Python-Skripte', leer: 'kein Skript', eintraege: p.skripte || [],
-    plus: { titel: 'Skript hinzufügen', tun: () => nachVorlage(SKRIPT, 'neues_skript', { anlass: 'skript' }) },
+    plus: { titel: 'Skript hinzufügen', tun: () => nachVorlage(SKRIPT, { anlass: 'skript' }) },
   }],
   name: (s) => s.name,
   kurztext: (s) => {

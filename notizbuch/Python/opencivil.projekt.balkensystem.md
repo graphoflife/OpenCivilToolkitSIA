@@ -1,5 +1,5 @@
 ---
-erzeugt: 9a1f978feefc
+erzeugt: a7001bbb5a68
 art: modul
 tags: [modul]
 ---
@@ -276,6 +276,15 @@ welches E.
 - `bezug: str = ''`
 - `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt.
 - `eq: ModulEintrag = field(default_factory=ModulEintrag)` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
+
+#### StabquerschnittEintrag.neu
+
+```python
+@classmethod
+def neu(cls) -> 'StabquerschnittEintrag'
+```
+
+Ein frischer Querschnitt, wie die Oberflaeche ihn anlegt: ein Rechteck mit seinen Vorgaben.
 
 #### StabquerschnittEintrag.stabvorlage
 

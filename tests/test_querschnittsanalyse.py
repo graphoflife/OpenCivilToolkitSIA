@@ -43,7 +43,7 @@ class TestBeschreibung(unittest.TestCase):
         self.assertNotEqual(p.freie_kennung("a"), "a1")
 
     def test_die_vorlage_kommt_aus_dem_kern(self):
-        vorlage = api.katalog()["neue_querschnittsanalyse"]
+        vorlage = api.katalog()["neu"]["querschnittsanalysen"]
         neu = {**vorlage, "kennung": "a1", "name": "Balken"}
         self.assertEqual(QuerschnittsanalyseEintrag.aus_dict(neu).als_dict(), neu)
         # Leer: nichts gezeichnet, kein Lastfall (Benutzer, 2026-10-19).
@@ -830,7 +830,7 @@ class TestLeereAnalyse(unittest.TestCase):
         d["balkensysteme"][0]["querschnitte"][0].update(art="analyse", bezug="a9")
         antwort = dienst.bearbeite("rechnen", {"projekt": d})
         self.assertEqual(antwort.status, 200)
-        meldungen = [m["text"] for m in antwort.daten["balkensysteme"]["r1"]["meldungen"]]
+        meldungen = [m["text"] for m in antwort.daten["zeichendaten"]["r1"]["uebersicht"]["meldungen"]]
         self.assertTrue(any("Die Querschnittsanalyse «Leer» ist noch leer." in m
                             for m in meldungen))
 

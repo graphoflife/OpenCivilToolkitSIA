@@ -26,10 +26,6 @@ from opencivil.projekt import Aufbau
 kN = 1e-3
 
 
-def situationen(aufbau: Aufbau, loesung: Loesung) -> Dict[str, Any]:
-    """Je Fundament, nach Kennung, was die Zeichnung vom Kern braucht."""
-    return {kennung: situation(aufbau, kennung, loesung) for kennung in aufbau.grundbrueche}
-
 
 def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
     """

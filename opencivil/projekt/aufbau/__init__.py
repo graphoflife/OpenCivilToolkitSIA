@@ -18,9 +18,16 @@ Platte, Querschnittsanalyse, Balkensystem, Durchstanzen, Grundbruch und Setzung 
 einen Steckbrief
 (:class:`Bauteilart`) in :data:`BAUTEILE` -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
-Bauteile durchgeht, geht diese Liste durch; eine neue Art kommt dort dazu
-und nirgends sonst. Gebaut wird je Eintrag ein :class:`Bauteil`, das seine
-Nachweise, Ziele und Bezuege selbst fuehrt.
+Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
+:class:`Bauteil`, das seine Nachweise, Ziele und Bezuege selbst fuehrt.
+
+Was Bericht und Oberflaeche je Art brauchen, kennt der Kern nicht; es steht
+in ihren Schichten, je an einer Stelle: was ueber der Nachweistabelle steht
+(:data:`~opencivil.bericht.zusammenfassung.ANGABEN`), was gezeichnet wird
+(:data:`~opencivil.web.zeichendaten.ZEICHENDATEN`), in der Oberflaeche ihr
+Eintrag in arten.js und ihre Zeile in apps.js mit Editor und Karten. Fehlt
+eine neue Art dort, meldet es sich -- beim Laden oder in
+tests/test_bauteilarten.py; ihre Vorlage im Katalog entsteht von selbst.
 
 WO WAS STEHT:
 Hier der Steckbrief, die Liste der Arten und :func:`aufbauen`, das sie
@@ -116,9 +123,10 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
 @dataclass(frozen=True)
 class Bauteilart:
     """
-    Der Steckbrief einer Bauteilart: was ausserhalb ihres Eintrags und ihrer
-    Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
-    :data:`BAUTEILE` dazu und nirgends sonst.
+    Der Steckbrief einer Bauteilart: was der Kern ausserhalb ihres Eintrags
+    und ihrer Baufunktion von ihr wissen muss. Eine neue Art kommt in
+    :data:`BAUTEILE` dazu -- und in die Verzeichnisse von Bericht und
+    Oberflaeche, siehe Dateikopf.
     """
 
     name: str

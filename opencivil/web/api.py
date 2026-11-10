@@ -15,6 +15,8 @@ erfinden, sonst laufen Bericht und Bildschirm auseinander.
 
 from __future__ import annotations
 
+import dataclasses
+import inspect
 import math
 from typing import Any, Callable, Dict, List, Optional
 
@@ -38,22 +40,12 @@ from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsort
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt import (
-    BAUTEILE, AussparungEintrag, Aufbau, DurchstanzEintrag, GebrauchsfallEintrag,
-    GrundbruchEintrag, GrundrissknotenEintrag,
-    GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
-    QuerschnittEintrag, SchichtEintrag, SetzungEintrag,
-    SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
-)
+from opencivil.projekt import BAUTEILE, Aufbau, SkriptEintrag
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import EIGENE_VORSILBE
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, wahl_von
 from opencivil.projekt.projekt import Projekt
-from opencivil.projekt.querschnittsanalyse import (
-    SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
-    QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
-    SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
-)
+from opencivil.projekt.querschnittsanalyse import SCHNITTE, WerkstoffwahlEintrag
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import (
@@ -70,10 +62,9 @@ from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.stabwerk.rechnung import BETONKENNWERTE
 from opencivil.geotechnik.setzung import Steifigkeit
-from opencivil.web import (
-    balkendaten, diagrammdaten, durchstanzdaten, grundbruchdaten, setzungsdaten,
-)
+from opencivil.web import diagrammdaten, durchstanzdaten
 from opencivil.web.umschlag import endlich
+from opencivil.web.zeichendaten import zeichendaten
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
 #: Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. ``kurz`` fuer
@@ -115,20 +106,36 @@ def _rechenarten(arten) -> list:
 # ===========================================================================
 
 
-def _felder() -> Dict[str, Dict[str, Dict[str, Any]]]:
+def _vorlage(cls: type) -> Dict[str, Any]:
     """
-    Die Feldangaben jeder Klasse von Eintraegen unter dem Projekt
-    (:func:`~opencivil.projekt.lesen.feldangaben`), unter ihrem Namen ohne
-    «Eintrag», klein: ``grundbruch``, ``schicht``, ``stabmaterial``. Bis
-    2026-10-25 standen elf von 49 Klassen von Hand da.
+    Wie ein frischer Eintrag dieser Klasse aussieht: ueber ``neu``, wo die
+    Klasse eines hat -- eine Platte mit ihren Lagen, ein Grundbruch mit
+    einer Kombination --, sonst mit ihren Vorgaben. Was keine Vorgabe hat,
+    sind Kennung, Name und Verweise: leer, die Oberflaeche setzt sie.
     """
-    felder: Dict[str, Dict[str, Dict[str, Any]]] = {}
+    neu = getattr(cls, "neu", None)
+    if neu is not None:
+        pflicht = [n for n, p in inspect.signature(neu).parameters.items()
+                   if p.default is inspect.Parameter.empty]
+        return neu(**{n: "" for n in pflicht}).als_dict()
+    return cls(**{f.name: "" for f in dataclasses.fields(cls)
+                  if f.init and f.default is dataclasses.MISSING
+                  and f.default_factory is dataclasses.MISSING}).als_dict()
+
+
+def _klassen() -> Dict[str, type]:
+    """
+    Jede Klasse von Eintraegen unter dem Projekt, unter ihrem Namen ohne
+    «Eintrag», klein: ``grundbruch``, ``schicht``, ``kombination`` -- so
+    heissen ihre Feldangaben und ihre Vorlage im Katalog.
+    """
+    klassen: Dict[str, type] = {}
     for cls in eintragsklassen(Projekt):
         name = cls.__name__.removesuffix("Eintrag").lower()
-        if name in felder:
+        if name in klassen:
             raise ValueError(f"Zwei Klassen von Eintraegen hiessen im Katalog «{name}».")
-        felder[name] = feldangaben(cls)
-    return felder
+        klassen[name] = cls
+    return klassen
 
 
 def katalog() -> dict:
@@ -160,80 +167,20 @@ def katalog() -> dict:
         "erfuellungsarten": [
             {"wert": a.value, "beschriftung": a.beschriftung} for a in Erfuellungsart
         ],
-        # Die frische Platte kommt aus dem Kern. Die Oberflaeche trug sie
-        # einmal selbst -- zwanzig Felder, die jemand von Hand mit den
-        # Vorgaben gleichhalten musste, und beim ersten Mal, als sich die
-        # Vorgaben aenderten, lief das auseinander. Gesetzt werden dort jetzt
-        # nur noch Kennung, Name und die beiden Materialien.
-        "neue_platte": QuerschnittEintrag.neu(
-            kennung="", name="", beton="", stahl="").als_dict(),
-        # Dasselbe fuer die Querschnittsanalyse und das Balkensystem: beide
-        # leer, nichts gezeichnet (Benutzer, 2026-10-19). Die Oberflaeche
-        # setzt Kennung und Name.
-        "neue_querschnittsanalyse": QuerschnittsanalyseEintrag.neu(kennung="", name="").als_dict(),
-        "neues_balkensystem": bs.BalkensystemEintrag.neu(kennung="", name="").als_dict(),
-        # Ein Grundbruch mit den Vorgaben des Benutzers und einer Kombination.
-        # Die Oberflaeche setzt Kennung und Name.
-        "neuer_grundbruch": GrundbruchEintrag.neu(kennung="", name="").als_dict(),
-        # Eine Setzung ohne Pressung und mit einer Schicht. Die Oberflaeche
-        # setzt Kennung und Name.
-        "neue_setzung": SetzungEintrag.neu(kennung="", name="").als_dict(),
-        # Eine Durchstanzstelle ohne Einwirkung und ohne Aussparung. Die
-        # Oberflaeche setzt Kennung, Name, Beton und Stahl.
-        "neue_durchstanzstelle": DurchstanzEintrag.neu(kennung="", name="").als_dict(),
-        # Je Feld, was der Kern ueber seine Zahl weiss: die Einheit, in der
-        # sie gemeint ist, die Grenzen und ob sie ganz sein muss -- zuerst
-        # beim Grundbruch, dessen Einheiten die Maske selbst trug.
-        "felder": _felder(),
-        # Ein Skript der App «Python», mit einem Diagramm darin.
-        "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
-        # Dasselbe fuer jede Zeile, die man anfuegt. Eine neue Zeile bringt
-        # keine Einwirkung mit: Kraefte, Momente und die Durchbiegung sind null,
-        # bis jemand sie eintraegt (Benutzer, 2026-10-19) -- bis dahin standen
-        # hier 30 kNm, ein Knickfall unter Druck und w = 2 mm. Laengen haben
-        # ihre Vorgaben. Die Oberflaeche setzt nur den Namen und beim Material
-        # Kennung, Art und Sorte.
-        "neue_zeilen": {
-            "einwirkung": KombinationEintrag(name="").als_dict(),
-            "knickfall": KnickEintrag(name="").als_dict(),
-            "gebrauchsfall": GebrauchsfallEintrag(name="").als_dict(),
-            "verformungsfall": VerformungsfallEintrag(name="").als_dict(),
-            "analyse": SpannungsfallEintrag(name="").als_dict(),
-            "material": MaterialEintrag(kennung="", art="", sorte="").als_dict(),
-            # Die Teile der Querschnittsanalyse, wie das Zeichenfenster sie
-            # anlegt. Es setzt nur Kennung, Knoten und die Materialien.
-            "qa_lastfall": QALastfallEintrag(name="").als_dict(),
-            "qa_analyse": QASpannungsfallEintrag(name="").als_dict(),
-            "qa_gebrauchsfall": QAGebrauchsfallEintrag(name="").als_dict(),
-            "qa_knickfall": QAKnickEintrag(name="").als_dict(),
-            "knoten": KnotenEintrag().als_dict(),
-            "flaeche": FlaecheEintrag().als_dict(),
-            "stab": StabEintrag().als_dict(),
-            "stablinie": StablinieEintrag().als_dict(),
-            "schubwand": SchubwandEintrag().als_dict(),
-            "hilfslinie": HilfslinieEintrag().als_dict(),
-            "werkstoffwahl": WerkstoffwahlEintrag(material="").als_dict(),
-            # Die Teile eines Balkensystems, wie Zeichenfenster und Panels sie
-            # anlegen -- der Querschnitt mit den Massen seiner Vorlage.
-            "systemknoten": bs.SystemknotenEintrag().als_dict(),
-            "systemlinie": bs.SystemlinieEintrag().als_dict(),
-            "lager": bs.LagerEintrag().als_dict(),
-            "knotenlast": bs.KnotenlastEintrag().als_dict(),
-            "stablast": bs.StablastEintrag().als_dict(),
-            "stabmaterial": bs.StabmaterialEintrag().als_dict(),
-            "stabquerschnitt": bs.StabquerschnittEintrag(
-                masse=stabquerschnitte.RECHTECK.vorgaben()).als_dict(),
-            "lastfall": bs.LastfallEintrag().als_dict(),
-            "lastkombination": bs.LastkombinationEintrag().als_dict(),
-            "statikdiagramm": bs.StatikdiagrammEintrag().als_dict(),
-            # Eine Einwirkung auf ein Fundament.
-            "grundbruchkombination": GrundbruchkombinationEintrag(name="").als_dict(),
-            # Eine Schicht unter einem Fundament der Setzung.
-            "schicht": SchichtEintrag(name="").als_dict(),
-            # Knoten und Aussparung im Grundriss einer Durchstanzstelle.
-            "grundrissknoten": GrundrissknotenEintrag().als_dict(),
-            "aussparung": AussparungEintrag().als_dict(),
-        },
+        # Je Klasse von Eintraegen, was der Kern ueber ihre Felder weiss --
+        # Einheit, Grenzen, ob ganz -- und wie ein frischer Eintrag aussieht,
+        # beides unter demselben Namen (:func:`_klassen`). Die Oberflaeche
+        # setzt an einer Vorlage nur Kennung, Name und Materialien. Bis
+        # 2026-11-10 standen die Vorlagen von Hand da, unter eigenen Namen:
+        # die Einwirkung einer Platte hiess dort «einwirkung», ihre Felder
+        # «kombination».
+        "felder": {name: feldangaben(cls) for name, cls in _klassen().items()},
+        "vorlagen": {name: _vorlage(cls) for name, cls in _klassen().items()},
+        # Was ein neuer Eintrag einer Liste des Projekts mitbringt -- je
+        # Bauteilart und das Skript der App «Python». Eine neue Art hat ihre
+        # Vorlage damit von selbst.
+        "neu": {**{art.liste: _vorlage(art.eintrag) for art in BAUTEILE},
+                "skripte": _vorlage(SkriptEintrag)},
         # Die Wahlen einer Durchstanzstelle -- je ein Schalter -- und welche
         # Felder der Nachweis mit jeder Stellung liest.
         "durchstanzen": durchstanzdaten.wahlen(),
@@ -583,28 +530,19 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
             spannungsanalysen if spannungsanalysen is not None
             else diagrammdaten.spannungsanalysen(aufbau, loesung))
         ergebnis["zusammenfassungen"] = zusammenfassungen(loesung, aufbau)
-        # Je Balkensystem die knappe Uebersicht; die Verlaeufe fuer die
-        # Bilder holt eine eigene Anfrage (dienst.balkensystem_verlauf).
-        ergebnis["balkensysteme"] = endlich({
-            kennung: balkendaten.uebersicht(loesung.befunde.get(system.rechnung.id))
-            for kennung, system in aufbau.balkensysteme.items()})
-        # Je Querschnitt eines Systems sein Umriss -- auch wenn es nicht rechnet.
-        ergebnis["stabumrisse"] = endlich({
-            kennung: balkendaten.umrisse(system, loesung)
-            for kennung, system in aufbau.balkensysteme.items()})
-        # Je Fundament, was die Situationszeichnung vom Kern braucht.
-        ergebnis["grundbrueche"] = endlich(grundbruchdaten.situationen(aufbau, loesung))
-        ergebnis["setzungen"] = endlich(setzungsdaten.situationen(aufbau, loesung))
-        ergebnis["durchstanzstellen"] = endlich(durchstanzdaten.situationen(aufbau, loesung))
-        # Je Platte und je gezeichneten Querschnitt die Kennzahlen -- auch
-        # ohne Lastfall, darum nicht in der Zusammenfassung, die es nur mit
-        # Urteilen gibt.
+        # Je Bauteil, was seine Bilder vom Kern brauchen -- nach seiner Art
+        # (zeichendaten.py). Die Verlaeufe eines Balkensystems holt eine
+        # eigene Anfrage (dienst.balkensystem_verlauf).
+        ergebnis["zeichendaten"] = endlich(zeichendaten(aufbau, loesung))
+        # Je Bauteil seine Kennzahlen -- auch ohne Lastfall, darum nicht in
+        # der Zusammenfassung, die es nur mit Urteilen gibt. Welche es hat,
+        # sagt das Bauteil selbst; die meisten haben keine.
         ergebnis["kennzahlen"] = {
             kennung: [{"beschriftung": k.beschriftung, "symbol": wert.symbol,
                        "text": k.text(wert), "einheit": wert_dict(wert)["einheit"],
                        "erklaerung": k.erklaerung, "id": wert.id}
                       for k, wert in kennzahlen(aufbau, kennung, loesung)]
-            for kennung in [*aufbau.querschnitte, *aufbau.querschnittsanalysen]}
+            for kennung in aufbau.teile}
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
     return ergebnis

@@ -141,7 +141,7 @@ class TestGleicheFallnamen(unittest.TestCase):
         return antwort.daten
 
     def meldungen(self, daten) -> list:
-        system = daten["balkensysteme"]["r1"]
+        system = daten["zeichendaten"]["r1"]["uebersicht"]
         self.assertFalse(system["gueltig"])
         self.assertEqual(system["faelle"], [])
         return [m["text"] for m in system["meldungen"] if m["fehler"]]
@@ -187,7 +187,7 @@ class TestLagerkraefteAmBildschirm(unittest.TestCase):
         s.stablast(g, balken, wert=10.0)
 
         antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
-        uebersicht = antwort.daten["balkensysteme"][s.kennung]
+        uebersicht = antwort.daten["zeichendaten"][s.kennung]["uebersicht"]
         zeilen = uebersicht["faelle"][0]["lagerkraefte"]
         self.assertEqual([z["wo"] for z in zeilen], ["A1 (K1)", "L1: Bettung, Summe"])
         self.assertEqual([z["summe"] for z in zeilen], [False, True])
@@ -448,7 +448,7 @@ class TestRechnen(unittest.TestCase):
         p.balkensysteme[0].lager[0].x = "frei"
         antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
         self.assertEqual(antwort.status, 200)
-        uebersicht = antwort.daten["balkensysteme"]["r1"]
+        uebersicht = antwort.daten["zeichendaten"]["r1"]["uebersicht"]
         self.assertFalse(uebersicht["gueltig"])
         self.assertIn("beweglich", uebersicht["meldungen"][0]["text"])
         self.assertTrue(uebersicht["beweglich"])
@@ -798,7 +798,7 @@ class TestUmrisse(unittest.TestCase):
         s.querschnitt_aus("Unterzug", "analyse", p.analyse("Unterzug"))
         s.querschnitt_mit_kennwerten("Von Hand", A=1000.0, I=10.0)
         s.querschnitt("Unmöglich", "rechteck", h=0.0)
-        umrisse = dienst.bearbeite("rechnen", {"projekt": p.als_dict()}).daten["stabumrisse"]["r1"]
+        umrisse = dienst.bearbeite("rechnen", {"projekt": p.als_dict()}).daten["zeichendaten"]["r1"]["umrisse"]
         # Das Rechteck 300 × 600 mit seinen Massen, der Streifen 1000 × 250 der Platte.
         self.assertEqual(umrisse["Q1"], [[[0.0, 0.0], [300.0, 0.0], [300.0, 600.0], [0.0, 600.0]]])
         self.assertEqual(umrisse["Q2"], [[[0.0, 0.0], [1000.0, 0.0], [1000.0, 250.0], [0.0, 250.0]]])

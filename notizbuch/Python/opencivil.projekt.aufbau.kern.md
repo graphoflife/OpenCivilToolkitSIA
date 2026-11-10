@@ -1,5 +1,5 @@
 ---
-erzeugt: 6ef21dc0e9b0
+erzeugt: 08b841672fee
 art: modul
 tags: [modul]
 ---
@@ -51,7 +51,9 @@ Was beim Zusammenbauen eines Projekts entsteht.
 def objekte(self, art: str) -> Dict[str, Any]
 ```
 
-Die gebauten Objekte einer Bauteilart nach Kennung -- `art` ist ihr Name.
+Die gebauten Objekte einer Bauteilart nach Kennung -- `art` ist ihr
+Name. Einen Namen, den keine Art traegt, meldet sie, statt still ein
+leeres Verzeichnis zu geben.
 
 #### Aufbau.querschnitte
 

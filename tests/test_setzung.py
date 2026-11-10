@@ -254,14 +254,14 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
 
     def test_katalog(self):
         k = katalog()
-        self.assertEqual(k["neue_setzung"]["schichten"][0]["name"], "Schicht 1")
+        self.assertEqual(k["neu"]["setzungen"]["schichten"][0]["name"], "Schicht 1")
         self.assertEqual(k["felder"]["schicht"]["M_E"]["einheit"], "MN/m²")
         self.assertEqual(k["felder"]["setzung"]["q_W"]["einheit"], "kN/m²")
         self.assertEqual([s["wert"] for s in k["setzung"]["steifigkeiten"]], ["starr", "schlaff"])
 
     def test_situation(self):
         self.assertEqual(self.antwort.status, 200)
-        s = self.antwort.daten["setzungen"]["w1"]
+        s = self.antwort.daten["zeichendaten"]["w1"]
         self.assertEqual(s["punkt"], "Punkt K")
         self.assertEqual(s["lage"], [K * 2.5, K * 2.0])
         self.assertEqual([x["name"] for x in s["schichten"]],

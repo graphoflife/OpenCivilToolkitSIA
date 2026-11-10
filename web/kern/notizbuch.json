@@ -4583,6 +4583,7 @@
         "ModulEintrag",
         "ModulEintrag.wahl",
         "StabquerschnittEintrag",
+        "StabquerschnittEintrag.neu",
         "StabquerschnittEintrag.stabvorlage",
         "StabquerschnittEintrag.masse_mit_vorgaben",
         "StabquerschnittEintrag.fehler",
@@ -5791,7 +5792,8 @@
       "kurz": "Uebersetzung der Rechenergebnisse nach JSON.",
       "stichworte": [
         "_rechenarten",
-        "_felder",
+        "_vorlage",
+        "_klassen",
         "katalog",
         "obergrenzen",
         "wert_dict",
@@ -5921,7 +5923,6 @@
       "kurz": "was die Oberflaeche von einer Durchstanzstelle zeichnet.",
       "stichworte": [
         "wahlen",
-        "situationen",
         "situation",
         "_linien",
         "_leisten",
@@ -5934,7 +5935,6 @@
       "art": "modul",
       "kurz": "was die Oberflaeche von einem Grundbruch zeichnet.",
       "stichworte": [
-        "situationen",
         "situation"
       ]
     },
@@ -5959,7 +5959,6 @@
       "art": "modul",
       "kurz": "was die Oberflaeche von einer Setzung zeichnet.",
       "stichworte": [
-        "situationen",
         "situation"
       ]
     },
@@ -5988,6 +5987,16 @@
         "nach_json",
         "fehlerdaten",
         "umschlag"
+      ]
+    },
+    {
+      "name": "opencivil.web.zeichendaten",
+      "pfad": "Python/opencivil.web.zeichendaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche je Bauteil zeichnet, nach seiner Art.",
+      "stichworte": [
+        "_balkensystem",
+        "zeichendaten"
       ]
     },
     {

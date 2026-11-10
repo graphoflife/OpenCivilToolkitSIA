@@ -1,5 +1,5 @@
 ---
-erzeugt: 369fa3501f93
+erzeugt: 843be33aa4de
 art: modul
 tags: [modul]
 ---
@@ -238,7 +238,7 @@ hoch, beide, getrennt durch `/`.
 - `GRAD_SPALTE = 4` – Welche Spalte den Erfuellungsgrad traegt. Die Oberflaeche hinterlegt genau sie -- zaehlen statt raten, sonst haenge die Einfaerbung an der Reihenfolge der Kopfzeile.
 - `STAPEL_SPALTEN = (2, 3)` – Widerstand und Einwirkung: die Oberflaeche setzt sie uebereinander in eine Zelle, der Bericht behaelt beide Spalten.
 - `AUSRICHTUNG = 'LLrrr'` – Nachweis und Bezeichnung duerfen umbrechen: mit zwei Formeln daneben liefe die Tabelle im Bericht sonst ueber den Rand.
-- `ANGABEN = {'platte': lambda teil, loesung: (plattenangaben(teil.objekt), bewehr…` – Je Bauteilart mit Nachweisen, was ueber ihrer Tabelle steht -- nach dem Namen der Art. Ein Balkensystem hat keine Nachweise und keine Tabelle.
+- `ANGABEN = {'platte': lambda teil, loesung: (plattenangaben(teil.objekt), bewehr…` – Je Bauteilart, nach ihrem Namen, was ueber ihrer Tabelle steht. Ein Balkensystem hat keine Nachweise und keine Tabelle -- auch das steht hier (`None`). Dass jede Art hier steht, prueft tests/test_bauteilarten.py; beim Laden ginge es nicht, der Bericht laedt vor den Bauteilarten.
 
 ## Braucht
 

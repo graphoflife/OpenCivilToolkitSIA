@@ -1,5 +1,5 @@
 ---
-erzeugt: 895f0fb8c2cc
+erzeugt: 4556c08ce4c5
 art: modul
 tags: [modul]
 ---
@@ -118,3 +118,4 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.speicher]]
+- [[opencivil.web.zeichendaten]]

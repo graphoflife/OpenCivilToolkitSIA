@@ -150,7 +150,7 @@ const VERFORMUNG = {
  * Bauteil anders zeigen.
  */
 export const PLATTE = {
-  vorlage: 'analyse',
+  vorlage: 'spannungsfall',
   richtung: (k, setzen) => richtungsWahl(k.richtung || 'x', setzen, ['x', 'y']),
   raender: () => ['oben', 'unten'],
   bezug: jeB,
@@ -170,7 +170,7 @@ export const PLATTE = {
   rechenwerte: null,
   // Das Knicken: nur in x.
   knick: {
-    vorlage: 'knickfall',
+    vorlage: 'knick',
     kopf: ['N_Ed,x [kN]', 'M_Ed,1,x [kNm]', 'l [m]', 'l_cr [m]'],
     titel: {
       N_Ed: 'Druckkraft in kN – negativ, in x-Richtung',
@@ -228,7 +228,7 @@ function tragsicherheitInhalt(querschnitt) {
       ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
       : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
     anfuegenKnopf('Einwirkung', () => aendernAn((q) => q.kombinationen.push(
-      ausVorlage('einwirkung', { name: naechsterName('Tragsicherheit', q.kombinationen) }),
+      ausVorlage('kombination', { name: naechsterName('Tragsicherheit', q.kombinationen) }),
     ))),
     querkraftAngaben(querschnitt),
   ];

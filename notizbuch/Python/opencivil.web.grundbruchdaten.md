@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ff10bb7e9ea
+erzeugt: aeda31323fe0
 art: modul
 tags: [modul]
 ---
@@ -22,14 +22,6 @@ Werten b und phi_eff wie die Formeln fuer L_Gl und H_Gl.
 
 ## Inhalt
 
-### situationen
-
-```python
-def situationen(aufbau: Aufbau, loesung: Loesung) -> Dict[str, Any]
-```
-
-Je Fundament, nach Kennung, was die Zeichnung vom Kern braucht.
-
 ### situation
 
 ```python
@@ -49,4 +41,4 @@ sie nur das Fundament, ohne Gleitkörper und ohne Kräfte.
 
 ## Gebraucht von
 
-- [[opencivil.web.api]]
+- [[opencivil.web.zeichendaten]]

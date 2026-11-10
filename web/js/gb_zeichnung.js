@@ -274,7 +274,7 @@ function legende(g, s, fall) {
 export function situationKarten(kennung) {
   const g = eintragVon(kennung);
   if (!g) return [];
-  const s = zustand.loesung?.grundbrueche?.[kennung];
+  const s = zustand.loesung?.zeichendaten?.[kennung];
   const faelle = s?.faelle || [];
   // Welche Kombination die Ansicht zeigt (`ansichtVon`) -- ohne Wahl die massgebende.
   const ansicht = ansichtVon(kennung);

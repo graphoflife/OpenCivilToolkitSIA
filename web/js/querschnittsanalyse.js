@@ -163,7 +163,7 @@ function querschnittGruppe(analyse) {
 function werkstoffwahl(analyse) {
   const kennungen = materialienVon(analyse.kennung);
   const wahlen = katalog('querschnittsanalyse');
-  const vorgabe = katalog('neue_zeilen', 'werkstoffwahl');
+  const vorgabe = katalog('vorlagen', 'werkstoffwahl');
 
   const setzen = (material, feldname, wert) => eintragAendern(analyse.kennung, (a) => {
     let w = a.werkstoffwahl.find((x) => x.material === material);
@@ -282,7 +282,7 @@ function tragsicherheitInhalt(analyse) {
       text: '+ Lastfall',
       on: {
         click: () => aendern((a) => a.lastfaelle.push(
-          ausVorlage('qa_lastfall', { name: naechsterName('Tragsicherheit', a.lastfaelle) }))),
+          ausVorlage('qalastfall', { name: naechsterName('Tragsicherheit', a.lastfaelle) }))),
       },
     }),
     schubwandAngaben(analyse),
@@ -439,7 +439,7 @@ function zugseitenWahl(gewaehlt, setzen, titel) {
  * gegenüber.
  */
 const ORT = {
-  vorlage: 'qa_analyse',
+  vorlage: 'qaspannungsfall',
   richtung: (k, setzen) => mitKopf('Zug', zugseitenWahl(
     k.richtung, setzen, 'Zugseite: die Seite, die ein positives Moment zieht')),
   raender: (k) => zugseite(k.richtung)?.raender || ['oben', 'unten'],
@@ -454,7 +454,7 @@ const ORT = {
   rechenwerte: 'Gerechnet mit den Rechenwerten der Tragsicherheit.',
   // Das Knicken je Fall zu seiner Zugseite -- sie steht neben dem Namen.
   knick: {
-    vorlage: 'qa_knickfall',
+    vorlage: 'qaknick',
     kopf: ['N_Ed [kN]', 'M_Ed,1 [kNm]', 'l [m]', 'l_cr [m]'],
     titel: {
       N_Ed: 'Druckkraft in kN – negativ',
@@ -469,7 +469,7 @@ const ORT = {
   // Die Lastfälle unter Gebrauchslast: wie die der Tragsicherheit, ohne
   // Querkraft und Torsion.
   gebrauch: {
-    vorlage: 'qa_gebrauchsfall',
+    vorlage: 'qagebrauchsfall',
     arten: 'faserspannungsarten',
     spalten: (a) => spalten(a).filter((s) => ['N_Ed', 'M_y_Ed', 'M_z_Ed'].includes(s.feld))
       .map((s) => ({

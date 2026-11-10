@@ -1,5 +1,5 @@
 ---
-erzeugt: eff2c53674bb
+erzeugt: 655696b5c81c
 art: modul
 tags: [modul]
 ---
@@ -35,14 +35,6 @@ Die Schalter einer Durchstanzstelle mit ihren Stellungen -- und je Lage
 ihre Art: wie die Maske ihre Masse überschreibt, ob sie eine Form hat,
 welche Masse sie je Form liest, was die Liste von ihr zeigt und welche
 Felder jede Näherungsstufe an ihr liest.
-
-### situationen
-
-```python
-def situationen(aufbau: Aufbau, loesung: Loesung) -> Dict[str, Any]
-```
-
-Je Durchstanzstelle, nach Kennung, was die Zeichnung vom Kern braucht.
 
 ### situation
 
@@ -90,3 +82,4 @@ Der Stahlpilz mit seinen Stegen, seiner Fläche und dem Schnitt um sie -- in mm,
 ## Gebraucht von
 
 - [[opencivil.web.api]]
+- [[opencivil.web.zeichendaten]]

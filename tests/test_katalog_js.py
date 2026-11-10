@@ -1,7 +1,8 @@
 """
 Was die Oberflaeche im Katalog liest, gibt es dort: jeder Pfad, den
-``web/js`` an ``katalog(...)`` gibt, und jede Art, nach der ``feldangabe``,
-``ausVorlage`` und ``nachVorlage`` fragen.
+``web/js`` an ``katalog(...)`` gibt, jede Art, nach der ``feldangabe`` und
+``ausVorlage`` fragen, und je Liste des Projekts die Vorlage, die
+``nachVorlage`` nimmt.
 
 Die Oberflaeche wirft, wenn ein Schluessel fehlt (``katalog`` in
 ``web/js/zustand.js``), statt still einen leeren Schalter zu zeigen. Damit
@@ -63,18 +64,24 @@ class TestKatalogpfade(unittest.TestCase):
             with self.subTest(datei=datei, pfad=pfad):
                 self.nachschlagen(pfad)
 
-    def test_feldangaben_vorlagen_und_neue_eintraege(self):
-        """Die Art als festes Argument: an erster Stelle, bei ``nachVorlage`` an zweiter."""
+    def test_feldangaben_und_vorlagen(self):
+        """Die Art als festes Argument -- dazu die Vorlagen, die ein Ort nennt (`vorlage: '…'`)."""
         for muster, wurzel in ((r"(?<![.\w])feldangabe\(\s*'(\w+)'", "felder"),
-                               (r"(?<![.\w])ausVorlage\(\s*'(\w+)'", "neue_zeilen"),
-                               (r"(?<![.\w])nachVorlage\(\s*\w+,\s*'(\w+)'", None)):
+                               (r"(?<![.\w])ausVorlage\(\s*'(\w+)'", "vorlagen"),
+                               (r"\bvorlage: '(\w+)'", "vorlagen")):
             arten = {(pfad.name, m.group(1))
                      for pfad in (WURZEL / "web" / "js").glob("*.js")
                      for m in re.finditer(muster, pfad.read_text(encoding="utf-8"))}
             self.assertTrue(arten, muster)
             for datei, art in sorted(arten):
                 with self.subTest(datei=datei, art=art):
-                    self.nachschlagen([wurzel, art] if wurzel else [art])
+                    self.nachschlagen([wurzel, art])
+
+    def test_jede_liste_hat_ihre_vorlage(self):
+        """Ein neuer Eintrag nimmt die Vorlage seiner Liste (`nachVorlage`, apps.js)."""
+        from opencivil.projekt.aufbau import BAUTEILE
+        self.assertEqual(set(self.katalog["neu"]),
+                         {art.liste for art in BAUTEILE} | {"skripte"})
 
 
 if __name__ == "__main__":

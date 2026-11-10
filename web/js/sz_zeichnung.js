@@ -236,7 +236,7 @@ function legende(s, d) {
 export function setzungKarten(kennung) {
   const s = eintragVon(kennung);
   if (!s) return [];
-  const d = zustand.loesung?.setzungen?.[kennung];
+  const d = zustand.loesung?.zeichendaten?.[kennung];
   return [karte('Situation', [
     el('div.gb-bildhuelle', {}, [situationsbild(s, d)]),
     legende(s, d),

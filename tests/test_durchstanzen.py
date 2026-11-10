@@ -472,7 +472,7 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
 
     def test_katalog(self):
         k = katalog()
-        self.assertEqual(k["neue_durchstanzstelle"]["h"], 280.0)
+        self.assertEqual(k["neu"]["durchstanzstellen"]["h"], 280.0)
         self.assertEqual(k["felder"]["durchstanz"]["l_x"]["einheit"], "m")
         self.assertEqual([f["wert"] for f in k["durchstanzen"]["formen"]],
                          ["rechteck", "rund", "oval"])
@@ -503,7 +503,7 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
 
     def test_grundriss_in_mm(self):
         self.assertEqual(self.antwort.status, 200)
-        s = self.antwort.daten["durchstanzstellen"]["d1"]
+        s = self.antwort.daten["zeichendaten"]["d1"]
         self.assertEqual(len(s["raender"]), 1)
         rand = s["raender"][0]
         self.assertAlmostEqual(rand["punkt"][1], -250.0)

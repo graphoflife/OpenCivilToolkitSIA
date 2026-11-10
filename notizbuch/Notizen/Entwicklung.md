@@ -44,6 +44,40 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Eine Bauteilart: wo sie steht und dass sie überall steht
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 5. Für den Benutzer ändert
+sich nichts.
+
+Der Steckbrief einer Bauteilart versprach «nirgends sonst», tatsächlich
+stand sie an rund fünfzehn Stellen, und sieben schwiegen, wenn sie fehlte.
+Der Kern kennt Bericht und Oberfläche nicht; was die je Art brauchen,
+steht darum in ihren Schichten -- aber je an einer Stelle, und vollständig:
+
+- **Zeichendaten.** Statt eines Schlüssels je Art (`balkensysteme`,
+  `stabumrisse`, `grundbrueche`, `setzungen`, `durchstanzstellen`) liefert
+  die Antwort `zeichendaten[kennung]`, und `web/zeichendaten.py` sagt je
+  Art, wie sie entstehen -- auch, dass Platte und Analyse keine haben.
+  Fehlt eine Art, scheitert das Laden.
+- **Kennzahlen** für jedes Bauteil; welche es hat, sagt das Bauteil.
+- **Was über der Nachweistabelle steht** (`ANGABEN`) nennt jede Art,
+  das Balkensystem mit `None`; der Test prüft es, beim Laden geht es
+  wegen der Reihenfolge der Module nicht.
+- **Vorlagen des Katalogs.** Sie entstehen im selben Durchgang wie die
+  Feldangaben, je Klasse unter demselben Namen -- aus «einwirkung» wurde
+  «kombination», wie ihre Felder schon hiessen. Ein neuer Eintrag nimmt
+  die Vorlage seiner Liste (`katalog.neu`), die je Bauteilart von selbst
+  entsteht. Alle dreissig Vorlagen sind Zeichen für Zeichen dieselben.
+- **`objekte("…")`** meldet einen Namen, den keine Art trägt.
+- **In der Oberfläche** sind die Karten im Reiter «Diagramme» und die
+  Übersicht einer Art ohne Nachweise Felder ihrer Zeile in apps.js; fehlt
+  eines, scheitert das Laden. bericht.js kennt keine Art mehr selbst.
+- **Sinnbilder:** ein Test findet jedes Zeichen, das die Oberfläche nennt.
+
+`tests/test_bauteilarten.py` hält die Verzeichnisse beisammen.
+
+---
+
 ## 2026-11-10 · Dateien unter tausend Zeilen
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 11. Für den Benutzer

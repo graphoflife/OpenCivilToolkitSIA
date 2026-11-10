@@ -450,7 +450,7 @@ function diagrammKarte(kennung, system, zeile) {
  */
 export function systemKarten(kennung) {
   const system = eintragVon(kennung);
-  const uebersicht = zustand.loesung?.balkensysteme?.[kennung];
+  const uebersicht = zustand.loesung?.zeichendaten?.[kennung]?.uebersicht;
   if (uebersicht && !uebersicht.gueltig) {
     return [karte(null, (uebersicht.meldungen || []).filter((m) => m.fehler)
       .map((m) => el('p.hinweis.hinweis-warnung', { text: m.text })))];
@@ -490,7 +490,7 @@ function wertzelle(w, stellen) {
  * Grenzwerte, die Lagerkräfte. Das Panel darum baut bericht.js.
  */
 export function systemZusammenfassung(kennung) {
-  const u = zustand.loesung?.balkensysteme?.[kennung];
+  const u = zustand.loesung?.zeichendaten?.[kennung]?.uebersicht;
   if (!u?.gerechnet) return [karte(null, [leerzustand('Noch nicht gerechnet.')])];
   const meldungen = (u.meldungen || []).map((m) => el('p', {
     class: m.fehler ? 'hinweis hinweis-warnung' : 'hinweis', text: m.text,

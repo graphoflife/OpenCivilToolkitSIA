@@ -202,7 +202,7 @@ function legende(s) {
 
 /** Die Karte einer Durchstanzstelle im Reiter «Diagramme». Das Panel darum baut bericht.js. */
 export function durchstanzKarten(kennung) {
-  const s = zustand.loesung?.durchstanzstellen?.[kennung];
+  const s = zustand.loesung?.zeichendaten?.[kennung];
   if (!s) return [karte('Grundriss', [el('p.karte-hinweis', { text: 'Noch nicht gerechnet.' })])];
   return [karte('Grundriss', [el('div.gb-bildhuelle', {}, [grundrissBild(s)]), legende(s)],
     { klasse: 'ist-breit' })];

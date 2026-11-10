@@ -462,7 +462,7 @@ class TestZusammenfassung(unittest.TestCase):
     def test_ohne_kombination_kein_gleitkoerper(self):
         p = Projekt(name="Probe")
         p.grundbruch("F")
-        s = dienst.rechnen({"projekt": p.als_dict()})["grundbrueche"]["g1"]
+        s = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["g1"]
         self.assertEqual((s["umriss"], s["faelle"], s["H_gl"], s["massgebend"]),
                          ([], [], None, None))
 
@@ -472,7 +472,7 @@ class TestZusammenfassung(unittest.TestCase):
         g.kombination("Leicht", N_Ed=500.0, T_Ed=20.0)
         g.kombination("Schwer", N_Ed=3000.0, T_Ed=400.0)
         antwort = dienst.rechnen({"projekt": p.als_dict()})
-        s = antwort["grundbrueche"]["g1"]
+        s = antwort["zeichendaten"]["g1"]
         self.assertFalse(s["undrainiert"])
         self.assertTrue(s["grundwasser"].startswith("Lage 1"))
         self.assertAlmostEqual(s["umriss"][-1][0], s["L_gl"])

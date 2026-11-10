@@ -25,13 +25,7 @@ import { setzen, span } from './mathe.js';
 import { werkzeugleiste } from './kopierleiste.js';
 import { adresse, seiteVorhanden } from './notizbuch.js';
 import { kurveZeichnen } from './diagramm.js';
-import { plattenkarten } from './platte_bilder.js';
-import { analyseKarten } from './qa_diagramme.js';
-import { systemKarten, systemZusammenfassung } from './bs_diagramme.js';
-import { durchstanzKarten } from './ds_grundriss.js';
-import { situationKarten } from './gb_zeichnung.js';
-import { setzungKarten } from './sz_zeichnung.js';
-import { spannungskarten } from './spannungsbild.js';
+import { appVon } from './apps.js';
 import { ARTEN } from './arten.js';
 import { aendern, eintragVon, namensraum, zustand } from './zustand.js';
 
@@ -317,12 +311,6 @@ function abschnitte(bloecke) {
 }
 
 /**
- * Was eine Bauteilart ohne Nachweise in der Zusammenfassung zeigt -- je Art
- * (ARTEN, arten.js).
- */
-const UEBERSICHTEN = { balkensystem: systemZusammenfassung };
-
-/**
  * Die Zusammenfassung: je Bauteil eine Tabelle, in der Reihenfolge von ARTEN
  * -- wie im Bericht.
  *
@@ -404,7 +392,7 @@ function zusammenfassung(loesung, verfolgen) {
     ...panels,
     ...ohne.map(({ art, kennung, eintrag }) => panel({
       schluessel: `bericht/zusammenfassung/${kennung}`, titel: `Zusammenfassung – ${eintrag.name}`,
-    }, UEBERSICHTEN[art.art](kennung))),
+    }, appVon(art.art).uebersicht(kennung))),
     lueckenPanel(loesung),
   ]);
 }
@@ -511,24 +499,9 @@ function kennzahlenliste(kennung, loesung) {
 }
 
 /**
- * Die Karten je Bauteilart (ARTEN, arten.js). Die Diagramme der
- * Querschnittsanalysen und der Balkensysteme kommen aus eigenen Anfragen,
- * siehe qa_diagramme.js und bs_diagramme.js; die Spannung-Dehnung-Analysen
- * eines Querschnitts kommen mit der Rechnung.
- */
-const DIAGRAMME = {
-  querschnitt: plattenkarten,
-  querschnittsanalyse: (kennung, eintrag, loesung) => [
-    ...analyseKarten(kennung), ...spannungskarten(kennung, loesung)],
-  balkensystem: systemKarten,
-  durchstanzen: durchstanzKarten,
-  grundbruch: situationKarten,
-  setzung: setzungKarten,
-};
-
-/**
  * Was der Reiter «Diagramme» zeigt, in Gruppen: die Werkstoffgesetze und je
- * Bauteil seine Karten -- eingegrenzt wie die anderen Sichten.
+ * Bauteil seine Karten -- eingegrenzt wie die anderen Sichten. Welche Karten
+ * ein Bauteil hat, sagt die Zeile seiner Art (`karten`, apps.js).
  */
 function diagrammgruppen(loesung) {
   const raum = eingrenzung();
@@ -551,7 +524,7 @@ function diagrammgruppen(loesung) {
       if (imRaum(raum, eintrag.namensraum)) {
         gruppen.push({ schluessel: kennung, name: eintrag.name,
           titel: `Diagramme – ${eintrag.name}`,
-          karten: DIAGRAMME[art.art](kennung, eintrag, loesung) });
+          karten: appVon(art.art).karten(kennung, eintrag, loesung) });
       }
     }
   }

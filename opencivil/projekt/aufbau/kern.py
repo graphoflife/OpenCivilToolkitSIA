@@ -111,7 +111,15 @@ class Aufbau:
     # einem Woerterbuch je Art. Jetzt steht es nur im Bauteil.
 
     def objekte(self, art: str) -> Dict[str, Any]:
-        """Die gebauten Objekte einer Bauteilart nach Kennung -- ``art`` ist ihr Name."""
+        """
+        Die gebauten Objekte einer Bauteilart nach Kennung -- ``art`` ist ihr
+        Name. Einen Namen, den keine Art traegt, meldet sie, statt still ein
+        leeres Verzeichnis zu geben.
+        """
+        # Hier und nicht oben: die Steckbriefe bauen auf diesem Modul auf.
+        from opencivil.projekt.aufbau import BAUTEILE
+        if art not in {a.name for a in BAUTEILE}:
+            raise KeyError(f"Eine Bauteilart «{art}» gibt es nicht.")
         return {k: t.objekt for k, t in self.teile.items() if t.art.name == art}
 
     @property

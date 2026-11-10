@@ -1,5 +1,5 @@
 ---
-erzeugt: 4d56e714d2e4
+erzeugt: 20b701a35ece
 art: modul
 tags: [modul]
 ---
@@ -21,14 +21,6 @@ mit denselben L, B und demselben Punkt wie die Tabelle der Teilschichten.
 
 ## Inhalt
 
-### situationen
-
-```python
-def situationen(aufbau: Aufbau, loesung: Loesung) -> Dict[str, Any]
-```
-
-Je Fundament, nach Kennung, was die Zeichnung vom Kern braucht.
-
 ### situation
 
 ```python
@@ -47,4 +39,4 @@ Nachweis und keinen Befund -- dann zeichnet sie nur das Fundament.
 
 ## Gebraucht von
 
-- [[opencivil.web.api]]
+- [[opencivil.web.zeichendaten]]

@@ -91,28 +91,11 @@ Fachmodule; Oberfläche; Durchstanzen), jeder Punkt am Code nachgeprüft.
 Urteil: gutheissen mit Änderungen. Im Kern ist nichts verheddert, und die
 Schichten sind sauber. Vor der nächsten Bauteilart und vor dem nächsten
 Schritt beim Durchstanzen braucht es aber einen Umbau: drei Muster stehen
-schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3, 4, 6 und 7 am
-2026-11-10, ebenso 11 (siehe [[Entwicklung]]). Empfohlene Reihenfolge für
-den Rest: 5 vor der nächsten Bauteilart.
+schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 7 und 11 am
+2026-11-10 (siehe [[Entwicklung]]). Offen sind 8, 9, 10 und 12.
 
 **Im übrigen Repo, neu gefunden:**
 
-- [ ] **5. Eine Bauteilart ist an rund 15 Stellen verdrahtet, und sieben
-      schweigen, wenn eine fehlt.** Der Steckbrief verspricht «nirgends
-      sonst» (aufbau/__init__.py:118-121). Daneben stehen: `ANGABEN` nach
-      Namen (zusammenfassung.py:283), je Art ein Ergebnisschlüssel
-      (api.py:593-603), Kennzahlen nur für Platte und Analyse (api.py:612),
-      `objekte("…")` per Text (kern.py:113), die Vorlagen des Katalogs von
-      Hand (api.py:169-237; dieselbe Klasse heisst dort «einwirkung», in
-      `felder` «kombination»), dazu die Karten in bericht.js und die
-      Sinnbilder. Still bleiben: die Zeichendaten (leeres Bild), die
-      Kennzahlen, die Karten, das Sinnbild, `neue_<art>` (dann erscheint
-      «Katalog noch nicht geladen», sonst unerreichbar) und nackte Zeilen.
-      Besser: `angaben`, `zeichendaten` und `kennzahlen` als Felder am
-      Steckbrief, ein Schlüssel `zeichendaten[kennung]`, die Vorlagen im
-      selben Durchgang wie `felder`. Im JS werden die Karten Felder der
-      Zeilen von apps.js, sobald die Bilder der Platte aus diagramm.js und
-      bericht.js ausziehen (siehe 11).
 - [ ] **8. Der Lagennachweis steht viermal** (duktilitaet.py:132-331,
       mindestbewehrung.py:205-364 und 445-633, sproedes_versagen.py:80-202)
       mit eigener Lagenwahl, Stahl-Entdoppelung, Gradkennung und
@@ -628,6 +611,14 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 5: die Zeichendaten aller
+Bauteile unter einem Schlüssel, je Art an einer Stelle · Kennzahlen für
+jedes Bauteil · die Vorlagen des Katalogs im selben Durchgang wie die
+Feldangaben, unter denselben Namen, und je Liste die Vorlage eines neuen
+Eintrags · die Karten und die Übersicht einer Art als Felder ihrer Zeile in
+apps.js · ein Test, der jede Art in jedem Verzeichnis und jedes Sinnbild
+findet ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 11: der Nachweis in
 core/nachweis.py · die Prüfprojekte in projekt/beispiele.py · das Modell

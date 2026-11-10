@@ -341,6 +341,11 @@ class StabquerschnittEintrag(Beschreibung):
     eq: ModulEintrag = field(default_factory=ModulEintrag)
     """Wie das E_eq entsteht -- es gilt nur bei ``e_modul = "e_eq"``."""
 
+    @classmethod
+    def neu(cls) -> "StabquerschnittEintrag":
+        """Ein frischer Querschnitt, wie die Oberflaeche ihn anlegt: ein Rechteck mit seinen Vorgaben."""
+        return cls(masse=qs.RECHTECK.vorgaben())
+
     def stabvorlage(self) -> qs.Stabvorlage:
         return qs.vorlage(self.vorlage)
 

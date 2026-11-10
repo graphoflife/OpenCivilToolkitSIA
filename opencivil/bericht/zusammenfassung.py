@@ -245,11 +245,10 @@ def angaben(aufbau: "Aufbau", kennung: str, loesung: Loesung) -> Angaben:
     Probieren gefunden, ein Register nach dem anderen.
     """
     teil = aufbau.bauteil(kennung)
-    try:
-        je_art = ANGABEN[teil.art.name]
-    except KeyError:
-        raise KeyError(f"Fuer die Bauteilart '{teil.art.name}' steht in ANGABEN nicht, "
-                       f"was ueber ihrer Nachweistabelle steht.") from None
+    je_art = ANGABEN[teil.art.name]
+    if je_art is None:
+        raise ValueError(f"Die Bauteilart '{teil.art.name}' fuehrt keine Nachweise und hat "
+                         f"keine Nachweistabelle.")
     return je_art(teil, loesung)
 
 
@@ -278,12 +277,15 @@ def _setzungsangaben(teil, loesung: Loesung) -> Angaben:
             if befund is not None else None)
 
 
-#: Je Bauteilart mit Nachweisen, was ueber ihrer Tabelle steht -- nach dem
-#: Namen der Art. Ein Balkensystem hat keine Nachweise und keine Tabelle.
-ANGABEN: Dict[str, Callable[[Any, Loesung], Angaben]] = {
+#: Je Bauteilart, nach ihrem Namen, was ueber ihrer Tabelle steht. Ein
+#: Balkensystem hat keine Nachweise und keine Tabelle -- auch das steht hier
+#: (``None``). Dass jede Art hier steht, prueft tests/test_bauteilarten.py;
+#: beim Laden ginge es nicht, der Bericht laedt vor den Bauteilarten.
+ANGABEN: Dict[str, Optional[Callable[[Any, Loesung], Angaben]]] = {
     "platte": lambda teil, loesung: (plattenangaben(teil.objekt),
                                      bewehrungsuebersicht(teil.objekt, loesung.werte)),
     "querschnittsanalyse": lambda teil, loesung: teil.objekt.angaben(),
+    "balkensystem": None,
     "durchstanzen": _durchstanzangaben,
     "grundbruch": _grundbruchangaben,
     "setzung": _setzungsangaben,

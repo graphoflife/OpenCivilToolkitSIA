@@ -262,7 +262,7 @@ function materialienInhalt(system) {
   };
   const neu = (art) => aendern((s) => {
     s.stabmaterialien.push({
-      ...structuredClone(katalog('neue_zeilen', 'stabmaterial')),
+      ...structuredClone(katalog('vorlagen', 'stabmaterial')),
       kennung: naechsteKennung(s.stabmaterialien, 'M'), art,
       ...(art === 'beton' ? { beton: betone[0]?.kennung || '' }
         : { name: naechsterName('Material', s.stabmaterialien) }),
@@ -315,7 +315,7 @@ function kennwerte(system, q) {
  * Zeichen.
  */
 function umrissBild(system, q, breite, hoehe) {
-  const polygone = zustand.loesung?.stabumrisse?.[system.kennung]?.[q.kennung] || [];
+  const polygone = zustand.loesung?.zeichendaten?.[system.kennung]?.umrisse?.[q.kennung] || [];
   const svg = svgEl('svg', { viewBox: `0 0 ${breite} ${hoehe}`, width: breite, height: hoehe, class: 'bs-umriss', 'aria-hidden': 'true' });
   const punkte = polygone.flat();
   if (!punkte.length) {
@@ -366,7 +366,7 @@ function querschnittZeile(system, q, i) {
   const benutzt = system.linien.filter((l) => l.querschnitt === q.kennung).map((l) => l.kennung);
   // Ohne A und I sagt die Meldung des Kerns, was dem Querschnitt fehlt.
   const werte = kennwerte(system, q);
-  const fehler = (zustand.loesung?.balkensysteme?.[system.kennung]?.meldungen || [])
+  const fehler = (zustand.loesung?.zeichendaten?.[system.kennung]?.uebersicht?.meldungen || [])
     .find((m) => m.fehler && m.elemente.includes(q.kennung));
   const weg = () => {
     if (benutzt.length) {
@@ -518,7 +518,7 @@ function querschnitteInhalt(system) {
     const kennung = naechsteKennung(system.querschnitte, 'Q');
     eintragAendern(system.kennung, (s) => {
       s.querschnitte.push({
-        ...structuredClone(katalog('neue_zeilen', 'stabquerschnitt')),
+        ...structuredClone(katalog('vorlagen', 'stabquerschnitt')),
         kennung, name: naechsterName('Querschnitt', s.querschnitte),
       });
     });

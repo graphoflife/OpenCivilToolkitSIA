@@ -391,10 +391,10 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
 
     def test_auch_jede_neue_zeile(self):
         """Jede Vorlage ist ein gültiger Eintrag -- der Leser lässt sie, wie sie ist."""
-        zeilen = api.katalog()["neue_zeilen"]
-        for art, cls in (("einwirkung", KombinationEintrag), ("knickfall", KnickEintrag),
+        zeilen = api.katalog()["vorlagen"]
+        for art, cls in (("kombination", KombinationEintrag), ("knick", KnickEintrag),
                          ("gebrauchsfall", GebrauchsfallEintrag),
-                         ("analyse", SpannungsfallEintrag)):
+                         ("spannungsfall", SpannungsfallEintrag)):
             with self.subTest(art=art):
                 roh = {**zeilen[art], "name": "Neu"}
                 self.assertEqual(cls.aus_dict(roh).als_dict(), roh)
@@ -402,10 +402,10 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
                     "sorte": "C30/37", "name": "C30/37"}
         self.assertEqual(MaterialEintrag.aus_dict(material).als_dict(), material)
         for art, cls, pflicht in (
-                ("qa_lastfall", QALastfallEintrag, {"name": "Neu"}),
-                ("qa_analyse", QASpannungsfallEintrag, {"name": "Neu"}),
-                ("qa_gebrauchsfall", QAGebrauchsfallEintrag, {"name": "Neu"}),
-                ("qa_knickfall", QAKnickEintrag, {"name": "Neu"}),
+                ("qalastfall", QALastfallEintrag, {"name": "Neu"}),
+                ("qaspannungsfall", QASpannungsfallEintrag, {"name": "Neu"}),
+                ("qagebrauchsfall", QAGebrauchsfallEintrag, {"name": "Neu"}),
+                ("qaknick", QAKnickEintrag, {"name": "Neu"}),
                 ("knoten", KnotenEintrag, {}), ("flaeche", FlaecheEintrag, {}),
                 ("stab", StabEintrag, {}), ("stablinie", StablinieEintrag, {}),
                 ("schubwand", SchubwandEintrag, {}), ("hilfslinie", HilfslinieEintrag, {}),
@@ -415,7 +415,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
                 self.assertEqual(cls.aus_dict(roh).als_dict(), roh)
 
     def test_der_katalog_traegt_sie(self):
-        vorlage = api.katalog()["neue_platte"]
+        vorlage = api.katalog()["neu"]["querschnitte"]
         self.assertEqual(vorlage["h"], 300.0)
         # Alle vier: die y-Lagen liegen aussen und kosten x seine statische
         # Höhe -- sie leer zu lassen hiesse, mit einer Höhe zu rechnen, die es
@@ -434,16 +434,16 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         Platte und des gezeichneten Querschnitts. Bis dahin standen 30 kNm,
         ein Knickfall unter Druck und w = 2 mm da.
         """
-        zeilen = api.katalog()["neue_zeilen"]
-        for art in ("einwirkung", "gebrauchsfall", "knickfall", "verformungsfall", "analyse",
-                    "qa_lastfall", "qa_gebrauchsfall", "qa_knickfall", "qa_analyse"):
+        zeilen = api.katalog()["vorlagen"]
+        for art in ("kombination", "gebrauchsfall", "knick", "verformungsfall", "spannungsfall",
+                    "qalastfall", "qagebrauchsfall", "qaknick", "qaspannungsfall"):
             einwirkungen = {k: v for k, v in zeilen[art].items() if "_Ed" in k or k == "w"}
             with self.subTest(art=art):
                 self.assertTrue(einwirkungen)
                 self.assertEqual(set(einwirkungen.values()), {0.0})
 
     def test_ihre_nachweise_sind_ausgeschaltet(self):
-        vorlage = api.katalog()["neue_platte"]
+        vorlage = api.katalog()["neu"]["querschnitte"]
         for feld in ("duktilitaet", "sproede", "zwaengung_biegung", "zwaengung"):
             with self.subTest(feld=feld):
                 self.assertIs(vorlage[feld], False)
@@ -456,7 +456,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         """
         from opencivil.projekt import QuerschnittEintrag
 
-        vorlage = api.katalog()["neue_platte"]
+        vorlage = api.katalog()["neu"]["querschnitte"]
         leer = QuerschnittEintrag(kennung="x", name="x", beton="b").als_dict()
         for feld in ("duktilitaet", "sproede", "zwaengung_biegung", "zwaengung",
                      "haeufig", "quasistaendig", "automatik_modus",
@@ -467,7 +467,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
 
     def test_sie_laesst_sich_ohne_nacharbeit_rechnen(self):
         """Was die Oberfläche einfügt, muss der Kern auch wieder annehmen."""
-        vorlage = dict(api.katalog()["neue_platte"])
+        vorlage = dict(api.katalog()["neu"]["querschnitte"])
         vorlage.update(kennung="q9", name="Platte 9", beton="b1", stahl="s1")
 
         d = Projekt.beispiel().als_dict()

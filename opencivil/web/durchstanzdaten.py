@@ -68,11 +68,6 @@ def wahlen() -> Dict[str, Any]:
     }
 
 
-def situationen(aufbau: Aufbau, loesung: Loesung) -> Dict[str, Any]:
-    """Je Durchstanzstelle, nach Kennung, was die Zeichnung vom Kern braucht."""
-    return {kennung: situation(aufbau, kennung, loesung)
-            for kennung in aufbau.objekte("durchstanzen")}
-
 
 def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Dict[str, Any]]:
     """Was der Grundriss einer Stelle braucht -- ``None``, wenn ihr Nachweis nicht gelaufen ist."""

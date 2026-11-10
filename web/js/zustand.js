@@ -310,12 +310,13 @@ export function feldangabe(art, feld) {
 }
 
 /**
- * Eine neue Zeile nach der Vorlage des Kerns (`katalog.neue_zeilen`) -- mit
+ * Eine neue Zeile nach der Vorlage des Kerns (`katalog.vorlagen`, je Klasse
+ * von Einträgen unter demselben Namen wie ihre Feldangaben) -- mit
  * dem, was nur die Oberfläche weiss: Name, Kennung. Eine Kopie, nicht die
  * Vorlage selbst: sonst teilten sich zwei Materialien dieselben Abweichungen.
  */
 export function ausVorlage(art, felder) {
-  return { ...structuredClone(katalog('neue_zeilen', art)), ...felder };
+  return { ...structuredClone(katalog('vorlagen', art)), ...felder };
 }
 
 /**

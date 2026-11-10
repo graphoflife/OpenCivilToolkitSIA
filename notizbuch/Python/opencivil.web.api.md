@@ -1,5 +1,5 @@
 ---
-erzeugt: 891feb2fe324
+erzeugt: f582cadb79d1
 art: modul
 tags: [modul]
 ---
@@ -29,16 +29,26 @@ def _rechenarten(arten) -> list
 
 Die Rechenarten mit Beschriftung -- und ob die Kriechzahl bei ihnen wirkt.
 
-### _felder
+### _vorlage
 
 ```python
-def _felder() -> Dict[str, Dict[str, Dict[str, Any]]]
+def _vorlage(cls: type) -> Dict[str, Any]
 ```
 
-Die Feldangaben jeder Klasse von Eintraegen unter dem Projekt
-([[opencivil.projekt.lesen#feldangaben|feldangaben]]), unter ihrem Namen ohne
-«Eintrag», klein: `grundbruch`, `schicht`, `stabmaterial`. Bis
-2026-10-25 standen elf von 49 Klassen von Hand da.
+Wie ein frischer Eintrag dieser Klasse aussieht: ueber `neu`, wo die
+Klasse eines hat -- eine Platte mit ihren Lagen, ein Grundbruch mit
+einer Kombination --, sonst mit ihren Vorgaben. Was keine Vorgabe hat,
+sind Kennung, Name und Verweise: leer, die Oberflaeche setzt sie.
+
+### _klassen
+
+```python
+def _klassen() -> Dict[str, type]
+```
+
+Jede Klasse von Eintraegen unter dem Projekt, unter ihrem Namen ohne
+«Eintrag», klein: `grundbruch`, `schicht`, `kombination` -- so
+heissen ihre Feldangaben und ihre Vorlage im Katalog.
 
 ### katalog
 
@@ -188,12 +198,10 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
-- [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
-- [[opencivil.web.grundbruchdaten]]
-- [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.umschlag]]
+- [[opencivil.web.zeichendaten]]
 
 ## Gebraucht von
 

@@ -44,7 +44,7 @@ const EINSTELLUNG = {
 
 /** Was der Kern zuletzt zu dieser Stelle gerechnet hat -- oder null. */
 function situationVon(kennung) {
-  return zustand.loesung?.durchstanzstellen?.[kennung] || null;
+  return zustand.loesung?.zeichendaten?.[kennung] || null;
 }
 
 /** Das Zeichenfenster einer Stelle, samt einer Zeile darunter. Die Tafel ruft das bei jedem Neubau. */

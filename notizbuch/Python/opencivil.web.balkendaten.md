@@ -1,5 +1,5 @@
 ---
-erzeugt: b2ada2807c8d
+erzeugt: 1123d934cb08
 art: modul
 tags: [modul]
 ---
@@ -77,5 +77,5 @@ Ein Querschnitt, der nicht geht, hat keinen.
 
 ## Gebraucht von
 
-- [[opencivil.web.api]]
 - [[opencivil.web.dienst]]
+- [[opencivil.web.zeichendaten]]
