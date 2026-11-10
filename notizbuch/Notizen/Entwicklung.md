@@ -44,6 +44,22 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-10 · Aufgeräumt: Totes und doppelt Gefangenes
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 12, erster Teil. Für den
+Benutzer ändert sich nichts.
+
+- **Tot oder nur geschrieben, jetzt weg:** `Rechenwerk.erzeuger`,
+  `Protokoll.warnungen`, `Knickergebnis.halbierungen` und `.durchlaeufe`,
+  `Baustoff.eingabewerte`; im JS `rechnetImBrowser` und der Haken
+  `anhangVorschau`, den kein Zeichenfenster anbot; im Stilblatt die Regeln
+  des alten Lastblocks im Balkensystem, `.marke-gut`/`-schlecht`,
+  `.abstand-oben` und die y-Marke der Duktilitätszeile, die nur x kennt.
+  `Durchstanzbefund.rotationen` bleibt: ein Test prüft die Rotation daran.
+- **Der Dienst fängt nicht doppelt.** Vier Anfragen fingen einen
+  `ProjektFehler` und warfen ihn als 400 weiter -- genau das tut
+  `bearbeite` für alle. Jetzt steht es dort, mit einem Satz dazu.
+
 ## 2026-11-10 · Die Anzeige: Einheiten an einer Stelle, Legenden aus dem Kern
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 10.

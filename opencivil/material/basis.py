@@ -184,8 +184,6 @@ class Baustoff:
 
     definitionen: Dict[str, WertDef] = field(default_factory=dict)
     berechnungen: List[Berechnung] = field(default_factory=list)
-    eingabewerte: Dict[str, Groesse] = field(default_factory=dict)
-    """Zahlenwerte aus der Sortenvorlage, nach Kurzname."""
 
     def id_von(self, kurzname: str) -> str:
         """Globale Wert-ID zu einem Kurznamen, z.B. ``f_cd`` -> ``beton.C30_37.f_cd``."""
@@ -270,7 +268,6 @@ def erzeuge(
     namensraum = praefix or f"{art.value}.{kennung_aus(sorte or name)}"
     definitionen = {v.kurzname: v.definition(namensraum, symbol_index) for v in vorlagen}
     berechnungen: List[Berechnung] = []
-    eingabewerte: Dict[str, Groesse] = {}
     abschnitt = Abschnitt(f"{art.beschriftung}: {name}", namensraum,
                           thema=art.beschriftung)
 
@@ -307,7 +304,6 @@ def erzeuge(
                 f"Fuer '{name}' fehlt der Zahlenwert des Kennwerts "
                 f"'{vorlage.kurzname}'."
             )
-        eingabewerte[vorlage.kurzname] = groesse
         berechnungen.append(
             Vorgabe(
                 id=bid,
@@ -327,5 +323,4 @@ def erzeuge(
         symbol_index=symbol_index,
         definitionen=definitionen,
         berechnungen=berechnungen,
-        eingabewerte=eingabewerte,
     )

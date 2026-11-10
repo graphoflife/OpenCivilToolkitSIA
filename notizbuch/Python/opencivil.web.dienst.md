@@ -1,5 +1,5 @@
 ---
-erzeugt: b5aabd907c2d
+erzeugt: 2d5a72cb3870
 art: modul
 tags: [modul]
 ---
@@ -348,7 +348,9 @@ Fuehrt eine Anfrage aus. Wirft nicht -- Fehler kommen als Antwort zurueck.
 
 Dass auch der Fehlerfall eine gewoehnliche Antwort ist, haelt die beiden
 Huellen duenn: keine muss sich ueberlegen, welche Ausnahme welchen Status
-verdient.
+verdient. Ein [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] -- ein unbekanntes Bauteil, ein
+falscher Eintrag -- wird hier zur 400; die Anfragen fangen ihn darum
+nicht selbst (bis 2026-11-10 taten es vier, mit derselben Folge).
 
 ### bearbeite_json
 

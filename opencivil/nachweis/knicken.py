@@ -239,7 +239,6 @@ class Knickergebnis(Fallausgang):
     chi: float = 0.0
     N_int: float = 0.0
     M_int: float = 0.0
-    durchlaeufe: int = 0
     stabil: bool = False
     M_Rd: float = 0.0
     """Momentenwiderstand bei dieser Normalkraft, in Nm."""
@@ -260,7 +259,6 @@ class Knickergebnis(Fallausgang):
     schritte: List[Durchlauf] = field(default_factory=list)
     """Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile."""
 
-    halbierungen: int = 0
     ausgang: Ausgang = NICHT_FUEHRBAR
     """|N_Ed| gegen N_Rd -- ohne Druck gibt es nichts zu begrenzen."""
 
@@ -356,7 +354,6 @@ class Knickverfahren(Nachweis):
 
         bei_N_Ed = self._gleichgewicht(stab, abs(N_Ed), erg, l_cr)
         erg.schritte = bei_N_Ed.schritte
-        erg.durchlaeufe = len(bei_N_Ed.schritte)
         erg.stabil = bei_N_Ed.stabil
         erg.e_2d = bei_N_Ed.e_2d
         erg.M_ges = bei_N_Ed.M_ges
@@ -464,13 +461,11 @@ class Knickverfahren(Nachweis):
                 unten, oben = oben, oben * 2.0
             if oben > N_Ed * OBERGRENZE:
                 # So weit ueber der Last, dass die Zahl nichts mehr aussagt.
-                erg.halbierungen = 0
                 return unten
         else:
             unten, oben = 0.0, N_Ed
 
-        for schritt in range(1, HALBIERUNGEN + 1):
-            erg.halbierungen = schritt
+        for _ in range(HALBIERUNGEN):
             mitte = 0.5 * (unten + oben)
             if traegt_bei(mitte):
                 unten = mitte

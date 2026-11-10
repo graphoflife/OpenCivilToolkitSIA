@@ -426,13 +426,6 @@ class Protokoll:
     def gleichungen(self) -> List[GleichungBlock]:
         return [b for b in self.alle_bloecke() if isinstance(b, GleichungBlock)]
 
-    def warnungen(self) -> List[HinweisBlock]:
-        return [
-            b
-            for b in self.alle_bloecke()
-            if isinstance(b, HinweisBlock) and b.art is HinweisArt.WARNUNG
-        ]
-
     def __len__(self) -> int:
         return len(self.bloecke)
 

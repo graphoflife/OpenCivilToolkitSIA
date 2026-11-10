@@ -1,5 +1,5 @@
 ---
-erzeugt: 8be8fdba137b
+erzeugt: f872e4a39991
 art: modul
 tags: [modul]
 ---
@@ -200,13 +200,11 @@ Alle Zwischenwerte eines Knickfalls.
 - `chi: float = 0.0`
 - `N_int: float = 0.0`
 - `M_int: float = 0.0`
-- `durchlaeufe: int = 0`
 - `stabil: bool = False`
 - `M_Rd: float = 0.0` – Momentenwiderstand bei dieser Normalkraft, in Nm.
 - `N_Rd: float = 0.0` – Groesste Druckkraft mit Gleichgewicht, als Betrag in N.
 - `M_bei_N_Rd: float = 0.0` – Das Moment am verformten System bei `N_Rd`, in Nm. Dort liegt der Stab an seiner Grenze, also ist es zugleich sein Momentenwiderstand bei dieser Normalkraft -- der Punkt sitzt damit auf der Interaktionslinie. Im M-N-Diagramm ist das der Widerstandspunkt des Knicknachweises.
 - `schritte: List[Durchlauf] = field(default_factory=list)` – Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile.
-- `halbierungen: int = 0`
 - `ausgang: Ausgang = NICHT_FUEHRBAR` – \|N_Ed\| gegen N_Rd -- ohne Druck gibt es nichts zu begrenzen.
 - `begruendung: str = ''`
 - `hinweis: str = ''`

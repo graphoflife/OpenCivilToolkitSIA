@@ -116,11 +116,6 @@ function ruf(name, rumpf) {
   return kern.ruf(name, rumpf);
 }
 
-/** Ob gerade im Browser gerechnet wird (statt auf einem Server). */
-export function rechnetImBrowser() {
-  return kern?.art === 'pyodide';
-}
-
 export const api = {
   katalog: () => ruf('katalog', {}),
   /** Das Beispielprojekt -- der Start, wenn nichts abgelegt ist. */

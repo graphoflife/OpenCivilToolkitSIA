@@ -404,12 +404,7 @@ def geometrie(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Schnell genug fuer jede Aenderung: gerechnet wird nur Geometrie.
     """
     projekt = _projekt(rumpf)
-    kennung = str(rumpf.get("kennung") or "")
-    try:
-        eintrag = projekt.querschnittsanalyse(kennung)
-    except ProjektFehler as fehler:
-        raise DienstFehler(400, str(fehler)) from None
-    return api.geometrie(eintrag, projekt)
+    return api.geometrie(projekt.querschnittsanalyse(str(rumpf.get("kennung") or "")), projekt)
 
 
 def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -428,10 +423,7 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     projekt = _projekt(rumpf)
     kennung = str(rumpf.get("kennung") or "")
-    try:
-        projekt.querschnittsanalyse(kennung)
-    except ProjektFehler as fehler:
-        raise DienstFehler(400, str(fehler)) from None
+    projekt.querschnittsanalyse(kennung)   # ob es sie gibt
     # Wo das Interaktionsdiagramm schneidet: welche Groesse fest ist und mit
     # welchem Wert, in kN bzw. kNm. Ohne Angabe bei M_z = 0.
     wahl = rumpf.get("schnitt") or {}
@@ -457,10 +449,7 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
 def _balkensystem(projekt: Projekt, rumpf: Mapping[str, Any]) -> BalkensystemEintrag:
     kennung = str(rumpf.get("kennung") or "")
-    try:
-        eintrag = projekt.bauteil(kennung)
-    except ProjektFehler as fehler:
-        raise DienstFehler(400, str(fehler)) from None
+    eintrag = projekt.bauteil(kennung)
     if not isinstance(eintrag, BalkensystemEintrag):
         raise DienstFehler(400, f"'{kennung}' ist kein Balkensystem.")
     return eintrag
@@ -579,11 +568,7 @@ def vorlage_einsetzen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     kann.
     """
     projekt = _projekt(rumpf)
-    kennung = str(rumpf.get("kennung") or "")
-    try:
-        eintrag = projekt.querschnittsanalyse(kennung)
-    except ProjektFehler as fehler:
-        raise DienstFehler(400, str(fehler)) from None
+    eintrag = projekt.querschnittsanalyse(str(rumpf.get("kennung") or ""))
     ursprung = rumpf.get("ursprung") or [0.0, 0.0]
     try:
         ursprung = (float(ursprung[0]), float(ursprung[1]))
@@ -631,7 +616,9 @@ def bearbeite(name: str, rumpf: Mapping[str, Any] | None = None) -> Antwort:
 
     Dass auch der Fehlerfall eine gewoehnliche Antwort ist, haelt die beiden
     Huellen duenn: keine muss sich ueberlegen, welche Ausnahme welchen Status
-    verdient.
+    verdient. Ein :class:`ProjektFehler` -- ein unbekanntes Bauteil, ein
+    falscher Eintrag -- wird hier zur 400; die Anfragen fangen ihn darum
+    nicht selbst (bis 2026-11-10 taten es vier, mit derselben Folge).
     """
     funktion = ANFRAGEN.get(name)
     if funktion is None:

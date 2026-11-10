@@ -377,10 +377,6 @@ class Rechenwerk:
     def definition(self, wert_id: str) -> Optional[WertDef]:
         return self._definitionen.get(wert_id)
 
-    def erzeuger(self, wert_id: str) -> Tuple[Berechnung, ...]:
-        """Alle Berechnungen, die diesen Wert liefern koennen (Varianten)."""
-        return tuple(self._nach_ausgabe.get(wert_id, ()))
-
     def moegliche_ziele(self) -> Tuple[str, ...]:
         """
         Alle Werte, die ueberhaupt berechenbar waeren -- und die Berechnungen

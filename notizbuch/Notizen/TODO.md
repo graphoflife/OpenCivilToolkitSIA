@@ -101,14 +101,11 @@ schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 11 am
       den Abschnitten: Ändern und Rückgängig, Befehle, Zeichnen,
       schwebendes Fenster mit Knöpfen, Bedienen, Aufbau.
 - [ ] **12. Kleineres:** `Stahlgesetz.nur_zug` ist ein Typ im Kleid eines
-      Schalters (werkstoffgesetz.py:380-446) · der Dienst fängt vier Mal,
-      was `bearbeite` schon fängt (dienst.py:402-451) · `materialien()` und
+      Schalters (werkstoffgesetz.py:380-446) · `materialien()` und
       `bezuege()` sind ungeschriebene Verträge, sieben Rechenobjekte bauen
-      `id_von`/`ins_rechenwerk` von Hand · tot oder nur geschrieben:
-      `Rechenwerk.erzeuger`, `Protokoll.warnungen`, `Knickergebnis.halbierungen`
-      und `.durchlaeufe`, `Baustoff.eingabewerte`,
-      `Durchstanzbefund.rotationen`, `rechnetImBrowser`, `anhangVorschau`,
-      CSS `.bs-lastblock` und Co.
+      `id_von`/`ins_rechenwerk` von Hand. (Das Tote und die doppelten
+      Fänge im Dienst sind am 2026-11-10 weg. `Durchstanzbefund.rotationen`
+      bleibt: ein Test prüft die Rotation daran.)
 
 **Stand der früheren Befunde:** fast alle offen. Teilweise behoben: die
 Grenze x/d kommt aus dem Katalog (nachweise.js), editor.js nennt keine
@@ -184,8 +181,7 @@ liess, ist behoben (siehe [[Entwicklung]]). Liegen blieb:
 - [ ] **Der Rand des Gleichgewichts wird viermal von Hand halbiert**
       (`linie._grenze`, N_Rd beim Knicken, `gebrauchsebene._rand`,
       `Faserloeser._rand`), mit vier Abbruchregeln; `core/suche.py` kennt
-      diese Suchform nicht. `Knickergebnis.halbierungen` wird geschrieben,
-      aber nie gelesen.
+      diese Suchform nicht.
 - [ ] **Teilung oder Stabzahl** steht als `art`/`abstand`/`anzahl` und als
       `art_y`/`abstand_y`/`anzahl_y` da; die Rechenobjekte wandeln es zurück
       in «eine Zahl ist None». Besser ein gemeinsamer Eintrag für beide.
@@ -592,6 +588,10 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-09, Punkt 12 zum Teil: Totes und
+nur Geschriebenes weg, im Kern, im JS und im Stilblatt · der Dienst fängt
+nicht mehr, was `bearbeite` schon fängt ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 10: die Einheiten der
 Anzeige an einer Stelle (`web/anzeige.py`), mit den Einheiten des Kerns

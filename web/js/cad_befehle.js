@@ -103,10 +103,8 @@ export function anhangBefehl(werkzeug) {
         neu = a.adapter.anhangAnlegen(a, z, erg, werkzeug);
       }, { auswahl: () => (neu ? [neu] : [...a.auswahl]) });
     },
-    vorschau(a, g) {
-      const f = a.zeiger?.fang;
-      if (f) a.adapter.anhangVorschau?.(a, g, f, werkzeug);
-    },
+    // Ohne Vorschau: was der Klick anhängt, zeigt erst die Zeichnung danach.
+    vorschau: () => {},
     enter: () => false,
     zurueck: () => false,
   };

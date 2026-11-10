@@ -1,5 +1,5 @@
 ---
-erzeugt: d5d99007396c
+erzeugt: 64fb5f243da8
 art: modul
 tags: [modul]
 ---
@@ -340,12 +340,6 @@ davor (und jeder Titel ohne Namensraum) gehoert zum laufenden.
 
 ```python
 def gleichungen(self) -> List[GleichungBlock]
-```
-
-#### Protokoll.warnungen
-
-```python
-def warnungen(self) -> List[HinweisBlock]
 ```
 
 ### codestelle_aus

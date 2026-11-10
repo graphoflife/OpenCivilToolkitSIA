@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ff87f7151e5
+erzeugt: 5cd9b0b410e0
 art: modul
 tags: [modul]
 ---
@@ -317,14 +317,6 @@ def vorgegebene_werte(self) -> Mapping[str, Wert]
 ```python
 def definition(self, wert_id: str) -> Optional[WertDef]
 ```
-
-#### Rechenwerk.erzeuger
-
-```python
-def erzeuger(self, wert_id: str) -> Tuple[Berechnung, ...]
-```
-
-Alle Berechnungen, die diesen Wert liefern koennen (Varianten).
 
 #### Rechenwerk.moegliche_ziele
 

@@ -660,9 +660,6 @@ dialog.materialwahl .fenster-kopf { top: 0; }
   border-radius: 4px; padding: 1px 0;
   background: var(--richtung-x-hell); color: var(--richtung-x-tief);
 }
-.duktilitaetszeile .richtung.lage-y {
-  background: var(--richtung-y-hell); color: var(--richtung-y-tief);
-}
 /* Ja|Nein: grüner Haken, rotes Kreuz. Beide Hälften gleich breit und die
    Zeichen mittig: ✓ und ✗ sind verschieden breit, und bei symmetrischem
    Innenabstand stand der Schalter dadurch schief. */
@@ -1039,8 +1036,6 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .nachweis-tabelle td.grad { font-weight: 700; font-size: 13.5px; }
 .nachweis-tabelle .ist-gut      td.grad { background: var(--gut-hell);      color: var(--gut); }
 .nachweis-tabelle .ist-schlecht td.grad { background: var(--schlecht-hell); color: var(--schlecht); }
-.marke-gut      { color: var(--gut); font-weight: 600; font-size: 12.5px; }
-.marke-schlecht { color: var(--schlecht); font-weight: 700; font-size: 12.5px; }
 
 .luecke { padding: 9px 12px; margin-bottom: 6px; border-radius: var(--radius);
           border: 1px solid var(--warn); border-left-width: 4px; background: var(--warn-hell); }
@@ -1080,7 +1075,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .katex-display { margin: 0; }
 
 .reihe { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.abstand-oben { margin-top: 14px; }
 
 /* ------------------------------------------------------------ Ladeschirm -- */
 /* Liegt über allem, bis der Rechenkern antwortet. Pyodide bringt beim ersten
@@ -2051,19 +2045,9 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-unbestimmt-text { font-size: 12px; font-weight: 700; fill: var(--warn); }
 .bs-beweglich { fill: var(--schlecht); fill-opacity: .15; stroke: var(--schlecht); stroke-width: 1.6; }
 
-/* Im schwebenden Fenster: je Last ein Block, darunter die Knöpfe für neue. */
-.bs-lastblock {
-  display: flex; flex-direction: column; gap: 3px; padding: 4px 0 6px;
-  border-bottom: 1px dashed var(--rand);
-}
-.bs-lastkopf { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 600; }
-.bs-lastzeile { display: flex; align-items: center; gap: 4px; }
-.bs-lastzeile .cad-zeile { flex: 1; min-width: 0; }
-.bs-neue-lasten { display: flex; flex-wrap: wrap; gap: 4px; }
 /* Die Wahl des Lastfalls in der Leiste, gleich neben «Last». */
 .bs-lastfallwahl { align-self: center; }
 .bs-lastfallwahl select { max-width: 11em; font-size: 12px; padding: 2px 4px; }
-.bs-neue-lasten .knopf { padding: 2px 6px; font-size: 11.5px; }
 
 /* Unter der Zeichnung: je Linie, Lager und Last eine Zeile; ein Klick
    wählt. Jede Gruppe klappt auf und zu, zu Beginn zu. */
