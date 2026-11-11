@@ -44,6 +44,16 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-11 · Die Vorgängerfassung aus dem Repo
+
+`_Old by Gemini/`, der alte Prototyp (32 Dateien), ist weg, auf Wunsch des
+Benutzers. Nichts im Werkzeug brauchte ihn, aber er war das Einzige im Repo
+mit fremden Paketen (FastAPI, Uvicorn, Pydantic, SymPy) -- wer fragte, ob
+das Repo für sich steht, musste ihn ausnehmen. Seine Dateien stehen noch in
+der git-Geschichte, zuletzt im Commit `673dc33`; dort liegt auch die alte
+Wunschliste `TODOs.txt` des Benutzers. Den Vergleich mit damals führt das
+README weiter.
+
 ## 2026-11-10 · Verträge, die in einer Klasse stehen
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 12, zweiter Teil. Für den

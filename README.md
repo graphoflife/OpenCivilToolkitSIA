@@ -786,8 +786,10 @@ Massstab ab:
 
 ## Verhältnis zur Vorgängerfassung
 
-`_Old by Gemini/` bleibt als Referenz liegen. Neu gegenüber damals:
+Sie lag bis 2026-11-11 unter `_Old by Gemini/` im Repo; seither steht sie nur
+noch in der git-Geschichte, zuletzt im Commit `673dc33`. Neu gegenüber damals:
 
+* Kein Fremdpaket (dort: FastAPI, Uvicorn, Pydantic, SymPy)
 * Einheitensystem statt Einheiten als Zierde (dort: `/1e6`-Faktoren von Hand)
 * Formel einmal statt bis zu dreimal (dort: `calc_fn`, `sympy_expr`,
   `formula_template` nebeneinander, ungeprüft)
