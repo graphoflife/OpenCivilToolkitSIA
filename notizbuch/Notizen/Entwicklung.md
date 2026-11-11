@@ -51,8 +51,8 @@ Benutzers. Nichts im Werkzeug brauchte ihn, aber er war das Einzige im Repo
 mit fremden Paketen (FastAPI, Uvicorn, Pydantic, SymPy) -- wer fragte, ob
 das Repo für sich steht, musste ihn ausnehmen. Seine Dateien stehen noch in
 der git-Geschichte, zuletzt im Commit `673dc33`; dort liegt auch die alte
-Wunschliste `TODOs.txt` des Benutzers. Den Vergleich mit damals führt das
-README weiter.
+Wunschliste `TODOs.txt` des Benutzers. In die TODO-Notiz kommt sie nicht
+(Benutzer, 2026-11-11). Den Vergleich mit damals führt das README weiter.
 
 ## 2026-11-10 · Verträge, die in einer Klasse stehen
 
