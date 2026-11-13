@@ -1,5 +1,5 @@
 ---
-erzeugt: e5b830588a95
+erzeugt: 9354989b7e96
 art: modul
 tags: [modul]
 ---
@@ -13,8 +13,9 @@ Aus dem Befund einer Decke die Daten ihrer Bilder, in m: wie die Last auf
 die zwei Richtungen geht -- je Zelle der automatischen Aufteilung, je
 Platte bei fester, und in den Zonen --, wo die Grenzen der Streifen
 verlaufen, die Flaechen der Unterzuege und die Stuetzenbereiche, dazu die
-Meldungen. Was in eine Rechnung eingeht, rechnet hier niemand; geschnitten
-wird nur fuers Bild.
+Meldungen -- die der Decke und je Lastfall und Kombination die eigenen,
+samt Last und Lagerkraft. Was in eine Rechnung eingeht, rechnet hier
+niemand; geschnitten wird nur fuers Bild.
 
 ## Inhalt
 
@@ -35,8 +36,11 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]
 `gerechnet` und `meldungen` (`{text, elemente, fehler}`) immer;
 wenn die Decke in Streifen zerfiel, dazu `richtungen`, `anteile`
 (Vieleck und Anteil in Richtung 1, in %), `grenzen` (je Grenze
-zweier Streifen eine Strecke), `unterzuege` und `stuetzenbereiche`.
-Die Zonen zeichnet die Oberflaeche nach dem Projekt.
+zweier Streifen eine Strecke), `unterzuege`, `stuetzenbereiche` und
+`faelle`: je Lastfall und Kombination `name`, die Last `summe`,
+was davon `daneben` liegt und `nicht_getragen` wird, und was die
+`lager` tragen, in kN -- und seine `meldungen`. Die Zonen und
+Lasten zeichnet die Oberflaeche nach dem Projekt.
 
 ### _anteile
 
@@ -68,6 +72,7 @@ in der Platte -- in einem L zwei, wo die Grenze die Ecke quert.
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.werk]]
 - [[opencivil.projekt]]
+- [[opencivil.stabwerk.system]]
 
 ## Gebraucht von
 

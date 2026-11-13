@@ -1,5 +1,5 @@
 ---
-erzeugt: 2bc15f6966da
+erzeugt: 6aff6574049f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -106,6 +106,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
       - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
       - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
+      - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
       - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
       - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
       - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
@@ -116,6 +117,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.decke]] – eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
+    - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
     - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.

@@ -53,6 +53,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.wahl import Wahl
 from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
+from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
@@ -156,10 +157,6 @@ LAGERARTEN = {
 
 #: Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.
 Ort = Union[str, Sequence[float]]
-
-
-def _kennung_von(eintrag: Any) -> str:
-    return eintrag if isinstance(eintrag, str) else eintrag.kennung
 
 
 # ===========================================================================
@@ -380,28 +377,6 @@ class StabquerschnittEintrag(Beschreibung):
 
 
 @dataclass
-class LastfallEintrag(Beschreibung):
-    """Ein Lastfall des Systems: eine Kennung, auf die die Lasten zeigen, und ein Name."""
-
-    kennung: str = ""
-    name: str = ""
-    eigengewicht: bool = False
-    """
-    Ob der Lastfall das Eigengewicht aller Staebe bekommt -- von selbst, aus
-    Dichte und Flaeche (Benutzer, 2026-10-23). Ein System hat einen davon.
-    """
-
-
-@dataclass
-class LastkombinationEintrag(Beschreibung):
-    """Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand."""
-
-    kennung: str = ""
-    name: str = ""
-    faktoren: Dict[str, float] = field(default_factory=dict)
-
-
-@dataclass
 class StatikdiagrammEintrag(Beschreibung):
     """
     Ein Diagramm der Statik-Analyse (Benutzer, 2026-10-23): ein Fall und was
@@ -421,7 +396,7 @@ class StatikdiagrammEintrag(Beschreibung):
 
 
 @dataclass
-class BalkensystemEintrag(BauteilEintrag):
+class BalkensystemEintrag(MitFaellen, BauteilEintrag):
     """
     Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen.
 
@@ -521,8 +496,8 @@ class BalkensystemEintrag(BauteilEintrag):
         eintrag = SystemlinieEintrag.aus_dict({
             "kennung": self._neue_kennung(self.linien, "L"),
             "von": self._knoten(netz, von), "bis": self._knoten(netz, bis),
-            "querschnitt": _kennung_von(querschnitt) if querschnitt is not None else "",
-            "material": _kennung_von(material) if material is not None else "", **felder},
+            "querschnitt": kennung_von(querschnitt) if querschnitt is not None else "",
+            "material": kennung_von(material) if material is not None else "", **felder},
             f"Balkensystem '{self.name}', linien")
         self.linien.append(eintrag)
         return eintrag
@@ -545,7 +520,7 @@ class BalkensystemEintrag(BauteilEintrag):
         Das Material des Systems aus einem Beton des Projekts (Eintrag oder
         Kennung) -- das schon da ist, sonst ein neues.
         """
-        kennung = _kennung_von(beton)
+        kennung = kennung_von(beton)
         for m in self.stabmaterialien:
             if m.art == "beton" and m.beton == kennung:
                 return m
@@ -586,7 +561,7 @@ class BalkensystemEintrag(BauteilEintrag):
             raise ProjektFehler(f"Ein Querschnitt kommt aus einer «platte» oder einer «analyse», "
                                 f"nicht aus «{art}».")
         eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
-                                         name=name, art=art, bezug=_kennung_von(bezug))
+                                         name=name, art=art, bezug=kennung_von(bezug))
         if E_eq is not None:
             eintrag.e_modul = "e_eq"
             eintrag.eq = ModulEintrag.aus_dict(dict(E_eq), f"Querschnitt '{name}', E_eq")
@@ -601,24 +576,10 @@ class BalkensystemEintrag(BauteilEintrag):
         self.querschnitte.append(eintrag)
         return eintrag
 
-    def lastfall(self, name: str, *, eigengewicht: bool = False) -> LastfallEintrag:
-        eintrag = LastfallEintrag(kennung=self._neue_kennung(self.lastfaelle, "LF"), name=name,
-                                  eigengewicht=eigengewicht)
-        self.lastfaelle.append(eintrag)
-        return eintrag
-
-    def kombination(self, name: str, *faktoren: Tuple[Any, float]) -> LastkombinationEintrag:
-        """Eine Kombination -- je Lastfall (Eintrag oder Kennung) ein Beiwert: ``(g, 1.35), (w, 1.5)``."""
-        eintrag = LastkombinationEintrag(
-            kennung=self._neue_kennung(self.kombinationen, "LK"), name=name,
-            faktoren={_kennung_von(lf): float(beiwert) for lf, beiwert in faktoren})
-        self.kombinationen.append(eintrag)
-        return eintrag
-
     def diagramm(self, fall: Any, groesse: str = "M") -> StatikdiagrammEintrag:
         """Ein Diagramm der Statik-Analyse -- ``fall`` ein Lastfall oder eine Kombination."""
         eintrag = StatikdiagrammEintrag.aus_dict(
-            {"fall": _kennung_von(fall), "groesse": groesse},
+            {"fall": kennung_von(fall), "groesse": groesse},
             f"Balkensystem '{self.name}', diagramme")
         self.diagramme.append(eintrag)
         return eintrag
@@ -627,17 +588,17 @@ class BalkensystemEintrag(BauteilEintrag):
                  wert: float = 10.0, **felder: Any) -> StablastEintrag:
         """Eine Last auf einer Linie -- ``wert`` ist ``wert_a``; Felder wie :class:`StablastEintrag`."""
         eintrag = StablastEintrag.aus_dict({"kennung": self._neue_kennung(self.alle_lasten(), "P"),
-                                            "lastfall": _kennung_von(lastfall), "art": art,
+                                            "lastfall": kennung_von(lastfall), "art": art,
                                             "wert_a": wert, **felder},
                                            f"Balkensystem '{self.name}', lasten")
-        self.linie_von(_kennung_von(linie)).lasten.append(eintrag)
+        self.linie_von(kennung_von(linie)).lasten.append(eintrag)
         return eintrag
 
     def knotenlast(self, lastfall: Any, ort: Ort, wert: float = 10.0, *, art: str = "kraft",
                    richtung: Lastrichtung = Lastrichtung.SENKRECHT) -> KnotenlastEintrag:
         eintrag = KnotenlastEintrag.aus_dict({
             "kennung": self._neue_kennung(self.alle_lasten(), "P"),
-            "knoten": self._knoten(self.netz(), ort), "lastfall": _kennung_von(lastfall),
+            "knoten": self._knoten(self.netz(), ort), "lastfall": kennung_von(lastfall),
             "art": art, "richtung": richtung, "wert": wert},
             f"Balkensystem '{self.name}', knotenlasten")
         self.knotenlasten.append(eintrag)
@@ -727,11 +688,7 @@ class BalkensystemEintrag(BauteilEintrag):
         Diagramme M, V und N der GZT und die Verschiebung der GZG.
         """
         s = cls(kennung=kennung, name=name)
-        g = s.lastfall("Eigengewicht", eigengewicht=True)
-        auflast = s.lastfall("Auflast")
-        nutzlast = s.lastfall("Nutzlast")
-        gzt = s.kombination("GZT", (g, 1.35), (auflast, 1.35), (nutzlast, 1.5))
-        gzg = s.kombination("GZG", (g, 1.0), (auflast, 1.0), (nutzlast, 1.0))
+        gzt, gzg = s.standardfaelle()
         for groesse in ("M", "V", "N"):
             s.diagramm(gzt, groesse)
         s.diagramm(gzg, "verschiebung")

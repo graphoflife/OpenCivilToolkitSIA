@@ -7,6 +7,15 @@
  * Kern dazu sagt (`daten`, die Antwort auf `decke_zeichnung`): wie die Last
  * auf die zwei Richtungen geht oder wo die Streifen verlaufen. Beide Bilder
  * rufen dieselbe Funktion, jedes mit seiner Ansicht `v` (cad_ansicht.js).
+ * Das Zeichenfenster zeigt darüber die Lasten eines Lastfalls.
+ *
+ * ZEICHEN DER LASTEN, in der Farbe der Lasten:
+ *   Flächenlast                  getönt, gestrichelt umrandet
+ *   auf der ganzen Platte        die Platte getönt, ihr Wert über ihrem Namen
+ *   Linienlast                   eine breite Linie
+ *   Punktlast                    ein Kreis mit Kreuz -- ein Pfeil, von oben
+ *                                gesehen --, gestrichelt die Fläche, über die
+ *                                sie sich verteilt
  *
  * ZEICHEN DER LINIENLAGER:
  *   vertikal gehalten            eine kräftige Linie
@@ -152,13 +161,79 @@ function unterlage(v, daten, was) {
   return g;
 }
 
+/** Ein Kreis mit Kreuz um `[x, y]` (Bildpunkte): ein Pfeil in die Platte, von oben gesehen. */
+function kreuzkreis(x, y, r) {
+  const d = r * Math.SQRT1_2;
+  return `M${(x - r).toFixed(1)} ${y.toFixed(1)} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0 `
+    + `M${(x - d).toFixed(1)} ${(y - d).toFixed(1)} l${(2 * d).toFixed(1)} ${(2 * d).toFixed(1)} `
+    + `M${(x + d).toFixed(1)} ${(y - d).toFixed(1)} l${(-2 * d).toFixed(1)} ${(2 * d).toFixed(1)}`;
+}
+
+/**
+ * Die Lasten des Lastfalls `lastfall` (Kennung): ihre Zeichen und, in
+ * `namen`, ihre Werte. `orte` und `klasse` wie im Grundriss.
+ */
+function lasten(v, decke, lastfall, { orte, klasse, texte, namen }) {
+  const g = svgEl('g', { class: 'dk-lasten' });
+  const im = (liste) => (decke[liste] || []).filter((x) => x.lastfall === lastfall);
+  for (const p of decke.platten || []) {
+    const q = (p.lasten || []).find((x) => x.lastfall === lastfall);
+    const punkte = q && orte(p.knoten);
+    if (!punkte || punkte.length < 3) continue;
+    const wert = `q = ${zahlText(q.wert, 2)} kN/m²`;
+    g.append(mitTitel(svgEl('path', { d: pfad(v, punkte), class: 'dk-flaechenlast ist-platte' }),
+      [`Auf der ganzen Platte ${p.kennung}: ${wert}`]));
+    // Eine Zeile über dem Namen der Platte -- darunter steht der einer Zone.
+    const [x, y] = nachBild(v, beschriftungsort(punkte));
+    namen.append(text([x, y - 14], wert, 'dk-name ist-last'));
+  }
+  for (const f of im('flaechenlasten')) {
+    const punkte = orte(f.knoten);
+    if (!punkte || punkte.length < 3) continue;
+    g.append(mitTitel(svgEl('path', { d: pfad(v, punkte), class: klasse('dk-flaechenlast', f.kennung) }),
+      [`Flächenlast ${f.kennung}: q = ${zahlText(f.wert, 2)} kN/m²`, ...texte(f.kennung)]));
+    // Innen an ihrem oberen Rand: in ihrer Mitte stünde der Wert oft auf dem Namen der Platte.
+    const oben = Math.min(...punkte.map((x) => nachBild(v, x)[1]));
+    namen.append(text([nachBild(v, beschriftungsort(punkte))[0], oben + 11],
+      `${f.kennung} · ${zahlText(f.wert, 2)} kN/m²`, 'dk-name ist-last'));
+  }
+  for (const l of im('linienlasten')) {
+    const punkte = orte([l.von, l.bis]);
+    if (!punkte) continue;
+    g.append(mitTitel(svgEl('path', { d: pfad(v, punkte, false), class: klasse('dk-linienlast', l.kennung) }),
+      [`Linienlast ${l.kennung}: q = ${zahlText(l.wert, 2)} kN/m`, ...texte(l.kennung)]));
+    const [p, q] = punkte.map((x) => nachBild(v, x));
+    namen.append(text([(p[0] + q[0]) / 2 + 6, (p[1] + q[1]) / 2 - 8], `${l.kennung} · ${zahlText(l.wert, 2)} kN/m`,
+      'dk-name ist-klein ist-last'));
+  }
+  for (const e of im('punktlasten')) {
+    const [ort] = orte([e.knoten]) || [];
+    if (!ort) continue;
+    const [lx, ly] = [e.l_x / 2, e.l_y / 2];
+    g.append(svgEl('path', {
+      d: pfad(v, [[ort[0] - lx, ort[1] - ly], [ort[0] + lx, ort[1] - ly], [ort[0] + lx, ort[1] + ly],
+        [ort[0] - lx, ort[1] + ly]]),
+      class: 'dk-verteilflaeche',
+    }));
+    const [x, y] = nachBild(v, ort);
+    g.append(mitTitel(svgEl('path', { d: kreuzkreis(x, y, 6), class: klasse('dk-punktlast', e.kennung) }),
+      [`Punktlast ${e.kennung}: Q = ${zahlText(e.wert, 1)} kN, verteilt über `
+        + `${zahlText(e.l_x, 2)} × ${zahlText(e.l_y, 2)} m`, ...texte(e.kennung)]));
+    namen.append(text([x + 9, y + 12], `${e.kennung} · ${zahlText(e.wert, 1)} kN`, 'dk-name ist-klein ist-last'));
+  }
+  return g;
+}
+
 /**
  * Der ganze Grundriss: die Flächen der Platten, darüber die Unterlage des
  * Kerns, die Zonen, die Umrisse, die Unterzüge, die Linienlager, die
- * Stützen und die Namen. `fehler(kennung)` und `texte(kennung)` sagen, was
- * der Kern an einem Teil meldet -- rot, und als Titel beim Darüberfahren.
+ * Stützen, die Lasten des Lastfalls `lastfall` (Kennung -- ohne ihn keine)
+ * und die Namen. `fehler(kennung)` und `texte(kennung)` sagen, was der Kern
+ * an einem Teil meldet -- rot, und als Titel beim Darüberfahren.
  */
-export function grundriss(v, decke, daten, { was = 'aufteilung', fehler = () => false, texte = () => [] } = {}) {
+export function grundriss(v, decke, daten, {
+  was = 'aufteilung', fehler = () => false, texte = () => [], lastfall = null,
+} = {}) {
   const g = svgEl('g', { class: 'dk-grundriss' });
   const lagen = new Map((decke.knoten || []).map((k) => [k.kennung, [k.x, k.y]]));
   const orte = (knoten) => {
@@ -233,6 +308,7 @@ export function grundriss(v, decke, daten, { was = 'aufteilung', fehler = () => 
     namen.append(text([x + b / 2 + 3, y - h / 2 - 3], s.kennung, 'dk-name ist-klein'));
   }
 
-  g.append(flaechen, unterlage(v, daten, was), zonen, umrisse, traeger, lager, stuetzen, namen);
+  g.append(flaechen, unterlage(v, daten, was), zonen, umrisse, traeger, lager, stuetzen,
+    ...(lastfall ? [lasten(v, decke, lastfall, { orte, klasse, texte, namen })] : []), namen);
   return g;
 }

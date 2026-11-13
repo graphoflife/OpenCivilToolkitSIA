@@ -234,6 +234,22 @@ const ZEICHEN = {
   'cad-zone': {
     pfade: ['M4 4.5h16v15H4z', 'M8 12h8 M14 10l2 2-2 2', 'M12 8v8 M10 14l2 2 2-2'],
   },
+  // Eine Flächenlast: ein gestrichelter Umriss, darin Pfeile nach unten.
+  'cad-flaechenlast': {
+    strich: ['M3.5 4.5h17v15h-17z'],
+    pfade: ['M8 8v7 M6.3 13.3L8 15l1.7-1.7', 'M12 8v7 M10.3 13.3L12 15l1.7-1.7',
+      'M16 8v7 M14.3 13.3L16 15l1.7-1.7'],
+  },
+  // Eine Linienlast: Pfeile auf eine kräftige Linie.
+  'cad-linienlast': {
+    pfade: ['M3 18.5h18', 'M3 17.5h18', 'M6 4v10 M4.3 12.3L6 14l1.7-1.7', 'M12 4v10 M10.3 12.3L12 14l1.7-1.7',
+      'M18 4v10 M16.3 12.3L18 14l1.7-1.7'],
+  },
+  // Eine Punktlast: ein Pfeil auf einen Punkt.
+  'cad-punktlast': {
+    pfade: ['M12 3v13 M8.5 12.5L12 16l3.5-3.5'],
+    voll: [[12, 19.5, 2]],
+  },
   // Eine Last: drei Pfeile auf einen Stab.
   'cad-last': {
     pfade: ['M3 19.5h18', 'M5 4.5h14',

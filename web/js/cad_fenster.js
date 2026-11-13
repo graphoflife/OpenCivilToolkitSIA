@@ -75,11 +75,11 @@ import { sinnbild } from './sinnbilder.js';
  * Werte der Querschnittsanalyse. `massstab`: kleinster und grösster, in
  * Bildpunkten je Einheit.
  *
- * Ein Werkzeug ist `{name, text, zeichen, taste, form, titel?}`: `zeichen`
- * ein Sinnbild, `form` was es zeichnet -- 'knoten', 'linie' oder 'polygon',
- * oder eine Funktion `(a) => form`, wo das Fenster es umstellt (die
- * Bewehrung als Linie oder als Punkt). Eine Vorgabe gibt es nicht: was ein
- * Werkzeug anlegt, weiss nur seine App.
+ * Ein Werkzeug ist `{name, text, zeichen, taste, form, titel?, bereit?}`:
+ * `zeichen` ein Sinnbild, `form` was es zeichnet -- 'knoten', 'linie' oder
+ * 'polygon', oder `(a) => form`, wo das Fenster es umstellt (die Bewehrung
+ * als Linie oder als Punkt). Gibt `bereit(a)` falsch, startet es nicht und
+ * sagt selbst, warum -- eine Last ohne Lastfall. Was es anlegt, weiss nur seine App.
  */
 const EINSTELLUNG = {
   werkzeuge: [],
@@ -304,9 +304,8 @@ function befehlEnde(a) {
  */
 function werkzeugStarten(a, name) {
   const w = a.einstellung.werkzeuge.find((x) => x.name === name);
-  if (!w) return;
-  const form = typeof w.form === 'function' ? w.form(a) : w.form;
-  starten(a, BEFEHLE[form](w.name));
+  if (!w || w.bereit?.(a) === false) return;
+  starten(a, BEFEHLE[typeof w.form === 'function' ? w.form(a) : w.form](w.name));
 }
 
 /** Ein fertiger Punkt geht an den Befehl; danach sind die Hilfen wieder frei. */

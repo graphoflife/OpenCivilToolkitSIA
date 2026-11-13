@@ -5,12 +5,14 @@
  *
  *     Decke       Bezeichnung, Zeichnung samt Liste, Beschreibung
  *     Eingaben    Knöpfe, je mit einem Fenster (`KAPITEL`): die Streifen --
- *                 wie breit, und wie die Last auf die zwei Richtungen geht
+ *                 wie breit, und wie die Last auf die zwei Richtungen geht --,
+ *                 die Lastfälle und Lastkombinationen (lastfaelle.js)
  *
  * Rechts im Reiter «Diagramme» der Grundriss mit der Aufteilung und einer
- * mit den Streifen, in der Zusammenfassung die Streifen je Richtung und die
- * Meldungen. Gerechnet wird nach der Streifenmethode, im Kern
- * (opencivil/decke); hier stehen nur seine Zahlen.
+ * mit den Streifen, in der Zusammenfassung die Streifen je Richtung, je Fall
+ * die Last und was die Lager tragen, und die Meldungen. Gerechnet wird nach
+ * der Streifenmethode, im Kern (opencivil/decke); hier stehen nur seine
+ * Zahlen.
  */
 
 import {
@@ -18,13 +20,14 @@ import {
 } from './bausteine.js';
 import { ansichtNeu, einpassen, zahlText } from './cad_ansicht.js';
 import { umrissVon } from './cad_app.js';
-import { frischeAntwort } from './dk_eigenschaften.js';
+import { LASTLISTEN, kernmeldungen } from './dk_eigenschaften.js';
 import { anteilText, grundriss, legende } from './dk_grundriss.js';
 import { waehlen, zeichenbereich } from './dk_zeichnung.js';
 import {
   el, leerzustand, svgEl, zahlfeld,
 } from './dom.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
+import { lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import {
   eintragAendern, eintragVon, feldangabe, katalog, zustand,
 } from './zustand.js';
@@ -57,8 +60,9 @@ const HILFE = {
 // ===========================================================================
 
 /**
- * Meldungen des Kerns und je Teil eine Zeile -- ein Klick wählt im
- * Fenster; bei einer Stütze ihren Knoten.
+ * Meldungen des Kerns -- zur Decke und zum gezeigten Lastfall -- und je Teil
+ * eine Zeile: ein Klick wählt im Fenster, bei einer Stütze oder Punktlast
+ * ihren Knoten; bei einer Last zeigt die Zeichnung dann ihren Lastfall.
  */
 function liste(a) {
   const z = eintragVon(a.dk.kennung);
@@ -66,8 +70,8 @@ function liste(a) {
   const teile = [];
   if (a.dk.unterlage === 'aufteilung') teile.push(legende());
   if (a.dk.daten?.fehler) teile.push(el('div.qa-meldungen', {}, [el('div.qa-meldung', { text: a.dk.daten.fehler })]));
-  const knotenVon = new Map(z.stuetzen.map((s) => [s.kennung, s.knoten]));
-  const meldungen = frischeAntwort(a)?.meldungen || [];
+  const knotenVon = new Map([...z.stuetzen, ...z.punktlasten].map((s) => [s.kennung, s.knoten]));
+  const meldungen = kernmeldungen(a);
   if (meldungen.length) {
     teile.push(el('div.qa-meldungen', {}, meldungen.map((m) => el('button.qa-meldung', {
       type: 'button', text: m.text, class: m.fehler ? '' : 'ist-hinweis',
@@ -75,11 +79,18 @@ function liste(a) {
       on: { click: () => waehlen(a.dk.kennung, m.elemente.map((k) => knotenVon.get(k) || k)) },
     }))));
   }
-  const zeile = (kennung, links, rechts, waehlbar = kennung) => el('div.bs-element', {
+  const zeile = (kennung, links, rechts, waehlbar = kennung, lastfall = undefined) => el('div.bs-element', {
     dataset: { kennung: waehlbar },
-    on: { click: () => waehlen(a.dk.kennung, [waehlbar]) },
+    on: {
+      click: () => {
+        if (lastfall !== undefined) lastfallWaehlen(a, a.dk, lastfall);
+        waehlen(a.dk.kennung, [waehlbar]);
+      },
+    },
   }, [el('span.bs-element-name', { text: kennung }), el('span', { text: links }),
     el('span.bs-element-zusatz', { text: rechts })]);
+  const fall = (lf) => z.lastfaelle.find((x) => x.kennung === lf)?.name || 'kein Lastfall';
+  const flaeche = (w) => `q = ${zahlText(w, 2)} kN/m²`;
   const beton = (k) => {
     const m = eintragVon(k);
     return m ? (m.name || m.sorte) : 'kein Beton';
@@ -96,6 +107,17 @@ function liste(a) {
     ['Unterzüge', z.unterzuege.map((u) => zeile(u.kennung, `${u.von} → ${u.bis}`,
       `b = ${zahlText(u.breite, 2)} m · Stufe ${u.stufe}`))],
     ['Zonen', z.zonen.map((x) => zeile(x.kennung, anteilText(x.anteil), `${x.knoten.length} Ecken`))],
+    ['Lasten', [
+      ...z.platten.flatMap((p) => p.lasten.map((q) => zeile(p.kennung, 'ganze Platte',
+        `${flaeche(q.wert)} · ${fall(q.lastfall)}`, p.kennung, q.lastfall))),
+      ...z.flaechenlasten.map((f) => zeile(f.kennung, `${f.knoten.length} Ecken`,
+        `${flaeche(f.wert)} · ${fall(f.lastfall)}`, f.kennung, f.lastfall)),
+      ...z.linienlasten.map((l) => zeile(l.kennung, `${l.von} → ${l.bis}`,
+        `q = ${zahlText(l.wert, 2)} kN/m · ${fall(l.lastfall)}`, l.kennung, l.lastfall)),
+      ...z.punktlasten.map((e) => zeile(e.kennung, `an ${e.knoten}`,
+        `Q = ${zahlText(e.wert, 1)} kN über ${zahlText(e.l_x, 2)} × ${zahlText(e.l_y, 2)} m · ${fall(e.lastfall)}`,
+        e.knoten, e.lastfall)),
+    ]],
   ];
   // Jede Gruppe klappt auf und zu, zu Beginn zu -- wie im Balkensystem.
   const offen = a.dk.aufgeklappt || (a.dk.aufgeklappt = new Set());
@@ -184,6 +206,14 @@ const KAPITEL = [
       },
     ],
   },
+  lastenKapitel({
+    lastenVon: (d, lf) => d.platten.reduce((n, p) => n + p.lasten.filter((x) => x.lastfall === lf).length, 0)
+      + LASTLISTEN.reduce((n, liste) => n + d[liste].filter((x) => x.lastfall === lf).length, 0),
+    eigengewicht: {
+      text: 'ρ · g · h',
+      titel: 'Je Platte die Dichte des Stahlbetons mal g = 10 m/s² mal ihre Dicke',
+    },
+  }),
 ];
 
 /** Die Fenster der Decke, nach ihrem Schlüssel: die Kapitel. */
@@ -258,22 +288,53 @@ export function deckenKarten(kennung) {
   ];
 }
 
+/** Eine Tabelle der Zusammenfassung: Kopf und Zeilen, je Zelle ein Text -- Zahlen rechtsbündig. */
+function tabelle(kopf, zeilen) {
+  return el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [
+    el('thead', {}, [el('tr', {}, kopf.map((t) => el('th', { text: t })))]),
+    el('tbody', {}, zeilen.map((z) => el('tr', {}, z.map((t, i) => el(i ? 'td.bs-zahl' : 'td', { text: t }))))),
+  ])]);
+}
+
 /**
- * Die Zusammenfassung einer Decke: die Meldungen und je Richtung, wie viele
- * Feldstreifen sie hat. Das Panel darum baut bericht.js.
+ * Je Lastfall und Kombination die Last und was die Lager davon tragen -- die
+ * Probe des Kerns --, darunter, was er zu den Fällen meldet. Was neben den
+ * Platten liegt oder nicht getragen wird, nur, wo es das gibt.
+ */
+function faelleKarte(daten) {
+  const faelle = daten.faelle || [];
+  if (!faelle.length) return karte('Lasten', [leerzustand('Kein Lastfall.', 'Anlegen unter «Lastfälle».')]);
+  const spalten = [['Last', 'summe'], ['Lager', 'lager'], ['neben den Platten', 'daneben'],
+    ['nicht getragen', 'nicht_getragen']]
+    .filter(([, feld], i) => i < 2 || faelle.some((f) => Math.abs(f[feld]) >= 5e-4));
+  return karte('Lasten und Lagerkräfte', [
+    tabelle(['Fall', ...spalten.map(([t]) => `${t} [kN]`)],
+      faelle.map((f) => [f.name, ...spalten.map(([, feld]) => zahlText(f[feld], 1))])),
+    ...faelle.flatMap((f) => f.meldungen.map((m) => el('p', {
+      class: m.fehler ? 'hinweis hinweis-warnung' : 'hinweis', text: `«${f.name}»: ${m.text}`,
+    }))),
+    el('p.karte-hinweis', {
+      text: 'Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem Streifen, der nicht trägt.',
+    }),
+  ]);
+}
+
+/**
+ * Die Zusammenfassung einer Decke: die Meldungen, je Richtung, wie viele
+ * Feldstreifen sie hat, und je Fall Last und Lagerkraft. Das Panel darum
+ * baut bericht.js.
  */
 export function deckenZusammenfassung(kennung) {
   const daten = zeichendaten(kennung);
   if (!daten) return [karte(null, [leerzustand('Noch nicht gerechnet.')])];
   if (!daten.gerechnet) return [karte(null, [...meldungszeilen(daten), leerzustand('Nicht gerechnet.')])];
   // Eine schräge Richtung heisst nach ihrem Winkel -- «71.57°» --, eine eigene Spalte dafür wiederholte ihn.
-  const kopf = ['Richtung', 'Feldstreifen'].map((t) => el('th', { text: t }));
-  const zeilen = daten.richtungen.map((r) => el('tr', {}, [
-    el('td', { text: r.name }), el('td.bs-zahl', { text: String(r.streifen) }),
-  ]));
-  return [karte('Streifen', [
-    ...meldungszeilen(daten),
-    el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [el('thead', {}, [el('tr', {}, kopf)]), el('tbody', {}, zeilen)])]),
-  ])];
+  return [
+    karte('Streifen', [
+      ...meldungszeilen(daten),
+      tabelle(['Richtung', 'Feldstreifen'], daten.richtungen.map((r) => [r.name, String(r.streifen)])),
+    ]),
+    faelleKarte(daten),
+  ];
 }
 

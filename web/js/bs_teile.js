@@ -4,15 +4,15 @@
  *
  * Die Art einer Last nach dem Katalog des Kerns, die Last zu einer
  * Kennung, die Zugseite einer Linie und der Name eines Materials. Dazu die
- * Antwort des Kerns, solange sie zur Fassung des Projekts passt, und der
- * Lastfall, den ein Zeichenfenster zeigt: was ein Fenster betrifft, nimmt
- * das Fenster `a` (bs_zeichnung.js), nicht seine Kennung -- so liest das
- * schwebende Fenster es ohne Umweg über den Adapter.
+ * Antwort des Kerns, solange sie zur Fassung des Projekts passt: was ein
+ * Fenster betrifft, nimmt das Fenster `a` (bs_zeichnung.js), nicht seine
+ * Kennung -- so liest das schwebende Fenster es ohne Umweg über den
+ * Adapter. Den Lastfall, den ein Fenster zeigt, führt lastfaelle.js.
  * Nichts davon rechnet: es liest die Beschreibung, den Katalog und die
  * Materialien des Projekts.
  */
 
-import { aendern, eintragVon, katalog, zustand } from './zustand.js';
+import { eintragVon, katalog, zustand } from './zustand.js';
 
 export function lastart(wert) {
   return katalog('balkensystem', 'lastarten').find((x) => x.wert === wert) || { beschriftung: wert, einheit: '' };
@@ -50,25 +50,4 @@ export function materialname(m) {
 export function passendeUebersicht(a) {
   const u = a.bs.uebersicht;
   return u && u.fassung === zustand.fassung ? u : null;
-}
-
-/**
- * Der Lastfall, dessen Lasten das Fenster zeigt und bearbeitet -- der
- * gewählte, solange es ihn gibt, sonst der erste. Ansichtssache, nicht Teil
- * des Projekts.
- */
-export function aktiverLastfall(a) {
-  const faelle = eintragVon(a.bs.kennung)?.lastfaelle || [];
-  // «– kein Lastfall –»: die Zeichnung zeigt keine Lasten.
-  if (a.bs.lastfall === '') return null;
-  if (faelle.some((lf) => lf.kennung === a.bs.lastfall)) return a.bs.lastfall;
-  // Zuerst das Eigengewicht (Benutzer, 2026-10-24).
-  return (faelle.find((lf) => lf.eigengewicht) || faelle[0])?.kennung || null;
-}
-
-/** Zeigt im Fenster die Lasten dieses Lastfalls -- '' heisst keine. */
-export function lastfallWaehlen(a, lastfall) {
-  a.bs.lastfall = lastfall;
-  a.neuZeichnen();
-  aendern({}, 'zeichnung');
 }

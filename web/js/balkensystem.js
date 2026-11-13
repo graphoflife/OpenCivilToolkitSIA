@@ -25,16 +25,18 @@
 import {
   erklaerung, feld, klappgruppe, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
-import { lastfallWaehlen, materialname, passendeUebersicht } from './bs_teile.js';
+import { materialname, passendeUebersicht } from './bs_teile.js';
 import { waehlen, zeichenbereich } from './bs_zeichnung.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import { fenster, fensterOeffnen } from './fenster.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
+import { lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import { anfuegenKnopf, rechenwahlZeile } from './nachweise.js';
 import {
-  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsterName, zustand,
+  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsteKennung, naechsterName,
+  zustand,
 } from './zustand.js';
 
 const HILFE = {
@@ -129,7 +131,7 @@ function uebersicht(a) {
     dataset: { kennung: last.kennung },
     on: {
       click: () => {
-        lastfallWaehlen(a, last.lastfall);
+        lastfallWaehlen(a, a.bs, last.lastfall);
         waehlen(a.bs.kennung, [last.kennung]);
       },
     },
@@ -532,102 +534,6 @@ function querschnitteInhalt(system) {
 }
 
 // ===========================================================================
-// Lastfälle und Kombinationen
-// ===========================================================================
-
-/** Die nächste Kennung einer Liste: die grösste bisherige plus eins -- eine Kennung kommt nie wieder. */
-function naechsteKennung(liste, vorsilbe) {
-  const nummern = liste.map((x) => Number(String(x.kennung).slice(vorsilbe.length)))
-    .filter(Number.isInteger);
-  return `${vorsilbe}${Math.max(0, ...nummern) + 1}`;
-}
-
-const lastenText = (n) => `${n} ${n === 1 ? 'Last' : 'Lasten'}`;
-
-function lastfaelleInhalt(system) {
-  const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
-  const lastenVon = (lf) => system.linien.reduce((n, l) => n + l.lasten.filter((x) => x.lastfall === lf).length, 0)
-    + system.knotenlasten.filter((x) => x.lastfall === lf).length;
-  // Das Eigengewicht kommt von selbst und bleibt: es lässt sich umbenennen,
-  // nicht löschen (Benutzer, 2026-10-23).
-  const fall = (lf, i) => el('div.bs-fall', {}, [
-    el('input', {
-      type: 'text', value: lf.name, title: 'Name des Lastfalls -- so steht er im Bericht',
-      on: { change: (e) => aendern((s) => { s.lastfaelle[i].name = e.target.value; }) },
-    }),
-    el('span.bs-fall-zahl', {
-      text: lf.eigengewicht
-        ? `von selbst, ρ · g · A${lastenVon(lf.kennung) ? ` · dazu ${lastenText(lastenVon(lf.kennung))}` : ''}`
-        : lastenText(lastenVon(lf.kennung)),
-      title: lf.eigengewicht ? 'Je Stab Dichte mal g = 10 m/s² mal Fläche -- beim Beton die Dichte des Stahlbetons' : '',
-    }),
-    lf.eigengewicht ? el('span') : el('button.weg', {
-      type: 'button', text: '×', title: 'Lastfall löschen',
-      on: {
-        click: () => {
-          const n = lastenVon(lf.kennung);
-          if (n) {
-            melden(`«${lf.name}» hat noch ${lastenText(n)} -- zuerst diese löschen.`, true);
-            return;
-          }
-          aendern((s) => {
-            s.lastfaelle.splice(i, 1);
-            for (const k of s.kombinationen) delete k.faktoren[lf.kennung];
-          });
-        },
-      },
-    }),
-  ]);
-  const neuerFall = () => aendern((s) => {
-    const kennung = naechsteKennung(s.lastfaelle, 'LF');
-    s.lastfaelle.push({ kennung, name: naechsterName('Lastfall', s.lastfaelle) });
-  });
-  return [
-    ...system.lastfaelle.map(fall),
-    el('button.knopf.knopf-klein', { type: 'button', text: '+ Lastfall', on: { click: neuerFall } }),
-  ];
-}
-
-/** Je Kombination eine Zeile: je Lastfall ein Beiwert, von Hand. */
-function kombinationenInhalt(system) {
-  const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
-  const kombination = (k, i) => el('tr', {}, [
-    el('td', {}, [el('input', {
-      type: 'text', value: k.name,
-      on: { change: (e) => aendern((s) => { s.kombinationen[i].name = e.target.value; }) },
-    })]),
-    ...system.lastfaelle.map((lf) => el('td', {}, [zahlfeld({
-      wert: k.faktoren[lf.kennung] ?? 0, schritt: 0.05,
-      titel: `Beiwert für «${lf.name}» -- 0: zählt nicht`,
-      beiAenderung: (w) => aendern((s) => { s.kombinationen[i].faktoren[lf.kennung] = w; }),
-    })])),
-    el('td', {}, [el('button.weg', {
-      type: 'button', text: '×', title: 'Kombination löschen',
-      on: { click: () => aendern((s) => { s.kombinationen.splice(i, 1); }) },
-    })]),
-  ]);
-  const neueKombination = () => aendern((s) => {
-    s.kombinationen.push({
-      kennung: naechsteKennung(s.kombinationen, 'LK'),
-      name: naechsterName('Kombination', s.kombinationen),
-      faktoren: Object.fromEntries(s.lastfaelle.map((lf) => [lf.kennung, 1.0])),
-    });
-  });
-  if (!system.lastfaelle.length) return [el('p.bs-leer', { text: 'Zuerst einen Lastfall anlegen.' })];
-  return [
-    system.kombinationen.length ? el('div.tabelle-huelle', {}, [el('table.bs-kombinationen', {}, [
-      el('thead', {}, [el('tr', {}, [
-        el('th', { text: 'Kombination' }),
-        ...system.lastfaelle.map((lf) => el('th', { text: lf.name })),
-        el('th'),
-      ])]),
-      el('tbody', {}, system.kombinationen.map(kombination)),
-    ])]) : el('p.bs-leer', { text: 'Noch keine Kombination.' }),
-    el('button.knopf.knopf-klein', { type: 'button', text: '+ Kombination', on: { click: neueKombination } }),
-  ];
-}
-
-// ===========================================================================
 // Die Knöpfe der Eingaben
 // ===========================================================================
 
@@ -653,20 +559,14 @@ const KAPITEL = [
       },
     ],
   },
-  {
-    titel: 'Lasten',
-    kapitel: [
-      {
-        schluessel: 'lastfaelle', name: 'Lastfälle', titel: 'Lastfälle', inhalt: lastfaelleInhalt,
-        stand: (s) => zeilenstand(s.lastfaelle, 'Lastfall', 'Lastfälle', 'kein Lastfall'),
-      },
-      {
-        schluessel: 'kombinationen', name: 'Lastkombi\u00adnationen', titel: 'Lastkombinationen',
-        inhalt: kombinationenInhalt,
-        stand: (s) => zeilenstand(s.kombinationen, 'Kombination', 'Kombinationen', 'keine'),
-      },
-    ],
-  },
+  lastenKapitel({
+    lastenVon: (s, lf) => s.linien.reduce((n, l) => n + l.lasten.filter((x) => x.lastfall === lf).length, 0)
+      + s.knotenlasten.filter((x) => x.lastfall === lf).length,
+    eigengewicht: {
+      text: 'ρ · g · A',
+      titel: 'Je Stab Dichte mal g = 10 m/s² mal Fläche -- beim Beton die Dichte des Stahlbetons',
+    },
+  }),
   {
     titel: 'Analyse',
     kapitel: [

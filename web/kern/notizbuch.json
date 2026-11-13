@@ -3257,7 +3257,10 @@
       "art": "modul",
       "kurz": "wie eine Decke ihre Rechnung aufschreibt.",
       "stichworte": [
-        "schreiben"
+        "schreiben",
+        "_lasten",
+        "_last",
+        "_faelle"
       ]
     },
     {
@@ -4747,6 +4750,18 @@
       ]
     },
     {
+      "name": "opencivil.projekt.aufbau.faelle",
+      "pfad": "Python/opencivil.projekt.aufbau.faelle.md",
+      "art": "modul",
+      "kurz": "was Balkensystem und Decke an Faellen gleich pruefen.",
+      "stichworte": [
+        "doppelte_kennungen",
+        "faelle_pruefen",
+        "ohne_lastfall",
+        "beiwerte"
+      ]
+    },
+    {
       "name": "opencivil.projekt.aufbau.grundbruch",
       "pfad": "Python/opencivil.projekt.aufbau.grundbruch.md",
       "art": "modul",
@@ -4852,8 +4867,6 @@
         "StabquerschnittEintrag.stabvorlage",
         "StabquerschnittEintrag.masse_mit_vorgaben",
         "StabquerschnittEintrag.fehler",
-        "LastfallEintrag",
-        "LastkombinationEintrag",
         "StatikdiagrammEintrag",
         "BalkensystemEintrag",
         "BalkensystemEintrag.materialien",
@@ -4871,8 +4884,6 @@
         "BalkensystemEintrag.querschnitt",
         "BalkensystemEintrag.querschnitt_aus",
         "BalkensystemEintrag.querschnitt_mit_kennwerten",
-        "BalkensystemEintrag.lastfall",
-        "BalkensystemEintrag.kombination",
         "BalkensystemEintrag.diagramm",
         "BalkensystemEintrag.stablast",
         "BalkensystemEintrag.knotenlast",
@@ -4904,11 +4915,15 @@
       "kurz": "eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.",
       "stichworte": [
         "DeckenknotenEintrag",
+        "PlattenlastEintrag",
         "DeckenplatteEintrag",
         "LinienlagerEintrag",
         "StuetzeEintrag",
         "UnterzugEintrag",
         "ZoneEintrag",
+        "FlaechenlastEintrag",
+        "LinienlastEintrag",
+        "PunktlastEintrag",
         "DeckeEintrag",
         "DeckeEintrag.materialien",
         "DeckeEintrag.lagen",
@@ -4918,6 +4933,10 @@
         "DeckeEintrag.stuetze",
         "DeckeEintrag.unterzug",
         "DeckeEintrag.zone",
+        "DeckeEintrag.flaechenlast",
+        "DeckeEintrag.linienlast",
+        "DeckeEintrag.punktlast",
+        "DeckeEintrag.plattenlast",
         "DeckeEintrag.neu"
       ]
     },
@@ -4994,6 +5013,21 @@
         "Gebrauchsliste.namen_pruefen",
         "Querschnittsangaben",
         "KombinationEintrag"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.faelle",
+      "pfad": "Python/opencivil.projekt.faelle.md",
+      "art": "modul",
+      "kurz": "Lastfaelle und Kombinationen eines Bauteils.",
+      "stichworte": [
+        "kennung_von",
+        "LastfallEintrag",
+        "LastkombinationEintrag",
+        "MitFaellen",
+        "MitFaellen.lastfall",
+        "MitFaellen.kombination",
+        "MitFaellen.standardfaelle"
       ]
     },
     {

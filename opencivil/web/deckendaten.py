@@ -6,8 +6,9 @@ Aus dem Befund einer Decke die Daten ihrer Bilder, in m: wie die Last auf
 die zwei Richtungen geht -- je Zelle der automatischen Aufteilung, je
 Platte bei fester, und in den Zonen --, wo die Grenzen der Streifen
 verlaufen, die Flaechen der Unterzuege und die Stuetzenbereiche, dazu die
-Meldungen. Was in eine Rechnung eingeht, rechnet hier niemand; geschnitten
-wird nur fuers Bild.
+Meldungen -- die der Decke und je Lastfall und Kombination die eigenen,
+samt Last und Lagerkraft. Was in eine Rechnung eingeht, rechnet hier
+niemand; geschnitten wird nur fuers Bild.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from opencivil.decke.modell import Aufteilung
 from opencivil.decke.rechnung import Ergebnis
 from opencivil.decke.werk import Deckenbefund
 from opencivil.projekt import Aufbau
+from opencivil.stabwerk.system import Meldung
 
 #: Auf einen Zehntelmillimeter -- fuers Bild genug, und die Antwort bleibt klein.
 STELLEN = 4
@@ -39,13 +41,15 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
     ``gerechnet`` und ``meldungen`` (``{text, elemente, fehler}``) immer;
     wenn die Decke in Streifen zerfiel, dazu ``richtungen``, ``anteile``
     (Vieleck und Anteil in Richtung 1, in %), ``grenzen`` (je Grenze
-    zweier Streifen eine Strecke), ``unterzuege`` und ``stuetzenbereiche``.
-    Die Zonen zeichnet die Oberflaeche nach dem Projekt.
+    zweier Streifen eine Strecke), ``unterzuege``, ``stuetzenbereiche`` und
+    ``faelle``: je Lastfall und Kombination ``name``, die Last ``summe``,
+    was davon ``daneben`` liegt und ``nicht_getragen`` wird, und was die
+    ``lager`` tragen, in kN -- und seine ``meldungen``. Die Zonen und
+    Lasten zeichnet die Oberflaeche nach dem Projekt.
     """
     if befund is None:
         return {"gerechnet": False, "meldungen": []}
-    meldungen = [{"text": m.text, "elemente": list(m.elemente), "fehler": m.fehler}
-                 for m in befund.meldungen]
+    meldungen = _meldungen(befund.meldungen)
     e = befund.ergebnis
     if e is None or e.aufteilungen is None:
         return {"gerechnet": False, "meldungen": meldungen}
@@ -60,7 +64,14 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
         "unterzuege": [{"name": u.name, "ecken": _punkte(u.gebiet)} for u in z.unterzuege],
         "stuetzenbereiche": [{"name": name, "ecken": _punkte(ecken)}
                              for name, ecken in z.stuetzenbereiche.items()],
+        "faelle": [{"name": f.name, "summe": f.summe / 1e3, "daneben": f.daneben / 1e3,
+                    "nicht_getragen": f.nicht_getragen / 1e3, "lager": f.lagerkraft / 1e3,
+                    "meldungen": _meldungen(f.meldungen)} for f in e.faelle],
     }
+
+
+def _meldungen(meldungen: Sequence[Meldung]) -> List[Dict[str, Any]]:
+    return [{"text": m.text, "elemente": list(m.elemente), "fehler": m.fehler} for m in meldungen]
 
 
 def _anteile(e: Ergebnis) -> List[Tuple[Sequence[Tuple[float, float]], float]]:

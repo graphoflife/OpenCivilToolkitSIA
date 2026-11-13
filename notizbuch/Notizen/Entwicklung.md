@@ -44,6 +44,46 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-13 · Decken: Lasten und Lastfälle
+
+Dritter Schritt der App «Decken»: Flächen-, Linien- und Punktlasten, getrennt
+nach Lastfällen, und Kombinationen mit Beiwerten. Ergebnisbilder und Bericht
+folgen.
+
+- **Lastfälle und Kombinationen gelten wie im Balkensystem.** Ihre Regeln
+  -- gleiche Namen, Beiwerte, eine Last ohne Lastfall -- stehen jetzt einmal
+  in `opencivil/projekt/aufbau/faelle.py`, ihre beiden Fenster einmal in
+  `web/js/lastfaelle.js`. Vorher lag beides im Balkensystem; eine zweite
+  Fassung für die Decke hätte jede Regel doppelt geführt. Eine neue Decke
+  bekommt dieselben Fälle wie ein neues Balkensystem: Eigengewicht,
+  Auflast, Nutzlast, dazu GZT und GZG.
+- **Das Eigengewicht kommt von selbst**, je Platte ρ · g · h mit
+  g = 10 m/s².
+- **Gezeichnet wird in den Lastfall, der oben in der Leiste steht**; nur
+  dessen Lasten sind zu sehen und zu wählen. Ein Klick auf eine Last in der
+  Liste wechselt in ihren Lastfall. Ohne Lastfall lehnt ein Lastwerkzeug
+  ab, bevor es beginnt: dafür kennt das Zeichenfenster jetzt `bereit(a)` je
+  Werkzeug. Lehnte erst das Anlegen ab, blieben die schon gesetzten Knoten
+  liegen.
+- **Die Last auf einer ganzen Platte gehört zur Platte**: im Fenster der
+  Platte «q überall», je Lastfall höchstens eine. So folgt sie jeder
+  Änderung des Umrisses, ohne dass ein zweites Vieleck nachgeführt werden
+  muss.
+- **Eine Punktlast ist, wie die Stütze, eine Eigenschaft ihres Knotens**:
+  Q und die Fläche l_x × l_y, über die sie sich verteilt.
+- **Eine Last ohne Lastfall ist ein Hinweis, kein Fehler**: sie bleibt weg,
+  der Rest rechnet -- in der Decke wie im Balkensystem.
+- **Die Probe je Fall**: Zusammenfassung und Bericht zeigen je Lastfall und
+  Kombination die Last und was die Lager davon tragen. Was neben den
+  Platten liegt oder auf einem Streifen, der nicht trägt, zeigt die
+  Zusammenfassung nur, wo es das gibt; der Bericht immer, damit die Summe
+  aufgeht. Die Meldungen eines Falls tragen seinen Namen.
+- **Der Bericht** listet die Lasten in einer Tabelle (Lastfall, Last, wo,
+  Wert) und schreibt jede Kombination als Summe aus.
+- **Das Beispiel «Jede Wahl»** hat in jedem Lastfall Lasten, so dass jede
+  Art einmal gerechnet wird; sie liegen so, dass keine Beschriftung auf
+  einer anderen steht.
+
 ## 2026-11-13 · Decken: die App mit dem Zeichenfenster
 
 Zweiter Schritt der App «Decken»: die Zeile in der Liste der Apps und das

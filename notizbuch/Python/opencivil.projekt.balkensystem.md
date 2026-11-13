@@ -1,5 +1,5 @@
 ---
-erzeugt: 3632e5101350
+erzeugt: 77b59adabf8d
 art: modul
 tags: [modul]
 ---
@@ -310,32 +310,6 @@ Was an Massen oder Kennwerten nicht geht -- `None`, wenn alles geht.
 Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
 2026-10-16 stand `B=500` still da, und gerechnet wurde mit b = 300.
 
-### LastfallEintrag
-
-```python
-@dataclass
-class LastfallEintrag(Beschreibung)
-```
-
-Ein Lastfall des Systems: eine Kennung, auf die die Lasten zeigen, und ein Name.
-
-- `kennung: str = ''`
-- `name: str = ''`
-- `eigengewicht: bool = False` – Ob der Lastfall das Eigengewicht aller Staebe bekommt -- von selbst, aus Dichte und Flaeche (Benutzer, 2026-10-23). Ein System hat einen davon.
-
-### LastkombinationEintrag
-
-```python
-@dataclass
-class LastkombinationEintrag(Beschreibung)
-```
-
-Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand.
-
-- `kennung: str = ''`
-- `name: str = ''`
-- `faktoren: Dict[str, float] = field(default_factory=dict)`
-
 ### StatikdiagrammEintrag
 
 ```python
@@ -354,7 +328,7 @@ Fall; die Liste sagt nur, welche Diagramme rechts stehen.
 
 ```python
 @dataclass
-class BalkensystemEintrag(BauteilEintrag)
+class BalkensystemEintrag(MitFaellen, BauteilEintrag)
 ```
 
 Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen.
@@ -501,20 +475,6 @@ def querschnitt_mit_kennwerten(self, name: str, *, A: float, I: float) -> Stabqu
 
 Ein Querschnitt mit Kennwerten von Hand -- A in mm², I in 10⁶ mm⁴.
 
-#### BalkensystemEintrag.lastfall
-
-```python
-def lastfall(self, name: str, *, eigengewicht: bool=False) -> LastfallEintrag
-```
-
-#### BalkensystemEintrag.kombination
-
-```python
-def kombination(self, name: str, *faktoren: Tuple[Any, float]) -> LastkombinationEintrag
-```
-
-Eine Kombination -- je Lastfall (Eintrag oder Kennung) ein Beiwert: `(g, 1.35), (w, 1.5)`.
-
 #### BalkensystemEintrag.diagramm
 
 ```python
@@ -599,6 +559,7 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - [[opencivil.core.wahl]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
 - [[opencivil.querschnitt.gesetzwahl]]

@@ -64,9 +64,9 @@ from opencivil.projekt.eintraege import (
     VerformungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
+from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag
 from opencivil.projekt.balkensystem import (
-    BalkensystemEintrag, KnotenlastEintrag, LagerEintrag, LastfallEintrag,
-    LastkombinationEintrag, StablastEintrag, StabquerschnittEintrag,
+    BalkensystemEintrag, KnotenlastEintrag, LagerEintrag, StablastEintrag, StabquerschnittEintrag,
     StatikdiagrammEintrag, SystemknotenEintrag, SystemlinieEintrag,
 )
 from opencivil.projekt.querschnittsanalyse import (
@@ -81,8 +81,9 @@ from opencivil.projekt.durchstanzen import (
     AussparungEintrag, DurchstanzEintrag, GrundrissknotenEintrag,
 )
 from opencivil.projekt.decke import (
-    DeckeEintrag, DeckenknotenEintrag, DeckenplatteEintrag, LinienlagerEintrag, StuetzeEintrag,
-    UnterzugEintrag, ZoneEintrag,
+    DeckeEintrag, DeckenknotenEintrag, DeckenplatteEintrag, FlaechenlastEintrag, LinienlagerEintrag,
+    LinienlastEintrag, PlattenlastEintrag, PunktlastEintrag, StuetzeEintrag, UnterzugEintrag,
+    ZoneEintrag,
 )
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
@@ -106,7 +107,8 @@ __all__ = [
     "GrundbruchEintrag", "GrundbruchkombinationEintrag",
     "SchichtEintrag", "SetzungEintrag",
     "AussparungEintrag", "DurchstanzEintrag", "GrundrissknotenEintrag",
-    "DeckeEintrag", "DeckenknotenEintrag", "DeckenplatteEintrag", "LinienlagerEintrag",
+    "DeckeEintrag", "DeckenknotenEintrag", "DeckenplatteEintrag", "FlaechenlastEintrag",
+    "LinienlagerEintrag", "LinienlastEintrag", "PlattenlastEintrag", "PunktlastEintrag",
     "StuetzeEintrag", "UnterzugEintrag", "ZoneEintrag",
     "aufbauen", "sorten",
 ]

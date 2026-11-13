@@ -1,5 +1,5 @@
 ---
-erzeugt: 6b00abedaf22
+erzeugt: eb98906d4b39
 art: modul
 tags: [modul]
 ---
@@ -77,6 +77,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.decke]] – eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
+- [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
 - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
@@ -93,6 +94,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]

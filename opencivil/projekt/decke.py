@@ -16,11 +16,20 @@ Wo zwei Platten oder eine Platte und eine Wand sich eine Ecke teilen,
 teilen sie den Knoten -- wer ihn verschiebt, verschiebt sie beide, und es
 entsteht keine Fuge, die niemand gezeichnet hat.
 
+LASTEN:
+Jede Last gehoert zu einem Lastfall (:mod:`opencivil.projekt.faelle`, wie
+im Balkensystem). Eine Flaechenlast ist gezeichnet -- ein Umriss aus
+Knoten -- oder liegt auf der ganzen Platte: dann steht sie an der Platte
+(``lasten``) und geht mit ihr, wenn sie kopiert oder geloescht wird. Eine
+Linienlast laeuft von Knoten zu Knoten, eine Punktlast steht an einem und
+verteilt sich ueber ``l_x × l_y``. Nach unten positiv.
+
 KOORDINATEN UND EINHEITEN:
 x nach rechts, y nach oben, in m -- ebenso die Breite eines Unterzugs, der
 Stuetzenbereich und die Streifenbreite. Die Dicke einer Platte und der
 Querschnitt einer Stuetze in mm, Anteile in %, die Richtungen der Streifen
-in Grad gegen x, im Gegenuhrzeigersinn. Umgerechnet wird beim Bauen.
+in Grad gegen x, im Gegenuhrzeigersinn. Lasten in kN/m², kN/m und kN.
+Umgerechnet wird beim Bauen.
 """
 
 from __future__ import annotations
@@ -28,10 +37,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, List, Sequence, Union
 
-from opencivil.core.einheiten import GRAD, M, MM, PROZENT
-from opencivil.decke.modell import Aufteilung
+from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KN_PRO_M2, M, MM, PROZENT
+from opencivil.decke.modell import VERTEILBREITE, Aufteilung
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
-from opencivil.projekt.lesen import bereich, lesen
+from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
+from opencivil.projekt.lesen import ProjektFehler, bereich, lesen
 from opencivil.projekt.netz import Netz, naechste_kennung
 
 #: Ein Ort im Baukasten: die Kennung eines Knotens oder ``(x, y)`` in m.
@@ -39,7 +49,7 @@ Ort = Union[str, Sequence[float]]
 
 #: Womit die Kennungen der Teile einer Decke beginnen.
 VORSILBEN = {"platten": "P", "linienlager": "L", "stuetzen": "S", "unterzuege": "U",
-             "zonen": "Z"}
+             "zonen": "Z", "flaechenlasten": "FL", "linienlasten": "LL", "punktlasten": "PL"}
 
 
 @dataclass
@@ -49,6 +59,14 @@ class DeckenknotenEintrag(Beschreibung):
     kennung: str = ""
     x: float = 0.0
     y: float = 0.0
+
+
+@dataclass
+class PlattenlastEintrag(Beschreibung):
+    """Eine Flaechenlast auf der ganzen Platte, an der sie steht, in einem Lastfall."""
+
+    lastfall: str = ""
+    wert: float = bereich(2.0, heisst="q", einheit=KN_PRO_M2)
 
 
 @dataclass
@@ -67,6 +85,7 @@ class DeckenplatteEintrag(Beschreibung):
 
     richtung_1: float = bereich(0.0, heisst="Richtung 1", einheit=GRAD, ab=-180.0, bis=180.0)
     richtung_2: float = bereich(90.0, heisst="Richtung 2", einheit=GRAD, ab=-180.0, bis=180.0)
+    lasten: List[PlattenlastEintrag] = field(default_factory=list)
 
 
 @dataclass
@@ -133,12 +152,51 @@ class ZoneEintrag(Beschreibung):
 
 
 @dataclass
-class DeckeEintrag(BauteilEintrag):
+class FlaechenlastEintrag(Beschreibung):
+    """Eine gleichmaessige Flaechenlast auf einem gezeichneten Umriss, in einem Lastfall."""
+
+    kennung: str = ""
+    lastfall: str = ""
+    knoten: List[str] = field(default_factory=list)
+    wert: float = bereich(2.0, heisst="q", einheit=KN_PRO_M2)
+
+
+@dataclass
+class LinienlastEintrag(Beschreibung):
+    """Eine gleichmaessige Linienlast von Knoten zu Knoten, in einem Lastfall -- eine Wand darauf etwa."""
+
+    kennung: str = ""
+    lastfall: str = ""
+    von: str = ""
+    bis: str = ""
+    wert: float = bereich(10.0, heisst="q", einheit=KN_PRO_M)
+
+
+@dataclass
+class PunktlastEintrag(Beschreibung):
+    """
+    Eine Einzellast an einem Knoten, in einem Lastfall. Die Streifen tragen
+    sie gleichmaessig verteilt ueber ``l_x × l_y`` (nach Vorgabe, nicht
+    nachgeschlagen); was das die Platte darueber hinaus kostet, sagt das
+    Lastverteilelement.
+    """
+
+    kennung: str = ""
+    lastfall: str = ""
+    knoten: str = ""
+    wert: float = bereich(50.0, heisst="Q", einheit=KN)
+    l_x: float = bereich(VERTEILBREITE, heisst="Verteilbreite l_x", einheit=M, ueber=0.0)
+    l_y: float = bereich(VERTEILBREITE, heisst="Verteilbreite l_y", einheit=M, ueber=0.0)
+
+
+@dataclass
+class DeckeEintrag(MitFaellen, BauteilEintrag):
     """
     Eine Decke aus Platten auf Linienlagern und Stützen, mit versteckten
-    Unterzügen und Zonen. Wie die Last aufgeteilt wird, gilt für die ganze
-    Decke: automatisch nach Folie 31 oder ``anteil`` in die Richtung 1 --
-    in einer Zone deren Anteil.
+    Unterzügen und Zonen, und ihren Lasten, Lastfällen und Kombinationen.
+    Wie die Last aufgeteilt wird, gilt für die ganze Decke: automatisch
+    nach Folie 31 oder ``anteil`` in die Richtung 1 -- in einer Zone deren
+    Anteil.
 
     Ohne Regeln, die das ganze Projekt aufhielten: was an einer Decke nicht
     stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
@@ -154,6 +212,11 @@ class DeckeEintrag(BauteilEintrag):
     stuetzen: List[StuetzeEintrag] = field(default_factory=list)
     unterzuege: List[UnterzugEintrag] = field(default_factory=list)
     zonen: List[ZoneEintrag] = field(default_factory=list)
+    flaechenlasten: List[FlaechenlastEintrag] = field(default_factory=list)
+    linienlasten: List[LinienlastEintrag] = field(default_factory=list)
+    punktlasten: List[PunktlastEintrag] = field(default_factory=list)
+    lastfaelle: List[LastfallEintrag] = field(default_factory=list)
+    kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
     streifenbreite: float = bereich(0.25, heisst="Streifenbreite", einheit=M, ueber=0.0)
     aufteilung: Aufteilung = Aufteilung.AUTOMATISCH
     anteil: float = bereich(50.0, heisst="Anteil in Richtung 1", einheit=PROZENT, ab=0.0, bis=100.0)
@@ -216,10 +279,48 @@ class DeckeEintrag(BauteilEintrag):
         return self._anlegen("zonen", ZoneEintrag,
                              {"knoten": [self._knoten(netz, e) for e in ecken], **felder}, "Zone")
 
+    def flaechenlast(self, lastfall: Any, ecken: Sequence[Ort], **felder: Any) -> FlaechenlastEintrag:
+        """Eine Flächenlast auf diesem Umriss im Lastfall ``lastfall`` (Eintrag oder Kennung)."""
+        netz = self.netz()
+        return self._anlegen("flaechenlasten", FlaechenlastEintrag,
+                             {"lastfall": kennung_von(lastfall),
+                              "knoten": [self._knoten(netz, e) for e in ecken], **felder}, "Flächenlast")
+
+    def linienlast(self, lastfall: Any, von: Ort, bis: Ort, **felder: Any) -> LinienlastEintrag:
+        netz = self.netz()
+        return self._anlegen("linienlasten", LinienlastEintrag,
+                             {"lastfall": kennung_von(lastfall), "von": self._knoten(netz, von),
+                              "bis": self._knoten(netz, bis), **felder}, "Linienlast")
+
+    def punktlast(self, lastfall: Any, ort: Ort, **felder: Any) -> PunktlastEintrag:
+        return self._anlegen("punktlasten", PunktlastEintrag,
+                             {"lastfall": kennung_von(lastfall), "knoten": self._knoten(self.netz(), ort),
+                              **felder}, "Punktlast")
+
+    def plattenlast(self, lastfall: Any, platte: Any, wert: float) -> PlattenlastEintrag:
+        """
+        Die Flächenlast auf der ganzen Platte ``platte`` (Eintrag oder
+        Kennung) im Lastfall ``lastfall``, in kN/m² -- je Platte und Lastfall
+        eine, wie in der Oberfläche: eine zweite ersetzt die erste.
+        """
+        p = next((x for x in self.platten if x.kennung == kennung_von(platte)), None)
+        if p is None:
+            raise ProjektFehler(f"Decke '{self.name}': eine Platte '{kennung_von(platte)}' gibt es nicht.")
+        eintrag = lesen(PlattenlastEintrag, {"lastfall": kennung_von(lastfall), "wert": wert},
+                        f"Decke '{self.name}': Last auf {p.kennung}", PlattenlastEintrag())
+        p.lasten = [q for q in p.lasten if q.lastfall != eintrag.lastfall] + [eintrag]
+        return eintrag
+
     # -- Die frische Anlage -------------------------------------------------------
 
     @classmethod
     def neu(cls, kennung: str, name: str) -> "DeckeEintrag":
-        """Eine leere Decke, wie der Benutzer sie angelegt bekommt."""
-        return cls(kennung=kennung, name=name)
+        """
+        Eine frische Decke, wie der Benutzer sie angelegt bekommt: ohne
+        Platte, aber mit den Lastfällen und Kombinationen eines frischen
+        Balkensystems -- das Eigengewicht kommt von selbst.
+        """
+        d = cls(kennung=kennung, name=name)
+        d.standardfaelle()
+        return d
 

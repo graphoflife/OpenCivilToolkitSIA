@@ -1,5 +1,5 @@
 ---
-erzeugt: 68471693f64d
+erzeugt: c2697c85d6ae
 art: modul
 tags: [modul]
 ---
@@ -59,6 +59,7 @@ in einer Datei von ueber tausend Zeilen.
 - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
 - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
 - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
+- [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
 - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
 - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
 - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.

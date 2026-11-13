@@ -1,5 +1,5 @@
 ---
-erzeugt: 966c1f45d22a
+erzeugt: 43e8d36d5d02
 art: modul
 tags: [modul]
 ---
@@ -136,6 +136,7 @@ Teil sagt, warum.
 - [[opencivil.core.einheiten]]
 - [[opencivil.material.basis]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.faelle]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.lesen]]

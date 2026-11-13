@@ -249,11 +249,14 @@ def _decken(p: Projekt) -> None:
     """
     Zwei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
     einer Wand und drei Stützen, versteckte Unterzüge in zwei Stufen, fest
-    30 % in x. Und eine, die jede Wahl einmal braucht: zwei Platten
-    verschiedener Dicke in einem L, automatisch aufgeteilt, mit einer Zone,
-    einer eingespannten Wand, einem Rand an einer Symmetrieachse und einer
-    Stütze mit Stützenbereich von Hand -- daneben eine schiefe Platte, deren
-    Streifen ihren Rändern folgen.
+    30 % in x, und als einziger Lastfall q_d = 18.6 kN/m² auf der ganzen
+    Platte, das Eigengewicht darin. Und eine, die jede Wahl einmal braucht:
+    zwei Platten verschiedener Dicke in einem L, automatisch aufgeteilt, mit
+    einer Zone, einer eingespannten Wand, einem Rand an einer Symmetrieachse
+    und einer Stütze mit Stützenbereich von Hand -- daneben eine schiefe
+    Platte, deren Streifen ihren Rändern folgen. Sie hat die Lastfälle und
+    Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
+    Platte, gezeichnet, längs einer Linie und an einem Punkt.
     """
     beton = next(m.kennung for m in p.materialien if m.art == "beton")
     k4 = p.decke("Kolloquium 4", aufteilung="fest", anteil=30.0)
@@ -263,6 +266,7 @@ def _decken(p: Projekt) -> None:
         k4.stuetze((x, 5.0))
         k4.unterzug((x, 0), (x, 5.5), stufe=2)
     k4.unterzug((0, 5.0), (9, 5.0))
+    k4.plattenlast(k4.lastfall("q_d"), "P1", 18.6)
 
     el = p.decke("Jede Wahl", streifenbreite=0.5)
     el.platte([(0, 0), (6, 0), (6, 4), (0, 4)], beton=beton, h=220)
@@ -278,6 +282,12 @@ def _decken(p: Projekt) -> None:
     el.platte(schief, beton=beton, h=200, richtung_1=0.0, richtung_2=math.degrees(math.atan2(3.0, 1.0)))
     for a, b in zip(schief, schief[1:] + schief[:1]):
         el.lager(a, b)
+    el.standardfaelle()
+    _, auflast, nutzlast = el.lastfaelle
+    el.plattenlast(auflast, "P2", 1.5)
+    el.linienlast(auflast, (1, 6.5), (5, 6.5), wert=8.0)
+    el.flaechenlast(nutzlast, [(3, 1), (5, 1), (5, 3), (3, 3)], wert=5.0)
+    el.punktlast(nutzlast, (12.5, 2.0), wert=30.0)
 
 
 def _durchstanzstellen(p: Projekt) -> None:

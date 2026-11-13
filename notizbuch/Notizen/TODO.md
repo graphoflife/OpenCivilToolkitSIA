@@ -8,10 +8,13 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] **Decken: die App fertig bauen.** Rechenkern und Zeichenfenster
-      stehen (siehe [[Entwicklung]], 2026-11-13). Es fehlen, je ein Commit:
-      Lasten und Lastfälle, die Ergebnisbilder samt Lagerkräften, der
+- [ ] **Decken: die App fertig bauen.** Rechenkern, Zeichenfenster sowie
+      Lasten und Lastfälle stehen (siehe [[Entwicklung]], 2026-11-13). Es
+      fehlen, je ein Commit: die Ergebnisbilder samt Lagerkräften, der
       Bericht mit Herleitung.
+- [ ] Decken: die Knoten der Lasten anderer Lastfälle bleiben in der
+      Zeichnung als Punkte stehen, ohne ihre Last. Prüfen, ob sie mit ihr
+      verschwinden sollen.
 - [ ] Decken: eine schräge Richtung heisst nach ihrem Winkel, ihre
       Streifen «71.57° 1 … 71.57° 8», und der Bericht nennt den Winkel
       daneben noch einmal. Mit den Ergebnisbildern besser benennen --

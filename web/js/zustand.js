@@ -332,6 +332,17 @@ export function naechsterName(stamm, eintraege) {
   return `${stamm} ${i}`;
 }
 
+/**
+ * Die nächste Kennung einer Liste eines Bauteils -- «LF4»: die grösste
+ * bisherige plus eins. Eine Kennung kommt nie wieder: an ihr hängen Lasten
+ * und Beiwerte, die sonst an etwas anderes gerieten.
+ */
+export function naechsteKennung(liste, vorsilbe) {
+  const nummern = liste.map((x) => Number(String(x.kennung).slice(vorsilbe.length)))
+    .filter(Number.isInteger);
+  return `${vorsilbe}${Math.max(0, ...nummern) + 1}`;
+}
+
 /** Der Namensraum eines Bestandteils im Rechenwerk: `beton.b1`, `querschnitt.q1`. */
 export function namensraum(art, kennung) {
   return `${art}.${kennung}`;

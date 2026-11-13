@@ -6,8 +6,9 @@ Aus einem :class:`~opencivil.projekt.decke.DeckeEintrag` das Modell der
 Streifenmethode in SI (:func:`modell_von`) und das Bauteil im Rechenwerk
 (:func:`bauen`). Hart scheitert nur ein Verweis auf einen Beton, den es im
 Projekt nicht gibt -- wie im Balkensystem. Was der Decke selbst fehlt --
-ein Knoten, eine Platte ohne Beton --, steht in ihren Meldungen, und der
-Rest des Projekts rechnet.
+ein Knoten, eine Platte ohne Beton, ein Lastfall --, steht in ihren
+Meldungen, und der Rest des Projekts rechnet. Die Regeln der Lastfaelle
+teilt sie mit dem Balkensystem (:mod:`opencivil.projekt.aufbau.faelle`).
 """
 
 from __future__ import annotations
@@ -15,13 +16,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.decke.geometrie import Punkt
-from opencivil.decke.modell import Decke, Linienlager, Platte, Stuetze, Unterzug, Zone
+from opencivil.decke.modell import (
+    Decke, Flaechenlast, Kombination, Last, Lastfall, Linienlager, Linienlast, Platte, Punktlast,
+    Stuetze, Unterzug, Zone,
+)
 from opencivil.decke.werk import Deckensystem
 from opencivil.material.basis import Baustoff
 from opencivil.projekt.decke import DeckeEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.stabwerk.system import Meldung
 
+from opencivil.projekt.aufbau.faelle import beiwerte, doppelte_kennungen, faelle_pruefen, ohne_lastfall
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil
 
 if TYPE_CHECKING:
@@ -32,10 +37,19 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
     """
     Die Decke der Beschreibung in SI -- E und Gewicht der Platten null, die
     kommen beim Rechnen von ihrem Beton. Ein Teil, das auf einen Knoten
-    zeigt, den es nicht gibt, fehlt im Modell; die Meldung sagt es.
+    zeigt, den es nicht gibt, fehlt im Modell; die Meldung sagt es. Eine
+    Last heisst im Modell nach ihrer Kennung, eine auf der ganzen Platte
+    nach dieser; eine Last, deren Lastfall es nicht gibt, und ein Beiwert
+    dafuer bleiben mit einem Hinweis weg.
     """
     lagen = eintrag.lagen()
-    meldungen: List[Meldung] = []
+    meldungen = faelle_pruefen(eintrag.lastfaelle, eintrag.kombinationen)
+    for was, liste in (("Knoten", eintrag.knoten), ("Platten", eintrag.platten),
+                       ("Linienlager", eintrag.linienlager), ("Stützen", eintrag.stuetzen),
+                       ("Unterzüge", eintrag.unterzuege), ("Zonen", eintrag.zonen),
+                       ("Lasten", [*eintrag.flaechenlasten, *eintrag.linienlasten, *eintrag.punktlasten]),
+                       ("Lastfälle", eintrag.lastfaelle), ("Kombinationen", eintrag.kombinationen)):
+        meldungen.extend(doppelte_kennungen(was, liste))
 
     def orte(teil, knoten: Sequence[str]) -> Optional[Tuple[Punkt, ...]]:
         fehlt = [k for k in knoten if k not in lagen]
@@ -56,9 +70,31 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
                   for u in eintrag.unterzuege if (ab := orte(u, (u.von, u.bis))) is not None]
     zonen = [Zone(z.kennung, ecken, z.si("anteil"))
              for z in eintrag.zonen if (ecken := orte(z, z.knoten)) is not None]
+    # Je Last ``(Kennung, Lastfall, Last)`` -- die auf einer ganzen Platte heisst nach dieser.
+    lasten: List[Tuple[str, str, Last]] = [
+        (p.kennung, q.lastfall, Flaechenlast(p.kennung, q.si("wert"), platte=p.kennung))
+        for p in eintrag.platten for q in p.lasten]
+    lasten += [(f.kennung, f.lastfall, Flaechenlast(f.kennung, f.si("wert"), ecken))
+               for f in eintrag.flaechenlasten if (ecken := orte(f, f.knoten)) is not None]
+    lasten += [(l.kennung, l.lastfall, Linienlast(l.kennung, *ab, l.si("wert")))
+               for l in eintrag.linienlasten if (ab := orte(l, (l.von, l.bis))) is not None]
+    lasten += [(e.kennung, e.lastfall, Punktlast(e.kennung, ort[0], e.si("wert"), e.si("l_x"), e.si("l_y")))
+               for e in eintrag.punktlasten if (ort := orte(e, (e.knoten,))) is not None]
+    je_fall: Dict[str, List[Last]] = {lf.kennung: [] for lf in eintrag.lastfaelle}
+    for kennung, lastfall, last in lasten:
+        if lastfall in je_fall:
+            je_fall[lastfall].append(last)
+        else:
+            meldungen.append(ohne_lastfall(kennung))
+    faktoren, hinweise = beiwerte(eintrag.kombinationen, eintrag.lastfaelle)
+    meldungen.extend(hinweise)
     decke = Decke(platten=platten, linienlager=linienlager, stuetzen=stuetzen,
-                  unterzuege=unterzuege, zonen=zonen, streifenbreite=eintrag.si("streifenbreite"),
-                  aufteilung=eintrag.aufteilung, anteil=eintrag.si("anteil"))
+                  unterzuege=unterzuege, zonen=zonen,
+                  lastfaelle=[Lastfall(lf.name, je_fall[lf.kennung], lf.eigengewicht)
+                              for lf in eintrag.lastfaelle],
+                  kombinationen=[Kombination(name, je_fall) for name, je_fall in faktoren],
+                  streifenbreite=eintrag.si("streifenbreite"), aufteilung=eintrag.aufteilung,
+                  anteil=eintrag.si("anteil"))
     return decke, meldungen
 
 

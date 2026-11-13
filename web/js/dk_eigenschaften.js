@@ -2,11 +2,13 @@
  * dk_eigenschaften.js -- das schwebende Fenster im Zeichenfenster einer Decke.
  *
  * Was ein Werkzeug als Nächstes anlegt (`neuEigenschaften`) und was gewählt
- * ist (`eigenschaften`): je Knoten -- mit seiner Stütze --, Platte,
- * Linienlager, Unterzug oder Zone seine Felder. Sind mehrere derselben Art
- * gewählt, ändert das Fenster alle zugleich; was sie gemeinsam haben, steht
- * da, sonst «Var» -- wie im Balkensystem. Eine Stütze wählt man nicht für
- * sich: sie steht im Fenster ihres Knotens, wie ein Lager im Balkensystem.
+ * ist (`eigenschaften`): je Knoten -- mit seiner Stütze und Punktlast --,
+ * Platte -- mit der Last auf ihr --, Linienlager, Unterzug, Zone oder Last
+ * seine Felder. Sind mehrere derselben Art gewählt, ändert das Fenster alle
+ * zugleich; was sie gemeinsam haben, steht da, sonst «Var» -- wie im
+ * Balkensystem. Eine Stütze und eine Punktlast wählt man nicht für sich:
+ * sie stehen im Fenster ihres Knotens, wie ein Lager im Balkensystem. Die
+ * Lasten gelten dem Lastfall, den das Fenster zeigt (lastfaelle.js).
  *
  * Vom Zeichenfenster kennt es nur `a`: was die Werkzeuge vorgeben
  * (`a.dk.vorgaben`), die letzte Antwort des Kerns (`a.dk.daten`) und das
@@ -21,12 +23,33 @@ import {
 } from './cad_app.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
 import { auswahl, el } from './dom.js';
-import { feldangabe, materialien, zustand } from './zustand.js';
+import { aktiverLastfall, lastfallWaehlen, lastfallZeile } from './lastfaelle.js';
+import {
+  eintragVon, feldangabe, materialien, zustand,
+} from './zustand.js';
 
 /** Die Antwort des Kerns, wenn sie zur Zeichnung gehört, wie sie jetzt ist -- sonst null. */
 export function frischeAntwort(a) {
   const d = a.dk.daten;
   return d && d.fassung === zustand.fassung ? d : null;
+}
+
+/** Der Lastfall, den das Fenster zeigt, als Eintrag -- oder null. */
+export function gezeigterLastfall(a) {
+  const lf = aktiverLastfall(a.dk);
+  return eintragVon(a.dk.kennung)?.lastfaelle.find((x) => x.kennung === lf) || null;
+}
+
+/**
+ * Was der Kern meldet, wenn seine Antwort zur Zeichnung gehört: zur Decke,
+ * und zum Lastfall, den das Fenster zeigt -- mit dessen Namen davor.
+ */
+export function kernmeldungen(a) {
+  const d = frischeAntwort(a);
+  if (!d) return [];
+  const lf = gezeigterLastfall(a);
+  const fall = lf && (d.faelle || []).find((f) => f.name === lf.name);
+  return [...d.meldungen, ...(fall?.meldungen || []).map((m) => ({ ...m, text: `«${lf.name}»: ${m.text}` }))];
 }
 
 /** Der Beton, den eine neue Platte bekommt: der gewählte, sonst der erste des Projekts. */
@@ -90,6 +113,19 @@ const FELDER = {
       schritt: 10, titel: 'Dieser Anteil der Last geht in Richtung 1 der Platte, der Rest in Richtung 2',
     }),
   ],
+  flaechenlasten: (wert, setzen) => [
+    feldzeile('flaechenlast', 'wert', 'q', wert, setzen, { schritt: 0.5, titel: 'Nach unten positiv' }),
+  ],
+  linienlasten: (wert, setzen) => [
+    feldzeile('linienlast', 'wert', 'q', wert, setzen, { schritt: 1, titel: 'Je Meter Linie, nach unten positiv' }),
+  ],
+  punktlasten: (wert, setzen) => [
+    feldzeile('punktlast', 'wert', 'Q', wert, setzen, { schritt: 5, titel: 'Nach unten positiv' }),
+    feldzeile('punktlast', 'l_x', 'l_x', wert, setzen, {
+      schritt: 0.1, titel: 'Über l_x × l_y verteilt tragen die Streifen die Last',
+    }),
+    feldzeile('punktlast', 'l_y', 'l_y', wert, setzen, { schritt: 0.1 }),
+  ],
   stuetzen: (wert, setzen) => {
     const vonHand = wert('bereich_von_hand');
     return [
@@ -114,7 +150,18 @@ const FELDER = {
 /** Welche Liste ein Werkzeug füllt -- der Knoten keine. */
 const LISTE_VON = {
   platte: 'platten', lager: 'linienlager', stuetze: 'stuetzen', unterzug: 'unterzuege', zone: 'zonen',
+  flaechenlast: 'flaechenlasten', linienlast: 'linienlasten', punktlast: 'punktlasten',
 };
+
+/** Die Listen der gezeichneten Lasten -- jede in einem Lastfall. */
+export const LASTLISTEN = ['flaechenlasten', 'linienlasten', 'punktlasten'];
+
+/** In welchen Lastfall die Lasten gehen -- eine Zeile über ihren Feldern. */
+function lastfallText(a) {
+  const lf = gezeigterLastfall(a);
+  return lf ? el('p.cad-info', { text: `Lastfall «${lf.name}»` })
+    : el('p.cad-hinweis-klein', { text: 'Kein Lastfall gewählt -- oben in der Leiste einen wählen.' });
+}
 
 /** Die Felder für das, was ein Werkzeug als Nächstes anlegt. */
 export function neuEigenschaften(a, werkzeug) {
@@ -124,14 +171,15 @@ export function neuEigenschaften(a, werkzeug) {
   const wert = (feld) => (feld === 'beton' ? vorgabeBeton(a) : v[feld]);
   const setzen = (feld) => (w) => { v[feld] = w; a.neuZeichnen(); };
   return {
-    inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...FELDER[liste](wert, setzen)],
-    schluessel: JSON.stringify([werkzeug, v, vorgabeBeton(a)]),
+    inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...(LASTLISTEN.includes(liste) ? [lastfallText(a)] : []),
+      ...FELDER[liste](wert, setzen)],
+    schluessel: JSON.stringify([werkzeug, v, vorgabeBeton(a), aktiverLastfall(a.dk)]),
   };
 }
 
 /** Was der Kern zu diesen Teilen meldet -- nur, wenn seine Antwort zur Zeichnung gehört. */
 function meldungszeilen(a, kennungen) {
-  return (frischeAntwort(a)?.meldungen || []).filter((m) => m.elemente.some((k) => kennungen.includes(k)))
+  return kernmeldungen(a).filter((m) => m.elemente.some((k) => kennungen.includes(k)))
     .map((m) => el(m.fehler ? 'p.cad-meldung' : 'p.cad-hinweis-klein', { text: m.text }));
 }
 
@@ -141,7 +189,7 @@ export function eigenschaften(a) {
   const kennungen = [...new Set([...a.auswahl].map((s) => auswahlTeil(s).kennung))]
     .filter((k) => verzeichnis.has(k));
   const listen = new Set(kennungen.map((k) => verzeichnis.get(k).art?.liste ?? 'knoten'));
-  const schluessel = JSON.stringify([Boolean(frischeAntwort(a))]);
+  const schluessel = JSON.stringify([Boolean(frischeAntwort(a)), aktiverLastfall(a.dk)]);
   if (!kennungen.length) return { titel: '', inhalt: [] };
   if (listen.size > 1) {
     return {
@@ -166,6 +214,38 @@ export function stuetzeSetzen(a, z, knoten, an) {
       ...structuredClone(a.dk.vorgaben.stuetzen), kennung: a.modell.naechsteKennung(z, a.dk.vorsilben.stuetzen), knoten,
     });
   }
+}
+
+/**
+ * Setzt an einen Knoten eine Punktlast nach der Vorgabe des Werkzeugs, im
+ * Lastfall, den das Fenster zeigt -- oder nimmt die dieses Lastfalls weg.
+ */
+export function punktlastSetzen(a, z, knoten, an, lastfall) {
+  const hier = (e) => e.knoten === knoten && e.lastfall === lastfall;
+  if (!an) z.punktlasten = z.punktlasten.filter((e) => !hier(e));
+  else if (!z.punktlasten.some(hier)) {
+    z.punktlasten.push({
+      ...structuredClone(a.dk.vorgaben.punktlasten), kennung: a.modell.naechsteKennung(z, a.dk.vorsilben.punktlasten),
+      knoten, lastfall,
+    });
+  }
+}
+
+/** Die Punktlast der gewählten Knoten im gezeigten Lastfall -- wie die Stütze: ein Schalter, dann ihre Felder. */
+function punktlastFelder(a, z, knoten) {
+  const lf = gezeigterLastfall(a);
+  if (!lf) return [];
+  const lasten = knoten.map((k) => z.punktlasten.find((e) => e.knoten === k && e.lastfall === lf.kennung) || null);
+  const zeilen = [lastfallText(a), schalterzeile('Punktlast', jaNein(gemeinsam(lasten.map(Boolean)), (w) => a.aendern((zz) => {
+    for (const k of knoten) punktlastSetzen(a, zz, k, w, lf.kennung);
+  }), `Eine Punktlast an diesem Knoten im Lastfall «${lf.name}»`))];
+  if (lasten.some((e) => !e)) return zeilen;
+  const kennungen = lasten.map((e) => e.kennung);
+  const wert = (feld) => gemeinsam(lasten.map((e) => e[feld]));
+  const setzen = (feld) => (w) => a.aendern((zz) => {
+    for (const e of zz.punktlasten) if (kennungen.includes(e.kennung)) e[feld] = w;
+  });
+  return [...zeilen, ...FELDER.punktlasten(wert, setzen), ...meldungszeilen(a, kennungen)];
 }
 
 function stuetzeFelder(a, z, knoten) {
@@ -199,12 +279,36 @@ function knotenEigenschaften(a, z, knoten) {
         wert: gemeinsam(gewaehlt.map((k) => k[feld])), schritt: a.raster, beiAenderung: lageSetzen(feld),
       }), a.einstellung.einheit)),
       ...stuetzeFelder(a, z, knoten),
+      ...punktlastFelder(a, z, knoten),
       ...meldungszeilen(a, knoten),
     ],
   };
 }
 
-// -- Platten, Linienlager, Unterzüge, Zonen -----------------------------------
+// -- Platten, Linienlager, Unterzüge, Zonen, Lasten ---------------------------
+
+/**
+ * Die Last auf den ganzen gewählten Platten im gezeigten Lastfall -- leer
+ * heisst keine. Je Platte und Lastfall eine, wie im Kern.
+ */
+function plattenlastFelder(a, platten) {
+  const lf = gezeigterLastfall(a);
+  if (!lf) return [];
+  const kennungen = platten.map((p) => p.kennung);
+  const angabe = feldangabe('plattenlast', 'wert');
+  const setzen = (w) => a.aendern((zz) => {
+    for (const p of zz.platten) {
+      if (!kennungen.includes(p.kennung)) continue;
+      p.lasten = p.lasten.filter((x) => x.lastfall !== lf.kennung);
+      if (w !== null) p.lasten.push({ lastfall: lf.kennung, wert: w });
+    }
+  });
+  return [lastfallText(a), cadZeile('q überall', zahlfeldMitVar({
+    wert: gemeinsam(platten.map((p) => p.lasten.find((x) => x.lastfall === lf.kennung)?.wert ?? null)),
+    schritt: 0.5, angabe, leer: null, platzhalter: 'keine', beiAenderung: setzen,
+    titel: `Flächenlast auf der ganzen Platte im Lastfall «${lf.name}», nach unten positiv -- leer: keine`,
+  }), angabe.einheit)];
+}
 
 function teilEigenschaften(a, z, liste, kennungen) {
   const gewaehlt = z[liste].filter((x) => kennungen.includes(x.kennung));
@@ -212,7 +316,15 @@ function teilEigenschaften(a, z, liste, kennungen) {
   const setzen = (feld) => (w) => a.aendern((zz) => {
     for (const e of zz[liste]) if (kennungen.includes(e.kennung)) e[feld] = w;
   });
-  const inhalt = [...FELDER[liste](wert, setzen)];
+  // Ändert man den Lastfall einer Last, zeigt das Fenster danach dessen Lasten -- sonst verschwände sie.
+  const inhalt = [
+    ...(LASTLISTEN.includes(liste) ? [lastfallZeile(z, wert('lastfall'), (w) => {
+      setzen('lastfall')(w);
+      lastfallWaehlen(a, a.dk, w);
+    }, 'Zu welchem Lastfall die Lasten gehören')] : []),
+    ...FELDER[liste](wert, setzen),
+    ...(liste === 'platten' ? plattenlastFelder(a, gewaehlt) : []),
+  ];
   const art = a.adapter.arten.find((x) => x.liste === liste);
   if (gewaehlt.length === 1 && art.form === 'linie') {
     const [e] = gewaehlt;

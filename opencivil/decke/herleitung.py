@@ -3,13 +3,14 @@ opencivil/decke/herleitung.py -- wie eine Decke ihre Rechnung aufschreibt.
 
 VERANTWORTUNG:
 Die Herleitung der Streifenmethode, so dass man sie von Hand nachvollziehen
-kann: die Decke in Tabellen -- Platten, Linienlager, Stützen, Unterzüge --,
-die Streifen je Richtung, in welcher Reihenfolge die Träger rechnen, wie die
-Last auf die Richtungen geht, und die Meldungen.
+kann: die Decke in Tabellen -- Platten, Linienlager, Stützen, Unterzüge,
+Lasten je Lastfall und die Kombinationen --, die Streifen je Richtung, in
+welcher Reihenfolge die Träger rechnen, wie die Last auf die Richtungen
+geht, je Fall die Last und was die Lager davon tragen, und die Meldungen.
 
 EINHEITEN:
 Längen in m, Dicken und Stützen in mm, Winkel in Grad gegen x, E in N/mm²,
-Gewichte in kN/m².
+Gewichte und Flächenlasten in kN/m², Linienlasten in kN/m, Kräfte in kN.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ from typing import TYPE_CHECKING, Optional
 from opencivil.core.latex import Mathe, fest
 from opencivil.core.protokoll import Protokoll
 from opencivil.decke import geometrie as geo
-from opencivil.decke.modell import Aufteilung, Decke
+from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Last, Linienlast
 from opencivil.decke.rechnung import Ergebnis
 from opencivil.decke.streifen import richtungen_der_platte
 
@@ -49,6 +50,7 @@ def schreiben(p: Protokoll, system: "Deckensystem", befund: "Deckenbefund") -> N
     p.annahme(ANNAHME)
     _platten(p, system, befund.gerechnet)
     _lager(p, befund.gerechnet, befund.ergebnis)
+    _lasten(p, befund.gerechnet)
     for m in befund.meldungen:
         (p.warnung if m.fehler else p.hinweis)(m.text)
     e = befund.ergebnis
@@ -56,6 +58,7 @@ def schreiben(p: Protokoll, system: "Deckensystem", befund: "Deckenbefund") -> N
         return
     _streifen(p, e)
     _aufteilung(p, befund.gerechnet)
+    _faelle(p, e)
 
 
 def _ort(p) -> str:
@@ -110,6 +113,37 @@ def _lager(p: Protokoll, decke: Decke, e: Optional[Ergebnis]) -> None:
                    for u in decke.unterzuege], titel="Versteckte Unterzüge")
 
 
+def _lasten(p: Protokoll, decke: Decke) -> None:
+    """Die Lasten je Lastfall, wie sie beschrieben sind, und die Beiwerte der Kombinationen."""
+    zeilen = []
+    for lf in decke.lastfaelle:
+        if lf.eigengewicht:
+            zeilen.append([lf.name, "Eigengewicht", "jede Platte", Mathe(r"\rho \cdot g \cdot h")])
+        zeilen.extend([lf.name, *_last(last)] for last in lf.lasten)
+    if zeilen:
+        p.tabelle(["Lastfall", "Last", "wo", "Wert"], zeilen, titel="Lasten, nach unten positiv")
+    leer = [f"«{lf.name}»" for lf in decke.lastfaelle if not (lf.lasten or lf.eigengewicht)]
+    if leer:
+        p.text(f"Ohne Last: {', '.join(leer)}.")
+    for k in decke.kombinationen:
+        p.text(f"Kombination «{k.name}»: "
+               + (" + ".join(f"{beiwert:g} · «{lf}»" for lf, beiwert in k.faktoren.items())
+                  or "keine Beiwerte – sie ist leer."))
+
+
+def _last(last: Last) -> list:
+    """Name, Ort und Wert einer Last für die Tabelle."""
+    if isinstance(last, Flaechenlast):
+        wo = ("die ganze Platte" if last.platte
+              else f"A = {fest(abs(geo.flaeche(list(last.ecken))), 2)} m²")
+        return [last.name, wo, Mathe(f"{fest(last.wert / 1e3, 2)}" + r"\ \mathrm{kN/m^{2}}")]
+    if isinstance(last, Linienlast):
+        return [last.name, f"{_ort(last.a)} – {_ort(last.b)}",
+                Mathe(f"{fest(last.wert / 1e3, 2)}" + r"\ \mathrm{kN/m}")]
+    return [last.name, f"{_ort(last.ort)}, verteilt über {fest(last.lx, 2)} × {fest(last.ly, 2)} m",
+            Mathe(f"{fest(last.wert / 1e3, 1)}" + r"\ \mathrm{kN}")]
+
+
 def _streifen(p: Protokoll, e: Ergebnis) -> None:
     z = e.zerlegung
     zeilen = []
@@ -149,3 +183,18 @@ def _aufteilung(p: Protokoll, decke: Decke) -> None:
     if len(richtungen) > 1:
         p.text("Die Platten tragen in verschiedenen Richtungen: "
                + "; ".join(sorted(richtungen)) + ". Die Aufteilung gilt je Platte in ihren zwei Richtungen.")
+
+
+def _faelle(p: Protokoll, e: Ergebnis) -> None:
+    """Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, und die Meldungen des Falls."""
+    if not e.faelle:
+        return
+    p.tabelle(["Fall", Mathe(r"Q\ [\mathrm{kN}]"), Mathe(r"Q_{\mathrm{daneben}}\ [\mathrm{kN}]"),
+               Mathe(r"Q_{\mathrm{nicht\ getragen}}\ [\mathrm{kN}]"), Mathe(r"\sum R\ [\mathrm{kN}]")],
+              [[f.name, *(Mathe(fest(w / 1e3, 1)) for w in (f.summe, f.daneben, f.nicht_getragen, f.lagerkraft))]
+               for f in e.faelle], titel="Last und Lagerkräfte je Fall")
+    p.text("Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem "
+           "Streifen, der nicht trägt.")
+    for f in e.faelle:
+        for m in f.meldungen:
+            (p.warnung if m.fehler else p.hinweis)(f"«{f.name}»: {m.text}")

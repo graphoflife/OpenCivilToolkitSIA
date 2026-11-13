@@ -17,7 +17,7 @@
 
 import { wahlBlock, wahlSchalter } from './bausteine.js';
 import {
-  aktiverLastfall, lastart, lastfallWaehlen, lastVon, materialname, passendeUebersicht, zugseite,
+  lastart, lastVon, materialname, passendeUebersicht, zugseite,
 } from './bs_teile.js';
 import { zahlText } from './cad_ansicht.js';
 import {
@@ -25,6 +25,7 @@ import {
 } from './cad_app.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
 import { auswahl, el } from './dom.js';
+import { aktiverLastfall, lastfallWaehlen, lastfallZeile } from './lastfaelle.js';
 import { ausVorlage, katalog } from './zustand.js';
 
 /** Was ein Lager je Richtung kann -- die Feder heisst an einer Linie Bettung. */
@@ -90,20 +91,6 @@ function materialWahl(z, bringt, gewaehlt, setzen) {
 }
 
 /**
- * Der Lastfall, in den das Werkzeug zeichnet und dessen Lasten die
- * Zeichnung zeigt -- eine Wahl aus dem Projekt, darum eine Liste.
- */
-function lastfallWahl(a, z, gewaehlt, setzen, titel) {
-  if (!z.lastfaelle.length) {
-    return el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst unter «Lastfälle» einen Lastfall anlegen.' });
-  }
-  return cadZeile('Lastfall', auswahl({
-    werte: mitVar(z.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })), gewaehlt),
-    gewaehlt, titel, beiAenderung: setzen,
-  }));
-}
-
-/**
  * Die Felder einer Last: Richtung, Wert -- verteilt Anfang und Ende --,
  * die Stelle einer einzelnen in % der Linie, und ob eine verteilte je Meter
  * Projektion zählt. `last` ist die Last, die Vorgabe des Werkzeugs oder das
@@ -159,7 +146,7 @@ export function neuEigenschaften(a, werkzeug) {
     const v = a.bs.vorgaben.last;
     // Der Lastfall steht oben neben «Last»; hier nur, wenn keiner gewählt ist.
     inhalt = [
-      aktiverLastfall(a) ? null : el('p.cad-hinweis-klein', {
+      aktiverLastfall(a.bs) ? null : el('p.cad-hinweis-klein', {
         text: 'Kein Lastfall gewählt -- oben neben «Last» einen wählen.',
       }),
       wahlBlock('Art', wahlSchalter({
@@ -172,7 +159,7 @@ export function neuEigenschaften(a, werkzeug) {
   }
   return {
     inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...inhalt.filter(Boolean)],
-    schluessel: JSON.stringify([werkzeug, a.bs.vorgaben, aktiverLastfall(a)]),
+    schluessel: JSON.stringify([werkzeug, a.bs.vorgaben, aktiverLastfall(a.bs)]),
   };
 }
 
@@ -182,7 +169,7 @@ export function eigenschaften(a) {
   const lasten = kennungen.filter((k) => lastVon(z, k));
   const knoten = kennungen.filter((k) => z.knoten.some((x) => x.kennung === k));
   const linien = kennungen.filter((k) => z.linien.some((x) => x.kennung === k));
-  const schluessel = JSON.stringify([aktiverLastfall(a), Boolean(passendeUebersicht(a)), a.bs.bettungOffen]);
+  const schluessel = JSON.stringify([aktiverLastfall(a.bs), Boolean(passendeUebersicht(a)), a.bs.bettungOffen]);
   if (lasten.length && lasten.length === kennungen.length) return { ...lastEigenschaften(a, z, lasten), schluessel };
   if ((knoten.length && linien.length) || lasten.length) {
     return {
@@ -396,9 +383,9 @@ function lastEigenschaften(a, z, kennungen) {
   });
   const amKnoten = gemeinsam(da.map((d) => Boolean(d.knoten)));
   const art = gemeinsam(da.map((d) => d.last.art));
-  const inhalt = [lastfallWahl(a, z, gemeinsam(da.map((d) => d.last.lastfall)), (w) => {
+  const inhalt = [lastfallZeile(z, gemeinsam(da.map((d) => d.last.lastfall)), (w) => {
     setzen('lastfall', w);
-    lastfallWaehlen(a, w);
+    lastfallWaehlen(a, a.bs, w);
   }, 'Zu welchem Lastfall die Lasten gehören')];
   if (amKnoten !== VAR && art !== VAR) {
     const felder = Object.fromEntries(Object.keys(da[0].last)

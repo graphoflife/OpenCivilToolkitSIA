@@ -13325,6 +13325,12 @@ Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und g =
 | U3 | (8.50, 0.00) | (8.50, 5.50) | $1.00$ | 2 |
 | U4 | (0.00, 5.00) | (9.00, 5.00) | $1.00$ | 1 |
 
+**Lasten, nach unten positiv**
+
+| Lastfall | Last | wo | Wert |
+| ---: | ---: | ---: | ---: |
+| q\_d | P1 | die ganze Platte | $18.60\ \mathrm{kN/m^{2}}$ |
+
 **Streifen**
 
 | Richtung | $\varphi\ [°]$ | Feldstreifen | $b\ [\mathrm{m}]$ | Namen |
@@ -13337,6 +13343,14 @@ Je Richtung sind die Streifen höchstens 0.25 m breit; geteilt wird an jeder Eck
 Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann die Unterzüge, jeder nach denen tieferer Stufe: U4 (Stufe 1), U1 (Stufe 2), U2 (Stufe 2), U3 (Stufe 2). Was ein Träger an Lagerkraft abgibt, ist die Last dessen, auf dem er liegt.
 
 Aufteilung fest: 30 % der Last in Richtung 1, 70 % in Richtung 2.
+
+**Last und Lagerkräfte je Fall**
+
+| Fall | $Q\ [\mathrm{kN}]$ | $Q_{\mathrm{daneben}}\ [\mathrm{kN}]$ | $Q_{\mathrm{nicht\ getragen}}\ [\mathrm{kN}]$ | $\sum R\ [\mathrm{kN}]$ |
+| ---: | ---: | ---: | ---: | ---: |
+| q\_d | $920.7$ | $0.0$ | $0.0$ | $920.7$ |
+
+Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem Streifen, der nicht trägt.
 
 ### Decke: Jede Wahl
 
@@ -13378,6 +13392,20 @@ Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und g =
 | ---: | ---: | ---: | ---: | ---: |
 | S1 | (6.00, 7.00) | 400 × 250 | 1.20 × 0.80 | von Hand |
 
+**Lasten, nach unten positiv**
+
+| Lastfall | Last | wo | Wert |
+| ---: | ---: | ---: | ---: |
+| Eigengewicht | Eigengewicht | jede Platte | $\rho \cdot g \cdot h$ |
+| Auflast | P2 | die ganze Platte | $1.50\ \mathrm{kN/m^{2}}$ |
+| Auflast | LL1 | (1.00, 6.50) – (5.00, 6.50) | $8.00\ \mathrm{kN/m}$ |
+| Nutzlast | FL1 | A = 4.00 m² | $5.00\ \mathrm{kN/m^{2}}$ |
+| Nutzlast | PL1 | (12.50, 2.00), verteilt über 1.00 × 1.00 m | $30.0\ \mathrm{kN}$ |
+
+Kombination «GZT»: 1.35 · «Eigengewicht» + 1.35 · «Auflast» + 1.5 · «Nutzlast»
+
+Kombination «GZG»: 1 · «Eigengewicht» + 1 · «Auflast» + 1 · «Nutzlast»
+
 **Streifen**
 
 | Richtung | $\varphi\ [°]$ | Feldstreifen | $b\ [\mathrm{m}]$ | Namen |
@@ -13397,6 +13425,18 @@ Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt 
 | Z1 | $8.00$ | 100 % | 0 % |
 
 Die Platten tragen in verschiedenen Richtungen: x / 71.57°; x / y. Die Aufteilung gilt je Platte in ihren zwei Richtungen.
+
+**Last und Lagerkräfte je Fall**
+
+| Fall | $Q\ [\mathrm{kN}]$ | $Q_{\mathrm{daneben}}\ [\mathrm{kN}]$ | $Q_{\mathrm{nicht\ getragen}}\ [\mathrm{kN}]$ | $\sum R\ [\mathrm{kN}]$ |
+| ---: | ---: | ---: | ---: | ---: |
+| Eigengewicht | $318.0$ | $0.0$ | $0.0$ | $318.0$ |
+| Auflast | $59.0$ | $0.0$ | $0.0$ | $59.0$ |
+| Nutzlast | $50.0$ | $0.0$ | $0.0$ | $50.0$ |
+| GZT | $583.9$ | $0.0$ | $0.0$ | $583.9$ |
+| GZG | $427.0$ | $0.0$ | $0.0$ | $427.0$ |
+
+Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem Streifen, der nicht trägt.
 
 ## Verwendete Formeln
 

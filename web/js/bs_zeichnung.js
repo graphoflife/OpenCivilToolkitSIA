@@ -58,11 +58,10 @@ import {
   momentSymbol, streckenlast, streckenmoment, unbestimmtSymbol,
 } from './bs_symbole.js';
 import {
-  aktiverLastfall, lastart, lastfallWaehlen, lastVon, passendeUebersicht, zugseite,
+  lastart, lastVon, passendeUebersicht, zugseite,
 } from './bs_teile.js';
-import {
-  auswahl, el, melden, svgEl,
-} from './dom.js';
+import { el, melden, svgEl } from './dom.js';
+import { aktiverLastfall, lastfallFuerNeue, lastfallLeiste } from './lastfaelle.js';
 import { ausVorlage, eintragVon, katalog, zustand } from './zustand.js';
 
 /**
@@ -105,7 +104,7 @@ export function zeichenbereich(system, listeBauen) {
   const a = fensterVon(system.kennung);
   const bereich = cadBereichMitListe(a, listeBauen);
   uebersichtHolen(a);
-  lastfallLeiste(a);
+  lastfallLeiste(a, a.bs, a.bs.lastfallHuelle);
   return bereich;
 }
 
@@ -117,25 +116,6 @@ export function zeichenbereich(system, listeBauen) {
 const SYSTEME = cadApp('bs', adapter, (a) => { a.bs = a.adapter.bs; });
 const fensterVon = SYSTEME.fensterVon;
 export const waehlen = SYSTEME.waehlen;
-
-/**
- * Die Wahl des Lastfalls gleich neben dem Werkzeug «Last» (Benutzer,
- * 2026-10-24): dessen Lasten zeigt und bearbeitet die Zeichnung -- oder
- * «– kein Lastfall –». Neu bei jedem Neubau der Tafel, damit sie jeden
- * Lastfall kennt.
- */
-function lastfallLeiste(a) {
-  const huelle = a.bs.lastfallHuelle;
-  if (!huelle) return;
-  const faelle = eintragVon(a.bs.kennung)?.lastfaelle || [];
-  huelle.replaceChildren(auswahl({
-    werte: [{ wert: '', beschriftung: '– kein Lastfall –' },
-      ...faelle.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
-    gewaehlt: aktiverLastfall(a) || '',
-    titel: 'Dessen Lasten zeigt und bearbeitet die Zeichnung',
-    beiAenderung: (w) => lastfallWaehlen(a, w),
-  }));
-}
 
 // ===========================================================================
 // Der Adapter
@@ -259,11 +239,8 @@ function naechsteLast(z) {
  * einzeln dort, wo geklickt wurde. Gibt die Kennung zurück, oder null.
  */
 function lastAnlegen(a, z, erg) {
-  const lf = aktiverLastfall(a);
-  if (!lf) {
-    melden('Für eine Last zuerst oben neben «Last» einen Lastfall wählen.', true);
-    return null;
-  }
+  const lf = lastfallFuerNeue(a.bs);
+  if (!lf) return null;
   const v = a.bs.vorgaben.last;
   const art = lastart(v.art);
   const weit = NAEHE / a.v.massstab;
@@ -482,7 +459,7 @@ function zeichnen(a, g) {
   }
 
   // Die Lasten des gewählten Lastfalls.
-  const lf = aktiverLastfall(a);
+  const lf = aktiverLastfall(a.bs);
   a.bs.lastformen = [];
   if (lf) g.append(lastenZeichnen(a, z, lf, lagen));
 

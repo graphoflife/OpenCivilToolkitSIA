@@ -38,6 +38,7 @@ from opencivil.stabwerk.modell import (
 )
 from opencivil.stabwerk.system import Meldung
 
+from opencivil.projekt.aufbau.faelle import beiwerte, doppelte_kennungen, faelle_pruefen, ohne_lastfall
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil
 
 if TYPE_CHECKING:
@@ -85,34 +86,14 @@ def modell_von(eintrag: BalkensystemEintrag) -> Modell:
     def melden(text: str, *elemente: str, fehler: bool = True) -> None:
         meldungen.append(Meldung(text, tuple(elemente), fehler))
 
-    # Die Faelle werden an ihrem Namen erkannt; zwei gleiche waeren nicht zu
-    # unterscheiden. Ein Fehler dieses Systems -- bis 2026-10-15 hielt er
-    # das ganze Projekt auf, auch jede Platte.
-    lastfaelle = [lf.name for lf in eintrag.lastfaelle]
-    kombinationen = [k.name for k in eintrag.kombinationen]
-    for was, namen in (("Lastfälle", lastfaelle), ("Kombinationen", kombinationen)):
-        for name in sorted({n for n in namen if namen.count(n) > 1}):
-            melden(f"Mehrere {was} heissen «{name}» – sie wären nicht zu "
-                   f"unterscheiden. Gerechnet wird erst mit verschiedenen Namen.")
-    for name in sorted(set(lastfaelle) & set(kombinationen)):
-        melden(f"«{name}» heisst ein Lastfall und eine Kombination – die beiden wären "
-               f"nicht zu unterscheiden. Gerechnet wird erst mit verschiedenen Namen.")
+    meldungen.extend(faelle_pruefen(eintrag.lastfaelle, eintrag.kombinationen))
     eigen = [lf for lf in eintrag.lastfaelle if lf.eigengewicht]
-    if len(eigen) > 1:
-        melden(f"Das Eigengewicht bekommen {', '.join(f'«{lf.name}»' for lf in eigen)} – "
-               f"es gehört in einen Lastfall.", *[lf.kennung for lf in eigen])
-    # Je Teil eine Kennung: an ihr haengen Staebe, Lasten und Verweise. Bis
-    # 2026-10-16 fiel eine Last bei zwei gleichen Lastfall-Kennungen still
-    # in beide.
     for was, liste in (("Knoten", eintrag.knoten), ("Linien", eintrag.linien),
                        ("Lager", eintrag.lager), ("Lasten", eintrag.alle_lasten()),
                        ("Materialien", eintrag.stabmaterialien),
                        ("Querschnitte", eintrag.querschnitte), ("Lastfälle", eintrag.lastfaelle),
                        ("Kombinationen", eintrag.kombinationen)):
-        kennungen = [e.kennung for e in liste]
-        for kennung in sorted({k for k in kennungen if kennungen.count(k) > 1}):
-            melden(f"Mehrere {was} haben die Kennung «{kennung}» – sie wären nicht zu "
-                   f"unterscheiden. Gerechnet wird erst mit verschiedenen.", kennung)
+        meldungen.extend(doppelte_kennungen(was, liste))
 
     def halt(art: str, k: float, feld: str, wo: str) -> Halt:
         if art == "frei":
@@ -163,13 +144,11 @@ def modell_von(eintrag: BalkensystemEintrag) -> Modell:
                    phi=halt(a.phi, a.k_phi, "k_phi", a.kennung))
              for a in eintrag.lager]
 
-    name_von = {lf.kennung: lf.name for lf in eintrag.lastfaelle}
     lasten: Dict[str, List[Any]] = {lf.kennung: [] for lf in eintrag.lastfaelle}
     for l in eintrag.linien:
         for last in l.lasten:
-            if last.lastfall not in name_von:
-                melden(f"{last.kennung or l.kennung}: die Last gehört zu keinem Lastfall – "
-                       f"sie wird nicht gerechnet.", last.kennung or l.kennung, fehler=False)
+            if last.lastfall not in lasten:
+                meldungen.append(ohne_lastfall(last.kennung or l.kennung))
                 continue
             einheit = EINHEIT_DER_LAST[last.art]
             # Verteilt ueber die ganze Linie, einzeln an ihrer Stelle.
@@ -181,9 +160,8 @@ def modell_von(eintrag: BalkensystemEintrag) -> Modell:
                 richtung=last.richtung, von=von, bis=None,
                 projiziert=last.projiziert))
     for p in eintrag.knotenlasten:
-        if p.lastfall not in name_von:
-            melden(f"{p.kennung}: die Last gehört zu keinem Lastfall – sie wird nicht "
-                   f"gerechnet.", p.kennung, fehler=False)
+        if p.lastfall not in lasten:
+            meldungen.append(ohne_lastfall(p.kennung))
             continue
         wert = Groesse(p.wert, EINHEIT_DER_LAST[p.art]).si
         if p.art == "moment":
@@ -194,14 +172,9 @@ def modell_von(eintrag: BalkensystemEintrag) -> Modell:
             last = Knotenlast(p.knoten, Fz=-wert)
         lasten[p.lastfall].append(last)
 
-    kombinationen = []
-    for k in eintrag.kombinationen:
-        fremd = [lf for lf in k.faktoren if lf not in name_von]
-        if fremd:
-            melden(f"Kombination «{k.name}»: einen Lastfall «{fremd[0]}» gibt es nicht – "
-                   f"sein Beiwert zählt nicht.", fehler=False)
-        kombinationen.append(Kombination(k.name, {name_von[lf]: beiwert for lf, beiwert
-                                                  in k.faktoren.items() if lf in name_von}))
+    faktoren, hinweise = beiwerte(eintrag.kombinationen, eintrag.lastfaelle)
+    meldungen.extend(hinweise)
+    kombinationen = [Kombination(name, je_fall) for name, je_fall in faktoren]
 
     system = System(
         knoten=[Knoten(k.kennung, k.x, k.z) for k in eintrag.knoten],

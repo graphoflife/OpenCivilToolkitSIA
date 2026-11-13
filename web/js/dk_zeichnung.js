@@ -9,6 +9,13 @@
  * ein eigener Eintrag an ihrem Knoten, gewählt wird aber der Knoten -- wie
  * ein Lager im Balkensystem; sein Fenster zeigt die Stütze.
  *
+ * LASTEN:
+ * Flächen-, Linien- und Punktlasten zeichnen die Werkzeuge in den Lastfall,
+ * der in der Leiste gewählt ist (lastfaelle.js), wie im Balkensystem. Das
+ * Fenster zeigt nur dessen Lasten, und nur sie lassen sich wählen. Eine
+ * Punktlast steht wie eine Stütze an ihrem Knoten, die Last auf einer ganzen
+ * Platte im Fenster der Platte.
+ *
  * WAS DARUNTER LIEGT:
  * Was der Kern zur Zeichnung sagt (Anfrage `decke_zeichnung`): wie die Last
  * auf die zwei Richtungen geht, oder wo die Streifen laufen -- umzuschalten
@@ -25,35 +32,46 @@ import { wahlSchalter } from './bausteine.js';
 import { cadApp, cadBereichMitListe, listeZeichnen, umrissVon } from './cad_app.js';
 import { knotenname } from './cad_modell.js';
 import {
-  eigenschaften, frischeAntwort, neuEigenschaften, stuetzeSetzen, vorgabeBeton,
+  LASTLISTEN, eigenschaften, frischeAntwort, kernmeldungen, neuEigenschaften, punktlastSetzen, stuetzeSetzen,
+  vorgabeBeton,
 } from './dk_eigenschaften.js';
 import { anteilText, grundriss } from './dk_grundriss.js';
 import { el } from './dom.js';
+import { aktiverLastfall, lastfallFuerNeue, lastfallLeiste } from './lastfaelle.js';
 import { eintragVon, katalog, zustand } from './zustand.js';
 
 /** Was die Arten heissen, je Liste -- einzeln und mehrere. */
 const NAMEN = {
   stuetzen: ['Stütze', 'Stützen'],
+  punktlasten: ['Punktlast', 'Punktlasten'],
+  linienlasten: ['Linienlast', 'Linienlasten'],
   linienlager: ['Linienlager', 'Linienlager'],
   unterzuege: ['Unterzug', 'Unterzüge'],
+  flaechenlasten: ['Flächenlast', 'Flächenlasten'],
   zonen: ['Zone', 'Zonen'],
   platten: ['Platte', 'Platten'],
 };
 
 /**
  * Die Arten der Decke, ihre Vorsilben vom Kern (`VORSILBEN` in
- * opencivil/projekt/decke.py). Eine Stütze vor allem: sie steht auf dem
- * Knoten, an dem sonst eine Platte gewählt würde -- gewählt wird aber ihr
- * Knoten (`waehlbar`). Eine Zone vor ihrer Platte: sie liegt in ihr.
+ * opencivil/projekt/decke.py). Eine Stütze und eine Punktlast vor allem:
+ * sie stehen auf dem Knoten, an dem sonst eine Platte gewählt würde --
+ * gewählt wird aber ihr Knoten (`waehlbar`). Eine Last vor dem, worauf sie
+ * liegt, und eine Zone vor ihrer Platte: sie liegen darauf.
  */
 function arten() {
   const vorsilben = katalog('decke', 'vorsilben');
   return [
-    ['stuetzen', 'punkt'], ['linienlager', 'linie'], ['unterzuege', 'linie'], ['zonen', 'flaeche'],
-    ['platten', 'flaeche'],
+    ['stuetzen', 'punkt'], ['punktlasten', 'punkt'], ['linienlasten', 'linie'], ['linienlager', 'linie'],
+    ['unterzuege', 'linie'], ['flaechenlasten', 'flaeche'], ['zonen', 'flaeche'], ['platten', 'flaeche'],
   ].map(([liste, form], rang) => ({
     liste, form, rang, vorsilbe: vorsilben[liste], heisst: NAMEN[liste][0], mehrzahl: NAMEN[liste][1],
   }));
+}
+
+/** Eine Last braucht einen Lastfall -- ohne einen startet ihr Werkzeug nicht und sagt, wo er zu wählen ist. */
+function lastBereit(a) {
+  return Boolean(lastfallFuerNeue(a.dk));
 }
 
 /** Meter, ein Raster bis 2 m und die Werkzeuge der Decke -- sie hängt an ihren Knoten. */
@@ -69,6 +87,13 @@ const EINSTELLUNG = {
       titel: 'Versteckter Unterzug -- ein starker Streifen in der Platte' },
     { name: 'zone', text: 'Zone', zeichen: 'cad-zone', taste: 'z', form: 'polygon',
       titel: 'Zone -- dort geht ein eigener Anteil der Last in Richtung 1' },
+    { name: 'flaechenlast', text: 'Flächenlast', zeichen: 'cad-flaechenlast', taste: 'q', form: 'polygon',
+      bereit: lastBereit,
+      titel: 'Flächenlast -- ein Umriss im gewählten Lastfall; auf einer ganzen Platte im Fenster der Platte' },
+    { name: 'linienlast', text: 'Linienlast', zeichen: 'cad-linienlast', taste: 'l', form: 'linie',
+      bereit: lastBereit, titel: 'Linienlast -- von Punkt zu Punkt, im gewählten Lastfall' },
+    { name: 'punktlast', text: 'Punktlast', zeichen: 'cad-punktlast', taste: 'e', form: 'knoten',
+      bereit: lastBereit, titel: 'Punktlast -- an einen Knoten oder eine freie Stelle, im gewählten Lastfall' },
     { name: 'knoten', text: 'Knoten', zeichen: 'cad-knoten', taste: 'k', form: 'knoten' },
   ],
   einheit: 'm',
@@ -106,6 +131,7 @@ export function zeichenbereich(decke, listeBauen) {
   const bereich = cadBereichMitListe(a, listeBauen);
   zeichnungHolen(a);
   unterlageLeiste(a);
+  lastfallLeiste(a, a.dk, a.dk.lastfallHuelle);
   return bereich;
 }
 
@@ -136,6 +162,9 @@ function vorgabenNeu() {
     stuetzen: vorlage('stuetze'),
     unterzuege: vorlage('unterzug'),
     zonen: vorlage('zone'),
+    flaechenlasten: vorlage('flaechenlast'),
+    linienlasten: vorlage('linienlast'),
+    punktlasten: vorlage('punktlast'),
   };
 }
 
@@ -143,16 +172,18 @@ function vorgabenNeu() {
 function adapter(kennung) {
   const dk = {
     kennung, vorgaben: vorgabenNeu(), vorsilben: katalog('decke', 'vorsilben'), daten: null, gefragt: null,
-    unterlage: 'aufteilung', leiste: null,
+    unterlage: 'aufteilung', leiste: null, lastfall: null, lastfallHuelle: null,
   };
   return {
     dk,
     einstellung: EINSTELLUNG,
     achsen: ['x', 'y'],
     arten: arten(),
+    // Der Lastfall gleich neben den Werkzeugen, wie im Balkensystem -- dann die Unterlage.
     leisteZusatz: () => {
+      dk.lastfallHuelle = el('span.bs-lastfallwahl');
       dk.leiste = el('span.dk-unterlagewahl');
-      return dk.leiste;
+      return el('span.dk-leistenzusatz', {}, [dk.lastfallHuelle, dk.leiste]);
     },
     name: elementname,
     neuText,
@@ -160,7 +191,9 @@ function adapter(kennung) {
     linieAnlegen,
     flaecheAnlegen,
     zeichnen,
-    waehlbar: (art) => art.liste !== 'stuetzen',
+    // Eine Last nur in dem Lastfall, den das Fenster zeigt -- die anderen sind nicht zu sehen.
+    waehlbar: (art, e) => !['stuetzen', 'punktlasten'].includes(art.liste)
+      && (!LASTLISTEN.includes(art.liste) || e.lastfall === aktiverLastfall(dk)),
     umriss: () => umrissVon((eintragVon(kennung)?.knoten || []).map((k) => [k.x, k.y]), [[0, 0], [10, 8]]),
     geaendert: zeichnungHolen,
     eigenschaften,
@@ -183,27 +216,38 @@ function neuText(a, werkzeug) {
   return EINSTELLUNG.werkzeuge.find((w) => w.name === werkzeug)?.text || '';
 }
 
-/** Eine Stütze an den Knoten -- gewählt bleibt der Knoten, sein Fenster zeigt sie. */
+/**
+ * Eine Stütze oder Punktlast an den Knoten -- gewählt bleibt der Knoten,
+ * sein Fenster zeigt sie. Eine Last geht in den gezeigten Lastfall; ist
+ * keiner mehr gewählt, seit das Werkzeug lief, bleibt es beim Knoten.
+ */
 function punktAnlegen(a, z, knoten, werkzeug) {
   if (werkzeug === 'stuetze') stuetzeSetzen(a, z, knoten, true);
+  const lf = werkzeug === 'punktlast' && lastfallFuerNeue(a.dk);
+  if (lf) punktlastSetzen(a, z, knoten, true, lf);
   return null;
 }
 
-function linieAnlegen(a, z, von, bis, werkzeug) {
-  const liste = werkzeug === 'unterzug' ? 'unterzuege' : 'linienlager';
+/** Ein neuer Eintrag der Liste nach der Vorgabe ihres Werkzeugs -- eine Last im gezeigten Lastfall, sonst keiner. */
+function anlegen(a, z, liste, felder) {
+  const zusatz = {};
+  if (LASTLISTEN.includes(liste)) {
+    zusatz.lastfall = lastfallFuerNeue(a.dk);
+    if (!zusatz.lastfall) return null;
+  }
   const kennung = a.modell.naechsteKennung(z, a.dk.vorsilben[liste]);
-  z[liste].push({ ...structuredClone(a.dk.vorgaben[liste]), kennung, von, bis });
+  z[liste].push({ ...structuredClone(a.dk.vorgaben[liste]), kennung, ...felder, ...zusatz });
   return kennung;
 }
 
+function linieAnlegen(a, z, von, bis, werkzeug) {
+  const liste = { unterzug: 'unterzuege', linienlast: 'linienlasten' }[werkzeug] || 'linienlager';
+  return anlegen(a, z, liste, { von, bis });
+}
+
 function flaecheAnlegen(a, z, knoten, werkzeug) {
-  const liste = werkzeug === 'zone' ? 'zonen' : 'platten';
-  const kennung = a.modell.naechsteKennung(z, a.dk.vorsilben[liste]);
-  z[liste].push({
-    ...structuredClone(a.dk.vorgaben[liste]), kennung, knoten,
-    ...(liste === 'platten' ? { beton: vorgabeBeton(a) } : {}),
-  });
-  return kennung;
+  const liste = { zone: 'zonen', flaechenlast: 'flaechenlasten' }[werkzeug] || 'platten';
+  return anlegen(a, z, liste, { knoten, ...(liste === 'platten' ? { beton: vorgabeBeton(a) } : {}) });
 }
 
 // ===========================================================================
@@ -242,15 +286,15 @@ function zeichnungHolen(a) {
 function zeichnen(a, g) {
   const z = eintragVon(a.dk.kennung);
   if (!z) return;
-  const frisch = frischeAntwort(a);
   const je = new Map();
-  for (const m of frisch?.meldungen || []) {
+  for (const m of kernmeldungen(a)) {
     for (const k of m.elemente) je.set(k, [...(je.get(k) || []), m]);
   }
-  const daten = a.dk.daten && { ...a.dk.daten, veraltet: !frisch };
+  const daten = a.dk.daten && { ...a.dk.daten, veraltet: !frischeAntwort(a) };
   g.append(grundriss(a.v, z, daten, {
     was: a.dk.unterlage,
     fehler: (k) => (je.get(k) || []).some((m) => m.fehler),
     texte: (k) => (je.get(k) || []).map((m) => m.text),
+    lastfall: aktiverLastfall(a.dk),
   }));
 }
