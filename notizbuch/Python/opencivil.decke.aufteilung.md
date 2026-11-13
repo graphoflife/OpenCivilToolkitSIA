@@ -1,5 +1,5 @@
 ---
-erzeugt: d3b474ab107b
+erzeugt: 6cbb3a23d5cc
 art: modul
 tags: [modul]
 ---
@@ -20,8 +20,8 @@ die Last darauf.
 
 1. **Gezeichnete Zonen** gehen vor: dort gilt ihr Anteil.
 2. Sonst, bei **fester Aufteilung**, überall derselbe Anteil.
-3. Sonst, **automatisch**, nach dem Muster der Folie 31 -- «randnahe Lasten
-   werden direkt zum nächsten Auflagerrand abgetragen». Gerechnet wird je
+3. Sonst, **automatisch**, nach dem Muster der Folie 31 -- was nahe an einem
+   Rand liegt, geht auf kürzestem Weg in dessen Lager. Gerechnet wird je
    Zelle, wo sich ein Streifen der einen und einer der anderen Richtung
    kreuzen:
 

@@ -111,7 +111,7 @@ class TestBeispielDerTabelle84(unittest.TestCase):
             self.assertAlmostEqual(t.ds_E, soll, delta=0.00007)
 
     def test_rund_zwei_zentimeter(self):
-        """«Im Beispiel ergibt sich eine rechnerische Setzung von 2,1 cm aus der Tonschicht.»"""
+        """Das Beispiel des Kapitels kommt für die Tonschicht auf rund 2.1 cm."""
         self.assertAlmostEqual(self.befund.schichten[1].s, 0.021, delta=0.0006)
         self.assertLess(self.befund.schichten[0].s, 1e-6)
         self.assertEqual(self.befund.s_W, 0.0)

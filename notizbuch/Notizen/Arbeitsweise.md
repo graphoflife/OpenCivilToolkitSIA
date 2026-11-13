@@ -73,16 +73,25 @@ Kopie der Datei mit der Endung `.mjs`.
 
 ## Normstellen
 
-- Die Normstellen, also die Passagen aus SIA 262, liefert der Benutzer. Nie
-  eine erfinden.
+- Die Quellen liegen vollständig vor (Benutzer, 2026-11-14), in
+  `/home/stefan/Documents/SIA Normen/`: SIA 262:2025, SIA 267:2013 und das
+  Buch von Lang, Huder, Amann und Puzrin, «Bodenmechanik und Grundbau»,
+  8. Auflage 2007 – das Buch hinter den Verweisen «Kap. 8.x», «Kap. 9.2.x».
+  Eine Normstelle dort nachschlagen, nie eine erfinden. Die beiden SIA-PDFs
+  sind Scans: Seiten als Bild lesen, die gedruckte Seitenzahl ist die des
+  PDF. Das Buch hat eine Textschicht (`pdftotext`).
+- **Keine Normtexte in der Software** (Benutzer, 2026-11-13 und 2026-11-14):
+  kein Satz aus einer Norm oder dem Buch wörtlich in Code, Oberfläche,
+  Bericht, Tests oder Notizbuch, auch nicht als Zitat. Den Inhalt in eigenen
+  Worten, dazu Ziffer, Gleichungsnummer, Formel und Zahlen.
 - Kein Verifikationsblatt der Normverweise bauen (entschieden am 2026-09-25):
   der Benutzer gleicht lieber mit den Originaltexten ab, als eine Liste
   nachzuschlagen.
-- Kommen Passagen, den Code direkt dagegen prüfen – Konstanten, Formeln,
+- Neue Regeln direkt gegen die Norm prüfen – Konstanten, Formeln,
   `referenz=` – und die offenen Normfragen in [[TODO]] abhaken oder
   korrigieren.
-- Was nach Vorgabe eingebaut ist, heisst im Code «nach Vorgabe, nicht
-  nachgeschlagen» und steht in [[TODO]].
+- Was die Norm nicht regelt und nach Vorgabe eingebaut ist, heisst im Code
+  «nach Vorgabe, nicht nachgeschlagen» und steht in [[TODO]].
 
 ## Entschieden – nicht wieder ansprechen
 

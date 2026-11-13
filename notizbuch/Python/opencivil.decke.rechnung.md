@@ -1,5 +1,5 @@
 ---
-erzeugt: 406b9a7d62de
+erzeugt: 4b06db36aa1f
 art: modul
 tags: [modul]
 ---
@@ -18,9 +18,8 @@ Kombination die Träger rechnen -- von unten nach oben:
 2. die Unterzüge, nach Stufe aufsteigend. Was ein Streifen in einen
    Unterzug gibt, liegt auf diesem als Last -- mit umgekehrtem Vorzeichen
    die Pressung, mit der dieser ihn trägt, über die Fläche, die beide
-   teilen (Stahlbeton II, 7.2 Platten, Folie 33: «Anschliessend werden die
-   Reaktionen des Flächenlagers als Belastung auf den versteckten Unterzug
-   aufgebracht»).
+   teilen (Stahlbeton II, 7.2 Platten, Folie 33: die Pressung des
+   Flächenlagers wird zur Last des versteckten Unterzugs).
 3. Was in Linienlager und Stützen geht, sind die Lagerkräfte der Decke.
 
 Am Ende eine Probe: alle Lagerkräfte zusammen sind die Last, abzüglich
