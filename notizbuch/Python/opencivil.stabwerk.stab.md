@@ -1,5 +1,5 @@
 ---
-erzeugt: a2b657ddc226
+erzeugt: 9e6cbe94c94e
 art: modul
 tags: [modul]
 ---
@@ -207,6 +207,7 @@ Die arbeitsgleichen Knotenkraefte `f` (6) in den Achsen des Stabs --
 
 ## Gebraucht von
 
+- [[opencivil.decke.traeger]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk.verlauf]]

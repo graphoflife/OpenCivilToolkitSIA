@@ -1,5 +1,5 @@
 ---
-erzeugt: f1f41968484a
+erzeugt: 7b91168ec31c
 art: modul
 tags: [modul]
 ---
@@ -191,5 +191,6 @@ Die volle Matrix -- fuer die Herleitung kleiner Systeme und fuer Proben.
 
 ## Gebraucht von
 
+- [[opencivil.decke.traeger]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.system]]

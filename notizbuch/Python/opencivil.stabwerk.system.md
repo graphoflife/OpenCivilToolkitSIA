@@ -1,5 +1,5 @@
 ---
-erzeugt: 5527acbd404a
+erzeugt: 3a8dffac5679
 art: modul
 tags: [modul]
 ---
@@ -340,6 +340,10 @@ Alle Lasten des Falls als Kraft auf das Tragwerk und Moment um den Ursprung.
 
 ## Gebraucht von
 
+- [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.lasten]]
+- [[opencivil.decke.rechnung]]
+- [[opencivil.decke.streifen]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]

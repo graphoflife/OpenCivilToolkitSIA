@@ -8,6 +8,24 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
+- [ ] **Decken: die App fertig bauen.** Der Rechenkern steht
+      (`opencivil/decke/`, siehe [[Entwicklung]], 2026-11-13). Es fehlen,
+      je ein Commit: das Zeichnen (Platten, Lager, Stützen, Unterzüge,
+      Zonen), Lasten und Lastfälle, die Ergebnisbilder samt Lagerkräften,
+      der Bericht mit Herleitung.
+- [ ] Decken, nach Vorgabe, nicht nachgeschlagen (`opencivil/decke/`):
+      die automatische Aufteilung, wo Folie 31 nichts sagt (die Spannweite
+      eines Kragarms zählt doppelt, gleich lange Spannweiten innerhalb 1 %
+      je zur Hälfte, entschieden wird im Schwerpunkt jeder Zelle); die
+      Grösse des Stützenbereichs, wenn sie fehlt (ein Quadrat, so breit wie
+      die Stütze oder der breiteste Unterzug über ihr -- Folie 39 lässt sie
+      offen); Streifen in zwei Richtungen, die nicht rechtwinklig
+      aufeinander stehen; die Linienlast als Band von 1 mm, die Einzellast
+      über 1 × 1 m verteilt. Vom Benutzer bestätigen lassen.
+- [ ] Decken: B-B des Kolloquiums 4 weicht von der Musterlösung ab
+      (−60.1 statt −58.5 kNm/m, Stützen 115.0/276.4 statt 115.5/275.1 kN),
+      weil die App die Last aus C-C dort ablegt, wo sie aufliegt, statt mit
+      dem Faktor 8.0 über die ganze Länge. Dem Benutzer so vorlegen.
 - [ ] **Die Sortentabellen sind ungeprüft.** `BETONSORTEN` und `STAHLSORTEN` in
       `material/` stammen aus der Vorgängerfassung und sind nie gegen die
       gedruckte SIA 262 gehalten worden. Dasselbe gilt für sämtliche

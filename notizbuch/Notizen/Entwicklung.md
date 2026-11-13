@@ -44,6 +44,72 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-13 · Decken: der Rechenkern der Streifenmethode
+
+Erster Schritt der neuen App «Decken» (Wunsch des Benutzers, 2026-11-13):
+ganze Stahlbetondecken aus mehreren Platten verschiedener Dicke, auch nicht
+rechtwinklig, auf Linienlagern (mit oder ohne Einspannung, mit oder ohne
+vertikale Halterung) und Stützen, mit versteckten Unterzügen, unter Flächen-,
+Linien- und Einzellasten je Lastfall, mit Kombinationen. Gerechnet nach der
+Streifenmethode, nicht mit finiten Elementen -- so verlangt. Quellen sind die
+Vorlesung Stahlbeton II, 7.2 Platten, und die Musterlösung des Kolloquiums 4,
+beide vom Benutzer. Der Kern steht in `opencivil/decke/`; die Oberfläche
+folgt in eigenen Schritten: Zeichnen, Lasten und Lastfälle, Ergebnisbilder,
+Bericht mit Herleitung.
+
+Warum es so gebaut ist:
+
+- **Elastisch gelöste Streifen.** Der Benutzer hat für statisch unbestimmte
+  Streifen die elastische Rechnung gewählt. Jeder Streifen ist ein
+  Durchlaufträger; seine Steifigkeit folgt der Platte, über die er gerade
+  läuft. Darum läuft ein Streifen über die Grenze zweier Platten durch, und
+  die dickere zieht mehr Moment an.
+- **Unterzüge als Flächenlager** (Folie 33). Erst elastisch mit Punktlagern
+  lösen, dann die Statik mit gleichmässiger Pressung über die Breite des
+  Unterzugs -- wie die Musterlösung, die so über der Mitte von −10.9 auf
+  −7.3 kNm/m kommt. Ein Unterzug liegt auf denen höherer Stufe, die
+  Feldstreifen haben Stufe null; gerechnet wird von unten nach oben, und was
+  ein Träger an Lagerkraft abgibt, ist die Last des nächsten.
+- **Wer trägt, wenn zwei Lager am selben Ort sind:** das Linienlager vor dem
+  Unterzug, der höhere Unterzug vor dem tieferen, der Unterzug vor der
+  Stütze. Sonst trüge eine Last doppelt.
+- **Die Aufteilung** ist fest (ein Anteil für die ganze Decke) oder
+  automatisch: Folie 31 verallgemeinert. Je Zelle zweier Streifen trägt die
+  Richtung, die überhaupt Lager hat; haben beide, geht eine randnahe Last
+  (näher als ein Viertel der kürzeren Spannweite) zum nahen Rand, sonst zur
+  kürzeren Spannweite; nahe zweier Ränder und bei gleicher Spannweite je die
+  Hälfte. Das trifft die Momente der Folie genau. Gezeichnete Zonen mit
+  eigenem Anteil gehen vor; der Benutzer wollte beides.
+- **Lasten genau integriert.** Jedes Vieleck zerfällt in Dreiecke, wird mit
+  dem Band eines Streifens geschnitten, und seine Breite quer zum Streifen
+  ist stückweise linear: daraus werden Streckenlasten, ohne Raster. Eine
+  Linienlast ist ein Band von 1 mm, eine Einzellast eine Fläche
+  l_x × l_y (Vorgabe 1 × 1 m) -- so braucht es nur eine Art, Lasten zu
+  verteilen, und auf einer Streifengrenze teilt sich eine Linienlast von
+  selbst zur Hälfte.
+- **Schiefe Platten** tragen in den Richtungen ihrer Ränder. Ein schiefer
+  Streifen trägt `m_η`; ausgegeben werden `m_x`, `m_y` und `m_xy` (die
+  Transformation der Folie 14 rückwärts), daraus die Biegewiderstände nach
+  der linearisierten Fliessbedingung (Folien 9 und 10). Das hatte der
+  Benutzer ausdrücklich verlangt.
+- **Lagerkräfte** («Es sollen auch Lager Kräfte ersichtlich sein», Benutzer):
+  je Stütze die Kraft, je Linienlager der Verlauf in kN/m samt
+  Einspannmoment, je Streifen seine Lagerkräfte. Jeder Fall prüft das
+  Gleichgewicht: Last = Lagerkräfte + was neben den Platten liegt + was ein
+  Streifen ohne Lager fallen lässt. Beides wird gemeldet, nichts still
+  verworfen.
+- **Lastverteilelemente** (Folie 38) über jeder Stütze und unter jeder
+  Einzellast: was der Bereich zusätzlich braucht, damit die Kraft als Punkt
+  hineinpasst.
+
+Gegen das Kolloquium 4: A-A und C-C kommen wie in der Musterlösung heraus.
+B-B rechnet die Musterlösung mit dem Faktor 8.0, als läge die Last aus C-C
+über die ganze Länge des Unterzugs; die App legt sie dorthin, wo C-C
+wirklich aufliegt, also nicht über die Unterzüge in y. Daher über der Mitte
+−60.1 statt −58.5 kNm/m und die Stützen 115.0 und 276.4 statt 115.5 und
+275.1 kN. Die Tests prüfen die App gegen die Handrechnung mit dieser Last und
+die Musterlösung daneben mit ihrer Rundung (`tests/test_decke_rechnung.py`).
+
 ## 2026-11-11 · Die Vorgängerfassung aus dem Repo
 
 `_Old by Gemini/`, der alte Prototyp (32 Dateien), ist weg, auf Wunsch des

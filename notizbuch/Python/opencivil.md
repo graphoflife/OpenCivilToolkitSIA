@@ -1,5 +1,5 @@
 ---
-erzeugt: c3aac5d9e040
+erzeugt: 17c916f7a0d1
 art: modul
 tags: [modul]
 ---
@@ -52,6 +52,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.bericht]] – was aus einer Loesung zu lesen ist.
 - [[opencivil.bewehrungssuche]] – die Bewehrung suchen statt sie zu setzen.
 - [[opencivil.core]] – das Geruest, auf dem jede Rechnung steht.
+- [[opencivil.decke]] – Stahlbetondecken nach der Streifenmethode.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
 - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.

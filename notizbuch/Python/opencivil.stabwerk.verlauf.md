@@ -1,5 +1,5 @@
 ---
-erzeugt: 766d58931d5e
+erzeugt: 45ddd5c5188f
 art: modul
 tags: [modul]
 ---
@@ -245,4 +245,5 @@ def _schieben(p: Polynom, um: float) -> Polynom
 
 ## Gebraucht von
 
+- [[opencivil.decke.traeger]]
 - [[opencivil.stabwerk.rechnung]]

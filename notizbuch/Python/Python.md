@@ -1,5 +1,5 @@
 ---
-erzeugt: 40170a7fa399
+erzeugt: 790e8373ac73
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -29,6 +29,15 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.suche]] – wo eine steigende Funktion null wird.
     - [[opencivil.core.wahl]] – was ein Wahlfeld annehmen kann.
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
+- [[opencivil.decke]] – Stahlbetondecken nach der Streifenmethode.
+    - [[opencivil.decke.aufteilung]] – welcher Teil der Last in welche Richtung geht.
+    - [[opencivil.decke.feld]] – die Schnittkräfte der Platte an einer Stelle.
+    - [[opencivil.decke.geometrie]] – Vielecke in der Ebene der Decke.
+    - [[opencivil.decke.lasten]] – die Lasten eines Lastfalls auf den Streifen.
+    - [[opencivil.decke.modell]] – was gerechnet wird: die Decke in SI.
+    - [[opencivil.decke.rechnung]] – die Streifenmethode, Fall für Fall.
+    - [[opencivil.decke.streifen]] – die Decke in Streifen zerlegt.
+    - [[opencivil.decke.traeger]] – ein Streifen als Durchlaufträger.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
     - [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.
     - [[opencivil.durchstanzen.flaeche]] – die gestützte Fläche: was Lage und Form für den Nachweis heissen.
