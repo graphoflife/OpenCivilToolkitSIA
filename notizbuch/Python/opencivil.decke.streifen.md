@@ -1,5 +1,5 @@
 ---
-erzeugt: b507ff768791
+erzeugt: 2d18a9f0285e
 art: modul
 tags: [modul]
 ---
@@ -397,5 +397,6 @@ Ob sich zwei Flächen aus konvexen Stücken mehr als berühren.
 ## Gebraucht von
 
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]

@@ -70,7 +70,11 @@ class Aufteilungen:
 
     flaechen: Dict[Tuple[str, int], List[Anteil]]
     zellen: List[Tuple[Tuple[Punkt, ...], float]]
-    """Die Zellen der automatischen Aufteilung: Vieleck und Anteil in Richtung 1 -- fürs Bild."""
+    """
+    Fürs Bild, was automatisch entschieden wurde: Vieleck und Anteil in
+    Richtung 1 -- je Streifen der Richtung 1 die Zellen gleichen Anteils
+    zusammengelegt, wie die Last sie bekommt, geschnitten mit der Platte.
+    """
 
     meldungen: List[Meldung]
 
@@ -89,10 +93,9 @@ def aufteilen(decke: Decke, zerlegung: Zerlegung) -> Aufteilungen:
         else:
             grund, neue_zellen, ohne = _automatisch(zerlegung, gruppe, streifen1, streifen2)
             zellen.extend(neue_zellen)
-            if ohne:
-                meldungen.append(Meldung(
-                    f"An {ohne} Stellen trägt keine der beiden Richtungen -- dort fehlt ein Lager "
-                    "oder ein Unterzug.", tuple(p.name for p in gruppe.platten)))
+            meldungen.extend(Meldung(
+                f"Platte {name}: an {n} Stellen trägt keine der beiden Richtungen -- dort fehlt ein "
+                "Lager oder ein Unterzug.", (name,)) for name, n in ohne.items())
         for (name, nummer), anteile in grund.items():
             heraus = list(anteile)
             for zone, stuecke in zonen:
@@ -120,12 +123,12 @@ def _automatisch(zerlegung: Zerlegung, gruppe: Gruppe, streifen1: Sequence[Strei
     """
     Die Zellen der Gruppe, je mit ihrem Anteil in Richtung 1 -- und daraus je
     Streifen die Flächen, Zellen gleichen Anteils längs des Streifens
-    zusammengelegt.
+    zusammengelegt. Fürs Bild dieselben Flächen der Richtung 1, geschnitten
+    mit der Platte. Dazu je Platte, an wie vielen Zellen keine Richtung trägt.
     """
     r1, r2 = gruppe.richtungen
     anteil: Dict[Tuple[int, int], float] = {}
-    zellen: List[Tuple[Tuple[Punkt, ...], float]] = []
-    ohne = 0
+    ohne: Dict[str, int] = {}
     for i, a in enumerate(streifen1):
         band = _ganz(a, gruppe)
         for j, b in enumerate(streifen2):
@@ -142,10 +145,12 @@ def _automatisch(zerlegung: Zerlegung, gruppe: Gruppe, streifen1: Sequence[Strei
                      sum(geo.schwerpunkt(c)[1] * abs(geo.flaeche(c)) for c in teile) / flaeche)
             wert = _anteil_bei(zerlegung, mitte, (a, r1), (b, r2))
             if wert is None:
-                ohne += 1
+                # Jedes Teil liegt in einem Stück einer Platte -- sein Schwerpunkt also in ihr.
+                for p in gruppe.platten:
+                    if any(geo.innen(geo.schwerpunkt(c), p.ecken) for c in teile):
+                        ohne[p.name] = ohne.get(p.name, 0) + 1
                 wert = 0.5
             anteil[(i, j)] = wert
-            zellen.extend((tuple(c), wert) for c in teile)
     grund: Dict[Tuple[str, int], List[Anteil]] = {}
     for i, a in enumerate(streifen1):
         grund[(a.name, 1)] = _zusammengelegt(_ganz(a, gruppe), streifen2,
@@ -154,6 +159,8 @@ def _automatisch(zerlegung: Zerlegung, gruppe: Gruppe, streifen1: Sequence[Strei
         grund[(b.name, 2)] = _zusammengelegt(_ganz(b, gruppe), streifen1,
                                              [(i, 1.0 - anteil[(i, j)]) for i in range(len(streifen1))
                                               if (i, j) in anteil])
+    zellen = [(tuple(c), teil.faktor) for a in streifen1 for teil in grund[(a.name, 1)]
+              for stueck in gruppe.stuecke if (c := geo.schnitt(stueck, teil.ecken))]
     return grund, zellen, ohne
 
 

@@ -3252,6 +3252,15 @@
       ]
     },
     {
+      "name": "opencivil.decke.herleitung",
+      "pfad": "Python/opencivil.decke.herleitung.md",
+      "art": "modul",
+      "kurz": "wie eine Decke ihre Rechnung aufschreibt.",
+      "stichworte": [
+        "schreiben"
+      ]
+    },
+    {
       "name": "opencivil.decke.lasten",
       "pfad": "Python/opencivil.decke.lasten.md",
       "art": "modul",
@@ -3382,6 +3391,22 @@
         "statik",
         "wert",
         "extreme"
+      ]
+    },
+    {
+      "name": "opencivil.decke.werk",
+      "pfad": "Python/opencivil.decke.werk.md",
+      "art": "modul",
+      "kurz": "die Decke im Rechenwerk.",
+      "stichworte": [
+        "Deckenbefund",
+        "StreifenmethodeProzedur",
+        "StreifenmethodeProzedur.rechne",
+        "Deckensystem",
+        "Deckensystem.abschnitt",
+        "Deckensystem.baustoffe",
+        "Deckensystem.ziele",
+        "Deckensystem.rechnen_und_schreiben"
       ]
     },
     {
@@ -4701,6 +4726,17 @@
       ]
     },
     {
+      "name": "opencivil.projekt.aufbau.decke",
+      "pfad": "Python/opencivil.projekt.aufbau.decke.md",
+      "art": "modul",
+      "kurz": "eine Decke wird Rechnung.",
+      "stichworte": [
+        "modell_von",
+        "_betone",
+        "bauen"
+      ]
+    },
+    {
       "name": "opencivil.projekt.aufbau.durchstanzen",
       "pfad": "Python/opencivil.projekt.aufbau.durchstanzen.md",
       "art": "modul",
@@ -4730,6 +4766,7 @@
         "Aufbau.querschnitte",
         "Aufbau.querschnittsanalysen",
         "Aufbau.balkensysteme",
+        "Aufbau.decken",
         "Aufbau.grundbrueche",
         "Aufbau.setzungen",
         "Aufbau.feld",
@@ -4852,11 +4889,36 @@
       "stichworte": [
         "beispiel",
         "jeder_nachweis",
+        "_decken",
         "_durchstanzstellen",
         "_grundbrueche",
         "_setzungen",
         "_alles_einmal",
         "_beweglich"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.decke",
+      "pfad": "Python/opencivil.projekt.decke.md",
+      "art": "modul",
+      "kurz": "eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.",
+      "stichworte": [
+        "DeckenknotenEintrag",
+        "DeckenplatteEintrag",
+        "LinienlagerEintrag",
+        "StuetzeEintrag",
+        "UnterzugEintrag",
+        "ZoneEintrag",
+        "DeckeEintrag",
+        "DeckeEintrag.materialien",
+        "DeckeEintrag.lagen",
+        "DeckeEintrag.netz",
+        "DeckeEintrag.platte",
+        "DeckeEintrag.lager",
+        "DeckeEintrag.stuetze",
+        "DeckeEintrag.unterzug",
+        "DeckeEintrag.zone",
+        "DeckeEintrag.neu"
       ]
     },
     {
@@ -5041,6 +5103,7 @@
         "Projekt.platte",
         "Projekt.analyse",
         "Projekt.balkensystem",
+        "Projekt.decke",
         "Projekt.durchstanzen",
         "Projekt.grundbruch",
         "Projekt.setzung",
@@ -6083,6 +6146,18 @@
       ]
     },
     {
+      "name": "opencivil.web.deckendaten",
+      "pfad": "Python/opencivil.web.deckendaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einer Decke zeichnet.",
+      "stichworte": [
+        "zeichnung",
+        "uebersicht",
+        "_anteile",
+        "_grenzen"
+      ]
+    },
+    {
       "name": "opencivil.web.diagrammdaten",
       "pfad": "Python/opencivil.web.diagrammdaten.md",
       "art": "modul",
@@ -6142,6 +6217,7 @@
         "geometrie",
         "analysediagramme",
         "balkensystem_verlauf",
+        "decke_zeichnung",
         "balkensystem_bearbeiten",
         "_vorlagenwahl",
         "vorlage",

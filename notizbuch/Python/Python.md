@@ -1,5 +1,5 @@
 ---
-erzeugt: 790e8373ac73
+erzeugt: 2bc15f6966da
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -33,11 +33,13 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.decke.aufteilung]] – welcher Teil der Last in welche Richtung geht.
     - [[opencivil.decke.feld]] – die Schnittkräfte der Platte an einer Stelle.
     - [[opencivil.decke.geometrie]] – Vielecke in der Ebene der Decke.
+    - [[opencivil.decke.herleitung]] – wie eine Decke ihre Rechnung aufschreibt.
     - [[opencivil.decke.lasten]] – die Lasten eines Lastfalls auf den Streifen.
     - [[opencivil.decke.modell]] – was gerechnet wird: die Decke in SI.
     - [[opencivil.decke.rechnung]] – die Streifenmethode, Fall für Fall.
     - [[opencivil.decke.streifen]] – die Decke in Streifen zerlegt.
     - [[opencivil.decke.traeger]] – ein Streifen als Durchlaufträger.
+    - [[opencivil.decke.werk]] – die Decke im Rechenwerk.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
     - [[opencivil.durchstanzen.bewehrung]] – wo die Durchstanzbewehrung liegt, und welche reicht.
     - [[opencivil.durchstanzen.flaeche]] – die gestützte Fläche: was Lage und Form für den Nachweis heissen.
@@ -102,6 +104,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
   - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
       - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
+      - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
       - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
       - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
       - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
@@ -110,6 +113,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.setzung]] – eine Setzungsberechnung wird Rechnung.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».
+    - [[opencivil.projekt.decke]] – eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
@@ -159,6 +163,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.
     - [[opencivil.web.balkendaten]] – was die Oberflaeche von einem Balkensystem zeigt.
     - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.
+    - [[opencivil.web.deckendaten]] – was die Oberflaeche von einer Decke zeichnet.
     - [[opencivil.web.diagrammdaten]] – was die Oberflaeche zeichnet, als JSON.
     - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
     - [[opencivil.web.durchstanzdaten]] – was die Oberflaeche von einer Durchstanzstelle zeichnet.

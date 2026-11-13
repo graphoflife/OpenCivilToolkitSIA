@@ -1,5 +1,5 @@
 ---
-erzeugt: 160b7623d77a
+erzeugt: 498df70591b0
 art: modul
 tags: [modul]
 ---
@@ -57,6 +57,20 @@ Querkraft ohne Einlage, einer Einwirkung, die am kürzesten Abstand
 gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
 x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python
 täte.
+
+### _decken
+
+```python
+def _decken(p: Projekt) -> None
+```
+
+Zwei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
+einer Wand und drei Stützen, versteckte Unterzüge in zwei Stufen, fest
+30 % in x. Und eine, die jede Wahl einmal braucht: zwei Platten
+verschiedener Dicke in einem L, automatisch aufgeteilt, mit einer Zone,
+einer eingespannten Wand, einem Rand an einer Symmetrieachse und einer
+Stütze mit Stützenbereich von Hand -- daneben eine schiefe Platte, deren
+Streifen ihren Rändern folgen.
 
 ### _durchstanzstellen
 

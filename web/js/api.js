@@ -161,6 +161,8 @@ export const api = {
   /** Teilt Linien oder kehrt sie um -- `auftrag` = {aktion, linie, anteil|punkt|stelle} oder {aktion, linien}. */
   balkensystemBearbeiten: (projekt, kennung, auftrag) =>
     ruf('balkensystem_bearbeiten', { projekt, kennung, ...auftrag }),
+  /** Was das Zeichenfenster einer Decke unter ihre Teile legt: Streifen, Aufteilung, Meldungen. */
+  deckeZeichnung: (projekt, kennung) => ruf('decke_zeichnung', { projekt, kennung }),
 };
 
 export { KernFehler };

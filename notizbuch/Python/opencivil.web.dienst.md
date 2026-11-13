@@ -1,5 +1,5 @@
 ---
-erzeugt: 2d5a72cb3870
+erzeugt: c9aa69ea0f8c
 art: modul
 tags: [modul]
 ---
@@ -290,6 +290,19 @@ dann ist `verlauf` leer, und die Uebersicht sagt warum. Ohne `fall`
 kommt nur die Uebersicht -- was das Zeichenfenster nach jeder Aenderung
 braucht: Meldungen, Knoten ohne Drehsteifigkeit, was sich bewegt.
 
+### decke_zeichnung
+
+```python
+def decke_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Was das Zeichenfenster einer Decke unter ihre Teile legt -- die Streifen,
+wie die Last auf die Richtungen geht, die Meldungen
+([[opencivil.web.deckendaten#uebersicht|deckendaten.uebersicht]]). Eine eigene Anfrage wie die Uebersicht
+des Balkensystems: gebraucht nach jeder Aenderung, ohne auf die Rechnung
+des ganzen Projekts zu warten. Gerechnet wird die eine Decke, aus dem
+Zwischenspeicher, wenn er sie zu dieser Beschreibung noch hat.
+
 ### balkensystem_bearbeiten
 
 ```python
@@ -387,6 +400,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]
+- [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.speicher]]
 - [[opencivil.web.umschlag]]

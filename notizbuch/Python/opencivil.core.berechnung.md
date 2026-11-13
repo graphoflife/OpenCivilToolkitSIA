@@ -1,5 +1,5 @@
 ---
-erzeugt: a8f7794e9a53
+erzeugt: 68aee99a2997
 art: modul
 tags: [modul]
 ---
@@ -410,6 +410,7 @@ class Nulllinienlage(Prozedur):
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]

@@ -8,11 +8,19 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] **Decken: die App fertig bauen.** Der Rechenkern steht
-      (`opencivil/decke/`, siehe [[Entwicklung]], 2026-11-13). Es fehlen,
-      je ein Commit: das Zeichnen (Platten, Lager, Stützen, Unterzüge,
-      Zonen), Lasten und Lastfälle, die Ergebnisbilder samt Lagerkräften,
-      der Bericht mit Herleitung.
+- [ ] **Decken: die App fertig bauen.** Rechenkern und Zeichenfenster
+      stehen (siehe [[Entwicklung]], 2026-11-13). Es fehlen, je ein Commit:
+      Lasten und Lastfälle, die Ergebnisbilder samt Lagerkräften, der
+      Bericht mit Herleitung.
+- [ ] Decken: eine schräge Richtung heisst nach ihrem Winkel, ihre
+      Streifen «71.57° 1 … 71.57° 8», und der Bericht nennt den Winkel
+      daneben noch einmal. Mit den Ergebnisbildern besser benennen --
+      der Benutzer spricht von m_η.
+- [ ] Decken: «Knoten einfügen» auf einer Kante, die zwei Platten
+      teilen, setzt den Knoten nur in die gewählte Platte; die andere
+      behält ihre Kante ohne ihn. Prüfen, ob beide ihn bekommen sollen.
+- [ ] Zeichenfenster: während eines Befehls heissen P und S «parallel»
+      und «senkrecht», nicht Platte und Stütze. Erst Esc, dann die Taste.
 - [ ] Decken, nach Vorgabe, nicht nachgeschlagen (`opencivil/decke/`):
       die automatische Aufteilung, wo Folie 31 nichts sagt (die Spannweite
       eines Kragarms zählt doppelt, gleich lange Spannweiten innerhalb 1 %

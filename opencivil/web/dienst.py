@@ -35,10 +35,10 @@ from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
-from opencivil.projekt import BAUTEILE, BalkensystemEintrag, Projekt, ProjektFehler
+from opencivil.projekt import BAUTEILE, BalkensystemEintrag, DeckeEintrag, Projekt, ProjektFehler
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.interaktion import GROESSEN
-from opencivil.web import api, balkendaten, diagrammdaten, speicher
+from opencivil.web import api, balkendaten, deckendaten, diagrammdaten, speicher
 from opencivil.web.umschlag import endlich, fehlerdaten, umschlag
 
 #: Das Gedaechtnis zwischen zwei Anfragen -- siehe :mod:`opencivil.web.speicher`.
@@ -484,6 +484,24 @@ def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return {"verlauf": endlich(balkendaten.verlauf(befund, fall)), "uebersicht": uebersicht}
 
 
+def decke_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Was das Zeichenfenster einer Decke unter ihre Teile legt -- die Streifen,
+    wie die Last auf die Richtungen geht, die Meldungen
+    (:func:`deckendaten.uebersicht`). Eine eigene Anfrage wie die Uebersicht
+    des Balkensystems: gebraucht nach jeder Aenderung, ohne auf die Rechnung
+    des ganzen Projekts zu warten. Gerechnet wird die eine Decke, aus dem
+    Zwischenspeicher, wenn er sie zu dieser Beschreibung noch hat.
+    """
+    projekt = _projekt(rumpf)
+    kennung = str(rumpf.get("kennung") or "")
+    if not isinstance(projekt.bauteil(kennung), DeckeEintrag):
+        raise DienstFehler(400, f"'{kennung}' ist keine Decke.")
+    aufbau = projekt.aufbauen()
+    loesung = _bauteil_rechnen(projekt, aufbau, kennung)
+    return {"uebersicht": endlich(deckendaten.zeichnung(aufbau, kennung, loesung))}
+
+
 def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Teilt eine Linie oder kehrt Linien um -- im Kern, weil dabei Lastwerte
@@ -600,6 +618,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "analysediagramme": analysediagramme,
     "balkensystem_verlauf": balkensystem_verlauf,
     "balkensystem_bearbeiten": balkensystem_bearbeiten,
+    "decke_zeichnung": decke_zeichnung,
     "vorlage": vorlage,
     "vorlage_einsetzen": vorlage_einsetzen,
 }

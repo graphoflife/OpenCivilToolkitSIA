@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f53e2976bd6
+erzeugt: 4f9bd1851f8e
 art: modul
 tags: [modul]
 ---
@@ -245,6 +245,12 @@ class Decke
 
 - [[opencivil.decke.aufteilung]]
 - [[opencivil.decke.feld]]
+- [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]
+- [[opencivil.decke.werk]]
+- [[opencivil.projekt.aufbau.decke]]
+- [[opencivil.projekt.decke]]
+- [[opencivil.web.api]]
+- [[opencivil.web.deckendaten]]

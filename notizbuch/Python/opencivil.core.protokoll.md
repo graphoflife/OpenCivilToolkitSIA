@@ -1,5 +1,5 @@
 ---
-erzeugt: 64fb5f243da8
+erzeugt: a58f68da2664
 art: modul
 tags: [modul]
 ---
@@ -561,6 +561,8 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.decke.herleitung]]
+- [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]

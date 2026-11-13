@@ -1,5 +1,5 @@
 ---
-erzeugt: c4eca56c6243
+erzeugt: 473746b7789e
 art: modul
 tags: [modul]
 ---
@@ -288,6 +288,7 @@ seinem Material nimmt, eine Meldung.
 
 ## Gebraucht von
 
+- [[opencivil.decke.werk]]
 - [[opencivil.ergebnis]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]

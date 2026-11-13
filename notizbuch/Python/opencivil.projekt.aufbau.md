@@ -1,5 +1,5 @@
 ---
-erzeugt: 511fd71fcb25
+erzeugt: 68471693f64d
 art: modul
 tags: [modul]
 ---
@@ -10,7 +10,7 @@ tags: [modul]
 ## VERANTWORTUNG
 
 [[opencivil.projekt.aufbau#aufbauen|aufbauen]] macht aus einem [[opencivil.projekt.projekt#Projekt|Projekt]] Baustoffe, Querschnitte,
-Nachweise und Balkensysteme und meldet sie in einem [[opencivil.core.rechenwerk#Rechenwerk|Rechenwerk]] an.
+Nachweise, Balkensysteme und Decken und meldet sie in einem [[opencivil.core.rechenwerk#Rechenwerk|Rechenwerk]] an.
 Heraus kommt ein [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau]] -- das Werk samt allen Nachweisobjekten und
 Systemen, nach Bauteil und Art abgelegt, damit Schnittstelle,
 Zwischenspeicher und Bewehrungssuche sie wiederfinden.
@@ -23,8 +23,8 @@ ohne Bewehrung.
 
 ## DIE BAUTEILARTEN
 
-Platte, Querschnittsanalyse, Balkensystem, Durchstanzen, Grundbruch und Setzung haben je
-einen Steckbrief
+Platte, Querschnittsanalyse, Balkensystem, Decke, Durchstanzen, Grundbruch und Setzung
+haben je einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -46,6 +46,7 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion `bauen`
 ([[opencivil.projekt.aufbau.platte|platte]],
 [[opencivil.projekt.aufbau.querschnittsanalyse|querschnittsanalyse]],
 [[opencivil.projekt.aufbau.balkensystem|balkensystem]],
+[[opencivil.projekt.aufbau.decke|decke]],
 [[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]],
 [[opencivil.projekt.aufbau.setzung|setzung]]); was mehr als eine braucht, im
@@ -56,6 +57,7 @@ in einer Datei von ueber tausend Zeilen.
 ## Module
 
 - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
+- [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
 - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
 - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
 - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
@@ -110,15 +112,17 @@ Oberflaeche, siehe Dateikopf.
 - `PLATTE = Bauteilart('platte', 'querschnitte', QuerschnittEintrag, 'q', 'quersc…`
 - `ANALYSE = Bauteilart('querschnittsanalyse', 'querschnittsanalysen', Querschnitt…`
 - `BALKENSYSTEM = Bauteilart('balkensystem', 'balkensysteme', BalkensystemEintrag, 'r',…`
+- `DECKE = Bauteilart('decke', 'decken', DeckeEintrag, 'e', 'decke', 'Decken', d…` – Die Kennungen e1, e2 ...: «d» tragen schon die Durchstanzstellen.
 - `GRUNDBRUCH = Bauteilart('grundbruch', 'grundbrueche', GrundbruchEintrag, 'g', 'gru…`
 - `SETZUNG = Bauteilart('setzung', 'setzungen', SetzungEintrag, 'w', 'setzung', 'S…` – Die Kennungen w1, w2 ...: «s» tragen schon die Betonstaehle.
 - `DURCHSTANZEN = Bauteilart('durchstanzen', 'durchstanzstellen', DurchstanzEintrag, 'd…`
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, DURCHSTANZEN, GRUNDBRUCH, SETZUNG)` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Durchstanzen, Grundbruch und Setzung lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZ…` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Decke, Durchstanzen, Grundbruch und Setzung lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
@@ -126,6 +130,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.platte]]
@@ -138,6 +143,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]

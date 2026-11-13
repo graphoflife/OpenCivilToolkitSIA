@@ -80,6 +80,10 @@ from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.projekt.durchstanzen import (
     AussparungEintrag, DurchstanzEintrag, GrundrissknotenEintrag,
 )
+from opencivil.projekt.decke import (
+    DeckeEintrag, DeckenknotenEintrag, DeckenplatteEintrag, LinienlagerEintrag, StuetzeEintrag,
+    UnterzugEintrag, ZoneEintrag,
+)
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
 
@@ -102,5 +106,7 @@ __all__ = [
     "GrundbruchEintrag", "GrundbruchkombinationEintrag",
     "SchichtEintrag", "SetzungEintrag",
     "AussparungEintrag", "DurchstanzEintrag", "GrundrissknotenEintrag",
+    "DeckeEintrag", "DeckenknotenEintrag", "DeckenplatteEintrag", "LinienlagerEintrag",
+    "StuetzeEintrag", "UnterzugEintrag", "ZoneEintrag",
     "aufbauen", "sorten",
 ]

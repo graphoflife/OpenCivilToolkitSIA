@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b8c0bf911fe
+erzeugt: db391fff6607
 art: modul
 tags: [modul]
 ---
@@ -35,6 +35,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `querschnitte: List[QuerschnittEintrag] = field(default_factory=list)`
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
 - `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
+- `decken: List[DeckeEintrag] = field(default_factory=list)` – Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Unterzüge.
 - `durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)` – Stützen und Wände, an denen das Durchstanzen nachgewiesen wird.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
@@ -211,6 +212,16 @@ mit dem Baukasten des Eintrags -- `querschnitt`, `linie`,
 Kombinationen, die die Oberflaeche mitbringt: wer in Python zeichnet,
 zeichnet sein eigenes System.
 
+#### Projekt.decke
+
+```python
+def decke(self, name: str, **felder: Any) -> DeckeEintrag
+```
+
+Eine leere Decke. Gezeichnet wird danach mit dem Baukasten des
+Eintrags -- `platte`, `lager` (ein Linienlager), `stuetze`,
+`unterzug`, `zone` --, Koordinaten in m.
+
 #### Projekt.durchstanzen
 
 ```python
@@ -361,6 +372,7 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]

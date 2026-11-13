@@ -18,6 +18,7 @@ Die Decke nach der Streifenmethode -- gegen die Vorlesung und das Kolloquium 4.
 import math
 import unittest
 
+from opencivil.decke import geometrie as geo
 from opencivil.decke.feld import POSITIV_JE_LAST, an_stelle, lastverteilelemente, widerstaende
 from opencivil.decke.modell import (
     Aufteilung, Decke, Flaechenlast, Kombination, Lastfall, Linienlager, Linienlast, Platte, Punktlast,
@@ -214,9 +215,18 @@ class TestFolie31(Rechnung):
         self.assertAlmostEqual(an_stelle(self.e, self.f, (0.5, 2.0)).my, q * b * b / 64.0, places=6)
 
     def test_die_ecken_je_zur_haelfte(self):
-        zelle = next(z for z in self.e.aufteilungen.zellen if all(0.0 <= x <= 0.25 and 0.0 <= y <= 0.25
-                                                                   for x, y in z[0]))
-        self.assertEqual(zelle[1], 0.5)
+        def anteil_bei(p):
+            return next(wert for ecken, wert in self.e.aufteilungen.zellen if geo.innen(p, ecken))
+
+        self.assertEqual(anteil_bei((0.1, 0.1)), 0.5)
+        self.assertEqual(anteil_bei((4.0, 0.1)), 0.0, "am langen Rand in y, zu ihm hin")
+        self.assertEqual(anteil_bei((0.1, 2.0)), 1.0, "am kurzen Rand in x, zu ihm hin")
+        self.assertEqual(anteil_bei((4.0, 2.0)), 0.0, "in der Mitte in die kürzere Spannweite")
+
+    def test_das_bild_legt_gleiche_zellen_zusammen(self):
+        zellen = self.e.aufteilungen.zellen
+        self.assertLess(len(zellen), 16 * 3 + 1, "je Streifen in x höchstens drei Stücke")
+        self.assertAlmostEqual(sum(abs(geo.flaeche(ecken)) for ecken, _ in zellen), self.a * self.b)
 
 
 class TestSchief(Rechnung):
@@ -356,6 +366,14 @@ class TestEinachsig(Rechnung):
         f = e.faelle[0]
         self.assertAlmostEqual(f.nicht_getragen, f.summe)
         self.assertTrue(any("trägt nicht" in m.text and m.fehler for m in f.meldungen))
+
+    def test_die_meldung_nennt_nur_die_platte_ohne_lager(self):
+        gelagert = rechteck(0, 0, 4, 2)
+        frei = rechteck(6, 0, 8, 2)
+        e = rechnen(Decke(platten=[Platte("A", gelagert, 0.2, E, WICHTE), Platte("B", frei, 0.2, E, WICHTE)],
+                          linienlager=waende(gelagert, 0, 1, 2, 3)))
+        ohne = [m for m in e.meldungen if "trägt keine der beiden Richtungen" in m.text]
+        self.assertEqual([m.elemente for m in ohne], [("B",)])
 
 
 class TestPruefen(unittest.TestCase):

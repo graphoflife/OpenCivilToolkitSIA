@@ -1,5 +1,5 @@
 ---
-erzeugt: 08b841672fee
+erzeugt: 9e04ebedbdd3
 art: modul
 tags: [modul]
 ---
@@ -81,6 +81,15 @@ def balkensysteme(self) -> Dict[str, Balkensystem]
 ```
 
 Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
+
+#### Aufbau.decken
+
+```python
+@property
+def decken(self) -> Dict[str, Deckensystem]
+```
+
+Die Decken, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
 
 #### Aufbau.grundbrueche
 
@@ -391,6 +400,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.decke.werk]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
@@ -411,6 +421,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.platte]]

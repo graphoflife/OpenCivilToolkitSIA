@@ -1,5 +1,5 @@
 ---
-erzeugt: 98f31a9c7142
+erzeugt: 232aedbc33d7
 art: modul
 tags: [modul]
 ---
@@ -443,6 +443,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
@@ -477,6 +478,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]

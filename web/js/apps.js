@@ -1,7 +1,7 @@
 /**
  * apps.js -- die Apps der linken Tafel, je eine Zeile.
  *
- * Eine App hat links einen Knopf: die Materialien, die sechs Bauteilarten
+ * Eine App hat links einen Knopf: die Materialien, die sieben Bauteilarten
  * (ARTEN, arten.js) und Python. Was Baum, Editor und rechte Tafel von ihr
  * wissen müssen, steht in ihrer Zeile: ihre Liste im Projekt und die Gruppen
  * unter dem Knopf, wie ein Eintrag heisst und was rechts in ihm steht, wie er
@@ -21,6 +21,9 @@ import { materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor, balkensystemFenster } from './balkensystem.js';
+import {
+  deckeEditor, deckeFenster, deckenKarten, deckenZusammenfassung,
+} from './decke.js';
 import { durchstanzEditor } from './durchstanzen.js';
 import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
@@ -271,6 +274,20 @@ const SYSTEM = bauteil('balkensystem', {
 });
 
 /**
+ * Leer, aus dem Kern -- gezeichnet wird danach. Einen Beton braucht erst
+ * die erste Platte; verlangt wird er schon hier, sonst stünde man vor
+ * einem Fenster, in dem keine Platte rechnet.
+ */
+const DECKE = bauteil('decke', {
+  kurztext: (d) => `${d.platten.length} ${d.platten.length === 1 ? 'Platte' : 'Platten'}`,
+  anlegen: (a) => nachVorlage(a, { braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.' }),
+  editor: deckeEditor,
+  karten: deckenKarten,
+  uebersicht: deckenZusammenfassung,
+  fenster: deckeFenster,
+});
+
+/**
  * Eine Innenstütze mit den Vorgaben des Kerns, ohne Einwirkung -- Beton und
  * Betonstahl die ersten des Projekts, wie bei der Platte. Die Liste nennt sie
  * nach der Vorlage des Katalogs für ihre Lage und Form: «⌀{D} mm».
@@ -331,7 +348,9 @@ const SKRIPT = {
 };
 
 /** Die Apps, in der Folge ihrer Knöpfe: das Material, die Bauteilarten wie ARTEN, Python. */
-export const APPS = [MATERIAL, PLATTE, ANALYSE, SYSTEM, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, SKRIPT];
+export const APPS = [
+  MATERIAL, PLATTE, ANALYSE, SYSTEM, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, SKRIPT,
+];
 
 /** Die App, wie die Auswahl sie nennt: 'material', 'skript' oder eine Bauteilart. */
 export function appVon(name) {

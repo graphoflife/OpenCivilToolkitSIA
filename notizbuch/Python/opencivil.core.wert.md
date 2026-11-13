@@ -1,5 +1,5 @@
 ---
-erzeugt: f2e1a46b9c8b
+erzeugt: 99caed5e03fd
 art: modul
 tags: [modul]
 ---
@@ -303,6 +303,7 @@ def beschreibung(self) -> str
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]

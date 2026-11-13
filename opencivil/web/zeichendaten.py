@@ -19,9 +19,9 @@ from typing import Any, Callable, Dict, Optional
 from opencivil.core.rechenwerk import Loesung
 from opencivil.projekt import Aufbau
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BAUTEILE, DURCHSTANZEN, GRUNDBRUCH, PLATTE, SETZUNG,
+    ANALYSE, BALKENSYSTEM, BAUTEILE, DECKE, DURCHSTANZEN, GRUNDBRUCH, PLATTE, SETZUNG,
 )
-from opencivil.web import balkendaten, durchstanzdaten, grundbruchdaten, setzungsdaten
+from opencivil.web import balkendaten, deckendaten, durchstanzdaten, grundbruchdaten, setzungsdaten
 
 
 def _balkensystem(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
@@ -37,6 +37,7 @@ ZEICHENDATEN: Dict[str, Optional[Callable[[Aufbau, str, Loesung], Any]]] = {
     PLATTE.name: None,
     ANALYSE.name: None,
     BALKENSYSTEM.name: _balkensystem,
+    DECKE.name: deckendaten.zeichnung,
     DURCHSTANZEN.name: durchstanzdaten.situation,
     GRUNDBRUCH.name: grundbruchdaten.situation,
     SETZUNG.name: setzungsdaten.situation,

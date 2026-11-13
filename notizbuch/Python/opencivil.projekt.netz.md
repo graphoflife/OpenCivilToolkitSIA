@@ -1,5 +1,5 @@
 ---
-erzeugt: ed4fffc469a2
+erzeugt: 9bee36e51782
 art: modul
 tags: [modul]
 ---
@@ -83,5 +83,6 @@ Wo der Knoten liegt -- `None`, wenn es ihn nicht gibt.
 ## Gebraucht von
 
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.querschnittsanalyse]]

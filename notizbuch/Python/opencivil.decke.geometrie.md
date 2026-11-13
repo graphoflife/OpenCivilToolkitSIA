@@ -1,5 +1,5 @@
 ---
-erzeugt: 804b3cbf3ee2
+erzeugt: 02a83c013073
 art: modul
 tags: [modul]
 ---
@@ -206,7 +206,10 @@ Intervalle, die sich berühren oder überlappen, zu einem.
 
 - [[opencivil.decke.aufteilung]]
 - [[opencivil.decke.feld]]
+- [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]
+- [[opencivil.projekt.aufbau.decke]]
+- [[opencivil.web.deckendaten]]

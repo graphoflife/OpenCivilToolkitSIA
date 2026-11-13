@@ -112,6 +112,11 @@ const ZEICHEN = {
     pfade: ['M6 18V6h12v12', 'M3.5 18h5 M3.5 20l1-2 M5.5 20l1-2 M7.5 20l1-2',
       'M18 18l-2 3h4z'],
   },
+  // Eine Decke im Grundriss: ein L, gestrichelt geteilt in Streifen beider Richtungen.
+  decke: {
+    pfade: ['M3.5 3.5h17v8h-8v9h-9z'],
+    strich: ['M8 3.5v17 M3.5 8h17 M3.5 16h9'],
+  },
   // Eine Platte auf einer Stütze, darin gestrichelt der Kegel, der durchstanzt.
   durchstanzen: {
     pfade: ['M2.5 7h19v5h-19z', 'M10 12h4v9h-4z'],
@@ -151,6 +156,14 @@ const ZEICHEN = {
   // Ein Träger auf zwei Lagern, darunter sein Moment.
   statik: {
     pfade: ['M3 7h18', 'M3 7l-1.6 2.6h3.2z M21 7l-1.6 2.6h3.2z', 'M3 7Q12 25 21 7'],
+  },
+
+  // -- Die Knöpfe der Decke ---------------------------------------------------
+
+  // Die Streifen: eine Platte, gestrichelt in beide Richtungen geteilt.
+  streifen: {
+    pfade: ['M3.5 3.5h17v17h-17z'],
+    strich: ['M9 3.5v17 M15 3.5v17 M3.5 9h17 M3.5 15h17'],
   },
 
   // -- Die Werkzeuge des Zeichenfensters -----------------------------------
@@ -202,6 +215,24 @@ const ZEICHEN = {
   'cad-knoten': {
     kreise: [[12, 12, 6]],
     voll: [[12, 12, 2.2]],
+  },
+  // Eine Wand unter der Platte: eine Linie, auf der einen Seite schraffiert.
+  'cad-wand': {
+    pfade: ['M3 9h18', 'M5 9l-2 3 M9 9l-2 3 M13 9l-2 3 M17 9l-2 3 M21 9l-2 3'],
+    voll: [[3, 9, 1.6], [21, 9, 1.6]],
+  },
+  // Ein versteckter Unterzug: ein breites Band, gestrichelt seine Achse.
+  'cad-unterzug': {
+    pfade: ['M3 8.5h18 M3 15.5h18'],
+    strich: ['M3 12h18'],
+  },
+  // Eine Stütze im Grundriss: ein Quadrat mit Kreuz.
+  'cad-stuetze': {
+    pfade: ['M7 7h10v10H7z', 'M7 7l10 10 M17 7L7 17'],
+  },
+  // Eine Zone: ein Umriss, darin die Last zu Teilen in die zwei Richtungen.
+  'cad-zone': {
+    pfade: ['M4 4.5h16v15H4z', 'M8 12h8 M14 10l2 2-2 2', 'M12 8v8 M10 14l2 2 2-2'],
   },
   // Eine Last: drei Pfeile auf einen Stab.
   'cad-last': {

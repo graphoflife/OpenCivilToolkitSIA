@@ -44,6 +44,38 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-13 · Decken: die App mit dem Zeichenfenster
+
+Zweiter Schritt der App «Decken»: die Zeile in der Liste der Apps und das
+Zeichenfenster. Lasten, Ergebnisbilder und Bericht folgen.
+
+- **Dasselbe Zeichenfenster wie Querschnitt und Balkensystem**
+  (`cadApp`), so verlangt: Platte (P), Linienlager (W), Stütze (S),
+  Unterzug (U), Zone (Z) und Knoten (K), in Metern auf einem Raster von
+  0.5 m. Die Teile hängen an gemeinsamen Knoten; wer einen verschiebt,
+  verschiebt jede Platte und jedes Lager daran mit.
+- **Eine Stütze ist kein eigenes Teil, sondern eine Eigenschaft ihres
+  Knotens.** Wer den Knoten wählt, sieht «Stütze ja/nein» und ihre Masse.
+  So lässt sie sich nicht von ihrem Ort trennen, und es gibt keine zweite
+  Stütze am selben Punkt.
+- **Unter der Zeichnung, was der Kern sagt**: die Aufteilung der Last
+  (orange ganz in Richtung 1, gelb ganz in Richtung 2, dazwischen
+  gemischt), die Streifen samt Stützenbereichen, oder nichts. Der Kern
+  rechnet nach jeder Änderung neu (Anfrage `decke_zeichnung`, nur die eine
+  Decke); bis die Antwort da ist, steht die alte blass. So sieht der
+  Benutzer die «intelligent definierte» Aufteilung schon beim Zeichnen,
+  und die Oberfläche rechnet nichts selbst.
+- **Die Meldungen des Kerns stehen neben der Zeichnung**; ein Klick wählt
+  die Teile, die sie nennt, und diese sind rot. Die Meldung «trägt keine
+  der beiden Richtungen» nennt jetzt nur noch die Platte, der ein Lager
+  fehlt -- vorher alle Platten, die mit ihr dieselben Richtungen teilen.
+- **Die Hilfen der Mehrfachwahl** (`schalterzeile`, `gemeinsam`, `mitVar`,
+  `zahlfeldMitVar`, `jaNein`) stehen jetzt in `cad_app.js` statt im
+  Balkensystem: das schwebende Fenster der Decke braucht sie auch.
+- **Namen im Bild**: ein Unterzug heisst bei einem Viertel seiner Länge --
+  in der Mitte stünde er oft auf dem Namen der Platte, am Ende auf dem
+  einer Stütze.
+
 ## 2026-11-13 · Decken: der Rechenkern der Streifenmethode
 
 Erster Schritt der neuen App «Decken» (Wunsch des Benutzers, 2026-11-13):

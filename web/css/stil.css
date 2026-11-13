@@ -2170,6 +2170,49 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-wo { font-size: 10px; color: var(--schrift-zart); }
 .bs-einheiten { margin: 0 0 6px; font-size: 11px; color: var(--schrift-zart); }
 
+/* ---------------------------------------------------------------- Decken -- */
+
+/* Ein Grundriss: die Platten hell mit kräftigem Rand, darunter die Aufteilung
+   -- Richtung 1 orange, Richtung 2 gelb, wie x und y --, die Zonen violett
+   gestrichelt, die Unterzüge in der Farbe der Systeme. Ein Linienlager
+   kräftig, eingespannt schraffiert, ohne vertikalen Halt strichpunktiert
+   wie eine Symmetrieachse; eines, das nichts hält, fein gepunktet. */
+.dk-platte-flaeche { fill: #f6f7f9; stroke: none; }
+.dk-platte { fill: none; stroke: var(--schrift); stroke-width: 1.6; stroke-linejoin: round; }
+.dk-anteil { stroke: none; fill-opacity: .5; }
+.dk-unterlage.ist-veraltet { opacity: .4; }
+.dk-grenze { fill: none; stroke-width: .8; }
+.dk-grenze.ist-richtung-1 { stroke: var(--richtung-x-tief); opacity: .55; }
+.dk-grenze.ist-richtung-2 { stroke: var(--richtung-y-tief); opacity: .55; }
+.dk-stuetzenbereich { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 3 2; }
+.dk-zone-grund { fill: var(--flaeche); stroke: none; }
+.dk-zone { fill: none; stroke: var(--beide); stroke-width: 1.4; stroke-dasharray: 6 3; }
+.dk-unterzug-band { fill: var(--system); fill-opacity: .1; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }
+.dk-unterzug { fill: none; stroke: var(--system); stroke-width: 2; stroke-dasharray: 10 4; }
+.dk-lager { fill: none; stroke: var(--schrift); stroke-width: 4; stroke-linecap: round; }
+.dk-lager.ist-symmetrie { stroke-width: 1.6; stroke-dasharray: 12 3 2 3; stroke-linecap: butt; }
+.dk-lager.ist-frei { stroke: var(--schrift-matt); stroke-width: 1.2; stroke-dasharray: 1 3; }
+.dk-schraffur { fill: none; stroke: var(--schrift); stroke-width: 1; }
+.dk-stuetze { fill: var(--schrift); stroke: var(--flaeche); stroke-width: 1; }
+.dk-platte.ist-fehler, .dk-zone.ist-fehler, .dk-unterzug.ist-fehler, .dk-lager.ist-fehler { stroke: var(--schlecht); }
+.dk-stuetze.ist-fehler { fill: var(--schlecht); }
+.dk-name {
+  font-size: 11px; fill: var(--schrift-matt); text-anchor: middle; dominant-baseline: middle;
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none;
+}
+.dk-name.ist-klein { font-size: 10px; text-anchor: start; }
+.dk-name.ist-zone { fill: var(--beide); }
+
+/* Die Wahl der Unterlage in der Leiste, und unter der Zeichnung, was ihre Farben heissen. */
+.dk-unterlagewahl { align-self: center; }
+.dk-unterlagewahl .schalter { font-size: 12px; }
+.dk-legende { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--schrift-matt); margin: 4px 0; }
+.dk-legende-eintrag { display: inline-flex; align-items: center; gap: 5px; }
+.dk-legende-farbe {
+  display: inline-block; width: 14px; height: 10px; border-radius: 2px; opacity: .75;
+  box-shadow: inset 0 0 0 1px rgba(16, 24, 40, .15);
+}
+
 /* ----------------------------------------------------------- Grundbruch -- */
 
 /* Die Bemessungswerte des Bodens unter seinen Feldern, wie der Kern sie rechnet. */

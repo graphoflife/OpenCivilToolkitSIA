@@ -14,6 +14,8 @@ damit fast neunhundert Zeilen hatte.
 
 from __future__ import annotations
 
+import math
+
 from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN, MATERIAL_DES_QUERSCHNITTS
 from opencivil.projekt.eintraege import (
     Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, RechenwahlEintrag,
@@ -236,10 +238,46 @@ def jeder_nachweis() -> Projekt:
     # Spielart des Grundbruchs.
     _alles_einmal(p, decke, p.querschnittsanalysen[0])
     _beweglich(p)
+    _decken(p)
     _durchstanzstellen(p)
     _grundbrueche(p)
     _setzungen(p)
     return p
+
+
+def _decken(p: Projekt) -> None:
+    """
+    Zwei Decken. Die des Kolloquiums 4 (Stahlbeton II): eine Platte auf
+    einer Wand und drei Stützen, versteckte Unterzüge in zwei Stufen, fest
+    30 % in x. Und eine, die jede Wahl einmal braucht: zwei Platten
+    verschiedener Dicke in einem L, automatisch aufgeteilt, mit einer Zone,
+    einer eingespannten Wand, einem Rand an einer Symmetrieachse und einer
+    Stütze mit Stützenbereich von Hand -- daneben eine schiefe Platte, deren
+    Streifen ihren Rändern folgen.
+    """
+    beton = next(m.kennung for m in p.materialien if m.art == "beton")
+    k4 = p.decke("Kolloquium 4", aufteilung="fest", anteil=30.0)
+    k4.platte([(0, 0), (9, 0), (9, 5.5), (0, 5.5)], beton=beton, h=240)
+    k4.lager((0, 0), (9, 0))
+    for x in (0.5, 4.5, 8.5):
+        k4.stuetze((x, 5.0))
+        k4.unterzug((x, 0), (x, 5.5), stufe=2)
+    k4.unterzug((0, 5.0), (9, 5.0))
+
+    el = p.decke("Jede Wahl", streifenbreite=0.5)
+    el.platte([(0, 0), (6, 0), (6, 4), (0, 4)], beton=beton, h=220)
+    el.platte([(0, 4), (6, 4), (6, 7), (3, 7), (0, 7)], beton=beton, h=280)
+    el.lager((0, 0), (6, 0))
+    el.lager((6, 0), (6, 4), eingespannt=True)
+    el.lager((0, 0), (0, 7))
+    el.lager((0, 7), (3, 7))
+    el.lager((3, 7), (6, 7), vertikal=False, eingespannt=True)
+    el.stuetze((6, 7), b_x=400, b_y=250, bereich_von_hand=True, l_x=1.2, l_y=0.8)
+    el.zone([(0, 0), (2, 0), (2, 4), (0, 4)], anteil=100.0)
+    schief = [(9.0, 0.0), (13.0, 0.0), (14.0, 3.0), (10.0, 3.0)]
+    el.platte(schief, beton=beton, h=200, richtung_1=0.0, richtung_2=math.degrees(math.atan2(3.0, 1.0)))
+    for a, b in zip(schief, schief[1:] + schief[:1]):
+        el.lager(a, b)
 
 
 def _durchstanzstellen(p: Projekt) -> None:

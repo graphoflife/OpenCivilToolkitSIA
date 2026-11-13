@@ -1,5 +1,5 @@
 ---
-erzeugt: 224af1c15769
+erzeugt: d3b474ab107b
 art: modul
 tags: [modul]
 ---
@@ -73,7 +73,7 @@ class Aufteilungen
 Je `(Feldstreifen, Gruppe)` die Flächen mit Anteil -- und je Zelle, was automatisch entschieden wurde.
 
 - `flaechen: Dict[Tuple[str, int], List[Anteil]]`
-- `zellen: List[Tuple[Tuple[Punkt, ...], float]]` – Die Zellen der automatischen Aufteilung: Vieleck und Anteil in Richtung 1 -- fürs Bild.
+- `zellen: List[Tuple[Tuple[Punkt, ...], float]]` – Fürs Bild, was automatisch entschieden wurde: Vieleck und Anteil in Richtung 1 -- je Streifen der Richtung 1 die Zellen gleichen Anteils zusammengelegt, wie die Last sie bekommt, geschnitten mit der Platte.
 - `meldungen: List[Meldung]`
 
 ### aufteilen
@@ -98,7 +98,8 @@ def _automatisch(zerlegung: Zerlegung, gruppe: Gruppe, streifen1: Sequence[Strei
 
 Die Zellen der Gruppe, je mit ihrem Anteil in Richtung 1 -- und daraus je
 Streifen die Flächen, Zellen gleichen Anteils längs des Streifens
-zusammengelegt.
+zusammengelegt. Fürs Bild dieselben Flächen der Richtung 1, geschnitten
+mit der Platte. Dazu je Platte, an wie vielen Zellen keine Richtung trägt.
 
 ### _zusammengelegt
 

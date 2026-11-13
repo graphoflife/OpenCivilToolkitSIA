@@ -1,5 +1,5 @@
 ---
-erzeugt: 50df079eccde
+erzeugt: ffa73dc9e6de
 art: modul
 tags: [modul]
 ---
@@ -230,6 +230,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 
 ## Gebraucht von
 
+- [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
@@ -241,6 +242,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]

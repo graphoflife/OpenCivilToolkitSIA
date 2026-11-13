@@ -1,5 +1,5 @@
 ---
-erzeugt: 19bdd0f8b40d
+erzeugt: 83710025ca70
 art: modul
 tags: [modul]
 ---
@@ -40,8 +40,10 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 - [[opencivil.decke.aufteilung]] – welcher Teil der Last in welche Richtung geht.
 - [[opencivil.decke.feld]] – die Schnittkräfte der Platte an einer Stelle.
 - [[opencivil.decke.geometrie]] – Vielecke in der Ebene der Decke.
+- [[opencivil.decke.herleitung]] – wie eine Decke ihre Rechnung aufschreibt.
 - [[opencivil.decke.lasten]] – die Lasten eines Lastfalls auf den Streifen.
 - [[opencivil.decke.modell]] – was gerechnet wird: die Decke in SI.
 - [[opencivil.decke.rechnung]] – die Streifenmethode, Fall für Fall.
 - [[opencivil.decke.streifen]] – die Decke in Streifen zerlegt.
 - [[opencivil.decke.traeger]] – ein Streifen als Durchlaufträger.
+- [[opencivil.decke.werk]] – die Decke im Rechenwerk.

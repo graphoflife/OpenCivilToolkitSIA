@@ -32,8 +32,9 @@ from opencivil.projekt.skript import SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.projekt.setzung import SetzungEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
+from opencivil.projekt.decke import DeckeEintrag
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BAUTEILE, DURCHSTANZEN, GRUNDBRUCH, PLATTE, SETZUNG, Aufbau,
+    ANALYSE, BALKENSYSTEM, BAUTEILE, DECKE, DURCHSTANZEN, GRUNDBRUCH, PLATTE, SETZUNG, Aufbau,
     aufbauen,
 )
 
@@ -54,6 +55,9 @@ class Projekt(Beschreibung):
 
     balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)
     """Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle."""
+
+    decken: List[DeckeEintrag] = field(default_factory=list)
+    """Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Unterzüge."""
 
     durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)
     """Stützen und Wände, an denen das Durchstanzen nachgewiesen wird."""
@@ -298,6 +302,17 @@ class Projekt(Beschreibung):
                         BalkensystemEintrag(kennung=self.freie_kennung(BALKENSYSTEM.vorsilbe),
                                             name=name))
         self.balkensysteme.append(eintrag)
+        return eintrag
+
+    def decke(self, name: str, **felder: Any) -> DeckeEintrag:
+        """
+        Eine leere Decke. Gezeichnet wird danach mit dem Baukasten des
+        Eintrags -- ``platte``, ``lager`` (ein Linienlager), ``stuetze``,
+        ``unterzug``, ``zone`` --, Koordinaten in m.
+        """
+        eintrag = lesen(DeckeEintrag, felder, f"Decke '{name}'",
+                        DeckeEintrag(kennung=self.freie_kennung(DECKE.vorsilbe), name=name))
+        self.decken.append(eintrag)
         return eintrag
 
     def durchstanzen(self, name: str, beton: str, stahl: str, **felder: Any) -> DurchstanzEintrag:

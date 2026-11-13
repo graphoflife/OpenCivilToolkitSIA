@@ -34,6 +34,7 @@ from opencivil.core.protokoll import (
 )
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
+from opencivil.decke.modell import Aufteilung
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN, betonsorten_zum_anlegen
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsorten_zum_anlegen
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -41,6 +42,7 @@ from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import BAUTEILE, Aufbau, SkriptEintrag
 from opencivil.projekt import balkensystem as bs
+from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.eintraege import EIGENE_VORSILBE
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, wahl_von
 from opencivil.projekt.projekt import Projekt
@@ -93,6 +95,13 @@ _BETONGESETZE = [
     {"wert": a.value, "beschriftung": a.beschriftung, "kurz": a.kurz}
     for a in wahl_von(WerkstoffwahlEintrag, "betongesetz")
 ]
+#: Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem
+#: Titel. Die Regel dahinter steht in :mod:`opencivil.decke.aufteilung`.
+_AUFTEILUNGEN = {
+    Aufteilung.AUTOMATISCH: ("automatisch", "Je Stelle nach ihren Lagern: zum nahen Rand, sonst in "
+                                            "die kürzere Spannweite (Folie 31)"),
+    Aufteilung.FEST: ("fest", "Überall derselbe Anteil in Richtung 1 -- ausser in den Zonen"),
+}
 
 
 def _rechenarten(arten) -> list:
@@ -184,6 +193,13 @@ def katalog() -> dict:
         # Die Wahlen einer Durchstanzstelle -- je ein Schalter -- und welche
         # Felder der Nachweis mit jeder Stellung liest.
         "durchstanzen": durchstanzdaten.wahlen(),
+        # Wie eine Decke die Last auf ihre zwei Richtungen aufteilt -- und
+        # womit die Kennungen ihrer Teile beginnen, je Liste.
+        "decke": {
+            "vorsilben": dict(DECKENVORSILBEN),
+            "aufteilungen": [{"wert": a.value, "beschriftung": _AUFTEILUNGEN[a][0],
+                              "titel": _AUFTEILUNGEN[a][1]} for a in Aufteilung],
+        },
         # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
         "setzung": {
             "steifigkeiten": [{"wert": s.value, "beschriftung": s.beschriftung}

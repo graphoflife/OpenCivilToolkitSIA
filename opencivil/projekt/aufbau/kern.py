@@ -42,6 +42,7 @@ from opencivil.geotechnik.grundbruch import Fundament
 from opencivil.geotechnik.setzung import Setzungsfundament
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.stabwerk.rechnung import Balkensystem
+from opencivil.decke.werk import Deckensystem
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -136,6 +137,11 @@ class Aufbau:
     def balkensysteme(self) -> Dict[str, Balkensystem]:
         """Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
         return self.objekte("balkensystem")
+
+    @property
+    def decken(self) -> Dict[str, Deckensystem]:
+        """Die Decken, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
+        return self.objekte("decke")
 
     @property
     def grundbrueche(self) -> Dict[str, Fundament]:

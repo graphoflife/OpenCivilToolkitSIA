@@ -1,5 +1,5 @@
 ---
-erzeugt: 2eb65e9e6184
+erzeugt: 1fb653674070
 art: modul
 tags: [modul]
 ---
@@ -748,6 +748,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.platte]]

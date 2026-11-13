@@ -1,6 +1,6 @@
 # Voll
 
-515 Berechnungen ausgeführt, 796 Werte bestimmt.
+519 Berechnungen ausgeführt, 798 Werte bestimmt.
 
 ## Herleitung
 
@@ -13284,6 +13284,120 @@ $$
 \mathbf{K} = \begin{bmatrix} 1.210 \cdot 10^{6} & 0 & -1.210 \cdot 10^{6} & 0 \\ 0 & 145237 & 0 & 72619 \\ -1.210 \cdot 10^{6} & 0 & 1.210 \cdot 10^{6} & 0 \\ 0 & 72619 & 0 & 145237 \end{bmatrix}
 $$
 
+### Decke: Kolloquium 4
+
+**Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)**
+
+$$
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+$$
+
+> **Annahme:** Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern, ohne Drillmomente – eine Gleichgewichtslösung und damit ein unterer Grenzwert der Traglast. Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (nach Vorgabe, nicht nachgeschlagen); ein Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).
+
+**Platten**
+
+| Platte | $A\ [\mathrm{m}^{2}]$ | $h\ [\mathrm{mm}]$ | Beton | $E_{cm}\ [\mathrm{N/mm}^{2}]$ | $g_k\ [\mathrm{kN/m}^{2}]$ | $\varphi_1,\ \varphi_2\ [°]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| P1 | $49.50$ | $240$ | C30/37 | $33620$ | $6.00$ | $0.0,\ 90.0$ |
+
+Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und g = 10 m/s².
+
+**Linienlager**
+
+| Linienlager | von | bis | $L\ [\mathrm{m}]$ | vertikal | eingespannt |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| L1 | (0.00, 0.00) | (9.00, 0.00) | $9.00$ | ja | nein |
+
+**Stützen**
+
+| Stütze | Ort | $b_x \times b_y\ [\mathrm{mm}]$ | $l_x \times l_y\ [\mathrm{m}]$ | Stützenbereich |
+| ---: | ---: | ---: | ---: | ---: |
+| S1 | (0.50, 5.00) | 300 × 300 | 1.00 × 1.00 | von selbst |
+| S2 | (4.50, 5.00) | 300 × 300 | 1.00 × 1.00 | von selbst |
+| S3 | (8.50, 5.00) | 300 × 300 | 1.00 × 1.00 | von selbst |
+
+**Versteckte Unterzüge**
+
+| Unterzug | von | bis | $b\ [\mathrm{m}]$ | Stufe |
+| ---: | ---: | ---: | ---: | ---: |
+| U1 | (0.50, 0.00) | (0.50, 5.50) | $1.00$ | 2 |
+| U2 | (4.50, 0.00) | (4.50, 5.50) | $1.00$ | 2 |
+| U3 | (8.50, 0.00) | (8.50, 5.50) | $1.00$ | 2 |
+| U4 | (0.00, 5.00) | (9.00, 5.00) | $1.00$ | 1 |
+
+**Streifen**
+
+| Richtung | $\varphi\ [°]$ | Feldstreifen | $b\ [\mathrm{m}]$ | Namen |
+| ---: | ---: | ---: | ---: | ---: |
+| x | $0.0$ | 22 | $0.250 \ldots 0.250$ | x1 … x22 |
+| y | $90.0$ | 36 | $0.250 \ldots 0.250$ | y1 … y36 |
+
+Je Richtung sind die Streifen höchstens 0.25 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers.
+
+Gerechnet wird von unten nach oben: zuerst die Feldstreifen, dann die Unterzüge, jeder nach denen tieferer Stufe: U4 (Stufe 1), U1 (Stufe 2), U2 (Stufe 2), U3 (Stufe 2). Was ein Träger an Lagerkraft abgibt, ist die Last dessen, auf dem er liegt.
+
+Aufteilung fest: 30 % der Last in Richtung 1, 70 % in Richtung 2.
+
+### Decke: Jede Wahl
+
+**Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)**
+
+$$
+g = 10\,\mathrm{m}/\mathrm{s}^{2}
+$$
+
+> **Annahme:** Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern, ohne Drillmomente – eine Gleichgewichtslösung und damit ein unterer Grenzwert der Traglast. Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (nach Vorgabe, nicht nachgeschlagen); ein Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).
+
+**Platten**
+
+| Platte | $A\ [\mathrm{m}^{2}]$ | $h\ [\mathrm{mm}]$ | Beton | $E_{cm}\ [\mathrm{N/mm}^{2}]$ | $g_k\ [\mathrm{kN/m}^{2}]$ | $\varphi_1,\ \varphi_2\ [°]$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| P1 | $24.00$ | $220$ | C30/37 | $33620$ | $5.50$ | $0.0,\ 90.0$ |
+| P2 | $18.00$ | $280$ | C30/37 | $33620$ | $7.00$ | $0.0,\ 90.0$ |
+| P3 | $12.00$ | $200$ | C30/37 | $33620$ | $5.00$ | $0.0,\ 71.6$ |
+
+Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und g = 10 m/s².
+
+**Linienlager**
+
+| Linienlager | von | bis | $L\ [\mathrm{m}]$ | vertikal | eingespannt |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| L1 | (0.00, 0.00) | (6.00, 0.00) | $6.00$ | ja | nein |
+| L2 | (6.00, 0.00) | (6.00, 4.00) | $4.00$ | ja | ja |
+| L3 | (0.00, 0.00) | (0.00, 7.00) | $7.00$ | ja | nein |
+| L4 | (0.00, 7.00) | (3.00, 7.00) | $3.00$ | ja | nein |
+| L5 | (3.00, 7.00) | (6.00, 7.00) | $3.00$ | nein | ja |
+| L6 | (9.00, 0.00) | (13.00, 0.00) | $4.00$ | ja | nein |
+| L7 | (13.00, 0.00) | (14.00, 3.00) | $3.16$ | ja | nein |
+| L8 | (14.00, 3.00) | (10.00, 3.00) | $4.00$ | ja | nein |
+| L9 | (10.00, 3.00) | (9.00, 0.00) | $3.16$ | ja | nein |
+
+**Stützen**
+
+| Stütze | Ort | $b_x \times b_y\ [\mathrm{mm}]$ | $l_x \times l_y\ [\mathrm{m}]$ | Stützenbereich |
+| ---: | ---: | ---: | ---: | ---: |
+| S1 | (6.00, 7.00) | 400 × 250 | 1.20 × 0.80 | von Hand |
+
+**Streifen**
+
+| Richtung | $\varphi\ [°]$ | Feldstreifen | $b\ [\mathrm{m}]$ | Namen |
+| ---: | ---: | ---: | ---: | ---: |
+| x | $0.0$ | 15 | $0.400 \ldots 0.500$ | x1 … x15 |
+| y | $90.0$ | 13 | $0.300 \ldots 0.500$ | y1 … y13 |
+| 71.57° | $71.6$ | 8 | $0.474 \ldots 0.474$ | 71.57° 1 … 71.57° 8 |
+
+Je Richtung sind die Streifen höchstens 0.50 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers.
+
+Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, sonst in die kürzere Spannweite; nahe zweier Ränder und bei gleicher Spannweite je zur Hälfte. Ein Kragarm zählt doppelt (nach Vorgabe, nicht nachgeschlagen).
+
+**Zonen – sie gehen der Aufteilung vor**
+
+| Zone | $A\ [\mathrm{m}^{2}]$ | in Richtung 1 | in Richtung 2 |
+| ---: | ---: | ---: | ---: |
+| Z1 | $8.00$ | 100 % | 0 % |
+
+Die Platten tragen in verschiedenen Richtungen: x / 71.57°; x / y. Die Aufteilung gilt je Platte in ihren zwei Richtungen.
+
 ## Verwendete Formeln
 
 ### Querschnitt
@@ -15889,6 +16003,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Charakteristische Fliessgrenze | $f_{yk}$ | $500$ | N/mm² | Vorgabe |
 | Charakteristische Fliessgrenze auf Druck | $f_{yk}^{-}$ | $500$ | N/mm² | Vorgabe |
 | Teilsicherheitsbeiwert für Betonstahl | $\gamma_s$ | $1.15$ |  | Vorgabe |
+| Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
+| Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Bemessungswert der Auflagerkraft | $V_d$ | $900$ | kN | Vorgabe |
 | Abmessung der Stütze in x | $b_x$ | $400$ | mm | Vorgabe |

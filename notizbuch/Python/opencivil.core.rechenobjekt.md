@@ -1,5 +1,5 @@
 ---
-erzeugt: 3ad6ed512e2d
+erzeugt: 6bda5348790c
 art: modul
 tags: [modul]
 ---
@@ -72,6 +72,7 @@ nicht, ob eine andere ihren Beton schon angemeldet hat.
 
 ## Gebraucht von
 
+- [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4556c08ce4c5
+erzeugt: 6b00abedaf22
 art: modul
 tags: [modul]
 ---
@@ -74,6 +74,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
 - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».
+- [[opencivil.projekt.decke]] – eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
@@ -89,6 +90,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]
@@ -112,6 +114,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.ergebnis]]
 - [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.web.api]]
+- [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]
 - [[opencivil.web.durchstanzdaten]]

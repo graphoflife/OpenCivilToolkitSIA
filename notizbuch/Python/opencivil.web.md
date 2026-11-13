@@ -1,5 +1,5 @@
 ---
-erzeugt: a648a9c1edf6
+erzeugt: b90ef64429b6
 art: modul
 tags: [modul]
 ---
@@ -18,6 +18,7 @@ Browser laedt, samt dem Notizbuch.
 - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.
 - [[opencivil.web.balkendaten]] – was die Oberflaeche von einem Balkensystem zeigt.
 - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.
+- [[opencivil.web.deckendaten]] – was die Oberflaeche von einer Decke zeichnet.
 - [[opencivil.web.diagrammdaten]] – was die Oberflaeche zeichnet, als JSON.
 - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
 - [[opencivil.web.durchstanzdaten]] – was die Oberflaeche von einer Durchstanzstelle zeichnet.

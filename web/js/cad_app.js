@@ -8,13 +8,15 @@
  * Balkensystem (bs_zeichnung.js), Durchstanzen (ds_zeichnung.js) -- geben
  * nur dazu, was sie selbst wissen. Dazu die Liste unter dem Fenster, die
  * markiert, was gewählt ist, und die Bausteine der schwebenden Fenster: eine
- * Zeile mit Feld und Einheit, die Felder für die Lage eines Punktes, was
- * «Alles zeigen» ins Bild nimmt und die Meldungen des Kerns als Titel.
+ * Zeile mit Feld und Einheit, eine mit Schalter, die Felder für mehrere
+ * zugleich («Var»), die für die Lage eines Punktes, was «Alles zeigen» ins
+ * Bild nimmt und die Meldungen des Kerns als Titel.
  *
  * Bis 2026-11-10 stand das dreimal da, je mit eigenem Leser des Eintrags
  * und eigenem Vergessen.
  */
 
+import { wahlSchalter } from './bausteine.js';
 import { imSpiel } from './cad_auswahl.js';
 import {
   cadBereich, cadFenster, cadVergessen, cadWaehlen,
@@ -96,6 +98,45 @@ export function cadZeile(beschriftung, eingabe, einheit = '') {
   return el('label.cad-zeile', {}, [
     el('span', { text: beschriftung }), eingabe, einheit ? el('span.einheit', { text: einheit }) : el('span'),
   ]);
+}
+
+/** Wie `cadZeile`, für einen Schalter -- ein «div», kein «label»: ein Klick auf den Text löste sonst die erste Stellung aus. */
+export function schalterzeile(beschriftung, schalter, zusatz = '') {
+  return el('div.cad-zeile', {}, [
+    el('span', { text: beschriftung }), schalter, zusatz ? el('span.einheit', { text: zusatz }) : el('span'),
+  ]);
+}
+
+/**
+ * Mehrere zugleich (Benutzer, 2026-10-24): was die gewählten gemeinsam
+ * haben, steht da -- unterscheiden sie sich, steht «Var», und was man dann
+ * wählt oder tippt, gilt für alle.
+ */
+export const VAR = '*var*';
+
+/** Der gemeinsame Wert der gewählten -- oder VAR. */
+export function gemeinsam(werte) {
+  return werte.every((w) => w === werte[0]) ? werte[0] : VAR;
+}
+
+/** Die Stellungen eines Schalters oder einer Liste -- bei VAR mit «Var» vorneweg. */
+export function mitVar(werte, gewaehlt) {
+  return gewaehlt === VAR ? [{
+    wert: VAR, beschriftung: 'Var', titel: 'Die gewählten unterscheiden sich -- was man wählt, gilt für alle',
+  }, ...werte] : werte;
+}
+
+/** Ein Zahlenfeld, auch für mehrere: bei VAR leer, mit «Var» darin. */
+export function zahlfeldMitVar({ wert, platzhalter, ...rest }) {
+  return zahlfeld({ ...rest, wert: wert === VAR ? null : wert, platzhalter: wert === VAR ? 'Var' : platzhalter });
+}
+
+/** Ja oder nein als Schalter -- auch für mehrere, dann mit «Var». */
+export function jaNein(wert, setzen, titel) {
+  return wahlSchalter({
+    werte: mitVar([{ wert: true, beschriftung: 'ja' }, { wert: false, beschriftung: 'nein' }], wert),
+    gewaehlt: wert === VAR ? VAR : Boolean(wert), setzen, titel,
+  });
 }
 
 /**

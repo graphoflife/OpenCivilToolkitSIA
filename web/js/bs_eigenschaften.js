@@ -20,9 +20,11 @@ import {
   aktiverLastfall, lastart, lastfallWaehlen, lastVon, materialname, passendeUebersicht, zugseite,
 } from './bs_teile.js';
 import { zahlText } from './cad_ansicht.js';
-import { cadZeile } from './cad_app.js';
+import {
+  VAR, cadZeile, gemeinsam, jaNein, mitVar, schalterzeile, zahlfeldMitVar,
+} from './cad_app.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
-import { auswahl, el, zahlfeld } from './dom.js';
+import { auswahl, el } from './dom.js';
 import { ausVorlage, katalog } from './zustand.js';
 
 /** Was ein Lager je Richtung kann -- die Feder heisst an einer Linie Bettung. */
@@ -45,45 +47,6 @@ export function vorgabeMaterial(a, z) {
  */
 function richtungszeile(beschriftung, schalter) {
   return el('div.cad-zeile.ist-richtung', {}, [el('span', { text: beschriftung }), schalter]);
-}
-
-/** Wie `zeile`, für einen Schalter -- ebenso ein «div», kein «label». */
-function schalterzeile(beschriftung, schalter, zusatz = '') {
-  return el('div.cad-zeile', {}, [
-    el('span', { text: beschriftung }), schalter, zusatz ? el('span.einheit', { text: zusatz }) : el('span'),
-  ]);
-}
-
-/**
- * Mehrere zugleich (Benutzer, 2026-10-24): was die gewählten gemeinsam
- * haben, steht da -- unterscheiden sie sich, steht «Var», und was man dann
- * wählt oder tippt, gilt für alle.
- */
-const VAR = '*var*';
-
-/** Der gemeinsame Wert der gewählten -- oder VAR. */
-function gemeinsam(werte) {
-  return werte.every((w) => w === werte[0]) ? werte[0] : VAR;
-}
-
-/** Die Stellungen eines Schalters oder einer Liste -- bei VAR mit «Var» vorneweg. */
-function mitVar(werte, gewaehlt) {
-  return gewaehlt === VAR ? [{
-    wert: VAR, beschriftung: 'Var', titel: 'Die gewählten unterscheiden sich -- was man wählt, gilt für alle',
-  }, ...werte] : werte;
-}
-
-/** Ein Zahlenfeld, auch für mehrere: bei VAR leer, mit «Var» darin. */
-function zahlfeldMitVar({ wert, platzhalter, ...rest }) {
-  return zahlfeld({ ...rest, wert: wert === VAR ? null : wert, platzhalter: wert === VAR ? 'Var' : platzhalter });
-}
-
-/** Ja oder nein als Schalter -- auch für mehrere, dann mit «Var». */
-function jaNein(wert, setzen, titel) {
-  return wahlSchalter({
-    werte: mitVar([{ wert: true, beschriftung: 'ja' }, { wert: false, beschriftung: 'nein' }], wert),
-    gewaehlt: wert === VAR ? VAR : Boolean(wert), setzen, titel,
-  });
 }
 
 /** Ob ein Querschnitt ein Material mitbringt -- eine Platte oder Analyse; das sagt der Katalog. */
