@@ -6075,7 +6075,8 @@
         "MitFaellen",
         "MitFaellen.lastfall",
         "MitFaellen.kombination",
-        "MitFaellen.standardfaelle"
+        "MitFaellen.standardfaelle",
+        "MitFaellen.gebrauchskombination"
       ]
     },
     {

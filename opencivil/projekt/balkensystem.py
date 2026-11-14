@@ -688,7 +688,8 @@ class BalkensystemEintrag(MitFaellen, BauteilEintrag):
         Diagramme M, V und N der GZT und die Verschiebung der GZG.
         """
         s = cls(kennung=kennung, name=name)
-        gzt, gzg = s.standardfaelle()
+        gzt = s.standardfaelle()
+        gzg = s.gebrauchskombination()
         for groesse in ("M", "V", "N"):
             s.diagramm(gzt, groesse)
         s.diagramm(gzg, "verschiebung")

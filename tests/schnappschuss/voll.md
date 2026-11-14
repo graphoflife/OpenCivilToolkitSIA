@@ -16978,8 +16978,6 @@ Das Eigengewicht je m² ist ρ · g · h, mit der Dichte des Stahlbetons und g =
 
 Kombination «GZT»: 1.35 · «Eigengewicht» + 1.35 · «Auflast» + 1.5 · «Nutzlast»
 
-Kombination «GZG»: 1 · «Eigengewicht» + 1 · «Auflast» + 1 · «Nutzlast»
-
 **Streifen**
 
 | Richtung | $\varphi\ [°]$ | Feldstreifen | $b\ [\mathrm{m}]$ | Namen |
@@ -17008,7 +17006,6 @@ Die Platten tragen in verschiedenen Richtungen: x / 71.57°; x / y. Die Aufteilu
 | Auflast | $59.0$ | $0.0$ | $0.0$ | $59.0$ |
 | Nutzlast | $50.0$ | $0.0$ | $0.0$ | $50.0$ |
 | GZT | $583.9$ | $0.0$ | $0.0$ | $583.9$ |
-| GZG | $427.0$ | $0.0$ | $0.0$ | $427.0$ |
 
 Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem Streifen, der nicht trägt.
 
@@ -17327,88 +17324,6 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | S1 · Stütze | $11.3$ | $1.20 \times 0.80$ | $2.1$ | $0.6$ | $0.9$ | $0.3$ |
 | PL1 · Einzellast | $45.0$ | $1.00 \times 1.00$ | $1.5$ | $5.6$ | $1.5$ | $5.6$ |
-
-#### Kombination «GZG»
-
-**Träger, je Meter ihrer Breite**
-
-| Träger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| x1.1 … x2.1 | $0.500$ | $6.00$ | $15.3$ | L3 8.4 · L2 6.9 | $-7.7$ | $6.00$ | $6.5$ | $1.53$ |
-| x3.1 | $0.500$ | $6.00$ | $16.7$ | L3 8.5 · L2 8.2 | $-9.0$ | $6.00$ | $6.6$ | $1.55$ |
-| x4.1 … x6.1 | $0.500$ | $6.00$ | $43.0$ | L3 13.9 · L2 29.1 | $-35.3$ | $6.00$ | $17.7$ | $2.54$ |
-| x7 … x8 | $0.500$ | $6.00$ | $33.0$ | L3 12.4 · L2 20.6 | $-24.8$ | $6.00$ | $13.9$ | $2.25$ |
-| x15 | $0.400$ | $6.00$ | $31.9$ | L3 10.9 · S1 21.0 | $0.0$ | – | $19.6$ | $3.53$ |
-| x1.2 | $0.500$ | $4.17$ | $5.0$ | L9 2.5 · L7 2.5 | $0.0$ | – | $1.3$ | $10.17$ |
-| x2.2 | $0.500$ | $4.17$ | $5.0$ | L9 2.5 · L7 2.5 | $0.0$ | – | $1.3$ | $10.33$ |
-| x3.2 | $0.500$ | $4.17$ | $10.0$ | L9 5.0 · L7 5.0 | $0.0$ | – | $2.5$ | $10.50$ |
-| x4.2 | $0.500$ | $4.17$ | $22.5$ | L9 7.5 · L7 15.0 | $0.0$ | – | $10.0$ | $12.65$ |
-| x5.2 | $0.500$ | $4.17$ | $8.8$ | L9 3.3 · L7 5.4 | $0.0$ | – | $3.7$ | $12.79$ |
-| x6.2 | $0.500$ | $4.17$ | $5.0$ | L9 2.5 · L7 2.5 | $0.0$ | – | $1.3$ | $11.00$ |
-| y1 … y2 | $0.500$ | $7.00$ | $23.8$ | L1 5.4 · L4 18.4 | $0.0$ | – | $23.4$ | $4.64$ |
-| y3 | $0.500$ | $7.00$ | $31.8$ | L1 6.0 · L4 25.8 | $0.0$ | – | $26.1$ | $4.70$ |
-| y4 | $0.500$ | $7.00$ | $33.5$ | L1 6.0 · L4 27.5 | $0.0$ | – | $26.3$ | $4.71$ |
-| y5 … y6 | $0.500$ | $7.00$ | $41.7$ | L1 13.4 · L4 28.3 | $0.0$ | – | $28.4$ | $4.61$ |
-| y7 … y9 | $0.480$ | $7.00$ | $40.8$ | L1 40.8 · L5 0.0 | $0.0$ | – | $178.4$ | $6.60$ |
-| y10 | $0.480$ | $7.00$ | $35.5$ | L1 35.5 · L5 0.0 | $0.0$ | – | $173.8$ | $6.60$ |
-| y11 | $0.480$ | $7.00$ | $27.8$ | L1 27.8 · L5 0.0 | $0.0$ | – | $129.2$ | $6.60$ |
-| y12 … y13 | $0.300$ | $7.00$ | $26.2$ | L1 26.2 · L5 0.0 | $0.0$ | – | $120.2$ | $6.60$ |
-| 71.57° 1 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $4.06$ |
-| 71.57° 2 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $4.22$ |
-| 71.57° 3 | $0.474$ | $3.32$ | $15.8$ | L6 7.9 · L8 7.9 | $0.0$ | – | $6.2$ | $4.82$ |
-| 71.57° 4 | $0.474$ | $3.32$ | $15.8$ | L6 7.9 · L8 7.9 | $0.0$ | – | $6.2$ | $4.98$ |
-| 71.57° 5 | $0.474$ | $3.32$ | $26.4$ | L6 10.7 · L8 15.7 | $0.0$ | – | $11.2$ | $5.51$ |
-| 71.57° 6 | $0.474$ | $3.32$ | $47.4$ | L6 18.4 · L8 29.0 | $0.0$ | – | $24.5$ | $5.60$ |
-| 71.57° 7 | $0.474$ | $3.32$ | $9.2$ | L6 3.7 · L8 5.5 | $0.0$ | – | $3.7$ | $6.05$ |
-| 71.57° 8 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $5.17$ |
-
-Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
-
-**Lagerkräfte**
-
-| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $\vert m\vert _{\max}\ [\mathrm{kNm/m}]$ |
-| ---: | ---: | ---: | ---: |
-| S1 · Stütze | $8.4$ | – | – |
-| L1 · Linienlager | $129.7$ | $40.8$ | – |
-| L2 · Linienlager | $75.1$ | $29.1$ | $35.3$ |
-| L3 · Linienlager | $50.4$ | $13.9$ | – |
-| L4 · Linienlager | $73.4$ | $28.3$ | – |
-| L5 · Linienlager | $0.0$ | $0.0$ | $178.4$ |
-| L6 · Linienlager | $26.8$ | $17.5$ | – |
-| L7 · Linienlager | $16.5$ | $14.2$ | – |
-| L8 · Linienlager | $35.0$ | $27.5$ | – |
-| L9 · Linienlager | $11.7$ | $7.1$ | – |
-
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der grösste Wert davon. Das Moment eines eingespannten Lagers dreht um dessen Achse und steht als Betrag da: sein Vorzeichen hinge an der Richtung, in der das Lager gezeichnet ist.
-
-**Schnittkräfte der Platte, je Meter**
-
-| Grösse | kleinst | Ort | grösst | Ort |
-| ---: | ---: | ---: | ---: | ---: |
-| $m_x$ | $-35.3\ \mathrm{kNm/m}$ | (6.00, 1.75) | $19.6\ \mathrm{kNm/m}$ | (3.53, 6.80) |
-| $m_y$ | $0.0\ \mathrm{kNm/m}$ | – | $178.4\ \mathrm{kNm/m}$ | (3.24, 6.80) |
-| $m_{xy}$ | $0.0\ \mathrm{kNm/m}$ | – | $7.3\ \mathrm{kNm/m}$ | (12.35, 1.79) |
-| $v_x$ | $-29.1\ \mathrm{kN/m}$ | (6.00, 1.75) | $13.9\ \mathrm{kN/m}$ | (0.00, 1.75) |
-| $v_y$ | $-28.3\ \mathrm{kN/m}$ | (2.25, 7.00) | $40.8\ \mathrm{kN/m}$ | (3.24, 0.00) |
-| $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $40.9\ \mathrm{kN/m}$ | (3.24, 0.00) |
-
-Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
-
-**Erforderliche Biegewiderstände, ohne Lastverteilelemente**
-
-| Widerstand | Seite | erforderlich | Ort |
-| ---: | ---: | ---: | ---: |
-| $m_{xu}$ | unten, in x | $19.6\ \mathrm{kNm/m}$ | (3.53, 6.80) |
-| $m_{yu}$ | unten, in y | $178.4\ \mathrm{kNm/m}$ | (3.24, 6.80) |
-| $m'_{xu}$ | oben, in x | $35.3\ \mathrm{kNm/m}$ | (6.00, 1.75) |
-| $m'_{yu}$ | oben, in y | $0.0\ \mathrm{kNm/m}$ | – |
-
-**Lastverteilelemente: was der Bereich zusätzlich braucht**
-
-| Element | $Q\ [\mathrm{kN}]$ | $l_x \times l_y\ [\mathrm{m}]$ | $m'_{xu}\ [\mathrm{kNm/m}]$ | $m_{xu}\ [\mathrm{kNm/m}]$ | $m'_{yu}\ [\mathrm{kNm/m}]$ | $m_{yu}\ [\mathrm{kNm/m}]$ |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| S1 · Stütze | $8.4$ | $1.20 \times 0.80$ | $1.6$ | $0.4$ | $0.7$ | $0.2$ |
-| PL1 · Einzellast | $30.0$ | $1.00 \times 1.00$ | $1.0$ | $3.8$ | $1.0$ | $3.8$ |
 
 ## Verwendete Formeln
 

@@ -83,7 +83,8 @@ class TestBeschreibung(unittest.TestCase):
                          [["P1", "P2"], ["L1", "L2", "L3", "L4"], ["S1"], ["U1"], ["Z1"]])
         self.assertEqual(d.materialien(), ["b1"])
 
-    def test_neu_hat_die_faelle_eines_frischen_balkensystems(self):
+    def test_neu_hat_die_lastfaelle_eines_frischen_balkensystems_ohne_gzg(self):
+        """Die Streifenmethode gilt für die Tragsicherheit: eine neue Decke bekommt nur die GZT."""
         d = DeckeEintrag.neu("e1", "Decke")
         self.assertEqual((d.knoten, d.platten, d.linienlager, d.stuetzen, d.unterzuege, d.zonen),
                          ([], [], [], [], [], []))
@@ -91,10 +92,10 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual([(lf.kennung, lf.name, lf.eigengewicht) for lf in d.lastfaelle],
                          [("LF1", "Eigengewicht", True), ("LF2", "Auflast", False), ("LF3", "Nutzlast", False)])
         self.assertEqual({k.name: k.faktoren for k in d.kombinationen},
-                         {"GZT": {"LF1": 1.35, "LF2": 1.35, "LF3": 1.5},
-                          "GZG": {"LF1": 1.0, "LF2": 1.0, "LF3": 1.0}})
+                         {"GZT": {"LF1": 1.35, "LF2": 1.35, "LF3": 1.5}})
         b = BalkensystemEintrag.neu("r1", "System")
-        self.assertEqual((b.lastfaelle, b.kombinationen), (d.lastfaelle, d.kombinationen))
+        self.assertEqual((b.lastfaelle, b.kombinationen[0]), (d.lastfaelle, d.kombinationen[0]))
+        self.assertEqual([k.name for k in b.kombinationen], ["GZT", "GZG"])
         gzt = next(k.kennung for k in d.kombinationen if k.name == "GZT")
         self.assertEqual([(z.fall, z.groesse) for z in d.diagramme],
                          [(gzt, "m_x"), (gzt, "m_y"), (gzt, "v_0"), (gzt, "lager")])
@@ -158,8 +159,7 @@ class TestLasten(unittest.TestCase):
         self.assertEqual((flaeche.name, flaeche.wert, len(flaeche.ecken)), ("FL1", 3000.0, 4))
         self.assertEqual(punkt, Punktlast("PL1", (2.0, 2.0), 20000.0, 0.5, 1.0))
         self.assertEqual({k.name: k.faktoren for k in decke.kombinationen},
-                         {"GZT": {"Eigengewicht": 1.35, "Auflast": 1.35, "Nutzlast": 1.5},
-                          "GZG": {"Eigengewicht": 1.0, "Auflast": 1.0, "Nutzlast": 1.0}})
+                         {"GZT": {"Eigengewicht": 1.35, "Auflast": 1.35, "Nutzlast": 1.5}})
 
     def test_eine_plattenlast_je_lastfall(self):
         """Wie in der Oberfläche: eine zweite Last auf derselben Platte im selben Lastfall ersetzt die erste."""
@@ -202,7 +202,7 @@ class TestLasten(unittest.TestCase):
     def test_die_probe_je_fall(self):
         """Je Fall tragen die Lager die ganze Last; eine Kombination ist die Summe ihrer Fälle mal Beiwert."""
         faelle = {f["name"]: f for f in zeichnung(mit_lasten()).daten["uebersicht"]["faelle"]}
-        self.assertEqual(list(faelle), ["Eigengewicht", "Auflast", "Nutzlast", "GZT", "GZG"])
+        self.assertEqual(list(faelle), ["Eigengewicht", "Auflast", "Nutzlast", "GZT"])
         # 4 · 3 · 0.20 · 25 + 4 · 3 · 0.25 · 25 kN; 1.5 · 12 + 8 · 2; 3 · 4 + 20.
         for name, summe in (("Eigengewicht", 135.0), ("Auflast", 34.0), ("Nutzlast", 32.0)):
             self.assertAlmostEqual(faelle[name]["summe"], summe, places=6)
@@ -338,7 +338,7 @@ class TestBilder(unittest.TestCase):
         antwort = bilder(mit_lasten(), "GZX")
         self.assertEqual((antwort.status, antwort.daten["fehler"]),
                          (400, "Einen Fall «GZX» gibt es in «Zwei Felder» nicht. "
-                               "Gerechnet sind: Eigengewicht, Auflast, Nutzlast, GZT, GZG."))
+                               "Gerechnet sind: Eigengewicht, Auflast, Nutzlast, GZT."))
 
     def test_nur_fuer_eine_decke(self):
         p = zwei_felder()

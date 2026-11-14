@@ -1,5 +1,5 @@
 ---
-erzeugt: a90590df662d
+erzeugt: 3f0ec106f210
 art: modul
 tags: [modul]
 ---
@@ -81,13 +81,20 @@ Eine Kombination -- je Lastfall (Eintrag oder Kennung) ein Beiwert: `(g, 1.35), 
 #### MitFaellen.standardfaelle
 
 ```python
-def standardfaelle(self) -> Tuple[LastkombinationEintrag, LastkombinationEintrag]
+def standardfaelle(self) -> LastkombinationEintrag
 ```
 
 Die Faelle eines frischen Bauteils (Benutzer, 2026-10-23): Eigengewicht
 -- es kommt von selbst --, Auflast und Nutzlast, die beiden ohne Last,
-und die Kombinationen GZT mit 1.35, 1.35 und 1.5 und GZG mit je 1.0.
-Zurueck kommen GZT und GZG.
+und die Kombination GZT mit 1.35, 1.35 und 1.5. Zurueck kommt die GZT.
+
+#### MitFaellen.gebrauchskombination
+
+```python
+def gebrauchskombination(self) -> LastkombinationEintrag
+```
+
+Die Kombination GZG eines frischen Balkensystems: jeder Lastfall mit 1.0 (Benutzer, 2026-10-23).
 
 
 ## Braucht

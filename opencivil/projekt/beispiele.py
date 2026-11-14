@@ -298,7 +298,7 @@ def _decken(p: Projekt) -> None:
     el.platte(schief, beton=beton, h=200, richtung_1=0.0, richtung_2=math.degrees(math.atan2(3.0, 1.0)))
     for a, b in zip(schief, schief[1:] + schief[:1]):
         el.lager(a, b)
-    gzt, _ = el.standardfaelle()
+    gzt = el.standardfaelle()
     for groesse in DECKENGROESSEN:
         el.diagramm(gzt, groesse)
     _, auflast, nutzlast = el.lastfaelle

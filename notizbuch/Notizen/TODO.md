@@ -42,13 +42,6 @@ gelernt wurde, steht in [[Entwicklung]].
       Fliessbedingung (34) nur eine grobe Näherung (4.3.2.5, 4.3.2.6): bei
       45° ist m_xy = m/2. Vom Benutzer bestätigen lassen; Vorschlag: bei
       schiefen Richtungen ein Hinweis im Bericht.
-- [ ] **Decken: die Kombination GZG.** Jede neue Decke bekommt GZT und GZG,
-      beide nach der Streifenmethode. Die ist eine Methode der
-      Plastizitätstheorie und gilt für die Tragsicherheit (SIA 262:2025,
-      4.1.4.2.1); Schnittgrössen im Gebrauch rechnet man in der Regel
-      elastisch, mit Mittelwerten (4.4.1.2). Vorschlag: bei der Decke keine
-      GZG vorgeben, oder ihr Ergebnis als Gleichgewichtslösung kennzeichnen,
-      nicht als Gebrauchsnachweis. Entscheid des Benutzers.
 - [ ] **Günstige ständige Last in den Vorgaben.** Die Vorgabe-Kombination
       GZT nimmt Eigengewicht und Auflast mit 1.35 und die Nutzlast mit 1.5,
       im Balkensystem wie in der Decke. SIA 260:2013, Tabelle 1 kennt für

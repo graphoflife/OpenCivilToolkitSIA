@@ -7,6 +7,26 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Decken: neu ohne GZG
+
+Eine neue Decke bringt die Lastfälle des Balkensystems mit -- Eigengewicht,
+Auflast, Nutzlast --, aber nur noch die Kombination GZT (Benutzer,
+2026-11-14). Vorher bekam sie auch die GZG mit je 1.0, und der Bericht
+rechnete für sie Biegewiderstände.
+
+Warum so:
+
+- Die Streifenmethode ist eine Methode der Plastizitätstheorie und gilt für
+  die Tragsicherheit (SIA 262:2025, 4.1.4.2.1); Schnittgrössen im Gebrauch
+  rechnet man in der Regel elastisch, mit Mittelwerten (4.4.1.2). Eine GZG
+  nach der Streifenmethode sähe aus wie ein Gebrauchsnachweis und wäre
+  keiner. Wer sie trotzdem will, legt sie unter «Lastfälle» selbst an.
+- Die Vorgabe ist geteilt: `standardfaelle` legt die Lastfälle und die GZT
+  an, `gebrauchskombination` die GZG. Das Balkensystem nimmt beide, die
+  Decke nur die erste -- die Beiwerte stehen weiter an einer Stelle.
+- Das Beispiel «Jede Wahl» ist angelegt wie eine neue Decke und hat darum
+  auch keine GZG mehr.
+
 ## 2026-11-14 · Decken: Bericht mit Herleitung
 
 Die Herleitung einer Decke geht jetzt bis zu den Ergebnissen. Nach den

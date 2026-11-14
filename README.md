@@ -515,9 +515,10 @@ ganze Platte, entlang einer Linie, auf einer Fläche oder an einem Punkt.
 Darunter Knöpfe wie im Balkensystem: «Streifen» -- wie breit sie höchstens
 sind und wie die Last auf die zwei Richtungen geht, automatisch zum nahen
 Rand und in die kürzere Spannweite oder überall derselbe Anteil; in einer
-Zone gilt deren --, die Lastfälle und Kombinationen, wie im Balkensystem
-vorgegeben, und «Ergebnisse». Das Eigengewicht kommt von selbst,
-ρ · g · h mit g = 10 m/s².
+Zone gilt deren --, die Lastfälle und Kombinationen und «Ergebnisse».
+Eine neue Decke bringt die Lastfälle des Balkensystems mit, aber nur die
+Kombination GZT: die Streifenmethode gilt für die Tragsicherheit. Das
+Eigengewicht kommt von selbst, ρ · g · h mit g = 10 m/s².
 Jeder Streifen trägt als Balken auf seinen Lagern, statisch unbestimmt
 elastisch gelöst. Unterzüge und Stützenbereiche tragen als Fläche mit
 gleichmässiger Pressung, und ein Unterzug trägt weiter, was die Streifen

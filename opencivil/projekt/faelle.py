@@ -67,16 +67,17 @@ class MitFaellen:
         self.kombinationen.append(eintrag)
         return eintrag
 
-    def standardfaelle(self) -> Tuple[LastkombinationEintrag, LastkombinationEintrag]:
+    def standardfaelle(self) -> LastkombinationEintrag:
         """
         Die Faelle eines frischen Bauteils (Benutzer, 2026-10-23): Eigengewicht
         -- es kommt von selbst --, Auflast und Nutzlast, die beiden ohne Last,
-        und die Kombinationen GZT mit 1.35, 1.35 und 1.5 und GZG mit je 1.0.
-        Zurueck kommen GZT und GZG.
+        und die Kombination GZT mit 1.35, 1.35 und 1.5. Zurueck kommt die GZT.
         """
         g = self.lastfall("Eigengewicht", eigengewicht=True)
         auflast = self.lastfall("Auflast")
         nutzlast = self.lastfall("Nutzlast")
-        gzt = self.kombination("GZT", (g, 1.35), (auflast, 1.35), (nutzlast, 1.5))
-        gzg = self.kombination("GZG", (g, 1.0), (auflast, 1.0), (nutzlast, 1.0))
-        return gzt, gzg
+        return self.kombination("GZT", (g, 1.35), (auflast, 1.35), (nutzlast, 1.5))
+
+    def gebrauchskombination(self) -> LastkombinationEintrag:
+        """Die Kombination GZG eines frischen Balkensystems: jeder Lastfall mit 1.0 (Benutzer, 2026-10-23)."""
+        return self.kombination("GZG", *((lf, 1.0) for lf in self.lastfaelle))
