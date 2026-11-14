@@ -23,9 +23,10 @@ class TestDienst(unittest.TestCase):
         # der Zusammenfassung, nicht in dieser Liste.
         # 3 M-N-Fälle der Platte in x und ihre Verformung im Feld, dazu
         # Biegung und Querkraft mit Torsion des Unterzugs, Grundbruch und
-        # Gleiten des Fundaments, seine Setzung und der äussere und innere
-        # Widerstand des Pfahls; mehr ist im Beispiel nicht eingeschaltet.
-        self.assertEqual(len(antwort.daten["urteile"]), 11)
+        # Gleiten des Fundaments, seine Setzung, der äussere und innere
+        # Widerstand des Pfahls, quer sein äusserer Widerstand und die
+        # Bettungskraft; mehr ist im Beispiel nicht eingeschaltet.
+        self.assertEqual(len(antwort.daten["urteile"]), 13)
         self.assertTrue(antwort.daten["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):

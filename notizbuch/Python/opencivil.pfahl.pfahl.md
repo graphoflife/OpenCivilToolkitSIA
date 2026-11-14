@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f84df518d35
+erzeugt: 0934443f0f88
 art: modul
 tags: [modul]
 ---
@@ -22,8 +22,10 @@ Rechenwerk, und nur die, die nach den Wahlen gelten ([[opencivil.pfahl.pfahl#Pfa
 * [[opencivil.pfahl.pfahl#Kopf|Kopf]] -- ob sich der Kopf frei drehen kann oder eingespannt ist.
 
 Gerechnet wird in den Nachweisen: äusserer Widerstand in
-[[opencivil.pfahl.aussen]], innerer in [[opencivil.pfahl.innen]] --
-und die Steifigkeit in [[opencivil.pfahl.steifigkeit]].
+[[opencivil.pfahl.aussen]], innerer in [[opencivil.pfahl.innen]], der
+äussere quer zur Achse in [[opencivil.pfahl.quer]] -- und die Steifigkeit
+in [[opencivil.pfahl.steifigkeit]]. Welche Kombination den Pfahl quer
+belastet, sagt [[opencivil.pfahl.pfahl#Pfahl.quer_belastet|Pfahl.quer_belastet]].
 
 
 ## TIEFEN
@@ -232,6 +234,15 @@ def beschriftung(self) -> str
 def erklaerung(self) -> str
 ```
 
+### quer_belastet
+
+```python
+def quer_belastet(H: float, M: float, kopf: Kopf) -> bool
+```
+
+Ob Kräfte am Kopf den Pfahl quer belasten: eine Querkraft, oder ein Moment
+am frei drehbaren Kopf -- am eingespannten ist das Moment Reaktion.
+
 ### Kombination
 
 ```python
@@ -294,6 +305,7 @@ Siehe Dateikopf.
 - `dt: Groesse` – Mikropfahl: Aussendurchmesser und Wanddicke des Tragglieds, Abrostung aussen.
 - `kopf: Kopf`
 - `t_red: Groesse` – Bis in diese Tiefe unter Terrain wächst die Bettung quer von null an.
+- `eta_tr: Groesse` – Der Umrechnungsfaktor des äusseren Widerstands quer zur Achse.
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
 - `berechnungen: List[Berechnung] = field(default_factory=list, init=False)`
 
@@ -312,6 +324,14 @@ Ueberschrift, unter der der Pfahl in der Herleitung steht.
 @property
 def bohrpfahl(self) -> bool
 ```
+
+#### Pfahl.quer_belastet
+
+```python
+def quer_belastet(self, k: Kombination) -> bool
+```
+
+Ob eine Kombination den Pfahl quer belastet ([[opencivil.pfahl.pfahl#Pfahl.quer_belastet|quer_belastet]]).
 
 #### Pfahl.fuss_traegt
 
@@ -340,6 +360,14 @@ def stoffe(self) -> Tuple[Baustoff, ...]
 ```
 
 Die Baustoffe des Querschnitts: Beton und Stahl beim Bohrpfahl, Stahl beim Mikropfahl.
+
+#### Pfahl.profil
+
+```python
+def profil(self, e: Eingaben) -> Profil
+```
+
+Die Schichten und das Wasser als Zahlen, aus den Eingaben eines Nachweises.
 
 #### Pfahl._gruppen
 
@@ -391,6 +419,7 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 - [[opencivil.pfahl.achse]]
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt.aufbau.kern]]

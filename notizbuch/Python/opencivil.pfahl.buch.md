@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e0b427bea44
+erzeugt: 6daafc272c9d
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,9 @@ tags: [modul]
 Was Lang, Huder, Amann und Puzrin für Pfähle als Bild oder Beiwert geben,
 als Zahlen: der Form- und Tiefenfaktor X am Pfahlfuss (Bild 12.4), der
 Tragfähigkeitsfaktor N_c undrainiert (Bild 12.5), der Anteil von φ und c beim
-örtlichen Abscheren (Kap. 9.2.7), der Ruhedruckbeiwert (Kap. 2.7) und die
-Federn nach Cassan am Mantel und am Fuss (Kap. 12.8). Die Bilder sind
+örtlichen Abscheren (Kap. 9.2.7), der Ruhedruckbeiwert (Kap. 2.7), die
+Federn nach Cassan am Mantel und am Fuss (Kap. 12.8) und die wirksame
+Breite vor einer schmalen Druckfläche (Kap. 10.8). Die Bilder sind
 abgelesen, nicht nachgerechnet: auf etwa ±0.02 genau.
 
 
@@ -89,6 +90,9 @@ Unter den Grenzen ist der Wert am Rand zu gross, über ihnen zu klein.
 - `KAP_ABSCHEREN = 'Kap. 9.2.7, 12.5'`
 - `KAP_FEDERN = 'Kap. 12.8, Bild 12.9'`
 - `KAP_QUER = 'Kap. 12.10, Bild 12.14'`
+- `KAP_ERDDRUCK = 'Kap. 9.3.5'`
+- `KAP_ERDDRUCK_UNDRAINIERT = 'Kap. 9.3.6'`
+- `KAP_SCHMAL = 'Kap. 10.8'`
 - `X_H_D = (2.5, 3.0, 4.0, 5.0, 7.5, 10.0, 12.5, 15.0, 20.0, 25.0, 30.0)`
 - `X_PHI = (15.0, 25.0, 30.0, 32.5, 35.0, 37.5, 40.0)`
 - `X_WERTE = ((1.6, 1.63, 1.68, 1.73, 1.8, 1.83, 1.84, 1.85, 1.87, 1.89, 1.91), (1…`
@@ -97,9 +101,12 @@ Unter den Grenzen ist der Wert am Rand zu gross, über ihnen zu klein.
 - `ABSCHEREN = 2.0 / 3.0` – Auf diesen Teil sinken φ und c, wenn der Boden am Fuss nur örtlich abschert.
 - `CASSAN_MANTEL = 0.42` – Die Feder am Mantel, B ≈ 0.42 · E: Schubspannung je Setzung, in kN/m³ bei E in kN/m².
 - `CASSAN_FUSS = 4.5` – Die Feder am Fuss, R ≈ 4.5 · E: Spannung mal D je Setzung, σ_F = R · s / D.
+- `BREITE_SCHMAL = 3.0` – Der Erdwiderstand vor einem schmalen Körper wirkt auf einer breiteren Fläche als dieser -- grob genähert auf der dreifachen Breite.
 
 ## Gebraucht von
 
 - [[opencivil.pfahl.aussen]]
+- [[opencivil.pfahl.erdwiderstand]]
 - [[opencivil.pfahl.pfahl]]
+- [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]

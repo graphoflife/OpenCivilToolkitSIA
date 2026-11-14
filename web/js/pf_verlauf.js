@@ -6,7 +6,9 @@
  * Verdrehung θ, das Moment M, die Querkraft V und der Bettungsdruck p --
  * je über der Tiefe ab Terrain, die Tiefe nach unten wie im Bild der
  * Situation. Angeschrieben ist der Wert mit dem grössten Betrag, mit
- * Punkt; was überall null ist, fehlt.
+ * Punkt; was überall null ist, fehlt. Neben dem Bettungsdruck gestrichelt
+ * der Erdwiderstand, den er nicht übersteigen darf -- so weit er ins Bild
+ * fällt: bis zum Doppelten des grössten Drucks.
  *
  * Gerechnet wird nichts: die Werte kommen fertig aus dem Kern
  * (opencivil/web/pfahldaten.py), mit dem Bemessungswert des
@@ -18,7 +20,7 @@ import { karte } from './bausteine.js';
 import { el, svgEl } from './dom.js';
 import { legende, zahl } from './gb_skizze.js';
 
-/** Die Verläufe: Feld der Daten, Achsentitel, Stellen der Beschriftung, Farbe. */
+/** Die Verläufe: Feld der Daten, Achsentitel, Stellen der Beschriftung, Farbe, Feld der Grenze. */
 const GROESSEN = [
   { feld: 'N', titel: 'N [kN]', stellen: 0, klasse: 'bs-d-n' },
   { feld: 'w', titel: 'w [mm]', stellen: 2, klasse: 'pf-d-w' },
@@ -26,8 +28,11 @@ const GROESSEN = [
   { feld: 'theta', titel: 'θ [mrad]', stellen: 2, klasse: 'bs-d-phi' },
   { feld: 'M', titel: 'M [kNm]', stellen: 1, klasse: 'bs-d-m' },
   { feld: 'V', titel: 'V [kN]', stellen: 1, klasse: 'bs-d-v' },
-  { feld: 'p', titel: 'p [kN/m²]', stellen: 0, klasse: 'pf-d-p' },
+  { feld: 'p', titel: 'p [kN/m²]', stellen: 0, klasse: 'pf-d-p', grenze: 'p_grenze' },
 ];
+
+/** So weit, gemessen am grössten Wert, reicht das Bild für die Grenze. */
+const GRENZE_IM_BILD = 2;
 
 const BREITE = 168;
 const HOEHE = 380;
@@ -38,11 +43,38 @@ function groesster(werte) {
   return werte.reduce((best, v, i) => (Math.abs(v) > Math.abs(werte[best]) ? i : best), 0);
 }
 
-/** Ein Verlauf über die Tiefe: die Fläche zwischen null und der Kurve, der grösste Wert. */
-function verlaufsbild(z, werte, { titel, stellen, klasse }) {
+/**
+ * Die Stücke der Linie (w über z), die nicht über `oben` hinausgehen -- an
+ * dieser Grenze geschnitten, damit nichts über das Bild hinaus zeichnet.
+ */
+function bisZu(z, w, oben) {
+  const stuecke = [];
+  let stueck = [];
+  for (let k = 0; k < z.length; k += 1) {
+    if (k > 0 && (w[k - 1] - oben) * (w[k] - oben) < 0) {
+      const t = (oben - w[k - 1]) / (w[k] - w[k - 1]);
+      stueck.push([oben, z[k - 1] + t * (z[k] - z[k - 1])]);
+      if (w[k] > oben) {
+        stuecke.push(stueck);
+        stueck = [];
+      }
+    }
+    if (w[k] <= oben) stueck.push([w[k], z[k]]);
+  }
+  stuecke.push(stueck);
+  return stuecke.filter((s) => s.length > 1);
+}
+
+/**
+ * Ein Verlauf über die Tiefe: die Fläche zwischen null und der Kurve, der
+ * grösste Wert -- und, wo es eine gibt, die Grenze beidseits gestrichelt.
+ */
+function verlaufsbild(z, werte, { titel, stellen, klasse }, grenze) {
   const i = groesster(werte);
   const spitze = Math.abs(werte[i]);
-  const [von, bis] = [Math.min(0, ...werte), Math.max(0, ...werte)];
+  let [von, bis] = [Math.min(0, ...werte), Math.max(0, ...werte)];
+  const weit = grenze ? Math.min(Math.max(...grenze), GRENZE_IM_BILD * spitze) : 0;
+  [von, bis] = [Math.min(von, -weit), Math.max(bis, weit)];
   const luft = 0.08 * (bis - von || 1);
   const bild = achsenkreuz({
     breite: BREITE, hoehe: HOEHE, rand: RAND,
@@ -61,6 +93,16 @@ function verlaufsbild(z, werte, { titel, stellen, klasse }) {
     }),
     svgEl('path', { d: pfad(punkte), class: `bs-d-kurve ${klasse}` }),
   );
+  if (grenze) {
+    for (const seite of [1, -1]) {
+      for (const stueck of bisZu(z, grenze, seite > 0 ? bis : -von)) {
+        bild.daten.append(svgEl('path', {
+          d: pfad(stueck.map(([w, zi]) => [bild.x(seite * w), bild.y(zi)])),
+          class: `pf-d-grenze ${klasse}`,
+        }));
+      }
+    }
+  }
   if (spitze > 0) {
     const [x, y] = punkte[i];
     const rechts = x < (bild.feld.links + bild.feld.rechts) / 2;
@@ -85,7 +127,7 @@ export function verlaufKarten(d) {
   return (d?.verlaeufe || []).map((v) => karte(`Verläufe – ${v.name}`, [
     el('div.pf-verlaeufe', {}, GROESSEN
       .filter((g) => v[g.feld] && v[g.feld].some((x) => Math.abs(x) > 1e-9))
-      .map((g) => verlaufsbild(v.z, v[g.feld], g))),
+      .map((g) => verlaufsbild(v.z, v[g.feld], g, g.grenze && v[g.grenze]))),
     legende(d.verlaufslegende || []),
   ], { klasse: 'ist-breit' }));
 }

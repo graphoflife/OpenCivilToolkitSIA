@@ -1,11 +1,11 @@
 ---
-erzeugt: 5fd1259f3365
+erzeugt: 74e5096dea84
 art: formel
 tags: [formel]
-normstelle: "SIA 267:2013, 9.5.2.2.1, (42)"
+normstelle: ["SIA 267:2013, 9.5.2.2.1, (42)", "SIA 267:2013, 9.5.2.2.1, (42); 9.5.2.3.1, (49)"]
 ---
-> [!info] Normstelle
-> SIA 267:2013, 9.5.2.2.1, (42)
+> [!info] Normstellen
+> SIA 267:2013, 9.5.2.2.1, (42) · SIA 267:2013, 9.5.2.2.1, (42); 9.5.2.3.1, (49)
 
 *In der Herleitung: «Äusserer Widerstand auf Druck, Bemessungswert»*
 
@@ -32,10 +32,12 @@ $$
 ## Im Code
 
 - [[opencivil.pfahl.aussen#AeussererWiderstand._bemessung|AeussererWiderstand._bemessung]]
+- [[opencivil.pfahl.quer#AeussererQuerwiderstand|AeussererQuerwiderstand._querkraft]]
 
 ## Themen
 
 - [[Äusserer Pfahlwiderstand]]
+- [[Äusserer Pfahlwiderstand quer]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -50,3 +52,10 @@ auf Druck und 1.6 auf Zug (9.5.2.2.4, (43), (44)).
 
 Aus einer Berechnung bleiben so auf Druck 0.7/1.3 = 54 % von R_a,k, auf Zug
 0.7/1.6 = 44 %; aus einem statischen Versuch 77 % und 63 %.
+
+Quer zur Achse gilt dieselbe Formel. Die Norm will R_tr,d für das Objekt
+festgelegt, in der Regel mit γ_M,a mindestens 1.4 (9.5.2.3.1, (49)); das
+Werkzeug nimmt 1.4. Für η_a gelten quer dieselben Grenzen wie längs
+(9.5.2.3.2), und R_tr,k ist immer gerechnet: höchstens 0.7. Mit
+R_tr,k = 678 kN wird R_tr,d = 0.7 · 678 kN / 1.4 = 339 kN -- zusammen ein
+Faktor 2.

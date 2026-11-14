@@ -1,5 +1,5 @@
 ---
-erzeugt: b0d15d397063
+erzeugt: 1a1474904fbe
 art: modul
 tags: [modul]
 ---
@@ -25,7 +25,8 @@ von SIA 267:2013, 9.6.3.2.6. Eine Schicht, 20 m Kies mit φ'_k = 30° und
 K = 0.5, etwa K_0 = 1 − sin φ'_k (Kap. 2.7), und δ = φ'_k, wie das Buch
 für raue Pfähle sagt (Kap. 12.5); undrainiert α = 0.6, sein Wert für
 Bohrpfähle in weichem Ton. η_a = 0.7 und η_i = 0.8 sind die Grenzwerte der
-Norm für eine Berechnung und ohne Prüfung der Integrität. Der Mikropfahl
+Norm für eine Berechnung und ohne Prüfung der Integrität, quer zur Achse
+ebenso η_a,tr = 0.7: der Querwiderstand wird immer gerechnet. Der Mikropfahl
 hat ein Rohr 114.3 × 10 mm ohne Abrostung, bis jemand eine angibt. Der
 Verformungsmodul E_s,k = 30 MN/m² ist der des Beispiels im Buch zu Cassans
 Federn (Kap. 12.8); der Kopf dreht sich frei, und die Bettung quer wächst
@@ -114,6 +115,7 @@ Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf.
 - `dt: float = bereich(0.0, heisst='Abrostung Δt', einheit=MM, ab=0.0)`
 - `kopf: Kopf = Kopf.FREI`
 - `t_red: float = bereich(2.0, heisst='Tiefe der Abminderung t_red', einheit=M, ab=0.0)`
+- `eta_tr: float = bereich(0.7, heisst='η_a,tr', ueber=0.0, bis=1.0)` – Höchstens der Grenzwert einer Berechnung: R_tr,k wird immer aus den Schichten gerechnet (SIA 267:2013, 9.5.2.3.2) -- das prüft [[opencivil.projekt.pfahl#PfahlEintrag.regeln|regeln]].
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
 - `schichten: List[PfahlschichtEintrag] = field(default_factory=list)` – Vom Terrain an nach unten.
 - `kombinationen: List[PfahlkombinationEintrag] = field(default_factory=list)`
@@ -187,6 +189,14 @@ def _baugrund(self, wo: str) -> None
 ```
 
 Was die Rechnung aus den Schichten braucht.
+
+#### PfahlEintrag._festigkeiten
+
+```python
+def _festigkeiten(self, wo: str) -> None
+```
+
+Was jede Schicht haben muss, damit ihr Widerstand eine Zahl wird.
 
 #### PfahlEintrag._bewehrung
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: fc0ce7e8a153
+erzeugt: 71aaca8a0210
 art: modul
 tags: [modul]
 ---
@@ -133,7 +133,9 @@ sein Moment zählt dann nicht. Ein Mikropfahl mit Rohr aus einem
 statischen Versuch, ohne Schichten und darum ohne Steifigkeit, mit
 Abrostung und η_i über dem Regelwert; einer mit Vollstab aus Erfahrung,
 die Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
-eingegeben, quer leicht belastet.
+eingegeben, quer leicht belastet -- und schon das trägt er nicht: ein
+gezogener Stab hält quer wenig, und am Terrain drückt er den Kies
+stärker, als dieser hält.
 
 ### _erstes
 

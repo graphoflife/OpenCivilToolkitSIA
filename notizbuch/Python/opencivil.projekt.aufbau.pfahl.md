@@ -1,5 +1,5 @@
 ---
-erzeugt: 034a62f33c12
+erzeugt: 07745f26cbf5
 art: modul
 tags: [modul]
 ---
@@ -10,8 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Aus einem [[opencivil.projekt.pfahl#PfahlEintrag|PfahlEintrag]] der Pfahl, seine
-beiden Nachweise längs der Achse, äusserer und innerer Widerstand, und seine
-Steifigkeit ([[opencivil.projekt.aufbau.pfahl#bauen|bauen]]).
+beiden Nachweise längs der Achse, äusserer und innerer Widerstand, seine
+Steifigkeit und der äussere Widerstand quer ([[opencivil.projekt.aufbau.pfahl#bauen|bauen]]).
 
 ## Inhalt
 
@@ -25,7 +25,9 @@ Ein Pfahl und seine beiden Nachweise, sobald eine Kombination
 eingeschaltet ist -- ohne sie steht er allein da, wie ein Grundbruch
 ohne Kombination. Seine Steifigkeit, gleich ob mit Kombinationen, sobald
 unter dem Fuss Boden ist; sie liest nur die Schichten, auch wenn R_a,k
-aus einem Versuch kommt. Jede Zahl in der Einheit ihres Feldes
+aus einem Versuch kommt. Mit ihr der Widerstand quer, sobald eine
+Kombination quer belastet: er liest ihre Verläufe und den Querschnitt
+des inneren Widerstands. Jede Zahl in der Einheit ihres Feldes
 ([[opencivil.projekt.lesen#als_groesse|als_groesse]]).
 
 
@@ -35,6 +37,7 @@ aus einem Versuch kommt. Jede Zahl in der Einheit ihres Feldes
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.innen]]
 - [[opencivil.pfahl.pfahl]]
+- [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]

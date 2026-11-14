@@ -1,5 +1,5 @@
 ---
-erzeugt: cf366bc0d4b7
+erzeugt: 109205bec95f
 art: modul
 tags: [modul]
 ---
@@ -480,6 +480,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.innen]]
 - [[opencivil.pfahl.pfahl]]
+- [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]

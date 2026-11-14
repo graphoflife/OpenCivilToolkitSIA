@@ -137,15 +137,9 @@ class AeussererWiderstand(Achsnachweis):
 
     # -- R_a,k aus den Schichten -------------------------------------------
 
-    def _profil(self, e: Eingaben) -> Profil:
-        n = len(self.pfahl.schichten)
-        return Profil([e.g(f"d_{i}").si for i in range(1, n + 1)],
-                      [e.g(f"gamma_{i}").si for i in range(1, n + 1)],
-                      e.g("t_w").si, e.g("gamma_w").si)
-
     def _aus_schichten(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
                        befund: Aussenbefund) -> Tuple[Wert, Wert]:
-        profil = self._profil(e)
+        profil = self.pfahl.profil(e)
         R_s = self._mantel(e, p, werte, profil, befund)
         R_b = self._fuss(e, p, werte, profil, befund)
         p.titel("Charakteristischer äusserer Widerstand", ebene=3)

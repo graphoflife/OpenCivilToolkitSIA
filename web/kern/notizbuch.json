@@ -122,6 +122,12 @@
       "bereich": "Pfähle"
     },
     {
+      "name": "Äusserer Pfahlwiderstand quer",
+      "pfad": "Formelsammlung/Themen/Äusserer Pfahlwiderstand quer.md",
+      "art": "thema",
+      "bereich": "Pfähle"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -535,7 +541,8 @@
         "R_{a,d}"
       ],
       "themen": [
-        "Äusserer Pfahlwiderstand"
+        "Äusserer Pfahlwiderstand",
+        "Äusserer Pfahlwiderstand quer"
       ]
     },
     {
@@ -547,6 +554,17 @@
       ],
       "themen": [
         "Beton"
+      ]
+    },
+    {
+      "name": "Bemessungswert des Erdwiderstands am Pfahl",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert des Erdwiderstands am Pfahl.md",
+      "art": "formel",
+      "zeichen": [
+        "p_{E,d}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand quer"
       ]
     },
     {
@@ -1081,6 +1099,33 @@
       ]
     },
     {
+      "name": "Erddruck am Pfahl drainiert",
+      "pfad": "Formelsammlung/Formeln/Erddruck am Pfahl drainiert.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Erddruck am Pfahl undrainiert",
+      "pfad": "Formelsammlung/Formeln/Erddruck am Pfahl undrainiert.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Erdwiderstand je Meter Pfahl",
+      "pfad": "Formelsammlung/Formeln/Erdwiderstand je Meter Pfahl.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand quer"
+      ]
+    },
+    {
       "name": "Erfüllungsgrad",
       "pfad": "Formelsammlung/Formeln/Erfüllungsgrad.md",
       "art": "formel",
@@ -1097,6 +1142,7 @@
         "Setzung",
         "Äusserer Pfahlwiderstand",
         "Innerer Pfahlwiderstand",
+        "Äusserer Pfahlwiderstand quer",
         "Querkraft",
         "Duktilität",
         "Zwängung auf Normalkraft",
@@ -1623,6 +1669,17 @@
       ]
     },
     {
+      "name": "Hebel des Moments am Pfahlkopf",
+      "pfad": "Formelsammlung/Formeln/Hebel des Moments am Pfahlkopf.md",
+      "art": "formel",
+      "zeichen": [
+        "e"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand quer"
+      ]
+    },
+    {
       "name": "Hilfsgrösse der Nulllinie",
       "pfad": "Formelsammlung/Formeln/Hilfsgrösse der Nulllinie.md",
       "art": "formel",
@@ -2129,6 +2186,33 @@
       ],
       "themen": [
         "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Querbruch am eingespannten Kopf",
+      "pfad": "Formelsammlung/Formeln/Querbruch am eingespannten Kopf.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Querbruch am frei drehbaren Kopf",
+      "pfad": "Formelsammlung/Formeln/Querbruch am frei drehbaren Kopf.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Querbruch durch Verschieben",
+      "pfad": "Formelsammlung/Formeln/Querbruch durch Verschieben.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand quer"
       ]
     },
     {
@@ -5295,6 +5379,29 @@
       ]
     },
     {
+      "name": "opencivil.pfahl.erdwiderstand",
+      "pfad": "Python/opencivil.pfahl.erdwiderstand.md",
+      "art": "modul",
+      "kurz": "was der Boden quer zum Pfahl hält, und wie der Pfahl quer bricht.",
+      "stichworte": [
+        "Festigkeit",
+        "Festigkeit.K_p",
+        "Festigkeit.erddruecke",
+        "Linie",
+        "Linie.p",
+        "Erdwiderstand",
+        "Erdwiderstand.erddruecke",
+        "Erdwiderstand.je_meter",
+        "Erdwiderstand.bei",
+        "Erdwiderstand.linien",
+        "Bruch",
+        "_Integrale",
+        "_Integrale.oben",
+        "_Integrale.unten",
+        "brueche"
+      ]
+    },
+    {
       "name": "opencivil.pfahl.innen",
       "pfad": "Python/opencivil.pfahl.innen.md",
       "art": "modul",
@@ -5303,6 +5410,7 @@
         "kreis",
         "Masse",
         "querschnitt",
+        "biegewiderstand",
         "Innenbefund",
         "InnererWiderstand",
         "InnererWiderstand.pruefe",
@@ -5337,17 +5445,36 @@
         "Kopf",
         "Kopf.beschriftung",
         "Kopf.erklaerung",
+        "quer_belastet",
         "Kombination",
         "Kombination.kennung",
         "Pfahl",
         "Pfahl.abschnitt",
         "Pfahl.bohrpfahl",
+        "Pfahl.quer_belastet",
         "Pfahl.fuss_traegt",
         "Pfahl.baustoffe",
         "Pfahl.stoffe",
+        "Pfahl.profil",
         "Pfahl._gruppen",
         "Pfahl._schichtwert",
         "Pfahl.kurznamen"
+      ]
+    },
+    {
+      "name": "opencivil.pfahl.quer",
+      "pfad": "Python/opencivil.pfahl.quer.md",
+      "art": "modul",
+      "kurz": "der äussere Widerstand eines Pfahls quer zu seiner Achse.",
+      "stichworte": [
+        "Querfall",
+        "Querbefund",
+        "AeussererQuerwiderstand",
+        "AeussererQuerwiderstand.pruefe",
+        "AeussererQuerwiderstand._erdwiderstand",
+        "AeussererQuerwiderstand._tabelle",
+        "AeussererQuerwiderstand._brueche",
+        "AeussererQuerwiderstand._bettung"
       ]
     },
     {
@@ -5816,6 +5943,7 @@
         "PfahlEintrag.boden_unter_dem_fuss",
         "PfahlEintrag.regeln",
         "PfahlEintrag._baugrund",
+        "PfahlEintrag._festigkeiten",
         "PfahlEintrag._bewehrung",
         "PfahlEintrag._tragglied"
       ]
@@ -7041,6 +7169,7 @@
       "kurz": "was die Oberflaeche von einem Pfahl zeichnet.",
       "stichworte": [
         "situation",
+        "_querbefund",
         "verlaeufe",
         "_legende"
       ]

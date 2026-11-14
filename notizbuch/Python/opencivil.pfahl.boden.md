@@ -1,5 +1,5 @@
 ---
-erzeugt: 9360d98e3705
+erzeugt: c9b7c905c109
 art: modul
 tags: [modul]
 ---
@@ -109,7 +109,7 @@ die übrigen stehen da und gehen nicht ein.
 - `gamma: Groesse` – Die Raumlast, über und unter dem Wasser dieselbe.
 - `verhalten: Verhalten`
 - `phi_k: Groesse` – Der Reibungswinkel, charakteristisch -- drainiert.
-- `c_k: Groesse` – Die Kohäsion, charakteristisch -- drainiert; sie zählt nur am Fuss.
+- `c_k: Groesse` – Die Kohäsion, charakteristisch -- drainiert; sie zählt am Fuss und im Erdwiderstand quer.
 - `s_u: Groesse` – Die undrainierte Scherfestigkeit, charakteristisch -- undrainiert.
 - `mantel: Mantel`
 - `q_s: Groesse` – Die Mantelreibung, charakteristisch -- eingegeben.
@@ -227,6 +227,7 @@ Der Mantel von `oben` bis `unten` in Stücken, je Schicht und Seite des Wassers.
 ## Gebraucht von
 
 - [[opencivil.pfahl.aussen]]
+- [[opencivil.pfahl.erdwiderstand]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.projekt.aufbau.pfahl]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3fcfbeecc313
+erzeugt: ae8a2a342ad4
 art: modul
 tags: [modul]
 ---
@@ -84,6 +84,18 @@ def querschnitt(masse: Masse, werkstoffe: Sequence[Werkstoff]) -> Querschnitt
 Der Querschnitt der Interaktion, um die Achse des Pfahls: mit Beton als
 erstem Werkstoff und Stahl als zweitem der Bohrpfahl, sonst nur Stahl.
 
+### biegewiderstand
+
+```python
+def biegewiderstand(q: Querschnitt, N: float, eta_i: float, staebe: int=0) -> float
+```
+
+Das Moment, das der Pfahl bei der Normalkraft N trägt, Druck positiv:
+η_i · M_R(N / η_i) -- die Fläche der Widerstände um η_i verkleinert, wie
+(50) den Widerstand. Von `staebe` Stäben gilt die Lage, die dem Moment
+weniger nützt: ein Stab im gezogenen Rand oder zwei beidseits davon.
+Null, wo N allein schon mehr ist, als der Querschnitt trägt.
+
 ### Innenbefund
 
 ```python
@@ -158,6 +170,7 @@ R_i,d = η_i · R_mat,d (50).
 
 ## Gebraucht von
 
+- [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.web.pfahldaten]]

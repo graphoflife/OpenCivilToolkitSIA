@@ -90,7 +90,7 @@ class Pfahlschicht:
     """Der Reibungswinkel, charakteristisch -- drainiert."""
 
     c_k: Groesse
-    """Die Kohäsion, charakteristisch -- drainiert; sie zählt nur am Fuss."""
+    """Die Kohäsion, charakteristisch -- drainiert; sie zählt am Fuss und im Erdwiderstand quer."""
 
     s_u: Groesse
     """Die undrainierte Scherfestigkeit, charakteristisch -- undrainiert."""

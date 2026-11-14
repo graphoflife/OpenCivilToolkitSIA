@@ -1,5 +1,5 @@
 ---
-erzeugt: ea66ed8b3df3
+erzeugt: b4d22db7d5bc
 art: modul
 tags: [modul]
 ---
@@ -500,6 +500,7 @@ die andere Koordinate jeder Stelle.
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.quer]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.spannungsanalyse.schnitt]]

@@ -2306,7 +2306,7 @@ details.nb-callout > summary { cursor: pointer; }
    so viele die Breite fasst -- im schmalen Fenster zwei, jedes so breit wie
    seine Spalte, höchstens wie gezeichnet. Flächen und Kurven wie beim
    Balkensystem, Setzung und Verschiebung blau, der Bettungsdruck in der Farbe
-   des Bodens. */
+   des Bodens, der Erdwiderstand daneben gestrichelt. */
 .pf-verlaeufe {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 4px 10px;
@@ -2316,6 +2316,8 @@ details.nb-callout > summary { cursor: pointer; }
 .pf-d-w.bs-d-extrem { fill: var(--blau); }
 .pf-d-p.bs-d-flaeche { fill: #8a6d3b; } .pf-d-p.bs-d-kurve { stroke: #8a6d3b; }
 .pf-d-p.bs-d-extrem { fill: #8a6d3b; }
+.pf-d-grenze { fill: none; stroke-width: 1.2; stroke-dasharray: 5 3; }
+.pf-d-p.pf-d-grenze { stroke: #8a6d3b; }
 
 /* ---------------------------------------------------------- Durchstanzen -- */
 

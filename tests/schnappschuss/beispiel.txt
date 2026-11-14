@@ -2,7 +2,7 @@
 Beispiel
 ====================================================================================================
 
-146 Berechnungen ausgeführt, 217 Werte bestimmt.
+148 Berechnungen ausgeführt, 220 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -1388,6 +1388,9 @@ Einwirkung gegen Widerstand auf Druck
 Erfüllungsgrad
     \alpha_{eff,i,\text{Tragsicherheit}} = \frac{R_{i,d}}{N_{Ed}} = \frac{11325\,\mathrm{kN}}{2000\,\mathrm{kN}} = 5.66 \quad \Rightarrow \quad \text{erfüllt}
 
+Umrechnungsfaktor des äusseren Widerstands quer   [SIA 267:2013, 9.5.2.3.2; 9.5.2.2.5, (48)]
+    \eta_{a,tr} = 0.7
+
 Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst   [SIA 267:2013, 9.5.4.5]
     t_{red} = 2\,\mathrm{m}
 
@@ -1506,6 +1509,98 @@ Quer: am Kopf und die grössten Werte über die Tiefe, z ab Terrain
     Kombination     H_{Ed}\ [\mathrm{kN}]  M_{Ed}\ [\mathrm{kNm}]  y_0\ [\mathrm{mm}]  \theta_0\ [\mathrm{mrad}]  M_{max}\ [\mathrm{kNm}]  z\ [\mathrm{m}]  |V|_{max}\ [\mathrm{kN}]  |p|_{max}\ [\mathrm{kN/m^2}]
     --------------  ---------------------  ----------------------  ------------------  -------------------------  -----------------------  ---------------  ------------------------  ----------------------------
     Tragsicherheit                  100.0                     0.0                1.99                       0.60                    132.6             4.10                     100.0                            75
+
+Äusserer Widerstand quer
+------------------------
+
+Erdwiderstand
+-------------
+
+Erddruck drainiert, vorne passiv und hinten aktiv: wirksame Spannungen, ohne Reibung am Pfahl   [Kap. 9.3.5]
+    e_p = K_p \cdot \sigma'_v + 2 \cdot c' \cdot \sqrt{K_p} \qquad e_a = \frac{\sigma'_v}{K_p} - \frac{2 \cdot c'}{\sqrt{K_p}} \qquad K_p = \frac{1 + \sin\varphi'}{1 - \sin\varphi'}
+
+Erdwiderstand je Meter Pfahl: vor dem schmalen Pfahl auf der dreifachen Breite   [Kap. 10.8]
+    p_{E,k} = b' \cdot \left(e_p - \max\left(0;\ e_a\right)\right) \qquad b' = 3 \cdot D
+[*] Annahme: Hinten drückt der Boden aktiv nach, wo e_a positiv ist, sonst klafft ein Spalt; beide
+Drücke wirken auf 3 · D -- nach Vorgabe, nicht nachgeschlagen. Das Buch nennt diese Breite für den
+passiven Druck vor einem schmalen Träger. So hebt sich undrainiert σ_v vorne und hinten auf, und
+p_E,k wächst nicht ohne Grenze mit der Tiefe.
+
+Erdwiderstand am Pfahl, charakteristisch, z ab Terrain -- geteilt an den Schichten, am Wasser und wo e_a null wird
+    Schicht          z_o\ [\mathrm{m}]  z_u\ [\mathrm{m}]  p_{E,k,o}\ [\mathrm{kN/m}]  p_{E,k,u}\ [\mathrm{kN/m}]
+    ---------------  -----------------  -----------------  --------------------------  --------------------------
+    1: Auffüllung                 1.50               2.00                         205                         274
+    2: Kies, sandig               2.00               3.00                         334                         518
+    2: Kies, sandig               3.00               8.00                         518                        1002
+    3: Moräne                     8.00              13.50                        1172                        1813
+
+Brüche
+------
+
+Frei drehbarer Kopf: der ganze Pfahl um s_r gedreht, oder ein Gelenk in s_h; s ab Kopf, e = M_Ed / H_Ed   [SIA 267:2013, 9.4.4.2.2]
+    H \cdot \left|s_r + e\right| = \int_0^L p_{E,k} \cdot \left|s - s_r\right| ds \qquad H \cdot \left|s_h + e\right| = M_R + \int_0^{s_h} p_{E,k} \cdot \left(s_h - s\right) ds
+
+Der ganze Pfahl verschoben   [SIA 267:2013, 9.4.4.2.2]
+    H = \int_0^L p_{E,k}\, ds
+
+Je Mechanismus leistet die Last dieselbe Arbeit, die Boden und Gelenke verzehren. s_r und s_h liegen
+dort, wo H am kleinsten wird, gesucht auf Knoten höchstens 1 cm auseinander; unter einem Gelenk
+steht der Pfahl still. Der kleinste Bruch ist R_tr,k.
+[*] Annahme: Die Mechanismen, wie für kurze und lange Pfähle üblich, sind nach Vorgabe gewählt,
+nicht nachgeschlagen: die Norm verlangt nur, R_tr,k aus dem Erdwiderstand und dem inneren Widerstand
+zu bestimmen. Der Biegewiderstand zählt dabei charakteristisch, mal η_i.
+[*] Annahme: γ_M,a = 1.4 ist quer in der Regel der kleinste Wert; die Norm will den Bemessungswert
+je Objekt bestimmt haben. Die Bettungskraft steht mit denselben Beiwerten gegen den Erdwiderstand --
+beides nach Vorgabe, nicht nachgeschlagen.
+
+Äusserer Widerstand quer – Tragsicherheit
+-----------------------------------------
+
+Biegewiderstand des Pfahls im Bruch, mit f_ck und f_yk
+    Stelle  N\ [\mathrm{kN}]  \eta_i \cdot M_{R,k}(N / \eta_i)\ [\mathrm{kNm}]
+    ------  ----------------  ------------------------------------------------
+    Kopf                2000                                            1100.4
+    Fuss                 436                                             687.5
+
+Biegewiderstand im Bruch, der kleinere: dazwischen ist er nicht kleiner, die Fläche der Widerstände ist konvex   [SIA 267:2013, 9.4.4.2.2; 9.5.2.4.1, (50)]
+    M_R = 687.5\,\mathrm{kNm}
+
+Die Brüche an ihrer ungünstigsten Lage, s ab Kopf
+    Bruch                           s\ [\mathrm{m}]  H\ [\mathrm{kN}]
+    ------------------------------  ---------------  ----------------
+    Drehung des ganzen Pfahls                  9.35            3761.5
+    Gelenk im Pfahl                            1.75             677.9
+    Verschiebung des ganzen Pfahls                –           12555.0
+
+Der kleinste Bruch: Gelenk im Pfahl   [SIA 267:2013, 9.4.4.2.2]
+    R_{tr,k} = 677.9\,\mathrm{kN}
+
+Äusserer Widerstand quer, Bemessungswert   [SIA 267:2013, 9.5.2.2.1, (42); 9.5.2.3.1, (49)]
+    R_{tr,d} = \frac{\eta_{a,tr} \cdot R_{tr,k}}{\gamma_{M,a}} = \frac{0.7 \cdot 677.9\,\mathrm{kN}}{1.4} = 338.9\,\mathrm{kN}
+
+Querkraft gegen Widerstand quer
+    H_{Ed} = 100\,\mathrm{kN} \quad \le \quad R_{tr,d} = 338.9\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,tr,\text{Tragsicherheit}} = \frac{R_{tr,d}}{H_{Ed}} = \frac{338.9\,\mathrm{kN}}{100\,\mathrm{kN}} = 3.39 \quad \Rightarrow \quad \text{erfüllt}
+
+Tiefe unter Terrain, wo die Bettungskraft dem Erdwiderstand am nächsten kommt
+    z = 2\,\mathrm{m}
+
+Erdwiderstand dort, charakteristisch   [Kap. 10.8]
+    p_{E,k} = 274\,\mathrm{kN}/\mathrm{m}
+
+Erdwiderstand dort, Bemessungswert   [SIA 267:2013, 9.5.2.3.1, (49)]
+    p_{E,d} = \frac{\eta_{a,tr} \cdot p_{E,k}}{\gamma_{M,a}} = \frac{0.7 \cdot 274\,\mathrm{kN}/\mathrm{m}}{1.4} = 137\,\mathrm{kN}/\mathrm{m}
+
+Bettungskraft dort, aus den Verläufen mit E_s,d   [SIA 267:2013, 9.5.4.5]
+    q_d = 68\,\mathrm{kN}/\mathrm{m}
+
+Bettungskraft gegen Erdwiderstand
+    q_d = 68\,\mathrm{kN}/\mathrm{m} \quad \le \quad p_{E,d} = 137\,\mathrm{kN}/\mathrm{m}
+
+Erfüllungsgrad
+    \alpha_{eff,E,\text{Tragsicherheit}} = \frac{p_{E,d}}{q_d} = \frac{137\,\mathrm{kN}/\mathrm{m}}{68\,\mathrm{kN}/\mathrm{m}} = 2.02 \quad \Rightarrow \quad \text{erfüllt}
 
 Balkensystem: Rahmen
 --------------------
@@ -2316,6 +2411,80 @@ Materialwiderstand auf Zug: nur der Stahl   [SIA 267:2013, 9.5.2.4.2]
 Innerer Widerstand auf Druck, Bemessungswert   [SIA 267:2013, 9.5.2.4.1, (50)]
     R_{i,d} = \eta_i \cdot R_{mat,d}
 
+Pfahlsteifigkeit
+----------------
+
+Der Pfahl steht im Boden wie ein Stab auf Federn. Längs halten ihn die Reibung am Mantel und der
+Druck am Fuss, quer drückt er gegen den Boden neben sich. Wie stark die Federn sind, folgt aus dem
+Verformungsmodul der Schichten: am Mantel und am Fuss nach Cassan, quer nach der Norm. Die Federn am
+Kopf -- wie weit er sich unter einer Last setzt, verschiebt und dreht -- braucht das Modell des
+Tragwerks darüber; sie gelten mit dem charakteristischen Modul. Für die Schnittkräfte rechnet die
+Norm mit einem kleineren: in weicherem Boden weicht der Pfahl weiter aus und biegt sich stärker.
+
+Dehnsteifigkeit des Pfahls
+    EA = E_{cm} \cdot \frac{\pi \cdot D^{2}}{4}
+
+Biegesteifigkeit des Pfahls
+    EI = E_{cm} \cdot \frac{\pi \cdot D^{4}}{64}
+
+Feder am Mantel je Meter Pfahl, für Bohrpfähle   [Kap. 12.8, Bild 12.9]
+    k_l = B \cdot \pi \cdot D \qquad B = 0.42 \cdot E_{s,k}
+
+Bettung quer, je Meter Pfahl   [SIA 267:2013, 9.5.4.5, (53)]
+    k_s = \frac{E_{s,k}}{D} \qquad k_s \cdot D = E_{s,k}
+
+Bettung quer nahe dem Terrain abgemindert, z ab Terrain   [SIA 267:2013, 9.5.4.5]
+    k_s(z) = k_s \cdot \min\left(1;\ \frac{z}{t_{red}}\right)
+
+Feder am Fuss, in Schicht 3: A_b · R / D mit R E_s,k   [Kap. 12.8, Bild 12.9]
+    K_b = \frac{\pi \cdot D \cdot 4.5 \cdot E_{s,k,3}}{4}
+
+Gebetteter Stab: längs die Setzung w, quer die Verschiebung y   [Kap. 12.8, Bild 12.9; Kap. 12.10, Bild 12.14]
+    EA \cdot w'' = k_l \cdot w \qquad EI \cdot y'''' = -k_s \cdot D \cdot y
+
+Längsfeder auf Druck   [Kap. 12.8, Bild 12.9]
+    k_v = \frac{1\,\mathrm{MN}}{w_0}
+
+Querfeder, Kopf frei drehbar   [Kap. 12.10, Bild 12.14]
+    k_h = \frac{1\,\mathrm{MN}}{y_0}
+
+Querfeder, Kopf eingespannt   [Kap. 12.10, Bild 12.14]
+    K_{HH} = \frac{1\,\mathrm{MN}}{y_{0,E}}
+
+Kopplung: das Moment am eingespannten Kopf je Verschiebung   [Kap. 12.10, Bild 12.14]
+    K_{HM} = \frac{M_{0,E}}{y_{0,E}}
+
+Drehfeder, Kopf nicht verschoben: aus k_h = K_HH − K_HM² / K_MM
+    K_{MM} = \frac{K_{HM}^{2}}{K_{HH} - k_h}
+
+Verformungsmodul der Tragsicherheit: hier führt zu wenig Steifigkeit zum Versagen   [SIA 267:2013, 5.3.2.5]
+    E_{s,d} = \frac{E_{s,k}}{\gamma_E} \qquad \gamma_E = 1.5
+
+Äusserer Pfahlwiderstand quer
+-----------------------------
+
+Quer zur Achse hält den Pfahl der Boden neben ihm. Gibt der Boden nach, dreht oder verschiebt sich
+der ganze Pfahl, oder er knickt in einem Gelenk, wo das Moment so gross wird, wie er tragen kann.
+Die Querkraft, bei der das zuerst geschieht, ist der charakteristische Widerstand quer; der
+Bemessungswert folgt wie längs mit η_a und γ_M,a. Dazu darf der Pfahl den Boden nirgends stärker
+drücken, als dieser hält: die Bettungskraft aus der Steifigkeit gegen den Erdwiderstand, in jeder
+Tiefe.
+
+Erddruck drainiert, vorne passiv und hinten aktiv: wirksame Spannungen, ohne Reibung am Pfahl   [Kap. 9.3.5]
+    e_p = K_p \cdot \sigma'_v + 2 \cdot c' \cdot \sqrt{K_p} \qquad e_a = \frac{\sigma'_v}{K_p} - \frac{2 \cdot c'}{\sqrt{K_p}} \qquad K_p = \frac{1 + \sin\varphi'}{1 - \sin\varphi'}
+
+Erdwiderstand je Meter Pfahl: vor dem schmalen Pfahl auf der dreifachen Breite   [Kap. 10.8]
+    p_{E,k} = b' \cdot \left(e_p - \max\left(0;\ e_a\right)\right) \qquad b' = 3 \cdot D
+
+Frei drehbarer Kopf: der ganze Pfahl um s_r gedreht, oder ein Gelenk in s_h; s ab Kopf, e = M_Ed / H_Ed   [SIA 267:2013, 9.4.4.2.2]
+    H \cdot \left|s_r + e\right| = \int_0^L p_{E,k} \cdot \left|s - s_r\right| ds \qquad H \cdot \left|s_h + e\right| = M_R + \int_0^{s_h} p_{E,k} \cdot \left(s_h - s\right) ds
+
+Der ganze Pfahl verschoben   [SIA 267:2013, 9.4.4.2.2]
+    H = \int_0^L p_{E,k}\, ds
+
+Erdwiderstand dort, Bemessungswert   [SIA 267:2013, 9.5.2.3.1, (49)]
+    p_{E,d} = \frac{\eta_{a,tr} \cdot p_{E,k}}{\gamma_{M,a}}
+
 Kennzahlen
 ----------
 
@@ -2407,55 +2576,6 @@ Schnittgrössen aus den Kräften an den Stabenden
 
 Biegelinie und Längsverschiebung
     v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
-
-Pfahlsteifigkeit
-----------------
-
-Der Pfahl steht im Boden wie ein Stab auf Federn. Längs halten ihn die Reibung am Mantel und der
-Druck am Fuss, quer drückt er gegen den Boden neben sich. Wie stark die Federn sind, folgt aus dem
-Verformungsmodul der Schichten: am Mantel und am Fuss nach Cassan, quer nach der Norm. Die Federn am
-Kopf -- wie weit er sich unter einer Last setzt, verschiebt und dreht -- braucht das Modell des
-Tragwerks darüber; sie gelten mit dem charakteristischen Modul. Für die Schnittkräfte rechnet die
-Norm mit einem kleineren: in weicherem Boden weicht der Pfahl weiter aus und biegt sich stärker.
-
-Dehnsteifigkeit des Pfahls
-    EA = E_{cm} \cdot \frac{\pi \cdot D^{2}}{4}
-
-Biegesteifigkeit des Pfahls
-    EI = E_{cm} \cdot \frac{\pi \cdot D^{4}}{64}
-
-Feder am Mantel je Meter Pfahl, für Bohrpfähle   [Kap. 12.8, Bild 12.9]
-    k_l = B \cdot \pi \cdot D \qquad B = 0.42 \cdot E_{s,k}
-
-Bettung quer, je Meter Pfahl   [SIA 267:2013, 9.5.4.5, (53)]
-    k_s = \frac{E_{s,k}}{D} \qquad k_s \cdot D = E_{s,k}
-
-Bettung quer nahe dem Terrain abgemindert, z ab Terrain   [SIA 267:2013, 9.5.4.5]
-    k_s(z) = k_s \cdot \min\left(1;\ \frac{z}{t_{red}}\right)
-
-Feder am Fuss, in Schicht 3: A_b · R / D mit R E_s,k   [Kap. 12.8, Bild 12.9]
-    K_b = \frac{\pi \cdot D \cdot 4.5 \cdot E_{s,k,3}}{4}
-
-Gebetteter Stab: längs die Setzung w, quer die Verschiebung y   [Kap. 12.8, Bild 12.9; Kap. 12.10, Bild 12.14]
-    EA \cdot w'' = k_l \cdot w \qquad EI \cdot y'''' = -k_s \cdot D \cdot y
-
-Längsfeder auf Druck   [Kap. 12.8, Bild 12.9]
-    k_v = \frac{1\,\mathrm{MN}}{w_0}
-
-Querfeder, Kopf frei drehbar   [Kap. 12.10, Bild 12.14]
-    k_h = \frac{1\,\mathrm{MN}}{y_0}
-
-Querfeder, Kopf eingespannt   [Kap. 12.10, Bild 12.14]
-    K_{HH} = \frac{1\,\mathrm{MN}}{y_{0,E}}
-
-Kopplung: das Moment am eingespannten Kopf je Verschiebung   [Kap. 12.10, Bild 12.14]
-    K_{HM} = \frac{M_{0,E}}{y_{0,E}}
-
-Drehfeder, Kopf nicht verschoben: aus k_h = K_HH − K_HM² / K_MM
-    K_{MM} = \frac{K_{HM}^{2}}{K_{HH} - k_h}
-
-Verformungsmodul der Tragsicherheit: hier führt zu wenig Steifigkeit zum Versagen   [SIA 267:2013, 5.3.2.5]
-    E_{s,d} = \frac{E_{s,k}}{\gamma_E} \qquad \gamma_E = 1.5
 
 ====================================================================================================
 Nachweise
@@ -2595,10 +2715,12 @@ Widerstände
     Querschnitt                 R_{mat,d}                        14156                       1639
     Innerer, Bemessungswert     R_{i,d}                          11325                       1311
 
-    Nachweis                  Bezeichnung                       Widerstand                    Einwirkung  \alpha_{eff}
-    ------------------------  --------------  ----------------------------  ----------------------------  ------------
-    Äusserer Pfahlwiderstand  Tragsicherheit   R_{a,d} = 2199\,\mathrm{kN}  N_{Ed} = 2000.0\,\mathrm{kN}          1.10
-    Innerer Pfahlwiderstand   Tragsicherheit  R_{i,d} = 11325\,\mathrm{kN}  N_{Ed} = 2000.0\,\mathrm{kN}          5.66
+    Nachweis                       Bezeichnung                                Widerstand                        Einwirkung  \alpha_{eff}
+    -----------------------------  --------------  -------------------------------------  --------------------------------  ------------
+    Äusserer Pfahlwiderstand       Tragsicherheit            R_{a,d} = 2199\,\mathrm{kN}      N_{Ed} = 2000.0\,\mathrm{kN}          1.10
+    Innerer Pfahlwiderstand        Tragsicherheit           R_{i,d} = 11325\,\mathrm{kN}      N_{Ed} = 2000.0\,\mathrm{kN}          5.66
+    Äusserer Pfahlwiderstand quer  Tragsicherheit          R_{tr,d} = 338.9\,\mathrm{kN}       H_{Ed} = 100.0\,\mathrm{kN}          3.39
+    Bettungskraft am Pfahl         Tragsicherheit  p_{E,d} = 137\,\mathrm{kN}/\mathrm{m}  q_d = 68\,\mathrm{kN}/\mathrm{m}          2.02
 
 Kennzahlen
     Kennzahl                          Zeichen                               Wert
@@ -2690,6 +2812,7 @@ Werte
     Reibungswinkel Pfahl–Boden in der Schicht 3, als Teil von φ'_k                            k_{\delta,3}                                                 1            Vorgabe
     Umrechnungsfaktor des äusseren Widerstands                                                \eta_a                                                     0.7            Vorgabe
     Umrechnungsfaktor des inneren Widerstands                                                 \eta_i                                                     0.8            Vorgabe
+    Umrechnungsfaktor des äusseren Widerstands quer                                           \eta_{a,tr}                                                0.7            Vorgabe
     Raumlast der Schicht 1                                                                    \gamma_{1}                                                  19  kN/m³     Vorgabe
     Raumlast der Schicht 2                                                                    \gamma_{2}                                                  21  kN/m³     Vorgabe
     Raumlast der Schicht 3                                                                    \gamma_{3}                                                  22  kN/m³     Vorgabe
@@ -2697,6 +2820,8 @@ Werte
     Zahl der Längsstäbe                                                                       n                                                           12            Vorgabe
     Erfüllungsgrad äusserer Widerstand – Tragsicherheit                                       \alpha_{eff,a,\text{Tragsicherheit}}                      1.10            berechnet
     Erfüllungsgrad innerer Widerstand – Tragsicherheit                                        \alpha_{eff,i,\text{Tragsicherheit}}                      5.66            berechnet
+    Erfüllungsgrad Bettungskraft – Tragsicherheit                                             \alpha_{eff,E,\text{Tragsicherheit}}                      2.02            berechnet
+    Erfüllungsgrad äusserer Widerstand quer – Tragsicherheit                                  \alpha_{eff,tr,\text{Tragsicherheit}}                     3.39            berechnet
     Reibungswinkel der Schicht 1, charakteristisch                                            \varphi'_{k,1}                                              30  °         Vorgabe
     Reibungswinkel der Schicht 2, charakteristisch                                            \varphi'_{k,2}                                              34  °         Vorgabe
     Reibungswinkel der Schicht 3, charakteristisch                                            \varphi'_{k,3}                                              36  °         Vorgabe

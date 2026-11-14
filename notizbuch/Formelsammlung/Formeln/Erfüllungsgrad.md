@@ -1,5 +1,5 @@
 ---
-erzeugt: 8bccc6d8cbe3
+erzeugt: f09d6cbcb3d9
 art: formel
 tags: [formel]
 ---
@@ -40,6 +40,7 @@ $$
 - [[Setzung]]
 - [[Äusserer Pfahlwiderstand]]
 - [[Innerer Pfahlwiderstand]]
+- [[Äusserer Pfahlwiderstand quer]]
 - [[Querkraft]]
 - [[Duktilität]]
 - [[Zwängung auf Normalkraft]]

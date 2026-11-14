@@ -108,6 +108,23 @@ def querschnitt(masse: Masse, werkstoffe: Sequence[Werkstoff]) -> Querschnitt:
     return Querschnitt(werkstoffe=werkstoffe, teile=teile, bewehrung=[], bezug=(0.0, 0.0))
 
 
+def biegewiderstand(q: Querschnitt, N: float, eta_i: float, staebe: int = 0) -> float:
+    """
+    Das Moment, das der Pfahl bei der Normalkraft N trägt, Druck positiv:
+    η_i · M_R(N / η_i) -- die Fläche der Widerstände um η_i verkleinert, wie
+    (50) den Widerstand. Von ``staebe`` Stäben gilt die Lage, die dem Moment
+    weniger nützt: ein Stab im gezogenen Rand oder zwei beidseits davon.
+    Null, wo N allein schon mehr ist, als der Querschnitt trägt.
+    """
+    momente = []
+    for drehung in ((0.0, math.pi / staebe) if staebe else (0.0,)):
+        punkt = q.bei_normalkraft(-math.pi / 2.0 + drehung, -N / eta_i)
+        if punkt is None:
+            return 0.0
+        momente.append(punkt.moment)
+    return eta_i * min(momente)
+
+
 @dataclass
 class Innenbefund:
     """Was ausser den Erfüllungsgraden bleibt -- für Zusammenfassung und Bild, in SI."""

@@ -5,7 +5,7 @@
  *
  *     Pfahl Situation   Bezeichnung; Bohr- oder Mikropfahl; Masse,
  *                       Grundwasser, Querschnitt, äusserer Widerstand und
- *                       Bettung je als Karte; Beschreibung
+ *                       Querlast je als Karte; Beschreibung
  *     Schichten         vom Terrain an nach unten, je eine Karte: Dicke,
  *                       Raumlast, drainiert oder undrainiert, die
  *                       Mantelreibung gerechnet oder eingegeben, der
@@ -18,7 +18,8 @@
  * stehen rechts in der Zusammenfassung, die Situation und die Verläufe über
  * die Tiefe unter «Diagramme». Einheiten
  * und Grenzen kommen aus dem Katalog (`katalog.felder`), die Stellungen der
- * Schalter ebenso (`katalog.pfahl`), samt dem Grenzwert von η_a.
+ * Schalter ebenso (`katalog.pfahl`), samt dem Grenzwert von η_a -- quer der
+ * einer Berechnung: R_tr,k wird immer gerechnet.
  */
 
 import {
@@ -42,8 +43,12 @@ const HILFE = {
       ['Fuss', 'drainiert (c·N_c + σ\'_v·N_q)·X mit X aus Bild 12.4, undrainiert s_u·N_c mit N_c ≤ 9 aus Bild 12.5 (Kap. 12.5); örtliches Abscheren mit 2/3 von φ\'_k und c\'_k (Kap. 9.2.7)'],
       ['Kopf', 'frei drehbar: ein Moment am Kopf ist Einwirkung; eingespannt, etwa in einer steifen Pfahlkopfplatte: der Kopf dreht sich nicht, das Moment dort ist Reaktion'],
       ['t_red', 'bis in diese Tiefe unter Terrain wächst die Bettung quer linear von null an -- die Norm verlangt nur, sie nahe der Oberfläche abzumindern (SIA 267:2013, 9.5.4.5)'],
+      ['R_tr,k', 'Widerstand quer: der kleinste Bruch -- der ganze Pfahl gedreht oder verschoben, oder ein Gelenk, wo das Moment den Biegewiderstand erreicht (SIA 267:2013, 9.4.4.2.2); der Biegewiderstand mit f_ck und f_yk, mal η_i'],
+      ['η_a,tr', 'Umrechnungsfaktor quer: R_tr,k wird immer gerechnet, also höchstens 0.7 (SIA 267:2013, 9.5.2.3.2, 9.5.2.2.5)'],
+      ['γ_M,a quer', '1.4, der kleinste Wert der Norm (SIA 267:2013, 9.5.2.3.1, (49)) -- fest, keine Eingabe'],
+      ['Bettung', 'in keiner Tiefe darf die Bettungskraft der Verläufe den Erdwiderstand p_E,d = η_a,tr·p_E,k/1.4 übersteigen (SIA 267:2013, 9.5.4.5)'],
     ],
-    formel: 'R_a,d = η_a·(R_b,k + R_s,k)/γ_M,a;  R_i,d = η_i·R_mat,d',
+    formel: 'R_a,d = η_a·(R_b,k + R_s,k)/γ_M,a;  R_i,d = η_i·R_mat,d;  R_tr,d = η_a,tr·R_tr,k/γ_M,a',
   },
   schichten: {
     zeilen: [
@@ -53,6 +58,7 @@ const HILFE = {
       ['undrainiert', 'q_s,k = α·s_u,k; am Bohrpfahl α ≈ 0.6 in weichem, 0.9 in steifem Ton (Kap. 12.5)'],
       ['eingegeben', 'q_s,k, etwa aus dem geotechnischen Bericht; eine Schicht, die nicht trägt, mit null -- sie hat dann auch längs keine Feder'],
       ['E_s,k', 'Verformungsmodul: am Mantel die Feder 0.42·E_s,k, am Fuss 4.5·E_s,k (Cassan, Kap. 12.8), quer k_s = E_s,k/D (SIA 267:2013, 9.5.4.5, (53)); in der Tragsicherheit E_s,k/1.5 (5.3.2.5)'],
+      ['quer', 'Erdwiderstand p_E,k: vorne passiv, hinten aktiv, nach Rankine ohne Reibung am Pfahl -- drainiert mit φ\'_k und c\'_k (Kap. 9.3.5), undrainiert mit s_u,k (Kap. 9.3.6) --, beides auf der Breite 3·D (Kap. 10.8)'],
     ],
     formel: 'R_s,k = π·D·Σ h·q_s,k',
   },
@@ -63,6 +69,7 @@ const HILFE = {
       ['M_Ed', 'Moment am frei drehbaren Kopf, positiv, wenn es dreht wie H_Ed über dem Kopf; am eingespannten Kopf ist das Moment Reaktion'],
       ['Druck', 'N_Ed ≤ R_a,d und N_Ed ≤ R_i,d'],
       ['Zug', 'Z_Ed = −N_Ed ≤ R_a,d,Z (nur der Mantel) und ≤ R_i,d,Z (nur der Stahl)'],
+      ['Quer', '|H_Ed| ≤ R_tr,d, dazu in jeder Tiefe die Bettungskraft ≤ p_E,d; ein Moment ohne Querkraft prüft nur die Bettungskraft'],
     ],
     formel: 'E_d ≤ R_d (SIA 267:2013, 9.5.3.1, (52))',
   },
@@ -155,6 +162,21 @@ function aussenKarte(t) {
   ]);
 }
 
+function querlastKarte(t) {
+  const berechnung = katalog('pfahl', 'grundlagen').find((g) => g.wert === 'berechnung');
+  return karte('Querlast', [
+    feld('Kopf', schalter(t.kopf, 'koepfe', (w) => aenderer(t)((x) => { x.kopf = w; }),
+      'Wie der Pfahlkopf gehalten ist'), ''),
+    zahlzeile(t, 't_red', 'Abminderung bis', 't_{red}', {
+      schritt: 0.5, titel: 'Bis in diese Tiefe unter Terrain wächst die Bettung quer linear von null an (SIA 267:2013, 9.5.4.5)',
+    }),
+    zahlzeile(t, 'eta_tr', 'Umrechnungsfaktor', String.raw`\eta_{a,tr}`, {
+      schritt: 0.05,
+      titel: berechnung ? `Höchstens ${berechnung.grenze}: R_tr,k wird immer gerechnet (${berechnung.referenz})` : '',
+    }),
+  ]);
+}
+
 function situationPanel(t) {
   const aendern = aenderer(t);
   const mikro = t.art === 'mikropfahl';
@@ -188,13 +210,7 @@ function situationPanel(t) {
     ]),
     querschnittKarte(t),
     aussenKarte(t),
-    karte('Bettung', [
-      feld('Kopf', schalter(t.kopf, 'koepfe', (w) => aendern((x) => { x.kopf = w; }),
-        'Wie der Pfahlkopf gehalten ist'), ''),
-      zahlzeile(t, 't_red', 'Abminderung bis', 't_{red}', {
-        schritt: 0.5, titel: 'Bis in diese Tiefe unter Terrain wächst die Bettung quer linear von null an (SIA 267:2013, 9.5.4.5)',
-      }),
-    ]),
+    querlastKarte(t),
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [
         el('label', { text: 'Beschreibung' }),
@@ -240,7 +256,7 @@ function schichtKarte(t, i) {
       'Drainiert mit wirksamen Spannungen, undrainiert mit s_u,k'), ''),
     ...(drainiert
       ? [zahl('phi_k', 'Reibungswinkel', String.raw`\varphi'_k`),
-        zahl('c_k', 'Kohäsion', "c'_k", { titel: 'Zählt nur am Fuss' })]
+        zahl('c_k', 'Kohäsion', "c'_k", { titel: 'Zählt am Fuss und im Erdwiderstand quer' })]
       : [zahl('s_u', 'Scherfestigkeit', 's_{u,k}', { schritt: 5 })]),
     feld('Mantelreibung', schalter(s.mantel, 'mantel', (w) => aendern((x) => { x.mantel = w; }),
       'Gerechnet aus der Schicht oder eingegeben'), ''),

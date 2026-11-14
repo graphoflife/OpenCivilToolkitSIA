@@ -16,7 +16,8 @@ von SIA 267:2013, 9.6.3.2.6. Eine Schicht, 20 m Kies mit φ'_k = 30° und
 K = 0.5, etwa K_0 = 1 − sin φ'_k (Kap. 2.7), und δ = φ'_k, wie das Buch
 für raue Pfähle sagt (Kap. 12.5); undrainiert α = 0.6, sein Wert für
 Bohrpfähle in weichem Ton. η_a = 0.7 und η_i = 0.8 sind die Grenzwerte der
-Norm für eine Berechnung und ohne Prüfung der Integrität. Der Mikropfahl
+Norm für eine Berechnung und ohne Prüfung der Integrität, quer zur Achse
+ebenso η_a,tr = 0.7: der Querwiderstand wird immer gerechnet. Der Mikropfahl
 hat ein Rohr 114.3 × 10 mm ohne Abrostung, bis jemand eine angibt. Der
 Verformungsmodul E_s,k = 30 MN/m² ist der des Beispiels im Buch zu Cassans
 Federn (Kap. 12.8); der Kopf dreht sich frei, und die Bettung quer wächst
@@ -35,7 +36,7 @@ from typing import Any, List
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KNM, KPA, M, MM, MN_PRO_M2
 from opencivil.pfahl.boden import Mantel, Verhalten
 from opencivil.pfahl.pfahl import (
-    ETA_I_HOECHSTENS, Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied,
+    ETA_I_HOECHSTENS, Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied, quer_belastet,
 )
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung, eindeutig
 from opencivil.projekt.lesen import ProjektFehler, bereich, lesen
@@ -130,6 +131,11 @@ class PfahlEintrag(BauteilEintrag):
 
     kopf: Kopf = Kopf.FREI
     t_red: float = bereich(2.0, heisst="Tiefe der Abminderung t_red", einheit=M, ab=0.0)
+    eta_tr: float = bereich(0.7, heisst="η_a,tr", ueber=0.0, bis=1.0)
+    """
+    Höchstens der Grenzwert einer Berechnung: R_tr,k wird immer aus den
+    Schichten gerechnet (SIA 267:2013, 9.5.2.3.2) -- das prüft :meth:`regeln`.
+    """
 
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein."""
@@ -188,8 +194,17 @@ class PfahlEintrag(BauteilEintrag):
             raise ProjektFehler(
                 f"{wo}: η_a = {self.eta_a:g} liegt über {self.grundlage.eta_grenze:g}, dem "
                 f"Grenzwert für «{self.grundlage.beschriftung}» ({self.grundlage.referenz}).")
+        berechnung = Grundlage.BERECHNUNG
+        if self.eta_tr > berechnung.eta_grenze:
+            raise ProjektFehler(
+                f"{wo}: η_a,tr = {self.eta_tr:g} liegt über {berechnung.eta_grenze:g}, dem "
+                f"Grenzwert für einen gerechneten Widerstand ({berechnung.referenz}); quer "
+                f"wird er immer gerechnet.")
         if not self.grundlage.aus_versuch:
             self._baugrund(wo)
+        elif any(quer_belastet(k.H_Ed, k.M_Ed, self.kopf) for k in self.kombinationen if k.aktiv):
+            # Auch mit R_a,k aus dem Versuch: der Erdwiderstand quer kommt aus den Schichten.
+            self._festigkeiten(wo)
         if self.bohrpfahl:
             self._bewehrung(wo)
         else:
@@ -200,6 +215,15 @@ class PfahlEintrag(BauteilEintrag):
         if not self.schichten:
             raise ProjektFehler(f"{wo}: ohne Schicht lässt sich R_a,k nicht rechnen -- "
                                 f"eine Schicht anlegen oder R_a,k aus einem Versuch eingeben.")
+        self._festigkeiten(wo)
+        if not self.boden_unter_dem_fuss:
+            raise ProjektFehler(
+                f"{wo}: der Fuss liegt in {self.t_K + self.L:g} m, die Schichten reichen bis "
+                f"{sum(s.d for s in self.schichten):g} m. Unter dem Fuss muss noch Boden "
+                f"sein, der ihn trägt.")
+
+    def _festigkeiten(self, wo: str) -> None:
+        """Was jede Schicht haben muss, damit ihr Widerstand eine Zahl wird."""
         for i, s in enumerate(self.schichten, start=1):
             if s.gamma <= self.gamma_w:
                 raise ProjektFehler(
@@ -211,11 +235,6 @@ class PfahlEintrag(BauteilEintrag):
                                     f"ohne Reibung die Schicht undrainiert rechnen.")
             if s.verhalten is Verhalten.UNDRAINIERT and s.s_u <= 0.0:
                 raise ProjektFehler(f"{wo}, Schicht {i}: undrainiert braucht s_u,k über null.")
-        if not self.boden_unter_dem_fuss:
-            raise ProjektFehler(
-                f"{wo}: der Fuss liegt in {self.t_K + self.L:g} m, die Schichten reichen bis "
-                f"{sum(s.d for s in self.schichten):g} m. Unter dem Fuss muss noch Boden "
-                f"sein, der ihn trägt.")
 
     def _bewehrung(self, wo: str) -> None:
         """Die Längsstäbe müssen im Kreis Platz haben, ohne sich zu berühren."""

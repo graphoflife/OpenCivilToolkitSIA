@@ -387,7 +387,9 @@ def _pfaehle(p: Projekt) -> None:
     statischen Versuch, ohne Schichten und darum ohne Steifigkeit, mit
     Abrostung und η_i über dem Regelwert; einer mit Vollstab aus Erfahrung,
     die Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
-    eingegeben, quer leicht belastet.
+    eingegeben, quer leicht belastet -- und schon das trägt er nicht: ein
+    gezogener Stab hält quer wenig, und am Terrain drückt er den Kies
+    stärker, als dieser hält.
     """
     stahl, beton = _erstes(p, "betonstahl"), _erstes(p, "beton")
     kies = p.pfahl("Kies, örtlich", stahl=stahl, beton=beton, D=900.0, L=12.0, t_K=1.0,

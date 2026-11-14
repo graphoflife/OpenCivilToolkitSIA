@@ -448,7 +448,7 @@ class Pfahlsteifigkeit(Prozedur):
             laengs = bettung.laengs(strecken, EA, K_b if N >= 0.0 else 0.0, N, schritt)
             z = [grund.t_K + zi for zi in laengs.z]
             felder = {}
-            if H != 0.0 or (M != 0.0 and not eingespannt):
+            if self.pfahl.quer_belastet(k):
                 quer = bettung.quer(strecken, EI, H, M, eingespannt=eingespannt,
                                     schritt=schritt)
                 felder = {"y": quer.y, "theta": quer.theta, "M": quer.M, "V": quer.V,

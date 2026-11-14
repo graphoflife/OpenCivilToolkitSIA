@@ -1,5 +1,5 @@
 ---
-erzeugt: 714074bcf19c
+erzeugt: 9609bacf99c3
 art: modul
 tags: [modul]
 ---
@@ -400,6 +400,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.pfahl.achse]]
+- [[opencivil.pfahl.quer]]
 - [[opencivil.projekt.aufbau.kern]]
 
 ## Formeln aus diesem Modul

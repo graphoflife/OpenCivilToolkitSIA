@@ -49,5 +49,5 @@ ungerissene Querschnitt, γ_E = 1.5, längs und quer getrennt ohne zweite
 Ordnung, keine Mantelfeder, wo q_s,k null ist, und die Fussfeder bei R_a,k
 aus einem Versuch.
 
-Noch nicht gerechnet: der Vergleich des Bettungsdrucks mit dem Widerstand
-des Bodens und der Widerstand quer zur Achse (9.4.4.2, 9.5.4.5).
+Den Bettungsdruck gegen den Widerstand des Bodens und den Widerstand quer
+zur Achse rechnet [[Äusserer Pfahlwiderstand quer]] (9.4.4.2, 9.5.4.5).

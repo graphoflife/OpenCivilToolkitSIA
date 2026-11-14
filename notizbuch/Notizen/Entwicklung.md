@@ -7,6 +7,50 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Pfähle III: äusserer Widerstand quer und Bettungskraft
+
+Je Kombination mit H_Ed jetzt auch der Widerstand quer zur Achse, nach SIA
+267:2013, 9.4.4.2.2 und 9.5.2.3: R_tr,k aus dem Erdwiderstand und dem
+Biegewiderstand des Pfahls, R_tr,d = η_a,tr · R_tr,k / 1.4. Dazu in jeder
+Kombination die Bettungskraft der Verläufe gegen den Erdwiderstand
+(9.5.4.5). Die Karte «Querlast» trägt den Kopf, t_red und η_a,tr; im Bild
+des Bettungsdrucks steht p_E,d / D gestrichelt daneben, die Legende der
+Situation nennt R_tr,d je Kombination mit dem massgebenden Bruch.
+
+Der Erdwiderstand nach dem Buch: Rankine drainiert und undrainiert
+(Kap. 9.3.5, 9.3.6), vorne passiv weniger hinten aktiv, auf der dreifachen
+Breite (Kap. 10.8).
+
+Warum so:
+
+- Mechanismen statt der Diagramme von Broms: die gelten für gleichförmigen
+  oder linear wachsenden Boden. Mit Schichten und Grundwasser geht der
+  Mechanismus über jedes Profil; je Lage Arbeit gleich Arbeit, die Lagen
+  höchstens 1 cm auseinander, die Integrale je Stück genau. Geprüft gegen
+  die geschlossenen Lösungen: gleichförmig √(2·M_R·c), 2·√(M_R·c) und
+  (√2 − 1)·c·L, linear wachsend s³ = 3·M_R/a
+  (`tests/test_pfahl_quer.py`).
+- Die Linien des Erdwiderstands enden an Schichtgrenzen, am Wasserspiegel
+  und wo e_a null wird: so ist p_E je Stück linear und das Integral genau.
+  An einer Schichtgrenze gilt der kleinere Wert.
+- Der Biegewiderstand charakteristisch, mit f_ck und f_yk, mal η_i: R_tr,k
+  ist ein charakteristischer Wert, und der Pfahl ist im Boden nicht so
+  sicher wie im Plan (9.5.2.4.4). M_R(N) ist konkav, weil der
+  Interaktionsbereich konvex ist; zwischen Kopf und Fuss ist der kleinere
+  der beiden Endwerte also der kleinste. Bei wenigen Stäben zählt die
+  schwächere von zwei Lagen.
+- Die Bettungskraft mit denselben Beiwerten wie R_tr, weil 9.5.4.5 keine
+  nennt. η_a,tr / γ_M,a = 0.5 ist zugleich der Faktor 2, den das Buch auf
+  dem passiven Druck verlangt, damit die Verformung klein bleibt.
+- Nur ein Moment am Kopf gibt keinen Nachweis R_tr, aber den der
+  Bettungskraft. Eingespannt zählt M_Ed weiterhin nicht.
+- Der Erdwiderstand liest Schichten und Wasser aus demselben Profil wie der
+  äussere Widerstand längs (`Pfahl.profil`).
+- Der Mikropfahl mit Vollstab im Beispiel trägt quer nicht: M_R ≈ 2.6 kNm,
+  und am Terrain drückt die Bettung stärker, als der Kies hält. Er bleibt
+  so -- ein Beispiel, das zeigt, wie ein Nachweis scheitert.
+- Ohne Boden unter dem Fuss kein Widerstand quer; die Warnung sagt es jetzt.
+
 ## 2026-11-14 · Pfähle II: die Steifigkeit als gebetteter Stab
 
 Der Pfahl steht jetzt auch als Stab auf Federn im Boden. Daraus zweierlei:

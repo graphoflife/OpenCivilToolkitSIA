@@ -352,7 +352,9 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         zeilen = ["".join(z.get("text") or z["mathe"] for z in zeile) for zeile in s["legende"]]
         self.assertTrue(zeilen[0].startswith("Mantel R_{s,k}"))
         self.assertTrue(zeilen[1].startswith("Auf Druck R_{a,d}"))
-        self.assertTrue(zeilen[2].startswith("Massgebend: Äusserer Pfahlwiderstand, "
+        self.assertEqual(zeilen[2], r"Quer, in «Tragsicherheit» R_{tr,d} = 339\,\mathrm{kN} "
+                                    "(Gelenk im Pfahl).")
+        self.assertTrue(zeilen[3].startswith("Massgebend: Äusserer Pfahlwiderstand, "
                                              "Tragsicherheit – erfüllt"))
 
     def test_ohne_kombination_nur_der_pfahl(self):
@@ -375,7 +377,9 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         teil = next(b for b in zusammenfassen(aufbau, loesung).bauteile if b.kennung == "t1")
         self.assertEqual([z[:2] for z in nachweistabelle(teil).zeilen],
                          [["Äusserer Pfahlwiderstand", "Tragsicherheit"],
-                          ["Innerer Pfahlwiderstand", "Tragsicherheit"]])
+                          ["Innerer Pfahlwiderstand", "Tragsicherheit"],
+                          ["Äusserer Pfahlwiderstand quer", "Tragsicherheit"],
+                          ["Bettungskraft am Pfahl", "Tragsicherheit"]])
 
 
 if __name__ == "__main__":

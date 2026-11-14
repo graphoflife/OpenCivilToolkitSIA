@@ -157,7 +157,7 @@ unten, N_Ed am Kopf, Druck positiv:
 
 ```python
 t = p.pfahl("Pfahl Stütze", stahl="s1", beton="b1", D=900, L=12, t_K=1.5,
-            t_w=3.0)                 # art="mikropfahl", kopf="eingespannt", t_red=2.0, ...
+            t_w=3.0)       # art="mikropfahl", kopf="eingespannt", t_red=2.0, eta_tr=0.7, ...
 t.schicht("Auffüllung", d=2.0, gamma=19, mantel="eingeben", q_s=0, E_s=10)  # trägt nicht
 t.schicht("Kies, sandig", d=6.0, gamma=21, phi_k=34, K=0.44, E_s=60)        # K·σ'_v·tan δ
 t.schicht("Ton", d=15.0, gamma=19, verhalten="undrainiert", s_u=80, alpha=0.6, E_s=40)
@@ -230,7 +230,7 @@ Fertig und getestet (1229 Tests):
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
-| `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug; die Steifigkeit als gebetteter Stab (`steifigkeit`, `bettung`): Federn am Kopf und Verläufe über die Tiefe |
+| `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug; die Steifigkeit als gebetteter Stab (`steifigkeit`, `bettung`): Federn am Kopf und Verläufe über die Tiefe; der äussere Widerstand quer (`quer`, `erdwiderstand`): Erdwiderstand, Bruchmechanismen und die Bettungskraft |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
@@ -256,7 +256,7 @@ Fertig und getestet (1229 Tests):
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt: Übersicht und Verläufe |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
-| `web/pfahldaten.py` | was die Bilder eines Pfahls vom Kern brauchen: die Mantelreibung je Stück, den Spitzendruck, die Legende, je Kombination die Verläufe über die Tiefe |
+| `web/pfahldaten.py` | was die Bilder eines Pfahls vom Kern brauchen: die Mantelreibung je Stück, den Spitzendruck, die Legende, je Kombination die Verläufe über die Tiefe, neben dem Bettungsdruck der Erdwiderstand |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
@@ -551,14 +551,23 @@ Spitzendruck.
 Dazu die Steifigkeit, der Pfahl als Stab auf Federn: am Mantel und am Fuss
 nach Cassan (Kap. 12.8), quer k_s = E_s,k/D (SIA 267:2013, 9.5.4.5, (53)),
 bis zur Tiefe t_red von null an wachsend. Jede Schicht hat dafür ihren
-Verformungsmodul E_s,k, die Karte «Bettung» den Kopf -- frei drehbar oder
+Verformungsmodul E_s,k, die Karte «Querlast» den Kopf -- frei drehbar oder
 eingespannt -- und t_red, die Kombination neben N_Ed auch H_Ed und am frei
 drehbaren Kopf M_Ed. Die Federn am Kopf, mit E_s,k, stehen als Kennzahlen in
 der Zusammenfassung: längs auf Druck und auf Zug, quer frei drehbar und die
 Steifigkeitsmatrix des eingespannten Kopfs. Unter «Diagramme» je Kombination
 die Verläufe über die Tiefe mit E_s,k/1.5: Normalkraft, Setzung,
-Verschiebung, Verdrehung, Moment, Querkraft und Bettungsdruck. Der
-Widerstand quer folgt.
+Verschiebung, Verdrehung, Moment, Querkraft und Bettungsdruck.
+
+Quer zur Achse trägt der Pfahl, bis der Boden vor ihm bricht oder er selbst
+ein Gelenk bildet: R_tr,k ist der kleinste Wert mehrerer Bruchmechanismen aus
+dem Erdwiderstand -- nach Rankine, auf der dreifachen Breite (Kap. 9.3.5,
+9.3.6, 10.8) -- und dem Biegewiderstand des Querschnitts (9.4.4.2.2);
+R_tr,d = η_a,tr·R_tr,k/1.4 (49), η_a,tr steht in der Karte «Querlast».
+Zudem darf die Bettungskraft der Verläufe in keiner Tiefe den abgeminderten
+Erdwiderstand übersteigen (9.5.4.5); im Bild des Bettungsdrucks steht er
+gestrichelt daneben. Der innere Widerstand quer, Moment und Querkraft gegen
+den Querschnitt, folgt.
 
 **Python:** die letzte App. Skripte, gespeichert mit dem Projekt; in der
 Mitte der Code und darunter die Konsole, rechts statt der Berechnung die

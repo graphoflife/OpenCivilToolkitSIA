@@ -5,8 +5,9 @@ VERANTWORTUNG:
 Was Lang, Huder, Amann und Puzrin für Pfähle als Bild oder Beiwert geben,
 als Zahlen: der Form- und Tiefenfaktor X am Pfahlfuss (Bild 12.4), der
 Tragfähigkeitsfaktor N_c undrainiert (Bild 12.5), der Anteil von φ und c beim
-örtlichen Abscheren (Kap. 9.2.7), der Ruhedruckbeiwert (Kap. 2.7) und die
-Federn nach Cassan am Mantel und am Fuss (Kap. 12.8). Die Bilder sind
+örtlichen Abscheren (Kap. 9.2.7), der Ruhedruckbeiwert (Kap. 2.7), die
+Federn nach Cassan am Mantel und am Fuss (Kap. 12.8) und die wirksame
+Breite vor einer schmalen Druckfläche (Kap. 10.8). Die Bilder sind
 abgelesen, nicht nachgerechnet: auf etwa ±0.02 genau.
 
 AUSSERHALB DER BILDER:
@@ -37,6 +38,9 @@ KAP_MANTEL = "Kap. 12.5"
 KAP_ABSCHEREN = "Kap. 9.2.7, 12.5"
 KAP_FEDERN = "Kap. 12.8, Bild 12.9"
 KAP_QUER = "Kap. 12.10, Bild 12.14"
+KAP_ERDDRUCK = "Kap. 9.3.5"
+KAP_ERDDRUCK_UNDRAINIERT = "Kap. 9.3.6"
+KAP_SCHMAL = "Kap. 10.8"
 
 # -- Bild 12.4: X über h/D, je Kurve φ' -------------------------------------------
 X_H_D: Tuple[float, ...] = (2.5, 3.0, 4.0, 5.0, 7.5, 10.0, 12.5, 15.0, 20.0, 25.0, 30.0)
@@ -66,6 +70,11 @@ ABSCHEREN = 2.0 / 3.0
 CASSAN_MANTEL = 0.42
 #: Die Feder am Fuss, R ≈ 4.5 · E: Spannung mal D je Setzung, σ_F = R · s / D.
 CASSAN_FUSS = 4.5
+
+# -- Kap. 10.8: Erdwiderstand vor schmalen Druckflächen -------------------------------
+#: Der Erdwiderstand vor einem schmalen Körper wirkt auf einer breiteren Fläche als
+#: dieser -- grob genähert auf der dreifachen Breite.
+BREITE_SCHMAL = 3.0
 
 
 def _stelle(achse: Sequence[float], wert: float) -> Tuple[int, float]:

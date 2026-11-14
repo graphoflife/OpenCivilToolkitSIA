@@ -1,5 +1,5 @@
 ---
-erzeugt: ae4fc014dca6
+erzeugt: 3f05e7a8c580
 art: modul
 tags: [modul]
 ---
@@ -13,11 +13,13 @@ Je Pfahl die Zahlen der Situationszeichnung, in den Einheiten der Anzeige:
 die Mantelreibung je Stück und der Spitzendruck, wie der äussere Widerstand
 sie gerechnet hat. Dazu die Legende unter dem Bild
 ([[opencivil.web.anzeige]]): Mantel und Fuss, die Bemessungswerte beider
-Nachweise auf Druck und auf Zug und der Fall, der entscheidet. Masse,
-Schichten und Grundwasser liest die Oberflaeche aus dem Eintrag.
+Nachweise auf Druck und auf Zug, quer je Kombination, und der Fall, der
+entscheidet. Masse, Schichten und Grundwasser liest die Oberflaeche aus dem
+Eintrag.
 
 Und je Kombination die Verläufe über die Tiefe, wie die Steifigkeit sie
-gerechnet hat ([[opencivil.web.pfahldaten#verlaeufe|verlaeufe]]), mit dem Satz, der unter ihnen steht.
+gerechnet hat ([[opencivil.web.pfahldaten#verlaeufe|verlaeufe]]), mit dem Satz, der unter ihnen steht --
+neben dem Bettungsdruck der Erdwiderstand, den er nicht übersteigen darf.
 
 Gerechnet wird hier nichts: alles steht in den Befunden.
 
@@ -32,6 +34,14 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 Was die Zeichnung eines Pfahls braucht. Ohne Kombination gibt es keinen
 Nachweis und keinen Befund -- dann zeichnet sie nur den Pfahl im Boden.
 
+### _querbefund
+
+```python
+def _querbefund(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Querbefund]
+```
+
+Was der äussere Widerstand quer ergab -- `None`, wo keine Kombination quer belastet.
+
 ### verlaeufe
 
 ```python
@@ -45,10 +55,10 @@ Tiefe ab Terrain, dazu der Satz darunter. Leer ohne Steifigkeit.
 ### _legende
 
 ```python
-def _legende(aussen: Aussenbefund, innen: Innenbefund, urteile: List[Any]) -> List[list]
+def _legende(aussen: Aussenbefund, innen: Innenbefund, quer: Optional[Querbefund], urteile: List[Any]) -> List[list]
 ```
 
-Mantel und Fuss, die Bemessungswerte, der entscheidende Fall.
+Mantel und Fuss, die Bemessungswerte, quer je Kombination, der entscheidende Fall.
 
 
 ## Konstanten
@@ -62,6 +72,7 @@ Mantel und Fuss, die Bemessungswerte, der entscheidende Fall.
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.projekt]]
 - [[opencivil.web.anzeige]]

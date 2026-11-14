@@ -3,8 +3,8 @@ opencivil/projekt/aufbau/pfahl.py -- ein Pfahl wird Rechnung.
 
 VERANTWORTUNG:
 Aus einem :class:`~opencivil.projekt.pfahl.PfahlEintrag` der Pfahl, seine
-beiden Nachweise längs der Achse, äusserer und innerer Widerstand, und seine
-Steifigkeit (:func:`bauen`).
+beiden Nachweise längs der Achse, äusserer und innerer Widerstand, seine
+Steifigkeit und der äussere Widerstand quer (:func:`bauen`).
 """
 
 from __future__ import annotations
@@ -16,6 +16,7 @@ from opencivil.pfahl.aussen import AeussererWiderstand
 from opencivil.pfahl.boden import Pfahlschicht
 from opencivil.pfahl.innen import InnererWiderstand
 from opencivil.pfahl.pfahl import Kombination, Pfahl
+from opencivil.pfahl.quer import AeussererQuerwiderstand
 from opencivil.pfahl.steifigkeit import Pfahlsteifigkeit
 from opencivil.projekt.lesen import als_groesse
 from opencivil.projekt.pfahl import PfahlEintrag
@@ -32,7 +33,9 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
     eingeschaltet ist -- ohne sie steht er allein da, wie ein Grundbruch
     ohne Kombination. Seine Steifigkeit, gleich ob mit Kombinationen, sobald
     unter dem Fuss Boden ist; sie liest nur die Schichten, auch wenn R_a,k
-    aus einem Versuch kommt. Jede Zahl in der Einheit ihres Feldes
+    aus einem Versuch kommt. Mit ihr der Widerstand quer, sobald eine
+    Kombination quer belastet: er liest ihre Verläufe und den Querschnitt
+    des inneren Widerstands. Jede Zahl in der Einheit ihres Feldes
     (:func:`~opencivil.projekt.lesen.als_groesse`).
     """
     g = partial(als_groesse, eintrag)
@@ -52,17 +55,19 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
         beton=(material(aufbau.baustoffe, eintrag.beton, "beton", wo) if eintrag.bohrpfahl
                else None),
         n=g("n"), phi_l=g("phi_l"), c=g("c"), phi_w=g("phi_w"), tragglied=eintrag.tragglied,
-        d_a=g("d_a"), t_r=g("t_r"), dt=g("dt"), kopf=eintrag.kopf, t_red=g("t_red"))
+        d_a=g("d_a"), t_r=g("t_r"), dt=g("dt"), kopf=eintrag.kopf, t_red=g("t_red"),
+        eta_tr=g("eta_tr"))
     pfahl.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag.kennung, eintrag.name, art, pfahl)
     kombinationen = [Kombination(name=k.name, **{n: als_groesse(k, n)
                                                  for n in ("N_Ed", "H_Ed", "M_Ed")})
                      for k in eintrag.kombinationen if k.aktiv]
+    innen = None
     if kombinationen:
         aufbau.eintragen(teil, "pfahl_aussen", eintrag.kennung,
                          AeussererWiderstand(pfahl, kombinationen))
-        aufbau.eintragen(teil, "pfahl_innen", eintrag.kennung,
-                         InnererWiderstand(pfahl, kombinationen))
+        innen = InnererWiderstand(pfahl, kombinationen)
+        aufbau.eintragen(teil, "pfahl_innen", eintrag.kennung, innen)
     else:
         aufbau.warnungen.append(f"{wo}: keine Kombination → kein Nachweis.")
     if eintrag.boden_unter_dem_fuss:
@@ -70,7 +75,11 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
         aufbau.werk.registriere(steifigkeit)
         teil.weitere_ziele.append(steifigkeit.id)
         teil.kennzahlen += steifigkeit.kennzahlen
+        if innen is not None and any(pfahl.quer_belastet(k) for k in kombinationen):
+            aufbau.eintragen(teil, "pfahl_quer", eintrag.kennung, AeussererQuerwiderstand(
+                pfahl, kombinationen, steifigkeit=steifigkeit.id, innen=innen.id))
     else:
+        quer = any(pfahl.quer_belastet(k) for k in kombinationen)
         aufbau.warnungen.append(f"{wo}: die Schichten reichen nicht bis unter den Fuss → "
-                                f"keine Steifigkeit.")
+                                f"keine Steifigkeit{' und kein Widerstand quer' if quer else ''}.")
     return teil

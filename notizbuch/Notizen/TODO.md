@@ -8,12 +8,10 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] **Pfähle: die Querlast.** Widerstand längs der Achse und Steifigkeit
-      stehen (siehe [[Entwicklung]], 2026-11-14). Es fehlt: der seitliche
-      Erdwiderstand aus φ', c', γ (Kap. 9.3.5, 9.3.6) auf der Breite 3·D
-      (Kap. 10.8), R_tr,d = η_a·R_tr,k/1.4 (9.5.2.3.1, (49)), der
-      Bettungsdruck der Verläufe dagegen geprüft (9.5.4.5) und der innere
-      Widerstand mit M und V. Danach die Decken weiter.
+- [ ] **Pfähle: der innere Widerstand quer.** Widerstand längs der Achse,
+      Steifigkeit und äusserer Widerstand quer stehen (siehe [[Entwicklung]],
+      2026-11-14). Es fehlt: Moment und Querkraft der Verläufe gegen den
+      Querschnitt, mit η_i (9.5.2.4). Danach die Decken weiter.
 - [ ] **Decken: die App fertig bauen.** Rechenkern, Zeichenfenster sowie
       Lasten und Lastfälle stehen (siehe [[Entwicklung]], 2026-11-13). Es
       fehlen, je ein Commit: die Ergebnisbilder samt Lagerkräften, der
@@ -417,8 +415,9 @@ Norm dazu sagt.
       höchstens 1. Der Mörtel im Rohr eines Mikropfahls zählt nicht, obwohl
       SIA 267:2013, 9.5.2.4.8 ihn zuliesse -- nach SIA 262 endete der ganze
       Querschnitt sonst bei −ε_c1d. Das Tragglied rechnet als Betonstahl nach
-      SIA 262 mit γ_s; SIA 263 liegt nicht vor. Vorschlag: so lassen, jede
-      Annahme steht in der Herleitung. Entscheid des Benutzers.
+      SIA 262 mit γ_s; SIA 263:2013 liegt im Ordner der Normen, ist aber
+      nicht eingearbeitet. Vorschlag: so lassen, jede Annahme steht in der
+      Herleitung. Entscheid des Benutzers.
 - [ ] **Pfähle, Steifigkeit nach Vorgabe eingebaut**
       (`opencivil/pfahl/steifigkeit.py`). Die Bettung quer wächst vom
       Terrain linear bis t_red, vorgegeben 2 m -- 9.5.4.5 verlangt nur, sie
@@ -431,6 +430,37 @@ Norm dazu sagt.
       Fuss, wo R_a,k aus einem Versuch kommt. Vorgabe für E_s,k: 30 MN/m²,
       das Beispiel des Buches. Vorschlag: so lassen, jede Annahme steht in
       der Herleitung. Entscheid des Benutzers.
+- [ ] **Pfähle, Widerstand quer nach Vorgabe eingebaut**
+      (`opencivil/pfahl/quer.py`, `erdwiderstand.py`). Die Norm verlangt
+      R_tr,k aus Erdwiderstand und innerem Widerstand (9.4.4.2.2), sagt aber
+      nicht wie. Eingebaut: Rankine ohne Wandreibung (Kap. 9.3.5, 9.3.6),
+      vorne passiv und hinten aktiv, beide auf der Breite 3·D (das Buch nennt
+      die dreifache Breite nur für vorne, Kap. 10.8). Die Brüche als Familie
+      von Mechanismen: frei drehbar Drehung, ein Gelenk oder Verschiebung,
+      eingespannt Gelenk am Kopf mit Drehung, zwei Gelenke oder
+      Verschiebung. Der Biegewiderstand mit f_ck und f_yk mal η_i, der
+      kleinere an Kopf und Fuss. γ_M,a = 1.4, nach (49) in der Regel der
+      kleinste Wert. Die Bettungskraft gegen η_a,tr · p_E,k / γ_M,a, mit
+      denselben Beiwerten wie R_tr (9.5.4.5 nennt keine). Nur ein Moment am
+      Kopf, ohne Querkraft, gibt keinen Nachweis R_tr -- geprüft wird dann nur die
+      Bettungskraft. Vorschlag: so lassen, jede Annahme steht in der
+      Herleitung. Entscheid des Benutzers.
+- [ ] **Pfähle quer: die dreifache Breite.** Das Buch nennt sie eine grobe
+      Näherung (Kap. 10.8) und daneben den Weg nach Weissenbach: ein
+      räumlicher Gleitkeil, die resultierende Kraft bis in die Tiefe t aus
+      Tabelle 10.21 (mit δ = 27.5°), und eine Abminderung, wo die Fläche
+      schmaler ist als etwa 0.3 · t. Die eingebaute Näherung -- Rankine ohne
+      Wandreibung, hinten aktiv abgezogen -- bleibt darunter: ⌀ 900 mm in
+      Kies mit φ' = 35°, bis 3 m Tiefe 60 %, bis 6 m 43 % der Kraft nach
+      Weissenbach. Nur sehr nahe am Terrain und bei kleinem φ' kommt sie an
+      die Tabelle heran. Die Abminderung gehört zum Weg nach Weissenbach und
+      ist nicht eingebaut. Vorschlag: so lassen. Entscheid des Benutzers.
+- [ ] **Pfähle quer: undrainiert 12 · s_u · D.** Aus Rankine auf 3·D folgt
+      in der Tiefe 12 · s_u · D je Meter. In der Literatur (Broms; das Buch
+      nennt ihn nur im Literaturverzeichnis) ist 9 · s_u · D üblich, in den
+      obersten 1.5·D null. Das Werkzeug gibt im Ton also bis ein Drittel
+      mehr Widerstand. Vorschlag: so lassen, solange keine Quelle vorliegt,
+      die man nachschlagen kann. Entscheid des Benutzers.
 - [ ] **Pfähle, nicht nachgewiesen:** die konstruktiven Regeln des
       Bohrpfahls (SIA 267:2013, 9.6.3.2.3 bis 9.6.3.2.6: Mindestbewehrung,
       Zahl und Abstand der Stäbe, Überdeckung), der Kopf auf 1.2·R_i,k

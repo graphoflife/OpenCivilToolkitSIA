@@ -15,8 +15,10 @@ Rechenwerk, und nur die, die nach den Wahlen gelten (:meth:`Pfahl.kurznamen`):
 * :class:`Kopf` -- ob sich der Kopf frei drehen kann oder eingespannt ist.
 
 Gerechnet wird in den Nachweisen: äusserer Widerstand in
-:mod:`opencivil.pfahl.aussen`, innerer in :mod:`opencivil.pfahl.innen` --
-und die Steifigkeit in :mod:`opencivil.pfahl.steifigkeit`.
+:mod:`opencivil.pfahl.aussen`, innerer in :mod:`opencivil.pfahl.innen`, der
+äussere quer zur Achse in :mod:`opencivil.pfahl.quer` -- und die Steifigkeit
+in :mod:`opencivil.pfahl.steifigkeit`. Welche Kombination den Pfahl quer
+belastet, sagt :meth:`Pfahl.quer_belastet`.
 
 TIEFEN:
 z zählt ab Oberkante Terrain nach unten. Der Kopf liegt in der Tiefe t_K,
@@ -37,7 +39,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Berechnung, Vorgabe
+from opencivil.core.berechnung import Berechnung, Eingaben, Vorgabe
 from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KN, KN_PRO_M3, KNM, KPA, M, MM, MN_PRO_M2, Groesse,
 )
@@ -47,7 +49,7 @@ from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 from opencivil.pfahl import buch
-from opencivil.pfahl.boden import Pfahlschicht
+from opencivil.pfahl.boden import Pfahlschicht, Profil
 
 #: Wie gross der Umrechnungsfaktor des inneren Widerstands höchstens ist --
 #: nur mit verlässlicher Prüfung der Integrität (SIA 267:2013, 9.5.2.4.9).
@@ -198,6 +200,14 @@ class Kopf(Wahl):
                                   "Pfahlkopfplatte; das Moment dort ist die Reaktion"}[self]
 
 
+def quer_belastet(H: float, M: float, kopf: Kopf) -> bool:
+    """
+    Ob Kräfte am Kopf den Pfahl quer belasten: eine Querkraft, oder ein Moment
+    am frei drehbaren Kopf -- am eingespannten ist das Moment Reaktion.
+    """
+    return H != 0.0 or (M != 0.0 and kopf is Kopf.FREI)
+
+
 @dataclass(frozen=True)
 class Kombination:
     """
@@ -274,6 +284,9 @@ class Pfahl(Rechenobjekt):
     t_red: Groesse
     """Bis in diese Tiefe unter Terrain wächst die Bettung quer von null an."""
 
+    eta_tr: Groesse
+    """Der Umrechnungsfaktor des äusseren Widerstands quer zur Achse."""
+
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
     berechnungen: List[Berechnung] = field(default_factory=list, init=False)
 
@@ -289,6 +302,10 @@ class Pfahl(Rechenobjekt):
     @property
     def bohrpfahl(self) -> bool:
         return self.art is Pfahlart.BOHRPFAHL
+
+    def quer_belastet(self, k: Kombination) -> bool:
+        """Ob eine Kombination den Pfahl quer belastet (:func:`quer_belastet`)."""
+        return quer_belastet(k.H_Ed.si, k.M_Ed.si, self.kopf)
 
     @property
     def fuss_traegt(self) -> bool:
@@ -310,6 +327,12 @@ class Pfahl(Rechenobjekt):
             assert self.beton is not None, "Ein Bohrpfahl braucht einen Beton."
             return (self.beton, self.stahl)
         return (self.stahl,)
+
+    def profil(self, e: Eingaben) -> Profil:
+        """Die Schichten und das Wasser als Zahlen, aus den Eingaben eines Nachweises."""
+        n = range(1, len(self.schichten) + 1)
+        return Profil([e.g(f"d_{i}").si for i in n], [e.g(f"gamma_{i}").si for i in n],
+                      e.g("t_w").si, e.g("gamma_w").si)
 
     # -- Die Vorgaben -------------------------------------------------------
 
@@ -364,12 +387,17 @@ class Pfahl(Rechenobjekt):
         querschnitt += (("eta_i", r"\eta_i", EINHEITSLOS,
                          "Umrechnungsfaktor des inneren Widerstands", 2, self.eta_i,
                          "SIA 267:2013, 9.5.2.4.4, (51); 9.5.2.4.9"),)
-        bettung = (("t_red", "t_{red}", M,
-                    "Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst", 2,
-                    self.t_red, "SIA 267:2013, 9.5.4.5"),)
+        querlast = (
+            ("t_red", "t_{red}", M,
+             "Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst", 2,
+             self.t_red, "SIA 267:2013, 9.5.4.5"),
+            ("eta_tr", r"\eta_{a,tr}", EINHEITSLOS,
+             "Umrechnungsfaktor des äusseren Widerstands quer", 2, self.eta_tr,
+             "SIA 267:2013, 9.5.2.3.2; 9.5.2.2.5, (48)"),
+        )
         gruppen = [("Pfahl", pfahl), ("Grundwasser", wasser),
                    ("Äusserer Widerstand", tuple(aussen)), ("Querschnitt", querschnitt),
-                   ("Bettung", bettung)]
+                   ("Querlast", querlast)]
         for i, s in enumerate(self.schichten, start=1):
             gruppen.append((f"Schicht {i}: {s.name}", tuple(
                 self._schichtwert(i, s, kurz) for kurz in s.kurznamen())))

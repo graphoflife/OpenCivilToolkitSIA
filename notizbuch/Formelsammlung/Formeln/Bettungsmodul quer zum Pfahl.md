@@ -35,4 +35,5 @@ Das Buch nennt einen etwas grösseren Wert, rund 1.4 · E_s / D
 (Kap. 12.10); das Werkzeug folgt der Norm. Die Bettung ist linear und ohne
 Grenze. Ob der Boden den Druck auch aufnehmen kann, ist nach der Norm über
 die Tiefe, in der der Pfahl die Querlast abgibt, mit seinem Widerstand zu
-vergleichen (9.5.4.5) -- das rechnet das Werkzeug noch nicht.
+vergleichen (9.5.4.5) -- das tut
+[[Bemessungswert des Erdwiderstands am Pfahl]].

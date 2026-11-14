@@ -1,5 +1,5 @@
 ---
-erzeugt: b6e86286c049
+erzeugt: 146ea4326f59
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -56,6 +56,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Äusserer Pfahlwiderstand]] · 21
 - [[Innerer Pfahlwiderstand]] · 12
 - [[Pfahlsteifigkeit]] · 13
+- [[Äusserer Pfahlwiderstand quer]] · 10
 
 **Durchstanzen**
 
@@ -95,6 +96,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
 - [[Bemessungswert des äusseren Widerstands]] · $R_{a,d}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
+- [[Bemessungswert des Erdwiderstands am Pfahl]] · $p_{E,d}$
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
 - [[Bemessungswert des Sohlreibungswinkels]] · $\delta_d$
 - [[Bemessungswert des Verformungsmoduls]]
@@ -144,6 +146,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Einbindung in die tragende Schicht]] · $h$
 - [[Einflussfaktor der Rechtecklast]]
 - [[Einwirkung im normierten Diagramm]] · $\bar{E}_{d,x}$
+- [[Erddruck am Pfahl drainiert]]
+- [[Erddruck am Pfahl undrainiert]]
+- [[Erdwiderstand je Meter Pfahl]]
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
 - [[Erweiterte Tragfähigkeitsformel]]
@@ -192,6 +197,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Grösste Krümmung]] · $\chi_{u}$
 - [[Grundbruchwiderstand]] · $N_{Rd}$
 - [[Halbe Querkraft für das Verformungsvermögen]] · $V_d / 2$
+- [[Hebel des Moments am Pfahlkopf]] · $e$
 - [[Hilfsgrösse der Nulllinie]] · $\rho$
 - [[Höhe der Distanzhalter]] · $h_{Dist}$
 - [[Innerer Hebelarm]] · $z$
@@ -238,6 +244,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Probe – Moment um y]] · $M_{y,Rd}$
 - [[Probe – Moment um z]] · $M_{z,Rd}$
 - [[Probe – Normalkraft]] · $N_{Rd}$
+- [[Querbruch am eingespannten Kopf]]
+- [[Querbruch am frei drehbaren Kopf]]
+- [[Querbruch durch Verschieben]]
 - [[Querfeder des eingespannten Pfahlkopfs]] · $K_{HH}$
 - [[Querfeder des frei drehbaren Pfahlkopfs]] · $k_h$
 - [[Querkraft für die Durchstanzbewehrung]] · $V_{d,s}$
@@ -331,7 +340,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-91 von 265 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+92 von 273 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -382,6 +391,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Grösste Dehnung auf halber Höhe]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_dehnung_am_ende|Loeserpaar.herleitung_dehnung_am_ende]]
 - [[Grösste Dehnung im Schwerpunkt]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_dehnung_am_ende|Schnittpaar.herleitung_dehnung_am_ende]]
 - [[Grösste Krümmung]] · [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
+- [[Hebel des Moments am Pfahlkopf]] · [[opencivil.pfahl.quer#AeussererQuerwiderstand|AeussererQuerwiderstand._querkraft]]
 - [[Hilfsgrösse der Nulllinie]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Höhe der Distanzhalter]] · [[opencivil.querschnitt.lagenaufbau#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
 - [[Innerer Hebelarm]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
