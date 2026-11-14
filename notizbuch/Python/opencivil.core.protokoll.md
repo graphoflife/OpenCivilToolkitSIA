@@ -1,5 +1,5 @@
 ---
-erzeugt: 31247a7cbe49
+erzeugt: 85cbc4f03be8
 art: modul
 tags: [modul]
 ---
@@ -174,6 +174,8 @@ p.formel(f_cd, r"\frac{@eta_fc \cdot @f_ck}{@gamma_c}",
          {"eta_fc": eta, "f_ck": fck, "gamma_c": gamma})
 p.hinweis("Massgebend ist der abgeminderte Wert.")
 ```
+
+- `still = False` – Ob niemand mitliest ([[opencivil.core.protokoll#StillesProtokoll|StillesProtokoll]]).
 
 #### Protokoll.anfuegen
 
@@ -383,6 +385,12 @@ und ohne dass die beiden Pfade auseinanderlaufen koennen.
 Gebaut wird gar nichts, nicht erst gebaut und dann verworfen: eine Formel
 setzt ihre Vorlage zweimal ein und misst ihre Breite, und die
 Bewehrungssuche rechnet hundertfach, ohne je eine Zeile zu zeigen.
+
+Eine Herleitung, die erst nach der Rechnung für sich sucht, was sie
+zeigt -- die der Decke ihre grössten Werte --, fragt nach [[opencivil.core.protokoll#StillesProtokoll|still]]
+und lässt es: in die Rechnung geht davon nichts ein.
+
+- `still = True`
 
 #### StillesProtokoll.titel
 

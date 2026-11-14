@@ -5,9 +5,14 @@ VERANTWORTUNG:
 Aus den Trägern eines Falls, was an einer Stelle der Platte wirkt: die
 Momente ``m_x``, ``m_y``, ``m_xy`` je Meter, die Querkräfte ``v_x``,
 ``v_y`` je Meter und daraus die erforderlichen Biegewiderstände. Dazu die
-Lastverteilelemente über Stützen und unter Einzellasten -- und für die
-Bilder die Stellen, an denen die Träger eines Falls springen oder ihre
-grössten Werte haben (:func:`stellen`).
+Lastverteilelemente über Stützen und unter Einzellasten.
+
+WO BILDER UND BERICHT HINSEHEN:
+An den Proben eines Falls (:func:`proben`): dem Schwerpunkt jeder Zelle der
+Bilder (:func:`zellen_von`) und den Stellen, an denen ein Träger springt
+oder seine grössten Werte hat (:func:`stellen`). Dort sucht :func:`extrem`
+den grössten und den kleinsten Wert -- für das Bild und den Bericht
+derselbe.
 
 VOM STREIFEN ZUR PLATTE:
 Ein Streifen der Breite ``b`` in Richtung ``n`` trägt mit dem Moment ``M``
@@ -54,13 +59,14 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import List, Sequence, Tuple
+from typing import Callable, List, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import Punktlast
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis
-from opencivil.decke.traeger import wert
+from opencivil.decke.streifen import Streifen
+from opencivil.decke.traeger import vorderste_extreme, wert
 
 #: Der positive Widerstand je Last eins im Lastverteilelement: ``1/(2π) − 1/8``, auf der Folie 0.034.
 POSITIV_JE_LAST = 1.0 / (2.0 * math.pi) - 1.0 / 8.0
@@ -71,6 +77,15 @@ GROESSEN = {"m_x": "mx", "m_y": "my", "m_xy": "mxy", "v_x": "vx", "v_y": "vy", "
 #: So weit innerhalb eines Stücks liegt die Stelle an seinem Ende, in m: weiter als
 #: :data:`~opencivil.decke.traeger.GLEICH`, so dass links und rechts eines Sprungs beide zählen.
 INNEN = 1e-6
+
+#: So viele Zellen hat ein Bild über die längere Seite der Decke mindestens --
+#: breitere Streifen werden dafür geteilt. Mehr machten die Bilder gross: bei
+#: 40 waren es für die Decke des Kolloquiums 4 (9 m, Streifen 0.25 m) 3168
+#: Zellen und 330 kB.
+ZELLEN = 24
+
+#: Eine Stelle der Platte mit ihren Schnittkräften.
+Probe = Tuple[Punkt, "Schnittkraefte"]
 
 
 @dataclass(frozen=True)
@@ -148,6 +163,51 @@ def _beitrag(fall: Fallergebnis, streifen, p: Punkt) -> Schnittkraefte:
     return Schnittkraefte()
 
 
+def widerstaende(k: Schnittkraefte) -> Widerstaende:
+    """Die erforderlichen Biegewiderstände nach der linearisierten Fliessbedingung, ``k = 1``."""
+    d = abs(k.mxy)
+    return Widerstaende(max(0.0, k.mx + d), max(0.0, k.my + d), max(0.0, -k.mx + d), max(0.0, -k.my + d))
+
+
+# ===========================================================================
+# Proben: wo Bilder und Bericht hinsehen
+# ===========================================================================
+
+
+def zellen_von(ergebnis: Ergebnis) -> List[List[Punkt]]:
+    """
+    Die Zellen der Bilder: je Gruppe die Feldstreifen ihrer beiden
+    Richtungen, die breiten geteilt (:data:`ZELLEN`), gekreuzt und mit den
+    konvexen Stücken ihrer Platten geschnitten. So liegt jede Zelle in
+    einem Streifen jeder Richtung, und ihr Wert gilt für sie ganz.
+    """
+    z = ergebnis.zerlegung
+    ecken = [p for platte in ergebnis.decke.platten for p in platte.ecken]
+    weite = max(max(p[0] for p in ecken) - min(p[0] for p in ecken),
+                max(p[1] for p in ecken) - min(p[1] for p in ecken)) / ZELLEN
+    heraus: List[List[Punkt]] = []
+    for gruppe in z.gruppen:
+        r1, r2 = gruppe.richtungen
+        baender1, baender2 = (_baender(z.feldstreifen(r), weite) for r in (r1, r2))
+        for stueck in gruppe.stuecke:
+            for a1, b1 in baender1:
+                band = geo.im_band(stueck, r1.t, a1, b1)
+                for a2, b2 in baender2 if band else ():
+                    zelle = geo.im_band(band, r2.t, a2, b2)
+                    if zelle:
+                        heraus.append(zelle)
+    return heraus
+
+
+def _baender(streifen: Sequence[Streifen], weite: float) -> List[Tuple[float, float]]:
+    """Die Feldstreifen einer Richtung quer in Bänder, keines breiter als ``weite``."""
+    heraus = []
+    for s in streifen:
+        n = max(1, math.ceil(s.breite / weite - 1e-9))
+        heraus.extend((s.von + s.breite * i / n, s.von + s.breite * (i + 1) / n) for i in range(n))
+    return heraus
+
+
 def stellen(ergebnis: Ergebnis, fall: Fallergebnis) -> List[Punkt]:
     """
     Wo ein Träger des Falls springt oder ein Extremum hat, auf der Mittellinie
@@ -167,10 +227,26 @@ def stellen(ergebnis: Ergebnis, fall: Fallergebnis) -> List[Punkt]:
     return heraus
 
 
-def widerstaende(k: Schnittkraefte) -> Widerstaende:
-    """Die erforderlichen Biegewiderstände nach der linearisierten Fliessbedingung, ``k = 1``."""
-    d = abs(k.mxy)
-    return Widerstaende(max(0.0, k.mx + d), max(0.0, k.my + d), max(0.0, -k.mx + d), max(0.0, -k.my + d))
+def proben(ergebnis: Ergebnis, fall: Fallergebnis, zellen: Sequence[Sequence[Punkt]]) -> List[Probe]:
+    """
+    Wo Bilder und Bericht die Platte im Fall ansehen, je mit den
+    Schnittkräften dort: zuerst die Schwerpunkte der ``zellen``
+    (:func:`zellen_von`), in ihrer Folge, dann die Stellen
+    (:func:`stellen`), die in einer Platte liegen.
+    """
+    platten = [list(p.ecken) for p in ergebnis.decke.platten]
+    orte = [geo.schwerpunkt(z) for z in zellen]
+    orte += [p for p in stellen(ergebnis, fall) if any(geo.innen(p, v) for v in platten)]
+    return [(p, an_stelle(ergebnis, fall, p)) for p in orte]
+
+
+def extrem(proben: Sequence[Probe],
+           aus: Callable[[Schnittkraefte], float]) -> Tuple[Tuple[Punkt, float], Tuple[Punkt, float]]:
+    """
+    ``((Ort, kleinster), (Ort, grösster))`` dessen, was ``aus`` aus den
+    Schnittkräften liest -- bei gleichen Werten die vordere Probe.
+    """
+    return vorderste_extreme([(p, aus(k)) for p, k in proben])
 
 
 # ===========================================================================

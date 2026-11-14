@@ -1,5 +1,5 @@
 ---
-erzeugt: c8a872aa5b42
+erzeugt: 0477ae898802
 art: modul
 tags: [modul]
 ---
@@ -22,9 +22,9 @@ Kraft jeder Stuetze und der Verlauf laengs jedes Linienlagers. Die Zellen
 sind gross; mit jeder Rechnung mitgeliefert, machten sie jede Eingabe
 langsamer -- dasselbe wie beim Verlauf des Balkensystems.
 
-Was in eine Rechnung eingeht, rechnet hier niemand; geschnitten wird nur
-fuers Bild, und die Werte an einer Stelle kommen aus
-[[opencivil.decke.feld]].
+Was in eine Rechnung eingeht, rechnet hier niemand: Zellen, Werte und
+groesste Werte kommen aus [[opencivil.decke.feld]], derselben Stelle, an
+der auch der Bericht sie holt.
 
 ## Inhalt
 
@@ -78,8 +78,8 @@ Die Bilder des Falls `name`, Lastfall oder Kombination: `zellen`, je
 Zelle ihre Ecken, und `werte`, je Groesse
 ([[opencivil.decke.feld#Konstanten|GROESSEN]]) der Wert am Schwerpunkt jeder
 Zelle; `extreme`, je Groesse der groesste und der kleinste Wert mit
-seinem Ort -- gesucht unter den Schwerpunkten und den Stellen, an denen
-ein Traeger springt oder sein Extremum hat ([[opencivil.decke.feld#stellen|stellen]]).
+seinem Ort -- gesucht an den Proben des Falls
+([[opencivil.decke.feld#proben|proben]]).
 Dazu je Stuetze ihre Kraft `F` und je Linienlager, was
 [[opencivil.web.deckendaten#_linienlager|_linienlager]] sagt. Momente in kNm/m, Querkraefte und `r` in
 kN/m, Kraefte in kN -- wie `einheiten` sagt.
@@ -92,36 +92,15 @@ def _linienlager(lager: Linienlager, fall: Fallergebnis) -> Dict[str, Any]
 
 Ein Linienlager im Bild eines Falls: seine Summe `F`, seine Stufen
 `[u_a, u_b, r, m]` ([[opencivil.decke.rechnung#lagerverlauf|lagerverlauf]]),
-`r_max`, der Wert von r mit dem groessten Betrag, und `m_max`, der
-groesste Betrag von m -- nur der Betrag: das Vorzeichen von m haengt an
-der Richtung a -> b, die niemand sieht.
+`r_max` und `m_max` ([[opencivil.decke.rechnung#spitzen|spitzen]]).
 
 ### _extreme
 
 ```python
-def _extreme(proben: Sequence[Tuple[Punkt, feld.Schnittkraefte]], groesse: str) -> Dict[str, Any]
+def _extreme(proben: Sequence[feld.Probe], groesse: str) -> Dict[str, Any]
 ```
 
 Der groesste und der kleinste Wert einer Groesse unter den Proben, je mit Ort.
-
-### _zellen
-
-```python
-def _zellen(e: Ergebnis) -> List[List[Punkt]]
-```
-
-Die Zellen der Bilder: je Gruppe die Feldstreifen ihrer beiden
-Richtungen, die breiten geteilt ([[opencivil.web.deckendaten#Konstanten|ZELLEN]]), gekreuzt und mit den
-konvexen Stuecken ihrer Platten geschnitten. So liegt jede Zelle in
-einem Streifen jeder Richtung, und ihr Wert gilt fuer sie ganz.
-
-### _baender
-
-```python
-def _baender(streifen: Sequence[Any], weite: float) -> List[Tuple[float, float]]
-```
-
-Die Feldstreifen einer Richtung quer in Baender, keines breiter als `weite`.
 
 ### _anteile
 
@@ -144,7 +123,6 @@ in der Platte -- in einem L zwei, wo die Grenze die Ecke quert.
 ## Konstanten
 
 - `STELLEN = 4` – Auf einen Zehntelmillimeter -- fuers Bild genug, und die Antwort bleibt klein.
-- `ZELLEN = 24` – So viele Zellen hat ein Bild der Schnittkraefte ueber die laengere Seite der Decke mindestens -- breitere Streifen werden dafuer geteilt. Mehr machten die Antwort gross: bei 40 waren es fuer die Decke des Kolloquiums 4 (9 m, Streifen 0.25 m) 3168 Zellen und 330 kB.
 - `EINHEITEN = {g: KNM_PRO_M if g.startswith('m') else KN_PRO_M for g in feld.GROESS…` – Die Einheit der Anzeige je Groesse: Momente in kNm/m, Querkraefte in kN/m.
 
 ## Braucht

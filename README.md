@@ -228,6 +228,7 @@ Fertig und getestet (1229 Tests):
 | `stabwerk/verlauf` | N, V, M und Biegelinie längs der Stäbe als Polynome, mit Extremwerten |
 | `stabwerk/querschnitte` | die Querschnitte der Stäbe nach Vorlage, mit ihren Formeln |
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
+| `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Träger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`traeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
 | `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug; die Steifigkeit als gebetteter Stab (`steifigkeit`, `bettung`): Federn am Kopf und Verläufe über die Tiefe; der äussere Widerstand quer (`quer`, `erdwiderstand`): Erdwiderstand, Bruchmechanismen und die Bettungskraft |
@@ -254,6 +255,7 @@ Fertig und getestet (1229 Tests):
 | `web/api.py` | Lösung, Mitschrift und Zusammenfassung als JSON |
 | `web/diagrammdaten.py` | die Punktfolgen der Diagramme als JSON |
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt: Übersicht und Verläufe |
+| `web/deckendaten.py` | was die Oberfläche von einer Decke zeigt: die Übersicht beim Zeichnen und die Bilder eines Falls |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
 | `web/pfahldaten.py` | was die Bilder eines Pfahls vom Kern brauchen: die Mantelreibung je Stück, den Spitzendruck, die Legende, je Kombination die Verläufe über die Tiefe, neben dem Bettungsdruck der Erdwiderstand |
@@ -269,6 +271,8 @@ Fertig und getestet (1229 Tests):
 | `web/js/bs_zeichnung.js`, `bs_symbole.js` | was es im Balkensystem zeichnet: Stäbe, Lager, Federn, Gelenke, Lasten |
 | `web/js/bs_eigenschaften.js`, `bs_teile.js` | das schwebende Fenster des Balkensystems -- die Felder des Gewählten, mehrere zugleich mit «Var» -- und was Zeichnung, Fenster und Panels gemeinsam brauchen |
 | `web/js/balkensystem.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems und seine Ergebnisse |
+| `web/js/decke.js`, `dk_zeichnung.js`, `dk_eigenschaften.js` | die Eingabe einer Decke, was das Zeichenfenster von ihr zeichnet und sein schwebendes Fenster |
+| `web/js/dk_grundriss.js`, `dk_ergebnis.js` | ihr Grundriss mit Aufteilung und Streifen, und ihre Ergebnisbilder |
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
 | `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die die Bilder des Grundbaus teilen |
 | `web/js/pfahl.js`, `pf_zeichnung.js`, `pf_verlauf.js` | die Eingabe eines Pfahls, das Bild seiner Situation und seine Verläufe über die Tiefe |
@@ -500,6 +504,34 @@ Steifigkeit ist E_cm, ein E von Hand oder E_eq als Sekantensteifigkeit
 (SIA 262:2025, 4.1.4.1.2), am ungerissenen Bruttoquerschnitt (4.1.4.1.3),
 ohne Bewehrung und Schubverformung; das Gleichgewicht nach Theorie
 1. Ordnung, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2).
+
+**Decken:** eine Stahlbetondecke nach der Streifenmethode (Stahlbeton II,
+7.2 Platten). Gezeichnet wird mit demselben Fenster, in Metern: Platten als
+Umriss mit Dicke und Beton -- auch schief, mit Ecken, die nicht rechtwinklig
+sind --, je Platte zwei Richtungen der Streifen, Linienlager (vertikal
+gehalten, eingespannt oder beides), Stützen an Knoten, versteckte Unterzüge
+als Streifen eigener Breite, Zonen und je Lastfall die Lasten: auf eine
+ganze Platte, entlang einer Linie, auf einer Fläche oder an einem Punkt.
+Darunter Knöpfe wie im Balkensystem: «Streifen» -- wie breit sie höchstens
+sind und wie die Last auf die zwei Richtungen geht, automatisch zum nahen
+Rand und in die kürzere Spannweite oder überall derselbe Anteil; in einer
+Zone gilt deren --, die Lastfälle und Kombinationen, wie im Balkensystem
+vorgegeben, und «Ergebnisse». Das Eigengewicht kommt von selbst,
+ρ · g · h mit g = 10 m/s².
+Jeder Streifen trägt als Balken auf seinen Lagern, statisch unbestimmt
+elastisch gelöst. Unterzüge und Stützenbereiche tragen als Fläche mit
+gleichmässiger Pressung, und ein Unterzug trägt weiter, was die Streifen
+auf ihn geben: erst rechnen die Feldstreifen, dann die Unterzüge, Stufe um
+Stufe. Rechts im Reiter «Diagramme» je ein Grundriss mit der Aufteilung und
+mit den Streifen, dazu je Zeile der Ergebnisse ein Bild: m_x, m_y, m_xy, v_x, v_y
+oder v_0 in Farbe über dem Grundriss, mit dem grössten und dem kleinsten
+Wert an seiner Stelle, oder die Lager mit dem Verlauf ihrer Kraft. Ein
+schiefer Streifen gibt sein Moment in x und y umgerechnet weiter, samt
+Drillmoment. Die Herleitung nennt je Fall jeden Träger mit Last,
+Lagerkräften und Momenten je Meter -- gleiche nebeneinander in einer
+Zeile --, was jedes Lager trägt, die grössten Schnittkräfte der Platte, die
+Biegewiderstände nach der linearisierten Fliessbedingung (SIA 262:2025,
+4.3.2.6) und die Lastverteilelemente über Stützen und unter Einzellasten.
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch

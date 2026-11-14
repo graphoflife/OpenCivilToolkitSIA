@@ -32,7 +32,7 @@ Am Ende eines Trägers sind V und M null -- eine Probe, die
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import Profilmatrix, Zerlegung
@@ -40,6 +40,9 @@ from opencivil.stabwerk.verlauf import NULL, Polynom
 
 #: Was in m als dieselbe Stelle gilt.
 GLEICH = 1e-9
+
+#: Wo ein Wert liegt: ``s`` längs eines Trägers, ein Punkt der Platte.
+Ort = TypeVar("Ort")
 
 
 @dataclass(frozen=True)
@@ -279,10 +282,26 @@ def wert(stuecke: Sequence[Stueck], groesse: str, s: float, links: bool = False)
 
 
 def extreme(stuecke: Sequence[Stueck], groesse: str) -> Tuple[Tuple[float, float], Tuple[float, float]]:
-    """``((s, kleinster), (s, grösster))`` von ``V`` oder ``M`` -- an Grenzen und wo die Ableitung null ist."""
+    """
+    ``((s, kleinster), (s, grösster))`` von ``V`` oder ``M`` -- an Grenzen und
+    wo die Ableitung null ist; bei gleichen Werten die vordere Stelle.
+    """
     werte = []
     for t in stuecke:
         funktion = getattr(t, groesse)
         for s in [t.a, t.b] + funktion.ableitung().nullstellen(t.a, t.b):
             werte.append((s, funktion(s)))
-    return min(werte, key=lambda w: w[1]), max(werte, key=lambda w: w[1])
+    return vorderste_extreme(sorted(werte, key=lambda w: w[0]))
+
+
+def vorderste_extreme(werte: Sequence[Tuple[Ort, float]]) -> Tuple[Tuple[Ort, float], Tuple[Ort, float]]:
+    """
+    Aus ``(Ort, Wert)``, in ihrer Folge: das erste Paar mit dem kleinsten und
+    das erste mit dem grössten Wert. Was sich nur in der Rundung
+    unterscheidet, gilt als gleich -- sonst entschiede bei gleichen Werten an
+    zwei Orten, etwa in einem symmetrischen Träger, das Rauschen.
+    """
+    klein, gross = min(w for _, w in werte), max(w for _, w in werte)
+    rauschen = 1e-9 * max(abs(klein), abs(gross), 1.0)
+    return (next(w for w in werte if w[1] <= klein + rauschen),
+            next(w for w in werte if w[1] >= gross - rauschen))

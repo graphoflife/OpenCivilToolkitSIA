@@ -228,11 +228,12 @@ def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung:
     """
     Ein Bauteil gerechnet: aus dem Zwischenspeicher, wenn er es zu genau
     dieser Beschreibung noch hat -- nach einer Rechnung ist das der Fall --,
-    sonst dieses eine.
+    sonst dieses eine, ohne Herleitung: wer hier fragt, will Werte und
+    Bilder, und die Zeichnung fragt nach jeder Eingabe.
     """
     teil = SPEICHER.hole(kennung, _abdruck(projekt.als_dict(), aufbau, kennung))
     if teil is None:
-        return aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung))
+        return aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung), ohne_herleitung=True)
     return teil
 
 

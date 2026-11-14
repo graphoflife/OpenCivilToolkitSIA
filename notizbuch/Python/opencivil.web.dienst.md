@@ -1,5 +1,5 @@
 ---
-erzeugt: 382fb0f43127
+erzeugt: d4e2cce9d9c8
 art: modul
 tags: [modul]
 ---
@@ -172,7 +172,8 @@ def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung
 
 Ein Bauteil gerechnet: aus dem Zwischenspeicher, wenn er es zu genau
 dieser Beschreibung noch hat -- nach einer Rechnung ist das der Fall --,
-sonst dieses eine.
+sonst dieses eine, ohne Herleitung: wer hier fragt, will Werte und
+Bilder, und die Zeichnung fragt nach jeder Eingabe.
 
 ### querkraftkurven
 

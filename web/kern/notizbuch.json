@@ -194,6 +194,12 @@
       "bereich": "Querschnittsanalyse"
     },
     {
+      "name": "Streifenmethode",
+      "pfad": "Formelsammlung/Themen/Streifenmethode.md",
+      "art": "thema",
+      "bereich": "Decken"
+    },
+    {
       "name": "Durchstanzen",
       "pfad": "Formelsammlung/Themen/Durchstanzen.md",
       "art": "thema",
@@ -1918,6 +1924,24 @@
       ]
     },
     {
+      "name": "Lastverteilelement",
+      "pfad": "Formelsammlung/Formeln/Lastverteilelement.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Streifenmethode"
+      ]
+    },
+    {
+      "name": "Linearisierte Fliessbedingung",
+      "pfad": "Formelsammlung/Formeln/Linearisierte Fliessbedingung.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Streifenmethode"
+      ]
+    },
+    {
       "name": "Mantelreibung drainiert",
       "pfad": "Formelsammlung/Formeln/Mantelreibung drainiert.md",
       "art": "formel",
@@ -2193,6 +2217,15 @@
       ],
       "themen": [
         "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Pressung eines Flächenlagers",
+      "pfad": "Formelsammlung/Formeln/Pressung eines Flächenlagers.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Streifenmethode"
       ]
     },
     {
@@ -2550,6 +2583,15 @@
       "zeichen": [],
       "themen": [
         "Steifigkeitsmethode"
+      ]
+    },
+    {
+      "name": "Schnittkräfte eines Streifens in x und y",
+      "pfad": "Formelsammlung/Formeln/Schnittkräfte eines Streifens in x und y.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Streifenmethode"
       ]
     },
     {
@@ -3915,8 +3957,12 @@
         "Widerstaende",
         "in_xy",
         "an_stelle",
-        "stellen",
         "widerstaende",
+        "zellen_von",
+        "_baender",
+        "stellen",
+        "proben",
+        "extrem",
         "Lastverteilelement",
         "Lastverteilelement.ecken",
         "Lastverteilelement.zusatz",
@@ -3961,7 +4007,18 @@
         "schreiben",
         "_lasten",
         "_last",
-        "_faelle"
+        "_faelle",
+        "_ansaetze",
+        "_fall",
+        "_traeger",
+        "_reihe",
+        "_mit_stelle",
+        "_zahl",
+        "_lagerkraefte",
+        "_schnittkraefte",
+        "_widerstaende",
+        "_ort_von",
+        "_lastverteilelemente"
       ]
     },
     {
@@ -4011,6 +4068,7 @@
       "stichworte": [
         "Lagerkraft",
         "Traegerergebnis",
+        "Traegerergebnis.last",
         "Wandkraft",
         "Wandkraft.laenge",
         "Wandkraft.je_meter",
@@ -4027,6 +4085,7 @@
         "gegenkraefte",
         "_weitergeben",
         "lagerverlauf",
+        "spitzen",
         "_schwerpunkt"
       ]
     },
@@ -4095,7 +4154,8 @@
         "Stueck",
         "statik",
         "wert",
-        "extreme"
+        "extreme",
+        "vorderste_extreme"
       ]
     },
     {
@@ -7227,8 +7287,6 @@
         "ergebnis",
         "_linienlager",
         "_extreme",
-        "_zellen",
-        "_baender",
         "_anteile",
         "_grenzen"
       ]

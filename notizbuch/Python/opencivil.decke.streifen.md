@@ -1,5 +1,5 @@
 ---
-erzeugt: 2d18a9f0285e
+erzeugt: cb2e23221ca0
 art: modul
 tags: [modul]
 ---
@@ -268,10 +268,12 @@ class Zerlegung
 def feldstreifen(self, r: Richtung) -> List[Streifen]
 ```
 
+Die Feldstreifen in Richtung `r` -- je Richtung einmal gesucht: Bilder und Bericht fragen an jeder Stelle.
+
 #### Zerlegung.unterzuege
 
 ```python
-@property
+@cached_property
 def unterzuege(self) -> List[Streifen]
 ```
 
@@ -397,6 +399,7 @@ Ob sich zwei Flächen aus konvexen Stücken mehr als berühren.
 ## Gebraucht von
 
 - [[opencivil.decke.aufteilung]]
+- [[opencivil.decke.feld]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]

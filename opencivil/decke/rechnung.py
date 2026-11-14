@@ -66,6 +66,11 @@ class Traegerergebnis:
     stuecke: List[Stueck]
     """Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm)."""
 
+    @property
+    def last(self) -> float:
+        """Was auf ihm liegt, zusammen, in N."""
+        return sum(_summe(l) for l in self.lasten)
+
 
 @dataclass(frozen=True)
 class Wandkraft:
@@ -297,6 +302,17 @@ def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple
         auf = [s for s in stuecke if s[0] <= mitte <= s[1]]
         heraus.append((ua, ub, sum(s[2] for s in auf), sum(s[3] for s in auf)))
     return heraus
+
+
+def spitzen(stufen: Sequence[Tuple[float, float, float, float]]) -> Tuple[float, float]:
+    """
+    Aus den Stufen eines Linienlagers (:func:`lagerverlauf`): der Wert von
+    ``r`` mit dem grössten Betrag und der grösste Betrag von ``m`` -- nur
+    der Betrag, denn das Vorzeichen von ``m`` hängt an der Richtung, in der
+    das Lager gezeichnet ist.
+    """
+    return (max((r for _, _, r, _ in stufen), key=abs, default=0.0),
+            max((abs(m) for *_, m in stufen), default=0.0))
 
 
 def _summe(l: Teillast) -> float:

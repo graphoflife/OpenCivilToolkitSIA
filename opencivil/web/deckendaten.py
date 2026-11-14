@@ -15,23 +15,21 @@ Kraft jeder Stuetze und der Verlauf laengs jedes Linienlagers. Die Zellen
 sind gross; mit jeder Rechnung mitgeliefert, machten sie jede Eingabe
 langsamer -- dasselbe wie beim Verlauf des Balkensystems.
 
-Was in eine Rechnung eingeht, rechnet hier niemand; geschnitten wird nur
-fuers Bild, und die Werte an einer Stelle kommen aus
-:mod:`opencivil.decke.feld`.
+Was in eine Rechnung eingeht, rechnet hier niemand: Zellen, Werte und
+groesste Werte kommen aus :mod:`opencivil.decke.feld`, derselben Stelle, an
+der auch der Bericht sie holt.
 """
 
 from __future__ import annotations
 
-import math
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import KN, KN_PRO_M, KNM_PRO_M
 from opencivil.core.rechenwerk import Loesung
 from opencivil.decke import feld
 from opencivil.decke import geometrie as geo
-from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import Aufteilung, Linienlager
-from opencivil.decke.rechnung import Ergebnis, Fallergebnis, lagerverlauf
+from opencivil.decke.rechnung import Ergebnis, Fallergebnis, lagerverlauf, spitzen
 from opencivil.decke.werk import Deckenbefund
 from opencivil.projekt import Aufbau
 from opencivil.stabwerk.system import Meldung
@@ -39,12 +37,6 @@ from opencivil.web.anzeige import zahl
 
 #: Auf einen Zehntelmillimeter -- fuers Bild genug, und die Antwort bleibt klein.
 STELLEN = 4
-
-#: So viele Zellen hat ein Bild der Schnittkraefte ueber die laengere Seite
-#: der Decke mindestens -- breitere Streifen werden dafuer geteilt. Mehr
-#: machten die Antwort gross: bei 40 waren es fuer die Decke des
-#: Kolloquiums 4 (9 m, Streifen 0.25 m) 3168 Zellen und 330 kB.
-ZELLEN = 24
 
 #: Die Einheit der Anzeige je Groesse: Momente in kNm/m, Querkraefte in kN/m.
 EINHEITEN = {g: KNM_PRO_M if g.startswith("m") else KN_PRO_M for g in feld.GROESSEN}
@@ -115,20 +107,17 @@ def ergebnis(befund: Deckenbefund, name: str) -> Dict[str, Any]:
     Zelle ihre Ecken, und ``werte``, je Groesse
     (:data:`~opencivil.decke.feld.GROESSEN`) der Wert am Schwerpunkt jeder
     Zelle; ``extreme``, je Groesse der groesste und der kleinste Wert mit
-    seinem Ort -- gesucht unter den Schwerpunkten und den Stellen, an denen
-    ein Traeger springt oder sein Extremum hat (:func:`~opencivil.decke.feld.stellen`).
+    seinem Ort -- gesucht an den Proben des Falls
+    (:func:`~opencivil.decke.feld.proben`).
     Dazu je Stuetze ihre Kraft ``F`` und je Linienlager, was
     :func:`_linienlager` sagt. Momente in kNm/m, Querkraefte und ``r`` in
     kN/m, Kraefte in kN -- wie ``einheiten`` sagt.
     """
     e = befund.ergebnis
     fall = e.fall(name)
-    zellen = _zellen(e)
-    mitten = [geo.schwerpunkt(z) for z in zellen]
-    werte = [feld.an_stelle(e, fall, p) for p in mitten]
-    platten = [list(p.ecken) for p in e.decke.platten]
-    stellen = [p for p in feld.stellen(e, fall) if any(geo.innen(p, v) for v in platten)]
-    proben = list(zip(mitten, werte)) + [(p, feld.an_stelle(e, fall, p)) for p in stellen]
+    zellen = feld.zellen_von(e)
+    proben = feld.proben(e, fall, zellen)
+    werte = [k for _, k in proben[:len(zellen)]]
     return {
         "fall": name,
         "einheiten": {g: EINHEITEN[g].beschriftung for g in feld.GROESSEN},
@@ -144,63 +133,26 @@ def _linienlager(lager: Linienlager, fall: Fallergebnis) -> Dict[str, Any]:
     """
     Ein Linienlager im Bild eines Falls: seine Summe ``F``, seine Stufen
     ``[u_a, u_b, r, m]`` (:func:`~opencivil.decke.rechnung.lagerverlauf`),
-    ``r_max``, der Wert von r mit dem groessten Betrag, und ``m_max``, der
-    groesste Betrag von m -- nur der Betrag: das Vorzeichen von m haengt an
-    der Richtung a -> b, die niemand sieht.
+    ``r_max`` und ``m_max`` (:func:`~opencivil.decke.rechnung.spitzen`).
     """
     stufen = lagerverlauf(lager, fall.linienlager.get(lager.name, ()))
+    r_max, m_max = spitzen(stufen)
     return {"name": lager.name, "a": _punkte([lager.a])[0], "b": _punkte([lager.b])[0],
             "eingespannt": lager.eingespannt, "F": zahl(fall.wandkraft(lager.name), KN),
             "stufen": [[round(ua, STELLEN), round(ub, STELLEN), zahl(r, KN_PRO_M), zahl(m, KNM_PRO_M)]
                        for ua, ub, r, m in stufen],
-            "r_max": zahl(max((r for _, _, r, _ in stufen), key=abs, default=0.0), KN_PRO_M),
-            "m_max": zahl(max((abs(m) for *_, m in stufen), default=0.0), KNM_PRO_M)}
+            "r_max": zahl(r_max, KN_PRO_M), "m_max": zahl(m_max, KNM_PRO_M)}
 
 
 def _wert(si: float, groesse: str) -> float:
     return round(zahl(si, EINHEITEN[groesse]), 3)
 
 
-def _extreme(proben: Sequence[Tuple[Punkt, feld.Schnittkraefte]], groesse: str) -> Dict[str, Any]:
+def _extreme(proben: Sequence[feld.Probe], groesse: str) -> Dict[str, Any]:
     """Der groesste und der kleinste Wert einer Groesse unter den Proben, je mit Ort."""
-    def eintrag(probe: Tuple[Punkt, feld.Schnittkraefte]) -> Dict[str, Any]:
-        return {"wert": _wert(probe[1].groesse(groesse), groesse), "ort": _punkte([probe[0]])[0]}
-    return {"groesst": eintrag(max(proben, key=lambda pk: pk[1].groesse(groesse))),
-            "kleinst": eintrag(min(proben, key=lambda pk: pk[1].groesse(groesse)))}
-
-
-def _zellen(e: Ergebnis) -> List[List[Punkt]]:
-    """
-    Die Zellen der Bilder: je Gruppe die Feldstreifen ihrer beiden
-    Richtungen, die breiten geteilt (:data:`ZELLEN`), gekreuzt und mit den
-    konvexen Stuecken ihrer Platten geschnitten. So liegt jede Zelle in
-    einem Streifen jeder Richtung, und ihr Wert gilt fuer sie ganz.
-    """
-    z = e.zerlegung
-    ecken = [p for platte in e.decke.platten for p in platte.ecken]
-    weite = max(max(p[0] for p in ecken) - min(p[0] for p in ecken),
-                max(p[1] for p in ecken) - min(p[1] for p in ecken)) / ZELLEN
-    heraus: List[List[Punkt]] = []
-    for gruppe in z.gruppen:
-        r1, r2 = gruppe.richtungen
-        baender1, baender2 = (_baender(z.feldstreifen(r), weite) for r in (r1, r2))
-        for stueck in gruppe.stuecke:
-            for a1, b1 in baender1:
-                band = geo.im_band(stueck, r1.t, a1, b1)
-                for a2, b2 in baender2 if band else ():
-                    zelle = geo.im_band(band, r2.t, a2, b2)
-                    if zelle:
-                        heraus.append(zelle)
-    return heraus
-
-
-def _baender(streifen: Sequence[Any], weite: float) -> List[Tuple[float, float]]:
-    """Die Feldstreifen einer Richtung quer in Baender, keines breiter als ``weite``."""
-    heraus = []
-    for s in streifen:
-        n = max(1, math.ceil(s.breite / weite - 1e-9))
-        heraus.extend((s.von + s.breite * i / n, s.von + s.breite * (i + 1) / n) for i in range(n))
-    return heraus
+    kleinst, groesst = feld.extrem(proben, lambda k: k.groesse(groesse))
+    return {art: {"wert": _wert(w, groesse), "ort": _punkte([ort])[0]}
+            for art, (ort, w) in (("groesst", groesst), ("kleinst", kleinst))}
 
 
 def _meldungen(meldungen: Sequence[Meldung]) -> List[Dict[str, Any]]:

@@ -1,5 +1,5 @@
 ---
-erzeugt: ae570dd00e55
+erzeugt: 3b995e5da9ba
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -58,6 +58,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Pfahlsteifigkeit]] · 13
 - [[Äusserer Pfahlwiderstand quer]] · 10
 - [[Innerer Pfahlwiderstand quer]] · 12
+
+**Decken**
+
+- [[Streifenmethode]] · 4
 
 **Durchstanzen**
 
@@ -220,6 +224,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Lastneigungsfaktor i_c]] · $i_c$
 - [[Lastneigungsfaktor i_q]] · $i_q$
 - [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
+- [[Lastverteilelement]]
+- [[Linearisierte Fliessbedingung]]
 - [[Mantelreibung drainiert]]
 - [[Mantelreibung undrainiert]]
 - [[Mantelwiderstand]] · $R_{s,k}$
@@ -245,6 +251,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Parabel-Rechteck-Beziehung des Betons]]
 - [[Plattenrotation]] · $\psi_x$
 - [[Platz für die Durchstanzbewehrung]] · $h_{frei}$
+- [[Pressung eines Flächenlagers]]
 - [[Probe – Moment um y]] · $M_{y,Rd}$
 - [[Probe – Moment um z]] · $M_{z,Rd}$
 - [[Probe – Normalkraft]] · $N_{Rd}$
@@ -278,6 +285,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schiefstellung]] · $\alpha_i$
 - [[Schnittgrössen aus der Spannungsverteilung]]
 - [[Schnittgrössen längs eines Stabs]]
+- [[Schnittkräfte eines Streifens in x und y]]
 - [[Schwerpunkt der zusammengefassten Lage]] · $z_{2,x}$
 - [[Schwerpunkt eines T-Querschnitts]] · $z_{S}$
 - [[Setzung aus Erstbelastung]] · $s_E$
@@ -352,7 +360,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-95 von 284 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+95 von 288 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]

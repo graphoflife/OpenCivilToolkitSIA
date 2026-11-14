@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d183ec31fc4
+erzeugt: b71752594e7f
 art: modul
 tags: [modul]
 ---
@@ -12,9 +12,16 @@ tags: [modul]
 Aus den Trägern eines Falls, was an einer Stelle der Platte wirkt: die
 Momente `m_x`, `m_y`, `m_xy` je Meter, die Querkräfte `v_x`,
 `v_y` je Meter und daraus die erforderlichen Biegewiderstände. Dazu die
-Lastverteilelemente über Stützen und unter Einzellasten -- und für die
-Bilder die Stellen, an denen die Träger eines Falls springen oder ihre
-grössten Werte haben ([[opencivil.decke.feld#stellen|stellen]]).
+Lastverteilelemente über Stützen und unter Einzellasten.
+
+
+## WO BILDER UND BERICHT HINSEHEN
+
+An den Proben eines Falls ([[opencivil.decke.feld#proben|proben]]): dem Schwerpunkt jeder Zelle der
+Bilder ([[opencivil.decke.feld#zellen_von|zellen_von]]) und den Stellen, an denen ein Träger springt
+oder seine grössten Werte hat ([[opencivil.decke.feld#stellen|stellen]]). Dort sucht [[opencivil.decke.feld#extrem|extrem]]
+den grössten und den kleinsten Wert -- für das Bild und den Bericht
+derselbe.
 
 
 ## VOM STREIFEN ZUR PLATTE
@@ -134,6 +141,33 @@ Die Schnittkräfte an der Stelle `p`: je Richtung der Feldstreifen, in
 dem sie liegt, und jeder Unterzug, in dessen Fläche sie liegt. An der
 Grenze zweier Feldstreifen zählt der mit dem grösseren `τ`.
 
+### widerstaende
+
+```python
+def widerstaende(k: Schnittkraefte) -> Widerstaende
+```
+
+Die erforderlichen Biegewiderstände nach der linearisierten Fliessbedingung, `k = 1`.
+
+### zellen_von
+
+```python
+def zellen_von(ergebnis: Ergebnis) -> List[List[Punkt]]
+```
+
+Die Zellen der Bilder: je Gruppe die Feldstreifen ihrer beiden
+Richtungen, die breiten geteilt ([[opencivil.decke.feld#Konstanten|ZELLEN]]), gekreuzt und mit den
+konvexen Stücken ihrer Platten geschnitten. So liegt jede Zelle in
+einem Streifen jeder Richtung, und ihr Wert gilt für sie ganz.
+
+### _baender
+
+```python
+def _baender(streifen: Sequence[Streifen], weite: float) -> List[Tuple[float, float]]
+```
+
+Die Feldstreifen einer Richtung quer in Bänder, keines breiter als `weite`.
+
 ### stellen
 
 ```python
@@ -146,13 +180,25 @@ seines Streifens: an den Enden jedes Stücks -- knapp innerhalb
 ein Streifen trägt, liegen dort die grössten und kleinsten m und v genau;
 wo sich zwei überlagern, in der Nähe.
 
-### widerstaende
+### proben
 
 ```python
-def widerstaende(k: Schnittkraefte) -> Widerstaende
+def proben(ergebnis: Ergebnis, fall: Fallergebnis, zellen: Sequence[Sequence[Punkt]]) -> List[Probe]
 ```
 
-Die erforderlichen Biegewiderstände nach der linearisierten Fliessbedingung, `k = 1`.
+Wo Bilder und Bericht die Platte im Fall ansehen, je mit den
+Schnittkräften dort: zuerst die Schwerpunkte der `zellen`
+([[opencivil.decke.feld#zellen_von|zellen_von]]), in ihrer Folge, dann die Stellen
+([[opencivil.decke.feld#stellen|stellen]]), die in einer Platte liegen.
+
+### extrem
+
+```python
+def extrem(proben: Sequence[Probe], aus: Callable[[Schnittkraefte], float]) -> Tuple[Tuple[Punkt, float], Tuple[Punkt, float]]
+```
+
+`((Ort, kleinster), (Ort, grösster))` dessen, was `aus` aus den
+Schnittkräften liest -- bei gleichen Werten die vordere Probe.
 
 ### Lastverteilelement
 
@@ -210,15 +256,19 @@ Die Einzellasten eines Lastfalls oder einer Kombination, mit ihrem Beiwert.
 - `POSITIV_JE_LAST = 1.0 / (2.0 * math.pi) - 1.0 / 8.0` – Der positive Widerstand je Last eins im Lastverteilelement: `1/(2π) − 1/8`, auf der Folie 0.034.
 - `GROESSEN = {'m_x': 'mx', 'm_y': 'my', 'm_xy': 'mxy', 'v_x': 'vx', 'v_y': 'vy', '…` – Was ein Bild der Platte zeigen kann: je Name das Feld von [[opencivil.decke.feld#Schnittkraefte|Schnittkraefte]].
 - `INNEN = 1e-06` – So weit innerhalb eines Stücks liegt die Stelle an seinem Ende, in m: weiter als [[opencivil.decke.traeger#Konstanten|GLEICH]], so dass links und rechts eines Sprungs beide zählen.
+- `ZELLEN = 24` – So viele Zellen hat ein Bild über die längere Seite der Decke mindestens -- breitere Streifen werden dafür geteilt. Mehr machten die Bilder gross: bei 40 waren es für die Decke des Kolloquiums 4 (9 m, Streifen 0.25 m) 3168 Zellen und 330 kB.
+- `Probe = Tuple[Punkt, 'Schnittkraefte']` – Eine Stelle der Platte mit ihren Schnittkräften.
 
 ## Braucht
 
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
+- [[opencivil.decke.streifen]]
 - [[opencivil.decke.traeger]]
 
 ## Gebraucht von
 
+- [[opencivil.decke.herleitung]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.web.deckendaten]]

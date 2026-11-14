@@ -26,7 +26,7 @@ from opencivil.decke.modell import (
     Aufteilung, Decke, Flaechenlast, Kombination, Lastfall, Linienlager, Linienlast, Platte, Punktlast,
     Stuetze, Unterzug, Zone,
 )
-from opencivil.decke.rechnung import Wandkraft, lagerverlauf, rechnen
+from opencivil.decke.rechnung import Wandkraft, lagerverlauf, rechnen, spitzen
 from opencivil.decke.traeger import extreme, wert
 
 E, WICHTE = 30e9, 25e3
@@ -438,6 +438,11 @@ class TestLagerverlauf(unittest.TestCase):
         self.assertEqual([(ua, ub, r) for ua, ub, r, _ in stufen],
                          [(0.0, 1.0, 0.0), (1.0, 2.0, 3e3), (2.0, 3.0, 0.0)])
         self.assertEqual(lagerverlauf(lager, []), [(0.0, 3.0, 0.0, 0.0)])
+
+    def test_die_spitzen(self):
+        """Die grösste Kraft mit Vorzeichen, das grösste Moment als Betrag -- sein Vorzeichen hängt an a → b."""
+        self.assertEqual(spitzen([(0.0, 1.0, 2e3, -5e3), (1.0, 2.0, -3e3, 4e3)]), (-3e3, 5e3))
+        self.assertEqual(spitzen([]), (0.0, 0.0))
 
 
 class TestPruefen(unittest.TestCase):

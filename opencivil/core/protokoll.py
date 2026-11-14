@@ -227,6 +227,9 @@ class Protokoll:
         p.hinweis("Massgebend ist der abgeminderte Wert.")
     """
 
+    #: Ob niemand mitliest (:class:`StillesProtokoll`).
+    still = False
+
     def __init__(self, titel: str = "", referenz: str = "") -> None:
         self.kopftitel = titel
         self.referenz = referenz
@@ -477,7 +480,13 @@ class StillesProtokoll(Protokoll):
     Gebaut wird gar nichts, nicht erst gebaut und dann verworfen: eine Formel
     setzt ihre Vorlage zweimal ein und misst ihre Breite, und die
     Bewehrungssuche rechnet hundertfach, ohne je eine Zeile zu zeigen.
+
+    Eine Herleitung, die erst nach der Rechnung für sich sucht, was sie
+    zeigt -- die der Decke ihre grössten Werte --, fragt nach :attr:`still`
+    und lässt es: in die Rechnung geht davon nichts ein.
     """
+
+    still = True
 
     def _anfuegen(self, block: Block) -> Block:
         return block

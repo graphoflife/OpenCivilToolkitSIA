@@ -7,6 +7,48 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Decken: Bericht mit Herleitung
+
+Die Herleitung einer Decke geht jetzt bis zu den Ergebnissen. Nach den
+Fällen stehen einmal die Ansätze -- vom Streifen zur Platte, die Pressung
+eines Flächenlagers, die linearisierte Fliessbedingung (SIA 262:2025,
+4.3.2.6, (34)) und das Lastverteilelement --, dann je Lastfall und
+Kombination: jeder Träger mit Breite, Länge, Last, Lagerkräften und seinem
+kleinsten und grössten Moment samt Stelle; was jedes Lager trägt; die
+grössten Schnittkräfte der Platte mit Ort; die Biegewiderstände, die sie
+verlangen; und je Stütze und Einzellast, was ihr Lastverteilelement
+zusätzlich braucht. Die vier Ansätze haben Formelseiten unter dem neuen
+Thema [[Streifenmethode]]. Damit ist die App Decken fertig.
+
+Warum so:
+
+- Alles je Meter, auch die Träger: Last und Lagerkräfte in kN/m, Momente in
+  kNm/m. So steht eine Zeile der Trägertabelle neben dem Bild, ohne dass
+  jemand durch die Breite teilt.
+- Gleiche Feldstreifen in einer Zeile: im Kolloquium 4 tragen alle 18 in x
+  dasselbe, «x1 … x18». Zusammen kommen nur Nachbarn derselben Richtung mit
+  denselben Zahlen, auch derselben Stelle des grössten Moments; ein Träger
+  ohne Last fehlt und trennt seine Nachbarn. Von geteilten Streifen erst
+  alle ersten Stücke, dann alle zweiten (`herleitung._reihe`): so steht
+  x1.2 neben x2.2 statt hinter x1.1.
+- Bei gleichen Werten an zwei Stellen gilt die vordere
+  (`traeger.vorderste_extreme`): sonst entschied in einem symmetrischen
+  Träger die Rundung, welche Stelle dasteht, und gleiche Nachbarn fanden
+  sich nicht mehr.
+- Die grössten Werte der Platte an denselben Stellen wie in den Bildern:
+  Zellen und Proben stehen jetzt in `feld` (`zellen_von`, `proben`,
+  `extrem`), Bild und Bericht holen sie dort -- ebenso Spitze und grösstes
+  Moment eines Linienlagers (`rechnung.spitzen`). Ein Wert, der als 0.0
+  dasteht, hat keinen Ort: er liegt an vielen Stellen.
+- Die Proben kosten mehr als die Rechnung selbst. Das Zeichenfenster fragt
+  nach jeder Eingabe, braucht aber nur Zahlen und Bilder: was der Dienst
+  nur dafür rechnet, rechnet ohne Herleitung (`dienst._bauteil_rechnen`),
+  und die Herleitung der Decke fragt, ob jemand mitliest
+  (`Protokoll.still`) -- nichts von ihr geht in die Rechnung ein. Dazu
+  sucht die Zerlegung die Feldstreifen einer Richtung nur noch einmal,
+  nicht für jede Stelle neu. Im Kolloquium 4 braucht die Decke nach einer
+  Eingabe so 19 ms; mit Bericht wären es 70 ms.
+
 ## 2026-11-14 · Decken: Ergebnisbilder samt Lagerkräften
 
 Unter «Ergebnisse» legt man Bilder an, je Zeile ein Fall und eine Grösse:
@@ -25,7 +67,7 @@ Warum so:
   so liegt jede in genau einem Streifen jeder Richtung, und der Wert an
   ihrem Schwerpunkt gilt für sie ganz. Breite Streifen werden quer geteilt,
   keine Zelle breiter als ein Vierundzwanzigstel der Decke
-  (`deckendaten.ZELLEN`). Mit 40 waren es im Kolloquium 4 3168 Zellen und
+  (`feld.ZELLEN`). Mit 40 waren es im Kolloquium 4 3168 Zellen und
   330 kB je Antwort, mit 24 sind es 792 und 79 kB.
 - Die grössten Werte nicht nur an den Schwerpunkten gesucht, sondern auch
   an den Enden jedes Trägerstücks, knapp innen, und wo seine Querkraft oder

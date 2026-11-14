@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
+from functools import cached_property
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
@@ -275,14 +276,18 @@ class Zerlegung:
 
     def __post_init__(self) -> None:
         self._nach_name = {s.name: s for s in self.streifen}
+        self._feld: Dict[Richtung, List[Streifen]] = {}
 
     def __getitem__(self, name: str) -> Streifen:
         return self._nach_name[name]
 
     def feldstreifen(self, r: Richtung) -> List[Streifen]:
-        return [s for s in self.streifen if s.stufe == 0 and s.richtung.parallel(r)]
+        """Die Feldstreifen in Richtung ``r`` -- je Richtung einmal gesucht: Bilder und Bericht fragen an jeder Stelle."""
+        if r not in self._feld:
+            self._feld[r] = [s for s in self.streifen if s.stufe == 0 and s.richtung.parallel(r)]
+        return self._feld[r]
 
-    @property
+    @cached_property
     def unterzuege(self) -> List[Streifen]:
         return [s for s in self.streifen if s.stufe > 0]
 

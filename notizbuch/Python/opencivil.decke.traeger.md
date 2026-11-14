@@ -1,5 +1,5 @@
 ---
-erzeugt: 47499118433d
+erzeugt: 645745185705
 art: modul
 tags: [modul]
 ---
@@ -200,12 +200,25 @@ def wert(stuecke: Sequence[Stueck], groesse: str, s: float, links: bool=False) -
 def extreme(stuecke: Sequence[Stueck], groesse: str) -> Tuple[Tuple[float, float], Tuple[float, float]]
 ```
 
-`((s, kleinster), (s, grösster))` von `V` oder `M` -- an Grenzen und wo die Ableitung null ist.
+`((s, kleinster), (s, grösster))` von `V` oder `M` -- an Grenzen und
+wo die Ableitung null ist; bei gleichen Werten die vordere Stelle.
+
+### vorderste_extreme
+
+```python
+def vorderste_extreme(werte: Sequence[Tuple[Ort, float]]) -> Tuple[Tuple[Ort, float], Tuple[Ort, float]]
+```
+
+Aus `(Ort, Wert)`, in ihrer Folge: das erste Paar mit dem kleinsten und
+das erste mit dem grössten Wert. Was sich nur in der Rundung
+unterscheidet, gilt als gleich -- sonst entschiede bei gleichen Werten an
+zwei Orten, etwa in einem symmetrischen Träger, das Rauschen.
 
 
 ## Konstanten
 
 - `GLEICH = 1e-09` – Was in m als dieselbe Stelle gilt.
+- `Ort = TypeVar('Ort')` – Wo ein Wert liegt: `s` längs eines Trägers, ein Punkt der Platte.
 
 ## Braucht
 
@@ -216,6 +229,7 @@ def extreme(stuecke: Sequence[Stueck], groesse: str) -> Tuple[Tuple[float, float
 ## Gebraucht von
 
 - [[opencivil.decke.feld]]
+- [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]

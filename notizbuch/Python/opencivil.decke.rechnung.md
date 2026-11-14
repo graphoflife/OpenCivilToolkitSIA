@@ -1,5 +1,5 @@
 ---
-erzeugt: 40b91aaf00f5
+erzeugt: 986c416eded9
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,15 @@ class Traegerergebnis
 - `lasten: List[Teillast]` – Was auf ihm liegt, ohne seine Lagerkräfte -- in m ab seinem Anfang.
 - `lagerkraefte: List[Lagerkraft]`
 - `stuecke: List[Stueck]` – Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm).
+
+#### Traegerergebnis.last
+
+```python
+@property
+def last(self) -> float
+```
+
+Was auf ihm liegt, zusammen, in N.
 
 ### Wandkraft
 
@@ -215,6 +224,17 @@ Längs eines Linienlagers, was die Träger in es geben: Stufen
 rechtsdrehend um `a → b` positiv. Wo zwei Träger dasselbe Stück
 tragen, zählen beide -- darum das Moment um die Achse des Lagers: so
 lassen sich auch Träger verschiedener Richtung zusammenzählen.
+
+### spitzen
+
+```python
+def spitzen(stufen: Sequence[Tuple[float, float, float, float]]) -> Tuple[float, float]
+```
+
+Aus den Stufen eines Linienlagers ([[opencivil.decke.rechnung#lagerverlauf|lagerverlauf]]): der Wert von
+`r` mit dem grössten Betrag und der grösste Betrag von `m` -- nur
+der Betrag, denn das Vorzeichen von `m` hängt an der Richtung, in der
+das Lager gezeichnet ist.
 
 ### _schwerpunkt
 
