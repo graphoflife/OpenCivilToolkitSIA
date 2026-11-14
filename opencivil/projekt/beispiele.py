@@ -294,13 +294,15 @@ def _durchstanzstellen(p: Projekt) -> None:
     """
     Jede Lage der gestützten Fläche, jede Form der Stütze, jede
     Näherungsstufe und beide Wege zu k_e: eine Innenstütze mit Flächenlast;
-    eine Rundstütze am Rand, k_e aus der Exzentrizität; eine Eckstütze in
-    Stufe 1, die ohne Durchstanzbewehrung aufgeht; eine lange Ovalstütze in
-    einer Bodenplatte, mit Momenten von Hand und einer Aussparung neben der
-    Ecke; ein Wandende und eine Wandecke, an denen Stufe 2 wie Stufe 1
-    rechnet und für die es noch keinen Vorschlag gibt. Innen-, Rand- und
-    Ovalstütze brauchen Durchstanzbewehrung; eine zweite Innenstütze trägt
-    so viel, dass es einen Stahlpilz braucht.
+    eine Rundstütze am Rand, k_e aus der Exzentrizität; eine Eckstütze, die
+    ohne Durchstanzbewehrung aufgeht, mit den Randstreifen bis zum zweiten
+    Rand (Figur 25); eine Randstütze in Stufe 3, deren r_s senkrecht zum Rand
+    auf 2/3 · b_sr steigt; eine lange Ovalstütze in einer Bodenplatte, mit
+    Momenten von Hand und einer Aussparung neben der Ecke; ein Wandende und
+    eine Wandecke, an denen Stufe 2 wie Stufe 1 rechnet und für die es noch
+    keinen Vorschlag gibt. Innen-, Rand- und Ovalstütze brauchen
+    Durchstanzbewehrung; eine zweite Innenstütze trägt so viel, dass es einen
+    Stahlpilz braucht.
     """
     beton, stahl = (next(m.kennung for m in p.materialien if m.art == art)
                     for art in ("beton", "betonstahl"))
@@ -308,7 +310,9 @@ def _durchstanzstellen(p: Projekt) -> None:
     p.durchstanzen("Mit Stahlpilz", beton, stahl, b_x=400, b_y=400, V_d=1000.0)
     p.durchstanzen("Randstütze", beton, stahl, lage="rand", form="rund", D=450, a_y=100,
                    h=300, ke="exzentrizitaet", e_y=80, V_d=500.0, q_d=12.0)
-    p.durchstanzen("Eckstütze", beton, stahl, lage="ecke", stufe="1", V_d=80.0)
+    p.durchstanzen("Eckstütze", beton, stahl, lage="ecke", V_d=80.0)
+    p.durchstanzen("Randstütze in Stufe 3", beton, stahl, lage="rand", stufe="3", r_sx=0.8,
+                   r_sy=0.4, m_sdx=40.0, m_sdy=60.0, V_d=150.0)
     oval = p.durchstanzen("Ovalstütze", beton, stahl, plattenart="bodenplatte", form="oval",
                           b_x=1200, b_y=300, h=400, c=40, phi_x=20, phi_y=20, stufe="3",
                           r_sx=2.0, r_sy=1.6, m_sdx=180.0, m_sdy=150.0, V_d=1400.0,

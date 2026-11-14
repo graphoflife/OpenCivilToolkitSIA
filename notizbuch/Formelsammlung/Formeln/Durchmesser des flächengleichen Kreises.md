@@ -1,5 +1,5 @@
 ---
-erzeugt: 5252c12d9eb0
+erzeugt: 13ddf0e73c78
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.4"
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._k_e|Durchstanzen._k_e]]
+- [[opencivil.durchstanzen.herleitung#k_e|k_e]]
 
 ## Themen
 
@@ -44,4 +44,5 @@ $$
 Für $k_e$ aus der Exzentrizität ([[Beiwert der Momentenübertragung]]) wird
 die Fläche innerhalb des Nachweisschnitts durch einen Kreis derselben Fläche
 ersetzt; $b$ ist sein Durchmesser (4.3.6.2.4). Am Plattenrand zählt nur die
-Fläche in der Platte.
+Fläche in der Platte. Jeder Schnitt hat sein eigenes $b$: um die Stütze, um
+die äussersten Anker und um einen Stahlpilz.

@@ -1,5 +1,5 @@
 ---
-erzeugt: dd7dd454dd72
+erzeugt: d687f5d4ad30
 art: modul
 tags: [modul]
 ---
@@ -21,11 +21,11 @@ erfüllt ([[opencivil.durchstanzen.bewehrung#bemessen|bemessen]]). Hier steht ke
 Die Leisten stehen senkrecht auf dem Rand der gestützten Fläche, an Ecken und
 Rundungen radial. Ihre zweiten Anker liegen auf der Linie im Abstand r_2 um
 die gestützte Fläche; entlang dieser Linie stehen zwei Leisten höchstens
-e_max auseinander, als Sehne gemessen. Auf jeder geraden Seite steht an
-beiden Enden eine Leiste und dazwischen gleichmässig so viele wie nötig, auf
-den Rundungen ebenso. Das ist der Grundriss der Herstellerunterlagen, die
-Regeln dazu sind die des Produkts ([[opencivil.durchstanzen.produkte|.produkte]]) -- nach Vorgabe, nicht
-nachgeschlagen.
+e_max = 1.5·d_v auseinander (SIA 262:2025, 5.5.3.9), als Sehne gemessen. Auf
+jeder geraden Seite steht an beiden Enden eine Leiste und dazwischen
+gleichmässig so viele wie nötig, auf den Rundungen ebenso. Das ist der
+Grundriss der Herstellerunterlagen; die Abstände der Anker sind die des
+Produkts ([[opencivil.durchstanzen.produkte|.produkte]]) -- nach Vorgabe, nicht nachgeschlagen.
 
 
 ## AN RÄNDERN UND AUSSPARUNGEN ([[opencivil.durchstanzen.bewehrung#setzen|setzen]])

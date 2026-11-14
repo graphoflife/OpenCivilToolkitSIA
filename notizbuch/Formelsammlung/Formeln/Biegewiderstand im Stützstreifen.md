@@ -1,11 +1,11 @@
 ---
-erzeugt: 8ceed2dd6f34
+erzeugt: 6a51d0ae9e31
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.6.4.5"
+normstelle: "SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.3.6.4.5
+> SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12
 
 *In der Herleitung: «Biegewiderstand im Stützstreifen in x»*
 

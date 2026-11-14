@@ -5,8 +5,9 @@ Eine Innenstütze gegen die Gleichungen (58) bis (60) von Hand, die Näherungen
 für k_e je Lage, die Ovalstütze, Decke und Bodenplatte, die Wand in
 Näherungsstufe 2, Aussparungen aus Knoten; die Durchstanzbewehrung mit
 ancoPLUS -- Höhe, Abstände, Leisten, die Gleichungen (66) bis (70) und der
-äussere Schnitt nach Figur 26 --, die Prüfungen der Eingabe und was die
-Oberflaeche davon zu sehen bekommt.
+äussere Schnitt nach Figur 26 --, die Breite der Stützstreifen am Rand
+(Figur 25), die Prüfungen der Eingabe und was die Oberflaeche davon zu sehen
+bekommt.
 """
 
 import math
@@ -16,10 +17,10 @@ from itertools import accumulate, product
 from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammenfassen
 from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.bewehrung import (
-    Leiste, Vorschlag, aeussere_kandidaten, anrechenbar, leisten_anordnen, setzen,
+    Leiste, Vorschlag, aeussere_kandidaten, anrechenbar, bemessen, leisten_anordnen, setzen,
 )
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
-from opencivil.durchstanzen.pruefung import spannung
+from opencivil.durchstanzen.pruefung import beiwert_k_e, kreisdurchmesser, spannung, tabelle_21
 from opencivil.durchstanzen.schnitt import (
     Schatten, Stuetzenflaeche, kandidaten_stuetze, nachweisschnitt, schatten_am_schnitt,
 )
@@ -58,6 +59,12 @@ def texte(loesung):
     """Was das Protokoll in Worten sagt -- Titel, Erklärungen und Hinweise."""
     return " ".join(str(getattr(b, "titel", "") or getattr(b, "text", ""))
                     for b in loesung.protokoll.bloecke)
+
+
+def ergebnis(loesung, name):
+    """Das Ergebnis des Zwischenwerts ``name``, wie es in der Herleitung steht."""
+    return next(b.formelzeile.ergebnis for b in loesung.protokoll.bloecke
+                if getattr(b, "wert_id", "").endswith(f".{name}"))
 
 
 class TestInnenstuetzeVonHand(unittest.TestCase):
@@ -108,8 +115,11 @@ class TestDurchstanzbewehrung(unittest.TestCase):
         cls.urteile = {u.fall: u for u in cls.loesung.urteile}
         cls.b = cls.befund.leisten
 
-    def test_vier_nachweise_statt_einem(self):
-        """4.3.6.5.1: Bewehrung, Verformungsvermögen, Betondruckdiagonale, ausserhalb."""
+    def test_vier_urteile_statt_einem(self):
+        """
+        4.3.6.5.1: drei Nachweise, der erste geteilt in den Beitrag der
+        Bewehrung (68) und das Verformungsvermögen (67).
+        """
         self.assertEqual(set(self.urteile), {"mit Durchstanzbewehrung", "Verformungsvermögen",
                                              "Betondruckdiagonale",
                                              "ausserhalb der Durchstanzbewehrung"})
@@ -193,6 +203,54 @@ class TestDurchstanzbewehrung(unittest.TestCase):
         self.assertTrue(anker)
         self.assertTrue(all(p[1] >= -0.15 + 0.030 - 1e-9 for p in anker))
 
+    def test_anker_aus_b500b_auch_bei_b700b(self):
+        """4.3.6.5.4: in (67) und (69) gilt die Fliessgrenze der Anker, nicht die der Platte."""
+        p = Projekt(name="Probe")
+        beton, stahl = p.beton("C30/37"), p.stahl("B700B")
+        p.durchstanzen("S", beton.kennung, stahl.kennung, b_x=400, b_y=400, V_d=800.0)
+        b = rechnen(p)[2].leisten
+        self.assertAlmostEqual(b.f_yd / 1e6, F_YD)
+        self.assertLessEqual(b.sigma_sd / 1e6, F_YD + 1e-9)
+
+    def test_koepfe_genuegend_verankert(self):
+        """5.5.3.11: c_v = 30 mm ≤ d_v/6 = 39 mm -- (68) und (70) ungemindert."""
+        self.assertEqual(self.b.eta, 1.0)
+        self.assertIn("genügend verankert", texte(self.loesung))
+
+    def test_zu_tiefe_koepfe_mindern_68_und_70(self):
+        """5.5.3.11: h = 220 mm gibt d_v = 174 mm, c_v = 30 mm > d_v/6 = 29 mm -- 30 % weniger."""
+        _, loesung, befund, _ = rechnen(projekt(h=220, b_x=300, b_y=300, V_d=400.0))
+        b = befund.leisten
+        self.assertAlmostEqual(befund.innen.d_v, 0.174)
+        self.assertEqual(b.eta, 0.7)
+        self.assertAlmostEqual(b.V_Rd_s, 0.7 * b.A_sw * 0.9 * b.sigma_sd, delta=1.0)
+        self.assertAlmostEqual(b.V_Rd_v, b.A_sw * 0.9 * b.f_yd, delta=1.0)
+        self.assertAlmostEqual(b.V_Rd_max, 0.7 * min(b.k_sys * befund.k_r, 3.5) * TAU_CD
+                               * 174.0 * befund.innen.u * 1e3, delta=1.0)
+        self.assertIn("30 % weniger", texte(loesung))
+
+    def test_aussen_eigenes_k_e_nach_57(self):
+        """
+        4.3.6.5.10 verweist auf 4.3.6.2.3: k_e nach (57) mit der Fläche und dem
+        Schwerpunkt des äusseren Schnitts. Die Resultierende liegt in der
+        Stützenachse, im Ursprung; an der Randstütze ist k_e aussen kleiner.
+        """
+        befund = rechnen(projekt(lage="rand", ke="exzentrizitaet", a_y=0, b_x=400, b_y=400,
+                                 V_d=400.0))[2]
+        a = befund.leisten.aussen.auswertung
+        k_e = beiwert_k_e(math.hypot(*a.schwerpunkt), kreisdurchmesser(a.flaeche))
+        self.assertAlmostEqual(befund.leisten.aussen.k_e, k_e)
+        self.assertLess(befund.leisten.aussen.k_e, befund.innen.k_e - 0.05)
+
+    def test_hinweis_wo_das_produkt_tabelle_21_ueberschreitet(self):
+        """
+        5.5.3.8, Tabelle 21: bei d = 404 mm höchstens 200 + d/6 = 267 mm zwischen
+        den Reihen; das Produkt stellt sie 0.75·d = 300 mm auseinander.
+        """
+        _, loesung, befund, _ = rechnen(projekt(h=450, b_x=400, b_y=400, V_d=2500.0))
+        self.assertAlmostEqual(max(befund.leisten.vorschlag.abstaende), 0.300)
+        self.assertIn("Tabelle 21 weniger zu", texte(loesung))
+
 
 class TestLeistenAnAussparungen(unittest.TestCase):
     """
@@ -267,7 +325,7 @@ class TestStahlpilz(unittest.TestCase):
         self.assertEqual((pilz.art, pilz.s, pilz.g), ("Doppelkreuz", 0.730, 0.150))
         self.assertLessEqual(pilz.h, 0.280 - produkte.PILZ_OBEN - produkte.PILZ_UNTEN)
 
-    def test_vier_nachweise_um_den_pilz(self):
+    def test_vier_urteile_um_den_pilz(self):
         """4.3.6.6.2: ausserhalb des Pilzes die Nachweise nach 4.3.6.3 bis 4.3.6.5."""
         faelle = [u.fall for u in self.loesung.urteile]
         self.assertEqual(faelle, ["mit Durchstanzbewehrung um den Stahlpilz",
@@ -319,15 +377,39 @@ class TestAnordnung(unittest.TestCase):
                                    radien[1], 1.5 * d)
         self.assertEqual(len(leisten), 8)
 
-    def test_leisten_beim_zweiten_anker_hoechstens_1_5_d_auseinander(self):
-        d = 0.234
-        radien = tuple(accumulate(produkte.abstaende(d, 2)))
+    def test_leisten_beim_zweiten_anker_hoechstens_1_5_d_v_auseinander(self):
+        """
+        5.5.3.9 misst in d_v: um einen Stahlpilz ist d_v kleiner als d, und die
+        Suche stellt die Leisten dichter -- hier d_v = 150 mm bei d = 234 mm.
+        """
+        d, d_v = 0.234, 0.150
         rund = Stuetzenflaeche(((0.0, 0.0),), 0.25)
-        leisten = leisten_anordnen(kandidaten_stuetze(rund, radien[1], 1e9)[0].stuecke,
-                                   radien[1], 1.5 * d)
-        zweite = [l.anker(radien)[1] for l in leisten]
+
+        class Reicht:
+            """Die Prüfung eines Vorschlags, der alles erfüllt."""
+            traegt = aussen_reicht = True
+
+            def __init__(self, vorschlag):
+                self.vorschlag = vorschlag
+
+        v = bemessen(d=d, d_v=d_v, d_v_out=d - 0.030, h_A=0.215,
+                     r_2_zu=lambda r: kandidaten_stuetze(rund, r, 1e9)[0].stuecke,
+                     umriss=rund.umriss(), raender=(), aussparungen=(), schatten=(),
+                     achse=(0.0, 0.0), ueberdeckung=0.030, pruefen=Reicht).vorschlag
+        zweite = [l.anker(v.radien)[1] for l in v.leisten]
         abstaende = [math.dist(zweite[i - 1], zweite[i]) for i in range(len(zweite))]
-        self.assertLessEqual(max(abstaende), 1.5 * d + 1e-9)
+        self.assertLessEqual(max(abstaende), 1.5 * d_v + 1e-9)
+
+    def test_tabelle_21(self):
+        """Unter d = 140 mm nichts; eine Grenze gehört zur Zeile darunter."""
+        self.assertIsNone(tabelle_21(0.139))
+        for d, phi, s_1 in ((0.140, 12, 0.6 * 140), (0.160, 12, 0.6 * 160),
+                            (0.161, 14, 0.66 * 161), (0.340, 20, 0.75 * 340),
+                            (0.341, 26, 200 + 341 / 6), (0.601, 30, 200 + 601 / 6)):
+            with self.subTest(d=d):
+                grenzen = tabelle_21(d)
+                self.assertAlmostEqual(grenzen.durchmesser, phi * 1e-3)
+                self.assertAlmostEqual(grenzen.s_1, s_1 * 1e-3)
 
     def test_aeusserer_schnitt_zaehlt_zwischen_ankern_hoechstens_3_d_v_out(self):
         """
@@ -387,8 +469,27 @@ class TestFormenUndLagen(unittest.TestCase):
         stelle = zwei[0].teile["d1"].objekt
         self.assertNotIn("e_x", stelle.eingaben())
 
+    def test_randstreifen_an_der_ecke_bis_zum_zweiten_rand(self):
+        """
+        Figur 25: an der Eckstütze 300 × 300 mit a = 0 reicht der Streifen innen
+        b_sr/2 = 450 mm weit, aussen nur bis zum zweiten Rand, 150 mm -- 600 statt
+        900 mm.
+        """
+        loesung = rechnen(projekt(lage="ecke", b_x=300, b_y=300, a_x=0, a_y=0, V_d=150.0))[1]
+        self.assertEqual(ergebnis(loesung, "b_srx"), r"900\,\mathrm{mm}")
+        self.assertEqual(ergebnis(loesung, "b_sx"), r"600\,\mathrm{mm}")
+        self.assertEqual(ergebnis(loesung, "b_sy"), r"600\,\mathrm{mm}")
+
+    def test_stufe_3_am_rand_r_s_mindestens_zwei_drittel_b_sr(self):
+        """4.3.6.4.8: senkrecht zum Rand r_s ≥ 2/3 · b_sr = 2/3 · (300 + 2 · 300) = 600 mm."""
+        befund = rechnen(projekt(lage="rand", a_y=0, stufe="3", r_sx=0.3, r_sy=0.3,
+                                 m_sdx=50.0, m_sdy=50.0, V_d=200.0))[2]
+        r_s = {r.richtung.value: r.r_s for r in befund.rotationen}
+        self.assertAlmostEqual(r_s["x"], 0.3)
+        self.assertAlmostEqual(r_s["y"], 0.6)
+
     def test_stufe_3_mit_momenten_von_hand(self):
-        """1.2 statt 1.5 vor der Klammer, r_s und m_sd wie eingegeben."""
+        """1.2 statt 1.5 als erster Faktor in (60), r_s und m_sd wie eingegeben."""
         befund = rechnen(projekt(stufe="3", r_sx=1.6, r_sy=1.6, m_sdx=100.0, m_sdy=100.0,
                                  V_d=500.0))[2]
         x = next(r for r in befund.rotationen if r.richtung.value == "x")

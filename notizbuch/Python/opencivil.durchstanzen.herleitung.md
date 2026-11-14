@@ -1,5 +1,5 @@
 ---
-erzeugt: 8412f61f4ac9
+erzeugt: 371fc7c1c0fb
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Schritte, die jeder Schnitt durchläuft -- was von ihm nicht zählt, der
-wirksame Umfang, die Querkraft und der Widerstand (58) --, einmal
+Die Schritte, die jeder Schnitt durchläuft -- was von ihm nicht zählt, k_e
+nach (57), der wirksame Umfang, die Querkraft und der Widerstand (58) --, einmal
 geschrieben: für den Schnitt um die Stütze ([[opencivil.durchstanzen.nachweis|.nachweis]]), um die
 äussersten Anker und um einen Stahlpilz ([[opencivil.durchstanzen.mit_bewehrung|.mit_bewehrung]]). Die Zahlen
 kommen aus der [[opencivil.durchstanzen.pruefung#Schnittpruefung|Schnittpruefung]], sie werden hier nicht
@@ -86,6 +86,15 @@ Was vom Schnitt nicht zählt -- neben den Ecken und hinter Aussparungen
 schon nicht mitzählt (die Formeln um Wandende und Wandecke). Die Zahl ist
 die der Auswertung, mit der auch die Prüfung rechnet.
 
+### k_e
+
+```python
+def k_e(p: Protokoll, w: Zwischenwerte, a: Auswertung, e_u: Tuple[float, float], *, ix: Index) -> Wert
+```
+
+k_e nach (57): b aus der Fläche im Schnitt, e_u von seinem Schwerpunkt
+zur Resultierenden der Auflagerkraft -- je Komponente, in m.
+
 ### wirksam
 
 ```python
@@ -132,7 +141,9 @@ V_Rd,c nach (58) an diesem Schnitt.
 
 ## Formeln aus diesem Modul
 
+- [[Beiwert der Momentenübertragung]] · `k_e`
 - [[Bemessungswert der Querkraft im Nachweisschnitt]] · `querkraft`
+- [[Durchmesser des flächengleichen Kreises]] · `k_e`
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · `widerstand`
 - [[Flächenlast innerhalb des Nachweisschnitts]] · `querkraft`
 - [[Nachweisschnitt ohne das, was nicht zählt]] · `abzuege`

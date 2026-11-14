@@ -198,6 +198,17 @@
       ]
     },
     {
+      "name": "Abstand zum Momentennullpunkt am Plattenrand",
+      "pfad": "Formelsammlung/Formeln/Abstand zum Momentennullpunkt am Plattenrand.md",
+      "art": "formel",
+      "zeichen": [
+        "r_{sy}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Anrechenbare Durchstanzbewehrung",
       "pfad": "Formelsammlung/Formeln/Anrechenbare Durchstanzbewehrung.md",
       "art": "formel",
@@ -717,6 +728,17 @@
       ]
     },
     {
+      "name": "Breite des Randstreifens an der Eckstütze",
+      "pfad": "Formelsammlung/Formeln/Breite des Randstreifens an der Eckstütze.md",
+      "art": "formel",
+      "zeichen": [
+        "b_{s,x}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
       "name": "Breite des Stützstreifens",
       "pfad": "Formelsammlung/Formeln/Breite des Stützstreifens.md",
       "art": "formel",
@@ -733,6 +755,17 @@
       "art": "formel",
       "zeichen": [
         "b_{sr,y}"
+      ],
+      "themen": [
+        "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Breite des Stützstreifens senkrecht zum Rand",
+      "pfad": "Formelsammlung/Formeln/Breite des Stützstreifens senkrecht zum Rand.md",
+      "art": "formel",
+      "zeichen": [
+        "b_{s,y}"
       ],
       "themen": [
         "Durchstanzen"
@@ -3498,6 +3531,7 @@
         "GestuetzteFlaeche.umfang",
         "GestuetzteFlaeche.k_e_naeherung",
         "GestuetzteFlaeche.momentengleichung",
+        "GestuetzteFlaeche.randbreite",
         "Stuetze",
         "Stuetze.masse",
         "Stuetze.kurz",
@@ -3511,9 +3545,11 @@
         "Randstuetze",
         "Randstuetze.raender",
         "Randstuetze.momentengleichung",
+        "Randstuetze.randbreite",
         "Eckstuetze",
         "Eckstuetze.raender",
         "Eckstuetze.momentengleichung",
+        "Eckstuetze.randbreite",
         "Wand",
         "Wand.masse",
         "Wand.kurz",
@@ -3541,6 +3577,7 @@
         "Index.symbol",
         "rand",
         "abzuege",
+        "k_e",
         "wirksam",
         "querkraft",
         "widerstand"
@@ -3556,6 +3593,10 @@
         "Ort",
         "_Werte",
         "nachweisen",
+        "_k_e",
+        "_k_e_schreiben",
+        "_verankerung_schreiben",
+        "_tabelle_21_pruefen",
         "_suchen",
         "_leisten_schreiben",
         "_pilz_pruefen",
@@ -3578,12 +3619,14 @@
         "Durchstanzen.pruefe",
         "Durchstanzen._statische_hoehe",
         "Durchstanzen._nachweisschnitt",
-        "Durchstanzen._exzentrizitaet",
+        "Durchstanzen.exzentrizitaet",
         "Durchstanzen._k_e",
         "Durchstanzen._rotation",
         "Durchstanzen._m_Rd",
         "Durchstanzen._m_sd",
         "Durchstanzen._b_sr",
+        "Durchstanzen._breite_am_rand",
+        "Durchstanzen._r_s_am_rand",
         "Durchstanzen._k_r",
         "angaben",
         "kennwerttabelle"
@@ -3614,6 +3657,11 @@
       "art": "modul",
       "kurz": "was der Durchstanznachweis rechnet, ohne Herleitung.",
       "stichworte": [
+        "Grenzen",
+        "tabelle_21",
+        "minderung",
+        "kreisdurchmesser",
+        "beiwert_k_e",
         "widerstand",
         "druckdiagonale",
         "spannung",
@@ -3711,6 +3759,7 @@
         "wirksame_stufe",
         "eingaben_fuer",
         "Durchstanzstelle",
+        "Durchstanzstelle.baustoffe",
         "Durchstanzstelle.abschnitt",
         "Durchstanzstelle.eingaben"
       ]

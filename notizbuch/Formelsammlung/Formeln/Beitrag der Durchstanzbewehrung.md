@@ -44,3 +44,6 @@ Fläche ([[Anrechenbare Durchstanzbewehrung]]) mal die Spannung, die sie bei
 der Rotation der Platte erreicht ([[Spannung in der Durchstanzbewehrung]]),
 mit $k_e$ gemindert wie der Umfang. Die Anker stehen senkrecht, $\sin\beta = 1$.
 Er muss die [[Querkraft für die Durchstanzbewehrung]] tragen.
+
+Liegt die Verankerung der Anker auf der Druckseite tiefer als $d_v/6$, ist der
+Beitrag um 30 % kleiner (5.5.3.11): vor der Formel steht dann 0.7.

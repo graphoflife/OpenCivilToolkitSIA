@@ -1,5 +1,5 @@
 ---
-erzeugt: 7c2af51a2135
+erzeugt: 55f0a69a7a6b
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.5.4, (69)"
@@ -8,14 +8,14 @@ normstelle: "SIA 262:2025, 4.3.6.5.4, (69)"
 > SIA 262:2025, 4.3.6.5.4, (69)
 
 $$
-\sigma_{sd} = \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right]
+\sigma_{sd} = \min\left[\frac{E_{s} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right]
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $E_s$ | Elastizitätsmodul des Betonstahls | N/mm² | Vorgabe |
+| $E_{s}$ | Elastizitätsmodul des Betonstahls | N/mm² | Vorgabe |
 | $\psi$ | – | – | [[Massgebende Plattenrotation – die grössere]] |
 | $f_{ctm}$ | Mittelwert der Zugfestigkeit | N/mm² | Vorgabe |
 | $f_{yd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
@@ -28,7 +28,7 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
 \begin{aligned}
-  \sigma_{sd} &= \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right] \\
+  \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
   &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0186}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
@@ -55,3 +55,7 @@ Die Durchstanzbewehrung wird erst gedehnt, wenn sich der kritische Schubriss
 die Spannung wächst mit $\psi$ und mit der Verbundwirkung, ausgedrückt durch
 $f_{ctm}$ und das Verhältnis von statischer Höhe und Ankerdurchmesser. Mehr als
 $f_{yd}$ kann sie nicht werden (4.3.6.5.4, Gleichung (69)).
+
+$f_{yd}$ und $E_s$ sind die des Stahls der Anker, B500B, nicht die der
+Biegebewehrung (4.3.6.5.4). Bis 2026-11-14 rechneten die Anker mit dem Stahl
+der Platte -- mit B700B um 40 % zu günstig.

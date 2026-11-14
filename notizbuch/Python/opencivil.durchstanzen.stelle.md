@@ -1,5 +1,5 @@
 ---
-erzeugt: 065b7b6b967f
+erzeugt: 3cadc04f6c2a
 art: modul
 tags: [modul]
 ---
@@ -16,6 +16,16 @@ Was einen Durchstanznachweis beschreibt, als Vorgaben im Rechenwerk
 Lage und Form der gestützten Fläche heissen, steht in [[opencivil.durchstanzen.flaeche|.flaeche]].
 Welche Felder der Nachweis liest, sagt [[opencivil.durchstanzen.stelle#eingaben_fuer|eingaben_fuer]] -- dieselben Teile
 bekommt die Maske über den Katalog, damit sie nichts davon nachbaut.
+
+
+## DER STAHL DER ANKER
+
+Die Durchstanzbewehrung hat ihren eigenen Stahl, den des Produkts
+([[opencivil.durchstanzen.produkte#Konstanten|.produkte.STAHL]]): in (67) und (69) gilt dessen Fliessgrenze
+(SIA 262:2025, 4.3.6.5.4). Er steht als Baustoff neben der Stelle, mit dem
+Index «sw» an seinen Zeichen; alle Stellen teilen ihn. Bis 2026-11-14
+rechneten die Anker mit dem Stahl der Biegebewehrung -- mit B700B um 40 %
+zu günstig.
 
 
 ## DECKE UND BODENPLATTE
@@ -76,7 +86,7 @@ Wo die Zugbewehrung über der gestützten Fläche liegt.
 def druckseite(self) -> str
 ```
 
-Die andere Seite -- dort liegen die unteren Köpfe der Durchstanzbewehrung.
+Die andere Seite -- von ihr aus misst c_v die Verankerung der Anker.
 
 ### Naeherungsstufe
 
@@ -180,7 +190,7 @@ b_x, eine Innenstütze keinen Randabstand.
 - `stahl: Baustoff` – Der Stahl der Biegebewehrung.
 - `h: Groesse`
 - `c: Groesse` – Die Überdeckung auf der Zugseite.
-- `c_v: Groesse` – Die Überdeckung der Durchstanzbewehrung auf der Druckseite (Figur 26).
+- `c_v: Groesse` – Der Abstand der Verankerung der Durchstanzbewehrung von der Oberfläche der Druckseite (SIA 262:2025, Figur 26) -- bei ancoPLUS bis zu den Köpfen.
 - `D_max: Groesse`
 - `phi_x: Groesse`
 - `s_x: Groesse`
@@ -209,6 +219,16 @@ b_x, eine Innenstütze keinen Randabstand.
 - `aussparungen: Sequence[Sequence[Punkt]] = ()` – Je Aussparung ihre Ecken, in m.
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
 - `berechnungen: List[Berechnung] = field(default_factory=list, init=False)`
+- `anker: Baustoff = field(init=False)` – Der Stahl der Durchstanzbewehrung -- siehe Dateikopf.
+
+#### Durchstanzstelle.baustoffe
+
+```python
+@property
+def baustoffe(self) -> Tuple[Baustoff, ...]
+```
+
+Der Stahl der Anker -- Beton und Biegebewehrung meldet das Projekt an.
 
 #### Durchstanzstelle.abschnitt
 
@@ -228,6 +248,7 @@ Die Kurznamen, die der Nachweis liest -- siehe [[opencivil.durchstanzen.stelle#e
 
 ## Konstanten
 
+- `ANKERSTAHL = 'produkt.ancoplus'` – Der Namensraum des Stahls der Anker -- einer für alle Stellen.
 - `VOR_DEN_MASSEN = ('h', 'c', 'c_v', 'D_max', 'phi_x', 's_x', 'phi_y', 's_y')` – Was der Nachweis an jeder Stelle liest -- vor den Massen der gestützten Fläche und danach.
 - `NACH_DEN_MASSEN = ('V_d', 'q_d')`
 
@@ -240,12 +261,15 @@ Die Kurznamen, die der Nachweis liest -- siehe [[opencivil.durchstanzen.stelle#e
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.durchstanzen.flaeche]]
+- [[opencivil.durchstanzen.produkte]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.material.basis]]
+- [[opencivil.material.betonstahl]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.durchstanzen]]

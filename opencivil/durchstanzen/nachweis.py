@@ -24,17 +24,23 @@ Platte reicht (Figur 21).
 DIE PLATTENROTATION (4.3.6.4.2):
 In Näherungsstufe 1 ist ``m_sd/m_Rd = 1``; in Stufe 2 kommen die Momente im
 Stützstreifen aus den Gleichungen (62) bis (65), in Stufe 3 gibt sie der
-Benutzer an, mit 1.2 statt 1.5 vor der Klammer. ``r_s = 0.22 · l`` in den
+Benutzer an, und in (60) steht 1.2 statt 1.5 als erster Faktor; an Rand- und
+Eckstützen gilt dann r_s ≥ 2/3 · b_sr (4.3.6.4.8). ``r_s = 0.22 · l`` in den
 Stufen 1 und 2 (4.3.6.4.4). Massgebend ist die grössere Rotation der beiden
 Richtungen. Für Wandende und Wandecke nennt 4.3.6.4.7 keine Momente; dort
 rechnet Stufe 2 wie Stufe 1, und die Herleitung sagt es.
 
-DIE BREITE DER STÜTZSTREIFEN (Figur 25), gelesen (nicht nachgeschlagen):
+DIE BREITE DER STÜTZSTREIFEN (4.3.6.4.6, Figur 25):
 ``b_s = 1.5 · √(r_sx · r_sy) ≤ l_min``. Ein Streifen senkrecht zum Rand einer
 Randstütze und die Randstreifen einer Eckstütze sind auf ``b_sr`` begrenzt:
 die Breite, die zwei Linien unter 45° von den inneren Ecken der Stütze am
 Plattenrand einschliessen, ``b_sr = b_x + 2 · (b_y + a_y)`` für den Streifen
-in y, entsprechend in x, höchstens ``b_s``.
+in y, entsprechend in x. An der Randstütze ist der Streifen
+``min[b_s; b_sr]`` breit. An der Eckstütze schneidet ihn quer der zweite
+Rand ab: die halbe Breite ``min[b_s; b_sr]/2`` innen, zum zweiten Rand hin
+nur bis zu ihm, ``b_x/2 + a_x`` für den Streifen in y, höchstens ebenso viel.
+Bis 2026-11-14 lag er an der Ecke symmetrisch um die Achse, bis zu 50 %
+breiter, als Figur 25 ihn zeigt.
 
 EINHEITEN:
 SI-Basis; wo die Norm in mm rechnet (59), sagt es die Herleitung.
@@ -54,7 +60,7 @@ from opencivil.core.protokoll import GleichungBlock, Protokoll, TabellenBlock, Z
 from opencivil.core.wert import Wert, WertDef
 from opencivil.durchstanzen import herleitung, mit_bewehrung
 from opencivil.durchstanzen.herleitung import STUETZE
-from opencivil.durchstanzen.flaeche import Randbreite
+from opencivil.durchstanzen.flaeche import Mass, Masse, Randbreite
 from opencivil.durchstanzen.mit_bewehrung import Grundlage
 from opencivil.durchstanzen.pruefung import Leistenpruefung, Pilzbefund, Schnittpruefung
 from opencivil.durchstanzen.schnitt import Auswertung, Punkt, nachweisschnitt
@@ -109,7 +115,7 @@ class Durchstanzbefund:
     """Je Plattenrand ein Punkt auf ihm und die Richtung, in die die Platte liegt (rad)."""
 
     leisten: Optional[Leistenpruefung] = None
-    """Die vorgeschlagene Durchstanzbewehrung mit ihren vier Nachweisen."""
+    """Die vorgeschlagene Durchstanzbewehrung mit ihren Nachweisen (4.3.6.5.1)."""
 
     pilz: Optional[Pilzbefund] = None
     """Der gewählte Stahlpilz; mit ``leisten`` stehen die Leisten um ihn."""
@@ -142,17 +148,23 @@ class Durchstanzen(Nachweis):
             "Erfüllungsgrad erste Betondruckdiagonale", "SIA 262:2025, 4.3.6.5.8")
         self.d_aussen: WertDef = grad_def(
             f"{basis}.aussen.erfuellungsgrad", r"\alpha_{eff,DS,out}",
-            "Erfüllungsgrad ausserhalb der Durchstanzbewehrung", "SIA 262:2025, 4.3.6.5.10")
+            "Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes",
+            "SIA 262:2025, 4.3.6.5.10; 4.3.6.6.2")
         bezuege = [Eingabebezug(n, stelle.id_von(n)) for n in stelle.eingaben()]
         bezuege += [stelle.beton.bezug(k) for k in ("f_ck", "f_ctm", "f_cd", "tau_cd")]
         bezuege += [stelle.stahl.bezug(k) for k in ("f_yd", "E_s")]
+        bezuege += [stelle.anker.bezug(k) for k in ("f_yd", "E_s")]
         super().__init__(basis, ausgaben=[self.d_ohne, *self.mit_graden], bezuege=bezuege,
                          titel=f"Durchstanzen – {stelle.name}", referenz="SIA 262:2025, 4.3.6",
                          abschnitt=stelle.abschnitt)
 
     @property
     def mit_graden(self) -> Tuple[WertDef, ...]:
-        """Die Grade der vier Nachweise mit Durchstanzbewehrung (4.3.6.5.1)."""
+        """
+        Die vier Grade mit Durchstanzbewehrung: die drei Nachweise nach
+        4.3.6.5.1, der erste geteilt in den Beitrag der Bewehrung (66), (68)
+        und das Verformungsvermögen (67).
+        """
         return (self.d_mit, self.d_verformung, self.d_diagonale, self.d_aussen)
 
     def nicht_fuehrbar(self, grund: str) -> List[NachweisUrteil]:
@@ -180,7 +192,7 @@ class Durchstanzen(Nachweis):
                                   achse=f.achse(masse), aussparungen=s.aussparungen)
         a = schnitt.massgebend
         u_red = self._nachweisschnitt(e, p, w, a, d_v)
-        e_u = self._exzentrizitaet(e, a, masse)
+        e_u = self.exzentrizitaet(e, a, masse)
         k_e = self._k_e(e, p, w, a, e_u)
         innen = Schnittpruefung(schnitt, dv, k_e.groesse.si, e.g("V_d").si, e.g("q_d").si)
         u = herleitung.wirksam(p, w, k_e, u_red, ix=STUETZE,
@@ -297,11 +309,11 @@ class Durchstanzen(Nachweis):
                        "einer Ecke entfernt liegt.",
             ecken_referenz="SIA 262:2025, 4.3.6.2.3, Figur 23a")
 
-    def _exzentrizitaet(self, e: Eingaben, a: Auswertung,
-                        masse: Dict[str, float]) -> Tuple[float, float]:
+    def exzentrizitaet(self, e: Eingaben, a: Auswertung, masse: Masse) -> Tuple[float, float]:
         """
-        e_u: von dem Schwerpunkt der zählenden Teile des Schnitts zur Resultierenden
-        der Auflagerkraft -- je Komponente, in m.
+        e_u: von dem Schwerpunkt der zählenden Teile eines Schnitts zur
+        Resultierenden der Auflagerkraft -- je Komponente, in m. Gilt für jeden
+        Schnitt: um die Stütze, um die äussersten Anker und um den Pilz.
         """
         ax, ay = self.stelle.flaeche.achse(masse)
         ex = e.g("e_x").si if e.hat("e_x") else 0.0
@@ -322,24 +334,11 @@ class Durchstanzen(Nachweis):
                 "Platte anschliessen, aber keine Horizontalkräfte abtragen.")
             p.wert(k_e, titel=titel, referenz="SIA 262:2025, 4.3.6.2.5")
             return k_e
-        A = w.wert("A_u", "A_u", Groesse.aus_si(a.flaeche, M2), 3,
-                   "Fläche innerhalb des Nachweisschnitts")
-        p.wert(A, titel="Fläche innerhalb des Nachweisschnitts", referenz="SIA 262:2025, Figur 22")
-        b = w.laenge("b", "b", math.sqrt(4.0 * a.flaeche / math.pi), stellen=0)
-        p.formel(b, r"\sqrt{\frac{4 \cdot @A_u}{\pi}}", {"A_u": A},
-                 titel="Durchmesser des flächengleichen Kreises", referenz="SIA 262:2025, 4.3.6.2.4")
-        e_u_si = math.hypot(*e_u)
-        e_u_w = w.laenge("e_u", "e_u", e_u_si, stellen=0)
         p.erklaerung(
             "e_u ist der Abstand zwischen der Resultierenden der Auflagerkraft -- in der "
             "Stützenachse, verschoben um die Exzentrizität e_x, e_y -- und dem Schwerpunkt der "
             "zählenden Teile des Nachweisschnitts.")
-        p.wert(e_u_w, titel="Exzentrizität zum Schwerpunkt des Nachweisschnitts",
-               referenz="SIA 262:2025, 4.3.6.2.4")
-        k_e = w.zahl("k_e", "k_e", 1.0 / (1.0 + e_u_si / b.groesse.si), stellen=3)
-        p.formel(k_e, r"\frac{1}{1 + \frac{@e_u}{@b}}", {"e_u": e_u_w, "b": b},
-                 titel="Beiwert der Momentenübertragung", referenz="SIA 262:2025, 4.3.6.2.4, (57)")
-        return k_e
+        return herleitung.k_e(p, w, a, e_u, ix=STUETZE)
 
     # -- Plattenrotation ----------------------------------------------------
 
@@ -360,14 +359,15 @@ class Durchstanzen(Nachweis):
                Naeherungsstufe.ZWEI: "die mittleren Momente im Stützstreifen nach den "
                                      "Gleichungen (62) bis (65).",
                Naeherungsstufe.DREI: "r_s und die mittleren Momente im Stützstreifen aus einer "
-                                     "Berechnung nach der Elastizitätstheorie; 1.2 statt 1.5 "
-                                     "vor der Klammer."}[stufe])
+                                     "Berechnung nach der Elastizitätstheorie; in (60) steht "
+                                     "1.2 statt 1.5 als erster Faktor."}[stufe])
         f_yd, E_s = e[s.stahl.eingabename("f_yd")], e[s.stahl.eingabename("E_s")]
         r_s: Dict[Richtung, Wert] = {}
         for r in (Richtung.X, Richtung.Y):
             k = r.value
             if stufe is Naeherungsstufe.DREI:
-                r_s[r] = e[f"r_s{k}"]
+                rand = s.flaeche.randbreite(r, masse)
+                r_s[r] = e[f"r_s{k}"] if rand is None else self._r_s_am_rand(e, p, w, r, rand)
             else:
                 r_s[r] = w.laenge(f"r_s{k}", f"r_{{s{k}}}", R_S * e.g(f"l_{k}").si, stellen=0)
                 p.formel(r_s[r], rf"{R_S} \cdot @l", {"l": e[f"l_{k}"]},
@@ -430,12 +430,15 @@ class Durchstanzen(Nachweis):
         x = w.laenge(f"x_{k}", f"x_{k}", x_si)
         p.formel(x, rf"\frac{{@a_s \cdot @f_yd}}{{{BLOCKANTEIL} \cdot @f_cd}}",
                  {"a_s": a_s, "f_yd": f_yd, "f_cd": f_cd},
-                 titel=f"Druckzonenhöhe in {k}, je Meter", name="Druckzonenhöhe im Stützstreifen")
+                 titel=f"Druckzonenhöhe in {k}, je Meter",
+                 referenz="SIA 262:2025, 4.2.1.5, Figur 12",
+                 name="Druckzonenhöhe im Stützstreifen")
         m_si = a_s_si * f_yd.groesse.si * (d_r.groesse.si - BLOCKANTEIL * x_si / 2.0)
         m = w.wert(f"m_Rd{k}", f"m_{{Rd,{k}}}", Groesse.aus_si(m_si, KNM_PRO_M), 1)
         p.formel(m, rf"@a_s \cdot @f_yd \cdot \left(@d - \frac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right)",
                  {"a_s": a_s, "f_yd": f_yd, "d": d_r, "x": x},
-                 titel=f"Biegewiderstand im Stützstreifen in {k}", referenz="SIA 262:2025, 4.3.6.4.5",
+                 titel=f"Biegewiderstand im Stützstreifen in {k}",
+                 referenz="SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12",
                  name="Biegewiderstand im Stützstreifen")
         return m
 
@@ -445,19 +448,25 @@ class Durchstanzen(Nachweis):
         """Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7)."""
         s = self.stelle
         l_min = min(e.g("l_x").si, e.g("l_y").si)
-        b_s_si = min(1.5 * math.sqrt(r_s[Richtung.X].groesse.si * r_s[Richtung.Y].groesse.si), l_min)
-        b_s = w.laenge("b_s", "b_s", b_s_si, stellen=0)
+        frei = 1.5 * math.sqrt(r_s[Richtung.X].groesse.si * r_s[Richtung.Y].groesse.si)
+        b_s = w.laenge("b_s", "b_s", min(frei, l_min), "Breite des Stützstreifens", stellen=0)
         p.formel(b_s, r"\min\left[1.5 \cdot \sqrt{@r_sx \cdot @r_sy};\ @l_min\right]",
                  {"r_sx": r_s[Richtung.X], "r_sy": r_s[Richtung.Y],
-                  "l_min": w.laenge("l_min", "l_{min}", l_min, stellen=0)},
+                  "l_min": w.laenge("l_min", "l_{min}", l_min, "Die kleinere Spannweite",
+                                    stellen=0)},
                  titel="Breite des Stützstreifens", referenz="SIA 262:2025, 4.3.6.4.6, (61)")
+        if l_min < frei:
+            p.text("l_min ist hier die kleinere der beiden eingegebenen Spannweiten, je die "
+                   "grössere der angrenzenden. Ist ein angrenzendes Feld kürzer, gilt seine "
+                   "Spannweite, und b_s wird kleiner (4.3.6.4.6).")
         V = V_d.groesse.si
         ergebnis: Dict[Richtung, Optional[Wert]] = {}
         for r, e_i in ((Richtung.X, e_u[0]), (Richtung.Y, e_u[1])):
             k = r.value
             e_w = w.laenge(f"e_u{k}", f"e_{{u,{k}}}", abs(e_i), stellen=0)
             g = s.flaeche.momentengleichung(r, masse)
-            breite = b_s if g.rand is None else self._b_sr(p, w, r, b_s, g.rand)
+            rand = s.flaeche.randbreite(r, masse)
+            breite = b_s if rand is None else self._breite_am_rand(p, w, r, b_s, rand)
             m_si = max(V * (1.0 / 8.0 + abs(e_i) / (g.teiler * breite.groesse.si)), g.mindest * V)
             m = w.wert(f"m_sd{k}", f"m_{{sd,{k}}}", Groesse.aus_si(m_si, KNM_PRO_M), 1)
             nenner = r"2 \cdot @b" if g.teiler == 2.0 else "@b"
@@ -471,25 +480,73 @@ class Durchstanzen(Nachweis):
             ergebnis[r] = m
         return ergebnis
 
-    def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert,
-              rand: Randbreite) -> Wert:
-        """
-        Die Breite eines Streifens senkrecht zum Rand oder eines Randstreifens an
-        der Ecke (Figur 25) -- siehe Dateikopf.
-        """
+    @staticmethod
+    def _mass(w: Zwischenwerte, mass: Mass) -> Wert:
+        was = ("Abstand der Stütze vom Plattenrand" if mass.name.startswith("a_")
+               else "Abmessung der Stütze")
+        return w.laenge(mass.name, mass.zeichen, mass.wert, was, stellen=0)
+
+    def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, rand: Randbreite) -> Wert:
+        """b_sr des Streifens in ``r``: zwischen den Linien unter 45° (Figur 25) -- siehe Kopf."""
         quer, laengs, a = rand.quer, rand.laengs, rand.abstand
-        breite_si = quer.wert + 2.0 * (laengs.wert + a.wert)
-        b_sr = w.laenge(f"b_sr{r.value}", f"b_{{sr,{r.value}}}", min(b_s.groesse.si, breite_si),
-                        stellen=0)
-        p.formel(b_sr, r"\min\left[@b_s;\ @quer + 2 \cdot \left(@laengs + @a\right)\right]",
-                 {"b_s": b_s,
-                  "quer": w.laenge(quer.name, quer.zeichen, quer.wert, stellen=0),
-                  "laengs": w.laenge(laengs.name, laengs.zeichen, laengs.wert, stellen=0),
-                  "a": w.laenge(a.name, a.zeichen, a.wert, stellen=0)},
-                 titel=f"Breite des Stützstreifens in {r.value}, durch den Plattenrand begrenzt",
+        b_sr = w.laenge(f"b_sr{r.value}", f"b_{{sr,{r.value}}}",
+                        quer.wert + 2.0 * (laengs.wert + a.wert),
+                        "Grenze der Breite des Stützstreifens am Plattenrand", stellen=0)
+        p.formel(b_sr, r"@quer + 2 \cdot \left(@laengs + @a\right)",
+                 {"quer": self._mass(w, quer), "laengs": self._mass(w, laengs),
+                  "a": self._mass(w, a)},
+                 titel=f"Grenze der Breite des Stützstreifens in {r.value} am Plattenrand: "
+                       f"zwischen den Linien unter 45° von den inneren Ecken der Stütze",
                  referenz="SIA 262:2025, 4.3.6.4.6, Figur 25",
                  name="Breite des Stützstreifens am Plattenrand")
         return b_sr
+
+    def _breite_am_rand(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert,
+                        rand: Randbreite) -> Wert:
+        """
+        Die Breite eines Streifens, den der Plattenrand begrenzt: höchstens
+        b_sr, an der Ecke vom zweiten Rand abgeschnitten -- siehe Dateikopf.
+        """
+        k = r.value
+        b_sr = self._b_sr(p, w, r, rand)
+        halb = min(b_s.groesse.si, b_sr.groesse.si) / 2.0
+        if rand.zweiter is None:
+            breite = w.laenge(f"b_s{k}", f"b_{{s,{k}}}", 2.0 * halb,
+                              f"Breite des Stützstreifens in {k}", stellen=0)
+            p.formel(breite, r"\min\left[@b_s;\ @b_sr\right]", {"b_s": b_s, "b_sr": b_sr},
+                     titel=f"Breite des Stützstreifens in {k}, senkrecht zum Rand",
+                     referenz="SIA 262:2025, 4.3.6.4.6, Figur 25",
+                     name="Breite des Stützstreifens senkrecht zum Rand")
+            return breite
+        quer, zweiter = rand.quer, rand.zweiter
+        breite = w.laenge(f"b_s{k}", f"b_{{s,{k}}}",
+                          halb + min(halb, quer.wert / 2.0 + zweiter.wert),
+                          f"Breite des Stützstreifens in {k}", stellen=0)
+        haelfte = r"\frac{\min\left[@b_s;\ @b_sr\right]}{2}"
+        p.formel(breite, rf"{haelfte} + \min\left[{haelfte};\ \frac{{@quer}}{{2}} + @a\right]",
+                 {"b_s": b_s, "b_sr": b_sr, "quer": self._mass(w, quer),
+                  "a": self._mass(w, zweiter)},
+                 titel=f"Breite des Randstreifens in {k}: innen die halbe, aussen bis zum "
+                       f"zweiten Plattenrand",
+                 referenz="SIA 262:2025, 4.3.6.4.6, Figur 25",
+                 name="Breite des Randstreifens an der Eckstütze")
+        return breite
+
+    def _r_s_am_rand(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r: Richtung,
+                     rand: Randbreite) -> Wert:
+        """In Stufe 3 an Rand- und Eckstützen: r_s mindestens 2/3 · b_sr (4.3.6.4.8)."""
+        k = r.value
+        eingabe = e[f"r_s{k}"]
+        b_sr = self._b_sr(p, w, r, rand)
+        r_s = w.laenge(f"r_s{k}", f"r_{{s{k}}}",
+                       max(eingabe.groesse.si, 2.0 / 3.0 * b_sr.groesse.si),
+                       f"Abstand zum Momentennullpunkt in {k}", stellen=0)
+        p.formel(r_s, r"\max\left[@r_s;\ \frac{2}{3} \cdot @b_sr\right]",
+                 {"r_s": eingabe, "b_sr": b_sr},
+                 titel=f"Abstand zum Momentennullpunkt in {k}: am Plattenrand mindestens "
+                       f"2/3 · b_sr", referenz="SIA 262:2025, 4.3.6.4.8",
+                 name="Abstand zum Momentennullpunkt am Plattenrand")
+        return r_s
 
     # -- k_r ----------------------------------------------------------------
 

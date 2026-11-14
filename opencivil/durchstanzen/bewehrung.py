@@ -12,11 +12,11 @@ DIE ANORDNUNG:
 Die Leisten stehen senkrecht auf dem Rand der gestützten Fläche, an Ecken und
 Rundungen radial. Ihre zweiten Anker liegen auf der Linie im Abstand r_2 um
 die gestützte Fläche; entlang dieser Linie stehen zwei Leisten höchstens
-e_max auseinander, als Sehne gemessen. Auf jeder geraden Seite steht an
-beiden Enden eine Leiste und dazwischen gleichmässig so viele wie nötig, auf
-den Rundungen ebenso. Das ist der Grundriss der Herstellerunterlagen, die
-Regeln dazu sind die des Produkts (:mod:`.produkte`) -- nach Vorgabe, nicht
-nachgeschlagen.
+e_max = 1.5·d_v auseinander (SIA 262:2025, 5.5.3.9), als Sehne gemessen. Auf
+jeder geraden Seite steht an beiden Enden eine Leiste und dazwischen
+gleichmässig so viele wie nötig, auf den Rundungen ebenso. Das ist der
+Grundriss der Herstellerunterlagen; die Abstände der Anker sind die des
+Produkts (:mod:`.produkte`) -- nach Vorgabe, nicht nachgeschlagen.
 
 AN RÄNDERN UND AUSSPARUNGEN (:func:`setzen`):
 Eine Leiste ist ein Stahlstück vom Rand der gestützten Fläche bis zu ihrem
@@ -283,7 +283,7 @@ def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float,
 
     bester = None
     for dichte in DICHTEN:
-        alle = leisten_anordnen(r_2_zu(r_2), r_2, dichte * produkte.TANGENTIAL * d)
+        alle = leisten_anordnen(r_2_zu(r_2), r_2, dichte * produkte.TANGENTIAL * d_v)
         for typ in typen:
             for anzahl in produkte.ANKER_JE_LEISTE:
                 pruefung = versuch(alle, typ, anzahl)
@@ -295,5 +295,5 @@ def bemessen(*, d: float, d_v: float, d_v_out: float, h_A: float,
                 bester = pruefung
     if bester is not None:
         return bester
-    dichteste = leisten_anordnen(r_2_zu(r_2), r_2, DICHTEN[-1] * produkte.TANGENTIAL * d)
+    dichteste = leisten_anordnen(r_2_zu(r_2), r_2, DICHTEN[-1] * produkte.TANGENTIAL * d_v)
     return versuch(dichteste, typen[-1], produkte.ANKER_JE_LEISTE[-1])

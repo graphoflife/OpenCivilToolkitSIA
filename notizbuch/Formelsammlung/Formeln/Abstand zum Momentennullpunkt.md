@@ -49,4 +49,5 @@ das negative Moment reicht: bis zum Momentennullpunkt im Abstand $r_s$ von der
 Stützenachse. In den Näherungsstufen 1 und 2 wird er aus der Spannweite
 geschätzt, mit der grösseren der angrenzenden Spannweiten je Richtung
 (4.3.6.4.4). In Stufe 3 kommt $r_s$ aus einer Berechnung nach der
-Elastizitätstheorie und wird eingegeben.
+Elastizitätstheorie und wird eingegeben; an Rand- und Eckstützen gilt ein
+Mindestwert ([[Abstand zum Momentennullpunkt am Plattenrand]]).

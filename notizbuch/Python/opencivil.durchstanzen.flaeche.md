@@ -1,5 +1,5 @@
 ---
-erzeugt: 04866cab6b11
+erzeugt: 20cc9764fef6
 art: modul
 tags: [modul]
 ---
@@ -15,7 +15,8 @@ je Lage eine Art gestützter Fläche: [[opencivil.durchstanzen.flaeche#Innenstue
 [[opencivil.durchstanzen.flaeche#Wandende|Wandende]] und [[opencivil.durchstanzen.flaeche#Wandecke|Wandecke]]. Jede Art weiss, was der Nachweis
 von ihr braucht -- ihre Masse, den Umriss, die Achse, die Plattenränder, die
 Kandidaten des Nachweisschnitts, u_0 als Formel, wo es eine gibt, die
-Näherung für k_e, die Gleichungen der Momente im Stützstreifen und ob das
+Näherung für k_e, die Gleichungen der Momente im Stützstreifen, welche
+Streifen der Plattenrand begrenzt (Figur 25) und ob das
 Werkzeug Durchstanzbewehrung und Stahlpilze vorschlägt. Welche Art es ist,
 entscheidet [[opencivil.durchstanzen.flaeche#Lage.flaeche|Lage.flaeche]] einmal. Bis 2026-11-10 fragten Stelle,
 Nachweis, Bewehrung und Maske an 28 Stellen nach Lage und Form.
@@ -74,11 +75,17 @@ class Randbreite
 
 Was die Breite b_sr eines Stützstreifens am Plattenrand bestimmt
 (Figur 25): b_sr = quer + 2 · (längs + a), mit den Abmessungen der Stütze
-quer und längs zum Streifen und ihrem Abstand zum Rand.
+quer und längs zum Streifen und ihrem Abstand a zum Rand, auf den der
+Streifen zuläuft -- die Breite zwischen zwei Linien unter 45° von den
+inneren Ecken der Stütze. An der Eckstütze liegt quer zum Streifen ein
+zweiter Rand, `zweiter` ist der Abstand der Stütze zu ihm: er schneidet
+den Streifen ab, auf dieser Seite reicht er von der Achse nur bis zum
+Rand, höchstens b_sr/2.
 
 - `quer: Mass`
 - `laengs: Mass`
 - `abstand: Mass`
+- `zweiter: Optional[Mass] = None`
 
 ### Momentengleichung
 
@@ -89,12 +96,12 @@ class Momentengleichung
 
 Wie 4.3.6.4.7 das mittlere Moment im Stützstreifen einer Richtung rechnet:
 m_sd = max[V_d · (1/8 + e_u / (teiler · b)); mindest · V_d]. Die Breite b
-ist b_s, am Plattenrand b_sr nach `rand`.
+ist b_s, wo der Plattenrand den Streifen begrenzt, die Breite nach
+[[opencivil.durchstanzen.flaeche#GestuetzteFlaeche.randbreite|GestuetzteFlaeche.randbreite]].
 
 - `nummer: str`
 - `teiler: float`
 - `mindest: float = 0.0`
-- `rand: Optional[Randbreite] = None`
 
 ### Stuetzenform
 
@@ -291,6 +298,15 @@ def momentengleichung(self, r: Richtung, masse: Masse) -> Momentengleichung
 
 Die Gleichung der Momente im Stützstreifen in `r` -- nur, wo [[opencivil.durchstanzen.flaeche#GestuetzteFlaeche|momente]] gilt.
 
+#### GestuetzteFlaeche.randbreite
+
+```python
+def randbreite(self, r: Richtung, masse: Masse) -> Optional[Randbreite]
+```
+
+Was den Stützstreifen in `r` am Plattenrand begrenzt (4.3.6.4.6,
+Figur 25) -- nichts, wo kein Rand ihn begrenzt.
+
 ### Stuetze
 
 ```python
@@ -337,7 +353,7 @@ def umriss(self, masse: Masse, d_v: float) -> List[Punkt]
 def _randbreite(self, r: Richtung, masse: Masse) -> Randbreite
 ```
 
-Der Streifen in `r` am Plattenrand: quer zu ihm die Stütze, längs ihr Abstand zum Rand.
+Der Streifen in `r` zum Plattenrand hin: quer zu ihm die Stütze, längs ihr Abstand.
 
 ### Innenstuetze
 
@@ -398,7 +414,15 @@ Der Rand unten.
 def momentengleichung(self, r: Richtung, masse: Masse) -> Momentengleichung
 ```
 
-Parallel zum Rand (63), senkrecht zu ihm (64) mit b_sr.
+Parallel zum Rand (63), senkrecht zu ihm (64).
+
+#### Randstuetze.randbreite
+
+```python
+def randbreite(self, r: Richtung, masse: Masse) -> Optional[Randbreite]
+```
+
+Nur der Streifen senkrecht zum Rand, in y.
 
 ### Eckstuetze
 
@@ -424,6 +448,14 @@ Der Rand unten und der links.
 ```python
 def momentengleichung(self, r: Richtung, masse: Masse) -> Momentengleichung
 ```
+
+#### Eckstuetze.randbreite
+
+```python
+def randbreite(self, r: Richtung, masse: Masse) -> Optional[Randbreite]
+```
+
+Beide Streifen; quer zu jedem liegt der zweite Rand.
 
 ### Wand
 

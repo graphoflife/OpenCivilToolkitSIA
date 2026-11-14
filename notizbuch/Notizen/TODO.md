@@ -409,11 +409,6 @@ Norm dazu sagt.
       der gestützten Fläche und entlang einer Wand von ihrem Ende her; eine
       Strecke, die von einer Ecke zum freien Plattenrand läuft (Figur 22d),
       zählt ganz.
-- [ ] **Durchstanzen, Breite b_sr der Stützstreifen am Rand (Figur 25).**
-      Eingebaut: die Breite, die zwei Linien unter 45° von den inneren Ecken
-      der Stütze am Plattenrand einschliessen -- `b_sr = b_x + 2·(b_y + a_y)`
-      für den Streifen in y, entsprechend in x, höchstens b_s. Aus dem Bild
-      gelesen, nicht nachgeschlagen.
 - [ ] **Durchstanzen, Näherungsstufe 2 an Wandende und Wandecke.**
       4.3.6.4.7 nennt Momente nur für Innen-, Rand- und Eckstützen. Eingebaut:
       dort rechnet Stufe 2 wie Stufe 1 (m_sd/m_Rd = 1), und die Herleitung
@@ -427,19 +422,18 @@ Norm dazu sagt.
 - [ ] **Durchstanzbewehrung: die Regeln von ancoPLUS.** Eingebaut nach dem
       Gutachten Muttoni / Fernández Ruiz 2007 (zu SIA 262:2003):
       Abstände 0.375·d / 0.60·d bis zum dritten Anker / danach 0.75·d,
-      Leisten beim zweiten Anker höchstens 1.5·d auseinander, ⌀ je nach d
-      (Tabelle 1), k_sys = 3.0 bei c_v ≤ d/10 und 2.0 bei c_v ≥ d/6
-      (dazwischen linear) für Innenstützen und Wandenden, 2.0 am Rand und an
-      der Ecke, Obergrenze 3.5. Die Höhe h_A = h − c_nom − c_v auf …5 mm
-      abgerundet stammt aus der Zulassung ETA-13/0196 und zwei Beispielen. Zu
-      prüfen gegen das Gutachten zu SIA 262:2025, das nicht lesbar war, und
-      gegen die Konstruktionsregeln 5.5.3.7 bis 5.5.3.12 der Norm, die nicht
-      vorliegen.
-- [ ] **Durchstanzbewehrung: d_v,out und k_e im äusseren Schnitt.**
-      Eingebaut: d_v,out = d − c_v (aus Figur 26 gelesen), k_e wie im inneren
-      Schnitt (aus der Exzentrizität wäre es aussen grösser).
-- [ ] **Stufe 3 an Rand- und Eckstützen: r_s ≥ 2/3·b_sr (4.3.6.4.8).** Noch
-      nicht geprüft: r_s wird genommen, wie eingegeben.
+      ⌀ je nach d (Tabelle 1), k_sys = 3.0 bei c_v ≤ d/10 und 2.0 bei
+      c_v ≥ d/6 (dazwischen linear) für Innenstützen und Wandenden, 2.0 am
+      Rand und an der Ecke, Obergrenze 3.5. Die Höhe h_A = h − c_nom − c_v
+      auf …5 mm abgerundet stammt aus der Zulassung ETA-13/0196 und zwei
+      Beispielen. Nach der Norm geprüft (2026-11-14): Leisten beim zweiten
+      Anker höchstens 1.5·d_v auseinander (5.5.3.9), Anker aus B500B mit
+      eigenem f_yd (4.3.6.5.4), −30 % auf (68) und (70) bei c_v > d_v/6
+      (5.5.3.11). **Zu entscheiden:** Tabelle 21 (5.5.3.12) lässt bei
+      d ≤ 180 mm und d > 340 mm engere Reihen zu, als das Produkt stellt
+      (bei d = 404 mm 267 statt 300 mm). Heute steht nur ein Hinweis in der
+      Herleitung. Empfehlung: auf Tabelle 21 begrenzen, ausser das Gutachten
+      deckt die Abstände (4.3.6.5.6).
 - [ ] **Durchstanzbewehrung an Aussparungen.** Eingebaut: eine Leiste hält
       zur Aussparung die Überdeckung c_nom, wie zum Plattenrand (nach Vorgabe,
       nicht nachgeschlagen), und im Schatten einer Aussparung nach Figur 23d

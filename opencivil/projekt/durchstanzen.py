@@ -75,8 +75,11 @@ class DurchstanzEintrag(BauteilEintrag):
     c: float = bereich(30.0, heisst="Überdeckung c_nom", einheit=MM, ab=0.0)
     """Die Überdeckung auf der Zugseite: oben bei der Decke, unten bei der Bodenplatte."""
 
-    c_v: float = bereich(30.0, heisst="Überdeckung c_v", einheit=MM, ab=0.0)
-    """Die Überdeckung der Durchstanzbewehrung auf der Druckseite (SIA 262:2025, Figur 26)."""
+    c_v: float = bereich(30.0, heisst="Abstand der Ankerköpfe c_v", einheit=MM, ab=0.0)
+    """
+    Der Abstand der Verankerung der Durchstanzbewehrung -- der Köpfe der Anker
+    -- von der Oberfläche der Druckseite (SIA 262:2025, Figur 26).
+    """
 
     D_max: float = bereich(32.0, heisst="Grösstkorn D_max", einheit=MM, ueber=0.0)
 

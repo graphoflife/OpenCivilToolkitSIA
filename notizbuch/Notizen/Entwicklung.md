@@ -7,6 +7,26 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Normprüfung VII: Durchstanzen
+
+Geprüft gegen SIA 262:2025, 4.3.6 und 5.5.3. Was sich ändert:
+
+- Die Anker rechnen mit ihrem eigenen Stahl B500B (4.3.6.5.4). Vorher mit dem
+  der Platte: mit B700B f_yd 609 statt 435 N/mm², 40 % zu günstig.
+- Liegt die Verankerung tiefer als d_v/6, tragen (68) und (70) 30 % weniger
+  (5.5.3.11). Beispiel: h = 220 mm, d_v = 174 mm, c_v = 30 > 29 mm.
+- k_e gilt je Schnitt (4.3.6.5.10 → 4.3.6.2.3): an einer Randstütze mit (57)
+  aussen 0.746 statt 0.815 von innen.
+- Der Randstreifen an der Eckstütze reicht nur bis zum zweiten Rand
+  (Figur 25): 300 × 300 in der Ecke 600 statt 900 mm.
+- Stufe 3 an Rand- und Eckstützen: r_s ≥ 2/3·b_sr (4.3.6.4.8).
+- Leisten beim zweiten Anker höchstens 1.5·d_v auseinander (5.5.3.9), um den
+  Stahlpilz also dichter.
+- Ein Hinweis, wo das Produkt Tabelle 21 überschreitet; die Grenze selbst ist
+  offen ([[TODO]]).
+- Das Prüfprojekt hat eine Eckstütze in Stufe 2 und eine Randstütze in
+  Stufe 3, damit die drei neuen Formeln im Notizbuch stehen.
+
 ## Aufbau in einem Bild
 
 ```

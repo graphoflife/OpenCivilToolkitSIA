@@ -2,8 +2,8 @@
 opencivil/durchstanzen/herleitung.py -- wie ein Nachweisschnitt in der Herleitung steht.
 
 VERANTWORTUNG:
-Die Schritte, die jeder Schnitt durchläuft -- was von ihm nicht zählt, der
-wirksame Umfang, die Querkraft und der Widerstand (58) --, einmal
+Die Schritte, die jeder Schnitt durchläuft -- was von ihm nicht zählt, k_e
+nach (57), der wirksame Umfang, die Querkraft und der Widerstand (58) --, einmal
 geschrieben: für den Schnitt um die Stütze (:mod:`.nachweis`), um die
 äussersten Anker und um einen Stahlpilz (:mod:`.mit_bewehrung`). Die Zahlen
 kommen aus der :class:`~.pruefung.Schnittpruefung`, sie werden hier nicht
@@ -20,13 +20,15 @@ SI-Basis.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
+from typing import Tuple
 
 from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import M2, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
-from opencivil.durchstanzen.pruefung import Schnittpruefung
+from opencivil.durchstanzen.pruefung import Schnittpruefung, beiwert_k_e, kreisdurchmesser
 from opencivil.durchstanzen.schnitt import Auswertung
 
 
@@ -97,6 +99,29 @@ def abzuege(p: Protokoll, w: Zwischenwerte, a: Auswertung, u_0: Wert, *, ix: Ind
              else "Nichts mindert den Schnitt",
              referenz="SIA 262:2025, 4.3.6.2.3", name="Nachweisschnitt ohne das, was nicht zählt")
     return u_red
+
+
+def k_e(p: Protokoll, w: Zwischenwerte, a: Auswertung, e_u: Tuple[float, float], *,
+        ix: Index) -> Wert:
+    """
+    k_e nach (57): b aus der Fläche im Schnitt, e_u von seinem Schwerpunkt
+    zur Resultierenden der Auflagerkraft -- je Komponente, in m.
+    """
+    A = w.wert(ix.name("A_u"), ix.symbol("A", "u"), Groesse.aus_si(a.flaeche, M2), 3,
+               "Fläche innerhalb des Nachweisschnitts")
+    p.wert(A, titel="Fläche innerhalb des Nachweisschnitts", referenz="SIA 262:2025, Figur 22")
+    b = w.laenge(ix.name("b"), ix.symbol("b"), kreisdurchmesser(a.flaeche), stellen=0)
+    p.formel(b, r"\sqrt{\frac{4 \cdot @A_u}{\pi}}", {"A_u": A},
+             titel="Durchmesser des flächengleichen Kreises", referenz="SIA 262:2025, 4.3.6.2.4")
+    e_u_si = math.hypot(*e_u)
+    e_u_w = w.laenge(ix.name("e_u"), ix.symbol("e", "u"), e_u_si, stellen=0)
+    p.wert(e_u_w, titel="Exzentrizität zum Schwerpunkt des Nachweisschnitts",
+           referenz="SIA 262:2025, 4.3.6.2.4")
+    ergebnis = w.zahl(ix.name("k_e"), ix.symbol("k", "e"), beiwert_k_e(e_u_si, b.groesse.si),
+                      stellen=3)
+    p.formel(ergebnis, r"\frac{1}{1 + \frac{@e_u}{@b}}", {"e_u": e_u_w, "b": b},
+             titel="Beiwert der Momentenübertragung", referenz="SIA 262:2025, 4.3.6.2.4, (57)")
+    return ergebnis
 
 
 def wirksam(p: Protokoll, w: Zwischenwerte, k_e: Wert, u_red: Wert, *, ix: Index,

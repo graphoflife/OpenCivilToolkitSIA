@@ -1,11 +1,11 @@
 ---
-erzeugt: 2deeb86a055f
+erzeugt: 042a9cbcf08d
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.6.2.3, Figur 23b und c"
+normstelle: "SIA 262:2025, 4.3.6.2.3, Figur 23b"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.3.6.2.3, Figur 23b und c
+> SIA 262:2025, 4.3.6.2.3, Figur 23b
 
 *In der Herleitung: «Nachweisschnitt um das Wandende: 1.5·d\_v entlang der Wand»*
 

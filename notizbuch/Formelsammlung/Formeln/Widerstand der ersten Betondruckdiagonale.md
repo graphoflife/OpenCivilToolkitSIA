@@ -53,5 +53,7 @@ begrenzt den Widerstand darum auf $2 \cdot k_r$, höchstens 3.5, mal
 $\tau_{cd} \cdot d_v \cdot u$ (4.3.6.5.8). Beide Faktoren dürfen höher sein,
 wenn Versuche es belegen (4.3.6.5.9): für ancoPLUS lässt das Gutachten des
 Herstellers bis $3 \cdot k_r$ zu, je nachdem, wie tief die Köpfe auf der
-Druckseite liegen. Geht dieser Nachweis nicht auf, hilft nur eine grössere
-Stütze, eine dickere Platte, ein besserer Beton oder ein Stahlpilz.
+Druckseite liegen. Liegen sie tiefer als $d_v/6$, ist der Widerstand
+zudem um 30 % kleiner (5.5.3.11). Geht dieser Nachweis nicht auf, hilft nur
+eine grössere Stütze, eine dickere Platte, ein besserer Beton oder ein
+Stahlpilz.

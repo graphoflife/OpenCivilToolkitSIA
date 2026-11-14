@@ -1,10 +1,11 @@
 ---
-erzeugt: b3d2fbd48b20
+erzeugt: 4148b1dab9fa
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.2.1.5, Figur 12"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.2.1.5, Figur 12
 
 *In der Herleitung: «Druckzonenhöhe in x, je Meter»*
 

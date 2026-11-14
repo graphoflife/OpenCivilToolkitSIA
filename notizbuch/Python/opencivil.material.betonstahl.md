@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b5b966581be
+erzeugt: 3ed006bb2251
 art: modul
 tags: [modul]
 ---
@@ -96,6 +96,7 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.stelle]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.qa_kennzahlen]]

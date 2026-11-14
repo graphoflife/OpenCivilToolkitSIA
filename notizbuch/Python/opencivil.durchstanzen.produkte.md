@@ -1,5 +1,5 @@
 ---
-erzeugt: 1e76377440f6
+erzeugt: e428ddfbd6c0
 art: modul
 tags: [modul]
 ---
@@ -18,8 +18,8 @@ die Anordnung um die Stütze steht in [[opencivil.durchstanzen.bewehrung|.bewehr
 
 ## ANCOPLUS (AncoTech AG)
 
-Doppelkopfanker auf einer Montageleiste, je Leiste 2 bis 9 Anker gleichen
-Durchmessers. Die Typen «D…» haben ungleiche Abstände: der erste Anker
+Doppelkopfanker aus B500B auf einer Montageleiste, je Leiste 2 bis 9 Anker
+gleichen Durchmessers. Die Typen «D…» haben ungleiche Abstände: der erste Anker
 liegt 0.375·d vom Rand der Stütze, bis und mit dem dritten folgen sie sich
 im Abstand 0.60·d, danach 0.75·d. So hat es das Gutachten Muttoni /
 Fernández Ruiz von 2007 für die erhöhte Obergrenze 3·k_r festgelegt
@@ -162,13 +162,14 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 - `ABSTAND_ERSTER = 0.375` – Die Abstände der Typen «D…», in Vielfachen von d (siehe Dateikopf): vom Rand der Stütze zum ersten Anker, bis zum dritten, danach.
 - `ABSTAND_BIS_DRITTER = 0.6`
 - `ABSTAND_DANACH = 0.75`
-- `TANGENTIAL = 1.5` – Höchstens so weit stehen zwei Leisten beim zweiten Anker auseinander, in Vielfachen von d (Gutachten 2007, Regel 5).
+- `TANGENTIAL = 1.5` – Höchstens so weit stehen zwei Leisten beim zweiten Anker auseinander, in Vielfachen von d_v: das Gutachten 2007 (Regel 5) misst in d, SIA 262:2025, 5.5.3.9, in d_v. An der Stütze ist das dasselbe, um einen Stahlpilz ist d_v kleiner.
 - `GROESSTER_DURCHMESSER = ((0.18, 0.014), (0.22, 0.016), (0.26, 0.018), (0.34, 0.02), (0.6, 0.0…` – Die Durchmesser je statischer Höhe d (Gutachten 2007, Tabelle 1): bis zu diesem d höchstens dieser Durchmesser; unter 0.160 m keiner.
 - `KLEINSTES_D = 0.16`
-- `K_SYS_HOCH = 3.0` – Der Faktor des Gutachtens anstelle der 2 in Gleichung (70), und die Obergrenze anstelle der 3.5: für Innenstützen, Wandenden und einspringende Ecken 3·k_r, wenn die Überdeckung der unteren Köpfe höchstens d/10 ist; bei d/6 gilt wieder 2·k_r, dazwischen linear (Gutachten 2007, S. 5–7). Für Rand- und Eckstützen 2.0 wie in der Norm -- die Software von 2026 nennt dort 3.0, ein Gutachten dazu war nicht lesbar.
+- `K_SYS_HOCH = 3.0` – Der Faktor des Gutachtens anstelle der 2 in Gleichung (70); die Obergrenze 3.5 bleibt. Für Innenstützen, Wandenden und einspringende Ecken 3·k_r, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt wieder 2·k_r, dazwischen linear (Gutachten 2007, S. 5–7). Für Rand- und Eckstützen 2.0 wie in der Norm -- die Software von 2026 nennt dort 3.0, ein Gutachten dazu war nicht lesbar.
 - `K_SYS_NORM = 2.0`
 - `GRENZE = 3.5`
 - `HOEHENSCHRITT = 0.01` – Die Höhen h_A enden auf 5 mm, in Schritten von 10 mm (Preisliste).
+- `STAHL = 'B500B'` – Der Stahl der Anker (Herstellerangabe, nach Vorgabe, nicht nachgeschlagen). In (67) und (69) gilt seine Fliessgrenze, nicht die der Biegebewehrung (SIA 262:2025, 4.3.6.5.4).
 - `STAHLPILZE = tuple(sorted(_pilze('Kreuz', 470, (100, 120)) + _pilze('Kreuz', 530, …` – Die ZEUS-Pilze der Preisliste, kleinste zuerst. Die Sondertypen (Rechteck) und der Doppelkreuz ohne g sind weggelassen.
 - `PILZ_UNTEN = 0.02` – Unter dem Pilz bleiben 20 mm Beton, über ihm 50 mm bis zur Oberfläche -- die Vorgaben der AncoTech-Software (Theorie 2010, S. 11, aus dem Bild).
 - `PILZ_OBEN = 0.05`
@@ -179,3 +180,4 @@ umschliessen die gestützte Fläche ausserhalb des Pilzes
 - [[opencivil.durchstanzen.bewehrung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.pruefung]]
+- [[opencivil.durchstanzen.stelle]]

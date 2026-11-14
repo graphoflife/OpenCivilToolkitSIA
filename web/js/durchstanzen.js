@@ -35,7 +35,7 @@ const HILFE = {
       ['Wandende', 'die Wand läuft nach rechts weiter; gezählt werden 1.5·d_v entlang der Wand'],
       ['Wandecke', 'die äussere Ecke zweier Wände, die nach rechts und oben laufen'],
     ],
-    formel: 'u = 2·(b_x + b_y) + π·d_v',
+    formel: 'u_0 = 2·(b_x + b_y) + π·d_v;  u = k_e · u_red',
   },
   bewehrung: {
     zeilen: [
@@ -48,8 +48,10 @@ const HILFE = {
   rotation: {
     zeilen: [
       ['Stufe 1', 'm_sd/m_Rd = 1, für regelmässige Flachdecken mit 0.5 ≤ l_x/l_y ≤ 2'],
-      ['Stufe 2', 'die Momente im Stützstreifen aus V_d und e_u, Gleichungen (62) bis (65)'],
-      ['Stufe 3', 'r_s und m_sd aus einer Berechnung nach der Elastizitätstheorie'],
+      ['Stufe 2', 'die Momente im Stützstreifen aus V_d und e_u, Gleichungen (62) bis (65); '
+        + 'ebenfalls nur mit 0.5 ≤ l_x/l_y ≤ 2'],
+      ['Stufe 3', 'r_s und m_sd aus einer Berechnung nach der Elastizitätstheorie; '
+        + 'in ψ steht 1.2 statt 1.5'],
       ['l', 'die grössere der angrenzenden Spannweiten; r_s = 0.22·l'],
     ],
     formel: 'ψ = 1.5 · r_s/d · f_yd/E_s · (m_sd/m_Rd)^1.5',
@@ -166,10 +168,11 @@ function plattenPanel(d) {
       zahlzeile(d, 'c', bodenplatte ? 'Überdeckung unten' : 'Überdeckung oben', 'c_{nom}', {
         schritt: 5, titel: 'Die Überdeckung der Zugbewehrung',
       }),
-      zahlzeile(d, 'c_v', bodenplatte ? 'Überdeckung der Anker oben' : 'Überdeckung der Anker unten',
+      zahlzeile(d, 'c_v', bodenplatte ? 'Ankerköpfe von oben' : 'Ankerköpfe von unten',
         'c_v', {
           schritt: 5,
-          titel: 'Wie tief die Köpfe der Durchstanzbewehrung auf der Druckseite liegen (Figur 26)',
+          titel: 'Abstand der Verankerung der Durchstanzbewehrung von der Oberfläche der '
+            + 'Druckseite (Figur 26); über d_v/6 tragen die Anker 30 % weniger (5.5.3.11)',
         }),
       zahlzeile(d, 'D_max', 'Grösstkorn', 'D_{max}', { schritt: 1 }),
       materialfeld(d, 'beton', 'beton', 'Beton'),

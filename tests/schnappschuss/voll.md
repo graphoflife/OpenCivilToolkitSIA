@@ -1,6 +1,6 @@
 # Voll
 
-522 Berechnungen ausgeführt, 801 Werte bestimmt.
+546 Berechnungen ausgeführt, 829 Werte bestimmt.
 
 ## Herleitung
 
@@ -7835,7 +7835,7 @@ $$
 c_{nom} = 30\,\mathrm{mm}
 $$
 
-**Überdeckung der Durchstanzbewehrung unten**
+**Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten**
 
 $$
 c_v = 30\,\mathrm{mm}
@@ -8013,13 +8013,13 @@ $$
 a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
 $$
 
-**Druckzonenhöhe in x, je Meter**
+**Druckzonenhöhe in x, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
 $$
 
-**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 \begin{aligned}
@@ -8035,13 +8035,13 @@ $$
 a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
 $$
 
-**Druckzonenhöhe in y, je Meter**
+**Druckzonenhöhe in y, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
 $$
 
-**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 \begin{aligned}
@@ -8157,11 +8157,13 @@ $$
 h_A = 215\,\mathrm{mm}
 $$
 
+c\_v = 30 mm ≤ d\_v/6 = 39 mm: die Anker sind auf der Druckseite genügend verankert (SIA 262:2025, 5.5.3.11).
+
 **Spannung in der Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4, (69))*
 
 $$
 \begin{aligned}
-  \sigma_{sd} &= \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right] \\
+  \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
   &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0186}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
@@ -8206,7 +8208,7 @@ $$
 **Durchstanzbewehrung an der Fliessgrenze** *(SIA 262:2025, 4.3.6.5.3, (67))*
 
 $$
-V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 2513\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 983.5\,\mathrm{kN}
+V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd,\text{sw}} = 2513\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 983.5\,\mathrm{kN}
 $$
 
 **Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung**
@@ -8251,7 +8253,7 @@ $$
 
 #### Ausserhalb der Durchstanzbewehrung
 
-**Wirksame statische Höhe bis zu den Köpfen der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
+**Wirksame statische Höhe bis zur Verankerung der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
 d_{v,out} = d - c_v = 234\,\mathrm{mm} - 30\,\mathrm{mm} = 204\,\mathrm{mm}
@@ -8269,7 +8271,7 @@ $$
 u_{red,out} = u_{0,out} = 6619\,\mathrm{mm}
 $$
 
-**Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
+**Wirksamer Umfang des äusseren Nachweisschnitts** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
 u_{out} = k_e \cdot u_{red,out} = 0.9 \cdot 6619\,\mathrm{mm} = 5957\,\mathrm{mm}
@@ -8315,6 +8317,32 @@ $$
 \alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{959.3\,\mathrm{kN}}{852.5\,\mathrm{kN}} = 1.13 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
+### Betonstahl: ancoPLUS, B500B
+
+**Charakteristische Fliessgrenze** *(SIA 262:2025, 3.2.2.2, Tabelle 5)*
+
+$$
+f_{yk,\text{sw}} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Teilsicherheitsbeiwert für Betonstahl** *(SIA 262:2025, 2.4.2.6)*
+
+$$
+\gamma_{s,\text{sw}} = 1.15
+$$
+
+**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5, (4))*
+
+$$
+f_{yd,\text{sw}} = \frac{f_{yk,\text{sw}}}{\gamma_{s,\text{sw}}} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Elastizitätsmodul des Betonstahls** *(SIA 262:2025, 3.2.2.4)*
+
+$$
+E_{s,\text{sw}} = 200000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
 ### Durchstanzen: Mit Stahlpilz
 
 **Plattendicke**
@@ -8329,7 +8357,7 @@ $$
 c_{nom} = 30\,\mathrm{mm}
 $$
 
-**Überdeckung der Durchstanzbewehrung unten**
+**Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten**
 
 $$
 c_v = 30\,\mathrm{mm}
@@ -8495,13 +8523,13 @@ $$
 a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
 $$
 
-**Druckzonenhöhe in x, je Meter**
+**Druckzonenhöhe in x, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
 $$
 
-**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 \begin{aligned}
@@ -8517,13 +8545,13 @@ $$
 a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
 $$
 
-**Druckzonenhöhe in y, je Meter**
+**Druckzonenhöhe in y, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
 $$
 
-**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 \begin{aligned}
@@ -8643,11 +8671,13 @@ $$
 
 > **Hinweis:** Kein ancoPLUS erfüllt alle Bedingungen; gerechnet ist der stärkste Versuch.
 
+c\_v = 30 mm ≤ d\_v/6 = 39 mm: die Anker sind auf der Druckseite genügend verankert (SIA 262:2025, 5.5.3.11).
+
 **Spannung in der Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4, (69))*
 
 $$
 \begin{aligned}
-  \sigma_{sd} &= \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right] \\
+  \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
   &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0219}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{16\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
@@ -8692,7 +8722,7 @@ $$
 **Durchstanzbewehrung an der Fliessgrenze** *(SIA 262:2025, 4.3.6.5.3, (67))*
 
 $$
-V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 8042\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 3147.1\,\mathrm{kN}
+V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd,\text{sw}} = 8042\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 3147.1\,\mathrm{kN}
 $$
 
 **Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung**
@@ -8739,7 +8769,7 @@ $$
 
 #### Ausserhalb der Durchstanzbewehrung
 
-**Wirksame statische Höhe bis zu den Köpfen der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
+**Wirksame statische Höhe bis zur Verankerung der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
 d_{v,out} = d - c_v = 234\,\mathrm{mm} - 30\,\mathrm{mm} = 204\,\mathrm{mm}
@@ -8763,7 +8793,7 @@ $$
 u_{red,out} = u_{0,out} - \Delta u_{E,out} = 10905\,\mathrm{mm} - 3768\,\mathrm{mm} = 7137\,\mathrm{mm}
 $$
 
-**Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
+**Wirksamer Umfang des äusseren Nachweisschnitts** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
 u_{out} = k_e \cdot u_{red,out} = 0.9 \cdot 7137\,\mathrm{mm} = 6423\,\mathrm{mm}
@@ -8823,7 +8853,7 @@ $$
 u_{red,P} = u_{0,P} = 2913\,\mathrm{mm}
 $$
 
-**Wirksamer Umfang des Schnitts um den Stahlpilz, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
+**Wirksamer Umfang des Schnitts um den Stahlpilz** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
 u_P = k_e \cdot u_{red,P} = 0.9 \cdot 2913\,\mathrm{mm} = 2622\,\mathrm{mm}
@@ -8851,11 +8881,13 @@ $$
 V_{d,P} = 1000\,\mathrm{kN} \quad > \quad V_{Rd,c,P} = 394.4\,\mathrm{kN}
 $$
 
+c\_v = 30 mm ≤ d\_v/6 = 36 mm: die Anker sind auf der Druckseite genügend verankert (SIA 262:2025, 5.5.3.11).
+
 **Spannung in der Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4, (69))*
 
 $$
 \begin{aligned}
-  \sigma_{sd} &= \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right] \\
+  \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
   &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0219}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{234\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
@@ -8900,7 +8932,7 @@ $$
 **Durchstanzbewehrung an der Fliessgrenze** *(SIA 262:2025, 4.3.6.5.3, (67))*
 
 $$
-V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 1571\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 614.7\,\mathrm{kN}
+V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd,\text{sw}} = 1571\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 614.7\,\mathrm{kN}
 $$
 
 **Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung**
@@ -8945,7 +8977,7 @@ $$
 
 #### Ausserhalb der Durchstanzbewehrung um den Stahlpilz
 
-**Wirksame statische Höhe bis zu den Köpfen der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
+**Wirksame statische Höhe bis zur Verankerung der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
 d_{v,out} = d - c_v = 234\,\mathrm{mm} - 30\,\mathrm{mm} = 204\,\mathrm{mm}
@@ -8969,7 +9001,7 @@ $$
 u_{red,out} = u_{0,out} - \Delta u_{E,out} = 8331\,\mathrm{mm} - 559\,\mathrm{mm} = 7771\,\mathrm{mm}
 $$
 
-**Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
+**Wirksamer Umfang des äusseren Nachweisschnitts** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
 u_{out} = k_e \cdot u_{red,out} = 0.9 \cdot 7771\,\mathrm{mm} = 6994\,\mathrm{mm}
@@ -9017,7 +9049,7 @@ $$
 c_{nom} = 30\,\mathrm{mm}
 $$
 
-**Überdeckung der Durchstanzbewehrung unten**
+**Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten**
 
 $$
 c_v = 30\,\mathrm{mm}
@@ -9213,13 +9245,13 @@ $$
 a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
 $$
 
-**Druckzonenhöhe in x, je Meter**
+**Druckzonenhöhe in x, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
 $$
 
-**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 \begin{aligned}
@@ -9235,13 +9267,13 @@ $$
 a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
 $$
 
-**Druckzonenhöhe in y, je Meter**
+**Druckzonenhöhe in y, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
 $$
 
-**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 \begin{aligned}
@@ -9271,20 +9303,22 @@ $$
 \end{aligned}
 $$
 
-**Breite des Stützstreifens in y, durch den Plattenrand begrenzt** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+**Grenze der Breite des Stützstreifens in y am Plattenrand: zwischen den Linien unter 45° von den inneren Ecken der Stütze** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
 
 $$
-\begin{aligned}
-  b_{sr,y} &= \min\left[b_s;\ D + 2 \cdot \left(D + a_y\right)\right] \\
-  &= \min\left[2310\,\mathrm{mm};\ 450\,\mathrm{mm} + 2 \cdot \left(450\,\mathrm{mm} + 100\,\mathrm{mm}\right)\right] \\
-  &= 1550\,\mathrm{mm}
-\end{aligned}
+b_{sr,y} = D + 2 \cdot \left(D + a_y\right) = 450\,\mathrm{mm} + 2 \cdot \left(450\,\mathrm{mm} + 100\,\mathrm{mm}\right) = 1550\,\mathrm{mm}
+$$
+
+**Breite des Stützstreifens in y, senkrecht zum Rand** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+
+$$
+b_{s,y} = \min\left[b_s;\ b_{sr,y}\right] = \min\left[2310\,\mathrm{mm};\ 1550\,\mathrm{mm}\right] = 1550\,\mathrm{mm}
 $$
 
 **Mittleres Moment im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.7, (64))*
 
 $$
-m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{sr,y}}\right) = 494.9\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{1\,\mathrm{mm}}{1550\,\mathrm{mm}}\right) = 62.2\,\mathrm{kNm}/\mathrm{m}
+m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right) = 494.9\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{1\,\mathrm{mm}}{1550\,\mathrm{mm}}\right) = 62.2\,\mathrm{kNm}/\mathrm{m}
 $$
 
 **Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
@@ -9371,11 +9405,13 @@ $$
 h_A = 235\,\mathrm{mm}
 $$
 
+c\_v = 30 mm ≤ d\_v/6 = 42 mm: die Anker sind auf der Druckseite genügend verankert (SIA 262:2025, 5.5.3.11).
+
 **Spannung in der Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4, (69))*
 
 $$
 \begin{aligned}
-  \sigma_{sd} &= \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right] \\
+  \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
   &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0157}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{254\,\mathrm{mm}}{10\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
@@ -9420,7 +9456,7 @@ $$
 **Durchstanzbewehrung an der Fliessgrenze** *(SIA 262:2025, 4.3.6.5.3, (67))*
 
 $$
-V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 785\,\mathrm{mm}^{2} \cdot 0.999 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 341\,\mathrm{kN}
+V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd,\text{sw}} = 785\,\mathrm{mm}^{2} \cdot 0.999 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 341\,\mathrm{kN}
 $$
 
 **Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung**
@@ -9465,7 +9501,7 @@ $$
 
 #### Ausserhalb der Durchstanzbewehrung
 
-**Wirksame statische Höhe bis zu den Köpfen der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
+**Wirksame statische Höhe bis zur Verankerung der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
 d_{v,out} = d - c_v = 254\,\mathrm{mm} - 30\,\mathrm{mm} = 224\,\mathrm{mm}
@@ -9474,37 +9510,61 @@ $$
 **Äusserer Nachweisschnitt, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
-u_{0,out} = 2900\,\mathrm{mm}
+u_{0,out} = 3482\,\mathrm{mm}
 $$
 
 **Nichts mindert den Schnitt** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
-u_{red,out} = u_{0,out} = 2900\,\mathrm{mm}
+u_{red,out} = u_{0,out} = 3482\,\mathrm{mm}
 $$
 
-**Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
+**Fläche innerhalb des Nachweisschnitts** *(SIA 262:2025, Figur 22)*
 
 $$
-u_{out} = k_e \cdot u_{red,out} = 0.999 \cdot 2900\,\mathrm{mm} = 2896\,\mathrm{mm}
+A_{u,out} = 1.825\,\mathrm{m}^{2}
+$$
+
+**Durchmesser des flächengleichen Kreises** *(SIA 262:2025, 4.3.6.2.4)*
+
+$$
+b_{out} = \sqrt{\frac{4 \cdot A_{u,out}}{\pi}} = \sqrt{\frac{4 \cdot 1.825\,\mathrm{m}^{2}}{\pi}} = 1524\,\mathrm{mm}
+$$
+
+**Exzentrizität zum Schwerpunkt des Nachweisschnitts** *(SIA 262:2025, 4.3.6.2.4)*
+
+$$
+e_{u,out} = 347\,\mathrm{mm}
+$$
+
+**Beiwert der Momentenübertragung** *(SIA 262:2025, 4.3.6.2.4, (57))*
+
+$$
+k_{e,out} = \frac{1}{1 + \frac{e_{u,out}}{b_{out}}} = \frac{1}{1 + \frac{347\,\mathrm{mm}}{1524\,\mathrm{mm}}} = 0.815
+$$
+
+**Wirksamer Umfang des äusseren Nachweisschnitts** *(SIA 262:2025, 4.3.6.2.3)*
+
+$$
+u_{out} = k_{e,out} \cdot u_{red,out} = 0.815 \cdot 3482\,\mathrm{mm} = 2837\,\mathrm{mm}
 $$
 
 **Fläche innerhalb des Schnitts, ohne Aussparungen**
 
 $$
-A_{q,out} = 1.252\,\mathrm{m}^{2}
+A_{q,out} = 1.825\,\mathrm{m}^{2}
 $$
 
 **Eigengewicht und Nutzlast innerhalb des äusseren Schnitts** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
-\Delta V_{d,out} = q_d \cdot A_{q,out} = 12\,\mathrm{kN}/\mathrm{m}^{2} \cdot 1.252\,\mathrm{m}^{2} = 15\,\mathrm{kN}
+\Delta V_{d,out} = q_d \cdot A_{q,out} = 12\,\mathrm{kN}/\mathrm{m}^{2} \cdot 1.825\,\mathrm{m}^{2} = 21.9\,\mathrm{kN}
 $$
 
 **Querkraft im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.2.6)*
 
 $$
-V_{d,out} = V_d - \Delta V_{d,out} = 500\,\mathrm{kN} - 15\,\mathrm{kN} = 485\,\mathrm{kN}
+V_{d,out} = V_d - \Delta V_{d,out} = 500\,\mathrm{kN} - 21.9\,\mathrm{kN} = 478.1\,\mathrm{kN}
 $$
 
 **Durchstanzwiderstand im äusseren Nachweisschnitt** *(SIA 262:2025, 4.3.6.5.10, (58))*
@@ -9512,21 +9572,21 @@ $$
 $$
 \begin{aligned}
   V_{Rd,c,out} &= k_r \cdot \tau_{cd} \cdot d_{v,out} \cdot u_{out} \\
-  &= 0.762 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 224\,\mathrm{mm} \cdot 2896\,\mathrm{mm} \\
-  &= 541.6\,\mathrm{kN}
+  &= 0.762 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 224\,\mathrm{mm} \cdot 2837\,\mathrm{mm} \\
+  &= 530.5\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Querkraft gegen den Widerstand ausserhalb der Bewehrung**
 
 $$
-V_{d,out} = 485\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 541.6\,\mathrm{kN}
+V_{d,out} = 478.1\,\mathrm{kN} \quad \le \quad V_{Rd,c,out} = 530.5\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{541.6\,\mathrm{kN}}{485\,\mathrm{kN}} = 1.12 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS,out} = \frac{V_{Rd,c,out}}{V_{d,out}} = \frac{530.5\,\mathrm{kN}}{478.1\,\mathrm{kN}} = 1.11 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Durchstanzen: Eckstütze
@@ -9543,7 +9603,7 @@ $$
 c_{nom} = 30\,\mathrm{mm}
 $$
 
-**Überdeckung der Durchstanzbewehrung unten**
+**Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten**
 
 $$
 c_v = 30\,\mathrm{mm}
@@ -9627,6 +9687,18 @@ $$
 l_y = 7\,\mathrm{m}
 $$
 
+**Exzentrizität der Auflagerkraft in x**
+
+$$
+e_x = 0\,\mathrm{mm}
+$$
+
+**Exzentrizität der Auflagerkraft in y**
+
+$$
+e_y = 0\,\mathrm{mm}
+$$
+
 ### Durchstanzen
 
 **Statische Höhe der Lage in x (aussen)**
@@ -9703,22 +9775,136 @@ $$
 r_{sy} = 0.22 \cdot l_y = 0.22 \cdot 7\,\mathrm{m} = 1540\,\mathrm{mm}
 $$
 
+**Bewehrung in x je Meter**
+
+$$
+a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+$$
+
+**Druckzonenhöhe in x, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
+
+$$
+x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+$$
+
+**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
+
+$$
+\begin{aligned}
+  m_{Rd,x} &= a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right) \\
+  &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(242\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+  &= 132.5\,\mathrm{kNm}/\mathrm{m}
+\end{aligned}
+$$
+
+**Bewehrung in y je Meter**
+
+$$
+a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+$$
+
+**Druckzonenhöhe in y, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
+
+$$
+x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+$$
+
+**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
+
+$$
+\begin{aligned}
+  m_{Rd,y} &= a_{s,y} \cdot f_{yd} \cdot \left(d_y - \frac{0.85 \cdot x_y}{2}\right) \\
+  &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(226\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+  &= 123.2\,\mathrm{kNm}/\mathrm{m}
+\end{aligned}
+$$
+
+**Breite des Stützstreifens** *(SIA 262:2025, 4.3.6.4.6, (61))*
+
+$$
+\begin{aligned}
+  b_s &= \min\left[1.5 \cdot \sqrt{r_{sx} \cdot r_{sy}};\ l_{min}\right] \\
+  &= \min\left[1.5 \cdot \sqrt{1540\,\mathrm{mm} \cdot 1540\,\mathrm{mm}};\ 7000\,\mathrm{mm}\right] \\
+  &= 2310\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Grenze der Breite des Stützstreifens in x am Plattenrand: zwischen den Linien unter 45° von den inneren Ecken der Stütze** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+
+$$
+b_{sr,x} = b_y + 2 \cdot \left(b_x + a_x\right) = 300\,\mathrm{mm} + 2 \cdot \left(300\,\mathrm{mm} + 0\,\mathrm{mm}\right) = 900\,\mathrm{mm}
+$$
+
+**Breite des Randstreifens in x: innen die halbe, aussen bis zum zweiten Plattenrand** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+
+$$
+\begin{aligned}
+  b_{s,x} &= \frac{\min\left[b_s;\ b_{sr,x}\right]}{2} + \min\left[\frac{\min\left[b_s;\ b_{sr,x}\right]}{2};\ \frac{b_y}{2} + a_y\right] \\
+  &= \frac{\min\left[2310\,\mathrm{mm};\ 900\,\mathrm{mm}\right]}{2} + \min\left[\frac{\min\left[2310\,\mathrm{mm};\ 900\,\mathrm{mm}\right]}{2};\ \frac{300\,\mathrm{mm}}{2} + 0\,\mathrm{mm}\right] \\
+  &= 600\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Mittleres Moment im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.7, (65))*
+
+$$
+\begin{aligned}
+  m_{sd,x} &= \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{b_{s,x}}\right);\ 0.5 \cdot V_{d,red}\right] \\
+  &= \max\left[80\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{155\,\mathrm{mm}}{600\,\mathrm{mm}}\right);\ 0.5 \cdot 80\,\mathrm{kN}\right] \\
+  &= 40\,\mathrm{kNm}/\mathrm{m}
+\end{aligned}
+$$
+
+**Grenze der Breite des Stützstreifens in y am Plattenrand: zwischen den Linien unter 45° von den inneren Ecken der Stütze** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+
+$$
+b_{sr,y} = b_x + 2 \cdot \left(b_y + a_y\right) = 300\,\mathrm{mm} + 2 \cdot \left(300\,\mathrm{mm} + 0\,\mathrm{mm}\right) = 900\,\mathrm{mm}
+$$
+
+**Breite des Randstreifens in y: innen die halbe, aussen bis zum zweiten Plattenrand** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+
+$$
+\begin{aligned}
+  b_{s,y} &= \frac{\min\left[b_s;\ b_{sr,y}\right]}{2} + \min\left[\frac{\min\left[b_s;\ b_{sr,y}\right]}{2};\ \frac{b_x}{2} + a_x\right] \\
+  &= \frac{\min\left[2310\,\mathrm{mm};\ 900\,\mathrm{mm}\right]}{2} + \min\left[\frac{\min\left[2310\,\mathrm{mm};\ 900\,\mathrm{mm}\right]}{2};\ \frac{300\,\mathrm{mm}}{2} + 0\,\mathrm{mm}\right] \\
+  &= 600\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Mittleres Moment im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.7, (65))*
+
+$$
+\begin{aligned}
+  m_{sd,y} &= \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right);\ 0.5 \cdot V_{d,red}\right] \\
+  &= \max\left[80\,\mathrm{kN} \cdot \left(\frac{1}{8} + \frac{155\,\mathrm{mm}}{600\,\mathrm{mm}}\right);\ 0.5 \cdot 80\,\mathrm{kN}\right] \\
+  &= 40\,\mathrm{kNm}/\mathrm{m}
+\end{aligned}
+$$
+
 **Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
 
 $$
-\psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+\begin{aligned}
+  \psi_x &= 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
+  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{40\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0036
+\end{aligned}
 $$
 
 **Plattenrotation in y** *(SIA 262:2025, 4.3.6.4.1, (60))*
 
 $$
-\psi_y = 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.0215
+\begin{aligned}
+  \psi_y &= 1.5 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,y}}{m_{Rd,y}}\right)^{3/2} \\
+  &= 1.5 \cdot \frac{1540\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{40\,\mathrm{kNm}/\mathrm{m}}{123.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.004
+\end{aligned}
 $$
 
 **Massgebende Plattenrotation: die grössere** *(SIA 262:2025, 4.3.6.4.1)*
 
 $$
-\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0215;\ 0.0215\right] = 0.0215
+\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0036;\ 0.004\right] = 0.004
 $$
 
 #### Durchstanzwiderstand
@@ -9738,28 +9924,324 @@ $$
 $$
 \begin{aligned}
   k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
-  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0215 \cdot 234 \cdot 1.2}\right] \\
-  &= 0.652 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.004 \cdot 234 \cdot 1.2}\right] \\
+  &= 1.537 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
 \end{aligned}
 $$
 
 **Durchstanzwiderstand ohne Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.3.1)*
 
 $$
-V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 0.652 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 509\,\mathrm{mm} = 85.1\,\mathrm{kN}
+V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 1.537 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 509\,\mathrm{mm} = 200.7\,\mathrm{kN}
 $$
 
 **Querkraft gegen Durchstanzwiderstand**
 
 $$
-V_{d,red} = 80\,\mathrm{kN} \quad \le \quad V_{Rd,c} = 85.1\,\mathrm{kN}
+V_{d,red} = 80\,\mathrm{kN} \quad \le \quad V_{Rd,c} = 200.7\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{85.1\,\mathrm{kN}}{80\,\mathrm{kN}} = 1.06 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{200.7\,\mathrm{kN}}{80\,\mathrm{kN}} = 2.51 \quad \Rightarrow \quad \text{erfüllt}
 $$
+
+> **Hinweis:** ψ = 0.004 ≤ 0.020: das Verformungsvermögen ist ohne Durchstanzbewehrung nach Gleichung (67) nicht nachgewiesen -- sonst sind die aufgezwungenen Verformungen nach 4.1.2 zu berücksichtigen (4.3.6.1.2).
+
+> **Hinweis:** Ohne Durchstanzbewehrung, die Bedingung (67) erfüllt, braucht es eine Sicherung gegen Totaleinsturz nach 4.3.6.7 (4.3.6.1.3).
+
+### Durchstanzen: Randstütze in Stufe 3
+
+**Plattendicke**
+
+$$
+h = 280\,\mathrm{mm}
+$$
+
+**Überdeckung der Zugbewehrung oben**
+
+$$
+c_{nom} = 30\,\mathrm{mm}
+$$
+
+**Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten**
+
+$$
+c_v = 30\,\mathrm{mm}
+$$
+
+**Grösstkorndurchmesser**
+
+$$
+D_{max} = 32\,\mathrm{mm}
+$$
+
+**Stabdurchmesser in x**
+
+$$
+\varnothing_x = 16\,\mathrm{mm}
+$$
+
+**Stababstand in x**
+
+$$
+s_x = 150\,\mathrm{mm}
+$$
+
+**Stabdurchmesser in y**
+
+$$
+\varnothing_y = 16\,\mathrm{mm}
+$$
+
+**Stababstand in y**
+
+$$
+s_y = 150\,\mathrm{mm}
+$$
+
+**Abmessung der Stütze in x**
+
+$$
+b_x = 300\,\mathrm{mm}
+$$
+
+**Abmessung der Stütze in y**
+
+$$
+b_y = 300\,\mathrm{mm}
+$$
+
+**Abstand vom Plattenrand in y**
+
+$$
+a_y = 0\,\mathrm{mm}
+$$
+
+**Bemessungswert der Auflagerkraft**
+
+$$
+V_d = 150\,\mathrm{kN}
+$$
+
+**Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast**
+
+$$
+q_d = 0\,\mathrm{kN}/\mathrm{m}^{2}
+$$
+
+**Abstand zum Momentennullpunkt in x**
+
+$$
+r_{sx} = 0.8\,\mathrm{m}
+$$
+
+**Abstand zum Momentennullpunkt in y**
+
+$$
+r_{sy} = 0.4\,\mathrm{m}
+$$
+
+**Mittleres Moment im Stützstreifen, x**
+
+$$
+m_{sd,x} = 40\,\mathrm{kNm}/\mathrm{m}
+$$
+
+**Mittleres Moment im Stützstreifen, y**
+
+$$
+m_{sd,y} = 60\,\mathrm{kNm}/\mathrm{m}
+$$
+
+### Durchstanzen
+
+**Statische Höhe der Lage in x (aussen)**
+
+$$
+d_x = h - c_{nom} - \frac{\varnothing_x}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 242\,\mathrm{mm}
+$$
+
+**Statische Höhe der Lage in y (innen)**
+
+$$
+d_y = h - c_{nom} - \varnothing_x - \frac{\varnothing_y}{2} = 280\,\mathrm{mm} - 30\,\mathrm{mm} - 16\,\mathrm{mm} - \frac{16\,\mathrm{mm}}{2} = 226\,\mathrm{mm}
+$$
+
+**Mittlere statische Höhe der beiden Lagen der Zugbewehrung** *(SIA 262:2025, 4.3.6.2.1)*
+
+$$
+d = \frac{d_x + d_y}{2} = \frac{242\,\mathrm{mm} + 226\,\mathrm{mm}}{2} = 234\,\mathrm{mm}
+$$
+
+**Wirksame statische Höhe: die gestützte Fläche reicht nicht in die Platte** *(SIA 262:2025, 4.3.6.2.1, Figur 21)*
+
+$$
+d_v = d = 234\,\mathrm{mm}
+$$
+
+#### Nachweisschnitt
+
+**Nachweisschnitt im Abstand d\_v/2, soweit er in der Platte liegt** *(SIA 262:2025, 4.3.6.2.2, Figur 22)*
+
+$$
+u_0 = 1268\,\mathrm{mm}
+$$
+
+**Nichts mindert den Schnitt** *(SIA 262:2025, 4.3.6.2.3)*
+
+$$
+u_{red} = u_0 = 1268\,\mathrm{mm}
+$$
+
+#### Momentenübertragung
+
+**Näherung für Randstützen** *(SIA 262:2025, 4.3.6.2.5)*
+
+$$
+k_e = 0.7
+$$
+
+**Wirksamer Umfang des Nachweisschnitts** *(SIA 262:2025, 4.3.6.2.3)*
+
+$$
+u = k_e \cdot u_{red} = 0.7 \cdot 1268\,\mathrm{mm} = 887\,\mathrm{mm}
+$$
+
+#### Bemessungswert der Querkraft
+
+**Bemessungswert der Querkraft im Nachweisschnitt: keine Flächenlast abgezogen** *(SIA 262:2025, 4.3.6.2.6)*
+
+$$
+V_{d,red} = V_d = 150\,\mathrm{kN}
+$$
+
+#### Plattenrotation
+
+**Grenze der Breite des Stützstreifens in y am Plattenrand: zwischen den Linien unter 45° von den inneren Ecken der Stütze** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+
+$$
+b_{sr,y} = b_x + 2 \cdot \left(b_y + a_y\right) = 300\,\mathrm{mm} + 2 \cdot \left(300\,\mathrm{mm} + 0\,\mathrm{mm}\right) = 900\,\mathrm{mm}
+$$
+
+**Abstand zum Momentennullpunkt in y: am Plattenrand mindestens 2/3 · b\_sr** *(SIA 262:2025, 4.3.6.4.8)*
+
+$$
+r_{sy} = \max\left[r_{sy};\ \frac{2}{3} \cdot b_{sr,y}\right] = \max\left[0.4\,\mathrm{m};\ \frac{2}{3} \cdot 900\,\mathrm{mm}\right] = 600\,\mathrm{mm}
+$$
+
+**Bewehrung in x je Meter**
+
+$$
+a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+$$
+
+**Druckzonenhöhe in x, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
+
+$$
+x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+$$
+
+**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
+
+$$
+\begin{aligned}
+  m_{Rd,x} &= a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right) \\
+  &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(242\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+  &= 132.5\,\mathrm{kNm}/\mathrm{m}
+\end{aligned}
+$$
+
+**Bewehrung in y je Meter**
+
+$$
+a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(16\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 1340\,\mathrm{mm}^{2}/\mathrm{m}
+$$
+
+**Druckzonenhöhe in y, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
+
+$$
+x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 34.3\,\mathrm{mm}
+$$
+
+**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
+
+$$
+\begin{aligned}
+  m_{Rd,y} &= a_{s,y} \cdot f_{yd} \cdot \left(d_y - \frac{0.85 \cdot x_y}{2}\right) \\
+  &= 1340\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(226\,\mathrm{mm} - \frac{0.85 \cdot 34.3\,\mathrm{mm}}{2}\right) \\
+  &= 123.2\,\mathrm{kNm}/\mathrm{m}
+\end{aligned}
+$$
+
+**Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
+
+$$
+\begin{aligned}
+  \psi_x &= 1.2 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2} \\
+  &= 1.2 \cdot \frac{0.8\,\mathrm{m}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{40\,\mathrm{kNm}/\mathrm{m}}{132.5\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0015
+\end{aligned}
+$$
+
+**Plattenrotation in y** *(SIA 262:2025, 4.3.6.4.1, (60))*
+
+$$
+\begin{aligned}
+  \psi_y &= 1.2 \cdot \frac{r_{sy}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,y}}{m_{Rd,y}}\right)^{3/2} \\
+  &= 1.2 \cdot \frac{600\,\mathrm{mm}}{234\,\mathrm{mm}} \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(\frac{60\,\mathrm{kNm}/\mathrm{m}}{123.2\,\mathrm{kNm}/\mathrm{m}}\right)^{3/2} \\
+  &= 0.0023
+\end{aligned}
+$$
+
+**Massgebende Plattenrotation: die grössere** *(SIA 262:2025, 4.3.6.4.1)*
+
+$$
+\psi = \max\left[\psi_x;\ \psi_y\right] = \max\left[0.0015;\ 0.0023\right] = 0.0023
+$$
+
+#### Durchstanzwiderstand
+
+**Beiwert der Gesteinskörnung** *(SIA 262:2025, 4.3.3.2.1, (37))*
+
+$$
+\begin{aligned}
+  k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+  &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+  &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+\end{aligned}
+$$
+
+**Beiwert für Bauteilgrösse, Plattenrotation und Grösstkorn** *(SIA 262:2025, 4.3.6.3.2, (59))*
+
+$$
+\begin{aligned}
+  k_r &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot \psi \cdot d \cdot k_g}\right] \\
+  &= \min\left[2;\ \frac{1}{0.45 + 0.18 \cdot 0.0023 \cdot 234 \cdot 1.2}\right] \\
+  &= 1.77 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+\end{aligned}
+$$
+
+**Durchstanzwiderstand ohne Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.3.1)*
+
+$$
+V_{Rd,c} = k_r \cdot \tau_{cd} \cdot d_v \cdot u = 1.77 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 234\,\mathrm{mm} \cdot 887\,\mathrm{mm} = 402.6\,\mathrm{kN}
+$$
+
+**Querkraft gegen Durchstanzwiderstand**
+
+$$
+V_{d,red} = 150\,\mathrm{kN} \quad \le \quad V_{Rd,c} = 402.6\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,DS} = \frac{V_{Rd,c}}{V_{d,red}} = \frac{402.6\,\mathrm{kN}}{150\,\mathrm{kN}} = 2.68 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+> **Hinweis:** ψ = 0.0023 ≤ 0.020: das Verformungsvermögen ist ohne Durchstanzbewehrung nach Gleichung (67) nicht nachgewiesen -- sonst sind die aufgezwungenen Verformungen nach 4.1.2 zu berücksichtigen (4.3.6.1.2).
 
 > **Hinweis:** Ohne Durchstanzbewehrung, die Bedingung (67) erfüllt, braucht es eine Sicherung gegen Totaleinsturz nach 4.3.6.7 (4.3.6.1.3).
 
@@ -9777,7 +10259,7 @@ $$
 c_{nom} = 40\,\mathrm{mm}
 $$
 
-**Überdeckung der Durchstanzbewehrung oben**
+**Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, oben**
 
 $$
 c_v = 30\,\mathrm{mm}
@@ -9949,13 +10431,13 @@ $$
 a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x} = \frac{\pi \cdot \left(20\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 2094\,\mathrm{mm}^{2}/\mathrm{m}
 $$
 
-**Druckzonenhöhe in x, je Meter**
+**Druckzonenhöhe in x, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{2094\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 53.6\,\mathrm{mm}
 $$
 
-**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 \begin{aligned}
@@ -9971,13 +10453,13 @@ $$
 a_{s,y} = \frac{\pi \cdot \varnothing_y^{2}}{4 \cdot s_y} = \frac{\pi \cdot \left(20\,\mathrm{mm}\right)^{2}}{4 \cdot 150\,\mathrm{mm}} = 2094\,\mathrm{mm}^{2}/\mathrm{m}
 $$
 
-**Druckzonenhöhe in y, je Meter**
+**Druckzonenhöhe in y, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_y = \frac{a_{s,y} \cdot f_{yd}}{0.85 \cdot f_{cd}} = \frac{2094\,\mathrm{mm}^{2}/\mathrm{m} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 53.6\,\mathrm{mm}
 $$
 
-**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 \begin{aligned}
@@ -10071,11 +10553,13 @@ $$
 h_A = 325\,\mathrm{mm}
 $$
 
+c\_v = 30 mm ≤ d\_v/6 = 57 mm: die Anker sind auf der Druckseite genügend verankert (SIA 262:2025, 5.5.3.11).
+
 **Spannung in der Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4, (69))*
 
 $$
 \begin{aligned}
-  \sigma_{sd} &= \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right] \\
+  \sigma_{sd} &= \min\left[\frac{E_{s,\text{sw}} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd,\text{sw}}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd,\text{sw}}\right] \\
   &= \min\left[\frac{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.0072}{6} \cdot \left(1 + \frac{2.9\,\mathrm{N}/\mathrm{mm}^{2}}{435\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \frac{340\,\mathrm{mm}}{14\,\mathrm{mm}}\right);\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
   &= 279\,\mathrm{N}/\mathrm{mm}^{2}
 \end{aligned}
@@ -10120,7 +10604,7 @@ $$
 **Durchstanzbewehrung an der Fliessgrenze** *(SIA 262:2025, 4.3.6.5.3, (67))*
 
 $$
-V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 2771\,\mathrm{mm}^{2} \cdot 0.7 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 843.3\,\mathrm{kN}
+V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd,\text{sw}} = 2771\,\mathrm{mm}^{2} \cdot 0.7 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 843.3\,\mathrm{kN}
 $$
 
 **Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung**
@@ -10165,7 +10649,7 @@ $$
 
 #### Ausserhalb der Durchstanzbewehrung
 
-**Wirksame statische Höhe bis zu den Köpfen der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
+**Wirksame statische Höhe bis zur Verankerung der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
 d_{v,out} = d - c_v = 340\,\mathrm{mm} - 30\,\mathrm{mm} = 310\,\mathrm{mm}
@@ -10189,7 +10673,7 @@ $$
 u_{red,out} = u_{0,out} - \Delta u_{A,out} = 5592\,\mathrm{mm} - 491\,\mathrm{mm} = 5102\,\mathrm{mm}
 $$
 
-**Wirksamer Umfang des äusseren Nachweisschnitts, mit k\_e von innen** *(SIA 262:2025, 4.3.6.2.3)*
+**Wirksamer Umfang des äusseren Nachweisschnitts** *(SIA 262:2025, 4.3.6.2.3)*
 
 $$
 u_{out} = k_e \cdot u_{red,out} = 0.7 \cdot 5102\,\mathrm{mm} = 3571\,\mathrm{mm}
@@ -10249,7 +10733,7 @@ $$
 c_{nom} = 30\,\mathrm{mm}
 $$
 
-**Überdeckung der Durchstanzbewehrung unten**
+**Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten**
 
 $$
 c_v = 30\,\mathrm{mm}
@@ -10343,7 +10827,7 @@ $$
 
 #### Nachweisschnitt
 
-**Nachweisschnitt um das Wandende: 1.5·d\_v entlang der Wand** *(SIA 262:2025, 4.3.6.2.3, Figur 23b und c)*
+**Nachweisschnitt um das Wandende: 1.5·d\_v entlang der Wand** *(SIA 262:2025, 4.3.6.2.3, Figur 23b)*
 
 $$
 u_0 = t + 3 \cdot d_v + \frac{\pi \cdot d_v}{2} = 250\,\mathrm{mm} + 3 \cdot 234\,\mathrm{mm} + \frac{\pi \cdot 234\,\mathrm{mm}}{2} = 1320\,\mathrm{mm}
@@ -10467,7 +10951,7 @@ $$
 c_{nom} = 30\,\mathrm{mm}
 $$
 
-**Überdeckung der Durchstanzbewehrung unten**
+**Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten**
 
 $$
 c_v = 30\,\mathrm{mm}
@@ -10561,7 +11045,7 @@ $$
 
 #### Nachweisschnitt
 
-**Nachweisschnitt um die Wandecke: je 1.5·d\_v entlang der Wände** *(SIA 262:2025, 4.3.6.2.3, Figur 23b und c)*
+**Nachweisschnitt um die Wandecke: je 1.5·d\_v entlang der Wände** *(SIA 262:2025, 4.3.6.2.3, Figur 23c)*
 
 $$
 u_0 = 3 \cdot d_v + \frac{\pi \cdot d_v}{4} = 3 \cdot 234\,\mathrm{mm} + \frac{\pi \cdot 234\,\mathrm{mm}}{4} = 886\,\mathrm{mm}
@@ -14548,7 +15032,9 @@ Die festen Werte für k\_e gelten nur für Flachdecken mit regelmässigem Stütz
 
 Näherungsstufe 2: die mittleren Momente im Stützstreifen nach den Gleichungen (62) bis (65).
 
-Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 -- Anker ⌀10 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 -- Anker ⌀10 aus B500B mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d\_v auseinander (5.5.3.9).
+
+Die Anker sind aus B500B: in (67) und (69) gilt ihre Fliessgrenze, nicht die der Biegebewehrung (4.3.6.5.4).
 
 Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützten Fläche: 2 je Leiste.
 
@@ -14556,15 +15042,17 @@ Mehr als 2·k\_r und 3.5 in Gleichung (70) lässt 4.3.6.5.9 nur für Systeme zu,
 
 Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker.
 
-Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 -- Anker ⌀16 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Die Näherung für k\_e gilt für die gestützte Fläche, an jedem ihrer Schnitte (4.3.6.2.5).
+
+Vorgeschlagen wird ancoPLUS von AncoTech: 20 × ancoPLUS DC9-0215 -- Anker ⌀16 aus B500B mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d\_v auseinander (5.5.3.9).
 
 Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens 1.5·d\_v,out von jedem Ende (Figur 26).
 
 Ein Stahlpilz vergrössert die gestützte Fläche. Gewählt ist der kleinste, der zwischen die Überdeckungen passt -- unten 20 mm, oben 50 mm, die Vorgaben der Software von AncoTech -- und mit dem die Platte ausserhalb hält: ZEUS Doppelkreuz 730 × 730 mm, h = 120 mm, g = 150 mm (AncoTech, Preisliste ZEUS 12.2018). Seine gestützte Fläche reicht bis an die Enden der Stege (4.3.6.6.2). Den Widerstand des Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.
 
-Um den Pilz reicht der Beton allein nicht: dazu kommen Leisten, bündig an den Pilz, mit den vier Nachweisen der Durchstanzbewehrung.
+Um den Pilz reicht der Beton allein nicht: dazu kommen Leisten, bündig an den Pilz, mit den Nachweisen der Durchstanzbewehrung (4.3.6.5.1).
 
-Vorgeschlagen wird ancoPLUS von AncoTech um den Stahlpilz: 20 × ancoPLUS DX6-0215 -- Anker ⌀10 mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech um den Stahlpilz: 20 × ancoPLUS DX6-0215 -- Anker ⌀10 aus B500B mit h\_A = 215 mm, vom Rand der gestützten Fläche 85 / 140 / 140 / 175 / 175 / 175 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d\_v auseinander (5.5.3.9).
 
 Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützten Fläche: 1 je Leiste.
 
@@ -14574,23 +15062,25 @@ Der Schnitt endet am Plattenrand: so ist er kürzer als der geschlossene (Figur 
 
 e\_u ist der Abstand zwischen der Resultierenden der Auflagerkraft -- in der Stützenachse, verschoben um die Exzentrizität e\_x, e\_y -- und dem Schwerpunkt der zählenden Teile des Nachweisschnitts.
 
-Vorgeschlagen wird ancoPLUS von AncoTech: 5 × ancoPLUS DX3-0235 -- Anker ⌀10 mit h\_A = 235 mm, vom Rand der gestützten Fläche 95 / 150 / 150 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 5 × ancoPLUS DX4-0235 -- Anker ⌀10 aus B500B mit h\_A = 235 mm, vom Rand der gestützten Fläche 95 / 150 / 150 / 190 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d\_v auseinander (5.5.3.9).
+
+k\_e nach (57) gilt für jeden Schnitt mit seiner eigenen Fläche und dem Schwerpunkt seiner zählenden Teile (4.3.6.2.3, 4.3.6.2.4).
 
 Eckstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
-Näherungsstufe 1: für regelmässig gestützte Flachdecken mit 0.5 ≤ l\_x/l\_y ≤ 2 ohne grosse Umlagerung: m\_sd/m\_Rd = 1.
+Näherungsstufe 3: r\_s und die mittleren Momente im Stützstreifen aus einer Berechnung nach der Elastizitätstheorie; in (60) steht 1.2 statt 1.5 als erster Faktor.
 
 Innenstütze einer Bodenplatte. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
 Hinter einer Aussparung, die näher als 5·d\_v am Schnitt liegt, zählt nicht, was zwischen den beiden Strahlen von der Stützenachse an ihr vorbei liegt.
 
-Näherungsstufe 3: r\_s und die mittleren Momente im Stützstreifen aus einer Berechnung nach der Elastizitätstheorie; 1.2 statt 1.5 vor der Klammer.
-
-Vorgeschlagen wird ancoPLUS von AncoTech: 9 × ancoPLUS DB2-0325 -- Anker ⌀14 mit h\_A = 325 mm, vom Rand der gestützten Fläche 125 / 200 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d; zwei Leisten stehen beim zweiten Anker höchstens 1.5·d auseinander (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen).
+Vorgeschlagen wird ancoPLUS von AncoTech: 9 × ancoPLUS DB2-0325 -- Anker ⌀14 aus B500B mit h\_A = 325 mm, vom Rand der gestützten Fläche 125 / 200 mm. Die Abstände sind die der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum dritten 0.60·d, danach 0.75·d (AncoTech, Gutachten Muttoni / Fernández Ruiz 2007 (07-A05-R1c) und Preisliste ancoPLUS, nach Vorgabe, nicht nachgeschlagen). Zwei Leisten stehen beim zweiten Anker höchstens 1.5·d\_v auseinander (5.5.3.9).
 
 Keine Leiste läuft über den Plattenrand oder durch eine Aussparung, auch nicht zwischen zwei Ankern; zu beiden hält sie die Überdeckung c\_nom, sonst endet sie mit dem Anker davor. Im Schatten einer Aussparung zählt der Nachweisschnitt nicht (Figur 23d) -- dort liegt auch keine Leiste: Bewehrung, die diesen Teil quert, trüge nichts zur gestützten Fläche.
 
 Wandende einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
+
+Näherungsstufe 1: für regelmässig gestützte Flachdecken mit 0.5 ≤ l\_x/l\_y ≤ 2 ohne grosse Umlagerung: m\_sd/m\_Rd = 1.
 
 Wandecke einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
@@ -14654,13 +15144,13 @@ $$
 a_{s,x} = \frac{\pi \cdot \varnothing_x^{2}}{4 \cdot s_x}
 $$
 
-**Druckzonenhöhe in x, je Meter**
+**Druckzonenhöhe in x, je Meter** *(SIA 262:2025, 4.2.1.5, Figur 12)*
 
 $$
 x_x = \frac{a_{s,x} \cdot f_{yd}}{0.85 \cdot f_{cd}}
 $$
 
-**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5)*
+**Biegewiderstand im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.5; 4.2.1.5, Figur 12)*
 
 $$
 m_{Rd,x} = a_{s,x} \cdot f_{yd} \cdot \left(d_x - \frac{0.85 \cdot x_x}{2}\right)
@@ -14711,7 +15201,7 @@ $$
 **Spannung in der Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4, (69))*
 
 $$
-\sigma_{sd} = \min\left[\frac{E_s \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right]
+\sigma_{sd} = \min\left[\frac{E_{s} \cdot \psi}{6} \cdot \left(1 + \frac{f_{ctm}}{f_{yd}} \cdot \frac{d}{\varnothing_{sw}}\right);\ f_{yd}\right]
 $$
 
 **Anrechenbare Durchstanzbewehrung** *(SIA 262:2025, 4.3.6.5.4)*
@@ -14750,7 +15240,7 @@ $$
 V_{Rd,max} = \min\left[k_{sys} \cdot k_r;\ 3.5\right] \cdot \tau_{cd} \cdot d_v \cdot u
 $$
 
-**Wirksame statische Höhe bis zu den Köpfen der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
+**Wirksame statische Höhe bis zur Verankerung der Anker** *(SIA 262:2025, 4.3.6.5.10, Figur 26)*
 
 $$
 d_{v,out} = d - c_v
@@ -14792,28 +15282,40 @@ $$
 m_{sd,x} = \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{2 \cdot b_s}\right);\ 0.25 \cdot V_{d,red}\right]
 $$
 
-**Breite des Stützstreifens in y, durch den Plattenrand begrenzt** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+**Grenze der Breite des Stützstreifens in y am Plattenrand: zwischen den Linien unter 45° von den inneren Ecken der Stütze** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
 
 $$
-b_{sr,y} = \min\left[b_s;\ D + 2 \cdot \left(D + a_y\right)\right]
+b_{sr,y} = D + 2 \cdot \left(D + a_y\right)
+$$
+
+**Breite des Stützstreifens in y, senkrecht zum Rand** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
+
+$$
+b_{s,y} = \min\left[b_s;\ b_{sr,y}\right]
 $$
 
 **Mittleres Moment im Stützstreifen in y** *(SIA 262:2025, 4.3.6.4.7, (64))*
 
 $$
-m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{sr,y}}\right)
+m_{sd,y} = V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,y}}{b_{s,y}}\right)
 $$
 
-**Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
+**Breite des Randstreifens in x: innen die halbe, aussen bis zum zweiten Plattenrand** *(SIA 262:2025, 4.3.6.4.6, Figur 25)*
 
 $$
-\psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s}
+b_{s,x} = \frac{\min\left[b_s;\ b_{sr,x}\right]}{2} + \min\left[\frac{\min\left[b_s;\ b_{sr,x}\right]}{2};\ \frac{b_y}{2} + a_y\right]
 $$
 
-**Nachweisschnitt ohne das, was nicht zählt** *(SIA 262:2025, 4.3.6.2.3)*
+**Mittleres Moment im Stützstreifen in x** *(SIA 262:2025, 4.3.6.4.7, (65))*
 
 $$
-u_{red} = u_0 - \Delta u_A
+m_{sd,x} = \max\left[V_{d,red} \cdot \left(\frac{1}{8} + \frac{e_{u,x}}{b_{s,x}}\right);\ 0.5 \cdot V_{d,red}\right]
+$$
+
+**Abstand zum Momentennullpunkt in y: am Plattenrand mindestens 2/3 · b\_sr** *(SIA 262:2025, 4.3.6.4.8)*
+
+$$
+r_{sy} = \max\left[r_{sy};\ \frac{2}{3} \cdot b_{sr,y}\right]
 $$
 
 **Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
@@ -14822,13 +15324,25 @@ $$
 \psi_x = 1.2 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s} \cdot \left(\frac{m_{sd,x}}{m_{Rd,x}}\right)^{3/2}
 $$
 
-**Nachweisschnitt um das Wandende: 1.5·d\_v entlang der Wand** *(SIA 262:2025, 4.3.6.2.3, Figur 23b und c)*
+**Nachweisschnitt ohne das, was nicht zählt** *(SIA 262:2025, 4.3.6.2.3)*
+
+$$
+u_{red} = u_0 - \Delta u_A
+$$
+
+**Nachweisschnitt um das Wandende: 1.5·d\_v entlang der Wand** *(SIA 262:2025, 4.3.6.2.3, Figur 23b)*
 
 $$
 u_0 = t + 3 \cdot d_v + \frac{\pi \cdot d_v}{2}
 $$
 
-**Nachweisschnitt um die Wandecke: je 1.5·d\_v entlang der Wände** *(SIA 262:2025, 4.3.6.2.3, Figur 23b und c)*
+**Plattenrotation in x** *(SIA 262:2025, 4.3.6.4.1, (60))*
+
+$$
+\psi_x = 1.5 \cdot \frac{r_{sx}}{d} \cdot \frac{f_{yd}}{E_s}
+$$
+
+**Nachweisschnitt um die Wandecke: je 1.5·d\_v entlang der Wände** *(SIA 262:2025, 4.3.6.2.3, Figur 23c)*
 
 $$
 u_0 = 3 \cdot d_v + \frac{\pi \cdot d_v}{4}
@@ -15832,19 +16346,19 @@ $$
 | Beiwert | $k_r$ | $0.762$ | – |
 | Querkraft im Schnitt | $V_d$ | $494.9$ | kN |
 | Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $371.8$ | kN |
-| Durchstanzbewehrung |  | 5 × ancoPLUS DX3-0235 |  |
-| Abstände ab Stütze | $s$ | $95 / 150 / 150$ | mm |
+| Durchstanzbewehrung |  | 5 × ancoPLUS DX4-0235 |  |
+| Abstände ab Stütze | $s$ | $95 / 150 / 150 / 190$ | mm |
 | Beitrag der Bewehrung | $V_{Rd,s}$ | $341.0$ | kN |
 | Erste Betondruckdiagonale | $V_{Rd,max}$ | $743.7$ | kN |
-| Querkraft ausserhalb | $V_{d,out}$ | $485.0$ | kN |
-| Widerstand ausserhalb | $V_{Rd,c,out}$ | $541.6$ | kN |
+| Querkraft ausserhalb | $V_{d,out}$ | $478.1$ | kN |
+| Widerstand ausserhalb | $V_{Rd,c,out}$ | $530.5$ | kN |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
 | Durchstanzen | mit Durchstanzbewehrung | $V_{Rd,s} = 341.0\,\mathrm{kN}$ | $V_{d,s} = 123.1\,\mathrm{kN}$ | $2.77$ |
 | Durchstanzen | Verformungsvermögen | $V_{Rd,v} = 341.0\,\mathrm{kN}$ | $V_d / 2 = 247.5\,\mathrm{kN}$ | $1.38$ |
 | Durchstanzen | Betondruckdiagonale | $V_{Rd,max} = 743.7\,\mathrm{kN}$ | $V_{d,red} = 494.9\,\mathrm{kN}$ | $1.50$ |
-| Durchstanzen | ausserhalb der Durchstanzbewehrung | $V_{Rd,c,out} = 541.6\,\mathrm{kN}$ | $V_{d,out} = 485.0\,\mathrm{kN}$ | $1.12$ |
+| Durchstanzen | ausserhalb der Durchstanzbewehrung | $V_{Rd,c,out} = 530.5\,\mathrm{kN}$ | $V_{d,out} = 478.1\,\mathrm{kN}$ | $1.11$ |
 
 ### Eckstütze
 
@@ -15861,14 +16375,38 @@ $$
 | Wirksame statische Höhe | $d_v$ | $234$ | mm |
 | Nachweisschnitt, wirksam | $u$ | $509$ | mm |
 | Momentenübertragung | $k_e$ | $0.650$ | – |
-| Plattenrotation | $\psi$ | $0.0215$ | – |
-| Beiwert | $k_r$ | $0.652$ | – |
+| Plattenrotation | $\psi$ | $0.0040$ | – |
+| Beiwert | $k_r$ | $1.537$ | – |
 | Querkraft im Schnitt | $V_d$ | $80.0$ | kN |
-| Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $85.1$ | kN |
+| Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $200.7$ | kN |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
-| Durchstanzen | ohne Durchstanzbewehrung | $V_{Rd,c} = 85.1\,\mathrm{kN}$ | $V_{d,red} = 80.0\,\mathrm{kN}$ | $1.06$ |
+| Durchstanzen | ohne Durchstanzbewehrung | $V_{Rd,c} = 200.7\,\mathrm{kN}$ | $V_{d,red} = 80.0\,\mathrm{kN}$ | $2.51$ |
+
+### Randstütze in Stufe 3
+
+**Angaben zur Durchstanzstelle**
+
+$$
+\text{Randstütze, Decke, Beton C30/37} \qquad h = 280\,\mathrm{mm} \qquad b_x = 300\,\mathrm{mm} \qquad b_y = 300\,\mathrm{mm} \qquad a_y = 0\,\mathrm{mm}
+$$
+
+**Durchstanzen**
+
+| Grösse | Zeichen | Wert | Einheit |
+| :--- | :--- | ---: | :--- |
+| Wirksame statische Höhe | $d_v$ | $234$ | mm |
+| Nachweisschnitt, wirksam | $u$ | $887$ | mm |
+| Momentenübertragung | $k_e$ | $0.700$ | – |
+| Plattenrotation | $\psi$ | $0.0023$ | – |
+| Beiwert | $k_r$ | $1.770$ | – |
+| Querkraft im Schnitt | $V_d$ | $150.0$ | kN |
+| Widerstand ohne Durchstanzbewehrung | $V_{Rd,c}$ | $402.6$ | kN |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Durchstanzen | ohne Durchstanzbewehrung | $V_{Rd,c} = 402.6\,\mathrm{kN}$ | $V_{d,red} = 150.0\,\mathrm{kN}$ | $2.68$ |
 
 ### Ovalstütze
 
@@ -16253,13 +16791,13 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Abmessung der Stütze in x | $b_x$ | $400$ | mm | Vorgabe |
 | Abmessung der Stütze in y | $b_y$ | $400$ | mm | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
-| Überdeckung der Durchstanzbewehrung unten | $c_v$ | $30$ | mm | Vorgabe |
+| Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | $c_v$ | $30$ | mm | Vorgabe |
 | Exzentrizität der Auflagerkraft in x | $e_x$ | $0$ | mm | Vorgabe |
 | Exzentrizität der Auflagerkraft in y | $e_y$ | $0$ | mm | Vorgabe |
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $1.13$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $1.13$ |  | berechnet |
 | Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $1.12$ |  | berechnet |
 | Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $1.94$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.43$ |  | berechnet |
@@ -16274,13 +16812,13 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Abmessung der Stütze in x | $b_x$ | $400$ | mm | Vorgabe |
 | Abmessung der Stütze in y | $b_y$ | $400$ | mm | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
-| Überdeckung der Durchstanzbewehrung unten | $c_v$ | $30$ | mm | Vorgabe |
+| Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | $c_v$ | $30$ | mm | Vorgabe |
 | Exzentrizität der Auflagerkraft in x | $e_x$ | $0$ | mm | Vorgabe |
 | Exzentrizität der Auflagerkraft in y | $e_y$ | $0$ | mm | Vorgabe |
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $1.00$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $1.00$ |  | berechnet |
 | Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $1.02$ |  | berechnet |
 | Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $1.01$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.35$ |  | berechnet |
@@ -16295,13 +16833,13 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bemessungswert der Auflagerkraft | $V_d$ | $500$ | kN | Vorgabe |
 | Abstand vom Plattenrand in y | $a_y$ | $100$ | mm | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
-| Überdeckung der Durchstanzbewehrung unten | $c_v$ | $30$ | mm | Vorgabe |
+| Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | $c_v$ | $30$ | mm | Vorgabe |
 | Exzentrizität der Auflagerkraft in x | $e_x$ | $0$ | mm | Vorgabe |
 | Exzentrizität der Auflagerkraft in y | $e_y$ | $80$ | mm | Vorgabe |
 | Plattendicke | $h$ | $300$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $1.12$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $1.11$ |  | berechnet |
 | Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $1.50$ |  | berechnet |
 | Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $2.77$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.75$ |  | berechnet |
@@ -16318,14 +16856,16 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Abmessung der Stütze in x | $b_x$ | $300$ | mm | Vorgabe |
 | Abmessung der Stütze in y | $b_y$ | $300$ | mm | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
-| Überdeckung der Durchstanzbewehrung unten | $c_v$ | $30$ | mm | Vorgabe |
+| Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | $c_v$ | $30$ | mm | Vorgabe |
+| Exzentrizität der Auflagerkraft in x | $e_x$ | $0$ | mm | Vorgabe |
+| Exzentrizität der Auflagerkraft in y | $e_y$ | $0$ | mm | Vorgabe |
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $1.06$ |  | berechnet |
+| Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $2.51$ |  | berechnet |
 | Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $\infty$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |
@@ -16333,15 +16873,37 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Stababstand in x | $s_x$ | $150$ | mm | Vorgabe |
 | Stababstand in y | $s_y$ | $150$ | mm | Vorgabe |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
+| Bemessungswert der Auflagerkraft | $V_d$ | $150$ | kN | Vorgabe |
+| Abstand vom Plattenrand in y | $a_y$ | $0$ | mm | Vorgabe |
+| Abmessung der Stütze in x | $b_x$ | $300$ | mm | Vorgabe |
+| Abmessung der Stütze in y | $b_y$ | $300$ | mm | Vorgabe |
+| Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
+| Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | $c_v$ | $30$ | mm | Vorgabe |
+| Plattendicke | $h$ | $280$ | mm | Vorgabe |
+| Mittleres Moment im Stützstreifen, x | $m_{sd,x}$ | $40$ | kNm/m | Vorgabe |
+| Mittleres Moment im Stützstreifen, y | $m_{sd,y}$ | $60$ | kNm/m | Vorgabe |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $2.68$ |  | berechnet |
+| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $\infty$ |  | berechnet |
+| Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
+| Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |
+| Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast | $q_d$ | $0$ | kN/m² | Vorgabe |
+| Abstand zum Momentennullpunkt in x | $r_{sx}$ | $0.8$ | m | Vorgabe |
+| Abstand zum Momentennullpunkt in y | $r_{sy}$ | $0.4$ | m | Vorgabe |
+| Stababstand in x | $s_x$ | $150$ | mm | Vorgabe |
+| Stababstand in y | $s_y$ | $150$ | mm | Vorgabe |
+| Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Bemessungswert der Auflagerkraft | $V_d$ | $1400$ | kN | Vorgabe |
 | Abmessung der Stütze in x | $b_x$ | $1200$ | mm | Vorgabe |
 | Abmessung der Stütze in y | $b_y$ | $300$ | mm | Vorgabe |
 | Überdeckung der Zugbewehrung unten | $c_{nom}$ | $40$ | mm | Vorgabe |
-| Überdeckung der Durchstanzbewehrung oben | $c_v$ | $30$ | mm | Vorgabe |
+| Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, oben | $c_v$ | $30$ | mm | Vorgabe |
 | Plattendicke | $h$ | $400$ | mm | Vorgabe |
 | Mittleres Moment im Stützstreifen, x | $m_{sd,x}$ | $180$ | kNm/m | Vorgabe |
 | Mittleres Moment im Stützstreifen, y | $m_{sd,y}$ | $150$ | kNm/m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $1.15$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $1.15$ |  | berechnet |
 | Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $2.18$ |  | berechnet |
 | Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $1.57$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.73$ |  | berechnet |
@@ -16356,11 +16918,11 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Bemessungswert der Auflagerkraft | $V_d$ | $400$ | kN | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
-| Überdeckung der Durchstanzbewehrung unten | $c_v$ | $30$ | mm | Vorgabe |
+| Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | $c_v$ | $30$ | mm | Vorgabe |
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.41$ |  | berechnet |
@@ -16374,11 +16936,11 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Bemessungswert der Auflagerkraft | $V_d$ | $300$ | kN | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
-| Überdeckung der Durchstanzbewehrung unten | $c_v$ | $30$ | mm | Vorgabe |
+| Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | $c_v$ | $30$ | mm | Vorgabe |
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.37$ |  | berechnet |
@@ -16488,6 +17050,10 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Dauernde Auflast neben dem Fundament | $q_{Ed}$ | $0$ | kPa | Vorgabe |
 | Tiefe der Sohle unter Terrain | $t$ | $2$ | m | Vorgabe |
 | Tiefe des höchsten Grundwasserspiegels unter Terrain | $t_1$ | $0$ | m | Vorgabe |
+| Elastizitätsmodul des Betonstahls | $E_{s,\text{sw}}$ | $200000$ | N/mm² | Vorgabe |
+| Bemessungswert der Fliessgrenze | $f_{yd,\text{sw}}$ | $435$ | N/mm² | berechnet |
+| Charakteristische Fliessgrenze | $f_{yk,\text{sw}}$ | $500$ | N/mm² | Vorgabe |
+| Teilsicherheitsbeiwert für Betonstahl | $\gamma_{s,\text{sw}}$ | $1.15$ |  | Vorgabe |
 | Betrachtete Breite (x) | $b$ | $1000$ | mm | Vorgabe |
 | Betrachtete Breite (y) | $b_y$ | $1000$ | mm | Vorgabe |
 | Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $123$ | kg/m³ | berechnet |

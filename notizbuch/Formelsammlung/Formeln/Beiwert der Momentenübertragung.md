@@ -1,5 +1,5 @@
 ---
-erzeugt: b3cdeec5d7c1
+erzeugt: 3bb8114bb757
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.2.4, (57)"
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.durchstanzen.nachweis#Durchstanzen._k_e|Durchstanzen._k_e]]
+- [[opencivil.durchstanzen.herleitung#k_e|k_e]]
 
 ## Themen
 
@@ -54,3 +54,11 @@ Schnitts ([[Durchmesser des flächengleichen Kreises]]).
 Für regelmässig gestützte Flachdecken darf $k_e$ genähert werden
 (4.3.6.2.5): 0.9 für Innenstützen, 0.7 für Randstützen und Innenstützen mit
 grossen Aussparungen, 0.65 für Eckstützen, 0.75 für Wandenden und Wandecken.
+
+$k_e$ gehört zu einem Schnitt. Der Schnitt um die äussersten Anker und der
+um einen Stahlpilz werden nach denselben Regeln geführt wie der um die
+Stütze (4.3.6.5.10, 4.3.6.6.2): nach (57) je mit der eigenen Fläche und dem
+eigenen Schwerpunkt; die Näherung gilt für die gestützte Fläche und damit für
+jeden ihrer Schnitte. Aussen ist die Fläche grösser, an Rand- und Eckstützen
+liegt ihr Schwerpunkt aber weiter von der Stütze weg -- dort wird $k_e$
+aussen kleiner. Bis 2026-11-14 galt aussen der Wert von innen.

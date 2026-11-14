@@ -1,5 +1,5 @@
 ---
-erzeugt: 9075cff50061
+erzeugt: 2350d906a5b7
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.4.6, (61)"
@@ -17,7 +17,7 @@ $$
 | --- | --- | --- | --- |
 | $r_{sx}$ | – | mm | [[Abstand zum Momentennullpunkt]] |
 | $r_{sy}$ | – | mm | [[Abstand zum Momentennullpunkt]] |
-| $l_{min}$ | – | mm | Zwischenwert |
+| $l_{min}$ | Die kleinere Spannweite | mm | Zwischenwert |
 
 ## Beispiel
 
@@ -33,7 +33,8 @@ $$
 
 ## Gebraucht von
 
-- [[Breite des Stützstreifens am Plattenrand]]
+- [[Breite des Randstreifens an der Eckstütze]]
+- [[Breite des Stützstreifens senkrecht zum Rand]]
 - [[Mittleres Moment im Stützstreifen]]
 
 ## Im Code
@@ -51,4 +52,6 @@ $$
 In Näherungsstufe 2 wird das Moment über die Breite des Stützstreifens
 gemittelt ([[Mittleres Moment im Stützstreifen]]). Sie wächst mit dem
 [[Abstand zum Momentennullpunkt]] in beiden Richtungen und ist höchstens so
-breit wie die kleinere Spannweite.
+breit wie die kleinere Spannweite. Am Plattenrand begrenzt ihn der Rand:
+[[Breite des Stützstreifens senkrecht zum Rand]] und
+[[Breite des Randstreifens an der Eckstütze]].

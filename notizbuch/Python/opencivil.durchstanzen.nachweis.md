@@ -1,5 +1,5 @@
 ---
-erzeugt: 5cb30a5098be
+erzeugt: ab5f80c864fa
 art: modul
 tags: [modul]
 ---
@@ -37,20 +37,25 @@ Platte reicht (Figur 21).
 
 In Näherungsstufe 1 ist `m_sd/m_Rd = 1`; in Stufe 2 kommen die Momente im
 Stützstreifen aus den Gleichungen (62) bis (65), in Stufe 3 gibt sie der
-Benutzer an, mit 1.2 statt 1.5 vor der Klammer. `r_s = 0.22 · l` in den
+Benutzer an, und in (60) steht 1.2 statt 1.5 als erster Faktor; an Rand- und
+Eckstützen gilt dann r_s ≥ 2/3 · b_sr (4.3.6.4.8). `r_s = 0.22 · l` in den
 Stufen 1 und 2 (4.3.6.4.4). Massgebend ist die grössere Rotation der beiden
 Richtungen. Für Wandende und Wandecke nennt 4.3.6.4.7 keine Momente; dort
 rechnet Stufe 2 wie Stufe 1, und die Herleitung sagt es.
 
 
-## DIE BREITE DER STÜTZSTREIFEN
+## DIE BREITE DER STÜTZSTREIFEN (4.3.6.4.6, Figur 25)
 
-(Figur 25), gelesen (nicht nachgeschlagen)
 `b_s = 1.5 · √(r_sx · r_sy) ≤ l_min`. Ein Streifen senkrecht zum Rand einer
 Randstütze und die Randstreifen einer Eckstütze sind auf `b_sr` begrenzt:
 die Breite, die zwei Linien unter 45° von den inneren Ecken der Stütze am
 Plattenrand einschliessen, `b_sr = b_x + 2 · (b_y + a_y)` für den Streifen
-in y, entsprechend in x, höchstens `b_s`.
+in y, entsprechend in x. An der Randstütze ist der Streifen
+`min[b_s; b_sr]` breit. An der Eckstütze schneidet ihn quer der zweite
+Rand ab: die halbe Breite `min[b_s; b_sr]/2` innen, zum zweiten Rand hin
+nur bis zu ihm, `b_x/2 + a_x` für den Streifen in y, höchstens ebenso viel.
+Bis 2026-11-14 lag er an der Ecke symmetrisch um die Achse, bis zu 50 %
+breiter, als Figur 25 ihn zeigt.
 
 
 ## EINHEITEN
@@ -94,7 +99,7 @@ braucht; jedes mit seinen eigenen Zahlen.
 - `umriss: Tuple[Punkt, ...]`
 - `aussparungen: Tuple[Tuple[Punkt, ...], ...]`
 - `raender: Tuple[Tuple[Punkt, float], ...]` – Je Plattenrand ein Punkt auf ihm und die Richtung, in die die Platte liegt (rad).
-- `leisten: Optional[Leistenpruefung] = None` – Die vorgeschlagene Durchstanzbewehrung mit ihren vier Nachweisen.
+- `leisten: Optional[Leistenpruefung] = None` – Die vorgeschlagene Durchstanzbewehrung mit ihren Nachweisen (4.3.6.5.1).
 - `pilz: Optional[Pilzbefund] = None` – Der gewählte Stahlpilz; mit `leisten` stehen die Leisten um ihn.
 
 ### Durchstanzen
@@ -116,7 +121,9 @@ Der Durchstanznachweis an einer Durchstanzstelle -- siehe Dateikopf.
 def mit_graden(self) -> Tuple[WertDef, ...]
 ```
 
-Die Grade der vier Nachweise mit Durchstanzbewehrung (4.3.6.5.1).
+Die vier Grade mit Durchstanzbewehrung: die drei Nachweise nach
+4.3.6.5.1, der erste geteilt in den Beitrag der Bewehrung (66), (68)
+und das Verformungsvermögen (67).
 
 #### Durchstanzen.nicht_fuehrbar
 
@@ -151,14 +158,15 @@ k_e. Wo die gestützte Fläche eine Formel für u_0 kennt, steht sie da,
 sonst die Länge in der Platte; die Abzüge schreibt [[opencivil.durchstanzen.herleitung|.herleitung]],
 wie an jedem Schnitt.
 
-#### Durchstanzen._exzentrizitaet
+#### Durchstanzen.exzentrizitaet
 
 ```python
-def _exzentrizitaet(self, e: Eingaben, a: Auswertung, masse: Dict[str, float]) -> Tuple[float, float]
+def exzentrizitaet(self, e: Eingaben, a: Auswertung, masse: Masse) -> Tuple[float, float]
 ```
 
-e_u: von dem Schwerpunkt der zählenden Teile des Schnitts zur Resultierenden
-der Auflagerkraft -- je Komponente, in m.
+e_u: von dem Schwerpunkt der zählenden Teile eines Schnitts zur
+Resultierenden der Auflagerkraft -- je Komponente, in m. Gilt für jeden
+Schnitt: um die Stütze, um die äussersten Anker und um den Pilz.
 
 #### Durchstanzen._k_e
 
@@ -195,11 +203,27 @@ Die mittleren Momente im Stützstreifen in Näherungsstufe 2 (4.3.6.4.7).
 #### Durchstanzen._b_sr
 
 ```python
-def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert, rand: Randbreite) -> Wert
+def _b_sr(self, p: Protokoll, w: Zwischenwerte, r: Richtung, rand: Randbreite) -> Wert
 ```
 
-Die Breite eines Streifens senkrecht zum Rand oder eines Randstreifens an
-der Ecke (Figur 25) -- siehe Dateikopf.
+b_sr des Streifens in `r`: zwischen den Linien unter 45° (Figur 25) -- siehe Kopf.
+
+#### Durchstanzen._breite_am_rand
+
+```python
+def _breite_am_rand(self, p: Protokoll, w: Zwischenwerte, r: Richtung, b_s: Wert, rand: Randbreite) -> Wert
+```
+
+Die Breite eines Streifens, den der Plattenrand begrenzt: höchstens
+b_sr, an der Ecke vom zweiten Rand abgeschnitten -- siehe Dateikopf.
+
+#### Durchstanzen._r_s_am_rand
+
+```python
+def _r_s_am_rand(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, r: Richtung, rand: Randbreite) -> Wert
+```
+
+In Stufe 3 an Rand- und Eckstützen: r_s mindestens 2/3 · b_sr (4.3.6.4.8).
 
 #### Durchstanzen._k_r
 
@@ -261,14 +285,15 @@ Stahlpilz und Durchstanzbewehrung dazu, was sie sind und was sie tragen.
 ## Formeln aus diesem Modul
 
 - [[Abstand zum Momentennullpunkt]] · `Durchstanzen._rotation`
-- [[Beiwert der Momentenübertragung]] · `Durchstanzen._k_e`
+- [[Abstand zum Momentennullpunkt am Plattenrand]] · `Durchstanzen._r_s_am_rand`
 - [[Beiwert k_r]] · `Durchstanzen._k_r`
 - [[Biegebewehrung im Stützstreifen je Meter]] · `Durchstanzen._m_Rd`
 - [[Biegewiderstand im Stützstreifen]] · `Durchstanzen._m_Rd`
+- [[Breite des Randstreifens an der Eckstütze]] · `Durchstanzen._breite_am_rand`
 - [[Breite des Stützstreifens]] · `Durchstanzen._m_sd`
 - [[Breite des Stützstreifens am Plattenrand]] · `Durchstanzen._b_sr`
+- [[Breite des Stützstreifens senkrecht zum Rand]] · `Durchstanzen._breite_am_rand`
 - [[Druckzonenhöhe im Stützstreifen]] · `Durchstanzen._m_Rd`
-- [[Durchmesser des flächengleichen Kreises]] · `Durchstanzen._k_e`
 - [[Massgebende Plattenrotation – die grössere]] · `Durchstanzen._rotation`
 - [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · `Durchstanzen._statische_hoehe`
 - [[Mittleres Moment im Stützstreifen]] · `Durchstanzen._m_sd`

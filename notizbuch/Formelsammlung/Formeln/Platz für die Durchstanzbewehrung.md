@@ -1,5 +1,5 @@
 ---
-erzeugt: 9dbef48296b2
+erzeugt: 6e9fa549f766
 art: formel
 tags: [formel]
 ---
@@ -18,7 +18,7 @@ $$
 | --- | --- | --- | --- |
 | $h$ | Plattendicke | mm | Vorgabe |
 | $c_{nom}$ | Überdeckung der Zugbewehrung oben | mm | Vorgabe |
-| $c_v$ | Überdeckung der Durchstanzbewehrung unten | mm | Vorgabe |
+| $c_v$ | Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | mm | Vorgabe |
 
 ## Beispiel
 

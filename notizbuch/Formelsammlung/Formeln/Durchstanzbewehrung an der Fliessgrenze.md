@@ -1,5 +1,5 @@
 ---
-erzeugt: 6839b49e659e
+erzeugt: f2ff5b4ecc86
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.6.5.3, (67)"
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd} = 2513\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 983.5\,\mathrm{kN}
+V_{Rd,v} = \sum A_{sw} \cdot k_e \cdot f_{yd,\text{sw}} = 2513\,\mathrm{mm}^{2} \cdot 0.9 \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 983.5\,\mathrm{kN}
 $$
 
 ## Im Code
@@ -39,7 +39,7 @@ $$
 
 ## Theorie
 
-Die anrechenbare Durchstanzbewehrung, als flösse sie: $f_{yd}$ statt der
-Spannung aus der Rotation. Sie muss mindestens die halbe Querkraft tragen
+Die anrechenbare Durchstanzbewehrung, als flösse sie: $f_{yd}$ der Anker
+statt der Spannung aus der Rotation. Sie muss mindestens die halbe Querkraft tragen
 ([[Halbe Querkraft für das Verformungsvermögen]]). Das sichert ein
 genügendes Verformungsvermögen (4.3.6.5.3).

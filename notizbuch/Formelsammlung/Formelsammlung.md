@@ -1,5 +1,5 @@
 ---
-erzeugt: ad0f0f4a73fa
+erzeugt: 22def2a8d344
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -53,12 +53,13 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Durchstanzen**
 
-- [[Durchstanzen]] · 36
+- [[Durchstanzen]] · 39
 
 ## Formeln von A bis Z
 
 - [[Abstand des Grundwassers unter der Sohle]] · $T$
 - [[Abstand zum Momentennullpunkt]] · $r_{sx}$
+- [[Abstand zum Momentennullpunkt am Plattenrand]] · $r_{sy}$
 - [[Anrechenbare Durchstanzbewehrung]] · $\sum A_{sw}$
 - [[Äquivalenter E-Modul eines Stabs]] · $E_{eq}$
 - [[Äquivalenter E-Modul über dem Moment]]
@@ -106,8 +107,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
 - [[Biegewiderstand im Stützstreifen]] · $m_{Rd,x}$
 - [[Bilineare Beziehung des Betonstahls]]
+- [[Breite des Randstreifens an der Eckstütze]] · $b_{s,x}$
 - [[Breite des Stützstreifens]] · $b_s$
 - [[Breite des Stützstreifens am Plattenrand]] · $b_{sr,y}$
+- [[Breite des Stützstreifens senkrecht zum Rand]] · $b_{s,y}$
 - [[Bruchspannung in der Sohle]] · $\sigma_f$
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]]
 - [[Dehnsteifigkeit]] · $EA_{\text{Q1}}$
@@ -284,7 +287,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-86 von 224 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+85 von 227 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -306,7 +309,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Dehnsteifigkeit]] · [[opencivil.stabwerk.rechnung|_dehnsteifigkeit]]
 - [[Dickster Stab der Lage]] · [[opencivil.nachweis.mindestbewehrung#_protokoll_stahlspannung|_protokoll_stahlspannung]]
 - [[Drehung in die Achsen des Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
-- [[Druckzonenhöhe im Stützstreifen]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
 - [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#Balkensystem._eigengewicht|_eigengewicht]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Erfüllungsgrad]] · [[opencivil.core.nachweis#Vergleich.zeile|Vergleich.zeile]]

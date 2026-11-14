@@ -9,8 +9,8 @@ die Anordnung um die Stütze steht in :mod:`.bewehrung`, der Nachweis in
 :mod:`.nachweis`.
 
 ANCOPLUS (AncoTech AG):
-Doppelkopfanker auf einer Montageleiste, je Leiste 2 bis 9 Anker gleichen
-Durchmessers. Die Typen «D…» haben ungleiche Abstände: der erste Anker
+Doppelkopfanker aus B500B auf einer Montageleiste, je Leiste 2 bis 9 Anker
+gleichen Durchmessers. Die Typen «D…» haben ungleiche Abstände: der erste Anker
 liegt 0.375·d vom Rand der Stütze, bis und mit dem dritten folgen sie sich
 im Abstand 0.60·d, danach 0.75·d. So hat es das Gutachten Muttoni /
 Fernández Ruiz von 2007 für die erhöhte Obergrenze 3·k_r festgelegt
@@ -78,8 +78,10 @@ ABSTAND_ERSTER = 0.375
 ABSTAND_BIS_DRITTER = 0.60
 ABSTAND_DANACH = 0.75
 
-#: Höchstens so weit stehen zwei Leisten beim zweiten Anker auseinander,
-#: in Vielfachen von d (Gutachten 2007, Regel 5).
+#: Höchstens so weit stehen zwei Leisten beim zweiten Anker auseinander, in
+#: Vielfachen von d_v: das Gutachten 2007 (Regel 5) misst in d, SIA 262:2025,
+#: 5.5.3.9, in d_v. An der Stütze ist das dasselbe, um einen Stahlpilz ist
+#: d_v kleiner.
 TANGENTIAL = 1.5
 
 #: Die Durchmesser je statischer Höhe d (Gutachten 2007, Tabelle 1): bis zu
@@ -90,9 +92,9 @@ GROESSTER_DURCHMESSER: Tuple[Tuple[float, float], ...] = (
 )
 KLEINSTES_D = 0.160
 
-#: Der Faktor des Gutachtens anstelle der 2 in Gleichung (70), und die
-#: Obergrenze anstelle der 3.5: für Innenstützen, Wandenden und einspringende
-#: Ecken 3·k_r, wenn die Überdeckung der unteren Köpfe höchstens d/10 ist;
+#: Der Faktor des Gutachtens anstelle der 2 in Gleichung (70); die
+#: Obergrenze 3.5 bleibt. Für Innenstützen, Wandenden und einspringende
+#: Ecken 3·k_r, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen;
 #: bei d/6 gilt wieder 2·k_r, dazwischen linear (Gutachten 2007, S. 5–7).
 #: Für Rand- und Eckstützen 2.0 wie in der Norm -- die Software von 2026 nennt
 #: dort 3.0, ein Gutachten dazu war nicht lesbar.
@@ -102,6 +104,11 @@ GRENZE = 3.5
 
 #: Die Höhen h_A enden auf 5 mm, in Schritten von 10 mm (Preisliste).
 HOEHENSCHRITT = 0.010
+
+#: Der Stahl der Anker (Herstellerangabe, nach Vorgabe, nicht nachgeschlagen).
+#: In (67) und (69) gilt seine Fliessgrenze, nicht die der Biegebewehrung
+#: (SIA 262:2025, 4.3.6.5.4).
+STAHL = "B500B"
 
 
 def groesster_durchmesser(d: float) -> Optional[float]:

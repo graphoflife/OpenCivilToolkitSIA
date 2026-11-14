@@ -10,6 +10,14 @@ Lage und Form der gestützten Fläche heissen, steht in :mod:`.flaeche`.
 Welche Felder der Nachweis liest, sagt :func:`eingaben_fuer` -- dieselben Teile
 bekommt die Maske über den Katalog, damit sie nichts davon nachbaut.
 
+DER STAHL DER ANKER:
+Die Durchstanzbewehrung hat ihren eigenen Stahl, den des Produkts
+(:data:`.produkte.STAHL`): in (67) und (69) gilt dessen Fliessgrenze
+(SIA 262:2025, 4.3.6.5.4). Er steht als Baustoff neben der Stelle, mit dem
+Index «sw» an seinen Zeichen; alle Stellen teilen ihn. Bis 2026-11-14
+rechneten die Anker mit dem Stahl der Biegebewehrung -- mit B700B um 40 %
+zu günstig.
+
 DECKE UND BODENPLATTE:
 Bei einer Decke liegt die Zugbewehrung über der Stütze oben, bei einer
 Bodenplatte unten -- die Bodenpressung drückt sie von unten gegen die Stütze.
@@ -32,10 +40,15 @@ from opencivil.core.protokoll import Abschnitt
 from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef
+from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.flaeche import GestuetzteFlaeche
 from opencivil.durchstanzen.schnitt import Punkt
 from opencivil.material.basis import Baustoff
+from opencivil.material.betonstahl import betonstahl
 from opencivil.querschnitt.platte import Richtung
+
+#: Der Namensraum des Stahls der Anker -- einer für alle Stellen.
+ANKERSTAHL = "produkt.ancoplus"
 
 #: Was der Nachweis an jeder Stelle liest -- vor den Massen der gestützten Fläche und danach.
 VOR_DEN_MASSEN = ("h", "c", "c_v", "D_max", "phi_x", "s_x", "phi_y", "s_y")
@@ -65,7 +78,7 @@ class Plattenart(Wahl):
 
     @property
     def druckseite(self) -> str:
-        """Die andere Seite -- dort liegen die unteren Köpfe der Durchstanzbewehrung."""
+        """Die andere Seite -- von ihr aus misst c_v die Verankerung der Anker."""
         return "unten" if self is Plattenart.DECKE else "oben"
 
 
@@ -153,7 +166,10 @@ class Durchstanzstelle(Rechenobjekt):
     """Die Überdeckung auf der Zugseite."""
 
     c_v: Groesse
-    """Die Überdeckung der Durchstanzbewehrung auf der Druckseite (Figur 26)."""
+    """
+    Der Abstand der Verankerung der Durchstanzbewehrung von der Oberfläche
+    der Druckseite (SIA 262:2025, Figur 26) -- bei ancoPLUS bis zu den Köpfen.
+    """
 
     D_max: Groesse
     phi_x: Groesse
@@ -199,11 +215,20 @@ class Durchstanzstelle(Rechenobjekt):
 
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
     berechnungen: List[Berechnung] = field(default_factory=list, init=False)
+    anker: Baustoff = field(init=False)
+    """Der Stahl der Durchstanzbewehrung -- siehe Dateikopf."""
 
     def __post_init__(self) -> None:
         self.id = self.praefix
         self.aussparungen = tuple(tuple(map(tuple, a)) for a in self.aussparungen)
+        self.anker = betonstahl(produkte.STAHL, name=f"ancoPLUS, {produkte.STAHL}",
+                                praefix=ANKERSTAHL, symbol_index="sw")
         self._aufbauen()
+
+    @property
+    def baustoffe(self) -> Tuple[Baustoff, ...]:
+        """Der Stahl der Anker -- Beton und Biegebewehrung meldet das Projekt an."""
+        return (self.anker,)
 
     @property
     def abschnitt(self) -> Abschnitt:
@@ -220,8 +245,8 @@ class Durchstanzstelle(Rechenobjekt):
                 ("h", "h", MM, "Plattendicke", 0, self.h),
                 ("c", "c_{nom}", MM, f"Überdeckung der Zugbewehrung {self.plattenart.zugseite}",
                  0, self.c),
-                ("c_v", "c_v", MM, f"Überdeckung der Durchstanzbewehrung {self.plattenart.druckseite}",
-                 0, self.c_v),
+                ("c_v", "c_v", MM, "Abstand der Verankerung der Durchstanzbewehrung von der "
+                 f"Druckseite, {self.plattenart.druckseite}", 0, self.c_v),
                 ("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0, self.D_max),
             )),
             ("Biegebewehrung", (

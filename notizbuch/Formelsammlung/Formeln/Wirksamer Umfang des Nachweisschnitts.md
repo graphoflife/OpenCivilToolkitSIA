@@ -49,6 +49,7 @@ Der Umfang, mit dem der Widerstand rechnet: der
 verteilte Querkraft als kürzerer Schnitt ein.
 
 Der äussere Schnitt um die Anker und der Schnitt um einen Stahlpilz werden
-mit dem $k_e$ des Schnitts um die Stütze gemindert. Aus der Näherung ist es
-dasselbe; aus der Exzentrizität wäre es aussen grösser, der Wert von innen
-liegt auf der sicheren Seite.
+mit ihrem eigenen $k_e$ gemindert (4.3.6.5.10, 4.3.6.6.2): aus der Näherung
+ist es derselbe Wert wie um die Stütze, nach (57) rechnet jeder Schnitt mit
+seiner eigenen Fläche und seinem Schwerpunkt
+([[Beiwert der Momentenübertragung]]).

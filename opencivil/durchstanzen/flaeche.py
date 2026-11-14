@@ -8,7 +8,8 @@ je Lage eine Art gestützter Fläche: :class:`Innenstuetze`,
 :class:`Wandende` und :class:`Wandecke`. Jede Art weiss, was der Nachweis
 von ihr braucht -- ihre Masse, den Umriss, die Achse, die Plattenränder, die
 Kandidaten des Nachweisschnitts, u_0 als Formel, wo es eine gibt, die
-Näherung für k_e, die Gleichungen der Momente im Stützstreifen und ob das
+Näherung für k_e, die Gleichungen der Momente im Stützstreifen, welche
+Streifen der Plattenrand begrenzt (Figur 25) und ob das
 Werkzeug Durchstanzbewehrung und Stahlpilze vorschlägt. Welche Art es ist,
 entscheidet :meth:`Lage.flaeche` einmal. Bis 2026-11-10 fragten Stelle,
 Nachweis, Bewehrung und Maske an 28 Stellen nach Lage und Form.
@@ -28,7 +29,7 @@ from __future__ import annotations
 
 import math
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import ClassVar, Dict, List, Optional, Tuple
 
 from opencivil.core.berechnung import Eingaben
@@ -70,12 +71,18 @@ class Randbreite:
     """
     Was die Breite b_sr eines Stützstreifens am Plattenrand bestimmt
     (Figur 25): b_sr = quer + 2 · (längs + a), mit den Abmessungen der Stütze
-    quer und längs zum Streifen und ihrem Abstand zum Rand.
+    quer und längs zum Streifen und ihrem Abstand a zum Rand, auf den der
+    Streifen zuläuft -- die Breite zwischen zwei Linien unter 45° von den
+    inneren Ecken der Stütze. An der Eckstütze liegt quer zum Streifen ein
+    zweiter Rand, ``zweiter`` ist der Abstand der Stütze zu ihm: er schneidet
+    den Streifen ab, auf dieser Seite reicht er von der Achse nur bis zum
+    Rand, höchstens b_sr/2.
     """
 
     quer: Mass
     laengs: Mass
     abstand: Mass
+    zweiter: Optional[Mass] = None
 
 
 @dataclass(frozen=True)
@@ -83,13 +90,13 @@ class Momentengleichung:
     """
     Wie 4.3.6.4.7 das mittlere Moment im Stützstreifen einer Richtung rechnet:
     m_sd = max[V_d · (1/8 + e_u / (teiler · b)); mindest · V_d]. Die Breite b
-    ist b_s, am Plattenrand b_sr nach ``rand``.
+    ist b_s, wo der Plattenrand den Streifen begrenzt, die Breite nach
+    :meth:`GestuetzteFlaeche.randbreite`.
     """
 
     nummer: str
     teiler: float
     mindest: float = 0.0
-    rand: Optional[Randbreite] = None
 
 
 class Stuetzenform(Wahl):
@@ -251,6 +258,13 @@ class GestuetzteFlaeche(ABC):
         """Die Gleichung der Momente im Stützstreifen in ``r`` -- nur, wo :attr:`momente` gilt."""
         raise TypeError(f"Für {self.lage.mehrzahl} nennt 4.3.6.4.7 keine Momente im Stützstreifen.")
 
+    def randbreite(self, r: Richtung, masse: Masse) -> Optional[Randbreite]:
+        """
+        Was den Stützstreifen in ``r`` am Plattenrand begrenzt (4.3.6.4.6,
+        Figur 25) -- nichts, wo kein Rand ihn begrenzt.
+        """
+        return None
+
 
 @dataclass(frozen=True)
 class Stuetze(GestuetzteFlaeche):
@@ -278,7 +292,7 @@ class Stuetze(GestuetzteFlaeche):
         return self.form.flaeche(masse).umriss()
 
     def _randbreite(self, r: Richtung, masse: Masse) -> Randbreite:
-        """Der Streifen in ``r`` am Plattenrand: quer zu ihm die Stütze, längs ihr Abstand zum Rand."""
+        """Der Streifen in ``r`` zum Plattenrand hin: quer zu ihm die Stütze, längs ihr Abstand."""
         quer, laengs = ("x", "y") if r is Richtung.Y else ("y", "x")
         abstand = f"a_{laengs}"
         return Randbreite(self.form.breite(masse, quer), self.form.breite(masse, laengs),
@@ -320,10 +334,14 @@ class Randstuetze(Stuetze):
         return (Halbebene((0.0, -1.0), -(y0 - masse["a_y"])),)
 
     def momentengleichung(self, r: Richtung, masse: Masse) -> Momentengleichung:
-        """Parallel zum Rand (63), senkrecht zu ihm (64) mit b_sr."""
+        """Parallel zum Rand (63), senkrecht zu ihm (64)."""
         if r is Richtung.X:
             return Momentengleichung("(63)", 2.0, 0.25)
-        return Momentengleichung("(64)", 1.0, rand=self._randbreite(r, masse))
+        return Momentengleichung("(64)", 1.0)
+
+    def randbreite(self, r: Richtung, masse: Masse) -> Optional[Randbreite]:
+        """Nur der Streifen senkrecht zum Rand, in y."""
+        return self._randbreite(r, masse) if r is Richtung.Y else None
 
 
 @dataclass(frozen=True)
@@ -339,7 +357,13 @@ class Eckstuetze(Stuetze):
                 Halbebene((-1.0, 0.0), -(x0 - masse["a_x"])))
 
     def momentengleichung(self, r: Richtung, masse: Masse) -> Momentengleichung:
-        return Momentengleichung("(65)", 1.0, 0.5, self._randbreite(r, masse))
+        return Momentengleichung("(65)", 1.0, 0.5)
+
+    def randbreite(self, r: Richtung, masse: Masse) -> Optional[Randbreite]:
+        """Beide Streifen; quer zu jedem liegt der zweite Rand."""
+        quer = "x" if r is Richtung.Y else "y"
+        abstand = f"a_{quer}"
+        return replace(self._randbreite(r, masse), zweiter=Mass(abstand, abstand, masse[abstand]))
 
 
 class Wand(GestuetzteFlaeche):
@@ -385,7 +409,7 @@ class Wandende(Wand):
                              r"@t + 3 \cdot @d_v + \frac{\pi \cdot @d_v}{2}",
                              {"t": e["t"], "d_v": d_v},
                              "Nachweisschnitt um das Wandende: 1.5·d_v entlang der Wand",
-                             "SIA 262:2025, 4.3.6.2.3, Figur 23b und c")
+                             "SIA 262:2025, 4.3.6.2.3, Figur 23b")
 
 
 class Wandecke(Wand):
@@ -407,4 +431,4 @@ class Wandecke(Wand):
         return Umfangsformel(3.0 * dv + math.pi * dv / 4.0,
                              r"3 \cdot @d_v + \frac{\pi \cdot @d_v}{4}", {"d_v": d_v},
                              "Nachweisschnitt um die Wandecke: je 1.5·d_v entlang der Wände",
-                             "SIA 262:2025, 4.3.6.2.3, Figur 23b und c")
+                             "SIA 262:2025, 4.3.6.2.3, Figur 23c")
