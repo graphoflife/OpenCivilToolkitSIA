@@ -317,10 +317,9 @@ class Durchstanzen(Nachweis):
             k, titel = s.flaeche.k_e_naeherung(a)
             k_e = w.zahl("k_e", "k_e", k, stellen=2)
             p.erklaerung(
-                "Bei regelmässig gestützten Flachdecken mit gleichmässigen angrenzenden "
-                "Spannweiten und biegesteif angeschlossenen Stützen, die nicht für die "
-                "Aufnahme horizontaler Einwirkungen ausgelegt sind, darf k_e näherungsweise "
-                "angenommen werden.")
+                "Die festen Werte für k_e gelten nur für Flachdecken mit regelmässigem "
+                "Stützenraster und ähnlich langen Feldern, deren Stützen biegesteif an die "
+                "Platte anschliessen, aber keine Horizontalkräfte abtragen.")
             p.wert(k_e, titel=titel, referenz="SIA 262:2025, 4.3.6.2.5")
             return k_e
         A = w.wert("A_u", "A_u", Groesse.aus_si(a.flaeche, M2), 3,

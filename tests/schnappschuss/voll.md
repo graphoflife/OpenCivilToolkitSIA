@@ -14402,7 +14402,7 @@ $$
 
 Innenstütze einer Decke. Die Querkraft fliesst im Bereich der gestützten Fläche auf einen Kegel zu; ohne Durchstanzbewehrung trägt ihn der Beton allein. Wie viel, hängt davon ab, wie stark sich die Platte über der Stütze verdreht: je grösser die Rotation ψ, desto breiter der kritische Schubriss und desto kleiner k\_r.
 
-Bei regelmässig gestützten Flachdecken mit gleichmässigen angrenzenden Spannweiten und biegesteif angeschlossenen Stützen, die nicht für die Aufnahme horizontaler Einwirkungen ausgelegt sind, darf k\_e näherungsweise angenommen werden.
+Die festen Werte für k\_e gelten nur für Flachdecken mit regelmässigem Stützenraster und ähnlich langen Feldern, deren Stützen biegesteif an die Platte anschliessen, aber keine Horizontalkräfte abtragen.
 
 Näherungsstufe 2: die mittleren Momente im Stützstreifen nach den Gleichungen (62) bis (65).
 
@@ -14410,7 +14410,7 @@ Vorgeschlagen wird ancoPLUS von AncoTech: 16 × ancoPLUS DX5-0215 -- Anker ⌀10
 
 Angerechnet werden die Anker zwischen 0.35·d\_v und d\_v vom Rand der gestützten Fläche: 2 je Leiste.
 
-Die Faktoren 2 und 3.5 in Gleichung (70) dürfen erhöht werden, wenn Versuche es belegen (4.3.6.5.9). Das Gutachten von ancoPLUS lässt für Innenstützen und Wandenden 3·k\_r zu, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt wieder 2·k\_r, dazwischen linear. Für Rand- und Eckstützen bleibt es bei 2·k\_r. Die Obergrenze bleibt 3.5.
+Mehr als 2·k\_r und 3.5 in Gleichung (70) lässt 4.3.6.5.9 nur für Systeme zu, deren gleichwertige Sicherheit Versuche zeigen. Das Gutachten von ancoPLUS lässt für Innenstützen und Wandenden 3·k\_r zu, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt wieder 2·k\_r, dazwischen linear. Für Rand- und Eckstützen bleibt es bei 2·k\_r. Die Obergrenze bleibt 3.5.
 
 Der äussere Schnitt läuft im Abstand 0.5·d\_v,out um die äussersten Anker.
 

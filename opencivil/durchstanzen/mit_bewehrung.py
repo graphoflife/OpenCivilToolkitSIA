@@ -278,11 +278,11 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
     d = g.d.groesse.si
     k_sys = w.zahl(f"{k}k_sys", r"k_{sys}", pruefung.k_sys, stellen=2)
     p.erklaerung(
-        "Die Faktoren 2 und 3.5 in Gleichung (70) dürfen erhöht werden, wenn Versuche es "
-        "belegen (4.3.6.5.9). Das Gutachten von ancoPLUS lässt für Innenstützen und Wandenden "
-        "3·k_r zu, wenn die Köpfe auf der Druckseite höchstens d/10 tief liegen; bei d/6 gilt "
-        "wieder 2·k_r, dazwischen linear. Für Rand- und Eckstützen bleibt es bei 2·k_r. Die "
-        "Obergrenze bleibt 3.5.")
+        "Mehr als 2·k_r und 3.5 in Gleichung (70) lässt 4.3.6.5.9 nur für Systeme zu, deren "
+        "gleichwertige Sicherheit Versuche zeigen. Das Gutachten von ancoPLUS lässt für "
+        "Innenstützen und Wandenden 3·k_r zu, wenn die Köpfe auf der Druckseite höchstens "
+        "d/10 tief liegen; bei d/6 gilt wieder 2·k_r, dazwischen linear. Für Rand- und "
+        "Eckstützen bleibt es bei 2·k_r. Die Obergrenze bleibt 3.5.")
     p.wert(k_sys, titel=f"Faktor des Produkts: c_v = {werte.c_v * 1e3:.0f} mm, d/10 = {d * 1e2:.0f} mm, "
                         f"d/6 = {d * 1e3 / 6:.0f} mm")
     V_Rd_max = w.kraft(f"{k}V_Rd_max", r"V_{Rd,max}", pruefung.V_Rd_max,
