@@ -1,5 +1,5 @@
 ---
-erzeugt: 17c916f7a0d1
+erzeugt: d6a9718cb2c9
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.material]] – die Baustoffe: Beton und Betonstahl.
 - [[opencivil.nachweis]] – die Nachweise der Platte und des gezeichneten Querschnitts.
 - [[opencivil.notizbuch]] – das Notizbuch: Formelsammlung und Python-Doku als Markdown.
+- [[opencivil.pfahl]] – ein Einzelpfahl nach SIA 267:2013, Kapitel 9.
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
 - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.

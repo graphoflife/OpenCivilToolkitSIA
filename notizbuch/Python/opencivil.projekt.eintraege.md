@@ -1,5 +1,5 @@
 ---
-erzeugt: 83a54e5c8389
+erzeugt: 4edb386e3dfd
 art: modul
 tags: [modul]
 ---
@@ -752,6 +752,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.grundbruch]]
+- [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]

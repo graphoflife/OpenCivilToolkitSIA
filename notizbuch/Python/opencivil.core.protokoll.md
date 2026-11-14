@@ -1,5 +1,5 @@
 ---
-erzeugt: a58f68da2664
+erzeugt: 3b13b7050d04
 art: modul
 tags: [modul]
 ---
@@ -598,6 +598,11 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
+- [[opencivil.pfahl.achse]]
+- [[opencivil.pfahl.aussen]]
+- [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.pfahl]]
+- [[opencivil.pfahl.uebersicht]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]

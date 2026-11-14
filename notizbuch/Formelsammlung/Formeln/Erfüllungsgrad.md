@@ -1,5 +1,5 @@
 ---
-erzeugt: 846c4bf66e94
+erzeugt: 8bccc6d8cbe3
 art: formel
 tags: [formel]
 ---
@@ -38,6 +38,8 @@ $$
 - [[Grundbruch]]
 - [[Gleiten]]
 - [[Setzung]]
+- [[Äusserer Pfahlwiderstand]]
+- [[Innerer Pfahlwiderstand]]
 - [[Querkraft]]
 - [[Duktilität]]
 - [[Zwängung auf Normalkraft]]

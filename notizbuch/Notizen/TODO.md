@@ -8,6 +8,16 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
+- [ ] **Pfähle: Steifigkeit und Querlast.** Äusserer und innerer Widerstand
+      längs der Achse stehen (siehe [[Entwicklung]], 2026-11-14). Es fehlen,
+      je ein Commit: die Steifigkeit -- der Pfahl als gebetteter Stab im
+      Stabwerk, längs mit den Federn nach Cassan (Kap. 12.8), quer mit
+      k_s = E_s/D (SIA 267:2013, 9.5.4.5, (53)), in der Tragsicherheit mit
+      E_s,k/1.5, sonst mit E_s,k; Kopf frei oder eingespannt, Kopffedern und
+      Verläufe über die Tiefe --, dann die Querlast: der seitliche
+      Erdwiderstand aus φ', c', γ (Kap. 9.3.5, 9.3.6) auf der Breite 3·D
+      (Kap. 10.8), R_tr,d = η_a·R_tr,k/1.4 (9.5.2.3.1, (49)), die Bettung
+      gegen 9.5.4.5 geprüft. Danach die Decken weiter.
 - [ ] **Decken: die App fertig bauen.** Rechenkern, Zeichenfenster sowie
       Lasten und Lastfälle stehen (siehe [[Entwicklung]], 2026-11-13). Es
       fehlen, je ein Commit: die Ergebnisbilder samt Lagerkräften, der
@@ -400,6 +410,24 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 Diese Punkte sind **nicht** entschieden. Eingebaut ist je eine Annahme; wo die
 Prüfung vom 2026-11-14 den Bereich schon erreicht hat, steht dabei, was die
 Norm dazu sagt.
+
+- [ ] **Pfähle, nach Vorgabe eingebaut** (`opencivil/pfahl/`). Beim
+      örtlichen Abscheren gelten η_a und γ_M,a trotzdem, obwohl das Buch
+      danach keine weitere Sicherheit vorsieht (Kap. 12.5); X wird dabei mit
+      φ'_k abgelesen, nicht mit 2/3 davon. Ausserhalb der Bilder 12.4 und
+      12.5 gilt der Wert am Rand. Der Fuss im undrainierten Ton rechnet ohne
+      die Überlagerung, das Gewicht des Pfahls steht ebenso wenig in der
+      Einwirkung. Auf Zug dieselbe Mantelreibung wie auf Druck. δ/φ'_k und α
+      höchstens 1. Der Mörtel im Rohr eines Mikropfahls zählt nicht, obwohl
+      SIA 267:2013, 9.5.2.4.8 ihn zuliesse -- nach SIA 262 endete der ganze
+      Querschnitt sonst bei −ε_c1d. Das Tragglied rechnet als Betonstahl nach
+      SIA 262 mit γ_s; SIA 263 liegt nicht vor. Vorschlag: so lassen, jede
+      Annahme steht in der Herleitung. Entscheid des Benutzers.
+- [ ] **Pfähle, nicht nachgewiesen:** die konstruktiven Regeln des
+      Bohrpfahls (SIA 267:2013, 9.6.3.2.3 bis 9.6.3.2.6: Mindestbewehrung,
+      Zahl und Abstand der Stäbe, Überdeckung), der Kopf auf 1.2·R_i,k
+      (9.6.1.2.3) und das Knicken (9.5.1.1, nur ein Hinweis). Negative
+      Mantelreibung und Gruppenwirkung (9.4.3.1, 9.4.4.1.7) fehlen ganz.
 
 - [ ] **Durchstanzen, Begrenzung auf 1.5·d_v (Figur 23a bis c).** Eingebaut:
       eine gerade Strecke des Nachweisschnitts zählt 1.5·d_v von jeder Ecke

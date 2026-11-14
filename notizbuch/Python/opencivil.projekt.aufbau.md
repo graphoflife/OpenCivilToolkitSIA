@@ -1,5 +1,5 @@
 ---
-erzeugt: c2697c85d6ae
+erzeugt: f87019eadbcf
 art: modul
 tags: [modul]
 ---
@@ -23,8 +23,8 @@ ohne Bewehrung.
 
 ## DIE BAUTEILARTEN
 
-Platte, Querschnittsanalyse, Balkensystem, Decke, Durchstanzen, Grundbruch und Setzung
-haben je einen Steckbrief
+Platte, Querschnittsanalyse, Balkensystem, Decke, Durchstanzen, Grundbruch, Setzung und
+Pfahl haben je einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -49,7 +49,8 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion `bauen`
 [[opencivil.projekt.aufbau.decke|decke]],
 [[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]],
-[[opencivil.projekt.aufbau.setzung|setzung]]); was mehr als eine braucht, im
+[[opencivil.projekt.aufbau.setzung|setzung]],
+[[opencivil.projekt.aufbau.pfahl|pfahl]]); was mehr als eine braucht, im
 Kern ([[opencivil.projekt.aufbau.kern|kern]]): der Aufbau, das Bauteil, die
 Baustoffe, die Stahlspannungen und der Knickfall. Bis 2026-10-17 stand alles
 in einer Datei von ueber tausend Zeilen.
@@ -62,6 +63,7 @@ in einer Datei von ueber tausend Zeilen.
 - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
 - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
 - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
+- [[opencivil.projekt.aufbau.pfahl]] – ein Pfahl wird Rechnung.
 - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
 - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
 - [[opencivil.projekt.aufbau.setzung]] – eine Setzungsberechnung wird Rechnung.
@@ -117,7 +119,8 @@ Oberflaeche, siehe Dateikopf.
 - `GRUNDBRUCH = Bauteilart('grundbruch', 'grundbrueche', GrundbruchEintrag, 'g', 'gru…`
 - `SETZUNG = Bauteilart('setzung', 'setzungen', SetzungEintrag, 'w', 'setzung', 'S…` – Die Kennungen w1, w2 ...: «s» tragen schon die Betonstaehle.
 - `DURCHSTANZEN = Bauteilart('durchstanzen', 'durchstanzstellen', DurchstanzEintrag, 'd…`
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZ…` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Decke, Durchstanzen, Grundbruch und Setzung lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `PFAHL = Bauteilart('pfahl', 'pfaehle', PfahlEintrag, 't', 'pfahl', 'Pfähle', …` – Die Kennungen t1, t2 ...: «p» tragen schon die Skripte.
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZ…` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Decke, Durchstanzen, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
@@ -127,6 +130,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
@@ -134,6 +138,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.grundbruch]]
+- [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
@@ -148,6 +153,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]

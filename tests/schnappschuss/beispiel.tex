@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-111 Berechnungen ausgeführt, 177 Werte bestimmt.
+141 Berechnungen ausgeführt, 207 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke über EG}
@@ -1332,6 +1332,332 @@ s = 9.9\,\mathrm{mm} \quad \le \quad s_{zul} = 25\,\mathrm{mm}
 \begin{equation*}
 \alpha_{eff,s} = \frac{s_{zul}}{s} = \frac{25\,\mathrm{mm}}{9.9\,\mathrm{mm}} = 2.54 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
+\subsection{Pfahl: Pfahl Stütze}
+\noindent\textbf{Durchmesser des Pfahls} \hfill \normref{SIA 267:2013, 9.5.2.4.7}
+\begin{equation*}
+D = 900\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Länge des Pfahls}
+\begin{equation*}
+L = 12\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe des Pfahlkopfs unter Terrain}
+\begin{equation*}
+t_K = 1.5\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe des höchsten Grundwasserspiegels unter Terrain} \hfill \normref{SIA 267:2013, 4.2.2.3}
+\begin{equation*}
+t_w = 3\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Raumlast des Wassers}
+\begin{equation*}
+\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Umrechnungsfaktor des äusseren Widerstands} \hfill \normref{SIA 267:2013, 9.5.2.2.5, (48)}
+\begin{equation*}
+\eta_a = 0.7
+\end{equation*}
+\noindent\textbf{Dicke der Schicht 1}
+\begin{equation*}
+d_{1} = 2\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Raumlast der Schicht 1}
+\begin{equation*}
+\gamma_{1} = 19\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Reibungswinkel der Schicht 1, charakteristisch}
+\begin{equation*}
+\varphi'_{k,1} = 30{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion der Schicht 1, charakteristisch}
+\begin{equation*}
+c'_{k,1} = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Mantelreibung in der Schicht 1, charakteristisch}
+\begin{equation*}
+q_{s,k,1} = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Dicke der Schicht 2}
+\begin{equation*}
+d_{2} = 6\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Raumlast der Schicht 2}
+\begin{equation*}
+\gamma_{2} = 21\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Reibungswinkel der Schicht 2, charakteristisch}
+\begin{equation*}
+\varphi'_{k,2} = 34{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion der Schicht 2, charakteristisch}
+\begin{equation*}
+c'_{k,2} = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Erddruckbeiwert am Mantel in der Schicht 2} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+K_{2} = 0.44
+\end{equation*}
+\noindent\textbf{Reibungswinkel Pfahl–Boden in der Schicht 2, als Teil von φ'\_k} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+k_{\delta,2} = 1
+\end{equation*}
+\noindent\textbf{Dicke der Schicht 3}
+\begin{equation*}
+d_{3} = 15\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Raumlast der Schicht 3}
+\begin{equation*}
+\gamma_{3} = 22\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Reibungswinkel der Schicht 3, charakteristisch}
+\begin{equation*}
+\varphi'_{k,3} = 36{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion der Schicht 3, charakteristisch}
+\begin{equation*}
+c'_{k,3} = 5\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Erddruckbeiwert am Mantel in der Schicht 3} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+K_{3} = 0.41
+\end{equation*}
+\noindent\textbf{Reibungswinkel Pfahl–Boden in der Schicht 3, als Teil von φ'\_k} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+k_{\delta,3} = 1
+\end{equation*}
+\subsection{Äusserer Widerstand}
+\subsubsection{Mantel}
+\noindent\textbf{Umfang des Pfahls}
+\begin{equation*}
+U = \pi \cdot D = \pi \cdot 900\,\mathrm{mm} = 2.827\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Wirksame Spannung aus dem Gewicht des Bodens darüber} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+\sigma'_v(z) = \sum \gamma_i \, t_i - u(z) \qquad u(z) = \gamma_w \cdot \max\left(0;\ z - t_w\right)
+\end{equation*}
+\noindent\textbf{Mantelreibung drainiert, σ'\_v in der Mitte des Stücks} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+q_{s,k} = K \cdot \sigma'_v \cdot \tan\delta \qquad \delta = k_{\delta} \cdot \varphi'_k
+\end{equation*}
+Der Mantel reicht vom Kopf in 1.50 m bis zum Fuss in 13.50 m unter Terrain; je Schicht ein Stück, am Grundwasserspiegel geteilt. Über dem Kopf trägt der Boden nur als Auflast.
+
+\noindent\textbf{Mantelreibung je Stück}
+\begin{longtable}{lrrrrrr}
+\hline
+Schicht & $z_o\ [\mathrm{m}]$ & $z_u\ [\mathrm{m}]$ & $h\ [\mathrm{m}]$ & $\sigma'_v\ [\mathrm{kPa}]$ & $q_{s,k}\ [\mathrm{kPa}]$ & $h \cdot q_{s,k}\ [\mathrm{kN/m}]$ \\
+\hline
+\endhead
+1: Auffüllung & $1.50$ & $2.00$ & $0.50$ & – & $0.0$ & $0.0$ \\
+2: Kies, sandig & $2.00$ & $3.00$ & $1.00$ & $48.5$ & $14.4$ & $14.4$ \\
+2: Kies, sandig & $3.00$ & $8.00$ & $5.00$ & $86.5$ & $25.7$ & $128.4$ \\
+3: Moräne & $8.00$ & $13.50$ & $5.50$ & $147.0$ & $43.8$ & $240.8$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Mantelwiderstand} \hfill \normref{Kap. 12.5; SIA 267:2013, 9.4.4.1.1}
+\begin{equation*}
+R_{s,k} = U \cdot \sum h \, q_{s,k} = 2.827\,\mathrm{m} \cdot 383.6\,\mathrm{kN}/\mathrm{m} = 1085\,\mathrm{kN}
+\end{equation*}
+\subsubsection{Fuss}
+\noindent\textbf{Fläche des Fusses}
+\begin{equation*}
+A_b = \frac{\pi \cdot D^{2}}{4} = \frac{\pi \cdot \left(900\,\mathrm{mm}\right)^{2}}{4} = 0.636\,\mathrm{m}^{2}
+\end{equation*}
+Der Fuss steht in 13.50 m unter Terrain in Schicht 3, Moräne; sie reicht noch 9.50 m tiefer.
+
+\hinweis{Annahme}{Die Schicht unter dem Fuss ist mächtig genug, dass der Fuss sie nicht durchstanzt -- die Voraussetzung des Spitzendrucks (Kap. 12.5).}
+Örtliches Abscheren: bis der Boden am Fuss ganz bricht, müsste sich der Pfahl stark setzen. Darum zählen nur 2/3 von φ'\_k und c'\_k (Kap. 9.2.7, 12.5).
+
+\hinweis{Annahme}{Das Buch sieht danach keine weitere Sicherheit am Spitzendruck vor; hier gelten η\_a und γ\_M,a der Norm trotzdem. X wird mit φ'\_k abgelesen, nicht mit 2/3 davon -- beides nach Vorgabe, nicht nachgeschlagen.}
+\noindent\textbf{Reibungswinkel für örtliches Abscheren} \hfill \normref{Kap. 9.2.7, 12.5}
+\begin{equation*}
+\varphi^{*} = \tfrac{2}{3} \cdot \varphi'_{k,3} = \tfrac{2}{3} \cdot 36{}^{\circ} = 24{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion für örtliches Abscheren} \hfill \normref{Kap. 9.2.7, 12.5}
+\begin{equation*}
+c^{*} = \tfrac{2}{3} \cdot c'_{k,3} = \tfrac{2}{3} \cdot 5\,\mathrm{kPa} = 3.3\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_q = e^{\pi \tan \varphi^{*}} \cdot \tan^{2}\left(45^\circ + \frac{\varphi^{*}}{2}\right) = e^{\pi \tan 24{}^{\circ}} \cdot \tan^{2}\left(45^\circ + \frac{24{}^{\circ}}{2}\right) = 9.6
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_c = \frac{N_q - 1}{\tan \varphi^{*}} = \frac{9.6 - 1}{\tan 24{}^{\circ}} = 19.32
+\end{equation*}
+\noindent\textbf{Einbindung in die Schicht am Fuss} \hfill \normref{Kap. 12.4, Bild 12.3}
+\begin{equation*}
+h = z_F - z_{o,3} = 13.5\,\mathrm{m} - 8\,\mathrm{m} = 5.5\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Form- und Tiefenfaktor, abgelesen nach φ'\_k und h/D} \hfill \normref{Kap. 12.5, Bild 12.4}
+\begin{equation*}
+X = X\left(\varphi'_{k,3}, \tfrac{h}{D}\right) = X\left(36{}^{\circ}, \tfrac{5.5\,\mathrm{m}}{900\,\mathrm{mm}}\right) = 2.63
+\end{equation*}
+\noindent\textbf{Wirksame Spannung am Fuss} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+\sigma'_{v,F} = \sum \gamma_i \, t_i - u = 180\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Spitzendruck, drainiert} \hfill \normref{Kap. 12.5, Bild 12.4}
+\begin{equation*}
+\begin{aligned}
+  q_{b,k} &= \left(c^{*} \cdot N_c + \sigma'_{v,F} \cdot N_q\right) \cdot X \\
+  &= \left(3.3\,\mathrm{kPa} \cdot 19.32 + 180\,\mathrm{kPa} \cdot 9.6\right) \cdot 2.63 \\
+  &= 4714\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Spitzenwiderstand} \hfill \normref{Kap. 12.5, Bild 12.4; SIA 267:2013, 9.4.4.1.1}
+\begin{equation*}
+R_{b,k} = A_b \cdot q_{b,k} = 0.636\,\mathrm{m}^{2} \cdot 4714\,\mathrm{kPa} = 2999\,\mathrm{kN}
+\end{equation*}
+\subsubsection{Charakteristischer äusserer Widerstand}
+\noindent\textbf{Äusserer Widerstand auf Druck, charakteristisch} \hfill \normref{SIA 267:2013, 9.4.4.1.1, (41); 9.4.4.1.6}
+\begin{equation*}
+R_{a,k} = R_{b,k} + R_{s,k} = 2999\,\mathrm{kN} + 1085\,\mathrm{kN} = 4084\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Äusserer Widerstand auf Zug, charakteristisch: nur der Mantel} \hfill \normref{SIA 267:2013, 9.4.4.1.1}
+\begin{equation*}
+R_{a,k,Z} = R_{s,k} = 1085\,\mathrm{kN}
+\end{equation*}
+\hinweis{Annahme}{Auf Zug trägt nur der Mantel, mit derselben Mantelreibung wie auf Druck -- nach Vorgabe, nicht nachgeschlagen. Ein Zugpfahl muss die Zugkraft über seine ganze Länge tragen (SIA 267:2013, 9.5.3.4.2).}
+\subsubsection{Bemessungswert auf Druck}
+\noindent\textbf{Widerstandsbeiwert auf Druck} \hfill \normref{SIA 267:2013, 9.5.2.2.4, (43)}
+\begin{equation*}
+\gamma_{M,a} = 1.3
+\end{equation*}
+\noindent\textbf{Äusserer Widerstand auf Druck, Bemessungswert} \hfill \normref{SIA 267:2013, 9.5.2.2.1, (42)}
+\begin{equation*}
+R_{a,d} = \frac{\eta_a \cdot R_{a,k}}{\gamma_{M,a}} = \frac{0.7 \cdot 4084\,\mathrm{kN}}{1.3} = 2199\,\mathrm{kN}
+\end{equation*}
+\subsubsection{Bemessungswert auf Zug}
+\noindent\textbf{Widerstandsbeiwert auf Zug} \hfill \normref{SIA 267:2013, 9.5.2.2.4, (44)}
+\begin{equation*}
+\gamma_{M,a} = 1.6
+\end{equation*}
+\noindent\textbf{Äusserer Widerstand auf Zug, Bemessungswert} \hfill \normref{SIA 267:2013, 9.5.2.2.1, (42)}
+\begin{equation*}
+R_{a,d,Z} = \frac{\eta_a \cdot R_{a,k,Z}}{\gamma_{M,a}} = \frac{0.7 \cdot 1085\,\mathrm{kN}}{1.6} = 475\,\mathrm{kN}
+\end{equation*}
+\subsubsection{Äusserer Widerstand – Tragsicherheit}
+\noindent\textbf{Einwirkung gegen Widerstand auf Druck}
+\begin{equation*}
+N_{Ed} = 2000\,\mathrm{kN} \quad \le \quad R_{a,d} = 2199\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,a,\text{Tragsicherheit}} = \frac{R_{a,d}}{N_{Ed}} = \frac{2199\,\mathrm{kN}}{2000\,\mathrm{kN}} = 1.10 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\noindent\textbf{Zahl der Längsstäbe}
+\begin{equation*}
+n = 12
+\end{equation*}
+\noindent\textbf{Durchmesser der Längsstäbe}
+\begin{equation*}
+\varnothing_l = 20\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Überdeckung der Wendel}
+\begin{equation*}
+c = 75\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Durchmesser der Wendel}
+\begin{equation*}
+\varnothing_w = 10\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Umrechnungsfaktor des inneren Widerstands} \hfill \normref{SIA 267:2013, 9.5.2.4.4, (51); 9.5.2.4.9}
+\begin{equation*}
+\eta_i = 0.8
+\end{equation*}
+\subsection{Innerer Widerstand}
+Einzugeben ist der kleinste Querschnitt längs des Pfahls (SIA 267:2013, 9.5.2.4.5).
+
+\subsubsection{Querschnitt}
+\noindent\textbf{Fläche des Pfahlquerschnitts} \hfill \normref{SIA 267:2013, 9.5.2.4.7}
+\begin{equation*}
+A_c = \frac{\pi \cdot D^{2}}{4} = \frac{\pi \cdot \left(900\,\mathrm{mm}\right)^{2}}{4} = 636173\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Fläche der Längsbewehrung}
+\begin{equation*}
+A_s = n \cdot \frac{\pi \cdot \varnothing_l^{2}}{4} = 12 \cdot \frac{\pi \cdot \left(20\,\mathrm{mm}\right)^{2}}{4} = 3770\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Radius des Kreises, auf dem die Längsstäbe liegen}
+\begin{equation*}
+r_s = \frac{D}{2} - c - \varnothing_w - \frac{\varnothing_l}{2} = \frac{900\,\mathrm{mm}}{2} - 75\,\mathrm{mm} - 10\,\mathrm{mm} - \frac{20\,\mathrm{mm}}{2} = 355\,\mathrm{mm}
+\end{equation*}
+Die 12 Stäbe liegen gleichmässig auf diesem Kreis; sie verdrängen den Beton, in dem sie liegen.
+
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel} \hfill \normref{SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe}
+\begin{equation*}
+k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
+\end{equation*}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)}
+\begin{equation*}
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+\end{equation*}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Werte des Betons}
+\begin{equation*}
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+\end{equation*}
+\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5}
+\begin{equation*}
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+\end{equation*}
+\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Werte des Stahls}
+\begin{equation*}
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
+\end{equation*}
+\subsubsection{Materialwiderstand auf Druck}
+\noindent\textbf{Dehnung im Bruchzustand auf Druck, über den Querschnitt gleich}
+\begin{equation*}
+\varepsilon = -2\,\text{‰}
+\end{equation*}
+\noindent\textbf{Spannung im Stahl auf Druck, als Betrag}
+\begin{equation*}
+\sigma_s = 400\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Spannung im Beton auf Druck, als Betrag}
+\begin{equation*}
+\sigma_c = 20\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Materialwiderstand auf Druck: Beton ohne die Stäbe, dazu die Stäbe} \hfill \normref{SIA 267:2013, 9.5.2.4.2}
+\begin{equation*}
+\begin{aligned}
+  R_{mat,d} &= \left(A_c - A_s\right) \cdot \sigma_c + A_s \cdot \sigma_s \\
+  &= \left(636173\,\mathrm{mm}^{2} - 3770\,\mathrm{mm}^{2}\right) \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} + 3770\,\mathrm{mm}^{2} \cdot 400\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= 14156\,\mathrm{kN}
+\end{aligned}
+\end{equation*}
+\subsubsection{Materialwiderstand auf Zug}
+\noindent\textbf{Dehnung im Bruchzustand auf Zug, über den Querschnitt gleich}
+\begin{equation*}
+\varepsilon = 45\,\text{‰}
+\end{equation*}
+\noindent\textbf{Spannung im Stahl auf Zug, als Betrag}
+\begin{equation*}
+\sigma_s = 435\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+Auf Zug trägt der Beton nichts.
+
+\noindent\textbf{Materialwiderstand auf Zug: nur der Stahl} \hfill \normref{SIA 267:2013, 9.5.2.4.2}
+\begin{equation*}
+R_{mat,d,Z} = A_s \cdot \sigma_s = 3770\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} = 1639\,\mathrm{kN}
+\end{equation*}
+\subsubsection{Bemessungswert}
+\noindent\textbf{Innerer Widerstand auf Druck, Bemessungswert} \hfill \normref{SIA 267:2013, 9.5.2.4.1, (50)}
+\begin{equation*}
+R_{i,d} = \eta_i \cdot R_{mat,d} = 0.8 \cdot 14156\,\mathrm{kN} = 11325\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Innerer Widerstand auf Zug, Bemessungswert} \hfill \normref{SIA 267:2013, 9.5.2.4.1, (50)}
+\begin{equation*}
+R_{i,d,Z} = \eta_i \cdot R_{mat,d,Z} = 0.8 \cdot 1639\,\mathrm{kN} = 1311\,\mathrm{kN}
+\end{equation*}
+\hinweis{Hinweis}{Knicken ist nicht nachgewiesen. Ein schlanker Pfahl, der seitlich nicht oder nur schwach gebettet ist -- in sehr weichem Boden, frei über dem Terrain --, kann knicken (SIA 267:2013, 9.5.1.1).}
+\subsubsection{Innerer Widerstand – Tragsicherheit}
+\noindent\textbf{Einwirkung gegen Widerstand auf Druck}
+\begin{equation*}
+N_{Ed} = 2000\,\mathrm{kN} \quad \le \quad R_{i,d} = 11325\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,i,\text{Tragsicherheit}} = \frac{R_{i,d}}{N_{Ed}} = \frac{11325\,\mathrm{kN}}{2000\,\mathrm{kN}} = 5.66 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
 \subsection{Balkensystem: Rahmen}
 \noindent\textbf{Querschnittsfläche, «Stütze 300×300» (Rechteck)}
 \begin{equation*}
@@ -2202,6 +2528,92 @@ s_E = \sum \Delta s_E
 \begin{equation*}
 s = s_W + s_E
 \end{equation*}
+\subsection{Äusserer Pfahlwiderstand}
+Der Pfahl gibt seine Last über den Mantel und den Fuss an den Boden ab. Am Mantel reibt er an jeder Schicht, durch die er geht; am Fuss drückt er auf die Schicht, in der er steht. Die Summe ist der charakteristische äussere Widerstand. Auf Zug trägt nur der Mantel. Der Bemessungswert folgt mit zwei Faktoren der Norm: der Umrechnungsfaktor η\_a sagt, wie verlässlich der Widerstand bestimmt ist -- aus einer Berechnung am wenigsten, aus einem statischen Versuch am meisten --, der Widerstandsbeiwert γ\_M,a deckt die Streuung des Bodens und der Ausführung.
+
+\noindent\textbf{Umfang des Pfahls}
+\begin{equation*}
+U = \pi \cdot D
+\end{equation*}
+\noindent\textbf{Wirksame Spannung aus dem Gewicht des Bodens darüber} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+\sigma'_v(z) = \sum \gamma_i \, t_i - u(z) \qquad u(z) = \gamma_w \cdot \max\left(0;\ z - t_w\right)
+\end{equation*}
+\noindent\textbf{Mantelreibung drainiert, σ'\_v in der Mitte des Stücks} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+q_{s,k} = K \cdot \sigma'_v \cdot \tan\delta \qquad \delta = k_{\delta} \cdot \varphi'_k
+\end{equation*}
+\noindent\textbf{Mantelwiderstand} \hfill \normref{Kap. 12.5; SIA 267:2013, 9.4.4.1.1}
+\begin{equation*}
+R_{s,k} = U \cdot \sum h \, q_{s,k}
+\end{equation*}
+\noindent\textbf{Fläche des Fusses}
+\begin{equation*}
+A_b = \frac{\pi \cdot D^{2}}{4}
+\end{equation*}
+\noindent\textbf{Reibungswinkel für örtliches Abscheren} \hfill \normref{Kap. 9.2.7, 12.5}
+\begin{equation*}
+\varphi^{*} = \tfrac{2}{3} \cdot \varphi'_{k,3}
+\end{equation*}
+\noindent\textbf{Kohäsion für örtliches Abscheren} \hfill \normref{Kap. 9.2.7, 12.5}
+\begin{equation*}
+c^{*} = \tfrac{2}{3} \cdot c'_{k,3}
+\end{equation*}
+\noindent\textbf{Einbindung in die Schicht am Fuss} \hfill \normref{Kap. 12.4, Bild 12.3}
+\begin{equation*}
+h = z_F - z_{o,3}
+\end{equation*}
+\noindent\textbf{Form- und Tiefenfaktor, abgelesen nach φ'\_k und h/D} \hfill \normref{Kap. 12.5, Bild 12.4}
+\begin{equation*}
+X = X\left(\varphi'_{k,3}, \tfrac{h}{D}\right)
+\end{equation*}
+\noindent\textbf{Wirksame Spannung am Fuss} \hfill \normref{Kap. 12.5}
+\begin{equation*}
+\sigma'_{v,F} = \sum \gamma_i \, t_i - u
+\end{equation*}
+\noindent\textbf{Spitzendruck, drainiert} \hfill \normref{Kap. 12.5, Bild 12.4}
+\begin{equation*}
+q_{b,k} = \left(c^{*} \cdot N_c + \sigma'_{v,F} \cdot N_q\right) \cdot X
+\end{equation*}
+\noindent\textbf{Spitzenwiderstand} \hfill \normref{Kap. 12.5, Bild 12.4; SIA 267:2013, 9.4.4.1.1}
+\begin{equation*}
+R_{b,k} = A_b \cdot q_{b,k}
+\end{equation*}
+\noindent\textbf{Äusserer Widerstand auf Druck, charakteristisch} \hfill \normref{SIA 267:2013, 9.4.4.1.1, (41); 9.4.4.1.6}
+\begin{equation*}
+R_{a,k} = R_{b,k} + R_{s,k}
+\end{equation*}
+\noindent\textbf{Äusserer Widerstand auf Zug, charakteristisch: nur der Mantel} \hfill \normref{SIA 267:2013, 9.4.4.1.1}
+\begin{equation*}
+R_{a,k,Z} = R_{s,k}
+\end{equation*}
+\noindent\textbf{Äusserer Widerstand auf Druck, Bemessungswert} \hfill \normref{SIA 267:2013, 9.5.2.2.1, (42)}
+\begin{equation*}
+R_{a,d} = \frac{\eta_a \cdot R_{a,k}}{\gamma_{M,a}}
+\end{equation*}
+\subsection{Innerer Pfahlwiderstand}
+Der Pfahl selbst muss die Kraft tragen, die er an den Boden abgibt. Sein Querschnitt trägt sie nach SIA 262: ganz gestaucht oder ganz gedehnt, jeder Werkstoff mit seinem Gesetz und bis zu seiner Grenze. Ganz gedrückt darf der Beton nur bis −ε\_c1d gestaucht werden, und der Stahl darin nicht weiter. Der Umrechnungsfaktor η\_i deckt, was die Herstellung im Boden dem Querschnitt antun kann, ohne dass man es sieht: Fehlstellen im Beton, verschobene Bewehrung.
+
+\noindent\textbf{Fläche der Längsbewehrung}
+\begin{equation*}
+A_s = n \cdot \frac{\pi \cdot \varnothing_l^{2}}{4}
+\end{equation*}
+\noindent\textbf{Radius des Kreises, auf dem die Längsstäbe liegen}
+\begin{equation*}
+r_s = \frac{D}{2} - c - \varnothing_w - \frac{\varnothing_l}{2}
+\end{equation*}
+\noindent\textbf{Materialwiderstand auf Druck: Beton ohne die Stäbe, dazu die Stäbe} \hfill \normref{SIA 267:2013, 9.5.2.4.2}
+\begin{equation*}
+R_{mat,d} = \left(A_c - A_s\right) \cdot \sigma_c + A_s \cdot \sigma_s
+\end{equation*}
+\noindent\textbf{Materialwiderstand auf Zug: nur der Stahl} \hfill \normref{SIA 267:2013, 9.5.2.4.2}
+\begin{equation*}
+R_{mat,d,Z} = A_s \cdot \sigma_s
+\end{equation*}
+\noindent\textbf{Innerer Widerstand auf Druck, Bemessungswert} \hfill \normref{SIA 267:2013, 9.5.2.4.1, (50)}
+\begin{equation*}
+R_{i,d} = \eta_i \cdot R_{mat,d}
+\end{equation*}
 \subsection{Kennzahlen}
 Was die Platte in x aufnimmt, ohne Bezug auf eine Einwirkung: die Eckwerte der Handrechnung mit Bemessungswerten und der Querkraftwiderstand ohne Normalkraft. Wo eine Seite massgebend ist, gilt das Kleinere beider Seiten.
 
@@ -2455,6 +2867,34 @@ Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
 Setzung & starr, Punkt K & $s_{zul} = 25.0\,\mathrm{mm}$ & $s = 9.9\,\mathrm{mm}$ & $2.54$ \\
 \hline
 \end{xltabular}
+\subsection{Pfahl Stütze}
+\noindent\textbf{Angaben zum Pfahl}
+\begin{equation*}
+\begin{aligned} & \text{Bohrpfahl} \qquad D = 900\,\mathrm{mm} \qquad L = 12\,\mathrm{m} \qquad t_K = 1.5\,\mathrm{m} \qquad t_w = 3\,\mathrm{m} \\ & n = 12 \qquad \varnothing_l = 20\,\mathrm{mm} \qquad c = 75\,\mathrm{mm} \qquad \varnothing_w = 10\,\mathrm{mm} \qquad \eta_i = 0.8 \qquad \text{Berechnung} \qquad \eta_a = 0.7 \end{aligned}
+\end{equation*}
+\noindent\textbf{Widerstände}
+\begin{longtable}{llrr}
+\hline
+Widerstand &  & $\text{Druck}\ [\mathrm{kN}]$ & $\text{Zug}\ [\mathrm{kN}]$ \\
+\hline
+\endhead
+Mantel & $R_{s,k}$ & $1085$ & $1085$ \\
+Fuss & $R_{b,k}$ & $2999$ & – \\
+Äusserer, charakteristisch & $R_{a,k}$ & $4084$ & $1085$ \\
+Äusserer, Bemessungswert & $R_{a,d}$ & $2199$ & $475$ \\
+Querschnitt & $R_{mat,d}$ & $14156$ & $1639$ \\
+Innerer, Bemessungswert & $R_{i,d}$ & $11325$ & $1311$ \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Äusserer Pfahlwiderstand & Tragsicherheit & $R_{a,d} = 2199\,\mathrm{kN}$ & $N_{Ed} = 2000.0\,\mathrm{kN}$ & $1.10$ \\
+Innerer Pfahlwiderstand & Tragsicherheit & $R_{i,d} = 11325\,\mathrm{kN}$ & $N_{Ed} = 2000.0\,\mathrm{kN}$ & $5.66$ \\
+\hline
+\end{xltabular}
 Alle geführten Nachweise sind erfüllt.
 
 \section{Werte}
@@ -2517,6 +2957,36 @@ Reibungswinkel, charakteristisch & $\varphi_k$ & $32$ & ° & Vorgabe \\
 Dauernde Auflast neben dem Fundament & $q_{Ed}$ & $0$ & kPa & Vorgabe \\
 Tiefe der Sohle unter Terrain & $t$ & $1.2$ & m & Vorgabe \\
 Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_1$ & $5$ & m & Vorgabe \\
+Durchmesser des Pfahls & $D$ & $900$ & mm & Vorgabe \\
+Erddruckbeiwert am Mantel in der Schicht 2 & $K_{2}$ & $0.44$ &  & Vorgabe \\
+Erddruckbeiwert am Mantel in der Schicht 3 & $K_{3}$ & $0.41$ &  & Vorgabe \\
+Länge des Pfahls & $L$ & $12$ & m & Vorgabe \\
+Überdeckung der Wendel & $c$ & $75$ & mm & Vorgabe \\
+Kohäsion der Schicht 1, charakteristisch & $c'_{k,1}$ & $0$ & kPa & Vorgabe \\
+Kohäsion der Schicht 2, charakteristisch & $c'_{k,2}$ & $0$ & kPa & Vorgabe \\
+Kohäsion der Schicht 3, charakteristisch & $c'_{k,3}$ & $5$ & kPa & Vorgabe \\
+Dicke der Schicht 1 & $d_{1}$ & $2$ & m & Vorgabe \\
+Dicke der Schicht 2 & $d_{2}$ & $6$ & m & Vorgabe \\
+Dicke der Schicht 3 & $d_{3}$ & $15$ & m & Vorgabe \\
+Reibungswinkel Pfahl–Boden in der Schicht 2, als Teil von φ'\_k & $k_{\delta,2}$ & $1$ &  & Vorgabe \\
+Reibungswinkel Pfahl–Boden in der Schicht 3, als Teil von φ'\_k & $k_{\delta,3}$ & $1$ &  & Vorgabe \\
+Umrechnungsfaktor des äusseren Widerstands & $\eta_a$ & $0.7$ &  & Vorgabe \\
+Umrechnungsfaktor des inneren Widerstands & $\eta_i$ & $0.8$ &  & Vorgabe \\
+Raumlast der Schicht 1 & $\gamma_{1}$ & $19$ & kN/m³ & Vorgabe \\
+Raumlast der Schicht 2 & $\gamma_{2}$ & $21$ & kN/m³ & Vorgabe \\
+Raumlast der Schicht 3 & $\gamma_{3}$ & $22$ & kN/m³ & Vorgabe \\
+Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Zahl der Längsstäbe & $n$ & $12$ &  & Vorgabe \\
+Erfüllungsgrad äusserer Widerstand – Tragsicherheit & $\alpha_{eff,a,\text{Tragsicherheit}}$ & $1.10$ &  & berechnet \\
+Erfüllungsgrad innerer Widerstand – Tragsicherheit & $\alpha_{eff,i,\text{Tragsicherheit}}$ & $5.66$ &  & berechnet \\
+Reibungswinkel der Schicht 1, charakteristisch & $\varphi'_{k,1}$ & $30$ & ° & Vorgabe \\
+Reibungswinkel der Schicht 2, charakteristisch & $\varphi'_{k,2}$ & $34$ & ° & Vorgabe \\
+Reibungswinkel der Schicht 3, charakteristisch & $\varphi'_{k,3}$ & $36$ & ° & Vorgabe \\
+Durchmesser der Längsstäbe & $\varnothing_l$ & $20$ & mm & Vorgabe \\
+Durchmesser der Wendel & $\varnothing_w$ & $10$ & mm & Vorgabe \\
+Mantelreibung in der Schicht 1, charakteristisch & $q_{s,k,1}$ & $0$ & kPa & Vorgabe \\
+Tiefe des Pfahlkopfs unter Terrain & $t_K$ & $1.5$ & m & Vorgabe \\
+Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_w$ & $3$ & m & Vorgabe \\
 Grösstkorndurchmesser & $D_{max}$ & $32$ & mm & Vorgabe \\
 Betrachtete Breite (x) & $b$ & $1000$ & mm & Vorgabe \\
 Betrachtete Breite (y) & $b_y$ & $1000$ & mm & Vorgabe \\

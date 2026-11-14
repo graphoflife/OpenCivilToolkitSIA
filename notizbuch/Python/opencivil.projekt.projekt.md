@@ -1,5 +1,5 @@
 ---
-erzeugt: db391fff6607
+erzeugt: e9c81343d114
 art: modul
 tags: [modul]
 ---
@@ -39,6 +39,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)` – Stützen und Wände, an denen das Durchstanzen nachgewiesen wird.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
+- `pfaehle: List[PfahlEintrag] = field(default_factory=list)` – Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand.
 - `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
 
 #### Projekt.material
@@ -258,6 +259,19 @@ selbst an, von der Sohle an nach unten. Alles Weitere -- `B`,
 `q_E`, `steifigkeit` ... -- geht als Stichwort an den Eintrag;
 Masse in m, Pressungen in kN/m², die zulaessige Setzung in mm.
 
+#### Projekt.pfahl
+
+```python
+def pfahl(self, name: str, stahl: str, beton: str='', **felder: Any) -> PfahlEintrag
+```
+
+Ein Pfahl mit den Vorgaben der Oberflaeche, aber ohne ihre Startschicht
+und Startkombination: wer rechnet, gibt sie mit `schicht` und
+`kombination` selbst an. `stahl` und `beton` sind Kennungen von
+Materialien, der Beton nur beim Bohrpfahl. Alles Weitere -- `art`,
+`D`, `grundlage` ... -- geht als Stichwort an den Eintrag; Masse
+des Querschnitts in mm, Tiefen in m, Spannungen in kPa.
+
 #### Projekt.skript
 
 ```python
@@ -377,6 +391,7 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]

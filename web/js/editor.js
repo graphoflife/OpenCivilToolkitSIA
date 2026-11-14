@@ -5,7 +5,8 @@
  * steht, sagt die Zeile seiner App (apps.js); hier steht nur, wie die Tafel
  * gezeichnet wird. Die Editoren stehen bei ihren Apps: material.js,
  * platte.js, querschnittsanalyse.js, balkensystem.js, durchstanzen.js, grundbruch.js,
- * setzung.js und python.js. Bis 2026-10-18 standen der des Materials und der der Platte hier.
+ * setzung.js, pfahl.js und python.js. Bis 2026-10-18 standen der des Materials
+ * und der der Platte hier.
  *
  * Angezeigt wird immer der Wert aus der letzten Lösung, nie ein in der
  * Oberfläche nachgerechneter.

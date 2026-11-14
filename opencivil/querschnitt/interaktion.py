@@ -588,15 +588,18 @@ class Querschnitt:
 
     # -- Reine Normalkraft --------------------------------------------------
 
-    def normalkraft_grenzen(self) -> Tuple[float, float]:
+    def reine_normalkraft(self, zug: bool) -> Bruchpunkt:
         """
-        Groesste Zug- und groesste Druckkraft -- gleichmaessige Dehnung, also
-        fuer jede Neigung dieselbe.
+        Der Bruchzustand bei gleichmaessiger Dehnung -- der groesste Zug oder
+        der groesste Druck, fuer jede Neigung derselbe. Was jeder Werkstoff
+        dazu beitraegt, sagt :meth:`anteile`.
         """
         r = self.richtung(-math.pi / 2.0)
-        zug = r.punkt(self._auf_kette(r, 0.0, True), 0.0).N
-        druck = r.punkt(self._auf_kette(r, 0.0, False), 0.0).N
-        return zug, druck
+        return r.punkt(self._auf_kette(r, 0.0, zug), 0.0)
+
+    def normalkraft_grenzen(self) -> Tuple[float, float]:
+        """Groesste Zug- und groesste Druckkraft (:meth:`reine_normalkraft`)."""
+        return self.reine_normalkraft(True).N, self.reine_normalkraft(False).N
 
     # -- N = N_Ed auf dem Faecher -------------------------------------------
 

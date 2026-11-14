@@ -22,11 +22,12 @@ class TestUrteilsraum(unittest.TestCase):
         # Nur Platten: um sie geht es hier. Der Unterzug des Beispiels hat
         # seinen eigenen Namensraum und zählte sonst bei keiner mit -- und der
         # Rahmen, der seinen Querschnitt nimmt, geht mit ihm. Das Fundament
-        # ebenso, mit seiner Setzung.
+        # ebenso, mit seiner Setzung, und der Pfahl.
         projekt.querschnittsanalysen = []
         projekt.balkensysteme = []
         projekt.grundbrueche = []
         projekt.setzungen = []
+        projekt.pfaehle = []
         zweite = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict()))).querschnitt("q1")
         zweite.kennung, zweite.name = "q2", "Decke über 1. OG"
         projekt.querschnitte.append(zweite)
@@ -321,14 +322,17 @@ class TestAngabengruppen(unittest.TestCase):
 
     def test_zwei_kaesten_statt_vier_zeilen(self):
         gruppen = self.gruppen()
-        # Zwei Kästen der Platte, einer des Unterzugs, vier des Fundaments und
-        # sechs seiner Setzung -- deren «Fundament» heisst wie das des
-        # Grundbruchs und steht hier mit ihm in einer Liste.
+        # Zwei Kästen der Platte, einer des Unterzugs, vier des Fundaments,
+        # sechs seiner Setzung und sieben des Pfahls -- das «Fundament» der
+        # Setzung heisst wie das des Grundbruchs, die dritte Schicht des
+        # Pfahls wie die der Setzung; sie stehen hier je in einer Liste.
         self.assertEqual(sorted(gruppen),
                          ["Abmessungen – Beton C30/37", "Boden", "Bruttoquerschnitt",
-                          "Fundament", "Gelände und Grundwasser", "Nachweis",
-                          "Pressung in der Sohle", "Schicht 1: Kies, sandig",
-                          "Schicht 2: Silt, tonig", "Schicht 3: Moräne", "Sohlreibung",
+                          "Fundament", "Gelände und Grundwasser", "Grundwasser", "Nachweis",
+                          "Pfahl", "Pressung in der Sohle", "Querschnitt",
+                          "Schicht 1: Auffüllung", "Schicht 1: Kies, sandig",
+                          "Schicht 2: Kies, sandig", "Schicht 2: Silt, tonig",
+                          "Schicht 3: Moräne", "Sohlreibung", "Äusserer Widerstand",
                           "Überdeckungen"])
         self.assertEqual(gruppen["Fundament"],
                          ["Breite des Fundaments", "Länge des Fundaments",
@@ -527,6 +531,11 @@ class TestAngabengruppen(unittest.TestCase):
                 "alpha", "t1", "beta", "q_Ed", "delta_faktor")),
             *(f"setzung.w1.{n}" for n in ("B", "L", "q_W", "q_E", "s_zul", "dz")),
             *(f"setzung.w1.{n}_{i}" for i in (1, 2, 3) for n in ("d", "M_E", "M_E_strich")),
+            *(f"pfahl.t1.{n}" for n in (
+                "D", "L", "t_K", "t_w", "gamma_w", "n", "phi_l", "c", "phi_w", "eta_i", "eta_a")),
+            *(f"pfahl.t1.{n}_{i}" for i in (1, 2, 3) for n in ("d", "gamma", "phi_k", "c_k")),
+            "pfahl.t1.q_s_1",
+            *(f"pfahl.t1.{n}_{i}" for i in (2, 3) for n in ("K", "delta_faktor")),
         })
 
 

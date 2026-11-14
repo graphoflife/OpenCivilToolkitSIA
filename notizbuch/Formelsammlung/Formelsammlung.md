@@ -1,5 +1,5 @@
 ---
-erzeugt: 330e621e0b70
+erzeugt: 1a5eeb803ca5
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -51,6 +51,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Setzung]] · 8
 
+**Pfähle**
+
+- [[Äusserer Pfahlwiderstand]] · 21
+- [[Innerer Pfahlwiderstand]] · 12
+
 **Durchstanzen**
 
 - [[Durchstanzen]] · 39
@@ -67,6 +72,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Arbeitsgleiche Knotenkräfte]]
 - [[Aufnehmbare Risskraft]] · $N_{s,adm,2,x}$
 - [[Aufnehmbares Moment der Bewehrung]] · $M_{s,adm,2,x}$
+- [[Äusserer Widerstand auf Druck]] · $R_{a,k}$
+- [[Äusserer Widerstand auf Zug]] · $R_{a,k,Z}$
 - [[Bedingung der Duktilität]]
 - [[Bedingung gegen sprödes Versagen]]
 - [[Beide Lagen fliessen auf Zug]] · $N_{Rd}^{+}$
@@ -84,6 +91,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert der Kohäsion]] · $c_{eff}$
 - [[Bemessungswert der Querkraft im Nachweisschnitt]] · $V_{d,red}$
 - [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
+- [[Bemessungswert des äusseren Widerstands]] · $R_{a,d}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
 - [[Bemessungswert des Sohlreibungswinkels]] · $\delta_d$
@@ -126,12 +134,17 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Durchstanzbewehrung an der Fliessgrenze]] · $V_{Rd,v}$
 - [[Durchstanzwiderstand ohne Durchstanzbewehrung]] · $V_{Rd,c}$
 - [[Eigengewicht eines Stabs]] · $g_{k}$
+- [[Einbindung in die tragende Schicht]] · $h$
 - [[Einflussfaktor der Rechtecklast]]
 - [[Einwirkung im normierten Diagramm]] · $\bar{E}_{d,x}$
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
 - [[Erweiterte Tragfähigkeitsformel]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · $\varnothing_{fikt}$
+- [[Fläche der Längsbewehrung]] · $A_s$
+- [[Fläche des Pfahlquerschnitts]] · $A_b$
+- [[Fläche des Tragrohrs nach Abrostung]] · $A_s$
+- [[Fläche des Tragstabs nach Abrostung]] · $A_s$
 - [[Fläche eines Doppel-T-Querschnitts]] · $A_{\text{Q6}}$
 - [[Fläche eines Kreises]] · $A_{\text{Q2}}$
 - [[Fläche eines Kreisrings]] · $A_{\text{Q3}}$
@@ -149,6 +162,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · $I_{\text{Q5}}$
 - [[Flächenträgheitsmoment eines Trapezes]] · $I_{\text{Q7}}$
 - [[Fliessdehnung]] · $\varepsilon_{yd}$
+- [[Form- und Tiefenfaktor des Pfahlfusses]] · $X$
 - [[Formfaktor s_c]] · $s_c$
 - [[Formfaktor s_q]] · $s_q$
 - [[Formfaktor s_γ]] · $s_{\gamma}$
@@ -171,8 +185,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Hilfsgrösse der Nulllinie]] · $\rho$
 - [[Höhe der Distanzhalter]] · $h_{Dist}$
 - [[Innerer Hebelarm]] · $z$
+- [[Innerer Widerstand des Pfahls]] · $R_{i,d}$
 - [[Iteration der Ausmitte 2. Ordnung]]
 - [[Kleinerer Widerstand beider Seiten]] · $V_{Rd,max}$
+- [[Kohäsion für örtliches Abscheren]] · $c^{*}$
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · $M_{Rd}(N_{Rd}^{+})$
 - [[Kräftegleichgewicht]] · $N_{Rd}^{+}$
 - [[Kräftegleichgewicht bei M_Ed = 0]]
@@ -183,7 +199,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Lastneigungsfaktor i_c]] · $i_c$
 - [[Lastneigungsfaktor i_q]] · $i_q$
 - [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
+- [[Mantelreibung drainiert]]
+- [[Mantelreibung undrainiert]]
+- [[Mantelwiderstand]] · $R_{s,k}$
 - [[Massgebende Plattenrotation – die grössere]] · $\psi$
+- [[Materialwiderstand auf Druck]] · $R_{mat,d}$
+- [[Materialwiderstand des Stahls]] · $R_{mat,d,Z}$
 - [[Mittelwert der Zylinderdruckfestigkeit]] · $f_{cm}$
 - [[Mittelwert des Elastizitätsmoduls]] · $E_{cm}$
 - [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · $d$
@@ -211,9 +232,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]] · $V_{Rd}^{+}(M_{Ed} = 0)$
 - [[Querkraftwiderstand ohne Querkraftbewehrung]] · $V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+})$
 - [[Querschnitt eines Bügelschenkels]] · $A_{\varnothing,V}$
+- [[Radius des Bewehrungskreises]] · $r_s$
 - [[Raumlast im Gleitkörper]] · $\gamma_G$
 - [[Raumlast unter Auftrieb]] · $\gamma'$
 - [[Reibungswinkel der Sohlfuge]] · $\delta_k$
+- [[Reibungswinkel für örtliches Abscheren]] · $\varphi^{*}$
 - [[Reichweite des Gleitkörpers]] · $L_{Gl}$
 - [[Rissaktive Dicke des gezeichneten Querschnitts]] · $t$
 - [[Rissaktive Plattendicke]] · $h_{eff}$
@@ -237,6 +260,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Spannung im ungerissenen Querschnitt]]
 - [[Spannung in der Durchstanzbewehrung]] · $\sigma_{sd}$
 - [[Spannungsblock des Betons]]
+- [[Spitzendruck drainiert]] · $q_{b,k}$
+- [[Spitzendruck undrainiert]] · $q_{b,k}$
+- [[Spitzenwiderstand]] · $R_{b,k}$
 - [[Stahlspannung, höchstens die Fliessgrenze]] · $\sigma_{sd}$
 - [[Statische Höhe]] · $d_{2,x}$
 - [[Statische Höhe der äusseren Lage]] · $d_x$
@@ -248,12 +274,14 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Tiefenfaktor d_c]] · $d_c$
 - [[Tiefenfaktor d_q]] · $d_q$
 - [[Torsion in den Zellen (Bredt, mehrzellig)]]
+- [[Tragfähigkeitsfaktor des Pfahlfusses undrainiert]] · $N_c$
 - [[Tragfähigkeitsfaktor N_c]] · $N_c$
 - [[Tragfähigkeitsfaktor N_q]] · $N_q$
 - [[Tragfähigkeitsfaktor N_γ]] · $N_{\gamma}$
 - [[Tragfähigkeitsformel undrainiert]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]]
 - [[Überlagerung auf Höhe der Sohle]] · $\sigma_{v,0}$
+- [[Umfang des Pfahls]] · $U$
 - [[Ungewollte Ausmitte]] · $e_{0d}$
 - [[Ungewollte Ausmitte – allgemein]]
 - [[Vergrösserungsfaktor der Durchbiegung]] · $\omega_w$
@@ -275,8 +303,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wirksame Durchbiegung]] · $w_{eff}$
 - [[Wirksame Höhe ohne Abzug]] · $d_v^{+}$
 - [[Wirksame Höhe, um die Einlage vermindert]] · $d_v$
+- [[Wirksame Spannung am Pfahlfuss]] · $\sigma'_{v,F}$
 - [[Wirksame statische Höhe im äusseren Nachweisschnitt]] · $d_{v,out}$
 - [[Wirksame statische Höhe um den Stahlpilz]] · $d_{v,P}$
+- [[Wirksame Überlagerungsspannung]]
 - [[Wirksame Zugfestigkeit]] · $f_{ct,eff}$
 - [[Wirksamer Elastizitätsmodul]] · $E_{c,eff}$
 - [[Wirksamer Umfang des Nachweisschnitts]] · $u$
@@ -287,7 +317,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-85 von 227 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+88 von 252 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -314,6 +344,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Erfüllungsgrad]] · [[opencivil.core.nachweis#Vergleich.zeile|Vergleich.zeile]]
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · [[opencivil.nachweis.stabgrenzen#_protokoll_fiktiv|_protokoll_fiktiv]]
+- [[Fläche der Längsbewehrung]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Fläche eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
@@ -349,6 +380,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Probe – Moment um z]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
+- [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.grundbruch|_gamma_auftrieb]]
 - [[Rissmoment bei der Normalkraft]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
@@ -364,6 +396,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
+- [[Umfang des Pfahls]] · [[opencivil.pfahl.aussen#AeussererWiderstand._mantel|AeussererWiderstand._mantel]]
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
 - [[Verschmierte Stahlfläche aus Stäben]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Was die Zellen tragen]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]

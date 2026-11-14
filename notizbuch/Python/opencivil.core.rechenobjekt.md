@@ -1,5 +1,5 @@
 ---
-erzeugt: 6bda5348790c
+erzeugt: 6c22b6516649
 art: modul
 tags: [modul]
 ---
@@ -77,6 +77,7 @@ nicht, ob eine andere ihren Beton schon angemeldet hat.
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.stabwerk.rechnung]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 97ff9c9161c9
+erzeugt: 649bf6fbde30
 art: modul
 tags: [modul]
 ---
@@ -451,6 +451,9 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
+- [[opencivil.pfahl.achse]]
+- [[opencivil.pfahl.aussen]]
+- [[opencivil.pfahl.uebersicht]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.lagenaufbau]]
@@ -462,4 +465,5 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.web.anzeige]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]

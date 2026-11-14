@@ -47,7 +47,7 @@ from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN
 from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz
-from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
@@ -58,6 +58,53 @@ KENNWERTE = {
     Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "f_ctm", "E_cm", "E_cd"),
     Baustoffart.BETONSTAHL: ("f_yk", "f_yd", "f_yk_druck", "f_yd_druck", "E_s", "eps_ud"),
 }
+
+
+def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *,
+              ungerissen: bool = False) -> Werkstoff:
+    """
+    Ein Baustoff als Werkstoff der Interaktion -- die eine Stelle, die ihn
+    baut, fuer den gezeichneten Querschnitt und den Pfahl. ``wert`` liefert
+    zu einer Wert-ID die Zahl in SI.
+
+    Beton: das Gesetz der Wahl, gebaut wie bei der Platte
+    (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`), der Beiwert der
+    Parabel also aus ``E_cm/(1+phi)`` -- oder, ``ungerissen``, linear in
+    Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
+    ``-eps_c2d`` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
+    ``±eps_ud``. Der Wertesatz bestimmt, wo die Plateaus liegen
+    (``f_cd`` oder ``f_ck``, ``f_yd`` oder ``f_yk``); Moduln und
+    Dehnungsgrenzen bleiben
+    (:class:`~opencivil.querschnitt.gesetzwahl.Werkstoffsatz`).
+
+    Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
+    selbst, und der Bruchzustand nahm den Beiwert der Parabel aus ``E_cd``.
+    """
+    w = lambda k: abs(wert(stoff.id_von(k)))
+    satz = wahl.satz
+    if stoff.art is Baustoffart.BETON:
+        eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
+        gesetz = betongesetz(wahl, f_c=w(satz.beton), E_c=w(wahl.modul),
+                             eps_c1d=eps_c1d, eps_c2d=eps_c2d, ungerissen=ungerissen)
+        return Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
+                         c_punkt=(eps_c1d, eps_c2d), verdraengbar=True)
+    gesetz = Stahlgesetz(E_s=w("E_s"), f_yd=w(satz.stahl),
+                         f_yd_druck=w(satz.stahl_druck), eps_ud=w("eps_ud"))
+    return Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud)
+
+
+def gesetz_protokollieren(p: Protokoll, e: Eingaben, stoff: Baustoff, gesetz: Gesetz,
+                          wahl: Rechenwahl, basis: str) -> None:
+    """
+    Das Gesetz eines Baustoffs in die Herleitung, mit den Kennwerten, aus
+    denen es gebaut ist (:func:`werkstoff`) -- gelesen aus ``e`` unter
+    :meth:`~opencivil.material.basis.Baustoff.eingabename`.
+    """
+    satz = wahl.satz
+    kennwerte = wahl.betonkennwerte if stoff.art is Baustoffart.BETON else satz.stahlkennwerte
+    gesetz.protokoll(p, {rolle: e[stoff.eingabename(name)] for rolle, name in kennwerte.items()},
+                     titel=f"Werkstoffgesetz {stoff.name}, {satz.beschriftung}",
+                     basis=f"{basis}.{kennung_aus(stoff.id)}")
 
 
 @dataclass(frozen=True)
@@ -580,40 +627,15 @@ class Querschnittsanalyse(Rechenobjekt):
                    wahl: Callable[[Baustoff], Rechenwahl], *, ungerissen: bool = False,
                    ) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]:
         """
-        Die Werkstoffe des Querschnitts -- die eine Stelle, die sie baut.
+        Die Werkstoffe des Querschnitts, je Baustoff einer (:func:`werkstoff`).
         ``wert`` liefert zu einer Wert-ID die Zahl in SI; ``wahl`` je Baustoff
         seine Rechenwahl: im Bruchzustand die des Baustoffs
         (:meth:`rechenwahl`), fuer Spannungen und Knicken die des Kapitels.
-
-        Beton: das Gesetz der Wahl, gebaut wie bei der Platte
-        (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`), der Beiwert der
-        Parabel also aus ``E_cm/(1+phi)`` -- oder, ``ungerissen``, linear in
-        Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
-        ``-eps_c2d`` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
-        ``±eps_ud``. Der Wertesatz bestimmt, wo die Plateaus liegen
-        (``f_cd`` oder ``f_ck``, ``f_yd`` oder ``f_yk``); Moduln und
-        Dehnungsgrenzen bleiben
-        (:class:`~opencivil.querschnitt.gesetzwahl.Werkstoffsatz`).
-
-        Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
-        selbst, und der Bruchzustand nahm den Beiwert der Parabel aus ``E_cd``.
         """
         liste: List[Werkstoff] = []
         index: Dict[str, int] = {}
         for stoff in self.baustoffe:
-            w = lambda k: abs(wert(stoff.id_von(k)))
-            gewaehlt = wahl(stoff)
-            satz = gewaehlt.satz
-            if stoff.art is Baustoffart.BETON:
-                eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
-                gesetz = betongesetz(gewaehlt, f_c=w(satz.beton), E_c=w(gewaehlt.modul),
-                                     eps_c1d=eps_c1d, eps_c2d=eps_c2d, ungerissen=ungerissen)
-                liste.append(Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
-                                       c_punkt=(eps_c1d, eps_c2d), verdraengbar=True))
-            else:
-                gesetz = Stahlgesetz(E_s=w("E_s"), f_yd=w(satz.stahl),
-                                     f_yd_druck=w(satz.stahl_druck), eps_ud=w("eps_ud"))
-                liste.append(Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud))
+            liste.append(werkstoff(stoff, wert, wahl(stoff), ungerissen=ungerissen))
             index[stoff.id] = len(liste) - 1
         return liste, (lambda stoff: index[stoff.id])
 
@@ -643,14 +665,8 @@ class Querschnittsanalyse(Rechenobjekt):
         """
         werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.rechenwahl)
         for stoff in self.baustoffe:
-            wahl = self.rechenwahl(stoff)
-            satz = wahl.satz
-            kennwerte = (wahl.betonkennwerte if stoff.art is Baustoffart.BETON
-                         else satz.stahlkennwerte)
-            werkstoffe[index(stoff)].gesetz.protokoll(
-                p, {rolle: e[stoff.eingabename(name)] for rolle, name in kennwerte.items()},
-                titel=f"Werkstoffgesetz {stoff.name}, {satz.beschriftung}",
-                basis=f"{basis}.{kennung_aus(stoff.id)}")
+            gesetz_protokollieren(p, e, stoff, werkstoffe[index(stoff)].gesetz,
+                                  self.rechenwahl(stoff), basis)
 
     def grundbezuege(self) -> List[Eingabebezug]:
         """Was jeder Nachweis der Analyse liest: den Schwerpunkt und die Werkstoffe."""

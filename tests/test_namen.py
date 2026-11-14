@@ -35,6 +35,7 @@ LISTEN = {
     "Knicken der Analyse": lambda p, n: analyse(p).knickfall(n, N_Ed=-500.0),
     "Spannung-Dehnung der Analyse": lambda p, n: analyse(p).spannungsfall(n, M_Ed=10.0),
     "Kombinationen des Grundbruchs": lambda p, n: p.grundbrueche[0].kombination(n, N_Ed=100.0),
+    "Kombinationen des Pfahls": lambda p, n: p.pfaehle[0].kombination(n, N_Ed=100.0),
 }
 
 

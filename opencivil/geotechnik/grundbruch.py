@@ -113,6 +113,27 @@ def grad(winkel: Groesse) -> float:
     return math.degrees(winkel.si)
 
 
+def tragfaehigkeitsfaktoren(p: Protokoll, werte: Zwischenwerte, phi: Wert) -> Tuple[Wert, Wert]:
+    """
+    N_q und N_c für den Reibungswinkel ``phi`` (Kap. 9.2.6), in die
+    Herleitung geschrieben -- unter einem Fundament und am Fuss eines Pfahls
+    dieselben Formeln (:mod:`opencivil.pfahl.aussen`). ``phi`` grösser als null.
+    """
+    tan_phi = math.tan(phi.groesse.si)
+    n_q = math.exp(math.pi * tan_phi) * math.tan(math.pi / 4 + phi.groesse.si / 2) ** 2
+    N_q = werte.zahl("N_q", "N_q", n_q, "Tragfähigkeitsfaktor der seitlichen Auflast",
+                     stellen=2)
+    p.formel(N_q, r"e^{\pi \tan @phi} \cdot \tan^{2}\left(45^\circ + \frac{@phi}{2}\right)",
+             {"phi": phi}, titel="Tragfähigkeitsfaktor der seitlichen Auflast",
+             referenz=KAP_FAKTOREN, name="Tragfähigkeitsfaktor N_q")
+    N_c = werte.zahl("N_c", "N_c", (n_q - 1.0) / tan_phi,
+                     "Tragfähigkeitsfaktor der Kohäsion", stellen=2)
+    p.formel(N_c, r"\frac{@N_q - 1}{\tan @phi}", {"N_q": N_q, "phi": phi},
+             titel="Tragfähigkeitsfaktor der Kohäsion", referenz=KAP_FAKTOREN,
+             name="Tragfähigkeitsfaktor N_c")
+    return N_q, N_c
+
+
 # ===========================================================================
 # Das Fundament
 # ===========================================================================
@@ -375,17 +396,8 @@ class Grundbruch(Nachweis):
 
         # -- Tragfähigkeitsfaktoren -------------------------------------------
         p.titel("Tragfähigkeitsfaktoren", ebene=3)
-        n_q = math.exp(math.pi * tan_phi) * math.tan(math.pi / 4 + phi.groesse.si / 2) ** 2
-        N_q = werte.zahl("N_q", "N_q", n_q, "Tragfähigkeitsfaktor der seitlichen Auflast",
-                         stellen=2)
-        p.formel(N_q, r"e^{\pi \tan @phi} \cdot \tan^{2}\left(45^\circ + \frac{@phi}{2}\right)",
-                 {"phi": phi}, titel="Tragfähigkeitsfaktor der seitlichen Auflast",
-                 referenz=KAP_FAKTOREN, name="Tragfähigkeitsfaktor N_q")
-        N_c = werte.zahl("N_c", "N_c", (n_q - 1.0) / tan_phi,
-                         "Tragfähigkeitsfaktor der Kohäsion", stellen=2)
-        p.formel(N_c, r"\frac{@N_q - 1}{\tan @phi}", {"N_q": N_q, "phi": phi},
-                 titel="Tragfähigkeitsfaktor der Kohäsion", referenz=KAP_FAKTOREN,
-                 name="Tragfähigkeitsfaktor N_c")
+        N_q, N_c = tragfaehigkeitsfaktoren(p, werte, phi)
+        n_q = N_q.groesse.si
         N_g = werte.zahl("N_gamma", r"N_{\gamma}", 1.8 * (n_q - 1.0) * tan_phi,
                          "Tragfähigkeitsfaktor des Gleitkörpergewichts", stellen=2)
         p.formel(N_g, r"1.8 \cdot \left(@N_q - 1\right) \cdot \tan @phi",

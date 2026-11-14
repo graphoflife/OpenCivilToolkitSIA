@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f0744874f1d
+erzeugt: db4a7e74dfb6
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -101,6 +101,14 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.notizbuch.formelseiten]] – die Formelsammlung als Seiten.
     - [[opencivil.notizbuch.namen]] – aus einem Namen wird ein Seitenname.
     - [[opencivil.notizbuch.tresor]] – erzeugte Seiten in den Ordner `notizbuch/`.
+- [[opencivil.pfahl]] – ein Einzelpfahl nach SIA 267:2013, Kapitel 9.
+    - [[opencivil.pfahl.achse]] – was die Nachweise längs der Pfahlachse teilen.
+    - [[opencivil.pfahl.aussen]] – der äussere Widerstand eines Pfahls längs seiner Achse.
+    - [[opencivil.pfahl.boden]] – der Baugrund um einen Pfahl.
+    - [[opencivil.pfahl.buch]] – die Zahlen des Buches zum Einzelpfahl.
+    - [[opencivil.pfahl.innen]] – der innere Widerstand eines Pfahls: sein Querschnitt.
+    - [[opencivil.pfahl.pfahl]] – ein Einzelpfahl in seinem Baugrund.
+    - [[opencivil.pfahl.uebersicht]] – was über der Nachweistabelle eines Pfahls steht.
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
   - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
       - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
@@ -109,6 +117,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
       - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
       - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
+      - [[opencivil.projekt.aufbau.pfahl]] – ein Pfahl wird Rechnung.
       - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
       - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
       - [[opencivil.projekt.aufbau.setzung]] – eine Setzungsberechnung wird Rechnung.
@@ -121,6 +130,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
     - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
+    - [[opencivil.projekt.pfahl]] – ein Einzelpfahl, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
     - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
@@ -171,6 +181,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
     - [[opencivil.web.durchstanzdaten]] – was die Oberflaeche von einer Durchstanzstelle zeichnet.
     - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
+    - [[opencivil.web.pfahldaten]] – was die Oberflaeche von einem Pfahl zeichnet.
     - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
     - [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.
     - [[opencivil.web.speicher]] – was vom letzten Lauf noch gilt.

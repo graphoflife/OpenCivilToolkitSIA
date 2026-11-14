@@ -1,5 +1,5 @@
 ---
-erzeugt: f091074311ce
+erzeugt: aa61d5075bab
 art: modul
 tags: [modul]
 ---
@@ -465,5 +465,6 @@ def abschliessen(self) -> Loesung
 - [[opencivil.web.dienst]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.zeichendaten]]

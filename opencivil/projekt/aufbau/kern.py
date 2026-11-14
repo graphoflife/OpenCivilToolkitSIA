@@ -13,8 +13,9 @@ Was nur eine Art braucht, steht bei ihr: :mod:`~opencivil.projekt.aufbau.platte`
 :mod:`~opencivil.projekt.aufbau.querschnittsanalyse`,
 :mod:`~opencivil.projekt.aufbau.balkensystem`,
 :mod:`~opencivil.projekt.aufbau.durchstanzen`,
-:mod:`~opencivil.projekt.aufbau.grundbruch` und
-:mod:`~opencivil.projekt.aufbau.setzung`. Bis 2026-10-17 stand alles in
+:mod:`~opencivil.projekt.aufbau.grundbruch`,
+:mod:`~opencivil.projekt.aufbau.setzung` und
+:mod:`~opencivil.projekt.aufbau.pfahl`. Bis 2026-10-17 stand alles in
 einer Datei ``aufbau.py`` von ueber tausend Zeilen.
 """
 
@@ -40,6 +41,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.geotechnik.grundbruch import Fundament
 from opencivil.geotechnik.setzung import Setzungsfundament
+from opencivil.pfahl.pfahl import Pfahl
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.decke.werk import Deckensystem
@@ -104,7 +106,7 @@ class Aufbau:
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
                       "qa_spannung", "qa_knicken", "durchstanzen", "grundbruch", "gleiten",
-                      "setzung")
+                      "setzung", "pfahl_aussen", "pfahl_innen")
 
     # -- Die Objekte je Bauteilart: Sichten auf die Bauteile --------------
     #
@@ -152,6 +154,11 @@ class Aufbau:
     def setzungen(self) -> Dict[str, Setzungsfundament]:
         """Die Fundamente der Setzungsberechnungen, nach Kennung."""
         return self.objekte("setzung")
+
+    @property
+    def pfaehle(self) -> Dict[str, Pfahl]:
+        """Die Pfähle, nach Kennung."""
+        return self.objekte("pfahl")
 
     def feld(self, feld: str) -> Dict[str, Nachweis]:
         """

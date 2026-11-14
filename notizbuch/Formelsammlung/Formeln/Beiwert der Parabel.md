@@ -1,5 +1,5 @@
 ---
-erzeugt: a3c9a3f04df0
+erzeugt: ec79d7a60fea
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe"
@@ -35,6 +35,7 @@ $$
 ## Themen
 
 - [[Schiefe Biegung]]
+- [[Innerer Pfahlwiderstand]]
 - [[Knicken]]
 - [[Biegung und Normalkraft]]
 - [[Stahlspannung gegen Fliessen]]

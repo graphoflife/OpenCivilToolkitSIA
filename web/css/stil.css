@@ -2290,6 +2290,18 @@ details.nb-callout > summary { cursor: pointer; }
 .sz-punkt { fill: var(--system); stroke: #fff; stroke-width: 1.2; }
 .sz-punkttext { fill: var(--system); font-weight: 700; }
 
+/* ---------------------------------------------------------------- Pfahl -- */
+
+/* Die Situation: der Pfahl in den Schichten, rechts die Mantelreibung je
+   Stück, unter dem Fuss der Spitzendruck (pf_zeichnung.js). Schichten,
+   Wasser und Masse teilt sie mit Setzung und Grundbruch. */
+.pf-verpresskoerper { fill: #eceff2; stroke: var(--schrift); stroke-width: 1.4; }
+.pf-stahl { fill: var(--schrift); stroke: none; }
+.pf-mantel { fill: rgba(112, 72, 232, .14); stroke: var(--system); stroke-width: 1.2; }
+.pf-widerstand { fill: var(--system); font-size: 12px; }
+.pf-spitze .gb-pfeil-schaft { stroke: var(--system); stroke-width: 1.6; }
+.pf-spitze .gb-pfeil-spitze { fill: var(--system); }
+
 /* ---------------------------------------------------------- Durchstanzen -- */
 
 /* Der Grundriss: Stütze, Plattenrand, Aussparungen, Nachweisschnitt. Was

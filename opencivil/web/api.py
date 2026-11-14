@@ -63,6 +63,8 @@ from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.stabwerk.rechnung import BETONKENNWERTE
 from opencivil.geotechnik.setzung import Steifigkeit
+from opencivil.pfahl.boden import Mantel, Verhalten
+from opencivil.pfahl.pfahl import Abscheren, Grundlage, Pfahlart, Spitze, Tragglied
 from opencivil.web import diagrammdaten, durchstanzdaten
 from opencivil.web.anzeige import zelle_dict
 from opencivil.web.umschlag import endlich
@@ -204,6 +206,20 @@ def katalog() -> dict:
         "setzung": {
             "steifigkeiten": [{"wert": s.value, "beschriftung": s.beschriftung}
                               for s in Steifigkeit],
+        },
+        # Die Wahlen eines Pfahls -- je ein Schalter, das Wort auf dem Knopf,
+        # die Erklärung darüber --, bei der Grundlage dazu der Grenzwert von
+        # eta_a und wo er steht.
+        "pfahl": {
+            **{name: [{"wert": w.value, "beschriftung": w.beschriftung, "titel": w.erklaerung}
+                      for w in wahl]
+               for name, wahl in (("arten", Pfahlart), ("spitzen", Spitze),
+                                  ("abscheren", Abscheren), ("tragglieder", Tragglied),
+                                  ("verhalten", Verhalten), ("mantel", Mantel))},
+            "grundlagen": [{"wert": g.value, "beschriftung": g.beschriftung,
+                            "titel": g.erklaerung, "grenze": g.eta_grenze,
+                            "referenz": g.referenz, "versuch": g.aus_versuch}
+                           for g in Grundlage],
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.
         "querschnittsanalyse": {

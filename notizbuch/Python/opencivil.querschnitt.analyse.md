@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c0b4870b6d5
+erzeugt: 149afdaa5155
 art: modul
 tags: [modul]
 ---
@@ -33,6 +33,39 @@ Tabellen der Herleitung bleiben in Millimetern; fuer die Nachweise wird
 einmal in Meter umgerechnet ([[opencivil.querschnitt.analyse#Querschnittsanalyse.geometrie|Querschnittsanalyse.geometrie]]).
 
 ## Inhalt
+
+### werkstoff
+
+```python
+def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Werkstoff
+```
+
+Ein Baustoff als Werkstoff der Interaktion -- die eine Stelle, die ihn
+baut, fuer den gezeichneten Querschnitt und den Pfahl. `wert` liefert
+zu einer Wert-ID die Zahl in SI.
+
+Beton: das Gesetz der Wahl, gebaut wie bei der Platte
+([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), der Beiwert der
+Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
+Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
+`-eps_c2d` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
+`±eps_ud`. Der Wertesatz bestimmt, wo die Plateaus liegen
+(`f_cd` oder `f_ck`, `f_yd` oder `f_yk`); Moduln und
+Dehnungsgrenzen bleiben
+([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]).
+
+Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
+selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
+
+### gesetz_protokollieren
+
+```python
+def gesetz_protokollieren(p: Protokoll, e: Eingaben, stoff: Baustoff, gesetz: Gesetz, wahl: Rechenwahl, basis: str) -> None
+```
+
+Das Gesetz eines Baustoffs in die Herleitung, mit den Kennwerten, aus
+denen es gebaut ist ([[opencivil.querschnitt.analyse#werkstoff|werkstoff]]) -- gelesen aus `e` unter
+[[opencivil.material.basis#Baustoff.eingabename|eingabename]].
 
 ### Lastfall
 
@@ -284,23 +317,10 @@ def kennwert(self, e: Eingaben, stoff: Baustoff, kennwert: str) -> float
 def werkstoffe(self, wert: Callable[[str], float], wahl: Callable[[Baustoff], Rechenwahl], *, ungerissen: bool=False) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]
 ```
 
-Die Werkstoffe des Querschnitts -- die eine Stelle, die sie baut.
+Die Werkstoffe des Querschnitts, je Baustoff einer ([[opencivil.querschnitt.analyse#werkstoff|werkstoff]]).
 `wert` liefert zu einer Wert-ID die Zahl in SI; `wahl` je Baustoff
 seine Rechenwahl: im Bruchzustand die des Baustoffs
 ([[opencivil.querschnitt.analyse#Querschnittsanalyse.rechenwahl|rechenwahl]]), fuer Spannungen und Knicken die des Kapitels.
-
-Beton: das Gesetz der Wahl, gebaut wie bei der Platte
-([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), der Beiwert der
-Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
-Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
-`-eps_c2d` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
-`±eps_ud`. Der Wertesatz bestimmt, wo die Plateaus liegen
-(`f_cd` oder `f_ck`, `f_yd` oder `f_yk`); Moduln und
-Dehnungsgrenzen bleiben
-([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]).
-
-Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
-selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
 
 #### Querschnittsanalyse.querschnitt
 
@@ -432,6 +452,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.stabgrenzen]]
+- [[opencivil.pfahl.innen]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]

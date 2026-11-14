@@ -7,6 +7,43 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Pfähle I: äusserer und innerer Widerstand
+
+Eine neue App für den Einzelpfahl nach SIA 267:2013, Kapitel 9, gerechnet
+nach Kapitel 12 des Buches von Lang, Huder, Amann und Puzrin: ein Bohrpfahl
+aus Stahlbeton oder ein Mikropfahl mit Rohr oder Vollstab. Zwei Nachweise
+längs der Achse, je Kombination auf Druck oder, bei negativem N_Ed, auf Zug:
+
+- Äusserer Widerstand: Mantel und Fuss aus den Schichten -- drainiert
+  K·σ'_v·tan δ und (c'·N_c + σ'_v·N_q)·X, undrainiert α·s_u und s_u·N_c --
+  oder R_a,k aus Versuchen. η_a richtet sich nach der Grundlage (0.7 bis
+  1.0), γ_M,a ist 1.3 auf Druck und 1.6 auf Zug. Auf Zug trägt nur der
+  Mantel.
+- Innerer Widerstand: der Querschnitt nach SIA 262, ganz gedrückt oder ganz
+  gezogen, mal η_i (0.8, mit Prüfung der Integrität 0.9). Beim Mikropfahl
+  nur das Tragglied, um die Abrostung verkleinert.
+
+Warum so:
+
+- Die Stücke des Mantels enden an jeder Schichtgrenze und am Wasserspiegel.
+  Darin verläuft σ'_v linear, der Wert in der Mitte ist also genau das
+  Mittel. Das Buch nimmt die halbe Einbindetiefe -- dasselbe, solange kein
+  Wasser die Schicht teilt. Sein Beispiel 17.15 geht damit auf ein Prozent
+  auf: 310 kN am Mantel, 4529 kN am Fuss (`tests/test_pfahl.py`).
+- Der Querschnitt läuft durch dieselbe Interaktion wie die
+  Querschnittsanalyse, nicht durch eine eigene Formel. So gilt dieselbe
+  Grenze −ε_c1d, und der Stahl steht ganz gedrückt bei 400 statt 435 N/mm².
+  Der Kreis ist ein 48-Eck mit derselben Fläche.
+- Beide Nachweise teilen ihre Fälle (`pfahl/achse.py`): ob Druck oder Zug
+  und gegen welchen Widerstand verglichen wird, steht an einer Stelle.
+- Die Wahlen tragen ein Wort für den Knopf und eine Erklärung darüber, wie
+  die Verschmierungen der Querschnittsanalyse.
+- Das Beispielprojekt hat einen Bohrpfahl, das Prüfprojekt vier Pfähle:
+  drainiert und undrainiert, aus dem Versuch, mit Rohr und Vollstab. Einer
+  geht absichtlich nicht auf.
+- Was weder Norm noch Buch sagen, steht als Annahme in der Herleitung und in
+  [[TODO]]. Steifigkeit und Querlast folgen.
+
 ## 2026-11-14 · Normprüfung VII: Durchstanzen
 
 Geprüft gegen SIA 262:2025, 4.3.6 und 5.5.3. Was sich ändert:

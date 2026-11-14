@@ -1,10 +1,11 @@
 /**
- * gb_skizze.js -- die Bausteine der Bilder im Grundbau: Grundbruch und Setzung.
+ * gb_skizze.js -- die Bausteine der Bilder im Grundbau: Grundbruch, Setzung, Pfahl.
  *
- * Linien, Pfeile, Masse, Winkelbögen, Text mit tiefgestellten Teilen und die
- * Schraffur unter dem Gelände -- in px, im Stil der Klassen `gb-…` im
- * Stilblatt («gb» für Grundbau). Bis 2026-10-23 standen sie in
- * gb_zeichnung.js; die Setzung (sz_zeichnung.js) zeichnet mit denselben.
+ * Linien, Pfeile, Masse, Winkelbögen, Text mit tiefgestellten Teilen, das
+ * Zeichen des Grundwassers und die Schraffur unter dem Gelände -- in px, im
+ * Stil der Klassen `gb-…` im Stilblatt («gb» für Grundbau). Bis 2026-10-23
+ * standen sie in gb_zeichnung.js; Setzung (sz_zeichnung.js) und Pfahl
+ * (pf_zeichnung.js) zeichnen mit denselben.
  */
 
 import { el, svgEl } from './dom.js';
@@ -111,6 +112,19 @@ export function mass(von, bis, teile, { seite = 'rechts' } = {}) {
     pfeil(mitte, von, 'gb-masspfeil'),
     pfeil(mitte, bis, 'gb-masspfeil'),
     text(lage.x, lage.y, teile, { anker: lage.anker, klasse: 'gb-masstext' }),
+  ]);
+}
+
+/**
+ * Das Zeichen des Grundwasserspiegels bei `[x, y]` auf seiner Linie: das
+ * Dreieck darüber, zwei Striche darunter, rechts die Beschriftung.
+ */
+export function wasserzeichen([x, y], beschriftung) {
+  return gruppe('', [
+    svgEl('path', { d: `M${x - 7} ${y - 9} h14 l-7 9 z`, class: 'gb-wasserzeichen' }),
+    linie([[x - 6, y + 4], [x + 6, y + 4]], 'gb-wasser-kurz'),
+    linie([[x - 3, y + 8], [x + 3, y + 8]], 'gb-wasser-kurz'),
+    text(x + 12, y - 2, [beschriftung], { klasse: 'gb-wassertext' }),
   ]);
 }
 

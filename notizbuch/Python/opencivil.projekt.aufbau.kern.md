@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e04ebedbdd3
+erzeugt: cab9be4bbd9f
 art: modul
 tags: [modul]
 ---
@@ -20,8 +20,9 @@ Was nur eine Art braucht, steht bei ihr: [[opencivil.projekt.aufbau.platte|platt
 [[opencivil.projekt.aufbau.querschnittsanalyse|querschnittsanalyse]],
 [[opencivil.projekt.aufbau.balkensystem|balkensystem]],
 [[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
-[[opencivil.projekt.aufbau.grundbruch|grundbruch]] und
-[[opencivil.projekt.aufbau.setzung|setzung]]. Bis 2026-10-17 stand alles in
+[[opencivil.projekt.aufbau.grundbruch|grundbruch]],
+[[opencivil.projekt.aufbau.setzung|setzung]] und
+[[opencivil.projekt.aufbau.pfahl|pfahl]]. Bis 2026-10-17 stand alles in
 einer Datei `aufbau.py` von ueber tausend Zeilen.
 
 ## Inhalt
@@ -108,6 +109,15 @@ def setzungen(self) -> Dict[str, Setzungsfundament]
 ```
 
 Die Fundamente der Setzungsberechnungen, nach Kennung.
+
+#### Aufbau.pfaehle
+
+```python
+@property
+def pfaehle(self) -> Dict[str, Pfahl]
+```
+
+Die Pfähle, nach Kennung.
 
 #### Aufbau.feld
 
@@ -410,6 +420,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
@@ -424,6 +435,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
+- [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]

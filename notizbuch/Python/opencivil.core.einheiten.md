@@ -1,5 +1,5 @@
 ---
-erzeugt: 232aedbc33d7
+erzeugt: cf441efcbbca
 art: modul
 tags: [modul]
 ---
@@ -473,6 +473,10 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.verformung]]
+- [[opencivil.pfahl.aussen]]
+- [[opencivil.pfahl.boden]]
+- [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
@@ -483,6 +487,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
@@ -502,4 +507,5 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]

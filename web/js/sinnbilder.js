@@ -133,6 +133,11 @@ const ZEICHEN = {
     pfade: ['M8 3.5h8v4.5H8z', 'M2.5 8h19 M2.5 13.5h19 M2.5 19h19'],
     strich: ['M5 10.5Q12 16.5 19 10.5'],
   },
+  // Ein Pfahl durch zwei Schichten, gestrichelt ihre Grenze, darauf die Last.
+  pfahl: {
+    pfade: ['M10 6h4v15.5h-4z', 'M12 1v3.6 M10.5 3.2l1.5 1.5 1.5-1.5', 'M2.5 8h7.5 M14 8h7.5'],
+    strich: ['M2.5 14.5h7.5 M14 14.5h7.5'],
+  },
   // Eine Konsole: die Aufforderung und eine Zeile dahinter.
   python: {
     pfade: ['M3 4.5h18v15H3z', 'M6.5 9l3 3-3 3', 'M11.5 15.5h5'],

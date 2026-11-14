@@ -1,5 +1,5 @@
 ---
-erzeugt: 7f863047fd18
+erzeugt: 44d799608381
 art: modul
 tags: [modul]
 ---
@@ -242,6 +242,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.stabgrenzen]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.kern]]

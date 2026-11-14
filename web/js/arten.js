@@ -111,6 +111,19 @@ export const ARTEN = [
     leer: 'keine Setzung',
     nachweise: true,
   },
+  {
+    art: 'pfahl',
+    liste: 'pfaehle',
+    vorsilbe: 't',
+    zeichen: 'pfahl',
+    knopf: 'Pfähle',
+    titel: 'Pfähle',
+    bezeichnung: 'Pfahl',
+    einzahl: 'Pfahl',
+    stamm: 'Pfahl',
+    leer: 'kein Pfahl',
+    nachweise: true,
+  },
 ];
 
 /** Die Art, die die Auswahl so nennt -- `undefined` beim Material. */

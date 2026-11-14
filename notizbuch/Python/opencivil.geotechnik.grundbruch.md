@@ -1,5 +1,5 @@
 ---
-erzeugt: a050b54dc003
+erzeugt: 944ba854c8d0
 art: modul
 tags: [modul]
 ---
@@ -82,6 +82,16 @@ def grad(winkel: Groesse) -> float
 ```
 
 Ein Winkel in Grad -- so gehen alpha, beta und arctan(t/b) in die Faktoren ein.
+
+### tragfaehigkeitsfaktoren
+
+```python
+def tragfaehigkeitsfaktoren(p: Protokoll, werte: Zwischenwerte, phi: Wert) -> Tuple[Wert, Wert]
+```
+
+N_q und N_c für den Reibungswinkel `phi` (Kap. 9.2.6), in die
+Herleitung geschrieben -- unter einem Fundament und am Fuss eines Pfahls
+dieselben Formeln ([[opencivil.pfahl.aussen]]). `phi` grösser als null.
 
 ### Fundament
 
@@ -344,6 +354,7 @@ die Spalte der Kohäsion.
 ## Gebraucht von
 
 - [[opencivil.bericht.zusammenfassung]]
+- [[opencivil.pfahl.aussen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.web.grundbruchdaten]]
@@ -383,8 +394,8 @@ die Spalte der Kohäsion.
 - [[Tiefenfaktor d_c]] · `Grundbruch._drainiert`
 - [[Tiefenfaktor d_c]] · `Grundbruch._undrainiert`
 - [[Tiefenfaktor d_q]] · `Grundbruch._drainiert`
-- [[Tragfähigkeitsfaktor N_c]] · `Grundbruch._drainiert`
-- [[Tragfähigkeitsfaktor N_q]] · `Grundbruch._drainiert`
+- [[Tragfähigkeitsfaktor N_c]] · `tragfaehigkeitsfaktoren`
+- [[Tragfähigkeitsfaktor N_q]] · `tragfaehigkeitsfaktoren`
 - [[Tragfähigkeitsfaktor N_γ]] · `Grundbruch._drainiert`
 - [[Tragfähigkeitsformel undrainiert]] · `Grundbruch._undrainiert`
 - [[Überlagerung auf Höhe der Sohle]] · `Grundbruch._grundwasser`

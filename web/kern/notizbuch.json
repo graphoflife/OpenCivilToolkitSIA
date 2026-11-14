@@ -104,6 +104,18 @@
       "bereich": "Setzung"
     },
     {
+      "name": "Äusserer Pfahlwiderstand",
+      "pfad": "Formelsammlung/Themen/Äusserer Pfahlwiderstand.md",
+      "art": "thema",
+      "bereich": "Pfähle"
+    },
+    {
+      "name": "Innerer Pfahlwiderstand",
+      "pfad": "Formelsammlung/Themen/Innerer Pfahlwiderstand.md",
+      "art": "thema",
+      "bereich": "Pfähle"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -281,6 +293,28 @@
       ]
     },
     {
+      "name": "Äusserer Widerstand auf Druck",
+      "pfad": "Formelsammlung/Formeln/Äusserer Widerstand auf Druck.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{a,k}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Äusserer Widerstand auf Zug",
+      "pfad": "Formelsammlung/Formeln/Äusserer Widerstand auf Zug.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{a,k,Z}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
       "name": "Bedingung der Duktilität",
       "pfad": "Formelsammlung/Formeln/Bedingung der Duktilität.md",
       "art": "formel",
@@ -355,6 +389,7 @@
       ],
       "themen": [
         "Schiefe Biegung",
+        "Innerer Pfahlwiderstand",
         "Knicken",
         "Biegung und Normalkraft",
         "Stahlspannung gegen Fliessen",
@@ -475,6 +510,17 @@
       ],
       "themen": [
         "Beton"
+      ]
+    },
+    {
+      "name": "Bemessungswert des äusseren Widerstands",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert des äusseren Widerstands.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{a,d}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
       ]
     },
     {
@@ -720,6 +766,7 @@
       "zeichen": [],
       "themen": [
         "Schiefe Biegung",
+        "Innerer Pfahlwiderstand",
         "Stahlspannung aus Rissbreite",
         "Stahlspannung gegen Fliessen",
         "Knicken",
@@ -937,6 +984,17 @@
       ]
     },
     {
+      "name": "Einbindung in die tragende Schicht",
+      "pfad": "Formelsammlung/Formeln/Einbindung in die tragende Schicht.md",
+      "art": "formel",
+      "zeichen": [
+        "h"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
       "name": "Einflussfaktor der Rechtecklast",
       "pfad": "Formelsammlung/Formeln/Einflussfaktor der Rechtecklast.md",
       "art": "formel",
@@ -971,6 +1029,8 @@
         "Grundbruch",
         "Gleiten",
         "Setzung",
+        "Äusserer Pfahlwiderstand",
+        "Innerer Pfahlwiderstand",
         "Querkraft",
         "Duktilität",
         "Zwängung auf Normalkraft",
@@ -1013,6 +1073,51 @@
         "Zwängung auf Normalkraft",
         "Zwängung auf Biegung",
         "Stahlspannung aus Rissbreite"
+      ]
+    },
+    {
+      "name": "Fläche der Längsbewehrung",
+      "pfad": "Formelsammlung/Formeln/Fläche der Längsbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "A_s"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Fläche des Pfahlquerschnitts",
+      "pfad": "Formelsammlung/Formeln/Fläche des Pfahlquerschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "A_b"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand",
+        "Innerer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Fläche des Tragrohrs nach Abrostung",
+      "pfad": "Formelsammlung/Formeln/Fläche des Tragrohrs nach Abrostung.md",
+      "art": "formel",
+      "zeichen": [
+        "A_s"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Fläche des Tragstabs nach Abrostung",
+      "pfad": "Formelsammlung/Formeln/Fläche des Tragstabs nach Abrostung.md",
+      "art": "formel",
+      "zeichen": [
+        "A_s"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand"
       ]
     },
     {
@@ -1204,6 +1309,17 @@
         "Kennzahlen",
         "Stahlspannung aus Rissbreite",
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Form- und Tiefenfaktor des Pfahlfusses",
+      "pfad": "Formelsammlung/Formeln/Form- und Tiefenfaktor des Pfahlfusses.md",
+      "art": "formel",
+      "zeichen": [
+        "X"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
       ]
     },
     {
@@ -1445,6 +1561,17 @@
       ]
     },
     {
+      "name": "Innerer Widerstand des Pfahls",
+      "pfad": "Formelsammlung/Formeln/Innerer Widerstand des Pfahls.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{i,d}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand"
+      ]
+    },
+    {
       "name": "Iteration der Ausmitte 2. Ordnung",
       "pfad": "Formelsammlung/Formeln/Iteration der Ausmitte 2. Ordnung.md",
       "art": "formel",
@@ -1462,6 +1589,17 @@
       ],
       "themen": [
         "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Kohäsion für örtliches Abscheren",
+      "pfad": "Formelsammlung/Formeln/Kohäsion für örtliches Abscheren.md",
+      "art": "formel",
+      "zeichen": [
+        "c^{*}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
       ]
     },
     {
@@ -1577,6 +1715,35 @@
       ]
     },
     {
+      "name": "Mantelreibung drainiert",
+      "pfad": "Formelsammlung/Formeln/Mantelreibung drainiert.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Mantelreibung undrainiert",
+      "pfad": "Formelsammlung/Formeln/Mantelreibung undrainiert.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Mantelwiderstand",
+      "pfad": "Formelsammlung/Formeln/Mantelwiderstand.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{s,k}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
       "name": "Massgebende Plattenrotation – die grössere",
       "pfad": "Formelsammlung/Formeln/Massgebende Plattenrotation – die grössere.md",
       "art": "formel",
@@ -1585,6 +1752,28 @@
       ],
       "themen": [
         "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Materialwiderstand auf Druck",
+      "pfad": "Formelsammlung/Formeln/Materialwiderstand auf Druck.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{mat,d}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Materialwiderstand des Stahls",
+      "pfad": "Formelsammlung/Formeln/Materialwiderstand des Stahls.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{mat,d,Z}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand"
       ]
     },
     {
@@ -1762,6 +1951,7 @@
       "zeichen": [],
       "themen": [
         "Schiefe Biegung",
+        "Innerer Pfahlwiderstand",
         "Knicken",
         "Biegung und Normalkraft",
         "Stahlspannung gegen Fliessen",
@@ -1891,6 +2081,17 @@
       ]
     },
     {
+      "name": "Radius des Bewehrungskreises",
+      "pfad": "Formelsammlung/Formeln/Radius des Bewehrungskreises.md",
+      "art": "formel",
+      "zeichen": [
+        "r_s"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand"
+      ]
+    },
+    {
       "name": "Raumlast im Gleitkörper",
       "pfad": "Formelsammlung/Formeln/Raumlast im Gleitkörper.md",
       "art": "formel",
@@ -1921,6 +2122,17 @@
       ],
       "themen": [
         "Gleiten"
+      ]
+    },
+    {
+      "name": "Reibungswinkel für örtliches Abscheren",
+      "pfad": "Formelsammlung/Formeln/Reibungswinkel für örtliches Abscheren.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varphi^{*}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
       ]
     },
     {
@@ -2182,6 +2394,39 @@
       ]
     },
     {
+      "name": "Spitzendruck drainiert",
+      "pfad": "Formelsammlung/Formeln/Spitzendruck drainiert.md",
+      "art": "formel",
+      "zeichen": [
+        "q_{b,k}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Spitzendruck undrainiert",
+      "pfad": "Formelsammlung/Formeln/Spitzendruck undrainiert.md",
+      "art": "formel",
+      "zeichen": [
+        "q_{b,k}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
+      "name": "Spitzenwiderstand",
+      "pfad": "Formelsammlung/Formeln/Spitzenwiderstand.md",
+      "art": "formel",
+      "zeichen": [
+        "R_{b,k}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
       "name": "Stahlspannung, höchstens die Fliessgrenze",
       "pfad": "Formelsammlung/Formeln/Stahlspannung, höchstens die Fliessgrenze.md",
       "art": "formel",
@@ -2305,6 +2550,17 @@
       ]
     },
     {
+      "name": "Tragfähigkeitsfaktor des Pfahlfusses undrainiert",
+      "pfad": "Formelsammlung/Formeln/Tragfähigkeitsfaktor des Pfahlfusses undrainiert.md",
+      "art": "formel",
+      "zeichen": [
+        "N_c"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
       "name": "Tragfähigkeitsfaktor N_c",
       "pfad": "Formelsammlung/Formeln/Tragfähigkeitsfaktor N_c.md",
       "art": "formel",
@@ -2312,7 +2568,8 @@
         "N_c"
       ],
       "themen": [
-        "Grundbruch"
+        "Grundbruch",
+        "Äusserer Pfahlwiderstand"
       ]
     },
     {
@@ -2323,7 +2580,8 @@
         "N_q"
       ],
       "themen": [
-        "Grundbruch"
+        "Grundbruch",
+        "Äusserer Pfahlwiderstand"
       ]
     },
     {
@@ -2364,6 +2622,17 @@
       ],
       "themen": [
         "Grundbruch"
+      ]
+    },
+    {
+      "name": "Umfang des Pfahls",
+      "pfad": "Formelsammlung/Formeln/Umfang des Pfahls.md",
+      "art": "formel",
+      "zeichen": [
+        "U"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
       ]
     },
     {
@@ -2602,6 +2871,17 @@
       ]
     },
     {
+      "name": "Wirksame Spannung am Pfahlfuss",
+      "pfad": "Formelsammlung/Formeln/Wirksame Spannung am Pfahlfuss.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma'_{v,F}"
+      ],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
+      ]
+    },
+    {
       "name": "Wirksame statische Höhe im äusseren Nachweisschnitt",
       "pfad": "Formelsammlung/Formeln/Wirksame statische Höhe im äusseren Nachweisschnitt.md",
       "art": "formel",
@@ -2621,6 +2901,15 @@
       ],
       "themen": [
         "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Wirksame Überlagerungsspannung",
+      "pfad": "Formelsammlung/Formeln/Wirksame Überlagerungsspannung.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Äusserer Pfahlwiderstand"
       ]
     },
     {
@@ -3799,6 +4088,7 @@
       "kurz": "Grundbruch und Gleiten eines Flachfundaments.",
       "stichworte": [
         "grad",
+        "tragfaehigkeitsfaktoren",
         "Fundament",
         "Fundament.abschnitt",
         "Kombination",
@@ -4777,6 +5067,140 @@
       ]
     },
     {
+      "name": "opencivil.pfahl",
+      "pfad": "Python/opencivil.pfahl.md",
+      "art": "modul",
+      "kurz": "ein Einzelpfahl nach SIA 267:2013, Kapitel 9.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.pfahl.achse",
+      "pfad": "Python/opencivil.pfahl.achse.md",
+      "art": "modul",
+      "kurz": "was die Nachweise längs der Pfahlachse teilen.",
+      "stichworte": [
+        "Achsnachweis",
+        "Achsnachweis.faelle"
+      ]
+    },
+    {
+      "name": "opencivil.pfahl.aussen",
+      "pfad": "Python/opencivil.pfahl.aussen.md",
+      "art": "modul",
+      "kurz": "der äussere Widerstand eines Pfahls längs seiner Achse.",
+      "stichworte": [
+        "Mantelstueck",
+        "Aussenbefund",
+        "AeussererWiderstand",
+        "AeussererWiderstand.pruefe",
+        "AeussererWiderstand._mantel",
+        "AeussererWiderstand._erddruck_pruefen",
+        "AeussererWiderstand._bemessung"
+      ]
+    },
+    {
+      "name": "opencivil.pfahl.boden",
+      "pfad": "Python/opencivil.pfahl.boden.md",
+      "art": "modul",
+      "kurz": "der Baugrund um einen Pfahl.",
+      "stichworte": [
+        "Verhalten",
+        "Verhalten.beschriftung",
+        "Verhalten.erklaerung",
+        "Mantel",
+        "Mantel.beschriftung",
+        "Mantel.erklaerung",
+        "Pfahlschicht",
+        "Pfahlschicht.drainiert",
+        "Pfahlschicht.kurznamen",
+        "Stueck",
+        "Stueck.h",
+        "Stueck.mitte",
+        "Profil",
+        "Profil.tiefe",
+        "Profil.schicht_bei",
+        "Profil.sigma_v",
+        "Profil.u",
+        "Profil.sigma_v_wirksam",
+        "Profil.stuecke"
+      ]
+    },
+    {
+      "name": "opencivil.pfahl.buch",
+      "pfad": "Python/opencivil.pfahl.buch.md",
+      "art": "modul",
+      "kurz": "die Zahlen des Buches zum Einzelpfahl.",
+      "stichworte": [
+        "_stelle",
+        "faktor_x",
+        "faktor_n_c_undrainiert",
+        "ruhedruckbeiwert",
+        "ausserhalb"
+      ]
+    },
+    {
+      "name": "opencivil.pfahl.innen",
+      "pfad": "Python/opencivil.pfahl.innen.md",
+      "art": "modul",
+      "kurz": "der innere Widerstand eines Pfahls: sein Querschnitt.",
+      "stichworte": [
+        "kreis",
+        "Masse",
+        "querschnitt",
+        "Innenbefund",
+        "InnererWiderstand",
+        "InnererWiderstand.pruefe",
+        "InnererWiderstand._normalkraft",
+        "InnererWiderstand._bemessung"
+      ]
+    },
+    {
+      "name": "opencivil.pfahl.pfahl",
+      "pfad": "Python/opencivil.pfahl.pfahl.md",
+      "art": "modul",
+      "kurz": "ein Einzelpfahl in seinem Baugrund.",
+      "stichworte": [
+        "Pfahlart",
+        "Pfahlart.beschriftung",
+        "Pfahlart.erklaerung",
+        "Grundlage",
+        "Grundlage.beschriftung",
+        "Grundlage.erklaerung",
+        "Grundlage.eta_grenze",
+        "Grundlage.referenz",
+        "Grundlage.aus_versuch",
+        "Spitze",
+        "Spitze.beschriftung",
+        "Spitze.erklaerung",
+        "Abscheren",
+        "Abscheren.beschriftung",
+        "Abscheren.erklaerung",
+        "Tragglied",
+        "Tragglied.beschriftung",
+        "Tragglied.erklaerung",
+        "Kombination",
+        "Kombination.kennung",
+        "Pfahl",
+        "Pfahl.abschnitt",
+        "Pfahl.bohrpfahl",
+        "Pfahl.baustoffe",
+        "Pfahl.stoffe",
+        "Pfahl._gruppen",
+        "Pfahl._schichtwert",
+        "Pfahl.kurznamen"
+      ]
+    },
+    {
+      "name": "opencivil.pfahl.uebersicht",
+      "pfad": "Python/opencivil.pfahl.uebersicht.md",
+      "art": "modul",
+      "kurz": "was über der Nachweistabelle eines Pfahls steht.",
+      "stichworte": [
+        "angaben",
+        "widerstandstabelle"
+      ]
+    },
+    {
       "name": "opencivil.projekt",
       "pfad": "Python/opencivil.projekt.md",
       "art": "modul",
@@ -4867,6 +5291,7 @@
         "Aufbau.decken",
         "Aufbau.grundbrueche",
         "Aufbau.setzungen",
+        "Aufbau.pfaehle",
         "Aufbau.feld",
         "Aufbau.nachweise_je_feld",
         "Aufbau.alle_nachweise",
@@ -4891,6 +5316,15 @@
         "spannungsnachweise",
         "_gebrauchsfaelle",
         "knickfall"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.aufbau.pfahl",
+      "pfad": "Python/opencivil.projekt.aufbau.pfahl.md",
+      "art": "modul",
+      "kurz": "ein Pfahl wird Rechnung.",
+      "stichworte": [
+        "bauen"
       ]
     },
     {
@@ -4987,6 +5421,8 @@
         "_durchstanzstellen",
         "_grundbrueche",
         "_setzungen",
+        "_pfaehle",
+        "_erstes",
         "_alles_einmal",
         "_beweglich"
       ]
@@ -5178,6 +5614,26 @@
       ]
     },
     {
+      "name": "opencivil.projekt.pfahl",
+      "pfad": "Python/opencivil.projekt.pfahl.md",
+      "art": "modul",
+      "kurz": "ein Einzelpfahl, wie die Oberflaeche ihn beschreibt.",
+      "stichworte": [
+        "PfahlschichtEintrag",
+        "PfahlkombinationEintrag",
+        "PfahlEintrag",
+        "PfahlEintrag.neu",
+        "PfahlEintrag.materialien",
+        "PfahlEintrag.bohrpfahl",
+        "PfahlEintrag.schicht",
+        "PfahlEintrag.kombination",
+        "PfahlEintrag.regeln",
+        "PfahlEintrag._baugrund",
+        "PfahlEintrag._bewehrung",
+        "PfahlEintrag._tragglied"
+      ]
+    },
+    {
       "name": "opencivil.projekt.platte",
       "pfad": "Python/opencivil.projekt.platte.md",
       "art": "modul",
@@ -5224,6 +5680,7 @@
         "Projekt.durchstanzen",
         "Projekt.grundbruch",
         "Projekt.setzung",
+        "Projekt.pfahl",
         "Projekt.skript",
         "Projekt._einziges",
         "Projekt.rechnen",
@@ -5317,6 +5774,8 @@
       "art": "modul",
       "kurz": "der gezeichnete Querschnitt als Bauteil im Rechenwerk.",
       "stichworte": [
+        "werkstoff",
+        "gesetz_protokollieren",
         "Lastfall",
         "Lastfall.kennung",
         "Flaechenteil",
@@ -5552,6 +6011,7 @@
         "Querschnitt.faecher",
         "Querschnitt._dazwischen",
         "Querschnitt._auf_kette",
+        "Querschnitt.reine_normalkraft",
         "Querschnitt.normalkraft_grenzen",
         "Querschnitt.bei_normalkraft",
         "Querschnitt.neigung_fuer",
@@ -6382,6 +6842,16 @@
       "pfad": "Python/opencivil.web.grundbruchdaten.md",
       "art": "modul",
       "kurz": "was die Oberflaeche von einem Grundbruch zeichnet.",
+      "stichworte": [
+        "situation",
+        "_legende"
+      ]
+    },
+    {
+      "name": "opencivil.web.pfahldaten",
+      "pfad": "Python/opencivil.web.pfahldaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einem Pfahl zeichnet.",
       "stichworte": [
         "situation",
         "_legende"

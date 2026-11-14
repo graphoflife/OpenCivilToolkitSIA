@@ -1,5 +1,5 @@
 ---
-erzeugt: 54f62622b395
+erzeugt: 70fa6332542f
 art: modul
 tags: [modul]
 ---
@@ -340,6 +340,7 @@ ist der Modul der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.pfahl.innen]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.eintraege]]

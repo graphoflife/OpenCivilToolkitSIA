@@ -1,5 +1,5 @@
 ---
-erzeugt: d7c3d3e829d3
+erzeugt: c4222148d40f
 art: modul
 tags: [modul]
 ---
@@ -117,6 +117,29 @@ Das Beispiel der Tabelle 8.4 des Kapitels -- ein Bauwerk 15 × 8 m, starr,
 auf Kiessand über Ton; der Kiessand setzt sich dort nicht, hier fast
 nicht --, das mit 20 mm nicht aufgeht; dazu ein schlaffer Damm mit
 Wiederbelastung, und eine Berechnung ohne Schicht.
+
+### _pfaehle
+
+```python
+def _pfaehle(p: Projekt) -> None
+```
+
+Jede Spielart des Pfahls. Ein Bohrpfahl im Kies, das Grundwasser teilt
+eine Schicht, die oberste trägt nicht; sein Fuss schert örtlich ab, in
+der Moräne liegt K über K_0, und er wird auch gezogen. Ein Bohrpfahl
+im Ton, undrainiert an Mantel und Fuss, der auf Druck nicht aufgeht.
+Ein Mikropfahl mit Rohr aus einem statischen Versuch, mit Abrostung
+und η_i über dem Regelwert; einer mit Vollstab aus Erfahrung, die
+Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
+eingegeben.
+
+### _erstes
+
+```python
+def _erstes(p: Projekt, art: str) -> str
+```
+
+Die Kennung des ersten Materials dieser Art im Projekt.
 
 ### _alles_einmal
 

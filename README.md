@@ -151,6 +151,19 @@ s.schicht("Kies, sandig", d=2.0, M_E=60, M_E_strich=180)
 s.schicht("Silt, tonig", d=3.0, M_E=15, M_E_strich=45)
 ```
 
+Ein Pfahl -- Querschnitt in mm, Tiefen ab Terrain in m, Spannungen in kPa,
+Kräfte in kN; die Schichten vom Terrain an nach unten, N_Ed am Kopf, Druck
+positiv:
+
+```python
+t = p.pfahl("Pfahl Stütze", stahl="s1", beton="b1", D=900, L=12, t_K=1.5,
+            t_w=3.0)                         # art="mikropfahl", grundlage="statisch", ...
+t.schicht("Auffüllung", d=2.0, gamma=19, mantel="eingeben", q_s=0)   # trägt nicht
+t.schicht("Kies, sandig", d=6.0, gamma=21, phi_k=34, K=0.44)         # K·σ'_v·tan δ
+t.schicht("Ton", d=15.0, gamma=19, verhalten="undrainiert", s_u=80, alpha=0.6)
+t.kombination("Tragsicherheit", N_Ed=800)    # gezogen: N_Ed negativ
+```
+
 Linien- und Dreieckslasten (`wert_b`), Einzellasten, Momente und verteilte
 Momente gehen mit `art=`; Federn, Bettung und feste Linienlager mit den
 Feldern der Linie (`quer`, `k_quer`, `laengs`, `k_laengs`). `r.teilen("L2",
@@ -217,6 +230,7 @@ Fertig und getestet (1229 Tests):
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
+| `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
@@ -233,7 +247,7 @@ Fertig und getestet (1229 Tests):
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `grundbruch`, `setzung`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `grundbruch`, `setzung`, `pfahl`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
 | `web/bruecke.py` | was der Browser lädt: das Verzeichnis des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
@@ -242,6 +256,7 @@ Fertig und getestet (1229 Tests):
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt: Übersicht und Verläufe |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
+| `web/pfahldaten.py` | was die Situationszeichnung eines Pfahls vom Kern braucht: die Mantelreibung je Stück, den Spitzendruck, die Legende |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
@@ -255,7 +270,8 @@ Fertig und getestet (1229 Tests):
 | `web/js/bs_eigenschaften.js`, `bs_teile.js` | das schwebende Fenster des Balkensystems -- die Felder des Gewählten, mehrere zugleich mit «Var» -- und was Zeichnung, Fenster und Panels gemeinsam brauchen |
 | `web/js/balkensystem.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems und seine Ergebnisse |
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
-| `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die beide Bilder des Grundbaus teilen |
+| `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die die Bilder des Grundbaus teilen |
+| `web/js/pfahl.js`, `pf_zeichnung.js` | die Eingabe eines Pfahls und das Bild seiner Situation |
 | `web/js/python.js`, `konsole.js`, `variablen.js`, `zeichnen.js` | die App «Python»: Code und Konsole, der Faden der Sitzung, die Variablen rechts, die Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
@@ -270,8 +286,8 @@ dieselbe Aufteilung, nur nacheinander.
 
 Links steht zuoberst der Name des Projekts, darunter je App ein Knopf mit
 Zeichen und Anzahl -- Materialien, Stahlbeton-Platten, Querschnittsanalyse, 2D
-Balkensysteme, Grundbruch, Setzung, Python -- und unter den Knöpfen die Liste der
-gewählten App, mit «+» zum Anlegen.
+Balkensysteme, Decken, Durchstanzen, Grundbruch, Setzung, Pfähle, Python -- und
+unter den Knöpfen die Liste der gewählten App, mit «+» zum Anlegen.
 
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
@@ -516,7 +532,23 @@ stehen die Schichten mit ihrem Anteil an der Setzung und unter «Diagramme»
 der Schnitt mit den Schichten, der Linie von J über die Tiefe und dem
 Grundriss mit dem Punkt.
 
-**Python:** die siebte App. Skripte, gespeichert mit dem Projekt; in der
+**Pfähle:** ein Einzelpfahl nach SIA 267:2013, Kapitel 9, gerechnet nach
+Kapitel 12 des Buches von Lang, Huder, Amann und Puzrin. Oben das Panel
+«Pfahl Situation»: Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem
+Tragglied aus Stahl (Rohr oder Vollstab, mit Abrostung), Durchmesser, Länge
+und Tiefe des Kopfs, Grundwasser, der Querschnitt mit η_i und worauf der
+äussere Widerstand beruht -- Berechnung, Erfahrung oder ein Versuch, danach
+richtet sich, wie gross η_a sein darf. Darunter die Schichten vom Terrain an,
+je drainiert mit φ'_k und c'_k oder undrainiert mit s_u,k, die Mantelreibung
+gerechnet oder eingegeben, und die Kombinationen mit N_Ed am Kopf. Der
+äussere Widerstand ist Mantel und Fuss (41), auf Zug nur der Mantel;
+R_a,d = η_a·R_a,k/γ_M,a mit 1.3 auf Druck und 1.6 auf Zug (42). Der innere
+ist der Querschnitt nach SIA 262, ganz gedrückt oder ganz gezogen, mal η_i
+(50). Rechts stehen die Widerstände beider Nachweise und unter «Diagramme»
+der Pfahl in seinen Schichten mit der Mantelreibung je Stück und dem
+Spitzendruck. Steifigkeit und Querlast folgen.
+
+**Python:** die letzte App. Skripte, gespeichert mit dem Projekt; in der
 Mitte der Code und darunter die Konsole, rechts statt der Berechnung die
 Variablen mit Typ, Grösse und Wert -- wie in Spyder. Strg+Enter führt das
 Skript aus, die Zeile der Konsole einen einzelnen Befehl (Enter; ↑ und ↓

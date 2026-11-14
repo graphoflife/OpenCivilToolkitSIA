@@ -1,5 +1,5 @@
 ---
-erzeugt: 6e9ae1f4658a
+erzeugt: ea66ed8b3df3
 art: modul
 tags: [modul]
 ---
@@ -307,14 +307,23 @@ def _auf_kette(r: Richtung, chi: float, oben: bool) -> float
 
 Die Dehnung im Bezugspunkt auf der oberen oder unteren Kette.
 
+#### Querschnitt.reine_normalkraft
+
+```python
+def reine_normalkraft(self, zug: bool) -> Bruchpunkt
+```
+
+Der Bruchzustand bei gleichmaessiger Dehnung -- der groesste Zug oder
+der groesste Druck, fuer jede Neigung derselbe. Was jeder Werkstoff
+dazu beitraegt, sagt [[opencivil.querschnitt.interaktion#Querschnitt.anteile|anteile]].
+
 #### Querschnitt.normalkraft_grenzen
 
 ```python
 def normalkraft_grenzen(self) -> Tuple[float, float]
 ```
 
-Groesste Zug- und groesste Druckkraft -- gleichmaessige Dehnung, also
-fuer jede Neigung dieselbe.
+Groesste Zug- und groesste Druckkraft ([[opencivil.querschnitt.interaktion#Querschnitt.reine_normalkraft|reine_normalkraft]]).
 
 #### Querschnitt.bei_normalkraft
 
@@ -490,6 +499,7 @@ die andere Koordinate jeder Stelle.
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.stabgrenzen]]
+- [[opencivil.pfahl.innen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.spannungsanalyse.schnitt]]

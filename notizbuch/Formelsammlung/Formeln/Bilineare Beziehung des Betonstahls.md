@@ -1,5 +1,5 @@
 ---
-erzeugt: 5f41ad3ae3b0
+erzeugt: 91ca8b839117
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5"
@@ -26,6 +26,7 @@ $$
 ## Themen
 
 - [[Schiefe Biegung]]
+- [[Innerer Pfahlwiderstand]]
 - [[Stahlspannung aus Rissbreite]]
 - [[Stahlspannung gegen Fliessen]]
 - [[Knicken]]

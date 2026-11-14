@@ -1,5 +1,5 @@
 ---
-erzeugt: c60848956bd7
+erzeugt: 21923b821381
 art: modul
 tags: [modul]
 ---
@@ -174,6 +174,8 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
+- [[opencivil.pfahl.boden]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.decke]]

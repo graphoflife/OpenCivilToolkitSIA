@@ -1,5 +1,5 @@
 ---
-erzeugt: 843be33aa4de
+erzeugt: ea24d9beb818
 art: modul
 tags: [modul]
 ---
@@ -168,7 +168,8 @@ Was ueber der Nachweistabelle eines Bauteils steht: eine Zeile mit den
 Angaben und eine Tabelle -- bei der Platte ihre Lagen, bei der
 Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
 Faktoren der Tragfaehigkeitsformel, bei der Setzung die Schichten mit
-ihrem Anteil. Die stehen erst nach dem Rechnen fest; darum die Loesung.
+ihrem Anteil, beim Pfahl seine Widerstaende auf Druck und Zug. Die
+stehen erst nach dem Rechnen fest; darum die Loesung.
 Was je Art, sagt [[opencivil.bericht.zusammenfassung#Konstanten|ANGABEN]] -- bis 2026-10-25 wurde die Art durch
 Probieren gefunden, ein Register nach dem anderen.
 
@@ -251,6 +252,7 @@ hoch, beide, getrennt durch `/`.
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.platte]]
 

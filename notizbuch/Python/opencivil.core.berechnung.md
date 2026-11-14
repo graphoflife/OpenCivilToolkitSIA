@@ -1,5 +1,5 @@
 ---
-erzeugt: 68aee99a2997
+erzeugt: 4af967038cdb
 art: modul
 tags: [modul]
 ---
@@ -443,6 +443,10 @@ class Nulllinienlage(Prozedur):
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]
+- [[opencivil.pfahl.achse]]
+- [[opencivil.pfahl.aussen]]
+- [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]

@@ -17,7 +17,7 @@
 import { karte } from './bausteine.js';
 import { auswahl, el, svgEl } from './dom.js';
 import {
-  BREITE, bogen, legende, linie, mass, pfeil, schraffur, text, textzeile, zahl,
+  BREITE, bogen, legende, linie, mass, pfeil, schraffur, text, textzeile, wasserzeichen, zahl,
 } from './gb_skizze.js';
 import { aendern, ansichtVon, eintragVon, zustand } from './zustand.js';
 
@@ -124,13 +124,7 @@ function situationsbild(g, s, fall) {
   const gwStart = tanB > 0 ? Math.max(links, gwY / tanB) : links;
   if (gwY <= 0) {
     zeichne(linie([[gwStart, gwY], [rechts, gwY]].map(px), 'gb-wasser'));
-    const [zx, zy] = px([b + 0.62 * (rechts - b), gwY]);
-    zeichne(
-      svgEl('path', { d: `M${zx - 7} ${zy - 9} h14 l-7 9 z`, class: 'gb-wasserzeichen' }),
-      linie([[zx - 6, zy + 4], [zx + 6, zy + 4]], 'gb-wasser-kurz'),
-      linie([[zx - 3, zy + 8], [zx + 3, zy + 8]], 'gb-wasser-kurz'),
-      text(zx + 12, zy - 2, gwTiefer ? ['GW tiefer'] : ['GW'], { klasse: 'gb-wassertext' }),
-    );
+    zeichne(wasserzeichen(px([b + 0.62 * (rechts - b), gwY]), gwTiefer ? 'GW tiefer' : 'GW'));
   }
 
   // -- Gleitkörper, gestrichelt, bis er aus dem Gelände tritt --------------

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5679b265beea
+erzeugt: 677b42b57a24
 art: formel
 tags: [formel]
 normstelle: "Kap. 9.2.6"
@@ -32,14 +32,16 @@ $$
 
 - [[Bruchspannung in der Sohle]]
 - [[Formfaktor s_c]]
+- [[Spitzendruck drainiert]]
 
 ## Im Code
 
-- [[opencivil.geotechnik.grundbruch#Grundbruch|Grundbruch._drainiert]]
+- [[opencivil.geotechnik.grundbruch#tragfaehigkeitsfaktoren|tragfaehigkeitsfaktoren]]
 
 ## Themen
 
 - [[Grundbruch]]
+- [[Äusserer Pfahlwiderstand]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

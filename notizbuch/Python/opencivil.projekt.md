@@ -1,5 +1,5 @@
 ---
-erzeugt: eb98906d4b39
+erzeugt: b64cfdd212ff
 art: modul
 tags: [modul]
 ---
@@ -38,6 +38,8 @@ grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                und Einwirkungen fuer Grundbruch und Gleiten
 setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
                aus Wieder- und Erstbelastung, Schichten mit M_E-Werten
+pfahl.py       ein Einzelpfahl: Art, Masse, Querschnitt, Schichten,
+               Grundwasser, Grundlage des äusseren Widerstands, Kombinationen
 netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
 skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                gerechnet
@@ -81,6 +83,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
 - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
+- [[opencivil.projekt.pfahl]] – ein Einzelpfahl, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
 - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
@@ -97,6 +100,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
@@ -121,6 +125,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.dienst]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.speicher]]
 - [[opencivil.web.zeichendaten]]

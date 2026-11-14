@@ -26,6 +26,7 @@ from opencivil.ergebnis import Ergebnis
 from opencivil.projekt.eintraege import EIGENE_VORSILBE, Beschreibung, MaterialEintrag, PostenEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
+from opencivil.projekt.pfahl import PfahlEintrag
 from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.skript import SkriptEintrag
@@ -34,8 +35,8 @@ from opencivil.projekt.setzung import SetzungEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.decke import DeckeEintrag
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BAUTEILE, DECKE, DURCHSTANZEN, GRUNDBRUCH, PLATTE, SETZUNG, Aufbau,
-    aufbauen,
+    ANALYSE, BALKENSYSTEM, BAUTEILE, DECKE, DURCHSTANZEN, GRUNDBRUCH, PFAHL, PLATTE, SETZUNG,
+    Aufbau, aufbauen,
 )
 
 
@@ -67,6 +68,9 @@ class Projekt(Beschreibung):
 
     setzungen: List[SetzungEintrag] = field(default_factory=list)
     """Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung."""
+
+    pfaehle: List[PfahlEintrag] = field(default_factory=list)
+    """Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand."""
 
     skripte: List[SkriptEintrag] = field(default_factory=list)
     """Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet."""
@@ -356,6 +360,21 @@ class Projekt(Beschreibung):
                         SetzungEintrag(kennung=self.freie_kennung(SETZUNG.vorsilbe),
                                        name=name))
         self.setzungen.append(eintrag)
+        return eintrag
+
+    def pfahl(self, name: str, stahl: str, beton: str = "", **felder: Any) -> PfahlEintrag:
+        """
+        Ein Pfahl mit den Vorgaben der Oberflaeche, aber ohne ihre Startschicht
+        und Startkombination: wer rechnet, gibt sie mit ``schicht`` und
+        ``kombination`` selbst an. ``stahl`` und ``beton`` sind Kennungen von
+        Materialien, der Beton nur beim Bohrpfahl. Alles Weitere -- ``art``,
+        ``D``, ``grundlage`` ... -- geht als Stichwort an den Eintrag; Masse
+        des Querschnitts in mm, Tiefen in m, Spannungen in kPa.
+        """
+        eintrag = lesen(PfahlEintrag, {"stahl": stahl, "beton": beton, **felder},
+                        f"Pfahl '{name}'",
+                        PfahlEintrag(kennung=self.freie_kennung(PFAHL.vorsilbe), name=name))
+        self.pfaehle.append(eintrag)
         return eintrag
 
     def skript(self, name: str, code: str = "") -> SkriptEintrag:

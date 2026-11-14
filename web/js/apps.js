@@ -1,7 +1,7 @@
 /**
  * apps.js -- die Apps der linken Tafel, je eine Zeile.
  *
- * Eine App hat links einen Knopf: die Materialien, die sieben Bauteilarten
+ * Eine App hat links einen Knopf: die Materialien, die acht Bauteilarten
  * (ARTEN, arten.js) und Python. Was Baum, Editor und rechte Tafel von ihr
  * wissen müssen, steht in ihrer Zeile: ihre Liste im Projekt und die Gruppen
  * unter dem Knopf, wie ein Eintrag heisst und was rechts in ihm steht, wie er
@@ -27,6 +27,7 @@ import {
 import { durchstanzEditor } from './durchstanzen.js';
 import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
+import { pfahlEditor } from './pfahl.js';
 import { skriptZeichnen } from './python.js';
 import { variablenZeichnen } from './variablen.js';
 import { plattenkarten } from './platte_bilder.js';
@@ -36,6 +37,7 @@ import { systemKarten, systemZusammenfassung } from './bs_diagramme.js';
 import { durchstanzKarten } from './ds_grundriss.js';
 import { situationKarten } from './gb_zeichnung.js';
 import { setzungKarten } from './sz_zeichnung.js';
+import { pfahlKarten } from './pf_zeichnung.js';
 import {
   ansichtVergessen, eintragVon, freieKennung, katalog, naechsterName, projektAendern, waehlen,
   zustand,
@@ -323,6 +325,25 @@ const SETZUNG = bauteil('setzung', {
 });
 
 /**
+ * Ein Bohrpfahl mit den Vorgaben des Kerns, einer Schicht und einer
+ * Kombination -- Beton und Betonstahl die ersten des Projekts, wie bei der
+ * Platte. Ein Mikropfahl braucht den Beton nicht; angelegt wird aber als
+ * Bohrpfahl. Die Liste nennt Durchmesser und Länge: «⌀900 mm, 10 m».
+ */
+const PFAHL = bauteil('pfahl', {
+  kurztext: (t) => `⌀${t.D} mm, ${t.L} m`,
+  anlegen: (a) => nachVorlage(a, {
+    braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
+    einrichten: (t, { beton, betonstahl }) => {
+      t.beton = beton.kennung;
+      t.stahl = betonstahl.kennung;
+    },
+  }),
+  editor: pfahlEditor,
+  karten: pfahlKarten,
+});
+
+/**
  * Python: ein Skript je Eintrag, nach der Vorlage des Kerns mit einem
  * Diagramm darin. Rechts stehen statt der Berechnung die Variablen der
  * Sitzung, wie in Spyder (Benutzer, 2026-10-15) -- Umfang und Reiter gelten
@@ -349,7 +370,7 @@ const SKRIPT = {
 
 /** Die Apps, in der Folge ihrer Knöpfe: das Material, die Bauteilarten wie ARTEN, Python. */
 export const APPS = [
-  MATERIAL, PLATTE, ANALYSE, SYSTEM, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, SKRIPT,
+  MATERIAL, PLATTE, ANALYSE, SYSTEM, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, PFAHL, SKRIPT,
 ];
 
 /** Die App, wie die Auswahl sie nennt: 'material', 'skript' oder eine Bauteilart. */

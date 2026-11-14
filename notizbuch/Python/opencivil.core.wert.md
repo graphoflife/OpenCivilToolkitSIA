@@ -1,5 +1,5 @@
 ---
-erzeugt: 99caed5e03fd
+erzeugt: eb6e8f893eb2
 art: modul
 tags: [modul]
 ---
@@ -338,6 +338,11 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
+- [[opencivil.pfahl.achse]]
+- [[opencivil.pfahl.aussen]]
+- [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.pfahl]]
+- [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.querschnitt.analyse]]
