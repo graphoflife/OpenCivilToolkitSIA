@@ -47,5 +47,13 @@ Modul unsicher: eine zu steife Druckzone unterschätzte die Verformung, beim
 Knicken die Ausmitte zweiter Ordnung. Darum wird der Mittelwert durch den
 Teilsicherheitsbeiwert $\gamma_{cE}$ geteilt.
 
-$E_{cd}$ bestimmt den [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] und
-damit, wie steil die Parabel des Betons beginnt.
+Die Norm nimmt dafür $\gamma_{cE} = 1.2$ bei Druckgliedern mit Einflüssen
+zweiter Ordnung; für Verformungen im Gebrauch darf er 1.0 sein. Das Werkzeug
+braucht $E_{cd}$ für die Verformung beim Knicken. Alle übrigen Rechnungen
+hängen an $E_{cm}$, mit dem Kriechen am
+[[Wirksamer Elastizitätsmodul|wirksamen Modul]].
+
+Nach der Norm bestimmt $E_{cd}$ auch den
+[[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] und damit, wie steil
+die Parabel des Betons beginnt. Die Materialtabelle zeigt diesen Wert; die
+Parabel eines Kapitels nimmt den Modul, mit dem das Kapitel rechnet.

@@ -93,7 +93,8 @@ export function materialAnlegen(art) {
     el('div.fenster-inhalt', {}, [
       karte('Normsorte nach SIA', frei.length ? [
         el('p.materialwahl-text', {
-          text: 'Kennwerte nach SIA 262:2025. Das Material heisst wie die Sorte und lässt '
+          text: 'Kennwerte nach SIA 262:2025, die Dichten und k_E nach Vorgabe. Das '
+            + 'Material heisst wie die Sorte und lässt '
             + 'sich danach nicht mehr ändern – auch die Sorte nicht.',
         }),
         el('div.materialwahl-zeile', {}, [

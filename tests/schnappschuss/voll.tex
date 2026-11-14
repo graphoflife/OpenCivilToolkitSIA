@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-521 Berechnungen ausgeführt, 800 Werte bestimmt.
+522 Berechnungen ausgeführt, 801 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -44,15 +44,15 @@ b = 1000\,\mathrm{mm}
 \begin{equation*}
 b_y = 1000\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung unten}
+\noindent\textbf{Überdeckung unten} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,u} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung oben}
+\noindent\textbf{Überdeckung oben} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,o} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
+\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \end{equation*}
@@ -707,7 +707,7 @@ Massgebend: 3. Lage (kleinster Erfüllungsgrad).
 \begin{equation*}
 \varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
 \end{equation*}
-\noindent\textbf{Wirksamer Elastizitätsmodul}
+\noindent\textbf{Wirksamer Elastizitätsmodul} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 \end{equation*}
@@ -834,7 +834,7 @@ N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 70\,\mathrm{kNm} \;\check
 \begin{equation*}
 \varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
 \end{equation*}
-\noindent\textbf{Wirksamer Elastizitätsmodul}
+\noindent\textbf{Wirksamer Elastizitätsmodul} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 \end{equation*}
@@ -1051,7 +1051,7 @@ e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| 
 \begin{equation*}
 \varphi = 2 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Präzise ohne Vereinfachung}
 \end{equation*}
-\noindent\textbf{Steifigkeit des Betons}
+\noindent\textbf{Steifigkeit des Betons} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cd}}{1 + \varphi} = \frac{28016\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 9339\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -1293,47 +1293,51 @@ Zug oben: α = 30° … 45° ganzgradig → grösster Widerstand bei α = 30°.
 \end{aligned}
 \end{equation*}
 \subsection{Beton: C30/37}
-\noindent\textbf{Charakteristische Zylinderdruckfestigkeit} \hfill \normref{SIA 262:2025, 3.1.2.2.7}
+\noindent\textbf{Charakteristische Zylinderdruckfestigkeit} \hfill \normref{SIA 262:2025, 3.1.2.2.1, Tabelle 3}
 \begin{equation*}
 f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Beiwert zur Berücksichtigung der Festigkeitsminderung} \hfill \normref{SIA 262:2025, 2.4.2.3}
+\noindent\textbf{Beiwert zur Berücksichtigung der Festigkeitsminderung} \hfill \normref{SIA 262:2025, 4.2.1.2, (26)}
 \begin{equation*}
 \eta_{fc} = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right] = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{30\,\mathrm{N}/\mathrm{mm}^{2}}\right)^{1/3};\ 1.0\right] = 1
+\end{equation*}
+\noindent\textbf{Beiwert für die Dauer der Einwirkung} \hfill \normref{SIA 262:2025, 4.2.1.3}
+\begin{equation*}
+\eta_t = 1
 \end{equation*}
 \noindent\textbf{Teilsicherheitsbeiwert für Beton} \hfill \normref{SIA 262:2025, 2.4.2.6}
 \begin{equation*}
 \gamma_c = 1.5
 \end{equation*}
-\noindent\textbf{Bemessungswert der Betondruckfestigkeit} \hfill \normref{SIA 262:2025, 2.4.2.3}
+\noindent\textbf{Bemessungswert der Betondruckfestigkeit} \hfill \normref{SIA 262:2025, 2.4.2.3, (2)}
 \begin{equation*}
-f_{cd} = \frac{\eta_{fc} \cdot f_{ck}}{\gamma_c} = \frac{1 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}{1.5} = 20\,\mathrm{N}/\mathrm{mm}^{2}
+f_{cd} = \frac{\eta_{fc} \cdot \eta_t \cdot f_{ck}}{\gamma_c} = \frac{1 \cdot 1 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}{1.5} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Dehnung am Ende des ansteigenden Astes} \hfill \normref{SIA 262:2025, 4.2.1.4}
+\noindent\textbf{Dehnung am Ende des ansteigenden Astes} \hfill \normref{SIA 262:2025, 4.2.1.4, Tabelle 8}
 \begin{equation*}
 \varepsilon_{c1d} = 2\,\text{‰}
 \end{equation*}
-\noindent\textbf{Bruchdehnung des Betons} \hfill \normref{SIA 262:2025, 4.2.1.4}
+\noindent\textbf{Bruchdehnung des Betons} \hfill \normref{SIA 262:2025, 4.2.1.4, Tabelle 8}
 \begin{equation*}
 \varepsilon_{c2d} = 3.5\,\text{‰}
 \end{equation*}
-\noindent\textbf{Beiwert für die Gesteinskörnung} \hfill \normref{SIA 262:2025, 3.1.2.3.3}
+\noindent\textbf{Beiwert des Elastizitätsmoduls je nach Gestein} \hfill \normref{SIA 262:2025, 3.1.2.3.3, (10)}
 \begin{equation*}
-k_e = 10000
+k_E = 10000
 \end{equation*}
-\noindent\textbf{Mittelwert der Zylinderdruckfestigkeit} \hfill \normref{SIA 262:2025, 3.1.2.2.2}
+\noindent\textbf{Mittelwert der Zylinderdruckfestigkeit} \hfill \normref{SIA 262:2025, 3.1.2.2.2, (6)}
 \begin{equation*}
 f_{cm} = f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2} = 30\,\mathrm{N}/\mathrm{mm}^{2} + 8\,\mathrm{N}/\mathrm{mm}^{2} = 38\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Mittelwert des Elastizitätsmoduls} \hfill \normref{SIA 262:2025, 3.1.2.3.3}
+\noindent\textbf{Mittelwert des Elastizitätsmoduls} \hfill \normref{SIA 262:2025, 3.1.2.3.3, (10)}
 \begin{equation*}
-E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+E_{cm} = k_E \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 \end{equation*}
-\noindent\textbf{Bemessungswert der Schubspannungsgrenze} \hfill \normref{SIA 262:2025, 2.4.2.4}
+\noindent\textbf{Bemessungswert der Schubspannungsgrenze} \hfill \normref{SIA 262:2025, 2.4.2.4, (3)}
 \begin{equation*}
 \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} = \frac{0.3 \cdot \sqrt{30}}{1.5} = 1.1\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 \end{equation*}
-\noindent\textbf{Mittelwert der Zugfestigkeit} \hfill \normref{SIA 262:2025, 3.1.2.2.7}
+\noindent\textbf{Mittelwert der Zugfestigkeit} \hfill \normref{SIA 262:2025, 3.1.2.2.4, Tabelle 3}
 \begin{equation*}
 f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -1354,7 +1358,7 @@ E_{cd} = \frac{E_{cm}}{\gamma_{cE}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1
 \begin{equation*}
 E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Charakteristische Fliessgrenze} \hfill \normref{SIA 262:2025, 3.2.2.3}
+\noindent\textbf{Charakteristische Fliessgrenze} \hfill \normref{SIA 262:2025, 3.2.2.2, Tabelle 5}
 \begin{equation*}
 f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -1362,19 +1366,19 @@ f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 \begin{equation*}
 \gamma_s = 1.15
 \end{equation*}
-\noindent\textbf{Bemessungswert der Fliessgrenze} \hfill \normref{SIA 262:2025, 2.4.2.5}
+\noindent\textbf{Bemessungswert der Fliessgrenze} \hfill \normref{SIA 262:2025, 2.4.2.5, (4)}
 \begin{equation*}
 f_{yd} = \frac{f_{yk}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Charakteristische Fliessgrenze auf Druck} \hfill \normref{SIA 262:2025, 3.2.2.3}
+\noindent\textbf{Charakteristische Fliessgrenze auf Druck} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16}
 \begin{equation*}
 f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Bemessungswert der Fliessgrenze auf Druck} \hfill \normref{SIA 262:2025, 2.4.2.5}
+\noindent\textbf{Bemessungswert der Fliessgrenze auf Druck} \hfill \normref{SIA 262:2025, 2.4.2.5, (4)}
 \begin{equation*}
 f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 435\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Bemessungswert der Dehnung bei Höchstlast} \hfill \normref{SIA 262:2025, 4.2.2.1}
+\noindent\textbf{Bemessungswert der Dehnung bei Höchstlast} \hfill \normref{SIA 262:2025, 4.2.2.1, Tabelle 9}
 \begin{equation*}
 \varepsilon_{ud} = 4.5\,\%
 \end{equation*}
@@ -1391,15 +1395,15 @@ b = 500\,\mathrm{mm}
 \begin{equation*}
 b_y = 1000\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung unten}
+\noindent\textbf{Überdeckung unten} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,u} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung oben}
+\noindent\textbf{Überdeckung oben} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,o} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
+\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \end{equation*}
@@ -1728,7 +1732,7 @@ k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.199\,\text{
 \begin{equation*}
 \varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
 \end{equation*}
-\noindent\textbf{Wirksamer Elastizitätsmodul}
+\noindent\textbf{Wirksamer Elastizitätsmodul} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 \end{equation*}
@@ -1975,15 +1979,15 @@ b = 1000\,\mathrm{mm}
 \begin{equation*}
 b_y = 1000\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung unten}
+\noindent\textbf{Überdeckung unten} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,u} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung oben}
+\noindent\textbf{Überdeckung oben} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,o} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
+\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \end{equation*}
@@ -2016,7 +2020,7 @@ Bewehrung & Richtung & Stahl & $\varnothing\ [\mathrm{mm}]$ & $s\ [\mathrm{mm}]$
 \begin{equation*}
 \varphi = 1 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 \end{equation*}
-\noindent\textbf{Wirksamer Modul der Parabel}
+\noindent\textbf{Wirksamer Modul der Parabel} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1} = 16810\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -2277,7 +2281,7 @@ N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 30\,\mathrm{kNm} \;\check
 \begin{equation*}
 \varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 \end{equation*}
-\noindent\textbf{Wirksamer Elastizitätsmodul}
+\noindent\textbf{Wirksamer Elastizitätsmodul} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -2346,7 +2350,7 @@ e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| 
 \begin{equation*}
 \varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 \end{equation*}
-\noindent\textbf{Steifigkeit des Betons}
+\noindent\textbf{Steifigkeit des Betons} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cd}}{1 + \varphi} = \frac{28016\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 28016\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -2380,7 +2384,7 @@ f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mat
 \begin{equation*}
 \varphi = 0 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Präzise ohne Vereinfachung}
 \end{equation*}
-\noindent\textbf{Wirksamer Modul der Parabel}
+\noindent\textbf{Wirksamer Modul der Parabel} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -2799,15 +2803,15 @@ b = 1000\,\mathrm{mm}
 \begin{equation*}
 b_y = 1000\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung unten}
+\noindent\textbf{Überdeckung unten} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,u} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung oben}
+\noindent\textbf{Überdeckung oben} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,o} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
+\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \end{equation*}
@@ -3095,7 +3099,7 @@ e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| 
 \begin{equation*}
 \varphi = 0 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Präzise ohne Vereinfachung}
 \end{equation*}
-\noindent\textbf{Steifigkeit des Betons}
+\noindent\textbf{Steifigkeit des Betons} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cd}}{1 + \varphi} = \frac{28016\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 28016\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -3497,15 +3501,15 @@ b = 1000\,\mathrm{mm}
 \begin{equation*}
 b_y = 1000\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung unten}
+\noindent\textbf{Überdeckung unten} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,u} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung oben}
+\noindent\textbf{Überdeckung oben} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,o} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
+\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \end{equation*}
@@ -3994,15 +3998,15 @@ b = 1000\,\mathrm{mm}
 \begin{equation*}
 b_y = 1000\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung unten}
+\noindent\textbf{Überdeckung unten} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,u} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Überdeckung oben}
+\noindent\textbf{Überdeckung oben} \hfill \normref{SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18}
 \begin{equation*}
 c_{nom,o} = 30\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
+\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \end{equation*}
@@ -4718,7 +4722,7 @@ $\sigma_{s,adm,5}$ & Linie 4 & $500$ \\
 \begin{equation*}
 \varphi = 1 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
 \end{equation*}
-\noindent\textbf{Wirksamer Elastizitätsmodul C30/37}
+\noindent\textbf{Wirksamer Elastizitätsmodul C30/37} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1} = 16810\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -5052,7 +5056,7 @@ $\sigma_{s,adm,5}$ & Linie 4 & $500$ \\
 \hline
 \end{longtable}
 \subsubsection{Welche Werte angesetzt werden}
-\noindent\textbf{Wirksamer Elastizitätsmodul C30/37}
+\noindent\textbf{Wirksamer Elastizitätsmodul C30/37} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -5191,7 +5195,7 @@ Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 \sigma_{s,adm} = f_{yd} - 80\,\mathrm{N}/\mathrm{mm}^{2} = 435\,\mathrm{N}/\mathrm{mm}^{2} - 80\,\mathrm{N}/\mathrm{mm}^{2} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \subsubsection{Welche Werte angesetzt werden}
-\noindent\textbf{Wirksamer Elastizitätsmodul C30/37}
+\noindent\textbf{Wirksamer Elastizitätsmodul C30/37} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -5547,7 +5551,7 @@ N_{Riss} = A_c \cdot f_{ct,eff} = 160000\,\mathrm{mm}^{2} \cdot 2.42\,\mathrm{N}
 \sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
 \subsubsection{Welche Werte angesetzt werden}
-\noindent\textbf{Wirksamer Elastizitätsmodul C30/37}
+\noindent\textbf{Wirksamer Elastizitätsmodul C30/37} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -5622,7 +5626,7 @@ e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| 
 \begin{equation*}
 \varphi = 1.5 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Präzise ohne Vereinfachung}
 \end{equation*}
-\noindent\textbf{Wirksamer Elastizitätsmodul C30/37}
+\noindent\textbf{Wirksamer Elastizitätsmodul C30/37} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cd}}{1 + \varphi} = \frac{28016\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1.5} = 11207\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
@@ -10021,7 +10025,7 @@ Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf
 
 \section{Verwendete Formeln}
 \subsection{Querschnitt}
-\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
+\noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \end{equation*}
@@ -10038,23 +10042,23 @@ h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage}
 A_{\varnothing,V} = \frac{\pi \cdot \left(\varnothing_{V}\right)^{2}}{4}
 \end{equation*}
 \subsection{Beton}
-\noindent\textbf{Beiwert zur Berücksichtigung der Festigkeitsminderung} \hfill \normref{SIA 262:2025, 2.4.2.3}
+\noindent\textbf{Beiwert zur Berücksichtigung der Festigkeitsminderung} \hfill \normref{SIA 262:2025, 4.2.1.2, (26)}
 \begin{equation*}
 \eta_{fc} = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right]
 \end{equation*}
-\noindent\textbf{Bemessungswert der Betondruckfestigkeit} \hfill \normref{SIA 262:2025, 2.4.2.3}
+\noindent\textbf{Bemessungswert der Betondruckfestigkeit} \hfill \normref{SIA 262:2025, 2.4.2.3, (2)}
 \begin{equation*}
-f_{cd} = \frac{\eta_{fc} \cdot f_{ck}}{\gamma_c}
+f_{cd} = \frac{\eta_{fc} \cdot \eta_t \cdot f_{ck}}{\gamma_c}
 \end{equation*}
-\noindent\textbf{Mittelwert der Zylinderdruckfestigkeit} \hfill \normref{SIA 262:2025, 3.1.2.2.2}
+\noindent\textbf{Mittelwert der Zylinderdruckfestigkeit} \hfill \normref{SIA 262:2025, 3.1.2.2.2, (6)}
 \begin{equation*}
 f_{cm} = f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Mittelwert des Elastizitätsmoduls} \hfill \normref{SIA 262:2025, 3.1.2.3.3}
+\noindent\textbf{Mittelwert des Elastizitätsmoduls} \hfill \normref{SIA 262:2025, 3.1.2.3.3, (10)}
 \begin{equation*}
-E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+E_{cm} = k_E \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 \end{equation*}
-\noindent\textbf{Bemessungswert der Schubspannungsgrenze} \hfill \normref{SIA 262:2025, 2.4.2.4}
+\noindent\textbf{Bemessungswert der Schubspannungsgrenze} \hfill \normref{SIA 262:2025, 2.4.2.4, (3)}
 \begin{equation*}
 \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 \end{equation*}
@@ -10063,11 +10067,11 @@ E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\m
 E_{cd} = \frac{E_{cm}}{\gamma_{cE}}
 \end{equation*}
 \subsection{Betonstahl}
-\noindent\textbf{Bemessungswert der Fliessgrenze} \hfill \normref{SIA 262:2025, 2.4.2.5}
+\noindent\textbf{Bemessungswert der Fliessgrenze} \hfill \normref{SIA 262:2025, 2.4.2.5, (4)}
 \begin{equation*}
 f_{yd} = \frac{f_{yk}}{\gamma_s}
 \end{equation*}
-\noindent\textbf{Bemessungswert der Fliessgrenze auf Druck} \hfill \normref{SIA 262:2025, 2.4.2.5}
+\noindent\textbf{Bemessungswert der Fliessgrenze auf Druck} \hfill \normref{SIA 262:2025, 2.4.2.5, (4)}
 \begin{equation*}
 f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s}
 \end{equation*}
@@ -10148,7 +10152,7 @@ M_{Rd} = M_{Rd}(N_{Ed}=0)^{+}
 \begin{equation*}
 M_{Rd} = M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right)
 \end{equation*}
-\noindent\textbf{Wirksamer Modul der Parabel}
+\noindent\textbf{Wirksamer Modul der Parabel} \hfill \normref{SIA 262:2025, 3.1.2.6.1, (12)}
 \begin{equation*}
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi}
 \end{equation*}
@@ -12188,13 +12192,14 @@ Mittelwert des Elastizitätsmoduls & $E_{cm}$ & $33620$ & N/mm² & berechnet \\
 Dehnung am Ende des ansteigenden Astes & $\varepsilon_{c1d}$ & $2$ & ‰ & Vorgabe \\
 Bruchdehnung des Betons & $\varepsilon_{c2d}$ & $3.5$ & ‰ & Vorgabe \\
 Beiwert zur Berücksichtigung der Festigkeitsminderung & $\eta_{fc}$ & $1$ &  & berechnet \\
+Beiwert für die Dauer der Einwirkung & $\eta_t$ & $1$ &  & Vorgabe \\
 Bemessungswert der Betondruckfestigkeit & $f_{cd}$ & $20$ & N/mm² & berechnet \\
 Charakteristische Zylinderdruckfestigkeit & $f_{ck}$ & $30$ & N/mm² & Vorgabe \\
 Mittelwert der Zylinderdruckfestigkeit & $f_{cm}$ & $38$ & N/mm² & berechnet \\
 Mittelwert der Zugfestigkeit & $f_{ctm}$ & $2.9$ & N/mm² & Vorgabe \\
 Teilsicherheitsbeiwert für Beton & $\gamma_c$ & $1.5$ &  & Vorgabe \\
 Teilsicherheitsbeiwert für den Elastizitätsmodul, Druckglieder mit Einflüssen 2. Ordnung & $\gamma_{cE}$ & $1.2$ &  & Vorgabe \\
-Beiwert für die Gesteinskörnung & $k_e$ & $10000$ &  & Vorgabe \\
+Beiwert des Elastizitätsmoduls je nach Gestein & $k_E$ & $10000$ &  & Vorgabe \\
 Dichte des Stahlbetons & $\rho_{sb}$ & $2500$ & kg/m³ & Vorgabe \\
 Bemessungswert der Schubspannungsgrenze & $\tau_{cd}$ & $1.1$ & N/mm² & berechnet \\
 Elastizitätsmodul des Betonstahls & $E_s$ & $200000$ & N/mm² & Vorgabe \\

@@ -31,7 +31,8 @@ class TestDienst(unittest.TestCase):
     def test_rechnen_mit_einzelziel(self):
         antwort = dienst.bearbeite("rechnen", self.rumpf(ziele=["beton.b1.f_cd"]))
         self.assertEqual(set(antwort.daten["werte"]), {
-            "beton.b1.eta_fc", "beton.b1.f_ck", "beton.b1.f_cd", "beton.b1.gamma_c",
+            "beton.b1.eta_fc", "beton.b1.eta_t", "beton.b1.f_ck", "beton.b1.f_cd",
+            "beton.b1.gamma_c",
         })
         self.assertEqual(antwort.daten["reihenfolge"][-1], "beton.b1.f_cd")
 

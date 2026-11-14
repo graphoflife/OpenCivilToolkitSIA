@@ -21,7 +21,9 @@ from opencivil import spannungsanalyse
 from opencivil.core.wert import grad_als_text
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, MM2, N_PRO_MM2, PRO_M, PROMILLE
 from opencivil.core.rechenwerk import Loesung
-from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
+from opencivil.querschnitt.werkstoffgesetz import (
+    BLOCKANTEIL, Betongesetz, Spannungsblock, Stahlgesetz,
+)
 from opencivil.nachweis.resistenzlinie import Handlinie
 from opencivil.nachweis.schubwandnachweis import Schubbefund
 from opencivil.projekt import Aufbau
@@ -422,7 +424,7 @@ def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
         "x_titel": "ε [‰]",
         "y_titel": "σ [N/mm²]",
         "titel": "Beton – Parabel-Rechteck-Beziehung",
-        "referenz": "SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)",
+        "referenz": Betongesetz.REFERENZ,
         "marken": [
             {"eps": zahl(-abs(eps_c1d), PROMILLE), "sigma": zahl(-abs(f_cd), N_PRO_MM2),
              "text": "ε_c1d"},
@@ -485,7 +487,7 @@ def _stahlkurve(stoff, wert) -> Optional[dict]:
         "x_titel": "ε [‰]",
         "y_titel": "σ [N/mm²]",
         "titel": "Betonstahl – bilineare Beziehung",
-        "referenz": "SIA 262:2025, 4.2.2.2, Figur 16",
+        "referenz": Stahlgesetz.REFERENZ,
         "marken": [
             {"eps": zahl(eps_yd, PROMILLE), "sigma": zahl(f_yd, N_PRO_MM2), "text": "ε_yd"},
             {"eps": zahl(abs(eps_ud), PROMILLE), "sigma": zahl(f_yd, N_PRO_MM2), "text": "ε_ud"},

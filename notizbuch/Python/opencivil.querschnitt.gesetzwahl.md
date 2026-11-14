@@ -1,5 +1,5 @@
 ---
-erzeugt: dbbbada176f7
+erzeugt: a2283e022b95
 art: modul
 tags: [modul]
 ---
@@ -301,7 +301,7 @@ Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo
 def wirksamer_modul(E_c: float, phi: float) -> float
 ```
 
-`E_c,eff = E_c / (1 + phi)` -- das Kriechen weicht den Beton auf.
+`E_c,eff = E_c / (1 + phi)` -- das Kriechen weicht den Beton auf ([[opencivil.querschnitt.gesetzwahl#Konstanten|REFERENZ_KRIECHEN]]).
 
 ### betongesetz
 
@@ -317,6 +317,10 @@ Platte ihrem Loeser den ungerissenen Beton als eigenes Gesetz mit, und der
 gezeichnete Querschnitt baute ihn hinter einem Schalter selbst. `E_c`
 ist der Modul der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohne Kriechen.
 
+
+## Konstanten
+
+- `REFERENZ_KRIECHEN = 'SIA 262:2025, 3.1.2.6.1, (12)'` – Die Kriechdehnung ist `phi` mal die elastische; zusammen `(1 + phi)` mal, und daraus folgt der wirksame Modul.
 
 ## Braucht
 

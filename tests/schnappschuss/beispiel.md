@@ -1,6 +1,6 @@
 # Beispiel
 
-110 Berechnungen ausgeführt, 176 Werte bestimmt.
+111 Berechnungen ausgeführt, 177 Werte bestimmt.
 
 ## Herleitung
 
@@ -24,19 +24,19 @@ $$
 b_y = 1000\,\mathrm{mm}
 $$
 
-**Überdeckung unten**
+**Überdeckung unten** *(SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18)*
 
 $$
 c_{nom,u} = 30\,\mathrm{mm}
 $$
 
-**Überdeckung oben**
+**Überdeckung oben** *(SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18)*
 
 $$
 c_{nom,o} = 30\,\mathrm{mm}
 $$
 
-**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*
+**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
@@ -630,16 +630,22 @@ $$
 
 ### Beton: C30/37
 
-**Charakteristische Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.7)*
+**Charakteristische Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.1, Tabelle 3)*
 
 $$
 f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Beiwert zur Berücksichtigung der Festigkeitsminderung** *(SIA 262:2025, 2.4.2.3)*
+**Beiwert zur Berücksichtigung der Festigkeitsminderung** *(SIA 262:2025, 4.2.1.2, (26))*
 
 $$
 \eta_{fc} = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right] = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{30\,\mathrm{N}/\mathrm{mm}^{2}}\right)^{1/3};\ 1.0\right] = 1
+$$
+
+**Beiwert für die Dauer der Einwirkung** *(SIA 262:2025, 4.2.1.3)*
+
+$$
+\eta_t = 1
 $$
 
 **Teilsicherheitsbeiwert für Beton** *(SIA 262:2025, 2.4.2.6)*
@@ -648,49 +654,49 @@ $$
 \gamma_c = 1.5
 $$
 
-**Bemessungswert der Betondruckfestigkeit** *(SIA 262:2025, 2.4.2.3)*
+**Bemessungswert der Betondruckfestigkeit** *(SIA 262:2025, 2.4.2.3, (2))*
 
 $$
-f_{cd} = \frac{\eta_{fc} \cdot f_{ck}}{\gamma_c} = \frac{1 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}{1.5} = 20\,\mathrm{N}/\mathrm{mm}^{2}
+f_{cd} = \frac{\eta_{fc} \cdot \eta_t \cdot f_{ck}}{\gamma_c} = \frac{1 \cdot 1 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}{1.5} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Dehnung am Ende des ansteigenden Astes** *(SIA 262:2025, 4.2.1.4)*
+**Dehnung am Ende des ansteigenden Astes** *(SIA 262:2025, 4.2.1.4, Tabelle 8)*
 
 $$
 \varepsilon_{c1d} = 2\,\text{‰}
 $$
 
-**Bruchdehnung des Betons** *(SIA 262:2025, 4.2.1.4)*
+**Bruchdehnung des Betons** *(SIA 262:2025, 4.2.1.4, Tabelle 8)*
 
 $$
 \varepsilon_{c2d} = 3.5\,\text{‰}
 $$
 
-**Beiwert für die Gesteinskörnung** *(SIA 262:2025, 3.1.2.3.3)*
+**Beiwert des Elastizitätsmoduls je nach Gestein** *(SIA 262:2025, 3.1.2.3.3, (10))*
 
 $$
-k_e = 10000
+k_E = 10000
 $$
 
-**Mittelwert der Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.2)*
+**Mittelwert der Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.2, (6))*
 
 $$
 f_{cm} = f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2} = 30\,\mathrm{N}/\mathrm{mm}^{2} + 8\,\mathrm{N}/\mathrm{mm}^{2} = 38\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Mittelwert des Elastizitätsmoduls** *(SIA 262:2025, 3.1.2.3.3)*
+**Mittelwert des Elastizitätsmoduls** *(SIA 262:2025, 3.1.2.3.3, (10))*
 
 $$
-E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+E_{cm} = k_E \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
 
-**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4)*
+**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4, (3))*
 
 $$
 \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} = \frac{0.3 \cdot \sqrt{30}}{1.5} = 1.1\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
 
-**Mittelwert der Zugfestigkeit** *(SIA 262:2025, 3.1.2.2.7)*
+**Mittelwert der Zugfestigkeit** *(SIA 262:2025, 3.1.2.2.4, Tabelle 3)*
 
 $$
 f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
@@ -722,7 +728,7 @@ $$
 E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Charakteristische Fliessgrenze** *(SIA 262:2025, 3.2.2.3)*
+**Charakteristische Fliessgrenze** *(SIA 262:2025, 3.2.2.2, Tabelle 5)*
 
 $$
 f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
@@ -734,25 +740,25 @@ $$
 \gamma_s = 1.15
 $$
 
-**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5)*
+**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5, (4))*
 
 $$
 f_{yd} = \frac{f_{yk}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 435\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Charakteristische Fliessgrenze auf Druck** *(SIA 262:2025, 3.2.2.3)*
+**Charakteristische Fliessgrenze auf Druck** *(SIA 262:2025, 4.2.2.2, Figur 16)*
 
 $$
 f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Bemessungswert der Fliessgrenze auf Druck** *(SIA 262:2025, 2.4.2.5)*
+**Bemessungswert der Fliessgrenze auf Druck** *(SIA 262:2025, 2.4.2.5, (4))*
 
 $$
 f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 435\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Bemessungswert der Dehnung bei Höchstlast** *(SIA 262:2025, 4.2.2.1)*
+**Bemessungswert der Dehnung bei Höchstlast** *(SIA 262:2025, 4.2.2.1, Tabelle 9)*
 
 $$
 \varepsilon_{ud} = 4.5\,\%
@@ -2139,7 +2145,7 @@ Grösste Durchbiegung gegen die Sehne: L2, w = 2.29 mm bei x = 3.00 m, L/w = 262
 
 ### Querschnitt
 
-**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*
+**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
@@ -2159,31 +2165,31 @@ $$
 
 ### Beton
 
-**Beiwert zur Berücksichtigung der Festigkeitsminderung** *(SIA 262:2025, 2.4.2.3)*
+**Beiwert zur Berücksichtigung der Festigkeitsminderung** *(SIA 262:2025, 4.2.1.2, (26))*
 
 $$
 \eta_{fc} = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right]
 $$
 
-**Bemessungswert der Betondruckfestigkeit** *(SIA 262:2025, 2.4.2.3)*
+**Bemessungswert der Betondruckfestigkeit** *(SIA 262:2025, 2.4.2.3, (2))*
 
 $$
-f_{cd} = \frac{\eta_{fc} \cdot f_{ck}}{\gamma_c}
+f_{cd} = \frac{\eta_{fc} \cdot \eta_t \cdot f_{ck}}{\gamma_c}
 $$
 
-**Mittelwert der Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.2)*
+**Mittelwert der Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.2, (6))*
 
 $$
 f_{cm} = f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Mittelwert des Elastizitätsmoduls** *(SIA 262:2025, 3.1.2.3.3)*
+**Mittelwert des Elastizitätsmoduls** *(SIA 262:2025, 3.1.2.3.3, (10))*
 
 $$
-E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+E_{cm} = k_E \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
 
-**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4)*
+**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4, (3))*
 
 $$
 \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
@@ -2197,13 +2203,13 @@ $$
 
 ### Betonstahl
 
-**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5)*
+**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5, (4))*
 
 $$
 f_{yd} = \frac{f_{yk}}{\gamma_s}
 $$
 
-**Bemessungswert der Fliessgrenze auf Druck** *(SIA 262:2025, 2.4.2.5)*
+**Bemessungswert der Fliessgrenze auf Druck** *(SIA 262:2025, 2.4.2.5, (4))*
 
 $$
 f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s}
@@ -3021,13 +3027,14 @@ Alle geführten Nachweise sind erfüllt.
 | Dehnung am Ende des ansteigenden Astes | $\varepsilon_{c1d}$ | $2$ | ‰ | Vorgabe |
 | Bruchdehnung des Betons | $\varepsilon_{c2d}$ | $3.5$ | ‰ | Vorgabe |
 | Beiwert zur Berücksichtigung der Festigkeitsminderung | $\eta_{fc}$ | $1$ |  | berechnet |
+| Beiwert für die Dauer der Einwirkung | $\eta_t$ | $1$ |  | Vorgabe |
 | Bemessungswert der Betondruckfestigkeit | $f_{cd}$ | $20$ | N/mm² | berechnet |
 | Charakteristische Zylinderdruckfestigkeit | $f_{ck}$ | $30$ | N/mm² | Vorgabe |
 | Mittelwert der Zylinderdruckfestigkeit | $f_{cm}$ | $38$ | N/mm² | berechnet |
 | Mittelwert der Zugfestigkeit | $f_{ctm}$ | $2.9$ | N/mm² | Vorgabe |
 | Teilsicherheitsbeiwert für Beton | $\gamma_c$ | $1.5$ |  | Vorgabe |
 | Teilsicherheitsbeiwert für den Elastizitätsmodul, Druckglieder mit Einflüssen 2. Ordnung | $\gamma_{cE}$ | $1.2$ |  | Vorgabe |
-| Beiwert für die Gesteinskörnung | $k_e$ | $10000$ |  | Vorgabe |
+| Beiwert des Elastizitätsmoduls je nach Gestein | $k_E$ | $10000$ |  | Vorgabe |
 | Dichte des Stahlbetons | $\rho_{sb}$ | $2500$ | kg/m³ | Vorgabe |
 | Bemessungswert der Schubspannungsgrenze | $\tau_{cd}$ | $1.1$ | N/mm² | berechnet |
 | Elastizitätsmodul des Betonstahls | $E_s$ | $200000$ | N/mm² | Vorgabe |

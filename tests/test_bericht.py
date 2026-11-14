@@ -138,7 +138,7 @@ class TestFormelnSammeln(unittest.TestCase):
     def test_referenz_wird_mitgeliefert(self):
         loesung, c30 = beispiel_loesung()
         f_cd = next(f for f in formeln_sammeln(loesung) if f.wert_id == c30.id_von("f_cd"))
-        self.assertEqual(f_cd.referenz, "SIA 262:2025, 2.4.2.3")
+        self.assertEqual(f_cd.referenz, "SIA 262:2025, 2.4.2.3, (2)")
         self.assertIn(r"\frac", f_cd.latex)
 
 

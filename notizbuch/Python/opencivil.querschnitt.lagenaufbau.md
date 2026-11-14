@@ -1,5 +1,5 @@
 ---
-erzeugt: 7166989b2189
+erzeugt: 381f5a7a3724
 art: modul
 tags: [modul]
 ---
@@ -204,6 +204,10 @@ Beides sind Angaben fuer die Ausfuehrung, keine Nachweisgroessen -- sie
 gehoeren aber in den Kern und nicht in die Oberflaeche, damit sie in der
 Herleitung stehen und sich zurueckverfolgen lassen.
 
+
+## Konstanten
+
+- `REFERENZ_NENNDURCHMESSER = 'SIA 262:2025, 4.2.2.4'` – Die Querschnittsflaeche eines Stabs aus seinem Nenndurchmesser -- mit dem bemisst die Norm. Der Rest von `A_s` ist Geometrie.
 
 ## Braucht
 

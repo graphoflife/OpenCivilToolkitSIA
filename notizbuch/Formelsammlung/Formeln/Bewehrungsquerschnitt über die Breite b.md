@@ -1,11 +1,11 @@
 ---
-erzeugt: e138f13d6573
+erzeugt: d1c7b1189cf1
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 5.5.2"
+normstelle: "SIA 262:2025, 4.2.2.4"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 5.5.2
+> SIA 262:2025, 4.2.2.4
 
 $$
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}

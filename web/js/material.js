@@ -108,8 +108,8 @@ export function materialEditor(material) {
       el('span.sia', { text: 'SIA' }),
       el('div', { style: { flex: '1 1 220px' } }, [
         el('b', { text: `Normsorte ${material.sorte}` }),
-        ' · Kennwerte nach SIA 262:2025, nicht änderbar. Abweichen: links «+» '
-        + '→ eigenes Material.',
+        ' · Kennwerte nach SIA 262:2025, die Dichten und k_E nach Vorgabe; nicht '
+        + 'änderbar. Abweichen: links «+» → eigenes Material.',
       ]),
     ])
     : el('div.gesperrt-hinweis', {

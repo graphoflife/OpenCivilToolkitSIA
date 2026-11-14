@@ -22,8 +22,8 @@ Bruchdehnung $\varepsilon_{ud}$ (siehe [[Bilineare Beziehung des Betonstahls]]).
 Die Verfestigung, die ein wirklicher Stahl nach dem Fliessen zeigt, liegt auf
 der sicheren Seite und wird nicht angesetzt.
 
-Zug und Druck haben je eine eigene Fliessgrenze, weil die Sortentabelle sie
-verschieden angeben darf. Für die Tragsicherheit gelten die Bemessungswerte,
+Zug und Druck haben je eine eigene Fliessgrenze. Die Norm setzt beide gleich;
+ein eigener Stahl darf auf Druck anders fliessen. Für die Tragsicherheit gelten die Bemessungswerte,
 durch $\gamma_s$ geteilt; im Gebrauch rechnen die Kapitel mit den
 charakteristischen. Die [[Fliessdehnung]] verbindet beides: bis zu ihr ist die
 Spannung $E_s \cdot \varepsilon_s$, darüber bleibt sie am Plateau.

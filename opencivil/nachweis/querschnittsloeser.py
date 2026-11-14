@@ -79,7 +79,7 @@ from opencivil.core.suche import HALBIEREN, Suche, eingrenzen
 from opencivil.querschnitt.fasern import (
     FASERN, Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
-from opencivil.querschnitt.gesetzwahl import wirksamer_modul
+from opencivil.querschnitt.gesetzwahl import REFERENZ_KRIECHEN, wirksamer_modul
 from opencivil.querschnitt.lagenaufbau import schwerpunkt
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 
@@ -272,7 +272,8 @@ def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
     """
     p.formel(wirksamer_modul_wert(E_cm, phi.groesse.si, basis),
              r"\frac{@E_cm}{1 + @phi}", {"E_cm": E_cm, "phi": phi},
-             titel=titel, nachsatz=nachsatz, name="Wirksamer Elastizitätsmodul")
+             titel=titel, nachsatz=nachsatz, name="Wirksamer Elastizitätsmodul",
+             referenz=REFERENZ_KRIECHEN)
 
 
 def protokoll_verfahren(p, *, eps_c2d: float, suche: Suche,

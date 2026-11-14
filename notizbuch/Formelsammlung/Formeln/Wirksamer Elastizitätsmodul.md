@@ -1,10 +1,11 @@
 ---
-erzeugt: 8c858554dbc7
+erzeugt: fd9705517ab6
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 3.1.2.6.1, (12)"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 3.1.2.6.1, (12)
 
 $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi}

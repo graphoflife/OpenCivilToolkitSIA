@@ -1,11 +1,11 @@
 ---
-erzeugt: e3dcf06c882c
+erzeugt: 83e5818e8924
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 2.4.2.4"
+normstelle: "SIA 262:2025, 2.4.2.4, (3)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 2.4.2.4
+> SIA 262:2025, 2.4.2.4, (3)
 
 $$
 \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)

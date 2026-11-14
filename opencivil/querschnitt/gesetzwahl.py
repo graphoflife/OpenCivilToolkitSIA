@@ -235,8 +235,13 @@ class Rechenwahl:
         return ", ".join(teile + [self.satz.kurz])
 
 
+#: Die Kriechdehnung ist ``phi`` mal die elastische; zusammen ``(1 + phi)``
+#: mal, und daraus folgt der wirksame Modul.
+REFERENZ_KRIECHEN = "SIA 262:2025, 3.1.2.6.1, (12)"
+
+
 def wirksamer_modul(E_c: float, phi: float) -> float:
-    """``E_c,eff = E_c / (1 + phi)`` -- das Kriechen weicht den Beton auf."""
+    """``E_c,eff = E_c / (1 + phi)`` -- das Kriechen weicht den Beton auf (:data:`REFERENZ_KRIECHEN`)."""
     return E_c / (1.0 + phi)
 
 

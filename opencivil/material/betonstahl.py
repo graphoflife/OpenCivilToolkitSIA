@@ -39,7 +39,11 @@ class Stahlsorte:
     """Charakteristische Fliessgrenze in N/mm^2."""
 
     f_yk_druck: float
-    """Charakteristische Fliessgrenze auf Druck in N/mm^2."""
+    """
+    Charakteristische Fliessgrenze auf Druck in N/mm^2 -- bei jeder Sorte
+    gleich ``f_yk``: SIA 262:2025, 4.2.2.2 nimmt fuer Zug und Druck dasselbe
+    Diagramm. Getrennt gefuehrt, damit ein eigener Stahl abweichen darf.
+    """
 
     eps_uk: float
     """Dehnung bei Hoechstlast in %."""
@@ -51,10 +55,10 @@ class Stahlsorte:
     """Duktilitaetsklasse A, B oder C (Tabelle 5) -- leer, wo sie nicht bekannt ist."""
 
 
-#: Betonstahlsorten nach SIA 262:2025, Tabelle 5 (3.2.2.3).
-#:
-#: Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven
-#: Einsatz gegen die gedruckte Norm pruefen.
+#: Betonstahlsorten nach SIA 262:2025, Tabelle 5 (f_yk, eps_uk) und Tabelle 9
+#: (eps_ud). Am 2026-11-14 gegen die gedruckten Tabellen geprueft: B500A,
+#: B500B, B500C und B700B stimmen. «Stahl II» steht in keiner Tabelle von
+#: SIA 262:2025; woher er stammt, ist offen (TODO im Notizbuch).
 STAHLSORTEN: Dict[str, Stahlsorte] = {
     "B500A": Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud=2.0, klasse="A"),
     "B500B": Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=5.0, eps_ud=4.5, klasse="B"),
@@ -93,7 +97,7 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="f_{yk}",
         einheit=N_PRO_MM2,
         beschreibung="Charakteristische Fliessgrenze",
-        referenz="SIA 262:2025, 3.2.2.3",
+        referenz="SIA 262:2025, 3.2.2.2, Tabelle 5",
         stellen=0,
     ),
     KennwertVorlage(
@@ -101,7 +105,7 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="f_{yk}^{-}",
         einheit=N_PRO_MM2,
         beschreibung="Charakteristische Fliessgrenze auf Druck",
-        referenz="SIA 262:2025, 3.2.2.3",
+        referenz="SIA 262:2025, 4.2.2.2, Figur 16",
         stellen=0,
     ),
     KennwertVorlage(
@@ -109,7 +113,7 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol=r"\varepsilon_{uk}",
         einheit=PROZENT,
         beschreibung="Dehnung bei Höchstlast",
-        referenz="SIA 262:2025, 3.2.2.3",
+        referenz="SIA 262:2025, 3.2.2.3, Tabelle 5",
         stellen=1,
     ),
     KennwertVorlage(
@@ -117,7 +121,7 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol=r"\varepsilon_{ud}",
         einheit=PROZENT,
         beschreibung="Bemessungswert der Dehnung bei Höchstlast",
-        referenz="SIA 262:2025, 4.2.2.1",
+        referenz="SIA 262:2025, 4.2.2.1, Tabelle 9",
         stellen=1,
     ),
     # -- Normvorgaben -------------------------------------------------------
@@ -154,7 +158,7 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="f_{yd}",
         einheit=N_PRO_MM2,
         beschreibung="Bemessungswert der Fliessgrenze",
-        referenz="SIA 262:2025, 2.4.2.5",
+        referenz="SIA 262:2025, 2.4.2.5, (4)",
         stellen=0,
         eingaben=("f_yk", "gamma_s"),
         vorlage_latex=r"\frac{@f_yk}{@gamma_s}",
@@ -165,7 +169,7 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="f_{yd}^{-}",
         einheit=N_PRO_MM2,
         beschreibung="Bemessungswert der Fliessgrenze auf Druck",
-        referenz="SIA 262:2025, 2.4.2.5",
+        referenz="SIA 262:2025, 2.4.2.5, (4)",
         stellen=0,
         eingaben=("f_yk_druck", "gamma_s"),
         vorlage_latex=r"\frac{@f_yk_druck}{@gamma_s}",

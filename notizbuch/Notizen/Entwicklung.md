@@ -44,6 +44,38 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-14 · Normprüfung III: Baustoffe
+
+Dritter Bereich, an den Normseiten bestätigt (S. 21, 28–30, 34–35, 48–49,
+80–81, 89).
+
+- **f_cd mit η_t** (2.4.2.3, (2); 4.2.1.3): der Beiwert für die Dauer der
+  Einwirkung steht jetzt als Kennwert in der Formel, Vorgabe 1.0. Keine Zahl
+  ändert sich, aber der Bericht zeigt die Annahme. Mit η_t = 0.85 -- wenn f_ck
+  später als nach 28 Tagen bestimmt ist oder früh viel Last wirkt -- hätte
+  C30/37 17.0 statt 20.0 N/mm². Eine Normsorte bleibt bei 1.0; wer abweicht,
+  legt ein eigenes Material an.
+- **Die Sortentabellen sind geprüft:** die neun Betone stimmen mit Tabelle 3,
+  B500A, B500B, B500C und B700B mit den Tabellen 5 und 9. Der Hinweis «vor
+  dem produktiven Einsatz prüfen» ist fort. «Stahl II» steht in keiner
+  Tabelle -- offen für den Benutzer.
+- **Ziffern:** f_ck und f_ctm 3.1.2.2.1 und 3.1.2.2.4 mit Tabelle 3 statt
+  3.1.2.2.7, der Ziffer des Leichtbetons; η_fc 4.2.1.2, (26) statt 2.4.2.3;
+  f_yk 3.2.2.2 und ε_uk 3.2.2.3, je mit Tabelle 5; die Fliessgrenze auf Druck
+  4.2.2.2, Figur 16 -- die Norm setzt sie gleich der auf Zug; A_s und der
+  Bügelschenkel 4.2.2.4 statt 5.5.2; der Lagenaufbau ohne Verweis statt
+  5.2.2, dafür die Überdeckung mit 5.2.2.1 und Tabelle 18; der wirksame
+  Modul E_cm/(1+φ) mit 3.1.2.6.1, (12). Gleichungsnummern an f_cm, E_cm,
+  τ_cd und f_yd.
+- **k_E statt k_e**, wie in der Norm; der Kurzname bleibt k_e, damit
+  gespeicherte Projekte laden. 10 000 liegt im Band der Norm für Kies und
+  Kalk.
+- **Die Diagramme lesen den Verweis vom Werkstoffgesetz**, statt ihn ein
+  zweites Mal zu schreiben -- beim Stahl fehlte dort 4.2.2.5.
+- **Offen für den Benutzer** ([[TODO]]): «Stahl II», die Rundung von
+  Tabelle 8, die Vorgabe c_nom = 30 mm, die konstruktiven Regeln der
+  Bewehrungssuche, der Verweis der Dichten auf SIA 261.
+
 ## 2026-11-14 · Normprüfung II: Querkraft und Torsion
 
 Zweiter Bereich, jede Änderung an der Normseite bestätigt (S. 49, 54–59).

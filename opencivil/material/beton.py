@@ -38,10 +38,8 @@ from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage, erz
 # Sortentabelle
 # ===========================================================================
 
-#: Betonsorten nach SIA 262:2025, Tabelle 3.1.2.2.7 -- (f_ck, f_ctm) in N/mm^2.
-#:
-#: Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven
-#: Einsatz gegen die gedruckte Norm pruefen.
+#: Betonsorten nach SIA 262:2025, Tabelle 3 -- (f_ck, f_ctm) in N/mm^2. Am
+#: 2026-11-14 gegen die gedruckte Tabelle geprueft: alle neun stimmen.
 BETONSORTEN: Dict[str, tuple[float, float]] = {
     "C12/15": (12.0, 1.6),
     "C16/20": (16.0, 1.9),
@@ -73,7 +71,7 @@ def betonsorten_zum_anlegen() -> List[str]:
 
 
 def _tau_cd(f_ck: Groesse, gamma_c: Groesse):
-    """SIA 262:2025, 2.4.2.4 -- empirisch, f_ck in N/mm^2."""
+    """SIA 262:2025, 2.4.2.4, (3) -- empirisch, f_ck in N/mm^2."""
     return empirisch(
         lambda f_ck, gamma_c: 0.3 * math.sqrt(f_ck) / gamma_c,
         ergebnis=N_PRO_MM2,
@@ -83,7 +81,7 @@ def _tau_cd(f_ck: Groesse, gamma_c: Groesse):
 
 
 def _e_cm(k_e: Groesse, f_cm: Groesse):
-    """SIA 262:2025, 3.1.2.3.3 -- empirisch, f_cm in N/mm^2."""
+    """SIA 262:2025, 3.1.2.3.3, (10) -- empirisch, f_cm in N/mm^2."""
     return empirisch(
         lambda k_e, f_cm: k_e * f_cm ** (1.0 / 3.0),
         ergebnis=N_PRO_MM2,
@@ -93,7 +91,7 @@ def _e_cm(k_e: Groesse, f_cm: Groesse):
 
 
 def _eta_fc(f_ck: Groesse) -> Groesse:
-    """SIA 262:2025, 2.4.2.3 -- einheitenrein, da nur ein Verhaeltnis eingeht."""
+    """SIA 262:2025, 4.2.1.2, (26) -- einheitenrein, da nur ein Verhaeltnis eingeht."""
     verhaeltnis = (Groesse(40, N_PRO_MM2) / f_ck) ** (1.0 / 3.0)
     return min(verhaeltnis, Groesse(1.0, EINHEITSLOS))
 
@@ -106,7 +104,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="f_{ck}",
         einheit=N_PRO_MM2,
         beschreibung="Charakteristische Zylinderdruckfestigkeit",
-        referenz="SIA 262:2025, 3.1.2.2.7",
+        referenz="SIA 262:2025, 3.1.2.2.1, Tabelle 3",
         stellen=1,
     ),
     KennwertVorlage(
@@ -114,7 +112,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="f_{ctm}",
         einheit=N_PRO_MM2,
         beschreibung="Mittelwert der Zugfestigkeit",
-        referenz="SIA 262:2025, 3.1.2.2.7",
+        referenz="SIA 262:2025, 3.1.2.2.4, Tabelle 3",
         stellen=2,
     ),
     # -- Normvorgaben -------------------------------------------------------
@@ -126,6 +124,18 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         stellen=2,
         festwert=Groesse(1.5, EINHEITSLOS),
     ),
+    # Die Dauer der Einwirkung. 1.0 setzt voraus, dass f_ck an Proben von
+    # hoechstens 28 Tagen bestimmt ist und in den ersten drei Monaten nicht
+    # mehr als 85 % der Bemessungslast wirken; sonst 0.85, bei Anprall oder
+    # Explosion 1.2 (4.2.1.3). Tabelle 8 gilt fuer 1.0.
+    KennwertVorlage(
+        kurzname="eta_t",
+        symbol=r"\eta_t",
+        beschreibung="Beiwert für die Dauer der Einwirkung",
+        referenz="SIA 262:2025, 4.2.1.3",
+        stellen=2,
+        festwert=Groesse(1.0, EINHEITSLOS),
+    ),
     KennwertVorlage(
         kurzname="gamma_cE",
         symbol=r"\gamma_{cE}",
@@ -135,11 +145,14 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         stellen=2,
         festwert=Groesse(1.2, EINHEITSLOS),
     ),
+    # 10 000 aus dem Band der Norm: Alluvialkies 10 000 bis 12 000, gebrochener
+    # Kalk 8 000 bis 10 000. Der Kurzname bleibt k_e, weil gespeicherte
+    # Projekte ihn tragen; die Norm schreibt k_E.
     KennwertVorlage(
         kurzname="k_e",
-        symbol="k_e",
-        beschreibung="Beiwert für die Gesteinskörnung",
-        referenz="SIA 262:2025, 3.1.2.3.3",
+        symbol="k_E",
+        beschreibung="Beiwert des Elastizitätsmoduls je nach Gestein",
+        referenz="SIA 262:2025, 3.1.2.3.3, (10)",
         stellen=0,
         festwert=Groesse(10000, EINHEITSLOS),
     ),
@@ -148,7 +161,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol=r"\varepsilon_{c1d}",
         einheit=PROMILLE,
         beschreibung="Dehnung am Ende des ansteigenden Astes",
-        referenz="SIA 262:2025, 4.2.1.4",
+        referenz="SIA 262:2025, 4.2.1.4, Tabelle 8",
         stellen=2,
         festwert=Groesse(2.0, PROMILLE),
     ),
@@ -157,7 +170,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol=r"\varepsilon_{c2d}",
         einheit=PROMILLE,
         beschreibung="Bruchdehnung des Betons",
-        referenz="SIA 262:2025, 4.2.1.4",
+        referenz="SIA 262:2025, 4.2.1.4, Tabelle 8",
         stellen=2,
         festwert=Groesse(3.5, PROMILLE),
     ),
@@ -186,7 +199,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         kurzname="eta_fc",
         symbol=r"\eta_{fc}",
         beschreibung="Beiwert zur Berücksichtigung der Festigkeitsminderung",
-        referenz="SIA 262:2025, 2.4.2.3",
+        referenz="SIA 262:2025, 4.2.1.2, (26)",
         stellen=3,
         eingaben=("f_ck",),
         vorlage_latex=(
@@ -200,18 +213,18 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="f_{cd}",
         einheit=N_PRO_MM2,
         beschreibung="Bemessungswert der Betondruckfestigkeit",
-        referenz="SIA 262:2025, 2.4.2.3",
+        referenz="SIA 262:2025, 2.4.2.3, (2)",
         stellen=1,
-        eingaben=("eta_fc", "f_ck", "gamma_c"),
-        vorlage_latex=r"\frac{@eta_fc \cdot @f_ck}{@gamma_c}",
-        funktion=lambda eta_fc, f_ck, gamma_c: eta_fc * f_ck / gamma_c,
+        eingaben=("eta_fc", "eta_t", "f_ck", "gamma_c"),
+        vorlage_latex=r"\frac{@eta_fc \cdot @eta_t \cdot @f_ck}{@gamma_c}",
+        funktion=lambda eta_fc, eta_t, f_ck, gamma_c: eta_fc * eta_t * f_ck / gamma_c,
     ),
     KennwertVorlage(
         kurzname="tau_cd",
         symbol=r"\tau_{cd}",
         einheit=N_PRO_MM2,
         beschreibung="Bemessungswert der Schubspannungsgrenze",
-        referenz="SIA 262:2025, 2.4.2.4",
+        referenz="SIA 262:2025, 2.4.2.4, (3)",
         stellen=2,
         eingaben=("f_ck", "gamma_c"),
         vorlage_latex=r"\frac{0.3 \cdot \sqrt{@f_ck}}{@gamma_c}",
@@ -222,7 +235,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="f_{cm}",
         einheit=N_PRO_MM2,
         beschreibung="Mittelwert der Zylinderdruckfestigkeit",
-        referenz="SIA 262:2025, 3.1.2.2.2",
+        referenz="SIA 262:2025, 3.1.2.2.2, (6)",
         stellen=1,
         eingaben=("f_ck",),
         vorlage_latex=r"@f_ck + 8\,\mathrm{N}/\mathrm{mm}^{2}",
@@ -233,7 +246,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="E_{cm}",
         einheit=N_PRO_MM2,
         beschreibung="Mittelwert des Elastizitätsmoduls",
-        referenz="SIA 262:2025, 3.1.2.3.3",
+        referenz="SIA 262:2025, 3.1.2.3.3, (10)",
         stellen=0,
         eingaben=("k_e", "f_cm"),
         vorlage_latex=r"@k_e \cdot \sqrt[3]{@f_cm}",

@@ -52,7 +52,9 @@ from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Kennzahl, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 from opencivil.material.betonstahl import STAHLDICHTE
-from opencivil.querschnitt.lagenaufbau import Lagenaufbau, Postenbezug
+from opencivil.querschnitt.lagenaufbau import (
+    REFERENZ_NENNDURCHMESSER, Lagenaufbau, Postenbezug,
+)
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je
@@ -247,6 +249,11 @@ K_C = 0.55
 REFERENZ_ALPHA_MIN = "SIA 262:2025, 4.3.3.3.3"
 REFERENZ_ALPHA_MAX = "SIA 262:2025, 4.3.3.3.2, (42)"
 REFERENZ_K_C = "SIA 262:2025, 4.2.1.7"
+
+#: Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die
+#: Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe 30 mm ist
+#: keiner davon -- die Klasse kennt nur der Ingenieur.
+REFERENZ_UEBERDECKUNG = "SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18"
 
 @dataclass
 class Querkraftbewehrung:
@@ -465,8 +472,10 @@ class Plattenquerschnitt(Rechenobjekt):
         d_h = self._def("h", "h", MM, "Plattendicke", 0)
         d_b = self._def("b", "b", MM, "Betrachtete Breite (x)", 0)
         d_b_y = self._def("b_y", "b_y", MM, "Betrachtete Breite (y)", 0)
-        d_cu = self._def("c_nom_unten", "c_{nom,u}", MM, "Überdeckung unten", 0)
-        d_co = self._def("c_nom_oben", "c_{nom,o}", MM, "Überdeckung oben", 0)
+        d_cu = self._def("c_nom_unten", "c_{nom,u}", MM, "Überdeckung unten", 0,
+                         referenz=REFERENZ_UEBERDECKUNG)
+        d_co = self._def("c_nom_oben", "c_{nom,o}", MM, "Überdeckung oben", 0,
+                         referenz=REFERENZ_UEBERDECKUNG)
         d_dmax = self._def("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0)
         d_einl = self._def("einlagenhoehe", "e_{Einlage}", MM,
                            "Grösstes Mass der Einlage (Breite oder Höhe)", 0)
@@ -559,7 +568,7 @@ class Plattenquerschnitt(Rechenobjekt):
                 d_as = self._def(
                     f"lage.{marke}.a_s", f"A_{{s,{index}}}", MM2,
                     f"Bewehrungsquerschnitt {bezeichnung}", 0,
-                    referenz="SIA 262:2025, 5.5.2")
+                    referenz=REFERENZ_NENNDURCHMESSER)
                 # Die Tiefe ab Oberkante, nicht die statische Hoehe: bei einer
                 # oberen Lage misst die ab der Unterkante. Mit «d» hiess eine
                 # obere Lage hier 48 mm, im Nachweis darunter 252 mm.
@@ -654,7 +663,7 @@ class Plattenquerschnitt(Rechenobjekt):
 
         d_as = self._def("querkraft.a_s", r"A_{\varnothing,V}", MM2,
                          "Querschnitt eines Bügelschenkels", 1,
-                         referenz="SIA 262:2025, 4.2.2.4")
+                         referenz=REFERENZ_NENNDURCHMESSER)
         self.berechnungen.append(
             Formel(
                 id=f"{self.id}.querkraft.a_s",

@@ -1,11 +1,11 @@
 ---
-erzeugt: 8ce74298661a
+erzeugt: f01ad8a029ad
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 2.4.2.5"
+normstelle: "SIA 262:2025, 2.4.2.5, (4)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 2.4.2.5
+> SIA 262:2025, 2.4.2.5, (4)
 
 $$
 f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s}
@@ -38,8 +38,9 @@ $$
 
 ## Theorie
 
-Auf Druck kann ein Stahl anders fliessen als auf Zug, und die Sortentabelle
-darf beide getrennt nennen. Gebraucht wird $f_{yd}^{-}$ überall dort, wo
+Die Norm setzt die Fliessgrenze auf Druck gleich der auf Zug (SIA 262,
+4.2.2.2). Das Werkzeug führt sie trotzdem getrennt, damit ein eigener Stahl
+auf Druck anders fliessen darf. Gebraucht wird $f_{yd}^{-}$ überall dort, wo
 gedrückte Bewehrung mitträgt: in der Resistenzlinie aus Dehnungsebenen und im
 Querschnittslöser. Die Handrechnung lässt gedrückte Bewehrung weg und braucht
 sie nicht (siehe [[Betonstahl nur auf Zug]]).

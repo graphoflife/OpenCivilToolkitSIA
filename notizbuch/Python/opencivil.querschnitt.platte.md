@@ -1,5 +1,5 @@
 ---
-erzeugt: 941b5c3c666b
+erzeugt: 5afbb069d032
 art: modul
 tags: [modul]
 ---
@@ -449,6 +449,7 @@ Rechnung sehen statt nur die Zahl.
 - `REFERENZ_ALPHA_MIN = 'SIA 262:2025, 4.3.3.3.3'` – Wo die Grenzen der Neigung und k_c stehen -- fuer die Platte und die Querschnittsanalyse.
 - `REFERENZ_ALPHA_MAX = 'SIA 262:2025, 4.3.3.3.2, (42)'`
 - `REFERENZ_K_C = 'SIA 262:2025, 4.2.1.7'`
+- `REFERENZ_UEBERDECKUNG = 'SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18'` – Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe 30 mm ist keiner davon -- die Klasse kennt nur der Ingenieur.
 - `UEBERDECKUNGEN = 'Überdeckungen'` – Die beiden Kaesten, in denen die Plattenangaben zusammenstehen. Der erste traegt die Betonsorte im Namen: sie ist keine gerechnete Groesse und hat darum keine eigene Kette, an der sie haengen koennte -- als Aufschrift des Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
 
 ## Braucht

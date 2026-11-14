@@ -1,11 +1,11 @@
 ---
-erzeugt: 359230c1df2a
+erzeugt: f00b8d4817d5
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 3.1.2.2.2"
+normstelle: "SIA 262:2025, 3.1.2.2.2, (6)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 3.1.2.2.2
+> SIA 262:2025, 3.1.2.2.2, (6)
 
 $$
 f_{cm} = f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2}
@@ -44,7 +44,7 @@ $$
 $f_{ck}$ ist ein Fraktilwert: 95 % der Prüfkörper sind fester. Für das
 Verhalten im Mittel -- Steifigkeit, Verformung, Rissbildung -- zählt der
 Mittelwert. Der feste Zuschlag von $8\,\mathrm{N/mm^2}$ entspricht bei normal
-verteilter Festigkeit dem 1.645-fachen einer Standardabweichung von knapp
-$5\,\mathrm{N/mm^2}$.
+verteilter Festigkeit dem 1.645-fachen einer Standardabweichung von
+$4.8\,\mathrm{N/mm^2}$, wie sie die Norm annimmt.
 
 Das Werkzeug braucht $f_{cm}$ für den [[Mittelwert des Elastizitätsmoduls]].

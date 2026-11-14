@@ -1,11 +1,11 @@
 ---
-erzeugt: 04549ac11fbb
+erzeugt: d41634109c48
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 2.4.2.3"
+normstelle: "SIA 262:2025, 4.2.1.2, (26)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 2.4.2.3
+> SIA 262:2025, 4.2.1.2, (26)
 
 $$
 \eta_{fc} = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right]

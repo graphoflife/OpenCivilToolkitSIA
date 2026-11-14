@@ -35,6 +35,10 @@ from opencivil.querschnitt.zugseite import Zugseite
 if TYPE_CHECKING:
     from opencivil.querschnitt.platte import Bewehrungslage, Bewehrungsposten, Postenart
 
+#: Die Querschnittsflaeche eines Stabs aus seinem Nenndurchmesser -- mit dem
+#: bemisst die Norm. Der Rest von ``A_s`` ist Geometrie.
+REFERENZ_NENNDURCHMESSER = "SIA 262:2025, 4.2.2.4"
+
 
 @dataclass(frozen=True)
 class Postenbezug:
@@ -251,7 +255,7 @@ class Lagenaufbau(Prozedur):
         abschnitt: Optional[Abschnitt] = None,
     ) -> None:
         super().__init__(id, ausgaben=ausgaben, bezuege=bezuege, titel=titel,
-                         referenz="SIA 262:2025, 5.2.2", abschnitt=abschnitt)
+                         abschnitt=abschnitt)
         self.posten = list(posten)
         self.d_bewehrungsmass = d_bewehrungsmass
         self.d_distanzhalter = d_distanzhalter
@@ -275,12 +279,12 @@ class Lagenaufbau(Prozedur):
             p.ansatz(
                 r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}",
                 titel="Bewehrungsquerschnitt über die Breite b",
-                referenz="SIA 262:2025, 5.5.2")
+                referenz=REFERENZ_NENNDURCHMESSER)
         if ueber_anzahl:
             p.ansatz(
                 r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot n",
                 titel="Bewehrungsquerschnitt aus der Stabzahl",
-                referenz="SIA 262:2025, 5.5.2")
+                referenz=REFERENZ_NENNDURCHMESSER)
 
         # Huellen je Seite, von aussen nach innen. Jede Lage kommt nur einmal
         # vor, auch wenn sie zwei Posten traegt -- nach Nummer entdoppelt, weil

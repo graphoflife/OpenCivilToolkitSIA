@@ -1,5 +1,5 @@
 ---
-erzeugt: 955f494f2a66
+erzeugt: 7314a4771457
 art: modul
 tags: [modul]
 ---
@@ -52,7 +52,7 @@ Die Betonsorten in der Reihenfolge, in der neue angelegt werden -- siehe [[openc
 def _tau_cd(f_ck: Groesse, gamma_c: Groesse)
 ```
 
-SIA 262:2025, 2.4.2.4 -- empirisch, f_ck in N/mm^2.
+SIA 262:2025, 2.4.2.4, (3) -- empirisch, f_ck in N/mm^2.
 
 ### _e_cm
 
@@ -60,7 +60,7 @@ SIA 262:2025, 2.4.2.4 -- empirisch, f_ck in N/mm^2.
 def _e_cm(k_e: Groesse, f_cm: Groesse)
 ```
 
-SIA 262:2025, 3.1.2.3.3 -- empirisch, f_cm in N/mm^2.
+SIA 262:2025, 3.1.2.3.3, (10) -- empirisch, f_cm in N/mm^2.
 
 ### _eta_fc
 
@@ -68,7 +68,7 @@ SIA 262:2025, 3.1.2.3.3 -- empirisch, f_cm in N/mm^2.
 def _eta_fc(f_ck: Groesse) -> Groesse
 ```
 
-SIA 262:2025, 2.4.2.3 -- einheitenrein, da nur ein Verhaeltnis eingeht.
+SIA 262:2025, 4.2.1.2, (26) -- einheitenrein, da nur ein Verhaeltnis eingeht.
 
 ### beton
 
@@ -99,7 +99,7 @@ werden, um Normvorgaben zu ersetzen.
 
 ## Konstanten
 
-- `BETONSORTEN = {'C12/15': (12.0, 1.6), 'C16/20': (16.0, 1.9), 'C20/25': (20.0, 2.2),…` – Betonsorten nach SIA 262:2025, Tabelle 3.1.2.2.7 -- (f_ck, f_ctm) in N/mm^2. Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven Einsatz gegen die gedruckte Norm pruefen.
+- `BETONSORTEN = {'C12/15': (12.0, 1.6), 'C16/20': (16.0, 1.9), 'C20/25': (20.0, 2.2),…` – Betonsorten nach SIA 262:2025, Tabelle 3 -- (f_ck, f_ctm) in N/mm^2. Am 2026-11-14 gegen die gedruckte Tabelle geprueft: alle neun stimmen.
 - `ERSTER_BETON = 'C25/30'` – Womit ein neuer Beton anfängt, wenn man in der Oberfläche einen anlegt: C25/30; gibt es den schon, der nächstfestere, und so weiter (Benutzer, 2026-10-15). Nach dem festesten kommen die schwächeren, von unten.
 - `BETON_VORLAGEN = (KennwertVorlage(kurzname='f_ck', symbol='f_{ck}', einheit=N_PRO_MM2,…` – Alle Betonkennwerte in der Reihenfolge, in der sie im Bericht erscheinen.
 

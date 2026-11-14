@@ -1,11 +1,11 @@
 ---
-erzeugt: 2a29e4810cd8
+erzeugt: b094c605668a
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 2.4.2.5"
+normstelle: "SIA 262:2025, 2.4.2.5, (4)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 2.4.2.5
+> SIA 262:2025, 2.4.2.5, (4)
 
 $$
 f_{yd} = \frac{f_{yk}}{\gamma_s}
