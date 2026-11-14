@@ -7,6 +7,53 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Pfähle II: die Steifigkeit als gebetteter Stab
+
+Der Pfahl steht jetzt auch als Stab auf Federn im Boden. Daraus zweierlei:
+
+- Die Federn am Kopf, mit E_s,k: längs auf Druck und auf Zug, quer mit frei
+  drehbarem Kopf, dazu die Steifigkeitsmatrix des eingespannten Kopfs
+  (K_HH, K_HM, K_MM) für ein Modell des Tragwerks darüber. Sie hängen an
+  keiner Kombination und stehen als Kennzahlen in der Zusammenfassung.
+- Je Kombination die Verläufe über die Tiefe mit E_s,k/1.5: Normalkraft,
+  Setzung, Verschiebung, Verdrehung, Moment, Querkraft und Bettungsdruck,
+  als Bilder unter «Diagramme». Die Kombination hat dafür H_Ed und, am frei
+  drehbaren Kopf, M_Ed.
+
+Die Federn des Bodens: am Mantel 0.42·E_s und am Fuss 4.5·E_s nach Cassan
+(Kap. 12.8), quer k_s = E_s/D (SIA 267:2013, 9.5.4.5, (53)), vom Terrain
+bis t_red linear abgemindert. Jede Schicht hat dafür ihr E_s,k.
+
+Warum so:
+
+- Ein kleiner Löser für den Pfahl (`pfahl/bettung.py`) mit den Elementen
+  des Stabwerks: Steifigkeit und Bettungsmatrix stehen nur in
+  `stabwerk/stab.py`, gelöst wird mit dessen Profillöser. Das ganze
+  Stabwerk wäre zu viel: es kennt Lastfälle, Lager und Teilstäbe, der Pfahl
+  ist ein gerader Stab mit einer Last am Kopf.
+- Die Bettungsmatrix des Stabwerks darf quer linear wachsen. Mit Stufen von
+  gleicher Bettung zeigte der Bettungsdruck unter dem Kopf Sägezähne; so
+  steht die Abminderung genau im Modell, und die Knoten richten sich nur
+  nach den Schichtgrenzen und nach t_red.
+- N, M und V aus dem Gleichgewicht der Bettungskräfte, für den Ansatz genau
+  integriert, nicht aus der Krümmung eines Elements: eine Ordnung genauer,
+  und am Fuss schliesst das Gleichgewicht auf Rundungsfehler.
+- Die Federn am Kopf aus einer Probelast von 1 MN -- das System ist linear.
+  K_MM folgt ohne dritte Rechnung aus k_h = K_HH − K_HM²/K_MM.
+- Geprüft gegen die geschlossenen Lösungen: längs Cassan, quer der lange
+  Balken frei, mit Moment und eingespannt, je auf fünf Stellen
+  (`tests/test_pfahl_steifigkeit.py`). Als Vergleich für die lineare
+  Bettung dienen 100 Stufen zu 2 cm; 400 zu 5 mm machten das System schon
+  so schlecht konditioniert, dass die Rundung 1e-4 erreichte.
+- Das Moment am Kopf dreht wie H über dem Kopf (M_0 = H·e). So verrichten H
+  an y und M_0 an θ Arbeit, und K_HM ist negativ.
+- Am eingespannten Kopf zählt M_Ed nicht, das Moment dort ist Reaktion; die
+  Oberfläche blendet das Feld aus, die Herleitung meldet ein eingegebenes.
+- Ohne Boden unter dem Fuss keine Steifigkeit, nur eine Warnung.
+- Nebenbei: die Achsen aller Diagramme schreiben ohne eigene Schrift so
+  viele Nachkommastellen, wie ihr Schritt verlangt. Vorher stand bei 0.5
+  eine 1 -- etwa bei der Verdrehung in mrad.
+
 ## 2026-11-14 · Pfähle I: äusserer und innerer Widerstand
 
 Eine neue App für den Einzelpfahl nach SIA 267:2013, Kapitel 9, gerechnet
@@ -42,7 +89,7 @@ Warum so:
   drainiert und undrainiert, aus dem Versuch, mit Rohr und Vollstab. Einer
   geht absichtlich nicht auf.
 - Was weder Norm noch Buch sagen, steht als Annahme in der Herleitung und in
-  [[TODO]]. Steifigkeit und Querlast folgen.
+  [[TODO]].
 
 ## 2026-11-14 · Normprüfung VII: Durchstanzen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c597824d464
+erzeugt: 2f84df518d35
 art: modul
 tags: [modul]
 ---
@@ -18,10 +18,12 @@ Rechenwerk, und nur die, die nach den Wahlen gelten ([[opencivil.pfahl.pfahl#Pfa
 * [[opencivil.pfahl.pfahl#Grundlage|Grundlage]] -- worauf der äussere Widerstand R_a,k beruht: auf einer
   Berechnung aus den Schichten, auf Erfahrung oder auf einem Versuch, und
   wie gross der Umrechnungsfaktor η_a darum höchstens ist;
-* [[opencivil.pfahl.pfahl#Spitze|Spitze]] und [[opencivil.pfahl.pfahl#Abscheren|Abscheren]] -- ob der Fuss trägt und wie.
+* [[opencivil.pfahl.pfahl#Spitze|Spitze]] und [[opencivil.pfahl.pfahl#Abscheren|Abscheren]] -- ob der Fuss trägt und wie;
+* [[opencivil.pfahl.pfahl#Kopf|Kopf]] -- ob sich der Kopf frei drehen kann oder eingespannt ist.
 
 Gerechnet wird in den Nachweisen: äusserer Widerstand in
-[[opencivil.pfahl.aussen]], innerer in [[opencivil.pfahl.innen]].
+[[opencivil.pfahl.aussen]], innerer in [[opencivil.pfahl.innen]] --
+und die Steifigkeit in [[opencivil.pfahl.steifigkeit]].
 
 
 ## TIEFEN
@@ -205,6 +207,31 @@ def beschriftung(self) -> str
 def erklaerung(self) -> str
 ```
 
+### Kopf
+
+```python
+class Kopf(Wahl)
+```
+
+Wie der Pfahlkopf gehalten ist -- daran hängt, was eine Querkraft mit ihm macht.
+
+- `FREI = 'frei'`
+- `EINGESPANNT = 'eingespannt'`
+
+#### Kopf.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Kopf.erklaerung
+
+```python
+@property
+def erklaerung(self) -> str
+```
+
 ### Kombination
 
 ```python
@@ -212,10 +239,14 @@ def erklaerung(self) -> str
 class Kombination
 ```
 
-Eine Einwirkung auf den Pfahlkopf: die Normalkraft, Druck positiv.
+Eine Einwirkung auf den Pfahlkopf: die Normalkraft, Druck positiv, die
+Querkraft und das Moment -- das Moment dreht wie die Querkraft, wenn sie
+über dem Kopf angreift.
 
 - `name: str`
 - `N_Ed: Groesse`
+- `H_Ed: Groesse = field(default_factory=lambda: Groesse(0.0, KN))`
+- `M_Ed: Groesse = field(default_factory=lambda: Groesse(0.0, KNM))`
 
 #### Kombination.kennung
 
@@ -261,6 +292,8 @@ Siehe Dateikopf.
 - `d_a: Groesse`
 - `t_r: Groesse`
 - `dt: Groesse` – Mikropfahl: Aussendurchmesser und Wanddicke des Tragglieds, Abrostung aussen.
+- `kopf: Kopf`
+- `t_red: Groesse` – Bis in diese Tiefe unter Terrain wächst die Bettung quer von null an.
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
 - `berechnungen: List[Berechnung] = field(default_factory=list, init=False)`
 
@@ -279,6 +312,16 @@ Ueberschrift, unter der der Pfahl in der Herleitung steht.
 @property
 def bohrpfahl(self) -> bool
 ```
+
+#### Pfahl.fuss_traegt
+
+```python
+@property
+def fuss_traegt(self) -> bool
+```
+
+Ob der Fuss trägt: nach der Wahl «Fuss» -- mit R_a,k aus einem Versuch
+immer, der Versuch hat den ganzen Pfahl belastet.
 
 #### Pfahl.baustoffe
 
@@ -348,6 +391,7 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 - [[opencivil.pfahl.achse]]
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]

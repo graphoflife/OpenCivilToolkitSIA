@@ -1,5 +1,5 @@
 ---
-erzeugt: 1a5eeb803ca5
+erzeugt: b6e86286c049
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -55,6 +55,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Äusserer Pfahlwiderstand]] · 21
 - [[Innerer Pfahlwiderstand]] · 12
+- [[Pfahlsteifigkeit]] · 13
 
 **Durchstanzen**
 
@@ -62,6 +63,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Formeln von A bis Z
 
+- [[Abgeminderte Bettung am Terrain]]
 - [[Abstand des Grundwassers unter der Sohle]] · $T$
 - [[Abstand zum Momentennullpunkt]] · $r_{sx}$
 - [[Abstand zum Momentennullpunkt am Plattenrand]] · $r_{sy}$
@@ -95,10 +97,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
 - [[Bemessungswert des Sohlreibungswinkels]] · $\delta_d$
+- [[Bemessungswert des Verformungsmoduls]]
 - [[Beton linear, ohne Zug]]
 - [[Beton ungerissen, in Druck und Zug]]
 - [[Betonstahl nur auf Zug]]
 - [[Bettung eines Stabs]]
+- [[Bettungsmodul quer zum Pfahl]]
 - [[Bewehrung der Lage]] · $A_{s,2,x}$
 - [[Bewehrungsgehalt]] · $\rho_{u}$
 - [[Bewehrungsgehalt der Gegenseite]] · $\rho'_{u}$
@@ -113,6 +117,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegebewehrung im Stützstreifen je Meter]] · $a_{s,x}$
 - [[Biegelinie eines Stabs]]
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
+- [[Biegesteifigkeit des Pfahls]] · $EI$
 - [[Biegewiderstand im Stützstreifen]] · $m_{Rd,x}$
 - [[Bilineare Beziehung des Betonstahls]]
 - [[Breite des Randstreifens an der Eckstütze]] · $b_{s,x}$
@@ -122,11 +127,13 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bruchspannung in der Sohle]] · $\sigma_f$
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]]
 - [[Dehnsteifigkeit]] · $EA_{\text{Q1}}$
+- [[Dehnsteifigkeit des Pfahls]] · $EA$
 - [[Dehnung der Zugbewehrung]] · $\varepsilon_s^{+}$
 - [[Dehnungsebene und innere Kräfte]]
 - [[Dekompressionsmoment]] · $m_{Dd}$
 - [[Dekompressionsmoment und Dehnung]]
 - [[Dickster Stab der Lage]] · $\varnothing_{2,x}$
+- [[Drehfeder des Pfahlkopfs]] · $K_{MM}$
 - [[Drehung in die Achsen des Stabs]]
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
 - [[Druckzonenhöhe im Stützstreifen]] · $x_x$
@@ -140,6 +147,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
 - [[Erweiterte Tragfähigkeitsformel]]
+- [[Feder am Pfahlfuss]] · $K_b$
+- [[Feder am Pfahlmantel]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · $\varnothing_{fikt}$
 - [[Fläche der Längsbewehrung]] · $A_s$
 - [[Fläche des Pfahlquerschnitts]] · $A_b$
@@ -166,6 +175,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Formfaktor s_c]] · $s_c$
 - [[Formfaktor s_q]] · $s_q$
 - [[Formfaktor s_γ]] · $s_{\gamma}$
+- [[Gebetteter Pfahl]]
 - [[Geländeneigungsfaktor g_c]] · $g_c$
 - [[Geländeneigungsfaktor g_q]] · $g_q$
 - [[Gesamtsetzung]] · $s$
@@ -189,6 +199,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Iteration der Ausmitte 2. Ordnung]]
 - [[Kleinerer Widerstand beider Seiten]] · $V_{Rd,max}$
 - [[Kohäsion für örtliches Abscheren]] · $c^{*}$
+- [[Kopplung am Pfahlkopf]] · $K_{HM}$
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · $M_{Rd}(N_{Rd}^{+})$
 - [[Kräftegleichgewicht]] · $N_{Rd}^{+}$
 - [[Kräftegleichgewicht bei M_Ed = 0]]
@@ -196,6 +207,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kürzester Abstand zur Resistenzlinie]] · $a$
 - [[Lage des Punktes längs B]] · $y_K$
 - [[Lage des Punktes längs L]] · $x_K$
+- [[Längsfeder des Pfahlkopfs]] · $k_v$
 - [[Lastneigungsfaktor i_c]] · $i_c$
 - [[Lastneigungsfaktor i_q]] · $i_q$
 - [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
@@ -226,6 +238,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Probe – Moment um y]] · $M_{y,Rd}$
 - [[Probe – Moment um z]] · $M_{z,Rd}$
 - [[Probe – Normalkraft]] · $N_{Rd}$
+- [[Querfeder des eingespannten Pfahlkopfs]] · $K_{HH}$
+- [[Querfeder des frei drehbaren Pfahlkopfs]] · $k_h$
 - [[Querkraft für die Durchstanzbewehrung]] · $V_{d,s}$
 - [[Querkraft über die Federn der Wände]]
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
@@ -317,7 +331,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-88 von 252 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+91 von 265 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -335,9 +349,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegebewehrung im Stützstreifen je Meter]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
 - [[Biegelinie eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Biegesteifigkeit]] · [[opencivil.stabwerk.rechnung|_biegesteifigkeit]]
+- [[Biegesteifigkeit des Pfahls]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit._querschnitt|Pfahlsteifigkeit._querschnitt]]
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._waende_protokollieren]]
 - [[Dehnsteifigkeit]] · [[opencivil.stabwerk.rechnung|_dehnsteifigkeit]]
+- [[Dehnsteifigkeit des Pfahls]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit._querschnitt|Pfahlsteifigkeit._querschnitt]]
 - [[Dickster Stab der Lage]] · [[opencivil.nachweis.mindestbewehrung#_protokoll_stahlspannung|_protokoll_stahlspannung]]
+- [[Drehfeder des Pfahlkopfs]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit|Pfahlsteifigkeit._federn]]
 - [[Drehung in die Achsen des Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#Balkensystem._eigengewicht|_eigengewicht]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]

@@ -323,11 +323,11 @@ class TestAngabengruppen(unittest.TestCase):
     def test_zwei_kaesten_statt_vier_zeilen(self):
         gruppen = self.gruppen()
         # Zwei Kästen der Platte, einer des Unterzugs, vier des Fundaments,
-        # sechs seiner Setzung und sieben des Pfahls -- das «Fundament» der
+        # sechs seiner Setzung und acht des Pfahls -- das «Fundament» der
         # Setzung heisst wie das des Grundbruchs, die dritte Schicht des
         # Pfahls wie die der Setzung; sie stehen hier je in einer Liste.
         self.assertEqual(sorted(gruppen),
-                         ["Abmessungen – Beton C30/37", "Boden", "Bruttoquerschnitt",
+                         ["Abmessungen – Beton C30/37", "Bettung", "Boden", "Bruttoquerschnitt",
                           "Fundament", "Gelände und Grundwasser", "Grundwasser", "Nachweis",
                           "Pfahl", "Pressung in der Sohle", "Querschnitt",
                           "Schicht 1: Auffüllung", "Schicht 1: Kies, sandig",
@@ -532,8 +532,10 @@ class TestAngabengruppen(unittest.TestCase):
             *(f"setzung.w1.{n}" for n in ("B", "L", "q_W", "q_E", "s_zul", "dz")),
             *(f"setzung.w1.{n}_{i}" for i in (1, 2, 3) for n in ("d", "M_E", "M_E_strich")),
             *(f"pfahl.t1.{n}" for n in (
-                "D", "L", "t_K", "t_w", "gamma_w", "n", "phi_l", "c", "phi_w", "eta_i", "eta_a")),
-            *(f"pfahl.t1.{n}_{i}" for i in (1, 2, 3) for n in ("d", "gamma", "phi_k", "c_k")),
+                "D", "L", "t_K", "t_w", "gamma_w", "n", "phi_l", "c", "phi_w", "eta_i", "eta_a",
+                "t_red")),
+            *(f"pfahl.t1.{n}_{i}" for i in (1, 2, 3)
+              for n in ("d", "gamma", "phi_k", "c_k", "E_s")),
             "pfahl.t1.q_s_1",
             *(f"pfahl.t1.{n}_{i}" for i in (2, 3) for n in ("K", "delta_faktor")),
         })

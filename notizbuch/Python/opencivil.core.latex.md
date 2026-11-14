@@ -1,5 +1,5 @@
 ---
-erzeugt: 649bf6fbde30
+erzeugt: ac0bc5c2fa7f
 art: modul
 tags: [modul]
 ---
@@ -453,6 +453,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.pfahl.achse]]
 - [[opencivil.pfahl.aussen]]
+- [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]

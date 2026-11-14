@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-623 Berechnungen ausgeführt, 910 Werte bestimmt.
+635 Berechnungen ausgeführt, 937 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -8116,6 +8116,9 @@ Kohäsion der Schicht 1, charakteristisch
 Mantelreibung in der Schicht 1, charakteristisch
     q_{s,k,1} = 0\,\mathrm{kPa}
 
+Verformungsmodul der Schicht 1, charakteristisch
+    E_{s,k,1} = 8\,\mathrm{MN}/\mathrm{m}^{2}
+
 Dicke der Schicht 2
     d_{2} = 7\,\mathrm{m}
 
@@ -8134,6 +8137,9 @@ Erddruckbeiwert am Mantel in der Schicht 2   [Kap. 12.5]
 Reibungswinkel Pfahl–Boden in der Schicht 2, als Teil von φ'_k   [Kap. 12.5]
     k_{\delta,2} = 1
 
+Verformungsmodul der Schicht 2, charakteristisch
+    E_{s,k,2} = 50\,\mathrm{MN}/\mathrm{m}^{2}
+
 Dicke der Schicht 3
     d_{3} = 20\,\mathrm{m}
 
@@ -8151,6 +8157,9 @@ Erddruckbeiwert am Mantel in der Schicht 3   [Kap. 12.5]
 
 Reibungswinkel Pfahl–Boden in der Schicht 3, als Teil von φ'_k   [Kap. 12.5]
     k_{\delta,3} = 0.8
+
+Verformungsmodul der Schicht 3, charakteristisch
+    E_{s,k,3} = 100\,\mathrm{MN}/\mathrm{m}^{2}
 
 Äusserer Widerstand
 -------------------
@@ -8394,6 +8403,126 @@ Einwirkung gegen Widerstand auf Zug
 Erfüllungsgrad
     \alpha_{eff,i,\text{Zug}} = \frac{R_{i,d,Z}}{Z_{Ed}} = \frac{1311\,\mathrm{kN}}{300\,\mathrm{kN}} = 4.37 \quad \Rightarrow \quad \text{erfüllt}
 
+Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst   [SIA 267:2013, 9.5.4.5]
+    t_{red} = 2\,\mathrm{m}
+
+Steifigkeit
+-----------
+
+Querschnitt
+-----------
+[*] Annahme: Der Beton ungerissen und ohne die Bewehrung, mit E_cm -- nach Vorgabe, nicht
+nachgeschlagen. Gerissen ist der Pfahl weicher: die Verschiebungen werden grösser, die Momente etwas
+kleiner.
+
+Dehnsteifigkeit des Pfahls
+    EA = E_{cm} \cdot \frac{\pi \cdot D^{2}}{4} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\pi \cdot \left(900\,\mathrm{mm}\right)^{2}}{4} = 21388\,\mathrm{MN}
+
+Biegesteifigkeit des Pfahls
+    EI = E_{cm} \cdot \frac{\pi \cdot D^{4}}{64} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\pi \cdot \left(900\,\mathrm{mm}\right)^{4}}{64} = 1082.8\,\mathrm{MNm}^{2}
+
+Bettung
+-------
+
+Feder am Mantel je Meter Pfahl, für Bohrpfähle   [Kap. 12.8, Bild 12.9]
+    k_l = B \cdot \pi \cdot D \qquad B = 0.42 \cdot E_{s,k}
+
+Bettung quer, je Meter Pfahl   [SIA 267:2013, 9.5.4.5, (53)]
+    k_s = \frac{E_{s,k}}{D} \qquad k_s \cdot D = E_{s,k}
+
+Bettung quer nahe dem Terrain abgemindert, z ab Terrain   [SIA 267:2013, 9.5.4.5]
+    k_s(z) = k_s \cdot \min\left(1;\ \frac{z}{t_{red}}\right)
+[*] Annahme: Wie die Bettung nahe dem Terrain abnimmt, sagt die Norm nicht; hier linear von null am
+Terrain bis zum vollen Wert in t_red -- nach Vorgabe, nicht nachgeschlagen. An der Oberfläche stützt
+der Boden nicht (Kap. 12.10, Bild 12.14).
+
+Federn je Schicht, charakteristisch, ohne Abminderung
+    Schicht          z_o\ [\mathrm{m}]  z_u\ [\mathrm{m}]  E_{s,k}\ [\mathrm{MN/m^2}]  k_l\ [\mathrm{MN/m^2}]  k_s\ [\mathrm{MN/m^3}]
+    ---------------  -----------------  -----------------  --------------------------  ----------------------  ----------------------
+    1: Auffüllung                 1.00               2.50                           8                     0.0                     8.9
+    2: Kies, sandig               2.50               9.50                          50                    59.4                    55.6
+    3: Moräne                     9.50              13.00                         100                   118.8                   111.1
+
+Schicht 1: die Mantelreibung ist null eingegeben, der Mantel trägt dort nicht -- auch längs keine
+Feder. Cassan zählt nur die Schicht, in der der Pfahl trägt (Kap. 12.8, Bild 12.9).
+
+Feder am Fuss, in Schicht 3: A_b · R / D mit R = 4.5 · E_s,k   [Kap. 12.8, Bild 12.9]
+    K_b = \frac{\pi \cdot D \cdot 4.5 \cdot E_{s,k,3}}{4} = \frac{\pi \cdot 900\,\mathrm{mm} \cdot 4.5 \cdot 100\,\mathrm{MN}/\mathrm{m}^{2}}{4} = 318.1\,\mathrm{MN}/\mathrm{m}
+
+Der Fuss drückt nur: auf Zug hat er keine Feder.
+
+Federn am Kopf
+--------------
+
+Gebetteter Stab: längs die Setzung w, quer die Verschiebung y   [Kap. 12.8, Bild 12.9; Kap. 12.10, Bild 12.14]
+    EA \cdot w'' = k_l \cdot w \qquad EI \cdot y'''' = -k_s \cdot D \cdot y
+
+Gelöst mit finiten Elementen: Knoten an jeder Grenze einer Schicht und bei t_red, dazwischen gleich
+weit, längs mit linearem, quer mit kubischem Ansatz; die abgeminderte Bettung wächst in jedem
+Element linear. Mit dem charakteristischen Verformungsmodul (SIA 267:2013, 5.3.2.8), unter einer
+Probelast von 1 MN am Kopf -- das System ist linear, jede Last gibt dieselbe Feder.
+
+Länge der Elemente, höchstens
+    \Delta z = 0.1\,\mathrm{m}
+
+Setzung des Kopfs unter 1 MN Druck
+    w_0 = 1.189\,\mathrm{mm}
+
+Längsfeder auf Druck   [Kap. 12.8, Bild 12.9]
+    k_v = \frac{1\,\mathrm{MN}}{w_0} = \frac{1\,\mathrm{MN}}{1.189\,\mathrm{mm}} = 841\,\mathrm{MN}/\mathrm{m}
+
+Setzung des Kopfs unter 1 MN Zug
+    w_{0,Z} = 1.472\,\mathrm{mm}
+
+Längsfeder auf Zug   [Kap. 12.8, Bild 12.9]
+    k_{v,Z} = \frac{1\,\mathrm{MN}}{w_{0,Z}} = \frac{1\,\mathrm{MN}}{1.472\,\mathrm{mm}} = 679\,\mathrm{MN}/\mathrm{m}
+
+Verschiebung des frei drehbaren Kopfs unter H = 1 MN
+    y_0 = 27.751\,\mathrm{mm}
+
+Querfeder, Kopf frei drehbar   [Kap. 12.10, Bild 12.14]
+    k_h = \frac{1\,\mathrm{MN}}{y_0} = \frac{1\,\mathrm{MN}}{27.751\,\mathrm{mm}} = 36.03\,\mathrm{MN}/\mathrm{m}
+
+Verschiebung des eingespannten Kopfs unter H = 1 MN
+    y_{0,E} = 10.534\,\mathrm{mm}
+
+Moment am eingespannten Kopf unter H = 1 MN
+    M_{0,E} = -2.118\,\mathrm{MNm}
+
+Querfeder, Kopf eingespannt   [Kap. 12.10, Bild 12.14]
+    K_{HH} = \frac{1\,\mathrm{MN}}{y_{0,E}} = \frac{1\,\mathrm{MN}}{10.534\,\mathrm{mm}} = 94.93\,\mathrm{MN}/\mathrm{m}
+
+Kopplung: das Moment am eingespannten Kopf je Verschiebung   [Kap. 12.10, Bild 12.14]
+    K_{HM} = \frac{M_{0,E}}{y_{0,E}} = \frac{-2.118\,\mathrm{MNm}}{10.534\,\mathrm{mm}} = -201.09\,\mathrm{MN}
+
+Drehfeder, Kopf nicht verschoben: aus k_h = K_HH − K_HM² / K_MM
+    K_{MM} = \frac{K_{HM}^{2}}{K_{HH} - k_h} = \frac{\left(-201.09\,\mathrm{MN}\right)^{2}}{94.93\,\mathrm{MN}/\mathrm{m} - 36.03\,\mathrm{MN}/\mathrm{m}} = 686.64\,\mathrm{MNm}/\mathrm{rad}
+
+K_HH, K_HM und K_MM bilden die Steifigkeitsmatrix des Kopfs: H = K_HH · y + K_HM · θ, M = K_HM · y +
+K_MM · θ. Das Moment dreht wie H, wenn es über dem Kopf angreift; K_HM ist darum negativ.
+
+Verformungen und Schnittkräfte je Kombination
+---------------------------------------------
+
+Verformungsmodul der Tragsicherheit: hier führt zu wenig Steifigkeit zum Versagen   [SIA 267:2013, 5.3.2.5]
+    E_{s,d} = \frac{E_{s,k}}{\gamma_E} \qquad \gamma_E = 1.5
+[*] Annahme: γ_E = 1.5 ist der kleinste Wert, den die Norm zulässt; sie verlangt ihn objektbezogen
+-- nach Vorgabe, nicht nachgeschlagen.
+[*] Annahme: Längs und quer getrennt: die Normalkraft verstärkt die Biegung nicht. Wächst die
+Wirkung nicht im Mass der Last, etwa durch Effekte zweiter Ordnung, verlangt die Norm eine eigene
+Untersuchung (SIA 267:2013, 9.5.3.4.3) -- hier nach Vorgabe, nicht nachgeschlagen, ohne sie.
+
+Längs: Setzung des Kopfs und Kraft am Fuss
+    Kombination  N_{Ed}\ [\mathrm{kN}]  w_0\ [\mathrm{mm}]  N_b\ [\mathrm{kN}]
+    -----------  ---------------------  ------------------  ------------------
+    Druck                         2000                3.25                 520
+    Zug                           -300               -0.62                   0
+
+Quer: am Kopf und die grössten Werte über die Tiefe, z ab Terrain
+    Kombination  H_{Ed}\ [\mathrm{kN}]  M_{Ed}\ [\mathrm{kNm}]  y_0\ [\mathrm{mm}]  \theta_0\ [\mathrm{mrad}]  M_{max}\ [\mathrm{kNm}]  z\ [\mathrm{m}]  |V|_{max}\ [\mathrm{kN}]  |p|_{max}\ [\mathrm{kN/m^2}]
+    -----------  ---------------------  ----------------------  ------------------  -------------------------  -----------------------  ---------------  ------------------------  ----------------------------
+    Druck                        150.0                    80.0                6.05                       1.75                    353.5             3.80                     150.0                           133
+
 Pfahl: Ton, undrainiert
 -----------------------
 
@@ -8427,6 +8556,9 @@ Undrainierte Scherfestigkeit der Schicht 1, charakteristisch
 Adhäsion in der Schicht 1, als Teil von s_u,k   [Kap. 12.5]
     \alpha_{1} = 0.6
 
+Verformungsmodul der Schicht 1, charakteristisch
+    E_{s,k,1} = 6\,\mathrm{MN}/\mathrm{m}^{2}
+
 Dicke der Schicht 2
     d_{2} = 20\,\mathrm{m}
 
@@ -8438,6 +8570,9 @@ Undrainierte Scherfestigkeit der Schicht 2, charakteristisch
 
 Adhäsion in der Schicht 2, als Teil von s_u,k   [Kap. 12.5]
     \alpha_{2} = 0.9
+
+Verformungsmodul der Schicht 2, charakteristisch
+    E_{s,k,2} = 40\,\mathrm{MN}/\mathrm{m}^{2}
 
 Äusserer Widerstand
 -------------------
@@ -8626,6 +8761,123 @@ Einwirkung gegen Widerstand auf Druck
 
 Erfüllungsgrad
     \alpha_{eff,i,\text{Druck}} = \frac{R_{i,d}}{N_{Ed}} = \frac{20678\,\mathrm{kN}}{6000\,\mathrm{kN}} = 3.45 \quad \Rightarrow \quad \text{erfüllt}
+
+Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst   [SIA 267:2013, 9.5.4.5]
+    t_{red} = 2\,\mathrm{m}
+
+Steifigkeit
+-----------
+
+Querschnitt
+-----------
+[*] Annahme: Der Beton ungerissen und ohne die Bewehrung, mit E_cm -- nach Vorgabe, nicht
+nachgeschlagen. Gerissen ist der Pfahl weicher: die Verschiebungen werden grösser, die Momente etwas
+kleiner.
+
+Dehnsteifigkeit des Pfahls
+    EA = E_{cm} \cdot \frac{\pi \cdot D^{2}}{4} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\pi \cdot \left(1200\,\mathrm{mm}\right)^{2}}{4} = 38023\,\mathrm{MN}
+
+Biegesteifigkeit des Pfahls
+    EI = E_{cm} \cdot \frac{\pi \cdot D^{4}}{64} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\pi \cdot \left(1200\,\mathrm{mm}\right)^{4}}{64} = 3422.1\,\mathrm{MNm}^{2}
+
+Bettung
+-------
+
+Feder am Mantel je Meter Pfahl, für Bohrpfähle   [Kap. 12.8, Bild 12.9]
+    k_l = B \cdot \pi \cdot D \qquad B = 0.42 \cdot E_{s,k}
+
+Bettung quer, je Meter Pfahl   [SIA 267:2013, 9.5.4.5, (53)]
+    k_s = \frac{E_{s,k}}{D} \qquad k_s \cdot D = E_{s,k}
+
+Bettung quer nahe dem Terrain abgemindert, z ab Terrain   [SIA 267:2013, 9.5.4.5]
+    k_s(z) = k_s \cdot \min\left(1;\ \frac{z}{t_{red}}\right)
+[*] Annahme: Wie die Bettung nahe dem Terrain abnimmt, sagt die Norm nicht; hier linear von null am
+Terrain bis zum vollen Wert in t_red -- nach Vorgabe, nicht nachgeschlagen. An der Oberfläche stützt
+der Boden nicht (Kap. 12.10, Bild 12.14).
+
+Federn je Schicht, charakteristisch, ohne Abminderung
+    Schicht        z_o\ [\mathrm{m}]  z_u\ [\mathrm{m}]  E_{s,k}\ [\mathrm{MN/m^2}]  k_l\ [\mathrm{MN/m^2}]  k_s\ [\mathrm{MN/m^3}]
+    -------------  -----------------  -----------------  --------------------------  ----------------------  ----------------------
+    1: Seeton                   0.50               8.00                           6                     9.5                     5.0
+    2: Ton, steif               8.00              15.50                          40                    63.3                    33.3
+
+Feder am Fuss, in Schicht 2: A_b · R / D mit R = 4.5 · E_s,k   [Kap. 12.8, Bild 12.9]
+    K_b = \frac{\pi \cdot D \cdot 4.5 \cdot E_{s,k,2}}{4} = \frac{\pi \cdot 1200\,\mathrm{mm} \cdot 4.5 \cdot 40\,\mathrm{MN}/\mathrm{m}^{2}}{4} = 169.6\,\mathrm{MN}/\mathrm{m}
+
+Der Fuss drückt nur: auf Zug hat er keine Feder.
+
+Federn am Kopf
+--------------
+
+Gebetteter Stab: längs die Setzung w, quer die Verschiebung y   [Kap. 12.8, Bild 12.9; Kap. 12.10, Bild 12.14]
+    EA \cdot w'' = k_l \cdot w \qquad EI \cdot y'''' = -k_s \cdot D \cdot y
+
+Gelöst mit finiten Elementen: Knoten an jeder Grenze einer Schicht und bei t_red, dazwischen gleich
+weit, längs mit linearem, quer mit kubischem Ansatz; die abgeminderte Bettung wächst in jedem
+Element linear. Mit dem charakteristischen Verformungsmodul (SIA 267:2013, 5.3.2.8), unter einer
+Probelast von 1 MN am Kopf -- das System ist linear, jede Last gibt dieselbe Feder.
+
+Länge der Elemente, höchstens
+    \Delta z = 0.1\,\mathrm{m}
+
+Setzung des Kopfs unter 1 MN Druck
+    w_0 = 1.643\,\mathrm{mm}
+
+Längsfeder auf Druck   [Kap. 12.8, Bild 12.9]
+    k_v = \frac{1\,\mathrm{MN}}{w_0} = \frac{1\,\mathrm{MN}}{1.643\,\mathrm{mm}} = 609\,\mathrm{MN}/\mathrm{m}
+
+Setzung des Kopfs unter 1 MN Zug
+    w_{0,Z} = 2.051\,\mathrm{mm}
+
+Längsfeder auf Zug   [Kap. 12.8, Bild 12.9]
+    k_{v,Z} = \frac{1\,\mathrm{MN}}{w_{0,Z}} = \frac{1\,\mathrm{MN}}{2.051\,\mathrm{mm}} = 488\,\mathrm{MN}/\mathrm{m}
+
+Verschiebung des frei drehbaren Kopfs unter H = 1 MN
+    y_0 = 54.605\,\mathrm{mm}
+
+Querfeder, Kopf frei drehbar   [Kap. 12.10, Bild 12.14]
+    k_h = \frac{1\,\mathrm{MN}}{y_0} = \frac{1\,\mathrm{MN}}{54.605\,\mathrm{mm}} = 18.31\,\mathrm{MN}/\mathrm{m}
+
+Verschiebung des eingespannten Kopfs unter H = 1 MN
+    y_{0,E} = 22.988\,\mathrm{mm}
+
+Moment am eingespannten Kopf unter H = 1 MN
+    M_{0,E} = -3.926\,\mathrm{MNm}
+
+Querfeder, Kopf eingespannt   [Kap. 12.10, Bild 12.14]
+    K_{HH} = \frac{1\,\mathrm{MN}}{y_{0,E}} = \frac{1\,\mathrm{MN}}{22.988\,\mathrm{mm}} = 43.5\,\mathrm{MN}/\mathrm{m}
+
+Kopplung: das Moment am eingespannten Kopf je Verschiebung   [Kap. 12.10, Bild 12.14]
+    K_{HM} = \frac{M_{0,E}}{y_{0,E}} = \frac{-3.926\,\mathrm{MNm}}{22.988\,\mathrm{mm}} = -170.8\,\mathrm{MN}
+
+Drehfeder, Kopf nicht verschoben: aus k_h = K_HH − K_HM² / K_MM
+    K_{MM} = \frac{K_{HM}^{2}}{K_{HH} - k_h} = \frac{\left(-170.8\,\mathrm{MN}\right)^{2}}{43.5\,\mathrm{MN}/\mathrm{m} - 18.31\,\mathrm{MN}/\mathrm{m}} = 1158.19\,\mathrm{MNm}/\mathrm{rad}
+
+K_HH, K_HM und K_MM bilden die Steifigkeitsmatrix des Kopfs: H = K_HH · y + K_HM · θ, M = K_HM · y +
+K_MM · θ. Das Moment dreht wie H, wenn es über dem Kopf angreift; K_HM ist darum negativ.
+
+Verformungen und Schnittkräfte je Kombination
+---------------------------------------------
+
+Verformungsmodul der Tragsicherheit: hier führt zu wenig Steifigkeit zum Versagen   [SIA 267:2013, 5.3.2.5]
+    E_{s,d} = \frac{E_{s,k}}{\gamma_E} \qquad \gamma_E = 1.5
+[*] Annahme: γ_E = 1.5 ist der kleinste Wert, den die Norm zulässt; sie verlangt ihn objektbezogen
+-- nach Vorgabe, nicht nachgeschlagen.
+[*] Annahme: Längs und quer getrennt: die Normalkraft verstärkt die Biegung nicht. Wächst die
+Wirkung nicht im Mass der Last, etwa durch Effekte zweiter Ordnung, verlangt die Norm eine eigene
+Untersuchung (SIA 267:2013, 9.5.3.4.3) -- hier nach Vorgabe, nicht nachgeschlagen, ohne sie.
+[i] Hinweis: Druck: der Kopf ist eingespannt -- M_Ed = 200.0 kNm zählt nicht, das Moment am Kopf ist
+die Reaktion.
+
+Längs: Setzung des Kopfs und Kraft am Fuss
+    Kombination  N_{Ed}\ [\mathrm{kN}]  w_0\ [\mathrm{mm}]  N_b\ [\mathrm{kN}]
+    -----------  ---------------------  ------------------  ------------------
+    Druck                         6000               14.06                1388
+
+Quer: am Kopf und die grössten Werte über die Tiefe, z ab Terrain
+    Kombination  H_{Ed}\ [\mathrm{kN}]  M_{Ed}\ [\mathrm{kNm}]  y_0\ [\mathrm{mm}]  \theta_0\ [\mathrm{mrad}]  M_{max}\ [\mathrm{kNm}]  z\ [\mathrm{m}]  |V|_{max}\ [\mathrm{kN}]  |p|_{max}\ [\mathrm{kN/m^2}]
+    -----------  ---------------------  ----------------------  ------------------  -------------------------  -----------------------  ---------------  ------------------------  ----------------------------
+    Druck                        300.0                       –                9.03                       0.00                  -1311.9             0.50                     300.0                            77
 
 Pfahl: Mikropfahl, Versuch
 --------------------------
@@ -8821,6 +9073,9 @@ Kohäsion der Schicht 1, charakteristisch
 Mantelreibung in der Schicht 1, charakteristisch
     q_{s,k,1} = 120\,\mathrm{kPa}
 
+Verformungsmodul der Schicht 1, charakteristisch
+    E_{s,k,1} = 80\,\mathrm{MN}/\mathrm{m}^{2}
+
 Äusserer Widerstand
 -------------------
 
@@ -8968,6 +9223,121 @@ Einwirkung gegen Widerstand auf Zug
 
 Erfüllungsgrad
     \alpha_{eff,i,\text{Zug}} = \frac{R_{i,d,Z}}{Z_{Ed}} = \frac{354\,\mathrm{kN}}{150\,\mathrm{kN}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
+
+Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst   [SIA 267:2013, 9.5.4.5]
+    t_{red} = 2\,\mathrm{m}
+
+Steifigkeit
+-----------
+
+Querschnitt
+-----------
+[*] Annahme: Es trägt nur das Tragglied, nach der Abrostung; der Mörtel zählt nicht -- nach Vorgabe,
+nicht nachgeschlagen, wie beim inneren Widerstand.
+
+Dehnsteifigkeit des Pfahls
+    EA = E_s \cdot \frac{\pi \cdot \left(\varnothing - 2 \cdot \Delta t\right)^{2}}{4} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\pi \cdot \left(40\,\mathrm{mm} - 2 \cdot 2\,\mathrm{mm}\right)^{2}}{4} = 204\,\mathrm{MN}
+
+Biegesteifigkeit des Pfahls
+    EI = E_s \cdot \frac{\pi \cdot \left(\varnothing - 2 \cdot \Delta t\right)^{4}}{64} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\pi \cdot \left(40\,\mathrm{mm} - 2 \cdot 2\,\mathrm{mm}\right)^{4}}{64} = 0\,\mathrm{MNm}^{2}
+
+Bettung
+-------
+
+Feder am Mantel je Meter Pfahl, für Bohrpfähle   [Kap. 12.8, Bild 12.9]
+    k_l = B \cdot \pi \cdot D \qquad B = 0.42 \cdot E_{s,k}
+
+Bettung quer, je Meter Pfahl   [SIA 267:2013, 9.5.4.5, (53)]
+    k_s = \frac{E_{s,k}}{D} \qquad k_s \cdot D = E_{s,k}
+
+Bettung quer nahe dem Terrain abgemindert, z ab Terrain   [SIA 267:2013, 9.5.4.5]
+    k_s(z) = k_s \cdot \min\left(1;\ \frac{z}{t_{red}}\right)
+[*] Annahme: Wie die Bettung nahe dem Terrain abnimmt, sagt die Norm nicht; hier linear von null am
+Terrain bis zum vollen Wert in t_red -- nach Vorgabe, nicht nachgeschlagen. An der Oberfläche stützt
+der Boden nicht (Kap. 12.10, Bild 12.14).
+[*] Annahme: Cassans Federn gelten für Bohrpfähle; der Mikropfahl rechnet mit denselben -- nach
+Vorgabe, nicht nachgeschlagen.
+
+Federn je Schicht, charakteristisch, ohne Abminderung
+    Schicht  z_o\ [\mathrm{m}]  z_u\ [\mathrm{m}]  E_{s,k}\ [\mathrm{MN/m^2}]  k_l\ [\mathrm{MN/m^2}]  k_s\ [\mathrm{MN/m^3}]
+    -------  -----------------  -----------------  --------------------------  ----------------------  ----------------------
+    1: Kies               0.00               6.00                          80                    15.8                   533.3
+
+Feder am Fuss, in Schicht 1: A_b · R / D mit R = 4.5 · E_s,k   [Kap. 12.8, Bild 12.9]
+    K_b = \frac{\pi \cdot D \cdot 4.5 \cdot E_{s,k,1}}{4} = \frac{\pi \cdot 150\,\mathrm{mm} \cdot 4.5 \cdot 80\,\mathrm{MN}/\mathrm{m}^{2}}{4} = 42.4\,\mathrm{MN}/\mathrm{m}
+
+Der Fuss drückt nur: auf Zug hat er keine Feder.
+
+Federn am Kopf
+--------------
+
+Gebetteter Stab: längs die Setzung w, quer die Verschiebung y   [Kap. 12.8, Bild 12.9; Kap. 12.10, Bild 12.14]
+    EA \cdot w'' = k_l \cdot w \qquad EI \cdot y'''' = -k_s \cdot D \cdot y
+
+Gelöst mit finiten Elementen: Knoten an jeder Grenze einer Schicht und bei t_red, dazwischen gleich
+weit, längs mit linearem, quer mit kubischem Ansatz; die abgeminderte Bettung wächst in jedem
+Element linear. Mit dem charakteristischen Verformungsmodul (SIA 267:2013, 5.3.2.8), unter einer
+Probelast von 1 MN am Kopf -- das System ist linear, jede Last gibt dieselbe Feder.
+
+Länge der Elemente, höchstens
+    \Delta z = 0.034\,\mathrm{m}
+
+Setzung des Kopfs unter 1 MN Druck
+    w_0 = 17.794\,\mathrm{mm}
+
+Längsfeder auf Druck   [Kap. 12.8, Bild 12.9]
+    k_v = \frac{1\,\mathrm{MN}}{w_0} = \frac{1\,\mathrm{MN}}{17.794\,\mathrm{mm}} = 56\,\mathrm{MN}/\mathrm{m}
+
+Setzung des Kopfs unter 1 MN Zug
+    w_{0,Z} = 18.899\,\mathrm{mm}
+
+Längsfeder auf Zug   [Kap. 12.8, Bild 12.9]
+    k_{v,Z} = \frac{1\,\mathrm{MN}}{w_{0,Z}} = \frac{1\,\mathrm{MN}}{18.899\,\mathrm{mm}} = 53\,\mathrm{MN}/\mathrm{m}
+
+Verschiebung des frei drehbaren Kopfs unter H = 1 MN
+    y_0 = 1371.953\,\mathrm{mm}
+
+Querfeder, Kopf frei drehbar   [Kap. 12.10, Bild 12.14]
+    k_h = \frac{1\,\mathrm{MN}}{y_0} = \frac{1\,\mathrm{MN}}{1371.953\,\mathrm{mm}} = 0.73\,\mathrm{MN}/\mathrm{m}
+
+Verschiebung des eingespannten Kopfs unter H = 1 MN
+    y_{0,E} = 524.039\,\mathrm{mm}
+
+Moment am eingespannten Kopf unter H = 1 MN
+    M_{0,E} = -0.195\,\mathrm{MNm}
+
+Querfeder, Kopf eingespannt   [Kap. 12.10, Bild 12.14]
+    K_{HH} = \frac{1\,\mathrm{MN}}{y_{0,E}} = \frac{1\,\mathrm{MN}}{524.039\,\mathrm{mm}} = 1.91\,\mathrm{MN}/\mathrm{m}
+
+Kopplung: das Moment am eingespannten Kopf je Verschiebung   [Kap. 12.10, Bild 12.14]
+    K_{HM} = \frac{M_{0,E}}{y_{0,E}} = \frac{-0.195\,\mathrm{MNm}}{524.039\,\mathrm{mm}} = -0.37\,\mathrm{MN}
+
+Drehfeder, Kopf nicht verschoben: aus k_h = K_HH − K_HM² / K_MM
+    K_{MM} = \frac{K_{HM}^{2}}{K_{HH} - k_h} = \frac{\left(-0.37\,\mathrm{MN}\right)^{2}}{1.91\,\mathrm{MN}/\mathrm{m} - 0.73\,\mathrm{MN}/\mathrm{m}} = 0.12\,\mathrm{MNm}/\mathrm{rad}
+
+K_HH, K_HM und K_MM bilden die Steifigkeitsmatrix des Kopfs: H = K_HH · y + K_HM · θ, M = K_HM · y +
+K_MM · θ. Das Moment dreht wie H, wenn es über dem Kopf angreift; K_HM ist darum negativ.
+
+Verformungen und Schnittkräfte je Kombination
+---------------------------------------------
+
+Verformungsmodul der Tragsicherheit: hier führt zu wenig Steifigkeit zum Versagen   [SIA 267:2013, 5.3.2.5]
+    E_{s,d} = \frac{E_{s,k}}{\gamma_E} \qquad \gamma_E = 1.5
+[*] Annahme: γ_E = 1.5 ist der kleinste Wert, den die Norm zulässt; sie verlangt ihn objektbezogen
+-- nach Vorgabe, nicht nachgeschlagen.
+[*] Annahme: Längs und quer getrennt: die Normalkraft verstärkt die Biegung nicht. Wächst die
+Wirkung nicht im Mass der Last, etwa durch Effekte zweiter Ordnung, verlangt die Norm eine eigene
+Untersuchung (SIA 267:2013, 9.5.3.4.3) -- hier nach Vorgabe, nicht nachgeschlagen, ohne sie.
+
+Längs: Setzung des Kopfs und Kraft am Fuss
+    Kombination  N_{Ed}\ [\mathrm{kN}]  w_0\ [\mathrm{mm}]  N_b\ [\mathrm{kN}]
+    -----------  ---------------------  ------------------  ------------------
+    Zug                           -150               -3.69                   0
+
+Quer: am Kopf und die grössten Werte über die Tiefe, z ab Terrain
+    Kombination  H_{Ed}\ [\mathrm{kN}]  M_{Ed}\ [\mathrm{kNm}]  y_0\ [\mathrm{mm}]  \theta_0\ [\mathrm{mrad}]  M_{max}\ [\mathrm{kNm}]  z\ [\mathrm{m}]  |V|_{max}\ [\mathrm{kN}]  |p|_{max}\ [\mathrm{kN/m^2}]
+    -----------  ---------------------  ----------------------  ------------------  -------------------------  -----------------------  ---------------  ------------------------  ----------------------------
+    Zug                            5.0                     0.0                8.75                      25.56                      0.9             0.30                       5.0                           143
 
 Balkensystem: Alles einmal
 --------------------------
@@ -11149,6 +11519,61 @@ Schnittgrössen aus den Kräften an den Stabenden
 Biegelinie und Längsverschiebung
     v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
 
+Pfahlsteifigkeit
+----------------
+
+Der Pfahl steht im Boden wie ein Stab auf Federn. Längs halten ihn die Reibung am Mantel und der
+Druck am Fuss, quer drückt er gegen den Boden neben sich. Wie stark die Federn sind, folgt aus dem
+Verformungsmodul der Schichten: am Mantel und am Fuss nach Cassan, quer nach der Norm. Die Federn am
+Kopf -- wie weit er sich unter einer Last setzt, verschiebt und dreht -- braucht das Modell des
+Tragwerks darüber; sie gelten mit dem charakteristischen Modul. Für die Schnittkräfte rechnet die
+Norm mit einem kleineren: in weicherem Boden weicht der Pfahl weiter aus und biegt sich stärker.
+
+Dehnsteifigkeit des Pfahls
+    EA = E_{cm} \cdot \frac{\pi \cdot D^{2}}{4}
+
+Biegesteifigkeit des Pfahls
+    EI = E_{cm} \cdot \frac{\pi \cdot D^{4}}{64}
+
+Feder am Mantel je Meter Pfahl, für Bohrpfähle   [Kap. 12.8, Bild 12.9]
+    k_l = B \cdot \pi \cdot D \qquad B = 0.42 \cdot E_{s,k}
+
+Bettung quer, je Meter Pfahl   [SIA 267:2013, 9.5.4.5, (53)]
+    k_s = \frac{E_{s,k}}{D} \qquad k_s \cdot D = E_{s,k}
+
+Bettung quer nahe dem Terrain abgemindert, z ab Terrain   [SIA 267:2013, 9.5.4.5]
+    k_s(z) = k_s \cdot \min\left(1;\ \frac{z}{t_{red}}\right)
+
+Feder am Fuss, in Schicht 3: A_b · R / D mit R E_s,k   [Kap. 12.8, Bild 12.9]
+    K_b = \frac{\pi \cdot D \cdot 4.5 \cdot E_{s,k,3}}{4}
+
+Gebetteter Stab: längs die Setzung w, quer die Verschiebung y   [Kap. 12.8, Bild 12.9; Kap. 12.10, Bild 12.14]
+    EA \cdot w'' = k_l \cdot w \qquad EI \cdot y'''' = -k_s \cdot D \cdot y
+
+Längsfeder auf Druck   [Kap. 12.8, Bild 12.9]
+    k_v = \frac{1\,\mathrm{MN}}{w_0}
+
+Querfeder, Kopf frei drehbar   [Kap. 12.10, Bild 12.14]
+    k_h = \frac{1\,\mathrm{MN}}{y_0}
+
+Querfeder, Kopf eingespannt   [Kap. 12.10, Bild 12.14]
+    K_{HH} = \frac{1\,\mathrm{MN}}{y_{0,E}}
+
+Kopplung: das Moment am eingespannten Kopf je Verschiebung   [Kap. 12.10, Bild 12.14]
+    K_{HM} = \frac{M_{0,E}}{y_{0,E}}
+
+Drehfeder, Kopf nicht verschoben: aus k_h = K_HH − K_HM² / K_MM
+    K_{MM} = \frac{K_{HM}^{2}}{K_{HH} - k_h}
+
+Verformungsmodul der Tragsicherheit: hier führt zu wenig Steifigkeit zum Versagen   [SIA 267:2013, 5.3.2.5]
+    E_{s,d} = \frac{E_{s,k}}{\gamma_E} \qquad \gamma_E = 1.5
+
+Dehnsteifigkeit des Pfahls
+    EA = E_s \cdot \frac{\pi \cdot \left(\varnothing - 2 \cdot \Delta t\right)^{2}}{4}
+
+Biegesteifigkeit des Pfahls
+    EI = E_s \cdot \frac{\pi \cdot \left(\varnothing - 2 \cdot \Delta t\right)^{4}}{64}
+
 ====================================================================================================
 Nachweise
 ====================================================================================================
@@ -11881,6 +12306,16 @@ Widerstände
     Innerer Pfahlwiderstand   Druck         R_{i,d} = 11325\,\mathrm{kN}  N_{Ed} = 2000.0\,\mathrm{kN}          5.66
     Innerer Pfahlwiderstand   Zug          R_{i,d,Z} = 1311\,\mathrm{kN}   Z_{Ed} = 300.0\,\mathrm{kN}          4.37
 
+Kennzahlen
+    Kennzahl                          Zeichen                               Wert
+    --------------------------------  -------  ---------------------------------
+    Längsfeder auf Druck              k_v            841\,\mathrm{MN}/\mathrm{m}
+    Längsfeder auf Zug                k_{v,Z}        679\,\mathrm{MN}/\mathrm{m}
+    Querfeder, Kopf frei drehbar      k_h          36.03\,\mathrm{MN}/\mathrm{m}
+    Querfeder, Kopf eingespannt       K_{HH}       94.93\,\mathrm{MN}/\mathrm{m}
+    Kopplung am Kopf                  K_{HM}                -201.09\,\mathrm{MN}
+    Drehfeder, Kopf nicht verschoben  K_{MM}   686.64\,\mathrm{MNm}/\mathrm{rad}
+
 Ton, undrainiert
 ----------------
 
@@ -11902,6 +12337,16 @@ Widerstände
     Äusserer Pfahlwiderstand  Druck         R_{a,d} = 2339\,\mathrm{kN}  N_{Ed} = 6000.0\,\mathrm{kN}          0.39
     Innerer Pfahlwiderstand   Druck        R_{i,d} = 20678\,\mathrm{kN}  N_{Ed} = 6000.0\,\mathrm{kN}          3.45
 [!] Warnung: Äusserer Pfahlwiderstand – Druck: nicht erfüllt. N_Ed = 6000 kN > R_a,d = 2339 kN.
+
+Kennzahlen
+    Kennzahl                          Zeichen                                Wert
+    --------------------------------  -------  ----------------------------------
+    Längsfeder auf Druck              k_v             609\,\mathrm{MN}/\mathrm{m}
+    Längsfeder auf Zug                k_{v,Z}         488\,\mathrm{MN}/\mathrm{m}
+    Querfeder, Kopf frei drehbar      k_h           18.31\,\mathrm{MN}/\mathrm{m}
+    Querfeder, Kopf eingespannt       K_{HH}         43.5\,\mathrm{MN}/\mathrm{m}
+    Kopplung am Kopf                  K_{HM}                  -170.8\,\mathrm{MN}
+    Drehfeder, Kopf nicht verschoben  K_{MM}   1158.19\,\mathrm{MNm}/\mathrm{rad}
 
 Mikropfahl, Versuch
 -------------------
@@ -11945,9 +12390,21 @@ Widerstände
     Äusserer Pfahlwiderstand  Zug          R_{a,d,Z} = 191\,\mathrm{kN}  Z_{Ed} = 150.0\,\mathrm{kN}          1.27
     Innerer Pfahlwiderstand   Zug          R_{i,d,Z} = 354\,\mathrm{kN}  Z_{Ed} = 150.0\,\mathrm{kN}          2.36
 
+Kennzahlen
+    Kennzahl                          Zeichen                             Wert
+    --------------------------------  -------  -------------------------------
+    Längsfeder auf Druck              k_v           56\,\mathrm{MN}/\mathrm{m}
+    Längsfeder auf Zug                k_{v,Z}       53\,\mathrm{MN}/\mathrm{m}
+    Querfeder, Kopf frei drehbar      k_h         0.73\,\mathrm{MN}/\mathrm{m}
+    Querfeder, Kopf eingespannt       K_{HH}      1.91\,\mathrm{MN}/\mathrm{m}
+    Kopplung am Kopf                  K_{HM}                -0.37\,\mathrm{MN}
+    Drehfeder, Kopf nicht verschoben  K_{MM}   0.12\,\mathrm{MNm}/\mathrm{rad}
+
 Mindestens ein Nachweis ist nicht erfüllt.
 [!] Warnung: Platte 'Ohne x': ohne x-Bewehrung kein Verformungsnachweis.
 [!] Warnung: Setzung 'Ohne Schicht': keine Schicht → kein Nachweis.
+[!] Warnung: Pfahl 'Mikropfahl, Versuch': die Schichten reichen nicht bis unter den Fuss → keine
+Steifigkeit.
 
 ====================================================================================================
 Werte
@@ -12324,6 +12781,9 @@ Werte
     Tiefe der Sohle unter Terrain                                                             t                                                            2  m         Vorgabe
     Tiefe des höchsten Grundwasserspiegels unter Terrain                                      t_1                                                          0  m         Vorgabe
     Durchmesser des Pfahls                                                                    D                                                          900  mm        Vorgabe
+    Verformungsmodul der Schicht 1, charakteristisch                                          E_{s,k,1}                                                    8  MN/m²     Vorgabe
+    Verformungsmodul der Schicht 2, charakteristisch                                          E_{s,k,2}                                                   50  MN/m²     Vorgabe
+    Verformungsmodul der Schicht 3, charakteristisch                                          E_{s,k,3}                                                  100  MN/m²     Vorgabe
     Erddruckbeiwert am Mantel in der Schicht 2                                                K_{2}                                                     0.44            Vorgabe
     Erddruckbeiwert am Mantel in der Schicht 3                                                K_{3}                                                      0.6            Vorgabe
     Länge des Pfahls                                                                          L                                                           12  m         Vorgabe
@@ -12353,9 +12813,18 @@ Werte
     Durchmesser der Längsstäbe                                                                \varnothing_l                                               20  mm        Vorgabe
     Durchmesser der Wendel                                                                    \varnothing_w                                               10  mm        Vorgabe
     Mantelreibung in der Schicht 1, charakteristisch                                          q_{s,k,1}                                                    0  kPa       Vorgabe
+    Querfeder, Kopf eingespannt                                                               K_{HH}                                                   94.93  MN/m      berechnet
+    Kopplung am Kopf                                                                          K_{HM}                                                 -201.09  MN        berechnet
+    Drehfeder, Kopf nicht verschoben                                                          K_{MM}                                                  686.64  MNm/rad   berechnet
+    Querfeder, Kopf frei drehbar                                                              k_h                                                      36.03  MN/m      berechnet
+    Längsfeder auf Druck                                                                      k_v                                                        841  MN/m      berechnet
+    Längsfeder auf Zug                                                                        k_{v,Z}                                                    679  MN/m      berechnet
     Tiefe des Pfahlkopfs unter Terrain                                                        t_K                                                          1  m         Vorgabe
+    Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst                       t_{red}                                                      2  m         Vorgabe
     Tiefe des höchsten Grundwasserspiegels unter Terrain                                      t_w                                                          4  m         Vorgabe
     Durchmesser des Pfahls                                                                    D                                                         1200  mm        Vorgabe
+    Verformungsmodul der Schicht 1, charakteristisch                                          E_{s,k,1}                                                    6  MN/m²     Vorgabe
+    Verformungsmodul der Schicht 2, charakteristisch                                          E_{s,k,2}                                                   40  MN/m²     Vorgabe
     Länge des Pfahls                                                                          L                                                           15  m         Vorgabe
     Adhäsion in der Schicht 1, als Teil von s_u,k                                             \alpha_{1}                                                 0.6            Vorgabe
     Adhäsion in der Schicht 2, als Teil von s_u,k                                             \alpha_{2}                                                 0.9            Vorgabe
@@ -12374,7 +12843,14 @@ Werte
     Durchmesser der Wendel                                                                    \varnothing_w                                               10  mm        Vorgabe
     Undrainierte Scherfestigkeit der Schicht 1, charakteristisch                              s_{u,k,1}                                                   25  kPa       Vorgabe
     Undrainierte Scherfestigkeit der Schicht 2, charakteristisch                              s_{u,k,2}                                                  110  kPa       Vorgabe
+    Querfeder, Kopf eingespannt                                                               K_{HH}                                                    43.5  MN/m      berechnet
+    Kopplung am Kopf                                                                          K_{HM}                                                  -170.8  MN        berechnet
+    Drehfeder, Kopf nicht verschoben                                                          K_{MM}                                                 1158.19  MNm/rad   berechnet
+    Querfeder, Kopf frei drehbar                                                              k_h                                                      18.31  MN/m      berechnet
+    Längsfeder auf Druck                                                                      k_v                                                        609  MN/m      berechnet
+    Längsfeder auf Zug                                                                        k_{v,Z}                                                    488  MN/m      berechnet
     Tiefe des Pfahlkopfs unter Terrain                                                        t_K                                                        0.5  m         Vorgabe
+    Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst                       t_{red}                                                      2  m         Vorgabe
     Tiefe des höchsten Grundwasserspiegels unter Terrain                                      t_w                                                          1  m         Vorgabe
     Äusserer Widerstand auf Druck, aus dem Versuch                                            R_{a,k}                                                    900  kN        Vorgabe
     Äusserer Widerstand auf Zug, aus dem Versuch                                              R_{a,k,Z}                                                  700  kN        Vorgabe
@@ -12388,6 +12864,7 @@ Werte
     Erfüllungsgrad innerer Widerstand – Zug                                                   \alpha_{eff,i,\text{Zug}}                                 1.81            berechnet
     Wanddicke des Rohrs                                                                       t                                                            8  mm        Vorgabe
     Durchmesser des Verpresskörpers                                                           D                                                          150  mm        Vorgabe
+    Verformungsmodul der Schicht 1, charakteristisch                                          E_{s,k,1}                                                   80  MN/m²     Vorgabe
     Länge des Pfahls                                                                          L                                                            6  m         Vorgabe
     Kohäsion der Schicht 1, charakteristisch                                                  c'_{k,1}                                                     0  kPa       Vorgabe
     Dicke der Schicht 1                                                                       d_{1}                                                       12  m         Vorgabe
@@ -12402,7 +12879,14 @@ Werte
     Reibungswinkel der Schicht 1, charakteristisch                                            \varphi'_{k,1}                                              35  °         Vorgabe
     Spitzendruck, charakteristisch                                                            q_{b,k}                                                   2500  kPa       Vorgabe
     Mantelreibung in der Schicht 1, charakteristisch                                          q_{s,k,1}                                                  120  kPa       Vorgabe
+    Querfeder, Kopf eingespannt                                                               K_{HH}                                                    1.91  MN/m      berechnet
+    Kopplung am Kopf                                                                          K_{HM}                                                   -0.37  MN        berechnet
+    Drehfeder, Kopf nicht verschoben                                                          K_{MM}                                                    0.12  MNm/rad   berechnet
+    Querfeder, Kopf frei drehbar                                                              k_h                                                       0.73  MN/m      berechnet
+    Längsfeder auf Druck                                                                      k_v                                                         56  MN/m      berechnet
+    Längsfeder auf Zug                                                                        k_{v,Z}                                                     53  MN/m      berechnet
     Tiefe des Pfahlkopfs unter Terrain                                                        t_K                                                          0  m         Vorgabe
+    Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst                       t_{red}                                                      2  m         Vorgabe
     Tiefe des höchsten Grundwasserspiegels unter Terrain                                      t_w                                                         10  m         Vorgabe
     Elastizitätsmodul des Betonstahls                                                         E_{s,\text{sw}}                                         200000  N/mm²     Vorgabe
     Bemessungswert der Fliessgrenze                                                           f_{yd,\text{sw}}                                           435  N/mm²     berechnet

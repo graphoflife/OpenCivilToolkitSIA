@@ -116,6 +116,12 @@
       "bereich": "Pfähle"
     },
     {
+      "name": "Pfahlsteifigkeit",
+      "pfad": "Formelsammlung/Themen/Pfahlsteifigkeit.md",
+      "art": "thema",
+      "bereich": "Pfähle"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -186,6 +192,15 @@
       "pfad": "Formelsammlung/Themen/Spannung-Dehnung-Analyse.md",
       "art": "thema",
       "bereich": "Platte"
+    },
+    {
+      "name": "Abgeminderte Bettung am Terrain",
+      "pfad": "Formelsammlung/Formeln/Abgeminderte Bettung am Terrain.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Pfahlsteifigkeit"
+      ]
     },
     {
       "name": "Abstand des Grundwassers unter der Sohle",
@@ -557,6 +572,15 @@
       ]
     },
     {
+      "name": "Bemessungswert des Verformungsmoduls",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert des Verformungsmoduls.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Pfahlsteifigkeit"
+      ]
+    },
+    {
       "name": "Beton linear, ohne Zug",
       "pfad": "Formelsammlung/Formeln/Beton linear, ohne Zug.md",
       "art": "formel",
@@ -592,6 +616,15 @@
       "zeichen": [],
       "themen": [
         "Steifigkeitsmethode"
+      ]
+    },
+    {
+      "name": "Bettungsmodul quer zum Pfahl",
+      "pfad": "Formelsammlung/Formeln/Bettungsmodul quer zum Pfahl.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Pfahlsteifigkeit"
       ]
     },
     {
@@ -749,6 +782,17 @@
       ]
     },
     {
+      "name": "Biegesteifigkeit des Pfahls",
+      "pfad": "Formelsammlung/Formeln/Biegesteifigkeit des Pfahls.md",
+      "art": "formel",
+      "zeichen": [
+        "EI"
+      ],
+      "themen": [
+        "Pfahlsteifigkeit"
+      ]
+    },
+    {
       "name": "Biegewiderstand im Stützstreifen",
       "pfad": "Formelsammlung/Formeln/Biegewiderstand im Stützstreifen.md",
       "art": "formel",
@@ -850,6 +894,17 @@
       ]
     },
     {
+      "name": "Dehnsteifigkeit des Pfahls",
+      "pfad": "Formelsammlung/Formeln/Dehnsteifigkeit des Pfahls.md",
+      "art": "formel",
+      "zeichen": [
+        "EA"
+      ],
+      "themen": [
+        "Pfahlsteifigkeit"
+      ]
+    },
+    {
       "name": "Dehnung der Zugbewehrung",
       "pfad": "Formelsammlung/Formeln/Dehnung der Zugbewehrung.md",
       "art": "formel",
@@ -904,6 +959,17 @@
       "themen": [
         "Zwängung auf Normalkraft",
         "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Drehfeder des Pfahlkopfs",
+      "pfad": "Formelsammlung/Formeln/Drehfeder des Pfahlkopfs.md",
+      "art": "formel",
+      "zeichen": [
+        "K_{MM}"
+      ],
+      "themen": [
+        "Pfahlsteifigkeit"
       ]
     },
     {
@@ -1060,6 +1126,26 @@
       "zeichen": [],
       "themen": [
         "Grundbruch"
+      ]
+    },
+    {
+      "name": "Feder am Pfahlfuss",
+      "pfad": "Formelsammlung/Formeln/Feder am Pfahlfuss.md",
+      "art": "formel",
+      "zeichen": [
+        "K_b"
+      ],
+      "themen": [
+        "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Feder am Pfahlmantel",
+      "pfad": "Formelsammlung/Formeln/Feder am Pfahlmantel.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Pfahlsteifigkeit"
       ]
     },
     {
@@ -1356,6 +1442,15 @@
       ]
     },
     {
+      "name": "Gebetteter Pfahl",
+      "pfad": "Formelsammlung/Formeln/Gebetteter Pfahl.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Pfahlsteifigkeit"
+      ]
+    },
+    {
       "name": "Geländeneigungsfaktor g_c",
       "pfad": "Formelsammlung/Formeln/Geländeneigungsfaktor g_c.md",
       "art": "formel",
@@ -1603,6 +1698,17 @@
       ]
     },
     {
+      "name": "Kopplung am Pfahlkopf",
+      "pfad": "Formelsammlung/Formeln/Kopplung am Pfahlkopf.md",
+      "art": "formel",
+      "zeichen": [
+        "K_{HM}"
+      ],
+      "themen": [
+        "Pfahlsteifigkeit"
+      ]
+    },
+    {
       "name": "Kräfte mal Hebelarm um die halbe Höhe",
       "pfad": "Formelsammlung/Formeln/Kräfte mal Hebelarm um die halbe Höhe.md",
       "art": "formel",
@@ -1679,6 +1785,17 @@
       ],
       "themen": [
         "Setzung"
+      ]
+    },
+    {
+      "name": "Längsfeder des Pfahlkopfs",
+      "pfad": "Formelsammlung/Formeln/Längsfeder des Pfahlkopfs.md",
+      "art": "formel",
+      "zeichen": [
+        "k_v"
+      ],
+      "themen": [
+        "Pfahlsteifigkeit"
       ]
     },
     {
@@ -2012,6 +2129,28 @@
       ],
       "themen": [
         "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Querfeder des eingespannten Pfahlkopfs",
+      "pfad": "Formelsammlung/Formeln/Querfeder des eingespannten Pfahlkopfs.md",
+      "art": "formel",
+      "zeichen": [
+        "K_{HH}"
+      ],
+      "themen": [
+        "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Querfeder des frei drehbaren Pfahlkopfs",
+      "pfad": "Formelsammlung/Formeln/Querfeder des frei drehbaren Pfahlkopfs.md",
+      "art": "formel",
+      "zeichen": [
+        "k_h"
+      ],
+      "themen": [
+        "Pfahlsteifigkeit"
       ]
     },
     {
@@ -5099,6 +5238,23 @@
       ]
     },
     {
+      "name": "opencivil.pfahl.bettung",
+      "pfad": "Python/opencivil.pfahl.bettung.md",
+      "art": "modul",
+      "kurz": "der Pfahl als gebetteter Stab.",
+      "stichworte": [
+        "Strecke",
+        "Strecke.quer_bei",
+        "Laengs",
+        "Quer",
+        "knoten",
+        "laengs",
+        "quer",
+        "_element",
+        "_schnittkraefte"
+      ]
+    },
+    {
       "name": "opencivil.pfahl.boden",
       "pfad": "Python/opencivil.pfahl.boden.md",
       "art": "modul",
@@ -5178,16 +5334,46 @@
         "Tragglied",
         "Tragglied.beschriftung",
         "Tragglied.erklaerung",
+        "Kopf",
+        "Kopf.beschriftung",
+        "Kopf.erklaerung",
         "Kombination",
         "Kombination.kennung",
         "Pfahl",
         "Pfahl.abschnitt",
         "Pfahl.bohrpfahl",
+        "Pfahl.fuss_traegt",
         "Pfahl.baustoffe",
         "Pfahl.stoffe",
         "Pfahl._gruppen",
         "Pfahl._schichtwert",
         "Pfahl.kurznamen"
+      ]
+    },
+    {
+      "name": "opencivil.pfahl.steifigkeit",
+      "pfad": "Python/opencivil.pfahl.steifigkeit.md",
+      "art": "modul",
+      "kurz": "wie steif ein Pfahl im Boden steht, und wie er sich verformt.",
+      "stichworte": [
+        "Baugrund",
+        "Baugrund.z_F",
+        "Baugrund.stuecke",
+        "Baugrund.schicht_am_fuss",
+        "Baugrund.abminderung",
+        "Baugrund.strecken",
+        "Baugrund.fussfeder",
+        "Verlauf",
+        "Verlauf.quer",
+        "Steifigkeitsbefund",
+        "_extrem",
+        "Pfahlsteifigkeit",
+        "Pfahlsteifigkeit.kennung",
+        "Pfahlsteifigkeit.rechne",
+        "Pfahlsteifigkeit._querschnitt",
+        "Pfahlsteifigkeit._bettung",
+        "Pfahlsteifigkeit._kombinationen",
+        "Pfahlsteifigkeit._tabellen"
       ]
     },
     {
@@ -5627,6 +5813,7 @@
         "PfahlEintrag.bohrpfahl",
         "PfahlEintrag.schicht",
         "PfahlEintrag.kombination",
+        "PfahlEintrag.boden_unter_dem_fuss",
         "PfahlEintrag.regeln",
         "PfahlEintrag._baugrund",
         "PfahlEintrag._bewehrung",
@@ -6854,6 +7041,7 @@
       "kurz": "was die Oberflaeche von einem Pfahl zeichnet.",
       "stichworte": [
         "situation",
+        "verlaeufe",
         "_legende"
       ]
     },

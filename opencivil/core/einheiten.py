@@ -338,6 +338,12 @@ PRO_M = Einheit("1/m", KRUEMMUNG, 1.0, latex=r"\mathrm{m}^{-1}", beschriftung="1
 # eine Kraft je Laenge und Meter (kN/m², wie eine Spannung).
 KNM2 = Einheit("kNm^2", MOMENT * LAENGE, 1e3, latex=r"\mathrm{kNm}^{2}", beschriftung="kNm²")
 KNM_PRO_RAD = Einheit("kNm/rad", MOMENT, 1e3, latex=r"\mathrm{kNm}/\mathrm{rad}")
+# Dieselben eines Pfahls im Boden, tausendmal grösser: seine Federn am Kopf --
+# längs und quer eine Kraft je Länge, gedreht ein Moment je Drehung -- und
+# seine Biegesteifigkeit.
+MN_PRO_M = Einheit("MN/m", KRAFT_PRO_LAENGE, 1e6, latex=r"\mathrm{MN}/\mathrm{m}")
+MNM_PRO_RAD = Einheit("MNm/rad", MOMENT, 1e6, latex=r"\mathrm{MNm}/\mathrm{rad}")
+MNM2 = Einheit("MNm^2", MOMENT * LAENGE, 1e6, latex=r"\mathrm{MNm}^{2}", beschriftung="MNm²")
 
 # Masse und Dichte
 KG = Einheit("kg", MASSE, 1.0)
@@ -377,7 +383,7 @@ EINHEITEN: Dict[str, Einheit] = {
         PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2, MN_PRO_M2,
         NM, KNM, MNM,
         KN_PRO_M, KNM_PRO_M, MM2_PRO_M, PRO_M,
-        KNM2, KNM_PRO_RAD,
+        KNM2, KNM_PRO_RAD, MN_PRO_M, MNM_PRO_RAD, MNM2,
         KG, T, KG_PRO_M3, KN_PRO_M3, M_PRO_S2,
         S, MIN, H,
         RAD, GRAD, MRAD,

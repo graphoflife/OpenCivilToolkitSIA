@@ -1,5 +1,5 @@
 ---
-erzeugt: a52e9dc8dfe3
+erzeugt: 9360d98e3705
 art: modul
 tags: [modul]
 ---
@@ -11,8 +11,9 @@ tags: [modul]
 
 Die Schichten des Baugrunds, wie der Pfahl sie braucht ([[opencivil.pfahl.boden#Pfahlschicht|Pfahlschicht]]):
 Dicke, Raumlast, das Verhalten -- drainiert mit φ'_k und c'_k, undrainiert
-mit s_u,k ([[opencivil.pfahl.boden#Verhalten|Verhalten]]) -- und woher die Mantelreibung kommt:
-gerechnet oder eingegeben ([[opencivil.pfahl.boden#Mantel|Mantel]]). Dazu als Zahlen die Spannungen
+mit s_u,k ([[opencivil.pfahl.boden#Verhalten|Verhalten]]) --, woher die Mantelreibung kommt: gerechnet
+oder eingegeben ([[opencivil.pfahl.boden#Mantel|Mantel]]), und der Verformungsmodul, auf dem der
+Pfahl gebettet ist. Dazu als Zahlen die Spannungen
 im Boden und die Stücke des Mantels, über die die Mantelreibung summiert
 wird ([[opencivil.pfahl.boden#Profil|Profil]]).
 
@@ -115,6 +116,7 @@ die übrigen stehen da und gehen nicht ein.
 - `K: Groesse` – Der Erddruckbeiwert am Mantel -- gerechnet, drainiert.
 - `delta_faktor: Groesse` – Der Reibungswinkel zwischen Pfahl und Boden im Verhältnis zu φ'_k -- gerechnet, drainiert.
 - `alpha: Groesse` – Die Adhäsion im Verhältnis zu s_u,k -- gerechnet, undrainiert.
+- `E_s: Groesse` – Der Verformungsmodul, charakteristisch: woraus die Bettung des Pfahls folgt.
 
 #### Pfahlschicht.drainiert
 
@@ -129,7 +131,8 @@ def drainiert(self) -> bool
 def kurznamen(self) -> Tuple[str, ...]
 ```
 
-Die Zahlen, die gelten: Dicke und Raumlast, die Festigkeit, die Mantelreibung.
+Die Zahlen, die gelten: Dicke und Raumlast, die Festigkeit, die
+Mantelreibung, der Verformungsmodul.
 
 ### Stueck
 
@@ -225,6 +228,7 @@ Der Mantel von `oben` bis `unten` in Stücken, je Schicht und Seite des Wassers.
 
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.pfahl]]
+- [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.web.api]]

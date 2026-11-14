@@ -4,16 +4,19 @@
  * Von oben nach unten:
  *
  *     Pfahl Situation   Bezeichnung; Bohr- oder Mikropfahl; Masse,
- *                       Grundwasser, Querschnitt und äusserer Widerstand je
- *                       als Karte; Beschreibung
+ *                       Grundwasser, Querschnitt, äusserer Widerstand und
+ *                       Bettung je als Karte; Beschreibung
  *     Schichten         vom Terrain an nach unten, je eine Karte: Dicke,
  *                       Raumlast, drainiert oder undrainiert, die
- *                       Mantelreibung gerechnet oder eingegeben
- *     Einwirkungen      die Kombinationen: N_Ed am Kopf, Druck positiv
+ *                       Mantelreibung gerechnet oder eingegeben, der
+ *                       Verformungsmodul
+ *     Einwirkungen      die Kombinationen: N_Ed am Kopf, Druck positiv,
+ *                       H_Ed und -- am frei drehbaren Kopf -- M_Ed
  *
  * Gezeigt werden nur die Felder, die der Kern mit den gewählten Stellungen
- * liest. Gerechnet wird nichts: die Widerstände stehen rechts in der
- * Zusammenfassung und im Bild der Situation unter «Diagramme». Einheiten
+ * liest. Gerechnet wird nichts: die Widerstände und die Federn am Kopf
+ * stehen rechts in der Zusammenfassung, die Situation und die Verläufe über
+ * die Tiefe unter «Diagramme». Einheiten
  * und Grenzen kommen aus dem Katalog (`katalog.felder`), die Stellungen der
  * Schalter ebenso (`katalog.pfahl`), samt dem Grenzwert von η_a.
  */
@@ -37,6 +40,8 @@ const HILFE = {
       ['η_i', 'Umrechnungsfaktor des inneren Widerstands, in der Regel höchstens 0.8, mit verlässlicher Prüfung der Integrität bis 0.9 (SIA 267:2013, 9.5.2.4.4, 9.5.2.4.9)'],
       ['Mikropfahl', 'es trägt nur das Tragglied aus Stahl, aussen um die Abrostung Δt verkleinert'],
       ['Fuss', 'drainiert (c·N_c + σ\'_v·N_q)·X mit X aus Bild 12.4, undrainiert s_u·N_c mit N_c ≤ 9 aus Bild 12.5 (Kap. 12.5); örtliches Abscheren mit 2/3 von φ\'_k und c\'_k (Kap. 9.2.7)'],
+      ['Kopf', 'frei drehbar: ein Moment am Kopf ist Einwirkung; eingespannt, etwa in einer steifen Pfahlkopfplatte: der Kopf dreht sich nicht, das Moment dort ist Reaktion'],
+      ['t_red', 'bis in diese Tiefe unter Terrain wächst die Bettung quer linear von null an -- die Norm verlangt nur, sie nahe der Oberfläche abzumindern (SIA 267:2013, 9.5.4.5)'],
     ],
     formel: 'R_a,d = η_a·(R_b,k + R_s,k)/γ_M,a;  R_i,d = η_i·R_mat,d',
   },
@@ -46,13 +51,16 @@ const HILFE = {
       ['γ', 'eine Raumlast über und unter dem Wasser; darunter zählt γ − γ_w'],
       ['drainiert', 'q_s,k = K·σ\'_v·tan δ, mit δ = k_δ·φ\'_k; rau δ ≈ φ\'_k, K an einem Bohrpfahl höchstens etwa K₀ = 1 − sin φ\'_k (Kap. 12.5)'],
       ['undrainiert', 'q_s,k = α·s_u,k; am Bohrpfahl α ≈ 0.6 in weichem, 0.9 in steifem Ton (Kap. 12.5)'],
-      ['eingegeben', 'q_s,k, etwa aus dem geotechnischen Bericht; eine Schicht, die nicht trägt, mit null'],
+      ['eingegeben', 'q_s,k, etwa aus dem geotechnischen Bericht; eine Schicht, die nicht trägt, mit null -- sie hat dann auch längs keine Feder'],
+      ['E_s,k', 'Verformungsmodul: am Mantel die Feder 0.42·E_s,k, am Fuss 4.5·E_s,k (Cassan, Kap. 12.8), quer k_s = E_s,k/D (SIA 267:2013, 9.5.4.5, (53)); in der Tragsicherheit E_s,k/1.5 (5.3.2.5)'],
     ],
     formel: 'R_s,k = π·D·Σ h·q_s,k',
   },
   einwirkungen: {
     zeilen: [
       ['N_Ed', 'Normalkraft am Pfahlkopf, Druck positiv, Zug negativ'],
+      ['H_Ed', 'Querkraft am Pfahlkopf'],
+      ['M_Ed', 'Moment am frei drehbaren Kopf, positiv, wenn es dreht wie H_Ed über dem Kopf; am eingespannten Kopf ist das Moment Reaktion'],
       ['Druck', 'N_Ed ≤ R_a,d und N_Ed ≤ R_i,d'],
       ['Zug', 'Z_Ed = −N_Ed ≤ R_a,d,Z (nur der Mantel) und ≤ R_i,d,Z (nur der Stahl)'],
     ],
@@ -180,6 +188,13 @@ function situationPanel(t) {
     ]),
     querschnittKarte(t),
     aussenKarte(t),
+    karte('Bettung', [
+      feld('Kopf', schalter(t.kopf, 'koepfe', (w) => aendern((x) => { x.kopf = w; }),
+        'Wie der Pfahlkopf gehalten ist'), ''),
+      zahlzeile(t, 't_red', 'Abminderung bis', 't_{red}', {
+        schritt: 0.5, titel: 'Bis in diese Tiefe unter Terrain wächst die Bettung quer linear von null an (SIA 267:2013, 9.5.4.5)',
+      }),
+    ]),
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [
         el('label', { text: 'Beschreibung' }),
@@ -230,6 +245,9 @@ function schichtKarte(t, i) {
     feld('Mantelreibung', schalter(s.mantel, 'mantel', (w) => aendern((x) => { x.mantel = w; }),
       'Gerechnet aus der Schicht oder eingegeben'), ''),
     ...mantel,
+    zahl('E_s', 'Verformungsmodul', 'E_{s,k}', {
+      schritt: 5, titel: 'Für die Federn: am Mantel 0.42·E, am Fuss 4.5·E (Cassan, Kap. 12.8), quer E/D (SIA 267:2013, (53))',
+    }),
   ], { zusatz: weg });
 }
 
@@ -251,16 +269,24 @@ function schichtenPanel(t) {
   ].filter(Boolean));
 }
 
+/** Die Kräfte am Kopf: N_Ed und H_Ed, M_Ed nur am frei drehbaren Kopf -- sonst ist es Reaktion. */
+function kraefte(t) {
+  return [
+    ['N_Ed', 50, 'Am Pfahlkopf, Druck positiv, Zug negativ'],
+    ['H_Ed', 10, 'Querkraft am Pfahlkopf'],
+    t.kopf === 'frei' ? ['M_Ed', 10, 'Moment am Kopf, positiv, wenn es dreht wie H_Ed über dem Kopf'] : null,
+  ].filter(Boolean);
+}
+
 function kombinationZeile(t, i) {
   const k = t.kombinationen[i];
   const aendern = (veraenderer) => eintragAendern(t.kennung, (x) => veraenderer(x.kombinationen[i]));
   return fallzeile({
     fall: k, aendern, was: 'Kombination', nameTitel: 'Bezeichnung der Kombination',
-    zahlen: [zahlfeld({
-      wert: k.N_Ed, schritt: 50, angabe: feldangabe('pfahlkombination', 'N_Ed'),
-      titel: 'Am Pfahlkopf, Druck positiv, Zug negativ', leer: 0,
-      beiAenderung: (v) => aendern((x) => { x.N_Ed = v; }),
-    })],
+    zahlen: kraefte(t).map(([schluessel, schritt, titel]) => zahlfeld({
+      wert: k[schluessel], schritt, angabe: feldangabe('pfahlkombination', schluessel), titel,
+      leer: 0, beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
+    })),
     entfernenTitel: 'Kombination entfernen',
     entfernen: () => eintragAendern(t.kennung, (x) => { x.kombinationen.splice(i, 1); }),
   });
@@ -277,7 +303,8 @@ function einwirkungenPanel(t) {
   }, [
     el('div.unterkapitel', {}, [
       t.kombinationen.length
-        ? fallkopf([`N_Ed [${feldangabe('pfahlkombination', 'N_Ed').einheit}]`])
+        ? fallkopf(kraefte(t).map(([schluessel]) =>
+          `${schluessel} [${feldangabe('pfahlkombination', schluessel).einheit}]`))
         : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
       ...t.kombinationen.map((_, i) => kombinationZeile(t, i)),
       el('button.knopf-anfuegen', { type: 'button', text: '+ Kombination', on: { click: neu } }),

@@ -5,8 +5,9 @@ VERANTWORTUNG:
 Was Lang, Huder, Amann und Puzrin für Pfähle als Bild oder Beiwert geben,
 als Zahlen: der Form- und Tiefenfaktor X am Pfahlfuss (Bild 12.4), der
 Tragfähigkeitsfaktor N_c undrainiert (Bild 12.5), der Anteil von φ und c beim
-örtlichen Abscheren (Kap. 9.2.7) und der Ruhedruckbeiwert (Kap. 2.7). Die
-Bilder sind abgelesen, nicht nachgerechnet: auf etwa ±0.02 genau.
+örtlichen Abscheren (Kap. 9.2.7), der Ruhedruckbeiwert (Kap. 2.7) und die
+Federn nach Cassan am Mantel und am Fuss (Kap. 12.8). Die Bilder sind
+abgelesen, nicht nachgerechnet: auf etwa ±0.02 genau.
 
 AUSSERHALB DER BILDER:
 Bild 12.4 reicht von h/D = 2.5 bis 30 und von φ' = 15° bis 40°, Bild 12.5 bis
@@ -34,6 +35,8 @@ KAP_SPITZE = "Kap. 12.5, Bild 12.4"
 KAP_SPITZE_UNDRAINIERT = "Kap. 12.5, Bild 12.5"
 KAP_MANTEL = "Kap. 12.5"
 KAP_ABSCHEREN = "Kap. 9.2.7, 12.5"
+KAP_FEDERN = "Kap. 12.8, Bild 12.9"
+KAP_QUER = "Kap. 12.10, Bild 12.14"
 
 # -- Bild 12.4: X über h/D, je Kurve φ' -------------------------------------------
 X_H_D: Tuple[float, ...] = (2.5, 3.0, 4.0, 5.0, 7.5, 10.0, 12.5, 15.0, 20.0, 25.0, 30.0)
@@ -57,6 +60,12 @@ NC_WERTE: Tuple[float, ...] = (6.2, 6.6, 7.0, 7.3, 7.6, 7.8, 8.1, 8.35, 8.55, 8.
 # -- Kap. 9.2.7, 12.5: örtliches Abscheren -------------------------------------------
 #: Auf diesen Teil sinken φ und c, wenn der Boden am Fuss nur örtlich abschert.
 ABSCHEREN = 2.0 / 3.0
+
+# -- Kap. 12.8: die Federn nach Cassan, für Bohrpfähle --------------------------------
+#: Die Feder am Mantel, B ≈ 0.42 · E: Schubspannung je Setzung, in kN/m³ bei E in kN/m².
+CASSAN_MANTEL = 0.42
+#: Die Feder am Fuss, R ≈ 4.5 · E: Spannung mal D je Setzung, σ_F = R · s / D.
+CASSAN_FUSS = 4.5
 
 
 def _stelle(achse: Sequence[float], wert: float) -> Tuple[int, float]:

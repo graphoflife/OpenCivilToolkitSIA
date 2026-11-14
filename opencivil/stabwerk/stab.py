@@ -39,6 +39,9 @@ Ein Stab auf einem nachgiebigen Linienlager (Winkler) bekommt zu seiner
 Steifigkeit ``k · ∫ Nᵀ N dx`` -- die konsistente Bettungsmatrix. Mit
 kubischen Formfunktionen ist das eine Naeherung; das System teilt einen
 gebetteten Stab darum in kurze Stuecke (:mod:`~opencivil.stabwerk.system`).
+Quer darf ``k`` vom Anfang zum Ende linear wachsen -- der gebettete Pfahl
+(:mod:`opencivil.pfahl.bettung`) mindert so die Bettung am Terrain ab; das
+System selbst bettet gleichmaessig.
 """
 
 from __future__ import annotations
@@ -107,28 +110,39 @@ def steifigkeit(L: float, EA: float, EI: float) -> Matrix:
     ]
 
 
-def bettung(L: float, k_quer: float = 0.0, k_laengs: float = 0.0) -> Matrix:
+def bettung(L: float, k_quer: Tuple[float, float] = (0.0, 0.0),
+            k_laengs: float = 0.0) -> Matrix:
     """
     Die konsistente Bettungsmatrix 6 × 6: ``k · ∫ Nᵀ N dx``, quer auf
-    ``v`` und ``θ``, laengs auf ``u``. ``k`` in N/m je m Stab, also N/m².
+    ``v`` und ``θ``, laengs auf ``u``. ``k`` in N/m je m Stab, also N/m²;
+    quer am Anfang und am Ende, dazwischen linear -- an beiden Enden gleich
+    ist es die Matrix mit ``k · L / 420`` (:data:`BETTUNG_LATEX`).
     """
     k = nullmatrix(6)
     if k_laengs:
         f = k_laengs * L / 6.0
         for i, j, w in ((0, 0, 2.0), (0, 3, 1.0), (3, 0, 1.0), (3, 3, 2.0)):
             k[i][j] += f * w
-    if k_quer:
-        f = k_quer * L / 420.0
-        werte = (
-            (156.0, 22.0 * L, 54.0, -13.0 * L),
-            (22.0 * L, 4.0 * L * L, 13.0 * L, -3.0 * L * L),
-            (54.0, 13.0 * L, 156.0, -22.0 * L),
-            (-13.0 * L, -3.0 * L * L, -22.0 * L, 4.0 * L * L),
-        )
+    a, e = (wert * L / 840.0 for wert in k_quer)
+    if a or e:
+        # Das obere Dreieck auf v1, θ1, v2, θ2: je Ende das Integral mit dem
+        # Gewicht 1 − x/L und x/L.
+        dreieck = {
+            (0, 0): 240.0 * a + 72.0 * e,
+            (0, 1): L * (30.0 * a + 14.0 * e),
+            (0, 2): 54.0 * (a + e),
+            (0, 3): -L * (14.0 * a + 12.0 * e),
+            (1, 1): L * L * (5.0 * a + 3.0 * e),
+            (1, 2): L * (12.0 * a + 14.0 * e),
+            (1, 3): -3.0 * L * L * (a + e),
+            (2, 2): 72.0 * a + 240.0 * e,
+            (2, 3): -L * (14.0 * a + 30.0 * e),
+            (3, 3): L * L * (3.0 * a + 5.0 * e),
+        }
         stellen = (1, 2, 4, 5)
         for p, i in enumerate(stellen):
             for q, j in enumerate(stellen):
-                k[i][j] += f * werte[p][q]
+                k[i][j] += dreieck[min(p, q), max(p, q)]
     return k
 
 

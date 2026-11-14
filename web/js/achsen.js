@@ -29,14 +29,28 @@ export function schrittweite(spanne, zielAnzahl = 8) {
   return gewaehlt * groesse;
 }
 
+/** Der Schritt einer Teilung: fest, sonst ein runder aus `ziel` Strichen. */
+function schrittDerTeilung([a, b], { ziel = 8, schritt } = {}) {
+  return schritt ?? schrittweite(Math.abs(b - a), ziel);
+}
+
 /** Die Striche einer Teilung: runde Vielfache im Bereich, aufsteigend. */
-function striche([a, b], { ziel = 8, schritt } = {}) {
-  const von = Math.min(a, b);
-  const bis = Math.max(a, b);
-  const s = schritt ?? schrittweite(bis - von, ziel);
+function striche(bereich, teilung) {
+  const von = Math.min(...bereich);
+  const bis = Math.max(...bereich);
+  const s = schrittDerTeilung(bereich, teilung);
   const heraus = [];
   for (let v = Math.ceil(von / s) * s; v <= bis; v += s) heraus.push(v);
   return heraus;
+}
+
+/**
+ * Die Schrift einer Teilung ohne eigene: so viele Nachkommastellen, wie ihr
+ * Schritt verlangt -- ganze Zahlen machten aus 0.5 eine 1 --, ohne «-0».
+ */
+function schriftDerTeilung(bereich, teilung) {
+  const stellen = Math.max(0, Math.ceil(-Math.log10(schrittDerTeilung(bereich, teilung)) - 1e-9));
+  return (v) => (Math.abs(v) < 0.5 * 10 ** -stellen ? 0 : v).toFixed(stellen);
 }
 
 function text(inhalt, attribute) {
@@ -101,7 +115,8 @@ export function formelText(knoten, inhalt) {
  *   - `bereich: [a, b]` -- a liegt links bzw. unten. Umgekehrt angegeben läuft
  *     die Achse andersherum, etwa die Höhe eines Schnitts nach unten.
  *   - `teilung` -- Gitter mit beschrifteten Strichen: `{ziel, schritt,
- *     format}`. `schritt` fest, sonst ein runder aus `ziel` Strichen. Ohne
+ *     format}`. `schritt` fest, sonst ein runder aus `ziel` Strichen; ohne
+ *     `format` mit so vielen Nachkommastellen, wie der Schritt verlangt. Ohne
  *     `teilung` kein Gitter.
  *   - `null` -- die Nulllinie betonen, sofern sie im Bereich liegt
  *   - `titel` -- der Achsentitel
@@ -139,14 +154,14 @@ export function achsenkreuz({
 
   if (xAchse.teilung || yAchse.teilung) {
     const gitter = svgEl('g');
-    const format = (teilung) => teilung.format || ((v) => Math.round(v));
+    const format = (achse) => achse.teilung.format || schriftDerTeilung(achse.bereich, achse.teilung);
     if (xAchse.teilung) {
       for (const v of striche(xAchse.bereich, xAchse.teilung)) {
         gitter.append(svgEl('line', {
           x1: x(v), y1: feld.oben, x2: x(v), y2: feld.unten,
           stroke: GITTER, 'stroke-width': 1,
         }));
-        gitter.append(text(format(xAchse.teilung)(v), {
+        gitter.append(text(format(xAchse)(v), {
           x: x(v), y: feld.unten + schrift.teilung + 5, 'text-anchor': 'middle',
           'font-size': schrift.teilung, fill: TEILUNG,
         }));
@@ -158,7 +173,7 @@ export function achsenkreuz({
           x1: feld.links, y1: y(v), x2: feld.rechts, y2: y(v),
           stroke: GITTER, 'stroke-width': 1,
         }));
-        gitter.append(text(format(yAchse.teilung)(v), {
+        gitter.append(text(format(yAchse)(v), {
           x: feld.links - 8, y: y(v) + 4, 'text-anchor': 'end',
           'font-size': schrift.teilung, fill: TEILUNG,
         }));

@@ -178,7 +178,7 @@ class Teilstab:
         return [sum(b * x[i] for i, b in eintrag) for eintrag in self.abbildung]
 
     def bettungsmatrix(self) -> List[List[float]]:
-        return st.bettung(self.L, self.k_quer, self.k_laengs)
+        return st.bettung(self.L, (self.k_quer, self.k_quer), self.k_laengs)
 
 
 @dataclass

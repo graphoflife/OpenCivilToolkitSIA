@@ -100,14 +100,15 @@ def beispiel() -> Projekt:
     setzung.schicht("Silt, tonig", d=3.0, M_E=15.0, M_E_strich=45.0)
     setzung.schicht("Moräne", d=4.0, M_E=100.0, M_E_strich=250.0)
     # Und als Pfahl gegründet: ein Bohrpfahl ⌀ 900 durch die Auffüllung, die
-    # nicht trägt, und den Kies bis in die Moräne -- grün, wie der Rest.
+    # nicht trägt, und den Kies bis in die Moräne, am Kopf auch quer belastet
+    # -- grün, wie der Rest.
     pfahl = projekt.pfahl("Pfahl Stütze", stahl=_erstes(projekt, "betonstahl"),
                           beton=_erstes(projekt, "beton"), D=900.0, L=12.0, t_K=1.5,
                           t_w=3.0)
-    pfahl.schicht("Auffüllung", d=2.0, gamma=19.0, mantel="eingeben", q_s=0.0)
-    pfahl.schicht("Kies, sandig", d=6.0, gamma=21.0, phi_k=34.0, K=0.44)
-    pfahl.schicht("Moräne", d=15.0, gamma=22.0, phi_k=36.0, c_k=5.0, K=0.41)
-    pfahl.kombination("Tragsicherheit", N_Ed=2000.0)
+    pfahl.schicht("Auffüllung", d=2.0, gamma=19.0, mantel="eingeben", q_s=0.0, E_s=10.0)
+    pfahl.schicht("Kies, sandig", d=6.0, gamma=21.0, phi_k=34.0, K=0.44, E_s=60.0)
+    pfahl.schicht("Moräne", d=15.0, gamma=22.0, phi_k=36.0, c_k=5.0, K=0.41, E_s=120.0)
+    pfahl.kombination("Tragsicherheit", N_Ed=2000.0, H_Ed=100.0)
 
     # Ein Skript für die App «Python», mit einem Diagramm -- ohne Download.
     projekt.skript("Skript 1", VORLAGE)
@@ -379,28 +380,32 @@ def _pfaehle(p: Projekt) -> None:
     """
     Jede Spielart des Pfahls. Ein Bohrpfahl im Kies, das Grundwasser teilt
     eine Schicht, die oberste trägt nicht; sein Fuss schert örtlich ab, in
-    der Moräne liegt K über K_0, und er wird auch gezogen. Ein Bohrpfahl
-    im Ton, undrainiert an Mantel und Fuss, der auf Druck nicht aufgeht.
-    Ein Mikropfahl mit Rohr aus einem statischen Versuch, mit Abrostung
-    und η_i über dem Regelwert; einer mit Vollstab aus Erfahrung, die
-    Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
-    eingegeben.
+    der Moräne liegt K über K_0, und er wird auch gezogen, quer mit einem
+    Moment am frei drehbaren Kopf. Ein Bohrpfahl im Ton, undrainiert an
+    Mantel und Fuss, der auf Druck nicht aufgeht, der Kopf eingespannt --
+    sein Moment zählt dann nicht. Ein Mikropfahl mit Rohr aus einem
+    statischen Versuch, ohne Schichten und darum ohne Steifigkeit, mit
+    Abrostung und η_i über dem Regelwert; einer mit Vollstab aus Erfahrung,
+    die Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
+    eingegeben, quer leicht belastet.
     """
     stahl, beton = _erstes(p, "betonstahl"), _erstes(p, "beton")
     kies = p.pfahl("Kies, örtlich", stahl=stahl, beton=beton, D=900.0, L=12.0, t_K=1.0,
                    t_w=4.0)
-    kies.schicht("Auffüllung", d=2.5, gamma=19.0, mantel="eingeben", q_s=0.0)
-    kies.schicht("Kies, sandig", d=7.0, gamma=21.0, phi_k=34.0, K=0.44)
-    kies.schicht("Moräne", d=20.0, gamma=22.0, phi_k=36.0, c_k=5.0, K=0.6, delta_faktor=0.8)
-    kies.kombination("Druck", N_Ed=2000.0)
+    kies.schicht("Auffüllung", d=2.5, gamma=19.0, mantel="eingeben", q_s=0.0, E_s=8.0)
+    kies.schicht("Kies, sandig", d=7.0, gamma=21.0, phi_k=34.0, K=0.44, E_s=50.0)
+    kies.schicht("Moräne", d=20.0, gamma=22.0, phi_k=36.0, c_k=5.0, K=0.6, delta_faktor=0.8,
+                 E_s=100.0)
+    kies.kombination("Druck", N_Ed=2000.0, H_Ed=150.0, M_Ed=80.0)
     kies.kombination("Zug", N_Ed=-300.0)
 
     ton = p.pfahl("Ton, undrainiert", stahl=stahl, beton=beton, D=1200.0, L=15.0, t_K=0.5,
-                  t_w=1.0, abscheren="allgemein", n=16, phi_l=26.0)
-    ton.schicht("Seeton", d=8.0, gamma=18.0, verhalten="undrainiert", s_u=25.0, alpha=0.6)
+                  t_w=1.0, abscheren="allgemein", n=16, phi_l=26.0, kopf="eingespannt")
+    ton.schicht("Seeton", d=8.0, gamma=18.0, verhalten="undrainiert", s_u=25.0, alpha=0.6,
+                E_s=6.0)
     ton.schicht("Ton, steif", d=20.0, gamma=20.0, verhalten="undrainiert", s_u=110.0,
-                alpha=0.9)
-    ton.kombination("Druck", N_Ed=6000.0)
+                alpha=0.9, E_s=40.0)
+    ton.kombination("Druck", N_Ed=6000.0, H_Ed=300.0, M_Ed=200.0)
 
     rohr = p.pfahl("Mikropfahl, Versuch", stahl=stahl, art="mikropfahl", D=200.0, L=8.0,
                    t_K=0.5, grundlage="statisch", eta_a=1.0, R_ak=900.0, R_ak_zug=700.0,
@@ -411,8 +416,9 @@ def _pfaehle(p: Projekt) -> None:
     stab = p.pfahl("Mikropfahl, Stab", stahl=stahl, art="mikropfahl", D=150.0, L=6.0,
                    t_K=0.0, t_w=10.0, grundlage="erfahrung", eta_a=0.9, tragglied="stab",
                    d_a=40.0, dt=2.0, spitze="eingeben", q_b=2500.0)
-    stab.schicht("Kies", d=12.0, gamma=21.0, phi_k=35.0, mantel="eingeben", q_s=120.0)
-    stab.kombination("Zug", N_Ed=-150.0)
+    stab.schicht("Kies", d=12.0, gamma=21.0, phi_k=35.0, mantel="eingeben", q_s=120.0,
+                 E_s=80.0)
+    stab.kombination("Zug", N_Ed=-150.0, H_Ed=5.0)
 
 
 def _erstes(p: Projekt, art: str) -> str:

@@ -2302,6 +2302,21 @@ details.nb-callout > summary { cursor: pointer; }
 .pf-spitze .gb-pfeil-schaft { stroke: var(--system); stroke-width: 1.6; }
 .pf-spitze .gb-pfeil-spitze { fill: var(--system); }
 
+/* Die Verläufe über die Tiefe, je Kombination nebeneinander (pf_verlauf.js),
+   so viele die Breite fasst -- im schmalen Fenster zwei, jedes so breit wie
+   seine Spalte, höchstens wie gezeichnet. Flächen und Kurven wie beim
+   Balkensystem, Setzung und Verschiebung blau, der Bettungsdruck in der Farbe
+   des Bodens. */
+.pf-verlaeufe {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 4px 10px;
+}
+.pf-verlauf { display: block; width: 100%; max-width: 168px; height: auto; }
+.pf-d-w.bs-d-flaeche { fill: var(--blau); } .pf-d-w.bs-d-kurve { stroke: var(--blau); }
+.pf-d-w.bs-d-extrem { fill: var(--blau); }
+.pf-d-p.bs-d-flaeche { fill: #8a6d3b; } .pf-d-p.bs-d-kurve { stroke: #8a6d3b; }
+.pf-d-p.bs-d-extrem { fill: #8a6d3b; }
+
 /* ---------------------------------------------------------- Durchstanzen -- */
 
 /* Der Grundriss: Stütze, Plattenrand, Aussparungen, Nachweisschnitt. Was

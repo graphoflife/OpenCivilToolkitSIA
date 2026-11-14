@@ -152,16 +152,16 @@ s.schicht("Silt, tonig", d=3.0, M_E=15, M_E_strich=45)
 ```
 
 Ein Pfahl -- Querschnitt in mm, Tiefen ab Terrain in m, Spannungen in kPa,
-Kräfte in kN; die Schichten vom Terrain an nach unten, N_Ed am Kopf, Druck
-positiv:
+Verformungsmoduln in MN/m², Kräfte in kN; die Schichten vom Terrain an nach
+unten, N_Ed am Kopf, Druck positiv:
 
 ```python
 t = p.pfahl("Pfahl Stütze", stahl="s1", beton="b1", D=900, L=12, t_K=1.5,
-            t_w=3.0)                         # art="mikropfahl", grundlage="statisch", ...
-t.schicht("Auffüllung", d=2.0, gamma=19, mantel="eingeben", q_s=0)   # trägt nicht
-t.schicht("Kies, sandig", d=6.0, gamma=21, phi_k=34, K=0.44)         # K·σ'_v·tan δ
-t.schicht("Ton", d=15.0, gamma=19, verhalten="undrainiert", s_u=80, alpha=0.6)
-t.kombination("Tragsicherheit", N_Ed=800)    # gezogen: N_Ed negativ
+            t_w=3.0)                 # art="mikropfahl", kopf="eingespannt", t_red=2.0, ...
+t.schicht("Auffüllung", d=2.0, gamma=19, mantel="eingeben", q_s=0, E_s=10)  # trägt nicht
+t.schicht("Kies, sandig", d=6.0, gamma=21, phi_k=34, K=0.44, E_s=60)        # K·σ'_v·tan δ
+t.schicht("Ton", d=15.0, gamma=19, verhalten="undrainiert", s_u=80, alpha=0.6, E_s=40)
+t.kombination("Tragsicherheit", N_Ed=800, H_Ed=100)   # gezogen: N_Ed negativ; M_Ed
 ```
 
 Linien- und Dreieckslasten (`wert_b`), Einzellasten, Momente und verteilte
@@ -230,7 +230,7 @@ Fertig und getestet (1229 Tests):
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
-| `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug |
+| `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug; die Steifigkeit als gebetteter Stab (`steifigkeit`, `bettung`): Federn am Kopf und Verläufe über die Tiefe |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
@@ -256,7 +256,7 @@ Fertig und getestet (1229 Tests):
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt: Übersicht und Verläufe |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
-| `web/pfahldaten.py` | was die Situationszeichnung eines Pfahls vom Kern braucht: die Mantelreibung je Stück, den Spitzendruck, die Legende |
+| `web/pfahldaten.py` | was die Bilder eines Pfahls vom Kern brauchen: die Mantelreibung je Stück, den Spitzendruck, die Legende, je Kombination die Verläufe über die Tiefe |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
@@ -271,7 +271,7 @@ Fertig und getestet (1229 Tests):
 | `web/js/balkensystem.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems und seine Ergebnisse |
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
 | `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die die Bilder des Grundbaus teilen |
-| `web/js/pfahl.js`, `pf_zeichnung.js` | die Eingabe eines Pfahls und das Bild seiner Situation |
+| `web/js/pfahl.js`, `pf_zeichnung.js`, `pf_verlauf.js` | die Eingabe eines Pfahls, das Bild seiner Situation und seine Verläufe über die Tiefe |
 | `web/js/python.js`, `konsole.js`, `variablen.js`, `zeichnen.js` | die App «Python»: Code und Konsole, der Faden der Sitzung, die Variablen rechts, die Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
@@ -546,7 +546,19 @@ R_a,d = η_a·R_a,k/γ_M,a mit 1.3 auf Druck und 1.6 auf Zug (42). Der innere
 ist der Querschnitt nach SIA 262, ganz gedrückt oder ganz gezogen, mal η_i
 (50). Rechts stehen die Widerstände beider Nachweise und unter «Diagramme»
 der Pfahl in seinen Schichten mit der Mantelreibung je Stück und dem
-Spitzendruck. Steifigkeit und Querlast folgen.
+Spitzendruck.
+
+Dazu die Steifigkeit, der Pfahl als Stab auf Federn: am Mantel und am Fuss
+nach Cassan (Kap. 12.8), quer k_s = E_s,k/D (SIA 267:2013, 9.5.4.5, (53)),
+bis zur Tiefe t_red von null an wachsend. Jede Schicht hat dafür ihren
+Verformungsmodul E_s,k, die Karte «Bettung» den Kopf -- frei drehbar oder
+eingespannt -- und t_red, die Kombination neben N_Ed auch H_Ed und am frei
+drehbaren Kopf M_Ed. Die Federn am Kopf, mit E_s,k, stehen als Kennzahlen in
+der Zusammenfassung: längs auf Druck und auf Zug, quer frei drehbar und die
+Steifigkeitsmatrix des eingespannten Kopfs. Unter «Diagramme» je Kombination
+die Verläufe über die Tiefe mit E_s,k/1.5: Normalkraft, Setzung,
+Verschiebung, Verdrehung, Moment, Querkraft und Bettungsdruck. Der
+Widerstand quer folgt.
 
 **Python:** die letzte App. Skripte, gespeichert mit dem Projekt; in der
 Mitte der Code und darunter die Konsole, rechts statt der Berechnung die

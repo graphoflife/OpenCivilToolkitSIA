@@ -107,25 +107,30 @@ class TestKnotenlasten(unittest.TestCase):
 
 class TestBettung(unittest.TestCase):
     def test_ist_das_integral(self):
-        """k · ∫ Nᵀ N dx, mit vielen Punkten nachgerechnet."""
-        k_q, k_l = 2e6, 5e5
-        kb = bettung(L, k_q, k_l)
-        n = 2000
-        soll = [[0.0] * 6 for _ in range(6)]
-        for i in range(n):
-            x = (i + 0.5) * L / n
-            n1, n2, h1, h2, h3, h4 = formfunktionen(x, L)
-            quer = {1: h1, 2: h2, 4: h3, 5: h4}
-            laengs = {0: n1, 3: n2}
-            for a, fa in quer.items():
-                for b, fb in quer.items():
-                    soll[a][b] += k_q * fa * fb * L / n
-            for a, fa in laengs.items():
-                for b, fb in laengs.items():
-                    soll[a][b] += k_l * fa * fb * L / n
-        for i in range(6):
-            for j in range(6):
-                self.assertAlmostEqual(kb[i][j], soll[i][j], delta=1e-5 * abs(kb[1][1]))
+        """
+        k · ∫ Nᵀ N dx, mit vielen Punkten nachgerechnet -- quer gleich und
+        linear wachsend, wie am Terrain abgemindert.
+        """
+        k_l = 5e5
+        for k_q in ((2e6, 2e6), (0.0, 2e6), (3e6, 1e6)):
+            kb = bettung(L, k_q, k_l)
+            n = 2000
+            soll = [[0.0] * 6 for _ in range(6)]
+            for i in range(n):
+                x = (i + 0.5) * L / n
+                k_x = k_q[0] + (k_q[1] - k_q[0]) * x / L
+                n1, n2, h1, h2, h3, h4 = formfunktionen(x, L)
+                quer = {1: h1, 2: h2, 4: h3, 5: h4}
+                laengs = {0: n1, 3: n2}
+                for a, fa in quer.items():
+                    for b, fb in quer.items():
+                        soll[a][b] += k_x * fa * fb * L / n
+                for a, fa in laengs.items():
+                    for b, fb in laengs.items():
+                        soll[a][b] += k_l * fa * fb * L / n
+            for i in range(6):
+                for j in range(6):
+                    self.assertAlmostEqual(kb[i][j], soll[i][j], delta=1e-5 * abs(kb[1][1]))
 
 
 class TestAufteilen(unittest.TestCase):

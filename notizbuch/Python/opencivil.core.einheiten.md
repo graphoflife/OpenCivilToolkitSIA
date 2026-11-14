@@ -1,5 +1,5 @@
 ---
-erzeugt: cf441efcbbca
+erzeugt: cf366bc0d4b7
 art: modul
 tags: [modul]
 ---
@@ -421,6 +421,9 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `PRO_M = Einheit('1/m', KRUEMMUNG, 1.0, latex='\\mathrm{m}^{-1}', beschriftung…`
 - `KNM2 = Einheit('kNm^2', MOMENT * LAENGE, 1000.0, latex='\\mathrm{kNm}^{2}', …`
 - `KNM_PRO_RAD = Einheit('kNm/rad', MOMENT, 1000.0, latex='\\mathrm{kNm}/\\mathrm{rad}…`
+- `MN_PRO_M = Einheit('MN/m', KRAFT_PRO_LAENGE, 1000000.0, latex='\\mathrm{MN}/\\ma…`
+- `MNM_PRO_RAD = Einheit('MNm/rad', MOMENT, 1000000.0, latex='\\mathrm{MNm}/\\mathrm{r…`
+- `MNM2 = Einheit('MNm^2', MOMENT * LAENGE, 1000000.0, latex='\\mathrm{MNm}^{2}…`
 - `KG = Einheit('kg', MASSE, 1.0)`
 - `T = Einheit('t', MASSE, 1000.0)`
 - `KG_PRO_M3 = Einheit('kg/m^3', DICHTE, 1.0, latex='\\mathrm{kg}/\\mathrm{m}^{3}')`
@@ -477,6 +480,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.innen]]
 - [[opencivil.pfahl.pfahl]]
+- [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]

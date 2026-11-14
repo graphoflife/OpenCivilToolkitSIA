@@ -11,5 +11,9 @@ opencivil/pfahl -- ein Einzelpfahl nach SIA 267:2013, Kapitel 9.
   teilen: je Kombination Druck oder Zug gegen den Widerstand.
 * :mod:`~opencivil.pfahl.aussen` -- der äussere Widerstand: Mantel und Fuss.
 * :mod:`~opencivil.pfahl.innen` -- der innere Widerstand: der Querschnitt.
+* :mod:`~opencivil.pfahl.steifigkeit` -- der Pfahl als Stab auf Federn: die
+  Federn des Bodens, die Federn am Kopf und je Kombination die Verläufe.
+* :mod:`~opencivil.pfahl.bettung` -- der gebettete Stab, längs und quer, mit
+  den Elementen des Stabwerks gelöst.
 * :mod:`~opencivil.pfahl.uebersicht` -- was über der Nachweistabelle steht.
 """

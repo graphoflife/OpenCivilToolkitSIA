@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e6cbe94c94e
+erzeugt: f6dffdc57e3e
 art: modul
 tags: [modul]
 ---
@@ -54,6 +54,9 @@ Ein Stab auf einem nachgiebigen Linienlager (Winkler) bekommt zu seiner
 Steifigkeit `k · ∫ Nᵀ N dx` -- die konsistente Bettungsmatrix. Mit
 kubischen Formfunktionen ist das eine Naeherung; das System teilt einen
 gebetteten Stab darum in kurze Stuecke ([[opencivil.stabwerk.system|system]]).
+Quer darf `k` vom Anfang zum Ende linear wachsen -- der gebettete Pfahl
+([[opencivil.pfahl.bettung]]) mindert so die Bettung am Terrain ab; das
+System selbst bettet gleichmaessig.
 
 ## Inhalt
 
@@ -74,11 +77,13 @@ Die Steifigkeitsmatrix 6 × 6 in den Achsen des Stabs.
 ### bettung
 
 ```python
-def bettung(L: float, k_quer: float=0.0, k_laengs: float=0.0) -> Matrix
+def bettung(L: float, k_quer: Tuple[float, float]=(0.0, 0.0), k_laengs: float=0.0) -> Matrix
 ```
 
 Die konsistente Bettungsmatrix 6 × 6: `k · ∫ Nᵀ N dx`, quer auf
-`v` und `θ`, laengs auf `u`. `k` in N/m je m Stab, also N/m².
+`v` und `θ`, laengs auf `u`. `k` in N/m je m Stab, also N/m²;
+quer am Anfang und am Ende, dazwischen linear -- an beiden Enden gleich
+ist es die Matrix mit `k · L / 420` ([[opencivil.stabwerk.stab#Konstanten|BETTUNG_LATEX]]).
 
 ### summe
 
@@ -208,6 +213,7 @@ Die arbeitsgleichen Knotenkraefte `f` (6) in den Achsen des Stabs --
 ## Gebraucht von
 
 - [[opencivil.decke.traeger]]
+- [[opencivil.pfahl.bettung]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk.verlauf]]

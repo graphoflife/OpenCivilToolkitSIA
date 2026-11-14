@@ -8,16 +8,12 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] **Pfähle: Steifigkeit und Querlast.** Äusserer und innerer Widerstand
-      längs der Achse stehen (siehe [[Entwicklung]], 2026-11-14). Es fehlen,
-      je ein Commit: die Steifigkeit -- der Pfahl als gebetteter Stab im
-      Stabwerk, längs mit den Federn nach Cassan (Kap. 12.8), quer mit
-      k_s = E_s/D (SIA 267:2013, 9.5.4.5, (53)), in der Tragsicherheit mit
-      E_s,k/1.5, sonst mit E_s,k; Kopf frei oder eingespannt, Kopffedern und
-      Verläufe über die Tiefe --, dann die Querlast: der seitliche
+- [ ] **Pfähle: die Querlast.** Widerstand längs der Achse und Steifigkeit
+      stehen (siehe [[Entwicklung]], 2026-11-14). Es fehlt: der seitliche
       Erdwiderstand aus φ', c', γ (Kap. 9.3.5, 9.3.6) auf der Breite 3·D
-      (Kap. 10.8), R_tr,d = η_a·R_tr,k/1.4 (9.5.2.3.1, (49)), die Bettung
-      gegen 9.5.4.5 geprüft. Danach die Decken weiter.
+      (Kap. 10.8), R_tr,d = η_a·R_tr,k/1.4 (9.5.2.3.1, (49)), der
+      Bettungsdruck der Verläufe dagegen geprüft (9.5.4.5) und der innere
+      Widerstand mit M und V. Danach die Decken weiter.
 - [ ] **Decken: die App fertig bauen.** Rechenkern, Zeichenfenster sowie
       Lasten und Lastfälle stehen (siehe [[Entwicklung]], 2026-11-13). Es
       fehlen, je ein Commit: die Ergebnisbilder samt Lagerkräften, der
@@ -423,6 +419,18 @@ Norm dazu sagt.
       Querschnitt sonst bei −ε_c1d. Das Tragglied rechnet als Betonstahl nach
       SIA 262 mit γ_s; SIA 263 liegt nicht vor. Vorschlag: so lassen, jede
       Annahme steht in der Herleitung. Entscheid des Benutzers.
+- [ ] **Pfähle, Steifigkeit nach Vorgabe eingebaut**
+      (`opencivil/pfahl/steifigkeit.py`). Die Bettung quer wächst vom
+      Terrain linear bis t_red, vorgegeben 2 m -- 9.5.4.5 verlangt nur, sie
+      nahe der Oberfläche abzumindern. Der Mikropfahl rechnet mit Cassans
+      Federn für Bohrpfähle. Der Querschnitt ungerissen und ohne Bewehrung,
+      beim Bohrpfahl mit E_cm, beim Mikropfahl nur das Tragglied. γ_E = 1.5,
+      der kleinste Wert nach 5.3.2.5. Längs und quer getrennt, ohne Theorie
+      zweiter Ordnung (9.5.3.4.3 verlangt dafür eine eigene Untersuchung).
+      Keine Feder am Mantel, wo q_s,k null eingegeben ist; eine Feder am
+      Fuss, wo R_a,k aus einem Versuch kommt. Vorgabe für E_s,k: 30 MN/m²,
+      das Beispiel des Buches. Vorschlag: so lassen, jede Annahme steht in
+      der Herleitung. Entscheid des Benutzers.
 - [ ] **Pfähle, nicht nachgewiesen:** die konstruktiven Regeln des
       Bohrpfahls (SIA 267:2013, 9.6.3.2.3 bis 9.6.3.2.6: Mindestbewehrung,
       Zahl und Abstand der Stäbe, Überdeckung), der Kopf auf 1.2·R_i,k

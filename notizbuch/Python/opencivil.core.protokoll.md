@@ -1,5 +1,5 @@
 ---
-erzeugt: 3b13b7050d04
+erzeugt: 65c53e33c323
 art: modul
 tags: [modul]
 ---
@@ -602,6 +602,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
 - [[opencivil.pfahl.pfahl]]
+- [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]

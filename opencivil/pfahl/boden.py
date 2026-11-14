@@ -4,8 +4,9 @@ opencivil/pfahl/boden.py -- der Baugrund um einen Pfahl.
 VERANTWORTUNG:
 Die Schichten des Baugrunds, wie der Pfahl sie braucht (:class:`Pfahlschicht`):
 Dicke, Raumlast, das Verhalten -- drainiert mit φ'_k und c'_k, undrainiert
-mit s_u,k (:class:`Verhalten`) -- und woher die Mantelreibung kommt:
-gerechnet oder eingegeben (:class:`Mantel`). Dazu als Zahlen die Spannungen
+mit s_u,k (:class:`Verhalten`) --, woher die Mantelreibung kommt: gerechnet
+oder eingegeben (:class:`Mantel`), und der Verformungsmodul, auf dem der
+Pfahl gebettet ist. Dazu als Zahlen die Spannungen
 im Boden und die Stücke des Mantels, über die die Mantelreibung summiert
 wird (:class:`Profil`).
 
@@ -107,18 +108,24 @@ class Pfahlschicht:
     alpha: Groesse
     """Die Adhäsion im Verhältnis zu s_u,k -- gerechnet, undrainiert."""
 
+    E_s: Groesse
+    """Der Verformungsmodul, charakteristisch: woraus die Bettung des Pfahls folgt."""
+
     @property
     def drainiert(self) -> bool:
         return self.verhalten is Verhalten.DRAINIERT
 
     def kurznamen(self) -> Tuple[str, ...]:
-        """Die Zahlen, die gelten: Dicke und Raumlast, die Festigkeit, die Mantelreibung."""
+        """
+        Die Zahlen, die gelten: Dicke und Raumlast, die Festigkeit, die
+        Mantelreibung, der Verformungsmodul.
+        """
         namen = ["d", "gamma", *(("phi_k", "c_k") if self.drainiert else ("s_u",))]
         if self.mantel is Mantel.EINGEBEN:
             namen.append("q_s")
         else:
             namen += ["K", "delta_faktor"] if self.drainiert else ["alpha"]
-        return tuple(namen)
+        return (*namen, "E_s")
 
 
 @dataclass(frozen=True)

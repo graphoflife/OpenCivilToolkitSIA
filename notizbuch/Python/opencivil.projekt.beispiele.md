@@ -1,5 +1,5 @@
 ---
-erzeugt: c4222148d40f
+erzeugt: fc0ce7e8a153
 art: modul
 tags: [modul]
 ---
@@ -126,12 +126,14 @@ def _pfaehle(p: Projekt) -> None
 
 Jede Spielart des Pfahls. Ein Bohrpfahl im Kies, das Grundwasser teilt
 eine Schicht, die oberste trägt nicht; sein Fuss schert örtlich ab, in
-der Moräne liegt K über K_0, und er wird auch gezogen. Ein Bohrpfahl
-im Ton, undrainiert an Mantel und Fuss, der auf Druck nicht aufgeht.
-Ein Mikropfahl mit Rohr aus einem statischen Versuch, mit Abrostung
-und η_i über dem Regelwert; einer mit Vollstab aus Erfahrung, die
-Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
-eingegeben.
+der Moräne liegt K über K_0, und er wird auch gezogen, quer mit einem
+Moment am frei drehbaren Kopf. Ein Bohrpfahl im Ton, undrainiert an
+Mantel und Fuss, der auf Druck nicht aufgeht, der Kopf eingespannt --
+sein Moment zählt dann nicht. Ein Mikropfahl mit Rohr aus einem
+statischen Versuch, ohne Schichten und darum ohne Steifigkeit, mit
+Abrostung und η_i über dem Regelwert; einer mit Vollstab aus Erfahrung,
+die Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
+eingegeben, quer leicht belastet.
 
 ### _erstes
 

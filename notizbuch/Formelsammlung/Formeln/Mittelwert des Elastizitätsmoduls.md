@@ -1,5 +1,5 @@
 ---
-erzeugt: 75d399903231
+erzeugt: 2db2218da884
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.1.2.3.3, (10)"
@@ -31,7 +31,9 @@ $$
 - [[Beiwert der Parabel]]
 - [[Bemessungswert des Elastizitätsmoduls]]
 - [[Biegesteifigkeit]]
+- [[Biegesteifigkeit des Pfahls]]
 - [[Dehnsteifigkeit]]
+- [[Dehnsteifigkeit des Pfahls]]
 - [[Wertigkeit im gerissenen Zustand]]
 - [[Wirksamer Elastizitätsmodul]]
 

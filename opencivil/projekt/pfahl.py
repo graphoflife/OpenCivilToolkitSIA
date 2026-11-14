@@ -4,8 +4,8 @@ opencivil/projekt/pfahl.py -- ein Einzelpfahl, wie die Oberflaeche ihn beschreib
 VERANTWORTUNG:
 Der :class:`PfahlEintrag`: Art und Masse des Pfahls, sein Querschnitt, die
 Schichten des Baugrunds, das Grundwasser, worauf der äussere Widerstand
-beruht, und die Normalkräfte am Kopf -- als speicherbare Datenklasse.
-Gerechnet wird in :mod:`opencivil.pfahl`.
+beruht, wie der Kopf gehalten ist, und die Kräfte am Kopf -- als
+speicherbare Datenklasse. Gerechnet wird in :mod:`opencivil.pfahl`.
 
 DIE VORGABEN:
 Gesetzt, damit sich gleich etwas rechnen lässt, aus keiner Quelle: ein
@@ -17,7 +17,10 @@ K = 0.5, etwa K_0 = 1 − sin φ'_k (Kap. 2.7), und δ = φ'_k, wie das Buch
 für raue Pfähle sagt (Kap. 12.5); undrainiert α = 0.6, sein Wert für
 Bohrpfähle in weichem Ton. η_a = 0.7 und η_i = 0.8 sind die Grenzwerte der
 Norm für eine Berechnung und ohne Prüfung der Integrität. Der Mikropfahl
-hat ein Rohr 114.3 × 10 mm ohne Abrostung, bis jemand eine angibt.
+hat ein Rohr 114.3 × 10 mm ohne Abrostung, bis jemand eine angibt. Der
+Verformungsmodul E_s,k = 30 MN/m² ist der des Beispiels im Buch zu Cassans
+Federn (Kap. 12.8); der Kopf dreht sich frei, und die Bettung quer wächst
+bis 2 m unter Terrain von null an.
 
 Die Namen der Schichten müssen nicht verschieden sein, wie bei der Setzung:
 die Werte tragen die Nummer der Schicht.
@@ -29,9 +32,11 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, List
 
-from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KPA, M, MM
+from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KNM, KPA, M, MM, MN_PRO_M2
 from opencivil.pfahl.boden import Mantel, Verhalten
-from opencivil.pfahl.pfahl import ETA_I_HOECHSTENS, Abscheren, Grundlage, Pfahlart, Spitze, Tragglied
+from opencivil.pfahl.pfahl import (
+    ETA_I_HOECHSTENS, Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied,
+)
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung, eindeutig
 from opencivil.projekt.lesen import ProjektFehler, bereich, lesen
 
@@ -62,13 +67,21 @@ class PfahlschichtEintrag(Beschreibung):
     Vorgabe, nicht nachgeschlagen.
     """
 
+    E_s: float = bereich(30.0, heisst="Verformungsmodul E_s,k", einheit=MN_PRO_M2, ueber=0.0)
+
 
 @dataclass
 class PfahlkombinationEintrag(Beschreibung):
-    """Eine Einwirkung auf den Pfahlkopf: die Normalkraft in kN, Druck positiv."""
+    """
+    Eine Einwirkung auf den Pfahlkopf: die Normalkraft in kN, Druck positiv,
+    die Querkraft in kN und das Moment in kNm -- siehe
+    :class:`~opencivil.pfahl.pfahl.Kombination`.
+    """
 
     name: str
     N_Ed: float = bereich(1000.0, heisst="Normalkraft N_Ed, Druck positiv", einheit=KN)
+    H_Ed: float = bereich(0.0, heisst="Querkraft H_Ed", einheit=KN)
+    M_Ed: float = bereich(0.0, heisst="Moment M_Ed", einheit=KNM)
     aktiv: bool = True
     """Ob die Kombination gerechnet wird. Ausgeschaltet bleibt sie stehen."""
 
@@ -115,6 +128,9 @@ class PfahlEintrag(BauteilEintrag):
     t_r: float = bereich(10.0, heisst="Wanddicke t", einheit=MM, ueber=0.0)
     dt: float = bereich(0.0, heisst="Abrostung Δt", einheit=MM, ab=0.0)
 
+    kopf: Kopf = Kopf.FREI
+    t_red: float = bereich(2.0, heisst="Tiefe der Abminderung t_red", einheit=M, ab=0.0)
+
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein."""
 
@@ -141,18 +157,24 @@ class PfahlEintrag(BauteilEintrag):
     def schicht(self, name: str, **felder: Any) -> PfahlschichtEintrag:
         """
         Eine Schicht unten anfügen -- Dicke in m, Raumlast in kN/m³, Winkel in
-        Grad, Spannungen in kPa; ``verhalten`` und ``mantel`` als Wort, wie in
-        der Datei: ``verhalten="undrainiert"``.
+        Grad, Spannungen in kPa, den Verformungsmodul in MN/m²; ``verhalten``
+        und ``mantel`` als Wort, wie in der Datei: ``verhalten="undrainiert"``.
         """
         eintrag = lesen(PfahlschichtEintrag, {"name": name, **felder}, f"Schicht '{name}'")
         self.schichten.append(eintrag)
         return eintrag
 
-    def kombination(self, name: str, *, N_Ed: float) -> PfahlkombinationEintrag:
-        """Eine Kombination anfügen -- N_Ed in kN, Druck positiv."""
-        eintrag = PfahlkombinationEintrag(name=name, N_Ed=N_Ed)
+    def kombination(self, name: str, *, N_Ed: float, H_Ed: float = 0.0,
+                    M_Ed: float = 0.0) -> PfahlkombinationEintrag:
+        """Eine Kombination anfügen -- N_Ed und H_Ed in kN, Druck positiv, M_Ed in kNm."""
+        eintrag = PfahlkombinationEintrag(name=name, N_Ed=N_Ed, H_Ed=H_Ed, M_Ed=M_Ed)
         self.kombinationen.append(eintrag)
         return eintrag
+
+    @property
+    def boden_unter_dem_fuss(self) -> bool:
+        """Ob die Schichten tiefer reichen als der Fuss -- nur dann trägt ihn Boden."""
+        return self.t_K + self.L < sum(s.d for s in self.schichten)
 
     def regeln(self, wo: str) -> None:
         """
@@ -189,11 +211,11 @@ class PfahlEintrag(BauteilEintrag):
                                     f"ohne Reibung die Schicht undrainiert rechnen.")
             if s.verhalten is Verhalten.UNDRAINIERT and s.s_u <= 0.0:
                 raise ProjektFehler(f"{wo}, Schicht {i}: undrainiert braucht s_u,k über null.")
-        tiefe = sum(s.d for s in self.schichten)
-        if self.t_K + self.L >= tiefe:
+        if not self.boden_unter_dem_fuss:
             raise ProjektFehler(
                 f"{wo}: der Fuss liegt in {self.t_K + self.L:g} m, die Schichten reichen bis "
-                f"{tiefe:g} m. Unter dem Fuss muss noch Boden sein, der ihn trägt.")
+                f"{sum(s.d for s in self.schichten):g} m. Unter dem Fuss muss noch Boden "
+                f"sein, der ihn trägt.")
 
     def _bewehrung(self, wo: str) -> None:
         """Die Längsstäbe müssen im Kreis Platz haben, ohne sich zu berühren."""

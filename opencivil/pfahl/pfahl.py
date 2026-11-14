@@ -11,10 +11,12 @@ Rechenwerk, und nur die, die nach den Wahlen gelten (:meth:`Pfahl.kurznamen`):
 * :class:`Grundlage` -- worauf der äussere Widerstand R_a,k beruht: auf einer
   Berechnung aus den Schichten, auf Erfahrung oder auf einem Versuch, und
   wie gross der Umrechnungsfaktor η_a darum höchstens ist;
-* :class:`Spitze` und :class:`Abscheren` -- ob der Fuss trägt und wie.
+* :class:`Spitze` und :class:`Abscheren` -- ob der Fuss trägt und wie;
+* :class:`Kopf` -- ob sich der Kopf frei drehen kann oder eingespannt ist.
 
 Gerechnet wird in den Nachweisen: äusserer Widerstand in
-:mod:`opencivil.pfahl.aussen`, innerer in :mod:`opencivil.pfahl.innen`.
+:mod:`opencivil.pfahl.aussen`, innerer in :mod:`opencivil.pfahl.innen` --
+und die Steifigkeit in :mod:`opencivil.pfahl.steifigkeit`.
 
 TIEFEN:
 z zählt ab Oberkante Terrain nach unten. Der Kopf liegt in der Tiefe t_K,
@@ -36,7 +38,9 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Berechnung, Vorgabe
-from opencivil.core.einheiten import EINHEITSLOS, GRAD, KN, KN_PRO_M3, KPA, M, MM, Groesse
+from opencivil.core.einheiten import (
+    EINHEITSLOS, GRAD, KN, KN_PRO_M3, KNM, KPA, M, MM, MN_PRO_M2, Groesse,
+)
 from opencivil.core.protokoll import Abschnitt
 from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wahl import Wahl
@@ -177,12 +181,35 @@ class Tragglied(Wahl):
                 Tragglied.STAB: "Ein voller Stab aus Stahl"}[self]
 
 
+class Kopf(Wahl):
+    """Wie der Pfahlkopf gehalten ist -- daran hängt, was eine Querkraft mit ihm macht."""
+
+    FREI = "frei"
+    EINGESPANNT = "eingespannt"
+
+    @property
+    def beschriftung(self) -> str:
+        return {Kopf.FREI: "frei drehbar", Kopf.EINGESPANNT: "eingespannt"}[self]
+
+    @property
+    def erklaerung(self) -> str:
+        return {Kopf.FREI: "Der Kopf dreht sich frei; ein Moment am Kopf ist eine Einwirkung",
+                Kopf.EINGESPANNT: "Der Kopf dreht sich nicht, etwa in einer steifen "
+                                  "Pfahlkopfplatte; das Moment dort ist die Reaktion"}[self]
+
+
 @dataclass(frozen=True)
 class Kombination:
-    """Eine Einwirkung auf den Pfahlkopf: die Normalkraft, Druck positiv."""
+    """
+    Eine Einwirkung auf den Pfahlkopf: die Normalkraft, Druck positiv, die
+    Querkraft und das Moment -- das Moment dreht wie die Querkraft, wenn sie
+    über dem Kopf angreift.
+    """
 
     name: str
     N_Ed: Groesse
+    H_Ed: Groesse = field(default_factory=lambda: Groesse(0.0, KN))
+    M_Ed: Groesse = field(default_factory=lambda: Groesse(0.0, KNM))
 
     @property
     def kennung(self) -> str:
@@ -243,6 +270,10 @@ class Pfahl(Rechenobjekt):
     dt: Groesse
     """Mikropfahl: Aussendurchmesser und Wanddicke des Tragglieds, Abrostung aussen."""
 
+    kopf: Kopf
+    t_red: Groesse
+    """Bis in diese Tiefe unter Terrain wächst die Bettung quer von null an."""
+
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
     berechnungen: List[Berechnung] = field(default_factory=list, init=False)
 
@@ -258,6 +289,14 @@ class Pfahl(Rechenobjekt):
     @property
     def bohrpfahl(self) -> bool:
         return self.art is Pfahlart.BOHRPFAHL
+
+    @property
+    def fuss_traegt(self) -> bool:
+        """
+        Ob der Fuss trägt: nach der Wahl «Fuss» -- mit R_a,k aus einem Versuch
+        immer, der Versuch hat den ganzen Pfahl belastet.
+        """
+        return self.grundlage.aus_versuch or self.spitze is not Spitze.KEINE
 
     @property
     def baustoffe(self) -> Tuple[Baustoff, ...]:
@@ -325,8 +364,12 @@ class Pfahl(Rechenobjekt):
         querschnitt += (("eta_i", r"\eta_i", EINHEITSLOS,
                          "Umrechnungsfaktor des inneren Widerstands", 2, self.eta_i,
                          "SIA 267:2013, 9.5.2.4.4, (51); 9.5.2.4.9"),)
+        bettung = (("t_red", "t_{red}", M,
+                    "Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst", 2,
+                    self.t_red, "SIA 267:2013, 9.5.4.5"),)
         gruppen = [("Pfahl", pfahl), ("Grundwasser", wasser),
-                   ("Äusserer Widerstand", tuple(aussen)), ("Querschnitt", querschnitt)]
+                   ("Äusserer Widerstand", tuple(aussen)), ("Querschnitt", querschnitt),
+                   ("Bettung", bettung)]
         for i, s in enumerate(self.schichten, start=1):
             gruppen.append((f"Schicht {i}: {s.name}", tuple(
                 self._schichtwert(i, s, kurz) for kurz in s.kurznamen())))
@@ -351,6 +394,8 @@ class Pfahl(Rechenobjekt):
                              buch.KAP_MANTEL),
             "alpha": (rf"\alpha_{{{i}}}", EINHEITSLOS,
                       "Adhäsion in der #, als Teil von s_u,k", 2, buch.KAP_MANTEL),
+            "E_s": (f"E_{{s,k,{i}}}", MN_PRO_M2, "Verformungsmodul der #, charakteristisch", 0,
+                    ""),
         }[kurz]
         return (f"{kurz}_{i}", symbol, einheit, beschreibung.replace("#", f"Schicht {i}"),
                 stellen, getattr(s, kurz), referenz)

@@ -1,5 +1,5 @@
 ---
-erzeugt: a45ad4047192
+erzeugt: 3cf1c6111a7e
 art: modul
 tags: [modul]
 ---
@@ -17,14 +17,20 @@ tags: [modul]
   teilen: je Kombination Druck oder Zug gegen den Widerstand.
 * [[opencivil.pfahl.aussen|aussen]] -- der äussere Widerstand: Mantel und Fuss.
 * [[opencivil.pfahl.innen|innen]] -- der innere Widerstand: der Querschnitt.
+* [[opencivil.pfahl.steifigkeit|steifigkeit]] -- der Pfahl als Stab auf Federn: die
+  Federn des Bodens, die Federn am Kopf und je Kombination die Verläufe.
+* [[opencivil.pfahl.bettung|bettung]] -- der gebettete Stab, längs und quer, mit
+  den Elementen des Stabwerks gelöst.
 * [[opencivil.pfahl.uebersicht|uebersicht]] -- was über der Nachweistabelle steht.
 
 ## Module
 
 - [[opencivil.pfahl.achse]] – was die Nachweise längs der Pfahlachse teilen.
 - [[opencivil.pfahl.aussen]] – der äussere Widerstand eines Pfahls längs seiner Achse.
+- [[opencivil.pfahl.bettung]] – der Pfahl als gebetteter Stab.
 - [[opencivil.pfahl.boden]] – der Baugrund um einen Pfahl.
 - [[opencivil.pfahl.buch]] – die Zahlen des Buches zum Einzelpfahl.
 - [[opencivil.pfahl.innen]] – der innere Widerstand eines Pfahls: sein Querschnitt.
 - [[opencivil.pfahl.pfahl]] – ein Einzelpfahl in seinem Baugrund.
+- [[opencivil.pfahl.steifigkeit]] – wie steif ein Pfahl im Boden steht, und wie er sich verformt.
 - [[opencivil.pfahl.uebersicht]] – was über der Nachweistabelle eines Pfahls steht.

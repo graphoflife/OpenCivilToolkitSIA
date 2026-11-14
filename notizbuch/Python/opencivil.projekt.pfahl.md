@@ -1,5 +1,5 @@
 ---
-erzeugt: df58d97b3220
+erzeugt: b0d15d397063
 art: modul
 tags: [modul]
 ---
@@ -11,8 +11,8 @@ tags: [modul]
 
 Der [[opencivil.projekt.pfahl#PfahlEintrag|PfahlEintrag]]: Art und Masse des Pfahls, sein Querschnitt, die
 Schichten des Baugrunds, das Grundwasser, worauf der äussere Widerstand
-beruht, und die Normalkräfte am Kopf -- als speicherbare Datenklasse.
-Gerechnet wird in [[opencivil.pfahl]].
+beruht, wie der Kopf gehalten ist, und die Kräfte am Kopf -- als
+speicherbare Datenklasse. Gerechnet wird in [[opencivil.pfahl]].
 
 
 ## DIE VORGABEN
@@ -26,7 +26,10 @@ K = 0.5, etwa K_0 = 1 − sin φ'_k (Kap. 2.7), und δ = φ'_k, wie das Buch
 für raue Pfähle sagt (Kap. 12.5); undrainiert α = 0.6, sein Wert für
 Bohrpfähle in weichem Ton. η_a = 0.7 und η_i = 0.8 sind die Grenzwerte der
 Norm für eine Berechnung und ohne Prüfung der Integrität. Der Mikropfahl
-hat ein Rohr 114.3 × 10 mm ohne Abrostung, bis jemand eine angibt.
+hat ein Rohr 114.3 × 10 mm ohne Abrostung, bis jemand eine angibt. Der
+Verformungsmodul E_s,k = 30 MN/m² ist der des Beispiels im Buch zu Cassans
+Federn (Kap. 12.8); der Kopf dreht sich frei, und die Bettung quer wächst
+bis 2 m unter Terrain von null an.
 
 Die Namen der Schichten müssen nicht verschieden sein, wie bei der Setzung:
 die Werte tragen die Nummer der Schicht.
@@ -54,6 +57,7 @@ Eine Schicht des Baugrunds, vom Terrain an nach unten -- siehe [[opencivil.pfahl
 - `K: float = bereich(0.5, heisst='K', ab=0.0)`
 - `delta_faktor: float = bereich(1.0, heisst="δ/φ'_k", ab=0.0, bis=1.0)` – Höchstens eins: zwischen Pfahl und Boden reibt es nie stärker als im Boden -- nach Vorgabe, nicht nachgeschlagen.
 - `alpha: float = bereich(0.6, heisst='α', ab=0.0, bis=1.0)` – Höchstens eins: die Adhäsion erreicht höchstens die Scherfestigkeit -- nach Vorgabe, nicht nachgeschlagen.
+- `E_s: float = bereich(30.0, heisst='Verformungsmodul E_s,k', einheit=MN_PRO_M2, ueb…`
 
 ### PfahlkombinationEintrag
 
@@ -62,10 +66,14 @@ Eine Schicht des Baugrunds, vom Terrain an nach unten -- siehe [[opencivil.pfahl
 class PfahlkombinationEintrag(Beschreibung)
 ```
 
-Eine Einwirkung auf den Pfahlkopf: die Normalkraft in kN, Druck positiv.
+Eine Einwirkung auf den Pfahlkopf: die Normalkraft in kN, Druck positiv,
+die Querkraft in kN und das Moment in kNm -- siehe
+[[opencivil.pfahl.pfahl#Kombination|Kombination]].
 
 - `name: str`
 - `N_Ed: float = bereich(1000.0, heisst='Normalkraft N_Ed, Druck positiv', einheit=KN)`
+- `H_Ed: float = bereich(0.0, heisst='Querkraft H_Ed', einheit=KN)`
+- `M_Ed: float = bereich(0.0, heisst='Moment M_Ed', einheit=KNM)`
 - `aktiv: bool = True` – Ob die Kombination gerechnet wird. Ausgeschaltet bleibt sie stehen.
 
 ### PfahlEintrag
@@ -104,6 +112,8 @@ Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf.
 - `d_a: float = bereich(114.3, heisst='Aussendurchmesser d_a', einheit=MM, ueber=0.0)`
 - `t_r: float = bereich(10.0, heisst='Wanddicke t', einheit=MM, ueber=0.0)`
 - `dt: float = bereich(0.0, heisst='Abrostung Δt', einheit=MM, ab=0.0)`
+- `kopf: Kopf = Kopf.FREI`
+- `t_red: float = bereich(2.0, heisst='Tiefe der Abminderung t_red', einheit=M, ab=0.0)`
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
 - `schichten: List[PfahlschichtEintrag] = field(default_factory=list)` – Vom Terrain an nach unten.
 - `kombinationen: List[PfahlkombinationEintrag] = field(default_factory=list)`
@@ -139,16 +149,25 @@ def schicht(self, name: str, **felder: Any) -> PfahlschichtEintrag
 ```
 
 Eine Schicht unten anfügen -- Dicke in m, Raumlast in kN/m³, Winkel in
-Grad, Spannungen in kPa; `verhalten` und `mantel` als Wort, wie in
-der Datei: `verhalten="undrainiert"`.
+Grad, Spannungen in kPa, den Verformungsmodul in MN/m²; `verhalten`
+und `mantel` als Wort, wie in der Datei: `verhalten="undrainiert"`.
 
 #### PfahlEintrag.kombination
 
 ```python
-def kombination(self, name: str, *, N_Ed: float) -> PfahlkombinationEintrag
+def kombination(self, name: str, *, N_Ed: float, H_Ed: float=0.0, M_Ed: float=0.0) -> PfahlkombinationEintrag
 ```
 
-Eine Kombination anfügen -- N_Ed in kN, Druck positiv.
+Eine Kombination anfügen -- N_Ed und H_Ed in kN, Druck positiv, M_Ed in kNm.
+
+#### PfahlEintrag.boden_unter_dem_fuss
+
+```python
+@property
+def boden_unter_dem_fuss(self) -> bool
+```
+
+Ob die Schichten tiefer reichen als der Fuss -- nur dann trägt ihn Boden.
 
 #### PfahlEintrag.regeln
 
