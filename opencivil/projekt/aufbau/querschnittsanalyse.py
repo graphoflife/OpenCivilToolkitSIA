@@ -76,7 +76,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     aufbau.eintragen(teil, "qa_biegung", eintrag.kennung, SchiefeBiegung(
         analyse, lastfaelle, laengszug=schub if eintrag.laengszugkraft else None))
 
-    duktilitaet = DuktilitaetQA(analyse, grenze=eintrag.x_d_max)
+    duktilitaet = DuktilitaetQA(analyse, beiwert=eintrag.x_d_max)
     duktilitaet.still = not eintrag.duktilitaet
     aufbau.eintragen(teil, "qa_duktilitaet", eintrag.kennung, duktilitaet)
     sproede = SproedesVersagenQA(analyse)

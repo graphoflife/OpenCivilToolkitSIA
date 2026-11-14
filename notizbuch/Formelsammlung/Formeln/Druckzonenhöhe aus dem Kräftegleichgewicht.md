@@ -1,10 +1,11 @@
 ---
-erzeugt: 20f2519c1737
+erzeugt: 4cd2c1ca3f37
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.2.1.5, Figur 12"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.2.1.5, Figur 12
 
 $$
 x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}}
@@ -14,10 +15,10 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $A_{s,2,x}$ | – | mm² | Zwischenwert |
-| $f_{yd}$ | – | N/mm² | Zwischenwert |
-| $b$ | – | mm | Zwischenwert |
-| $f_{cd}$ | – | N/mm² | Zwischenwert |
+| $A_{s,2,x}$ | – | mm² | Zwischenwert, [[Bewehrung der Lage]] |
+| $f_{yd}$ | Bemessungswert der Fliessgrenze | N/mm² | Zwischenwert, [[Bemessungswert der Fliessgrenze]] |
+| $b$ | Betrachtete Breite (x) | mm | Zwischenwert, Vorgabe |
+| $f_{cd}$ | Bemessungswert der Betondruckfestigkeit | N/mm² | Zwischenwert, [[Bemessungswert der Betondruckfestigkeit]] |
 
 ## Beispiel
 
@@ -34,11 +35,13 @@ $$
 
 ## Im Code
 
+- [[opencivil.nachweis.duktilitaet#Duktilitaet.protokoll_lage|Duktilitaet.protokoll_lage]]
 - [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
 
 ## Themen
 
 - [[Biegung und Normalkraft]]
+- [[Duktilität]]
 - [[Kennzahlen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
@@ -52,4 +55,5 @@ Kräfte folgt $x$ -- die Lage der Nulllinie, ab dem gedrückten Rand.
 
 Dass der Stahl dabei fliesst, setzt die Rechnung voraus. Bei üblicher
 Bewehrung trifft das zu; ob die Druckzone dafür klein genug ist, prüft die
-[[Bedingung der Duktilität]].
+[[Bedingung der Duktilität]]. Sie rechnet dieselbe Höhe je Lage einzeln, als
+trüge die Lage allein.

@@ -157,7 +157,7 @@ export function anfuegenKnopf(text, tun) {
  * Die Zeile eines Nachweises mit *einem* Schalter: Duktilität, sprödes
  * Versagen und die Zeilen der Zwängung. Vorne der Schalter, dann die Marke,
  * die der Ort davor setzt (`ort.marke`: bei der Platte die Tragrichtung x),
- * der Name, dahinter wahlweise ein Feld -- die Grenze x/d, das φ der
+ * der Name, dahinter wahlweise ein Feld -- der Beiwert der Grenze x/d, das φ der
  * Zwängung auf Biegung -- und zuletzt, was der Ort zum Nachweis sagt
  * (`ort.hinweis`). `name` sagt, woran gemessen wird, `was` im Titel des
  * Schalters, was er führt.
@@ -196,18 +196,19 @@ function rechenwerteSatz(ort) {
   return ort.rechenwerte ? el('p.qa-erlaeuterung', { text: ort.rechenwerte }) : null;
 }
 
-/** Duktilität: ein Schalter und die Grenze x/d. */
+/** Duktilität: ein Schalter und der Beiwert k der Grenze x/d ≤ k·435/f_yd. */
 function duktilitaetInhalt(eintrag, ort) {
   return [
     schalterZeile(eintrag, ort, {
-      feld: 'duktilitaet', name: 'Max. x/d',
-      // Vorgabe und Höchstwert der Grenze kennt der Kern. Leer gelassen
+      feld: 'duktilitaet', name: 'x/d ≤ k·435/f_yd, k =',
+      // Vorgabe und Höchstwert des Beiwerts kennt der Kern. Leer gelassen
       // bleibt der bisherige Wert -- eine Grenze von null gäbe es nicht.
       zusatz: zahlfeld({
         wert: eintrag.x_d_max, schritt: 0.05, min: 0.05,
         max: katalog('duktilitaet', 'hoechstens'),
-        titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
-          katalog('duktilitaet', 'hoechstens')}`,
+        titel: `Beiwert k der Grenze x/d ≤ k · 435 N/mm² / f_yd (SIA 262:2025, 4.1.4.2.5); `
+          + `Vorgabe ${katalog('duktilitaet', 'vorgabe')}, `
+          + `höchstens ${katalog('duktilitaet', 'hoechstens')}`,
         beiAenderung: (v) => eintragAendern(eintrag.kennung, (e) => { e.x_d_max = v; }),
       }),
     }),

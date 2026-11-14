@@ -422,7 +422,7 @@ def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
         "x_titel": "ε [‰]",
         "y_titel": "σ [N/mm²]",
         "titel": "Beton – Parabel-Rechteck-Beziehung",
-        "referenz": "SIA 262:2025, 4.2.1.6",
+        "referenz": "SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)",
         "marken": [
             {"eps": zahl(-abs(eps_c1d), PROMILLE), "sigma": zahl(-abs(f_cd), N_PRO_MM2),
              "text": "ε_c1d"},
@@ -485,7 +485,7 @@ def _stahlkurve(stoff, wert) -> Optional[dict]:
         "x_titel": "ε [‰]",
         "y_titel": "σ [N/mm²]",
         "titel": "Betonstahl – bilineare Beziehung",
-        "referenz": "SIA 262:2025, 4.2.2.4",
+        "referenz": "SIA 262:2025, 4.2.2.2, Figur 16",
         "marken": [
             {"eps": zahl(eps_yd, PROMILLE), "sigma": zahl(f_yd, N_PRO_MM2), "text": "ε_yd"},
             {"eps": zahl(abs(eps_ud), PROMILLE), "sigma": zahl(f_yd, N_PRO_MM2), "text": "ε_ud"},

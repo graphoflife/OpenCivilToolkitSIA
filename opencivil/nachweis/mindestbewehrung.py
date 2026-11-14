@@ -299,7 +299,7 @@ class Rissnormalkraft(Lagennachweis):
 
         f_ct_eff = protokoll_zugfestigkeit(
             p, werte, k_t=g.k_t, f_ct_eff=g.f_ct_eff, h=h_eff, f_ctm=e["f_ctm"],
-            teiler=1, referenz="SIA 262:2025, 4.4.2")
+            teiler=1)
         p.formel(self._n_riss(g), r"\frac{@h_eff}{2} \cdot @b \cdot @f_ct_eff",
                  {"h_eff": h_eff, "b": e["b"], "f_ct_eff": f_ct_eff},
                  titel="Risskraft der gezogenen Querschnittshälfte")
@@ -478,7 +478,7 @@ class ZwaengungBiegung(Biegezwang, Lagennachweis):
                           groessen: Momentgroessen) -> None:
         p.titel(f"{self.THEMA} – {self.richtung.beschriftung}")
         p.erklaerung(self.EINLEITUNG)
-        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id, referenz=self.REFERENZ)
+        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id)
         p.erklaerung(
             "Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den "
             "Zustand vor dem Riss. Der Widerstand dagegen wird am gerissenen "

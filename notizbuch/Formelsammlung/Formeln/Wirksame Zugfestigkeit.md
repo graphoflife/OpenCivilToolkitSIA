@@ -1,10 +1,11 @@
 ---
-erzeugt: 6e2425122171
+erzeugt: 53211fe0a1be
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.4.1.3, (99)"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.4.1.3, (99)
 
 $$
 f_{ct,eff} = k_t \cdot f_{ctm}

@@ -1,11 +1,11 @@
 ---
-erzeugt: aff783d89b76
+erzeugt: 0e0e74ae9492
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.2.2.4"
+normstelle: "SIA 262:2025, 4.2.2.2, Figur 16"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.2.2.4
+> SIA 262:2025, 4.2.2.2, Figur 16
 
 *In der Herleitung: «Fliessdehnung (Bemessungswert)»*
 

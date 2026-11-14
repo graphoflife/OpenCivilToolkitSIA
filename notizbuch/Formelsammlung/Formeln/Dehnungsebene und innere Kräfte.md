@@ -1,10 +1,11 @@
 ---
-erzeugt: 770dd68b82c2
+erzeugt: d1e5bb2ad45e
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.3.2.3"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.3.2.3
 
 *In der Herleitung: «Dehnungsebene und innere Kräfte»*
 

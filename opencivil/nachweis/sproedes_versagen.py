@@ -27,8 +27,9 @@ dem **ungerissenen** Bruttoquerschnitt::
     f_ct,eff = k_t * f_ctm
     M_Riss   = f_ct,eff * h^2 * b / 6
 
-Der Teiler 3 gilt fuer Platten unter Biegung -- es reisst der Randbereich, nicht
-die halbe Hoehe wie beim Zwang (SIA 262:2025, 4.4.1.3).
+Der Teiler 3 gilt fuer Platten und Rechtecke unter Biegung; unter Zug zaehlt
+die kleinste Abmessung des gezogenen Teils, bei der Platte die ganze Dicke
+(SIA 262:2025, 4.4.1.3, (100)). Die Bedingung selbst steht in 4.3.1.2.
 """
 
 from __future__ import annotations
@@ -77,7 +78,7 @@ class SproedesVersagen(Lagennachweis):
     ART = "SV"
     KUERZEL = "SV"
     BENENNUNG = "sprödes Versagen"
-    REFERENZ = "SIA 262:2025, 4.4.1.3"
+    REFERENZ = "SIA 262:2025, 4.3.1.2"
 
     def __init__(
         self,
@@ -139,8 +140,7 @@ class SproedesVersagen(Lagennachweis):
             "Querschnitt mehr trägt als der unbewehrte im Augenblick des "
             f"Risses: M_{self.mn.wahl.index}(N_Ed = 0) ≥ M_Riss."
         )
-        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id,
-                                      referenz="SIA 262:2025, 4.4.1.3")
+        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id)
 
     def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis,
                        ansatz: Tuple[Rissgroessen, Wert]) -> None:

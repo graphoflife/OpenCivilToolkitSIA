@@ -1,10 +1,11 @@
 ---
-erzeugt: 8773b5095927
+erzeugt: a57acc2b288e
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8
 
 $$
 \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}}

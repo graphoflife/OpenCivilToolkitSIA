@@ -82,7 +82,7 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
     beton = {"f_c": ein("f_c"), "E_c": E_c_eff, "eps_c1d": ein("eps_c1d"),
              "eps_c2d": ein("eps_c2d")}
     BetonUngerissen(E_c=E_c_eff.groesse.si).protokoll(p, beton, titel="Ungerissen (Zustand I)")
-    betongesetz(wahl, f_c=beton["f_c"].groesse.si, E_cm=ein("E_cm").groesse.si,
+    betongesetz(wahl, f_c=beton["f_c"].groesse.si, E_c=ein("E_cm").groesse.si,
                 eps_c1d=beton["eps_c1d"].groesse.si, eps_c2d=beton["eps_c2d"].groesse.si
                 ).protokoll(p, beton, titel="Gerissen (Zustand II)", basis=w.basis)
     if wahl.art.mit_block:

@@ -4,13 +4,14 @@ opencivil/nachweis/duktilitaet.py -- Duktilitaetsnachweis ueber die Druckzonenho
 VERANTWORTUNG:
 Prueft je Bewehrungslage, ob die Druckzone schlank genug bleibt::
 
-    0.85 * x * b * f_cd = A_s * f_sd        (Kraeftegleichgewicht, M_Ed = 0)
-    x / d <= (x/d)_max                      (Vorgabe 0.35, hoechstens 0.5)
+    0.85 * x * b * f_cd = A_s * f_yd        (Kraeftegleichgewicht, M_Ed = 0)
+    x / d <= k * 435 N/mm^2 / f_yd          (k: Vorgabe 0.35, hoechstens 0.5)
 
 Eine flache Druckzone heisst: der Stahl fliesst lange, bevor der Beton
-versagt. Der Querschnitt kuendigt sein Versagen an, statt ploetzlich zu
-brechen -- darum wird hier keine Tragfaehigkeit nachgewiesen, sondern ein
-Verhaeltnis.
+versagt, und das Bauteil kann Schnittgroessen umlagern. Haelt die Druckzone
+die Grenze ein, darf man nach SIA 262:2025, 4.1.4.2.5 umlagern, ohne das
+Verformungsvermoegen nachzurechnen -- darum wird hier keine Tragfaehigkeit
+nachgewiesen, sondern ein Verhaeltnis.
 
 JE LAGE, EIN URTEIL JE LAGE:
 Anders als M-N und Querkraft gilt dieser Nachweis fuer eine einzelne
@@ -39,10 +40,17 @@ Das Verhaeltnis ``x/d`` ist dimensionslos und wird als Einwirkung gegen die
 Grenze ``(x/d)_max`` gehalten.
 
 DIE GRENZE:
-Vorgabe ist 0.35. Sie laesst sich je Platte setzen, hoechstens auf 0.5
-(``QuerschnittEintrag.x_d_max``). Weicht sie von der Vorgabe ab, sagt das die
-Herleitung -- eine andere Grenze ist eine Annahme, die man im Bericht finden
-muss.
+Sie haengt am Stahl der Lage, ``k * 435 N/mm^2 / f_yd``: bei B500 ist sie
+0.35, bei B700B 0.25. Bis 2026-11-14 stand sie fest auf 0.35, auch bei B700B.
+Den Beiwert ``k`` gibt man je Platte an, hoechstens 0.5
+(``QuerschnittEintrag.x_d_max``): darueber raet 4.1.4.2.6 ab. Weicht er von
+der Vorgabe ab, sagt das die Herleitung -- ein anderer Beiwert ist eine
+Annahme, die man im Bericht finden muss.
+
+Die Ziffer setzt ausserdem einen Stahl der Duktilitaetsklasse B oder C und
+Beton bis C50/60 voraus. Sonst ist das Verformungsvermoegen nachzurechnen
+(4.1.4.2.6), und das kann dieser Nachweis nicht: die Lage steht als nicht
+fuehrbar da, mit dem Grund (:func:`hindernis`).
 """
 
 from __future__ import annotations
@@ -56,21 +64,80 @@ from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
-from opencivil.material.basis import mit_index
+from opencivil.material.basis import Baustoff
+from opencivil.material.betonstahl import duktilitaetsklasse
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 from opencivil.querschnitt.lagenaufbau import lage_aus_posten, protokoll_lage
 from opencivil.nachweis.lagennachweis import Lagennachweis
 from opencivil.querschnitt.platte import Bewehrungslage
 
-#: Groesste zulaessige bezogene Druckzonenhoehe -- die Vorgabe.
-GRENZE = 0.35
+REFERENZ = "SIA 262:2025, 4.1.4.2.5"
+
+#: Der Beiwert k der Grenze -- die Vorgabe der Ziffer.
+BEIWERT = 0.35
+
+#: So weit laesst sich der Beiwert hoechstens anheben: darueber raet
+#: SIA 262:2025, 4.1.4.2.6 ab.
+HOECHSTENS = 0.5
+
+#: Die Fliessgrenze, auf die sich der Beiwert bezieht, in Pa: f_yd von B500,
+#: so gerundet, wie die Norm sie in die Grenze schreibt.
+BEZUG_F_YD = 435e6
+
+#: Bis zu dieser Festigkeit f_ck, in Pa, gilt die Grenze: C50/60.
+HOECHSTE_FESTIGKEIT = 50e6
 
 #: Die Seite im Notizbuch: die Bedingung der Platte und die des gezeichneten
 #: Querschnitts sind dieselbe.
 DUKTILITAETSBEDINGUNG = "Bedingung der Duktilität"
 
-#: So weit laesst sich die Grenze hoechstens anheben.
-HOECHSTENS = 0.5
+#: Die Bedingung -- fuer beide dieselbe, wie die Zeile ihrer Grenze
+#: (:func:`protokoll_grenze`).
+BEDINGUNG = r"\frac{x}{d} \le k \cdot \frac{435\,\mathrm{N/mm^2}}{f_{yd}}"
+
+
+def grenze(beiwert: float, f_yd: float) -> float:
+    """Die zulaessige bezogene Druckzonenhoehe ``k * 435 N/mm^2 / f_yd``; f_yd in Pa."""
+    return beiwert * BEZUG_F_YD / f_yd
+
+
+def hindernis(staehle: Sequence[Baustoff], f_ck: float) -> str:
+    """
+    Was an den Baustoffen die Bedingung ausschliesst, als Begruendung --
+    leer, wenn nichts. Ein Stahl ohne Klasse, ein eigener, schliesst nichts
+    aus: seine Klasse kennt nur, wer ihn angelegt hat.
+    """
+    if f_ck > HOECHSTE_FESTIGKEIT * (1.0 + 1e-9):
+        grund = f"Beton mit f_ck = {f_ck / 1e6:g} N/mm² über C50/60"
+    else:
+        klasse_a = [s.name for s in staehle if duktilitaetsklasse(s.sorte) == "A"]
+        if not klasse_a:
+            return ""
+        grund = f"{', '.join(klasse_a)}: Duktilitätsklasse A"
+    return (f"{grund} → kein Nachweis über x/d. Umlagern nur mit einem Nachweis "
+            f"des Verformungsvermögens (SIA 262:2025, 4.1.4.2.6).")
+
+
+def protokoll_bedingung(p: Protokoll, beiwert: float) -> None:
+    """Die Bedingung, was sie voraussetzt, und ein abweichender Beiwert."""
+    p.ansatz(BEDINGUNG, titel="Bedingung", referenz=REFERENZ, name=DUKTILITAETSBEDINGUNG)
+    p.erklaerung(
+        "Die Grenze hängt an der Fliessgrenze: mit der Vorgabe k = 0.35 ist "
+        "sie bei B500 0.35, bei B700B 0.25. Ohne Nachweis des "
+        "Verformungsvermögens gilt sie nur mit einem Stahl der "
+        "Duktilitätsklasse B oder C und mit Beton bis C50/60. "
+        f"Mehr als k = {HOECHSTENS:g} lässt das Werkzeug nicht zu, darüber rät "
+        "4.1.4.2.6 ab.")
+    if abs(beiwert - BEIWERT) > 1e-12:
+        p.text(f"Beiwert eingegeben: k = {beiwert:.2f} statt der Vorgabe {BEIWERT:.2f}.")
+
+
+def protokoll_grenze(p: Protokoll, werte: Zwischenwerte, grenzwert: Wert, *,
+                     beiwert: float, f_yd: Wert) -> None:
+    """Die Grenze, hergeleitet -- fuer Platte und gezeichneten Querschnitt dieselbe Zeile."""
+    p.formel(grenzwert, r"@k \cdot \frac{435\,\mathrm{N/mm^2}}{@f_yd}",
+             {"k": werte.zahl("k", "k", beiwert, stellen=2), "f_yd": f_yd},
+             titel="Grenze der bezogenen Druckzonenhöhe", referenz=REFERENZ)
 
 
 @dataclass
@@ -87,29 +154,32 @@ class Lagenergebnis(Fallausgang):
     d: float = 0.0
     """Statische Hoehe ab der gedrueckten Randfaser, in m."""
 
-    f_sd: float = 0.0
-    """Stahlspannung im Gleichgewicht -- die fliessende Bewehrung, in Pa."""
+    f_yd: float = 0.0
+    """Fliessgrenze der Lage, in Pa -- die Stahlspannung im Gleichgewicht."""
 
     x: float = 0.0
     """Druckzonenhoehe bei M_Ed = 0, in m."""
 
     verhaeltnis: float = 0.0
+    grenze: float = 0.0
+    """(x/d)_max der Lage -- sie haengt an ihrem Stahl."""
+
     ausgang: Ausgang = NICHT_FUEHRBAR
     """x/d gegen (x/d)_max."""
 
     begruendung: str = ""
 
 
-def druckzonenhoehe(*, a_s: float, f_sd: float, b: float, f_cd: float) -> float:
+def druckzonenhoehe(*, a_s: float, f_yd: float, b: float, f_cd: float) -> float:
     """
     ``x`` aus dem Kraeftegleichgewicht bei reiner Biegung.
 
-    ``0.85 * x * b * f_cd = A_s * f_sd``, aufgeloest nach ``x``. Alles in
+    ``0.85 * x * b * f_cd = A_s * f_yd``, aufgeloest nach ``x``. Alles in
     SI-Basis; Rueckgabe in m. Dieselbe Formel wie beim Eckpunkt *reine Biegung*
     der Handrechnung -- sie steht dort schon einmal, weil sie dort einen
     anderen Zweck hat, aber es ist dieselbe Gleichgewichtsbedingung.
     """
-    return a_s * f_sd / (BLOCKANTEIL * b * f_cd)
+    return a_s * f_yd / (BLOCKANTEIL * b * f_cd)
 
 
 class Duktilitaet(Lagennachweis):
@@ -122,26 +192,26 @@ class Duktilitaet(Lagennachweis):
 
     Ob er ueberhaupt gefuehrt wird, entscheidet ein einziger Schalter am
     Querschnitt; welche Lagen er ansieht, sagt der Aufbau, und wie tief die
-    Druckzone reichen darf, ``grenze``.
+    Druckzone reichen darf, der Beiwert ``beiwert`` mit dem Stahl der Lage.
     """
 
     THEMA = "Duktilität"
     ART = "D"
     KUERZEL = "D"
     BENENNUNG = "Duktilität"
-    REFERENZ = "SIA 262:2025, 4.1.4.2.5"
+    REFERENZ = REFERENZ
 
     def __init__(
         self,
         querschnitt,
         lagen: Sequence[int],
-        grenze: float = GRENZE,
+        beiwert: float = BEIWERT,
     ) -> None:
-        if not 0.0 < grenze <= HOECHSTENS:
+        if not 0.0 < beiwert <= HOECHSTENS:
             raise ValueError(
-                f"Die Grenze (x/d)_max muss grösser als null und höchstens "
-                f"{HOECHSTENS:g} sein, angegeben ist {grenze:g}.")
-        self.grenze = grenze
+                f"Der Beiwert k der Grenze muss grösser als null und höchstens "
+                f"{HOECHSTENS:g} sein, angegeben ist {beiwert:g}.")
+        self.beiwert = beiwert
         gewaehlt = sorted(set(lagen))
         if not gewaehlt:
             raise ValueError("Der Duktilitätsnachweis braucht mindestens eine Lage.")
@@ -177,6 +247,7 @@ class Duktilitaet(Lagennachweis):
                 Eingabebezug("b", querschnitt.id_von("b")),
                 Eingabebezug("b_y", querschnitt.id_von("b_y")),
                 Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
+                Eingabebezug("f_ck", querschnitt.beton.id_von("f_ck")),
             ],
             posten=("a_s", "z"), stahl=("f_yd",),
             weitere_ausgaben=list(self.d_verhaeltnis.values()))
@@ -193,53 +264,53 @@ class Duktilitaet(Lagennachweis):
         erg.a_s, erg.z, erg.d = lage_aus_posten(e, self.posten_je_lage[lage.nummer])
         # Eine Lage traegt genau einen Stahl -- eine schwaechere Sorte unter
         # ihren Posten gibt es nicht. Die Breite ist die in ihrer Richtung.
-        erg.f_sd = e.g(lage.stahl.eingabename("f_yd")).si
-        erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=erg.f_sd, b=e.g(lage.richtung.breite).si,
+        erg.f_yd = e.g(lage.stahl.eingabename("f_yd")).si
+        erg.x = druckzonenhoehe(a_s=erg.a_s, f_yd=erg.f_yd, b=e.g(lage.richtung.breite).si,
                                 f_cd=ansatz)
         erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")
+        erg.grenze = grenze(self.beiwert, erg.f_yd)
+        erg.begruendung = hindernis([lage.stahl], e.g("f_ck").si)
+        if erg.begruendung:
+            return erg
         erg.ausgang = v = Vergleich(
             self.d_verhaeltnis[lage.nummer].belegen(Groesse(erg.verhaeltnis, EINHEITSLOS)),
-            self._grenze(lage.nummer))
+            self._grenze(lage.nummer, erg.grenze))
         erg.begruendung = (
             f"x/d = {erg.x * 1e3:.1f} mm / {erg.d * 1e3:.1f} mm = "
-            f"{erg.verhaeltnis:.3f} {'≤' if v.erfuellt else '>'} {self.grenze:.2f}.")
+            f"{erg.verhaeltnis:.3f} {'≤' if v.erfuellt else '>'} {erg.grenze:.3f}.")
         return erg
 
     def ausgaben_der_lage(self, erg: Lagenergebnis) -> Dict[str, Groesse]:
         return {self.d_verhaeltnis[erg.lage.nummer].id: Groesse(erg.verhaeltnis, EINHEITSLOS)}
 
-    def _grenze(self, nummer: int) -> Wert:
+    def _grenze(self, nummer: int, zahl: float) -> Wert:
         """Die zulaessige bezogene Druckzonenhoehe -- Widerstand und Herleitung."""
         return WertDef(
             id=f"{self.id}.lage{nummer}.grenze",
             symbol=r"\left(x/d\right)_{max}",
-            einheit=EINHEITSLOS, beschreibung="Widerstand", stellen=2,
-        ).belegen(Groesse(self.grenze, EINHEITSLOS))
+            einheit=EINHEITSLOS, beschreibung="Grenze der bezogenen Druckzonenhöhe",
+            referenz=REFERENZ, stellen=3,
+        ).belegen(Groesse(zahl, EINHEITSLOS))
 
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel("Duktilität")
         p.erklaerung(
-            "Die Druckzone muss schlank bleiben, damit der Stahl lange fliesst, "
-            "bevor der Beton versagt: der Querschnitt kündigt sein Versagen an. "
+            "Die Druckzone muss klein bleiben, damit der Stahl lange fliesst, "
+            "bevor der Beton versagt: dann lassen sich Schnittgrössen umlagern. "
             "Gerechnet wird die Druckzonenhöhe bei reiner Biegung, je Lage "
-            "einzeln."
+            "einzeln, mit dem Spannungsblock und ohne Druckbewehrung."
         )
         f_cd = e["f_cd"].symbol
         p.ansatz(
-            rf"{BLOCKANTEIL} \cdot x \cdot b \cdot {f_cd} = A_s \cdot f_{{sd}}"
+            rf"{BLOCKANTEIL} \cdot x \cdot b \cdot {f_cd} = A_s \cdot f_{{yd}}"
             r" \qquad \Rightarrow \qquad "
-            rf"x = \frac{{A_s \cdot f_{{sd}}}}"
+            rf"x = \frac{{A_s \cdot f_{{yd}}}}"
             rf"{{{BLOCKANTEIL} \cdot b \cdot {f_cd}}}",
             titel="Kräftegleichgewicht bei M_Ed = 0",
-            referenz="SIA 262:2025, 4.1.4.2.5")
-        p.ansatz(
-            rf"\frac{{x}}{{d}} \le {self.grenze:.2f}",
-            titel="Bedingung", name=DUKTILITAETSBEDINGUNG)
-        if abs(self.grenze - GRENZE) > 1e-12:
-            p.text(f"Grenze eingegeben: (x/d)_max = {self.grenze:.2f} statt der "
-                   f"Vorgabe {GRENZE:.2f}.")
+            referenz="SIA 262:2025, 4.1.4.2.5; 4.2.1.5, Figur 12")
+        protokoll_bedingung(p, self.beiwert)
         p.erklaerung(
             "d wird von der gedrückten Randfaser aus gemessen: bei den unteren "
             "Lagen von der Oberkante, bei den oberen von der Unterkante. "
@@ -255,21 +326,26 @@ class Duktilitaet(Lagennachweis):
         """
         nummer, breite = erg.lage.nummer, erg.lage.richtung.breite
         p.titel(f"Duktilität – {nummer}. Lage", ebene=3)
+        if not erg.machbar:
+            p.text(erg.begruendung)
+            return
 
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")
         a_s, d = protokoll_lage(p, e, werte, self.posten_je_lage[nummer],
                                 a_s=erg.a_s, z=erg.z, d=erg.d)
 
+        f_yd = e[erg.lage.stahl.eingabename("f_yd")]
         x = werte.laenge("x", "x", erg.x)
         p.formel(
             x,
-            rf"\frac{{@A_s \cdot @f_sd}}{{{BLOCKANTEIL} \cdot @b \cdot @f_cd}}",
-            {"A_s": a_s, "b": e[breite], "f_cd": e["f_cd"],
-             "f_sd": werte.spannung(
-                 "f_sd", mit_index("f_{sd}", erg.lage.stahl.symbol_index), erg.f_sd)},
-            titel="Druckzonenhöhe bei reiner Biegung")
+            rf"\frac{{@A_s \cdot @f_yd}}{{{BLOCKANTEIL} \cdot @b \cdot @f_cd}}",
+            {"A_s": a_s, "b": e[breite], "f_cd": e["f_cd"], "f_yd": f_yd},
+            titel="Druckzonenhöhe bei reiner Biegung",
+            referenz="SIA 262:2025, 4.2.1.5, Figur 12",
+            name="Druckzonenhöhe aus dem Kräftegleichgewicht")
 
         v = erg.ausgang
+        protokoll_grenze(p, werte, v.widerstand, beiwert=self.beiwert, f_yd=f_yd)
         p.formel(v.einwirkung, r"\frac{@x}{@d}", {"x": x, "d": d},
                  titel="Bezogene Druckzonenhöhe",
                  nachsatz=vergleich(r"\le", angabe(v.widerstand), v.erfuellt))

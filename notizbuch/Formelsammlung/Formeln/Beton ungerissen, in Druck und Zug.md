@@ -1,10 +1,11 @@
 ---
-erzeugt: a8cb3fdc8e99
+erzeugt: 682cfdf3d286
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.1.4.1.4"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.1.4.1.4
 
 *In der Herleitung: «Ungerissen (Zustand I): Beton, linear in Druck und Zug»*
 

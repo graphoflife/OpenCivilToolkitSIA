@@ -449,7 +449,7 @@ class PlattenStellen(Stahlspannungsort):
         ] + [b for q in self.posten for b in q.bezuege("phi")]
 
     def zustand(self, e: Eingaben, wahl: Rechenwahl) -> _Plattenzustand:
-        w = Betonkennwerte.aus_eingaben(e, wahl.satz)
+        w = Betonkennwerte.aus_eingaben(e, wahl)
         lagen = stahllagen(self.posten, wahl.satz, e.si_nach_id())
         loeser = gesetze(wahl, w).loeser(h=e.g("h").si, b=e.g("b").si, lagen=lagen)
         nach_sorte = {kennung_aus(s.id): s for s in self.staehle}
@@ -521,7 +521,7 @@ class PlattenStellen(Stahlspannungsort):
         werte = Zwischenwerte(basis)
         angaben = []
         for name, symbol, E_s in paare:
-            n = wertigkeit(E_s=E_s, E_cm=zustand.w.E_cm, phi=wahl.kriechzahl)
+            n = wertigkeit(E_s=E_s, E_cm=zustand.w.E_c, phi=wahl.kriechzahl)
             angaben.append(rf"\qquad {angabe(werte.zahl(name, symbol, n, stellen=2))}")
         return "".join(angaben)
 

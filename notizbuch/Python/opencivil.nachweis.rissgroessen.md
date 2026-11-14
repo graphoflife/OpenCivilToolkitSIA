@@ -1,5 +1,5 @@
 ---
-erzeugt: 08969e1353ef
+erzeugt: 172d7b2c32e5
 art: modul
 tags: [modul]
 ---
@@ -71,7 +71,7 @@ Platte, siehe Dateikopf -- die Dicke `h`.
 ### protokoll_zugfestigkeit
 
 ```python
-def protokoll_zugfestigkeit(p: Protokoll, werte: Zwischenwerte, *, k_t: float, f_ct_eff: float, h: Wert, f_ctm: Wert, teiler: float, referenz: str, titel: str='Beiwert für die Plattendicke') -> Wert
+def protokoll_zugfestigkeit(p: Protokoll, werte: Zwischenwerte, *, k_t: float, f_ct_eff: float, h: Wert, f_ctm: Wert, teiler: float, titel: str='Beiwert für die Plattendicke') -> Wert
 ```
 
 Beiwert fuer die Dicke und wirksame Zugfestigkeit, hergeleitet.
@@ -114,7 +114,7 @@ Das Rissmoment -- die Einwirkung in Tabelle und Herleitung.
 ### protokoll_rissmoment_rechteck
 
 ```python
-def protokoll_rissmoment_rechteck(p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str, referenz: str) -> None
+def protokoll_rissmoment_rechteck(p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str) -> None
 ```
 
 Das Rissmoment von `k_t` an -- fuer das spröde Versagen und die
@@ -271,7 +271,7 @@ def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoque
 ### protokoll_rissmoment
 
 ```python
-def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment, M_y: float, M_z: float, *, referenz: str) -> Wert
+def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment, M_y: float, M_z: float) -> Wert
 ```
 
 Die Herleitung von [[opencivil.nachweis.rissgroessen#rissmoment|rissmoment]] -- zurueck kommt `M_Riss`.
@@ -287,7 +287,9 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 
 ## Konstanten
 
-- `MOMENTENTEILER = 3.0` – Teiler der Hoehe in Biegerichtung im Beiwert. Unter Biegung reisst der Randbereich, nicht die halbe Hoehe wie beim Zwang. SIA 262:2025, 4.4.1.3.
+- `MOMENTENTEILER = 3.0` – Teiler der Hoehe in Biegerichtung im Beiwert: unter Biegung zaehlt bei Platten und Rechtecken ein Drittel der Hoehe, unter Zug die kleinste Abmessung des gezogenen Teils, bei der Platte also die ganze Dicke. SIA 262:2025, 4.4.1.3.
+- `REFERENZ_BEIWERT = 'SIA 262:2025, 4.4.1.3, (100)'` – Woher `k_t` und `f_ct,eff` kommen -- fuer jeden Nachweis dieselbe Stelle.
+- `REFERENZ_ZUGFESTIGKEIT = 'SIA 262:2025, 4.4.1.3, (99)'`
 - `DICKENGRENZE = 0.5` – Groesste rissaktive Dicke unter Zug, in m -- wo die Begrenzung eingeschaltet ist.
 
 ## Braucht

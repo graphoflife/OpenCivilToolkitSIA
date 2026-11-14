@@ -2,7 +2,7 @@
 Beispiel
 ====================================================================================================
 
-108 Berechnungen ausgeführt, 174 Werte bestimmt.
+110 Berechnungen ausgeführt, 176 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -73,7 +73,7 @@ Zusammengefasste Bewehrung
 Grösste Druckkraft
 ------------------
 
-Gleichmässiger Druck, ohne Bewehrung
+Gleichmässiger Druck, ohne Bewehrung   [SIA 262:2025, 4.2.1.5, Figur 12]
     N_{Rd}^{-} = -b \cdot h \cdot f_{cd} = -1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = -6000\,\mathrm{kN}
 
 Zugehöriges Moment
@@ -82,7 +82,7 @@ Zugehöriges Moment
 Grösste Zugkraft
 ----------------
 
-Beide Lagen fliessen auf Zug
+Beide Lagen fliessen auf Zug   [SIA 262:2025, 4.2.2.2, Figur 16]
     \begin{aligned}
       N_{Rd}^{+} &= A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd} \\
       &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
@@ -102,7 +102,7 @@ Positives Moment (Zug unten)
 Statische Höhe der Lage unten, ab dem gedrückten Rand oben
     d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 
-Druckzonenhöhe aus dem Kräftegleichgewicht
+Druckzonenhöhe aus dem Kräftegleichgewicht   [SIA 262:2025, 4.2.1.5, Figur 12]
     x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 62.7\,\mathrm{mm}
 
 Momentenwiderstand bei reiner Biegung
@@ -115,10 +115,10 @@ Momentenwiderstand bei reiner Biegung
 Nulllinie auf halber Höhe
     x^{+} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 
-Dehnung der Zugbewehrung
+Dehnung der Zugbewehrung   [SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8]
     \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(248.1\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.29\,\text{‰}
 
-Stahlspannung, höchstens die Fliessgrenze
+Stahlspannung, höchstens die Fliessgrenze   [SIA 262:2025, 4.2.2.2, Figur 16]
     \begin{aligned}
       \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
       &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.29\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
@@ -145,7 +145,7 @@ Negatives Moment (Zug oben)
 Statische Höhe der Lage oben, ab dem gedrückten Rand unten
     d_{3,x} = h - z_{3,x} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 
-Druckzonenhöhe aus dem Kräftegleichgewicht
+Druckzonenhöhe aus dem Kräftegleichgewicht   [SIA 262:2025, 4.2.1.5, Figur 12]
     x^{-} = \frac{A_{s,3,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 19.3\,\mathrm{mm}
 
 Momentenwiderstand bei reiner Biegung
@@ -158,10 +158,10 @@ Momentenwiderstand bei reiner Biegung
 Nulllinie auf halber Höhe
     x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 
-Dehnung der Zugbewehrung
+Dehnung der Zugbewehrung   [SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8]
     \varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(252\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.38\,\text{‰}
 
-Stahlspannung, höchstens die Fliessgrenze
+Stahlspannung, höchstens die Fliessgrenze   [SIA 262:2025, 4.2.2.2, Figur 16]
     \begin{aligned}
       \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
       &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.38\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
@@ -444,6 +444,12 @@ Bemessungswert der Schubspannungsgrenze   [SIA 262:2025, 2.4.2.4]
 Mittelwert der Zugfestigkeit   [SIA 262:2025, 3.1.2.2.7]
     f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
 
+Teilsicherheitsbeiwert für den Elastizitätsmodul, Druckglieder mit Einflüssen 2. Ordnung   [SIA 262:2025, 4.2.1.17]
+    \gamma_{cE} = 1.2
+
+Bemessungswert des Elastizitätsmoduls   [SIA 262:2025, 4.2.1.15, (33)]
+    E_{cd} = \frac{E_{cm}}{\gamma_{cE}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1.2} = 28016\,\mathrm{N}/\mathrm{mm}^{2}
+
 Dichte des Stahlbetons
     \rho_{sb} = 2500\,\mathrm{kg}/\mathrm{m}^{3}
 
@@ -526,22 +532,22 @@ Schubwände
     Wand 3  (250;\ 550) \rightarrow (50;\ 550)               200                 100  1 \times \varnothing 10\ @\ 150                                   524
     Wand 4  (50;\ 550) \rightarrow (50;\ 50)                 500                 100  1 \times \varnothing 10\ @\ 150                                   524
 
-Dehnungsebene und innere Kräfte
+Dehnungsebene und innere Kräfte   [SIA 262:2025, 4.3.2.3]
     \varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad v = n_y (y - y_S) + n_z (z - z_S) \qquad N = \int_A \sigma\,\mathrm{d}A \qquad M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A
 
 Erfüllungsgrad bei fester Normalkraft und fester Richtung
     \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 
-Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel
+Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel   [SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe]
     k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
 
-Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.6]
+Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)]
     \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 
 Werkstoffgesetz C30/37, Bemessungswerte: Werte des Betons
     f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 
-Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear   [SIA 262:2025, 4.2.2.4]
+Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear   [SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5]
     \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 
 Werkstoffgesetz B500B, Bemessungswerte: Werte des Stahls
@@ -676,13 +682,13 @@ Momentenwiderstand bei N_Ed = 0, Zug links
     M_{z,Rd}^{+}(N_{Ed} = 0) = 60.8\,\mathrm{kNm}
 
 Bezogene Druckzonenhöhe bei N_Ed = 0, Zug links
-    \left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{66.8\,\mathrm{mm}}{305.3\,\mathrm{mm}} = 0.219
+    \left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{66.8\,\mathrm{mm}}{267.4\,\mathrm{mm}} = 0.25
 
 Momentenwiderstand bei N_Ed = 0, Zug rechts
     M_{z,Rd}^{-}(N_{Ed} = 0) = -60.8\,\mathrm{kNm}
 
 Bezogene Druckzonenhöhe bei N_Ed = 0, Zug rechts
-    \left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{66.8\,\mathrm{mm}}{305.3\,\mathrm{mm}} = 0.219
+    \left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{66.8\,\mathrm{mm}}{267.4\,\mathrm{mm}} = 0.25
 
 Reiner Zug, gleichmässig gedehnt
     N_{Rd}^{+} = 508.1\,\mathrm{kN}
@@ -1442,6 +1448,9 @@ Mittelwert des Elastizitätsmoduls   [SIA 262:2025, 3.1.2.3.3]
 Bemessungswert der Schubspannungsgrenze   [SIA 262:2025, 2.4.2.4]
     \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 
+Bemessungswert des Elastizitätsmoduls   [SIA 262:2025, 4.2.1.15, (33)]
+    E_{cd} = \frac{E_{cm}}{\gamma_{cE}}
+
 Betonstahl
 ----------
 
@@ -1464,10 +1473,10 @@ Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zula
 Bewehrungsquerschnitt der zusammengefassten Lage
     A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
 
-Gleichmässiger Druck, ohne Bewehrung
+Gleichmässiger Druck, ohne Bewehrung   [SIA 262:2025, 4.2.1.5, Figur 12]
     N_{Rd}^{-} = -b \cdot h \cdot f_{cd}
 
-Beide Lagen fliessen auf Zug
+Beide Lagen fliessen auf Zug   [SIA 262:2025, 4.2.2.2, Figur 16]
     N_{Rd}^{+} = A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd}
 
 Kräfte mal Hebelarm um die halbe Höhe
@@ -1476,7 +1485,7 @@ Kräfte mal Hebelarm um die halbe Höhe
 Statische Höhe der Lage unten, ab dem gedrückten Rand oben
     d_{2,x} = z_{2,x}
 
-Druckzonenhöhe aus dem Kräftegleichgewicht
+Druckzonenhöhe aus dem Kräftegleichgewicht   [SIA 262:2025, 4.2.1.5, Figur 12]
     x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}}
 
 Momentenwiderstand bei reiner Biegung
@@ -1485,10 +1494,10 @@ Momentenwiderstand bei reiner Biegung
 Nulllinie auf halber Höhe
     x^{+} = \frac{h}{2}
 
-Dehnung der Zugbewehrung
+Dehnung der Zugbewehrung   [SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8]
     \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}}
 
-Stahlspannung, höchstens die Fliessgrenze
+Stahlspannung, höchstens die Fliessgrenze   [SIA 262:2025, 4.2.2.2, Figur 16]
     \sigma_{sd} = \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right]
 
 Kräftegleichgewicht
@@ -1574,19 +1583,19 @@ bis -ε_c1d; die Bewehrung bis ±ε_ud. Gesucht wird die Ebene mit N = N_Ed, der
 Richtung der Einwirkung zeigt. Nachgewiesen wird nicht die Suche, sondern ihre Probe: die Kräfte
 jedes Teils und ihre Summen.
 
-Dehnungsebene und innere Kräfte
+Dehnungsebene und innere Kräfte   [SIA 262:2025, 4.3.2.3]
     \varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad v = n_y (y - y_S) + n_z (z - z_S) \qquad N = \int_A \sigma\,\mathrm{d}A \qquad M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A
 
 Erfüllungsgrad bei fester Normalkraft und fester Richtung
     \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 
-Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel
+Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel   [SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe]
     k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right)
 
-Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.6]
+Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)]
     \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 
-Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear   [SIA 262:2025, 4.2.2.4]
+Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear   [SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5]
     \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 
 Probe: Normalkraft
@@ -1937,8 +1946,8 @@ Kennzahlen
     Druckwiderstand                      N_{Rd}^{-}                          -4044.1\,\mathrm{kN}
     Bezogene Druckzonenhöhe, Zug unten   \left(x/d\right)_{y}^{+}                           0.128
     Bezogene Druckzonenhöhe, Zug oben    \left(x/d\right)_{y}^{-}                           0.077
-    Bezogene Druckzonenhöhe, Zug links   \left(x/d\right)_{z}^{+}                           0.219
-    Bezogene Druckzonenhöhe, Zug rechts  \left(x/d\right)_{z}^{-}                           0.219
+    Bezogene Druckzonenhöhe, Zug links   \left(x/d\right)_{z}^{+}                            0.25
+    Bezogene Druckzonenhöhe, Zug rechts  \left(x/d\right)_{z}^{-}                            0.25
     Querkraftwiderstand in z             V_{z,Rd}                              394.3\,\mathrm{kN}
     Querkraftwiderstand in y             V_{y,Rd}                              157.7\,\mathrm{kN}
     Torsionswiderstand                   T_{Rd}                                78.9\,\mathrm{kNm}
@@ -1987,179 +1996,181 @@ Alle geführten Nachweise sind erfüllt.
 Werte
 ====================================================================================================
 
-    Bezeichnung                                                                     Symbol                                                    Wert  Einheit   Herkunft
-    ------------------------------------------------------------------------------  -----------------------------------------------------  -------  --------  ---------
-    Querschnittsfläche, Stütze 300×300                                              A_{\text{Q1}}                                            90000  mm²       berechnet
-    Flächenträgheitsmoment, Stütze 300×300                                          I_{\text{Q1}}                                              675  ·10⁶ mm⁴  berechnet
-    Dehnsteifigkeit, Stütze 300×300, C30/37                                         EA_{\text{Q1}}                                            3026  MN        berechnet
-    Biegesteifigkeit, Stütze 300×300, C30/37                                        EI_{\text{Q1}}                                           22693  kNm²      berechnet
-    Eigengewicht je Meter, Stütze 300×300, C30/37                                   g_{k,\text{Q1}}                                           2.25  kN/m      berechnet
-    Breite, Stütze 300×300                                                          b_{\text{Q1}}                                              300  mm        Vorgabe
-    Höhe, Stütze 300×300                                                            h_{\text{Q1}}                                              300  mm        Vorgabe
-    Querschnittsfläche, Unterzug                                                    A_{\text{Q2}}                                           180000  mm²       berechnet
-    Flächenträgheitsmoment, Unterzug                                                I_{\text{Q2}}                                             5400  ·10⁶ mm⁴  berechnet
-    Dehnsteifigkeit, Unterzug, C30/37                                               EA_{\text{Q2}}                                            6052  MN        berechnet
-    Biegesteifigkeit, Unterzug, C30/37                                              EI_{\text{Q2}}                                          181547  kNm²      berechnet
-    Eigengewicht je Meter, Unterzug, C30/37                                         g_{k,\text{Q2}}                                            4.5  kN/m      berechnet
-    Erdbeschleunigung                                                               g                                                           10  m/s²      Vorgabe
-    Mittelwert des Elastizitätsmoduls                                               E_{cm}                                                   33620  N/mm²     berechnet
-    Dehnung am Ende des ansteigenden Astes                                          \varepsilon_{c1d}                                            2  ‰         Vorgabe
-    Bruchdehnung des Betons                                                         \varepsilon_{c2d}                                          3.5  ‰         Vorgabe
-    Beiwert zur Berücksichtigung der Festigkeitsminderung                           \eta_{fc}                                                    1            berechnet
-    Bemessungswert der Betondruckfestigkeit                                         f_{cd}                                                      20  N/mm²     berechnet
-    Charakteristische Zylinderdruckfestigkeit                                       f_{ck}                                                      30  N/mm²     Vorgabe
-    Mittelwert der Zylinderdruckfestigkeit                                          f_{cm}                                                      38  N/mm²     berechnet
-    Mittelwert der Zugfestigkeit                                                    f_{ctm}                                                    2.9  N/mm²     Vorgabe
-    Teilsicherheitsbeiwert für Beton                                                \gamma_c                                                   1.5            Vorgabe
-    Beiwert für die Gesteinskörnung                                                 k_e                                                      10000            Vorgabe
-    Dichte des Stahlbetons                                                          \rho_{sb}                                                 2500  kg/m³     Vorgabe
-    Bemessungswert der Schubspannungsgrenze                                         \tau_{cd}                                                  1.1  N/mm²     berechnet
-    Elastizitätsmodul des Betonstahls                                               E_s                                                     200000  N/mm²     Vorgabe
-    Bemessungswert der Dehnung bei Höchstlast                                       \varepsilon_{ud}                                           4.5  %         Vorgabe
-    Bemessungswert der Fliessgrenze                                                 f_{yd}                                                     435  N/mm²     berechnet
-    Bemessungswert der Fliessgrenze auf Druck                                       f_{yd}^{-}                                                 435  N/mm²     berechnet
-    Charakteristische Fliessgrenze                                                  f_{yk}                                                     500  N/mm²     Vorgabe
-    Charakteristische Fliessgrenze auf Druck                                        f_{yk}^{-}                                                 500  N/mm²     Vorgabe
-    Teilsicherheitsbeiwert für Betonstahl                                           \gamma_s                                                  1.15            Vorgabe
-    Länge des Fundaments                                                            L                                                          2.5  m         Vorgabe
-    Neigung der Sohle                                                               \alpha                                                       0  °         Vorgabe
-    Breite des Fundaments                                                           b                                                            2  m         Vorgabe
-    Neigung des Geländes                                                            \beta                                                        0  °         Vorgabe
-    Kohäsion, Bemessungswert                                                        c_{eff}                                                      0  kPa       berechnet
-    Kohäsion, charakteristisch                                                      c_k                                                          0  kPa       Vorgabe
-    Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ                       k_{\delta}                                                   1            Vorgabe
-    Raumlast des Bodens                                                             \gamma                                                      21  kN/m³     Vorgabe
-    Raumlast des Bodens unter Auftrieb                                              \gamma'                                                     11  kN/m³     berechnet
-    Partialfaktor der Kohäsion                                                      \gamma_c                                                   1.5            Vorgabe
-    Partialfaktor des Reibungswinkels                                               \gamma_{\varphi}                                           1.2            Vorgabe
-    Raumlast des Wassers                                                            \gamma_w                                                    10  kN/m³     Vorgabe
-    Erfüllungsgrad Gleiten – Tragsicherheit                                         \alpha_{eff,GL,\text{Tragsicherheit}}                     5.21            berechnet
-    Erfüllungsgrad Grundbruch – Tragsicherheit                                      \alpha_{eff,GB,\text{Tragsicherheit}}                     1.90            berechnet
-    Reibungswinkel, Bemessungswert                                                  \varphi_{eff}                                            27.51  °         berechnet
-    Reibungswinkel, charakteristisch                                                \varphi_k                                                   32  °         Vorgabe
-    Bemessungslast neben dem Fundament                                              q_{Ed}                                                       0  kPa       Vorgabe
-    Tiefe der Sohle unter Terrain                                                   t                                                          1.2  m         Vorgabe
-    Tiefe des höchsten Grundwasserspiegels unter Terrain                            t_1                                                          5  m         Vorgabe
-    Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
-    Betrachtete Breite (x)                                                          b                                                         1000  mm        Vorgabe
-    Betrachtete Breite (y)                                                          b_y                                                       1000  mm        Vorgabe
-    Bewehrungsmass je Kubikmeter Beton                                              \mu_s                                                      123  kg/m³     berechnet
-    Überdeckung oben                                                                c_{nom,o}                                                   30  mm        Vorgabe
-    Überdeckung unten                                                               c_{nom,u}                                                   30  mm        Vorgabe
-    Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage)              h_{Dist}                                                   186  mm        berechnet
-    Höhe der Einlage                                                                e_{Einlage}                                                  0  mm        Vorgabe
-    Plattendicke                                                                    h                                                          300  mm        Vorgabe
-    Momentenwiderstand bei N_Ed = 0, Zug oben                                       M_{Rd}^{-}(N_{Ed} = 0)                                   -79.9  kNm       berechnet
-    Momentenwiderstand bei N_Ed = 0, Zug unten                                      M_{Rd}^{+}(N_{Ed} = 0)                                   235.9  kNm       berechnet
-    Druckwiderstand bei M_Ed = 0                                                    N_{Rd}^{-}(M_{Ed} = 0)                                   -6000  kN        berechnet
-    Zugwiderstand bei M_Ed = 0                                                      N_{Rd}^{+}(M_{Ed} = 0)                                   737.5  kN        berechnet
-    Querkraftwiderstand ohne Bügel bei M_Ed = 0 und N_Ed = 0                        V_{Rd,max}                                               272.8  kN/m      berechnet
-    Querkraftwiderstand ohne Bügel bei M_Ed = M_Rd und N_Ed = 0                     V_{Rd,min}                                               165.4  kN/m      berechnet
-    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug oben                                  \left(x/d\right)^{-}                                     0.077            berechnet
-    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug unten                                 \left(x/d\right)^{+}                                     0.253            berechnet
-    Bewehrungsquerschnitt 1. Lage Grundbewehrung                                    A_{s,1,y,g}                                                754  mm²       berechnet
-    Stabdurchmesser 1. Lage Grundbewehrung                                          \varnothing_{1,y,g}                                         12  mm        Vorgabe
-    Teilung 1. Lage Grundbewehrung                                                  s_{1,y,g}                                                  150  mm        Vorgabe
-    Tiefe 1. Lage Grundbewehrung ab Oberkante                                       z_{1,y,g}                                                  264  mm        berechnet
-    Bewehrungsquerschnitt 2. Lage Grundbewehrung                                    A_{s,2,x,g}                                               1696  mm²       berechnet
-    Stabdurchmesser 2. Lage Grundbewehrung                                          \varnothing_{2,x,g}                                         18  mm        Vorgabe
-    Teilung 2. Lage Grundbewehrung                                                  s_{2,x,g}                                                  150  mm        Vorgabe
-    Tiefe 2. Lage Grundbewehrung ab Oberkante                                       z_{2,x,g}                                                  249  mm        berechnet
-    Bewehrungsquerschnitt 2. Lage Zulage                                            A_{s,2,x,z}                                                754  mm²       berechnet
-    Stabdurchmesser 2. Lage Zulage                                                  \varnothing_{2,x,z}                                         12  mm        Vorgabe
-    Teilung 2. Lage Zulage                                                          s_{2,x,z}                                                  150  mm        Vorgabe
-    Tiefe 2. Lage Zulage ab Oberkante                                               z_{2,x,z}                                                  246  mm        berechnet
-    Bewehrungsquerschnitt 3. Lage Grundbewehrung                                    A_{s,3,x,g}                                                754  mm²       berechnet
-    Stabdurchmesser 3. Lage Grundbewehrung                                          \varnothing_{3,x,g}                                         12  mm        Vorgabe
-    Teilung 3. Lage Grundbewehrung                                                  s_{3,x,g}                                                  150  mm        Vorgabe
-    Tiefe 3. Lage Grundbewehrung ab Oberkante                                       z_{3,x,g}                                                   48  mm        berechnet
-    Bewehrungsquerschnitt 4. Lage Grundbewehrung                                    A_{s,4,y,g}                                                754  mm²       berechnet
-    Stabdurchmesser 4. Lage Grundbewehrung                                          \varnothing_{4,y,g}                                         12  mm        Vorgabe
-    Teilung 4. Lage Grundbewehrung                                                  s_{4,y,g}                                                  150  mm        Vorgabe
-    Tiefe 4. Lage Grundbewehrung ab Oberkante                                       z_{4,y,g}                                                   36  mm        berechnet
-    Erfüllungsgrad Duktilität – 2. Lage                                             \alpha_{eff,D,2}                                          1.39            berechnet
-    Bezogene Druckzonenhöhe – 2. Lage                                               \left(x/d\right)_{2}                                     0.253            berechnet
-    Erfüllungsgrad Duktilität – 3. Lage                                             \alpha_{eff,D,3}                                          4.57            berechnet
-    Bezogene Druckzonenhöhe – 3. Lage                                               \left(x/d\right)_{3}                                     0.077            berechnet
-    Momentenwiderstand bei N_Ed (x-Richtung) – Feld                                 M_{Rd,x}(N_{Ed})_{\text{Feld}}                           235.9  kNm       berechnet
-    Erfüllungsgrad x-Richtung – Feld                                                \alpha_{eff,x,\text{Feld}}                                2.36            berechnet
-    Momentenwiderstand bei N_Ed (x-Richtung) – Feld mit Druck                       M_{Rd,x}(N_{Ed})_{\text{Feld mit Druck}}                 253.8  kNm       berechnet
-    Erfüllungsgrad x-Richtung – Feld mit Druck                                      \alpha_{eff,x,\text{Feld mit Druck}}                      2.54            berechnet
-    Momentenwiderstand bei N = 0, negativ (x-Richtung)                              M_{Rd,x}(N=0)^{-}                                        -79.9  kNm       berechnet
-    Momentenwiderstand bei N = 0, positiv (x-Richtung)                              M_{Rd,x}(N=0)^{+}                                        235.9  kNm       berechnet
-    Grösster positiver Momentenwiderstand (x-Richtung)                              M_{Rd,x}^{+}                                             324.4  kNm       berechnet
-    Grösster negativer Momentenwiderstand (x-Richtung)                              M_{Rd,x}^{-}                                            -253.4  kNm       berechnet
-    Grösste aufnehmbare Druckkraft (x-Richtung)                                     N_{Rd,x}^{-}                                             -6000  kN        berechnet
-    Grösste aufnehmbare Zugkraft (x-Richtung)                                       N_{Rd,x}^{+}                                            1393.2  kN        berechnet
-    Momentenwiderstand bei N_Ed (x-Richtung) – Stütze                               M_{Rd,x}(N_{Ed})_{\text{Stütze}}                          79.9  kNm       berechnet
-    Erfüllungsgrad x-Richtung – Stütze                                              \alpha_{eff,x,\text{Stütze}}                              1.60            berechnet
-    Erfüllungsgrad Rissnormalkraft – 2. Lage x                                      \alpha_{eff,NR,2,x}                                       3.24            berechnet
-    Erfüllungsgrad Rissnormalkraft – 3. Lage x                                      \alpha_{eff,NR,3,x}                                      0.996            berechnet
-    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %)            \alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}               4.54            berechnet
-    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 %)  \alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}     6.80            berechnet
-    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 %)          \alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}             3.02            berechnet
-    Erfüllungsgrad sprödes Versagen – 2. Lage x                                     \alpha_{eff,SV,2,x}                                       5.69            berechnet
-    Erfüllungsgrad sprödes Versagen – 3. Lage x                                     \alpha_{eff,SV,3,x}                                       1.93            berechnet
-    Erfüllungsgrad Verformung – Feld                                                \alpha_{eff,w,\text{Feld}}                                1.22            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – 2. Lage x                                 \alpha_{eff,ZB,2,x}                                       6.63            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – 3. Lage x                                 \alpha_{eff,ZB,3,x}                                       2.16            berechnet
-    Vergrösserungsfaktor der Durchbiegung, Zug oben                                 \omega_w'                                                 7.52            berechnet
-    Vergrösserungsfaktor der Durchbiegung, Zug unten                                \omega_w                                                     4            berechnet
-    Fläche des Bruttoquerschnitts                                                   A                                                       180000  mm²       berechnet
-    Stahlfläche der Bewehrung                                                       A_{s,tot}                                                 1169  mm²       berechnet
-    Trägheitsmoment um y                                                            I_y                                                       5400  ·10⁶ mm⁴  berechnet
-    Deviationsmoment                                                                I_{yz}                                                       0  ·10⁶ mm⁴  berechnet
-    Trägheitsmoment um z                                                            I_z                                                       1350  ·10⁶ mm⁴  berechnet
-    Grösste Neigung der Druckdiagonalen                                             \alpha_{max}                                                45  °         Vorgabe
-    Kleinste Neigung der Druckdiagonalen                                            \alpha_{min}                                                30  °         Vorgabe
-    Abminderung der Betondruckfestigkeit in der Druckdiagonalen                     k_c                                                       0.55            Vorgabe
-    Momentenwiderstand bei N_Ed = 0, Zug links                                      M_{z,Rd}^{+}(N_{Ed} = 0)                                  60.8  kNm       berechnet
-    Momentenwiderstand bei N_Ed = 0, Zug oben                                       M_{y,Rd}^{-}(N_{Ed} = 0)                                 -56.1  kNm       berechnet
-    Momentenwiderstand bei N_Ed = 0, Zug rechts                                     M_{z,Rd}^{-}(N_{Ed} = 0)                                 -60.8  kNm       berechnet
-    Momentenwiderstand bei N_Ed = 0, Zug unten                                      M_{y,Rd}^{+}(N_{Ed} = 0)                                 211.8  kNm       berechnet
-    Druckwiderstand bei gleichmässiger Dehnung                                      N_{Rd}^{-}                                             -4044.1  kN        berechnet
-    Zugwiderstand bei gleichmässiger Dehnung                                        N_{Rd}^{+}                                               508.1  kN        berechnet
-    Torsionswiderstand der Schubwände, allein                                       T_{Rd}                                                    78.9  kNm       berechnet
-    Querkraftwiderstand in y der Schubwände, allein                                 V_{y,Rd}                                                 157.7  kN        berechnet
-    Querkraftwiderstand in z der Schubwände, allein                                 V_{z,Rd}                                                 394.3  kN        berechnet
-    Bewehrungsmass je Kubikmeter Beton                                              \mu_s                                                       51  kg/m³     berechnet
-    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug links                                 \left(x/d\right)_{z}^{+}                                 0.219            berechnet
-    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug oben                                  \left(x/d\right)_{y}^{-}                                 0.077            berechnet
-    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug rechts                                \left(x/d\right)_{z}^{-}                                 0.219            berechnet
-    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug unten                                 \left(x/d\right)_{y}^{+}                                 0.128            berechnet
-    Erfüllungsgrad Duktilität – Zug links                                           \alpha_{eff,x/d,\text{Zug links}}                         1.60            berechnet
-    Erfüllungsgrad Duktilität – Zug oben                                            \alpha_{eff,x/d,\text{Zug oben}}                          4.56            berechnet
-    Erfüllungsgrad Duktilität – Zug rechts                                          \alpha_{eff,x/d,\text{Zug rechts}}                        1.60            berechnet
-    Erfüllungsgrad Duktilität – Zug unten                                           \alpha_{eff,x/d,\text{Zug unten}}                         2.73            berechnet
-    Erfüllungsgrad Biegung und Normalkraft – Feld                                   \alpha_{eff,\text{Feld}}                                  1.41            berechnet
-    Grösste aufnehmbare Druckkraft                                                  N_{Rd}^{-}                                             -4044.1  kN        berechnet
-    Grösste aufnehmbare Zugkraft                                                    N_{Rd}^{+}                                               508.1  kN        berechnet
-    Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt                             \alpha_{eff,NR}                                           1.29            berechnet
-    Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %)                       \alpha_{eff,\sigma,w,\text{Feld (60 \%)}}                 2.66            berechnet
-    Erfüllungsgrad sprödes Versagen – Zug links                                     \alpha_{eff,Riss,\text{Zug links}}                        2.45            berechnet
-    Erfüllungsgrad sprödes Versagen – Zug oben                                      \alpha_{eff,Riss,\text{Zug oben}}                         1.18            berechnet
-    Erfüllungsgrad sprödes Versagen – Zug rechts                                    \alpha_{eff,Riss,\text{Zug rechts}}                       2.45            berechnet
-    Erfüllungsgrad sprödes Versagen – Zug unten                                     \alpha_{eff,Riss,\text{Zug unten}}                        4.46            berechnet
-    Erfüllungsgrad Querkraft und Torsion – Feld                                     \alpha_{eff,V,\text{Feld}}                                1.75            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – Zug links                                 \alpha_{eff,ZB,\text{Zug links}}                          1.99            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – Zug oben                                  \alpha_{eff,ZB,\text{Zug oben}}                           1.25            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – Zug rechts                                \alpha_{eff,ZB,\text{Zug rechts}}                         1.99            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – Zug unten                                 \alpha_{eff,ZB,\text{Zug unten}}                          5.05            berechnet
-    Schwerpunkt, y                                                                  y_S                                                        150  mm        berechnet
-    Schwerpunkt, z                                                                  z_S                                                        300  mm        berechnet
-    Breite des Fundaments                                                           B                                                            2  m         Vorgabe
-    Länge des Fundaments                                                            L                                                          2.5  m         Vorgabe
-    M_E-Wert der Schicht 1, Erstbelastung                                           M_{E,1}                                                     60  MN/m²     Vorgabe
-    M_E-Wert der Schicht 2, Erstbelastung                                           M_{E,2}                                                     15  MN/m²     Vorgabe
-    M_E-Wert der Schicht 3, Erstbelastung                                           M_{E,3}                                                    100  MN/m²     Vorgabe
-    M_E-Wert der Schicht 1, Wiederbelastung                                         M'_{E,1}                                                   180  MN/m²     Vorgabe
-    M_E-Wert der Schicht 2, Wiederbelastung                                         M'_{E,2}                                                    45  MN/m²     Vorgabe
-    M_E-Wert der Schicht 3, Wiederbelastung                                         M'_{E,3}                                                   250  MN/m²     Vorgabe
-    Dicke der Schicht 1                                                             d_{1}                                                        2  m         Vorgabe
-    Dicke der Schicht 2                                                             d_{2}                                                        3  m         Vorgabe
-    Dicke der Schicht 3                                                             d_{3}                                                        4  m         Vorgabe
-    Grösste Dicke einer Teilschicht                                                 \Delta z_{max}                                             0.5  m         Vorgabe
-    Erfüllungsgrad Setzung                                                          \alpha_{eff,s}                                            2.54            berechnet
-    Pressung aus Erstbelastung                                                      q_E                                                        196  kN/m²     Vorgabe
-    Pressung aus Wiederbelastung                                                    q_W                                                         24  kN/m²     Vorgabe
-    Zulässige Setzung                                                               s_{zul}                                                     25  mm        Vorgabe
+    Bezeichnung                                                                               Symbol                                                    Wert  Einheit   Herkunft
+    ----------------------------------------------------------------------------------------  -----------------------------------------------------  -------  --------  ---------
+    Querschnittsfläche, Stütze 300×300                                                        A_{\text{Q1}}                                            90000  mm²       berechnet
+    Flächenträgheitsmoment, Stütze 300×300                                                    I_{\text{Q1}}                                              675  ·10⁶ mm⁴  berechnet
+    Dehnsteifigkeit, Stütze 300×300, C30/37                                                   EA_{\text{Q1}}                                            3026  MN        berechnet
+    Biegesteifigkeit, Stütze 300×300, C30/37                                                  EI_{\text{Q1}}                                           22693  kNm²      berechnet
+    Eigengewicht je Meter, Stütze 300×300, C30/37                                             g_{k,\text{Q1}}                                           2.25  kN/m      berechnet
+    Breite, Stütze 300×300                                                                    b_{\text{Q1}}                                              300  mm        Vorgabe
+    Höhe, Stütze 300×300                                                                      h_{\text{Q1}}                                              300  mm        Vorgabe
+    Querschnittsfläche, Unterzug                                                              A_{\text{Q2}}                                           180000  mm²       berechnet
+    Flächenträgheitsmoment, Unterzug                                                          I_{\text{Q2}}                                             5400  ·10⁶ mm⁴  berechnet
+    Dehnsteifigkeit, Unterzug, C30/37                                                         EA_{\text{Q2}}                                            6052  MN        berechnet
+    Biegesteifigkeit, Unterzug, C30/37                                                        EI_{\text{Q2}}                                          181547  kNm²      berechnet
+    Eigengewicht je Meter, Unterzug, C30/37                                                   g_{k,\text{Q2}}                                            4.5  kN/m      berechnet
+    Erdbeschleunigung                                                                         g                                                           10  m/s²      Vorgabe
+    Bemessungswert des Elastizitätsmoduls                                                     E_{cd}                                                   28016  N/mm²     berechnet
+    Mittelwert des Elastizitätsmoduls                                                         E_{cm}                                                   33620  N/mm²     berechnet
+    Dehnung am Ende des ansteigenden Astes                                                    \varepsilon_{c1d}                                            2  ‰         Vorgabe
+    Bruchdehnung des Betons                                                                   \varepsilon_{c2d}                                          3.5  ‰         Vorgabe
+    Beiwert zur Berücksichtigung der Festigkeitsminderung                                     \eta_{fc}                                                    1            berechnet
+    Bemessungswert der Betondruckfestigkeit                                                   f_{cd}                                                      20  N/mm²     berechnet
+    Charakteristische Zylinderdruckfestigkeit                                                 f_{ck}                                                      30  N/mm²     Vorgabe
+    Mittelwert der Zylinderdruckfestigkeit                                                    f_{cm}                                                      38  N/mm²     berechnet
+    Mittelwert der Zugfestigkeit                                                              f_{ctm}                                                    2.9  N/mm²     Vorgabe
+    Teilsicherheitsbeiwert für Beton                                                          \gamma_c                                                   1.5            Vorgabe
+    Teilsicherheitsbeiwert für den Elastizitätsmodul, Druckglieder mit Einflüssen 2. Ordnung  \gamma_{cE}                                                1.2            Vorgabe
+    Beiwert für die Gesteinskörnung                                                           k_e                                                      10000            Vorgabe
+    Dichte des Stahlbetons                                                                    \rho_{sb}                                                 2500  kg/m³     Vorgabe
+    Bemessungswert der Schubspannungsgrenze                                                   \tau_{cd}                                                  1.1  N/mm²     berechnet
+    Elastizitätsmodul des Betonstahls                                                         E_s                                                     200000  N/mm²     Vorgabe
+    Bemessungswert der Dehnung bei Höchstlast                                                 \varepsilon_{ud}                                           4.5  %         Vorgabe
+    Bemessungswert der Fliessgrenze                                                           f_{yd}                                                     435  N/mm²     berechnet
+    Bemessungswert der Fliessgrenze auf Druck                                                 f_{yd}^{-}                                                 435  N/mm²     berechnet
+    Charakteristische Fliessgrenze                                                            f_{yk}                                                     500  N/mm²     Vorgabe
+    Charakteristische Fliessgrenze auf Druck                                                  f_{yk}^{-}                                                 500  N/mm²     Vorgabe
+    Teilsicherheitsbeiwert für Betonstahl                                                     \gamma_s                                                  1.15            Vorgabe
+    Länge des Fundaments                                                                      L                                                          2.5  m         Vorgabe
+    Neigung der Sohle                                                                         \alpha                                                       0  °         Vorgabe
+    Breite des Fundaments                                                                     b                                                            2  m         Vorgabe
+    Neigung des Geländes                                                                      \beta                                                        0  °         Vorgabe
+    Kohäsion, Bemessungswert                                                                  c_{eff}                                                      0  kPa       berechnet
+    Kohäsion, charakteristisch                                                                c_k                                                          0  kPa       Vorgabe
+    Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ                                 k_{\delta}                                                   1            Vorgabe
+    Raumlast des Bodens                                                                       \gamma                                                      21  kN/m³     Vorgabe
+    Raumlast des Bodens unter Auftrieb                                                        \gamma'                                                     11  kN/m³     berechnet
+    Partialfaktor der Kohäsion                                                                \gamma_c                                                   1.5            Vorgabe
+    Partialfaktor des Reibungswinkels                                                         \gamma_{\varphi}                                           1.2            Vorgabe
+    Raumlast des Wassers                                                                      \gamma_w                                                    10  kN/m³     Vorgabe
+    Erfüllungsgrad Gleiten – Tragsicherheit                                                   \alpha_{eff,GL,\text{Tragsicherheit}}                     5.21            berechnet
+    Erfüllungsgrad Grundbruch – Tragsicherheit                                                \alpha_{eff,GB,\text{Tragsicherheit}}                     1.90            berechnet
+    Reibungswinkel, Bemessungswert                                                            \varphi_{eff}                                            27.51  °         berechnet
+    Reibungswinkel, charakteristisch                                                          \varphi_k                                                   32  °         Vorgabe
+    Bemessungslast neben dem Fundament                                                        q_{Ed}                                                       0  kPa       Vorgabe
+    Tiefe der Sohle unter Terrain                                                             t                                                          1.2  m         Vorgabe
+    Tiefe des höchsten Grundwasserspiegels unter Terrain                                      t_1                                                          5  m         Vorgabe
+    Grösstkorndurchmesser                                                                     D_{max}                                                     32  mm        Vorgabe
+    Betrachtete Breite (x)                                                                    b                                                         1000  mm        Vorgabe
+    Betrachtete Breite (y)                                                                    b_y                                                       1000  mm        Vorgabe
+    Bewehrungsmass je Kubikmeter Beton                                                        \mu_s                                                      123  kg/m³     berechnet
+    Überdeckung oben                                                                          c_{nom,o}                                                   30  mm        Vorgabe
+    Überdeckung unten                                                                         c_{nom,u}                                                   30  mm        Vorgabe
+    Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage)                        h_{Dist}                                                   186  mm        berechnet
+    Höhe der Einlage                                                                          e_{Einlage}                                                  0  mm        Vorgabe
+    Plattendicke                                                                              h                                                          300  mm        Vorgabe
+    Momentenwiderstand bei N_Ed = 0, Zug oben                                                 M_{Rd}^{-}(N_{Ed} = 0)                                   -79.9  kNm       berechnet
+    Momentenwiderstand bei N_Ed = 0, Zug unten                                                M_{Rd}^{+}(N_{Ed} = 0)                                   235.9  kNm       berechnet
+    Druckwiderstand bei M_Ed = 0                                                              N_{Rd}^{-}(M_{Ed} = 0)                                   -6000  kN        berechnet
+    Zugwiderstand bei M_Ed = 0                                                                N_{Rd}^{+}(M_{Ed} = 0)                                   737.5  kN        berechnet
+    Querkraftwiderstand ohne Bügel bei M_Ed = 0 und N_Ed = 0                                  V_{Rd,max}                                               272.8  kN/m      berechnet
+    Querkraftwiderstand ohne Bügel bei M_Ed = M_Rd und N_Ed = 0                               V_{Rd,min}                                               165.4  kN/m      berechnet
+    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug oben                                            \left(x/d\right)^{-}                                     0.077            berechnet
+    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug unten                                           \left(x/d\right)^{+}                                     0.253            berechnet
+    Bewehrungsquerschnitt 1. Lage Grundbewehrung                                              A_{s,1,y,g}                                                754  mm²       berechnet
+    Stabdurchmesser 1. Lage Grundbewehrung                                                    \varnothing_{1,y,g}                                         12  mm        Vorgabe
+    Teilung 1. Lage Grundbewehrung                                                            s_{1,y,g}                                                  150  mm        Vorgabe
+    Tiefe 1. Lage Grundbewehrung ab Oberkante                                                 z_{1,y,g}                                                  264  mm        berechnet
+    Bewehrungsquerschnitt 2. Lage Grundbewehrung                                              A_{s,2,x,g}                                               1696  mm²       berechnet
+    Stabdurchmesser 2. Lage Grundbewehrung                                                    \varnothing_{2,x,g}                                         18  mm        Vorgabe
+    Teilung 2. Lage Grundbewehrung                                                            s_{2,x,g}                                                  150  mm        Vorgabe
+    Tiefe 2. Lage Grundbewehrung ab Oberkante                                                 z_{2,x,g}                                                  249  mm        berechnet
+    Bewehrungsquerschnitt 2. Lage Zulage                                                      A_{s,2,x,z}                                                754  mm²       berechnet
+    Stabdurchmesser 2. Lage Zulage                                                            \varnothing_{2,x,z}                                         12  mm        Vorgabe
+    Teilung 2. Lage Zulage                                                                    s_{2,x,z}                                                  150  mm        Vorgabe
+    Tiefe 2. Lage Zulage ab Oberkante                                                         z_{2,x,z}                                                  246  mm        berechnet
+    Bewehrungsquerschnitt 3. Lage Grundbewehrung                                              A_{s,3,x,g}                                                754  mm²       berechnet
+    Stabdurchmesser 3. Lage Grundbewehrung                                                    \varnothing_{3,x,g}                                         12  mm        Vorgabe
+    Teilung 3. Lage Grundbewehrung                                                            s_{3,x,g}                                                  150  mm        Vorgabe
+    Tiefe 3. Lage Grundbewehrung ab Oberkante                                                 z_{3,x,g}                                                   48  mm        berechnet
+    Bewehrungsquerschnitt 4. Lage Grundbewehrung                                              A_{s,4,y,g}                                                754  mm²       berechnet
+    Stabdurchmesser 4. Lage Grundbewehrung                                                    \varnothing_{4,y,g}                                         12  mm        Vorgabe
+    Teilung 4. Lage Grundbewehrung                                                            s_{4,y,g}                                                  150  mm        Vorgabe
+    Tiefe 4. Lage Grundbewehrung ab Oberkante                                                 z_{4,y,g}                                                   36  mm        berechnet
+    Erfüllungsgrad Duktilität – 2. Lage                                                       \alpha_{eff,D,2}                                          1.39            berechnet
+    Bezogene Druckzonenhöhe – 2. Lage                                                         \left(x/d\right)_{2}                                     0.253            berechnet
+    Erfüllungsgrad Duktilität – 3. Lage                                                       \alpha_{eff,D,3}                                          4.58            berechnet
+    Bezogene Druckzonenhöhe – 3. Lage                                                         \left(x/d\right)_{3}                                     0.077            berechnet
+    Momentenwiderstand bei N_Ed (x-Richtung) – Feld                                           M_{Rd,x}(N_{Ed})_{\text{Feld}}                           235.9  kNm       berechnet
+    Erfüllungsgrad x-Richtung – Feld                                                          \alpha_{eff,x,\text{Feld}}                                2.36            berechnet
+    Momentenwiderstand bei N_Ed (x-Richtung) – Feld mit Druck                                 M_{Rd,x}(N_{Ed})_{\text{Feld mit Druck}}                 253.8  kNm       berechnet
+    Erfüllungsgrad x-Richtung – Feld mit Druck                                                \alpha_{eff,x,\text{Feld mit Druck}}                      2.54            berechnet
+    Momentenwiderstand bei N = 0, negativ (x-Richtung)                                        M_{Rd,x}(N=0)^{-}                                        -79.9  kNm       berechnet
+    Momentenwiderstand bei N = 0, positiv (x-Richtung)                                        M_{Rd,x}(N=0)^{+}                                        235.9  kNm       berechnet
+    Grösster positiver Momentenwiderstand (x-Richtung)                                        M_{Rd,x}^{+}                                             324.4  kNm       berechnet
+    Grösster negativer Momentenwiderstand (x-Richtung)                                        M_{Rd,x}^{-}                                            -253.4  kNm       berechnet
+    Grösste aufnehmbare Druckkraft (x-Richtung)                                               N_{Rd,x}^{-}                                             -6000  kN        berechnet
+    Grösste aufnehmbare Zugkraft (x-Richtung)                                                 N_{Rd,x}^{+}                                            1393.2  kN        berechnet
+    Momentenwiderstand bei N_Ed (x-Richtung) – Stütze                                         M_{Rd,x}(N_{Ed})_{\text{Stütze}}                          79.9  kNm       berechnet
+    Erfüllungsgrad x-Richtung – Stütze                                                        \alpha_{eff,x,\text{Stütze}}                              1.60            berechnet
+    Erfüllungsgrad Rissnormalkraft – 2. Lage x                                                \alpha_{eff,NR,2,x}                                       3.24            berechnet
+    Erfüllungsgrad Rissnormalkraft – 3. Lage x                                                \alpha_{eff,NR,3,x}                                      0.996            berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %)                      \alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}               4.54            berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 %)            \alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}     6.80            berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 %)                    \alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}             3.02            berechnet
+    Erfüllungsgrad sprödes Versagen – 2. Lage x                                               \alpha_{eff,SV,2,x}                                       5.69            berechnet
+    Erfüllungsgrad sprödes Versagen – 3. Lage x                                               \alpha_{eff,SV,3,x}                                       1.93            berechnet
+    Erfüllungsgrad Verformung – Feld                                                          \alpha_{eff,w,\text{Feld}}                                1.22            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 2. Lage x                                           \alpha_{eff,ZB,2,x}                                       6.63            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 3. Lage x                                           \alpha_{eff,ZB,3,x}                                       2.16            berechnet
+    Vergrösserungsfaktor der Durchbiegung, Zug oben                                           \omega_w'                                                 7.52            berechnet
+    Vergrösserungsfaktor der Durchbiegung, Zug unten                                          \omega_w                                                     4            berechnet
+    Fläche des Bruttoquerschnitts                                                             A                                                       180000  mm²       berechnet
+    Stahlfläche der Bewehrung                                                                 A_{s,tot}                                                 1169  mm²       berechnet
+    Trägheitsmoment um y                                                                      I_y                                                       5400  ·10⁶ mm⁴  berechnet
+    Deviationsmoment                                                                          I_{yz}                                                       0  ·10⁶ mm⁴  berechnet
+    Trägheitsmoment um z                                                                      I_z                                                       1350  ·10⁶ mm⁴  berechnet
+    Grösste Neigung der Druckdiagonalen                                                       \alpha_{max}                                                45  °         Vorgabe
+    Kleinste Neigung der Druckdiagonalen                                                      \alpha_{min}                                                30  °         Vorgabe
+    Abminderung der Betondruckfestigkeit in der Druckdiagonalen                               k_c                                                       0.55            Vorgabe
+    Momentenwiderstand bei N_Ed = 0, Zug links                                                M_{z,Rd}^{+}(N_{Ed} = 0)                                  60.8  kNm       berechnet
+    Momentenwiderstand bei N_Ed = 0, Zug oben                                                 M_{y,Rd}^{-}(N_{Ed} = 0)                                 -56.1  kNm       berechnet
+    Momentenwiderstand bei N_Ed = 0, Zug rechts                                               M_{z,Rd}^{-}(N_{Ed} = 0)                                 -60.8  kNm       berechnet
+    Momentenwiderstand bei N_Ed = 0, Zug unten                                                M_{y,Rd}^{+}(N_{Ed} = 0)                                 211.8  kNm       berechnet
+    Druckwiderstand bei gleichmässiger Dehnung                                                N_{Rd}^{-}                                             -4044.1  kN        berechnet
+    Zugwiderstand bei gleichmässiger Dehnung                                                  N_{Rd}^{+}                                               508.1  kN        berechnet
+    Torsionswiderstand der Schubwände, allein                                                 T_{Rd}                                                    78.9  kNm       berechnet
+    Querkraftwiderstand in y der Schubwände, allein                                           V_{y,Rd}                                                 157.7  kN        berechnet
+    Querkraftwiderstand in z der Schubwände, allein                                           V_{z,Rd}                                                 394.3  kN        berechnet
+    Bewehrungsmass je Kubikmeter Beton                                                        \mu_s                                                       51  kg/m³     berechnet
+    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug links                                           \left(x/d\right)_{z}^{+}                                  0.25            berechnet
+    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug oben                                            \left(x/d\right)_{y}^{-}                                 0.077            berechnet
+    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug rechts                                          \left(x/d\right)_{z}^{-}                                  0.25            berechnet
+    Bezogene Druckzonenhöhe bei N_Ed = 0, Zug unten                                           \left(x/d\right)_{y}^{+}                                 0.128            berechnet
+    Erfüllungsgrad Duktilität – Zug links                                                     \alpha_{eff,x/d,\text{Zug links}}                         1.40            berechnet
+    Erfüllungsgrad Duktilität – Zug oben                                                      \alpha_{eff,x/d,\text{Zug oben}}                          4.56            berechnet
+    Erfüllungsgrad Duktilität – Zug rechts                                                    \alpha_{eff,x/d,\text{Zug rechts}}                        1.40            berechnet
+    Erfüllungsgrad Duktilität – Zug unten                                                     \alpha_{eff,x/d,\text{Zug unten}}                         2.73            berechnet
+    Erfüllungsgrad Biegung und Normalkraft – Feld                                             \alpha_{eff,\text{Feld}}                                  1.41            berechnet
+    Grösste aufnehmbare Druckkraft                                                            N_{Rd}^{-}                                             -4044.1  kN        berechnet
+    Grösste aufnehmbare Zugkraft                                                              N_{Rd}^{+}                                               508.1  kN        berechnet
+    Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt                                       \alpha_{eff,NR}                                           1.29            berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %)                                 \alpha_{eff,\sigma,w,\text{Feld (60 \%)}}                 2.66            berechnet
+    Erfüllungsgrad sprödes Versagen – Zug links                                               \alpha_{eff,Riss,\text{Zug links}}                        2.45            berechnet
+    Erfüllungsgrad sprödes Versagen – Zug oben                                                \alpha_{eff,Riss,\text{Zug oben}}                         1.18            berechnet
+    Erfüllungsgrad sprödes Versagen – Zug rechts                                              \alpha_{eff,Riss,\text{Zug rechts}}                       2.45            berechnet
+    Erfüllungsgrad sprödes Versagen – Zug unten                                               \alpha_{eff,Riss,\text{Zug unten}}                        4.46            berechnet
+    Erfüllungsgrad Querkraft und Torsion – Feld                                               \alpha_{eff,V,\text{Feld}}                                1.75            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – Zug links                                           \alpha_{eff,ZB,\text{Zug links}}                          1.99            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – Zug oben                                            \alpha_{eff,ZB,\text{Zug oben}}                           1.25            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – Zug rechts                                          \alpha_{eff,ZB,\text{Zug rechts}}                         1.99            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – Zug unten                                           \alpha_{eff,ZB,\text{Zug unten}}                          5.05            berechnet
+    Schwerpunkt, y                                                                            y_S                                                        150  mm        berechnet
+    Schwerpunkt, z                                                                            z_S                                                        300  mm        berechnet
+    Breite des Fundaments                                                                     B                                                            2  m         Vorgabe
+    Länge des Fundaments                                                                      L                                                          2.5  m         Vorgabe
+    M_E-Wert der Schicht 1, Erstbelastung                                                     M_{E,1}                                                     60  MN/m²     Vorgabe
+    M_E-Wert der Schicht 2, Erstbelastung                                                     M_{E,2}                                                     15  MN/m²     Vorgabe
+    M_E-Wert der Schicht 3, Erstbelastung                                                     M_{E,3}                                                    100  MN/m²     Vorgabe
+    M_E-Wert der Schicht 1, Wiederbelastung                                                   M'_{E,1}                                                   180  MN/m²     Vorgabe
+    M_E-Wert der Schicht 2, Wiederbelastung                                                   M'_{E,2}                                                    45  MN/m²     Vorgabe
+    M_E-Wert der Schicht 3, Wiederbelastung                                                   M'_{E,3}                                                   250  MN/m²     Vorgabe
+    Dicke der Schicht 1                                                                       d_{1}                                                        2  m         Vorgabe
+    Dicke der Schicht 2                                                                       d_{2}                                                        3  m         Vorgabe
+    Dicke der Schicht 3                                                                       d_{3}                                                        4  m         Vorgabe
+    Grösste Dicke einer Teilschicht                                                           \Delta z_{max}                                             0.5  m         Vorgabe
+    Erfüllungsgrad Setzung                                                                    \alpha_{eff,s}                                            2.54            berechnet
+    Pressung aus Erstbelastung                                                                q_E                                                        196  kN/m²     Vorgabe
+    Pressung aus Wiederbelastung                                                              q_W                                                         24  kN/m²     Vorgabe
+    Zulässige Setzung                                                                         s_{zul}                                                     25  mm        Vorgabe

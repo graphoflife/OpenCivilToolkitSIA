@@ -1,5 +1,5 @@
 ---
-erzeugt: 1009c2cbbce1
+erzeugt: deeb32f3b2fd
 art: modul
 tags: [modul]
 ---
@@ -399,7 +399,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 
 ## Konstanten
 
-- `KENNWERTE = {Baustoffart.BETON: ('f_ck', 'f_cd', 'eps_c1d', 'eps_c2d', 'f_ctm', '…` – Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus `E_cm` entsteht der Beiwert der Parabel, wie bei der Platte; der Gebrauchszustand rechnet mit `E_cm/(1+phi)`.
+- `KENNWERTE = {Baustoffart.BETON: ('f_ck', 'f_cd', 'eps_c1d', 'eps_c2d', 'f_ctm', '…` – Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus `E_cm` entsteht der Beiwert der Parabel, wie bei der Platte, beim Knicken aus `E_cd`; der Gebrauchszustand rechnet mit `E_cm/(1+phi)`.
 
 ## Braucht
 

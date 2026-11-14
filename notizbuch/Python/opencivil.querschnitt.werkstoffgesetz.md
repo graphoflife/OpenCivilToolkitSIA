@@ -1,5 +1,5 @@
 ---
-erzeugt: 10216115ecfd
+erzeugt: 5723b71212c0
 art: modul
 tags: [modul]
 ---
@@ -11,11 +11,12 @@ tags: [modul]
 
 Jedes Werkstoffgesetz ist ein Objekt, das rechnet und sich selbst als Formel
 schreibt -- dieselben Werte, dieselben Aeste. Beton: die
-Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.6, [[opencivil.querschnitt.werkstoffgesetz#Betongesetz|Betongesetz]]), der
-Spannungsblock 0.85·x ([[opencivil.querschnitt.werkstoffgesetz#Spannungsblock|Spannungsblock]]), linear ohne Zug
-([[opencivil.querschnitt.werkstoffgesetz#BetonElastisch|BetonElastisch]]) und ungerissen ([[opencivil.querschnitt.werkstoffgesetz#BetonUngerissen|BetonUngerissen]]).
-Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt, oder nur auf Zug
-([[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], 4.2.2.4).
+Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.5 mit Figur 12, 4.2.1.6,
+[[opencivil.querschnitt.werkstoffgesetz#Betongesetz|Betongesetz]]), der Spannungsblock 0.85·x (4.2.1.5,
+[[opencivil.querschnitt.werkstoffgesetz#Spannungsblock|Spannungsblock]]), linear ohne Zug ([[opencivil.querschnitt.werkstoffgesetz#BetonElastisch|BetonElastisch]]) und
+ungerissen ([[opencivil.querschnitt.werkstoffgesetz#BetonUngerissen|BetonUngerissen]], beide 4.1.4.1.4). Betonstahl:
+bilinear, auf Zug und Druck getrennt begrenzt ([[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]],
+4.2.2.2 mit Figur 16), oder nur auf Zug.
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -144,7 +145,8 @@ Zwischenwerte zu, wo ein Gesetz welche hat.
 class Betongesetz(Gesetz)
 ```
 
-Parabel-Rechteck-Beziehung nach SIA 262:2025, 4.2.1.6.
+Parabel-Rechteck-Beziehung nach SIA 262:2025, 4.2.1.5 (Figur 12) und
+4.2.1.6, Gl. (27). Die Norm schreibt `zeta` fuer `eta`.
 
 Mit `eta = |eps| / eps_c1d` gilt fuer den Druckbereich:
 
@@ -160,7 +162,7 @@ Jenseits von `eps_c2d` null -- siehe Dateikopf.
 
 - `NAME = 'Parabel-Rechteck-Beziehung des Betons'`
 - `WORT = 'Beton, Parabel-Rechteck'`
-- `REFERENZ = 'SIA 262:2025, 4.2.1.6'`
+- `REFERENZ = 'SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)'`
 - `ROLLEN = ('f_c', 'eps_c1d', 'eps_c2d')`
 - `f_cd: float` – Festigkeit in N/m^2 (positiver Betrag) -- je nach Werkstoffsatz `f_cd` oder `f_ck`.
 - `eps_c1d: float` – Dehnung am Ende des ansteigenden Astes (positiver Betrag).
@@ -214,11 +216,15 @@ Handrechnung rechnet. Als Gesetz gilt er auch dort, wo der Rand nicht bei
 `eps_c2d` liegt; so setzt ihn die Interaktionslinie des gezeichneten
 Querschnitts ein.
 
-Die Normstelle des Blocks ist offen (`notizbuch/Notizen/TODO.md`); sie
-wird nicht erfunden.
+Der Block steht in SIA 262:2025, 4.2.1.5 mit Figur 12: ein Rechteck der
+Hoehe 0.85·x mit der Spannung f_cd. Die Schwelle `(1 - 0.85)·eps_c2d`
+bildet ihn nach, wo der Rand `eps_c2d` erreicht; dass sie auch bei
+kleinerer Randstauchung gilt (Rand bei 2 ‰: Block 0.74·x), ist eine
+Vorgabe -- die Norm regelt diesen Fall nicht.
 
 - `NAME = 'Spannungsblock des Betons'`
 - `WORT = f'Beton, Spannungsblock {BLOCKANTEIL}·x'`
+- `REFERENZ = 'SIA 262:2025, 4.2.1.5, Figur 12'`
 - `ROLLEN = ('f_c', 'eps_c2d')`
 - `f_cd: float` – Festigkeit des Blocks in N/m^2 (positiver Betrag) -- je nach Werkstoffsatz `f_cd` oder `f_ck`.
 - `eps_c2d: float` – Bruchdehnung (positiver Betrag).
@@ -268,15 +274,16 @@ Als Formel -- `f` ist das Zeichen der Festigkeit, `f_{ck}` bei charakteristische
 class Stahlgesetz(Gesetz)
 ```
 
-Bilineare Beziehung ohne Verfestigung nach SIA 262:2025, 4.2.2.4.
+Bilineare Beziehung nach SIA 262:2025, 4.2.2.2 (Figur 16), ohne
+Verfestigung, wie 4.2.2.5 es zulaesst.
 
-Zug und Druck werden getrennt begrenzt, weil `f_yd` und `f_yd^-` in der
-Sortentabelle unterschiedlich sein duerfen. Den Stahl, der gedrueckt
-nichts traegt, rechnet [[opencivil.querschnitt.werkstoffgesetz#StahlNurZug|StahlNurZug]].
+Zug und Druck werden getrennt begrenzt. Die Norm setzt beide gleich
+(4.2.2.2); ein eigener Stahl darf auf Druck eine andere Fliessgrenze
+haben. Den Stahl, der gedrueckt nichts traegt, rechnet [[opencivil.querschnitt.werkstoffgesetz#StahlNurZug|StahlNurZug]].
 
 - `NAME = 'Bilineare Beziehung des Betonstahls'`
 - `WORT = 'Stahl, bilinear'`
-- `REFERENZ = 'SIA 262:2025, 4.2.2.4'`
+- `REFERENZ = 'SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5'`
 - `ROLLEN = ('f_s', 'f_s_druck', 'E_s', 'eps_ud')`
 - `WERTTITEL = 'Werte des Stahls'`
 - `E_s: float` – Elastizitaetsmodul in N/m^2.
@@ -363,7 +370,8 @@ class BetonElastisch(Gesetz)
 ```
 
 Beton ohne Zugfestigkeit, im Druck linear bis `f_c`, dann waagrecht --
-fuer den gerissenen Gebrauchszustand.
+fuer den gerissenen Gebrauchszustand. Linear und ohne Zug nach
+SIA 262:2025, 4.1.4.1.4; die Grenze bei `f_c` ist eine Vorgabe.
 
 `E_c` ist bereits der wirksame Modul, `E_cm/(1+phi)`, falls Kriechen
 zaehlt; `f_c` die Festigkeit aus dem Werkstoffsatz, im Gebrauchszustand
@@ -376,6 +384,7 @@ Festigkeiten nichts zu tun haben.
 
 - `NAME = 'Beton linear, ohne Zug'`
 - `WORT = 'Beton, linear ohne Zug'`
+- `REFERENZ = 'SIA 262:2025, 4.1.4.1.4'`
 - `ROLLEN = ('E_c', 'f_c')`
 - `E_c: float`
 - `f_c: float = math.inf`
@@ -412,6 +421,7 @@ des Loesers braucht Monotonie.
 
 - `NAME = 'Beton ungerissen, in Druck und Zug'`
 - `WORT = 'Beton, linear in Druck und Zug'`
+- `REFERENZ = 'SIA 262:2025, 4.1.4.1.4'`
 - `ROLLEN = ('E_c',)`
 - `E_c: float`
 
@@ -488,7 +498,7 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 
 - `Werte = Mapping[str, Wert]` – Womit ein Gesetz sich anschreibt: je Rolle der Wert, mit seinem Zeichen. Beim Beton die Festigkeit des Wertesatzes `f_c` (`f_cd` oder `f_ck`), der Modul `E_c`, an dem ein Gesetz haengt -- der wirksame, wo Kriechen zaehlt --, und die Dehnungen `eps_c1d` und `eps_c2d`; beim Stahl die Plateaus `f_s` und `f_s_druck`, `E_s` und `eps_ud`.
 - `RUNDUNG = 1e-12` – Um so viel darf eine Dehnung ueber ihrer Grenze liegen und gilt noch als auf ihr: eine Rundung. Ein Milliardstel Promille -- weit unter allem, was eine Eingabe oder eine Suche unterscheidet, weit ueber der letzten Stelle.
-- `K_SIGMA_MIN = 1.0` – Kleiner rechnet die Parabel `k_sigma` nicht. Darunter haette ihr Nenner `1 + (k_sigma - 2)·eta` im ansteigenden Ast eine Nullstelle, bei `eta = 1/(2 - k_sigma)` -- die Spannung spraenge dort ins Unendliche und wechselte das Vorzeichen. So weit kommt es mit dem kriechweichen Modul: `E_cm/(1 + phi)` mit charakteristischen Werten und `phi = 2` gibt `k_sigma = 0.93`. Mit 1 ist der Beton bis `f_c` bei `eps_c1d` linear. Nach Vorgabe, nicht nachgeschlagen (`notizbuch/Notizen/TODO.md`).
+- `K_SIGMA_MIN = 1.0` – Kleiner rechnet die Parabel `k_sigma` nicht. Darunter haette ihr Nenner `1 + (k_sigma - 2)·eta` im ansteigenden Ast eine Nullstelle, bei `eta = 1/(2 - k_sigma)` -- die Spannung spraenge dort ins Unendliche und wechselte das Vorzeichen. So weit kommt es mit dem kriechweichen Modul: `E_cm/(1 + phi)` mit charakteristischen Werten und `phi = 2` gibt `k_sigma = 0.93`. Mit 1 ist der Beton bis `f_c` bei `eps_c1d` linear. Nach Vorgabe: SIA 262:2025, 4.2.1.6 kennt keine Untergrenze. Mit den Werten der Norm braucht es auch keine -- `E_cd/(400·f_cd)` liegt fuer C12/15 bis C50/60 zwischen 2.6 und 8.5; unter 1 kommt erst der kriechweiche Modul mit `f_ck`.
 - `K_SIGMA_LATEX = '\\max\\left(1;\\ \\frac{@E_c}{400 \\cdot @f_c}\\right)'` – Dieselbe Regel als Formel, fuer die Herleitung -- mit `@E_c` und `@f_c`.
 - `K_SIGMA_SEITE = 'Beiwert der Parabel'` – Ihre Seite im Notizbuch -- eine fuer jede Herleitung, die sie anschreibt, mit welchem Modul auch immer.
 - `STAHL_NUR_ZUG = 'Betonstahl nur auf Zug'` – Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.

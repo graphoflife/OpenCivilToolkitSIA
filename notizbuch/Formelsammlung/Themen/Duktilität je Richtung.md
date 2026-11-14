@@ -1,20 +1,21 @@
 ---
-erzeugt: 83d743f18d8f
+erzeugt: d4dfff0aca8c
 art: thema
 tags: [thema]
 ---
 > [!abstract] Querschnittsanalyse
-> 3 Formeln, in der Folge, in der gerechnet wird.
+> 4 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
-Ein Querschnitt kündigt sein Versagen an, wenn die Bewehrung fliesst, bevor der Beton bricht -- dann ist die Druckzone klein. Gemessen wird das an x/d bei reiner Biegung: x ist der Abstand der Nulllinie vom gedrücktesten Betonpunkt, d der des entferntesten gezogenen Stabs, beide senkrecht zur Nulllinie.
+Ein Querschnitt kann Schnittgrössen umlagern, wenn die Bewehrung fliesst, bevor der Beton bricht -- dann ist die Druckzone klein. Gemessen wird das an x/d bei reiner Biegung: x ist der Abstand der Nulllinie vom gedrücktesten Betonpunkt, d der des Schwerpunkts der Zugbewehrung, beide senkrecht zur Nulllinie. Zur Zugbewehrung zählen die gedehnten Stäbe auf der gezogenen Seite des Schwerpunkts; liegen dort verschiedene Stähle, gilt die Grenze des festesten.
 
 ## Formeln
 
 1. [[Bedingung der Duktilität]]
-2. [[Bezogene Druckzonenhöhe bei reiner Biegung]]
-3. [[Erfüllungsgrad]]
+2. [[Grenze der bezogenen Druckzonenhöhe]]
+3. [[Bezogene Druckzonenhöhe bei reiner Biegung]]
+4. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

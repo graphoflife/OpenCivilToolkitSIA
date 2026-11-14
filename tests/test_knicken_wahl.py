@@ -9,6 +9,7 @@ mit eigener Herleitung, und im Diagramm steht sie neben der massgebenden.
 
 import unittest
 
+from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.querschnitt.gesetzwahl import Rechenart
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.projekt import (
@@ -154,6 +155,23 @@ class TestVerformung(unittest.TestCase):
                 verformung=KnickVerformungswahl(kriechzahl=phi))
             e_2d[phi] = loesung.befund(knicken).ergebnisse[0].e_2d
         self.assertGreater(e_2d[2.0], e_2d[0.0])
+
+    def test_mit_dem_bemessungswert_des_moduls(self):
+        """
+        Ein Druckglied mit Einflüssen 2. Ordnung verformt sich mit
+        E_cd = E_cm / 1.2 (SIA 262:2025, 4.2.1.17) -- bis 2026-11-14 mit E_cm.
+        Weicher heisst: mehr Ausmitte, als mit E_cm herauskäme.
+        """
+        aufbau, knicken, loesung = gerechnet()
+        self.assertEqual(knicken.verformung.modul, "E_cd")
+        beton = aufbau.baustoffe["b1"]
+        E_cm, E_cd = (loesung.groesse(beton.id_von(k)).si for k in ("E_cm", "E_cd"))
+        self.assertAlmostEqual(E_cd, E_cm / 1.2)
+
+        aufbau.werk.setze(beton.id_von("gamma_cE"), Groesse(1.0, EINHEITSLOS))
+        steif = aufbau.werk.loese(knicken.d_ausnutzung["Stütze"].id)
+        self.assertGreater(loesung.befund(knicken).ergebnisse[0].e_2d,
+                           steif.befund(knicken).ergebnisse[0].e_2d)
 
     def test_den_block_gibt_es_fuer_die_verformung_nicht(self):
         """

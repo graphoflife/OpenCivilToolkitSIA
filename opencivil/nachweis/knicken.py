@@ -100,7 +100,7 @@ laeuft nur das Ergebnis mit, sonst stuenden vierzig Iterationstabellen da.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Callable, Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
@@ -149,15 +149,27 @@ HALBIERUNGEN = 14
 #: einen Stab mit alpha_eff > 64 baut, hat kein Knickproblem.
 OBERGRENZE = 64.0
 
-#: Riegel der Schiefstellung, SIA 262:2025, 4.3.7.
+#: Riegel der Schiefstellung, SIA 262:2025, 4.1.3.2.3, (17).
 ALPHA_UNTEN = 1.0 / 300.0
 ALPHA_OBEN = 1.0 / 200.0
 
+def verformungswahl(wahl: Rechenwahl) -> Rechenwahl:
+    """
+    Die Wahl der Verformung, mit ``E_cd = E_cm / gamma_cE``: ein Druckglied
+    mit Einfluessen 2. Ordnung verformt sich mit dem Bemessungswert des
+    Moduls (SIA 262:2025, 4.2.1.17, Regelwert gamma_cE = 1.2). Bis 2026-11-14
+    rechnete es mit ``E_cm``, also 20 % zu steif.
+    """
+    return replace(wahl, modul="E_cd")
+
+
 #: Warum die Wahl der Verformung zaehlt -- fuer jeden Knicknachweis derselbe Satz.
 VERFORMUNG_NACH_WAHL = (
-    "Die Verformung rechnet präzise, mit der Parabel; Kriechzahl und Werte "
-    "wählt das Kapitel. Das Kriechen weicht den Beton auf: er verformt sich "
-    "mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher – "
+    "Die Verformung rechnet präzise, mit der Parabel und mit dem "
+    "Bemessungswert des Elastizitätsmoduls E_cd = E_cm/γ_cE: für Druckglieder "
+    "mit Einflüssen 2. Ordnung nennt SIA 262:2025, 4.2.1.17 als Regelwert "
+    "γ_cE = 1.2. Kriechzahl und Werte wählt das Kapitel. Das Kriechen weicht "
+    "den Beton auf: er verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher – "
     "φ = 0 läge dann auf der unsicheren Seite. Im Bereich der Gebrauchslasten "
     "unterscheidet sich die Parabel kaum vom linearen Gesetz, in der Nähe der "
     "Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine "
@@ -519,13 +531,15 @@ class Knickverfahren(Nachweis):
             r"e_{0d} = \max\left(\frac{d}{30};\ "
             r"\frac{\alpha_i \cdot l_{cr}}{2}\right)",
             titel="Ungewollte Ausmitte – allgemein",
-            referenz="SIA 262:2025, 4.3.7")
+            referenz="SIA 262:2025, 4.1.3.2.3, (17); 4.3.7.5, (75)")
         p.ansatz(
             r"e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad "
             r"e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} "
             r"\qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot "
             r"\left(e_{0d} + e_{1d} + e_{2d}\right)",
-            titel="Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein")
+            titel="Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein",
+            referenz="SIA 262:2025, 4.3.7.6, (76); 4.3.7.7, (77); 4.3.7.12, (81); "
+                     "4.3.7.3, (73); 4.3.7.4, (74)")
 
     def _protokoll_fall(self, p: Protokoll, erg: Knickergebnis) -> None:
         fall = erg.fall
@@ -542,24 +556,24 @@ class Knickverfahren(Nachweis):
             return
 
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
-        # Empirisch: die Norm setzt die Stablaenge in Metern ein.
+        # Empirisch: die Norm setzt die Hoehe des Druckglieds in Metern ein.
         alpha_i = werte.zahl("alpha_i", r"\alpha_i", erg.alpha_i, stellen=5)
         p.formel(alpha_i,
                  r"\min\left[\max\left(\frac{0.01}{\sqrt{@l}};\ \frac{1}{300}\right);\ "
                  r"\frac{1}{200}\right]",
                  {"l": werte.wert("l", "l", fall.laenge, 2)},
-                 titel="Schiefstellung", referenz="SIA 262:2025, 4.3.7",
+                 titel="Schiefstellung", referenz="SIA 262:2025, 4.1.3.2.3, (17)",
                  empirisch={"l": M})
         p.formel(werte.laenge("e_0d", "e_{0d}", erg.e_0d),
                  r"\max\left(\frac{@d}{30};\ \frac{@alpha_i \cdot @l_cr}{2}\right)",
                  {"d": werte.laenge("d", "d", erg.d), "alpha_i": alpha_i,
                   "l_cr": werte.wert("l_cr", "l_{cr}", fall.knicklaenge, 2)},
-                 titel="Ungewollte Ausmitte", referenz="SIA 262:2025, 4.3.7")
+                 titel="Ungewollte Ausmitte", referenz="SIA 262:2025, 4.3.7.5, (75)")
         p.formel(werte.laenge("e_1d", "e_{1d}", erg.e_1d),
                  r"\left|\frac{@M_Ed_1}{@N_Ed}\right|",
                  {"M_Ed_1": werte.moment("M_Ed_1", "M_{Ed,1}", fall.M_Ed_1.si),
                   "N_Ed": werte.kraft("N_Ed", "N_{Ed}", fall.N_Ed.si)},
-                 titel="Gewollte Ausmitte")
+                 titel="Gewollte Ausmitte", referenz="SIA 262:2025, 4.3.7.6, (76)")
 
         self._protokoll_iteration(p, erg)
 
@@ -599,7 +613,9 @@ class Knickverfahren(Nachweis):
             r"\frac{l_{cr}^{2}}{\pi^{2}} \qquad "
             r"M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + "
             r"e_{1d} + e_{2d}^{(k-1)}\right)",
-            titel="Das Verfahren", referenz="SIA 262:2025, 4.3.7",
+            titel="Das Verfahren",
+            referenz="SIA 262:2025, 4.3.7.2; 4.3.7.3, (73); 4.3.7.4, (74); 4.3.7.7, (77); "
+                     "4.3.7.12, (81)",
             name="Iteration der Ausmitte 2. Ordnung")
         p.erklaerung(
             "Zu jedem Moment wird die Dehnungsebene gesucht, die es im "
@@ -679,7 +695,7 @@ class Knicken(Knickverfahren):
         self.richtung = Richtung.X
         self.faelle = list(faelle)
         self.mn = mn_nachweis
-        self.verformung = verformung
+        self.verformung = verformungswahl(verformung)
         self.widerstand = widerstand
         self.eigene_linie = not gleiche_linie(widerstand, mn_nachweis.wahl)
         """
@@ -716,8 +732,8 @@ class Knicken(Knickverfahren):
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
-        ] + betonbezuege(verformung.satz, querschnitt.beton) + lagenbezuege(
-            self.posten, verformung.satz)
+        ] + betonbezuege(verformung.satz, querschnitt.beton,
+                         modul=self.verformung.modul) + lagenbezuege(self.posten, verformung.satz)
         befunde = []
         if self.eigene_linie:
             bezuege = bezuege_vereinen(
@@ -759,13 +775,13 @@ class Knicken(Knickverfahren):
         h = e.g("h").si
         b = e.g("b").si
         wahl = self.verformung
-        w = Betonkennwerte.aus_eingaben(e, wahl.satz)
+        w = Betonkennwerte.aus_eingaben(e, wahl)
 
         # Jede Lage mit ihrem Stahl; das Fenster reicht im Zug bis zur
         # kleinsten Bruchdehnung der Lagen, an beiden Raendern.
         lagen = stahllagen(self.posten, wahl.satz, e.si_nach_id())
         # Kriechen weicht den Beton auf; das Gesetz rechnet mit dem wirksamen
-        # Modul. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
+        # Modul aus E_cd. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
         g = gesetze(wahl, w)
         # Gesucht mit Illinois, von der zuletzt gefundenen Ebene aus: die
         # Iteration und die Suche nach N_Rd folgen sich in hunderten Ebenen
@@ -813,7 +829,7 @@ class Knicken(Knickverfahren):
         wahl, basis = self.verformung, f"{self.id}.verformung"
         phi = protokoll_rechenwahl(p, wahl, basis, titel="Rechenwahl – Verformung (e_2d)")
         if wahl.art.mit_kriechzahl:
-            protokoll_wirksamer_modul(p, e["E_cm"], phi, basis,
+            protokoll_wirksamer_modul(p, e[wahl.modul], phi, basis,
                                       titel="Steifigkeit des Betons",
                                       nachsatz=rf"\qquad {angabe(e[wahl.satz.beton])}")
         protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze der Verformung",

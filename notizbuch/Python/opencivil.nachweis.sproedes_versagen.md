@@ -1,5 +1,5 @@
 ---
-erzeugt: c7a1aeec5fe9
+erzeugt: f45681affd2d
 art: modul
 tags: [modul]
 ---
@@ -40,8 +40,9 @@ f_ct,eff = k_t * f_ctm
 M_Riss   = f_ct,eff * h^2 * b / 6
 ```
 
-Der Teiler 3 gilt fuer Platten unter Biegung -- es reisst der Randbereich, nicht
-die halbe Hoehe wie beim Zwang (SIA 262:2025, 4.4.1.3).
+Der Teiler 3 gilt fuer Platten und Rechtecke unter Biegung; unter Zug zaehlt
+die kleinste Abmessung des gezogenen Teils, bei der Platte die ganze Dicke
+(SIA 262:2025, 4.4.1.3, (100)). Die Bedingung selbst steht in 4.3.1.2.
 
 ## Inhalt
 
@@ -79,7 +80,7 @@ Rückverfolgung sie zeigt.
 - `ART = 'SV'`
 - `KUERZEL = 'SV'`
 - `BENENNUNG = 'sprödes Versagen'`
-- `REFERENZ = 'SIA 262:2025, 4.4.1.3'`
+- `REFERENZ = 'SIA 262:2025, 4.3.1.2'`
 
 #### SproedesVersagen.ansatz
 

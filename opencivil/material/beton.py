@@ -129,10 +129,11 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
     KennwertVorlage(
         kurzname="gamma_cE",
         symbol=r"\gamma_{cE}",
-        beschreibung="Teilsicherheitsbeiwert für den Elastizitätsmodul",
-        referenz="SIA 262:2025, 4.2.1.15",
+        beschreibung="Teilsicherheitsbeiwert für den Elastizitätsmodul, "
+                     "Druckglieder mit Einflüssen 2. Ordnung",
+        referenz="SIA 262:2025, 4.2.1.17",
         stellen=2,
-        festwert=Groesse(1.0, EINHEITSLOS),
+        festwert=Groesse(1.2, EINHEITSLOS),
     ),
     KennwertVorlage(
         kurzname="k_e",
@@ -243,7 +244,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol="E_{cd}",
         einheit=N_PRO_MM2,
         beschreibung="Bemessungswert des Elastizitätsmoduls",
-        referenz="SIA 262:2025, 4.2.1.15",
+        referenz="SIA 262:2025, 4.2.1.15, (33)",
         stellen=0,
         eingaben=("E_cm", "gamma_cE"),
         vorlage_latex=r"\frac{@E_cm}{@gamma_cE}",
@@ -253,7 +254,7 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         kurzname="k_sigma",
         symbol=r"k_{\sigma}",
         beschreibung="Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung",
-        referenz="SIA 262:2025, 4.2.1.6",
+        referenz="SIA 262:2025, 4.2.1.6, (27)",
         stellen=3,
         eingaben=("E_cd", "f_cd"),
         vorlage_latex=r"\frac{@E_cd}{400 \cdot @f_cd}",

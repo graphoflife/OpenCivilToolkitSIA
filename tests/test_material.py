@@ -57,12 +57,13 @@ class TestBeton(unittest.TestCase):
         )
 
     def test_e_cd(self):
+        """E_cd = E_cm / 1.2 -- für Druckglieder 2. Ordnung, SIA 262:2025, 4.2.1.17."""
         self.assertAlmostEqual(
-            self.w("E_cd").in_einheit(N_PRO_MM2), 10000 * 38 ** (1 / 3), places=6
+            self.w("E_cd").in_einheit(N_PRO_MM2), 10000 * 38 ** (1 / 3) / 1.2, places=6
         )
 
     def test_k_sigma(self):
-        erwartet = (10000 * 38 ** (1 / 3)) / (400 * 20.0)
+        erwartet = (10000 * 38 ** (1 / 3) / 1.2) / (400 * 20.0)
         self.assertAlmostEqual(self.w("k_sigma").in_einheit(EINHEITSLOS), erwartet, places=6)
 
     def test_empirische_annahme_steht_an_der_formel(self):
@@ -144,7 +145,7 @@ class TestBetonUeberschreiben(unittest.TestCase):
         self.assertFalse(loesung.hat(c30.id_von("eta_fc")))
         self.assertAlmostEqual(
             loesung.groesse(c30.id_von("k_sigma")).in_einheit(EINHEITSLOS),
-            (10000 * 38 ** (1 / 3)) / (400 * 15),
+            (10000 * 38 ** (1 / 3) / 1.2) / (400 * 15),
             places=6,
         )
 

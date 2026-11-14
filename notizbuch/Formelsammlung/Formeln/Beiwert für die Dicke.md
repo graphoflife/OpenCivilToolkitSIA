@@ -1,11 +1,11 @@
 ---
-erzeugt: 69ee1c80c604
+erzeugt: 6a8d18f05791
 art: formel
 tags: [formel]
-normstelle: ["SIA 262:2025, 4.4.2", "SIA 262:2025, 4.4.1.3"]
+normstelle: "SIA 262:2025, 4.4.1.3, (100)"
 ---
-> [!info] Normstellen
-> SIA 262:2025, 4.4.2 · SIA 262:2025, 4.4.1.3
+> [!info] Normstelle
+> SIA 262:2025, 4.4.1.3, (100)
 
 *In der Herleitung: «Beiwert für die Plattendicke»*
 

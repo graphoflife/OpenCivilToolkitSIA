@@ -305,7 +305,7 @@ def protokoll_verfahren(p, *, eps_c2d: float, suche: Suche,
         r"\qquad "
         r"M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot "
         r"\left(z - \frac{h}{2}\right)\,\mathrm{d}A",
-        titel="Dehnungsebene und innere Kräfte")
+        titel="Dehnungsebene und innere Kräfte", referenz="SIA 262:2025, 4.3.2.3")
     p.erklaerung(
         f"Das Integral über den Beton wird als Summe über {fasern} Fasern "
         f"gleicher Dicke gebildet, jede mit der Spannung in ihrer Mitte; der "

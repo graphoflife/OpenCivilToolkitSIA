@@ -19,7 +19,7 @@ from opencivil.querschnitt.werkstoffgesetz import (
     BetonUngerissen, Spannungsblock, Stahlgesetz, StahlNurZug,
 )
 
-W = Betonkennwerte(f_c=20e6, E_cm=33.6e9, eps_c1d=0.002, eps_c2d=0.0035)
+W = Betonkennwerte(f_c=20e6, E_c=33.6e9, eps_c1d=0.002, eps_c2d=0.0035)
 STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
 
 LAGEN = [Stahllage(a_s=1696e-6, z=0.249, stahl=STAHL, nummer=2, von_unten=True),

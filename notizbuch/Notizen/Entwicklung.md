@@ -44,6 +44,39 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-14 · Normprüfung I: Biegung, Duktilität, Knicken
+
+Erster Bereich der Prüfung aller Apps gegen SIA 262:2025, jede Änderung an
+der Normseite bestätigt (S. 43–59, 75). Der Benutzer hat die Norm vorgelegt
+und verlangt, dass kein Normtext wörtlich in die Software kommt.
+
+- **Die Duktilitätsgrenze hängt am Stahl.** 4.1.4.2.5 setzt
+  x/d ≤ k·435 N/mm²/f_yd mit k = 0.35: bei B500 0.35, bei B700B 0.25 --
+  bis heute stand 0.35 fest. Mehr als k = 0.5 lässt das Werkzeug nicht zu
+  (4.1.4.2.6). Ohne Nachweis des Verformungsvermögens gilt die Bedingung
+  nur mit Stahl der Klasse B oder C (Tabelle 5) und Beton bis C50/60;
+  sonst heisst der Nachweis «nicht führbar» statt eines Erfüllungsgrads.
+  Das Feld heisst weiter `x_d_max`, damit gespeicherte Projekte laden; es
+  hält jetzt k.
+- **d im gezeichneten Querschnitt reicht bis zum Schwerpunkt der gezogenen
+  Stäbe** -- bei mehreren Lagen die mittlere statische Höhe, wie das
+  Zeichenverzeichnis sie bestimmt. Vorher bis zum entferntesten Stab; x/d
+  war damit zu klein.
+- **Knicken verformt mit E_cd = E_cm/1.2** (4.2.1.17). Vorher mit E_cm: der
+  Stab war 20 % zu steif, e_2d zu klein. Die Rechenwahl trägt dafür ihren
+  Modul (`Rechenwahl.modul`); nur die Verformung beim Knicken wählt E_cd,
+  alle anderen Rechnungen bleiben bei E_cm -- γ_cE = 1.0 wie in 4.2.1.16.
+- **k_t trägt seinen Verweis selbst** (4.4.1.3, (99), (100)). Vorher erbte
+  er ihn von sieben Aufrufern, mal als 4.4.1.3, mal als 4.4.2.
+- **Ziffern berichtigt:** Querschnittsanalyse 4.1.4 → 4.3.2.3; Stahlgesetz
+  4.2.2.4 → 4.2.2.2 mit Figur 16; Parabel 4.2.1.5 mit Figur 12 und 4.2.1.6,
+  (27); Schiefstellung 4.1.3.2.3, (17); ungewollte Ausmitte 4.3.7.5, (75);
+  sprödes Versagen 4.4.1.3 → 4.3.1.2. Die Länge beim Knicken heisst wie in
+  4.1.3.2.3 «Höhe des Druckglieds», nicht mehr «Systemlänge». Die Hilfe der
+  Platte sagt, dass Drillmomente selbst zum Moment zu zählen sind (4.3.2.6).
+- **Offen für den Benutzer:** das Kriechen beim Knicken -- die Vorgabe
+  φ = 0 liegt unsicher ([[TODO]]).
+
 ## 2026-11-13 · Decken: Lasten und Lastfälle
 
 Dritter Schritt der App «Decken»: Flächen-, Linien- und Punktlasten, getrennt

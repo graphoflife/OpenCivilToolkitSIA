@@ -96,7 +96,7 @@ def protokoll_dehnungsebene(p: Protokoll) -> None:
         r"N = \int_A \sigma\,\mathrm{d}A \qquad "
         r"M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad "
         r"M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A",
-        titel="Dehnungsebene und innere Kräfte")
+        titel="Dehnungsebene und innere Kräfte", referenz="SIA 262:2025, 4.3.2.3")
 
 
 class SchiefeBiegung(Nachweis):
@@ -121,7 +121,7 @@ class SchiefeBiegung(Nachweis):
             f.name: grad_def(f"{basis}.{f.kennung}.erfuellungsgrad",
                              rf"\alpha_{{eff,{als_text(f.name)}}}",
                              f"Erfüllungsgrad Biegung und Normalkraft – {f.name}",
-                             "SIA 262:2025, 4.1.4")
+                             "SIA 262:2025, 4.3.2.3")
             for f in self.lastfaelle
         }
         self.d_eckwerte = {
@@ -140,7 +140,7 @@ class SchiefeBiegung(Nachweis):
             ausgaben=list(self.d_ausnutzung.values()) + list(self.d_eckwerte.values()),
             bezuege=bezuege,
             titel=f"Biegung und Normalkraft – {analyse.name}",
-            referenz="SIA 262:2025, 4.1.4",
+            referenz="SIA 262:2025, 4.3.2.3",
             abschnitt=analyse.abschnitt,
         )
 

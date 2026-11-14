@@ -315,7 +315,7 @@ class TestNichtsStill(unittest.TestCase):
         """Sie rechnete und hiess «erfüllt»."""
         p = Projekt.beispiel()
         p.querschnitt("q1").knickfall("Wand", N_Ed=-500.0, laenge=0.0)
-        self.assertIn("knickfaelle 'Wand': Systemlänge muss grösser als null sein, "
+        self.assertIn("knickfaelle 'Wand': Höhe des Druckglieds muss grösser als null sein, "
                       "angegeben ist 0 m.", self.fehler(p))
 
     def test_die_grenzen_der_buegel_gelten_auch_ohne_buegel(self):
@@ -338,7 +338,7 @@ class TestNichtsStill(unittest.TestCase):
     def test_die_grenzen_des_gezeichneten_querschnitts(self):
         for feld, wert, text in (("alpha_min", 60, "α_min = 60° ist grösser als α_max"),
                                  ("k_c", -1.0, "k_c muss grösser als null sein"),
-                                 ("x_d_max", 0.9, "max. x/d muss grösser als null")):
+                                 ("x_d_max", 0.9, "k der Grenze x/d muss grösser als null")):
             with self.subTest(feld=feld):
                 p = Projekt.beispiel()
                 setattr(p.querschnittsanalysen[0], feld, wert)

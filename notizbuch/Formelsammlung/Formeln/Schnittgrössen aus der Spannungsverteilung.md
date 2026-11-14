@@ -1,10 +1,11 @@
 ---
-erzeugt: b22f990c367f
+erzeugt: ad8f26e5dd6f
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.3.2.3"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.3.2.3
 
 $$
 N = \int_A \sigma\,\mathrm{d}A \qquad M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A

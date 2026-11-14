@@ -1,5 +1,5 @@
 ---
-erzeugt: 595bfd4df89e
+erzeugt: 9cd29eade640
 art: modul
 tags: [modul]
 ---
@@ -48,7 +48,7 @@ je Seite urteilen: `alpha_{eff,<symbol>,<Seite>}`.
 class DuktilitaetQA(Nachweis)
 ```
 
-`x/d <= Grenze` bei reiner Biegung, je Richtung.
+`x/d <= k * 435 N/mm^2 / f_yd` bei reiner Biegung, je Richtung.
 
 - `THEMA = 'Duktilität je Richtung'`
 - `LANGNAME = 'Duktilität'`
@@ -86,6 +86,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.analyse]]
@@ -97,6 +98,5 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Formeln aus diesem Modul
 
-- [[Bedingung der Duktilität]] · `DuktilitaetQA.pruefe`
 - [[Bedingung gegen sprödes Versagen]] · `SproedesVersagenQA.pruefe`
 - [[Bezogene Druckzonenhöhe bei reiner Biegung]] · `DuktilitaetQA.pruefe`

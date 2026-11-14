@@ -1,5 +1,5 @@
 ---
-erzeugt: 5406be86d73b
+erzeugt: e5592c3634b7
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.1.4.2.5"
@@ -10,19 +10,12 @@ normstelle: "SIA 262:2025, 4.1.4.2.5"
 *In der Herleitung: «Bedingung»*
 
 $$
-\frac{x}{d} \le 0.35
-$$
-
-*In der Herleitung: «Duktilität»*
-
-$$
-\frac{x}{d} \le \left(\frac{x}{d}\right)_{max}
+\frac{x}{d} \le k \cdot \frac{435\,\mathrm{N/mm^2}}{f_{yd}}
 $$
 
 ## Im Code
 
-- [[opencivil.nachweis.duktilitaet#Duktilitaet|Duktilitaet._protokoll_ansatz]]
-- [[opencivil.nachweis.richtungsnachweise#DuktilitaetQA.pruefe|DuktilitaetQA.pruefe]]
+- [[opencivil.nachweis.duktilitaet#protokoll_bedingung|protokoll_bedingung]]
 
 ## Themen
 

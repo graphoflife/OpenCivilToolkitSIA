@@ -320,7 +320,7 @@ class BiegungNormalkraft(Nachweis):
                 f"{basis}.{k.kennung}.erfuellungsgrad",
                 rf"\alpha_{{eff,{r},{als_text(k.name)}}}",
                 f"Erfüllungsgrad {richtung.beschriftung} – {k.name}",
-                "SIA 262:2025, 4.1.4",
+                "SIA 262:2025, 4.3.2.3",
             )
             for k in self.kombinationen
         }
@@ -334,7 +334,7 @@ class BiegungNormalkraft(Nachweis):
                 einheit=KNM,
                 beschreibung=(f"Momentenwiderstand bei N_Ed "
                               f"({richtung.beschriftung}) – {k.name}"),
-                referenz="SIA 262:2025, 4.1.4",
+                referenz="SIA 262:2025, 4.3.2.3",
                 stellen=1,
             )
             for k in self.kombinationen
@@ -368,7 +368,7 @@ class BiegungNormalkraft(Nachweis):
                       + list(self.d_m_rd.values())),
             bezuege=linienbezuege(querschnitt, self.posten, richtung, wahl.satz),
             titel=f"M-N-Nachweis {richtung.beschriftung} – {querschnitt.name}",
-            referenz="SIA 262:2025, 4.1.4",
+            referenz="SIA 262:2025, 4.3.2.3",
             # Siehe Querkraft: ohne Abschnitt landet der Nachweis unter der
             # Ueberschrift, die die Rechenreihenfolge zufaellig offen liess.
             abschnitt=querschnitt.abschnitt,
@@ -701,7 +701,7 @@ def resistenzlinie(
 
     linie = Ebenenlinie(
         wahl, h=h, b=b, lagen=lagen, eps_c1d=eps_c1d, eps_c2d=eps_c2d,
-        beton=betongesetz(wahl, f_c=f_c, E_cm=e.g("E_cm").si,
+        beton=betongesetz(wahl, f_c=f_c, E_c=e.g(wahl.modul).si,
                           eps_c1d=eps_c1d, eps_c2d=eps_c2d),
         schritte=schritte, fasern=fasern)
     linie.protokoll_ansatz(p, e, posten=posten, phi=phi, basis=basis)

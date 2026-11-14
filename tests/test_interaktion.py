@@ -112,6 +112,24 @@ class TestWieDiePlatte(unittest.TestCase):
         self.assertAlmostEqual(d, 0.215, delta=1e-9)
         self.assertTrue(0.0 < x < 0.25 * d)
 
+    def test_d_reicht_bis_zum_schwerpunkt_der_zugbewehrung(self):
+        """
+        Zwei Lagen unten, 1131 mm² bei 215 mm und 565 mm² bei 165 mm unter
+        dem gedrückten Rand: d = (1131 · 215 + 565 · 165) / 1696 = 198.3 mm,
+        wie das Zeichen d in SIA 262:2025 definiert ist -- bis 2026-11-14
+        215 mm, der entfernteste Stab. Die obere Lage zählt nicht mit: sie
+        liegt auf der gedrückten Seite des Schwerpunkts.
+        """
+        q = querschnitt(
+            [Teil(rechteck(0, 0, self.b, self.h), 0, None)],
+            [Bewehrung((0.5, self.h - 0.215), 1131e-6, 1, 0),
+             Bewehrung((0.5, self.h - 0.165), 565e-6, 1, 0),
+             Bewehrung((0.5, self.h - 0.035), 565e-6, 1, 0)])
+        punkt = q.bei_normalkraft(-math.pi / 2, 0.0)
+        _, d = q.druckzone(punkt)
+        self.assertAlmostEqual(d, (1131 * 0.215 + 565 * 0.165) / 1696, delta=1e-9)
+        self.assertEqual(len(q.zugbewehrung(punkt)), 2)
+
 
 class TestSchief(unittest.TestCase):
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: acf5aef434f5
+erzeugt: c34fbd2f5939
 art: modul
 tags: [modul]
 ---
@@ -30,7 +30,8 @@ Iteration, Grenzkraft N_Rd); hier steht nur, woher der Stab kommt
 wie in der einachsigen Tragsicherheit und den Analysen. Das Moment um die
 andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zaehlt nicht;
 um beide Achsen zugleich knickt hier kein Stab -- je Richtung ein Fall.
-Nach Vorgabe, nicht nachgeschlagen (`notizbuch/Notizen/TODO.md`).
+Nach Vorgabe: SIA 262:2025, 4.3.7 regelt das Knicken um beide Achsen
+zugleich nicht (`notizbuch/Notizen/TODO.md`).
 
 
 ## WAS ES KOSTET

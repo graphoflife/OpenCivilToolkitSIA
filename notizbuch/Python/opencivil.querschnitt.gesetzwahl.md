@@ -1,5 +1,5 @@
 ---
-erzeugt: 3444b110ed6c
+erzeugt: dbbbada176f7
 art: modul
 tags: [modul]
 ---
@@ -266,6 +266,16 @@ Was ein Kapitel waehlt: Kriechzahl, Wertesatz, Rechenart.
 - `kriechzahl: float = 0.0`
 - `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
 - `art: Rechenart = Rechenart.HANDRECHNUNG`
+- `modul: str = 'E_cm'` – Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: `E_cm`, bei der Verformung des Knickens `E_cd` (SIA 262:2025, 4.2.1.17). Keine Wahl des Benutzers -- das Kapitel setzt ihn.
+
+#### Rechenwahl.betonkennwerte
+
+```python
+@property
+def betonkennwerte(self) -> Dict[str, str]
+```
+
+Die Kennwerte des Betongesetzes ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz.betonkennwerte|Werkstoffsatz.betonkennwerte]]) mit diesem Modul.
 
 #### Rechenwahl.index
 
@@ -288,15 +298,15 @@ Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo
 ### wirksamer_modul
 
 ```python
-def wirksamer_modul(E_cm: float, phi: float) -> float
+def wirksamer_modul(E_c: float, phi: float) -> float
 ```
 
-`E_c,eff = E_cm / (1 + phi)` -- das Kriechen weicht den Beton auf.
+`E_c,eff = E_c / (1 + phi)` -- das Kriechen weicht den Beton auf.
 
 ### betongesetz
 
 ```python
-def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float, eps_c2d: float, ungerissen: bool=False) -> Gesetz
+def betongesetz(wahl: Rechenwahl, *, f_c: float, E_c: float, eps_c1d: float, eps_c2d: float, ungerissen: bool=False) -> Gesetz
 ```
 
 Der Beton einer Wahl -- im gerissenen Zustand je Rechenart, `ungerissen`
@@ -304,7 +314,8 @@ linear in Druck und Zug mit dem wirksamen Modul. Die eine Stelle fuer
 beide: der Loeser der Platte, die genaue Resistenzlinie und der
 gezeichnete Querschnitt bekommen ihren Beton hier. Bis 2026-10-17 gab die
 Platte ihrem Loeser den ungerissenen Beton als eigenes Gesetz mit, und der
-gezeichnete Querschnitt baute ihn hinter einem Schalter selbst.
+gezeichnete Querschnitt baute ihn hinter einem Schalter selbst. `E_c`
+ist der Modul der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohne Kriechen.
 
 
 ## Braucht

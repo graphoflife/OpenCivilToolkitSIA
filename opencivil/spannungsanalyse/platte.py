@@ -157,7 +157,7 @@ class Loeserpaar:
             "ungerissenen auf den gerissenen Wert.")
         f_ct_eff = protokoll_zugfestigkeit(
             p, w, k_t=self.k_t_zug, f_ct_eff=self.f_ct_eff_zug, h=h,
-            f_ctm=ein("f_ctm"), teiler=1, referenz="SIA 262:2025, 4.4.2")
+            f_ctm=ein("f_ctm"), teiler=1)
         p.formel(w.kraft("N_Riss_M", "N_{Riss}(M)", linie.riss),
                  r"@f_ct_eff \cdot @b \cdot @h - \frac{6 \cdot \left|@M\right|}{@h}",
                  {"f_ct_eff": f_ct_eff, "b": ein("b"), "h": h,
@@ -217,7 +217,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         "f_ctm": beton.id_von("f_ctm"),
     }
     h, b = wert(ids["h"]), wert(ids["b"])
-    w = Betonkennwerte(f_c=wert(ids["f_c"]), E_cm=wert(ids["E_cm"]),
+    w = Betonkennwerte(f_c=wert(ids["f_c"]), E_c=wert(ids["E_cm"]),
                        eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
     # Gesucht wird im Fenster der Gesetze, wie in jedem Loeser der Platte;
     # seine Grenzen tragen ihre Namen, und die Bilder nennen damit, welche
@@ -233,4 +233,4 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         M_Riss=rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm).M_Riss,
         k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
         staehle=tuple(staehle(posten)),
-        wahl=wahl, ids=ids, E_cm=w.E_cm)
+        wahl=wahl, ids=ids, E_cm=w.E_c)

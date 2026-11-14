@@ -338,7 +338,7 @@ class TestGesetzeWieDiePlatte(unittest.TestCase):
                     stoff = aufbau.baustoffe["b1"]
                     w = lambda k: abs(wert(stoff.id_von(k)))
                     platte = gesetze(Rechenwahl(satz=satz, art=art), Betonkennwerte(
-                        f_c=w(satz.beton), E_cm=w("E_cm"), eps_c1d=w("eps_c1d"),
+                        f_c=w(satz.beton), E_c=w("E_cm"), eps_c1d=w("eps_c1d"),
                         eps_c2d=w("eps_c2d"))).beton
                     self.assertEqual(werkstoffe[index(stoff)].gesetz, platte)
 

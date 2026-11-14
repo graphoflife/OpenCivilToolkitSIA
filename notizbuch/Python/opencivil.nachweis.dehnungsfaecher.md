@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a65abee23b5
+erzeugt: aa8c3a3c4bee
 art: modul
 tags: [modul]
 ---
@@ -42,6 +42,10 @@ gedrueckten Querschnitt nicht mehr die Randfaser massgebend ist: reiner Druck
 endet bei gleichmaessig -eps_c1d, nicht bei -eps_c2d. Ohne diesen Abschnitt
 liefe die Linie an beiden Enden ueber die wahre Grenze hinaus und schnitte sich
 selbst -- womit Punkt-in-Linie-Test und Schnittsuche unbrauchbar waeren.
+
+Punkt C ist nach Vorgabe eingebaut: SIA 262:2025 regelt ihn weder in 4.2.1
+noch in 4.3.2 oder 4.3.7, und er ist strenger als die Norm. Die Grenzen
+-eps_c2d (Tabelle 8) und eps_ud (Tabelle 9) stehen dort.
 
 Anfang (gleichmaessiger Zug bei eps_ud) und Ende (gleichmaessiger Druck bei
 eps_c1d) sind beiden Faechern gemeinsam, sodass sich eine geschlossene Linie

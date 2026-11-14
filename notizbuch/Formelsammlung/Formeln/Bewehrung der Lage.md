@@ -1,5 +1,5 @@
 ---
-erzeugt: 545d8faff82e
+erzeugt: 3691681a7344
 art: formel
 tags: [formel]
 ---
@@ -30,7 +30,7 @@ $$
 - [[Aufnehmbare Risskraft]]
 - [[Aufnehmbares Moment der Bewehrung]]
 - [[Bewehrungsgehalt]]
-- [[Druckzonenhöhe bei reiner Biegung]]
+- [[Druckzonenhöhe aus dem Kräftegleichgewicht]]
 - [[Hilfsgrösse der Nulllinie]]
 
 ## Im Code

@@ -47,22 +47,30 @@ class Stahlsorte:
     eps_ud: float
     """Bemessungswert der Dehnung bei Hoechstlast in %."""
 
+    klasse: str = ""
+    """Duktilitaetsklasse A, B oder C (Tabelle 5) -- leer, wo sie nicht bekannt ist."""
 
-#: Betonstahlsorten nach SIA 262:2025, Tabelle 3.2.2.3.
+
+#: Betonstahlsorten nach SIA 262:2025, Tabelle 5 (3.2.2.3).
 #:
 #: Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven
 #: Einsatz gegen die gedruckte Norm pruefen.
 STAHLSORTEN: Dict[str, Stahlsorte] = {
-    "B500A": Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud=2.0),
-    "B500B": Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=5.0, eps_ud=4.5),
-    "B500C": Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=7.5, eps_ud=6.5),
-    "B700B": Stahlsorte(f_yk=700.0, f_yk_druck=700.0, eps_uk=5.0, eps_ud=4.5),
+    "B500A": Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud=2.0, klasse="A"),
+    "B500B": Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=5.0, eps_ud=4.5, klasse="B"),
+    "B500C": Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=7.5, eps_ud=6.5, klasse="C"),
+    "B700B": Stahlsorte(f_yk=700.0, f_yk_druck=700.0, eps_uk=5.0, eps_ud=4.5, klasse="B"),
     "Stahl II": Stahlsorte(f_yk=345.0, f_yk_druck=345.0, eps_uk=5.0, eps_ud=4.5),
 }
 
 #: Womit ein neuer Betonstahl anfängt, wenn man in der Oberfläche einen
 #: anlegt: B500B, danach die übrigen der Reihe nach (Benutzer, 2026-10-15).
 ERSTER_STAHL = "B500B"
+
+
+def duktilitaetsklasse(sorte: str) -> str:
+    """Die Duktilitaetsklasse einer Sorte -- leer bei einem eigenen Stahl oder ohne Angabe."""
+    return STAHLSORTEN[sorte].klasse if sorte in STAHLSORTEN else ""
 
 
 def stahlsorten_zum_anlegen() -> List[str]:
@@ -168,7 +176,7 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         symbol=r"\varepsilon_{yd}",
         einheit=PROZENT,
         beschreibung="Fliessdehnung (Bemessungswert)",
-        referenz="SIA 262:2025, 4.2.2.4",
+        referenz="SIA 262:2025, 4.2.2.2, Figur 16",
         name=FLIESSDEHNUNG,
         stellen=3,
         eingaben=("f_yd", "E_s"),

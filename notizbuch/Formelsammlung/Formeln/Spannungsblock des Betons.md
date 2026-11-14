@@ -1,10 +1,11 @@
 ---
-erzeugt: 26952bbfde08
+erzeugt: ae03551168da
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.2.1.5, Figur 12"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.2.1.5, Figur 12
 
 *In der Herleitung: «Werkstoffgesetze: Beton, Spannungsblock 0.85·x»*
 

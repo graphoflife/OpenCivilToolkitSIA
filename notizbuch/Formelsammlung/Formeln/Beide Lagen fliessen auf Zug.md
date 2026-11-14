@@ -1,10 +1,11 @@
 ---
-erzeugt: f1add8586903
+erzeugt: 6faf42ebc6b6
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.2.2.2, Figur 16"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.2.2.2, Figur 16
 
 $$
 N_{Rd}^{+} = A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd}

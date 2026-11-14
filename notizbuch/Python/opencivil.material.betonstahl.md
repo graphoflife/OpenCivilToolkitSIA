@@ -1,5 +1,5 @@
 ---
-erzeugt: 1541f33bd718
+erzeugt: b36315ae34d6
 art: modul
 tags: [modul]
 ---
@@ -43,6 +43,15 @@ Zeile der Sortentabelle.
 - `f_yk_druck: float` – Charakteristische Fliessgrenze auf Druck in N/mm^2.
 - `eps_uk: float` – Dehnung bei Hoechstlast in %.
 - `eps_ud: float` – Bemessungswert der Dehnung bei Hoechstlast in %.
+- `klasse: str = ''` – Duktilitaetsklasse A, B oder C (Tabelle 5) -- leer, wo sie nicht bekannt ist.
+
+### duktilitaetsklasse
+
+```python
+def duktilitaetsklasse(sorte: str) -> str
+```
+
+Die Duktilitaetsklasse einer Sorte -- leer bei einem eigenen Stahl oder ohne Angabe.
 
 ### stahlsorten_zum_anlegen
 
@@ -75,7 +84,7 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 ## Konstanten
 
 - `FLIESSDEHNUNG = 'Fliessdehnung'` – Die Seite im Notizbuch fuer die Dehnung, bei der der Stahl zu fliessen beginnt -- mit Bemessungswert oder charakteristisch, wo immer sie steht.
-- `STAHLSORTEN = {'B500A': Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud…` – Betonstahlsorten nach SIA 262:2025, Tabelle 3.2.2.3. Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven Einsatz gegen die gedruckte Norm pruefen.
+- `STAHLSORTEN = {'B500A': Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud…` – Betonstahlsorten nach SIA 262:2025, Tabelle 5 (3.2.2.3). Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven Einsatz gegen die gedruckte Norm pruefen.
 - `ERSTER_STAHL = 'B500B'` – Womit ein neuer Betonstahl anfängt, wenn man in der Oberfläche einen anlegt: B500B, danach die übrigen der Reihe nach (Benutzer, 2026-10-15).
 - `STAHLDICHTE = 7850.0` – Die Dichte von Betonstahl in kg/m³ -- die Vorgabe seines Kennwerts `rho_s` und die Zahl des Bewehrungsmasses.
 - `STAHL_VORLAGEN = (KennwertVorlage(kurzname='f_yk', symbol='f_{yk}', einheit=N_PRO_MM2,…`
@@ -87,6 +96,7 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.aufbau.kern]]

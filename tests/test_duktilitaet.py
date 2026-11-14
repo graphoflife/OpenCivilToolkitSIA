@@ -5,7 +5,8 @@ import unittest
 from opencivil.core.einheiten import EINHEITSLOS
 from opencivil.core.protokoll import TextBlock
 from opencivil.nachweis import duktilitaet
-from opencivil.projekt import Projekt, ProjektFehler
+from opencivil.material.betonstahl import betonstahl
+from opencivil.projekt import MaterialEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
 
 
@@ -15,6 +16,13 @@ def projekt_mit(an: bool = True, **abweichungen) -> Projekt:
     q.duktilitaet = an
     for name, wert in abweichungen.items():
         setattr(q, name, wert)
+    return projekt
+
+
+def mit_stahl(projekt: Projekt, sorte: str) -> Projekt:
+    """Die Platte aus einem anderen Stahl -- sie hat einen fuer alle Lagen."""
+    projekt.materialien.append(MaterialEintrag("s2", "betonstahl", sorte, sorte))
+    projekt.querschnitte[0].stahl = "s2"
     return projekt
 
 
@@ -50,19 +58,42 @@ class TestDruckzonenhoehe(unittest.TestCase):
 
     def test_von_hand(self):
         """
-        0.85 · x · b · f_cd = A_s · f_sd
+        0.85 · x · b · f_cd = A_s · f_yd
 
             x = 2450e-6 · 434.78e6 / (0.85 · 1.0 · 20e6)
               = 1065.2e3 / 17.0e6
               = 62.7 mm
         """
         x = duktilitaet.druckzonenhoehe(
-            a_s=2450e-6, f_sd=434.78e6, b=1.0, f_cd=20.0e6)
+            a_s=2450e-6, f_yd=434.78e6, b=1.0, f_cd=20.0e6)
         self.assertAlmostEqual(x * 1e3, 62.7, delta=0.1)
 
     def test_die_grenze_steht_als_benannte_groesse_da(self):
         """Eine 0.35 mitten in einer Bedingung sagt niemandem, was sie ist."""
-        self.assertAlmostEqual(duktilitaet.GRENZE, 0.35)
+        self.assertAlmostEqual(duktilitaet.BEIWERT, 0.35)
+
+    def test_die_grenze_haengt_am_stahl(self):
+        """
+        SIA 262:2025, 4.1.4.2.5: x/d <= 0.35 · 435 N/mm² / f_yd.
+
+            B500:  0.35 · 435 / 434.78 = 0.350
+            B700B: 0.35 · 435 / 608.70 = 0.250
+        """
+        self.assertAlmostEqual(duktilitaet.grenze(0.35, 500e6 / 1.15), 0.3502, delta=1e-4)
+        self.assertAlmostEqual(duktilitaet.grenze(0.35, 700e6 / 1.15), 0.2501, delta=1e-4)
+
+    def test_was_die_baustoffe_ausschliessen(self):
+        """Klasse A und Beton über C50/60 schliessen die Bedingung aus, B und C nicht."""
+        for sorte, f_ck, hindernis in (("B500B", 30e6, ""), ("B500C", 50e6, ""),
+                                       ("B500A", 30e6, "Duktilitätsklasse A"),
+                                       ("B500B", 55e6, "über C50/60")):
+            with self.subTest(sorte=sorte, f_ck=f_ck):
+                grund = duktilitaet.hindernis([betonstahl(sorte)], f_ck)
+                if hindernis:
+                    self.assertIn(hindernis, grund)
+                    self.assertIn("4.1.4.2.6", grund)
+                else:
+                    self.assertEqual(grund, "")
 
 
 class TestNachweis(unittest.TestCase):
@@ -75,8 +106,8 @@ class TestNachweis(unittest.TestCase):
             A_s = 2450 mm²
             d   = z = 248.1 mm     (untere Lage -> gedrückt ist oben)
             x   = 62.7 mm          (hängt nur von A_s ab, nicht von d)
-            x/d = 0.253 ≤ 0.35     -> erfüllt
-            α   = 0.35/0.253 = 1.39
+            x/d = 0.253 ≤ 0.350    -> erfüllt (0.35 · 435 / 434.78)
+            α   = 0.350/0.253 = 1.39
         """
         lagen, gefunden = urteile(projekt_mit())
         erg = lagen[0]
@@ -94,8 +125,7 @@ class TestNachweis(unittest.TestCase):
             if not erg.machbar:
                 continue
             with self.subTest(lage=erg.lage.nummer):
-                self.assertAlmostEqual(
-                    erg.erfuellungsgrad, duktilitaet.GRENZE / erg.verhaeltnis)
+                self.assertAlmostEqual(erg.erfuellungsgrad, erg.grenze / erg.verhaeltnis)
 
     def test_bei_den_oberen_lagen_wird_von_unten_gemessen(self):
         """
@@ -145,7 +175,7 @@ class TestNachweis(unittest.TestCase):
         lage.grund.abstand = 75.0
         lagen, gefunden = urteile(projekt)
         erg = lagen[0]
-        self.assertGreater(erg.verhaeltnis, duktilitaet.GRENZE)
+        self.assertGreater(erg.verhaeltnis, erg.grenze)
         self.assertFalse(erg.erfuellt)
         self.assertLess(
             gefunden[f"Duktilität – {untere}. Lage"].erfuellungsgrad.si, 1.0)
@@ -249,8 +279,35 @@ class TestHerleitungAusVorlagen(unittest.TestCase):
         self.assertIn(r"1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm}", schwerpunkt.latex)
 
 
+class TestStahl(unittest.TestCase):
+    """Die Grenze folgt dem Stahl der Platte, und Klasse A schliesst sie aus."""
+
+    def test_b700b_hat_die_tiefere_grenze(self):
+        """
+        Dieselbe Lage aus B700B: f_yd = 608.7 N/mm², also tiefere Grenze und
+        tiefere Druckzone zugleich -- bis 2026-11-14 hielt sie 0.35.
+
+            x      = 2450e-6 · 608.7e6 / (0.85 · 1.0 · 20e6) = 87.7 mm
+            x/d    = 87.7 / 248.1 = 0.354
+            Grenze = 0.35 · 435 / 608.7 = 0.250
+        """
+        erg = urteile(mit_stahl(projekt_mit(), "B700B"))[0][0]
+        self.assertAlmostEqual(erg.grenze, 0.2501, delta=1e-4)
+        self.assertAlmostEqual(erg.verhaeltnis, 0.354, delta=0.002)
+        self.assertFalse(erg.erfuellt)
+        self.assertAlmostEqual(erg.erfuellungsgrad, erg.grenze / erg.verhaeltnis)
+
+    def test_klasse_a_ist_nicht_fuehrbar(self):
+        lagen, gefunden = urteile(mit_stahl(projekt_mit(), "B500A"))
+        for erg in lagen:
+            with self.subTest(lage=erg.lage.nummer):
+                self.assertFalse(erg.machbar)
+                self.assertFalse(erg.erfuellt)
+                self.assertIn("Duktilitätsklasse A", erg.begruendung)
+
+
 class TestEigeneGrenze(unittest.TestCase):
-    """(x/d)_max je Platte: Vorgabe 0.35, höchstens 0.5."""
+    """Der Beiwert k der Grenze je Platte: Vorgabe 0.35, höchstens 0.5."""
 
     def dicke_untere_lage(self, grenze: float) -> Projekt:
         """⌀26@150 + ⌀10@150 unten: x/d = 0.43 -- über 0.35, unter 0.5."""
@@ -261,7 +318,7 @@ class TestEigeneGrenze(unittest.TestCase):
 
     def test_die_vorgabe_ist_die_des_nachweises(self):
         self.assertEqual(Projekt.beispiel().querschnitt("q1").x_d_max,
-                         duktilitaet.GRENZE)
+                         duktilitaet.BEIWERT)
 
     def test_sie_entscheidet_ueber_erfuellt(self):
         for grenze, erfuellt in ((0.35, False), (0.5, True)):
@@ -269,32 +326,33 @@ class TestEigeneGrenze(unittest.TestCase):
             with self.subTest(grenze=grenze):
                 self.assertAlmostEqual(erg.verhaeltnis, 0.426, delta=0.002)
                 self.assertIs(erg.erfuellt, erfuellt)
-                self.assertAlmostEqual(erg.erfuellungsgrad, grenze / erg.verhaeltnis)
+                self.assertAlmostEqual(erg.grenze, grenze * 435 / (500 / 1.15))
+                self.assertAlmostEqual(erg.erfuellungsgrad, erg.grenze / erg.verhaeltnis)
 
     def test_ausserhalb_ist_ein_fehler_mit_grund(self):
         for grenze in (0.0, 0.6):
             with self.subTest(grenze=grenze):
                 with self.assertRaises(ProjektFehler) as fehler:
                     projekt_mit(x_d_max=grenze).aufbauen()
-                self.assertIn("max. x/d", str(fehler.exception))
+                self.assertIn("k der Grenze x/d", str(fehler.exception))
                 self.assertIn("höchstens 0.5", str(fehler.exception))
 
     def test_eine_andere_grenze_steht_in_der_herleitung(self):
-        """Eine geänderte Grenze ist eine Annahme -- die muss man finden."""
-        for grenze, steht_da in ((duktilitaet.GRENZE, False), (0.45, True)):
+        """Ein geänderter Beiwert ist eine Annahme -- die muss man finden."""
+        for grenze, steht_da in ((duktilitaet.BEIWERT, False), (0.45, True)):
             aufbau = projekt_mit(x_d_max=grenze).aufbauen()
             loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
             texte = [b.text for b in loesung.protokoll.alle_bloecke()
                      if isinstance(b, TextBlock)]
             with self.subTest(grenze=grenze):
-                self.assertIs(any("Grenze eingegeben: (x/d)_max = 0.45" in text
+                self.assertIs(any("Beiwert eingegeben: k = 0.45" in text
                                   for text in texte), steht_da)
 
     def test_eine_alte_datei_bekommt_die_vorgabe(self):
         d = Projekt.beispiel().als_dict()
         d["querschnitte"][0].pop("x_d_max")
         self.assertEqual(Projekt.aus_dict(d).querschnitt("q1").x_d_max,
-                         duktilitaet.GRENZE)
+                         duktilitaet.BEIWERT)
 
 
 class TestVorgabeUndAblage(unittest.TestCase):

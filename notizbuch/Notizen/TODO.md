@@ -41,10 +41,6 @@ gelernt wurde, steht in [[Entwicklung]].
       `material/` stammen aus der Vorgängerfassung und sind nie gegen die
       gedruckte SIA 262 gehalten worden. Dasselbe gilt für sämtliche
       Normverweise. Vor ernsthaftem Gebrauch nachschlagen.
-- [ ] Normstelle für den vereinfachten Spannungsblock (0.15·ε_c2d … f_cd) fehlt
-      — bewusst leer gelassen, statt eine Ziffer zu erfinden. Er ist jetzt
-      auch ein wählbares Gesetz der Querschnittsanalyse («Spannungsblock
-      0.85·x»).
 - [ ] Der Riegel `k_g ≥ 1.20` ist nach Vorgabe eingebaut, aber nicht gegen die
       Norm geprüft. Bei D_max = 32 mm und C30/37 greift er (roh 1.00 → 1.20)
       und senkt den Querkraftwiderstand um gut 4 %.
@@ -396,9 +392,9 @@ sie hier notiert; keine davon ist nachgeschlagen.
       `f_ctm`.
 - [ ] **Unterscheidet die Norm inneren Zwang auf Normalkraft und auf Biegung?**
       Eingebaut: ja, als zwei getrennte Nachweise mit verschiedenem `k_t`
-      (`h` gegen `h/3`). 4.4.1.3 stützt das («für Platten- und
-      Rechteckquerschnitte unter Biegebeanspruchung gilt t = h/3»), nennt sie
-      aber nicht als zwei Nachweise.
+      (`h` gegen `h/3`). 4.4.1.3 stützt das: bei Biegung von Platten und
+      Rechtecken zählt ein Drittel der Höhe, sonst die kleinste Abmessung des
+      gezogenen Teils. Als zwei Nachweise nennt sie sie aber nicht.
 - [ ] **Unterscheidet die Norm sprödes Versagen auf Normalkraft und Biegung?**
       Eingebaut: die Rissnormalkraft steht unter *Mindestbewehrung* (4.4.2), das
       Rissmoment unter *sprödes Versagen* (4.4.1.3). Ob das die gemeinte
@@ -408,23 +404,21 @@ sie hier notiert; keine davon ist nachgeschlagen.
       SIA 4.4.2, aber mit `k_c` und `k` statt `k_t`, und mit einer anderen
       Begründung für die wirksame Zugzone. Ein Vergleich würde zeigen, ob die
       Zahlen zusammenpassen.
-- [ ] **k_σ der Parabel aus `E_cm/(1+φ)`.** Die Parabel rechnet überall --
-      Tragsicherheit, Knicken, Stahlspannung, Analyse, seit 2026-10-16 auch
-      der Bruchzustand der Querschnittsanalyse und das Materialbild -- mit
-      `k_σ = max(1; E_c,eff/(400·f_c))`, `E_c,eff = E_cm/(1+φ)` und `f_c` des
-      Wertesatzes. Der Beton hat daneben sein `k_σ = E_cd/(400·f_cd)`
-      (4.2.1.6), das keine Rechnung mehr liest; die Materialtabelle zeigt es
-      noch. Mit `γ_cE = 1` ist das bei φ = 0 dieselbe Zahl. Ob für die
-      Tragsicherheit `E_cd` und für das Kriechen der Modul der richtige Ort
-      ist, ist nach Vorgabe, nicht nachgeschlagen; mit der Normstelle
-      entscheiden, ob das k_σ des Materials bleibt.
+- [ ] **Kriechen beim Knicken – Entscheid des Benutzers.** Die Vorgabe φ = 0
+      liegt auf der unsicheren Seite: SIA 262:2025, 4.3.7.2 verlangt beim
+      Druckglied das Kriechen. Die Norm setzt es über die Krümmung an –
+      (78) enthält es, sonst eine Vorkrümmung nach (80) –, das Werkzeug über
+      den Modul der Parabel, `E_c/(1+φ)`. Wege: eine Vorgabe φ > 0 oder die
+      Vorkrümmung.
 - [ ] **Die Handrechnung als Rechenart im Löser.** Bei der Stahlspannung
       rechnet «Handrechnung» wie die Resistenzlinie aus Handrechnung
       (Knicken und Analysen bieten sie seit 2026-10-12 nicht mehr an):
       Spannungsblock, gedrückter Stahl weggelassen, je Seite eine Lage im
-      Schwerpunkt, der Beton auch dort gezählt, wo der Stahl liegt. Ein
-      Modell, keine Normregel — nach Vorgabe. Dazu bekommt der Stahl im Löser das Druckplateau `f_y,druck`
-      wie die genaue Linie; bei den Normsorten ist es gleich `f_y`.
+      Schwerpunkt, der Beton auch dort gezählt, wo der Stahl liegt. Nach
+      Vorgabe: den Block lässt SIA 262:2025, 4.2.1.5 für den Bruch zu,
+      Spannungen im Gebrauch rechnet 4.1.4.1.4 linear elastisch -- dort ist
+      er ein Modell, keine Normregel. Das Druckplateau `f_y,druck` des Stahls
+      im Löser deckt 4.2.2.2: Figur 16 gilt für Zug und Druck.
 - [ ] **Querkraft mit `m_Rk`.** Rechnet die Tragsicherheit charakteristisch,
       nimmt die Querkraft ohne Bügel ihr `m_Rk(N_Ed)` aus derselben Linie, ihr
       eigenes `τ_cd` und `f_yd` bleiben aber Bemessungswerte. Das mischt zwei
@@ -453,8 +447,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **C-Punkt bei beliebiger Form.** Eingebaut: ganz gedrückt darf der
       Beton am Punkt im Abstand `(1 − ε_c1d/ε_c2d)·h` vom gedrücktesten Rand
       nicht über `ε_c1d` gestaucht werden, mit `h` als Ausdehnung des Betons
-      senkrecht zur Nulllinie. Bei der Platte ist das die bekannte Regel; ob
-      sie für L, T oder Kasten so gilt, steht dahin.
+      senkrecht zur Nulllinie. SIA 262:2025 regelt den Punkt nicht, auch bei
+      der Platte nicht (gesucht in 4.2.1, 4.3.2, 4.3.7); er ist strenger als
+      die Norm und liegt damit sicher. Vom Benutzer bestätigen lassen.
 - [ ] **Federmodell und Bredt.** Eingebaut: die Querkraft verteilt sich nach
       der Steifigkeit `k = b_w·l` (reine Verschiebung), das Versatzmoment
       tragen die Zellen nach Bredt, mehrzellig mit gleicher Verdrillung. Ohne
@@ -467,9 +462,6 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **k_t bei beliebiger Form.** Eingebaut: wie bei der Platte mit `h/3`,
       wobei `h` die Ausdehnung des Betons in Biegerichtung ist (z für M_y,
       y für M_z).
-- [ ] **Duktilität in beliebiger Richtung.** Eingebaut: x und d senkrecht zur
-      Nulllinie, x ab dem gedrücktesten Betonpunkt, d bis zum entferntesten
-      gezogenen Stab -- in den Richtungen Zug unten, oben, links, rechts.
 - [ ] **Wanddicke im vollen Querschnitt.** Wie dick eine Schubwand in einem
       Rechteck anzusetzen ist, sagt das Werkzeug nicht -- das gibt der
       Benutzer ein. Das Beispiel nimmt 100 mm auf der Bügelachse; eine Regel
@@ -499,9 +491,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Knicken je Richtung.** Eingebaut (`nachweis/qa_knicken.py`): je Fall
       zu einer Zugseite, die Nulllinie parallel zur Achse wie einachsig --
       ein unsymmetrischer Querschnitt, der um beide Achsen zugleich knickt,
-      wird nicht erfasst. `d` für die Mindestausmitte `d/30` vom gedrückten
-      Rand bis zum entferntesten Stab in Zugrichtung. Die Regeln der Platte,
-      übertragen; nach Vorgabe, nicht nachgeschlagen.
+      wird nicht erfasst; SIA 262:2025, 4.3.7 regelt das nicht. `d` für die
+      Mindestausmitte `d/30` (4.3.7.5) reicht bis zum entferntesten Stab in
+      Zugrichtung statt bis zum Schwerpunkt der Zugbewehrung: `e_0d` wird
+      etwas grösser, das liegt sicher.
 
 ### Balkensysteme
 
@@ -590,21 +583,19 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `E_cm/(1+φ)` und charakteristischen Werten wird `E_c/(400·f_c)` kleiner
       als 1 (C30/37, φ = 2: 0.93); dann hätte der Nenner der Parabel im
       ansteigenden Ast eine Nullstelle. Angesetzt wird `max(1; E_c/(400·f_c))`:
-      der Beton ist dann bis f_c bei ε_c1d linear -- nach Vorgabe, nicht
-      nachgeschlagen. Ob die Norm das Kriechen über den Modul oder über die
-      Dehnungen (ε_c1d·(1+φ)) ansetzt, ist offen.
+      der Beton ist dann bis f_c bei ε_c1d linear -- nach Vorgabe;
+      SIA 262:2025, 4.2.1.6 nennt keine Untergrenze. Das Kriechen über den
+      Modul der Parabel ist ebenfalls Vorgabe; beim Druckglied setzt es die
+      Norm über die Krümmung an (siehe «Kriechen beim Knicken»).
 - [ ] **Das Ende der Linien** liegt an den Grenzen des Dehnungsfächers:
-      Betonrand −ε_c2d, Stahllagen ±ε_ud, Punkt C −ε_c1d bei
-      `z_C = h·(1 − ε_c1d/ε_c2d)`. Dieselben Grenzen wie in
-      `nachweis/dehnungsfaecher.py`, nach Vorgabe, nicht nachgeschlagen.
+      Betonrand −ε_c2d (Tabelle 8), Stahllagen ±ε_ud (Tabelle 9), Punkt C
+      −ε_c1d bei `z_C = h·(1 − ε_c1d/ε_c2d)` -- dieselben Grenzen wie in
+      `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
 - [ ] Die Normstelle für das Fachwerkmodell mit Bügeln (`SIA 262:2025, 4.3.3.4`)
       ist eingetragen, aber wie alle anderen Verweise nicht nachgeschlagen.
       Dasselbe gilt für die Vorgaben `α_min = 30°`, `α_max = 45°`, `k_c = 0.55`
       und die Regel, dass Normalzug beide Grenzen auf 40° hebt — alle nach
       Vorgabe eingebaut, keine geprüft.
-- [ ] Ebenso der Duktilitätsnachweis: die Grenze `x/d ≤ 0.35` und der Verweis
-      `SIA 262:2025, 4.1.4.2.5` stehen nach Vorgabe da, nachgeschlagen ist
-      keines von beiden.
 
 - [ ] Die Zahlen der Rissnachweise sind ungeprüft wie alle anderen: beide `k_t`,
       die 500-mm-Grenze, `h/3`, `w_nom = 0.5/0.2 mm` und die Wurzelformel für

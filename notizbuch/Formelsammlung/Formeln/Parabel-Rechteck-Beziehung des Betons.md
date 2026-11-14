@@ -1,11 +1,11 @@
 ---
-erzeugt: 757eed6ed8ae
+erzeugt: 6690be8a620e
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.2.1.6"
+normstelle: "SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.2.1.6
+> SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)
 
 *In der Herleitung: «Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck»*
 

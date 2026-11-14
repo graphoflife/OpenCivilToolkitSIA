@@ -51,10 +51,10 @@ from opencivil.querschnitt.zugseite import Zugseite
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
 #: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus ``E_cm``
-#: entsteht der Beiwert der Parabel, wie bei der Platte; der Gebrauchszustand
-#: rechnet mit ``E_cm/(1+phi)``.
+#: entsteht der Beiwert der Parabel, wie bei der Platte, beim Knicken aus
+#: ``E_cd``; der Gebrauchszustand rechnet mit ``E_cm/(1+phi)``.
 KENNWERTE = {
-    Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "f_ctm", "E_cm"),
+    Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "f_ctm", "E_cm", "E_cd"),
     Baustoffart.BETONSTAHL: ("f_yk", "f_yd", "f_yk_druck", "f_yd_druck", "E_s", "eps_ud"),
 }
 
@@ -604,7 +604,7 @@ class Querschnittsanalyse(Rechenobjekt):
             satz = gewaehlt.satz
             if stoff.art is Baustoffart.BETON:
                 eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
-                gesetz = betongesetz(gewaehlt, f_c=w(satz.beton), E_cm=w("E_cm"),
+                gesetz = betongesetz(gewaehlt, f_c=w(satz.beton), E_c=w(gewaehlt.modul),
                                      eps_c1d=eps_c1d, eps_c2d=eps_c2d, ungerissen=ungerissen)
                 liste.append(Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
                                        c_punkt=(eps_c1d, eps_c2d), verdraengbar=True))
@@ -641,8 +641,9 @@ class Querschnittsanalyse(Rechenobjekt):
         """
         werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.rechenwahl)
         for stoff in self.baustoffe:
-            satz = self.rechenwahl(stoff).satz
-            kennwerte = (satz.betonkennwerte if stoff.art is Baustoffart.BETON
+            wahl = self.rechenwahl(stoff)
+            satz = wahl.satz
+            kennwerte = (wahl.betonkennwerte if stoff.art is Baustoffart.BETON
                          else satz.stahlkennwerte)
             werkstoffe[index(stoff)].gesetz.protokoll(
                 p, {rolle: e[stoff.eingabename(name)] for rolle, name in kennwerte.items()},

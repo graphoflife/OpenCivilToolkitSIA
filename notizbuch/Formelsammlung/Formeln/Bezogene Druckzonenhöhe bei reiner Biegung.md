@@ -1,5 +1,5 @@
 ---
-erzeugt: 85a4c92b7416
+erzeugt: aff710540c01
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-x/d = \frac{x}{d} = \frac{75.5\,\mathrm{mm}}{572.3\,\mathrm{mm}} = 0.132 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{75.5\,\mathrm{mm}}{495.2\,\mathrm{mm}} = 0.153 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ## Im Code

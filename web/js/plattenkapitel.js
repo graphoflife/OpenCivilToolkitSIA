@@ -48,6 +48,7 @@ const HILFE = {
       ['V', 'ohne Bügel k_d·τ_cd·d_v mit m_R aus derselben Linie, mit Bügeln Fachwerk bei günstigster Neigung'],
       ['Werte', 'M-N nach Rechenwahl: Bemessung (f_cd, f_yd → M_Rd) oder charakteristisch (f_ck, f_yk → M_Rk); V mit τ_cd, f_yd'],
       ['φ', 'nach Rechenwahl, nur präzise → E_c,eff = E_cm / (1 + φ)'],
+      ['Drillung', 'nicht gerechnet – ein Drillmoment selbst zum Moment zählen: m_xd + |m_xyd| ≤ m_xRd (SIA 262:2025, 4.3.2.6)'],
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
   },
@@ -57,7 +58,7 @@ const HILFE = {
       ['Werte', 'Bemessung (f_cd, f_yd)'],
       ['φ', '–'],
     ],
-    formel: '0.85·x·b·f_cd = A_s·f_yd    x/d ≤ 0.35',
+    formel: '0.85·x·b·f_cd = A_s·f_yd    x/d ≤ k·435/f_yd',
   },
   sproede: {
     zeilen: [
@@ -175,7 +176,7 @@ export const PLATTE = {
     titel: {
       N_Ed: 'Druckkraft in kN – negativ, in x-Richtung',
       M_Ed_1: 'Moment 1. Ordnung in kNm, um die y-Achse (Tragrichtung x)',
-      laenge: 'Systemlänge in m – geht in die Schiefstellung ein',
+      laenge: 'Höhe des Druckglieds in m, bei mehreren übereinander die ganze – bestimmt die Schiefstellung',
       knicklaenge: 'Knicklänge in m',
     },
     richtung: null,

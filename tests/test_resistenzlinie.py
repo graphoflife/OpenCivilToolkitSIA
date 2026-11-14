@@ -30,7 +30,7 @@ def ebenenlinie(art=Rechenart.PARABEL, *, schritte=80, phi=0.0):
     wahl = Rechenwahl(kriechzahl=phi, art=art)
     return Ebenenlinie(
         wahl, h=H, b=B, lagen=LAGEN, eps_c1d=EPS_C1D, eps_c2d=EPS_C2D, schritte=schritte,
-        beton=betongesetz(wahl, f_c=F_C, E_cm=E_CM, eps_c1d=EPS_C1D, eps_c2d=EPS_C2D))
+        beton=betongesetz(wahl, f_c=F_C, E_c=E_CM, eps_c1d=EPS_C1D, eps_c2d=EPS_C2D))
 
 
 class TestGenau(unittest.TestCase):

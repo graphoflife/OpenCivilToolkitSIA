@@ -518,7 +518,7 @@ class Schnittpaar:
             f_ct_eff = protokoll_zugfestigkeit(
                 p, w, k_t=self.riss.k_t, f_ct_eff=self.riss.f_ct_eff, h=h,
                 f_ctm=ein(ecke.stoff.id_von("f_ctm")), teiler=MOMENTENTEILER,
-                referenz="SIA 262:2025, 4.4.1.3", titel="Beiwert für die Tiefe in Biegerichtung")
+                titel="Beiwert für die Tiefe in Biegerichtung")
             p.formel(w.moment("M_Riss_N", "M_{Riss}(N)", linie.riss),
                      r"\left(@f - \frac{@N}{@A}\right) \cdot @W",
                      {"f": f_ct_eff, "N": w.kraft("N", "N", linie.fest), "A": A, "W": W},
@@ -540,7 +540,7 @@ class Schnittpaar:
         f_ct_eff = protokoll_zugfestigkeit(
             p, w, k_t=self.k_t_zug, f_ct_eff=zug.f_ct_eff, h=t,
             f_ctm=ein(zug.ecke.stoff.id_von("f_ctm")), teiler=1,
-            referenz="SIA 262:2025, 4.4.2", titel="Beiwert für die rissaktive Dicke")
+            titel="Beiwert für die rissaktive Dicke")
         N_Riss = w.kraft("N_Riss_M", "N_{Riss}(M)", linie.riss)
         M_wert = w.moment("M", "M", M)
         if self.einachsig:

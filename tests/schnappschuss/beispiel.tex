@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-108 Berechnungen ausgeführt, 174 Werte bestimmt.
+110 Berechnungen ausgeführt, 176 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke über EG}
@@ -109,7 +109,7 @@ Seite & $A_s\ [\mathrm{mm}^2]$ & $z\ [\mathrm{mm}]$ & $f_{yd}\ [\mathrm{N/mm^2}]
 \hline
 \end{longtable}
 \subsubsection{Grösste Druckkraft}
-\noindent\textbf{Gleichmässiger Druck, ohne Bewehrung}
+\noindent\textbf{Gleichmässiger Druck, ohne Bewehrung} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12}
 \begin{equation*}
 N_{Rd}^{-} = -b \cdot h \cdot f_{cd} = -1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = -6000\,\mathrm{kN}
 \end{equation*}
@@ -118,7 +118,7 @@ N_{Rd}^{-} = -b \cdot h \cdot f_{cd} = -1000\,\mathrm{mm} \cdot 300\,\mathrm{mm}
 M_{Rd}(N_{Rd}^{-}) = 0\,\mathrm{kNm}
 \end{equation*}
 \subsubsection{Grösste Zugkraft}
-\noindent\textbf{Beide Lagen fliessen auf Zug}
+\noindent\textbf{Beide Lagen fliessen auf Zug} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16}
 \begin{equation*}
 \begin{aligned}
   N_{Rd}^{+} &= A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd} \\
@@ -139,7 +139,7 @@ M_{Rd}(N_{Rd}^{-}) = 0\,\mathrm{kNm}
 \begin{equation*}
 d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht}
+\noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12}
 \begin{equation*}
 x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 62.7\,\mathrm{mm}
 \end{equation*}
@@ -155,11 +155,11 @@ x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{2450\,\
 \begin{equation*}
 x^{+} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Dehnung der Zugbewehrung}
+\noindent\textbf{Dehnung der Zugbewehrung} \hfill \normref{SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8}
 \begin{equation*}
 \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(248.1\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.29\,\text{‰}
 \end{equation*}
-\noindent\textbf{Stahlspannung, höchstens die Fliessgrenze}
+\noindent\textbf{Stahlspannung, höchstens die Fliessgrenze} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16}
 \begin{equation*}
 \begin{aligned}
   \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
@@ -188,7 +188,7 @@ x^{+} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 \begin{equation*}
 d_{3,x} = h - z_{3,x} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht}
+\noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12}
 \begin{equation*}
 x^{-} = \frac{A_{s,3,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 19.3\,\mathrm{mm}
 \end{equation*}
@@ -204,11 +204,11 @@ x^{-} = \frac{A_{s,3,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\m
 \begin{equation*}
 x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Dehnung der Zugbewehrung}
+\noindent\textbf{Dehnung der Zugbewehrung} \hfill \normref{SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8}
 \begin{equation*}
 \varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(252\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.38\,\text{‰}
 \end{equation*}
-\noindent\textbf{Stahlspannung, höchstens die Fliessgrenze}
+\noindent\textbf{Stahlspannung, höchstens die Fliessgrenze} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16}
 \begin{equation*}
 \begin{aligned}
   \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
@@ -539,6 +539,14 @@ E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38} = 33620\,\mathrm{
 \begin{equation*}
 f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
 \end{equation*}
+\noindent\textbf{Teilsicherheitsbeiwert für den Elastizitätsmodul, Druckglieder mit Einflüssen 2. Ordnung} \hfill \normref{SIA 262:2025, 4.2.1.17}
+\begin{equation*}
+\gamma_{cE} = 1.2
+\end{equation*}
+\noindent\textbf{Bemessungswert des Elastizitätsmoduls} \hfill \normref{SIA 262:2025, 4.2.1.15, (33)}
+\begin{equation*}
+E_{cd} = \frac{E_{cm}}{\gamma_{cE}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1.2} = 28016\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
 \noindent\textbf{Dichte des Stahlbetons}
 \begin{equation*}
 \rho_{sb} = 2500\,\mathrm{kg}/\mathrm{m}^{3}
@@ -648,7 +656,7 @@ Wand 3 & $(250;\ 550) \rightarrow (50;\ 550)$ & $200$ & $100$ & $1 \times \varno
 Wand 4 & $(50;\ 550) \rightarrow (50;\ 50)$ & $500$ & $100$ & $1 \times \varnothing 10\ @\ 150$ & $524$ \\
 \hline
 \end{longtable}
-\noindent\textbf{Dehnungsebene und innere Kräfte}
+\noindent\textbf{Dehnungsebene und innere Kräfte} \hfill \normref{SIA 262:2025, 4.3.2.3}
 \begin{equation*}
 \varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad v = n_y (y - y_S) + n_z (z - z_S) \qquad N = \int_A \sigma\,\mathrm{d}A \qquad M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A
 \end{equation*}
@@ -656,11 +664,11 @@ Wand 4 & $(50;\ 550) \rightarrow (50;\ 50)$ & $500$ & $100$ & $1 \times \varnoth
 \begin{equation*}
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 \end{equation*}
-\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel} \hfill \normref{SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe}
 \begin{equation*}
 k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
 \end{equation*}
-\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck} \hfill \normref{SIA 262:2025, 4.2.1.6}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)}
 \begin{equation*}
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 \end{equation*}
@@ -668,7 +676,7 @@ k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;
 \begin{equation*}
 f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 \end{equation*}
-\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear} \hfill \normref{SIA 262:2025, 4.2.2.4}
+\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5}
 \begin{equation*}
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 \end{equation*}
@@ -850,7 +858,7 @@ M_{z,Rd}^{+}(N_{Ed} = 0) = 60.8\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links}
 \begin{equation*}
-\left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{66.8\,\mathrm{mm}}{305.3\,\mathrm{mm}} = 0.219
+\left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{66.8\,\mathrm{mm}}{267.4\,\mathrm{mm}} = 0.25
 \end{equation*}
 \noindent\textbf{Momentenwiderstand bei N\_Ed = 0, Zug rechts}
 \begin{equation*}
@@ -858,7 +866,7 @@ M_{z,Rd}^{-}(N_{Ed} = 0) = -60.8\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts}
 \begin{equation*}
-\left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{66.8\,\mathrm{mm}}{305.3\,\mathrm{mm}} = 0.219
+\left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{66.8\,\mathrm{mm}}{267.4\,\mathrm{mm}} = 0.25
 \end{equation*}
 \noindent\textbf{Reiner Zug, gleichmässig gedehnt}
 \begin{equation*}
@@ -1803,6 +1811,10 @@ E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\m
 \begin{equation*}
 \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 \end{equation*}
+\noindent\textbf{Bemessungswert des Elastizitätsmoduls} \hfill \normref{SIA 262:2025, 4.2.1.15, (33)}
+\begin{equation*}
+E_{cd} = \frac{E_{cm}}{\gamma_{cE}}
+\end{equation*}
 \subsection{Betonstahl}
 \noindent\textbf{Bemessungswert der Fliessgrenze} \hfill \normref{SIA 262:2025, 2.4.2.5}
 \begin{equation*}
@@ -1823,11 +1835,11 @@ z_{2,x} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,
 \begin{equation*}
 A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
 \end{equation*}
-\noindent\textbf{Gleichmässiger Druck, ohne Bewehrung}
+\noindent\textbf{Gleichmässiger Druck, ohne Bewehrung} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12}
 \begin{equation*}
 N_{Rd}^{-} = -b \cdot h \cdot f_{cd}
 \end{equation*}
-\noindent\textbf{Beide Lagen fliessen auf Zug}
+\noindent\textbf{Beide Lagen fliessen auf Zug} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16}
 \begin{equation*}
 N_{Rd}^{+} = A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd}
 \end{equation*}
@@ -1839,7 +1851,7 @@ M_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\r
 \begin{equation*}
 d_{2,x} = z_{2,x}
 \end{equation*}
-\noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht}
+\noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12}
 \begin{equation*}
 x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}}
 \end{equation*}
@@ -1851,11 +1863,11 @@ M_{Rd}(N_{Ed}=0)^{+} = A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \frac{0.85 \
 \begin{equation*}
 x^{+} = \frac{h}{2}
 \end{equation*}
-\noindent\textbf{Dehnung der Zugbewehrung}
+\noindent\textbf{Dehnung der Zugbewehrung} \hfill \normref{SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8}
 \begin{equation*}
 \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}}
 \end{equation*}
-\noindent\textbf{Stahlspannung, höchstens die Fliessgrenze}
+\noindent\textbf{Stahlspannung, höchstens die Fliessgrenze} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16}
 \begin{equation*}
 \sigma_{sd} = \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right]
 \end{equation*}
@@ -1934,7 +1946,7 @@ Der Querschnitt bleibt eben (Bernoulli). Die Dehnung hängt nur vom Abstand v in
 
 Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an seiner Grenze steht und keiner darüber. Der Beton wird an seinem gedrücktesten Punkt bis -ε\_c2d gestaucht, ganz gedrückt am C-Punkt bis -ε\_c1d; die Bewehrung bis ±ε\_ud. Gesucht wird die Ebene mit N = N\_Ed, deren Moment in die Richtung der Einwirkung zeigt. Nachgewiesen wird nicht die Suche, sondern ihre Probe: die Kräfte jedes Teils und ihre Summen.
 
-\noindent\textbf{Dehnungsebene und innere Kräfte}
+\noindent\textbf{Dehnungsebene und innere Kräfte} \hfill \normref{SIA 262:2025, 4.3.2.3}
 \begin{equation*}
 \varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad v = n_y (y - y_S) + n_z (z - z_S) \qquad N = \int_A \sigma\,\mathrm{d}A \qquad M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A
 \end{equation*}
@@ -1942,15 +1954,15 @@ Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an seiner Grenze ste
 \begin{equation*}
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 \end{equation*}
-\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel} \hfill \normref{SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe}
 \begin{equation*}
 k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right)
 \end{equation*}
-\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck} \hfill \normref{SIA 262:2025, 4.2.1.6}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck} \hfill \normref{SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27)}
 \begin{equation*}
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 \end{equation*}
-\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear} \hfill \normref{SIA 262:2025, 4.2.2.4}
+\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear} \hfill \normref{SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5}
 \begin{equation*}
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 \end{equation*}
@@ -2349,8 +2361,8 @@ Zugwiderstand & $N_{Rd}^{+}$ & $508.1\,\mathrm{kN}$ \\
 Druckwiderstand & $N_{Rd}^{-}$ & $-4044.1\,\mathrm{kN}$ \\
 Bezogene Druckzonenhöhe, Zug unten & $\left(x/d\right)_{y}^{+}$ & $0.128$ \\
 Bezogene Druckzonenhöhe, Zug oben & $\left(x/d\right)_{y}^{-}$ & $0.077$ \\
-Bezogene Druckzonenhöhe, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.219$ \\
-Bezogene Druckzonenhöhe, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.219$ \\
+Bezogene Druckzonenhöhe, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.25$ \\
+Bezogene Druckzonenhöhe, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.25$ \\
 Querkraftwiderstand in z & $V_{z,Rd}$ & $394.3\,\mathrm{kN}$ \\
 Querkraftwiderstand in y & $V_{y,Rd}$ & $157.7\,\mathrm{kN}$ \\
 Torsionswiderstand & $T_{Rd}$ & $78.9\,\mathrm{kNm}$ \\
@@ -2429,6 +2441,7 @@ Dehnsteifigkeit, Unterzug, C30/37 & $EA_{\text{Q2}}$ & $6052$ & MN & berechnet \
 Biegesteifigkeit, Unterzug, C30/37 & $EI_{\text{Q2}}$ & $181547$ & kNm² & berechnet \\
 Eigengewicht je Meter, Unterzug, C30/37 & $g_{k,\text{Q2}}$ & $4.5$ & kN/m & berechnet \\
 Erdbeschleunigung & $g$ & $10$ & m/s² & Vorgabe \\
+Bemessungswert des Elastizitätsmoduls & $E_{cd}$ & $28016$ & N/mm² & berechnet \\
 Mittelwert des Elastizitätsmoduls & $E_{cm}$ & $33620$ & N/mm² & berechnet \\
 Dehnung am Ende des ansteigenden Astes & $\varepsilon_{c1d}$ & $2$ & ‰ & Vorgabe \\
 Bruchdehnung des Betons & $\varepsilon_{c2d}$ & $3.5$ & ‰ & Vorgabe \\
@@ -2438,6 +2451,7 @@ Charakteristische Zylinderdruckfestigkeit & $f_{ck}$ & $30$ & N/mm² & Vorgabe \
 Mittelwert der Zylinderdruckfestigkeit & $f_{cm}$ & $38$ & N/mm² & berechnet \\
 Mittelwert der Zugfestigkeit & $f_{ctm}$ & $2.9$ & N/mm² & Vorgabe \\
 Teilsicherheitsbeiwert für Beton & $\gamma_c$ & $1.5$ &  & Vorgabe \\
+Teilsicherheitsbeiwert für den Elastizitätsmodul, Druckglieder mit Einflüssen 2. Ordnung & $\gamma_{cE}$ & $1.2$ &  & Vorgabe \\
 Beiwert für die Gesteinskörnung & $k_e$ & $10000$ &  & Vorgabe \\
 Dichte des Stahlbetons & $\rho_{sb}$ & $2500$ & kg/m³ & Vorgabe \\
 Bemessungswert der Schubspannungsgrenze & $\tau_{cd}$ & $1.1$ & N/mm² & berechnet \\
@@ -2506,7 +2520,7 @@ Teilung 4. Lage Grundbewehrung & $s_{4,y,g}$ & $150$ & mm & Vorgabe \\
 Tiefe 4. Lage Grundbewehrung ab Oberkante & $z_{4,y,g}$ & $36$ & mm & berechnet \\
 Erfüllungsgrad Duktilität – 2. Lage & $\alpha_{eff,D,2}$ & $1.39$ &  & berechnet \\
 Bezogene Druckzonenhöhe – 2. Lage & $\left(x/d\right)_{2}$ & $0.253$ &  & berechnet \\
-Erfüllungsgrad Duktilität – 3. Lage & $\alpha_{eff,D,3}$ & $4.57$ &  & berechnet \\
+Erfüllungsgrad Duktilität – 3. Lage & $\alpha_{eff,D,3}$ & $4.58$ &  & berechnet \\
 Bezogene Druckzonenhöhe – 3. Lage & $\left(x/d\right)_{3}$ & $0.077$ &  & berechnet \\
 Momentenwiderstand bei N\_Ed (x-Richtung) – Feld & $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ & $235.9$ & kNm & berechnet \\
 Erfüllungsgrad x-Richtung – Feld & $\alpha_{eff,x,\text{Feld}}$ & $2.36$ &  & berechnet \\
@@ -2550,13 +2564,13 @@ Torsionswiderstand der Schubwände, allein & $T_{Rd}$ & $78.9$ & kNm & berechnet
 Querkraftwiderstand in y der Schubwände, allein & $V_{y,Rd}$ & $157.7$ & kN & berechnet \\
 Querkraftwiderstand in z der Schubwände, allein & $V_{z,Rd}$ & $394.3$ & kN & berechnet \\
 Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $51$ & kg/m³ & berechnet \\
-Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.219$ &  & berechnet \\
+Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links & $\left(x/d\right)_{z}^{+}$ & $0.25$ &  & berechnet \\
 Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben & $\left(x/d\right)_{y}^{-}$ & $0.077$ &  & berechnet \\
-Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.219$ &  & berechnet \\
+Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts & $\left(x/d\right)_{z}^{-}$ & $0.25$ &  & berechnet \\
 Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten & $\left(x/d\right)_{y}^{+}$ & $0.128$ &  & berechnet \\
-Erfüllungsgrad Duktilität – Zug links & $\alpha_{eff,x/d,\text{Zug links}}$ & $1.60$ &  & berechnet \\
+Erfüllungsgrad Duktilität – Zug links & $\alpha_{eff,x/d,\text{Zug links}}$ & $1.40$ &  & berechnet \\
 Erfüllungsgrad Duktilität – Zug oben & $\alpha_{eff,x/d,\text{Zug oben}}$ & $4.56$ &  & berechnet \\
-Erfüllungsgrad Duktilität – Zug rechts & $\alpha_{eff,x/d,\text{Zug rechts}}$ & $1.60$ &  & berechnet \\
+Erfüllungsgrad Duktilität – Zug rechts & $\alpha_{eff,x/d,\text{Zug rechts}}$ & $1.40$ &  & berechnet \\
 Erfüllungsgrad Duktilität – Zug unten & $\alpha_{eff,x/d,\text{Zug unten}}$ & $2.73$ &  & berechnet \\
 Erfüllungsgrad Biegung und Normalkraft – Feld & $\alpha_{eff,\text{Feld}}$ & $1.41$ &  & berechnet \\
 Grösste aufnehmbare Druckkraft & $N_{Rd}^{-}$ & $-4044.1$ & kN & berechnet \\

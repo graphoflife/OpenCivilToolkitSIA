@@ -395,11 +395,17 @@ class TestDasNotizbuchImRepo(unittest.TestCase):
                 self.assertEqual(nur_katex_in(ohne_code), set())
 
     def test_normstellen_nur_aus_dem_code(self):
-        """Eine Normstelle in der Theorie muss eine sein, die der Code nennt."""
-        bekannt = {b.referenz for lauf in fs.laeufe() for b in lauf.alle_bloecke()
-                   if getattr(b, "referenz", "")}
-        muster = re.compile(r"SIA 262(?::\d{4})?,? (?:Tabelle )?\d[\d.]*\d|"
-                            r"SIA 262(?::\d{4})?,? Tabelle \d+")
+        """
+        Eine Normstelle in der Theorie muss eine sein, die der Code nennt --
+        als Ziffer oder Tabelle irgendwo in einem Verweis auf SIA 262, auch
+        hinter der ersten: ``SIA 262:2025, 4.3.7.6, (76); 4.3.7.7, (77)``
+        nennt 4.3.7.6 und 4.3.7.7.
+        """
+        teil = re.compile(r"Tabelle \d+|\d+(?:\.\d+)+")
+        bekannt = {stelle for lauf in fs.laeufe() for b in lauf.alle_bloecke()
+                   if getattr(b, "referenz", "").startswith("SIA 262")
+                   for stelle in teil.findall(b.referenz.split(",", 1)[-1])}
+        muster = re.compile(r"SIA 262(?::\d{4})?,? ((?:Tabelle )?\d[\d.]*\d|Tabelle \d+)")
         for pfad, text in self.dateien.items():
             eigen = tresor.zerlegen(text).eigen or ""
             for stelle in muster.findall(eigen):

@@ -1,10 +1,11 @@
 ---
-erzeugt: 847f847dc005
+erzeugt: 320b7a8d859d
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.1.4.1.4"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.1.4.1.4
 
 *In der Herleitung: «Werkstoffgesetze im Gebrauchszustand: Beton, linear ohne Zug»*
 

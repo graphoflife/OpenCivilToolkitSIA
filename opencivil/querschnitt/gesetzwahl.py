@@ -209,6 +209,17 @@ class Rechenwahl:
     kriechzahl: float = 0.0
     satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
     art: Rechenart = Rechenart.HANDRECHNUNG
+    modul: str = "E_cm"
+    """
+    Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: ``E_cm``,
+    bei der Verformung des Knickens ``E_cd`` (SIA 262:2025, 4.2.1.17). Keine
+    Wahl des Benutzers -- das Kapitel setzt ihn.
+    """
+
+    @property
+    def betonkennwerte(self) -> Dict[str, str]:
+        """Die Kennwerte des Betongesetzes (:attr:`Werkstoffsatz.betonkennwerte`) mit diesem Modul."""
+        return {**self.satz.betonkennwerte, "E_c": self.modul}
 
     @property
     def index(self) -> str:
@@ -224,12 +235,12 @@ class Rechenwahl:
         return ", ".join(teile + [self.satz.kurz])
 
 
-def wirksamer_modul(E_cm: float, phi: float) -> float:
-    """``E_c,eff = E_cm / (1 + phi)`` -- das Kriechen weicht den Beton auf."""
-    return E_cm / (1.0 + phi)
+def wirksamer_modul(E_c: float, phi: float) -> float:
+    """``E_c,eff = E_c / (1 + phi)`` -- das Kriechen weicht den Beton auf."""
+    return E_c / (1.0 + phi)
 
 
-def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float,
+def betongesetz(wahl: Rechenwahl, *, f_c: float, E_c: float, eps_c1d: float,
                  eps_c2d: float, ungerissen: bool = False) -> Gesetz:
     """
     Der Beton einer Wahl -- im gerissenen Zustand je Rechenart, ``ungerissen``
@@ -237,13 +248,14 @@ def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float,
     beide: der Loeser der Platte, die genaue Resistenzlinie und der
     gezeichnete Querschnitt bekommen ihren Beton hier. Bis 2026-10-17 gab die
     Platte ihrem Loeser den ungerissenen Beton als eigenes Gesetz mit, und der
-    gezeichnete Querschnitt baute ihn hinter einem Schalter selbst.
+    gezeichnete Querschnitt baute ihn hinter einem Schalter selbst. ``E_c``
+    ist der Modul der Wahl (:attr:`Rechenwahl.modul`), ohne Kriechen.
     """
     if ungerissen:
-        return BetonUngerissen(E_c=wirksamer_modul(E_cm, wahl.kriechzahl))
+        return BetonUngerissen(E_c=wirksamer_modul(E_c, wahl.kriechzahl))
     if wahl.art is Rechenart.ELASTISCH:
-        return BetonElastisch(E_c=wirksamer_modul(E_cm, wahl.kriechzahl), f_c=f_c)
+        return BetonElastisch(E_c=wirksamer_modul(E_c, wahl.kriechzahl), f_c=f_c)
     if wahl.art is Rechenart.PARABEL:
-        return Betongesetz.mit_modul(f_c=f_c, E_c=wirksamer_modul(E_cm, wahl.kriechzahl),
+        return Betongesetz.mit_modul(f_c=f_c, E_c=wirksamer_modul(E_c, wahl.kriechzahl),
                                      eps_c1d=eps_c1d, eps_c2d=eps_c2d)
     return Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)

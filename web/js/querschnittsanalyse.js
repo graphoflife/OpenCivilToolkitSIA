@@ -50,10 +50,10 @@ const HILFE = {
   duktilitaet: {
     zeilen: [
       ['Weg', 'reine Biegung (N = 0) je Richtung: Zug unten, oben, links, rechts'],
-      ['x, d', 'senkrecht zur Nulllinie, ab dem gedrücktesten Betonpunkt'],
+      ['x, d', 'senkrecht zur Nulllinie, ab dem gedrücktesten Betonpunkt; d bis zum Schwerpunkt der gezogenen Stäbe'],
       ['einachsig', 'nur Zug unten und oben'],
     ],
-    formel: 'x/d ≤ Grenze',
+    formel: 'x/d ≤ k·435/f_yd',
   },
   sproede: {
     zeilen: [
@@ -459,7 +459,7 @@ const ORT = {
     titel: {
       N_Ed: 'Druckkraft in kN – negativ',
       M_Ed_1: 'Moment 1. Ordnung in kNm – es zieht die gewählte Seite',
-      laenge: 'Systemlänge in m – geht in die Schiefstellung ein',
+      laenge: 'Höhe des Druckglieds in m, bei mehreren übereinander die ganze – bestimmt die Schiefstellung',
       knicklaenge: 'Knicklänge in m',
     },
     richtung: (k, setzen) => zugseitenWahl(

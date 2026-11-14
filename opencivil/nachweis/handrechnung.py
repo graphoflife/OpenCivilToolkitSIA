@@ -294,7 +294,7 @@ class Handrechnung:
                 "h": self.werte.laenge("h", "h", self.h),
                 "f_cd": self.w_f_cd,
             },
-            titel="Gleichmässiger Druck, ohne Bewehrung",
+            titel="Gleichmässiger Druck, ohne Bewehrung", referenz="SIA 262:2025, 4.2.1.5, Figur 12",
         )
         p.wert(self.werte.moment("M_druck", f"M_{{{self.R}}}(N_{{{self.R}}}^{{-}})", 0.0),
                titel="Zugehöriges Moment")
@@ -325,7 +325,7 @@ class Handrechnung:
                              "Grösste aufnehmbare Zugkraft"),
             r"@A_s \cdot @f_yd + @A_s2 \cdot @f_yd2",
             eingaben,
-            titel="Beide Lagen fliessen auf Zug",
+            titel="Beide Lagen fliessen auf Zug", referenz="SIA 262:2025, 4.2.2.2, Figur 16",
         )
         p.formel(
             self.werte.moment("M_Rd_zug", f"M_{{{self.R}}}(N_{{{self.R}}}^{{+}})", M,
@@ -385,7 +385,7 @@ class Handrechnung:
             w_x,
             rf"\frac{{@A_s \cdot @f_yd}}{{{BLOCKANTEIL} \cdot @b \cdot @f_cd}}",
             eingaben,
-            titel="Druckzonenhöhe aus dem Kräftegleichgewicht",
+            titel="Druckzonenhöhe aus dem Kräftegleichgewicht", referenz="SIA 262:2025, 4.2.1.5, Figur 12",
         )
         p.formel(
             self.werte.moment(f"M_Rd_N0_{marke}", rf"M_{{{self.R}}}(N_{{Ed}}=0)^{{{hoch}}}",
@@ -460,6 +460,7 @@ class Handrechnung:
                                               self.eps_c2d),
             },
             titel="Dehnung der Zugbewehrung",
+            referenz="SIA 262:2025, 4.3.2.3; 4.2.1.4, Tabelle 8",
         )
         w_sigma = self.werte.spannung(
             f"sigma_sd_{marke}", zug.symbol_sigma_sd, sigma, "Stahlspannung")
@@ -472,7 +473,7 @@ class Handrechnung:
                 "f_yd": self.werte.spannung(f"fyd_{marke}", zug.symbol_f_yd,
                                             zug.f_yd),
             },
-            titel="Stahlspannung, höchstens die Fliessgrenze",
+            titel="Stahlspannung, höchstens die Fliessgrenze", referenz="SIA 262:2025, 4.2.2.2, Figur 16",
         )
 
         eingaben = {

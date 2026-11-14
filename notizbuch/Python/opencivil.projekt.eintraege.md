@@ -1,5 +1,5 @@
 ---
-erzeugt: 33a7a6d52598
+erzeugt: 83a54e5c8389
 art: modul
 tags: [modul]
 ---
@@ -211,9 +211,9 @@ Die Abminderung k_c der Druckdiagonalen -- eine Festigkeit mal k_c, also groesse
 def x_d_grenze() -> Any
 ```
 
-Die Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis --
-Vorgabe und Hoechstwert stehen beim Nachweis (`duktilitaet.GRENZE`,
-`duktilitaet.HOECHSTENS`).
+Der Beiwert k der Grenze `x/d <= k * 435 N/mm^2 / f_yd` im
+Duktilitaetsnachweis -- Vorgabe und Hoechstwert stehen beim Nachweis
+(`duktilitaet.BEIWERT`, `duktilitaet.HOECHSTENS`).
 
 ### PostenEintrag
 
@@ -405,7 +405,7 @@ in y waere die Breite der Platte die Laenge.
 - `name: str`
 - `N_Ed: float = 0.0` – in kN, Druck negativ.
 - `M_Ed_1: float = 0.0`
-- `laenge: float = bereich(3.0, heisst='Systemlänge', einheit=M, ueber=0.0)` – Systemlaenge in m -- geht in die Schiefstellung ein. Bis 2026-10-16 rechnete eine Laenge von null und hiess «erfuellt».
+- `laenge: float = bereich(3.0, heisst='Höhe des Druckglieds', einheit=M, ueber=0.0)` – Hoehe des Druckglieds in m, bei mehreren uebereinander ihre ganze Hoehe (SIA 262:2025, 4.1.3.2.3) -- sie bestimmt die Schiefstellung. Bis 2026-11-14 hiess sie Systemlaenge; bis 2026-10-16 rechnete eine Laenge von null und hiess «erfuellt».
 - `knicklaenge: float = bereich(3.0, heisst='Knicklänge', einheit=M, ueber=0.0)` – Knicklaenge in m.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen.
 
@@ -694,7 +694,7 @@ Geometrie ohne Vorgabe dahinter folgen -- der Beton der Platte.
 - `zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit `E_cm/(1+φ)`, an der Platte als Wertigkeit `n = (E_s/E_cm)·(1+φ)`.
 - `sproede: bool = False` – Ob der Nachweis gegen sproedes Versagen gefuehrt wird.
 - `duktilitaet: bool = False` – Ob der Duktilitaetsnachweis gefuehrt wird. Ein Schalter fuer das Bauteil und nicht einer je Lage. An der Platte werden beide x-Lagen gerechnet -- die obere traegt das Stuetz-, die untere das Feldmoment --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die beantwortet die schlechtere Lage.
-- `x_d_max: float = x_d_grenze()` – Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis.
+- `x_d_max: float = x_d_grenze()` – Der Beiwert k der Grenze `x/d <= k * 435 N/mm^2 / f_yd` im Duktilitaetsnachweis. Bis 2026-11-14 war er selbst die Grenze; bei B500 sind beide gleich, darum heisst das Feld weiter so, und alte Dateien lesen sich ohne Umweg.
 - `knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte.
 - `knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
 - `k_c: float = druckfeld()` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.

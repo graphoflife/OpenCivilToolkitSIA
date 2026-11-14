@@ -1,5 +1,5 @@
 ---
-erzeugt: d35df452fe7b
+erzeugt: 6e9ae1f4658a
 art: modul
 tags: [modul]
 ---
@@ -411,18 +411,22 @@ def dehnung(self, punkt: Bruchpunkt, p: Punkt) -> float
 
 Die Dehnung dieser Ebene an einem Ort des Querschnitts.
 
-#### Querschnitt.zugseite_bewehrt
+#### Querschnitt.zugbewehrung
 
 ```python
-def zugseite_bewehrt(self, punkt: Bruchpunkt) -> bool
+def zugbewehrung(self, punkt: Bruchpunkt) -> List[Tuple[float, Bewehrung]]
 ```
 
-Ob auf der gezogenen Seite des Schwerpunkts Bewehrung liegt.
+Die Zugbewehrung dieser Ebene, je Stab mit seinem v: die gedehnten
+Staebe auf der gezogenen Seite des Schwerpunkts.
 
-Die Frage der Platte nach der gezogenen Lage, fuer jede Form: ohne
-obere Bewehrung haelt bei Zug oben nur der Stahl unten dagegen, kurz
-ueber dem gedrueckten Rand -- das geht rechnerisch auf, sagt aber
-weder ueber Duktilitaet noch ueber sproedes Versagen etwas.
+Die Frage der Platte nach der gezogenen Lage, fuer jede Form. Ein
+gedehnter Stab auf der anderen Seite liegt nur knapp jenseits der
+Nulllinie -- etwa die obere Bewehrung bei Zug unten -- und ist keine
+Zugbewehrung. Und ohne obere Bewehrung haelt bei Zug oben nur der Stahl
+unten dagegen, kurz ueber dem gedrueckten Rand: das geht rechnerisch
+auf, sagt aber weder ueber Duktilitaet noch ueber sproedes Versagen
+etwas.
 
 #### Querschnitt.druckzone
 
@@ -433,8 +437,9 @@ def druckzone(self, punkt: Bruchpunkt) -> Tuple[float, float]
 Druckzonenhoehe x und statische Hoehe d dieser Ebene, beide senkrecht
 zur Nulllinie und ab dem gedrueckten Betonrand gemessen.
 
-d gehoert zum entferntesten gezogenen Stab. Ohne gezogenen Stab ist d
-null, ohne Beton beides null.
+d reicht bis zum Schwerpunkt der Zugbewehrung ([[opencivil.querschnitt.interaktion#Querschnitt.zugbewehrung|zugbewehrung]]),
+wie das Zeichen d in SIA 262:2025 definiert ist. Ohne Zugbewehrung ist
+d null, ohne Beton beides null.
 
 ### _bei_n_gelesen
 

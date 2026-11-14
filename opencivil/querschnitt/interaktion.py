@@ -819,24 +819,31 @@ class Querschnitt:
         return punkt.eps_m + punkt.chi * (n[0] * (p[0] - self.bezug[0])
                                           + n[1] * (p[1] - self.bezug[1]))
 
-    def zugseite_bewehrt(self, punkt: Bruchpunkt) -> bool:
+    def zugbewehrung(self, punkt: Bruchpunkt) -> List[Tuple[float, Bewehrung]]:
         """
-        Ob auf der gezogenen Seite des Schwerpunkts Bewehrung liegt.
+        Die Zugbewehrung dieser Ebene, je Stab mit seinem v: die gedehnten
+        Staebe auf der gezogenen Seite des Schwerpunkts.
 
-        Die Frage der Platte nach der gezogenen Lage, fuer jede Form: ohne
-        obere Bewehrung haelt bei Zug oben nur der Stahl unten dagegen, kurz
-        ueber dem gedrueckten Rand -- das geht rechnerisch auf, sagt aber
-        weder ueber Duktilitaet noch ueber sproedes Versagen etwas.
+        Die Frage der Platte nach der gezogenen Lage, fuer jede Form. Ein
+        gedehnter Stab auf der anderen Seite liegt nur knapp jenseits der
+        Nulllinie -- etwa die obere Bewehrung bei Zug unten -- und ist keine
+        Zugbewehrung. Und ohne obere Bewehrung haelt bei Zug oben nur der Stahl
+        unten dagegen, kurz ueber dem gedrueckten Rand: das geht rechnerisch
+        auf, sagt aber weder ueber Duktilitaet noch ueber sproedes Versagen
+        etwas.
         """
-        return any(v > 0.0 for v in self.richtung(punkt.psi).staebe_v)
+        r = self.richtung(punkt.psi)
+        return [(v, s) for v, s in zip(r.staebe_v, self.bewehrung)
+                if v > 0.0 and punkt.eps_m + punkt.chi * v > 0.0]
 
     def druckzone(self, punkt: Bruchpunkt) -> Tuple[float, float]:
         """
         Druckzonenhoehe x und statische Hoehe d dieser Ebene, beide senkrecht
         zur Nulllinie und ab dem gedrueckten Betonrand gemessen.
 
-        d gehoert zum entferntesten gezogenen Stab. Ohne gezogenen Stab ist d
-        null, ohne Beton beides null.
+        d reicht bis zum Schwerpunkt der Zugbewehrung (:meth:`zugbewehrung`),
+        wie das Zeichen d in SIA 262:2025 definiert ist. Ohne Zugbewehrung ist
+        d null, ohne Beton beides null.
         """
         r = self.richtung(punkt.psi)
         if r.beton is None:
@@ -847,8 +854,9 @@ class Querschnitt:
             x = min(max(nulllinie - rand, 0.0), r.beton[1] - rand)
         else:
             x = (r.beton[1] - rand) if punkt.eps_m < 0.0 else 0.0
-        gezogen = [v for v in r.staebe_v if punkt.eps_m + punkt.chi * v > 0.0]
-        d = (max(gezogen) - rand) if gezogen else 0.0
+        zug = self.zugbewehrung(punkt)
+        flaeche = sum(s.flaeche for _, s in zug)
+        d = sum(v * s.flaeche for v, s in zug) / flaeche - rand if flaeche > 0.0 else 0.0
         return x, d
 
 

@@ -1,11 +1,11 @@
 ---
-erzeugt: 0ff5e3632e1d
+erzeugt: 5f41ad3ae3b0
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.2.2.4"
+normstelle: "SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.2.2.4
+> SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5
 
 *In der Herleitung: «Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear»*
 

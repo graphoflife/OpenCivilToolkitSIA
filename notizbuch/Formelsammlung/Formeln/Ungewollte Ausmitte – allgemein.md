@@ -1,11 +1,11 @@
 ---
-erzeugt: 70690382b486
+erzeugt: b06fbb54b9bd
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.7"
+normstelle: "SIA 262:2025, 4.1.3.2.3, (17); 4.3.7.5, (75)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.3.7
+> SIA 262:2025, 4.1.3.2.3, (17); 4.3.7.5, (75)
 
 $$
 \alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \qquad e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right)

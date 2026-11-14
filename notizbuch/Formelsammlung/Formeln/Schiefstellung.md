@@ -1,11 +1,11 @@
 ---
-erzeugt: 8072cdd127ce
+erzeugt: 75e7d07f79bb
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.7"
+normstelle: "SIA 262:2025, 4.1.3.2.3, (17)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.3.7
+> SIA 262:2025, 4.1.3.2.3, (17)
 
 $$
 \alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \quad \left(l\ \text{in}\ \mathrm{m}\right)

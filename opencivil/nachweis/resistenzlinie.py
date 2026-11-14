@@ -424,7 +424,7 @@ class Ebenenlinie(Widerstandslinie):
         p.ansatz(
             r"N = \int_A \sigma\,\mathrm{d}A \qquad "
             r"M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A",
-            titel="Schnittgrössen aus der Spannungsverteilung",
+            titel="Schnittgrössen aus der Spannungsverteilung", referenz="SIA 262:2025, 4.3.2.3",
         )
         mittel = ", jede mit ihrer mittleren Spannung" if wahl.art.mit_block else ""
         p.erklaerung(

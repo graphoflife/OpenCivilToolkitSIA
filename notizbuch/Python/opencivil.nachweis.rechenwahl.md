@@ -1,5 +1,5 @@
 ---
-erzeugt: e5e34dd09fb0
+erzeugt: 340bd5ca0b9c
 art: modul
 tags: [modul]
 ---
@@ -58,7 +58,7 @@ Die Zahlen, aus denen das Betongesetz entsteht -- SI, im Wertesatz der
 Wahl. Den Stahl traegt jede Lage selbst ([[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]]).
 
 - `f_c: float` – `f_cd` oder `f_ck`.
-- `E_cm: float`
+- `E_c: float` – Der Modul der Wahl, ohne Kriechen: `E_cm`, beim Knicken `E_cd`.
 - `eps_c1d: float`
 - `eps_c2d: float`
 
@@ -66,7 +66,7 @@ Wahl. Den Stahl traegt jede Lage selbst ([[opencivil.nachweis.rechenwahl#stahlla
 
 ```python
 @classmethod
-def aus_eingaben(cls, e: Eingaben, satz: Werkstoffsatz) -> 'Betonkennwerte'
+def aus_eingaben(cls, e: Eingaben, wahl: Rechenwahl) -> 'Betonkennwerte'
 ```
 
 Aus den Eingaben, die [[opencivil.nachweis.rechenwahl#betonbezuege|betonbezuege]] anmeldet.
@@ -74,13 +74,14 @@ Aus den Eingaben, die [[opencivil.nachweis.rechenwahl#betonbezuege|betonbezuege]
 ### betonbezuege
 
 ```python
-def betonbezuege(satz: Werkstoffsatz, beton) -> List[Eingabebezug]
+def betonbezuege(satz: Werkstoffsatz, beton, *, modul: str='E_cm') -> List[Eingabebezug]
 ```
 
 Was das Betongesetz einer Wahl braucht -- unter den Kurznamen des
-Wertesatzes, `f_cd` oder `f_ck`. So steht in der Herleitung das
-Zeichen, mit dem gerechnet wird. Die Reihenfolge ist die, in der die
-Werte in der Herleitung der Baustoffe erscheinen.
+Wertesatzes, `f_cd` oder `f_ck`, und des Moduls der Wahl
+([[opencivil.querschnitt.gesetzwahl#Rechenwahl|modul]]). So steht in
+der Herleitung das Zeichen, mit dem gerechnet wird. Die Reihenfolge ist
+die, in der die Werte in der Herleitung der Baustoffe erscheinen.
 
 ### staehle
 

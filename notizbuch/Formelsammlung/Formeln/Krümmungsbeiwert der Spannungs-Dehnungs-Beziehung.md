@@ -1,11 +1,11 @@
 ---
-erzeugt: df81d2c6891f
+erzeugt: cb55d9ea4f1e
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.2.1.6"
+normstelle: "SIA 262:2025, 4.2.1.6, (27)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.2.1.6
+> SIA 262:2025, 4.2.1.6, (27)
 
 $$
 k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}}
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 4.202
+k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}} = \frac{28016\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 3.502
 $$
 
 ## Im Code

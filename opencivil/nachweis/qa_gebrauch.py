@@ -338,8 +338,7 @@ class RissnormalkraftQA(Nachweis):
             f_ctm = e[stoff.eingabename("f_ctm")]
             f_ct_eff = protokoll_zugfestigkeit(
                 p, unter, k_t=k_t, f_ct_eff=k_t * abs(f_ctm.groesse.si), h=t, f_ctm=f_ctm,
-                teiler=1, referenz="SIA 262:2025, 4.4.2",
-                titel=f"Beiwert für die rissaktive Dicke, {stoff.name}")
+                teiler=1, titel=f"Beiwert für die rissaktive Dicke, {stoff.name}")
             glieder.append((unter.flaeche("A_c", mit_index("A_c", stoff.symbol_index), A_c,
                                           f"Betonfläche {stoff.name}"), f_ct_eff))
         N_Riss = werte.kraft("N_Riss", "N_{Riss}",
@@ -404,8 +403,7 @@ class ZwaengungBiegungQA(Biegezwang):
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
                 continue
             M_s_adm_si, ebene, stab = gefunden
-            M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z,
-                                          referenz=self.REFERENZ)
+            M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z)
             M_s_adm = werte.moment("M_s_adm", r"M_{s,adm}", M_s_adm_si, "Widerstand")
             p.wert(M_s_adm, titel="Moment, bei dem der erste gezogene Stab σ_s,adm erreicht")
             protokoll_ebene(p, werte, ebene, self.analyse.biegung)

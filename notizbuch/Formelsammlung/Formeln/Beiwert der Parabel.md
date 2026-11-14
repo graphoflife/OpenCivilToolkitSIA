@@ -1,10 +1,11 @@
 ---
-erzeugt: 2f93282fe676
+erzeugt: a3c9a3f04df0
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe
 
 *In der Herleitung: «Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel»*
 
@@ -45,12 +46,14 @@ $$
 ## Theorie
 
 Der Krümmungsbeiwert der Parabel aus dem Modul, mit dem das Gesetz rechnet
--- eine Regel für jede Rechnung. Im Bruchzustand ist das $E_{cm}$, unter
-Dauerlast der kriechweiche [[Wirksamer Elastizitätsmodul|wirksame Modul]]
-$E_{cm}/(1+\varphi)$: die Parabel beginnt dann flacher, der Beton gibt nach.
-Der Beton selbst nennt denselben Beiwert mit $E_{cd}$ (siehe
-[[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]); mit
-$\gamma_{cE} = 1$ ist das dieselbe Zahl.
+-- eine Regel für jede Rechnung. Im Bruchzustand des Querschnitts ist das
+$E_{cm}$, also $\gamma_{cE} = 1.0$; für die Verformung beim Knicken
+$E_{cd} = E_{cm}/1.2$ (SIA 262:2025, 4.2.1.15 bis 4.2.1.17). Unter Dauerlast
+kommt der kriechweiche [[Wirksamer Elastizitätsmodul|wirksame Modul]]
+$E_c/(1+\varphi)$ dazu: die Parabel beginnt dann flacher, der Beton gibt nach.
+Der Beton selbst nennt den Beiwert mit $E_{cd}$ für das Knicken (siehe
+[[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]); bis 2026-11-14
+stand hier, mit $\gamma_{cE} = 1$ sei das dieselbe Zahl.
 
 Mit grossem $\varphi$ und charakteristischen Werten würde $k_\sigma$ kleiner
 als 1. Dann hätte der Nenner der Parabel, $1 + (k_\sigma - 2)\,\eta$, im

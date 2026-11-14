@@ -1,10 +1,11 @@
 ---
-erzeugt: aa6b65e30718
+erzeugt: 50994744b32e
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.2.2.2, Figur 16"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.2.2.2, Figur 16
 
 $$
 \sigma_{sd} = \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right]

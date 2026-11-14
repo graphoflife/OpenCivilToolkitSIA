@@ -1,11 +1,11 @@
 ---
-erzeugt: 46f4e5f3d037
+erzeugt: a830094db91e
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.4.1.3"
+normstelle: "SIA 262:2025, 4.3.1.2"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.4.1.3
+> SIA 262:2025, 4.3.1.2
 
 *In der Herleitung: «Sprödes Versagen»*
 

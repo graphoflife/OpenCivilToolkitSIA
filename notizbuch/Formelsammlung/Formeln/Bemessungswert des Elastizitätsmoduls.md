@@ -1,11 +1,11 @@
 ---
-erzeugt: 5d8818c5355a
+erzeugt: 520d0510b591
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.2.1.15"
+normstelle: "SIA 262:2025, 4.2.1.15, (33)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.2.1.15
+> SIA 262:2025, 4.2.1.15, (33)
 
 $$
 E_{cd} = \frac{E_{cm}}{\gamma_{cE}}
@@ -16,14 +16,14 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $E_{cm}$ | Mittelwert des Elastizitätsmoduls | N/mm² | [[Mittelwert des Elastizitätsmoduls]] |
-| $\gamma_{cE}$ | Teilsicherheitsbeiwert für den Elastizitätsmodul | – | Vorgabe |
+| $\gamma_{cE}$ | Teilsicherheitsbeiwert für den Elastizitätsmodul, Druckglieder mit Einflüssen 2. Ordnung | – | Vorgabe |
 
 ## Beispiel
 
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-E_{cd} = \frac{E_{cm}}{\gamma_{cE}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
+E_{cd} = \frac{E_{cm}}{\gamma_{cE}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1.2} = 28016\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ## Gebraucht von

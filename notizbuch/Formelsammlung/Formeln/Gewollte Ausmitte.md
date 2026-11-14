@@ -1,10 +1,11 @@
 ---
-erzeugt: ea85ce14500f
+erzeugt: 5e0b54b2e8fc
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.3.7.6, (76)"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.3.7.6, (76)
 
 $$
 e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right|

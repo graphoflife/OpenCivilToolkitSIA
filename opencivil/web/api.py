@@ -38,7 +38,7 @@ from opencivil.decke.modell import Aufteilung
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN, betonsorten_zum_anlegen
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsorten_zum_anlegen
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
-from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
+from opencivil.nachweis.duktilitaet import BEIWERT as DUKTILITAET_BEIWERT, HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import BAUTEILE, Aufbau, SkriptEintrag
 from opencivil.projekt import balkensystem as bs
@@ -334,9 +334,9 @@ def katalog() -> dict:
             {"wert": m.value, "beschriftung": m.beschriftung}
             for m in Suchmodus
         ],
-        # Wie weit sich die Grenze x/d hoechstens setzen laesst -- fuer das
+        # Vorgabe und Hoechstwert des Beiwerts k der Grenze x/d -- fuer das
         # Feld; geprueft wird beim Bauen der Platte.
-        "duktilitaet": {"hoechstens": DUKTILITAET_HOECHSTENS},
+        "duktilitaet": {"vorgabe": DUKTILITAET_BEIWERT, "hoechstens": DUKTILITAET_HOECHSTENS},
         # Die Seiten, die ein Verformungsfall ziehen kann.
         "verformung": {"zugseiten": [{"wert": s.value, "beschriftung": s.value}
                                      for s in UM_Y]},

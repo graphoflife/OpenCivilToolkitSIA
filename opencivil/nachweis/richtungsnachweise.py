@@ -27,11 +27,12 @@ from __future__ import annotations
 from typing import Dict, List
 
 from opencivil.core.berechnung import Ausfuehrung, Eingaben
-from opencivil.core.nachweis import Nachweis, NachweisUrteil, Vergleich, grad_def
-from opencivil.core.latex import als_text, vergleich
+from opencivil.core.nachweis import NICHT_FUEHRBAR, Nachweis, NachweisUrteil, Vergleich, grad_def
+from opencivil.core.latex import als_text, angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef, kennung_aus
-from opencivil.nachweis.duktilitaet import DUKTILITAETSBEDINGUNG
+from opencivil.material.basis import Baustoffart
+from opencivil.nachweis import duktilitaet
 from opencivil.nachweis.rissgroessen import (
     bruttoquerschnitt, protokoll_rissmoment, protokoll_spannung_ungerissen, rissbezuege,
     rissmoment,
@@ -59,34 +60,37 @@ def grade_je_seite(basis: str, symbol: str, beschreibung: str, referenz: str,
 
 
 class DuktilitaetQA(Nachweis):
-    """``x/d <= Grenze`` bei reiner Biegung, je Richtung."""
+    """``x/d <= k * 435 N/mm^2 / f_yd`` bei reiner Biegung, je Richtung."""
 
     THEMA = "Duktilität je Richtung"
     LANGNAME = "Duktilität"
     ART = "x/d"
 
-    def __init__(self, analyse: Querschnittsanalyse, *, grenze: float) -> None:
+    def __init__(self, analyse: Querschnittsanalyse, *, beiwert: float) -> None:
         self.analyse = analyse
-        self.grenze = grenze
+        self.beiwert = beiwert
         basis = f"{analyse.id}.nachweis.duktilitaet"
         self.d_ausnutzung = grade_je_seite(basis, "x/d", "Erfüllungsgrad Duktilität",
-                                           "SIA 262:2025, 4.1.4.2.5", analyse)
+                                           duktilitaet.REFERENZ, analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege(),
                          titel=f"Duktilität – {analyse.name}",
-                         referenz="SIA 262:2025, 4.1.4.2.5", abschnitt=analyse.abschnitt)
+                         referenz=duktilitaet.REFERENZ, abschnitt=analyse.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         q, _ = self.analyse.interaktion(e)
         p.erklaerung(
-            "Ein Querschnitt kündigt sein Versagen an, wenn die Bewehrung fliesst, "
-            "bevor der Beton bricht -- dann ist die Druckzone klein. Gemessen wird "
-            "das an x/d bei reiner Biegung: x ist der Abstand der Nulllinie vom "
-            "gedrücktesten Betonpunkt, d der des entferntesten gezogenen Stabs, "
-            "beide senkrecht zur Nulllinie.")
-        p.ansatz(r"\frac{x}{d} \le \left(\frac{x}{d}\right)_{max}",
-                 titel="Duktilität", referenz="SIA 262:2025, 4.1.4.2.5",
-                 name=DUKTILITAETSBEDINGUNG)
+            "Ein Querschnitt kann Schnittgrössen umlagern, wenn die Bewehrung "
+            "fliesst, bevor der Beton bricht -- dann ist die Druckzone klein. "
+            "Gemessen wird das an x/d bei reiner Biegung: x ist der Abstand der "
+            "Nulllinie vom gedrücktesten Betonpunkt, d der des Schwerpunkts der "
+            "Zugbewehrung, beide senkrecht zur Nulllinie. Zur Zugbewehrung "
+            "zählen die gedehnten Stäbe auf der gezogenen Seite des "
+            "Schwerpunkts; liegen dort verschiedene Stähle, gilt die Grenze des "
+            "festesten.")
+        duktilitaet.protokoll_bedingung(p, self.beiwert)
+        f_ck = max((self.analyse.kennwert(e, s, "f_ck") for s in self.analyse.baustoffe
+                    if s.art is Baustoffart.BETON), default=0.0)
         urteile: List[NachweisUrteil] = []
         for seite in self.analyse.zugseiten:
             name = seite.beschriftung
@@ -95,20 +99,32 @@ class DuktilitaetQA(Nachweis):
             punkt = self.analyse.biegung.bei_reiner_biegung(q, seite)
             x, d = q.druckzone(punkt)
             p.titel(name, ebene=3)
-            if d <= 0.0 or not q.zugseite_bewehrt(punkt):
+            if d <= 0.0:
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
                 continue
+            # Die Werkstoffe der Interaktion stehen in der Reihenfolge der Baustoffe.
+            staehle = [self.analyse.baustoffe[w]
+                       for w in sorted({s.werkstoff for _, s in q.zugbewehrung(punkt)})]
+            grund = duktilitaet.hindernis(staehle, f_ck)
+            if grund:
+                p.text(grund)
+                urteile.append(self.urteil(d_grad, name, NICHT_FUEHRBAR, grund))
+                continue
+            stahl = max(staehle, key=lambda s: self.analyse.kennwert(e, s, "f_yd"))
+            grenze = duktilitaet.grenze(self.beiwert, self.analyse.kennwert(e, stahl, "f_yd"))
+            g = werte.zahl("grenze", r"\left(x/d\right)_{max}", grenze)
+            duktilitaet.protokoll_grenze(p, werte, g, beiwert=self.beiwert,
+                                         f_yd=e[stahl.eingabename("f_yd")])
             verhaeltnis = x / d
             x_d = werte.zahl("x_d", "x/d", verhaeltnis)
-            v = Vergleich(x_d, werte.zahl("grenze", r"\left(x/d\right)_{max}", self.grenze,
-                                          stellen=2))
+            v = Vergleich(x_d, g)
             p.formel(x_d, r"\frac{@x}{@d}",
                      {"x": werte.laenge("x", "x", x), "d": werte.laenge("d", "d", d)},
                      titel="Bezogene Druckzonenhöhe bei reiner Biegung",
-                     nachsatz=vergleich(r"\le", f"{self.grenze:g}", v.erfuellt))
+                     nachsatz=vergleich(r"\le", angabe(g), v.erfuellt))
             v.zeile(p, d_grad)
             urteile.append(self.urteil(d_grad, name, v,
-                                       f"x/d = {verhaeltnis:.3f} gegen {self.grenze:g}."))
+                                       f"x/d = {verhaeltnis:.3f} gegen {grenze:.3f}."))
         self.protokoll_massgebend(p, urteile)
         return Ausfuehrung({}, self.teilurteile(urteile))
 
@@ -124,11 +140,11 @@ class SproedesVersagenQA(Nachweis):
         self.analyse = analyse
         basis = f"{analyse.id}.nachweis.sproede"
         self.d_ausnutzung = grade_je_seite(basis, "Riss", "Erfüllungsgrad sprödes Versagen",
-                                           "SIA 262:2025, 4.4.1.3", analyse)
+                                           "SIA 262:2025, 4.3.1.2", analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
                          titel=f"Sprödes Versagen – {analyse.name}",
-                         referenz="SIA 262:2025, 4.4.1.3", abschnitt=analyse.abschnitt)
+                         referenz="SIA 262:2025, 4.3.1.2", abschnitt=analyse.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         q, _ = self.analyse.interaktion(e)
@@ -141,7 +157,7 @@ class SproedesVersagenQA(Nachweis):
             "Deviationsmoment.")
         protokoll_spannung_ungerissen(p, self.analyse.biegung)
         p.ansatz(r"M_{Rd}(N = 0) \ge M_{Riss} = f_{ct,eff} \cdot W",
-                 titel="Sprödes Versagen", referenz="SIA 262:2025, 4.4.1.3",
+                 titel="Sprödes Versagen", referenz="SIA 262:2025, 4.3.1.2",
                  name="Bedingung gegen sprödes Versagen")
 
         brutto = bruttoquerschnitt(self.analyse, e.si_nach_id())
@@ -153,13 +169,12 @@ class SproedesVersagenQA(Nachweis):
             p.titel(name, ebene=3)
             punkt = self.analyse.biegung.bei_reiner_biegung(q, seite)
             _, d = q.druckzone(punkt)
-            if d <= 0.0 or not q.zugseite_bewehrt(punkt):
+            if d <= 0.0:
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
                 continue
 
             riss = rissmoment(brutto, M_y, M_z)
-            M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, brutto, riss, M_y, M_z,
-                                          referenz="SIA 262:2025, 4.4.1.3")
+            M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, brutto, riss, M_y, M_z)
             M_Rd_si = self.analyse.biegung.betrag(punkt.M_y, punkt.M_z)
             M_Rd = werte.moment("M_Rd", "M_{Rd}", M_Rd_si)
             p.wert(M_Rd, titel="Biegewiderstand bei N = 0 in dieser Richtung")

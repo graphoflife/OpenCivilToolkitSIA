@@ -833,18 +833,8 @@
       ],
       "themen": [
         "Biegung und Normalkraft",
+        "Duktilität",
         "Kennzahlen"
-      ]
-    },
-    {
-      "name": "Druckzonenhöhe bei reiner Biegung",
-      "pfad": "Formelsammlung/Formeln/Druckzonenhöhe bei reiner Biegung.md",
-      "art": "formel",
-      "zeichen": [
-        "x"
-      ],
-      "themen": [
-        "Duktilität"
       ]
     },
     {
@@ -1297,6 +1287,18 @@
       "zeichen": [],
       "themen": [
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Grenze der bezogenen Druckzonenhöhe",
+      "pfad": "Formelsammlung/Formeln/Grenze der bezogenen Druckzonenhöhe.md",
+      "art": "formel",
+      "zeichen": [
+        "\\left(x/d\\right)_{max}"
+      ],
+      "themen": [
+        "Duktilität",
+        "Duktilität je Richtung"
       ]
     },
     {
@@ -3918,6 +3920,7 @@
       "kurz": "Betonstahl nach SIA 262:2025.",
       "stichworte": [
         "Stahlsorte",
+        "duktilitaetsklasse",
         "stahlsorten_zum_anlegen",
         "betonstahl",
         "betonstahl_frei"
@@ -3981,6 +3984,10 @@
       "art": "modul",
       "kurz": "Duktilitaetsnachweis ueber die Druckzonenhoehe.",
       "stichworte": [
+        "grenze",
+        "hindernis",
+        "protokoll_bedingung",
+        "protokoll_grenze",
         "Lagenergebnis",
         "druckzonenhoehe",
         "Duktilitaet",
@@ -4066,6 +4073,7 @@
       "art": "modul",
       "kurz": "Nachweis am verformten System.",
       "stichworte": [
+        "verformungswahl",
         "Knickfall",
         "Knickfall.kennung",
         "Durchlauf",
@@ -5438,6 +5446,7 @@
         "Rechenart.mit_block",
         "Rechenart.ohne_ebene",
         "Rechenwahl",
+        "Rechenwahl.betonkennwerte",
         "Rechenwahl.index",
         "Rechenwahl.beschriftung",
         "wirksamer_modul",
@@ -5476,7 +5485,7 @@
         "Querschnitt._flaechenstufen",
         "Querschnitt.anteile",
         "Querschnitt.dehnung",
-        "Querschnitt.zugseite_bewehrt",
+        "Querschnitt.zugbewehrung",
         "Querschnitt.druckzone",
         "_bei_n_gelesen",
         "_schnittstellen"

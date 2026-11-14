@@ -23,7 +23,7 @@ from opencivil.core.einheiten import GRAD, KN, KNM, M, MM, MM2, PROMILLE, PROZEN
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
-from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX, HOECHSTENS as X_D_HOECHSTENS
+from opencivil.nachweis.duktilitaet import BEIWERT as X_D_BEIWERT, HOECHSTENS as X_D_HOECHSTENS
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
@@ -231,11 +231,12 @@ def druckfeld() -> Any:
 
 def x_d_grenze() -> Any:
     """
-    Die Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis --
-    Vorgabe und Hoechstwert stehen beim Nachweis (``duktilitaet.GRENZE``,
-    ``duktilitaet.HOECHSTENS``).
+    Der Beiwert k der Grenze ``x/d <= k * 435 N/mm^2 / f_yd`` im
+    Duktilitaetsnachweis -- Vorgabe und Hoechstwert stehen beim Nachweis
+    (``duktilitaet.BEIWERT``, ``duktilitaet.HOECHSTENS``).
     """
-    return bereich(X_D_MAX, heisst="max. x/d", ueber=0.0, bis=X_D_HOECHSTENS)
+    return bereich(X_D_BEIWERT, heisst="k der Grenze x/d",
+                   ueber=0.0, bis=X_D_HOECHSTENS)
 
 
 # ===========================================================================
@@ -442,10 +443,12 @@ class KnickEintrag(Beschreibung):
     """in kN, Druck negativ."""
 
     M_Ed_1: float = 0.0
-    laenge: float = bereich(3.0, heisst="Systemlänge", einheit=M, ueber=0.0)
+    laenge: float = bereich(3.0, heisst="Höhe des Druckglieds", einheit=M, ueber=0.0)
     """
-    Systemlaenge in m -- geht in die Schiefstellung ein. Bis 2026-10-16
-    rechnete eine Laenge von null und hiess «erfuellt».
+    Hoehe des Druckglieds in m, bei mehreren uebereinander ihre ganze Hoehe
+    (SIA 262:2025, 4.1.3.2.3) -- sie bestimmt die Schiefstellung. Bis
+    2026-11-14 hiess sie Systemlaenge; bis 2026-10-16 rechnete eine Laenge von
+    null und hiess «erfuellt».
     """
 
     knicklaenge: float = bereich(3.0, heisst="Knicklänge", einheit=M, ueber=0.0)
@@ -828,7 +831,12 @@ class Querschnittsangaben(BauteilEintrag):
     """
 
     x_d_max: float = x_d_grenze()
-    """Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis."""
+    """
+    Der Beiwert k der Grenze ``x/d <= k * 435 N/mm^2 / f_yd`` im
+    Duktilitaetsnachweis. Bis 2026-11-14 war er selbst die Grenze; bei B500
+    sind beide gleich, darum heisst das Feld weiter so, und alte Dateien
+    lesen sich ohne Umweg.
+    """
 
     knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)
     """

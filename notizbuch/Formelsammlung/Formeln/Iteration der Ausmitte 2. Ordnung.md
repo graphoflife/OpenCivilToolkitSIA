@@ -1,11 +1,11 @@
 ---
-erzeugt: 324f6939fa0c
+erzeugt: 2f0347435226
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.7"
+normstelle: "SIA 262:2025, 4.3.7.2; 4.3.7.3, (73); 4.3.7.4, (74); 4.3.7.7, (77); 4.3.7.12, (81)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.3.7
+> SIA 262:2025, 4.3.7.2; 4.3.7.3, (73); 4.3.7.4, (74); 4.3.7.7, (77); 4.3.7.12, (81)
 
 *In der Herleitung: «Das Verfahren»*
 

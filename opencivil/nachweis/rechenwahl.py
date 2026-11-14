@@ -91,29 +91,32 @@ class Betonkennwerte:
     f_c: float
     """``f_cd`` oder ``f_ck``."""
 
-    E_cm: float
+    E_c: float
+    """Der Modul der Wahl, ohne Kriechen: ``E_cm``, beim Knicken ``E_cd``."""
+
     eps_c1d: float
     eps_c2d: float
 
     @classmethod
-    def aus_eingaben(cls, e: Eingaben, satz: Werkstoffsatz) -> "Betonkennwerte":
+    def aus_eingaben(cls, e: Eingaben, wahl: Rechenwahl) -> "Betonkennwerte":
         """Aus den Eingaben, die :func:`betonbezuege` anmeldet."""
-        return cls(f_c=e.g(satz.beton).si, E_cm=e.g("E_cm").si,
+        return cls(f_c=e.g(wahl.satz.beton).si, E_c=e.g(wahl.modul).si,
                    eps_c1d=e.g("eps_c1d").si, eps_c2d=e.g("eps_c2d").si)
 
 
-def betonbezuege(satz: Werkstoffsatz, beton) -> List[Eingabebezug]:
+def betonbezuege(satz: Werkstoffsatz, beton, *, modul: str = "E_cm") -> List[Eingabebezug]:
     """
     Was das Betongesetz einer Wahl braucht -- unter den Kurznamen des
-    Wertesatzes, ``f_cd`` oder ``f_ck``. So steht in der Herleitung das
-    Zeichen, mit dem gerechnet wird. Die Reihenfolge ist die, in der die
-    Werte in der Herleitung der Baustoffe erscheinen.
+    Wertesatzes, ``f_cd`` oder ``f_ck``, und des Moduls der Wahl
+    (:attr:`~opencivil.querschnitt.gesetzwahl.Rechenwahl.modul`). So steht in
+    der Herleitung das Zeichen, mit dem gerechnet wird. Die Reihenfolge ist
+    die, in der die Werte in der Herleitung der Baustoffe erscheinen.
     """
     return [
         Eingabebezug(satz.beton, beton.id_von(satz.beton)),
         Eingabebezug("eps_c1d", beton.id_von("eps_c1d")),
         Eingabebezug("eps_c2d", beton.id_von("eps_c2d")),
-        Eingabebezug("E_cm", beton.id_von("E_cm")),
+        Eingabebezug(modul, beton.id_von(modul)),
     ]
 
 
@@ -270,7 +273,7 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
     (:func:`~opencivil.nachweis.querschnittsloeser.protokoll_wirksamer_modul`).
     """
     satz = wahl.satz
-    g = gesetze(wahl, Betonkennwerte.aus_eingaben(e, satz))
+    g = gesetze(wahl, Betonkennwerte.aus_eingaben(e, wahl))
     if wahl.art is Rechenart.HANDRECHNUNG:
         p.erklaerung(
             "Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie "
@@ -278,8 +281,8 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
             "Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in "
             "ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, "
             "wo der Stahl liegt.")
-    beton = {rolle: e[name] for rolle, name in satz.betonkennwerte.items()}
-    beton["E_c"] = wirksamer_modul_wert(e["E_cm"], wahl.kriechzahl, basis)
+    beton = {rolle: e[name] for rolle, name in wahl.betonkennwerte.items()}
+    beton["E_c"] = wirksamer_modul_wert(beton["E_c"], wahl.kriechzahl, basis)
     g.beton.protokoll(p, beton, titel=titel, basis=basis)
 
     sorten = staehle(posten)
@@ -308,7 +311,7 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
         unter = f"{basis}.{kennung_aus(stoff.id)}"
         if stoff.art is Baustoffart.BETON:
             werte = {rolle: e[stoff.eingabename(name)]
-                     for rolle, name in satz.betonkennwerte.items()}
+                     for rolle, name in wahl.betonkennwerte.items()}
             if wahl.art.mit_kriechzahl:
                 protokoll_wirksamer_modul(p, werte["E_c"], phi, unter,
                                           titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
@@ -328,7 +331,7 @@ def gesetze(wahl: Rechenwahl, w: Betonkennwerte, *, ungerissen: bool = False) ->
     Stahlspannungen fest mit 4.5 %, das Knicken und die Analysen mit dem der
     ersten Lage.
     """
-    return Gesetze(wahl=wahl, beton=betongesetz(wahl, f_c=w.f_c, E_cm=w.E_cm,
+    return Gesetze(wahl=wahl, beton=betongesetz(wahl, f_c=w.f_c, E_c=w.E_c,
                                                 eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d,
                                                 ungerissen=ungerissen),
                    kennwerte=w)

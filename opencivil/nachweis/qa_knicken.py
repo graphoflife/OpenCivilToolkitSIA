@@ -21,7 +21,8 @@ DIE NULLLINIE BLEIBT PARALLEL ZUR ACHSE:
 wie in der einachsigen Tragsicherheit und den Analysen. Das Moment um die
 andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zaehlt nicht;
 um beide Achsen zugleich knickt hier kein Stab -- je Richtung ein Fall.
-Nach Vorgabe, nicht nachgeschlagen (``notizbuch/Notizen/TODO.md``).
+Nach Vorgabe: SIA 262:2025, 4.3.7 regelt das Knicken um beide Achsen
+zugleich nicht (``notizbuch/Notizen/TODO.md``).
 
 WAS ES KOSTET:
 Jede Probekraft der Suche nach N_Rd ist eine ganze Ausmitten-Iteration, jede
@@ -46,6 +47,7 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.suche import ILLINOIS
 from opencivil.nachweis.knicken import (
     VERFORMUNG, VERFORMUNG_NACH_WAHL, WIDERSTAND, Knickfall, Knickstab, Knickverfahren,
+    verformungswahl,
 )
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
@@ -96,7 +98,7 @@ class KnickenQA(Knickverfahren):
             raise ValueError("Der Knicknachweis braucht mindestens einen Fall.")
         self.analyse = analyse
         self.faelle = list(faelle)
-        self.verformung = verformung
+        self.verformung = verformungswahl(verformung)
         self.widerstand = widerstand
         self.schnell = schnell
         basis = f"{analyse.id}.nachweis.knicken"

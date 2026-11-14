@@ -1,5 +1,5 @@
 ---
-erzeugt: f872e4a39991
+erzeugt: ba17af96cd7a
 art: modul
 tags: [modul]
 ---
@@ -122,6 +122,17 @@ erzeugt, und die Suche nach `N_Rd` als Verfahren beschrieben: von der
 laeuft nur das Ergebnis mit, sonst stuenden vierzig Iterationstabellen da.
 
 ## Inhalt
+
+### verformungswahl
+
+```python
+def verformungswahl(wahl: Rechenwahl) -> Rechenwahl
+```
+
+Die Wahl der Verformung, mit `E_cd = E_cm / gamma_cE`: ein Druckglied
+mit Einfluessen 2. Ordnung verformt sich mit dem Bemessungswert des
+Moduls (SIA 262:2025, 4.2.1.17, Regelwert gamma_cE = 1.2). Bis 2026-11-14
+rechnete es mit `E_cm`, also 20 % zu steif.
 
 ### Knickfall
 
@@ -387,9 +398,9 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - `SCHRANKE = 0.0001` – Wann die Iteration als eingelaufen gilt -- Aenderung des Moments.
 - `HALBIERUNGEN = 14` – Durchlaeufe der Halbierung, die N_Rd sucht. Das Fenster ist so breit wie die getragene Kraft selbst; 14 Schritte bringen es auf deren Sechzehntausendstel, bei 2000 kN also auf ein Zehntel Kilonewton. Jeder weitere Schritt kostet eine vollstaendige Ausmitten-Iteration und aendert nichts mehr an der Zahl, die in der Tabelle steht.
 - `OBERGRENZE = 64.0` – Wie weit die Suche nach oben gehen darf, als Vielfaches von \|N_Ed\|. Wer einen Stab mit alpha_eff > 64 baut, hat kein Knickproblem.
-- `ALPHA_UNTEN = 1.0 / 300.0` – Riegel der Schiefstellung, SIA 262:2025, 4.3.7.
+- `ALPHA_UNTEN = 1.0 / 300.0` – Riegel der Schiefstellung, SIA 262:2025, 4.1.3.2.3, (17).
 - `ALPHA_OBEN = 1.0 / 200.0`
-- `VERFORMUNG_NACH_WAHL = 'Die Verformung rechnet präzise, mit der Parabel; Kriechzahl und Wert…` – Warum die Wahl der Verformung zaehlt -- fuer jeden Knicknachweis derselbe Satz.
+- `VERFORMUNG_NACH_WAHL = 'Die Verformung rechnet präzise, mit der Parabel und mit dem Bemessun…` – Warum die Wahl der Verformung zaehlt -- fuer jeden Knicknachweis derselbe Satz.
 
 ## Braucht
 

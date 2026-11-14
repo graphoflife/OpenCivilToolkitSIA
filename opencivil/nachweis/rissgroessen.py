@@ -48,9 +48,15 @@ from opencivil.core.wert import Wert
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.biegung import SCHIEF, Biegung
 
-#: Teiler der Hoehe in Biegerichtung im Beiwert. Unter Biegung reisst der
-#: Randbereich, nicht die halbe Hoehe wie beim Zwang. SIA 262:2025, 4.4.1.3.
+#: Teiler der Hoehe in Biegerichtung im Beiwert: unter Biegung zaehlt bei
+#: Platten und Rechtecken ein Drittel der Hoehe, unter Zug die kleinste
+#: Abmessung des gezogenen Teils, bei der Platte also die ganze Dicke.
+#: SIA 262:2025, 4.4.1.3.
 MOMENTENTEILER = 3.0
+
+#: Woher ``k_t`` und ``f_ct,eff`` kommen -- fuer jeden Nachweis dieselbe Stelle.
+REFERENZ_BEIWERT = "SIA 262:2025, 4.4.1.3, (100)"
+REFERENZ_ZUGFESTIGKEIT = "SIA 262:2025, 4.4.1.3, (99)"
 
 #: Groesste rissaktive Dicke unter Zug, in m -- wo die Begrenzung eingeschaltet ist.
 DICKENGRENZE = 0.500
@@ -83,8 +89,7 @@ def rissaktive_dicke(*, h: float, b: float = math.inf, zug: bool,
 
 def protokoll_zugfestigkeit(
     p: Protokoll, werte: Zwischenwerte, *, k_t: float, f_ct_eff: float,
-    h: Wert, f_ctm: Wert, teiler: float, referenz: str,
-    titel: str = "Beiwert für die Plattendicke",
+    h: Wert, f_ctm: Wert, teiler: float, titel: str = "Beiwert für die Plattendicke",
 ) -> Wert:
     """
     Beiwert fuer die Dicke und wirksame Zugfestigkeit, hergeleitet.
@@ -96,11 +101,11 @@ def protokoll_zugfestigkeit(
     anteil = "@h" if teiler == 1 else rf"@h/{teiler:.0f}"
     beiwert = werte.zahl("k_t", "k_t", k_t)
     p.formel(beiwert, rf"\frac{{1}}{{1 + 0.5 \cdot {anteil}}}", {"h": h},
-             titel=titel, referenz=referenz, empirisch={"h": M},
+             titel=titel, referenz=REFERENZ_BEIWERT, empirisch={"h": M},
              name="Beiwert für die Dicke")
     wirksam = werte.spannung("f_ct_eff", "f_{ct,eff}", f_ct_eff, stellen=2)
     p.formel(wirksam, r"@k_t \cdot @f_ctm", {"k_t": beiwert, "f_ctm": f_ctm},
-             titel="Wirksame Zugfestigkeit")
+             titel="Wirksame Zugfestigkeit", referenz=REFERENZ_ZUGFESTIGKEIT)
     return wirksam
 
 
@@ -136,7 +141,7 @@ def rissmoment_wert(basis: str, g: Rissgroessen) -> Wert:
 
 
 def protokoll_rissmoment_rechteck(
-    p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str, referenz: str,
+    p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str,
 ) -> None:
     """
     Das Rissmoment von ``k_t`` an -- fuer das spröde Versagen und die
@@ -145,7 +150,7 @@ def protokoll_rissmoment_rechteck(
     """
     f_ct_eff = protokoll_zugfestigkeit(
         p, Zwischenwerte(basis), k_t=g.k_t, f_ct_eff=g.f_ct_eff, h=e["h"],
-        f_ctm=e["f_ctm"], teiler=MOMENTENTEILER, referenz=referenz)
+        f_ctm=e["f_ctm"], teiler=MOMENTENTEILER)
     p.formel(rissmoment_wert(basis, g), r"@f_ct_eff \cdot \frac{@h^{2} \cdot @b}{6}",
              {"f_ct_eff": f_ct_eff, "h": e["h"], "b": e["b"]},
              titel="Rissmoment des ungerissenen Querschnitts")
@@ -340,7 +345,7 @@ def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoque
 
 def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
                          werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment,
-                         M_y: float, M_z: float, *, referenz: str) -> Wert:
+                         M_y: float, M_z: float) -> Wert:
     """Die Herleitung von :func:`rissmoment` -- zurueck kommt ``M_Riss``."""
     ecke = riss.ecke
     protokoll_ecke(p, ecke)
@@ -348,7 +353,7 @@ def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse
     f_ct_eff = protokoll_zugfestigkeit(
         p, werte, k_t=riss.k_t, f_ct_eff=riss.f_ct_eff, h=h,
         f_ctm=e[ecke.stoff.eingabename("f_ctm")], teiler=MOMENTENTEILER,
-        referenz=referenz, titel="Beiwert für die Höhe in Biegerichtung")
+        titel="Beiwert für die Höhe in Biegerichtung")
     W = protokoll_widerstandsmoment(p, werte, q, ecke, riss.W, M_y, M_z)
     M_Riss = werte.moment("M_Riss", "M_{Riss}", riss.M_Riss)
     p.formel(M_Riss, r"@f \cdot @W", {"f": f_ct_eff, "W": W},
