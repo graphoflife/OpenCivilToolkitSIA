@@ -7,6 +7,27 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Decken: ein Hinweis bei schiefen Platten
+
+Trägt eine Platte schief zu x und y, steht im Bericht unter der
+linearisierten Fliessbedingung ein Hinweis (Benutzer, 2026-11-14): ihre
+Streifen geben Drillmomente, und die Bedingung gilt nur näherungsweise und
+bei mässigen Drillmomenten (SIA 262:2025, 4.3.2.6); wo die Hauptmomente
+deutlich schräg zur Bewehrung stehen, gehört das eigens in die Bemessung
+(4.3.2.5). Im Beispiel «Jede Wahl» trägt P3 in 0° und 71.6°.
+
+Warum so:
+
+- Die Bedingung (34) nimmt eine Bewehrung in x und y an und lässt nur
+  mässige Drillmomente zu. Ein schiefer Streifen hat aber in x und y ein
+  Drillmoment, bei 45° halb so gross wie sein Moment -- und mehr
+  Biegewiderstand wird dann in beiden Richtungen verlangt.
+- Der Hinweis steht einmal, bei der Bedingung selbst, nicht in jedem Fall:
+  er hängt an den Richtungen der Platten, nicht an den Lasten.
+- Schief heisst: eine Richtung der Platte ist weder x noch y
+  (`Richtung.schief`). Zwei rechtwinklige Richtungen, gedreht gegen x,
+  zählen auch -- die Bewehrung, die (34) annimmt, liegt in x und y.
+
 ## 2026-11-14 · Decken: das Einspannmoment mit dem Vorzeichen der Platte
 
 Das Moment eines eingespannten Linienlagers steht in Bild und Bericht jetzt

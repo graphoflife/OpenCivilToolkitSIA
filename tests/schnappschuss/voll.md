@@ -17031,6 +17031,8 @@ $$
 \begin{aligned} & m_{xu} \ge m_x + |m_{xy}| \qquad m_{yu} \ge m_y + |m_{xy}| \\ & m'_{xu} \ge -m_x + |m_{xy}| \qquad m'_{yu} \ge -m_y + |m_{xy}| \end{aligned}
 $$
 
+> **Hinweis:** Die Platte «P3» trägt schief zu x und y: ihre Streifen geben Drillmomente m\_xy, bei 45° halb so gross wie das Moment des Streifens. Die linearisierte Fliessbedingung gilt nur näherungsweise und nur, solange die Drillmomente mässig bleiben (SIA 262:2025, 4.3.2.6); wo die Hauptmomente deutlich schräg zur Bewehrung in x und y stehen, gehört das eigens in die Bemessung (4.3.2.5).
+
 **Was ein Lastverteilelement l\_x × l\_y zusätzlich braucht** *(Stahlbeton II, 7.2 Platten, Folie 38)*
 
 $$

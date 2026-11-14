@@ -1,5 +1,5 @@
 ---
-erzeugt: c282797bee23
+erzeugt: 13f502482055
 art: modul
 tags: [modul]
 ---
@@ -14,7 +14,8 @@ kann: die Decke in Tabellen -- Platten, Linienlager, Stützen, Unterzüge,
 Lasten je Lastfall und die Kombinationen --, die Streifen je Richtung, in
 welcher Reihenfolge die Träger rechnen, wie die Last auf die Richtungen
 geht, je Fall die Last und was die Lager davon tragen, und die Meldungen.
-Dann die Ansätze und je Lastfall und Kombination: jeder Träger mit Last,
+Dann die Ansätze -- trägt eine Platte schief zu x und y, mit einem Hinweis
+zur Fliessbedingung -- und je Lastfall und Kombination: jeder Träger mit Last,
 Lagerkräften und Momenten, was jedes Lager trägt, die grössten
 Schnittkräfte der Platte, die Biegewiderstände, die sie verlangt, und die
 Lastverteilelemente.
@@ -172,6 +173,7 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 - `STREIFEN_IN_XY = '\\begin{aligned} & m = \\frac{M}{b} \\qquad m_x = m \\cdot \\cos^2\\…` – Vom Streifen zur Platte -- die Transformation der Folie 14, rückwärts gelesen ([[opencivil.decke.feld|feld]]).
 - `FLAECHENLAGER = 'p_{\\mathrm{Lager}} = \\frac{R}{l}'` – Ein Flächenlager drückt gleichmässig über seine Breite (Folie 33).
 - `FLIESSBEDINGUNG = "\\begin{aligned} & m_{xu} \\ge m_x + |m_{xy}| \\qquad m_{yu} \\ge m_…` – Die linearisierte Fliessbedingung, `k = k' = 1` ([[opencivil.decke.feld#widerstaende|widerstaende]]).
+- `SCHIEF = '{platten} schief zu x und y: ihre Streifen geben Drillmomente m_xy, …` – Trägt eine Platte schief zu x und y -- nach den Platten, die es tun.
 - `LASTVERTEILELEMENT = "\\begin{aligned} & m'_{xu} \\ge \\frac{Q}{8} \\cdot \\frac{l_x}{l_y}…` – Was ein Lastverteilelement zusätzlich braucht ([[opencivil.decke.feld#Lastverteilelement|Lastverteilelement]]).
 - `SCHNITTKRAEFTE = (('m_x', 'm_x', 'kNm/m'), ('m_y', 'm_y', 'kNm/m'), ('m_xy', 'm_{xy}',…` – Die Schnittkräfte der Platte im Bericht: je Grösse ihr Zeichen und ihre Einheit.
 - `WIDERSTAENDE = (('mxu', 'm_{xu}', 'unten, in x'), ('myu', 'm_{yu}', 'unten, in y'), …` – Die Biegewiderstände: Feld von [[opencivil.decke.feld#Widerstaende|Widerstaende]], Zeichen, Bedeutung.

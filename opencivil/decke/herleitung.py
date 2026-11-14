@@ -7,7 +7,8 @@ kann: die Decke in Tabellen -- Platten, Linienlager, Stützen, Unterzüge,
 Lasten je Lastfall und die Kombinationen --, die Streifen je Richtung, in
 welcher Reihenfolge die Träger rechnen, wie die Last auf die Richtungen
 geht, je Fall die Last und was die Lager davon tragen, und die Meldungen.
-Dann die Ansätze und je Lastfall und Kombination: jeder Träger mit Last,
+Dann die Ansätze -- trägt eine Platte schief zu x und y, mit einem Hinweis
+zur Fliessbedingung -- und je Lastfall und Kombination: jeder Träger mit Last,
 Lagerkräften und Momenten, was jedes Lager trägt, die grössten
 Schnittkräfte der Platte, die Biegewiderstände, die sie verlangt, und die
 Lastverteilelemente.
@@ -78,6 +79,13 @@ FLAECHENLAGER = r"p_{\mathrm{Lager}} = \frac{R}{l}"
 FLIESSBEDINGUNG = (
     r"\begin{aligned} & m_{xu} \ge m_x + |m_{xy}| \qquad m_{yu} \ge m_y + |m_{xy}| \\ "
     r"& m'_{xu} \ge -m_x + |m_{xy}| \qquad m'_{yu} \ge -m_y + |m_{xy}| \end{aligned}")
+
+#: Trägt eine Platte schief zu x und y -- nach den Platten, die es tun.
+SCHIEF = (
+    "{platten} schief zu x und y: ihre Streifen geben Drillmomente m_xy, bei 45° halb so gross wie "
+    "das Moment des Streifens. Die linearisierte Fliessbedingung gilt nur näherungsweise und nur, "
+    "solange die Drillmomente mässig bleiben (SIA 262:2025, 4.3.2.6); wo die Hauptmomente deutlich "
+    "schräg zur Bewehrung in x und y stehen, gehört das eigens in die Bemessung (4.3.2.5).")
 
 #: Was ein Lastverteilelement zusätzlich braucht (:class:`~opencivil.decke.feld.Lastverteilelement`).
 LASTVERTEILELEMENT = (
@@ -279,6 +287,10 @@ def _ansaetze(p: Protokoll, e: Ergebnis) -> None:
                "wird diese Pressung zu seiner Last.")
     p.ansatz(FLIESSBEDINGUNG, titel="Erforderliche Biegewiderstände, linearisierte Fliessbedingung",
              referenz="SIA 262:2025, 4.3.2.6, (34)", name="Linearisierte Fliessbedingung")
+    schief = [f"«{pl.name}»" for pl in decke.platten if any(r.schief for r in richtungen_der_platte(pl))]
+    if schief:
+        p.hinweis(SCHIEF.format(platten=(f"Die Platte {schief[0]} trägt" if len(schief) == 1
+                                         else f"Die Platten {', '.join(schief)} tragen")))
     if decke.stuetzen or any(isinstance(l, Punktlast) for lf in decke.lastfaelle for l in lf.lasten):
         p.ansatz(LASTVERTEILELEMENT, titel="Was ein Lastverteilelement l_x × l_y zusätzlich braucht",
                  referenz="Stahlbeton II, 7.2 Platten, Folie 38", name="Lastverteilelement")

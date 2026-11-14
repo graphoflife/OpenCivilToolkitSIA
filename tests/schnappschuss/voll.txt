@@ -10786,6 +10786,11 @@ Last.
 
 Erforderliche Biegewiderstände, linearisierte Fliessbedingung   [SIA 262:2025, 4.3.2.6, (34)]
     \begin{aligned} & m_{xu} \ge m_x + |m_{xy}| \qquad m_{yu} \ge m_y + |m_{xy}| \\ & m'_{xu} \ge -m_x + |m_{xy}| \qquad m'_{yu} \ge -m_y + |m_{xy}| \end{aligned}
+[i] Hinweis: Die Platte «P3» trägt schief zu x und y: ihre Streifen geben Drillmomente m_xy, bei 45°
+halb so gross wie das Moment des Streifens. Die linearisierte Fliessbedingung gilt nur
+näherungsweise und nur, solange die Drillmomente mässig bleiben (SIA 262:2025, 4.3.2.6); wo die
+Hauptmomente deutlich schräg zur Bewehrung in x und y stehen, gehört das eigens in die Bemessung
+(4.3.2.5).
 
 Was ein Lastverteilelement l_x × l_y zusätzlich braucht   [Stahlbeton II, 7.2 Platten, Folie 38]
     \begin{aligned} & m'_{xu} \ge \frac{Q}{8} \cdot \frac{l_x}{l_y} \qquad m_{xu} \ge \left(\frac{1}{2\pi} - \frac{1}{8}\right) \cdot Q \cdot \frac{l_x}{l_y} \\ & m'_{yu} \ge \frac{Q}{8} \cdot \frac{l_y}{l_x} \qquad m_{yu} \ge \left(\frac{1}{2\pi} - \frac{1}{8}\right) \cdot Q \cdot \frac{l_y}{l_x} \end{aligned}

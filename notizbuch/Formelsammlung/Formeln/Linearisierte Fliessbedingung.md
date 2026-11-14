@@ -41,5 +41,11 @@ Beispiel: $m_x = 30$, $m_y = -10$ und $m_{xy} = 5\,\mathrm{kNm/m}$ verlangen
 unten in x 35, unten in y nichts ($-10 + 5 < 0$), oben in x nichts und oben
 in y $15\,\mathrm{kNm/m}$.
 
+Tragen alle Streifen in x und y, ist $m_{xy}$ null.
+Trägt eine Platte schief dazu, geben ihre Streifen ein Drillmoment, bei 45°
+halb so gross wie ihr Moment: ein Streifen mit $m = 100\,\mathrm{kNm/m}$
+hat dann $m_x = m_y = m_{xy} = 50$ und verlangt unten in x und in y je 100.
+Der Bericht sagt in einem Hinweis, welche Platten schief tragen.
+
 Gesucht werden die grössten Werte an denselben Stellen wie in den Bildern.
 Über Stützen und unter Einzellasten kommt das [[Lastverteilelement]] dazu.

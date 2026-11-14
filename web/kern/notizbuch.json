@@ -4099,6 +4099,7 @@
       "stichworte": [
         "Richtung",
         "Richtung.parallel",
+        "Richtung.schief",
         "Richtung.punkt",
         "richtung",
         "richtung_der_strecke",

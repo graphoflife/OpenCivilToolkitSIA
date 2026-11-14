@@ -5,12 +5,14 @@ und die Lastverteilelemente -- gegen das Kolloquium 4 und die Bilder
 desselben Falls.
 """
 
+import math
 import unittest
 
 from opencivil.core.latex import Mathe
-from opencivil.core.protokoll import GleichungBlock, TabellenBlock, TitelBlock
+from opencivil.core.protokoll import GleichungBlock, HinweisBlock, TabellenBlock, TitelBlock
 from opencivil.decke.feld import GROESSEN
 from opencivil.decke.herleitung import SCHNITTKRAEFTE
+from opencivil.decke.streifen import richtung
 from opencivil.projekt import beispiele
 from opencivil.web import dienst
 
@@ -38,6 +40,12 @@ def tabelle(loesung, fall: str, titel: str):
         elif im_fall and isinstance(b, TabellenBlock) and b.titel == titel:
             return [[z.latex if isinstance(z, Mathe) else z for z in zeile] for zeile in b.zeilen]
     raise AssertionError(f"Keine Tabelle «{titel}» unter «{fall}».")
+
+
+def schief(loesung):
+    """Die Hinweise auf schiefe Platten."""
+    return [b.text for b in loesung.protokoll.alle_bloecke()
+            if isinstance(b, HinweisBlock) and "schief zu x und y" in b.text]
 
 
 class TestKolloquium4(unittest.TestCase):
@@ -105,6 +113,9 @@ class TestKolloquium4(unittest.TestCase):
         s2 = self.zeilen("Lastverteilelemente: was der Bereich zusätzlich braucht")[1]
         self.assertEqual(s2, ["S2 · Stütze", "276.4", "1.00 \\times 1.00", "34.5", "9.4", "34.5", "9.4"])
 
+    def test_kein_hinweis_in_x_und_y(self):
+        self.assertEqual(schief(self.loesung), [])
+
     def test_still_dasselbe_ohne_bericht(self):
         """Ohne Herleitung rechnet die Decke dasselbe -- und sucht nichts für einen Bericht, den niemand liest."""
         still, befund = gerechnet("Kolloquium 4", ohne_herleitung=True)
@@ -120,6 +131,18 @@ class TestJedeWahl(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.loesung, _ = gerechnet("Jede Wahl")
+
+    def test_ein_hinweis_bei_der_schiefen_platte(self):
+        """P3 trägt in 0° und 71.6°: einmal ein Hinweis, mit beiden Normstellen."""
+        (hinweis,) = schief(self.loesung)
+        self.assertTrue(hinweis.startswith("Die Platte «P3» trägt schief zu x und y: "), hinweis)
+        self.assertIn("(SIA 262:2025, 4.3.2.6)", hinweis)
+        self.assertIn("(4.3.2.5)", hinweis)
+
+    def test_schief_ist_weder_x_noch_y(self):
+        """Auch 180° ist x -- und zwei rechtwinklige Richtungen, gegen x gedreht, sind schief."""
+        self.assertEqual([richtung(math.radians(w)).schief for w in (0, 90, 180, -90, 30, 120)],
+                         [False, False, False, False, True, True])
 
     def test_stuecke_neben_ihresgleichen(self):
         """

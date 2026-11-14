@@ -85,6 +85,11 @@ class Richtung:
     def parallel(self, andere: "Richtung") -> bool:
         return abs(math.sin(self.winkel - andere.winkel)) < PARALLEL
 
+    @property
+    def schief(self) -> bool:
+        """Ob sie schief zu x und y liegt -- ihre Streifen tragen dann in x und y auch mit Drillmoment."""
+        return self.winkel not in (0.0, math.pi / 2.0)
+
     def punkt(self, s: float, tau: float) -> Punkt:
         """Der Punkt mit ``p·n = s`` und ``p·t = τ``."""
         return (s * self.n[0] + tau * self.t[0], s * self.n[1] + tau * self.t[1])

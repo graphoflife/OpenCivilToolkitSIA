@@ -33,10 +33,7 @@ gelernt wurde, steht in [[Entwicklung]].
       (SIA 262:2025, 4.1.4.2.2), wenn das Verformungsvermögen gesichert ist
       (4.1.4.2.4); quer braucht es trotzdem mindestens 20 % der
       Hauptbewehrung (5.5.3.2). Die Einzellast selbst steht nach SIA 261:2020,
-      Tabelle 8 auf 50 × 50 mm. Bei schiefen Richtungen ist die
-      Fliessbedingung (34) nur eine grobe Näherung (4.3.2.5, 4.3.2.6): bei
-      45° ist m_xy = m/2. Vom Benutzer bestätigen lassen; Vorschlag: bei
-      schiefen Richtungen ein Hinweis im Bericht.
+      Tabelle 8 auf 50 × 50 mm.
 - [ ] **Günstige ständige Last in den Vorgaben.** Die Vorgabe-Kombination
       GZT nimmt Eigengewicht und Auflast mit 1.35 und die Nutzlast mit 1.5,
       im Balkensystem wie in der Decke. SIA 260:2013, Tabelle 1 kennt für

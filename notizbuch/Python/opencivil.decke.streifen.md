@@ -1,5 +1,5 @@
 ---
-erzeugt: cb2e23221ca0
+erzeugt: 62197e5ca2aa
 art: modul
 tags: [modul]
 ---
@@ -71,6 +71,15 @@ Eine Richtung der Lastabtragung: Winkel in [0, π), `n` längs, `t` quer.
 ```python
 def parallel(self, andere: 'Richtung') -> bool
 ```
+
+#### Richtung.schief
+
+```python
+@property
+def schief(self) -> bool
+```
+
+Ob sie schief zu x und y liegt -- ihre Streifen tragen dann in x und y auch mit Drillmoment.
 
 #### Richtung.punkt
 
