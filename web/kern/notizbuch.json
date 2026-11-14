@@ -4069,9 +4069,10 @@
         "Lagerkraft",
         "Traegerergebnis",
         "Traegerergebnis.last",
+        "Traegerergebnis.beidseits",
         "Wandkraft",
         "Wandkraft.laenge",
-        "Wandkraft.je_meter",
+        "Wandkraft.r",
         "Fallergebnis",
         "Fallergebnis.stuetzenkraft",
         "Fallergebnis.wandkraft",
@@ -4085,6 +4086,7 @@
         "gegenkraefte",
         "_weitergeben",
         "lagerverlauf",
+        "_gehalten",
         "spitzen",
         "_schwerpunkt"
       ]

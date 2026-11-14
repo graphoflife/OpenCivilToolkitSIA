@@ -23,7 +23,8 @@ Eine Stütze bekommt die Summe der Kräfte aller Träger auf ihr. Ein
 Linienlager bekommt von jedem Träger, der es kreuzt, dessen Kraft --
 gleichmässig verteilt über das Stück des Lagers, über das der Träger geht --
 und bei Einspannung dessen Moment ebenso: ein Verlauf in kN/m und kNm/m
-längs des Lagers.
+längs des Lagers, das Moment mit dem Vorzeichen der Platte
+(:func:`lagerverlauf`).
 """
 
 from __future__ import annotations
@@ -40,7 +41,7 @@ from opencivil.decke.modell import Decke, Linienlager
 from opencivil.decke.streifen import (
     LINIENLAGER, STUETZE, UNTERZUG, Auflager, Streifen, Traeger, Zerlegung, pressung, zerlegen,
 )
-from opencivil.decke.traeger import Einzellast, Streckenlast, Stueck, Teillast, statik
+from opencivil.decke.traeger import GLEICH, Einzellast, Streckenlast, Stueck, Teillast, statik, wert
 from opencivil.stabwerk.system import Meldung
 
 #: Unter diesem Anteil der Last gilt die Probe als erfüllt.
@@ -71,6 +72,12 @@ class Traegerergebnis:
         """Was auf ihm liegt, zusammen, in N."""
         return sum(_summe(l) for l in self.lasten)
 
+    def beidseits(self, s: float) -> Tuple[float, float]:
+        """``M`` knapp vor und knapp nach der Stelle ``s``, in Nm -- vor seinem Anfang und nach seinem Ende null."""
+        vor = wert(self.stuecke, "M", s, links=True) if s > GLEICH else 0.0
+        nach = wert(self.stuecke, "M", s) if s < self.traeger.L - GLEICH else 0.0
+        return vor, nach
+
 
 @dataclass(frozen=True)
 class Wandkraft:
@@ -82,20 +89,26 @@ class Wandkraft:
     F: float
     """Nach unten auf das Lager, in N."""
 
-    C: float
-    """Das Einspannmoment, in Nm -- positiv, wenn es den Träger im Gegenuhrzeigersinn hält."""
+    vor: float
+    nach: float
+    """
+    Hält das Lager die Drehung, das Moment des Trägers knapp vor und knapp
+    nach ihm, in Nm, ``M > 0`` zieht unten -- vor seinem Anfang und nach
+    seinem Ende null. Was das Lager hält, ist der Unterschied. Ein Lager,
+    das die Drehung nicht hält, hält kein Moment: dann beide null.
+    """
 
     n: Punkt
-    """Die Richtung des Trägers, längs: in ihr hält ``C`` ihn, von ``t`` her gesehen."""
+    """Die Richtung des Trägers: in ihr liegt ``nach`` hinter dem Lager."""
 
     @property
     def laenge(self) -> float:
         return math.hypot(self.b[0] - self.a[0], self.b[1] - self.a[1])
 
     @property
-    def je_meter(self) -> Tuple[float, float]:
-        """``(r, m)``: Kraft in N/m und Moment in Nm/m."""
-        return self.F / self.laenge, self.C / self.laenge
+    def r(self) -> float:
+        """Die Kraft je Meter des Lagers, in N/m."""
+        return self.F / self.laenge
 
 
 @dataclass
@@ -194,10 +207,10 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
                 continue
             kraefte = [Lagerkraft(a, F, C) for a, (F, C) in
                        zip(traeger.auflager, traeger.balken.lagerkraefte(lokal))]
-            stuecke = statik(traeger.L, lokal + gegenkraefte(kraefte))
-            heraus.traeger[traeger.name] = Traegerergebnis(traeger, lokal, kraefte, stuecke)
+            ergebnis = Traegerergebnis(traeger, lokal, kraefte, statik(traeger.L, lokal + gegenkraefte(kraefte)))
+            heraus.traeger[traeger.name] = ergebnis
             for k in kraefte:
-                _weitergeben(k, traeger, zerlegung, heraus, uebertragen)
+                _weitergeben(k, ergebnis, zerlegung, heraus, uebertragen)
     return heraus
 
 
@@ -250,15 +263,16 @@ def gegenkraefte(kraefte: Sequence[Lagerkraft]) -> List[Teillast]:
     return heraus
 
 
-def _weitergeben(k: Lagerkraft, traeger: Traeger, zerlegung: Zerlegung, heraus: Fallergebnis,
+def _weitergeben(k: Lagerkraft, ergebnis: Traegerergebnis, zerlegung: Zerlegung, heraus: Fallergebnis,
                  uebertragen: Dict[str, List[Teillast]]) -> None:
     """Die Kraft eines Lagers auf den Träger geht, umgekehrt, in das, worauf er liegt."""
-    a = k.auflager
+    a, traeger = k.auflager, ergebnis.traeger
     if not (k.F or k.C):
         return
     if a.art == LINIENLAGER:
+        vor, nach = ergebnis.beidseits(a.s) if a.eingespannt else (0.0, 0.0)
         heraus.linienlager.setdefault(a.name, []).append(Wandkraft(
-            traeger.name, a.strecke[0], a.strecke[1], k.F, k.C, zerlegung[traeger.streifen].richtung.n))
+            traeger.name, a.strecke[0], a.strecke[1], k.F, vor, nach, zerlegung[traeger.streifen].richtung.n))
     elif a.art == STUETZE:
         heraus.stuetzen.setdefault(a.name, []).append((traeger.name, k.F))
     elif a.art == UNTERZUG:
@@ -276,22 +290,26 @@ def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple
     """
     Längs eines Linienlagers, was die Träger in es geben: Stufen
     ``(u_a, u_b, r, m)`` von seinem Anfang bis zu seinem Ende, ``u`` in m ab
-    ``lager.a``, ``r`` nach unten in N/m und ``m`` in Nm/m um seine Achse,
-    rechtsdrehend um ``a → b`` positiv. Wo zwei Träger dasselbe Stück
-    tragen, zählen beide -- darum das Moment um die Achse des Lagers: so
-    lassen sich auch Träger verschiedener Richtung zusammenzählen.
+    ``lager.a``, ``r`` nach unten in N/m und ``m`` in Nm/m: das Moment, das
+    es hält, mit dem Vorzeichen der Platte -- negativ, wo es oben zieht, wie
+    herum das Lager auch gezeichnet ist (:func:`_gehalten`). Wo zwei Träger
+    dasselbe Stück tragen, zählen beide; ein schiefer gibt quer zum Lager
+    cos² seines Winkels weiter, wie die Platte (Folie 14).
     """
     L = math.dist(lager.a, lager.b)
     e = ((lager.b[0] - lager.a[0]) / L, (lager.b[1] - lager.a[1]) / L)
+    links = (-e[1], e[0])
 
     def u(p: Punkt) -> float:
         return geo.skalar((p[0] - lager.a[0], p[1] - lager.a[1]), e)
 
     stuecke = []
     for w in kraefte:
-        r, C = w.je_meter
-        # C dreht in der Ebene von n und z: um -t, mit t quer zu n.
-        stuecke.append((*sorted((u(w.a), u(w.b))), r, C * geo.skalar((w.n[1], -w.n[0]), e)))
+        cos = geo.skalar(w.n, links)
+        vor, nach = (M * abs(cos) / w.laenge for M in (w.vor, w.nach))
+        # Was hinter dem Lager liegt, «nach», liegt links von a → b, wenn der Träger nach links läuft.
+        seiten = (nach, vor) if cos > 0.0 else (vor, nach)
+        stuecke.append((*sorted((u(w.a), u(w.b))), w.r, *seiten))
     stellen: List[float] = []
     for x in sorted([0.0, L, *(x for s in stuecke for x in s[:2])]):
         if not stellen or x - stellen[-1] > geo.TOLERANZ:
@@ -300,19 +318,25 @@ def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple
     for ua, ub in zip(stellen, stellen[1:]):
         mitte = 0.5 * (ua + ub)
         auf = [s for s in stuecke if s[0] <= mitte <= s[1]]
-        heraus.append((ua, ub, sum(s[2] for s in auf), sum(s[3] for s in auf)))
+        heraus.append((ua, ub, sum(s[2] for s in auf),
+                       _gehalten(sum(s[3] for s in auf), sum(s[4] for s in auf))))
     return heraus
 
 
+def _gehalten(links: float, rechts: float) -> float:
+    """
+    Was ein Lager an Moment hält, je Meter, wenn die Platte links von ihm
+    mit ``links`` an ihm zieht und rechts mit ``rechts``: den Unterschied,
+    mit dem Vorzeichen der Seite, die stärker zieht. An einem Rand ist die
+    andere Seite null -- dann ist es das Moment der Platte dort.
+    """
+    return links - rechts if abs(links) >= abs(rechts) else rechts - links
+
+
 def spitzen(stufen: Sequence[Tuple[float, float, float, float]]) -> Tuple[float, float]:
-    """
-    Aus den Stufen eines Linienlagers (:func:`lagerverlauf`): der Wert von
-    ``r`` mit dem grössten Betrag und der grösste Betrag von ``m`` -- nur
-    der Betrag, denn das Vorzeichen von ``m`` hängt an der Richtung, in der
-    das Lager gezeichnet ist.
-    """
+    """Aus den Stufen eines Linienlagers (:func:`lagerverlauf`): je der Wert von ``r`` und ``m`` mit dem grössten Betrag."""
     return (max((r for _, _, r, _ in stufen), key=abs, default=0.0),
-            max((abs(m) for *_, m in stufen), default=0.0))
+            max((m for *_, m in stufen), key=abs, default=0.0))
 
 
 def _summe(l: Teillast) -> float:

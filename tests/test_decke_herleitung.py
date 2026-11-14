@@ -132,10 +132,15 @@ class TestJedeWahl(unittest.TestCase):
         self.assertEqual(namen[:4], ["x1.1 … x3.1", "x4.1 … x8", "x15", "x1.2"])
         self.assertEqual(namen[9:12], ["y1 … y3", "y4", "y5 … y6"])
 
-    def test_eingespannt_ohne_kraft(self):
-        """L5 hält nur die Drehung: er trägt nichts, aber 102.6 kNm/m -- so viel, wie y7 an ihm hat."""
+    def test_eingespannt_mit_dem_vorzeichen_der_platte(self):
+        """
+        L5 hält nur die Drehung: er trägt nichts, aber 102.6 kNm/m mit Zug
+        unten -- so viel, wie y7 an ihm hat. Am eingespannten Rand L2 zieht
+        es oben.
+        """
         lager = {z[0]: z[1:] for z in tabelle(self.loesung, "Eigengewicht", "Lagerkräfte")}
         self.assertEqual(lager["L5 · Linienlager"], ["0.0", "0.0", "102.6"])
+        self.assertEqual(lager["L2 · Linienlager"], ["61.8", "20.6", "-24.8"])
         self.assertEqual(lager["S1 · Stütze"], ["6.9", "–", "–"])
 
 

@@ -182,7 +182,7 @@ class TestKolloquium4(Rechnung):
         """Unter den Feldstreifen von C-C trägt die Wand 32.2 kN/m."""
         stueck = next(w for w in self.f.linienlager["Wand"] if w.traeger == "y5")
         self.assertAlmostEqual(stueck.laenge, 0.25)
-        self.assertAlmostEqual(stueck.je_meter[0] / 1e3, 32.2, delta=0.05)
+        self.assertAlmostEqual(stueck.r / 1e3, 32.2, delta=0.05)
 
     def test_die_wand_laengs(self):
         """Die Stufen längs der Wand decken sie ganz und tragen zusammen, was sie trägt."""
@@ -192,7 +192,7 @@ class TestKolloquium4(Rechnung):
         self.assertAlmostEqual(sum((ub - ua) * r for ua, ub, r, _ in stufen), self.f.wandkraft("Wand"), places=3)
         stueck = next(w for w in self.f.linienlager["Wand"] if w.traeger == "y5")
         mitte = 0.5 * (stueck.a[0] + stueck.b[0])
-        self.assertEqual([r for ua, ub, r, _ in stufen if ua < mitte < ub], [stueck.je_meter[0]])
+        self.assertEqual([r for ua, ub, r, _ in stufen if ua < mitte < ub], [stueck.r])
 
     def test_lastverteilelement_ueber_der_mittelstuetze(self):
         """Musterlösung: m'_u = Q/8 = 34.4 kN, m_u = 0.034 Q = 9.4 kN über dem 1 × 1 m Stützenbereich."""
@@ -366,17 +366,14 @@ class TestEinachsig(Rechnung):
                                  lastfaelle=[Lastfall("q", [Flaechenlast("q", q, platte="P")])]))
         f = e.faelle[0]
         self.assertAlmostEqual(an_stelle(e, f, (0.0, 0.5)).mx, -q * 4.0 / 2.0, places=6)
-        r, m = f.linienlager["W"][0].je_meter
-        self.assertAlmostEqual(r, 2.0 * q)
-        self.assertAlmostEqual(m, q * 4.0 / 2.0)
 
-    def test_eingespannt_laengs(self):
+    def test_das_moment_mit_dem_vorzeichen_der_platte(self):
         """
-        Das Moment der Wand dreht um ihre Achse, rechtsdrehend um a → b
-        positiv: verkehrt herum gezeichnet, wechselt es das Vorzeichen.
+        Die Wand hält das Moment der Platte an ihr, mit deren Vorzeichen:
+        −qL²/2, es zieht oben -- wie herum die Wand auch gezeichnet ist.
         """
         ecken = rechteck(0, 0, 2, 1)
-        for a, b, vorzeichen in (((0, 0), (0, 1), -1.0), ((0, 1), (0, 0), 1.0)):
+        for a, b in (((0, 0), (0, 1)), ((0, 1), (0, 0))):
             wand = Linienlager("W", a, b, eingespannt=True)
             e = self.gerechnet(Decke(platten=[Platte("P", ecken, 0.2, E, WICHTE)], linienlager=[wand],
                                      lastfaelle=[Lastfall("q", [Flaechenlast("q", q, platte="P")])]))
@@ -384,7 +381,37 @@ class TestEinachsig(Rechnung):
             self.assertEqual((stufen[0][0], stufen[-1][1]), (0.0, 1.0))
             for _, _, r, m in stufen:
                 self.assertAlmostEqual(r, 2.0 * q)
-                self.assertAlmostEqual(m, vorzeichen * q * 4.0 / 2.0)
+                self.assertAlmostEqual(m, -q * 4.0 / 2.0)
+
+    def test_nur_die_drehung_gehalten_zieht_unten(self):
+        """
+        Ein Rand, der nur die Drehung hält -- wie eine Symmetrieachse --,
+        trägt nichts; das Feld davor hängt an ihm durch: +qL²/2, Zug unten.
+        """
+        achse = Linienlager("A", (3, 0), (3, 1), vertikal=False, eingespannt=True)
+        e = self.gerechnet(Decke(platten=[Platte("P", rechteck(0, 0, 3, 1), 0.2, E, WICHTE)],
+                                 linienlager=[Linienlager("W", (0, 1), (0, 0)), achse],
+                                 lastfaelle=[Lastfall("q", [Flaechenlast("q", q, platte="P")])],
+                                 aufteilung=Aufteilung.FEST, anteil=1.0))
+        for _, _, r, m in lagerverlauf(achse, e.faelle[0].linienlager["A"]):
+            self.assertAlmostEqual(r, 0.0)
+            self.assertAlmostEqual(m, q * 9.0 / 2.0, places=6)
+
+    def test_platte_zu_beiden_seiten(self):
+        """
+        Eine eingespannte Wand zwischen zwei Feldern hält nur den Unterschied
+        der Stützmomente, −qL²/8 über 6 m gegen −qL²/8 über 4 m -- mit dem
+        Vorzeichen der Seite, die stärker zieht: es zieht oben.
+        """
+        for a, b in (((4, 0), (4, 1)), ((4, 1), (4, 0))):
+            wand = Linienlager("M", a, b, eingespannt=True)
+            e = self.gerechnet(Decke(platten=[Platte("P", rechteck(0, 0, 10, 1), 0.2, E, WICHTE)],
+                                     linienlager=[Linienlager("A", (0, 0), (0, 1)), wand,
+                                                  Linienlager("B", (10, 0), (10, 1))],
+                                     lastfaelle=[Lastfall("q", [Flaechenlast("q", q, platte="P")])],
+                                     aufteilung=Aufteilung.FEST, anteil=1.0))
+            for _, _, r, m in lagerverlauf(wand, e.faelle[0].linienlager["M"]):
+                self.assertAlmostEqual(m, -q * 36.0 / 8.0 + q * 16.0 / 8.0, places=6)
 
     def test_die_stellen_der_extreme(self):
         """
@@ -426,22 +453,34 @@ class TestLagerverlauf(unittest.TestCase):
         """Zwei Feldstreifen und quer über ihre Grenze ein Unterzug: wo sie sich decken, tragen beide."""
         lager = Linienlager("W", (0, 0), (4, 0))
         y = (0.0, 1.0)
-        stufen = lagerverlauf(lager, [Wandkraft("y1", (0, 0), (2, 0), F=4e3, C=0.0, n=y),
-                                      Wandkraft("y2", (2, 0), (4, 0), F=2e3, C=0.0, n=y),
-                                      Wandkraft("U1", (3, 0), (1, 0), F=6e3, C=0.0, n=y)])
+        stufen = lagerverlauf(lager, [Wandkraft("y1", (0, 0), (2, 0), F=4e3, vor=0.0, nach=0.0, n=y),
+                                      Wandkraft("y2", (2, 0), (4, 0), F=2e3, vor=0.0, nach=0.0, n=y),
+                                      Wandkraft("U1", (3, 0), (1, 0), F=6e3, vor=0.0, nach=0.0, n=y)])
         self.assertEqual([(ua, ub, r) for ua, ub, r, _ in stufen],
                          [(0.0, 1.0, 2e3), (1.0, 2.0, 5e3), (2.0, 3.0, 4e3), (3.0, 4.0, 1e3)])
 
     def test_wo_nichts_aufliegt_null(self):
         lager = Linienlager("W", (0, 0), (0, 3))
-        stufen = lagerverlauf(lager, [Wandkraft("x1", (0, 1), (0, 2), F=3e3, C=0.0, n=(1.0, 0.0))])
+        stufen = lagerverlauf(lager, [Wandkraft("x1", (0, 1), (0, 2), F=3e3, vor=0.0, nach=0.0, n=(1.0, 0.0))])
         self.assertEqual([(ua, ub, r) for ua, ub, r, _ in stufen],
                          [(0.0, 1.0, 0.0), (1.0, 2.0, 3e3), (2.0, 3.0, 0.0)])
         self.assertEqual(lagerverlauf(lager, []), [(0.0, 3.0, 0.0, 0.0)])
 
+    def test_von_beiden_seiten_der_unterschied(self):
+        """
+        Zieht die Platte links mit −30 und rechts mit −50 kNm/m an der Wand,
+        hält diese −20, mit dem Vorzeichen der stärkeren Seite. Wo nur eine
+        Seite zieht, ist es deren Moment.
+        """
+        lager = Linienlager("W", (0, 0), (0, 2))
+        x = (1.0, 0.0)
+        stufen = lagerverlauf(lager, [Wandkraft("x1", (0, 0), (0, 1), F=0.0, vor=-30e3, nach=-50e3, n=x),
+                                      Wandkraft("x2", (0, 1), (0, 2), F=0.0, vor=0.0, nach=-50e3, n=x)])
+        self.assertEqual([round(m) for *_, m in stufen], [-20e3, -50e3])
+
     def test_die_spitzen(self):
-        """Die grösste Kraft mit Vorzeichen, das grösste Moment als Betrag -- sein Vorzeichen hängt an a → b."""
-        self.assertEqual(spitzen([(0.0, 1.0, 2e3, -5e3), (1.0, 2.0, -3e3, 4e3)]), (-3e3, 5e3))
+        """Je der Wert mit dem grössten Betrag, mit seinem Vorzeichen."""
+        self.assertEqual(spitzen([(0.0, 1.0, 2e3, -5e3), (1.0, 2.0, -3e3, 4e3)]), (-3e3, -5e3))
         self.assertEqual(spitzen([]), (0.0, 0.0))
 
 

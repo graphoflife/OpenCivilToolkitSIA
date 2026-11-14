@@ -297,8 +297,8 @@ class TestBilder(unittest.TestCase):
             self.assertEqual(l["r_max"], max((s[2] for s in l["stufen"]), key=abs))
             self.assertEqual((l["eingespannt"], l["m_max"]), (False, 0.0))
 
-    def test_eingespannt_das_moment_als_betrag(self):
-        """Kragplatte 2 m, an der Wand eingespannt: q·L²/2 = 20 kNm/m, ob die Wand auf- oder abwärts gezeichnet ist."""
+    def test_eingespannt_das_moment_mit_dem_vorzeichen_der_platte(self):
+        """Kragplatte 2 m, an der Wand eingespannt: −q·L²/2 = −20 kNm/m, ob die Wand auf- oder abwärts gezeichnet ist."""
         for a, b in (((0, 0), (0, 1)), ((0, 1), (0, 0))):
             p = Projekt(name="Krag")
             d = p.decke("Krag", streifenbreite=0.5)
@@ -309,7 +309,7 @@ class TestBilder(unittest.TestCase):
             (wand,) = bilder(p, "q").daten["ergebnis"]["linienlager"]
             self.assertTrue(wand["eingespannt"])
             self.assertAlmostEqual(wand["F"], 20.0, places=6)
-            self.assertAlmostEqual(wand["m_max"], 20.0, places=6)
+            self.assertAlmostEqual(wand["m_max"], -20.0, places=6)
 
     def test_kolloquium_4(self):
         """

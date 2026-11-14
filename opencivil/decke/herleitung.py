@@ -361,7 +361,7 @@ def _zahl(text: str):
 
 
 def _lagerkraefte(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
-    """Was jedes Lager trägt; längs eines Linienlagers die Spitze und, eingespannt, das grösste Moment."""
+    """Was jedes Lager trägt; längs eines Linienlagers die Spitze und, eingespannt, die des Moments."""
     eingespannt = any(l.eingespannt for l in e.decke.linienlager)
     zeilen = []
     for s in e.decke.stuetzen:
@@ -375,12 +375,14 @@ def _lagerkraefte(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
     if not zeilen:
         return
     p.tabelle(["Lager", Mathe(r"F\ [\mathrm{kN}]"), Mathe(r"r_{\max}\ [\mathrm{kN/m}]")]
-              + ([Mathe(r"|m|_{\max}\ [\mathrm{kNm/m}]")] if eingespannt else []),
+              + ([Mathe(r"m_{\max}\ [\mathrm{kNm/m}]")] if eingespannt else []),
               zeilen, titel="Lagerkräfte")
     p.text("Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über "
-           "das er geht; wo zwei dasselbe Stück tragen, zählen beide. r_max ist der grösste Wert davon. "
-           + ("Das Moment eines eingespannten Lagers dreht um dessen Achse und steht als Betrag da: "
-              "sein Vorzeichen hinge an der Richtung, in der das Lager gezeichnet ist." if eingespannt else ""))
+           "das er geht; wo zwei dasselbe Stück tragen, zählen beide. r_max ist der Wert mit dem grössten "
+           "Betrag."
+           + (" Ebenso m_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: "
+              "negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied "
+              "ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht." if eingespannt else ""))
 
 
 def _schnittkraefte(p: Protokoll, proben: Sequence[feld.Probe]) -> None:

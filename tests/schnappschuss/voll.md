@@ -16894,7 +16894,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | S3 · Stütze | $115.0$ | – |
 | L1 · Linienlager | $414.3$ | $100.0$ |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der grösste Wert davon. 
+Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -17075,11 +17075,11 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 
 **Lagerkräfte**
 
-| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $\vert m\vert _{\max}\ [\mathrm{kNm/m}]$ |
+| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ |
 | ---: | ---: | ---: | ---: |
 | S1 · Stütze | $6.9$ | – | – |
 | L1 · Linienlager | $93.7$ | $26.5$ | – |
-| L2 · Linienlager | $61.8$ | $20.6$ | $24.8$ |
+| L2 · Linienlager | $61.8$ | $20.6$ | $-24.8$ |
 | L3 · Linienlager | $47.2$ | $12.4$ | – |
 | L4 · Linienlager | $48.3$ | $17.4$ | – |
 | L5 · Linienlager | $0.0$ | $0.0$ | $102.6$ |
@@ -17088,7 +17088,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $20.0$ | $7.5$ | – |
 | L9 · Linienlager | $10.0$ | $4.7$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der grösste Wert davon. Das Moment eines eingespannten Lagers dreht um dessen Achse und steht als Betrag da: sein Vorzeichen hinge an der Richtung, in der das Lager gezeichnet ist.
+Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -17136,7 +17136,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 
 **Lagerkräfte**
 
-| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $\vert m\vert _{\max}\ [\mathrm{kNm/m}]$ |
+| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ |
 | ---: | ---: | ---: | ---: |
 | S1 · Stütze | $1.5$ | – | – |
 | L1 · Linienlager | $31.7$ | $11.9$ | – |
@@ -17149,7 +17149,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $0.0$ | $0.0$ | – |
 | L9 · Linienlager | $0.0$ | $0.0$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der grösste Wert davon. Das Moment eines eingespannten Lagers dreht um dessen Achse und steht als Betrag da: sein Vorzeichen hinge an der Richtung, in der das Lager gezeichnet ist.
+Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -17200,11 +17200,11 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 
 **Lagerkräfte**
 
-| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $\vert m\vert _{\max}\ [\mathrm{kNm/m}]$ |
+| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ |
 | ---: | ---: | ---: | ---: |
 | S1 · Stütze | $0.0$ | – | – |
 | L1 · Linienlager | $4.3$ | $2.5$ | – |
-| L2 · Linienlager | $13.3$ | $8.4$ | $10.6$ |
+| L2 · Linienlager | $13.3$ | $8.4$ | $-10.6$ |
 | L3 · Linienlager | $2.4$ | $1.6$ | – |
 | L4 · Linienlager | $0.0$ | $0.0$ | – |
 | L5 · Linienlager | $0.0$ | $0.0$ | $3.1$ |
@@ -17213,7 +17213,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $15.0$ | $20.0$ | – |
 | L9 · Linienlager | $1.7$ | $2.4$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der grösste Wert davon. Das Moment eines eingespannten Lagers dreht um dessen Achse und steht als Betrag da: sein Vorzeichen hinge an der Richtung, in der das Lager gezeichnet ist.
+Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 
@@ -17281,11 +17281,11 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 
 **Lagerkräfte**
 
-| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $\vert m\vert _{\max}\ [\mathrm{kNm/m}]$ |
+| Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ |
 | ---: | ---: | ---: | ---: |
 | S1 · Stütze | $11.3$ | – | – |
 | L1 · Linienlager | $175.8$ | $55.5$ | – |
-| L2 · Linienlager | $103.4$ | $40.5$ | $49.2$ |
+| L2 · Linienlager | $103.4$ | $40.5$ | $-49.2$ |
 | L3 · Linienlager | $68.3$ | $19.1$ | – |
 | L4 · Linienlager | $99.1$ | $38.3$ | – |
 | L5 · Linienlager | $0.0$ | $0.0$ | $241.4$ |
@@ -17294,7 +17294,7 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L8 · Linienlager | $49.6$ | $40.1$ | – |
 | L9 · Linienlager | $16.0$ | $9.9$ | – |
 
-Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der grösste Wert davon. Das Moment eines eingespannten Lagers dreht um dessen Achse und steht als Betrag da: sein Vorzeichen hinge an der Richtung, in der das Lager gezeichnet ist.
+Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
 **Schnittkräfte der Platte, je Meter**
 

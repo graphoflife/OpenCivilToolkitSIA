@@ -1,5 +1,5 @@
 ---
-erzeugt: 986c416eded9
+erzeugt: 08267471d952
 art: modul
 tags: [modul]
 ---
@@ -32,7 +32,8 @@ Eine Stütze bekommt die Summe der Kräfte aller Träger auf ihr. Ein
 Linienlager bekommt von jedem Träger, der es kreuzt, dessen Kraft --
 gleichmässig verteilt über das Stück des Lagers, über das der Träger geht --
 und bei Einspannung dessen Moment ebenso: ein Verlauf in kN/m und kNm/m
-längs des Lagers.
+längs des Lagers, das Moment mit dem Vorzeichen der Platte
+([[opencivil.decke.rechnung#lagerverlauf|lagerverlauf]]).
 
 ## Inhalt
 
@@ -70,6 +71,14 @@ def last(self) -> float
 
 Was auf ihm liegt, zusammen, in N.
 
+#### Traegerergebnis.beidseits
+
+```python
+def beidseits(self, s: float) -> Tuple[float, float]
+```
+
+`M` knapp vor und knapp nach der Stelle `s`, in Nm -- vor seinem Anfang und nach seinem Ende null.
+
 ### Wandkraft
 
 ```python
@@ -83,8 +92,9 @@ Was ein Träger in ein Linienlager gibt -- gleichmässig über das Stück `a →
 - `a: Punkt`
 - `b: Punkt`
 - `F: float` – Nach unten auf das Lager, in N.
-- `C: float` – Das Einspannmoment, in Nm -- positiv, wenn es den Träger im Gegenuhrzeigersinn hält.
-- `n: Punkt` – Die Richtung des Trägers, längs: in ihr hält `C` ihn, von `t` her gesehen.
+- `vor: float`
+- `nach: float` – Hält das Lager die Drehung, das Moment des Trägers knapp vor und knapp nach ihm, in Nm, `M > 0` zieht unten -- vor seinem Anfang und nach seinem Ende null. Was das Lager hält, ist der Unterschied. Ein Lager, das die Drehung nicht hält, hält kein Moment: dann beide null.
+- `n: Punkt` – Die Richtung des Trägers: in ihr liegt `nach` hinter dem Lager.
 
 #### Wandkraft.laenge
 
@@ -93,14 +103,14 @@ Was ein Träger in ein Linienlager gibt -- gleichmässig über das Stück `a →
 def laenge(self) -> float
 ```
 
-#### Wandkraft.je_meter
+#### Wandkraft.r
 
 ```python
 @property
-def je_meter(self) -> Tuple[float, float]
+def r(self) -> float
 ```
 
-`(r, m)`: Kraft in N/m und Moment in Nm/m.
+Die Kraft je Meter des Lagers, in N/m.
 
 ### Fallergebnis
 
@@ -207,7 +217,7 @@ also negativ.
 ### _weitergeben
 
 ```python
-def _weitergeben(k: Lagerkraft, traeger: Traeger, zerlegung: Zerlegung, heraus: Fallergebnis, uebertragen: Dict[str, List[Teillast]]) -> None
+def _weitergeben(k: Lagerkraft, ergebnis: Traegerergebnis, zerlegung: Zerlegung, heraus: Fallergebnis, uebertragen: Dict[str, List[Teillast]]) -> None
 ```
 
 Die Kraft eines Lagers auf den Träger geht, umgekehrt, in das, worauf er liegt.
@@ -220,10 +230,22 @@ def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple
 
 Längs eines Linienlagers, was die Träger in es geben: Stufen
 `(u_a, u_b, r, m)` von seinem Anfang bis zu seinem Ende, `u` in m ab
-`lager.a`, `r` nach unten in N/m und `m` in Nm/m um seine Achse,
-rechtsdrehend um `a → b` positiv. Wo zwei Träger dasselbe Stück
-tragen, zählen beide -- darum das Moment um die Achse des Lagers: so
-lassen sich auch Träger verschiedener Richtung zusammenzählen.
+`lager.a`, `r` nach unten in N/m und `m` in Nm/m: das Moment, das
+es hält, mit dem Vorzeichen der Platte -- negativ, wo es oben zieht, wie
+herum das Lager auch gezeichnet ist ([[opencivil.decke.rechnung#_gehalten|_gehalten]]). Wo zwei Träger
+dasselbe Stück tragen, zählen beide; ein schiefer gibt quer zum Lager
+cos² seines Winkels weiter, wie die Platte (Folie 14).
+
+### _gehalten
+
+```python
+def _gehalten(links: float, rechts: float) -> float
+```
+
+Was ein Lager an Moment hält, je Meter, wenn die Platte links von ihm
+mit `links` an ihm zieht und rechts mit `rechts`: den Unterschied,
+mit dem Vorzeichen der Seite, die stärker zieht. An einem Rand ist die
+andere Seite null -- dann ist es das Moment der Platte dort.
 
 ### spitzen
 
@@ -231,10 +253,7 @@ lassen sich auch Träger verschiedener Richtung zusammenzählen.
 def spitzen(stufen: Sequence[Tuple[float, float, float, float]]) -> Tuple[float, float]
 ```
 
-Aus den Stufen eines Linienlagers ([[opencivil.decke.rechnung#lagerverlauf|lagerverlauf]]): der Wert von
-`r` mit dem grössten Betrag und der grösste Betrag von `m` -- nur
-der Betrag, denn das Vorzeichen von `m` hängt an der Richtung, in der
-das Lager gezeichnet ist.
+Aus den Stufen eines Linienlagers ([[opencivil.decke.rechnung#lagerverlauf|lagerverlauf]]): je der Wert von `r` und `m` mit dem grössten Betrag.
 
 ### _schwerpunkt
 

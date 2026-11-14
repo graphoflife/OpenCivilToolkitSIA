@@ -7,6 +7,35 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Decken: das Einspannmoment mit dem Vorzeichen der Platte
+
+Das Moment eines eingespannten Linienlagers steht in Bild und Bericht jetzt
+mit dem Vorzeichen der Platte: negativ, wo es oben zieht (Benutzer,
+2026-11-14). Vorher stand nur sein Betrag da. Im Beispiel «Jede Wahl»
+zeigt der eingespannte Rand L2 −24.8 kNm/m, L5 dagegen, der nur die Drehung
+hält, +102.6 -- dort hängt das Feld durch, und es zieht unten.
+
+Warum so:
+
+- Vorher zählte das Moment um die Achse des Lagers, rechtsdrehend um a → b.
+  Sein Vorzeichen hing daran, wie herum jemand das Lager gezeichnet hatte,
+  und sagte darum niemandem etwas. Das Vorzeichen der Platte hängt nur an
+  der Seite, auf der die Platte liegt.
+- Dafür gibt jeder Träger dem Lager sein Moment knapp vor und knapp nach
+  ihm mit (`Wandkraft.vor`, `nach`), statt des Einspannmoments allein. Am
+  Rand ist eines davon null, und das andere ist das Moment der Platte dort.
+- Liegt Platte zu beiden Seiten -- eine eingespannte Wand zwischen zwei
+  Feldern --, hält das Lager nur den Unterschied ihrer Momente. Das
+  Vorzeichen hat dann keine Seite von selbst; es gilt die Seite, die
+  stärker zieht (`rechnung._gehalten`). Zwischen Feldern von 4 und 6 m
+  zieht die Platte links mit −q · 4²/8 = −2 q an der Wand, rechts mit
+  −q · 6²/8 = −4.5 q; die Wand hält −2.5 q, mit dem Vorzeichen der
+  rechten Seite.
+- Ein schiefer Träger gibt quer zum Lager cos² seines Winkels weiter, wie
+  die Platte -- das blieb.
+- Ein Lager, das die Drehung nicht hält, bekommt kein Moment: dort stünde
+  sonst Rauschen aus der Rechnung statt einer Null.
+
 ## 2026-11-14 · Decken: neu ohne GZG
 
 Eine neue Decke bringt die Lastfälle des Balkensystems mit -- Eigengewicht,

@@ -8,11 +8,6 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] Decken: das Moment eines eingespannten Linienlagers steht im Bild
-      der Lager und im Bericht nur als Betrag. Sein Vorzeichen um die Achse des Lagers
-      hängt an der Richtung, in der es gezeichnet ist, und sagt darum
-      niemandem etwas. Prüfen, ob es mit dem Vorzeichen der Platte
-      dastehen soll -- negativ, wo es oben zieht.
 - [ ] Decken: die Knoten der Lasten anderer Lastfälle bleiben in der
       Zeichnung als Punkte stehen, ohne ihre Last. Prüfen, ob sie mit ihr
       verschwinden sollen.

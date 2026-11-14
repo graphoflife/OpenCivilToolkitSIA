@@ -61,7 +61,7 @@ const HILFE = {
       ['m_x, m_y', 'die Momente je Meter in x und y, positiv mit Zug unten -- bei schiefen Streifen aus m_η umgerechnet'],
       ['m_xy', 'das Drillmoment je Meter: nur, wo ein Streifen schief zu x und y trägt'],
       ['v_x, v_y, v_0', 'die Querkräfte je Meter und die Hauptquerkraft v_0 = √(v_x² + v_y²)'],
-      ['Lager', 'je Linienlager der Verlauf seiner Kraft über die Länge; darunter je Lager die Summe, eingespannt auch das grösste Moment'],
+      ['Lager', 'je Linienlager der Verlauf seiner Kraft über die Länge; darunter je Lager die Summe, eingespannt auch sein Moment, negativ, wo es oben zieht'],
       ['Angeschrieben', 'der grösste und der kleinste Wert, mit Punkt an seiner Stelle; über einer Zelle ihr Wert'],
     ],
   },

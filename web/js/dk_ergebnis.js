@@ -9,7 +9,7 @@
  *   v_x, v_y, v_0    die Querkräfte je Meter und die Hauptquerkraft;
  *   Lager            je Linienlager der Verlauf seiner Kraft über die
  *                    Länge; darunter je Lager die Summe, eingespannt auch
- *                    das grösste Moment.
+ *                    sein Moment, mit dem Vorzeichen der Platte.
  *
  * Die Schnittkräfte liegen in Farbe über dem Grundriss: positiv rot,
  * negativ blau, weiss bei null -- je kräftiger, desto näher am grössten
@@ -185,13 +185,13 @@ function linienlager(v, decke, ergebnis) {
 
 /**
  * Je Lager eine Zeile: die Summe, beim Linienlager der Wert von r mit dem
- * grössten Betrag -- eingespannt auch das grösste Moment, als Betrag.
+ * grössten Betrag -- eingespannt auch der von m, mit dem Vorzeichen der Platte.
  */
 function lagertabelle(ergebnis) {
   const eingespannt = ergebnis.linienlager.some((l) => l.eingespannt);
   const zahl = (wert) => zahlText(wert, STELLEN);
   const moment = (l) => (eingespannt ? [l?.eingespannt ? zahl(l.m_max) : '–'] : []);
-  return tabelle(['Lager', 'F [kN]', 'r_max [kN/m]', ...(eingespannt ? ['|m|_max [kNm/m]'] : [])], [
+  return tabelle(['Lager', 'F [kN]', 'r_max [kN/m]', ...(eingespannt ? ['m_max [kNm/m]'] : [])], [
     ...ergebnis.stuetzen.map((s) => [`${s.name} · Stütze`, zahl(s.F), '–', ...moment(null)]),
     ...ergebnis.linienlager.map((l) => [`${l.name} · Linienlager`, zahl(l.F), zahl(l.r_max), ...moment(l)]),
   ]);
@@ -207,7 +207,8 @@ function lagerInhalt(decke, daten, ergebnis) {
     lagertabelle(ergebnis),
     el('p.karte-hinweis', {
       text: 'Im Bild je Linienlager die Kraft r über seine Länge: was zwei Streifen auf dasselbe Stück geben, '
-        + 'zählt zusammen. Das Moment eines eingespannten Rands steht nur als Betrag da.',
+        + 'zählt zusammen. Das Moment eines eingespannten Lagers steht mit dem Vorzeichen der Platte da: '
+        + 'negativ, wo es oben zieht.',
     }),
   ];
 }

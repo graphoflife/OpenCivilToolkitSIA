@@ -1,5 +1,5 @@
 ---
-erzeugt: 31f93680dfa2
+erzeugt: c282797bee23
 art: modul
 tags: [modul]
 ---
@@ -130,7 +130,7 @@ Eine Zahl als Formel, damit ihr Minus eines ist; der Strich bleibt Text.
 def _lagerkraefte(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None
 ```
 
-Was jedes Lager trägt; längs eines Linienlagers die Spitze und, eingespannt, das grösste Moment.
+Was jedes Lager trägt; längs eines Linienlagers die Spitze und, eingespannt, die des Moments.
 
 ### _schnittkraefte
 
