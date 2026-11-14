@@ -219,10 +219,10 @@ class TestNachweis(unittest.TestCase):
         aufbau, _ = rechnen(projekt)
         self.assertEqual(aufbau.feld("verformung"), {})
 
-    def test_die_vorgabe_steht_in_der_herleitung(self):
-        """L/350 ist nach Vorgabe eingebaut -- das steht da, nicht nur im Code."""
+    def test_die_annahme_steht_in_der_herleitung(self):
+        """Woher E_cm und L/350 kommen, steht in der Herleitung, nicht nur im Code."""
         texte = [getattr(b, "text", "") for b in self.loesung.protokoll.alle_bloecke()]
-        self.assertTrue(any("nach Vorgabe, nicht nachgeschlagen" in t and "E_cm" in t
+        self.assertTrue(any("E_cm" in t and "4.2.1.16" in t and "Tabelle 3" in t
                             for t in texte))
 
 
