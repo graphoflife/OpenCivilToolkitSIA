@@ -51,4 +51,6 @@ $$
 
 Der Flansch $b \times h_f$ oben und der Steg $b_w \times (h - h_f)$ darunter.
 So lässt sich ein Plattenbalken rechnen: die Breite der Platte, die mitträgt,
-wird als Flanschbreite $b$ eingesetzt.
+wird als Flanschbreite $b$ eingesetzt. Wie breit sie ist, schätzt die Norm
+aus der Stegbreite, dem Abstand zum nächsten Steg und dem Abstand der
+Momentennullpunkte ab; über einer Stütze ist sie schmaler als im Feld.

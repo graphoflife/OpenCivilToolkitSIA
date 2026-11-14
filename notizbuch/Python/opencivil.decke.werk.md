@@ -1,5 +1,5 @@
 ---
-erzeugt: 9d9603878aed
+erzeugt: 96b2a1d079a6
 art: modul
 tags: [modul]
 ---
@@ -18,8 +18,9 @@ von aussen liest.
 ## E UND GEWICHT
 
 nimmt jede Platte von ihrem Beton, wie ein Stab des Balkensystems
-([[opencivil.stabwerk.rechnung#Konstanten|BETONKENNWERTE]]): `E_cm` -- nach
-Vorgabe, nicht nachgeschlagen -- und die Dichte des Stahlbetons, mit
+([[opencivil.stabwerk.rechnung#Konstanten|BETONKENNWERTE]]): `E_cm` am
+ungerissenen Querschnitt (SIA 262:2025, 4.1.4.1.3) und die Dichte des
+Stahlbetons, mit
 `g = 10 m/s²` ([[opencivil.stabwerk.rechnung#Konstanten|ERDBESCHLEUNIGUNG]],
 Benutzer, 2026-10-23) ihr Gewicht je m³. Die Regel steht dort; hier wird
 sie nur gelesen.

@@ -473,7 +473,7 @@ class TestRechnen(unittest.TestCase):
 
     def test_herleitung(self):
         text = str(traeger().rechnen().bericht())
-        for wort in ("Balkensystem: Träger", "nach Vorgabe, nicht nachgeschlagen",
+        for wort in ("Balkensystem: Träger", "4.1.4.1.3", "Auflagern",
                      "Gleichgewichtsprobe", "Extremwerte", "Lagerkräfte"):
             self.assertIn(wort, text)
 

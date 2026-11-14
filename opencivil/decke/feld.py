@@ -25,7 +25,10 @@ Feldstreifen und jeder Unterzug, in dessen Fläche sie liegt.
 
 BIEGEWIDERSTÄNDE:
 Nach der linearisierten Normalmomenten-Fliessbedingung, ``k = k' = 1``
-(Folien 9 und 10)::
+(Folien 9 und 10) -- in der Norm SIA 262:2025, 4.3.2.6, (34), als Näherung
+für Bewehrung in x und y und nicht zu grosse Drillmomente. Weicht die
+Hauptbeanspruchung deutlich von der Bewehrung ab, etwa bei schiefen
+Streifen, verlangt 4.3.2.5, das zu beachten::
 
     m_x,u  ≥  m_x + |m_xy|      m'_x,u ≥ −m_x + |m_xy|
     m_y,u  ≥  m_y + |m_xy|      m'_y,u ≥ −m_y + |m_xy|

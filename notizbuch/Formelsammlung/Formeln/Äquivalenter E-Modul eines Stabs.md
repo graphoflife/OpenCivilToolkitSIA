@@ -46,6 +46,10 @@ Derselbe äquivalente Modul wie die Linie
 einer Stelle: bei der Normalkraft N und dem Moment M, die der Benutzer am
 Querschnitt eines Balkensystems eingibt (Benutzer, 2026-10-23). Ein Stab mit diesem Querschnitt rechnet dann
 mit $EA = E_{eq} \cdot A$ und $EI = E_{eq} \cdot I$ -- ein E für beides.
+Für $EI$ ist das eine Sekantensteifigkeit, wie sie die Norm für eine
+vereinfachte Rechnung mit Rissen und Kriechen zulässt. Für $EA$ ist es eine
+Näherung: der Modul kommt aus der Krümmung unter M, nicht aus der Dehnung
+unter N.
 
 Wie die Linie: ungerissen bis zum Rissmoment bei N, darüber gerissen;
 gezählt ab der Krümmung $\chi_0$ ohne Moment. Bei M = 0 gilt der Wert, mit

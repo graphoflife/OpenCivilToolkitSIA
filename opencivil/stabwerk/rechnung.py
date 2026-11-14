@@ -62,9 +62,9 @@ from opencivil.stabwerk.stabquerschnitt import Stabquerschnitt
 from opencivil.stabwerk.system import Ergebnis, Fall, Meldung, rechnen
 from opencivil.stabwerk.verlauf import Stabverlauf, verlaeufe
 
-#: Welche Kennwerte eines Betons ein Stab aus ihm nimmt: ``E_cm`` -- nach
-#: Vorgabe, nicht nachgeschlagen -- und die Dichte des Stahlbetons
-#: (Benutzer, 2026-10-23).
+#: Welche Kennwerte eines Betons ein Stab aus ihm nimmt: ``E_cm`` -- die
+#: Analyse rechnet in der Regel ungerissen (SIA 262:2025, 4.1.4.1.3), mit
+#: dem Mittelwert -- und die Dichte des Stahlbetons (Benutzer, 2026-10-23).
 BETONKENNWERTE = {"E": "E_cm", "rho": "rho_sb"}
 
 #: Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des

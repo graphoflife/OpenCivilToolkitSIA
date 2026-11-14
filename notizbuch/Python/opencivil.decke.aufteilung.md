@@ -1,5 +1,5 @@
 ---
-erzeugt: 6cbb3a23d5cc
+erzeugt: df79b83c6532
 art: modul
 tags: [modul]
 ---
@@ -38,7 +38,8 @@ die Last darauf.
 ```
 Für die einfach gelagerte Rechteckplatte der Folie 31 ergibt das genau
 deren Aufteilung. Für andere Platten ist es eine Verallgemeinerung --
-nach Vorgabe, nicht nachgeschlagen.
+nach Vorgabe. Die Norm schreibt keine vor: nach der statischen Methode
+gilt jede, die im Gleichgewicht ist (SIA 262:2025, 4.1.4.2.2).
 ```
 
 

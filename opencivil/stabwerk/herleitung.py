@@ -41,11 +41,23 @@ STAEBE_MIT_MATRIX = 6
 #: Bis zu so vielen Unbekannten stehen Gesamtmatrix, Lastvektor und Loesung mit Zahlen da.
 UNBEKANNTE_MIT_MATRIX = 12
 
-#: Was die Steifigkeit annimmt -- nach Vorgabe, nicht nachgeschlagen.
-ANNAHME = ("Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm für Beton und E_s für "
-           "Betonstahl, am ungerissenen Bruttoquerschnitt – je Querschnitt auch ein E von "
-           "Hand oder das E_eq seiner Querschnittsanalyse –, ohne Schubverformung; "
-           "Gleichgewicht am unverformten System (Theorie 1. Ordnung).")
+#: Was die Steifigkeit und das Gleichgewicht annehmen.
+ANNAHME = ("Steifigkeit: E_cm des Betons oder das E eines eigenen Materials; bei einem "
+           "Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E_eq bei N und M, "
+           "eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen "
+           "Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), "
+           "aber ohne die Bewehrung und ohne Schubverformung. Gleichgewicht am unverformten "
+           "System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein "
+           "bleiben (4.1.3.2.2). Schlanke Druckglieder sind nach 4.3.7 nachzuweisen; eine "
+           "Schiefstellung nach 4.1.3.2.3, (17) lässt sich als waagrechte Last ansetzen.")
+
+#: Was die Durchbiegung w ist -- und was sie nicht ist.
+DURCHBIEGUNG = ("Die Durchbiegung w misst jeder Stab gegen die Gerade zwischen seinen Enden. "
+                "Die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1), beim "
+                "Kragarm über die doppelte Länge (SIA 260:2013, 1.2.2): dasselbe nur, wo ein "
+                "Stab von Auflager zu Auflager reicht – ein Knoten im Feld oder ein Kragarm "
+                "geben hier weniger. Und w gilt kurzzeitig am ungerissenen Querschnitt, die "
+                "untere Grenze (SIA 262:2025, 4.4.3.2.2); Risse und Kriechen fehlen.")
 
 #: Das Gleichungssystem in Zeichen.
 GLEICHUNGSSYSTEM_LATEX = (
@@ -68,6 +80,7 @@ def schreiben(p: Protokoll, system: "Balkensystem", befund: "Systembefund") -> N
     """Die ganze Herleitung eines gerechneten Systems."""
     e = befund.ergebnis
     p.annahme(ANNAHME)
+    p.annahme(DURCHBIEGUNG)
     _staebe(p, system, befund.gerechnet)
     _lager(p, befund.gerechnet)
     for m in e.meldungen:
@@ -257,7 +270,7 @@ def _lagerkraefte(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
 
 def _extremwerte(p: Protokoll, verlaeufe) -> None:
     zeilen = []
-    massgebend: Tuple[float, str, float, float] = (0.0, "", 0.0, 0.0)
+    massgebend: Tuple[float, str, float] = (0.0, "", 0.0)
     for name, v in verlaeufe.items():
         for groesse, einheit, faktor, stellen in (("N", "kN", 1e-3, 1), ("V", "kN", 1e-3, 1),
                                                   ("M", "kNm", 1e-3, 1), ("w", "mm", 1e3, 2)):
@@ -271,13 +284,13 @@ def _extremwerte(p: Protokoll, verlaeufe) -> None:
             if groesse == "w":
                 for x, w in ((x0, klein), (x1, gross)):
                     if abs(w) > abs(massgebend[0]):
-                        massgebend = (w, name, x, v.L)
+                        massgebend = (w, name, x)
     p.tabelle(["Stab", "Grösse", "kleinst", Mathe(r"x\ [\mathrm{m}]"), "grösst",
                Mathe(r"x\ [\mathrm{m}]")], zeilen, titel="Extremwerte")
-    w, name, x, L = massgebend
+    w, name, x = massgebend
     if name and abs(w) > 0.0:
-        p.text(f"Grösste Durchbiegung gegen die Sehne: {name}, w = {w * 1e3:.2f} mm bei "
-               f"x = {x:.2f} m, L/w = {L / abs(w):.0f}.")
+        p.text(f"Grösste Durchbiegung gegen die Sehne eines Stabs: {name}, "
+               f"w = {w * 1e3:.2f} mm bei x = {x:.2f} m.")
 
 
 def _gleichgewicht(p: Protokoll, fall: Fall) -> None:

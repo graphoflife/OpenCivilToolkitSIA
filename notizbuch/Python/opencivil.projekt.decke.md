@@ -1,5 +1,5 @@
 ---
-erzeugt: bd2b2fb64f03
+erzeugt: 5850ca86ec9b
 art: modul
 tags: [modul]
 ---
@@ -196,8 +196,9 @@ class PunktlastEintrag(Beschreibung)
 ```
 
 Eine Einzellast an einem Knoten, in einem Lastfall. Die Streifen tragen
-sie gleichmaessig verteilt ueber `l_x × l_y` (nach Vorgabe, nicht
-nachgeschlagen); was das die Platte darueber hinaus kostet, sagt das
+sie gleichmaessig verteilt ueber `l_x × l_y` (nach Vorgabe; die Norm
+sagt nichts dazu, und SIA 261:2020, Tabelle 8 stellt die Last selbst auf
+50 × 50 mm); was das die Platte darueber hinaus kostet, sagt das
 Lastverteilelement.
 
 - `kennung: str = ''`

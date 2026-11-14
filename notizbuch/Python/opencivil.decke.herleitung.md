@@ -1,5 +1,5 @@
 ---
-erzeugt: ff71f8ae157f
+erzeugt: 17800fbf16a1
 art: modul
 tags: [modul]
 ---
@@ -58,7 +58,7 @@ Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, u
 
 ## Konstanten
 
-- `ANNAHME = 'Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede…` – Was die Streifenmethode annimmt -- die Steifigkeit nach Vorgabe, nicht nachgeschlagen.
+- `ANNAHME = 'Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede…` – Was die Streifenmethode annimmt.
 - `AUTOMATISCH = 'Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstre…` – Die automatische Aufteilung in Worten -- die Regel steht in [[opencivil.decke.aufteilung|aufteilung]].
 
 ## Braucht

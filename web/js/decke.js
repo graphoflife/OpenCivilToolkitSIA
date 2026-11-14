@@ -42,7 +42,7 @@ const HILFE = {
       ['Unterzug', 'versteckt in der Platte, ein starker Streifen der Breite b -- er liegt auf Lagern, Stützen und Unterzügen höherer Stufe'],
       ['Zone', 'dort geht ihr Anteil der Last in Richtung 1, der Rest in Richtung 2'],
     ],
-    formel: 'Streifenmethode: jede Last in Streifen zweier Richtungen, ohne Drillmomente',
+    formel: 'Streifenmethode: jede Last in Streifen zweier Richtungen; die Streifen tragen ohne Drillmoment, schiefe Richtungen geben in x, y ein m_xy',
   },
   streifen: {
     zeilen: [

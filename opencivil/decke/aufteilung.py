@@ -28,7 +28,8 @@ DREI QUELLEN, IN DIESER FOLGE:
 
    Für die einfach gelagerte Rechteckplatte der Folie 31 ergibt das genau
    deren Aufteilung. Für andere Platten ist es eine Verallgemeinerung --
-   nach Vorgabe, nicht nachgeschlagen.
+   nach Vorgabe. Die Norm schreibt keine vor: nach der statischen Methode
+   gilt jede, die im Gleichgewicht ist (SIA 262:2025, 4.1.4.2.2).
 
 FLÄCHEN MIT ANTEIL:
 Ein :class:`Anteil` ist ein konvexes Vieleck und ein Faktor: die Last

@@ -1,5 +1,5 @@
 ---
-erzeugt: 473746b7789e
+erzeugt: 2d6ebc0fada9
 art: modul
 tags: [modul]
 ---
@@ -267,7 +267,7 @@ seinem Material nimmt, eine Meldung.
 
 ## Konstanten
 
-- `BETONKENNWERTE = {'E': 'E_cm', 'rho': 'rho_sb'}` – Welche Kennwerte eines Betons ein Stab aus ihm nimmt: `E_cm` -- nach Vorgabe, nicht nachgeschlagen -- und die Dichte des Stahlbetons (Benutzer, 2026-10-23).
+- `BETONKENNWERTE = {'E': 'E_cm', 'rho': 'rho_sb'}` – Welche Kennwerte eines Betons ein Stab aus ihm nimmt: `E_cm` -- die Analyse rechnet in der Regel ungerissen (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert -- und die Dichte des Stahlbetons (Benutzer, 2026-10-23).
 - `ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)` – Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
 - `QUERSCHNITTE = 'Stabquerschnitte'` – Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.
 - `STEIFIGKEITSMETHODE = 'Steifigkeitsmethode'`

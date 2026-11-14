@@ -33,4 +33,6 @@ Die Zeilen in Längsrichtung sind die einer Feder $EA/L$. Die übrigen kommen
 aus der Biegelinie nach Euler-Bernoulli, ohne Schubverformung: mit
 kubischen Formfunktionen, die für einen Stab ohne Last zwischen den Enden
 genau sind. Theorie 1. Ordnung -- die Normalkraft ändert die
-Biegesteifigkeit nicht.
+Biegesteifigkeit nicht. Das reicht, solange die Wirkungen 2. Ordnung klein
+bleiben; ein schlankes Druckglied braucht den Nachweis des Knickens, und
+eine Schiefstellung lässt sich als waagrechte Last ansetzen.

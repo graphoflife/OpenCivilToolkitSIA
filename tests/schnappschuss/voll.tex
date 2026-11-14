@@ -9435,7 +9435,8 @@ EI_{\text{Q10}} = E_{\text{Q10}} \cdot I_{\text{Q10}} = 5441\,\mathrm{N}/\mathrm
 \begin{equation*}
 g_{k,\text{Q10}} = \rho_{sb} \cdot g \cdot A_{\text{Q10}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 330000\,\mathrm{mm}^{2} = 8.25\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
-\hinweis{Annahme}{Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt – je Querschnitt auch ein E von Hand oder das E\_eq seiner Querschnittsanalyse –, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).}
+\hinweis{Annahme}{Steifigkeit: E\_cm des Betons oder das E eines eigenen Materials; bei einem Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), aber ohne die Bewehrung und ohne Schubverformung. Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2). Schlanke Druckglieder sind nach 4.3.7 nachzuweisen; eine Schiefstellung nach 4.1.3.2.3, (17) lässt sich als waagrechte Last ansetzen.}
+\hinweis{Annahme}{Die Durchbiegung w misst jeder Stab gegen die Gerade zwischen seinen Enden. Die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1), beim Kragarm über die doppelte Länge (SIA 260:2013, 1.2.2): dasselbe nur, wo ein Stab von Auflager zu Auflager reicht – ein Knoten im Feld oder ein Kragarm geben hier weniger. Und w gilt kurzzeitig am ungerissenen Querschnitt, die untere Grenze (SIA 262:2025, 4.4.3.2.2); Risse und Kriechen fehlen.}
 \noindent\textbf{Stäbe}
 \begin{longtable}{rrrrrrrrr}
 \hline
@@ -9586,7 +9587,7 @@ L9 & $M$ & $-16.5\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $2.00$ \\
 L9 & $w$ & $-0.04\ \mathrm{mm}$ & $0.74$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 \hline
 \end{longtable}
-Grösste Durchbiegung gegen die Sehne: L1, w = -0.59 mm bei x = 4.97 m, L/w = 13476.
+Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -0.59 mm bei x = 4.97 m.
 
 \noindent\textbf{Gleichgewichtsprobe (Moment um den Ursprung)}
 \begin{longtable}{rrrrr}
@@ -9688,7 +9689,7 @@ L9 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
 L9 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 \hline
 \end{longtable}
-Grösste Durchbiegung gegen die Sehne: L1, w = -0.36 mm bei x = 5.53 m, L/w = 22002.
+Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -0.36 mm bei x = 5.53 m.
 
 \noindent\textbf{Gleichgewichtsprobe (Moment um den Ursprung)}
 \begin{longtable}{rrrrr}
@@ -9793,7 +9794,7 @@ L9 & $M$ & $-22.3\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $2.00$ \\
 L9 & $w$ & $-0.05\ \mathrm{mm}$ & $0.74$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
 \hline
 \end{longtable}
-Grösste Durchbiegung gegen die Sehne: L1, w = -1.34 mm bei x = 5.17 m, L/w = 5987.
+Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -1.34 mm bei x = 5.17 m.
 
 \noindent\textbf{Gleichgewichtsprobe (Moment um den Ursprung)}
 \begin{longtable}{rrrrr}
@@ -9823,7 +9824,8 @@ EA = E_{cm} \cdot A = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 180000\,\mathrm{mm
 \begin{equation*}
 EI = E_{cm} \cdot I = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5400\,\cdot 10^{6}\,\mathrm{mm}^{4} = 181547\,\mathrm{kNm}^{2}
 \end{equation*}
-\hinweis{Annahme}{Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt – je Querschnitt auch ein E von Hand oder das E\_eq seiner Querschnittsanalyse –, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).}
+\hinweis{Annahme}{Steifigkeit: E\_cm des Betons oder das E eines eigenen Materials; bei einem Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), aber ohne die Bewehrung und ohne Schubverformung. Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2). Schlanke Druckglieder sind nach 4.3.7 nachzuweisen; eine Schiefstellung nach 4.1.3.2.3, (17) lässt sich als waagrechte Last ansetzen.}
+\hinweis{Annahme}{Die Durchbiegung w misst jeder Stab gegen die Gerade zwischen seinen Enden. Die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1), beim Kragarm über die doppelte Länge (SIA 260:2013, 1.2.2): dasselbe nur, wo ein Stab von Auflager zu Auflager reicht – ein Knoten im Feld oder ein Kragarm geben hier weniger. Und w gilt kurzzeitig am ungerissenen Querschnitt, die untere Grenze (SIA 262:2025, 4.4.3.2.2); Risse und Kriechen fehlen.}
 \noindent\textbf{Stäbe}
 \begin{longtable}{rrrrrrrrr}
 \hline
@@ -9883,7 +9885,7 @@ v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
 \begin{equation*}
 g = 10\,\mathrm{m}/\mathrm{s}^{2}
 \end{equation*}
-\hinweis{Annahme}{Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern, ohne Drillmomente – eine Gleichgewichtslösung und damit ein unterer Grenzwert der Traglast. Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (nach Vorgabe, nicht nachgeschlagen); ein Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).}
+\hinweis{Annahme}{Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern; die Streifen selbst tragen ohne Drillmoment. Das ist eine Gleichgewichtslösung nach der statischen Methode und damit ein unterer Grenzwert der Traglast (SIA 262:2025, 4.1.4.2.2) – für die Tragsicherheit (4.1.4.2.1), und nur, wenn das Verformungsvermögen gesichert ist (4.1.4.2.4). Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).}
 \noindent\textbf{Platten}
 \begin{longtable}{rrrrrrr}
 \hline
@@ -9968,7 +9970,7 @@ Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf
 \begin{equation*}
 g = 10\,\mathrm{m}/\mathrm{s}^{2}
 \end{equation*}
-\hinweis{Annahme}{Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern, ohne Drillmomente – eine Gleichgewichtslösung und damit ein unterer Grenzwert der Traglast. Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (nach Vorgabe, nicht nachgeschlagen); ein Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).}
+\hinweis{Annahme}{Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen zweier Richtungen zu den Lagern; die Streifen selbst tragen ohne Drillmoment. Das ist eine Gleichgewichtslösung nach der statischen Methode und damit ein unterer Grenzwert der Traglast (SIA 262:2025, 4.1.4.2.2) – für die Tragsicherheit (4.1.4.2.1), und nur, wenn das Verformungsvermögen gesichert ist (4.1.4.2.4). Statisch unbestimmte Streifen sind elastisch gelöst, mit E\_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).}
 \noindent\textbf{Platten}
 \begin{longtable}{rrrrrrr}
 \hline
@@ -10038,7 +10040,7 @@ y & $90.0$ & 13 & $0.300 \ldots 0.500$ & y1 … y13 \\
 \end{longtable}
 Je Richtung sind die Streifen höchstens 0.50 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers.
 
-Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, sonst in die kürzere Spannweite; nahe zweier Ränder und bei gleicher Spannweite je zur Hälfte. Ein Kragarm zählt doppelt (nach Vorgabe, nicht nachgeschlagen).
+Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, sonst in die kürzere Spannweite; nahe zweier Ränder und bei gleicher Spannweite je zur Hälfte. Ein Kragarm zählt doppelt (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).
 
 \noindent\textbf{Zonen – sie gehen der Aufteilung vor}
 \begin{longtable}{rrrr}

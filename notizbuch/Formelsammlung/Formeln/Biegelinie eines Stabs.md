@@ -30,5 +30,11 @@ aus, mit dessen Verschiebung und Drehung aus der Lösung, ergibt sich die
 Biegelinie; am Ende trifft sie die Verschiebung des Endes.
 
 Die Durchbiegung $w$ wird gegen die Sehne zwischen den beiden Stabenden
-gemessen -- so, wie man $L/300$ prüft, ohne das, was sich der ganze Stab
-verschiebt.
+gemessen, ohne das, was sich der ganze Stab verschiebt. Die Norm misst
+gegenüber den Auflagern, beim Kragarm über die doppelte Länge; die
+Richtwerte der SIA 260:2013, Anhang A, Tabelle 3 gelten je nach Lastfall
+und mit den Langzeitwirkungen. Gegen die Sehne ist das nur dasselbe, wo ein
+Stab von Auflager zu Auflager reicht: liegt ein Knoten im Feld, misst jeder
+Teil gegen seine eigene Sehne, und am Kragarm fällt die Spitze weg. Dazu ist
+$w$ ein Kurzzeitwert am ungerissenen Querschnitt, die untere Grenze --
+Risse und Kriechen machen den Balken weicher.

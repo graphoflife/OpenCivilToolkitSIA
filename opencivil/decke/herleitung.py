@@ -28,21 +28,23 @@ from opencivil.decke.streifen import richtungen_der_platte
 if TYPE_CHECKING:
     from opencivil.decke.werk import Deckenbefund, Deckensystem
 
-#: Was die Streifenmethode annimmt -- die Steifigkeit nach Vorgabe, nicht nachgeschlagen.
+#: Was die Streifenmethode annimmt.
 ANNAHME = (
     "Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede Last geht in Streifen "
-    "zweier Richtungen zu den Lagern, ohne Drillmomente – eine Gleichgewichtslösung und damit ein "
-    "unterer Grenzwert der Traglast. Statisch unbestimmte Streifen sind elastisch gelöst, mit "
-    "E_cm · h³/12 je Meter der ungerissenen Platte (nach Vorgabe, nicht nachgeschlagen); ein "
-    "Unterzug trägt als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).")
+    "zweier Richtungen zu den Lagern; die Streifen selbst tragen ohne Drillmoment. Das ist eine "
+    "Gleichgewichtslösung nach der statischen Methode und damit ein unterer Grenzwert der "
+    "Traglast (SIA 262:2025, 4.1.4.2.2) – für die Tragsicherheit (4.1.4.2.1), und nur, wenn das "
+    "Verformungsvermögen gesichert ist (4.1.4.2.4). Statisch unbestimmte Streifen sind elastisch "
+    "gelöst, mit E_cm · h³/12 je Meter der ungerissenen Platte (4.1.4.1.3); ein Unterzug trägt "
+    "als Flächenlager mit gleichmässiger Pressung über seine Breite (Folie 33).")
 
 #: Die automatische Aufteilung in Worten -- die Regel steht in :mod:`~opencivil.decke.aufteilung`.
 AUTOMATISCH = (
     "Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, "
     "die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der "
     "kürzeren Spannweite an einem Lager liegt, sonst in die kürzere Spannweite; nahe zweier "
-    "Ränder und bei gleicher Spannweite je zur Hälfte. Ein Kragarm zählt doppelt (nach Vorgabe, "
-    "nicht nachgeschlagen).")
+    "Ränder und bei gleicher Spannweite je zur Hälfte. Ein Kragarm zählt doppelt (nach Vorgabe; "
+    "die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).")
 
 
 def schreiben(p: Protokoll, system: "Deckensystem", befund: "Deckenbefund") -> None:

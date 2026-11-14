@@ -41,6 +41,9 @@ $$
 
 Wie stark sich ein Stab gegen eine Längskraft wehrt: $N = EA \cdot \varepsilon$.
 Gerechnet wird mit dem [[Mittelwert des Elastizitätsmoduls]] beim Beton und
-mit $E_s$ beim Stahl, am ungerissenen Bruttoquerschnitt. Das ist eine Annahme
-nach Vorgabe, nicht nachgeschlagen: ein gerissener Betonstab ist weicher, und
-die Bewehrung zählt hier nicht mit.
+mit dem E eines eigenen Materials sonst, bei Stahl etwa $E_s$, am
+ungerissenen Bruttoquerschnitt. So sieht es die Norm für die Analyse in der
+Regel vor: ungerissen, mit dem Mittelwert. Dass die Bewehrung nicht
+mitzählt, ist eine Vereinfachung, der Stab wird damit etwas weicher. Ein
+gerissener Betonstab ist noch weicher; das darf man mit einer begründeten
+Abschätzung ansetzen, etwa mit dem [[Äquivalenter E-Modul eines Stabs|äquivalenten Modul]].

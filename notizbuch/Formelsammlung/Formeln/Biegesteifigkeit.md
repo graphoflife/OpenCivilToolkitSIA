@@ -41,9 +41,10 @@ $$
 
 Wie stark sich ein Stab gegen Biegung wehrt: $M = EI \cdot \chi$, mit der
 Krümmung $\chi$. Wie bei der [[Dehnsteifigkeit]] mit dem Mittelwert des
-E-Moduls am ungerissenen Bruttoquerschnitt -- nach Vorgabe, nicht
-nachgeschlagen.
+E-Moduls am ungerissenen Bruttoquerschnitt, wie es die Norm für die Analyse
+in der Regel vorsieht.
 
 Für die Schnittgrössen eines statisch bestimmten Systems ist sie gleichgültig;
-bei einem unbestimmten zählt nur, wie steif die Stäbe im Verhältnis
-zueinander sind. Die Verschiebungen dagegen hängen an ihrem Betrag.
+bei einem unbestimmten zählt, wie steif die Stäbe im Verhältnis zueinander
+und zu Federn und Bettung sind. Eine kleinere Steifigkeit kann darum günstig
+oder ungünstig wirken. Die Verschiebungen hängen an ihrem Betrag.

@@ -44,6 +44,41 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-14 · Normprüfung V: Decke und Balkensystem
+
+Fünfter Bereich, an den Normseiten bestätigt (SIA 262:2025, S. 43–45, 54,
+66, 78; SIA 260:2013, S. 17 und 33; SIA 261:2020, S. 37).
+
+- **Die Durchbiegung im Balkensystem sagt, was sie ist.** Jeder Stab misst
+  w gegen die Gerade zwischen seinen Enden; die Norm misst gegenüber den
+  Auflagern (4.4.3.1.1), beim Kragarm über die doppelte Länge. Das ist
+  dasselbe nur, wo ein Stab von Lager zu Lager reicht. Einfeldträger 6 m,
+  EI = 22 693 kNm², q = 10 kN/m: gegenüber den Auflagern 7.44 mm; mit einem
+  Knoten in Feldmitte zeigte der Bericht 1.60 mm und L/w = 1875 statt 807.
+  Kragarm 2 m: 0.14 statt 0.88 mm. Der Bericht sagt das jetzt, und L/w ist
+  fort -- es sah aus wie ein Nachweis. Dazu: w gilt kurzzeitig und
+  ungerissen, die untere Grenze (4.4.3.2.2).
+- **Die Annahmen des Balkensystems mit Ziffern:** E_eq ist eine
+  Sekantensteifigkeit (4.1.4.1.2), gerechnet wird ungerissen wie in der
+  Regel vorgesehen (4.1.4.1.3), aber ohne Bewehrung; Theorie 1. Ordnung,
+  solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2), schlanke
+  Druckglieder nach 4.3.7, eine Schiefstellung nach (17) als waagrechte
+  Last. Vorher stand dort «nach Vorgabe, nicht nachgeschlagen».
+- **Die Annahmen der Decke mit Ziffern:** die Streifenmethode ist eine
+  Lösung nach der statischen Methode, ein unterer Grenzwert für die
+  Tragsicherheit (4.1.4.2.1, 4.1.4.2.2), und nur, wenn das
+  Verformungsvermögen gesichert ist (4.1.4.2.4). Jede Aufteilung im
+  Gleichgewicht ist zulässig; die automatische bleibt eine Vorgabe. Die
+  Fliessbedingung der Platte ist (34) der Norm, eine Näherung für
+  Bewehrung in x und y (4.3.2.5, 4.3.2.6). Eine Punktlast stellt
+  SIA 261:2020, Tabelle 8 selbst auf 50 × 50 mm.
+- **Hilfetexte und Formelseiten** nennen dieselben Grenzen: E_eq für EA
+  ist eine Näherung, schiefe Streifen geben in x, y ein m_xy, b_eff hängt
+  vom Abstand der Momentennullpunkte ab und ist über Stützen schmaler.
+- **Offen für den Benutzer** ([[TODO]]): die Durchbiegung je Feld; die
+  Gebrauchskombination der Decke; γ_G,inf = 0.80 für günstige ständige
+  Last; die Vorgaben der Decke; die Dichten aus SIA 261.
+
 ## 2026-11-14 · Normprüfung IV: Gebrauchstauglichkeit
 
 Vierter Bereich, an den Normseiten bestätigt (SIA 262:2025, S. 45, 51, 53,

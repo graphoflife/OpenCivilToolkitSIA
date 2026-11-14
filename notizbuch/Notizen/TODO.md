@@ -24,15 +24,37 @@ gelernt wurde, steht in [[Entwicklung]].
       behält ihre Kante ohne ihn. Prüfen, ob beide ihn bekommen sollen.
 - [ ] Zeichenfenster: während eines Befehls heissen P und S «parallel»
       und «senkrecht», nicht Platte und Stütze. Erst Esc, dann die Taste.
-- [ ] Decken, nach Vorgabe, nicht nachgeschlagen (`opencivil/decke/`):
-      die automatische Aufteilung, wo Folie 31 nichts sagt (die Spannweite
-      eines Kragarms zählt doppelt, gleich lange Spannweiten innerhalb 1 %
-      je zur Hälfte, entschieden wird im Schwerpunkt jeder Zelle); die
-      Grösse des Stützenbereichs, wenn sie fehlt (ein Quadrat, so breit wie
-      die Stütze oder der breiteste Unterzug über ihr -- Folie 39 lässt sie
-      offen); Streifen in zwei Richtungen, die nicht rechtwinklig
-      aufeinander stehen; die Linienlast als Band von 1 mm, die Einzellast
-      über 1 × 1 m verteilt. Vom Benutzer bestätigen lassen.
+- [ ] Decken, nach Vorgabe (`opencivil/decke/`): die automatische
+      Aufteilung, wo Folie 31 nichts sagt (die Spannweite eines Kragarms
+      zählt doppelt, gleich lange Spannweiten innerhalb 1 % je zur Hälfte,
+      entschieden wird im Schwerpunkt jeder Zelle); die Grösse des
+      Stützenbereichs, wenn sie fehlt (ein Quadrat, so breit wie die Stütze
+      oder der breiteste Unterzug über ihr -- Folie 39 lässt sie offen);
+      Streifen in zwei Richtungen, die nicht rechtwinklig aufeinander stehen;
+      die Linienlast als Band von 1 mm, die Einzellast über 1 × 1 m verteilt.
+      Die Norm sagt zu keinem etwas (geprüft am 2026-11-14): nach der
+      statischen Methode gilt jede Aufteilung, die im Gleichgewicht ist
+      (SIA 262:2025, 4.1.4.2.2), wenn das Verformungsvermögen gesichert ist
+      (4.1.4.2.4); quer braucht es trotzdem mindestens 20 % der
+      Hauptbewehrung (5.5.3.2). Die Einzellast selbst steht nach SIA 261:2020,
+      Tabelle 8 auf 50 × 50 mm. Bei schiefen Richtungen ist die
+      Fliessbedingung (34) nur eine grobe Näherung (4.3.2.5, 4.3.2.6): bei
+      45° ist m_xy = m/2. Vom Benutzer bestätigen lassen; Vorschlag: bei
+      schiefen Richtungen ein Hinweis im Bericht.
+- [ ] **Decken: die Kombination GZG.** Jede neue Decke bekommt GZT und GZG,
+      beide nach der Streifenmethode. Die ist eine Methode der
+      Plastizitätstheorie und gilt für die Tragsicherheit (SIA 262:2025,
+      4.1.4.2.1); Schnittgrössen im Gebrauch rechnet man in der Regel
+      elastisch, mit Mittelwerten (4.4.1.2). Vorschlag: bei der Decke keine
+      GZG vorgeben, oder ihr Ergebnis als Gleichgewichtslösung kennzeichnen,
+      nicht als Gebrauchsnachweis. Entscheid des Benutzers.
+- [ ] **Günstige ständige Last in den Vorgaben.** Die Vorgabe-Kombination
+      GZT nimmt Eigengewicht und Auflast mit 1.35 und die Nutzlast mit 1.5,
+      im Balkensystem wie in der Decke. SIA 260:2013, Tabelle 1 kennt für
+      eine günstig wirkende ständige Last 0.80; massgebend ist sie etwa beim
+      Kragarm mit Nachbarfeld, beim Abheben eines Lagers oder beim Gleiten.
+      Vorschlag: eine zweite Vorgabe-Kombination mit 0.80 auf den ständigen
+      Lasten, oder ein Hinweis in der Herleitung. Entscheid des Benutzers.
 - [ ] Decken: B-B des Kolloquiums 4 weicht von der Musterlösung ab
       (−60.1 statt −58.5 kNm/m, Stützen 115.0/276.4 statt 115.5/275.1 kN),
       weil die App die Last aus C-C dort ablegt, wo sie aufliegt, statt mit
@@ -630,18 +652,19 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 ### Balkensysteme
 
-Im Code mit «nach Vorgabe, nicht nachgeschlagen».
-
-- [ ] **Welche Steifigkeit?** Eingebaut: E_cm eines Betons, E von Hand
-      eines eigenen Materials -- oder mit dem Material gemäss Querschnitt das
-      E_eq seiner Analyse bei N und M --, am ungerissenen Bruttoquerschnitt,
-      ohne Schubverformung, Theorie 1. Ordnung (`stabwerk/rechnung.py`,
-      `BETONKENNWERTE`). Für Verformungen im
-      Gebrauch ist ein gerissener Stahlbetonbalken weicher, unter Dauerlast
-      kriecht er; die Schnittgrössen eines unbestimmten Systems hängen daran.
-- [ ] **Platte als Stabquerschnitt.** Eingebaut: ein Streifen b × h mit den
-      Formeln des Rechtecks, ohne Bewehrung -- b ist die betrachtete Breite
-      der Platte.
+- [ ] **Durchbiegung gegenüber den Auflagern.** Das Balkensystem misst w je
+      Stab gegen die Gerade zwischen seinen Enden; die Norm misst gegenüber
+      den Auflagern (SIA 262:2025, 4.4.3.1.1), beim Kragarm über die doppelte
+      Länge (SIA 260:2013, 1.2.2). Beispiel mit EI = 22 693 kNm² und
+      q = 10 kN/m: einfacher Balken 6 m, w = 7.44 mm (L/w = 807) -- liegt ein
+      Knoten in Feldmitte, zeigt die App 1.60 mm. Kragarm 2 m: die Spitze
+      senkt sich 0.88 mm, die App zeigt 0.14 mm. Seit 2026-11-14 sagt der
+      Bericht das, und L/w steht nicht mehr da. Vorschlag: w je Feld gegen
+      die Verbindung seiner Auflager messen, mit L/w; ein Feld reicht über
+      Knoten ohne Lager, an denen zwei Stäbe in einer Flucht stossen, und am
+      Kragarm gilt die doppelte Länge. Offen bliebe der Abfangträger: eine
+      Stütze, die auf ihm steht, sieht aus wie eine, die ihn trägt.
+      Entscheid des Benutzers.
 
 ## Noch nicht gebaut
 
