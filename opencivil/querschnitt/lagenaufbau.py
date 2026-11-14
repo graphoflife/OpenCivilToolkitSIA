@@ -6,9 +6,9 @@ Der Lagenaufbau (:class:`Lagenaufbau`) rechnet je Bewehrungsposten seine
 Tiefe ab Oberkante und seinen Querschnitt, dazu Bewehrungsmass und
 Distanzhalter. Die Nachweise fassen die Posten einer Lage mit den Helfern
 hier zusammen: Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe
-(:func:`lage_aus_posten`, :func:`protokoll_lage`). Den Schwerpunkt mehrerer
-Flaechen rechnet :func:`schwerpunkt` -- fuer die Posten einer Lage wie fuer
-die Lagen einer Seite.
+(:func:`lage_aus_posten`, :func:`protokoll_lage`, :func:`protokoll_schwerpunkt`).
+Den Schwerpunkt mehrerer Flaechen rechnet :func:`schwerpunkt` -- fuer die
+Posten einer Lage wie fuer die Lagen einer Seite.
 
 EIN POSTEN, EINE GESTALT:
 Ein Posten reist als :class:`Postenbezug` -- Lage, Art, Posten und seine
@@ -170,18 +170,34 @@ def protokoll_lage(
     if z is None:
         return flaeche, None
 
-    if len(posten) > 1:
-        tiefe = werte.laenge("z", f"z_{{{index}}}", z)
-        eingaben.update({f"z{i}": e[q.name("z")] for i, q in enumerate(posten)})
-        momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(posten)))
-        p.formel(tiefe, rf"\frac{{{momente}}}{{{summe}}}", eingaben,
-                 titel="Gemeinsamer Schwerpunkt der Lage",
-                 name="Schwerpunkt der zusammengefassten Lage")
-    else:
-        tiefe = e[posten[0].name("z")]
+    tiefe = protokoll_schwerpunkt(p, e, werte, posten, z, ("z", f"z_{{{index}}}"),
+                                  titel="Gemeinsamer Schwerpunkt der Lage")
     hoehe = werte.laenge("d", f"d_{{{index}}}", d)
     protokoll_statische_hoehe(p, hoehe, h=e["h"], z=tiefe, seite=posten[0].lage.seite)
     return flaeche, hoehe
+
+
+def protokoll_schwerpunkt(
+    p: Protokoll, e: Eingaben, werte: Zwischenwerte, posten: Sequence[Postenbezug],
+    z: float, name: Tuple[str, str], *, titel: str,
+) -> Wert:
+    """
+    Die Tiefe mehrerer Posten in ihrem gemeinsamen Schwerpunkt, nach Flaechen
+    gewichtet -- die Zeile zu :func:`schwerpunkt`. Bei einem Posten ist es
+    dessen eigene Tiefe, ohne Zeile. ``name`` ist Kurzname und Zeichen des
+    Schwerpunkts. Fuer eine Lage (:func:`protokoll_lage`) wie fuer die
+    gezogene Seite im Querkraftnachweis.
+    """
+    if len(posten) == 1:
+        return e[posten[0].name("z")]
+    eingaben = {f"a{i}": e[q.name("a_s")] for i, q in enumerate(posten)}
+    eingaben.update({f"z{i}": e[q.name("z")] for i, q in enumerate(posten)})
+    momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(posten)))
+    summe = " + ".join(f"@a{i}" for i in range(len(posten)))
+    tiefe = werte.laenge(*name, z)
+    p.formel(tiefe, rf"\frac{{{momente}}}{{{summe}}}", eingaben, titel=titel,
+             name="Schwerpunkt der zusammengefassten Lage")
+    return tiefe
 
 
 def protokoll_statische_hoehe(

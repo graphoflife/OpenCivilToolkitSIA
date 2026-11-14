@@ -1,11 +1,11 @@
 ---
-erzeugt: 8b46a852d146
+erzeugt: ac2660e57a72
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 5.5.2"
+normstelle: "SIA 262:2025, 4.2.2.4"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 5.5.2
+> SIA 262:2025, 4.2.2.4
 
 $$
 A_{\varnothing,V} = \frac{\pi \cdot \left(\varnothing_{V}\right)^{2}}{4}

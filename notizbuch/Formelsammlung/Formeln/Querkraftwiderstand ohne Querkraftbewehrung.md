@@ -1,11 +1,11 @@
 ---
-erzeugt: 3b81adc51931
+erzeugt: aa119822d3c8
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.3.2.1"
+normstelle: ["SIA 262:2025, 4.3.3.2.1, (35)", "SIA 262:2025, 4.3.3.2.1, (35), (36)"]
 ---
-> [!info] Normstelle
-> SIA 262:2025, 4.3.3.2.1
+> [!info] Normstellen
+> SIA 262:2025, 4.3.3.2.1, (35) · SIA 262:2025, 4.3.3.2.1, (35), (36)
 
 *In der Herleitung: «Zug unten, M\_Ed = M\_Rd»*
 
@@ -23,7 +23,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $k_d^{+}$ | – | – | [[Beiwert für die statische Höhe]] |
+| $k_d^{+}$ | – | – | [[Beiwert für den Querkraftwiderstand]] |
 | $\tau_{cd}$ | – | N/mm² | Zwischenwert |
 | $d_v^{+}$ | – | mm | [[Wirksame Höhe ohne Abzug]], [[Wirksame Höhe, um die Einlage vermindert]] |
 
@@ -34,8 +34,8 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 \begin{aligned}
   V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) &= k_d^{+} \cdot \tau_{cd} \cdot d_v^{+} \\
-  &= 0.6062 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} \\
-  &= 165.4\,\mathrm{kN}/\mathrm{m}
+  &= 0.6071 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 248.1\,\mathrm{mm} \\
+  &= 165\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 $$
 
@@ -57,7 +57,7 @@ Ohne Bügel begrenzt der kritische Schubriss die Querkraft: über ihn muss die
 Kraft durch die Verzahnung der Rissufer, und die trägt umso weniger, je
 weiter sich der Riss öffnet. Die Rissöffnung wächst mit der Dehnung der
 Platte und mit ihrer Höhe -- das fasst der
-[[Beiwert für die statische Höhe]] $k_d$ zusammen. Der Widerstand ist dann
+[[Beiwert für den Querkraftwiderstand]] $k_d$ zusammen. Der Widerstand ist dann
 $k_d \cdot \tau_{cd}$ über die wirksame Höhe $d_v$.
 
 Weil die Dehnung vom Moment abhängt, hängt auch der Widerstand von der

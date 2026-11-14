@@ -25,7 +25,10 @@ Bis 2026-10-25 steckten beide Ansaetze in einer Klasse hinter einem
 STATISCHE HOEHE:
 ``d`` ist die statische Hoehe der *gezogenen* Bewehrung und haengt damit vom
 Vorzeichen des Moments ab: bei positivem Moment liegt der Zug unten, bei
-negativem oben.
+negativem oben. Gemessen wird bis zum Schwerpunkt aller gezogenen Posten der
+Richtung -- Grundbewehrung, Zulage, auch mehrere Lagen (SIA 262:2025,
+4.3.3.2.2). Bis 2026-11-14 galt der aeusserste Posten; mit einer Zulage war
+``d`` damit 1 bis 3 mm zu gross.
 """
 
 from __future__ import annotations
@@ -38,56 +41,48 @@ from opencivil.core.berechnung import Befundbezug, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
     NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, NachweisUrteil, grad_def,
 )
-from opencivil.core.einheiten import KN, KN_PRO_M, KNM, Groesse
+from opencivil.core.einheiten import KN, KN_PRO_M, KNM, MM, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
-from opencivil.querschnitt.lagenaufbau import protokoll_statische_hoehe
+from opencivil.querschnitt.lagenaufbau import (
+    Postenbezug, lage_aus_posten, protokoll_schwerpunkt, protokoll_statische_hoehe,
+)
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 
-def _statische_hoehe(
-    lagen: Sequence[Tuple[float, bool]], h: float, moment_positiv: bool
-) -> Optional[float]:
+#: Wo die wirksame Hoehe und ihre Einlage stehen.
+REFERENZ_EINLAGE = "SIA 262:2025, 4.3.3.2.9"
+
+
+def zugposten(posten: Sequence[Postenbezug], moment_positiv: bool) -> List[Postenbezug]:
     """
-    Statische Hoehe der gezogenen Bewehrung, in m ab der gedrueckten Kante.
-
-    ``lagen`` ist eine Folge von ``(z ab Oberkante, liegt unten)``.
-
-    Bei positivem Moment liegt der Zug unten: gemessen wird von der Oberkante
-    zur aeussersten unteren Lage. Bei negativem Moment umgekehrt. **Nur die
-    Lagen der gezogenen Seite zaehlen.** Wer alle nimmt, bekommt bei
+    Die Posten der gezogenen Seite: bei positivem Moment die unteren, bei
+    negativem die oberen. **Nur sie zaehlen.** Wer alle nimmt, bekommt bei
     einseitiger Bewehrung eine Zahl, die gar keine statische Hoehe ist: eine
     Platte nur mit unterer Bewehrung lieferte fuers negative Moment
     ``h - 261 = 39 mm`` -- den Abstand der Unterkante zur *unteren* Lage.
-
-    ``None``, wenn auf der gezogenen Seite nichts liegt. Dann gibt es kein
-    ``d``, und ohne ``d`` keinen Querkraftwiderstand.
     """
-    i = zuglage(lagen, moment_positiv)
-    if i is None:
-        return None
-    z = lagen[i][0]
-    return z if moment_positiv else h - z
+    return [q for q in posten if q.lage.von_unten is moment_positiv]
 
 
-def lagen_von(e: Eingaben, posten) -> Tuple[Tuple[float, bool], ...]:
+def statische_hoehen(e: Eingaben, posten: Sequence[Postenbezug]) -> Dict[bool, float]:
     """
-    Je Posten die Tiefe und auf welcher Seite er liegt, ``(z, liegt unten)``
-    -- ohne das laesst sich die gezogene Bewehrung nicht von der gedrueckten
-    trennen. Fuer den Nachweis und die Kennzahlen.
+    Je Momentenrichtung (``True``: Zug unten) die statische Hoehe der
+    gezogenen Bewehrung, in m ab dem gedrueckten Rand -- im Schwerpunkt ihrer
+    Posten (:func:`~opencivil.querschnitt.lagenaufbau.lage_aus_posten`). Fuer
+    den Nachweis und die Kennzahlen.
+
+    Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung. Dann gibt
+    es kein ``d``, und ohne ``d`` keinen Querkraftwiderstand.
     """
-    return tuple((e.g(q.name("z")).si, q.lage.von_unten) for q in posten)
-
-
-def zuglage(
-    lagen: Sequence[Tuple[float, bool]], moment_positiv: bool
-) -> Optional[int]:
-    """Die aeusserste Lage der gezogenen Seite, als Index in ``lagen``."""
-    gezogen = [i for i, (_, unten) in enumerate(lagen) if unten is moment_positiv]
-    if not gezogen:
-        return None
-    return (max if moment_positiv else min)(gezogen, key=lambda i: lagen[i][0])
+    hoehen: Dict[bool, float] = {}
+    for positiv in (True, False):
+        gezogen = zugposten(posten, positiv)
+        d = lage_aus_posten(e, gezogen)[2] if gezogen else None
+        if d is not None:
+            hoehen[positiv] = d
+    return hoehen
 
 
 # ===========================================================================
@@ -102,31 +97,39 @@ def _hoch(kurz: str, symbol: str, zeichen: str) -> Tuple[str, str]:
     return f"{kurz}_{zeichen}", f"{symbol}^{{{zeichen}}}"
 
 
-def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zuglage: int,
-                     d: float, d_v: Optional[float] = None, *, seite: Zugseite,
-                     zeichen: str = "") -> Tuple[Wert, Optional[Wert]]:
+def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben,
+                     gezogen: Sequence[Postenbezug], d: float, d_v: Optional[float] = None,
+                     *, seite: Zugseite, zeichen: str = "") -> Tuple[Wert, Optional[Wert]]:
     """
     Die statische Hoehe der gezogenen Bewehrung und, ohne Buegel, die
-    wirksame -- geschrieben, und fuer die Formeln danach. ``zuglage`` ist der
-    Posten der aeussersten gezogenen Lage (:func:`zuglage`), ``seite`` die
-    gezogene. ``zeichen`` hebt die Groessen hoch, wo zwei Seiten
-    nebeneinander stehen: ``d^{+}`` (die Kennzahlen).
+    wirksame -- geschrieben, und fuer die Formeln danach. ``gezogen`` sind die
+    Posten der gezogenen Seite (:func:`zugposten`), ``seite`` die gezogene.
+    Liegen dort mehrere, steht zuerst ihr Schwerpunkt da. ``zeichen`` hebt die
+    Groessen hoch, wo zwei Seiten nebeneinander stehen: ``d^{+}`` (die
+    Kennzahlen).
 
     Mit Buegeln gibt es kein ``d_v``: bis 2026-10-18 schrieben die Kennzahlen
     dort ein «d_v = d (Einlage nicht massgebend)», weil sie die Hoehen ohne
     Buegel mit einer Einlage null mitbenutzten.
     """
+    _, z, _ = lage_aus_posten(e, gezogen)
+    tiefe = protokoll_schwerpunkt(p, e, werte, gezogen, z, _hoch("z_s", "z_s", zeichen),
+                                  titel=f"Schwerpunkt der gezogenen Bewehrung, Zug {seite}")
     hoehe = werte.laenge(*_hoch("d", "d", zeichen), d)
-    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=e[posten[zuglage].name("z")], seite=seite)
+    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=tiefe, seite=seite)
     if d_v is None:
         return hoehe, None
     wirksam = werte.laenge(*_hoch("d_v", "d_v", zeichen), d_v)
+    einlage = e["einlagenhoehe"]
+    if einlage.groesse.si > 0.0:
+        p.text(f"Einlage {einlage.formatiert()} mm {'>' if d_v < d else '≤'} d/6 = "
+               f"{Groesse.aus_si(d / 6.0, MM).formatiert(1)} mm.")
     if d_v < d:
-        p.formel(wirksam, "@d - @e", {"d": hoehe, "e": e["einlagenhoehe"]},
-                 titel="Wirksame Höhe, um die Einlage vermindert")
+        p.formel(wirksam, "@d - @e", {"d": hoehe, "e": einlage},
+                 titel="Wirksame Höhe, um die Einlage vermindert", referenz=REFERENZ_EINLAGE)
     else:
         p.formel(wirksam, "@d", {"d": hoehe}, titel="Wirksame Höhe (Einlage nicht massgebend)",
-                 name="Wirksame Höhe ohne Abzug")
+                 referenz=REFERENZ_EINLAGE, name="Wirksame Höhe ohne Abzug")
     return hoehe, wirksam
 
 
@@ -158,8 +161,8 @@ class Querkraftergebnis(Fallausgang):
     """
 
     fall: Querkraftfall
-    zuglage: Optional[int] = None
-    """Die aeusserste gezogene Lage, als Index in den Posten -- aus ihr kommt ``d``."""
+    zugposten: Tuple[Postenbezug, ...] = ()
+    """Die Posten der gezogenen Seite -- aus ihrem Schwerpunkt kommt ``d``; leer ohne Zugbewehrung."""
 
     d: float = 0.0
     v_Rd: float = 0.0
@@ -181,6 +184,9 @@ class Querkraft(Nachweis):
 
     THEMA = "Querkraft"
     ART = "V"
+
+    REFERENZ: str
+    """Wo der Widerstand des Ansatzes steht -- fuer Nachweis, Widerstand und Erfuellungsgrad."""
 
     buegel = None
     """Die Buegel der Platte -- nur der Ansatz mit Buegeln hat welche."""
@@ -222,7 +228,7 @@ class Querkraft(Nachweis):
                 f"{basis}.{f.kennung}.erfuellungsgrad",
                 rf"\alpha_{{eff,V,{r},{als_text(f.name)}}}",
                 f"Erfüllungsgrad Querkraft {richtung.beschriftung} – {f.name}",
-                "SIA 262:2025, 4.3.3.2",
+                self.REFERENZ,
             )
             for f in self.faelle
         }
@@ -232,7 +238,7 @@ class Querkraft(Nachweis):
                 symbol=f"V_{{Rd,{r}}}",
                 einheit=KN_PRO_M,
                 beschreibung=f"Querkraftwiderstand {richtung.beschriftung} – {f.name}",
-                referenz="SIA 262:2025, 4.3.3.2.1",
+                referenz=self.REFERENZ,
                 stellen=1,
             )
             for f in self.faelle
@@ -242,7 +248,7 @@ class Querkraft(Nachweis):
             Eingabebezug("h", querschnitt.id_von("h")),
         ]
         for q in self.posten:
-            bezuege += q.bezuege("z")
+            bezuege += q.bezuege("a_s", "z")
 
         super().__init__(
             basis,
@@ -250,7 +256,7 @@ class Querkraft(Nachweis):
             bezuege=bezuege + self._ansatzbezuege(),
             befunde=self._befunde(),
             titel=f"Querkraftnachweis {richtung.beschriftung} – {querschnitt.name}",
-            referenz="SIA 262:2025, 4.3.3.2",
+            referenz=self.REFERENZ,
             # Der Nachweis gehoert zu seiner Platte. Ohne diese Angabe stuende
             # er unter der Ueberschrift, die zufaellig zuletzt offen war -- und
             # welche das ist, entscheidet die Abhaengigkeitsfolge.

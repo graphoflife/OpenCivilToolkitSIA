@@ -1,5 +1,5 @@
 ---
-erzeugt: 3bf5ecd7d848
+erzeugt: a57044c5b915
 art: modul
 tags: [modul]
 ---
@@ -18,24 +18,30 @@ Buegeln teilt, steht in [[opencivil.nachweis.querkraft]].
 
 
 ```
-V_Rd = k_d * tau_cd * d_v
+V_Rd = k_d * tau_cd * d_v                                   (35)
 
-k_d   = 1 / (1 + eps_v * d * k_g)
-k_g   = 48 / (16 + D_max * min[1.0; (60/f_ck)^2])
-m_Dd  = |N_Ed| * h / 6                      Dekompressionsmoment
-eps_v = f_yd * (m_Ed - m_Dd) / (E_s * (m_Rd(N_Ed) - m_Dd))
+k_d   = 1 / (1 + eps_v * d * k_g)                           (36)
+k_g   = max[1.20; 48 / (16 + D_max * min[1.0; (60/f_ck)^2])]   (37)
+m_Dd  = -N_Ed * h / 6               Dekompressionsmoment, Zug positiv
+eps_v = f_yd * (m_Ed - m_Dd) / (E_s * (m_Rd(N_Ed) - m_Dd))  (39)
 
-d_v = d - Einlagenhoehe,  falls  h/6 < Einlagenhoehe < d
-d_v = d                   sonst
+d_v = d - e,  falls  e > d/6        e: groesstes Mass der Einlage
+d_v = d       sonst
 ```
 
+Die Nummern sind die der Gleichungen in SIA 262:2025, 4.3.3.2; die Einlage
+regelt 4.3.3.2.9, das Dekompressionsmoment 4.3.3.2.6. Dass `h/6` dazu
+gehoert, sagt die Norm nicht -- es ist der Rand eines Rechtecks, der unter
+`N_Ed` und `m_Dd` spannungsfrei wird.
 
-## ZUG BRAUCHT KEINEN SONDERFALL
 
-Das Dekompressionsmoment ist ueber `min(N_Ed; 0)` definiert und wird bei
-einer Normalzugkraft von selbst null -- entlastend wirkt nur Druck. Der
-Nachweis laeuft damit unveraendert weiter; frueher stand hier ein Sonderfall,
-der `V_Rd = 0` setzte.
+## DIE NORMALKRAFT ZAEHLT MIT VORZEICHEN
+
+Druck hebt das Dekompressionsmoment, Zug macht es negativ: der Querschnitt
+ist dann schon ohne Moment gerissen, und die Dehnung waechst. SIA 262:2025,
+4.3.3.2.6 will den Zug bei m_Rd und bei m_Dd beruecksichtigt haben. Bis
+2026-11-14 zaehlte hier nur Druck, ueber `min(N_Ed; 0)`; noch frueher
+setzte ein Sonderfall bei Zug `V_Rd = 0`.
 
 
 ## EINHEITEN
@@ -62,8 +68,8 @@ Kurve zu jeder eingestellten Normalkraft neu rechnen laesst -- ohne dass
 die Oberflaeche die Formel ein zweites Mal enthaelt.
 
 - `h: float`
-- `lagen: Tuple[Tuple[float, bool], ...]` – Je vorhandener Posten: `(z ab Oberkante, liegt unten)`.
-- `einlage: float`
+- `statische_hoehen: Mapping[bool, float]` – Je Momentenrichtung (`True`: Zug unten) die statische Hoehe der gezogenen Bewehrung ([[opencivil.nachweis.querkraft#statische_hoehen|statische_hoehen]]). Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
+- `einlage: float` – Das groesste Mass der Einlage, Breite oder Hoehe.
 - `tau_cd: float`
 - `zugstahl: Mapping[bool, Tuple[float, float]]` – Je Momentenrichtung (`True`: Zug unten) `(f_yd, E_s)` des Stahls der gezogenen Seite -- unten und oben duerfen verschiedene Staehle liegen. Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
 - `k_g: float`
@@ -75,6 +81,20 @@ def hoehen(self, moment_positiv: bool) -> Optional[Tuple[float, float]]
 ```
 
 `(d, d_v)` fuer diese Momentenrichtung -- `None` ohne Zugbewehrung.
+
+### wirksame_hoehe
+
+```python
+def wirksame_hoehe(d: float, einlage: float) -> float
+```
+
+`d_v`: `d`, um die Einlage vermindert, sobald ihr groesstes Mass `d/6`
+uebersteigt -- sonst `d` (SIA 262:2025, 4.3.3.2.9). Eine obere Grenze
+gibt es nicht: reicht die Einlage ueber `d`, wird `d_v` null oder
+negativ, und ohne Buegel bleibt kein Widerstand ([[opencivil.nachweis.querkraft_ohne_buegel#widerstand|widerstand]]).
+
+Bis 2026-11-14 zaehlte die Einlage erst ab `h/6` und nur bis `d` --
+zwischen `d/6` und `h/6` und ab `d` blieb sie unbeachtet.
 
 ### Widerstandspunkt
 
@@ -112,12 +132,16 @@ der Linie, aus der er kommt; er steht nur im Text.
 
 
 * `|m_Ed| <= m_Dd` -- der Querschnitt bleibt ungerissen, `eps_v = 0`
-  und `k_d` damit am groessten.
+  und `k_d` damit am groessten. Unter Zug ist `m_Dd` negativ, und
+  diesen Ast gibt es nicht.
 * `|m_Ed| <= m_Rd` -- der Regelfall der Norm.
 * `|m_Ed| >  m_Rd` -- die Bewehrung fliesst. Die Dehnung folgt dann nicht
   mehr dem Moment, sondern ist **fest**: `eps_v = 1.5 * f_yd/E_s`. Der
   Widerstand faellt an dieser Stelle sprunghaft und bleibt danach
   unveraendert -- in der Kurve eine Waagrechte.
+
+Ist `d_v` null oder negativ, nimmt die Einlage die ganze Hoehe: kein
+Widerstand.
 
 ### beiwert_k_g
 
@@ -229,6 +253,8 @@ class QuerkraftOhneBuegel(Querkraft)
 
 Der Querkraftnachweis einer Platte ohne Buegel -- siehe Dateikopf.
 
+- `REFERENZ = REFERENZ`
+
 #### QuerkraftOhneBuegel.pruefe
 
 ```python
@@ -250,8 +276,15 @@ nicht nachrechnen konnte.
 
 ## Konstanten
 
-- `K_G_MINDEST = 1.2` – Unterer Riegel fuer den Beiwert der Gesteinskoernung.
-- `PLASTISCH = 1.5` – Vielfaches der Fliessdehnung, sobald `m_Ed` den Widerstand ueberschreitet. `eps_v = PLASTISCH * f_yd / E_s` -- fest, nicht vom Moment abhaengig.
+- `K_G_MINDEST = 1.2` – Unterer Riegel fuer den Beiwert der Gesteinskoernung -- er steht in der Gleichung selbst.
+- `PLASTISCH = 1.5` – Vielfaches der Fliessdehnung, sobald `m_Ed` den Widerstand ueberschreitet. `eps_v = PLASTISCH * f_yd / E_s` -- fest, nicht vom Moment abhaengig. Die Norm setzt den Wert, wo plastische Verformungen der Biegebewehrung nicht auszuschliessen sind ([[opencivil.nachweis.querkraft_ohne_buegel#Konstanten|REFERENZ_PLASTISCH]]).
+- `REFERENZ = 'SIA 262:2025, 4.3.3.2.1, (35)'` – Wo die Gleichungen stehen, je eine Stelle.
+- `REFERENZ_K_D = 'SIA 262:2025, 4.3.3.2.1, (36)'`
+- `REFERENZ_K_G = 'SIA 262:2025, 4.3.3.2.1, (37)'`
+- `REFERENZ_DEHNUNG = 'SIA 262:2025, 4.3.3.2.2, (39); 4.3.3.2.6'`
+- `REFERENZ_PLASTISCH = 'SIA 262:2025, 4.3.3.2.3, (41)'`
+- `REFERENZ_DEKOMPRESSION = 'SIA 262:2025, 4.3.3.2.6'`
+- `DEHNUNG = 'Nominelle Dehnung der Zugbewehrung'` – Was eps_v ist: die Dehnung, mit der die Norm den Widerstand bemisst.
 - `OHNE_BUEGEL = 'Querkraftwiderstand ohne Querkraftbewehrung'` – Die Seite des Widerstands im Notizbuch -- Ansatz und Rechnung stehen darauf.
 - `KURVENPUNKTE = 50` – Stuetzstellen der M_Ed-v_Rd-Kurve.
 - `KURVENZUGABE = 20000.0` – Wie weit die Kurve ueber `m_Rd` hinaus gezeichnet wird, in Nm.
@@ -278,9 +311,9 @@ nicht nachrechnen konnte.
 ## Formeln aus diesem Modul
 
 - [[Beiwert der Gesteinskörnung]] · `beiwert_k_g`
-- [[Beiwert für die statische Höhe]] · `protokoll_ohne_buegel`
-- [[Dehnung auf halber Höhe]] · `QuerkraftOhneBuegel._protokoll_fall`
+- [[Beiwert für den Querkraftwiderstand]] · `protokoll_ohne_buegel`
 - [[Dekompressionsmoment]] · `QuerkraftOhneBuegel._protokoll_fall`
 - [[Dekompressionsmoment und Dehnung]] · `QuerkraftOhneBuegel._protokoll_ansatz`
+- [[Nominelle Dehnung der Zugbewehrung]] · `QuerkraftOhneBuegel._protokoll_fall`
 - [[Querkraftwiderstand ohne Querkraftbewehrung]] · `QuerkraftOhneBuegel._protokoll_ansatz`
 - [[Querkraftwiderstand ohne Querkraftbewehrung]] · `protokoll_ohne_buegel`

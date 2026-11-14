@@ -26,5 +26,5 @@ $$
 Bei reiner Biegung halten sich die Druckkraft im Beton und die Zugkraft im
 Stahl die Waage. Mit dem Spannungsblock der Höhe $0.85\,x$ ist die
 Betondruckkraft $0.85\,x \cdot b \cdot f_{cd}$; der Stahl zieht mit
-$A_s f_{sd}$. Gleichgesetzt und nach $x$ aufgelöst ergibt das die
+$A_s f_{yd}$. Gleichgesetzt und nach $x$ aufgelöst ergibt das die
 Druckzonenhöhe, die die [[Bedingung der Duktilität]] prüft.

@@ -90,10 +90,10 @@ const HILFE = {
   schubwaende: {
     zeilen: [
       ['Wand', 'eine Linie über dem Querschnitt, Länge = Hebelarm'],
-      ['α', 'ganzgradig zwischen α_min und α_max; bei Normalzug α_min = 40°'],
+      ['α', 'ganzgradig zwischen α_min und α_max; bei Normalzug α_min mindestens 40°'],
       ['Längszug', 'ΔN = |V|·cot α je Wand, in der Wandmitte; geht in M-N ein'],
     ],
-    formel: 'V_Rd = min(A_sw/s·l·f_sd·cot α ; b_w·l·k_c·f_cd·sin α·cos α)',
+    formel: 'V_Rd = min(A_sw/s·l·f_yd·cot α ; b_w·l·k_c·f_cd·sin α·cos α)',
   },
 };
 
@@ -221,7 +221,7 @@ function schubwandAngaben(analyse) {
     el('div.neigungszeile', {}, [
       el('span.postenname', { text: 'Neigung' }),
       ...[['alpha_min', String.raw`\alpha_{min}`,
-        'Kleinste Neigung der Druckdiagonalen, ganze °; bei Normalzug 40°'],
+        'Kleinste Neigung der Druckdiagonalen, ganze °; bei Normalzug mindestens 40°'],
       ['alpha_max', String.raw`\alpha_{max}`, 'Grösste Neigung der Druckdiagonalen, ganze °'],
       ].flatMap(([schluessel, symbol, titel]) => {
         const angabe = feldangabe('querschnittsanalyse', schluessel);

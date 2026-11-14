@@ -1,11 +1,11 @@
 ---
-erzeugt: 0e0e74ae9492
+erzeugt: 23d622db960f
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.2.2.2, Figur 16"
+normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)"]
 ---
-> [!info] Normstelle
-> SIA 262:2025, 4.2.2.2, Figur 16
+> [!info] Normstellen
+> SIA 262:2025, 4.2.2.2, Figur 16 · SIA 262:2025, 4.3.3.2.2, (38)
 
 *In der Herleitung: «Fliessdehnung (Bemessungswert)»*
 
@@ -43,7 +43,7 @@ $$
 
 ## Gebraucht von
 
-- [[Beiwert für die statische Höhe]]
+- [[Beiwert für den Querkraftwiderstand]]
 
 ## Im Code
 
@@ -68,11 +68,15 @@ den Elastizitätsmodul. Für B500B mit Bemessungswerten rund 2.17 ‰,
 charakteristisch 2.5 ‰. Darunter ist die Stahlspannung $E_s \cdot
 \varepsilon_s$, darüber bleibt sie am Plateau.
 
-Gebraucht wird sie an drei Stellen:
+Gebraucht wird sie an vier Stellen:
 
 - als Kennwert des Betonstahls, mit Bemessungswerten;
 - in der Spannung-Dehnung-Analyse als Fliessbeginn: erreicht die am stärksten
   gezogene Lage diese Dehnung, knickt die Linie ab;
 - in der Stahlspannungsbegrenzung: fliesst der Stahl unter der Einwirkung,
   bliebe seine Spannung am Plateau stehen und sagte nichts mehr -- verglichen
-  wird dann über die Dehnung (siehe [[Zulässige Dehnung]]).
+  wird dann über die Dehnung (siehe [[Zulässige Dehnung]]);
+- in den [[Kennzahlen]] als
+  [[Nominelle Dehnung der Zugbewehrung|nominelle Dehnung der Zugbewehrung]]
+  beim Biegewiderstand: daraus der kleinste Querkraftwiderstand ohne Bügel,
+  solange die Bewehrung elastisch bleibt.

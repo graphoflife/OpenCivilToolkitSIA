@@ -16,7 +16,7 @@ from opencivil.querschnitt.schubwaende import Wand, WandFehler
 
 def wand(name, von, bis, b_w=0.2, a_sw_s=1.0e-3):
     return Wand(name=name, von=von, bis=bis, b_w=b_w, a_sw_s=a_sw_s,
-                f_sd=435e6, f_cd=20e6, k_c=0.55)
+                f_yd=435e6, f_cd=20e6, k_c=0.55)
 
 
 def kasten(y0, z0, b, h, b_w=0.2, praefix="K"):

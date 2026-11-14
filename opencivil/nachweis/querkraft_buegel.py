@@ -12,16 +12,19 @@ MIT BUEGELN -- Fachwerkmodell, siehe :func:`buegelwiderstand`::
     V_Rd,c = 0.9 * d * k_c * f_cd * sin(alpha) * cos(alpha)
     V_Rd   = max ueber alpha von min(V_Rd,s; V_Rd,c)
 
-Gesucht wird ganzgradig zwischen ``alpha_min`` und ``alpha_max``. Bei
-Normalzug steilt sich die Druckdiagonale auf -- beide Grenzen werden dann auf
-mindestens ``ALPHA_ZUG`` gehoben. Der Betonanteil des Ansatzes ohne Buegel
-geht nicht zusaetzlich ein.
+Die Buegel stehen in SIA 262:2025, 4.3.3.4.3, Gl. (45), die Druckdiagonale
+in 4.3.3.4.6, Gl. (47), der Hebelarm ``0.9 * d`` in 4.3.3.4.2.
+
+Gesucht wird ganzgradig zwischen ``alpha_min`` und ``alpha_max`` (4.3.3.3.2,
+Gl. (42)). Bei Normalzug steilt sich die Druckdiagonale auf -- beide Grenzen
+werden dann auf mindestens ``ALPHA_ZUG`` gehoben (4.3.3.3.3). Der Betonanteil
+des Ansatzes ohne Buegel geht nicht zusaetzlich ein.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import NachweisUrteil, Vergleich
@@ -29,14 +32,20 @@ from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.nachweis.querkraft import (
-    Querkraft, Querkraftergebnis, Querkraftfall, _hoch, _ohne_zugbewehrung, _statische_hoehe,
-    lagen_von, protokoll_hoehen, zuglage,
+    Querkraft, Querkraftergebnis, Querkraftfall, _hoch, _ohne_zugbewehrung, protokoll_hoehen,
+    statische_hoehen, zugposten,
 )
 from opencivil.querschnitt.fachwerk import Buegelpunkt, beste_neigung, fachwerk
 from opencivil.querschnitt.platte import ALPHA_ZUG, Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 
 MIT_BUEGELN = "Querkraftwiderstand mit Querkraftbewehrung"
+
+#: Wo die Gleichungen stehen, je eine Stelle.
+REFERENZ_BUEGEL = "SIA 262:2025, 4.3.3.4.3, (45)"
+REFERENZ_DIAGONALE = "SIA 262:2025, 4.3.3.4.6, (47)"
+#: Der Ansatz als Ganzes: der Hebelarm 0.9 · d und beide Gleichungen.
+REFERENZ = "SIA 262:2025, 4.3.3.4.2; 4.3.3.4.3, (45); 4.3.3.4.6, (47)"
 
 
 def buegelwiderstand(
@@ -122,11 +131,12 @@ def protokoll_mit_buegeln(p: Protokoll, werte: Zwischenwerte, widerstand: Wert,
              r"\frac{@A}{@s_x \cdot @s_y} \cdot 0.9 \cdot @d \cdot @f_yd \cdot \cot @alpha",
              {"A": e["a_s_V"], "s_x": e["s_x"], "s_y": s_y, "d": d,
               "f_yd": e["f_yd_V"], "alpha": alpha},
-             titel=f"Widerstand der Bügel{zug}", name="Widerstand der Bügel")
+             titel=f"Widerstand der Bügel{zug}", referenz=REFERENZ_BUEGEL,
+             name="Widerstand der Bügel")
     p.formel(diagonale,
              r"0.9 \cdot @d \cdot @k_c \cdot @f_cd \cdot \sin @alpha \cdot \cos @alpha",
              {"d": d, "k_c": e["k_c"], "f_cd": e["f_cd"], "alpha": alpha},
-             titel=f"Widerstand der Druckdiagonalen{zug}",
+             titel=f"Widerstand der Druckdiagonalen{zug}", referenz=REFERENZ_DIAGONALE,
              name="Widerstand der Druckdiagonalen")
     p.formel(widerstand, r"\min\left[@s;\ @c\right]", {"s": buegel, "c": diagonale},
              titel=f"Querkraftwiderstand{zug}", name=MIT_BUEGELN)
@@ -195,6 +205,8 @@ OHNE_EINWIRKUNG = Querkraftfall(name="ohne Einwirkung", V_Ed=Groesse(0.0, KN_PRO
 class QuerkraftMitBuegeln(Querkraft):
     """Der Querkraftnachweis einer Platte mit Buegeln -- siehe Dateikopf."""
 
+    REFERENZ = REFERENZ
+
     def __init__(self, querschnitt, faelle: Sequence[Querkraftfall], richtung: Richtung,
                  mn_nachweis) -> None:
         self.buegel = querschnitt.querkraftbewehrung
@@ -235,14 +247,13 @@ class QuerkraftMitBuegeln(Querkraft):
         beides zu addieren wäre ein anderes Modell, und dieses Werkzeug rechnet
         nur, was es auch herleitet.
         """
-        h = e.g("h").si
         b = e.g("b").si
         a_s = e.g("a_s_V").si
         s_x = e.g("s_x").si
         f_yd = e.g("f_yd_V").si
         f_cd = e.g("f_cd").si
         k_c = e.g("k_c").si
-        lagen = lagen_von(e, self.posten)
+        hoehen = statische_hoehen(e, self.posten)
 
         # Die Menge in y: entweder eine Teilung oder eine Stabzahl über die
         # betrachtete Breite. Aus der Zahl wird hier eine Teilung -- die Formel
@@ -262,22 +273,21 @@ class QuerkraftMitBuegeln(Querkraft):
 
         for fall in self.faelle:
             erg = self._einen_fall_buegel(
-                fall, h=h, lagen=lagen, a_s=a_s, s_x=s_x, s_y=s_y,
+                fall, hoehen=hoehen, a_s=a_s, s_x=s_x, s_y=s_y,
                 f_yd=f_yd, f_cd=f_cd, k_c=k_c, ueber_teilung=ueber_teilung)
             befund.ergebnisse.append(erg)
             self._protokoll_fall_buegel(p, e, erg, teilung_y)
             self._eintragen(erg, ergebnis, urteile)
         if not self.faelle:
             befund.ohne_einwirkung = self._einen_fall_buegel(
-                OHNE_EINWIRKUNG, h=h, lagen=lagen, a_s=a_s, s_x=s_x, s_y=s_y,
+                OHNE_EINWIRKUNG, hoehen=hoehen, a_s=a_s, s_x=s_x, s_y=s_y,
                 f_yd=f_yd, f_cd=f_cd, k_c=k_c, ueber_teilung=ueber_teilung)
 
         return Ausfuehrung(ergebnis, urteile, befund)
 
     def _einen_fall_buegel(
-        self, fall: Querkraftfall, *, h: float,
-        lagen: Sequence[Tuple[float, bool]], a_s: float, s_x: float,
-        s_y: float, f_yd: float, f_cd: float, k_c: float, ueber_teilung: bool,
+        self, fall: Querkraftfall, *, hoehen: Mapping[bool, float], a_s: float,
+        s_x: float, s_y: float, f_yd: float, f_cd: float, k_c: float, ueber_teilung: bool,
     ) -> ErgebnisMitBuegeln:
         erg = ErgebnisMitBuegeln(fall=fall)
         M_Ed, N_Ed = fall.M_Ed.si, fall.N_Ed.si
@@ -291,12 +301,12 @@ class QuerkraftMitBuegeln(Querkraft):
                 "in mm.")
             return erg
 
-        erg.zuglage = zuglage(lagen, M_Ed >= 0)
-        hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
-        if hoehen is None:
+        erg.zugposten = tuple(zugposten(self.posten, M_Ed >= 0))
+        d = hoehen.get(M_Ed >= 0)
+        if d is None:
             erg.begruendung = _ohne_zugbewehrung(M_Ed)
             return erg
-        erg.d = erg.d_v = hoehen
+        erg.d = d
 
         erg.zug_hebt_alpha = N_Ed > 0.0
         erg.alpha_min, erg.alpha_max = self.buegel.grenzen(erg.zug_hebt_alpha)
@@ -335,14 +345,14 @@ class QuerkraftMitBuegeln(Querkraft):
             rf"\cdot 0.9 \cdot d \cdot {s['f_yd_V']} \cdot \cot\alpha \qquad "
             rf"V_{{Rd,c}} = 0.9 \cdot d \cdot {s['k_c']} \cdot {s['f_cd']} "
             r"\cdot \sin\alpha \cdot \cos\alpha",
-            titel="Ansatz", referenz="SIA 262:2025, 4.3.3.4",
-            name=MIT_BUEGELN)
+            titel="Ansatz", referenz=REFERENZ, name=MIT_BUEGELN)
         p.erklaerung(
-            "Beide Anteile gelten je Laufmeter, wie die Querkraft selbst. "
-            "Gesucht wird ganzgradig zwischen α_min und α_max die Neigung mit "
-            f"dem grössten Widerstand V_Rd = min(V_Rd,s; V_Rd,c). Bei einer "
-            f"Normalzugkraft steilt sich die Druckdiagonale auf: α_min wird "
-            f"dann auf {ALPHA_ZUG}° gesetzt und α_max notfalls mitgehoben."
+            "Beide Anteile gelten je Laufmeter, wie die Querkraft selbst; der "
+            "Hebelarm der inneren Kräfte ist 0.9 · d. Gesucht wird ganzgradig "
+            "zwischen α_min und α_max die Neigung mit dem grössten Widerstand "
+            f"V_Rd = min(V_Rd,s; V_Rd,c). Bei einer Normalzugkraft steilt sich die "
+            f"Druckdiagonale auf: α_min ist dann mindestens {ALPHA_ZUG}°, und α_max "
+            f"wird notfalls mitgehoben."
         )
         if not self.buegel.ueber_abstand_y:
             p.formel(s_y, r"\frac{@b}{@n}", {"b": e["b"], "n": e["menge_y"]},
@@ -360,7 +370,7 @@ class QuerkraftMitBuegeln(Querkraft):
             return
 
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
-        d, _ = protokoll_hoehen(p, werte, e, self.posten, erg.zuglage, erg.d,
+        d, _ = protokoll_hoehen(p, werte, e, erg.zugposten, erg.d,
                                 seite=Zugseite.aus_moment(fall.M_Ed.si))
 
         if erg.zug_hebt_alpha:

@@ -59,9 +59,9 @@ BRUCH = "N_Ed = 0, Dehnungsfächer mit der Rechenwahl der Tragsicherheit"
 #: Die Lasten, gegen die die Schubwaende einzeln widerstehen: Kurzname,
 #: Komponente der Verteilung, Zeichen, Einheit, Beschriftung.
 SCHUB = (
-    ("V_z_Rd", "V_z", "V_{z,Rd}", KN, "Querkraftwiderstand in z"),
-    ("V_y_Rd", "V_y", "V_{y,Rd}", KN, "Querkraftwiderstand in y"),
-    ("T_Rd", "T", "T_{Rd}", KNM, "Torsionswiderstand"),
+    ("V_z_Rd", "V_z", "V_{z,Rd}", KN, "Querkraftwiderstand in z", sw.REFERENZ_WAND),
+    ("V_y_Rd", "V_y", "V_{y,Rd}", KN, "Querkraftwiderstand in y", sw.REFERENZ_WAND),
+    ("T_Rd", "T", "T_{Rd}", KNM, "Torsionswiderstand", sw.REFERENZ_TORSION),
 )
 
 
@@ -79,11 +79,11 @@ def _getragen(analyse: Querschnittsanalyse) -> List[str]:
     """
     if not analyse.waende:
         return []
-    waende = analyse.schubwaende(f_sd=lambda _: 0.0, f_cd=lambda _: 0.0, k_c=0.0)
+    waende = analyse.schubwaende(f_yd=lambda _: 0.0, f_cd=lambda _: 0.0, k_c=0.0)
     modell = sw.zellen(waende)
     bezug = (analyse.brutto.y_S * 1e-3, analyse.brutto.z_S * 1e-3)
     getragen = []
-    for _, last, _, _, _ in SCHUB:
+    for _, last, *_ in SCHUB:
         einheit = _einheit(last, analyse.biegung)
         if not any(einheit.values()):
             continue
@@ -118,9 +118,9 @@ class KennzahlenQA(Prozedur):
         self.kennzahlen: List[Kennzahl] = []
 
         def dazu(kurz: str, symbol: str, einheit, beschreibung: str, beschriftung: str,
-                 erklaerung: str, *, stellen: int = 1) -> None:
+                 erklaerung: str, *, stellen: int = 1, referenz: str = "") -> None:
             definition = WertDef(id=f"{basis}.{kurz}", symbol=symbol, einheit=einheit,
-                                 beschreibung=beschreibung, stellen=stellen)
+                                 beschreibung=beschreibung, referenz=referenz, stellen=stellen)
             self.d[kurz] = definition
             self.kennzahlen.append(Kennzahl(definition, beschriftung, erklaerung))
 
@@ -147,12 +147,12 @@ class KennzahlenQA(Prozedur):
                  f"Bezogene Druckzonenhöhe, {seite.beschriftung}",
                  "N_Ed = 0 – wie im Nachweis der Duktilität", stellen=3)
         self.getragen = _getragen(analyse)
-        for kurz, last, symbol, einheit, beschriftung in SCHUB:
+        for kurz, last, symbol, einheit, beschriftung, referenz in SCHUB:
             if last in self.getragen:
                 dazu(kurz, symbol, einheit, f"{beschriftung} der Schubwände, allein",
                      beschriftung,
                      "Schubwände bei der günstigsten Neigung, allein und mit N_Ed = 0 – "
-                     "bis die erste Wand ihren Widerstand erreicht")
+                     "bis die erste Wand ihren Widerstand erreicht", referenz=referenz)
 
         bezuege = (list(analyse.grundbezuege()) + analyse.schubbezuege()
                    + [Eingabebezug(k, analyse.id_von(k)) for k in ("A", "A_s")])
@@ -248,7 +248,7 @@ class KennzahlenQA(Prozedur):
         alpha_min, alpha_max = self.analyse.neigungsgrenzen(e)
         widerstaende = [sw.widerstand(w, alpha_min=alpha_min, alpha_max=alpha_max,
                                       zugkraft=False) for w in waende]
-        for kurz, last, symbol, einheit, beschriftung in SCHUB:
+        for kurz, last, symbol, einheit, beschriftung, _ in SCHUB:
             if last not in self.getragen:
                 continue
             v = sw.verteilen(waende, modell, **_einheit(last, self.analyse.biegung),

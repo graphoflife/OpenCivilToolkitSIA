@@ -78,16 +78,24 @@ class TestHandrechnung(unittest.TestCase):
         self.assertTrue(any(t.startswith("Kennzahlen: Resistenzlinie") for t in titel))
 
 
+#: Statische Höhe unten im Beispiel: ⌀18 auf 249 mm, ⌀12 auf 246 mm.
+D_UNTEN = 0.249 - 0.003 * 12 ** 2 / (18 ** 2 + 12 ** 2)
+
+
 class TestQuerkraft(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.aufbau, cls.loesung = rechnen(Projekt.beispiel())
 
     def test_ohne_buegel_das_kleinere_beider_seiten(self):
-        """M = 0: tau_cd d_v; M = M_Rd: k_d = 1/(1 + f_yd/E_s · d · k_g)."""
+        """
+        M = 0: tau_cd d_v; M = M_Rd: k_d = 1/(1 + f_yd/E_s · d · k_g). Unten
+        reicht d bis zum Schwerpunkt von ⌀18 und der Zulage ⌀12, 3 mm weiter
+        innen (SIA 262:2025, 4.3.3.2.2).
+        """
         tau = self.loesung.werte["beton.b1.tau_cd"].groesse.si
         k_g, eps = 1.2, (500 / 1.15) / 200000
-        d_u, d_o = 0.249, 0.300 - 0.048
+        d_u, d_o = D_UNTEN, 0.300 - 0.048
         null = [tau * d for d in (d_u, d_o)]
         voll = [tau * d / (1.0 + eps * d * 1e3 * k_g) for d in (d_u, d_o)]
         self.assertAlmostEqual(wert(self.aufbau, self.loesung, "V_Rd_max"), min(null), places=6)
@@ -108,7 +116,7 @@ class TestQuerkraft(unittest.TestCase):
             beste_neigung(neigungen(alpha_min=b.alpha_min, alpha_max=b.alpha_max,
                                     a_s=a_s, s_x=0.2, s_y=0.2,
                                     d=d, f_yd=f_yd, f_cd=f_cd, k_c=0.55)).V_Rd
-            for d in (0.249, 0.252))
+            for d in (D_UNTEN, 0.252))
         self.assertAlmostEqual(wert(aufbau, loesung, "V_Rd_buegel"), erwartet, places=6)
 
 
@@ -127,7 +135,7 @@ class TestImmer(unittest.TestCase):
             "Zugwiderstand", "Druckwiderstand",
             "Bezogene Druckzonenhöhe, Zug unten", "Bezogene Druckzonenhöhe, Zug oben",
             "Querkraftwiderstand ohne Bügel, grösster",
-            "Querkraftwiderstand ohne Bügel, kleinster"])
+            "Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung"])
         faktor = next(k for k in antwort["kennzahlen"]["q1"] if k["symbol"] == r"\omega_w")
         self.assertEqual(faktor["text"], "4.00")
 
@@ -145,7 +153,7 @@ class TestImmer(unittest.TestCase):
         text = projekt.rechnen().bericht()
         teil = text[text.index("Decke über EG\n-"):]
         self.assertIn("Kennzahlen", teil)
-        self.assertIn("Querkraftwiderstand ohne Bügel, kleinster", teil)
+        self.assertIn("Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung", teil)
 
 
 class TestEinseitigBewehrt(unittest.TestCase):
@@ -182,7 +190,7 @@ class TestEinseitigBewehrt(unittest.TestCase):
             "Momentenwiderstand, Zug unten", "Momentenwiderstand, Zug oben",
             "Zugwiderstand", "Druckwiderstand", "Bezogene Druckzonenhöhe, Zug unten",
             "Querkraftwiderstand ohne Bügel, grösster",
-            "Querkraftwiderstand ohne Bügel, kleinster"])
+            "Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung"])
         self.assertEqual(wert(aufbau, loesung, "M_Rd_neg"), 0.0)
         self.assertGreater(wert(aufbau, loesung, "x_d_pos"), 0.0)
         texte = [getattr(b, "text", "") for b in loesung.protokoll.alle_bloecke()]

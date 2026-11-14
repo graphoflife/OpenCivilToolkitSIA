@@ -1,5 +1,5 @@
 ---
-erzeugt: d9d41e65e2b2
+erzeugt: 7166989b2189
 art: modul
 tags: [modul]
 ---
@@ -13,9 +13,9 @@ Der Lagenaufbau ([[opencivil.querschnitt.lagenaufbau#Lagenaufbau|Lagenaufbau]]) 
 Tiefe ab Oberkante und seinen Querschnitt, dazu Bewehrungsmass und
 Distanzhalter. Die Nachweise fassen die Posten einer Lage mit den Helfern
 hier zusammen: Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe
-([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]], [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]). Den Schwerpunkt mehrerer
-Flaechen rechnet [[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]] -- fuer die Posten einer Lage wie fuer
-die Lagen einer Seite.
+([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]], [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]], [[opencivil.querschnitt.lagenaufbau#protokoll_schwerpunkt|protokoll_schwerpunkt]]).
+Den Schwerpunkt mehrerer Flaechen rechnet [[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]] -- fuer die
+Posten einer Lage wie fuer die Lagen einer Seite.
 
 
 ## EIN POSTEN, EINE GESTALT
@@ -138,6 +138,18 @@ Liegen Grundbewehrung und Zulage in der Lage, stehen Summe und gemeinsamer
 Schwerpunkt da -- sonst fiele der Schwerpunkt vom Himmel. Ohne `z` nur
 der Querschnitt. Zurueck kommen `A_s` und `d` fuer die Formeln danach.
 
+### protokoll_schwerpunkt
+
+```python
+def protokoll_schwerpunkt(p: Protokoll, e: Eingaben, werte: Zwischenwerte, posten: Sequence[Postenbezug], z: float, name: Tuple[str, str], *, titel: str) -> Wert
+```
+
+Die Tiefe mehrerer Posten in ihrem gemeinsamen Schwerpunkt, nach Flaechen
+gewichtet -- die Zeile zu [[opencivil.querschnitt.lagenaufbau#schwerpunkt|schwerpunkt]]. Bei einem Posten ist es
+dessen eigene Tiefe, ohne Zeile. `name` ist Kurzname und Zeichen des
+Schwerpunkts. Fuer eine Lage ([[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]) wie fuer die
+gezogene Seite im Querkraftnachweis.
+
 ### protokoll_statische_hoehe
 
 ```python
@@ -221,5 +233,5 @@ Herleitung stehen und sich zurueckverfolgen lassen.
 - [[Bewehrungsmass je Kubikmeter Beton]] · `Lagenaufbau._kennzahlen`
 - [[Bewehrungsquerschnitt über die Breite b]] · `Lagenaufbau.rechne`
 - [[Höhe der Distanzhalter]] · `Lagenaufbau._kennzahlen`
-- [[Schwerpunkt der zusammengefassten Lage]] · `protokoll_lage`
+- [[Schwerpunkt der zusammengefassten Lage]] · `protokoll_schwerpunkt`
 - [[Statische Höhe]] · `protokoll_statische_hoehe`

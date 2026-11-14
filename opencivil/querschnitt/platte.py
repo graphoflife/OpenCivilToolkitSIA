@@ -227,17 +227,26 @@ class Bewehrungslage:
         return f"{self.nummer},{self.richtung.value}"
 
 
-#: Vorgabe fuer die Neigung der Druckdiagonalen, in Grad.
+#: Vorgabe fuer die Neigung der Druckdiagonalen, in Grad: 30° ist im
+#: Normalfall die untere Grenze (SIA 262:2025, 4.3.3.3.3), 45° die obere der
+#: Norm (4.3.3.3.2, Gl. (42)).
 ALPHA_MIN = 30
 ALPHA_MAX = 45
 
 #: Bei einer Normalzugkraft steilt sich die Druckdiagonale auf. Beide Grenzen
-#: werden dann auf mindestens diesen Wert gehoben.
+#: werden dann auf mindestens diesen Wert gehoben (SIA 262:2025, 4.3.3.3.3).
 ALPHA_ZUG = 40
 
 #: Vorgabe fuer den Abminderungsbeiwert der Betondruckfestigkeit in der
-#: Druckdiagonalen.
+#: Druckdiagonalen: der Wert fuer Stege, deren Druckfeld die Bewehrung schief
+#: kreuzt (SIA 262:2025, 4.2.1.7).
 K_C = 0.55
+
+#: Wo die Grenzen der Neigung und k_c stehen -- fuer die Platte und die
+#: Querschnittsanalyse.
+REFERENZ_ALPHA_MIN = "SIA 262:2025, 4.3.3.3.3"
+REFERENZ_ALPHA_MAX = "SIA 262:2025, 4.3.3.3.2, (42)"
+REFERENZ_K_C = "SIA 262:2025, 4.2.1.7"
 
 @dataclass
 class Querkraftbewehrung:
@@ -302,13 +311,14 @@ def druckfeldgrenzen(alpha_min: int, alpha_max: int, zugkraft: bool) -> Tuple[in
     Vorzeichen von ``N_Ed`` -- fuer die Buegel der Platte wie fuer die
     Schubwaende der Querschnittsanalyse.
 
-    Bei Normalzug steilt sich die Druckdiagonale auf: ``alpha_min`` wird auf
-    40° gesetzt und ``alpha_max`` notfalls mitgehoben, damit der Bereich
-    nicht leer wird.
+    Bei Normalzug steilt sich die Druckdiagonale auf: ``alpha_min`` ist dann
+    mindestens 40°, und ``alpha_max`` wird notfalls mitgehoben, damit der
+    Bereich nicht leer wird (SIA 262:2025, 4.3.3.3.3). Bis 2026-11-14 wurde
+    ``alpha_min`` auf genau 40° gesetzt -- auch von 42° herunter.
     """
     if not zugkraft:
         return alpha_min, alpha_max
-    return ALPHA_ZUG, max(alpha_max, ALPHA_ZUG)
+    return max(alpha_min, ALPHA_ZUG), max(alpha_max, ALPHA_ZUG)
 
 
 # ===========================================================================
@@ -349,7 +359,11 @@ class Plattenquerschnitt(Rechenobjekt):
     """Grösstkorndurchmesser -- geht in den Querkraftwiderstand ein."""
 
     einlagenhoehe: Groesse = field(default_factory=lambda: Groesse(0, MM))
-    """Höhe einer Einlage; verringert den Hebelarm d_v, wenn h/6 < e < d."""
+    """
+    Grösstes Mass einer Einlage, Breite oder Höhe. Übersteigt es d/6,
+    vermindert es die wirksame statische Höhe d_v (SIA 262:2025, 4.3.3.2.9).
+    Der Name stammt von früher, als nur die Höhe zählte.
+    """
 
     k_c: Groesse = field(default_factory=lambda: Groesse(K_C, EINHEITSLOS))
     """Abminderung der Betondruckfestigkeit in der Druckdiagonalen."""
@@ -454,11 +468,12 @@ class Plattenquerschnitt(Rechenobjekt):
         d_cu = self._def("c_nom_unten", "c_{nom,u}", MM, "Überdeckung unten", 0)
         d_co = self._def("c_nom_oben", "c_{nom,o}", MM, "Überdeckung oben", 0)
         d_dmax = self._def("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0)
-        d_einl = self._def("einlagenhoehe", "e_{Einlage}", MM, "Höhe der Einlage", 0)
+        d_einl = self._def("einlagenhoehe", "e_{Einlage}", MM,
+                           "Grösstes Mass der Einlage (Breite oder Höhe)", 0)
 
         abschnitt = self.abschnitt
         self.berechnungen += [
-            # Grösstkorn und Einlagenhöhe gehen nur in den Querkraftnachweis
+            # Grösstkorn und Einlage gehen nur in den Querkraftnachweis
             # ein und stehen darum dort, bei den Grössen, die sie erklären --
             # nicht verwaist am Anfang der Plattenanalyse.
             Vorgabe(id=f"{self.id}.D_max", ausgabe=d_dmax, groesse=self.d_max,
@@ -590,7 +605,8 @@ class Plattenquerschnitt(Rechenobjekt):
         Rechnung sehen statt nur die Zahl.
         """
         d_kc = self._def("k_c", "k_c", EINHEITSLOS,
-                         "Abminderung der Betondruckfestigkeit in der Druckdiagonalen", 2)
+                         "Abminderung der Betondruckfestigkeit in der Druckdiagonalen", 2,
+                         referenz=REFERENZ_K_C)
         self.berechnungen.append(
             Vorgabe(id=f"{self.id}.k_c", ausgabe=d_kc, groesse=self.k_c,
                     abschnitt=abschnitt, stumm=True))
@@ -605,9 +621,11 @@ class Plattenquerschnitt(Rechenobjekt):
         d_sx = self._def("querkraft.s_x", "s_{V,x}", MM,
                          "Bügelteilung in x-Richtung", 0)
         d_amin = self._def("querkraft.alpha_min", r"\alpha_{min}", GRAD,
-                           "Kleinste Neigung der Druckdiagonalen", 0)
+                           "Kleinste Neigung der Druckdiagonalen", 0,
+                           referenz=REFERENZ_ALPHA_MIN)
         d_amax = self._def("querkraft.alpha_max", r"\alpha_{max}", GRAD,
-                           "Grösste Neigung der Druckdiagonalen", 0)
+                           "Grösste Neigung der Druckdiagonalen", 0,
+                           referenz=REFERENZ_ALPHA_MAX)
 
         self.berechnungen += [
             Vorgabe(id=f"{self.id}.querkraft.phi", ausgabe=d_phi,
@@ -636,7 +654,7 @@ class Plattenquerschnitt(Rechenobjekt):
 
         d_as = self._def("querkraft.a_s", r"A_{\varnothing,V}", MM2,
                          "Querschnitt eines Bügelschenkels", 1,
-                         referenz="SIA 262:2025, 5.5.2")
+                         referenz="SIA 262:2025, 4.2.2.4")
         self.berechnungen.append(
             Formel(
                 id=f"{self.id}.querkraft.a_s",

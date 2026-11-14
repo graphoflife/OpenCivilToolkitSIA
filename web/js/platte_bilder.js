@@ -131,7 +131,7 @@ function neigungskurven(loesung, querschnitt) {
       el('span.kurvenfuss-name', { text: `d = ${kurve.d.toFixed(1)} mm` }),
       el('span.kurvenhinweis', {
         text: kurve.zug
-          ? `Normalzug: α_min ist auf ${kurve.alpha_min}° angehoben. `
+          ? `Normalzug: α_min = ${kurve.alpha_min}° – unter Zug mindestens 40°. `
             + 'Ausserhalb der Grenzen ist die Kurve blass gezeichnet.'
           : 'Ausserhalb von α_min und α_max ist die Kurve blass gezeichnet.',
       }),

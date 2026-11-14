@@ -1,5 +1,5 @@
 ---
-erzeugt: 400d6ed67d2b
+erzeugt: 63bca466f5e9
 art: formel
 tags: [formel]
 ---
@@ -40,12 +40,14 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
-- [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]
+- [[opencivil.querschnitt.lagenaufbau#protokoll_schwerpunkt|protokoll_schwerpunkt]]
 
 ## Themen
 
 - [[Biegung und Normalkraft]]
 - [[Verformung]]
+- [[Kennzahlen]]
+- [[Querkraft]]
 - [[Duktilität]]
 - [[Zwängung auf Biegung]]
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 026623e1df4b
+erzeugt: d8ad62dc2719
 art: formel
 tags: [formel]
 ---
@@ -42,7 +42,7 @@ $$
 
 ## Gebraucht von
 
-- [[Beiwert für die statische Höhe]]
+- [[Beiwert für den Querkraftwiderstand]]
 - [[Bewehrungsgehalt]]
 - [[Bezogene Druckzonenhöhe]]
 - [[Dehnung der Zugbewehrung]]
@@ -77,6 +77,9 @@ Der Abstand vom gedrückten Rand bis zum Schwerpunkt der gezogenen
 Bewehrung -- der Hebelarm, an dem die Stahlkraft gegen die Druckzone
 arbeitet. Eine untere Lage misst ab der Oberkante, $d = z$; eine obere ab der
 Unterkante, $d = h - z$, denn bei negativem Moment liegt die Druckzone unten.
+Liegen auf der gezogenen Seite mehrere Lagen, zählt ihr gemeinsamer
+Schwerpunkt ([[Schwerpunkt der zusammengefassten Lage]]); bei der Querkraft
+ohne Bügel verlangt die Norm das ausdrücklich (SIA 262, 4.3.3.2.2).
 
 $d$ steckt in fast jedem Widerstand: im Momentenwiderstand, im
 Bewehrungsgehalt, in der Querkraft und in der Duktilität.

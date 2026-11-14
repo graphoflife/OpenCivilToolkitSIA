@@ -8,21 +8,27 @@ Buegeln teilt, steht in :mod:`opencivil.nachweis.querkraft`.
 
 OHNE BUEGEL::
 
-    V_Rd = k_d * tau_cd * d_v
+    V_Rd = k_d * tau_cd * d_v                                   (35)
 
-    k_d   = 1 / (1 + eps_v * d * k_g)
-    k_g   = 48 / (16 + D_max * min[1.0; (60/f_ck)^2])
-    m_Dd  = |N_Ed| * h / 6                      Dekompressionsmoment
-    eps_v = f_yd * (m_Ed - m_Dd) / (E_s * (m_Rd(N_Ed) - m_Dd))
+    k_d   = 1 / (1 + eps_v * d * k_g)                           (36)
+    k_g   = max[1.20; 48 / (16 + D_max * min[1.0; (60/f_ck)^2])]   (37)
+    m_Dd  = -N_Ed * h / 6               Dekompressionsmoment, Zug positiv
+    eps_v = f_yd * (m_Ed - m_Dd) / (E_s * (m_Rd(N_Ed) - m_Dd))  (39)
 
-    d_v = d - Einlagenhoehe,  falls  h/6 < Einlagenhoehe < d
-    d_v = d                   sonst
+    d_v = d - e,  falls  e > d/6        e: groesstes Mass der Einlage
+    d_v = d       sonst
 
-ZUG BRAUCHT KEINEN SONDERFALL:
-Das Dekompressionsmoment ist ueber ``min(N_Ed; 0)`` definiert und wird bei
-einer Normalzugkraft von selbst null -- entlastend wirkt nur Druck. Der
-Nachweis laeuft damit unveraendert weiter; frueher stand hier ein Sonderfall,
-der ``V_Rd = 0`` setzte.
+Die Nummern sind die der Gleichungen in SIA 262:2025, 4.3.3.2; die Einlage
+regelt 4.3.3.2.9, das Dekompressionsmoment 4.3.3.2.6. Dass ``h/6`` dazu
+gehoert, sagt die Norm nicht -- es ist der Rand eines Rechtecks, der unter
+``N_Ed`` und ``m_Dd`` spannungsfrei wird.
+
+DIE NORMALKRAFT ZAEHLT MIT VORZEICHEN:
+Druck hebt das Dekompressionsmoment, Zug macht es negativ: der Querschnitt
+ist dann schon ohne Moment gerissen, und die Dehnung waechst. SIA 262:2025,
+4.3.3.2.6 will den Zug bei m_Rd und bei m_Dd beruecksichtigt haben. Bis
+2026-11-14 zaehlte hier nur Druck, ueber ``min(N_Ed; 0)``; noch frueher
+setzte ein Sonderfall bei Zug ``V_Rd = 0``.
 
 EINHEITEN:
 Die Formeln der Norm sind dimensionell inhomogen -- ``d`` und ``D_max`` gehen
@@ -44,18 +50,32 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.nachweis.biegung_normalkraft import MNBefund, protokoll_widerstand
 from opencivil.nachweis.querkraft import (
-    Querkraft, Querkraftergebnis, Querkraftfall, _ohne_zugbewehrung, _hoch, _statische_hoehe,
-    lagen_von, protokoll_hoehen, zuglage,
+    Querkraft, Querkraftergebnis, Querkraftfall, _ohne_zugbewehrung, _hoch, protokoll_hoehen,
+    statische_hoehen, zugposten,
 )
 from opencivil.nachweis.rechenwahl import stahlbezuege, staehle
 from opencivil.querschnitt.zugseite import Zugseite
 
-#: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
+#: Unterer Riegel fuer den Beiwert der Gesteinskoernung -- er steht in der
+#: Gleichung selbst.
 K_G_MINDEST = 1.20
 
 #: Vielfaches der Fliessdehnung, sobald ``m_Ed`` den Widerstand ueberschreitet.
-#: ``eps_v = PLASTISCH * f_yd / E_s`` -- fest, nicht vom Moment abhaengig.
+#: ``eps_v = PLASTISCH * f_yd / E_s`` -- fest, nicht vom Moment abhaengig. Die
+#: Norm setzt den Wert, wo plastische Verformungen der Biegebewehrung nicht
+#: auszuschliessen sind (:data:`REFERENZ_PLASTISCH`).
 PLASTISCH = 1.5
+
+#: Wo die Gleichungen stehen, je eine Stelle.
+REFERENZ = "SIA 262:2025, 4.3.3.2.1, (35)"
+REFERENZ_K_D = "SIA 262:2025, 4.3.3.2.1, (36)"
+REFERENZ_K_G = "SIA 262:2025, 4.3.3.2.1, (37)"
+REFERENZ_DEHNUNG = "SIA 262:2025, 4.3.3.2.2, (39); 4.3.3.2.6"
+REFERENZ_PLASTISCH = "SIA 262:2025, 4.3.3.2.3, (41)"
+REFERENZ_DEKOMPRESSION = "SIA 262:2025, 4.3.3.2.6"
+
+#: Was eps_v ist: die Dehnung, mit der die Norm den Widerstand bemisst.
+DEHNUNG = "Nominelle Dehnung der Zugbewehrung"
 
 #: Die Seite des Widerstands im Notizbuch -- Ansatz und Rechnung stehen darauf.
 OHNE_BUEGEL = "Querkraftwiderstand ohne Querkraftbewehrung"
@@ -82,10 +102,16 @@ class Kurvenbeiwerte:
     """
 
     h: float
-    lagen: Tuple[Tuple[float, bool], ...]
-    """Je vorhandener Posten: ``(z ab Oberkante, liegt unten)``."""
+    statische_hoehen: Mapping[bool, float]
+    """
+    Je Momentenrichtung (``True``: Zug unten) die statische Hoehe der
+    gezogenen Bewehrung (:func:`~opencivil.nachweis.querkraft.statische_hoehen`).
+    Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
+    """
 
     einlage: float
+    """Das groesste Mass der Einlage, Breite oder Hoehe."""
+
     tau_cd: float
     zugstahl: Mapping[bool, Tuple[float, float]]
     """
@@ -98,11 +124,23 @@ class Kurvenbeiwerte:
 
     def hoehen(self, moment_positiv: bool) -> Optional[Tuple[float, float]]:
         """``(d, d_v)`` fuer diese Momentenrichtung -- ``None`` ohne Zugbewehrung."""
-        d = _statische_hoehe(self.lagen, self.h, moment_positiv)
+        d = self.statische_hoehen.get(moment_positiv)
         if d is None:
             return None
-        d_v = d - self.einlage if (self.h / 6.0 < self.einlage < d) else d
-        return d, d_v
+        return d, wirksame_hoehe(d, self.einlage)
+
+
+def wirksame_hoehe(d: float, einlage: float) -> float:
+    """
+    ``d_v``: ``d``, um die Einlage vermindert, sobald ihr groesstes Mass ``d/6``
+    uebersteigt -- sonst ``d`` (SIA 262:2025, 4.3.3.2.9). Eine obere Grenze
+    gibt es nicht: reicht die Einlage ueber ``d``, wird ``d_v`` null oder
+    negativ, und ohne Buegel bleibt kein Widerstand (:func:`widerstand`).
+
+    Bis 2026-11-14 zaehlte die Einlage erst ab ``h/6`` und nur bis ``d`` --
+    zwischen ``d/6`` und ``h/6`` und ab ``d`` blieb sie unbeachtet.
+    """
+    return d - einlage if einlage > d / 6.0 else d
 
 
 @dataclass(frozen=True)
@@ -143,14 +181,24 @@ def widerstand(
     DREI AESTE:
 
     * ``|m_Ed| <= m_Dd`` -- der Querschnitt bleibt ungerissen, ``eps_v = 0``
-      und ``k_d`` damit am groessten.
+      und ``k_d`` damit am groessten. Unter Zug ist ``m_Dd`` negativ, und
+      diesen Ast gibt es nicht.
     * ``|m_Ed| <= m_Rd`` -- der Regelfall der Norm.
     * ``|m_Ed| >  m_Rd`` -- die Bewehrung fliesst. Die Dehnung folgt dann nicht
       mehr dem Moment, sondern ist **fest**: ``eps_v = 1.5 * f_yd/E_s``. Der
       Widerstand faellt an dieser Stelle sprunghaft und bleibt danach
       unveraendert -- in der Kurve eine Waagrechte.
+
+    Ist ``d_v`` null oder negativ, nimmt die Einlage die ganze Hoehe: kein
+    Widerstand.
     """
-    m_Dd = abs(min(N_Ed, 0.0)) * h / 6.0
+    # Ohne Normalkraft null -- nicht -0, das als «-0.0 kNm» dastuende.
+    m_Dd = -N_Ed * h / 6.0 if N_Ed else 0.0
+    if d_v <= 0.0:
+        return Widerstandspunkt(
+            m_Dd=m_Dd, eps_v=0.0, k_d=0.0, v_Rd=0.0,
+            grund=(f"d_v = {d_v * 1e3:.1f} mm ≤ 0 – die Einlage reicht über die ganze "
+                   f"statische Höhe → ohne Bügel kein Querkraftwiderstand."))
     zaehler = abs(M_Ed) - m_Dd
     nenner = m_Rd - m_Dd
     plastisch = False
@@ -195,7 +243,7 @@ def beiwert_k_g(p: Protokoll, basis: str, D_max: Wert, f_ck: Wert) -> Wert:
         rf"\max\left[{K_G_MINDEST:.2f};\ \frac{{48}}{{16 + @D_max \cdot "
         r"\min\left[1.0;\ \left(\frac{60}{@f_ck}\right)^{2}\right]}\right]",
         {"D_max": D_max, "f_ck": f_ck}, empirisch=k_g.einheiten,
-        titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
+        titel="Beiwert der Gesteinskörnung", referenz=REFERENZ_K_G)
     return beiwert
 
 
@@ -226,10 +274,10 @@ def protokoll_ohne_buegel(p: Protokoll, werte: Zwischenwerte, widerstand: Wert, 
     beiwert = werte.zahl(*_hoch("k_d", "k_d", zeichen), k_d, stellen=4)
     p.formel(beiwert, r"\frac{1}{1 + @eps_v \cdot @d \cdot @k_g}",
              {"eps_v": eps_v, "d": d, "k_g": k_g}, empirisch={"d": MM},
-             titel="Beiwert für die statische Höhe")
+             titel="Beiwert für den Querkraftwiderstand", referenz=REFERENZ_K_D)
     p.formel(widerstand, r"@k_d \cdot @tau_cd \cdot @d_v",
              {"k_d": beiwert, "tau_cd": tau_cd, "d_v": d_v},
-             titel=titel, referenz="SIA 262:2025, 4.3.3.2.1", name=OHNE_BUEGEL)
+             titel=titel, referenz=REFERENZ, name=OHNE_BUEGEL)
 
 
 @dataclass
@@ -338,6 +386,8 @@ class ErgebnisOhneBuegel(Querkraftergebnis):
 class QuerkraftOhneBuegel(Querkraft):
     """Der Querkraftnachweis einer Platte ohne Buegel -- siehe Dateikopf."""
 
+    REFERENZ = REFERENZ
+
     def _ansatzbezuege(self) -> List[Eingabebezug]:
         # Die Dehnung eps_v rechnet mit dem Stahl der gezogenen Seite --
         # unten und oben duerfen verschiedene liegen, also je Stahl.
@@ -364,23 +414,22 @@ class QuerkraftOhneBuegel(Querkraft):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         m_rd = {f.name: abs(e.g(f"m_Rd_{f.kennung}").si) for f in self.faelle}
-        lagen = lagen_von(e, self.posten)
+        hoehen = statische_hoehen(e, self.posten)
+        # Der Stahl der gezogenen Seite; eine Seite hat nur einen.
         zugstahl = {}
-        for positiv in (True, False):
-            i = zuglage(lagen, positiv)
-            if i is not None:
-                stahl = self.posten[i].lage.stahl
-                zugstahl[positiv] = (e.g(stahl.eingabename("f_yd")).si,
-                                     e.g(stahl.eingabename("E_s")).si)
+        for positiv in hoehen:
+            stahl = zugposten(self.posten, positiv)[0].lage.stahl
+            zugstahl[positiv] = (e.g(stahl.eingabename("f_yd")).si,
+                                 e.g(stahl.eingabename("E_s")).si)
 
         self._protokoll_ansatz(p, e)
 
         beiwert = beiwert_k_g(p, self.id, e["D_max"], e["f_ck"])
         # Fuer die Faelle und fuer die Kurve dieselben -- auch d_v entsteht
         # darum an einer Stelle (:meth:`Kurvenbeiwerte.hoehen`).
-        beiwerte = Kurvenbeiwerte(h=e.g("h").si, lagen=lagen, einlage=e.g("einlagenhoehe").si,
-                                  tau_cd=e.g("tau_cd").si, zugstahl=zugstahl,
-                                  k_g=beiwert.groesse.si)
+        beiwerte = Kurvenbeiwerte(h=e.g("h").si, statische_hoehen=hoehen,
+                                  einlage=e.g("einlagenhoehe").si, tau_cd=e.g("tau_cd").si,
+                                  zugstahl=zugstahl, k_g=beiwert.groesse.si)
         mn = e.befund("mn")
         befund = BefundOhneBuegel(beiwerte=beiwerte, mn=mn, index=self.mn.wahl.index)
 
@@ -404,7 +453,7 @@ class QuerkraftOhneBuegel(Querkraft):
         # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und ohne d
         # keinen Querkraftwiderstand. Frueher wurde hier die gedrueckte Seite
         # herangezogen und lieferte eine Zahl, die keine statische Hoehe ist.
-        erg.zuglage = zuglage(w.lagen, M_Ed >= 0)
+        erg.zugposten = tuple(zugposten(self.posten, M_Ed >= 0))
         hoehen = w.hoehen(M_Ed >= 0)
         if hoehen is None:
             erg.begruendung = _ohne_zugbewehrung(M_Ed)
@@ -412,10 +461,8 @@ class QuerkraftOhneBuegel(Querkraft):
         erg.d, erg.d_v = hoehen
         f_yd, E_s = w.zugstahl[M_Ed >= 0]
 
-        # Nur Druck entlastet: bei Zug liefert min(N_Ed; 0) null, das
-        # Dekompressionsmoment entfaellt und der Nachweis laeuft unveraendert
-        # weiter. Eine Sonderbehandlung braucht es dafuer nicht -- sie stand
-        # frueher hier und setzte v_Rd kurzerhand auf null.
+        # Zug braucht keinen Sonderfall: er macht m_Dd negativ (siehe
+        # widerstand). Frueher setzte hier einer v_Rd kurzerhand auf null.
         punkt = widerstand(
             M_Ed=M_Ed, N_Ed=N_Ed, h=w.h, d=erg.d, d_v=erg.d_v,
             tau_cd=w.tau_cd, f_yd=f_yd, E_s=E_s, k_g=w.k_g, m_Rd=m_Rd,
@@ -445,7 +492,7 @@ class QuerkraftOhneBuegel(Querkraft):
         p.erklaerung(
             "Querkraftwiderstand ohne Querkraftbewehrung. Massgebend sind die "
             "statische Höhe der gezogenen Bewehrung, die Grösstkorngrösse und "
-            "die Dehnung auf halber Höhe."
+            "die nominelle Dehnung der Zugbewehrung."
         )
         # Bei einem Stahl mit seinem Zeichen; bei zweien das allgemeine --
         # welcher gilt, steht bei jedem Fall.
@@ -456,20 +503,20 @@ class QuerkraftOhneBuegel(Querkraft):
         p.ansatz(
             rf"V_{{Rd}} = k_d \cdot {s['tau_cd']} \cdot d_v \qquad "
             r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}",
-            titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1", name=OHNE_BUEGEL)
+            titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1, (35), (36)", name=OHNE_BUEGEL)
         p.ansatz(
-            r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad "
+            r"m_{Dd} = -\frac{N_{Ed} \cdot h}{6} \qquad "
             rf"\varepsilon_v = \frac{{{s['f_yd']} \cdot \left(\left|m_{{Ed}}\right| "
             r"- m_{Dd}\right)}"
             rf"{{{s['E_s']} \cdot \left(\left|m_{{Rd}}(N_{{Ed}})\right| - m_{{Dd}}\right)}}",
-            titel="Dekompressionsmoment und Dehnung")
+            titel="Dekompressionsmoment und Dehnung", referenz=REFERENZ_DEHNUNG)
         p.erklaerung(
-            "Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim "
-            "Dekompressionsmoment unberücksichtigt. Da der Widerstand über "
-            "m_Ed und N_Ed von der Einwirkung abhängt, wird er für jede "
-            "Kombination einzeln bestimmt."
+            "N_Ed zählt mit Vorzeichen, Zug positiv: Druck hebt das "
+            "Dekompressionsmoment und entlastet, Zug macht es negativ und "
+            "vergrössert die Dehnung. Da der Widerstand über m_Ed und N_Ed von "
+            "der Einwirkung abhängt, wird er für jede Kombination einzeln bestimmt."
         )
-        # Grösstkorn und Einlagenhöhe gehen nur hier ein. Sie stehen darum
+        # Grösstkorn und Einlage gehen nur hier ein. Sie stehen darum
         # hier und nicht am Anfang der Plattenanalyse, wo sie zwischen
         # Abmessungen und Bewehrung niemandem etwas sagen.
         for name in ("D_max", "einlagenhoehe"):
@@ -494,18 +541,18 @@ class QuerkraftOhneBuegel(Querkraft):
 
         # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und nichts
         # weiter herzuleiten.
-        if erg.zuglage is None:
+        if not erg.zugposten:
             p.text(erg.begruendung)
             return
 
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
-        d, d_v = protokoll_hoehen(p, werte, e, self.posten, erg.zuglage, erg.d, erg.d_v,
+        d, d_v = protokoll_hoehen(p, werte, e, erg.zugposten, erg.d, erg.d_v,
                                   seite=Zugseite.aus_moment(M_Ed))
 
         m_Dd = werte.moment("m_Dd", "m_{Dd}", erg.m_Dd)
-        p.formel(m_Dd, r"\frac{\left|\min(@N_Ed;\ 0)\right| \cdot @h}{6}",
+        p.formel(m_Dd, r"-\frac{@N_Ed \cdot @h}{6}",
                  {"N_Ed": werte.kraft("N_Ed", "N_{Ed}", N_Ed), "h": e["h"]},
-                 titel="Dekompressionsmoment")
+                 titel="Dekompressionsmoment", referenz=REFERENZ_DEKOMPRESSION)
 
         if not erg.machbar:
             p.text(erg.begruendung)
@@ -524,7 +571,7 @@ class QuerkraftOhneBuegel(Querkraft):
         idx = self.mn.wahl.index
         m_Rd = werte.moment("m_Rd", f"m_{{{idx}}}(N_{{Ed}})", erg.m_Rd)
         eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
-        zugseite = self.posten[erg.zuglage].lage.stahl
+        zugseite = erg.zugposten[0].lage.stahl
         stahl = {"f_yd": e[zugseite.eingabename("f_yd")], "E_s": e[zugseite.eingabename("E_s")]}
         if erg.eps_v == 0.0:
             p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "
@@ -537,14 +584,14 @@ class QuerkraftOhneBuegel(Querkraft):
                    f"> m_{idx}(N_Ed) = {m_Rd.formatiert()} kNm → Bewehrung fliesst, "
                    f"ε_v fest.")
             p.formel(eps_v, rf"{PLASTISCH} \cdot \frac{{@f_yd}}{{@E_s}}", stahl,
-                     titel="Dehnung auf halber Höhe")
+                     titel=DEHNUNG, referenz=REFERENZ_PLASTISCH)
         else:
             p.formel(
                 eps_v,
                 r"\frac{@f_yd \cdot \left(\left|@m_Ed\right| - @m_Dd\right)}"
                 r"{@E_s \cdot \left(\left|@m_Rd\right| - @m_Dd\right)}",
                 {**stahl, "m_Ed": m_Ed, "m_Dd": m_Dd, "m_Rd": m_Rd},
-                titel="Dehnung auf halber Höhe")
+                titel=DEHNUNG, referenz=REFERENZ_DEHNUNG)
 
         protokoll_ohne_buegel(p, werte, self._widerstand(erg), k_d=erg.k_d, eps_v=eps_v,
                               d=d, d_v=d_v, k_g=k_g, tau_cd=tau_cd_wert(werte, e))

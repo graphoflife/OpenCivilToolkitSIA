@@ -1,13 +1,14 @@
 ---
-erzeugt: a845515e6da5
+erzeugt: 56646d7048c1
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.3.3.2.6"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.3.3.2.6
 
 $$
-m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6}
+m_{Dd} = -\frac{N_{Ed} \cdot h}{6}
 $$
 
 ## Grössen
@@ -22,12 +23,12 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 200\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
+m_{Dd} = -\frac{N_{Ed} \cdot h}{6} = -\frac{0\,\mathrm{kN} \cdot 200\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
 $$
 
 ## Gebraucht von
 
-- [[Dehnung auf halber Höhe]]
+- [[Nominelle Dehnung der Zugbewehrung]]
 
 ## Im Code
 
@@ -41,9 +42,21 @@ $$
 
 ## Theorie
 
-Eine Normaldruckkraft $N_{Ed}$ in der halben Höhe drückt den Rand mit
-$N/A$. Ein Moment $m$ zieht ihn mit $m/W$, bei $W = h^2/6$ je Laufmeter --
-der Rand ist wieder spannungsfrei bei $m = |N| \cdot h/6$. Bis dahin reisst
-nichts, und die Bewehrung bekommt keine Dehnung.
+Eine Normalkraft $N_{Ed}$ in der halben Höhe erzeugt am Rand die Spannung
+$N/A$, ein Moment $m$ dazu $m/W$ -- im Streifen mit $A = b\,h$ und
+$W = b\,h^2/6$. Spannungsfrei ist der gezogene Rand bei
+$m = -N_{Ed} \cdot h/6$, Zug positiv gezählt:
 
-Nur Druck entlastet: eine Zugkraft bleibt hier unberücksichtigt.
+- Druck macht $m_{Dd}$ positiv: bis dahin reisst nichts, und die Bewehrung
+  bekommt keine Dehnung.
+- Zug macht $m_{Dd}$ negativ: der Querschnitt ist schon ohne Moment
+  gerissen, und die Bewehrung ist gedehnt.
+
+Beispiel mit $h = 300\,\mathrm{mm}$: $N_{Ed} = -200\,\mathrm{kN}$ (Druck)
+gibt $m_{Dd} = +10\,\mathrm{kNm}$, $N_{Ed} = +200\,\mathrm{kN}$ (Zug)
+$m_{Dd} = -10\,\mathrm{kNm}$.
+
+Mit einer Normalkraft misst die Norm das Moment in der
+[[Nominelle Dehnung der Zugbewehrung|nominellen Dehnung]] ab $m_{Dd}$, und
+auch eine Zugkraft geht in $m_{Rd}$ und $m_{Dd}$ ein (SIA 262, 4.3.3.2.6).
+Die Formel $-N_{Ed}\,h/6$ selbst ist Mechanik des Rechtecks, kein Normtext.

@@ -285,7 +285,7 @@ export function plattenEditor(querschnitt) {
           titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
           beiAenderung: (v) => aendern((q) => { q.b = v; }),
         }), 'mm'),
-        // Grösstkorn, k_c und Einlagenhöhe stehen im Fenster der
+        // Grösstkorn, k_c und Einlage stehen im Fenster der
         // Tragsicherheit: nur die Querkraft braucht sie. Die Kriechzahl des
         // Vergrösserungsfaktors steht im Fenster der Verformung.
         // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld

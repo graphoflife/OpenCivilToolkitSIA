@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b45afe66227
+erzeugt: c3222ca41343
 art: modul
 tags: [modul]
 ---
@@ -81,6 +81,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.wert]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.biegung]]
+- [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schubwaende]]
 
 ## Gebraucht von

@@ -46,5 +46,5 @@ Ergebnis ist eine Spannung in N/mm².
 
 $\tau_{cd}$ ist der Grundwert des
 [[Querkraftwiderstand ohne Querkraftbewehrung|Querkraftwiderstands ohne Querkraftbewehrung]];
-der [[Beiwert für die statische Höhe]] passt ihn an Höhe, Dehnung und
+der [[Beiwert für den Querkraftwiderstand]] passt ihn an Höhe, Dehnung und
 Gesteinskörnung an.

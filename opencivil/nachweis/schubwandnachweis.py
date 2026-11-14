@@ -29,6 +29,7 @@ from opencivil.core.wert import WertDef, grad_als_text
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.biegung import Biegung
+from opencivil.querschnitt.platte import ALPHA_ZUG
 
 
 def schub_belastet(biegung: Biegung, fall: Lastfall) -> bool:
@@ -74,7 +75,7 @@ class Schubwandnachweis(Nachweis):
             f.name: grad_def(f"{basis}.{f.kennung}.erfuellungsgrad",
                              rf"\alpha_{{eff,V,{als_text(f.name)}}}",
                              f"Erfüllungsgrad Querkraft und Torsion – {f.name}",
-                             "SIA 262:2025, 4.3.3")
+                             sw.REFERENZ_TORSION)
             for f in self.lastfaelle if schub_belastet(analyse.biegung, f)
         }
         self.d_laengszug: Dict[str, Dict[str, WertDef]] = {}
@@ -95,7 +96,7 @@ class Schubwandnachweis(Nachweis):
         super().__init__(
             basis, ausgaben=ausgaben, bezuege=bezuege,
             titel=f"Querkraft und Torsion – {analyse.name}",
-            referenz="SIA 262:2025, 4.3.3", abschnitt=analyse.abschnitt)
+            referenz=sw.REFERENZ_TORSION, abschnitt=analyse.abschnitt)
 
     # -- Pruefen ----------------------------------------------------------------
 
@@ -204,7 +205,8 @@ class Schubwandnachweis(Nachweis):
             zeilen=zeilen, ausrichtung="lrrrrrrr",
             titel="Je Wand: Kraft aus der Querkraft, stärkster Schubfluss, Widerstand")
         if zugkraft:
-            p.text("Normalzug: die Druckdiagonalen steilen sich auf, α mindestens 40°.")
+            p.text(f"Normalzug: die Druckdiagonalen steilen sich auf, α mindestens "
+                   f"{ALPHA_ZUG}° (SIA 262:2025, 4.3.3.3.3).")
 
         i = min(range(len(vergleiche)), key=lambda k: vergleiche[k].grad)
         w, r, massgebend = befund.waende[i], widerstaende[i], vergleiche[i]
@@ -222,6 +224,7 @@ class Schubwandnachweis(Nachweis):
                  Mathe(fest(laengs.M_z / 1e3, 1)), "kNm"],
             ], titel="Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte",
                 ausrichtung="lrl")
+            p.text(f"Je Stück ΔN_i = |q|·l·cot α, halb in jedem Gurt ({sw.REFERENZ_LAENGSZUG}).")
 
         return self.urteil(self.d_ausnutzung[fall.name], fall.name, massgebend,
                            f"Massgebend {w.name}, α = {r.alpha}°."), laengs
@@ -244,12 +247,12 @@ class Schubwandnachweis(Nachweis):
                  titel="Querkraft über die Federn der Wände")
         p.ansatz(r"T - \Delta T = \sum_k 2 A_k\, q_k \qquad "
                  r"\oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta",
-                 titel="Torsion in den Zellen (Bredt, mehrzellig)")
-        p.ansatz(r"v_{Rd,s} = \frac{A_{sw}}{s}\, f_{sd} \cot\alpha \qquad "
+                 titel="Torsion in den Zellen (Bredt, mehrzellig)", referenz=sw.REFERENZ_ZELLE)
+        p.ansatz(r"v_{Rd,s} = \frac{A_{sw}}{s}\, f_{yd} \cot\alpha \qquad "
                  r"v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad "
                  r"v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})",
                  titel="Widerstand je Länge einer Wand (Fachwerk)",
-                 referenz="SIA 262:2025, 4.3.3.4")
+                 referenz=sw.REFERENZ_WAND)
         p.tabelle(kopf=["Grenze", "Wert"], zeilen=[
             [Mathe(r"\alpha_{min}"), Mathe(e["alpha_min"].zahl_latex())],
             [Mathe(r"\alpha_{max}"), Mathe(e["alpha_max"].zahl_latex())],

@@ -1,11 +1,11 @@
 ---
-erzeugt: 99a2faa31ea1
+erzeugt: 9b60ed04797c
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.3.2.1"
+normstelle: "SIA 262:2025, 4.3.3.2.1, (37)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.3.3.2.1
+> SIA 262:2025, 4.3.3.2.1, (37)
 
 $$
 k_g = \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
@@ -32,7 +32,7 @@ $$
 
 ## Gebraucht von
 
-- [[Beiwert für die statische Höhe]]
+- [[Beiwert für den Querkraftwiderstand]]
 - [[Beiwert k_r]]
 
 ## Im Code

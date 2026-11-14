@@ -1,5 +1,5 @@
 ---
-erzeugt: 0341957f1b17
+erzeugt: f72aeaafd466
 art: modul
 tags: [modul]
 ---
@@ -36,47 +36,38 @@ Bis 2026-10-25 steckten beide Ansaetze in einer Klasse hinter einem
 
 `d` ist die statische Hoehe der *gezogenen* Bewehrung und haengt damit vom
 Vorzeichen des Moments ab: bei positivem Moment liegt der Zug unten, bei
-negativem oben.
+negativem oben. Gemessen wird bis zum Schwerpunkt aller gezogenen Posten der
+Richtung -- Grundbewehrung, Zulage, auch mehrere Lagen (SIA 262:2025,
+4.3.3.2.2). Bis 2026-11-14 galt der aeusserste Posten; mit einer Zulage war
+`d` damit 1 bis 3 mm zu gross.
 
 ## Inhalt
 
-### _statische_hoehe
+### zugposten
 
 ```python
-def _statische_hoehe(lagen: Sequence[Tuple[float, bool]], h: float, moment_positiv: bool) -> Optional[float]
+def zugposten(posten: Sequence[Postenbezug], moment_positiv: bool) -> List[Postenbezug]
 ```
 
-Statische Hoehe der gezogenen Bewehrung, in m ab der gedrueckten Kante.
-
-`lagen` ist eine Folge von `(z ab Oberkante, liegt unten)`.
-
-Bei positivem Moment liegt der Zug unten: gemessen wird von der Oberkante
-zur aeussersten unteren Lage. Bei negativem Moment umgekehrt. **Nur die
-Lagen der gezogenen Seite zaehlen.** Wer alle nimmt, bekommt bei
+Die Posten der gezogenen Seite: bei positivem Moment die unteren, bei
+negativem die oberen. **Nur sie zaehlen.** Wer alle nimmt, bekommt bei
 einseitiger Bewehrung eine Zahl, die gar keine statische Hoehe ist: eine
 Platte nur mit unterer Bewehrung lieferte fuers negative Moment
 `h - 261 = 39 mm` -- den Abstand der Unterkante zur *unteren* Lage.
 
-`None`, wenn auf der gezogenen Seite nichts liegt. Dann gibt es kein
-`d`, und ohne `d` keinen Querkraftwiderstand.
-
-### lagen_von
+### statische_hoehen
 
 ```python
-def lagen_von(e: Eingaben, posten) -> Tuple[Tuple[float, bool], ...]
+def statische_hoehen(e: Eingaben, posten: Sequence[Postenbezug]) -> Dict[bool, float]
 ```
 
-Je Posten die Tiefe und auf welcher Seite er liegt, `(z, liegt unten)`
--- ohne das laesst sich die gezogene Bewehrung nicht von der gedrueckten
-trennen. Fuer den Nachweis und die Kennzahlen.
+Je Momentenrichtung (`True`: Zug unten) die statische Hoehe der
+gezogenen Bewehrung, in m ab dem gedrueckten Rand -- im Schwerpunkt ihrer
+Posten ([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]]). Fuer
+den Nachweis und die Kennzahlen.
 
-### zuglage
-
-```python
-def zuglage(lagen: Sequence[Tuple[float, bool]], moment_positiv: bool) -> Optional[int]
-```
-
-Die aeusserste Lage der gezogenen Seite, als Index in `lagen`.
+Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung. Dann gibt
+es kein `d`, und ohne `d` keinen Querkraftwiderstand.
 
 ### _hoch
 
@@ -89,14 +80,15 @@ Kurzname und Zeichen, mit `zeichen` hochgestellt: `d_+` und `d^{+}`.
 ### protokoll_hoehen
 
 ```python
-def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zuglage: int, d: float, d_v: Optional[float]=None, *, seite: Zugseite, zeichen: str='') -> Tuple[Wert, Optional[Wert]]
+def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, gezogen: Sequence[Postenbezug], d: float, d_v: Optional[float]=None, *, seite: Zugseite, zeichen: str='') -> Tuple[Wert, Optional[Wert]]
 ```
 
 Die statische Hoehe der gezogenen Bewehrung und, ohne Buegel, die
-wirksame -- geschrieben, und fuer die Formeln danach. `zuglage` ist der
-Posten der aeussersten gezogenen Lage ([[opencivil.nachweis.querkraft#zuglage|zuglage]]), `seite` die
-gezogene. `zeichen` hebt die Groessen hoch, wo zwei Seiten
-nebeneinander stehen: `d^{+}` (die Kennzahlen).
+wirksame -- geschrieben, und fuer die Formeln danach. `gezogen` sind die
+Posten der gezogenen Seite ([[opencivil.nachweis.querkraft#zugposten|zugposten]]), `seite` die gezogene.
+Liegen dort mehrere, steht zuerst ihr Schwerpunkt da. `zeichen` hebt die
+Groessen hoch, wo zwei Seiten nebeneinander stehen: `d^{+}` (die
+Kennzahlen).
 
 Mit Buegeln gibt es kein `d_v`: bis 2026-10-18 schrieben die Kennzahlen
 dort ein «d_v = d (Einlage nicht massgebend)», weil sie die Hoehen ohne
@@ -143,7 +135,7 @@ tragen [[opencivil.nachweis.querkraft_ohne_buegel#ErgebnisOhneBuegel|ErgebnisOhn
 und [[opencivil.nachweis.querkraft_buegel#ErgebnisMitBuegeln|ErgebnisMitBuegeln]].
 
 - `fall: Querkraftfall`
-- `zuglage: Optional[int] = None` – Die aeusserste gezogene Lage, als Index in den Posten -- aus ihr kommt `d`.
+- `zugposten: Tuple[Postenbezug, ...] = ()` – Die Posten der gezogenen Seite -- aus ihrem Schwerpunkt kommt `d`; leer ohne Zugbewehrung.
 - `d: float = 0.0`
 - `v_Rd: float = 0.0` – in N/m.
 - `ausgang: Ausgang = NICHT_FUEHRBAR` – \|V_Ed\| gegen v_Rd -- nicht fuehrbar, wo sich kein Widerstand bestimmen liess.
@@ -162,6 +154,7 @@ oder [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuege
 
 - `THEMA = 'Querkraft'`
 - `ART = 'V'`
+- `REFERENZ: str` – Wo der Widerstand des Ansatzes steht -- fuer Nachweis, Widerstand und Erfuellungsgrad.
 - `buegel = None` – Die Buegel der Platte -- nur der Ansatz mit Buegeln hat welche.
 
 #### Querkraft._ansatzbezuege
@@ -236,6 +229,10 @@ Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe. Der
 Widerstand steht hier kurz: seine Bedingung steht in der Zeile, die ihn
 herleitet.
 
+
+## Konstanten
+
+- `REFERENZ_EINLAGE = 'SIA 262:2025, 4.3.3.2.9'` – Wo die wirksame Hoehe und ihre Einlage stehen.
 
 ## Braucht
 

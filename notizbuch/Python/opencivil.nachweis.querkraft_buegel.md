@@ -1,5 +1,5 @@
 ---
-erzeugt: 5dcd19e71cb6
+erzeugt: fcbc90f09e9c
 art: modul
 tags: [modul]
 ---
@@ -24,10 +24,13 @@ V_Rd,c = 0.9 * d * k_c * f_cd * sin(alpha) * cos(alpha)
 V_Rd   = max ueber alpha von min(V_Rd,s; V_Rd,c)
 ```
 
-Gesucht wird ganzgradig zwischen `alpha_min` und `alpha_max`. Bei
-Normalzug steilt sich die Druckdiagonale auf -- beide Grenzen werden dann auf
-mindestens `ALPHA_ZUG` gehoben. Der Betonanteil des Ansatzes ohne Buegel
-geht nicht zusaetzlich ein.
+Die Buegel stehen in SIA 262:2025, 4.3.3.4.3, Gl. (45), die Druckdiagonale
+in 4.3.3.4.6, Gl. (47), der Hebelarm `0.9 * d` in 4.3.3.4.2.
+
+Gesucht wird ganzgradig zwischen `alpha_min` und `alpha_max` (4.3.3.3.2,
+Gl. (42)). Bei Normalzug steilt sich die Druckdiagonale auf -- beide Grenzen
+werden dann auf mindestens `ALPHA_ZUG` gehoben (4.3.3.3.3). Der Betonanteil
+des Ansatzes ohne Buegel geht nicht zusaetzlich ein.
 
 ## Inhalt
 
@@ -149,6 +152,8 @@ class QuerkraftMitBuegeln(Querkraft)
 
 Der Querkraftnachweis einer Platte mit Buegeln -- siehe Dateikopf.
 
+- `REFERENZ = REFERENZ`
+
 #### QuerkraftMitBuegeln.pruefe
 
 ```python
@@ -165,6 +170,9 @@ nur, was es auch herleitet.
 ## Konstanten
 
 - `MIT_BUEGELN = 'Querkraftwiderstand mit Querkraftbewehrung'`
+- `REFERENZ_BUEGEL = 'SIA 262:2025, 4.3.3.4.3, (45)'` – Wo die Gleichungen stehen, je eine Stelle.
+- `REFERENZ_DIAGONALE = 'SIA 262:2025, 4.3.3.4.6, (47)'`
+- `REFERENZ = 'SIA 262:2025, 4.3.3.4.2; 4.3.3.4.3, (45); 4.3.3.4.6, (47)'` – Der Ansatz als Ganzes: der Hebelarm 0.9 · d und beide Gleichungen.
 - `OHNE_EINWIRKUNG = Querkraftfall(name='ohne Einwirkung', V_Ed=Groesse(0.0, KN_PRO_M), M_…` – Was der Nachweis mit Buegeln ohne Lastfall rechnet, nur fuer sein Bild (siehe [[opencivil.nachweis.querkraft_buegel#BefundMitBuegeln|BefundMitBuegeln.ohne_einwirkung]]).
 
 ## Braucht

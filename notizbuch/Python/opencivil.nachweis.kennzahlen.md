@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c12ae7e474c
+erzeugt: b7e035618cb0
 art: modul
 tags: [modul]
 ---
@@ -56,8 +56,11 @@ standen ihre Zeilen hier ein zweites Mal.
 ## WAS DIE GRENZEN BEDEUTEN
 
 Ohne Buegel ist bei `M_Ed = 0` die Dehnung null und `k_d = 1`; bei
-`M_Ed = M_Rd` ist sie `f_yd/E_s`, gleich wie gross `M_Rd` ist.
-Dazwischen liegt jeder Widerstand ohne Normalkraft.
+`M_Ed = M_Rd` ist sie `f_yd/E_s`, gleich wie gross `M_Rd` ist
+(SIA 262:2025, 4.3.3.2.2, Gl. (38)). Dazwischen liegt jeder Widerstand ohne
+Normalkraft, solange die Bewehrung elastisch bleibt. Sind plastische
+Verformungen nicht auszuschliessen, gilt `1.5 * f_yd/E_s` (Gl. (41)), und
+der Widerstand liegt unter `V_Rd,min`.
 
 ## Inhalt
 
@@ -129,6 +132,7 @@ Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.querkraft]]

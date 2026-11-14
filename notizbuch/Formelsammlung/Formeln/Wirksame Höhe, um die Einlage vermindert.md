@@ -1,10 +1,11 @@
 ---
-erzeugt: 47748a8d49f1
+erzeugt: fba49d28473e
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.3.3.2.9"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.3.3.2.9
 
 $$
 d_v = d - e_{Einlage}
@@ -15,7 +16,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $d$ | – | mm | [[Statische Höhe]] |
-| $e_{Einlage}$ | Höhe der Einlage | mm | Vorgabe |
+| $e_{Einlage}$ | Grösstes Mass der Einlage (Breite oder Höhe) | mm | Vorgabe |
 
 ## Beispiel
 
@@ -44,6 +45,13 @@ $$
 ## Theorie
 
 Liegt in der Platte eine Einlage -- ein Leitungsrohr, ein Kanal --, schwächt
-sie den Querschnitt dort, wo die Querkraft durch muss. Liegt ihre Höhe
-zwischen $h/6$ und $d$, wird die wirksame Höhe um sie vermindert; sonst gilt
-die [[Wirksame Höhe ohne Abzug]].
+sie den Querschnitt dort, wo die Querkraft durch muss. Es zählt ihr grösstes
+Mass, Breite oder Höhe. Ist es grösser als ein Sechstel der statischen Höhe,
+wird $d$ um dieses Mass vermindert; sonst gilt die
+[[Wirksame Höhe ohne Abzug]].
+
+Beispiel mit $d = 248\,\mathrm{mm}$, also $d/6 = 41.3\,\mathrm{mm}$: ein Rohr
+⌀40 stört nicht, eines mit ⌀45 vermindert $d_v$ auf 203 mm.
+
+Eine obere Grenze gibt es nicht. Reicht die Einlage über die ganze
+statische Höhe, bleibt ohne Bügel kein Widerstand.

@@ -42,6 +42,7 @@ from opencivil.querschnitt.bewehrungselemente import Bewehrungselement, aus_lini
 from opencivil.querschnitt.biegung import SCHIEF, Biegung
 from opencivil.querschnitt.geometrie import GeometrieFehler, Linienart, Punkt
 from opencivil.querschnitt.interaktion import Bewehrung, Querschnitt, Teil, Werkstoff
+from opencivil.querschnitt.platte import REFERENZ_ALPHA_MAX, REFERENZ_ALPHA_MIN, REFERENZ_K_C
 from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN
@@ -302,7 +303,7 @@ class Zeichnung:
         m = 1e-3
         achsen = [Wand(name="", von=(w["von"][0] * m, w["von"][1] * m),
                        bis=(w["bis"][0] * m, w["bis"][1] * m), b_w=1.0,
-                       a_sw_s=0.0, f_sd=0.0, f_cd=0.0, k_c=0.0) for w in waende]
+                       a_sw_s=0.0, f_yd=0.0, f_cd=0.0, k_c=0.0) for w in waende]
         modell = zellen_finden(achsen)
         umrisse = []
         for zelle in modell.zellen:
@@ -430,14 +431,15 @@ class Querschnittsanalyse(Rechenobjekt):
             titel="Querschnitt", abschnitt=abschnitt))
 
         gruppe = "Schubwände"
-        for kurzname, symbol, einheit, groesse, beschreibung, stellen in (
+        for kurzname, symbol, einheit, groesse, beschreibung, stellen, referenz in (
                 ("alpha_min", r"\alpha_{min}", GRAD, Groesse(alpha_min, GRAD),
-                 "Kleinste Neigung der Druckdiagonalen", 0),
+                 "Kleinste Neigung der Druckdiagonalen", 0, REFERENZ_ALPHA_MIN),
                 ("alpha_max", r"\alpha_{max}", GRAD, Groesse(alpha_max, GRAD),
-                 "Grösste Neigung der Druckdiagonalen", 0),
+                 "Grösste Neigung der Druckdiagonalen", 0, REFERENZ_ALPHA_MAX),
                 ("k_c", "k_c", EINHEITSLOS, Groesse(k_c, EINHEITSLOS),
-                 "Abminderung der Betondruckfestigkeit in der Druckdiagonalen", 2)):
-            d = self._def(kurzname, symbol, einheit, beschreibung, stellen)
+                 "Abminderung der Betondruckfestigkeit in der Druckdiagonalen", 2,
+                 REFERENZ_K_C)):
+            d = self._def(kurzname, symbol, einheit, beschreibung, stellen, referenz)
             self.berechnungen.append(Vorgabe(
                 id=d.id, ausgabe=d, groesse=groesse, abschnitt=abschnitt,
                 gruppe=gruppe, stumm=True))
@@ -700,23 +702,23 @@ class Querschnittsanalyse(Rechenobjekt):
             herkunft += [g] * len(stuecke)
         return teile, bewehrung, herkunft
 
-    def schubwaende(self, f_sd: Callable[[Wandangabe], float],
+    def schubwaende(self, f_yd: Callable[[Wandangabe], float],
                     f_cd: Callable[[Wandangabe], float], k_c: float) -> List[Wand]:
         """Die Schubwaende in Metern, mit den Festigkeiten, die der Nachweis waehlt."""
         mm = MM.faktor   # was in mm steht, in m
         return [Wand(name=w.name, von=(w.von[0] * mm, w.von[1] * mm),
                      bis=(w.bis[0] * mm, w.bis[1] * mm), b_w=w.dicke * mm,
-                     a_sw_s=w.a_sw_s * mm, f_sd=f_sd(w), f_cd=f_cd(w), k_c=k_c)
+                     a_sw_s=w.a_sw_s * mm, f_yd=f_yd(w), f_cd=f_cd(w), k_c=k_c)
                 for w in self.waende]
 
     def schubwaende_mit(self, e: Eingaben) -> List[Wand]:
         """
         Die Schubwaende mit den Festigkeiten ihrer Werkstoffe, wie deren
-        Rechenwahl sie waehlt: ``f_sd`` der Buegel -- ohne Buegel null --,
+        Rechenwahl sie waehlt: ``f_yd`` der Buegel -- ohne Buegel null --,
         ``f_cd`` des Betons, in dem die Wand liegt. Der Nachweis der Waende
         und die Kennzahlen lesen sie hier.
         """
-        def f_sd(w: Wandangabe) -> float:
+        def f_yd(w: Wandangabe) -> float:
             if w.stahl is None:
                 return 0.0
             return abs(self.kennwert(e, w.stahl, self.rechenwahl(w.stahl).satz.stahl))
@@ -724,7 +726,7 @@ class Querschnittsanalyse(Rechenobjekt):
         def f_cd(w: Wandangabe) -> float:
             return abs(self.kennwert(e, w.beton, self.rechenwahl(w.beton).satz.beton))
 
-        return self.schubwaende(f_sd=f_sd, f_cd=f_cd, k_c=e.g("k_c").si)
+        return self.schubwaende(f_yd=f_yd, f_cd=f_cd, k_c=e.g("k_c").si)
 
     def neigungsgrenzen(self, e: Eingaben) -> Tuple[int, int]:
         """``α_min`` und ``α_max`` der Druckdiagonalen, ganzgradig."""

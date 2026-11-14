@@ -1,5 +1,5 @@
 ---
-erzeugt: deeb32f3b2fd
+erzeugt: 3c0b4870b6d5
 art: modul
 tags: [modul]
 ---
@@ -355,7 +355,7 @@ der Probe, sein Durchmesser bestimmt die Rissbreite.
 #### Querschnittsanalyse.schubwaende
 
 ```python
-def schubwaende(self, f_sd: Callable[[Wandangabe], float], f_cd: Callable[[Wandangabe], float], k_c: float) -> List[Wand]
+def schubwaende(self, f_yd: Callable[[Wandangabe], float], f_cd: Callable[[Wandangabe], float], k_c: float) -> List[Wand]
 ```
 
 Die Schubwaende in Metern, mit den Festigkeiten, die der Nachweis waehlt.
@@ -367,7 +367,7 @@ def schubwaende_mit(self, e: Eingaben) -> List[Wand]
 ```
 
 Die Schubwaende mit den Festigkeiten ihrer Werkstoffe, wie deren
-Rechenwahl sie waehlt: `f_sd` der Buegel -- ohne Buegel null --,
+Rechenwahl sie waehlt: `f_yd` der Buegel -- ohne Buegel null --,
 `f_cd` des Betons, in dem die Wand liegt. Der Nachweis der Waende
 und die Kennzahlen lesen sie hier.
 
@@ -416,6 +416,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]

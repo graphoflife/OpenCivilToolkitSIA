@@ -414,7 +414,7 @@ $M_{Rd}(N_{Ed}=0)^{-}$ & $-79.9$ & $0.0$ \\
 N_{Rd}^{-}(M_{Ed} = 0) = N_{Rd}^{-} = -6000\,\mathrm{kN}
 \end{equation*}
 \subsubsection{Querkraftwiderstand ohne Bügel bei N\_Ed = 0}
-\noindent\textbf{Beiwert der Gesteinskörnung} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Beiwert der Gesteinskörnung} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (37)}
 \begin{equation*}
 \begin{aligned}
   k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
@@ -422,55 +422,63 @@ N_{Rd}^{-}(M_{Ed} = 0) = N_{Rd}^{-} = -6000\,\mathrm{kN}
   &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 \end{aligned}
 \end{equation*}
+\noindent\textbf{Schwerpunkt der gezogenen Bewehrung, Zug unten}
+\begin{equation*}
+\begin{aligned}
+  z_s^{+} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
+  &= 248.1\,\mathrm{mm}
+\end{aligned}
+\end{equation*}
 \noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d^{+} = z_{2,x,g} = 249\,\mathrm{mm}
+d^{+} = z_s^{+} = 248.1\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)}
+\noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)} \hfill \normref{SIA 262:2025, 4.3.3.2.9}
 \begin{equation*}
-d_v^{+} = d^{+} = 249\,\mathrm{mm}
+d_v^{+} = d^{+} = 248.1\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36)}
 \begin{equation*}
-V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} = 272.8\,\mathrm{kN}/\mathrm{m}
+V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 248.1\,\mathrm{mm} = 271.8\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
-\noindent\textbf{Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn}
+\noindent\textbf{Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn} \hfill \normref{SIA 262:2025, 4.3.3.2.2, (38)}
 \begin{equation*}
 \varepsilon_v^{+} = \frac{f_{yd}}{E_s} = \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.174\,\text{‰}
 \end{equation*}
-\noindent\textbf{Beiwert für die statische Höhe}
+\noindent\textbf{Beiwert für den Querkraftwiderstand} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (36)}
 \begin{equation*}
-k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 249 \cdot 1.2} = 0.6062 \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
+k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 248.1 \cdot 1.2} = 0.6071 \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
 \end{equation*}
-\noindent\textbf{Zug unten, M\_Ed = M\_Rd} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Zug unten, M\_Ed = M\_Rd} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35)}
 \begin{equation*}
 \begin{aligned}
   V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) &= k_d^{+} \cdot \tau_{cd} \cdot d_v^{+} \\
-  &= 0.6062 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} \\
-  &= 165.4\,\mathrm{kN}/\mathrm{m}
+  &= 0.6071 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 248.1\,\mathrm{mm} \\
+  &= 165\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
 d^{-} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)}
+\noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)} \hfill \normref{SIA 262:2025, 4.3.3.2.9}
 \begin{equation*}
 d_v^{-} = d^{-} = 252\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Zug oben, M\_Ed = 0: ε\_v = 0, k\_d = 1} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Zug oben, M\_Ed = 0: ε\_v = 0, k\_d = 1} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36)}
 \begin{equation*}
 V_{Rd}^{-}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{-} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 252\,\mathrm{mm} = 276.1\,\mathrm{kN}/\mathrm{m}
 \end{equation*}
-\noindent\textbf{Zug oben, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn}
+\noindent\textbf{Zug oben, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn} \hfill \normref{SIA 262:2025, 4.3.3.2.2, (38)}
 \begin{equation*}
 \varepsilon_v^{-} = \frac{f_{yd}}{E_s} = \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.174\,\text{‰}
 \end{equation*}
-\noindent\textbf{Beiwert für die statische Höhe}
+\noindent\textbf{Beiwert für den Querkraftwiderstand} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (36)}
 \begin{equation*}
 k_d^{-} = \frac{1}{1 + \varepsilon_v^{-} \cdot d^{-} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 252 \cdot 1.2} = 0.6034 \quad \left(d^{-}\ \text{in}\ \mathrm{mm}\right)
 \end{equation*}
-\noindent\textbf{Zug oben, M\_Ed = M\_Rd} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Zug oben, M\_Ed = M\_Rd} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35)}
 \begin{equation*}
 \begin{aligned}
   V_{Rd}^{-}(M_{Ed} = M_{Rd}^{-}) &= k_d^{-} \cdot \tau_{cd} \cdot d_v^{-} \\
@@ -478,20 +486,20 @@ k_d^{-} = \frac{1}{1 + \varepsilon_v^{-} \cdot d^{-} \cdot k_g} = \frac{1}{1 + 2
   &= 166.6\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 \end{equation*}
-\noindent\textbf{Querkraftwiderstand ohne Bügel bei M\_Ed = 0, das Kleinere beider Seiten} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Querkraftwiderstand ohne Bügel bei M\_Ed = 0, das Kleinere beider Seiten} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36)}
 \begin{equation*}
 \begin{aligned}
   V_{Rd,max} &= \min\left[V_{Rd}^{+}(M_{Ed} = 0);\ V_{Rd}^{-}(M_{Ed} = 0)\right] \\
-  &= \min\left[272.8\,\mathrm{kN}/\mathrm{m};\ 276.1\,\mathrm{kN}/\mathrm{m}\right] \\
-  &= 272.8\,\mathrm{kN}/\mathrm{m}
+  &= \min\left[271.8\,\mathrm{kN}/\mathrm{m};\ 276.1\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 271.8\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 \end{equation*}
-\noindent\textbf{Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd, das Kleinere beider Seiten} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd, das Kleinere beider Seiten} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36); 4.3.3.2.2, (38)}
 \begin{equation*}
 \begin{aligned}
   V_{Rd,min} &= \min\left[V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+});\ V_{Rd}^{-}(M_{Ed} = M_{Rd}^{-})\right] \\
-  &= \min\left[165.4\,\mathrm{kN}/\mathrm{m};\ 166.6\,\mathrm{kN}/\mathrm{m}\right] \\
-  &= 165.4\,\mathrm{kN}/\mathrm{m}
+  &= \min\left[165\,\mathrm{kN}/\mathrm{m};\ 166.6\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 165\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 \end{equation*}
 \subsection{Beton: C30/37}
@@ -752,13 +760,13 @@ M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(211.8\,\mathrm{kNm}\ri
 \begin{equation*}
 k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\, e_i \cdot u \qquad \Delta T = \sum_i V_i\, r_i
 \end{equation*}
-\noindent\textbf{Torsion in den Zellen (Bredt, mehrzellig)}
+\noindent\textbf{Torsion in den Zellen (Bredt, mehrzellig)} \hfill \normref{SIA 262:2025, 4.3.5.2, (55), Figur 20}
 \begin{equation*}
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 \end{equation*}
-\noindent\textbf{Widerstand je Länge einer Wand (Fachwerk)} \hfill \normref{SIA 262:2025, 4.3.3.4}
+\noindent\textbf{Widerstand je Länge einer Wand (Fachwerk)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
 \begin{equation*}
-v_{Rd,s} = \frac{A_{sw}}{s}\, f_{sd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
+v_{Rd,s} = \frac{A_{sw}}{s}\, f_{yd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
 \end{equation*}
 \noindent\textbf{Druckfeld}
 \begin{longtable}{lr}
@@ -889,7 +897,7 @@ Wand 3 & $0.000$ & $30$ & $394.3$ & $\infty$ \\
 Wand 4 & $1.000$ & $30$ & $394.3$ & $394.3$ \\
 \hline
 \end{longtable}
-\noindent\textbf{Querkraftwiderstand in z, allein – massgebend Wand 2}
+\noindent\textbf{Querkraftwiderstand in z, allein – massgebend Wand 2} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
 \begin{equation*}
 V_{z,Rd} = 394.3\,\mathrm{kN}
 \end{equation*}
@@ -905,7 +913,7 @@ Wand 3 & $2.500$ & $30$ & $394.3$ & $157.7$ \\
 Wand 4 & $0.000$ & $30$ & $394.3$ & $\infty$ \\
 \hline
 \end{longtable}
-\noindent\textbf{Querkraftwiderstand in y, allein – massgebend Wand 1}
+\noindent\textbf{Querkraftwiderstand in y, allein – massgebend Wand 1} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
 \begin{equation*}
 V_{y,Rd} = 157.7\,\mathrm{kN}
 \end{equation*}
@@ -921,7 +929,7 @@ Wand 3 & $5.000$ & $30$ & $394.3$ & $78.9$ \\
 Wand 4 & $5.000$ & $30$ & $394.3$ & $78.9$ \\
 \hline
 \end{longtable}
-\noindent\textbf{Torsionswiderstand, allein – massgebend Wand 1}
+\noindent\textbf{Torsionswiderstand, allein – massgebend Wand 1} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5; 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
 \begin{equation*}
 T_{Rd} = 78.9\,\mathrm{kNm}
 \end{equation*}
@@ -1989,13 +1997,13 @@ Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebela
 \begin{equation*}
 k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\, e_i \cdot u \qquad \Delta T = \sum_i V_i\, r_i
 \end{equation*}
-\noindent\textbf{Torsion in den Zellen (Bredt, mehrzellig)}
+\noindent\textbf{Torsion in den Zellen (Bredt, mehrzellig)} \hfill \normref{SIA 262:2025, 4.3.5.2, (55), Figur 20}
 \begin{equation*}
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 \end{equation*}
-\noindent\textbf{Widerstand je Länge einer Wand (Fachwerk)} \hfill \normref{SIA 262:2025, 4.3.3.4}
+\noindent\textbf{Widerstand je Länge einer Wand (Fachwerk)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
 \begin{equation*}
-v_{Rd,s} = \frac{A_{sw}}{s}\, f_{sd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
+v_{Rd,s} = \frac{A_{sw}}{s}\, f_{yd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
 \end{equation*}
 \noindent\textbf{Versatz: Moment der Querkraftanteile um den Schwerpunkt}
 \begin{equation*}
@@ -2170,7 +2178,7 @@ s = s_W + s_E
 \subsection{Kennzahlen}
 Was die Platte in x aufnimmt, ohne Bezug auf eine Einwirkung: die Eckwerte der Handrechnung mit Bemessungswerten und der Querkraftwiderstand ohne Normalkraft. Wo eine Seite massgebend ist, gilt das Kleinere beider Seiten.
 
-Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die Dehnung null ist, am kleinsten bei M\_Ed = M\_Rd, wo die Bewehrung zu fliessen beginnt und die Dehnung f\_yd/E\_s erreicht. Je Seite gilt ihre statische Höhe.
+Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die Dehnung null ist. Solange die Bewehrung elastisch bleibt, ist er am kleinsten bei M\_Ed = M\_Rd, wo sie zu fliessen beginnt und die Dehnung f\_yd/E\_s erreicht; darf sie plastisch werden, gilt 1.5·f\_yd/E\_s, und er liegt tiefer. Je Seite gilt ihre statische Höhe.
 
 Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass, die Widerstände bei N = 0 und bei reiner Normalkraft, die bezogene Druckzonenhöhe und, mit Schubwänden, der Widerstand gegen Querkraft und Torsion je allein. Gerechnet wird mit der Rechenwahl der Tragsicherheit.
 
@@ -2188,31 +2196,31 @@ N_{Rd}^{+}(M_{Ed} = 0) = N_1 + \frac{M_{Ed} - M_1}{M_2 - M_1} \cdot \left(N_2 - 
 \begin{equation*}
 N_{Rd}^{-}(M_{Ed} = 0) = N_{Rd}^{-}
 \end{equation*}
-\noindent\textbf{Beiwert der Gesteinskörnung} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Beiwert der Gesteinskörnung} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (37)}
 \begin{equation*}
 k_g = \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 \end{equation*}
-\noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)}
+\noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)} \hfill \normref{SIA 262:2025, 4.3.3.2.9}
 \begin{equation*}
 d_v^{+} = d^{+}
 \end{equation*}
-\noindent\textbf{Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36)}
 \begin{equation*}
 V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+}
 \end{equation*}
-\noindent\textbf{Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn}
+\noindent\textbf{Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn} \hfill \normref{SIA 262:2025, 4.3.3.2.2, (38)}
 \begin{equation*}
 \varepsilon_v^{+} = \frac{f_{yd}}{E_s}
 \end{equation*}
-\noindent\textbf{Beiwert für die statische Höhe}
+\noindent\textbf{Beiwert für den Querkraftwiderstand} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (36)}
 \begin{equation*}
 k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
 \end{equation*}
-\noindent\textbf{Zug unten, M\_Ed = M\_Rd} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Zug unten, M\_Ed = M\_Rd} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35)}
 \begin{equation*}
 V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) = k_d^{+} \cdot \tau_{cd} \cdot d_v^{+}
 \end{equation*}
-\noindent\textbf{Querkraftwiderstand ohne Bügel bei M\_Ed = 0, das Kleinere beider Seiten} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
+\noindent\textbf{Querkraftwiderstand ohne Bügel bei M\_Ed = 0, das Kleinere beider Seiten} \hfill \normref{SIA 262:2025, 4.3.3.2.1, (35), (36)}
 \begin{equation*}
 V_{Rd,max} = \min\left[V_{Rd}^{+}(M_{Ed} = 0);\ V_{Rd}^{-}(M_{Ed} = 0)\right]
 \end{equation*}
@@ -2314,8 +2322,8 @@ Zugwiderstand & $N_{Rd}^{+}(M_{Ed} = 0)$ & $737.5\,\mathrm{kN}$ \\
 Druckwiderstand & $N_{Rd}^{-}(M_{Ed} = 0)$ & $-6000\,\mathrm{kN}$ \\
 Bezogene Druckzonenhöhe, Zug unten & $\left(x/d\right)^{+}$ & $0.253$ \\
 Bezogene Druckzonenhöhe, Zug oben & $\left(x/d\right)^{-}$ & $0.077$ \\
-Querkraftwiderstand ohne Bügel, grösster & $V_{Rd,max}$ & $272.8\,\mathrm{kN}/\mathrm{m}$ \\
-Querkraftwiderstand ohne Bügel, kleinster & $V_{Rd,min}$ & $165.4\,\mathrm{kN}/\mathrm{m}$ \\
+Querkraftwiderstand ohne Bügel, grösster & $V_{Rd,max}$ & $271.8\,\mathrm{kN}/\mathrm{m}$ \\
+Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung & $V_{Rd,min}$ & $165\,\mathrm{kN}/\mathrm{m}$ \\
 \hline
 \end{longtable}
 \subsection{Unterzug}
@@ -2488,14 +2496,14 @@ Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $123$ & kg/m³ & berechnet \\
 Überdeckung oben & $c_{nom,o}$ & $30$ & mm & Vorgabe \\
 Überdeckung unten & $c_{nom,u}$ & $30$ & mm & Vorgabe \\
 Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & $186$ & mm & berechnet \\
-Höhe der Einlage & $e_{Einlage}$ & $0$ & mm & Vorgabe \\
+Grösstes Mass der Einlage (Breite oder Höhe) & $e_{Einlage}$ & $0$ & mm & Vorgabe \\
 Plattendicke & $h$ & $300$ & mm & Vorgabe \\
 Momentenwiderstand bei N\_Ed = 0, Zug oben & $M_{Rd}^{-}(N_{Ed} = 0)$ & $-79.9$ & kNm & berechnet \\
 Momentenwiderstand bei N\_Ed = 0, Zug unten & $M_{Rd}^{+}(N_{Ed} = 0)$ & $235.9$ & kNm & berechnet \\
 Druckwiderstand bei M\_Ed = 0 & $N_{Rd}^{-}(M_{Ed} = 0)$ & $-6000$ & kN & berechnet \\
 Zugwiderstand bei M\_Ed = 0 & $N_{Rd}^{+}(M_{Ed} = 0)$ & $737.5$ & kN & berechnet \\
-Querkraftwiderstand ohne Bügel bei M\_Ed = 0 und N\_Ed = 0 & $V_{Rd,max}$ & $272.8$ & kN/m & berechnet \\
-Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd und N\_Ed = 0 & $V_{Rd,min}$ & $165.4$ & kN/m & berechnet \\
+Querkraftwiderstand ohne Bügel bei M\_Ed = 0 und N\_Ed = 0 & $V_{Rd,max}$ & $271.8$ & kN/m & berechnet \\
+Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd und N\_Ed = 0 & $V_{Rd,min}$ & $165$ & kN/m & berechnet \\
 Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben & $\left(x/d\right)^{-}$ & $0.077$ &  & berechnet \\
 Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten & $\left(x/d\right)^{+}$ & $0.253$ &  & berechnet \\
 Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,y,g}$ & $754$ & mm² & berechnet \\

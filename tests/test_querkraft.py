@@ -36,22 +36,26 @@ class TestQuerkraft(unittest.TestCase):
         """
         Feld, x-Richtung, M_Ed = 100 kNm/m, N_Ed = 0, von Hand nachgerechnet:
 
-            d     = 249 mm            (Grund ⌀18 in der 2. Lage; darunter
-                                       liegt die y-Lage ⌀12, und die Zulage
-                                       ⌀12 sitzt bei ungünstiger Lage weiter
-                                       innen)
+            d     = 248.08 mm         (Schwerpunkt der 2. Lage: Grund ⌀18
+                                       bei 249 mm -- darunter liegt die
+                                       y-Lage ⌀12 --, die Zulage ⌀12 bei
+                                       ungünstiger Lage 3 mm weiter innen;
+                                       beide @150, Flächen wie 324 : 144:
+                                       249 - 3·144/468 = 248.08)
             k_g   = max(1.20; 48/(16+32·1))   = 1.200   ← der Riegel greift
             m_Rd  = 235.9 kNm/m       (Handrechnung bei N_Ed = 0)
             eps_v = 434.8·100/(200000·235.9)  = 0.9214 ‰
-            k_d   = 1/(1+0.9214e-3·249·1.200) = 0.7841
+            k_d   = 1/(1+0.9214e-3·248.08·1.200) = 0.7847
             tau_cd= 0.3·sqrt(30)/1.5          = 1.0954 N/mm²
-            v_Rd  = 0.7841·1.0954·249         = 213.9 kN/m
+            v_Rd  = 0.7847·1.0954·248.08      = 213.3 kN/m
+
+        Bis 2026-11-14 zählte der Grundstab allein, d = 249 mm.
         """
         erg = querkraftbefund(projekt_mit_querkraft()).ergebnisse[0]
-        self.assertAlmostEqual(erg.d * 1e3, 249.0, places=6)
+        self.assertAlmostEqual(erg.d * 1e3, 249.0 - 3.0 * 144 / 468, places=6)
         self.assertAlmostEqual(erg.eps_v * 1e3, 0.9214, places=4)
-        self.assertAlmostEqual(erg.k_d, 0.7841, places=4)
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 213.9, delta=0.2)
+        self.assertAlmostEqual(erg.k_d, 0.7847, places=4)
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 213.3, delta=0.2)
 
     def test_k_g_hat_einen_unteren_riegel(self):
         """
@@ -75,19 +79,29 @@ class TestQuerkraft(unittest.TestCase):
         projekt.querschnitte[0].kombinationen[0].N_Ed = N_Ed
         return querkraftbefund(projekt).ergebnisse[0]
 
-    def test_zug_zaehlt_beim_dekompressionsmoment_nicht(self):
-        """m_Dd = |min(N_Ed; 0)| · h/6 -- entlastend wirkt nur Druck."""
-        self.assertEqual(self.ergebnis_bei(+200.0).m_Dd, 0.0)
+    def test_zug_macht_das_dekompressionsmoment_negativ(self):
+        """
+        m_Dd = -N_Ed · h/6, Zug positiv: Druck hebt es, Zug senkt es unter
+        null -- SIA 262:2025, 4.3.3.2.6 will den Zug bei m_Rd und bei m_Dd
+        berücksichtigt haben. Bis 2026-11-14 zählte hier nur Druck.
+        """
+        zug = self.ergebnis_bei(+200.0)
+        self.assertAlmostEqual(zug.m_Dd, -200e3 * 0.3 / 6)
         self.assertEqual(self.ergebnis_bei(0.0).m_Dd, 0.0)
         self.assertAlmostEqual(self.ergebnis_bei(-300.0).m_Dd, 300e3 * 0.3 / 6)
+
+        # Von Hand: eps_v = f_yd·(|m_Ed| - m_Dd) / (E_s·(m_Rd(N) - m_Dd)).
+        f_yd, E_s = 500e6 / 1.15, 200e9
+        self.assertAlmostEqual(
+            zug.eps_v, f_yd * (100e3 + 10e3) / (E_s * (zug.m_Rd + 10e3)), places=12)
 
     def test_zugkraft_wird_gerechnet_statt_ausgeschlossen(self):
         """
         Eine Normalzugkraft setzte v_Rd früher kurzerhand auf null.
 
-        Nötig ist das nicht: m_Dd wird über min(N_Ed; 0) von selbst null, und
-        der kleinere Momentenwiderstand bei Zug senkt den Widerstand ohnehin --
-        der Nachweis läuft also unverändert durch.
+        Nötig ist das nicht: Zug macht m_Dd negativ, und mit dem kleineren
+        Momentenwiderstand bei Zug senkt das den Widerstand von selbst -- der
+        Nachweis läuft also unverändert durch.
         """
         zug = self.ergebnis_bei(+200.0)
         ohne = self.ergebnis_bei(0.0)
@@ -184,7 +198,7 @@ class TestQuerkraft(unittest.TestCase):
 
         dehnung = next(
             b for b in loesung.protokoll.nach_abschnitten()
-            if isinstance(b, GleichungBlock) and b.titel == "Dehnung auf halber Höhe")
+            if isinstance(b, GleichungBlock) and b.titel == querkraft_ohne_buegel.DEHNUNG)
         self.assertIn(r"\left|m_{Rd}(N_{Ed})\right|", dehnung.latex)
         self.assertIn(r"\left|m_{Ed}\right|", dehnung.latex)
 
@@ -205,14 +219,29 @@ class TestQuerkraft(unittest.TestCase):
         self.assertGreater(querkraftbefund(mit).ergebnisse[0].v_Rd,
                            querkraftbefund(ohne).ergebnisse[0].v_Rd)
 
-    def test_einlagenhoehe_wirkt_nur_im_fenster(self):
-        """d_v = d - e nur, wenn h/6 < e < d. Sonst bleibt d_v = d."""
-        klein = projekt_mit_querkraft(einlagenhoehe=20.0)     # < h/6 = 50
-        drin = projekt_mit_querkraft(einlagenhoehe=80.0)      # 50 < 80 < 264
-        e1 = querkraftbefund(klein).ergebnisse[0]
-        e2 = querkraftbefund(drin).ergebnisse[0]
-        self.assertAlmostEqual(e1.d_v, e1.d)
-        self.assertAlmostEqual(e2.d_v * 1e3, e2.d * 1e3 - 80.0, places=6)
+    def test_die_einlage_zaehlt_ab_einem_sechstel_von_d(self):
+        """
+        d_v = d - e, sobald e > d/6 -- e ist das grössere Mass der Einlage,
+        Breite oder Höhe (SIA 262:2025, 4.3.3.2.9). Hier d = 248.1 mm, d/6 =
+        41.3 mm: 40 mm zählen nicht, 45 mm schon. Bis 2026-11-14 zählte eine
+        Einlage erst ab h/6 = 50 mm.
+        """
+        klein = querkraftbefund(projekt_mit_querkraft(einlagenhoehe=40.0)).ergebnisse[0]
+        gross = querkraftbefund(projekt_mit_querkraft(einlagenhoehe=45.0)).ergebnisse[0]
+        self.assertAlmostEqual(klein.d_v, klein.d)
+        self.assertAlmostEqual(gross.d_v * 1e3, gross.d * 1e3 - 45.0, places=6)
+
+    def test_eine_einlage_ueber_d_laesst_ohne_buegel_nichts(self):
+        """
+        Eine obere Grenze kennt die Norm nicht: reicht die Einlage über d,
+        bleibt ohne Bügel kein Widerstand. Bis 2026-11-14 rechnete der
+        Nachweis dann mit der vollen Höhe.
+        """
+        erg = querkraftbefund(projekt_mit_querkraft(einlagenhoehe=300.0)).ergebnisse[0]
+        self.assertLess(erg.d_v, 0.0)
+        self.assertFalse(erg.machbar)
+        self.assertEqual(erg.v_Rd, 0.0)
+        self.assertIn("Einlage", erg.begruendung)
 
     def test_groesstkorn_wirkt(self):
         klein = projekt_mit_querkraft(d_max=16.0)
@@ -307,14 +336,16 @@ class TestQuerkraftkurve(unittest.TestCase):
 
     def test_jeder_ast_nimmt_seine_eigene_statische_hoehe(self):
         """
-        Zug unten misst zur untersten Lage, Zug oben zur obersten. Beide aus
-        derselben Richtung, aber von verschiedenen Seiten.
+        Zug unten misst zur unteren x-Lage, Zug oben zur oberen -- je zu ihrem
+        Schwerpunkt. Beide aus derselben Richtung, aber von verschiedenen
+        Seiten.
         """
         kurve = self.befund().kurve(0.0)
         unten = self.ast(kurve, True)["d"]
         oben = self.ast(kurve, False)["d"]
-        self.assertAlmostEqual(unten, 0.249, places=6)    # untere x-Lage, ⌀18
-        self.assertAlmostEqual(oben, 0.252, places=6)     # obere x-Lage, ⌀12
+        # Unten ⌀18 bei 249 mm und die Zulage ⌀12 3 mm weiter innen, oben ⌀12.
+        self.assertAlmostEqual(unten, 0.249 - 0.003 * 144 / 468, places=9)
+        self.assertAlmostEqual(oben, 0.252, places=6)
         self.assertNotAlmostEqual(unten, oben)
 
     def test_fuenfzig_punkte_je_ast_von_null_bis_m_rd_plus_zwanzig(self):
@@ -525,9 +556,10 @@ class TestNachweisMitBuegeln(unittest.TestCase):
     def test_der_widerstand_kommt_aus_dem_fachwerkmodell(self):
         erg = querkraftbefund(projekt_mit_buegeln()).ergebnisse[0]
         self.assertIsNotNone(erg.massgebend)
-        self.assertAlmostEqual(erg.d * 1e3, 249.0, places=6)
+        self.assertAlmostEqual(erg.d * 1e3, 249.0 - 3.0 * 144 / 468, places=6)
         self.assertAlmostEqual(erg.v_Rd, erg.massgebend.V_Rd)
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 331.4, delta=0.5)
+        # 78.54/(200·200) · 0.9·248.08 · 434.8 · cot 30° = 330.1 kN/m
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 330.1, delta=0.1)
 
     def test_buegel_ersetzen_den_betonanteil(self):
         """Nicht addieren: das wäre ein drittes Modell."""
@@ -555,6 +587,18 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         ohne_zug = ergebnisse["Feld mit Druck"]
         self.assertFalse(ohne_zug.zug_hebt_alpha)
         self.assertEqual((ohne_zug.alpha_min, ohne_zug.alpha_max), (30, 35))
+
+    def test_unter_zug_bleibt_eine_steilere_untergrenze(self):
+        """
+        40° ist unter Zug die Untergrenze von α_min, kein fester Wert
+        (SIA 262:2025, 4.3.3.3.3): 42° bleiben 42°. Bis 2026-11-14 wurden
+        sie auf 40° gesetzt.
+        """
+        projekt = projekt_mit_buegeln(alpha_min=42, alpha_max=45)
+        projekt.querschnitte[0].kombinationen[0].N_Ed = 400.0
+        erg = querkraftbefund(projekt).ergebnisse[0]
+        self.assertTrue(erg.zug_hebt_alpha)
+        self.assertEqual((erg.alpha_min, erg.alpha_max), (42, 45))
 
     def test_die_statische_hoehe_folgt_dem_momentenvorzeichen(self):
         """Zug oben bei M < 0 -- dann zählt die obere Lage dieser Richtung."""
@@ -584,7 +628,7 @@ class TestNachweisMitBuegeln(unittest.TestCase):
                          "Widerstand der Druckdiagonalen", "Querkraftwiderstand"):
             self.assertIn(erwartet, titel)
         # Der bügellose Ansatz darf daneben nicht auch noch dastehen.
-        self.assertNotIn("Beiwert für die statische Höhe", titel)
+        self.assertNotIn("Beiwert für den Querkraftwiderstand", titel)
         self.assertNotIn("Dekompressionsmoment und Dehnung", titel)
 
 

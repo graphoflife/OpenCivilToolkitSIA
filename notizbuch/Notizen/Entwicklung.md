@@ -44,6 +44,45 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-14 · Normprüfung II: Querkraft und Torsion
+
+Zweiter Bereich, jede Änderung an der Normseite bestätigt (S. 49, 54–59).
+
+- **Eine Einlage zählt ab d/6, mit ihrem grössten Mass** (4.3.3.2.9).
+  Vorher ab h/6, nur mit ihrer Höhe und nur, solange sie kleiner als d war.
+  Bei h = 300 und d = 248 mm vermindert ein Rohr ⌀45 d_v jetzt auf 203 mm;
+  vorher blieb es unter h/6 = 50 mm unbeachtet. Reicht eine Einlage über d,
+  bleibt ohne Bügel kein Widerstand -- vorher fiel sie dort ganz weg. Das
+  Feld heisst weiter `einlagenhoehe`, damit gespeicherte Projekte laden.
+- **Zug zählt im Dekompressionsmoment** (4.3.3.2.6): m_Dd = −N_Ed·h/6, Zug
+  positiv. Vorher setzte eine Zugkraft m_Dd auf null; bei h = 300 mm und
+  N_Ed = +200 kN ist es jetzt −10 kNm, die Dehnung grösser und der
+  Widerstand kleiner. h/6 ist Mechanik des Rechtecks, kein Normtext.
+- **Unter Normalzug ist die Neigung der Druckdiagonalen mindestens 40°**
+  (4.3.3.3.3). Vorher wurde α_min auf genau 40° gesetzt, ein eingegebenes
+  42° also gesenkt.
+- **d der Querkraft reicht bis zum Schwerpunkt aller gezogenen Lagen**
+  (4.3.3.2.2 verlangt für k_d alle Lagen der Richtung). Vorher bis zur
+  äussersten, 1 bis 3 mm zu viel: im Beispiel 249 statt 248.1 mm.
+- **Namen wie in der Norm:** ε_v heisst «nominelle Dehnung der
+  Zugbewehrung», nicht «Dehnung auf halber Höhe»; k_d «Beiwert für den
+  Querkraftwiderstand» statt «für die statische Höhe». Bügel und Schubwände
+  schreiben f_yd statt f_sd, dem Zeichen der Ausgabe 2013. V_Rd,min der
+  Kennzahlen ist der kleinste Widerstand bei elastischer Bewehrung; darf
+  sie plastisch werden, gilt (41), und er liegt tiefer.
+- **Ziffern:** ohne Bügel 4.3.3.2.1 mit (35), (36), (37), die Dehnung
+  4.3.3.2.2 mit (38), (39) und 4.3.3.2.3, (41); mit Bügeln 4.3.3.4.3, (45)
+  und 4.3.3.4.6, (47) statt 4.3.3.2; die Grenzen der Neigung 4.3.3.3.2,
+  (42) und 4.3.3.3.3, k_c 4.2.1.7; Bredt 4.3.5.2, (55), Figur 20, mit
+  Querkraft zusammen 4.3.5.5; der Bügelschenkel 4.2.2.4 statt 5.5.2.
+- **In der Norm nicht gefunden** und so markiert: das Federmodell der
+  Schubwände, die Aufteilung der Torsion auf mehrere Zellen, die Torsion
+  ohne Zelle.
+- **Offen für den Benutzer** ([[TODO]]): m_Rk bei charakteristischer
+  Rechenwahl, die Längszugkraft, die Eingabegrenzen von α und k_c, die
+  Schubwände charakteristisch, die Wanddicke im Beispiel «Unterzug» und
+  die Regeln, die das Werkzeug nicht prüft.
+
 ## 2026-11-14 · Normprüfung I: Biegung, Duktilität, Knicken
 
 Erster Bereich der Prüfung aller Apps gegen SIA 262:2025, jede Änderung an

@@ -1,11 +1,11 @@
 ---
-erzeugt: fb0db215e10f
+erzeugt: 4305fe5a8b9e
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.6.2.1, Figur 21"
+normstelle: ["SIA 262:2025, 4.3.3.2.9", "SIA 262:2025, 4.3.6.2.1, Figur 21"]
 ---
-> [!info] Normstelle
-> SIA 262:2025, 4.3.6.2.1, Figur 21
+> [!info] Normstellen
+> SIA 262:2025, 4.3.3.2.9 · SIA 262:2025, 4.3.6.2.1, Figur 21
 
 *In der Herleitung: «Wirksame Höhe (Einlage nicht massgebend)»*
 
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-d_v^{+} = d^{+} = 249\,\mathrm{mm}
+d_v^{+} = d^{+} = 248.1\,\mathrm{mm}
 $$
 
 ## Gebraucht von
@@ -52,9 +52,9 @@ $$
 
 ## Theorie
 
-Ohne Einlage, oder mit einer Einlage, die zu klein ist, um zu stören, ist die
-wirksame Höhe für die Querkraft die statische Höhe der gezogenen
-Bewehrung. Mit einer störenden Einlage siehe
+Ohne Einlage, oder mit einer Einlage, deren grösstes Mass höchstens $d/6$
+ist, ist die wirksame Höhe für die Querkraft die statische Höhe der
+gezogenen Bewehrung, gemessen bis zu ihrem Schwerpunkt. Mit einer störenden Einlage siehe
 [[Wirksame Höhe, um die Einlage vermindert]].
 
 Beim Durchstanzen ist $d$ das Mittel der beiden Lagen der Zugbewehrung

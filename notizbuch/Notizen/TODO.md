@@ -41,9 +41,6 @@ gelernt wurde, steht in [[Entwicklung]].
       `material/` stammen aus der Vorgängerfassung und sind nie gegen die
       gedruckte SIA 262 gehalten worden. Dasselbe gilt für sämtliche
       Normverweise. Vor ernsthaftem Gebrauch nachschlagen.
-- [ ] Der Riegel `k_g ≥ 1.20` ist nach Vorgabe eingebaut, aber nicht gegen die
-      Norm geprüft. Bei D_max = 32 mm und C30/37 greift er (roh 1.00 → 1.20)
-      und senkt den Querkraftwiderstand um gut 4 %.
 - [ ] Normstellen für 112 von 176 Formeln fehlen noch -- die Liste samt
       Stelle im Code steht auf der Übersicht der [[Formelsammlung]]. Sie
       kommen vom Benutzer und werden im Code eingetragen (`referenz=`).
@@ -421,8 +418,12 @@ sie hier notiert; keine davon ist nachgeschlagen.
       im Löser deckt 4.2.2.2: Figur 16 gilt für Zug und Druck.
 - [ ] **Querkraft mit `m_Rk`.** Rechnet die Tragsicherheit charakteristisch,
       nimmt die Querkraft ohne Bügel ihr `m_Rk(N_Ed)` aus derselben Linie, ihr
-      eigenes `τ_cd` und `f_yd` bleiben aber Bemessungswerte. Das mischt zwei
-      Niveaus — nach Vorgabe, nicht nachgeschlagen.
+      eigenes `τ_cd` und `f_yd` bleiben aber Bemessungswerte. Die Norm setzt
+      in die Dehnung den Bemessungswert `m_Rd` (SIA 262:2025, 4.3.3.2.2, (39));
+      mit `m_Rk` wird sie um etwa 1/1.15 zu klein und `v_Rd` im Beispiel um
+      3.4 % zu gross. Vorschlag: die Querkraft liest `m_Rd(N_Ed)` immer aus
+      einer Linie mit Bemessungswerten, gleich, wie der M-N-Nachweis rechnet.
+      Entscheid des Benutzers.
 - [ ] **Der Vergrösserungsfaktor w/w_c** (SIA 262:2025, 4.4.3.2.5, Formel von
       dir): `d′` reicht vom gezogenen Rand bis zur Gegenlage (deine
       Festlegung), also ist `ρ′` das `ρ` der Gegenseite; ohne Gegenlage ist
@@ -453,19 +454,52 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Federmodell und Bredt.** Eingebaut: die Querkraft verteilt sich nach
       der Steifigkeit `k = b_w·l` (reine Verschiebung), das Versatzmoment
       tragen die Zellen nach Bredt, mehrzellig mit gleicher Verdrillung. Ohne
-      Zelle tragen die Federn die Torsion mit Drehung. Ein Modell, keine
-      Normregel.
-- [ ] **Längszugkraft in der Wandmitte.** Eingebaut: `ΔN = |q|·l·cot α` je
-      Stück einer Wand, angreifend in seiner Mitte; daraus `ΔN`, `ΔM_y`,
-      `ΔM_z`. Gleichwertig mit `V·cot α / 2` in jedem Gurt, aber nicht
-      nachgeschlagen.
+      Zelle tragen die Federn die Torsion mit Drehung. Bredt für eine Zelle
+      steht in der Norm (SIA 262:2025, 4.3.5.2, (55), Figur 20), das
+      Zusammenzählen mit der Querkraft deckt 4.3.5.5. Das Federmodell, die
+      Aufteilung auf mehrere Zellen und die Torsion ohne Zelle stehen nicht
+      darin: nach Vorgabe eingebaut, in SIA 262:2025 nicht gefunden. Einen
+      Vollquerschnitt rechnet die Norm als Zelle (4.3.5.1). Vom Benutzer
+      bestätigen lassen.
+- [ ] **Längszugkraft aus Querkraft und Torsion.** Die Formel ist bestätigt
+      (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4): je Stück einer Wand
+      `ΔN = |q|·l·cot α`, halb in jedem Gurt. Die Norm verlangt sie immer;
+      das Werkzeug rechnet sie in der Querschnittsanalyse nur auf Wunsch
+      (Vorgabe aus) und bei der Platte mit Bügeln gar nicht. Vorschlag: in
+      der Analyse Vorgabe ein, bei der Platte im Bericht als nicht
+      nachgewiesen ausweisen. Entscheid des Benutzers.
 - [ ] **k_t bei beliebiger Form.** Eingebaut: wie bei der Platte mit `h/3`,
       wobei `h` die Ausdehnung des Betons in Biegerichtung ist (z für M_y,
       y für M_z).
-- [ ] **Wanddicke im vollen Querschnitt.** Wie dick eine Schubwand in einem
-      Rechteck anzusetzen ist, sagt das Werkzeug nicht -- das gibt der
-      Benutzer ein. Das Beispiel nimmt 100 mm auf der Bügelachse; eine Regel
-      dafür ist nicht nachgeschlagen.
+- [ ] **Wanddicke im vollen Querschnitt.** Für die Torsion zählt eine Wand
+      eines Vollquerschnitts höchstens `d_k/8` dick, `d_k` der grösste Kreis
+      in `A_k` (SIA 262:2025, 4.3.5.3, (56)); für die Querkraft allein zählt
+      die Stegbreite. Das Beispiel «Unterzug» 300 × 600 nimmt 100 mm, für die
+      Torsion wären höchstens 25 mm erlaubt -- es rechnet sie viermal zu
+      dick. Vorschlag: Hinweis am Feld «Dicke» mit beiden Regeln, im
+      Beispiel 25 mm oder Torsion und Querkraft getrennt. Entscheid des
+      Benutzers.
+- [ ] **Querkraft: Eingabegrenzen.** Die Neigung der Druckdiagonalen darf
+      1° bis 89° sein, `k_c` beliebig gross. Die Norm erlaubt höchstens 45°
+      (SIA 262:2025, 4.3.3.3.2, (42)), mit festem `k_c` mindestens 30°, bei
+      bedeutendem Normaldruck 25° (4.3.3.3.3), und `k_c` höchstens 1
+      (4.2.1.7). Vorschlag: Feldgrenzen 25° bis 45° und `k_c ≤ 1`, mit Hinweis
+      auf 30°. Entscheid des Benutzers.
+- [ ] **Schubwände der Querschnittsanalyse charakteristisch.** Rechnet die
+      Tragsicherheit charakteristisch, tragen die Wände mit `f_yk` und
+      `f_ck`, heissen aber weiter `v_Rd`. Die Platte nimmt immer
+      Bemessungswerte. Vorschlag: Schubwände immer mit Bemessungswerten.
+      Entscheid des Benutzers.
+- [ ] **Querkraft: Regeln, die das Werkzeug nicht prüft.** Mindestbügel und
+      grösster Bügelabstand (SIA 262:2025, 5.5.2.2, (116); 5.5.3.4); die
+      feste Dehnung `1.5·f_yd/E_s`, wo die Biegebewehrung plastisch werden
+      kann, etwa nach der Streifenmethode (4.3.3.2.3, (41)) -- das Werkzeug
+      nimmt sie erst über `m_Rd`; dort auch `α_min = 40°` und `k_c = 0.4`
+      (4.3.3.3.3, 4.2.1.7); abgestufte Längsbewehrung, schiefe Querkraft,
+      Einzellast nahe am Auflager (4.3.3.2.4, 4.3.3.2.5, 4.3.3.2.8); wo der
+      Schnitt für `V_Ed` liegt (4.3.3.2.1, 4.3.3.4.1). Zur Kenntnis; was
+      davon das Werkzeug prüfen oder am Feld sagen soll, entscheidet der
+      Benutzer.
 - [ ] **Spannung-Dehnung-Analyse je Zugseite.** Eingebaut
       (`spannungsanalyse/schnitt.py`): unter reiner Biegung kippt die
       Nulllinie, bis kein Moment um die andere Achse bleibt, «einachsig»
@@ -591,12 +625,6 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Betonrand −ε_c2d (Tabelle 8), Stahllagen ±ε_ud (Tabelle 9), Punkt C
       −ε_c1d bei `z_C = h·(1 − ε_c1d/ε_c2d)` -- dieselben Grenzen wie in
       `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
-- [ ] Die Normstelle für das Fachwerkmodell mit Bügeln (`SIA 262:2025, 4.3.3.4`)
-      ist eingetragen, aber wie alle anderen Verweise nicht nachgeschlagen.
-      Dasselbe gilt für die Vorgaben `α_min = 30°`, `α_max = 45°`, `k_c = 0.55`
-      und die Regel, dass Normalzug beide Grenzen auf 40° hebt — alle nach
-      Vorgabe eingebaut, keine geprüft.
-
 - [ ] Die Zahlen der Rissnachweise sind ungeprüft wie alle anderen: beide `k_t`,
       die 500-mm-Grenze, `h/3`, `w_nom = 0.5/0.2 mm` und die Wurzelformel für
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.

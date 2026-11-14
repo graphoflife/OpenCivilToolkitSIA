@@ -352,6 +352,18 @@
       ]
     },
     {
+      "name": "Beiwert für den Querkraftwiderstand",
+      "pfad": "Formelsammlung/Formeln/Beiwert für den Querkraftwiderstand.md",
+      "art": "formel",
+      "zeichen": [
+        "k_d^{+}"
+      ],
+      "themen": [
+        "Kennzahlen",
+        "Querkraft"
+      ]
+    },
+    {
       "name": "Beiwert für die Dicke",
       "pfad": "Formelsammlung/Formeln/Beiwert für die Dicke.md",
       "art": "formel",
@@ -364,18 +376,6 @@
         "Zwängung auf Biegung",
         "Sprödes Versagen je Richtung",
         "Spannung-Dehnung-Analyse"
-      ]
-    },
-    {
-      "name": "Beiwert für die statische Höhe",
-      "pfad": "Formelsammlung/Formeln/Beiwert für die statische Höhe.md",
-      "art": "formel",
-      "zeichen": [
-        "k_d^{+}"
-      ],
-      "themen": [
-        "Kennzahlen",
-        "Querkraft"
       ]
     },
     {
@@ -745,17 +745,6 @@
       ],
       "themen": [
         "Stabquerschnitte"
-      ]
-    },
-    {
-      "name": "Dehnung auf halber Höhe",
-      "pfad": "Formelsammlung/Formeln/Dehnung auf halber Höhe.md",
-      "art": "formel",
-      "zeichen": [
-        "\\varepsilon_v"
-      ],
-      "themen": [
-        "Querkraft"
       ]
     },
     {
@@ -1678,6 +1667,17 @@
       ]
     },
     {
+      "name": "Nominelle Dehnung der Zugbewehrung",
+      "pfad": "Formelsammlung/Formeln/Nominelle Dehnung der Zugbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_v"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
       "name": "Nulllinie auf halber Höhe",
       "pfad": "Formelsammlung/Formeln/Nulllinie auf halber Höhe.md",
       "art": "formel",
@@ -1999,6 +1999,8 @@
       "themen": [
         "Biegung und Normalkraft",
         "Verformung",
+        "Kennzahlen",
+        "Querkraft",
         "Duktilität",
         "Zwängung auf Biegung"
       ]
@@ -4221,9 +4223,8 @@
       "art": "modul",
       "kurz": "Querkraftnachweis, was beide Ansaetze teilen.",
       "stichworte": [
-        "_statische_hoehe",
-        "lagen_von",
-        "zuglage",
+        "zugposten",
+        "statische_hoehen",
         "_hoch",
         "protokoll_hoehen",
         "_ohne_zugbewehrung",
@@ -4266,6 +4267,7 @@
       "stichworte": [
         "Kurvenbeiwerte",
         "Kurvenbeiwerte.hoehen",
+        "wirksame_hoehe",
         "Widerstandspunkt",
         "widerstand",
         "beiwert_k_g",
@@ -5505,6 +5507,7 @@
         "schwerpunkt",
         "lage_aus_posten",
         "protokoll_lage",
+        "protokoll_schwerpunkt",
         "protokoll_statische_hoehe",
         "Lagenaufbau",
         "Lagenaufbau.rechne",

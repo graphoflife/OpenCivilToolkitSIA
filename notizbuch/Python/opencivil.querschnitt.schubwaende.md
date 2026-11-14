@@ -1,5 +1,5 @@
 ---
-erzeugt: 932d65e5a978
+erzeugt: caf3a696abcd
 art: modul
 tags: [modul]
 ---
@@ -53,10 +53,10 @@ Moment um den Schwerpunkt ist `T`.
 ## WIDERSTAND
 
 Je Wand das Fachwerk aus [[opencivil.querschnitt.fachwerk#fachwerk|opencivil.querschnitt.fachwerk.fachwerk]], je
-Laenge der Wand:
+Laenge der Wand -- SIA 262:2025, Gl. (45) und (47), durch den Hebelarm geteilt:
 
 ```
-v_Rd,s = A_sw/s · f_sd · cot α          v_Rd,c = b_w · k_c · f_cd · sin α · cos α
+v_Rd,s = A_sw/s · f_yd · cot α          v_Rd,c = b_w · k_c · f_cd · sin α · cos α
 ```
 
 α ganzgradig zwischen den Grenzen, massgebend das groesste `min`. Eine Wand,
@@ -71,10 +71,21 @@ Gegenuhrzeigersinn. Der Fluss einer Wand zaehlt in ihrer Richtung, vom
 Anfangs- zum Endpunkt. Einheiten in SI-Basis.
 
 
-## ANNAHMEN
+## WAS DIE NORM SAGT
 
-Federmodell, Bredt-Verteilung und die Laengszugkraft in der Wandmitte sind
-nach Vorgabe eingebaut, nicht nachgeschlagen (`notizbuch/Notizen/TODO.md`).
+- Eine einzelne Zelle traegt die Torsion mit dem Schubfluss `T / (2 · A_k)`
+  rundum (SIA 262:2025, 4.3.5.2, Gl. (55)). `A_k` ist die Flaeche, die die
+  Laengsbewehrung umschliesst (Figur 20): die Wandachsen gehoeren darum durch
+  die Eckstaebe. Querkraft und Torsion zusammen: 4.3.5.5.
+- Die Laengszugkraft `|q| · l · cot α` je Stueck, halb in jedem Gurt, ihre
+  Resultierende also in der Wandmitte: 4.3.3.4.11, Gl. (51), mit lotrechten
+  Buegeln; fuer die Torsion 4.3.5.4.
+- Das Federmodell, die Verteilung auf mehrere Zellen mit gleicher
+  Verdrillung und die Torsion ohne Zelle ueber Federn mit Drehung sind nach
+  Vorgabe eingebaut, in SIA 262:2025 nicht gefunden
+  (`notizbuch/Notizen/TODO.md`). Die Norm legt auch einem Vollquerschnitt
+  einen Hohlquerschnitt zugrunde (4.3.5.1) -- wer ihn rechnet, zeichnet ihn
+  als Zelle.
 
 ## Inhalt
 
@@ -100,7 +111,7 @@ Eine Schubwand: Achse, Dicke, Buegel und die Festigkeiten dazu.
 - `bis: Punkt`
 - `b_w: float` – Dicke in m.
 - `a_sw_s: float` – Buegelquerschnitt je Laenge in Laengsrichtung, `n · π⌀²/4 / s`, in m²/m.
-- `f_sd: float` – Fliessgrenze der Buegel in Pa.
+- `f_yd: float` – Fliessgrenze der Buegel in Pa, im Wertesatz der Rechenwahl.
 - `f_cd: float` – Druckfestigkeit des Betons der Wand in Pa.
 - `k_c: float`
 
@@ -168,7 +179,7 @@ class Zelle
 
 Eine geschlossene Flaeche, umrandet von Wandstuecken.
 
-- `flaeche: float` – `A_k`, umschlossen von den Wandachsen.
+- `flaeche: float` – `A_k`, umschlossen von den Wandachsen -- die Norm meint die Laengsbewehrung.
 - `rand: Tuple[Tuple[int, int], ...]` – Je Randstueck: (Index, +1 wenn die Zelle es in seiner Richtung umlaeuft).
 
 ### Zellenmodell
@@ -294,6 +305,8 @@ def _bredt(waende: Sequence[Wand], modell: Zellenmodell, T: float) -> List[float
 ```
 
 Die Umlauf-Schubfluesse der Zellen: Gleichgewicht und gleiche Verdrillung.
+Eine Zelle allein ergibt `T / (2 · A_k)` ([[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_ZELLE]]); die
+gleiche Verdrillung mehrerer ist Vorgabe.
 
 Unbekannt sind `q_0 … q_(n-1)` und `θ`. Je Zelle:
 
@@ -330,8 +343,9 @@ def widerstand(w: Wand, *, alpha_min: int, alpha_max: int, zugkraft: bool) -> Wa
 ```
 
 Der Widerstand einer Wand je Laenge: das Fachwerk mit dem Hebelarm eins,
-ganzgradig ueber α, massgebend das groesste `min(v_Rd,s; v_Rd,c)`. Bei
-Normalzug gelten die gehobenen Grenzen der Platte.
+ganzgradig ueber α, massgebend das groesste `min(v_Rd,s; v_Rd,c)`
+([[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_WAND]]). Bei Normalzug gelten die gehobenen Grenzen der
+Platte ([[opencivil.querschnitt.platte#druckfeldgrenzen|druckfeldgrenzen]]).
 
 ### Laengszug
 
@@ -352,7 +366,8 @@ Die Zugkraft, die das Druckfeld der Waende in Laengsrichtung braucht.
 def laengszug(modell: Zellenmodell, verteilung: Verteilung, neigungen: Sequence[int], bezug: Punkt) -> Laengszug
 ```
 
-`ΔN = Σ |q|·l·cot α` ueber alle Wandstuecke, je Stueck in seiner Mitte.
+`ΔN = Σ |q|·l·cot α` ueber alle Wandstuecke, je Stueck in seiner Mitte
+([[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_LAENGSZUG]]).
 
 Das Druckfeld einer Wand mit dem Fluss q braucht je Laenge den Zug
 `q · cot α`, gleichmaessig ueber die Wand verteilt; seine Resultierende
@@ -368,6 +383,10 @@ die Mitten nicht im Schwerpunkt, gibt das auch Momente:
 
 ## Konstanten
 
+- `REFERENZ_WAND = 'SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)'` – Wo der Widerstand einer Wand steht: Buegel und Druckdiagonale.
+- `REFERENZ_ZELLE = 'SIA 262:2025, 4.3.5.2, (55), Figur 20'` – Wo die Torsion einer Zelle steht.
+- `REFERENZ_TORSION = 'SIA 262:2025, 4.3.5.2, (55); 4.3.5.5; 4.3.3.4.3, (45); 4.3.3.4.6, (4…` – Querkraft und Torsion zusammen: die Zelle, kombiniert nach 4.3.5.5, und je Wand das Fachwerk.
+- `REFERENZ_LAENGSZUG = 'SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4'` – Wo die Laengszugkraft aus dem Druckfeld steht.
 - `KNOTEN_TOLERANZ = 1e-06` – Wann zwei Punkte im Graphen der Wandachsen derselbe Knoten sind, in Metern. Gezeichnet wird auf Millimeter; ein Tausendstel davon fasst alles Rundungsrauschen und trennt alles, was jemand absichtlich auseinanderlegt.
 
 ## Braucht

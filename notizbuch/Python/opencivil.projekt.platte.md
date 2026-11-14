@@ -1,5 +1,5 @@
 ---
-erzeugt: 797148a73dbb
+erzeugt: ce02b598ad53
 art: modul
 tags: [modul]
 ---
@@ -38,7 +38,7 @@ gezeichneten Querschnitt gleich angibt, steht in der Grundlage
 - `ueberdeckung_unten: float = bereich(30.0, heisst='Überdeckung unten', einheit=MM, ab=0.0)`
 - `ueberdeckung_oben: float = bereich(30.0, heisst='Überdeckung oben', einheit=MM, ab=0.0)`
 - `d_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)` – Grösstkorndurchmesser in mm.
-- `einlagenhoehe: float = bereich(0.0, heisst='Einlagenhöhe', einheit=MM, ab=0.0)` – Höhe einer Einlage in mm.
+- `einlagenhoehe: float = bereich(0.0, heisst='Grösstes Mass der Einlage', einheit=MM, ab=0.0)` – Grösstes Mass einer Einlage in mm, Breite oder Höhe -- der Name ist von früher.
 - `querkraftbewehrung: QuerkraftbewehrungEintrag = field(default_factory=QuerkraftbewehrungEintrag)` – Bügel; ohne Durchmesser heisst: keine.
 - `haeufig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen.
 - `quasistaendig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANT…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.

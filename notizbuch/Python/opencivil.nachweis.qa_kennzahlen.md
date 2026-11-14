@@ -1,5 +1,5 @@
 ---
-erzeugt: 09d5a6a575dc
+erzeugt: bb62ba5c79af
 art: modul
 tags: [modul]
 ---
@@ -107,7 +107,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 ## Konstanten
 
 - `BRUCH = 'N_Ed = 0, Dehnungsfächer mit der Rechenwahl der Tragsicherheit'` – Woher die Widerstaende stammen -- ihre Erklaerung unter dem Querschnitt.
-- `SCHUB = (('V_z_Rd', 'V_z', 'V_{z,Rd}', KN, 'Querkraftwiderstand in z'), ('V_y…` – Die Lasten, gegen die die Schubwaende einzeln widerstehen: Kurzname, Komponente der Verteilung, Zeichen, Einheit, Beschriftung.
+- `SCHUB = (('V_z_Rd', 'V_z', 'V_{z,Rd}', KN, 'Querkraftwiderstand in z', sw.REF…` – Die Lasten, gegen die die Schubwaende einzeln widerstehen: Kurzname, Komponente der Verteilung, Zeichen, Einheit, Beschriftung.
 
 ## Braucht
 

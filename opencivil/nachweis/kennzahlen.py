@@ -43,8 +43,11 @@ standen ihre Zeilen hier ein zweites Mal.
 
 WAS DIE GRENZEN BEDEUTEN:
 Ohne Buegel ist bei ``M_Ed = 0`` die Dehnung null und ``k_d = 1``; bei
-``M_Ed = M_Rd`` ist sie ``f_yd/E_s``, gleich wie gross ``M_Rd`` ist.
-Dazwischen liegt jeder Widerstand ohne Normalkraft.
+``M_Ed = M_Rd`` ist sie ``f_yd/E_s``, gleich wie gross ``M_Rd`` ist
+(SIA 262:2025, 4.3.3.2.2, Gl. (38)). Dazwischen liegt jeder Widerstand ohne
+Normalkraft, solange die Bewehrung elastisch bleibt. Sind plastische
+Verformungen nicht auszuschliessen, gilt ``1.5 * f_yd/E_s`` (Gl. (41)), und
+der Widerstand liegt unter ``V_Rd,min``.
 """
 
 from __future__ import annotations
@@ -55,16 +58,18 @@ from opencivil.core.berechnung import BerechnungsFehler, Befundbezug, Eingaben, 
 from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef
+from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis import linie as geo
 from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
 )
-from opencivil.nachweis.querkraft import lagen_von, protokoll_hoehen, zuglage
+from opencivil.nachweis.querkraft import protokoll_hoehen, statische_hoehen, zugposten
 from opencivil.nachweis.querkraft_buegel import (
-    buegelteilung_y, neigungen, protokoll_mit_buegeln,
+    REFERENZ as REFERENZ_MIT_BUEGELN, buegelteilung_y, neigungen, protokoll_mit_buegeln,
 )
 from opencivil.nachweis.querkraft_ohne_buegel import (
-    Kurvenbeiwerte, beiwert_k_g, protokoll_ohne_buegel, tau_cd_wert, widerstand,
+    REFERENZ as REFERENZ_OHNE_BUEGEL, Kurvenbeiwerte, beiwert_k_g,
+    protokoll_ohne_buegel, tau_cd_wert, widerstand,
 )
 from opencivil.querschnitt.fachwerk import beste_neigung
 from opencivil.nachweis.rechenwahl import bezuege_vereinen
@@ -125,18 +130,20 @@ class Plattenkennzahlen(Prozedur):
                  "Querkraftwiderstand ohne Bügel bei M_Ed = 0 und N_Ed = 0",
                  "Querkraftwiderstand ohne Bügel, grösster",
                  "N_Ed = 0, M_Ed = 0 – das Kleinere beider Seiten",
-                 referenz="SIA 262:2025, 4.3.3.2.1")
+                 referenz=f"{REFERENZ_OHNE_BUEGEL}, (36)")
+            # Der kleinste bei elastischer Bewehrung: ist plastisches Fliessen
+            # nicht auszuschliessen, gilt (41), und der Widerstand liegt tiefer.
             dazu("V_Rd_min", r"V_{Rd,min}", KN_PRO_M,
                  "Querkraftwiderstand ohne Bügel bei M_Ed = M_Rd und N_Ed = 0",
-                 "Querkraftwiderstand ohne Bügel, kleinster",
+                 "Querkraftwiderstand ohne Bügel, kleinster bei elastischer Bewehrung",
                  "N_Ed = 0, M_Ed = M_Rd – das Kleinere beider Seiten",
-                 referenz="SIA 262:2025, 4.3.3.2.1")
+                 referenz=f"{REFERENZ_OHNE_BUEGEL}, (36); 4.3.3.2.2, (38)")
         else:
             dazu("V_Rd_buegel", r"V_{Rd}(\alpha_{opt})", KN_PRO_M,
                  "Querkraftwiderstand mit Bügeln bei der günstigsten Neigung, N_Ed = 0",
                  "Querkraftwiderstand mit Bügeln",
                  "N_Ed = 0, günstigste Neigung – das Kleinere beider Seiten",
-                 referenz="SIA 262:2025, 4.3.3.4")
+                 referenz=REFERENZ_MIT_BUEGELN)
 
         # Was die Querkraft braucht, unter den Namen ihres Nachweises -- ohne
         # die Momentenwiderstaende seiner Faelle.
@@ -246,8 +253,7 @@ class Plattenkennzahlen(Prozedur):
         hoehen = beiwerte.hoehen(seite.positiv)
         if hoehen is None:
             return None
-        return protokoll_hoehen(p, werte, e, self.posten,
-                                zuglage(beiwerte.lagen, seite.positiv),
+        return protokoll_hoehen(p, werte, e, zugposten(self.posten, seite.positiv),
                                 hoehen[0], hoehen[1] if wirksam else None,
                                 seite=seite, zeichen=seite.zeichen)
 
@@ -256,13 +262,14 @@ class Plattenkennzahlen(Prozedur):
         p.titel("Querkraftwiderstand ohne Bügel bei N_Ed = 0", ebene=3)
         p.erklaerung(
             "Ohne Bügel hängt der Widerstand am Moment: am grössten bei M_Ed = 0, "
-            "wo die Dehnung null ist, am kleinsten bei M_Ed = M_Rd, wo die "
-            "Bewehrung zu fliessen beginnt und die Dehnung f_yd/E_s erreicht. Je "
-            "Seite gilt ihre statische Höhe."
+            "wo die Dehnung null ist. Solange die Bewehrung elastisch bleibt, ist er "
+            "am kleinsten bei M_Ed = M_Rd, wo sie zu fliessen beginnt und die "
+            "Dehnung f_yd/E_s erreicht; darf sie plastisch werden, gilt "
+            "1.5·f_yd/E_s, und er liegt tiefer. Je Seite gilt ihre statische Höhe."
         )
         k_g = beiwert_k_g(p, self.id, e["D_max"], e["f_ck"])
         tau_cd = tau_cd_wert(werte, e)
-        beiwerte = Kurvenbeiwerte(h=e.g("h").si, lagen=lagen_von(e, self.posten),
+        beiwerte = Kurvenbeiwerte(h=e.g("h").si, statische_hoehen=statische_hoehen(e, self.posten),
                                   einlage=e.g("einlagenhoehe").si,
                                   tau_cd=e["tau_cd"].groesse.si, zugstahl={},
                                   k_g=k_g.groesse.si)
@@ -276,38 +283,40 @@ class Plattenkennzahlen(Prozedur):
                 p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein Widerstand dieser Seite.")
                 continue
             d, d_v = hoehen
-            # Der Stahl der aeussersten gezogenen Lage, wie im Querkraftnachweis.
-            stahl = self.posten[zuglage(beiwerte.lagen, seite.positiv)].lage.stahl
+            # Der Stahl der gezogenen Seite, wie im Querkraftnachweis.
+            stahl = zugposten(self.posten, seite.positiv)[0].lage.stahl
             f_yd, E_s = e[stahl.eingabename("f_yd")], e[stahl.eingabename("E_s")]
 
-            null = widerstand(M_Ed=0.0, N_Ed=0.0, h=beiwerte.h, d=d.groesse.si,
-                              d_v=d_v.groesse.si, tau_cd=beiwerte.tau_cd,
-                              f_yd=f_yd.groesse.si, E_s=E_s.groesse.si, k_g=beiwerte.k_g,
-                              m_Rd=momente[seite])
+            null, voll = (widerstand(M_Ed=m_Ed, N_Ed=0.0, h=beiwerte.h, d=d.groesse.si,
+                                     d_v=d_v.groesse.si, tau_cd=beiwerte.tau_cd,
+                                     f_yd=f_yd.groesse.si, E_s=E_s.groesse.si,
+                                     k_g=beiwerte.k_g, m_Rd=momente[seite])
+                          for m_Ed in (0.0, momente[seite]))
             v_null = werte.wert(f"V_null_{hoch}", rf"V_{{Rd}}^{{{hoch}}}(M_{{Ed}} = 0)",
                                 Groesse.aus_si(null.v_Rd, KN_PRO_M), 1)
+            v_voll = werte.wert(f"V_voll_{hoch}",
+                                rf"V_{{Rd}}^{{{hoch}}}(M_{{Ed}} = M_{{Rd}}^{{{hoch}}})",
+                                Groesse.aus_si(voll.v_Rd, KN_PRO_M), 1)
+            bei_null.append(v_null)
+            beim_widerstand.append(v_voll)
+            # Reicht die Einlage ueber d, bleibt dieser Seite nichts -- und
+            # das Kleinere beider Seiten ist null.
+            if null.grund:
+                p.text(f"Zug {seite}: {null.grund}")
+                continue
+
             p.formel(v_null, r"@tau_cd \cdot @d_v", {"tau_cd": tau_cd, "d_v": d_v},
                      titel=f"Zug {seite}, M_Ed = 0: ε_v = 0, k_d = 1",
-                     referenz="SIA 262:2025, 4.3.3.2.1",
+                     referenz=f"{REFERENZ_OHNE_BUEGEL}, (36)",
                      name="Querkraftwiderstand ohne Bügel bei M_Ed = 0")
-            bei_null.append(v_null)
-
-            voll = widerstand(M_Ed=momente[seite], N_Ed=0.0, h=beiwerte.h,
-                              d=d.groesse.si, d_v=d_v.groesse.si, tau_cd=beiwerte.tau_cd,
-                              f_yd=f_yd.groesse.si, E_s=E_s.groesse.si, k_g=beiwerte.k_g,
-                              m_Rd=momente[seite])
             eps_v = werte.dehnung(f"eps_v_{hoch}", rf"\varepsilon_v^{{{hoch}}}", voll.eps_v,
                                   stellen=3)
             p.formel(eps_v, r"\frac{@f_yd}{@E_s}", {"f_yd": f_yd, "E_s": E_s},
                      titel=f"Zug {seite}, M_Ed = M_Rd: Dehnung beim Fliessbeginn",
-                     name="Fliessdehnung")
-            v_voll = werte.wert(f"V_voll_{hoch}",
-                                rf"V_{{Rd}}^{{{hoch}}}(M_{{Ed}} = M_{{Rd}}^{{{hoch}}})",
-                                Groesse.aus_si(voll.v_Rd, KN_PRO_M), 1)
+                     referenz="SIA 262:2025, 4.3.3.2.2, (38)", name=FLIESSDEHNUNG)
             protokoll_ohne_buegel(p, werte, v_voll, k_d=voll.k_d, eps_v=eps_v, d=d, d_v=d_v,
                                   k_g=k_g, tau_cd=tau_cd, titel=f"Zug {seite}, M_Ed = M_Rd",
                                   zeichen=hoch)
-            beim_widerstand.append(v_voll)
 
         for kurz, teile, titel in (("V_Rd_max", bei_null, "bei M_Ed = 0"),
                                    ("V_Rd_min", beim_widerstand, "bei M_Ed = M_Rd")):
@@ -331,7 +340,7 @@ class Plattenkennzahlen(Prozedur):
             p.formel(w_sy, r"\frac{@b}{@n}", {"b": e["b"], "n": e["menge_y"]},
                      titel="Teilung in y aus der Stabzahl")
         alpha_min, alpha_max = self.buegel.grenzen(False)
-        beiwerte = Kurvenbeiwerte(h=e.g("h").si, lagen=lagen_von(e, self.posten),
+        beiwerte = Kurvenbeiwerte(h=e.g("h").si, statische_hoehen=statische_hoehen(e, self.posten),
                                   einlage=0.0, tau_cd=0.0, zugstahl={}, k_g=0.0)
 
         teile: List[Wert] = []

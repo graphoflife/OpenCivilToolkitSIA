@@ -1,11 +1,11 @@
 ---
-erzeugt: 799f321210ab
+erzeugt: 2064c638af1e
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.3.3.4"
+normstelle: "SIA 262:2025, 4.3.3.4.2; 4.3.3.4.3, (45); 4.3.3.4.6, (47)"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.3.3.4
+> SIA 262:2025, 4.3.3.4.2; 4.3.3.4.3, (45); 4.3.3.4.6, (47)
 
 *In der Herleitung: «Ansatz»*
 
@@ -33,8 +33,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \begin{aligned}
   V_{Rd,x}(M_{Ed} = 150\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= \min\left[V_{Rd,s};\ V_{Rd,c}\right] \\
-  &= \min\left[212.1\,\mathrm{kN}/\mathrm{m};\ 1067.4\,\mathrm{kN}/\mathrm{m}\right] \\
-  &= 212.1\,\mathrm{kN}/\mathrm{m}
+  &= \min\left[211.3\,\mathrm{kN}/\mathrm{m};\ 1063.5\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 211.3\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 $$
 
@@ -59,10 +59,11 @@ nicht vorgegeben:
 
 - je flacher die Diagonale, desto mehr Bügel schneidet ein Schnitt -- der
   [[Widerstand der Bügel]] wächst mit $\cot\alpha$;
-- desto steiler und schmaler aber auch die Druckstrebe -- der
-  [[Widerstand der Druckdiagonalen]] fällt mit $\sin\alpha\,\cos\alpha$.
+- desto schmaler aber auch die Druckstrebe -- der
+  [[Widerstand der Druckdiagonalen]] fällt unter 45° mit
+  $\sin\alpha\,\cos\alpha$.
 
 Das Werkzeug sucht ganzgradig zwischen $\alpha_{min}$ und $\alpha_{max}$ die
 Neigung, bei der das Kleinere der beiden am grössten ist. Bei Normalzug
-steilt sich die Diagonale auf; die untere Grenze wird dann gehoben. Ein
+steilt sich die Diagonale auf: die Neigung ist dann mindestens 40°. Ein
 Betonanteil wie ohne Bügel kommt nicht hinzu.

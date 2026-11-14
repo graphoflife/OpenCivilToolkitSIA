@@ -237,7 +237,7 @@ function tragsicherheitInhalt(querschnitt) {
 
 /**
  * Was allein der Querkraftnachweis braucht -- darum hier und nicht bei der
- * Platte: ohne Bügel Grösstkorn und Einlagenhöhe, mit Bügeln die
+ * Platte: ohne Bügel Grösstkorn und Einlage, mit Bügeln die
  * Abminderung k_c und die Grenzen der Neigung. In keinem anderen Nachweis
  * spielen sie eine Rolle.
  */
@@ -252,12 +252,12 @@ function querkraftAngaben(querschnitt) {
       titel: 'Für k_g, Querkraft ohne Bügel',
       beiAenderung: (v) => aendernAn((q) => { q.d_max = v; }),
     }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
-    feld('Einlagenhöhe', zahlfeld({
+    feld('Einlage, grösstes Mass', zahlfeld({
       wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
-      titel: 'Verringert d_v, falls h/6 < e < d',
+      titel: 'Breite oder Höhe der Einlage, das Grössere. Über d/6 gilt d_v = d − e',
       leer: 0,
       beiAenderung: (v) => aendernAn((q) => { q.einlagenhoehe = v; }),
-    }), 'mm'),
+    }), 'mm', 'Breite oder Höhe der Einlage, das Grössere – über d/6 vermindert es d'),
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
       el('span', { text: 'Querkraft mit Bügeln' }),
     ]),
