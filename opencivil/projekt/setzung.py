@@ -12,7 +12,10 @@ eine neue Berechnung bringt keine Einwirkung mit, wie ein neuer Lastfall
 (Benutzer, 2026-10-19). Die zulaessige Setzung von 20 mm, die Dicke der
 Teilschichten von 0.5 m und die Schicht, mit der eine neue Berechnung
 beginnt -- 2 m mit M_E = 20 und M'_E = 60 MN/m² --, sind nicht vom Benutzer,
-sondern gesetzt, damit sich gleich etwas rechnen laesst.
+sondern gesetzt, damit sich gleich etwas rechnen laesst. Keine davon steht
+in einer Quelle: s_zul ist je Bauwerk festzulegen (SIA 267:2013, 8.5.4.1),
+und fuer M'_E nimmt das Buch grob das 8- bis 10-Fache von M_E an (Kap. 5.3)
+-- 60 ist nur ein Startwert.
 
 Die Namen der Schichten muessen nicht verschieden sein: sie beschriften nur,
 die Werte tragen die Nummer der Schicht. Zwei Tonschichten, durch Sand
@@ -72,7 +75,10 @@ class SetzungEintrag(BauteilEintrag):
     """Der Teil, der darüber hinausgeht und den Boden zum ersten Mal belastet, in kN/m²."""
 
     s_zul: float = bereich(20.0, heisst="Zulässige Setzung s_zul", einheit=MM, ueber=0.0)
-    """Die Setzung, die das Fundament höchstens erfahren darf, in mm."""
+    """
+    Die Setzung, die das Fundament höchstens erfahren darf, in mm -- je
+    Bauwerk festzulegen (SIA 267:2013, 8.5.4.1; Kap. 8.12).
+    """
 
     dz: float = bereich(0.5, heisst="Dicke der Teilschichten Δz_max", einheit=M, ueber=0.0)
     """Wie dick eine Teilschicht höchstens ist, in m -- jede Schicht wird so geteilt."""

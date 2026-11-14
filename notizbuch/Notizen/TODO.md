@@ -110,36 +110,59 @@ gelernt wurde, steht in [[Entwicklung]].
       Werkzeug hält die ganze samt Kriechen gegen L/350, strenger als jede
       Zeile ausser L/500. Vorschlag: ein Schalter 500 / 350 / 300, Vorgabe
       350. Entscheid des Benutzers.
-- [ ] **Grundbruch: die Quelle benennen.** Die Formeln stehen mit «Kap.
-      9.2.x» am Code (`geotechnik/grundbruch.py`, `KAP_*`); der Titel des
-      Buches fehlt. Er kommt vom Benutzer.
-- [ ] Grundbruch, nach Vorgabe, nicht nachgeschlagen: b_γ mit tan φ wie
-      Tabelle 9.2.18 (der Text schreibt tan α); Wasser unter der Sohle, aber
-      im Gleitkörper, rechnet mit γ' statt der verlangten
-      Stabilitätsberechnung; eine Klammer der Lastneigung unter null gilt
-      null; δ*/φ als Eingabe mit Vorgabe 1; gerechnet wird mit den
-      Teilsicherheiten auf φ und c, ein globaler Sicherheitsgrad wie F_stat
-      des Kapitels kommt nicht dazu. Vom Benutzer bestätigen lassen.
-- [ ] Grundbruch: keine Ausmitte der Last (wirksame Breite), kein
-      Erdwiderstand vor dem Fundament. Der Gleitkörper im Bild gilt für
-      waagrechte Sohle und waagrechtes Gelände.
-- [ ] **Setzung: die Formel für J nachschlagen lassen.** Das Kapitel 8
-      verweist für den Einflussfaktor auf Kapitel 3, das nicht vorliegt. Die
-      Eckformel nach Boussinesq (`geotechnik/setzung.py`,
-      `einflussfaktor_ecke`) gibt J_K der Tabelle 8.4 auf die gedruckte
-      Stelle wieder und die Grenztiefen der Tabelle 8.5 so genau, wie sie
-      dort stehen -- nicht nachgeschlagen. Kapitel 3 vom Benutzer, dann
-      `referenz=` am Ansatz setzen.
-- [ ] Setzung, gesetzt und nicht vom Benutzer: die Vorgaben einer neuen
-      Berechnung (s_zul = 20 mm, Δz_max = 0.5 m, eine Schicht von 2 m mit
-      M_E = 20 und M'_E = 60 MN/m²), die Einheit MN/m² der M_E-Werte (das
-      Kapitel schreibt kN/m²) und «starr» als Vorgabe der Steifigkeit.
-      Bestätigen lassen.
+- [ ] **Grundbruch: ein Widerstandsbeiwert γ_R?** SIA 267:2013 teilt
+      Grundbruch- und Gleitwiderstand durch γ_R, in der Regel 1.0 bis 1.2,
+      1.0 nur bei bewährten, zuverlässigen Verfahren (8.5.2.1, (29), (30)).
+      Das Werkzeug setzt 1.0, und der Bericht sagt es; das Buch nennt die
+      Tragfähigkeitsformel selbst eine Näherung (Kap. 9.2.9), sein N_γ liegt
+      eher hoch (9.2.6). Mit γ_R = 1.2 sinken N_Rd und T_Rd um 17 %.
+      Empfehlung: ein Feld γ_R, Vorgabe 1.0. Entscheid des Benutzers.
+- [ ] **Grundbruch: die Raumlast unter Wasser.** Das Buch bildet γ' aus
+      der gesättigten Raumlast, γ' = γ_g − γ_w (Kap. 1.4); das Werkzeug hat
+      nur ein γ und nimmt es auch unter dem Wasser. Mit γ = 21 statt
+      γ_g = 22 kN/m³ wird γ' 11 statt 12, gut 8 % kleiner -- sicher, denn
+      γ' hält den Gleitkörper nieder; die Hilfe sagt es. Empfehlung: ein
+      eigenes Feld γ_g für den Boden unter dem Wasser, Vorgabe 22 kN/m³.
+      Entscheid des Benutzers.
+- [ ] **Grundbruch: φ_k über 45°?** Das Feld nimmt bis unter 90°; die
+      Tabellen des Buches enden bei 45°, eine Grenze nennt es nicht.
+      Empfehlung: ab 45° ein Hinweis «ausserhalb der Tabellen des Buches»,
+      keine Sperre. Entscheid des Benutzers.
+- [ ] Grundbruch, ohne Stelle in der Quelle: Liegt das Grundwasser im
+      Gleitkörper (T < H), verlangt das Buch eine Stabilitätsberechnung
+      (Kap. 9.2.8, 9.2.10); gerechnet wird mit γ' wie in Lage 2. Bei
+      ruhendem Wasser liegt das sicher, eine Strömung fehlt (SIA 267:2013,
+      8.4.4.4 verlangt sie). Eine Klammer der Lastneigung unter null gilt
+      null; das wird erst ab δ_R > 55° wirksam, wo das Gleiten längst nicht
+      mehr erfüllt ist. Bestätigt sind dagegen: b_γ mit tan φ (Tabelle
+      9.2.18 lässt sich nur so nachrechnen) und die Partialfaktoren statt
+      F_stat (SIA 267:2013, 5.3.2.1, 5.3.2.2, Tabelle 1).
+- [ ] **Grundbruch und Gleiten, nicht gebaut** -- SIA 267:2013 verlangt
+      es, wo massgebend: die Ausmitte der Last mit der wirksamen Fläche
+      A' = a'·b' (8.4.4.4, Figur 4; im Buch Kap. 9.2.11), bis dahin sagt
+      die Hilfe, b und L als wirksame Masse einzugeben; das Kippen
+      (8.5.3.6, (38)–(40)) und im Gebrauch die Ausmitte bis zur einfachen
+      Kernweite (8.5.4.7); der Erdwiderstand vor dem Fundament (8.4.3,
+      8.5.2.3, γ_M = 1.4) -- ihn wegzulassen ist sicher; der Geländebruch
+      (8.5.3.3, Kap. 14 der Norm); benachbarte Fundamente (8.4.4.3).
+      Der Gleitkörper im Bild gilt für waagrechte Sohle und waagrechtes
+      Gelände, wie die Formeln für L_Gl und H_Gl.
+- [ ] **Setzung: die Startwerte einer neuen Berechnung.** Keine steht in
+      einer Quelle. s_zul = 20 mm: die zulässige Setzung ist je Bauwerk
+      festzulegen (SIA 267:2013, 8.5.4.1; Kap. 8.12), das Beispiel in
+      Kap. 8.8 nimmt 2 cm. Δz_max = 0.5 m: das Buch schweigt, sein
+      Beispiel teilt in 1 m. M'_E = 60 MN/m² bei M_E = 20: das Buch nimmt
+      grob M'_E ≈ 8 bis 10 · M_E an (Kap. 5.3) -- 3 · M_E ist weicher als
+      jede Angabe. Wirkt nur, solange q_W > 0. Empfehlung: M'_E = 160
+      (8 · M_E). Bestätigt: MN/m² statt kN/m² (nur die Anzeige, Tabelle
+      8.4 trifft) und «starr» als Vorgabe (das Beispiel in Kap. 8.3 rechnet
+      so). Entscheid des Benutzers.
 - [ ] Setzung, nicht gebaut: Setzungsdifferenzen und Verkippung
-      (Kap. 8.11 bis 8.13), der zeitliche Verlauf (Konsolidation), die
-      Einflusstiefe als Abbruch (Kap. 8.4) -- gerechnet wird bis zur
-      untersten Schicht, und unter der Tabelle steht, wie viel J dort noch
-      ist.
+      (Kap. 8.11 bis 8.13; SIA 267:2013, 8.5.1.2, 8.5.4.4), der zeitliche
+      Verlauf (Konsolidation; 8.5.4.3), die Einflusstiefe als Abbruch
+      (Kap. 8.4) -- gerechnet wird bis zur untersten Schicht, und unter der
+      Tabelle steht, wie viel J dort noch ist. Liegen darunter weichere
+      Schichten, mahnt das Buch zur Vorsicht.
 - [ ] Der Dienst «bericht» und das PDF des lokalen Servers haben seit dem
       Wegfall des Knopfs «Bericht» keinen Weg mehr aus der Oberfläche.
       Entfernen, oder wieder erreichbar machen.

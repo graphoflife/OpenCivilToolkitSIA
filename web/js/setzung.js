@@ -31,6 +31,7 @@ const HILFE = {
         + 'mittlere Setzung'],
       ['schlaff', 'gerechnet unter der Mitte: die grösste Setzung (Kap. 8.10)'],
       ['Δz_max', 'jede Schicht wird in gleich dicke Teilschichten geteilt, höchstens so dick'],
+      ['s_zul', 'je Bauwerk festzulegen, eine allgemeine Zahl gibt es nicht (SIA 267:2013, 8.5.4.1; Kap. 8.12)'],
     ],
     formel: 's ≤ s_zul',
   },
@@ -39,7 +40,7 @@ const HILFE = {
       ['Folge', 'von der Sohle an nach unten; unter der letzten gilt der Baugrund als '
         + 'unzusammendrückbar'],
       ['M_E', 'Modul der Erstbelastung -- rechnet mit q_E'],
-      ["M'_E", 'Modul der Wiederbelastung -- rechnet mit q_W'],
+      ["M'_E", 'Modul der Wiederbelastung -- rechnet mit q_W; grob das 8- bis 10-Fache von M_E (Kap. 5.3)'],
     ],
     formel: "Δs = J·q_W·Δz / M'_E + J·q_E·Δz / M_E",
   },
@@ -80,7 +81,9 @@ function situationPanel(s) {
       }),
     ]),
     karte('Nachweis', [
-      zahl('s_zul', 'Zulässige Setzung', 's_{zul}'),
+      zahl('s_zul', 'Zulässige Setzung', 's_{zul}', {
+        titel: 'Je Bauwerk festzulegen (SIA 267:2013, 8.5.4.1)',
+      }),
       zahl('dz', 'Teilschichten höchstens', String.raw`\Delta z_{max}`, {
         schritt: 0.1, titel: 'Jede Schicht wird in gleich dicke Teilschichten geteilt',
       }),

@@ -284,15 +284,22 @@ class TestUndrainiert(unittest.TestCase):
 
 
 class TestGleiten(unittest.TestCase):
-    def test_reibung_mit_dem_bemessungswert(self):
+    def test_reibung_nach_sia_267(self):
+        """delta_k = k · phi_k, dann tan delta_d = tan delta_k / gamma_phi (8.4.1.1, 8.5.2.2)."""
         _, loesung, _ = rechnen(phi_k=30.0, gamma_phi=1.25, delta_faktor=2.0 / 3.0,
                                 kombinationen=(("K", 1000.0, 150.0),))
         urteil = next(u for u in loesung.urteile if u.art == "GL")
-        phi_eff = math.atan(math.tan(math.radians(30.0)) / 1.25)
-        T_Rd = 1000e3 * math.tan(2.0 / 3.0 * phi_eff)
+        T_Rd = 1000e3 * math.tan(math.radians(20.0)) / 1.25
         self.assertAlmostEqual(urteil.widerstand.groesse.si, T_Rd, delta=1e-6)
         self.assertAlmostEqual(urteil.erfuellungsgrad.si, T_Rd / 150e3)
         self.assertTrue(urteil.erfuellt)
+
+    def test_hoechstens_35_grad(self):
+        """Auch ein steifer Boden reibt in der Sohle höchstens mit delta_k = 35° (8.4.1.1)."""
+        _, loesung, _ = rechnen(phi_k=40.0, gamma_phi=1.2, kombinationen=(("K", 1000.0, 100.0),))
+        urteil = next(u for u in loesung.urteile if u.art == "GL")
+        self.assertAlmostEqual(urteil.widerstand.groesse.si,
+                               1000e3 * math.tan(math.radians(35.0)) / 1.2, delta=1e-6)
 
     def test_ohne_T_ist_es_unendlich_erfuellt(self):
         _, loesung, _ = rechnen(phi_k=30.0)
@@ -300,11 +307,13 @@ class TestGleiten(unittest.TestCase):
         self.assertTrue(urteil.erfuellt)
         self.assertEqual(urteil.erfuellungsgrad.si, math.inf)
 
-    def test_undrainiert_ohne_reibung(self):
-        _, loesung, _ = rechnen(phi_k=0.0, c_k=50.0, kombinationen=(("K", 300.0, 10.0),))
+    def test_undrainiert_aus_der_scherfestigkeit(self):
+        """Undrainiert trägt die Sohlfläche mit c_u,d: T_Rd = b · L · c_eff (8.5.2.2, (32))."""
+        _, loesung, _ = rechnen(phi_k=0.0, c_k=50.0, gamma_c=1.5, b=2.0, L=3.0,
+                                kombinationen=(("K", 300.0, 10.0),))
         urteil = next(u for u in loesung.urteile if u.art == "GL")
-        self.assertEqual(urteil.widerstand.groesse.si, 0.0)
-        self.assertFalse(urteil.erfuellt)
+        self.assertAlmostEqual(urteil.widerstand.groesse.si, 2.0 * 3.0 * 50e3 / 1.5, delta=1e-6)
+        self.assertTrue(urteil.erfuellt)
 
 
 class TestGleitkoerper(unittest.TestCase):
@@ -404,7 +413,7 @@ class TestEintrag(unittest.TestCase):
             "β": {"beta": 95.0},
             "nur die Kohäsion": {"phi_k": 0.0, "c_k": 0.0},
             "Tiefe t": {"t": -0.5},
-            "δ*/φ": {"delta_faktor": 0.0},
+            "δ_k/φ_k": {"delta_faktor": 0.0},
         }
         for wort, felder in faelle.items():
             p = Projekt(name="Probe")

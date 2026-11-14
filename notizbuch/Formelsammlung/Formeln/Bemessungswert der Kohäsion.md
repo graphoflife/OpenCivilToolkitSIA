@@ -1,10 +1,11 @@
 ---
-erzeugt: 46ef76e19571
+erzeugt: 45b5156f7f0a
 art: formel
 tags: [formel]
+normstelle: "SIA 267:2013, 5.3.2.1, (5)"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 267:2013, 5.3.2.1, (5)
 
 *In der Herleitung: «Kohäsion, Bemessungswert»*
 
@@ -30,6 +31,7 @@ $$
 ## Gebraucht von
 
 - [[Bruchspannung in der Sohle]]
+- [[Gleitwiderstand]]
 - [[Lastneigungsfaktor i_c]]
 - [[Lastneigungsfaktor i_q]]
 - [[Lastneigungsfaktor i_γ]]
@@ -47,7 +49,10 @@ $$
 ## Theorie
 
 Die Kohäsion ist der Teil der Scherfestigkeit, der auch ohne Normalspannung
-trägt. Sie wird mit einem eigenen Partialfaktor $\gamma_c$ geteilt.
+trägt. Sie wird mit einem eigenen Partialfaktor $\gamma_c$ geteilt, nach
+SIA 267:2013, Tabelle 1, 1.5 -- ebenso $\gamma_{cu}$ für die undrainierte
+Scherfestigkeit. Neben $\varphi$ zählt sie nur, wo sie dauerhaft wirkt
+(8.5.1.6), in der Sohlfuge beim Gleiten gar nicht (8.4.1.2).
 
 Mit $\varphi = 0$ -- undrainiert -- steht an ihrer Stelle die undrainierte
 Scherfestigkeit $s_u$; das Werkzeug liest $c_{eff}$ dann als $s_u$ (siehe

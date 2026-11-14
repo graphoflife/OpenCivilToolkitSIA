@@ -33,6 +33,10 @@ lotrechter, mittiger Last auf waagrechtem Gelände. Die Beiwerte passen jeden
 Anteil an das wirkliche Fundament an: $s$ an die Form, $d$ an die Tiefe, $i$
 an die Lastneigung, $g$ an die Geländeneigung und $b$ an die Sohlneigung.
 
-Die drei Anteile haben nicht genau dieselbe Gleitfläche. Sie einzeln zu
-rechnen und zu addieren, liegt auf der sicheren Seite: die Summe der
-kleinsten Anteile ist nie grösser als der kleinste Wert der Summe.
+Die drei Anteile beruhen nicht auf derselben Gleitfläche, und für
+$N_{\gamma}$ nennt die Literatur sehr verschiedene Werte; das verwendete
+liegt eher hoch. Das Buch nennt die Formel darum eine Näherung, und die
+Beiwerte verstärken das noch (Kap. 9.2.6, 9.2.9, 9.2.10). Dass die Summe auf
+der sicheren Seite liegt, sagt es nicht. SIA 267:2013 teilt den Widerstand
+zusätzlich durch einen Widerstandsbeiwert $\gamma_R$ von in der Regel 1.0
+bis 1.2 (8.5.2.1); das Werkzeug setzt 1.0.

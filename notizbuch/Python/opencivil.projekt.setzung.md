@@ -1,5 +1,5 @@
 ---
-erzeugt: 2449825097de
+erzeugt: 1e032acc6912
 art: modul
 tags: [modul]
 ---
@@ -19,7 +19,10 @@ eine neue Berechnung bringt keine Einwirkung mit, wie ein neuer Lastfall
 (Benutzer, 2026-10-19). Die zulaessige Setzung von 20 mm, die Dicke der
 Teilschichten von 0.5 m und die Schicht, mit der eine neue Berechnung
 beginnt -- 2 m mit M_E = 20 und M'_E = 60 MN/m² --, sind nicht vom Benutzer,
-sondern gesetzt, damit sich gleich etwas rechnen laesst.
+sondern gesetzt, damit sich gleich etwas rechnen laesst. Keine davon steht
+in einer Quelle: s_zul ist je Bauwerk festzulegen (SIA 267:2013, 8.5.4.1),
+und fuer M'_E nimmt das Buch grob das 8- bis 10-Fache von M_E an (Kap. 5.3)
+-- 60 ist nur ein Startwert.
 
 Die Namen der Schichten muessen nicht verschieden sein: sie beschriften nur,
 die Werte tragen die Nummer der Schicht. Zwei Tonschichten, durch Sand
@@ -58,7 +61,7 @@ Ein Flachfundament auf geschichtetem Baugrund, mit seinen Pressungen.
 - `steifigkeit: Steifigkeit = Steifigkeit.STARR` – Starr: gerechnet wird im Punkt K; schlaff: unter der Mitte (Kap. 8.10).
 - `q_W: float = bereich(0.0, heisst='Pressung aus Wiederbelastung q_W', einheit=KN_PR…` – Der Teil der Pressung in der Sohle, der den Boden nur wieder belastet, in kN/m².
 - `q_E: float = bereich(0.0, heisst='Pressung aus Erstbelastung q_E', einheit=KN_PRO_…` – Der Teil, der darüber hinausgeht und den Boden zum ersten Mal belastet, in kN/m².
-- `s_zul: float = bereich(20.0, heisst='Zulässige Setzung s_zul', einheit=MM, ueber=0.0)` – Die Setzung, die das Fundament höchstens erfahren darf, in mm.
+- `s_zul: float = bereich(20.0, heisst='Zulässige Setzung s_zul', einheit=MM, ueber=0.0)` – Die Setzung, die das Fundament höchstens erfahren darf, in mm -- je Bauwerk festzulegen (SIA 267:2013, 8.5.4.1; Kap. 8.12).
 - `dz: float = bereich(0.5, heisst='Dicke der Teilschichten Δz_max', einheit=M, uebe…` – Wie dick eine Teilschicht höchstens ist, in m -- jede Schicht wird so geteilt.
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
 - `schichten: List[SchichtEintrag] = field(default_factory=list)` – Von der Sohle an nach unten; darunter gilt der Baugrund als unzusammendrückbar.

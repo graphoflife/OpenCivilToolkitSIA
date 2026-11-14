@@ -48,7 +48,8 @@ $$
 Der Faktor der Kohäsion folgt aus [[Tragfähigkeitsfaktor N_q|N_q]]: ein Boden
 mit Kohäsion $c$ verhält sich wie ein kohäsionsloser unter einem allseitigen
 Druck $c \cot\varphi$ (Satz von Caquot). Daraus wird
-$N_c = (N_q - 1)\cot\varphi$.
+$N_c = (N_q - 1)\cot\varphi$. Das Buch gibt die Formel ohne diese
+Herleitung (Kap. 9.2.6); sie ist die übliche, steht aber nicht dort.
 
 Für $\varphi \to 0$ strebt er gegen $\pi + 2 = 5.14$ -- daher der Beiwert
 5.1 der [[Tragfähigkeitsformel undrainiert|undrainierten Formel]].

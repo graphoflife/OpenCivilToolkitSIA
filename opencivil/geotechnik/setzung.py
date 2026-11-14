@@ -21,7 +21,7 @@ Einflussfaktor an Ober- und Unterkante, wie die Spalte «J_K mittel» der
 Tabelle 8.4. Die Setzung ist die Summe über alle Teilschichten; unter der
 untersten Schicht gilt der Baugrund als unzusammendrückbar (Bild 8.1).
 
-DER EINFLUSSFAKTOR (Kap. 8.2):
+DER EINFLUSSFAKTOR (Kap. 3.7, Bild 3.15; Anhang, Tabelle A1):
 Die Zusatzspannung unter einer gleichmässig belasteten Rechteckfläche nach
 Boussinesq, Δσ'_z = J · q. Unter einer Ecke eines Rechtecks a × b in der
 Tiefe z (:func:`einflussfaktor_ecke`)::
@@ -30,19 +30,19 @@ Tiefe z (:func:`einflussfaktor_ecke`)::
     R   = √(a² + b² + z²)
 
 Unter einem anderen Punkt der Fläche die Summe der vier Rechtecke, die sich in
-ihm treffen (:func:`einflussfaktor`). Welcher Punkt, sagt die
+ihm treffen (:func:`einflussfaktor`), wie Bild 3.15 sie überlagert. Welcher Punkt, sagt die
 :class:`Steifigkeit` (Kap. 8.10): beim starren Fundament der kennzeichnende
 Punkt K, 0.13 L und 0.13 B von einer Ecke (Bild 8.15) -- dort setzt sich die
 schlaffe Last so stark, wie sich das starre Fundament im Mittel setzt; beim
 schlaffen die Mitte, wo die Setzungsmulde am tiefsten ist.
 
 QUELLE:
-Das Kapitel 8 «Setzungsberechnung», das der Benutzer geliefert hat; der
-Abschnitt steht an jeder Formel. Die Formel für J_E steht dort nicht -- das
-Kapitel verweist auf Kapitel 3, das nicht vorliegt. Sie gibt die Werte J_K
-der Tabelle 8.4 auf die gedruckte Stelle wieder und die Grenztiefen der
-Tabelle 8.5 so genau, wie sie dort stehen (tests/test_setzung.py); nicht
-nachgeschlagen (notizbuch/Notizen/TODO.md).
+Lang, Huder, Amann, Puzrin: Bodenmechanik und Grundbau, 8. Aufl. 2007, Kap. 8
+«Setzungsberechnung»; der Abschnitt steht an jeder Formel, «Kap.» meint
+dieses Buch. Die Formel für J_E steht dort im Anhang, zu Tabelle A1, und die
+Überlagerung in Kap. 3.7. Sie gibt die Tabellen A1 und A2 wieder, J_K der
+Tabelle 8.4 auf die gedruckte Stelle und die Grenztiefen der Tabelle 8.5 so
+genau, wie sie dort stehen (tests/test_setzung.py).
 
 EINHEITEN:
 Alles in SI-Basis.
@@ -68,8 +68,9 @@ from opencivil.core.wert import Wert, WertDef
 #: Wo der kennzeichnende Punkt K liegt: 0.13 L und 0.13 B von einer Ecke (Bild 8.15).
 K = 0.13
 
-#: Die Abschnitte des gelieferten Kapitels, an den Formeln als Referenz.
+#: Die Abschnitte des Buches, an den Formeln als Referenz.
 KAP_PRINZIP = "Kap. 8.2"
+KAP_EINFLUSSFAKTOR = "Kap. 3.7, Bild 3.15; Anhang, Tabelle A1"
 KAP_TABELLE = "Kap. 8.3, Tabelle 8.4"
 KAP_EINFLUSSTIEFE = "Kap. 8.4"
 KAP_WIEDERBELASTUNG = "Kap. 8.5"
@@ -202,30 +203,36 @@ class Setzungsfundament(Rechenobjekt):
         # Je Gruppe ein Kasten in der Herleitung, je Schicht einer -- wie beim Grundbruch.
         vorgaben = [
             ("Fundament", (
-                ("B", "B", M, "Breite des Fundaments", 2, self.B),
-                ("L", "L", M, "Länge des Fundaments", 2, self.L),
+                ("B", "B", M, "Breite des Fundaments", 2, self.B, ""),
+                ("L", "L", M, "Länge des Fundaments", 2, self.L, ""),
             )),
             ("Pressung in der Sohle", (
-                ("q_W", "q_W", KN_PRO_M2, "Pressung aus Wiederbelastung", 1, self.q_W),
-                ("q_E", "q_E", KN_PRO_M2, "Pressung aus Erstbelastung", 1, self.q_E),
+                ("q_W", "q_W", KN_PRO_M2, "Pressung aus Wiederbelastung", 1, self.q_W,
+                 KAP_WIEDERBELASTUNG),
+                ("q_E", "q_E", KN_PRO_M2, "Pressung aus Erstbelastung", 1, self.q_E,
+                 KAP_WIEDERBELASTUNG),
             )),
             ("Nachweis", (
-                ("s_zul", "s_{zul}", MM, "Zulässige Setzung", 1, self.s_zul),
-                ("dz", r"\Delta z_{max}", M, "Grösste Dicke einer Teilschicht", 2, self.dz),
+                ("s_zul", "s_{zul}", MM, "Zulässige Setzung, je Bauwerk festzulegen", 1,
+                 self.s_zul, "SIA 267:2013, 8.5.4.1; Kap. 8.12"),
+                ("dz", r"\Delta z_{max}", M, "Grösste Dicke einer Teilschicht", 2, self.dz,
+                 "Kap. 8.3"),
             )),
         ]
+        # Im Gebrauch ohne Partialfaktor (SIA 267:2013, 5.3.2.8): M_E, wie gemessen.
+        modul = "Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8"
         for i, schicht in enumerate(self.schichten, start=1):
             vorgaben.append((f"Schicht {i}: {schicht.name}", (
-                (f"d_{i}", f"d_{{{i}}}", M, f"Dicke der Schicht {i}", 2, schicht.d),
+                (f"d_{i}", f"d_{{{i}}}", M, f"Dicke der Schicht {i}", 2, schicht.d, ""),
                 (f"M_E_{i}", f"M_{{E,{i}}}", MN_PRO_M2,
-                 f"M_E-Wert der Schicht {i}, Erstbelastung", 1, schicht.M_E),
+                 f"M_E-Wert der Schicht {i}, Erstbelastung", 1, schicht.M_E, modul),
                 (f"M_E_strich_{i}", f"M'_{{E,{i}}}", MN_PRO_M2,
-                 f"M_E-Wert der Schicht {i}, Wiederbelastung", 1, schicht.M_E_strich),
+                 f"M_E-Wert der Schicht {i}, Wiederbelastung", 1, schicht.M_E_strich, modul),
             )))
         for gruppe, eintraege in vorgaben:
-            for kurz, symbol, einheit, beschreibung, stellen, groesse in eintraege:
+            for kurz, symbol, einheit, beschreibung, stellen, groesse, referenz in eintraege:
                 d = WertDef(id=f"{self.id}.{kurz}", symbol=symbol, einheit=einheit,
-                            beschreibung=beschreibung, stellen=stellen)
+                            beschreibung=beschreibung, referenz=referenz, stellen=stellen)
                 self.definitionen[kurz] = d
                 self.berechnungen.append(Vorgabe(id=d.id, ausgabe=d, groesse=groesse,
                                                  abschnitt=self.abschnitt, gruppe=gruppe))
@@ -386,7 +393,7 @@ class Setzung(Nachweis):
             r" + \frac{a \, b \, z}{R} \left(\frac{1}{a^2 + z^2} + \frac{1}{b^2 + z^2}\right)"
             r"\right] \qquad R = \sqrt{a^2 + b^2 + z^2} \end{aligned}",
             titel="Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die "
-                  "sich im Punkt treffen", referenz=KAP_PRINZIP,
+                  "sich im Punkt treffen", referenz=KAP_EINFLUSSFAKTOR,
             name="Einflussfaktor der Rechtecklast")
         return x_si, y_si
 
@@ -400,8 +407,8 @@ class Setzung(Nachweis):
         dz_max = e["dz"].groesse.si
         p.titel("Teilschichten", ebene=3)
         p.text(f"Jede Schicht in gleich dicke Teilschichten von höchstens "
-               f"Δz_max = {e['dz'].formatiert()} m; J an Ober- und Unterkante, gemittelt. "
-               f"z ab der Sohle.")
+               f"Δz_max = {e['dz'].formatiert()} m; J an Ober- und Unterkante, gemittelt "
+               f"({KAP_TABELLE}). z ab der Sohle.")
         teile: List[Teilschicht] = []
         oben, J_o = 0.0, einflussfaktor(L, B, x, y, 0.0)
         for i in range(1, len(f.schichten) + 1):
@@ -471,7 +478,7 @@ class Setzung(Nachweis):
                  referenz=KAP_WIEDERBELASTUNG, name="Setzung aus Erstbelastung")
         s = werte.laenge("s", "s", befund.s, "Setzung", stellen=1)
         p.formel(s, "@s_W + @s_E", {"s_W": s_W, "s_E": s_E}, titel="Setzung",
-                 referenz=KAP_PRINZIP, name="Gesamtsetzung")
+                 referenz=f"{KAP_PRINZIP}, 8.5", name="Gesamtsetzung")
         s_zul = e["s_zul"]
         v = Vergleich(s, s_zul)
         v.bedingung(p, "Setzung gegen zulässige Setzung")

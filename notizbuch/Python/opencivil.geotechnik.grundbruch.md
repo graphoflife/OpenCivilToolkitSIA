@@ -1,5 +1,5 @@
 ---
-erzeugt: 4c48d5abb427
+erzeugt: a050b54dc003
 art: modul
 tags: [modul]
 ---
@@ -27,20 +27,26 @@ und für phi = 0, undrainiert (Kap. 9.2.17)::
     sigma_f = 5.1 s_u (1 + s_c + d_c - i_c - b_c - g_c) + (gamma t + q)
 ```
 
-* [[opencivil.geotechnik.grundbruch#Gleiten|Gleiten]] -- der Gleitwiderstand in der Sohle,
-  T_Rd = N_Ed · tan delta* (Kap. 9.2.18).
+* [[opencivil.geotechnik.grundbruch#Gleiten|Gleiten]] -- der Gleitwiderstand in der Sohle nach SIA 267:2013,
+  8.5.2.2: drainiert T_Rd = N_Ed · tan delta_d, mit delta_k = min(k_delta ·
+  phi_k; 35°) nach 8.4.1.1 und tan delta_d = tan delta_k / gamma_phi;
+  undrainiert T_Rd = b · L · c_eff, Gl. (32).
 
 Gerechnet wird mit Bemessungswerten: phi_eff = arctan(tan phi_k / gamma_phi)
-(SIA 267:2013, 5.3.2.1) und c_eff = c_k / gamma_c. Ein globaler
-Sicherheitsgrad wie F_stat des Kapitels kommt nicht dazu.
+und c_eff = c_k / gamma_c (SIA 267:2013, 5.3.2.1). Ein globaler
+Sicherheitsgrad wie F_stat des Buches kommt nicht dazu; den
+Widerstandsbeiwert gamma_R der Norm (8.5.2.1) setzt die Rechnung 1.0
+(notizbuch/Notizen/TODO.md).
 
 
 ## QUELLE
 
-Die Formeln stammen aus dem Kapitel 9.2 «Tragfähigkeit», das der Benutzer
-geliefert hat; der Abschnitt steht an jeder Formel. Wo der Text und seine
-Tabellen auseinandergehen, steht es beim Faktor: b_gamma rechnet nach
-Tabelle 9.2.18 mit tan phi, im Text steht tan alpha.
+Die Formeln des Grundbruchs stammen aus Lang, Huder, Amann, Puzrin:
+Bodenmechanik und Grundbau, 8. Aufl. 2007, Kap. 9.2 «Tragfähigkeit»; der
+Abschnitt steht an jeder Formel, «Kap.» meint dieses Buch. Wo der Text und
+seine Tabellen auseinandergehen, steht es beim Faktor: b_gamma rechnet nach
+Tabelle 9.2.18 mit tan phi, im Text steht tan alpha. Das Gleiten und die
+Bemessungswerte folgen SIA 267:2013.
 
 
 ## WINKEL (Bild 9.2.15)
@@ -254,8 +260,9 @@ Eine Klammer hoch fünf -- unter null gilt null (siehe Herleitung).
 class Gleiten(Nachweis)
 ```
 
-Der Gleitwiderstand in der Sohle je Kombination: T_Rd = N_Ed · tan delta*,
-ohne Erdwiderstand -- wie im Kapitel für eine geneigte Sohle.
+Der Gleitwiderstand in der Sohle je Kombination nach SIA 267:2013,
+8.5.2.2 -- drainiert aus der Reibung, undrainiert aus der Scherfestigkeit
+--, ohne Erdwiderstand, wie im Buch für eine geneigte Sohle.
 
 - `THEMA = 'Gleiten'`
 - `ART = 'GL'`
@@ -265,6 +272,23 @@ ohne Erdwiderstand -- wie im Kapitel für eine geneigte Sohle.
 ```python
 def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
+
+#### Gleiten._sohlreibung
+
+```python
+def _sohlreibung(self, e: Eingaben, p: Protokoll) -> Wert
+```
+
+delta_k nach SIA 267:2013, 8.4.1.1, und daraus der Bemessungswert delta_d.
+
+#### Gleiten._widerstand
+
+```python
+@staticmethod
+def _widerstand(e: Eingaben, p: Protokoll, zw: Zwischenwerte, N: Wert, delta: Optional[Wert]) -> Wert
+```
+
+Drainiert die Reibung unter N, undrainiert die Scherfestigkeit auf der Sohlfläche.
 
 ### angaben
 
@@ -292,7 +316,8 @@ die Spalte der Kohäsion.
 ## Konstanten
 
 - `N_C_UNDRAINIERT = 5.1` – Der Beiwert der undrainierten Tragfähigkeitsformel, Kap. 9.2.17 -- 5.1, wie das Kapitel ihn schreibt (pi + 2 = 5.14 gerundet).
-- `KAP_FAKTOREN = 'Kap. 9.2.6'` – Die Abschnitte des gelieferten Kapitels, an den Formeln als Referenz.
+- `KAP_AUFLAST = 'Kap. 9.2.5'` – Die Abschnitte des Buches, an den Formeln als Referenz.
+- `KAP_FAKTOREN = 'Kap. 9.2.6'`
 - `KAP_GRUNDWASSER = 'Kap. 9.2.8'`
 - `KAP_FORMEL = 'Kap. 9.2.10'`
 - `KAP_FORM = 'Kap. 9.2.12'`
@@ -302,6 +327,8 @@ die Spalte der Kohäsion.
 - `KAP_SOHLE = 'Kap. 9.2.16'`
 - `KAP_UNDRAINIERT = 'Kap. 9.2.17'`
 - `KAP_GLEITEN = 'Kap. 9.2.18'`
+- `SOHLREIBUNG_GRENZE = 35.0` – Wie gross der Sohlreibungswinkel delta_k höchstens ist, in Grad -- SIA 267:2013, 8.4.1.1.
+- `OHNE_GAMMA_R = 'Grundbruch- und Gleitwiderstand ohne Widerstandsbeiwert, γ_R = 1.0. …` – Was beide Widerstände annehmen -- die Norm teilt sie noch durch gamma_R.
 - `SPALTEN = (('c', 'Kohäsion'), ('q', 'Seitliche Auflast'), ('g', 'Gewicht Gleitk…` – Die Spalten der Tragfähigkeitsformel, wie die Zusammenfassung sie zeigt.
 
 ## Braucht
@@ -326,6 +353,7 @@ die Spalte der Kohäsion.
 - [[Abstand des Grundwassers unter der Sohle]] · `Grundbruch._grundwasser`
 - [[Bemessungswert der Kohäsion]] · `_c_eff`
 - [[Bemessungswert des Reibungswinkels]] · `_phi_eff`
+- [[Bemessungswert des Sohlreibungswinkels]] · `Gleiten._sohlreibung`
 - [[Bruchspannung in der Sohle]] · `Grundbruch._drainierter_fall`
 - [[Bruchspannung in der Sohle]] · `Grundbruch._undrainierter_fall`
 - [[Erweiterte Tragfähigkeitsformel]] · `Grundbruch._drainiert`
@@ -336,7 +364,7 @@ die Spalte der Kohäsion.
 - [[Geländeneigungsfaktor g_c]] · `Grundbruch._drainiert`
 - [[Geländeneigungsfaktor g_c]] · `Grundbruch._undrainiert`
 - [[Geländeneigungsfaktor g_q]] · `Grundbruch._drainiert`
-- [[Gleitwiderstand]] · `Gleiten.pruefe`
+- [[Gleitwiderstand]] · `Gleiten._widerstand`
 - [[Grundbruchwiderstand]] · `Grundbruch._widerstand`
 - [[Lastneigungsfaktor i_c]] · `Grundbruch._drainierter_fall`
 - [[Lastneigungsfaktor i_c]] · `Grundbruch._undrainierter_fall`
@@ -345,7 +373,7 @@ die Spalte der Kohäsion.
 - [[Neigung der Last]] · `Grundbruch._drainierter_fall`
 - [[Raumlast im Gleitkörper]] · `Grundbruch._grundwasser`
 - [[Raumlast unter Auftrieb]] · `_gamma_auftrieb`
-- [[Reibungswinkel der Sohlfuge]] · `Gleiten.pruefe`
+- [[Reibungswinkel der Sohlfuge]] · `Gleiten._sohlreibung`
 - [[Reichweite des Gleitkörpers]] · `Grundbruch._drainiert`
 - [[Sohlneigungsfaktor b_c]] · `Grundbruch._drainiert`
 - [[Sohlneigungsfaktor b_c]] · `Grundbruch._undrainiert`

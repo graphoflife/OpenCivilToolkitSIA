@@ -1,11 +1,11 @@
 ---
-erzeugt: c9141393e20e
+erzeugt: 88a7c493d563
 art: formel
 tags: [formel]
-normstelle: "Kap. 9.2.10"
+normstelle: "Kap. 9.2.11; SIA 267:2013, 8.5.3.5"
 ---
 > [!info] Normstelle
-> Kap. 9.2.10
+> Kap. 9.2.11; SIA 267:2013, 8.5.3.5
 
 $$
 N_{Rd} = \sigma_f \cdot b \cdot L
@@ -39,8 +39,10 @@ $$
 
 ## Theorie
 
-Die [[Bruchspannung in der Sohle]] mal Sohlfläche. Weil $\varphi_{eff}$ und
+Die [[Bruchspannung in der Sohle]] mal Sohlfläche, wie das Buch die Bruchlast
+des Rechteckfundaments schreibt (Kap. 9.2.11). Weil $\varphi_{eff}$ und
 $c_{eff}$ schon Bemessungswerte sind, ist $N_{Rd}$ ein Bemessungswiderstand
-und steht direkt gegen $N_{Ed}$ -- ohne einen globalen Sicherheitsfaktor, wie
-ihn das Kapitel für die zulässige Last verwendet. Ergibt die Formel eine
-negative Bruchspannung, gilt null.
+und steht direkt gegen $N_{Ed}$ (SIA 267:2013, 8.5.3.5) -- ohne einen
+globalen Sicherheitsfaktor, wie ihn das Buch für die zulässige Last
+verwendet. Den Widerstandsbeiwert $\gamma_R$ der Norm (8.5.2.1) setzt das
+Werkzeug 1.0. Ergibt die Formel eine negative Bruchspannung, gilt null.

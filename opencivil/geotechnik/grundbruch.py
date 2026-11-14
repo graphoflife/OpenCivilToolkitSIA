@@ -18,18 +18,24 @@ Einwirkungskombination zwei Nachweise:
 
       sigma_f = 5.1 s_u (1 + s_c + d_c - i_c - b_c - g_c) + (gamma t + q)
 
-* :class:`Gleiten` -- der Gleitwiderstand in der Sohle,
-  T_Rd = N_Ed · tan delta* (Kap. 9.2.18).
+* :class:`Gleiten` -- der Gleitwiderstand in der Sohle nach SIA 267:2013,
+  8.5.2.2: drainiert T_Rd = N_Ed · tan delta_d, mit delta_k = min(k_delta ·
+  phi_k; 35°) nach 8.4.1.1 und tan delta_d = tan delta_k / gamma_phi;
+  undrainiert T_Rd = b · L · c_eff, Gl. (32).
 
 Gerechnet wird mit Bemessungswerten: phi_eff = arctan(tan phi_k / gamma_phi)
-(SIA 267:2013, 5.3.2.1) und c_eff = c_k / gamma_c. Ein globaler
-Sicherheitsgrad wie F_stat des Kapitels kommt nicht dazu.
+und c_eff = c_k / gamma_c (SIA 267:2013, 5.3.2.1). Ein globaler
+Sicherheitsgrad wie F_stat des Buches kommt nicht dazu; den
+Widerstandsbeiwert gamma_R der Norm (8.5.2.1) setzt die Rechnung 1.0
+(notizbuch/Notizen/TODO.md).
 
 QUELLE:
-Die Formeln stammen aus dem Kapitel 9.2 «Tragfähigkeit», das der Benutzer
-geliefert hat; der Abschnitt steht an jeder Formel. Wo der Text und seine
-Tabellen auseinandergehen, steht es beim Faktor: b_gamma rechnet nach
-Tabelle 9.2.18 mit tan phi, im Text steht tan alpha.
+Die Formeln des Grundbruchs stammen aus Lang, Huder, Amann, Puzrin:
+Bodenmechanik und Grundbau, 8. Aufl. 2007, Kap. 9.2 «Tragfähigkeit»; der
+Abschnitt steht an jeder Formel, «Kap.» meint dieses Buch. Wo der Text und
+seine Tabellen auseinandergehen, steht es beim Faktor: b_gamma rechnet nach
+Tabelle 9.2.18 mit tan phi, im Text steht tan alpha. Das Gleiten und die
+Bemessungswerte folgen SIA 267:2013.
 
 WINKEL (Bild 9.2.15):
 alpha ist die Neigung der Sohle, positiv, wenn sie gegen T ansteigt -- das
@@ -75,7 +81,8 @@ from opencivil.core.wert import Wert, WertDef, kennung_aus
 #: wie das Kapitel ihn schreibt (pi + 2 = 5.14 gerundet).
 N_C_UNDRAINIERT = 5.1
 
-#: Die Abschnitte des gelieferten Kapitels, an den Formeln als Referenz.
+#: Die Abschnitte des Buches, an den Formeln als Referenz.
+KAP_AUFLAST = "Kap. 9.2.5"
 KAP_FAKTOREN = "Kap. 9.2.6"
 KAP_GRUNDWASSER = "Kap. 9.2.8"
 KAP_FORMEL = "Kap. 9.2.10"
@@ -86,6 +93,16 @@ KAP_GELAENDE = "Kap. 9.2.15"
 KAP_SOHLE = "Kap. 9.2.16"
 KAP_UNDRAINIERT = "Kap. 9.2.17"
 KAP_GLEITEN = "Kap. 9.2.18"
+
+#: Wie gross der Sohlreibungswinkel delta_k höchstens ist, in Grad -- SIA 267:2013, 8.4.1.1.
+SOHLREIBUNG_GRENZE = 35.0
+
+#: Was beide Widerstände annehmen -- die Norm teilt sie noch durch gamma_R.
+OHNE_GAMMA_R = (
+    "Grundbruch- und Gleitwiderstand ohne Widerstandsbeiwert, γ_R = 1.0. SIA 267:2013 "
+    "teilt beide durch γ_R, in der Regel 1.0 bis 1.2, und lässt 1.0 bei bewährten, "
+    "zuverlässigen Verfahren zu (8.5.2.1, (29), (30)); die Tragfähigkeitsformel nennt "
+    "das Buch eine Näherung (Kap. 9.2.9).")
 
 #: Die Spalten der Tragfähigkeitsformel, wie die Zusammenfassung sie zeigt.
 SPALTEN = (("c", "Kohäsion"), ("q", "Seitliche Auflast"), ("g", "Gewicht Gleitkörper"))
@@ -156,10 +173,12 @@ class Fundament(Rechenobjekt):
             ("Boden", (
                 ("phi_k", r"\varphi_k", GRAD, "Reibungswinkel, charakteristisch", 1, ""),
                 ("gamma_phi", r"\gamma_{\varphi}", EINHEITSLOS,
-                 "Partialfaktor des Reibungswinkels", 2, "SIA 267:2013, 5.3.2.2"),
+                 "Partialfaktor des Reibungswinkels", 2, "SIA 267:2013, 5.3.2.2, Tabelle 1"),
                 ("c_k", "c_k", KPA, "Kohäsion, charakteristisch", 1, ""),
-                ("gamma_c", r"\gamma_c", EINHEITSLOS, "Partialfaktor der Kohäsion", 2, ""),
-                ("gamma", r"\gamma", KN_PRO_M3, "Raumlast des Bodens", 1, ""),
+                ("gamma_c", r"\gamma_c", EINHEITSLOS, "Partialfaktor der Kohäsion", 2,
+                 "SIA 267:2013, 5.3.2.2, Tabelle 1"),
+                ("gamma", r"\gamma", KN_PRO_M3, "Raumlast des Bodens, ohne Partialfaktor", 1,
+                 "SIA 267:2013, 5.3.2.2, Tabelle 1"),
                 ("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1, ""),
             )),
             ("Fundament", (
@@ -169,13 +188,15 @@ class Fundament(Rechenobjekt):
                 ("alpha", r"\alpha", GRAD, "Neigung der Sohle", 1, ""),
             )),
             ("Gelände und Grundwasser", (
-                ("t1", "t_1", M, "Tiefe des höchsten Grundwasserspiegels unter Terrain", 2, ""),
+                ("t1", "t_1", M, "Tiefe des höchsten Grundwasserspiegels unter Terrain", 2,
+                 "SIA 267:2013, 4.2.2.3"),
                 ("beta", r"\beta", GRAD, "Neigung des Geländes", 1, ""),
-                ("q_Ed", "q_{Ed}", KPA, "Bemessungslast neben dem Fundament", 1, ""),
+                ("q_Ed", "q_{Ed}", KPA, "Dauernde Auflast neben dem Fundament", 1, KAP_AUFLAST),
             )),
             ("Sohlreibung", (
                 ("delta_faktor", r"k_{\delta}", EINHEITSLOS,
-                 "Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ", 2, ""),
+                 "Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ_k/φ_k", 2,
+                 "SIA 267:2013, 8.4.1.1"),
             )),
         )
         for gruppe, eintraege in vorgaben:
@@ -186,8 +207,9 @@ class Fundament(Rechenobjekt):
                     abschnitt=abschnitt, gruppe=gruppe))
 
         d_phi = self._def("phi_eff", r"\varphi_{eff}", GRAD,
-                          "Reibungswinkel, Bemessungswert", 2, "SIA 267:2013, 5.3.2.1")
-        d_c = self._def("c_eff", "c_{eff}", KPA, "Kohäsion, Bemessungswert", 1)
+                          "Reibungswinkel, Bemessungswert", 2, "SIA 267:2013, 5.3.2.1, (5)")
+        d_c = self._def("c_eff", "c_{eff}", KPA, "Kohäsion, Bemessungswert", 1,
+                        "SIA 267:2013, 5.3.2.1, (5)")
         d_ga = self._def("gamma_auftrieb", r"\gamma'", KN_PRO_M3,
                          "Raumlast des Bodens unter Auftrieb", 1)
         self.berechnungen += [
@@ -320,6 +342,7 @@ class Grundbruch(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         p.titel("Grundbruch")
+        p.annahme(OHNE_GAMMA_R)
         if e.g("phi_eff").si <= 0.0:
             befund = self._undrainiert(e, p)
         else:
@@ -387,6 +410,9 @@ class Grundbruch(Nachweis):
                        r" \tan @phi}", {"b": b, "phi": phi},
                  titel="Tiefe des Gleitkörpers", referenz=KAP_FORMEL,
                  name="Tiefe des Gleitkörpers")
+        p.annahme("Der Boden ist bis H_Gl unter der Sohle einheitlich, wie das Buch es "
+                  "voraussetzt (Kap. 9.2.10). Bei Schichten erlaubt SIA 267:2013, 8.4.4.1, "
+                  "vorsichtig gemittelte Werte über die Schichten, die der Bruch erfasst.")
         sigma0, gamma_G, grundwasser = self._grundwasser(e, p, werte, H_gl)
 
         # -- Korrekturfaktoren --------------------------------------------------
@@ -709,7 +735,7 @@ class Grundbruch(Nachweis):
         N_Rd = werte.kraft("N_Rd", "N_{Rd}", max(0.0, sigma_f.groesse.si) * b.groesse.si
                            * L.groesse.si, "Widerstand")
         p.formel(N_Rd, r"@sigma_f \cdot @b \cdot @L", {"sigma_f": sigma_f, "b": b, "L": L},
-                 titel="Grundbruchwiderstand", referenz=KAP_FORMEL,
+                 titel="Grundbruchwiderstand", referenz="Kap. 9.2.11; SIA 267:2013, 8.5.3.5",
                  name="Grundbruchwiderstand")
         erg.N_Rd = N_Rd.groesse.si
         erg.ausgang = v = Vergleich(N, N_Rd)
@@ -767,8 +793,9 @@ def _produkt(z: Dict[str, Wert], *namen: str) -> float:
 
 class Gleiten(Nachweis):
     """
-    Der Gleitwiderstand in der Sohle je Kombination: T_Rd = N_Ed · tan delta*,
-    ohne Erdwiderstand -- wie im Kapitel für eine geneigte Sohle.
+    Der Gleitwiderstand in der Sohle je Kombination nach SIA 267:2013,
+    8.5.2.2 -- drainiert aus der Reibung, undrainiert aus der Scherfestigkeit
+    --, ohne Erdwiderstand, wie im Buch für eine geneigte Sohle.
     """
 
     THEMA = "Gleiten"
@@ -785,38 +812,27 @@ class Gleiten(Nachweis):
                              rf"\alpha_{{eff,GL,{als_text(k.name)}}}",
                              f"Erfüllungsgrad Gleiten – {k.name}")
             for k in self.kombinationen}
-        bezuege = [Eingabebezug(n, fundament.id_von(n)) for n in ("phi_eff", "delta_faktor")]
+        bezuege = [Eingabebezug(n, fundament.id_von(n)) for n in (
+            "phi_k", "gamma_phi", "delta_faktor", "c_eff", "b", "L")]
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()), bezuege=bezuege,
                          titel=f"Gleiten – {fundament.name}", abschnitt=fundament.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         p.titel("Gleiten")
         p.erklaerung(
-            "Die Kraft T in der Sohle muss durch Reibung zwischen Fundament und "
-            "Boden aufgenommen werden. Der Reibungswinkel δ* der Sohlfuge liegt "
-            "meist zwischen 2/3 φ und φ; ein Erdwiderstand vor dem Fundament wird "
+            "Die Kraft T in der Sohle muss die Sohlfuge aufnehmen: drainiert durch "
+            "Reibung zwischen Fundament und Boden, undrainiert durch die "
+            "Scherfestigkeit des Bodens. Ein Erdwiderstand vor dem Fundament wird "
             "nicht angesetzt."
         )
-        werte = Zwischenwerte(self.id)
-        phi, k_delta = e["phi_eff"], e["delta_faktor"]
-        delta = werte.wert("delta_stern", r"\delta^{*}", Groesse.aus_si(
-            k_delta.groesse.si * phi.groesse.si, GRAD), 2, "Reibungswinkel der Sohlfuge")
-        p.formel(delta, r"@k \cdot @phi", {"k": k_delta, "phi": phi},
-                 titel="Reibungswinkel der Sohlfuge", referenz=KAP_GLEITEN,
-                 name="Reibungswinkel der Sohlfuge")
-        if phi.groesse.si <= 0.0:
-            p.text("Mit φ = 0 gibt die Reibung in der Sohle keinen Widerstand; eine "
-                   "Haftung zählt nach dem Kapitel nicht.")
+        delta = self._sohlreibung(e, p) if e.g("phi_k").si > 0.0 else None
         urteile: List[NachweisUrteil] = []
         for k in self.kombinationen:
             zw = Zwischenwerte(f"{self.id}.{k.kennung}")
             p.titel(f"Gleiten – {k.name}", ebene=3)
             N = zw.kraft("N_Ed", "N_{Ed}", k.N_Ed.si, "Einwirkung normal zur Sohle")
             T = zw.kraft("T_Ed", "T_{Ed}", k.T_Ed.si, "Einwirkung")
-            T_Rd = zw.kraft("T_Rd", "T_{Rd}", k.N_Ed.si * math.tan(delta.groesse.si),
-                            "Widerstand")
-            p.formel(T_Rd, r"@N \cdot \tan @delta", {"N": N, "delta": delta},
-                     titel="Gleitwiderstand", referenz=KAP_GLEITEN, name="Gleitwiderstand")
+            T_Rd = self._widerstand(e, p, zw, N, delta)
             v = Vergleich(T, T_Rd)
             v.bedingung(p, "Einwirkung gegen Widerstand")
             v.zeile(p, self.d_ausnutzung[k.name], mit_urteil=True)
@@ -825,6 +841,46 @@ class Gleiten(Nachweis):
                 f"T_Rd = {T_Rd.formatiert()} kN {'≥' if v.erfuellt else '<'} "
                 f"T_Ed = {T.formatiert()} kN."))
         return Ausfuehrung({}, urteile)
+
+    def _sohlreibung(self, e: Eingaben, p: Protokoll) -> Wert:
+        """delta_k nach SIA 267:2013, 8.4.1.1, und daraus der Bemessungswert delta_d."""
+        werte = Zwischenwerte(self.id)
+        phi_k, k_delta, gamma_phi = e["phi_k"], e["delta_faktor"], e["gamma_phi"]
+        delta_k = werte.wert("delta_k", r"\delta_k", Groesse.aus_si(min(
+            k_delta.groesse.si * phi_k.groesse.si, math.radians(SOHLREIBUNG_GRENZE)), GRAD), 2,
+            "Sohlreibungswinkel, charakteristisch")
+        p.formel(delta_k, rf"\min\left[@k \cdot @phi_k;\ {SOHLREIBUNG_GRENZE:g}^\circ\right]",
+                 {"k": k_delta, "phi_k": phi_k}, titel="Sohlreibungswinkel, charakteristisch",
+                 referenz="SIA 267:2013, 8.4.1.1, (27), (28)", name="Reibungswinkel der Sohlfuge")
+        delta_d = werte.wert("delta_d", r"\delta_d", Groesse.aus_si(
+            math.atan(math.tan(delta_k.groesse.si) / gamma_phi.groesse.si), GRAD), 2,
+            "Sohlreibungswinkel, Bemessungswert")
+        p.formel(delta_d, r"\arctan\left(\frac{\tan @delta_k}{@gamma_phi}\right)",
+                 {"delta_k": delta_k, "gamma_phi": gamma_phi},
+                 titel="Sohlreibungswinkel, Bemessungswert", referenz="SIA 267:2013, 8.5.2.2",
+                 name="Bemessungswert des Sohlreibungswinkels")
+        if e.g("c_eff").si > 0.0:
+            p.text("Die Kohäsion zählt in der Sohlfuge nicht: SIA 267:2013, 8.4.1.2, lässt sie "
+                   "nur zu, wo sicher ist, dass sie dauerhaft bleibt.")
+        return delta_d
+
+    @staticmethod
+    def _widerstand(e: Eingaben, p: Protokoll, zw: Zwischenwerte, N: Wert,
+                    delta: Optional[Wert]) -> Wert:
+        """Drainiert die Reibung unter N, undrainiert die Scherfestigkeit auf der Sohlfläche."""
+        if delta is None:
+            b, L, c = e["b"], e["L"], e["c_eff"]
+            T_Rd = zw.kraft("T_Rd", "T_{Rd}", b.groesse.si * L.groesse.si * c.groesse.si,
+                            "Widerstand")
+            p.formel(T_Rd, r"@b \cdot @L \cdot @c", {"b": b, "L": L, "c": c},
+                     titel="Gleitwiderstand, undrainiert", referenz="SIA 267:2013, 8.5.2.2, (32)",
+                     name="Gleitwiderstand")
+            return T_Rd
+        T_Rd = zw.kraft("T_Rd", "T_{Rd}", N.groesse.si * math.tan(delta.groesse.si), "Widerstand")
+        p.formel(T_Rd, r"@N \cdot \tan @delta", {"N": N, "delta": delta},
+                 titel="Gleitwiderstand", referenz="SIA 267:2013, 8.5.2.2, (31)",
+                 name="Gleitwiderstand")
+        return T_Rd
 
 
 # ===========================================================================

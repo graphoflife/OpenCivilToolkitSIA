@@ -1,11 +1,11 @@
 ---
-erzeugt: 6fbcb1a49568
+erzeugt: 62a28229c083
 art: formel
 tags: [formel]
-normstelle: "SIA 267:2013, 5.3.2.1"
+normstelle: "SIA 267:2013, 5.3.2.1, (5)"
 ---
 > [!info] Normstelle
-> SIA 267:2013, 5.3.2.1
+> SIA 267:2013, 5.3.2.1, (5)
 
 *In der Herleitung: «Reibungswinkel, Bemessungswert»*
 
@@ -33,7 +33,6 @@ $$
 - [[Formfaktor s_q]]
 - [[Lastneigungsfaktor i_q]]
 - [[Lastneigungsfaktor i_γ]]
-- [[Reibungswinkel der Sohlfuge]]
 - [[Reichweite des Gleitkörpers]]
 - [[Sohlneigungsfaktor b_q]]
 - [[Sohlneigungsfaktor b_γ]]
@@ -61,6 +60,7 @@ $\tan\varphi_{eff} = \tan\varphi_k / \gamma_{\varphi}$, und erst daraus
 folgt der Winkel: mit $\gamma_{\varphi} = 1.2$ wird aus $\varphi_k = 30°$
 der Bemessungswert $\varphi_{eff} = 25.7°$.
 
-Alle Faktoren der Tragfähigkeitsformel und die Reibung in der Sohle rechnen
-mit $\varphi_{eff}$. Die Sicherheit steckt damit im Boden und nicht in einem
-globalen Faktor auf der Bruchlast.
+Alle Faktoren der Tragfähigkeitsformel rechnen mit $\varphi_{eff}$, die
+Reibung in der Sohle mit ihrem eigenen
+[[Bemessungswert des Sohlreibungswinkels]]. Die Sicherheit steckt damit im
+Boden und nicht in einem globalen Faktor auf der Bruchlast.

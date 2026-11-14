@@ -33,21 +33,23 @@ import { ausVorlage, eintragAendern, feldangabe, naechsterName, zustand } from '
 const HILFE = {
   situation: {
     zeilen: [
-      ['φ_eff', 'arctan(tan φ_k / γ_φ) nach SIA 267:2013, 5.3.2.1; γ_φ nach 5.3.2.2'],
+      ['φ_eff', 'arctan(tan φ_k / γ_φ) nach SIA 267:2013, 5.3.2.1; γ_φ nach 5.3.2.2, Tabelle 1'],
       ['c_eff', 'c_k / γ_c -- mit φ = 0 rechnet c als undrainierte Scherfestigkeit s_u'],
+      ['Feinkörnig', 'kurzzeitig undrainiert, langfristig drainiert: je ein Grundbruch mit φ = 0 und c = s_u und einer mit φ und c (SIA 267:2013, 8.5.1.5, 8.5.1.6)'],
+      ['γ', 'eine Raumlast über und unter dem Wasser; das Buch nimmt unter ihm die gesättigte (Kap. 1.4), mit der feuchten wird γ\' etwas kleiner, auf der sicheren Seite'],
       ['t, t₁', 'ab Oberkante Terrain: bis zur Sohle, bis zum höchsten Grundwasserspiegel'],
       ['α', 'Neigung der Sohle, positiv, wenn sie in Richtung von T ansteigt (Bild 9.2.15)'],
       ['β', 'Neigung des Geländes, positiv, wenn es auf der Seite von T abfällt'],
-      ['b, L', 'b ist die kürzere Seite; ein Streifenfundament ist ein sehr langes'],
+      ['b, L', 'b ist die kürzere Seite; ein Streifenfundament ist ein sehr langes. Eine Ausmitte rechnet das Werkzeug nicht: bei ausmittiger Last die wirksamen Masse b − 2e und L − 2e eingeben (Kap. 9.2.11; SIA 267:2013, Figur 4)'],
     ],
     formel: "γ' = γ − γ_w",
   },
   einwirkungen: {
     zeilen: [
-      ['N_Ed', 'normal zur Sohle, Druck positiv'],
+      ['N_Ed', 'normal zur Sohle, Druck positiv; das günstige Eigengewicht von Fundament und Hinterfüllung mit γ_G,inf = 1.0 (SIA 267:2013, 8.5.2.4)'],
       ['T_Ed', 'in der Sohle, zur Seite, auf der das Gelände abfällt'],
       ['Grundbruch', 'N_Ed ≤ N_Rd = σ_f · b · L'],
-      ['Gleiten', 'T_Ed ≤ T_Rd = N_Ed · tan δ*'],
+      ['Gleiten', 'T_Ed ≤ T_Rd = N_Ed · tan δ_d, undrainiert b · L · c_eff (SIA 267:2013, 8.5.2.2)'],
     ],
     formel: 'δ_R = arctan(T_Ed / N_Ed)',
   },
@@ -90,9 +92,9 @@ function situationPanel(g) {
       zahlzeile(g, 'gamma_phi', 'Partialfaktor', String.raw`\gamma_{\varphi}`,
         { schritt: 0.05, titel: 'Partialfaktor des Reibungswinkels, SIA 267:2013, 5.3.2.2' }),
       zahlzeile(g, 'c_k', 'Kohäsion', 'c_k',
-        { titel: 'Kohäsion, charakteristisch -- mit φ = 0 die undrainierte Scherfestigkeit' }),
+        { titel: 'Kohäsion, charakteristisch -- mit φ = 0 die undrainierte Scherfestigkeit; neben φ nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)' }),
       zahlzeile(g, 'gamma_c', 'Partialfaktor', String.raw`\gamma_c`,
-        { schritt: 0.05, titel: 'Partialfaktor der Kohäsion' }),
+        { schritt: 0.05, titel: 'Partialfaktor der Kohäsion, SIA 267:2013, 5.3.2.2, Tabelle 1 -- auch für s_u' }),
       zahlzeile(g, 'gamma', 'Raumlast Boden', String.raw`\gamma`, { schritt: 0.5 }),
       zahlzeile(g, 'gamma_w', 'Raumlast Wasser', String.raw`\gamma_w`, { schritt: 0.5 }),
       bemessungswerte(g),
@@ -111,11 +113,11 @@ function situationPanel(g) {
       zahlzeile(g, 't1', 'Grundwasser', 't_1',
         { schritt: 0.1, titel: 'Oberkante Terrain bis zum höchsten möglichen Grundwasserspiegel' }),
       zahlzeile(g, 'q_Ed', 'Auflast neben dem Fundament', 'q_{Ed}',
-        { titel: 'Bemessungslast auf dem Gelände neben dem Fundament' }),
+        { titel: 'Nur eine dauernde, auf beiden Seiten mindestens über L_Gl (Kap. 9.2.5); sie wirkt günstig' }),
     ]),
     karte('Sohlreibung', [
-      zahlzeile(g, 'delta_faktor', 'Reibung der Sohle', String.raw`\delta^{*}/\varphi`,
-        { schritt: 0.05, titel: 'δ* im Verhältnis zu φ -- meist zwischen 2/3 und 1' }),
+      zahlzeile(g, 'delta_faktor', 'Reibung der Sohle', String.raw`\delta_k/\varphi_k`,
+        { schritt: 0.05, titel: '1 bei rauer Sohle mit dem Bruch im Boden, ½ bis ⅔ bei glatter mit dem Bruch in der Fuge; δ_k höchstens 35° (SIA 267:2013, 8.4.1.1)' }),
     ]),
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [

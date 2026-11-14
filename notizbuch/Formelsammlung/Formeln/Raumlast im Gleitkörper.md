@@ -1,5 +1,5 @@
 ---
-erzeugt: 149c69889342
+erzeugt: 2c7360abae38
 art: formel
 tags: [formel]
 normstelle: "Kap. 9.2.8"
@@ -23,7 +23,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $\gamma$ | Raumlast des Bodens | kN/m³ | Vorgabe |
+| $\gamma$ | Raumlast des Bodens, ohne Partialfaktor | kN/m³ | Vorgabe |
 | $\gamma'$ | Raumlast des Bodens unter Auftrieb | kN/m³ | [[Raumlast unter Auftrieb]] |
 
 ## Beispiel

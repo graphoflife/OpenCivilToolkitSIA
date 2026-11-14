@@ -44,6 +44,47 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-14 · Normprüfung VI: Grundbruch, Gleiten und Setzung
+
+Sechster Bereich, an den Seiten bestätigt: SIA 267:2013, S. 30, 35–36,
+53–57; Lang, Huder, Amann, Puzrin, *Bodenmechanik und Grundbau*, 8. Aufl.
+2007, Kap. 1.4, 3.7, 5.3, 8.3–8.12, 9.2.5–9.2.18 und Anhang, Tabelle A1.
+
+- **Gleiten nach SIA 267** (8.4.1.1, 8.5.2.2): δ_k = min(k_δ · φ_k; 35°),
+  dann tan δ_d = tan δ_k / γ_φ. Vorher δ* = k_δ · φ_eff, ohne Grenze --
+  das Buch nennt keine, die Norm schon. φ_k = 40°, γ_φ = 1.2,
+  N_Ed = 1000 kN: T_Rd vorher 699 kN, jetzt 584 kN. Mit k_δ = ⅔ und
+  φ_k = 30° lag es 1.6 % zu hoch, mit k_δ = 1 und φ_k ≤ 35° bleibt alles
+  gleich. Der Feldtitel nennt die Regel der Norm statt «meist ⅔ bis 1».
+- **Gleiten undrainiert** (8.5.2.2, (32)): T_Rd = b · L · c_eff statt
+  null. b = L = 2 m, s_u = 30 kPa, γ_cu = 1.5: 80 kN; vorher war jede
+  Kombination mit T > 0 «nicht erfüllt». Der Satz, nach dem Buch zähle
+  keine Haftung, stand dort nicht.
+- **γ_R = 1.0 steht im Bericht** (8.5.2.1, (29), (30)); vorher fehlte er
+  ganz. Ob ein Feld dazukommt, entscheidet der Benutzer.
+- **Der Einflussfaktor J ist nachgeschlagen:** die Eckformel steht im
+  Anhang des Buches zu Tabelle A1, die Überlagerung in Kap. 3.7, Bild 3.15.
+  Die Rechnung trifft die Tabellen A1 und A2; «nicht nachgeschlagen» ist
+  fort.
+- **Verweise:** N_Rd Kap. 9.2.11 und SIA 267:2013, 8.5.3.5; s = s_W + s_E
+  Kap. 8.2, 8.5; der Punkt K Kap. 8.10, Bild 8.15; c_eff 5.3.2.1, (5); γ_c
+  und γ Tabelle 1; t₁ 4.2.2.3; q_Ed Kap. 9.2.5; k_δ 8.4.1.1; s_zul 8.5.4.1;
+  Δz_max Kap. 8.3; q_W, q_E Kap. 8.5; M_E Kap. 5.3, 8.5 und 5.3.2.8 (im
+  Gebrauch ohne Partialfaktor). Der Titel des Buches steht im Code.
+- **Hinweise:** die Auflast zählt nur dauernd und beidseitig über L_Gl
+  (Kap. 9.2.5); c' neben φ' nur bei dauerhafter Wirkung, feinkörnige Böden
+  kurz- und langfristig (8.5.1.5, 8.5.1.6); günstiges Eigengewicht mit
+  γ_G,inf = 1.0 (8.5.2.4); bei Ausmitte die wirksamen Masse eingeben; der
+  Boden einheitlich bis H_Gl (Kap. 9.2.10; 8.4.4.1); γ' aus der feuchten
+  Raumlast liegt sicher.
+- **Formelseiten:** «die Summe liegt auf der sicheren Seite» bei der
+  erweiterten Tragfähigkeitsformel stand nicht im Buch -- es nennt sie eine
+  Näherung (9.2.9). Der Satz von Caquot ist als Herleitung ausserhalb des
+  Buches gekennzeichnet.
+- **Offen für den Benutzer** ([[TODO]]): ein Feld γ_R; ein Feld γ_g für
+  den Boden unter Wasser; φ_k über 45°; die Startwerte der Setzung, vor
+  allem M'_E = 3 · M_E statt 8 bis 10 · M_E.
+
 ## 2026-11-14 · Normprüfung V: Decke und Balkensystem
 
 Fünfter Bereich, an den Normseiten bestätigt (SIA 262:2025, S. 43–45, 54,

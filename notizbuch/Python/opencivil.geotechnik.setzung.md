@@ -1,5 +1,5 @@
 ---
-erzeugt: 5503c1a47c56
+erzeugt: 858e0abfa231
 art: modul
 tags: [modul]
 ---
@@ -33,7 +33,7 @@ Tabelle 8.4. Die Setzung ist die Summe über alle Teilschichten; unter der
 untersten Schicht gilt der Baugrund als unzusammendrückbar (Bild 8.1).
 
 
-## DER EINFLUSSFAKTOR (Kap. 8.2)
+## DER EINFLUSSFAKTOR (Kap. 3.7, Bild 3.15; Anhang, Tabelle A1)
 
 Die Zusatzspannung unter einer gleichmässig belasteten Rechteckfläche nach
 Boussinesq, Δσ'_z = J · q. Unter einer Ecke eines Rechtecks a × b in der
@@ -45,7 +45,7 @@ R   = √(a² + b² + z²)
 ```
 
 Unter einem anderen Punkt der Fläche die Summe der vier Rechtecke, die sich in
-ihm treffen ([[opencivil.geotechnik.setzung#einflussfaktor|einflussfaktor]]). Welcher Punkt, sagt die
+ihm treffen ([[opencivil.geotechnik.setzung#einflussfaktor|einflussfaktor]]), wie Bild 3.15 sie überlagert. Welcher Punkt, sagt die
 [[opencivil.geotechnik.setzung#Steifigkeit|Steifigkeit]] (Kap. 8.10): beim starren Fundament der kennzeichnende
 Punkt K, 0.13 L und 0.13 B von einer Ecke (Bild 8.15) -- dort setzt sich die
 schlaffe Last so stark, wie sich das starre Fundament im Mittel setzt; beim
@@ -54,12 +54,12 @@ schlaffen die Mitte, wo die Setzungsmulde am tiefsten ist.
 
 ## QUELLE
 
-Das Kapitel 8 «Setzungsberechnung», das der Benutzer geliefert hat; der
-Abschnitt steht an jeder Formel. Die Formel für J_E steht dort nicht -- das
-Kapitel verweist auf Kapitel 3, das nicht vorliegt. Sie gibt die Werte J_K
-der Tabelle 8.4 auf die gedruckte Stelle wieder und die Grenztiefen der
-Tabelle 8.5 so genau, wie sie dort stehen (tests/test_setzung.py); nicht
-nachgeschlagen (notizbuch/Notizen/TODO.md).
+Lang, Huder, Amann, Puzrin: Bodenmechanik und Grundbau, 8. Aufl. 2007, Kap. 8
+«Setzungsberechnung»; der Abschnitt steht an jeder Formel, «Kap.» meint
+dieses Buch. Die Formel für J_E steht dort im Anhang, zu Tabelle A1, und die
+Überlagerung in Kap. 3.7. Sie gibt die Tabellen A1 und A2 wieder, J_K der
+Tabelle 8.4 auf die gedruckte Stelle und die Grenztiefen der Tabelle 8.5 so
+genau, wie sie dort stehen (tests/test_setzung.py).
 
 
 ## EINHEITEN
@@ -345,7 +345,8 @@ Die Schichten, wie man sie im Schnitt sieht: Tiefe, M_E-Werte und ihr Beitrag zu
 ## Konstanten
 
 - `K = 0.13` – Wo der kennzeichnende Punkt K liegt: 0.13 L und 0.13 B von einer Ecke (Bild 8.15).
-- `KAP_PRINZIP = 'Kap. 8.2'` – Die Abschnitte des gelieferten Kapitels, an den Formeln als Referenz.
+- `KAP_PRINZIP = 'Kap. 8.2'` – Die Abschnitte des Buches, an den Formeln als Referenz.
+- `KAP_EINFLUSSFAKTOR = 'Kap. 3.7, Bild 3.15; Anhang, Tabelle A1'`
 - `KAP_TABELLE = 'Kap. 8.3, Tabelle 8.4'`
 - `KAP_EINFLUSSTIEFE = 'Kap. 8.4'`
 - `KAP_WIEDERBELASTUNG = 'Kap. 8.5'`

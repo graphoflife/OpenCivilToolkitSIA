@@ -489,6 +489,17 @@
       ]
     },
     {
+      "name": "Bemessungswert des Sohlreibungswinkels",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert des Sohlreibungswinkels.md",
+      "art": "formel",
+      "zeichen": [
+        "\\delta_d"
+      ],
+      "themen": [
+        "Gleiten"
+      ]
+    },
+    {
       "name": "Beton linear, ohne Zug",
       "pfad": "Formelsammlung/Formeln/Beton linear, ohne Zug.md",
       "art": "formel",
@@ -1873,7 +1884,7 @@
       "pfad": "Formelsammlung/Formeln/Reibungswinkel der Sohlfuge.md",
       "art": "formel",
       "zeichen": [
-        "\\delta^{*}"
+        "\\delta_k"
       ],
       "themen": [
         "Gleiten"
@@ -3754,6 +3765,8 @@
         "_hoch5",
         "Gleiten",
         "Gleiten.pruefe",
+        "Gleiten._sohlreibung",
+        "Gleiten._widerstand",
         "angaben",
         "faktortabelle"
       ]

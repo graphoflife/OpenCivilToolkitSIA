@@ -1,11 +1,11 @@
 ---
-erzeugt: 47a831b09cf2
+erzeugt: bd93af312d4a
 art: formel
 tags: [formel]
-normstelle: "Kap. 8.2"
+normstelle: "Kap. 3.7, Bild 3.15; Anhang, Tabelle A1"
 ---
 > [!info] Normstelle
-> Kap. 8.2
+> Kap. 3.7, Bild 3.15; Anhang, Tabelle A1
 
 *In der Herleitung: «Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die sich im Punkt treffen»*
 
@@ -34,7 +34,8 @@ die sich in ihm treffen, und zählt ihre Eckwerte zusammen. In der Sohle ist
 $J = 1$; mit der Tiefe nimmt er ab, unter langen Streifen langsamer als unter
 quadratischen Flächen (Tabelle 8.5).
 
-Das Kapitel 8 verwendet $J$, die Formel selbst steht in Kapitel 3, das nicht
-vorliegt. Sie gibt die Werte $J_K$ der Tabelle 8.4 auf die gedruckte Stelle
-wieder und die Grenztiefen der Tabelle 8.5 so genau, wie sie dort abgelesen
-sind -- nachgeschlagen ist sie nicht.
+Das Kapitel 8 verwendet $J$; die Eckformel steht im Anhang des Buches, zu
+Tabelle A1, und wie man die vier Rechtecke überlagert, in Kap. 3.7 mit
+Bild 3.15. Die Rechnung gibt die Tabellen A1 und A2 wieder, die Werte $J_K$
+der Tabelle 8.4 auf die gedruckte Stelle und die Grenztiefen der Tabelle 8.5
+so genau, wie sie dort abgelesen sind.

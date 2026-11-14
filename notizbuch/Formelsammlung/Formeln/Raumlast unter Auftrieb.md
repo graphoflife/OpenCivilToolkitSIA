@@ -1,5 +1,5 @@
 ---
-erzeugt: b1516e258e43
+erzeugt: 55a8e4af5845
 art: formel
 tags: [formel]
 ---
@@ -16,7 +16,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $\gamma$ | Raumlast des Bodens | kN/m³ | Vorgabe |
+| $\gamma$ | Raumlast des Bodens, ohne Partialfaktor | kN/m³ | Vorgabe |
 | $\gamma_w$ | Raumlast des Wassers | kN/m³ | Vorgabe |
 
 ## Beispiel
@@ -46,8 +46,12 @@ $$
 
 Unter dem Grundwasserspiegel trägt das Wasser einen Teil des Bodengewichts:
 jedes Korn erfährt Auftrieb. Für die wirksamen Spannungen zählt darum nur
-$\gamma' = \gamma - \gamma_w$. Mit $\gamma = 21$ und
-$\gamma_w = 10\ \mathrm{kN/m^3}$ bleibt etwa die Hälfte.
+die Raumlast unter Auftrieb. Das Buch bildet sie aus der gesättigten
+Raumlast, $\gamma' = \gamma_g - \gamma_w$ (Kap. 1.4); das Werkzeug kennt
+nur eine Raumlast $\gamma$ und nimmt sie auch unter dem Wasser. Ist sie die
+feuchte, wird $\gamma'$ etwas kleiner: mit $\gamma = 21$ statt
+$\gamma_g = 22\ \mathrm{kN/m^3}$ 11 statt 12, gut 8 % weniger. Das
+liegt auf der sicheren Seite, denn $\gamma'$ hält den Gleitkörper nieder.
 
 Wo das Wasser steht, entscheidet die [[Überlagerung auf Höhe der Sohle]] und
 die [[Raumlast im Gleitkörper]].

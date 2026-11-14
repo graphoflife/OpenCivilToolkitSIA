@@ -69,7 +69,7 @@ def _legende(fundament: setzung.Setzungsfundament, befund: setzung.Setzungsbefun
         punkt = zeile("Starr: gerechnet im Punkt K, ", Mathe(masszahl(x, M, 2)), " längs ",
                       Mathe("L"), " und ", Mathe(masszahl(y, M, 2)), " längs ", Mathe("B"),
                       " von einer Ecke – seine Setzung ist die mittlere des Fundaments "
-                      "(Bild 8.15).")
+                      "(Kap. 8.10, Bild 8.15).")
     teile = " + ".join(Groesse.aus_si(t, MM).formatiert(1) for t in (befund.s_W, befund.s_E))
     return [
         punkt,

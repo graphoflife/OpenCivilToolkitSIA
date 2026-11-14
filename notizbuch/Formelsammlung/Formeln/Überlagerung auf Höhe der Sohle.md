@@ -1,5 +1,5 @@
 ---
-erzeugt: 58bc1da03ced
+erzeugt: 94c3d4c87117
 art: formel
 tags: [formel]
 normstelle: ["Kap. 9.2.8", "Kap. 9.2.17"]
@@ -23,9 +23,9 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $\gamma$ | Raumlast des Bodens | kN/m³ | Vorgabe |
+| $\gamma$ | Raumlast des Bodens, ohne Partialfaktor | kN/m³ | Vorgabe |
 | $t$ | Tiefe der Sohle unter Terrain | m | Vorgabe |
-| $q_{Ed}$ | Bemessungslast neben dem Fundament | kPa | Vorgabe |
+| $q_{Ed}$ | Dauernde Auflast neben dem Fundament | kPa | Vorgabe |
 | $t_1$ | Tiefe des höchsten Grundwasserspiegels unter Terrain | m | Vorgabe |
 | $\gamma'$ | Raumlast des Bodens unter Auftrieb | kN/m³ | [[Raumlast unter Auftrieb]] |
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0239ff83297e
+erzeugt: ad0f0f4a73fa
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -45,7 +45,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Fundament]] · 3
 - [[Grundbruch]] · 28
-- [[Gleiten]] · 3
+- [[Gleiten]] · 4
 
 **Setzung**
 
@@ -85,6 +85,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
+- [[Bemessungswert des Sohlreibungswinkels]] · $\delta_d$
 - [[Beton linear, ohne Zug]]
 - [[Beton ungerissen, in Druck und Zug]]
 - [[Betonstahl nur auf Zug]]
@@ -209,7 +210,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt eines Bügelschenkels]] · $A_{\varnothing,V}$
 - [[Raumlast im Gleitkörper]] · $\gamma_G$
 - [[Raumlast unter Auftrieb]] · $\gamma'$
-- [[Reibungswinkel der Sohlfuge]] · $\delta^{*}$
+- [[Reibungswinkel der Sohlfuge]] · $\delta_k$
 - [[Reichweite des Gleitkörpers]] · $L_{Gl}$
 - [[Rissaktive Dicke des gezeichneten Querschnitts]] · $t$
 - [[Rissaktive Plattendicke]] · $h_{eff}$
@@ -283,13 +284,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-87 von 223 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+86 von 224 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Arbeitsgleiche Knotenkräfte]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
-- [[Bemessungswert der Kohäsion]] · [[opencivil.geotechnik.grundbruch|_c_eff]]
 - [[Betonstahl nur auf Zug]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Bewehrung der Lage]] · [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]

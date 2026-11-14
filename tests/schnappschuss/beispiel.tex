@@ -950,11 +950,11 @@ T_{Rd} = 78.9\,\mathrm{kNm}
 \begin{equation*}
 \varphi_k = 32{}^{\circ}
 \end{equation*}
-\noindent\textbf{Partialfaktor des Reibungswinkels} \hfill \normref{SIA 267:2013, 5.3.2.2}
+\noindent\textbf{Partialfaktor des Reibungswinkels} \hfill \normref{SIA 267:2013, 5.3.2.2, Tabelle 1}
 \begin{equation*}
 \gamma_{\varphi} = 1.2
 \end{equation*}
-\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1}
+\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1, (5)}
 \begin{equation*}
 \varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 32{}^{\circ}}{1.2}\right) = 27.51{}^{\circ}
 \end{equation*}
@@ -962,15 +962,15 @@ T_{Rd} = 78.9\,\mathrm{kNm}
 \begin{equation*}
 c_k = 0\,\mathrm{kPa}
 \end{equation*}
-\noindent\textbf{Partialfaktor der Kohäsion}
+\noindent\textbf{Partialfaktor der Kohäsion} \hfill \normref{SIA 267:2013, 5.3.2.2, Tabelle 1}
 \begin{equation*}
 \gamma_c = 1.5
 \end{equation*}
-\noindent\textbf{Kohäsion, Bemessungswert}
+\noindent\textbf{Kohäsion, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1, (5)}
 \begin{equation*}
 c_{eff} = \frac{c_k}{\gamma_c} = \frac{0\,\mathrm{kPa}}{1.5} = 0\,\mathrm{kPa}
 \end{equation*}
-\noindent\textbf{Raumlast des Bodens}
+\noindent\textbf{Raumlast des Bodens, ohne Partialfaktor} \hfill \normref{SIA 267:2013, 5.3.2.2, Tabelle 1}
 \begin{equation*}
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
@@ -982,7 +982,7 @@ c_{eff} = \frac{c_k}{\gamma_c} = \frac{0\,\mathrm{kPa}}{1.5} = 0\,\mathrm{kPa}
 \begin{equation*}
 \gamma' = \gamma - \gamma_w = 21\,\mathrm{kN}/\mathrm{m}^{3} - 10\,\mathrm{kN}/\mathrm{m}^{3} = 11\,\mathrm{kN}/\mathrm{m}^{3}
 \end{equation*}
-\noindent\textbf{Bemessungslast neben dem Fundament}
+\noindent\textbf{Dauernde Auflast neben dem Fundament} \hfill \normref{Kap. 9.2.5}
 \begin{equation*}
 q_{Ed} = 0\,\mathrm{kPa}
 \end{equation*}
@@ -994,7 +994,7 @@ b = 2\,\mathrm{m}
 \begin{equation*}
 L = 2.5\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{Tiefe des höchsten Grundwasserspiegels unter Terrain}
+\noindent\textbf{Tiefe des höchsten Grundwasserspiegels unter Terrain} \hfill \normref{SIA 267:2013, 4.2.2.3}
 \begin{equation*}
 t_1 = 5\,\mathrm{m}
 \end{equation*}
@@ -1011,6 +1011,7 @@ t = 1.2\,\mathrm{m}
 \beta = 0{}^{\circ}
 \end{equation*}
 \subsection{Grundbruch}
+\hinweis{Annahme}{Grundbruch- und Gleitwiderstand ohne Widerstandsbeiwert, γ\_R = 1.0. SIA 267:2013 teilt beide durch γ\_R, in der Regel 1.0 bis 1.2, und lässt 1.0 bei bewährten, zuverlässigen Verfahren zu (8.5.2.1, (29), (30)); die Tragfähigkeitsformel nennt das Buch eine Näherung (Kap. 9.2.9).}
 \noindent\textbf{Erweiterte Tragfähigkeitsformel} \hfill \normref{Kap. 9.2.10}
 \begin{equation*}
 \sigma_f = c \, N_c s_c d_c i_c g_c b_c + \sigma_{v,0} \, N_q s_q d_q i_q g_q b_q + \tfrac{1}{2} \gamma_G \, b \, N_{\gamma} s_{\gamma} d_{\gamma} i_{\gamma} g_{\gamma} b_{\gamma} \qquad N_{Rd} = \sigma_f \cdot b \cdot L
@@ -1045,6 +1046,7 @@ N_{\gamma} = 1.8 \cdot \left(N_q - 1\right) \cdot \tan \varphi_{eff} = 1.8 \cdot
   &= 2.92\,\mathrm{m}
 \end{aligned}
 \end{equation*}
+\hinweis{Annahme}{Der Boden ist bis H\_Gl unter der Sohle einheitlich, wie das Buch es voraussetzt (Kap. 9.2.10). Bei Schichten erlaubt SIA 267:2013, 8.4.4.1, vorsichtig gemittelte Werte über die Schichten, die der Bruch erfasst.}
 \noindent\textbf{Überlagerung auf Höhe der Sohle, Grundwasser tiefer} \hfill \normref{Kap. 9.2.8}
 \begin{equation*}
 \sigma_{v,0} = \gamma \cdot t + q_{Ed} = 21\,\mathrm{kN}/\mathrm{m}^{3} \cdot 1.2\,\mathrm{m} + 0\,\mathrm{kPa} = 25.2\,\mathrm{kPa}
@@ -1148,7 +1150,7 @@ i_c = i_q - \frac{1 - i_q}{N_q - 1} = 0.77 - \frac{1 - 0.77}{13.95 - 1} = 0.76
   &= 568.8\,\mathrm{kPa}
 \end{aligned}
 \end{equation*}
-\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.11; SIA 267:2013, 8.5.3.5}
 \begin{equation*}
 N_{Rd} = \sigma_f \cdot b \cdot L = 568.8\,\mathrm{kPa} \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
 \end{equation*}
@@ -1160,19 +1162,23 @@ N_{Ed} = 1500\,\mathrm{kN} \quad \le \quad N_{Rd} = 2843.8\,\mathrm{kN}
 \begin{equation*}
 \alpha_{eff,GB,\text{Tragsicherheit}} = \frac{N_{Rd}}{N_{Ed}} = \frac{2843.8\,\mathrm{kN}}{1500\,\mathrm{kN}} = 1.90 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
-\noindent\textbf{Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ}
+\noindent\textbf{Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ\_k/φ\_k} \hfill \normref{SIA 267:2013, 8.4.1.1}
 \begin{equation*}
 k_{\delta} = 1
 \end{equation*}
 \subsection{Gleiten}
-\noindent\textbf{Reibungswinkel der Sohlfuge} \hfill \normref{Kap. 9.2.18}
+\noindent\textbf{Sohlreibungswinkel, charakteristisch} \hfill \normref{SIA 267:2013, 8.4.1.1, (27), (28)}
 \begin{equation*}
-\delta^{*} = k_{\delta} \cdot \varphi_{eff} = 1 \cdot 27.51{}^{\circ} = 27.51{}^{\circ}
+\delta_k = \min\left[k_{\delta} \cdot \varphi_k;\ 35^\circ\right] = \min\left[1 \cdot 32{}^{\circ};\ 35^\circ\right] = 32{}^{\circ}
+\end{equation*}
+\noindent\textbf{Sohlreibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 8.5.2.2}
+\begin{equation*}
+\delta_d = \arctan\left(\frac{\tan \delta_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 32{}^{\circ}}{1.2}\right) = 27.51{}^{\circ}
 \end{equation*}
 \subsubsection{Gleiten – Tragsicherheit}
-\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{SIA 267:2013, 8.5.2.2, (31)}
 \begin{equation*}
-T_{Rd} = N_{Ed} \cdot \tan \delta^{*} = 1500\,\mathrm{kN} \cdot \tan 27.51{}^{\circ} = 781.1\,\mathrm{kN}
+T_{Rd} = N_{Ed} \cdot \tan \delta_d = 1500\,\mathrm{kN} \cdot \tan 27.51{}^{\circ} = 781.1\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Einwirkung gegen Widerstand}
 \begin{equation*}
@@ -1191,19 +1197,19 @@ B = 2\,\mathrm{m}
 \begin{equation*}
 L = 2.5\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{Pressung aus Wiederbelastung}
+\noindent\textbf{Pressung aus Wiederbelastung} \hfill \normref{Kap. 8.5}
 \begin{equation*}
 q_W = 24\,\mathrm{kN}/\mathrm{m}^{2}
 \end{equation*}
-\noindent\textbf{Pressung aus Erstbelastung}
+\noindent\textbf{Pressung aus Erstbelastung} \hfill \normref{Kap. 8.5}
 \begin{equation*}
 q_E = 196\,\mathrm{kN}/\mathrm{m}^{2}
 \end{equation*}
-\noindent\textbf{Zulässige Setzung}
+\noindent\textbf{Zulässige Setzung, je Bauwerk festzulegen} \hfill \normref{SIA 267:2013, 8.5.4.1; Kap. 8.12}
 \begin{equation*}
 s_{zul} = 25\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Grösste Dicke einer Teilschicht}
+\noindent\textbf{Grösste Dicke einer Teilschicht} \hfill \normref{Kap. 8.3}
 \begin{equation*}
 \Delta z_{max} = 0.5\,\mathrm{m}
 \end{equation*}
@@ -1211,11 +1217,11 @@ s_{zul} = 25\,\mathrm{mm}
 \begin{equation*}
 d_{1} = 2\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{M\_E-Wert der Schicht 1, Erstbelastung}
+\noindent\textbf{M\_E-Wert der Schicht 1, Erstbelastung} \hfill \normref{Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8}
 \begin{equation*}
 M_{E,1} = 60\,\mathrm{MN}/\mathrm{m}^{2}
 \end{equation*}
-\noindent\textbf{M\_E-Wert der Schicht 1, Wiederbelastung}
+\noindent\textbf{M\_E-Wert der Schicht 1, Wiederbelastung} \hfill \normref{Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8}
 \begin{equation*}
 M'_{E,1} = 180\,\mathrm{MN}/\mathrm{m}^{2}
 \end{equation*}
@@ -1223,11 +1229,11 @@ M'_{E,1} = 180\,\mathrm{MN}/\mathrm{m}^{2}
 \begin{equation*}
 d_{2} = 3\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{M\_E-Wert der Schicht 2, Erstbelastung}
+\noindent\textbf{M\_E-Wert der Schicht 2, Erstbelastung} \hfill \normref{Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8}
 \begin{equation*}
 M_{E,2} = 15\,\mathrm{MN}/\mathrm{m}^{2}
 \end{equation*}
-\noindent\textbf{M\_E-Wert der Schicht 2, Wiederbelastung}
+\noindent\textbf{M\_E-Wert der Schicht 2, Wiederbelastung} \hfill \normref{Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8}
 \begin{equation*}
 M'_{E,2} = 45\,\mathrm{MN}/\mathrm{m}^{2}
 \end{equation*}
@@ -1235,11 +1241,11 @@ M'_{E,2} = 45\,\mathrm{MN}/\mathrm{m}^{2}
 \begin{equation*}
 d_{3} = 4\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{M\_E-Wert der Schicht 3, Erstbelastung}
+\noindent\textbf{M\_E-Wert der Schicht 3, Erstbelastung} \hfill \normref{Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8}
 \begin{equation*}
 M_{E,3} = 100\,\mathrm{MN}/\mathrm{m}^{2}
 \end{equation*}
-\noindent\textbf{M\_E-Wert der Schicht 3, Wiederbelastung}
+\noindent\textbf{M\_E-Wert der Schicht 3, Wiederbelastung} \hfill \normref{Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8}
 \begin{equation*}
 M'_{E,3} = 250\,\mathrm{MN}/\mathrm{m}^{2}
 \end{equation*}
@@ -1259,12 +1265,12 @@ x_K = 0.13 \cdot L = 0.13 \cdot 2.5\,\mathrm{m} = 0.33\,\mathrm{m}
 \begin{equation*}
 y_K = 0.13 \cdot B = 0.13 \cdot 2\,\mathrm{m} = 0.26\,\mathrm{m}
 \end{equation*}
-\noindent\textbf{Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die sich im Punkt treffen} \hfill \normref{Kap. 8.2}
+\noindent\textbf{Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die sich im Punkt treffen} \hfill \normref{Kap. 3.7, Bild 3.15; Anhang, Tabelle A1}
 \begin{equation*}
 \begin{aligned} J &= J_E(x, y) + J_E(L - x, y) + J_E(x, B - y) + J_E(L - x, B - y) \\ J_E(a, b) &= \frac{1}{2\pi} \left[\arctan\frac{a \, b}{z \, R} + \frac{a \, b \, z}{R} \left(\frac{1}{a^2 + z^2} + \frac{1}{b^2 + z^2}\right)\right] \qquad R = \sqrt{a^2 + b^2 + z^2} \end{aligned}
 \end{equation*}
 \subsubsection{Teilschichten}
-Jede Schicht in gleich dicke Teilschichten von höchstens Δz\_max = 0.5 m; J an Ober- und Unterkante, gemittelt. z ab der Sohle.
+Jede Schicht in gleich dicke Teilschichten von höchstens Δz\_max = 0.5 m; J an Ober- und Unterkante, gemittelt (Kap. 8.3, Tabelle 8.4). z ab der Sohle.
 
 \noindent\textbf{Setzung je Teilschicht}
 \begin{longtable}{lrrrrrrr}
@@ -1314,7 +1320,7 @@ s_W = \sum \Delta s_W = 0.4\,\mathrm{mm}
 \begin{equation*}
 s_E = \sum \Delta s_E = 9.5\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Setzung} \hfill \normref{Kap. 8.2}
+\noindent\textbf{Setzung} \hfill \normref{Kap. 8.2, 8.5}
 \begin{equation*}
 s = s_W + s_E = 0.4\,\mathrm{mm} + 9.5\,\mathrm{mm} = 9.9\,\mathrm{mm}
 \end{equation*}
@@ -2031,11 +2037,11 @@ v_{Rd,s} = \frac{A_{sw}}{s}\, f_{yd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_
 T_{Zellen} = T_{Ed} - \Delta T
 \end{equation*}
 \subsection{Fundament}
-\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1}
+\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1, (5)}
 \begin{equation*}
 \varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right)
 \end{equation*}
-\noindent\textbf{Kohäsion, Bemessungswert}
+\noindent\textbf{Kohäsion, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1, (5)}
 \begin{equation*}
 c_{eff} = \frac{c_k}{\gamma_c}
 \end{equation*}
@@ -2146,20 +2152,24 @@ i_{\gamma} = \left[1 - \frac{\left(0.7 - \frac{\alpha}{450^\circ}\right) \cdot T
 \begin{equation*}
 \sigma_f = c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma}
 \end{equation*}
-\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.11; SIA 267:2013, 8.5.3.5}
 \begin{equation*}
 N_{Rd} = \sigma_f \cdot b \cdot L
 \end{equation*}
 \subsection{Gleiten}
-Die Kraft T in der Sohle muss durch Reibung zwischen Fundament und Boden aufgenommen werden. Der Reibungswinkel δ* der Sohlfuge liegt meist zwischen 2/3 φ und φ; ein Erdwiderstand vor dem Fundament wird nicht angesetzt.
+Die Kraft T in der Sohle muss die Sohlfuge aufnehmen: drainiert durch Reibung zwischen Fundament und Boden, undrainiert durch die Scherfestigkeit des Bodens. Ein Erdwiderstand vor dem Fundament wird nicht angesetzt.
 
-\noindent\textbf{Reibungswinkel der Sohlfuge} \hfill \normref{Kap. 9.2.18}
+\noindent\textbf{Sohlreibungswinkel, charakteristisch} \hfill \normref{SIA 267:2013, 8.4.1.1, (27), (28)}
 \begin{equation*}
-\delta^{*} = k_{\delta} \cdot \varphi_{eff}
+\delta_k = \min\left[k_{\delta} \cdot \varphi_k;\ 35^\circ\right]
 \end{equation*}
-\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\noindent\textbf{Sohlreibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 8.5.2.2}
 \begin{equation*}
-T_{Rd} = N_{Ed} \cdot \tan \delta^{*}
+\delta_d = \arctan\left(\frac{\tan \delta_k}{\gamma_{\varphi}}\right)
+\end{equation*}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{SIA 267:2013, 8.5.2.2, (31)}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta_d
 \end{equation*}
 \subsection{Setzung}
 Unter der Last drückt sich das Korngerüst des Bodens zusammen. Je Teilschicht zählt die Zusatzspannung, die von der Pressung in der Sohle in ihrer Tiefe noch ankommt, und der M\_E-Wert ihrer Schicht: was den Boden nur wieder so stark belastet, wie er schon einmal belastet war, mit dem Modul der Wiederbelastung M'\_E, was darüber hinausgeht, mit dem der Erstbelastung M\_E. Unter der untersten Schicht gilt der Baugrund als unzusammendrückbar.
@@ -2176,7 +2186,7 @@ x_K = 0.13 \cdot L
 \begin{equation*}
 y_K = 0.13 \cdot B
 \end{equation*}
-\noindent\textbf{Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die sich im Punkt treffen} \hfill \normref{Kap. 8.2}
+\noindent\textbf{Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die sich im Punkt treffen} \hfill \normref{Kap. 3.7, Bild 3.15; Anhang, Tabelle A1}
 \begin{equation*}
 \begin{aligned} J &= J_E(x, y) + J_E(L - x, y) + J_E(x, B - y) + J_E(L - x, B - y) \\ J_E(a, b) &= \frac{1}{2\pi} \left[\arctan\frac{a \, b}{z \, R} + \frac{a \, b \, z}{R} \left(\frac{1}{a^2 + z^2} + \frac{1}{b^2 + z^2}\right)\right] \qquad R = \sqrt{a^2 + b^2 + z^2} \end{aligned}
 \end{equation*}
@@ -2188,7 +2198,7 @@ s_W = \sum \Delta s_W
 \begin{equation*}
 s_E = \sum \Delta s_E
 \end{equation*}
-\noindent\textbf{Setzung} \hfill \normref{Kap. 8.2}
+\noindent\textbf{Setzung} \hfill \normref{Kap. 8.2, 8.5}
 \begin{equation*}
 s = s_W + s_E
 \end{equation*}
@@ -2494,8 +2504,8 @@ Breite des Fundaments & $b$ & $2$ & m & Vorgabe \\
 Neigung des Geländes & $\beta$ & $0$ & ° & Vorgabe \\
 Kohäsion, Bemessungswert & $c_{eff}$ & $0$ & kPa & berechnet \\
 Kohäsion, charakteristisch & $c_k$ & $0$ & kPa & Vorgabe \\
-Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ & $k_{\delta}$ & $1$ &  & Vorgabe \\
-Raumlast des Bodens & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
+Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ\_k/φ\_k & $k_{\delta}$ & $1$ &  & Vorgabe \\
+Raumlast des Bodens, ohne Partialfaktor & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
 Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
 Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
 Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
@@ -2504,7 +2514,7 @@ Erfüllungsgrad Gleiten – Tragsicherheit & $\alpha_{eff,GL,\text{Tragsicherhei
 Erfüllungsgrad Grundbruch – Tragsicherheit & $\alpha_{eff,GB,\text{Tragsicherheit}}$ & $1.90$ &  & berechnet \\
 Reibungswinkel, Bemessungswert & $\varphi_{eff}$ & $27.51$ & ° & berechnet \\
 Reibungswinkel, charakteristisch & $\varphi_k$ & $32$ & ° & Vorgabe \\
-Bemessungslast neben dem Fundament & $q_{Ed}$ & $0$ & kPa & Vorgabe \\
+Dauernde Auflast neben dem Fundament & $q_{Ed}$ & $0$ & kPa & Vorgabe \\
 Tiefe der Sohle unter Terrain & $t$ & $1.2$ & m & Vorgabe \\
 Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_1$ & $5$ & m & Vorgabe \\
 Grösstkorndurchmesser & $D_{max}$ & $32$ & mm & Vorgabe \\
@@ -2629,7 +2639,7 @@ Grösste Dicke einer Teilschicht & $\Delta z_{max}$ & $0.5$ & m & Vorgabe \\
 Erfüllungsgrad Setzung & $\alpha_{eff,s}$ & $2.54$ &  & berechnet \\
 Pressung aus Erstbelastung & $q_E$ & $196$ & kN/m² & Vorgabe \\
 Pressung aus Wiederbelastung & $q_W$ & $24$ & kN/m² & Vorgabe \\
-Zulässige Setzung & $s_{zul}$ & $25$ & mm & Vorgabe \\
+Zulässige Setzung, je Bauwerk festzulegen & $s_{zul}$ & $25$ & mm & Vorgabe \\
 \hline
 \end{xltabular}
 \end{document}
