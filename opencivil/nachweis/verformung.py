@@ -14,24 +14,31 @@ Vergroesserungsfaktor omega_w -- in der Norm w/w_c, SIA 262:2025, 4.4.3.2.5
 -- fuehrt sie auf die Durchbiegung der gerissenen Platte unter Dauerlast.
 
 EIN FAKTOR JE SEITE, NICHT JE FALL:
-``rho = A_s/(b·d)`` gehoert zur gezogenen Seite, ``rho'`` zur Gegenseite, mit
-``d'`` vom gezogenen Rand bis zur Gegenlage -- das ist deren statische Hoehe:
-``rho'`` der einen Seite ist das ``rho`` der anderen. Der Faktor haengt also
-nur an der Platte und an der gezogenen Seite: :class:`Vergroesserungsfaktor`
-rechnet ihn je Seite mit x-Bewehrung, immer -- unten omega_w, oben omega_w'
---, denn die Zusammenfassung zeigt beide als Kennzahl (Benutzer,
-2026-10-16). Der Nachweis liest ihn fuer jeden Fall seiner Seite. Die
-x-Posten einer Seite zaehlen zusammen, in ihrem Schwerpunkt. Fehlt die
-Gegenseite, ist ``rho' = 0``; fehlt die gezogene, gibt es keinen Faktor, und
-der Fall laesst sich nicht nachweisen.
+``rho = A_s/(b·d)`` gehoert zur gezogenen Seite, ``rho' = A_s'/(b·d)`` zur
+Gegenseite -- beide mit dem ``d`` der gezogenen Seite (SIA 262:2025,
+4.4.3.2.5). Bis 2026-11-14 bezog sich ``rho'`` auf die statische Hoehe der
+Gegenseite; im Beispiel aenderte das omega_w um ein Promille. Der Faktor
+haengt nur an der Platte und an der gezogenen Seite:
+:class:`Vergroesserungsfaktor` rechnet ihn je Seite mit x-Bewehrung, immer
+-- unten omega_w, oben omega_w' --, denn die Zusammenfassung zeigt beide als
+Kennzahl (Benutzer, 2026-10-16). Der Nachweis liest ihn fuer jeden Fall
+seiner Seite. Die x-Posten einer Seite zaehlen zusammen, in ihrem
+Schwerpunkt. Fehlt die Gegenseite, ist ``rho' = 0``; fehlt die gezogene,
+gibt es keinen Faktor, und der Fall laesst sich nicht nachweisen. Ab
+``rho' = 5 %`` waere der Faktor nicht mehr positiv: dann gibt es keinen
+Nachweis.
 
-Das phi gehoert der Verformung der Platte, Vorgabe 2.
+Das phi gehoert der Verformung der Platte, Vorgabe 2; die Norm bestimmt es
+nach 3.1.2.6.
 
-NACH VORGABE:
-Der Grenzwert L/350 und dass ``w`` mit E_cm ermittelt ist, stehen so, wie
-der Benutzer sie vorgegeben hat -- nicht nachgeschlagen
-(``notizbuch/Notizen/TODO.md``). Die Formel des Faktors und ihre Normstelle
-hat er geliefert.
+DIE NORM:
+``w`` mit E_cm heisst mit ``gamma_cE = 1.0`` (4.2.1.16). Den Grenzwert gibt
+SIA 262 an SIA 260 weiter (4.4.3.1.1): L/350 steht in SIA 260:2013,
+Anhang A, Tabelle 3, unter haeufiger Last fuer Funktionstuechtigkeit und
+Komfort; welches Kriterium gilt, legt das Projekt fest (4.4.3.2.1). Die
+Tabelle meint dort nur einen Teil der Durchbiegung -- was nach dem Einbau
+der Einbauten dazukommt, oder was die veraenderlichen Lasten bewirken.
+Gehalten wird die ganze samt Kriechen; das liegt sicher.
 
 EINHEITEN:
 Alles in SI-Basis; ``w`` in mm und ``L`` in m kommen als Groessen.
@@ -58,9 +65,14 @@ from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 #: Belastungsalter, eine Annahme ueber das Bauwerk.
 KRIECHZAHL = 2.0
 
-#: ``w_max = L / GRENZE`` -- nach Vorgabe des Benutzers (2026-10-16), nicht
-#: nachgeschlagen.
+#: ``w_max = L / GRENZE`` -- SIA 260:2013, Anhang A, Tabelle 3 (siehe
+#: Dateikopf). Daneben stehen dort L/500 (selten, sproede Einbauten) und
+#: L/300 (quasi-staendig, Aussehen).
 GRENZE = 350.0
+
+#: Woher Faktor und Grenzwert kommen.
+REFERENZ_FAKTOR = "SIA 262:2025, 4.4.3.2.5, (104)"
+REFERENZ_GRENZE = "SIA 260:2013, Anhang A, Tabelle 3"
 
 #: Wie der Faktor einer Seite heisst: omega_w fuer Zug unten, omega_w' fuer
 #: Zug oben (Benutzer, 2026-10-16). Ziehen kann ein Fall die Seiten der
@@ -118,7 +130,7 @@ class Vergroesserungsfaktor(Prozedur):
             seite: WertDef(
                 id=f"{basis}.omega_w_{seite}", symbol=SYMBOL[seite], einheit=EINHEITSLOS,
                 beschreibung=f"Vergrösserungsfaktor der Durchbiegung, Zug {seite}",
-                referenz="SIA 262:2025, 4.4.3.2.5", stellen=2)
+                referenz=REFERENZ_FAKTOR, stellen=2)
             for seite in UM_Y if self.posten_je_seite[seite]}
         #: Je Seite mit x-Bewehrung ihr Faktor, mit allen Stellen.
         self.kennzahlen: List[Kennzahl] = [
@@ -135,7 +147,7 @@ class Vergroesserungsfaktor(Prozedur):
         super().__init__(
             basis, ausgaben=list(self.d_omega.values()), bezuege=bezuege,
             titel="Vergrösserungsfaktor der Durchbiegung",
-            referenz="SIA 262:2025, 4.4.3.2.5", abschnitt=querschnitt.abschnitt)
+            referenz=REFERENZ_FAKTOR, abschnitt=querschnitt.abschnitt)
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]:
         p.titel("Vergrösserungsfaktor der Durchbiegung")
@@ -151,26 +163,31 @@ class Vergroesserungsfaktor(Prozedur):
         p.ansatz(
             r"\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot "
             r"\left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3}"
-            r" \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}",
+            r" \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}",
             titel="Vergrösserungsfaktor der Durchbiegung – allgemein",
-            referenz="SIA 262:2025, 4.4.3.2.5", name="Vergrösserungsfaktor der Durchbiegung")
+            referenz=REFERENZ_FAKTOR, name="Vergrösserungsfaktor der Durchbiegung")
         p.erklaerung(
             "Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je "
-            "Fall. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom "
-            "gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – "
-            "ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite "
-            "zählt zusammen, in ihrem Schwerpunkt."
+            "Fall. ρ ist der Gehalt der gezogenen Seite, ρ′ der der Gegenseite; beide "
+            "beziehen sich auf die statische Höhe d der gezogenen Seite. Die "
+            "x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. Die "
+            "Kriechzahl ist nach 3.1.2.6 zu wählen; die Vorgabe ist 2."
         )
-        p.wert(phi, titel="Kriechzahl")
+        p.wert(phi, titel="Kriechzahl", referenz="SIA 262:2025, 3.1.2.6")
         gehalte = self._bewehrungsgehalte(p, e, werte)
-        h = e["h"]
+        h, b = e["h"], e["b"]
         ergebnis: Dict[str, Groesse] = {}
         for seite, definition in self.d_omega.items():
-            rho, d = gehalte[seite]
+            _, rho, d = gehalte[seite]
             gegen = gehalte.get(seite.gegen)
-            k = seite.gegen.value[0]
-            rho_s = gegen[0] if gegen else werte.zahl(f"rho_{k}", rf"\rho_{{{k}}}", 0.0,
-                                                      stellen=5)
+            k = seite.value[0]
+            rho_s = werte.zahl(f"rho_s_{k}", rf"\rho'_{{{k}}}",
+                               gegen[0].groesse.si / (b.groesse.si * d.groesse.si) if gegen
+                               else 0.0, stellen=5)
+            if gegen:
+                p.formel(rho_s, r"\frac{@A}{@b \cdot @d}", {"A": gegen[0], "b": b, "d": d},
+                         titel=f"Bewehrungsgehalt der Gegenseite, Zug {seite}",
+                         referenz=REFERENZ_FAKTOR, name="Bewehrungsgehalt der Gegenseite")
             zahl = ((1.0 - 20.0 * rho_s.groesse.si) / (10.0 * rho.groesse.si ** 0.7)
                     * (0.75 + 0.1 * phi.groesse.si)
                     * (h.groesse.si / d.groesse.si) ** 3)
@@ -186,17 +203,18 @@ class Vergroesserungsfaktor(Prozedur):
         return ergebnis
 
     def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben,
-                           werte: Zwischenwerte) -> Dict[Zugseite, Tuple[Wert, Wert]]:
+                           werte: Zwischenwerte) -> Dict[Zugseite, Tuple[Wert, Wert, Wert]]:
         """
-        Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
-        Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
-        Gehalt als rho'. Querschnitt, Schwerpunkt und Hoehe der Lage schreibt
+        Je Seite mit x-Bewehrung ihr Querschnitt, ihr Bewehrungsgehalt und
+        ihre statische Hoehe -- die gezogene Seite braucht Gehalt und Hoehe,
+        die Gegenseite ihren Querschnitt fuer rho'. Querschnitt, Schwerpunkt
+        und Hoehe der Lage schreibt
         :func:`~opencivil.querschnitt.lagenaufbau.protokoll_lage`, wie in den
         Nachweisen der Lagen: dieselbe Hoehe heisst ueberall gleich, etwa
         d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
         """
         b = e["b"]
-        gehalte: Dict[Zugseite, Tuple[Wert, Wert]] = {}
+        gehalte: Dict[Zugseite, Tuple[Wert, Wert, Wert]] = {}
         for seite, eintraege in self.posten_je_seite.items():
             if not eintraege:
                 continue
@@ -207,8 +225,9 @@ class Vergroesserungsfaktor(Prozedur):
             r = werte.zahl(f"rho_{k}", rf"\rho_{{{k}}}", a_s / (b.groesse.si * d.groesse.si),
                            stellen=5)
             p.formel(r, r"\frac{@A}{@b \cdot @d}", {"A": A, "b": b, "d": d},
-                     titel=f"Bewehrungsgehalt {seite}", name="Bewehrungsgehalt")
-            gehalte[seite] = (r, d)
+                     titel=f"Bewehrungsgehalt {seite}", name="Bewehrungsgehalt",
+                     referenz=REFERENZ_FAKTOR)
+            gehalte[seite] = (A, r, d)
         return gehalte
 
 
@@ -272,6 +291,13 @@ class Verformung(Nachweis):
             p.text(erg.begruendung)
             return erg
 
+        if omega.groesse.si <= 0.0:
+            erg.begruendung = (
+                f"{omega.symbol} = {omega.groesse.si:.2f}: ab ρ′ = 5 % gibt (104) keinen "
+                f"positiven Faktor → kein Nachweis.")
+            p.text(erg.begruendung)
+            return erg
+
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
         w = werte.laenge("w", "w", fall.w.si, "Durchbiegung mit E_cm")
         L = werte.wert("L", "L", fall.laenge, 2, "Spannweite")
@@ -280,10 +306,10 @@ class Verformung(Nachweis):
         w_max = werte.laenge("w_max", "w_{max}", fall.laenge.si / GRENZE, "Widerstand")
         p.formel(w_eff, r"@omega \cdot @w", {"omega": omega, "w": w},
                  titel=f"Wirksame Durchbiegung, Zug {fall.zugseite}",
-                 name="Wirksame Durchbiegung")
+                 name="Wirksame Durchbiegung", referenz=REFERENZ_FAKTOR)
         p.formel(w_max, rf"\frac{{@L}}{{{GRENZE:g}}}", {"L": L},
-                 titel="Grenzwert der Durchbiegung, nach Vorgabe",
-                 name="Grenzwert der Durchbiegung")
+                 titel="Grenzwert der Durchbiegung",
+                 name="Grenzwert der Durchbiegung", referenz=REFERENZ_GRENZE)
 
         erg.ausgang = v = Vergleich(w_eff, w_max)
         erg.begruendung = (
@@ -304,5 +330,11 @@ class Verformung(Nachweis):
             "sie auf die gerissene Platte unter Dauerlast; die so vergrösserte "
             "Durchbiegung hält der Nachweis gegen L/350."
         )
-        p.annahme(f"w ist mit der Steifigkeit E_cm ermittelt. Grenzwert w_max = "
-                  f"L/{GRENZE:g} nach Vorgabe, nicht nachgeschlagen.")
+        p.annahme(f"w ist mit der Steifigkeit E_cm ermittelt, also mit γ_cE = 1.0 "
+                  f"(SIA 262:2025, 4.2.1.16). Grenzwert w_max = L/{GRENZE:g} nach "
+                  f"SIA 260:2013, Anhang A, Tabelle 3: unter häufiger Last, für "
+                  f"Funktionstüchtigkeit und Komfort. Die Tabelle meint dort nur einen "
+                  f"Teil der Durchbiegung, was nach dem Einbau dazukommt oder was die "
+                  f"veränderlichen Lasten bewirken; gehalten wird die ganze samt Kriechen, "
+                  f"das liegt sicher. Welches Kriterium gilt, legt das Projekt fest "
+                  f"(SIA 262:2025, 4.4.3.2.1).")

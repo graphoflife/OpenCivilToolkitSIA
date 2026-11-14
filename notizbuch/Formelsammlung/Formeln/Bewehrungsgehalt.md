@@ -1,10 +1,11 @@
 ---
-erzeugt: 40e958415343
+erzeugt: 6782bc4509a1
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.4.3.2.5, (104)"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.4.3.2.5, (104)
 
 *In der Herleitung: «Bewehrungsgehalt unten»*
 
@@ -47,5 +48,6 @@ $$
 Die Bewehrung im Verhältnis zur Betonfläche bis zur statischen Höhe,
 $\rho = A_s / (b \cdot d)$ -- eine dimensionslose Zahl, gewöhnlich zwischen
 0.2 % und 1.5 %. Sie sagt, wie stark der gerissene Querschnitt ist, und geht
-so in den [[Vergrösserungsfaktor der Durchbiegung]] ein: als $\rho$ der
-gezogenen Seite und als $\rho'$ der Gegenseite.
+so in den [[Vergrösserungsfaktor der Durchbiegung]] ein, als $\rho$ der
+gezogenen Seite. Die Gegenseite zählt dort als
+[[Bewehrungsgehalt der Gegenseite]], mit demselben $d$.

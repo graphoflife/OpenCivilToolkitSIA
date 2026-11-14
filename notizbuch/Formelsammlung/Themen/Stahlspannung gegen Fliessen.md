@@ -1,5 +1,5 @@
 ---
-erzeugt: 00acde01d042
+erzeugt: 7dc8683f39d1
 art: thema
 tags: [thema]
 ---
@@ -8,11 +8,11 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
+Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4). Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
 
-Drittens die Grenze: sie rechnet mit dem Bemessungswert, σ\_s,adm = f\_yd − 80 N/mm², und nicht mit f\_yk − 80. Die Norm sagt an dieser Stelle nicht eindeutig, welcher Wert gemeint ist; f\_yd ist die strengere Wahl – die Grenze liegt rund 15 % tiefer –, gewählt ist deshalb die Seite, auf der man nicht danebenliegen kann. Das ist etwas anderes als das Fliessplateau oben: dort geht es darum, was der Stahl tut, hier darum, wie viel Abstand man davon verlangt.
+Drittens die Grenze: σ\_s,adm = f\_yd − 80 N/mm², mit dem Bemessungswert, wie ihn die Norm in Tabelle 17 ausdrücklich nennt – für B500 sind das 355 N/mm². Das ist etwas anderes als das Fliessplateau oben: dort geht es darum, was der Stahl tut, hier darum, wie viel Abstand man davon verlangt.
 
-Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
+Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4), die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
 
 ## Formeln
 

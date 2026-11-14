@@ -1,5 +1,5 @@
 ---
-erzeugt: c44d9d45d61b
+erzeugt: 2ba3d1630d60
 art: modul
 tags: [modul]
 ---
@@ -41,8 +41,9 @@ Ueberdeckung braucht dieselbe:
 
 Kommt ihre Flaeche aus ⌀ und Teilung, gilt dieser ⌀ (Benutzer, 2026-10-24).
 
-Nach Vorgabe, nicht nachgeschlagen: die Grenze je Stab und der fiktive
-Durchmesser. Siehe `notizbuch/Notizen/TODO.md`.
+Nach Vorgabe, in SIA 262:2025 nicht gefunden: die Grenze je Stab und der
+fiktive Durchmesser -- Gl. (102) kennt nur den Durchmesser eines Stabs.
+Siehe `notizbuch/Notizen/TODO.md`.
 
 
 ## EINHEITEN
@@ -120,7 +121,7 @@ seinem Durchmesser und dem `f_ctm` seines Betons.
 ### protokoll_rissbreitengrenzen
 
 ```python
-def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, staebe: Sequence[Stabangabe], grenzen: Grenzen, anforderung: Rissanforderung, basis: str, *, referenz: str) -> None
+def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, staebe: Sequence[Stabangabe], grenzen: Grenzen, anforderung: Rissanforderung, basis: str) -> None
 ```
 
 `sigma_s,adm` aus der Rissbreite, je Gruppe gleicher Staebe einmal

@@ -78,11 +78,16 @@ gelernt wurde, steht in [[Entwicklung]].
       gehört zur eingegebenen Dicke und wächst bei gleicher Last mit 1/h³.
       Kein Umrechnen mit (h₀/h)³. Erst umsetzen, wenn der Benutzer es sagt;
       bis dahin hält die Suche w fest wie eine Einwirkung.
-- [ ] Verformung der Platte: der Grenzwert w_max = L/350 und dass w mit der
-      Steifigkeit E_cm ermittelt ist, sind nach Vorgabe eingebaut, nicht
-      nachgeschlagen (`nachweis/verformung.py`, `GRENZE`). Die Normstelle dazu
-      fehlt; die des Vergrösserungsfaktors (4.4.3.2.5) hat der Benutzer
-      geliefert.
+- [ ] **Grenzwert der Durchbiegung wählbar?** L/350 steht in SIA 260:2013,
+      Anhang A, Tabelle 3: häufige Last, Funktionstüchtigkeit und Komfort.
+      Dieselbe Tabelle nennt L/500 (seltene Last, spröde Einbauten) und
+      L/300 (quasi-ständige Last, Aussehen); welches Kriterium gilt, legt das
+      Projekt fest (SIA 262:2025, 4.4.3.2.1). Die Tabelle meint je Zeile nur
+      einen Teil der Durchbiegung -- was nach dem Einbau dazukommt, was die
+      veränderlichen Lasten bewirken, oder alles abzüglich Überhöhung; das
+      Werkzeug hält die ganze samt Kriechen gegen L/350, strenger als jede
+      Zeile ausser L/500. Vorschlag: ein Schalter 500 / 350 / 300, Vorgabe
+      350. Entscheid des Benutzers.
 - [ ] **Grundbruch: die Quelle benennen.** Die Formeln stehen mit «Kap.
       9.2.x» am Code (`geotechnik/grundbruch.py`, `KAP_*`); der Titel des
       Buches fehlt. Er kommt vom Benutzer.
@@ -350,8 +355,9 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 
 ## Offene Normfragen — deine Fragen, unbeantwortet
 
-Diese Punkte sind **nicht** entschieden. Ich habe je eine Annahme eingebaut und
-sie hier notiert; keine davon ist nachgeschlagen.
+Diese Punkte sind **nicht** entschieden. Eingebaut ist je eine Annahme; wo die
+Prüfung vom 2026-11-14 den Bereich schon erreicht hat, steht dabei, was die
+Norm dazu sagt.
 
 - [ ] **Durchstanzen, Begrenzung auf 1.5·d_v (Figur 23a bis c).** Eingebaut:
       eine gerade Strecke des Nachweisschnitts zählt 1.5·d_v von jeder Ecke
@@ -398,37 +404,53 @@ sie hier notiert; keine davon ist nachgeschlagen.
 - [ ] **Stahlpilz: d_v = d − 20 mm und die gestützte Fläche bis an die Stege.**
       Gelesen aus 4.3.6.2.1, Figur 21 und 4.3.6.6.2; 20 mm unten und 50 mm
       oben aus der Software von AncoTech. Nicht nachgeschlagen.
-- [ ] **Die Grenze des Nachweises gegen Fliessen.** Eingebaut `f_yd − 80 MPa`,
-      weil Tabelle 17 ausdrücklich `f_yd` nennt — mit charakteristischen
-      Werten in der Rechnung mischt das zwei Niveaus, ist aber die strengere
-      Seite. Womit die Stahlspannung rechnet (φ, Werte, Rechenart), wählt
-      jedes Kapitel; Vorgabe elastisch, charakteristisch, φ = 0.
+- [ ] **Sprödes Versagen unter Zug fehlt.** Wo ein Querschnitt für die
+      Tragsicherheit zählt, muss sein Widerstand die Rissbeanspruchung
+      übertreffen, auch die auf Normalkraft (SIA 262:2025, 4.3.1.2, mit
+      `f_ct,eff` nach 4.4.1.3; ebenso 4.1.4.2.4). Geführt wird nur das
+      Rissmoment gegen `M_Rd`; die Rissnormalkraft hält das Werkzeug allein
+      gegen die zulässige Stahlspannung der Zwängung, und die liegt bei
+      normaler Anforderung bei `f_yk`, bei erhöhter für ⌀10 und ⌀12 ebenfalls
+      über `f_yd`. Beispiel: Platte h = 250 mm, C30/37, normale Anforderung,
+      `N_Riss` = 322 kN je Lage und Meter -- heute genügen 644 mm²/m, mit
+      `A_s·f_yd ≥ N_Riss` brauchte es 741 mm²/m (+15 %). Vorschlag: die
+      Bedingung als eigenen Nachweis führen. Entscheid des Benutzers.
+- [ ] **Gebrauch mit Mittelwerten.** Gebrauchsnachweise rechnen mit den
+      Mittelwerten der Baustoffe (SIA 262:2025, 4.4.1.2). Die Stahlspannung
+      nimmt als Grenze des Betons `f_ck` statt `f_cm = f_ck + 8 N/mm²`
+      (C30/37: 30 statt 38 N/mm²); im elastischen Bereich zählen nur `E_s`
+      und `E_cm`, die schon Mittelwerte sind. Einen Mittelwert der
+      Fliessgrenze kennt die Norm nicht, beim Stahl bleibt `f_yk`. Die Grenze
+      gegen Fliessen ist `f_yd − 80 N/mm²`, so nennt sie Tabelle 17.
+      Empfehlung: lassen -- `f_ck` liegt auf der sicheren Seite. Entscheid
+      des Benutzers.
 - [ ] **Welcher Durchmesser bestimmt `σ_s,adm` unter quasi-ständiger Last?**
-      Eingebaut: der dickste Stab der Tragrichtung. Die Spannung kommt aus dem
-      ganzen Querschnitt, und welche Lage am stärksten gezogen ist, wechselt
-      mit dem Lastfall; der dickste Stab gibt die kleinste Grenze. Denkbar
-      wäre auch der Stab der jeweils am stärksten gezogenen Lage.
-- [ ] **60 % und 70 % sind Abschätzungen, keine Normwerte.** Beide sind je
-      Platte einstellbar; wer die echten ψ-Kombinationen kennt, trägt sie als
-      eigene Lastfälle ein.
-- [ ] **Zugfestigkeit des Betons in der Spannungsrechnung?** Eingebaut: nein,
-      voll gerissen. Das ist konservativ (ohne Mitwirkung zwischen den Rissen),
-      aber die Norm erlaubt in 4.4.1.2 die Mittelwerte — also womöglich auch
-      `f_ctm`.
-- [ ] **Unterscheidet die Norm inneren Zwang auf Normalkraft und auf Biegung?**
-      Eingebaut: ja, als zwei getrennte Nachweise mit verschiedenem `k_t`
-      (`h` gegen `h/3`). 4.4.1.3 stützt das: bei Biegung von Platten und
-      Rechtecken zählt ein Drittel der Höhe, sonst die kleinste Abmessung des
-      gezogenen Teils. Als zwei Nachweise nennt sie sie aber nicht.
-- [ ] **Unterscheidet die Norm sprödes Versagen auf Normalkraft und Biegung?**
-      Eingebaut: die Rissnormalkraft steht unter *Mindestbewehrung* (4.4.2), das
-      Rissmoment unter *sprödes Versagen* (4.4.1.3). Ob das die gemeinte
-      Trennung ist, steht dahin.
+      Eingebaut: der dickste Stab der Tragrichtung; er gibt die kleinste
+      Grenze. Die Norm sagt dazu nichts, (102) kennt nur den Durchmesser
+      eines Stabs (geprüft am 2026-11-14). Ebenso eigene Festlegung: der
+      fiktive Durchmesser einer verschmierten Linie im gezeichneten
+      Querschnitt bei 150 mm Teilung (`nachweis/stabgrenzen.py`). Beides
+      bestätigen lassen.
+- [ ] **60 % und 70 % liegen teils auf der unsicheren Seite.** Die Gebrauchs-
+      fälle aus der Tragsicherheit nehmen 70 % (häufig) und 60 %
+      (quasi-ständig) ihrer Last. Mit den Kombinationen nach SIA 260:2013,
+      4.4.4.4, den Beiwerten ψ aus Anhang A, Tabelle 2, sowie γ_G = 1.35
+      und γ_Q = 1.5 aus Tabelle 1 wären es (häufig / quasi-ständig):
+      - Wohnen, g = 5 und q = 2 kN/m²: 62 % / 57 %
+      - Wohnen, g = 8 und q = 2 kN/m²: 65 % / 62 %
+      - Verkauf, g = 5 und q = 4 kN/m²: 61 % / 58 %
+      - Lager, g = 5 und q = 4 kN/m²: 68 % / 64 %
+      - nur Eigenlast: 74 % / 74 %
+
+      Bei schwerer Eigenlast und bei Lagern sind 60 % zu wenig, bei
+      überwiegender Eigenlast auch 70 %. Vorschlag: die Anteile im Bericht
+      als Annahme ausweisen, oder die Kombination aus g, q und ψ anbieten.
+      Entscheid des Benutzers.
 - [ ] **Was macht der Eurocode?** Nicht verglichen. EC2 7.3.2 hat
       `A_s,min·σ_s = k_c·k·f_ct,eff·A_ct` — formal dieselbe Gestalt wie
-      SIA 4.4.2, aber mit `k_c` und `k` statt `k_t`, und mit einer anderen
-      Begründung für die wirksame Zugzone. Ein Vergleich würde zeigen, ob die
-      Zahlen zusammenpassen.
+      SIA 262:2025, Tabelle 17, aber mit `k_c` und `k` statt `k_t`, und mit
+      einer anderen Begründung für die wirksame Zugzone. Ein Vergleich würde
+      zeigen, ob die Zahlen zusammenpassen.
 - [ ] **Kriechen beim Knicken – Entscheid des Benutzers.** Die Vorgabe φ = 0
       liegt auf der unsicheren Seite: SIA 262:2025, 4.3.7.2 verlangt beim
       Druckglied das Kriechen. Die Norm setzt es über die Krümmung an –
@@ -444,27 +466,65 @@ sie hier notiert; keine davon ist nachgeschlagen.
       Spannungen im Gebrauch rechnet 4.1.4.1.4 linear elastisch -- dort ist
       er ein Modell, keine Normregel. Das Druckplateau `f_y,druck` des Stahls
       im Löser deckt 4.2.2.2: Figur 16 gilt für Zug und Druck.
-- [ ] **Querkraft mit `m_Rk`.** Rechnet die Tragsicherheit charakteristisch,
-      nimmt die Querkraft ohne Bügel ihr `m_Rk(N_Ed)` aus derselben Linie, ihr
-      eigenes `τ_cd` und `f_yd` bleiben aber Bemessungswerte. Die Norm setzt
-      in die Dehnung den Bemessungswert `m_Rd` (SIA 262:2025, 4.3.3.2.2, (39));
-      mit `m_Rk` wird sie um etwa 1/1.15 zu klein und `v_Rd` im Beispiel um
-      3.4 % zu gross. Vorschlag: die Querkraft liest `m_Rd(N_Ed)` immer aus
-      einer Linie mit Bemessungswerten, gleich, wie der M-N-Nachweis rechnet.
+- [ ] **Rechnet die Tragsicherheit charakteristisch,** nehmen drei
+      Nachweise charakteristische Werte, wo die Norm Bemessungswerte meint:
+      - Sprödes Versagen hält `M_Rk` statt `M_Rd` gegen das Rissmoment; die
+        Bedingung steht bei der Tragsicherheit (SIA 262:2025, 4.3.1.2). Es
+        genügt damit rund 13 % weniger Bewehrung (`f_yk/f_yd` = 1.15).
+      - Die Querkraft ohne Bügel nimmt ihr `m_Rk(N_Ed)` aus derselben Linie,
+        ihr eigenes `τ_cd` und `f_yd` bleiben Bemessungswerte. Die Norm setzt
+        in die Dehnung `m_Rd` (4.3.3.2.2, (39)); mit `m_Rk` wird sie um etwa
+        1/1.15 zu klein und `v_Rd` im Beispiel um 3.4 % zu gross.
+      - Die Schubwände der Querschnittsanalyse tragen mit `f_yk` und `f_ck`,
+        heissen aber weiter `v_Rd`. Die Platte nimmt immer Bemessungswerte.
+
+      Vorschlag: alle drei immer mit Bemessungswerten, gleich, wie der
+      M-N-Nachweis rechnet. Entscheid des Benutzers.
+- [ ] **Durchbiegung nach (103) oder (104)?** Gerechnet wird immer der
+      gerissene Zustand, (104). Ungerissen gilt `w = w_c·(1 + φ)`, (103); die
+      wahre Durchbiegung liegt dazwischen (SIA 262:2025, 4.4.3.2.4 bis
+      4.4.3.2.6). Bei φ = 2, h/d = 1.2 und ohne Gegenbewehrung gibt (104) ab
+      etwa ρ = 1.6 % weniger als (103). Und die Normalkraft fehlt: Druck
+      verkleinert die Durchbiegung, Zug vergrössert sie (4.4.3.2.5).
+      Vorschlag: das Grössere von (103) und (104), und ein Hinweis, wenn die
+      Platte eine Normalkraft hat. Entscheid des Benutzers.
+- [ ] **Fussnote 1 zu Tabelle 17 je Fall erkennen?** Liegt die
+      quasi-ständige Beanspruchung über dem Rissniveau, reicht die Grenze aus
+      (102) für die verlangte Rissbreite nicht, und wie viel mehr Stahl es
+      braucht, sagt die Norm nicht. Seit 2026-11-14 steht dazu ein Hinweis bei
+      jedem Nachweis mit verlangter Rissbreite. Vorschlag: je Fall
+      vergleichen, ob das quasi-ständige Moment über `M_Riss` liegt, und den
+      Hinweis nur dann geben. Ein Modell für die Rissbreite darüber wäre ein
+      eigener Entscheid.
+- [ ] **Hohe Zugfestigkeit, wo sie ungünstig wirkt.** Wo ein hohes `f_ct`
+      oder der ungerissene Zustand den Nachbarn schadet, etwa an
+      Diskontinuitäten, gilt `f_ct,eff = k_t·f_ctk0.95` = 1.3·`k_t·f_ctm`
+      (SIA 262:2025, 4.4.1.4, (101); 4.4.2.3.9). Das Werkzeug rechnet die
+      Zwängung immer mit `f_ctm`. Vorschlag: zur Kenntnis, oder ein Schalter
+      an der Zwängung. Entscheid des Benutzers.
+- [ ] **Wann reisst der Querschnitt in der Spannung-Dehnung-Analyse?**
+      Eingebaut: sobald der Beton ohne Stahl `k_t·f_ctm` erreicht, mit `k_t`
+      für `h/3` beim Moment und für `h` bei der Normalkraft. Die Norm nimmt
+      `f_ctm` oder eine Fraktile, 0.7 oder 1.3·`f_ctm`, ohne `k_t`
+      (SIA 262:2025, 4.2.1.14; 3.1.2.2.5, (7) und (8)), und rechnet den
+      ungerissenen Querschnitt mit dem Stahl (4.1.4.1.4). Beispiel Platte
+      h = 300 mm: das Rissmoment liegt 5 % tiefer als mit `f_ctm`, die
+      Rissnormalkraft 13 %; ohne Stahl kommen bei ρ = 0.5 % je Seite rund
+      5 % dazu. Für Durchbiegungen ist das die sichere Seite, für Zwangkräfte
+      nicht. Wegen der zwei `k_t` reissen die M-χ- und die N-ε-Linie beim
+      selben N und M auch nicht am selben Punkt: die M-χ-Linie bei
+      N = 300 kN bei 26.4 kNm, die N-ε-Linie bei M = 26.4 kNm schon bei
+      228 kN. Vorschlag: `f_ctm`, wahlweise 0.7·`f_ctm` oder 1.3·`f_ctm`, am
+      Querschnitt mit Stahl -- dann reissen beide Linien am selben Punkt.
       Entscheid des Benutzers.
-- [ ] **Der Vergrösserungsfaktor w/w_c** (SIA 262:2025, 4.4.3.2.5, Formel von
-      dir): `d′` reicht vom gezogenen Rand bis zur Gegenlage (deine
-      Festlegung), also ist `ρ′` das `ρ` der Gegenseite; ohne Gegenlage ist
-      `ρ′ = 0`. Gezählt wird nur die x-Bewehrung, Grund und Zulage einer Seite
-      im Schwerpunkt. Der Gültigkeitsbereich ist nicht geprüft — etwa
-      `1 − 20·ρ′ ≤ 0` ab `ρ′ = 5 %` gäbe einen negativen Faktor.
 - [ ] **Der äquivalente E-Modul** (Spannung-Dehnung-Analyse, M–E_eq und
       N–E_eq) zählt die Verformung ab dem Zustand ohne laufende Kraft (deine
       Wahl, 2026-10-11): `E_eq = M/(I_c·(χ − χ_0))`. Ein Modell mit dem
       ungerissenen Betonquerschnitt gibt damit die Verformung aus der
       laufenden Kraft wieder, nicht, was die feste allein verformt. Er gilt
       für den Querschnitt, ohne Zugversteifung -- für eine Durchbiegung liegt
-      er damit tief (sicher), für Zwangkräfte nicht. Keine Normstelle.
+      er damit tief (sicher), für Zwangkräfte nicht. SIA 262:2025 kennt
+      keinen solchen Modul (geprüft am 2026-11-14); bestätigen lassen.
 - [ ] **Der kürzeste Abstand bei der genauen Linie** misst zum gezeichneten
       Polygon des Fächers (80 Schritte je Abschnitt), nicht zum genau
       gesuchten Rand wie Normalkraft und Moment konstant.
@@ -496,9 +556,19 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       (Vorgabe aus) und bei der Platte mit Bügeln gar nicht. Vorschlag: in
       der Analyse Vorgabe ein, bei der Platte im Bericht als nicht
       nachgewiesen ausweisen. Entscheid des Benutzers.
-- [ ] **k_t bei beliebiger Form.** Eingebaut: wie bei der Platte mit `h/3`,
-      wobei `h` die Ausdehnung des Betons in Biegerichtung ist (z für M_y,
-      y für M_z).
+- [ ] **k_t bei beliebiger Form.** Eingebaut: beim Moment `t` = ein Drittel
+      der Ausdehnung des Betons in Biegerichtung (z für M_y, y für M_z), unter
+      Zug die kleinere Seite des umschreibenden Rechtecks. Die Norm nimmt die
+      kleinste Abmessung des gezogenen Teils, ein Drittel der Höhe nur bei
+      Biegung von Platten und Rechtecken (SIA 262:2025, 4.4.1.3). Bei Steg,
+      Flansch oder Hohlkasten liegt `k_t` darum zu tief, auf der unsicheren
+      Seite. Beispiel Plattenbalken, Steg 200 × 800 mm unter einer Platte
+      600 × 200 mm, Zug unten: heute t = 333 mm und `k_t` = 0.857, nach der
+      Norm zählt der Steg, t = 200 mm und `k_t` = 0.909 -- Rissmoment und
+      Mindestbewehrung rund 6 % zu klein. Unter Zug heute `k_t` = 0.769
+      (t = 600 mm) statt 0.909. Vorschlag: `t` aus der Dicke des gezogenen
+      Teils (Steg- oder Plattendicke); einfach und sicher wäre die dünnste
+      Wand des Querschnitts. Entscheid des Benutzers.
 - [ ] **Wanddicke im vollen Querschnitt.** Für die Torsion zählt eine Wand
       eines Vollquerschnitts höchstens `d_k/8` dick, `d_k` der grösste Kreis
       in `A_k` (SIA 262:2025, 4.3.5.3, (56)); für die Querkraft allein zählt
@@ -513,11 +583,6 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       bedeutendem Normaldruck 25° (4.3.3.3.3), und `k_c` höchstens 1
       (4.2.1.7). Vorschlag: Feldgrenzen 25° bis 45° und `k_c ≤ 1`, mit Hinweis
       auf 30°. Entscheid des Benutzers.
-- [ ] **Schubwände der Querschnittsanalyse charakteristisch.** Rechnet die
-      Tragsicherheit charakteristisch, tragen die Wände mit `f_yk` und
-      `f_ck`, heissen aber weiter `v_Rd`. Die Platte nimmt immer
-      Bemessungswerte. Vorschlag: Schubwände immer mit Bemessungswerten.
-      Entscheid des Benutzers.
 - [ ] **Querkraft: Regeln, die das Werkzeug nicht prüft.** Mindestbügel und
       grösster Bügelabstand (SIA 262:2025, 5.5.2.2, (116); 5.5.3.4); die
       feste Dehnung `1.5·f_yd/E_s`, wo die Biegebewehrung plastisch werden
@@ -536,20 +601,25 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `M_Riss(N) = (f_ct,eff − N/A)·W` mit W zur Ecke, die unter reiner
       Biegung zuerst reisst, und `N_Riss(M) = (f_ct,eff,t − σ_M)·A` an der
       Ecke, an der das am wenigsten Zug braucht; `k_t` für ein Drittel der
-      Tiefe bzw. für `min(h; b)`, die Regeln der Platte, übertragen; `f_ctm`
+      Tiefe bzw. für `min(h; b)`, die Regeln der Platte, übertragen (siehe
+      «k_t bei beliebiger Form» und «Wann reisst der Querschnitt …»); `f_ctm`
       vom Beton der Ecke. Der äquivalente Modul am Bruttoquerschnitt (`I`,
       `A`), gekippt mit `I_y − I_yz²/I_z`.
 - [ ] **Gebrauchsnachweise.** Eingebaut (`nachweis/qa_gebrauch.py`), je auf
       Vorgabe des Benutzers vom 2026-10-15: die Zwängung auf Normalkraft am
       ganzen Querschnitt, `N_Riss = Σ A_c·k_t·f_ctm` mit `t` als kleinerer
-      Abmessung des Betons (umschreibendes Rechteck, wahlweise ≤ 500 mm),
-      gegen `Σ A_s·σ_s,adm` aller Stäbe; die Zwängung auf Biegung je
-      Richtung mit dem Rissmoment des spröden Versagens gegen das Moment, bei
-      dem der erste gezogene Stab `σ_s,adm` erreicht -- gerissen, elastisch,
-      ohne N, mit eigenem φ, die gedrückte Bewehrung wirkt mit (die Platte
-      lässt sie weg). `σ_s,adm` je Stab mit seinem Durchmesser und dem
-      `f_ctm` seines Betons; eine verschmierte Linie mit einem fiktiven
-      Durchmesser bei 150 mm Teilung (`nachweis/stabgrenzen.py`).
+      Seite des umschreibenden Rechtecks (siehe «k_t bei beliebiger Form»),
+      gegen `Σ A_s·σ_s,adm` aller Stäbe. Mit dem Schalter «500 mm» zählt bei
+      massigen Bauteilen nur der Beton bis 250 mm vom Rand, und `k_t` gilt
+      für 500 mm (SIA 262:2025, 4.4.2.3.7) -- seit 2026-11-14, vorher
+      begrenzte der Schalter nur `t`. Die Zwängung auf Biegung je Richtung
+      mit dem Rissmoment des spröden Versagens gegen das Moment, bei dem der
+      erste gezogene Stab `σ_s,adm` erreicht -- gerissen und elastisch wie in
+      4.1.4.1.4; ohne N, mit eigenem φ und mit der gedrückten Bewehrung (die
+      Platte lässt sie weg), dazu sagt die Norm nichts. `σ_s,adm` je Stab mit
+      seinem Durchmesser und dem `f_ctm` seines Betons, wie (102) es will;
+      eine verschmierte Linie mit einem fiktiven Durchmesser (siehe «Welcher
+      Durchmesser …»).
 - [ ] **Knicken je Richtung.** Eingebaut (`nachweis/qa_knicken.py`): je Fall
       zu einer Zugseite, die Nulllinie parallel zur Achse wie einachsig --
       ein unsymmetrischer Querschnitt, der um beide Achsen zugleich knickt,
@@ -624,23 +694,6 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       SIA 262, ist nicht nachgeschlagen. Für eine Durchbiegung ist der
       kleinere Beiwert (weicher) der ungünstige, für eine Zwängung der
       grössere.
-- [ ] **Das Rissmoment der Momenten-Krümmungs-Linie** gilt am
-      Bruttoquerschnitt ohne Stahl, `M_Riss(N) = M_Riss(0) − N·h/6` (Zug
-      positiv) -- Annahme, nicht nachgeschlagen. Sein f_ct,eff hat k_t für
-      `t = h/3`, auch unter Zug: Biegung bleibt bei h/3, nach Vorgabe
-      (2026-10-09). Der ungerissene Zustand
-      daneben rechnet mit Stahl und Kriechzahl und ist steifer: am Beispiel
-      steht sein gezogener Rand beim Rissmoment bei 2.14 statt
-      f_ct,eff = 2.76 N/mm². Ob für die Linie der ideelle Querschnitt gelten
-      soll, ist offen.
-- [ ] **Die Rissnormalkraft der N-ε-Linie** ist dieselbe Bedingung nach N
-      aufgelöst: `N_Riss(M) = f_ct,eff·b·h − 6·|M|/h`, am Bruttoquerschnitt
-      ohne Stahl, mit `k_t = 1/(1 + 0.5·t)` für die ganze Dicke, `t = h` --
-      nach Vorgabe (2026-10-09), nicht nachgeschlagen. Das Rissmoment der
-      M-χ-Linie bleibt nach Vorgabe bei `t = h/3`. Beim selben N und M reissen die
-      beiden Linien darum nicht am selben Punkt: am Beispiel reisst die M-χ-
-      Linie bei N = 300 kN bei 26.4 kNm, die N-ε-Linie bei M = 26.4 kNm
-      schon bei 228 kN.
 - [ ] **k_σ der Parabel nie unter 1.** Mit dem kriechweichen Modul
       `E_cm/(1+φ)` und charakteristischen Werten wird `E_c/(400·f_c)` kleiner
       als 1 (C30/37, φ = 2: 0.93); dann hätte der Nenner der Parabel im
@@ -653,9 +706,6 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Betonrand −ε_c2d (Tabelle 8), Stahllagen ±ε_ud (Tabelle 9), Punkt C
       −ε_c1d bei `z_C = h·(1 − ε_c1d/ε_c2d)` -- dieselben Grenzen wie in
       `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
-- [ ] Die Zahlen der Rissnachweise sind ungeprüft wie alle anderen: beide `k_t`,
-      die 500-mm-Grenze, `h/3`, `w_nom = 0.5/0.2 mm` und die Wurzelformel für
-      `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
 

@@ -106,14 +106,16 @@ from opencivil.nachweis.rechenwahl import (
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.spannungsgrenzen import (
-    GrenzeAusRissbreite, Grenzen, Spannungsgrenze, Stahlzustand, Stelle, je_stahl, nach_stahl,
+    Grenzen, Spannungsgrenze, Stahlzustand, Stelle, je_stahl, nach_stahl,
 )
 from opencivil.nachweis.zustand2 import wertigkeit
 from opencivil.querschnitt.platte import Richtung
 
 #: Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt:
 #: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt,
-#: was der Querschnitt tut, nicht was er darf.
+#: was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte
+#: (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege
+#: f_cm hoeher als f_ck -- f_ck liegt sicher (``notizbuch/Notizen/TODO.md``).
 VORGABE = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.ELASTISCH)
 
 
@@ -160,12 +162,14 @@ def protokoll_festlegungen(p: Protokoll, wahl: Rechenwahl) -> None:
     )
     if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
         p.erklaerung(
-            "Zweitens die Werkstoffgesetze: sie rechnen mit den "
-            "charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk "
-            "und fliesst dann, der Beton trägt höchstens f_ck. Ein "
-            "Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was "
-            "er darf – der Teilsicherheitsbeiwert gehört in die "
-            "Tragsicherheit. Läge das Plateau bei f_yd, bliebe jede "
+            "Zweitens die Werkstoffgesetze: sie rechnen ohne "
+            "Teilsicherheitsbeiwerte. Der Stahl ist linear bis f_yk und "
+            "fliesst dann, der Beton trägt höchstens f_ck. Die Norm verlangt im "
+            "Gebrauch Mittelwerte (SIA 262:2025, 4.4.1.2). Einen Mittelwert der "
+            "Fliessgrenze nennt sie nicht, darum f_yk. Beim Beton wäre es f_cm, "
+            "das höher liegt: mit f_ck kommt der Beton früher an seine Grenze, "
+            "und die Stahlspannung wird eher grösser – das liegt auf der "
+            "sicheren Seite. Läge das Plateau des Stahls bei f_yd, bliebe jede "
             "Stahlspannung darunter, und eine Grenze darüber könnte nie "
             "überschritten werden."
         )
@@ -425,10 +429,11 @@ class PlattenStellen(Stahlspannungsort):
                    "Grenze, und massgebend ist die gezogene Lage mit dem kleinsten "
                    "Erfüllungsgrad." if len(self.staehle) > 1 else "")
         self.messung = (
-            f"Gerechnet wird am gerissenen Querschnitt: der "
-            f"Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf "
-            f"Druck – nur in der Handrechnung zählt die gedrückte nicht. "
-            f"Gemessen wird an der am stärksten gezogenen Lage.{mehrere}")
+            f"Gerechnet wird am gerissenen Querschnitt: der Beton nimmt "
+            f"keinen Zug auf (SIA 262:2025, 4.1.4.1.4). Die Bewehrung wirkt "
+            f"auf Zug und auf Druck – nur in der Handrechnung zählt die "
+            f"gedrückte nicht. Gemessen wird an der am stärksten gezogenen "
+            f"Lage.{mehrere}")
 
     def basis(self, grenze: Type[Spannungsgrenze]) -> str:
         return f"{self.querschnitt.id}.nachweis.{grenze.idteil}.{self.richtung.value}"
@@ -477,8 +482,7 @@ class PlattenStellen(Stahlspannungsort):
             protokoll_zulaessige_stahlspannung(
                 p, gruppe.wert, anforderung=anforderung, f_yk=e[stahl.eingabename("f_yk")],
                 E_s=e[stahl.eingabename("E_s")], f_ctm=e["f_ctm"], durchmesser=dm,
-                basis=basis if len(self.staehle) == 1 else f"{basis}.{kennung_aus(stahl.id)}",
-                referenz=GrenzeAusRissbreite.referenz)
+                basis=basis if len(self.staehle) == 1 else f"{basis}.{kennung_aus(stahl.id)}")
         return grenzen
 
     def ebene(self, zustand: _Plattenzustand, fall: Gebrauchsfall) -> Ebene:
@@ -720,7 +724,7 @@ class Spannungsbegrenzung(Nachweis):
         grenzen = g.bestimmen(ort, zustand, e, p, self.anforderung, self.id)
         protokoll_festlegungen(p, wahl)
         ort.protokoll_gesetze(p, e, zustand, wahl, self.id)
-        g.festlegung(p, ort)
+        g.festlegung(p, ort, self.anforderung)
         p.erklaerung(VERGLEICH_BEIM_FLIESSEN)
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
         ort.protokoll_verfahren(p, zustand, wahl)

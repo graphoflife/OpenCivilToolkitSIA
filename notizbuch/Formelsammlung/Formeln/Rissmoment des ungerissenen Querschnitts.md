@@ -1,10 +1,11 @@
 ---
-erzeugt: 42b77aca8694
+erzeugt: e044e84d6164
 art: formel
 tags: [formel]
+normstelle: ["SIA 262:2025, 4.3.1.2", "SIA 262:2025, 4.4.2.3.4, Tabelle 17"]
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstellen
+> SIA 262:2025, 4.3.1.2 · SIA 262:2025, 4.4.2.3.4, Tabelle 17
 
 *In der Herleitung: «Rissmoment des ungerissenen Querschnitts»*
 
@@ -63,5 +64,7 @@ Querschnitt das [[Widerstandsmoment zum gezogensten Betonpunkt]].
 
 Gerechnet wird mit dem Bruttoquerschnitt ohne Bewehrung -- es geht um den
 Zustand vor dem Riss. Mit der Bewehrung wäre der Querschnitt etwas steifer
-und risse etwas später; das bleibt hier unberücksichtigt, nach Vorgabe und
-nicht nachgeschlagen.
+und risse etwas später; das bleibt hier unberücksichtigt. Beim spröden
+Versagen liegt das auf der sicheren Seite, bei der Zwängung auf der
+unsicheren; wie die Spannung-Dehnung-Analyse den Riss finden soll, ist
+offen (siehe [[TODO]]).

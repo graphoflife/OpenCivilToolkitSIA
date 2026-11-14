@@ -1,5 +1,5 @@
 ---
-erzeugt: fbc3b9d56919
+erzeugt: 9d3320e39a32
 art: modul
 tags: [modul]
 ---
@@ -545,7 +545,7 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 
 ## Konstanten
 
-- `VORGABE = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.ELASTIS…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf.
+- `VORGABE = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.ELASTIS…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege f_cm hoeher als f_ck -- f_ck liegt sicher (`notizbuch/Notizen/TODO.md`).
 - `VERGLEICH_BEIM_FLIESSEN = 'Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, währe…` – Was verglichen wird, wenn die Bewehrung fliesst -- siehe Dateikopf.
 
 ## Braucht

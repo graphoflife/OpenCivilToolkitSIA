@@ -1,5 +1,5 @@
 ---
-erzeugt: 701c98ef8f0b
+erzeugt: f6d3304012a2
 art: thema
 tags: [thema]
 ---
@@ -8,9 +8,9 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Die Bewehrung muss die Kraft übernehmen können, die der Beton beim Reissen abgibt – erst dann kündigt sich das Versagen an.
+Eine aufgezwungene oder behinderte Verkürzung zieht den Querschnitt, bis er reisst. Die Kraft, die der Beton dabei abgibt, muss die Bewehrung übernehmen – ohne über die zulässige Stahlspannung zu kommen; so bleiben die Risse fein. Nicht zu verwechseln mit dem Nachweis gegen sprödes Versagen: dort steht der Widerstand gegen die Rissbeanspruchung.
 
-Eine aufgezwungene Verkürzung zieht den ganzen Querschnitt: es reisst der ganze Beton, und alle Stäbe teilen sich seine Risskraft, jeder bis zu seiner zulässigen Spannung. Die rissaktive Dicke t ist die kleinere Abmessung des Betons.
+Am gezeichneten Querschnitt reisst der ganze Beton, und alle Stäbe teilen sich seine Risskraft, jeder bis zu seiner zulässigen Spannung. Die rissaktive Dicke t ist die kleinere Abmessung des umschreibenden Rechtecks. Die Norm nimmt die kleinste Abmessung des gezogenen Teils: bei einem Rechteck dasselbe, bei anderen Formen ist es eine Annahme.
 
 Eine verschmierte Linie mit ihrer Fläche von Hand hat keinen Durchmesser – sie bekommt einen fiktiven, als lägen ihre Stäbe 150 mm auseinander (Annahme). Eine aus ⌀ und Teilung behält ihren ⌀.
 
@@ -36,13 +36,18 @@ Eine verschmierte Linie mit ihrer Fläche von Hand hat keinen Durchmesser – si
 
 Eine Platte, die sich nicht frei verkürzen kann -- beim Schwinden, beim
 Abkühlen --, bekommt Zug, ohne dass eine Last wirkt. Die Kraft wächst, bis
-der Beton reisst; dann gibt er sie schlagartig an die Bewehrung ab. Reicht
-die Bewehrung dafür nicht, versagt der Querschnitt im Augenblick des Risses.
+der Beton reisst; dann gibt er sie schlagartig an die Bewehrung ab. Nimmt
+die Bewehrung sie nur mit hoher Spannung auf, öffnen sich wenige breite
+Risse statt vieler feiner.
 
 Nachgewiesen wird darum, dass jede Lage die Kraft ihrer Hälfte aufnimmt, die
 [[Risskraft der gezogenen Querschnittshälfte]], ohne die
 [[Zulässige Stahlspannung (Rissbreite w_nom)|zulässige Stahlspannung]] zu
-überschreiten. Bei normaler Anforderung ist das die Fliessgrenze; bei
-erhöhter oder hoher begrenzt zusätzlich die Rissbreite. Gerechnet wird mit
-charakteristischen Werten: nachgewiesen wird nicht die Tragfähigkeit, sondern
-dass die Bewehrung den Riss übersteht.
+überschreiten (SIA 262, Tabelle 17). Bei normaler Anforderung ist das die
+Fliessgrenze $f_{yk}$; bei erhöhter oder hoher begrenzt zusätzlich die
+Rissbreite. Bei dicken Platten zählt mit der Begrenzung nur eine Randzone
+(siehe [[Rissaktive Plattendicke]]).
+
+Ein anderer Nachweis ist das [[Sprödes Versagen|spröde Versagen]]: dort muss
+der Widerstand der Tragsicherheit die Rissbeanspruchung übertreffen. Unter
+Zug führt das Werkzeug ihn noch nicht (siehe [[TODO]]).

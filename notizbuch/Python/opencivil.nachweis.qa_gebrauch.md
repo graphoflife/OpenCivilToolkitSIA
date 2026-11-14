@@ -1,5 +1,5 @@
 ---
-erzeugt: d81ac920a12e
+erzeugt: b20940e668f8
 art: modul
 tags: [modul]
 ---
@@ -49,6 +49,11 @@ N_s,adm  = Σ A_s,i · sigma_s,adm,i   >=  N_Riss
 ```
 
 Bei der Platte nimmt jede Lage die Haelfte -- zusammen derselbe Gedanke.
+Mit der Begrenzung fuer massige Bauteile zaehlt nur der Beton bis 250 mm vom
+Rand, und `t` ist hoechstens 500 mm (SIA 262:2025, 4.4.2.3.7): unter
+zentrischem Zug sind alle Raender gezogen ([[opencivil.querschnitt.randzone]]).
+Bis 2026-11-14 begrenzte der Schalter nur `t` und liess die ganze Flaeche
+stehen -- er verlangte damit mehr Bewehrung statt weniger.
 
 
 ## ZWAENGUNG AUF BIEGUNG
@@ -61,11 +66,17 @@ am gerissenen Querschnitt, elastisch, ohne Normalkraft, mit eigenem φ
 Hebelarm `d - x/3` und ohne die gedrueckte Bewehrung; hier wirkt sie mit.
 
 
-## NACH VORGABE, NICHT NACHGESCHLAGEN
+## DIE NORM
 
-Der ganze Querschnitt bei der Normalkraft, `t` als kleinere Abmessung, die
-Grenze je Stab, der fiktive Durchmesser und das Moment am elastisch
-gerissenen Querschnitt. Siehe `notizbuch/Notizen/TODO.md`.
+Beide Zwaengungen begrenzen die Rissbreite beim Erreichen von `f_ct,eff`
+(SIA 262:2025, 4.4.2.3.4, Tabelle 17, Zeile 2); gerechnet wird gerissen und
+elastisch, ohne Zug im Beton (4.1.4.1.4). `t` ist nach 4.4.1.3 die
+kleinste Abmessung des Zuggurts, bei Rechtecken unter Biegung `h/3`.
+
+NACH VORGABE, IN SIA 262:2025 NICHT GEFUNDEN:
+`t` aus dem umschreibenden Rechteck auch bei anderen Formen als dem
+Rechteck, die Grenze je Stab und der fiktive Durchmesser. Siehe
+`notizbuch/Notizen/TODO.md`.
 
 
 ## EINHEITEN
@@ -187,11 +198,13 @@ am naechsten kommt.
 ### betonflaechen
 
 ```python
-def betonflaechen(analyse: Querschnittsanalyse) -> List[Tuple[Baustoff, float]]
+def betonflaechen(analyse: Querschnittsanalyse, randzone: Optional[float]=None) -> List[Tuple[Baustoff, float]]
 ```
 
 Die Flaeche jedes Betons, in m² -- ein Polygon zaehlt fuer seinen Beton
-und wird dem abgezogen, in dem es liegt, wie in der Interaktion.
+und wird dem abgezogen, in dem es liegt, wie in der Interaktion. Mit
+`randzone` (in m) nur der Beton bis zu diesem Abstand vom Rand des
+Bauteils ([[opencivil.querschnitt.randzone#flaechen_am_rand|flaechen_am_rand]]).
 
 ### RissnormalkraftQA
 
@@ -254,6 +267,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 ## Konstanten
 
 - `GRENZ_SCHRANKE = 1e-07` – Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.
+- `RANDZONE = 'Massiges Bauteil: es wirkt nur der Beton bis 250 mm vom Rand mit, un…` – Was die Begrenzung fuer massige Bauteile aendert -- im Bericht.
 
 ## Braucht
 
@@ -280,6 +294,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.randzone]]
 
 ## Gebraucht von
 

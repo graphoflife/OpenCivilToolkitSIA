@@ -1,11 +1,11 @@
 ---
-erzeugt: d6fabf8ff17b
+erzeugt: 4ebba705ec3d
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.4.2"
+normstelle: "SIA 262:2025, 4.4.2.3.4, Tabelle 17"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.4.2
+> SIA 262:2025, 4.4.2.3.4, Tabelle 17
 
 *In der Herleitung: «Zwängung auf Biegung, je Stab»*
 

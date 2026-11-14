@@ -73,6 +73,7 @@ const HILFE = {
       ['Weg', 'Risskraft des ungerissenen Querschnitts gegen A_s bei σ_s,adm'],
       ['Werte', 'f_ctm, f_yk; σ_s,adm nach Tab. 17 und Rissanforderung'],
       ['φ', 'Normalkraft: –; Biegung: eigenes φ → n = E_s/E_cm · (1 + φ)'],
+      ['500 mm', 'nur massige Bauteile: je Rand 250 mm Zugzone, k_t für 500 mm (SIA 262:2025, 4.4.2.3.7)'],
     ],
     formel: 'σ_s,adm ≥ N_Riss / A_s    N_Riss = h_eff/2 · b · f_ct,eff',
   },
@@ -90,8 +91,8 @@ const HILFE = {
   verformung: {
     zeilen: [
       ['Weg', 'w mit E_cm ermittelt, mal Vergrösserungsfaktor ω_w der gezogenen Seite'],
-      ['ω_w', 'SIA 262:2025, 4.4.3.2.5 – je Platte und gezogene Seite einmal gerechnet'],
-      ['Grenze', 'w_max = L/350 – nach Vorgabe, nicht nachgeschlagen'],
+      ['ω_w', 'SIA 262:2025, 4.4.3.2.5, Gl. (104) – je Platte und gezogene Seite einmal gerechnet'],
+      ['Grenze', 'w_max = L/350 – SIA 260:2013, Tab. 3: häufige Last, Funktionstüchtigkeit und Komfort'],
       ['φ', 'oben im Fenster, für alle Fälle der Platte; Vorgabe 2'],
     ],
     formel: 'w_eff = ω_w · w ≤ w_max = L/350',
@@ -319,7 +320,7 @@ function verformungInhalt(querschnitt) {
       titel: 'Kriechzahl φ im Vergrösserungsfaktor ω_w',
       beiAenderung: (v) => aendern((l) => { l.kriechzahl = v; }),
     }), erklaerung([
-      ['Wofür', 'den Vergrösserungsfaktor ω_w (SIA 262:2025, 4.4.3.2.5)'],
+      ['Wofür', 'den Vergrösserungsfaktor ω_w (SIA 262:2025, 4.4.3.2.5, Gl. (104))'],
       ['Gilt für', 'alle Verformungsfälle dieser Platte: ω_w wird je gezogene Seite einmal gerechnet'],
     ], 'ω_w = (1 − 20ρ′)/(10ρ^0.7) · (0.75 + 0.1φ) · (h/d)³')),
     el('p.hinweis.hinweis-annahme', { text: 'w mit der Steifigkeit E_cm ermitteln.' }),

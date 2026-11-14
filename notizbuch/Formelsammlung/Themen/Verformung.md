@@ -1,16 +1,16 @@
 ---
-erzeugt: da9f12115ed7
+erzeugt: de19f6575730
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 8 Formeln, in der Folge, in der gerechnet wird.
+> 9 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
 Eine Durchbiegung, mit der Steifigkeit E\_cm ermittelt, gilt für die ungerissene Platte. Die gerissene ist weicher, und unter Dauerlast kriecht der Beton; um wie viel beides die Durchbiegung vergrössert, schätzt der Faktor ω\_w. Er hängt nur an der Platte und an der Seite, die gezogen wird: ω\_w für Zug unten, ω\_w′ für Zug oben.
 
-Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je Fall. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt.
+Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je Fall. ρ ist der Gehalt der gezogenen Seite, ρ′ der der Gegenseite; beide beziehen sich auf die statische Höhe d der gezogenen Seite. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. Die Kriechzahl ist nach 3.1.2.6 zu wählen; die Vorgabe ist 2.
 
 Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungerissenen Querschnitt. Der Faktor ω\_w der gezogenen Seite führt sie auf die gerissene Platte unter Dauerlast; die so vergrösserte Durchbiegung hält der Nachweis gegen L/350.
 
@@ -21,9 +21,10 @@ Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungeri
 3. [[Schwerpunkt der zusammengefassten Lage]]
 4. [[Statische Höhe]]
 5. [[Bewehrungsgehalt]]
-6. [[Wirksame Durchbiegung]]
-7. [[Grenzwert der Durchbiegung]]
-8. [[Erfüllungsgrad]]
+6. [[Bewehrungsgehalt der Gegenseite]]
+7. [[Wirksame Durchbiegung]]
+8. [[Grenzwert der Durchbiegung]]
+9. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

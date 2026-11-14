@@ -1,10 +1,11 @@
 ---
-erzeugt: 7bf1cdec7f60
+erzeugt: 0c6c01d5e9f8
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 3.1.2.6.1, (12)"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 3.1.2.6.1, (12)
 
 $$
 n = \frac{E_s}{E_{cm}} \cdot \left(1 + \varphi\right)

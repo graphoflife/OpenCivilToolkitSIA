@@ -32,7 +32,9 @@ Ebene ist die Platte unbegrenzt. Unter Zug reisst sie darum ueber ihre Dicke,
 ``t = h``, auch bei einem Streifen, der schmaler ist als die Platte dick.
 
 Die Uebertragung der Regeln der Platte auf den gezeichneten Querschnitt
-geschieht nach Vorgabe, nicht nachgeschlagen (``notizbuch/Notizen/TODO.md``).
+geschieht nach Vorgabe: SIA 262:2025, 4.4.1.3 nimmt die kleinste Abmessung
+des Zuggurts und legt ``h/3`` nur fuer Platten und Rechtecke unter Biegung
+fest. Fuer andere Formen ist das offen (``notizbuch/Notizen/TODO.md``).
 """
 
 from __future__ import annotations
@@ -58,7 +60,8 @@ MOMENTENTEILER = 3.0
 REFERENZ_BEIWERT = "SIA 262:2025, 4.4.1.3, (100)"
 REFERENZ_ZUGFESTIGKEIT = "SIA 262:2025, 4.4.1.3, (99)"
 
-#: Groesste rissaktive Dicke unter Zug, in m -- wo die Begrenzung eingeschaltet ist.
+#: Groesste rissaktive Dicke unter Zug, in m -- wo die Begrenzung eingeschaltet
+#: ist: massige Bauteile, je gezogenem Rand 250 mm (SIA 262:2025, 4.4.2.3.7).
 DICKENGRENZE = 0.500
 
 
@@ -141,19 +144,21 @@ def rissmoment_wert(basis: str, g: Rissgroessen) -> Wert:
 
 
 def protokoll_rissmoment_rechteck(
-    p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str,
+    p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str, referenz: str,
 ) -> None:
     """
     Das Rissmoment von ``k_t`` an -- fuer das spröde Versagen und die
     Zwängung auf Biegung der Platte dieselben drei Zeilen. Gebraucht werden
-    die Eingaben ``h``, ``b`` und ``f_ctm``.
+    die Eingaben ``h``, ``b`` und ``f_ctm``; ``referenz`` ist die Stelle des
+    Nachweises, der die Rissbeanspruchung braucht -- 4.3.1.2 beim spröden
+    Versagen, Tabelle 17 bei der Zwängung.
     """
     f_ct_eff = protokoll_zugfestigkeit(
         p, Zwischenwerte(basis), k_t=g.k_t, f_ct_eff=g.f_ct_eff, h=e["h"],
         f_ctm=e["f_ctm"], teiler=MOMENTENTEILER)
     p.formel(rissmoment_wert(basis, g), r"@f_ct_eff \cdot \frac{@h^{2} \cdot @b}{6}",
              {"f_ct_eff": f_ct_eff, "h": e["h"], "b": e["b"]},
-             titel="Rissmoment des ungerissenen Querschnitts")
+             titel="Rissmoment des ungerissenen Querschnitts", referenz=referenz)
 
 
 # ===========================================================================
@@ -345,8 +350,11 @@ def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoque
 
 def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
                          werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment,
-                         M_y: float, M_z: float) -> Wert:
-    """Die Herleitung von :func:`rissmoment` -- zurueck kommt ``M_Riss``."""
+                         M_y: float, M_z: float, *, referenz: str) -> Wert:
+    """
+    Die Herleitung von :func:`rissmoment` -- zurueck kommt ``M_Riss``.
+    ``referenz`` wie bei :func:`protokoll_rissmoment_rechteck`.
+    """
     ecke = riss.ecke
     protokoll_ecke(p, ecke)
     h = werte.laenge("h", "h", riss.hoehe)
@@ -357,7 +365,7 @@ def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse
     W = protokoll_widerstandsmoment(p, werte, q, ecke, riss.W, M_y, M_z)
     M_Riss = werte.moment("M_Riss", "M_{Riss}", riss.M_Riss)
     p.formel(M_Riss, r"@f \cdot @W", {"f": f_ct_eff, "W": W},
-             titel="Rissmoment des ungerissenen Querschnitts")
+             titel="Rissmoment des ungerissenen Querschnitts", referenz=referenz)
     return M_Riss
 
 

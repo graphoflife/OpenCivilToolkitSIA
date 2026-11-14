@@ -1,5 +1,5 @@
 ---
-erzeugt: 871b750109e2
+erzeugt: f6fa4c349f75
 art: modul
 tags: [modul]
 ---
@@ -65,9 +65,11 @@ N_Riss(M) = (f_ct,eff,t - σ_M) · A      σ_M aus M, an der Ecke, die zuerst re
 Unter reiner Biegung mit dem Deviationsmoment `I_yz`, «einachsig» mit
 `W = I/v`. `f_ct,eff` mit `k_t` fuer ein Drittel der Tiefe, unter Zug
 fuer die rissaktive Dicke `min(h; b)` -- die Regeln der Platte,
-uebertragen; der Beton der Ecke gibt `f_ctm`. Nach Vorgabe, nicht
-nachgeschlagen (`notizbuch/Notizen/TODO.md`). Bei der Platte ist
-`W/A = h/6` -- dieselbe Formel.
+uebertragen; der Beton der Ecke gibt `f_ctm`. Nach Vorgabe: SIA 262:2025
+laesst den Querschnitt reissen, wenn der Beton `f_ctm` oder eine Fraktile
+erreicht, ohne `k_t` (4.2.1.14), und rechnet ihn ungerissen mit dem Stahl
+(4.1.4.1.4) -- Entscheid des Benutzers offen (`notizbuch/Notizen/TODO.md`).
+Bei der Platte ist `W/A = h/6` -- dieselbe Formel.
 
 
 ## DER AEQUIVALENTE MODUL

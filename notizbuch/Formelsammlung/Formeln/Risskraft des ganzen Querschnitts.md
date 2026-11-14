@@ -1,10 +1,11 @@
 ---
-erzeugt: 537a96046989
+erzeugt: 4d5c9512854b
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.4.2.3.4, Tabelle 17"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.4.2.3.4, Tabelle 17
 
 $$
 N_{Riss} = A_c \cdot f_{ct,eff}
@@ -43,4 +44,6 @@ mehrere Betone im Querschnitt, zählt jeder mit seiner Fläche und seinem
 $f_{ctm}$; ein Polygon, das in einem anderen liegt, ersetzt dieses dort. Die
 Bewehrung muss die Kraft übernehmen, jeder Stab bis zu seiner zulässigen
 Spannung. Bei der Platte nimmt jede Lage die gezogene Hälfte,
-$h_{eff}/2 \cdot b \cdot f_{ct,eff}$ – zusammen derselbe Gedanke.
+$h_{eff}/2 \cdot b \cdot f_{ct,eff}$ – zusammen derselbe Gedanke. Bei
+massigen Bauteilen zählt mit dem Schalter «500 mm» nur die Randzone,
+$A_{c,eff}$ (siehe [[Rissaktive Dicke des gezeichneten Querschnitts]]).

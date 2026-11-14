@@ -140,7 +140,7 @@ class SproedesVersagen(Lagennachweis):
             "Querschnitt mehr trägt als der unbewehrte im Augenblick des "
             f"Risses: M_{self.mn.wahl.index}(N_Ed = 0) ≥ M_Riss."
         )
-        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id)
+        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id, referenz=self.REFERENZ)
 
     def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis,
                        ansatz: Tuple[Rissgroessen, Wert]) -> None:

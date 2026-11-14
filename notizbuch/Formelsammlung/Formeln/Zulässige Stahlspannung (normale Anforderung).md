@@ -1,11 +1,11 @@
 ---
-erzeugt: 0b4c546ee183
+erzeugt: 727c74049575
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.4.2"
+normstelle: "SIA 262:2025, Tabelle 17"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.4.2
+> SIA 262:2025, Tabelle 17
 
 $$
 \sigma_{s,adm} = f_{yk}

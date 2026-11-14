@@ -1,10 +1,11 @@
 ---
-erzeugt: 7e8544182388
+erzeugt: 282f920fbaf1
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.4.2.3.4, Tabelle 17"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.4.2.3.4, Tabelle 17
 
 $$
 N_{Riss} = \frac{h_{eff}}{2} \cdot b \cdot f_{ct,eff}

@@ -1,10 +1,11 @@
 ---
-erzeugt: c201d237240e
+erzeugt: 717b3517e086
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.4.2.3.7"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.4.2.3.7
 
 $$
 h_{eff} = \min\left[500\,\mathrm{mm};\ h\right]
@@ -42,6 +43,7 @@ $$
 ## Theorie
 
 Die Dicke, über die eine Zwängung den Querschnitt reissen lässt. Ist die
-Begrenzung eingeschaltet, zählt höchstens 500 mm: dicke Bauteile reissen
-nicht über ihre ganze Dicke gleichzeitig, die Zwängung wirkt in einer
-Randzone. Ohne Begrenzung zählt die ganze Dicke.
+Begrenzung eingeschaltet, zählt höchstens 500 mm: bei massigen Bauteilen
+wirkt je gezogenem Rand nur eine Zone von 250 mm mit, und $k_t$ gilt für
+500 mm (SIA 262, 4.4.2.3.7). Unter Zug sind beide Ränder der Platte
+gezogen, zusammen 500 mm. Ohne Begrenzung zählt die ganze Dicke.

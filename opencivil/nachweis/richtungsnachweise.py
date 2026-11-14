@@ -37,6 +37,7 @@ from opencivil.nachweis.rissgroessen import (
     bruttoquerschnitt, protokoll_rissmoment, protokoll_spannung_ungerissen, rissbezuege,
     rissmoment,
 )
+from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 
 
@@ -140,11 +141,11 @@ class SproedesVersagenQA(Nachweis):
         self.analyse = analyse
         basis = f"{analyse.id}.nachweis.sproede"
         self.d_ausnutzung = grade_je_seite(basis, "Riss", "Erfüllungsgrad sprödes Versagen",
-                                           "SIA 262:2025, 4.3.1.2", analyse)
+                                           SproedesVersagen.REFERENZ, analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
                          titel=f"Sprödes Versagen – {analyse.name}",
-                         referenz="SIA 262:2025, 4.3.1.2", abschnitt=analyse.abschnitt)
+                         referenz=SproedesVersagen.REFERENZ, abschnitt=analyse.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         q, _ = self.analyse.interaktion(e)
@@ -157,7 +158,7 @@ class SproedesVersagenQA(Nachweis):
             "Deviationsmoment.")
         protokoll_spannung_ungerissen(p, self.analyse.biegung)
         p.ansatz(r"M_{Rd}(N = 0) \ge M_{Riss} = f_{ct,eff} \cdot W",
-                 titel="Sprödes Versagen", referenz="SIA 262:2025, 4.3.1.2",
+                 titel="Sprödes Versagen", referenz=SproedesVersagen.REFERENZ,
                  name="Bedingung gegen sprödes Versagen")
 
         brutto = bruttoquerschnitt(self.analyse, e.si_nach_id())
@@ -174,7 +175,8 @@ class SproedesVersagenQA(Nachweis):
                 continue
 
             riss = rissmoment(brutto, M_y, M_z)
-            M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, brutto, riss, M_y, M_z)
+            M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, brutto, riss, M_y, M_z,
+                                          referenz=SproedesVersagen.REFERENZ)
             M_Rd_si = self.analyse.biegung.betrag(punkt.M_y, punkt.M_z)
             M_Rd = werte.moment("M_Rd", "M_{Rd}", M_Rd_si)
             p.wert(M_Rd, titel="Biegewiderstand bei N = 0 in dieser Richtung")

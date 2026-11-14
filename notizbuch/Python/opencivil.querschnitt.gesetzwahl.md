@@ -1,5 +1,5 @@
 ---
-erzeugt: a2283e022b95
+erzeugt: 54f62622b395
 art: modul
 tags: [modul]
 ---
@@ -333,6 +333,7 @@ ist der Modul der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querschnittsloeser]]

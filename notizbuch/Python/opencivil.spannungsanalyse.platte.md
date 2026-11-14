@@ -1,5 +1,5 @@
 ---
-erzeugt: 999ab96b2118
+erzeugt: 006db9286ec7
 art: modul
 tags: [modul]
 ---
@@ -63,11 +63,13 @@ Mit `A = b·h` und `W = b·h²/6` -- denselben Werten, mit denen
 Rissmoment ohne Normalkraft rechnet -- ist das
 `M_Riss(N) = M_Riss(0) - N·h/6`. Druck hebt es, Zug senkt es.
 
-Annahme, nicht nachgeschlagen (`notizbuch/Notizen/TODO.md`): der
-Bruttoquerschnitt ohne Stahl, wie beim spröden Versagen. Der
-ungerissene Zustand daneben rechnet mit Stahl und Kriechzahl und ist
-darum steifer; beim Rissmoment steht sein Rand etwas unter
-`f_ct,eff`.
+Nach Vorgabe: der Bruttoquerschnitt ohne Stahl, wie beim spröden
+Versagen. Der ungerissene Zustand daneben rechnet mit Stahl und
+Kriechzahl und ist darum steifer; beim Rissmoment steht sein Rand
+etwas unter `f_ct,eff`. SIA 262:2025 laesst den Querschnitt reissen,
+wenn der Beton `f_ctm` oder eine Fraktile erreicht, ohne `k_t`
+(4.2.1.14), und rechnet ihn ungerissen mit dem Stahl (4.1.4.1.4) --
+Entscheid des Benutzers offen (`notizbuch/Notizen/TODO.md`).
 
 `f_ct,eff` mit `k_t` fuer ein Drittel der Dicke, auch unter Zug:
 Biegung bleibt bei `h/3`, nach Vorgabe. Die Rissnormalkraft nimmt die
@@ -88,7 +90,7 @@ Moments zaehlt nicht -- der Querschnitt ist oben wie unten derselbe.
 
 `f_ct,eff` mit `k_t = 1/(1 + 0.5·t)` fuer die ganze Dicke,
 `t = h`: unter Zug reisst der ganze Querschnitt, nicht ein Drittel
-wie unter Biegung. Nach Vorgabe, nicht nachgeschlagen
+wie unter Biegung. Nach Vorgabe, wie beim Rissmoment
 (`notizbuch/Notizen/TODO.md`). Bis 2026-10-09 galt das `f_ct,eff`
 des Rissmoments, mit `t = h/3` -- am Beispiel 829 statt 757 kN.
 

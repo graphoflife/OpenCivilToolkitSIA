@@ -1,5 +1,5 @@
 ---
-erzeugt: 9cd29eade640
+erzeugt: 80eaf2ef8138
 art: modul
 tags: [modul]
 ---
@@ -89,6 +89,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rissgroessen]]
+- [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.querschnitt.analyse]]
 
 ## Gebraucht von

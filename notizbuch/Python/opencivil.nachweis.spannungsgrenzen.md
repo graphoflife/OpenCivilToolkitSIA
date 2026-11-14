@@ -1,5 +1,5 @@
 ---
-erzeugt: b562ee94e741
+erzeugt: 65ccfad0f530
 art: modul
 tags: [modul]
 ---
@@ -197,7 +197,7 @@ mitgeschrieben, mit [[opencivil.nachweis.spannungsgrenzen#Grenzgruppe|Grenzgrupp
 ```python
 @classmethod
 @abstractmethod
-def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort') -> None
+def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort', anforderung: Rissanforderung) -> None
 ```
 
 Welche Werte die Grenze ansetzt, und warum -- nur der Absatz.
@@ -250,7 +250,7 @@ def bestimmen(cls, ort: 'Stahlspannungsort', zustand: Stahlzustand, e: Eingaben,
 
 ```python
 @classmethod
-def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort') -> None
+def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort', anforderung: Rissanforderung) -> None
 ```
 
 ### GrenzeAusRissbreite
@@ -280,7 +280,7 @@ Querschnitt je Stab den eigenen.
 - `einwirkung = 'quasi-ständiger'`
 - `lastindex = '\\text{quasi-ständig}'`
 - `fallwort = 'Quasi-ständiger Lastfall'`
-- `referenz = 'SIA 262:2025, 4.4.2'`
+- `referenz = REFERENZ_RISSBREITE`
 - `einleitung = 'Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Riss…`
 
 #### GrenzeAusRissbreite.bezuege
@@ -301,13 +301,14 @@ def bestimmen(cls, ort: 'Stahlspannungsort', zustand: Stahlzustand, e: Eingaben,
 
 ```python
 @classmethod
-def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort') -> None
+def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort', anforderung: Rissanforderung) -> None
 ```
 
 
 ## Konstanten
 
 - `FLIESSABSTAND = 80000000.0` – Abstand zur Bemessungsfliessgrenze, in Pa. SIA 262:2025, Tabelle 17.
+- `FUSSNOTE_RISSBREITE = 'Die Grenze nach Gl. (102) gilt für den Augenblick, in dem der Riss e…` – Was die Grenze aus der Rissbreite nicht deckt: SIA 262:2025, Tabelle 17, Fussnote 1 zu Zeile 2 -- in eigenen Worten. Nur wo eine Rissbreite verlangt ist; bei normaler Anforderung gilt f_yk ohne sie.
 
 ## Braucht
 
@@ -316,6 +317,7 @@ def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort') -> None
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.stabgrenzen]]

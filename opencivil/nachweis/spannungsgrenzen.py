@@ -31,6 +31,7 @@ from opencivil.core.einheiten import N_PRO_MM2, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
+from opencivil.nachweis.mindestbewehrung import REFERENZ_RISSBREITE
 from opencivil.nachweis.rissanforderung import Rissanforderung
 
 if TYPE_CHECKING:
@@ -215,7 +216,8 @@ class Spannungsgrenze(ABC):
 
     @classmethod
     @abstractmethod
-    def festlegung(cls, p: Protokoll, ort: "Stahlspannungsort") -> None:
+    def festlegung(cls, p: Protokoll, ort: "Stahlspannungsort",
+                   anforderung: Rissanforderung) -> None:
         """Welche Werte die Grenze ansetzt, und warum -- nur der Absatz."""
 
 
@@ -254,17 +256,27 @@ class GrenzeGegenFliessen(Spannungsgrenze):
         return gegen_fliessen(zustand, e, p, basis)
 
     @classmethod
-    def festlegung(cls, p: Protokoll, ort: "Stahlspannungsort") -> None:
+    def festlegung(cls, p: Protokoll, ort: "Stahlspannungsort",
+                   anforderung: Rissanforderung) -> None:
         p.erklaerung(
-            "Drittens die Grenze: sie rechnet mit dem Bemessungswert, "
-            "σ_s,adm = f_yd − 80 N/mm², und nicht mit f_yk − 80. Die Norm sagt "
-            "an dieser Stelle nicht eindeutig, welcher Wert gemeint ist; f_yd "
-            "ist die strengere Wahl – die Grenze liegt rund 15 % tiefer –, "
-            "gewählt ist deshalb die Seite, auf der man nicht danebenliegen "
-            "kann. Das ist etwas anderes als das Fliessplateau oben: dort geht "
-            "es darum, was der Stahl tut, hier darum, wie viel Abstand man "
-            "davon verlangt."
+            "Drittens die Grenze: σ_s,adm = f_yd − 80 N/mm², mit dem "
+            "Bemessungswert, wie ihn die Norm in Tabelle 17 ausdrücklich nennt – "
+            "für B500 sind das 355 N/mm². Das ist etwas anderes als das "
+            "Fliessplateau oben: dort geht es darum, was der Stahl tut, hier "
+            "darum, wie viel Abstand man davon verlangt."
         )
+
+
+#: Was die Grenze aus der Rissbreite nicht deckt: SIA 262:2025, Tabelle 17,
+#: Fussnote 1 zu Zeile 2 -- in eigenen Worten. Nur wo eine Rissbreite
+#: verlangt ist; bei normaler Anforderung gilt f_yk ohne sie.
+FUSSNOTE_RISSBREITE = (
+    "Die Grenze nach Gl. (102) gilt für den Augenblick, in dem der Riss "
+    "entsteht. Liegt die quasi-ständige Beanspruchung darüber – bei einer "
+    "Platte im Feld der Regelfall –, hält die Bewehrung die verlangte "
+    "Rissbreite nach Tabelle 17, Fussnote 1 nur mit mehr Stahl ein, als die "
+    "Formel verlangt; wie viel, sagt die Norm nicht. Das Werkzeug prüft das "
+    "nicht.")
 
 
 class GrenzeAusRissbreite(Spannungsgrenze):
@@ -291,7 +303,7 @@ class GrenzeAusRissbreite(Spannungsgrenze):
     einwirkung = "quasi-ständiger"
     lastindex = r"\text{quasi-ständig}"
     fallwort = "Quasi-ständiger Lastfall"
-    referenz = "SIA 262:2025, 4.4.2"
+    referenz = REFERENZ_RISSBREITE
     einleitung = ("Unter quasi-ständiger Einwirkung begrenzt die "
                   "Stahlspannung die Rissbreite – dieselbe Grenze wie bei der "
                   "Zwängung, nur dass die Spannung hier aus den Lasten kommt "
@@ -307,9 +319,12 @@ class GrenzeAusRissbreite(Spannungsgrenze):
         return ort.aus_rissbreite(zustand, e, p, anforderung, basis)
 
     @classmethod
-    def festlegung(cls, p: Protokoll, ort: "Stahlspannungsort") -> None:
+    def festlegung(cls, p: Protokoll, ort: "Stahlspannungsort",
+                   anforderung: Rissanforderung) -> None:
         p.erklaerung(
             "Drittens die Grenze: dieselbe wie bei der Zwängung, mit f_yk und "
             "bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die "
             f"Rissbreite. {ort.regel_der_rissbreite}"
         )
+        if anforderung.rissbreite is not None:
+            p.hinweis(FUSSNOTE_RISSBREITE)

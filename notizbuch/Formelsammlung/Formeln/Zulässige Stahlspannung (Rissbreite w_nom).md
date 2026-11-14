@@ -1,11 +1,11 @@
 ---
-erzeugt: a4490f8d3d59
+erzeugt: a85d1718144d
 art: formel
 tags: [formel]
-normstelle: "SIA 262:2025, 4.4.2"
+normstelle: "SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17"
 ---
 > [!info] Normstelle
-> SIA 262:2025, 4.4.2
+> SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17
 
 $$
 \sigma_{s,adm,2,x} = \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{2,x}}};\ f_{yk}\right]

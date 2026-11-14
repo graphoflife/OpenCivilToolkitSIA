@@ -1,5 +1,5 @@
 ---
-erzeugt: f45681affd2d
+erzeugt: e19012cb2d14
 art: modul
 tags: [modul]
 ---
@@ -124,4 +124,5 @@ def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis, ansatz: 
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.projekt.aufbau.platte]]

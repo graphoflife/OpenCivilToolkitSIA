@@ -1,5 +1,5 @@
 ---
-erzeugt: f9d882b82de1
+erzeugt: 46cfd8188e63
 art: modul
 tags: [modul]
 ---
@@ -25,26 +25,33 @@ Vergroesserungsfaktor omega_w -- in der Norm w/w_c, SIA 262:2025, 4.4.3.2.5
 
 ## EIN FAKTOR JE SEITE, NICHT JE FALL
 
-`rho = A_s/(b·d)` gehoert zur gezogenen Seite, `rho'` zur Gegenseite, mit
-`d'` vom gezogenen Rand bis zur Gegenlage -- das ist deren statische Hoehe:
-`rho'` der einen Seite ist das `rho` der anderen. Der Faktor haengt also
-nur an der Platte und an der gezogenen Seite: [[opencivil.nachweis.verformung#Vergroesserungsfaktor|Vergroesserungsfaktor]]
-rechnet ihn je Seite mit x-Bewehrung, immer -- unten omega_w, oben omega_w'
---, denn die Zusammenfassung zeigt beide als Kennzahl (Benutzer,
-2026-10-16). Der Nachweis liest ihn fuer jeden Fall seiner Seite. Die
-x-Posten einer Seite zaehlen zusammen, in ihrem Schwerpunkt. Fehlt die
-Gegenseite, ist `rho' = 0`; fehlt die gezogene, gibt es keinen Faktor, und
-der Fall laesst sich nicht nachweisen.
+`rho = A_s/(b·d)` gehoert zur gezogenen Seite, `rho' = A_s'/(b·d)` zur
+Gegenseite -- beide mit dem `d` der gezogenen Seite (SIA 262:2025,
+4.4.3.2.5). Bis 2026-11-14 bezog sich `rho'` auf die statische Hoehe der
+Gegenseite; im Beispiel aenderte das omega_w um ein Promille. Der Faktor
+haengt nur an der Platte und an der gezogenen Seite:
+[[opencivil.nachweis.verformung#Vergroesserungsfaktor|Vergroesserungsfaktor]] rechnet ihn je Seite mit x-Bewehrung, immer
+-- unten omega_w, oben omega_w' --, denn die Zusammenfassung zeigt beide als
+Kennzahl (Benutzer, 2026-10-16). Der Nachweis liest ihn fuer jeden Fall
+seiner Seite. Die x-Posten einer Seite zaehlen zusammen, in ihrem
+Schwerpunkt. Fehlt die Gegenseite, ist `rho' = 0`; fehlt die gezogene,
+gibt es keinen Faktor, und der Fall laesst sich nicht nachweisen. Ab
+`rho' = 5 %` waere der Faktor nicht mehr positiv: dann gibt es keinen
+Nachweis.
 
-Das phi gehoert der Verformung der Platte, Vorgabe 2.
+Das phi gehoert der Verformung der Platte, Vorgabe 2; die Norm bestimmt es
+nach 3.1.2.6.
 
 
-## NACH VORGABE
+## DIE NORM
 
-Der Grenzwert L/350 und dass `w` mit E_cm ermittelt ist, stehen so, wie
-der Benutzer sie vorgegeben hat -- nicht nachgeschlagen
-(`notizbuch/Notizen/TODO.md`). Die Formel des Faktors und ihre Normstelle
-hat er geliefert.
+`w` mit E_cm heisst mit `gamma_cE = 1.0` (4.2.1.16). Den Grenzwert gibt
+SIA 262 an SIA 260 weiter (4.4.3.1.1): L/350 steht in SIA 260:2013,
+Anhang A, Tabelle 3, unter haeufiger Last fuer Funktionstuechtigkeit und
+Komfort; welches Kriterium gilt, legt das Projekt fest (4.4.3.2.1). Die
+Tabelle meint dort nur einen Teil der Durchbiegung -- was nach dem Einbau
+der Einbauten dazukommt, oder was die veraenderlichen Lasten bewirken.
+Gehalten wird die ganze samt Kriechen; das liegt sicher.
 
 
 ## EINHEITEN
@@ -108,12 +115,13 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 #### Vergroesserungsfaktor._bewehrungsgehalte
 
 ```python
-def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) -> Dict[Zugseite, Tuple[Wert, Wert]]
+def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) -> Dict[Zugseite, Tuple[Wert, Wert, Wert]]
 ```
 
-Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
-Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
-Gehalt als rho'. Querschnitt, Schwerpunkt und Hoehe der Lage schreibt
+Je Seite mit x-Bewehrung ihr Querschnitt, ihr Bewehrungsgehalt und
+ihre statische Hoehe -- die gezogene Seite braucht Gehalt und Hoehe,
+die Gegenseite ihren Querschnitt fuer rho'. Querschnitt, Schwerpunkt
+und Hoehe der Lage schreibt
 [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]], wie in den
 Nachweisen der Lagen: dieselbe Hoehe heisst ueberall gleich, etwa
 d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
@@ -141,7 +149,9 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ## Konstanten
 
 - `KRIECHZAHL = 2.0` – Vorgabe der Kriechzahl phi im Vergroesserungsfaktor -- Klima und Belastungsalter, eine Annahme ueber das Bauwerk.
-- `GRENZE = 350.0` – `w_max = L / GRENZE` -- nach Vorgabe des Benutzers (2026-10-16), nicht nachgeschlagen.
+- `GRENZE = 350.0` – `w_max = L / GRENZE` -- SIA 260:2013, Anhang A, Tabelle 3 (siehe Dateikopf). Daneben stehen dort L/500 (selten, sproede Einbauten) und L/300 (quasi-staendig, Aussehen).
+- `REFERENZ_FAKTOR = 'SIA 262:2025, 4.4.3.2.5, (104)'` – Woher Faktor und Grenzwert kommen.
+- `REFERENZ_GRENZE = 'SIA 260:2013, Anhang A, Tabelle 3'`
 - `SYMBOL = {Zugseite.UNTEN: '\\omega_w', Zugseite.OBEN: "\\omega_w'"}` – Wie der Faktor einer Seite heisst: omega_w fuer Zug unten, omega_w' fuer Zug oben (Benutzer, 2026-10-16). Ziehen kann ein Fall die Seiten der Platte, [[opencivil.querschnitt.zugseite#Konstanten|UM_Y]]: unten im Feld, oben am Kragarm oder ueber der Stuetze.
 
 ## Braucht
@@ -164,6 +174,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ## Formeln aus diesem Modul
 
 - [[Bewehrungsgehalt]] · `Vergroesserungsfaktor._bewehrungsgehalte`
+- [[Bewehrungsgehalt der Gegenseite]] · `Vergroesserungsfaktor.rechne`
 - [[Grenzwert der Durchbiegung]] · `Verformung._einen_fall`
 - [[Vergrösserungsfaktor der Durchbiegung]] · `Vergroesserungsfaktor.rechne`
 - [[Wirksame Durchbiegung]] · `Verformung._einen_fall`

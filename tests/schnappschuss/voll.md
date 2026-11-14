@@ -609,9 +609,9 @@ $$
 
 Massgebend: 2. Lage (kleinster Erfüllungsgrad).
 
-### Sprödes Versagen unter Zwängung – x-Richtung
+### Zwängung auf Normalkraft – x-Richtung
 
-**Rissaktive Plattendicke**
+**Rissaktive Plattendicke** *(SIA 262:2025, 4.4.2.3.7)*
 
 $$
 h_{eff} = \min\left[500\,\mathrm{mm};\ h\right] = \min\left[500\,\mathrm{mm};\ 300\,\mathrm{mm}\right] = 300\,\mathrm{mm}
@@ -629,7 +629,7 @@ $$
 f_{ct,eff} = k_t \cdot f_{ctm} = 0.87 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.52\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Risskraft der gezogenen Querschnittshälfte**
+**Risskraft der gezogenen Querschnittshälfte** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 N_{Riss} = \frac{h_{eff}}{2} \cdot b \cdot f_{ct,eff} = \frac{300\,\mathrm{mm}}{2} \cdot 1000\,\mathrm{mm} \cdot 2.52\,\mathrm{N}/\mathrm{mm}^{2} = 378.3\,\mathrm{kN}
@@ -649,7 +649,7 @@ $$
 \varnothing_{2,x} = \max\left[\varnothing_{2,x,g};\ \varnothing_{2,x,z}\right] = \max\left[18\,\mathrm{mm};\ 12\,\mathrm{mm}\right] = 18\,\mathrm{mm}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -659,7 +659,7 @@ $$
 \end{aligned}
 $$
 
-**Aufnehmbare Risskraft**
+**Aufnehmbare Risskraft** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -677,7 +677,7 @@ $$
 
 #### Rissnormalkraft – 3. Lage x
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -687,7 +687,7 @@ $$
 \end{aligned}
 $$
 
-**Aufnehmbare Risskraft**
+**Aufnehmbare Risskraft** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -719,7 +719,7 @@ $$
 f_{ct,eff} = k_t \cdot f_{ctm} = 0.952 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.76\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.3.1.2)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6} = 2.76\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\left(300\,\mathrm{mm}\right)^{2} \cdot 1000\,\mathrm{mm}}{6} = 41.4\,\mathrm{kNm}
@@ -769,13 +769,13 @@ $$
 f_{ct,eff} = k_t \cdot f_{ctm} = 0.952 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.76\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6} = 2.76\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\left(300\,\mathrm{mm}\right)^{2} \cdot 1000\,\mathrm{mm}}{6} = 41.4\,\mathrm{kNm}
 $$
 
-**Wertigkeit im gerissenen Zustand**
+**Wertigkeit im gerissenen Zustand** *(SIA 262:2025, 3.1.2.6.1, (12))*
 
 $$
 n = \frac{E_s}{E_{cm}} \cdot \left(1 + \varphi\right) = \frac{200000\,\mathrm{N}/\mathrm{mm}^{2}}{33620\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(1 + 2\right) = 17.85
@@ -811,7 +811,7 @@ $$
 \varnothing_{2,x} = \max\left[\varnothing_{2,x,g};\ \varnothing_{2,x,z}\right] = \max\left[18\,\mathrm{mm};\ 12\,\mathrm{mm}\right] = 18\,\mathrm{mm}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -843,7 +843,7 @@ $$
 z = d_{2,x} - \frac{x}{3} = 248.1\,\mathrm{mm} - \frac{109.9\,\mathrm{mm}}{3} = 211.4\,\mathrm{mm}
 $$
 
-**Aufnehmbares Moment der Bewehrung**
+**Aufnehmbares Moment der Bewehrung** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -867,7 +867,7 @@ $$
 d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -899,7 +899,7 @@ $$
 z = d_{3,x,g} - \frac{x}{3} = 252\,\mathrm{mm} - \frac{70\,\mathrm{mm}}{3} = 228.7\,\mathrm{mm}
 $$
 
-**Aufnehmbares Moment der Bewehrung**
+**Aufnehmbares Moment der Bewehrung** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -937,7 +937,7 @@ $$
 \varnothing_{max} = 18\,\mathrm{mm}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -972,6 +972,8 @@ $$
 $$
 f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
+
+> **Hinweis:** Die Grenze nach Gl. (102) gilt für den Augenblick, in dem der Riss entsteht. Liegt die quasi-ständige Beanspruchung darüber – bei einer Platte im Feld der Regelfall –, hält die Bewehrung die verlangte Rissbreite nach Tabelle 17, Fussnote 1 nur mit mehr Stahl ein, als die Formel verlangt; wie viel, sagt die Norm nicht. Das Werkzeug prüft das nicht.
 
 #### Wie die Dehnungsebene gefunden wird
 
@@ -1293,13 +1295,13 @@ $$
 
 ### Vergrösserungsfaktor der Durchbiegung
 
-**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
-\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}
 $$
 
-**Kriechzahl**
+**Kriechzahl** *(SIA 262:2025, 3.1.2.6)*
 
 $$
 \varphi = 2
@@ -1327,7 +1329,7 @@ $$
 d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt unten**
+**Bewehrungsgehalt unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
@@ -1339,45 +1341,57 @@ $$
 d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt oben**
+**Bewehrungsgehalt oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00299
 $$
 
-**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00304
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00299}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00304}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
   &= 4
 \end{aligned}
 $$
 
-**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{o} = \frac{A_{s,2,x}}{b \cdot d_{3,x,g}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00972
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00988}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
-  &= 7.52
+  \omega_w' &= \frac{1 - 20 \cdot \rho'_{o}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00972}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
+  &= 7.55
 \end{aligned}
 $$
 
 ### Verformung
 
-> **Annahme:** w ist mit der Steifigkeit E\_cm ermittelt. Grenzwert w\_max = L/350 nach Vorgabe, nicht nachgeschlagen.
+> **Annahme:** w ist mit der Steifigkeit E\_cm ermittelt, also mit γ\_cE = 1.0 (SIA 262:2025, 4.2.1.16). Grenzwert w\_max = L/350 nach SIA 260:2013, Anhang A, Tabelle 3: unter häufiger Last, für Funktionstüchtigkeit und Komfort. Die Tabelle meint dort nur einen Teil der Durchbiegung, was nach dem Einbau dazukommt oder was die veränderlichen Lasten bewirken; gehalten wird die ganze samt Kriechen, das liegt sicher. Welches Kriterium gilt, legt das Projekt fest (SIA 262:2025, 4.4.3.2.1).
 
 #### Verformung – Feld
 
-**Wirksame Durchbiegung, Zug unten**
+**Wirksame Durchbiegung, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 w_{eff} = \omega_w \cdot w = 4 \cdot 3\,\mathrm{mm} = 12\,\mathrm{mm}
 $$
 
-**Grenzwert der Durchbiegung, nach Vorgabe**
+**Grenzwert der Durchbiegung** *(SIA 260:2013, Anhang A, Tabelle 3)*
 
 $$
 w_{max} = \frac{L}{350} = \frac{6\,\mathrm{m}}{350} = 17.1\,\mathrm{mm}
@@ -1397,13 +1411,13 @@ $$
 
 #### Verformung – Kragarm
 
-**Wirksame Durchbiegung, Zug oben**
+**Wirksame Durchbiegung, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
-w_{eff} = \omega_w' \cdot w = 7.52 \cdot 0.8\,\mathrm{mm} = 6\,\mathrm{mm}
+w_{eff} = \omega_w' \cdot w = 7.55 \cdot 0.8\,\mathrm{mm} = 6\,\mathrm{mm}
 $$
 
-**Grenzwert der Durchbiegung, nach Vorgabe**
+**Grenzwert der Durchbiegung** *(SIA 260:2013, Anhang A, Tabelle 3)*
 
 $$
 w_{max} = \frac{L}{350} = \frac{2.5\,\mathrm{m}}{350} = 7.1\,\mathrm{mm}
@@ -1418,7 +1432,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,w,\text{Kragarm}} = \frac{w_{max}}{w_{eff}} = \frac{7.1\,\mathrm{mm}}{6\,\mathrm{mm}} = 1.19 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,w,\text{Kragarm}} = \frac{w_{max}}{w_{eff}} = \frac{7.1\,\mathrm{mm}}{6\,\mathrm{mm}} = 1.18 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Knicken
@@ -2372,7 +2386,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 $$
 
-**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
@@ -2458,13 +2472,13 @@ $$
 
 ### Vergrösserungsfaktor der Durchbiegung
 
-**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
-\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}
 $$
 
-**Kriechzahl**
+**Kriechzahl** *(SIA 262:2025, 3.1.2.6)*
 
 $$
 \varphi = 1.5
@@ -2476,7 +2490,7 @@ $$
 d_{1,x,g} = z_{1,x,g} = 165\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt unten**
+**Bewehrungsgehalt unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{u} = \frac{A_{s,1,x,g}}{b \cdot d_{1,x,g}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
@@ -2488,27 +2502,39 @@ $$
 d_{4,x,g} = h - z_{4,x,g} = 200\,\mathrm{mm} - 35\,\mathrm{mm} = 165\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt oben**
+**Bewehrungsgehalt oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{o} = \frac{A_{s,4,x,g}}{b \cdot d_{4,x,g}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
 $$
 
-**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{u} = \frac{A_{s,4,x,g}}{b \cdot d_{1,x,g}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{1,x,g}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{1,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00317}{10 \cdot 0.00317^{0.7}} \cdot \left(0.75 + 0.1 \cdot 1.5\right) \cdot \left(\frac{200\,\mathrm{mm}}{165\,\mathrm{mm}}\right)^{3} \\
   &= 8.42
 \end{aligned}
 $$
 
-**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{o} = \frac{A_{s,1,x,g}}{b \cdot d_{4,x,g}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{4,x,g}}\right)^{3} \\
+  \omega_w' &= \frac{1 - 20 \cdot \rho'_{o}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{4,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00317}{10 \cdot 0.00317^{0.7}} \cdot \left(0.75 + 0.1 \cdot 1.5\right) \cdot \left(\frac{200\,\mathrm{mm}}{165\,\mathrm{mm}}\right)^{3} \\
   &= 8.42
 \end{aligned}
@@ -2516,17 +2542,17 @@ $$
 
 ### Verformung
 
-> **Annahme:** w ist mit der Steifigkeit E\_cm ermittelt. Grenzwert w\_max = L/350 nach Vorgabe, nicht nachgeschlagen.
+> **Annahme:** w ist mit der Steifigkeit E\_cm ermittelt, also mit γ\_cE = 1.0 (SIA 262:2025, 4.2.1.16). Grenzwert w\_max = L/350 nach SIA 260:2013, Anhang A, Tabelle 3: unter häufiger Last, für Funktionstüchtigkeit und Komfort. Die Tabelle meint dort nur einen Teil der Durchbiegung, was nach dem Einbau dazukommt oder was die veränderlichen Lasten bewirken; gehalten wird die ganze samt Kriechen, das liegt sicher. Welches Kriterium gilt, legt das Projekt fest (SIA 262:2025, 4.4.3.2.1).
 
 #### Verformung – Feld
 
-**Wirksame Durchbiegung, Zug unten**
+**Wirksame Durchbiegung, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 w_{eff} = \omega_w \cdot w = 8.42 \cdot 2\,\mathrm{mm} = 16.8\,\mathrm{mm}
 $$
 
-**Grenzwert der Durchbiegung, nach Vorgabe**
+**Grenzwert der Durchbiegung** *(SIA 260:2013, Anhang A, Tabelle 3)*
 
 $$
 w_{max} = \frac{L}{350} = \frac{5\,\mathrm{m}}{350} = 14.3\,\mathrm{mm}
@@ -3000,7 +3026,7 @@ $$
 f_{ct,eff} = k_t \cdot f_{ctm} = 0.96 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.78\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.3.1.2)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6} = 2.78\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\left(250\,\mathrm{mm}\right)^{2} \cdot 1000\,\mathrm{mm}}{6} = 29\,\mathrm{kNm}
@@ -3050,7 +3076,7 @@ $$
 \varnothing_{max} = 12\,\mathrm{mm}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -3085,6 +3111,8 @@ $$
 $$
 f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
+
+> **Hinweis:** Die Grenze nach Gl. (102) gilt für den Augenblick, in dem der Riss entsteht. Liegt die quasi-ständige Beanspruchung darüber – bei einer Platte im Feld der Regelfall –, hält die Bewehrung die verlangte Rissbreite nach Tabelle 17, Fussnote 1 nur mit mehr Stahl ein, als die Formel verlangt; wie viel, sagt die Norm nicht. Das Werkzeug prüft das nicht.
 
 #### Wie die Dehnungsebene gefunden wird
 
@@ -3412,13 +3440,13 @@ $$
 
 ### Vergrösserungsfaktor der Durchbiegung
 
-**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
-\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}
 $$
 
-**Kriechzahl**
+**Kriechzahl** *(SIA 262:2025, 3.1.2.6)*
 
 $$
 \varphi = 2
@@ -3430,7 +3458,7 @@ $$
 d_{2,x,g} = z_{2,x,g} = 204\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt unten**
+**Bewehrungsgehalt unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{2,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
@@ -3442,28 +3470,40 @@ $$
 d_{3,x,g} = h - z_{3,x,g} = 250\,\mathrm{mm} - 45\,\mathrm{mm} = 205\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt oben**
+**Bewehrungsgehalt oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 205\,\mathrm{mm}} = 0.00255
 $$
 
-**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.00257
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00255}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
-  &= 8.37
+  \omega_w &= \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00257}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
+  &= 8.36
 \end{aligned}
 $$
 
-**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{o} = \frac{A_{s,2,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 205\,\mathrm{mm}} = 0.00368
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.0037}{10 \cdot 0.00255^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{205\,\mathrm{mm}}\right)^{3} \\
+  \omega_w' &= \frac{1 - 20 \cdot \rho'_{o}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00368}{10 \cdot 0.00255^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{205\,\mathrm{mm}}\right)^{3} \\
   &= 10.42
 \end{aligned}
 $$
@@ -4147,7 +4187,7 @@ $$
 \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Handrechnung}
 $$
 
-**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
@@ -4365,13 +4405,13 @@ $$
 
 ### Vergrösserungsfaktor der Durchbiegung
 
-**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
-\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}
 $$
 
-**Kriechzahl**
+**Kriechzahl** *(SIA 262:2025, 3.1.2.6)*
 
 $$
 \varphi = 2
@@ -4383,7 +4423,7 @@ $$
 d_{2,x,g} = z_{2,x,g} = 177\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt unten**
+**Bewehrungsgehalt unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{2,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
@@ -4395,27 +4435,39 @@ $$
 d_{3,x,g} = h - z_{3,x,g} = 220\,\mathrm{mm} - 43\,\mathrm{mm} = 177\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt oben**
+**Bewehrungsgehalt oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
 $$
 
-**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00296}{10 \cdot 0.00296^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{220\,\mathrm{mm}}{177\,\mathrm{mm}}\right)^{3} \\
   &= 10.11
 \end{aligned}
 $$
 
-**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{o} = \frac{A_{s,2,x,g}}{b \cdot d_{3,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
+  \omega_w' &= \frac{1 - 20 \cdot \rho'_{o}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00296}{10 \cdot 0.00296^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{220\,\mathrm{mm}}{177\,\mathrm{mm}}\right)^{3} \\
   &= 10.11
 \end{aligned}
@@ -5208,13 +5260,13 @@ $$
 
 ### Vergrösserungsfaktor der Durchbiegung
 
-**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
-\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}
 $$
 
-**Kriechzahl**
+**Kriechzahl** *(SIA 262:2025, 3.1.2.6)*
 
 $$
 \varphi = 2
@@ -5226,7 +5278,7 @@ $$
 d_{2,x,g} = z_{2,x,g} = 174\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt unten**
+**Bewehrungsgehalt unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{2,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 174\,\mathrm{mm}} = 0.00433
@@ -5238,29 +5290,41 @@ $$
 d_{3,x,g} = h - z_{3,x,g} = 250\,\mathrm{mm} - 46\,\mathrm{mm} = 204\,\mathrm{mm}
 $$
 
-**Bewehrungsgehalt oben**
+**Bewehrungsgehalt oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
 $$
 
-**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 174\,\mathrm{mm}} = 0.00433
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.0037}{10 \cdot 0.00433^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{174\,\mathrm{mm}}\right)^{3} \\
-  &= 11.77
+  \omega_w &= \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00433}{10 \cdot 0.00433^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{174\,\mathrm{mm}}\right)^{3} \\
+  &= 11.61
 \end{aligned}
 $$
 
-**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\rho'_{o} = \frac{A_{s,2,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00433}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
-  &= 8.05
+  \omega_w' &= \frac{1 - 20 \cdot \rho'_{o}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.0037}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
+  &= 8.16
 \end{aligned}
 $$
 
@@ -6038,7 +6102,7 @@ $$
 \end{aligned}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.3.1.2)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W = 2.64\,\mathrm{N}/\mathrm{mm}^{2} \cdot 44.25\,\cdot 10^{6}\,\mathrm{mm}^{3} = 116.7\,\mathrm{kNm}
@@ -6082,7 +6146,7 @@ $$
 \end{aligned}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.3.1.2)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W = 2.64\,\mathrm{N}/\mathrm{mm}^{2} \cdot 44.25\,\cdot 10^{6}\,\mathrm{mm}^{3} = 116.7\,\mathrm{kNm}
@@ -6126,7 +6190,7 @@ $$
 \end{aligned}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.3.1.2)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W = 2.56\,\mathrm{N}/\mathrm{mm}^{2} \cdot 56.19\,\cdot 10^{6}\,\mathrm{mm}^{3} = 143.8\,\mathrm{kNm}
@@ -6170,7 +6234,7 @@ $$
 \end{aligned}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.3.1.2)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W = 2.56\,\mathrm{N}/\mathrm{mm}^{2} \cdot 56.19\,\cdot 10^{6}\,\mathrm{mm}^{3} = 143.8\,\mathrm{kNm}
@@ -6190,9 +6254,9 @@ $$
 
 Massgebend: Zug oben (kleinster Erfüllungsgrad).
 
-### Sprödes Versagen unter Zwängung
+### Zwängung auf Normalkraft
 
-**Rissaktive Dicke: die kleinere Abmessung, höchstens 500 mm**
+**Rissaktive Dicke: die kleinere Abmessung, höchstens 500 mm** *(SIA 262:2025, 4.4.2.3.7)*
 
 $$
 t = \min\left[500\,\mathrm{mm};\ b;\ h\right] = \min\left[500\,\mathrm{mm};\ 800\,\mathrm{mm};\ 600\,\mathrm{mm}\right] = 500\,\mathrm{mm}
@@ -6210,7 +6274,7 @@ $$
 f_{ct,eff} = k_t \cdot f_{ctm} = 0.8 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.32\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Risskraft des ganzen Querschnitts**
+**Risskraft des ganzen Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 N_{Riss} = A_c \cdot f_{ct,eff} = 330000\,\mathrm{mm}^{2} \cdot 2.32\,\mathrm{N}/\mathrm{mm}^{2} = 765.6\,\mathrm{kN}
@@ -6222,7 +6286,7 @@ $$
 \varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{400\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 16\,\mathrm{mm}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6232,7 +6296,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6242,7 +6306,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6252,7 +6316,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6262,7 +6326,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6282,7 +6346,7 @@ $$
 | $\sigma_{s,adm,4}$ | Linie 3 | $404$ |
 | $\sigma_{s,adm,5}$ | Linie 4 | $500$ |
 
-**Aufnehmbare Risskraft**
+**Aufnehmbare Risskraft** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6300,7 +6364,7 @@ $$
 
 ### Zwängung auf Biegung
 
-**Zwängung auf Biegung, je Stab** *(SIA 262:2025, 4.4.2)*
+**Zwängung auf Biegung, je Stab** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 \max_i \frac{\sigma_{s,i}(M_{s,adm})}{\sigma_{s,adm,i}} = 1\qquad M_{s,adm} \ge M_{Riss}
@@ -6354,7 +6418,7 @@ $$
 \varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{400\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 16\,\mathrm{mm}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6364,7 +6428,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6374,7 +6438,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6384,7 +6448,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6394,7 +6458,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6446,7 +6510,7 @@ $$
 \end{aligned}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W = 2.64\,\mathrm{N}/\mathrm{mm}^{2} \cdot 44.25\,\cdot 10^{6}\,\mathrm{mm}^{3} = 116.7\,\mathrm{kNm}
@@ -6514,7 +6578,7 @@ $$
 \end{aligned}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W = 2.64\,\mathrm{N}/\mathrm{mm}^{2} \cdot 44.25\,\cdot 10^{6}\,\mathrm{mm}^{3} = 116.7\,\mathrm{kNm}
@@ -6582,7 +6646,7 @@ $$
 \end{aligned}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W = 2.56\,\mathrm{N}/\mathrm{mm}^{2} \cdot 56.19\,\cdot 10^{6}\,\mathrm{mm}^{3} = 143.8\,\mathrm{kNm}
@@ -6650,7 +6714,7 @@ $$
 \end{aligned}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W = 2.56\,\mathrm{N}/\mathrm{mm}^{2} \cdot 56.19\,\cdot 10^{6}\,\mathrm{mm}^{3} = 143.8\,\mathrm{kNm}
@@ -6708,7 +6772,7 @@ $$
 \varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s} = \sqrt{\frac{4}{\pi} \cdot \frac{400\,\mathrm{mm}^{2}}{300\,\mathrm{mm}} \cdot 150\,\mathrm{mm}} = 16\,\mathrm{mm}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6718,7 +6782,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6728,7 +6792,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6738,7 +6802,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6748,7 +6812,7 @@ $$
 \end{aligned}
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -6799,6 +6863,8 @@ $$
 $$
 f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
+
+> **Hinweis:** Die Grenze nach Gl. (102) gilt für den Augenblick, in dem der Riss entsteht. Liegt die quasi-ständige Beanspruchung darüber – bei einer Platte im Feld der Regelfall –, hält die Bewehrung die verlangte Rissbreite nach Tabelle 17, Fussnote 1 nur mit mehr Stahl ein, als die Formel verlangt; wie viel, sagt die Norm nicht. Das Werkzeug prüft das nicht.
 
 #### Wie die Dehnungsebene gefunden wird
 
@@ -7332,9 +7398,9 @@ $$
 \alpha_{eff,\text{Zug}} = \frac{N_{Rd}^{+}}{N_{Ed}} = \frac{942.5\,\mathrm{kN}}{400\,\mathrm{kN}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
-### Sprödes Versagen unter Zwängung
+### Zwängung auf Normalkraft
 
-**Rissaktive Dicke: die kleinere Abmessung**
+**Rissaktive Dicke: die kleinere Abmessung** *(SIA 262:2025, 4.4.1.3)*
 
 $$
 t = \min\left[b;\ h\right] = \min\left[400\,\mathrm{mm};\ 400\,\mathrm{mm}\right] = 400\,\mathrm{mm}
@@ -7352,19 +7418,19 @@ $$
 f_{ct,eff} = k_t \cdot f_{ctm} = 0.833 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.42\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Risskraft des ganzen Querschnitts**
+**Risskraft des ganzen Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 N_{Riss} = A_c \cdot f_{ct,eff} = 160000\,\mathrm{mm}^{2} \cdot 2.42\,\mathrm{N}/\mathrm{mm}^{2} = 386.7\,\mathrm{kN}
 $$
 
-**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Aufnehmbare Risskraft**
+**Aufnehmbare Risskraft** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \begin{aligned}
@@ -7388,7 +7454,7 @@ $$
 \varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
-**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
@@ -13928,13 +13994,13 @@ $$
 
 ### Zwängung auf Normalkraft
 
-Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Die Bewehrung muss die Kraft übernehmen können, die der Beton beim Reissen abgibt – erst dann kündigt sich das Versagen an.
+Eine aufgezwungene oder behinderte Verkürzung zieht den Querschnitt, bis er reisst. Die Kraft, die der Beton dabei abgibt, muss die Bewehrung übernehmen – ohne über die zulässige Stahlspannung zu kommen; so bleiben die Risse fein. Nicht zu verwechseln mit dem Nachweis gegen sprödes Versagen: dort steht der Widerstand gegen die Rissbeanspruchung.
 
-Eine aufgezwungene Verkürzung zieht den ganzen Querschnitt: es reisst der ganze Beton, und alle Stäbe teilen sich seine Risskraft, jeder bis zu seiner zulässigen Spannung. Die rissaktive Dicke t ist die kleinere Abmessung des Betons.
+Am gezeichneten Querschnitt reisst der ganze Beton, und alle Stäbe teilen sich seine Risskraft, jeder bis zu seiner zulässigen Spannung. Die rissaktive Dicke t ist die kleinere Abmessung des umschreibenden Rechtecks. Die Norm nimmt die kleinste Abmessung des gezogenen Teils: bei einem Rechteck dasselbe, bei anderen Formen ist es eine Annahme.
 
 Eine verschmierte Linie mit ihrer Fläche von Hand hat keinen Durchmesser – sie bekommt einen fiktiven, als lägen ihre Stäbe 150 mm auseinander (Annahme). Eine aus ⌀ und Teilung behält ihren ⌀.
 
-**Rissaktive Plattendicke**
+**Rissaktive Plattendicke** *(SIA 262:2025, 4.4.2.3.7)*
 
 $$
 h_{eff} = \min\left[500\,\mathrm{mm};\ h\right]
@@ -13952,7 +14018,7 @@ $$
 f_{ct,eff} = k_t \cdot f_{ctm}
 $$
 
-**Risskraft der gezogenen Querschnittshälfte**
+**Risskraft der gezogenen Querschnittshälfte** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 N_{Riss} = \frac{h_{eff}}{2} \cdot b \cdot f_{ct,eff}
@@ -13964,25 +14030,25 @@ $$
 \varnothing_{2,x} = \max\left[\varnothing_{2,x,g};\ \varnothing_{2,x,z}\right]
 $$
 
-**Zulässige Stahlspannung (Rissbreite w\_nom)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (Rissbreite w\_nom)** *(SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17)*
 
 $$
 \sigma_{s,adm,2,x} = \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{2,x}}};\ f_{yk}\right]
 $$
 
-**Aufnehmbare Risskraft**
+**Aufnehmbare Risskraft** *(SIA 262:2025, Tabelle 17)*
 
 $$
 N_{s,adm,2,x} = A_{s,2,x} \cdot \sigma_{s,adm,2,x}
 $$
 
-**Rissaktive Dicke: die kleinere Abmessung, höchstens 500 mm**
+**Rissaktive Dicke: die kleinere Abmessung, höchstens 500 mm** *(SIA 262:2025, 4.4.2.3.7)*
 
 $$
 t = \min\left[500\,\mathrm{mm};\ b;\ h\right]
 $$
 
-**Risskraft des ganzen Querschnitts**
+**Risskraft des ganzen Querschnitts** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 N_{Riss} = A_c \cdot f_{ct,eff}
@@ -13994,19 +14060,19 @@ $$
 \varnothing_{fikt} = \sqrt{\frac{4}{\pi} \cdot \frac{A_s}{l} \cdot s}
 $$
 
-**Aufnehmbare Risskraft**
+**Aufnehmbare Risskraft** *(SIA 262:2025, Tabelle 17)*
 
 $$
 N_{s,adm} = A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} + A_{s,5} \cdot \sigma_{s,adm,5}
 $$
 
-**Rissaktive Dicke: die kleinere Abmessung**
+**Rissaktive Dicke: die kleinere Abmessung** *(SIA 262:2025, 4.4.1.3)*
 
 $$
 t = \min\left[b;\ h\right]
 $$
 
-**Aufnehmbare Risskraft**
+**Aufnehmbare Risskraft** *(SIA 262:2025, Tabelle 17)*
 
 $$
 N_{s,adm} = A_s \cdot \sigma_{s,adm}
@@ -14024,7 +14090,7 @@ $$
 k_t = \frac{1}{1 + 0.5 \cdot h/3} \quad \left(h\ \text{in}\ \mathrm{m}\right)
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.3.1.2)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6}
@@ -14046,7 +14112,7 @@ Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durchmesser und 
 
 Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zugrichtung n ist es dieselbe Aufgabe wie bei der Platte: zwei geschachtelte Suchen finden ε\_0 und κ, mit denen N und das Moment um die Nulllinie stimmen, beide mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beiden Seiten herankommt; beide beginnen bei der Ebene, die zuletzt gefunden wurde, und grenzen die Stelle von dort mit wachsenden Schritten ein. Übrig bleibt das Moment entlang der Nulllinie; die Zugrichtung wird gedreht, bis auch es stimmt – bei einem symmetrischen Querschnitt steht sie senkrecht zum Moment, bei einem unsymmetrischen nicht. Nachgewiesen wird das Ergebnis: die Probe, dass die Ebene die Einwirkung erzeugt.
 
-**Wertigkeit im gerissenen Zustand**
+**Wertigkeit im gerissenen Zustand** *(SIA 262:2025, 3.1.2.6.1, (12))*
 
 $$
 n = \frac{E_s}{E_{cm}} \cdot \left(1 + \varphi\right)
@@ -14070,13 +14136,13 @@ $$
 z = d_{2,x} - \frac{x}{3}
 $$
 
-**Aufnehmbares Moment der Bewehrung**
+**Aufnehmbares Moment der Bewehrung** *(SIA 262:2025, Tabelle 17)*
 
 $$
 M_{s,adm,2,x} = \sigma_{s,adm,2,x} \cdot A_{s,2,x} \cdot z
 $$
 
-**Zwängung auf Biegung, je Stab** *(SIA 262:2025, 4.4.2)*
+**Zwängung auf Biegung, je Stab** *(SIA 262:2025, 4.4.2.3.4, Tabelle 17)*
 
 $$
 \max_i \frac{\sigma_{s,i}(M_{s,adm})}{\sigma_{s,adm,i}} = 1\qquad M_{s,adm} \ge M_{Riss}
@@ -14084,11 +14150,11 @@ $$
 
 ### Stahlspannung aus Rissbreite
 
-Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
+Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4). Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
 
 Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: angesetzt wird das φ dieses Kapitels. Ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm wird kleiner und die Stahlspannung damit grösser; mit φ = 0 gehen die Spannungen zurück, und der Nachweis geht leichter auf. Mit dem Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht.
 
-Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist linear bis f\_yk und fliesst dann, der Beton trägt höchstens f\_ck. Ein Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit. Läge das Plateau bei f\_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden.
+Zweitens die Werkstoffgesetze: sie rechnen ohne Teilsicherheitsbeiwerte. Der Stahl ist linear bis f\_yk und fliesst dann, der Beton trägt höchstens f\_ck. Die Norm verlangt im Gebrauch Mittelwerte (SIA 262:2025, 4.4.1.2). Einen Mittelwert der Fliessgrenze nennt sie nicht, darum f\_yk. Beim Beton wäre es f\_cm, das höher liegt: mit f\_ck kommt der Beton früher an seine Grenze, und die Stahlspannung wird eher grösser – das liegt auf der sicheren Seite. Läge das Plateau des Stahls bei f\_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden.
 
 Drittens die Grenze: dieselbe wie bei der Zwängung, mit f\_yk und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. Welche Lage die grösste Zugspannung trägt, wechselt mit dem Lastfall – bei einem Feldmoment die untere, bei einem Stützmoment die obere –, und der dickste Stab gibt die kleinste zulässige Spannung. Das liegt für beide auf der sicheren Seite.
 
@@ -14112,7 +14178,7 @@ Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie aus Handrech
 
 Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in der Handrechnung zählt der Beton auch dort, wo der Stahl liegt.
 
-Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
+Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4), die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
 
 Drittens die Grenze: dieselbe wie bei der Zwängung, mit f\_yk und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die Rissbreite. Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durchmesser und dem f\_ctm des Betons, in dem er liegt; massgebend ist der Stab mit dem kleinsten Erfüllungsgrad.
 
@@ -14130,7 +14196,7 @@ $$
 \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
 $$
 
-**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, 4.4.2)*
+**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
 
 $$
 \sigma_{s,adm} = f_{yk}
@@ -14162,11 +14228,11 @@ $$
 
 ### Stahlspannung gegen Fliessen
 
-Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
+Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4). Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
 
-Drittens die Grenze: sie rechnet mit dem Bemessungswert, σ\_s,adm = f\_yd − 80 N/mm², und nicht mit f\_yk − 80. Die Norm sagt an dieser Stelle nicht eindeutig, welcher Wert gemeint ist; f\_yd ist die strengere Wahl – die Grenze liegt rund 15 % tiefer –, gewählt ist deshalb die Seite, auf der man nicht danebenliegen kann. Das ist etwas anderes als das Fliessplateau oben: dort geht es darum, was der Stahl tut, hier darum, wie viel Abstand man davon verlangt.
+Drittens die Grenze: σ\_s,adm = f\_yd − 80 N/mm², mit dem Bemessungswert, wie ihn die Norm in Tabelle 17 ausdrücklich nennt – für B500 sind das 355 N/mm². Das ist etwas anderes als das Fliessplateau oben: dort geht es darum, was der Stahl tut, hier darum, wie viel Abstand man davon verlangt.
 
-Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
+Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4), die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
 
 **Zulässige Stahlspannung** *(SIA 262:2025, Tabelle 17)*
 
@@ -14178,35 +14244,41 @@ $$
 
 Eine Durchbiegung, mit der Steifigkeit E\_cm ermittelt, gilt für die ungerissene Platte. Die gerissene ist weicher, und unter Dauerlast kriecht der Beton; um wie viel beides die Durchbiegung vergrössert, schätzt der Faktor ω\_w. Er hängt nur an der Platte und an der Seite, die gezogen wird: ω\_w für Zug unten, ω\_w′ für Zug oben.
 
-Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je Fall. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt.
+Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je Fall. ρ ist der Gehalt der gezogenen Seite, ρ′ der der Gegenseite; beide beziehen sich auf die statische Höhe d der gezogenen Seite. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. Die Kriechzahl ist nach 3.1.2.6 zu wählen; die Vorgabe ist 2.
 
 Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungerissenen Querschnitt. Der Faktor ω\_w der gezogenen Seite führt sie auf die gerissene Platte unter Dauerlast; die so vergrösserte Durchbiegung hält der Nachweis gegen L/350.
 
-**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
-\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}
 $$
 
-**Bewehrungsgehalt unten**
+**Bewehrungsgehalt unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 \rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}}
 $$
 
-**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+**Bewehrungsgehalt der Gegenseite, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
-\omega_w = \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3}
+\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x}}
 $$
 
-**Wirksame Durchbiegung, Zug unten**
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
+
+$$
+\omega_w = \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3}
+$$
+
+**Wirksame Durchbiegung, Zug unten** *(SIA 262:2025, 4.4.3.2.5, (104))*
 
 $$
 w_{eff} = \omega_w \cdot w
 $$
 
-**Grenzwert der Durchbiegung, nach Vorgabe**
+**Grenzwert der Durchbiegung** *(SIA 260:2013, Anhang A, Tabelle 3)*
 
 $$
 w_{max} = \frac{L}{350}
@@ -14418,7 +14490,7 @@ $$
 W = \frac{I_y \cdot I_z - I_{yz}^{2}}{I_{yz} \cdot y' - I_z \cdot z'}
 $$
 
-**Rissmoment des ungerissenen Querschnitts**
+**Rissmoment des ungerissenen Querschnitts** *(SIA 262:2025, 4.3.1.2)*
 
 $$
 M_{Riss} = f_{ct,eff} \cdot W
@@ -15298,7 +15370,7 @@ $$
 | Risse: Häufige Lastfälle | Stütze (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.43$ |
 | Risse: Häufige Lastfälle | Gebrauch | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.03$ |
 | Verformung | Feld | $w_{max} = 17.1\,\mathrm{mm}$ | $w_{eff} = 12.0\,\mathrm{mm}$ | $1.43$ |
-| Verformung | Kragarm | $w_{max} = 7.1\,\mathrm{mm}$ | $w_{eff} = 6.0\,\mathrm{mm}$ | $1.19$ |
+| Verformung | Kragarm | $w_{max} = 7.1\,\mathrm{mm}$ | $w_{eff} = 6.0\,\mathrm{mm}$ | $1.18$ |
 | Knicken | Wand | $N_{Rd,K} = 4462.9\,\mathrm{kN}$ | $N_{Ed} = 800.0\,\mathrm{kN}$ | $5.58$ |
 
 > **Warnung:** Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt. N\_s,adm = 754 mm² · 466 N/mm² = 351.6 kN \< N\_Riss = 378.3 kN.
@@ -15310,7 +15382,7 @@ $$
 | Bewehrungsmass | $\mu_s$ | $123\,\mathrm{kg}/\mathrm{m}^{3}$ |
 | Höhe der Distanzhalter | $h_{Dist}$ | $186\,\mathrm{mm}$ |
 | Vergrösserungsfaktor, Zug unten | $\omega_w$ | $4.00$ |
-| Vergrösserungsfaktor, Zug oben | $\omega_w'$ | $7.52$ |
+| Vergrösserungsfaktor, Zug oben | $\omega_w'$ | $7.55$ |
 | Momentenwiderstand, Zug unten | $M_{Rd}^{+}(N_{Ed} = 0)$ | $235.9\,\mathrm{kNm}$ |
 | Momentenwiderstand, Zug oben | $M_{Rd}^{-}(N_{Ed} = 0)$ | $-79.9\,\mathrm{kNm}$ |
 | Zugwiderstand | $N_{Rd}^{+}(M_{Ed} = 0)$ | $737.5\,\mathrm{kN}$ |
@@ -15408,7 +15480,7 @@ $$
 | :--- | :--- | ---: |
 | Bewehrungsmass | $\mu_s$ | $73\,\mathrm{kg}/\mathrm{m}^{3}$ |
 | Höhe der Distanzhalter | $h_{Dist}$ | $148\,\mathrm{mm}$ |
-| Vergrösserungsfaktor, Zug unten | $\omega_w$ | $8.37$ |
+| Vergrösserungsfaktor, Zug unten | $\omega_w$ | $8.36$ |
 | Vergrösserungsfaktor, Zug oben | $\omega_w'$ | $10.42$ |
 | Momentenwiderstand, Zug unten | $M_{Rd}^{+}(N_{Ed} = 0)$ | $64.2\,\mathrm{kNm}$ |
 | Momentenwiderstand, Zug oben | $M_{Rd}^{-}(N_{Ed} = 0)$ | $-45.4\,\mathrm{kNm}$ |
@@ -15529,8 +15601,8 @@ $$
 | :--- | :--- | ---: |
 | Bewehrungsmass | $\mu_s$ | $327\,\mathrm{kg}/\mathrm{m}^{3}$ |
 | Höhe der Distanzhalter | $h_{Dist}$ | $116\,\mathrm{mm}$ |
-| Vergrösserungsfaktor, Zug unten | $\omega_w$ | $11.77$ |
-| Vergrösserungsfaktor, Zug oben | $\omega_w'$ | $8.05$ |
+| Vergrösserungsfaktor, Zug unten | $\omega_w$ | $11.61$ |
+| Vergrösserungsfaktor, Zug oben | $\omega_w'$ | $8.16$ |
 | Momentenwiderstand, Zug unten | $M_{Rd}^{+}(N_{Ed} = 0)$ | $54.4\,\mathrm{kNm}$ |
 | Momentenwiderstand, Zug oben | $M_{Rd}^{-}(N_{Ed} = 0)$ | $-64.2\,\mathrm{kNm}$ |
 | Zugwiderstand | $N_{Rd}^{+}(M_{Ed} = 0)$ | $555.2\,\mathrm{kN}$ |
@@ -16451,7 +16523,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $5.69$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $1.93$ |  | berechnet |
 | Erfüllungsgrad Verformung – Feld | $\alpha_{eff,w,\text{Feld}}$ | $1.43$ |  | berechnet |
-| Erfüllungsgrad Verformung – Kragarm | $\alpha_{eff,w,\text{Kragarm}}$ | $1.19$ |  | berechnet |
+| Erfüllungsgrad Verformung – Kragarm | $\alpha_{eff,w,\text{Kragarm}}$ | $1.18$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $4.76$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 3. Lage x | $\alpha_{eff,ZB,3,x}$ | $1.94$ |  | berechnet |
 | Querschnitt eines Bügelschenkels | $A_{\varnothing,V}$ | $50.3$ | mm² | berechnet |
@@ -16460,7 +16532,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bügelzahl über die betrachtete Breite | $n_{V,y}$ | $5$ |  | Vorgabe |
 | Bügeldurchmesser | $\varnothing_{V}$ | $8$ | mm | Vorgabe |
 | Bügelteilung in x-Richtung | $s_{V,x}$ | $200$ | mm | Vorgabe |
-| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\omega_w'$ | $7.52$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\omega_w'$ | $7.55$ |  | berechnet |
 | Vergrösserungsfaktor der Durchbiegung, Zug unten | $\omega_w$ | $4$ |  | berechnet |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Betrachtete Breite (x) | $b$ | $500$ | mm | Vorgabe |
@@ -16584,7 +16656,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $2.32$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 3. Lage x | $\alpha_{eff,ZB,3,x}$ | $1.75$ |  | berechnet |
 | Vergrösserungsfaktor der Durchbiegung, Zug oben | $\omega_w'$ | $10.42$ |  | berechnet |
-| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\omega_w$ | $8.37$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\omega_w$ | $8.36$ |  | berechnet |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Betrachtete Breite (x) | $b$ | $1000$ | mm | Vorgabe |
 | Betrachtete Breite (y) | $b_y$ | $1000$ | mm | Vorgabe |
@@ -16720,8 +16792,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $2.21$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $2.11$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 3. Lage x | $\alpha_{eff,ZB,3,x}$ | $2.48$ |  | berechnet |
-| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\omega_w'$ | $8.05$ |  | berechnet |
-| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\omega_w$ | $11.77$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\omega_w'$ | $8.16$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\omega_w$ | $11.61$ |  | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $330000$ | mm² | berechnet |
 | Stahlfläche der Bewehrung | $A_{s,tot}$ | $2491$ | mm² | berechnet |
 | Trägheitsmoment um y | $I_y$ | $13275$ | ·10⁶ mm⁴ | berechnet |

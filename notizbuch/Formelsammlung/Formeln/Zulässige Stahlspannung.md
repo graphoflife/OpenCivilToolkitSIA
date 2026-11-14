@@ -38,7 +38,8 @@ $$
 ## Theorie
 
 Unter häufiger Einwirkung soll die Bewehrung mit Abstand unter dem Fliessen
-bleiben: die Grenze liegt 80 N/mm² unter der Fliessgrenze. Gerechnet wird
-mit dem Bemessungswert $f_{yd}$ und nicht mit $f_{yk}$ -- die strengere der
-beiden möglichen Lesarten; welche gemeint ist, sagt die Normstelle nicht
-eindeutig. Für B500B gibt das rund 355 N/mm².
+bleiben: die Grenze liegt 80 N/mm² unter dem Bemessungswert der
+Fliessgrenze $f_{yd}$, so nennt es SIA 262, Tabelle 17 ausdrücklich. Für
+B500B gibt das 435 − 80 = 355 N/mm². Die Spannung selbst rechnet das
+Kapitel mit seinen eigenen Werten; mit $f_{yd}$ statt $f_{yk}$ liegt die
+Grenze auf der strengeren Seite.

@@ -28,8 +28,9 @@ Ueberdeckung braucht dieselbe::
 
 Kommt ihre Flaeche aus ⌀ und Teilung, gilt dieser ⌀ (Benutzer, 2026-10-24).
 
-Nach Vorgabe, nicht nachgeschlagen: die Grenze je Stab und der fiktive
-Durchmesser. Siehe ``notizbuch/Notizen/TODO.md``.
+Nach Vorgabe, in SIA 262:2025 nicht gefunden: die Grenze je Stab und der
+fiktive Durchmesser -- Gl. (102) kennt nur den Durchmesser eines Stabs.
+Siehe ``notizbuch/Notizen/TODO.md``.
 
 EINHEITEN:
 SI-Basis; die Zeichnung in mm.
@@ -158,8 +159,7 @@ FIKTIV = ("Eine verschmierte Linie mit ihrer Fläche von Hand hat keinen Durchme
 
 def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
                                  staebe: Sequence[Stabangabe], grenzen: Grenzen,
-                                 anforderung: Rissanforderung, basis: str, *,
-                                 referenz: str) -> None:
+                                 anforderung: Rissanforderung, basis: str) -> None:
     """
     ``sigma_s,adm`` aus der Rissbreite, je Gruppe gleicher Staebe einmal
     hergeleitet -- vorher der fiktive Durchmesser jeder verschmierten Linie,
@@ -192,7 +192,7 @@ def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnitt
             p, gruppe.wert, anforderung=anforderung,
             f_yk=e[gruppe.stahl.eingabename("f_yk")],
             E_s=e[gruppe.stahl.eingabename("E_s")], f_ctm=e[beton.eingabename("f_ctm")],
-            durchmesser=durchmesser, basis=w.basis, referenz=referenz)
+            durchmesser=durchmesser, basis=w.basis)
     if mehrere:
         _tabelle_grenzen(p, staebe, grenzen)
 

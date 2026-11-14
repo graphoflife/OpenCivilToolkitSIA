@@ -246,11 +246,23 @@ class TestRissnormalkraft(unittest.TestCase):
         self.assertAlmostEqual(urteil.widerstand.groesse.si, a_s * F_YK, delta=10.0)
 
     def test_begrenzt_auf_500_mm(self):
+        """Massig: nur der Beton bis 250 mm vom Rand, k_t für 500 mm (4.4.2.3.7)."""
         p, _ = rechteck(b=800, h=600, zwaengung=True, zwaengung_begrenzt=True)
         aufbau, loesung = rechnen(p)
         [urteil] = urteile(loesung, aufbau.feld("qa_rissnormalkraft")["a1"])
+        randzone = 0.8 * 0.6 - (0.8 - 0.5) * (0.6 - 0.5)
         self.assertAlmostEqual(urteil.einwirkung.groesse.si,
-                               0.8 * 0.6 / (1.0 + 0.5 * 0.5) * F_CTM, delta=10.0)
+                               randzone / (1.0 + 0.5 * 0.5) * F_CTM, delta=10.0)
+
+    def test_begrenzt_ohne_massigen_querschnitt(self):
+        """Reicht kein Punkt weiter als 250 mm vom Rand, ändert die Begrenzung nichts."""
+        werte = []
+        for begrenzt in (False, True):
+            p, _ = rechteck(zwaengung=True, zwaengung_begrenzt=begrenzt)
+            aufbau, loesung = rechnen(p)
+            [urteil] = urteile(loesung, aufbau.feld("qa_rissnormalkraft")["a1"])
+            werte.append(urteil.einwirkung.groesse.si)
+        self.assertEqual(werte[0], werte[1])
 
 
 class TestZwaengungBiegung(unittest.TestCase):

@@ -19,7 +19,9 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.material.betonstahl import FLIESSDEHNUNG
-from opencivil.querschnitt.gesetzwahl import Werkstoffsatz, betongesetz, wirksamer_modul
+from opencivil.querschnitt.gesetzwahl import (
+    REFERENZ_KRIECHEN, Werkstoffsatz, betongesetz, wirksamer_modul,
+)
 from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen
 from opencivil.spannungsanalyse.linie import Linie, Paar
 from opencivil.spannungsanalyse.modul import Modullinie
@@ -68,7 +70,7 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
     E_c_eff = w.spannung("E_c_eff", "E_{c,eff}",
                          wirksamer_modul(ein("E_cm").groesse.si, wahl.kriechzahl))
     p.formel(E_c_eff, r"\frac{@E_cm}{1 + @phi}", {"E_cm": ein("E_cm"), "phi": phi},
-             titel="Wirksamer Elastizitätsmodul")
+             titel="Wirksamer Elastizitätsmodul", referenz=REFERENZ_KRIECHEN)
 
     p.erklaerung(
         "Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E_c,eff "

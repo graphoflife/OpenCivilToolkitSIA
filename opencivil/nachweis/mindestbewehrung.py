@@ -1,14 +1,18 @@
 """
-opencivil/nachweis/mindestbewehrung.py -- Nachweise gegen sprödes Versagen.
+opencivil/nachweis/mindestbewehrung.py -- Mindestbewehrung gegen breite Risse bei Zwang.
 
 VERANTWORTUNG:
 Prueft, ob die Bewehrung uebernehmen kann, was der Beton beim Reissen abgibt --
-ohne dabei ueber die zulaessige Stahlspannung zu kommen.
+ohne dabei ueber die zulaessige Stahlspannung zu kommen: die Begrenzung der
+Rissbreiten unter aufgezwungenen oder behinderten Verformungen, beim
+Erreichen von ``f_ct,eff`` (SIA 262:2025, 4.4.2.3.4, Tabelle 17, Zeile 2).
 
 WARUM:
-Ein unbewehrter oder zu schwach bewehrter Querschnitt reisst und versagt im
-selben Augenblick. Genau das soll nicht passieren: die Bewehrung muss die
-Risskraft aufnehmen koennen, damit sich das Versagen ankuendigt.
+Eine aufgezwungene Verkuerzung oder Kruemmung zieht den Querschnitt, bis er
+reisst, und der Beton gibt seine Zugkraft an die Bewehrung ab. Nimmt sie sie
+nur mit hoher Spannung auf, werden die Risse breit. Das sproede Versagen ist
+ein anderer Nachweis (:mod:`opencivil.nachweis.sproedes_versagen`,
+4.3.1.2): dort steht der Widerstand gegen die Rissbeanspruchung.
 
 RISSNORMALKRAFT (Normalkraft-Zwaengung)::
 
@@ -18,19 +22,20 @@ RISSNORMALKRAFT (Normalkraft-Zwaengung)::
     N_Riss   = h_eff/2 * b * f_ct,eff
     N_s,adm  = A_s * sigma_s,adm  >=  N_Riss
 
-``h_eff/2`` ist die gezogene Haelfte des Querschnitts. ``k_t`` traegt dem
-Rechnung, dass eine dicke Platte nicht ueber ihre ganze Hoehe gleichzeitig
-reisst.
+``h_eff/2`` ist die gezogene Haelfte des Querschnitts, je Lage. ``k_t`` traegt
+dem Rechnung, dass eine dicke Platte nicht ueber ihre ganze Hoehe gleichzeitig
+reisst (4.4.1.3, (99), (100)). Bei massigen Bauteilen darf die Zugzone auf
+250 mm je gezogenem Rand beschraenkt werden, unter zentrischem Zug also auf
+500 mm; dieselbe Dicke gilt dann fuer ``k_t`` (4.4.2.3.7).
 
 ZULAESSIGE STAHLSPANNUNG:
-Bei *normaler* Anforderung gilt ``f_yk`` -- die Bewehrung darf fliessen, sie
-muss nur da sein. Bei *erhoehter* und *hoher* Anforderung begrenzt zusaetzlich
-die nominelle Rissbreite::
+Bei *normaler* Anforderung gilt ``f_yk`` -- die Bewehrung darf bis an die
+Fliessgrenze gehen. Bei *erhoehter* und *hoher* Anforderung begrenzt
+zusaetzlich die nominelle Rissbreite, 0.5 und 0.2 mm (Tabelle 17)::
 
     sigma_s,adm = min( sqrt(9 * E_s * f_ctm * w_nom / durchmesser); f_yk )
 
-Gerechnet wird mit ``f_yk`` und nicht ``f_yd``: nachgewiesen wird nicht die
-Tragfaehigkeit, sondern dass die Bewehrung den Riss ueberlebt.
+``f_yk`` und nicht ``f_yd``: so steht es in Tabelle 17 und in (102).
 
 EINHEITEN:
 Alles in SI-Basis. Die Wurzelformel ist dimensionell stimmig -- ``E_s * f_ctm``
@@ -57,8 +62,33 @@ from opencivil.nachweis.rissgroessen import (
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
+from opencivil.querschnitt.gesetzwahl import REFERENZ_KRIECHEN
 from opencivil.querschnitt.lagenaufbau import Postenbezug, lage_aus_posten, protokoll_lage
 from opencivil.querschnitt.platte import Bewehrungslage, Richtung
+
+#: Die Begrenzung der Rissbreite: bei Zwang beim Erreichen von f_ct,eff und
+#: unter quasi-staendiger Last -- dieselbe Zeile der Tabelle.
+REFERENZ_RISSBREITE = "SIA 262:2025, 4.4.2.3.4, Tabelle 17"
+
+#: Die Grenzen der Tabelle: die zulaessige Stahlspannung bei normaler
+#: Anforderung und die Bedingung sigma_s <= sigma_s,adm. Sonst gilt die
+#: Wurzelformel mit w_nom nach der Tabelle.
+REFERENZ_TABELLE = "SIA 262:2025, Tabelle 17"
+REFERENZ_WURZELFORMEL = "SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17"
+
+#: Die rissaktive Dicke unter Zug, ohne und mit der Begrenzung massiger Bauteile.
+REFERENZ_DICKE = "SIA 262:2025, 4.4.1.3"
+REFERENZ_RANDZONE = "SIA 262:2025, 4.4.2.3.7"
+
+#: Der erste Satz der Zwaengung auf Normalkraft -- an der Platte wie am
+#: gezeichneten Querschnitt.
+EINLEITUNG_NORMALKRAFT = (
+    "Eine aufgezwungene oder behinderte Verkürzung zieht den Querschnitt, bis "
+    "er reisst. Die Kraft, die der Beton dabei abgibt, muss die Bewehrung "
+    "übernehmen – ohne über die zulässige Stahlspannung zu kommen; so bleiben "
+    "die Risse fein. Nicht zu verwechseln mit dem Nachweis gegen sprödes "
+    "Versagen: dort steht der Widerstand gegen die Rissbeanspruchung."
+)
 
 
 @dataclass(frozen=True)
@@ -111,7 +141,7 @@ def zulaessige_stahlspannung(
 
 def protokoll_zulaessige_stahlspannung(
     p: Protokoll, sigma: Wert, *, anforderung: Rissanforderung, f_yk: Wert, E_s: Wert,
-    f_ctm: Wert, durchmesser: Wert, basis: str, referenz: str = "",
+    f_ctm: Wert, durchmesser: Wert, basis: str,
 ) -> None:
     """
     Wie :func:`zulaessige_stahlspannung` zu ihrer Zahl kommt -- eine
@@ -126,7 +156,7 @@ def protokoll_zulaessige_stahlspannung(
     if w_nom is None or durchmesser.groesse.si <= 0.0:
         p.formel(sigma, "@f_yk", {"f_yk": f_yk},
                  titel="Zulässige Stahlspannung (normale Anforderung)",
-                 referenz=referenz)
+                 referenz=REFERENZ_TABELLE)
         return
     w = Zwischenwerte(basis).laenge("w_nom", "w_{nom}", w_nom)
     p.formel(
@@ -134,7 +164,7 @@ def protokoll_zulaessige_stahlspannung(
         r"\min\left[\sqrt{\frac{9 \cdot @E_s \cdot @f_ctm \cdot @w_nom}{@dm}};\ @f_yk\right]",
         {"E_s": E_s, "f_ctm": f_ctm, "w_nom": w, "dm": durchmesser, "f_yk": f_yk},
         titel=f"Zulässige Stahlspannung (Rissbreite w_nom = {w.formatiert()} mm)",
-        referenz=referenz)
+        referenz=REFERENZ_WURZELFORMEL)
 
 
 def _protokoll_stahlspannung(
@@ -167,7 +197,7 @@ def _protokoll_stahlspannung(
     protokoll_zulaessige_stahlspannung(
         p, sigma, anforderung=anforderung, f_yk=e[stahl.eingabename("f_yk")],
         E_s=e[stahl.eingabename("E_s")], f_ctm=e["f_ctm"], durchmesser=durchmesser,
-        basis=werte.basis, referenz="SIA 262:2025, 4.4.2")
+        basis=werte.basis)
     return sigma
 
 
@@ -188,7 +218,8 @@ class Lagenergebnis(Fallausgang):
 
 class Rissnormalkraft(Lagennachweis):
     """
-    Sprödes Versagen unter Normalkraft-Zwängung (:class:`~.lagennachweis.Lagennachweis`).
+    Zwängung auf Normalkraft: die Rissbreite bei Zwang, beim Erreichen von
+    ``f_ct,eff`` (:class:`~.lagennachweis.Lagennachweis`).
 
     Ein Urteil je Lage der Tragrichtung: die untere und die obere müssen beide
     die Risskraft aufnehmen können -- ein Zwang kennt keine Zugseite, er
@@ -202,7 +233,7 @@ class Rissnormalkraft(Lagennachweis):
     LANGNAME = "Risse: Zwängung Normalkraft"
     KUERZEL = "NR"
     BENENNUNG = "Rissnormalkraft"
-    REFERENZ = "SIA 262:2025, 4.4.2"
+    REFERENZ = REFERENZ_RISSBREITE
     # Genau zwei Lagen je Richtung -- auch die leeren, denn gerade sie
     # fallen durch und sollen es sichtbar tun.
     NUR_MIT_STAHL = False
@@ -221,8 +252,7 @@ class Rissnormalkraft(Lagennachweis):
             querschnitt, [l for l in querschnitt.lagen if l.richtung is richtung],
             richtung=richtung,
             basis=f"{querschnitt.id}.nachweis.rissnormalkraft.{richtung.value}",
-            titel=(f"Sprödes Versagen unter Zwängung {richtung.beschriftung} – "
-                   f"{querschnitt.name}"),
+            titel=f"{self.THEMA} {richtung.beschriftung} – {querschnitt.name}",
             bezuege=[
                 Eingabebezug("h", querschnitt.id_von("h")),
                 Eingabebezug("b", querschnitt.id_breite(richtung)),
@@ -281,28 +311,25 @@ class Rissnormalkraft(Lagennachweis):
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, g: Rissgroessen) -> None:
         werte = Zwischenwerte(self.id)
-        p.titel(f"Sprödes Versagen unter Zwängung – {self.richtung.beschriftung}")
-        p.erklaerung(
-            "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
-            "Augenblick. Die Bewehrung muss die Kraft übernehmen können, die "
-            "der Beton beim Reissen abgibt – erst dann kündigt sich das "
-            "Versagen an."
-        )
+        p.titel(f"{self.THEMA} – {self.richtung.beschriftung}")
+        p.erklaerung(EINLEITUNG_NORMALKRAFT)
 
         h_eff = werte.laenge("h_eff", "h_{eff}", g.h_eff)
         if self.begrenzt:
             grenze = Groesse.aus_si(DICKENGRENZE, MM).als_latex(0)
             p.formel(h_eff, rf"\min\left[{grenze};\ @h\right]", {"h": e["h"]},
-                     titel="Rissaktive Plattendicke")
+                     titel="Rissaktive Plattendicke", referenz=REFERENZ_RANDZONE)
         else:
-            p.formel(h_eff, "@h", {"h": e["h"]}, titel="Rissaktive Plattendicke")
+            p.formel(h_eff, "@h", {"h": e["h"]}, titel="Rissaktive Plattendicke",
+                     referenz=REFERENZ_DICKE)
 
         f_ct_eff = protokoll_zugfestigkeit(
             p, werte, k_t=g.k_t, f_ct_eff=g.f_ct_eff, h=h_eff, f_ctm=e["f_ctm"],
             teiler=1)
         p.formel(self._n_riss(g), r"\frac{@h_eff}{2} \cdot @b \cdot @f_ct_eff",
                  {"h_eff": h_eff, "b": e["b"], "f_ct_eff": f_ct_eff},
-                 titel="Risskraft der gezogenen Querschnittshälfte")
+                 titel="Risskraft der gezogenen Querschnittshälfte",
+                 referenz=REFERENZ_RISSBREITE)
 
     def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis,
                        ansatz: Rissgroessen) -> None:
@@ -321,7 +348,7 @@ class Rissnormalkraft(Lagennachweis):
 
         v = erg.ausgang
         p.formel(v.widerstand, r"@A_s \cdot @sigma", {"A_s": a_s, "sigma": sigma},
-                 titel="Aufnehmbare Risskraft",
+                 titel="Aufnehmbare Risskraft", referenz=REFERENZ_TABELLE,
                  nachsatz=vergleich(r"\ge", angabe(v.einwirkung), v.erfuellt))
         v.zeile(p, self.d_ausnutzung[nummer])
 
@@ -377,7 +404,7 @@ class Biegezwang(Nachweis):
 
     THEMA = "Zwängung auf Biegung"
     LANGNAME = "Risse: Zwängung Biegung"
-    REFERENZ = "SIA 262:2025, 4.4.2"
+    REFERENZ = REFERENZ_RISSBREITE
     ART = "ZB"
 
     #: Der erste Satz der Herleitung.
@@ -478,7 +505,7 @@ class ZwaengungBiegung(Biegezwang, Lagennachweis):
                           groessen: Momentgroessen) -> None:
         p.titel(f"{self.THEMA} – {self.richtung.beschriftung}")
         p.erklaerung(self.EINLEITUNG)
-        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id)
+        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id, referenz=self.REFERENZ)
         p.erklaerung(
             "Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den "
             "Zustand vor dem Riss. Der Widerstand dagegen wird am gerissenen "
@@ -494,7 +521,7 @@ class ZwaengungBiegung(Biegezwang, Lagennachweis):
                      r"\frac{@E_s}{@E_cm} \cdot \left(1 + @phi\right)",
                      {"E_s": E_s, "E_cm": e["E_cm"],
                       "phi": werte.zahl("phi", r"\varphi", self.kriechzahl, stellen=2)},
-                     titel="Wertigkeit im gerissenen Zustand")
+                     titel="Wertigkeit im gerissenen Zustand", referenz=REFERENZ_KRIECHEN)
         p.erklaerung(
             "Das Kriechen weicht den Beton auf: E_c,eff = E_cm/(1+φ), und die "
             "Wertigkeit ist E_s/E_c,eff. Ein grösseres φ senkt damit den "
@@ -531,7 +558,7 @@ class ZwaengungBiegung(Biegezwang, Lagennachweis):
         v = erg.ausgang
         p.formel(v.widerstand, r"@sigma \cdot @A_s \cdot @z",
                  {"sigma": sigma, "A_s": a_s, "z": hebelarm},
-                 titel="Aufnehmbares Moment der Bewehrung",
+                 titel="Aufnehmbares Moment der Bewehrung", referenz=REFERENZ_TABELLE,
                  nachsatz=vergleich(r"\ge", angabe(v.einwirkung), v.erfuellt))
         v.zeile(p, self.d_ausnutzung[nummer])
 

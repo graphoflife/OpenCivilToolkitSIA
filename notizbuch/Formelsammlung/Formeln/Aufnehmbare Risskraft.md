@@ -1,10 +1,11 @@
 ---
-erzeugt: 2172dfa46e49
+erzeugt: 432350d8fe97
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, Tabelle 17"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, Tabelle 17
 
 *In der Herleitung: «Aufnehmbare Risskraft»*
 

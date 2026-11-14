@@ -12,9 +12,9 @@ die Liste fuer die Maske daraus gebaut --, und eine unbekannte Stufe wurde
 an zwei Stellen ueber ``.get`` zur mildesten. Jetzt ist eine unbekannte
 Stufe ein Fehler, wo immer sie auftaucht.
 
-Die Rissbreiten 0.5 und 0.2 mm sind nach Vorgabe eingebaut, nicht
-nachgeschlagen; dass bei normaler Anforderung kein Nachweis gegen Fliessen
-gefuehrt wird, steht in SIA 262:2025, Tabelle 17 (ein Strich).
+Alles steht in SIA 262:2025, Tabelle 17: erhoeht 0.5 mm, hoch 0.2 mm,
+normal keine Rissbreite, nur ``f_yk``; gegen Fliessen bei normaler
+Anforderung ein Strich (am 2026-11-14 gegen die gedruckte Tabelle geprueft).
 """
 
 from __future__ import annotations
@@ -41,8 +41,7 @@ class Rissanforderung(Wahl):
     def rissbreite(self) -> Optional[float]:
         """
         Die nominelle Rissbreite w_nom in m -- ``None`` heisst: keine Grenze aus
-        der Rissbreite, dann gilt allein ``f_yk``. Nach Vorgabe, nicht
-        nachgeschlagen.
+        der Rissbreite, dann gilt allein ``f_yk``. SIA 262:2025, Tabelle 17.
         """
         return {Rissanforderung.NORMAL: None, Rissanforderung.ERHOEHT: 0.5e-3,
                 Rissanforderung.HOCH: 0.2e-3}[self]

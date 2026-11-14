@@ -36,6 +36,11 @@ Beton dabei abgibt (Benutzer, 2026-10-15)::
     N_s,adm  = Σ A_s,i · sigma_s,adm,i   >=  N_Riss
 
 Bei der Platte nimmt jede Lage die Haelfte -- zusammen derselbe Gedanke.
+Mit der Begrenzung fuer massige Bauteile zaehlt nur der Beton bis 250 mm vom
+Rand, und ``t`` ist hoechstens 500 mm (SIA 262:2025, 4.4.2.3.7): unter
+zentrischem Zug sind alle Raender gezogen (:mod:`opencivil.querschnitt.randzone`).
+Bis 2026-11-14 begrenzte der Schalter nur ``t`` und liess die ganze Flaeche
+stehen -- er verlangte damit mehr Bewehrung statt weniger.
 
 ZWAENGUNG AUF BIEGUNG:
 Je Richtung wie das sproede Versagen: dasselbe Rissmoment
@@ -45,10 +50,16 @@ am gerissenen Querschnitt, elastisch, ohne Normalkraft, mit eigenem φ
 (Benutzer, 2026-10-15). Die Platte rechnet dasselbe von Hand, mit dem
 Hebelarm ``d - x/3`` und ohne die gedrueckte Bewehrung; hier wirkt sie mit.
 
-NACH VORGABE, NICHT NACHGESCHLAGEN:
-Der ganze Querschnitt bei der Normalkraft, ``t`` als kleinere Abmessung, die
-Grenze je Stab, der fiktive Durchmesser und das Moment am elastisch
-gerissenen Querschnitt. Siehe ``notizbuch/Notizen/TODO.md``.
+DIE NORM:
+Beide Zwaengungen begrenzen die Rissbreite beim Erreichen von ``f_ct,eff``
+(SIA 262:2025, 4.4.2.3.4, Tabelle 17, Zeile 2); gerechnet wird gerissen und
+elastisch, ohne Zug im Beton (4.1.4.1.4). ``t`` ist nach 4.4.1.3 die
+kleinste Abmessung des Zuggurts, bei Rechtecken unter Biegung ``h/3``.
+
+NACH VORGABE, IN SIA 262:2025 NICHT GEFUNDEN:
+``t`` aus dem umschreibenden Rechteck auch bei anderen Formen als dem
+Rechteck, die Grenze je Stab und der fiktive Durchmesser. Siehe
+``notizbuch/Notizen/TODO.md``.
 
 EINHEITEN:
 SI-Basis wie im ganzen Querschnittsmodul; die Zeichnung in mm.
@@ -73,7 +84,10 @@ from opencivil.material.basis import Baustoff, mit_index
 from opencivil.nachweis.gebrauchsebene import (
     Gebrauchsebene, gebrauchsebene, protokoll_ebene, verfahren_der_ebene,
 )
-from opencivil.nachweis.mindestbewehrung import Biegezwang
+from opencivil.nachweis.mindestbewehrung import (
+    EINLEITUNG_NORMALKRAFT, REFERENZ_DICKE, REFERENZ_RANDZONE, REFERENZ_RISSBREITE,
+    REFERENZ_TABELLE, Biegezwang,
+)
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
 from opencivil.nachweis.richtungsnachweise import grade_je_seite
@@ -87,7 +101,7 @@ from opencivil.nachweis.rissgroessen import (
 from opencivil.nachweis.schiefe_biegung import protokoll_dehnungsebene
 from opencivil.nachweis.spannungsbegrenzung import VORGABE, Fallergebnis, Stahlspannungsort
 from opencivil.nachweis.spannungsgrenzen import (
-    GrenzeAusRissbreite, Grenzen, Spannungsgrenze, Stahlzustand, Stelle,
+    Grenzen, Spannungsgrenze, Stahlzustand, Stelle,
 )
 from opencivil.nachweis.stabgrenzen import (
     GRENZE_JE_STAB, Stabangabe, grenzen_aus_rissbreite, protokoll_rissbreitengrenzen,
@@ -96,6 +110,7 @@ from opencivil.nachweis.stabgrenzen import (
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Querschnitt
+from opencivil.querschnitt.randzone import flaechen_am_rand
 
 #: Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der
 #: erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.
@@ -126,7 +141,8 @@ class AnalyseStellen(Stahlspannungsort):
     """
 
     messung = ("Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen "
-               "Zug auf, die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene "
+               "Zug auf (SIA 262:2025, 4.1.4.1.4), die Bewehrung wirkt auf Zug und "
+               "auf Druck. Jeder gezogene "
                "Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten "
                "Erfüllungsgrad.")
     regel_der_rissbreite = GRENZE_JE_STAB
@@ -159,7 +175,7 @@ class AnalyseStellen(Stahlspannungsort):
                        anforderung: Rissanforderung, basis: str) -> Grenzen:
         grenzen = grenzen_aus_rissbreite(self.analyse, e, zustand.staebe, anforderung)
         protokoll_rissbreitengrenzen(p, e, self.analyse, zustand.staebe, grenzen, anforderung,
-                                     basis, referenz=GrenzeAusRissbreite.referenz)
+                                     basis)
         return grenzen
 
     def ebene(self, zustand: _Analysezustand, fall: Lastfall) -> Gebrauchsebene:
@@ -236,12 +252,31 @@ def _tabelle_gezogen(p: Protokoll, staebe: Sequence[Stabangabe], grenzen: Grenze
 # ===========================================================================
 
 
-def betonflaechen(analyse: Querschnittsanalyse) -> List[Tuple[Baustoff, float]]:
+#: Was die Begrenzung fuer massige Bauteile aendert -- im Bericht.
+RANDZONE = (
+    "Massiges Bauteil: es wirkt nur der Beton bis 250 mm vom Rand mit, und "
+    "k_t gilt für höchstens 500 mm (SIA 262:2025, 4.4.2.3.7). Unter "
+    "zentrischem Zug sind alle Ränder gezogen, auch die einer Aussparung; wo "
+    "zwei Betone aneinandergrenzen, ist kein Rand.")
+
+
+def betonflaechen(analyse: Querschnittsanalyse,
+                  randzone: Optional[float] = None) -> List[Tuple[Baustoff, float]]:
     """
     Die Flaeche jedes Betons, in m² -- ein Polygon zaehlt fuer seinen Beton
-    und wird dem abgezogen, in dem es liegt, wie in der Interaktion.
+    und wird dem abgezogen, in dem es liegt, wie in der Interaktion. Mit
+    ``randzone`` (in m) nur der Beton bis zu diesem Abstand vom Rand des
+    Bauteils (:func:`~opencivil.querschnitt.randzone.flaechen_am_rand`).
     """
     flaechen: Dict[str, List] = {}
+    if randzone is not None:
+        am_rand = flaechen_am_rand([f.punkte for f in analyse.flaechen], analyse.eltern,
+                                   [f.stoff is not None for f in analyse.flaechen],
+                                   randzone * 1e3)
+        for f, A in zip(analyse.flaechen, am_rand):
+            if f.stoff is not None:
+                flaechen.setdefault(f.stoff.id, [f.stoff, 0.0])[1] += A * 1e-6
+        return [(stoff, A) for stoff, A in flaechen.values() if A > 0.0]
     for i, f in enumerate(analyse.flaechen):
         A = abs(geo.flaechenwerte(f.punkte).A) * 1e-6
         eltern = analyse.eltern[i]
@@ -267,25 +302,22 @@ class RissnormalkraftQA(Nachweis):
         basis = f"{analyse.id}.nachweis.rissnormalkraft"
         self.d_grad = grad_def(f"{basis}.erfuellungsgrad", r"\alpha_{eff,NR}",
                                "Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt",
-                               "SIA 262:2025, 4.4.2")
+                               REFERENZ_RISSBREITE)
         super().__init__(basis, ausgaben=[self.d_grad], bezuege=analyse.grundbezuege(),
-                         titel=f"Sprödes Versagen unter Zwängung – {analyse.name}",
-                         referenz="SIA 262:2025, 4.4.2", abschnitt=analyse.abschnitt)
+                         titel=f"{self.THEMA} – {analyse.name}",
+                         referenz=REFERENZ_RISSBREITE, abschnitt=analyse.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         a = self.analyse
         werte = Zwischenwerte(self.id)
-        p.titel("Sprödes Versagen unter Zwängung")
+        p.titel(self.THEMA)
+        p.erklaerung(EINLEITUNG_NORMALKRAFT)
         p.erklaerung(
-            "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
-            "Augenblick. Die Bewehrung muss die Kraft übernehmen können, die "
-            "der Beton beim Reissen abgibt – erst dann kündigt sich das "
-            "Versagen an.")
-        p.erklaerung(
-            "Eine aufgezwungene Verkürzung zieht den ganzen Querschnitt: es reisst der "
-            "ganze Beton, und alle Stäbe teilen sich seine Risskraft, jeder bis zu seiner "
-            "zulässigen Spannung. Die rissaktive Dicke t ist die kleinere Abmessung des "
-            "Betons.")
+            "Am gezeichneten Querschnitt reisst der ganze Beton, und alle Stäbe teilen "
+            "sich seine Risskraft, jeder bis zu seiner zulässigen Spannung. Die "
+            "rissaktive Dicke t ist die kleinere Abmessung des umschreibenden "
+            "Rechtecks. Die Norm nimmt die kleinste Abmessung des gezogenen Teils: "
+            "bei einem Rechteck dasselbe, bei anderen Formen ist es eine Annahme.")
         N_Riss = self._risskraft(p, e, werte)
 
         q, herkunft, _ = a.querschnitt(e.si_nach_id(), VORGABE)
@@ -294,8 +326,7 @@ class RissnormalkraftQA(Nachweis):
             p.text("Ohne Bewehrung → kein Nachweis.")
             return self._ergebnis(NICHT_FUEHRBAR, "Ohne Bewehrung → kein Nachweis.")
         grenzen = grenzen_aus_rissbreite(a, e, staebe, self.anforderung)
-        protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id,
-                                     referenz="SIA 262:2025, 4.4.2")
+        protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id)
         mehrere = len(grenzen.gruppen) > 1
         glieder = []
         for nummer, gruppe in enumerate(grenzen.gruppen, start=1):
@@ -310,6 +341,7 @@ class RissnormalkraftQA(Nachweis):
                  {**{f"A{i}": A for i, (A, _) in enumerate(glieder)},
                   **{f"s{i}": s for i, (_, s) in enumerate(glieder)}},
                  titel="Aufnehmbare Risskraft", name="Aufnehmbare Risskraft",
+                 referenz=REFERENZ_TABELLE,
                  nachsatz=vergleich(r"\ge", angabe(N_Riss), v.erfuellt))
         v.zeile(p, self.d_grad)
         return self._ergebnis(
@@ -330,24 +362,36 @@ class RissnormalkraftQA(Nachweis):
                   "h": werte.laenge("h", "h", h, "Ausdehnung des Betons in z")},
                  titel=("Rissaktive Dicke: die kleinere Abmessung, höchstens 500 mm"
                         if self.begrenzt else "Rissaktive Dicke: die kleinere Abmessung"),
-                 name="Rissaktive Dicke des gezeichneten Querschnitts")
+                 name="Rissaktive Dicke des gezeichneten Querschnitts",
+                 referenz=REFERENZ_RANDZONE if self.begrenzt else REFERENZ_DICKE)
         k_t = beiwert_dicke(t.groesse.si)
+        flaechen = betonflaechen(self.analyse)
+        am_rand = (betonflaechen(self.analyse, randzone=DICKENGRENZE / 2.0)
+                   if self.begrenzt else flaechen)
+        # Erst ein Querschnitt, der irgendwo mehr als 250 mm vom Rand reicht, ist massig.
+        massig = sum(A for _, A in am_rand) < sum(A for _, A in flaechen) * (1.0 - 1e-9)
+        if massig:
+            p.erklaerung(RANDZONE)
         glieder = []
-        for stoff, A_c in betonflaechen(self.analyse):
+        for stoff, A_c in am_rand if massig else flaechen:
             unter = Zwischenwerte(f"{self.id}.{kennung_aus(stoff.id)}")
             f_ctm = e[stoff.eingabename("f_ctm")]
             f_ct_eff = protokoll_zugfestigkeit(
                 p, unter, k_t=k_t, f_ct_eff=k_t * abs(f_ctm.groesse.si), h=t, f_ctm=f_ctm,
                 teiler=1, titel=f"Beiwert für die rissaktive Dicke, {stoff.name}")
-            glieder.append((unter.flaeche("A_c", mit_index("A_c", stoff.symbol_index), A_c,
-                                          f"Betonfläche {stoff.name}"), f_ct_eff))
+            flaeche = (unter.flaeche("A_c_eff", mit_index("A_{c,eff}", stoff.symbol_index), A_c,
+                                     f"Betonfläche bis 250 mm vom Rand, {stoff.name}")
+                       if massig else
+                       unter.flaeche("A_c", mit_index("A_c", stoff.symbol_index), A_c,
+                                     f"Betonfläche {stoff.name}"))
+            glieder.append((flaeche, f_ct_eff))
         N_Riss = werte.kraft("N_Riss", "N_{Riss}",
                              sum(A.groesse.si * f.groesse.si for A, f in glieder), "Einwirkung")
         p.formel(N_Riss, " + ".join(f"@A{i} \\cdot @f{i}" for i in range(len(glieder))),
                  {**{f"A{i}": A for i, (A, _) in enumerate(glieder)},
                   **{f"f{i}": f for i, (_, f) in enumerate(glieder)}},
                  titel="Risskraft des ganzen Querschnitts",
-                 name="Risskraft des ganzen Querschnitts")
+                 name="Risskraft des ganzen Querschnitts", referenz=REFERENZ_RISSBREITE)
         return N_Riss
 
     def _ergebnis(self, ausgang: Ausgang, begruendung: str) -> Ausfuehrung:
@@ -385,8 +429,7 @@ class ZwaengungBiegungQA(Biegezwang):
         staebe = stabangaben(a, q, herkunft)
         self._protokoll_ansatz(p, e)
         grenzen = grenzen_aus_rissbreite(a, e, staebe, self.anforderung)
-        protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id,
-                                     referenz=self.REFERENZ)
+        protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id)
         protokoll_dehnungsebene(p)
         p.erklaerung(verfahren_der_ebene(q, self.analyse.biegung))
 
@@ -403,7 +446,8 @@ class ZwaengungBiegungQA(Biegezwang):
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
                 continue
             M_s_adm_si, ebene, stab = gefunden
-            M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z)
+            M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z,
+                                          referenz=self.REFERENZ)
             M_s_adm = werte.moment("M_s_adm", r"M_{s,adm}", M_s_adm_si, "Widerstand")
             p.wert(M_s_adm, titel="Moment, bei dem der erste gezogene Stab σ_s,adm erreicht")
             protokoll_ebene(p, werte, ebene, self.analyse.biegung)

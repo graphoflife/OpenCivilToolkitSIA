@@ -44,6 +44,54 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-11-14 · Normprüfung IV: Gebrauchstauglichkeit
+
+Vierter Bereich, an den Normseiten bestätigt (SIA 262:2025, S. 45, 51, 53,
+75–78; SIA 260:2013, Tabellen 1 bis 3).
+
+- **Massige Bauteile im gezeichneten Querschnitt** (4.4.2.3.7): mit dem
+  Schalter «500 mm» zählt bei der Zwängung auf Normalkraft nur der Beton
+  bis 250 mm vom Rand, und k_t gilt für 500 mm. Vorher begrenzte der
+  Schalter nur t, und das machte den Nachweis strenger statt milder. Wand
+  1000 × 2000 mm, C30/37: ohne Schalter N_Riss = 3867 kN, mit Schalter
+  vorher 4640 kN, jetzt 2900 kN (1.25 m² Randzone · 0.8 · 2.9 N/mm²). Unter
+  zentrischem Zug sind alle Ränder gezogen, auch die einer Aussparung; wo
+  zwei Betone aneinanderstossen, ist kein Rand. Die Fläche rechnet ein
+  eigenes Modul (`querschnitt/randzone.py`) auf waagrechten Linien: bei
+  Rechtecken genau, an einer einspringenden Ecke unter einem Promille
+  daneben.
+- **ρ′ mit dem d der gezogenen Seite** (4.4.3.2.5): beide Gehalte beziehen
+  sich auf die statische Höhe des Bauteils. Vorher nahm ρ′ das d der
+  Gegenseite. Im Beispiel wird ω_w′ = 7.55 statt 7.52. Ab ρ′ = 5 % gäbe
+  (104) einen negativen Faktor; dort steht jetzt «kein Nachweis».
+- **Die Zwängung heisst nach dem, was sie rechnet.** «Sprödes Versagen
+  unter Zwängung» war die Begrenzung der Rissbreite bei Zwang (Tabelle 17,
+  Zeile 2) und heisst jetzt «Zwängung auf Normalkraft». Sprödes Versagen
+  ist 4.3.1.2 und rechnet mit dem Widerstand.
+- **Ziffern:** σ_s,adm 4.4.2.3.4, (102) mit Tabelle 17 statt 4.4.2, bei
+  normaler Anforderung Tabelle 17; die Risskräfte und das aufnehmbare
+  Moment Tabelle 17; das Rissmoment 4.3.1.2 beim spröden Versagen, Tabelle
+  17 bei der Zwängung; die rissaktive Dicke 4.4.2.3.7; ω_w und die Gehalte
+  (104); die Kriechzahl 3.1.2.6; die Wertigkeit 3.1.2.6.1, (12).
+- **L/350 stammt aus SIA 260:2013, Anhang A, Tabelle 3** (häufige Last,
+  Funktionstüchtigkeit und Komfort), und w mit E_cm heisst γ_cE = 1.0
+  (4.2.1.16). Beides stand als Vorgabe da. Die Tabelle meint dort nur einen
+  Teil der Durchbiegung; gehalten wird die ganze samt Kriechen, das liegt
+  sicher, und der Bericht sagt es.
+- **Texte:** Tabelle 17 nennt für das Fliessen ausdrücklich f_yd − 80 N/mm²,
+  für B500 355 N/mm² -- der Satz, die Norm lasse f_yd oder f_yk offen, ist
+  fort. Die Spannungsrechnung begründet ihre Werte mit 4.4.1.2
+  (Mittelwerte); f_ck statt f_cm liegt dort auf der sicheren Seite. Wo eine
+  Rissbreite verlangt ist, sagt ein Hinweis, dass (102) nur für den
+  Augenblick des Risses gilt (Tabelle 17, Fussnote 1).
+- **Offen für den Benutzer** ([[TODO]]): k_t bei Steg, Flansch und
+  Hohlkasten; drei Nachweise mit charakteristischen Werten; sprödes
+  Versagen unter Zug; die Fussnote je Fall; der Rissbeginn der
+  Spannung-Dehnung-Analyse; f_ctk0.95 nach (101); (103) oder (104) und die
+  Normalkraft in der Durchbiegung; ein Schalter für L/500, L/350, L/300;
+  die Anteile 60 und 70 %; Mittelwerte im Gebrauch; der dickste Stab und
+  der fiktive Durchmesser; der äquivalente Modul.
+
 ## 2026-11-14 · Normprüfung III: Baustoffe
 
 Dritter Bereich, an den Normseiten bestätigt (S. 21, 28–30, 34–35, 48–49,

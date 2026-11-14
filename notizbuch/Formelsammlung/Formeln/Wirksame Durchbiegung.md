@@ -1,10 +1,11 @@
 ---
-erzeugt: 3cbe6b578587
+erzeugt: 4a9a5d1a8c59
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, 4.4.3.2.5, (104)"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, 4.4.3.2.5, (104)
 
 *In der Herleitung: «Wirksame Durchbiegung, Zug unten»*
 

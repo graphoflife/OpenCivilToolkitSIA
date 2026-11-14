@@ -300,11 +300,11 @@ M_{Rd} = M_{Rd}(N_{Ed}=0)^{-} = -79.9\,\mathrm{kNm}
 \alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{-79.9\,\mathrm{kNm}}{-50\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsection{Vergrösserungsfaktor der Durchbiegung}
-\noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
-\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}
 \end{equation*}
-\noindent\textbf{Kriechzahl}
+\noindent\textbf{Kriechzahl} \hfill \normref{SIA 262:2025, 3.1.2.6}
 \begin{equation*}
 \varphi = 2
 \end{equation*}
@@ -324,7 +324,7 @@ A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}
 \begin{equation*}
 d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Bewehrungsgehalt unten}
+\noindent\textbf{Bewehrungsgehalt unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 \rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
 \end{equation*}
@@ -332,34 +332,42 @@ d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 \begin{equation*}
 d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Bewehrungsgehalt oben}
+\noindent\textbf{Bewehrungsgehalt oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 \rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00299
 \end{equation*}
-\noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\noindent\textbf{Bewehrungsgehalt der Gegenseite, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
+\begin{equation*}
+\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00304
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00299}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00304}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
   &= 4
 \end{aligned}
 \end{equation*}
-\noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\noindent\textbf{Bewehrungsgehalt der Gegenseite, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
+\begin{equation*}
+\rho'_{o} = \frac{A_{s,2,x}}{b \cdot d_{3,x,g}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00972
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
-  &= \frac{1 - 20 \cdot 0.00988}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
-  &= 7.52
+  \omega_w' &= \frac{1 - 20 \cdot \rho'_{o}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00972}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
+  &= 7.55
 \end{aligned}
 \end{equation*}
 \subsection{Verformung}
-\hinweis{Annahme}{w ist mit der Steifigkeit E\_cm ermittelt. Grenzwert w\_max = L/350 nach Vorgabe, nicht nachgeschlagen.}
+\hinweis{Annahme}{w ist mit der Steifigkeit E\_cm ermittelt, also mit γ\_cE = 1.0 (SIA 262:2025, 4.2.1.16). Grenzwert w\_max = L/350 nach SIA 260:2013, Anhang A, Tabelle 3: unter häufiger Last, für Funktionstüchtigkeit und Komfort. Die Tabelle meint dort nur einen Teil der Durchbiegung, was nach dem Einbau dazukommt oder was die veränderlichen Lasten bewirken; gehalten wird die ganze samt Kriechen, das liegt sicher. Welches Kriterium gilt, legt das Projekt fest (SIA 262:2025, 4.4.3.2.1).}
 \subsubsection{Verformung – Feld}
-\noindent\textbf{Wirksame Durchbiegung, Zug unten}
+\noindent\textbf{Wirksame Durchbiegung, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 w_{eff} = \omega_w \cdot w = 4 \cdot 3.5\,\mathrm{mm} = 14\,\mathrm{mm}
 \end{equation*}
-\noindent\textbf{Grenzwert der Durchbiegung, nach Vorgabe}
+\noindent\textbf{Grenzwert der Durchbiegung} \hfill \normref{SIA 260:2013, Anhang A, Tabelle 3}
 \begin{equation*}
 w_{max} = \frac{L}{350} = \frac{6\,\mathrm{m}}{350} = 17.1\,\mathrm{mm}
 \end{equation*}
@@ -369,7 +377,7 @@ w_{eff} = 14\,\mathrm{mm} \quad \le \quad w_{max} = 17.1\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,w,\text{Feld}} = \frac{w_{max}}{w_{eff}} = \frac{17.1\,\mathrm{mm}}{14\,\mathrm{mm}} = 1.22 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,w,\text{Feld}} = \frac{w_{max}}{w_{eff}} = \frac{17.1\,\mathrm{mm}}{14\,\mathrm{mm}} = 1.23 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsection{Kennzahlen}
 Die Eckpunkte stammen aus der Handrechnung der Tragsicherheit – sie rechnet ebenso, von Hand mit Bemessungswerten.
@@ -1910,27 +1918,31 @@ M_{Rd} = M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right)
 \subsection{Verformung}
 Eine Durchbiegung, mit der Steifigkeit E\_cm ermittelt, gilt für die ungerissene Platte. Die gerissene ist weicher, und unter Dauerlast kriecht der Beton; um wie viel beides die Durchbiegung vergrössert, schätzt der Faktor ω\_w. Er hängt nur an der Platte und an der Seite, die gezogen wird: ω\_w für Zug unten, ω\_w′ für Zug oben.
 
-Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je Fall. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt.
+Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je Fall. ρ ist der Gehalt der gezogenen Seite, ρ′ der der Gegenseite; beide beziehen sich auf die statische Höhe d der gezogenen Seite. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. Die Kriechzahl ist nach 3.1.2.6 zu wählen; die Vorgabe ist 2.
 
 Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungerissenen Querschnitt. Der Faktor ω\_w der gezogenen Seite führt sie auf die gerissene Platte unter Dauerlast; die so vergrösserte Durchbiegung hält der Nachweis gegen L/350.
 
-\noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
-\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d}
 \end{equation*}
-\noindent\textbf{Bewehrungsgehalt unten}
+\noindent\textbf{Bewehrungsgehalt unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 \rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}}
 \end{equation*}
-\noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\noindent\textbf{Bewehrungsgehalt der Gegenseite, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
-\omega_w = \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3}
+\rho'_{u} = \frac{A_{s,3,x,g}}{b \cdot d_{2,x}}
 \end{equation*}
-\noindent\textbf{Wirksame Durchbiegung, Zug unten}
+\noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
+\begin{equation*}
+\omega_w = \frac{1 - 20 \cdot \rho'_{u}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3}
+\end{equation*}
+\noindent\textbf{Wirksame Durchbiegung, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5, (104)}
 \begin{equation*}
 w_{eff} = \omega_w \cdot w
 \end{equation*}
-\noindent\textbf{Grenzwert der Durchbiegung, nach Vorgabe}
+\noindent\textbf{Grenzwert der Durchbiegung} \hfill \normref{SIA 260:2013, Anhang A, Tabelle 3}
 \begin{equation*}
 w_{max} = \frac{L}{350}
 \end{equation*}
@@ -2306,7 +2318,7 @@ Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
 Biegung und Normalkraft & Feld & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 235.9\,\mathrm{kNm}$ & $M_{Ed,x} = 100.0\,\mathrm{kNm}$ & $2.36$ \\
 Biegung und Normalkraft & Feld mit Druck & $M_{Rd,x}(N_{Ed} = -300\,\mathrm{kN}) = 253.8\,\mathrm{kNm}$ & $M_{Ed,x} = 100.0\,\mathrm{kNm}$ & $2.54$ \\
 Biegung und Normalkraft & Stütze & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = -79.9\,\mathrm{kNm}$ & $M_{Ed,x} = -50.0\,\mathrm{kNm}$ & $1.60$ \\
-Verformung & Feld & $w_{max} = 17.1\,\mathrm{mm}$ & $w_{eff} = 14.0\,\mathrm{mm}$ & $1.22$ \\
+Verformung & Feld & $w_{max} = 17.1\,\mathrm{mm}$ & $w_{eff} = 14.0\,\mathrm{mm}$ & $1.23$ \\
 \hline
 \end{xltabular}
 \hinweis{Hinweis}{Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt (α\_eff = 0.996), ausgeschaltet. N\_s,adm = 754 mm² · 500 N/mm² = 377.0 kN < N\_Riss = 378.3 kN.}
@@ -2319,7 +2331,7 @@ Kennzahl & Zeichen & Wert \\
 Bewehrungsmass & $\mu_s$ & $123\,\mathrm{kg}/\mathrm{m}^{3}$ \\
 Höhe der Distanzhalter & $h_{Dist}$ & $186\,\mathrm{mm}$ \\
 Vergrösserungsfaktor, Zug unten & $\omega_w$ & $4.00$ \\
-Vergrösserungsfaktor, Zug oben & $\omega_w'$ & $7.52$ \\
+Vergrösserungsfaktor, Zug oben & $\omega_w'$ & $7.55$ \\
 Momentenwiderstand, Zug unten & $M_{Rd}^{+}(N_{Ed} = 0)$ & $235.9\,\mathrm{kNm}$ \\
 Momentenwiderstand, Zug oben & $M_{Rd}^{-}(N_{Ed} = 0)$ & $-79.9\,\mathrm{kNm}$ \\
 Zugwiderstand & $N_{Rd}^{+}(M_{Ed} = 0)$ & $737.5\,\mathrm{kN}$ \\
@@ -2554,10 +2566,10 @@ Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 \
 Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ & $3.02$ &  & berechnet \\
 Erfüllungsgrad sprödes Versagen – 2. Lage x & $\alpha_{eff,SV,2,x}$ & $5.69$ &  & berechnet \\
 Erfüllungsgrad sprödes Versagen – 3. Lage x & $\alpha_{eff,SV,3,x}$ & $1.93$ &  & berechnet \\
-Erfüllungsgrad Verformung – Feld & $\alpha_{eff,w,\text{Feld}}$ & $1.22$ &  & berechnet \\
+Erfüllungsgrad Verformung – Feld & $\alpha_{eff,w,\text{Feld}}$ & $1.23$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – 2. Lage x & $\alpha_{eff,ZB,2,x}$ & $6.63$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – 3. Lage x & $\alpha_{eff,ZB,3,x}$ & $2.16$ &  & berechnet \\
-Vergrösserungsfaktor der Durchbiegung, Zug oben & $\omega_w'$ & $7.52$ &  & berechnet \\
+Vergrösserungsfaktor der Durchbiegung, Zug oben & $\omega_w'$ & $7.55$ &  & berechnet \\
 Vergrösserungsfaktor der Durchbiegung, Zug unten & $\omega_w$ & $4$ &  & berechnet \\
 Fläche des Bruttoquerschnitts & $A$ & $180000$ & mm² & berechnet \\
 Stahlfläche der Bewehrung & $A_{s,tot}$ & $1169$ & mm² & berechnet \\

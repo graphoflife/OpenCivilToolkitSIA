@@ -1,12 +1,11 @@
 ---
-erzeugt: ad724b3a2f31
+erzeugt: 1ef0af3dd900
 art: formel
 tags: [formel]
+normstelle: "SIA 260:2013, Anhang A, Tabelle 3"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
-
-*In der Herleitung: «Grenzwert der Durchbiegung, nach Vorgabe»*
+> [!info] Normstelle
+> SIA 260:2013, Anhang A, Tabelle 3
 
 $$
 w_{max} = \frac{L}{350}
@@ -39,7 +38,15 @@ $$
 ## Theorie
 
 Die Durchbiegung wird gegen einen Bruchteil der Spannweite gehalten: je
-länger das Feld, desto mehr Durchbiegung ist erträglich. $L/350$ ist so
-eingebaut, wie der Benutzer es vorgegeben hat -- nach Vorgabe, nicht
-nachgeschlagen. Welche Grenze für ein Bauteil gilt, hängt davon ab, was es
-trägt und was an ihm hängt; das entscheidet der Ingenieur.
+länger das Feld, desto mehr Durchbiegung ist erträglich. $L/350$ ist der
+Richtwert aus SIA 260:2013, Anhang A, Tabelle 3, unter häufiger Last: für
+Einbauten, die sich verformen dürfen, für Nutzung und Betrieb und für den
+Komfort. Dieselbe Tabelle nennt $L/500$ für spröde Einbauten unter
+seltener Last und $L/300$ fürs Aussehen unter quasi-ständiger Last.
+
+Die Tabelle meint je Zeile nur einen Teil der Durchbiegung: was nach dem
+Einbau dazukommt, was die veränderlichen Lasten bewirken, oder alles
+abzüglich einer Überhöhung. Gehalten wird hier die ganze Durchbiegung samt
+Kriechen -- strenger als jede dieser Zeilen ausser $L/500$. Welche Grenze
+für ein Bauteil gilt, hängt davon ab, was es trägt und was an ihm hängt;
+das legt das Projekt fest.

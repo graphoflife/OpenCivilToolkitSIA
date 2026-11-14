@@ -1,5 +1,5 @@
 ---
-erzeugt: f266d626f3c5
+erzeugt: ca7a9edd7505
 art: thema
 tags: [thema]
 ---
@@ -8,11 +8,11 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
+Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4). Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
 
 Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: angesetzt wird das φ dieses Kapitels. Ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm wird kleiner und die Stahlspannung damit grösser; mit φ = 0 gehen die Spannungen zurück, und der Nachweis geht leichter auf. Mit dem Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht.
 
-Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist linear bis f\_yk und fliesst dann, der Beton trägt höchstens f\_ck. Ein Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit. Läge das Plateau bei f\_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden.
+Zweitens die Werkstoffgesetze: sie rechnen ohne Teilsicherheitsbeiwerte. Der Stahl ist linear bis f\_yk und fliesst dann, der Beton trägt höchstens f\_ck. Die Norm verlangt im Gebrauch Mittelwerte (SIA 262:2025, 4.4.1.2). Einen Mittelwert der Fliessgrenze nennt sie nicht, darum f\_yk. Beim Beton wäre es f\_cm, das höher liegt: mit f\_ck kommt der Beton früher an seine Grenze, und die Stahlspannung wird eher grösser – das liegt auf der sicheren Seite. Läge das Plateau des Stahls bei f\_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden.
 
 Drittens die Grenze: dieselbe wie bei der Zwängung, mit f\_yk und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. Welche Lage die grösste Zugspannung trägt, wechselt mit dem Lastfall – bei einem Feldmoment die untere, bei einem Stützmoment die obere –, und der dickste Stab gibt die kleinste zulässige Spannung. Das liegt für beide auf der sicheren Seite.
 
@@ -36,7 +36,7 @@ Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie aus Handrech
 
 Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in der Handrechnung zählt der Beton auch dort, wo der Stahl liegt.
 
-Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
+Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4), die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
 
 Drittens die Grenze: dieselbe wie bei der Zwängung, mit f\_yk und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die Rissbreite. Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durchmesser und dem f\_ctm des Betons, in dem er liegt; massgebend ist der Stab mit dem kleinsten Erfüllungsgrad.
 

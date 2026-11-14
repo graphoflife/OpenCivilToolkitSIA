@@ -552,6 +552,17 @@
       ]
     },
     {
+      "name": "Bewehrungsgehalt der Gegenseite",
+      "pfad": "Formelsammlung/Formeln/Bewehrungsgehalt der Gegenseite.md",
+      "art": "formel",
+      "zeichen": [
+        "\\rho'_{u}"
+      ],
+      "themen": [
+        "Verformung"
+      ]
+    },
+    {
       "name": "Bewehrungsmass des gezeichneten Querschnitts",
       "pfad": "Formelsammlung/Formeln/Bewehrungsmass des gezeichneten Querschnitts.md",
       "art": "formel",
@@ -4137,7 +4148,7 @@
       "name": "opencivil.nachweis.mindestbewehrung",
       "pfad": "Python/opencivil.nachweis.mindestbewehrung.md",
       "art": "modul",
-      "kurz": "Nachweise gegen sprödes Versagen.",
+      "kurz": "Mindestbewehrung gegen breite Risse bei Zwang.",
       "stichworte": [
         "Rissgroessen",
         "rissnormalkraft",
@@ -5560,6 +5571,25 @@
         "Plattenquerschnitt.abschnitt",
         "Plattenquerschnitt.hat_buegel",
         "Plattenquerschnitt._querkraftbewehrung_aufbauen"
+      ]
+    },
+    {
+      "name": "opencivil.querschnitt.randzone",
+      "pfad": "Python/opencivil.querschnitt.randzone.md",
+      "art": "modul",
+      "kurz": "der Beton nahe am Rand eines gezeichneten Querschnitts.",
+      "stichworte": [
+        "flaechen_am_rand",
+        "_randkanten",
+        "_deckung",
+        "_reste",
+        "_bandgrenzen",
+        "_innen",
+        "_streifen",
+        "_zwischen",
+        "_vereinigen",
+        "_schneiden",
+        "_abziehen"
       ]
     },
     {

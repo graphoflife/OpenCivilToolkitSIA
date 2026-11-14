@@ -71,6 +71,7 @@ const HILFE = {
   zwang: {
     zeilen: [
       ['Normalkraft', 'der ganze Querschnitt reisst: Σ A_c·k_t·f_ctm, t = kleinere Abmessung; gegen alle Stäbe'],
+      ['500 mm', 'nur massige Bauteile: Beton bis 250 mm vom Rand, k_t für 500 mm (SIA 262:2025, 4.4.2.3.7)'],
       ['Biegung', 'je Richtung M_Riss wie beim spröden Versagen, gegen das Moment, bei dem der erste gezogene Stab σ_s,adm erreicht – gerissen, elastisch, eigenes φ'],
       ['σ_s,adm', 'je Stab nach Tab. 17 mit seinem ⌀; verschmiert: fiktiver ⌀ bei 150 mm Teilung'],
     ],

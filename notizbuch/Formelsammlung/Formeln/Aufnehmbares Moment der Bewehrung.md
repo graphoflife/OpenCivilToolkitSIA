@@ -1,10 +1,11 @@
 ---
-erzeugt: a4efa18b298f
+erzeugt: e3f97f4ec91d
 art: formel
 tags: [formel]
+normstelle: "SIA 262:2025, Tabelle 17"
 ---
-> [!warning] Normstelle fehlt noch
-> Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+> [!info] Normstelle
+> SIA 262:2025, Tabelle 17
 
 $$
 M_{s,adm,2,x} = \sigma_{s,adm,2,x} \cdot A_{s,2,x} \cdot z

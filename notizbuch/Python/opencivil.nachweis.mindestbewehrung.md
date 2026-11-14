@@ -1,23 +1,27 @@
 ---
-erzeugt: f95b3b837ce9
+erzeugt: 41e87d72edf9
 art: modul
 tags: [modul]
 ---
 > [!abstract] opencivil/nachweis/mindestbewehrung.py
-> Nachweise gegen sprödes Versagen.
+> Mindestbewehrung gegen breite Risse bei Zwang.
 > Paket [[opencivil.nachweis]] · [Quelltext](../../opencivil/nachweis/mindestbewehrung.py)
 
 ## VERANTWORTUNG
 
 Prueft, ob die Bewehrung uebernehmen kann, was der Beton beim Reissen abgibt --
-ohne dabei ueber die zulaessige Stahlspannung zu kommen.
+ohne dabei ueber die zulaessige Stahlspannung zu kommen: die Begrenzung der
+Rissbreiten unter aufgezwungenen oder behinderten Verformungen, beim
+Erreichen von `f_ct,eff` (SIA 262:2025, 4.4.2.3.4, Tabelle 17, Zeile 2).
 
 
 ## WARUM
 
-Ein unbewehrter oder zu schwach bewehrter Querschnitt reisst und versagt im
-selben Augenblick. Genau das soll nicht passieren: die Bewehrung muss die
-Risskraft aufnehmen koennen, damit sich das Versagen ankuendigt.
+Eine aufgezwungene Verkuerzung oder Kruemmung zieht den Querschnitt, bis er
+reisst, und der Beton gibt seine Zugkraft an die Bewehrung ab. Nimmt sie sie
+nur mit hoher Spannung auf, werden die Risse breit. Das sproede Versagen ist
+ein anderer Nachweis ([[opencivil.nachweis.sproedes_versagen]],
+4.3.1.2): dort steht der Widerstand gegen die Rissbeanspruchung.
 
 
 ## RISSNORMALKRAFT (Normalkraft-Zwaengung)
@@ -31,23 +35,24 @@ N_Riss   = h_eff/2 * b * f_ct,eff
 N_s,adm  = A_s * sigma_s,adm  >=  N_Riss
 ```
 
-`h_eff/2` ist die gezogene Haelfte des Querschnitts. `k_t` traegt dem
-Rechnung, dass eine dicke Platte nicht ueber ihre ganze Hoehe gleichzeitig
-reisst.
+`h_eff/2` ist die gezogene Haelfte des Querschnitts, je Lage. `k_t` traegt
+dem Rechnung, dass eine dicke Platte nicht ueber ihre ganze Hoehe gleichzeitig
+reisst (4.4.1.3, (99), (100)). Bei massigen Bauteilen darf die Zugzone auf
+250 mm je gezogenem Rand beschraenkt werden, unter zentrischem Zug also auf
+500 mm; dieselbe Dicke gilt dann fuer `k_t` (4.4.2.3.7).
 
 
 ## ZULAESSIGE STAHLSPANNUNG
 
-Bei *normaler* Anforderung gilt `f_yk` -- die Bewehrung darf fliessen, sie
-muss nur da sein. Bei *erhoehter* und *hoher* Anforderung begrenzt zusaetzlich
-die nominelle Rissbreite:
+Bei *normaler* Anforderung gilt `f_yk` -- die Bewehrung darf bis an die
+Fliessgrenze gehen. Bei *erhoehter* und *hoher* Anforderung begrenzt
+zusaetzlich die nominelle Rissbreite, 0.5 und 0.2 mm (Tabelle 17):
 
 ```
 sigma_s,adm = min( sqrt(9 * E_s * f_ctm * w_nom / durchmesser); f_yk )
 ```
 
-Gerechnet wird mit `f_yk` und nicht `f_yd`: nachgewiesen wird nicht die
-Tragfaehigkeit, sondern dass die Bewehrung den Riss ueberlebt.
+`f_yk` und nicht `f_yd`: so steht es in Tabelle 17 und in (102).
 
 
 ## EINHEITEN
@@ -100,7 +105,7 @@ scheitert an ihr.
 ### protokoll_zulaessige_stahlspannung
 
 ```python
-def protokoll_zulaessige_stahlspannung(p: Protokoll, sigma: Wert, *, anforderung: Rissanforderung, f_yk: Wert, E_s: Wert, f_ctm: Wert, durchmesser: Wert, basis: str, referenz: str='') -> None
+def protokoll_zulaessige_stahlspannung(p: Protokoll, sigma: Wert, *, anforderung: Rissanforderung, f_yk: Wert, E_s: Wert, f_ctm: Wert, durchmesser: Wert, basis: str) -> None
 ```
 
 Wie [[opencivil.nachweis.mindestbewehrung#zulaessige_stahlspannung|zulaessige_stahlspannung]] zu ihrer Zahl kommt -- eine
@@ -147,7 +152,8 @@ Was der Nachweis fuer eine Lage gefunden hat: N_s,adm gegen N_Riss.
 class Rissnormalkraft(Lagennachweis)
 ```
 
-Sprödes Versagen unter Normalkraft-Zwängung ([[opencivil.nachweis.lagennachweis#Lagennachweis|Lagennachweis]]).
+Zwängung auf Normalkraft: die Rissbreite bei Zwang, beim Erreichen von
+`f_ct,eff` ([[opencivil.nachweis.lagennachweis#Lagennachweis|Lagennachweis]]).
 
 Ein Urteil je Lage der Tragrichtung: die untere und die obere müssen beide
 die Risskraft aufnehmen können -- ein Zwang kennt keine Zugseite, er
@@ -160,7 +166,7 @@ Frage gestempelt (siehe `Nachweis.teilurteile`).
 - `LANGNAME = 'Risse: Zwängung Normalkraft'`
 - `KUERZEL = 'NR'`
 - `BENENNUNG = 'Rissnormalkraft'`
-- `REFERENZ = 'SIA 262:2025, 4.4.2'`
+- `REFERENZ = REFERENZ_RISSBREITE`
 - `NUR_MIT_STAHL = False`
 
 #### Rissnormalkraft.ansatz
@@ -241,7 +247,7 @@ fast nur weitergereicht (Benutzer, 2026-10-17).
 
 - `THEMA = 'Zwängung auf Biegung'`
 - `LANGNAME = 'Risse: Zwängung Biegung'`
-- `REFERENZ = 'SIA 262:2025, 4.4.2'`
+- `REFERENZ = REFERENZ_RISSBREITE`
 - `ART = 'ZB'`
 - `EINLEITUNG = 'Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das die…` – Der erste Satz der Herleitung.
 
@@ -307,6 +313,15 @@ massgebend ist, was in der Lagenrechnung steht. `None`, wenn keine der
 Lagen einen Stahl traegt.
 
 
+## Konstanten
+
+- `REFERENZ_RISSBREITE = 'SIA 262:2025, 4.4.2.3.4, Tabelle 17'` – Die Begrenzung der Rissbreite: bei Zwang beim Erreichen von f_ct,eff und unter quasi-staendiger Last -- dieselbe Zeile der Tabelle.
+- `REFERENZ_TABELLE = 'SIA 262:2025, Tabelle 17'` – Die Grenzen der Tabelle: die zulaessige Stahlspannung bei normaler Anforderung und die Bedingung sigma_s \<= sigma_s,adm. Sonst gilt die Wurzelformel mit w_nom nach der Tabelle.
+- `REFERENZ_WURZELFORMEL = 'SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17'`
+- `REFERENZ_DICKE = 'SIA 262:2025, 4.4.1.3'` – Die rissaktive Dicke unter Zug, ohne und mit der Begrenzung massiger Bauteile.
+- `REFERENZ_RANDZONE = 'SIA 262:2025, 4.4.2.3.7'`
+- `EINLEITUNG_NORMALKRAFT = 'Eine aufgezwungene oder behinderte Verkürzung zieht den Querschnitt,…` – Der erste Satz der Zwaengung auf Normalkraft -- an der Platte wie am gezeichneten Querschnitt.
+
 ## Braucht
 
 - [[opencivil.core.berechnung]]
@@ -319,6 +334,7 @@ Lagen einen Stahl traegt.
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.zustand2]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
 
@@ -326,6 +342,7 @@ Lagen einen Stahl traegt.
 
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau.platte]]
 

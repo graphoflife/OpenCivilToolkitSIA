@@ -1,5 +1,5 @@
 ---
-erzeugt: f48a11b34eb4
+erzeugt: af32a03e162b
 art: modul
 tags: [modul]
 ---
@@ -25,6 +25,7 @@ schiefer Biegung, Querkraft und Torsion auf Schubwaende.
 - [[opencivil.querschnitt.interaktion]] – Bruchzustand gezeichneter Querschnitte, auch schief.
 - [[opencivil.querschnitt.lagenaufbau]] – wo die Bewehrung einer Platte liegt.
 - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
+- [[opencivil.querschnitt.randzone]] – der Beton nahe am Rand eines gezeichneten Querschnitts.
 - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
 - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
 - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.

@@ -75,7 +75,8 @@ class Modullinie:
 
     Gezaehlt wird ab dem Zustand ohne laufende Kraft -- ``chi_0`` bei M = 0
     unter der festen Normalkraft, ``eps_0`` bei N = 0 unter dem festen
-    Moment --, nach Vorgabe (2026-10-11). Was die festgehaltene Kraft allein
+    Moment --, nach Vorgabe (2026-10-11); SIA 262:2025 kennt keinen solchen
+    Modul. Was die festgehaltene Kraft allein
     verformt, kann ein gerader, ungerissener Betonquerschnitt nicht abbilden:
     bei unsymmetrischer Bewehrung kruemmt schon eine Normalkraft, und ein
     gerissener Querschnitt dehnt sich schon unter dem Moment allein. Ab null

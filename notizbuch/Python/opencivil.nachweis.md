@@ -1,5 +1,5 @@
 ---
-erzeugt: 558034f39377
+erzeugt: 6db82fdde341
 art: modul
 tags: [modul]
 ---
@@ -25,7 +25,7 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.knicken]] – Nachweis am verformten System.
 - [[opencivil.nachweis.lagennachweis]] – ein Nachweis je Platte, ein Urteil je Bewehrungslage.
 - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
-- [[opencivil.nachweis.mindestbewehrung]] – Nachweise gegen sprödes Versagen.
+- [[opencivil.nachweis.mindestbewehrung]] – Mindestbewehrung gegen breite Risse bei Zwang.
 - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
 - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
 - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
