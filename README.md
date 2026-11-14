@@ -357,8 +357,10 @@ Seite (Feld unten, Kragarm oben). Gehalten wird w_eff = ω_w · w gegen
 w_max = L/350. Der Vergrösserungsfaktor ω_w -- in der Norm w/w_c, SIA
 262:2025, 4.4.3.2.5 -- wird je gezogene Seite einmal gerechnet, nicht je Fall,
 und steht in der Zusammenfassung unter der Tabelle. Ohne x-Bewehrung auf der
-gezogenen Seite gibt es keinen Faktor und keinen Nachweis. Der Grenzwert L/350
-ist nach Vorgabe eingebaut, nicht nachgeschlagen.
+gezogenen Seite gibt es keinen Faktor und keinen Nachweis. Den Grenzwert gibt
+SIA 262:2025 an SIA 260 weiter (4.4.3.1.1): L/350 steht in SIA 260:2013,
+Anhang A, Tabelle 3, unter häufiger Last; welches Kriterium gilt, legt das
+Projekt fest.
 
 **Querschnittsanalyse:** unter den Platten ein zweites Kapitel. Der
 Querschnitt wird gezeichnet wie in einem kleinen CAD, und oben steht je Art
@@ -478,8 +480,10 @@ System beweglich, sagt es eine Meldung und markiert, was sich bewegt; eine
 Drehung ohne Steifigkeit, an einem Knoten, an dem nur Gelenke hängen, ist
 gestrichen und trägt ein Fragezeichen. Die Querschnitte kommen aus einer
 Vorlage, von Hand, aus einer Platte oder aus einer Querschnittsanalyse; die
-Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm, E von Hand oder E_eq
-am ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie 1. Ordnung.
+Steifigkeit ist E_cm, ein E von Hand oder E_eq als Sekantensteifigkeit
+(SIA 262:2025, 4.1.4.1.2), am ungerissenen Bruttoquerschnitt (4.1.4.1.3),
+ohne Bewehrung und Schubverformung; das Gleichgewicht nach Theorie
+1. Ordnung, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2).
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch

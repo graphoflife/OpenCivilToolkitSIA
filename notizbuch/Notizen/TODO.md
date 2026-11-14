@@ -91,9 +91,6 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] **Kriechzahl bei hoher Spannung.** Über 0.4·f_cm kriecht der Beton
       stärker, und die Norm erhöht φ (SIA 262:2025, 3.1.2.6.3, (14)). φ ist
       eine Eingabe; das Werkzeug prüft das nicht. Zur Kenntnis.
-- [ ] Normstellen für 112 von 176 Formeln fehlen noch -- die Liste samt
-      Stelle im Code steht auf der Übersicht der [[Formelsammlung]]. Sie
-      kommen vom Benutzer und werden im Code eingetragen (`referenz=`).
 - [ ] Verformung und «Plattendicke optimieren»: **entschieden, noch nicht
       umsetzen** (Benutzer, 2026-10-16). Bei der Dickensuche wird der
       Verformungsnachweis ignoriert, denn w hängt von der Plattendicke ab: es
@@ -408,17 +405,31 @@ Norm dazu sagt.
       eine gerade Strecke des Nachweisschnitts zählt 1.5·d_v von jeder Ecke
       der gestützten Fläche und entlang einer Wand von ihrem Ende her; eine
       Strecke, die von einer Ecke zum freien Plattenrand läuft (Figur 22d),
-      zählt ganz.
-- [ ] **Durchstanzen, Näherungsstufe 2 an Wandende und Wandecke.**
-      4.3.6.4.7 nennt Momente nur für Innen-, Rand- und Eckstützen. Eingebaut:
-      dort rechnet Stufe 2 wie Stufe 1 (m_sd/m_Rd = 1), und die Herleitung
-      sagt es.
+      zählt ganz. Geprüft (2026-11-14): Ecken und Wände wie 4.3.6.2.3 und
+      Figur 23a bis c. Zur Strecke bis zum freien Rand sagt die Norm nichts;
+      vorsichtiger wäre, auch dort nur 1.5·d_v ab der Ecke zu zählen.
+      Entscheid des Benutzers.
+- [ ] **Durchstanzen, l_min in (61).** Das Werkzeug nimmt die kleinere der
+      beiden eingegebenen Spannweiten, je die grössere der angrenzenden
+      (4.3.6.4.4); gemeint ist in (61) die kleinste Spannweite. Selten
+      massgebend, weil b_s = 1.5·0.22·l ≈ 0.33·l meist kleiner ist; in Stufe 3
+      mit grossem r_s möglich, und die Herleitung sagt es, wo l_min greift.
+      Vorschlag: ein eigenes Feld für die kleinste Spannweite, oder so lassen.
+      Entscheid des Benutzers.
+- [ ] **Durchstanzen, Rundstütze am Rand (Figur 25).** b_sr rechnet mit dem
+      Durchmesser für beide Abmessungen der Stütze; die Figur zeigt nur
+      Rechtecke, die Norm sagt nichts. Vorsichtiger wäre das einbeschriebene
+      Quadrat, Seite D/√2. Entscheid des Benutzers.
 - [ ] **Durchstanzen, «grosse Aussparungen» für k_e = 0.7 (4.3.6.2.5).**
       Eingebaut: eine Innenstütze bekommt 0.7, sobald eine Aussparung den
       Nachweisschnitt mindert (Figur 23d) -- wie gross sie ist, zählt nicht.
+      Geprüft (2026-11-14): die Norm nennt keine Grösse; die Annahme ist
+      strenger als nötig, nicht falsch.
 - [ ] **Durchstanzen, Ovalstütze.** Eingebaut: ihre geraden Seiten zählen wie
       die einer Rechteckstütze 1.5·d_v von jedem Ende her. Der Name kommt aus
-      der Software von Leviat. Offen: ob du diese Form gemeint hast.
+      der Software von Leviat. Die Norm kennt die Form nicht (Figur 22 zeigt
+      Kreis und Rechteck); die Regel für gerade Abschnitte (Figur 23a) ist
+      folgerichtig übertragen. Offen: ob du diese Form gemeint hast.
 - [ ] **Durchstanzbewehrung: die Regeln von ancoPLUS.** Eingebaut nach dem
       Gutachten Muttoni / Fernández Ruiz 2007 (zu SIA 262:2003):
       Abstände 0.375·d / 0.60·d bis zum dritten Anker / danach 0.75·d,
@@ -438,11 +449,24 @@ Norm dazu sagt.
       zur Aussparung die Überdeckung c_nom, wie zum Plattenrand (nach Vorgabe,
       nicht nachgeschlagen), und im Schatten einer Aussparung nach Figur 23d
       liegt keine Leiste (gelesen: dort zählt der Schnitt nicht, also auch
-      keine Bewehrung, die ihn quert). Die Konstruktionsregeln 5.5.3.7 bis
-      5.5.3.12 liegen nicht vor.
-- [ ] **Stahlpilz: d_v = d − 20 mm und die gestützte Fläche bis an die Stege.**
-      Gelesen aus 4.3.6.2.1, Figur 21 und 4.3.6.6.2; 20 mm unten und 50 mm
-      oben aus der Software von AncoTech. Nicht nachgeschlagen.
+      keine Bewehrung, die ihn quert). Geprüft (2026-11-14): 4.3.6 und 5.5.3
+      sagen zu beidem nichts; die Leiste im Schatten folgt Figur 23d.
+- [ ] **Stahlpilz: die Masse des Herstellers.** Geprüft (2026-11-14): die
+      gestützte Fläche reicht bis an die äussersten Stege, ausserhalb gilt
+      4.3.6.3 bis 4.3.6.5 (4.3.6.6.2), den Widerstand des Pilzes bestätigt der
+      Hersteller (4.3.6.6.1), und d_v reicht bis zur Höhe der gestützten
+      Fläche (Figur 21). Nach Vorgabe von AncoTech, die Norm sagt nichts:
+      20 mm Beton unter und 50 mm über dem Pilz, 50 mm Überstand über die
+      Stütze. Wo an den Stegen gemessen wird, zeigt Figur 21 nicht.
+- [ ] **Durchstanzen: was das Werkzeug nicht abbildet** (zur Kenntnis):
+      Einzellasten über 0.2·V_d näher als 3·d_v am Schnitt (4.3.6.2.3);
+      einbetonierte Leitungen (Figur 23e); Verstärkungen und Schwächungen der
+      Platte (4.3.6.2.7, Figur 24); Vorspannung (4.3.6.4.3); an Rand- und
+      Eckstützen die untere Bewehrung als gezogene (4.3.6.4.7); die
+      Verankerung der Biegebewehrung (5.5.3.7); ein Schnitt, der an einer
+      Aussparung nahe der Stütze endet (4.3.6.2.2). Die Bedingung
+      0.5 ≤ l_x/l_y ≤ 2 für Stufe 1 und 2 (4.3.6.4.2) prüft das Werkzeug nicht,
+      die Sicherung gegen Totaleinsturz (4.3.6.7) steht nur als Hinweis.
 - [ ] **Sprödes Versagen unter Zug fehlt.** Wo ein Querschnitt für die
       Tragsicherheit zählt, muss sein Widerstand die Rissbeanspruchung
       übertreffen, auch die auf Normalkraft (SIA 262:2025, 4.3.1.2, mit

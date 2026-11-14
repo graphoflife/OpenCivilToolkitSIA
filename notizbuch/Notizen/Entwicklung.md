@@ -26,6 +26,11 @@ Geprüft gegen SIA 262:2025, 4.3.6 und 5.5.3. Was sich ändert:
   offen ([[TODO]]).
 - Das Prüfprojekt hat eine Eckstütze in Stufe 2 und eine Randstütze in
   Stufe 3, damit die drei neuen Formeln im Notizbuch stehen.
+- Bestätigt und aus der [[TODO]]: an Wandende und Wandecke rechnet Stufe 2
+  wie Stufe 1 -- 4.3.6.4.7 nennt für Wände keine Momente, und m_sd/m_Rd = 1
+  liegt sicher. Ebenso die Normstellen, die noch fehlten: übrig sind 85 von
+  227 Formeln, Geometrie und Mechanik ohne Normbezug und zwei Festlegungen,
+  deren Entscheid offen steht (Rissbeginn, Raumlast unter Auftrieb).
 
 ## Aufbau in einem Bild
 
