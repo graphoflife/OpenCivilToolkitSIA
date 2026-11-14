@@ -28,7 +28,7 @@ NACH VORGABE, NICHT NACHGESCHLAGEN (notizbuch/Notizen/TODO.md):
   Stahl umschlossenen Beton zuliesse: nach SIA 262 gerechnet, endete mit ihm
   das Ganze bei −ε_c1d, und das Rohr flösse nicht mehr.
 * Das Tragglied rechnet als Stahl der Liste nach SIA 262, mit dessen γ_s;
-  SIA 263 liegt nicht vor.
+  SIA 263 ist nicht eingearbeitet.
 
 EINHEITEN:
 SI-Basis.
@@ -240,7 +240,7 @@ class InnererWiderstand(Achsnachweis):
                      {"d": d_a, "dt": dt}, titel="Fläche des Tragstabs nach der Abrostung",
                      referenz="SIA 267:2013, 9.6.1.5.2", name="Fläche des Tragstabs nach Abrostung")
         p.annahme("Das Tragglied rechnet als Stahl nach SIA 262, mit dessen γ_s -- nach "
-                  "Vorgabe, nicht nachgeschlagen; SIA 263 für Baustahl liegt nicht vor.")
+                  "Vorgabe, nicht nachgeschlagen; SIA 263 für Baustahl ist nicht eingearbeitet.")
         return Masse(d_aussen=d_aussen, d_innen=d_innen), A_s, None
 
     # -- Normalkraft ----------------------------------------------------------

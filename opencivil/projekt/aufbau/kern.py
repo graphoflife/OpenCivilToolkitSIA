@@ -106,7 +106,8 @@ class Aufbau:
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
                       "qa_spannung", "qa_knicken", "durchstanzen", "grundbruch", "gleiten",
-                      "setzung", "pfahl_aussen", "pfahl_innen", "pfahl_quer")
+                      "setzung", "pfahl_aussen", "pfahl_innen", "pfahl_quer",
+                      "pfahl_innen_quer")
 
     # -- Die Objekte je Bauteilart: Sichten auf die Bauteile --------------
     #

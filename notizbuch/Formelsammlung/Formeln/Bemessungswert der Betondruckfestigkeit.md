@@ -1,5 +1,5 @@
 ---
-erzeugt: 763f1bd2fef2
+erzeugt: 569ad4516c6d
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.3, (2)"
@@ -35,6 +35,7 @@ $$
 - [[Druckzonenhöhe im Stützstreifen]]
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]
 - [[Widerstand der Druckdiagonalen]]
+- [[Widerstand der Druckdiagonalen im Pfahl]]
 
 ## Im Code
 

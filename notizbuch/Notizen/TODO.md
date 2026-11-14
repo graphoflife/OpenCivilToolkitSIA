@@ -8,10 +8,6 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] **Pfähle: der innere Widerstand quer.** Widerstand längs der Achse,
-      Steifigkeit und äusserer Widerstand quer stehen (siehe [[Entwicklung]],
-      2026-11-14). Es fehlt: Moment und Querkraft der Verläufe gegen den
-      Querschnitt, mit η_i (9.5.2.4). Danach die Decken weiter.
 - [ ] **Decken: die App fertig bauen.** Rechenkern, Zeichenfenster sowie
       Lasten und Lastfälle stehen (siehe [[Entwicklung]], 2026-11-13). Es
       fehlen, je ein Commit: die Ergebnisbilder samt Lagerkräften, der
@@ -415,8 +411,8 @@ Norm dazu sagt.
       höchstens 1. Der Mörtel im Rohr eines Mikropfahls zählt nicht, obwohl
       SIA 267:2013, 9.5.2.4.8 ihn zuliesse -- nach SIA 262 endete der ganze
       Querschnitt sonst bei −ε_c1d. Das Tragglied rechnet als Betonstahl nach
-      SIA 262 mit γ_s; SIA 263:2013 liegt im Ordner der Normen, ist aber
-      nicht eingearbeitet. Vorschlag: so lassen, jede Annahme steht in der
+      SIA 262 mit γ_s; SIA 263:2013 liegt im Ordner der Normen und ist nur
+      für die Querkraft eingearbeitet. Vorschlag: so lassen, jede Annahme steht in der
       Herleitung. Entscheid des Benutzers.
 - [ ] **Pfähle, Steifigkeit nach Vorgabe eingebaut**
       (`opencivil/pfahl/steifigkeit.py`). Die Bettung quer wächst vom
@@ -444,6 +440,22 @@ Norm dazu sagt.
       denselben Beiwerten wie R_tr (9.5.4.5 nennt keine). Nur ein Moment am
       Kopf, ohne Querkraft, gibt keinen Nachweis R_tr -- geprüft wird dann nur die
       Bettungskraft. Vorschlag: so lassen, jede Annahme steht in der
+      Herleitung. Entscheid des Benutzers.
+- [ ] **Pfähle, innerer Widerstand quer nach Vorgabe eingebaut**
+      (`opencivil/pfahl/innen_quer.py`). Bohrpfahl: d reicht bis zum
+      Schwerpunkt der halben Bewehrung, als ob die Stäbe gleichmässig auf dem
+      Kreis lägen; b_w ist die Sehne auf der Höhe des Druckgurts -- für den
+      Kreis nennt SIA 262:2025 keine Breite; α_min = 30° auch unter Druck, wo
+      4.3.3.3.3 bei bedeutendem Druck 25° zuliesse; die Wendel ist aus dem
+      Stahl der Längsbewehrung; die Längszugkraft F_tVd (4.3.3.4.11) wirkt in
+      der Achse statt je zur Hälfte an den Gurten, auf der sicheren Seite;
+      die Querkraft zählt auch nahe dem Kopf, wo 4.3.3.4.1 sie im Abstand
+      z · cot α nähme. Mikropfahl: A_v = 2·A/π für Rohr und Vollstab --
+      SIA 263:2013, 5.1.4.1 verweist für runde Querschnitte auf
+      SN EN 1993-1-1, die nicht vorliegt; f_yd nach SIA 262 (γ_s = 1.15) statt
+      f_y/γ_M1 (1.05, SIA 263:2013, 4.1.3); dass die Querkraft über der
+      Hälfte ihres Widerstands den Biegewiderstand mindert (5.1.5.1), steht
+      nur als Hinweis. Vorschlag: so lassen, jede Annahme steht in der
       Herleitung. Entscheid des Benutzers.
 - [ ] **Pfähle quer: die dreifache Breite.** Das Buch nennt sie eine grobe
       Näherung (Kap. 10.8) und daneben den Weg nach Weissenbach: ein

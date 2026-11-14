@@ -532,8 +532,8 @@ class TestAngabengruppen(unittest.TestCase):
             *(f"setzung.w1.{n}" for n in ("B", "L", "q_W", "q_E", "s_zul", "dz")),
             *(f"setzung.w1.{n}_{i}" for i in (1, 2, 3) for n in ("d", "M_E", "M_E_strich")),
             *(f"pfahl.t1.{n}" for n in (
-                "D", "L", "t_K", "t_w", "gamma_w", "n", "phi_l", "c", "phi_w", "eta_i", "eta_a",
-                "t_red", "eta_tr")),
+                "D", "L", "t_K", "t_w", "gamma_w", "n", "phi_l", "c", "phi_w", "s_w", "eta_i",
+                "eta_a", "t_red", "eta_tr")),
             *(f"pfahl.t1.{n}_{i}" for i in (1, 2, 3)
               for n in ("d", "gamma", "phi_k", "c_k", "E_s")),
             "pfahl.t1.q_s_1",

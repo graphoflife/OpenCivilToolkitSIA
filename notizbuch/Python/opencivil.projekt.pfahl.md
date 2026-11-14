@@ -1,5 +1,5 @@
 ---
-erzeugt: 1a1474904fbe
+erzeugt: 0dcedb2284a9
 art: modul
 tags: [modul]
 ---
@@ -109,6 +109,7 @@ Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf.
 - `phi_l: float = bereich(20.0, heisst='⌀ der Stäbe', einheit=MM, ueber=0.0)`
 - `c: float = bereich(75.0, heisst='Überdeckung c', einheit=MM, ab=0.0)`
 - `phi_w: float = bereich(10.0, heisst='⌀ der Wendel', einheit=MM, ab=0.0)`
+- `s_w: float = bereich(150.0, heisst='Ganghöhe der Wendel s_w', einheit=MM, ueber=0.…`
 - `tragglied: Tragglied = Tragglied.ROHR`
 - `d_a: float = bereich(114.3, heisst='Aussendurchmesser d_a', einheit=MM, ueber=0.0)`
 - `t_r: float = bereich(10.0, heisst='Wanddicke t', einheit=MM, ueber=0.0)`

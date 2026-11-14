@@ -6,9 +6,10 @@
  * Verdrehung θ, das Moment M, die Querkraft V und der Bettungsdruck p --
  * je über der Tiefe ab Terrain, die Tiefe nach unten wie im Bild der
  * Situation. Angeschrieben ist der Wert mit dem grössten Betrag, mit
- * Punkt; was überall null ist, fehlt. Neben dem Bettungsdruck gestrichelt
- * der Erdwiderstand, den er nicht übersteigen darf -- so weit er ins Bild
- * fällt: bis zum Doppelten des grössten Drucks.
+ * Punkt; was überall null ist, fehlt. Gestrichelt die Grenzen, die sie
+ * nicht übersteigen dürfen -- neben Moment und Querkraft der Widerstand des
+ * Pfahls, neben dem Bettungsdruck der Erdwiderstand --, so weit sie ins Bild
+ * fallen: bis zum Doppelten des grössten Werts.
  *
  * Gerechnet wird nichts: die Werte kommen fertig aus dem Kern
  * (opencivil/web/pfahldaten.py), mit dem Bemessungswert des
@@ -26,8 +27,8 @@ const GROESSEN = [
   { feld: 'w', titel: 'w [mm]', stellen: 2, klasse: 'pf-d-w' },
   { feld: 'y', titel: 'y [mm]', stellen: 2, klasse: 'pf-d-w' },
   { feld: 'theta', titel: 'θ [mrad]', stellen: 2, klasse: 'bs-d-phi' },
-  { feld: 'M', titel: 'M [kNm]', stellen: 1, klasse: 'bs-d-m' },
-  { feld: 'V', titel: 'V [kN]', stellen: 1, klasse: 'bs-d-v' },
+  { feld: 'M', titel: 'M [kNm]', stellen: 1, klasse: 'bs-d-m', grenze: 'M_grenze' },
+  { feld: 'V', titel: 'V [kN]', stellen: 1, klasse: 'bs-d-v', grenze: 'V_grenze' },
   { feld: 'p', titel: 'p [kN/m²]', stellen: 0, klasse: 'pf-d-p', grenze: 'p_grenze' },
 ];
 

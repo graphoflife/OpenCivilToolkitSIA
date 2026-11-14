@@ -47,7 +47,8 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertEqual(sorted(u.art for u in unterzug), ["M-N", "V+T"])
         self.assertEqual(sorted(u.art for u in fundament), ["GB", "GL"])
         self.assertEqual([u.art for u in setzung], ["s"])
-        self.assertEqual(sorted(u.art for u in pfahl), ["R_a", "R_i", "R_tr", "q_d"])
+        self.assertEqual(sorted(u.art for u in pfahl),
+                         ["M-N", "R_a", "R_i", "R_tr", "V", "q_d"])
         self.assertEqual(len(laut), len(platte) + len(unterzug) + len(fundament) + len(setzung)
                          + len(pfahl))
         self.assertTrue(all(u.erfuellt for u in laut))

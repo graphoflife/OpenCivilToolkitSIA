@@ -1,5 +1,5 @@
 ---
-erzeugt: 0934443f0f88
+erzeugt: e1b6e9e30864
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,8 @@ Rechenwerk, und nur die, die nach den Wahlen gelten ([[opencivil.pfahl.pfahl#Pfa
 
 Gerechnet wird in den Nachweisen: äusserer Widerstand in
 [[opencivil.pfahl.aussen]], innerer in [[opencivil.pfahl.innen]], der
-äussere quer zur Achse in [[opencivil.pfahl.quer]] -- und die Steifigkeit
+äussere quer zur Achse in [[opencivil.pfahl.quer]], der innere quer in
+[[opencivil.pfahl.innen_quer]] -- und die Steifigkeit
 in [[opencivil.pfahl.steifigkeit]]. Welche Kombination den Pfahl quer
 belastet, sagt [[opencivil.pfahl.pfahl#Pfahl.quer_belastet|Pfahl.quer_belastet]].
 
@@ -298,7 +299,8 @@ Siehe Dateikopf.
 - `n: Groesse`
 - `phi_l: Groesse`
 - `c: Groesse`
-- `phi_w: Groesse` – Bohrpfahl: Zahl und Durchmesser der Längsstäbe, Überdeckung, Durchmesser der Wendel.
+- `phi_w: Groesse`
+- `s_w: Groesse` – Bohrpfahl: Zahl und Durchmesser der Längsstäbe, Überdeckung, Durchmesser und Ganghöhe der Wendel.
 - `tragglied: Tragglied`
 - `d_a: Groesse`
 - `t_r: Groesse`
@@ -419,6 +421,7 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 - [[opencivil.pfahl.achse]]
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.pfahl.uebersicht]]

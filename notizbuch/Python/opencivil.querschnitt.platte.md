@@ -1,5 +1,5 @@
 ---
-erzeugt: 5afbb069d032
+erzeugt: 8aea4205ad77
 art: modul
 tags: [modul]
 ---
@@ -486,6 +486,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.verformung]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.durchstanzen]]

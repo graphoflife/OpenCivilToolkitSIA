@@ -1,5 +1,5 @@
 ---
-erzeugt: 146ea4326f59
+erzeugt: ae570dd00e55
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -57,6 +57,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Innerer Pfahlwiderstand]] · 12
 - [[Pfahlsteifigkeit]] · 13
 - [[Äusserer Pfahlwiderstand quer]] · 10
+- [[Innerer Pfahlwiderstand quer]] · 12
 
 **Durchstanzen**
 
@@ -198,6 +199,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Grundbruchwiderstand]] · $N_{Rd}$
 - [[Halbe Querkraft für das Verformungsvermögen]] · $V_d / 2$
 - [[Hebel des Moments am Pfahlkopf]] · $e$
+- [[Hebelarm der inneren Kräfte]] · $z$
 - [[Hilfsgrösse der Nulllinie]] · $\rho$
 - [[Höhe der Distanzhalter]] · $h_{Dist}$
 - [[Innerer Hebelarm]] · $z$
@@ -214,6 +216,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Lage des Punktes längs B]] · $y_K$
 - [[Lage des Punktes längs L]] · $x_K$
 - [[Längsfeder des Pfahlkopfs]] · $k_v$
+- [[Längszugkraft aus der Querkraft]] · $F_{tVd}$
 - [[Lastneigungsfaktor i_c]] · $i_c$
 - [[Lastneigungsfaktor i_q]] · $i_q$
 - [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
@@ -236,6 +239,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Nachweisschnitt um die Wandecke – je 1.5·d_v entlang der Wände]] · $u_0$
 - [[Neigung der Last]] · $\delta_R$
 - [[Nominelle Dehnung der Zugbewehrung]] · $\varepsilon_v$
+- [[Normalkraft mit der Längszugkraft aus der Querkraft]] · $N_V$
 - [[Nulllinie auf halber Höhe]] · $x^{+}$
 - [[Nulllinie des gerissenen Querschnitts]] · $x$
 - [[Parabel-Rechteck-Beziehung des Betons]]
@@ -251,9 +255,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querfeder des frei drehbaren Pfahlkopfs]] · $k_h$
 - [[Querkraft für die Durchstanzbewehrung]] · $V_{d,s}$
 - [[Querkraft über die Federn der Wände]]
+- [[Querkraftwiderstand des Pfahls]] · $V_{Rd}$
+- [[Querkraftwiderstand des Tragglieds]] · $V_{Rd}$
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]] · $V_{Rd}^{+}(M_{Ed} = 0)$
 - [[Querkraftwiderstand ohne Querkraftbewehrung]] · $V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+})$
+- [[Querschnitt der Wendel]] · $A_{sw}$
 - [[Querschnitt eines Bügelschenkels]] · $A_{\varnothing,V}$
 - [[Radius des Bewehrungskreises]] · $r_s$
 - [[Raumlast im Gleitkörper]] · $\gamma_G$
@@ -290,6 +297,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Statische Höhe]] · $d_{2,x}$
 - [[Statische Höhe der äusseren Lage]] · $d_x$
 - [[Statische Höhe der inneren Lage]] · $d_y$
+- [[Statische Höhe des Kreisquerschnitts]] · $d$
+- [[Stegbreite des Kreisquerschnitts]] · $b_w$
 - [[Steifigkeitsmatrix eines Stabs]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]]
 - [[Teilung in y aus der Stabzahl]] · $s_{V,y}$
@@ -316,7 +325,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand bei festgehaltenem N_Ed]] · $M_{Rd}$
 - [[Widerstand der Bügel]] · $V_{Rd,s}$
 - [[Widerstand der Druckdiagonalen]] · $V_{Rd,c}$
+- [[Widerstand der Druckdiagonalen im Pfahl]] · $V_{Rd,c}$
 - [[Widerstand der ersten Betondruckdiagonale]] · $V_{Rd,max}$
+- [[Widerstand der Wendel]] · $V_{Rd,s}$
 - [[Widerstand im normierten Diagramm]] · $\bar{R}_{d,x}$
 - [[Widerstand in der Richtung der Einwirkung]] · $M_{Rd}$
 - [[Widerstand je Länge einer Wand (Fachwerk)]]
@@ -326,6 +337,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wirksame Durchbiegung]] · $w_{eff}$
 - [[Wirksame Höhe ohne Abzug]] · $d_v^{+}$
 - [[Wirksame Höhe, um die Einlage vermindert]] · $d_v$
+- [[Wirksame Schubfläche eines Kreisquerschnitts]] · $A_v$
 - [[Wirksame Spannung am Pfahlfuss]] · $\sigma'_{v,F}$
 - [[Wirksame statische Höhe im äusseren Nachweisschnitt]] · $d_{v,out}$
 - [[Wirksame statische Höhe um den Stahlpilz]] · $d_{v,P}$
@@ -340,7 +352,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-92 von 273 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+95 von 284 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -400,6 +412,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kürzester Abstand zur Resistenzlinie]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Momentengleichgewicht um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Momentenwiderstand bei reiner Biegung]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
+- [[Normalkraft mit der Längszugkraft aus der Querkraft]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._biegung|InnererQuerwiderstand._biegung]]
 - [[Nulllinie auf halber Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Nulllinie des gerissenen Querschnitts]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Platz für die Durchstanzbewehrung]] · [[opencivil.durchstanzen.mit_bewehrung#nachweisen|nachweisen]]
@@ -407,6 +420,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Probe – Moment um z]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
+- [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.grundbruch|_gamma_auftrieb]]
 - [[Rissmoment bei der Normalkraft]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
@@ -419,6 +433,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Statische Höhe]] · [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]
 - [[Statische Höhe der äusseren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
 - [[Statische Höhe der inneren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
+- [[Stegbreite des Kreisquerschnitts]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]

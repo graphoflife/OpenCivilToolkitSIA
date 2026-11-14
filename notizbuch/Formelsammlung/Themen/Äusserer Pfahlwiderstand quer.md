@@ -44,5 +44,5 @@ Druck und beide Drücke auf 3 · D, Rankine ohne Wandreibung, die Familie der
 Mechanismen, der Biegewiderstand charakteristisch mal η_i, γ_M,a = 1.4 und
 dieselben Beiwerte für die Bettungskraft.
 
-Noch nicht gerechnet: der innere Widerstand quer -- Moment und Querkraft
-der Verläufe gegen den Querschnitt.
+Moment und Querkraft der Verläufe gegen den Querschnitt prüft der
+[[Innerer Pfahlwiderstand quer|innere Widerstand quer]].

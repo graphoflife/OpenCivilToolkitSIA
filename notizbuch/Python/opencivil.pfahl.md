@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d1705fc8065
+erzeugt: 665ba9c848c8
 art: modul
 tags: [modul]
 ---
@@ -32,6 +32,7 @@ tags: [modul]
 - [[opencivil.pfahl.buch]] – die Zahlen des Buches zum Einzelpfahl.
 - [[opencivil.pfahl.erdwiderstand]] – was der Boden quer zum Pfahl hält, und wie der Pfahl quer bricht.
 - [[opencivil.pfahl.innen]] – der innere Widerstand eines Pfahls: sein Querschnitt.
+- [[opencivil.pfahl.innen_quer]] – der innere Widerstand eines Pfahls quer zu seiner Achse.
 - [[opencivil.pfahl.pfahl]] – ein Einzelpfahl in seinem Baugrund.
 - [[opencivil.pfahl.quer]] – der äussere Widerstand eines Pfahls quer zu seiner Achse.
 - [[opencivil.pfahl.steifigkeit]] – wie steif ein Pfahl im Boden steht, und wie er sich verformt.

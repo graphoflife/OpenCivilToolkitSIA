@@ -1,5 +1,5 @@
 ---
-erzeugt: b0ad3dd07546
+erzeugt: 31247a7cbe49
 art: modul
 tags: [modul]
 ---
@@ -601,6 +601,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.pfahl.achse]]
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]

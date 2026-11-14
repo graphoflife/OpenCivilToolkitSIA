@@ -1,5 +1,5 @@
 ---
-erzeugt: 874194003b82
+erzeugt: 7db2fe824cbd
 art: modul
 tags: [modul]
 ---
@@ -260,6 +260,7 @@ Je Kombination die Werte am Kopf und die grössten über die Tiefe.
 
 ## Gebraucht von
 
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.web.pfahldaten]]

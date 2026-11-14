@@ -1,5 +1,5 @@
 ---
-erzeugt: ae8a2a342ad4
+erzeugt: e8f25aca8899
 art: modul
 tags: [modul]
 ---
@@ -41,7 +41,7 @@ Kreise sind Vielecke derselben Fläche ([[opencivil.pfahl.innen#kreis|kreis]]).
   Stahl umschlossenen Beton zuliesse: nach SIA 262 gerechnet, endete mit ihm
   das Ganze bei −ε_c1d, und das Rohr flösse nicht mehr.
 * Das Tragglied rechnet als Stahl der Liste nach SIA 262, mit dessen γ_s;
-  SIA 263 liegt nicht vor.
+  SIA 263 ist nicht eingearbeitet.
 
 
 ## EINHEITEN
@@ -170,6 +170,7 @@ R_i,d = η_i · R_mat,d (50).
 
 ## Gebraucht von
 
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt.aufbau.pfahl]]

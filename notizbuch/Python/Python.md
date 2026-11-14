@@ -1,5 +1,5 @@
 ---
-erzeugt: 18708bde759f
+erzeugt: b5e586c6170f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -109,6 +109,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.pfahl.buch]] – die Zahlen des Buches zum Einzelpfahl.
     - [[opencivil.pfahl.erdwiderstand]] – was der Boden quer zum Pfahl hält, und wie der Pfahl quer bricht.
     - [[opencivil.pfahl.innen]] – der innere Widerstand eines Pfahls: sein Querschnitt.
+    - [[opencivil.pfahl.innen_quer]] – der innere Widerstand eines Pfahls quer zu seiner Achse.
     - [[opencivil.pfahl.pfahl]] – ein Einzelpfahl in seinem Baugrund.
     - [[opencivil.pfahl.quer]] – der äussere Widerstand eines Pfahls quer zu seiner Achse.
     - [[opencivil.pfahl.steifigkeit]] – wie steif ein Pfahl im Boden steht, und wie er sich verformt.

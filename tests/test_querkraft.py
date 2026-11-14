@@ -268,7 +268,8 @@ class TestQuerkraft(unittest.TestCase):
             with self.subTest(bild=bild.__name__):
                 nachweis = aufbau.feld("querkraft")["q1.x"]
                 self.assertTrue(nachweis.still)
-                self.assertFalse([u for u in loesung.gefuehrte_urteile if u.art == "V"])
+                self.assertFalse([u for u in loesung.gefuehrte_urteile if u.art == "V"
+                                  and u.raum.startswith("querschnitt.q1.")])
                 # Ohne Fall keine Ausgabe: gerechnet wird er als Ziel unter
                 # seiner ID, fuer den Befund, aus dem die Kurve kommt.
                 self.assertEqual(nachweis.ausgaben, ())
@@ -292,7 +293,9 @@ class TestQuerkraft(unittest.TestCase):
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(aufbau.feld("querkraft")["q1.x"].still)
-        self.assertFalse([u for u in loesung.urteile if u.art == "V"])
+        # Die Querkraft der Platte -- das Beispiel hat auch einen Pfahl mit Querkraft.
+        self.assertFalse([u for u in loesung.urteile
+                          if u.art == "V" and u.raum.startswith("querschnitt.q1.")])
 
     def test_erfuellungsgrad_ist_widerstand_durch_einwirkung(self):
         aufbau = projekt_mit_querkraft().aufbauen()

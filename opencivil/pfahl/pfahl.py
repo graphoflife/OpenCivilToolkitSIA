@@ -16,7 +16,8 @@ Rechenwerk, und nur die, die nach den Wahlen gelten (:meth:`Pfahl.kurznamen`):
 
 Gerechnet wird in den Nachweisen: äusserer Widerstand in
 :mod:`opencivil.pfahl.aussen`, innerer in :mod:`opencivil.pfahl.innen`, der
-äussere quer zur Achse in :mod:`opencivil.pfahl.quer` -- und die Steifigkeit
+äussere quer zur Achse in :mod:`opencivil.pfahl.quer`, der innere quer in
+:mod:`opencivil.pfahl.innen_quer` -- und die Steifigkeit
 in :mod:`opencivil.pfahl.steifigkeit`. Welche Kombination den Pfahl quer
 belastet, sagt :meth:`Pfahl.quer_belastet`.
 
@@ -272,7 +273,11 @@ class Pfahl(Rechenobjekt):
     phi_l: Groesse
     c: Groesse
     phi_w: Groesse
-    """Bohrpfahl: Zahl und Durchmesser der Längsstäbe, Überdeckung, Durchmesser der Wendel."""
+    s_w: Groesse
+    """
+    Bohrpfahl: Zahl und Durchmesser der Längsstäbe, Überdeckung, Durchmesser
+    und Ganghöhe der Wendel.
+    """
 
     tragglied: Tragglied
     d_a: Groesse
@@ -372,6 +377,7 @@ class Pfahl(Rechenobjekt):
                 ("phi_l", r"\varnothing_l", MM, "Durchmesser der Längsstäbe", 0, self.phi_l, ""),
                 ("c", "c", MM, "Überdeckung der Wendel", 0, self.c, ""),
                 ("phi_w", r"\varnothing_w", MM, "Durchmesser der Wendel", 0, self.phi_w, ""),
+                ("s_w", "s_w", MM, "Ganghöhe der Wendel", 0, self.s_w, "SIA 267:2013, 9.6.3.2.4"),
             )
         elif self.tragglied is Tragglied.ROHR:
             querschnitt = (

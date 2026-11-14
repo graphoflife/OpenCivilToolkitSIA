@@ -1,5 +1,5 @@
 ---
-erzeugt: c7dd722d31e3
+erzeugt: 79814ca83e17
 art: modul
 tags: [modul]
 ---
@@ -80,4 +80,5 @@ steilere Neigung, weil sie die Druckdiagonale weniger beansprucht.
 
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.querkraft_buegel]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.querschnitt.schubwaende]]

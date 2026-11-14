@@ -1,5 +1,5 @@
 ---
-erzeugt: b094c605668a
+erzeugt: d5e879129d8a
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.5, (4)"
@@ -36,8 +36,10 @@ $$
 - [[Grenze der bezogenen Druckzonenhöhe]]
 - [[Nominelle Dehnung der Zugbewehrung]]
 - [[Plattenrotation]]
+- [[Querkraftwiderstand des Tragglieds]]
 - [[Spannung in der Durchstanzbewehrung]]
 - [[Widerstand der Bügel]]
+- [[Widerstand der Wendel]]
 - [[Zulässige Stahlspannung]]
 
 ## Im Code

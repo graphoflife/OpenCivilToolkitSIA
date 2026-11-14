@@ -566,8 +566,14 @@ dem Erdwiderstand -- nach Rankine, auf der dreifachen Breite (Kap. 9.3.5,
 R_tr,d = η_a,tr·R_tr,k/1.4 (49), η_a,tr steht in der Karte «Querlast».
 Zudem darf die Bettungskraft der Verläufe in keiner Tiefe den abgeminderten
 Erdwiderstand übersteigen (9.5.4.5); im Bild des Bettungsdrucks steht er
-gestrichelt daneben. Der innere Widerstand quer, Moment und Querkraft gegen
-den Querschnitt, folgt.
+gestrichelt daneben. Und der Pfahl selbst muss in jeder Tiefe Moment und
+Querkraft tragen, beide mal η_i (50): das Moment mit der Normalkraft dort,
+im Bohrpfahl vermindert um die Längszugkraft aus der Querkraft
+(SIA 262:2025, 4.3.3.4.11); die Querkraft im Bohrpfahl ein Fachwerk aus
+Druckdiagonalen und Wendel, deren Ganghöhe s_w im Querschnitt steht
+(4.3.3.4), im Mikropfahl der Stahl mit A_v·f_yd/√3 (SIA 263:2013, 5.1.4.1).
+In den Bildern von Moment und Querkraft steht der Widerstand gestrichelt
+daneben.
 
 **Python:** die letzte App. Skripte, gespeichert mit dem Projekt; in der
 Mitte der Code und darunter die Konsole, rechts statt der Berechnung die

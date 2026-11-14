@@ -307,7 +307,8 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         self.assertTrue(any(z.startswith("Quer, in «K» R_{tr,d} = ") for z in zeilen))
         legende = ["".join(z.get("text") or z["mathe"] for z in zeile)
                    for zeile in d["verlaufslegende"]]
-        self.assertTrue(any(z.startswith("Neben p gestrichelt der Erdwiderstand") for z in legende))
+        self.assertTrue(any(z.startswith("Gestrichelt, so weit sie ins Bild fallen, die Grenzen")
+                            and "p_{E,d} / D" in z for z in legende))
 
 
 if __name__ == "__main__":

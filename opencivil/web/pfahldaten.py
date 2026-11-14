@@ -12,7 +12,9 @@ Eintrag.
 
 Und je Kombination die Verläufe über die Tiefe, wie die Steifigkeit sie
 gerechnet hat (:func:`verlaeufe`), mit dem Satz, der unter ihnen steht --
-neben dem Bettungsdruck der Erdwiderstand, den er nicht übersteigen darf.
+neben Moment und Querkraft der Widerstand des Pfahls, neben dem
+Bettungsdruck der Erdwiderstand: die Grenzen, die sie nicht übersteigen
+dürfen.
 
 Gerechnet wird hier nichts: alles steht in den Befunden.
 """
@@ -26,6 +28,7 @@ from opencivil.core.latex import Mathe, fest
 from opencivil.core.rechenwerk import Loesung
 from opencivil.pfahl.aussen import Aussenbefund
 from opencivil.pfahl.innen import Innenbefund
+from opencivil.pfahl.innen_quer import Innenquerbefund
 from opencivil.pfahl.quer import Querbefund
 from opencivil.pfahl.steifigkeit import GAMMA_E, Pfahlsteifigkeit, Steifigkeitsbefund
 from opencivil.projekt import Aufbau
@@ -49,21 +52,22 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
     innen: Optional[Innenbefund] = loesung.befunde.get(nachweise[1].id)
     if aussen is None or innen is None:
         return {"stuecke": [], "q_b": None, "legende": [zeile("Nicht gerechnet.")]}
-    quer = aufbau.feld("pfahl_quer").get(kennung)
-    raeume = {n.id for n in [*nachweise, quer] if n is not None}
+    quer = [aufbau.feld(f).get(kennung) for f in ("pfahl_quer", "pfahl_innen_quer")]
+    raeume = {n.id for n in [*nachweise, *quer] if n is not None}
     urteile = [u for u in loesung.urteile if u.raum in raeume and not u.still]
     return {
         "stuecke": [{"z_o": s.stueck.z_o, "z_u": s.stueck.z_u, "q_s": zahl(s.q_s, KPA)}
                     for s in aussen.stuecke],
         "q_b": zahl(aussen.q_b, KPA),
-        "legende": _legende(aussen, innen, _querbefund(aufbau, kennung, loesung), urteile),
+        "legende": _legende(aussen, innen, _befund(aufbau, kennung, loesung, "pfahl_quer"),
+                            urteile),
         **verlaeufe(aufbau, kennung, loesung),
     }
 
 
-def _querbefund(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Querbefund]:
-    """Was der äussere Widerstand quer ergab -- ``None``, wo keine Kombination quer belastet."""
-    nachweis = aufbau.feld("pfahl_quer").get(kennung)
+def _befund(aufbau: Aufbau, kennung: str, loesung: Loesung, feld: str) -> Optional[Any]:
+    """Der Befund des Nachweises in ``feld`` -- ``None``, wo es ihn nicht gibt."""
+    nachweis = aufbau.feld(feld).get(kennung)
     return loesung.befunde.get(nachweis.id) if nachweis is not None else None
 
 
@@ -77,27 +81,39 @@ def verlaeufe(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
         Pfahlsteifigkeit.kennung(aufbau.bauteil(kennung).objekt))
     if befund is None:
         return {"verlaeufe": [], "verlaufslegende": []}
-    quer = _querbefund(aufbau, kennung, loesung)
-    faelle = quer.faelle if quer is not None else {}
+    aussen: Optional[Querbefund] = _befund(aufbau, kennung, loesung, "pfahl_quer")
+    innen: Optional[Innenquerbefund] = _befund(aufbau, kennung, loesung, "pfahl_innen_quer")
     kopf = "eingespannt" if befund.eingespannt else "frei drehbar"
     legende = [
         zeile("Tragsicherheit, mit ", Mathe(rf"E_{{s,d}} = E_{{s,k}} / {fest(GAMMA_E, 1)}"),
               f"; der Kopf {kopf}. Die Tiefe z ab Terrain, die Querkraft H",
               " in Richtung von y, das Moment dreht wie H über dem Kopf."),
     ]
-    if faelle:
-        legende.append(zeile("Neben p gestrichelt der Erdwiderstand ",
-                             Mathe(r"p_{E,d} / D"), ", den der Bettungsdruck nirgends "
-                             "übersteigen darf -- so weit er ins Bild fällt."))
+    if aussen is not None and innen is not None:
+        legende.append(zeile("Gestrichelt, so weit sie ins Bild fallen, die Grenzen: neben M "
+                             "und V der Widerstand des Pfahls mit der Normalkraft in derselben "
+                             "Tiefe, neben p der Erdwiderstand ", Mathe(r"p_{E,d} / D"), "."))
     return {
         "verlaeufe": [{"name": v.name, "z": v.z,
                        **{feld: [zahl(x, einheit) for x in getattr(v, feld)]
                           for feld, einheit in VERLAEUFE if getattr(v, feld) is not None},
-                       **({"p_grenze": [zahl(x, KPA) for x in faelle[v.name].grenze]}
-                          if v.name in faelle else {})}
+                       **_grenzen(v.name, aussen, innen)}
                       for v in befund.verlaeufe],
         "verlaufslegende": legende,
     }
+
+
+def _grenzen(name: str, aussen: Optional[Querbefund],
+             innen: Optional[Innenquerbefund]) -> Dict[str, List[float]]:
+    """Die Grenzen einer Kombination neben M, V und p -- leer, wo sie nicht quer belastet."""
+    heraus = {}
+    if aussen is not None and name in aussen.faelle:
+        heraus["p_grenze"] = [zahl(x, KPA) for x in aussen.faelle[name].grenze]
+    if innen is not None and name in innen.faelle:
+        fall = innen.faelle[name]
+        heraus["M_grenze"] = [zahl(x, KNM) for x in fall.M_grenze]
+        heraus["V_grenze"] = [zahl(x, KN) for x in fall.V_grenze]
+    return heraus
 
 
 def _legende(aussen: Aussenbefund, innen: Innenbefund, quer: Optional[Querbefund],

@@ -128,6 +128,12 @@
       "bereich": "Pfähle"
     },
     {
+      "name": "Innerer Pfahlwiderstand quer",
+      "pfad": "Formelsammlung/Themen/Innerer Pfahlwiderstand quer.md",
+      "art": "thema",
+      "bereich": "Pfähle"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -1143,6 +1149,7 @@
         "Äusserer Pfahlwiderstand",
         "Innerer Pfahlwiderstand",
         "Äusserer Pfahlwiderstand quer",
+        "Innerer Pfahlwiderstand quer",
         "Querkraft",
         "Duktilität",
         "Zwängung auf Normalkraft",
@@ -1680,6 +1687,17 @@
       ]
     },
     {
+      "name": "Hebelarm der inneren Kräfte",
+      "pfad": "Formelsammlung/Formeln/Hebelarm der inneren Kräfte.md",
+      "art": "formel",
+      "zeichen": [
+        "z"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
       "name": "Hilfsgrösse der Nulllinie",
       "pfad": "Formelsammlung/Formeln/Hilfsgrösse der Nulllinie.md",
       "art": "formel",
@@ -1853,6 +1871,17 @@
       ],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Längszugkraft aus der Querkraft",
+      "pfad": "Formelsammlung/Formeln/Längszugkraft aus der Querkraft.md",
+      "art": "formel",
+      "zeichen": [
+        "F_{tVd}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
       ]
     },
     {
@@ -2096,6 +2125,17 @@
       ]
     },
     {
+      "name": "Normalkraft mit der Längszugkraft aus der Querkraft",
+      "pfad": "Formelsammlung/Formeln/Normalkraft mit der Längszugkraft aus der Querkraft.md",
+      "art": "formel",
+      "zeichen": [
+        "N_V"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
       "name": "Nulllinie auf halber Höhe",
       "pfad": "Formelsammlung/Formeln/Nulllinie auf halber Höhe.md",
       "art": "formel",
@@ -2258,6 +2298,28 @@
       ]
     },
     {
+      "name": "Querkraftwiderstand des Pfahls",
+      "pfad": "Formelsammlung/Formeln/Querkraftwiderstand des Pfahls.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Querkraftwiderstand des Tragglieds",
+      "pfad": "Formelsammlung/Formeln/Querkraftwiderstand des Tragglieds.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
       "name": "Querkraftwiderstand mit Querkraftbewehrung",
       "pfad": "Formelsammlung/Formeln/Querkraftwiderstand mit Querkraftbewehrung.md",
       "art": "formel",
@@ -2290,6 +2352,17 @@
       "themen": [
         "Kennzahlen",
         "Querkraft"
+      ]
+    },
+    {
+      "name": "Querschnitt der Wendel",
+      "pfad": "Formelsammlung/Formeln/Querschnitt der Wendel.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{sw}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
       ]
     },
     {
@@ -2701,6 +2774,28 @@
       ]
     },
     {
+      "name": "Statische Höhe des Kreisquerschnitts",
+      "pfad": "Formelsammlung/Formeln/Statische Höhe des Kreisquerschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "d"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Stegbreite des Kreisquerschnitts",
+      "pfad": "Formelsammlung/Formeln/Stegbreite des Kreisquerschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "b_w"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
       "name": "Steifigkeitsmatrix eines Stabs",
       "pfad": "Formelsammlung/Formeln/Steifigkeitsmatrix eines Stabs.md",
       "art": "formel",
@@ -2981,6 +3076,17 @@
       ]
     },
     {
+      "name": "Widerstand der Druckdiagonalen im Pfahl",
+      "pfad": "Formelsammlung/Formeln/Widerstand der Druckdiagonalen im Pfahl.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,c}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
       "name": "Widerstand der ersten Betondruckdiagonale",
       "pfad": "Formelsammlung/Formeln/Widerstand der ersten Betondruckdiagonale.md",
       "art": "formel",
@@ -2989,6 +3095,17 @@
       ],
       "themen": [
         "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Widerstand der Wendel",
+      "pfad": "Formelsammlung/Formeln/Widerstand der Wendel.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,s}"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
       ]
     },
     {
@@ -3091,6 +3208,17 @@
       "themen": [
         "Querkraft",
         "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Wirksame Schubfläche eines Kreisquerschnitts",
+      "pfad": "Formelsammlung/Formeln/Wirksame Schubfläche eines Kreisquerschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "A_v"
+      ],
+      "themen": [
+        "Innerer Pfahlwiderstand quer"
       ]
     },
     {
@@ -5419,6 +5547,29 @@
       ]
     },
     {
+      "name": "opencivil.pfahl.innen_quer",
+      "pfad": "Python/opencivil.pfahl.innen_quer.md",
+      "art": "modul",
+      "kurz": "der innere Widerstand eines Pfahls quer zu seiner Achse.",
+      "stichworte": [
+        "gezogen",
+        "stuetzstellen",
+        "zwischen",
+        "anteil",
+        "Schub",
+        "Schub.laengszug",
+        "Innenquerfall",
+        "Innenquerbefund",
+        "InnererQuerwiderstand",
+        "InnererQuerwiderstand.pruefe",
+        "InnererQuerwiderstand._fachwerk",
+        "InnererQuerwiderstand._neigung",
+        "InnererQuerwiderstand._tragglied",
+        "InnererQuerwiderstand._biegung",
+        "InnererQuerwiderstand._querkraft"
+      ]
+    },
+    {
       "name": "opencivil.pfahl.pfahl",
       "pfad": "Python/opencivil.pfahl.pfahl.md",
       "art": "modul",
@@ -7169,8 +7320,9 @@
       "kurz": "was die Oberflaeche von einem Pfahl zeichnet.",
       "stichworte": [
         "situation",
-        "_querbefund",
+        "_befund",
         "verlaeufe",
+        "_grenzen",
         "_legende"
       ]
     },

@@ -1,5 +1,5 @@
 ---
-erzeugt: f09d6cbcb3d9
+erzeugt: f21f4c440d1b
 art: formel
 tags: [formel]
 ---
@@ -14,7 +14,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $M_{Rd}$ | – | kNm | [[Widerstand bei festgehaltenem N_Ed]], [[Widerstand in der Richtung der Einwirkung]], Zwischenwert |
+| $M_{Rd}$ | Biegewiderstand dort | kNm | [[Widerstand bei festgehaltenem N_Ed]], [[Widerstand in der Richtung der Einwirkung]], Zwischenwert |
 | $M_{Ed}$ | – | kNm | Zwischenwert |
 
 ## Beispiel
@@ -41,6 +41,7 @@ $$
 - [[Äusserer Pfahlwiderstand]]
 - [[Innerer Pfahlwiderstand]]
 - [[Äusserer Pfahlwiderstand quer]]
+- [[Innerer Pfahlwiderstand quer]]
 - [[Querkraft]]
 - [[Duktilität]]
 - [[Zwängung auf Normalkraft]]

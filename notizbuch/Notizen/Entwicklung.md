@@ -7,6 +7,43 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Pfähle IV: innerer Widerstand quer
+
+Je Kombination, die den Pfahl quer belastet, jetzt auch Moment und Querkraft
+der Verläufe gegen den Querschnitt, in jeder Tiefe und beide mal η_i
+(SIA 267:2013, 9.5.2.4.1, (50)). Neu beim Bohrpfahl die Ganghöhe der Wendel
+s_w, vorgegeben 150 mm. In den Bildern von M und V steht der Widerstand
+gestrichelt daneben, wie der Erdwiderstand neben p.
+
+Warum so:
+
+- Das Moment mit der Normalkraft in derselben Tiefe, nicht mit N_Ed am Kopf:
+  längs des Pfahls nimmt N ab, und unter mässigem Druck trägt der
+  Querschnitt mit weniger Normalkraft weniger Moment.
+- M_Rd an sieben Normalkräften, dazwischen linear: jede Tiefe einzeln wäre
+  ein Schnitt der Interaktion je Knoten, in Pyodide spürbar. M_R(N) ist
+  konkav, die Gerade liegt also darunter; in den Proben weniger als 1 %
+  (`tests/test_pfahl_innen_quer.py`).
+- Im Bohrpfahl mindert die Längszugkraft aus der Querkraft (SIA 262:2025,
+  4.3.3.4.11, (51)) die Normalkraft, mit der der Querschnitt biegt: am
+  eingespannten Kopf ⌀ 900 mit N = 1000 kN und H = 100 kN von 742 auf
+  699 kNm. Als Zug in der Achse statt je zur Hälfte an den Gurten: einfacher,
+  und weil der Druckgurt weiter von der Achse liegt als der Zuggurt, auf der
+  sicheren Seite.
+- Die Querkraft im Bohrpfahl wie in einem Steg: das Fachwerk der Platte
+  (`querschnitt/fachwerk.py`) mit der Wendel zu 70 % (4.3.3.4.4), d bis zum
+  Schwerpunkt der gezogenen Hälfte der Stäbe, b_w als Sehne am Druckgurt.
+  Im Beispiel trägt die Wendel ⌀ 10 alle 150 mm im ⌀ 900 rund ein Viertel
+  dessen, was die Druckdiagonalen tragen.
+- Unter Zug α ab 40°. Am Fuss eines Zugpfahls ist N null, dort gilt 30° --
+  ein Zugpfahl zeigt darum beide Bereiche. Was dort als Millionstel Newton
+  übrig bleibt, ist Rauschen und kein Zug (`innen_quer.RAUSCHEN`).
+- Im Mikropfahl SIA 263:2013, soweit die Querkraft es braucht:
+  V_Rd = A_v·f_yd/√3 (5.1.4.1, (41)), A_v = 2·A/π aus Ringen gleichen
+  Schubflusses. f_yd bleibt der Wert nach SIA 262, wie längs.
+- Die Ganghöhe ist die grösste längs des Pfahls; über 0.40 m ein Hinweis
+  (SIA 267:2013, 9.6.3.2.4).
+
 ## 2026-11-14 · Pfähle III: äusserer Widerstand quer und Bettungskraft
 
 Je Kombination mit H_Ed jetzt auch der Widerstand quer zur Achse, nach SIA

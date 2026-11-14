@@ -379,7 +379,9 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
                          [["Äusserer Pfahlwiderstand", "Tragsicherheit"],
                           ["Innerer Pfahlwiderstand", "Tragsicherheit"],
                           ["Äusserer Pfahlwiderstand quer", "Tragsicherheit"],
-                          ["Bettungskraft am Pfahl", "Tragsicherheit"]])
+                          ["Bettungskraft am Pfahl", "Tragsicherheit"],
+                          ["Biegung im Pfahl", "Tragsicherheit"],
+                          ["Querkraft im Pfahl", "Tragsicherheit"]])
 
 
 if __name__ == "__main__":

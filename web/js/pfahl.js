@@ -47,6 +47,8 @@ const HILFE = {
       ['η_a,tr', 'Umrechnungsfaktor quer: R_tr,k wird immer gerechnet, also höchstens 0.7 (SIA 267:2013, 9.5.2.3.2, 9.5.2.2.5)'],
       ['γ_M,a quer', '1.4, der kleinste Wert der Norm (SIA 267:2013, 9.5.2.3.1, (49)) -- fest, keine Eingabe'],
       ['Bettung', 'in keiner Tiefe darf die Bettungskraft der Verläufe den Erdwiderstand p_E,d = η_a,tr·p_E,k/1.4 übersteigen (SIA 267:2013, 9.5.4.5)'],
+      ['M im Pfahl', 'in jeder Tiefe |M| ≤ η_i·M_Rd(N/η_i), mit der Normalkraft dort; im Bohrpfahl um die Längszugkraft aus der Querkraft vermindert, F_tVd = |V|·cot α (SIA 262:2025, 4.3.3.4.11)'],
+      ['V im Pfahl', 'Bohrpfahl: Fachwerk mit z = 0.9·d, die Wendel zu 70 % von Bügeln (SIA 262:2025, 4.3.3.4.4), α 30° bis 45°, unter Zug ab 40°; Mikropfahl: A_v·f_yd/√3 mit A_v = 2·A/π (SIA 263:2013, 5.1.4.1) -- beides mal η_i'],
     ],
     formel: 'R_a,d = η_a·(R_b,k + R_s,k)/γ_M,a;  R_i,d = η_i·R_mat,d;  R_tr,d = η_a,tr·R_tr,k/γ_M,a',
   },
@@ -108,6 +110,9 @@ function querschnittKarte(t) {
         schritt: 5, titel: 'Mindestens 60 mm verrohrt, 60 mm unverrohrt in Fels oder hartem Boden, 75 mm unverrohrt in weichem Boden (SIA 267:2013, 9.6.3.2.6)',
       }),
       zahlzeile(t, 'phi_w', 'Durchmesser der Wendel', String.raw`\varnothing_w`, { schritt: 2 }),
+      zahlzeile(t, 's_w', 'Ganghöhe der Wendel', 's_w', {
+        schritt: 10, titel: 'Die grösste längs des Pfahls; in der Regel höchstens 0.40 m, am Kopf 0.10 bis 0.15 m (SIA 267:2013, 9.6.3.2.4)',
+      }),
       zahlzeile(t, 'eta_i', 'Umrechnungsfaktor', String.raw`\eta_i`, {
         schritt: 0.05, titel: 'In der Regel höchstens 0.8, mit Prüfung der Integrität bis 0.9',
       }),

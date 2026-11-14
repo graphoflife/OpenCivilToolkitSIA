@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a4c34ad85f2
+erzeugt: 494395830734
 art: modul
 tags: [modul]
 ---
@@ -446,6 +446,7 @@ class Nulllinienlage(Prozedur):
 - [[opencivil.pfahl.achse]]
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]

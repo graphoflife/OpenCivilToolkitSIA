@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f05e7a8c580
+erzeugt: 7991016ee03c
 art: modul
 tags: [modul]
 ---
@@ -19,7 +19,9 @@ Eintrag.
 
 Und je Kombination die Verläufe über die Tiefe, wie die Steifigkeit sie
 gerechnet hat ([[opencivil.web.pfahldaten#verlaeufe|verlaeufe]]), mit dem Satz, der unter ihnen steht --
-neben dem Bettungsdruck der Erdwiderstand, den er nicht übersteigen darf.
+neben Moment und Querkraft der Widerstand des Pfahls, neben dem
+Bettungsdruck der Erdwiderstand: die Grenzen, die sie nicht übersteigen
+dürfen.
 
 Gerechnet wird hier nichts: alles steht in den Befunden.
 
@@ -34,13 +36,13 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 Was die Zeichnung eines Pfahls braucht. Ohne Kombination gibt es keinen
 Nachweis und keinen Befund -- dann zeichnet sie nur den Pfahl im Boden.
 
-### _querbefund
+### _befund
 
 ```python
-def _querbefund(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Optional[Querbefund]
+def _befund(aufbau: Aufbau, kennung: str, loesung: Loesung, feld: str) -> Optional[Any]
 ```
 
-Was der äussere Widerstand quer ergab -- `None`, wo keine Kombination quer belastet.
+Der Befund des Nachweises in `feld` -- `None`, wo es ihn nicht gibt.
 
 ### verlaeufe
 
@@ -51,6 +53,14 @@ def verlaeufe(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 Je Kombination Setzung, Normalkraft und -- wo quer gerechnet ist --
 Verschiebung, Verdrehung, Moment, Querkraft und Bettungsdruck über die
 Tiefe ab Terrain, dazu der Satz darunter. Leer ohne Steifigkeit.
+
+### _grenzen
+
+```python
+def _grenzen(name: str, aussen: Optional[Querbefund], innen: Optional[Innenquerbefund]) -> Dict[str, List[float]]
+```
+
+Die Grenzen einer Kombination neben M, V und p -- leer, wo sie nicht quer belastet.
 
 ### _legende
 
@@ -72,6 +82,7 @@ Mantel und Fuss, die Bemessungswerte, quer je Kombination, der entscheidende Fal
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.projekt]]

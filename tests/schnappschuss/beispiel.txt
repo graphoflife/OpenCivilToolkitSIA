@@ -2,7 +2,7 @@
 Beispiel
 ====================================================================================================
 
-148 Berechnungen ausgeführt, 220 Werte bestimmt.
+150 Berechnungen ausgeführt, 223 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -1297,6 +1297,9 @@ Durchmesser der Längsstäbe
 Durchmesser der Wendel
     \varnothing_w = 10\,\mathrm{mm}
 
+Ganghöhe der Wendel   [SIA 267:2013, 9.6.3.2.4]
+    s_w = 150\,\mathrm{mm}
+
 Umrechnungsfaktor des inneren Widerstands   [SIA 267:2013, 9.5.2.4.4, (51); 9.5.2.4.9]
     \eta_i = 0.8
 
@@ -1601,6 +1604,114 @@ Bettungskraft gegen Erdwiderstand
 
 Erfüllungsgrad
     \alpha_{eff,E,\text{Tragsicherheit}} = \frac{p_{E,d}}{q_d} = \frac{137\,\mathrm{kN}/\mathrm{m}}{68\,\mathrm{kN}/\mathrm{m}} = 2.02 \quad \Rightarrow \quad \text{erfüllt}
+
+Innerer Widerstand quer
+-----------------------
+
+Querkraftwiderstand
+-------------------
+
+Der Pfahl trägt die Querkraft wie der Steg eines Balkens: schräge Druckdiagonalen im Beton, die
+Wendel als Zugglied, die Längsstäbe als Gurt.
+
+Radius des Kreises, auf dem die Längsstäbe liegen -- aus dem inneren Widerstand
+    r_s = 355\,\mathrm{mm}
+
+Statische Höhe: bis zum Schwerpunkt der Stäbe in der gezogenen Hälfte   [SIA 262:2025, 4.3.3.4.2]
+    d = \frac{D}{2} + \frac{2 \cdot r_s}{\pi} = \frac{900\,\mathrm{mm}}{2} + \frac{2 \cdot 355\,\mathrm{mm}}{\pi} = 676\,\mathrm{mm}
+
+Hebelarm der inneren Kräfte   [SIA 262:2025, 4.3.3.4.2]
+    z = 0.9 \cdot d = 0.9 \cdot 676\,\mathrm{mm} = 608.4\,\mathrm{mm}
+
+Breite des Stegs: die Sehne des Kreises auf der Höhe des Druckgurts, die kleinste zwischen den Gurten
+    \begin{aligned}
+      b_w &= 2 \cdot \sqrt{\left(\frac{D}{2}\right)^{2} - \left(\frac{D}{2} - d + z\right)^{2}} \\
+      &= 2 \cdot \sqrt{\left(\frac{900\,\mathrm{mm}}{2}\right)^{2} - \left(\frac{900\,\mathrm{mm}}{2} - 676\,\mathrm{mm} + 608.4\,\mathrm{mm}\right)^{2}} \\
+      &= 474.4\,\mathrm{mm}
+    \end{aligned}
+
+Querschnitt der Wendel: sie kreuzt den Schnitt zweimal
+    A_{sw} = 2 \cdot \frac{\pi \cdot \varnothing_w^{2}}{4} = 2 \cdot \frac{\pi \cdot \left(10\,\mathrm{mm}\right)^{2}}{4} = 157\,\mathrm{mm}^{2}
+
+Abminderung der Betondruckfestigkeit in der Druckdiagonalen   [SIA 262:2025, 4.2.1.7]
+    k_c = 0.55
+[*] Annahme: Nach Vorgabe, nicht nachgeschlagen: gezogen ist die halbe Bewehrung, die Stäbe
+gleichmässig auf dem Kreis; b_w ist die Sehne auf der Höhe des Druckgurts; die Wendel ist aus dem
+Stahl der Längsbewehrung; α_min = 30° auch unter Druck. Die Querkraft zählt in jeder Tiefe, auch
+dort, wo SIA 262:2025, 4.3.3.4.1, nahe dem Kopf die im Abstand z · cot α gelten liesse.
+
+Neigung der Druckdiagonalen: ganzgradig zwischen 30° und 45° die mit dem grössten Widerstand   [SIA 262:2025, 4.3.3.3.2, (42); SIA 262:2025, 4.3.3.3.3]
+    \alpha = 30{}^{\circ}
+
+Widerstand der Wendel: 70 % senkrechter Bügel   [SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.4]
+    \begin{aligned}
+      V_{Rd,s} &= 0.7 \cdot \frac{A_{sw}}{s_w} \cdot z \cdot f_{yd} \cdot \cot \alpha \\
+      &= 0.7 \cdot \frac{157\,\mathrm{mm}^{2}}{150\,\mathrm{mm}} \cdot 608.4\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30{}^{\circ} \\
+      &= 335.9\,\mathrm{kN}
+    \end{aligned}
+
+Widerstand der Druckdiagonalen   [SIA 262:2025, 4.3.3.4.6, (47)]
+    \begin{aligned}
+      V_{Rd,c} &= b_w \cdot z \cdot k_c \cdot f_{cd} \cdot \sin \alpha \cdot \cos \alpha \\
+      &= 474.4\,\mathrm{mm} \cdot 608.4\,\mathrm{mm} \cdot 0.55 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30{}^{\circ} \cdot \cos 30{}^{\circ} \\
+      &= 1374.8\,\mathrm{kN}
+    \end{aligned}
+
+Querkraftwiderstand   [SIA 267:2013, 9.5.2.4.1, (50)]
+    V_{Rd} = \eta_i \cdot \min\left[V_{Rd,s};\ V_{Rd,c}\right] = 0.8 \cdot \min\left[335.9\,\mathrm{kN};\ 1374.8\,\mathrm{kN}\right] = 268.7\,\mathrm{kN}
+
+Innerer Widerstand quer – Tragsicherheit
+----------------------------------------
+
+Biegewiderstand an Stützstellen der Normalkraft, dazwischen linear: er ist in N konkav, die Gerade liegt darunter
+    N_V\ [\mathrm{kN}]  \eta_i \cdot M_{Rd}(N_V / \eta_i)\ [\mathrm{kNm}]
+    ------------------  -------------------------------------------------
+                   436                                              595.6
+                   670                                              658.0
+                   903                                              717.9
+                  1136                                              775.3
+                  1370                                              828.0
+                  1603                                              876.9
+                  1836                                              923.4
+
+Tiefe unter Terrain, wo das Moment dem Biegewiderstand am nächsten kommt
+    z = 4.3\,\mathrm{m}
+
+Normalkraft dort, Druck positiv
+    N = 1747.1\,\mathrm{kN}
+
+Querkraft dort, als Betrag
+    \left|V\right| = 4.6\,\mathrm{kN}
+
+Längszugkraft aus der Querkraft, je zur Hälfte an beiden Gurten: ein Zug in der Achse   [SIA 262:2025, 4.3.3.4.11, (51)]
+    F_{tVd} = \left|V\right| \cdot \cot \alpha = 4.6\,\mathrm{kN} \cdot \cot 30{}^{\circ} = 8\,\mathrm{kN}
+
+Normalkraft, mit der der Querschnitt biegt
+    N_V = N - F_{tVd} = 1747.1\,\mathrm{kN} - 8\,\mathrm{kN} = 1739.1\,\mathrm{kN}
+
+Moment dort, als Betrag
+    \left|M\right| = 132.2\,\mathrm{kNm}
+
+Biegewiderstand dort, η_i · M_Rd(N_V / η_i), zwischen den Stützstellen gelesen   [SIA 267:2013, 9.5.2.4.1, (50)]
+    M_{Rd} = 904\,\mathrm{kNm}
+
+Moment gegen Biegewiderstand
+    \left|M\right| = 132.2\,\mathrm{kNm} \quad \le \quad M_{Rd} = 904\,\mathrm{kNm}
+
+Erfüllungsgrad
+    \alpha_{eff,M,\text{Tragsicherheit}} = \frac{M_{Rd}}{\left|M\right|} = \frac{904\,\mathrm{kNm}}{132.2\,\mathrm{kNm}} = 6.84 \quad \Rightarrow \quad \text{erfüllt}
+
+Tiefe unter Terrain, wo die Querkraft dem Widerstand am nächsten kommt
+    z = 1.5\,\mathrm{m}
+
+Querkraft dort, als Betrag
+    \left|V\right| = 100\,\mathrm{kN}
+
+Querkraft gegen Querkraftwiderstand
+    \left|V\right| = 100\,\mathrm{kN} \quad \le \quad V_{Rd} = 268.7\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,V,\text{Tragsicherheit}} = \frac{V_{Rd}}{\left|V\right|} = \frac{268.7\,\mathrm{kN}}{100\,\mathrm{kN}} = 2.69 \quad \Rightarrow \quad \text{erfüllt}
 
 Balkensystem: Rahmen
 --------------------
@@ -2485,6 +2596,41 @@ Der ganze Pfahl verschoben   [SIA 267:2013, 9.4.4.2.2]
 Erdwiderstand dort, Bemessungswert   [SIA 267:2013, 9.5.2.3.1, (49)]
     p_{E,d} = \frac{\eta_{a,tr} \cdot p_{E,k}}{\gamma_{M,a}}
 
+Innerer Pfahlwiderstand quer
+----------------------------
+
+Quer belastet biegt sich der Pfahl: in jeder Tiefe wirken ein Moment und eine Querkraft, so wie die
+Steifigkeit sie gerechnet hat. Der Querschnitt muss beide tragen -- das Moment zusammen mit der
+Normalkraft in derselben Tiefe, die Querkraft im Beton mit der Wendel oder im Stahl des Tragglieds.
+Beide Widerstände mindert η_i, wie längs.
+
+Statische Höhe: bis zum Schwerpunkt der Stäbe in der gezogenen Hälfte   [SIA 262:2025, 4.3.3.4.2]
+    d = \frac{D}{2} + \frac{2 \cdot r_s}{\pi}
+
+Hebelarm der inneren Kräfte   [SIA 262:2025, 4.3.3.4.2]
+    z = 0.9 \cdot d
+
+Breite des Stegs: die Sehne des Kreises auf der Höhe des Druckgurts, die kleinste zwischen den Gurten
+    b_w = 2 \cdot \sqrt{\left(\frac{D}{2}\right)^{2} - \left(\frac{D}{2} - d + z\right)^{2}}
+
+Querschnitt der Wendel: sie kreuzt den Schnitt zweimal
+    A_{sw} = 2 \cdot \frac{\pi \cdot \varnothing_w^{2}}{4}
+
+Widerstand der Wendel: 70 % senkrechter Bügel   [SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.4]
+    V_{Rd,s} = 0.7 \cdot \frac{A_{sw}}{s_w} \cdot z \cdot f_{yd} \cdot \cot \alpha
+
+Widerstand der Druckdiagonalen   [SIA 262:2025, 4.3.3.4.6, (47)]
+    V_{Rd,c} = b_w \cdot z \cdot k_c \cdot f_{cd} \cdot \sin \alpha \cdot \cos \alpha
+
+Querkraftwiderstand   [SIA 267:2013, 9.5.2.4.1, (50)]
+    V_{Rd} = \eta_i \cdot \min\left[V_{Rd,s};\ V_{Rd,c}\right]
+
+Längszugkraft aus der Querkraft, je zur Hälfte an beiden Gurten: ein Zug in der Achse   [SIA 262:2025, 4.3.3.4.11, (51)]
+    F_{tVd} = \left|V\right| \cdot \cot \alpha
+
+Normalkraft, mit der der Querschnitt biegt
+    N_V = N - F_{tVd}
+
 Kennzahlen
 ----------
 
@@ -2703,7 +2849,7 @@ Pfahl Stütze
 ------------
 
 Angaben zum Pfahl
-    \begin{aligned} & \text{Bohrpfahl} \qquad D = 900\,\mathrm{mm} \qquad L = 12\,\mathrm{m} \qquad t_K = 1.5\,\mathrm{m} \qquad t_w = 3\,\mathrm{m} \\ & n = 12 \qquad \varnothing_l = 20\,\mathrm{mm} \qquad c = 75\,\mathrm{mm} \qquad \varnothing_w = 10\,\mathrm{mm} \qquad \eta_i = 0.8 \qquad \text{Berechnung} \qquad \eta_a = 0.7 \end{aligned}
+    \begin{aligned} & \text{Bohrpfahl} \qquad D = 900\,\mathrm{mm} \qquad L = 12\,\mathrm{m} \qquad t_K = 1.5\,\mathrm{m} \qquad t_w = 3\,\mathrm{m} \\ & n = 12 \qquad \varnothing_l = 20\,\mathrm{mm} \qquad c = 75\,\mathrm{mm} \qquad \varnothing_w = 10\,\mathrm{mm} \qquad s_w = 150\,\mathrm{mm} \qquad \eta_i = 0.8 \qquad \text{Berechnung} \qquad \eta_a = 0.7 \end{aligned}
 
 Widerstände
     Widerstand                             \text{Druck}\ [\mathrm{kN}]  \text{Zug}\ [\mathrm{kN}]
@@ -2715,12 +2861,14 @@ Widerstände
     Querschnitt                 R_{mat,d}                        14156                       1639
     Innerer, Bemessungswert     R_{i,d}                          11325                       1311
 
-    Nachweis                       Bezeichnung                                Widerstand                        Einwirkung  \alpha_{eff}
-    -----------------------------  --------------  -------------------------------------  --------------------------------  ------------
-    Äusserer Pfahlwiderstand       Tragsicherheit            R_{a,d} = 2199\,\mathrm{kN}      N_{Ed} = 2000.0\,\mathrm{kN}          1.10
-    Innerer Pfahlwiderstand        Tragsicherheit           R_{i,d} = 11325\,\mathrm{kN}      N_{Ed} = 2000.0\,\mathrm{kN}          5.66
-    Äusserer Pfahlwiderstand quer  Tragsicherheit          R_{tr,d} = 338.9\,\mathrm{kN}       H_{Ed} = 100.0\,\mathrm{kN}          3.39
-    Bettungskraft am Pfahl         Tragsicherheit  p_{E,d} = 137\,\mathrm{kN}/\mathrm{m}  q_d = 68\,\mathrm{kN}/\mathrm{m}          2.02
+    Nachweis                       Bezeichnung                                Widerstand                            Einwirkung  \alpha_{eff}
+    -----------------------------  --------------  -------------------------------------  ------------------------------------  ------------
+    Äusserer Pfahlwiderstand       Tragsicherheit            R_{a,d} = 2199\,\mathrm{kN}          N_{Ed} = 2000.0\,\mathrm{kN}          1.10
+    Innerer Pfahlwiderstand        Tragsicherheit           R_{i,d} = 11325\,\mathrm{kN}          N_{Ed} = 2000.0\,\mathrm{kN}          5.66
+    Äusserer Pfahlwiderstand quer  Tragsicherheit          R_{tr,d} = 338.9\,\mathrm{kN}           H_{Ed} = 100.0\,\mathrm{kN}          3.39
+    Bettungskraft am Pfahl         Tragsicherheit  p_{E,d} = 137\,\mathrm{kN}/\mathrm{m}      q_d = 68\,\mathrm{kN}/\mathrm{m}          2.02
+    Biegung im Pfahl               Tragsicherheit           M_{Rd} = 904.0\,\mathrm{kNm}  \left|M\right| = 132.2\,\mathrm{kNm}          6.84
+    Querkraft im Pfahl             Tragsicherheit            V_{Rd} = 268.7\,\mathrm{kN}   \left|V\right| = 100.0\,\mathrm{kN}          2.69
 
 Kennzahlen
     Kennzahl                          Zeichen                               Wert
@@ -2820,6 +2968,8 @@ Werte
     Zahl der Längsstäbe                                                                       n                                                           12            Vorgabe
     Erfüllungsgrad äusserer Widerstand – Tragsicherheit                                       \alpha_{eff,a,\text{Tragsicherheit}}                      1.10            berechnet
     Erfüllungsgrad innerer Widerstand – Tragsicherheit                                        \alpha_{eff,i,\text{Tragsicherheit}}                      5.66            berechnet
+    Erfüllungsgrad Biegung im Pfahl – Tragsicherheit                                          \alpha_{eff,M,\text{Tragsicherheit}}                      6.84            berechnet
+    Erfüllungsgrad Querkraft im Pfahl – Tragsicherheit                                        \alpha_{eff,V,\text{Tragsicherheit}}                      2.69            berechnet
     Erfüllungsgrad Bettungskraft – Tragsicherheit                                             \alpha_{eff,E,\text{Tragsicherheit}}                      2.02            berechnet
     Erfüllungsgrad äusserer Widerstand quer – Tragsicherheit                                  \alpha_{eff,tr,\text{Tragsicherheit}}                     3.39            berechnet
     Reibungswinkel der Schicht 1, charakteristisch                                            \varphi'_{k,1}                                              30  °         Vorgabe
@@ -2828,6 +2978,7 @@ Werte
     Durchmesser der Längsstäbe                                                                \varnothing_l                                               20  mm        Vorgabe
     Durchmesser der Wendel                                                                    \varnothing_w                                               10  mm        Vorgabe
     Mantelreibung in der Schicht 1, charakteristisch                                          q_{s,k,1}                                                    0  kPa       Vorgabe
+    Ganghöhe der Wendel                                                                       s_w                                                        150  mm        Vorgabe
     Querfeder, Kopf eingespannt                                                               K_{HH}                                                  149.93  MN/m      berechnet
     Kopplung am Kopf                                                                          K_{HM}                                                 -249.35  MN        berechnet
     Drehfeder, Kopf nicht verschoben                                                          K_{MM}                                                  743.14  MNm/rad   berechnet

@@ -1,5 +1,5 @@
 ---
-erzeugt: 70fedf194945
+erzeugt: 117b844b7349
 art: modul
 tags: [modul]
 ---
@@ -341,6 +341,7 @@ def beschreibung(self) -> str
 - [[opencivil.pfahl.achse]]
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]

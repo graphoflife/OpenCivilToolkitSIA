@@ -1,5 +1,5 @@
 ---
-erzeugt: 109205bec95f
+erzeugt: 9292db4b634b
 art: modul
 tags: [modul]
 ---
@@ -479,6 +479,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.pfahl.aussen]]
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.innen]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.pfahl.steifigkeit]]

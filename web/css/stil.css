@@ -2318,6 +2318,7 @@ details.nb-callout > summary { cursor: pointer; }
 .pf-d-p.bs-d-extrem { fill: #8a6d3b; }
 .pf-d-grenze { fill: none; stroke-width: 1.2; stroke-dasharray: 5 3; }
 .pf-d-p.pf-d-grenze { stroke: #8a6d3b; }
+.bs-d-m.pf-d-grenze { stroke: var(--system); } .bs-d-v.pf-d-grenze { stroke: #0d9488; }
 
 /* ---------------------------------------------------------- Durchstanzen -- */
 

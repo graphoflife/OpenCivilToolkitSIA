@@ -1,5 +1,5 @@
 ---
-erzeugt: fcbc90f09e9c
+erzeugt: 8c4429d80513
 art: modul
 tags: [modul]
 ---
@@ -190,6 +190,7 @@ nur, was es auch herleitet.
 ## Gebraucht von
 
 - [[opencivil.nachweis.kennzahlen]]
+- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.projekt.aufbau.platte]]
 
 ## Formeln aus diesem Modul
