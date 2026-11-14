@@ -163,6 +163,8 @@ export const api = {
     ruf('balkensystem_bearbeiten', { projekt, kennung, ...auftrag }),
   /** Was das Zeichenfenster einer Decke unter ihre Teile legt: Streifen, Aufteilung, Meldungen. */
   deckeZeichnung: (projekt, kennung) => ruf('decke_zeichnung', { projekt, kennung }),
+  /** Die Bilder einer Decke in einem Fall: Momente und Querkräfte in Zellen, die grössten Werte, die Lager. */
+  deckeErgebnis: (projekt, kennung, fall) => ruf('decke_ergebnis', { projekt, kennung, fall }),
 };
 
 export { KernFehler };

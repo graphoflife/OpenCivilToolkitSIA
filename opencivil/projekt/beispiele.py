@@ -17,6 +17,7 @@ from __future__ import annotations
 import math
 
 from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN, MATERIAL_DES_QUERSCHNITTS
+from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.eintraege import (
     Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, RechenwahlEintrag,
 )
@@ -267,7 +268,8 @@ def _decken(p: Projekt) -> None:
     und einer Stütze mit Stützenbereich von Hand -- daneben eine schiefe
     Platte, deren Streifen ihren Rändern folgen. Sie hat die Lastfälle und
     Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
-    Platte, gezeichnet, längs einer Linie und an einem Punkt.
+    Platte, gezeichnet, längs einer Linie und an einem Punkt. Die erste
+    zeigt m_x, m_y und die Lager, die zweite jedes Ergebnisbild einmal.
     """
     beton = _erstes(p, "beton")
     k4 = p.decke("Kolloquium 4", aufteilung="fest", anteil=30.0)
@@ -277,7 +279,10 @@ def _decken(p: Projekt) -> None:
         k4.stuetze((x, 5.0))
         k4.unterzug((x, 0), (x, 5.5), stufe=2)
     k4.unterzug((0, 5.0), (9, 5.0))
-    k4.plattenlast(k4.lastfall("q_d"), "P1", 18.6)
+    q_d = k4.lastfall("q_d")
+    k4.plattenlast(q_d, "P1", 18.6)
+    for groesse in ("m_x", "m_y", "lager"):
+        k4.diagramm(q_d, groesse)
 
     el = p.decke("Jede Wahl", streifenbreite=0.5)
     el.platte([(0, 0), (6, 0), (6, 4), (0, 4)], beton=beton, h=220)
@@ -293,7 +298,9 @@ def _decken(p: Projekt) -> None:
     el.platte(schief, beton=beton, h=200, richtung_1=0.0, richtung_2=math.degrees(math.atan2(3.0, 1.0)))
     for a, b in zip(schief, schief[1:] + schief[:1]):
         el.lager(a, b)
-    el.standardfaelle()
+    gzt, _ = el.standardfaelle()
+    for groesse in DECKENGROESSEN:
+        el.diagramm(gzt, groesse)
     _, auflast, nutzlast = el.lastfaelle
     el.plattenlast(auflast, "P2", 1.5)
     el.linienlast(auflast, (1, 6.5), (5, 6.5), wert=8.0)

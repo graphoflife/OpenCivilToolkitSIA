@@ -6,28 +6,30 @@
  *     Decke       Bezeichnung, Zeichnung samt Liste, Beschreibung
  *     Eingaben    Knöpfe, je mit einem Fenster (`KAPITEL`): die Streifen --
  *                 wie breit, und wie die Last auf die zwei Richtungen geht --,
- *                 die Lastfälle und Lastkombinationen (lastfaelle.js)
+ *                 die Lastfälle und Lastkombinationen (lastfaelle.js), und
+ *                 welche Ergebnisbilder rechts stehen
  *
  * Rechts im Reiter «Diagramme» der Grundriss mit der Aufteilung und einer
- * mit den Streifen, in der Zusammenfassung die Streifen je Richtung, je Fall
- * die Last und was die Lager tragen, und die Meldungen. Gerechnet wird nach
- * der Streifenmethode, im Kern (opencivil/decke); hier stehen nur seine
- * Zahlen.
+ * mit den Streifen, darunter je Zeile der Ergebnisse ein Bild der
+ * Schnittkräfte oder Lager (dk_ergebnis.js); in der Zusammenfassung die
+ * Streifen je Richtung, je Fall die Last und was die Lager tragen -- auch
+ * je Lager --, und die Meldungen. Gerechnet wird nach der Streifenmethode,
+ * im Kern (opencivil/decke); hier stehen nur seine Zahlen.
  */
 
 import {
-  erklaerung, feld, karte, klappgruppe, panel, wahlBlock, wahlSchalter,
+  erklaerung, feld, karte, klappgruppe, panel, tabelle, wahlBlock, wahlSchalter,
 } from './bausteine.js';
-import { ansichtNeu, einpassen, zahlText } from './cad_ansicht.js';
-import { umrissVon } from './cad_app.js';
+import { zahlText } from './cad_ansicht.js';
 import { LASTLISTEN, kernmeldungen } from './dk_eigenschaften.js';
-import { anteilText, grundriss, legende } from './dk_grundriss.js';
+import { ergebnisKarten } from './dk_ergebnis.js';
+import { anteilText, grundrissBild, legende } from './dk_grundriss.js';
 import { waehlen, zeichenbereich } from './dk_zeichnung.js';
 import {
-  el, leerzustand, svgEl, zahlfeld,
+  el, leerzustand, zahlfeld,
 } from './dom.js';
-import { kapitelFenster, kapitelPanel } from './kapitel.js';
-import { lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
+import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
+import { diagrammzeilen, lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import {
   eintragAendern, eintragVon, feldangabe, katalog, zustand,
 } from './zustand.js';
@@ -52,6 +54,16 @@ const HILFE = {
       ['Zonen', 'gehen beidem vor: dort gilt ihr Anteil -- zu zeichnen im Fenster mit «Zone»'],
     ],
     formel: 'q₁ = α · q   q₂ = (1 − α) · q',
+  },
+  ergebnisse: {
+    zeilen: [
+      ['Fall', 'ein Lastfall oder eine Kombination -- gerechnet wird jeder Fall'],
+      ['m_x, m_y', 'die Momente je Meter in x und y, positiv mit Zug unten -- bei schiefen Streifen aus m_η umgerechnet'],
+      ['m_xy', 'das Drillmoment je Meter: nur, wo ein Streifen schief zu x und y trägt'],
+      ['v_x, v_y, v_0', 'die Querkräfte je Meter und die Hauptquerkraft v_0 = √(v_x² + v_y²)'],
+      ['Lager', 'je Linienlager der Verlauf seiner Kraft über die Länge; darunter je Lager die Summe, eingespannt auch das grösste Moment'],
+      ['Angeschrieben', 'der grösste und der kleinste Wert, mit Punkt an seiner Stelle; über einer Zelle ihr Wert'],
+    ],
   },
 };
 
@@ -214,6 +226,16 @@ const KAPITEL = [
       titel: 'Je Platte die Dichte des Stahlbetons mal g = 10 m/s² mal ihre Dicke',
     },
   }),
+  {
+    titel: 'Analyse',
+    kapitel: [
+      {
+        schluessel: 'ergebnisse', name: 'Ergebnisse', titel: 'Ergebnisse', hilfe: HILFE.ergebnisse,
+        inhalt: (d) => diagrammzeilen(d, { groessen: katalog('decke', 'diagrammgroessen'), vorlage: 'deckendiagramm' }),
+        stand: (d) => zeilenstand(d.diagramme, 'Diagramm', 'Diagramme', 'kein Diagramm'),
+      },
+    ],
+  },
 ];
 
 /** Die Fenster der Decke, nach ihrem Schlüssel: die Kapitel. */
@@ -229,28 +251,6 @@ export function deckeEditor(decke) {
 // Rechts: Diagramme und Zusammenfassung
 // ===========================================================================
 
-/** So breit ist ein Grundriss auf seiner Karte, und so hoch höchstens und mindestens -- px. */
-const BILD = { breite: 720, hoehe: [260, 560], rand: 24 };
-
-/**
- * Ein Grundriss als Bild, fest im Massstab: die Decke, wie sie im Projekt
- * steht, und darunter, was die letzte Rechnung zu ihr sagt.
- */
-function grundrissBild(decke, daten, was) {
-  const umriss = umrissVon(decke.knoten.map((k) => [k.x, k.y]), [[0, 0], [10, 8]]);
-  const [[x0, y0], [x1, y1]] = umriss;
-  const breit = Math.max(x1 - x0, 1);
-  const hoch = Math.max(y1 - y0, 1);
-  const hoehe = Math.min(BILD.hoehe[1], Math.max(BILD.hoehe[0],
-    (hoch / breit) * (BILD.breite - 2 * BILD.rand) + 2 * BILD.rand));
-  const v = ansichtNeu([1e-3, 1e5]);
-  Object.assign(v, { breite: BILD.breite, hoehe });
-  einpassen(v, umriss, { rand: BILD.rand });
-  const svg = svgEl('svg', { viewBox: `0 0 ${BILD.breite} ${hoehe.toFixed(0)}`, class: 'gb-bild dk-bild' });
-  svg.append(grundriss(v, decke, daten, { was }));
-  return svg;
-}
-
 /** Was die letzte Rechnung zu einer Decke zeichnet -- oder null. */
 const zeichendaten = (kennung) => zustand.loesung?.zeichendaten?.[kennung] || null;
 
@@ -263,7 +263,8 @@ function meldungszeilen(daten) {
 
 /**
  * Die Karten einer Decke im Reiter «Diagramme»: der Grundriss mit der
- * Aufteilung und einer mit den Streifen. Das Panel darum baut bericht.js.
+ * Aufteilung, einer mit den Streifen und die Ergebnisbilder. Das Panel
+ * darum baut bericht.js.
  */
 export function deckenKarten(kennung) {
   const decke = eintragVon(kennung);
@@ -285,15 +286,8 @@ export function deckenKarten(kennung) {
         text: 'Gestrichelt die Stützenbereiche: über sie geben die Streifen ihre Last an die Stützen ab.',
       }),
     ], { klasse: 'ist-breit' }),
+    ...ergebnisKarten(kennung, decke, daten),
   ];
-}
-
-/** Eine Tabelle der Zusammenfassung: Kopf und Zeilen, je Zelle ein Text -- Zahlen rechtsbündig. */
-function tabelle(kopf, zeilen) {
-  return el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [
-    el('thead', {}, [el('tr', {}, kopf.map((t) => el('th', { text: t })))]),
-    el('tbody', {}, zeilen.map((z) => el('tr', {}, z.map((t, i) => el(i ? 'td.bs-zahl' : 'td', { text: t }))))),
-  ])]);
 }
 
 /**
@@ -320,9 +314,26 @@ function faelleKarte(daten) {
 }
 
 /**
+ * Je Lager, was es in jedem Fall trägt: jede Stütze ihre Kraft, jedes
+ * Linienlager die Summe über seine Länge -- in kN.
+ */
+function lagerKarte(daten) {
+  const faelle = daten.faelle || [];
+  const lager = faelle[0]?.je_lager || [];
+  if (!lager.length) return null;
+  return karte('Lagerkräfte', [
+    tabelle(['Lager', ...faelle.map((f) => `${f.name} [kN]`)], lager.map((l, i) => [
+      `${l.name} · ${l.art === 'stuetze' ? 'Stütze' : 'Linienlager'}`,
+      ...faelle.map((f) => zahlText(f.je_lager[i].F, 1)),
+    ])),
+    el('p.karte-hinweis', { text: 'Den Verlauf längs eines Linienlagers zeigt das Bild «Lager» unter «Diagramme».' }),
+  ]);
+}
+
+/**
  * Die Zusammenfassung einer Decke: die Meldungen, je Richtung, wie viele
- * Feldstreifen sie hat, und je Fall Last und Lagerkraft. Das Panel darum
- * baut bericht.js.
+ * Feldstreifen sie hat, je Fall Last und Lagerkraft und je Lager, was es
+ * trägt. Das Panel darum baut bericht.js.
  */
 export function deckenZusammenfassung(kennung) {
   const daten = zeichendaten(kennung);
@@ -335,6 +346,7 @@ export function deckenZusammenfassung(kennung) {
       tabelle(['Richtung', 'Feldstreifen'], daten.richtungen.map((r) => [r.name, String(r.streifen)])),
     ]),
     faelleKarte(daten),
-  ];
+    lagerKarte(daten),
+  ].filter(Boolean);
 }
 

@@ -13,18 +13,20 @@ Die Decke nach der Streifenmethode -- gegen die Vorlesung und das Kolloquium 4.
   die automatische Aufteilung trifft ihre Momente genau.
 * Dieselbe Platte gedreht: schiefe Streifen tragen ``m_η``, und ``m_x``,
   ``m_y``, ``m_xy`` sind dessen Transformation.
+* Längs eines Linienlagers: was die Träger in es geben, als Stufen -- und wo
+  die Bilder ihre grössten Werte suchen.
 """
 
 import math
 import unittest
 
 from opencivil.decke import geometrie as geo
-from opencivil.decke.feld import POSITIV_JE_LAST, an_stelle, lastverteilelemente, widerstaende
+from opencivil.decke.feld import INNEN, POSITIV_JE_LAST, an_stelle, lastverteilelemente, stellen, widerstaende
 from opencivil.decke.modell import (
     Aufteilung, Decke, Flaechenlast, Kombination, Lastfall, Linienlager, Linienlast, Platte, Punktlast,
     Stuetze, Unterzug, Zone,
 )
-from opencivil.decke.rechnung import rechnen
+from opencivil.decke.rechnung import Wandkraft, lagerverlauf, rechnen
 from opencivil.decke.traeger import extreme, wert
 
 E, WICHTE = 30e9, 25e3
@@ -181,6 +183,16 @@ class TestKolloquium4(Rechnung):
         stueck = next(w for w in self.f.linienlager["Wand"] if w.traeger == "y5")
         self.assertAlmostEqual(stueck.laenge, 0.25)
         self.assertAlmostEqual(stueck.je_meter[0] / 1e3, 32.2, delta=0.05)
+
+    def test_die_wand_laengs(self):
+        """Die Stufen längs der Wand decken sie ganz und tragen zusammen, was sie trägt."""
+        stufen = lagerverlauf(self.decke.linienlager[0], self.f.linienlager["Wand"])
+        self.assertEqual((stufen[0][0], stufen[-1][1]), (0.0, 9.0))
+        self.assertTrue(all(a[1] == b[0] for a, b in zip(stufen, stufen[1:])), "lückenlos")
+        self.assertAlmostEqual(sum((ub - ua) * r for ua, ub, r, _ in stufen), self.f.wandkraft("Wand"), places=3)
+        stueck = next(w for w in self.f.linienlager["Wand"] if w.traeger == "y5")
+        mitte = 0.5 * (stueck.a[0] + stueck.b[0])
+        self.assertEqual([r for ua, ub, r, _ in stufen if ua < mitte < ub], [stueck.je_meter[0]])
 
     def test_lastverteilelement_ueber_der_mittelstuetze(self):
         """Musterlösung: m'_u = Q/8 = 34.4 kN, m_u = 0.034 Q = 9.4 kN über dem 1 × 1 m Stützenbereich."""
@@ -358,6 +370,37 @@ class TestEinachsig(Rechnung):
         self.assertAlmostEqual(r, 2.0 * q)
         self.assertAlmostEqual(m, q * 4.0 / 2.0)
 
+    def test_eingespannt_laengs(self):
+        """
+        Das Moment der Wand dreht um ihre Achse, rechtsdrehend um a → b
+        positiv: verkehrt herum gezeichnet, wechselt es das Vorzeichen.
+        """
+        ecken = rechteck(0, 0, 2, 1)
+        for a, b, vorzeichen in (((0, 0), (0, 1), -1.0), ((0, 1), (0, 0), 1.0)):
+            wand = Linienlager("W", a, b, eingespannt=True)
+            e = self.gerechnet(Decke(platten=[Platte("P", ecken, 0.2, E, WICHTE)], linienlager=[wand],
+                                     lastfaelle=[Lastfall("q", [Flaechenlast("q", q, platte="P")])]))
+            stufen = lagerverlauf(wand, e.faelle[0].linienlager["W"])
+            self.assertEqual((stufen[0][0], stufen[-1][1]), (0.0, 1.0))
+            for _, _, r, m in stufen:
+                self.assertAlmostEqual(r, 2.0 * q)
+                self.assertAlmostEqual(m, vorzeichen * q * 4.0 / 2.0)
+
+    def test_die_stellen_der_extreme(self):
+        """
+        Je Streifen die Enden seiner Stücke, knapp innen, und in der Mitte, wo
+        die Querkraft null wird: dort liegt das grösste Moment, q·L²/8.
+        """
+        e = self.gerechnet(self.decke(Flaechenlast("q", q, platte="P")))
+        f = e.faelle[0]
+        orte = stellen(e, f)
+        mitten = sorted({round(y, 9) for _, y in orte})
+        self.assertEqual(len(mitten), len(e.zerlegung.feldstreifen(e.zerlegung.richtungen[0])))
+        for y in mitten:
+            self.assertEqual(sorted(round(x, 9) for x, y_ in orte if round(y_, 9) == y),
+                             [round(INNEN, 9), 2.0, round(4.0 - INNEN, 9)])
+        self.assertAlmostEqual(max(an_stelle(e, f, p).mx for p in orte), q * 16.0 / 8.0, places=6)
+
     def test_ohne_lager_traegt_nichts(self):
         ecken = rechteck(0, 0, 4, 2)
         e = rechnen(Decke(platten=[Platte("P", ecken, 0.2, E, WICHTE)], linienlager=waende(ecken, 3),
@@ -374,6 +417,27 @@ class TestEinachsig(Rechnung):
                           linienlager=waende(gelagert, 0, 1, 2, 3)))
         ohne = [m for m in e.meldungen if "trägt keine der beiden Richtungen" in m.text]
         self.assertEqual([m.elemente for m in ohne], [("B",)])
+
+
+class TestLagerverlauf(unittest.TestCase):
+    """Längs eines Linienlagers, Stück um Stück -- von Hand gegeben."""
+
+    def test_was_sich_deckt_zaehlt_zusammen(self):
+        """Zwei Feldstreifen und quer über ihre Grenze ein Unterzug: wo sie sich decken, tragen beide."""
+        lager = Linienlager("W", (0, 0), (4, 0))
+        y = (0.0, 1.0)
+        stufen = lagerverlauf(lager, [Wandkraft("y1", (0, 0), (2, 0), F=4e3, C=0.0, n=y),
+                                      Wandkraft("y2", (2, 0), (4, 0), F=2e3, C=0.0, n=y),
+                                      Wandkraft("U1", (3, 0), (1, 0), F=6e3, C=0.0, n=y)])
+        self.assertEqual([(ua, ub, r) for ua, ub, r, _ in stufen],
+                         [(0.0, 1.0, 2e3), (1.0, 2.0, 5e3), (2.0, 3.0, 4e3), (3.0, 4.0, 1e3)])
+
+    def test_wo_nichts_aufliegt_null(self):
+        lager = Linienlager("W", (0, 0), (0, 3))
+        stufen = lagerverlauf(lager, [Wandkraft("x1", (0, 1), (0, 2), F=3e3, C=0.0, n=(1.0, 0.0))])
+        self.assertEqual([(ua, ub, r) for ua, ub, r, _ in stufen],
+                         [(0.0, 1.0, 0.0), (1.0, 2.0, 3e3), (2.0, 3.0, 0.0)])
+        self.assertEqual(lagerverlauf(lager, []), [(0.0, 3.0, 0.0, 0.0)])
 
 
 class TestPruefen(unittest.TestCase):

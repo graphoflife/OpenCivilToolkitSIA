@@ -5,7 +5,9 @@ VERANTWORTUNG:
 Aus den Trägern eines Falls, was an einer Stelle der Platte wirkt: die
 Momente ``m_x``, ``m_y``, ``m_xy`` je Meter, die Querkräfte ``v_x``,
 ``v_y`` je Meter und daraus die erforderlichen Biegewiderstände. Dazu die
-Lastverteilelemente über Stützen und unter Einzellasten.
+Lastverteilelemente über Stützen und unter Einzellasten -- und für die
+Bilder die Stellen, an denen die Träger eines Falls springen oder ihre
+grössten Werte haben (:func:`stellen`).
 
 VOM STREIFEN ZUR PLATTE:
 Ein Streifen der Breite ``b`` in Richtung ``n`` trägt mit dem Moment ``M``
@@ -63,6 +65,13 @@ from opencivil.decke.traeger import wert
 #: Der positive Widerstand je Last eins im Lastverteilelement: ``1/(2π) − 1/8``, auf der Folie 0.034.
 POSITIV_JE_LAST = 1.0 / (2.0 * math.pi) - 1.0 / 8.0
 
+#: Was ein Bild der Platte zeigen kann: je Name das Feld von :class:`Schnittkraefte`.
+GROESSEN = {"m_x": "mx", "m_y": "my", "m_xy": "mxy", "v_x": "vx", "v_y": "vy", "v_0": "v0"}
+
+#: So weit innerhalb eines Stücks liegt die Stelle an seinem Ende, in m: weiter als
+#: :data:`~opencivil.decke.traeger.GLEICH`, so dass links und rechts eines Sprungs beide zählen.
+INNEN = 1e-6
+
 
 @dataclass(frozen=True)
 class Schnittkraefte:
@@ -78,6 +87,10 @@ class Schnittkraefte:
     def v0(self) -> float:
         """Die Hauptquerkraft ``√(v_x² + v_y²)``."""
         return math.hypot(self.vx, self.vy)
+
+    def groesse(self, name: str) -> float:
+        """Die Grösse ``name`` aus :data:`GROESSEN`."""
+        return getattr(self, GROESSEN[name])
 
     def __add__(self, andere: "Schnittkraefte") -> "Schnittkraefte":
         return Schnittkraefte(self.mx + andere.mx, self.my + andere.my, self.mxy + andere.mxy,
@@ -133,6 +146,25 @@ def _beitrag(fall: Fallergebnis, streifen, p: Punkt) -> Schnittkraefte:
             return in_xy(wert(ergebnis.stuecke, "M", lokal) / streifen.breite,
                          wert(ergebnis.stuecke, "V", lokal) / streifen.breite, streifen.richtung.n)
     return Schnittkraefte()
+
+
+def stellen(ergebnis: Ergebnis, fall: Fallergebnis) -> List[Punkt]:
+    """
+    Wo ein Träger des Falls springt oder ein Extremum hat, auf der Mittellinie
+    seines Streifens: an den Enden jedes Stücks -- knapp innerhalb
+    (:data:`INNEN`) -- und wo die Querkraft oder die Last null wird. Wo nur
+    ein Streifen trägt, liegen dort die grössten und kleinsten m und v genau;
+    wo sich zwei überlagern, in der Nähe.
+    """
+    heraus: List[Punkt] = []
+    for streifen in ergebnis.zerlegung.streifen:
+        for t in streifen.traeger:
+            traeger = fall.traeger.get(t.name)
+            for stueck in traeger.stuecke if traeger is not None else ():
+                orte = [stueck.a + INNEN, stueck.b - INNEN] if stueck.b - stueck.a > 2.0 * INNEN else []
+                orte += stueck.V.nullstellen(stueck.a, stueck.b) + stueck.p.nullstellen(stueck.a, stueck.b)
+                heraus.extend(streifen.richtung.punkt(t.s0 + s, streifen.mitte) for s in orte)
+    return heraus
 
 
 def widerstaende(k: Schnittkraefte) -> Widerstaende:

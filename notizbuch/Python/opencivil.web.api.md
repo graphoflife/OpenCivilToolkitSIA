@@ -1,5 +1,5 @@
 ---
-erzeugt: 21923b821381
+erzeugt: 5d15f582dade
 art: modul
 tags: [modul]
 ---
@@ -152,7 +152,8 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - `_VERSCHMIERUNGEN = {'flaeche': ('Stahlfläche', 'Die Stahlfläche der ganzen Linie, von Ha…` – Wie die Angaben einer verschmierten Stablinie heissen: kurz im Schalter, lang in seinem Titel -- je Angabe, die die Beschreibung kennt.
 - `_DIAGRAMMGROESSEN = {'M': ('M', 'Moment M'), 'V': ('V', 'Querkraft V'), 'N': ('N', 'Norma…` – Wie die Diagramme der Statik-Analyse heissen: kurz im Schalter, lang ueber dem Diagramm -- je Groesse, die die Beschreibung kennt.
 - `_BETONGESETZE = [{'wert': a.value, 'beschriftung': a.beschriftung, 'kurz': a.kurz} fo…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche es gibt, steht am Feld der Werkstoffwahl.
-- `_AUFTEILUNGEN = {Aufteilung.AUTOMATISCH: ('automatisch', 'Je Stelle nach ihren Lagern…` – Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem Titel. Die Regel dahinter steht in [[opencivil.decke.aufteilung]].
+- `_DECKENGROESSEN = {'m_x': ('m_x', 'Moment m_x'), 'm_y': ('m_y', 'Moment m_y'), 'm_xy': …` – Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem Titel. Die Regel dahinter steht in [[opencivil.decke.aufteilung]]. Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber dem Bild -- je Groesse, die die Beschreibung kennt.
+- `_AUFTEILUNGEN = {Aufteilung.AUTOMATISCH: ('automatisch', 'Je Stelle nach ihren Lagern…`
 - `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.
 - `_ZUORDNUNG = {'platte': _plattenzuordnung, 'balkensystem': _systemzuordnung}` – Was eine Bauteilart in der Zuordnung mehr hat als Namensraum und Name -- ohne Eintrag ihre Werte ([[opencivil.web.api#_werte|_werte]]). Bis 2026-10-25 stand die Zuordnung je Art von Hand da, zwei Bloecke wortgleich.
 

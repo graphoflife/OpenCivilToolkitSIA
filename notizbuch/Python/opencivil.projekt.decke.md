@@ -1,5 +1,5 @@
 ---
-erzeugt: 5850ca86ec9b
+erzeugt: a452c10a147a
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,13 @@ Knoten -- oder liegt auf der ganzen Platte: dann steht sie an der Platte
 (`lasten`) und geht mit ihr, wenn sie kopiert oder geloescht wird. Eine
 Linienlast laeuft von Knoten zu Knoten, eine Punktlast steht an einem und
 verteilt sich ueber `l_x × l_y`. Nach unten positiv.
+
+
+## ERGEBNISBILDER
+
+Welche Bilder rechts stehen, sagt die Liste `diagramme` -- wie die
+Statik-Analyse des Balkensystems je Zeile ein Fall und eine Groesse. Eine
+frische Decke hat m_x, m_y, v_0 und die Lagerkraefte der GZT.
 
 
 ## KOORDINATEN UND EINHEITEN
@@ -208,6 +215,20 @@ Lastverteilelement.
 - `l_x: float = bereich(VERTEILBREITE, heisst='Verteilbreite l_x', einheit=M, ueber=0…`
 - `l_y: float = bereich(VERTEILBREITE, heisst='Verteilbreite l_y', einheit=M, ueber=0…`
 
+### DeckendiagrammEintrag
+
+```python
+@dataclass
+class DeckendiagrammEintrag(Beschreibung)
+```
+
+Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt. Gerechnet
+wird damit nichts -- die Decke rechnet jeden Fall; die Liste sagt nur,
+welche Bilder rechts stehen.
+
+- `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
+- `groesse: str = einer_von(DIAGRAMMGROESSEN, 'm_x')`
+
 ### DeckeEintrag
 
 ```python
@@ -238,6 +259,7 @@ stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
 - `punktlasten: List[PunktlastEintrag] = field(default_factory=list)`
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
+- `diagramme: List[DeckendiagrammEintrag] = field(default_factory=list)`
 - `streifenbreite: float = bereich(0.25, heisst='Streifenbreite', einheit=M, ueber=0.0)`
 - `aufteilung: Aufteilung = Aufteilung.AUTOMATISCH`
 - `anteil: float = bereich(50.0, heisst='Anteil in Richtung 1', einheit=PROZENT, ab=0.0,…` – Nur bei fester Aufteilung.
@@ -329,6 +351,14 @@ Die Flächenlast auf der ganzen Platte `platte` (Eintrag oder
 Kennung) im Lastfall `lastfall`, in kN/m² -- je Platte und Lastfall
 eine, wie in der Oberfläche: eine zweite ersetzt die erste.
 
+#### DeckeEintrag.diagramm
+
+```python
+def diagramm(self, fall: Any, groesse: str='m_x') -> DeckendiagrammEintrag
+```
+
+Ein Ergebnisbild -- `fall` ein Lastfall oder eine Kombination.
+
 #### DeckeEintrag.neu
 
 ```python
@@ -338,17 +368,20 @@ def neu(cls, kennung: str, name: str) -> 'DeckeEintrag'
 
 Eine frische Decke, wie der Benutzer sie angelegt bekommt: ohne
 Platte, aber mit den Lastfällen und Kombinationen eines frischen
-Balkensystems -- das Eigengewicht kommt von selbst.
+Balkensystems -- das Eigengewicht kommt von selbst. Dazu die Bilder
+m_x, m_y, v_0 und die Lagerkräfte der GZT.
 
 
 ## Konstanten
 
 - `Ort = Union[str, Sequence[float]]` – Ein Ort im Baukasten: die Kennung eines Knotens oder `(x, y)` in m.
+- `DIAGRAMMGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte oder die Lagerkraefte.
 - `VORSILBEN = {'platten': 'P', 'linienlager': 'L', 'stuetzen': 'S', 'unterzuege': '…` – Womit die Kennungen der Teile einer Decke beginnen.
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.decke.feld]]
 - [[opencivil.decke.modell]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]
@@ -360,5 +393,6 @@ Balkensystems -- das Eigengewicht kommt von selbst.
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.decke]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 71aaca8a0210
+erzeugt: 0d414d05f7ff
 art: modul
 tags: [modul]
 ---
@@ -73,7 +73,8 @@ einer Zone, einer eingespannten Wand, einem Rand an einer Symmetrieachse
 und einer Stütze mit Stützenbereich von Hand -- daneben eine schiefe
 Platte, deren Streifen ihren Rändern folgen. Sie hat die Lastfälle und
 Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
-Platte, gezeichnet, längs einer Linie und an einem Punkt.
+Platte, gezeichnet, längs einer Linie und an einem Punkt. Die erste
+zeigt m_x, m_y und die Lager, die zweite jedes Ergebnisbild einmal.
 
 ### _durchstanzstellen
 
@@ -170,6 +171,7 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 ## Braucht
 
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.decke]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]

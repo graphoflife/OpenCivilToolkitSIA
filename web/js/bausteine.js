@@ -256,3 +256,11 @@ export function erklaerung(zeilen, formel = '') {
   });
   return zettel;
 }
+
+/** Eine Tabelle: Kopf und Zeilen, je Zelle ein Text -- ausser in der ersten Spalte rechtsbündig, für Zahlen. */
+export function tabelle(kopf, zeilen) {
+  return el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [
+    el('thead', {}, [el('tr', {}, kopf.map((t) => el('th', { text: t })))]),
+    el('tbody', {}, zeilen.map((z) => el('tr', {}, z.map((t, i) => el(i ? 'td.bs-zahl' : 'td', { text: t }))))),
+  ])]);
+}

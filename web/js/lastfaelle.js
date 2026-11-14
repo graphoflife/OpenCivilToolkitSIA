@@ -4,8 +4,10 @@
  * Die Fenster «Lastfälle» und «Lastkombinationen» (`lastenKapitel`), und
  * was ein Zeichenfenster mit ihnen tut: welchen Lastfall es zeigt und in
  * welchen es zeichnet (`aktiverLastfall`) -- zu wählen neben den Werkzeugen
- * (`lastfallLeiste`) und im Fenster einer Last (`lastfallZeile`). Was beim
- * Rechnen gilt -- verschiedene Namen, ein Eigengewicht --, prüft der Kern
+ * (`lastfallLeiste`) und im Fenster einer Last (`lastfallZeile`). Dazu die
+ * Zeilen der Diagramme, je ein Fall und eine Grösse (`diagrammzeilen`), und
+ * wie ein Fall heisst (`fallname`). Was beim Rechnen gilt -- verschiedene
+ * Namen, ein Eigengewicht --, prüft der Kern
  * (opencivil/projekt/aufbau/faelle.py). Bis 2026-11-13 stand das im
  * Balkensystem allein.
  *
@@ -14,13 +16,15 @@
  * Ansichtssache, nicht Teil des Projekts.
  */
 
+import { wahlSchalter } from './bausteine.js';
 import { cadZeile, mitVar } from './cad_app.js';
 import {
   auswahl, el, melden, zahlfeld,
 } from './dom.js';
 import { zeilenstand } from './kapitel.js';
+import { anfuegenKnopf } from './nachweise.js';
 import {
-  aendern, eintragAendern, eintragVon, naechsteKennung, naechsterName,
+  aendern, ausVorlage, eintragAendern, eintragVon, naechsteKennung, naechsterName,
 } from './zustand.js';
 
 const lastenText = (n) => `${n} ${n === 1 ? 'Last' : 'Lasten'}`;
@@ -200,4 +204,58 @@ export function lastfallZeile(eintrag, gewaehlt, setzen, titel) {
     werte: mitVar(eintrag.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })), gewaehlt),
     gewaehlt, titel, beiAenderung: setzen,
   }));
+}
+
+// ===========================================================================
+// Die Diagramme
+// ===========================================================================
+
+/** Der Name eines Falls -- Lastfall oder Kombination -- aus seiner Kennung; `null`, wenn es ihn nicht gibt. */
+export function fallname(eintrag, kennung) {
+  return [...eintrag.lastfaelle, ...eintrag.kombinationen].find((f) => f.kennung === kennung)?.name ?? null;
+}
+
+/**
+ * Welche Diagramme rechts stehen -- wie in der Spannung-Dehnung-Analyse: je
+ * Zeile ein Fall, Lastfall oder Kombination, und was das Diagramm von ihm
+ * zeigt (Benutzer, 2026-10-23), im Balkensystem wie in der Decke. Gerechnet
+ * wird damit nichts, das Bauteil rechnet jeden Fall. Ein Fall, den es nicht
+ * mehr gibt, steht als «– Fall wählen –» da. `groessen` sind die Stellungen
+ * des Schalters aus dem Katalog, `vorlage` die Art einer neuen Zeile.
+ */
+export function diagrammzeilen(eintrag, { groessen, vorlage }) {
+  const aendern = (veraenderer) => eintragAendern(eintrag.kennung, veraenderer);
+  const faelle = [
+    ...eintrag.lastfaelle.map((lf) => ({ wert: lf.kennung, beschriftung: lf.name })),
+    ...eintrag.kombinationen.map((k) => ({ wert: k.kennung, beschriftung: `${k.name} (Kombination)` })),
+  ];
+  const zeile = (d, i) => el('div.bs-diagrammzeile', {}, [
+    el('div.bs-diagrammzeile-kopf', {}, [
+      auswahl({
+        werte: faelle.some((f) => f.wert === d.fall) ? faelle
+          : [{ wert: d.fall, beschriftung: '– Fall wählen –' }, ...faelle],
+        gewaehlt: d.fall,
+        titel: 'Welcher Lastfall oder welche Kombination',
+        beiAenderung: (w) => aendern((s) => { s.diagramme[i].fall = w; }),
+      }),
+      el('button.weg', {
+        type: 'button', text: '×', title: 'Diagramm löschen',
+        on: { click: () => aendern((s) => { s.diagramme.splice(i, 1); }) },
+      }),
+    ]),
+    wahlSchalter({
+      werte: groessen.map((g) => ({ wert: g.wert, beschriftung: g.beschriftung, titel: g.titel })),
+      gewaehlt: d.groesse, titel: 'Was das Diagramm zeigt',
+      setzen: (w) => aendern((s) => { s.diagramme[i].groesse = w; }),
+    }),
+  ]);
+  return [
+    ...(eintrag.diagramme.length ? eintrag.diagramme.map(zeile)
+      : [el('div.leer', { text: 'Noch kein Diagramm.' })]),
+    anfuegenKnopf('Diagramm', () => aendern((s) => {
+      s.diagramme.push(ausVorlage(vorlage, {
+        fall: s.kombinationen[0]?.kennung || s.lastfaelle[0]?.kennung || '',
+      }));
+    })),
+  ];
 }

@@ -1,5 +1,5 @@
 ---
-erzeugt: b2eeff3dce1f
+erzeugt: 1d183ec31fc4
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,9 @@ tags: [modul]
 Aus den Trägern eines Falls, was an einer Stelle der Platte wirkt: die
 Momente `m_x`, `m_y`, `m_xy` je Meter, die Querkräfte `v_x`,
 `v_y` je Meter und daraus die erforderlichen Biegewiderstände. Dazu die
-Lastverteilelemente über Stützen und unter Einzellasten.
+Lastverteilelemente über Stützen und unter Einzellasten -- und für die
+Bilder die Stellen, an denen die Träger eines Falls springen oder ihre
+grössten Werte haben ([[opencivil.decke.feld#stellen|stellen]]).
 
 
 ## VOM STREIFEN ZUR PLATTE
@@ -92,6 +94,14 @@ def v0(self) -> float
 
 Die Hauptquerkraft `√(v_x² + v_y²)`.
 
+#### Schnittkraefte.groesse
+
+```python
+def groesse(self, name: str) -> float
+```
+
+Die Grösse `name` aus [[opencivil.decke.feld#Konstanten|GROESSEN]].
+
 ### Widerstaende
 
 ```python
@@ -123,6 +133,18 @@ def an_stelle(ergebnis: Ergebnis, fall: Fallergebnis, p: Punkt) -> Schnittkraeft
 Die Schnittkräfte an der Stelle `p`: je Richtung der Feldstreifen, in
 dem sie liegt, und jeder Unterzug, in dessen Fläche sie liegt. An der
 Grenze zweier Feldstreifen zählt der mit dem grösseren `τ`.
+
+### stellen
+
+```python
+def stellen(ergebnis: Ergebnis, fall: Fallergebnis) -> List[Punkt]
+```
+
+Wo ein Träger des Falls springt oder ein Extremum hat, auf der Mittellinie
+seines Streifens: an den Enden jedes Stücks -- knapp innerhalb
+([[opencivil.decke.feld#Konstanten|INNEN]]) -- und wo die Querkraft oder die Last null wird. Wo nur
+ein Streifen trägt, liegen dort die grössten und kleinsten m und v genau;
+wo sich zwei überlagern, in der Nähe.
 
 ### widerstaende
 
@@ -186,6 +208,8 @@ Die Einzellasten eines Lastfalls oder einer Kombination, mit ihrem Beiwert.
 ## Konstanten
 
 - `POSITIV_JE_LAST = 1.0 / (2.0 * math.pi) - 1.0 / 8.0` – Der positive Widerstand je Last eins im Lastverteilelement: `1/(2π) − 1/8`, auf der Folie 0.034.
+- `GROESSEN = {'m_x': 'mx', 'm_y': 'my', 'm_xy': 'mxy', 'v_x': 'vx', 'v_y': 'vy', '…` – Was ein Bild der Platte zeigen kann: je Name das Feld von [[opencivil.decke.feld#Schnittkraefte|Schnittkraefte]].
+- `INNEN = 1e-06` – So weit innerhalb eines Stücks liegt die Stelle an seinem Ende, in m: weiter als [[opencivil.decke.traeger#Konstanten|GLEICH]], so dass links und rechts eines Sprungs beide zählen.
 
 ## Braucht
 
@@ -193,3 +217,8 @@ Die Einzellasten eines Lastfalls oder einer Kombination, mit ihrem Beiwert.
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.traeger]]
+
+## Gebraucht von
+
+- [[opencivil.projekt.decke]]
+- [[opencivil.web.deckendaten]]

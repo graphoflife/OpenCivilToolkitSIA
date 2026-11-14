@@ -1,5 +1,5 @@
 ---
-erzeugt: 9292db4b634b
+erzeugt: fbefb5109595
 art: modul
 tags: [modul]
 ---
@@ -510,6 +510,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.web.anzeige]]
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]
+- [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.grundbruchdaten]]

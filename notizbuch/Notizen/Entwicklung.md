@@ -7,6 +7,52 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-14 · Decken: Ergebnisbilder samt Lagerkräften
+
+Unter «Ergebnisse» legt man Bilder an, je Zeile ein Fall und eine Grösse:
+m_x, m_y, m_xy, v_x, v_y, v_0 oder die Lager -- wie die Diagramme des
+Balkensystems. Die Schnittkräfte liegen in Farbe über dem Grundriss, positiv
+rot, negativ blau; der grösste und der kleinste Wert stehen mit Punkt an
+ihrer Stelle. Das Bild der Lager zeigt je Linienlager den Verlauf seiner
+Kraft über die Länge, darunter je Lager die Summe F, die Spitze r_max und,
+eingespannt, das grösste Moment. Die Zusammenfassung hat neu die Tabelle
+«Lagerkräfte», je Lager und Fall. Eine neue Decke zeigt für GZT m_x, m_y,
+v_0 und die Lager.
+
+Warum so:
+
+- Die Zellen der Bilder sind die Feldstreifen beider Richtungen, gekreuzt:
+  so liegt jede in genau einem Streifen jeder Richtung, und der Wert an
+  ihrem Schwerpunkt gilt für sie ganz. Breite Streifen werden quer geteilt,
+  keine Zelle breiter als ein Vierundzwanzigstel der Decke
+  (`deckendaten.ZELLEN`). Mit 40 waren es im Kolloquium 4 3168 Zellen und
+  330 kB je Antwort, mit 24 sind es 792 und 79 kB.
+- Die grössten Werte nicht nur an den Schwerpunkten gesucht, sondern auch
+  an den Enden jedes Trägerstücks, knapp innen, und wo seine Querkraft oder
+  Last null wird (`feld.stellen`). Wo nur ein Streifen trägt, liegt das
+  Extremum dort genau: im Kolloquium 4 m_x = −60.1 kNm/m über der mittleren
+  Stütze, wie die Handrechnung von B-B -- an den Schwerpunkten wären es
+  −58.7 gewesen.
+- Die Farben symmetrisch um null, so weit wie der grösste Betrag samt den
+  Extremwerten: sonst endete die Legende bei −58.7, und daneben stand −60.1.
+- Längs eines Linienlagers Stufen: jeder Streifen gibt seine Kraft
+  gleichmässig über seine Breite ab, und wo zwei dasselbe Stück tragen,
+  zählen beide (`rechnung.lagerverlauf`). Das Moment eines eingespannten
+  Lagers um dessen Achse, damit sich Streifen verschiedener Richtung
+  zusammenzählen lassen; sein Vorzeichen hängt dann an der Richtung, in der
+  das Lager gezeichnet ist -- darum steht nur der Betrag da (siehe [[TODO]]).
+- Im Bild der Lager nur ihre Namen, die Zahlen in der Tabelle darunter: mit
+  Zahlen neben jedem Lager deckten sich in «Jede Wahl» die Beschriftungen
+  nahe beisammen liegender Lager, und am linken Rand liefen sie aus dem
+  Bild. Spitze und grösstes Moment rechnet der Kern, nicht die Oberfläche --
+  der Bericht braucht sie auch.
+- Die Bilder eines Falls kommen mit einer eigenen Anfrage
+  (`decke_ergebnis`), wie die Verläufe des Balkensystems: sie sind gross
+  und nur gebraucht, wenn jemand hinsieht. Wie man nach ihnen fragt und
+  die Antwort je Fall behält, steht jetzt einmal für beide
+  (`web/js/fallantwort.js`), ebenso die Zeilen mit «+ Diagramm»
+  (`diagrammzeilen` in `web/js/lastfaelle.js`).
+
 ## 2026-11-14 · Pfähle IV: innerer Widerstand quer
 
 Je Kombination, die den Pfahl quer belastet, jetzt auch Moment und Querkraft

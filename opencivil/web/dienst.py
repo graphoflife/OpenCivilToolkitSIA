@@ -484,6 +484,14 @@ def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return {"verlauf": endlich(balkendaten.verlauf(befund, fall)), "uebersicht": uebersicht}
 
 
+def _decke(projekt: Projekt, rumpf: Mapping[str, Any]) -> DeckeEintrag:
+    kennung = str(rumpf.get("kennung") or "")
+    eintrag = projekt.bauteil(kennung)
+    if not isinstance(eintrag, DeckeEintrag):
+        raise DienstFehler(400, f"'{kennung}' ist keine Decke.")
+    return eintrag
+
+
 def decke_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Was das Zeichenfenster einer Decke unter ihre Teile legt -- die Streifen,
@@ -494,12 +502,36 @@ def decke_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Zwischenspeicher, wenn er sie zu dieser Beschreibung noch hat.
     """
     projekt = _projekt(rumpf)
-    kennung = str(rumpf.get("kennung") or "")
-    if not isinstance(projekt.bauteil(kennung), DeckeEintrag):
-        raise DienstFehler(400, f"'{kennung}' ist keine Decke.")
+    kennung = _decke(projekt, rumpf).kennung
     aufbau = projekt.aufbauen()
     loesung = _bauteil_rechnen(projekt, aufbau, kennung)
     return {"uebersicht": endlich(deckendaten.zeichnung(aufbau, kennung, loesung))}
+
+
+def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Die Bilder einer Decke in einem Fall: Momente und Querkraefte in Zellen,
+    ihre groessten Werte, die Kraefte der Lager (:func:`deckendaten.ergebnis`).
+    Eine eigene Anfrage wie der Verlauf des Balkensystems -- gross, und nur
+    gebraucht, wenn jemand hinsieht.
+
+    Eine Decke, die sich nicht rechnen laesst, ist keine falsche Anfrage:
+    dann ist ``ergebnis`` leer, und die Uebersicht sagt warum.
+    """
+    projekt = _projekt(rumpf)
+    kennung = _decke(projekt, rumpf).kennung
+    aufbau = projekt.aufbauen()
+    loesung = _bauteil_rechnen(projekt, aufbau, kennung)
+    befund = loesung.befunde.get(aufbau.decken[kennung].rechnung.id)
+    uebersicht = endlich(deckendaten.uebersicht(befund))
+    fall = str(rumpf.get("fall") or "")
+    gerechnet = deckendaten.faelle(befund)
+    if not fall or not gerechnet:
+        return {"ergebnis": None, "uebersicht": uebersicht}
+    if fall not in gerechnet:
+        raise DienstFehler(400, f"Einen Fall «{fall}» gibt es in «{projekt.bauteil(kennung).name}» "
+                                f"nicht. Gerechnet sind: {', '.join(gerechnet)}.")
+    return {"ergebnis": endlich(deckendaten.ergebnis(befund, fall)), "uebersicht": uebersicht}
 
 
 def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -619,6 +651,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "balkensystem_verlauf": balkensystem_verlauf,
     "balkensystem_bearbeiten": balkensystem_bearbeiten,
     "decke_zeichnung": decke_zeichnung,
+    "decke_ergebnis": decke_ergebnis,
     "vorlage": vorlage,
     "vorlage_einsetzen": vorlage_einsetzen,
 }

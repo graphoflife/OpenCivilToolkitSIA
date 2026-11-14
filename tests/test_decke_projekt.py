@@ -1,14 +1,16 @@
 """
 Die Beschreibung einer Decke: lesen, ablegen, zeichnen ohne Oberfläche,
 ihre Lasten, Lastfälle und Kombinationen -- und was die Oberfläche beim
-Zeichnen vom Kern bekommt.
+Zeichnen vom Kern bekommt, auch die Bilder eines Falls.
 """
 
 import math
 import unittest
 
+from opencivil.decke import geometrie as geo
+from opencivil.decke.feld import GROESSEN
 from opencivil.decke.modell import Flaechenlast, Linienlast, Punktlast
-from opencivil.projekt import BalkensystemEintrag, DeckeEintrag, Projekt, ProjektFehler
+from opencivil.projekt import BalkensystemEintrag, DeckeEintrag, Projekt, ProjektFehler, beispiele
 from opencivil.projekt.aufbau.decke import modell_von
 from opencivil.web import dienst
 
@@ -53,6 +55,10 @@ def zeichnung(p: Projekt, kennung: str = "e1"):
     return dienst.bearbeite("decke_zeichnung", {"projekt": p.als_dict(), "kennung": kennung})
 
 
+def bilder(p: Projekt, fall: str = "", kennung: str = "e1"):
+    return dienst.bearbeite("decke_ergebnis", {"projekt": p.als_dict(), "kennung": kennung, "fall": fall})
+
+
 class TestBeschreibung(unittest.TestCase):
     def test_hin_und_zurueck(self):
         p = zwei_felder()
@@ -89,6 +95,9 @@ class TestBeschreibung(unittest.TestCase):
                           "GZG": {"LF1": 1.0, "LF2": 1.0, "LF3": 1.0}})
         b = BalkensystemEintrag.neu("r1", "System")
         self.assertEqual((b.lastfaelle, b.kombinationen), (d.lastfaelle, d.kombinationen))
+        gzt = next(k.kennung for k in d.kombinationen if k.name == "GZT")
+        self.assertEqual([(z.fall, z.groesse) for z in d.diagramme],
+                         [(gzt, "m_x"), (gzt, "m_y"), (gzt, "v_0"), (gzt, "lager")])
 
     def test_ein_anteil_ueber_hundert_haelt_das_rechnen_auf(self):
         """Die Grenzen eines Felds prüft das Rechnen, nicht schon das Zeichnen."""
@@ -252,6 +261,90 @@ class TestZeichnung(unittest.TestCase):
         meldungen = zeichnung(p).daten["uebersicht"]["meldungen"]
         ohne = [m for m in meldungen if "trägt keine der beiden Richtungen" in m["text"]]
         self.assertEqual([m["elemente"] for m in ohne], [["P3"]])
+
+
+class TestBilder(unittest.TestCase):
+    """Die Bilder eines Falls: Schnittkräfte in Zellen, ihre grössten Werte und was die Lager tragen."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.antwort = bilder(mit_lasten(), "GZT")
+        cls.e = cls.antwort.daten["ergebnis"]
+
+    def test_die_zellen_decken_die_platten(self):
+        self.assertEqual(self.antwort.status, 200)
+        self.assertAlmostEqual(sum(geo.flaeche(z) for z in self.e["zellen"]), 8.0 * 3.0, places=3)
+        self.assertEqual(set(self.e["werte"]), set(GROESSEN))
+        self.assertTrue(all(len(w) == len(self.e["zellen"]) for w in self.e["werte"].values()))
+        self.assertEqual(self.e["einheiten"]["m_x"], "kNm/m")
+        self.assertEqual(self.e["einheiten"]["v_0"], "kN/m")
+
+    def test_die_extreme_fassen_jede_zelle(self):
+        for g, extrem in self.e["extreme"].items():
+            self.assertLessEqual(max(self.e["werte"][g]), extrem["groesst"]["wert"], g)
+            self.assertGreaterEqual(min(self.e["werte"][g]), extrem["kleinst"]["wert"], g)
+        # Ohne Einspannung kein negatives Moment ausser über Unterzug und Stütze.
+        self.assertLess(self.e["extreme"]["m_x"]["kleinst"]["wert"], 0.0)
+
+    def test_die_lager_tragen_die_last(self):
+        faelle = {f["name"]: f for f in self.antwort.daten["uebersicht"]["faelle"]}
+        stuetzen = sum(s["F"] for s in self.e["stuetzen"])
+        waende = sum(l["F"] for l in self.e["linienlager"])
+        self.assertAlmostEqual(stuetzen + waende, faelle["GZT"]["lager"], places=3)
+        self.assertEqual([s["name"] for s in self.e["stuetzen"]], ["S1"])
+        for l in self.e["linienlager"]:
+            self.assertAlmostEqual(sum((ub - ua) * r for ua, ub, r, _ in l["stufen"]), l["F"], places=2)
+            self.assertEqual(l["r_max"], max((s[2] for s in l["stufen"]), key=abs))
+            self.assertEqual((l["eingespannt"], l["m_max"]), (False, 0.0))
+
+    def test_eingespannt_das_moment_als_betrag(self):
+        """Kragplatte 2 m, an der Wand eingespannt: q·L²/2 = 20 kNm/m, ob die Wand auf- oder abwärts gezeichnet ist."""
+        for a, b in (((0, 0), (0, 1)), ((0, 1), (0, 0))):
+            p = Projekt(name="Krag")
+            d = p.decke("Krag", streifenbreite=0.5)
+            d.platte([(0, 0), (2, 0), (2, 1), (0, 1)], beton=p.beton("C30/37"), h=200)
+            d.lager(a, b, eingespannt=True)
+            fall = d.lastfall("q")
+            d.plattenlast(fall, "P1", 10.0)
+            (wand,) = bilder(p, "q").daten["ergebnis"]["linienlager"]
+            self.assertTrue(wand["eingespannt"])
+            self.assertAlmostEqual(wand["F"], 20.0, places=6)
+            self.assertAlmostEqual(wand["m_max"], 20.0, places=6)
+
+    def test_kolloquium_4(self):
+        """
+        Die Beispieldecke: m_x bis −60.1 kNm/m im Unterzug über der mittleren
+        Stütze, m_y bis 123.7 im mittleren Unterzug quer dazu; die Stützen
+        tragen 115.0, 276.4 und 115.0 kN, die Wand den Rest der 920.7 kN.
+        """
+        p = beispiele.jeder_nachweis()
+        k4 = next(d for d in p.decken if d.name == "Kolloquium 4")
+        e = bilder(p, "q_d", k4.kennung).daten["ergebnis"]
+        self.assertEqual(e["extreme"]["m_x"]["kleinst"], {"wert": -60.121, "ort": [4.5, 5.0]})
+        self.assertEqual(e["extreme"]["m_y"]["groesst"]["wert"], 123.728)
+        self.assertEqual(e["extreme"]["m_y"]["groesst"]["ort"][0], 4.5)
+        self.assertEqual([(s["name"], round(s["F"], 1)) for s in e["stuetzen"]],
+                         [("S1", 115.0), ("S2", 276.4), ("S3", 115.0)])
+        (wand,) = e["linienlager"]
+        self.assertAlmostEqual(wand["F"] + sum(s["F"] for s in e["stuetzen"]), 18.6 * 9.0 * 5.5, places=6)
+
+    def test_ohne_fall_nur_die_uebersicht(self):
+        antwort = bilder(mit_lasten())
+        self.assertEqual(antwort.status, 200)
+        self.assertIsNone(antwort.daten["ergebnis"])
+        self.assertTrue(antwort.daten["uebersicht"]["gerechnet"])
+
+    def test_ein_fall_den_es_nicht_gibt(self):
+        antwort = bilder(mit_lasten(), "GZX")
+        self.assertEqual((antwort.status, antwort.daten["fehler"]),
+                         (400, "Einen Fall «GZX» gibt es in «Zwei Felder» nicht. "
+                               "Gerechnet sind: Eigengewicht, Auflast, Nutzlast, GZT, GZG."))
+
+    def test_nur_fuer_eine_decke(self):
+        p = zwei_felder()
+        p.balkensystem("Träger")
+        antwort = bilder(p, "GZT", "r1")
+        self.assertEqual((antwort.status, antwort.daten["fehler"]), (400, "'r1' ist keine Decke."))
 
 
 if __name__ == "__main__":

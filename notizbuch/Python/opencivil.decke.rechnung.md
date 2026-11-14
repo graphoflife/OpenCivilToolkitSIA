@@ -1,5 +1,5 @@
 ---
-erzeugt: 4b06db36aa1f
+erzeugt: 40b91aaf00f5
 art: modul
 tags: [modul]
 ---
@@ -75,6 +75,7 @@ Was ein Träger in ein Linienlager gibt -- gleichmässig über das Stück `a →
 - `b: Punkt`
 - `F: float` – Nach unten auf das Lager, in N.
 - `C: float` – Das Einspannmoment, in Nm -- positiv, wenn es den Träger im Gegenuhrzeigersinn hält.
+- `n: Punkt` – Die Richtung des Trägers, längs: in ihr hält `C` ihn, von `t` her gesehen.
 
 #### Wandkraft.laenge
 
@@ -201,6 +202,19 @@ def _weitergeben(k: Lagerkraft, traeger: Traeger, zerlegung: Zerlegung, heraus: 
 ```
 
 Die Kraft eines Lagers auf den Träger geht, umgekehrt, in das, worauf er liegt.
+
+### lagerverlauf
+
+```python
+def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple[float, float, float, float]]
+```
+
+Längs eines Linienlagers, was die Träger in es geben: Stufen
+`(u_a, u_b, r, m)` von seinem Anfang bis zu seinem Ende, `u` in m ab
+`lager.a`, `r` nach unten in N/m und `m` in Nm/m um seine Achse,
+rechtsdrehend um `a → b` positiv. Wo zwei Träger dasselbe Stück
+tragen, zählen beide -- darum das Moment um die Achse des Lagers: so
+lassen sich auch Träger verschiedener Richtung zusammenzählen.
 
 ### _schwerpunkt
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: c9aa69ea0f8c
+erzeugt: 382fb0f43127
 art: modul
 tags: [modul]
 ---
@@ -302,6 +302,20 @@ wie die Last auf die Richtungen geht, die Meldungen
 des Balkensystems: gebraucht nach jeder Aenderung, ohne auf die Rechnung
 des ganzen Projekts zu warten. Gerechnet wird die eine Decke, aus dem
 Zwischenspeicher, wenn er sie zu dieser Beschreibung noch hat.
+
+### decke_ergebnis
+
+```python
+def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Die Bilder einer Decke in einem Fall: Momente und Querkraefte in Zellen,
+ihre groessten Werte, die Kraefte der Lager ([[opencivil.web.deckendaten#ergebnis|deckendaten.ergebnis]]).
+Eine eigene Anfrage wie der Verlauf des Balkensystems -- gross, und nur
+gebraucht, wenn jemand hinsieht.
+
+Eine Decke, die sich nicht rechnen laesst, ist keine falsche Anfrage:
+dann ist `ergebnis` leer, und die Uebersicht sagt warum.
 
 ### balkensystem_bearbeiten
 

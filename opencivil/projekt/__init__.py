@@ -86,9 +86,9 @@ from opencivil.projekt.durchstanzen import (
     AussparungEintrag, DurchstanzEintrag, GrundrissknotenEintrag,
 )
 from opencivil.projekt.decke import (
-    DeckeEintrag, DeckenknotenEintrag, DeckenplatteEintrag, FlaechenlastEintrag, LinienlagerEintrag,
-    LinienlastEintrag, PlattenlastEintrag, PunktlastEintrag, StuetzeEintrag, UnterzugEintrag,
-    ZoneEintrag,
+    DeckeEintrag, DeckendiagrammEintrag, DeckenknotenEintrag, DeckenplatteEintrag, FlaechenlastEintrag,
+    LinienlagerEintrag, LinienlastEintrag, PlattenlastEintrag, PunktlastEintrag, StuetzeEintrag,
+    UnterzugEintrag, ZoneEintrag,
 )
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
@@ -113,7 +113,8 @@ __all__ = [
     "SchichtEintrag", "SetzungEintrag",
     "PfahlEintrag", "PfahlkombinationEintrag", "PfahlschichtEintrag",
     "AussparungEintrag", "DurchstanzEintrag", "GrundrissknotenEintrag",
-    "DeckeEintrag", "DeckenknotenEintrag", "DeckenplatteEintrag", "FlaechenlastEintrag",
+    "DeckeEintrag", "DeckendiagrammEintrag", "DeckenknotenEintrag", "DeckenplatteEintrag",
+    "FlaechenlastEintrag",
     "LinienlagerEintrag", "LinienlastEintrag", "PlattenlastEintrag", "PunktlastEintrag",
     "StuetzeEintrag", "UnterzugEintrag", "ZoneEintrag",
     "aufbauen", "sorten",

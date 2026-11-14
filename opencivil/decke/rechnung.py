@@ -36,7 +36,7 @@ from opencivil.decke import geometrie as geo
 from opencivil.decke.aufteilung import Aufteilungen, aufteilen
 from opencivil.decke.geometrie import Punkt
 from opencivil.decke.lasten import Belastung, belasten, kombiniert
-from opencivil.decke.modell import Decke
+from opencivil.decke.modell import Decke, Linienlager
 from opencivil.decke.streifen import (
     LINIENLAGER, STUETZE, UNTERZUG, Auflager, Streifen, Traeger, Zerlegung, pressung, zerlegen,
 )
@@ -79,6 +79,9 @@ class Wandkraft:
 
     C: float
     """Das Einspannmoment, in Nm -- positiv, wenn es den Träger im Gegenuhrzeigersinn hält."""
+
+    n: Punkt
+    """Die Richtung des Trägers, längs: in ihr hält ``C`` ihn, von ``t`` her gesehen."""
 
     @property
     def laenge(self) -> float:
@@ -249,8 +252,8 @@ def _weitergeben(k: Lagerkraft, traeger: Traeger, zerlegung: Zerlegung, heraus: 
     if not (k.F or k.C):
         return
     if a.art == LINIENLAGER:
-        heraus.linienlager.setdefault(a.name, []).append(Wandkraft(traeger.name, a.strecke[0], a.strecke[1],
-                                                                   k.F, k.C))
+        heraus.linienlager.setdefault(a.name, []).append(Wandkraft(
+            traeger.name, a.strecke[0], a.strecke[1], k.F, k.C, zerlegung[traeger.streifen].richtung.n))
     elif a.art == STUETZE:
         heraus.stuetzen.setdefault(a.name, []).append((traeger.name, k.F))
     elif a.art == UNTERZUG:
@@ -262,6 +265,38 @@ def _weitergeben(k: Lagerkraft, traeger: Traeger, zerlegung: Zerlegung, heraus: 
             punkt = streifen.richtung.punkt(traeger.s0 + a.s, streifen.mitte)
             lasten = [Einzellast(geo.skalar(punkt, unterzug.richtung.n), k.F)]
         uebertragen.setdefault(a.name, []).extend(lasten)
+
+
+def lagerverlauf(lager: Linienlager, kraefte: Sequence[Wandkraft]) -> List[Tuple[float, float, float, float]]:
+    """
+    Längs eines Linienlagers, was die Träger in es geben: Stufen
+    ``(u_a, u_b, r, m)`` von seinem Anfang bis zu seinem Ende, ``u`` in m ab
+    ``lager.a``, ``r`` nach unten in N/m und ``m`` in Nm/m um seine Achse,
+    rechtsdrehend um ``a → b`` positiv. Wo zwei Träger dasselbe Stück
+    tragen, zählen beide -- darum das Moment um die Achse des Lagers: so
+    lassen sich auch Träger verschiedener Richtung zusammenzählen.
+    """
+    L = math.dist(lager.a, lager.b)
+    e = ((lager.b[0] - lager.a[0]) / L, (lager.b[1] - lager.a[1]) / L)
+
+    def u(p: Punkt) -> float:
+        return geo.skalar((p[0] - lager.a[0], p[1] - lager.a[1]), e)
+
+    stuecke = []
+    for w in kraefte:
+        r, C = w.je_meter
+        # C dreht in der Ebene von n und z: um -t, mit t quer zu n.
+        stuecke.append((*sorted((u(w.a), u(w.b))), r, C * geo.skalar((w.n[1], -w.n[0]), e)))
+    stellen: List[float] = []
+    for x in sorted([0.0, L, *(x for s in stuecke for x in s[:2])]):
+        if not stellen or x - stellen[-1] > geo.TOLERANZ:
+            stellen.append(x)
+    heraus = []
+    for ua, ub in zip(stellen, stellen[1:]):
+        mitte = 0.5 * (ua + ub)
+        auf = [s for s in stuecke if s[0] <= mitte <= s[1]]
+        heraus.append((ua, ub, sum(s[2] for s in auf), sum(s[3] for s in auf)))
+    return heraus
 
 
 def _summe(l: Teillast) -> float:

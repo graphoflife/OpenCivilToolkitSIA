@@ -3911,9 +3911,11 @@
       "stichworte": [
         "Schnittkraefte",
         "Schnittkraefte.v0",
+        "Schnittkraefte.groesse",
         "Widerstaende",
         "in_xy",
         "an_stelle",
+        "stellen",
         "widerstaende",
         "Lastverteilelement",
         "Lastverteilelement.ecken",
@@ -4024,6 +4026,7 @@
         "auf_traeger",
         "gegenkraefte",
         "_weitergeben",
+        "lagerverlauf",
         "_schwerpunkt"
       ]
     },
@@ -5907,6 +5910,7 @@
         "FlaechenlastEintrag",
         "LinienlastEintrag",
         "PunktlastEintrag",
+        "DeckendiagrammEintrag",
         "DeckeEintrag",
         "DeckeEintrag.materialien",
         "DeckeEintrag.lagen",
@@ -5920,6 +5924,7 @@
         "DeckeEintrag.linienlast",
         "DeckeEintrag.punktlast",
         "DeckeEintrag.plattenlast",
+        "DeckeEintrag.diagramm",
         "DeckeEintrag.neu"
       ]
     },
@@ -7217,6 +7222,13 @@
       "stichworte": [
         "zeichnung",
         "uebersicht",
+        "faelle",
+        "_je_lager",
+        "ergebnis",
+        "_linienlager",
+        "_extreme",
+        "_zellen",
+        "_baender",
         "_anteile",
         "_grenzen"
       ]
@@ -7282,6 +7294,7 @@
         "analysediagramme",
         "balkensystem_verlauf",
         "decke_zeichnung",
+        "decke_ergebnis",
         "balkensystem_bearbeiten",
         "_vorlagenwahl",
         "vorlage",

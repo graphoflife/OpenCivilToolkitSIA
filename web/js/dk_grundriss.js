@@ -34,8 +34,10 @@
  * eine Beschriftung steht, wie gross eine Stütze im Bild ist.
  */
 
-import { nachBild, pfad, zahlText } from './cad_ansicht.js';
-import { mitTitel } from './cad_app.js';
+import {
+  ansichtNeu, einpassen, nachBild, pfad, zahlText,
+} from './cad_ansicht.js';
+import { mitTitel, umrissVon } from './cad_app.js';
 import { flaecheVon, innen } from './cad_modell.js';
 import { el, svgEl } from './dom.js';
 
@@ -232,7 +234,7 @@ function lasten(v, decke, lastfall, { orte, klasse, texte, namen }) {
  * an einem Teil meldet -- rot, und als Titel beim Darüberfahren.
  */
 export function grundriss(v, decke, daten, {
-  was = 'aufteilung', fehler = () => false, texte = () => [], lastfall = null,
+  was = 'aufteilung', unter = null, fehler = () => false, texte = () => [], lastfall = null,
 } = {}) {
   const g = svgEl('g', { class: 'dk-grundriss' });
   const lagen = new Map((decke.knoten || []).map((k) => [k.kennung, [k.x, k.y]]));
@@ -308,7 +310,32 @@ export function grundriss(v, decke, daten, {
     namen.append(text([x + b / 2 + 3, y - h / 2 - 3], s.kennung, 'dk-name ist-klein'));
   }
 
-  g.append(flaechen, unterlage(v, daten, was), zonen, umrisse, traeger, lager, stuetzen,
+  g.append(flaechen, unter || unterlage(v, daten, was), zonen, umrisse, traeger, lager, stuetzen,
     ...(lastfall ? [lasten(v, decke, lastfall, { orte, klasse, texte, namen })] : []), namen);
   return g;
+}
+
+/** So breit ist ein Grundriss auf seiner Karte, und so hoch höchstens und mindestens -- px. */
+const BILD = { breite: 720, hoehe: [260, 560], rand: 24 };
+
+/**
+ * Ein Grundriss als Bild, fest im Massstab: die Decke, wie sie im Projekt
+ * steht, und darunter, was die letzte Rechnung zu ihr sagt (`was`). Ein
+ * Ergebnisbild gibt seine eigenen Ebenen, je eine Funktion der Ansicht:
+ * `unter` statt dessen, was die Rechnung unter die Teile legt, `oben` über
+ * allem. `rand` lässt Platz für das, was über den Umriss hinaus steht.
+ */
+export function grundrissBild(decke, daten, was, { unter = null, oben = null, rand = BILD.rand } = {}) {
+  const umriss = umrissVon(decke.knoten.map((k) => [k.x, k.y]), [[0, 0], [10, 8]]);
+  const [[x0, y0], [x1, y1]] = umriss;
+  const breit = Math.max(x1 - x0, 1);
+  const hoch = Math.max(y1 - y0, 1);
+  const hoehe = Math.min(BILD.hoehe[1], Math.max(BILD.hoehe[0],
+    (hoch / breit) * (BILD.breite - 2 * rand) + 2 * rand));
+  const v = ansichtNeu([1e-3, 1e5]);
+  Object.assign(v, { breite: BILD.breite, hoehe });
+  einpassen(v, umriss, { rand });
+  const svg = svgEl('svg', { viewBox: `0 0 ${BILD.breite} ${hoehe.toFixed(0)}`, class: 'gb-bild dk-bild' });
+  svg.append(grundriss(v, decke, daten, { was, unter: unter ? unter(v) : null }), ...(oben ? oben(v) : []));
+  return svg;
 }

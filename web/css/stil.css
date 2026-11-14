@@ -83,6 +83,11 @@
   /* Beide Tragrichtungen zugleich -- und die Bügel, die quer zu beiden
      tragen: ein leuchtendes Violett. */
   --beide:        #8b5cf6;
+  /* Die Schnittkräfte einer Decke in Farbe: positiv rot, negativ blau, null
+     weiss. Nicht das Rot eines Fehlers: ein positives Moment ist keiner. */
+  --feld-plus:    #e03131;
+  --feld-minus:   #1c7ed6;
+  --feld-null:    #ffffff;
 
   /* Akzent der Zwischenüberschriften. Eigene Variable, weil die Farben oben
      je eine Bedeutung tragen (Beton, Betonstahl, Platte) -- eine davon hier
@@ -2209,6 +2214,26 @@ details.nb-callout > summary { cursor: pointer; }
 .dk-name.ist-klein { font-size: 10px; text-anchor: start; }
 .dk-name.ist-zone { fill: var(--beide); }
 .dk-name.ist-last { fill: var(--last); font-weight: 600; }
+
+/* Die Ergebnisbilder: die Zellen in der Farbe ihres Werts, ohne Fuge
+   zwischen zweien, der grösste und der kleinste Wert mit Punkt; die
+   Verläufe der Linienlager dunkel und blass, daneben ihre Zahlen. Unter
+   dem Bild die Skala der Farben. */
+.dk-zelle { stroke-width: .6; }
+.dk-extrem { stroke: #fff; stroke-width: 1.5; }
+.dk-extrem.ist-plus { fill: var(--feld-plus); }
+.dk-extrem.ist-minus { fill: var(--feld-minus); }
+.dk-extremtext, .dk-lagertext {
+  font-size: 11.5px; font-weight: 600; fill: var(--schrift); dominant-baseline: middle;
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none;
+}
+.dk-lagerverlauf {
+  fill: var(--schrift); fill-opacity: .12; stroke: var(--schrift); stroke-width: 1.2; stroke-linejoin: round;
+}
+.dk-farblegende { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--schrift-matt); margin: 4px 0; }
+.dk-farbbalken {
+  flex: 0 1 220px; height: 10px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(16, 24, 40, .15);
+}
 
 /* Die Wahl der Unterlage in der Leiste, und unter der Zeichnung, was ihre Farben heissen. */
 .dk-unterlagewahl { align-self: center; }

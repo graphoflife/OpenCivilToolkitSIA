@@ -32,10 +32,10 @@ import {
 } from './dom.js';
 import { fenster, fensterOeffnen } from './fenster.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
-import { lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
-import { anfuegenKnopf, rechenwahlZeile } from './nachweise.js';
+import { diagrammzeilen, lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
+import { rechenwahlZeile } from './nachweise.js';
 import {
-  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsteKennung, naechsterName,
+  eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsteKennung, naechsterName,
   zustand,
 } from './zustand.js';
 
@@ -590,51 +590,15 @@ export function balkensystemFenster(system, schluessel) {
 // Statik-Analyse
 // ===========================================================================
 
-const DIAGRAMMGROESSEN = () => katalog('balkensystem', 'diagrammgroessen');
-
 /**
- * Welche Diagramme rechts stehen -- wie in der Spannung-Dehnung-Analyse: je
- * Zeile ein Fall, Lastfall oder Kombination, und was das Diagramm von ihm
- * zeigt (Benutzer, 2026-10-23). Gerechnet wird damit nichts, das System
- * rechnet jeden Fall. Ein Fall, den es nicht mehr gibt, steht als «– Fall
- * wählen –» da. Ein Knopf mit Fenster wie die Eingaben (Benutzer,
- * 2026-10-24).
+ * Welche Diagramme rechts stehen -- je Zeile ein Fall und was das Diagramm
+ * von ihm zeigt (`diagrammzeilen`, Benutzer, 2026-10-23). Ein Knopf mit
+ * Fenster wie die Eingaben (Benutzer, 2026-10-24).
  */
 function statikInhalt(system) {
-  const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
-  const faelle = [
-    ...system.lastfaelle.map((lf) => ({ wert: lf.kennung, beschriftung: lf.name })),
-    ...system.kombinationen.map((k) => ({ wert: k.kennung, beschriftung: `${k.name} (Kombination)` })),
-  ];
-  const zeile = (d, i) => el('div.bs-diagrammzeile', {}, [
-    el('div.bs-diagrammzeile-kopf', {}, [
-      auswahl({
-        werte: faelle.some((f) => f.wert === d.fall) ? faelle
-          : [{ wert: d.fall, beschriftung: '– Fall wählen –' }, ...faelle],
-        gewaehlt: d.fall,
-        titel: 'Welcher Lastfall oder welche Kombination',
-        beiAenderung: (w) => aendern((s) => { s.diagramme[i].fall = w; }),
-      }),
-      el('button.weg', {
-        type: 'button', text: '×', title: 'Diagramm löschen',
-        on: { click: () => aendern((s) => { s.diagramme.splice(i, 1); }) },
-      }),
-    ]),
-    wahlSchalter({
-      werte: DIAGRAMMGROESSEN().map((g) => ({ wert: g.wert, beschriftung: g.beschriftung, titel: g.titel })),
-      gewaehlt: d.groesse, titel: 'Was das Diagramm zeigt',
-      setzen: (w) => aendern((s) => { s.diagramme[i].groesse = w; }),
-    }),
-  ]);
-  return [
-    ...(system.diagramme.length ? system.diagramme.map(zeile)
-      : [el('div.leer', { text: 'Noch kein Diagramm.' })]),
-    anfuegenKnopf('Diagramm', () => aendern((s) => {
-      s.diagramme.push(ausVorlage('statikdiagramm', {
-        fall: s.kombinationen[0]?.kennung || s.lastfaelle[0]?.kennung || '',
-      }));
-    })),
-  ];
+  return diagrammzeilen(system, {
+    groessen: katalog('balkensystem', 'diagrammgroessen'), vorlage: 'statikdiagramm',
+  });
 }
 
 // ===========================================================================

@@ -1,5 +1,5 @@
 ---
-erzeugt: 73d6abed94c7
+erzeugt: c0a85540502f
 art: modul
 tags: [modul]
 ---
@@ -136,6 +136,7 @@ nicht auf, steht sein Gegenteil da; `grad` der Erfuellungsgrad in LaTeX.
 
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]
+- [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
 - [[opencivil.web.grundbruchdaten]]

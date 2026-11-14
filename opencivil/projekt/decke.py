@@ -24,6 +24,11 @@ Knoten -- oder liegt auf der ganzen Platte: dann steht sie an der Platte
 Linienlast laeuft von Knoten zu Knoten, eine Punktlast steht an einem und
 verteilt sich ueber ``l_x × l_y``. Nach unten positiv.
 
+ERGEBNISBILDER:
+Welche Bilder rechts stehen, sagt die Liste ``diagramme`` -- wie die
+Statik-Analyse des Balkensystems je Zeile ein Fall und eine Groesse. Eine
+frische Decke hat m_x, m_y, v_0 und die Lagerkraefte der GZT.
+
 KOORDINATEN UND EINHEITEN:
 x nach rechts, y nach oben, in m -- ebenso die Breite eines Unterzugs, der
 Stuetzenbereich und die Streifenbreite. Die Dicke einer Platte und der
@@ -38,14 +43,18 @@ from dataclasses import dataclass, field
 from typing import Any, List, Sequence, Union
 
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KN_PRO_M2, M, MM, PROZENT
+from opencivil.decke.feld import GROESSEN
 from opencivil.decke.modell import VERTEILBREITE, Aufteilung
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
-from opencivil.projekt.lesen import ProjektFehler, bereich, lesen
+from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, lesen
 from opencivil.projekt.netz import Netz, naechste_kennung
 
 #: Ein Ort im Baukasten: die Kennung eines Knotens oder ``(x, y)`` in m.
 Ort = Union[str, Sequence[float]]
+
+#: Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte oder die Lagerkraefte.
+DIAGRAMMGROESSEN = (*GROESSEN, "lager")
 
 #: Womit die Kennungen der Teile einer Decke beginnen.
 VORSILBEN = {"platten": "P", "linienlager": "L", "stuetzen": "S", "unterzuege": "U",
@@ -191,6 +200,20 @@ class PunktlastEintrag(Beschreibung):
 
 
 @dataclass
+class DeckendiagrammEintrag(Beschreibung):
+    """
+    Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt. Gerechnet
+    wird damit nichts -- die Decke rechnet jeden Fall; die Liste sagt nur,
+    welche Bilder rechts stehen.
+    """
+
+    fall: str = ""
+    """Die Kennung eines Lastfalls (``LF1``) oder einer Kombination (``LK1``)."""
+
+    groesse: str = einer_von(DIAGRAMMGROESSEN, "m_x")
+
+
+@dataclass
 class DeckeEintrag(MitFaellen, BauteilEintrag):
     """
     Eine Decke aus Platten auf Linienlagern und Stützen, mit versteckten
@@ -218,6 +241,7 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     punktlasten: List[PunktlastEintrag] = field(default_factory=list)
     lastfaelle: List[LastfallEintrag] = field(default_factory=list)
     kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
+    diagramme: List[DeckendiagrammEintrag] = field(default_factory=list)
     streifenbreite: float = bereich(0.25, heisst="Streifenbreite", einheit=M, ueber=0.0)
     aufteilung: Aufteilung = Aufteilung.AUTOMATISCH
     anteil: float = bereich(50.0, heisst="Anteil in Richtung 1", einheit=PROZENT, ab=0.0, bis=100.0)
@@ -312,6 +336,13 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
         p.lasten = [q for q in p.lasten if q.lastfall != eintrag.lastfall] + [eintrag]
         return eintrag
 
+    def diagramm(self, fall: Any, groesse: str = "m_x") -> DeckendiagrammEintrag:
+        """Ein Ergebnisbild -- ``fall`` ein Lastfall oder eine Kombination."""
+        eintrag = lesen(DeckendiagrammEintrag, {"fall": kennung_von(fall), "groesse": groesse},
+                        f"Decke '{self.name}', diagramme", DeckendiagrammEintrag())
+        self.diagramme.append(eintrag)
+        return eintrag
+
     # -- Die frische Anlage -------------------------------------------------------
 
     @classmethod
@@ -319,9 +350,12 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
         """
         Eine frische Decke, wie der Benutzer sie angelegt bekommt: ohne
         Platte, aber mit den Lastfällen und Kombinationen eines frischen
-        Balkensystems -- das Eigengewicht kommt von selbst.
+        Balkensystems -- das Eigengewicht kommt von selbst. Dazu die Bilder
+        m_x, m_y, v_0 und die Lagerkräfte der GZT.
         """
         d = cls(kennung=kennung, name=name)
-        d.standardfaelle()
+        gzt, _ = d.standardfaelle()
+        for groesse in ("m_x", "m_y", "v_0", "lager"):
+            d.diagramm(gzt, groesse)
         return d
 

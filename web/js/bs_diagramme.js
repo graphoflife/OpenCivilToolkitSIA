@@ -26,7 +26,7 @@
  * Rechnung, die mit jeder Eingabe läuft.
  *
  * Die Verläufe kommen aus einer eigenen Anfrage (`balkensystem_verlauf`),
- * erst wenn jemand sie sehen will -- wie die Diagramme der
+ * erst wenn jemand sie sehen will (fallantwort.js) -- wie die Diagramme der
  * Querschnittsanalyse. Gerechnet wird hier nichts: die Werte kommen fertig
  * aus dem Kern, mit den Extremstellen; zwischen seinen dichten Proben wird
  * für die Anzeige beim Darüberfahren nur gerade verbunden.
@@ -36,7 +36,9 @@ import { api } from './api.js';
 import { karte } from './bausteine.js';
 import { kraftpfeil, momentSymbol } from './bs_symbole.js';
 import { el, leerzustand, svgEl } from './dom.js';
-import { aendern, ansichtVon, eintragVon, katalog, zustand } from './zustand.js';
+import { antwortZu } from './fallantwort.js';
+import { fallname } from './lastfaelle.js';
+import { eintragVon, katalog, zustand } from './zustand.js';
 
 const BREITE = 640;
 /** Wie weit die grösste Ordinate vom Stab absteht, in Bildpunkten. */
@@ -59,61 +61,7 @@ const GROESSEN = {
   verdrehung: { schluessel: 'phi', zeichen: 'φ', einheit: 'mrad', stellen: 2, klasse: 'bs-d-phi' },
 };
 
-/*
- * Je System merkt sich die Ansicht (`ansichtVon`) unter `verlaeufe` je Fall
- * die letzte Antwort: {fassung, fall, daten, alt, fehler, uhr}.
- */
-
 const fest = (x, n) => (Math.abs(x) < 0.5 * 10 ** -n ? 0 : x).toFixed(n);
-
-// ===========================================================================
-// Anfrage
-// ===========================================================================
-
-/** Fragt nach den Verläufen -- erst, wenn gerade nicht gerechnet wird: dann liegt das System im Speicher des Kerns. */
-function anfordern(kennung, eintrag, verzug = 500) {
-  const gilt = () => verlaeufeVon(kennung).get(eintrag.fall) === eintrag;
-  clearTimeout(eintrag.uhr);
-  eintrag.uhr = setTimeout(() => {
-    if (!gilt()) return;
-    if (zustand.rechnetGerade) {
-      anfordern(kennung, eintrag);
-      return;
-    }
-    api.balkensystemVerlauf(zustand.projekt, kennung, eintrag.fall).then((antwort) => {
-      if (!gilt()) return;
-      eintrag.daten = antwort;
-      aendern({}, 'diagramm');
-    }).catch((fehler) => {
-      if (!gilt()) return;
-      eintrag.fehler = fehler.message;
-      aendern({}, 'diagramm');
-    });
-  }, verzug);
-}
-
-/** Je Fall die letzte Antwort zu diesem System. */
-function verlaeufeVon(kennung) {
-  const ansicht = ansichtVon(kennung);
-  ansicht.verlaeufe ??= new Map();
-  return ansicht.verlaeufe;
-}
-
-/**
- * Die Antwort des Kerns zu einem Fall -- neu angefragt, wenn es keine gibt
- * oder sich das Projekt seither geändert hat. Bis die neue da ist, gilt die
- * alte. Zeigen zwei Diagramme denselben Fall, teilen sie sich die Antwort.
- */
-function antwortZu(kennung, fall) {
-  let eintrag = verlaeufeVon(kennung).get(fall);
-  if (!eintrag || eintrag.fassung !== zustand.fassung) {
-    const alt = eintrag?.daten || eintrag?.alt || null;
-    eintrag = { fassung: zustand.fassung, fall, daten: null, alt, fehler: null, uhr: null };
-    verlaeufeVon(kennung).set(fall, eintrag);
-    anfordern(kennung, eintrag, alt ? 500 : 80);
-  }
-  return eintrag;
-}
 
 // ===========================================================================
 // Rahmen: vom System ins Bild
@@ -389,11 +337,6 @@ function zeigerEinrichten(huelle, svg, r, daten, zeilen) {
 // Blätter
 // ===========================================================================
 
-/** Der Name eines Falls -- Lastfall oder Kombination -- aus seiner Kennung; `null`, wenn es ihn nicht gibt. */
-function fallname(system, kennung) {
-  return [...system.lastfaelle, ...system.kombinationen].find((f) => f.kennung === kennung)?.name ?? null;
-}
-
 /**
  * Ein Diagramm der Statik-Analyse als Karte: der Fall der Zeile, die Grösse
  * der Zeile. Über dem Diagramm sein Titel und der Fall.
@@ -406,7 +349,8 @@ function diagrammKarte(kennung, system, zeile) {
     return karte(titel, [leerzustand('Kein Fall gewählt.',
       'Unter «Statik-Analyse» einen Lastfall oder eine Kombination wählen.')]);
   }
-  const eintrag = antwortZu(kennung, fall);
+  const eintrag = antwortZu(kennung, fall,
+    (f) => api.balkensystemVerlauf(zustand.projekt, kennung, f));
   if (eintrag.fehler) return karte(`${titel} – ${fall}`, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })]);
   const antwort = eintrag.daten || eintrag.alt;
   const daten = antwort?.verlauf;
