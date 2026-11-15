@@ -6,10 +6,12 @@ heisst hier: genau sie, mit umgekehrtem Vorzeichen. In den Achsen des Stabs
 zeigt y nach links, eine Last nach unten ist also negativ.
 """
 
+import math
 import unittest
 
 from opencivil.stabwerk.stab import (
-    Punkt, Strecke, aufteilen, bettung, formfunktionen, knotenlasten, mal, steifigkeit,
+    TEILUNG, Punkt, Strecke, abklingen_laengs, abklingen_quer, aufteilen, bettung,
+    formfunktionen, knotenlasten, mal, schritt, steifigkeit, stuecke,
 )
 
 L = 5.0
@@ -121,6 +123,27 @@ class TestBettung(unittest.TestCase):
             for i in range(6):
                 for j in range(6):
                     self.assertAlmostEqual(kb[i][j], soll[i][j], delta=1e-5 * abs(kb[1][1]))
+
+
+class TestTeilung(unittest.TestCase):
+    """Wie fein ein gebetteter Stab geteilt wird -- im Balkensystem und beim Pfahl."""
+
+    def test_nach_der_abklinglaenge(self):
+        EI, k = 1e6, 64e6
+        beta = abklingen_quer(k, EI)
+        self.assertAlmostEqual(beta, 2.0)
+        self.assertAlmostEqual(schritt(beta), TEILUNG / 2.0)
+        self.assertAlmostEqual(abklingen_laengs(4e6, 1e6), 2.0)
+        # Höchstens so lang, wie verlangt; ohne Bettung ungeteilt.
+        self.assertEqual(schritt(beta, 0.05), 0.05)
+        self.assertEqual(schritt(abklingen_quer(0.0, EI)), math.inf)
+        self.assertEqual(stuecke(7.0, math.inf), 1)
+
+    def test_stuecke_auf_rundung_genau(self):
+        """0.3 / 0.1 ist im Rechner 2.9999999999999996: drei Stücke, nicht vier."""
+        self.assertEqual(stuecke(0.3, 0.1), 3)
+        self.assertEqual(stuecke(0.30001, 0.1), 4)
+        self.assertEqual(stuecke(0.0, 0.1), 1)
 
 
 class TestAufteilen(unittest.TestCase):

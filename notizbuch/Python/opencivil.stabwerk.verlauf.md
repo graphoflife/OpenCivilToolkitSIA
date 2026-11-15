@@ -1,5 +1,5 @@
 ---
-erzeugt: a281437ad8c1
+erzeugt: 417a4f5deace
 art: modul
 tags: [modul]
 ---
@@ -72,7 +72,9 @@ Zwischen zwei Laststellen sind die Lasten linear -- also V quadratisch, M
 kubisch, die Biegelinie vom fuenften Grad. Gerechnet wird darum genau, mit
 Polynomen ([[opencivil.stabwerk.verlauf#Polynom|Polynom]]), nicht an Stuetzstellen. Ein gebetteter Teilstab
 traegt dazu `-k · v(x)` mit der kubischen Biegelinie seiner Enden; dort ist
-es die Naeherung, mit der auch gerechnet wurde.
+es die Naeherung, mit der auch gerechnet wurde. Quer darf `k` vom Anfang
+zum Ende linear wachsen, wie in der Bettungsmatrix -- so rechnet auch der
+Pfahl ([[opencivil.pfahl.bettung]]) seine Schnittkraefte.
 
 Die Biegelinie folgt aus `v'' = M/EI` und `u' = N/EA`, je Teilstab von
 seinem Anfang aus -- Verschiebung und Drehung dort sind die der Loesung, am
@@ -327,14 +329,15 @@ Je Stab sein Verlauf in diesem Fall -- aus den Teilstaeben, der Reihe nach.
 ### ebener_verlauf
 
 ```python
-def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float], lasten: Sequence[st.Teillast], EA: float=0.0, EI: float=0.0, k_quer: float=0.0, k_laengs: float=0.0, laengs: bool=True, biegung: bool=True) -> List[EbenesIntervall]
+def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float], lasten: Sequence[st.Teillast], EA: float=0.0, EI: float=0.0, k_quer: Tuple[float, float]=(0.0, 0.0), k_laengs: float=0.0, laengs: bool=True, biegung: bool=True) -> List[EbenesIntervall]
 ```
 
 Die Intervalle eines ebenen Teils der Laenge `L`, in x ab dem Anfang
 seines Stabs (`x0`) -- aus den Kraeften `s` und Verschiebungen `d`
 seiner Enden und seinen Lasten. `EA` gilt nur, wenn er sich dehnt
 (`laengs`), `EI` nur, wenn er sich biegt (`biegung`): sonst bleiben
-`u` und `theta` die des Anfangs.
+`u` und `theta` die des Anfangs. Die Bettung quer `k_quer` am
+Anfang und am Ende, dazwischen linear ([[opencivil.stabwerk.stab#bettung|bettung]]).
 
 ### _zusammen
 
@@ -350,7 +353,9 @@ Die drei ebenen Teile eines Stuecks als eines -- mit der Zuordnung aus [[openciv
 def _hermite(L: float, v1: float, t1: float, v2: float, t2: float) -> Polynom
 ```
 
-Die kubische Biegelinie aus den Enden -- die Form, mit der die Bettung gerechnet wurde.
+Die kubische Biegelinie aus den Enden -- die Form, mit der die Bettung
+gerechnet wurde ([[opencivil.stabwerk.stab#formfunktionen|formfunktionen]]), nach
+Potenzen von x geordnet.
 
 ### _verschoben
 
@@ -366,7 +371,7 @@ Dasselbe Intervall in x ab dem Anfang des ganzen Stabs.
 def _schieben(p: Polynom, um: float) -> Polynom
 ```
 
-`q(x) = p(x - um)`.
+`q(x) = p(x - um)` -- nach Horner, `(…(k_n·(x − um) + k_{n−1})·(x − um) + …)`.
 
 
 ## Konstanten
@@ -385,6 +390,7 @@ def _schieben(p: Polynom, um: float) -> Polynom
 ## Gebraucht von
 
 - [[opencivil.decke.traeger]]
+- [[opencivil.pfahl.bettung]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk3d.herleitung]]

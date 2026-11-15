@@ -175,21 +175,20 @@ nachgeprüft. Urteil: umbauen, bevor weiter darauf gebaut wird. Gerechnet
 wird richtig, aber den gebetteten Stab lösen drei Programme, und Regeln des
 Kerns stehen ein zweites Mal im JS. Empfohlene Reihenfolge: 1, dann 3a und
 3b, dann 2 -- vor Knicken oder 2. Ordnung am Pfahl; der Rest, wenn dort
-ohnehin gearbeitet wird. Die Punkte 1, 3a und 3b sind erledigt (unten
-unter «Erledigt zuletzt»).
+ohnehin gearbeitet wird. Die Punkte 1, 3a und 3b und der kleine Umbau aus
+Punkt 2 sind erledigt (unten unter «Erledigt zuletzt»); von Punkt 2 bleibt
+der grosse.
 
-- [ ] **2. Der Pfahl löst den gebetteten Stab ein drittes Mal.**
-      `pfahl/bettung.py` nummeriert, baut zusammen, löst und integriert die
-      Schnittkräfte selbst: `_schnittkraefte` mit den Beiwerten der
-      kubischen Form, N nach der Trapezregel, das Moment am eingespannten
-      Kopf nachgeschoben. `ebener_verlauf` in `stabwerk/verlauf.py` rechnet
-      dasselbe genau mit Polynomen, nur ohne linear wachsende Bettung. Zwei
-      Regeln, wie fein geteilt wird: Stücke höchstens 1/(2β) im
-      Balkensystem, min(0.1 m, 0.2/λ) beim Pfahl. Kosten: Knicken oder
-      2. Ordnung am Pfahl zweimal; Extremwerte nur am Raster. Umbau, klein:
-      `ebener_verlauf` mit linear wachsender Bettung (Polynom mal Polynom
-      gibt es), `bettung.py` ruft es, eine Teilungsregel für beide. Gross,
-      nach 1: der Pfahl als lotrechter Stab eines ebenen Systems.
+- [ ] **2. Rest: der Pfahl liest am Raster ab und baut sein System
+      selbst.** Seit dem kleinen Umbau rechnet er mit den Elementen und dem
+      Verlauf des Balkensystems, nummeriert und baut aber selbst zusammen.
+      Seine Nachweise lesen M, V und den Bodendruck an den Knoten ab; darum
+      teilen Pfahl und Balkensystem gebettete Stäbe in Stücke von 1/(5β),
+      wo für die Lösung 1/(2β) genügte. Kosten: Knicken oder 2. Ordnung am Pfahl zweimal
+      zusammenbauen; rund 15 % Rechenzeit im Balkensystem. Umbau, gross:
+      der Pfahl als lotrechter Stab eines ebenen Systems -- dann fände er
+      seine grössten Werte genau wie das Balkensystem, und beide könnten
+      wieder gröber teilen.
 - [ ] **3c. Die Eingabe der Pfähle entscheidet selbst, welche Felder
       gelten** -- drainiert, Mantel eingegeben, Bohrpfahl, Kopf frei --,
       obwohl der Kern es weiss (`Pfahlschicht.kurznamen`, die Gruppen in
@@ -1006,6 +1005,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-15, Punkt 2, der kleine Umbau: der
+Pfahl rechnet N, M und V mit `ebener_verlauf`, das dafür linear wachsende
+Bettung kennt · weg: `_schnittkraefte`, N nach der Trapezregel, das
+nachgeschobene Kopfmoment · eine Teilungsregel für Balkensystem und Pfahl
+(`stab.schritt`, `stab.stuecke`, `bettung.elementlaenge`), die feinere des
+Pfahls · `SCHRITT_LAMBDA` ist weg ·
 
 Aus der Strukturdurchsicht vom 2026-11-15, Punkt 3b: die Achsen jeder
 Linie kommen eben wie im Raum aus dem Kern (`stabachsen`) · die Oberfläche

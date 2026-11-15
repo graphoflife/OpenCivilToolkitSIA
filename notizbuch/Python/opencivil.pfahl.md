@@ -1,5 +1,5 @@
 ---
-erzeugt: 665ba9c848c8
+erzeugt: 8670d045a8e3
 art: modul
 tags: [modul]
 ---
@@ -20,7 +20,7 @@ tags: [modul]
 * [[opencivil.pfahl.steifigkeit|steifigkeit]] -- der Pfahl als Stab auf Federn: die
   Federn des Bodens, die Federn am Kopf und je Kombination die Verläufe.
 * [[opencivil.pfahl.bettung|bettung]] -- der gebettete Stab, längs und quer, mit
-  den Elementen des Stabwerks gelöst.
+  den Elementen und Verläufen des Stabwerks gelöst.
 * [[opencivil.pfahl.uebersicht|uebersicht]] -- was über der Nachweistabelle steht.
 
 ## Module

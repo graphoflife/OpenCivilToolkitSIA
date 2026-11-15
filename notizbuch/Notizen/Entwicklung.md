@@ -7,6 +7,40 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Der Pfahl rechnet mit dem Verlauf des Balkensystems
+
+Der gebettete Pfahl integriert seine Schnittkräfte nicht mehr selbst (Punkt
+2 der Strukturdurchsicht vom selben Tag). Am Bildschirm und im Bericht des
+Pfahls ändert sich keine Zahl; im Balkensystem werden gebettete Stäbe
+feiner geteilt, im vollen Beispiel der Tests 75 statt 42 Unbekannte, und
+drei Werte rücken in der letzten Stelle zur genauen Lösung hin (ein Lager
+46.5 statt 46.6 kN, genau 46.549).
+
+Warum so:
+
+- N, M und V jedes Pfahlelements kommen aus `ebener_verlauf`, genau mit
+  Polynomen aus den Kräften an seinen Enden -- dasselbe, womit das
+  Balkensystem seine Stäbe auswertet. Dafür kennt `ebener_verlauf` jetzt
+  eine Bettung, die vom Anfang zum Ende linear wächst, wie die Abminderung
+  am Terrain. Weg sind die Beiwerte der kubischen Form in
+  `_schnittkraefte`, N nach der Trapezregel und das Moment, das am
+  eingespannten Kopf nachgeschoben wurde. Ein Test prüft, dass ein solches
+  Stück am Ende genau die Kräfte und die Biegelinie seines Endes trifft.
+- Eine Regel, wie fein ein gebetteter Stab geteilt wird, für beide
+  (`stab.schritt`): Stücke höchstens 1/(5β). Das ist die bisherige des
+  Pfahls; das Balkensystem teilte nach 1/(2β). Genau genug wären beide --
+  die Lösung weicht bei 1/(2β) um 0.2 ‰ ab --, aber der Pfahl liest seine
+  Nachweise an den Knoten ab: beim Mikropfahl des Beispiels wären die
+  Elemente 8.5 statt 3.4 cm lang geworden, und zwei Nachweise wären um
+  1 % günstiger ausgefallen, weil das grösste Moment zwischen den Knoten
+  liegt. Die feinere Regel kostet das ganze Beispiel rund 15 % Rechenzeit.
+  Wie viele Stücke ein Stab höchstens bekommt, folgt aus der Regel, damit
+  der Hinweis auf eine zu steife Bettung wie bisher erst ab β·L = 32 kommt.
+- Damit der Pfahl nicht langsamer rechnet, wertet er jedes Element ab
+  seinem oberen Ende aus, ohne die Polynome zu verschieben, und die
+  Biegelinie aus den Enden ist direkt nach Potenzen geschrieben. Das
+  Beispiel rechnet so schnell wie vorher.
+
 ## 2026-11-15 · Die Seite der Faser legt nur der Kern
 
 Wo die gestrichelte Faser einer Linie liegt -- und damit, wo ein positives

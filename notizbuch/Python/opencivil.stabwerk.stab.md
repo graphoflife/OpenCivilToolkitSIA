@@ -1,5 +1,5 @@
 ---
-erzeugt: cbf815de2192
+erzeugt: 959e37e6e75d
 art: modul
 tags: [modul]
 ---
@@ -54,11 +54,14 @@ Grad vier. Ein verteiltes Moment `m` leistet Arbeit an der Drehung
 
 Ein Stab auf einem nachgiebigen Linienlager (Winkler) bekommt zu seiner
 Steifigkeit `k · ∫ Nᵀ N dx` -- die konsistente Bettungsmatrix. Mit
-kubischen Formfunktionen ist das eine Naeherung; das System teilt einen
-gebetteten Stab darum in kurze Stuecke ([[opencivil.stabwerk.system|system]]).
+kubischen Formfunktionen ist das eine Naeherung; ein gebetteter Stab wird
+darum in kurze Stuecke geteilt, nach einer Regel fuer das System
+([[opencivil.stabwerk.system|system]]) und den Pfahl
+([[opencivil.pfahl.bettung]]): jedes Stueck hoechstens [[opencivil.stabwerk.stab#Konstanten|TEILUNG]]
+mal die Laenge `1/β`, auf der seine Biegelinie abklingt ([[opencivil.stabwerk.stab#schritt|schritt]]).
 Quer darf `k` vom Anfang zum Ende linear wachsen -- der gebettete Pfahl
-([[opencivil.pfahl.bettung]]) mindert so die Bettung am Terrain ab; das
-System selbst bettet gleichmaessig.
+mindert so die Bettung am Terrain ab; das System selbst bettet
+gleichmaessig.
 
 ## Inhalt
 
@@ -86,6 +89,40 @@ Die konsistente Bettungsmatrix 6 × 6: `k · ∫ Nᵀ N dx`, quer auf
 `v` und `θ`, laengs auf `u`. `k` in N/m je m Stab, also N/m²;
 quer am Anfang und am Ende, dazwischen linear -- an beiden Enden gleich
 ist es die Matrix mit `k · L / 420` ([[opencivil.stabwerk.stab#Konstanten|BETTUNG_LATEX]]).
+
+### abklingen_quer
+
+```python
+def abklingen_quer(k: float, EI: float) -> float
+```
+
+`β = (k/(4EI))^(1/4)`: wie schnell die Biegelinie auf der Bettung `k` abklingt -- null ohne.
+
+### abklingen_laengs
+
+```python
+def abklingen_laengs(k: float, EA: float) -> float
+```
+
+`β = √(k/EA)`: wie schnell die Verschiebung laengs abklingt -- null ohne Bettung.
+
+### schritt
+
+```python
+def schritt(beta: float, hoechstens: float=math.inf) -> float
+```
+
+Wie lang ein Stueck hoechstens ist: [[opencivil.stabwerk.stab#Konstanten|TEILUNG]]/β, und nicht laenger als `hoechstens`.
+
+### stuecke
+
+```python
+def stuecke(laenge: float, schritt_: float) -> int
+```
+
+In wie viele gleich lange Stuecke von hoechstens `schritt_` ein Stab
+der Laenge `laenge` geteilt wird -- auf Rundung genau: 0.1 m sind bei
+0.1 m ein Stueck, nicht zwei.
 
 ### summe
 
@@ -195,6 +232,7 @@ Die arbeitsgleichen Knotenkraefte `f` (6) in den Achsen des Stabs --
 - `DREHUNG_LATEX = '\\mathbf{d} = \\mathbf{T} \\cdot \\mathbf{d}_{glob} \\qquad \\mathbf…` – Die Drehung von den Achsen des Systems in die des Stabs.
 - `BETTUNG_LATEX = '\\mathbf{k}_{b} = \\frac{k_{\\perp} \\cdot L}{420} \\begin{bmatrix} …` – Die Bettung in Zeichen -- quer und laengs.
 - `LASTEN_LATEX = "f_i = \\int_0^L N_i(x) \\cdot p(x)\\,\\mathrm{d}x + \\int_0^L N_i'(x…` – Die arbeitsgleichen Knotenkraefte in Zeichen.
+- `TEILUNG = 0.2` – Wie lang ein gebettetes Stueck hoechstens ist, als Teil der Laenge 1/β, auf der seine Biegelinie abklingt. Bei 1/(5β) weicht die kubische Naeherung am langen Balken auf der Bettung um 0.006 ‰ ab, bei 1/(2β) waeren es 0.2 ‰. So fein, weil der Pfahl seine Nachweise an den Knoten abliest ([[opencivil.pfahl.bettung#Konstanten|opencivil.pfahl.bettung.SCHRITT]]): unter einer Kraft am frei drehbaren Kopf laege das groesste Moment zwischen zwei Knoten bei 1/(2β) bis 6 % ueber dem abgelesenen, bei 1/(5β) bis 1 %.
 
 ## Gebraucht von
 

@@ -133,7 +133,8 @@ class TestBohrpfahl(unittest.TestCase):
         u = urteile(loesung, nachweis)["Querkraft im Pfahl"]
         self.assertLess(wendel(30), diagonalen(30))
         self.assertAlmostEqual(u.widerstand.groesse.si / (0.8 * wendel(30)), 1.0, places=9)
-        self.assertAlmostEqual(u.einwirkung.groesse.si, 100e3)
+        # Am Kopf ist V = H: aus der Kraft auf das oberste Element, bis auf Rundung.
+        self.assertAlmostEqual(u.einwirkung.groesse.si / 100e3, 1.0, places=9)
         self.assertEqual((u.art, u.fall), ("V", "K"))
         self.assertIn("V_Rd = 268.7 kN in z = 1 m", u.begruendung)
 

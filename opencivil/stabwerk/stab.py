@@ -39,11 +39,14 @@ Grad vier. Ein verteiltes Moment ``m`` leistet Arbeit an der Drehung
 BETTUNG:
 Ein Stab auf einem nachgiebigen Linienlager (Winkler) bekommt zu seiner
 Steifigkeit ``k · ∫ Nᵀ N dx`` -- die konsistente Bettungsmatrix. Mit
-kubischen Formfunktionen ist das eine Naeherung; das System teilt einen
-gebetteten Stab darum in kurze Stuecke (:mod:`~opencivil.stabwerk.system`).
+kubischen Formfunktionen ist das eine Naeherung; ein gebetteter Stab wird
+darum in kurze Stuecke geteilt, nach einer Regel fuer das System
+(:mod:`~opencivil.stabwerk.system`) und den Pfahl
+(:mod:`opencivil.pfahl.bettung`): jedes Stueck hoechstens :data:`TEILUNG`
+mal die Laenge ``1/β``, auf der seine Biegelinie abklingt (:func:`schritt`).
 Quer darf ``k`` vom Anfang zum Ende linear wachsen -- der gebettete Pfahl
-(:mod:`opencivil.pfahl.bettung`) mindert so die Bettung am Terrain ab; das
-System selbst bettet gleichmaessig.
+mindert so die Bettung am Terrain ab; das System selbst bettet
+gleichmaessig.
 """
 
 from __future__ import annotations
@@ -146,6 +149,42 @@ def bettung(L: float, k_quer: Tuple[float, float] = (0.0, 0.0),
             for q, j in enumerate(stellen):
                 k[i][j] += dreieck[min(p, q), max(p, q)]
     return k
+
+
+#: Wie lang ein gebettetes Stueck hoechstens ist, als Teil der Laenge 1/β,
+#: auf der seine Biegelinie abklingt. Bei 1/(5β) weicht die kubische
+#: Naeherung am langen Balken auf der Bettung um 0.006 ‰ ab, bei 1/(2β)
+#: waeren es 0.2 ‰. So fein, weil der Pfahl seine Nachweise an den Knoten
+#: abliest (:data:`opencivil.pfahl.bettung.SCHRITT`): unter einer Kraft am
+#: frei drehbaren Kopf laege das groesste Moment zwischen zwei Knoten bei
+#: 1/(2β) bis 6 % ueber dem abgelesenen, bei 1/(5β) bis 1 %.
+TEILUNG = 0.2
+
+
+def abklingen_quer(k: float, EI: float) -> float:
+    """``β = (k/(4EI))^(1/4)``: wie schnell die Biegelinie auf der Bettung ``k`` abklingt -- null ohne."""
+    return (k / (4.0 * EI)) ** 0.25 if k > 0.0 else 0.0
+
+
+def abklingen_laengs(k: float, EA: float) -> float:
+    """``β = √(k/EA)``: wie schnell die Verschiebung laengs abklingt -- null ohne Bettung."""
+    return math.sqrt(k / EA) if k > 0.0 else 0.0
+
+
+def schritt(beta: float, hoechstens: float = math.inf) -> float:
+    """Wie lang ein Stueck hoechstens ist: :data:`TEILUNG`/β, und nicht laenger als ``hoechstens``."""
+    return min(hoechstens, TEILUNG / beta) if beta > 0.0 else hoechstens
+
+
+def stuecke(laenge: float, schritt_: float) -> int:
+    """
+    In wie viele gleich lange Stuecke von hoechstens ``schritt_`` ein Stab
+    der Laenge ``laenge`` geteilt wird -- auf Rundung genau: 0.1 m sind bei
+    0.1 m ein Stueck, nicht zwei.
+    """
+    if schritt_ == math.inf:
+        return 1
+    return max(1, math.ceil(laenge / schritt_ - 1e-9))
 
 
 def summe(*matrizen: Matrix) -> Matrix:

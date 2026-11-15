@@ -1,5 +1,5 @@
 ---
-erzeugt: 41ef326f05bd
+erzeugt: 9f051cb2cf31
 art: modul
 tags: [modul]
 ---
@@ -37,10 +37,9 @@ Beschreibung -- oder ein Punkt im Innern eines Stabs, wo er geteilt ist:
 * Liegt ein Knoten auf einem Stab, nicht an dessen Ende, ist er mit ihm
   verbunden (T-Stoss); der Stab wird dort geteilt. Linien, die sich ohne
   Knoten kreuzen, sind nicht verbunden -- dazu ein Hinweis.
-* Ein gebetteter Stab wird in kurze Stuecke geteilt, so dass jedes hoechstens
-  `1/(2β)` lang ist, quer `β = (k/(4EI))^(1/4)`, laengs `β = √(k/EA)`:
-  dann weicht die kubische Naeherung um weniger als ein Promille ab.
-  Hoechstens [[opencivil.stabwerk.system#Konstanten|TEILE_HOECHSTENS]].
+* Ein gebetteter Stab wird in kurze Stuecke geteilt, nach der Regel des
+  gebetteten Stabs ([[opencivil.stabwerk.stab#schritt|schritt]]), mit dem
+  groessten β quer und laengs. Hoechstens [[opencivil.stabwerk.system#Konstanten|TEILE_HOECHSTENS]].
 
 Zwischen zwei Orten liegt ein Teilstab -- ein Stab im Sinn von
 [[opencivil.stabwerk3d.stab|stab]].
@@ -360,7 +359,7 @@ Wie u, v, w und θx, θy, θz eines Stabendes an den Unbekannten haengen.
 
 ## Konstanten
 
-- `TEILE_HOECHSTENS = 64` – In hoechstens so viele Stuecke wird ein gebetteter Stab geteilt.
+- `TEILE_HOECHSTENS = round(32 / st.TEILUNG)` – In hoechstens so viele Stuecke wird ein gebetteter Stab geteilt: so viele, wie die Regel des gebetteten Stabs bis β·L = 32 verlangt.
 - `UNBESTIMMT = 'Verdrehung nicht bestimmbar, da keine Steifigkeit'` – Was an einem Knoten steht, dessen Drehung gestrichen ist.
 - `SUMMEN = 'Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursp…` – Was unter den Lagerkraeften steht, wenn Linienlager oder Bettung dabei sind.
 

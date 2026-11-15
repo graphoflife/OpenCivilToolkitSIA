@@ -11,9 +11,12 @@ import unittest
 from opencivil.stabwerk.modell import (
     FEST, Knoten, Knotenlast, Lager, Lastart, Lastfall, Stab, Stablast, System, feder,
 )
+from opencivil.stabwerk import stab as st
 from opencivil.stabwerk import system as kern
 from opencivil.stabwerk.art import EBENE
-from opencivil.stabwerk.verlauf import Extrem, Grenzwert, Polynom, grenzwerte, verlaeufe
+from opencivil.stabwerk.verlauf import (
+    Extrem, Grenzwert, Polynom, ebener_verlauf, grenzwerte, verlaeufe,
+)
 from opencivil.stabwerk3d import stab as st3
 
 EI, EA = 50e6, 5e9
@@ -151,6 +154,27 @@ class TestBettung(unittest.TestCase):
         for x in (0.0, 2.5, 5.0, 9.9):
             self.assertAlmostEqual(v.bei(x)["M_y"], 0.0, delta=1e-6 * q)
             self.assertAlmostEqual(v.bei(x)["uz"], -q / k, delta=1e-12)
+
+    def test_linear_wachsende_bettung_trifft_das_ende(self):
+        """
+        Ein Stück auf einer Bettung, die von 2 auf 7 MN/m² wächst, allein aus
+        den Kräften seiner Enden: die Bettungsmatrix ist die Arbeit derselben
+        Kraft, darum treffen Kräfte und Biegelinie am Ende genau die des
+        Endes. Die Bettung trägt die Kraft k(x)·v(x) mit der kubischen Form.
+        """
+        l, k = 0.8, (2e6, 7e6)
+        d = (1e-3, 2e-3, -1e-3, -0.5e-3, 1e-3, 3e-3)
+        s = st.mal(st.summe(st.steifigkeit(l, EA, EI), st.bettung(l, k, 1e6)), d)
+        (t,) = ebener_verlauf(L=l, x0=0.0, s=s, d=d, lasten=(), EA=EA, EI=EI, k_quer=k,
+                              k_laengs=1e6)
+        for ist, soll in ((t.N(l), s[3]), (t.V(l), -s[4]), (t.M(l), s[5])):
+            self.assertAlmostEqual(ist, soll, delta=1e-9 * max(map(abs, s)))
+        for ist, soll in ((t.u(l), d[3]), (t.v(l), d[4]), (t.theta(l), d[5])):
+            self.assertAlmostEqual(ist, soll, delta=1e-12)
+        x = l / 3.0
+        form = st.formfunktionen(x, l)[2:]
+        v = sum(f * w for f, w in zip(form, (d[1], d[2], d[4], d[5])))
+        self.assertAlmostEqual(t.p_y(x), -(k[0] + (k[1] - k[0]) * x / l) * v, delta=1e-6)
 
 
 class TestStetig(unittest.TestCase):

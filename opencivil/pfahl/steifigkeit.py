@@ -72,9 +72,6 @@ GAMMA_E_REFERENZ = "SIA 267:2013, 5.3.2.5"
 #: Die Probelast am Kopf, an der die Federn abgelesen werden, in N und Nm.
 PROBE = 1e6
 
-#: So lang ist ein Element höchstens, gemessen an der elastischen Länge 1/λ.
-SCHRITT_LAMBDA = 0.2
-
 #: Die Federn am Kopf, als Kennzahlen: Kurzname, Zeichen, Einheit, Stellen,
 #: Beschriftung, Erklärung. Quer zwei Stellen: ein Mikropfahl ist dort rund
 #: tausendmal weicher als ein Bohrpfahl, seine Drehfeder etwa 0.15 MNm/rad.
@@ -250,8 +247,8 @@ class Pfahlsteifigkeit(Prozedur):
         grund = Baugrund(tuple(grenzen), tuple(e.g(f"E_s_{i}").si for i in range(1, n + 1)),
                          mantel, e.g("t_K").si, e.g("L").si, e.g("D").si, e.g("t_red").si)
         self._bettung(e, p, werte, grund)
-        lam = (max(grund.E_s) / (4.0 * EI.groesse.si)) ** 0.25
-        schritt = min(bettung.SCHRITT, SCHRITT_LAMBDA / lam)
+        # Mit dem charakteristischen Modul ist die Bettung am steifsten.
+        schritt = bettung.elementlaenge(grund.strecken(1.0), EA.groesse.si, EI.groesse.si)
         ergebnis: Dict[str, Groesse] = {}
         self._federn(p, werte, grund, EA.groesse.si, EI.groesse.si, schritt, ergebnis)
         befund = Steifigkeitsbefund(eingespannt=self.pfahl.kopf is Kopf.EINGESPANNT)

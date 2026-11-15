@@ -55,7 +55,9 @@ Zwischen zwei Laststellen sind die Lasten linear -- also V quadratisch, M
 kubisch, die Biegelinie vom fuenften Grad. Gerechnet wird darum genau, mit
 Polynomen (:class:`Polynom`), nicht an Stuetzstellen. Ein gebetteter Teilstab
 traegt dazu ``-k · v(x)`` mit der kubischen Biegelinie seiner Enden; dort ist
-es die Naeherung, mit der auch gerechnet wurde.
+es die Naeherung, mit der auch gerechnet wurde. Quer darf ``k`` vom Anfang
+zum Ende linear wachsen, wie in der Bettungsmatrix -- so rechnet auch der
+Pfahl (:mod:`opencivil.pfahl.bettung`) seine Schnittkraefte.
 
 Die Biegelinie folgt aus ``v'' = M/EI`` und ``u' = N/EA``, je Teilstab von
 seinem Anfang aus -- Verschiebung und Drehung dort sind die der Loesung, am
@@ -374,9 +376,9 @@ def verlaeufe(fall) -> Dict[str, Stabverlauf]:
         # Die Laengskraft gehoert der Ebene z; die Torsion ist ein Teil ohne
         # Biegung, ihr Torsionsmoment und ihre Verdrehung stehen dort, wo
         # sonst N und u stehen.
-        z = ebene(st3.EBENE_Z, teil.lasten.z, EA=t.EA, EI=t.EI_y, k_quer=t.k_z,
+        z = ebene(st3.EBENE_Z, teil.lasten.z, EA=t.EA, EI=t.EI_y, k_quer=(t.k_z, t.k_z),
                   k_laengs=t.k_x, laengs=t.laengs, biegung=t.biegung_z)
-        y = ebene(st3.EBENE_Y, teil.lasten.y, EI=t.EI_z, k_quer=t.k_y,
+        y = ebene(st3.EBENE_Y, teil.lasten.y, EI=t.EI_z, k_quer=(t.k_y, t.k_y),
                   laengs=False, biegung=t.biegung_y)
         drillung = ebene(st3.TORSION, teil.lasten.t, EA=t.GI_T,
                          laengs=t.torsion, biegung=False)
@@ -388,23 +390,24 @@ def verlaeufe(fall) -> Dict[str, Stabverlauf]:
 
 def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float],
                    lasten: Sequence[st.Teillast], EA: float = 0.0, EI: float = 0.0,
-                   k_quer: float = 0.0, k_laengs: float = 0.0, laengs: bool = True,
-                   biegung: bool = True) -> List[EbenesIntervall]:
+                   k_quer: Tuple[float, float] = (0.0, 0.0), k_laengs: float = 0.0,
+                   laengs: bool = True, biegung: bool = True) -> List[EbenesIntervall]:
     """
     Die Intervalle eines ebenen Teils der Laenge ``L``, in x ab dem Anfang
     seines Stabs (``x0``) -- aus den Kraeften ``s`` und Verschiebungen ``d``
     seiner Enden und seinen Lasten. ``EA`` gilt nur, wenn er sich dehnt
     (``laengs``), ``EI`` nur, wenn er sich biegt (``biegung``): sonst bleiben
-    ``u`` und ``theta`` die des Anfangs.
+    ``u`` und ``theta`` die des Anfangs. Die Bettung quer ``k_quer`` am
+    Anfang und am Ende, dazwischen linear (:func:`~opencivil.stabwerk.stab.bettung`).
     """
     strecken = [l for l in lasten if isinstance(l, st.Strecke) and l.b > l.a]
     punkte = [l for l in lasten if isinstance(l, st.Punkt)]
     grenzen = sorted({0.0, L} | {g for l in strecken for g in (l.a, l.b) if 0.0 < g < L}
                      | {p.a for p in punkte if 0.0 < p.a < L})
 
-    # Die Biegelinie der Enden -- fuer die Bettung.
-    if k_quer:
-        hermite = _hermite(L, d[1], d[2], d[4], d[5])
+    # Die Bettung mal der Biegelinie der Enden -- die Kraft, mit der gerechnet wurde.
+    if any(k_quer):
+        bettung = Polynom.durch(0.0, k_quer[0], L, k_quer[1]) * _hermite(L, d[1], d[2], d[4], d[5])
     if k_laengs:
         gerade = Polynom.durch(0.0, d[0], L, d[3])
 
@@ -423,8 +426,8 @@ def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float
                 px = px + Polynom.durch(l.a, l.px_a, l.b, l.px_b)
                 py = py + Polynom.durch(l.a, l.py_a, l.b, l.py_b)
                 m = m + Polynom.durch(l.a, l.m_a, l.b, l.m_b)
-        if k_quer:
-            py = py + (-k_quer) * hermite
+        if any(k_quer):
+            py = py - bettung
         if k_laengs:
             px = px + (-k_laengs) * gerade
         if not laengs:
@@ -461,14 +464,13 @@ def _zusammen(z: EbenesIntervall, y: EbenesIntervall, t: EbenesIntervall) -> Int
 
 
 def _hermite(L: float, v1: float, t1: float, v2: float, t2: float) -> Polynom:
-    """Die kubische Biegelinie aus den Enden -- die Form, mit der die Bettung gerechnet wurde."""
-    a = Polynom((0.0, 1.0 / L))
-    eins = Polynom((1.0,))
-    h1 = eins - 3.0 * a * a + 2.0 * a * a * a
-    h2 = L * (a - 2.0 * a * a + a * a * a)
-    h3 = 3.0 * a * a - 2.0 * a * a * a
-    h4 = L * (a * a * a - a * a)
-    return v1 * h1 + t1 * h2 + v2 * h3 + t2 * h4
+    """
+    Die kubische Biegelinie aus den Enden -- die Form, mit der die Bettung
+    gerechnet wurde (:func:`~opencivil.stabwerk.stab.formfunktionen`), nach
+    Potenzen von x geordnet.
+    """
+    return Polynom((v1, t1, (3.0 * (v2 - v1) - (2.0 * t1 + t2) * L) / L ** 2,
+                    (2.0 * (v1 - v2) + (t1 + t2) * L) / L ** 3))
 
 
 def _verschoben(i: EbenesIntervall, um: float) -> EbenesIntervall:
@@ -480,11 +482,12 @@ def _verschoben(i: EbenesIntervall, um: float) -> EbenesIntervall:
 
 
 def _schieben(p: Polynom, um: float) -> Polynom:
-    """``q(x) = p(x - um)``."""
-    heraus = NULL
-    potenz = Polynom((1.0,))
-    verschoben = Polynom((-um, 1.0))
-    for k in p.k:
-        heraus = heraus + k * potenz
-        potenz = potenz * verschoben
-    return heraus
+    """``q(x) = p(x - um)`` -- nach Horner, ``(…(k_n·(x − um) + k_{n−1})·(x − um) + …)``."""
+    k: List[float] = []
+    for c in reversed(p.k):
+        neu = [0.0] + k
+        for i, a in enumerate(k):
+            neu[i] -= um * a
+        neu[0] += c
+        k = neu
+    return Polynom(k)

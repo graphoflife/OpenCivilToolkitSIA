@@ -5887,10 +5887,12 @@
         "Laengs",
         "Quer",
         "knoten",
+        "elementlaenge",
         "laengs",
         "quer",
         "_element",
-        "_schnittkraefte"
+        "_auf",
+        "_verlauf"
       ]
     },
     {
@@ -7586,6 +7588,10 @@
         "nullmatrix",
         "steifigkeit",
         "bettung",
+        "abklingen_quer",
+        "abklingen_laengs",
+        "schritt",
+        "stuecke",
         "summe",
         "mal",
         "formfunktionen",

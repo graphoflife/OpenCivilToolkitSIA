@@ -1,5 +1,5 @@
 ---
-erzeugt: 80d7d795fd59
+erzeugt: 085754c5da64
 art: modul
 tags: [modul]
 ---
@@ -24,16 +24,19 @@ bedeuten, sagt [[opencivil.pfahl.steifigkeit|.steifigkeit]]. Hier wird nur gerec
 ## DAS VERFAHREN
 
 Finite Elemente mit Knoten an jeder Grenze einer Strecke, dazwischen gleich
-lang und höchstens `schritt`: die Stäbe des Stabwerks, längs mit linearem,
-quer mit kubischem Ansatz und konsistent verteilter Bettung
-([[opencivil.stabwerk.stab#steifigkeit|opencivil.stabwerk.stab.steifigkeit]], [[opencivil.stabwerk.stab#bettung|bettung]]).
-Quer darf die Bettung über eine Strecke linear wachsen -- so steht die
-Abminderung am Terrain genau im Modell, ohne Stufen. Gelöst wird mit dem
-Profillöser des Stabwerks ([[opencivil.stabwerk.matrix]]). N, M
-und V folgen danach aus dem Gleichgewicht der Bettungskräfte, Element für
-Element und für den Ansatz genau integriert -- nicht aus der Krümmung eines
-Elements, die eine Ordnung ungenauer wäre. Am eingespannten Kopf ist das
-Moment die Reaktion, die das Gleichgewicht am freien Fuss schliesst.
+lang und höchstens `schritt` ([[opencivil.pfahl.bettung#elementlaenge|elementlaenge]],
+[[opencivil.stabwerk.stab#stuecke|stuecke]]):
+die Stäbe des Stabwerks, längs mit linearem, quer mit kubischem Ansatz und
+konsistent verteilter Bettung ([[opencivil.stabwerk.stab#steifigkeit|opencivil.stabwerk.stab.steifigkeit]],
+[[opencivil.stabwerk.stab#bettung|bettung]]). Quer darf die Bettung über eine
+Strecke linear wachsen -- so steht die Abminderung am Terrain genau im
+Modell, ohne Stufen. Gelöst wird mit dem Profillöser des Stabwerks
+([[opencivil.stabwerk.matrix]]). N, M und V folgen danach je Element aus
+den Kräften an seinen Enden und der Bettung dazwischen, für den Ansatz genau
+integriert -- wie im Balkensystem ([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]]),
+nicht aus der Krümmung eines Elements, die eine Ordnung ungenauer wäre. Am
+eingespannten Kopf ist das Moment die Kraft auf das oberste Element: die
+Reaktion.
 
 
 ## VORZEICHEN
@@ -114,6 +117,17 @@ def knoten(strecken: Sequence[Strecke], schritt: float=SCHRITT) -> List[float]
 
 Die Knoten: jede Grenze einer Strecke, dazwischen gleich weit, höchstens `schritt`.
 
+### elementlaenge
+
+```python
+def elementlaenge(strecken: Sequence[Strecke], EA: float, EI: float) -> float
+```
+
+Wie lang ein Element höchstens ist: [[opencivil.pfahl.bettung#Konstanten|SCHRITT]], und so kurz, wie es
+der gebettete Stab für die steifste Bettung längs oder quer verlangt
+([[opencivil.stabwerk.stab#schritt|schritt]]) -- dieselbe Regel wie im
+Balkensystem.
+
 ### laengs
 
 ```python
@@ -136,30 +150,41 @@ die Reaktion.
 ### _element
 
 ```python
-def _element(l: float, stellen: Sequence[int], *, EA: float=0.0, EI: float=0.0, laengs: float=0.0, quer: Tuple[float, float]=(0.0, 0.0)) -> List[List[float]]
+def _element(l: float, *, EA: float=0.0, EI: float=0.0, laengs: float=0.0, quer: Tuple[float, float]=(0.0, 0.0)) -> st.Matrix
 ```
 
-Ein Element der Länge `l`: Steifigkeit und Bettung des Stabwerks, auf `stellen`.
+Ein Element der Länge `l`: Steifigkeit und Bettung des Stabwerks, 6 × 6.
 
-### _schnittkraefte
+### _auf
 
 ```python
-def _schnittkraefte(z: Sequence[float], k: Sequence[Tuple[float, float]], y: Sequence[float], phi: Sequence[float], H: float, M_0: float) -> Tuple[List[float], List[float]]
+def _auf(k: st.Matrix, stellen: Sequence[int]) -> List[List[float]]
 ```
 
-V und M von oben nach unten aus dem Gleichgewicht: je Element die
-Bettungskraft und ihr Moment um das untere Ende, für den kubischen Ansatz
-genau integriert.
+Ein Element, nur auf den Unbekannten `stellen`.
+
+### _verlauf
+
+```python
+def _verlauf(l: float, k: st.Matrix, d: Sequence[float], **verlauf) -> EbenesIntervall
+```
+
+Ein Element der Länge `l` mit der Matrix `k` als Teil eines Stabs, in
+x ab seinem oberen Ende: aus den Kräften an seinen Enden -- `k · d`,
+eine Last trägt es nicht -- und seiner Bettung
+([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]]). y des Pfahls ist v
+des Stabs, φ = dy/dz seine Drehung.
 
 
 ## Konstanten
 
-- `SCHRITT = 0.1` – So lang ist ein Element höchstens, in m.
+- `SCHRITT = 0.1` – So lang ist ein Element höchstens, in m -- so dicht lesen die Nachweise die Verläufe, in jeder Tiefe. Wo die Bettung steif ist, sind die Elemente kürzer ([[opencivil.pfahl.bettung#elementlaenge|elementlaenge]]).
 
 ## Braucht
 
 - [[opencivil.stabwerk.matrix]]
 - [[opencivil.stabwerk.stab]]
+- [[opencivil.stabwerk.verlauf]]
 
 ## Gebraucht von
 

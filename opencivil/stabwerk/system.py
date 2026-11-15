@@ -26,10 +26,9 @@ Beschreibung -- oder ein Punkt im Innern eines Stabs, wo er geteilt ist:
 * Liegt ein Knoten auf einem Stab, nicht an dessen Ende, ist er mit ihm
   verbunden (T-Stoss); der Stab wird dort geteilt. Linien, die sich ohne
   Knoten kreuzen, sind nicht verbunden -- dazu ein Hinweis.
-* Ein gebetteter Stab wird in kurze Stuecke geteilt, so dass jedes hoechstens
-  ``1/(2β)`` lang ist, quer ``β = (k/(4EI))^(1/4)``, laengs ``β = √(k/EA)``:
-  dann weicht die kubische Naeherung um weniger als ein Promille ab.
-  Hoechstens :data:`TEILE_HOECHSTENS`.
+* Ein gebetteter Stab wird in kurze Stuecke geteilt, nach der Regel des
+  gebetteten Stabs (:func:`~opencivil.stabwerk.stab.schritt`), mit dem
+  groessten β quer und laengs. Hoechstens :data:`TEILE_HOECHSTENS`.
 
 Zwischen zwei Orten liegt ein Teilstab -- ein Stab im Sinn von
 :mod:`~opencivil.stabwerk3d.stab`.
@@ -82,7 +81,6 @@ zeigt die Meldungen an den Elementen; der Rest des Projekts rechnet weiter.
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -99,8 +97,9 @@ from opencivil.stabwerk3d.raum import (
 
 __all__ = ["SUMMEN", "UNBESTIMMT", "Ergebnis", "Fall", "Meldung", "Ort", "Teilstab", "rechnen"]
 
-#: In hoechstens so viele Stuecke wird ein gebetteter Stab geteilt.
-TEILE_HOECHSTENS = 64
+#: In hoechstens so viele Stuecke wird ein gebetteter Stab geteilt: so
+#: viele, wie die Regel des gebetteten Stabs bis β·L = 32 verlangt.
+TEILE_HOECHSTENS = round(32 / st.TEILUNG)
 
 #: Was an einem Knoten steht, dessen Drehung gestrichen ist.
 UNBESTIMMT = "Verdrehung nicht bestimmbar, da keine Steifigkeit"
@@ -457,12 +456,13 @@ class _Rechnung:
                     stellen.append((t, self._ort(k.name)))
             stellen.sort(key=lambda e: e[0])
             k_y, k_z, k_x = stab_.quer_y.feder, stab_.quer_z.feder, stab_.laengs.feder
-            # Wie schnell die Biegelinie auf der Bettung abklingt, je Richtung.
-            abklingen = [(k / (4.0 * EI)) ** 0.25 for k, EI in ((k_y, stab_.EI_z), (k_z, stab_.EI_y))
-                         if k > 0.0] + ([math.sqrt(k_x / stab_.EA)] if k_x > 0.0 else [])
+            # Wie schnell die Biegelinie auf der Bettung abklingt -- am schnellsten.
+            schritt = st.schritt(max(st.abklingen_quer(k_y, stab_.EI_z),
+                                     st.abklingen_quer(k_z, stab_.EI_y),
+                                     st.abklingen_laengs(k_x, stab_.EA)))
             nummer = 0
             for (x0, o0), (x1, o1) in zip(stellen, stellen[1:]):
-                teile = max([1] + [math.ceil(2.0 * beta * (x1 - x0)) for beta in abklingen])
+                teile = st.stuecke(x1 - x0, schritt)
                 if teile > TEILE_HOECHSTENS:
                     self._melden(f"{stab_.name}: die Bettung ist so steif, dass {teile} Stücke "
                                  f"nötig wären; gerechnet mit {TEILE_HOECHSTENS}. Die Biegelinie "

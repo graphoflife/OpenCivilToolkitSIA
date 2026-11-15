@@ -1,5 +1,5 @@
 ---
-erzeugt: 7db2fe824cbd
+erzeugt: afa085b272d9
 art: modul
 tags: [modul]
 ---
@@ -243,7 +243,6 @@ Je Kombination die Werte am Kopf und die grössten über die Tiefe.
 - `GAMMA_E = 1.5` – Der Widerstandsbeiwert des Verformungsmoduls, wo eine zu kleine Steifigkeit zum Versagen führt -- der kleinste, den die Norm zulässt.
 - `GAMMA_E_REFERENZ = 'SIA 267:2013, 5.3.2.5'`
 - `PROBE = 1000000.0` – Die Probelast am Kopf, an der die Federn abgelesen werden, in N und Nm.
-- `SCHRITT_LAMBDA = 0.2` – So lang ist ein Element höchstens, gemessen an der elastischen Länge 1/λ.
 - `FEDERN = (('k_v', 'k_v', MN_PRO_M, 0, 'Längsfeder auf Druck', 'N/w am Kopf, mi…` – Die Federn am Kopf, als Kennzahlen: Kurzname, Zeichen, Einheit, Stellen, Beschriftung, Erklärung. Quer zwei Stellen: ein Mikropfahl ist dort rund tausendmal weicher als ein Bohrpfahl, seine Drehfeder etwa 0.15 MNm/rad.
 
 ## Braucht

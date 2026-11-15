@@ -13,9 +13,12 @@ import unittest
 
 from opencivil.core.protokoll import HinweisBlock
 from opencivil.pfahl import buch
-from opencivil.pfahl.bettung import Strecke, knoten, laengs, quer
+from opencivil.pfahl.bettung import SCHRITT, Strecke, elementlaenge, knoten, laengs, quer
 from opencivil.pfahl.steifigkeit import GAMMA_E, Pfahlsteifigkeit
 from opencivil.projekt import PfahlEintrag, Projekt
+from opencivil.stabwerk import system as kern
+from opencivil.stabwerk.art import EBENE
+from opencivil.stabwerk.modell import FEST, Knoten, Lager, Lastfall, Stab, System, feder
 from opencivil.web import dienst
 from opencivil.web.api import katalog
 
@@ -99,6 +102,23 @@ class TestGebetteterStab(unittest.TestCase):
         for zi, yi, q in zip(frei.z, frei.y, frei.q):
             if zi <= 2.0:
                 self.assertAlmostEqual(q, k * zi / 2.0 * yi, delta=1e-9 * k * frei.y[0])
+
+    def test_geteilt_wie_im_balkensystem(self):
+        """
+        Ein Mikropfahl in dichtem Boden, 1/λ = 0.3 m: der Pfahl teilt ihn wie
+        das Balkensystem einen gebetteten Stab, feiner als alle 0.1 m.
+        """
+        EI, EA, k, L = 1e5, 1e9, 50e6, 3.0
+        strecken = [Strecke(0.0, L, 0.0, (k, k))]
+        schritt = elementlaenge(strecken, EA, EI)
+        self.assertLess(schritt, SCHRITT)
+        s = System(knoten=[Knoten("K1", 0, 0), Knoten("K2", L, 0)],
+                   staebe=[Stab("L1", "K1", "K2", EA=EA, EI=EI, quer=feder(k))],
+                   lager=[Lager("A1", "K1", x=FEST)], lastfaelle=[Lastfall("LF", [])])
+        innen = [o for o in kern.rechnen(s, EBENE).orte.values() if o.stab == "L1"]
+        self.assertEqual(len(knoten(strecken, schritt)), len(innen) + 2)
+        # In weichem Boden genügt es, alle 0.1 m zu lesen.
+        self.assertEqual(elementlaenge([Strecke(0.0, L, 1e6, (1e6, 1e6))], EA, 1e9), SCHRITT)
 
     def test_knoten_ohne_rundungsfehler(self):
         """Eine Strecke von 0.1 m gibt bei Δz = 0.1 m ein Element, nicht zwei."""
