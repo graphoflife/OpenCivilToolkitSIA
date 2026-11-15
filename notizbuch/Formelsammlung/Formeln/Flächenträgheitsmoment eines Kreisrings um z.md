@@ -1,5 +1,5 @@
 ---
-erzeugt: ed3f2081c614
+erzeugt: e6de088ae04b
 art: formel
 tags: [formel]
 ---
@@ -28,7 +28,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.stabwerk.profilformen]]
+- [[opencivil.stabwerk.querschnitte#_wie_um_y|_wie_um_y]]
 
 ## Themen
 
@@ -41,3 +41,5 @@ $$
 Ein Kreisring hat keine starke und keine schwache Achse: um jede Achse
 durch die Mitte ist das Trägheitsmoment dasselbe. Darum ist $I_z = I_y$,
 und $I_y$ rechnet wie beim [[Flächenträgheitsmoment eines Kreisrings]].
+Das Rundrohr der Stahlprofile (ROR) ist ein solcher Kreisring und
+rechnet ebenso, nur in cm⁴.

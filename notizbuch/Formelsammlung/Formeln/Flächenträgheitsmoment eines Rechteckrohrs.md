@@ -1,15 +1,15 @@
 ---
-erzeugt: 58c30a9092cd
+erzeugt: 7abbc2d2747a
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «Flächenträgheitsmoment, «Hohlprofil» (Rechteckrohr)»*
+*In der Herleitung: «Flächenträgheitsmoment um y, «Hohlprofil» (Rechteckrohr)»*
 
 $$
-I_{\text{Q4}} = \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12}
+I_{y} = \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12}
 $$
 
 ## Grössen
@@ -26,11 +26,15 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
 \begin{aligned}
-  I_{\text{Q4}} &= \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12} \\
+  I_{y,\text{Q4}} &= \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12} \\
   &= \frac{200\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3} - \left(200\,\mathrm{mm} - 2 \cdot 12.5\,\mathrm{mm}\right) \cdot \left(300\,\mathrm{mm} - 2 \cdot 12.5\,\mathrm{mm}\right)^{3}}{12} \\
   &= 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}
 $$
+
+## Gebraucht von
+
+- [[Biegesteifigkeit]]
 
 ## Im Code
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: a6cb7d630363
+erzeugt: 05577c438d54
 art: thema
 tags: [thema]
 ---
@@ -46,7 +46,7 @@ Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Be
 32. [[Fläche eines kaltgefertigten Rechteckrohrs]]
 33. [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]]
 34. [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]]
-35. [[Flächenträgheitsmoment eines Rundrohrs um z]]
+35. [[Flächenträgheitsmoment eines Kreisrings um z]]
 36. [[Äquivalenter E-Modul eines Stabs]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

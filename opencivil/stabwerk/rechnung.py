@@ -269,10 +269,10 @@ class Balkensystem(Rechenobjekt):
         index = len(self.querschnitte) > 1
         for q in self.querschnitte:
             if not q.fehler:
-                berechnungen, A, I = q.flaechenwerte(self._def, self.abschnitt(QUERSCHNITTE),
-                                                     q.kennung if index else "")
+                berechnungen, werte = q.flaechenwerte(self._def, self.abschnitt(QUERSCHNITTE),
+                                                      q.kennung if index else "")
                 self.berechnungen += berechnungen
-                self.flaechen[q.kennung] = (A, I)
+                self.flaechen[q.kennung] = (werte["A"], werte["I"])
                 if q.modulfrage is not None:
                     berechnungen, E, suche = q.modulfrage.einbauen(
                         self._def, wo=f"{q.kennung}.", index=q.kennung if index else "",

@@ -1,15 +1,15 @@
 ---
-erzeugt: 27a0a1016289
+erzeugt: 38c623c9756d
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «Flächenträgheitsmoment, «Stütze 300×300» (Rechteck)»*
+*In der Herleitung: «Flächenträgheitsmoment um y, «Stütze 300×300» (Rechteck)»*
 
 $$
-I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
+I_{y} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
 $$
 
 ## Grössen
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 675\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_{y,\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 675\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 ## Gebraucht von

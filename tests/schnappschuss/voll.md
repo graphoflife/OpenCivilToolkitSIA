@@ -15927,10 +15927,10 @@ $$
 A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}} = 300\,\mathrm{mm} \cdot 500\,\mathrm{mm} = 150000\,\mathrm{mm}^{2}
 $$
 
-**Flächenträgheitsmoment, «Balken 300×500» (Rechteck)**
+**Flächenträgheitsmoment um y, «Balken 300×500» (Rechteck)**
 
 $$
-I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(500\,\mathrm{mm}\right)^{3}}{12} = 3125\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_{y,\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(500\,\mathrm{mm}\right)^{3}}{12} = 3125\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 **Querschnittsfläche, «Rundstütze» (Kreis)**
@@ -15939,10 +15939,10 @@ $$
 A_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{2}}{4} = \frac{\pi \cdot \left(400\,\mathrm{mm}\right)^{2}}{4} = 125664\,\mathrm{mm}^{2}
 $$
 
-**Flächenträgheitsmoment, «Rundstütze» (Kreis)**
+**Flächenträgheitsmoment um y, «Rundstütze» (Kreis)**
 
 $$
-I_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64} = \frac{\pi \cdot \left(400\,\mathrm{mm}\right)^{4}}{64} = 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_{y,\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64} = \frac{\pi \cdot \left(400\,\mathrm{mm}\right)^{4}}{64} = 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 **Querschnittsfläche, «Rohr» (Kreisring)**
@@ -15955,11 +15955,11 @@ $$
 \end{aligned}
 $$
 
-**Flächenträgheitsmoment, «Rohr» (Kreisring)**
+**Flächenträgheitsmoment um y, «Rohr» (Kreisring)**
 
 $$
 \begin{aligned}
-  I_{\text{Q3}} &= \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{4} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{4}\right)}{64} \\
+  I_{y,\text{Q3}} &= \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{4} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{4}\right)}{64} \\
   &= \frac{\pi \cdot \left(\left(168.3\,\mathrm{mm}\right)^{4} - \left(168.3\,\mathrm{mm} - 2 \cdot 10\,\mathrm{mm}\right)^{4}\right)}{64} \\
   &= 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}
@@ -15975,11 +15975,11 @@ $$
 \end{aligned}
 $$
 
-**Flächenträgheitsmoment, «Hohlprofil» (Rechteckrohr)**
+**Flächenträgheitsmoment um y, «Hohlprofil» (Rechteckrohr)**
 
 $$
 \begin{aligned}
-  I_{\text{Q4}} &= \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12} \\
+  I_{y,\text{Q4}} &= \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12} \\
   &= \frac{200\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3} - \left(200\,\mathrm{mm} - 2 \cdot 12.5\,\mathrm{mm}\right) \cdot \left(300\,\mathrm{mm} - 2 \cdot 12.5\,\mathrm{mm}\right)^{3}}{12} \\
   &= 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}
@@ -16005,11 +16005,11 @@ $$
 \end{aligned}
 $$
 
-**Flächenträgheitsmoment, «Plattenbalken» (T-Querschnitt)**
+**Flächenträgheitsmoment um y, «Plattenbalken» (T-Querschnitt)**
 
 $$
 \begin{aligned}
-  I_{\text{Q5}} &= \frac{b_{\text{Q5}} \cdot \left(h_{f,\text{Q5}}\right)^{3}}{12} + b_{\text{Q5}} \cdot h_{f,\text{Q5}} \cdot \left(z_{S,\text{Q5}} - \frac{h_{f,\text{Q5}}}{2}\right)^{2} + \frac{b_{w,\text{Q5}} \cdot \left(h_{\text{Q5}} - h_{f,\text{Q5}}\right)^{3}}{12} + b_{w,\text{Q5}} \cdot \left(h_{\text{Q5}} - h_{f,\text{Q5}}\right) \cdot \left(\frac{h_{\text{Q5}} + h_{f,\text{Q5}}}{2} - z_{S,\text{Q5}}\right)^{2} \\
+  I_{y,\text{Q5}} &= \frac{b_{\text{Q5}} \cdot \left(h_{f,\text{Q5}}\right)^{3}}{12} + b_{\text{Q5}} \cdot h_{f,\text{Q5}} \cdot \left(z_{S,\text{Q5}} - \frac{h_{f,\text{Q5}}}{2}\right)^{2} + \frac{b_{w,\text{Q5}} \cdot \left(h_{\text{Q5}} - h_{f,\text{Q5}}\right)^{3}}{12} + b_{w,\text{Q5}} \cdot \left(h_{\text{Q5}} - h_{f,\text{Q5}}\right) \cdot \left(\frac{h_{\text{Q5}} + h_{f,\text{Q5}}}{2} - z_{S,\text{Q5}}\right)^{2} \\
   &= \frac{1200\,\mathrm{mm} \cdot \left(200\,\mathrm{mm}\right)^{3}}{12} + 1200\,\mathrm{mm} \cdot 200\,\mathrm{mm} \cdot \left(200\,\mathrm{mm} - \frac{200\,\mathrm{mm}}{2}\right)^{2} + \frac{300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm} - 200\,\mathrm{mm}\right)^{3}}{12} + 300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm} - 200\,\mathrm{mm}\right) \cdot \left(\frac{600\,\mathrm{mm} + 200\,\mathrm{mm}}{2} - 200\,\mathrm{mm}\right)^{2} \\
   &= 9600\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}
@@ -16025,11 +16025,11 @@ $$
 \end{aligned}
 $$
 
-**Flächenträgheitsmoment, «Walzprofil» (Doppel-T)**
+**Flächenträgheitsmoment um y, «Walzprofil» (Doppel-T)**
 
 $$
 \begin{aligned}
-  I_{\text{Q6}} &= \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w,\text{Q6}}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f,\text{Q6}}\right)^{3}}{12} \\
+  I_{y,\text{Q6}} &= \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w,\text{Q6}}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f,\text{Q6}}\right)^{3}}{12} \\
   &= \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3} - \left(300\,\mathrm{mm} - 11\,\mathrm{mm}\right) \cdot \left(300\,\mathrm{mm} - 2 \cdot 19\,\mathrm{mm}\right)^{3}}{12} \\
   &= 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}
@@ -16041,11 +16041,11 @@ $$
 A_{\text{Q7}} = \frac{\left(b_{o,\text{Q7}} + b_{u,\text{Q7}}\right) \cdot h_{\text{Q7}}}{2} = \frac{\left(600\,\mathrm{mm} + 400\,\mathrm{mm}\right) \cdot 500\,\mathrm{mm}}{2} = 250000\,\mathrm{mm}^{2}
 $$
 
-**Flächenträgheitsmoment, «Fundamentbalken» (Trapez)**
+**Flächenträgheitsmoment um y, «Fundamentbalken» (Trapez)**
 
 $$
 \begin{aligned}
-  I_{\text{Q7}} &= \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o,\text{Q7}}\right)^{2} + 4 \cdot b_{o,\text{Q7}} \cdot b_{u,\text{Q7}} + \left(b_{u,\text{Q7}}\right)^{2}\right)}{36 \cdot \left(b_{o,\text{Q7}} + b_{u,\text{Q7}}\right)} \\
+  I_{y,\text{Q7}} &= \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o,\text{Q7}}\right)^{2} + 4 \cdot b_{o,\text{Q7}} \cdot b_{u,\text{Q7}} + \left(b_{u,\text{Q7}}\right)^{2}\right)}{36 \cdot \left(b_{o,\text{Q7}} + b_{u,\text{Q7}}\right)} \\
   &= \frac{\left(500\,\mathrm{mm}\right)^{3} \cdot \left(\left(600\,\mathrm{mm}\right)^{2} + 4 \cdot 600\,\mathrm{mm} \cdot 400\,\mathrm{mm} + \left(400\,\mathrm{mm}\right)^{2}\right)}{36 \cdot \left(600\,\mathrm{mm} + 400\,\mathrm{mm}\right)} \\
   &= 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}
@@ -16069,10 +16069,10 @@ $$
 A_{\text{Q9}} = b \cdot h = 1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} = 300000\,\mathrm{mm}^{2}
 $$
 
-**Flächenträgheitsmoment, «Deckenstreifen» (Platte «Decke»)**
+**Flächenträgheitsmoment um y, «Deckenstreifen» (Platte «Decke»)**
 
 $$
-I_{\text{Q9}} = \frac{b \cdot \left(h\right)^{3}}{12} = \frac{1000\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 2250\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_{y,\text{Q9}} = \frac{b \cdot \left(h\right)^{3}}{12} = \frac{1000\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 2250\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 **Querschnittsfläche, «Kasten» (Bruttoquerschnitt der Querschnittsanalyse «Kastenträger»)**
@@ -16418,7 +16418,7 @@ $$
 **Biegesteifigkeit, «Balken 300×500» aus C30/37**
 
 $$
-EI_{\text{Q1,C30/37}} = E_{cm} \cdot I_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3125\,\cdot 10^{6}\,\mathrm{mm}^{4} = 105062\,\mathrm{kNm}^{2}
+EI_{\text{Q1,C30/37}} = E_{cm} \cdot I_{y,\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3125\,\cdot 10^{6}\,\mathrm{mm}^{4} = 105062\,\mathrm{kNm}^{2}
 $$
 
 **Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)**
@@ -16442,7 +16442,7 @@ $$
 **Biegesteifigkeit, «Rundstütze» aus C30/37**
 
 $$
-EI_{\text{Q2,C30/37}} = E_{cm} \cdot I_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 42248\,\mathrm{kNm}^{2}
+EI_{\text{Q2,C30/37}} = E_{cm} \cdot I_{y,\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 42248\,\mathrm{kNm}^{2}
 $$
 
 **Eigengewicht, «Rundstütze» aus C30/37**
@@ -16460,7 +16460,7 @@ $$
 **Biegesteifigkeit, «Plattenbalken» aus C30/37**
 
 $$
-EI_{\text{Q5,C30/37}} = E_{cm} \cdot I_{\text{Q5}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 9600\,\cdot 10^{6}\,\mathrm{mm}^{4} = 322750\,\mathrm{kNm}^{2}
+EI_{\text{Q5,C30/37}} = E_{cm} \cdot I_{y,\text{Q5}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 9600\,\cdot 10^{6}\,\mathrm{mm}^{4} = 322750\,\mathrm{kNm}^{2}
 $$
 
 **Eigengewicht, «Plattenbalken» aus C30/37**
@@ -16478,7 +16478,7 @@ $$
 **Biegesteifigkeit, «Rohr» aus S355**
 
 $$
-EI_{\text{Q3,S355}} = E_a \cdot I_{\text{Q3}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3284\,\mathrm{kNm}^{2}
+EI_{\text{Q3,S355}} = E_a \cdot I_{y,\text{Q3}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3284\,\mathrm{kNm}^{2}
 $$
 
 **Eigengewicht, «Rohr» aus S355**
@@ -16525,7 +16525,7 @@ $$
 
 $$
 \begin{aligned}
-  EI_{\text{Q7,Fundamentbeton}} &= E_{\text{Fundamentbeton}} \cdot I_{\text{Q7}} \\
+  EI_{\text{Q7,Fundamentbeton}} &= E_{\text{Fundamentbeton}} \cdot I_{y,\text{Q7}} \\
   &= 15000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4} \\
   &= 77083\,\mathrm{kNm}^{2}
 \end{aligned}
@@ -16556,7 +16556,7 @@ $$
 **Biegesteifigkeit, «Hohlprofil» aus S355**
 
 $$
-EI_{\text{Q4,S355}} = E_a \cdot I_{\text{Q4}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 30810\,\mathrm{kNm}^{2}
+EI_{\text{Q4,S355}} = E_a \cdot I_{y,\text{Q4}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 30810\,\mathrm{kNm}^{2}
 $$
 
 **Eigengewicht, «Hohlprofil» aus S355**
@@ -16952,10 +16952,10 @@ $$
 A = b \cdot h = 300\,\mathrm{mm} \cdot 600\,\mathrm{mm} = 180000\,\mathrm{mm}^{2}
 $$
 
-**Flächenträgheitsmoment, «Rechteck» (Rechteck)**
+**Flächenträgheitsmoment um y, «Rechteck» (Rechteck)**
 
 $$
-I = \frac{b \cdot \left(h\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm}\right)^{3}}{12} = 5400\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_y = \frac{b \cdot \left(h\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm}\right)^{3}}{12} = 5400\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 **Dehnsteifigkeit, «Rechteck» aus C30/37**
@@ -16967,7 +16967,7 @@ $$
 **Biegesteifigkeit, «Rechteck» aus C30/37**
 
 $$
-EI = E_{cm} \cdot I = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5400\,\cdot 10^{6}\,\mathrm{mm}^{4} = 181547\,\mathrm{kNm}^{2}
+EI = E_{cm} \cdot I_y = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5400\,\cdot 10^{6}\,\mathrm{mm}^{4} = 181547\,\mathrm{kNm}^{2}
 $$
 
 > **Annahme:** Steifigkeit: E\_cm des Betons, E\_a des Baustahls oder das E eines eigenen Materials; bei einem Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), aber ohne die Bewehrung und ohne Schubverformung. Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2). Schlanke Druckglieder sind nach 4.3.7 nachzuweisen; eine Schiefstellung nach 4.1.3.2.3, (17) lässt sich als waagrechte Last ansetzen.
@@ -19597,10 +19597,10 @@ $$
 A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}}
 $$
 
-**Flächenträgheitsmoment, «Balken 300×500» (Rechteck)**
+**Flächenträgheitsmoment um y, «Balken 300×500» (Rechteck)**
 
 $$
-I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
+I_{y} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
 $$
 
 **Querschnittsfläche, «Rundstütze» (Kreis)**
@@ -19609,10 +19609,10 @@ $$
 A_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{2}}{4}
 $$
 
-**Flächenträgheitsmoment, «Rundstütze» (Kreis)**
+**Flächenträgheitsmoment um y, «Rundstütze» (Kreis)**
 
 $$
-I_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64}
+I_{y} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64}
 $$
 
 **Querschnittsfläche, «Rohr» (Kreisring)**
@@ -19621,10 +19621,10 @@ $$
 A_{\text{Q3}} = \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{2} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{2}\right)}{4}
 $$
 
-**Flächenträgheitsmoment, «Rohr» (Kreisring)**
+**Flächenträgheitsmoment um y, «Rohr» (Kreisring)**
 
 $$
-I_{\text{Q3}} = \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{4} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{4}\right)}{64}
+I_{y} = \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{4} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{4}\right)}{64}
 $$
 
 **Querschnittsfläche, «Hohlprofil» (Rechteckrohr)**
@@ -19633,10 +19633,10 @@ $$
 A_{\text{Q4}} = b_{\text{Q4}} \cdot h_{\text{Q4}} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)
 $$
 
-**Flächenträgheitsmoment, «Hohlprofil» (Rechteckrohr)**
+**Flächenträgheitsmoment um y, «Hohlprofil» (Rechteckrohr)**
 
 $$
-I_{\text{Q4}} = \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12}
+I_{y} = \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12}
 $$
 
 **Querschnittsfläche, «Plattenbalken» (T-Querschnitt)**
@@ -19651,10 +19651,10 @@ $$
 z_{S} = \frac{b_{\text{Q5}} \cdot \left(h_{f}\right)^{2} / 2 + b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right) \cdot \left(h_{\text{Q5}} + h_{f}\right) / 2}{A_{\text{Q5}}}
 $$
 
-**Flächenträgheitsmoment, «Plattenbalken» (T-Querschnitt)**
+**Flächenträgheitsmoment um y, «Plattenbalken» (T-Querschnitt)**
 
 $$
-I_{\text{Q5}} = \frac{b_{\text{Q5}} \cdot \left(h_{f}\right)^{3}}{12} + b_{\text{Q5}} \cdot h_{f} \cdot \left(z_{S} - \frac{h_{f}}{2}\right)^{2} + \frac{b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right)^{3}}{12} + b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right) \cdot \left(\frac{h_{\text{Q5}} + h_{f}}{2} - z_{S}\right)^{2}
+I_{y} = \frac{b_{\text{Q5}} \cdot \left(h_{f}\right)^{3}}{12} + b_{\text{Q5}} \cdot h_{f} \cdot \left(z_{S} - \frac{h_{f}}{2}\right)^{2} + \frac{b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right)^{3}}{12} + b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right) \cdot \left(\frac{h_{\text{Q5}} + h_{f}}{2} - z_{S}\right)^{2}
 $$
 
 **Querschnittsfläche, «Walzprofil» (Doppel-T)**
@@ -19663,10 +19663,10 @@ $$
 A_{\text{Q6}} = 2 \cdot b_{\text{Q6}} \cdot t_{f} + t_{w} \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f}\right)
 $$
 
-**Flächenträgheitsmoment, «Walzprofil» (Doppel-T)**
+**Flächenträgheitsmoment um y, «Walzprofil» (Doppel-T)**
 
 $$
-I_{\text{Q6}} = \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f}\right)^{3}}{12}
+I_{y} = \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f}\right)^{3}}{12}
 $$
 
 **Querschnittsfläche, «Fundamentbalken» (Trapez)**
@@ -19675,10 +19675,10 @@ $$
 A_{\text{Q7}} = \frac{\left(b_{o} + b_{u}\right) \cdot h_{\text{Q7}}}{2}
 $$
 
-**Flächenträgheitsmoment, «Fundamentbalken» (Trapez)**
+**Flächenträgheitsmoment um y, «Fundamentbalken» (Trapez)**
 
 $$
-I_{\text{Q7}} = \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o}\right)^{2} + 4 \cdot b_{o} \cdot b_{u} + \left(b_{u}\right)^{2}\right)}{36 \cdot \left(b_{o} + b_{u}\right)}
+I_{y} = \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o}\right)^{2} + 4 \cdot b_{o} \cdot b_{u} + \left(b_{u}\right)^{2}\right)}{36 \cdot \left(b_{o} + b_{u}\right)}
 $$
 
 **Querschnittsfläche, «Träger» (HEB 300, um y, die starke Achse)**
@@ -19798,7 +19798,7 @@ $$
 **Biegesteifigkeit, «Balken 300×500» aus C30/37**
 
 $$
-EI_{\text{Q1,C30/37}} = E_{cm} \cdot I_{\text{Q1}}
+EI_{\text{Q1,C30/37}} = E_{cm} \cdot I_{y}
 $$
 
 **Eigengewicht, «Balken 300×500» aus C30/37**
@@ -20833,7 +20833,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | E-Modul, Fundamentbeton | $E_{\text{Fundamentbeton}}$ | $15000$ | N/mm² | Eingabe |
 | Dichte, Fundamentbeton | $\rho_{\text{Fundamentbeton}}$ | $2500$ | kg/m³ | Eingabe |
 | Querschnittsfläche, Balken 300×500 | $A_{\text{Q1}}$ | $150000$ | mm² | berechnet |
-| Flächenträgheitsmoment, Balken 300×500 | $I_{\text{Q1}}$ | $3125$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Balken 300×500 | $I_{y,\text{Q1}}$ | $3125$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Balken 300×500, C30/37 | $EA_{\text{Q1,C30/37}}$ | $5043$ | MN | berechnet |
 | Biegesteifigkeit, Balken 300×500, C30/37 | $EI_{\text{Q1,C30/37}}$ | $105062$ | kNm² | berechnet |
 | Eigengewicht je Meter, Balken 300×500, C30/37 | $g_{k,\text{Q1,C30/37}}$ | $3.75$ | kN/m | berechnet |
@@ -20926,7 +20926,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Radius aussen, RRK 200 x 100 x 8 um z | $r_{o,\text{Q19}}$ | $20$ | mm | Vorgabe |
 | Wanddicke, RRK 200 x 100 x 8 um z | $t_{\text{Q19}}$ | $8$ | mm | Vorgabe |
 | Querschnittsfläche, Rundstütze | $A_{\text{Q2}}$ | $125664$ | mm² | berechnet |
-| Flächenträgheitsmoment, Rundstütze | $I_{\text{Q2}}$ | $1256.64$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Rundstütze | $I_{y,\text{Q2}}$ | $1256.64$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Rundstütze, C30/37 | $EA_{\text{Q2,C30/37}}$ | $4225$ | MN | berechnet |
 | Biegesteifigkeit, Rundstütze, C30/37 | $EI_{\text{Q2,C30/37}}$ | $42248$ | kNm² | berechnet |
 | Eigengewicht je Meter, Rundstütze, C30/37 | $g_{k,\text{Q2,C30/37}}$ | $3.14$ | kN/m | berechnet |
@@ -20938,13 +20938,13 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Wanddicke, Rundrohr | $t_{\text{Q20}}$ | $8$ | mm | Vorgabe |
 | Querschnittsfläche, Rohr | $A_{\text{Q3}}$ | $4973$ | mm² | berechnet |
 | Aussendurchmesser, Rohr | $D_{\text{Q3}}$ | $168.3$ | mm | Vorgabe |
-| Flächenträgheitsmoment, Rohr | $I_{\text{Q3}}$ | $15.64$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Rohr | $I_{y,\text{Q3}}$ | $15.64$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Rohr, S355 | $EA_{\text{Q3,S355}}$ | $1044$ | MN | berechnet |
 | Biegesteifigkeit, Rohr, S355 | $EI_{\text{Q3,S355}}$ | $3284$ | kNm² | berechnet |
 | Eigengewicht je Meter, Rohr, S355 | $g_{k,\text{Q3,S355}}$ | $0.39$ | kN/m | berechnet |
 | Wanddicke, Rohr | $t_{\text{Q3}}$ | $10$ | mm | Vorgabe |
 | Querschnittsfläche, Hohlprofil | $A_{\text{Q4}}$ | $11875$ | mm² | berechnet |
-| Flächenträgheitsmoment, Hohlprofil | $I_{\text{Q4}}$ | $146.71$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Hohlprofil | $I_{y,\text{Q4}}$ | $146.71$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Hohlprofil, S355 | $EA_{\text{Q4,S355}}$ | $2494$ | MN | berechnet |
 | Biegesteifigkeit, Hohlprofil, S355 | $EI_{\text{Q4,S355}}$ | $30810$ | kNm² | berechnet |
 | Eigengewicht je Meter, Hohlprofil, S355 | $g_{k,\text{Q4,S355}}$ | $0.93$ | kN/m | berechnet |
@@ -20952,7 +20952,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Höhe, Hohlprofil | $h_{\text{Q4}}$ | $300$ | mm | Vorgabe |
 | Wanddicke, Hohlprofil | $t_{\text{Q4}}$ | $12.5$ | mm | Vorgabe |
 | Querschnittsfläche, Plattenbalken | $A_{\text{Q5}}$ | $360000$ | mm² | berechnet |
-| Flächenträgheitsmoment, Plattenbalken | $I_{\text{Q5}}$ | $9600$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Plattenbalken | $I_{y,\text{Q5}}$ | $9600$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Plattenbalken, C30/37 | $EA_{\text{Q5,C30/37}}$ | $12103$ | MN | berechnet |
 | Biegesteifigkeit, Plattenbalken, C30/37 | $EI_{\text{Q5,C30/37}}$ | $322750$ | kNm² | berechnet |
 | Eigengewicht je Meter, Plattenbalken, C30/37 | $g_{k,\text{Q5,C30/37}}$ | $9$ | kN/m | berechnet |
@@ -20962,13 +20962,13 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Flanschdicke, Plattenbalken | $h_{f,\text{Q5}}$ | $200$ | mm | Vorgabe |
 | Abstand des Schwerpunkts vom oberen Rand, Plattenbalken | $z_{S,\text{Q5}}$ | $200$ | mm | berechnet |
 | Querschnittsfläche, Walzprofil | $A_{\text{Q6}}$ | $14282$ | mm² | berechnet |
-| Flächenträgheitsmoment, Walzprofil | $I_{\text{Q6}}$ | $241.87$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Walzprofil | $I_{y,\text{Q6}}$ | $241.87$ | ·10⁶ mm⁴ | berechnet |
 | Flanschbreite, Walzprofil | $b_{\text{Q6}}$ | $300$ | mm | Vorgabe |
 | Höhe, Walzprofil | $h_{\text{Q6}}$ | $300$ | mm | Vorgabe |
 | Flanschdicke, Walzprofil | $t_{f,\text{Q6}}$ | $19$ | mm | Vorgabe |
 | Stegdicke, Walzprofil | $t_{w,\text{Q6}}$ | $11$ | mm | Vorgabe |
 | Querschnittsfläche, Fundamentbalken | $A_{\text{Q7}}$ | $250000$ | mm² | berechnet |
-| Flächenträgheitsmoment, Fundamentbalken | $I_{\text{Q7}}$ | $5138.89$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Fundamentbalken | $I_{y,\text{Q7}}$ | $5138.89$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Fundamentbalken, Fundamentbeton | $EA_{\text{Q7,Fundamentbeton}}$ | $3750$ | MN | berechnet |
 | Biegesteifigkeit, Fundamentbalken, Fundamentbeton | $EI_{\text{Q7,Fundamentbeton}}$ | $77083$ | kNm² | berechnet |
 | Eigengewicht je Meter, Fundamentbalken, Fundamentbeton | $g_{k,\text{Q7,Fundamentbeton}}$ | $6.25$ | kN/m | berechnet |
@@ -20978,12 +20978,12 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Querschnittsfläche, Von Hand | $A_{\text{Q8}}$ | $15000$ | mm² | Eingabe |
 | Flächenträgheitsmoment, Von Hand | $I_{\text{Q8}}$ | $120$ | ·10⁶ mm⁴ | Eingabe |
 | Querschnittsfläche, Deckenstreifen | $A_{\text{Q9}}$ | $300000$ | mm² | berechnet |
-| Flächenträgheitsmoment, Deckenstreifen | $I_{\text{Q9}}$ | $2250$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Deckenstreifen | $I_{y,\text{Q9}}$ | $2250$ | ·10⁶ mm⁴ | berechnet |
 | Moment für E\_eq, Deckenstreifen | $M_{\text{Q9}}$ | $20$ | kNm | Eingabe |
 | Normalkraft für E\_eq, Deckenstreifen | $N_{\text{Q9}}$ | $0$ | kN | Eingabe |
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Querschnittsfläche, Rechteck | $A$ | $180000$ | mm² | berechnet |
-| Flächenträgheitsmoment, Rechteck | $I$ | $5400$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Rechteck | $I_y$ | $5400$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Rechteck, C30/37 | $EA$ | $6052$ | MN | berechnet |
 | Biegesteifigkeit, Rechteck, C30/37 | $EI$ | $181547$ | kNm² | berechnet |
 | Breite, Rechteck | $b$ | $300$ | mm | Vorgabe |

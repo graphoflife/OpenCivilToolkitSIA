@@ -7,6 +7,34 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Stabquerschnitte: I_z und I_T für jede Vorlage
+
+Jede Vorlage eines Stabquerschnitts rechnet jetzt auch das
+Trägheitsmoment um die senkrechte Achse (I_z) und das
+Torsionsträgheitsmoment (I_T), wie die Stahlprofile schon. Das Stabwerk im
+Raum braucht beide. Ein Rechteck 300 × 600 hat I_y = 5400·10⁶ mm⁴,
+I_z = 1350·10⁶ mm⁴ und I_T = 3708·10⁶ mm⁴. Im 2D-Balkensystem ändert sich
+keine Zahl, nur ein Zeichen: Was bisher «I = b·h³/12» hiess, heisst jetzt
+«I_y = b·h³/12», mit dem Titel «Flächenträgheitsmoment um y».
+
+Warum so:
+
+- Mit I_z daneben wäre ein blosses «I» zweideutig. Die Stahlprofile hiessen
+  schon I_y und I_z. Die Seiten in der Formelsammlung behalten ihren Namen,
+  damit die Theorie dort stehen bleibt; neu dazu kommen die Seiten «… um z».
+- Wie viel jeder Querschnitt dem Stab gibt, sagt jetzt das System: der
+  ebene Rahmen fragt nach A und I, der räumliche nach A, I_y, I_z und I_T
+  (`stabwerk/stabquerschnitt.py`). Gerechnet wird nur, was gefragt ist.
+- I_T ist nach Vorgabe (TODO). Rechteck, T und Doppel-T zerfallen in
+  Rechtecke mit der Näherung von Roark, die beim Rechteck die Tafel von
+  Timoshenko auf ein Prozent trifft. Die kürzere und die längere Seite
+  stehen als eigene Zeile in der Herleitung, mit min und max: so stimmt die
+  Formel auch für ein liegendes Rechteck.
+- Rechteckrohr und RRK rechnen I_T mit derselben Formel, nach Bredt, nur
+  mit anderem p_m und A_m. Das Rundrohr (ROR) ist ein Kreisring und nimmt
+  dessen Formeln, in cm⁴; die Seite «Flächenträgheitsmoment eines Rundrohrs
+  um z» heisst darum jetzt «… eines Kreisrings um z».
+
 ## 2026-11-15 · 3D-Balkensysteme: der Rechenkern
 
 Ein Stabwerk im Raum lässt sich rechnen, noch ohne Oberfläche: Knoten mit

@@ -35,11 +35,13 @@ Tabelle, damit sich vergleichen laesst.
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from typing import List, Mapping, Sequence, Tuple
 
-from opencivil.core.einheiten import CM2, CM4, EINHEITSLOS, MM, PROZENT, Groesse
-from opencivil.querschnitt.vorlagen import kreispunkte
-from opencivil.stabwerk.querschnitte import KREISRING, Kennformel, Mass, Stabvorlage
+from opencivil.core.einheiten import CM2, CM4, EINHEITSLOS, MIO_MM4, MM, MM2, PROZENT, Groesse
+from opencivil.stabwerk.querschnitte import (
+    EINS, KREISRING, ROHRTORSION, Kennformel, Mass, Stabvorlage,
+)
 
 Punkt = Tuple[float, float]
 
@@ -49,8 +51,6 @@ Punkt = Tuple[float, float]
 #: Traegheitsmoment um den eigenen Schwerpunkt 0.00755 r⁴
 #: (1/3 - π/16 - 1/(3(12 - 3π))) -- um beide Achsen dasselbe.
 ZWICKEL = (0.2146, 0.2234, 0.00755)
-
-_EINS = Groesse(1.0, EINHEITSLOS)
 
 #: Je Viertelkreis eines Umrisses so viele Ecken -- fuer das Bild genug.
 BOGENECKEN = 6
@@ -115,7 +115,7 @@ def _u_torsion(form: str, r: str) -> Tuple[Kennformel, Kennformel]:
               r"\left(@h - 2 \cdot @t_f\right) + 2 \cdot \left(0.07 + 0.075 \cdot "
               rf"\frac{{@{r}}}{{@t_f}}\right) \cdot \frac{{@t_w}}{{@t_f}} \cdot \left(@d_K\right)^{{4}}",
         lambda b, t_f, t_w, h, d_K, **k: (
-            2 / 3 * b * t_f ** 3 * (_EINS - 0.315 * t_f / b) + t_w ** 3 * (h - 2 * t_f) / 3
+            2 / 3 * b * t_f ** 3 * (EINS - 0.315 * t_f / b) + t_w ** 3 * (h - 2 * t_f) / 3
             + 2 * (Groesse(0.07, EINHEITSLOS) + 0.075 * k[r] / t_f) * t_w / t_f * d_K ** 4))
     return knoten, torsion
 
@@ -237,7 +237,7 @@ I_PROFIL = Stabvorlage(
                 r"\left(@t_w\right)^{3} + 2 \cdot \left(0.145 + 0.1 \cdot \frac{@r}{@t_f}\right) "
                 r"\cdot \frac{@t_w}{@t_f} \cdot \left(@d_K\right)^{4}",
             lambda b, t_f, h, t_w, r, d_K: (
-                2 / 3 * b * t_f ** 3 * (_EINS - 0.63 * t_f / b) + (h - 2 * t_f) * t_w ** 3 / 3
+                2 / 3 * b * t_f ** 3 * (EINS - 0.63 * t_f / b) + (h - 2 * t_f) * t_w ** 3 / 3
                 + 2 * (Groesse(0.145, EINHEITSLOS) + 0.1 * r / t_f) * t_w / t_f * d_K ** 4)),
     ),
     pruefung=lambda m: None,
@@ -370,38 +370,34 @@ RECHTECKROHR_KALT = Stabvorlage(
                    r"2 \cdot \left(@h + @b - 2 \cdot @t\right) - \left(@r_o + @r_i\right) \cdot "
                    r"\left(4 - \pi\right)",
                    lambda h, b, t, r_o, r_i: 2 * (h + b - 2 * t) - (r_o + r_i) * (4 - math.pi),
-                   "Umfang der Mittellinie eines Rechteckrohrs"),
+                   f"Umfang der Mittellinie eines {_RRK}"),
         Kennformel("A_m", "A_m", CM2, 2, "von der Mittellinie umschlossene Fläche",
                    r"\left(@h - @t\right) \cdot \left(@b - @t\right) - \left(\frac{@r_o + @r_i}{2}"
                    r"\right)^{2} \cdot \left(4 - \pi\right)",
                    lambda h, t, b, r_o, r_i: (h - t) * (b - t) - ((r_o + r_i) / 2) ** 2 * (4 - math.pi),
-                   "Umschlossene Fläche eines Rechteckrohrs"),
-        _it("Rechteckrohrs", r"\frac{\left(@t\right)^{3} \cdot @p_m}{3} + \frac{4 \cdot \left(@A_m"
-                             r"\right)^{2} \cdot @t}{@p_m}",
-            lambda t, p_m, A_m: t ** 3 * p_m / 3 + 4 * A_m ** 2 * t / p_m),
+                   f"Umschlossene Fläche eines {_RRK}"),
+        # Dieselbe Formel wie beim Rechteckrohr der Vorlagen -- nur p_m und A_m
+        # haben hier runde Ecken. Darum dieselbe Seite.
+        _it("Rechteckrohrs", *ROHRTORSION),
     ),
     pruefung=lambda m: None,
     umriss=_rohr_umriss,
 )
 
-_KREISRING_A, _KREISRING_I = KREISRING.formeln
 
-#: Rundrohr -- ROR: aussen ``D``, Wand ``t``; Flaeche und I_y sind die des
-#: Kreisrings, mit derselben Seite im Notizbuch, nur in cm² und cm⁴.
+def _in_cm(f: Kennformel) -> Kennformel:
+    """Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Momente in cm⁴."""
+    return replace(f, einheit={MM2: CM2, MIO_MM4: CM4}.get(f.einheit, f.einheit), stellen=2)
+
+
+#: Rundrohr -- ROR: aussen ``D``, Wand ``t``; die Formeln und Seiten des
+#: Kreisrings, nur in cm² und cm⁴.
 RUNDROHR = Stabvorlage(
     schluessel="rundrohr", name="Rundrohr",
     masse=KREISRING.masse,
-    formeln=(
-        Kennformel("A", "A", CM2, 2, _KREISRING_A.beschreibung, _KREISRING_A.vorlage,
-                   _KREISRING_A.funktion, _KREISRING_A.name),
-        Kennformel("I_y", "I_y", CM4, 2, "Flächenträgheitsmoment um y", _KREISRING_I.vorlage,
-                   _KREISRING_I.funktion, _KREISRING_I.name),
-        _iz("Rundrohrs", "@I_y", lambda I_y: I_y),
-        _it("Rundrohrs", r"2 \cdot @I_y", lambda I_y: 2 * I_y),
-    ),
+    formeln=tuple(_in_cm(f) for f in KREISRING.formeln),
     pruefung=KREISRING.pruefung,
-    umriss=lambda m: [kreispunkte((m["D"] / 2, m["D"] / 2), m["D"] / 2),
-                      kreispunkte((m["D"] / 2, m["D"] / 2), m["D"] / 2 - m["t"])],
+    umriss=KREISRING.umriss,
 )
 
 PROFILFORMEN: Tuple[Stabvorlage, ...] = (I_PROFIL, U_PARALLEL, U_GENEIGT, RECHTECKROHR_KALT,

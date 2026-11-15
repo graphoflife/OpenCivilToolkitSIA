@@ -2706,10 +2706,10 @@ $$
 A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}} = 300\,\mathrm{mm} \cdot 300\,\mathrm{mm} = 90000\,\mathrm{mm}^{2}
 $$
 
-**Flächenträgheitsmoment, «Stütze 300×300» (Rechteck)**
+**Flächenträgheitsmoment um y, «Stütze 300×300» (Rechteck)**
 
 $$
-I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 675\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_{y,\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 675\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 **Querschnittsfläche, «Unterzug» (Bruttoquerschnitt der Querschnittsanalyse «Unterzug»)**
@@ -2733,7 +2733,7 @@ $$
 **Biegesteifigkeit, «Stütze 300×300» aus C30/37**
 
 $$
-EI_{\text{Q1}} = E_{cm} \cdot I_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 675\,\cdot 10^{6}\,\mathrm{mm}^{4} = 22693\,\mathrm{kNm}^{2}
+EI_{\text{Q1}} = E_{cm} \cdot I_{y,\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 675\,\cdot 10^{6}\,\mathrm{mm}^{4} = 22693\,\mathrm{kNm}^{2}
 $$
 
 **Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)**
@@ -4128,10 +4128,10 @@ $$
 A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}}
 $$
 
-**Flächenträgheitsmoment, «Stütze 300×300» (Rechteck)**
+**Flächenträgheitsmoment um y, «Stütze 300×300» (Rechteck)**
 
 $$
-I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
+I_{y} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
 $$
 
 **Dehnsteifigkeit, «Stütze 300×300» aus C30/37**
@@ -4143,7 +4143,7 @@ $$
 **Biegesteifigkeit, «Stütze 300×300» aus C30/37**
 
 $$
-EI_{\text{Q1}} = E_{cm} \cdot I_{\text{Q1}}
+EI_{\text{Q1}} = E_{cm} \cdot I_{y}
 $$
 
 **Eigengewicht, «Stütze 300×300» aus C30/37**
@@ -4370,7 +4370,7 @@ Alle geführten Nachweise sind erfüllt.
 | Bezeichnung | Symbol | Wert | Einheit | Herkunft |
 | :--- | :--- | ---: | :--- | :--- |
 | Querschnittsfläche, Stütze 300×300 | $A_{\text{Q1}}$ | $90000$ | mm² | berechnet |
-| Flächenträgheitsmoment, Stütze 300×300 | $I_{\text{Q1}}$ | $675$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Stütze 300×300 | $I_{y,\text{Q1}}$ | $675$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Stütze 300×300, C30/37 | $EA_{\text{Q1}}$ | $3026$ | MN | berechnet |
 | Biegesteifigkeit, Stütze 300×300, C30/37 | $EI_{\text{Q1}}$ | $22693$ | kNm² | berechnet |
 | Eigengewicht je Meter, Stütze 300×300, C30/37 | $g_{k,\text{Q1}}$ | $2.25$ | kN/m | berechnet |

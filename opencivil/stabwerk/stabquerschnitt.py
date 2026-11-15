@@ -3,17 +3,23 @@ opencivil/stabwerk/stabquerschnitt.py -- woher A und I eines Stabs kommen.
 
 VERANTWORTUNG:
 Ein Querschnitt der Staebe, aufgeloest: je Art eine Klasse, die ihre
-Berechnungen fuer ``A`` und ``I`` und ihren Umriss selbst traegt --
+Berechnungen fuer die Kennwerte des Stabs und ihren Umriss selbst traegt.
+Welche Kennwerte, sagt das System: der ebene Rahmen braucht ``A`` und ``I``
+(:data:`EBEN`), das Stabwerk im Raum ``A``, ``I_y``, ``I_z`` und ``I_T``
+(:data:`RAEUMLICH`). Die Arten --
 
 * nach Vorlage (:class:`NachVorlage`) -- die Formeln der Vorlage
   (:mod:`~opencivil.stabwerk.querschnitte`), die Masse als Vorgaben; ein
-  Stahlprofil ebenso, mit den Massen aus der Tabelle und ``I_y`` oder
-  ``I_z`` seiner Form als ``I`` (:mod:`~opencivil.stabwerk.profilformen`);
-* von Hand (:class:`VonHand`) -- ``A`` und ``I`` als Eingaben;
+  Stahlprofil ebenso, mit den Massen aus der Tabelle
+  (:mod:`~opencivil.stabwerk.profilformen`). Das ``I`` des ebenen Rahmens
+  ist ihr ``I_y`` -- bei einem Profil, das sich um z biegt, ihr ``I_z``;
+* von Hand (:class:`VonHand`) -- die Kennwerte als Eingaben;
 * aus einer Platte (:class:`AusPlatte`) -- die Formeln des Rechtecks mit
   ``b`` und ``h`` der Platte;
 * aus einer Querschnittsanalyse (:class:`AusAnalyse`) -- ``A`` und ``I_y``
   ihres Bruttoquerschnitts.
+
+Platte und Analyse gibt es nur im ebenen Rahmen: ``I_T`` haben sie nicht.
 
 Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu. Nur ein Querschnitt aus
@@ -29,7 +35,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Callable, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Berechnung, Formel, Vorgabe
 from opencivil.core.einheiten import MIO_MM4, MM, MM2, Einheit, Groesse
@@ -45,8 +51,29 @@ Definieren = Callable[[str, str, Einheit, str, int], WertDef]
 #: Ein Umriss in mm -- der erste aussen, die weiteren Loecher.
 Umriss = List[Sequence[Tuple[float, float]]]
 
-#: Was ein Querschnitt von Hand oder aus einer Analyse traegt.
-FLAECHENWERTE = (("A", MM2, 0, "Querschnittsfläche"), ("I", MIO_MM4, 2, "Flächenträgheitsmoment"))
+
+@dataclass(frozen=True)
+class Kennwert:
+    """Ein Wert, den ein Stab von seinem Querschnitt braucht -- wie er heisst und gezeigt wird."""
+
+    kurzname: str
+    einheit: Einheit
+    stellen: int
+    beschreibung: str
+
+
+_A = Kennwert("A", MM2, 0, "Querschnittsfläche")
+
+#: Was ein Stab des ebenen Rahmens braucht: ``I`` um die Achse senkrecht zur Ebene.
+EBEN = (_A, Kennwert("I", MIO_MM4, 2, "Flächenträgheitsmoment"))
+
+#: Was ein Stab im Raum braucht (:mod:`opencivil.stabwerk3d`).
+RAEUMLICH = (_A, Kennwert("I_y", MIO_MM4, 2, "Flächenträgheitsmoment um y"),
+             Kennwert("I_z", MIO_MM4, 2, "Flächenträgheitsmoment um z"),
+             Kennwert("I_T", MIO_MM4, 2, "Torsionsträgheitsmoment"))
+
+#: Je Kennwert die Wert-ID, die ihn liefert.
+Werte = Dict[str, str]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -72,9 +99,9 @@ class Stabquerschnitt(ABC):
         return None
 
     @abstractmethod
-    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt,
-                      index: str) -> Tuple[List[Berechnung], str, str]:
-        """Die Berechnungen fuer ``A`` und ``I`` -- und deren Wert-IDs."""
+    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str,
+                      kennwerte: Sequence[Kennwert] = EBEN) -> Tuple[List[Berechnung], Werte]:
+        """Die Berechnungen fuer die ``kennwerte`` -- und je Kennwert seine Wert-ID."""
 
     def umriss(self, loesung: Any) -> Umriss:
         """Sein Umriss in mm, fuer das Bildchen seiner Zeile -- ohne einen leer."""
@@ -86,12 +113,14 @@ class Stabquerschnitt(ABC):
                           f"{beschreibung}, {self.name}", stellen)
 
     def _formeln(self, vorlage: Stabvorlage, quellen: Mapping[str, str],
-                 definieren: Definieren, abschnitt: Abschnitt,
-                 index: str, traegheit: str = "I") -> Tuple[List[Berechnung], str, str]:
+                 definieren: Definieren, abschnitt: Abschnitt, index: str,
+                 kennwerte: Sequence[Kennwert], traegheit: str = "I_y"
+                 ) -> Tuple[List[Berechnung], Werte]:
         """
-        Die Formeln einer Vorlage, aus den Wert-IDs ihrer Masse -- und als
-        ``I`` die mit dem Kurznamen ``traegheit``. Gerechnet wird davon nur,
-        was ``A`` und dieses ``I`` brauchen: das Rechenwerk folgt den Zielen.
+        Die Formeln einer Vorlage, aus den Wert-IDs ihrer Masse -- je
+        Kennwert die mit seinem Kurznamen, als ``I`` des ebenen Rahmens die
+        mit dem Kurznamen ``traegheit``. Gerechnet wird davon nur, was die
+        Kennwerte brauchen: das Rechenwerk folgt den Zielen.
         """
         quellen = dict(quellen)
         berechnungen: List[Berechnung] = []
@@ -104,16 +133,17 @@ class Stabquerschnitt(ABC):
                 titel=f"{f.beschreibung}, «{self.name}» ({self.herkunft})", name=f.name,
                 abschnitt=abschnitt))
             quellen[f.kurzname] = d.id
-        return berechnungen, quellen["A"], quellen[traegheit]
+        return berechnungen, {k.kurzname: quellen[traegheit if k.kurzname == "I" else k.kurzname]
+                              for k in kennwerte}
 
-    def _a_und_i(self, definieren: Definieren, index: str,
-                 berechnung: Callable[[WertDef, str, str], Berechnung]
-                 ) -> Tuple[List[Berechnung], str, str]:
-        """``A`` und ``I`` je als eine Berechnung -- von Hand eine Vorgabe, sonst ein Bezug."""
-        berechnungen = [berechnung(self._wert(definieren, kurz, kurz, einheit, beschreibung,
-                                              stellen, index), kurz, beschreibung)
-                        for kurz, einheit, stellen, beschreibung in FLAECHENWERTE]
-        return berechnungen, berechnungen[0].id, berechnungen[1].id
+    def _je_kennwert(self, definieren: Definieren, index: str, kennwerte: Sequence[Kennwert],
+                     berechnung: Callable[[WertDef, Kennwert], Berechnung]
+                     ) -> Tuple[List[Berechnung], Werte]:
+        """Jeder Kennwert als eine Berechnung -- von Hand eine Vorgabe, sonst ein Bezug."""
+        berechnungen = [berechnung(self._wert(definieren, k.kurzname, k.kurzname, k.einheit,
+                                              k.beschreibung, k.stellen, index), k)
+                        for k in kennwerte]
+        return berechnungen, {k.kurzname: b.id for k, b in zip(kennwerte, berechnungen)}
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -124,11 +154,11 @@ class NachVorlage(Stabquerschnitt):
     masse: Mapping[str, float]
     """Die Masse der Vorlage in mm -- was fehlte, mit seiner Vorgabe."""
 
-    traegheit: str = "I"
-    """Welche ihrer Formeln das ``I`` des Stabs ist -- bei einem Profil ``I_y`` oder ``I_z``."""
+    traegheit: str = "I_y"
+    """Welche ihrer Formeln das ``I`` des ebenen Rahmens ist -- bei einem Profil um z ``I_z``."""
 
-    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt,
-                      index: str) -> Tuple[List[Berechnung], str, str]:
+    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str,
+                      kennwerte: Sequence[Kennwert] = EBEN) -> Tuple[List[Berechnung], Werte]:
         berechnungen: List[Berechnung] = []
         quellen = {}
         for mass in self.vorlage.masse:
@@ -138,9 +168,9 @@ class NachVorlage(Stabquerschnitt):
             berechnungen.append(Vorgabe(id=d.id, ausgabe=d, groesse=Groesse(wert, mass.einheit),
                                         abschnitt=abschnitt, stumm=True))
             quellen[mass.schluessel] = d.id
-        formeln, A, I = self._formeln(self.vorlage, quellen, definieren, abschnitt, index,
-                                      self.traegheit)
-        return berechnungen + formeln, A, I
+        formeln, werte = self._formeln(self.vorlage, quellen, definieren, abschnitt, index,
+                                       kennwerte, self.traegheit)
+        return berechnungen + formeln, werte
 
     def umriss(self, loesung: Any) -> Umriss:
         return self.vorlage.umriss(self.masse)
@@ -148,15 +178,15 @@ class NachVorlage(Stabquerschnitt):
 
 @dataclass(frozen=True, kw_only=True)
 class VonHand(Stabquerschnitt):
-    """Kennwerte von Hand: ``A`` in mm², ``I`` in 10⁶ mm⁴. Ein Umriss fehlt."""
+    """Kennwerte von Hand: ``A`` in mm², die Traegheitsmomente in 10⁶ mm⁴. Ein Umriss fehlt."""
 
     masse: Mapping[str, float]
 
-    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt,
-                      index: str) -> Tuple[List[Berechnung], str, str]:
-        return self._a_und_i(definieren, index, lambda d, kurz, beschreibung: Vorgabe(
-            id=d.id, ausgabe=d, groesse=Groesse(self.masse.get(kurz, 0.0), d.einheit),
-            quelle=Quelle.EINGABE, titel=f"{beschreibung}, «{self.name}» (von Hand)",
+    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str,
+                      kennwerte: Sequence[Kennwert] = EBEN) -> Tuple[List[Berechnung], Werte]:
+        return self._je_kennwert(definieren, index, kennwerte, lambda d, k: Vorgabe(
+            id=d.id, ausgabe=d, groesse=Groesse(self.masse.get(k.kurzname, 0.0), d.einheit),
+            quelle=Quelle.EINGABE, titel=f"{k.beschreibung}, «{self.name}» (von Hand)",
             abschnitt=abschnitt))
 
 
@@ -190,9 +220,9 @@ class AusBauteil(Stabquerschnitt):
 class AusPlatte(AusBauteil):
     """Der Streifen ``b × h`` einer Platte -- ``quelle`` sind ``b`` und ``h``."""
 
-    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt,
-                      index: str) -> Tuple[List[Berechnung], str, str]:
-        return self._formeln(RECHTECK, self.quelle, definieren, abschnitt, index)
+    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str,
+                      kennwerte: Sequence[Kennwert] = EBEN) -> Tuple[List[Berechnung], Werte]:
+        return self._formeln(RECHTECK, self.quelle, definieren, abschnitt, index, kennwerte)
 
     def umriss(self, loesung: Any) -> Umriss:
         werte = [loesung.werte.get(self.quelle[k]) for k in ("b", "h")]
@@ -209,11 +239,11 @@ class AusAnalyse(AusBauteil):
     flaechen: Tuple[Sequence[Tuple[float, float]], ...] = ()
     """Die Polygone ihrer Flaechen, in mm -- Aussparungen mit, das Bild fuellt gerade-ungerade."""
 
-    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt,
-                      index: str) -> Tuple[List[Berechnung], str, str]:
-        return self._a_und_i(definieren, index, lambda d, kurz, beschreibung: Formel(
-            id=d.id, ausgabe=d, funktion=_derselbe, eingaben={"wert": self.quelle[kurz]},
-            titel=f"{beschreibung}, «{self.name}» (Bruttoquerschnitt der {self.herkunft})",
+    def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str,
+                      kennwerte: Sequence[Kennwert] = EBEN) -> Tuple[List[Berechnung], Werte]:
+        return self._je_kennwert(definieren, index, kennwerte, lambda d, k: Formel(
+            id=d.id, ausgabe=d, funktion=_derselbe, eingaben={"wert": self.quelle[k.kurzname]},
+            titel=f"{k.beschreibung}, «{self.name}» (Bruttoquerschnitt der {self.herkunft})",
             abschnitt=abschnitt))
 
     def umriss(self, loesung: Any) -> Umriss:

@@ -813,6 +813,17 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Meldung sagt es. Liegt der Balken schief im Grundriss, hält eine Gabel
       um x oder y auch einen Teil seiner Biegung fest. Schiefe Lager fehlen,
       wie in der Ebene.
+- [ ] **I_T der Querschnittsvorlagen, nach Vorgabe**
+      (`stabwerk/querschnitte.py`). Rechteck, T und Doppel-T zerfallen in
+      Rechtecke, je mit der Näherung von Roark: s · t³ · (1/3 − 0.21 · t/s ·
+      (1 − t⁴/(12 · s⁴))), t die kürzere Seite. Beim Rechteck trifft das die
+      Tafel von Timoshenko auf ein Prozent; bei T und Doppel-T fehlt der
+      Knoten zwischen Steg und Flansch, der etwas dazugibt (die Walzprofile
+      rechnen ihn mit d_K). Das Trapez rechnet als Rechteck seiner
+      mittleren Breite, das Rechteckrohr als dünne Wand nach Bredt, Kreis
+      und Kreisring mit 2 · I_y. Ein Betonquerschnitt reisst unter Torsion,
+      und seine Torsionssteifigkeit fällt dann stark ab; gerechnet wird
+      ungerissen. Prüfen, ob die Formeln so bleiben sollen.
 
 ## Noch nicht gebaut
 

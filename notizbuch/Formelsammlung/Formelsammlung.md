@@ -1,5 +1,5 @@
 ---
-erzeugt: 5d586bb23d35
+erzeugt: 738e07b1aac7
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -180,18 +180,18 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fläche eines U-Profils mit parallelen Flanschen]] · $A_{\text{Q14}}$
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]]
 - [[Flächenlast innerhalb des Nachweisschnitts]] · $\Delta V_d$
-- [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]] · $I_{\text{Q6}}$
+- [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]] · $I_{y}$
 - [[Flächenträgheitsmoment eines I-Profils um y]] · $I_{y}$
 - [[Flächenträgheitsmoment eines I-Profils um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]] · $I_{y}$
 - [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]] · $I_{z}$
-- [[Flächenträgheitsmoment eines Kreises]] · $I_{\text{Q2}}$
-- [[Flächenträgheitsmoment eines Kreisrings]] · $I_{\text{Q3}}$
-- [[Flächenträgheitsmoment eines Rechteckrohrs]] · $I_{\text{Q4}}$
-- [[Flächenträgheitsmoment eines Rechtecks]] · $I_{\text{Q1}}$
-- [[Flächenträgheitsmoment eines Rundrohrs um z]] · $I_{z}$
-- [[Flächenträgheitsmoment eines T-Querschnitts]] · $I_{\text{Q5}}$
-- [[Flächenträgheitsmoment eines Trapezes]] · $I_{\text{Q7}}$
+- [[Flächenträgheitsmoment eines Kreises]] · $I_{y}$
+- [[Flächenträgheitsmoment eines Kreisrings]] · $I_{y}$
+- [[Flächenträgheitsmoment eines Kreisrings um z]] · $I_{z}$
+- [[Flächenträgheitsmoment eines Rechteckrohrs]] · $I_{y}$
+- [[Flächenträgheitsmoment eines Rechtecks]] · $I_{y}$
+- [[Flächenträgheitsmoment eines T-Querschnitts]] · $I_{y}$
+- [[Flächenträgheitsmoment eines Trapezes]] · $I_{y}$
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]] · $I_{y}$
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]] · $I_{y}$
@@ -430,9 +430,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]] · [[opencivil.stabwerk.profilformen#_rohr_traegheit|_rohr_traegheit]]
 - [[Flächenträgheitsmoment eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
+- [[Flächenträgheitsmoment eines Kreisrings um z]] · [[opencivil.stabwerk.querschnitte#_wie_um_y|_wie_um_y]]
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_traegheit|Loeserpaar.herleitung_traegheit]], [[opencivil.stabwerk.querschnitte]]
-- [[Flächenträgheitsmoment eines Rundrohrs um z]] · [[opencivil.stabwerk.profilformen]]
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]] · [[opencivil.stabwerk.profilformen]]

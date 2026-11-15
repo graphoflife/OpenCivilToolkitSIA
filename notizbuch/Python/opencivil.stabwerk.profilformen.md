@@ -1,5 +1,5 @@
 ---
-erzeugt: 10bdf8dbf6c4
+erzeugt: f89506d9f89b
 art: modul
 tags: [modul]
 ---
@@ -96,11 +96,18 @@ def _u_umriss(h: float, b: float, t_w: float, t_1: float, t_2: float, r_1: float
 
 Ein U, der Ruecken links -- am Steg `t_1` dick, an der Spitze `t_2`.
 
+### _in_cm
+
+```python
+def _in_cm(f: Kennformel) -> Kennformel
+```
+
+Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Momente in cm⁴.
+
 
 ## Konstanten
 
 - `ZWICKEL = (0.2146, 0.2234, 0.00755)` – Der Zwickel zwischen zwei Kanten im rechten Winkel und einem Viertelkreis mit Radius r, gerundet wie in der Tabelle: Flaeche 0.2146 r² (1 - π/4), Abstand des Schwerpunkts von jeder Kante 0.2234 r ((10 - 3π)/(12 - 3π)), Traegheitsmoment um den eigenen Schwerpunkt 0.00755 r⁴ (1/3 - π/16 - 1/(3(12 - 3π))) -- um beide Achsen dasselbe.
-- `_EINS = Groesse(1.0, EINHEITSLOS)`
 - `BOGENECKEN = 6` – Je Viertelkreis eines Umrisses so viele Ecken -- fuer das Bild genug.
 - `_RRK = 'kaltgefertigten Rechteckrohrs'`
 - `_I = 'I-Profils'`
@@ -110,13 +117,12 @@ Ein U, der Ruecken links -- am Steg `t_1` dick, an der Spitze `t_2`.
 - `_UNP = 'U-Profils mit geneigten Flanschen'`
 - `U_GENEIGT = Stabvorlage(schluessel='u_geneigt', name='U-Profil mit geneigten Flan…` – U-Profil mit geneigten Flanschen -- UNP: die Flansche innen um `p` geneigt, `t_f` gilt im Abstand `c` vom Ruecken; am Steg die Ausrundung `r_1`, an der Spitze die Rundung `r_2`.
 - `RECHTECKROHR_KALT = Stabvorlage(schluessel='rechteckrohr_kalt', name='Rechteckrohr, kaltg…` – Rechteckrohr, kaltgefertigt -- RRK: Wand `t` ringsum, die Ecken aussen mit `r_o`, innen mit `r_i` gerundet; `h` steht senkrecht.
-- `RUNDROHR = Stabvorlage(schluessel='rundrohr', name='Rundrohr', masse=KREISRING.m…` – Rundrohr -- ROR: aussen `D`, Wand `t`; Flaeche und I_y sind die des Kreisrings, mit derselben Seite im Notizbuch, nur in cm² und cm⁴.
+- `RUNDROHR = Stabvorlage(schluessel='rundrohr', name='Rundrohr', masse=KREISRING.m…` – Rundrohr -- ROR: aussen `D`, Wand `t`; die Formeln und Seiten des Kreisrings, nur in cm² und cm⁴.
 - `PROFILFORMEN = (I_PROFIL, U_PARALLEL, U_GENEIGT, RECHTECKROHR_KALT, RUNDROHR)`
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
-- [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.stabwerk.querschnitte]]
 
 ## Gebraucht von
@@ -135,7 +141,6 @@ Ein U, der Ruecken links -- am Steg `t_1` dick, an der Spitze `t_2`.
 - [[Flächenträgheitsmoment eines I-Profils um z]]
 - [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]] · `_rohr_traegheit`
 - [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]] · `_rohr_traegheit`
-- [[Flächenträgheitsmoment eines Rundrohrs um z]]
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]]
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]]
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5dc7a786e88f
+erzeugt: 9f13f4b23310
 art: modul
 tags: [modul]
 ---
@@ -10,17 +10,23 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Ein Querschnitt der Staebe, aufgeloest: je Art eine Klasse, die ihre
-Berechnungen fuer `A` und `I` und ihren Umriss selbst traegt --
+Berechnungen fuer die Kennwerte des Stabs und ihren Umriss selbst traegt.
+Welche Kennwerte, sagt das System: der ebene Rahmen braucht `A` und `I`
+([[opencivil.stabwerk.stabquerschnitt#Konstanten|EBEN]]), das Stabwerk im Raum `A`, `I_y`, `I_z` und `I_T`
+([[opencivil.stabwerk.stabquerschnitt#Konstanten|RAEUMLICH]]). Die Arten --
 
 * nach Vorlage ([[opencivil.stabwerk.stabquerschnitt#NachVorlage|NachVorlage]]) -- die Formeln der Vorlage
   ([[opencivil.stabwerk.querschnitte|querschnitte]]), die Masse als Vorgaben; ein
-  Stahlprofil ebenso, mit den Massen aus der Tabelle und `I_y` oder
-  `I_z` seiner Form als `I` ([[opencivil.stabwerk.profilformen|profilformen]]);
-* von Hand ([[opencivil.stabwerk.stabquerschnitt#VonHand|VonHand]]) -- `A` und `I` als Eingaben;
+  Stahlprofil ebenso, mit den Massen aus der Tabelle
+  ([[opencivil.stabwerk.profilformen|profilformen]]). Das `I` des ebenen Rahmens
+  ist ihr `I_y` -- bei einem Profil, das sich um z biegt, ihr `I_z`;
+* von Hand ([[opencivil.stabwerk.stabquerschnitt#VonHand|VonHand]]) -- die Kennwerte als Eingaben;
 * aus einer Platte ([[opencivil.stabwerk.stabquerschnitt#AusPlatte|AusPlatte]]) -- die Formeln des Rechtecks mit
   `b` und `h` der Platte;
 * aus einer Querschnittsanalyse ([[opencivil.stabwerk.stabquerschnitt#AusAnalyse|AusAnalyse]]) -- `A` und `I_y`
   ihres Bruttoquerschnitts.
+
+Platte und Analyse gibt es nur im ebenen Rahmen: `I_T` haben sie nicht.
 
 Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu. Nur ein Querschnitt aus
@@ -32,6 +38,20 @@ einer Zeile. Jetzt loest der Aufbau ihn einmal auf
 ([[opencivil.projekt.aufbau.balkensystem]]).
 
 ## Inhalt
+
+### Kennwert
+
+```python
+@dataclass(frozen=True)
+class Kennwert
+```
+
+Ein Wert, den ein Stab von seinem Querschnitt braucht -- wie er heisst und gezeigt wird.
+
+- `kurzname: str`
+- `einheit: Einheit`
+- `stellen: int`
+- `beschreibung: str`
 
 ### Stabquerschnitt
 
@@ -69,10 +89,10 @@ Die Frage nach seinem E_eq -- nur einer aus einem Bauteil kann eine haben.
 
 ```python
 @abstractmethod
-def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str) -> Tuple[List[Berechnung], str, str]
+def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str, kennwerte: Sequence[Kennwert]=EBEN) -> Tuple[List[Berechnung], Werte]
 ```
 
-Die Berechnungen fuer `A` und `I` -- und deren Wert-IDs.
+Die Berechnungen fuer die `kennwerte` -- und je Kennwert seine Wert-ID.
 
 #### Stabquerschnitt.umriss
 
@@ -85,20 +105,21 @@ Sein Umriss in mm, fuer das Bildchen seiner Zeile -- ohne einen leer.
 #### Stabquerschnitt._formeln
 
 ```python
-def _formeln(self, vorlage: Stabvorlage, quellen: Mapping[str, str], definieren: Definieren, abschnitt: Abschnitt, index: str, traegheit: str='I') -> Tuple[List[Berechnung], str, str]
+def _formeln(self, vorlage: Stabvorlage, quellen: Mapping[str, str], definieren: Definieren, abschnitt: Abschnitt, index: str, kennwerte: Sequence[Kennwert], traegheit: str='I_y') -> Tuple[List[Berechnung], Werte]
 ```
 
-Die Formeln einer Vorlage, aus den Wert-IDs ihrer Masse -- und als
-`I` die mit dem Kurznamen `traegheit`. Gerechnet wird davon nur,
-was `A` und dieses `I` brauchen: das Rechenwerk folgt den Zielen.
+Die Formeln einer Vorlage, aus den Wert-IDs ihrer Masse -- je
+Kennwert die mit seinem Kurznamen, als `I` des ebenen Rahmens die
+mit dem Kurznamen `traegheit`. Gerechnet wird davon nur, was die
+Kennwerte brauchen: das Rechenwerk folgt den Zielen.
 
-#### Stabquerschnitt._a_und_i
+#### Stabquerschnitt._je_kennwert
 
 ```python
-def _a_und_i(self, definieren: Definieren, index: str, berechnung: Callable[[WertDef, str, str], Berechnung]) -> Tuple[List[Berechnung], str, str]
+def _je_kennwert(self, definieren: Definieren, index: str, kennwerte: Sequence[Kennwert], berechnung: Callable[[WertDef, Kennwert], Berechnung]) -> Tuple[List[Berechnung], Werte]
 ```
 
-`A` und `I` je als eine Berechnung -- von Hand eine Vorgabe, sonst ein Bezug.
+Jeder Kennwert als eine Berechnung -- von Hand eine Vorgabe, sonst ein Bezug.
 
 ### NachVorlage
 
@@ -111,12 +132,12 @@ Nach einer Vorlage: ihre Masse als Vorgaben, ihre Formeln.
 
 - `vorlage: Stabvorlage`
 - `masse: Mapping[str, float]` – Die Masse der Vorlage in mm -- was fehlte, mit seiner Vorgabe.
-- `traegheit: str = 'I'` – Welche ihrer Formeln das `I` des Stabs ist -- bei einem Profil `I_y` oder `I_z`.
+- `traegheit: str = 'I_y'` – Welche ihrer Formeln das `I` des ebenen Rahmens ist -- bei einem Profil um z `I_z`.
 
 #### NachVorlage.flaechenwerte
 
 ```python
-def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str) -> Tuple[List[Berechnung], str, str]
+def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str, kennwerte: Sequence[Kennwert]=EBEN) -> Tuple[List[Berechnung], Werte]
 ```
 
 #### NachVorlage.umriss
@@ -132,14 +153,14 @@ def umriss(self, loesung: Any) -> Umriss
 class VonHand(Stabquerschnitt)
 ```
 
-Kennwerte von Hand: `A` in mm², `I` in 10⁶ mm⁴. Ein Umriss fehlt.
+Kennwerte von Hand: `A` in mm², die Traegheitsmomente in 10⁶ mm⁴. Ein Umriss fehlt.
 
 - `masse: Mapping[str, float]`
 
 #### VonHand.flaechenwerte
 
 ```python
-def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str) -> Tuple[List[Berechnung], str, str]
+def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str, kennwerte: Sequence[Kennwert]=EBEN) -> Tuple[List[Berechnung], Werte]
 ```
 
 ### AusBauteil
@@ -181,7 +202,7 @@ Der Streifen `b × h` einer Platte -- `quelle` sind `b` und `h`.
 #### AusPlatte.flaechenwerte
 
 ```python
-def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str) -> Tuple[List[Berechnung], str, str]
+def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str, kennwerte: Sequence[Kennwert]=EBEN) -> Tuple[List[Berechnung], Werte]
 ```
 
 #### AusPlatte.umriss
@@ -204,7 +225,7 @@ Der Bruttoquerschnitt einer Querschnittsanalyse -- `quelle` sind `A` und `I`.
 #### AusAnalyse.flaechenwerte
 
 ```python
-def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str) -> Tuple[List[Berechnung], str, str]
+def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str, kennwerte: Sequence[Kennwert]=EBEN) -> Tuple[List[Berechnung], Werte]
 ```
 
 #### AusAnalyse.umriss
@@ -226,7 +247,10 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 
 - `Definieren = Callable[[str, str, Einheit, str, int], WertDef]` – Wie das System einen Wert anlegt: Kurzname, Zeichen, Einheit, Beschreibung, Stellen.
 - `Umriss = List[Sequence[Tuple[float, float]]]` – Ein Umriss in mm -- der erste aussen, die weiteren Loecher.
-- `FLAECHENWERTE = (('A', MM2, 0, 'Querschnittsfläche'), ('I', MIO_MM4, 2, 'Flächenträgh…` – Was ein Querschnitt von Hand oder aus einer Analyse traegt.
+- `_A = Kennwert('A', MM2, 0, 'Querschnittsfläche')`
+- `EBEN = (_A, Kennwert('I', MIO_MM4, 2, 'Flächenträgheitsmoment'))` – Was ein Stab des ebenen Rahmens braucht: `I` um die Achse senkrecht zur Ebene.
+- `RAEUMLICH = (_A, Kennwert('I_y', MIO_MM4, 2, 'Flächenträgheitsmoment um y'), Kenn…` – Was ein Stab im Raum braucht ([[opencivil.stabwerk3d]]).
+- `Werte = Dict[str, str]` – Je Kennwert die Wert-ID, die ihn liefert.
 
 ## Braucht
 

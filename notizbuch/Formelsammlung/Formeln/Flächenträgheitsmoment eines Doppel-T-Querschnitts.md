@@ -1,15 +1,15 @@
 ---
-erzeugt: 3414f5208b5b
+erzeugt: d6b92e4dda66
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «Flächenträgheitsmoment, «Walzprofil» (Doppel-T)»*
+*In der Herleitung: «Flächenträgheitsmoment um y, «Walzprofil» (Doppel-T)»*
 
 $$
-I_{\text{Q6}} = \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f}\right)^{3}}{12}
+I_{y} = \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f}\right)^{3}}{12}
 $$
 
 ## Grössen
@@ -27,7 +27,7 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
 \begin{aligned}
-  I_{\text{Q6}} &= \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w,\text{Q6}}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f,\text{Q6}}\right)^{3}}{12} \\
+  I_{y,\text{Q6}} &= \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w,\text{Q6}}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f,\text{Q6}}\right)^{3}}{12} \\
   &= \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3} - \left(300\,\mathrm{mm} - 11\,\mathrm{mm}\right) \cdot \left(300\,\mathrm{mm} - 2 \cdot 19\,\mathrm{mm}\right)^{3}}{12} \\
   &= 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}

@@ -2040,9 +2040,9 @@ z = 1.5\,\mathrm{m}
 \begin{equation*}
 A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}} = 300\,\mathrm{mm} \cdot 300\,\mathrm{mm} = 90000\,\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Flächenträgheitsmoment, «Stütze 300×300» (Rechteck)}
+\noindent\textbf{Flächenträgheitsmoment um y, «Stütze 300×300» (Rechteck)}
 \begin{equation*}
-I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 675\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_{y,\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 675\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{equation*}
 \noindent\textbf{Querschnittsfläche, «Unterzug» (Bruttoquerschnitt der Querschnittsanalyse «Unterzug»)}
 \begin{equation*}
@@ -2058,7 +2058,7 @@ EA_{\text{Q1}} = E_{cm} \cdot A_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} 
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit, «Stütze 300×300» aus C30/37}
 \begin{equation*}
-EI_{\text{Q1}} = E_{cm} \cdot I_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 675\,\cdot 10^{6}\,\mathrm{mm}^{4} = 22693\,\mathrm{kNm}^{2}
+EI_{\text{Q1}} = E_{cm} \cdot I_{y,\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 675\,\cdot 10^{6}\,\mathrm{mm}^{4} = 22693\,\mathrm{kNm}^{2}
 \end{equation*}
 \noindent\textbf{Erdbeschleunigung für das Eigengewicht (nach Vorgabe des Benutzers)}
 \begin{equation*}
@@ -3166,9 +3166,9 @@ V_{Rd,max} = \min\left[V_{Rd}^{+}(M_{Ed} = 0);\ V_{Rd}^{-}(M_{Ed} = 0)\right]
 \begin{equation*}
 A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}}
 \end{equation*}
-\noindent\textbf{Flächenträgheitsmoment, «Stütze 300×300» (Rechteck)}
+\noindent\textbf{Flächenträgheitsmoment um y, «Stütze 300×300» (Rechteck)}
 \begin{equation*}
-I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
+I_{y} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
 \end{equation*}
 \noindent\textbf{Dehnsteifigkeit, «Stütze 300×300» aus C30/37}
 \begin{equation*}
@@ -3176,7 +3176,7 @@ EA_{\text{Q1}} = E_{cm} \cdot A_{\text{Q1}}
 \end{equation*}
 \noindent\textbf{Biegesteifigkeit, «Stütze 300×300» aus C30/37}
 \begin{equation*}
-EI_{\text{Q1}} = E_{cm} \cdot I_{\text{Q1}}
+EI_{\text{Q1}} = E_{cm} \cdot I_{y}
 \end{equation*}
 \noindent\textbf{Eigengewicht, «Stütze 300×300» aus C30/37}
 \begin{equation*}
@@ -3416,7 +3416,7 @@ Bezeichnung & Symbol & Wert & Einheit & Herkunft \\
 \hline
 \endhead
 Querschnittsfläche, Stütze 300×300 & $A_{\text{Q1}}$ & $90000$ & mm² & berechnet \\
-Flächenträgheitsmoment, Stütze 300×300 & $I_{\text{Q1}}$ & $675$ & ·10⁶ mm⁴ & berechnet \\
+Flächenträgheitsmoment um y, Stütze 300×300 & $I_{y,\text{Q1}}$ & $675$ & ·10⁶ mm⁴ & berechnet \\
 Dehnsteifigkeit, Stütze 300×300, C30/37 & $EA_{\text{Q1}}$ & $3026$ & MN & berechnet \\
 Biegesteifigkeit, Stütze 300×300, C30/37 & $EI_{\text{Q1}}$ & $22693$ & kNm² & berechnet \\
 Eigengewicht je Meter, Stütze 300×300, C30/37 & $g_{k,\text{Q1}}$ & $2.25$ & kN/m & berechnet \\

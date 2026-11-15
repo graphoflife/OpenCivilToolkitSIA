@@ -1,5 +1,5 @@
 ---
-erzeugt: a46cfe2c5cab
+erzeugt: 6bce853e5922
 art: formel
 tags: [formel]
 ---
@@ -33,6 +33,10 @@ $$
   &= 25165.66\,\mathrm{cm}^{4}
 \end{aligned}
 $$
+
+## Gebraucht von
+
+- [[Biegesteifigkeit]]
 
 ## Im Code
 

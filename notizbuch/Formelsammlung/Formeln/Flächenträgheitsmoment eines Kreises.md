@@ -1,15 +1,15 @@
 ---
-erzeugt: c855f8928ff2
+erzeugt: 9ec1271280ba
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «Flächenträgheitsmoment, «Rundstütze» (Kreis)»*
+*In der Herleitung: «Flächenträgheitsmoment um y, «Rundstütze» (Kreis)»*
 
 $$
-I_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64}
+I_{y} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64}
 $$
 
 ## Grössen
@@ -23,8 +23,12 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-I_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64} = \frac{\pi \cdot \left(400\,\mathrm{mm}\right)^{4}}{64} = 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4}
+I_{y,\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64} = \frac{\pi \cdot \left(400\,\mathrm{mm}\right)^{4}}{64} = 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
+
+## Gebraucht von
+
+- [[Biegesteifigkeit]]
 
 ## Im Code
 
