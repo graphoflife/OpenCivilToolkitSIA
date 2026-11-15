@@ -1,5 +1,5 @@
 ---
-erzeugt: fbefb5109595
+erzeugt: 231c2e85fb87
 art: modul
 tags: [modul]
 ---
@@ -454,6 +454,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
+- [[opencivil.material.baustahl]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]

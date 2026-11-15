@@ -1,5 +1,5 @@
 ---
-erzeugt: e9c81343d114
+erzeugt: 9b30b37449b7
 art: modul
 tags: [modul]
 ---
@@ -111,7 +111,7 @@ Liste nachzubauen.
 def eigener_name(self, art: str) -> str
 ```
 
-Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder S1 ...
+Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ... oder ST1 ...
 
 #### Projekt.beton
 
@@ -128,6 +128,14 @@ def stahl(self, sorte: str='B500B') -> MaterialEintrag
 ```
 
 Eine Betonstahlsorte nach Norm -- Kennung `s1`, `s2` ...
+
+#### Projekt.baustahl
+
+```python
+def baustahl(self, sorte: str='S235') -> MaterialEintrag
+```
+
+Eine Baustahlsorte nach SIA 263 -- Kennung `st1`, `st2` ...
 
 #### Projekt.eigener_beton
 
@@ -147,10 +155,18 @@ def eigener_stahl(self, vorlage: str='B500B') -> MaterialEintrag
 
 Ein eigener Betonstahl, `S1`, `S2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
+#### Projekt.eigener_baustahl
+
+```python
+def eigener_baustahl(self, vorlage: str='S235') -> MaterialEintrag
+```
+
+Ein eigener Baustahl, `ST1`, `ST2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+
 #### Projekt._normsorte
 
 ```python
-def _normsorte(self, art: str, vorsilbe: str, sorte: str) -> MaterialEintrag
+def _normsorte(self, art: str, sorte: str) -> MaterialEintrag
 ```
 
 Legt eine Normsorte an und prueft sie sofort.
@@ -383,6 +399,7 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 ## Braucht
 
 - [[opencivil.ergebnis]]
+- [[opencivil.material.arten]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.beispiele]]

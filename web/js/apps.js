@@ -191,9 +191,9 @@ function bauteil(name, {
  */
 const MATERIAL = {
   app: 'material', liste: 'materialien', knopf: 'Materialien', zeichen: 'material',
-  gruppen: (p) => [['beton', 'Beton', 'kein Beton'], ['betonstahl', 'Betonstahl', 'kein Betonstahl']]
-    .map(([art, titel, leer]) => ({
-      titel, leer, eintraege: p.materialien.filter((m) => m.art === art),
+  gruppen: (p) => Object.entries(katalog('materialarten'))
+    .map(([art, { titel }]) => ({
+      titel, leer: `kein ${titel}`, eintraege: p.materialien.filter((m) => m.art === art),
       plus: { titel: `${titel} hinzufügen`, tun: () => materialAnlegen(art) },
     })),
   name: (m) => m.name || m.sorte,

@@ -784,9 +784,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Querschnittsanalyse.
 
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
-      Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit
-      eigenem G; in der Zeichnung pastellblau, `--mat-baustahl`), Holz (wie spröd Zug und Druck sind, legen wir vorher fest),
-      weitere Nachweise (Wände ohne Bügel).
+      Baustahl (Gesetz, Verbundquerschnitt, Stahlwände mit eigenem G; in
+      der Zeichnung pastellblau, `--mat-baustahl` -- die Sortentabelle
+      steht seit 2026-11-15), Holz (wie spröd Zug und Druck sind, legen wir
+      vorher fest), weitere Nachweise (Wände ohne Bügel).
+- [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,
+      3.2.2.2) fehlt -- es gibt keine Temperatur als Einheit, und keine
+      Rechnung braucht sie. Kommt mit der ersten, die sie braucht.
 - [ ] **Die genaue Linie der Platte über den neuen Fächer.** Die Platte hat
       noch ihren eigenen `dehnungsfaecher`; der Fächer der Analyse kann
       dasselbe für jede Form. Seit beide ihren Widerstand genau suchen, liegen

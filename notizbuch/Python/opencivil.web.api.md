@@ -1,5 +1,5 @@
 ---
-erzeugt: 5d15f582dade
+erzeugt: 632c9c780d11
 art: modul
 tags: [modul]
 ---
@@ -169,6 +169,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.core.wert]]
 - [[opencivil.decke.modell]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.material.arten]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]
@@ -180,7 +181,6 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.projekt]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.decke]]
-- [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]

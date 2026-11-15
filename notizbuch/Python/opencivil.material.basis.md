@@ -1,5 +1,5 @@
 ---
-erzeugt: 44d799608381
+erzeugt: 99cc4f40dac1
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,7 @@ class Baustoffart(Wahl)
 
 - `BETON = 'beton'`
 - `BETONSTAHL = 'betonstahl'`
+- `BAUSTAHL = 'baustahl'`
 
 #### Baustoffart.beschriftung
 
@@ -232,6 +233,8 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.material.arten]]
+- [[opencivil.material.baustahl]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.duktilitaet]]

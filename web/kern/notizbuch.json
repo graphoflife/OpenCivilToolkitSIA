@@ -4654,8 +4654,18 @@
       "name": "opencivil.material",
       "pfad": "Python/opencivil.material.md",
       "art": "modul",
-      "kurz": "die Baustoffe: Beton und Betonstahl.",
+      "kurz": "die Baustoffe: Beton, Betonstahl und Baustahl.",
       "stichworte": []
+    },
+    {
+      "name": "opencivil.material.arten",
+      "pfad": "Python/opencivil.material.arten.md",
+      "art": "modul",
+      "kurz": "die Materialarten des Projekts, je eine Zeile.",
+      "stichworte": [
+        "Materialart",
+        "Materialart.titel"
+      ]
     },
     {
       "name": "opencivil.material.basis",
@@ -4679,6 +4689,17 @@
         "Baustoff.ins_rechenwerk",
         "Baustoff.ist_angemeldet",
         "erzeuge"
+      ]
+    },
+    {
+      "name": "opencivil.material.baustahl",
+      "pfad": "Python/opencivil.material.baustahl.md",
+      "art": "modul",
+      "kurz": "Baustahl nach SIA 263:2013.",
+      "stichworte": [
+        "Baustahlsorte",
+        "baustahlsorten_zum_anlegen",
+        "baustahl"
       ]
     },
     {
@@ -6111,7 +6132,6 @@
         "als_groesse",
         "feldangaben",
         "eintragsklassen",
-        "sorten",
         "unbekanntes_feld",
         "lesen",
         "_wert_lesen",
@@ -6205,8 +6225,10 @@
         "Projekt.eigener_name",
         "Projekt.beton",
         "Projekt.stahl",
+        "Projekt.baustahl",
         "Projekt.eigener_beton",
         "Projekt.eigener_stahl",
+        "Projekt.eigener_baustahl",
         "Projekt._normsorte",
         "Projekt.platte",
         "Projekt.analyse",

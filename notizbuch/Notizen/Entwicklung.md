@@ -7,6 +7,32 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Material: Baustahl nach SIA 263
+
+Neben Beton und Betonstahl gibt es Baustahl (Benutzer, 2026-11-15): die
+Sorten S235, S275, S355 und S460 nach SIA 263:2013, Tabelle 1, mit
+Streckgrenze f_y, Fliessschubspannung τ_y und Zugfestigkeit f_u -- je bis
+40 mm Dicke und darüber bis 100 mm --, dazu E_a = 210 000, G_a = 81 000,
+ν_a = 0.3 und ρ_a = 7850 (3.2.2.1), γ_M1 = 1.05 und γ_M2 = 1.25 (4.1.3)
+und die Fliessdehnung ε_y = f_y/E_a. Eine Normsorte heisst wie die Sorte und
+hat die Kennung st1, ein eigener Baustahl heisst ST1.
+
+Warum so:
+
+- Beide Spalten der Tabelle stehen als Kennwerte da (f_y und f_y^{t>40}):
+  welche gilt, hängt an der Dicke des Blechs oder Profils, nicht am
+  Material. Wer sie braucht, wählt sie dort.
+- Die Wärmedehnzahl (3.2.2.2) fehlt: es gibt keine Temperatur als Einheit,
+  und keine Rechnung braucht sie (TODO).
+- Was das Werkzeug über eine Materialart weiss -- Sorten, Kennwerte, wie ein
+  Material entsteht, die Vorsilben b/s/st und BE/S/ST, worauf die Kennwerte
+  stehen --, steht jetzt in einer Liste (`opencivil/material/arten.py`).
+  Vorher war es an sieben Stellen von Hand als «beton» und «betonstahl»
+  aufgezählt, in Python und im JS; die Oberfläche liest die Arten aus dem
+  Katalog (`materialarten`).
+- Die Fliessdehnung des Baustahls steht auf derselben Seite wie die des
+  Betonstahls: es ist dieselbe Grösse, Fliessgrenze durch E-Modul.
+
 ## 2026-11-14 · Decken: ein Hinweis bei schiefen Platten
 
 Trägt eine Platte schief zu x und y, steht im Bericht unter der

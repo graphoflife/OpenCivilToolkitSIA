@@ -63,8 +63,6 @@ import typing
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
-from opencivil.material.beton import BETONSORTEN
-from opencivil.material.betonstahl import STAHLSORTEN
 
 
 class ProjektFehler(Exception):
@@ -195,11 +193,6 @@ def eintragsklassen(cls: type) -> List[type]:
 
     durch(cls)
     return list(gefunden)
-
-
-def sorten(art: str) -> Mapping[str, Any]:
-    """Die Normsorten einer Materialart."""
-    return {"beton": BETONSORTEN, "betonstahl": STAHLSORTEN}[art]
 
 
 # ===========================================================================

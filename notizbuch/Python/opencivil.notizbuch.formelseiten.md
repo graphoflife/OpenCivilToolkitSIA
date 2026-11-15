@@ -1,5 +1,5 @@
 ---
-erzeugt: a649355b7706
+erzeugt: 174597a15452
 art: modul
 tags: [modul]
 ---
@@ -135,7 +135,7 @@ Die Zeilen der Tabelle -- dieselbe Groessenzeile in mehreren Fassungen einmal.
 - `FORMELN = 'Formelsammlung/Formeln'`
 - `THEMEN = 'Formelsammlung/Themen'`
 - `UEBERSICHT = 'Formelsammlung/Formelsammlung.md'`
-- `BEREICHE = {'beton': 'Baustoffe', 'betonstahl': 'Baustoffe', **{art.raum: art.be…` – Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem sie gehoeren (`Thema.art` der Formelsammlung: der Anfang des Namensraums). Die Bauteile nennen ihren Abschnitt im Steckbrief.
+- `BEREICHE = {'beton': 'Baustoffe', 'betonstahl': 'Baustoffe', 'baustahl': 'Bausto…` – Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem sie gehoeren (`Thema.art` der Formelsammlung: der Anfang des Namensraums). Die Bauteile nennen ihren Abschnitt im Steckbrief.
 - `ANGABEN = {Quelle.EINGABE: 'Eingabe', Quelle.UEBERSCHRIEBEN: 'Eingabe', Quelle.…` – Woher ein Wert kommt, den keine Formel der Sammlung geschrieben hat.
 
 ## Braucht

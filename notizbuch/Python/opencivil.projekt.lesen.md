@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f17f137c4c5
+erzeugt: 5b64d174b426
 art: modul
 tags: [modul]
 ---
@@ -168,14 +168,6 @@ Jede Klasse von Eintraegen, die unter `cls` vorkommt, `cls` zuerst --
 gefunden auf dem Weg, auf dem [[opencivil.projekt.lesen#lesen|lesen]] eine Datei ablaeuft: durch
 Felder, Listen, Zuordnungen und Optionale. Fuer den Katalog der
 Feldangaben ([[opencivil.projekt.lesen#feldangaben|feldangaben]]).
-
-### sorten
-
-```python
-def sorten(art: str) -> Mapping[str, Any]
-```
-
-Die Normsorten einer Materialart.
 
 ### unbekanntes_feld
 
@@ -363,8 +355,6 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
-- [[opencivil.material.beton]]
-- [[opencivil.material.betonstahl]]
 
 ## Gebraucht von
 

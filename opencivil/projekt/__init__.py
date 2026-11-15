@@ -57,7 +57,7 @@ kNm, ...) -- also so, wie der Benutzer sie eintippt. Die Umrechnung in SI
 geschieht erst beim Aufbau, ueber die :class:`Groesse`.
 """
 
-from opencivil.projekt.lesen import ProjektFehler, sorten
+from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, GebrauchsfallEintrag,
     Gebrauchsliste, Gebrauchswahl, KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl,
@@ -117,5 +117,5 @@ __all__ = [
     "FlaechenlastEintrag",
     "LinienlagerEintrag", "LinienlastEintrag", "PlattenlastEintrag", "PunktlastEintrag",
     "StuetzeEintrag", "UnterzugEintrag", "ZoneEintrag",
-    "aufbauen", "sorten",
+    "aufbauen",
 ]

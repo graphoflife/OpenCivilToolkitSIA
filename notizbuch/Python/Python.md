@@ -1,5 +1,5 @@
 ---
-erzeugt: b5e586c6170f
+erzeugt: 2ec6e0992b36
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -59,8 +59,10 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.
     - [[opencivil.konsole.sitzung]] – eine Python-Sitzung für die App «Python».
     - [[opencivil.konsole.zeichnen]] – Diagramme aus der App «Python», ohne matplotlib.
-- [[opencivil.material]] – die Baustoffe: Beton und Betonstahl.
+- [[opencivil.material]] – die Baustoffe: Beton, Betonstahl und Baustahl.
+    - [[opencivil.material.arten]] – die Materialarten des Projekts, je eine Zeile.
     - [[opencivil.material.basis]] – Gemeinsames Geruest fuer Baustoffe.
+    - [[opencivil.material.baustahl]] – Baustahl nach SIA 263:2013.
     - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
     - [[opencivil.material.betonstahl]] – Betonstahl nach SIA 262:2025.
 - [[opencivil.nachweis]] – die Nachweise der Platte und des gezeichneten Querschnitts.

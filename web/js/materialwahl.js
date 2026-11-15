@@ -7,11 +7,12 @@
  *                          ist -- nichts daran lässt sich ändern, auch die
  *                          Sorte nicht
  *     eigenes Material     nimmt eine Sorte als Vorlage, heisst BE1, BE2 ...
- *                          (Betonstahl S1 ...) und seine Kennwerte sind
- *                          änderbar; eine Sorte trägt es nicht
+ *                          (Betonstahl S1 ..., Baustahl ST1 ...) und seine
+ *                          Kennwerte sind änderbar; eine Sorte trägt es nicht
  *
- * Womit die Namen eigener Materialien beginnen und in welcher Folge die
- * Sorten stehen, sagt der Katalog des Kerns.
+ * Wie eine Art heisst, womit Kennungen und Namen eigener Materialien
+ * beginnen und in welcher Folge die Sorten stehen, sagt der Katalog des
+ * Kerns (`materialarten`).
  */
 
 import { karte } from './bausteine.js';
@@ -19,14 +20,12 @@ import { auswahl, el, melden } from './dom.js';
 import { sinnbild } from './sinnbilder.js';
 import { ausVorlage, freieKennung, katalog, projektAendern, waehlen, zustand } from './zustand.js';
 
-const ART = {
-  beton: { titel: 'Neuer Beton', eigen: 'Eigener Beton', kennung: 'b' },
-  betonstahl: { titel: 'Neuer Betonstahl', eigen: 'Eigener Betonstahl', kennung: 's' },
-};
+/** Was der Katalog über eine Materialart sagt. */
+const artVon = (art) => katalog('materialarten', art);
 
 /** Der erste freie Name eines eigenen Materials -- BE1, BE2 ... */
 function eigenerName(art) {
-  const vorsilbe = katalog('anlegen', 'eigen', art);
+  const vorsilbe = artVon(art).eigene;
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
   let i = 1;
   while (vergeben.has(`${vorsilbe}${i}`)) i += 1;
@@ -34,7 +33,7 @@ function eigenerName(art) {
 }
 
 function anlegen(dialog, art, sorte, eigen) {
-  const kennung = freieKennung(ART[art].kennung);
+  const kennung = freieKennung(artVon(art).kennung);
   const name = eigen ? eigenerName(art) : sorte;
   projektAendern((p) => {
     p.materialien.push(ausVorlage('material', {
@@ -53,7 +52,7 @@ function anlegen(dialog, art, sorte, eigen) {
  * Vorlage und seine Abweichungen mit.
  */
 export function materialKopieren(material) {
-  const kennung = freieKennung(ART[material.art].kennung);
+  const kennung = freieKennung(artVon(material.art).kennung);
   const name = eigenerName(material.art);
   projektAendern((p) => {
     const i = p.materialien.findIndex((x) => x.kennung === material.kennung);
@@ -65,15 +64,15 @@ export function materialKopieren(material) {
   melden(`«${name}» angelegt, eine Kopie von ${material.name || material.sorte}.`);
 }
 
-/** Öffnet das Fenster für ein neues Material dieser Art: 'beton' oder 'betonstahl'. */
+/** Öffnet das Fenster für ein neues Material dieser Art: 'beton', 'betonstahl' oder 'baustahl'. */
 export function materialAnlegen(art) {
-  const sorten = katalog('anlegen', art);
+  const { titel, grundlage, anlegen: sorten } = artVon(art);
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
   const frei = sorten.filter((s) => !vergeben.has(s));
   let norm = frei[0];
   let vorlage = sorten[0];
 
-  const dialog = el('dialog.fenster.materialwahl', { 'aria-label': ART[art].titel });
+  const dialog = el('dialog.fenster.materialwahl', { 'aria-label': `Neuer ${titel}` });
   dialog.addEventListener('close', () => dialog.remove());
   // Ein Klick neben das Fenster schliesst es, wie Esc.
   dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
@@ -82,7 +81,7 @@ export function materialAnlegen(art) {
     el('div.fenster-kopf', {}, [
       sinnbild('material'),
       el('div.fenster-titel', {}, [
-        el('span', { text: ART[art].titel }),
+        el('span', { text: `Neuer ${titel}` }),
         el('span.fenster-zusatz', { text: 'Normsorte nach SIA oder eigenes Material' }),
       ]),
       el('button.fenster-zu', {
@@ -93,8 +92,7 @@ export function materialAnlegen(art) {
     el('div.fenster-inhalt', {}, [
       karte('Normsorte nach SIA', frei.length ? [
         el('p.materialwahl-text', {
-          text: 'Kennwerte nach SIA 262:2025, die Dichten und k_E nach Vorgabe. Das '
-            + 'Material heisst wie die Sorte und lässt '
+          text: `${grundlage}. Das Material heisst wie die Sorte und lässt `
             + 'sich danach nicht mehr ändern – auch die Sorte nicht.',
         }),
         el('div.materialwahl-zeile', {}, [
@@ -111,7 +109,7 @@ export function materialAnlegen(art) {
       ] : [el('p.materialwahl-text', {
         text: 'Alle Normsorten stehen schon im Projekt – jede braucht es nur einmal.',
       })]),
-      karte(ART[art].eigen, [
+      karte(`Eigener ${titel}`, [
         el('p.materialwahl-text', {
           text: `Die Kennwerte einer Sorte als Vorlage, danach frei änderbar. Das Material `
             + `heisst ${eigenerName(art)} und trägt keine Sorte.`,

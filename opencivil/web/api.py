@@ -35,8 +35,9 @@ from opencivil.core.protokoll import (
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
 from opencivil.decke.modell import Aufteilung
-from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN, betonsorten_zum_anlegen
-from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsorten_zum_anlegen
+from opencivil.material.arten import MATERIALARTEN
+from opencivil.material.beton import BETONSORTEN
+from opencivil.material.betonstahl import STAHLSORTEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import BEIWERT as DUKTILITAET_BEIWERT, HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
@@ -44,7 +45,6 @@ from opencivil.projekt import BAUTEILE, Aufbau, SkriptEintrag
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
-from opencivil.projekt.eintraege import EIGENE_VORSILBE
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, wahl_von
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE, WerkstoffwahlEintrag
@@ -174,14 +174,15 @@ def katalog() -> dict:
             }
             for sorte, s in STAHLSORTEN.items()
         ],
-        # In welcher Reihenfolge das Fenster «Neues Material» die Sorten
-        # anbietet -- und womit die Namen eigener Materialien beginnen.
-        "anlegen": {"beton": betonsorten_zum_anlegen(),
-                    "betonstahl": stahlsorten_zum_anlegen(),
-                    "eigen": dict(EIGENE_VORSILBE)},
-        "kennwerte": {
-            "beton": [_vorlage_dict(v) for v in BETON_VORLAGEN],
-            "betonstahl": [_vorlage_dict(v) for v in STAHL_VORLAGEN],
+        # Je Materialart, in ihrer Folge: wie sie heisst, in welcher
+        # Reihenfolge das Fenster «Neues Material» die Sorten anbietet,
+        # womit Kennungen und Namen eigener Materialien beginnen, worauf die
+        # Kennwerte stehen -- und die Kennwerte selbst.
+        "materialarten": {
+            name: {"titel": a.titel, "kennung": a.kennung, "eigene": a.eigene,
+                   "grundlage": a.grundlage, "anlegen": list(a.anlegen),
+                   "kennwerte": [_vorlage_dict(v) for v in a.vorlagen]}
+            for name, a in MATERIALARTEN.items()
         },
         "erfuellungsarten": [
             {"wert": a.value, "beschriftung": a.beschriftung} for a in Erfuellungsart

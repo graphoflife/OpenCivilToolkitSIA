@@ -21,6 +21,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import GRAD, KN, KNM, M, MM, MM2, PROMILLE, PROZENT, Groesse
 from opencivil.core.wert import kennung_aus
+from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import BEIWERT as X_D_BEIWERT, HOECHSTENS as X_D_HOECHSTENS
@@ -28,7 +29,7 @@ from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
 from opencivil.projekt.lesen import (
-    ProjektFehler, als_groesse, bereich, einer_von, lesen, ort, sorten, unbekanntes_feld,
+    ProjektFehler, als_groesse, bereich, einer_von, lesen, ort, unbekanntes_feld,
     wahl_aus_text,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
@@ -120,11 +121,6 @@ class Beschreibung:
         return lesen(cls, roh, wo or ort(cls, roh))
 
 
-#: Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton,
-#: S1, S2 ... beim Betonstahl (Benutzer, 2026-10-16).
-EIGENE_VORSILBE = {"beton": "BE", "betonstahl": "S"}
-
-
 @dataclass
 class BauteilEintrag(Beschreibung):
     """
@@ -187,10 +183,11 @@ class MaterialEintrag(Beschreibung):
         sie laesst sich das Material nicht einmal zeigen. Die Materialart
         prueft ihr Feld.
         """
-        if self.sorte not in sorten(self.art):
+        sorten = MATERIALARTEN[self.art].sorten
+        if self.sorte not in sorten:
             raise ProjektFehler(
                 f"Unbekannte Sorte '{self.sorte}' für {self.art}. "
-                f"Verfügbar: {', '.join(sorten(self.art))}.")
+                f"Verfügbar: {', '.join(sorten)}.")
 
     def regeln(self, wo: str) -> None:
         """
@@ -206,7 +203,7 @@ class MaterialEintrag(Beschreibung):
             if self.name and self.name != self.sorte:
                 raise ProjektFehler(
                     f"{wo}: eine unveränderte Normsorte muss '{self.sorte}' heissen.")
-        elif self.anzeigename in sorten(self.art):
+        elif self.anzeigename in MATERIALARTEN[self.art].sorten:
             # Sonst stuende eine abgeaenderte Festigkeit unter einer
             # Normbezeichnung im Bericht.
             raise ProjektFehler(

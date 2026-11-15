@@ -28,9 +28,8 @@ from opencivil.core.einheiten import KN, KNM, M, Groesse
 from opencivil.core.nachweis import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import Kennzahl
-from opencivil.material.basis import Baustoff
-from opencivil.material.beton import beton
-from opencivil.material.betonstahl import betonstahl
+from opencivil.material.arten import MATERIALARTEN
+from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.knicken import Knickfall
 from opencivil.nachweis.spannungsbegrenzung import Spannungsbegrenzung, Stahlspannungsort
 from opencivil.nachweis.spannungsgrenzen import GrenzeAusRissbreite, GrenzeGegenFliessen
@@ -286,7 +285,8 @@ class Aufbau:
 
     def materialziele(self) -> List[str]:
         """
-        Saemtliche Kennwerte aller Materialien -- Beton zuerst, dann Betonstahl.
+        Saemtliche Kennwerte aller Materialien -- in der Folge der Arten,
+        Beton zuerst, dann Betonstahl und Baustahl.
 
         Gehoert zum Regellauf: ein Material, das noch keine Platte verwendet,
         waere sonst nie Ziel und bliebe ungerechnet -- im Editor staenden dann
@@ -296,11 +296,9 @@ class Aufbau:
         arbeitet die Ziele der Reihe nach ab, und das Protokoll folgt ihm. So
         stehen im Bericht erst die Baustoffe und dann die Bauteile.
         """
-        nach_art = {"beton": [], "betonstahl": []}
-        for stoff in self.baustoffe.values():
-            nach_art.setdefault(stoff.art.value, []).extend(
-                d.id for d in stoff.definitionen.values())
-        return nach_art["beton"] + nach_art["betonstahl"]
+        folge = list(MATERIALARTEN)
+        stoffe = sorted(self.baustoffe.values(), key=lambda s: folge.index(s.art.value))
+        return [d.id for s in stoffe for d in s.definitionen.values()]
 
 
 @dataclass
@@ -356,9 +354,9 @@ class Bauteil:
 
 
 def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
-    bauer = {"beton": beton, "betonstahl": betonstahl}[eintrag.art]
+    bauer = MATERIALARTEN[eintrag.art].bauen
     roh = bauer(eintrag.sorte, praefix=f"{eintrag.art}.{eintrag.kennung}")
-    # Jeder Kennwert dieser beiden Baustoffe ist seiner Natur nach positiv:
+    # Jeder Kennwert eines Baustoffs ist seiner Natur nach positiv:
     # Festigkeiten, Moduln, Dehnungen, Teilsicherheitsbeiwerte. Eine Null
     # oder ein negativer Wert liefert keine falsche Zahl, sondern gar keine
     # -- gamma_c = 0 endete in einem ZeroDivisionError, ein negatives f_ck
@@ -403,8 +401,7 @@ def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wer: str
             f"{wer} verweist auf das Material '{kennung}', das es nicht (mehr) gibt."
             if kennung else f"{wer} hat kein Material.")
     if gefunden.art.value != art:
-        raise ProjektFehler(f"{wer} braucht einen "
-                            f"{'Beton' if art == 'beton' else 'Betonstahl'}, "
+        raise ProjektFehler(f"{wer} braucht einen {Baustoffart(art).beschriftung}, "
                             f"'{gefunden.name}' ist keiner.")
     return gefunden
 

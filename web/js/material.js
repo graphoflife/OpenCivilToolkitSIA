@@ -4,7 +4,7 @@
  * NORMSORTE ODER EIGENES MATERIAL:
  * Eine Normsorte nach SIA ist gesperrt -- kein Feld lässt sich anfassen, auch
  * die Sorte nicht. Wer abweichen will, legt ein eigenes Material an
- * (materialwahl.js): es heisst BE1 oder S1 und ist änderbar. So kann keine
+ * (materialwahl.js): es heisst BE1, S1 oder ST1 und ist änderbar. So kann keine
  * abgewandelte Festigkeit unter einer Normbezeichnung im Bericht landen.
  *
  * Angezeigt wird immer der Wert aus der letzten Lösung, nie ein in der
@@ -16,9 +16,6 @@ import { feld, panel } from './bausteine.js';
 import { el, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { eintragAendern, katalog, kennwertId, zustand } from './zustand.js';
-
-/** Wie die Arten über dem Editor heissen. */
-const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
 
 function gerechnet(id) {
   return zustand.loesung?.werte?.[id] || null;
@@ -96,7 +93,7 @@ function kennwertZeile(material, vorlage) {
 }
 
 export function materialEditor(material) {
-  const vorlagen = katalog('kennwerte', material.art);
+  const vorlagen = katalog('materialarten', material.art, 'kennwerte');
   const gesperrt = !material.eigenstaendig;
   const anzahlUeberschrieben = Object.keys(material.ueberschreibungen).length;
 
@@ -108,7 +105,7 @@ export function materialEditor(material) {
       el('span.sia', { text: 'SIA' }),
       el('div', { style: { flex: '1 1 220px' } }, [
         el('b', { text: `Normsorte ${material.sorte}` }),
-        ' · Kennwerte nach SIA 262:2025, die Dichten und k_E nach Vorgabe; nicht '
+        ` · ${katalog('materialarten', material.art, 'grundlage')}; nicht `
         + 'änderbar. Abweichen: links «+» → eigenes Material.',
       ]),
     ])
@@ -165,6 +162,6 @@ function nameAendern(material, wunsch, feldKnoten) {
 
 /** Was über dem Editor steht: die Art, und ob es eine Normsorte ist. */
 export function materialHinweis(material) {
-  return `${ART_TEXT[material.art] || ''}`
+  return katalog('materialarten', material.art, 'titel')
     + (material.eigenstaendig ? ' · eigenes Material' : ' · Normsorte SIA');
 }

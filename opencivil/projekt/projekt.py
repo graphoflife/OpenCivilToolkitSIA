@@ -23,7 +23,8 @@ from typing import Any, Dict, List, Sequence, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
-from opencivil.projekt.eintraege import EIGENE_VORSILBE, Beschreibung, MaterialEintrag, PostenEintrag
+from opencivil.material.arten import MATERIALARTEN
+from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag, PostenEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
@@ -140,12 +141,13 @@ class Projekt(Beschreibung):
                 if kennung in e.materialien() or kennung in e.bezuege()]
 
     def eigener_name(self, art: str) -> str:
-        """Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder S1 ..."""
+        """Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ... oder ST1 ..."""
+        vorsilbe = MATERIALARTEN[art].eigene
         vergeben = {m.anzeigename for m in self.materialien}
         i = 1
-        while f"{EIGENE_VORSILBE[art]}{i}" in vergeben:
+        while f"{vorsilbe}{i}" in vergeben:
             i += 1
-        return f"{EIGENE_VORSILBE[art]}{i}"
+        return f"{vorsilbe}{i}"
 
     # -- Ohne Oberflaeche ---------------------------------------------------
     #
@@ -157,11 +159,15 @@ class Projekt(Beschreibung):
 
     def beton(self, sorte: str = "C30/37") -> MaterialEintrag:
         """Eine Betonsorte nach Norm -- Kennung ``b1``, ``b2`` ..."""
-        return self._normsorte("beton", "b", sorte)
+        return self._normsorte("beton", sorte)
 
     def stahl(self, sorte: str = "B500B") -> MaterialEintrag:
         """Eine Betonstahlsorte nach Norm -- Kennung ``s1``, ``s2`` ..."""
-        return self._normsorte("betonstahl", "s", sorte)
+        return self._normsorte("betonstahl", sorte)
+
+    def baustahl(self, sorte: str = "S235") -> MaterialEintrag:
+        """Eine Baustahlsorte nach SIA 263 -- Kennung ``st1``, ``st2`` ..."""
+        return self._normsorte("baustahl", sorte)
 
     def eigener_beton(self, vorlage: str = "C30/37") -> MaterialEintrag:
         """
@@ -169,29 +175,33 @@ class Projekt(Beschreibung):
         ``vorlage``, abzuaendern ueber ``abweichungen`` und
         ``ueberschreibungen``. Eine Normsorte selbst bleibt, wie sie ist.
         """
-        return self._eigenes("beton", "b", vorlage)
+        return self._eigenes("beton", vorlage)
 
     def eigener_stahl(self, vorlage: str = "B500B") -> MaterialEintrag:
         """Ein eigener Betonstahl, ``S1``, ``S2`` ... -- siehe :meth:`eigener_beton`."""
-        return self._eigenes("betonstahl", "s", vorlage)
+        return self._eigenes("betonstahl", vorlage)
 
-    def _eigenes(self, art: str, vorsilbe: str, vorlage: str) -> MaterialEintrag:
-        eintrag = MaterialEintrag(kennung=self.freie_kennung(vorsilbe), art=art,
+    def eigener_baustahl(self, vorlage: str = "S235") -> MaterialEintrag:
+        """Ein eigener Baustahl, ``ST1``, ``ST2`` ... -- siehe :meth:`eigener_beton`."""
+        return self._eigenes("baustahl", vorlage)
+
+    def _eigenes(self, art: str, vorlage: str) -> MaterialEintrag:
+        eintrag = MaterialEintrag(kennung=self.freie_kennung(MATERIALARTEN[art].kennung), art=art,
                                   sorte=vorlage, name=self.eigener_name(art),
                                   eigenstaendig=True)
         eintrag.sorte_pruefen()
         self.materialien.append(eintrag)
         return eintrag
 
-    def _normsorte(self, art: str, vorsilbe: str, sorte: str) -> MaterialEintrag:
+    def _normsorte(self, art: str, sorte: str) -> MaterialEintrag:
         """
         Legt eine Normsorte an und prueft sie sofort.
 
         Sofort und nicht erst beim Rechnen: ein Tippfehler in der Sorte soll
         an der Zeile auffallen, in der er steht.
         """
-        eintrag = MaterialEintrag(kennung=self.freie_kennung(vorsilbe), art=art,
-                                  sorte=sorte, name=sorte)
+        eintrag = MaterialEintrag(kennung=self.freie_kennung(MATERIALARTEN[art].kennung),
+                                  art=art, sorte=sorte, name=sorte)
         eintrag.sorte_pruefen()
         if any(m.anzeigename == sorte for m in self.materialien):
             raise ProjektFehler(

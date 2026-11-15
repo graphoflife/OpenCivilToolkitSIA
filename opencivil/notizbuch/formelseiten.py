@@ -43,7 +43,7 @@ UEBERSICHT = "Formelsammlung/Formelsammlung.md"
 #: Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem
 #: sie gehoeren (``Thema.art`` der Formelsammlung: der Anfang des
 #: Namensraums). Die Bauteile nennen ihren Abschnitt im Steckbrief.
-BEREICHE = {"beton": "Baustoffe", "betonstahl": "Baustoffe",
+BEREICHE = {"beton": "Baustoffe", "betonstahl": "Baustoffe", "baustahl": "Baustoffe",
             **{art.raum: art.bereich for art in BAUTEILE}}
 
 #: Woher ein Wert kommt, den keine Formel der Sammlung geschrieben hat.

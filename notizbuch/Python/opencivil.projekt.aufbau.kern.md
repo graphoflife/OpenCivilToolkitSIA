@@ -1,5 +1,5 @@
 ---
-erzeugt: cab9be4bbd9f
+erzeugt: a227036b52df
 art: modul
 tags: [modul]
 ---
@@ -259,7 +259,8 @@ Nachweise mehrerer Platten in dieselbe Tabelle gepackt.
 def materialziele(self) -> List[str]
 ```
 
-Saemtliche Kennwerte aller Materialien -- Beton zuerst, dann Betonstahl.
+Saemtliche Kennwerte aller Materialien -- in der Folge der Arten,
+Beton zuerst, dann Betonstahl und Baustahl.
 
 Gehoert zum Regellauf: ein Material, das noch keine Platte verwendet,
 waere sonst nie Ziel und bliebe ungerechnet -- im Editor staenden dann
@@ -413,9 +414,8 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.decke.werk]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.material.arten]]
 - [[opencivil.material.basis]]
-- [[opencivil.material.beton]]
-- [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.spannungsbegrenzung]]

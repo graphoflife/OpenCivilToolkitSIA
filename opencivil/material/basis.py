@@ -80,12 +80,14 @@ def mit_index(symbol: str, index: str) -> str:
 class Baustoffart(Wahl):
     BETON = "beton"
     BETONSTAHL = "betonstahl"
+    BAUSTAHL = "baustahl"
 
     @property
     def beschriftung(self) -> str:
         return {
             Baustoffart.BETON: "Beton",
             Baustoffart.BETONSTAHL: "Betonstahl",
+            Baustoffart.BAUSTAHL: "Baustahl",
         }[self]
 
 

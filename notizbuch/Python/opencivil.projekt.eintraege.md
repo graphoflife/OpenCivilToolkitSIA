@@ -1,5 +1,5 @@
 ---
-erzeugt: 4edb386e3dfd
+erzeugt: f0978238d704
 art: modul
 tags: [modul]
 ---
@@ -719,7 +719,6 @@ Eine zu pruefende Schnittgroessenkombination.
 
 ## Konstanten
 
-- `EIGENE_VORSILBE = {'beton': 'BE', 'betonstahl': 'S'}` – Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton, S1, S2 ... beim Betonstahl (Benutzer, 2026-10-16).
 - `MENGEN = (Linienart.TEILUNG, Linienart.ANZAHL)` – Wie ein Posten der Platte seine Menge angibt -- wie eine Stablinie ([[opencivil.projekt.querschnittsanalyse#StablinieEintrag|StablinieEintrag]]), aber ohne verschmierte Flaeche: als Teilung oder als Stabzahl.
 - `HAEUFIG_ANTEIL = 70.0` – Anteil der Tragsicherheitseinwirkungen, der als haeufiger Lastfall gilt -- in Prozent, wie die Maske ihn zeigt. Eine Vorgabe, einstellbar je Platte.
 - `QUASISTAENDIG_ANTEIL = 60.0` – Dasselbe fuer die quasi-staendigen Lastfaelle.
@@ -728,6 +727,7 @@ Eine zu pruefende Schnittgroessenkombination.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.arten]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
@@ -758,4 +758,3 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.skript]]
-- [[opencivil.web.api]]
