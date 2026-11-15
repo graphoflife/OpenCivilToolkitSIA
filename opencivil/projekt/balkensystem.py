@@ -372,6 +372,7 @@ class BalkensystemEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     LAGERFELDER = ("x", "z", "phi")
     LINIENLAGER = ("quer", "laengs")
     LAGERARTEN = LAGERARTEN
+    EINHEIT_DER_FEDER = EINHEIT_DER_FEDER
     NEUE_DIAGRAMME = ("M", "V", "N")
     KNOTEN = SystemknotenEintrag
     LINIE = SystemlinieEintrag

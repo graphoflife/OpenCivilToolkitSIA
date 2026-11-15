@@ -1,5 +1,5 @@
 ---
-erzeugt: 38c623c9756d
+erzeugt: 10ff3434fe09
 art: formel
 tags: [formel]
 ---
@@ -30,6 +30,7 @@ $$
 ## Gebraucht von
 
 - [[Biegesteifigkeit]]
+- [[Biegesteifigkeit um y]]
 
 ## Im Code
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: d4c74d67142c
+erzeugt: d86f8cb717b3
 art: modul
 tags: [modul]
 ---
@@ -96,6 +96,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: d4e2cce9d9c8
+erzeugt: 7f3483459444
 art: modul
 tags: [modul]
 ---
@@ -274,22 +274,31 @@ sie zu genau dieser Beschreibung noch hat -- nach einer Rechnung ist das
 der Fall. Sonst wird das eine Bauteil gerechnet. Die Diagramme selbst
 kommen aus [[opencivil.web.dienst#Konstanten|DIAGRAMME]], solange Abdruck und Schnitt dieselben sind.
 
+### _balkensystem
+
+```python
+def _balkensystem(projekt: Projekt, rumpf: Mapping[str, Any]) -> MitStaeben
+```
+
+Ein Balkensystem, eben oder im Raum -- beide bedienen dieselben Anfragen.
+
 ### balkensystem_verlauf
 
 ```python
 def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 ```
 
-Die Bilder eines Balkensystems in einem Fall: je Stab N, V, M und die
-Verschiebung, je Knoten seine Verschiebung. Eine eigene Anfrage wie die
+Die Bilder eines Balkensystems in einem Fall: je Stab die
+Schnittgroessen und die Verschiebung, je Knoten seine Verschiebung. Eine eigene Anfrage wie die
 Diagramme der Querschnittsanalyse -- gross, und nur gebraucht, wenn
 jemand hinsieht. Gerechnet wird aus dem Zwischenspeicher, wenn er das
 System zu dieser Beschreibung noch hat.
 
 Ein System, das sich nicht rechnen laesst, ist keine falsche Anfrage:
 dann ist `verlauf` leer, und die Uebersicht sagt warum. Ohne `fall`
-kommt nur die Uebersicht -- was das Zeichenfenster nach jeder Aenderung
-braucht: Meldungen, Knoten ohne Drehsteifigkeit, was sich bewegt.
+kommen nur die Zeichendaten des Systems ([[opencivil.web.zeichendaten]])
+-- was das Zeichenfenster nach jeder Aenderung braucht: Meldungen, Knoten
+ohne Drehsteifigkeit, was sich bewegt, im Raum die Achsen der Linien.
 
 ### decke_zeichnung
 
@@ -331,7 +340,8 @@ Oberflaeche uebernimmt es in einem Schritt, den man rueckgaengig machen
 kann.
 
 `teilen`: `linie` und die Stelle -- `stelle` in m ab dem Anfang,
-ein `anteil` der Laenge (0.5: in der Mitte) oder ein `punkt` [x, z],
+ein `anteil` der Laenge (0.5: in der Mitte) oder ein `punkt` mit
+einer Koordinate je Achse -- [x, z] in der Ebene, [x, y, z] im Raum --,
 der auf die Linie gelotet wird.
 `umkehren`: `linien`, eine oder mehrere.
 
@@ -411,6 +421,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.bewehrungssuche]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.web.api]]
@@ -419,6 +430,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.speicher]]
 - [[opencivil.web.umschlag]]
+- [[opencivil.web.zeichendaten]]
 
 ## Gebraucht von
 

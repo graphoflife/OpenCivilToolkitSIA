@@ -1,5 +1,5 @@
 ---
-erzeugt: 20b5533c8061
+erzeugt: 22911d0b604b
 art: modul
 tags: [modul]
 ---
@@ -68,4 +68,7 @@ Ein 3D-Balkensystem, fertig fuer das Rechenwerk.
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau.balkensystem3d]]
+- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.stabwerk3d.herleitung]]
+- [[opencivil.web.api]]
+- [[opencivil.web.balkendaten]]

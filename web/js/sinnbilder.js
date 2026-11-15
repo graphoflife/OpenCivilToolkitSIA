@@ -112,6 +112,12 @@ const ZEICHEN = {
     pfade: ['M6 18V6h12v12', 'M3.5 18h5 M3.5 20l1-2 M5.5 20l1-2 M7.5 20l1-2',
       'M18 18l-2 3h4z'],
   },
+  // Ein Rahmen im Raum, schräg von oben: vier Stützen, oben ein Rost --
+  // gestrichelt die Stütze hinten links, die hinter dem Rahmen steht.
+  balkensystem3d: {
+    pfade: ['M3.5 20V10h11v10', 'M3.5 10l6-5h11l-6 5', 'M20.5 5v10'],
+    strich: ['M9.5 5v10'],
+  },
   // Eine Decke im Grundriss: ein L, gestrichelt geteilt in Streifen beider Richtungen.
   decke: {
     pfade: ['M3.5 3.5h17v8h-8v9h-9z'],

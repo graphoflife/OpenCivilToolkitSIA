@@ -42,10 +42,11 @@ from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import BEIWERT as DUKTILITAET_BEIWERT, HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import BAUTEILE, Aufbau, SkriptEintrag
-from opencivil.projekt import balkensystem as bs
+from opencivil.projekt.balkensystem import BalkensystemEintrag
+from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
-from opencivil.projekt.lesen import eintragsklassen, feldangaben, wahl_von
+from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE, WerkstoffwahlEintrag
 from opencivil.querschnitt.analyse import Zeichnung
@@ -60,14 +61,12 @@ from opencivil.nachweis.rechenwahl import (
     FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
 )
 from opencivil.spannungsanalyse import Analyseart
-from opencivil.stabwerk import profiltabelle
-from opencivil.stabwerk import querschnitte as stabquerschnitte
-from opencivil.stabwerk.modell import Lastart, Lastrichtung
-from opencivil.stabwerk.rechnung import STABKENNWERTE
+from opencivil.stabwerk.rechnung import Balkensystem
+from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.pfahl.boden import Mantel, Verhalten
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
-from opencivil.web import diagrammdaten, durchstanzdaten
+from opencivil.web import balkendaten, diagrammdaten, durchstanzdaten, systemkatalog
 from opencivil.web.anzeige import zelle_dict
 from opencivil.web.umschlag import endlich
 from opencivil.web.zeichendaten import zeichendaten
@@ -85,13 +84,6 @@ _WERKSTOFFSAETZE = [
 _VERSCHMIERUNGEN = {
     "flaeche": ("Stahlfläche", "Die Stahlfläche der ganzen Linie, von Hand"),
     "staebe": ("⌀ und Teilung", "Stäbe ⌀ im Abstand s über die Länge L, verschmiert: L/s · π⌀²/4"),
-}
-#: Wie die Diagramme der Statik-Analyse heissen: kurz im Schalter, lang ueber
-#: dem Diagramm -- je Groesse, die die Beschreibung kennt.
-_DIAGRAMMGROESSEN = {
-    "M": ("M", "Moment M"), "V": ("V", "Querkraft V"), "N": ("N", "Normalkraft N"),
-    "verschiebung": ("Verschiebung", "Verschiebung"), "verdrehung": ("Verdrehung", "Verdrehung φ"),
-    "lagerkraefte": ("Lager", "Lagerkräfte"),
 }
 #: Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche
 #: es gibt, steht am Feld der Werkstoffwahl.
@@ -151,7 +143,7 @@ def _klassen() -> Dict[str, type]:
     """
     klassen: Dict[str, type] = {}
     for cls in eintragsklassen(Projekt):
-        name = cls.__name__.removesuffix("Eintrag").lower()
+        name = katalogname(cls)
         if name in klassen:
             raise ValueError(f"Zwei Klassen von Eintraegen hiessen im Katalog «{name}».")
         klassen[name] = cls
@@ -264,67 +256,11 @@ def katalog() -> dict:
                 for v in VORLAGEN
             ],
         },
-        # Die Wahlmoeglichkeiten des Balkensystems, mit Beschriftung und
-        # Einheit -- die Einheiten aus der Beschreibung, die mit ihnen rechnet.
-        "balkensystem": {
-            "vorlagen": [
-                {"schluessel": v.schluessel, "name": v.name,
-                 "masse": [{"schluessel": m.schluessel, "symbol": m.symbol,
-                            "beschriftung": m.beschriftung, "vorgabe": m.vorgabe}
-                           for m in v.masse],
-                 "skizze": [[[round(y, 1), round(z, 1)] for y, z in umriss]
-                            for umriss in v.umriss(v.vorgaben())]}
-                for v in stabquerschnitte.VORLAGEN
-            ],
-            # Die Stahlprofile: je Reihe ihre Namen in der Folge der Tabelle
-            # -- die Masse kennt nur der Kern, das Bild kommt mit der Loesung.
-            "profilreihen": [{"kurz": r.kurz, "beschreibung": r.beschreibung,
-                              "profile": [p.name for p in r.profile]}
-                             for r in profiltabelle.PROFILREIHEN],
-            "profilachsen": [{"wert": a.value, "beschriftung": a.kurz, "titel": a.beschriftung}
-                             for a in bs.Profilachse],
-            # Woher A und I eines Stabs kommen. Der kurze Name steht im
-            # Schalter, der lange in seinem Titel; ob die Art ein Material
-            # mitbringt, sagt, ob eine Linie es «gemäss Querschnitt» nehmen kann.
-            "querschnittsarten": [
-                {"wert": a.value, "beschriftung": a.beschriftung, "kurz": a.kurz,
-                 "bringt_material": a.aus_bauteil}
-                for a in bs.Querschnittsart
-            ],
-            # Je Art, aus der ein Stab sein kann -- Beton und Baustahl des
-            # Projekts --, die Kennwerte, die er nimmt; die Tabelle der
-            # Materialien zeigt sie gesperrt.
-            "stabkennwerte": {art.value: dict(k) for art, k in STABKENNWERTE.items()},
-            # Welches E ein Stab hat, der das Material seines Querschnitts
-            # nimmt -- und bei welchen Arten: bei einem aus einem Bauteil.
-            "e_module": [
-                {"wert": "e0", "beschriftung": "E₀ = E_cm",
-                 "titel": "E_cm des Betons, den der Querschnitt mitbringt",
-                 "arten": [a.value for a in bs.Querschnittsart if a.aus_bauteil]},
-                {"wert": "e_eq", "beschriftung": "E_eq",
-                 "titel": "Der äquivalente E-Modul der Platte oder Querschnittsanalyse bei N und M",
-                 "arten": [a.value for a in bs.Querschnittsart if a.aus_bauteil]},
-            ],
-            # Was als Material einer Linie heisst: das ihres Querschnitts.
-            "material_des_querschnitts": bs.MATERIAL_DES_QUERSCHNITTS,
-            # Was ein Diagramm der Statik-Analyse zeigt -- kurz im Schalter,
-            # lang ueber dem Diagramm.
-            "diagrammgroessen": [{"wert": wert, "beschriftung": _DIAGRAMMGROESSEN[wert][0],
-                                  "titel": _DIAGRAMMGROESSEN[wert][1]}
-                                 for wert in bs.DIAGRAMMGROESSEN],
-            "lastarten": [
-                {"wert": a.value, "beschriftung": a.beschriftung, "verteilt": a.verteilt,
-                 "kraft": a.kraft, "einheit": bs.EINHEIT_DER_LAST[a.value].beschriftung}
-                for a in Lastart
-            ],
-            "richtungen": [{"wert": r.value, "beschriftung": r.beschriftung}
-                           for r in Lastrichtung],
-            "knotenrichtungen": [r.value for r in bs.KNOTENRICHTUNGEN],
-            "halt": list(bs.HALT),
-            "federeinheiten": {feld: e.beschriftung for feld, e in bs.EINHEIT_DER_FEDER.items()},
-            "lagerarten": [{"wert": art, "x": x, "z": z, "phi": phi}
-                           for art, (x, z, phi) in bs.LAGERARTEN.items()],
-        },
+        # Die Wahlmoeglichkeiten der Balkensysteme, eben und im Raum -- mit
+        # Beschriftung und Einheit, aus der Beschreibung, die mit ihnen rechnet.
+        "balkensystem": systemkatalog.katalog(BalkensystemEintrag, Balkensystem, balkendaten.EBEN),
+        "balkensystem3d": systemkatalog.katalog(Balkensystem3dEintrag, Balkensystem3d,
+                                                balkendaten.RAUM),
         # Die Fragen der Spannung-Dehnung-Analyse.
         "spannungsanalyse": {
             # Je Frage, welche Felder des Falls sie braucht und was ihre
@@ -831,4 +767,5 @@ def _systemzuordnung(teil) -> dict:
 _ZUORDNUNG: Dict[str, Callable[[Any], dict]] = {
     "platte": _plattenzuordnung,
     "balkensystem": _systemzuordnung,
+    "balkensystem3d": _systemzuordnung,
 }

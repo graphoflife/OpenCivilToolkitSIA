@@ -1,7 +1,7 @@
 /**
  * apps.js -- die Apps der linken Tafel, je eine Zeile.
  *
- * Eine App hat links einen Knopf: die Materialien, die acht Bauteilarten
+ * Eine App hat links einen Knopf: die Materialien, die neun Bauteilarten
  * (ARTEN, arten.js) und Python. Was Baum, Editor und rechte Tafel von ihr
  * wissen müssen, steht in ihrer Zeile: ihre Liste im Projekt und die Gruppen
  * unter dem Knopf, wie ein Eintrag heisst und was rechts in ihm steht, wie er
@@ -39,8 +39,8 @@ import { situationKarten } from './gb_zeichnung.js';
 import { setzungKarten } from './sz_zeichnung.js';
 import { pfahlKarten } from './pf_zeichnung.js';
 import {
-  ansichtVergessen, eintragVon, freieKennung, katalog, naechsterName, projektAendern, waehlen,
-  zustand,
+  ansichtVergessen, ausVorlage, eintragVon, freieKennung, katalog, naechsterName, projektAendern,
+  waehlen, zustand,
 } from './zustand.js';
 
 // ===========================================================================
@@ -254,8 +254,10 @@ const ANALYSE = bauteil('querschnittsanalyse', {
 /**
  * Leer, aus dem Kern (Benutzer, 2026-10-19) -- bis auf ein Material: der
  * erste Beton des Projekts, damit ein gezeichneter Stab gleich eines hat.
+ * Das 2D- und das 3D-Balkensystem sind dieselbe App, je mit ihrer Liste und
+ * ihrem Katalog (bs_teile.js); das Material ist eines ihrer Art.
  */
-const SYSTEM = bauteil('balkensystem', {
+const balkensystem = (art) => bauteil(art, {
   kurztext: (s) => {
     const staebe = s.linien.filter((l) => l.querschnitt).length;
     return `${staebe} ${staebe === 1 ? 'Stab' : 'Stäbe'}`;
@@ -263,10 +265,8 @@ const SYSTEM = bauteil('balkensystem', {
   anlegen: (a) => nachVorlage(a, {
     braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.',
     einrichten: (s, { beton }) => {
-      s.stabmaterialien = [{
-        ...structuredClone(katalog('vorlagen', 'stabmaterial')),
-        kennung: 'M1', art: 'beton', stoff: beton.kennung,
-      }];
+      s.stabmaterialien = [ausVorlage(katalog(art, 'klassen', 'material'),
+        { kennung: 'M1', art: 'beton', stoff: beton.kennung })];
     },
   }),
   editor: balkensystemEditor,
@@ -274,6 +274,8 @@ const SYSTEM = bauteil('balkensystem', {
   uebersicht: systemZusammenfassung,
   fenster: balkensystemFenster,
 });
+const SYSTEM = balkensystem('balkensystem');
+const SYSTEM3D = balkensystem('balkensystem3d');
 
 /**
  * Leer, aus dem Kern -- gezeichnet wird danach. Einen Beton braucht erst
@@ -370,7 +372,8 @@ const SKRIPT = {
 
 /** Die Apps, in der Folge ihrer Knöpfe: das Material, die Bauteilarten wie ARTEN, Python. */
 export const APPS = [
-  MATERIAL, PLATTE, ANALYSE, SYSTEM, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, PFAHL, SKRIPT,
+  MATERIAL, PLATTE, ANALYSE, SYSTEM, SYSTEM3D, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, PFAHL,
+  SKRIPT,
 ];
 
 /** Die App, wie die Auswahl sie nennt: 'material', 'skript' oder eine Bauteilart. */

@@ -71,6 +71,7 @@ from opencivil.projekt.balkensystem import (
     BalkensystemEintrag, KnotenlastEintrag, LagerEintrag, StablastEintrag, StabquerschnittEintrag,
     StatikdiagrammEintrag, SystemknotenEintrag, SystemlinieEintrag,
 )
+from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchswahl, QALastfallEintrag,
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
@@ -94,7 +95,7 @@ from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufb
 from opencivil.projekt.projekt import Projekt
 
 __all__ = [
-    "Aufbau", "BAUTEILE", "BalkensystemEintrag", "Bauteil",
+    "Aufbau", "BAUTEILE", "Balkensystem3dEintrag", "BalkensystemEintrag", "Bauteil",
     "Bauteilart", "Beschreibung",
     "FlaecheEintrag", "KnotenlastEintrag", "LagerEintrag", "LastfallEintrag",
     "LastkombinationEintrag", "StablastEintrag", "StabquerschnittEintrag",

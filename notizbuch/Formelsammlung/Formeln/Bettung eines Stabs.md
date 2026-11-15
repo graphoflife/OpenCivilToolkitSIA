@@ -1,5 +1,5 @@
 ---
-erzeugt: fb912b6d89d8
+erzeugt: 34bbdfdd9b91
 art: formel
 tags: [formel]
 ---
@@ -15,6 +15,7 @@ $$
 ## Im Code
 
 - [[opencivil.stabwerk.herleitung|_ansaetze]]
+- [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 
 ## Themen
 

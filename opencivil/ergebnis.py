@@ -86,15 +86,16 @@ class Ergebnis:
 
     def balkensystem(self, bauteil: str) -> "Systembefund":
         """
-        Ein gerechnetes Balkensystem -- nach Name oder Kennung: sein Ergebnis
-        (``ergebnis``: Meldungen, Faelle mit Verschiebungen und
-        Lagerkraeften) und je Fall die Verlaeufe der Schnittgroessen
-        (``verlaeufe("Eigengewicht")``), in SI.
+        Ein gerechnetes Balkensystem, eben oder im Raum -- nach Name oder
+        Kennung: sein Ergebnis (``ergebnis``: Meldungen, Faelle mit
+        Verschiebungen und Lagerkraeften) und je Fall die Verlaeufe der
+        Schnittgroessen (``verlaeufe("Eigengewicht")``), in SI.
         """
-        for kennung, system in self.aufbau.balkensysteme.items():
+        systeme = {**self.aufbau.balkensysteme, **self.aufbau.balkensysteme3d}
+        for kennung, system in systeme.items():
             if bauteil in (kennung, system.name):
                 return self.loesung.befund(system.rechnung)
-        namen = ", ".join(f"'{s.name}'" for s in self.aufbau.balkensysteme.values())
+        namen = ", ".join(f"'{s.name}'" for s in systeme.values())
         raise KeyError(f"Ein Balkensystem '{bauteil}' gibt es nicht. Vorhanden: {namen or 'keines'}.")
 
     def analysen(self) -> Dict[str, List[Analyse]]:

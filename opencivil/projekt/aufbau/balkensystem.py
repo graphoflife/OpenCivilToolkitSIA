@@ -26,12 +26,12 @@ Hand die Form eines Querschnitts.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.einheiten import Einheit, Groesse
+from opencivil.core.einheiten import Groesse
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.projekt.balkensystem import (
-    EINHEIT_DER_FEDER, EINHEIT_DER_LAST, MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag,
+    EINHEIT_DER_LAST, MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag,
     Profilachse, Querschnittsart, StabmaterialEintrag, StabquerschnittEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler
@@ -96,11 +96,9 @@ class Uebersetzung:
     Beiwert dafuer bleiben mit einem Hinweis weg.
     """
 
-    def __init__(self, eintrag: Any, einheit_der_feder: Mapping[str, Einheit],
-                 weitere_stoffe: Sequence[str] = ()) -> None:
+    def __init__(self, eintrag: Any, weitere_stoffe: Sequence[str] = ()) -> None:
         """``weitere_stoffe``: was eine Linie als Material nehmen kann, ohne dass es im System steht."""
         self.eintrag = eintrag
-        self.einheit_der_feder = einheit_der_feder
         self.meldungen: List[Meldung] = list(faelle_pruefen(eintrag.lastfaelle,
                                                             eintrag.kombinationen))
         for was, liste in (("Knoten", eintrag.knoten), ("Linien", eintrag.linien),
@@ -137,7 +135,7 @@ class Uebersetzung:
             self.melden(f"{teil.kennung}: eine Feder braucht eine Steifigkeit grösser als null.",
                         teil.kennung)
             return FREI
-        return feder(Groesse(k, self.einheit_der_feder[f"k_{richtung}"]).si)
+        return feder(Groesse(k, self.eintrag.EINHEIT_DER_FEDER[f"k_{richtung}"]).si)
 
     def stab(self, l: Any) -> Dict[str, Any]:
         """
@@ -212,7 +210,7 @@ class Uebersetzung:
 
 def modell_von(eintrag: BalkensystemEintrag) -> Modell:
     """Das Stabwerk zum Rechnen, in SI (:mod:`opencivil.stabwerk.modell`) -- siehe :class:`Uebersetzung`."""
-    u = Uebersetzung(eintrag, EINHEIT_DER_FEDER, weitere_stoffe=(MATERIAL_DES_QUERSCHNITTS,))
+    u = Uebersetzung(eintrag, weitere_stoffe=(MATERIAL_DES_QUERSCHNITTS,))
     staebe = [Stab(**u.stab(l)) for l in eintrag.linien]
     lager = u.lager(Lager)
     u.stablasten(Stablast)

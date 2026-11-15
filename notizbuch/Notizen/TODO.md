@@ -838,6 +838,17 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Im Raum fehlt ein Diagramm der Verdrehung.** Ein Knoten dreht sich
       dort um drei Achsen; welches Bild es zeigen soll, ist offen. Die
       Zahlen stehen in der Herleitung.
+- [ ] **Lager, die im Bild aufeinanderfallen.** In den Ansichten x-z und
+      y-z liegen zwei Lager, die sich nur in der Tiefe unterscheiden, auf
+      demselben Punkt; ihre Lagerkräfte drängen sich dann, und die Zahlen
+      können sich trotz `freistellen` decken. Schräg von oben stehen sie
+      getrennt. Offen, ob es mehr braucht.
+- [ ] **Ein Knoten, der sich um eine Achse frei dreht, zeigt keine
+      Drehung.** Im Raum zählt ein Knoten als «nicht bestimmbar», sobald ihn
+      um eine Achse nichts hält -- etwa mit einer Drehfeder um eine Achse,
+      wo sonst nur Gelenke hängen. Beim Darüberfahren steht dann der Satz
+      statt aller drei Drehungen, auch der bestimmten; die Herleitung nennt
+      den Knoten (`web/balkendaten.py`). Besser wäre je Achse.
 
 ## Noch nicht gebaut
 

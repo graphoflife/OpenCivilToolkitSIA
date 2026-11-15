@@ -1,5 +1,5 @@
 ---
-erzeugt: 1f67a1a2e42a
+erzeugt: e6f6c2b8905b
 art: modul
 tags: [modul]
 ---
@@ -132,4 +132,4 @@ Das Profil dieses Namens -- ein unbekannter ist ein `KeyError`, der es sagt.
 
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.staebe]]
-- [[opencivil.web.api]]
+- [[opencivil.web.systemkatalog]]

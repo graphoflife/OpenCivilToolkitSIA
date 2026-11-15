@@ -7,6 +7,50 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · 3D-Balkensysteme: die App
+
+Neben den 2D-Balkensystemen gibt es die App «3D Balkensysteme» (Benutzer,
+2026-11-15): dieselbe Eingabe und dieselben Ergebnisse für einen Rahmen im
+Raum. Gezeichnet wird schräg von oben oder in den Ansichten x-y, x-z und
+y-z; die rechte Maustaste dreht, ein Klick trifft die Arbeitsebene, und die
+Taste E legt sie durch den Punkt unter dem Zeiger. Die Diagramme zeigen N,
+V_y, V_z, T, M_y, M_z, die Verschiebung und die Lagerkräfte, je aus einer
+Ansicht, die ein Schalter über dem Diagramm wählt.
+
+Warum so:
+
+- Eine Oberfläche für beide Arten. `balkensystem.js`, `bs_diagramme.js`,
+  `bs_zeichnung.js` und das schwebende Fenster lesen aus dem Katalog ihrer
+  Art, was sie hat (`systemkatalog(art, …)` in `bs_teile.js`, im Kern
+  `web/systemkatalog.py`): Achsen, Richtungen, Lager, Kennwerte, die Grössen
+  der Ergebnisse. Beide Kataloge haben dieselben Schlüssel; ein Test liest
+  jeden festen Pfad aus dem Quelltext und schlägt ihn in beiden nach. Was
+  sich nur in Worten unterscheidet -- die Hilfe, das Bild der Vorzeichen --,
+  steht in `bs_texte.js`.
+- Was nur der Raum braucht, steht in `cad_raum.js`: die vier Ansichten, das
+  Drehen um die Mitte der Zeichnung, die Arbeitsebene und ihr Raster.
+  `cad_fenster.js` ruft es an wenigen Stellen; in der Ebene ist `a.raum`
+  leer, und alles bleibt, wie es war. Gedreht wird mit der rechten
+  Maustaste, weil die linke wählt und zeichnet und die mittlere schiebt.
+- Wie eine Richtung im Bild erscheint, entscheidet eine Stelle (`imBild`,
+  `kraft`, `moment` in `bs_symbole.js`), für die Zeichnung wie für die
+  Diagramme: eine Kraft, die man fast von vorne sieht, wird ein Kreis mit
+  Punkt oder Kreuz, ein Moment ein Pfeil mit zwei Spitzen oder, von vorne,
+  ein Bogen.
+- Ein Verlauf liegt in der Ebene aus dem Stab und der Achse, die der
+  Katalog nennt -- M_y und V_z zu z, M_z und V_y zu y -- und erscheint
+  verkürzt wie sie; N und T stehen zu der Achse, die man länger sieht. Die
+  Ansicht eines Diagramms ist Darstellung und wird nicht gespeichert.
+- Zahlen weichen einander aus (`freistellen` in `bs_diagramme.js`): eine,
+  die eine frühere deckt, rückt in halben Zeilen weiter. Im Raum enden an
+  einer Ecke oft drei Stäbe, und f_y und f_z eines Stabs liegen nahe
+  beieinander. Das gilt auch in der Ebene, wo vorher an einer Ecke zwei
+  Zahlen übereinander standen.
+- Die Schalter der Ansicht, der Ebene und der Diagramme schreiben ihre
+  Stellungen, wie sie heissen: in Grossbuchstaben würde aus M_y ein M_Y.
+  Darum stehen auch in der Ebene die Grössen der Statik-Analyse jetzt
+  gemischt («Verschiebung» statt «VERSCHIEBUNG»), in den Decken ebenso.
+
 ## 2026-11-15 · Zeichenfenster: im Bild treffen, mit jeder Zahl von Achsen
 
 Vorbereitung für das 3D-Balkensystem; in den bestehenden Apps ändert sich

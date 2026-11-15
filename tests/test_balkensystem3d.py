@@ -1,7 +1,8 @@
 """
 Das 3D-Balkensystem: die Beschreibung, ihr Baukasten, Teilen und Umkehren,
-und gerechnet von der Beschreibung bis zur Herleitung -- gegen Handrechnungen
-und gegen das 2D-Balkensystem.
+gerechnet von der Beschreibung bis zur Herleitung -- gegen Handrechnungen
+und gegen das 2D-Balkensystem --, und was die Oberflaeche davon bekommt:
+Katalog, Zeichendaten, Verlaeufe, Teilen ueber den Dienst.
 """
 
 import math
@@ -9,24 +10,19 @@ import unittest
 
 from opencivil.core.protokoll import TabellenBlock
 from opencivil.projekt import BalkensystemEintrag, Projekt, ProjektFehler
-from opencivil.projekt.aufbau import Bauteilart
+from opencivil.projekt.aufbau import BALKENSYSTEM3D
 from opencivil.projekt.aufbau import balkensystem3d as aufbau3d
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.stabwerk.rechnung import STABKENNWERTE
 from opencivil.stabwerk3d.modell import Richtung
 from opencivil.stabwerk3d.rechnung import RAUMKENNWERTE
-
-#: Bis die Oberflaeche es kennt, steht das 3D-Balkensystem noch nicht in
-#: :data:`~opencivil.projekt.aufbau.BAUTEILE` -- gerechnet wird es hier am
-#: Projekt vorbei.
-ART = Bauteilart("balkensystem3d", "balkensysteme3d", Balkensystem3dEintrag, "u",
-                 "balkensystem3d", "3D-Balkensysteme", aufbau3d.bauen)
+from opencivil.web import api, dienst
 
 
 def gerechnet(projekt: Projekt, s: Balkensystem3dEintrag):
     """Das System und seine Loesung -- mit den Baustoffen des Projekts."""
     aufbau = projekt.aufbauen()
-    teil = ART.bauen(ART, s, aufbau)
+    teil = BALKENSYSTEM3D.bauen(BALKENSYSTEM3D, s, aufbau)
     loesung = aufbau.werk.loese(*teil.weitere_ziele)
     return loesung.befunde.get(teil.objekt.rechnung.id), loesung
 
@@ -271,3 +267,92 @@ class TestMaterialkennwerte(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def im_projekt():
+    """Der Kragarm im Projekt, mit 10 kN am Ende -- wie die Oberflaeche ihn schickt."""
+    p = Projekt(name="Raum")
+    p.baustahl("S355")
+    s = kragarm()
+    s.knotenlast(s.lastfall("P"), (4, 0, 0), 10.0)
+    p.balkensysteme3d.append(s)
+    return p
+
+
+class TestImProjekt(unittest.TestCase):
+    def test_ueber_die_fassade_und_zurueck(self):
+        p = Projekt(name="Raum")
+        s = p.balkensystem3d("Rahmen")
+        self.assertEqual((s.kennung, p.bauteil("u1")), ("u1", s))
+        self.assertEqual(Projekt.aus_dict(p.als_dict()).balkensysteme3d, [s])
+
+    def test_das_ergebnis_findet_es(self):
+        e = im_projekt().rechnen()
+        befund = e.balkensystem("Kragarm")
+        uz = befund.ergebnis.fall("P").verschiebungen["K2"][2]
+        self.assertAlmostEqual(uz, -10e3 * 4.0 ** 3 / (3 * 210000e6 * 100e-6), places=12)
+
+
+class TestFuerDieOberflaeche(unittest.TestCase):
+    def test_derselbe_katalog_wie_in_der_ebene(self):
+        k = api.katalog()
+        eben, raum = k["balkensystem"], k["balkensystem3d"]
+        self.assertEqual(sorted(eben), sorted(raum))
+        self.assertEqual(raum["achsen"], ["x", "y", "z"])
+        richtungen = {r["wert"]: (r["vektor"], r["stabachse"]) for r in raum["richtungen"]}
+        self.assertEqual(richtungen["senkrecht"], ([0.0, 0.0, -1.0], None))
+        self.assertEqual(richtungen["quer_y"], (None, "y"))
+        self.assertEqual({r["wert"]: r["stabachse"] for r in eben["richtungen"]}["quer"], "z")
+        self.assertEqual(raum["profilachsen"], [])
+        self.assertEqual([q["wert"] for q in raum["querschnittsarten"]],
+                         ["vorlage", "profil", "kennwerte"])
+        self.assertEqual(raum["lagerarten"][0], {"wert": "gelenkig", "x": "fest", "y": "fest",
+                                                 "z": "fest", "phi_x": "frei", "phi_y": "frei",
+                                                 "phi_z": "frei"})
+        self.assertEqual(raum["klassen"]["linie"], "raumlinie")
+        self.assertIn("raumlinie", k["vorlagen"])
+
+    def test_zeichendaten_mit_den_achsen_der_linien(self):
+        antwort = dienst.bearbeite("rechnen", {"projekt": im_projekt().als_dict()})
+        self.assertEqual(antwort.status, 200)
+        daten = antwort.daten["zeichendaten"]["u1"]
+        self.assertTrue(daten["uebersicht"]["gueltig"])
+        # Laengs in x, z nach unten, y = z × x ist -y des Systems.
+        self.assertEqual(daten["achsen"]["L1"], {"x": [1.0, 0.0, 0.0], "y": [0.0, -1.0, 0.0],
+                                                 "z": [0.0, 0.0, -1.0]})
+        (zeile,) = daten["uebersicht"]["faelle"][0]["lagerkraefte"]
+        self.assertEqual([round(zeile[g], 6) for g in ("R_x", "R_y", "R_z", "M_x", "M_y", "M_z")],
+                         [0.0, 0.0, 10.0, 0.0, -40.0, 0.0])
+        extrem = daten["uebersicht"]["faelle"][0]["staebe"]["L1"]["M_y"]
+        self.assertAlmostEqual(extrem["kleinst"][1], -40.0)
+
+    def test_verlauf_im_raum(self):
+        antwort = dienst.bearbeite("balkensystem_verlauf",
+                                   {"projekt": im_projekt().als_dict(), "kennung": "u1", "fall": "P"})
+        self.assertEqual(antwort.status, 200)
+        verlauf = antwort.daten["verlauf"]
+        stab = verlauf["staebe"]["L1"]
+        self.assertEqual((stab["L"], stab["anfang"]), (4.0, [0.0, 0.0, 0.0]))
+        self.assertEqual(stab["achsen"]["z"], [0.0, 0.0, -1.0])
+        ende = stab["proben"][-1]
+        uz = -10e3 * 4.0 ** 3 / (3 * 210000e6 * 100e-6) * 1e3
+        self.assertAlmostEqual(ende["u"][2], uz, places=6)
+        self.assertAlmostEqual(stab["proben"][0]["M_y"], -40.0, places=6)
+        knoten = verlauf["knoten"]["K2"]
+        self.assertEqual(knoten["lage"], [4.0, 0.0, 0.0])
+        self.assertEqual(len(knoten["phi"]), 3)
+        self.assertIn("L1", antwort.daten["achsen"])
+
+    def test_teilen_mit_einem_punkt_im_raum(self):
+        d = im_projekt().als_dict()
+        antwort = dienst.bearbeite("balkensystem_bearbeiten", {
+            "projekt": d, "kennung": "u1", "aktion": "teilen", "linie": "L1",
+            "punkt": [1.0, 0.5, -0.5]})
+        self.assertEqual((antwort.status, antwort.daten["neu"]), (200, ["L2"]))
+        knoten = {k["kennung"]: (k["x"], k["y"], k["z"])
+                  for k in antwort.daten["balkensystem"]["knoten"]}
+        self.assertEqual(knoten["K3"], (1.0, 0.0, 0.0))
+        falsch = dienst.bearbeite("balkensystem_bearbeiten", {
+            "projekt": d, "kennung": "u1", "aktion": "teilen", "linie": "L1", "punkt": [1.0, 0.5]})
+        self.assertEqual(falsch.status, 400)
+        self.assertIn("3 Zahlen", falsch.daten["fehler"])

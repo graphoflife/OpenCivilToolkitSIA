@@ -1,5 +1,5 @@
 ---
-erzeugt: e726fc269974
+erzeugt: c797b0f0b619
 art: modul
 tags: [modul]
 ---
@@ -104,10 +104,10 @@ Ein einzelner gerechneter Wert, mit Einheit, Herkunft und Norm.
 def balkensystem(self, bauteil: str) -> 'Systembefund'
 ```
 
-Ein gerechnetes Balkensystem -- nach Name oder Kennung: sein Ergebnis
-(`ergebnis`: Meldungen, Faelle mit Verschiebungen und
-Lagerkraeften) und je Fall die Verlaeufe der Schnittgroessen
-(`verlaeufe("Eigengewicht")`), in SI.
+Ein gerechnetes Balkensystem, eben oder im Raum -- nach Name oder
+Kennung: sein Ergebnis (`ergebnis`: Meldungen, Faelle mit
+Verschiebungen und Lagerkraeften) und je Fall die Verlaeufe der
+Schnittgroessen (`verlaeufe("Eigengewicht")`), in SI.
 
 #### Ergebnis.analysen
 

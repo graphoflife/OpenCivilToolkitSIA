@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 
 from opencivil.projekt.aufbau.balkensystem import Modell, Uebersetzung, form_von, stabwerk_bauen
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil
-from opencivil.projekt.balkensystem3d import EINHEIT_DER_FEDER, Balkensystem3dEintrag, RaumknotenlastEintrag
+from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag, RaumknotenlastEintrag
 from opencivil.stabwerk3d.modell import Knoten, Knotenlast, Lager, Stab, Stablast, System
 from opencivil.stabwerk3d.raum import ACHSEN, mal
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 def modell_von(eintrag: Balkensystem3dEintrag) -> Modell:
     """Das Stabwerk zum Rechnen, in SI (:mod:`opencivil.stabwerk3d.modell`)."""
-    u = Uebersetzung(eintrag, EINHEIT_DER_FEDER)
+    u = Uebersetzung(eintrag)
     staebe = [Stab(**u.stab(l), drehung=math.radians(l.drehung)) for l in eintrag.linien]
     lager = u.lager(Lager)
     u.stablasten(Stablast)

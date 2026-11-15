@@ -248,6 +248,8 @@ export function diagrammzeilen(eintrag, { groessen, vorlage }) {
       werte: groessen.map((g) => ({ wert: g.wert, beschriftung: g.beschriftung, titel: g.titel })),
       gewaehlt: d.groesse, titel: 'Was das Diagramm zeigt',
       setzen: (w) => aendern((s) => { s.diagramme[i].groesse = w; }),
+      // Wie geschrieben: gross geschrieben würde aus m_x ein M_X, aus M_y ein M_Y.
+      klasse: '.ist-wortlaut.ist-umbruch',
     }),
   ]);
   return [

@@ -1,5 +1,5 @@
 ---
-erzeugt: b52b7194246a
+erzeugt: 3489a4e8c31b
 art: modul
 tags: [modul]
 ---
@@ -317,6 +317,7 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 - `LAGERFELDER = ('x', 'z', 'phi')`
 - `LINIENLAGER = ('quer', 'laengs')`
 - `LAGERARTEN = LAGERARTEN`
+- `EINHEIT_DER_FEDER = EINHEIT_DER_FEDER`
 - `NEUE_DIAGRAMME = ('M', 'V', 'N')`
 - `KNOTEN = SystemknotenEintrag`
 - `LINIE = SystemlinieEintrag`
@@ -402,3 +403,4 @@ etwa `{"M": 80}` -- mit ihrem aequivalenten E-Modul.
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]
+- [[opencivil.web.systemkatalog]]

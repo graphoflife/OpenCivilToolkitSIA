@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c5bdecb585d
+erzeugt: bede5c7bfc55
 art: modul
 tags: [modul]
 ---
@@ -53,3 +53,7 @@ Ein 3D-Balkensystem -- seine Querschnitte nach Vorlage, als Profil oder von Hand
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.raum]]
 - [[opencivil.stabwerk3d.rechnung]]
+
+## Gebraucht von
+
+- [[opencivil.projekt.aufbau]]

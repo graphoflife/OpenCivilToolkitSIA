@@ -1,5 +1,5 @@
 ---
-erzeugt: 0171bbf8ee10
+erzeugt: 1354837687f4
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.1.2.3.3, (10)"
@@ -32,6 +32,8 @@ $$
 - [[Bemessungswert des Elastizitätsmoduls]]
 - [[Biegesteifigkeit]]
 - [[Biegesteifigkeit des Pfahls]]
+- [[Biegesteifigkeit um y]]
+- [[Biegesteifigkeit um z]]
 - [[Dehnsteifigkeit]]
 - [[Dehnsteifigkeit des Pfahls]]
 - [[Mittelwert des Schubmoduls]]

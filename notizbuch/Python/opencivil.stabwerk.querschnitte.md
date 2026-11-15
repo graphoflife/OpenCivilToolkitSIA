@@ -1,5 +1,5 @@
 ---
-erzeugt: d7e7e488bf5e
+erzeugt: ebecbe62f6df
 art: modul
 tags: [modul]
 ---
@@ -199,7 +199,7 @@ def vorlage(schluessel: str) -> Stabvorlage
 - [[opencivil.stabwerk.profilformen]]
 - [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.stabquerschnitt]]
-- [[opencivil.web.api]]
+- [[opencivil.web.systemkatalog]]
 
 ## Formeln aus diesem Modul
 
@@ -216,6 +216,10 @@ def vorlage(schluessel: str) -> Stabvorlage
 - [[Flächenträgheitsmoment eines Kreisrings um z]] · `_wie_um_y`
 - [[Flächenträgheitsmoment eines Rechteckrohrs]]
 - [[Flächenträgheitsmoment eines Rechtecks]]
+- [[Flächenträgheitsmoment eines Rechtecks um z]]
 - [[Flächenträgheitsmoment eines T-Querschnitts]]
 - [[Flächenträgheitsmoment eines Trapezes]]
+- [[Kürzere Seite eines Rechtecks]] · `_seiten`
+- [[Längere Seite eines Rechtecks]] · `_seiten`
 - [[Schwerpunkt eines T-Querschnitts]]
+- [[Torsionsträgheitsmoment eines Rechtecks]] · `_torsion`

@@ -296,6 +296,7 @@ ANGABEN: Dict[str, Optional[Callable[[Any, Loesung], Angaben]]] = {
                                      bewehrungsuebersicht(teil.objekt, loesung.werte)),
     "querschnittsanalyse": lambda teil, loesung: teil.objekt.angaben(),
     "balkensystem": None,
+    "balkensystem3d": None,
     "decke": None,
     "durchstanzen": _durchstanzangaben,
     "grundbruch": _grundbruchangaben,

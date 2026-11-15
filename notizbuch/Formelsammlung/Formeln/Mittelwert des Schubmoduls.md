@@ -1,5 +1,5 @@
 ---
-erzeugt: 589d7fc3d50f
+erzeugt: 65520ec69320
 art: formel
 tags: [formel]
 ---
@@ -24,6 +24,10 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 G_{cm} = \frac{E_{cm}}{2 \cdot \left(1 + \nu_c\right)} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{2 \cdot \left(1 + 0.2\right)} = 14008\,\mathrm{N}/\mathrm{mm}^{2}
 $$
+
+## Gebraucht von
+
+- [[Torsionssteifigkeit]]
 
 ## Im Code
 

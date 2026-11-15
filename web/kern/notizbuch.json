@@ -260,6 +260,15 @@
       ]
     },
     {
+      "name": "Achsen eines Stabs im Raum",
+      "pfad": "Formelsammlung/Formeln/Achsen eines Stabs im Raum.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
+      ]
+    },
+    {
       "name": "Anrechenbare Durchstanzbewehrung",
       "pfad": "Formelsammlung/Formeln/Anrechenbare Durchstanzbewehrung.md",
       "art": "formel",
@@ -807,6 +816,15 @@
       ]
     },
     {
+      "name": "Biegelinie eines Stabs im Raum",
+      "pfad": "Formelsammlung/Formeln/Biegelinie eines Stabs im Raum.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
+      ]
+    },
+    {
       "name": "Biegesteifigkeit",
       "pfad": "Formelsammlung/Formeln/Biegesteifigkeit.md",
       "art": "formel",
@@ -826,6 +844,28 @@
       ],
       "themen": [
         "Pfahlsteifigkeit"
+      ]
+    },
+    {
+      "name": "Biegesteifigkeit um y",
+      "pfad": "Formelsammlung/Formeln/Biegesteifigkeit um y.md",
+      "art": "formel",
+      "zeichen": [
+        "EI_{y}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Biegesteifigkeit um z",
+      "pfad": "Formelsammlung/Formeln/Biegesteifigkeit um z.md",
+      "art": "formel",
+      "zeichen": [
+        "EI_{z}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
       ]
     },
     {
@@ -1547,6 +1587,17 @@
       ]
     },
     {
+      "name": "Flächenträgheitsmoment eines Rechtecks um z",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Rechtecks um z.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{z}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Flächenträgheitsmoment eines T-Querschnitts",
       "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines T-Querschnitts.md",
       "art": "formel",
@@ -1995,6 +2046,17 @@
       ]
     },
     {
+      "name": "Kreis im Knoten eines I-Profils",
+      "pfad": "Formelsammlung/Formeln/Kreis im Knoten eines I-Profils.md",
+      "art": "formel",
+      "zeichen": [
+        "d_{K}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung",
       "pfad": "Formelsammlung/Formeln/Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung.md",
       "art": "formel",
@@ -2003,6 +2065,17 @@
       ],
       "themen": [
         "Beton"
+      ]
+    },
+    {
+      "name": "Kürzere Seite eines Rechtecks",
+      "pfad": "Formelsammlung/Formeln/Kürzere Seite eines Rechtecks.md",
+      "art": "formel",
+      "zeichen": [
+        "t_{\\text{Q1}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
       ]
     },
     {
@@ -2038,6 +2111,17 @@
       ],
       "themen": [
         "Setzung"
+      ]
+    },
+    {
+      "name": "Längere Seite eines Rechtecks",
+      "pfad": "Formelsammlung/Formeln/Längere Seite eines Rechtecks.md",
+      "art": "formel",
+      "zeichen": [
+        "s_{\\text{Q1}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
       ]
     },
     {
@@ -2760,6 +2844,15 @@
       ]
     },
     {
+      "name": "Schnittgrössen eines Stabs im Raum",
+      "pfad": "Formelsammlung/Formeln/Schnittgrössen eines Stabs im Raum.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
+      ]
+    },
+    {
       "name": "Schnittgrössen längs eines Stabs",
       "pfad": "Formelsammlung/Formeln/Schnittgrössen längs eines Stabs.md",
       "art": "formel",
@@ -3112,6 +3205,39 @@
       "zeichen": [],
       "themen": [
         "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Torsionssteifigkeit",
+      "pfad": "Formelsammlung/Formeln/Torsionssteifigkeit.md",
+      "art": "formel",
+      "zeichen": [
+        "GI_{T}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Torsionsträgheitsmoment eines I-Profils",
+      "pfad": "Formelsammlung/Formeln/Torsionsträgheitsmoment eines I-Profils.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{T}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Torsionsträgheitsmoment eines Rechtecks",
+      "pfad": "Formelsammlung/Formeln/Torsionsträgheitsmoment eines Rechtecks.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{T}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
       ]
     },
     {
@@ -3550,6 +3676,15 @@
       ],
       "themen": [
         "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Zerlegung eines Stabs im Raum",
+      "pfad": "Formelsammlung/Formeln/Zerlegung eines Stabs im Raum.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
       ]
     },
     {
@@ -6066,6 +6201,7 @@
         "Aufbau.querschnitte",
         "Aufbau.querschnittsanalysen",
         "Aufbau.balkensysteme",
+        "Aufbau.balkensysteme3d",
         "Aufbau.decken",
         "Aufbau.grundbrueche",
         "Aufbau.setzungen",
@@ -6202,7 +6338,8 @@
         "_pfaehle",
         "_erstes",
         "_alles_einmal",
-        "_beweglich"
+        "_beweglich",
+        "_raumrahmen"
       ]
     },
     {
@@ -6358,6 +6495,7 @@
         "bereich",
         "als_groesse",
         "feldangaben",
+        "katalogname",
         "eintragsklassen",
         "unbekanntes_feld",
         "lesen",
@@ -6460,6 +6598,7 @@
         "Projekt.platte",
         "Projekt.analyse",
         "Projekt.balkensystem",
+        "Projekt.balkensystem3d",
         "Projekt.decke",
         "Projekt.durchstanzen",
         "Projekt.grundbruch",
@@ -7321,7 +7460,9 @@
         "feder",
         "Lastrichtung",
         "Lastrichtung.beschriftung",
+        "Lastrichtung.stabachse",
         "Lastrichtung.im_system",
+        "Lastrichtung.systemvektor",
         "Lastrichtung.vektor",
         "Lastrichtung.projektion",
         "Lastart",
@@ -7565,7 +7706,9 @@
       "stichworte": [
         "Richtung",
         "Richtung.beschriftung",
+        "Richtung.stabachse",
         "Richtung.im_system",
+        "Richtung.systemvektor",
         "Richtung.vektor",
         "Richtung.projektion",
         "Knoten",
@@ -7734,10 +7877,16 @@
       "art": "modul",
       "kurz": "was die Oberflaeche von einem Balkensystem zeigt.",
       "stichworte": [
+        "Darstellung",
+        "Darstellung.drehungen",
+        "Darstellung._lagerwerte",
+        "Darstellung.lagerkraefte",
+        "Darstellung.als_dict",
         "uebersicht",
         "verlauf",
         "faelle",
-        "umrisse"
+        "umrisse",
+        "stabachsen"
       ]
     },
     {
@@ -7842,6 +7991,7 @@
         "verweise",
         "geometrie",
         "analysediagramme",
+        "_balkensystem",
         "balkensystem_verlauf",
         "decke_zeichnung",
         "decke_ergebnis",
@@ -7930,6 +8080,16 @@
       ]
     },
     {
+      "name": "opencivil.web.systemkatalog",
+      "pfad": "Python/opencivil.web.systemkatalog.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche an einem Balkensystem waehlen laesst.",
+      "stichworte": [
+        "_zeichen",
+        "katalog"
+      ]
+    },
+    {
       "name": "opencivil.web.umschlag",
       "pfad": "Python/opencivil.web.umschlag.md",
       "art": "modul",
@@ -7948,6 +8108,7 @@
       "kurz": "was die Oberflaeche je Bauteil zeichnet, nach seiner Art.",
       "stichworte": [
         "_balkensystem",
+        "_balkensystem3d",
         "zeichendaten"
       ]
     },

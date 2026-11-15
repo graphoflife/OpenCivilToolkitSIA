@@ -1,5 +1,5 @@
 ---
-erzeugt: 6a73352b2cec
+erzeugt: 86922e74bd34
 art: modul
 tags: [modul]
 ---
@@ -157,6 +157,16 @@ die Wahllisten des Katalogs, mit Beschriftung.
 Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
 des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
 und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
+
+### katalogname
+
+```python
+def katalogname(cls: type) -> str
+```
+
+Wie eine Klasse von Eintraegen im Katalog der Oberflaeche heisst: ohne
+«Eintrag», klein -- `grundbruch`, `raumlinie`. Unter diesem Namen
+stehen ihre Feldangaben und ihre Vorlage.
 
 ### eintragsklassen
 
@@ -381,3 +391,4 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.web.api]]
+- [[opencivil.web.systemkatalog]]

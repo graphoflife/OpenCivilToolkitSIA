@@ -43,6 +43,7 @@ from opencivil.geotechnik.setzung import Setzungsfundament
 from opencivil.pfahl.pfahl import Pfahl
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.stabwerk.rechnung import Balkensystem
+from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.decke.werk import Deckensystem
 
 if TYPE_CHECKING:
@@ -139,6 +140,11 @@ class Aufbau:
     def balkensysteme(self) -> Dict[str, Balkensystem]:
         """Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
         return self.objekte("balkensystem")
+
+    @property
+    def balkensysteme3d(self) -> Dict[str, Balkensystem3d]:
+        """Die 3D-Balkensysteme, nach Kennung -- wie die ebenen."""
+        return self.objekte("balkensystem3d")
 
     @property
     def decken(self) -> Dict[str, Deckensystem]:

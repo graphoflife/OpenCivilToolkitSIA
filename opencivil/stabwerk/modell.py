@@ -82,9 +82,22 @@ class Lastrichtung(Wahl):
         }[self]
 
     @property
+    def stabachse(self) -> Optional[str]:
+        """
+        In welcher Achse des Stabs sie liegt: ``x`` laengs, ``z`` quer -- zur
+        gestrichelten Faser. Keine, wenn sie im System liegt.
+        """
+        return {Lastrichtung.LAENGS: "x", Lastrichtung.QUER: "z"}.get(self)
+
+    @property
     def im_system(self) -> bool:
         """Ob sie in den Achsen des Systems liegt -- und nicht in denen des Stabs."""
-        return self in (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)
+        return self.stabachse is None
+
+    @property
+    def systemvektor(self) -> Optional[Tuple[float, float]]:
+        """Die Richtung ``(x, z)``, wenn sie im System liegt."""
+        return {Lastrichtung.SENKRECHT: (0.0, -1.0), Lastrichtung.WAAGRECHT: (1.0, 0.0)}.get(self)
 
     def vektor(self, c: float, s: float) -> Tuple[float, float]:
         """
@@ -92,12 +105,7 @@ class Lastrichtung(Wahl):
         mit ``(c, s) = (cos α, sin α)``. Quer heisst zur gestrichelten Faser:
         ``(s, -c)``, die rechte Seite des Stabs.
         """
-        return {
-            Lastrichtung.SENKRECHT: (0.0, -1.0),
-            Lastrichtung.WAAGRECHT: (1.0, 0.0),
-            Lastrichtung.QUER: (s, -c),
-            Lastrichtung.LAENGS: (c, s),
-        }[self]
+        return self.systemvektor or {"x": (c, s), "z": (s, -c)}[self.stabachse]
 
     def projektion(self, c: float, s: float) -> float:
         """Laenge der Projektion je Meter Stab -- senkrecht auf die Waagrechte, waagrecht auf die Senkrechte."""

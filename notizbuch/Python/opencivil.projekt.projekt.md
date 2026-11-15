@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b30b37449b7
+erzeugt: b9b489e3204c
 art: modul
 tags: [modul]
 ---
@@ -35,6 +35,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `querschnitte: List[QuerschnittEintrag] = field(default_factory=list)`
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
 - `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
+- `balkensysteme3d: List[Balkensystem3dEintrag] = field(default_factory=list)` – Rahmen im Raum: wie die ebenen, mit x, y und z und Torsion.
 - `decken: List[DeckeEintrag] = field(default_factory=list)` – Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Unterzüge.
 - `durchstanzstellen: List[DurchstanzEintrag] = field(default_factory=list)` – Stützen und Wände, an denen das Durchstanzen nachgewiesen wird.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
@@ -229,6 +230,15 @@ mit dem Baukasten des Eintrags -- `querschnitt`, `linie`,
 Kombinationen, die die Oberflaeche mitbringt: wer in Python zeichnet,
 zeichnet sein eigenes System.
 
+#### Projekt.balkensystem3d
+
+```python
+def balkensystem3d(self, name: str, **felder: Any) -> Balkensystem3dEintrag
+```
+
+Ein leeres 3D-Balkensystem, ein Rahmen im Raum -- gezeichnet wie das
+ebene ([[opencivil.projekt.projekt#Projekt.balkensystem|balkensystem]]), mit Punkten `(x, y, z)` in m.
+
 #### Projekt.decke
 
 ```python
@@ -402,6 +412,7 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 - [[opencivil.material.arten]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]

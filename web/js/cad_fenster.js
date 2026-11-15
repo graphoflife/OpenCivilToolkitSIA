@@ -51,6 +51,13 @@
  * halb gezeichnetes Polygon, der Massstab und «Rückgängig» überstehen so
  * jede Rechnung, die zwischendurch fertig wird.
  *
+ * IM RAUM:
+ * Hat der Adapter drei Achsen, sieht man die Zeichnung parallel projiziert
+ * (cad_raum.js): die rechte Maustaste dreht sie, die Leiste hat die
+ * Ansichten, das schwebende Fenster die Arbeitsebene, und E legt diese
+ * durch den gefangenen Punkt. Auf dem Handy wird nur mit den Knöpfen
+ * gedreht.
+ *
  * ZWEI EBENEN:
  * Das Modell wird nur gezeichnet, wenn es sich ändert oder die Ansicht
  * wandert. Zeiger, Fangzeichen und Vorschau liegen darüber und folgen der
@@ -63,6 +70,7 @@ import {
 import { abstand, auswahlTeil, cadModell, mitte } from './cad_modell.js';
 import {
   eingabeLeeren, eingabeNeu, fangen, getipptPunkt, hilfenZeichnen, klickPunkt, taste as eingabeTaste,
+  zeigerFang,
 } from './cad_eingabe.js';
 import {
   anhangBefehl, knotenBefehl, knotenEinfuegenBefehl, kopierenBefehl, linienBefehl,
@@ -72,6 +80,9 @@ import {
   hervorheben, istAnhang, klickWaehlen, leisteZeichnen, ohneAnhaenge, rahmenWaehlen, treffer,
 } from './cad_auswahl.js';
 import { lageZeichnen, paletteBauen, paletteZeichnen } from './cad_palette.js';
+import {
+  ansichtsleiste, drehen, drehpunkt, ebeneDurch, raumEinrichten, raumRaster,
+} from './cad_raum.js';
 import { aendern, aktualisieren, vorwaerts, zurueck } from './cad_verlauf.js';
 import { el, svgEl } from './dom.js';
 import { sinnbild } from './sinnbilder.js';
@@ -182,6 +193,8 @@ function neu(adapter) {
   a.neuZeichnen = () => zeichnen(a);
   a.obenBald = () => obenBald(a);
   a.getipptLiefern = () => getipptLiefern(a);
+  // Mit drei Achsen: eine Ansicht, die sich drehen lässt, und eine Arbeitsebene.
+  if (adapter.achsen.length === 3) raumEinrichten(a);
   bauen(a);
   return a;
 }
@@ -362,7 +375,7 @@ function zeichnen(a) {
   const app = svgEl('g');
   a.adapter.zeichnen(a, app);
   a.teile.modell.replaceChildren(
-    rasterZeichnen(a.v, a.raster, a.adapter.achsen),
+    a.raum ? raumRaster(a) : rasterZeichnen(a.v, a.raster, a.adapter.achsen),
     app,
     knotenZeichnen(a),
     hervorheben(a, a.auswahl, 'cad-auswahl'),
@@ -416,11 +429,12 @@ function statusZeichnen(a) {
   if (a.befehl) {
     const achsen = a.adapter.achsen.map((x) => x.toUpperCase()).join('/');
     satz = `${a.befehl.hinweis ? `${a.befehl.hinweis} · ` : ''}R Bezugspunkt · ${achsen} Achse · `
-      + 'P/S parallel/senkrecht · M Mitte · Ziffern tippen · Esc zurück';
+      + `${a.raum ? 'E Ebene durch den Punkt · ' : ''}P/S parallel/senkrecht · M Mitte · Ziffern tippen · Esc zurück`;
   } else if (a.auswahl.size) {
     satz = 'V verschieben · C kopieren · Entf löschen · Shift+Klick nimmt dazu · Esc wählt ab';
   } else {
-    satz = 'Klick wählt, noch ein Klick das darunter · Rahmen ziehen wählt mehrere · Mausrad zoomt';
+    satz = `Klick wählt, noch ein Klick das darunter · Rahmen ziehen wählt mehrere · Mausrad zoomt${
+      a.raum ? ' · rechte Maustaste dreht' : ''}`;
   }
   a.teile.hinweis.textContent = a.kurzhinweis || satz;
 }
@@ -466,12 +480,14 @@ function leisteBauen(a) {
   const vor = knopf('cad-wiederholen', '', 'Wiederholen (Strg+Y)', () => vorwaerts(a));
   const alles = knopf('cad-alles', '', 'Alles zeigen (F)', () => allesZeigen(a));
   const gross = knopf('cad-vollbild', '', 'Vollbild', () => vollbildSetzen(a, !a.vollbild));
-  a.teile.knoepfe = { werkzeuge, rueck, vor, gross };
+  // Im Raum die Ansichten: 3D, x-y, x-z, y-z.
+  const ansichten = a.raum ? ansichtsleiste(a, () => allesZeigen(a)) : null;
+  a.teile.knoepfe = { werkzeuge, rueck, vor, gross, ansichten };
   // Was die App gleich neben ihre Werkzeuge stellt -- das Balkensystem die
   // Wahl des Lastfalls. Sie füllt es selbst, so oft sich etwas ändert.
   const zusatz = a.adapter.leisteZusatz?.(a) || null;
   return [
-    ...werkzeuge, zusatz, vorlage, el('span.cad-luecke'),
+    ...werkzeuge, zusatz, vorlage, ansichten?.knoten, el('span.cad-luecke'),
     el('div.cad-ansicht', {}, [rueck, vor, alles, gross]),
   ];
 }
@@ -484,6 +500,7 @@ function knoepfeZeichnen(a) {
   k.gross.classList.toggle('ist-an', a.vollbild);
   k.gross.title = a.vollbild ? 'Vollbild verlassen (Esc)' : 'Vollbild';
   k.gross.setAttribute('aria-label', k.gross.title);
+  k.ansichten?.zeichnen();
   a.teile.bild.classList.toggle('ist-befehl', !!a.befehl);
 }
 
@@ -533,12 +550,14 @@ function druecken(a, e) {
   }
   if (a.druck || !a.v.massstab) return;
   const schieben = e.button === 1 || (e.button === 0 && a.leertaste);
-  if (e.button !== 0 && !schieben) return;
+  // Im Raum dreht die rechte Maustaste die Ansicht -- um die Mitte der Zeichnung.
+  const dreht = e.button === 2 && a.raum ? { um: drehpunkt(a), zuletzt: bild } : null;
+  if (e.button !== 0 && !schieben && !dreht) return;
   if (e.button === 1) e.preventDefault();
   // Ein Feld im schwebenden Fenster gibt seinen Fokus ab: der Klick gehört der Zeichnung.
   if (document.activeElement?.closest?.('.cad-palette')) document.activeElement.blur();
   a.druck = {
-    id: e.pointerId, start: bild, ursprung: [...a.v.ursprung], schieben, bewegt: false,
+    id: e.pointerId, start: bild, ursprung: [...a.v.ursprung], schieben, dreht, bewegt: false,
     beruehrung: e.pointerType === 'touch', rahmen: null,
   };
 }
@@ -566,6 +585,12 @@ function bewegen(a, e) {
   if (e.pointerId !== d.id) return;
   if (!d.bewegt && abstand(bild, d.start) < ZITTERN) return;
   d.bewegt = true;
+  if (d.dreht) {
+    drehen(a, bild[0] - d.dreht.zuletzt[0], bild[1] - d.dreht.zuletzt[1], d.dreht.um);
+    d.dreht.zuletzt = bild;
+    zeichnen(a);
+    return;
+  }
   // Mit der Maus auf leerer Fläche ohne Befehl: ein Rahmen. Sonst: die Ansicht schieben.
   if (!d.schieben && !a.befehl && !d.beruehrung) {
     d.rahmen = bild;
@@ -593,7 +618,7 @@ function loslassen(a, e) {
     zeichnen(a);
     return;
   }
-  if (d.bewegt || d.schieben) {
+  if (d.bewegt || d.schieben || d.dreht) {
     zeichnen(a);
     return;
   }
@@ -685,6 +710,16 @@ function taste(e) {
     }
   }
   if (imFeld) return;
+
+  // Im Raum legt E die Arbeitsebene durch den gefangenen Punkt -- vor den
+  // Werkzeugen: in der Ebene ist E eines (die Punktlast der Decke).
+  if (k === 'e' && a.raum) {
+    const p = zeigerFang(a)?.p;
+    if (p) ebeneDurch(a, p);
+    e.preventDefault();
+    zeichnen(a);
+    return;
+  }
 
   switch (k) {
     case 'Escape':

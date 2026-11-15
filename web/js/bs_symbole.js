@@ -2,17 +2,23 @@
  * bs_symbole.js -- die Zeichen eines Balkensystems im Bild.
  *
  * Lager und Federn, Gelenke, Linienlager, die gestrichelte Faser und die
- * Lasten. Gezeichnet wird in Bildpunkten: ein Lager ist gleich gross, wie
- * weit man auch zoomt -- nur seine Lage kommt aus der Zeichnung. Die Länge
- * eines Lastpfeils folgt seinem Wert, im Verhältnis zur grössten Last
- * derselben Art im Bild; das ist Darstellung und geht in keine Rechnung ein.
+ * Lasten -- eben und im Raum. Gezeichnet wird in Bildpunkten: ein Lager ist
+ * gleich gross, wie weit man auch zoomt -- nur seine Lage kommt aus der
+ * Zeichnung. Die Länge eines Lastpfeils folgt seinem Wert, im Verhältnis zur
+ * grössten Last derselben Art im Bild; das ist Darstellung und geht in keine
+ * Rechnung ein.
  *
  * RICHTUNGEN IM BILD:
- * Das Bild hat y nach unten, die Zeichnung z nach oben: eine Richtung
- * (dx, dz) der Zeichnung ist im Bild (dx, −dz) -- `imBild`. Die gestrichelte
- * Faser liegt rechts der Laufrichtung eines Stabs: in der Zeichnung bei
- * (s, −c), im Bild bei (−t_y, t_x) für seine Laufrichtung t im Bild. Dorthin
- * zeigt auch eine Last «quer», und dort liegt ein Linienlager.
+ * Jedes Zeichen bekommt seine Richtungen schon im Bild, als Einheitsvektor
+ * (y nach unten): die Seite der gestrichelten Faser, die eines
+ * Linienlagers, die eines Pfeils. Wie eine Richtung der Zeichnung ins Bild
+ * fällt, sagt die Ansicht (cad_ansicht.js) -- in der Ebene liegt die Faser
+ * rechts der Laufrichtung, im Raum dort, wohin z des Stabs zeigt. Zeigt
+ * eine Kraft fast auf den Betrachter zu oder von ihm weg, ist sie ein Kreis
+ * mit Punkt oder Kreuz (`blickSymbol`); ein Moment im Raum ist ein Pfeil mit
+ * zwei Spitzen (`momentpfeil`), von vorne gesehen ein Bogen. Welches Zeichen
+ * eine Richtung bekommt, entscheiden `imBild`, `kraft` und `moment` -- für
+ * das Zeichenfenster und die Diagramme dieselben.
  *
  * TREFFEN:
  * Ein Lastzeichen trägt seine Formen im Bild mit (`formen` an der Gruppe):
@@ -21,7 +27,8 @@
  * dort, wo das Zeichen entsteht, und nicht ein zweites Mal im Adapter.
  */
 
-import { text } from './cad_ansicht.js';
+import { blickrichtung, richtungImBild, text } from './cad_ansicht.js';
+import { skalar } from './cad_modell.js';
 import { svgEl } from './dom.js';
 
 /** Wie gross die Zeichen sind, in Bildpunkten. */
@@ -32,10 +39,9 @@ export const GROESSE = {
   faser: 4,         // Abstand der gestrichelten Faser vom Stab
   pfeil: 44,        // Länge des längsten Lastpfeils
   moment: 13,       // Radius eines Momentbogens
+  momentpfeil: 30,  // Länge eines Momentpfeils im Raum
+  blick: 6,         // Radius einer Kraft, die man von vorne sieht
 };
-
-/** Eine Richtung der Zeichnung (x nach rechts, z nach oben) im Bild. */
-export const imBild = ([dx, dz]) => [dx, -dz];
 
 function linie(p, q, klasse) {
   return svgEl('path', { d: `M${p[0].toFixed(1)} ${p[1].toFixed(1)} L${q[0].toFixed(1)} ${q[1].toFixed(1)}`, class: klasse });
@@ -75,7 +81,7 @@ function feder(p, q, klasse = 'bs-feder') {
 }
 
 /**
- * Ein Lager am Bildpunkt `p`: je Richtung frei, fest oder Feder (`halt`
+ * Ein Lager in der Ebene am Bildpunkt `p`: je Richtung frei, fest oder Feder (`halt`
  * = {x, z, phi} mit 'frei' | 'fest' | 'feder'). Fest in x und z ein
  * Dreieck auf schraffiertem Grund, nur in z ein Dreieck auf Rollen, nur in
  * x dasselbe von der Seite; eingespannt ein Balken mit Schraffur. Eine
@@ -131,6 +137,46 @@ export function lagerSymbol(p, halt, klasse = '') {
   return g;
 }
 
+/**
+ * Ein Lager im Raum am Bildpunkt `p`: ein Dreieck unter dem Knoten -- in
+ * Richtung `unten`, der Richtung −z im Bild (Einheitsvektor). Hält jede
+ * Verschiebung, steht es auf schraffiertem Grund, ist eine frei, auf Rollen,
+ * federt eine, auf einer Feder. Hält eine Drehung, liegt ein Riegel darüber,
+ * federt eine, ein Bogen; hält alles, ist es eingespannt: ein Balken mit
+ * Schraffur. `halt` = {schieben, drehen}, je eine Liste mit 'frei' | 'fest'
+ * | 'feder'. Was je Richtung gilt, sagt der Titel des Zeichens.
+ */
+export function raumlagerSymbol(p, { schieben, drehen }, unten, klasse = '') {
+  const g = svgEl('g', { class: `bs-lager ${klasse}` });
+  const h = GROESSE.lager;
+  const quer = [-unten[1], unten[0]];
+  const auf = (s, t = 0) => [p[0] + unten[0] * s + quer[0] * t, p[1] + unten[1] * s + quer[1] * t];
+  const alle = (liste, wert) => liste.every((x) => x === wert);
+  if (alle([...schieben, ...drehen], 'fest')) {
+    schraffur(g, auf(0, -h), auf(0, h), unten);
+    g.append(linie(auf(0, -h), auf(0, h), 'bs-einspannung'));
+    return g;
+  }
+  g.append(pfadAus([p, auf(h, -h * 0.7), auf(h, h * 0.7)], 'bs-dreieck', true));
+  if (alle(schieben, 'fest')) {
+    schraffur(g, auf(h, -h), auf(h, h), unten);
+  } else if (schieben.includes('feder')) {
+    g.append(feder(auf(h), auf(h + 14)));
+    schraffur(g, auf(h + 14, -h * 0.7), auf(h + 14, h * 0.7), unten);
+  } else {
+    g.append(linie(auf(h + 3, -h), auf(h + 3, h), 'bs-boden'));
+    schraffur(g, auf(h + 3, -h), auf(h + 3, h), unten);
+  }
+  if (drehen.includes('fest')) {
+    g.append(linie(auf(-4, -h * 0.8), auf(-4, h * 0.8), 'bs-einspannung'));
+  } else if (drehen.includes('feder')) {
+    const r = 9;
+    const [a, b] = [auf(0, r), auf(-r)];
+    g.append(svgEl('path', { d: `M${a[0].toFixed(1)} ${a[1].toFixed(1)} A${r} ${r} 0 1 1 ${b[0].toFixed(1)} ${b[1].toFixed(1)}`, class: 'bs-feder' }));
+  }
+  return g;
+}
+
 /** Ein Gelenk am Stabende: ein offener Kreis kurz vor dem Knoten, in Richtung `t` (Einheitsvektor im Bild, vom Knoten weg). */
 export function gelenkSymbol(p, t, klasse = '') {
   const a = GROESSE.gelenkAbstand;
@@ -140,13 +186,11 @@ export function gelenkSymbol(p, t, klasse = '') {
   });
 }
 
-/** Die gestrichelte Faser: rechts der Laufrichtung, knapp neben dem Stab. */
-export function faserSymbol(p, q, klasse = '') {
+/** Die gestrichelte Faser: knapp neben dem Stab, auf der Seite `n` (Einheitsvektor im Bild). */
+export function faserSymbol(p, q, n, klasse = '') {
   const l = Math.hypot(q[0] - p[0], q[1] - p[1]);
   if (l < 24) return null;
   const t = [(q[0] - p[0]) / l, (q[1] - p[1]) / l];
-  // Im Bild ist y unten: rechts der Laufrichtung ist (−t_y, t_x).
-  const n = [-t[1], t[0]];
   const f = GROESSE.faser;
   const rand = Math.min(14, l * 0.15);
   return linie(
@@ -155,29 +199,35 @@ export function faserSymbol(p, q, klasse = '') {
 }
 
 /**
- * Ein Linienlager neben dem Stab: quer fest eine schraffierte Linie auf der
- * Seite der gestrichelten Faser, quer federnd ein Band aus Federn (Bettung);
- * längs fest kurze Querstriche an der Linie, längs federnd kleine Federn.
+ * Ein Linienlager neben dem Stab: quer fest eine schraffierte Linie auf
+ * seiner Seite, quer federnd ein Band aus Federn (Bettung); längs fest
+ * kurze Querstriche an der Linie, längs federnd kleine Federn. `quer` ist
+ * eine Liste `{halt, n}`: je Richtung quer, wie sie hält, und ihre Seite im
+ * Bild (Einheitsvektor) -- in der Ebene eine, zur gestrichelten Faser, im
+ * Raum zwei, in y und z des Stabs.
  */
 export function linienlagerSymbol(p, q, quer, laengs, klasse = '') {
   const g = svgEl('g', { class: `bs-linienlager ${klasse}` });
   const l = Math.hypot(q[0] - p[0], q[1] - p[1]);
   if (l < 8) return g;
   const t = [(q[0] - p[0]) / l, (q[1] - p[1]) / l];
-  const n = [-t[1], t[0]];
   const ab = 9;
-  if (quer === 'fest') {
-    schraffur(g, [p[0] + n[0] * ab, p[1] + n[1] * ab], [q[0] + n[0] * ab, q[1] + n[1] * ab], n);
-  } else if (quer === 'feder') {
-    const anzahl = Math.max(2, Math.min(24, Math.round(l / 22)));
-    for (let i = 0; i < anzahl; i += 1) {
-      const s = ((i + 0.5) * l) / anzahl;
-      const a = [p[0] + t[0] * s, p[1] + t[1] * s];
-      g.append(feder([a[0] + n[0] * 2, a[1] + n[1] * 2], [a[0] + n[0] * 16, a[1] + n[1] * 16]));
+  for (const { halt, n } of quer) {
+    if (halt === 'fest') {
+      schraffur(g, [p[0] + n[0] * ab, p[1] + n[1] * ab], [q[0] + n[0] * ab, q[1] + n[1] * ab], n);
+    } else if (halt === 'feder') {
+      const anzahl = Math.max(2, Math.min(24, Math.round(l / 22)));
+      for (let i = 0; i < anzahl; i += 1) {
+        const s = ((i + 0.5) * l) / anzahl;
+        const a = [p[0] + t[0] * s, p[1] + t[1] * s];
+        g.append(feder([a[0] + n[0] * 2, a[1] + n[1] * 2], [a[0] + n[0] * 16, a[1] + n[1] * 16]));
+      }
+      g.append(linie([p[0] + n[0] * 16, p[1] + n[1] * 16], [q[0] + n[0] * 16, q[1] + n[1] * 16], 'bs-boden'));
     }
-    g.append(linie([p[0] + n[0] * 16, p[1] + n[1] * 16], [q[0] + n[0] * 16, q[1] + n[1] * 16], 'bs-boden'));
   }
   if (laengs === 'fest' || laengs === 'feder') {
+    // Auf der Seite gegenüber der ersten Richtung quer.
+    const n = quer[0]?.n || [-t[1], t[0]];
     const anzahl = Math.max(2, Math.min(16, Math.round(l / 30)));
     for (let i = 0; i < anzahl; i += 1) {
       const s = ((i + 0.5) * l) / anzahl;
@@ -275,20 +325,136 @@ export function streckenlast(a, b, r, la, lb, beschriftung, klasse = 'bs-last') 
   return g;
 }
 
-/** Ein verteiltes Moment: kleine Bögen entlang der Strecke. */
-export function streckenmoment(a, b, wert, beschriftung, klasse = 'bs-last') {
+/**
+ * Ein Moment im Raum an `p`: ein Pfeil mit zwei Spitzen in Richtung `r`
+ * (Einheitsvektor im Bild), vom Punkt weg -- es dreht im Rechtssinn um ihn.
+ */
+export function momentpfeil(p, r, beschriftung, klasse = 'bs-last') {
+  const g = svgEl('g');
+  const l = GROESSE.momentpfeil;
+  const ende = [p[0] + r[0] * l, p[1] + r[1] * l];
+  const zweite = [ende[0] - r[0] * 6, ende[1] - r[1] * 6];
+  g.append(linie(p, ende, `${klasse} bs-momentpfeil`), spitze(ende, r, klasse), spitze(zweite, r, klasse));
+  // Getroffen wird der Schaft ab etwas Abstand vom Punkt: dort liegt der Knoten oder Stab.
+  g.formen = [{ art: 'strecke', von: [p[0] + r[0] * 9, p[1] + r[1] * 9], bis: ende }];
+  if (beschriftung) {
+    g.append(text(ende[0] + r[0] * 5 + (Math.abs(r[0]) < 0.5 ? 6 : 0),
+      ende[1] + r[1] * 5 + (Math.abs(r[1]) < 0.5 ? -5 : 4), beschriftung,
+      `bs-lasttext ${klasse}`, Math.abs(r[0]) < 0.5 ? 'start' : (r[0] > 0 ? 'start' : 'end')));
+  }
+  return g;
+}
+
+/**
+ * Eine Kraft, die man von vorne sieht: ein Kreis um `p`, mit einem Punkt,
+ * wenn sie auf den Betrachter zu zeigt, mit einem Kreuz, wenn von ihm weg.
+ */
+export function blickSymbol(p, zuMir, beschriftung, klasse = 'bs-last') {
+  const g = svgEl('g');
+  const r = GROESSE.blick;
+  const [x, y] = p;
+  g.append(svgEl('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r, class: `${klasse} bs-blick` }));
+  if (zuMir) {
+    g.append(svgEl('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: 1.6, class: `${klasse} bs-spitze` }));
+  } else {
+    const k = r * 0.62;
+    g.append(svgEl('path', {
+      d: `M${(x - k).toFixed(1)} ${(y - k).toFixed(1)} L${(x + k).toFixed(1)} ${(y + k).toFixed(1)} M${(x - k).toFixed(1)} ${(y + k).toFixed(1)} L${(x + k).toFixed(1)} ${(y - k).toFixed(1)}`,
+      class: `${klasse} bs-lastpfeil`,
+    }));
+  }
+  if (beschriftung) g.append(text(x + r + 4, y - r - 2, beschriftung, `bs-lasttext ${klasse}`, 'start'));
+  g.formen = [{ art: 'bogen', mitte: p, r: r / 2 }];
+  return g;
+}
+
+/**
+ * Eine Reihe gleicher Zeichen entlang der Strecke von `a` nach `b`, etwa
+ * alle `abstand` Bildpunkte, höchstens `hoechstens`: ein verteiltes
+ * Moment, eine verteilte Last, die man von vorne sieht. `zeichen(p,
+ * beschriftung)` baut eines; die Beschriftung trägt das mittlere.
+ */
+export function reihe(a, b, abstand, zeichen, beschriftung, hoechstens = 8) {
   const g = svgEl('g');
   const l = Math.hypot(b[0] - a[0], b[1] - a[1]);
-  const anzahl = Math.max(1, Math.min(8, Math.round(l / 40)));
-  const boegen = [];
+  const anzahl = Math.max(1, Math.min(hoechstens, Math.round(l / abstand)));
+  const teile = [];
   for (let i = 0; i < anzahl; i += 1) {
     const s = (i + 0.5) / anzahl;
-    boegen.push(momentSymbol([a[0] + (b[0] - a[0]) * s, a[1] + (b[1] - a[1]) * s], wert,
-      i === Math.floor(anzahl / 2) ? beschriftung : '', `${klasse} bs-klein`));
+    teile.push(zeichen([a[0] + (b[0] - a[0]) * s, a[1] + (b[1] - a[1]) * s],
+      i === Math.floor(anzahl / 2) ? beschriftung : ''));
   }
-  g.append(...boegen);
-  g.formen = boegen.flatMap((x) => x.formen);
+  g.append(...teile);
+  g.formen = teile.flatMap((x) => x.formen);
   return g;
+}
+
+/** Ein verteiltes Moment: kleine Bögen entlang der Strecke. */
+export function streckenmoment(a, b, wert, beschriftung, klasse = 'bs-last') {
+  return reihe(a, b, 40, (p, t) => momentSymbol(p, wert, t, `${klasse} bs-klein`), beschriftung);
+}
+
+// ===========================================================================
+// Richtungen der Zeichnung im Bild
+// ===========================================================================
+
+/** Ab welchem Anteil ihrer Länge eine Richtung im Bild ein Pfeil ist -- darunter sieht man sie von vorne. */
+const SICHTBAR = 0.35;
+
+/** In der Ebene dreht ein Moment um die Achse, die auf den Betrachter zeigt -- im Bild ein Bogen. */
+const ZUM_BETRACHTER = { f: 0, zuMir: true };
+
+/**
+ * Eine Richtung der Zeichnung im Bild der Ansicht `v` (cad_ansicht.js): als
+ * Einheitsvektor (`r`), wie lang sie dort erscheint, 0 bis 1 (`f`), und ob
+ * sie auf den Betrachter zu zeigt (`zuMir`). In der Ebene liegt jede
+ * Richtung ganz im Bild. Das Zeichenfenster und die Diagramme zeichnen
+ * damit ihre Kräfte und Momente.
+ */
+export function imBild(v, richtung) {
+  const [x, y] = richtungImBild(v, richtung).map((w) => w / v.massstab);
+  const f = Math.hypot(x, y);
+  return {
+    r: f > 1e-9 ? [x / f, y / f] : [0, 1], f,
+    zuMir: Boolean(v.basis) && skalar(richtung, blickrichtung(v)) > 0,
+  };
+}
+
+/**
+ * Eine Kraft an `p`: ein Pfeil in ihrer Richtung `d` (wie `imBild`), dessen
+ * Spitze `p` berührt -- ein negativer Wert zeigt entgegen --, oder, sieht
+ * man sie von vorne, ein Kreis.
+ */
+export function kraft(p, d, wert, laenge, beschriftung, klasse) {
+  if (d.f < SICHTBAR) return blickSymbol(p, (wert >= 0) === d.zuMir, beschriftung, klasse);
+  return kraftpfeil(p, wert >= 0 ? d.r : [-d.r[0], -d.r[1]], laenge, beschriftung, klasse);
+}
+
+/** Eine verteilte Kraft von `p` nach `q`: ein Pfeilband -- oder, von vorne, eine Reihe Kreise. */
+export function kraftband(p, q, d, la, lb, beschriftung, klasse) {
+  if (d.f < SICHTBAR) {
+    return reihe(p, q, 26, (o, t) => blickSymbol(o, (la + lb >= 0) === d.zuMir, t, klasse), beschriftung, 12);
+  }
+  return streckenlast(p, q, d.r, la, lb, beschriftung, klasse);
+}
+
+/**
+ * Ein Moment an `p` um die Achse `achse` der Ansicht `v` (in der Ebene
+ * null): ein Pfeil mit zwei Spitzen -- sieht man die Achse von vorne, ein
+ * Bogen, im Drehsinn, den man sieht.
+ */
+export function moment(v, p, achse, wert, beschriftung, klasse) {
+  const d = achse ? imBild(v, achse) : ZUM_BETRACHTER;
+  if (d.f < SICHTBAR) return momentSymbol(p, d.zuMir ? wert : -wert, beschriftung, klasse);
+  return momentpfeil(p, wert >= 0 ? d.r : [-d.r[0], -d.r[1]], beschriftung, klasse);
+}
+
+/** Ein verteiltes Moment von `p` nach `q`, wie `moment` je Zeichen. */
+export function momentband(v, p, q, achse, wert, beschriftung, klasse = 'bs-last') {
+  const d = achse ? imBild(v, achse) : ZUM_BETRACHTER;
+  if (d.f < SICHTBAR) return streckenmoment(p, q, d.zuMir ? wert : -wert, beschriftung, klasse);
+  const r = wert >= 0 ? d.r : [-d.r[0], -d.r[1]];
+  return reihe(p, q, 40, (o, t) => momentpfeil(o, r, t, `${klasse} bs-klein`), beschriftung);
 }
 
 /** Ein Knoten, dessen Drehung keine Steifigkeit hat: ein Ring mit Fragezeichen. */

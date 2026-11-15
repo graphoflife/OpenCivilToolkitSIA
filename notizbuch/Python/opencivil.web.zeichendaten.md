@@ -1,5 +1,5 @@
 ---
-erzeugt: a32d6885df80
+erzeugt: 4263ee8d7974
 art: modul
 tags: [modul]
 ---
@@ -27,6 +27,14 @@ def _balkensystem(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, A
 ```
 
 Die knappe Uebersicht und je Querschnitt sein Umriss -- auch wenn das System nicht rechnet.
+
+### _balkensystem3d
+
+```python
+def _balkensystem3d(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
+```
+
+Wie in der Ebene -- dazu je Linie ihre Achsen, die die Oberflaeche nicht selbst legt.
 
 ### zeichendaten
 
@@ -56,3 +64,4 @@ Je Bauteil, nach Kennung, seine Zeichendaten -- nur fuer die Arten, die welche h
 ## Gebraucht von
 
 - [[opencivil.web.api]]
+- [[opencivil.web.dienst]]

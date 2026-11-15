@@ -1,5 +1,5 @@
 ---
-erzeugt: fe6b6268d3e6
+erzeugt: 3492a63ecc85
 art: modul
 tags: [modul]
 ---
@@ -169,10 +169,24 @@ def _beweglich(p: Projekt) -> None
 
 Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt einer Zahl.
 
+### _raumrahmen
+
+```python
+def _raumrahmen(p: Projekt) -> None
+```
+
+Ein Rahmen im Raum, der alles einmal braucht: Stützen aus Beton, Stahl
+und Holz, je mit anderem Lager -- eingespannt, gelenkig mit Drehfeder,
+verschieblich und in y gehalten --, Riegel in x und y, einer gedreht und
+einer mit Gelenk, ein geneigter Kragarm, ein gebetteter Fundamentbalken;
+Querschnitte nach Vorlage, als Profil und von Hand, ein eigenes Material
+mit G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
+
 
 ## Braucht
 
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]

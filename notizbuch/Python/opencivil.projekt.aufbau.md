@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a7492959a1e
+erzeugt: 0dfd049f9508
 art: modul
 tags: [modul]
 ---
@@ -23,8 +23,8 @@ ohne Bewehrung.
 
 ## DIE BAUTEILARTEN
 
-Platte, Querschnittsanalyse, Balkensystem, Decke, Durchstanzen, Grundbruch, Setzung und
-Pfahl haben je einen Steckbrief
+Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen, Grundbruch,
+Setzung und Pfahl haben je einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -46,6 +46,7 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion `bauen`
 ([[opencivil.projekt.aufbau.platte|platte]],
 [[opencivil.projekt.aufbau.querschnittsanalyse|querschnittsanalyse]],
 [[opencivil.projekt.aufbau.balkensystem|balkensystem]],
+[[opencivil.projekt.aufbau.balkensystem3d|balkensystem3d]],
 [[opencivil.projekt.aufbau.decke|decke]],
 [[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]],
@@ -116,17 +117,19 @@ Oberflaeche, siehe Dateikopf.
 - `PLATTE = Bauteilart('platte', 'querschnitte', QuerschnittEintrag, 'q', 'quersc…`
 - `ANALYSE = Bauteilart('querschnittsanalyse', 'querschnittsanalysen', Querschnitt…`
 - `BALKENSYSTEM = Bauteilart('balkensystem', 'balkensysteme', BalkensystemEintrag, 'r',…`
+- `BALKENSYSTEM3D = Bauteilart('balkensystem3d', 'balkensysteme3d', Balkensystem3dEintrag…` – Die Kennungen u1, u2 ...: «r» tragen die Rahmen in der Ebene.
 - `DECKE = Bauteilart('decke', 'decken', DeckeEintrag, 'e', 'decke', 'Decken', d…` – Die Kennungen e1, e2 ...: «d» tragen schon die Durchstanzstellen.
 - `GRUNDBRUCH = Bauteilart('grundbruch', 'grundbrueche', GrundbruchEintrag, 'g', 'gru…`
 - `SETZUNG = Bauteilart('setzung', 'setzungen', SetzungEintrag, 'w', 'setzung', 'S…` – Die Kennungen w1, w2 ...: «s» tragen schon die Betonstaehle.
 - `DURCHSTANZEN = Bauteilart('durchstanzen', 'durchstanzstellen', DurchstanzEintrag, 'd…`
 - `PFAHL = Bauteilart('pfahl', 'pfaehle', PfahlEintrag, 't', 'pfahl', 'Pfähle', …` – Die Kennungen t1, t2 ...: «p» tragen schon die Skripte.
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZ…` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Decke, Durchstanzen, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Decke, Durchstanzen, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
@@ -136,6 +139,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.grundbruch]]

@@ -77,6 +77,28 @@ class TestKatalogpfade(unittest.TestCase):
                 with self.subTest(datei=datei, art=art):
                     self.nachschlagen([wurzel, art])
 
+    def test_systemkatalog_beider_arten(self):
+        """
+        Ein Balkensystem liest seinen Katalog ueber ``systemkatalog(art, ...)``
+        (bs_teile.js) -- eben und im Raum mit denselben Schluesseln. Jeder
+        feste Pfad dahinter steht darum in beiden Katalogen, und jede Klasse,
+        die einer nennt, hat ihre Feldangaben und ihre Vorlage.
+        """
+        arten = ("balkensystem", "balkensystem3d")
+        self.assertEqual(set(self.katalog[arten[0]]), set(self.katalog[arten[1]]))
+        gefunden = list(aufrufe("systemkatalog"))
+        self.assertGreater(len(gefunden), 20)
+        for datei, argumente in gefunden:
+            pfad = feste_teile(argumente[1:])
+            for art in arten:
+                with self.subTest(datei=datei, art=art, pfad=pfad):
+                    self.nachschlagen([art, *pfad])
+        for art in arten:
+            for rolle, klasse in self.katalog[art]["klassen"].items():
+                with self.subTest(art=art, rolle=rolle):
+                    self.nachschlagen(["felder", klasse])
+                    self.nachschlagen(["vorlagen", klasse])
+
     def test_jede_liste_hat_ihre_vorlage(self):
         """Ein neuer Eintrag nimmt die Vorlage seiner Liste (`nachVorlage`, apps.js)."""
         from opencivil.projekt.aufbau import BAUTEILE

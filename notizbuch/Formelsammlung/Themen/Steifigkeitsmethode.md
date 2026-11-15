@@ -1,10 +1,10 @@
 ---
-erzeugt: 0c244f3e0721
+erzeugt: 14ed79c63e8c
 art: thema
 tags: [thema]
 ---
 > [!abstract] Balkensysteme
-> 7 Formeln, in der Folge, in der gerechnet wird.
+> 11 Formeln, in der Folge, in der gerechnet wird.
 
 ## Formeln
 
@@ -15,6 +15,10 @@ tags: [thema]
 5. [[Schnittgrössen längs eines Stabs]]
 6. [[Biegelinie eines Stabs]]
 7. [[Bettung eines Stabs]]
+8. [[Zerlegung eines Stabs im Raum]]
+9. [[Achsen eines Stabs im Raum]]
+10. [[Schnittgrössen eines Stabs im Raum]]
+11. [[Biegelinie eines Stabs im Raum]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

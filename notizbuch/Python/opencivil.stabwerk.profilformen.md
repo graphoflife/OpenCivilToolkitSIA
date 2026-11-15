@@ -1,5 +1,5 @@
 ---
-erzeugt: f89506d9f89b
+erzeugt: 7540024873f4
 art: modul
 tags: [modul]
 ---
@@ -145,5 +145,7 @@ Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Moment
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]]
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]]
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z]]
+- [[Kreis im Knoten eines I-Profils]]
 - [[Schwerpunkt eines U-Profils mit geneigten Flanschen]]
 - [[Schwerpunkt eines U-Profils mit parallelen Flanschen]]
+- [[Torsionsträgheitsmoment eines I-Profils]]

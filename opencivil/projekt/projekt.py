@@ -26,6 +26,7 @@ from opencivil.ergebnis import Ergebnis
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag, PostenEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
+from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
 from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort
@@ -36,8 +37,8 @@ from opencivil.projekt.setzung import SetzungEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.decke import DeckeEintrag
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BAUTEILE, DECKE, DURCHSTANZEN, GRUNDBRUCH, PFAHL, PLATTE, SETZUNG,
-    Aufbau, aufbauen,
+    ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, BAUTEILE, DECKE, DURCHSTANZEN, GRUNDBRUCH, PFAHL,
+    PLATTE, SETZUNG, Aufbau, aufbauen,
 )
 
 
@@ -57,6 +58,9 @@ class Projekt(Beschreibung):
 
     balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)
     """Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle."""
+
+    balkensysteme3d: List[Balkensystem3dEintrag] = field(default_factory=list)
+    """Rahmen im Raum: wie die ebenen, mit x, y und z und Torsion."""
 
     decken: List[DeckeEintrag] = field(default_factory=list)
     """Stahlbetondecken nach der Streifenmethode: Platten, Lager, Stützen, Unterzüge."""
@@ -316,6 +320,17 @@ class Projekt(Beschreibung):
                         BalkensystemEintrag(kennung=self.freie_kennung(BALKENSYSTEM.vorsilbe),
                                             name=name))
         self.balkensysteme.append(eintrag)
+        return eintrag
+
+    def balkensystem3d(self, name: str, **felder: Any) -> Balkensystem3dEintrag:
+        """
+        Ein leeres 3D-Balkensystem, ein Rahmen im Raum -- gezeichnet wie das
+        ebene (:meth:`balkensystem`), mit Punkten ``(x, y, z)`` in m.
+        """
+        eintrag = lesen(Balkensystem3dEintrag, felder, f"3D-Balkensystem '{name}'",
+                        Balkensystem3dEintrag(kennung=self.freie_kennung(BALKENSYSTEM3D.vorsilbe),
+                                              name=name))
+        self.balkensysteme3d.append(eintrag)
         return eintrag
 
     def decke(self, name: str, **felder: Any) -> DeckeEintrag:

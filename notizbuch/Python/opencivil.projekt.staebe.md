@@ -1,5 +1,5 @@
 ---
-erzeugt: 591bb4d639af
+erzeugt: cf718c532c4f
 art: modul
 tags: [modul]
 ---
@@ -161,6 +161,7 @@ und die Arten der Lager stehen in ihr als Klassenattribute.
 - `LAGERFELDER: Tuple[str, ...]` – Die Richtungen eines Lagers, in der Folge der Vorwahlen in [[opencivil.projekt.staebe#MitStaeben|LAGERARTEN]] -- Felder des Lagers wie des Lagers im Rechenkern.
 - `LAGERARTEN: Mapping[str, Tuple[str, ...]]` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 - `LINIENLAGER: Tuple[str, ...]` – Die Richtungen eines Linienlagers -- Felder der Linie wie des Stabs im Rechenkern.
+- `EINHEIT_DER_FEDER: Mapping[str, Any]` – Die Einheit jeder Feder, nach ihrem Feld -- an Lager und Linie.
 - `NEUE_DIAGRAMME: Tuple[str, ...]` – Was ein frisches System von der GZT zeigt -- dazu die Verschiebung der GZG.
 - `KNOTEN: type`
 - `LINIE: type`
@@ -402,3 +403,4 @@ Ob eine Last ihr Vorzeichen wechselt, wenn ihre Linie umgekehrt wird.
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.web.dienst]]

@@ -17,6 +17,7 @@ from __future__ import annotations
 import math
 
 from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN, MATERIAL_DES_QUERSCHNITTS
+from opencivil.projekt.balkensystem3d import DIAGRAMMGROESSEN as DIAGRAMMGROESSEN3D
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.eintraege import (
     Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, RechenwahlEintrag,
@@ -246,10 +247,11 @@ def jeder_nachweis() -> Projekt:
     p.querschnittsanalysen.append(_stuetze(p.freie_kennung("a")))
 
     # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
-    # sich nicht rechnen lässt. Dazu jede Lage beim Durchstanzen und jede
-    # Spielart von Grundbruch, Setzung und Pfahl.
+    # sich nicht rechnen lässt -- dazu ein Rahmen im Raum. Dazu jede Lage
+    # beim Durchstanzen und jede Spielart von Grundbruch, Setzung und Pfahl.
     _alles_einmal(p, decke, p.querschnittsanalysen[0])
     _beweglich(p)
+    _raumrahmen(p)
     _decken(p)
     _durchstanzstellen(p)
     _grundbrueche(p)
@@ -512,6 +514,54 @@ def _beweglich(p: Projekt) -> None:
     s.lager_an((0, 0), "verschieblich")
     s.lager_an((5, 0), "verschieblich")
     s.stablast(s.lastfall("Last"), traeger, wert=10.0)
+
+
+def _raumrahmen(p: Projekt) -> None:
+    """
+    Ein Rahmen im Raum, der alles einmal braucht: Stützen aus Beton, Stahl
+    und Holz, je mit anderem Lager -- eingespannt, gelenkig mit Drehfeder,
+    verschieblich und in y gehalten --, Riegel in x und y, einer gedreht und
+    einer mit Gelenk, ein geneigter Kragarm, ein gebetteter Fundamentbalken;
+    Querschnitte nach Vorlage, als Profil und von Hand, ein eigenes Material
+    mit G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
+    """
+    s = p.balkensystem3d("Raumrahmen")
+    beton = s.beton("b1")
+    stahl = s.baustahl(_erstes(p, "baustahl"))
+    holz = s.eigenes_material("Brettschichtholz", E=11500.0, rho=480.0, G=650.0)
+    balken = s.querschnitt("Balken 300×500", "rechteck", b=300.0, h=500.0)
+    heb = s.stahlprofil("Stütze", "HEB 300")
+    hand = s.querschnitt_mit_kennwerten("Holzstütze", A=40000.0, I_y=133.3, I_z=133.3,
+                                        I_T=225.0)
+    s.linie((0, 0, 0), (0, 0, 3), querschnitt=balken, material=beton)
+    s.linie((6, 0, 0), (6, 0, 3), querschnitt=heb, material=stahl, drehung=90.0)
+    s.linie((0, 4, 0), (0, 4, 3), querschnitt=hand, material=holz)
+    riegel_x = s.linie((0, 0, 3), (6, 0, 3), querschnitt=heb, material=stahl, gelenk_ende=True)
+    riegel_y = s.linie((0, 0, 3), (0, 4, 3), querschnitt=balken, material=beton, drehung=30.0)
+    kragarm = s.linie((6, 0, 3), (6, 2, 4), querschnitt=heb, material=stahl)
+    fundament = s.linie((0, 0, 0), (6, 0, 0), querschnitt=balken, material=beton,
+                        quer_z="feder", k_quer_z=20000.0, laengs="feder", k_laengs=5000.0)
+    s.lager_an((0, 0, 0), "eingespannt")
+    s.lager_an((6, 0, 0), "gelenkig", phi_z="feder", k_phi_z=5000.0)
+    s.lager_an((0, 4, 0), "verschieblich", y="fest", x="feder", k_x=10000.0)
+    g = s.lastfall("Eigengewicht", eigengewicht=True)
+    q = s.lastfall("Nutzlast und Wind")
+    s.stablast(g, riegel_x, wert=8.0)
+    s.stablast(q, riegel_x, wert=5.0, wert_b=10.0, richtung="z")
+    s.stablast(q, riegel_y, wert=3.0, richtung="quer_y")
+    s.stablast(q, kragarm, wert=4.0, projiziert=True)
+    s.stablast(q, kragarm, art="einzellast", wert=6.0, stelle=100.0, richtung="quer_z")
+    s.stablast(q, riegel_x, art="moment", wert=2.0, stelle=50.0, richtung="laengs")
+    s.stablast(q, riegel_y, art="linienmoment", wert=1.0, richtung="x")
+    s.stablast(q, fundament, art="einzellast", wert=12.0, stelle=50.0, richtung="laengs")
+    s.knotenlast(q, (0, 4, 3), 5.0, richtung="x")
+    s.knotenlast(q, (6, 0, 3), 3.0, richtung="y")
+    s.knotenlast(g, (0, 0, 3), 4.0, art="moment", richtung="z")
+    tragsicherheit = s.kombination("Tragsicherheit", (g, 1.35), (q, 1.5))
+    # Jede Grösse einmal, eine auch für einen Lastfall allein.
+    for groesse in DIAGRAMMGROESSEN3D:
+        s.diagramm(tragsicherheit, groesse)
+    s.diagramm(q, "T")
 
 
 def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:

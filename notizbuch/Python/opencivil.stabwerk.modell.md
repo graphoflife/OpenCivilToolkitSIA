@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c4c77064539
+erzeugt: 70a0cacc2533
 art: modul
 tags: [modul]
 ---
@@ -91,6 +91,16 @@ Wohin eine Kraftlast zeigt, wenn ihr Wert positiv ist.
 def beschriftung(self) -> str
 ```
 
+#### Lastrichtung.stabachse
+
+```python
+@property
+def stabachse(self) -> Optional[str]
+```
+
+In welcher Achse des Stabs sie liegt: `x` laengs, `z` quer -- zur
+gestrichelten Faser. Keine, wenn sie im System liegt.
+
 #### Lastrichtung.im_system
 
 ```python
@@ -99,6 +109,15 @@ def im_system(self) -> bool
 ```
 
 Ob sie in den Achsen des Systems liegt -- und nicht in denen des Stabs.
+
+#### Lastrichtung.systemvektor
+
+```python
+@property
+def systemvektor(self) -> Optional[Tuple[float, float]]
+```
+
+Die Richtung `(x, z)`, wenn sie im System liegt.
 
 #### Lastrichtung.vektor
 
@@ -315,4 +334,3 @@ gewichteten Lastfaelle. Eben wie raeumlich: eine Last kann `mal`.
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
 - [[opencivil.stabwerk3d.system]]
-- [[opencivil.web.api]]

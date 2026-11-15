@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ad1e6111703
+erzeugt: 88028434e4eb
 art: modul
 tags: [modul]
 ---
@@ -62,6 +62,15 @@ Wohin eine Kraftlast zeigt -- oder um welche Achse eine Momentlast dreht --, wen
 def beschriftung(self) -> str
 ```
 
+#### Richtung.stabachse
+
+```python
+@property
+def stabachse(self) -> Optional[str]
+```
+
+In welcher Achse des Stabs sie liegt -- keine, wenn sie im System liegt.
+
 #### Richtung.im_system
 
 ```python
@@ -70,6 +79,15 @@ def im_system(self) -> bool
 ```
 
 Ob sie in den Achsen des Systems liegt -- und nicht in denen des Stabs.
+
+#### Richtung.systemvektor
+
+```python
+@property
+def systemvektor(self) -> Optional[Vektor]
+```
+
+Die Richtung, wenn sie im System liegt.
 
 #### Richtung.vektor
 
@@ -236,3 +254,4 @@ class System
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
 - [[opencivil.stabwerk3d.system]]
+- [[opencivil.web.balkendaten]]

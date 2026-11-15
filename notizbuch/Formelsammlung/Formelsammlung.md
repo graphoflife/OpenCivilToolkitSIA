@@ -1,5 +1,5 @@
 ---
-erzeugt: f11e56fe1d8a
+erzeugt: f1337076df26
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -39,8 +39,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Balkensysteme**
 
-- [[Stabquerschnitte]] · 36
-- [[Steifigkeitsmethode]] · 7
+- [[Stabquerschnitte]] · 45
+- [[Steifigkeitsmethode]] · 11
 
 **Grundbruch**
 
@@ -74,6 +74,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Abstand des Grundwassers unter der Sohle]] · $T$
 - [[Abstand zum Momentennullpunkt]] · $r_{sx}$
 - [[Abstand zum Momentennullpunkt am Plattenrand]] · $r_{sy}$
+- [[Achsen eines Stabs im Raum]]
 - [[Anrechenbare Durchstanzbewehrung]] · $\sum A_{sw}$
 - [[Äquivalenter E-Modul eines Stabs]] · $E_{eq}$
 - [[Äquivalenter E-Modul über dem Moment]]
@@ -124,8 +125,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bezugsgrösse des Moments]] · $M_{ref}$
 - [[Biegebewehrung im Stützstreifen je Meter]] · $a_{s,x}$
 - [[Biegelinie eines Stabs]]
+- [[Biegelinie eines Stabs im Raum]]
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
 - [[Biegesteifigkeit des Pfahls]] · $EI$
+- [[Biegesteifigkeit um y]] · $EI_{y}$
+- [[Biegesteifigkeit um z]] · $EI_{z}$
 - [[Biegewiderstand im Stützstreifen]] · $m_{Rd,x}$
 - [[Bilineare Beziehung des Betonstahls]]
 - [[Breite des Randstreifens an der Eckstütze]] · $b_{s,x}$
@@ -190,6 +194,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines Kreisrings um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · $I_{y}$
 - [[Flächenträgheitsmoment eines Rechtecks]] · $I_{y}$
+- [[Flächenträgheitsmoment eines Rechtecks um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · $I_{y}$
 - [[Flächenträgheitsmoment eines Trapezes]] · $I_{y}$
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]] · $I_{y}$
@@ -231,10 +236,13 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · $M_{Rd}(N_{Rd}^{+})$
 - [[Kräftegleichgewicht]] · $N_{Rd}^{+}$
 - [[Kräftegleichgewicht bei M_Ed = 0]]
+- [[Kreis im Knoten eines I-Profils]] · $d_{K}$
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] · $k_{\sigma}$
+- [[Kürzere Seite eines Rechtecks]] · $t_{\text{Q1}}$
 - [[Kürzester Abstand zur Resistenzlinie]] · $a$
 - [[Lage des Punktes längs B]] · $y_K$
 - [[Lage des Punktes längs L]] · $x_K$
+- [[Längere Seite eines Rechtecks]] · $s_{\text{Q1}}$
 - [[Längsfeder des Pfahlkopfs]] · $k_v$
 - [[Längszugkraft aus der Querkraft]] · $F_{tVd}$
 - [[Lastneigungsfaktor i_c]] · $i_c$
@@ -301,6 +309,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Rissnormalkraft beim Moment]] · $N_{Riss}(M)$
 - [[Schiefstellung]] · $\alpha_i$
 - [[Schnittgrössen aus der Spannungsverteilung]]
+- [[Schnittgrössen eines Stabs im Raum]]
 - [[Schnittgrössen längs eines Stabs]]
 - [[Schnittkräfte eines Streifens in x und y]]
 - [[Schwerpunkt der zusammengefassten Lage]] · $z_{2,x}$
@@ -333,6 +342,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Tiefenfaktor d_c]] · $d_c$
 - [[Tiefenfaktor d_q]] · $d_q$
 - [[Torsion in den Zellen (Bredt, mehrzellig)]]
+- [[Torsionssteifigkeit]] · $GI_{T}$
+- [[Torsionsträgheitsmoment eines I-Profils]] · $I_{T}$
+- [[Torsionsträgheitsmoment eines Rechtecks]] · $I_{T}$
 - [[Tragfähigkeitsfaktor des Pfahlfusses undrainiert]] · $N_c$
 - [[Tragfähigkeitsfaktor N_c]] · $N_c$
 - [[Tragfähigkeitsfaktor N_q]] · $N_q$
@@ -372,6 +384,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Wirksame Zugfestigkeit]] · $f_{ct,eff}$
 - [[Wirksamer Elastizitätsmodul]] · $E_{c,eff}$
 - [[Wirksamer Umfang des Nachweisschnitts]] · $u$
+- [[Zerlegung eines Stabs im Raum]]
 - [[Zulässige Dehnung]] · $\varepsilon_{s,adm}$
 - [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
 - [[Zulässige Stahlspannung (normale Anforderung)]] · $\sigma_{s,adm}$
@@ -379,14 +392,15 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-113 von 306 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+126 von 319 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
+- [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
-- [[Arbeitsgleiche Knotenkräfte]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
+- [[Arbeitsgleiche Knotenkräfte]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Betonstahl nur auf Zug]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
-- [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
+- [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Bewehrung der Lage]] · [[opencivil.querschnitt.lagenaufbau#protokoll_lage|protokoll_lage]]
 - [[Bewehrungsmass des gezeichneten Querschnitts]] · [[opencivil.nachweis.qa_kennzahlen#KennzahlenQA|KennzahlenQA._bewehrungsmass]]
 - [[Bewehrungsmass je Kubikmeter Beton]] · [[opencivil.querschnitt.lagenaufbau#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
@@ -396,8 +410,11 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bezugsgrösse des Moments]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Biegebewehrung im Stützstreifen je Meter]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
 - [[Biegelinie eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
+- [[Biegelinie eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Biegesteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Biegesteifigkeit des Pfahls]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit._querschnitt|Pfahlsteifigkeit._querschnitt]]
+- [[Biegesteifigkeit um y]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
+- [[Biegesteifigkeit um z]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._waende_protokollieren]]
 - [[Dehnsteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Dehnsteifigkeit des Pfahls]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit._querschnitt|Pfahlsteifigkeit._querschnitt]]
@@ -434,13 +451,14 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines Kreisrings um z]] · [[opencivil.stabwerk.querschnitte#_wie_um_y|_wie_um_y]]
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_traegheit|Loeserpaar.herleitung_traegheit]], [[opencivil.stabwerk.querschnitte]]
+- [[Flächenträgheitsmoment eines Rechtecks um z]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]] · [[opencivil.stabwerk.profilformen]]
 - [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]] · [[opencivil.stabwerk.profilformen]]
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]] · [[opencivil.stabwerk.profilformen]]
 - [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z]] · [[opencivil.stabwerk.profilformen]]
-- [[Gleichungssystem der Steifigkeitsmethode]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
+- [[Gleichungssystem der Steifigkeitsmethode]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Grenzdehnungen am Ende der Linie]] · [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
 - [[Grösste Dehnung auf halber Höhe]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_dehnung_am_ende|Loeserpaar.herleitung_dehnung_am_ende]]
 - [[Grösste Dehnung im Schwerpunkt]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_dehnung_am_ende|Schnittpaar.herleitung_dehnung_am_ende]]
@@ -451,7 +469,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Innerer Hebelarm]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung.protokoll_lage|ZwaengungBiegung.protokoll_lage]]
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Kräftegleichgewicht]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
+- [[Kreis im Knoten eines I-Profils]] · [[opencivil.stabwerk.profilformen]]
+- [[Kürzere Seite eines Rechtecks]] · [[opencivil.stabwerk.querschnitte#_seiten|_seiten]]
 - [[Kürzester Abstand zur Resistenzlinie]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
+- [[Längere Seite eines Rechtecks]] · [[opencivil.stabwerk.querschnitte#_seiten|_seiten]]
 - [[Mittelwert des Schubmoduls]] · [[opencivil.material.beton]]
 - [[Momentengleichgewicht um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Momentenwiderstand bei reiner Biegung]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
@@ -468,6 +489,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.grundbruch|_gamma_auftrieb]]
 - [[Rissmoment bei der Normalkraft]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[Schnittgrössen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Schnittgrössen längs eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Schwerpunkt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]], [[opencivil.querschnitt.lagenaufbau#protokoll_schwerpunkt|protokoll_schwerpunkt]]
 - [[Schwerpunkt eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
@@ -479,9 +501,12 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Statische Höhe der äusseren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
 - [[Statische Höhe der inneren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
 - [[Stegbreite des Kreisquerschnitts]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
-- [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
+- [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]
+- [[Torsionssteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
+- [[Torsionsträgheitsmoment eines I-Profils]] · [[opencivil.stabwerk.profilformen]]
+- [[Torsionsträgheitsmoment eines Rechtecks]] · [[opencivil.stabwerk.querschnitte#_torsion|_torsion]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 - [[Umfang des Pfahls]] · [[opencivil.pfahl.aussen#AeussererWiderstand._mantel|AeussererWiderstand._mantel]]
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
@@ -493,4 +518,5 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand in der Richtung der Einwirkung]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._ein_fall]]
 - [[Widerstandsmoment zum gezogenen Rand]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · [[opencivil.nachweis.rissgroessen#protokoll_widerstandsmoment|protokoll_widerstandsmoment]]
+- [[Zerlegung eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Zulässige Dehnung]] · [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]

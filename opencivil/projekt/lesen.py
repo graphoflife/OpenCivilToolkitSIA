@@ -170,6 +170,15 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     return angaben
 
 
+def katalogname(cls: type) -> str:
+    """
+    Wie eine Klasse von Eintraegen im Katalog der Oberflaeche heisst: ohne
+    «Eintrag», klein -- ``grundbruch``, ``raumlinie``. Unter diesem Namen
+    stehen ihre Feldangaben und ihre Vorlage.
+    """
+    return cls.__name__.removesuffix("Eintrag").lower()
+
+
 def eintragsklassen(cls: type) -> List[type]:
     """
     Jede Klasse von Eintraegen, die unter ``cls`` vorkommt, ``cls`` zuerst --

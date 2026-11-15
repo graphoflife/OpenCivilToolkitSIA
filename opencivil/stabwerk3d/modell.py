@@ -62,21 +62,28 @@ class Richtung(Wahl):
         }[self]
 
     @property
+    def stabachse(self) -> Optional[str]:
+        """In welcher Achse des Stabs sie liegt -- keine, wenn sie im System liegt."""
+        return {Richtung.LAENGS: "x", Richtung.QUER_Y: "y", Richtung.QUER_Z: "z"}.get(self)
+
+    @property
     def im_system(self) -> bool:
         """Ob sie in den Achsen des Systems liegt -- und nicht in denen des Stabs."""
-        return self not in (Richtung.LAENGS, Richtung.QUER_Y, Richtung.QUER_Z)
+        return self.stabachse is None
 
-    def vektor(self, achsen: Sequence[Vektor]) -> Vektor:
-        """Die Richtung als Einheitsvektor im System, fuer einen Stab mit den Achsen ``(x, y, z)``."""
+    @property
+    def systemvektor(self) -> Optional[Vektor]:
+        """Die Richtung, wenn sie im System liegt."""
         return {
             Richtung.SENKRECHT: (0.0, 0.0, -1.0),
             Richtung.X: (1.0, 0.0, 0.0),
             Richtung.Y: (0.0, 1.0, 0.0),
             Richtung.Z: (0.0, 0.0, 1.0),
-            Richtung.LAENGS: achsen[0],
-            Richtung.QUER_Y: achsen[1],
-            Richtung.QUER_Z: achsen[2],
-        }[self]
+        }.get(self)
+
+    def vektor(self, achsen: Sequence[Vektor]) -> Vektor:
+        """Die Richtung als Einheitsvektor im System, fuer einen Stab mit den Achsen ``(x, y, z)``."""
+        return self.systemvektor or dict(zip("xyz", achsen))[self.stabachse]
 
     def projektion(self, achsen: Sequence[Vektor]) -> float:
         """

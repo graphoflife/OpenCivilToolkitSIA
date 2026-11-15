@@ -1543,6 +1543,13 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 .cad-knopf.ist-gross .sinnbild { width: 20px; height: 20px; }
 .cad-luecke { flex: 1; }
+/* Im Raum die Ansichten: 3D, x-y, x-z, y-z. */
+.cad-ansichten { display: inline-flex; align-self: center; margin-left: 4px; }
+.cad-ansichten .schalter { min-height: 24px; }
+.cad-ansichten .schalter-halb { padding: 0 7px; }
+/* «x-y» bricht sonst am Bindestrich um, wo es eng wird -- auch in der
+   Wahl der Arbeitsebene im schwebenden Fenster. */
+.cad-wahl.ist-wortlaut .schalter-halb { white-space: nowrap; }
 /* Rückgängig, Wiederholen, Alles zeigen und Vollbild: klein, zu zweit
    übereinander -- was sie tun, sagt ihr Titel. */
 .cad-ansicht { display: grid; grid-template-columns: repeat(2, auto); gap: 1px 2px; }
@@ -1732,6 +1739,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-raster-grob { stroke: #e0e5ec; stroke-width: 1; }
 .cad-achse { stroke: #b9c3d1; stroke-width: 1; }
 .cad-achstext { font-size: 11px; font-weight: 600; fill: var(--schrift-zart); }
+/* Im Raum unten links die Achsen, wie sie im Bild liegen. */
+.cad-achsenpfeil { stroke: var(--schrift-matt); stroke-width: 1.4; }
+.cad-achsenkreuz .cad-achstext { fill: var(--schrift-matt); }
 .cad-beton { fill: var(--mat-beton); stroke: var(--mat-beton-linie); stroke-width: 1.3; }
 .cad-loch { fill: #fff; stroke: var(--mat-beton-linie); stroke-width: 1.3; stroke-dasharray: 6 3; }
 .cad-zelle { stroke: none; }
@@ -2046,6 +2056,11 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-eigengewicht:not(text) { stroke: var(--schrift-zart); }
 .bs-eigengewicht.bs-spitze { fill: var(--schrift-zart); }
 .bs-lasttext.bs-eigengewicht { fill: var(--schrift-matt); }
+/* Im Raum: eine Kraft, die man von vorne sieht, als Kreis -- weiss gefüllt,
+   damit der Punkt oder das Kreuz darin klar steht --, ein Moment als Pfeil
+   mit zwei Spitzen. */
+.bs-blick { fill: #fff; stroke-width: 1.2; }
+.bs-momentpfeil { stroke-width: 1.5; }
 .bs-unbestimmt circle { fill: none; stroke: var(--warn); stroke-width: 1.6; stroke-dasharray: 2 2; }
 .bs-unbestimmt-text { font-size: 12px; font-weight: 700; fill: var(--warn); }
 .bs-beweglich { fill: var(--schlecht); fill-opacity: .15; stroke: var(--schlecht); stroke-width: 1.6; }
@@ -2079,6 +2094,7 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-vz-stab { stroke: var(--schrift); stroke-width: 3; }
 .bs-vz-faser { stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
 .bs-vz-text { font-size: 10px; fill: var(--schrift-matt); }
+.bs-vz-punkt { fill: var(--schrift); }
 
 /* Materialien, Querschnitte, Lastfälle, Kombinationen. Die Materialien als
    Tabelle (Benutzer, 2026-10-24): ein Beton des Projekts mit gesperrten
@@ -2138,6 +2154,7 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-d-v.bs-d-flaeche { fill: #0d9488; } .bs-d-v.bs-d-kurve { stroke: #0d9488; }
 .bs-d-m.bs-d-flaeche { fill: var(--system); } .bs-d-m.bs-d-kurve { stroke: var(--system); }
 .bs-d-phi.bs-d-flaeche { fill: #b45309; } .bs-d-phi.bs-d-kurve { stroke: #b45309; }
+.bs-d-t.bs-d-flaeche { fill: #7b4fa0; } .bs-d-t.bs-d-kurve { stroke: #7b4fa0; }
 .bs-d-verformt { fill: none; stroke: var(--blau); stroke-width: 2; }
 .bs-d-knoten { fill: #fff; stroke: var(--blau); stroke-width: 1.2; }
 .bs-d-knoten.ist-unbestimmt { stroke: var(--warn); stroke-dasharray: 2 2; }
@@ -2152,6 +2169,10 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-d-v.bs-d-extrem { fill: #0d9488; }
 .bs-d-m.bs-d-extrem { fill: var(--system); }
 .bs-d-phi.bs-d-extrem { fill: #b45309; }
+.bs-d-t.bs-d-extrem { fill: #7b4fa0; }
+/* Über einem Diagramm im Raum die Wahl der Ansicht -- klein, im Kopf der Karte. */
+.bs-d-ansicht { min-height: 22px; }
+.bs-d-ansicht .schalter-halb { padding: 0 6px; font-size: 11px; letter-spacing: 0; white-space: nowrap; }
 .bs-d-w.bs-d-extrem { fill: var(--blau); }
 .bs-d-stelle { font-size: 10.5px; fill: var(--schrift-matt); }
 .bs-d-marke { fill: var(--blau); stroke: #fff; stroke-width: 1.5; pointer-events: none; }

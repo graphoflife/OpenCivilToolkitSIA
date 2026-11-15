@@ -214,7 +214,7 @@ Fertig und getestet (1229 Tests):
 | `core/latex` | Platzhalter-Einsetzung, `Formelzeile`, Tabellen aus Text- und Formelzellen, Fallunterscheidung |
 | `core/protokoll` | Mitschrift als Datenstruktur, `Zwischenwerte` für Vorlagen, ein Durchlauf mit einer Tafel je Darstellung, `StillesProtokoll` |
 | `core/rechenwerk` | Rückwärtsauflösung, Variantenwahl, fehlende Eingaben, Zyklen |
-| `material/` | Beton und Betonstahl nach SIA 262:2025 |
+| `material/` | Beton und Betonstahl nach SIA 262:2025, Baustahl nach SIA 263:2013 |
 | `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze (dazu der Spannungsblock als Gesetz) |
 | `querschnitt/geometrie` | Polygone, Verschachtelung, Stablinien, Prüfungen der Zeichnung |
 | `querschnitt/fasern` | Fasern und Dehnungsgrenzen -- auch der Löser der Platte rechnet darüber |
@@ -227,7 +227,9 @@ Fertig und getestet (1229 Tests):
 | `stabwerk/system` | das ganze System: Unbekannte, Gelenke, Federn, Linienlager, Knoten auf Stäben, Kombinationen, Lagerkräfte, Gleichgewichtsprobe |
 | `stabwerk/verlauf` | N, V, M und Biegelinie längs der Stäbe als Polynome, mit Extremwerten |
 | `stabwerk/querschnitte` | die Querschnitte der Stäbe nach Vorlage, mit ihren Formeln |
+| `stabwerk/profilformen`, `profiltabelle` | die Stahlprofile: je Form (I, U, Rechteck- und Rundrohr) die Masse und die Formeln für A, I_y, I_z und I_T, und welche Grössen es gibt |
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
+| `stabwerk3d/` | das Balkensystem im Raum: Vektoren (`raum`), die Beschreibung in SI (`modell`), der Stab als drei ebene (`stab`), das System mit sechs Unbekannten je Knoten (`system`), die Verläufe (`verlauf`), im Rechenwerk (`rechnung`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Träger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`traeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
@@ -248,13 +250,14 @@ Fertig und getestet (1229 Tests):
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `grundbruch`, `setzung`, `pfahl`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `balkensystem3d`, `grundbruch`, `setzung`, `pfahl`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
 | `web/bruecke.py` | was der Browser lädt: das Verzeichnis des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
 | `web/api.py` | Lösung, Mitschrift und Zusammenfassung als JSON |
 | `web/diagrammdaten.py` | die Punktfolgen der Diagramme als JSON |
-| `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt: Übersicht und Verläufe |
+| `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt, eben oder im Raum: Übersicht und Verläufe |
+| `web/systemkatalog.py` | was die Oberfläche an einem Balkensystem wählen lässt, eben und im Raum mit denselben Schlüsseln: Querschnitte, Materialien, Lasten, Lager, Diagramme |
 | `web/deckendaten.py` | was die Oberfläche von einer Decke zeigt: die Übersicht beim Zeichnen und die Bilder eines Falls |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
@@ -265,12 +268,12 @@ Fertig und getestet (1229 Tests):
 | `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
 | `web/js/kapitel.js`, `fenster.js`, `sinnbilder.js`, `nachweise.js` | die Kapitel der Platte als Knöpfe mit Zeichen, ihre Eingaben in einem Fenster über der Tafel |
-| `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, schwebendes Fenster |
+| `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, schwebendes Fenster; im Raum die Ansichten, das Drehen und die Arbeitsebene (`cad_raum.js`) |
 | `web/js/qa_zeichnung.js`, `qa_uebersicht.js`, `qa_vorlagen.js` | was es in der Querschnittsanalyse zeichnet, die Liste darunter und die Vorlagen |
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
 | `web/js/bs_zeichnung.js`, `bs_symbole.js` | was es im Balkensystem zeichnet: Stäbe, Lager, Federn, Gelenke, Lasten |
 | `web/js/bs_eigenschaften.js`, `bs_teile.js` | das schwebende Fenster des Balkensystems -- die Felder des Gewählten, mehrere zugleich mit «Var» -- und was Zeichnung, Fenster und Panels gemeinsam brauchen |
-| `web/js/balkensystem.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems und seine Ergebnisse |
+| `web/js/balkensystem.js`, `bs_texte.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems, eben und im Raum, ihre Texte je Art und seine Ergebnisse |
 | `web/js/decke.js`, `dk_zeichnung.js`, `dk_eigenschaften.js` | die Eingabe einer Decke, was das Zeichenfenster von ihr zeichnet und sein schwebendes Fenster |
 | `web/js/dk_grundriss.js`, `dk_ergebnis.js` | ihr Grundriss mit Aufteilung und Streifen, und ihre Ergebnisbilder |
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
@@ -290,7 +293,8 @@ dieselbe Aufteilung, nur nacheinander.
 
 Links steht zuoberst der Name des Projekts, darunter je App ein Knopf mit
 Zeichen und Anzahl -- Materialien, Stahlbeton-Platten, Querschnittsanalyse, 2D
-Balkensysteme, Decken, Durchstanzen, Grundbruch, Setzung, Pfähle, Python -- und
+und 3D Balkensysteme, Decken, Durchstanzen, Grundbruch, Setzung, Pfähle,
+Python -- und
 unter den Knöpfen die Liste der gewählten App, mit «+» zum Anlegen.
 
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
@@ -465,8 +469,9 @@ Darunter fünf Knöpfe wie die Kapitel einer Querschnittsanalyse -- Material,
 Querschnitte, Lastfälle, Lastkombinationen und Statik-Analyse --, je mit
 einem Fenster und darunter klein, wie viele es gibt. Unter «Material» die
 Materialien des Systems als Tabelle: ein Beton des Projekts -- E_cm und die
-Dichte des Stahlbetons, gesperrt -- oder ein eigenes Material mit E und ρ
-von Hand; Betonstahl ist keines. Ein neues System bekommt den ersten Beton
+Dichte des Stahlbetons, gesperrt --, ein Baustahl des Projekts -- E_a und
+ρ_a, gesperrt -- oder ein eigenes Material mit E und ρ von Hand;
+Betonstahl ist keines. Ein neues System bekommt den ersten Beton
 des Projekts. Eine Linie nimmt eines davon oder -- kommt ihr Querschnitt
 aus einer Platte oder Analyse -- deren Beton («gemäss Querschnitt»); dann
 stehen an der Linie nur solche Querschnitte zur Wahl. Mit dem Material
@@ -477,7 +482,9 @@ dafür steht am Querschnitt, sobald eine Linie ihn so nimmt. Unter
 «Querschnitte» je einer eine Zeile: links sein Bild,
 daneben Name, A und I und woher er kommt. Ein Klick auf das Bild -- und ein
 neuer Querschnitt gleich -- öffnet sein Fenster: woher A und I kommen, die
-Vorlage als Auswahlliste mit ihrem Bild und den Massen, die Kennwerte, die
+Vorlage als Auswahlliste mit ihrem Bild und den Massen, ein Stahlprofil --
+die Reihe (IPE, HEA, HEB, HEM, UPE, UNP, RRK, ROR), die Grösse als
+Auswahlliste und die Achse, um die es sich biegt --, die Kennwerte, die
 Platte oder Analyse und, wo nötig, das E. Dann die Lastfälle. Ein neues System bringt
 die Lastfälle Eigengewicht, Auflast und Nutzlast mit und die Kombinationen
 GZT (1.35 / 1.35 / 1.5) und GZG (je 1.0). Das Eigengewicht kommt von
@@ -499,11 +506,30 @@ Teilen und Umkehren rechnet der Kern -- dabei entstehen Lastwerte. Ist das
 System beweglich, sagt es eine Meldung und markiert, was sich bewegt; eine
 Drehung ohne Steifigkeit, an einem Knoten, an dem nur Gelenke hängen, ist
 gestrichen und trägt ein Fragezeichen. Die Querschnitte kommen aus einer
-Vorlage, von Hand, aus einer Platte oder aus einer Querschnittsanalyse; die
-Steifigkeit ist E_cm, ein E von Hand oder E_eq als Sekantensteifigkeit
+Vorlage, einem Stahlprofil, von Hand, aus einer Platte oder aus einer
+Querschnittsanalyse; die Steifigkeit ist E_cm, E_a, ein E von Hand oder
+E_eq als Sekantensteifigkeit
 (SIA 262:2025, 4.1.4.1.2), am ungerissenen Bruttoquerschnitt (4.1.4.1.3),
 ohne Bewehrung und Schubverformung; das Gleichgewicht nach Theorie
 1. Ordnung, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2).
+
+**3D Balkensysteme:** dieselbe App für einen Rahmen im Raum, mit sechs
+Unbekannten je Knoten: drei Verschiebungen und drei Drehungen. Gezeichnet
+wird im selben Fenster, schräg von oben, im Grundriss x-y oder in den
+Ansichten x-z und y-z -- Knöpfe in der Leiste --, und die rechte Maustaste
+dreht die Ansicht. Ein Klick trifft die Arbeitsebene: x-y in einer Höhe z,
+x-z bei einem y oder y-z bei einem x, gewählt im schwebenden Fenster; die
+Taste E legt sie durch den Punkt unter dem Zeiger. Eine Linie hat dazu
+ihren Drehwinkel β, der den Querschnitt um die Stabachse dreht. Ein Lager
+hält je Verschiebung in x, y, z und je Drehung um x, y, z frei, fest oder
+mit einer Feder; Lasten wirken senkrecht, in x, y, z oder in den Achsen
+des Stabs, ein Moment dreht um seine Richtung. Die Materialien wie in der
+Ebene, dazu mit G: G_cm = E_cm / 2.4 beim Beton, G_a beim Baustahl. Ein
+Querschnitt hat A, I_y, I_z und I_T; ein Stahlprofil biegt sich um y, wie
+es steht, und β dreht es. Die Diagramme zeigen N, V_y, V_z, T, M_y, M_z,
+die Verschiebung und die Lagerkräfte, je mit einem Schalter für die
+Ansicht. Ein Gelenk löst alle drei Momente, wie ein Kugelgelenk; die
+Torsion rechnet nach St. Venant, ohne Wölbkrafttorsion.
 
 **Decken:** eine Stahlbetondecke nach der Streifenmethode (Stahlbeton II,
 7.2 Platten). Gezeichnet wird mit demselben Fenster, in Metern: Platten als
@@ -660,7 +686,9 @@ weisse Karten; ein Klick auf den Kopf klappt es zu.
   Klick auf einen Lastfall legt den Schnitt durch ihn), dazu je Lastfall der
   Bruchzustand im Schnitt und der Schubfluss in den Wänden; bei einem
   Balkensystem je Zeile seiner Statik-Analyse ein Diagramm -- M, V, N,
-  Verschiebung, Verdrehung oder Lagerkräfte eines Lastfalls oder einer Kombination, die
+  Verschiebung, Verdrehung oder Lagerkräfte eines Lastfalls oder einer Kombination,
+  im Raum N, V_y, V_z, T, M_y, M_z, Verschiebung oder Lagerkräfte aus einer
+  wählbaren Ansicht; die
   Werte an den Enden und je Stab die grössten mit Punkt und Stelle; mit der
   Maus darüber (auf dem Telefon: tippen) der Wert an der Stelle, an einem
   Knoten seine Verschiebung; bei einem Grundbruch und einer Setzung die Situation
@@ -823,6 +851,24 @@ Im Balkensystem:
 * Querschnittsmasse in mm, Lasten in kN, kN/m, kNm, kNm/m; Federn in kN/m und
   kNm/rad, Bettung in kN/m²
 
+Im 3D-Balkensystem:
+
+* `x` und `y` waagrecht, `z` nach oben, in m, als Rechtssystem;
+  Verschiebungen und Lagerkräfte positiv entlang der Achsen, Drehungen und
+  Momente im Rechtssinn um ihre Achse
+* Die Achsen eines Stabs: `x` vom Anfang zum Ende, `z` quer dazu in der
+  lotrechten Ebene durch den Stab, nach unten, `y = z × x`; bei einem
+  lotrechten Stab ist `y` die Achse `-y` des Systems. Der Drehwinkel `β`
+  dreht `y` und `z` im Rechtssinn um `x`
+* Kraftlasten positiv: *senkrecht* nach unten, *in x, y, z* entlang der
+  Achsen des Systems, *längs* vom Anfang zum Ende, *quer* in `y` oder `z`
+  des Stabs; eine Momentlast dreht im Rechtssinn um ihre Richtung, längs ist
+  sie ein Torsionsmoment
+* Schnittgrössen: `N > 0` Zug, `M_y` zieht an der Seite `+z`, `M_z` an der
+  Seite `+y`, also `σ = N/A + M_y·z/I_y + M_z·y/I_z`; `V_z = dM_y/dx`,
+  `V_y = dM_z/dx`; `T > 0` dreht im Rechtssinn um `x`. Bei einem
+  waagrechten Stab mit `β = 0` zieht `M_y > 0` unten, wie `M` in der Ebene
+
 Im Grundbruch, wie in Bild 9.2.15 des Kapitels:
 
 * `N_Ed` normal zur Sohle, Druck positiv; `T_Ed` in der Sohle, zur Seite, auf
@@ -875,7 +921,9 @@ Massstab ab:
   Kapitel 3, das nicht vorliegt; sie trifft die Tabellen 8.4 und 8.5.
 * **Balkensysteme**: Eigengewicht aus dem Querschnitt, Umhüllende der
   Kombinationen, Theorie 2. Ordnung, Schubverformung, schiefe Lager und die
-  Übergabe der Schnittgrössen an die Querschnittsnachweise fehlen noch.
+  Übergabe der Schnittgrössen an die Querschnittsnachweise fehlen noch; im
+  Raum dazu die Wölbkrafttorsion, ein Gelenk, das nur die Biegung löst,
+  und ein Diagramm der Verdrehung.
 * **Normwerte prüfen**: die Sortentabellen in `material/beton.py` und
   `material/betonstahl.py` sind aus der Vorgängerfassung übernommen und vor dem
   produktiven Einsatz gegen die gedruckte Norm abzugleichen.

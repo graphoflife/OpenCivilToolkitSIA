@@ -1,5 +1,5 @@
 ---
-erzeugt: 1b454c5a4360
+erzeugt: 24d79954390e
 art: modul
 tags: [modul]
 ---
@@ -150,12 +150,11 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 
 - `_WERKSTOFFSAETZE = [{'wert': s.value, 'beschriftung': s.beschriftung, 'kurz': s.kurz} fo…` – Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. `kurz` fuer die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter stehen beim Wertesatz selbst.
 - `_VERSCHMIERUNGEN = {'flaeche': ('Stahlfläche', 'Die Stahlfläche der ganzen Linie, von Ha…` – Wie die Angaben einer verschmierten Stablinie heissen: kurz im Schalter, lang in seinem Titel -- je Angabe, die die Beschreibung kennt.
-- `_DIAGRAMMGROESSEN = {'M': ('M', 'Moment M'), 'V': ('V', 'Querkraft V'), 'N': ('N', 'Norma…` – Wie die Diagramme der Statik-Analyse heissen: kurz im Schalter, lang ueber dem Diagramm -- je Groesse, die die Beschreibung kennt.
 - `_BETONGESETZE = [{'wert': a.value, 'beschriftung': a.beschriftung, 'kurz': a.kurz} fo…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche es gibt, steht am Feld der Werkstoffwahl.
 - `_DECKENGROESSEN = {'m_x': ('m_x', 'Moment m_x'), 'm_y': ('m_y', 'Moment m_y'), 'm_xy': …` – Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem Titel. Die Regel dahinter steht in [[opencivil.decke.aufteilung]]. Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber dem Bild -- je Groesse, die die Beschreibung kennt.
 - `_AUFTEILUNGEN = {Aufteilung.AUTOMATISCH: ('automatisch', 'Je Stelle nach ihren Lagern…`
 - `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.
-- `_ZUORDNUNG = {'platte': _plattenzuordnung, 'balkensystem': _systemzuordnung}` – Was eine Bauteilart in der Zuordnung mehr hat als Namensraum und Name -- ohne Eintrag ihre Werte ([[opencivil.web.api#_werte|_werte]]). Bis 2026-10-25 stand die Zuordnung je Art von Hand da, zwei Bloecke wortgleich.
+- `_ZUORDNUNG = {'platte': _plattenzuordnung, 'balkensystem': _systemzuordnung, 'balk…` – Was eine Bauteilart in der Zuordnung mehr hat als Namensraum und Name -- ohne Eintrag ihre Werte ([[opencivil.web.api#_werte|_werte]]). Bis 2026-10-25 stand die Zuordnung je Art von Hand da, zwei Bloecke wortgleich.
 
 ## Braucht
 
@@ -180,6 +179,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.projekt]]
@@ -190,13 +190,13 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]
-- [[opencivil.stabwerk.modell]]
-- [[opencivil.stabwerk.profiltabelle]]
-- [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.web.anzeige]]
+- [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
+- [[opencivil.web.systemkatalog]]
 - [[opencivil.web.umschlag]]
 - [[opencivil.web.zeichendaten]]
 

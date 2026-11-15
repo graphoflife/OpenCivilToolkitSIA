@@ -1,5 +1,5 @@
 ---
-erzeugt: 06ec9a192e77
+erzeugt: 9d41d4d8a333
 art: formel
 tags: [formel]
 ---
@@ -33,6 +33,10 @@ $$
   &= 1335.51\,\mathrm{cm}^{4}
 \end{aligned}
 $$
+
+## Gebraucht von
+
+- [[Biegesteifigkeit um z]]
 
 ## Im Code
 

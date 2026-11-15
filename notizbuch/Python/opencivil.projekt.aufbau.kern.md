@@ -1,5 +1,5 @@
 ---
-erzeugt: 1ea938d4712b
+erzeugt: 5dfe7816dbe1
 art: modul
 tags: [modul]
 ---
@@ -82,6 +82,15 @@ def balkensysteme(self) -> Dict[str, Balkensystem]
 ```
 
 Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
+
+#### Aufbau.balkensysteme3d
+
+```python
+@property
+def balkensysteme3d(self) -> Dict[str, Balkensystem3d]
+```
+
+Die 3D-Balkensysteme, nach Kennung -- wie die ebenen.
 
 #### Aufbau.decken
 
@@ -427,6 +436,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.projekt.projekt]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk3d.rechnung]]
 
 ## Gebraucht von
 

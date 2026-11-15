@@ -11,7 +11,8 @@
  * Was darin steht, setzt `paletteZeichnen` je nach Lage: in Ruhe die
  * Koordinaten des Zeigers, Raster und Fang; während eines Befehls seine
  * Frage, die Eingabefelder -- je Achse eines -- und die Hilfen; bei einer
- * Auswahl, was die App zu ihr zeigt. Die Zeilen darin (`cadZeile`,
+ * Auswahl, was die App zu ihr zeigt. Im Raum steht in Ruhe und während
+ * eines Befehls dazu die Arbeitsebene (cad_raum.js). Die Zeilen darin (`cadZeile`,
  * `schalterzeile`) sind dieselben, aus denen die Apps ihre Eigenschaften
  * bauen.
  */
@@ -21,7 +22,8 @@ import { zahlText } from './cad_ansicht.js';
 import {
   feldeinheiten, feldnamen, felderLeeren, hilfstext, taste as eingabeTaste, zeigerFang,
 } from './cad_eingabe.js';
-import { el } from './dom.js';
+import { EBENEN, ebeneSetzen } from './cad_raum.js';
+import { el, zahlfeld } from './dom.js';
 
 const ABLAGE = 'opencivil.cad.palette';
 
@@ -146,6 +148,30 @@ export function lageZeichnen(a) {
   ziel.textContent = f ? a.adapter.achsen.map((x, i) => `${x} ${zahlText(f.p[i], s)} ${e}`).join('   ') : '';
 }
 
+/**
+ * Die Arbeitsebene im Raum: welche, als Schalter, und wo, als Zahlenfeld --
+ * dorthin zeigt ein Klick ins Leere. In der Ebene nichts.
+ */
+function ebenenzeilen(a) {
+  if (!a.raum) return [];
+  const { achse, lage } = a.v.ebene;
+  const name = a.adapter.achsen[achse];
+  return [
+    schalterzeile('Ebene', wahlSchalter({
+      werte: EBENEN.map((x) => ({ wert: x.achse, beschriftung: x.kurz, titel: x.name })),
+      gewaehlt: achse, titel: 'Wo ein Klick ins Leere hinzeigt -- E legt sie durch den gefangenen Punkt',
+      setzen: (w) => { ebeneSetzen(a, w); a.neuZeichnen(); }, klasse: '.cad-wahl.ist-wortlaut',
+    })),
+    cadZeile(`bei ${name}`, zahlfeld({
+      wert: lage, schritt: a.raster, titel: `Die Lage der Arbeitsebene auf der Achse ${name}`,
+      beiAenderung: (w) => { ebeneSetzen(a, achse, w); a.neuZeichnen(); },
+    }), a.einstellung.einheit),
+  ];
+}
+
+/** Was die Arbeitsebene im schwebenden Fenster ausmacht -- ändert es sich, baut es sich neu. */
+const ebenenschluessel = (a) => (a.v.ebene ? [a.v.ebene.achse, a.v.ebene.lage] : null);
+
 /** Ein Feld der Punkteingabe: schmal, rechtsbündig, ohne Pfeile. */
 function eingabefeld(a, i, name) {
   const feld = el('input.cad-eingabe', {
@@ -244,10 +270,11 @@ export function paletteZeichnen(a) {
     const schluessel = JSON.stringify([
       'befehl', a.befehl.name, pe.modus, pe.runde, pe.bindung?.text, pe.warten?.art || pe.warten,
       a.befehl.kopie ? a.befehl.anzahl : null, neuTeil?.schluessel ?? null,
-      (a.befehl.tasten || []).map((t) => !!t.an?.(a.befehl)),
+      (a.befehl.tasten || []).map((t) => !!t.an?.(a.befehl)), ebenenschluessel(a),
     ]);
     pal.setzen(hilfstext(a) || a.befehl.frage(a), [
       ...punkteingabe(a),
+      ...ebenenzeilen(a),
       neuTeil ? el('div.cad-neu', {}, neuTeil.inhalt) : null,
     ], schluessel);
     return;
@@ -275,7 +302,8 @@ export function paletteZeichnen(a) {
       el('span', { text: `Raster in ${a.einstellung.einheit}` }), el('label', {}, [fang, ' Fang']),
     ]),
     raster,
-  ], JSON.stringify(['ruhe', a.raster, a.fang]));
+    ...ebenenzeilen(a),
+  ], JSON.stringify(['ruhe', a.raster, a.fang, ebenenschluessel(a)]));
   if (!a.teile.lage.isConnected) a.teile.lage = pal.koerper.querySelector('.cad-lage');
   lageZeichnen(a);
 }

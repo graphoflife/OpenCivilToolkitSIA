@@ -1,5 +1,5 @@
 ---
-erzeugt: adadd358045c
+erzeugt: 9b648ac879da
 art: modul
 tags: [modul]
 ---
@@ -226,3 +226,4 @@ tragen ihre Werte in den Achsen ihrer Ebene, siehe Dateikopf.
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.system]]
 - [[opencivil.stabwerk3d.verlauf]]
+- [[opencivil.web.balkendaten]]

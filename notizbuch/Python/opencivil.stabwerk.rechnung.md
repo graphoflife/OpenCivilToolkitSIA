@@ -1,5 +1,5 @@
 ---
-erzeugt: 53fd9195c6bc
+erzeugt: 338f8288894f
 art: modul
 tags: [modul]
 ---
@@ -420,9 +420,13 @@ Modul mal Kennwert ([[opencivil.stabwerk.rechnung#Steifigkeitsformel|Steifigkeit
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]
+- [[opencivil.web.systemkatalog]]
 
 ## Formeln aus diesem Modul
 
 - [[Biegesteifigkeit]] · `_modul_mal_kennwert`
+- [[Biegesteifigkeit um y]] · `_modul_mal_kennwert`
+- [[Biegesteifigkeit um z]] · `_modul_mal_kennwert`
 - [[Dehnsteifigkeit]] · `_modul_mal_kennwert`
 - [[Eigengewicht eines Stabs]] · `_gewicht_je_meter`
+- [[Torsionssteifigkeit]] · `_modul_mal_kennwert`

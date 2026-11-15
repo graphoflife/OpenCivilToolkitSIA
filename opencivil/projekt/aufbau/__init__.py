@@ -14,8 +14,8 @@ auffallen koennen -- ein Verweis auf ein geloeschtes Material, eine Platte
 ohne Bewehrung.
 
 DIE BAUTEILARTEN:
-Platte, Querschnittsanalyse, Balkensystem, Decke, Durchstanzen, Grundbruch, Setzung und
-Pfahl haben je einen Steckbrief
+Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen, Grundbruch,
+Setzung und Pfahl haben je einen Steckbrief
 (:class:`Bauteilart`) in :data:`BAUTEILE` -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -35,6 +35,7 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion ``bauen``
 (:mod:`~opencivil.projekt.aufbau.platte`,
 :mod:`~opencivil.projekt.aufbau.querschnittsanalyse`,
 :mod:`~opencivil.projekt.aufbau.balkensystem`,
+:mod:`~opencivil.projekt.aufbau.balkensystem3d`,
 :mod:`~opencivil.projekt.aufbau.decke`,
 :mod:`~opencivil.projekt.aufbau.durchstanzen`,
 :mod:`~opencivil.projekt.aufbau.grundbruch`,
@@ -52,6 +53,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Tuple
 
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.projekt.balkensystem import BalkensystemEintrag
+from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.decke import DeckeEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
@@ -61,7 +63,8 @@ from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.projekt.setzung import SetzungEintrag
 
 from opencivil.projekt.aufbau import (
-    balkensystem, decke, durchstanzen, grundbruch, pfahl, platte, querschnittsanalyse, setzung,
+    balkensystem, balkensystem3d, decke, durchstanzen, grundbruch, pfahl, platte,
+    querschnittsanalyse, setzung,
 )
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, baustoff_bauen, ueberschreibungen_setzen
 
@@ -69,7 +72,8 @@ if TYPE_CHECKING:
     from opencivil.projekt.projekt import Projekt
 
 __all__ = [
-    "ANALYSE", "Aufbau", "BALKENSYSTEM", "BAUTEILE", "Bauteil", "Bauteilart", "DECKE", "DURCHSTANZEN",
+    "ANALYSE", "Aufbau", "BALKENSYSTEM", "BALKENSYSTEM3D", "BAUTEILE", "Bauteil", "Bauteilart",
+    "DECKE", "DURCHSTANZEN",
     "GRUNDBRUCH", "PFAHL", "PLATTE", "SETZUNG", "aufbauen",
 ]
 
@@ -166,6 +170,9 @@ ANALYSE = Bauteilart("querschnittsanalyse", "querschnittsanalysen",
                      "Querschnittsanalyse", querschnittsanalyse.bauen)
 BALKENSYSTEM = Bauteilart("balkensystem", "balkensysteme", BalkensystemEintrag, "r",
                           "balkensystem", "Balkensysteme", balkensystem.bauen)
+#: Die Kennungen u1, u2 ...: «r» tragen die Rahmen in der Ebene.
+BALKENSYSTEM3D = Bauteilart("balkensystem3d", "balkensysteme3d", Balkensystem3dEintrag, "u",
+                            "balkensystem3d", "3D-Balkensysteme", balkensystem3d.bauen)
 #: Die Kennungen e1, e2 ...: «d» tragen schon die Durchstanzstellen.
 DECKE = Bauteilart("decke", "decken", DeckeEintrag, "e", "decke", "Decken", decke.bauen)
 GRUNDBRUCH = Bauteilart("grundbruch", "grundbrueche", GrundbruchEintrag, "g",
@@ -184,5 +191,5 @@ PFAHL = Bauteilart("pfahl", "pfaehle", PfahlEintrag, "t", "pfahl", "Pfähle", pf
 #: den anderen.
 #: Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher,
 #: Erkennen einer Datei), geht diese Liste durch.
-BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM, DECKE, DURCHSTANZEN,
-                                     GRUNDBRUCH, SETZUNG, PFAHL)
+BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE,
+                                     DURCHSTANZEN, GRUNDBRUCH, SETZUNG, PFAHL)

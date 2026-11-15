@@ -1,5 +1,6 @@
 /**
- * balkensystem.js -- Mittlere Tafel: Eingaben eines 2D-Balkensystems.
+ * balkensystem.js -- Mittlere Tafel: Eingaben eines Balkensystems, eben
+ * oder im Raum.
  *
  * Von oben nach unten:
  *
@@ -12,20 +13,23 @@
  *                     Zeile ein Fall und eine Grösse, wie in der
  *                     Spannung-Dehnung-Analyse
  *
- * Gerechnet wird nichts: A und I, die Steifigkeiten und alles Weitere bildet
- * der Kern; hier stehen nur seine Zahlen.
+ * Gerechnet wird nichts: die Kennwerte der Querschnitte, die Steifigkeiten
+ * und alles Weitere bildet der Kern; hier stehen nur seine Zahlen.
  *
- * VORZEICHEN: x nach rechts, z nach oben, Drehungen und Momentlasten im
- * Gegenuhrzeigersinn. Kraftlasten sind positiv in Pfeilrichtung --
- * senkrecht nach unten, quer zur gestrichelten Faser. Die Schnittgrössen
- * nach Baustatik: N > 0 ist Zug, M > 0 zieht an der gestrichelten Faser.
- * Das kleine Bild unter «Vorzeichen» zeigt es.
+ * Das 2D- und das 3D-Balkensystem teilen sich diese Tafel. Was eine Art
+ * anders hat -- die Kennwerte eines Querschnitts und eines Materials, die
+ * Linienlager, die Diagramme --, sagt ihr Katalog (bs_teile.js); wie sie es
+ * erklärt, auch ihre Vorzeichen und deren kleines Bild, bs_texte.js.
  */
 
 import {
   erklaerung, feld, klappgruppe, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
-import { materialname, passendeUebersicht } from './bs_teile.js';
+import {
+  lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart, systemkatalog,
+  systemliste, undListe,
+} from './bs_teile.js';
+import { texte } from './bs_texte.js';
 import { waehlen, zeichenbereich } from './bs_zeichnung.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
@@ -35,54 +39,9 @@ import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { diagrammzeilen, lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import { rechenwahlZeile } from './nachweise.js';
 import {
-  eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsteKennung, naechsterName,
-  zustand,
+  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsteKennung,
+  naechsterName, zustand,
 } from './zustand.js';
-
-const HILFE = {
-  vorzeichen: {
-    zeilen: [
-      ['Achsen', 'x nach rechts, z nach oben; Verschiebungen positiv entlang der Achsen'],
-      ['Drehung', 'im Gegenuhrzeigersinn positiv, ebenso Momentlasten'],
-      ['Lasten', 'positiv in Pfeilrichtung: senkrecht nach unten, waagrecht nach rechts, quer zur gestrichelten Faser, längs vom Anfang zum Ende'],
-      ['N, V, M', 'nach Baustatik: N > 0 Zug, M > 0 zieht an der gestrichelten Faser, dM/dx = V − m'],
-      ['Faser', 'die Zugseite: an einer neuen Linie unten, an einer senkrechten links -- im Fenster des Stabs umzuschalten; die Lasten bleiben dabei, wo sie wirken'],
-    ],
-    formel: 'Lagerkraft nach oben positiv',
-  },
-  materialien: {
-    zeilen: [
-      ['Beton', 'einer aus dem Projekt: E = E_cm und ρ des Stahlbetons, die Bewehrung steckt darin -- zu ändern in der App «Materialien»'],
-      ['Baustahl', 'einer aus dem Projekt: E = E_a und ρ_a (SIA 263:2013, 3.2.2.1)'],
-      ['eigenes', 'E und ρ von Hand, etwa für Holz'],
-      ['ρ', 'für das Eigengewicht ρ · g · A, mit g = 10 m/s²'],
-      ['gemäss Querschnitt', 'wählt man an der Linie: der Beton ihrer Platte oder Analyse'],
-    ],
-    formel: 'g_k = ρ · g · A   g = 10 m/s²',
-  },
-  querschnitte: {
-    zeilen: [
-      ['Vorlage', 'A und I nach den Formeln der Vorlage, Masse in mm'],
-      ['Profil', 'ein Stahlprofil aus der Tabelle -- A und I_y oder I_z aus seinen Massen, in cm² und cm⁴; y ist die starke Achse, der Steg liegt dann in der Ebene des Rahmens'],
-      ['Platte', 'ein Streifen b × h der gewählten Platte'],
-      ['Analyse', 'A und I_y des Bruttoquerschnitts'],
-      ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, bei einer Analyse auf Wunsch E_eq bei N und M, für EA und EI (für EA eine Näherung)'],
-      ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten -- bei einer Platte immer in x-Richtung, Zug unten'],
-      ['Steifigkeit', 'EA, EI am Bruttoquerschnitt, beim Beton ungerissen und ohne Bewehrung (SIA 262:2025, 4.1.4.1.3); Theorie 1. Ordnung'],
-    ],
-    formel: 'EA = E · A   EI = E · I',
-  },
-  statik: {
-    zeilen: [
-      ['Fall', 'ein Lastfall oder eine Kombination -- gerechnet wird jeder Fall'],
-      ['M, V, N', 'je Stab der Verlauf, positiv auf der Seite der gestrichelten Faser'],
-      ['Verschiebung', 'das verschobene System, überhöht -- je Stab die grösste Durchbiegung gegen die Sehne, kurzzeitig und ungerissen; die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1)'],
-      ['Verdrehung', 'je Stab die Verdrehung φ des Querschnitts in mrad, im Gegenuhrzeigersinn positiv'],
-      ['Lager', 'die Lagerkräfte auf das Tragwerk'],
-      ['Angeschrieben', 'die Werte an den Enden und je Stab die grössten, mit Punkt und Stelle'],
-    ],
-  },
-};
 
 // ===========================================================================
 // Unter der Zeichnung
@@ -95,6 +54,7 @@ const HILFE = {
 function uebersicht(a) {
   const z = eintragVon(a.bs.kennung);
   if (!z) return [];
+  const { art } = a.bs;
   const u = passendeUebersicht(a);
   const teile = [];
   if (u?.fehler) teile.push(el('div.qa-meldungen', {}, [el('div.qa-meldung', { text: u.fehler })]));
@@ -108,7 +68,7 @@ function uebersicht(a) {
   }
   const name = (q) => z.querschnitte.find((x) => x.kennung === q)?.name || q || '–';
   const stoff = (m) => {
-    if (m === katalog('balkensystem', 'material_des_querschnitts')) return 'gemäss Querschnitt';
+    if (m === systemkatalog(art, 'material_des_querschnitts')) return 'gemäss Querschnitt';
     const da = eintragVon(m);
     return da ? (da.name || da.sorte) : '–';
   };
@@ -116,18 +76,20 @@ function uebersicht(a) {
     dataset: { kennung },
     on: { click: () => waehlen(a.bs.kennung, [waehlbar]) },
   }, [el('span.bs-element-name', { text: kennung }), el('span', { text: links }), el('span.bs-element-zusatz', { text: rechts })]);
+  const linienlager = systemkatalog(art, 'linienlager');
   const linien = z.linien.map((l) => {
     const gelenke = [l.gelenk_anfang ? 'Anfang' : '', l.gelenk_ende ? 'Ende' : ''].filter(Boolean);
-    const lager = [l.quer !== 'frei' ? `quer ${l.quer === 'feder' ? 'gebettet' : 'fest'}` : '',
-      l.laengs !== 'frei' ? `längs ${l.laengs === 'feder' ? 'gebettet' : 'fest'}` : ''].filter(Boolean);
+    const lager = linienlager.filter((x) => l[x.feld] !== 'frei')
+      .map((x) => `${x.kurz} ${l[x.feld] === 'feder' ? 'gebettet' : 'fest'}`);
     return zeile(l.kennung, `${l.von} → ${l.bis}`, [
       l.querschnitt ? `${name(l.querschnitt)} · ${stoff(l.material)}` : 'kein Stab',
+      // Der Drehwinkel β einer Linie im Raum, wenn sie gedreht ist.
+      l.drehung ? `β = ${l.drehung}°` : '',
       gelenke.length ? `Gelenk ${gelenke.join(', ')}` : '',
       ...lager,
     ].filter(Boolean).join(' · '));
   });
-  const lager = z.lager.map((l) => zeile(l.kennung, `an ${l.knoten}`,
-    `x ${l.x} · z ${l.z} · φ ${l.phi}`, l.knoten));
+  const lager = z.lager.map((l) => zeile(l.kennung, `an ${l.knoten}`, lagertext(art, l), l.knoten));
   const lastfall = (lf) => z.lastfaelle.find((x) => x.kennung === lf)?.name || lf;
   const lastzeile = (last, wo, text) => el('div.bs-element', {
     dataset: { kennung: last.kennung },
@@ -139,16 +101,21 @@ function uebersicht(a) {
     },
   }, [el('span.bs-element-name', { text: last.kennung }), el('span', { text: wo }),
     el('span.bs-element-zusatz', { text: `${text} · ${lastfall(last.lastfall)}` })]);
-  const arten = katalog('balkensystem', 'lastarten');
+  // Die Richtung einer Kraft -- im Raum auch die Achse eines Moments; in
+  // der Ebene dreht jedes Moment um dieselbe.
+  const richtung = (last, kraft) => (kraft || a.bs.raum
+    ? ` · ${lastrichtung(art, last.richtung)?.beschriftung || last.richtung}` : '');
   const lasten = [
     ...z.linien.flatMap((l) => l.lasten.map((last) => {
-      const art = arten.find((x) => x.wert === last.art);
+      const la = lastart(art, last.art);
       const wert = last.wert_b === null || last.wert_b === undefined ? `${last.wert_a}` : `${last.wert_a} … ${last.wert_b}`;
-      const stelle = art?.verteilt ? '' : ` bei ${last.stelle} %`;
-      return lastzeile(last, `auf ${l.kennung}`, `${art?.beschriftung || last.art} ${wert} ${art?.einheit || ''}${stelle}`);
+      const stelle = la.verteilt ? '' : ` bei ${last.stelle} %`;
+      return lastzeile(last, `auf ${l.kennung}`, `${la.beschriftung} ${wert} ${la.einheit}${stelle}${richtung(last, la.kraft)}`);
     })),
-    ...z.knotenlasten.map((p) => lastzeile(p, `an ${p.knoten}`,
-      `${p.art === 'moment' ? 'Moment' : 'Kraft'} ${p.wert} ${p.art === 'moment' ? 'kNm' : 'kN'}`)),
+    ...z.knotenlasten.map((p) => {
+      const kraft = p.art !== 'moment';
+      return lastzeile(p, `an ${p.knoten}`, `${kraft ? 'Kraft' : 'Moment'} ${p.wert} ${kraft ? 'kN' : 'kNm'}${richtung(p, kraft)}`);
+    }),
   ];
   // Jede Gruppe klappt auf und zu, zu Beginn zu (Benutzer, 2026-10-24).
   const offen = a.bs.aufgeklappt || (a.bs.aufgeklappt = new Set());
@@ -162,44 +129,19 @@ function uebersicht(a) {
 // System
 // ===========================================================================
 
-/** Ein kleines Bild der Vorzeichen: Achsen, Drehsinn, ein Stab mit Faser, M > 0. */
-function vorzeichenbild() {
-  const s = svgEl('svg', { viewBox: '0 0 300 92', class: 'bs-vorzeichen', role: 'img', 'aria-label': 'Vorzeichen' });
-  const pfeil = (d) => svgEl('path', { d, class: 'bs-vz-pfeil' });
-  const text = (x, y, t, k = '') => {
-    const e = svgEl('text', { x, y, class: `bs-vz-text ${k}` });
-    e.textContent = t;
-    return e;
-  };
-  s.append(
-    pfeil('M20 70 H70 M64 66 L70 70 L64 74'), text(74, 74, 'x'),
-    pfeil('M20 70 V20 M16 26 L20 20 L24 26'), text(16, 14, 'z'),
-    svgEl('path', { d: 'M48 40 A12 12 0 1 0 36 52', class: 'bs-vz-pfeil' }),
-    pfeil('M36 52 L42 50 M36 52 L39 46'), text(52, 38, 'φ, M ↺'),
-    svgEl('path', { d: 'M120 46 H270', class: 'bs-vz-stab' }),
-    svgEl('path', { d: 'M135 51 H255', class: 'bs-vz-faser' }),
-    text(120, 36, 'Anfang'), text(240, 36, 'Ende'),
-    pfeil('M195 14 V40 M191 34 L195 40 L199 34'), text(201, 22, 'Last ↓ positiv'),
-    text(150, 68, 'gestrichelte Faser: die Zugseite'),
-    text(150, 84, 'M > 0 zieht dort · N > 0 ist Zug'),
-  );
-  return s;
-}
-
 function systemGruppe(system) {
+  const art = systemart(system.kennung);
+  const t = texte(art);
   const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
-  return panel({
-    schluessel: 'balkensystem/System', titel: 'System', zusatz: 'x nach rechts, z nach oben, m',
-    breit: true,
-  }, [
+  return panel({ schluessel: `${art}/System`, titel: 'System', zusatz: t.zusatz, breit: true }, [
     // Der Lastfall der Zeichnung steht in ihrer Leiste, neben «Last».
     feld('Bezeichnung', el('input', {
       type: 'text', value: system.name,
       on: { change: (e) => aendern((s) => { s.name = e.target.value; }) },
-    }), erklaerung(HILFE.vorzeichen.zeilen, HILFE.vorzeichen.formel)),
+    }), erklaerung(t.hilfe.vorzeichen.zeilen, t.hilfe.vorzeichen.formel)),
     zeichenbereich(system, uebersicht),
     el('div.unterkapitel', {}, [
-      el('details.bs-vorzeichen-huelle', {}, [el('summary', { text: 'Vorzeichen' }), vorzeichenbild()]),
+      el('details.bs-vorzeichen-huelle', {}, [el('summary', { text: 'Vorzeichen' }), t.vorzeichenbild()]),
       el('div.beschreibung', {}, [
         el('label', { text: 'Beschreibung' }),
         el('textarea', {
@@ -215,20 +157,26 @@ function systemGruppe(system) {
 // Materialien
 // ===========================================================================
 
+/** Wie weit ein Pfeil im Zahlenfeld eines eigenen Materials springt -- je Kennwert. */
+const SCHRITT = { E: 1000, rho: 50, G: 1000 };
+
 /**
  * Die Materialien der Stäbe als Tabelle (Benutzer, 2026-10-24): je Zeile
- * ein Beton oder Baustahl des Projekts -- E und ρ von ihm, gesperrt,
- * gerechnet vom Kern -- oder ein eigenes mit E und ρ von Hand. Betonstahl
- * steht nicht zur Wahl: aus ihm ist kein Stab. Daneben, welche Linien es
- * nehmen.
+ * ein Beton oder Baustahl des Projekts -- seine Kennwerte gesperrt,
+ * gerechnet vom Kern -- oder ein eigenes mit Kennwerten von Hand: E und ρ,
+ * im Raum dazu G. Betonstahl steht nicht zur Wahl: aus ihm ist kein Stab.
+ * Daneben, welche Linien es nehmen.
  */
 function materialienInhalt(system) {
+  const art = systemart(system.kennung);
   const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
   // Je Art des Projekts, aus der ein Stab sein kann, die Kennwerte, die er nimmt.
-  const kennwerte = katalog('balkensystem', 'stabkennwerte');
-  const titel = (art) => katalog('materialarten', art, 'titel');
-  const stoffe = (art) => zustand.projekt.materialien.filter((m) => m.art === art);
-  const angabe = (feldname) => feldangabe('stabmaterial', feldname);
+  const kennwerte = systemkatalog(art, 'stabkennwerte');
+  const spalten = systemkatalog(art, 'materialkennwerte');
+  const klasse = systemkatalog(art, 'klassen', 'material');
+  const titel = (stoffart) => katalog('materialarten', stoffart, 'titel');
+  const stoffe = (stoffart) => zustand.projekt.materialien.filter((m) => m.art === stoffart);
+  const angabe = (feldname) => feldangabe(klasse, feldname);
   const gesperrt = (stoff, kurz) => {
     const wert = stoff ? zustand.loesung?.werte?.[kennwertId(stoff, kennwerte[stoff.art][kurz])] : null;
     return el('span.bs-gesperrt', { text: wert ? wert.wert : '–', title: 'Vom Material des Projekts -- zu ändern in der App «Materialien»' });
@@ -243,7 +191,7 @@ function materialienInhalt(system) {
         gewaehlt: m.stoff, titel: `Ein ${titel(m.art)} des Projekts`, beiAenderung: setzen('stoff'),
       }),
       el('span.bs-material-art', { text: titel(m.art) }),
-      gesperrt(stoff, 'E'), gesperrt(stoff, 'rho'),
+      ...spalten.map((k) => gesperrt(stoff, k.kurz)),
     ];
   };
   const eigenes = (m, setzen) => [
@@ -252,8 +200,10 @@ function materialienInhalt(system) {
       on: { change: (e) => setzen('name')(e.target.value) },
     }),
     el('span.bs-material-art', { text: 'eigenes' }),
-    zahlfeld({ wert: m.E, schritt: 1000, angabe: angabe('E'), titel: 'E-Modul von Hand', beiAenderung: setzen('E') }),
-    zahlfeld({ wert: m.rho, schritt: 50, angabe: angabe('rho'), titel: 'Dichte für das Eigengewicht', beiAenderung: setzen('rho') }),
+    ...spalten.map((k) => zahlfeld({
+      wert: m[k.kurz], schritt: SCHRITT[k.kurz], angabe: angabe(k.kurz), titel: `${k.beschreibung} von Hand`,
+      beiAenderung: setzen(k.kurz),
+    })),
   ];
   const zeile = (m, i) => {
     const setzen = (feldname) => (wert) => aendern((s) => { s.stabmaterialien[i][feldname] = wert; });
@@ -272,15 +222,14 @@ function materialienInhalt(system) {
       el('td', {}, [el('button.weg', { type: 'button', text: '×', title: 'Material löschen', on: { click: weg } })]),
     ]);
   };
-  const neu = (art) => aendern((s) => {
-    s.stabmaterialien.push({
-      ...structuredClone(katalog('vorlagen', 'stabmaterial')),
-      kennung: naechsteKennung(s.stabmaterialien, 'M'), art,
-      ...(art === 'eigen' ? { name: naechsterName('Material', s.stabmaterialien) }
-        : { stoff: stoffe(art)[0]?.kennung || '' }),
-    });
+  const neu = (stoffart) => aendern((s) => {
+    s.stabmaterialien.push(ausVorlage(klasse, {
+      kennung: naechsteKennung(s.stabmaterialien, 'M'), art: stoffart,
+      ...(stoffart === 'eigen' ? { name: naechsterName('Material', s.stabmaterialien) }
+        : { stoff: stoffe(stoffart)[0]?.kennung || '' }),
+    }));
   });
-  const kopf = [['Material'], ['Art'], ['E', angabe('E').einheit], ['ρ', angabe('rho').einheit], ['trägt'], ['']];
+  const kopf = [['Material'], ['Art'], ...spalten.map((k) => [k.zeichen, angabe(k.kurz).einheit]), ['trägt'], ['']];
   return [
     system.stabmaterialien.length ? el('div.tabelle-huelle', {}, [el('table.bs-materialien', {}, [
       el('thead', {}, [el('tr', {}, kopf.map(([text, einheit]) => el('th', {}, [
@@ -289,14 +238,14 @@ function materialienInhalt(system) {
       el('tbody', {}, system.stabmaterialien.map(zeile)),
     ])]) : el('p.bs-leer', { text: 'Noch kein Material -- ein Stab braucht eines.' }),
     el('div.bs-knopfreihe', {}, [
-      ...Object.keys(kennwerte).map((art) => el('button.knopf.knopf-klein', {
-        type: 'button', text: `+ ${titel(art)}`,
-        title: stoffe(art).length ? `Ein ${titel(art)} aus dem Projekt`
-          : `Im Projekt gibt es keinen ${titel(art)} -- anlegen in der App «Materialien»`,
-        disabled: !stoffe(art).length, on: { click: () => neu(art) },
+      ...Object.keys(kennwerte).map((stoffart) => el('button.knopf.knopf-klein', {
+        type: 'button', text: `+ ${titel(stoffart)}`,
+        title: stoffe(stoffart).length ? `Ein ${titel(stoffart)} aus dem Projekt`
+          : `Im Projekt gibt es keinen ${titel(stoffart)} -- anlegen in der App «Materialien»`,
+        disabled: !stoffe(stoffart).length, on: { click: () => neu(stoffart) },
       })),
       el('button.knopf.knopf-klein', {
-        type: 'button', text: '+ eigenes Material', title: 'E-Modul und Dichte von Hand',
+        type: 'button', text: '+ eigenes Material', title: `${undListe(spalten.map((k) => k.beschreibung))} von Hand`,
         on: { click: () => neu('eigen') },
       }),
     ]),
@@ -307,23 +256,29 @@ function materialienInhalt(system) {
 // Querschnitte
 // ===========================================================================
 
-const QUERSCHNITTSARTEN = () => katalog('balkensystem', 'querschnittsarten');
-const VORLAGEN = () => katalog('balkensystem', 'vorlagen');
-const PROFILREIHEN = () => katalog('balkensystem', 'profilreihen');
-
 /** Die Reihe eines Profils -- «HEB 300» gehört zu HEB. */
-const reiheVon = (profil) => PROFILREIHEN().find((r) => r.profile.includes(profil)) || PROFILREIHEN()[0];
-const E_MODULE = () => katalog('balkensystem', 'e_module');
+function reiheVon(art, profil) {
+  const reihen = systemkatalog(art, 'profilreihen');
+  return reihen.find((r) => r.profile.includes(profil)) || reihen[0];
+}
 
-/** Was der Kern zu einem Querschnitt gerechnet hat: A und I -- und sein eigenes E --, oder nichts. */
+/** Die Kennwerte eines Querschnitts in Worten: «A und I», im Raum «A, I_y, I_z und I_T». */
+const kennwertnamen = (art) => undListe(systemkatalog(art, 'kennwerte').map((k) => k.kurz));
+
+/**
+ * Was der Kern zu einem Querschnitt gerechnet hat: seine Kennwerte, wie der
+ * Katalog sie nennt -- und sein eigenes E --, oder nichts.
+ */
 function kennwerte(system, q) {
-  const zuordnung = zustand.loesung?.zuordnung?.balkensysteme?.[system.kennung];
+  const art = systemart(system.kennung);
+  const zuordnung = zustand.loesung?.zuordnung?.[systemliste(art)]?.[system.kennung];
   const ids = zuordnung?.querschnitte?.[q.kennung];
   const werte = zustand.loesung?.werte || {};
   if (!ids) return null;
   const text = (id) => (werte[id] ? `${werte[id].wert} ${werte[id].einheit}` : '–');
   const E = zuordnung.module?.[q.kennung];
-  return `A = ${text(ids.A)} · I = ${text(ids.I)}${E ? ` · E = ${text(E)}` : ''}`;
+  return [...systemkatalog(art, 'kennwerte').map((k) => `${k.kurz} = ${text(ids[k.kurz])}`),
+    ...(E ? [`E = ${text(E)}`] : [])].join(' · ');
 }
 
 /**
@@ -354,19 +309,23 @@ function umrissBild(system, q, breite, hoehe) {
 }
 
 /** Die Masse einer Vorlage mit ihren Vorgaben, aus dem Katalog. */
-function vorgabenDer(schluessel) {
-  return Object.fromEntries((VORLAGEN().find((v) => v.schluessel === schluessel)?.masse || [])
+function vorgabenDer(art, schluessel) {
+  return Object.fromEntries((systemkatalog(art, 'vorlagen').find((v) => v.schluessel === schluessel)?.masse || [])
     .map((m) => [m.schluessel, m.vorgabe]));
 }
 
-/** Woher ein Querschnitt kommt, in Worten -- mit den Massen einer Vorlage. */
-function herkunftText(q) {
+/**
+ * Woher ein Querschnitt kommt, in Worten -- mit den Massen einer Vorlage;
+ * ein Profil in der Ebene mit der Achse, um die es sich biegt. Im Raum
+ * biegt es sich um beide.
+ */
+function herkunftText(art, q) {
   if (q.art === 'vorlage') {
-    const vorlage = VORLAGEN().find((v) => v.schluessel === q.vorlage);
+    const vorlage = systemkatalog(art, 'vorlagen').find((v) => v.schluessel === q.vorlage);
     const masse = (vorlage?.masse || []).map((m) => `${m.symbol} ${q.masse?.[m.schluessel] ?? m.vorgabe}`);
     return `${vorlage?.name || q.vorlage} · ${masse.join(' · ')} mm`;
   }
-  if (q.art === 'profil') return `${q.profil} · um ${q.achse}`;
+  if (q.art === 'profil') return q.achse ? `${q.profil} · um ${q.achse}` : q.profil;
   if (q.art === 'kennwerte') return 'Kennwerte von Hand';
   const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
   const bezug = liste.find((x) => x.kennung === q.bezug);
@@ -382,8 +341,9 @@ const fensterVon = (kennung) => `querschnitt:${kennung}`;
  * woher er kommt.
  */
 function querschnittZeile(system, q, i) {
+  const art = systemart(system.kennung);
   const benutzt = system.linien.filter((l) => l.querschnitt === q.kennung).map((l) => l.kennung);
-  // Ohne A und I sagt die Meldung des Kerns, was dem Querschnitt fehlt.
+  // Ohne Kennwerte sagt die Meldung des Kerns, was dem Querschnitt fehlt.
   const werte = kennwerte(system, q);
   const fehler = (zustand.loesung?.zeichendaten?.[system.kennung]?.uebersicht?.meldungen || [])
     .find((m) => m.fehler && m.elemente.includes(q.kennung));
@@ -396,7 +356,7 @@ function querschnittZeile(system, q, i) {
   };
   return el('div.bs-qzeile', {}, [
     el('button.bs-qbild', {
-      type: 'button', title: 'Bearbeiten: woher A und I kommen, Masse',
+      type: 'button', title: `Bearbeiten: woher ${kennwertnamen(art)} kommen, Masse`,
       on: { click: () => fensterOeffnen(fensterVon(q.kennung)) },
     }, [umrissBild(system, q, 44, 44)]),
     el('div.bs-qmitte', {}, [
@@ -409,8 +369,8 @@ function querschnittZeile(system, q, i) {
         },
       }),
       werte ? el('div.bs-kennwerte', { text: werte })
-        : el('div.bs-qfehler', { text: fehler?.text || 'A und I: –', title: fehler?.text || '' }),
-      el('div.bs-benutzt', { text: `${herkunftText(q)} · ${benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab'}` }),
+        : el('div.bs-qfehler', { text: fehler?.text || `${kennwertnamen(art)}: –`, title: fehler?.text || '' }),
+      el('div.bs-benutzt', { text: `${herkunftText(art, q)} · ${benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab'}` }),
     ]),
     el('button.weg', { type: 'button', text: '×', title: 'Querschnitt löschen', on: { click: weg } }),
   ]);
@@ -425,6 +385,8 @@ function querschnittZeile(system, q, i) {
 function querschnittFenster(system, kennung) {
   const i = system.querschnitte.findIndex((x) => x.kennung === kennung);
   if (i < 0) return null;
+  const art = systemart(system.kennung);
+  const vorlagen = systemkatalog(art, 'vorlagen');
   const q = system.querschnitte[i];
   const aendern = (veraenderer) => eintragAendern(system.kennung, (s) => veraenderer(s.querschnitte[i], s));
   const setzen = (feldname) => (wert) => aendern((x) => { x[feldname] = wert; });
@@ -433,32 +395,32 @@ function querschnittFenster(system, kennung) {
       type: 'text', value: q.name, title: 'Name des Querschnitts',
       on: { change: (e) => setzen('name')(e.target.value) },
     })),
-    wahlBlock('A und I aus', wahlSchalter({
-      werte: QUERSCHNITTSARTEN().map((x) => ({ wert: x.wert, beschriftung: x.kurz, titel: x.beschriftung })),
-      gewaehlt: q.art, titel: 'Woher A und I kommen',
+    wahlBlock(`${kennwertnamen(art)} aus`, wahlSchalter({
+      werte: systemkatalog(art, 'querschnittsarten').map((x) => ({ wert: x.wert, beschriftung: x.kurz, titel: x.beschriftung })),
+      gewaehlt: q.art, titel: `Woher ${kennwertnamen(art)} kommen`,
       // Die Masse gehören zur Art: eine Vorlage bekommt ihre Vorgaben,
       // Kennwerte beginnen leer -- bis 2026-10-24 blieben b und h stehen,
       // und «einen Kennwert «b» gibt es nicht» war die Folge.
       setzen: (w) => aendern((x) => {
         x.art = w;
-        if (w === 'vorlage') x.masse = vorgabenDer(x.vorlage);
+        if (w === 'vorlage') x.masse = vorgabenDer(art, x.vorlage);
         if (w === 'kennwerte' || w === 'profil') x.masse = {};
       }),
     })),
   ];
   if (q.art === 'vorlage') {
-    const vorlage = VORLAGEN().find((v) => v.schluessel === q.vorlage) || VORLAGEN()[0];
+    const vorlage = vorlagen.find((v) => v.schluessel === q.vorlage) || vorlagen[0];
     // Die Vorlage als Auswahlliste, daneben ihr Bild mit den Massen dieses
     // Querschnitts (Benutzer, 2026-10-24).
     zeilen.push(el('div.bs-qvorlage', {}, [
       feld('Vorlage', auswahl({
-        werte: VORLAGEN().map((v) => ({ wert: v.schluessel, beschriftung: v.name })),
+        werte: vorlagen.map((v) => ({ wert: v.schluessel, beschriftung: v.name })),
         gewaehlt: q.vorlage,
         titel: 'Die Form des Querschnitts',
         beiAenderung: (w) => aendern((x) => {
           x.vorlage = w;
           // Die Masse der neuen Vorlage, mit ihren Vorgaben -- die alten passten nicht.
-          x.masse = vorgabenDer(w);
+          x.masse = vorgabenDer(art, w);
         }),
       })),
       umrissBild(system, q, 120, 90),
@@ -472,13 +434,15 @@ function querschnittFenster(system, kennung) {
     }
   } else if (q.art === 'profil') {
     // Die Reihe als Schalter, die Grösse als Liste mit dem Bild daneben --
-    // wie die Vorlage (Benutzer, 2026-10-24) -- und die Achse.
-    const reihe = reiheVon(q.profil);
+    // wie die Vorlage (Benutzer, 2026-10-24) -- und in der Ebene die Achse.
+    const reihen = systemkatalog(art, 'profilreihen');
+    const reihe = reiheVon(art, q.profil);
+    const achsen = systemkatalog(art, 'profilachsen');
     zeilen.push(
       wahlBlock('Reihe', wahlSchalter({
-        werte: PROFILREIHEN().map((r) => ({ wert: r.kurz, beschriftung: r.kurz, titel: r.beschreibung })),
+        werte: reihen.map((r) => ({ wert: r.kurz, beschriftung: r.kurz, titel: r.beschreibung })),
         gewaehlt: reihe.kurz, titel: 'Die Reihe der Stahlprofile',
-        setzen: (kurz) => setzen('profil')(PROFILREIHEN().find((r) => r.kurz === kurz).profile[0]),
+        setzen: (kurz) => setzen('profil')(reihen.find((r) => r.kurz === kurz).profile[0]),
       })),
       el('div.bs-qvorlage', {}, [
         feld('Profil', auswahl({
@@ -488,18 +452,16 @@ function querschnittFenster(system, kennung) {
         })),
         umrissBild(system, q, 120, 90),
       ]),
-      wahlBlock('Biegung', wahlSchalter({
-        werte: katalog('balkensystem', 'profilachsen'),
-        gewaehlt: q.achse, titel: 'Um welche Achse sich das Profil im Rahmen biegt',
+      achsen.length ? wahlBlock('Biegung', wahlSchalter({
+        werte: achsen, gewaehlt: q.achse, titel: 'Um welche Achse sich das Profil im Rahmen biegt',
         setzen: setzen('achse'),
-      })),
+      })) : null,
     );
   } else if (q.art === 'kennwerte') {
-    const kennwert = (schluessel, text, einheit) => feld(text, zahlfeld({
-      wert: q.masse?.[schluessel] ?? 0, schritt: schluessel === 'A' ? 1000 : 10, min: 0,
-      beiAenderung: (w) => aendern((x) => { x.masse = { ...x.masse, [schluessel]: w }; }),
-    }), einheit);
-    zeilen.push(kennwert('A', 'Fläche A', 'mm²'), kennwert('I', 'Trägheitsmoment I', '10⁶ mm⁴'));
+    zeilen.push(...systemkatalog(art, 'kennwerte').map((k) => feld(k.kurz, zahlfeld({
+      wert: q.masse?.[k.kurz] ?? 0, schritt: k.kurz === 'A' ? 1000 : 10, min: 0, titel: k.beschriftung,
+      beiAenderung: (w) => aendern((x) => { x.masse = { ...x.masse, [k.kurz]: w }; }),
+    }), k.einheit, k.beschriftung)));
   } else {
     const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
     zeilen.push(el('div.bs-qvorlage', {}, [
@@ -517,8 +479,8 @@ function querschnittFenster(system, kennung) {
   // Stellungen es gibt, sagt der
   // Katalog; die gewählte bleibt sichtbar, auch wo sie nicht mehr passt --
   // die Meldung des Kerns sagt dann warum.
-  const eigenes = katalog('balkensystem', 'material_des_querschnitts');
-  const module = E_MODULE().filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul);
+  const eigenes = systemkatalog(art, 'material_des_querschnitts');
+  const module = systemkatalog(art, 'e_module').filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul);
   const mitEigenem = system.linien.some((l) => l.querschnitt === q.kennung && l.material === eigenes);
   if (mitEigenem && module.length > 1) {
     zeilen.push(wahlBlock('E-Modul', wahlSchalter({
@@ -545,7 +507,7 @@ function querschnittFenster(system, kennung) {
   if (werte) zeilen.push(el('p.bs-kennwerte', { text: werte }));
   return fenster({
     titel: 'Querschnitt', zeichen: 'querschnitte', zusatz: `${system.name} · ${q.name}`,
-    hilfe: erklaerung(HILFE.querschnitte.zeilen, HILFE.querschnitte.formel),
+    hilfe: erklaerung(texte(art).hilfe.querschnitte.zeilen, texte(art).hilfe.querschnitte.formel),
     inhalt: [
       el('button.knopf.knopf-klein.bs-zurueck', {
         type: 'button', text: '← alle Querschnitte', on: { click: () => fensterOeffnen('querschnitte') },
@@ -557,13 +519,11 @@ function querschnittFenster(system, kennung) {
 
 /** Je Querschnitt eine Zeile; ein neuer öffnet gleich sein Fenster. */
 function querschnitteInhalt(system) {
+  const klasse = systemkatalog(systemart(system.kennung), 'klassen', 'querschnitt');
   const neu = () => {
     const kennung = naechsteKennung(system.querschnitte, 'Q');
     eintragAendern(system.kennung, (s) => {
-      s.querschnitte.push({
-        ...structuredClone(katalog('vorlagen', 'stabquerschnitt')),
-        kennung, name: naechsterName('Querschnitt', s.querschnitte),
-      });
+      s.querschnitte.push(ausVorlage(klasse, { kennung, name: naechsterName('Querschnitt', s.querschnitte) }));
     });
     fensterOeffnen(fensterVon(kennung));
   };
@@ -582,19 +542,19 @@ function querschnitteInhalt(system) {
  * Material, Querschnitte, Lastfälle, Kombinationen und die Statik-Analyse
  * als Knöpfe, jeder mit seinem Fenster -- wie die Kapitel der
  * Querschnittsanalyse (Benutzer, 2026-10-24). Unter dem Namen klein, wie
- * viele es gibt.
+ * viele es gibt. Dieselben für beide Arten, mit den Hilfen der Art.
  */
-const KAPITEL = [
+const kapitelVon = (art) => [
   {
     titel: 'Tragwerk',
     kapitel: [
       {
-        schluessel: 'material', name: 'Material', titel: 'Materialien', hilfe: HILFE.materialien,
+        schluessel: 'material', name: 'Material', titel: 'Materialien', hilfe: texte(art).hilfe.materialien,
         inhalt: materialienInhalt,
         stand: (s) => zeilenstand(s.stabmaterialien, 'Material', 'Materialien', 'kein Material'),
       },
       {
-        schluessel: 'querschnitte', name: 'Querschnitte', titel: 'Querschnitte', hilfe: HILFE.querschnitte,
+        schluessel: 'querschnitte', name: 'Querschnitte', titel: 'Querschnitte', hilfe: texte(art).hilfe.querschnitte,
         inhalt: querschnitteInhalt,
         stand: (s) => zeilenstand(s.querschnitte, 'Querschnitt', 'Querschnitte', 'kein Querschnitt'),
       },
@@ -612,7 +572,7 @@ const KAPITEL = [
     titel: 'Analyse',
     kapitel: [
       {
-        schluessel: 'statik', name: 'Statik-Analyse', titel: 'Statik-Analyse', hilfe: HILFE.statik,
+        schluessel: 'statik', name: 'Statik-Analyse', titel: 'Statik-Analyse', hilfe: texte(art).hilfe.statik,
         inhalt: statikInhalt,
         stand: (s) => zeilenstand(s.diagramme, 'Diagramm', 'Diagramme', 'kein Diagramm'),
       },
@@ -622,9 +582,9 @@ const KAPITEL = [
 
 /** Die Fenster des Systems, nach ihrem Schlüssel: die Kapitel und je Querschnitt seines. */
 export function balkensystemFenster(system, schluessel) {
-  const [art, kennung] = String(schluessel).split(':');
-  return art === 'querschnitt' && kennung ? querschnittFenster(system, kennung)
-    : kapitelFenster(system, KAPITEL, schluessel);
+  const [wo, kennung] = String(schluessel).split(':');
+  return wo === 'querschnitt' && kennung ? querschnittFenster(system, kennung)
+    : kapitelFenster(system, kapitelVon(systemart(system.kennung)), schluessel);
 }
 
 // ===========================================================================
@@ -637,14 +597,16 @@ export function balkensystemFenster(system, schluessel) {
  * Fenster wie die Eingaben (Benutzer, 2026-10-24).
  */
 function statikInhalt(system) {
+  const art = systemart(system.kennung);
   return diagrammzeilen(system, {
-    groessen: katalog('balkensystem', 'diagrammgroessen'), vorlage: 'statikdiagramm',
+    groessen: systemkatalog(art, 'diagrammgroessen'), vorlage: systemkatalog(art, 'klassen', 'diagramm'),
   });
 }
 
 // ===========================================================================
 
 export function balkensystemEditor(system) {
+  const art = systemart(system.kennung);
   return [systemGruppe(system),
-    kapitelPanel(system, KAPITEL, { schluessel: 'balkensystem/Eingaben', titel: 'Eingaben' })];
+    kapitelPanel(system, kapitelVon(art), { schluessel: `${art}/Eingaben`, titel: 'Eingaben' })];
 }

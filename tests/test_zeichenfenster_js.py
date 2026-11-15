@@ -5,7 +5,9 @@ Achsen nennt, und Verschieben, Kopieren und Zusammenfuehren rechnen mit
 allen. Zwei Strecken im Raum kreuzen sich nur, wo sie sich wirklich treffen.
 Die Ansicht bildet die Zeichnung ins Bild ab -- in der Ebene wie bisher, im
 Raum ueber zwei Richtungen --, und ein Punkt im Bild zeigt auf die
-Arbeitsebene.
+Arbeitsebene. Im Raum (``web/js/cad_raum.js``) liegen die vier Ansichten,
+wie ihre Knoepfe sagen, Drehen haelt den Punkt, um den es dreht, im Bild,
+und die Arbeitsebene merkt sich je Richtung ihre Lage.
 
 Die Module werden mit ihren Nachbarn in ein leeres Verzeichnis kopiert, das
 node als Module liest. Ohne node wird uebersprungen.
@@ -85,6 +87,26 @@ const ecken = [];
 for (const x of [0, 10]) for (const y of [0, 6]) for (const zz of [0, 4]) ecken.push(v.nachBild(schraeg, [x, y, zz]));
 erg.eingepasst = ecken.every(([x, h]) => x >= 19.99 && x <= 380.01 && h >= 19.99 && h <= 380.01);
 erg.raster = [v.rasterschritt(1, 30), v.rasterschritt(1, 3), v.rasterschritt(0.5, 2)];
+
+// Die Ansicht im Raum: die vier Ansichten, Drehen um einen Punkt, die Arbeitsebene.
+const raum = await import('./cad_raum.js');
+erg.basen = Object.fromEntries(raum.ANSICHTEN.map((x) => [x.name, raum.basisAus(x).map(r)]));
+const a = { v: v.ansichtNeu(), adapter: { umriss: () => [[0, 0, 0], [6, 4, 2]] } };
+raum.raumEinrichten(a);
+Object.assign(a.v, { massstab: 20, ursprung: [200, 200], breite: 400, hoehe: 400 });
+const um = raum.drehpunkt(a);
+const vorher = v.nachBild(a.v, um);
+raum.drehen(a, 25, -10, um);
+erg.drehen = [um, r(vorher), r(v.nachBild(a.v, um)), { ...a.raum.drehung }];
+raum.drehen(a, 0, 1000, um);
+erg.scheitel = a.raum.drehung.hoehe;
+erg.ebenen = [];
+for (const [achse, lage] of [[1, 4], [2], [1]]) {
+  raum.ebeneSetzen(a, achse, lage);
+  erg.ebenen.push({ ...a.v.ebene });
+}
+raum.ebeneDurch(a, [1, 2, 3]);
+erg.ebenen.push({ ...a.v.ebene });
 process.stdout.write(JSON.stringify(erg));
 """
 
@@ -160,6 +182,33 @@ class TestZeichenfensterMitAchsen(unittest.TestCase):
 
     def test_rasterschritt(self):
         self.assertEqual(self.erg["raster"], [1, 5, 10])
+
+    def test_die_vier_ansichten(self):
+        basen = self.erg["basen"]
+        self.assertEqual(basen["oben"], [[1, 0, 0], [0, 1, 0]], "Grundriss: x nach rechts, y nach oben")
+        self.assertEqual(basen["vorne"], [[1, 0, 0], [0, 0, 1]], "Ansicht x-z: z nach oben")
+        self.assertEqual(basen["seite"], [[0, 1, 0], [0, 0, 1]], "Ansicht y-z: y nach rechts")
+        (rechts, oben) = basen["3d"]
+        self.assertGreater(rechts[0], 0, "schräg von oben liegt x rechts unten")
+        self.assertLess(oben[0], 0)
+        self.assertGreater(rechts[1], 0, "und y rechts oben")
+        self.assertGreater(oben[1], 0)
+        self.assertEqual(rechts[2], 0, "rechts liegt immer waagrecht")
+        self.assertGreater(oben[2], 0, "z zeigt nach oben")
+
+    def test_drehen_haelt_den_punkt(self):
+        um, vorher, nachher, drehung = self.erg["drehen"]
+        self.assertEqual(um, [3, 2, 1], "gedreht wird um die Mitte der Zeichnung")
+        self.assertEqual(nachher, vorher)
+        self.assertEqual(drehung, {"azimut": -60, "hoehe": 26})
+
+    def test_hoehe_haelt_am_scheitel(self):
+        self.assertEqual(self.erg["scheitel"], 90)
+
+    def test_arbeitsebene_merkt_ihre_lage(self):
+        self.assertEqual(self.erg["ebenen"], [
+            {"achse": 1, "lage": 4}, {"achse": 2, "lage": 0}, {"achse": 1, "lage": 4},
+            {"achse": 1, "lage": 2}])
 
 
 if __name__ == "__main__":

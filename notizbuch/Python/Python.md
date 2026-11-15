@@ -1,5 +1,5 @@
 ---
-erzeugt: b155aab7ca36
+erzeugt: 04e7a80392c2
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -205,5 +205,6 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
     - [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.
     - [[opencivil.web.speicher]] – was vom letzten Lauf noch gilt.
+    - [[opencivil.web.systemkatalog]] – was die Oberflaeche an einem Balkensystem waehlen laesst.
     - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.
     - [[opencivil.web.zeichendaten]] – was die Oberflaeche je Bauteil zeichnet, nach seiner Art.

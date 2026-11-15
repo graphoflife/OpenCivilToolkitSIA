@@ -214,6 +214,7 @@ class Balkensystem3dEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     LAGERFELDER = ("x", "y", "z", "phi_x", "phi_y", "phi_z")
     LINIENLAGER = ("quer_y", "quer_z", "laengs")
     LAGERARTEN = LAGERARTEN
+    EINHEIT_DER_FEDER = EINHEIT_DER_FEDER
     NEUE_DIAGRAMME = ("M_y", "M_z", "N")
     KNOTEN = RaumknotenEintrag
     LINIE = RaumlinieEintrag

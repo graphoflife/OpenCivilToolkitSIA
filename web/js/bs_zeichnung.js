@@ -1,21 +1,28 @@
 /**
  * bs_zeichnung.js -- das Zeichenfenster eines Balkensystems: der Adapter.
  *
- * Gezeichnet werden Knoten und Linien, in Metern, x nach rechts und z nach
- * oben. Eine Linie ist ein Stab, sobald sie einen Querschnitt hat; daneben
- * kann sie ein Linienlager sein, quer und längs (die Bettung, im Fenster
- * eingeklappt). Lager sind eigene Einträge an einem Knoten -- so überstehen
- * sie das Zusammenführen von Knoten --, gewählt wird aber der Knoten.
+ * Gezeichnet werden Knoten und Linien, in Metern -- in der Ebene x nach
+ * rechts und z nach oben, im Raum mit x, y und z, aus einer Richtung, die
+ * sich drehen lässt (cad_raum.js). Welche Achsen ein System hat und was sich
+ * an ihm wählen lässt, sagt sein Katalog (bs_teile.js); der Code ist für
+ * beide Arten derselbe. Eine Linie ist ein Stab, sobald sie einen
+ * Querschnitt hat; daneben kann sie ein Linienlager sein, quer und längs
+ * (die Bettung, im Fenster eingeklappt). Lager sind eigene Einträge an einem
+ * Knoten -- so überstehen sie das Zusammenführen von Knoten --, gewählt wird
+ * aber der Knoten.
  *
  * Das schwebende Fenster mit den Feldern des Gewählten steht in
  * `bs_eigenschaften.js`, was beide brauchen in `bs_teile.js`: auch der
  * Lastfall, den das Fenster zeigt, und die Antwort des Kerns.
  *
  * ZUGSEITE:
- * Die gestrichelte Faser liegt rechts der Laufrichtung einer Linie. Eine
- * neue Linie läuft darum nach rechts, eine senkrechte nach unten: ihre
- * Zugseite liegt unten bzw. links (Benutzer, 2026-10-24). Der Schalter
- * «Zugseite» im Fenster kehrt die Linie um, wie «Umkehren».
+ * In der Ebene liegt die gestrichelte Faser rechts der Laufrichtung einer
+ * Linie. Eine neue Linie läuft darum nach rechts, eine senkrechte nach
+ * unten: ihre Zugseite liegt unten bzw. links (Benutzer, 2026-10-24). Der
+ * Schalter «Zugseite» im Fenster kehrt die Linie um, wie «Umkehren». Im
+ * Raum liegt die Faser, wohin z des Stabs zeigt; die Achsen legt der Kern,
+ * mit dem Drehwinkel β, und schickt sie mit seiner Antwort (`a.bs.achsen`).
+ * Bis sie da ist, fehlen einer neuen Linie die Faser und die Lasten quer.
  *
  * LASTEN:
  * Jede Last ist für sich zu wählen und zu löschen, ein Anhang des
@@ -23,7 +30,9 @@
  * Zahl (Benutzer, 2026-10-23). Angelegt wird sie mit dem Werkzeug «Last» --
  * ein Klick auf eine Linie, eine Einzellast oder ein Moment auch an einen
  * Knoten; eine Einzellast auf einer Linie steht dort, wo geklickt wurde, in
- * % der Linie. Gezeigt werden die Lasten des gewählten Lastfalls. Die Lasten
+ * % der Linie. Gezeigt werden die Lasten des gewählten Lastfalls -- im Raum
+ * eine Kraft, die fast auf den Betrachter zeigt, als Kreis, ein Moment als
+ * Pfeil mit zwei Spitzen (bs_symbole.js). Die Lasten
  * auf einem Stab stehen an seiner Linie und gehen mit ihr, wenn sie kopiert,
  * geteilt oder gelöscht wird; die an einem Knoten sind eigene Einträge an
  * ihm.
@@ -54,15 +63,16 @@ import {
   abstand, aufStrecke, innen, knotenname,
 } from './cad_modell.js';
 import {
-  GROESSE, faserSymbol, gelenkSymbol, imBild, kraftpfeil, lagerSymbol, linienlagerSymbol,
-  momentSymbol, streckenlast, streckenmoment, unbestimmtSymbol,
+  GROESSE, faserSymbol, gelenkSymbol, imBild, kraft, kraftband, lagerSymbol, linienlagerSymbol,
+  moment, momentband, raumlagerSymbol, unbestimmtSymbol,
 } from './bs_symbole.js';
 import {
-  lastart, lastVon, passendeUebersicht, zugseite,
+  lagertext, lastart, lastrichtung, lastVon, passendeUebersicht, raeumlich, systemart,
+  systemkatalog, systemliste, zugseite,
 } from './bs_teile.js';
 import { el, melden, svgEl } from './dom.js';
 import { aktiverLastfall, lastfallFuerNeue, lastfallLeiste } from './lastfaelle.js';
-import { ausVorlage, eintragVon, katalog, zustand } from './zustand.js';
+import { ausVorlage, eintragVon, zustand } from './zustand.js';
 
 /**
  * Die Arten des Systems. Gewählt werden Linien und Knoten: ein Lager gehört
@@ -109,8 +119,9 @@ export function zeichenbereich(system, listeBauen) {
 }
 
 /**
- * Die Zeichenfenster der Systeme, je Kennung eines (cad_app.js). Was das
- * System an der Ansicht braucht -- Vorgaben, Antwort des Kerns, Lastfall --,
+ * Die Zeichenfenster der Systeme, je Kennung eines (cad_app.js) -- eben und
+ * im Raum: die Kennungen beider Arten sind verschieden. Was das System an
+ * der Ansicht braucht -- Art, Vorgaben, Antwort des Kerns, Lastfall --,
  * hängt als `a.bs` am Fenster.
  */
 const SYSTEME = cadApp('bs', adapter, (a) => { a.bs = a.adapter.bs; });
@@ -138,16 +149,24 @@ function vorgabenNeu(system) {
   };
 }
 
-/** Was der Adapter eines Systems über die gemeinsame Grundlage hinaus weiss (cad_app.js). */
+/**
+ * Was der Adapter eines Systems über die gemeinsame Grundlage hinaus weiss
+ * (cad_app.js). `raum`: ob es im Raum liegt; `klassen`: unter welchem Namen
+ * die Vorlagen seiner Teile stehen; `achsen`: je Linie ihre Achsen vom Kern,
+ * im Raum.
+ */
 function adapter(kennung) {
+  const art = systemart(kennung);
   const bs = {
-    kennung, vorgaben: vorgabenNeu(eintragVon(kennung)), uebersicht: null, gefragt: null,
-    lastfall: null,
+    kennung, art, raum: raeumlich(art), klassen: systemkatalog(art, 'klassen'),
+    vorgaben: vorgabenNeu(eintragVon(kennung)), uebersicht: null, gefragt: null, lastfall: null,
+    achsen: {},
   };
+  const achsen = systemkatalog(art, 'achsen');
   return {
     bs,
     einstellung: EINSTELLUNG,
-    achsen: ['x', 'z'],
+    achsen,
     arten: ARTEN,
     leisteZusatz: () => {
       bs.lastfallHuelle = el('span.bs-lastfallwahl');
@@ -169,7 +188,7 @@ function adapter(kennung) {
       },
       rahmen: lastenRahmen,
     },
-    umriss: () => umriss(eintragVon(kennung)),
+    umriss: () => umriss(eintragVon(kennung), achsen),
     geaendert: uebersichtHolen,
     eigenschaften,
     neuEigenschaften,
@@ -196,22 +215,23 @@ export function elementname(a, kennung) {
 
 function neuText(a, werkzeug) {
   if (werkzeug === 'linie') return a.bs.vorgaben.linie.querschnitt ? 'Stab' : 'Linie';
-  if (werkzeug === 'last') return lastart(a.bs.vorgaben.last.art).beschriftung;
+  if (werkzeug === 'last') return lastart(a.bs.art, a.bs.vorgaben.last.art).beschriftung;
   return 'Knoten';
 }
 
 /**
- * Eine neue Linie mit den Vorgaben des Werkzeugs. Ihre Zugseite liegt
- * unten, an einer senkrechten links (Benutzer, 2026-10-24): sie läuft dafür
- * nach rechts bzw. nach unten, wie herum man sie auch zeichnet.
+ * Eine neue Linie mit den Vorgaben des Werkzeugs. In der Ebene liegt ihre
+ * Zugseite unten, an einer senkrechten links (Benutzer, 2026-10-24): sie
+ * läuft dafür nach rechts bzw. nach unten, wie herum man sie auch zeichnet.
+ * Im Raum läuft sie, wie sie gezeichnet ist: z des Stabs legt der Kern.
  */
 function linieAnlegen(a, z, von, bis) {
   const kennung = a.modell.naechsteKennung(z, 'L');
   const v = a.bs.vorgaben.linie;
   const lagen = a.modell.lagen(z);
-  if (['oben', 'rechts'].includes(zugseite(lagen.get(von), lagen.get(bis)))) [von, bis] = [bis, von];
+  if (!a.bs.raum && ['oben', 'rechts'].includes(zugseite(lagen.get(von), lagen.get(bis)))) [von, bis] = [bis, von];
   z.linien.push({
-    ...ausVorlage('systemlinie'), kennung, von, bis,
+    ...ausVorlage(a.bs.klassen.linie), kennung, von, bis,
     querschnitt: v.querschnitt, material: v.querschnitt ? vorgabeMaterial(a, z) : '',
   });
   return kennung;
@@ -236,35 +256,42 @@ function naechsteLast(z) {
  * Eine Last, wo geklickt wurde -- im gewählten Lastfall, nach den Vorgaben
  * des Werkzeugs. Eine Einzellast oder ein Moment an einem Knoten, wenn er
  * getroffen ist; sonst auf der nächsten Linie: verteilt auf der ganzen,
- * einzeln dort, wo geklickt wurde. Gibt die Kennung zurück, oder null.
+ * einzeln dort, wo geklickt wurde. Getroffen wird im Bild, wie beim Wählen:
+ * im Raum zählt, was man an der Stelle sieht. Gibt die Kennung zurück, oder
+ * null.
  */
 function lastAnlegen(a, z, erg) {
   const lf = lastfallFuerNeue(a.bs);
   if (!lf) return null;
   const v = a.bs.vorgaben.last;
-  const art = lastart(v.art);
-  const weit = NAEHE / a.v.massstab;
+  const art = lastart(a.bs.art, v.art);
+  const lagen = a.modell.lagen(z);
+  const bild = (k) => (lagen.get(k) ? nachBild(a.v, lagen.get(k)) : null);
+  const geklickt = nachBild(a.v, erg.p);
   if (!art.verteilt) {
-    const knoten = erg.knoten || z.knoten.find((k) => abstand([k.x, k.z], erg.p) <= weit)?.kennung;
+    const knoten = erg.knoten || z.knoten.find((k) => {
+      const p = bild(k.kennung);
+      return p && abstand(p, geklickt) <= NAEHE;
+    })?.kennung;
     if (knoten) {
       const kennung = naechsteLast(z);
       z.knotenlasten.push({
-        ...ausVorlage('knotenlast'), kennung, knoten, lastfall: lf,
+        ...ausVorlage(a.bs.klassen.knotenlast), kennung, knoten, lastfall: lf,
         art: v.art === 'moment' ? 'moment' : 'kraft',
-        richtung: katalog('balkensystem', 'knotenrichtungen').includes(v.richtung) ? v.richtung : 'senkrecht',
+        richtung: systemkatalog(a.bs.art, 'knotenrichtungen').includes(v.richtung) ? v.richtung : 'senkrecht',
         wert: v.wert_a,
       });
       return kennung;
     }
   }
-  const lagen = a.modell.lagen(z);
   let beste = null;
   for (const l of z.linien) {
-    const [p, q] = [lagen.get(l.von), lagen.get(l.bis)];
+    const [p, q] = [bild(l.von), bild(l.bis)];
     if (!p || !q) continue;
-    const { q: fuss, t } = aufStrecke(erg.p, p, q);
-    const d = abstand(fuss, erg.p);
-    if (d <= weit && (!beste || d < beste.d)) beste = { l, t, d };
+    // Im Bild wie in der Zeichnung derselbe Anteil der Linie: die Ansicht ist parallel.
+    const { q: fuss, t } = aufStrecke(geklickt, p, q);
+    const d = abstand(fuss, geklickt);
+    if (d <= NAEHE && (!beste || d < beste.d)) beste = { l, t, d };
   }
   if (!beste) {
     melden(art.verteilt ? 'Eine verteilte Last gehört auf eine Linie -- dort klicken.'
@@ -273,7 +300,7 @@ function lastAnlegen(a, z, erg) {
   }
   const kennung = naechsteLast(z);
   beste.l.lasten.push({
-    ...ausVorlage('stablast'), kennung, lastfall: lf, art: v.art, richtung: v.richtung,
+    ...ausVorlage(a.bs.klassen.stablast), kennung, lastfall: lf, art: v.art, richtung: v.richtung,
     wert_a: v.wert_a, wert_b: art.verteilt ? v.wert_b : null,
     // In % der Linie, auf ein Zehntel -- dort, wo geklickt wurde.
     ...(art.verteilt ? {} : { stelle: Math.round(beste.t * 1000) / 10 }),
@@ -324,9 +351,10 @@ function lastenRahmen(a) {
     Math.max(...rahmen.map((r) => r.right)) - ecke.left, Math.max(...rahmen.map((r) => r.bottom)) - ecke.top];
 }
 
-/** Was im Bild sein soll: alle Knoten -- sonst ein Feld von 6 × 4 m. */
-function umriss(system) {
-  return umrissVon((system?.knoten || []).map((k) => [k.x, k.z]), [[0, 0], [6, 4]]);
+/** Was im Bild sein soll: alle Knoten -- sonst ein Feld von 6 × 4 m, im Raum 6 × 4 × 3 m. */
+function umriss(system, achsen) {
+  const vorgabe = achsen.length === 3 ? [[0, 0, 0], [6, 4, 3]] : [[0, 0], [6, 4]];
+  return umrissVon((system?.knoten || []).map((k) => achsen.map((x) => k[x])), vorgabe);
 }
 
 // ===========================================================================
@@ -347,6 +375,10 @@ function uebersichtHolen(a) {
   api.balkensystemVerlauf(zustand.projekt, a.bs.kennung).then((antwort) => {
     if (a.bs.gefragt !== jetzt) return;
     a.bs.uebersicht = { ...antwort.uebersicht, fassung: jetzt };
+    // Die Achsen der Linien gelten, bis die nächste Antwort neue bringt --
+    // auch wenn sich die Zeichnung inzwischen geändert hat: so springt die
+    // Faser nicht bei jeder Eingabe weg und wieder her.
+    if (antwort.achsen) a.bs.achsen = antwort.achsen;
     a.neuZeichnen();
     listeZeichnen(a);
   }).catch((fehler) => {
@@ -370,12 +402,13 @@ function kernBearbeiten(a, auftraege, auswahlDanach = []) {
   const kennung = a.bs.kennung;
   const vorher = zustand.fassung;
   const projekt = structuredClone(zustand.projekt);
+  const liste = systemliste(a.bs.art);
   const neu = [];
   const schritt = (i) => {
     if (i >= auftraege.length) return Promise.resolve();
     return api.balkensystemBearbeiten(projekt, kennung, auftraege[i]).then((antwort) => {
-      const stelle = projekt.balkensysteme.findIndex((x) => x.kennung === kennung);
-      projekt.balkensysteme[stelle] = antwort.balkensystem;
+      const stelle = projekt[liste].findIndex((x) => x.kennung === kennung);
+      projekt[liste][stelle] = antwort.balkensystem;
       neu.push(...antwort.neu);
       return schritt(i + 1);
     });
@@ -385,9 +418,9 @@ function kernBearbeiten(a, auftraege, auswahlDanach = []) {
       melden('Die Zeichnung hat sich inzwischen geändert – bitte noch einmal.', true);
       return;
     }
-    const fertig = projekt.balkensysteme.find((x) => x.kennung === kennung);
+    const fertig = projekt[liste].find((x) => x.kennung === kennung);
     a.aendern((z) => {
-      for (const liste of a.listen) z[liste] = fertig[liste];
+      for (const teil of a.listen) z[teil] = fertig[teil];
     }, { auswahl: () => [...auswahlDanach, ...neu] });
   }).catch((fehler) => melden(fehler.message, true));
 }
@@ -410,11 +443,27 @@ function wertText(wert, einheit) {
   return `${zahlText(wert, 2)} ${einheit}`;
 }
 
-/** Die Richtung einer Kraftlast auf einem Stab, in der Zeichnung -- (c, s) seine Laufrichtung. */
-function richtungVon(richtung, c, s) {
-  return {
-    senkrecht: [0, -1], waagrecht: [1, 0], quer: [s, -c], laengs: [c, s],
-  }[richtung] || [0, -1];
+/**
+ * Die Achsen einer Linie von p nach q (Lagen der Zeichnung) -- x längs, z
+ * zur gestrichelten Faser, im Raum dazu y. In der Ebene liegt die Faser
+ * rechts der Laufrichtung; im Raum kommen die Achsen vom Kern, und bis er
+ * geantwortet hat, kennt die Zeichnung sie nicht: null.
+ */
+function linienachsen(a, l, p, q) {
+  if (a.bs.raum) return a.bs.achsen[l.kennung] || null;
+  const L = abstand(p, q);
+  if (!L) return null;
+  const [c, s] = [(q[0] - p[0]) / L, (q[1] - p[1]) / L];
+  return { x: [c, s], z: [s, -c] };
+}
+
+/**
+ * Wohin eine Last zeigt, in der Zeichnung: im System ihr Vektor, sonst die
+ * Achse des Stabs (`achsen`) -- null, solange diese fehlen.
+ */
+function lastvektor(a, richtung, achsen) {
+  const r = lastrichtung(a.bs.art, richtung);
+  return r?.vektor || achsen?.[r?.stabachse] || null;
 }
 
 function zeichnen(a, g) {
@@ -430,6 +479,7 @@ function zeichnen(a, g) {
     const p = lagen.get(k);
     return p ? nachBild(a.v, p) : null;
   };
+  const linienlager = systemkatalog(a.bs.art, 'linienlager');
 
   // Linienlager unter allem, dann die Linien, ihre Faser und Gelenke.
   const linien = svgEl('g');
@@ -437,13 +487,20 @@ function zeichnen(a, g) {
   for (const l of z.linien) {
     const [p, q] = [bild(l.von), bild(l.bis)];
     if (!p || !q) continue;
-    if (l.quer !== 'frei' || l.laengs !== 'frei') zeichen.append(linienlagerSymbol(p, q, l.quer, l.laengs));
+    const achsen = linienachsen(a, l, lagen.get(l.von), lagen.get(l.bis));
+    // Je Richtung quer ihre Seite im Bild -- dorthin zeigt ihre Achse.
+    const quer = linienlager.filter((x) => x.achse !== 'x' && l[x.feld] !== 'frei' && achsen)
+      .map((x) => ({ halt: l[x.feld], n: imBild(a.v, achsen[x.achse]).r }));
+    const laengs = l[linienlager.find((x) => x.achse === 'x').feld];
+    if (quer.length || laengs !== 'frei') zeichen.append(linienlagerSymbol(p, q, quer, laengs));
     const klasse = [l.querschnitt ? 'bs-stab' : 'bs-linie', fehler(l.kennung) || beweglich.has(l.kennung) ? 'ist-fehler' : ''].join(' ');
     linien.append(mitTitel(svgEl('path', {
       d: `M${p[0].toFixed(1)} ${p[1].toFixed(1)} L${q[0].toFixed(1)} ${q[1].toFixed(1)}`, class: klasse,
     }), texte(l.kennung)));
     if (!l.querschnitt) continue;
-    const faser = faserSymbol(p, q);
+    // Die Faser nur, wo ihre Seite im Bild liegt -- nicht von vorne gesehen.
+    const seite = achsen ? imBild(a.v, achsen.z) : null;
+    const faser = seite && seite.f > 0.15 ? faserSymbol(p, q, seite.r) : null;
     if (faser) zeichen.append(faser);
     const lang = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1;
     const t = [(q[0] - p[0]) / lang, (q[1] - p[1]) / lang];
@@ -452,10 +509,21 @@ function zeichnen(a, g) {
   }
   g.append(zeichen, linien);
 
-  // Lager.
+  // Lager -- im Raum steht das Dreieck nach −z, von oben gesehen nach unten im Bild.
+  const felder = systemkatalog(a.bs.art, 'lagerfelder').map((x) => x.feld);
+  const verschiebungen = felder.filter((f) => a.adapter.achsen.includes(f));
+  const drehungen = felder.filter((f) => !a.adapter.achsen.includes(f));
+  const unten = a.bs.raum ? imBild(a.v, [0, 0, -1]) : null;
   for (const lager of z.lager) {
     const p = bild(lager.knoten);
-    if (p) g.append(mitTitel(lagerSymbol(p, lager, fehler(lager.kennung) ? 'ist-fehler' : ''), texte(lager.kennung)));
+    if (!p) continue;
+    const klasse = fehler(lager.kennung) ? 'ist-fehler' : '';
+    const symbol = a.bs.raum
+      ? raumlagerSymbol(p, {
+        schieben: verschiebungen.map((f) => lager[f]), drehen: drehungen.map((f) => lager[f]),
+      }, unten.f > 0.2 ? unten.r : [0, 1], klasse)
+      : lagerSymbol(p, lager, klasse);
+    g.append(mitTitel(symbol, [`${lager.kennung}: ${lagertext(a.bs.art, lager)}`, ...texte(lager.kennung)]));
   }
 
   // Die Lasten des gewählten Lastfalls.
@@ -483,7 +551,8 @@ function zeichnen(a, g) {
  * zur grössten. Je Last merkt sich das Fenster ihr Zeichen und seine Formen
  * zum Wählen (`a.bs.lastformen`); eine gewählte steht blau. Bekommt der
  * Lastfall das Eigengewicht, steht es grau dabei -- je Stab vom Kern, nicht
- * zu wählen und nicht zu löschen.
+ * zu wählen und nicht zu löschen. Ein Moment dreht in der Ebene um die
+ * Achse auf den Betrachter zu, im Raum um seine Richtung.
  */
 function lastenZeichnen(a, z, lf, lagen) {
   const g = svgEl('g', { class: 'bs-lasten' });
@@ -505,53 +574,54 @@ function lastenZeichnen(a, z, lf, lagen) {
       groesste[last.art] = Math.max(groesste[last.art], Math.abs(last.wert_a), Math.abs(last.wert_b ?? last.wert_a));
     }
   }
+  const schwer = imBild(a.v, lastrichtung(a.bs.art, 'senkrecht').vektor);
   for (const l of z.linien) {
     const [pa, pb] = [lagen.get(l.von), lagen.get(l.bis)];
-    if (!pa || !pb) continue;
-    const L = abstand(pa, pb);
-    if (!L) continue;
-    const [c, s] = [(pb[0] - pa[0]) / L, (pb[1] - pa[1]) / L];
-    const ort = (x) => nachBild(a.v, [pa[0] + c * x, pa[1] + s * x]);
+    if (!pa || !pb || !abstand(pa, pb)) continue;
+    const achsen = linienachsen(a, l, pa, pb);
+    const ort = (anteil) => nachBild(a.v, pa.map((w, i) => w + (pb[i] - w) * anteil));
     const gk = eigen[l.kennung];
     if (gk) {
       const lang = (gk * GROESSE.pfeil) / (groesste.linienlast || 1);
-      g.append(streckenlast(ort(0), ort(L), imBild([0, -1]), lang, lang,
+      g.append(kraftband(ort(0), ort(1), schwer, lang, lang,
         `g_k = ${wertText(gk, 'kN/m')}`, 'bs-last bs-eigengewicht'));
     }
     for (const last of l.lasten) {
       if (last.lastfall !== lf) continue;
-      const art = lastart(last.art);
-      const r = imBild(richtungVon(last.richtung, c, s));
+      const art = lastart(a.bs.art, last.art);
+      const vektor = lastvektor(a, last.richtung, achsen);
+      if (!vektor) continue;
+      const achse = a.bs.raum ? vektor : null;
       // Eine verteilte Last liegt auf der ganzen Linie, eine einzelne an ihrer Stelle.
-      const stelle = ort((last.stelle / 100) * L);
+      const stelle = ort(last.stelle / 100);
       if (last.art === 'linienlast') {
         const wb = last.wert_b ?? last.wert_a;
         const massstab = GROESSE.pfeil / (groesste.linienlast || 1);
-        ablegen(last.kennung, streckenlast(ort(0), ort(L), r, last.wert_a * massstab, wb * massstab,
+        ablegen(last.kennung, kraftband(ort(0), ort(1), imBild(a.v, vektor), last.wert_a * massstab, wb * massstab,
           last.wert_b === null || last.wert_b === undefined || last.wert_b === last.wert_a
             ? wertText(last.wert_a, art.einheit)
             : `${zahlText(last.wert_a, 2)} … ${wertText(wb, art.einheit)}`));
       } else if (last.art === 'einzellast') {
-        const richtung = last.wert_a >= 0 ? r : [-r[0], -r[1]];
-        ablegen(last.kennung, kraftpfeil(stelle, richtung, 38, wertText(Math.abs(last.wert_a), art.einheit)));
+        ablegen(last.kennung, kraft(stelle, imBild(a.v, vektor), last.wert_a, 38,
+          wertText(Math.abs(last.wert_a), art.einheit)));
       } else if (last.art === 'moment') {
-        ablegen(last.kennung, momentSymbol(stelle, last.wert_a, wertText(last.wert_a, art.einheit)));
+        ablegen(last.kennung, moment(a.v, stelle, achse, last.wert_a, wertText(last.wert_a, art.einheit)));
       } else {
-        ablegen(last.kennung, streckenmoment(ort(0), ort(L), last.wert_a, wertText(last.wert_a, art.einheit)));
+        ablegen(last.kennung, momentband(a.v, ort(0), ort(1), achse, last.wert_a, wertText(last.wert_a, art.einheit)));
       }
     }
   }
   for (const p of z.knotenlasten) {
     if (p.lastfall !== lf) continue;
     const q = lagen.get(p.knoten);
-    if (!q) continue;
+    const vektor = lastrichtung(a.bs.art, p.richtung)?.vektor;
+    if (!q || !vektor) continue;
     const ort = nachBild(a.v, q);
+    const klasse = 'bs-last bs-knotenlast';
     if (p.art === 'moment') {
-      ablegen(p.kennung, momentSymbol(ort, p.wert, wertText(p.wert, 'kNm'), 'bs-last bs-knotenlast'));
+      ablegen(p.kennung, moment(a.v, ort, a.bs.raum ? vektor : null, p.wert, wertText(p.wert, 'kNm'), klasse));
     } else {
-      const r = imBild(p.richtung === 'waagrecht' ? [1, 0] : [0, -1]);
-      const richtung = p.wert >= 0 ? r : [-r[0], -r[1]];
-      ablegen(p.kennung, kraftpfeil(ort, richtung, 40, wertText(Math.abs(p.wert), 'kN'), 'bs-last bs-knotenlast'));
+      ablegen(p.kennung, kraft(ort, imBild(a.v, vektor), p.wert, 40, wertText(Math.abs(p.wert), 'kN'), klasse));
     }
   }
   a.bs.lastformen = formen;

@@ -35,11 +35,13 @@ from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
-from opencivil.projekt import BAUTEILE, BalkensystemEintrag, DeckeEintrag, Projekt, ProjektFehler
+from opencivil.projekt import BAUTEILE, DeckeEintrag, Projekt, ProjektFehler
+from opencivil.projekt.staebe import MitStaeben
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.interaktion import GROESSEN
 from opencivil.web import api, balkendaten, deckendaten, diagrammdaten, speicher
 from opencivil.web.umschlag import endlich, fehlerdaten, umschlag
+from opencivil.web.zeichendaten import ZEICHENDATEN
 
 #: Das Gedaechtnis zwischen zwei Anfragen -- siehe :mod:`opencivil.web.speicher`.
 #: Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser
@@ -448,41 +450,44 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return {"diagramme": daten}
 
 
-def _balkensystem(projekt: Projekt, rumpf: Mapping[str, Any]) -> BalkensystemEintrag:
+def _balkensystem(projekt: Projekt, rumpf: Mapping[str, Any]) -> MitStaeben:
+    """Ein Balkensystem, eben oder im Raum -- beide bedienen dieselben Anfragen."""
     kennung = str(rumpf.get("kennung") or "")
     eintrag = projekt.bauteil(kennung)
-    if not isinstance(eintrag, BalkensystemEintrag):
+    if not isinstance(eintrag, MitStaeben):
         raise DienstFehler(400, f"'{kennung}' ist kein Balkensystem.")
     return eintrag
 
 
 def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
-    Die Bilder eines Balkensystems in einem Fall: je Stab N, V, M und die
-    Verschiebung, je Knoten seine Verschiebung. Eine eigene Anfrage wie die
+    Die Bilder eines Balkensystems in einem Fall: je Stab die
+    Schnittgroessen und die Verschiebung, je Knoten seine Verschiebung. Eine eigene Anfrage wie die
     Diagramme der Querschnittsanalyse -- gross, und nur gebraucht, wenn
     jemand hinsieht. Gerechnet wird aus dem Zwischenspeicher, wenn er das
     System zu dieser Beschreibung noch hat.
 
     Ein System, das sich nicht rechnen laesst, ist keine falsche Anfrage:
     dann ist ``verlauf`` leer, und die Uebersicht sagt warum. Ohne ``fall``
-    kommt nur die Uebersicht -- was das Zeichenfenster nach jeder Aenderung
-    braucht: Meldungen, Knoten ohne Drehsteifigkeit, was sich bewegt.
+    kommen nur die Zeichendaten des Systems (:mod:`opencivil.web.zeichendaten`)
+    -- was das Zeichenfenster nach jeder Aenderung braucht: Meldungen, Knoten
+    ohne Drehsteifigkeit, was sich bewegt, im Raum die Achsen der Linien.
     """
     projekt = _projekt(rumpf)
     eintrag = _balkensystem(projekt, rumpf)
     aufbau = projekt.aufbauen()
+    teil = aufbau.teile[eintrag.kennung]
     loesung = _bauteil_rechnen(projekt, aufbau, eintrag.kennung)
-    befund = loesung.befunde.get(aufbau.balkensysteme[eintrag.kennung].rechnung.id)
-    uebersicht = endlich(balkendaten.uebersicht(befund))
+    daten = endlich(ZEICHENDATEN[teil.art.name](aufbau, eintrag.kennung, loesung))
+    befund = loesung.befunde.get(teil.objekt.rechnung.id)
     fall = str(rumpf.get("fall") or "")
     gerechnet = balkendaten.faelle(befund)
     if not fall or not gerechnet:
-        return {"verlauf": None, "uebersicht": uebersicht}
+        return {"verlauf": None, **daten}
     if fall not in gerechnet:
         raise DienstFehler(400, f"Einen Fall «{fall}» gibt es in «{eintrag.name}» nicht. "
                                 f"Gerechnet sind: {', '.join(gerechnet)}.")
-    return {"verlauf": endlich(balkendaten.verlauf(befund, fall)), "uebersicht": uebersicht}
+    return {"verlauf": endlich(balkendaten.verlauf(befund, fall)), **daten}
 
 
 def _decke(projekt: Projekt, rumpf: Mapping[str, Any]) -> DeckeEintrag:
@@ -544,7 +549,8 @@ def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     kann.
 
     ``teilen``: ``linie`` und die Stelle -- ``stelle`` in m ab dem Anfang,
-    ein ``anteil`` der Laenge (0.5: in der Mitte) oder ein ``punkt`` [x, z],
+    ein ``anteil`` der Laenge (0.5: in der Mitte) oder ein ``punkt`` mit
+    einer Koordinate je Achse -- [x, z] in der Ebene, [x, y, z] im Raum --,
     der auf die Linie gelotet wird.
     ``umkehren``: ``linien``, eine oder mehrere.
     """
@@ -556,8 +562,10 @@ def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         if aktion == "teilen":
             linie = str(rumpf.get("linie") or "")
             if rumpf.get("punkt") is not None:
-                punkt = rumpf["punkt"]
-                stelle = eintrag.stelle_auf(linie, (float(punkt[0]), float(punkt[1])))
+                punkt = tuple(float(c) for c in rumpf["punkt"])
+                if len(punkt) != len(eintrag.ACHSEN):
+                    raise ValueError
+                stelle = eintrag.stelle_auf(linie, punkt)
             elif rumpf.get("anteil") is not None:
                 stelle = float(rumpf["anteil"]) * eintrag.laenge(eintrag.linie_von(linie))
             else:
@@ -570,8 +578,8 @@ def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
             raise DienstFehler(400, f"Ein Balkensystem lässt sich «teilen» oder «umkehren», "
                                     f"nicht «{aktion}».")
     except (TypeError, ValueError, IndexError):
-        raise DienstFehler(400, "Die Stelle zum Teilen muss eine Zahl sein oder ein Punkt "
-                                "mit zwei Zahlen.") from None
+        raise DienstFehler(400, f"Die Stelle zum Teilen muss eine Zahl sein oder ein Punkt "
+                                f"mit {len(eintrag.ACHSEN)} Zahlen.") from None
     return {"balkensystem": eintrag.als_dict(), "neu": neu}
 
 
