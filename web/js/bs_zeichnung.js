@@ -16,13 +16,14 @@
  * Lastfall, den das Fenster zeigt, und die Antwort des Kerns.
  *
  * ZUGSEITE:
- * In der Ebene liegt die gestrichelte Faser rechts der Laufrichtung einer
- * Linie. Eine neue Linie läuft darum nach rechts, eine senkrechte nach
- * unten: ihre Zugseite liegt unten bzw. links (Benutzer, 2026-10-24). Der
- * Schalter «Zugseite» im Fenster kehrt die Linie um, wie «Umkehren». Im
- * Raum liegt die Faser, wohin z des Stabs zeigt; die Achsen legt der Kern,
- * mit dem Drehwinkel β, und schickt sie mit seiner Antwort (`a.bs.achsen`).
- * Bis sie da ist, fehlen einer neuen Linie die Faser und die Lasten quer.
+ * Die gestrichelte Faser liegt, wohin z des Stabs zeigt. Die Achsen jeder
+ * Linie legt der Kern, eben und im Raum, und schickt sie mit seiner Antwort
+ * (`a.bs.achsen`); bis sie da ist, fehlen einer neuen Linie die Faser und
+ * die Lasten quer. Wohin eine neue Linie läuft, sagt der Katalog
+ * (`laufrichtungen`): in der Ebene nach rechts, eine senkrechte nach unten
+ * -- so liegt ihre Zugseite unten bzw. links (Benutzer, 2026-10-24). Der
+ * Schalter «Zugseite» im Fenster kehrt die Linie um, wie «Umkehren»; im
+ * Raum dreht der Winkel β die Faser.
  *
  * LASTEN:
  * Jede Last ist für sich zu wählen und zu löschen, ein Anhang des
@@ -60,7 +61,7 @@ import {
 } from './cad_app.js';
 import { NAEHE } from './cad_eingabe.js';
 import {
-  abstand, aufStrecke, innen, knotenname,
+  abstand, aufStrecke, innen, knotenname, minus, skalar,
 } from './cad_modell.js';
 import {
   GROESSE, faserSymbol, gelenkSymbol, imBild, kraft, kraftband, lagerSymbol, linienlagerSymbol,
@@ -68,7 +69,7 @@ import {
 } from './bs_symbole.js';
 import {
   lagertext, lastart, lastrichtung, lastVon, passendeUebersicht, raeumlich, systemart,
-  systemkatalog, systemliste, zugseite,
+  systemkatalog, systemliste,
 } from './bs_teile.js';
 import { el, melden, svgEl } from './dom.js';
 import { aktiverLastfall, lastfallFuerNeue, lastfallLeiste } from './lastfaelle.js';
@@ -152,8 +153,7 @@ function vorgabenNeu(system) {
 /**
  * Was der Adapter eines Systems über die gemeinsame Grundlage hinaus weiss
  * (cad_app.js). `raum`: ob es im Raum liegt; `klassen`: unter welchem Namen
- * die Vorlagen seiner Teile stehen; `achsen`: je Linie ihre Achsen vom Kern,
- * im Raum.
+ * die Vorlagen seiner Teile stehen; `achsen`: je Linie ihre Achsen vom Kern.
  */
 function adapter(kennung) {
   const art = systemart(kennung);
@@ -220,16 +220,20 @@ function neuText(a, werkzeug) {
 }
 
 /**
- * Eine neue Linie mit den Vorgaben des Werkzeugs. In der Ebene liegt ihre
- * Zugseite unten, an einer senkrechten links (Benutzer, 2026-10-24): sie
- * läuft dafür nach rechts bzw. nach unten, wie herum man sie auch zeichnet.
- * Im Raum läuft sie, wie sie gezeichnet ist: z des Stabs legt der Kern.
+ * Eine neue Linie mit den Vorgaben des Werkzeugs. Sie läuft, wie herum man
+ * sie auch zeichnet, in die erste Laufrichtung des Katalogs, auf der sie
+ * nicht senkrecht steht -- in der Ebene nach rechts, sonst nach unten, damit
+ * ihre Zugseite unten bzw. links liegt. Im Raum hat der Katalog keine: sie
+ * läuft, wie sie gezeichnet ist.
  */
 function linieAnlegen(a, z, von, bis) {
   const kennung = a.modell.naechsteKennung(z, 'L');
   const v = a.bs.vorgaben.linie;
   const lagen = a.modell.lagen(z);
-  if (!a.bs.raum && ['oben', 'rechts'].includes(zugseite(lagen.get(von), lagen.get(bis)))) [von, bis] = [bis, von];
+  const d = minus(lagen.get(bis), lagen.get(von));
+  const r = systemkatalog(a.bs.art, 'laufrichtungen')
+    .find((x) => Math.abs(skalar(d, x)) > 1e-9 * Math.hypot(...d));
+  if (r && skalar(d, r) < 0) [von, bis] = [bis, von];
   z.linien.push({
     ...ausVorlage(a.bs.klassen.linie), kennung, von, bis,
     querschnitt: v.querschnitt, material: v.querschnitt ? vorgabeMaterial(a, z) : '',
@@ -444,20 +448,6 @@ function wertText(wert, einheit) {
 }
 
 /**
- * Die Achsen einer Linie von p nach q (Lagen der Zeichnung) -- x längs, z
- * zur gestrichelten Faser, im Raum dazu y. In der Ebene liegt die Faser
- * rechts der Laufrichtung; im Raum kommen die Achsen vom Kern, und bis er
- * geantwortet hat, kennt die Zeichnung sie nicht: null.
- */
-function linienachsen(a, l, p, q) {
-  if (a.bs.raum) return a.bs.achsen[l.kennung] || null;
-  const L = abstand(p, q);
-  if (!L) return null;
-  const [c, s] = [(q[0] - p[0]) / L, (q[1] - p[1]) / L];
-  return { x: [c, s], z: [s, -c] };
-}
-
-/**
  * Wohin eine Last zeigt, in der Zeichnung: im System ihr Vektor, sonst die
  * Achse des Stabs (`achsen`) -- null, solange diese fehlen.
  */
@@ -487,7 +477,9 @@ function zeichnen(a, g) {
   for (const l of z.linien) {
     const [p, q] = [bild(l.von), bild(l.bis)];
     if (!p || !q) continue;
-    const achsen = linienachsen(a, l, lagen.get(l.von), lagen.get(l.bis));
+    // Die Achsen vom Kern: x längs, z zur gestrichelten Faser, im Raum dazu
+    // y. Bis er geantwortet hat, kennt die Zeichnung sie nicht.
+    const achsen = a.bs.achsen[l.kennung];
     // Je Richtung quer ihre Seite im Bild -- dorthin zeigt ihre Achse.
     const quer = linienlager.filter((x) => x.achse !== 'x' && l[x.feld] !== 'frei' && achsen)
       .map((x) => ({ halt: l[x.feld], n: imBild(a.v, achsen[x.achse]).r }));
@@ -578,7 +570,7 @@ function lastenZeichnen(a, z, lf, lagen) {
   for (const l of z.linien) {
     const [pa, pb] = [lagen.get(l.von), lagen.get(l.bis)];
     if (!pa || !pb || !abstand(pa, pb)) continue;
-    const achsen = linienachsen(a, l, pa, pb);
+    const achsen = a.bs.achsen[l.kennung];
     const ort = (anteil) => nachBild(a.v, pa.map((w, i) => w + (pb[i] - w) * anteil));
     const gk = eigen[l.kennung];
     if (gk) {

@@ -28,16 +28,15 @@ from opencivil.web import (
 
 
 def _balkensystem(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
-    """Die knappe Uebersicht und je Querschnitt sein Umriss -- auch wenn das System nicht rechnet."""
+    """
+    Eben wie im Raum: die knappe Uebersicht, je Querschnitt sein Umriss und
+    je Linie ihre Achsen, die die Oberflaeche nicht selbst legt -- auch wenn
+    das System nicht rechnet.
+    """
     system = aufbau.teile[kennung].objekt
     return {"uebersicht": balkendaten.uebersicht(loesung.befunde.get(system.rechnung.id)),
-            "umrisse": balkendaten.umrisse(system, loesung)}
-
-
-def _balkensystem3d(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
-    """Wie in der Ebene -- dazu je Linie ihre Achsen, die die Oberflaeche nicht selbst legt."""
-    return {**_balkensystem(aufbau, kennung, loesung),
-            "achsen": balkendaten.stabachsen(aufbau.teile[kennung].objekt.system)}
+            "umrisse": balkendaten.umrisse(system, loesung),
+            "achsen": balkendaten.stabachsen(system)}
 
 
 #: Je Bauteilart, nach ihrem Namen, was die Oberflaeche von einem Eintrag
@@ -46,7 +45,7 @@ ZEICHENDATEN: Dict[str, Optional[Callable[[Aufbau, str, Loesung], Any]]] = {
     PLATTE.name: None,
     ANALYSE.name: None,
     BALKENSYSTEM.name: _balkensystem,
-    BALKENSYSTEM3D.name: _balkensystem3d,
+    BALKENSYSTEM3D.name: _balkensystem,
     DECKE.name: deckendaten.zeichnung,
     DURCHSTANZEN.name: durchstanzdaten.situation,
     GRUNDBRUCH.name: grundbruchdaten.situation,

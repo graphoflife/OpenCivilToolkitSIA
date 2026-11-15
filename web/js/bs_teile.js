@@ -74,18 +74,6 @@ export function lastVon(z, kennung) {
 }
 
 /**
- * Wo die gestrichelte Faser einer Linie von p nach q in der Ebene liegt,
- * ihre Zugseite: rechts der Laufrichtung -- 'unten' oder 'oben', an einer
- * senkrechten 'links' oder 'rechts'. Lagen [x, z] der Zeichnung. Im Raum
- * legt der Kern die Faser, mit dem Drehwinkel β der Linie.
- */
-export function zugseite(p, q) {
-  const [dx, dz] = [q[0] - p[0], q[1] - p[1]];
-  if (Math.abs(dx) <= 1e-9 * Math.hypot(dx, dz)) return dz > 0 ? 'rechts' : 'links';
-  return dx > 0 ? 'unten' : 'oben';
-}
-
-/**
  * Wie ein Material des Systems heisst: ein Beton oder Baustahl wie im
  * Projekt, ein eigenes mit seinem Namen.
  */

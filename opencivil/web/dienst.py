@@ -471,7 +471,7 @@ def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     dann ist ``verlauf`` leer, und die Uebersicht sagt warum. Ohne ``fall``
     kommen nur die Zeichendaten des Systems (:mod:`opencivil.web.zeichendaten`)
     -- was das Zeichenfenster nach jeder Aenderung braucht: Meldungen, Knoten
-    ohne Drehsteifigkeit, was sich bewegt, im Raum die Achsen der Linien.
+    ohne Drehsteifigkeit, was sich bewegt, die Achsen der Linien.
     """
     projekt = _projekt(rumpf)
     eintrag = _balkensystem(projekt, rumpf)

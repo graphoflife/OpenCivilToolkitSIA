@@ -190,6 +190,13 @@ class MitStaeben:
     NEUE_DIAGRAMME: Tuple[str, ...]
     """Was ein frisches System von der GZT zeigt -- dazu die Verschiebung der GZG."""
 
+    LAUFRICHTUNGEN: Tuple[Tuple[float, ...], ...]
+    """
+    Wohin eine neue Linie laeuft, wie herum sie auch gezeichnet ist: in die
+    erste dieser Richtungen, auf der sie nicht senkrecht steht. Keine: wie
+    gezeichnet. Die Oberflaeche legt danach Anfang und Ende.
+    """
+
     KNOTEN: type
     LINIE: type
     LAGER: type

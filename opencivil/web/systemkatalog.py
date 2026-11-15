@@ -77,6 +77,7 @@ def katalog(eintrag: type, rechnung: type, darstellung: Darstellung) -> Dict[str
     aus_bauteil = [a.value for a in querschnittsarten if a.aus_bauteil]
     return {
         "achsen": list(eintrag.ACHSEN),
+        "laufrichtungen": [list(r) for r in eintrag.LAUFRICHTUNGEN],
         # Unter welchem Namen die Vorlagen und Feldangaben der Teile stehen.
         "klassen": {rolle: katalogname(getattr(eintrag, rolle.upper()))
                     for rolle in ("knoten", "linie", "lager", "stablast", "knotenlast",

@@ -1,5 +1,5 @@
 ---
-erzeugt: c47d243163ec
+erzeugt: 5801bc3c1261
 art: modul
 tags: [modul]
 ---
@@ -255,4 +255,3 @@ class System
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
-- [[opencivil.web.balkendaten]]

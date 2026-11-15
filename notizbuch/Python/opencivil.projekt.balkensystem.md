@@ -1,5 +1,5 @@
 ---
-erzeugt: 3489a4e8c31b
+erzeugt: b43694e42945
 art: modul
 tags: [modul]
 ---
@@ -319,6 +319,7 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 - `LAGERARTEN = LAGERARTEN`
 - `EINHEIT_DER_FEDER = EINHEIT_DER_FEDER`
 - `NEUE_DIAGRAMME = ('M', 'V', 'N')`
+- `LAUFRICHTUNGEN = ((1.0, 0.0), (0.0, -1.0))` – Nach rechts, steht sie senkrecht, nach unten: so liegt die gestrichelte Faser einer neuen Linie unten bzw. links (Benutzer, 2026-10-24). Wohin die Faser zeigt, legt der Kern ([[opencivil.stabwerk3d.stab#achsen_eben|achsen_eben]]); ein Test prueft beides zusammen.
 - `KNOTEN = SystemknotenEintrag`
 - `LINIE = SystemlinieEintrag`
 - `LAGER = LagerEintrag`

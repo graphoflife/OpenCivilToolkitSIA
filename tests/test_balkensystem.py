@@ -20,7 +20,7 @@ from opencivil.spannungsanalyse.linie import moment_kruemmung
 from opencivil.spannungsanalyse.modul import aequivalenter_modul
 from opencivil.spannungsanalyse.platte import loeserpaar
 from opencivil.spannungsanalyse.schnitt import schnittpaar
-from opencivil.web import dienst
+from opencivil.web import api, dienst
 
 
 def einfeldtraeger(kennung: str = "r1", name: str = "T", beton: str = "b1") -> BalkensystemEintrag:
@@ -230,6 +230,39 @@ class TestGrenzwerteAmBildschirm(unittest.TestCase):
                                    {"projekt": d, "kennung": "r1", "fall": "G"}).daten["verlauf"]
         self.assertAlmostEqual(verlauf["groesste_verschiebung"], w["wert"], places=9)
         self.assertIn(f"L1, w = {w['wert']:.2f} mm bei x = 3.00 m", str(traeger().rechnen().bericht()))
+
+
+class TestAchsenVomKern(unittest.TestCase):
+    """
+    Die Achsen jeder Linie -- mit z die Seite der gestrichelten Faser --
+    legt der Kern, eben wie im Raum. Bis 2026-11-15 legte sie die Oberfläche
+    der Ebene selbst, nach einer zweiten Regel.
+    """
+
+    def achsen(self, *linien):
+        p = Projekt(name="Achsen")
+        s = p.balkensystem("Linien")
+        for von, bis in linien:
+            s.linie(von, bis)
+        antwort = dienst.bearbeite("balkensystem_verlauf", {"projekt": p.als_dict(), "kennung": s.kennung})
+        self.assertEqual(antwort.status, 200)
+        return antwort.daten["achsen"]
+
+    def test_die_faser_liegt_rechts_der_laufrichtung(self):
+        """In den Koordinaten der Zeichnung, [x, z] -- auch für eine Linie ohne Stab."""
+        achsen = self.achsen(((0, 0), (6, 0)), ((0, 0), (0, 4)))
+        self.assertEqual(achsen["L1"], {"x": [1.0, 0.0], "z": [0.0, -1.0]})
+        self.assertEqual(achsen["L2"], {"x": [0.0, 1.0], "z": [1.0, 0.0]})
+
+    def test_eine_neue_linie_hat_ihre_faser_unten_oder_links(self):
+        """
+        Läuft eine neue Linie, wie der Katalog sagt, liegt ihre Faser unten
+        -- steht sie senkrecht, links (Benutzer, 2026-10-24).
+        """
+        rechts, unten = api.katalog()["balkensystem"]["laufrichtungen"]
+        achsen = self.achsen(((0, 0), tuple(rechts)), ((0, 0), tuple(unten)))
+        self.assertEqual(achsen["L1"]["z"], [0.0, -1.0])
+        self.assertEqual(achsen["L2"]["z"], [-1.0, 0.0])
 
 
 class TestPruefen(unittest.TestCase):

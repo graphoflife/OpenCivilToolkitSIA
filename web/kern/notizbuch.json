@@ -7849,6 +7849,7 @@
         "Darstellung",
         "Darstellung.feld",
         "Darstellung.lage",
+        "Darstellung.stabachsen",
         "Darstellung.drehungen",
         "Darstellung._lagerwerte",
         "Darstellung.lagerkraefte",
@@ -8080,7 +8081,6 @@
       "kurz": "was die Oberflaeche je Bauteil zeichnet, nach seiner Art.",
       "stichworte": [
         "_balkensystem",
-        "_balkensystem3d",
         "zeichendaten"
       ]
     },

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4263ee8d7974
+erzeugt: ff131cbaee3c
 art: modul
 tags: [modul]
 ---
@@ -26,15 +26,9 @@ Schluessel in der Antwort.
 def _balkensystem(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
 ```
 
-Die knappe Uebersicht und je Querschnitt sein Umriss -- auch wenn das System nicht rechnet.
-
-### _balkensystem3d
-
-```python
-def _balkensystem3d(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]
-```
-
-Wie in der Ebene -- dazu je Linie ihre Achsen, die die Oberflaeche nicht selbst legt.
+Eben wie im Raum: die knappe Uebersicht, je Querschnitt sein Umriss und
+je Linie ihre Achsen, die die Oberflaeche nicht selbst legt -- auch wenn
+das System nicht rechnet.
 
 ### zeichendaten
 

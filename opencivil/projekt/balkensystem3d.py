@@ -216,6 +216,8 @@ class Balkensystem3dEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     LAGERARTEN = LAGERARTEN
     EINHEIT_DER_FEDER = EINHEIT_DER_FEDER
     NEUE_DIAGRAMME = ("M_y", "M_z", "N")
+    #: Keine: eine neue Linie laeuft, wie sie gezeichnet ist -- ihre Faser legt der Drehwinkel β.
+    LAUFRICHTUNGEN = ()
     KNOTEN = RaumknotenEintrag
     LINIE = RaumlinieEintrag
     LAGER = RaumlagerEintrag

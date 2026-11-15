@@ -374,6 +374,11 @@ class BalkensystemEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     LAGERARTEN = LAGERARTEN
     EINHEIT_DER_FEDER = EINHEIT_DER_FEDER
     NEUE_DIAGRAMME = ("M", "V", "N")
+    #: Nach rechts, steht sie senkrecht, nach unten: so liegt die gestrichelte
+    #: Faser einer neuen Linie unten bzw. links (Benutzer, 2026-10-24). Wohin
+    #: die Faser zeigt, legt der Kern (:func:`~opencivil.stabwerk3d.stab.achsen_eben`);
+    #: ein Test prueft beides zusammen.
+    LAUFRICHTUNGEN = ((1.0, 0.0), (0.0, -1.0))
     KNOTEN = SystemknotenEintrag
     LINIE = SystemlinieEintrag
     LAGER = LagerEintrag

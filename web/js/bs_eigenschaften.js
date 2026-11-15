@@ -19,7 +19,7 @@
 
 import { wahlBlock, wahlSchalter } from './bausteine.js';
 import {
-  lastart, lastVon, materialname, passendeUebersicht, systemkatalog, zugseite,
+  lastart, lastVon, materialname, passendeUebersicht, systemkatalog,
 } from './bs_teile.js';
 import { texte } from './bs_texte.js';
 import { zahlText } from './cad_ansicht.js';
@@ -302,15 +302,27 @@ function lagerAnLinie(a, linien, wert) {
 }
 
 /**
- * In der Ebene: die Zugseite der gewählten Linien als Schalter -- solange sie alle
- * senkrecht oder alle nicht senkrecht liegen. Umschalten kehrt eine Linie
- * im Kern um: die Faser wechselt die Seite, die Lasten bleiben, wo sie
- * wirken, und die Gelenke an ihren Knoten.
+ * Wohin die Achse z einer Linie in der Ebene zeigt -- dort liegt ihre
+ * gestrichelte Faser: 'unten' oder 'oben', an einer senkrechten 'links' oder
+ * 'rechts'. Ohne Achsen vom Kern null.
+ */
+function zugseite(achsen) {
+  if (!achsen) return null;
+  const [x, z] = achsen.z;
+  if (Math.abs(z) > 1e-9) return z < 0 ? 'unten' : 'oben';
+  return x < 0 ? 'links' : 'rechts';
+}
+
+/**
+ * In der Ebene: die Zugseite der gewählten Linien als Schalter -- solange
+ * der Kern ihre Achsen geschickt hat und sie alle senkrecht oder alle nicht
+ * senkrecht liegen. Umschalten kehrt eine Linie im Kern um: die Faser
+ * wechselt die Seite, die Lasten bleiben, wo sie wirken, und die Gelenke an
+ * ihren Knoten.
  */
 function zugseitenzeile(a, z, linien) {
-  const lagen = a.modell.lagen(z);
   const seiten = new Map(z.linien.filter((l) => linien.includes(l.kennung))
-    .map((l) => [l.kennung, zugseite(lagen.get(l.von), lagen.get(l.bis))]));
+    .map((l) => [l.kennung, zugseite(a.bs.achsen[l.kennung])]));
   const stellungen = [['unten', 'oben'], ['links', 'rechts']]
     .find((paar) => [...seiten.values()].every((s) => paar.includes(s)));
   if (!stellungen) return null;

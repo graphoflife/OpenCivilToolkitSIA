@@ -7,6 +7,33 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Die Seite der Faser legt nur der Kern
+
+Wo die gestrichelte Faser einer Linie liegt -- und damit, wo ein positives
+Moment zieht --, legt jetzt auch in der Ebene allein der Kern (Punkt 3b der
+Strukturdurchsicht vom selben Tag). Am Bildschirm bleibt alles, wie es war:
+die Faser rechts der Laufrichtung, eine neue Linie mit der Faser unten, eine
+senkrechte mit ihr links, der Schalter «Zugseite» wie bisher -- im Browser
+nachgeprüft.
+
+Warum so:
+
+- Der Kern schickt je Linie ihre Achsen, eben wie im Raum (`stabachsen` in
+  `web/balkendaten.py`), in den Koordinaten der Zeichnung. Die Oberfläche
+  zeichnet die Faser und die Lasten quer danach und nennt die Zugseite
+  danach, wohin z zeigt. Bisher rechnete sie die Achsen der Ebene selbst
+  aus, nach einer zweiten Regel, die mit der des Kerns übereinstimmen
+  musste -- sonst stand die Faser am Bildschirm auf der falschen Seite, und
+  jedes Moment hätte falsch herum gelesen.
+- Wohin eine neue Linie läuft, ist eine Angabe des Systems
+  (`LAUFRICHTUNGEN`): in der Ebene nach rechts, steht sie senkrecht, nach
+  unten; im Raum keine, sie läuft, wie sie gezeichnet ist. Ein Test prüft
+  mit den Achsen des Kerns, dass die Faser dann unten bzw. links liegt;
+  ändert sich eines von beiden, schlägt er an.
+- Bis die Antwort des Kerns da ist, fehlen einer neuen Linie die Faser und
+  die Lasten quer -- wie im Raum schon. Die Antwort kommt mit jeder
+  Änderung.
+
 ## 2026-11-15 · Grenzwerte und grösste Verschiebung aus dem Kern
 
 Drei Ergebnisse suchte der Bildschirm der Balkensysteme bisher selbst: die

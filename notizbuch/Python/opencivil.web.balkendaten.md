@@ -1,5 +1,5 @@
 ---
-erzeugt: b9ac293cbc4f
+erzeugt: df3c850136ec
 art: modul
 tags: [modul]
 ---
@@ -24,8 +24,9 @@ Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm, mrad, Stellen in m:
   bestimmbar ist --, und die groesste Verschiebung;
 * je Querschnitt sein Umriss fuer das Bildchen in seiner Zeile
   ([[opencivil.web.balkendaten#umrisse|umrisse]]);
-* im Raum je Linie ihre Achsen ([[opencivil.web.balkendaten#stabachsen|stabachsen]]), fuer die gestrichelte
-  Faser und die Lasten in den Richtungen des Stabs.
+* je Linie ihre Achsen, eben und im Raum ([[opencivil.web.balkendaten#stabachsen|stabachsen]]), fuer die
+  gestrichelte Faser, die Zugseite und die Lasten in den Richtungen des
+  Stabs -- die Oberflaeche legt sie nicht selbst.
 
 
 ## EBEN UND IM RAUM IN EINER FORM
@@ -77,6 +78,15 @@ def lage(self, v: Any) -> Dict[str, Any]
 ```
 
 Anfang und Achsen eines Stabs im System, aus seinem Verlauf -- in den Achsen der Darstellung.
+
+#### Darstellung.stabachsen
+
+```python
+def stabachsen(self, achsen: Tuple[Vektor, Vektor, Vektor]) -> Dict[str, List[float]]
+```
+
+Die Achsen `(x, y, z)` eines Stabs im System, die die Darstellung
+zeigt, in ihren Koordinaten -- in der Ebene x und z (siehe Dateikopf).
 
 #### Darstellung.drehungen
 
@@ -165,12 +175,13 @@ Ein Querschnitt, der nicht geht, hat keinen.
 ### stabachsen
 
 ```python
-def stabachsen(system: Raumsystem) -> Dict[str, Dict[str, List[float]]]
+def stabachsen(rechnung: Stabwerksrechnung) -> Dict[str, Dict[str, List[float]]]
 ```
 
-Je Linie eines Systems im Raum ihre Achsen `x`, `y` und `z` im
-System -- wie der Rechenkern sie legt ([[opencivil.stabwerk3d.stab#achsen|achsen]]),
-auch ohne Rechnung. Eine Linie ohne Laenge hat keine.
+Je Linie eines Systems ihre Achsen, wie der Rechenkern sie legt
+([[opencivil.stabwerk.art#Art|achsen]]) -- auch ohne Rechnung, auch
+fuer eine Linie ohne Stab, in den Koordinaten der Zeichnung
+([[opencivil.web.balkendaten#Darstellung.stabachsen|Darstellung.stabachsen]]). Eine Linie ohne Laenge hat keine.
 
 
 ## Konstanten
@@ -187,9 +198,7 @@ auch ohne Rechnung. Eine Linie ohne Laenge hat keine.
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk.verlauf]]
-- [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.raum]]
-- [[opencivil.stabwerk3d.stab]]
 - [[opencivil.web.anzeige]]
 
 ## Gebraucht von

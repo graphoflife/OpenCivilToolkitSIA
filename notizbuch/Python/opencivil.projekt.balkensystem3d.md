@@ -1,5 +1,5 @@
 ---
-erzeugt: 8888c2cf57eb
+erzeugt: 8d636636b07d
 art: modul
 tags: [modul]
 ---
@@ -194,6 +194,7 @@ Lastfaelle, Kombinationen -- was nicht stimmt, steht wie beim
 - `LAGERARTEN = LAGERARTEN`
 - `EINHEIT_DER_FEDER = EINHEIT_DER_FEDER`
 - `NEUE_DIAGRAMME = ('M_y', 'M_z', 'N')`
+- `LAUFRICHTUNGEN = ()` – Keine: eine neue Linie laeuft, wie sie gezeichnet ist -- ihre Faser legt der Drehwinkel β.
 - `KNOTEN = RaumknotenEintrag`
 - `LINIE = RaumlinieEintrag`
 - `LAGER = RaumlagerEintrag`

@@ -304,6 +304,7 @@ class TestFuerDieOberflaeche(unittest.TestCase):
         self.assertEqual(richtungen["quer_y"], (None, "y"))
         self.assertEqual({r["wert"]: r["stabachse"] for r in eben["richtungen"]}["quer"], "z")
         self.assertEqual(raum["profilachsen"], [])
+        self.assertEqual(raum["laufrichtungen"], [])        # wie gezeichnet
         self.assertEqual([q["wert"] for q in raum["querschnittsarten"]],
                          ["vorlage", "profil", "kennwerte"])
         self.assertEqual(raum["lagerarten"][0], {"wert": "gelenkig", "x": "fest", "y": "fest",

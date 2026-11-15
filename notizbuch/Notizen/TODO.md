@@ -175,8 +175,8 @@ nachgeprüft. Urteil: umbauen, bevor weiter darauf gebaut wird. Gerechnet
 wird richtig, aber den gebetteten Stab lösen drei Programme, und Regeln des
 Kerns stehen ein zweites Mal im JS. Empfohlene Reihenfolge: 1, dann 3a und
 3b, dann 2 -- vor Knicken oder 2. Ordnung am Pfahl; der Rest, wenn dort
-ohnehin gearbeitet wird. Die Punkte 1 und 3a sind erledigt (unten unter
-«Erledigt zuletzt»).
+ohnehin gearbeitet wird. Die Punkte 1, 3a und 3b sind erledigt (unten
+unter «Erledigt zuletzt»).
 
 - [ ] **2. Der Pfahl löst den gebetteten Stab ein drittes Mal.**
       `pfahl/bettung.py` nummeriert, baut zusammen, löst und integriert die
@@ -190,12 +190,6 @@ ohnehin gearbeitet wird. Die Punkte 1 und 3a sind erledigt (unten unter
       `ebener_verlauf` mit linear wachsender Bettung (Polynom mal Polynom
       gibt es), `bettung.py` ruft es, eine Teilungsregel für beide. Gross,
       nach 1: der Pfahl als lotrechter Stab eines ebenen Systems.
-- [ ] **3b. Die Seite der gestrichelten Faser steht noch zweimal im JS**
-      -- und mit ihr das Vorzeichen von M: `linienachsen` in
-      `bs_zeichnung.js`, `zugseite` in `bs_teile.js`. Im Kern steht sie seit
-      Punkt 1 einmal (`achsen_eben` in `stabwerk3d/stab.py`);
-      `Lastrichtung.vektor` und `_lage_eben` sind weg. Umbau: `stabachsen`
-      für beide Arten, wie im Raum schon.
 - [ ] **3c. Die Eingabe der Pfähle entscheidet selbst, welche Felder
       gelten** -- drainiert, Mantel eingegeben, Bohrpfahl, Kopf frei --,
       obwohl der Kern es weiss (`Pfahlschicht.kurznamen`, die Gruppen in
@@ -1012,6 +1006,12 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-15, Punkt 3b: die Achsen jeder
+Linie kommen eben wie im Raum aus dem Kern (`stabachsen`) · die Oberfläche
+legt keine Faser mehr selbst: `linienachsen` und die Regel in `zugseite`
+sind weg · wohin eine neue Linie läuft, sagt das System
+(`LAUFRICHTUNGEN`), mit einem Test gegen die Achsen des Kerns ·
 
 Aus der Strukturdurchsicht vom 2026-11-15, Punkt 3a: die Grenzwerte über
 alle Stäbe, die massgebende Durchbiegung und die grösste Verschiebung kommen

@@ -17,8 +17,9 @@ Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm, mrad, Stellen in m:
   bestimmbar ist --, und die groesste Verschiebung;
 * je Querschnitt sein Umriss fuer das Bildchen in seiner Zeile
   (:func:`umrisse`);
-* im Raum je Linie ihre Achsen (:func:`stabachsen`), fuer die gestrichelte
-  Faser und die Lasten in den Richtungen des Stabs.
+* je Linie ihre Achsen, eben und im Raum (:func:`stabachsen`), fuer die
+  gestrichelte Faser, die Zugseite und die Lasten in den Richtungen des
+  Stabs -- die Oberflaeche legt sie nicht selbst.
 
 EBEN UND IM RAUM IN EINER FORM:
 Was sich unterscheidet -- die Achsen, die Groessen, die Lagerkraefte --,
@@ -49,9 +50,7 @@ from opencivil.stabwerk import art
 from opencivil.stabwerk.rechnung import Stabwerksrechnung, Systembefund
 from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Fall
 from opencivil.stabwerk.verlauf import IN_DER_EBENE, Grenzwert, grenzwerte
-from opencivil.stabwerk3d import stab as st3
-from opencivil.stabwerk3d.modell import System as Raumsystem
-from opencivil.stabwerk3d.raum import TOLERANZ
+from opencivil.stabwerk3d.raum import TOLERANZ, Vektor
 from opencivil.web.anzeige import Anzeigegroesse, zahl
 
 #: Wie viele Stuecke ein Stab im Bild mindestens hat -- dazu jede Grenze und jeder Extremwert.
@@ -92,9 +91,16 @@ class Darstellung:
 
     def lage(self, v: Any) -> Dict[str, Any]:
         """Anfang und Achsen eines Stabs im System, aus seinem Verlauf -- in den Achsen der Darstellung."""
+        return {"anfang": [v.anfang["xyz".index(a)] for a in self.achsen],
+                "achsen": self.stabachsen(v.achsen)}
+
+    def stabachsen(self, achsen: Tuple[Vektor, Vektor, Vektor]) -> Dict[str, List[float]]:
+        """
+        Die Achsen ``(x, y, z)`` eines Stabs im System, die die Darstellung
+        zeigt, in ihren Koordinaten -- in der Ebene x und z (siehe Dateikopf).
+        """
         i = ["xyz".index(a) for a in self.achsen]
-        return {"anfang": [v.anfang[k] for k in i],
-                "achsen": {a: [v.achsen["xyz".index(a)][k] for k in i] for a in self.achsen}}
+        return {a: [achsen["xyz".index(a)][k] for k in i] for a in self.achsen}
 
     @property
     def drehungen(self) -> Tuple[str, ...]:
@@ -275,17 +281,21 @@ def umrisse(system: Stabwerksrechnung, loesung: Any) -> Dict[str, List[List[List
             for q in system.querschnitte}
 
 
-def stabachsen(system: Raumsystem) -> Dict[str, Dict[str, List[float]]]:
+def stabachsen(rechnung: Stabwerksrechnung) -> Dict[str, Dict[str, List[float]]]:
     """
-    Je Linie eines Systems im Raum ihre Achsen ``x``, ``y`` und ``z`` im
-    System -- wie der Rechenkern sie legt (:func:`~opencivil.stabwerk3d.stab.achsen`),
-    auch ohne Rechnung. Eine Linie ohne Laenge hat keine.
+    Je Linie eines Systems ihre Achsen, wie der Rechenkern sie legt
+    (:attr:`~opencivil.stabwerk.art.Art.achsen`) -- auch ohne Rechnung, auch
+    fuer eine Linie ohne Stab, in den Koordinaten der Zeichnung
+    (:meth:`Darstellung.stabachsen`). Eine Linie ohne Laenge hat keine.
     """
+    systemart = rechnung.ART
+    d = _DARSTELLUNGEN[systemart]
+    system = systemart.im_raum(rechnung.system)
     knoten = {k.name: k for k in system.knoten}
     heraus = {}
     for s in system.staebe:
         a, b = knoten.get(s.a), knoten.get(s.b)
         if a is None or b is None or math.dist((a.x, a.y, a.z), (b.x, b.y, b.z)) <= TOLERANZ:
             continue
-        heraus[s.name] = dict(zip("xyz", map(list, st3.achsen(a, b, s.drehung)[1])))
+        heraus[s.name] = d.stabachsen(systemart.achsen(a, b, s.drehung)[1])
     return heraus

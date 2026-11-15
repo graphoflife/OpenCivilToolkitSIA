@@ -1,5 +1,5 @@
 ---
-erzeugt: 7f3483459444
+erzeugt: 4bd549fe3534
 art: modul
 tags: [modul]
 ---
@@ -298,7 +298,7 @@ Ein System, das sich nicht rechnen laesst, ist keine falsche Anfrage:
 dann ist `verlauf` leer, und die Uebersicht sagt warum. Ohne `fall`
 kommen nur die Zeichendaten des Systems ([[opencivil.web.zeichendaten]])
 -- was das Zeichenfenster nach jeder Aenderung braucht: Meldungen, Knoten
-ohne Drehsteifigkeit, was sich bewegt, im Raum die Achsen der Linien.
+ohne Drehsteifigkeit, was sich bewegt, die Achsen der Linien.
 
 ### decke_zeichnung
 
