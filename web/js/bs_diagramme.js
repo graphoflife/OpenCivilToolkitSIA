@@ -37,14 +37,15 @@
  * Steifigkeit»; über einem Stab den Wert an dieser Stelle.
  *
  * Unter «Zusammenfassung» je System eine Tabelle: je Fall die grössten und
- * kleinsten Schnittgrössen und Durchbiegungen und die Lagerkräfte -- aus der
- * Rechnung, die mit jeder Eingabe läuft.
+ * kleinsten Schnittgrössen und die massgebenden Durchbiegungen über alle
+ * Stäbe und die Lagerkräfte -- aus der Rechnung, die mit jeder Eingabe läuft.
  *
  * Die Verläufe kommen aus einer eigenen Anfrage (`balkensystem_verlauf`),
  * erst wenn jemand sie sehen will (fallantwort.js) -- wie die Diagramme der
  * Querschnittsanalyse. Gerechnet wird hier nichts: die Werte kommen fertig
- * aus dem Kern, mit den Extremstellen; zwischen seinen dichten Proben wird
- * für die Anzeige beim Darüberfahren nur gerade verbunden.
+ * aus dem Kern, mit den Extremstellen, den Grenzwerten über alle Stäbe und
+ * der grössten Verschiebung; zwischen seinen dichten Proben wird für die
+ * Anzeige beim Darüberfahren nur gerade verbunden.
  */
 
 import { api } from './api.js';
@@ -225,8 +226,9 @@ function anschreiben(svg, p, n, text, { punkt = false, stelle = null, klasse = '
 /**
  * Ein Verlauf: je Stab die Fläche zwischen Stab und Ordinate. Angeschrieben
  * die Werte an den Enden und der grösste und der kleinste -- `extreme` vom
- * Kern, je Stab `{kleinst: [x, v], groesst: [x, v]}`. `g`: die Grösse aus
- * dem Katalog mit ihrem Feld, ihrer Achse und ihrer Farbe.
+ * Kern, je Stab und Grösse `{kleinst: [x, v], groesst: [x, v], massgebend:
+ * [x, v]}`. `g`: die Grösse aus dem Katalog mit ihrem Feld, ihrer Achse und
+ * ihrer Farbe.
  */
 function verlaufsbild(r, daten, g, extreme) {
   const svg = bildflaeche(r, daten.staebe);
@@ -268,20 +270,21 @@ function verlaufsbild(r, daten, g, extreme) {
 
 /**
  * Die Verschiebung: das System verschoben, überhöht -- das unverformte blass
- * darunter. Je Stab angeschrieben die grössten Durchbiegungen gegen die
+ * darunter. Je Stab angeschrieben die massgebenden Durchbiegungen gegen die
  * Sehne, mit Punkt und Stelle -- `extreme` vom Kern, wie beim Verlauf; in
- * der Ebene w, im Raum f_y und f_z, die nicht verschwinden.
+ * der Ebene w, im Raum f_y und f_z, die nicht verschwinden. Die grösste
+ * Verschiebung, auf die überhöht wird, kommt auch vom Kern.
  */
 function verformungsbild(r, daten, extreme, e) {
   const svg = bildflaeche(r, daten.staebe);
-  const groesste = Math.max(0, ...Object.values(daten.staebe).flatMap((s) => s.proben.map((p) => Math.hypot(...p.u))));
+  const groesste = daten.groesste_verschiebung;
   // Überhöht, bis die grösste Verschiebung ein Zwölftel des Systems ist.
   const faktor = groesste > 1e-12 ? (r.groesse / 12) / (groesste / 1000) : 0;
   const verschoben = (lage, u) => r.bild(lage.map((w, i) => w + (faktor * u[i]) / 1000));
   const durchbiegungen = Object.entries(daten.staebe).flatMap(([name, s]) => e.durchbiegungen.map(({ feld, achse }) => {
     const w = extreme[name]?.[feld];
     if (!w) return null;
-    const [x, v] = Math.abs(w.groesst[1]) >= Math.abs(w.kleinst[1]) ? w.groesst : w.kleinst;
+    const [x, v] = w.massgebend;
     return { s, x, v, g: e.groessen[feld], achse };
   })).filter(Boolean);
   const groessteW = Math.max(0, ...durchbiegungen.map((d) => Math.abs(d.v)));
@@ -513,23 +516,10 @@ export function systemKarten(kennung) {
 // Zusammenfassung
 // ===========================================================================
 
-/** Der grösste und der kleinste Wert einer Grösse über alle Stäbe -- mit Stab und Stelle. */
-function grenzen(staebe, groesse) {
-  let klein = null;
-  let gross = null;
-  for (const [name, e] of Object.entries(staebe)) {
-    const [xk, vk] = e[groesse].kleinst;
-    const [xg, vg] = e[groesse].groesst;
-    if (!klein || vk < klein.v) klein = { v: vk, name, x: xk };
-    if (!gross || vg > gross.v) gross = { v: vg, name, x: xg };
-  }
-  return { klein, gross };
-}
-
+/** Ein Grenzwert über alle Stäbe vom Kern, `{stab, x, wert}` -- mit Stab und Stelle. */
 function wertzelle(w, stellen) {
-  if (!w) return el('td', { text: '–' });
-  return el('td.bs-zahl', { title: `${w.name} bei x = ${fest(w.x, 2)} m` }, [
-    fest(w.v, stellen), el('span.bs-wo', { text: ` ${w.name}` })]);
+  return el('td.bs-zahl', { title: `${w.stab} bei x = ${fest(w.x, 2)} m` }, [
+    fest(w.wert, stellen), el('span.bs-wo', { text: ` ${w.stab}` })]);
 }
 
 /** «N_min», «M_y,max» -- ein Grenzwert im Kopf der Tabelle. */
@@ -573,14 +563,9 @@ export function systemZusammenfassung(kennung) {
     ...biegung.map((g) => grenzname(g.zeichen, 'max'))].map((t) => el('th', { text: t }));
   const zeilen = u.faelle.map((f) => el('tr', {}, [
     el('td', { text: f.name + (f.kombination ? ' (Kombination)' : '') }),
-    ...schnitt.flatMap((g) => {
-      const { klein, gross } = grenzen(f.staebe, g.feld);
-      return [wertzelle(klein, g.stellen), wertzelle(gross, g.stellen)];
-    }),
-    ...biegung.map((g) => {
-      const { klein, gross } = grenzen(f.staebe, g.feld);
-      return wertzelle(Math.abs(gross?.v ?? 0) >= Math.abs(klein?.v ?? 0) ? gross : klein, g.stellen);
-    }),
+    ...schnitt.flatMap((g) => [wertzelle(f.grenzen[g.feld].kleinst, g.stellen),
+      wertzelle(f.grenzen[g.feld].groesst, g.stellen)]),
+    ...biegung.map((g) => wertzelle(f.grenzen[g.feld].massgebend, g.stellen)),
   ]));
   // Alle Zeilen, wie in der Herleitung -- auch die Summen von Linienlager
   // und Bettung. Mit den Knoten allein gingen die Kräfte nicht auf.

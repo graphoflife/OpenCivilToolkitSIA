@@ -201,6 +201,37 @@ class TestLagerkraefteAmBildschirm(unittest.TestCase):
         self.assertIn("L1: Bettung, Summe", herleitung)
 
 
+class TestGrenzwerteAmBildschirm(unittest.TestCase):
+    """
+    Die Grenzwerte über alle Stäbe und die grösste Verschiebung kommen fertig
+    aus dem Kern, mit Stab und Stelle -- bis 2026-11-15 suchte sie der
+    Bildschirm selbst, mit einer eigenen Regel für gleich grosse Werte.
+    """
+
+    def test_einfeldtraeger(self):
+        d = traeger().als_dict()
+        uebersicht = dienst.bearbeite("rechnen", {"projekt": d}).daten["zeichendaten"]["r1"]["uebersicht"]
+        (fall,) = uebersicht["faelle"]
+        M = fall["grenzen"]["M"]
+        self.assertEqual((M["groesst"]["stab"], M["groesst"]["x"]), ("L1", 3.0))
+        self.assertAlmostEqual(M["groesst"]["wert"], 45.0, places=6)
+        self.assertEqual(M["massgebend"], M["groesst"])
+        self.assertEqual(fall["staebe"]["L1"]["M"]["massgebend"], [3.0, M["groesst"]["wert"]])
+        # V = ±30 kN an den Enden, gleich gross: massgebend ist der positive.
+        V = fall["grenzen"]["V"]
+        self.assertEqual((V["kleinst"]["x"], V["groesst"]["x"]), (6.0, 0.0))
+        self.assertEqual(V["massgebend"], V["groesst"])
+        self.assertAlmostEqual(V["massgebend"]["wert"], 30.0, places=6)
+
+        # Ohne Last längs verschiebt sich der Träger nur quer -- so weit, wie
+        # er sich gegen die Sehne durchbiegt. Der Bericht nennt dieselbe Stelle.
+        w = fall["grenzen"]["w"]["massgebend"]
+        verlauf = dienst.bearbeite("balkensystem_verlauf",
+                                   {"projekt": d, "kennung": "r1", "fall": "G"}).daten["verlauf"]
+        self.assertAlmostEqual(verlauf["groesste_verschiebung"], w["wert"], places=9)
+        self.assertIn(f"L1, w = {w['wert']:.2f} mm bei x = 3.00 m", str(traeger().rechnen().bericht()))
+
+
 class TestPruefen(unittest.TestCase):
 
     def test_unbekannte_wahl(self):

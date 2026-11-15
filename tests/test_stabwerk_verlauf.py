@@ -13,7 +13,7 @@ from opencivil.stabwerk.modell import (
 )
 from opencivil.stabwerk import system as kern
 from opencivil.stabwerk.art import EBENE
-from opencivil.stabwerk.verlauf import Polynom, verlaeufe
+from opencivil.stabwerk.verlauf import Extrem, Grenzwert, Polynom, grenzwerte, verlaeufe
 from opencivil.stabwerk3d import stab as st3
 
 EI, EA = 50e6, 5e9
@@ -192,6 +192,51 @@ class TestGeneigt(unittest.TestCase):
         self.assertAlmostEqual(v["L1"].bei(1.0)["N"], -P * math.sqrt(2), places=4)
         self.assertAlmostEqual(v["L2"].bei(1.0)["N"], -P, places=4)
         self.assertAlmostEqual(v["L1"].bei(1.0)["M_y"], 0.0, places=6)
+
+
+class TestGrenzwerte(unittest.TestCase):
+    """Über alle Stäbe eines Falls: der kleinste, der grösste und der massgebende Wert."""
+
+    def test_massgebend_nach_dem_betrag(self):
+        self.assertEqual(Extrem(kleinst=(1.0, -4.0), groesst=(2.0, 3.0)).massgebend, (1.0, -4.0))
+        # Bei gleichem Betrag gilt der positive -- in Bericht und Bildschirm.
+        self.assertEqual(Extrem(kleinst=(1.0, -3.0), groesst=(2.0, 3.0)).massgebend, (2.0, 3.0))
+
+    def test_mit_stab_und_stelle(self):
+        g = grenzwerte({"L1": Extrem((0.5, -2.0), (1.0, 5.0)),
+                        "L2": Extrem((3.0, -7.0), (0.0, 1.0)),
+                        "L3": Extrem((2.0, -1.0), (4.0, 5.0))})
+        self.assertEqual(g.kleinst, Grenzwert("L2", 3.0, -7.0))
+        self.assertEqual(g.groesst, Grenzwert("L1", 1.0, 5.0))      # gleich gross: der erste Stab
+        self.assertEqual(g.massgebend, Grenzwert("L2", 3.0, -7.0))
+
+
+class TestGroessteVerschiebung(unittest.TestCase):
+    def test_kragarm(self):
+        """Die Spitze eines Kragarms unter P: PL³/3EI."""
+        P = 10e3
+        s = System(
+            knoten=[Knoten("K1", 0, 0), Knoten("K2", L, 0)],
+            staebe=[Stab("L1", "K1", "K2", EA=EA, EI=EI)],
+            lager=[Lager("A1", "K1", x=FEST, z=FEST, phi=FEST)],
+            lastfaelle=[Lastfall("P", [Knotenlast("K2", Fz=-P)])])
+        x, u = verlaeufe(rechnen(s).faelle[0])["L1"].groesste_verschiebung()
+        self.assertEqual(x, L)
+        self.assertAlmostEqual(u, P * L ** 3 / (3 * EI), places=12)
+
+    def test_im_feld_genau(self):
+        """
+        Dreieckslast von 0 auf q: w = q·x·(7L⁴ − 10L²x² + 3x⁴)/(360·L·EI),
+        am grössten bei x = L·√(1 − √(8/15)) -- zwischen den Proben, und
+        doch genau.
+        """
+        v = einfeldtraeger(Stablast("L1", Lastart.LINIENLAST, 0.0, wert_b=q))
+        x, u = v.groesste_verschiebung()
+        x0 = L * math.sqrt(1 - math.sqrt(8 / 15))
+        self.assertAlmostEqual(x, x0, places=6)
+        self.assertAlmostEqual(u, q * x0 * (7 * L ** 4 - 10 * L ** 2 * x0 ** 2 + 3 * x0 ** 4)
+                               / (360 * L * EI), places=12)
+        self.assertFalse(any(abs(p["x"] - x0) < 1e-6 for p in v.proben()))
 
 
 if __name__ == "__main__":

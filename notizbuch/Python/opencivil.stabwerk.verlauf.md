@@ -1,5 +1,5 @@
 ---
-erzeugt: 7c2b7e765b97
+erzeugt: a281437ad8c1
 art: modul
 tags: [modul]
 ---
@@ -83,7 +83,12 @@ Ende trifft sie die des Endes (eine Probe in den Tests).
 
 Ein Moment ist dort am groessten, wo `dM/dx = V - m` null wird, oder an
 einer Grenze: einem Stabende, einer Laststelle -- dort auf beiden Seiten.
-Gesucht wird an genau diesen Stellen, nicht im Raster der Bilder.
+Gesucht wird an genau diesen Stellen, nicht im Raster der Bilder. Ueber
+alle Staebe eines Falls fasst [[opencivil.stabwerk.verlauf#grenzwerte|grenzwerte]] zusammen: den kleinsten,
+den groessten und den massgebenden Wert, den mit dem groessten Betrag --
+bei gleichem Betrag den positiven. Bericht und Bildschirm zeigen dieselben.
+Die groesste Verschiebung ist ebenso genau: ihr Quadrat `u² + v² + w²`
+ist ein Polynom ([[opencivil.stabwerk.verlauf#Stabverlauf.groesste_verschiebung|Stabverlauf.groesste_verschiebung]]).
 
 ## Inhalt
 
@@ -171,6 +176,14 @@ Ein Stueck eines Stabs ohne Laststelle -- alles darauf Polynome in x ab dem Stab
 - `p_y: Polynom = field(default_factory=lambda: NULL)`
 - `p_z: Polynom = field(default_factory=lambda: NULL)` – Die Querlast samt Bettung in y und z des Stabs.
 
+### nach_betrag
+
+```python
+def nach_betrag(wert: float) -> Tuple[float, float]
+```
+
+Wonach der massgebende Wert gewaehlt wird: nach dem Betrag, bei gleichem der positive.
+
 ### Extrem
 
 ```python
@@ -178,10 +191,55 @@ Ein Stueck eines Stabs ohne Laststelle -- alles darauf Polynome in x ab dem Stab
 class Extrem
 ```
 
-Der kleinste und der groesste Wert einer Groesse, je mit Stelle.
+Der kleinste und der groesste Wert einer Groesse, je mit Stelle: `(x, Wert)`.
 
 - `kleinst: Tuple[float, float]`
 - `groesst: Tuple[float, float]`
+
+#### Extrem.massgebend
+
+```python
+@property
+def massgebend(self) -> Tuple[float, float]
+```
+
+Der der beiden, der massgebend ist ([[opencivil.stabwerk.verlauf#nach_betrag|nach_betrag]]).
+
+### Grenzwert
+
+```python
+@dataclass(frozen=True)
+class Grenzwert
+```
+
+Ein Wert ueber alle Staebe eines Falls: an welchem Stab, wo darauf und wie gross.
+
+- `stab: str`
+- `x: float`
+- `wert: float`
+
+### Grenzwerte
+
+```python
+@dataclass(frozen=True)
+class Grenzwerte
+```
+
+Der kleinste, der groesste und der massgebende Wert einer Groesse ueber alle Staebe.
+
+- `kleinst: Grenzwert`
+- `groesst: Grenzwert`
+- `massgebend: Grenzwert`
+
+### grenzwerte
+
+```python
+def grenzwerte(extreme: Mapping[str, Extrem]) -> Grenzwerte
+```
+
+Aus den Extremwerten je Stab die ueber alle: der kleinste, der groesste
+und der massgebende ([[opencivil.stabwerk.verlauf#Extrem.massgebend|Extrem.massgebend]]) -- bei gleichem Wert der
+des ersten Stabs.
 
 ### Stabverlauf
 
@@ -241,6 +299,22 @@ def extrem(self, groesse: str) -> Extrem
 Kleinster und groesster Wert einer Groesse mit Stelle: einer
 Schnittgroesse, einer Verschiebung oder Verdrehung oder von `f_y`
 und `f_z`, der Durchbiegung gegen die Sehne.
+
+#### Stabverlauf.groesste_verschiebung
+
+```python
+def groesste_verschiebung(self) -> Tuple[float, float]
+```
+
+Wo sich der Stab am weitesten verschiebt, und wie weit, in m -- `(x, Betrag)`.
+
+#### Stabverlauf._extrem
+
+```python
+def _extrem(self, polynom: Callable[[Intervall], Polynom]) -> Extrem
+```
+
+Kleinster und groesster Wert eines Polynoms je Stueck: an den Grenzen und wo es flach ist.
 
 ### verlaeufe
 

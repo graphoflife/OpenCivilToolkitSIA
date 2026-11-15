@@ -64,14 +64,19 @@ Ende trifft sie die des Endes (eine Probe in den Tests).
 EXTREMWERTE:
 Ein Moment ist dort am groessten, wo ``dM/dx = V - m`` null wird, oder an
 einer Grenze: einem Stabende, einer Laststelle -- dort auf beiden Seiten.
-Gesucht wird an genau diesen Stellen, nicht im Raster der Bilder.
+Gesucht wird an genau diesen Stellen, nicht im Raster der Bilder. Ueber
+alle Staebe eines Falls fasst :func:`grenzwerte` zusammen: den kleinsten,
+den groessten und den massgebenden Wert, den mit dem groessten Betrag --
+bei gleichem Betrag den positiven. Bericht und Bildschirm zeigen dieselben.
+Die groesste Verschiebung ist ebenso genau: ihr Quadrat ``u² + v² + w²``
+ist ein Polynom (:meth:`Stabverlauf.groesste_verschiebung`).
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence, Tuple
+from typing import Callable, Dict, List, Mapping, Sequence, Tuple
 
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk3d import stab as st3
@@ -215,12 +220,55 @@ class Intervall:
     """Die Querlast samt Bettung in y und z des Stabs."""
 
 
+def nach_betrag(wert: float) -> Tuple[float, float]:
+    """Wonach der massgebende Wert gewaehlt wird: nach dem Betrag, bei gleichem der positive."""
+    return abs(wert), wert
+
+
 @dataclass(frozen=True)
 class Extrem:
-    """Der kleinste und der groesste Wert einer Groesse, je mit Stelle."""
+    """Der kleinste und der groesste Wert einer Groesse, je mit Stelle: ``(x, Wert)``."""
 
     kleinst: Tuple[float, float]
     groesst: Tuple[float, float]
+
+    @property
+    def massgebend(self) -> Tuple[float, float]:
+        """Der der beiden, der massgebend ist (:func:`nach_betrag`)."""
+        return max((self.kleinst, self.groesst), key=lambda w: nach_betrag(w[1]))
+
+
+@dataclass(frozen=True)
+class Grenzwert:
+    """Ein Wert ueber alle Staebe eines Falls: an welchem Stab, wo darauf und wie gross."""
+
+    stab: str
+    x: float
+    wert: float
+
+
+@dataclass(frozen=True)
+class Grenzwerte:
+    """Der kleinste, der groesste und der massgebende Wert einer Groesse ueber alle Staebe."""
+
+    kleinst: Grenzwert
+    groesst: Grenzwert
+    massgebend: Grenzwert
+
+
+def grenzwerte(extreme: Mapping[str, Extrem]) -> Grenzwerte:
+    """
+    Aus den Extremwerten je Stab die ueber alle: der kleinste, der groesste
+    und der massgebende (:attr:`Extrem.massgebend`) -- bei gleichem Wert der
+    des ersten Stabs.
+    """
+    def je_stab(wahl: Callable[[Extrem], Tuple[float, float]]) -> List[Grenzwert]:
+        return [Grenzwert(stab, *wahl(e)) for stab, e in extreme.items()]
+
+    return Grenzwerte(
+        kleinst=min(je_stab(lambda e: e.kleinst), key=lambda g: g.wert),
+        groesst=max(je_stab(lambda e: e.groesst), key=lambda g: g.wert),
+        massgebend=max(je_stab(lambda e: e.massgebend), key=lambda g: nach_betrag(g.wert)))
 
 
 @dataclass
@@ -290,9 +338,18 @@ class Stabverlauf:
         Schnittgroesse, einer Verschiebung oder Verdrehung oder von ``f_y``
         und ``f_z``, der Durchbiegung gegen die Sehne.
         """
+        return self._extrem(lambda teil: self._polynom(teil, groesse))
+
+    def groesste_verschiebung(self) -> Tuple[float, float]:
+        """Wo sich der Stab am weitesten verschiebt, und wie weit, in m -- ``(x, Betrag)``."""
+        x, quadrat = self._extrem(lambda t: t.u * t.u + t.v * t.v + t.w * t.w).groesst
+        return x, math.sqrt(max(quadrat, 0.0))
+
+    def _extrem(self, polynom: Callable[[Intervall], Polynom]) -> Extrem:
+        """Kleinster und groesster Wert eines Polynoms je Stueck: an den Grenzen und wo es flach ist."""
         werte = []
         for teil in self.intervalle:
-            p = self._polynom(teil, groesse)
+            p = polynom(teil)
             stellen = [teil.x0, teil.x1] + p.ableitung().nullstellen(teil.x0, teil.x1)
             werte.extend((x, p(x)) for x in stellen)
         return Extrem(kleinst=min(werte, key=lambda w: w[1]),

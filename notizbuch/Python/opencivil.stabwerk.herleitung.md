@@ -1,5 +1,5 @@
 ---
-erzeugt: 09d17b659dea
+erzeugt: f656c6e518f3
 art: modul
 tags: [modul]
 ---
@@ -96,7 +96,9 @@ def lagerkraefte(p: Protokoll, befund: 'Systembefund', fall, groessen: Sequence[
 def extremwerte(p: Protokoll, verlaeufe, groessen: Sequence[Tuple[str, str, str, float, int]]=EXTREMWERTE_DER_EBENE, durchbiegungen: Sequence[str]=(IN_DER_EBENE['w'],)) -> None
 ```
 
-Kleinster und groesster Wert je Stab -- dazu die groesste der `durchbiegungen` (Felder).
+Kleinster und groesster Wert je Stab -- dazu die massgebende der
+`durchbiegungen` (Felder) ueber alle Staebe, wie der Bildschirm sie
+zeigt ([[opencivil.stabwerk.verlauf#grenzwerte|grenzwerte]]).
 
 ### gleichgewicht
 

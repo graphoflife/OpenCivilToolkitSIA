@@ -325,6 +325,9 @@ class TestFuerDieOberflaeche(unittest.TestCase):
                          [0.0, 0.0, 10.0, 0.0, -40.0, 0.0])
         extrem = daten["uebersicht"]["faelle"][0]["staebe"]["L1"]["M_y"]
         self.assertAlmostEqual(extrem["kleinst"][1], -40.0)
+        grenzen = daten["uebersicht"]["faelle"][0]["grenzen"]
+        self.assertEqual(grenzen["M_y"]["massgebend"],
+                         {"stab": "L1", "x": extrem["kleinst"][0], "wert": extrem["kleinst"][1]})
 
     def test_verlauf_im_raum(self):
         antwort = dienst.bearbeite("balkensystem_verlauf",
@@ -337,6 +340,7 @@ class TestFuerDieOberflaeche(unittest.TestCase):
         ende = stab["proben"][-1]
         uz = -10e3 * 4.0 ** 3 / (3 * 210000e6 * 100e-6) * 1e3
         self.assertAlmostEqual(ende["u"][2], uz, places=6)
+        self.assertAlmostEqual(verlauf["groesste_verschiebung"], -uz, places=6)
         self.assertAlmostEqual(stab["proben"][0]["M_y"], -40.0, places=6)
         knoten = verlauf["knoten"]["K2"]
         self.assertEqual(knoten["lage"], [4.0, 0.0, 0.0])

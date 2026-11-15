@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f2393279846
+erzeugt: b9ac293cbc4f
 art: modul
 tags: [modul]
 ---
@@ -15,11 +15,13 @@ Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm, mrad, Stellen in m:
 
 * mit jeder Rechnung eine knappe Uebersicht ([[opencivil.web.balkendaten#uebersicht|uebersicht]]): die
   Meldungen mit den Elementen, die sie betreffen, die Knoten ohne
-  Drehsteifigkeit, und je Fall die Extremwerte und die Lagerkraefte;
+  Drehsteifigkeit, und je Fall die Extremwerte je Stab, die Grenzwerte
+  ueber alle ([[opencivil.stabwerk.verlauf#grenzwerte|grenzwerte]]) und die
+  Lagerkraefte;
 * auf Anfrage die Verlaeufe eines Falls fuer die Bilder ([[opencivil.web.balkendaten#verlauf|verlauf]]):
   je Stab seine Lage und Proben der Schnittgroessen und der Verschiebung,
   je Knoten seine Verschiebung und Drehung -- oder dass seine Drehung nicht
-  bestimmbar ist;
+  bestimmbar ist --, und die groesste Verschiebung;
 * je Querschnitt sein Umriss fuer das Bildchen in seiner Zeile
   ([[opencivil.web.balkendaten#umrisse|umrisse]]);
 * im Raum je Linie ihre Achsen ([[opencivil.web.balkendaten#stabachsen|stabachsen]]), fuer die gestrichelte
@@ -121,13 +123,25 @@ def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]
 Was die Oberflaeche nach jeder Rechnung von einem System weiss -- ohne
 die Verlaeufe. Ohne Befund lief es nicht, etwa weil ein Baustoff fehlt.
 
+### _fall
+
+```python
+def _fall(befund: Systembefund, d: Darstellung, fall: Fall) -> Dict[str, Any]
+```
+
+Je Stab und Groesse der kleinste, der groesste und der massgebende Wert
+als `[x, Wert]`, je Groesse dieselben ueber alle Staebe mit dem Stab --
+und die Lagerkraefte.
+
 ### verlauf
 
 ```python
 def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]
 ```
 
-Die Bilder eines Falls: je Stab die Proben, je Knoten Verschiebung und Drehung.
+Die Bilder eines Falls: je Stab die Proben, je Knoten Verschiebung und
+Drehung, und die groesste Verschiebung in mm -- genau, nicht aus den
+Proben ([[opencivil.stabwerk.verlauf#Stabverlauf.groesste_verschiebung|groesste_verschiebung]]).
 
 ### faelle
 

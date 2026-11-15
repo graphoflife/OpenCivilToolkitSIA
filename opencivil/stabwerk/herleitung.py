@@ -31,7 +31,7 @@ from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import dicht
 from opencivil.stabwerk.modell import Halt, Stablast, System
 from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Ergebnis, Fall
-from opencivil.stabwerk.verlauf import IN_DER_EBENE
+from opencivil.stabwerk.verlauf import IN_DER_EBENE, grenzwerte, nach_betrag
 from opencivil.stabwerk3d import stab as st3
 
 if TYPE_CHECKING:
@@ -294,28 +294,31 @@ EXTREMWERTE_DER_EBENE = tuple((IN_DER_EBENE[g], g, *rest) for g, *rest in (
 def extremwerte(p: Protokoll, verlaeufe,
                 groessen: Sequence[Tuple[str, str, str, float, int]] = EXTREMWERTE_DER_EBENE,
                 durchbiegungen: Sequence[str] = (IN_DER_EBENE["w"],)) -> None:
-    """Kleinster und groesster Wert je Stab -- dazu die groesste der ``durchbiegungen`` (Felder)."""
+    """
+    Kleinster und groesster Wert je Stab -- dazu die massgebende der
+    ``durchbiegungen`` (Felder) ueber alle Staebe, wie der Bildschirm sie
+    zeigt (:func:`~opencivil.stabwerk.verlauf.grenzwerte`).
+    """
+    extreme = {feld: {name: v.extrem(feld) for name, v in verlaeufe.items()}
+               for feld, *_ in groessen}
     zeilen = []
-    massgebend: Tuple[float, str, float, str] = (0.0, "", 0.0, "")
-    for name, v in verlaeufe.items():
+    for name in verlaeufe:
         for feld, zeichen, einheit, faktor, stellen in groessen:
-            extrem = v.extrem(feld)
-            (x0, klein), (x1, gross) = extrem.kleinst, extrem.groesst
+            (x0, klein), (x1, gross) = extreme[feld][name].kleinst, extreme[feld][name].groesst
             zeilen.append([name, Mathe(zeichen),
                            Mathe(f"{fest(klein * faktor, stellen)}\\ \\mathrm{{{einheit}}}"),
                            Mathe(fest(x0, 2)),
                            Mathe(f"{fest(gross * faktor, stellen)}\\ \\mathrm{{{einheit}}}"),
                            Mathe(fest(x1, 2))])
-            if feld in durchbiegungen:
-                for x, w in ((x0, klein), (x1, gross)):
-                    if abs(w) > abs(massgebend[0]):
-                        massgebend = (w, name, x, zeichen)
     p.tabelle(["Stab", "Grösse", "kleinst", Mathe(r"x\ [\mathrm{m}]"), "grösst",
                Mathe(r"x\ [\mathrm{m}]")], zeilen, titel="Extremwerte")
-    w, name, x, zeichen = massgebend
-    if name and abs(w) > 0.0:
-        p.text(f"Grösste Durchbiegung gegen die Sehne eines Stabs: {name}, "
-               f"{zeichen} = {w * 1e3:.2f} mm bei x = {x:.2f} m.")
+    zeichen = {feld: z for feld, z, *_ in groessen}
+    massgebend = {feld: grenzwerte(extreme[feld]).massgebend for feld in durchbiegungen}
+    feld = max(massgebend, key=lambda f: nach_betrag(massgebend[f].wert))
+    w = massgebend[feld]
+    if abs(w.wert) > 0.0:
+        p.text(f"Grösste Durchbiegung gegen die Sehne eines Stabs: {w.stab}, "
+               f"{zeichen[feld]} = {w.wert * 1e3:.2f} mm bei x = {w.x:.2f} m.")
 
 
 #: Die Summen der Gleichgewichtsprobe in der Ebene, in der Folge des Rechenkerns.

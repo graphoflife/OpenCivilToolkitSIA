@@ -175,8 +175,8 @@ nachgeprüft. Urteil: umbauen, bevor weiter darauf gebaut wird. Gerechnet
 wird richtig, aber den gebetteten Stab lösen drei Programme, und Regeln des
 Kerns stehen ein zweites Mal im JS. Empfohlene Reihenfolge: 1, dann 3a und
 3b, dann 2 -- vor Knicken oder 2. Ordnung am Pfahl; der Rest, wenn dort
-ohnehin gearbeitet wird. Punkt 1 ist erledigt (unten unter «Erledigt
-zuletzt»).
+ohnehin gearbeitet wird. Die Punkte 1 und 3a sind erledigt (unten unter
+«Erledigt zuletzt»).
 
 - [ ] **2. Der Pfahl löst den gebetteten Stab ein drittes Mal.**
       `pfahl/bettung.py` nummeriert, baut zusammen, löst und integriert die
@@ -190,14 +190,6 @@ zuletzt»).
       `ebener_verlauf` mit linear wachsender Bettung (Polynom mal Polynom
       gibt es), `bettung.py` ruft es, eine Teilungsregel für beide. Gross,
       nach 1: der Pfahl als lotrechter Stab eines ebenen Systems.
-- [ ] **3a. Die Oberfläche rechnet Ergebnisse.** Die Grenzwerte über alle
-      Stäbe, die massgebende Durchbiegung und die grösste Verschiebung
-      rechnet `bs_diagramme.js` selbst (277, 284, 517–527, 582). Die
-      Durchbiegung mit einer anderen Regel als die Herleitung
-      (`extremwerte`): bei gleichem Betrag nach oben und unten zeigt die
-      Tabelle den positiven Wert, der Bericht den negativen. Die grösste
-      Verschiebung kommt aus den Proben des Bilds. Umbau: der Kern liefert
-      alle drei je Fall.
 - [ ] **3b. Die Seite der gestrichelten Faser steht noch zweimal im JS**
       -- und mit ihr das Vorzeichen von M: `linienachsen` in
       `bs_zeichnung.js`, `zugseite` in `bs_teile.js`. Im Kern steht sie seit
@@ -1020,6 +1012,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-15, Punkt 3a: die Grenzwerte über
+alle Stäbe, die massgebende Durchbiegung und die grösste Verschiebung kommen
+aus dem Kern (`grenzwerte`, `Extrem.massgebend`,
+`Stabverlauf.groesste_verschiebung`) · eine Regel für «massgebend» in
+Bericht und Bildschirm (`nach_betrag`) · die grösste Verschiebung genau
+statt aus den Proben des Bilds ·
 
 Aus der Strukturdurchsicht vom 2026-11-15, Punkt 1: ein Rechenkern für
 Ebene und Raum (`stabwerk/system.py`); was die Ebene anders macht, steht in

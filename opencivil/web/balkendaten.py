@@ -8,11 +8,13 @@ Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm, mrad, Stellen in m:
 
 * mit jeder Rechnung eine knappe Uebersicht (:func:`uebersicht`): die
   Meldungen mit den Elementen, die sie betreffen, die Knoten ohne
-  Drehsteifigkeit, und je Fall die Extremwerte und die Lagerkraefte;
+  Drehsteifigkeit, und je Fall die Extremwerte je Stab, die Grenzwerte
+  ueber alle (:func:`~opencivil.stabwerk.verlauf.grenzwerte`) und die
+  Lagerkraefte;
 * auf Anfrage die Verlaeufe eines Falls fuer die Bilder (:func:`verlauf`):
   je Stab seine Lage und Proben der Schnittgroessen und der Verschiebung,
   je Knoten seine Verschiebung und Drehung -- oder dass seine Drehung nicht
-  bestimmbar ist;
+  bestimmbar ist --, und die groesste Verschiebung;
 * je Querschnitt sein Umriss fuer das Bildchen in seiner Zeile
   (:func:`umrisse`);
 * im Raum je Linie ihre Achsen (:func:`stabachsen`), fuer die gestrichelte
@@ -46,7 +48,7 @@ from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, MRAD
 from opencivil.stabwerk import art
 from opencivil.stabwerk.rechnung import Stabwerksrechnung, Systembefund
 from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Fall
-from opencivil.stabwerk.verlauf import IN_DER_EBENE
+from opencivil.stabwerk.verlauf import IN_DER_EBENE, Grenzwert, grenzwerte
 from opencivil.stabwerk3d import stab as st3
 from opencivil.stabwerk3d.modell import System as Raumsystem
 from opencivil.stabwerk3d.raum import TOLERANZ
@@ -187,18 +189,27 @@ def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
 
 
 def _fall(befund: Systembefund, d: Darstellung, fall: Fall) -> Dict[str, Any]:
-    staebe = {}
-    for name, v in befund.verlaeufe(fall.name).items():
-        extrem = {}
-        for groesse, anzeige in d.groessen.items():
-            e = v.extrem(d.feld(groesse))
-            extrem[groesse] = {"kleinst": [e.kleinst[0], anzeige.zahl(e.kleinst[1])],
-                               "groesst": [e.groesst[0], anzeige.zahl(e.groesst[1])]}
-        staebe[name] = extrem
+    """
+    Je Stab und Groesse der kleinste, der groesste und der massgebende Wert
+    als ``[x, Wert]``, je Groesse dieselben ueber alle Staebe mit dem Stab --
+    und die Lagerkraefte.
+    """
+    verlaeufe = befund.verlaeufe(fall.name)
+    staebe: Dict[str, Dict[str, Any]] = {name: {} for name in verlaeufe}
+    grenzen = {}
+    for groesse, anzeige in d.groessen.items():
+        extreme = {name: v.extrem(d.feld(groesse)) for name, v in verlaeufe.items()}
+        for name, e in extreme.items():
+            staebe[name][groesse] = {wo: [x, anzeige.zahl(w)] for wo, (x, w) in (
+                ("kleinst", e.kleinst), ("groesst", e.groesst), ("massgebend", e.massgebend))}
+        g = grenzwerte(extreme)
+        grenzen[groesse] = {wo: _grenzwert(w, anzeige) for wo, w in (
+            ("kleinst", g.kleinst), ("groesst", g.groesst), ("massgebend", g.massgebend))}
     return {
         "name": fall.name,
         "kombination": fall.kombination,
         "staebe": staebe,
+        "grenzen": grenzen,
         # Dieselben Zeilen wie in der Herleitung -- mit den Summen von
         # Linienlager und Bettung, sonst gingen die Kraefte nicht auf.
         "lagerkraefte": [
@@ -208,12 +219,21 @@ def _fall(befund: Systembefund, d: Darstellung, fall: Fall) -> Dict[str, Any]:
     }
 
 
+def _grenzwert(w: Grenzwert, anzeige: Anzeigegroesse) -> Dict[str, Any]:
+    return {"stab": w.stab, "x": w.x, "wert": anzeige.zahl(w.wert)}
+
+
 def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]:
-    """Die Bilder eines Falls: je Stab die Proben, je Knoten Verschiebung und Drehung."""
+    """
+    Die Bilder eines Falls: je Stab die Proben, je Knoten Verschiebung und
+    Drehung, und die groesste Verschiebung in mm -- genau, nicht aus den
+    Proben (:meth:`~opencivil.stabwerk.verlauf.Stabverlauf.groesste_verschiebung`).
+    """
     d = _darstellung(befund)
     fall = befund.ergebnis.fall(name)
+    verlaeufe = befund.verlaeufe(name)
     staebe = {}
-    for stab, v in befund.verlaeufe(name).items():
+    for stab, v in verlaeufe.items():
         staebe[stab] = {
             "L": v.L, **d.lage(v),
             "proben": [{"x": w["x"], **{g: a.zahl(w[d.feld(g)]) for g, a in d.groessen.items()},
@@ -232,8 +252,10 @@ def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]:
                               "u": [zahl(u, MM) for u in werte[:n]],
                               "phi": None if offen else [zahl(p, MRAD) for p in werte[n:]],
                               "unbestimmt": offen}
+    groesste = max(v.groesste_verschiebung()[1] for v in verlaeufe.values())
     return {"fall": name, "kombination": fall.kombination, "staebe": staebe,
-            "knoten": knoten, "unbestimmt_text": UNBESTIMMT}
+            "knoten": knoten, "groesste_verschiebung": zahl(groesste, MM),
+            "unbestimmt_text": UNBESTIMMT}
 
 
 def faelle(befund: Optional[Systembefund]) -> List[str]:

@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Grenzwerte und grösste Verschiebung aus dem Kern
+
+Drei Ergebnisse suchte der Bildschirm der Balkensysteme bisher selbst: die
+Grenzwerte über alle Stäbe in der Zusammenfassung, die massgebende
+Durchbiegung je Stab im Verschiebungsbild und die grösste Verschiebung, auf
+die dieses Bild überhöht. Jetzt liefert sie der Kern, je Fall (Punkt 3a der
+Strukturdurchsicht vom selben Tag). Am Bildschirm stehen dieselben Zahlen,
+nachgeprüft am Rahmen der Beispiele.
+
+Warum so:
+
+- «Massgebend» heisst an genau einer Stelle, was es heisst (`nach_betrag`
+  in `stabwerk/verlauf.py`): der grösste Betrag, bei gleichem der positive
+  Wert. Die Tabelle am Bildschirm nahm bei gleichem Betrag schon den
+  positiven, der Bericht den zuerst gefundenen, oft den negativen. Jetzt
+  nennen beide denselben; in den Beispielen ändert das keinen Satz.
+- Über alle Stäbe fasst `grenzwerte` zusammen, mit Stab und Stelle; bei
+  gleichem Wert gilt der erste Stab, wie vorher am Bildschirm.
+- Die grösste Verschiebung kam aus den Proben des Bilds und lag knapp
+  daneben, wenn sie zwischen zwei Proben fiel. Ihr Quadrat u² + v² + w² ist
+  je Stück ein Polynom; sein grösster Wert steht dort, wo die Ableitung null
+  wird, oder an einer Grenze -- gesucht wie jeder andere Extremwert
+  (`Stabverlauf.groesste_verschiebung`).
+
 ## 2026-11-15 · Ein Rechenkern für Ebene und Raum
 
 Die 2D- und die 3D-Balkensysteme rechnen mit demselben Kern (Punkt 1 der
