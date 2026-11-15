@@ -1,5 +1,5 @@
 ---
-erzeugt: 71660cbd72cc
+erzeugt: e4c193c54971
 art: modul
 tags: [modul]
 ---
@@ -65,6 +65,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
 - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
 - [[opencivil.stabwerk]] – ebene Stabwerke nach der Steifigkeitsmethode.
+- [[opencivil.stabwerk3d]] – raeumliche Stabwerke nach der Steifigkeitsmethode.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
 
 ## Braucht

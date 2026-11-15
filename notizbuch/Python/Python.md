@@ -1,5 +1,5 @@
 ---
-erzeugt: 35fc5a29859a
+erzeugt: a645cddc405a
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -180,6 +180,12 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.stabquerschnitt]] – woher A und I eines Stabs kommen.
     - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
     - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.
+- [[opencivil.stabwerk3d]] – raeumliche Stabwerke nach der Steifigkeitsmethode.
+    - [[opencivil.stabwerk3d.modell]] – was gerechnet wird: das raeumliche Stabwerk in SI.
+    - [[opencivil.stabwerk3d.raum]] – Vektoren, Richtungen und Strecken im Raum.
+    - [[opencivil.stabwerk3d.stab]] – der raeumliche Stab: drei ebene in einem.
+    - [[opencivil.stabwerk3d.system]] – das raeumliche Stabwerk: Unbekannte, Zusammenbau, Loesen.
+    - [[opencivil.stabwerk3d.verlauf]] – Schnittgroessen und Biegelinien laengs eines Stabs im Raum.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
     - [[opencivil.web.anzeige]] – Zahlen und Zeilen, wie die Oberflaeche sie zeigt.
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.

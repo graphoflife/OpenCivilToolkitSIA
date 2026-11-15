@@ -1,5 +1,5 @@
 ---
-erzeugt: b99556b8d0d8
+erzeugt: 59628cc07491
 art: modul
 tags: [modul]
 ---
@@ -282,16 +282,16 @@ class System
 - `lastfaelle: List[Lastfall] = field(default_factory=list)`
 - `kombinationen: List[Kombination] = field(default_factory=list)`
 
-#### System.kombiniert
+### kombiniert
 
 ```python
-def kombiniert(self, kombination: Kombination) -> Lastfall
+def kombiniert(lastfaelle: Sequence[Lastfall], kombination: Kombination) -> Lastfall
 ```
 
 Eine Kombination als Lastfall: jede Last ihres Lastfalls mal dessen
-Beiwert. So laeuft sie durch dieselbe Rechnung wie ein Lastfall --
-und weil alles linear ist, ist das Ergebnis die Summe der mit ihren
-Beiwerten gewichteten Lastfaelle.
+Beiwert. So laeuft sie durch dieselbe Rechnung wie ein Lastfall -- und
+weil alles linear ist, ist das Ergebnis die Summe der mit ihren Beiwerten
+gewichteten Lastfaelle. Eben wie raeumlich: eine Last kann `mal`.
 
 
 ## Konstanten
@@ -310,4 +310,7 @@ Beiwerten gewichteten Lastfaelle.
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk3d.modell]]
+- [[opencivil.stabwerk3d.stab]]
+- [[opencivil.stabwerk3d.system]]
 - [[opencivil.web.api]]

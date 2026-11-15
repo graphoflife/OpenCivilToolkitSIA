@@ -1,5 +1,5 @@
 ---
-erzeugt: 45ddd5c5188f
+erzeugt: a7a90704a5a2
 art: modul
 tags: [modul]
 ---
@@ -201,14 +201,16 @@ def verlaeufe(fall) -> Dict[str, Stabverlauf]
 
 Je Stab sein Verlauf in diesem Fall -- aus den Teilstaeben, der Reihe nach.
 
-### teilverlauf
+### ebener_verlauf
 
 ```python
-def teilverlauf(teil) -> List[Intervall]
+def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float], lasten: Sequence[st.Teillast], EA: float, EI: float, k_quer: float=0.0, k_laengs: float=0.0, laengs: bool=True, biegung: bool=True) -> List[Intervall]
 ```
 
-Die Intervalle eines Teilstabs, in x ab dem Anfang seines Stabs -- aus
-den Kraeften und Verschiebungen seiner Enden und seinen Lasten.
+Die Intervalle eines Teilstabs der Laenge `L`, in x ab dem Anfang
+seines Stabs (`x0`) -- aus den Kraeften `s` und Verschiebungen `d`
+seiner Enden und seinen Lasten. Auch der raeumliche Stab rechnet so, je
+Ebene einmal ([[opencivil.stabwerk3d.stab]]).
 
 ### _hermite
 
@@ -247,3 +249,4 @@ def _schieben(p: Polynom, um: float) -> Polynom
 
 - [[opencivil.decke.traeger]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk3d.verlauf]]

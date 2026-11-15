@@ -33,7 +33,7 @@ Stellen zurueck.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from opencivil.core.wahl import Wahl
 
@@ -243,18 +243,19 @@ class System:
     lastfaelle: List[Lastfall] = field(default_factory=list)
     kombinationen: List[Kombination] = field(default_factory=list)
 
-    def kombiniert(self, kombination: Kombination) -> Lastfall:
-        """
-        Eine Kombination als Lastfall: jede Last ihres Lastfalls mal dessen
-        Beiwert. So laeuft sie durch dieselbe Rechnung wie ein Lastfall --
-        und weil alles linear ist, ist das Ergebnis die Summe der mit ihren
-        Beiwerten gewichteten Lastfaelle.
-        """
-        nach_name = {f.name: f for f in self.lastfaelle}
-        lasten: List[Last] = []
-        for name, faktor in kombination.faktoren.items():
-            fall = nach_name.get(name)
-            if fall is None or not faktor:
-                continue
-            lasten.extend(last.mal(faktor) for last in fall.lasten)
-        return Lastfall(kombination.name, lasten)
+
+def kombiniert(lastfaelle: Sequence[Lastfall], kombination: Kombination) -> Lastfall:
+    """
+    Eine Kombination als Lastfall: jede Last ihres Lastfalls mal dessen
+    Beiwert. So laeuft sie durch dieselbe Rechnung wie ein Lastfall -- und
+    weil alles linear ist, ist das Ergebnis die Summe der mit ihren Beiwerten
+    gewichteten Lastfaelle. Eben wie raeumlich: eine Last kann ``mal``.
+    """
+    nach_name = {f.name: f for f in lastfaelle}
+    lasten: List[Last] = []
+    for name, faktor in kombination.faktoren.items():
+        fall = nach_name.get(name)
+        if fall is None or not faktor:
+            continue
+        lasten.extend(last.mal(faktor) for last in fall.lasten)
+    return Lastfall(kombination.name, lasten)

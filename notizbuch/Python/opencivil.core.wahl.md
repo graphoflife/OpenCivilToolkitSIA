@@ -1,5 +1,5 @@
 ---
-erzeugt: d4a7bc86d751
+erzeugt: d10bbea42fad
 art: modul
 tags: [modul]
 ---
@@ -48,3 +48,4 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.art]]
 - [[opencivil.stabwerk.modell]]
+- [[opencivil.stabwerk3d.modell]]

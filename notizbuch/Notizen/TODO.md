@@ -783,6 +783,37 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       UPE, mit t_f und r_1. Gegen eine Profiltabelle prüfen, etwa die
       Stahlbautabellen des SZS.
 
+### 3D-Balkensysteme
+
+- [ ] **Ein Gelenk löst im Raum alle drei Momente, nach Vorgabe**
+      (`stabwerk3d/system.py`). Biegung um beide Achsen und Torsion, wie ein
+      Kugelgelenk; ein Stab mit Gelenken an beiden Enden trägt darum keine
+      Torsion, und ein Moment um seine Achse ist ein Fehler. So rechnet ein
+      Fachwerk aus Gelenkstäben wie in der Ebene. Hielte das Gelenk die
+      Torsion, wäre jedes solche Fachwerk beweglich: seine Knoten drehten
+      sich ohne Widerstand. Ein Anschluss mit Fahnenblech hält die Torsion
+      aber oft fest, er wirkt als Gabel. Dafür bräuchte es ein Gelenk, das
+      nur die Biegung löst. Entscheid des Benutzers: so lassen, oder die Art
+      je Gelenk wählbar machen.
+- [ ] **Die Achsen des Stabs und das Vorzeichen von M_z, nach Vorgabe**
+      (`stabwerk3d/stab.py`, `stabwerk3d/verlauf.py`). Die z-Achse des Stabs
+      zeigt nach unten, in der lotrechten Ebene durch ihn; bei einem
+      lotrechten Stab ist y die Achse -y des Systems. M_y und M_z ziehen
+      beide an der positiven Seite ihrer Achse, wie das Moment des
+      2D-Balkensystems an der gestrichelten Faser: σ = N/A + M_y·z/I_y +
+      M_z·y/I_z. Nach der Rechtsschraube hätte M_z das andere Vorzeichen;
+      manche Programme rechnen so. Prüfen, ob es so bleiben soll.
+- [ ] **Torsion nur nach St. Venant, nach Vorgabe.** Die Wölbkrafttorsion
+      fehlt (I_w), und der Schubmittelpunkt liegt auf der Stabachse. Beim
+      U-Profil liegt er in Wirklichkeit neben dem Steg: eine Last durch den
+      Schwerpunkt verdreht es. Gerechnet wird, als täte sie das nicht.
+- [ ] **Ein Lager hält nur in den Achsen des Systems.** Ein einfacher
+      Balken auf zwei gelenkigen Lagern braucht eine Gabel, ein Lager, das
+      die Drehung um seine Achse festhält. Sonst ist er beweglich, und die
+      Meldung sagt es. Liegt der Balken schief im Grundriss, hält eine Gabel
+      um x oder y auch einen Teil seiner Biegung fest. Schiefe Lager fehlen,
+      wie in der Ebene.
+
 ## Noch nicht gebaut
 
 - [ ] **Stahlprofile, was fehlt:** L, INP, T, HEAA und die warmgefertigten

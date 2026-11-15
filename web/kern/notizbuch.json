@@ -7261,7 +7261,7 @@
         "Lastfall",
         "Kombination",
         "System",
-        "System.kombiniert"
+        "kombiniert"
       ]
     },
     {
@@ -7415,6 +7415,7 @@
         "_basis",
         "rechnen",
         "_ende",
+        "lastbereich",
         "_lokal",
         "_resultierende",
         "_summe_der_lasten"
@@ -7440,10 +7441,129 @@
         "Stabverlauf.extremstellen",
         "Stabverlauf.extrem",
         "verlaeufe",
-        "teilverlauf",
+        "ebener_verlauf",
         "_hermite",
         "_verschoben",
         "_schieben"
+      ]
+    },
+    {
+      "name": "opencivil.stabwerk3d",
+      "pfad": "Python/opencivil.stabwerk3d.md",
+      "art": "modul",
+      "kurz": "raeumliche Stabwerke nach der Steifigkeitsmethode.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.stabwerk3d.modell",
+      "pfad": "Python/opencivil.stabwerk3d.modell.md",
+      "art": "modul",
+      "kurz": "was gerechnet wird: das raeumliche Stabwerk in SI.",
+      "stichworte": [
+        "Richtung",
+        "Richtung.beschriftung",
+        "Richtung.im_system",
+        "Richtung.vektor",
+        "Richtung.projektion",
+        "Knoten",
+        "Lager",
+        "Lager.verschiebungen",
+        "Lager.drehungen",
+        "Stab",
+        "Stablast",
+        "Stablast.mal",
+        "Knotenlast",
+        "Knotenlast.mal",
+        "System"
+      ]
+    },
+    {
+      "name": "opencivil.stabwerk3d.raum",
+      "pfad": "Python/opencivil.stabwerk3d.raum.md",
+      "art": "modul",
+      "kurz": "Vektoren, Richtungen und Strecken im Raum.",
+      "stichworte": [
+        "skalar",
+        "kreuz",
+        "mal",
+        "plus",
+        "minus",
+        "betrag",
+        "punkt",
+        "im_system",
+        "addiere",
+        "orthonormal",
+        "in_achsen",
+        "stelle_auf",
+        "kreuzen"
+      ]
+    },
+    {
+      "name": "opencivil.stabwerk3d.stab",
+      "pfad": "Python/opencivil.stabwerk3d.stab.md",
+      "art": "modul",
+      "kurz": "der raeumliche Stab: drei ebene in einem.",
+      "stichworte": [
+        "achsen",
+        "steifigkeit",
+        "bettung",
+        "Lasten",
+        "Lasten.dazu",
+        "Lasten.mit_torsion",
+        "strecke",
+        "punkt",
+        "aufteilen",
+        "knotenlasten",
+        "eben",
+        "lokal",
+        "resultierende"
+      ]
+    },
+    {
+      "name": "opencivil.stabwerk3d.system",
+      "pfad": "Python/opencivil.stabwerk3d.system.md",
+      "art": "modul",
+      "kurz": "das raeumliche Stabwerk: Unbekannte, Zusammenbau, Loesen.",
+      "stichworte": [
+        "Ort",
+        "Ort.punkt",
+        "Ort.gehalten",
+        "Teilstab",
+        "Teilstab.L",
+        "Teilstab.EA",
+        "Teilstab.EI_y",
+        "Teilstab.EI_z",
+        "Teilstab.GI_T",
+        "Teilstab.gesperrt",
+        "Teilstab.lokal",
+        "Teilstab.bettungsmatrix",
+        "Teilergebnis",
+        "Fall",
+        "Ergebnis",
+        "Ergebnis.gueltig",
+        "Ergebnis.fall",
+        "Ergebnis.unbestimmt",
+        "_name",
+        "_traegt_torsion",
+        "rechnen",
+        "_ende"
+      ]
+    },
+    {
+      "name": "opencivil.stabwerk3d.verlauf",
+      "pfad": "Python/opencivil.stabwerk3d.verlauf.md",
+      "art": "modul",
+      "kurz": "Schnittgroessen und Biegelinien laengs eines Stabs im Raum.",
+      "stichworte": [
+        "Intervall",
+        "_zusammen",
+        "Stabverlauf",
+        "Stabverlauf.bei",
+        "Stabverlauf.sehne",
+        "Stabverlauf.proben",
+        "Stabverlauf.extremstellen",
+        "Stabverlauf.extrem",
+        "verlaeufe"
       ]
     },
     {

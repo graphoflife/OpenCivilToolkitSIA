@@ -1,5 +1,5 @@
 ---
-erzeugt: f6dffdc57e3e
+erzeugt: 89b3caf397d1
 art: modul
 tags: [modul]
 ---
@@ -217,3 +217,5 @@ Die arbeitsgleichen Knotenkraefte `f` (6) in den Achsen des Stabs --
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk.verlauf]]
+- [[opencivil.stabwerk3d.stab]]
+- [[opencivil.stabwerk3d.system]]

@@ -59,12 +59,12 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import Profilmatrix, Zerlegung, nummerierung
 from opencivil.stabwerk.modell import (
-    Knotenlast, Lastart, Lastfall, Stab, Stablast, System,
+    Knotenlast, Lastart, Lastfall, Stab, Stablast, System, kombiniert,
 )
 
 #: Wie nahe ein Knoten an einem Stab liegen muss, um mit ihm verbunden zu
@@ -338,7 +338,7 @@ class _Rechnung:
         self._unbekannte()
         self._zusammenbauen()
         faelle = [(f, False) for f in system.lastfaelle]
-        faelle += [(system.kombiniert(k), True) for k in system.kombinationen]
+        faelle += [(kombiniert(system.lastfaelle, k), True) for k in system.kombinationen]
         # Eine Kombination traegt Lasten ihrer Lastfaelle: was an ihnen nicht
         # stimmt, ist dort schon gemeldet.
         rechte = [self._rechte_seite(fall, melden=not kombination)
@@ -814,10 +814,11 @@ def _ende(ort: Ort, c: float, s: float, gelenk: bool, gelenkindex: Optional[int]
     return [u, v, theta]
 
 
-def _lokal(last: Stablast, L: float, c: float, s: float):
+def lastbereich(last, L: float) -> Union[Tuple[float, float], str]:
     """
-    Eine Last des Modells in den Achsen ihres Stabs -- oder ein Satz, warum
-    nicht: eine Stelle ausserhalb des Stabs.
+    Wo eine Last auf einem Stab der Laenge ``L`` liegt, ``(von, bis)`` in m
+    -- oder ein Satz, warum nicht: eine Stelle ausserhalb des Stabs. Eben wie
+    raeumlich; eine Einzellast steht bei ``von``.
     """
     von = last.von
     bis = L if last.bis is None else last.bis
@@ -825,11 +826,21 @@ def _lokal(last: Stablast, L: float, c: float, s: float):
         if von < -TOLERANZ or bis > L + TOLERANZ or bis < von - TOLERANZ:
             return (f"die Last reicht von {von:g} bis {bis:g} m, der Stab ist aber "
                     f"{L:.3f} m lang.")
-        von, bis = max(0.0, von), min(L, bis)
-    elif von < -TOLERANZ or von > L + TOLERANZ:
+        return max(0.0, von), min(L, bis)
+    if von < -TOLERANZ or von > L + TOLERANZ:
         return f"die Last steht bei {von:g} m, der Stab ist aber {L:.3f} m lang."
-    else:
-        von = min(max(von, 0.0), L)
+    return min(max(von, 0.0), L), bis
+
+
+def _lokal(last: Stablast, L: float, c: float, s: float):
+    """
+    Eine Last des Modells in den Achsen ihres Stabs -- oder ein Satz, warum
+    nicht: eine Stelle ausserhalb des Stabs.
+    """
+    bereich = lastbereich(last, L)
+    if isinstance(bereich, str):
+        return bereich
+    von, bis = bereich
     wert_a = last.wert_a
     wert_b = last.wert_a if last.wert_b is None else last.wert_b
     if last.art.kraft:

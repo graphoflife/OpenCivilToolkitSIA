@@ -254,29 +254,33 @@ def verlaeufe(fall) -> Dict[str, Stabverlauf]:
             verlauf = heraus[t.stab.name] = Stabverlauf(
                 stab=t.stab.name, L=t.L_stab, c=t.c, s=t.s,
                 x_a=t.a.x - t.c * t.x0, z_a=t.a.z - t.s * t.x0)
-        verlauf.intervalle.extend(teilverlauf(teil))
+        verlauf.intervalle.extend(ebener_verlauf(
+            L=t.L, x0=t.x0, s=teil.s, d=teil.d, lasten=teil.lasten, EA=t.EA, EI=t.EI,
+            k_quer=t.k_quer, k_laengs=t.k_laengs, laengs=t.laengs, biegung=t.biegung))
     for verlauf in heraus.values():
         verlauf.intervalle.sort(key=lambda i: (i.x0, i.x1))
     return heraus
 
 
-def teilverlauf(teil) -> List[Intervall]:
+def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float],
+                   lasten: Sequence[st.Teillast], EA: float, EI: float, k_quer: float = 0.0,
+                   k_laengs: float = 0.0, laengs: bool = True,
+                   biegung: bool = True) -> List[Intervall]:
     """
-    Die Intervalle eines Teilstabs, in x ab dem Anfang seines Stabs -- aus
-    den Kraeften und Verschiebungen seiner Enden und seinen Lasten.
+    Die Intervalle eines Teilstabs der Laenge ``L``, in x ab dem Anfang
+    seines Stabs (``x0``) -- aus den Kraeften ``s`` und Verschiebungen ``d``
+    seiner Enden und seinen Lasten. Auch der raeumliche Stab rechnet so, je
+    Ebene einmal (:mod:`opencivil.stabwerk3d.stab`).
     """
-    t = teil.teil
-    L, x0 = t.L, t.x0
-    s, d = teil.s, teil.d
-    strecken = [l for l in teil.lasten if isinstance(l, st.Strecke) and l.b > l.a]
-    punkte = [l for l in teil.lasten if isinstance(l, st.Punkt)]
+    strecken = [l for l in lasten if isinstance(l, st.Strecke) and l.b > l.a]
+    punkte = [l for l in lasten if isinstance(l, st.Punkt)]
     grenzen = sorted({0.0, L} | {g for l in strecken for g in (l.a, l.b) if 0.0 < g < L}
                      | {p.a for p in punkte if 0.0 < p.a < L})
 
     # Die Biegelinie der Enden -- fuer die Bettung.
-    if t.k_quer:
+    if k_quer:
         hermite = _hermite(L, d[1], d[2], d[4], d[5])
-    if t.k_laengs:
+    if k_laengs:
         gerade = Polynom.durch(0.0, d[0], L, d[3])
 
     N0, V0, M0 = -s[0], s[1], -s[2]
@@ -294,23 +298,23 @@ def teilverlauf(teil) -> List[Intervall]:
                 px = px + Polynom.durch(l.a, l.px_a, l.b, l.px_b)
                 py = py + Polynom.durch(l.a, l.py_a, l.b, l.py_b)
                 m = m + Polynom.durch(l.a, l.m_a, l.b, l.m_b)
-        if t.k_quer:
-            py = py + (-t.k_quer) * hermite
-        if t.k_laengs:
-            px = px + (-t.k_laengs) * gerade
-        if not t.laengs:
+        if k_quer:
+            py = py + (-k_quer) * hermite
+        if k_laengs:
+            px = px + (-k_laengs) * gerade
+        if not laengs:
             px = NULL
-        if not t.biegung:
+        if not biegung:
             py, m = NULL, NULL
         N = Polynom((N0,)) - px.stammfunktion(xa)
         V = Polynom((V0,)) + py.stammfunktion(xa)
         M = Polynom((M0,)) + (V - m).stammfunktion(xa)
-        if not t.laengs:
+        if not laengs:
             N = NULL
-        if not t.biegung:
+        if not biegung:
             V, M = NULL, NULL
-        u = Polynom((u0,)) + (N * (1.0 / t.EA)).stammfunktion(xa)
-        theta = Polynom((th0,)) + (M * (1.0 / t.EI)).stammfunktion(xa)
+        u = Polynom((u0,)) + (N * (1.0 / EA)).stammfunktion(xa)
+        theta = Polynom((th0,)) + (M * (1.0 / EI)).stammfunktion(xa)
         v = Polynom((v0,)) + theta.stammfunktion(xa)
         heraus.append(Intervall(xa, xb, N, V, M, u, v, theta, py))
         N0, V0, M0 = N(xb), V(xb), M(xb)

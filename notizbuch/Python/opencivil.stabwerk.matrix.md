@@ -1,5 +1,5 @@
 ---
-erzeugt: 17434859e772
+erzeugt: 67181a66b5f4
 art: modul
 tags: [modul]
 ---
@@ -195,3 +195,4 @@ Die volle Matrix -- fuer die Herleitung kleiner Systeme und fuer Proben.
 - [[opencivil.pfahl.bettung]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk3d.system]]

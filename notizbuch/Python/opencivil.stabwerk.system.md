@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f84c06795b7
+erzeugt: 25b5499e228b
 art: modul
 tags: [modul]
 ---
@@ -298,6 +298,16 @@ def _ende(ort: Ort, c: float, s: float, gelenk: bool, gelenkindex: Optional[int]
 
 Wie u, v und θ eines Stabendes an den Unbekannten haengen.
 
+### lastbereich
+
+```python
+def lastbereich(last, L: float) -> Union[Tuple[float, float], str]
+```
+
+Wo eine Last auf einem Stab der Laenge `L` liegt, `(von, bis)` in m
+-- oder ein Satz, warum nicht: eine Stelle ausserhalb des Stabs. Eben wie
+raeumlich; eine Einzellast steht bei `von`.
+
 ### _lokal
 
 ```python
@@ -350,5 +360,8 @@ Alle Lasten des Falls als Kraft auf das Tragwerk und Moment um den Ursprung.
 - [[opencivil.projekt.aufbau.faelle]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk3d.raum]]
+- [[opencivil.stabwerk3d.stab]]
+- [[opencivil.stabwerk3d.system]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.deckendaten]]

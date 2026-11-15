@@ -7,6 +7,44 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · 3D-Balkensysteme: der Rechenkern
+
+Ein Stabwerk im Raum lässt sich rechnen, noch ohne Oberfläche: Knoten mit
+x, y und z, Stäbe mit EA, EI_y, EI_z, GI_T und einem Drehwinkel, Lager
+und Federn in allen sechs Richtungen, Gelenke, Bettung und feste
+Linienlager quer in y und z und längs. Heraus kommen N, V_y, V_z, T, M_y
+und M_z längs jedes Stabs, die Biegelinie und die Lagerkräfte. Ein Kragarm
+um die Ecke, 3 m in x und 2 m in y mit 20 kN am Ende, senkt sich um die
+Biegung beider Arme und um die Verdrillung des ersten: Mit EI = 50 000 kNm²
+und GI_T = 10 000 kNm² sind es 28.67 mm, davon 24.00 mm aus der Torsion.
+
+Warum so:
+
+- Ein gerader Stab im Raum besteht aus drei ebenen Stäben, die nichts
+  voneinander wissen: Biegung in x-z samt Längskraft, Biegung in x-y und
+  Torsion -- die verhält sich wie die Längskraft, mit GI_T statt EA.
+  Steifigkeit, Lasten, Bettung und Verlauf kommen darum aus dem ebenen
+  Rechenkern (`stabwerk3d/stab.py`); dafür ist der Verlauf eines ebenen
+  Stücks dort als eigene Funktion herausgelöst (`ebener_verlauf`). Ein
+  ebener Rahmen, im Raum gerechnet, gibt auf 10⁻⁸ die Zahlen des
+  2D-Balkensystems (`tests/test_stabwerk3d_system.py`).
+- Die z-Achse eines Stabs zeigt nach unten, gleich in welche Richtung er
+  läuft. So hat ein Feldmoment unter Schwerelast immer das gleiche
+  Vorzeichen. Im 2D-Balkensystem hängt die gestrichelte Faser an der
+  Richtung: Bei einem Stab nach links liegt sie oben.
+- Ein Gelenk löst alle drei Momente (TODO): Sonst wäre ein Fachwerk aus
+  Gelenkstäben beweglich, seine Knoten drehten sich ohne Widerstand. Wo
+  ein Knoten um eine Achse keine Steifigkeit hat, ist seine Drehung
+  gestrichen, wie in der Ebene, erkannt an der Verbindung.
+- Was die Torsion allein nicht hält, ist ein Mechanismus und wird
+  gemeldet: Ein Balken auf zwei Gelenklagern dreht sich ohne Gabel um
+  seine Achse. Die Meldung sagt dann, dass sich nichts verschiebt.
+- Die Geometrie im Raum hat eine eigene Datei (`stabwerk3d/raum.py`).
+  Damit bleibt die Rechnung unter 1000 Zeilen.
+- In der Ebene ist die Kombination jetzt eine Funktion (`kombiniert`), die
+  beide Rechenkerne brauchen, ebenso der Bereich einer Last
+  (`lastbereich`).
+
 ## 2026-11-15 · Balkensysteme: Stahlprofile aus der Tabelle
 
 Ein Querschnitt kann ein Stahlprofil sein: im Fenster «Querschnitt» die Art
