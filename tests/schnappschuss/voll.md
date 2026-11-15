@@ -1,6 +1,6 @@
 # Voll
 
-646 Berechnungen ausgeführt, 954 Werte bestimmt.
+726 Berechnungen ausgeführt, 1034 Werte bestimmt.
 
 ## Herleitung
 
@@ -16087,6 +16087,272 @@ $$
 I_{\text{Q10}} = 13275\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
+**Querschnittsfläche, «Träger» (HEB 300, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q11}} &= 2 \cdot b_{\text{Q11}} \cdot t_{f,\text{Q11}} + \left(h_{\text{Q11}} - 2 \cdot t_{f,\text{Q11}}\right) \cdot t_{w,\text{Q11}} + 4 \cdot 0.2146 \cdot \left(r_{\text{Q11}}\right)^{2} \\
+  &= 2 \cdot 300\,\mathrm{mm} \cdot 19\,\mathrm{mm} + \left(300\,\mathrm{mm} - 2 \cdot 19\,\mathrm{mm}\right) \cdot 11\,\mathrm{mm} + 4 \cdot 0.2146 \cdot \left(27\,\mathrm{mm}\right)^{2} \\
+  &= 149.08\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um y, «Träger» (HEB 300, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  I_{y,\text{Q11}} &= \frac{t_{w,\text{Q11}} \cdot \left(h_{\text{Q11}} - 2 \cdot t_{f,\text{Q11}}\right)^{3}}{12} + \frac{b_{\text{Q11}} \cdot \left(t_{f,\text{Q11}}\right)^{3}}{6} + \frac{b_{\text{Q11}} \cdot t_{f,\text{Q11}} \cdot \left(h_{\text{Q11}} - t_{f,\text{Q11}}\right)^{2}}{2} + 4 \cdot \left(0.00755 \cdot \left(r_{\text{Q11}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q11}}\right)^{2} \cdot \left(\frac{h_{\text{Q11}}}{2} - t_{f,\text{Q11}} - 0.2234 \cdot r_{\text{Q11}}\right)^{2}\right) \\
+  &= \frac{11\,\mathrm{mm} \cdot \left(300\,\mathrm{mm} - 2 \cdot 19\,\mathrm{mm}\right)^{3}}{12} + \frac{300\,\mathrm{mm} \cdot \left(19\,\mathrm{mm}\right)^{3}}{6} + \frac{300\,\mathrm{mm} \cdot 19\,\mathrm{mm} \cdot \left(300\,\mathrm{mm} - 19\,\mathrm{mm}\right)^{2}}{2} + 4 \cdot \left(0.00755 \cdot \left(27\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(27\,\mathrm{mm}\right)^{2} \cdot \left(\frac{300\,\mathrm{mm}}{2} - 19\,\mathrm{mm} - 0.2234 \cdot 27\,\mathrm{mm}\right)^{2}\right) \\
+  &= 25165.66\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «HEA 200 um y» (HEA 200, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q12}} &= 2 \cdot b_{\text{Q12}} \cdot t_{f,\text{Q12}} + \left(h_{\text{Q12}} - 2 \cdot t_{f,\text{Q12}}\right) \cdot t_{w,\text{Q12}} + 4 \cdot 0.2146 \cdot \left(r_{\text{Q12}}\right)^{2} \\
+  &= 2 \cdot 200\,\mathrm{mm} \cdot 10\,\mathrm{mm} + \left(190\,\mathrm{mm} - 2 \cdot 10\,\mathrm{mm}\right) \cdot 6.5\,\mathrm{mm} + 4 \cdot 0.2146 \cdot \left(18\,\mathrm{mm}\right)^{2} \\
+  &= 53.83\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um y, «HEA 200 um y» (HEA 200, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  I_{y,\text{Q12}} &= \frac{t_{w,\text{Q12}} \cdot \left(h_{\text{Q12}} - 2 \cdot t_{f,\text{Q12}}\right)^{3}}{12} + \frac{b_{\text{Q12}} \cdot \left(t_{f,\text{Q12}}\right)^{3}}{6} + \frac{b_{\text{Q12}} \cdot t_{f,\text{Q12}} \cdot \left(h_{\text{Q12}} - t_{f,\text{Q12}}\right)^{2}}{2} + 4 \cdot \left(0.00755 \cdot \left(r_{\text{Q12}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q12}}\right)^{2} \cdot \left(\frac{h_{\text{Q12}}}{2} - t_{f,\text{Q12}} - 0.2234 \cdot r_{\text{Q12}}\right)^{2}\right) \\
+  &= \frac{6.5\,\mathrm{mm} \cdot \left(190\,\mathrm{mm} - 2 \cdot 10\,\mathrm{mm}\right)^{3}}{12} + \frac{200\,\mathrm{mm} \cdot \left(10\,\mathrm{mm}\right)^{3}}{6} + \frac{200\,\mathrm{mm} \cdot 10\,\mathrm{mm} \cdot \left(190\,\mathrm{mm} - 10\,\mathrm{mm}\right)^{2}}{2} + 4 \cdot \left(0.00755 \cdot \left(18\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(18\,\mathrm{mm}\right)^{2} \cdot \left(\frac{190\,\mathrm{mm}}{2} - 10\,\mathrm{mm} - 0.2234 \cdot 18\,\mathrm{mm}\right)^{2}\right) \\
+  &= 3692.15\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «HEA 200 um z» (HEA 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q13}} &= 2 \cdot b_{\text{Q13}} \cdot t_{f,\text{Q13}} + \left(h_{\text{Q13}} - 2 \cdot t_{f,\text{Q13}}\right) \cdot t_{w,\text{Q13}} + 4 \cdot 0.2146 \cdot \left(r_{\text{Q13}}\right)^{2} \\
+  &= 2 \cdot 200\,\mathrm{mm} \cdot 10\,\mathrm{mm} + \left(190\,\mathrm{mm} - 2 \cdot 10\,\mathrm{mm}\right) \cdot 6.5\,\mathrm{mm} + 4 \cdot 0.2146 \cdot \left(18\,\mathrm{mm}\right)^{2} \\
+  &= 53.83\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um z, «HEA 200 um z» (HEA 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  I_{z,\text{Q13}} &= \frac{t_{f,\text{Q13}} \cdot \left(b_{\text{Q13}}\right)^{3}}{6} + \frac{\left(h_{\text{Q13}} - 2 \cdot t_{f,\text{Q13}}\right) \cdot \left(t_{w,\text{Q13}}\right)^{3}}{12} + 4 \cdot \left(0.00755 \cdot \left(r_{\text{Q13}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q13}}\right)^{2} \cdot \left(\frac{t_{w,\text{Q13}}}{2} + 0.2234 \cdot r_{\text{Q13}}\right)^{2}\right) \\
+  &= \frac{10\,\mathrm{mm} \cdot \left(200\,\mathrm{mm}\right)^{3}}{6} + \frac{\left(190\,\mathrm{mm} - 2 \cdot 10\,\mathrm{mm}\right) \cdot \left(6.5\,\mathrm{mm}\right)^{3}}{12} + 4 \cdot \left(0.00755 \cdot \left(18\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(18\,\mathrm{mm}\right)^{2} \cdot \left(\frac{6.5\,\mathrm{mm}}{2} + 0.2234 \cdot 18\,\mathrm{mm}\right)^{2}\right) \\
+  &= 1335.51\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «UPE 200 um y» (UPE 200, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q14}} &= h_{\text{Q14}} \cdot t_{w,\text{Q14}} + 2 \cdot \left(b_{\text{Q14}} - t_{w,\text{Q14}}\right) \cdot t_{f,\text{Q14}} + 2 \cdot 0.2146 \cdot \left(r_{\text{Q14}}\right)^{2} \\
+  &= 200\,\mathrm{mm} \cdot 6\,\mathrm{mm} + 2 \cdot \left(80\,\mathrm{mm} - 6\,\mathrm{mm}\right) \cdot 11\,\mathrm{mm} + 2 \cdot 0.2146 \cdot \left(13\,\mathrm{mm}\right)^{2} \\
+  &= 29.01\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um y, «UPE 200 um y» (UPE 200, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  I_{y,\text{Q14}} &= \frac{t_{w,\text{Q14}} \cdot \left(h_{\text{Q14}}\right)^{3}}{12} + \frac{\left(b_{\text{Q14}} - t_{w,\text{Q14}}\right) \cdot \left(t_{f,\text{Q14}}\right)^{3}}{6} + \frac{\left(b_{\text{Q14}} - t_{w,\text{Q14}}\right) \cdot t_{f,\text{Q14}} \cdot \left(h_{\text{Q14}} - t_{f,\text{Q14}}\right)^{2}}{2} + 2 \cdot \left(0.00755 \cdot \left(r_{\text{Q14}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q14}}\right)^{2} \cdot \left(\frac{h_{\text{Q14}}}{2} - t_{f,\text{Q14}} - 0.2234 \cdot r_{\text{Q14}}\right)^{2}\right) \\
+  &= \frac{6\,\mathrm{mm} \cdot \left(200\,\mathrm{mm}\right)^{3}}{12} + \frac{\left(80\,\mathrm{mm} - 6\,\mathrm{mm}\right) \cdot \left(11\,\mathrm{mm}\right)^{3}}{6} + \frac{\left(80\,\mathrm{mm} - 6\,\mathrm{mm}\right) \cdot 11\,\mathrm{mm} \cdot \left(200\,\mathrm{mm} - 11\,\mathrm{mm}\right)^{2}}{2} + 2 \cdot \left(0.00755 \cdot \left(13\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(13\,\mathrm{mm}\right)^{2} \cdot \left(\frac{200\,\mathrm{mm}}{2} - 11\,\mathrm{mm} - 0.2234 \cdot 13\,\mathrm{mm}\right)^{2}\right) \\
+  &= 1909.3\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «UPE 200 um z» (UPE 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q15}} &= h_{\text{Q15}} \cdot t_{w,\text{Q15}} + 2 \cdot \left(b_{\text{Q15}} - t_{w,\text{Q15}}\right) \cdot t_{f,\text{Q15}} + 2 \cdot 0.2146 \cdot \left(r_{\text{Q15}}\right)^{2} \\
+  &= 200\,\mathrm{mm} \cdot 6\,\mathrm{mm} + 2 \cdot \left(80\,\mathrm{mm} - 6\,\mathrm{mm}\right) \cdot 11\,\mathrm{mm} + 2 \cdot 0.2146 \cdot \left(13\,\mathrm{mm}\right)^{2} \\
+  &= 29.01\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Abstand des Schwerpunkts vom Rücken, «UPE 200 um z» (UPE 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  e_{y,\text{Q15}} &= \frac{h_{\text{Q15}} \cdot \left(t_{w,\text{Q15}}\right)^{2} / 2 + 2 \cdot \left(b_{\text{Q15}} - t_{w,\text{Q15}}\right) \cdot t_{f,\text{Q15}} \cdot \frac{b_{\text{Q15}} + t_{w,\text{Q15}}}{2} + 2 \cdot 0.2146 \cdot \left(r_{\text{Q15}}\right)^{2} \cdot \left(t_{w,\text{Q15}} + 0.2234 \cdot r_{\text{Q15}}\right)}{A_{\text{Q15}}} \\
+  &= \frac{200\,\mathrm{mm} \cdot \left(6\,\mathrm{mm}\right)^{2} / 2 + 2 \cdot \left(80\,\mathrm{mm} - 6\,\mathrm{mm}\right) \cdot 11\,\mathrm{mm} \cdot \frac{80\,\mathrm{mm} + 6\,\mathrm{mm}}{2} + 2 \cdot 0.2146 \cdot \left(13\,\mathrm{mm}\right)^{2} \cdot \left(6\,\mathrm{mm} + 0.2234 \cdot 13\,\mathrm{mm}\right)}{29.01\,\mathrm{cm}^{2}} \\
+  &= 25.6\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um z, «UPE 200 um z» (UPE 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  I_{z,\text{Q15}} &= \frac{h_{\text{Q15}} \cdot \left(t_{w,\text{Q15}}\right)^{3}}{12} + \frac{t_{f,\text{Q15}} \cdot \left(b_{\text{Q15}} - t_{w,\text{Q15}}\right)^{3}}{6} + h_{\text{Q15}} \cdot t_{w,\text{Q15}} \cdot \left(e_{y,\text{Q15}} - \frac{t_{w,\text{Q15}}}{2}\right)^{2} + 2 \cdot \left(b_{\text{Q15}} - t_{w,\text{Q15}}\right) \cdot t_{f,\text{Q15}} \cdot \left(\frac{b_{\text{Q15}} + t_{w,\text{Q15}}}{2} - e_{y,\text{Q15}}\right)^{2} + 2 \cdot \left(0.00755 \cdot \left(r_{\text{Q15}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q15}}\right)^{2} \cdot \left(t_{w,\text{Q15}} + 0.2234 \cdot r_{\text{Q15}} - e_{y,\text{Q15}}\right)^{2}\right) \\
+  &= \frac{200\,\mathrm{mm} \cdot \left(6\,\mathrm{mm}\right)^{3}}{12} + \frac{11\,\mathrm{mm} \cdot \left(80\,\mathrm{mm} - 6\,\mathrm{mm}\right)^{3}}{6} + 200\,\mathrm{mm} \cdot 6\,\mathrm{mm} \cdot \left(25.6\,\mathrm{mm} - \frac{6\,\mathrm{mm}}{2}\right)^{2} + 2 \cdot \left(80\,\mathrm{mm} - 6\,\mathrm{mm}\right) \cdot 11\,\mathrm{mm} \cdot \left(\frac{80\,\mathrm{mm} + 6\,\mathrm{mm}}{2} - 25.6\,\mathrm{mm}\right)^{2} + 2 \cdot \left(0.00755 \cdot \left(13\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(13\,\mathrm{mm}\right)^{2} \cdot \left(6\,\mathrm{mm} + 0.2234 \cdot 13\,\mathrm{mm} - 25.6\,\mathrm{mm}\right)^{2}\right) \\
+  &= 187.3\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Flanschdicke am Steg, «UNP 200 um y» (UNP 200, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  t_{1,\text{Q16}} &= t_{f,\text{Q16}} + p_{\text{Q16}} \cdot \left(c_{\text{Q16}} - t_{w,\text{Q16}}\right) \\
+  &= 11.5\,\mathrm{mm} + 8\,\% \cdot \left(37.5\,\mathrm{mm} - 8.5\,\mathrm{mm}\right) \\
+  &= 13.82\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Flanschdicke an der Spitze, «UNP 200 um y» (UNP 200, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  t_{2,\text{Q16}} &= t_{f,\text{Q16}} - p_{\text{Q16}} \cdot \left(b_{\text{Q16}} - c_{\text{Q16}}\right) \\
+  &= 11.5\,\mathrm{mm} - 8\,\% \cdot \left(75\,\mathrm{mm} - 37.5\,\mathrm{mm}\right) \\
+  &= 8.5\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «UNP 200 um y» (UNP 200, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q16}} &= b_{\text{Q16}} \cdot h_{\text{Q16}} - \left(b_{\text{Q16}} - t_{w,\text{Q16}}\right) \cdot \left(h_{\text{Q16}} - t_{1,\text{Q16}} - t_{2,\text{Q16}}\right) + 2 \cdot 0.2146 \cdot \left(\left(r_{1,\text{Q16}}\right)^{2} - \left(r_{2,\text{Q16}}\right)^{2}\right) \\
+  &= 75\,\mathrm{mm} \cdot 200\,\mathrm{mm} - \left(75\,\mathrm{mm} - 8.5\,\mathrm{mm}\right) \cdot \left(200\,\mathrm{mm} - 13.82\,\mathrm{mm} - 8.5\,\mathrm{mm}\right) + 2 \cdot 0.2146 \cdot \left(\left(11.5\,\mathrm{mm}\right)^{2} - \left(6\,\mathrm{mm}\right)^{2}\right) \\
+  &= 32.26\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um y, «UNP 200 um y» (UNP 200, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  I_{y,\text{Q16}} &= \frac{b_{\text{Q16}} \cdot \left(h_{\text{Q16}}\right)^{3}}{12} - \frac{\left(b_{\text{Q16}} - t_{w,\text{Q16}}\right) \cdot \left(h_{\text{Q16}} - t_{1,\text{Q16}} - t_{2,\text{Q16}}\right) \cdot \left(\left(h_{\text{Q16}} - 2 \cdot t_{1,\text{Q16}}\right)^{2} + \left(h_{\text{Q16}} - 2 \cdot t_{2,\text{Q16}}\right)^{2}\right)}{24} + 2 \cdot \left(0.00755 \cdot \left(r_{1,\text{Q16}}\right)^{4} + 0.2146 \cdot \left(r_{1,\text{Q16}}\right)^{2} \cdot \left(\frac{h_{\text{Q16}}}{2} - t_{1,\text{Q16}} - 0.2234 \cdot r_{1,\text{Q16}}\right)^{2}\right) - 2 \cdot \left(0.00755 \cdot \left(r_{2,\text{Q16}}\right)^{4} + 0.2146 \cdot \left(r_{2,\text{Q16}}\right)^{2} \cdot \left(\frac{h_{\text{Q16}}}{2} - t_{2,\text{Q16}} + 0.2234 \cdot r_{2,\text{Q16}}\right)^{2}\right) \\
+  &= \frac{75\,\mathrm{mm} \cdot \left(200\,\mathrm{mm}\right)^{3}}{12} - \frac{\left(75\,\mathrm{mm} - 8.5\,\mathrm{mm}\right) \cdot \left(200\,\mathrm{mm} - 13.82\,\mathrm{mm} - 8.5\,\mathrm{mm}\right) \cdot \left(\left(200\,\mathrm{mm} - 2 \cdot 13.82\,\mathrm{mm}\right)^{2} + \left(200\,\mathrm{mm} - 2 \cdot 8.5\,\mathrm{mm}\right)^{2}\right)}{24} + 2 \cdot \left(0.00755 \cdot \left(11.5\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(11.5\,\mathrm{mm}\right)^{2} \cdot \left(\frac{200\,\mathrm{mm}}{2} - 13.82\,\mathrm{mm} - 0.2234 \cdot 11.5\,\mathrm{mm}\right)^{2}\right) - 2 \cdot \left(0.00755 \cdot \left(6\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(6\,\mathrm{mm}\right)^{2} \cdot \left(\frac{200\,\mathrm{mm}}{2} - 8.5\,\mathrm{mm} + 0.2234 \cdot 6\,\mathrm{mm}\right)^{2}\right) \\
+  &= 1915.06\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Flanschdicke am Steg, «UNP 200 um z» (UNP 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  t_{1,\text{Q17}} &= t_{f,\text{Q17}} + p_{\text{Q17}} \cdot \left(c_{\text{Q17}} - t_{w,\text{Q17}}\right) \\
+  &= 11.5\,\mathrm{mm} + 8\,\% \cdot \left(37.5\,\mathrm{mm} - 8.5\,\mathrm{mm}\right) \\
+  &= 13.82\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Flanschdicke an der Spitze, «UNP 200 um z» (UNP 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  t_{2,\text{Q17}} &= t_{f,\text{Q17}} - p_{\text{Q17}} \cdot \left(b_{\text{Q17}} - c_{\text{Q17}}\right) \\
+  &= 11.5\,\mathrm{mm} - 8\,\% \cdot \left(75\,\mathrm{mm} - 37.5\,\mathrm{mm}\right) \\
+  &= 8.5\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «UNP 200 um z» (UNP 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q17}} &= b_{\text{Q17}} \cdot h_{\text{Q17}} - \left(b_{\text{Q17}} - t_{w,\text{Q17}}\right) \cdot \left(h_{\text{Q17}} - t_{1,\text{Q17}} - t_{2,\text{Q17}}\right) + 2 \cdot 0.2146 \cdot \left(\left(r_{1,\text{Q17}}\right)^{2} - \left(r_{2,\text{Q17}}\right)^{2}\right) \\
+  &= 75\,\mathrm{mm} \cdot 200\,\mathrm{mm} - \left(75\,\mathrm{mm} - 8.5\,\mathrm{mm}\right) \cdot \left(200\,\mathrm{mm} - 13.82\,\mathrm{mm} - 8.5\,\mathrm{mm}\right) + 2 \cdot 0.2146 \cdot \left(\left(11.5\,\mathrm{mm}\right)^{2} - \left(6\,\mathrm{mm}\right)^{2}\right) \\
+  &= 32.26\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Abstand des Schwerpunkts vom Rücken, «UNP 200 um z» (UNP 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  e_{y,\text{Q17}} &= \frac{\left(b_{\text{Q17}}\right)^{2} \cdot h_{\text{Q17}} / 2 - \frac{b_{\text{Q17}} - t_{w,\text{Q17}}}{6} \cdot \left(t_{w,\text{Q17}} \cdot \left(3 \cdot h_{\text{Q17}} - 4 \cdot t_{1,\text{Q17}} - 2 \cdot t_{2,\text{Q17}}\right) + b_{\text{Q17}} \cdot \left(3 \cdot h_{\text{Q17}} - 2 \cdot t_{1,\text{Q17}} - 4 \cdot t_{2,\text{Q17}}\right)\right) + 2 \cdot 0.2146 \cdot \left(r_{1,\text{Q17}}\right)^{2} \cdot \left(t_{w,\text{Q17}} + 0.2234 \cdot r_{1,\text{Q17}}\right) - 2 \cdot 0.2146 \cdot \left(r_{2,\text{Q17}}\right)^{2} \cdot \left(b_{\text{Q17}} - 0.2234 \cdot r_{2,\text{Q17}}\right)}{A_{\text{Q17}}} \\
+  &= \frac{\left(75\,\mathrm{mm}\right)^{2} \cdot 200\,\mathrm{mm} / 2 - \frac{75\,\mathrm{mm} - 8.5\,\mathrm{mm}}{6} \cdot \left(8.5\,\mathrm{mm} \cdot \left(3 \cdot 200\,\mathrm{mm} - 4 \cdot 13.82\,\mathrm{mm} - 2 \cdot 8.5\,\mathrm{mm}\right) + 75\,\mathrm{mm} \cdot \left(3 \cdot 200\,\mathrm{mm} - 2 \cdot 13.82\,\mathrm{mm} - 4 \cdot 8.5\,\mathrm{mm}\right)\right) + 2 \cdot 0.2146 \cdot \left(11.5\,\mathrm{mm}\right)^{2} \cdot \left(8.5\,\mathrm{mm} + 0.2234 \cdot 11.5\,\mathrm{mm}\right) - 2 \cdot 0.2146 \cdot \left(6\,\mathrm{mm}\right)^{2} \cdot \left(75\,\mathrm{mm} - 0.2234 \cdot 6\,\mathrm{mm}\right)}{32.26\,\mathrm{cm}^{2}} \\
+  &= 20.1\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um z, «UNP 200 um z» (UNP 200, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  I_{z,\text{Q17}} &= \frac{\left(b_{\text{Q17}}\right)^{3} \cdot h_{\text{Q17}}}{3} - \frac{b_{\text{Q17}} - t_{w,\text{Q17}}}{12} \cdot \left(\left(h_{\text{Q17}} - 2 \cdot t_{1,\text{Q17}}\right) \cdot \left(3 \cdot \left(t_{w,\text{Q17}}\right)^{2} + 2 \cdot t_{w,\text{Q17}} \cdot b_{\text{Q17}} + \left(b_{\text{Q17}}\right)^{2}\right) + \left(h_{\text{Q17}} - 2 \cdot t_{2,\text{Q17}}\right) \cdot \left(\left(t_{w,\text{Q17}}\right)^{2} + 2 \cdot t_{w,\text{Q17}} \cdot b_{\text{Q17}} + 3 \cdot \left(b_{\text{Q17}}\right)^{2}\right)\right) + 2 \cdot \left(0.00755 \cdot \left(r_{1,\text{Q17}}\right)^{4} + 0.2146 \cdot \left(r_{1,\text{Q17}}\right)^{2} \cdot \left(t_{w,\text{Q17}} + 0.2234 \cdot r_{1,\text{Q17}}\right)^{2}\right) - 2 \cdot \left(0.00755 \cdot \left(r_{2,\text{Q17}}\right)^{4} + 0.2146 \cdot \left(r_{2,\text{Q17}}\right)^{2} \cdot \left(b_{\text{Q17}} - 0.2234 \cdot r_{2,\text{Q17}}\right)^{2}\right) - A_{\text{Q17}} \cdot \left(e_{y,\text{Q17}}\right)^{2} \\
+  &= \frac{\left(75\,\mathrm{mm}\right)^{3} \cdot 200\,\mathrm{mm}}{3} - \frac{75\,\mathrm{mm} - 8.5\,\mathrm{mm}}{12} \cdot \left(\left(200\,\mathrm{mm} - 2 \cdot 13.82\,\mathrm{mm}\right) \cdot \left(3 \cdot \left(8.5\,\mathrm{mm}\right)^{2} + 2 \cdot 8.5\,\mathrm{mm} \cdot 75\,\mathrm{mm} + \left(75\,\mathrm{mm}\right)^{2}\right) + \left(200\,\mathrm{mm} - 2 \cdot 8.5\,\mathrm{mm}\right) \cdot \left(\left(8.5\,\mathrm{mm}\right)^{2} + 2 \cdot 8.5\,\mathrm{mm} \cdot 75\,\mathrm{mm} + 3 \cdot \left(75\,\mathrm{mm}\right)^{2}\right)\right) + 2 \cdot \left(0.00755 \cdot \left(11.5\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(11.5\,\mathrm{mm}\right)^{2} \cdot \left(8.5\,\mathrm{mm} + 0.2234 \cdot 11.5\,\mathrm{mm}\right)^{2}\right) - 2 \cdot \left(0.00755 \cdot \left(6\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(6\,\mathrm{mm}\right)^{2} \cdot \left(75\,\mathrm{mm} - 0.2234 \cdot 6\,\mathrm{mm}\right)^{2}\right) - 32.26\,\mathrm{cm}^{2} \cdot \left(20.1\,\mathrm{mm}\right)^{2} \\
+  &= 147.08\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «RRK 200 x 100 x 8 um y» (RRK 200 x 100 x 8, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q18}} &= 2 \cdot t_{\text{Q18}} \cdot \left(h_{\text{Q18}} + b_{\text{Q18}} - 2 \cdot t_{\text{Q18}}\right) - 4 \cdot 0.2146 \cdot \left(\left(r_{o,\text{Q18}}\right)^{2} - \left(r_{i,\text{Q18}}\right)^{2}\right) \\
+  &= 2 \cdot 8\,\mathrm{mm} \cdot \left(200\,\mathrm{mm} + 100\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right) - 4 \cdot 0.2146 \cdot \left(\left(20\,\mathrm{mm}\right)^{2} - \left(12\,\mathrm{mm}\right)^{2}\right) \\
+  &= 43.24\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um y, «RRK 200 x 100 x 8 um y» (RRK 200 x 100 x 8, um y, die starke Achse)**
+
+$$
+\begin{aligned}
+  I_{y,\text{Q18}} &= \frac{b_{\text{Q18}} \cdot \left(h_{\text{Q18}}\right)^{3} - \left(b_{\text{Q18}} - 2 \cdot t_{\text{Q18}}\right) \cdot \left(h_{\text{Q18}} - 2 \cdot t_{\text{Q18}}\right)^{3}}{12} - 4 \cdot \left(0.00755 \cdot \left(r_{o,\text{Q18}}\right)^{4} + 0.2146 \cdot \left(r_{o,\text{Q18}}\right)^{2} \cdot \left(\frac{h_{\text{Q18}}}{2} - 0.2234 \cdot r_{o,\text{Q18}}\right)^{2}\right) + 4 \cdot \left(0.00755 \cdot \left(r_{i,\text{Q18}}\right)^{4} + 0.2146 \cdot \left(r_{i,\text{Q18}}\right)^{2} \cdot \left(\frac{h_{\text{Q18}}}{2} - t_{\text{Q18}} - 0.2234 \cdot r_{i,\text{Q18}}\right)^{2}\right) \\
+  &= \frac{100\,\mathrm{mm} \cdot \left(200\,\mathrm{mm}\right)^{3} - \left(100\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right) \cdot \left(200\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right)^{3}}{12} - 4 \cdot \left(0.00755 \cdot \left(20\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(20\,\mathrm{mm}\right)^{2} \cdot \left(\frac{200\,\mathrm{mm}}{2} - 0.2234 \cdot 20\,\mathrm{mm}\right)^{2}\right) + 4 \cdot \left(0.00755 \cdot \left(12\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(12\,\mathrm{mm}\right)^{2} \cdot \left(\frac{200\,\mathrm{mm}}{2} - 8\,\mathrm{mm} - 0.2234 \cdot 12\,\mathrm{mm}\right)^{2}\right) \\
+  &= 2090.85\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «RRK 200 x 100 x 8 um z» (RRK 200 x 100 x 8, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q19}} &= 2 \cdot t_{\text{Q19}} \cdot \left(h_{\text{Q19}} + b_{\text{Q19}} - 2 \cdot t_{\text{Q19}}\right) - 4 \cdot 0.2146 \cdot \left(\left(r_{o,\text{Q19}}\right)^{2} - \left(r_{i,\text{Q19}}\right)^{2}\right) \\
+  &= 2 \cdot 8\,\mathrm{mm} \cdot \left(200\,\mathrm{mm} + 100\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right) - 4 \cdot 0.2146 \cdot \left(\left(20\,\mathrm{mm}\right)^{2} - \left(12\,\mathrm{mm}\right)^{2}\right) \\
+  &= 43.24\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um z, «RRK 200 x 100 x 8 um z» (RRK 200 x 100 x 8, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  I_{z,\text{Q19}} &= \frac{h_{\text{Q19}} \cdot \left(b_{\text{Q19}}\right)^{3} - \left(h_{\text{Q19}} - 2 \cdot t_{\text{Q19}}\right) \cdot \left(b_{\text{Q19}} - 2 \cdot t_{\text{Q19}}\right)^{3}}{12} - 4 \cdot \left(0.00755 \cdot \left(r_{o,\text{Q19}}\right)^{4} + 0.2146 \cdot \left(r_{o,\text{Q19}}\right)^{2} \cdot \left(\frac{b_{\text{Q19}}}{2} - 0.2234 \cdot r_{o,\text{Q19}}\right)^{2}\right) + 4 \cdot \left(0.00755 \cdot \left(r_{i,\text{Q19}}\right)^{4} + 0.2146 \cdot \left(r_{i,\text{Q19}}\right)^{2} \cdot \left(\frac{b_{\text{Q19}}}{2} - t_{\text{Q19}} - 0.2234 \cdot r_{i,\text{Q19}}\right)^{2}\right) \\
+  &= \frac{200\,\mathrm{mm} \cdot \left(100\,\mathrm{mm}\right)^{3} - \left(200\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right) \cdot \left(100\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right)^{3}}{12} - 4 \cdot \left(0.00755 \cdot \left(20\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(20\,\mathrm{mm}\right)^{2} \cdot \left(\frac{100\,\mathrm{mm}}{2} - 0.2234 \cdot 20\,\mathrm{mm}\right)^{2}\right) + 4 \cdot \left(0.00755 \cdot \left(12\,\mathrm{mm}\right)^{4} + 0.2146 \cdot \left(12\,\mathrm{mm}\right)^{2} \cdot \left(\frac{100\,\mathrm{mm}}{2} - 8\,\mathrm{mm} - 0.2234 \cdot 12\,\mathrm{mm}\right)^{2}\right) \\
+  &= 705.36\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  A_{\text{Q20}} &= \frac{\pi \cdot \left(\left(D_{\text{Q20}}\right)^{2} - \left(D_{\text{Q20}} - 2 \cdot t_{\text{Q20}}\right)^{2}\right)}{4} \\
+  &= \frac{\pi \cdot \left(\left(219.1\,\mathrm{mm}\right)^{2} - \left(219.1\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right)^{2}\right)}{4} \\
+  &= 53.06\,\mathrm{cm}^{2}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um y, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)**
+
+$$
+\begin{aligned}
+  I_{y,\text{Q20}} &= \frac{\pi \cdot \left(\left(D_{\text{Q20}}\right)^{4} - \left(D_{\text{Q20}} - 2 \cdot t_{\text{Q20}}\right)^{4}\right)}{64} \\
+  &= \frac{\pi \cdot \left(\left(219.1\,\mathrm{mm}\right)^{4} - \left(219.1\,\mathrm{mm} - 2 \cdot 8\,\mathrm{mm}\right)^{4}\right)}{64} \\
+  &= 2959.63\,\mathrm{cm}^{4}
+\end{aligned}
+$$
+
+**Flächenträgheitsmoment um z, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)**
+
+$$
+I_{z,\text{Q20}} = I_{y,\text{Q20}} = 2959.63\,\mathrm{cm}^{4}
+$$
+
 **Normalkraft für E\_eq, «Deckenstreifen»**
 
 $$
@@ -16221,22 +16487,22 @@ $$
 g_{k,\text{Q3,S355}} = \rho_a \cdot g \cdot A_{\text{Q3}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 4973\,\mathrm{mm}^{2} = 0.39\,\mathrm{kN}/\mathrm{m}
 $$
 
-**Dehnsteifigkeit, «Walzprofil» aus S355**
+**Dehnsteifigkeit, «Träger» aus S355**
 
 $$
-EA_{\text{Q6,S355}} = E_a \cdot A_{\text{Q6}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14282\,\mathrm{mm}^{2} = 2999\,\mathrm{MN}
+EA_{\text{Q11,S355}} = E_a \cdot A_{\text{Q11}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 149.08\,\mathrm{cm}^{2} = 3131\,\mathrm{MN}
 $$
 
-**Biegesteifigkeit, «Walzprofil» aus S355**
+**Biegesteifigkeit, «Träger» aus S355**
 
 $$
-EI_{\text{Q6,S355}} = E_a \cdot I_{\text{Q6}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4} = 50792\,\mathrm{kNm}^{2}
+EI_{\text{Q11,S355}} = E_a \cdot I_{y,\text{Q11}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 25165.66\,\mathrm{cm}^{4} = 52848\,\mathrm{kNm}^{2}
 $$
 
-**Eigengewicht, «Walzprofil» aus S355**
+**Eigengewicht, «Träger» aus S355**
 
 $$
-g_{k,\text{Q6,S355}} = \rho_a \cdot g \cdot A_{\text{Q6}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 14282\,\mathrm{mm}^{2} = 1.12\,\mathrm{kN}/\mathrm{m}
+g_{k,\text{Q11,S355}} = \rho_a \cdot g \cdot A_{\text{Q11}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 149.08\,\mathrm{cm}^{2} = 1.17\,\mathrm{kN}/\mathrm{m}
 $$
 
 **E-Modul, «Fundamentbeton» (von Hand)**
@@ -16335,7 +16601,7 @@ $$
 | L2 | K2 – K3 | $3.000$ | $90.0$ | Rundstütze | $4225$ | $42248$ | – | – |
 | L3 | K3 – K4 | $4.472$ | $26.6$ | Plattenbalken | $12103$ | $322750$ | – | – |
 | L4 | K4 – K5 | $5.000$ | $-90.0$ | Rohr | $1044$ | $3284$ | beide | – |
-| L5 | K5 – K6 | $3.000$ | $0.0$ | Walzprofil | $2999$ | $50792$ | Anfang | – |
+| L5 | K5 – K6 | $3.000$ | $0.0$ | Träger | $3131$ | $52848$ | Anfang | – |
 | L6 | K6 – K7 | $2.000$ | $0.0$ | Fundamentbalken | $3750$ | $77083$ | – | quer fest |
 | L7 | K7 – K8 | $1.000$ | $-90.0$ | kein Stab | – | – | – | quer fest |
 | L8 | K6 – K9 | $2.000$ | $90.0$ | Hohlprofil | $2494$ | $30810$ | – | – |
@@ -16420,7 +16686,7 @@ $$
 | L2 | $-36.5$ | $0.0$ | $12.9$ | $-27.1$ | $0.0$ | $12.9$ |
 | L3 | $-12.1$ | $24.2$ | $7.9$ | $13.9$ | $-27.8$ | $0.0$ |
 | L4 | $-31.0$ | $0.0$ | $0.0$ | $-33.0$ | $0.0$ | $0.0$ |
-| L5 | $0.0$ | $1.3$ | $0.0$ | $0.0$ | $-2.1$ | $-1.3$ |
+| L5 | $0.0$ | $1.3$ | $0.0$ | $0.0$ | $-2.2$ | $-1.3$ |
 | L6 | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
 | L8 | $-18.4$ | $0.0$ | $-16.5$ | $-16.5$ | $0.0$ | $-16.5$ |
 | L9 | $0.0$ | $16.5$ | $-16.5$ | $0.0$ | $0.0$ | $0.0$ |
@@ -16431,7 +16697,7 @@ $$
 | ---: | ---: | ---: | ---: |
 | A1 (K1) | $0.0$ | $7.9$ | $1.4$ |
 | A2 (K5) | $0.0$ | $34.3$ | $0.0$ |
-| K6 | $0.0$ | $20.5$ | $15.2$ |
+| K6 | $0.0$ | $20.6$ | $15.2$ |
 | K7 | $0.0$ | $0.0$ | $0.0$ |
 | L6: Lasten geradewegs ins Linienlager | $0.0$ | $32.5$ | $520.0$ |
 | L1: Bettung, Summe | $0.0$ | $138.6$ | $755.3$ |
@@ -16459,7 +16725,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L4 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $5.00$ |
 | L4 | $w$ | $0.00\ \mathrm{mm}$ | $5.00$ | $0.00\ \mathrm{mm}$ | $3.54$ |
 | L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L5 | $V$ | $-2.1\ \mathrm{kN}$ | $3.00$ | $1.3\ \mathrm{kN}$ | $0.00$ |
+| L5 | $V$ | $-2.2\ \mathrm{kN}$ | $3.00$ | $1.3\ \mathrm{kN}$ | $0.00$ |
 | L5 | $M$ | $-1.3\ \mathrm{kNm}$ | $3.00$ | $0.7\ \mathrm{kNm}$ | $1.12$ |
 | L5 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.01\ \mathrm{mm}$ | $1.26$ |
 | L6 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
@@ -16482,8 +16748,8 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -0.59 mm bei x = 4.97
 |  | Lasten | Lager | Summe |  |
 | ---: | ---: | ---: | ---: | ---: |
 | $\sum F_x$ | $0.000$ | $0.000$ | $0.000$ | kN |
-| $\sum F_z$ | $-233.742$ | $233.742$ | $0.000$ | kN |
-| $\sum M_0$ | $-2009.904$ | $2009.904$ | $0.000$ | kNm |
+| $\sum F_z$ | $-233.890$ | $233.890$ | $0.000$ | kN |
+| $\sum M_0$ | $-2011.894$ | $2011.894$ | $0.000$ | kNm |
 
 #### Lastfall «Schnee und Wind»
 
@@ -16599,7 +16865,7 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -0.36 mm bei x = 5.53
 | L2 | $-49.7$ | $27.0$ | $-11.2$ | $-37.0$ | $15.0$ | $51.8$ |
 | L3 | $-16.5$ | $33.1$ | $45.1$ | $26.6$ | $-53.2$ | $0.0$ |
 | L4 | $-59.5$ | $0.0$ | $0.0$ | $-62.1$ | $0.0$ | $0.0$ |
-| L5 | $0.0$ | $4.0$ | $0.0$ | $0.0$ | $-0.6$ | $-1.0$ |
+| L5 | $0.0$ | $4.0$ | $0.0$ | $0.0$ | $-0.7$ | $-1.0$ |
 | L6 | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
 | L8 | $-24.8$ | $0.0$ | $-22.3$ | $-22.3$ | $0.0$ | $-22.3$ |
 | L9 | $0.0$ | $22.3$ | $-22.3$ | $0.0$ | $0.0$ | $0.0$ |
@@ -16609,8 +16875,8 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -0.36 mm bei x = 5.53
 | Lager | $R_x\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: |
 | A1 (K1) | $-27.0$ | $11.1$ | $1.6$ |
-| A2 (K5) | $0.0$ | $66.1$ | $0.0$ |
-| K6 | $0.0$ | $25.4$ | $21.3$ |
+| A2 (K5) | $0.0$ | $66.2$ | $0.0$ |
+| K6 | $0.0$ | $25.5$ | $21.2$ |
 | K7 | $0.0$ | $0.0$ | $0.0$ |
 | L6: Lasten geradewegs ins Linienlager | $0.0$ | $43.9$ | $702.0$ |
 | L1: Bettung, Summe | $0.0$ | $187.1$ | $1051.5$ |
@@ -16638,9 +16904,9 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L4 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $5.00$ |
 | L4 | $w$ | $0.00\ \mathrm{mm}$ | $2.14$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L5 | $V$ | $-0.6\ \mathrm{kN}$ | $3.00$ | $4.0\ \mathrm{kN}$ | $0.00$ |
-| L5 | $M$ | $-1.8\ \mathrm{kNm}$ | $1.50$ | $4.2\ \mathrm{kNm}$ | $1.50$ |
-| L5 | $w$ | $0.00\ \mathrm{mm}$ | $3.00$ | $0.03\ \mathrm{mm}$ | $1.08$ |
+| L5 | $V$ | $-0.7\ \mathrm{kN}$ | $3.00$ | $4.0\ \mathrm{kN}$ | $0.00$ |
+| L5 | $M$ | $-1.7\ \mathrm{kNm}$ | $1.50$ | $4.3\ \mathrm{kNm}$ | $1.50$ |
+| L5 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.03\ \mathrm{mm}$ | $1.08$ |
 | L6 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
@@ -16661,8 +16927,8 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -1.34 mm bei x = 5.17
 |  | Lasten | Lager | Summe |  |
 | ---: | ---: | ---: | ---: | ---: |
 | $\sum F_x$ | $27.000$ | $-27.000$ | $0.000$ | kN |
-| $\sum F_z$ | $-333.552$ | $333.552$ | $0.000$ | kN |
-| $\sum M_0$ | $-2950.371$ | $2950.371$ | $0.000$ | kNm |
+| $\sum F_z$ | $-333.751$ | $333.751$ | $0.000$ | kN |
+| $\sum M_0$ | $-2953.057$ | $2953.057$ | $0.000$ | kNm |
 
 ### Baustahl: S355
 
@@ -19415,6 +19681,108 @@ $$
 I_{\text{Q7}} = \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o}\right)^{2} + 4 \cdot b_{o} \cdot b_{u} + \left(b_{u}\right)^{2}\right)}{36 \cdot \left(b_{o} + b_{u}\right)}
 $$
 
+**Querschnittsfläche, «Träger» (HEB 300, um y, die starke Achse)**
+
+$$
+A_{\text{Q11}} = 2 \cdot b_{\text{Q11}} \cdot t_{f} + \left(h_{\text{Q11}} - 2 \cdot t_{f}\right) \cdot t_{w} + 4 \cdot 0.2146 \cdot \left(r_{\text{Q11}}\right)^{2}
+$$
+
+**Flächenträgheitsmoment um y, «Träger» (HEB 300, um y, die starke Achse)**
+
+$$
+I_{y} = \frac{t_{w} \cdot \left(h_{\text{Q11}} - 2 \cdot t_{f}\right)^{3}}{12} + \frac{b_{\text{Q11}} \cdot \left(t_{f}\right)^{3}}{6} + \frac{b_{\text{Q11}} \cdot t_{f} \cdot \left(h_{\text{Q11}} - t_{f}\right)^{2}}{2} + 4 \cdot \left(0.00755 \cdot \left(r_{\text{Q11}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q11}}\right)^{2} \cdot \left(\frac{h_{\text{Q11}}}{2} - t_{f} - 0.2234 \cdot r_{\text{Q11}}\right)^{2}\right)
+$$
+
+**Flächenträgheitsmoment um z, «HEA 200 um z» (HEA 200, um z, die schwache Achse)**
+
+$$
+I_{z} = \frac{t_{f} \cdot \left(b_{\text{Q13}}\right)^{3}}{6} + \frac{\left(h_{\text{Q13}} - 2 \cdot t_{f}\right) \cdot \left(t_{w}\right)^{3}}{12} + 4 \cdot \left(0.00755 \cdot \left(r_{\text{Q13}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q13}}\right)^{2} \cdot \left(\frac{t_{w}}{2} + 0.2234 \cdot r_{\text{Q13}}\right)^{2}\right)
+$$
+
+**Querschnittsfläche, «UPE 200 um y» (UPE 200, um y, die starke Achse)**
+
+$$
+A_{\text{Q14}} = h_{\text{Q14}} \cdot t_{w} + 2 \cdot \left(b_{\text{Q14}} - t_{w}\right) \cdot t_{f} + 2 \cdot 0.2146 \cdot \left(r_{\text{Q14}}\right)^{2}
+$$
+
+**Flächenträgheitsmoment um y, «UPE 200 um y» (UPE 200, um y, die starke Achse)**
+
+$$
+I_{y} = \frac{t_{w} \cdot \left(h_{\text{Q14}}\right)^{3}}{12} + \frac{\left(b_{\text{Q14}} - t_{w}\right) \cdot \left(t_{f}\right)^{3}}{6} + \frac{\left(b_{\text{Q14}} - t_{w}\right) \cdot t_{f} \cdot \left(h_{\text{Q14}} - t_{f}\right)^{2}}{2} + 2 \cdot \left(0.00755 \cdot \left(r_{\text{Q14}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q14}}\right)^{2} \cdot \left(\frac{h_{\text{Q14}}}{2} - t_{f} - 0.2234 \cdot r_{\text{Q14}}\right)^{2}\right)
+$$
+
+**Abstand des Schwerpunkts vom Rücken, «UPE 200 um z» (UPE 200, um z, die schwache Achse)**
+
+$$
+e_{y} = \frac{h_{\text{Q15}} \cdot \left(t_{w}\right)^{2} / 2 + 2 \cdot \left(b_{\text{Q15}} - t_{w}\right) \cdot t_{f} \cdot \frac{b_{\text{Q15}} + t_{w}}{2} + 2 \cdot 0.2146 \cdot \left(r_{\text{Q15}}\right)^{2} \cdot \left(t_{w} + 0.2234 \cdot r_{\text{Q15}}\right)}{A_{\text{Q15}}}
+$$
+
+**Flächenträgheitsmoment um z, «UPE 200 um z» (UPE 200, um z, die schwache Achse)**
+
+$$
+I_{z} = \frac{h_{\text{Q15}} \cdot \left(t_{w}\right)^{3}}{12} + \frac{t_{f} \cdot \left(b_{\text{Q15}} - t_{w}\right)^{3}}{6} + h_{\text{Q15}} \cdot t_{w} \cdot \left(e_{y} - \frac{t_{w}}{2}\right)^{2} + 2 \cdot \left(b_{\text{Q15}} - t_{w}\right) \cdot t_{f} \cdot \left(\frac{b_{\text{Q15}} + t_{w}}{2} - e_{y}\right)^{2} + 2 \cdot \left(0.00755 \cdot \left(r_{\text{Q15}}\right)^{4} + 0.2146 \cdot \left(r_{\text{Q15}}\right)^{2} \cdot \left(t_{w} + 0.2234 \cdot r_{\text{Q15}} - e_{y}\right)^{2}\right)
+$$
+
+**Flanschdicke am Steg, «UNP 200 um y» (UNP 200, um y, die starke Achse)**
+
+$$
+t_{1} = t_{f} + p_{\text{Q16}} \cdot \left(c_{\text{Q16}} - t_{w}\right)
+$$
+
+**Flanschdicke an der Spitze, «UNP 200 um y» (UNP 200, um y, die starke Achse)**
+
+$$
+t_{2} = t_{f} - p_{\text{Q16}} \cdot \left(b_{\text{Q16}} - c_{\text{Q16}}\right)
+$$
+
+**Querschnittsfläche, «UNP 200 um y» (UNP 200, um y, die starke Achse)**
+
+$$
+A_{\text{Q16}} = b_{\text{Q16}} \cdot h_{\text{Q16}} - \left(b_{\text{Q16}} - t_{w}\right) \cdot \left(h_{\text{Q16}} - t_{1} - t_{2}\right) + 2 \cdot 0.2146 \cdot \left(\left(r_{1}\right)^{2} - \left(r_{2}\right)^{2}\right)
+$$
+
+**Flächenträgheitsmoment um y, «UNP 200 um y» (UNP 200, um y, die starke Achse)**
+
+$$
+I_{y} = \frac{b_{\text{Q16}} \cdot \left(h_{\text{Q16}}\right)^{3}}{12} - \frac{\left(b_{\text{Q16}} - t_{w}\right) \cdot \left(h_{\text{Q16}} - t_{1} - t_{2}\right) \cdot \left(\left(h_{\text{Q16}} - 2 \cdot t_{1}\right)^{2} + \left(h_{\text{Q16}} - 2 \cdot t_{2}\right)^{2}\right)}{24} + 2 \cdot \left(0.00755 \cdot \left(r_{1}\right)^{4} + 0.2146 \cdot \left(r_{1}\right)^{2} \cdot \left(\frac{h_{\text{Q16}}}{2} - t_{1} - 0.2234 \cdot r_{1}\right)^{2}\right) - 2 \cdot \left(0.00755 \cdot \left(r_{2}\right)^{4} + 0.2146 \cdot \left(r_{2}\right)^{2} \cdot \left(\frac{h_{\text{Q16}}}{2} - t_{2} + 0.2234 \cdot r_{2}\right)^{2}\right)
+$$
+
+**Abstand des Schwerpunkts vom Rücken, «UNP 200 um z» (UNP 200, um z, die schwache Achse)**
+
+$$
+e_{y} = \frac{\left(b_{\text{Q17}}\right)^{2} \cdot h_{\text{Q17}} / 2 - \frac{b_{\text{Q17}} - t_{w}}{6} \cdot \left(t_{w} \cdot \left(3 \cdot h_{\text{Q17}} - 4 \cdot t_{1} - 2 \cdot t_{2}\right) + b_{\text{Q17}} \cdot \left(3 \cdot h_{\text{Q17}} - 2 \cdot t_{1} - 4 \cdot t_{2}\right)\right) + 2 \cdot 0.2146 \cdot \left(r_{1}\right)^{2} \cdot \left(t_{w} + 0.2234 \cdot r_{1}\right) - 2 \cdot 0.2146 \cdot \left(r_{2}\right)^{2} \cdot \left(b_{\text{Q17}} - 0.2234 \cdot r_{2}\right)}{A_{\text{Q17}}}
+$$
+
+**Flächenträgheitsmoment um z, «UNP 200 um z» (UNP 200, um z, die schwache Achse)**
+
+$$
+I_{z} = \frac{\left(b_{\text{Q17}}\right)^{3} \cdot h_{\text{Q17}}}{3} - \frac{b_{\text{Q17}} - t_{w}}{12} \cdot \left(\left(h_{\text{Q17}} - 2 \cdot t_{1}\right) \cdot \left(3 \cdot \left(t_{w}\right)^{2} + 2 \cdot t_{w} \cdot b_{\text{Q17}} + \left(b_{\text{Q17}}\right)^{2}\right) + \left(h_{\text{Q17}} - 2 \cdot t_{2}\right) \cdot \left(\left(t_{w}\right)^{2} + 2 \cdot t_{w} \cdot b_{\text{Q17}} + 3 \cdot \left(b_{\text{Q17}}\right)^{2}\right)\right) + 2 \cdot \left(0.00755 \cdot \left(r_{1}\right)^{4} + 0.2146 \cdot \left(r_{1}\right)^{2} \cdot \left(t_{w} + 0.2234 \cdot r_{1}\right)^{2}\right) - 2 \cdot \left(0.00755 \cdot \left(r_{2}\right)^{4} + 0.2146 \cdot \left(r_{2}\right)^{2} \cdot \left(b_{\text{Q17}} - 0.2234 \cdot r_{2}\right)^{2}\right) - A_{\text{Q17}} \cdot \left(e_{y}\right)^{2}
+$$
+
+**Querschnittsfläche, «RRK 200 x 100 x 8 um y» (RRK 200 x 100 x 8, um y, die starke Achse)**
+
+$$
+A_{\text{Q18}} = 2 \cdot t_{\text{Q18}} \cdot \left(h_{\text{Q18}} + b_{\text{Q18}} - 2 \cdot t_{\text{Q18}}\right) - 4 \cdot 0.2146 \cdot \left(\left(r_{o}\right)^{2} - \left(r_{i}\right)^{2}\right)
+$$
+
+**Flächenträgheitsmoment um y, «RRK 200 x 100 x 8 um y» (RRK 200 x 100 x 8, um y, die starke Achse)**
+
+$$
+I_{y} = \frac{b_{\text{Q18}} \cdot \left(h_{\text{Q18}}\right)^{3} - \left(b_{\text{Q18}} - 2 \cdot t_{\text{Q18}}\right) \cdot \left(h_{\text{Q18}} - 2 \cdot t_{\text{Q18}}\right)^{3}}{12} - 4 \cdot \left(0.00755 \cdot \left(r_{o}\right)^{4} + 0.2146 \cdot \left(r_{o}\right)^{2} \cdot \left(\frac{h_{\text{Q18}}}{2} - 0.2234 \cdot r_{o}\right)^{2}\right) + 4 \cdot \left(0.00755 \cdot \left(r_{i}\right)^{4} + 0.2146 \cdot \left(r_{i}\right)^{2} \cdot \left(\frac{h_{\text{Q18}}}{2} - t_{\text{Q18}} - 0.2234 \cdot r_{i}\right)^{2}\right)
+$$
+
+**Flächenträgheitsmoment um z, «RRK 200 x 100 x 8 um z» (RRK 200 x 100 x 8, um z, die schwache Achse)**
+
+$$
+I_{z} = \frac{h_{\text{Q19}} \cdot \left(b_{\text{Q19}}\right)^{3} - \left(h_{\text{Q19}} - 2 \cdot t_{\text{Q19}}\right) \cdot \left(b_{\text{Q19}} - 2 \cdot t_{\text{Q19}}\right)^{3}}{12} - 4 \cdot \left(0.00755 \cdot \left(r_{o}\right)^{4} + 0.2146 \cdot \left(r_{o}\right)^{2} \cdot \left(\frac{b_{\text{Q19}}}{2} - 0.2234 \cdot r_{o}\right)^{2}\right) + 4 \cdot \left(0.00755 \cdot \left(r_{i}\right)^{4} + 0.2146 \cdot \left(r_{i}\right)^{2} \cdot \left(\frac{b_{\text{Q19}}}{2} - t_{\text{Q19}} - 0.2234 \cdot r_{i}\right)^{2}\right)
+$$
+
+**Flächenträgheitsmoment um z, «Rundrohr» (ROR 219.1 x 8, um z, die schwache Achse)**
+
+$$
+I_{z} = I_{y}
+$$
+
 **Äquivalenter E-Modul, «Deckenstreifen»**
 
 $$
@@ -20479,12 +20847,95 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Dehnsteifigkeit, Kasten, C30/37 | $EA_{\text{Q10}}$ | $1796$ | MN | berechnet |
 | Biegesteifigkeit, Kasten, C30/37 | $EI_{\text{Q10}}$ | $72234$ | kNm² | berechnet |
 | Eigengewicht je Meter, Kasten, C30/37 | $g_{k,\text{Q10}}$ | $8.25$ | kN/m | berechnet |
+| Querschnittsfläche, Träger | $A_{\text{Q11}}$ | $149.08$ | cm² | berechnet |
+| Flächenträgheitsmoment um y, Träger | $I_{y,\text{Q11}}$ | $25165.66$ | cm⁴ | berechnet |
+| Dehnsteifigkeit, Träger, S355 | $EA_{\text{Q11,S355}}$ | $3131$ | MN | berechnet |
+| Biegesteifigkeit, Träger, S355 | $EI_{\text{Q11,S355}}$ | $52848$ | kNm² | berechnet |
+| Eigengewicht je Meter, Träger, S355 | $g_{k,\text{Q11,S355}}$ | $1.17$ | kN/m | berechnet |
+| Breite, Träger | $b_{\text{Q11}}$ | $300$ | mm | Vorgabe |
+| Höhe, Träger | $h_{\text{Q11}}$ | $300$ | mm | Vorgabe |
+| Ausrundung, Träger | $r_{\text{Q11}}$ | $27$ | mm | Vorgabe |
+| Flanschdicke, Träger | $t_{f,\text{Q11}}$ | $19$ | mm | Vorgabe |
+| Stegdicke, Träger | $t_{w,\text{Q11}}$ | $11$ | mm | Vorgabe |
+| Querschnittsfläche, HEA 200 um y | $A_{\text{Q12}}$ | $53.83$ | cm² | berechnet |
+| Flächenträgheitsmoment um y, HEA 200 um y | $I_{y,\text{Q12}}$ | $3692.15$ | cm⁴ | berechnet |
+| Breite, HEA 200 um y | $b_{\text{Q12}}$ | $200$ | mm | Vorgabe |
+| Höhe, HEA 200 um y | $h_{\text{Q12}}$ | $190$ | mm | Vorgabe |
+| Ausrundung, HEA 200 um y | $r_{\text{Q12}}$ | $18$ | mm | Vorgabe |
+| Flanschdicke, HEA 200 um y | $t_{f,\text{Q12}}$ | $10$ | mm | Vorgabe |
+| Stegdicke, HEA 200 um y | $t_{w,\text{Q12}}$ | $6.5$ | mm | Vorgabe |
+| Querschnittsfläche, HEA 200 um z | $A_{\text{Q13}}$ | $53.83$ | cm² | berechnet |
+| Flächenträgheitsmoment um z, HEA 200 um z | $I_{z,\text{Q13}}$ | $1335.51$ | cm⁴ | berechnet |
+| Breite, HEA 200 um z | $b_{\text{Q13}}$ | $200$ | mm | Vorgabe |
+| Höhe, HEA 200 um z | $h_{\text{Q13}}$ | $190$ | mm | Vorgabe |
+| Ausrundung, HEA 200 um z | $r_{\text{Q13}}$ | $18$ | mm | Vorgabe |
+| Flanschdicke, HEA 200 um z | $t_{f,\text{Q13}}$ | $10$ | mm | Vorgabe |
+| Stegdicke, HEA 200 um z | $t_{w,\text{Q13}}$ | $6.5$ | mm | Vorgabe |
+| Querschnittsfläche, UPE 200 um y | $A_{\text{Q14}}$ | $29.01$ | cm² | berechnet |
+| Flächenträgheitsmoment um y, UPE 200 um y | $I_{y,\text{Q14}}$ | $1909.3$ | cm⁴ | berechnet |
+| Breite, UPE 200 um y | $b_{\text{Q14}}$ | $80$ | mm | Vorgabe |
+| Höhe, UPE 200 um y | $h_{\text{Q14}}$ | $200$ | mm | Vorgabe |
+| Ausrundung, UPE 200 um y | $r_{\text{Q14}}$ | $13$ | mm | Vorgabe |
+| Flanschdicke, UPE 200 um y | $t_{f,\text{Q14}}$ | $11$ | mm | Vorgabe |
+| Stegdicke, UPE 200 um y | $t_{w,\text{Q14}}$ | $6$ | mm | Vorgabe |
+| Querschnittsfläche, UPE 200 um z | $A_{\text{Q15}}$ | $29.01$ | cm² | berechnet |
+| Flächenträgheitsmoment um z, UPE 200 um z | $I_{z,\text{Q15}}$ | $187.3$ | cm⁴ | berechnet |
+| Breite, UPE 200 um z | $b_{\text{Q15}}$ | $80$ | mm | Vorgabe |
+| Abstand des Schwerpunkts vom Rücken, UPE 200 um z | $e_{y,\text{Q15}}$ | $25.6$ | mm | berechnet |
+| Höhe, UPE 200 um z | $h_{\text{Q15}}$ | $200$ | mm | Vorgabe |
+| Ausrundung, UPE 200 um z | $r_{\text{Q15}}$ | $13$ | mm | Vorgabe |
+| Flanschdicke, UPE 200 um z | $t_{f,\text{Q15}}$ | $11$ | mm | Vorgabe |
+| Stegdicke, UPE 200 um z | $t_{w,\text{Q15}}$ | $6$ | mm | Vorgabe |
+| Querschnittsfläche, UNP 200 um y | $A_{\text{Q16}}$ | $32.26$ | cm² | berechnet |
+| Flächenträgheitsmoment um y, UNP 200 um y | $I_{y,\text{Q16}}$ | $1915.06$ | cm⁴ | berechnet |
+| Breite, UNP 200 um y | $b_{\text{Q16}}$ | $75$ | mm | Vorgabe |
+| Abstand der Stelle von t\_f vom Rücken, UNP 200 um y | $c_{\text{Q16}}$ | $37.5$ | mm | Vorgabe |
+| Höhe, UNP 200 um y | $h_{\text{Q16}}$ | $200$ | mm | Vorgabe |
+| Neigung der Flansche, UNP 200 um y | $p_{\text{Q16}}$ | $8$ | % | Vorgabe |
+| Ausrundung am Steg, UNP 200 um y | $r_{1,\text{Q16}}$ | $11.5$ | mm | Vorgabe |
+| Rundung an der Flanschspitze, UNP 200 um y | $r_{2,\text{Q16}}$ | $6$ | mm | Vorgabe |
+| Flanschdicke am Steg, UNP 200 um y | $t_{1,\text{Q16}}$ | $13.82$ | mm | berechnet |
+| Flanschdicke an der Spitze, UNP 200 um y | $t_{2,\text{Q16}}$ | $8.5$ | mm | berechnet |
+| Flanschdicke, UNP 200 um y | $t_{f,\text{Q16}}$ | $11.5$ | mm | Vorgabe |
+| Stegdicke, UNP 200 um y | $t_{w,\text{Q16}}$ | $8.5$ | mm | Vorgabe |
+| Querschnittsfläche, UNP 200 um z | $A_{\text{Q17}}$ | $32.26$ | cm² | berechnet |
+| Flächenträgheitsmoment um z, UNP 200 um z | $I_{z,\text{Q17}}$ | $147.08$ | cm⁴ | berechnet |
+| Breite, UNP 200 um z | $b_{\text{Q17}}$ | $75$ | mm | Vorgabe |
+| Abstand der Stelle von t\_f vom Rücken, UNP 200 um z | $c_{\text{Q17}}$ | $37.5$ | mm | Vorgabe |
+| Abstand des Schwerpunkts vom Rücken, UNP 200 um z | $e_{y,\text{Q17}}$ | $20.1$ | mm | berechnet |
+| Höhe, UNP 200 um z | $h_{\text{Q17}}$ | $200$ | mm | Vorgabe |
+| Neigung der Flansche, UNP 200 um z | $p_{\text{Q17}}$ | $8$ | % | Vorgabe |
+| Ausrundung am Steg, UNP 200 um z | $r_{1,\text{Q17}}$ | $11.5$ | mm | Vorgabe |
+| Rundung an der Flanschspitze, UNP 200 um z | $r_{2,\text{Q17}}$ | $6$ | mm | Vorgabe |
+| Flanschdicke am Steg, UNP 200 um z | $t_{1,\text{Q17}}$ | $13.82$ | mm | berechnet |
+| Flanschdicke an der Spitze, UNP 200 um z | $t_{2,\text{Q17}}$ | $8.5$ | mm | berechnet |
+| Flanschdicke, UNP 200 um z | $t_{f,\text{Q17}}$ | $11.5$ | mm | Vorgabe |
+| Stegdicke, UNP 200 um z | $t_{w,\text{Q17}}$ | $8.5$ | mm | Vorgabe |
+| Querschnittsfläche, RRK 200 x 100 x 8 um y | $A_{\text{Q18}}$ | $43.24$ | cm² | berechnet |
+| Flächenträgheitsmoment um y, RRK 200 x 100 x 8 um y | $I_{y,\text{Q18}}$ | $2090.85$ | cm⁴ | berechnet |
+| Breite, RRK 200 x 100 x 8 um y | $b_{\text{Q18}}$ | $100$ | mm | Vorgabe |
+| Höhe, RRK 200 x 100 x 8 um y | $h_{\text{Q18}}$ | $200$ | mm | Vorgabe |
+| Radius innen, RRK 200 x 100 x 8 um y | $r_{i,\text{Q18}}$ | $12$ | mm | Vorgabe |
+| Radius aussen, RRK 200 x 100 x 8 um y | $r_{o,\text{Q18}}$ | $20$ | mm | Vorgabe |
+| Wanddicke, RRK 200 x 100 x 8 um y | $t_{\text{Q18}}$ | $8$ | mm | Vorgabe |
+| Querschnittsfläche, RRK 200 x 100 x 8 um z | $A_{\text{Q19}}$ | $43.24$ | cm² | berechnet |
+| Flächenträgheitsmoment um z, RRK 200 x 100 x 8 um z | $I_{z,\text{Q19}}$ | $705.36$ | cm⁴ | berechnet |
+| Breite, RRK 200 x 100 x 8 um z | $b_{\text{Q19}}$ | $100$ | mm | Vorgabe |
+| Höhe, RRK 200 x 100 x 8 um z | $h_{\text{Q19}}$ | $200$ | mm | Vorgabe |
+| Radius innen, RRK 200 x 100 x 8 um z | $r_{i,\text{Q19}}$ | $12$ | mm | Vorgabe |
+| Radius aussen, RRK 200 x 100 x 8 um z | $r_{o,\text{Q19}}$ | $20$ | mm | Vorgabe |
+| Wanddicke, RRK 200 x 100 x 8 um z | $t_{\text{Q19}}$ | $8$ | mm | Vorgabe |
 | Querschnittsfläche, Rundstütze | $A_{\text{Q2}}$ | $125664$ | mm² | berechnet |
 | Flächenträgheitsmoment, Rundstütze | $I_{\text{Q2}}$ | $1256.64$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Rundstütze, C30/37 | $EA_{\text{Q2,C30/37}}$ | $4225$ | MN | berechnet |
 | Biegesteifigkeit, Rundstütze, C30/37 | $EI_{\text{Q2,C30/37}}$ | $42248$ | kNm² | berechnet |
 | Eigengewicht je Meter, Rundstütze, C30/37 | $g_{k,\text{Q2,C30/37}}$ | $3.14$ | kN/m | berechnet |
 | Durchmesser, Rundstütze | $d_{\text{Q2}}$ | $400$ | mm | Vorgabe |
+| Querschnittsfläche, Rundrohr | $A_{\text{Q20}}$ | $53.06$ | cm² | berechnet |
+| Aussendurchmesser, Rundrohr | $D_{\text{Q20}}$ | $219.1$ | mm | Vorgabe |
+| Flächenträgheitsmoment um y, Rundrohr | $I_{y,\text{Q20}}$ | $2959.63$ | cm⁴ | berechnet |
+| Flächenträgheitsmoment um z, Rundrohr | $I_{z,\text{Q20}}$ | $2959.63$ | cm⁴ | berechnet |
+| Wanddicke, Rundrohr | $t_{\text{Q20}}$ | $8$ | mm | Vorgabe |
 | Querschnittsfläche, Rohr | $A_{\text{Q3}}$ | $4973$ | mm² | berechnet |
 | Aussendurchmesser, Rohr | $D_{\text{Q3}}$ | $168.3$ | mm | Vorgabe |
 | Flächenträgheitsmoment, Rohr | $I_{\text{Q3}}$ | $15.64$ | ·10⁶ mm⁴ | berechnet |
@@ -20512,9 +20963,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Abstand des Schwerpunkts vom oberen Rand, Plattenbalken | $z_{S,\text{Q5}}$ | $200$ | mm | berechnet |
 | Querschnittsfläche, Walzprofil | $A_{\text{Q6}}$ | $14282$ | mm² | berechnet |
 | Flächenträgheitsmoment, Walzprofil | $I_{\text{Q6}}$ | $241.87$ | ·10⁶ mm⁴ | berechnet |
-| Dehnsteifigkeit, Walzprofil, S355 | $EA_{\text{Q6,S355}}$ | $2999$ | MN | berechnet |
-| Biegesteifigkeit, Walzprofil, S355 | $EI_{\text{Q6,S355}}$ | $50792$ | kNm² | berechnet |
-| Eigengewicht je Meter, Walzprofil, S355 | $g_{k,\text{Q6,S355}}$ | $1.12$ | kN/m | berechnet |
 | Flanschbreite, Walzprofil | $b_{\text{Q6}}$ | $300$ | mm | Vorgabe |
 | Höhe, Walzprofil | $h_{\text{Q6}}$ | $300$ | mm | Vorgabe |
 | Flanschdicke, Walzprofil | $t_{f,\text{Q6}}$ | $19$ | mm | Vorgabe |

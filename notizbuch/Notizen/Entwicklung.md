@@ -7,6 +7,36 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Balkensysteme: Stahlprofile aus der Tabelle
+
+Ein Querschnitt kann ein Stahlprofil sein: im Fenster «Querschnitt» die Art
+«Profil», dann die Reihe -- IPE, HEA, HEB, HEM, UPE, UNP, RRK oder ROR --,
+die Grösse aus der Liste und die Achse. Ein HEB 300 um y hat
+A = 149.08 cm² und I = 25 165.66 cm⁴; vorher brauchte es dafür ein
+Doppel-T ohne Ausrundungen (I = 24 187 cm⁴, 4 % zu wenig) oder Kennwerte
+von Hand. Es sind alle 666 Profile der Tabelle des Benutzers, mit ihren
+Massen.
+
+Warum so:
+
+- Je Form eine Vorlage mit Formeln (`stabwerk/profilformen.py`), je Grösse
+  nur die Masse (`stabwerk/profiltabelle.py`): parametrisch, wie der
+  Benutzer es wollte, und jede Zahl im Bericht hergeleitet. Die Formeln
+  sind die seiner Tabelle; gegen sie prüft ein Test jedes Profil, I, UPE
+  und ROR auf alle Stellen, RRK auf 2·10⁻⁵ (dort rundet das Werkzeug die
+  Beiwerte der Zwickel).
+- Das UNP hat in der Tabelle keine Formeln. Gerechnet wird es mit
+  geneigten Flanschen als Trapezen; Neigung und Stelle von t_f sind so
+  gewählt, dass die Werte der Tabelle auf 1.4 % getroffen werden (TODO).
+- Jede Form rechnet A, I_y, I_z und I_T, das räumliche Balkensystem
+  braucht sie alle. Das ebene nimmt I_y oder I_z, je nach Achse; weil das
+  Rechenwerk nur rechnet, was ein Ziel braucht, steht von den anderen
+  nichts im Bericht.
+- A in cm², I in cm⁴, wie in jeder Stahlbautabelle -- so lässt sich
+  vergleichen. Die Masse bleiben in mm.
+- Ein unbekannter Profilname ist ein Fehler des Projekts wie eine
+  fehlende Platte, kein Wahlfeld: dessen Meldung zählte alle 666 auf.
+
 ## 2026-11-15 · Balkensysteme: Stäbe aus Baustahl
 
 Ein Material der Stäbe kann neben einem Beton auch ein Baustahl des Projekts

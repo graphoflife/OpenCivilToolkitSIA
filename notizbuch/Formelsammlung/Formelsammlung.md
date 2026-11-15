@@ -1,5 +1,5 @@
 ---
-erzeugt: 5832ad4304ce
+erzeugt: 5d586bb23d35
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -39,7 +39,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Balkensysteme**
 
-- [[Stabquerschnitte]] · 19
+- [[Stabquerschnitte]] · 36
 - [[Steifigkeitsmethode]] · 7
 
 **Grundbruch**
@@ -140,6 +140,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Dehnungsebene und innere Kräfte]]
 - [[Dekompressionsmoment]] · $m_{Dd}$
 - [[Dekompressionsmoment und Dehnung]]
+- [[Dicke des geneigten Flanschs am Steg]] · $t_{1}$
+- [[Dicke des geneigten Flanschs an der Spitze]] · $t_{2}$
 - [[Dickster Stab der Lage]] · $\varnothing_{2,x}$
 - [[Drehfeder des Pfahlkopfs]] · $K_{MM}$
 - [[Drehung in die Achsen des Stabs]]
@@ -166,21 +168,34 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fläche des Tragrohrs nach Abrostung]] · $A_s$
 - [[Fläche des Tragstabs nach Abrostung]] · $A_s$
 - [[Fläche eines Doppel-T-Querschnitts]] · $A_{\text{Q6}}$
+- [[Fläche eines I-Profils]] · $A_{\text{Q11}}$
+- [[Fläche eines kaltgefertigten Rechteckrohrs]] · $A_{\text{Q18}}$
 - [[Fläche eines Kreises]] · $A_{\text{Q2}}$
 - [[Fläche eines Kreisrings]] · $A_{\text{Q3}}$
 - [[Fläche eines Rechteckrohrs]] · $A_{\text{Q4}}$
 - [[Fläche eines Rechtecks]] · $A_{\text{Q1}}$
 - [[Fläche eines T-Querschnitts]] · $A_{\text{Q5}}$
 - [[Fläche eines Trapezes]] · $A_{\text{Q7}}$
+- [[Fläche eines U-Profils mit geneigten Flanschen]] · $A_{\text{Q16}}$
+- [[Fläche eines U-Profils mit parallelen Flanschen]] · $A_{\text{Q14}}$
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]]
 - [[Flächenlast innerhalb des Nachweisschnitts]] · $\Delta V_d$
 - [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]] · $I_{\text{Q6}}$
+- [[Flächenträgheitsmoment eines I-Profils um y]] · $I_{y}$
+- [[Flächenträgheitsmoment eines I-Profils um z]] · $I_{z}$
+- [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]] · $I_{y}$
+- [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines Kreises]] · $I_{\text{Q2}}$
 - [[Flächenträgheitsmoment eines Kreisrings]] · $I_{\text{Q3}}$
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · $I_{\text{Q4}}$
 - [[Flächenträgheitsmoment eines Rechtecks]] · $I_{\text{Q1}}$
+- [[Flächenträgheitsmoment eines Rundrohrs um z]] · $I_{z}$
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · $I_{\text{Q5}}$
 - [[Flächenträgheitsmoment eines Trapezes]] · $I_{\text{Q7}}$
+- [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]] · $I_{y}$
+- [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]] · $I_{z}$
+- [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]] · $I_{y}$
+- [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z]] · $I_{z}$
 - [[Fliessdehnung]] · $\varepsilon_{yd}$
 - [[Form- und Tiefenfaktor des Pfahlfusses]] · $X$
 - [[Formfaktor s_c]] · $s_c$
@@ -289,6 +304,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schnittkräfte eines Streifens in x und y]]
 - [[Schwerpunkt der zusammengefassten Lage]] · $z_{2,x}$
 - [[Schwerpunkt eines T-Querschnitts]] · $z_{S}$
+- [[Schwerpunkt eines U-Profils mit geneigten Flanschen]] · $e_{y}$
+- [[Schwerpunkt eines U-Profils mit parallelen Flanschen]] · $e_{y}$
 - [[Setzung aus Erstbelastung]] · $s_E$
 - [[Setzung aus Wiederbelastung]] · $s_W$
 - [[Setzung einer Teilschicht]]
@@ -361,7 +378,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-95 von 288 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+112 von 305 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -383,6 +400,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._waende_protokollieren]]
 - [[Dehnsteifigkeit]] · [[opencivil.stabwerk.rechnung|_dehnsteifigkeit]]
 - [[Dehnsteifigkeit des Pfahls]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit._querschnitt|Pfahlsteifigkeit._querschnitt]]
+- [[Dicke des geneigten Flanschs am Steg]] · [[opencivil.stabwerk.profilformen]]
+- [[Dicke des geneigten Flanschs an der Spitze]] · [[opencivil.stabwerk.profilformen]]
 - [[Dickster Stab der Lage]] · [[opencivil.nachweis.mindestbewehrung#_protokoll_stahlspannung|_protokoll_stahlspannung]]
 - [[Drehfeder des Pfahlkopfs]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit|Pfahlsteifigkeit._federn]]
 - [[Drehung in die Achsen des Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
@@ -393,20 +412,33 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · [[opencivil.nachweis.stabgrenzen#_protokoll_fiktiv|_protokoll_fiktiv]]
 - [[Fläche der Längsbewehrung]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Fläche eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
+- [[Fläche eines I-Profils]] · [[opencivil.stabwerk.profilformen]]
+- [[Fläche eines kaltgefertigten Rechteckrohrs]] · [[opencivil.stabwerk.profilformen]]
 - [[Fläche eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_flaeche|Loeserpaar.herleitung_flaeche]], [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
+- [[Fläche eines U-Profils mit geneigten Flanschen]] · [[opencivil.stabwerk.profilformen]]
+- [[Fläche eines U-Profils mit parallelen Flanschen]] · [[opencivil.stabwerk.profilformen]]
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 - [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
+- [[Flächenträgheitsmoment eines I-Profils um y]] · [[opencivil.stabwerk.profilformen]]
+- [[Flächenträgheitsmoment eines I-Profils um z]] · [[opencivil.stabwerk.profilformen]]
+- [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]] · [[opencivil.stabwerk.profilformen#_rohr_traegheit|_rohr_traegheit]]
+- [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]] · [[opencivil.stabwerk.profilformen#_rohr_traegheit|_rohr_traegheit]]
 - [[Flächenträgheitsmoment eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_traegheit|Loeserpaar.herleitung_traegheit]], [[opencivil.stabwerk.querschnitte]]
+- [[Flächenträgheitsmoment eines Rundrohrs um z]] · [[opencivil.stabwerk.profilformen]]
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
+- [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]] · [[opencivil.stabwerk.profilformen]]
+- [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]] · [[opencivil.stabwerk.profilformen]]
+- [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]] · [[opencivil.stabwerk.profilformen]]
+- [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z]] · [[opencivil.stabwerk.profilformen]]
 - [[Gleichungssystem der Steifigkeitsmethode]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Grenzdehnungen am Ende der Linie]] · [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
 - [[Grösste Dehnung auf halber Höhe]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_dehnung_am_ende|Loeserpaar.herleitung_dehnung_am_ende]]
@@ -437,6 +469,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schnittgrössen längs eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Schwerpunkt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]], [[opencivil.querschnitt.lagenaufbau#protokoll_schwerpunkt|protokoll_schwerpunkt]]
 - [[Schwerpunkt eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
+- [[Schwerpunkt eines U-Profils mit geneigten Flanschen]] · [[opencivil.stabwerk.profilformen]]
+- [[Schwerpunkt eines U-Profils mit parallelen Flanschen]] · [[opencivil.stabwerk.profilformen]]
 - [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Spannung im ungerissenen Querschnitt]] · [[opencivil.nachweis.rissgroessen#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
 - [[Statische Höhe]] · [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]

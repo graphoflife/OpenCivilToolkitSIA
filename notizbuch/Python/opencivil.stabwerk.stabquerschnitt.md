@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b2c629e7e38
+erzeugt: 5dc7a786e88f
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,9 @@ Ein Querschnitt der Staebe, aufgeloest: je Art eine Klasse, die ihre
 Berechnungen fuer `A` und `I` und ihren Umriss selbst traegt --
 
 * nach Vorlage ([[opencivil.stabwerk.stabquerschnitt#NachVorlage|NachVorlage]]) -- die Formeln der Vorlage
-  ([[opencivil.stabwerk.querschnitte|querschnitte]]), die Masse als Vorgaben;
+  ([[opencivil.stabwerk.querschnitte|querschnitte]]), die Masse als Vorgaben; ein
+  Stahlprofil ebenso, mit den Massen aus der Tabelle und `I_y` oder
+  `I_z` seiner Form als `I` ([[opencivil.stabwerk.profilformen|profilformen]]);
 * von Hand ([[opencivil.stabwerk.stabquerschnitt#VonHand|VonHand]]) -- `A` und `I` als Eingaben;
 * aus einer Platte ([[opencivil.stabwerk.stabquerschnitt#AusPlatte|AusPlatte]]) -- die Formeln des Rechtecks mit
   `b` und `h` der Platte;
@@ -83,10 +85,12 @@ Sein Umriss in mm, fuer das Bildchen seiner Zeile -- ohne einen leer.
 #### Stabquerschnitt._formeln
 
 ```python
-def _formeln(self, vorlage: Stabvorlage, quellen: Mapping[str, str], definieren: Definieren, abschnitt: Abschnitt, index: str) -> Tuple[List[Berechnung], str, str]
+def _formeln(self, vorlage: Stabvorlage, quellen: Mapping[str, str], definieren: Definieren, abschnitt: Abschnitt, index: str, traegheit: str='I') -> Tuple[List[Berechnung], str, str]
 ```
 
-Die Formeln einer Vorlage, aus den Wert-IDs ihrer Masse.
+Die Formeln einer Vorlage, aus den Wert-IDs ihrer Masse -- und als
+`I` die mit dem Kurznamen `traegheit`. Gerechnet wird davon nur,
+was `A` und dieses `I` brauchen: das Rechenwerk folgt den Zielen.
 
 #### Stabquerschnitt._a_und_i
 
@@ -107,6 +111,7 @@ Nach einer Vorlage: ihre Masse als Vorgaben, ihre Formeln.
 
 - `vorlage: Stabvorlage`
 - `masse: Mapping[str, float]` – Die Masse der Vorlage in mm -- was fehlte, mit seiner Vorgabe.
+- `traegheit: str = 'I'` – Welche ihrer Formeln das `I` des Stabs ist -- bei einem Profil `I_y` oder `I_z`.
 
 #### NachVorlage.flaechenwerte
 
@@ -207,6 +212,14 @@ def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str
 ```python
 def umriss(self, loesung: Any) -> Umriss
 ```
+
+### _stellen
+
+```python
+def _stellen(wert: float) -> int
+```
+
+So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 
 
 ## Konstanten

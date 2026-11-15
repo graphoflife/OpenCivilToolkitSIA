@@ -57,6 +57,7 @@ from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, Mi
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
+from opencivil.stabwerk import profiltabelle
 from opencivil.stabwerk import querschnitte as qs
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.stabwerk.rechnung import STABKENNWERTE
@@ -90,6 +91,7 @@ class Querschnittsart(Wahl):
     """
 
     VORLAGE = "vorlage"
+    PROFIL = "profil"
     KENNWERTE = "kennwerte"
     PLATTE = "platte"
     ANALYSE = "analyse"
@@ -98,6 +100,7 @@ class Querschnittsart(Wahl):
     def beschriftung(self) -> str:
         return {
             Querschnittsart.VORLAGE: "nach Vorlage",
+            Querschnittsart.PROFIL: "ein Stahlprofil aus der Tabelle",
             Querschnittsart.KENNWERTE: "Kennwerte von Hand",
             Querschnittsart.PLATTE: "aus einer Platte",
             Querschnittsart.ANALYSE: "aus einer Querschnittsanalyse",
@@ -108,6 +111,7 @@ class Querschnittsart(Wahl):
         """Fuer den Schalter -- der lange Name steht in seinem Titel."""
         return {
             Querschnittsart.VORLAGE: "Vorlage",
+            Querschnittsart.PROFIL: "Profil",
             Querschnittsart.KENNWERTE: "Kennwerte",
             Querschnittsart.PLATTE: "Platte",
             Querschnittsart.ANALYSE: "Analyse",
@@ -127,6 +131,30 @@ class Querschnittsart(Wahl):
 
 #: Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
 KENNWERTE = ("A", "I")
+
+
+class Profilachse(Wahl):
+    """
+    Um welche Achse ein Stahlprofil sich im Rahmen biegt: um ``y``, die
+    starke -- der Steg liegt in der Ebene des Rahmens --, oder um ``z``.
+    """
+
+    Y = "y"
+    Z = "z"
+
+    @property
+    def beschriftung(self) -> str:
+        return "um y, die starke Achse" if self is Profilachse.Y else "um z, die schwache Achse"
+
+    @property
+    def kurz(self) -> str:
+        """Fuer den Schalter -- der lange Name steht in seinem Titel."""
+        return "um y – stark" if self is Profilachse.Y else "um z – schwach"
+
+    @property
+    def traegheit(self) -> str:
+        """Der Kurzname des Traegheitsmoments der Profilform, das dann ``I`` ist."""
+        return f"I_{self.value}"
 
 #: Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts --
 #: E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und
@@ -320,10 +348,11 @@ class ModulEintrag(Beschreibung):
 @dataclass
 class StabquerschnittEintrag(Beschreibung):
     """
-    Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, mit Kennwerten
-    von Hand (``A`` in mm², ``I`` in 10⁶ mm⁴), oder aus einer Platte oder
-    einer Querschnittsanalyse des Projekts (``bezug``). E kommt vom Material
-    des Stabs; nimmt der das Material des Querschnitts, sagt ``e_modul``,
+    Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, ein Stahlprofil
+    aus der Tabelle (``profil``, gebogen um ``achse``), mit Kennwerten von
+    Hand (``A`` in mm², ``I`` in 10⁶ mm⁴), oder aus einer Platte oder einer
+    Querschnittsanalyse des Projekts (``bezug``). E kommt vom Material des
+    Stabs; nimmt der das Material des Querschnitts, sagt ``e_modul``,
     welches E.
     """
 
@@ -332,6 +361,14 @@ class StabquerschnittEintrag(Beschreibung):
     art: Querschnittsart = einer_von(tuple(Querschnittsart), Querschnittsart.VORLAGE)
     vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)
     masse: Dict[str, float] = field(default_factory=dict)
+    profil: str = "IPE 300"
+    """
+    Der Name des Stahlprofils (:mod:`opencivil.stabwerk.profiltabelle`). Kein
+    Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen
+    unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
+    """
+
+    achse: Profilachse = Profilachse.Y
     bezug: str = ""
     e_modul: str = einer_von(E_MODULE, "e0")
     """
@@ -557,6 +594,18 @@ class BalkensystemEintrag(MitFaellen, BauteilEintrag):
             raise ProjektFehler(fehler.args[0]) from None
         eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
                                          name=name, vorlage=vorlage, masse=dict(masse))
+        self.querschnitte.append(eintrag)
+        return eintrag
+
+    def stahlprofil(self, name: str, profil: str, achse: str = "y") -> StabquerschnittEintrag:
+        """Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um ``achse``, y die starke."""
+        try:
+            profiltabelle.profil(profil)
+        except KeyError as fehler:
+            raise ProjektFehler(fehler.args[0]) from None
+        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
+                                         name=name, art=Querschnittsart.PROFIL, profil=profil,
+                                         achse=Profilachse(achse))
         self.querschnitte.append(eintrag)
         return eintrag
 

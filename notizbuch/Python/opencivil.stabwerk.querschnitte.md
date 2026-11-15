@@ -1,5 +1,5 @@
 ---
-erzeugt: d649c9e15cac
+erzeugt: 8c26cc1dac40
 art: modul
 tags: [modul]
 ---
@@ -47,12 +47,13 @@ sich die Vorlagen hier mit denen der Querschnittsanalyse
 class Mass
 ```
 
-Ein Mass einer Vorlage -- in mm.
+Ein Mass einer Vorlage -- in mm, wo nicht `einheit` anderes sagt.
 
 - `schluessel: str`
 - `symbol: str`
 - `beschriftung: str`
 - `vorgabe: float`
+- `einheit: Einheit = MM`
 
 ### Kennformel
 
@@ -84,7 +85,7 @@ class Stabvorlage
 - `schluessel: str`
 - `name: str`
 - `masse: Tuple[Mass, ...]`
-- `formeln: Tuple[Kennformel, ...]` – In der Reihenfolge, in der gerechnet wird -- am Ende `A` und `I`.
+- `formeln: Tuple[Kennformel, ...]` – In der Reihenfolge, in der gerechnet wird -- darunter `A` und `I`, bei einem Stahlprofil `A`, `I_y`, `I_z` und `I_T` ([[opencivil.stabwerk.profilformen]]).
 - `pruefung: Callable[[Masse], Optional[str]]`
 - `umriss: Callable[[Masse], List[List[Tuple[float, float]]]]` – Die Umrisse fuer das Bild, in mm -- der erste aussen, die weiteren Loecher.
 
@@ -137,6 +138,8 @@ def vorlage(schluessel: str) -> Stabvorlage
 ## Gebraucht von
 
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.stabwerk.profilformen]]
+- [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.web.api]]
 

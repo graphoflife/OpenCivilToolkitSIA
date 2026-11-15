@@ -42,12 +42,13 @@ Masse = Mapping[str, float]
 
 @dataclass(frozen=True)
 class Mass:
-    """Ein Mass einer Vorlage -- in mm."""
+    """Ein Mass einer Vorlage -- in mm, wo nicht ``einheit`` anderes sagt."""
 
     schluessel: str
     symbol: str
     beschriftung: str
     vorgabe: float
+    einheit: Einheit = MM
 
 
 @dataclass(frozen=True)
@@ -75,7 +76,11 @@ class Stabvorlage:
     name: str
     masse: Tuple[Mass, ...]
     formeln: Tuple[Kennformel, ...]
-    """In der Reihenfolge, in der gerechnet wird -- am Ende ``A`` und ``I``."""
+    """
+    In der Reihenfolge, in der gerechnet wird -- darunter ``A`` und ``I``,
+    bei einem Stahlprofil ``A``, ``I_y``, ``I_z`` und ``I_T``
+    (:mod:`opencivil.stabwerk.profilformen`).
+    """
 
     pruefung: Callable[[Masse], Optional[str]]
     umriss: Callable[[Masse], List[List[Tuple[float, float]]]]
@@ -93,7 +98,9 @@ class Stabvorlage:
 
     def kennwerte(self, masse: Masse) -> Dict[str, Groesse]:
         """Alle Kennwerte, der Reihe nach gerechnet -- ohne Herleitung."""
-        werte: Dict[str, Groesse] = {k: Groesse(v, MM) for k, v in masse.items()}
+        einheiten = {m.schluessel: m.einheit for m in self.masse}
+        werte: Dict[str, Groesse] = {k: Groesse(v, einheiten.get(k, MM))
+                                     for k, v in masse.items()}
         for f in self.formeln:
             werte[f.kurzname] = f.funktion(**{n: werte[n] for n in _namen(f.vorlage)})
         return werte

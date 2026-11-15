@@ -63,6 +63,7 @@ const HILFE = {
   querschnitte: {
     zeilen: [
       ['Vorlage', 'A und I nach den Formeln der Vorlage, Masse in mm'],
+      ['Profil', 'ein Stahlprofil aus der Tabelle -- A und I_y oder I_z aus seinen Massen, in cm² und cm⁴; y ist die starke Achse, der Steg liegt dann in der Ebene des Rahmens'],
       ['Platte', 'ein Streifen b × h der gewählten Platte'],
       ['Analyse', 'A und I_y des Bruttoquerschnitts'],
       ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, bei einer Analyse auf Wunsch E_eq bei N und M, für EA und EI (für EA eine Näherung)'],
@@ -308,6 +309,10 @@ function materialienInhalt(system) {
 
 const QUERSCHNITTSARTEN = () => katalog('balkensystem', 'querschnittsarten');
 const VORLAGEN = () => katalog('balkensystem', 'vorlagen');
+const PROFILREIHEN = () => katalog('balkensystem', 'profilreihen');
+
+/** Die Reihe eines Profils -- «HEB 300» gehört zu HEB. */
+const reiheVon = (profil) => PROFILREIHEN().find((r) => r.profile.includes(profil)) || PROFILREIHEN()[0];
 const E_MODULE = () => katalog('balkensystem', 'e_module');
 
 /** Was der Kern zu einem Querschnitt gerechnet hat: A und I -- und sein eigenes E --, oder nichts. */
@@ -361,6 +366,7 @@ function herkunftText(q) {
     const masse = (vorlage?.masse || []).map((m) => `${m.symbol} ${q.masse?.[m.schluessel] ?? m.vorgabe}`);
     return `${vorlage?.name || q.vorlage} · ${masse.join(' · ')} mm`;
   }
+  if (q.art === 'profil') return `${q.profil} · um ${q.achse}`;
   if (q.art === 'kennwerte') return 'Kennwerte von Hand';
   const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
   const bezug = liste.find((x) => x.kennung === q.bezug);
@@ -436,7 +442,7 @@ function querschnittFenster(system, kennung) {
       setzen: (w) => aendern((x) => {
         x.art = w;
         if (w === 'vorlage') x.masse = vorgabenDer(x.vorlage);
-        if (w === 'kennwerte') x.masse = {};
+        if (w === 'kennwerte' || w === 'profil') x.masse = {};
       }),
     })),
   ];
@@ -464,6 +470,30 @@ function querschnittFenster(system, kennung) {
         beiAenderung: (w) => aendern((x) => { x.masse = { ...x.masse, [m.schluessel]: w }; }),
       }), 'mm'));
     }
+  } else if (q.art === 'profil') {
+    // Die Reihe als Schalter, die Grösse als Liste mit dem Bild daneben --
+    // wie die Vorlage (Benutzer, 2026-10-24) -- und die Achse.
+    const reihe = reiheVon(q.profil);
+    zeilen.push(
+      wahlBlock('Reihe', wahlSchalter({
+        werte: PROFILREIHEN().map((r) => ({ wert: r.kurz, beschriftung: r.kurz, titel: r.beschreibung })),
+        gewaehlt: reihe.kurz, titel: 'Die Reihe der Stahlprofile',
+        setzen: (kurz) => setzen('profil')(PROFILREIHEN().find((r) => r.kurz === kurz).profile[0]),
+      })),
+      el('div.bs-qvorlage', {}, [
+        feld('Profil', auswahl({
+          werte: reihe.profile.map((name) => ({ wert: name, beschriftung: name })),
+          gewaehlt: q.profil, titel: `${reihe.beschreibung} -- Masse nach der Tabelle`,
+          beiAenderung: setzen('profil'),
+        })),
+        umrissBild(system, q, 120, 90),
+      ]),
+      wahlBlock('Biegung', wahlSchalter({
+        werte: katalog('balkensystem', 'profilachsen'),
+        gewaehlt: q.achse, titel: 'Um welche Achse sich das Profil im Rahmen biegt',
+        setzen: setzen('achse'),
+      })),
+    );
   } else if (q.art === 'kennwerte') {
     const kennwert = (schluessel, text, einheit) => feld(text, zahlfeld({
       wert: q.masse?.[schluessel] ?? 0, schritt: schluessel === 'A' ? 1000 : 10, min: 0,

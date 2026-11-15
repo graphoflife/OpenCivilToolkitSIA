@@ -1,5 +1,5 @@
 ---
-erzeugt: 632c9c780d11
+erzeugt: 1b454c5a4360
 art: modul
 tags: [modul]
 ---
@@ -191,6 +191,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.stabwerk.modell]]
+- [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.anzeige]]

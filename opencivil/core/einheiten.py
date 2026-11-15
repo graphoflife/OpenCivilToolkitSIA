@@ -307,6 +307,9 @@ MIO_MM3 = Einheit("10^6 mm^3", LAENGE**3, 1e-3,
 MIO_MM4 = Einheit("10^6 mm^4", LAENGE**4, 1e-6,
                   latex=r"\cdot 10^{6}\,\mathrm{mm}^{4}", beschriftung="·10⁶ mm⁴")
 
+#: Dasselbe in cm⁴ -- so stehen die Stahlprofile in ihren Tabellen.
+CM4 = Einheit("cm^4", LAENGE**4, 1e-8)
+
 # Kraft
 N = Einheit("N", KRAFT, 1.0)
 KN = Einheit("kN", KRAFT, 1e3)
@@ -378,7 +381,7 @@ EINHEITEN: Dict[str, Einheit] = {
     for e in (
         EINHEITSLOS, PROZENT, PROMILLE,
         M, DM, CM, MM, KM,
-        M2, CM2, MM2, M3,
+        M2, CM2, MM2, M3, CM4,
         N, KN, MN,
         PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2, MN_PRO_M2,
         NM, KNM, MNM,

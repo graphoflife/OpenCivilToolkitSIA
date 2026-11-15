@@ -1,10 +1,10 @@
 ---
-erzeugt: eb259cdd408c
+erzeugt: a6cb7d630363
 art: thema
 tags: [thema]
 ---
 > [!abstract] Balkensysteme
-> 19 Formeln, in der Folge, in der gerechnet wird.
+> 36 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -30,7 +30,24 @@ Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Be
 16. [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]]
 17. [[Fläche eines Trapezes]]
 18. [[Flächenträgheitsmoment eines Trapezes]]
-19. [[Äquivalenter E-Modul eines Stabs]]
+19. [[Fläche eines I-Profils]]
+20. [[Flächenträgheitsmoment eines I-Profils um y]]
+21. [[Flächenträgheitsmoment eines I-Profils um z]]
+22. [[Fläche eines U-Profils mit parallelen Flanschen]]
+23. [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y]]
+24. [[Schwerpunkt eines U-Profils mit parallelen Flanschen]]
+25. [[Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z]]
+26. [[Dicke des geneigten Flanschs am Steg]]
+27. [[Dicke des geneigten Flanschs an der Spitze]]
+28. [[Fläche eines U-Profils mit geneigten Flanschen]]
+29. [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y]]
+30. [[Schwerpunkt eines U-Profils mit geneigten Flanschen]]
+31. [[Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z]]
+32. [[Fläche eines kaltgefertigten Rechteckrohrs]]
+33. [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y]]
+34. [[Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z]]
+35. [[Flächenträgheitsmoment eines Rundrohrs um z]]
+36. [[Äquivalenter E-Modul eines Stabs]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -38,9 +55,17 @@ Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Be
 
 Was ein Stab des Balkensystems von seinem Querschnitt braucht: die Fläche
 $A$ und das Flächenträgheitsmoment $I$ um die Achse senkrecht zur Ebene des
-Rahmens. Sie kommen aus einer Vorlage mit ihren Formeln, von Hand, aus einer
-Platte -- ein Streifen $b \times h$ -- oder aus dem Bruttoquerschnitt einer
-Querschnittsanalyse.
+Rahmens. Sie kommen aus einer Vorlage mit ihren Formeln, aus einem
+Stahlprofil, von Hand, aus einer Platte -- ein Streifen $b \times h$ --
+oder aus dem Bruttoquerschnitt einer Querschnittsanalyse.
+
+Ein Stahlprofil kommt aus der Tabelle des Benutzers: IPE, HEA, HEB, HEM,
+UPE, UNP, kaltgefertigte Rechteckrohre und Rundrohre, je mit ihren Massen.
+Die Formeln seiner Form rechnen daraus Fläche und Trägheitsmomente, in
+cm² und cm⁴ wie in jeder Stahlbautabelle. Biegt es sich um $y$, die
+starke Achse, liegt der Steg in der Ebene des Rahmens und $I = I_y$; um
+$z$ ist $I = I_z$. Die Ausrundungen gehen als Zwickel ein: das Quadrat
+$r \times r$ ohne den Viertelkreis.
 
 Mit dem E-Modul des Materials werden daraus [[Dehnsteifigkeit]] und
 [[Biegesteifigkeit]]. Mehr weiss die [[Steifigkeitsmethode]] vom Querschnitt

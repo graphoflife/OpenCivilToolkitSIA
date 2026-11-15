@@ -1,5 +1,5 @@
 ---
-erzeugt: 2ec6e0992b36
+erzeugt: 35fc5a29859a
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -172,6 +172,8 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.herleitung]] – wie ein Balkensystem seine Rechnung aufschreibt.
     - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
     - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
+    - [[opencivil.stabwerk.profilformen]] – die Formen der Stahlprofile, mit ihren Formeln.
+    - [[opencivil.stabwerk.profiltabelle]] – welche Stahlprofile es gibt, mit ihren Massen.
     - [[opencivil.stabwerk.querschnitte]] – die Querschnitte der Staebe, nach Vorlage.
     - [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.

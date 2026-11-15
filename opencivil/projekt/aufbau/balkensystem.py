@@ -28,6 +28,7 @@ from opencivil.projekt.balkensystem import (
 )
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.spannungsanalyse.modul import ModulAusAnalyse, ModulAusPlatte, Modulfrage
+from opencivil.stabwerk.profiltabelle import PROFILE
 from opencivil.stabwerk.rechnung import Balkensystem, Stabmaterial
 from opencivil.stabwerk.stabquerschnitt import (
     AusAnalyse, AusPlatte, NachVorlage, Stabquerschnitt, VonHand,
@@ -217,6 +218,15 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
         return NachVorlage(kennung=q.kennung, name=q.name, herkunft=vorlage.name,
                            fehler=q.fehler() or "", vorlage=vorlage,
                            masse=q.masse_mit_vorgaben())
+    if q.art is Querschnittsart.PROFIL:
+        profil = PROFILE.get(q.profil)
+        if profil is None:
+            raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt das Profil "
+                                f"«{q.profil}», das es in der Tabelle nicht gibt.")
+        return NachVorlage(kennung=q.kennung, name=q.name,
+                           herkunft=f"{q.profil}, {q.achse.beschriftung}",
+                           fehler=q.fehler() or "", vorlage=profil.form,
+                           masse=dict(profil.masse), traegheit=q.achse.traegheit)
     if q.art is Querschnittsart.KENNWERTE:
         return VonHand(kennung=q.kennung, name=q.name, herkunft="von Hand",
                        fehler=q.fehler() or "", masse=dict(q.masse))

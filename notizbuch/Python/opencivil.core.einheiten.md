@@ -1,5 +1,5 @@
 ---
-erzeugt: 231c2e85fb87
+erzeugt: caa906492726
 art: modul
 tags: [modul]
 ---
@@ -402,6 +402,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `M3 = Einheit('m^3', VOLUMEN, 1.0)`
 - `MIO_MM3 = Einheit('10^6 mm^3', LAENGE ** 3, 0.001, latex='\\cdot 10^{6}\\,\\mat…` – Widerstandsmoment in Millionen mm^3 -- aus demselben Grund wie darunter.
 - `MIO_MM4 = Einheit('10^6 mm^4', LAENGE ** 4, 1e-06, latex='\\cdot 10^{6}\\,\\mat…` – Flaechenmoment zweiten Grades in Millionen mm^4. Bei Betonquerschnitten stuende in mm^4 eine zehnstellige Zahl; so heisst es «5400 · 10⁶ mm⁴».
+- `CM4 = Einheit('cm^4', LAENGE ** 4, 1e-08)` – Dasselbe in cm⁴ -- so stehen die Stahlprofile in ihren Tabellen.
 - `N = Einheit('N', KRAFT, 1.0)`
 - `KN = Einheit('kN', KRAFT, 1000.0)`
 - `MN = Einheit('MN', KRAFT, 1000000.0)`
@@ -505,6 +506,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.spannungsanalyse.schnitt]]
+- [[opencivil.stabwerk.profilformen]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]

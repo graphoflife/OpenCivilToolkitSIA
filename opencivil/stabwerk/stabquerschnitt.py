@@ -6,7 +6,9 @@ Ein Querschnitt der Staebe, aufgeloest: je Art eine Klasse, die ihre
 Berechnungen fuer ``A`` und ``I`` und ihren Umriss selbst traegt --
 
 * nach Vorlage (:class:`NachVorlage`) -- die Formeln der Vorlage
-  (:mod:`~opencivil.stabwerk.querschnitte`), die Masse als Vorgaben;
+  (:mod:`~opencivil.stabwerk.querschnitte`), die Masse als Vorgaben; ein
+  Stahlprofil ebenso, mit den Massen aus der Tabelle und ``I_y`` oder
+  ``I_z`` seiner Form als ``I`` (:mod:`~opencivil.stabwerk.profilformen`);
 * von Hand (:class:`VonHand`) -- ``A`` und ``I`` als Eingaben;
 * aus einer Platte (:class:`AusPlatte`) -- die Formeln des Rechtecks mit
   ``b`` und ``h`` der Platte;
@@ -85,8 +87,12 @@ class Stabquerschnitt(ABC):
 
     def _formeln(self, vorlage: Stabvorlage, quellen: Mapping[str, str],
                  definieren: Definieren, abschnitt: Abschnitt,
-                 index: str) -> Tuple[List[Berechnung], str, str]:
-        """Die Formeln einer Vorlage, aus den Wert-IDs ihrer Masse."""
+                 index: str, traegheit: str = "I") -> Tuple[List[Berechnung], str, str]:
+        """
+        Die Formeln einer Vorlage, aus den Wert-IDs ihrer Masse -- und als
+        ``I`` die mit dem Kurznamen ``traegheit``. Gerechnet wird davon nur,
+        was ``A`` und dieses ``I`` brauchen: das Rechenwerk folgt den Zielen.
+        """
         quellen = dict(quellen)
         berechnungen: List[Berechnung] = []
         for f in vorlage.formeln:
@@ -98,7 +104,7 @@ class Stabquerschnitt(ABC):
                 titel=f"{f.beschreibung}, «{self.name}» ({self.herkunft})", name=f.name,
                 abschnitt=abschnitt))
             quellen[f.kurzname] = d.id
-        return berechnungen, quellen["A"], quellen["I"]
+        return berechnungen, quellen["A"], quellen[traegheit]
 
     def _a_und_i(self, definieren: Definieren, index: str,
                  berechnung: Callable[[WertDef, str, str], Berechnung]
@@ -118,18 +124,22 @@ class NachVorlage(Stabquerschnitt):
     masse: Mapping[str, float]
     """Die Masse der Vorlage in mm -- was fehlte, mit seiner Vorgabe."""
 
+    traegheit: str = "I"
+    """Welche ihrer Formeln das ``I`` des Stabs ist -- bei einem Profil ``I_y`` oder ``I_z``."""
+
     def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt,
                       index: str) -> Tuple[List[Berechnung], str, str]:
         berechnungen: List[Berechnung] = []
         quellen = {}
         for mass in self.vorlage.masse:
             wert = self.masse[mass.schluessel]
-            d = self._wert(definieren, mass.schluessel, mass.symbol, MM, mass.beschriftung,
-                           0 if float(wert).is_integer() else 1, index)
-            berechnungen.append(Vorgabe(id=d.id, ausgabe=d, groesse=Groesse(wert, MM),
+            d = self._wert(definieren, mass.schluessel, mass.symbol, mass.einheit,
+                           mass.beschriftung, _stellen(wert), index)
+            berechnungen.append(Vorgabe(id=d.id, ausgabe=d, groesse=Groesse(wert, mass.einheit),
                                         abschnitt=abschnitt, stumm=True))
             quellen[mass.schluessel] = d.id
-        formeln, A, I = self._formeln(self.vorlage, quellen, definieren, abschnitt, index)
+        formeln, A, I = self._formeln(self.vorlage, quellen, definieren, abschnitt, index,
+                                      self.traegheit)
         return berechnungen + formeln, A, I
 
     def umriss(self, loesung: Any) -> Umriss:
@@ -212,3 +222,8 @@ class AusAnalyse(AusBauteil):
 
 def _derselbe(wert: Groesse) -> Groesse:
     return wert
+
+
+def _stellen(wert: float) -> int:
+    """So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei."""
+    return next((n for n in range(3) if round(wert, n) == wert), 3)

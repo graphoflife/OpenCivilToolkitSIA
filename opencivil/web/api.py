@@ -60,6 +60,7 @@ from opencivil.nachweis.rechenwahl import (
     FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
 )
 from opencivil.spannungsanalyse import Analyseart
+from opencivil.stabwerk import profiltabelle
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.stabwerk.rechnung import STABKENNWERTE
@@ -275,6 +276,13 @@ def katalog() -> dict:
                             for umriss in v.umriss(v.vorgaben())]}
                 for v in stabquerschnitte.VORLAGEN
             ],
+            # Die Stahlprofile: je Reihe ihre Namen in der Folge der Tabelle
+            # -- die Masse kennt nur der Kern, das Bild kommt mit der Loesung.
+            "profilreihen": [{"kurz": r.kurz, "beschreibung": r.beschreibung,
+                              "profile": [p.name for p in r.profile]}
+                             for r in profiltabelle.PROFILREIHEN],
+            "profilachsen": [{"wert": a.value, "beschriftung": a.kurz, "titel": a.beschriftung}
+                             for a in bs.Profilachse],
             # Woher A und I eines Stabs kommen. Der kurze Name steht im
             # Schalter, der lange in seinem Titel; ob die Art ein Material
             # mitbringt, sagt, ob eine Linie es «gemäss Querschnitt» nehmen kann.

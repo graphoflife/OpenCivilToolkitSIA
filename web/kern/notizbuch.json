@@ -986,6 +986,28 @@
       ]
     },
     {
+      "name": "Dicke des geneigten Flanschs am Steg",
+      "pfad": "Formelsammlung/Formeln/Dicke des geneigten Flanschs am Steg.md",
+      "art": "formel",
+      "zeichen": [
+        "t_{1}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Dicke des geneigten Flanschs an der Spitze",
+      "pfad": "Formelsammlung/Formeln/Dicke des geneigten Flanschs an der Spitze.md",
+      "art": "formel",
+      "zeichen": [
+        "t_{2}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Dickster Stab der Lage",
       "pfad": "Formelsammlung/Formeln/Dickster Stab der Lage.md",
       "art": "formel",
@@ -1283,6 +1305,28 @@
       ]
     },
     {
+      "name": "Fläche eines I-Profils",
+      "pfad": "Formelsammlung/Formeln/Fläche eines I-Profils.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q11}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Fläche eines kaltgefertigten Rechteckrohrs",
+      "pfad": "Formelsammlung/Formeln/Fläche eines kaltgefertigten Rechteckrohrs.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q18}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Fläche eines Kreises",
       "pfad": "Formelsammlung/Formeln/Fläche eines Kreises.md",
       "art": "formel",
@@ -1350,6 +1394,28 @@
       ]
     },
     {
+      "name": "Fläche eines U-Profils mit geneigten Flanschen",
+      "pfad": "Formelsammlung/Formeln/Fläche eines U-Profils mit geneigten Flanschen.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q16}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Fläche eines U-Profils mit parallelen Flanschen",
+      "pfad": "Formelsammlung/Formeln/Fläche eines U-Profils mit parallelen Flanschen.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q14}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Fläche und Schwerpunkt eines Polygons (Satz von Gauss)",
       "pfad": "Formelsammlung/Formeln/Fläche und Schwerpunkt eines Polygons (Satz von Gauss).md",
       "art": "formel",
@@ -1375,6 +1441,50 @@
       "art": "formel",
       "zeichen": [
         "I_{\\text{Q6}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines I-Profils um y",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines I-Profils um y.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{y}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines I-Profils um z",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines I-Profils um z.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{z}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um y.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{y}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines kaltgefertigten Rechteckrohrs um z.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{z}"
       ],
       "themen": [
         "Stabquerschnitte"
@@ -1426,6 +1536,17 @@
       ]
     },
     {
+      "name": "Flächenträgheitsmoment eines Rundrohrs um z",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Rundrohrs um z.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{z}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Flächenträgheitsmoment eines T-Querschnitts",
       "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines T-Querschnitts.md",
       "art": "formel",
@@ -1442,6 +1563,50 @@
       "art": "formel",
       "zeichen": [
         "I_{\\text{Q7}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um y.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{y}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines U-Profils mit geneigten Flanschen um z.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{z}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um y.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{y}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines U-Profils mit parallelen Flanschen um z.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{z}"
       ],
       "themen": [
         "Stabquerschnitte"
@@ -2623,6 +2788,28 @@
       "art": "formel",
       "zeichen": [
         "z_{S}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Schwerpunkt eines U-Profils mit geneigten Flanschen",
+      "pfad": "Formelsammlung/Formeln/Schwerpunkt eines U-Profils mit geneigten Flanschen.md",
+      "art": "formel",
+      "zeichen": [
+        "e_{y}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Schwerpunkt eines U-Profils mit parallelen Flanschen",
+      "pfad": "Formelsammlung/Formeln/Schwerpunkt eines U-Profils mit parallelen Flanschen.md",
+      "art": "formel",
+      "zeichen": [
+        "e_{y}"
       ],
       "themen": [
         "Stabquerschnitte"
@@ -5927,6 +6114,10 @@
         "Querschnittsart.beschriftung",
         "Querschnittsart.kurz",
         "Querschnittsart.aus_bauteil",
+        "Profilachse",
+        "Profilachse.beschriftung",
+        "Profilachse.kurz",
+        "Profilachse.traegheit",
         "SystemknotenEintrag",
         "StablastEintrag",
         "StablastEintrag.verteilt",
@@ -5958,6 +6149,7 @@
         "BalkensystemEintrag.baustahl",
         "BalkensystemEintrag.eigenes_material",
         "BalkensystemEintrag.querschnitt",
+        "BalkensystemEintrag.stahlprofil",
         "BalkensystemEintrag.querschnitt_aus",
         "BalkensystemEintrag.querschnitt_mit_kennwerten",
         "BalkensystemEintrag.diagramm",
@@ -7073,6 +7265,36 @@
       ]
     },
     {
+      "name": "opencivil.stabwerk.profilformen",
+      "pfad": "Python/opencivil.stabwerk.profilformen.md",
+      "art": "modul",
+      "kurz": "die Formen der Stahlprofile, mit ihren Formeln.",
+      "stichworte": [
+        "_zwickel",
+        "_u_torsion",
+        "_rohr_traegheit",
+        "ausgerundet",
+        "_u_umriss"
+      ]
+    },
+    {
+      "name": "opencivil.stabwerk.profiltabelle",
+      "pfad": "Python/opencivil.stabwerk.profiltabelle.md",
+      "art": "modul",
+      "kurz": "welche Stahlprofile es gibt, mit ihren Massen.",
+      "stichworte": [
+        "Profil",
+        "Profil.form",
+        "Profilreihe",
+        "_z",
+        "_unp",
+        "_rrk",
+        "_benannt",
+        "reihe",
+        "profil"
+      ]
+    },
+    {
       "name": "opencivil.stabwerk.querschnitte",
       "pfad": "Python/opencivil.stabwerk.querschnitte.md",
       "art": "modul",
@@ -7163,7 +7385,8 @@
         "AusPlatte.umriss",
         "AusAnalyse",
         "AusAnalyse.flaechenwerte",
-        "AusAnalyse.umriss"
+        "AusAnalyse.umriss",
+        "_stellen"
       ]
     },
     {

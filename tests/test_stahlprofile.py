@@ -1,0 +1,163 @@
+"""
+Die Stahlprofile: ihre Formeln gegen die Tabelle des Benutzers, ihre Umrisse,
+und ein Profil als Querschnitt im Balkensystem.
+"""
+
+import unittest
+
+from opencivil.core.einheiten import CM, CM2, CM4, MM2
+from opencivil.projekt import Projekt
+from opencivil.projekt.lesen import ProjektFehler
+from opencivil.stabwerk.profiltabelle import PROFILE, PROFILREIHEN, profil
+from tests.profilwerte import WERTE
+
+GROESSEN = ("A", "I_y", "I_z", "I_T", "e_y")
+EINHEITEN = {"A": CM2, "I_y": CM4, "I_z": CM4, "I_T": CM4, "e_y": CM}
+
+
+def gerechnet(name):
+    p = profil(name)
+    return p.form.kennwerte(p.masse)
+
+
+def flaeche(punkte):
+    return abs(sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1)
+                   in zip(punkte, punkte[1:] + punkte[:1]))) / 2
+
+
+class TestTabelle(unittest.TestCase):
+    def test_jedes_profil_der_tabelle(self):
+        self.assertEqual(set(PROFILE), set(WERTE))
+        self.assertEqual({r.kurz: len(r.profile) for r in PROFILREIHEN},
+                         {"IPE": 18, "HEA": 24, "HEB": 24, "HEM": 24, "UPE": 14, "UNP": 17,
+                          "RRK": 306, "ROR": 239})
+        for r in PROFILREIHEN:
+            with self.subTest(reihe=r.kurz):
+                self.assertTrue(all(p.name.startswith(f"{r.kurz} ") for p in r.profile))
+
+    def test_rechnet_wie_die_tabelle(self):
+        """
+        I, UPE und ROR mit denselben Formeln wie die Tabelle -- beim RRK sind
+        dort die Beiwerte der Zwickel genau, hier gerundet: auf 2·10⁻⁵.
+        """
+        for name, werte in WERTE.items():
+            if name.startswith("UNP"):
+                continue
+            w = gerechnet(name)
+            for groesse, soll in zip(GROESSEN, werte):
+                if soll is not None:
+                    with self.subTest(profil=name, groesse=groesse):
+                        ist = w[groesse].in_einheit(EINHEITEN[groesse])
+                        self.assertAlmostEqual(ist / soll, 1.0, delta=2e-5)
+
+    def test_unp_trifft_die_werte_der_tabelle(self):
+        """
+        Die Tabelle hat beim UNP keine Formeln, nur Werte mit drei Stellen:
+        geneigte Flansche und Ecken wie im rechten Winkel treffen sie so gut.
+        """
+        grenzen = {"A": 0.006, "I_y": 0.006, "I_z": 0.014, "e_y": 0.01}
+        for name, werte in WERTE.items():
+            if not name.startswith("UNP"):
+                continue
+            w = gerechnet(name)
+            for groesse, soll in zip(GROESSEN, werte):
+                if groesse in grenzen:
+                    with self.subTest(profil=name, groesse=groesse):
+                        ist = w[groesse].in_einheit(EINHEITEN[groesse])
+                        self.assertLess(abs(ist / soll - 1.0), grenzen[groesse])
+
+    def test_radien_der_rrk(self):
+        """Wie in der Tabelle: bis t = 6 mm 2t und t, bis 10 mm 2.5t und 1.5t, darüber 3t und 2t."""
+        for name, r_o, r_i in (("RRK 100 x 100 x 6", 12.0, 6.0),
+                               ("RRK 100 x 100 x 6.3", 15.75, 9.45),
+                               ("RRK 200 x 200 x 10", 25.0, 15.0),
+                               ("RRK 200 x 200 x 12.5", 37.5, 25.0)):
+            with self.subTest(profil=name):
+                m = profil(name).masse
+                self.assertAlmostEqual(m["r_o"], r_o)
+                self.assertAlmostEqual(m["r_i"], r_i)
+
+    def test_neigung_der_unp(self):
+        """Bis h = 300 mm 8 % und t_f bei b/2, darüber 5 % und t_f in der Mitte des Flanschs."""
+        self.assertEqual((profil("UNP 300").masse["p"], profil("UNP 300").masse["c"]), (8.0, 50.0))
+        self.assertEqual((profil("UNP 320").masse["p"], profil("UNP 320").masse["c"]), (5.0, 57.0))
+        w = gerechnet("UNP 300")
+        self.assertAlmostEqual(w["t_1"].si * 1000, 16 + 0.08 * (50 - 10))
+        self.assertAlmostEqual(w["t_2"].si * 1000, 16 - 0.08 * (100 - 50))
+
+    def test_unbekanntes_profil(self):
+        with self.assertRaisesRegex(KeyError, "«HEB 333» gibt es nicht"):
+            profil("HEB 333")
+
+
+class TestUmriss(unittest.TestCase):
+    def test_flaeche_des_umrisses(self):
+        """Das Bild zeigt, was die Formeln rechnen: seine Fläche ist A, bis auf 1 %."""
+        for name, p in PROFILE.items():
+            with self.subTest(profil=name):
+                aussen, *loecher = p.form.umriss(p.masse)
+                bild = flaeche(aussen) - sum(flaeche(loch) for loch in loecher)
+                self.assertAlmostEqual(bild / gerechnet(name)["A"].in_einheit(MM2), 1.0, delta=0.01)
+
+
+def stahltraeger(name="HEB 300", achse="y"):
+    """Ein Einfeldträger von 6 m aus S355 mit 10 kN/m."""
+    p = Projekt(name="Stahlträger")
+    p.baustahl("S355")
+    s = p.balkensystem("Träger")
+    q = s.stahlprofil("Träger", name, achse)
+    linie = s.linie((0, 0), (6, 0), querschnitt=q, material=s.baustahl("st1"))
+    s.lager_an((0, 0), "gelenkig")
+    s.lager_an((6, 0), "verschieblich")
+    s.stablast(s.lastfall("G"), linie, wert=10.0)
+    return p
+
+
+class TestImBalkensystem(unittest.TestCase):
+    def EI(self, p):
+        return p.rechnen().wert("balkensystem.r1.Q1.M1.EI").groesse.si
+
+    def test_um_die_starke_achse(self):
+        I_y = WERTE["HEB 300"][1] * 1e-8
+        self.assertAlmostEqual(self.EI(stahltraeger()) / (210000e6 * I_y), 1.0, delta=1e-9)
+
+    def test_um_die_schwache_achse(self):
+        I_z = WERTE["HEB 300"][2] * 1e-8
+        self.assertAlmostEqual(self.EI(stahltraeger(achse="z")) / (210000e6 * I_z), 1.0, delta=1e-9)
+
+    def test_nur_was_der_stab_braucht(self):
+        """Um y braucht der Stab I_y -- I_z, d_K und I_T rechnet erst das räumliche System."""
+        werte = stahltraeger().rechnen().loesung.werte
+        self.assertIn("balkensystem.r1.Q1.I_y", werte)
+        for kurz in ("I_z", "d_K", "I_T"):
+            self.assertNotIn(f"balkensystem.r1.Q1.{kurz}", werte)
+
+    def test_eigengewicht_aus_der_flaeche(self):
+        p = stahltraeger()
+        p.balkensysteme[0].lastfaelle[0].eigengewicht = True
+        g_k = p.rechnen().wert("balkensystem.r1.Q1.M1.g_k").groesse.si
+        self.assertAlmostEqual(g_k, 7850 * 10 * WERTE["HEB 300"][0] * 1e-4, delta=1e-9)
+
+    def test_im_bericht(self):
+        bericht = stahltraeger("UNP 200", "z").rechnen().bericht()
+        self.assertIn("UNP 200, um z, die schwache Achse", bericht)
+
+    def test_speichern_und_laden(self):
+        p = stahltraeger("RRK 200 x 100 x 8", "z")
+        wieder = Projekt.aus_dict(p.als_dict())
+        self.assertEqual(wieder, p)
+        q = wieder.balkensysteme[0].querschnitte[0]
+        self.assertEqual((q.art, q.profil, q.achse), ("profil", "RRK 200 x 100 x 8", "z"))
+
+    def test_unbekanntes_profil(self):
+        with self.assertRaisesRegex(ProjektFehler, "«HEB 333» gibt es nicht"):
+            stahltraeger("HEB 333")
+        p = stahltraeger()
+        p.balkensysteme[0].querschnitte[0].profil = "HEB 333"
+        with self.assertRaisesRegex(ProjektFehler, "nimmt das Profil «HEB 333», das es in der "
+                                                   "Tabelle nicht gibt"):
+            p.aufbauen()
+
+
+if __name__ == "__main__":
+    unittest.main()

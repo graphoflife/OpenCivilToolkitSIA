@@ -440,7 +440,9 @@ def _alles_einmal(p: Projekt, decke: QuerschnittEintrag,
                   analyse: QuerschnittsanalyseEintrag) -> None:
     """
     Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-    Querschnitt, beide mit E_eq; ein Beton und ein Baustahl des Projekts
+    Querschnitt, beide mit E_eq; jede Form der Stahlprofile um beide
+    Achsen -- ohne Stab, ausser dem HEB --, das Doppel-T ohne Stab; ein
+    Beton und ein Baustahl des Projekts
     und ein eigenes Material, ein weicherer Beton; ein Stab mit dem
     Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
     keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager mit
@@ -464,13 +466,18 @@ def _alles_einmal(p: Projekt, decke: QuerschnittEintrag,
     # E_eq der Platte -- in x, Zug unten --, auch ohne Stab gesucht und hergeleitet.
     s.querschnitt_aus("Deckenstreifen", "platte", decke, E_eq={"M": 20.0})
     kasten = s.querschnitt_aus("Kasten", "analyse", analyse, E_eq={"N": -100.0, "M": 200.0})
+    heb = s.stahlprofil("Träger", "HEB 300")
+    for profil in ("HEA 200", "UPE 200", "UNP 200", "RRK 200 x 100 x 8"):
+        for achse in ("y", "z"):
+            s.stahlprofil(f"{profil} um {achse}", profil, achse)
+    s.stahlprofil("Rundrohr", "ROR 219.1 x 8", "z")
     gebettet = s.linie((0, 0), (8, 0), querschnitt=q["rechteck"], material=beton,
                        quer="feder", k_quer=20000.0)
     stuetze = s.linie((8, 0), (8, 3), querschnitt=q["kreis"], material=beton)
     sparren = s.linie((8, 3), (12, 5), querschnitt=q["t"], material=beton)
     s.linie((12, 5), (12, 0), querschnitt=q["kreisring"], material=baustahl,
             gelenk_anfang=True, gelenk_ende=True)
-    stahl = s.linie((12, 0), (15, 0), querschnitt=q["doppel_t"], material=baustahl,
+    stahl = s.linie((12, 0), (15, 0), querschnitt=heb, material=baustahl,
                     gelenk_anfang=True)
     aufgelegt = s.linie((15, 0), (17, 0), querschnitt=q["trapez"], material=weich,
                         quer="fest")

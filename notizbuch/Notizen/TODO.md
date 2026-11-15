@@ -771,7 +771,24 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Stütze, die auf ihm steht, sieht aus wie eine, die ihn trägt.
       Entscheid des Benutzers.
 
+- [ ] **Stahlprofile nach Vorgabe, nicht nachgeschlagen.** Masse und
+      Formeln kommen aus der Tabelle des Benutzers («Festigkeitsnachweise
+      I-Standardprofile Stahl», 2019-04-15), mit den Beiwerten der Zwickel
+      gerundet wie dort (0.2146, 0.2234, 0.00755). Die RRK-Radien aus der
+      Wanddicke wie in der Tabelle (bis 6 mm 2t/t, bis 10 mm 2.5t/1.5t,
+      darüber 3t/2t). Beim UNP hat die Tabelle keine Formeln: gerechnet mit
+      8 % Neigung und t_f bei b/2 bis h = 300 mm, darüber 5 % und t_f in der
+      Mitte des Flanschs -- so gewählt, dass die Werte der Tabelle getroffen
+      werden (A, I_y auf 0.6 %, e_y 1 %, I_z 1.4 %); I_T des UNP wie beim
+      UPE, mit t_f und r_1. Gegen eine Profiltabelle prüfen, etwa die
+      Stahlbautabellen des SZS.
+
 ## Noch nicht gebaut
+
+- [ ] **Stahlprofile, was fehlt:** L, INP, T, HEAA und die warmgefertigten
+      Rechteckrohre (RRW) -- die Tabelle des Benutzers hat sie nicht, und
+      eine andere Quelle braucht seine Erlaubnis. Dazu für die Nachweise nach
+      SIA 263: W_el, W_pl, A_v, I_w; die Tabelle hat Formeln dafür.
 
 - [ ] **Durchstanzen, nächste Schritte:** Stahlpilze an Rand und Ecke
       (der Katalog hat nur ganze Pilze); Durchstanzbewehrung an Wandende und

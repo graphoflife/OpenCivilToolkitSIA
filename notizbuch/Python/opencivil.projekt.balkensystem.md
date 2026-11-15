@@ -1,5 +1,5 @@
 ---
-erzeugt: 9d2edb87000d
+erzeugt: 4bd78a25e636
 art: modul
 tags: [modul]
 ---
@@ -67,6 +67,7 @@ Art einmal, im Aufbau: je Art eine Klasse
 ([[opencivil.stabwerk.stabquerschnitt]]).
 
 - `VORLAGE = 'vorlage'`
+- `PROFIL = 'profil'`
 - `KENNWERTE = 'kennwerte'`
 - `PLATTE = 'platte'`
 - `ANALYSE = 'analyse'`
@@ -100,6 +101,43 @@ des Bauteils, und nur dann hat er ein E_eq -- eine
 Momenten-Kruemmungs-Linie mit ihrer Bewehrung, bei einer Platte immer
 in x-Richtung, Zug unten (Benutzer, 2026-10-24). Einer nach Vorlage
 oder von Hand ist nur eine Form.
+
+### Profilachse
+
+```python
+class Profilachse(Wahl)
+```
+
+Um welche Achse ein Stahlprofil sich im Rahmen biegt: um `y`, die
+starke -- der Steg liegt in der Ebene des Rahmens --, oder um `z`.
+
+- `Y = 'y'`
+- `Z = 'z'`
+
+#### Profilachse.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Profilachse.kurz
+
+```python
+@property
+def kurz(self) -> str
+```
+
+Fuer den Schalter -- der lange Name steht in seinem Titel.
+
+#### Profilachse.traegheit
+
+```python
+@property
+def traegheit(self) -> str
+```
+
+Der Kurzname des Traegheitsmoments der Profilform, das dann `I` ist.
 
 ### SystemknotenEintrag
 
@@ -263,10 +301,11 @@ def wahl(self) -> Rechenwahl
 class StabquerschnittEintrag(Beschreibung)
 ```
 
-Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, mit Kennwerten
-von Hand (`A` in mm², `I` in 10⁶ mm⁴), oder aus einer Platte oder
-einer Querschnittsanalyse des Projekts (`bezug`). E kommt vom Material
-des Stabs; nimmt der das Material des Querschnitts, sagt `e_modul`,
+Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, ein Stahlprofil
+aus der Tabelle (`profil`, gebogen um `achse`), mit Kennwerten von
+Hand (`A` in mm², `I` in 10⁶ mm⁴), oder aus einer Platte oder einer
+Querschnittsanalyse des Projekts (`bezug`). E kommt vom Material des
+Stabs; nimmt der das Material des Querschnitts, sagt `e_modul`,
 welches E.
 
 - `kennung: str = ''`
@@ -274,6 +313,8 @@ welches E.
 - `art: Querschnittsart = einer_von(tuple(Querschnittsart), Querschnittsart.VORLAGE)`
 - `vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)`
 - `masse: Dict[str, float] = field(default_factory=dict)`
+- `profil: str = 'IPE 300'` – Der Name des Stahlprofils ([[opencivil.stabwerk.profiltabelle]]). Kein Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
+- `achse: Profilachse = Profilachse.Y`
 - `bezug: str = ''`
 - `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt.
 - `eq: ModulEintrag = field(default_factory=ModulEintrag)` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
@@ -465,6 +506,14 @@ def querschnitt(self, name: str, vorlage: str=qs.RECHTECK.schluessel, **masse: f
 
 Ein Querschnitt nach Vorlage -- Masse in mm, was fehlt nach ihrer Vorgabe.
 
+#### BalkensystemEintrag.stahlprofil
+
+```python
+def stahlprofil(self, name: str, profil: str, achse: str='y') -> StabquerschnittEintrag
+```
+
+Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke.
+
 #### BalkensystemEintrag.querschnitt_aus
 
 ```python
@@ -573,6 +622,7 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - [[opencivil.projekt.netz]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.stabwerk.modell]]
+- [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]
 

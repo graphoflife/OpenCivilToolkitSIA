@@ -1,5 +1,5 @@
 ---
-erzeugt: f6adef77f9a2
+erzeugt: 77a83eb3a637
 art: formel
 tags: [formel]
 ---
@@ -30,6 +30,10 @@ $$
   &= 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4}
 \end{aligned}
 $$
+
+## Gebraucht von
+
+- [[Flächenträgheitsmoment eines Rundrohrs um z]]
 
 ## Im Code
 

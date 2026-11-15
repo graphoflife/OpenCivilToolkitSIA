@@ -1,5 +1,5 @@
 ---
-erzeugt: 9f027a2dfae2
+erzeugt: aebee5740000
 art: modul
 tags: [modul]
 ---
@@ -142,6 +142,7 @@ Teil sagt, warum.
 - [[opencivil.projekt.lesen]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.stabwerk.modell]]
+- [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.stabwerk.system]]
