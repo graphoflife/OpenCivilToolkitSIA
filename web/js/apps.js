@@ -265,7 +265,7 @@ const SYSTEM = bauteil('balkensystem', {
     einrichten: (s, { beton }) => {
       s.stabmaterialien = [{
         ...structuredClone(katalog('vorlagen', 'stabmaterial')),
-        kennung: 'M1', art: 'beton', beton: beton.kennung,
+        kennung: 'M1', art: 'beton', stoff: beton.kennung,
       }];
     },
   }),
