@@ -253,6 +253,26 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         funktion=_e_cm,
     ),
     KennwertVorlage(
+        kurzname="nu_c",
+        symbol=r"\nu_c",
+        beschreibung="Querdehnungszahl des Betons",
+        referenz="SIA 262:2025, 3.1.2.3.5",
+        stellen=2,
+        festwert=Groesse(0.2, EINHEITSLOS),
+    ),
+    # Isotrop elastisch, wie der Beton im Bereich elastischer Verformungen in
+    # erster Naeherung angenommen wird (3.1.2.3.5) -- die Norm nennt G nicht.
+    KennwertVorlage(
+        kurzname="G_cm",
+        symbol="G_{cm}",
+        einheit=N_PRO_MM2,
+        beschreibung="Mittelwert des Schubmoduls",
+        stellen=0,
+        eingaben=("E_cm", "nu_c"),
+        vorlage_latex=r"\frac{@E_cm}{2 \cdot \left(1 + @nu_c\right)}",
+        funktion=lambda E_cm, nu_c: E_cm / (2 * (Groesse(1.0, EINHEITSLOS) + nu_c)),
+    ),
+    KennwertVorlage(
         kurzname="E_cd",
         symbol="E_{cd}",
         einheit=N_PRO_MM2,

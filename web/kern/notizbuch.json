@@ -2198,6 +2198,17 @@
       ]
     },
     {
+      "name": "Mittelwert des Schubmoduls",
+      "pfad": "Formelsammlung/Formeln/Mittelwert des Schubmoduls.md",
+      "art": "formel",
+      "zeichen": [
+        "G_{cm}"
+      ],
+      "themen": [
+        "Beton"
+      ]
+    },
+    {
       "name": "Mittlere statische Höhe der beiden Lagen der Zugbewehrung",
       "pfad": "Formelsammlung/Formeln/Mittlere statische Höhe der beiden Lagen der Zugbewehrung.md",
       "art": "formel",
@@ -7511,6 +7522,7 @@
       "kurz": "der raeumliche Stab: drei ebene in einem.",
       "stichworte": [
         "achsen",
+        "drehung_umgekehrt",
         "steifigkeit",
         "bettung",
         "Lasten",

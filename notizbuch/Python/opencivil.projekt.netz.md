@@ -1,5 +1,5 @@
 ---
-erzeugt: 5bc862e0661a
+erzeugt: 95fc8868440d
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,7 @@ beim Zeichnen. Eine Toleranz hier wuerde zwei Punkte, die jemand absichtlich
 einen Hundertstelmillimeter auseinander gesetzt hat, stillschweigend vereinen.
 
 Allgemein gehalten: der Baukasten kennt weder Beton noch Querschnitt, nur
-Knoten mit Kennung und zwei Koordinaten. Das Zeichenfenster im Browser folgt
+Knoten mit Kennung und Koordinaten -- zwei in der Ebene, drei im Raum. Das Zeichenfenster im Browser folgt
 denselben Regeln (`web/js/cad_modell.js`), damit es nichts anlegt, was der
 Kern anders saehe; der Kern haengt von ihm nicht ab.
 
@@ -57,24 +57,24 @@ class Netz
 Die Knoten einer Zeichnung -- mit dem Zusammenfuehren gleicher Koordinaten.
 
 `knoten` ist die Liste der Beschreibung; neue Knoten werden an sie
-angehaengt. Jeder Knoten hat `kennung` und zwei Koordinaten -- wie sie
+angehaengt. Jeder Knoten hat `kennung` und seine Koordinaten -- wie sie
 heissen, sagt `achsen`: `y` und `z` im Querschnitt, `x` und `z`
-im Balkensystem. `neu` baut einen aus Kennung und Lage -- so bleibt der
-Baukasten bei der Klasse, die die Beschreibung speichert, ohne sie zu
-kennen.
+im Balkensystem, `x`, `y` und `z` im 3D-Balkensystem. `neu` baut
+einen aus Kennung und Lage -- so bleibt der Baukasten bei der Klasse, die
+die Beschreibung speichert, ohne sie zu kennen.
 
 #### Netz.an
 
 ```python
-def an(self, a: float, b: float) -> str
+def an(self, *koordinaten: float) -> str
 ```
 
-Die Kennung des Knotens an `(a, b)` -- angelegt, wenn es dort noch keinen gibt.
+Die Kennung des Knotens an diesen Koordinaten -- angelegt, wenn es dort noch keinen gibt.
 
 #### Netz.lage
 
 ```python
-def lage(self, kennung: str) -> Optional[Tuple[float, float]]
+def lage(self, kennung: str) -> Optional[Tuple[float, ...]]
 ```
 
 Wo der Knoten liegt -- `None`, wenn es ihn nicht gibt.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6e63d694ed78
+erzeugt: 90bf72c18b43
 art: modul
 tags: [modul]
 ---
@@ -75,6 +75,18 @@ def achsen(a, b, drehung: float=0.0) -> Tuple[float, Tuple[Vektor, Vektor, Vekto
 
 Laenge und Achsen `(x, y, z)` eines Stabs von `a` nach `b` --
 Einheitsvektoren im System, siehe Dateikopf.
+
+### drehung_umgekehrt
+
+```python
+def drehung_umgekehrt(a, b, drehung: float) -> float
+```
+
+Der Drehwinkel des Stabs von `a` nach `b`, wenn er umgekehrt von
+`b` nach `a` laeuft -- so, dass der Querschnitt bleibt, wie er
+steht: `z` bleibt, `y` kehrt um wie `x`. Liegt der Stab nicht
+lotrecht, bleibt `z` bei `β = 0` dasselbe, und es ist `-β`;
+lotrecht kehrt es um, und es ist `π - β`. Zwischen `-π` und `π`.
 
 ### steifigkeit
 

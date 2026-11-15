@@ -1,5 +1,5 @@
 ---
-erzeugt: 738e07b1aac7
+erzeugt: 9ee6764b8792
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -9,7 +9,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Baustoffe**
 
-- [[Beton]] · 7
+- [[Beton]] · 8
 - [[Betonstahl]] · 3
 - [[Baustahl]] · 1
 
@@ -250,6 +250,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Materialwiderstand des Stahls]] · $R_{mat,d,Z}$
 - [[Mittelwert der Zylinderdruckfestigkeit]] · $f_{cm}$
 - [[Mittelwert des Elastizitätsmoduls]] · $E_{cm}$
+- [[Mittelwert des Schubmoduls]] · $G_{cm}$
 - [[Mittlere statische Höhe der beiden Lagen der Zugbewehrung]] · $d$
 - [[Mittleres Moment im Stützstreifen]] · $m_{sd,x}$
 - [[Moment der Bewehrung bei zulässiger Stahlspannung]]
@@ -378,7 +379,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-112 von 305 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+113 von 306 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -451,6 +452,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Kräftegleichgewicht]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Kürzester Abstand zur Resistenzlinie]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
+- [[Mittelwert des Schubmoduls]] · [[opencivil.material.beton]]
 - [[Momentengleichgewicht um die halbe Höhe]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 - [[Momentenwiderstand bei reiner Biegung]] · [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
 - [[Normalkraft mit der Längszugkraft aus der Querkraft]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._biegung|InnererQuerwiderstand._biegung]]

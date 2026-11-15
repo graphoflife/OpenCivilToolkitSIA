@@ -1,5 +1,5 @@
 ---
-erzeugt: 46268a48a36b
+erzeugt: aca05aad0305
 art: modul
 tags: [modul]
 ---
@@ -122,3 +122,4 @@ werden, um Normvorgaben zu ersetzen.
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]
 - [[Mittelwert der Zylinderdruckfestigkeit]]
 - [[Mittelwert des Elastizitätsmoduls]] · `_e_cm`
+- [[Mittelwert des Schubmoduls]]

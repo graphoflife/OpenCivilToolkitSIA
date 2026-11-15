@@ -1,10 +1,10 @@
 ---
-erzeugt: 463892e7b072
+erzeugt: 65aebecbb5a4
 art: thema
 tags: [thema]
 ---
 > [!abstract] Baustoffe
-> 7 Formeln, in der Folge, in der gerechnet wird.
+> 8 Formeln, in der Folge, in der gerechnet wird.
 
 ## Formeln
 
@@ -13,8 +13,9 @@ tags: [thema]
 3. [[Bemessungswert der Schubspannungsgrenze]]
 4. [[Mittelwert der Zylinderdruckfestigkeit]]
 5. [[Mittelwert des Elastizitätsmoduls]]
-6. [[Bemessungswert des Elastizitätsmoduls]]
-7. [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]
+6. [[Mittelwert des Schubmoduls]]
+7. [[Bemessungswert des Elastizitätsmoduls]]
+8. [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

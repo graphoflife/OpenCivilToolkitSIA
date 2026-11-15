@@ -7,6 +7,21 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Material: Schubmodul des Betons
+
+Ein Beton hat jetzt die Querdehnungszahl ν_c = 0.20 (SIA 262:2025,
+3.1.2.3.5) und daraus den Schubmodul G_cm = E_cm / (2 · (1 + ν_c)) =
+E_cm / 2.4, beim C30/37 also 14 008 N/mm². Das Stabwerk im Raum braucht ihn
+für die Torsionssteifigkeit der Betonstäbe; der Baustahl hatte G_a schon.
+
+Warum so:
+
+- Den Schubmodul nennt die Norm nicht, nur die Querdehnungszahl für den
+  elastischen Bereich. G folgt daraus, wenn der Beton sich in alle
+  Richtungen gleich verhält -- die übliche Annahme.
+- Beide stehen beim Beton, wie E_cm: so lässt sich ν_c bei einem eigenen
+  Beton überschreiben, und jedes Bauteil liest denselben Wert.
+
 ## 2026-11-15 · Stabquerschnitte: I_z und I_T für jede Vorlage
 
 Jede Vorlage eines Stabquerschnitts rechnet jetzt auch das

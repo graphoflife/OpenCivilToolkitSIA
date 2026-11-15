@@ -62,6 +62,13 @@ class TestBeton(unittest.TestCase):
             self.w("E_cd").in_einheit(N_PRO_MM2), 10000 * 38 ** (1 / 3) / 1.2, places=6
         )
 
+    def test_schubmodul_aus_der_querdehnung(self):
+        """G_cm = E_cm / (2 · (1 + ν_c)) mit ν_c = 0.20, SIA 262:2025, 3.1.2.3.5."""
+        self.assertAlmostEqual(self.w("nu_c").in_einheit(EINHEITSLOS), 0.2)
+        self.assertAlmostEqual(
+            self.w("G_cm").in_einheit(N_PRO_MM2), 10000 * 38 ** (1 / 3) / 2.4, places=6
+        )
+
     def test_k_sigma(self):
         erwartet = (10000 * 38 ** (1 / 3) / 1.2) / (400 * 20.0)
         self.assertAlmostEqual(self.w("k_sigma").in_einheit(EINHEITSLOS), erwartet, places=6)
