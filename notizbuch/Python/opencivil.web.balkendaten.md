@@ -1,5 +1,5 @@
 ---
-erzeugt: 5e8bb5e47382
+erzeugt: 0f2393279846
 art: modul
 tags: [modul]
 ---
@@ -30,12 +30,14 @@ Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm, mrad, Stellen in m:
 
 Was sich unterscheidet -- die Achsen, die Groessen, die Lagerkraefte --,
 steht je einmal in einer [[opencivil.web.balkendaten#Darstellung|Darstellung]] ([[opencivil.web.balkendaten#Konstanten|EBEN]], [[opencivil.web.balkendaten#Konstanten|RAUM]]);
-welche gilt, sagt die Art des Befunds. Eine Lage oder Verschiebung ist eine
+welche gilt, sagt die Art der Rechnung. Eine Lage oder Verschiebung ist eine
 Liste mit einer Zahl je Achse des Systems -- `[x, z]` in der Ebene,
 `[x, y, z]` im Raum --, die Drehung eines Knotens eine Liste mit einer Zahl
 je Drehachse. Ein Stab hat seine Achsen im System: `x` laengs, `z` zur
 gestrichelten Faser, im Raum dazu `y` ([[opencivil.stabwerk3d.stab]]) --
-dorthin traegt ein Bild einen positiven Wert auf.
+dorthin traegt ein Bild einen positiven Wert auf. In der Ebene steht `y`
+jedes Stabs senkrecht auf ihr, wie `y` des Systems: ein Stab zeigt dort
+die Achsen, die heissen wie die des Systems.
 
 Die Verlaeufe sind gross; mit jeder Rechnung mitgeliefert, machten sie jede
 Eingabe langsamer, auch wenn niemand die Bilder ansieht -- dasselbe wie bei
@@ -58,7 +60,21 @@ Was eben und im Raum verschieden ist -- die Form der Daten bleibt dieselbe.
 - `groessen: Dict[str, Anzeigegroesse]` – Was die Proben eines Stabs je Stelle tragen, ausser `x` und der Verschiebung -- und wovon die Uebersicht je Stab und Fall den kleinsten und den groessten Wert hat.
 - `schnittgroessen: Tuple[str, ...]` – Welche der `groessen` Schnittgroessen sind -- die Zusammenfassung zeigt sie.
 - `durchbiegungen: Tuple[Tuple[str, str], ...]` – Die Durchbiegungen gegen die Sehne, je mit der Achse des Stabs, in die sie positiv zeigt.
-- `lage: Callable[[Any], Dict[str, Any]]` – Anfang und Achsen eines Stabs im System, aus seinem Verlauf.
+- `felder: Dict[str, str] = field(default_factory=dict)` – Je Groesse ihr Feld im Verlauf, wo es anders heisst ([[opencivil.stabwerk.verlauf#Konstanten|IN_DER_EBENE]]).
+
+#### Darstellung.feld
+
+```python
+def feld(self, groesse: str) -> str
+```
+
+#### Darstellung.lage
+
+```python
+def lage(self, v: Any) -> Dict[str, Any]
+```
+
+Anfang und Achsen eines Stabs im System, aus seinem Verlauf -- in den Achsen der Darstellung.
 
 #### Darstellung.drehungen
 
@@ -148,15 +164,17 @@ auch ohne Rechnung. Eine Linie ohne Laenge hat keine.
 - `PROBEN_JE_STAB = 24` – Wie viele Stuecke ein Stab im Bild mindestens hat -- dazu jede Grenze und jeder Extremwert.
 - `EBEN = Darstellung(achsen=('x', 'z'), drehachsen=(None,), groessen={'N': Anz…` – Das 2D-Balkensystem.
 - `RAUM = Darstellung(achsen=('x', 'y', 'z'), drehachsen=('x', 'y', 'z'), groes…` – Das 3D-Balkensystem.
-- `_DARSTELLUNGEN = {Systembefund: EBEN, Raumbefund: RAUM}` – Welche Darstellung zu welchem Befund gehoert -- nach seiner Klasse.
+- `_DARSTELLUNGEN = {art.EBENE: EBEN, art.RAUM: RAUM}` – Welche Darstellung zu welcher Art der Rechnung gehoert.
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.stabwerk.art]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk.verlauf]]
 - [[opencivil.stabwerk3d.modell]]
-- [[opencivil.stabwerk3d.rechnung]]
+- [[opencivil.stabwerk3d.raum]]
 - [[opencivil.stabwerk3d.stab]]
 - [[opencivil.web.anzeige]]
 

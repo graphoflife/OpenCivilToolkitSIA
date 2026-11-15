@@ -8,10 +8,9 @@ Strecken -- und eine Kraft mit ihrem Moment um den Ursprung. Nur die
 Standardbibliothek.
 
 GENAUIGKEIT:
-Ein Punkt liegt auf einer Strecke, wenn er weniger als
-:data:`~opencivil.stabwerk.system.TOLERANZ` daneben liegt -- so genau rundet
-das Zeichenfenster. Eine Richtung zaehlt in einer Basis, wenn von ihr nach
-Abzug der anderen mehr als 1e-9 bleibt.
+Ein Punkt liegt auf einer Strecke, wenn er weniger als :data:`TOLERANZ`
+daneben liegt -- so genau rundet das Zeichenfenster. Eine Richtung zaehlt in
+einer Basis, wenn von ihr nach Abzug der anderen mehr als 1e-9 bleibt.
 """
 
 from __future__ import annotations
@@ -19,7 +18,9 @@ from __future__ import annotations
 import math
 from typing import List, Optional, Sequence, Tuple
 
-from opencivil.stabwerk.system import TOLERANZ
+#: Wie nahe ein Knoten an einem Stab liegen muss, um mit ihm verbunden zu
+#: sein -- in m. Das Zeichenfenster rundet auf ein Millionstel.
+TOLERANZ = 1e-6
 
 Vektor = Tuple[float, float, float]
 
@@ -86,17 +87,17 @@ def orthonormal(vektoren: Sequence[Sequence[float]],
     return basis
 
 
-def in_achsen(raum: Sequence[Vektor]) -> List[Vektor]:
+def in_achsen(raum: Sequence[Vektor], achsen: Sequence[Vektor] = ACHSEN) -> List[Vektor]:
     """
     Eine orthonormale Basis des Raums, den die orthonormalen ``raum``
-    aufspannen -- aus den Achsen des Systems, zuerst die, die am meisten
-    darin liegt. Eine Rolle auf waagrechter Bahn ist so frei in x, nicht in
-    -x und nicht schief.
+    aufspannen -- aus den ``achsen``, zuerst die, die am meisten darin
+    liegt. Eine Rolle auf waagrechter Bahn ist so frei in x, nicht in -x und
+    nicht schief.
     """
     heraus: List[Vektor] = []
     while len(heraus) < len(raum):
         kandidaten = []
-        for e in ACHSEN:
+        for e in achsen:
             w = NULL
             for r in raum:
                 w = plus(w, mal(skalar(e, r), r))

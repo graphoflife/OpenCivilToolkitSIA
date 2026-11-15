@@ -7403,8 +7403,20 @@
       "name": "opencivil.stabwerk",
       "pfad": "Python/opencivil.stabwerk.md",
       "art": "modul",
-      "kurz": "ebene Stabwerke nach der Steifigkeitsmethode.",
+      "kurz": "Stabwerke nach der Steifigkeitsmethode, eben und im Raum.",
       "stichworte": []
+    },
+    {
+      "name": "opencivil.stabwerk.art",
+      "pfad": "Python/opencivil.stabwerk.art.md",
+      "art": "modul",
+      "kurz": "eben oder im Raum: was die beiden Balkensysteme unterscheidet.",
+      "stichworte": [
+        "Art",
+        "Art.werte",
+        "_im_raum",
+        "_last_im_raum"
+      ]
     },
     {
       "name": "opencivil.stabwerk.herleitung",
@@ -7463,8 +7475,6 @@
         "Lastrichtung.stabachse",
         "Lastrichtung.im_system",
         "Lastrichtung.systemvektor",
-        "Lastrichtung.vektor",
-        "Lastrichtung.projektion",
         "Lastart",
         "Lastart.beschriftung",
         "Lastart.verteilt",
@@ -7560,8 +7570,6 @@
         "Stabwerksrechnung.ziele",
         "Stabwerksrechnung.rechnen_und_schreiben",
         "Stabwerksrechnung._ohne_modul",
-        "Stabwerksrechnung._rechnen",
-        "Stabwerksrechnung._leer",
         "Stabwerksrechnung._eigenlast",
         "Stabwerksrechnung._schreiben",
         "Balkensystem",
@@ -7579,9 +7587,7 @@
         "steifigkeit",
         "bettung",
         "summe",
-        "drehung",
         "mal",
-        "transponiert_mal",
         "formfunktionen",
         "ableitungen",
         "Strecke",
@@ -7627,15 +7633,19 @@
       "name": "opencivil.stabwerk.system",
       "pfad": "Python/opencivil.stabwerk.system.md",
       "art": "modul",
-      "kurz": "das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.",
+      "kurz": "das Stabwerk, eben und im Raum: Unbekannte, Zusammenbau, Loesen.",
       "stichworte": [
         "Meldung",
         "Ort",
+        "Ort.punkt",
         "Ort.gehalten",
         "Teilstab",
         "Teilstab.L",
         "Teilstab.EA",
-        "Teilstab.EI",
+        "Teilstab.EI_y",
+        "Teilstab.EI_z",
+        "Teilstab.GI_T",
+        "Teilstab.gesperrt",
         "Teilstab.lokal",
         "Teilstab.bettungsmatrix",
         "Teilergebnis",
@@ -7644,28 +7654,24 @@
         "Ergebnis.gueltig",
         "Ergebnis.fall",
         "Ergebnis.unbestimmt",
-        "_stelle_auf",
-        "_kreuzen",
-        "_basis",
+        "_name",
+        "_traegt_torsion",
         "rechnen",
-        "_ende",
-        "lastbereich",
-        "_lokal",
-        "_resultierende",
-        "_summe_der_lasten"
+        "_ende"
       ]
     },
     {
       "name": "opencivil.stabwerk.verlauf",
       "pfad": "Python/opencivil.stabwerk.verlauf.md",
       "art": "modul",
-      "kurz": "Schnittgroessen und Biegelinie laengs eines Stabs.",
+      "kurz": "Schnittgroessen und Biegelinien laengs eines Stabs, eben und im Raum.",
       "stichworte": [
         "Polynom",
         "Polynom.durch",
         "Polynom.stammfunktion",
         "Polynom.ableitung",
         "Polynom.nullstellen",
+        "EbenesIntervall",
         "Intervall",
         "Extrem",
         "Stabverlauf",
@@ -7676,6 +7682,7 @@
         "Stabverlauf.extrem",
         "verlaeufe",
         "ebener_verlauf",
+        "_zusammen",
         "_hermite",
         "_verschoben",
         "_schieben"
@@ -7685,7 +7692,7 @@
       "name": "opencivil.stabwerk3d",
       "pfad": "Python/opencivil.stabwerk3d.md",
       "art": "modul",
-      "kurz": "raeumliche Stabwerke nach der Steifigkeitsmethode.",
+      "kurz": "was ein Stabwerk im Raum braucht.",
       "stichworte": []
     },
     {
@@ -7750,7 +7757,6 @@
       "art": "modul",
       "kurz": "das 3D-Balkensystem im Rechenwerk.",
       "stichworte": [
-        "Raumbefund",
         "Balkensystem3d"
       ]
     },
@@ -7761,6 +7767,7 @@
       "kurz": "der raeumliche Stab: drei ebene in einem.",
       "stichworte": [
         "achsen",
+        "achsen_eben",
         "_lotrecht",
         "drehung_umgekehrt",
         "steifigkeit",
@@ -7773,55 +7780,10 @@
         "aufteilen",
         "knotenlasten",
         "eben",
+        "eben_matrix",
+        "lastbereich",
         "lokal",
         "resultierende"
-      ]
-    },
-    {
-      "name": "opencivil.stabwerk3d.system",
-      "pfad": "Python/opencivil.stabwerk3d.system.md",
-      "art": "modul",
-      "kurz": "das raeumliche Stabwerk: Unbekannte, Zusammenbau, Loesen.",
-      "stichworte": [
-        "Ort",
-        "Ort.punkt",
-        "Ort.gehalten",
-        "Teilstab",
-        "Teilstab.L",
-        "Teilstab.EA",
-        "Teilstab.EI_y",
-        "Teilstab.EI_z",
-        "Teilstab.GI_T",
-        "Teilstab.gesperrt",
-        "Teilstab.lokal",
-        "Teilstab.bettungsmatrix",
-        "Teilergebnis",
-        "Fall",
-        "Ergebnis",
-        "Ergebnis.gueltig",
-        "Ergebnis.fall",
-        "Ergebnis.unbestimmt",
-        "_name",
-        "_traegt_torsion",
-        "rechnen",
-        "_ende"
-      ]
-    },
-    {
-      "name": "opencivil.stabwerk3d.verlauf",
-      "pfad": "Python/opencivil.stabwerk3d.verlauf.md",
-      "art": "modul",
-      "kurz": "Schnittgroessen und Biegelinien laengs eines Stabs im Raum.",
-      "stichworte": [
-        "Intervall",
-        "_zusammen",
-        "Stabverlauf",
-        "Stabverlauf.bei",
-        "Stabverlauf.sehne",
-        "Stabverlauf.proben",
-        "Stabverlauf.extremstellen",
-        "Stabverlauf.extrem",
-        "verlaeufe"
       ]
     },
     {
@@ -7878,6 +7840,8 @@
       "kurz": "was die Oberflaeche von einem Balkensystem zeigt.",
       "stichworte": [
         "Darstellung",
+        "Darstellung.feld",
+        "Darstellung.lage",
         "Darstellung.drehungen",
         "Darstellung._lagerwerte",
         "Darstellung.lagerkraefte",

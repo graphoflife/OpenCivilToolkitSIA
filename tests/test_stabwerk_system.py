@@ -19,10 +19,17 @@ from opencivil.stabwerk.modell import (
     FEST, Kombination, Knoten, Knotenlast, Lager, Lastart, Lastfall, Lastrichtung,
     Stab, Stablast, System, feder,
 )
-from opencivil.stabwerk.system import UNBESTIMMT, rechnen
+from opencivil.stabwerk import system as kern
+from opencivil.stabwerk.art import EBENE
+from opencivil.stabwerk.system import UNBESTIMMT
+from opencivil.stabwerk3d import stab as st3
 
 EI, EA = 50e6, 5e9
 q, P = 10e3, 20e3
+
+
+def rechnen(s):
+    return kern.rechnen(s, EBENE)
 
 
 def stab(name, a, b, **felder):
@@ -125,7 +132,7 @@ class TestZweifeldtraeger(Rechnung):
         self.assertAlmostEqual(f.lagerkraefte["K2"][1], 1.25 * q * L, places=5)
         self.assertAlmostEqual(f.lagerkraefte["K1"][1], 0.375 * q * L, places=5)
         # Das Moment am Ende b ist das der Baustatik: −qL²/8 über der Stütze.
-        self.assertAlmostEqual(f.teile[0].s[5], -q * L * L / 8, places=5)
+        self.assertAlmostEqual(st3.eben(f.teile[0].s, st3.EBENE_Z)[5], -q * L * L / 8, places=5)
 
 
 class TestRahmen(Rechnung):

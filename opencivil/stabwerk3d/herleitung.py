@@ -19,7 +19,7 @@ bis :data:`STAEBE_MIT_MATRIX` Teilstaebe.
 EINHEITEN:
 Wie in der Ebene: Laengen in m, Verschiebungen in mm, Drehungen in mrad,
 Kraefte in kN, Momente in kNm, in den Matrizen kN und m. Die
-Schnittgroessen in den Achsen des Stabs (:mod:`~opencivil.stabwerk3d.verlauf`).
+Schnittgroessen in den Achsen des Stabs (:mod:`~opencivil.stabwerk.verlauf`).
 """
 
 from __future__ import annotations
@@ -31,15 +31,15 @@ from opencivil.core.latex import Mathe, fest, text_latex
 from opencivil.core.protokoll import Protokoll
 from opencivil.stabwerk import herleitung as eben
 from opencivil.stabwerk import stab as st
-from opencivil.stabwerk.system import UNBESTIMMT
+from opencivil.stabwerk.system import UNBESTIMMT, Fall
+from opencivil.stabwerk.verlauf import SCHNITTGROESSEN
 from opencivil.stabwerk3d import stab as st3
 from opencivil.stabwerk3d.modell import Stablast, System
 from opencivil.stabwerk3d.raum import ACHSEN, betrag, minus, punkt, skalar
-from opencivil.stabwerk3d.system import Fall
-from opencivil.stabwerk3d.verlauf import SCHNITTGROESSEN
 
 if TYPE_CHECKING:
-    from opencivil.stabwerk3d.rechnung import Balkensystem3d, Raumbefund
+    from opencivil.stabwerk.rechnung import Systembefund
+    from opencivil.stabwerk3d.rechnung import Balkensystem3d
 
 #: Bis zu so vielen Teilstaeben steht die Matrix jedes einzelnen mit Zahlen da.
 STAEBE_MIT_MATRIX = 2
@@ -85,12 +85,13 @@ SUMMEN = ((r"\sum F_x", "kN"), (r"\sum F_y", "kN"), (r"\sum F_z", "kN"),
 #: Je Schnittgroesse ihre Einheit -- Kraefte in kN, Momente in kNm.
 EINHEITEN = {"N": "kN", "V_y": "kN", "V_z": "kN", "T": "kNm", "M_y": "kNm", "M_z": "kNm"}
 
-#: Die Extremwerte im Raum: Groesse, Einheit, Faktor von SI und Nachkommastellen.
-EXTREMWERTE = (*((g, EINHEITEN[g], 1e-3, 1) for g in SCHNITTGROESSEN),
-               ("f_y", "mm", 1e3, 2), ("f_z", "mm", 1e3, 2))
+#: Die Extremwerte im Raum: Feld im Verlauf, Zeichen, Einheit, Faktor von SI
+#: und Nachkommastellen -- das Zeichen ist das Feld.
+EXTREMWERTE = (*((g, g, EINHEITEN[g], 1e-3, 1) for g in SCHNITTGROESSEN),
+               ("f_y", "f_y", "mm", 1e3, 2), ("f_z", "f_z", "mm", 1e3, 2))
 
 
-def schreiben(p: Protokoll, system: "Balkensystem3d", befund: "Raumbefund") -> None:
+def schreiben(p: Protokoll, system: "Balkensystem3d", befund: "Systembefund") -> None:
     """Die ganze Herleitung eines gerechneten Systems."""
     e = befund.ergebnis
     p.annahme(ANNAHME)
@@ -151,7 +152,7 @@ def _lager(p: Protokoll, modell: System) -> None:
               titel="Lager")
 
 
-def _ansaetze(p: Protokoll, befund: "Raumbefund") -> None:
+def _ansaetze(p: Protokoll, befund: "Systembefund") -> None:
     e, modell = befund.ergebnis, befund.gerechnet
     p.ansatz(st3.ZERLEGUNG_LATEX, titel="Ein Stab im Raum: drei ebene Stäbe",
              name="Zerlegung eines Stabs im Raum")
@@ -197,7 +198,7 @@ def _ansaetze(p: Protokoll, befund: "Raumbefund") -> None:
 # ===========================================================================
 
 
-def _fall(p: Protokoll, befund: "Raumbefund", fall: Fall) -> None:
+def _fall(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
     eben.kopf_eines_falls(p, befund, fall)
     _verschiebungen(p, befund, fall)
     verlaeufe = befund.verlaeufe(fall.name)
@@ -207,7 +208,7 @@ def _fall(p: Protokoll, befund: "Raumbefund", fall: Fall) -> None:
     eben.gleichgewicht(p, fall, SUMMEN)
 
 
-def _verschiebungen(p: Protokoll, befund: "Raumbefund", fall: Fall) -> None:
+def _verschiebungen(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
     """
     Je Knoten seine Verschiebung und Drehung. Eine Drehung um eine Achse
     des Systems, die eine gestrichene Achse beruehrt, ist nicht bestimmbar.

@@ -7,6 +7,44 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Ein Rechenkern für Ebene und Raum
+
+Die 2D- und die 3D-Balkensysteme rechnen mit demselben Kern (Punkt 1 der
+Strukturdurchsicht vom selben Tag). Am Bildschirm und im Bericht bleibt
+alles gleich: dieselben Zahlen, nachgeprüft an jedem Balkensystem der
+Beispiele, alt gegen neu. Nur wo die Durchbiegung eines Stabs überall null
+ist, steht ihr Extremwert an einer anderen Stelle x -- bei null ist jede
+gleich richtig (TODO, Punkt 10).
+
+Warum so:
+
+- Ein ebenes System rechnet der Kern als System im Raum, das in seiner
+  x-z-Ebene liegt. Was die Ebene anders macht, steht einmal, in ihrer Art
+  (`stabwerk/art.py`): Ein Ort verschiebt sich nur in x und z und dreht
+  sich nur um −y; ein Stab biegt sich nur in seiner x-z-Ebene, trägt keine
+  Torsion und braucht nur EA und EI. Was aus der Ebene hinausführte, wird
+  gar nicht erst eine Unbekannte. Darum bleiben Unbekannte, Gesamtmatrix,
+  Lastvektor und Lösung der Ebene die alten, und die Herleitung zeigt
+  weiter die Matrix 6 × 6 eines ebenen Stabs (`eben_matrix`).
+- Die Achsen eines ebenen Stabs: y ist −y des Systems, z = x × y zeigt zur
+  gestrichelten Faser (`achsen_eben` in `stabwerk3d/stab.py`). So sind N,
+  V_z und M_y genau N, V und M von Hand, und die Drehung um y ist die im
+  Gegenuhrzeigersinn. Bildschirm und Bericht der Ebene heissen weiter N, V,
+  M, w und φ; welches Feld des Verlaufs dahinter steht, sagt eine Stelle
+  (`IN_DER_EBENE` in `stabwerk/verlauf.py`).
+- Kräfte und Gleichgewicht rechnet der Kern im Raum und gibt sie in den
+  Achsen der Art ab: eben (u_x, u_z, φ) und (R_x, R_z, M), im Raum je sechs.
+- Ein ebener Teil des Verlaufs nimmt EA nur, wo er sich dehnt, und EI nur,
+  wo er sich biegt: der ebene Stab hat EI_z und GI_T null. Vorher standen
+  dort Platzhalter 1.0.
+- Welche Darstellung der Bildschirm nimmt, sagt die Art der Rechnung, nicht
+  mehr die Klasse des Befunds; die Lage eines Stabs im Bild steht einmal.
+- Weggefallen, rund 830 Zeilen: der ebene Kern und sein `Stabverlauf`,
+  `stabwerk3d/system.py` und `stabwerk3d/verlauf.py`, der Befund des Raums,
+  drei der fünf Weichen in `rechnung.py` (geblieben sind das Eigengewicht
+  und die Herleitung), `_lage_eben`, `Lastrichtung.vektor`, `drehung` und
+  `transponiert_mal`.
+
 ## 2026-11-15 · 3D-Balkensysteme: die App
 
 Neben den 2D-Balkensystemen gibt es die App «3D Balkensysteme» (Benutzer,

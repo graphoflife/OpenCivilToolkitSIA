@@ -21,12 +21,14 @@ Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm, mrad, Stellen in m:
 EBEN UND IM RAUM IN EINER FORM:
 Was sich unterscheidet -- die Achsen, die Groessen, die Lagerkraefte --,
 steht je einmal in einer :class:`Darstellung` (:data:`EBEN`, :data:`RAUM`);
-welche gilt, sagt die Art des Befunds. Eine Lage oder Verschiebung ist eine
+welche gilt, sagt die Art der Rechnung. Eine Lage oder Verschiebung ist eine
 Liste mit einer Zahl je Achse des Systems -- ``[x, z]`` in der Ebene,
 ``[x, y, z]`` im Raum --, die Drehung eines Knotens eine Liste mit einer Zahl
 je Drehachse. Ein Stab hat seine Achsen im System: ``x`` laengs, ``z`` zur
 gestrichelten Faser, im Raum dazu ``y`` (:mod:`opencivil.stabwerk3d.stab`) --
-dorthin traegt ein Bild einen positiven Wert auf.
+dorthin traegt ein Bild einen positiven Wert auf. In der Ebene steht ``y``
+jedes Stabs senkrecht auf ihr, wie ``y`` des Systems: ein Stab zeigt dort
+die Achsen, die heissen wie die des Systems.
 
 Die Verlaeufe sind gross; mit jeder Rechnung mitgeliefert, machten sie jede
 Eingabe langsamer, auch wenn niemand die Bilder ansieht -- dasselbe wie bei
@@ -37,15 +39,17 @@ umgerechnet und in Listen gelegt.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, MRAD
+from opencivil.stabwerk import art
 from opencivil.stabwerk.rechnung import Stabwerksrechnung, Systembefund
-from opencivil.stabwerk.system import SUMMEN, TOLERANZ, UNBESTIMMT, Fall
+from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Fall
+from opencivil.stabwerk.verlauf import IN_DER_EBENE
 from opencivil.stabwerk3d import stab as st3
 from opencivil.stabwerk3d.modell import System as Raumsystem
-from opencivil.stabwerk3d.rechnung import Raumbefund
+from opencivil.stabwerk3d.raum import TOLERANZ
 from opencivil.web.anzeige import Anzeigegroesse, zahl
 
 #: Wie viele Stuecke ein Stab im Bild mindestens hat -- dazu jede Grenze und jeder Extremwert.
@@ -78,8 +82,17 @@ class Darstellung:
     durchbiegungen: Tuple[Tuple[str, str], ...]
     """Die Durchbiegungen gegen die Sehne, je mit der Achse des Stabs, in die sie positiv zeigt."""
 
-    lage: Callable[[Any], Dict[str, Any]]
-    """Anfang und Achsen eines Stabs im System, aus seinem Verlauf."""
+    felder: Dict[str, str] = field(default_factory=dict)
+    """Je Groesse ihr Feld im Verlauf, wo es anders heisst (:data:`~opencivil.stabwerk.verlauf.IN_DER_EBENE`)."""
+
+    def feld(self, groesse: str) -> str:
+        return self.felder.get(groesse, groesse)
+
+    def lage(self, v: Any) -> Dict[str, Any]:
+        """Anfang und Achsen eines Stabs im System, aus seinem Verlauf -- in den Achsen der Darstellung."""
+        i = ["xyz".index(a) for a in self.achsen]
+        return {"anfang": [v.anfang[k] for k in i],
+                "achsen": {a: [v.achsen["xyz".index(a)][k] for k in i] for a in self.achsen}}
 
     @property
     def drehungen(self) -> Tuple[str, ...]:
@@ -116,15 +129,6 @@ class Darstellung:
                                  for g, achse, moment in self._lagerwerte()]}
 
 
-def _lage_eben(v: Any) -> Dict[str, Any]:
-    # Die gestrichelte Faser liegt rechts des Stabs (Lastrichtung.QUER).
-    return {"anfang": [v.x_a, v.z_a], "achsen": {"x": [v.c, v.s], "z": [v.s, -v.c]}}
-
-
-def _lage_im_raum(v: Any) -> Dict[str, Any]:
-    return {"anfang": list(v.anfang), "achsen": dict(zip("xyz", map(list, v.achsen)))}
-
-
 #: Das 2D-Balkensystem.
 EBEN = Darstellung(
     achsen=("x", "z"),
@@ -134,7 +138,7 @@ EBEN = Darstellung(
               "phi": Anzeigegroesse("φ", MRAD, r"\varphi", 2)},
     schnittgroessen=("N", "V", "M"),
     durchbiegungen=(("w", "z"),),
-    lage=_lage_eben,
+    felder=IN_DER_EBENE,
 )
 
 #: Das 3D-Balkensystem.
@@ -146,15 +150,14 @@ RAUM = Darstellung(
               **{g: Anzeigegroesse(g, MM, stellen=2) for g in ("f_y", "f_z")}},
     schnittgroessen=("N", "V_y", "V_z", "T", "M_y", "M_z"),
     durchbiegungen=(("f_y", "y"), ("f_z", "z")),
-    lage=_lage_im_raum,
 )
 
-#: Welche Darstellung zu welchem Befund gehoert -- nach seiner Klasse.
-_DARSTELLUNGEN = {Systembefund: EBEN, Raumbefund: RAUM}
+#: Welche Darstellung zu welcher Art der Rechnung gehoert.
+_DARSTELLUNGEN = {art.EBENE: EBEN, art.RAUM: RAUM}
 
 
 def _darstellung(befund: Systembefund) -> Darstellung:
-    return _DARSTELLUNGEN[type(befund)]
+    return _DARSTELLUNGEN[befund.ergebnis.art]
 
 
 def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
@@ -188,7 +191,7 @@ def _fall(befund: Systembefund, d: Darstellung, fall: Fall) -> Dict[str, Any]:
     for name, v in befund.verlaeufe(fall.name).items():
         extrem = {}
         for groesse, anzeige in d.groessen.items():
-            e = v.extrem(groesse)
+            e = v.extrem(d.feld(groesse))
             extrem[groesse] = {"kleinst": [e.kleinst[0], anzeige.zahl(e.kleinst[1])],
                                "groesst": [e.groesst[0], anzeige.zahl(e.groesst[1])]}
         staebe[name] = extrem
@@ -213,7 +216,7 @@ def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]:
     for stab, v in befund.verlaeufe(name).items():
         staebe[stab] = {
             "L": v.L, **d.lage(v),
-            "proben": [{"x": w["x"], **{g: a.zahl(w[g]) for g, a in d.groessen.items()},
+            "proben": [{"x": w["x"], **{g: a.zahl(w[d.feld(g)]) for g, a in d.groessen.items()},
                         "u": [zahl(w[f"u{achse}"], MM) for achse in d.achsen]}
                        for w in v.proben(PROBEN_JE_STAB)],
         }

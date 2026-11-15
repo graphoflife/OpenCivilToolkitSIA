@@ -1,23 +1,19 @@
 """
-opencivil/stabwerk3d -- raeumliche Stabwerke nach der Steifigkeitsmethode.
+opencivil/stabwerk3d -- was ein Stabwerk im Raum braucht.
 
-Der Rechenkern der App «3D Balkensysteme»: ein Rahmen im Raum, gerechnet mit
-Euler-Bernoulli-Staeben und Torsion nach St. Venant, Theorie 1. Ordnung --
-wie :mod:`opencivil.stabwerk` in der Ebene, mit sechs Unbekannten je Knoten.
-Heraus kommen Verschiebungen und Drehungen, Normalkraft, zwei Querkraefte,
-Torsionsmoment, zwei Biegemomente und Lagerkraefte -- je Lastfall und je
-Kombination.
+Die App «3D Balkensysteme»: ein Rahmen im Raum, gerechnet mit
+Euler-Bernoulli-Staeben und Torsion nach St. Venant, Theorie 1. Ordnung, mit
+sechs Unbekannten je Knoten. Gerechnet wird im gemeinsamen Kern
+(:mod:`opencivil.stabwerk.system`), der auch die Ebene rechnet -- hier steht,
+was nur der Raum hat:
 
 * :mod:`~opencivil.stabwerk3d.modell` -- was gerechnet wird, in SI.
 * :mod:`~opencivil.stabwerk3d.raum` -- Vektoren, Richtungen und Strecken.
 * :mod:`~opencivil.stabwerk3d.stab` -- der einzelne Stab: seine Achsen, und
   wie er aus drei ebenen Staeben besteht.
-* :mod:`~opencivil.stabwerk3d.system` -- das ganze System: Unbekannte,
-  Zusammenbau, Loesen, Lagerkraefte.
-* :mod:`~opencivil.stabwerk3d.verlauf` -- Schnittgroessen und Biegelinien
-  laengs jedes Stabs.
+* :mod:`~opencivil.stabwerk3d.rechnung` und
+  :mod:`~opencivil.stabwerk3d.herleitung` -- das 3D-Balkensystem im
+  Rechenwerk und wie es seine Rechnung aufschreibt.
 
-Was die Ebene schon kann, kommt von dort: das Gleichungssystem
-(:mod:`opencivil.stabwerk.matrix`), der ebene Stab mit Lasten und Bettung,
-der Verlauf laengs eines Stabs. Nur die Standardbibliothek.
+Nur die Standardbibliothek.
 """

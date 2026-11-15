@@ -6,7 +6,8 @@ Die Eingabe des Rechenkerns, ohne Oberflaeche und ohne Projekt: Knoten,
 Staebe, Lager, Lasten, Lastfaelle und Kombinationen, alles in N, m und rad.
 Aus der Beschreibung eines Balkensystems baut sie
 :mod:`opencivil.projekt.balkensystem`; gerechnet wird in
-:mod:`~opencivil.stabwerk.system`.
+:mod:`~opencivil.stabwerk.system`, als System im Raum, das in seiner
+x-z-Ebene liegt.
 
 DIE ACHSEN DES SYSTEMS:
 ``x`` nach rechts, ``z`` nach oben, Drehungen im Gegenuhrzeigersinn.
@@ -98,18 +99,6 @@ class Lastrichtung(Wahl):
     def systemvektor(self) -> Optional[Tuple[float, float]]:
         """Die Richtung ``(x, z)``, wenn sie im System liegt."""
         return {Lastrichtung.SENKRECHT: (0.0, -1.0), Lastrichtung.WAAGRECHT: (1.0, 0.0)}.get(self)
-
-    def vektor(self, c: float, s: float) -> Tuple[float, float]:
-        """
-        Die Richtung als Einheitsvektor ``(x, z)`` im System, fuer einen Stab
-        mit ``(c, s) = (cos α, sin α)``. Quer heisst zur gestrichelten Faser:
-        ``(s, -c)``, die rechte Seite des Stabs.
-        """
-        return self.systemvektor or {"x": (c, s), "z": (s, -c)}[self.stabachse]
-
-    def projektion(self, c: float, s: float) -> float:
-        """Laenge der Projektion je Meter Stab -- senkrecht auf die Waagrechte, waagrecht auf die Senkrechte."""
-        return abs(c) if self is Lastrichtung.SENKRECHT else abs(s)
 
 
 class Lastart(Wahl):

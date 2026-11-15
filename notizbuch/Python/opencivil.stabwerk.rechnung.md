@@ -1,5 +1,5 @@
 ---
-erzeugt: 338f8288894f
+erzeugt: 5b65081dcf48
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,10 @@ Das 3D-Balkensystem ([[opencivil.stabwerk3d.rechnung]]) tut dasselbe mit
 mehr Kennwerten und Steifigkeiten -- `I_y`, `I_z` und `I_T`, `EI_y`,
 `EI_z` und `GI_T` -- und rechnet im Raum. Was beide gleich tun, steht in
 [[opencivil.stabwerk.rechnung#Stabwerksrechnung|Stabwerksrechnung]]: welche Kennwerte, Steifigkeiten und
-Materialkennwerte, sagt je System eine Liste, wie es rechnet und schreibt,
+Materialkennwerte, sagt je System eine Liste, ob eben oder im Raum seine
+Art ([[opencivil.stabwerk.art#Konstanten|EBENE]],
+[[opencivil.stabwerk.art#Konstanten|RAUM]]) -- gerechnet wird mit demselben
+Kern --, wie es sein Eigengewicht ansetzt und seine Herleitung schreibt,
 eine Methode.
 
 
@@ -220,13 +223,14 @@ class Stabwerksrechnung(Rechenobjekt)
 
 Ein Balkensystem, fertig fuer das Rechenwerk -- was die Ebene und der
 Raum gleich tun, siehe Dateikopf. Je System sagen die Klassenattribute,
-welche Kennwerte, Steifigkeiten und Materialkennwerte es hat, und die
-Methoden `_rechnen`, `_leer`, `_eigenlast`, `_befund` und
-`_schreiben`, wie es rechnet und schreibt.
+welche Kennwerte, Steifigkeiten und Materialkennwerte es hat und wie es
+rechnet, und die Methoden `_eigenlast` und `_schreiben`, wie sein
+Eigengewicht als Last aussieht und wie es seine Herleitung schreibt.
 
 - `KENNWERTE: Tuple[Kennwert, ...]` – Was ein Querschnitt liefert ([[opencivil.stabwerk.stabquerschnitt|stabquerschnitt]]).
 - `STEIFIGKEITEN: Tuple[Steifigkeitsformel, ...]`
 - `MATERIALKENNWERTE: Tuple[Materialkennwert, ...]`
+- `ART: Art` – Eben oder im Raum ([[opencivil.stabwerk.art|art]]).
 
 #### Stabwerksrechnung.abschnitt
 
@@ -322,29 +326,13 @@ def _ohne_modul(self, e: Eingaben) -> List[Meldung]
 Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab mit
 seinem Material nimmt, eine Meldung.
 
-#### Stabwerksrechnung._rechnen
-
-```python
-def _rechnen(self, system: Any) -> Any
-```
-
-Das System, gerechnet -- ein Ergebnis des Rechenkerns.
-
-#### Stabwerksrechnung._leer
-
-```python
-def _leer(self, meldungen: List[Meldung]) -> Any
-```
-
-Ein Ergebnis ohne Rechnung, nur mit den Meldungen, die sie aufhalten.
-
 #### Stabwerksrechnung._eigenlast
 
 ```python
 def _eigenlast(self, stab: str, g: float) -> Any
 ```
 
-Das Eigengewicht eines Stabs als Last des Rechenkerns: senkrecht, `g` in N/m.
+Das Eigengewicht eines Stabs als Last seines Systems: senkrecht, `g` in N/m.
 
 #### Stabwerksrechnung._schreiben
 
@@ -366,6 +354,7 @@ Ein ebenes Balkensystem, fertig fuer das Rechenwerk.
 - `KENNWERTE = EBEN`
 - `STEIFIGKEITEN = (DEHNSTEIFIGKEIT, Steifigkeitsformel('EI', KNM2, 'Biegesteifigkeit', …`
 - `MATERIALKENNWERTE = (E_MODUL, DICHTE)`
+- `ART = EBENE`
 
 ### _gewicht_je_meter
 
@@ -403,6 +392,7 @@ Modul mal Kennwert ([[opencivil.stabwerk.rechnung#Steifigkeitsformel|Steifigkeit
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.stabwerk.art]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.stabquerschnitt]]
@@ -417,6 +407,7 @@ Modul mal Kennwert ([[opencivil.stabwerk.rechnung#Steifigkeitsformel|Steifigkeit
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.stabwerk.herleitung]]
+- [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]

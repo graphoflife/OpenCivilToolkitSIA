@@ -398,7 +398,7 @@ class TestRechnen(unittest.TestCase):
         e = traeger().rechnen()
         system = e.balkensystem("Träger")
         self.assertTrue(system.ergebnis.gueltig)
-        x, M = system.verlaeufe("G")["L1"].extrem("M").groesst
+        x, M = system.verlaeufe("G")["L1"].extrem("M_y").groesst
         self.assertAlmostEqual(x, 3.0, places=9)
         self.assertAlmostEqual(M, 45e3, places=4)
         E = e.wert("beton.b1.E_cm").groesse.si
@@ -660,7 +660,7 @@ class TestMaterialien(unittest.TestCase):
         EI = 10000e6 * 0.3 * 0.6 ** 3 / 12
         self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.M2.EI").groesse.si, EI, delta=1e-9 * EI)
         # Die Durchbiegung in der Mitte, nach unten positiv: 5 q L⁴ / (384 EI).
-        w = e.balkensystem("r1").verlaeufe("G")["L1"].extrem("w").groesst[1]
+        w = e.balkensystem("r1").verlaeufe("G")["L1"].extrem("f_z").groesst[1]
         self.assertAlmostEqual(w, 5 * 10e3 * 6 ** 4 / (384 * EI), delta=1e-6)
 
     def test_ein_querschnitt_aus_zwei_materialien(self):

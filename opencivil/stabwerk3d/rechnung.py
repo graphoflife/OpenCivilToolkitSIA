@@ -6,7 +6,7 @@ Wie das ebene Balkensystem (:mod:`opencivil.stabwerk.rechnung`), im Raum:
 je Querschnitt ``A``, ``I_y``, ``I_z`` und ``I_T``, je Paar aus
 Querschnitt und Material ``EA``, ``EI_y``, ``EI_z`` und ``GI_T`` und das
 Eigengewicht, und eine Prozedur, die das System rechnet
-(:mod:`~opencivil.stabwerk3d.system`) und ihre Herleitung schreibt
+(:mod:`~opencivil.stabwerk.system`, im Raum) und ihre Herleitung schreibt
 (:mod:`~opencivil.stabwerk3d.herleitung`). Was beide gleich tun, steht in
 :class:`~opencivil.stabwerk.rechnung.Stabwerksrechnung`.
 
@@ -18,8 +18,6 @@ Venant, ohne Woelbkrafttorsion. Die Herleitung sagt es, das TODO fuehrt es.
 
 from __future__ import annotations
 
-from typing import Dict, List
-
 from opencivil.core.einheiten import KNM2
 from opencivil.core.protokoll import Protokoll
 from opencivil.stabwerk.modell import Lastart
@@ -28,22 +26,12 @@ from opencivil.stabwerk.rechnung import (
     Systembefund, stoffkennwerte,
 )
 from opencivil.stabwerk.stabquerschnitt import RAEUMLICH
-from opencivil.stabwerk.system import Meldung
+from opencivil.stabwerk.art import RAUM
 from opencivil.stabwerk3d import herleitung
-from opencivil.stabwerk3d.modell import Richtung, Stablast, System
-from opencivil.stabwerk3d.system import Ergebnis, Fall, rechnen
-from opencivil.stabwerk3d.verlauf import Stabverlauf, verlaeufe
+from opencivil.stabwerk3d.modell import Richtung, Stablast
 
 #: Welche Kennwerte eines Baustoffs ein Stab im Raum aus ihm nimmt.
 RAUMKENNWERTE = stoffkennwerte((E_MODUL, DICHTE, SCHUBMODUL))
-
-
-class Raumbefund(Systembefund):
-    """Was die Rechnung im Raum fand -- wie in der Ebene, mit den Verlaeufen des Raums."""
-
-    @staticmethod
-    def _verlaeufe_von(fall: Fall) -> Dict[str, Stabverlauf]:
-        return verlaeufe(fall)
 
 
 class Balkensystem3d(Stabwerksrechnung):
@@ -58,19 +46,10 @@ class Balkensystem3d(Stabwerksrechnung):
         Steifigkeitsformel("GI_T", KNM2, "Torsionssteifigkeit", "G", "I_T"),
     )
     MATERIALKENNWERTE = (E_MODUL, DICHTE, SCHUBMODUL)
-
-    def _rechnen(self, system: System) -> Ergebnis:
-        return rechnen(system)
-
-    def _leer(self, meldungen: List[Meldung]) -> Ergebnis:
-        return Ergebnis(meldungen=meldungen)
+    ART = RAUM
 
     def _eigenlast(self, stab: str, g: float) -> Stablast:
         return Stablast(stab=stab, art=Lastart.LINIENLAST, wert_a=g, richtung=Richtung.SENKRECHT)
-
-    def _befund(self, gerechnet: System, ergebnis: Ergebnis,
-                eigengewicht: Dict[str, float]) -> Raumbefund:
-        return Raumbefund(gerechnet, ergebnis, eigengewicht=eigengewicht)
 
     def _schreiben(self, p: Protokoll, befund: Systembefund) -> None:
         herleitung.schreiben(p, self, befund)

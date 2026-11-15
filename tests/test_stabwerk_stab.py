@@ -6,12 +6,10 @@ heisst hier: genau sie, mit umgekehrtem Vorzeichen. In den Achsen des Stabs
 zeigt y nach links, eine Last nach unten ist also negativ.
 """
 
-import math
 import unittest
 
 from opencivil.stabwerk.stab import (
-    Punkt, Strecke, aufteilen, bettung, drehung, formfunktionen, knotenlasten,
-    mal, steifigkeit,
+    Punkt, Strecke, aufteilen, bettung, formfunktionen, knotenlasten, mal, steifigkeit,
 )
 
 L = 5.0
@@ -42,14 +40,6 @@ class TestSteifigkeit(unittest.TestCase):
         v2, t2 = (c * P) / det, (-b * P) / det
         self.assertAlmostEqual(v2, P * L ** 3 / (3 * EI), places=9)
         self.assertAlmostEqual(t2, P * L ** 2 / (2 * EI), places=9)
-
-    def test_drehung_ist_orthogonal(self):
-        a = math.radians(33.0)
-        T = drehung(math.cos(a), math.sin(a))
-        for i in range(6):
-            for j in range(6):
-                s = sum(T[i][k] * T[j][k] for k in range(6))
-                self.assertAlmostEqual(s, 1.0 if i == j else 0.0, places=12)
 
 
 class TestKnotenlasten(unittest.TestCase):

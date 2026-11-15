@@ -4,7 +4,7 @@ opencivil/stabwerk3d/modell.py -- was gerechnet wird: das raeumliche Stabwerk in
 VERANTWORTUNG:
 Die Eingabe des Rechenkerns, ohne Oberflaeche und ohne Projekt: Knoten,
 Staebe, Lager, Lasten, Lastfaelle und Kombinationen, alles in N, m und rad.
-Gerechnet wird in :mod:`~opencivil.stabwerk3d.system`. Was nicht vom Raum
+Gerechnet wird in :mod:`~opencivil.stabwerk.system`. Was nicht vom Raum
 abhaengt, kommt aus der Ebene (:mod:`opencivil.stabwerk.modell`): wie eine
 Richtung gehalten ist (:class:`Halt`), die Arten der Lasten, Lastfall und
 Kombination.
@@ -139,7 +139,7 @@ class Stab:
     Linienlager halten laengs und quer in y und z des Stabs: frei, fest oder
     eine Bettung in N/m². Ein Gelenk loest am Stabende alle drei Momente,
     wie ein Kugelgelenk; mit Gelenken an beiden Enden traegt der Stab keine
-    Torsion (:mod:`~opencivil.stabwerk3d.system`).
+    Torsion (:mod:`~opencivil.stabwerk.system`).
     """
 
     name: str

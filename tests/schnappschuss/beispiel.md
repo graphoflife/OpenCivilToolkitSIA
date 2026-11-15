@@ -2896,7 +2896,7 @@ $$
 | L3 | $N$ | $-22.3\ \mathrm{kN}$ | $4.00$ | $-13.3\ \mathrm{kN}$ | $0.00$ |
 | L3 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L3 | $M$ | $0.0\ \mathrm{kNm}$ | $4.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $1.36$ |
 
 Grösste Durchbiegung gegen die Sehne eines Stabs: L2, w = 0.40 mm bei x = 3.02 m.
 
@@ -2955,7 +2955,7 @@ $$
 | L3 | $N$ | $-59.1\ \mathrm{kN}$ | $0.00$ | $-59.1\ \mathrm{kN}$ | $0.00$ |
 | L3 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L3 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $4.00$ |
-| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $4.00$ |
 
 Grösste Durchbiegung gegen die Sehne eines Stabs: L2, w = 1.79 mm bei x = 3.02 m.
 
@@ -3014,7 +3014,7 @@ $$
 | L3 | $N$ | $-1.3\ \mathrm{kN}$ | $0.00$ | $-1.3\ \mathrm{kN}$ | $0.00$ |
 | L3 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L3 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L3 | $w$ | $0.00\ \mathrm{mm}$ | $4.00$ | $0.00\ \mathrm{mm}$ | $1.35$ |
 
 Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = 0.15 mm bei x = 3.00 m.
 

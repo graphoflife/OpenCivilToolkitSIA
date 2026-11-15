@@ -5,7 +5,7 @@ VERANTWORTUNG:
 Was ein Stab im Raum zum System beitraegt, in seinen eigenen Achsen: die
 Achsen selbst, die Steifigkeitsmatrix 12 × 12, die Bettung und die Lasten --
 in seinen Achsen, als arbeitsgleiche Knotenkraefte und als Resultierende.
-Zusammengebaut wird in :mod:`~opencivil.stabwerk3d.system`.
+Zusammengebaut wird in :mod:`~opencivil.stabwerk.system`.
 
 DIE ACHSEN DES STABS:
 ``x`` laeuft vom Anfang zum Ende. ``z`` steht senkrecht dazu in der
@@ -23,8 +23,18 @@ die gestrichelte Faser der Ebene oben, ``z`` bleibt unten: ``V_z`` und
 dreht ``y`` und ``z`` im Rechtssinn um ``x``. Bei ``β = 0`` steht der Steg
 eines Profils, das sich um ``y`` biegt, in der lotrechten Ebene des Stabs.
 
-Lotrecht heisst: weniger als :data:`~opencivil.stabwerk.system.TOLERANZ`
+Lotrecht heisst: weniger als :data:`~opencivil.stabwerk3d.raum.TOLERANZ`
 daneben -- so genau rundet das Zeichenfenster.
+
+IN DER EBENE:
+Liegt das ganze System in der x-z-Ebene und bleibt darin
+(:data:`~opencivil.stabwerk.art.EBENE`), ist ``y`` jedes Stabs ``-y``
+des Systems, wie sonst nur bei einem lotrechten (:func:`achsen_eben`).
+``z = x × y`` steht dann rechts des Stabs, vom Anfang zum Ende gesehen, auf
+der gestrichelten Faser des 2D-Balkensystems -- auch wenn er nach links
+laeuft. So sind ``N``, ``V_z`` und ``M_y`` in jedem Stab ``N``, ``V`` und
+``M`` der Ebene, und eine Drehung um ``y`` des Stabs ist eine im
+Gegenuhrzeigersinn.
 
 DREI EBENE STAEBE:
 Ein gerader Stab mit den Hauptachsen y und z, ohne Schubverformung und mit
@@ -59,10 +69,9 @@ from typing import List, Sequence, Tuple, Union
 
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.modell import Lastart
-from opencivil.stabwerk.system import TOLERANZ, lastbereich
 from opencivil.stabwerk3d import raum
 from opencivil.stabwerk3d.modell import Stablast
-from opencivil.stabwerk3d.raum import Vektor
+from opencivil.stabwerk3d.raum import TOLERANZ, Vektor
 
 Matrix = List[List[float]]
 
@@ -113,6 +122,18 @@ def achsen(a, b, drehung: float = 0.0) -> Tuple[float, Tuple[Vektor, Vektor, Vek
     ey = tuple(c * p + s * q for p, q in zip(ey0, ez0))
     ez = tuple(-s * p + c * q for p, q in zip(ey0, ez0))
     return L, (ex, ey, ez)
+
+
+def achsen_eben(a, b) -> Tuple[float, Tuple[Vektor, Vektor, Vektor]]:
+    """
+    Laenge und Achsen eines Stabs in der x-z-Ebene: ``y`` ist ``-y`` des
+    Systems, ``z = x × y`` liegt rechts des Stabs -- siehe Dateikopf.
+    """
+    d = (b.x - a.x, b.y - a.y, b.z - a.z)
+    L = math.sqrt(sum(c * c for c in d))
+    ex = tuple(c / L for c in d)
+    ey = (0.0, -1.0, 0.0)
+    return L, (ex, ey, raum.kreuz(ex, ey))
 
 
 def _lotrecht(d: Sequence[float]) -> bool:
@@ -226,6 +247,33 @@ def eben(werte: Sequence[float], ebene) -> List[float]:
     for i, I, s in ebene:
         heraus[i] = s * werte[I]
     return heraus
+
+
+def eben_matrix(k: Matrix, ebene) -> Matrix:
+    """Die ebene Matrix 6 × 6 einer Ebene aus der raeumlichen 12 × 12 -- umgekehrt wie beim Einsetzen."""
+    heraus = st.nullmatrix(6)
+    for i, I, si in ebene:
+        for j, J, sj in ebene:
+            heraus[i][j] = si * sj * k[I][J]
+    return heraus
+
+
+def lastbereich(last, L: float) -> Union[Tuple[float, float], str]:
+    """
+    Wo eine Last auf einem Stab der Laenge ``L`` liegt, ``(von, bis)`` in m
+    -- oder ein Satz, warum nicht: eine Stelle ausserhalb des Stabs. Eine
+    Einzellast steht bei ``von``.
+    """
+    von = last.von
+    bis = L if last.bis is None else last.bis
+    if last.art.verteilt:
+        if von < -TOLERANZ or bis > L + TOLERANZ or bis < von - TOLERANZ:
+            return (f"die Last reicht von {von:g} bis {bis:g} m, der Stab ist aber "
+                    f"{L:.3f} m lang.")
+        return max(0.0, von), min(L, bis)
+    if von < -TOLERANZ or von > L + TOLERANZ:
+        return f"die Last steht bei {von:g} m, der Stab ist aber {L:.3f} m lang."
+    return min(max(von, 0.0), L), bis
 
 
 def lokal(last: Stablast, L: float, achsen: Sequence[Vektor]) -> Union[Lasten, str]:

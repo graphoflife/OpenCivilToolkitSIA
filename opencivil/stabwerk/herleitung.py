@@ -31,6 +31,8 @@ from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import dicht
 from opencivil.stabwerk.modell import Halt, Stablast, System
 from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Ergebnis, Fall
+from opencivil.stabwerk.verlauf import IN_DER_EBENE
+from opencivil.stabwerk3d import stab as st3
 
 if TYPE_CHECKING:
     from opencivil.stabwerk.rechnung import Balkensystem, Systembefund
@@ -166,7 +168,7 @@ def _ansaetze(p: Protokoll, befund: "Systembefund") -> None:
              name="Steifigkeitsmatrix eines Stabs")
     p.ansatz(st.DREHUNG_LATEX, titel="Von den Achsen des Systems in die des Stabs",
              name="Drehung in die Achsen des Stabs")
-    if any(t.k_quer or t.k_laengs for t in e.teilstaebe):
+    if any(t.k_z or t.k_x for t in e.teilstaebe):
         p.ansatz(st.BETTUNG_LATEX, titel="Bettung eines Stabs, quer und längs",
                  name="Bettung eines Stabs")
     if any(isinstance(l, Stablast) for f in modell.lastfaelle for l in f.lasten):
@@ -184,7 +186,7 @@ def _ansaetze(p: Protokoll, befund: "Systembefund") -> None:
     if len(e.teilstaebe) <= STAEBE_MIT_MATRIX:
         for t in e.teilstaebe:
             p.gleichung(rf"\mathbf{{k}}_{{\text{{{text_latex(teilname(e, t))}}}}} = "
-                        + matrix_latex(t.k, 1e-3),
+                        + matrix_latex(st3.eben_matrix(t.k, st3.EBENE_Z), 1e-3),
                         titel=f"Steifigkeitsmatrix {teilname(e, t)}, L = {t.L:.3f} m "
                               f"(kN, m)")
     p.ansatz(SCHNITTGROESSEN_LATEX, titel="Schnittgrössen aus den Kräften an den Stabenden",
@@ -249,21 +251,21 @@ def _verschiebungen(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
             continue
         ux, uz, phi = fall.verschiebungen[k.name]
         zeilen.append([k.name, Mathe(fest(ux * 1e3, 2)), Mathe(fest(uz * 1e3, 2)),
-                       "nicht bestimmbar" if ort.drehung == "unbestimmt"
+                       "nicht bestimmbar" if ort.offen
                        else Mathe(fest(phi * 1e3, 3))])
     p.tabelle(["Knoten", Mathe(r"u_x\ [\mathrm{mm}]"), Mathe(r"u_z\ [\mathrm{mm}]"),
                Mathe(r"\varphi\ [\mathrm{mrad}]")], zeilen, titel="Verschiebungen der Knoten")
 
 
 def _stabenden(p: Protokoll, verlaeufe) -> None:
+    groessen = (("N", "kN"), ("V", "kN"), ("M", "kNm"))
     zeilen = []
     for name, v in verlaeufe.items():
         a, b = v.bei(0.0), v.bei(v.L, links=True)
-        zeilen.append([name] + [Mathe(fest(w[g] / 1e3, 1)) for w in (a, b)
-                                for g in ("N", "V", "M")])
+        zeilen.append([name] + [Mathe(fest(w[IN_DER_EBENE[g]] / 1e3, 1)) for w in (a, b)
+                                for g, _ in groessen])
     kopf = ["Stab"] + [Mathe(rf"{g}_{{{ende}}}\ [\mathrm{{{einheit}}}]")
-                       for ende in ("a", "b")
-                       for g, einheit in (("N", "kN"), ("V", "kN"), ("M", "kNm"))]
+                       for ende in ("a", "b") for g, einheit in groessen]
     p.tabelle(kopf, zeilen, titel="Schnittgrössen an den Stabenden")
 
 
@@ -283,36 +285,37 @@ def lagerkraefte(p: Protokoll, befund: "Systembefund", fall,
         p.text(SUMMEN)
 
 
-#: Die Extremwerte in der Ebene: Groesse, Einheit, Faktor von SI und Nachkommastellen.
-EXTREMWERTE_DER_EBENE = (("N", "kN", 1e-3, 1), ("V", "kN", 1e-3, 1), ("M", "kNm", 1e-3, 1),
-                         ("w", "mm", 1e3, 2))
+#: Die Extremwerte in der Ebene: Feld im Verlauf, Zeichen, Einheit, Faktor von
+#: SI und Nachkommastellen.
+EXTREMWERTE_DER_EBENE = tuple((IN_DER_EBENE[g], g, *rest) for g, *rest in (
+    ("N", "kN", 1e-3, 1), ("V", "kN", 1e-3, 1), ("M", "kNm", 1e-3, 1), ("w", "mm", 1e3, 2)))
 
 
 def extremwerte(p: Protokoll, verlaeufe,
-                groessen: Sequence[Tuple[str, str, float, int]] = EXTREMWERTE_DER_EBENE,
-                durchbiegungen: Sequence[str] = ("w",)) -> None:
-    """Kleinster und groesster Wert je Stab -- dazu die groesste der ``durchbiegungen``."""
+                groessen: Sequence[Tuple[str, str, str, float, int]] = EXTREMWERTE_DER_EBENE,
+                durchbiegungen: Sequence[str] = (IN_DER_EBENE["w"],)) -> None:
+    """Kleinster und groesster Wert je Stab -- dazu die groesste der ``durchbiegungen`` (Felder)."""
     zeilen = []
     massgebend: Tuple[float, str, float, str] = (0.0, "", 0.0, "")
     for name, v in verlaeufe.items():
-        for groesse, einheit, faktor, stellen in groessen:
-            extrem = v.extrem(groesse)
+        for feld, zeichen, einheit, faktor, stellen in groessen:
+            extrem = v.extrem(feld)
             (x0, klein), (x1, gross) = extrem.kleinst, extrem.groesst
-            zeilen.append([name, Mathe(groesse),
+            zeilen.append([name, Mathe(zeichen),
                            Mathe(f"{fest(klein * faktor, stellen)}\\ \\mathrm{{{einheit}}}"),
                            Mathe(fest(x0, 2)),
                            Mathe(f"{fest(gross * faktor, stellen)}\\ \\mathrm{{{einheit}}}"),
                            Mathe(fest(x1, 2))])
-            if groesse in durchbiegungen:
+            if feld in durchbiegungen:
                 for x, w in ((x0, klein), (x1, gross)):
                     if abs(w) > abs(massgebend[0]):
-                        massgebend = (w, name, x, groesse)
+                        massgebend = (w, name, x, zeichen)
     p.tabelle(["Stab", "Grösse", "kleinst", Mathe(r"x\ [\mathrm{m}]"), "grösst",
                Mathe(r"x\ [\mathrm{m}]")], zeilen, titel="Extremwerte")
-    w, name, x, groesse = massgebend
+    w, name, x, zeichen = massgebend
     if name and abs(w) > 0.0:
         p.text(f"Grösste Durchbiegung gegen die Sehne eines Stabs: {name}, "
-               f"{groesse} = {w * 1e3:.2f} mm bei x = {x:.2f} m.")
+               f"{zeichen} = {w * 1e3:.2f} mm bei x = {x:.2f} m.")
 
 
 #: Die Summen der Gleichgewichtsprobe in der Ebene, in der Folge des Rechenkerns.

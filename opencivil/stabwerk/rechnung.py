@@ -14,7 +14,10 @@ Das 3D-Balkensystem (:mod:`opencivil.stabwerk3d.rechnung`) tut dasselbe mit
 mehr Kennwerten und Steifigkeiten -- ``I_y``, ``I_z`` und ``I_T``, ``EI_y``,
 ``EI_z`` und ``GI_T`` -- und rechnet im Raum. Was beide gleich tun, steht in
 :class:`Stabwerksrechnung`: welche Kennwerte, Steifigkeiten und
-Materialkennwerte, sagt je System eine Liste, wie es rechnet und schreibt,
+Materialkennwerte, sagt je System eine Liste, ob eben oder im Raum seine
+Art (:data:`~opencivil.stabwerk.art.EBENE`,
+:data:`~opencivil.stabwerk.art.RAUM`) -- gerechnet wird mit demselben
+Kern --, wie es sein Eigengewicht ansetzt und seine Herleitung schreibt,
 eine Methode.
 
 WOHER A UND I KOMMEN:
@@ -69,6 +72,7 @@ from opencivil.material.basis import Baustoff, Baustoffart, mit_index
 from opencivil.stabwerk import herleitung
 from opencivil.stabwerk.modell import Lastart, Lastrichtung, Stablast, System
 from opencivil.stabwerk.stabquerschnitt import EBEN, Kennwert, Stabquerschnitt
+from opencivil.stabwerk.art import EBENE, Art
 from opencivil.stabwerk.system import Ergebnis, Fall, Meldung, rechnen
 from opencivil.stabwerk.verlauf import Stabverlauf, verlaeufe
 
@@ -219,12 +223,8 @@ class Systembefund:
     def verlaeufe(self, fall: str) -> Dict[str, Stabverlauf]:
         """Je Stab der Verlauf der Schnittgroessen und der Biegelinie in einem Fall -- einmal gerechnet."""
         if fall not in self._verlaeufe:
-            self._verlaeufe[fall] = self._verlaeufe_von(self.ergebnis.fall(fall))
+            self._verlaeufe[fall] = verlaeufe(self.ergebnis.fall(fall))
         return self._verlaeufe[fall]
-
-    @staticmethod
-    def _verlaeufe_von(fall: Fall) -> Dict[str, Stabverlauf]:
-        return verlaeufe(fall)
 
     def lagerkraefte(self, fall: Fall) -> List[Lagerkraft]:
         """
@@ -272,9 +272,9 @@ class Stabwerksrechnung(Rechenobjekt):
     """
     Ein Balkensystem, fertig fuer das Rechenwerk -- was die Ebene und der
     Raum gleich tun, siehe Dateikopf. Je System sagen die Klassenattribute,
-    welche Kennwerte, Steifigkeiten und Materialkennwerte es hat, und die
-    Methoden ``_rechnen``, ``_leer``, ``_eigenlast``, ``_befund`` und
-    ``_schreiben``, wie es rechnet und schreibt.
+    welche Kennwerte, Steifigkeiten und Materialkennwerte es hat und wie es
+    rechnet, und die Methoden ``_eigenlast`` und ``_schreiben``, wie sein
+    Eigengewicht als Last aussieht und wie es seine Herleitung schreibt.
     """
 
     KENNWERTE: Tuple[Kennwert, ...]
@@ -282,6 +282,8 @@ class Stabwerksrechnung(Rechenobjekt):
 
     STEIFIGKEITEN: Tuple[Steifigkeitsformel, ...]
     MATERIALKENNWERTE: Tuple[Materialkennwert, ...]
+    ART: Art
+    """Eben oder im Raum (:mod:`~opencivil.stabwerk.art`)."""
 
     def __init__(self, *, name: str, kennung: str, praefix: str, system: Any,
                  paare: Mapping[str, Tuple[str, Stabmaterial]], meldungen: Sequence[Meldung],
@@ -519,11 +521,11 @@ class Stabwerksrechnung(Rechenobjekt):
             if lf.name == self.eigengewicht else lf
             for lf in self.system.lastfaelle])
         if any(m.fehler for m in meldungen):
-            ergebnis = self._leer(meldungen)
+            ergebnis = Ergebnis(self.ART, meldungen=meldungen)
         else:
-            ergebnis = self._rechnen(gerechnet)
+            ergebnis = rechnen(gerechnet, self.ART)
             ergebnis.meldungen[:0] = meldungen
-        befund = self._befund(gerechnet, ergebnis, eigen)
+        befund = Systembefund(gerechnet, ergebnis, eigengewicht=eigen)
         self._schreiben(p, befund)
         return Ausfuehrung({}, befund=befund)
 
@@ -545,19 +547,8 @@ class Stabwerksrechnung(Rechenobjekt):
 
     # -- Je System ----------------------------------------------------------------
 
-    def _rechnen(self, system: Any) -> Any:
-        """Das System, gerechnet -- ein Ergebnis des Rechenkerns."""
-        raise NotImplementedError
-
-    def _leer(self, meldungen: List[Meldung]) -> Any:
-        """Ein Ergebnis ohne Rechnung, nur mit den Meldungen, die sie aufhalten."""
-        raise NotImplementedError
-
     def _eigenlast(self, stab: str, g: float) -> Any:
-        """Das Eigengewicht eines Stabs als Last des Rechenkerns: senkrecht, ``g`` in N/m."""
-        raise NotImplementedError
-
-    def _befund(self, gerechnet: Any, ergebnis: Any, eigengewicht: Dict[str, float]) -> Systembefund:
+        """Das Eigengewicht eines Stabs als Last seines Systems: senkrecht, ``g`` in N/m."""
         raise NotImplementedError
 
     def _schreiben(self, p: Protokoll, befund: Systembefund) -> None:
@@ -572,20 +563,11 @@ class Balkensystem(Stabwerksrechnung):
     KENNWERTE = EBEN
     STEIFIGKEITEN = (DEHNSTEIFIGKEIT, Steifigkeitsformel("EI", KNM2, "Biegesteifigkeit", "E", "I"))
     MATERIALKENNWERTE = (E_MODUL, DICHTE)
-
-    def _rechnen(self, system: System) -> Ergebnis:
-        return rechnen(system)
-
-    def _leer(self, meldungen: List[Meldung]) -> Ergebnis:
-        return Ergebnis(meldungen=meldungen)
+    ART = EBENE
 
     def _eigenlast(self, stab: str, g: float) -> Stablast:
         return Stablast(stab=stab, art=Lastart.LINIENLAST, wert_a=g,
                         richtung=Lastrichtung.SENKRECHT)
-
-    def _befund(self, gerechnet: System, ergebnis: Ergebnis,
-                eigengewicht: Dict[str, float]) -> Systembefund:
-        return Systembefund(gerechnet, ergebnis, eigengewicht=eigengewicht)
 
     def _schreiben(self, p: Protokoll, befund: Systembefund) -> None:
         herleitung.schreiben(p, self, befund)

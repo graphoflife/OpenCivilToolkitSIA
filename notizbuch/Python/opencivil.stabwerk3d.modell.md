@@ -1,5 +1,5 @@
 ---
-erzeugt: 88028434e4eb
+erzeugt: c47d243163ec
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Die Eingabe des Rechenkerns, ohne Oberflaeche und ohne Projekt: Knoten,
 Staebe, Lager, Lasten, Lastfaelle und Kombinationen, alles in N, m und rad.
-Gerechnet wird in [[opencivil.stabwerk3d.system|system]]. Was nicht vom Raum
+Gerechnet wird in [[opencivil.stabwerk.system|system]]. Was nicht vom Raum
 abhaengt, kommt aus der Ebene ([[opencivil.stabwerk.modell]]): wie eine
 Richtung gehalten ist ([[opencivil.stabwerk.modell#Halt|Halt]]), die Arten der Lasten, Lastfall und
 Kombination.
@@ -164,7 +164,7 @@ Eine Linie des Systems -- ein Stab, der traegt, oder nur ein Linienlager.
 Linienlager halten laengs und quer in y und z des Stabs: frei, fest oder
 eine Bettung in N/m². Ein Gelenk loest am Stabende alle drei Momente,
 wie ein Kugelgelenk; mit Gelenken an beiden Enden traegt der Stab keine
-Torsion ([[opencivil.stabwerk3d.system|system]]).
+Torsion ([[opencivil.stabwerk.system|system]]).
 
 - `name: str`
 - `a: str`
@@ -250,8 +250,9 @@ class System
 
 - [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.stabwerk.art]]
+- [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
-- [[opencivil.stabwerk3d.system]]
 - [[opencivil.web.balkendaten]]

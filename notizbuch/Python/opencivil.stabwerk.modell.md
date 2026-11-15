@@ -1,5 +1,5 @@
 ---
-erzeugt: 70a0cacc2533
+erzeugt: 8fb01ff10ed9
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,8 @@ Die Eingabe des Rechenkerns, ohne Oberflaeche und ohne Projekt: Knoten,
 Staebe, Lager, Lasten, Lastfaelle und Kombinationen, alles in N, m und rad.
 Aus der Beschreibung eines Balkensystems baut sie
 [[opencivil.projekt.balkensystem]]; gerechnet wird in
-[[opencivil.stabwerk.system|system]].
+[[opencivil.stabwerk.system|system]], als System im Raum, das in seiner
+x-z-Ebene liegt.
 
 
 ## DIE ACHSEN DES SYSTEMS
@@ -118,24 +119,6 @@ def systemvektor(self) -> Optional[Tuple[float, float]]
 ```
 
 Die Richtung `(x, z)`, wenn sie im System liegt.
-
-#### Lastrichtung.vektor
-
-```python
-def vektor(self, c: float, s: float) -> Tuple[float, float]
-```
-
-Die Richtung als Einheitsvektor `(x, z)` im System, fuer einen Stab
-mit `(c, s) = (cos α, sin α)`. Quer heisst zur gestrichelten Faser:
-`(s, -c)`, die rechte Seite des Stabs.
-
-#### Lastrichtung.projektion
-
-```python
-def projektion(self, c: float, s: float) -> float
-```
-
-Laenge der Projektion je Meter Stab -- senkrecht auf die Waagrechte, waagrecht auf die Senkrechte.
 
 ### Lastart
 
@@ -327,10 +310,10 @@ gewichteten Lastfaelle. Eben wie raeumlich: eine Last kann `mal`.
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.staebe]]
+- [[opencivil.stabwerk.art]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
-- [[opencivil.stabwerk3d.system]]

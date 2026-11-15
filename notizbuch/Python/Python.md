@@ -1,5 +1,5 @@
 ---
-erzeugt: 04e7a80392c2
+erzeugt: cc9267ee2118
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -171,7 +171,8 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.spannungsanalyse.modul]] – der aequivalente E-Modul.
     - [[opencivil.spannungsanalyse.platte]] – das Paar einer Platte.
     - [[opencivil.spannungsanalyse.schnitt]] – das Paar eines gezeichneten Querschnitts.
-- [[opencivil.stabwerk]] – ebene Stabwerke nach der Steifigkeitsmethode.
+- [[opencivil.stabwerk]] – Stabwerke nach der Steifigkeitsmethode, eben und im Raum.
+    - [[opencivil.stabwerk.art]] – eben oder im Raum: was die beiden Balkensysteme unterscheidet.
     - [[opencivil.stabwerk.herleitung]] – wie ein Balkensystem seine Rechnung aufschreibt.
     - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
     - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
@@ -181,16 +182,14 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
     - [[opencivil.stabwerk.stabquerschnitt]] – woher A und I eines Stabs kommen.
-    - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
-    - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.
-- [[opencivil.stabwerk3d]] – raeumliche Stabwerke nach der Steifigkeitsmethode.
+    - [[opencivil.stabwerk.system]] – das Stabwerk, eben und im Raum: Unbekannte, Zusammenbau, Loesen.
+    - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinien laengs eines Stabs, eben und im Raum.
+- [[opencivil.stabwerk3d]] – was ein Stabwerk im Raum braucht.
     - [[opencivil.stabwerk3d.herleitung]] – wie ein 3D-Balkensystem seine Rechnung aufschreibt.
     - [[opencivil.stabwerk3d.modell]] – was gerechnet wird: das raeumliche Stabwerk in SI.
     - [[opencivil.stabwerk3d.raum]] – Vektoren, Richtungen und Strecken im Raum.
     - [[opencivil.stabwerk3d.rechnung]] – das 3D-Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk3d.stab]] – der raeumliche Stab: drei ebene in einem.
-    - [[opencivil.stabwerk3d.system]] – das raeumliche Stabwerk: Unbekannte, Zusammenbau, Loesen.
-    - [[opencivil.stabwerk3d.verlauf]] – Schnittgroessen und Biegelinien laengs eines Stabs im Raum.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
     - [[opencivil.web.anzeige]] – Zahlen und Zeilen, wie die Oberflaeche sie zeigt.
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.

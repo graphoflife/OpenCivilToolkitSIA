@@ -1,21 +1,29 @@
 """
-opencivil/stabwerk/verlauf.py -- Schnittgroessen und Biegelinie laengs eines Stabs.
+opencivil/stabwerk/verlauf.py -- Schnittgroessen und Biegelinien laengs eines Stabs, eben und im Raum.
 
 VERANTWORTUNG:
 Aus dem, was :mod:`~opencivil.stabwerk.system` an den Enden jedes Teilstabs
 findet -- Kraefte und Verschiebungen --, und aus seinen Lasten die Verlaeufe
-dazwischen: Normalkraft, Querkraft, Moment, Laengs- und Querverschiebung.
-Dazu die groessten und kleinsten Werte und wo sie liegen.
+dazwischen: Normalkraft, Querkraefte, Torsionsmoment, Biegemomente,
+Verschiebungen und Verdrehungen. Dazu die groessten und kleinsten Werte und
+wo sie liegen.
 
-VORZEICHEN DER BAUSTATIK:
-Die Schnittgroessen stehen, wie man sie von Hand rechnet: ``N > 0`` ist Zug;
-``M > 0`` zieht an der gestrichelten Faser, der rechten Seite des Stabs vom
-Anfang zum Ende gesehen -- bei einem Stab von links nach rechts unten;
-``V = dM/dx + m`` (``m`` ein verteiltes Moment im Gegenuhrzeigersinn). Ein
-Einfeldtraeger unter Last nach unten hat also ein positives Feldmoment und
-links eine positive Querkraft.
+EIN STAB AUS EBENEN TEILEN:
+Ein Stab besteht aus drei ebenen Teilen (:mod:`opencivil.stabwerk3d.stab`):
+der Biegung in seiner x-z-Ebene samt Laengskraft, der Biegung in seiner
+x-y-Ebene und der Torsion. Jeder Teil rechnet fuer sich
+(:func:`ebener_verlauf`), dann werden sie zusammengesetzt. Die drei Teile
+springen an denselben Stellen, weil jede Last in allen dreien steht. In der
+Ebene sind die beiden letzten null.
 
-Aus den Kraeften ``s`` auf die Enden (in den Achsen des Stabs, y links,
+VORZEICHEN EINES EBENEN TEILS:
+Wie man sie von Hand rechnet: ``N > 0`` ist Zug; ``M > 0`` zieht an der
+gestrichelten Faser, der rechten Seite des Teils vom Anfang zum Ende
+gesehen; ``V = dM/dx + m`` (``m`` ein verteiltes Moment im
+Gegenuhrzeigersinn). Ein Einfeldtraeger unter Last nach unten hat also ein
+positives Feldmoment und links eine positive Querkraft.
+
+Aus den Kraeften ``s`` auf die Enden (in den Achsen des Teils, y links,
 Gegenuhrzeigersinn) folgt am Anfang::
 
     N(0) = -s_u      V(0) = s_v      M(0) = -s_θ
@@ -26,6 +34,21 @@ und mit den Lasten ``p_x``, ``p_y`` und ``m`` laengs des Stabs::
 
 Eine Einzelkraft laesst N um ``-P_x`` und V um ``+P_y`` springen, ein
 Einzelmoment M um ``-M``.
+
+VORZEICHEN DES STABS -- M_z NACH VORGABE, NICHT NACHGESCHLAGEN:
+In den Achsen des Stabs. ``N > 0`` ist Zug, ``T > 0`` dreht im Rechtssinn
+um die nach aussen zeigende Normale des Schnitts. ``M_y > 0`` zieht an der
+Faser auf der Seite +z, ``M_z > 0`` an der auf der Seite +y: beide Ebenen
+wie die eines ebenen Teils, mit ``V_z = dM_y/dx`` und ``V_y = dM_z/dx``, wo
+kein verteiltes Moment liegt. Die Spannung im Querschnitt ist damit
+``σ = N/A + M_y·z/I_y + M_z·y/I_z``; die Rechtsschraube gaebe ``M_z`` das
+andere Vorzeichen. In der Ebene liegt z auf der gestrichelten Faser: ``N``,
+``V_z`` und ``M_y`` sind ``N``, ``V`` und ``M`` von Hand.
+
+Verschiebungen ``u``, ``v``, ``w`` in x, y und z des Stabs, Verdrehungen
+``theta_x``, ``theta_y``, ``theta_z`` im Rechtssinn um diese Achsen; dazu
+``ux``, ``uy``, ``uz`` in den Achsen des Systems und die Durchbiegungen
+``f_y`` und ``f_z`` gegen die Sehne zwischen den Stabenden.
 
 STUECKWEISE POLYNOME:
 Zwischen zwei Laststellen sind die Lasten linear -- also V quadratisch, M
@@ -51,6 +74,19 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
 from opencivil.stabwerk import stab as st
+from opencivil.stabwerk3d import stab as st3
+from opencivil.stabwerk3d.raum import Vektor, im_system, mal, minus
+
+#: Die Schnittgroessen eines Stabs -- ihre Extremstellen kommen in die Proben.
+SCHNITTGROESSEN = ("N", "V_y", "V_z", "T", "M_y", "M_z")
+
+#: Was ein Intervall als Polynom traegt, ausser den Lasten.
+POLYNOME = SCHNITTGROESSEN + ("u", "v", "w", "theta_x", "theta_y", "theta_z")
+
+#: In der Ebene heissen die Groessen eines Stabs wie von Hand -- je Zeichen
+#: sein Feld im Verlauf: z liegt auf der gestrichelten Faser, y steht
+#: senkrecht auf der Ebene.
+IN_DER_EBENE = {"N": "N", "V": "V_z", "M": "M_y", "w": "f_z", "phi": "theta_y"}
 
 
 class Polynom:
@@ -137,8 +173,8 @@ NULL = Polynom((0.0,))
 
 
 @dataclass
-class Intervall:
-    """Ein Stueck eines Stabs ohne Laststelle -- alles darauf Polynome in x ab dem Stabanfang."""
+class EbenesIntervall:
+    """Ein Stueck eines ebenen Teils ohne Laststelle -- alles darauf Polynome in x ab dem Stabanfang."""
 
     x0: float
     x1: float
@@ -156,6 +192,29 @@ class Intervall:
     """Die Querlast samt Bettung -- fuer das, was ins Linienlager geht."""
 
 
+@dataclass
+class Intervall:
+    """Ein Stueck eines Stabs ohne Laststelle -- alles darauf Polynome in x ab dem Stabanfang."""
+
+    x0: float
+    x1: float
+    N: Polynom
+    V_y: Polynom
+    V_z: Polynom
+    T: Polynom
+    M_y: Polynom
+    M_z: Polynom
+    u: Polynom
+    v: Polynom
+    w: Polynom
+    theta_x: Polynom
+    theta_y: Polynom
+    theta_z: Polynom
+    p_y: Polynom = field(default_factory=lambda: NULL)
+    p_z: Polynom = field(default_factory=lambda: NULL)
+    """Die Querlast samt Bettung in y und z des Stabs."""
+
+
 @dataclass(frozen=True)
 class Extrem:
     """Der kleinste und der groesste Wert einer Groesse, je mit Stelle."""
@@ -170,10 +229,8 @@ class Stabverlauf:
 
     stab: str
     L: float
-    c: float
-    s: float
-    x_a: float
-    z_a: float
+    anfang: Vektor
+    achsen: Tuple[Vektor, Vektor, Vektor]
     intervalle: List[Intervall] = field(default_factory=list)
 
     def bei(self, x: float, links: bool = False) -> Dict[str, float]:
@@ -184,20 +241,28 @@ class Stabverlauf:
         kandidaten = [i for i in self.intervalle if i.x0 <= x <= i.x1]
         if not kandidaten:
             kandidaten = [min(self.intervalle, key=lambda i: min(abs(i.x0 - x), abs(i.x1 - x)))]
-        teil = kandidaten[0] if links else kandidaten[-1]
-        return self._werte(teil, x)
+        return self._werte(kandidaten[0] if links else kandidaten[-1], x)
+
+    def sehne(self, groesse: str) -> Polynom:
+        """Die Gerade zwischen den Werten von ``v`` oder ``w`` an den Stabenden."""
+        erstes, letztes = self.intervalle[0], self.intervalle[-1]
+        return Polynom.durch(0.0, getattr(erstes, groesse)(0.0),
+                             self.L, getattr(letztes, groesse)(self.L))
+
+    def _polynom(self, teil: Intervall, groesse: str) -> Polynom:
+        if groesse == "f_y":
+            return teil.v - self.sehne("v")
+        if groesse == "f_z":
+            return teil.w - self.sehne("w")
+        return getattr(teil, groesse)
 
     def _werte(self, teil: Intervall, x: float) -> Dict[str, float]:
-        u, v = teil.u(x), teil.v(x)
-        return {"x": x, "N": teil.N(x), "V": teil.V(x), "M": teil.M(x), "u": u, "v": v,
-                "ux": self.c * u - self.s * v, "uz": self.s * u + self.c * v,
-                "w": -(v - self.sehne(x)), "phi": teil.theta(x)}
-
-    def sehne(self, x: float) -> float:
-        """Die Querverschiebung der Sehne zwischen den Stabenden -- fuer die relative Durchbiegung."""
-        va = self.intervalle[0].v(self.intervalle[0].x0)
-        vb = self.intervalle[-1].v(self.intervalle[-1].x1)
-        return va + (vb - va) * x / self.L
+        werte = {"x": x}
+        for groesse in POLYNOME + ("f_y", "f_z"):
+            werte[groesse] = self._polynom(teil, groesse)(x)
+        werte["ux"], werte["uy"], werte["uz"] = im_system(
+            self.achsen, (werte["u"], werte["v"], werte["w"]))
+        return werte
 
     def proben(self, je_stab: int = 24) -> List[Dict[str, float]]:
         """
@@ -215,31 +280,21 @@ class Stabverlauf:
         return heraus
 
     def extremstellen(self) -> List[float]:
-        """Wo ein Moment, eine Querkraft oder eine Normalkraft im Innern eines Stuecks extrem ist."""
-        stellen = []
-        for teil in self.intervalle:
-            for p in (teil.M.ableitung(), teil.V.ableitung(), teil.N.ableitung()):
-                stellen.extend(p.nullstellen(teil.x0, teil.x1))
-        return stellen
+        """Wo eine Schnittgroesse im Innern eines Stuecks extrem ist."""
+        return [x for teil in self.intervalle for groesse in SCHNITTGROESSEN
+                for x in getattr(teil, groesse).ableitung().nullstellen(teil.x0, teil.x1)]
 
     def extrem(self, groesse: str) -> Extrem:
         """
-        Kleinster und groesster Wert von ``N``, ``V``, ``M``, ``w`` (der
-        Durchbiegung gegen die Sehne) oder ``phi`` (der Verdrehung des
-        Querschnitts, im Gegenuhrzeigersinn), mit Stelle.
+        Kleinster und groesster Wert einer Groesse mit Stelle: einer
+        Schnittgroesse, einer Verschiebung oder Verdrehung oder von ``f_y``
+        und ``f_z``, der Durchbiegung gegen die Sehne.
         """
         werte = []
-        neigung = (self.intervalle[-1].v(self.L) - self.intervalle[0].v(0.0)) / self.L
         for teil in self.intervalle:
-            if groesse == "w":
-                # w ist extrem, wo die Biegelinie so steil ist wie die Sehne.
-                stellen = [teil.x0, teil.x1] + (
-                    teil.theta - Polynom((neigung,))).nullstellen(teil.x0, teil.x1)
-                werte.extend((x, self._werte(teil, x)["w"]) for x in stellen)
-                continue
-            funktion = teil.theta if groesse == "phi" else getattr(teil, groesse)
-            stellen = [teil.x0, teil.x1] + funktion.ableitung().nullstellen(teil.x0, teil.x1)
-            werte.extend((x, funktion(x)) for x in stellen)
+            p = self._polynom(teil, groesse)
+            stellen = [teil.x0, teil.x1] + p.ableitung().nullstellen(teil.x0, teil.x1)
+            werte.extend((x, p(x)) for x in stellen)
         return Extrem(kleinst=min(werte, key=lambda w: w[1]),
                       groesst=max(werte, key=lambda w: w[1]))
 
@@ -252,25 +307,38 @@ def verlaeufe(fall) -> Dict[str, Stabverlauf]:
         verlauf = heraus.get(t.stab.name)
         if verlauf is None:
             verlauf = heraus[t.stab.name] = Stabverlauf(
-                stab=t.stab.name, L=t.L_stab, c=t.c, s=t.s,
-                x_a=t.a.x - t.c * t.x0, z_a=t.a.z - t.s * t.x0)
-        verlauf.intervalle.extend(ebener_verlauf(
-            L=t.L, x0=t.x0, s=teil.s, d=teil.d, lasten=teil.lasten, EA=t.EA, EI=t.EI,
-            k_quer=t.k_quer, k_laengs=t.k_laengs, laengs=t.laengs, biegung=t.biegung))
+                stab=t.stab.name, L=t.L_stab, achsen=t.achsen,
+                anfang=minus(t.a.punkt, mal(t.x0, t.achsen[0])))
+
+        def ebene(zuordnung, lasten, **steifigkeit):
+            return ebener_verlauf(L=t.L, x0=t.x0, s=st3.eben(teil.s, zuordnung),
+                                  d=st3.eben(teil.d, zuordnung), lasten=lasten, **steifigkeit)
+
+        # Die Laengskraft gehoert der Ebene z; die Torsion ist ein Teil ohne
+        # Biegung, ihr Torsionsmoment und ihre Verdrehung stehen dort, wo
+        # sonst N und u stehen.
+        z = ebene(st3.EBENE_Z, teil.lasten.z, EA=t.EA, EI=t.EI_y, k_quer=t.k_z,
+                  k_laengs=t.k_x, laengs=t.laengs, biegung=t.biegung_z)
+        y = ebene(st3.EBENE_Y, teil.lasten.y, EI=t.EI_z, k_quer=t.k_y,
+                  laengs=False, biegung=t.biegung_y)
+        drillung = ebene(st3.TORSION, teil.lasten.t, EA=t.GI_T,
+                         laengs=t.torsion, biegung=False)
+        verlauf.intervalle.extend(_zusammen(*teile) for teile in zip(z, y, drillung))
     for verlauf in heraus.values():
         verlauf.intervalle.sort(key=lambda i: (i.x0, i.x1))
     return heraus
 
 
 def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float],
-                   lasten: Sequence[st.Teillast], EA: float, EI: float, k_quer: float = 0.0,
-                   k_laengs: float = 0.0, laengs: bool = True,
-                   biegung: bool = True) -> List[Intervall]:
+                   lasten: Sequence[st.Teillast], EA: float = 0.0, EI: float = 0.0,
+                   k_quer: float = 0.0, k_laengs: float = 0.0, laengs: bool = True,
+                   biegung: bool = True) -> List[EbenesIntervall]:
     """
-    Die Intervalle eines Teilstabs der Laenge ``L``, in x ab dem Anfang
+    Die Intervalle eines ebenen Teils der Laenge ``L``, in x ab dem Anfang
     seines Stabs (``x0``) -- aus den Kraeften ``s`` und Verschiebungen ``d``
-    seiner Enden und seinen Lasten. Auch der raeumliche Stab rechnet so, je
-    Ebene einmal (:mod:`opencivil.stabwerk3d.stab`).
+    seiner Enden und seinen Lasten. ``EA`` gilt nur, wenn er sich dehnt
+    (``laengs``), ``EI`` nur, wenn er sich biegt (``biegung``): sonst bleiben
+    ``u`` und ``theta`` die des Anfangs.
     """
     strecken = [l for l in lasten if isinstance(l, st.Strecke) and l.b > l.a]
     punkte = [l for l in lasten if isinstance(l, st.Punkt)]
@@ -288,7 +356,7 @@ def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float
         if p.a == 0.0:
             N0, V0, M0 = N0 - p.Px, V0 + p.Py, M0 - p.M
     u0, v0, th0 = d[0], d[1], d[2]
-    heraus: List[Intervall] = []
+    heraus: List[EbenesIntervall] = []
     for xa, xb in zip(grenzen, grenzen[1:]):
         if xb - xa <= 1e-12 * L:
             continue
@@ -313,16 +381,26 @@ def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float
             N = NULL
         if not biegung:
             V, M = NULL, NULL
-        u = Polynom((u0,)) + (N * (1.0 / EA)).stammfunktion(xa)
-        theta = Polynom((th0,)) + (M * (1.0 / EI)).stammfunktion(xa)
+        u, theta = Polynom((u0,)), Polynom((th0,))
+        if laengs:
+            u = u + (N * (1.0 / EA)).stammfunktion(xa)
+        if biegung:
+            theta = theta + (M * (1.0 / EI)).stammfunktion(xa)
         v = Polynom((v0,)) + theta.stammfunktion(xa)
-        heraus.append(Intervall(xa, xb, N, V, M, u, v, theta, py))
+        heraus.append(EbenesIntervall(xa, xb, N, V, M, u, v, theta, py))
         N0, V0, M0 = N(xb), V(xb), M(xb)
         u0, v0, th0 = u(xb), v(xb), theta(xb)
         for p in punkte:
             if p.a == xb and xb < L:
                 N0, V0, M0 = N0 - p.Px, V0 + p.Py, M0 - p.M
     return [_verschoben(i, x0) for i in heraus]
+
+
+def _zusammen(z: EbenesIntervall, y: EbenesIntervall, t: EbenesIntervall) -> Intervall:
+    """Die drei ebenen Teile eines Stuecks als eines -- mit der Zuordnung aus :mod:`~opencivil.stabwerk3d.stab`."""
+    return Intervall(z.x0, z.x1, N=z.N, V_y=y.V, V_z=z.V, T=t.N, M_y=z.M, M_z=y.M,
+                     u=z.u, v=-y.v, w=-z.v, theta_x=t.u, theta_y=z.theta, theta_z=-y.theta,
+                     p_y=-y.p_y, p_z=-z.p_y)
 
 
 def _hermite(L: float, v1: float, t1: float, v2: float, t2: float) -> Polynom:
@@ -336,12 +414,12 @@ def _hermite(L: float, v1: float, t1: float, v2: float, t2: float) -> Polynom:
     return v1 * h1 + t1 * h2 + v2 * h3 + t2 * h4
 
 
-def _verschoben(i: Intervall, um: float) -> Intervall:
+def _verschoben(i: EbenesIntervall, um: float) -> EbenesIntervall:
     """Dasselbe Intervall in x ab dem Anfang des ganzen Stabs."""
     if not um:
         return i
-    return Intervall(i.x0 + um, i.x1 + um, *(_schieben(p, um) for p in
-                                             (i.N, i.V, i.M, i.u, i.v, i.theta, i.p_y)))
+    return EbenesIntervall(i.x0 + um, i.x1 + um, *(_schieben(p, um) for p in
+                                                   (i.N, i.V, i.M, i.u, i.v, i.theta, i.p_y)))
 
 
 def _schieben(p: Polynom, um: float) -> Polynom:

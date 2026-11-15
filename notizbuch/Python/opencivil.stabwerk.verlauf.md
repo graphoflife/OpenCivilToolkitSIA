@@ -1,30 +1,40 @@
 ---
-erzeugt: a7a90704a5a2
+erzeugt: 7c2b7e765b97
 art: modul
 tags: [modul]
 ---
 > [!abstract] opencivil/stabwerk/verlauf.py
-> Schnittgroessen und Biegelinie laengs eines Stabs.
+> Schnittgroessen und Biegelinien laengs eines Stabs, eben und im Raum.
 > Paket [[opencivil.stabwerk]] · [Quelltext](../../opencivil/stabwerk/verlauf.py)
 
 ## VERANTWORTUNG
 
 Aus dem, was [[opencivil.stabwerk.system|system]] an den Enden jedes Teilstabs
 findet -- Kraefte und Verschiebungen --, und aus seinen Lasten die Verlaeufe
-dazwischen: Normalkraft, Querkraft, Moment, Laengs- und Querverschiebung.
-Dazu die groessten und kleinsten Werte und wo sie liegen.
+dazwischen: Normalkraft, Querkraefte, Torsionsmoment, Biegemomente,
+Verschiebungen und Verdrehungen. Dazu die groessten und kleinsten Werte und
+wo sie liegen.
 
 
-## VORZEICHEN DER BAUSTATIK
+## EIN STAB AUS EBENEN TEILEN
 
-Die Schnittgroessen stehen, wie man sie von Hand rechnet: `N > 0` ist Zug;
-`M > 0` zieht an der gestrichelten Faser, der rechten Seite des Stabs vom
-Anfang zum Ende gesehen -- bei einem Stab von links nach rechts unten;
-`V = dM/dx + m` (`m` ein verteiltes Moment im Gegenuhrzeigersinn). Ein
-Einfeldtraeger unter Last nach unten hat also ein positives Feldmoment und
-links eine positive Querkraft.
+Ein Stab besteht aus drei ebenen Teilen ([[opencivil.stabwerk3d.stab]]):
+der Biegung in seiner x-z-Ebene samt Laengskraft, der Biegung in seiner
+x-y-Ebene und der Torsion. Jeder Teil rechnet fuer sich
+([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]]), dann werden sie zusammengesetzt. Die drei Teile
+springen an denselben Stellen, weil jede Last in allen dreien steht. In der
+Ebene sind die beiden letzten null.
 
-Aus den Kraeften `s` auf die Enden (in den Achsen des Stabs, y links,
+
+## VORZEICHEN EINES EBENEN TEILS
+
+Wie man sie von Hand rechnet: `N > 0` ist Zug; `M > 0` zieht an der
+gestrichelten Faser, der rechten Seite des Teils vom Anfang zum Ende
+gesehen; `V = dM/dx + m` (`m` ein verteiltes Moment im
+Gegenuhrzeigersinn). Ein Einfeldtraeger unter Last nach unten hat also ein
+positives Feldmoment und links eine positive Querkraft.
+
+Aus den Kraeften `s` auf die Enden (in den Achsen des Teils, y links,
 Gegenuhrzeigersinn) folgt am Anfang:
 
 ```python
@@ -39,6 +49,21 @@ dN/dx = -p_x     dV/dx = p_y     dM/dx = V - m
 
 Eine Einzelkraft laesst N um `-P_x` und V um `+P_y` springen, ein
 Einzelmoment M um `-M`.
+
+VORZEICHEN DES STABS -- M_z NACH VORGABE, NICHT NACHGESCHLAGEN:
+In den Achsen des Stabs. `N > 0` ist Zug, `T > 0` dreht im Rechtssinn
+um die nach aussen zeigende Normale des Schnitts. `M_y > 0` zieht an der
+Faser auf der Seite +z, `M_z > 0` an der auf der Seite +y: beide Ebenen
+wie die eines ebenen Teils, mit `V_z = dM_y/dx` und `V_y = dM_z/dx`, wo
+kein verteiltes Moment liegt. Die Spannung im Querschnitt ist damit
+`σ = N/A + M_y·z/I_y + M_z·y/I_z`; die Rechtsschraube gaebe `M_z` das
+andere Vorzeichen. In der Ebene liegt z auf der gestrichelten Faser: `N`,
+`V_z` und `M_y` sind `N`, `V` und `M` von Hand.
+
+Verschiebungen `u`, `v`, `w` in x, y und z des Stabs, Verdrehungen
+`theta_x`, `theta_y`, `theta_z` im Rechtssinn um diese Achsen; dazu
+`ux`, `uy`, `uz` in den Achsen des Systems und die Durchbiegungen
+`f_y` und `f_z` gegen die Sehne zwischen den Stabenden.
 
 
 ## STUECKWEISE POLYNOME
@@ -101,6 +126,25 @@ def nullstellen(self, a: float, b: float, stellen: int=48) -> List[float]
 
 Wo es in `(a, b)` das Vorzeichen wechselt -- abgetastet und halbiert.
 
+### EbenesIntervall
+
+```python
+@dataclass
+class EbenesIntervall
+```
+
+Ein Stueck eines ebenen Teils ohne Laststelle -- alles darauf Polynome in x ab dem Stabanfang.
+
+- `x0: float`
+- `x1: float`
+- `N: Polynom`
+- `V: Polynom`
+- `M: Polynom`
+- `u: Polynom` – Laengs, in x des Stabs.
+- `v: Polynom` – Quer, in y des Stabs -- links positiv.
+- `theta: Polynom`
+- `p_y: Polynom = field(default_factory=lambda: NULL)` – Die Querlast samt Bettung -- fuer das, was ins Linienlager geht.
+
 ### Intervall
 
 ```python
@@ -113,12 +157,19 @@ Ein Stueck eines Stabs ohne Laststelle -- alles darauf Polynome in x ab dem Stab
 - `x0: float`
 - `x1: float`
 - `N: Polynom`
-- `V: Polynom`
-- `M: Polynom`
-- `u: Polynom` – Laengs, in x des Stabs.
-- `v: Polynom` – Quer, in y des Stabs -- links positiv.
-- `theta: Polynom`
-- `p_y: Polynom = field(default_factory=lambda: NULL)` – Die Querlast samt Bettung -- fuer das, was ins Linienlager geht.
+- `V_y: Polynom`
+- `V_z: Polynom`
+- `T: Polynom`
+- `M_y: Polynom`
+- `M_z: Polynom`
+- `u: Polynom`
+- `v: Polynom`
+- `w: Polynom`
+- `theta_x: Polynom`
+- `theta_y: Polynom`
+- `theta_z: Polynom`
+- `p_y: Polynom = field(default_factory=lambda: NULL)`
+- `p_z: Polynom = field(default_factory=lambda: NULL)` – Die Querlast samt Bettung in y und z des Stabs.
 
 ### Extrem
 
@@ -143,10 +194,8 @@ Ein Stab von Anfang bis Ende -- ueber alle seine Teilstaebe.
 
 - `stab: str`
 - `L: float`
-- `c: float`
-- `s: float`
-- `x_a: float`
-- `z_a: float`
+- `anfang: Vektor`
+- `achsen: Tuple[Vektor, Vektor, Vektor]`
 - `intervalle: List[Intervall] = field(default_factory=list)`
 
 #### Stabverlauf.bei
@@ -161,10 +210,10 @@ mit `links` links davon.
 #### Stabverlauf.sehne
 
 ```python
-def sehne(self, x: float) -> float
+def sehne(self, groesse: str) -> Polynom
 ```
 
-Die Querverschiebung der Sehne zwischen den Stabenden -- fuer die relative Durchbiegung.
+Die Gerade zwischen den Werten von `v` oder `w` an den Stabenden.
 
 #### Stabverlauf.proben
 
@@ -181,7 +230,7 @@ dicht, dass ein Stab rund `je_stab` Stuecke hat.
 def extremstellen(self) -> List[float]
 ```
 
-Wo ein Moment, eine Querkraft oder eine Normalkraft im Innern eines Stuecks extrem ist.
+Wo eine Schnittgroesse im Innern eines Stuecks extrem ist.
 
 #### Stabverlauf.extrem
 
@@ -189,9 +238,9 @@ Wo ein Moment, eine Querkraft oder eine Normalkraft im Innern eines Stuecks extr
 def extrem(self, groesse: str) -> Extrem
 ```
 
-Kleinster und groesster Wert von `N`, `V`, `M`, `w` (der
-Durchbiegung gegen die Sehne) oder `phi` (der Verdrehung des
-Querschnitts, im Gegenuhrzeigersinn), mit Stelle.
+Kleinster und groesster Wert einer Groesse mit Stelle: einer
+Schnittgroesse, einer Verschiebung oder Verdrehung oder von `f_y`
+und `f_z`, der Durchbiegung gegen die Sehne.
 
 ### verlaeufe
 
@@ -204,13 +253,22 @@ Je Stab sein Verlauf in diesem Fall -- aus den Teilstaeben, der Reihe nach.
 ### ebener_verlauf
 
 ```python
-def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float], lasten: Sequence[st.Teillast], EA: float, EI: float, k_quer: float=0.0, k_laengs: float=0.0, laengs: bool=True, biegung: bool=True) -> List[Intervall]
+def ebener_verlauf(*, L: float, x0: float, s: Sequence[float], d: Sequence[float], lasten: Sequence[st.Teillast], EA: float=0.0, EI: float=0.0, k_quer: float=0.0, k_laengs: float=0.0, laengs: bool=True, biegung: bool=True) -> List[EbenesIntervall]
 ```
 
-Die Intervalle eines Teilstabs der Laenge `L`, in x ab dem Anfang
+Die Intervalle eines ebenen Teils der Laenge `L`, in x ab dem Anfang
 seines Stabs (`x0`) -- aus den Kraeften `s` und Verschiebungen `d`
-seiner Enden und seinen Lasten. Auch der raeumliche Stab rechnet so, je
-Ebene einmal ([[opencivil.stabwerk3d.stab]]).
+seiner Enden und seinen Lasten. `EA` gilt nur, wenn er sich dehnt
+(`laengs`), `EI` nur, wenn er sich biegt (`biegung`): sonst bleiben
+`u` und `theta` die des Anfangs.
+
+### _zusammen
+
+```python
+def _zusammen(z: EbenesIntervall, y: EbenesIntervall, t: EbenesIntervall) -> Intervall
+```
+
+Die drei ebenen Teile eines Stuecks als eines -- mit der Zuordnung aus [[opencivil.stabwerk3d.stab|stab]].
 
 ### _hermite
 
@@ -223,7 +281,7 @@ Die kubische Biegelinie aus den Enden -- die Form, mit der die Bettung gerechnet
 ### _verschoben
 
 ```python
-def _verschoben(i: Intervall, um: float) -> Intervall
+def _verschoben(i: EbenesIntervall, um: float) -> EbenesIntervall
 ```
 
 Dasselbe Intervall in x ab dem Anfang des ganzen Stabs.
@@ -239,14 +297,21 @@ def _schieben(p: Polynom, um: float) -> Polynom
 
 ## Konstanten
 
+- `SCHNITTGROESSEN = ('N', 'V_y', 'V_z', 'T', 'M_y', 'M_z')` – Die Schnittgroessen eines Stabs -- ihre Extremstellen kommen in die Proben.
+- `POLYNOME = SCHNITTGROESSEN + ('u', 'v', 'w', 'theta_x', 'theta_y', 'theta_z')` – Was ein Intervall als Polynom traegt, ausser den Lasten.
+- `IN_DER_EBENE = {'N': 'N', 'V': 'V_z', 'M': 'M_y', 'w': 'f_z', 'phi': 'theta_y'}` – In der Ebene heissen die Groessen eines Stabs wie von Hand -- je Zeichen sein Feld im Verlauf: z liegt auf der gestrichelten Faser, y steht senkrecht auf der Ebene.
 - `NULL = Polynom((0.0,))`
 
 ## Braucht
 
 - [[opencivil.stabwerk.stab]]
+- [[opencivil.stabwerk3d.raum]]
+- [[opencivil.stabwerk3d.stab]]
 
 ## Gebraucht von
 
 - [[opencivil.decke.traeger]]
+- [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
-- [[opencivil.stabwerk3d.verlauf]]
+- [[opencivil.stabwerk3d.herleitung]]
+- [[opencivil.web.balkendaten]]

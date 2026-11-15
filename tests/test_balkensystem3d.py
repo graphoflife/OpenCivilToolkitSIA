@@ -227,9 +227,9 @@ class TestRechnen(unittest.TestCase):
         v2 = p2.rechnen().balkensystem("T").verlaeufe("G")["L1"]
         v3 = befund.verlaeufe("G")["L1"]
         for x in (0.0, 1.5, 3.0):
-            self.assertAlmostEqual(v3.bei(x)["M_y"], v2.bei(x)["M"], places=6)
-            self.assertAlmostEqual(v3.bei(x)["V_z"], v2.bei(x)["V"], places=6)
-            self.assertAlmostEqual(v3.bei(x)["f_z"], v2.bei(x)["w"], places=12)
+            for g in ("M_y", "V_z"):
+                self.assertAlmostEqual(v3.bei(x)[g], v2.bei(x)[g], places=6)
+            self.assertAlmostEqual(v3.bei(x)["f_z"], v2.bei(x)["f_z"], places=12)
 
     def test_meldungen_wie_in_der_ebene(self):
         s = kragarm()

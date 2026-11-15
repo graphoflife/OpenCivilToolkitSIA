@@ -14,14 +14,13 @@ import math
 import unittest
 
 from opencivil.stabwerk import modell as m2
-from opencivil.stabwerk import system as s2
-from opencivil.stabwerk import verlauf as v2
+from opencivil.stabwerk import system as kern
+from opencivil.stabwerk.art import EBENE, RAUM
 from opencivil.stabwerk.modell import FEST, FREI, Kombination, Lastart, Lastfall, feder
+from opencivil.stabwerk.verlauf import verlaeufe
 from opencivil.stabwerk3d.modell import (
     Knoten, Knotenlast, Lager, Richtung, Stab, Stablast, System,
 )
-from opencivil.stabwerk3d.system import rechnen
-from opencivil.stabwerk3d.verlauf import verlaeufe
 
 EA, EI_y, EI_z, GI_T = 5e9, 50e6, 20e6, 10e6
 q, P = 10e3, 20e3
@@ -48,6 +47,11 @@ def linienlast(stab_, wert=q, **felder):
 def system(knoten, staebe, lager, *lastfaelle, kombinationen=()):
     return System(knoten=[Knoten(*k) for k in knoten], staebe=staebe, lager=lager,
                   lastfaelle=list(lastfaelle), kombinationen=list(kombinationen))
+
+
+def rechnen(s, art=RAUM):
+    """Im Raum -- oder, mit :data:`~opencivil.stabwerk.art.EBENE`, ein ebenes System."""
+    return kern.rechnen(s, art)
 
 
 class Rechnung(unittest.TestCase):
@@ -191,7 +195,7 @@ class TestEbenerRahmen(Rechnung):
         eben = m2.System([m2.Knoten(n, x, z) for n, x, z in self.knoten],
                          [m2.Stab(n, a, b, EA=EA, EI=EI_y, **f) for n, a, b, f in self.staebe],
                          [m2.Lager(n, k, *h) for n, k, h in self.lager], [Lastfall("F", lasten)])
-        self.e2 = s2.rechnen(eben)
+        self.e2 = rechnen(eben, EBENE)
         self.assertTrue(self.e2.gueltig)
         # Aus der Ebene heraus gehalten: in y und um x und z.
         raeumlich = System(
@@ -239,15 +243,14 @@ class TestEbenerRahmen(Rechnung):
             self.assertAlmostEqual(-r[4], rm, delta=1e-8 * P)
 
     def test_verlaeufe(self):
-        eben, raeumlich = v2.verlaeufe(self.f2), verlaeufe(self.f3)
+        eben, raeumlich = verlaeufe(self.f2), verlaeufe(self.f3)
         for name, verlauf in eben.items():
             vz = -1.0 if name in self.nach_links else 1.0
             for x in (0.0, 0.3, 1.0, 1.5, 2.0, 2.9, verlauf.L):
                 a, b = verlauf.bei(x), raeumlich[name].bei(x)
-                for g2, g3, s in (("N", "N", 1), ("V", "V_z", vz), ("M", "M_y", vz),
-                                  ("ux", "ux", 1), ("uz", "uz", 1)):
-                    self.assertAlmostEqual(a[g2], s * b[g3], delta=1e-6 * (1 + abs(a[g2])),
-                                           msg=(name, x, g2))
+                for g, s in (("N", 1), ("V_z", vz), ("M_y", vz), ("ux", 1), ("uz", 1)):
+                    self.assertAlmostEqual(a[g], s * b[g], delta=1e-6 * (1 + abs(a[g])),
+                                           msg=(name, x, g))
                 for g3 in ("V_y", "M_z", "T", "uy"):
                     self.assertAlmostEqual(b[g3], 0.0, places=6, msg=(name, x, g3))
 
@@ -426,10 +429,10 @@ class TestBettung(Rechnung):
                    m2.Stablast("L1", Lastart.EINZELLAST, P, von=3.0),
                    m2.Stablast("L1", Lastart.EINZELLAST, P, richtung=m2.Lastrichtung.LAENGS,
                                von=L)]
-        eben = s2.rechnen(m2.System(
+        eben = rechnen(m2.System(
             [m2.Knoten("K1", 0, 0), m2.Knoten("K2", L, 0)],
             [m2.Stab("L1", "K1", "K2", EA=EA, EI=EI_y, quer=feder(k), laengs=feder(k_x))],
-            [], [Lastfall("F", lasten2)]))
+            [], [Lastfall("F", lasten2)]), EBENE)
         self.assertTrue(eben.gueltig, [m.text for m in eben.meldungen])
         lasten3 = [linienlast("L1"), Stablast("L1", Lastart.EINZELLAST, P, von=3.0),
                    Stablast("L1", Lastart.EINZELLAST, P, richtung=Richtung.LAENGS, von=L)]
@@ -438,12 +441,12 @@ class TestBettung(Rechnung):
             [stab("L1", "K1", "K2", quer_z=feder(k), laengs=feder(k_x))],
             [Lager("A1", "K1", y=FEST, phi_x=FEST), Lager("A2", "K2", y=FEST)],
             Lastfall("F", lasten3)))
-        a = v2.verlaeufe(eben.faelle[0])["L1"]
+        a = verlaeufe(eben.faelle[0])["L1"]
         b = verlaeufe(raeumlich.faelle[0])["L1"]
         for x in (0.0, 1.0, 3.0, 5.5, L):
-            for g2, g3 in (("uz", "uz"), ("ux", "ux"), ("M", "M_y"), ("N", "N")):
-                self.assertAlmostEqual(a.bei(x)[g2], b.bei(x)[g3],
-                                       delta=1e-6 * (1 + abs(a.bei(x)[g2])), msg=(x, g2))
+            for g in ("uz", "ux", "M_y", "N"):
+                self.assertAlmostEqual(a.bei(x)[g], b.bei(x)[g],
+                                       delta=1e-6 * (1 + abs(a.bei(x)[g])), msg=(x, g))
         bettung = raeumlich.faelle[0].bettung["L1"]
         self.nahe(bettung[2], q * L + P, 1e-8)
         self.nahe(bettung[0], -P, 1e-8)

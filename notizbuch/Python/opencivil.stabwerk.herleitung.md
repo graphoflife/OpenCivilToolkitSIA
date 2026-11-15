@@ -1,5 +1,5 @@
 ---
-erzeugt: adce7d967bc7
+erzeugt: 09d17b659dea
 art: modul
 tags: [modul]
 ---
@@ -93,10 +93,10 @@ def lagerkraefte(p: Protokoll, befund: 'Systembefund', fall, groessen: Sequence[
 ### extremwerte
 
 ```python
-def extremwerte(p: Protokoll, verlaeufe, groessen: Sequence[Tuple[str, str, float, int]]=EXTREMWERTE_DER_EBENE, durchbiegungen: Sequence[str]=('w',)) -> None
+def extremwerte(p: Protokoll, verlaeufe, groessen: Sequence[Tuple[str, str, str, float, int]]=EXTREMWERTE_DER_EBENE, durchbiegungen: Sequence[str]=(IN_DER_EBENE['w'],)) -> None
 ```
 
-Kleinster und groesster Wert je Stab -- dazu die groesste der `durchbiegungen`.
+Kleinster und groesster Wert je Stab -- dazu die groesste der `durchbiegungen` (Felder).
 
 ### gleichgewicht
 
@@ -131,7 +131,7 @@ def matrix_latex(zeilen: Sequence[Sequence[float]], faktor: float) -> str
 - `SCHNITTGROESSEN_LATEX = 'N(0) = -s_{u,a} \\qquad V(0) = s_{v,a} \\qquad M(0) = -s_{\\theta,a}…` – Von den Kraeften an den Stabenden zu den Schnittgroessen laengs des Stabs.
 - `BIEGELINIE_LATEX = "v'' = \\frac{M}{EI} \\qquad u' = \\frac{N}{EA}"` – Die Biegelinie aus Moment und Normalkraft.
 - `LAGERKRAEFTE_DER_EBENE = (('R_x', 'kN'), ('R_z', 'kN'), ('M', 'kNm'))` – Eine Lagerkraft in der Ebene, in der Folge des Rechenkerns: Zeichen und Einheit.
-- `EXTREMWERTE_DER_EBENE = (('N', 'kN', 0.001, 1), ('V', 'kN', 0.001, 1), ('M', 'kNm', 0.001, 1)…` – Die Extremwerte in der Ebene: Groesse, Einheit, Faktor von SI und Nachkommastellen.
+- `EXTREMWERTE_DER_EBENE = tuple(((IN_DER_EBENE[g], g, *rest) for g, *rest in (('N', 'kN', 0.001…` – Die Extremwerte in der Ebene: Feld im Verlauf, Zeichen, Einheit, Faktor von SI und Nachkommastellen.
 - `SUMMEN_DER_EBENE = (('\\sum F_x', 'kN'), ('\\sum F_z', 'kN'), ('\\sum M_0', 'kNm'))` – Die Summen der Gleichgewichtsprobe in der Ebene, in der Folge des Rechenkerns.
 
 ## Braucht
@@ -143,6 +143,8 @@ def matrix_latex(zeilen: Sequence[Sequence[float]], faktor: float) -> str
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stab]]
 - [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk.verlauf]]
+- [[opencivil.stabwerk3d.stab]]
 
 ## Gebraucht von
 

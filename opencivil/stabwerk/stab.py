@@ -4,7 +4,9 @@ opencivil/stabwerk/stab.py -- der ebene Stab: Steifigkeit, Lasten, Bettung.
 VERANTWORTUNG:
 Was ein einzelner Stab zum System beitraegt, in seinen eigenen Achsen: die
 Steifigkeitsmatrix, die Lasten als arbeitsgleiche Knotenkraefte, die
-Bettung, und die Drehung in die Achsen des Systems. Zusammengebaut wird in
+Bettung -- und fuer die Herleitung die Drehung in die Achsen des Systems,
+in Zeichen. Gedreht und zusammengebaut wird im Raum: ein Stab dort besteht
+aus drei ebenen (:mod:`opencivil.stabwerk3d.stab`), das System rechnet
 :mod:`~opencivil.stabwerk.system`.
 
 DIE ACHSEN DES STABS:
@@ -151,24 +153,8 @@ def summe(*matrizen: Matrix) -> Matrix:
     return [[sum(m[i][j] for m in matrizen) for j in range(n)] for i in range(n)]
 
 
-def drehung(c: float, s: float) -> Matrix:
-    """``T`` mit ``d = T · d_glob``: je Ende ``u = c·U + s·W``, ``v = -s·U + c·W``, ``θ = Θ``."""
-    T = nullmatrix(6)
-    for o in (0, 3):
-        T[o][o], T[o][o + 1] = c, s
-        T[o + 1][o], T[o + 1][o + 1] = -s, c
-        T[o + 2][o + 2] = 1.0
-    return T
-
-
 def mal(A: Matrix, x: Sequence[float]) -> List[float]:
     return [sum(a * b for a, b in zip(zeile, x)) for zeile in A]
-
-
-def transponiert_mal(A: Matrix, x: Sequence[float]) -> List[float]:
-    """``Aᵀ · x``."""
-    n = len(A[0])
-    return [sum(A[i][j] * x[i] for i in range(len(A))) for j in range(n)]
 
 
 # ===========================================================================

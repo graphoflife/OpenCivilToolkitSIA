@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b648ac879da
+erzeugt: 6cbe4bdb4d84
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Was ein Stab im Raum zum System beitraegt, in seinen eigenen Achsen: die
 Achsen selbst, die Steifigkeitsmatrix 12 × 12, die Bettung und die Lasten --
 in seinen Achsen, als arbeitsgleiche Knotenkraefte und als Resultierende.
-Zusammengebaut wird in [[opencivil.stabwerk3d.system|system]].
+Zusammengebaut wird in [[opencivil.stabwerk.system|system]].
 
 
 ## DIE ACHSEN DES STABS
@@ -32,8 +32,20 @@ die gestrichelte Faser der Ebene oben, `z` bleibt unten: `V_z` und
 dreht `y` und `z` im Rechtssinn um `x`. Bei `β = 0` steht der Steg
 eines Profils, das sich um `y` biegt, in der lotrechten Ebene des Stabs.
 
-Lotrecht heisst: weniger als [[opencivil.stabwerk.system#Konstanten|TOLERANZ]]
+Lotrecht heisst: weniger als [[opencivil.stabwerk3d.raum#Konstanten|TOLERANZ]]
 daneben -- so genau rundet das Zeichenfenster.
+
+
+## IN DER EBENE
+
+Liegt das ganze System in der x-z-Ebene und bleibt darin
+([[opencivil.stabwerk.art#Konstanten|EBENE]]), ist `y` jedes Stabs `-y`
+des Systems, wie sonst nur bei einem lotrechten ([[opencivil.stabwerk3d.stab#achsen_eben|achsen_eben]]).
+`z = x × y` steht dann rechts des Stabs, vom Anfang zum Ende gesehen, auf
+der gestrichelten Faser des 2D-Balkensystems -- auch wenn er nach links
+laeuft. So sind `N`, `V_z` und `M_y` in jedem Stab `N`, `V` und
+`M` der Ebene, und eine Drehung um `y` des Stabs ist eine im
+Gegenuhrzeigersinn.
 
 
 ## DREI EBENE STAEBE
@@ -75,6 +87,15 @@ def achsen(a, b, drehung: float=0.0) -> Tuple[float, Tuple[Vektor, Vektor, Vekto
 
 Laenge und Achsen `(x, y, z)` eines Stabs von `a` nach `b` --
 Einheitsvektoren im System, siehe Dateikopf.
+
+### achsen_eben
+
+```python
+def achsen_eben(a, b) -> Tuple[float, Tuple[Vektor, Vektor, Vektor]]
+```
+
+Laenge und Achsen eines Stabs in der x-z-Ebene: `y` ist `-y` des
+Systems, `z = x × y` liegt rechts des Stabs -- siehe Dateikopf.
 
 ### _lotrecht
 
@@ -184,6 +205,24 @@ def eben(werte: Sequence[float], ebene) -> List[float]
 
 Die sechs ebenen Werte einer Ebene aus den zwoelf raeumlichen -- Verschiebungen wie Kraefte.
 
+### eben_matrix
+
+```python
+def eben_matrix(k: Matrix, ebene) -> Matrix
+```
+
+Die ebene Matrix 6 × 6 einer Ebene aus der raeumlichen 12 × 12 -- umgekehrt wie beim Einsetzen.
+
+### lastbereich
+
+```python
+def lastbereich(last, L: float) -> Union[Tuple[float, float], str]
+```
+
+Wo eine Last auf einem Stab der Laenge `L` liegt, `(von, bis)` in m
+-- oder ein Satz, warum nicht: eine Stelle ausserhalb des Stabs. Eine
+Einzellast steht bei `von`.
+
 ### lokal
 
 ```python
@@ -216,14 +255,15 @@ tragen ihre Werte in den Achsen ihrer Ebene, siehe Dateikopf.
 
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.stab]]
-- [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.raum]]
 
 ## Gebraucht von
 
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.stabwerk.art]]
+- [[opencivil.stabwerk.herleitung]]
+- [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk.verlauf]]
 - [[opencivil.stabwerk3d.herleitung]]
-- [[opencivil.stabwerk3d.system]]
-- [[opencivil.stabwerk3d.verlauf]]
 - [[opencivil.web.balkendaten]]

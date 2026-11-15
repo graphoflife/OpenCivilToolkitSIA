@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b0e3debeab6
+erzeugt: cbf815de2192
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,9 @@ tags: [modul]
 
 Was ein einzelner Stab zum System beitraegt, in seinen eigenen Achsen: die
 Steifigkeitsmatrix, die Lasten als arbeitsgleiche Knotenkraefte, die
-Bettung, und die Drehung in die Achsen des Systems. Zusammengebaut wird in
+Bettung -- und fuer die Herleitung die Drehung in die Achsen des Systems,
+in Zeichen. Gedreht und zusammengebaut wird im Raum: ein Stab dort besteht
+aus drei ebenen ([[opencivil.stabwerk3d.stab]]), das System rechnet
 [[opencivil.stabwerk.system|system]].
 
 
@@ -91,27 +93,11 @@ ist es die Matrix mit `k · L / 420` ([[opencivil.stabwerk.stab#Konstanten|BETTU
 def summe(*matrizen: Matrix) -> Matrix
 ```
 
-### drehung
-
-```python
-def drehung(c: float, s: float) -> Matrix
-```
-
-`T` mit `d = T · d_glob`: je Ende `u = c·U + s·W`, `v = -s·U + c·W`, `θ = Θ`.
-
 ### mal
 
 ```python
 def mal(A: Matrix, x: Sequence[float]) -> List[float]
 ```
-
-### transponiert_mal
-
-```python
-def transponiert_mal(A: Matrix, x: Sequence[float]) -> List[float]
-```
-
-`Aᵀ · x`.
 
 ### formfunktionen
 
@@ -219,4 +205,3 @@ Die arbeitsgleichen Knotenkraefte `f` (6) in den Achsen des Stabs --
 - [[opencivil.stabwerk.verlauf]]
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.stab]]
-- [[opencivil.stabwerk3d.system]]

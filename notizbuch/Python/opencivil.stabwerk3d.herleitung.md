@@ -1,5 +1,5 @@
 ---
-erzeugt: bf93e26bcbaf
+erzeugt: 765aee3b8df5
 art: modul
 tags: [modul]
 ---
@@ -30,14 +30,14 @@ bis [[opencivil.stabwerk3d.herleitung#Konstanten|STAEBE_MIT_MATRIX]] Teilstaebe.
 
 Wie in der Ebene: Laengen in m, Verschiebungen in mm, Drehungen in mrad,
 Kraefte in kN, Momente in kNm, in den Matrizen kN und m. Die
-Schnittgroessen in den Achsen des Stabs ([[opencivil.stabwerk3d.verlauf|verlauf]]).
+Schnittgroessen in den Achsen des Stabs ([[opencivil.stabwerk.verlauf|verlauf]]).
 
 ## Inhalt
 
 ### schreiben
 
 ```python
-def schreiben(p: Protokoll, system: 'Balkensystem3d', befund: 'Raumbefund') -> None
+def schreiben(p: Protokoll, system: 'Balkensystem3d', befund: 'Systembefund') -> None
 ```
 
 Die ganze Herleitung eines gerechneten Systems.
@@ -45,7 +45,7 @@ Die ganze Herleitung eines gerechneten Systems.
 ### _verschiebungen
 
 ```python
-def _verschiebungen(p: Protokoll, befund: 'Raumbefund', fall: Fall) -> None
+def _verschiebungen(p: Protokoll, befund: 'Systembefund', fall: Fall) -> None
 ```
 
 Je Knoten seine Verschiebung und Drehung. Eine Drehung um eine Achse
@@ -62,21 +62,21 @@ des Systems, die eine gestrichene Achse beruehrt, ist nicht bestimmbar.
 - `LAGERKRAEFTE = (('R_x', 'kN'), ('R_y', 'kN'), ('R_z', 'kN'), ('M_x', 'kNm'), ('M_y',…` – Eine Lagerkraft im Raum, in der Folge des Rechenkerns: Zeichen und Einheit.
 - `SUMMEN = (('\\sum F_x', 'kN'), ('\\sum F_y', 'kN'), ('\\sum F_z', 'kN'), ('\\s…` – Die Summen der Gleichgewichtsprobe im Raum -- Momente um den Ursprung.
 - `EINHEITEN = {'N': 'kN', 'V_y': 'kN', 'V_z': 'kN', 'T': 'kNm', 'M_y': 'kNm', 'M_z'…` – Je Schnittgroesse ihre Einheit -- Kraefte in kN, Momente in kNm.
-- `EXTREMWERTE = (*((g, EINHEITEN[g], 0.001, 1) for g in SCHNITTGROESSEN), ('f_y', 'mm…` – Die Extremwerte im Raum: Groesse, Einheit, Faktor von SI und Nachkommastellen.
+- `EXTREMWERTE = (*((g, g, EINHEITEN[g], 0.001, 1) for g in SCHNITTGROESSEN), ('f_y', …` – Die Extremwerte im Raum: Feld im Verlauf, Zeichen, Einheit, Faktor von SI und Nachkommastellen -- das Zeichen ist das Feld.
 
 ## Braucht
 
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.stabwerk.herleitung]]
+- [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stab]]
 - [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk.verlauf]]
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.raum]]
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
-- [[opencivil.stabwerk3d.system]]
-- [[opencivil.stabwerk3d.verlauf]]
 
 ## Gebraucht von
 

@@ -175,26 +175,9 @@ nachgeprüft. Urteil: umbauen, bevor weiter darauf gebaut wird. Gerechnet
 wird richtig, aber den gebetteten Stab lösen drei Programme, und Regeln des
 Kerns stehen ein zweites Mal im JS. Empfohlene Reihenfolge: 1, dann 3a und
 3b, dann 2 -- vor Knicken oder 2. Ordnung am Pfahl; der Rest, wenn dort
-ohnehin gearbeitet wird.
+ohnehin gearbeitet wird. Punkt 1 ist erledigt (unten unter «Erledigt
+zuletzt»).
 
-- [ ] **1. Der Rechenkern steht zweimal, eben und im Raum.**
-      `stabwerk/system.py` (914 Zeilen) und `stabwerk3d/system.py` (776)
-      gehen dieselben 14 Schritte in derselben Folge -- prüfen, Orte und
-      Teilstäbe, Halt, Drehungen, Unbekannte, Zusammenbau, Lasten,
-      beweglich, Auswerten, Linienlager --, meist zur Hälfte bis zu neun
-      Zehnteln gleich; fünf Meldungen stehen wörtlich in beiden. Über dem
-      Kern ist verallgemeinert (`projekt/staebe.py`, `Stabwerksrechnung`,
-      der Katalog), im Kern kopiert. Kosten: jede Regel des Ablaufs zweimal,
-      und die Kopien laufen schon auseinander -- die Drehung eines Orts ist
-      in der Ebene ein Wort, im Raum je Achse bestimmt. Umbau: ein Kern, der
-      liest, wie sich ein Ort bewegen kann und was ein Stab trägt. Die Ebene
-      ist dann eine Angabe: Verschiebung in x und z, Drehung um eine Achse,
-      je Stab nur seine Ebene x-z, z zur gestrichelten Faser.
-      `TestEbenerRahmen` zeigt schon, dass der Kern des Raums einen ebenen
-      Rahmen gleich rechnet. Es fallen weg: `stabwerk/system.py` bis auf
-      seine Konstanten, die ebene Klasse `Stabverlauf`, die doppelten Teile
-      der Herleitung, die fünf Weichen in `rechnung.py` und `_lage_eben` --
-      geschätzt 1000 Zeilen. Die Oberfläche behält ihre zwei Arten.
 - [ ] **2. Der Pfahl löst den gebetteten Stab ein drittes Mal.**
       `pfahl/bettung.py` nummeriert, baut zusammen, löst und integriert die
       Schnittkräfte selbst: `_schnittkraefte` mit den Beiwerten der
@@ -215,11 +198,12 @@ ohnehin gearbeitet wird.
       Tabelle den positiven Wert, der Bericht den negativen. Die grösste
       Verschiebung kommt aus den Proben des Bilds. Umbau: der Kern liefert
       alle drei je Fall.
-- [ ] **3b. Die Seite der gestrichelten Faser steht viermal** -- und mit
-      ihr das Vorzeichen von M: `Lastrichtung.vektor` in
-      `stabwerk/modell.py`, `_lage_eben` in `web/balkendaten.py`,
-      `linienachsen` in `bs_zeichnung.js`, `zugseite` in `bs_teile.js`.
-      Umbau: `stabachsen` für beide Arten, wie im Raum schon.
+- [ ] **3b. Die Seite der gestrichelten Faser steht noch zweimal im JS**
+      -- und mit ihr das Vorzeichen von M: `linienachsen` in
+      `bs_zeichnung.js`, `zugseite` in `bs_teile.js`. Im Kern steht sie seit
+      Punkt 1 einmal (`achsen_eben` in `stabwerk3d/stab.py`);
+      `Lastrichtung.vektor` und `_lage_eben` sind weg. Umbau: `stabachsen`
+      für beide Arten, wie im Raum schon.
 - [ ] **3c. Die Eingabe der Pfähle entscheidet selbst, welche Felder
       gelten** -- drainiert, Mantel eingegeben, Bohrpfahl, Kopf frei --,
       obwohl der Kern es weiss (`Pfahlschicht.kurznamen`, die Gruppen in
@@ -262,10 +246,23 @@ ohnehin gearbeitet wird.
       die Aktionen der Auswahl nach `cad_auswahl.js` -- dann fällt der Haken
       `a.aktionen` weg --, die Bedienung im Raum in die Ansicht aus 4b, die
       Eingabe mit Maus und Tasten (rund 260 Zeilen) in eine eigene Datei.
-- [ ] **8. Klein.** `nur_drehung` in `_beweglich` (`stabwerk/system.py`)
-      und `transponiert_mal` (`stabwerk/stab.py`) sind tot. `profilformen.py`
-      schreibt `_flaeche`, `_iy`, `_iz` und `_it` aus `querschnitte.py` ab,
-      nur in cm, obwohl `_in_cm` genau das tut.
+- [ ] **8. Klein.** `profilformen.py` schreibt `_flaeche`, `_iy`, `_iz`
+      und `_it` aus `querschnitte.py` ab, nur in cm, obwohl `_in_cm` genau
+      das tut. (`nur_drehung` und `transponiert_mal` sind mit Punkt 1
+      weggefallen.)
+- [ ] **9. Die Geometrie des Raums gehört jetzt beiden Arten.** Seit Punkt
+      1 rechnet auch die Ebene mit `stabwerk3d/raum.py` und
+      `stabwerk3d/stab.py`, und `stabwerk/stab.py` ist nur noch der ebene
+      Teil, aus dem der Stab im Raum besteht. Die Pakete trennen damit nicht
+      mehr Ebene und Raum. Umbau, wenn dort ohnehin gearbeitet wird: beide
+      Dateien nach `stabwerk/`, `stabwerk3d/` behält Modell, Rechnung und
+      Herleitung des 3D-Balkensystems.
+- [ ] **10. Extremwert null an zufälliger Stelle.** Ist die Durchbiegung
+      eines Stabs überall null -- etwa bei einem, der nur Normalkraft trägt --,
+      nennt die Tabelle der Extremwerte für 0.00 mm eine Stelle x, die nur
+      vom Rundungsrauschen abhängt; seit Punkt 1 an sechs Stellen der
+      Beispiele eine andere als vorher. Umbau: Werte, die sich bis auf
+      Rundung gleichen, nehmen die erste Stelle.
 
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-11-09
 
@@ -1023,6 +1020,14 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
 
 ## Erledigt zuletzt
+
+Aus der Strukturdurchsicht vom 2026-11-15, Punkt 1: ein Rechenkern für
+Ebene und Raum (`stabwerk/system.py`); was die Ebene anders macht, steht in
+`stabwerk/art.py` · ein Verlauf längs der Stäbe für beide · eine Rechnung
+mit zwei statt fünf Weichen · die Darstellung am Bildschirm nach der Art
+der Rechnung, die Lage eines Stabs einmal · weg: `stabwerk3d/system.py`,
+`stabwerk3d/verlauf.py`, der ebene Kern und sein Verlauf, der Befund des
+Raums, `_lage_eben`, `Lastrichtung.vektor`, `drehung`, `transponiert_mal` ·
 
 Aus der Strukturdurchsicht vom 2026-11-09, Punkt 12 zu Ende: der Stahl nur
 auf Zug als eigene Art (`StahlNurZug`) · eine Grundlage der Rechenobjekte

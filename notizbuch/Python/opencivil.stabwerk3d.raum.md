@@ -1,5 +1,5 @@
 ---
-erzeugt: 772bbcc8af3d
+erzeugt: b0322b85c255
 art: modul
 tags: [modul]
 ---
@@ -17,10 +17,9 @@ Standardbibliothek.
 
 ## GENAUIGKEIT
 
-Ein Punkt liegt auf einer Strecke, wenn er weniger als
-[[opencivil.stabwerk.system#Konstanten|TOLERANZ]] daneben liegt -- so genau rundet
-das Zeichenfenster. Eine Richtung zaehlt in einer Basis, wenn von ihr nach
-Abzug der anderen mehr als 1e-9 bleibt.
+Ein Punkt liegt auf einer Strecke, wenn er weniger als [[opencivil.stabwerk3d.raum#Konstanten|TOLERANZ]]
+daneben liegt -- so genau rundet das Zeichenfenster. Eine Richtung zaehlt in
+einer Basis, wenn von ihr nach Abzug der anderen mehr als 1e-9 bleibt.
 
 ## Inhalt
 
@@ -95,13 +94,13 @@ Die Richtungen von `vektoren` orthonormal, ohne was in `gegen` liegt (Gram-Schmi
 ### in_achsen
 
 ```python
-def in_achsen(raum: Sequence[Vektor]) -> List[Vektor]
+def in_achsen(raum: Sequence[Vektor], achsen: Sequence[Vektor]=ACHSEN) -> List[Vektor]
 ```
 
 Eine orthonormale Basis des Raums, den die orthonormalen `raum`
-aufspannen -- aus den Achsen des Systems, zuerst die, die am meisten
-darin liegt. Eine Rolle auf waagrechter Bahn ist so frei in x, nicht in
--x und nicht schief.
+aufspannen -- aus den `achsen`, zuerst die, die am meisten darin
+liegt. Eine Rolle auf waagrechter Bahn ist so frei in x, nicht in -x und
+nicht schief.
 
 ### stelle_auf
 
@@ -122,19 +121,18 @@ Ob sich die Strecken p1-p2 und q1-q2 im Innern beider treffen.
 
 ## Konstanten
 
+- `TOLERANZ = 1e-06` – Wie nahe ein Knoten an einem Stab liegen muss, um mit ihm verbunden zu sein -- in m. Das Zeichenfenster rundet auf ein Millionstel.
 - `ACHSEN = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))` – Die Achsen des Systems.
 - `NULL = (0.0, 0.0, 0.0)`
-
-## Braucht
-
-- [[opencivil.stabwerk.system]]
 
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.stabwerk.art]]
+- [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk.verlauf]]
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.stab]]
-- [[opencivil.stabwerk3d.system]]
-- [[opencivil.stabwerk3d.verlauf]]
+- [[opencivil.web.balkendaten]]
