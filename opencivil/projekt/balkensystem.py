@@ -59,6 +59,7 @@ from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.stabwerk import querschnitte as qs
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
+from opencivil.stabwerk.rechnung import STABKENNWERTE
 
 #: Wie ein Lager oder Linienlager je Richtung haelt.
 HALT = ("frei", "fest", "feder")
@@ -127,10 +128,12 @@ class Querschnittsart(Wahl):
 #: Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
 KENNWERTE = ("A", "I")
 
-#: Was ein Material des Systems ist: ein Beton des Projekts -- E und Dichte
-#: von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand
-#: (Benutzer, 2026-10-24). Betonstahl ist keines: aus ihm ist kein Stab.
-STABMATERIALARTEN = ("beton", "eigen")
+#: Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts --
+#: E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und
+#: Dichte von Hand (Benutzer, 2026-10-24; Baustahl seit 2026-11-15).
+#: Betonstahl ist keines: aus ihm ist kein Stab. Welche Arten des Projekts
+#: es gibt, sagen die Kennwerte, die ein Stab aus ihnen nimmt.
+STABMATERIALARTEN = (*(art.value for art in STABKENNWERTE), "eigen")
 
 #: Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀,
 #: das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der
@@ -270,18 +273,19 @@ class KnotenlastEintrag(Beschreibung):
 @dataclass
 class StabmaterialEintrag(Beschreibung):
     """
-    Ein Material der Staebe (Benutzer, 2026-10-24): ein Beton des Projekts
-    (``beton``) -- E_cm und die Dichte des Stahlbetons von ihm -- oder ein
-    eigenes mit ``E`` und ``rho`` von Hand.
+    Ein Material der Staebe (Benutzer, 2026-10-24): ein Beton oder Baustahl
+    des Projekts (``stoff``) -- E und Dichte von ihm, siehe
+    :data:`~opencivil.stabwerk.rechnung.STABKENNWERTE` -- oder ein eigenes
+    mit ``E`` und ``rho`` von Hand.
     """
 
     kennung: str = ""
     art: str = einer_von(STABMATERIALARTEN, "beton")
-    beton: str = ""
-    """Die Kennung des Betons im Projekt (``b1``) -- nur bei ``beton``."""
+    stoff: str = ""
+    """Die Kennung des Betons oder Baustahls im Projekt (``b1``, ``st1``) -- nicht bei ``eigen``."""
 
     name: str = ""
-    """Wie ein eigenes heisst; ein Beton heisst wie im Projekt."""
+    """Wie ein eigenes heisst; ein Beton oder Baustahl heisst wie im Projekt."""
 
     E: float = bereich(200000.0, heisst="E-Modul E", einheit=N_PRO_MM2, ueber=0.0)
     """N/mm² -- nur bei ``eigen``."""
@@ -425,15 +429,15 @@ class BalkensystemEintrag(MitFaellen, BauteilEintrag):
 
     def materialien(self) -> List[str]:
         """
-        Jeder Beton des Projekts, auf den ein Material des Systems zeigt --
-        auch eines, das gerade keinen Stab traegt: wer den Beton loescht,
-        liesse es ins Leere zeigen, und spaetestens die naechste Aenderung
-        machte daraus einen Fehler beim Rechnen.
+        Jedes Material des Projekts, auf das ein Material des Systems zeigt --
+        auch eines, das gerade keinen Stab traegt: wer es loescht, liesse es
+        ins Leere zeigen, und spaetestens die naechste Aenderung machte
+        daraus einen Fehler beim Rechnen.
         """
         gesehen: List[str] = []
         for m in self.stabmaterialien:
-            if m.art == "beton" and m.beton and m.beton not in gesehen:
-                gesehen.append(m.beton)
+            if m.art != "eigen" and m.stoff and m.stoff not in gesehen:
+                gesehen.append(m.stoff)
         return gesehen
 
     def bezuege(self) -> List[str]:
@@ -520,12 +524,19 @@ class BalkensystemEintrag(MitFaellen, BauteilEintrag):
         Das Material des Systems aus einem Beton des Projekts (Eintrag oder
         Kennung) -- das schon da ist, sonst ein neues.
         """
-        kennung = kennung_von(beton)
+        return self._aus_projekt("beton", beton)
+
+    def baustahl(self, stahl: Any) -> StabmaterialEintrag:
+        """Das Material des Systems aus einem Baustahl des Projekts -- siehe :meth:`beton`."""
+        return self._aus_projekt("baustahl", stahl)
+
+    def _aus_projekt(self, art: str, stoff: Any) -> StabmaterialEintrag:
+        kennung = kennung_von(stoff)
         for m in self.stabmaterialien:
-            if m.art == "beton" and m.beton == kennung:
+            if m.art == art and m.stoff == kennung:
                 return m
         eintrag = StabmaterialEintrag(kennung=self._neue_kennung(self.stabmaterialien, "M"),
-                                      art="beton", beton=kennung)
+                                      art=art, stoff=kennung)
         self.stabmaterialien.append(eintrag)
         return eintrag
 

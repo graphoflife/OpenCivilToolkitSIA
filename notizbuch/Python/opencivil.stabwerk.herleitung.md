@@ -1,5 +1,5 @@
 ---
-erzeugt: 614bc2bc58c3
+erzeugt: 385c936878bd
 art: modul
 tags: [modul]
 ---
@@ -69,7 +69,7 @@ Vier gueltige Ziffern -- ab einer Million und unter einem Tausendstel mit Zehner
 
 - `STAEBE_MIT_MATRIX = 6` – Bis zu so vielen Teilstaeben steht die Matrix jedes einzelnen mit Zahlen da.
 - `UNBEKANNTE_MIT_MATRIX = 12` – Bis zu so vielen Unbekannten stehen Gesamtmatrix, Lastvektor und Loesung mit Zahlen da.
-- `ANNAHME = 'Steifigkeit: E_cm des Betons oder das E eines eigenen Materials; bei…` – Was die Steifigkeit und das Gleichgewicht annehmen.
+- `ANNAHME = 'Steifigkeit: E_cm des Betons, E_a des Baustahls oder das E eines eig…` – Was die Steifigkeit und das Gleichgewicht annehmen.
 - `DURCHBIEGUNG = 'Die Durchbiegung w misst jeder Stab gegen die Gerade zwischen seinen…` – Was die Durchbiegung w ist -- und was sie nicht ist.
 - `GLEICHUNGSSYSTEM_LATEX = '\\mathbf{K} = \\sum_{\\text{Stäbe}} \\mathbf{T}^{\\mathsf{T}} \\cdot…` – Das Gleichungssystem in Zeichen.
 - `SCHNITTGROESSEN_LATEX = 'N(0) = -s_{u,a} \\qquad V(0) = s_{v,a} \\qquad M(0) = -s_{\\theta,a}…` – Von den Kraeften an den Stabenden zu den Schnittgroessen laengs des Stabs.

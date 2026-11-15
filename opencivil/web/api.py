@@ -62,7 +62,7 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
-from opencivil.stabwerk.rechnung import BETONKENNWERTE
+from opencivil.stabwerk.rechnung import STABKENNWERTE
 from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.pfahl.boden import Mantel, Verhalten
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
@@ -283,16 +283,10 @@ def katalog() -> dict:
                  "bringt_material": a.aus_bauteil}
                 for a in bs.Querschnittsart
             ],
-            # Was ein Material des Systems ist: ein Beton des Projekts oder
-            # ein eigenes -- und welche Kennwerte des Betons ein Stab nimmt;
-            # die Tabelle der Materialien zeigt sie gesperrt.
-            "materialarten": [
-                {"wert": "beton", "beschriftung": "Beton",
-                 "titel": "Ein Beton des Projekts -- E_cm und die Dichte des Stahlbetons von ihm"},
-                {"wert": "eigen", "beschriftung": "eigenes",
-                 "titel": "E-Modul und Dichte von Hand"},
-            ],
-            "betonkennwerte": dict(BETONKENNWERTE),
+            # Je Art, aus der ein Stab sein kann -- Beton und Baustahl des
+            # Projekts --, die Kennwerte, die er nimmt; die Tabelle der
+            # Materialien zeigt sie gesperrt.
+            "stabkennwerte": {art.value: dict(k) for art, k in STABKENNWERTE.items()},
             # Welches E ein Stab hat, der das Material seines Querschnitts
             # nimmt -- und bei welchen Arten: bei einem aus einem Bauteil.
             "e_module": [

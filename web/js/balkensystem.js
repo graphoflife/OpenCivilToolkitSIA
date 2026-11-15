@@ -53,7 +53,8 @@ const HILFE = {
   materialien: {
     zeilen: [
       ['Beton', 'einer aus dem Projekt: E = E_cm und ρ des Stahlbetons, die Bewehrung steckt darin -- zu ändern in der App «Materialien»'],
-      ['eigenes', 'E und ρ von Hand, etwa für Stahl oder Holz'],
+      ['Baustahl', 'einer aus dem Projekt: E = E_a und ρ_a (SIA 263:2013, 3.2.2.1)'],
+      ['eigenes', 'E und ρ von Hand, etwa für Holz'],
       ['ρ', 'für das Eigengewicht ρ · g · A, mit g = 10 m/s²'],
       ['gemäss Querschnitt', 'wählt man an der Linie: der Beton ihrer Platte oder Analyse'],
     ],
@@ -66,7 +67,7 @@ const HILFE = {
       ['Analyse', 'A und I_y des Bruttoquerschnitts'],
       ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, bei einer Analyse auf Wunsch E_eq bei N und M, für EA und EI (für EA eine Näherung)'],
       ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten -- bei einer Platte immer in x-Richtung, Zug unten'],
-      ['Steifigkeit', 'EA, EI am ungerissenen Bruttoquerschnitt, ohne Bewehrung (SIA 262:2025, 4.1.4.1.3); Theorie 1. Ordnung'],
+      ['Steifigkeit', 'EA, EI am Bruttoquerschnitt, beim Beton ungerissen und ohne Bewehrung (SIA 262:2025, 4.1.4.1.3); Theorie 1. Ordnung'],
     ],
     formel: 'EA = E · A   EI = E · I',
   },
@@ -215,19 +216,44 @@ function systemGruppe(system) {
 
 /**
  * Die Materialien der Stäbe als Tabelle (Benutzer, 2026-10-24): je Zeile
- * ein Beton des Projekts -- E und ρ von ihm, gesperrt, gerechnet vom Kern
- * -- oder ein eigenes mit E und ρ von Hand. Betonstahl steht nicht zur
- * Wahl: aus ihm ist kein Stab. Daneben, welche Linien es nehmen.
+ * ein Beton oder Baustahl des Projekts -- E und ρ von ihm, gesperrt,
+ * gerechnet vom Kern -- oder ein eigenes mit E und ρ von Hand. Betonstahl
+ * steht nicht zur Wahl: aus ihm ist kein Stab. Daneben, welche Linien es
+ * nehmen.
  */
 function materialienInhalt(system) {
   const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
-  const betone = zustand.projekt.materialien.filter((m) => m.art === 'beton');
-  const kennwerte = katalog('balkensystem', 'betonkennwerte');
+  // Je Art des Projekts, aus der ein Stab sein kann, die Kennwerte, die er nimmt.
+  const kennwerte = katalog('balkensystem', 'stabkennwerte');
+  const titel = (art) => katalog('materialarten', art, 'titel');
+  const stoffe = (art) => zustand.projekt.materialien.filter((m) => m.art === art);
   const angabe = (feldname) => feldangabe('stabmaterial', feldname);
-  const gesperrt = (beton, kurz) => {
-    const wert = beton ? zustand.loesung?.werte?.[kennwertId(beton, kennwerte[kurz])] : null;
-    return el('span.bs-gesperrt', { text: wert ? wert.wert : '–', title: 'Vom Beton des Projekts -- zu ändern in der App «Materialien»' });
+  const gesperrt = (stoff, kurz) => {
+    const wert = stoff ? zustand.loesung?.werte?.[kennwertId(stoff, kennwerte[stoff.art][kurz])] : null;
+    return el('span.bs-gesperrt', { text: wert ? wert.wert : '–', title: 'Vom Material des Projekts -- zu ändern in der App «Materialien»' });
   };
+  const ausDemProjekt = (m, setzen) => {
+    const wahl = stoffe(m.art);
+    const stoff = wahl.find((s) => s.kennung === m.stoff);
+    return [
+      auswahl({
+        werte: [...(stoff ? [] : [{ wert: m.stoff, beschriftung: `– ${titel(m.art)} wählen –` }]),
+          ...wahl.map((s) => ({ wert: s.kennung, beschriftung: s.name || s.sorte }))],
+        gewaehlt: m.stoff, titel: `Ein ${titel(m.art)} des Projekts`, beiAenderung: setzen('stoff'),
+      }),
+      el('span.bs-material-art', { text: titel(m.art) }),
+      gesperrt(stoff, 'E'), gesperrt(stoff, 'rho'),
+    ];
+  };
+  const eigenes = (m, setzen) => [
+    el('input', {
+      type: 'text', value: m.name, title: 'Name des Materials -- so steht es im Bericht',
+      on: { change: (e) => setzen('name')(e.target.value) },
+    }),
+    el('span.bs-material-art', { text: 'eigenes' }),
+    zahlfeld({ wert: m.E, schritt: 1000, angabe: angabe('E'), titel: 'E-Modul von Hand', beiAenderung: setzen('E') }),
+    zahlfeld({ wert: m.rho, schritt: 50, angabe: angabe('rho'), titel: 'Dichte für das Eigengewicht', beiAenderung: setzen('rho') }),
+  ];
   const zeile = (m, i) => {
     const setzen = (feldname) => (wert) => aendern((s) => { s.stabmaterialien[i][feldname] = wert; });
     const benutzt = system.linien.filter((l) => l.material === m.kennung).map((l) => l.kennung);
@@ -238,24 +264,7 @@ function materialienInhalt(system) {
       }
       aendern((s) => { s.stabmaterialien.splice(i, 1); });
     };
-    const beton = betone.find((b) => b.kennung === m.beton);
-    const zellen = m.art === 'beton' ? [
-      auswahl({
-        werte: [...(beton ? [] : [{ wert: m.beton, beschriftung: '– Beton wählen –' }]),
-          ...betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte }))],
-        gewaehlt: m.beton, titel: 'Ein Beton des Projekts', beiAenderung: setzen('beton'),
-      }),
-      el('span.bs-material-art', { text: 'Beton' }),
-      gesperrt(beton, 'E'), gesperrt(beton, 'rho'),
-    ] : [
-      el('input', {
-        type: 'text', value: m.name, title: 'Name des Materials -- so steht es im Bericht',
-        on: { change: (e) => setzen('name')(e.target.value) },
-      }),
-      el('span.bs-material-art', { text: 'eigenes' }),
-      zahlfeld({ wert: m.E, schritt: 1000, angabe: angabe('E'), titel: 'E-Modul von Hand', beiAenderung: setzen('E') }),
-      zahlfeld({ wert: m.rho, schritt: 50, angabe: angabe('rho'), titel: 'Dichte für das Eigengewicht', beiAenderung: setzen('rho') }),
-    ];
+    const zellen = m.art === 'eigen' ? eigenes(m, setzen) : ausDemProjekt(m, setzen);
     return el('tr', {}, [
       ...zellen.map((z) => el('td', {}, [z])),
       el('td.bs-benutzt', { text: benutzt.join(', ') || '–', title: benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab' }),
@@ -266,8 +275,8 @@ function materialienInhalt(system) {
     s.stabmaterialien.push({
       ...structuredClone(katalog('vorlagen', 'stabmaterial')),
       kennung: naechsteKennung(s.stabmaterialien, 'M'), art,
-      ...(art === 'beton' ? { beton: betone[0]?.kennung || '' }
-        : { name: naechsterName('Material', s.stabmaterialien) }),
+      ...(art === 'eigen' ? { name: naechsterName('Material', s.stabmaterialien) }
+        : { stoff: stoffe(art)[0]?.kennung || '' }),
     });
   });
   const kopf = [['Material'], ['Art'], ['E', angabe('E').einheit], ['ρ', angabe('rho').einheit], ['trägt'], ['']];
@@ -279,10 +288,12 @@ function materialienInhalt(system) {
       el('tbody', {}, system.stabmaterialien.map(zeile)),
     ])]) : el('p.bs-leer', { text: 'Noch kein Material -- ein Stab braucht eines.' }),
     el('div.bs-knopfreihe', {}, [
-      el('button.knopf.knopf-klein', {
-        type: 'button', text: '+ Beton', title: 'Ein Beton aus dem Projekt',
-        disabled: !betone.length, on: { click: () => neu('beton') },
-      }),
+      ...Object.keys(kennwerte).map((art) => el('button.knopf.knopf-klein', {
+        type: 'button', text: `+ ${titel(art)}`,
+        title: stoffe(art).length ? `Ein ${titel(art)} aus dem Projekt`
+          : `Im Projekt gibt es keinen ${titel(art)} -- anlegen in der App «Materialien»`,
+        disabled: !stoffe(art).length, on: { click: () => neu(art) },
+      })),
       el('button.knopf.knopf-klein', {
         type: 'button', text: '+ eigenes Material', title: 'E-Modul und Dichte von Hand',
         on: { click: () => neu('eigen') },

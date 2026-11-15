@@ -1,16 +1,22 @@
 ---
-erzeugt: 23d622db960f
+erzeugt: 0c59c366ec48
 art: formel
 tags: [formel]
-normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)"]
+normstelle: ["SIA 262:2025, 4.2.2.2, Figur 16", "SIA 262:2025, 4.3.3.2.2, (38)", "SIA 263:2013, 3.2.2.4"]
 ---
 > [!info] Normstellen
-> SIA 262:2025, 4.2.2.2, Figur 16 · SIA 262:2025, 4.3.3.2.2, (38)
+> SIA 262:2025, 4.2.2.2, Figur 16 · SIA 262:2025, 4.3.3.2.2, (38) · SIA 263:2013, 3.2.2.4
 
 *In der Herleitung: «Fliessdehnung (Bemessungswert)»*
 
 $$
 \varepsilon_{yd} = \frac{f_{yd}}{E_s}
+$$
+
+*In der Herleitung: «Fliessdehnung des Baustahls»*
+
+$$
+\varepsilon_y = \frac{f_y}{E_a}
 $$
 
 *In der Herleitung: «Grösste Zugdehnung in der Bewehrung»*
@@ -25,6 +31,8 @@ $$
 | --- | --- | --- | --- |
 | $f_{yd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
 | $E_s$ | Elastizitätsmodul des Betonstahls | N/mm² | Vorgabe |
+| $f_y$ | Streckgrenze | N/mm² | Vorgabe |
+| $E_a$ | Elastizitätsmodul des Baustahls | N/mm² | Vorgabe |
 | $f_{yk}$ | Charakteristische Fliessgrenze | N/mm² | Vorgabe |
 
 ## Beispiel
@@ -33,6 +41,12 @@ Mit den Zahlen aus dem Beispielprojekt:
 
 $$
 \varepsilon_{yd} = \frac{f_{yd}}{E_s} = \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 0.217\,\%
+$$
+
+Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+
+$$
+\varepsilon_y = \frac{f_y}{E_a} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{210000\,\mathrm{N}/\mathrm{mm}^{2}} = 1.69\,\text{‰}
 $$
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
@@ -47,6 +61,7 @@ $$
 
 ## Im Code
 
+- [[opencivil.material.baustahl]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
 - [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]
@@ -56,6 +71,7 @@ $$
 
 - [[Betonstahl]]
 - [[Kennzahlen]]
+- [[Baustahl]]
 - [[Stahlspannung aus Rissbreite]]
 - [[Spannung-Dehnung-Analyse]]
 
@@ -68,7 +84,7 @@ den Elastizitätsmodul. Für B500B mit Bemessungswerten rund 2.17 ‰,
 charakteristisch 2.5 ‰. Darunter ist die Stahlspannung $E_s \cdot
 \varepsilon_s$, darüber bleibt sie am Plateau.
 
-Gebraucht wird sie an vier Stellen:
+Beim Betonstahl wird sie an vier Stellen gebraucht:
 
 - als Kennwert des Betonstahls, mit Bemessungswerten;
 - in der Spannung-Dehnung-Analyse als Fliessbeginn: erreicht die am stärksten
@@ -80,3 +96,9 @@ Gebraucht wird sie an vier Stellen:
   [[Nominelle Dehnung der Zugbewehrung|nominelle Dehnung der Zugbewehrung]]
   beim Biegewiderstand: daraus der kleinste Querkraftwiderstand ohne Bügel,
   solange die Bewehrung elastisch bleibt.
+
+Beim Baustahl ist sie bisher nur Kennwert, aus Streckgrenze und $E_a$: für
+S355 1.69 ‰. Brauchen wird sie, wer plastisch rechnet: SIA 263:2013,
+3.2.2.4 lässt das zu, wenn die Bruchdehnung über 15 % liegt und mindestens
+15-mal so gross ist wie die Fliessdehnung und die Zugfestigkeit mindestens
+das 1.1-Fache der Streckgrenze -- die Sorten der Tabelle 1 erfüllen das.

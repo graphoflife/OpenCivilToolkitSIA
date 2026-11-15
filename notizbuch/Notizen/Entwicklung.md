@@ -7,6 +7,29 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Balkensysteme: Stäbe aus Baustahl
+
+Ein Material der Stäbe kann neben einem Beton auch ein Baustahl des Projekts
+sein: in der Tabelle der Materialien steht dazu «+ Baustahl». Ein Stab aus
+ihm nimmt E_a und für das Eigengewicht ρ_a. Ein HEB 300 aus S355 wiegt so
+7850 · 10 · 0.0149 = 1.17 kN/m; vorher brauchte es dafür ein eigenes
+Material mit E und ρ von Hand. Im Prüfprojekt «Jeder Nachweis» sind die
+Stahlstäbe von «Alles einmal» jetzt aus S355 statt aus einem eigenen
+«Stahl» mit E = 200 000.
+
+Warum so:
+
+- Das Material zeigt mit `stoff` auf den Baustoff des Projekts, gleich
+  welcher Art; vorher hiess das Feld `beton`. Ein alter Stand mit einem
+  Balkensystem öffnet sich darum nicht mehr (Prototyp, Benutzer,
+  2026-10-11) -- die Seite bewahrt ihn auf.
+- Welche Kennwerte ein Stab aus welchem Baustoff nimmt, steht an einer
+  Stelle (`STABKENNWERTE` in `stabwerk/rechnung.py`); die Arten der Tabelle,
+  die Decke und die Oberfläche lesen von dort.
+- Die Art bleibt am Material (Beton, Baustahl, eigenes), nicht nur am
+  Baustoff: so bietet die Auswahl nur Baustoffe dieser Art an, und ein
+  Verweis auf die falsche Art meldet sich (««C30/37» ist kein Baustahl»).
+
 ## 2026-11-15 · Material: Baustahl nach SIA 263
 
 Neben Beton und Betonstahl gibt es Baustahl (Benutzer, 2026-11-15): die

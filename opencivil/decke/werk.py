@@ -9,7 +9,7 @@ von aussen liest.
 
 E UND GEWICHT:
 nimmt jede Platte von ihrem Beton, wie ein Stab des Balkensystems
-(:data:`~opencivil.stabwerk.rechnung.BETONKENNWERTE`): ``E_cm`` am
+(:data:`~opencivil.stabwerk.rechnung.STABKENNWERTE`): ``E_cm`` am
 ungerissenen Querschnitt (SIA 262:2025, 4.1.4.1.3) und die Dichte des
 Stahlbetons, mit
 ``g = 10 m/s²`` (:data:`~opencivil.stabwerk.rechnung.ERDBESCHLEUNIGUNG`,
@@ -36,7 +36,7 @@ from opencivil.decke import herleitung
 from opencivil.decke.modell import Decke
 from opencivil.decke.rechnung import Ergebnis, rechnen
 from opencivil.material.basis import Baustoff
-from opencivil.stabwerk.rechnung import BETONKENNWERTE, ERDBESCHLEUNIGUNG
+from opencivil.stabwerk.rechnung import ERDBESCHLEUNIGUNG, STABKENNWERTE
 from opencivil.stabwerk.system import Meldung
 
 #: Das Thema der Formelsammlung.
@@ -104,8 +104,9 @@ class Deckensystem(Rechenobjekt):
     def _aufbauen(self) -> None:
         bezuege = []
         for i, stoff in enumerate(self.baustoffe):
-            bezuege += [Eingabebezug(f"E_{i}", stoff.id_von(BETONKENNWERTE["E"])),
-                        Eingabebezug(f"rho_{i}", stoff.id_von(BETONKENNWERTE["rho"]))]
+            kennwerte = STABKENNWERTE[stoff.art]
+            bezuege += [Eingabebezug(f"E_{i}", stoff.id_von(kennwerte["E"])),
+                        Eingabebezug(f"rho_{i}", stoff.id_von(kennwerte["rho"]))]
         if bezuege:
             g = WertDef(id=f"{self.id}.g", symbol="g", einheit=M_PRO_S2,
                         beschreibung="Erdbeschleunigung", stellen=0)

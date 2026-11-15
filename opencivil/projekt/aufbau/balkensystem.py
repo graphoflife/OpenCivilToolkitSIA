@@ -5,7 +5,7 @@ VERANTWORTUNG:
 Aus einem :class:`~opencivil.projekt.balkensystem.BalkensystemEintrag` das
 Stabwerk in SI mit seinen Meldungen (:func:`modell_von`) und daraus die
 Rechnung mit aufgeloesten Materialien und Querschnitten (:func:`bauen`). Ein
-Material ist ein Beton des Projekts oder ein eigenes. Die Art eines
+Material ist ein Beton oder Baustahl des Projekts oder ein eigenes. Die Art eines
 Querschnitts wird hier aufgeloest, einmal: je Art eine Klasse
 (:mod:`~opencivil.stabwerk.stabquerschnitt`). Ein Querschnitt kann eine
 Platte oder eine Querschnittsanalyse des Projekts nehmen; die muessen dann
@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 from opencivil.core.einheiten import Groesse
-from opencivil.material.basis import Baustoff
+from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.projekt.balkensystem import (
     EINHEIT_DER_FEDER, EINHEIT_DER_LAST, MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag,
     Querschnittsart, StabmaterialEintrag, StabquerschnittEintrag,
@@ -78,7 +78,7 @@ def modell_von(eintrag: BalkensystemEintrag) -> Modell:
     Massen und eine Feder ohne Steifigkeit sind Fehler, die die Meldungen
     nennen: gerechnet wird dann nicht -- und nicht etwa mit einem Stab
     weniger. Ob ein Material traegt, weiss erst der Aufbau: er kennt die
-    Betone des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
+    Materialien des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
     Beiwert dafuer bleiben mit einem Hinweis weg.
     """
     meldungen: List[Meldung] = []
@@ -279,8 +279,8 @@ def _paare(eintrag: BalkensystemEintrag, modell: Modell, aufbau: Aufbau,
     return paare, meldungen
 
 
-def _beton(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff:
-    """Ein Beton des Projekts -- einen Verweis ins Leere gibt es nicht."""
+def _baustoff(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff:
+    """Ein Material des Projekts -- einen Verweis ins Leere gibt es nicht."""
     stoff = aufbau.baustoffe.get(kennung)
     if stoff is None:
         raise ProjektFehler(f"{wo}: das Material '{kennung}' gibt es im Projekt nicht.")
@@ -290,18 +290,18 @@ def _beton(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff:
 def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau,
                   wo: str) -> Tuple[Optional[Stabmaterial], str]:
     """
-    Ein Material des Systems, aufgeloest: ein Beton des Projekts oder ein
-    eigenes. Traegt es nicht, ist es ``None``, und der zweite Teil sagt
-    warum -- klein beginnend, er folgt auf ein «aber».
+    Ein Material des Systems, aufgeloest: ein Beton oder Baustahl des
+    Projekts oder ein eigenes. Traegt es nicht, ist es ``None``, und der
+    zweite Teil sagt warum -- klein beginnend, er folgt auf ein «aber».
     """
     if m.art == "eigen":
         return Stabmaterial(m.kennung, m.name or m.kennung, E=m.E, rho=m.rho), ""
-    if not m.beton:
-        return None, "bei ihm ist kein Beton gewählt."
-    stoff = _beton(m.beton, aufbau, wo)
-    if stoff.art.value != "beton":
-        return None, (f"«{stoff.name}» ist kein Beton – ein Material des Systems ist ein "
-                      f"Beton des Projekts oder ein eigenes.")
+    art = Baustoffart(m.art)
+    if not m.stoff:
+        return None, f"bei ihm ist kein {art.beschriftung} gewählt."
+    stoff = _baustoff(m.stoff, aufbau, wo)
+    if stoff.art is not art:
+        return None, f"«{stoff.name}» ist kein {art.beschriftung}."
     return Stabmaterial(m.kennung, stoff.name, stoff=stoff), ""
 
 

@@ -39,11 +39,14 @@ export function zugseite(p, q) {
   return dx > 0 ? 'unten' : 'oben';
 }
 
-/** Wie ein Material des Systems heisst: ein Beton wie im Projekt, ein eigenes mit seinem Namen. */
+/**
+ * Wie ein Material des Systems heisst: ein Beton oder Baustahl wie im
+ * Projekt, ein eigenes mit seinem Namen.
+ */
 export function materialname(m) {
-  if (m.art !== 'beton') return m.name || m.kennung;
-  const beton = eintragVon(m.beton);
-  return beton ? beton.name || beton.sorte : '– kein Beton –';
+  if (m.art === 'eigen') return m.name || m.kennung;
+  const stoff = eintragVon(m.stoff);
+  return stoff ? stoff.name || stoff.sorte : `– kein ${katalog('materialarten', m.art, 'titel')} –`;
 }
 
 /** Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu sehen ist. */

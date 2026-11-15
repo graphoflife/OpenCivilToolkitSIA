@@ -1,5 +1,5 @@
 ---
-erzeugt: 0d414d05f7ff
+erzeugt: b12c30a7534f
 art: modul
 tags: [modul]
 ---
@@ -153,8 +153,8 @@ def _alles_einmal(p: Projekt, decke: QuerschnittEintrag, analyse: Querschnittsan
 ```
 
 Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-Querschnitt, beide mit E_eq; ein Beton des Projekts und zwei eigene
-Materialien -- Stahl und ein weicherer Beton --, ein Stab mit dem
+Querschnitt, beide mit E_eq; ein Beton und ein Baustahl des Projekts
+und ein eigenes Material, ein weicherer Beton; ein Stab mit dem
 Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
 keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager mit
 und ohne Stab; jede Lastart, auch projiziert.

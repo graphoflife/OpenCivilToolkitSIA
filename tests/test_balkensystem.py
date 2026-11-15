@@ -644,8 +644,9 @@ class TestEigengewicht(unittest.TestCase):
 class TestMaterialien(unittest.TestCase):
     """
     Die Materialien eines Systems (Benutzer, 2026-10-24): ein Beton des
-    Projekts -- E_cm und die Dichte des Stahlbetons von ihm -- oder ein
-    eigenes mit E und Dichte von Hand.
+    Projekts -- E_cm und die Dichte des Stahlbetons von ihm --, ein
+    Baustahl des Projekts -- E_a und ρ_a -- oder ein eigenes mit E und
+    Dichte von Hand.
     """
 
     def meldungen(self, p):
@@ -701,13 +702,37 @@ class TestMaterialien(unittest.TestCase):
         """Den Beton eines Materials löscht man nicht; zeigt es ins Leere, scheitert es hart."""
         p = traeger()
         self.assertEqual(p.verweise("b1"), [p.balkensysteme[0]])
-        p.balkensysteme[0].stabmaterialien[0].beton = "b7"
+        p.balkensysteme[0].stabmaterialien[0].stoff = "b7"
         with self.assertRaisesRegex(ProjektFehler, "b7"):
             p.aufbauen()
 
+    def test_baustahl_des_projekts(self):
+        """E_a = 210 000 N/mm² und ρ_a = 7850 kg/m³ (SIA 263:2013, 3.2.2.1)."""
+        p = traeger()
+        p.baustahl("S355")
+        s = p.balkensysteme[0]
+        s.lastfaelle[0].eigengewicht = True
+        stahl = s.baustahl("st1")
+        self.assertIs(s.baustahl("st1"), stahl)                # einmal je Baustahl
+        s.linien[0].material = stahl.kennung
+        e = p.rechnen()
+        EI = 210000e6 * 0.3 * 0.6 ** 3 / 12
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.M2.EI").groesse.si, EI, delta=1e-9 * EI)
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.M2.g_k").groesse.si,
+                               7850 * 10 * 0.18, delta=1e-9)
+        self.assertEqual(p.verweise("st1"), [s])
+        self.assertIn("E_a des Baustahls", str(p.rechnen().bericht()))
+
+    def test_ein_beton_ist_kein_baustahl(self):
+        p = traeger()
+        p.balkensysteme[0].stabmaterialien[0].art = "baustahl"
+        meldungen = self.meldungen(p)
+        self.assertEqual(len(meldungen), 1)
+        self.assertIn("«C30/37» ist kein Baustahl", meldungen[0])
+
     def test_betonstahl_ist_kein_material_der_staebe(self):
         p = traeger()                                   # mit B500B als s1
-        p.balkensysteme[0].stabmaterialien[0].beton = "s1"
+        p.balkensysteme[0].stabmaterialien[0].stoff = "s1"
         meldungen = self.meldungen(p)
         self.assertEqual(len(meldungen), 1)
         self.assertIn("L1 nimmt das Material M1", meldungen[0])
@@ -715,7 +740,7 @@ class TestMaterialien(unittest.TestCase):
 
     def test_ohne_beton(self):
         p = traeger()
-        p.balkensysteme[0].stabmaterialien[0].beton = ""
+        p.balkensysteme[0].stabmaterialien[0].stoff = ""
         meldungen = self.meldungen(p)
         self.assertEqual(len(meldungen), 1)
         self.assertIn("kein Beton gewählt", meldungen[0])

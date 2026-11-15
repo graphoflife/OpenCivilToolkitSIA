@@ -1,5 +1,5 @@
 ---
-erzeugt: 43e8d36d5d02
+erzeugt: 9f027a2dfae2
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Aus einem [[opencivil.projekt.balkensystem#BalkensystemEintrag|BalkensystemEintrag]] das
 Stabwerk in SI mit seinen Meldungen ([[opencivil.projekt.aufbau.balkensystem#modell_von|modell_von]]) und daraus die
 Rechnung mit aufgeloesten Materialien und Querschnitten ([[opencivil.projekt.aufbau.balkensystem#bauen|bauen]]). Ein
-Material ist ein Beton des Projekts oder ein eigenes. Die Art eines
+Material ist ein Beton oder Baustahl des Projekts oder ein eigenes. Die Art eines
 Querschnitts wird hier aufgeloest, einmal: je Art eine Klasse
 ([[opencivil.stabwerk.stabquerschnitt|stabquerschnitt]]). Ein Querschnitt kann eine
 Platte oder eine Querschnittsanalyse des Projekts nehmen; die muessen dann
@@ -60,7 +60,7 @@ das es im System nicht gibt --, ein Querschnitt mit unmoeglichen
 Massen und eine Feder ohne Steifigkeit sind Fehler, die die Meldungen
 nennen: gerechnet wird dann nicht -- und nicht etwa mit einem Stab
 weniger. Ob ein Material traegt, weiss erst der Aufbau: er kennt die
-Betone des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
+Materialien des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
 Beiwert dafuer bleiben mit einem Hinweis weg.
 
 ### bauen
@@ -102,13 +102,13 @@ Je tragenden Stab sein Querschnitt und sein Material, aufgeloest --
 «gemäss Querschnitt» wird zum Beton der Platte oder Analyse. Traegt das
 Material nicht, sagt es eine Meldung, und das System rechnet nicht.
 
-### _beton
+### _baustoff
 
 ```python
-def _beton(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff
+def _baustoff(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff
 ```
 
-Ein Beton des Projekts -- einen Verweis ins Leere gibt es nicht.
+Ein Material des Projekts -- einen Verweis ins Leere gibt es nicht.
 
 ### _stabmaterial
 
@@ -116,9 +116,9 @@ Ein Beton des Projekts -- einen Verweis ins Leere gibt es nicht.
 def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau, wo: str) -> Tuple[Optional[Stabmaterial], str]
 ```
 
-Ein Material des Systems, aufgeloest: ein Beton des Projekts oder ein
-eigenes. Traegt es nicht, ist es `None`, und der zweite Teil sagt
-warum -- klein beginnend, er folgt auf ein «aber».
+Ein Material des Systems, aufgeloest: ein Beton oder Baustahl des
+Projekts oder ein eigenes. Traegt es nicht, ist es `None`, und der
+zweite Teil sagt warum -- klein beginnend, er folgt auf ein «aber».
 
 ### _material_des_querschnitts
 

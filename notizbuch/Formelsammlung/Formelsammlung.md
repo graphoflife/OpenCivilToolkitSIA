@@ -1,5 +1,5 @@
 ---
-erzeugt: 3b995e5da9ba
+erzeugt: 5832ad4304ce
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -11,6 +11,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Beton]] · 7
 - [[Betonstahl]] · 3
+- [[Baustahl]] · 1
 
 **Platte**
 

@@ -16203,52 +16203,40 @@ $$
 g_{k,\text{Q5,C30/37}} = \rho_{sb} \cdot g \cdot A_{\text{Q5}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 360000\,\mathrm{mm}^{2} = 9\,\mathrm{kN}/\mathrm{m}
 $$
 
-**E-Modul, «Stahl» (von Hand)**
+**Dehnsteifigkeit, «Rohr» aus S355**
 
 $$
-E_{\text{Stahl}} = 200000\,\mathrm{N}/\mathrm{mm}^{2}
+EA_{\text{Q3,S355}} = E_a \cdot A_{\text{Q3}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4973\,\mathrm{mm}^{2} = 1044\,\mathrm{MN}
 $$
 
-**Dehnsteifigkeit, «Rohr» aus Stahl**
+**Biegesteifigkeit, «Rohr» aus S355**
 
 $$
-EA_{\text{Q3,Stahl}} = E_{\text{Stahl}} \cdot A_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4973\,\mathrm{mm}^{2} = 995\,\mathrm{MN}
+EI_{\text{Q3,S355}} = E_a \cdot I_{\text{Q3}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3284\,\mathrm{kNm}^{2}
 $$
 
-**Biegesteifigkeit, «Rohr» aus Stahl**
+**Eigengewicht, «Rohr» aus S355**
 
 $$
-EI_{\text{Q3,Stahl}} = E_{\text{Stahl}} \cdot I_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3128\,\mathrm{kNm}^{2}
+g_{k,\text{Q3,S355}} = \rho_a \cdot g \cdot A_{\text{Q3}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 4973\,\mathrm{mm}^{2} = 0.39\,\mathrm{kN}/\mathrm{m}
 $$
 
-**Dichte, «Stahl» (von Hand)**
+**Dehnsteifigkeit, «Walzprofil» aus S355**
 
 $$
-\rho_{\text{Stahl}} = 7850\,\mathrm{kg}/\mathrm{m}^{3}
+EA_{\text{Q6,S355}} = E_a \cdot A_{\text{Q6}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14282\,\mathrm{mm}^{2} = 2999\,\mathrm{MN}
 $$
 
-**Eigengewicht, «Rohr» aus Stahl**
+**Biegesteifigkeit, «Walzprofil» aus S355**
 
 $$
-g_{k,\text{Q3,Stahl}} = \rho_{\text{Stahl}} \cdot g \cdot A_{\text{Q3}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 4973\,\mathrm{mm}^{2} = 0.39\,\mathrm{kN}/\mathrm{m}
+EI_{\text{Q6,S355}} = E_a \cdot I_{\text{Q6}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4} = 50792\,\mathrm{kNm}^{2}
 $$
 
-**Dehnsteifigkeit, «Walzprofil» aus Stahl**
+**Eigengewicht, «Walzprofil» aus S355**
 
 $$
-EA_{\text{Q6,Stahl}} = E_{\text{Stahl}} \cdot A_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14282\,\mathrm{mm}^{2} = 2856\,\mathrm{MN}
-$$
-
-**Biegesteifigkeit, «Walzprofil» aus Stahl**
-
-$$
-EI_{\text{Q6,Stahl}} = E_{\text{Stahl}} \cdot I_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4} = 48374\,\mathrm{kNm}^{2}
-$$
-
-**Eigengewicht, «Walzprofil» aus Stahl**
-
-$$
-g_{k,\text{Q6,Stahl}} = \rho_{\text{Stahl}} \cdot g \cdot A_{\text{Q6}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 14282\,\mathrm{mm}^{2} = 1.12\,\mathrm{kN}/\mathrm{m}
+g_{k,\text{Q6,S355}} = \rho_a \cdot g \cdot A_{\text{Q6}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 14282\,\mathrm{mm}^{2} = 1.12\,\mathrm{kN}/\mathrm{m}
 $$
 
 **E-Modul, «Fundamentbeton» (von Hand)**
@@ -16293,22 +16281,22 @@ $$
 \end{aligned}
 $$
 
-**Dehnsteifigkeit, «Hohlprofil» aus Stahl**
+**Dehnsteifigkeit, «Hohlprofil» aus S355**
 
 $$
-EA_{\text{Q4,Stahl}} = E_{\text{Stahl}} \cdot A_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 11875\,\mathrm{mm}^{2} = 2375\,\mathrm{MN}
+EA_{\text{Q4,S355}} = E_a \cdot A_{\text{Q4}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 11875\,\mathrm{mm}^{2} = 2494\,\mathrm{MN}
 $$
 
-**Biegesteifigkeit, «Hohlprofil» aus Stahl**
+**Biegesteifigkeit, «Hohlprofil» aus S355**
 
 $$
-EI_{\text{Q4,Stahl}} = E_{\text{Stahl}} \cdot I_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 29342\,\mathrm{kNm}^{2}
+EI_{\text{Q4,S355}} = E_a \cdot I_{\text{Q4}} = 210000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 30810\,\mathrm{kNm}^{2}
 $$
 
-**Eigengewicht, «Hohlprofil» aus Stahl**
+**Eigengewicht, «Hohlprofil» aus S355**
 
 $$
-g_{k,\text{Q4,Stahl}} = \rho_{\text{Stahl}} \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
+g_{k,\text{Q4,S355}} = \rho_a \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
 $$
 
 **E-Modul, «Kasten» (E\_eq)**
@@ -16335,7 +16323,7 @@ $$
 g_{k,\text{Q10}} = \rho_{sb} \cdot g \cdot A_{\text{Q10}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 330000\,\mathrm{mm}^{2} = 8.25\,\mathrm{kN}/\mathrm{m}
 $$
 
-> **Annahme:** Steifigkeit: E\_cm des Betons oder das E eines eigenen Materials; bei einem Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), aber ohne die Bewehrung und ohne Schubverformung. Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2). Schlanke Druckglieder sind nach 4.3.7 nachzuweisen; eine Schiefstellung nach 4.1.3.2.3, (17) lässt sich als waagrechte Last ansetzen.
+> **Annahme:** Steifigkeit: E\_cm des Betons, E\_a des Baustahls oder das E eines eigenen Materials; bei einem Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), aber ohne die Bewehrung und ohne Schubverformung. Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2). Schlanke Druckglieder sind nach 4.3.7 nachzuweisen; eine Schiefstellung nach 4.1.3.2.3, (17) lässt sich als waagrechte Last ansetzen.
 
 > **Annahme:** Die Durchbiegung w misst jeder Stab gegen die Gerade zwischen seinen Enden. Die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1), beim Kragarm über die doppelte Länge (SIA 260:2013, 1.2.2): dasselbe nur, wo ein Stab von Auflager zu Auflager reicht – ein Knoten im Feld oder ein Kragarm geben hier weniger. Und w gilt kurzzeitig am ungerissenen Querschnitt, die untere Grenze (SIA 262:2025, 4.4.3.2.2); Risse und Kriechen fehlen.
 
@@ -16346,11 +16334,11 @@ $$
 | L1 | K1 – K2 | $8.000$ | $0.0$ | Balken 300×500 | $5043$ | $105062$ | – | quer Bettung 20000 kN/m² |
 | L2 | K2 – K3 | $3.000$ | $90.0$ | Rundstütze | $4225$ | $42248$ | – | – |
 | L3 | K3 – K4 | $4.472$ | $26.6$ | Plattenbalken | $12103$ | $322750$ | – | – |
-| L4 | K4 – K5 | $5.000$ | $-90.0$ | Rohr | $995$ | $3128$ | beide | – |
-| L5 | K5 – K6 | $3.000$ | $0.0$ | Walzprofil | $2856$ | $48374$ | Anfang | – |
+| L4 | K4 – K5 | $5.000$ | $-90.0$ | Rohr | $1044$ | $3284$ | beide | – |
+| L5 | K5 – K6 | $3.000$ | $0.0$ | Walzprofil | $2999$ | $50792$ | Anfang | – |
 | L6 | K6 – K7 | $2.000$ | $0.0$ | Fundamentbalken | $3750$ | $77083$ | – | quer fest |
 | L7 | K7 – K8 | $1.000$ | $-90.0$ | kein Stab | – | – | – | quer fest |
-| L8 | K6 – K9 | $2.000$ | $90.0$ | Hohlprofil | $2375$ | $29342$ | – | – |
+| L8 | K6 – K9 | $2.000$ | $90.0$ | Hohlprofil | $2494$ | $30810$ | – | – |
 | L9 | K9 – K10 | $2.000$ | $0.0$ | Kasten | $1796$ | $72234$ | – | – |
 
 **Lager**
@@ -16416,13 +16404,13 @@ $$
 | ---: | ---: | ---: | ---: |
 | K1 | $0.00$ | $-0.16$ | $-0.140$ |
 | K2 | $0.00$ | $-2.28$ | $-0.549$ |
-| K3 | $0.28$ | $-2.30$ | $0.364$ |
-| K4 | $-0.79$ | $-0.16$ | $0.687$ |
+| K3 | $0.27$ | $-2.30$ | $0.365$ |
+| K4 | $-0.80$ | $-0.15$ | $0.688$ |
 | K5 | $0.00$ | $0.00$ | nicht bestimmbar |
 | K6 | $0.00$ | $0.00$ | $0.000$ |
 | K7 | $0.00$ | $0.00$ | $0.000$ |
-| K9 | $1.12$ | $-0.01$ | $-1.125$ |
-| K10 | $1.12$ | $-2.49$ | $-1.277$ |
+| K9 | $1.07$ | $-0.01$ | $-1.071$ |
+| K10 | $1.07$ | $-2.38$ | $-1.223$ |
 
 **Schnittgrössen an den Stabenden**
 
@@ -16442,7 +16430,7 @@ $$
 | Lager | $R_x\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: |
 | A1 (K1) | $0.0$ | $7.9$ | $1.4$ |
-| A2 (K5) | $0.0$ | $34.2$ | $0.0$ |
+| A2 (K5) | $0.0$ | $34.3$ | $0.0$ |
 | K6 | $0.0$ | $20.5$ | $15.2$ |
 | K7 | $0.0$ | $0.0$ | $0.0$ |
 | L6: Lasten geradewegs ins Linienlager | $0.0$ | $32.5$ | $520.0$ |
@@ -16454,7 +16442,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $0.0\ \mathrm{kN}$ | $3.00$ | $0.0\ \mathrm{kN}$ | $5.00$ |
+| L1 | $N$ | $0.0\ \mathrm{kN}$ | $6.00$ | $0.0\ \mathrm{kN}$ | $2.00$ |
 | L1 | $V$ | $-3.8\ \mathrm{kN}$ | $4.12$ | $36.5\ \mathrm{kN}$ | $8.00$ |
 | L1 | $M$ | $-15.9\ \mathrm{kNm}$ | $5.93$ | $12.9\ \mathrm{kNm}$ | $8.00$ |
 | L1 | $w$ | $-0.59\ \mathrm{mm}$ | $4.97$ | $0.00\ \mathrm{mm}$ | $0.00$ |
@@ -16464,12 +16452,12 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.34\ \mathrm{mm}$ | $1.50$ |
 | L3 | $N$ | $-12.1\ \mathrm{kN}$ | $0.00$ | $13.9\ \mathrm{kN}$ | $4.47$ |
 | L3 | $V$ | $-27.8\ \mathrm{kN}$ | $4.47$ | $24.2\ \mathrm{kN}$ | $0.00$ |
-| L3 | $M$ | $0.0\ \mathrm{kNm}$ | $4.47$ | $33.1\ \mathrm{kNm}$ | $2.09$ |
+| L3 | $M$ | $0.0\ \mathrm{kNm}$ | $4.47$ | $33.1\ \mathrm{kNm}$ | $2.08$ |
 | L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.22\ \mathrm{mm}$ | $2.19$ |
 | L4 | $N$ | $-33.0\ \mathrm{kN}$ | $5.00$ | $-31.0\ \mathrm{kN}$ | $0.00$ |
 | L4 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L4 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $5.00$ |
-| L4 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $3.00$ |
+| L4 | $w$ | $0.00\ \mathrm{mm}$ | $5.00$ | $0.00\ \mathrm{mm}$ | $3.54$ |
 | L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V$ | $-2.1\ \mathrm{kN}$ | $3.00$ | $1.3\ \mathrm{kN}$ | $0.00$ |
 | L5 | $M$ | $-1.3\ \mathrm{kNm}$ | $3.00$ | $0.7\ \mathrm{kNm}$ | $1.12$ |
@@ -16480,8 +16468,8 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L6 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L8 | $N$ | $-18.4\ \mathrm{kN}$ | $0.00$ | $-16.5\ \mathrm{kN}$ | $2.00$ |
 | L8 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L8 | $M$ | $-16.5\ \mathrm{kNm}$ | $2.00$ | $-16.5\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $w$ | $-0.28\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $M$ | $-16.5\ \mathrm{kNm}$ | $0.00$ | $-16.5\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $w$ | $-0.27\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V$ | $0.0\ \mathrm{kN}$ | $2.00$ | $16.5\ \mathrm{kN}$ | $0.00$ |
 | L9 | $M$ | $-16.5\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
@@ -16505,8 +16493,8 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -0.59 mm bei x = 4.97
 | ---: | ---: | ---: | ---: |
 | K1 | $0.00$ | $-0.01$ | $0.017$ |
 | K2 | $0.03$ | $-0.43$ | $-0.394$ |
-| K3 | $1.43$ | $-0.43$ | $-0.042$ |
-| K4 | $1.24$ | $-0.06$ | $0.173$ |
+| K3 | $1.43$ | $-0.43$ | $-0.041$ |
+| K4 | $1.24$ | $-0.06$ | $0.174$ |
 | K5 | $0.00$ | $0.00$ | nicht bestimmbar |
 | K6 | $0.00$ | $0.00$ | $0.000$ |
 | K7 | $0.00$ | $0.00$ | $0.000$ |
@@ -16542,7 +16530,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $18.0\ \mathrm{kN}$ | $4.00$ | $18.0\ \mathrm{kN}$ | $0.00$ |
+| L1 | $N$ | $18.0\ \mathrm{kN}$ | $5.00$ | $18.0\ \mathrm{kN}$ | $4.00$ |
 | L1 | $V$ | $-5.7\ \mathrm{kN}$ | $6.29$ | $0.3\ \mathrm{kN}$ | $0.33$ |
 | L1 | $M$ | $-19.0\ \mathrm{kNm}$ | $7.97$ | $0.5\ \mathrm{kNm}$ | $1.58$ |
 | L1 | $w$ | $-0.36\ \mathrm{mm}$ | $5.53$ | $0.00\ \mathrm{mm}$ | $0.00$ |
@@ -16557,7 +16545,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L4 | $N$ | $-11.7\ \mathrm{kN}$ | $0.00$ | $-11.7\ \mathrm{kN}$ | $0.00$ |
 | L4 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L4 | $M$ | $0.0\ \mathrm{kNm}$ | $5.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $w$ | $0.00\ \mathrm{mm}$ | $2.60$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L4 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V$ | $1.5\ \mathrm{kN}$ | $0.00$ | $1.5\ \mathrm{kN}$ | $0.00$ |
 | L5 | $M$ | $-1.8\ \mathrm{kNm}$ | $1.50$ | $2.2\ \mathrm{kNm}$ | $1.50$ |
@@ -16595,13 +16583,13 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -0.36 mm bei x = 5.53
 | ---: | ---: | ---: | ---: |
 | K1 | $0.00$ | $-0.22$ | $-0.163$ |
 | K2 | $0.04$ | $-3.71$ | $-1.332$ |
-| K3 | $2.52$ | $-3.74$ | $0.429$ |
-| K4 | $0.80$ | $-0.31$ | $1.186$ |
+| K3 | $2.51$ | $-3.74$ | $0.432$ |
+| K4 | $0.79$ | $-0.29$ | $1.190$ |
 | K5 | $0.00$ | $0.00$ | nicht bestimmbar |
 | K6 | $0.00$ | $0.00$ | $0.000$ |
 | K7 | $0.00$ | $0.00$ | $0.000$ |
-| K9 | $1.52$ | $-0.02$ | $-1.518$ |
-| K10 | $1.52$ | $-3.36$ | $-1.724$ |
+| K9 | $1.45$ | $-0.02$ | $-1.446$ |
+| K10 | $1.45$ | $-3.22$ | $-1.652$ |
 
 **Schnittgrössen an den Stabenden**
 
@@ -16625,7 +16613,7 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -0.36 mm bei x = 5.53
 | K6 | $0.0$ | $25.4$ | $21.3$ |
 | K7 | $0.0$ | $0.0$ | $0.0$ |
 | L6: Lasten geradewegs ins Linienlager | $0.0$ | $43.9$ | $702.0$ |
-| L1: Bettung, Summe | $0.0$ | $187.2$ | $1051.6$ |
+| L1: Bettung, Summe | $0.0$ | $187.1$ | $1051.5$ |
 
 Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
@@ -16633,34 +16621,34 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $27.0\ \mathrm{kN}$ | $7.00$ | $27.0\ \mathrm{kN}$ | $3.00$ |
-| L1 | $V$ | $-10.4\ \mathrm{kN}$ | $4.79$ | $49.7\ \mathrm{kN}$ | $8.00$ |
+| L1 | $N$ | $27.0\ \mathrm{kN}$ | $5.00$ | $27.0\ \mathrm{kN}$ | $3.00$ |
+| L1 | $V$ | $-10.3\ \mathrm{kN}$ | $4.79$ | $49.7\ \mathrm{kN}$ | $8.00$ |
 | L1 | $M$ | $-39.8\ \mathrm{kNm}$ | $6.55$ | $3.6\ \mathrm{kNm}$ | $1.31$ |
 | L1 | $w$ | $-1.34\ \mathrm{mm}$ | $5.17$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L2 | $N$ | $-49.7\ \mathrm{kN}$ | $0.00$ | $-37.0\ \mathrm{kN}$ | $3.00$ |
 | L2 | $V$ | $15.0\ \mathrm{kN}$ | $1.50$ | $27.0\ \mathrm{kN}$ | $0.00$ |
 | L2 | $M$ | $-11.2\ \mathrm{kNm}$ | $0.00$ | $51.8\ \mathrm{kNm}$ | $3.00$ |
-| L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.72\ \mathrm{mm}$ | $1.75$ |
+| L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.73\ \mathrm{mm}$ | $1.75$ |
 | L3 | $N$ | $-16.5\ \mathrm{kN}$ | $0.00$ | $26.6\ \mathrm{kN}$ | $4.47$ |
 | L3 | $V$ | $-53.2\ \mathrm{kN}$ | $4.47$ | $33.1\ \mathrm{kN}$ | $0.00$ |
 | L3 | $M$ | $0.0\ \mathrm{kNm}$ | $4.47$ | $73.4\ \mathrm{kNm}$ | $1.71$ |
 | L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.49\ \mathrm{mm}$ | $2.12$ |
 | L4 | $N$ | $-62.1\ \mathrm{kN}$ | $5.00$ | $-59.5\ \mathrm{kN}$ | $0.00$ |
 | L4 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L4 | $M$ | $0.0\ \mathrm{kNm}$ | $5.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $w$ | $0.00\ \mathrm{mm}$ | $2.44$ | $0.00\ \mathrm{mm}$ | $5.00$ |
+| L4 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $5.00$ |
+| L4 | $w$ | $0.00\ \mathrm{mm}$ | $2.14$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V$ | $-0.6\ \mathrm{kN}$ | $3.00$ | $4.0\ \mathrm{kN}$ | $0.00$ |
 | L5 | $M$ | $-1.8\ \mathrm{kNm}$ | $1.50$ | $4.2\ \mathrm{kNm}$ | $1.50$ |
-| L5 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.03\ \mathrm{mm}$ | $1.08$ |
+| L5 | $w$ | $0.00\ \mathrm{mm}$ | $3.00$ | $0.03\ \mathrm{mm}$ | $1.08$ |
 | L6 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L8 | $N$ | $-24.8\ \mathrm{kN}$ | $0.00$ | $-22.3\ \mathrm{kN}$ | $2.00$ |
 | L8 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L8 | $M$ | $-22.3\ \mathrm{kNm}$ | $2.00$ | $-22.3\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $w$ | $-0.38\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $M$ | $-22.3\ \mathrm{kNm}$ | $0.00$ | $-22.3\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $w$ | $-0.36\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V$ | $0.0\ \mathrm{kN}$ | $2.00$ | $22.3\ \mathrm{kN}$ | $0.00$ |
 | L9 | $M$ | $-22.3\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
@@ -16675,6 +16663,20 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -1.34 mm bei x = 5.17
 | $\sum F_x$ | $27.000$ | $-27.000$ | $0.000$ | kN |
 | $\sum F_z$ | $-333.552$ | $333.552$ | $0.000$ | kN |
 | $\sum M_0$ | $-2950.371$ | $2950.371$ | $0.000$ | kNm |
+
+### Baustahl: S355
+
+**Elastizitätsmodul des Baustahls** *(SIA 263:2013, 3.2.2.1)*
+
+$$
+E_a = 210000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Dichte des Baustahls** *(SIA 263:2013, 3.2.2.1)*
+
+$$
+\rho_a = 7850\,\mathrm{kg}/\mathrm{m}^{3}
+$$
 
 ### Balkensystem: Beweglich
 
@@ -16702,7 +16704,7 @@ $$
 EI = E_{cm} \cdot I = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5400\,\cdot 10^{6}\,\mathrm{mm}^{4} = 181547\,\mathrm{kNm}^{2}
 $$
 
-> **Annahme:** Steifigkeit: E\_cm des Betons oder das E eines eigenen Materials; bei einem Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), aber ohne die Bewehrung und ohne Schubverformung. Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2). Schlanke Druckglieder sind nach 4.3.7 nachzuweisen; eine Schiefstellung nach 4.1.3.2.3, (17) lässt sich als waagrechte Last ansetzen.
+> **Annahme:** Steifigkeit: E\_cm des Betons, E\_a des Baustahls oder das E eines eigenen Materials; bei einem Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), aber ohne die Bewehrung und ohne Schubverformung. Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2). Schlanke Druckglieder sind nach 4.3.7 nachzuweisen; eine Schiefstellung nach 4.1.3.2.3, (17) lässt sich als waagrechte Last ansetzen.
 
 > **Annahme:** Die Durchbiegung w misst jeder Stab gegen die Gerade zwischen seinen Enden. Die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1), beim Kragarm über die doppelte Länge (SIA 260:2013, 1.2.2): dasselbe nur, wo ein Stab von Auflager zu Auflager reicht – ein Knoten im Feld oder ein Kragarm geben hier weniger. Und w gilt kurzzeitig am ungerissenen Querschnitt, die untere Grenze (SIA 262:2025, 4.4.3.2.2); Risse und Kriechen fehlen.
 
@@ -20460,8 +20462,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 
 | Bezeichnung | Symbol | Wert | Einheit | Herkunft |
 | :--- | :--- | ---: | :--- | :--- |
-| E-Modul, Stahl | $E_{\text{Stahl}}$ | $200000$ | N/mm² | Eingabe |
-| Dichte, Stahl | $\rho_{\text{Stahl}}$ | $7850$ | kg/m³ | Eingabe |
 | E-Modul, Fundamentbeton | $E_{\text{Fundamentbeton}}$ | $15000$ | N/mm² | Eingabe |
 | Dichte, Fundamentbeton | $\rho_{\text{Fundamentbeton}}$ | $2500$ | kg/m³ | Eingabe |
 | Querschnittsfläche, Balken 300×500 | $A_{\text{Q1}}$ | $150000$ | mm² | berechnet |
@@ -20488,15 +20488,15 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Querschnittsfläche, Rohr | $A_{\text{Q3}}$ | $4973$ | mm² | berechnet |
 | Aussendurchmesser, Rohr | $D_{\text{Q3}}$ | $168.3$ | mm | Vorgabe |
 | Flächenträgheitsmoment, Rohr | $I_{\text{Q3}}$ | $15.64$ | ·10⁶ mm⁴ | berechnet |
-| Dehnsteifigkeit, Rohr, Stahl | $EA_{\text{Q3,Stahl}}$ | $995$ | MN | berechnet |
-| Biegesteifigkeit, Rohr, Stahl | $EI_{\text{Q3,Stahl}}$ | $3128$ | kNm² | berechnet |
-| Eigengewicht je Meter, Rohr, Stahl | $g_{k,\text{Q3,Stahl}}$ | $0.39$ | kN/m | berechnet |
+| Dehnsteifigkeit, Rohr, S355 | $EA_{\text{Q3,S355}}$ | $1044$ | MN | berechnet |
+| Biegesteifigkeit, Rohr, S355 | $EI_{\text{Q3,S355}}$ | $3284$ | kNm² | berechnet |
+| Eigengewicht je Meter, Rohr, S355 | $g_{k,\text{Q3,S355}}$ | $0.39$ | kN/m | berechnet |
 | Wanddicke, Rohr | $t_{\text{Q3}}$ | $10$ | mm | Vorgabe |
 | Querschnittsfläche, Hohlprofil | $A_{\text{Q4}}$ | $11875$ | mm² | berechnet |
 | Flächenträgheitsmoment, Hohlprofil | $I_{\text{Q4}}$ | $146.71$ | ·10⁶ mm⁴ | berechnet |
-| Dehnsteifigkeit, Hohlprofil, Stahl | $EA_{\text{Q4,Stahl}}$ | $2375$ | MN | berechnet |
-| Biegesteifigkeit, Hohlprofil, Stahl | $EI_{\text{Q4,Stahl}}$ | $29342$ | kNm² | berechnet |
-| Eigengewicht je Meter, Hohlprofil, Stahl | $g_{k,\text{Q4,Stahl}}$ | $0.93$ | kN/m | berechnet |
+| Dehnsteifigkeit, Hohlprofil, S355 | $EA_{\text{Q4,S355}}$ | $2494$ | MN | berechnet |
+| Biegesteifigkeit, Hohlprofil, S355 | $EI_{\text{Q4,S355}}$ | $30810$ | kNm² | berechnet |
+| Eigengewicht je Meter, Hohlprofil, S355 | $g_{k,\text{Q4,S355}}$ | $0.93$ | kN/m | berechnet |
 | Breite, Hohlprofil | $b_{\text{Q4}}$ | $200$ | mm | Vorgabe |
 | Höhe, Hohlprofil | $h_{\text{Q4}}$ | $300$ | mm | Vorgabe |
 | Wanddicke, Hohlprofil | $t_{\text{Q4}}$ | $12.5$ | mm | Vorgabe |
@@ -20512,9 +20512,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Abstand des Schwerpunkts vom oberen Rand, Plattenbalken | $z_{S,\text{Q5}}$ | $200$ | mm | berechnet |
 | Querschnittsfläche, Walzprofil | $A_{\text{Q6}}$ | $14282$ | mm² | berechnet |
 | Flächenträgheitsmoment, Walzprofil | $I_{\text{Q6}}$ | $241.87$ | ·10⁶ mm⁴ | berechnet |
-| Dehnsteifigkeit, Walzprofil, Stahl | $EA_{\text{Q6,Stahl}}$ | $2856$ | MN | berechnet |
-| Biegesteifigkeit, Walzprofil, Stahl | $EI_{\text{Q6,Stahl}}$ | $48374$ | kNm² | berechnet |
-| Eigengewicht je Meter, Walzprofil, Stahl | $g_{k,\text{Q6,Stahl}}$ | $1.12$ | kN/m | berechnet |
+| Dehnsteifigkeit, Walzprofil, S355 | $EA_{\text{Q6,S355}}$ | $2999$ | MN | berechnet |
+| Biegesteifigkeit, Walzprofil, S355 | $EI_{\text{Q6,S355}}$ | $50792$ | kNm² | berechnet |
+| Eigengewicht je Meter, Walzprofil, S355 | $g_{k,\text{Q6,S355}}$ | $1.12$ | kN/m | berechnet |
 | Flanschbreite, Walzprofil | $b_{\text{Q6}}$ | $300$ | mm | Vorgabe |
 | Höhe, Walzprofil | $h_{\text{Q6}}$ | $300$ | mm | Vorgabe |
 | Flanschdicke, Walzprofil | $t_{f,\text{Q6}}$ | $19$ | mm | Vorgabe |
@@ -20540,6 +20540,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Biegesteifigkeit, Rechteck, C30/37 | $EI$ | $181547$ | kNm² | berechnet |
 | Breite, Rechteck | $b$ | $300$ | mm | Vorgabe |
 | Höhe, Rechteck | $h$ | $600$ | mm | Vorgabe |
+| Elastizitätsmodul des Baustahls | $E_a$ | $210000$ | N/mm² | Vorgabe |
+| Dichte des Baustahls | $\rho_a$ | $7850$ | kg/m³ | Vorgabe |
 | Bemessungswert des Elastizitätsmoduls | $E_{cd}$ | $28016$ | N/mm² | berechnet |
 | Mittelwert des Elastizitätsmoduls | $E_{cm}$ | $33620$ | N/mm² | berechnet |
 | Dehnung am Ende des ansteigenden Astes | $\varepsilon_{c1d}$ | $2$ | ‰ | Vorgabe |

@@ -134,6 +134,12 @@
       "bereich": "Pfähle"
     },
     {
+      "name": "Baustahl",
+      "pfad": "Formelsammlung/Themen/Baustahl.md",
+      "art": "thema",
+      "bereich": "Baustoffe"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -1452,6 +1458,7 @@
       "themen": [
         "Betonstahl",
         "Kennzahlen",
+        "Baustahl",
         "Stahlspannung aus Rissbreite",
         "Spannung-Dehnung-Analyse"
       ]
@@ -5781,7 +5788,7 @@
         "_stabquerschnitt",
         "_modulfrage",
         "_paare",
-        "_beton",
+        "_baustoff",
         "_stabmaterial",
         "_material_des_querschnitts"
       ]
@@ -5948,6 +5955,7 @@
         "BalkensystemEintrag.linie",
         "BalkensystemEintrag.lager_an",
         "BalkensystemEintrag.beton",
+        "BalkensystemEintrag.baustahl",
         "BalkensystemEintrag.eigenes_material",
         "BalkensystemEintrag.querschnitt",
         "BalkensystemEintrag.querschnitt_aus",

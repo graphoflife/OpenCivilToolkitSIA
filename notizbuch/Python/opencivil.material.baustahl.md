@@ -1,5 +1,5 @@
 ---
-erzeugt: bd3ceb576b34
+erzeugt: 4323151ea7c9
 art: modul
 tags: [modul]
 ---
@@ -98,3 +98,7 @@ Erzeugt einen Baustahl aus der Sortentabelle.
 ## Gebraucht von
 
 - [[opencivil.material.arten]]
+
+## Formeln aus diesem Modul
+
+- [[Fliessdehnung]]

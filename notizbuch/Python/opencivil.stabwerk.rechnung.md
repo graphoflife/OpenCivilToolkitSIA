@@ -1,5 +1,5 @@
 ---
-erzeugt: 2d6ebc0fada9
+erzeugt: b30ad215164a
 art: modul
 tags: [modul]
 ---
@@ -26,15 +26,17 @@ Querschnittsanalyse.
 
 ## MATERIALIEN
 
-Ein Material der Staebe ([[opencivil.stabwerk.rechnung#Stabmaterial|Stabmaterial]]) ist ein Beton des Projekts
-oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24). Ein Stab
+Ein Material der Staebe ([[opencivil.stabwerk.rechnung#Stabmaterial|Stabmaterial]]) ist ein Beton oder Baustahl
+des Projekts oder ein eigenes mit E und Dichte von Hand (Benutzer,
+2026-10-24). Ein Stab
 kann auch das Material seines Querschnitts nehmen, den Beton einer Platte
 oder Querschnittsanalyse.
 
 
 ## STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN
 
-`E_cm` eines Betons ([[opencivil.stabwerk.rechnung#Konstanten|BETONKENNWERTE]]) oder E von Hand -- und bei
+`E_cm` eines Betons, `E_a` eines Baustahls ([[opencivil.stabwerk.rechnung#Konstanten|STABKENNWERTE]]) oder
+E von Hand -- und bei
 einem Stab mit dem Material seiner Querschnittsanalyse auf Wunsch deren
 E_eq bei N und M (Benutzer, 2026-10-23) --, am ungerissenen
 Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am unverformten
@@ -46,7 +48,7 @@ E_eq keinen Modul, sagt es eine Meldung, und das System rechnet nicht.
 
 Je Paar aus Querschnitt und Material `g_k = rho · g · A` in kN/m, mit
 `g = 10 m/s²` und beim Beton der Dichte des Stahlbetons -- ohne den Stahl
-noch dazu. Es kommt als Last senkrecht je Meter Stab in den Lastfall, den
+noch dazu --, beim Baustahl mit `rho_a`. Es kommt als Last senkrecht je Meter Stab in den Lastfall, den
 die Beschreibung dafuer nennt.
 
 
@@ -66,12 +68,12 @@ mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 class Stabmaterial
 ```
 
-Ein Material der Staebe, aufgeloest: ein Beton -- E und Dichte von ihm --
-oder ein eigenes mit E und Dichte von Hand.
+Ein Material der Staebe, aufgeloest: ein Beton oder Baustahl -- E und
+Dichte von ihm -- oder ein eigenes mit E und Dichte von Hand.
 
 - `kennung: str` – Im System, `M1` -- bei einem Stab mit dem Material seines Querschnitts dessen Zeichen.
 - `name: str`
-- `stoff: Optional[Baustoff] = None` – Der Beton -- `None` bei einem eigenen Material.
+- `stoff: Optional[Baustoff] = None` – Der Beton oder Baustahl -- `None` bei einem eigenen Material.
 - `E: float = 0.0` – Von Hand, N/mm² -- nur ohne `stoff`.
 - `rho: float = 0.0` – Von Hand, kg/m³ -- nur ohne `stoff`.
 - `vom_querschnitt: bool = False` – Das Material des Querschnitts: dann gilt dessen E_eq, wenn er eines hat.
@@ -195,7 +197,7 @@ Die Platten und Analysen, deren Werte das System liest.
 def _kennwerte(self, m: Stabmaterial) -> Tuple[str, str]
 ```
 
-Die Wert-IDs von E und Dichte eines Materials: die seines Betons --
+Die Wert-IDs von E und Dichte eines Materials: die seines Baustoffs --
 oder bei einem eigenen Vorgaben von Hand, einmal je Material.
 
 #### Balkensystem._erdbeschleunigung
@@ -267,7 +269,7 @@ seinem Material nimmt, eine Meldung.
 
 ## Konstanten
 
-- `BETONKENNWERTE = {'E': 'E_cm', 'rho': 'rho_sb'}` – Welche Kennwerte eines Betons ein Stab aus ihm nimmt: `E_cm` -- die Analyse rechnet in der Regel ungerissen (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert -- und die Dichte des Stahlbetons (Benutzer, 2026-10-23).
+- `STABKENNWERTE = {Baustoffart.BETON: {'E': 'E_cm', 'rho': 'rho_sb'}, Baustoffart.BAUST…` – Welche Kennwerte eines Baustoffs ein Stab aus ihm nimmt. Beim Beton `E_cm` -- die Analyse rechnet in der Regel ungerissen (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert -- und die Dichte des Stahlbetons (Benutzer, 2026-10-23); beim Baustahl `E_a` und `rho_a`.
 - `ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)` – Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
 - `QUERSCHNITTE = 'Stabquerschnitte'` – Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.
 - `STEIFIGKEITSMETHODE = 'Steifigkeitsmethode'`
@@ -292,6 +294,7 @@ seinem Material nimmt, eine Meldung.
 - [[opencivil.ergebnis]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]

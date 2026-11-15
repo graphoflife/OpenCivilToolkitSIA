@@ -1,5 +1,5 @@
 ---
-erzeugt: 77b59adabf8d
+erzeugt: 9d2edb87000d
 art: modul
 tags: [modul]
 ---
@@ -217,14 +217,15 @@ oder ein Moment. Ihre Kennung zaehlt mit denen der Stablasten (`P1`).
 class StabmaterialEintrag(Beschreibung)
 ```
 
-Ein Material der Staebe (Benutzer, 2026-10-24): ein Beton des Projekts
-(`beton`) -- E_cm und die Dichte des Stahlbetons von ihm -- oder ein
-eigenes mit `E` und `rho` von Hand.
+Ein Material der Staebe (Benutzer, 2026-10-24): ein Beton oder Baustahl
+des Projekts (`stoff`) -- E und Dichte von ihm, siehe
+[[opencivil.stabwerk.rechnung#Konstanten|STABKENNWERTE]] -- oder ein eigenes
+mit `E` und `rho` von Hand.
 
 - `kennung: str = ''`
 - `art: str = einer_von(STABMATERIALARTEN, 'beton')`
-- `beton: str = ''` – Die Kennung des Betons im Projekt (`b1`) -- nur bei `beton`.
-- `name: str = ''` – Wie ein eigenes heisst; ein Beton heisst wie im Projekt.
+- `stoff: str = ''` – Die Kennung des Betons oder Baustahls im Projekt (`b1`, `st1`) -- nicht bei `eigen`.
+- `name: str = ''` – Wie ein eigenes heisst; ein Beton oder Baustahl heisst wie im Projekt.
 - `E: float = bereich(200000.0, heisst='E-Modul E', einheit=N_PRO_MM2, ueber=0.0)` – N/mm² -- nur bei `eigen`.
 - `rho: float = bereich(7850.0, heisst='Dichte ρ', einheit=KG_PRO_M3, ab=0.0)` – kg/m³, fuer das Eigengewicht -- nur bei `eigen`.
 
@@ -357,10 +358,10 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 def materialien(self) -> List[str]
 ```
 
-Jeder Beton des Projekts, auf den ein Material des Systems zeigt --
-auch eines, das gerade keinen Stab traegt: wer den Beton loescht,
-liesse es ins Leere zeigen, und spaetestens die naechste Aenderung
-machte daraus einen Fehler beim Rechnen.
+Jedes Material des Projekts, auf das ein Material des Systems zeigt --
+auch eines, das gerade keinen Stab traegt: wer es loescht, liesse es
+ins Leere zeigen, und spaetestens die naechste Aenderung machte
+daraus einen Fehler beim Rechnen.
 
 #### BalkensystemEintrag.bezuege
 
@@ -439,6 +440,14 @@ def beton(self, beton: Any) -> StabmaterialEintrag
 
 Das Material des Systems aus einem Beton des Projekts (Eintrag oder
 Kennung) -- das schon da ist, sonst ein neues.
+
+#### BalkensystemEintrag.baustahl
+
+```python
+def baustahl(self, stahl: Any) -> StabmaterialEintrag
+```
+
+Das Material des Systems aus einem Baustahl des Projekts -- siehe [[opencivil.projekt.balkensystem#BalkensystemEintrag.beton|beton]].
 
 #### BalkensystemEintrag.eigenes_material
 
@@ -546,7 +555,7 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - `KNOTENLASTEN = ('kraft', 'moment')` – Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede [[opencivil.stabwerk.modell#Lastart|Lastart]].
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `KENNWERTE = ('A', 'I')` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
-- `STABMATERIALARTEN = ('beton', 'eigen')` – Was ein Material des Systems ist: ein Beton des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24). Betonstahl ist keines: aus ihm ist kein Stab.
+- `STABMATERIALARTEN = (*(art.value for art in STABKENNWERTE), 'eigen')` – Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24; Baustahl seit 2026-11-15). Betonstahl ist keines: aus ihm ist kein Stab. Welche Arten des Projekts es gibt, sagen die Kennwerte, die ein Stab aus ihnen nimmt.
 - `E_MODULE = ('e0', 'e_eq')` – Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀, das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-24). Einen E-Modul von Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
 - `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
 - `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte.
@@ -565,6 +574,7 @@ Diagramme M, V und N der GZT und die Verschiebung der GZG.
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.querschnitte]]
+- [[opencivil.stabwerk.rechnung]]
 
 ## Gebraucht von
 

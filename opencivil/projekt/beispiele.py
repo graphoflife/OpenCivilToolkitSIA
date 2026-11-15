@@ -140,6 +140,7 @@ def jeder_nachweis() -> Projekt:
     p = Projekt(name="Jeder Nachweis einmal")
     p.beton("C30/37")
     p.stahl("B500B")
+    p.baustahl("S355")
     decke = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
                      rissanforderung="erhoeht", duktilitaet=True, sproede=True,
                      zwaengung=True, zwaengung_begrenzt=True,
@@ -439,17 +440,15 @@ def _alles_einmal(p: Projekt, decke: QuerschnittEintrag,
                   analyse: QuerschnittsanalyseEintrag) -> None:
     """
     Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-    Querschnitt, beide mit E_eq; ein Beton des Projekts und zwei eigene
-    Materialien -- Stahl und ein weicherer Beton --, ein Stab mit dem
+    Querschnitt, beide mit E_eq; ein Beton und ein Baustahl des Projekts
+    und ein eigenes Material, ein weicherer Beton; ein Stab mit dem
     Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
     keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager mit
     und ohne Stab; jede Lastart, auch projiziert.
     """
     s = p.balkensystem("Alles einmal")
     beton = s.beton("b1")
-    # E_s und die Dichte des Betonstahls -- Betonstahl selbst ist kein
-    # Material der Stäbe.
-    baustahl = s.eigenes_material("Stahl", E=200000.0, rho=7850.0)
+    baustahl = s.baustahl(_erstes(p, "baustahl"))
     weich = s.eigenes_material("Fundamentbeton", E=15000.0, rho=2500.0)
     q = {
         "rechteck": s.querschnitt("Balken 300×500", "rechteck", b=300.0, h=500.0),

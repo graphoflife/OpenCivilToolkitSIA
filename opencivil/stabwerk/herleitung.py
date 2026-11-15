@@ -42,7 +42,8 @@ STAEBE_MIT_MATRIX = 6
 UNBEKANNTE_MIT_MATRIX = 12
 
 #: Was die Steifigkeit und das Gleichgewicht annehmen.
-ANNAHME = ("Steifigkeit: E_cm des Betons oder das E eines eigenen Materials; bei einem "
+ANNAHME = ("Steifigkeit: E_cm des Betons, E_a des Baustahls oder das E eines eigenen "
+           "Materials; bei einem "
            "Querschnitt aus Platte oder Querschnittsanalyse wahlweise sein E_eq bei N und M, "
            "eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2). Gerechnet am ungerissenen "
            "Querschnitt, wie die Norm es für die Analyse in der Regel vorsieht (4.1.4.1.3), "
