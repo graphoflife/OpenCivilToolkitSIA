@@ -17,7 +17,8 @@
  */
 
 import { wahlSchalter } from './bausteine.js';
-import { cadZeile, mitVar } from './cad_app.js';
+import { mitVar } from './cad_app.js';
+import { cadZeile } from './cad_palette.js';
 import {
   auswahl, el, melden, zahlfeld,
 } from './dom.js';

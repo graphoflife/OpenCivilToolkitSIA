@@ -19,8 +19,9 @@
 import { wahlBlock, wahlSchalter } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
 import {
-  cadZeile, gemeinsam, jaNein, mitVar, schalterzeile, zahlfeldMitVar,
+  gemeinsam, jaNein, mitVar, zahlfeldMitVar,
 } from './cad_app.js';
+import { cadZeile, schalterzeile } from './cad_palette.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
 import { auswahl, el } from './dom.js';
 import { aktiverLastfall, lastfallWaehlen, lastfallZeile } from './lastfaelle.js';

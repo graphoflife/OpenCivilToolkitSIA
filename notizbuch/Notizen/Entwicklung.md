@@ -7,6 +7,32 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · Zeichenfenster: im Bild treffen, mit jeder Zahl von Achsen
+
+Vorbereitung für das 3D-Balkensystem; in den bestehenden Apps ändert sich
+nichts. Ein Knoten hat so viele Koordinaten, wie die App Achsen nennt, und
+alles im Zeichenfenster rechnet mit allen: Verschieben, Kopieren,
+Zusammenführen, Teilen, die Punkteingabe mit einem Feld und einer Taste je
+Achse. Die Ansicht kann die Zeichnung über zwei Richtungen ins Bild legen
+und einen Klick auf eine Arbeitsebene zurückführen.
+
+Warum so:
+
+- Treffen, Fangen und Wählen rechnen im Bild, in Bildpunkten, nicht mehr in
+  der Zeichnung. Im Raum gibt es nur so eine Antwort auf «was liegt unter
+  dem Zeiger»: was man dort sieht, vorne wie hinten. In der Ebene ist es
+  dasselbe wie vorher -- das Bild ist die Zeichnung, nur vergrössert und
+  verschoben, und wie weit ein Punkt entlang einer Strecke liegt, ist in
+  beiden gleich.
+- Zwei Strecken schneiden sich im Raum nur, wo sie sich wirklich treffen
+  (`kreuzung`); meist gehen sie aneinander vorbei. Im Bild gekreuzte Stäbe
+  bieten darum keinen Schnittpunkt zum Fangen an.
+- `cad_fenster.js` hatte 1137 Zeilen; mit dem Raum wäre es weiter
+  gewachsen. Ändern und Rückgängig stehen jetzt in `cad_verlauf.js`, der
+  Inhalt des schwebenden Fensters samt seinen Zeilen (`cadZeile`,
+  `schalterzeile`) in `cad_palette.js`, das Hervorheben der Auswahl in
+  `cad_auswahl.js`.
+
 ## 2026-11-15 · 3D-Balkensysteme: Beschreibung, Aufbau und Rechnung
 
 Ein 3D-Balkensystem lässt sich im Projekt beschreiben und rechnen, mit

@@ -1,11 +1,16 @@
 /**
- * cad_fenster.js -- das Zeichenfenster: Rahmen, Knöpfe, Tasten, Rückgängig.
+ * cad_fenster.js -- das Zeichenfenster: Rahmen, Knöpfe, Maus und Tasten.
  *
  * Allgemein gebaut: was gezeichnet wird, sagt eine App über ihren «Adapter»
  * (für den Querschnitt `qa_zeichnung.js`, für das Balkensystem
  * `bs_zeichnung.js`). Das Fenster kennt nur Knoten und Elemente in drei
  * Formen -- Punkt, Linie, Fläche -- und die Mechanik, mit der man sie
- * zeichnet, wählt und ändert.
+ * zeichnet, wählt und ändert. Hier steht, was sie zusammenhält; die Teile
+ * stehen daneben: das Modell ohne Bild in cad_modell.js, die Ansicht in
+ * cad_ansicht.js, Fangen und Punkteingabe in cad_eingabe.js, Treffen, Wählen
+ * und Hervorheben in cad_auswahl.js, die Befehle in cad_befehle.js, Ändern
+ * und Rückgängig in cad_verlauf.js, das schwebende Fenster in
+ * cad_palette.js.
  *
  * WAS DER ADAPTER EINSTELLT (mit Vorgabe, siehe `EINSTELLUNG`):
  * die Werkzeuge -- je eines mit Namen, Zeichen, Taste und der Form, die es
@@ -53,20 +58,21 @@
  */
 
 import {
-  ansichtNeu, einpassen, nachBild, pfad, rasterZeichnen, zahlText, zoomen,
+  ansichtNeu, einpassen, nachBild, rasterZeichnen, zoomen,
 } from './cad_ansicht.js';
-import { abstand, auswahlTeil, cadModell } from './cad_modell.js';
+import { abstand, auswahlTeil, cadModell, mitte } from './cad_modell.js';
 import {
-  eingabeLeeren, eingabeNeu, fangen, feldeinheiten, feldnamen, felderLeeren, getipptPunkt, hilfenZeichnen, hilfstext,
-  klickPunkt, taste as eingabeTaste,
+  eingabeLeeren, eingabeNeu, fangen, getipptPunkt, hilfenZeichnen, klickPunkt, taste as eingabeTaste,
 } from './cad_eingabe.js';
 import {
   anhangBefehl, knotenBefehl, knotenEinfuegenBefehl, kopierenBefehl, linienBefehl,
   polygonBefehl, verschiebenBefehl,
 } from './cad_befehle.js';
-import { klickWaehlen, leisteZeichnen, rahmenWaehlen, treffer } from './cad_auswahl.js';
-import { paletteBauen } from './cad_palette.js';
-import { wahlSchalter } from './bausteine.js';
+import {
+  hervorheben, istAnhang, klickWaehlen, leisteZeichnen, ohneAnhaenge, rahmenWaehlen, treffer,
+} from './cad_auswahl.js';
+import { lageZeichnen, paletteBauen, paletteZeichnen } from './cad_palette.js';
+import { aendern, aktualisieren, vorwaerts, zurueck } from './cad_verlauf.js';
 import { el, svgEl } from './dom.js';
 import { sinnbild } from './sinnbilder.js';
 
@@ -91,8 +97,6 @@ const EINSTELLUNG = {
 };
 /** Ab wie viel Bewegung ein Druck ein Ziehen ist und kein Klick -- px. */
 const ZITTERN = 4;
-/** Wie viele Schritte «Rückgängig» zurückreicht. */
-const VERLAUF = 100;
 /** Unter diesem Schlüssel merkt sich der Browser die Höhe der Zeichnung. */
 const HOEHE = 'opencivil.cad.hoehe';
 
@@ -151,7 +155,7 @@ function neu(adapter) {
     fang: true,
     befehl: null,
     auswahl: new Set(),
-    eingabe: eingabeNeu(),
+    eingabe: eingabeNeu(adapter.achsen.length),
     zeiger: null,
     druck: null,
     finger: new Map(),
@@ -176,106 +180,10 @@ function neu(adapter) {
   a.starten = (befehl) => starten(a, befehl);
   a.werkzeugStarten = (name) => werkzeugStarten(a, name);
   a.neuZeichnen = () => zeichnen(a);
+  a.obenBald = () => obenBald(a);
+  a.getipptLiefern = () => getipptLiefern(a);
   bauen(a);
   return a;
-}
-
-// ===========================================================================
-// Ändern und Rückgängig
-// ===========================================================================
-
-/** Die Zeichnung als Text: die Listen, sonst nichts. */
-function stand(a) {
-  const z = a.adapter.zeichnung();
-  return JSON.stringify(a.listen.map((l) => z?.[l] || []));
-}
-
-/**
- * Ändert die Zeichnung und merkt sich den Stand davor -- ein Schritt für
- * «Rückgängig». `auswahl` liefert nach der Änderung, was danach gewählt sein
- * soll (etwa das eben angelegte Element); gesetzt wird es noch, bevor die
- * Tafel neu gezeichnet wird.
- */
-function aendern(a, veraenderer, { auswahl = null } = {}) {
-  const vorher = stand(a);
-  const vorherAuswahl = [...a.auswahl];
-  const vor = a.vor;
-  a.vor = [];
-  a.adapter.schreiben((z) => {
-    for (const l of a.listen) z[l] = z[l] || [];
-    veraenderer(z);
-    if (auswahl) a.auswahl = new Set((auswahl() || []).filter(Boolean));
-  });
-  if (stand(a) === vorher) {
-    a.vor = vor;
-    return;
-  }
-  a.rueck.push({ stand: vorher, auswahl: vorherAuswahl });
-  if (a.rueck.length > VERLAUF) a.rueck.shift();
-  aktualisieren(a);
-}
-
-function standSetzen(a, eintrag) {
-  const werte = JSON.parse(eintrag.stand);
-  a.auswahl = new Set(eintrag.auswahl);
-  a.adapter.schreiben((z) => { a.listen.forEach((l, i) => { z[l] = werte[i]; }); });
-  aktualisieren(a);
-}
-
-function zurueck(a) {
-  if (!a.rueck.length) return;
-  a.vor.push({ stand: stand(a), auswahl: [...a.auswahl] });
-  standSetzen(a, a.rueck.pop());
-}
-
-function vorwaerts(a) {
-  if (!a.vor.length) return;
-  a.rueck.push({ stand: stand(a), auswahl: [...a.auswahl] });
-  standSetzen(a, a.vor.pop());
-}
-
-/**
- * Die Zeichnung hat sich geändert -- von hier oder von aussen (Rückgängig,
- * eine geladene Datei): Fang neu sammeln, verschwundene Auswahl weg, die App
- * fragen lassen, was der Kern dazu sagt.
- */
-function aktualisieren(a) {
-  const jetzt = stand(a);
-  if (jetzt !== a.stand) {
-    a.stand = jetzt;
-    a.version += 1;
-    const z = a.adapter.zeichnung() || {};
-    // Ein Anhang ist kein Element des Modells; ob es ihn noch gibt, weiss
-    // die App. Bis 2026-10-25 fiel er hier weg: jede Änderung an einer Last
-    // auf einer Linie schloss ihr Fenster.
-    a.auswahl = new Set([...a.auswahl].filter((k) => a.modell.gibt(z, k) || istAnhang(a, k)));
-    a.adapter.geaendert?.(a);
-  }
-  zeichnen(a);
-}
-
-function loeschen(a) {
-  if (!a.auswahl.size) return;
-  const weg = new Set(a.auswahl);
-  aendern(a, (z) => {
-    a.modell.loeschen(z, weg);
-    a.adapter.anhaenge?.loeschen(z, weg);
-  }, { auswahl: () => [] });
-}
-
-/** Ob ein Schlüssel der Auswahl einen Anhang meint -- eine Last, kein Element. */
-function istAnhang(a, schluessel) {
-  return Boolean(a.adapter.anhaenge?.hat(a.adapter.zeichnung(), auswahlTeil(schluessel).kennung));
-}
-
-/**
- * Vor dem Verschieben und Kopieren: die Auswahl ohne Anhänge -- sie gehen mit
- * ihrem Element, und eine Last an einem Knoten nähme sonst den Knoten mit.
- * Gibt zurück, ob danach etwas gewählt ist.
- */
-function ohneAnhaenge(a) {
-  a.auswahl = new Set([...a.auswahl].filter((s) => !istAnhang(a, s)));
-  return a.auswahl.size > 0;
 }
 
 // ===========================================================================
@@ -317,6 +225,15 @@ function punktLiefern(a, erg) {
   zeichnen(a);
 }
 
+function loeschen(a) {
+  if (!a.auswahl.size) return;
+  const weg = new Set(a.auswahl);
+  aendern(a, (z) => {
+    a.modell.loeschen(z, weg);
+    a.adapter.anhaenge?.loeschen(z, weg);
+  }, { auswahl: () => [] });
+}
+
 /** Ändert jedes gewählte Element einer Form -- ein Schritt für Rückgängig. */
 function jedesGewaehlte(a, form, tun) {
   const auswahl = new Set(a.auswahl);
@@ -337,7 +254,7 @@ function teilen(a) {
   jedesGewaehlte(a, 'linie', (z, art, e) => {
     const lagen = a.modell.lagen(z);
     const [p, q] = [lagen.get(e.von), lagen.get(e.bis)];
-    return p && q ? a.modell.linieTeilen(z, art, e, [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]) : null;
+    return p && q ? a.modell.linieTeilen(z, art, e, mitte(p, q)) : null;
   });
 }
 
@@ -418,50 +335,6 @@ function allesZeigen(a) {
   zeichnen(a);
 }
 
-/**
- * Die Auswahl, hervorgehoben: über dem Modell, unter dem Zeiger. Eine
- * gewählte Ecke als volles Quadrat, und dünn gestrichelt das Element, dem
- * sie gehört -- so sieht man, wessen Ecke es ist, wo mehrere aufeinander
- * liegen.
- */
-function hervorheben(a, kennungen, klasse) {
-  const g = svgEl('g', { class: klasse });
-  if (!kennungen.size) return g;
-  const z = a.adapter.zeichnung();
-  const m = a.modell;
-  const lagen = m.lagen(z);
-  const quadrat = (p, extra = '') => {
-    const [x, y] = nachBild(a.v, p);
-    return svgEl('rect', { x: x - 4.5, y: y - 4.5, width: 9, height: 9, class: extra });
-  };
-  for (const k of z.knoten || []) if (kennungen.has(k.kennung)) g.append(quadrat(m.lage(k)));
-  const eigner = new Set();
-  for (const x of m.ecken(z)) {
-    const p = lagen.get(x.knoten);
-    if (!p || x.art.form === 'punkt' || !kennungen.has(x.schluessel)) continue;
-    g.append(quadrat(p, 'cad-ecke'));
-    eigner.add(x.e.kennung);
-  }
-  for (const { art, e } of m.elemente(z)) {
-    const ganz = kennungen.has(e.kennung);
-    if (!ganz && !eigner.has(e.kennung)) continue;
-    const orte = m.verweise(art, e).map((k) => lagen.get(k));
-    if (orte.some((p) => !p)) continue;
-    if (!ganz) {
-      g.prepend(svgEl('path', { d: pfad(a.v, orte, art.form === 'flaeche'), class: 'cad-eigner' }));
-      continue;
-    }
-    if (art.form === 'punkt') {
-      const [x, y] = nachBild(a.v, orte[0]);
-      const r = Math.max(5, (a.adapter.trefferradius?.(a, art, e) || 0) * a.v.massstab + 3);
-      g.append(svgEl('circle', { cx: x, cy: y, r }));
-    } else {
-      g.append(svgEl('path', { d: pfad(a.v, orte, art.form === 'flaeche') }));
-    }
-  }
-  return g;
-}
-
 /** Die Knoten: klein, damit sie die Zeichnung nicht zudecken -- aber treffbar. */
 function knotenZeichnen(a) {
   const g = svgEl('g', { class: 'cad-knotenpunkte' });
@@ -535,155 +408,8 @@ function obenBald(a) {
 }
 
 // ===========================================================================
-// Schwebendes Fenster, Knöpfe, Statuszeile
+// Knöpfe und Statuszeile
 // ===========================================================================
-
-/** Die Koordinaten des Zeigers, mit Einheit -- in der Ruhe oben im schwebenden Fenster. */
-function lageZeichnen(a) {
-  const ziel = a.teile.lage;
-  if (!ziel) return;
-  const f = a.zeiger?.fang || (a.zeiger?.bild && fangen(a, a.zeiger.bild));
-  const [x, y] = a.adapter.achsen;
-  const { stellen: s, einheit: e } = a.einstellung;
-  ziel.textContent = f ? `${x} ${zahlText(f.p[0], s)} ${e}   ${y} ${zahlText(f.p[1], s)} ${e}` : '';
-}
-
-/** Ein Feld der Punkteingabe: schmal, rechtsbündig, ohne Pfeile. */
-function eingabefeld(a, i, name) {
-  const feld = el('input.cad-eingabe', {
-    type: 'text', inputMode: 'decimal', value: a.eingabe.felder[i], placeholder: name,
-    title: name, autocomplete: 'off',
-    on: {
-      input: (e) => { a.eingabe.felder[i] = e.target.value; },
-      keydown: (e) => {
-        // Buchstaben gehören den Hilfen, auch wenn ein Feld den Fokus hat.
-        if (e.key.length === 1 && /[a-zA-Z]/.test(e.key) && !e.ctrlKey && !e.metaKey) {
-          if (eingabeTaste(a, e)) {
-            e.preventDefault();
-            zeichnen(a);
-          }
-        }
-      },
-    },
-  });
-  feld.dataset.feld = String(i);
-  return feld;
-}
-
-function hilfsknopf(a, zeichen, titel, tun, an = false) {
-  return el('button.cad-hilfe', {
-    type: 'button', title: titel, class: an ? 'ist-an' : '',
-    on: { click: (e) => { e.preventDefault(); tun(); zeichnen(a); } },
-  }, [zeichen]);
-}
-
-/** Der Teil des Fensters, der während eines Befehls nach dem Punkt fragt. */
-function punkteingabe(a) {
-  const pe = a.eingabe;
-  const [n1, n2] = feldnamen(a);
-  const [e1, e2] = feldeinheiten(a);
-  const modus = (wert, text, titel) => el('button.schalter-halb', {
-    type: 'button', text, title: titel, class: pe.modus === wert ? 'ist-an' : '',
-    on: { click: () => { pe.modus = wert; felderLeeren(pe); zeichnen(a); } },
-  });
-  const [x, y] = a.adapter.achsen;
-  const fake = (k) => ({ key: k, preventDefault() {} });
-  return [
-    pe.bindung
-      ? el('div.cad-bindung-zeile', {}, [
-        el('span.cad-bindungsmarke', { text: pe.bindung.text }),
-        el('button.weg', {
-          type: 'button', text: '×', title: 'Bindung lösen (Esc)',
-          on: { click: () => { pe.bindung = null; zeichnen(a); } },
-        }),
-      ])
-      : el('span.schalter.cad-modus', {}, [
-        modus('rel', 'Δ', 'Relativ zum Bezugspunkt'),
-        modus('abs', 'abs', 'Absolut'),
-        modus('polar', 'L∠', 'Länge und Winkel ab dem Bezugspunkt'),
-      ]),
-    el('div.cad-felder', {}, [
-      eingabefeld(a, 0, n1), el('span.einheit', { text: e1 }),
-      n2 ? eingabefeld(a, 1, n2) : null, n2 ? el('span.einheit', { text: e2 }) : null,
-      el('button.knopf.knopf-klein', {
-        type: 'button', text: '↵', title: 'Punkt setzen (Enter)',
-        on: { click: () => getipptLiefern(a) },
-      }),
-    ]),
-    el('div.cad-hilfen', {}, [
-      // Was der Befehl selbst an Tasten hat -- beim Verschieben D.
-      ...(a.befehl?.tasten || []).map((t) => hilfsknopf(
-        a, t.zeichen, t.titel, () => t.tun(a, a.befehl), t.an?.(a.befehl))),
-      hilfsknopf(a, 'R', 'Bezugspunkt auf den gefangenen Punkt (R)', () => eingabeTaste(a, fake('r'))),
-      hilfsknopf(a, x.toUpperCase(), `Entlang ${x} (${x.toUpperCase()})`, () => eingabeTaste(a, fake(x)),
-        pe.bindung?.art === 'achse' && pe.bindung.r[0] === 1),
-      hilfsknopf(a, y.toUpperCase(), `Entlang ${y} (${y.toUpperCase()})`, () => eingabeTaste(a, fake(y)),
-        pe.bindung?.art === 'achse' && pe.bindung.r[1] === 1),
-      hilfsknopf(a, '∥', 'Parallel zu einer Linie (P)', () => eingabeTaste(a, fake('p')),
-        pe.warten === 'parallel' || pe.bindung?.art === 'parallel'),
-      hilfsknopf(a, '⊥', 'Senkrecht zu einer Linie (S)', () => eingabeTaste(a, fake('s')),
-        pe.warten === 'senkrecht' || pe.bindung?.art === 'senkrecht'),
-      hilfsknopf(a, 'M', 'Mitte zweier Punkte (M)', () => eingabeTaste(a, fake('m')),
-        pe.warten?.art === 'mitte'),
-    ]),
-    a.befehl?.kopie ? el('label.cad-zeile', {}, [
-      el('span', { text: 'Anzahl' }),
-      el('input', {
-        type: 'number', min: 1, step: 1, value: a.befehl.anzahl,
-        on: { input: (e) => { a.befehl.anzahl = Number(e.target.value) || 1; obenBald(a); } },
-      }),
-    ]) : null,
-  ];
-}
-
-/**
- * Das schwebende Fenster. Neu gebaut wird sein Inhalt nur, wenn sich die
- * Lage ändert -- nicht bei jeder Zeigerbewegung, sonst verlöre ein Feld beim
- * Tippen den Fokus.
- */
-function paletteZeichnen(a) {
-  const pal = a.teile.palette;
-  if (a.befehl) {
-    const pe = a.eingabe;
-    const neuTeil = a.befehl.neu ? a.adapter.neuEigenschaften?.(a, a.befehl.neu) : null;
-    const schluessel = JSON.stringify([
-      'befehl', a.befehl.name, pe.modus, pe.runde, pe.bindung?.text, pe.warten?.art || pe.warten,
-      a.befehl.kopie ? a.befehl.anzahl : null, neuTeil?.schluessel ?? null,
-      (a.befehl.tasten || []).map((t) => !!t.an?.(a.befehl)),
-    ]);
-    pal.setzen(hilfstext(a) || a.befehl.frage(a), [
-      ...punkteingabe(a),
-      neuTeil ? el('div.cad-neu', {}, neuTeil.inhalt) : null,
-    ], schluessel);
-    return;
-  }
-  if (a.auswahl.size) {
-    const teil = a.adapter.eigenschaften(a);
-    pal.setzen(teil.titel, teil.inhalt, JSON.stringify(['auswahl', a.version, [...a.auswahl], teil.schluessel ?? null]));
-    return;
-  }
-  // Das Raster als Schalter mit seinen Stufen: Auswahllisten gibt es nur für
-  // die Wahl eines Materials (Benutzer, 2026-10-23).
-  const raster = wahlSchalter({
-    werte: a.einstellung.raster.stufen.map((r) => ({ wert: r, beschriftung: String(r) })),
-    gewaehlt: a.raster, setzen: (w) => { a.raster = w; zeichnen(a); },
-    titel: `Raster in ${a.einstellung.einheit}: daran fängt der Zeiger`, klasse: '.cad-wahl.cad-rasterwahl',
-  });
-  const fang = el('input', {
-    type: 'checkbox', checked: a.fang, title: 'Fang an Knoten, Linien und Raster (Alt hält ihn an)',
-    on: { change: (e) => { a.fang = e.target.checked; zeichnen(a); } },
-  });
-  a.teile.lage = el('span.cad-lage');
-  pal.setzen('Zeiger', [
-    a.teile.lage,
-    el('div.cad-ruhe', {}, [
-      el('span', { text: `Raster in ${a.einstellung.einheit}` }), el('label', {}, [fang, ' Fang']),
-    ]),
-    raster,
-  ], JSON.stringify(['ruhe', a.raster, a.fang]));
-  if (!a.teile.lage.isConnected) a.teile.lage = pal.koerper.querySelector('.cad-lage');
-  lageZeichnen(a);
-}
 
 function statusZeichnen(a) {
   let satz;
@@ -797,7 +523,7 @@ function druecken(a, e) {
       // Zwei Finger: kneifen und schieben. Was der erste begonnen hat, gilt nicht.
       const [p, q] = [...a.finger.values()];
       a.kneifen = {
-        abstand: abstand(p, q) || 1, mitte: [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2],
+        abstand: abstand(p, q) || 1, mitte: mitte(p, q),
         massstab: a.v.massstab, ursprung: [...a.v.ursprung],
       };
       a.druck = null;
@@ -824,10 +550,10 @@ function bewegen(a, e) {
     if (a.finger.size < 2) return;
     const [p, q] = [...a.finger.values()];
     const k = a.kneifen;
-    const mitte = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    const m = mitte(p, q);
     a.v.massstab = k.massstab;
-    a.v.ursprung = [k.ursprung[0] + mitte[0] - k.mitte[0], k.ursprung[1] + mitte[1] - k.mitte[1]];
-    zoomen(a.v, (abstand(p, q) || 1) / k.abstand, mitte);
+    a.v.ursprung = [k.ursprung[0] + m[0] - k.mitte[0], k.ursprung[1] + m[1] - k.mitte[1]];
+    zoomen(a.v, (abstand(p, q) || 1) / k.abstand, m);
     zeichnen(a);
     return;
   }
@@ -873,7 +599,8 @@ function loslassen(a, e) {
   }
   if (a.befehl) {
     const erg = klickPunkt(a, bild, e);
-    if (erg) punktLiefern(a, erg);
+    if (erg?.fehler) kurzMelden(a, erg.fehler);
+    if (erg?.p) punktLiefern(a, erg);
     else zeichnen(a);
     return;
   }

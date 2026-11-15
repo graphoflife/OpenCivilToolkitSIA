@@ -9,8 +9,21 @@
  * Gerechnet wird im Bild in Pixeln: die viewBox des SVG ist so gross wie das
  * Bild selbst, und alles Umrechnen geschieht hier. So bleiben Striche und
  * Schrift beim Zoomen gleich dick.
+ *
+ * IM RAUM:
+ * Eine Zeichnung mit drei Achsen sieht man parallel projiziert, von einer
+ * Richtung, die sich drehen lässt (cad_raum.js). Die Ansicht trägt dann ihre
+ * `basis`: die Richtungen in der Zeichnung, die im Bild nach rechts und
+ * nach oben zeigen. In der Ebene fehlt sie -- es gilt die erste Achse nach
+ * rechts, die zweite nach oben. Ein Punkt im Bild ist im Raum eine Gerade;
+ * wo der Zeiger hinzeigt, sagt erst die Arbeitsebene (`ebene`): die Achse,
+ * die auf ihr senkrecht steht, und ihre Lage auf dieser Achse. Weil die
+ * Projektion parallel ist, bleibt eine Gerade im Bild eine Gerade, und eine
+ * Stelle auf einer Strecke liegt im Bild beim selben Anteil wie in der
+ * Zeichnung -- darum trifft und fängt das Fenster im Bild.
  */
 
+import { skalar } from './cad_modell.js';
 import { svgEl } from './dom.js';
 
 /**
@@ -18,14 +31,51 @@ import { svgEl } from './dom.js';
  * kleinster und grösster Massstab, in Bildpunkten je Einheit der Zeichnung.
  */
 export function ansichtNeu(grenzen = [1e-3, 80]) {
-  return { massstab: null, ursprung: [0, 0], breite: 0, hoehe: 0, grenzen };
+  return { massstab: null, ursprung: [0, 0], breite: 0, hoehe: 0, grenzen, basis: null, ebene: null };
 }
 
-/** Welt -> Bild (px). */
-export const nachBild = (v, [a, b]) => [v.ursprung[0] + v.massstab * a, v.ursprung[1] - v.massstab * b];
+/** Die Richtungen nach rechts und nach oben, wo die Ansicht keine eigenen hat: die Ebene. */
+const EBEN = [[1, 0], [0, 1]];
 
-/** Bild (px) -> Welt. */
-export const nachWelt = (v, [x, h]) => [(x - v.ursprung[0]) / v.massstab, (v.ursprung[1] - h) / v.massstab];
+/** Welt -> Bild (px). */
+export function nachBild(v, p) {
+  const [rechts, oben] = v.basis || EBEN;
+  return [v.ursprung[0] + v.massstab * skalar(p, rechts), v.ursprung[1] - v.massstab * skalar(p, oben)];
+}
+
+/**
+ * Bild (px) -> Welt: in der Ebene der Punkt selbst, im Raum der Punkt auf
+ * der Arbeitsebene, den man dort sieht. Sieht man sie genau von der Seite,
+ * trifft die Gerade sie nicht -- dann der Punkt senkrecht auf sie.
+ */
+export function nachWelt(v, [x, h]) {
+  const a = (x - v.ursprung[0]) / v.massstab;
+  const b = (v.ursprung[1] - h) / v.massstab;
+  if (!v.basis) return [a, b];
+  const [rechts, oben] = v.basis;
+  const p = rechts.map((r, i) => a * r + b * oben[i]);
+  if (!v.ebene) return p;
+  const { achse, lage } = v.ebene;
+  const blick = blickrichtung(v);
+  if (Math.abs(blick[achse]) < 1e-9) {
+    p[achse] = lage;
+    return p;
+  }
+  const t = (lage - p[achse]) / blick[achse];
+  return p.map((w, i) => w + t * blick[i]);
+}
+
+/** Die Richtung, aus der man in den Raum blickt -- senkrecht auf das Bild, zum Betrachter. */
+export function blickrichtung(v) {
+  const [[a1, a2, a3], [b1, b2, b3]] = v.basis;
+  return [a2 * b3 - a3 * b2, a3 * b1 - a1 * b3, a1 * b2 - a2 * b1];
+}
+
+/** Eine Richtung der Zeichnung im Bild, in px je Einheit -- y nach unten. */
+export function richtungImBild(v, r) {
+  const [rechts, oben] = v.basis || EBEN;
+  return [v.massstab * skalar(r, rechts), -v.massstab * skalar(r, oben)];
+}
 
 /** Zoomt um `faktor` und hält dabei den Weltpunkt unter `bild` fest. */
 export function zoomen(v, faktor, bild) {
@@ -36,12 +86,27 @@ export function zoomen(v, faktor, bild) {
 }
 
 /**
- * Passt das Rechteck `[[a0, b0], [a1, b1]]` ins Bild -- mit Rand für
+ * Der Umriss `[[kleinste...], [grösste...]]` der Zeichnung, wie er im Bild
+ * liegt: das Rechteck um die Bilder seiner Ecken, in Einheiten der
+ * Zeichnung -- nach rechts und nach oben.
+ */
+function imBildUmriss(v, [klein, gross]) {
+  if (!v.basis) return [klein, gross];
+  const ecken = klein.reduce((liste, _, i) => liste.flatMap((e) => [[...e, klein[i]], [...e, gross[i]]]), [[]]);
+  const [rechts, oben] = v.basis;
+  const as = ecken.map((p) => skalar(p, rechts));
+  const bs = ecken.map((p) => skalar(p, oben));
+  return [[Math.min(...as), Math.min(...bs)], [Math.max(...as), Math.max(...bs)]];
+}
+
+/**
+ * Passt den Umriss `[[kleinste...], [grösste...]]` ins Bild -- mit Rand für
  * Masslinien. `frei` hält zusätzlich einen Streifen frei, in px: `rechts`,
  * `oben` oder `unten`, dort, wo das schwebende Fenster steht.
  */
-export function einpassen(v, [[a0, b0], [a1, b1]], { rand = 46, frei = {} } = {}) {
+export function einpassen(v, umriss, { rand = 46, frei = {} } = {}) {
   if (!v.breite || !v.hoehe) return;
+  const [[a0, b0], [a1, b1]] = imBildUmriss(v, umriss);
   const { rechts = 0, oben = 0, unten = 0 } = frei;
   const b = Math.max(a1 - a0, 1);
   const h = Math.max(b1 - b0, 1);
@@ -69,12 +134,13 @@ export function text(x, y, inhalt, klasse, anker = 'middle') {
 }
 
 /**
- * Wie weit zwei Rasterlinien im Bild auseinander stehen: das Raster mal 1,
- * 2, 5, 10, … -- so dicht, dass sie nicht verschwimmen.
+ * Wie weit zwei Rasterlinien auseinander stehen: das Raster mal 1, 2, 5,
+ * 10, … -- so weit, dass sie im Bild nicht verschwimmen. `jeEinheit`: wie
+ * viele Bildpunkte eine Einheit der Zeichnung dort lang ist.
  */
-function rasterschritt(v, raster) {
+export function rasterschritt(raster, jeEinheit) {
   let schritt = raster;
-  for (let i = 1; schritt * v.massstab < 14 && i < 30; i += 1) {
+  for (let i = 1; schritt * jeEinheit < 14 && i < 30; i += 1) {
     schritt = raster * [1, 2, 5][i % 3] * 10 ** Math.floor(i / 3);
   }
   return schritt;
@@ -83,7 +149,7 @@ function rasterschritt(v, raster) {
 /** Raster und Achsen, über das ganze Bild. */
 export function rasterZeichnen(v, raster, [achse1, achse2]) {
   const g = svgEl('g', { class: 'cad-raster' });
-  const schritt = rasterschritt(v, raster);
+  const schritt = rasterschritt(raster, v.massstab);
   const [a0, b1] = nachWelt(v, [0, 0]);
   const [a1, b0] = nachWelt(v, [v.breite, v.hoehe]);
   const fuenf = schritt * 5;

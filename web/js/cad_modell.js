@@ -32,6 +32,12 @@
  * und wer einen Stab verschiebt, verschiebt seine Knoten -- die Stäbe daneben
  * bleiben angeschlossen und dehnen sich mit (`verbunden: true`).
  *
+ * EBENE UND RAUM:
+ * Ein Knoten hat so viele Koordinaten, wie die App Achsen nennt -- zwei im
+ * Querschnitt und im 2D-Balkensystem, drei im 3D-Balkensystem. Alles hier
+ * rechnet mit jeder Zahl von Achsen; nur `schnitt`, `innen` und
+ * `flaecheVon` sind eben: sie arbeiten im Bild.
+ *
  * Alles hier ändert die übergebene Zeichnung -- gerufen wird es in einem
  * `veraenderer`, der das Projekt ändert.
  */
@@ -68,13 +74,15 @@ function nummer(kennung, vorsilbe) {
 
 /**
  * Die Werkzeuge auf einer Zeichnung, für die Arten und Achsen einer App.
- * `achsen` sind die Feldnamen der Koordinaten eines Knotens, etwa ['y', 'z'].
+ * `achsen` sind die Feldnamen der Koordinaten eines Knotens, etwa ['y', 'z']
+ * oder ['x', 'y', 'z'].
  */
 export function cadModell({ arten, achsen, verbunden = false }) {
-  const [a, b] = achsen;
   const artVon = new Map(arten.map((x) => [x.liste, x]));
 
-  const lage = (k) => [k[a], k[b]];
+  const lage = (k) => achsen.map((x) => k[x]);
+  /** Verschiebt einen Knoten um `d`, auf einen Millionstel genau. */
+  const schieben = (k, d) => achsen.forEach((x, i) => { k[x] = rund(k[x] + d[i]); });
 
   /** Jedes Element mit seiner Art. */
   function* elemente(z) {
@@ -113,7 +121,7 @@ export function cadModell({ arten, achsen, verbunden = false }) {
     return liste;
   }
 
-  /** Kennung -> [a, b] aller Knoten. */
+  /** Kennung -> Lage aller Knoten. */
   function lagen(z) {
     return new Map((z.knoten || []).map((k) => [k.kennung, lage(k)]));
   }
@@ -145,12 +153,12 @@ export function cadModell({ arten, achsen, verbunden = false }) {
 
   /** Der Knoten an `p` -- angelegt, wenn es dort noch keinen gibt. */
   function knotenAn(z, p) {
-    const [u, w] = [rund(p[0]), rund(p[1])];
-    const da = (z.knoten || []).find((k) => k[a] === u && k[b] === w);
+    const wo = p.map(rund);
+    const da = (z.knoten || []).find((k) => achsen.every((x, i) => k[x] === wo[i]));
     if (da) return da.kennung;
     const kennung = naechsteKennung(z, KNOTEN);
     z.knoten = z.knoten || [];
-    z.knoten.push({ kennung, [a]: u, [b]: w });
+    z.knoten.push({ kennung, ...Object.fromEntries(achsen.map((x, i) => [x, wo[i]])) });
     return kennung;
   }
 
@@ -184,7 +192,7 @@ export function cadModell({ arten, achsen, verbunden = false }) {
   function zusammenfuehren(z) {
     const orte = new Map();
     for (const k of z.knoten || []) {
-      const schluessel = `${k[a]}|${k[b]}`;
+      const schluessel = lage(k).join('|');
       orte.set(schluessel, [...(orte.get(schluessel) || []), k.kennung]);
     }
     const weg = new Set();
@@ -245,11 +253,7 @@ export function cadModell({ arten, achsen, verbunden = false }) {
   function verschieben(z, ziele, d) {
     if (verbunden) {
       const bewegt = bewegteKnoten(z, ziele);
-      for (const k of z.knoten || []) {
-        if (!bewegt.has(k.kennung)) continue;
-        k[a] = rund(k[a] + d[0]);
-        k[b] = rund(k[b] + d[1]);
-      }
+      for (const k of z.knoten || []) if (bewegt.has(k.kennung)) schieben(k, d);
       zusammenfuehren(z);
       return;
     }
@@ -274,10 +278,7 @@ export function cadModell({ arten, achsen, verbunden = false }) {
       ecke.forEach((x) => verweisSetzen(x.art, x.e, x.i, eigener.kennung));
       bewegt.add(eigener);
     }
-    for (const k of bewegt) {
-      k[a] = rund(k[a] + d[0]);
-      k[b] = rund(k[b] + d[1]);
-    }
+    for (const k of bewegt) schieben(k, d);
     zusammenfuehren(z);
   }
 
@@ -334,11 +335,7 @@ export function cadModell({ arten, achsen, verbunden = false }) {
     const gewaehlt = [...elemente(z)].filter(({ e }) => kennungen.has(e.kennung));
     const einzelne = (z.knoten || []).filter((k) => kennungen.has(k.kennung));
     for (let i = 1; i <= anzahl; i += 1) {
-      const versatz = [d[0] * i, d[1] * i];
-      const nach = (k) => {
-        const p = lage0.get(k);
-        return knotenAn(z, [p[0] + versatz[0], p[1] + versatz[1]]);
-      };
+      const nach = (k) => knotenAn(z, lage0.get(k).map((w, j) => w + d[j] * i));
       for (const k of einzelne) neu.push(nach(k.kennung));
       for (const { art, e } of gewaehlt) {
         const kopie = structuredClone(e);
@@ -361,29 +358,68 @@ export function cadModell({ arten, achsen, verbunden = false }) {
 }
 
 // ===========================================================================
-// Ebene Geometrie, nur zum Treffen und Fangen
+// Geometrie, nur zum Treffen und Fangen -- in der Zeichnung mit jeder Zahl
+// von Achsen, im Bild mit zweien
 // ===========================================================================
 
+/** Das Skalarprodukt zweier Vektoren. */
+export function skalar(p, q) {
+  return p.reduce((s, x, i) => s + x * q[i], 0);
+}
+
+/** p − q. */
+export function minus(p, q) {
+  return p.map((x, i) => x - q[i]);
+}
+
+/** Der Punkt `durch + t · r`. */
+export function entlang(durch, r, t) {
+  return durch.map((x, i) => x + t * r[i]);
+}
+
 export function abstand(p, q) {
-  return Math.hypot(p[0] - q[0], p[1] - q[1]);
+  return Math.hypot(...minus(p, q));
+}
+
+/** Die Mitte zwischen p und q. */
+export function mitte(p, q) {
+  return p.map((x, i) => (x + q[i]) / 2);
 }
 
 /** Der nächste Punkt auf der Strecke s-e -- und wie weit er entlang liegt (0 bis 1). */
 export function aufStrecke(p, s, e) {
-  const [dy, dz] = [e[0] - s[0], e[1] - s[1]];
-  const l2 = dy * dy + dz * dz;
-  const t = l2 ? Math.max(0, Math.min(1, ((p[0] - s[0]) * dy + (p[1] - s[1]) * dz) / l2)) : 0;
-  return { q: [s[0] + t * dy, s[1] + t * dz], t };
+  const r = minus(e, s);
+  const l2 = skalar(r, r);
+  const t = l2 ? Math.max(0, Math.min(1, skalar(minus(p, s), r) / l2)) : 0;
+  return { q: entlang(s, r, t), t };
 }
 
 /** Der Fusspunkt von p auf der Geraden durch `durch` in Richtung `r` (ohne Grenzen). */
 export function aufGerade(p, durch, r) {
-  const l2 = r[0] * r[0] + r[1] * r[1] || 1;
-  const t = ((p[0] - durch[0]) * r[0] + (p[1] - durch[1]) * r[1]) / l2;
-  return [durch[0] + t * r[0], durch[1] + t * r[1]];
+  return entlang(durch, r, skalar(minus(p, durch), r) / (skalar(r, r) || 1));
 }
 
-/** Wo sich zwei Strecken schneiden -- oder null. Berührung an den Enden zählt. */
+/**
+ * Wo sich zwei Strecken treffen -- oder null, auch wenn sie parallel sind:
+ * die Stelle, an der sie sich am nächsten kommen, wenn sie dort
+ * zusammenfallen. In der Ebene ist das der Schnittpunkt; im Raum gehen
+ * zwei Strecken meist aneinander vorbei. Berührung an den Enden zählt.
+ */
+export function kreuzung([p1, p2], [q1, q2]) {
+  const r = minus(p2, p1);
+  const s = minus(q2, q1);
+  const w = minus(p1, q1);
+  const [rr, rs, ss, rw, sw] = [skalar(r, r), skalar(r, s), skalar(s, s), skalar(r, w), skalar(s, w)];
+  const nenner = rr * ss - rs * rs;
+  if (nenner <= 1e-24) return null;
+  const t = (rs * sw - ss * rw) / nenner;
+  const u = (rr * sw - rs * rw) / nenner;
+  if (t < -1e-9 || t > 1 + 1e-9 || u < -1e-9 || u > 1 + 1e-9) return null;
+  const p = entlang(p1, r, t);
+  return abstand(p, entlang(q1, s, u)) <= 1e-6 ? p : null;
+}
+
+/** Wo sich zwei Strecken im Bild schneiden -- oder null. Berührung an den Enden zählt. */
 export function schnitt([p1, p2], [q1, q2]) {
   const r = [p2[0] - p1[0], p2[1] - p1[1]];
   const s = [q2[0] - q1[0], q2[1] - q1[1]];

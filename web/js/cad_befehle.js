@@ -31,7 +31,9 @@
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
-import { abstand, aufStrecke, eckeSchluessel } from './cad_modell.js';
+import {
+  abstand, aufStrecke, eckeSchluessel, entlang, minus,
+} from './cad_modell.js';
 import { svgEl } from './dom.js';
 import { NAEHE } from './cad_eingabe.js';
 
@@ -41,11 +43,10 @@ function zettel(g, [x, y], zeilen) {
 }
 
 function streckenzettel(a, g, p, q) {
-  const [x, y] = a.adapter.achsen;
   const s = a.einstellung.stellen;
   zettel(g, nachBild(a.v, q), [
     `L = ${zahlText(abstand(p, q), s)}`,
-    `Δ${x} = ${zahlText(q[0] - p[0], s)}  Δ${y} = ${zahlText(q[1] - p[1], s)}`,
+    a.adapter.achsen.map((x, i) => `Δ${x} = ${zahlText(q[i] - p[i], s)}`).join('  '),
   ]);
 }
 
@@ -319,7 +320,7 @@ function bewegungsBefehl(kopie) {
         this.basisSetzen(a, erg.p);
         return;
       }
-      const d = [erg.p[0] - this.basis[0], erg.p[1] - this.basis[1]];
+      const d = minus(erg.p, this.basis);
       const auswahl = new Set(a.auswahl);
       let ergebnis = null;
       a.aendern((z) => {
@@ -337,11 +338,11 @@ function bewegungsBefehl(kopie) {
     vorschau(a, g) {
       const f = a.zeiger?.fang;
       if (!this.basis || !f) return;
-      const d = [f.p[0] - this.basis[0], f.p[1] - this.basis[1]];
+      const d = minus(f.p, this.basis);
       const formen = auswahlGeometrie(a, kopie);
       const n = kopie ? Math.max(1, Math.round(this.anzahl) || 1) : 1;
       for (let i = 1; i <= n; i += 1) {
-        const schieben = ([p, mit]) => (mit ? [p[0] + d[0] * i, p[1] + d[1] * i] : p);
+        const schieben = ([p, mit]) => (mit ? entlang(p, d, i) : p);
         for (const { form, ecken } of formen) {
           if (form === 'punkt') {
             const [x, y] = nachBild(a.v, schieben(ecken[0]));
@@ -373,8 +374,8 @@ export const kopierenBefehl = () => bewegungsBefehl(true);
 // ===========================================================================
 
 /**
- * Die Kante des Elements `kennung`, die `p` am nächsten liegt: ihr Index und
- * der Punkt auf ihr. Bei einer Linie ist es die Linie selbst.
+ * Die Kante des Elements `kennung`, die `p` im Bild am nächsten liegt: ihr
+ * Index und der Punkt auf ihr. Bei einer Linie ist es die Linie selbst.
  */
 function naechsteKante(a, z, kennung, p) {
   const da = a.modell.verzeichnis(z).get(kennung);
@@ -384,11 +385,12 @@ function naechsteKante(a, z, kennung, p) {
   if (orte.some((x) => !x)) return null;
   const kanten = da.art.form === 'linie' ? [[orte[0], orte[1]]]
     : orte.map((x, i) => [x, orte[(i + 1) % orte.length]]);
+  const bild = nachBild(a.v, p);
   let beste = null;
   kanten.forEach(([s, t], i) => {
-    const { q } = aufStrecke(p, s, t);
-    const d = abstand(p, q);
-    if (!beste || d < beste.d) beste = { i, q, d, s, t };
+    const { q: imBild, t: anteil } = aufStrecke(bild, nachBild(a.v, s), nachBild(a.v, t));
+    const d = abstand(bild, imBild);
+    if (!beste || d < beste.d) beste = { i, q: entlang(s, minus(t, s), anteil), d, s, t };
   });
   return { ...beste, ...da };
 }

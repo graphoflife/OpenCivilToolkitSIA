@@ -15,10 +15,10 @@
  *              absolut, oder Länge und Winkel. Enter setzt den Punkt genau
  *              dorthin -- getippte Werte werden nicht gefangen.
  *   Y / Z      binden an die Achse durch den Bezugspunkt (die Buchstaben
- *              kommen von der App). Getippt wird dann nur der Abstand. Ein
- *              Punkt unter dem Zeiger wird gefangen und auf die Achse
- *              projiziert: das Fangzeichen steht an ihm, eine gestrichelte
- *              Spur führt zum Punkt auf der Achse.
+ *              kommen von der App, im Raum X, Y und Z). Getippt wird dann
+ *              nur der Abstand. Ein Punkt unter dem Zeiger wird gefangen
+ *              und auf die Achse projiziert: das Fangzeichen steht an ihm,
+ *              eine gestrichelte Spur führt zum Punkt auf der Achse.
  *   P / S      parallel oder senkrecht: danach eine Linie anklicken. Die
  *              Bindung läuft durch den Bezugspunkt; ein gefangener Punkt wird
  *              auf sie projiziert.
@@ -29,13 +29,21 @@
  * Gelesen wird die Taste selbst (`e.key`), nicht ihre Lage: auf der
  * Schweizer Tastatur liegen Y und Z vertauscht.
  *
+ * IM BILD:
+ * Was nah ist, misst sich im Bild, in Bildpunkten -- auch im Raum, wo ein
+ * Knoten weit hinten neben einem vorne liegen kann. Ein Punkt auf einer
+ * Strecke oder Geraden entsteht aus dem Anteil, bei dem er im Bild liegt;
+ * die Projektion ist parallel, also liegt er in der Zeichnung beim selben.
+ * Im Raum ohne einen Knoten oder eine Linie unter dem Zeiger: der Punkt der
+ * Arbeitsebene, den man dort sieht (cad_ansicht.js).
+ *
  * Das ist Eingabehilfe, keine Rechnung: in die Rechnung geht nur der Punkt,
  * der am Ende dasteht.
  */
 
-import { nachBild, nachWelt } from './cad_ansicht.js';
+import { nachBild, nachWelt, richtungImBild } from './cad_ansicht.js';
 import {
-  abstand, aufGerade, aufStrecke, rund, schnitt,
+  abstand, aufGerade, aufStrecke, entlang, kreuzung, minus, mitte, rund, skalar,
 } from './cad_modell.js';
 import { svgEl } from './dom.js';
 
@@ -50,20 +58,21 @@ export const NAEHE = 9;
  */
 export const FANGWEITE = 12;
 
-export function eingabeNeu() {
+/** Eine leere Eingabe, für eine Zeichnung mit `achsen` Achsen. */
+export function eingabeNeu(achsen = 2) {
   return {
-    bezug: null,         // [a, b] -- Bezugspunkt für Getipptes und Bindungen
-    bindung: null,       // {art: 'achse'|'parallel'|'senkrecht', r: [da, db], text}
+    bezug: null,         // ein Punkt -- Bezugspunkt für Getipptes und Bindungen
+    bindung: null,       // {art: 'achse'|'parallel'|'senkrecht', r: Richtung, achse?: Index, text}
     warten: null,        // 'parallel' | 'senkrecht' | {art: 'mitte', erster}
     modus: 'rel',        // 'rel' | 'abs' | 'polar'
-    felder: ['', ''],    // was getippt ist
+    felder: Array(achsen).fill(''), // was getippt ist, je Achse ein Feld
     runde: 0,            // zählt mit, wenn die Felder geleert werden -- dann neu bauen
   };
 }
 
 /** Leert die Felder -- auch die im schwebenden Fenster, das daran sieht, dass `runde` weiterzählt. */
 export function felderLeeren(pe) {
-  pe.felder = ['', ''];
+  pe.felder = pe.felder.map(() => '');
   pe.runde += 1;
 }
 
@@ -103,11 +112,11 @@ export function ziele(a) {
       }));
     }
   }
-  const mitten = strecken.map((st) => ({ p: [(st.s[0] + st.e[0]) / 2, (st.s[1] + st.e[1]) / 2], st }));
+  const mitten = strecken.map((st) => ({ p: mitte(st.s, st.e), st }));
   const schnitte = [];
   for (let i = 0; i < strecken.length; i += 1) {
     for (let j = i + 1; j < strecken.length; j += 1) {
-      const p = schnitt([strecken[i].s, strecken[i].e], [strecken[j].s, strecken[j].e]);
+      const p = kreuzung([strecken[i].s, strecken[i].e], [strecken[j].s, strecken[j].e]);
       // Gemeinsame Enden sind Knoten, keine Schnittpunkte.
       if (p && ![strecken[i].s, strecken[i].e].some((q) => abstand(p, q) < 1e-6)) {
         schnitte.push({ p });
@@ -127,9 +136,65 @@ export function ziele(a) {
 const ras = (w, r) => Math.round(w / r) * r;
 
 /** Die Gerade der Bindung: durch den Bezugspunkt, in ihrer Richtung. */
-function bindungsgerade(pe) {
+function bindungsgerade(a) {
+  const pe = a.eingabe;
   if (!pe.bindung) return null;
-  return { durch: pe.bezug || [0, 0], r: pe.bindung.r };
+  return { durch: pe.bezug || pe.felder.map(() => 0), r: pe.bindung.r };
+}
+
+/** Die Richtung einer Achse -- 1 in ihr, 0 in den anderen. */
+export function achsrichtung(n, i) {
+  return Array.from({ length: n }, (_, j) => (j === i ? 1 : 0));
+}
+
+/**
+ * Die Stelle auf einer Geraden, die der Bildpunkt trifft: der Abstand ab
+ * `durch` in Einheiten der Zeichnung, entlang der Richtung `r` (Länge 1).
+ * Zeigt die Gerade genau auf den Betrachter, ist es null.
+ */
+function stelleAufGerade(a, bild, { durch, r }) {
+  const d = richtungImBild(a.v, r);
+  const l2 = d[0] * d[0] + d[1] * d[1];
+  if (l2 < 1e-12) return 0;
+  const p = nachBild(a.v, durch);
+  return ((bild[0] - p[0]) * d[0] + (bild[1] - p[1]) * d[1]) / l2;
+}
+
+/** Eine Richtung auf die Länge 1. */
+function einheit(r) {
+  const l = Math.hypot(...r) || 1;
+  return r.map((x) => x / l);
+}
+
+/**
+ * Shift: die Achse durch den Bezugspunkt, die im Bild am ehesten dorthin
+ * zeigt, wo der Zeiger steht -- in der Ebene waagrecht oder senkrecht.
+ */
+function geradeRichtung(a, bild) {
+  const p = nachBild(a.v, a.eingabe.bezug);
+  const zum = [bild[0] - p[0], bild[1] - p[1]];
+  const n = a.eingabe.bezug.length;
+  let beste = null;
+  for (let i = 0; i < n; i += 1) {
+    const d = richtungImBild(a.v, achsrichtung(n, i));
+    const l = Math.hypot(...d);
+    const passt = l > 1e-9 ? Math.abs(zum[0] * d[0] + zum[1] * d[1]) / l : -1;
+    if (!beste || passt > beste.passt) beste = { i, passt };
+  }
+  return achsrichtung(n, beste.i);
+}
+
+/** Der Punkt aufs Raster -- im Raum nur in der Arbeitsebene; ihre Lage bleibt, wie sie ist. */
+function aufsRaster(a, p) {
+  const ebene = a.v.ebene;
+  return p.map((w, i) => (ebene && i === ebene.achse ? ebene.lage : ras(w, a.raster)));
+}
+
+/** In welcher Achse allein sich eine Strecke ändert -- oder -1. */
+function achsparallel(s, e) {
+  const d = minus(e, s);
+  const frei = d.map((x, i) => (Math.abs(x) < 1e-9 ? -1 : i)).filter((i) => i >= 0);
+  return frei.length === 1 ? frei[0] : -1;
 }
 
 /**
@@ -140,17 +205,13 @@ function bindungsgerade(pe) {
 export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   const v = a.v;
   const pe = a.eingabe;
-  let welt = nachWelt(v, bild);
-  const weit = NAEHE / v.massstab;
-  const punktweit = FANGWEITE / v.massstab;
+  const welt = nachWelt(v, bild);
+  const imBild = (p) => nachBild(v, p);
   const ohneFang = frei || !a.fang;
-  let linie = bindungsgerade(pe);
+  let linie = bindungsgerade(a);
 
-  // Shift: waagrecht oder senkrecht zum Bezugspunkt, solange gedrückt.
-  if (!linie && gerade && pe.bezug) {
-    const waagrecht = Math.abs(welt[0] - pe.bezug[0]) >= Math.abs(welt[1] - pe.bezug[1]);
-    linie = { durch: pe.bezug, r: waagrecht ? [1, 0] : [0, 1] };
-  }
+  // Shift: entlang einer Achse durch den Bezugspunkt, solange gedrückt.
+  if (!linie && gerade && pe.bezug) linie = { durch: pe.bezug, r: geradeRichtung(a, bild) };
 
   const z = ohneFang ? null : ziele(a);
   // Was die App dazu fangen lässt (der Schwerpunkt), je Mal neu: es kommt
@@ -162,8 +223,8 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   const naechster = (liste) => {
     let bester = null;
     for (const x of liste) {
-      const d = abstand(welt, x.p);
-      if (d <= punktweit && (!bester || d < bester.d)) bester = { ...x, d };
+      const d = abstand(bild, imBild(x.p));
+      if (d <= FANGWEITE && (!bester || d < bester.d)) bester = { ...x, d };
     }
     return bester;
   };
@@ -182,13 +243,11 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
       return { p: aufGerade(punkt.p, linie.durch, linie.r), art: 'projiziert',
         von: { p: punkt.p, art: punkt.art } };
     }
-    const fuss = aufGerade(welt, linie.durch, linie.r);
-    if (ohneFang) return { p: fuss, art: 'frei' };
+    const r = einheit(linie.r);
+    const t = stelleAufGerade(a, bild, { durch: linie.durch, r });
+    if (ohneFang) return { p: entlang(linie.durch, r, t), art: 'frei' };
     // Der Abstand ab dem Bezugspunkt aufs Raster.
-    const l = Math.hypot(linie.r[0], linie.r[1]) || 1;
-    const t = ((fuss[0] - linie.durch[0]) * linie.r[0] + (fuss[1] - linie.durch[1]) * linie.r[1]) / l;
-    const tr = ras(t, a.raster);
-    return { p: [linie.durch[0] + (tr * linie.r[0]) / l, linie.durch[1] + (tr * linie.r[1]) / l], art: 'raster' };
+    return { p: entlang(linie.durch, r, ras(t, a.raster)), art: 'raster' };
   }
 
   if (ohneFang) return { p: welt, art: 'frei' };
@@ -199,46 +258,65 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   if (pe.bezug) {
     let lot = null;
     for (const st of z.strecken) {
-      const r = [st.e[0] - st.s[0], st.e[1] - st.s[1]];
-      const l2 = r[0] * r[0] + r[1] * r[1];
+      const r = minus(st.e, st.s);
+      const l2 = skalar(r, r);
       if (!l2) continue;
-      const t = ((pe.bezug[0] - st.s[0]) * r[0] + (pe.bezug[1] - st.s[1]) * r[1]) / l2;
+      const t = skalar(minus(pe.bezug, st.s), r) / l2;
       if (t <= 1e-9 || t >= 1 - 1e-9) continue;
-      const fuss = [st.s[0] + t * r[0], st.s[1] + t * r[1]];
-      const d = abstand(welt, fuss);
-      if (d <= weit && abstand(fuss, pe.bezug) > 1e-9 && (!lot || d < lot.d)) lot = { p: fuss, d };
+      const fuss = entlang(st.s, r, t);
+      const d = abstand(bild, imBild(fuss));
+      if (d <= NAEHE && abstand(fuss, pe.bezug) > 1e-9 && (!lot || d < lot.d)) lot = { p: fuss, d };
     }
     if (lot) return { p: lot.p, art: 'lot' };
   }
 
   let bester = null;
   for (const st of z.strecken) {
-    const { q } = aufStrecke(welt, st.s, st.e);
-    const d = abstand(welt, q);
-    if (d > weit * 0.8 || (bester && d >= bester.d)) continue;
-    // Auf einer waagrechten oder senkrechten Strecke darf die freie Richtung
-    // ans Raster -- der Punkt bleibt trotzdem genau auf ihr.
+    const { t } = aufStrecke(bild, imBild(st.s), imBild(st.e));
+    const q = entlang(st.s, minus(st.e, st.s), t);
+    const d = abstand(bild, imBild(q));
+    if (d > NAEHE * 0.8 || (bester && d >= bester.d)) continue;
+    // Auf einer Strecke entlang einer Achse darf die freie Richtung ans
+    // Raster -- der Punkt bleibt trotzdem genau auf ihr.
     let p = q;
-    if (Math.abs(st.e[1] - st.s[1]) < 1e-9) p = [ras(q[0], a.raster), st.s[1]];
-    else if (Math.abs(st.e[0] - st.s[0]) < 1e-9) p = [st.s[0], ras(q[1], a.raster)];
+    const i = achsparallel(st.s, st.e);
+    if (i >= 0) p = st.s.map((w, j) => (j === i ? ras(q[i], a.raster) : w));
     if (abstand(aufStrecke(p, st.s, st.e).q, p) > 1e-9) p = q;
     bester = { p, d, art: 'linie' };
   }
   if (bester) return { p: bester.p, art: 'linie' };
-  welt = [ras(welt[0], a.raster), ras(welt[1], a.raster)];
-  return { p: welt, art: 'raster' };
+  return { p: aufsRaster(a, welt), art: 'raster' };
+}
+
+/**
+ * Was der Zeiger gerade fängt -- während eines Befehls ist es schon
+ * gefangen, in Ruhe erst hier. Null, wenn er nicht über der Zeichnung ist.
+ */
+export function zeigerFang(a) {
+  return a.zeiger?.fang || (a.zeiger?.bild ? fangen(a, a.zeiger.bild) : null);
 }
 
 /** Die Strecke unter dem Zeiger -- für P und S, und um eine Kante zu treffen. */
 function streckeAn(a, bild) {
-  const welt = nachWelt(a.v, bild);
-  const weit = NAEHE / a.v.massstab;
   let bester = null;
   for (const st of ziele(a).strecken) {
-    const d = abstand(welt, aufStrecke(welt, st.s, st.e).q);
-    if (d <= weit && (!bester || d < bester.d)) bester = { ...st, d };
+    const [s, e] = [nachBild(a.v, st.s), nachBild(a.v, st.e)];
+    const d = abstand(bild, aufStrecke(bild, s, e).q);
+    if (d <= NAEHE && (!bester || d < bester.d)) bester = { ...st, d };
   }
   return bester;
+}
+
+/**
+ * Senkrecht zur Richtung `r`: in der Ebene um 90° gedreht, im Raum in der
+ * Arbeitsebene -- quer zu `r` und zu ihrer Normalen. Null, wenn `r` auf
+ * der Arbeitsebene senkrecht steht.
+ */
+function senkrecht(a, r) {
+  if (r.length === 2) return [-r[1], r[0]];
+  const n = achsrichtung(3, a.v.ebene.achse);
+  const s = [n[1] * r[2] - n[2] * r[1], n[2] * r[0] - n[0] * r[2], n[0] * r[1] - n[1] * r[0]];
+  return Math.hypot(...s) > 1e-9 * Math.hypot(...r) ? s : null;
 }
 
 // ===========================================================================
@@ -254,8 +332,12 @@ export function klickPunkt(a, bild, e) {
   if (pe.warten === 'parallel' || pe.warten === 'senkrecht') {
     const st = streckeAn(a, bild);
     if (!st) return null;
-    let r = [st.e[0] - st.s[0], st.e[1] - st.s[1]];
-    if (pe.warten === 'senkrecht') r = [-r[1], r[0]];
+    let r = minus(st.e, st.s);
+    if (pe.warten === 'senkrecht') r = senkrecht(a, r);
+    if (!r) {
+      pe.warten = null;
+      return { fehler: 'Diese Linie steht senkrecht auf der Arbeitsebene -- darin gibt es keine Senkrechte zu ihr.' };
+    }
     pe.bindung = {
       art: pe.warten, r,
       text: `${pe.warten === 'parallel' ? '∥' : '⊥'} ${a.adapter.name(a, st.quelle) || st.quelle}`,
@@ -269,9 +351,8 @@ export function klickPunkt(a, bild, e) {
       pe.warten.erster = f.p;
       return null;
     }
-    const q = pe.warten.erster;
-    let m = [(q[0] + f.p[0]) / 2, (q[1] + f.p[1]) / 2];
-    const g = bindungsgerade(pe);
+    let m = mitte(pe.warten.erster, f.p);
+    const g = bindungsgerade(a);
     if (g) m = aufGerade(m, g.durch, g.r);
     pe.warten = null;
     return { p: m.map(rund), art: 'mitte' };
@@ -294,33 +375,45 @@ function zahl(text) {
  */
 export function getipptPunkt(a) {
   const pe = a.eingabe;
-  const [u, w] = pe.felder.map(zahl);
-  if (u === null && w === null) return null;
-  if (Number.isNaN(u) || Number.isNaN(w)) return { fehler: 'Das ist keine Zahl.' };
-  const bezug = pe.bezug || [0, 0];
-  const g = bindungsgerade(pe);
+  const werte = pe.felder.map(zahl);
+  if (werte.every((w) => w === null)) return null;
+  if (werte.some((w) => Number.isNaN(w))) return { fehler: 'Das ist keine Zahl.' };
+  const bezug = pe.bezug || werte.map(() => 0);
+  const g = bindungsgerade(a);
   if (g) {
     // Mit einer Bindung gibt es nur den Abstand entlang.
-    const l = Math.hypot(g.r[0], g.r[1]) || 1;
-    const t = u ?? 0;
-    return { p: [bezug[0] + (t * g.r[0]) / l, bezug[1] + (t * g.r[1]) / l].map(rund), art: 'getippt' };
+    return { p: entlang(bezug, einheit(g.r), werte[0] ?? 0).map(rund), art: 'getippt' };
   }
-  if (pe.modus === 'abs') return { p: [u ?? bezug[0], w ?? bezug[1]].map(rund), art: 'getippt' };
+  if (pe.modus === 'abs') return { p: werte.map((w, i) => w ?? bezug[i]).map(rund), art: 'getippt' };
   if (pe.modus === 'polar') {
-    const l = u ?? 0;
-    const winkel = ((w ?? 0) * Math.PI) / 180;
-    return { p: [bezug[0] + l * Math.cos(winkel), bezug[1] + l * Math.sin(winkel)].map(rund), art: 'getippt' };
+    // Länge und Winkel in der Ebene -- im Raum in der Arbeitsebene, ab ihrer ersten Achse.
+    const [i, j] = ebenenachsen(a);
+    const winkel = ((werte[1] ?? 0) * Math.PI) / 180;
+    const p = [...bezug];
+    p[i] += (werte[0] ?? 0) * Math.cos(winkel);
+    p[j] += (werte[0] ?? 0) * Math.sin(winkel);
+    return { p: p.map(rund), art: 'getippt' };
   }
-  return { p: [bezug[0] + (u ?? 0), bezug[1] + (w ?? 0)].map(rund), art: 'getippt' };
+  return { p: bezug.map((b, i) => b + (werte[i] ?? 0)).map(rund), art: 'getippt' };
 }
 
-/** Was die Felder gerade heissen -- je nach Modus und Bindung. */
+/** Die beiden Achsen, in denen gezeichnet wird -- in der Ebene beide, im Raum die der Arbeitsebene. */
+export function ebenenachsen(a) {
+  const n = a.adapter.achsen.length;
+  const quer = a.v.ebene ? a.v.ebene.achse : -1;
+  return Array.from({ length: n }, (_, i) => i).filter((i) => i !== quer).slice(0, 2);
+}
+
+/**
+ * Was die Felder gerade heissen -- je nach Modus und Bindung. Ein Feld, das
+ * nicht gebraucht wird, heisst null.
+ */
 export function feldnamen(a) {
-  const [x, y] = a.adapter.achsen;
-  if (a.eingabe.bindung) return ['Abstand', null];
-  return {
-    rel: [`Δ${x}`, `Δ${y}`], abs: [x, y], polar: ['L', 'α'],
-  }[a.eingabe.modus];
+  const achsen = a.adapter.achsen;
+  const ohne = (namen) => achsen.map((_, i) => namen[i] ?? null);
+  if (a.eingabe.bindung) return ohne(['Abstand']);
+  if (a.eingabe.modus === 'polar') return ohne(['L', 'α']);
+  return a.eingabe.modus === 'rel' ? achsen.map((x) => `Δ${x}`) : [...achsen];
 }
 
 /**
@@ -330,8 +423,9 @@ export function feldnamen(a) {
  */
 export function feldeinheiten(a) {
   const e = a.einstellung.einheit;
-  if (a.eingabe.bindung) return [e, null];
-  return a.eingabe.modus === 'polar' ? [e, '°'] : [e, e];
+  const namen = feldnamen(a);
+  if (a.eingabe.modus === 'polar' && !a.eingabe.bindung) return namen.map((n, i) => (n ? [e, '°'][i] : null));
+  return namen.map((n) => (n ? e : null));
 }
 
 // ===========================================================================
@@ -345,10 +439,23 @@ export function feldeinheiten(a) {
 export function taste(a, e) {
   const pe = a.eingabe;
   const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-  const [achse1, achse2] = a.adapter.achsen.map((x) => x.toLowerCase());
   const anBezug = () => {
     if (!pe.bezug && a.zeiger?.fang) pe.bezug = a.zeiger.fang.p.map(rund);
   };
+  const achse = a.adapter.achsen.findIndex((x) => x.toLowerCase() === k);
+  if (achse >= 0) {
+    if (pe.bindung?.art === 'achse' && pe.bindung.achse === achse) {
+      pe.bindung = null;
+    } else {
+      anBezug();
+      pe.bindung = {
+        art: 'achse', achse, r: achsrichtung(a.adapter.achsen.length, achse),
+        text: `entlang ${a.adapter.achsen[achse]}`,
+      };
+    }
+    felderLeeren(pe);
+    return true;
+  }
   switch (k) {
     case 'r':
       if (!a.zeiger?.fang) return false;
@@ -357,18 +464,6 @@ export function taste(a, e) {
     case 'm':
       pe.warten = { art: 'mitte', erster: null };
       return true;
-    case achse1:
-    case achse2: {
-      const r = k === achse1 ? [1, 0] : [0, 1];
-      if (pe.bindung?.art === 'achse' && pe.bindung.r[0] === r[0]) {
-        pe.bindung = null;
-      } else {
-        anBezug();
-        pe.bindung = { art: 'achse', r, text: `entlang ${k === achse1 ? a.adapter.achsen[0] : a.adapter.achsen[1]}` };
-      }
-      felderLeeren(pe);
-      return true;
-    }
     case 'p':
     case 's':
       anBezug();
@@ -412,15 +507,21 @@ const ZEICHEN = {
 export function hilfenZeichnen(a, g) {
   const v = a.v;
   const pe = a.eingabe;
-  if (pe.bindung) {
-    const durch = nachBild(v, pe.bezug || [0, 0]);
-    const r = pe.bindung.r;
-    const l = Math.hypot(r[0], -r[1]) || 1;
+  const gerade = bindungsgerade(a);
+  if (gerade) {
+    const durch = nachBild(v, gerade.durch);
+    const r = richtungImBild(v, gerade.r);
+    const l = Math.hypot(...r);
     const lang = Math.hypot(v.breite, v.hoehe);
-    const [dx, dy] = [(r[0] / l) * lang, (-r[1] / l) * lang];
-    g.append(svgEl('path', {
-      d: `M${durch[0] - dx} ${durch[1] - dy} L${durch[0] + dx} ${durch[1] + dy}`, class: 'cad-bindung',
-    }));
+    // Zeigt die Gerade auf den Betrachter, ist sie im Bild ein Punkt.
+    if (l > 1e-9) {
+      const [dx, dy] = [(r[0] / l) * lang, (r[1] / l) * lang];
+      g.append(svgEl('path', {
+        d: `M${durch[0] - dx} ${durch[1] - dy} L${durch[0] + dx} ${durch[1] + dy}`, class: 'cad-bindung',
+      }));
+    } else {
+      g.append(svgEl('circle', { cx: durch[0], cy: durch[1], r: 6, class: 'cad-bindung' }));
+    }
   }
   if (pe.bezug && a.befehl) {
     const [x, y] = nachBild(v, pe.bezug);

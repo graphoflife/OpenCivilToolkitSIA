@@ -35,8 +35,9 @@ import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
 import {
-  cadApp, cadBereichMitListe, cadZeile, lagefelder, listeZeichnen, mitTitel, umrissVon,
+  cadApp, cadBereichMitListe, lagefelder, listeZeichnen, mitTitel, umrissVon,
 } from './cad_app.js';
+import { cadZeile } from './cad_palette.js';
 import {
   abstand, auswahlTeil, eckeSchluessel, knotenname,
 } from './cad_modell.js';

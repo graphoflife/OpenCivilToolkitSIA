@@ -22,18 +22,41 @@
  * gibt es keine Ecken: an einem Knoten wird der Knoten gewählt, und ein
  * Rahmen nimmt die Knoten darin. Was der Adapter nicht wählbar nennt
  * (`waehlbar`), trifft weder Klick noch Rahmen.
+ *
+ * Getroffen wird im Bild, in Bildpunkten -- im Raum trifft ein Klick, was
+ * man an dieser Stelle sieht, vorne oder hinten.
  */
 
-import { nachBild, nachWelt } from './cad_ansicht.js';
+import { nachBild, pfad } from './cad_ansicht.js';
 import {
   abstand, auswahlTeil, aufStrecke, flaecheVon, innen, schnitt,
 } from './cad_modell.js';
 import { NAEHE } from './cad_eingabe.js';
-import { el } from './dom.js';
+import { el, svgEl } from './dom.js';
 
 /** Die Elemente, um die es gerade geht: die gewählten, und wem eine gewählte Ecke gehört. */
 export function imSpiel(a) {
   return new Set([...a.auswahl].map((s) => auswahlTeil(s).kennung));
+}
+
+/** Ob ein Schlüssel der Auswahl einen Anhang meint -- eine Last, kein Element. */
+export function istAnhang(a, schluessel) {
+  return Boolean(a.adapter.anhaenge?.hat(a.adapter.zeichnung(), auswahlTeil(schluessel).kennung));
+}
+
+/**
+ * Vor dem Verschieben und Kopieren: die Auswahl ohne Anhänge -- sie gehen mit
+ * ihrem Element, und eine Last an einem Knoten nähme sonst den Knoten mit.
+ * Gibt zurück, ob danach etwas gewählt ist.
+ */
+export function ohneAnhaenge(a) {
+  a.auswahl = new Set([...a.auswahl].filter((s) => !istAnhang(a, s)));
+  return a.auswahl.size > 0;
+}
+
+/** Wo die Knoten im Bild liegen: Kennung -> [x, y] in Bildpunkten. */
+function bildlagen(a, z) {
+  return new Map([...a.modell.lagen(z)].map(([k, p]) => [k, nachBild(a.v, p)]));
 }
 
 /**
@@ -52,9 +75,7 @@ export function treffer(a, bild) {
   const z = a.adapter.zeichnung();
   const m = a.modell;
   const waehlbar = (art, e) => a.adapter.waehlbar?.(art, e) ?? true;
-  const lagen = m.lagen(z);
-  const welt = nachWelt(a.v, bild);
-  const weit = NAEHE / a.v.massstab;
+  const lagen = bildlagen(a, z);
   const spiel = imSpiel(a);
   const rang = (x) => x.art.rang ?? m.arten.indexOf(x.art);
   const nummer = (x) => Number(String(x.e.kennung).replace(/^\D+/, '')) || 0;
@@ -66,8 +87,8 @@ export function treffer(a, bild) {
     if (waehlbar(x.art, x.e)) an.set(x.knoten, [...(an.get(x.knoten) || []), x]);
   }
   const liste = [];
-  const nahe = (z.knoten || []).map((k) => ({ k, d: abstand(welt, m.lage(k)) }))
-    .filter((x) => x.d <= weit).sort((p, q) => p.d - q.d);
+  const nahe = (z.knoten || []).map((k) => ({ k, d: abstand(bild, lagen.get(k.kennung)) }))
+    .filter((x) => x.d <= NAEHE).sort((p, q) => p.d - q.d);
   for (const { k } of nahe) {
     const ecken = an.get(k.kennung) || [];
     // Ein Knoten, an dem nichts hängt, ist selbst zu wählen -- in einer
@@ -87,17 +108,18 @@ export function treffer(a, bild) {
   const punkte = [];
   const linien = [];
   const flaechen = [];
+  // Der Radius, in dem ein Element trifft -- die App gibt ihn in Einheiten der Zeichnung.
+  const radius = (art, e) => Math.max(NAEHE, (a.adapter.trefferradius?.(a, art, e) || 0) * a.v.massstab);
   for (const { art, e } of m.elemente(z)) {
     const orte = m.verweise(art, e).map((k) => lagen.get(k));
     if (orte.some((p) => !p) || !waehlbar(art, e)) continue;
     if (art.form === 'punkt') {
-      const r = Math.max(weit, a.adapter.trefferradius?.(a, art, e) || 0);
-      const d = abstand(welt, orte[0]);
-      if (d <= r) punkte.push({ kennung: e.kennung, d });
+      const d = abstand(bild, orte[0]);
+      if (d <= radius(art, e)) punkte.push({ kennung: e.kennung, d });
     } else if (art.form === 'linie') {
-      const d = abstand(welt, aufStrecke(welt, orte[0], orte[1]).q);
-      if (d <= Math.max(weit, a.adapter.trefferradius?.(a, art, e) || 0)) linien.push({ kennung: e.kennung, d });
-    } else if (orte.length >= 3 && innen(welt, orte)) {
+      const d = abstand(bild, aufStrecke(bild, orte[0], orte[1]).q);
+      if (d <= radius(art, e)) linien.push({ kennung: e.kennung, d });
+    } else if (orte.length >= 3 && innen(bild, orte)) {
       flaechen.push({ kennung: e.kennung, d: Math.abs(flaecheVon(orte)) });
     }
   }
@@ -167,15 +189,15 @@ function streckeImRechteck(p, q, [y0, z0, y1, z1], ganz) {
  * genau aufeinander liegen. So zieht man die rechte Kante eines
  * Querschnitts samt allem, was dort endet, mit einem Rahmen auf. Nach links
  * gezogen jedes Element, das er schneidet. Dazu freie Knoten im Rahmen.
+ * Alles im Bild.
  */
 export function rahmenWaehlen(a, start, ende, dazu) {
   const ganz = ende[0] >= start[0];
-  const p = nachWelt(a.v, start);
-  const q = nachWelt(a.v, ende);
-  const rechteck = [Math.min(p[0], q[0]), Math.min(p[1], q[1]), Math.max(p[0], q[0]), Math.max(p[1], q[1])];
+  const rechteck = [Math.min(start[0], ende[0]), Math.min(start[1], ende[1]),
+    Math.max(start[0], ende[0]), Math.max(start[1], ende[1])];
   const z = a.adapter.zeichnung();
   const m = a.modell;
-  const lagen = m.lagen(z);
+  const lagen = bildlagen(a, z);
   const neu = new Set(dazu ? a.auswahl : []);
   if (!dazu) a.anker = null;
   const ganzDrin = new Set();
@@ -206,9 +228,53 @@ export function rahmenWaehlen(a, start, ende, dazu) {
   // Freie Knoten im Rahmen -- in einer verbundenen Zeichnung jeder.
   const benutzung = m.benutzung(z);
   for (const k of z.knoten || []) {
-    if ((verbunden || !benutzung.get(k.kennung)) && drin(m.lage(k))) neu.add(k.kennung);
+    if ((verbunden || !benutzung.get(k.kennung)) && drin(lagen.get(k.kennung))) neu.add(k.kennung);
   }
   a.auswahl = neu;
+}
+
+/**
+ * Die Auswahl, hervorgehoben: über dem Modell, unter dem Zeiger. Eine
+ * gewählte Ecke als volles Quadrat, und dünn gestrichelt das Element, dem
+ * sie gehört -- so sieht man, wessen Ecke es ist, wo mehrere aufeinander
+ * liegen.
+ */
+export function hervorheben(a, kennungen, klasse) {
+  const g = svgEl('g', { class: klasse });
+  if (!kennungen.size) return g;
+  const z = a.adapter.zeichnung();
+  const m = a.modell;
+  const lagen = m.lagen(z);
+  const quadrat = (p, extra = '') => {
+    const [x, y] = nachBild(a.v, p);
+    return svgEl('rect', { x: x - 4.5, y: y - 4.5, width: 9, height: 9, class: extra });
+  };
+  for (const k of z.knoten || []) if (kennungen.has(k.kennung)) g.append(quadrat(m.lage(k)));
+  const eigner = new Set();
+  for (const x of m.ecken(z)) {
+    const p = lagen.get(x.knoten);
+    if (!p || x.art.form === 'punkt' || !kennungen.has(x.schluessel)) continue;
+    g.append(quadrat(p, 'cad-ecke'));
+    eigner.add(x.e.kennung);
+  }
+  for (const { art, e } of m.elemente(z)) {
+    const ganz = kennungen.has(e.kennung);
+    if (!ganz && !eigner.has(e.kennung)) continue;
+    const orte = m.verweise(art, e).map((k) => lagen.get(k));
+    if (orte.some((p) => !p)) continue;
+    if (!ganz) {
+      g.prepend(svgEl('path', { d: pfad(a.v, orte, art.form === 'flaeche'), class: 'cad-eigner' }));
+      continue;
+    }
+    if (art.form === 'punkt') {
+      const [x, y] = nachBild(a.v, orte[0]);
+      const r = Math.max(5, (a.adapter.trefferradius?.(a, art, e) || 0) * a.v.massstab + 3);
+      g.append(svgEl('circle', { cx: x, cy: y, r }));
+    } else {
+      g.append(svgEl('path', { d: pfad(a.v, orte, art.form === 'flaeche') }));
+    }
+  }
+  return g;
 }
 
 /** Wo die Auswahl im Bild liegt -- [x0, y0, x1, y1] oder null. */
