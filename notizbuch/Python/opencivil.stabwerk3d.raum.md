@@ -1,5 +1,5 @@
 ---
-erzeugt: a26f3deca105
+erzeugt: 772bbcc8af3d
 art: modul
 tags: [modul]
 ---
@@ -131,6 +131,9 @@ Ob sich die Strecken p1-p2 und q1-q2 im Innern beider treffen.
 
 ## Gebraucht von
 
+- [[opencivil.projekt.aufbau.balkensystem3d]]
+- [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.stab]]
 - [[opencivil.stabwerk3d.system]]

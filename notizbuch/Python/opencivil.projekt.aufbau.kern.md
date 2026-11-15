@@ -1,5 +1,5 @@
 ---
-erzeugt: a227036b52df
+erzeugt: 1ea938d4712b
 art: modul
 tags: [modul]
 ---
@@ -432,6 +432,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: b64cfdd212ff
+erzeugt: d4c74d67142c
 art: modul
 tags: [modul]
 ---
@@ -75,6 +75,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 
 - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
 - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
+- [[opencivil.projekt.balkensystem3d]] – ein 3D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».
 - [[opencivil.projekt.decke]] – eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
@@ -89,6 +90,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
+- [[opencivil.projekt.staebe]] – der Baukasten eines Stabwerks, eben und im Raum.
 
 ## Braucht
 

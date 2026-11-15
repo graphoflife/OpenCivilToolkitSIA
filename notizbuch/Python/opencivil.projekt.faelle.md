@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f0ec106f210
+erzeugt: 0a50a03da84c
 art: modul
 tags: [modul]
 ---
@@ -107,4 +107,6 @@ Die Kombination GZG eines frischen Balkensystems: jeder Lastfall mit 1.0 (Benutz
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.faelle]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]
+- [[opencivil.projekt.staebe]]

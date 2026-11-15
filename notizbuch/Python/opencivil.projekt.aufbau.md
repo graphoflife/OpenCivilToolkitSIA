@@ -1,5 +1,5 @@
 ---
-erzeugt: f87019eadbcf
+erzeugt: 4a7492959a1e
 art: modul
 tags: [modul]
 ---
@@ -58,6 +58,7 @@ in einer Datei von ueber tausend Zeilen.
 ## Module
 
 - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
+- [[opencivil.projekt.aufbau.balkensystem3d]] – ein 3D-Balkensystem wird Rechnung.
 - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
 - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
 - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
@@ -149,6 +150,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]

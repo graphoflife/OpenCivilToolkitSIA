@@ -13,23 +13,32 @@ schon gebaut sein -- darum kommt das Balkensystem in
 :data:`~opencivil.projekt.aufbau.BAUTEILE` nach ihnen. Von dort kommt auch
 das Material einer Linie «gemäss Querschnitt»: der Beton der Platte oder
 der Analyse.
+
+GETEILT MIT DEM RAUM:
+Was das 3D-Balkensystem (:mod:`~opencivil.projekt.aufbau.balkensystem3d`)
+gleich macht, steht hier und wird dort benutzt: die :class:`Uebersetzung`
+prueft Faelle und Kennungen und uebersetzt Stabfelder, Lager und Lasten;
+:func:`stabwerk_bauen` loest Materialien und Querschnitte auf;
+:func:`form_von` macht aus einer Vorlage, einem Profil oder Kennwerten von
+Hand die Form eines Querschnitts.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field, replace
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
-from opencivil.core.einheiten import Groesse
+from opencivil.core.einheiten import Einheit, Groesse
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.projekt.balkensystem import (
     EINHEIT_DER_FEDER, EINHEIT_DER_LAST, MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag,
-    Querschnittsart, StabmaterialEintrag, StabquerschnittEintrag,
+    Profilachse, Querschnittsart, StabmaterialEintrag, StabquerschnittEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler
+from opencivil.projekt.staebe import StabquerschnittBasis
 from opencivil.spannungsanalyse.modul import ModulAusAnalyse, ModulAusPlatte, Modulfrage
 from opencivil.stabwerk.profiltabelle import PROFILE
-from opencivil.stabwerk.rechnung import Balkensystem, Stabmaterial
+from opencivil.stabwerk.rechnung import Balkensystem, Materialkennwert, Stabmaterial
 from opencivil.stabwerk.stabquerschnitt import (
     AusAnalyse, AusPlatte, NachVorlage, Stabquerschnitt, VonHand,
 )
@@ -70,9 +79,13 @@ class Modell:
 
 
 
-def modell_von(eintrag: BalkensystemEintrag) -> Modell:
+class Uebersetzung:
     """
-    Das Stabwerk zum Rechnen, in SI (:mod:`opencivil.stabwerk.modell`).
+    Was ein Stabwerk in der Ebene und eines im Raum gleich in SI uebersetzen
+    und pruefen: Kennungen, Faelle, Querschnitte, Paare aus Querschnitt und
+    Material, Lager, Federn, Lasten und Kombinationen -- in dieser Folge
+    melden sie, was nicht stimmt. Was der Raum anders macht, baut die
+    Funktion ``modell_von`` des Systems mit den Klassen ihres Rechenkerns.
 
     Ein Stab ohne Querschnitt oder Material -- oder mit einem Material,
     das es im System nicht gibt --, ein Querschnitt mit unmoeglichen
@@ -82,108 +95,138 @@ def modell_von(eintrag: BalkensystemEintrag) -> Modell:
     Materialien des Projekts. Eine Last, deren Lastfall es nicht gibt, und ein
     Beiwert dafuer bleiben mit einem Hinweis weg.
     """
-    meldungen: List[Meldung] = []
 
-    def melden(text: str, *elemente: str, fehler: bool = True) -> None:
-        meldungen.append(Meldung(text, tuple(elemente), fehler))
+    def __init__(self, eintrag: Any, einheit_der_feder: Mapping[str, Einheit],
+                 weitere_stoffe: Sequence[str] = ()) -> None:
+        """``weitere_stoffe``: was eine Linie als Material nehmen kann, ohne dass es im System steht."""
+        self.eintrag = eintrag
+        self.einheit_der_feder = einheit_der_feder
+        self.meldungen: List[Meldung] = list(faelle_pruefen(eintrag.lastfaelle,
+                                                            eintrag.kombinationen))
+        for was, liste in (("Knoten", eintrag.knoten), ("Linien", eintrag.linien),
+                           ("Lager", eintrag.lager), ("Lasten", eintrag.alle_lasten()),
+                           ("Materialien", eintrag.stabmaterialien),
+                           ("Querschnitte", eintrag.querschnitte),
+                           ("Lastfälle", eintrag.lastfaelle),
+                           ("Kombinationen", eintrag.kombinationen)):
+            self.meldungen.extend(doppelte_kennungen(was, liste))
+        self.querschnitte = {q.kennung: q for q in eintrag.querschnitte}
+        self.stoffe = {m.kennung for m in eintrag.stabmaterialien} | set(weitere_stoffe)
+        self.unmoeglich = set()
+        for q in eintrag.querschnitte:
+            grund = q.fehler()
+            if grund:
+                self.unmoeglich.add(q.kennung)
+                self.melden(f"Querschnitt «{q.name}»: {grund}", q.kennung,
+                            *[l.kennung for l in eintrag.linien
+                              if l.stab and l.querschnitt == q.kennung])
+        self.paare: Dict[str, Tuple[str, str]] = {}
+        self.lasten: Dict[str, List[Any]] = {lf.kennung: [] for lf in eintrag.lastfaelle}
 
-    meldungen.extend(faelle_pruefen(eintrag.lastfaelle, eintrag.kombinationen))
-    eigen = [lf for lf in eintrag.lastfaelle if lf.eigengewicht]
-    for was, liste in (("Knoten", eintrag.knoten), ("Linien", eintrag.linien),
-                       ("Lager", eintrag.lager), ("Lasten", eintrag.alle_lasten()),
-                       ("Materialien", eintrag.stabmaterialien),
-                       ("Querschnitte", eintrag.querschnitte), ("Lastfälle", eintrag.lastfaelle),
-                       ("Kombinationen", eintrag.kombinationen)):
-        meldungen.extend(doppelte_kennungen(was, liste))
+    def melden(self, text: str, *elemente: str, fehler: bool = True) -> None:
+        self.meldungen.append(Meldung(text, tuple(elemente), fehler))
 
-    def halt(art: str, k: float, feld: str, wo: str) -> Halt:
+    def halt(self, teil: Any, richtung: str) -> Halt:
+        """Wie ein Lager oder eine Linie in ``richtung`` haelt -- die Feder im Feld ``k_<richtung>``."""
+        art, k = getattr(teil, richtung), getattr(teil, f"k_{richtung}")
         if art == "frei":
             return FREI
         if art == "fest":
             return FEST
         if k <= 0.0:
-            melden(f"{wo}: eine Feder braucht eine Steifigkeit grösser als null.", wo)
+            self.melden(f"{teil.kennung}: eine Feder braucht eine Steifigkeit grösser als null.",
+                        teil.kennung)
             return FREI
-        return feder(Groesse(k, EINHEIT_DER_FEDER[feld]).si)
+        return feder(Groesse(k, self.einheit_der_feder[f"k_{richtung}"]).si)
 
-    querschnitte = {q.kennung: q for q in eintrag.querschnitte}
-    stoffe = {m.kennung for m in eintrag.stabmaterialien} | {MATERIAL_DES_QUERSCHNITTS}
-    unmoeglich = set()
-    for q in eintrag.querschnitte:
-        grund = q.fehler()
-        if grund:
-            unmoeglich.add(q.kennung)
-            melden(f"Querschnitt «{q.name}»: {grund}", q.kennung,
-                   *[l.kennung for l in eintrag.linien if l.stab and l.querschnitt == q.kennung])
-
-    staebe, paare = [], {}
-    for l in eintrag.linien:
+    def stab(self, l: Any) -> Dict[str, Any]:
+        """
+        Was ein Stab des Rechenkerns von seiner Linie hat, Linienlager
+        inbegriffen -- und, wenn sie ein Stab ist, ihr Paar aus Querschnitt
+        und Material, geprueft.
+        """
         if l.stab:
-            q = querschnitte.get(l.querschnitt)
+            q = self.querschnitte.get(l.querschnitt)
             if q is None:
-                melden(f"{l.kennung} ist ein Stab, hat aber "
-                       + (f"keinen Querschnitt «{l.querschnitt}»." if l.querschnitt
-                          else "keinen Querschnitt."), l.kennung)
-            elif q.kennung in unmoeglich:
+                self.melden(f"{l.kennung} ist ein Stab, hat aber "
+                            + (f"keinen Querschnitt «{l.querschnitt}»." if l.querschnitt
+                               else "keinen Querschnitt."), l.kennung)
+            elif q.kennung in self.unmoeglich:
                 pass
             elif not l.material:
-                melden(f"{l.kennung} ist ein Stab, hat aber kein Material.", l.kennung)
-            elif l.material not in stoffe:
-                melden(f"{l.kennung} nimmt das Material «{l.material}», das es im System "
-                       f"nicht gibt.", l.kennung)
+                self.melden(f"{l.kennung} ist ein Stab, hat aber kein Material.", l.kennung)
+            elif l.material not in self.stoffe:
+                self.melden(f"{l.kennung} nimmt das Material «{l.material}», das es im System "
+                            f"nicht gibt.", l.kennung)
             else:
-                paare[l.kennung] = (q.kennung, l.material)
-        staebe.append(Stab(
-            name=l.kennung, a=l.von, b=l.bis, traegt=l.stab,
-            gelenk_a=l.gelenk_anfang, gelenk_b=l.gelenk_ende,
-            quer=halt(l.quer, l.k_quer, "k_quer", l.kennung),
-            laengs=halt(l.laengs, l.k_laengs, "k_laengs", l.kennung)))
+                self.paare[l.kennung] = (q.kennung, l.material)
+        return dict(name=l.kennung, a=l.von, b=l.bis, traegt=l.stab,
+                    gelenk_a=l.gelenk_anfang, gelenk_b=l.gelenk_ende,
+                    **{r: self.halt(l, r) for r in self.eintrag.LINIENLAGER})
 
-    lager = [Lager(name=a.kennung, knoten=a.knoten,
-                   x=halt(a.x, a.k_x, "k_x", a.kennung),
-                   z=halt(a.z, a.k_z, "k_z", a.kennung),
-                   phi=halt(a.phi, a.k_phi, "k_phi", a.kennung))
-             for a in eintrag.lager]
+    def lager(self, klasse: type) -> List[Any]:
+        """Die Lager, je Richtung gehalten wie beschrieben."""
+        return [klasse(name=a.kennung, knoten=a.knoten,
+                       **{r: self.halt(a, r) for r in self.eintrag.LAGERFELDER})
+                for a in self.eintrag.lager]
 
-    lasten: Dict[str, List[Any]] = {lf.kennung: [] for lf in eintrag.lastfaelle}
-    for l in eintrag.linien:
-        for last in l.lasten:
-            if last.lastfall not in lasten:
-                meldungen.append(ohne_lastfall(last.kennung or l.kennung))
+    def stablasten(self, klasse: type) -> None:
+        """Die Lasten auf den Linien, in SI -- verteilt ueber die ganze Linie, einzeln an ihrer Stelle."""
+        for l in self.eintrag.linien:
+            for last in l.lasten:
+                if last.lastfall not in self.lasten:
+                    self.meldungen.append(ohne_lastfall(last.kennung or l.kennung))
+                    continue
+                einheit = EINHEIT_DER_LAST[last.art]
+                von = 0.0 if last.verteilt else last.stelle / 100.0 * self.eintrag.laenge(l)
+                self.lasten[last.lastfall].append(klasse(
+                    stab=l.kennung, art=last.art,
+                    wert_a=Groesse(last.wert_a, einheit).si,
+                    wert_b=None if last.wert_b is None else Groesse(last.wert_b, einheit).si,
+                    richtung=last.richtung, von=von, bis=None,
+                    projiziert=last.projiziert))
+
+    def knotenlasten(self, last_von: Callable[[Any, float], Any]) -> None:
+        """Die Lasten an den Knoten -- ``last_von`` macht aus einer und ihrem Wert in SI die des Rechenkerns."""
+        for p in self.eintrag.knotenlasten:
+            if p.lastfall not in self.lasten:
+                self.meldungen.append(ohne_lastfall(p.kennung))
                 continue
-            einheit = EINHEIT_DER_LAST[last.art]
-            # Verteilt ueber die ganze Linie, einzeln an ihrer Stelle.
-            von = 0.0 if last.verteilt else last.stelle / 100.0 * eintrag.laenge(l)
-            lasten[last.lastfall].append(Stablast(
-                stab=l.kennung, art=last.art,
-                wert_a=Groesse(last.wert_a, einheit).si,
-                wert_b=None if last.wert_b is None else Groesse(last.wert_b, einheit).si,
-                richtung=last.richtung, von=von, bis=None,
-                projiziert=last.projiziert))
-    for p in eintrag.knotenlasten:
-        if p.lastfall not in lasten:
-            meldungen.append(ohne_lastfall(p.kennung))
-            continue
-        wert = Groesse(p.wert, EINHEIT_DER_LAST[p.art]).si
-        if p.art == "moment":
-            last = Knotenlast(p.knoten, M=wert)
-        elif p.richtung is Lastrichtung.WAAGRECHT:
-            last = Knotenlast(p.knoten, Fx=wert)
-        else:
-            last = Knotenlast(p.knoten, Fz=-wert)
-        lasten[p.lastfall].append(last)
+            self.lasten[p.lastfall].append(last_von(p, Groesse(p.wert, EINHEIT_DER_LAST[p.art]).si))
 
-    faktoren, hinweise = beiwerte(eintrag.kombinationen, eintrag.lastfaelle)
-    meldungen.extend(hinweise)
-    kombinationen = [Kombination(name, je_fall) for name, je_fall in faktoren]
+    def modell(self, system: type, knoten: type, staebe: List[Any], lager: List[Any]) -> Modell:
+        """Das Modell, mit den Kombinationen -- ``system`` und ``knoten`` die Klassen des Rechenkerns."""
+        e = self.eintrag
+        faktoren, hinweise = beiwerte(e.kombinationen, e.lastfaelle)
+        self.meldungen.extend(hinweise)
+        eigen = [lf for lf in e.lastfaelle if lf.eigengewicht]
+        return Modell(
+            system=system(
+                knoten=[knoten(k.kennung, *(getattr(k, a) for a in e.ACHSEN)) for k in e.knoten],
+                staebe=staebe, lager=lager,
+                lastfaelle=[Lastfall(lf.name, self.lasten[lf.kennung]) for lf in e.lastfaelle],
+                kombinationen=[Kombination(name, je_fall) for name, je_fall in faktoren]),
+            paare=self.paare, meldungen=self.meldungen,
+            eigengewicht=eigen[0].name if eigen else None)
 
-    system = System(
-        knoten=[Knoten(k.kennung, k.x, k.z) for k in eintrag.knoten],
-        staebe=staebe, lager=lager,
-        lastfaelle=[Lastfall(lf.name, lasten[lf.kennung]) for lf in eintrag.lastfaelle],
-        kombinationen=kombinationen)
-    return Modell(system=system, paare=paare, meldungen=meldungen,
-                  eigengewicht=eigen[0].name if eigen else None)
+
+def modell_von(eintrag: BalkensystemEintrag) -> Modell:
+    """Das Stabwerk zum Rechnen, in SI (:mod:`opencivil.stabwerk.modell`) -- siehe :class:`Uebersetzung`."""
+    u = Uebersetzung(eintrag, EINHEIT_DER_FEDER, weitere_stoffe=(MATERIAL_DES_QUERSCHNITTS,))
+    staebe = [Stab(**u.stab(l)) for l in eintrag.linien]
+    lager = u.lager(Lager)
+    u.stablasten(Stablast)
+    u.knotenlasten(_knotenlast)
+    return u.modell(System, Knoten, staebe, lager)
+
+
+def _knotenlast(p: Any, wert: float) -> Knotenlast:
+    """Ein Moment, eine Kraft waagrecht nach rechts oder senkrecht nach unten."""
+    if p.art == "moment":
+        return Knotenlast(p.knoten, M=wert)
+    if p.richtung is Lastrichtung.WAAGRECHT:
+        return Knotenlast(p.knoten, Fx=wert)
+    return Knotenlast(p.knoten, Fz=-wert)
 
 
 
@@ -195,11 +238,16 @@ def bauen(art: "Bauteilart", eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Ba
     System selbst fehlt, steht in seinen Meldungen, und der Rest des
     Projekts rechnet.
     """
-    wo = f"Balkensystem '{eintrag.name}'"
     modell = modell_von(eintrag)
-    querschnitte = [_stabquerschnitt(q, aufbau, wo) for q in eintrag.querschnitte]
-    paare, meldungen = _paare(eintrag, modell, aufbau, wo)
-    system = Balkensystem(
+    querschnitte = [_stabquerschnitt(q, aufbau, eintrag.wo) for q in eintrag.querschnitte]
+    return stabwerk_bauen(Balkensystem, art, eintrag, aufbau, modell, querschnitte)
+
+
+def stabwerk_bauen(klasse: type, art: "Bauteilart", eintrag: Any, aufbau: Aufbau, modell: Modell,
+                   querschnitte: List[Stabquerschnitt]) -> Bauteil:
+    """Die Rechnung eines Stabwerks der Klasse ``klasse`` -- in der Ebene und im Raum."""
+    paare, meldungen = _paare(eintrag, modell, aufbau, klasse.MATERIALKENNWERTE)
+    system = klasse(
         name=eintrag.name, kennung=eintrag.kennung, praefix=f"{art.raum}.{eintrag.kennung}",
         system=modell.system, paare=paare, meldungen=meldungen, querschnitte=querschnitte,
         eigengewicht=modell.eigengewicht)
@@ -208,10 +256,12 @@ def bauen(art: "Bauteilart", eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Ba
                    weitere_ziele=system.ziele(), bezuege=tuple(system.bezuege))
 
 
-def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stabquerschnitt:
+def form_von(q: StabquerschnittBasis, wo: str,
+             achse: Optional[Profilachse] = None) -> Stabquerschnitt:
     """
-    Woher A und I eines Querschnitts kommen -- hier wird seine Art
-    aufgeloest. Die Platte oder Analyse dazu muss es geben.
+    Ein Querschnitt nach Vorlage, als Stahlprofil oder von Hand -- in der
+    Ebene und im Raum. Ein Profil biegt sich in der Ebene um ``achse``, im
+    Raum um beide.
     """
     if q.art is Querschnittsart.VORLAGE:
         vorlage = q.stabvorlage()
@@ -223,13 +273,21 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
         if profil is None:
             raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt das Profil "
                                 f"«{q.profil}», das es in der Tabelle nicht gibt.")
-        return NachVorlage(kennung=q.kennung, name=q.name,
-                           herkunft=f"{q.profil}, {q.achse.beschriftung}",
-                           fehler=q.fehler() or "", vorlage=profil.form,
-                           masse=dict(profil.masse), traegheit=q.achse.traegheit)
-    if q.art is Querschnittsart.KENNWERTE:
-        return VonHand(kennung=q.kennung, name=q.name, herkunft="von Hand",
-                       fehler=q.fehler() or "", masse=dict(q.masse))
+        form = NachVorlage(kennung=q.kennung, name=q.name, herkunft=q.profil,
+                           fehler=q.fehler() or "", vorlage=profil.form, masse=dict(profil.masse))
+        return form if achse is None else replace(
+            form, herkunft=f"{q.profil}, {achse.beschriftung}", traegheit=achse.traegheit)
+    return VonHand(kennung=q.kennung, name=q.name, herkunft="von Hand",
+                   fehler=q.fehler() or "", masse=dict(q.masse))
+
+
+def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stabquerschnitt:
+    """
+    Woher A und I eines Querschnitts kommen -- hier wird seine Art
+    aufgeloest. Die Platte oder Analyse dazu muss es geben.
+    """
+    if not q.art.aus_bauteil:
+        return form_von(q, wo, q.achse)
     if q.art is Querschnittsart.PLATTE:
         platte = aufbau.querschnitte.get(q.bezug)
         if platte is None:
@@ -262,8 +320,8 @@ def _modulfrage(q: StabquerschnittEintrag, quelle) -> Optional[Modulfrage]:
     return Modulfrage(quelle, q.eq.N, q.eq.M, q.eq.wahl) if q.e_modul == "e_eq" else None
 
 
-def _paare(eintrag: BalkensystemEintrag, modell: Modell, aufbau: Aufbau,
-           wo: str) -> Tuple[Dict[str, Tuple[str, Stabmaterial]], List[Meldung]]:
+def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Materialkennwert]
+           ) -> Tuple[Dict[str, Tuple[str, Stabmaterial]], List[Meldung]]:
     """
     Je tragenden Stab sein Querschnitt und sein Material, aufgeloest --
     «gemäss Querschnitt» wird zum Beton der Platte oder Analyse. Traegt das
@@ -279,7 +337,8 @@ def _paare(eintrag: BalkensystemEintrag, modell: Modell, aufbau: Aufbau,
             if grund:
                 grund = f"{stab} nimmt das Material gemäss Querschnitt, aber {grund}"
         else:
-            material, grund = _stabmaterial(materialien[kennung], aufbau, wo)
+            material, grund = _stabmaterial(materialien[kennung], aufbau, eintrag.wo,
+                                            kennwerte)
             if grund:
                 grund = f"{stab} nimmt das Material {kennung}, aber {grund}"
         if material is None:
@@ -297,15 +356,17 @@ def _baustoff(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff:
     return stoff
 
 
-def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau,
-                  wo: str) -> Tuple[Optional[Stabmaterial], str]:
+def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau, wo: str,
+                  kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], str]:
     """
     Ein Material des Systems, aufgeloest: ein Beton oder Baustahl des
-    Projekts oder ein eigenes. Traegt es nicht, ist es ``None``, und der
-    zweite Teil sagt warum -- klein beginnend, er folgt auf ein «aber».
+    Projekts oder ein eigenes mit den ``kennwerte`` von Hand. Traegt es
+    nicht, ist es ``None``, und der zweite Teil sagt warum -- klein
+    beginnend, er folgt auf ein «aber».
     """
     if m.art == "eigen":
-        return Stabmaterial(m.kennung, m.name or m.kennung, E=m.E, rho=m.rho), ""
+        return Stabmaterial(m.kennung, m.name or m.kennung,
+                            werte={k.kurzname: getattr(m, k.kurzname) for k in kennwerte}), ""
     art = Baustoffart(m.art)
     if not m.stoff:
         return None, f"bei ihm ist kein {art.beschriftung} gewählt."

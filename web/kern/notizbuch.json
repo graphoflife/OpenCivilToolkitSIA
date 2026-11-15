@@ -5981,14 +5981,36 @@
       "stichworte": [
         "Modell",
         "Modell.gueltig",
+        "Uebersetzung",
+        "Uebersetzung.melden",
+        "Uebersetzung.halt",
+        "Uebersetzung.stab",
+        "Uebersetzung.lager",
+        "Uebersetzung.stablasten",
+        "Uebersetzung.knotenlasten",
+        "Uebersetzung.modell",
         "modell_von",
+        "_knotenlast",
         "bauen",
+        "stabwerk_bauen",
+        "form_von",
         "_stabquerschnitt",
         "_modulfrage",
         "_paare",
         "_baustoff",
         "_stabmaterial",
         "_material_des_querschnitts"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.aufbau.balkensystem3d",
+      "pfad": "Python/opencivil.projekt.aufbau.balkensystem3d.md",
+      "art": "modul",
+      "kurz": "ein 3D-Balkensystem wird Rechnung.",
+      "stichworte": [
+        "modell_von",
+        "_knotenlast",
+        "bauen"
       ]
     },
     {
@@ -6121,10 +6143,6 @@
       "art": "modul",
       "kurz": "ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.",
       "stichworte": [
-        "Querschnittsart",
-        "Querschnittsart.beschriftung",
-        "Querschnittsart.kurz",
-        "Querschnittsart.aus_bauteil",
         "Profilachse",
         "Profilachse.beschriftung",
         "Profilachse.kurz",
@@ -6140,35 +6158,33 @@
         "ModulEintrag",
         "ModulEintrag.wahl",
         "StabquerschnittEintrag",
-        "StabquerschnittEintrag.neu",
-        "StabquerschnittEintrag.stabvorlage",
-        "StabquerschnittEintrag.masse_mit_vorgaben",
         "StabquerschnittEintrag.fehler",
         "StatikdiagrammEintrag",
         "BalkensystemEintrag",
-        "BalkensystemEintrag.materialien",
         "BalkensystemEintrag.bezuege",
-        "BalkensystemEintrag.alle_lasten",
-        "BalkensystemEintrag.linie_von",
-        "BalkensystemEintrag.enden",
-        "BalkensystemEintrag.laenge",
-        "BalkensystemEintrag.stelle_auf",
-        "BalkensystemEintrag.netz",
-        "BalkensystemEintrag.linie",
-        "BalkensystemEintrag.lager_an",
-        "BalkensystemEintrag.beton",
-        "BalkensystemEintrag.baustahl",
-        "BalkensystemEintrag.eigenes_material",
-        "BalkensystemEintrag.querschnitt",
+        "BalkensystemEintrag._kehrt_um",
         "BalkensystemEintrag.stahlprofil",
-        "BalkensystemEintrag.querschnitt_aus",
-        "BalkensystemEintrag.querschnitt_mit_kennwerten",
-        "BalkensystemEintrag.diagramm",
-        "BalkensystemEintrag.stablast",
-        "BalkensystemEintrag.knotenlast",
-        "BalkensystemEintrag.teilen",
-        "BalkensystemEintrag.umkehren",
-        "BalkensystemEintrag.neu"
+        "BalkensystemEintrag.querschnitt_aus"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.balkensystem3d",
+      "pfad": "Python/opencivil.projekt.balkensystem3d.md",
+      "art": "modul",
+      "kurz": "ein 3D-Balkensystem, wie die Oberflaeche es beschreibt.",
+      "stichworte": [
+        "RaumknotenEintrag",
+        "RaumstablastEintrag",
+        "RaumlinieEintrag",
+        "RaumlinieEintrag.stab",
+        "RaumlagerEintrag",
+        "RaumknotenlastEintrag",
+        "RaummaterialEintrag",
+        "RaumquerschnittEintrag",
+        "RaumdiagrammEintrag",
+        "Balkensystem3dEintrag",
+        "Balkensystem3dEintrag._kehrt_um",
+        "Balkensystem3dEintrag.umkehren"
       ]
     },
     {
@@ -6527,6 +6543,48 @@
       "stichworte": [
         "SkriptEintrag",
         "SkriptEintrag.neu"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.staebe",
+      "pfad": "Python/opencivil.projekt.staebe.md",
+      "art": "modul",
+      "kurz": "der Baukasten eines Stabwerks, eben und im Raum.",
+      "stichworte": [
+        "Querschnittsart",
+        "Querschnittsart.beschriftung",
+        "Querschnittsart.kurz",
+        "Querschnittsart.aus_bauteil",
+        "_aufgezaehlt",
+        "StabquerschnittBasis",
+        "StabquerschnittBasis.neu",
+        "StabquerschnittBasis.stabvorlage",
+        "StabquerschnittBasis.masse_mit_vorgaben",
+        "StabquerschnittBasis.fehler",
+        "MitStaeben",
+        "MitStaeben.neu",
+        "MitStaeben.wo",
+        "MitStaeben.materialien",
+        "MitStaeben.alle_lasten",
+        "MitStaeben.linie_von",
+        "MitStaeben.enden",
+        "MitStaeben.laenge",
+        "MitStaeben.stelle_auf",
+        "MitStaeben.netz",
+        "MitStaeben.linie",
+        "MitStaeben.lager_an",
+        "MitStaeben.beton",
+        "MitStaeben.baustahl",
+        "MitStaeben.eigenes_material",
+        "MitStaeben.querschnitt",
+        "MitStaeben.stahlprofil",
+        "MitStaeben.querschnitt_mit_kennwerten",
+        "MitStaeben.diagramm",
+        "MitStaeben.stablast",
+        "MitStaeben.knotenlast",
+        "MitStaeben.teilen",
+        "MitStaeben.umkehren",
+        "MitStaeben._kehrt_um"
       ]
     },
     {
@@ -7216,9 +7274,17 @@
       "kurz": "wie ein Balkensystem seine Rechnung aufschreibt.",
       "stichworte": [
         "schreiben",
-        "_teilname",
-        "_gleichgewicht",
-        "_zahl"
+        "halt_text",
+        "gelenke_text",
+        "linienlager_text",
+        "teilname",
+        "unbekannte",
+        "kopf_eines_falls",
+        "lagerkraefte",
+        "extremwerte",
+        "gleichgewicht",
+        "_zahl",
+        "matrix_latex"
       ]
     },
     {
@@ -7331,6 +7397,9 @@
       "art": "modul",
       "kurz": "das Balkensystem im Rechenwerk.",
       "stichworte": [
+        "Materialkennwert",
+        "stoffkennwerte",
+        "Steifigkeitsformel",
         "Stabmaterial",
         "Steifigkeit",
         "Lagerkraft",
@@ -7339,17 +7408,24 @@
         "Systembefund.lagerkraefte",
         "SteifigkeitsmethodeProzedur",
         "SteifigkeitsmethodeProzedur.rechne",
+        "Stabwerksrechnung",
+        "Stabwerksrechnung.abschnitt",
+        "Stabwerksrechnung.bezuege",
+        "Stabwerksrechnung._kennwerte",
+        "Stabwerksrechnung._erdbeschleunigung",
+        "Stabwerksrechnung._steifigkeit",
+        "Stabwerksrechnung._eigengewicht",
+        "Stabwerksrechnung.baustoffe",
+        "Stabwerksrechnung.ziele",
+        "Stabwerksrechnung.rechnen_und_schreiben",
+        "Stabwerksrechnung._ohne_modul",
+        "Stabwerksrechnung._rechnen",
+        "Stabwerksrechnung._leer",
+        "Stabwerksrechnung._eigenlast",
+        "Stabwerksrechnung._schreiben",
         "Balkensystem",
-        "Balkensystem.abschnitt",
-        "Balkensystem.bezuege",
-        "Balkensystem._kennwerte",
-        "Balkensystem._erdbeschleunigung",
-        "Balkensystem._steifigkeit",
-        "Balkensystem._eigengewicht",
-        "Balkensystem.baustoffe",
-        "Balkensystem.ziele",
-        "Balkensystem.rechnen_und_schreiben",
-        "Balkensystem._ohne_modul"
+        "_gewicht_je_meter",
+        "_modul_mal_kennwert"
       ]
     },
     {
@@ -7472,6 +7548,16 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.stabwerk3d.herleitung",
+      "pfad": "Python/opencivil.stabwerk3d.herleitung.md",
+      "art": "modul",
+      "kurz": "wie ein 3D-Balkensystem seine Rechnung aufschreibt.",
+      "stichworte": [
+        "schreiben",
+        "_verschiebungen"
+      ]
+    },
+    {
       "name": "opencivil.stabwerk3d.modell",
       "pfad": "Python/opencivil.stabwerk3d.modell.md",
       "art": "modul",
@@ -7516,12 +7602,23 @@
       ]
     },
     {
+      "name": "opencivil.stabwerk3d.rechnung",
+      "pfad": "Python/opencivil.stabwerk3d.rechnung.md",
+      "art": "modul",
+      "kurz": "das 3D-Balkensystem im Rechenwerk.",
+      "stichworte": [
+        "Raumbefund",
+        "Balkensystem3d"
+      ]
+    },
+    {
       "name": "opencivil.stabwerk3d.stab",
       "pfad": "Python/opencivil.stabwerk3d.stab.md",
       "art": "modul",
       "kurz": "der raeumliche Stab: drei ebene in einem.",
       "stichworte": [
         "achsen",
+        "_lotrecht",
         "drehung_umgekehrt",
         "steifigkeit",
         "bettung",

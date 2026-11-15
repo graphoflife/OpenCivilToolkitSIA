@@ -6,9 +6,10 @@ Der :class:`BalkensystemEintrag`: ein ebener Rahmen aus Knoten und Linien,
 Lagern und Lasten, mit seinen Materialien, Querschnitten, Lastfaellen und
 Kombinationen
 -- als speicherbare Datenklasse wie die Querschnittsanalyse
-(:mod:`opencivil.projekt.querschnittsanalyse`). Dazu der Baukasten, der ohne
-Oberflaeche zeichnet, und was beim Teilen und Umkehren einer Linie mit ihren
-Lasten geschieht. Gerechnet wird in :mod:`opencivil.stabwerk`.
+(:mod:`opencivil.projekt.querschnittsanalyse`). Was es mit dem
+3D-Balkensystem teilt -- zeichnen ohne Oberflaeche, teilen, umkehren, die
+Felder eines Querschnitts --, steht in :mod:`opencivil.projekt.staebe`.
+Gerechnet wird in :mod:`opencivil.stabwerk`.
 
 ZUERST GEOMETRIE:
 Gezeichnet werden Knoten und Linien. Eine Linie ist ein Stab, sobald sie
@@ -42,10 +43,8 @@ zum Ende. Momente drehen im Gegenuhrzeigersinn (:mod:`opencivil.stabwerk.modell`
 
 from __future__ import annotations
 
-import copy
-import math
-from dataclasses import dataclass, field, replace
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Mapping, Optional
 
 from opencivil.core.einheiten import (
     KG_PRO_M3, KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, N_PRO_MM2, PROZENT,
@@ -56,11 +55,10 @@ from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
-from opencivil.projekt.netz import Netz, naechste_kennung
-from opencivil.stabwerk import profiltabelle
-from opencivil.stabwerk import querschnitte as qs
+from opencivil.projekt.staebe import MitStaeben, Querschnittsart, StabquerschnittBasis
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.stabwerk.rechnung import STABKENNWERTE
+from opencivil.stabwerk.stabquerschnitt import EBEN
 
 #: Wie ein Lager oder Linienlager je Richtung haelt.
 HALT = ("frei", "fest", "feder")
@@ -83,54 +81,8 @@ KNOTENLASTEN = ("kraft", "moment")
 #: Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)
 
-class Querschnittsart(Wahl):
-    """
-    Woher ``A`` und ``I`` eines Stabquerschnitts kommen. Aufgeloest wird die
-    Art einmal, im Aufbau: je Art eine Klasse
-    (:mod:`opencivil.stabwerk.stabquerschnitt`).
-    """
-
-    VORLAGE = "vorlage"
-    PROFIL = "profil"
-    KENNWERTE = "kennwerte"
-    PLATTE = "platte"
-    ANALYSE = "analyse"
-
-    @property
-    def beschriftung(self) -> str:
-        return {
-            Querschnittsart.VORLAGE: "nach Vorlage",
-            Querschnittsart.PROFIL: "ein Stahlprofil aus der Tabelle",
-            Querschnittsart.KENNWERTE: "Kennwerte von Hand",
-            Querschnittsart.PLATTE: "aus einer Platte",
-            Querschnittsart.ANALYSE: "aus einer Querschnittsanalyse",
-        }[self]
-
-    @property
-    def kurz(self) -> str:
-        """Fuer den Schalter -- der lange Name steht in seinem Titel."""
-        return {
-            Querschnittsart.VORLAGE: "Vorlage",
-            Querschnittsart.PROFIL: "Profil",
-            Querschnittsart.KENNWERTE: "Kennwerte",
-            Querschnittsart.PLATTE: "Platte",
-            Querschnittsart.ANALYSE: "Analyse",
-        }[self]
-
-    @property
-    def aus_bauteil(self) -> bool:
-        """
-        Ob er ein Bauteil des Projekts nimmt, eine Platte oder eine
-        Querschnittsanalyse. Nur dann bringt er ein Material mit, den Beton
-        des Bauteils, und nur dann hat er ein E_eq -- eine
-        Momenten-Kruemmungs-Linie mit ihrer Bewehrung, bei einer Platte immer
-        in x-Richtung, Zug unten (Benutzer, 2026-10-24). Einer nach Vorlage
-        oder von Hand ist nur eine Form.
-        """
-        return self in (Querschnittsart.PLATTE, Querschnittsart.ANALYSE)
-
-#: Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
-KENNWERTE = ("A", "I")
+#: Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴ -- wie die Rechnung sie nimmt.
+KENNWERTE = tuple(k.kurzname for k in EBEN)
 
 
 class Profilachse(Wahl):
@@ -185,9 +137,6 @@ LAGERARTEN = {
     "verschieblich": ("frei", "fest", "frei"),
     "eingespannt": ("fest", "fest", "fest"),
 }
-
-#: Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.
-Ort = Union[str, Sequence[float]]
 
 
 # ===========================================================================
@@ -346,27 +295,15 @@ class ModulEintrag(Beschreibung):
 
 
 @dataclass
-class StabquerschnittEintrag(Beschreibung):
+class StabquerschnittEintrag(StabquerschnittBasis):
     """
-    Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, ein Stahlprofil
-    aus der Tabelle (``profil``, gebogen um ``achse``), mit Kennwerten von
-    Hand (``A`` in mm², ``I`` in 10⁶ mm⁴), oder aus einer Platte oder einer
-    Querschnittsanalyse des Projekts (``bezug``). E kommt vom Material des
-    Stabs; nimmt der das Material des Querschnitts, sagt ``e_modul``,
-    welches E.
+    Ein Querschnitt der Staebe in der Ebene: dazu aus einer Platte oder
+    einer Querschnittsanalyse des Projekts (``bezug``), ein Stahlprofil
+    gebogen um ``achse``. E kommt vom Material des Stabs; nimmt der das
+    Material des Querschnitts, sagt ``e_modul``, welches E.
     """
 
-    kennung: str = ""
-    name: str = ""
-    art: Querschnittsart = einer_von(tuple(Querschnittsart), Querschnittsart.VORLAGE)
-    vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)
-    masse: Dict[str, float] = field(default_factory=dict)
-    profil: str = "IPE 300"
-    """
-    Der Name des Stahlprofils (:mod:`opencivil.stabwerk.profiltabelle`). Kein
-    Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen
-    unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
-    """
+    KENNWERTE = KENNWERTE
 
     achse: Profilachse = Profilachse.Y
     bezug: str = ""
@@ -379,42 +316,11 @@ class StabquerschnittEintrag(Beschreibung):
     eq: ModulEintrag = field(default_factory=ModulEintrag)
     """Wie das E_eq entsteht -- es gilt nur bei ``e_modul = "e_eq"``."""
 
-    @classmethod
-    def neu(cls) -> "StabquerschnittEintrag":
-        """Ein frischer Querschnitt, wie die Oberflaeche ihn anlegt: ein Rechteck mit seinen Vorgaben."""
-        return cls(masse=qs.RECHTECK.vorgaben())
-
-    def stabvorlage(self) -> qs.Stabvorlage:
-        return qs.vorlage(self.vorlage)
-
-    def masse_mit_vorgaben(self) -> Dict[str, float]:
-        """Die Masse der Vorlage -- was fehlt, mit ihrer Vorgabe."""
-        return {**self.stabvorlage().vorgaben(), **self.masse}
-
     def fehler(self) -> Optional[str]:
-        """
-        Was an Massen oder Kennwerten nicht geht -- ``None``, wenn alles geht.
-        Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
-        2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
-        """
         if self.e_modul == "e_eq" and not self.art.aus_bauteil:
             return ("ein E_eq gibt es nur bei einem Querschnitt aus einer Platte oder "
                     "Querschnittsanalyse – nur sie haben eine Momenten-Krümmungs-Linie.")
-        if self.art is Querschnittsart.VORLAGE:
-            vorlage = self.stabvorlage()
-            fremd = [k for k in self.masse if k not in vorlage.vorgaben()]
-            if fremd:
-                return (f"ein Mass «{fremd[0]}» gibt es bei «{vorlage.name}» nicht. "
-                        f"Möglich sind: {', '.join(vorlage.vorgaben())}.")
-            return vorlage.pruefen(self.masse_mit_vorgaben())
-        if self.art is Querschnittsart.KENNWERTE:
-            fremd = [k for k in self.masse if k not in KENNWERTE]
-            if fremd:
-                return (f"einen Kennwert «{fremd[0]}» gibt es nicht. "
-                        f"Möglich sind: {', '.join(KENNWERTE)}.")
-            if not (self.masse.get("A", 0.0) > 0.0 and self.masse.get("I", 0.0) > 0.0):
-                return "A und I müssen grösser als null sein."
-        return None
+        return super().fehler()
 
 
 @dataclass
@@ -437,7 +343,7 @@ class StatikdiagrammEintrag(Beschreibung):
 
 
 @dataclass
-class BalkensystemEintrag(MitFaellen, BauteilEintrag):
+class BalkensystemEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     """
     Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen.
 
@@ -462,152 +368,35 @@ class BalkensystemEintrag(MitFaellen, BauteilEintrag):
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein."""
 
-    # -- Zugriff -------------------------------------------------------------
-
-    def materialien(self) -> List[str]:
-        """
-        Jedes Material des Projekts, auf das ein Material des Systems zeigt --
-        auch eines, das gerade keinen Stab traegt: wer es loescht, liesse es
-        ins Leere zeigen, und spaetestens die naechste Aenderung machte
-        daraus einen Fehler beim Rechnen.
-        """
-        gesehen: List[str] = []
-        for m in self.stabmaterialien:
-            if m.art != "eigen" and m.stoff and m.stoff not in gesehen:
-                gesehen.append(m.stoff)
-        return gesehen
+    ACHSEN = ("x", "z")
+    LAGERFELDER = ("x", "z", "phi")
+    LINIENLAGER = ("quer", "laengs")
+    LAGERARTEN = LAGERARTEN
+    NEUE_DIAGRAMME = ("M", "V", "N")
+    KNOTEN = SystemknotenEintrag
+    LINIE = SystemlinieEintrag
+    LAGER = LagerEintrag
+    STABLAST = StablastEintrag
+    KNOTENLAST = KnotenlastEintrag
+    MATERIAL = StabmaterialEintrag
+    QUERSCHNITT = StabquerschnittEintrag
+    DIAGRAMM = StatikdiagrammEintrag
 
     def bezuege(self) -> List[str]:
         """Die Platten und Querschnittsanalysen, deren Querschnitt ein Stab nimmt."""
         return sorted({q.bezug for q in self.querschnitte if q.art.aus_bauteil and q.bezug})
 
-    def alle_lasten(self) -> List[Any]:
-        """Jede Last des Systems, auf den Linien und an den Knoten -- ihre Kennungen zaehlen zusammen."""
-        return [last for l in self.linien for last in l.lasten] + list(self.knotenlasten)
-
-    def linie_von(self, kennung: str) -> SystemlinieEintrag:
-        for l in self.linien:
-            if l.kennung == kennung:
-                return l
-        raise ProjektFehler(f"Balkensystem '{self.name}': eine Linie «{kennung}» gibt es nicht.")
-
-    def enden(self, linie: SystemlinieEintrag) -> Tuple[Tuple[float, float], Tuple[float, float]]:
-        """Anfang und Ende einer Linie, in m."""
-        netz = self.netz()
-        a, b = netz.lage(linie.von), netz.lage(linie.bis)
-        if a is None or b is None:
-            raise ProjektFehler(f"Balkensystem '{self.name}': {linie.kennung} verweist auf "
-                                f"einen Knoten, den es nicht gibt.")
-        return a, b
-
-    def laenge(self, linie: SystemlinieEintrag) -> float:
-        (xa, za), (xb, zb) = self.enden(linie)
-        return math.hypot(xb - xa, zb - za)
-
-    def stelle_auf(self, kennung: str, punkt: Sequence[float]) -> float:
-        """Wo ein Punkt auf einer Linie liegt, in m ab ihrem Anfang -- auf die Linie gelotet."""
-        (xa, za), (xb, zb) = self.enden(self.linie_von(kennung))
-        L = math.hypot(xb - xa, zb - za)
-        return ((punkt[0] - xa) * (xb - xa) + (punkt[1] - za) * (zb - za)) / L if L else 0.0
-
-    # -- Zeichnen ohne Oberflaeche --------------------------------------------
-
-    def netz(self) -> Netz:
-        return Netz(self.knoten, neu=lambda kennung, x, z: SystemknotenEintrag(kennung, x, z),
-                    achsen=("x", "z"))
-
-    def _knoten(self, netz: Netz, ort: Ort) -> str:
-        if isinstance(ort, str):
-            return ort
-        x, z = ort
-        return netz.an(float(x), float(z))
-
-    def _neue_kennung(self, liste: Sequence[Any], vorsilbe: str) -> str:
-        return naechste_kennung((e.kennung for e in liste), vorsilbe)
-
-    def linie(self, von: Ort, bis: Ort, *, querschnitt: Any = None, material: Any = None,
-              **felder: Any) -> SystemlinieEintrag:
+    def _kehrt_um(self, last: StablastEintrag) -> bool:
         """
-        Eine Linie von ``von`` nach ``bis`` -- ein Stab, sobald ``querschnitt``
-        und ``material`` dastehen: ein Material des Systems (:meth:`beton`,
-        :meth:`eigenes_material`) oder :data:`MATERIAL_DES_QUERSCHNITTS`.
-        Weitere Felder wie :class:`SystemlinieEintrag`.
+        Die gestrichelte Faser liegt nach dem Umkehren auf der anderen Seite:
+        eine Kraft quer oder laengs kehrt mit ihr um. Senkrecht, waagrecht und
+        Momente -- sie drehen im Gegenuhrzeigersinn -- aendern sich nicht.
         """
-        netz = self.netz()
-        eintrag = SystemlinieEintrag.aus_dict({
-            "kennung": self._neue_kennung(self.linien, "L"),
-            "von": self._knoten(netz, von), "bis": self._knoten(netz, bis),
-            "querschnitt": kennung_von(querschnitt) if querschnitt is not None else "",
-            "material": kennung_von(material) if material is not None else "", **felder},
-            f"Balkensystem '{self.name}', linien")
-        self.linien.append(eintrag)
-        return eintrag
-
-    def lager_an(self, ort: Ort, art: str = "gelenkig", **felder: Any) -> LagerEintrag:
-        """Ein Lager -- ``gelenkig``, ``verschieblich`` oder ``eingespannt``, Felder darueber."""
-        if art not in LAGERARTEN:
-            raise ProjektFehler(f"Eine Lagerart «{art}» gibt es nicht. Möglich sind: "
-                                f"{', '.join(LAGERARTEN)}.")
-        x, z, phi = LAGERARTEN[art]
-        eintrag = LagerEintrag.aus_dict({
-            "kennung": self._neue_kennung(self.lager, "A"),
-            "knoten": self._knoten(self.netz(), ort), "x": x, "z": z, "phi": phi, **felder},
-            f"Balkensystem '{self.name}', lager")
-        self.lager.append(eintrag)
-        return eintrag
-
-    def beton(self, beton: Any) -> StabmaterialEintrag:
-        """
-        Das Material des Systems aus einem Beton des Projekts (Eintrag oder
-        Kennung) -- das schon da ist, sonst ein neues.
-        """
-        return self._aus_projekt("beton", beton)
-
-    def baustahl(self, stahl: Any) -> StabmaterialEintrag:
-        """Das Material des Systems aus einem Baustahl des Projekts -- siehe :meth:`beton`."""
-        return self._aus_projekt("baustahl", stahl)
-
-    def _aus_projekt(self, art: str, stoff: Any) -> StabmaterialEintrag:
-        kennung = kennung_von(stoff)
-        for m in self.stabmaterialien:
-            if m.art == art and m.stoff == kennung:
-                return m
-        eintrag = StabmaterialEintrag(kennung=self._neue_kennung(self.stabmaterialien, "M"),
-                                      art=art, stoff=kennung)
-        self.stabmaterialien.append(eintrag)
-        return eintrag
-
-    def eigenes_material(self, name: str, *, E: float, rho: float) -> StabmaterialEintrag:
-        """Ein eigenes Material des Systems -- E in N/mm², die Dichte in kg/m³."""
-        eintrag = StabmaterialEintrag.aus_dict({
-            "kennung": self._neue_kennung(self.stabmaterialien, "M"), "art": "eigen",
-            "name": name, "E": E, "rho": rho}, f"Balkensystem '{self.name}', stabmaterialien")
-        self.stabmaterialien.append(eintrag)
-        return eintrag
-
-    def querschnitt(self, name: str, vorlage: str = qs.RECHTECK.schluessel,
-                    **masse: float) -> StabquerschnittEintrag:
-        """Ein Querschnitt nach Vorlage -- Masse in mm, was fehlt nach ihrer Vorgabe."""
-        try:
-            qs.vorlage(vorlage)
-        except KeyError as fehler:
-            raise ProjektFehler(fehler.args[0]) from None
-        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
-                                         name=name, vorlage=vorlage, masse=dict(masse))
-        self.querschnitte.append(eintrag)
-        return eintrag
+        return last.richtung in (Lastrichtung.QUER, Lastrichtung.LAENGS) and last.art.kraft
 
     def stahlprofil(self, name: str, profil: str, achse: str = "y") -> StabquerschnittEintrag:
         """Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um ``achse``, y die starke."""
-        try:
-            profiltabelle.profil(profil)
-        except KeyError as fehler:
-            raise ProjektFehler(fehler.args[0]) from None
-        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
-                                         name=name, art=Querschnittsart.PROFIL, profil=profil,
-                                         achse=Profilachse(achse))
-        self.querschnitte.append(eintrag)
-        return eintrag
+        return super().stahlprofil(name, profil, achse=achse)
 
     def querschnitt_aus(self, name: str, art: str, bezug: Any, *,
                         E_eq: Optional[Mapping[str, Any]] = None) -> StabquerschnittEintrag:
@@ -627,130 +416,3 @@ class BalkensystemEintrag(MitFaellen, BauteilEintrag):
             eintrag.eq = ModulEintrag.aus_dict(dict(E_eq), f"Querschnitt '{name}', E_eq")
         self.querschnitte.append(eintrag)
         return eintrag
-
-    def querschnitt_mit_kennwerten(self, name: str, *, A: float,
-                                   I: float) -> StabquerschnittEintrag:
-        """Ein Querschnitt mit Kennwerten von Hand -- A in mm², I in 10⁶ mm⁴."""
-        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
-                                         name=name, art="kennwerte", masse={"A": A, "I": I})
-        self.querschnitte.append(eintrag)
-        return eintrag
-
-    def diagramm(self, fall: Any, groesse: str = "M") -> StatikdiagrammEintrag:
-        """Ein Diagramm der Statik-Analyse -- ``fall`` ein Lastfall oder eine Kombination."""
-        eintrag = StatikdiagrammEintrag.aus_dict(
-            {"fall": kennung_von(fall), "groesse": groesse},
-            f"Balkensystem '{self.name}', diagramme")
-        self.diagramme.append(eintrag)
-        return eintrag
-
-    def stablast(self, lastfall: Any, linie: Any, art: Lastart = Lastart.LINIENLAST,
-                 wert: float = 10.0, **felder: Any) -> StablastEintrag:
-        """Eine Last auf einer Linie -- ``wert`` ist ``wert_a``; Felder wie :class:`StablastEintrag`."""
-        eintrag = StablastEintrag.aus_dict({"kennung": self._neue_kennung(self.alle_lasten(), "P"),
-                                            "lastfall": kennung_von(lastfall), "art": art,
-                                            "wert_a": wert, **felder},
-                                           f"Balkensystem '{self.name}', lasten")
-        self.linie_von(kennung_von(linie)).lasten.append(eintrag)
-        return eintrag
-
-    def knotenlast(self, lastfall: Any, ort: Ort, wert: float = 10.0, *, art: str = "kraft",
-                   richtung: Lastrichtung = Lastrichtung.SENKRECHT) -> KnotenlastEintrag:
-        eintrag = KnotenlastEintrag.aus_dict({
-            "kennung": self._neue_kennung(self.alle_lasten(), "P"),
-            "knoten": self._knoten(self.netz(), ort), "lastfall": kennung_von(lastfall),
-            "art": art, "richtung": richtung, "wert": wert},
-            f"Balkensystem '{self.name}', knotenlasten")
-        self.knotenlasten.append(eintrag)
-        return eintrag
-
-    # -- Teilen und Umkehren ----------------------------------------------------
-
-    def teilen(self, kennung: str, stelle: float) -> SystemlinieEintrag:
-        """
-        Teilt eine Linie bei ``stelle`` m ab ihrem Anfang: sie endet dort, und
-        eine neue laeuft weiter zum alten Ende -- mit ihren Eigenschaften. Die
-        Lasten gehen mit: eine verteilte liegt danach auf beiden Haelften, mit
-        dem Wert an der Schnittstelle, die auf der zweiten mit einer eigenen
-        Kennung; eine Einzellast bleibt dort, wo sie steht, ihre Stelle in %
-        der neuen Haelfte. Das Gelenk am Ende wandert mit ans neue Ende; an der
-        Schnittstelle ist die Linie durchlaufend.
-        """
-        linie = self.linie_von(kennung)
-        (xa, za), (xb, zb) = self.enden(linie)
-        L = math.hypot(xb - xa, zb - za)
-        if not 0.0 < stelle < L:
-            raise ProjektFehler(f"{linie.kennung} ist {L:.3f} m lang -- geteilt werden kann nur "
-                                f"dazwischen, nicht bei {stelle:g} m.")
-        mitte = self._knoten(self.netz(), (xa + (xb - xa) * stelle / L,
-                                           za + (zb - za) * stelle / L))
-        zweite = copy.deepcopy(linie)
-        zweite.kennung = self._neue_kennung(self.linien, "L")
-        zweite.von, zweite.gelenk_anfang = mitte, False
-        linie.bis, linie.gelenk_ende = mitte, False
-        anteil = stelle / L
-        vergeben = {last.kennung for last in self.alle_lasten()}
-        erste_lasten, zweite_lasten = [], []
-        for last in linie.lasten:
-            if not last.verteilt:
-                if last.stelle <= 100.0 * anteil:
-                    erste_lasten.append(replace(last, stelle=last.stelle / anteil))
-                else:
-                    zweite_lasten.append(replace(
-                        last, stelle=(last.stelle - 100.0 * anteil) / (1.0 - anteil)))
-                continue
-            mitte = None if last.wert_b is None else \
-                last.wert_a + (last.wert_b - last.wert_a) * anteil
-            kennung = naechste_kennung(vergeben, "P")
-            vergeben.add(kennung)
-            erste_lasten.append(replace(last, wert_b=mitte))
-            zweite_lasten.append(replace(last, kennung=kennung,
-                                         wert_a=last.wert_a if mitte is None else mitte))
-        linie.lasten, zweite.lasten = erste_lasten, zweite_lasten
-        self.linien.insert(self.linien.index(linie) + 1, zweite)
-        return zweite
-
-    def umkehren(self, kennung: str) -> None:
-        """
-        Tauscht Anfang und Ende einer Linie. Die gestrichelte Faser liegt
-        danach auf der anderen Seite, die Lasten bleiben, wo sie wirken: ihre
-        Stellen gespiegelt, Anfangs- und Endwert getauscht, und quer und
-        laengs mit umgekehrtem Vorzeichen -- diese Richtungen haengen an der
-        Linie. Senkrecht, waagrecht und Momente aendern sich nicht.
-        """
-        linie = self.linie_von(kennung)
-        linie.von, linie.bis = linie.bis, linie.von
-        linie.gelenk_anfang, linie.gelenk_ende = linie.gelenk_ende, linie.gelenk_anfang
-        neu = []
-        for last in linie.lasten:
-            vorzeichen = -1.0 if last.richtung in (Lastrichtung.QUER, Lastrichtung.LAENGS) \
-                and last.art.kraft else 1.0
-            if not last.verteilt:
-                neu.append(replace(last, stelle=100.0 - last.stelle,
-                                   wert_a=vorzeichen * last.wert_a))
-                continue
-            wb = last.wert_a if last.wert_b is None else last.wert_b
-            neu.append(replace(
-                last, wert_a=vorzeichen * wb,
-                wert_b=None if last.wert_b is None else vorzeichen * last.wert_a))
-        linie.lasten = neu
-
-    # -- Die frische Anlage -------------------------------------------------------
-
-    @classmethod
-    def neu(cls, kennung: str, name: str) -> "BalkensystemEintrag":
-        """
-        Ein frisches System, wie der Benutzer es angelegt bekommt: ohne
-        Knoten, Linie, Lager und Querschnitt (Benutzer, 2026-10-19), aber mit
-        den Lastfaellen Eigengewicht -- es kommt von selbst --, Auflast und
-        Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
-        1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23). Dazu die
-        Diagramme M, V und N der GZT und die Verschiebung der GZG.
-        """
-        s = cls(kennung=kennung, name=name)
-        gzt = s.standardfaelle()
-        gzg = s.gebrauchskombination()
-        for groesse in ("M", "V", "N"):
-            s.diagramm(gzt, groesse)
-        s.diagramm(gzg, "verschiebung")
-        return s

@@ -9,6 +9,14 @@ das System nach der Steifigkeitsmethode rechnet
 (:mod:`~opencivil.stabwerk.system`) und ihre Herleitung schreibt
 (:mod:`~opencivil.stabwerk.herleitung`).
 
+EBEN UND IM RAUM:
+Das 3D-Balkensystem (:mod:`opencivil.stabwerk3d.rechnung`) tut dasselbe mit
+mehr Kennwerten und Steifigkeiten -- ``I_y``, ``I_z`` und ``I_T``, ``EI_y``,
+``EI_z`` und ``GI_T`` -- und rechnet im Raum. Was beide gleich tun, steht in
+:class:`Stabwerksrechnung`: welche Kennwerte, Steifigkeiten und
+Materialkennwerte, sagt je System eine Liste, wie es rechnet und schreibt,
+eine Methode.
+
 WOHER A UND I KOMMEN:
 sagt jeder Querschnitt selbst (:mod:`~opencivil.stabwerk.stabquerschnitt`):
 nach Vorlage, von Hand, aus einer Platte oder aus einer
@@ -22,7 +30,7 @@ kann auch das Material seines Querschnitts nehmen, den Beton einer Platte
 oder Querschnittsanalyse.
 
 STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN:
-``E_cm`` eines Betons, ``E_a`` eines Baustahls (:data:`STABKENNWERTE`) oder
+``E_cm`` eines Betons, ``E_a`` eines Baustahls (:data:`E_MODUL`) oder
 E von Hand -- und bei
 einem Stab mit dem Material seiner Querschnittsanalyse auf Wunsch deren
 E_eq bei N und M (Benutzer, 2026-10-23) --, am ungerissenen
@@ -46,13 +54,13 @@ mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
     Ausfuehrung, Befundbezug, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
 from opencivil.core.einheiten import (
-    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MN, N_PRO_MM2, Groesse,
+    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MN, N_PRO_MM2, Einheit, Groesse,
 )
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.rechenobjekt import Rechenobjekt
@@ -60,18 +68,48 @@ from opencivil.core.wert import Quelle, WertDef
 from opencivil.material.basis import Baustoff, Baustoffart, mit_index
 from opencivil.stabwerk import herleitung
 from opencivil.stabwerk.modell import Lastart, Lastrichtung, Stablast, System
-from opencivil.stabwerk.stabquerschnitt import Stabquerschnitt
+from opencivil.stabwerk.stabquerschnitt import EBEN, Kennwert, Stabquerschnitt
 from opencivil.stabwerk.system import Ergebnis, Fall, Meldung, rechnen
 from opencivil.stabwerk.verlauf import Stabverlauf, verlaeufe
 
-#: Welche Kennwerte eines Baustoffs ein Stab aus ihm nimmt. Beim Beton
-#: ``E_cm`` -- die Analyse rechnet in der Regel ungerissen (SIA 262:2025,
-#: 4.1.4.1.3), mit dem Mittelwert -- und die Dichte des Stahlbetons
-#: (Benutzer, 2026-10-23); beim Baustahl ``E_a`` und ``rho_a``.
-STABKENNWERTE = {
-    Baustoffart.BETON: {"E": "E_cm", "rho": "rho_sb"},
-    Baustoffart.BAUSTAHL: {"E": "E_a", "rho": "rho_a"},
-}
+
+@dataclass(frozen=True)
+class Materialkennwert:
+    """
+    Ein Kennwert, den ein Stab von seinem Material nimmt: je Art des
+    Baustoffs, welcher es ist, und wie er bei einem eigenen Material von
+    Hand heisst -- ``kurzname`` ist auch sein Feld dort.
+    """
+
+    kurzname: str
+    symbol: str
+    einheit: Einheit
+    beschreibung: str
+    je_stoff: Mapping[Baustoffart, str]
+
+
+#: Beim Beton ``E_cm`` -- die Analyse rechnet in der Regel ungerissen
+#: (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert --, beim Baustahl ``E_a``.
+E_MODUL = Materialkennwert("E", "E", N_PRO_MM2, "E-Modul",
+                           {Baustoffart.BETON: "E_cm", Baustoffart.BAUSTAHL: "E_a"})
+
+#: Fuer das Eigengewicht: beim Beton die Dichte des Stahlbetons (Benutzer, 2026-10-23).
+DICHTE = Materialkennwert("rho", r"\rho", KG_PRO_M3, "Dichte",
+                          {Baustoffart.BETON: "rho_sb", Baustoffart.BAUSTAHL: "rho_a"})
+
+#: Fuer die Torsion, nur im Raum: ``G_cm`` des Betons, ``G_a`` des Baustahls.
+SCHUBMODUL = Materialkennwert("G", "G", N_PRO_MM2, "Schubmodul",
+                              {Baustoffart.BETON: "G_cm", Baustoffart.BAUSTAHL: "G_a"})
+
+
+def stoffkennwerte(kennwerte: Sequence[Materialkennwert]) -> Dict[Baustoffart, Dict[str, str]]:
+    """Je Art des Baustoffs, welche seiner Kennwerte ein Stab nimmt: ``{BETON: {"E": "E_cm"}}``."""
+    return {art: {k.kurzname: k.je_stoff[art] for k in kennwerte}
+            for art in kennwerte[0].je_stoff}
+
+
+#: Welche Kennwerte eines Baustoffs ein Stab in der Ebene aus ihm nimmt.
+STABKENNWERTE = stoffkennwerte((E_MODUL, DICHTE))
 
 #: Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des
 #: Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
@@ -83,10 +121,31 @@ STEIFIGKEITSMETHODE = "Steifigkeitsmethode"
 
 
 @dataclass(frozen=True)
+class Steifigkeitsformel:
+    """
+    Eine Steifigkeit eines Stabs: ein Modul seines Materials mal ein
+    Kennwert seines Querschnitts. ``kurzname`` heisst auch das Feld des
+    Stabs im Rechenkern, ``beschreibung`` auch die Formel.
+    """
+
+    kurzname: str
+    einheit: Einheit
+    beschreibung: str
+    modul: str
+    """``E`` oder ``G`` -- ein :class:`Materialkennwert`."""
+
+    kennwert: str
+    """Ein Kennwert des Querschnitts: ``A``, ``I``, ``I_T`` ..."""
+
+
+DEHNSTEIFIGKEIT = Steifigkeitsformel("EA", MN, "Dehnsteifigkeit", "E", "A")
+
+
+@dataclass(frozen=True)
 class Stabmaterial:
     """
-    Ein Material der Staebe, aufgeloest: ein Beton oder Baustahl -- E und
-    Dichte von ihm -- oder ein eigenes mit E und Dichte von Hand.
+    Ein Material der Staebe, aufgeloest: ein Beton oder Baustahl -- seine
+    Kennwerte von ihm -- oder ein eigenes mit Kennwerten von Hand.
     """
 
     kennung: str
@@ -96,11 +155,8 @@ class Stabmaterial:
     stoff: Optional[Baustoff] = None
     """Der Beton oder Baustahl -- ``None`` bei einem eigenen Material."""
 
-    E: float = 0.0
-    """Von Hand, N/mm² -- nur ohne ``stoff``."""
-
-    rho: float = 0.0
-    """Von Hand, kg/m³ -- nur ohne ``stoff``."""
+    werte: Mapping[str, float] = field(default_factory=dict)
+    """Von Hand, je :class:`Materialkennwert` in seiner Einheit -- nur ohne ``stoff``."""
 
     vom_querschnitt: bool = False
     """Das Material des Querschnitts: dann gilt dessen E_eq, wenn er eines hat."""
@@ -114,13 +170,14 @@ class Steifigkeit:
     material: str
     """Die Kennung des :class:`Stabmaterial`."""
 
-    EA: str
-    EI: str
+    werte: Mapping[str, str]
+    """Je :class:`Steifigkeitsformel` die Wert-ID: ``{"EA": ..., "EI": ...}``."""
+
     g_k: str = ""
     """Das Eigengewicht je Meter -- leer, wenn kein Lastfall es bekommt."""
 
     mit_eq: bool = False
-    """Ob E das E_eq des Querschnitts ist -- dann fehlen EA und EI, wo die Suche keines fand."""
+    """Ob E das E_eq des Querschnitts ist -- dann fehlen die Steifigkeiten, wo die Suche keines fand."""
 
 
 @dataclass(frozen=True)
@@ -133,9 +190,9 @@ class Lagerkraft:
     wo: str
     """«A1 (K1)», «L2 bei 1.500 m», «L2: Bettung, Summe»."""
 
-    R_x: float
-    R_z: float
-    M: float
+    werte: Tuple[float, ...]
+    """Wie der Rechenkern sie gibt: ``(R_x, R_z, M)`` in der Ebene, sechs im Raum -- in N und Nm."""
+
     knoten: str = ""
     """Der Knoten, an dem sie angreift -- leer auf einem Stab und bei einer Summe."""
 
@@ -162,8 +219,12 @@ class Systembefund:
     def verlaeufe(self, fall: str) -> Dict[str, Stabverlauf]:
         """Je Stab der Verlauf der Schnittgroessen und der Biegelinie in einem Fall -- einmal gerechnet."""
         if fall not in self._verlaeufe:
-            self._verlaeufe[fall] = verlaeufe(self.ergebnis.fall(fall))
+            self._verlaeufe[fall] = self._verlaeufe_von(self.ergebnis.fall(fall))
         return self._verlaeufe[fall]
+
+    @staticmethod
+    def _verlaeufe_von(fall: Fall) -> Dict[str, Stabverlauf]:
+        return verlaeufe(fall)
 
     def lagerkraefte(self, fall: Fall) -> List[Lagerkraft]:
         """
@@ -178,19 +239,19 @@ class Systembefund:
         for l in self.gerechnet.lager:
             lager_an.setdefault(l.knoten, []).append(l.name)
         zeilen = []
-        for name, (rx, rz, rm) in fall.lagerkraefte.items():
+        for name, werte in fall.lagerkraefte.items():
             ort = orte[name]
             if ort.knoten:
                 wo = (", ".join(lager_an[ort.knoten]) + f" ({ort.knoten})"
                       if ort.knoten in lager_an else ort.knoten)
             else:
                 wo = f"{ort.stab} bei {ort.stelle:.3f} m"
-            zeilen.append(Lagerkraft(wo, rx, rz, rm, knoten=ort.knoten))
-        for stab, (fx, fz, m) in fall.linienlast.items():
+            zeilen.append(Lagerkraft(wo, tuple(werte), knoten=ort.knoten))
+        for stab, werte in fall.linienlast.items():
             zeilen.append(Lagerkraft(f"{stab}: Lasten geradewegs ins Linienlager",
-                                     fx, fz, m, summe=True))
-        for stab, (fx, fz, m) in fall.bettung.items():
-            zeilen.append(Lagerkraft(f"{stab}: Bettung, Summe", fx, fz, m, summe=True))
+                                     tuple(werte), summe=True))
+        for stab, werte in fall.bettung.items():
+            zeilen.append(Lagerkraft(f"{stab}: Bettung, Summe", tuple(werte), summe=True))
         return zeilen
 
 
@@ -199,7 +260,7 @@ class SteifigkeitsmethodeProzedur(Prozedur):
 
     THEMA = STEIFIGKEITSMETHODE
 
-    def __init__(self, system: "Balkensystem", **kwargs) -> None:
+    def __init__(self, system: "Stabwerksrechnung", **kwargs) -> None:
         super().__init__(**kwargs)
         self.system = system
 
@@ -207,12 +268,22 @@ class SteifigkeitsmethodeProzedur(Prozedur):
         return self.system.rechnen_und_schreiben(e, p)
 
 
-class Balkensystem(Rechenobjekt):
-    """Ein Balkensystem, fertig fuer das Rechenwerk."""
+class Stabwerksrechnung(Rechenobjekt):
+    """
+    Ein Balkensystem, fertig fuer das Rechenwerk -- was die Ebene und der
+    Raum gleich tun, siehe Dateikopf. Je System sagen die Klassenattribute,
+    welche Kennwerte, Steifigkeiten und Materialkennwerte es hat, und die
+    Methoden ``_rechnen``, ``_leer``, ``_eigenlast``, ``_befund`` und
+    ``_schreiben``, wie es rechnet und schreibt.
+    """
 
-    WAS = "Balkensystem"
+    KENNWERTE: Tuple[Kennwert, ...]
+    """Was ein Querschnitt liefert (:mod:`~opencivil.stabwerk.stabquerschnitt`)."""
 
-    def __init__(self, *, name: str, kennung: str, praefix: str, system: System,
+    STEIFIGKEITEN: Tuple[Steifigkeitsformel, ...]
+    MATERIALKENNWERTE: Tuple[Materialkennwert, ...]
+
+    def __init__(self, *, name: str, kennung: str, praefix: str, system: Any,
                  paare: Mapping[str, Tuple[str, Stabmaterial]], meldungen: Sequence[Meldung],
                  querschnitte: Sequence[Stabquerschnitt],
                  eigengewicht: Optional[str] = None) -> None:
@@ -232,8 +303,8 @@ class Balkensystem(Rechenobjekt):
         self.eigengewicht = eigengewicht
         self.definitionen: Dict[str, WertDef] = {}
         self.berechnungen: List[Berechnung] = []
-        self.flaechen: Dict[str, Tuple[str, str]] = {}
-        """Je Querschnitt die Wert-IDs von ``A`` und ``I``."""
+        self.flaechen: Dict[str, Dict[str, str]] = {}
+        """Je Querschnitt die Wert-IDs seiner :attr:`KENNWERTE`."""
 
         self.module: Dict[str, str] = {}
         """Je Querschnitt mit E_eq die Wert-ID dieses E."""
@@ -241,8 +312,8 @@ class Balkensystem(Rechenobjekt):
         self.modulsuchen: Dict[str, str] = {}
         """Je Querschnitt mit E_eq die ID der Suche -- ihr Befund sagt, ob sie einen fand."""
 
-        self.materialwerte: Dict[str, Tuple[str, str]] = {}
-        """Je eigenes Material die Wert-IDs von E und Dichte."""
+        self.materialwerte: Dict[str, Dict[str, str]] = {}
+        """Je eigenes Material die Wert-IDs seiner :attr:`MATERIALKENNWERTE`."""
 
         self.steifigkeiten: List[Steifigkeit] = []
         self._aufbauen()
@@ -251,7 +322,7 @@ class Balkensystem(Rechenobjekt):
 
     def abschnitt(self, thema: str = STEIFIGKEITSMETHODE) -> Abschnitt:
         """Ein Abschnitt fuer alles -- das Thema sagt nur, wo die Formeln gesammelt stehen."""
-        return Abschnitt(f"Balkensystem: {self.name}", self.id, thema=thema)
+        return Abschnitt(f"{self.WAS}: {self.name}", self.id, thema=thema)
 
     def _def(self, kurzname: str, symbol: str, einheit, beschreibung: str,
              stellen: int) -> WertDef:
@@ -270,9 +341,10 @@ class Balkensystem(Rechenobjekt):
         for q in self.querschnitte:
             if not q.fehler:
                 berechnungen, werte = q.flaechenwerte(self._def, self.abschnitt(QUERSCHNITTE),
-                                                      q.kennung if index else "")
+                                                      q.kennung if index else "",
+                                                      kennwerte=self.KENNWERTE)
                 self.berechnungen += berechnungen
-                self.flaechen[q.kennung] = (werte["A"], werte["I"])
+                self.flaechen[q.kennung] = werte
                 if q.modulfrage is not None:
                     berechnungen, E, suche = q.modulfrage.einbauen(
                         self._def, wo=f"{q.kennung}.", index=q.kennung if index else "",
@@ -309,40 +381,41 @@ class Balkensystem(Rechenobjekt):
                 teile.append(m.name)
             self.steifigkeiten.append(self._steifigkeit(q, m, ",".join(teile), g))
 
-        # Mit E_eq fehlen EA und EI, wo die Suche keinen Modul fand: dann
-        # liest die Rechnung ihren Befund und sagt es.
-        groessen = ("EA", "EI", "g_k") if g else ("EA", "EI")
+        # Mit E_eq fehlen die Steifigkeiten, wo die Suche keinen Modul fand:
+        # dann liest die Rechnung ihren Befund und sagt es.
+        bezuege = []
+        for i, s in enumerate(self.steifigkeiten):
+            bezuege += [Eingabebezug(f"{k}_{i}", wert, optional=s.mit_eq)
+                        for k, wert in s.werte.items()]
+            if s.g_k:
+                bezuege.append(Eingabebezug(f"g_k_{i}", s.g_k))
         self.rechnung = SteifigkeitsmethodeProzedur(
-            self, id=f"{self.id}.rechnung", ausgaben=[],
-            bezuege=[Eingabebezug(f"{groesse}_{i}", getattr(s, groesse),
-                                  optional=groesse != "g_k" and s.mit_eq)
-                     for i, s in enumerate(self.steifigkeiten) for groesse in groessen],
+            self, id=f"{self.id}.rechnung", ausgaben=[], bezuege=bezuege,
             befunde=[Befundbezug(f"modul_{q}", suche) for q, suche in self.modulsuchen.items()],
             titel="Steifigkeitsmethode", abschnitt=self.abschnitt())
         """Die Prozedur, die das System rechnet -- ihr Befund ist der :class:`Systembefund`."""
         self.berechnungen.append(self.rechnung)
 
-    def _kennwerte(self, m: Stabmaterial) -> Tuple[str, str]:
+    def _kennwerte(self, m: Stabmaterial) -> Dict[str, str]:
         """
-        Die Wert-IDs von E und Dichte eines Materials: die seines Baustoffs --
-        oder bei einem eigenen Vorgaben von Hand, einmal je Material.
+        Die Wert-IDs der :attr:`MATERIALKENNWERTE` eines Materials: die
+        seines Baustoffs -- oder bei einem eigenen Vorgaben von Hand, einmal
+        je Material.
         """
         if m.stoff is not None:
-            kennwerte = STABKENNWERTE[m.stoff.art]
-            return m.stoff.id_von(kennwerte["E"]), m.stoff.id_von(kennwerte["rho"])
+            return {k.kurzname: m.stoff.id_von(k.je_stoff[m.stoff.art])
+                    for k in self.MATERIALKENNWERTE}
         if m.kennung not in self.materialwerte:
-            ids = []
-            for kurz, symbol, einheit, wert, beschreibung in (
-                    ("E", "E", N_PRO_MM2, m.E, "E-Modul"),
-                    ("rho", r"\rho", KG_PRO_M3, m.rho, "Dichte")):
-                d = self._def(f"{m.kennung}.{kurz}", mit_index(symbol, m.name), einheit,
-                              f"{beschreibung}, {m.name}", 0)
+            ids = {}
+            for k in self.MATERIALKENNWERTE:
+                d = self._def(f"{m.kennung}.{k.kurzname}", mit_index(k.symbol, m.name),
+                              k.einheit, f"{k.beschreibung}, {m.name}", 0)
                 self.berechnungen.append(Vorgabe(
-                    id=d.id, ausgabe=d, groesse=Groesse(wert, einheit), quelle=Quelle.EINGABE,
-                    titel=f"{beschreibung}, «{m.name}» (von Hand)",
+                    id=d.id, ausgabe=d, groesse=Groesse(m.werte[k.kurzname], k.einheit),
+                    quelle=Quelle.EINGABE, titel=f"{k.beschreibung}, «{m.name}» (von Hand)",
                     abschnitt=self.abschnitt(QUERSCHNITTE)))
-                ids.append(d.id)
-            self.materialwerte[m.kennung] = (ids[0], ids[1])
+                ids[k.kurzname] = d.id
+            self.materialwerte[m.kennung] = ids
         return self.materialwerte[m.kennung]
 
     def _erdbeschleunigung(self) -> str:
@@ -356,45 +429,43 @@ class Balkensystem(Rechenobjekt):
     def _steifigkeit(self, q: str, m: Stabmaterial, index: str,
                      g: Optional[str] = None) -> Steifigkeit:
         """
-        EA und EI eines Paars aus Querschnitt und Material -- mit ``g`` dazu
-        sein Eigengewicht. E und Dichte kommen vom Material; nimmt der Stab
-        das Material seines Querschnitts und hat der ein E_eq, gilt dieses.
+        Die :attr:`STEIFIGKEITEN` eines Paars aus Querschnitt und Material --
+        mit ``g`` dazu sein Eigengewicht. Module und Dichte kommen vom
+        Material; nimmt der Stab das Material seines Querschnitts und hat der
+        ein E_eq, gilt dieses.
         """
         abschnitt = self.abschnitt(QUERSCHNITTE)
-        modul, dichte = self._kennwerte(m)
+        modul = self._kennwerte(m)
         mit_eq = m.vom_querschnitt and q in self.module
         if mit_eq:
-            modul = self.module[q]
+            modul = {**modul, "E": self.module[q]}
         womit = "mit E_eq" if mit_eq else f"aus {m.name}"
-        A, I = self.flaechen[q]
+        kennwerte = self.flaechen[q]
         name = next(x.name for x in self.querschnitte if x.kennung == q)
         wo = f"{q}.{m.kennung}."
-        d_EA = self._def(wo + "EA", mit_index("EA", index), MN,
-                         f"Dehnsteifigkeit, {name}, {m.name}", 0)
-        d_EI = self._def(wo + "EI", mit_index("EI", index), KNM2,
-                         f"Biegesteifigkeit, {name}, {m.name}", 0)
-        self.berechnungen += [
-            Formel(id=d_EA.id, ausgabe=d_EA, funktion=_dehnsteifigkeit,
-                   vorlage=r"@E \cdot @A", eingaben={"E": modul, "A": A},
-                   titel=f"Dehnsteifigkeit, «{name}» {womit}", name="Dehnsteifigkeit",
-                   abschnitt=abschnitt),
-            Formel(id=d_EI.id, ausgabe=d_EI, funktion=_biegesteifigkeit,
-                   vorlage=r"@E \cdot @I", eingaben={"E": modul, "I": I},
-                   titel=f"Biegesteifigkeit, «{name}» {womit}", name="Biegesteifigkeit",
-                   abschnitt=abschnitt),
-        ]
+        werte = {}
+        for s in self.STEIFIGKEITEN:
+            d = self._def(wo + s.kurzname, mit_index(s.kurzname, index), s.einheit,
+                          f"{s.beschreibung}, {name}, {m.name}", 0)
+            self.berechnungen.append(Formel(
+                id=d.id, ausgabe=d, funktion=_modul_mal_kennwert,
+                vorlage=rf"@{s.modul} \cdot @{s.kennwert}",
+                eingaben={s.modul: modul[s.modul], s.kennwert: kennwerte[s.kennwert]},
+                titel=f"{s.beschreibung}, «{name}» {womit}", name=s.beschreibung,
+                abschnitt=abschnitt))
+            werte[s.kurzname] = d.id
         if g is None:
-            return Steifigkeit(querschnitt=q, material=m.kennung, EA=d_EA.id, EI=d_EI.id,
-                               mit_eq=mit_eq)
+            return Steifigkeit(querschnitt=q, material=m.kennung, werte=werte, mit_eq=mit_eq)
         d_g = self._def(wo + "g_k", mit_index("g_k", index), KN_PRO_M,
                         f"Eigengewicht je Meter, {name}, {m.name}", 2)
         self.berechnungen.append(Formel(
-            id=d_g.id, ausgabe=d_g, funktion=_eigengewicht,
-            vorlage=r"@rho \cdot @g \cdot @A", eingaben={"rho": dichte, "g": g, "A": A},
+            id=d_g.id, ausgabe=d_g, funktion=_gewicht_je_meter,
+            vorlage=r"@rho \cdot @g \cdot @A",
+            eingaben={"rho": modul["rho"], "g": g, "A": kennwerte["A"]},
             titel=f"Eigengewicht, «{name}» aus {m.name}", name="Eigengewicht eines Stabs",
             abschnitt=abschnitt))
-        return Steifigkeit(querschnitt=q, material=m.kennung, EA=d_EA.id, EI=d_EI.id,
-                           g_k=d_g.id, mit_eq=mit_eq)
+        return Steifigkeit(querschnitt=q, material=m.kennung, werte=werte, g_k=d_g.id,
+                           mit_eq=mit_eq)
 
     def _eigengewicht(self, e: Eingaben) -> Dict[str, float]:
         """
@@ -420,7 +491,7 @@ class Balkensystem(Rechenobjekt):
         Stab nimmt -- und das System. Von einem E_eq die Suche, nicht E: das
         fehlt, wo sie keinen Modul fand.
         """
-        return ([i for paar in self.flaechen.values() for i in paar]
+        return ([i for werte in self.flaechen.values() for i in werte.values()]
                 + list(self.modulsuchen.values()) + [self.rechnung.id])
 
     # -- Rechnen ----------------------------------------------------------------
@@ -432,29 +503,28 @@ class Balkensystem(Rechenobjekt):
         oder ein E_eq, das es nicht gibt --, bleibt es bei ihr.
         """
         meldungen = list(self.meldungen) + self._ohne_modul(e)
-        steif = {(s.querschnitt, s.material): (e.g(f"EA_{i}").si, e.g(f"EI_{i}").si)
-                 for i, s in enumerate(self.steifigkeiten) if e.hat(f"EA_{i}")}
+        steif = {(s.querschnitt, s.material): {k: e.g(f"{k}_{i}").si for k in s.werte}
+                 for i, s in enumerate(self.steifigkeiten)
+                 if all(e.hat(f"{k}_{i}") for k in s.werte)}
         staebe = []
         for stab in self.system.staebe:
             q, m = self.paare.get(stab.name, ("", None))
             if m is not None and (q, m.kennung) in steif:
-                EA, EI = steif[q, m.kennung]
-                stab = replace(stab, EA=EA, EI=EI)
+                stab = replace(stab, **steif[q, m.kennung])
             staebe.append(stab)
         eigen = self._eigengewicht(e)
         gerechnet = replace(self.system, staebe=staebe, lastfaelle=[
-            replace(lf, lasten=[*(Stablast(stab=stab, art=Lastart.LINIENLAST, wert_a=g,
-                                           richtung=Lastrichtung.SENKRECHT)
-                                  for stab, g in eigen.items()), *lf.lasten])
+            replace(lf, lasten=[*(self._eigenlast(stab, g) for stab, g in eigen.items()),
+                                *lf.lasten])
             if lf.name == self.eigengewicht else lf
             for lf in self.system.lastfaelle])
         if any(m.fehler for m in meldungen):
-            ergebnis = Ergebnis(meldungen=meldungen)
+            ergebnis = self._leer(meldungen)
         else:
-            ergebnis = rechnen(gerechnet)
+            ergebnis = self._rechnen(gerechnet)
             ergebnis.meldungen[:0] = meldungen
-        befund = Systembefund(gerechnet, ergebnis, eigengewicht=eigen)
-        herleitung.schreiben(p, self, befund)
+        befund = self._befund(gerechnet, ergebnis, eigen)
+        self._schreiben(p, befund)
         return Ausfuehrung({}, befund=befund)
 
     def _ohne_modul(self, e: Eingaben) -> List[Meldung]:
@@ -473,14 +543,60 @@ class Balkensystem(Rechenobjekt):
                                          (q, *staebe), True))
         return meldungen
 
+    # -- Je System ----------------------------------------------------------------
 
-def _eigengewicht(rho: Groesse, g: Groesse, A: Groesse) -> Groesse:
+    def _rechnen(self, system: Any) -> Any:
+        """Das System, gerechnet -- ein Ergebnis des Rechenkerns."""
+        raise NotImplementedError
+
+    def _leer(self, meldungen: List[Meldung]) -> Any:
+        """Ein Ergebnis ohne Rechnung, nur mit den Meldungen, die sie aufhalten."""
+        raise NotImplementedError
+
+    def _eigenlast(self, stab: str, g: float) -> Any:
+        """Das Eigengewicht eines Stabs als Last des Rechenkerns: senkrecht, ``g`` in N/m."""
+        raise NotImplementedError
+
+    def _befund(self, gerechnet: Any, ergebnis: Any, eigengewicht: Dict[str, float]) -> Systembefund:
+        raise NotImplementedError
+
+    def _schreiben(self, p: Protokoll, befund: Systembefund) -> None:
+        """Die Herleitung."""
+        raise NotImplementedError
+
+
+class Balkensystem(Stabwerksrechnung):
+    """Ein ebenes Balkensystem, fertig fuer das Rechenwerk."""
+
+    WAS = "Balkensystem"
+    KENNWERTE = EBEN
+    STEIFIGKEITEN = (DEHNSTEIFIGKEIT, Steifigkeitsformel("EI", KNM2, "Biegesteifigkeit", "E", "I"))
+    MATERIALKENNWERTE = (E_MODUL, DICHTE)
+
+    def _rechnen(self, system: System) -> Ergebnis:
+        return rechnen(system)
+
+    def _leer(self, meldungen: List[Meldung]) -> Ergebnis:
+        return Ergebnis(meldungen=meldungen)
+
+    def _eigenlast(self, stab: str, g: float) -> Stablast:
+        return Stablast(stab=stab, art=Lastart.LINIENLAST, wert_a=g,
+                        richtung=Lastrichtung.SENKRECHT)
+
+    def _befund(self, gerechnet: System, ergebnis: Ergebnis,
+                eigengewicht: Dict[str, float]) -> Systembefund:
+        return Systembefund(gerechnet, ergebnis, eigengewicht=eigengewicht)
+
+    def _schreiben(self, p: Protokoll, befund: Systembefund) -> None:
+        herleitung.schreiben(p, self, befund)
+
+
+def _gewicht_je_meter(rho: Groesse, g: Groesse, A: Groesse) -> Groesse:
+    """Das Eigengewicht eines Stabs je Meter: Dichte mal g mal Flaeche."""
     return rho * g * A
 
 
-def _dehnsteifigkeit(E: Groesse, A: Groesse) -> Groesse:
-    return E * A
-
-
-def _biegesteifigkeit(E: Groesse, I: Groesse) -> Groesse:
-    return E * I
+def _modul_mal_kennwert(**faktoren: Groesse) -> Groesse:
+    """Modul mal Kennwert (:class:`Steifigkeitsformel`)."""
+    modul, kennwert = faktoren.values()
+    return modul * kennwert

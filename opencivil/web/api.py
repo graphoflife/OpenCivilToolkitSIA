@@ -817,9 +817,9 @@ def _systemzuordnung(teil) -> dict:
     """Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt und Material EA und EI."""
     system = teil.objekt
     return {
-        "querschnitte": {q: {"A": A, "I": I} for q, (A, I) in system.flaechen.items()},
-        "steifigkeiten": [{"querschnitt": s.querschnitt, "material": s.material,
-                           "EA": s.EA, "EI": s.EI} for s in system.steifigkeiten],
+        "querschnitte": {q: dict(werte) for q, werte in system.flaechen.items()},
+        "steifigkeiten": [{"querschnitt": s.querschnitt, "material": s.material, **s.werte}
+                          for s in system.steifigkeiten],
         # Je Querschnitt mit E_eq, wo es steht.
         "module": dict(system.module),
     }

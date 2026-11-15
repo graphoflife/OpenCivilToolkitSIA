@@ -1,5 +1,5 @@
 ---
-erzeugt: af54ef7c1d84
+erzeugt: d7e7e488bf5e
 art: modul
 tags: [modul]
 ---
@@ -195,7 +195,7 @@ def vorlage(schluessel: str) -> Stabvorlage
 
 ## Gebraucht von
 
-- [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.stabwerk.profilformen]]
 - [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.stabquerschnitt]]

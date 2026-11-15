@@ -1,5 +1,5 @@
 ---
-erzeugt: 4ce3172c3a58
+erzeugt: 27ca334f6a16
 art: modul
 tags: [modul]
 ---
@@ -70,6 +70,7 @@ Ein Querschnitt, der nicht geht, hat keinen.
 
 - `PROBEN_JE_STAB = 24` – Wie viele Stuecke ein Stab im Bild mindestens hat -- dazu jede Grenze und jeder Extremwert.
 - `EINHEITEN = {'N': KN, 'V': KN, 'M': KNM, 'w': MM, 'ux': MM, 'uz': MM, 'phi': MRAD}` – Die Einheit der Anzeige je Groesse eines Verlaufs.
+- `LAGERKRAEFTE = (('R_x', KN), ('R_z', KN), ('M', KNM))` – Eine Lagerkraft, wie der Rechenkern sie gibt -- je Groesse ihr Name und ihre Einheit.
 
 ## Braucht
 

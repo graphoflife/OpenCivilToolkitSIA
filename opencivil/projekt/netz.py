@@ -19,7 +19,7 @@ beim Zeichnen. Eine Toleranz hier wuerde zwei Punkte, die jemand absichtlich
 einen Hundertstelmillimeter auseinander gesetzt hat, stillschweigend vereinen.
 
 Allgemein gehalten: der Baukasten kennt weder Beton noch Querschnitt, nur
-Knoten mit Kennung und zwei Koordinaten. Das Zeichenfenster im Browser folgt
+Knoten mit Kennung und Koordinaten -- zwei in der Ebene, drei im Raum. Das Zeichenfenster im Browser folgt
 denselben Regeln (``web/js/cad_modell.js``), damit es nichts anlegt, was der
 Kern anders saehe; der Kern haengt von ihm nicht ab.
 """
@@ -47,44 +47,46 @@ class Netz:
     Die Knoten einer Zeichnung -- mit dem Zusammenfuehren gleicher Koordinaten.
 
     ``knoten`` ist die Liste der Beschreibung; neue Knoten werden an sie
-    angehaengt. Jeder Knoten hat ``kennung`` und zwei Koordinaten -- wie sie
+    angehaengt. Jeder Knoten hat ``kennung`` und seine Koordinaten -- wie sie
     heissen, sagt ``achsen``: ``y`` und ``z`` im Querschnitt, ``x`` und ``z``
-    im Balkensystem. ``neu`` baut einen aus Kennung und Lage -- so bleibt der
-    Baukasten bei der Klasse, die die Beschreibung speichert, ohne sie zu
-    kennen.
+    im Balkensystem, ``x``, ``y`` und ``z`` im 3D-Balkensystem. ``neu`` baut
+    einen aus Kennung und Lage -- so bleibt der Baukasten bei der Klasse, die
+    die Beschreibung speichert, ohne sie zu kennen.
     """
 
-    def __init__(self, knoten: List[Any],
-                 neu: Callable[[str, float, float], Any], vorsilbe: str = "K",
-                 achsen: Tuple[str, str] = ("y", "z")) -> None:
+    def __init__(self, knoten: List[Any], neu: Callable[..., Any], vorsilbe: str = "K",
+                 achsen: Tuple[str, ...] = ("y", "z")) -> None:
         self.knoten = knoten
         self.neu = neu
         self.vorsilbe = vorsilbe
         self.achsen = achsen
-        self._an: Dict[Tuple[float, float], str] = {}
-        self._lage: Dict[str, Tuple[float, float]] = {}
+        self._an: Dict[Tuple[float, ...], str] = {}
+        self._lage: Dict[str, Tuple[float, ...]] = {}
         self._groesste = 0
         for k in knoten:
             self._merken(k)
 
     def _merken(self, k: Any) -> None:
-        lage = (float(getattr(k, self.achsen[0])), float(getattr(k, self.achsen[1])))
+        lage = tuple(float(getattr(k, achse)) for achse in self.achsen)
         self._an.setdefault(lage, k.kennung)
         self._lage[k.kennung] = lage
         n = nummer(k.kennung, self.vorsilbe)
         if n is not None:
             self._groesste = max(self._groesste, n)
 
-    def an(self, a: float, b: float) -> str:
-        """Die Kennung des Knotens an ``(a, b)`` -- angelegt, wenn es dort noch keinen gibt."""
-        lage = (float(a), float(b))
+    def an(self, *koordinaten: float) -> str:
+        """Die Kennung des Knotens an diesen Koordinaten -- angelegt, wenn es dort noch keinen gibt."""
+        lage = tuple(float(c) for c in koordinaten)
+        if len(lage) != len(self.achsen):
+            raise ValueError(f"Ein Knoten hat {len(self.achsen)} Koordinaten "
+                             f"({', '.join(self.achsen)}), nicht {len(lage)}.")
         if lage not in self._an:
             self._groesste += 1
-            k = self.neu(f"{self.vorsilbe}{self._groesste}", lage[0], lage[1])
+            k = self.neu(f"{self.vorsilbe}{self._groesste}", *lage)
             self.knoten.append(k)
             self._merken(k)
         return self._an[lage]
 
-    def lage(self, kennung: str) -> Optional[Tuple[float, float]]:
+    def lage(self, kennung: str) -> Optional[Tuple[float, ...]]:
         """Wo der Knoten liegt -- ``None``, wenn es ihn nicht gibt."""
         return self._lage.get(kennung)

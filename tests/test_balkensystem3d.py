@@ -1,0 +1,273 @@
+"""
+Das 3D-Balkensystem: die Beschreibung, ihr Baukasten, Teilen und Umkehren,
+und gerechnet von der Beschreibung bis zur Herleitung -- gegen Handrechnungen
+und gegen das 2D-Balkensystem.
+"""
+
+import math
+import unittest
+
+from opencivil.core.protokoll import TabellenBlock
+from opencivil.projekt import BalkensystemEintrag, Projekt, ProjektFehler
+from opencivil.projekt.aufbau import Bauteilart
+from opencivil.projekt.aufbau import balkensystem3d as aufbau3d
+from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
+from opencivil.stabwerk.rechnung import STABKENNWERTE
+from opencivil.stabwerk3d.modell import Richtung
+from opencivil.stabwerk3d.rechnung import RAUMKENNWERTE
+
+#: Bis die Oberflaeche es kennt, steht das 3D-Balkensystem noch nicht in
+#: :data:`~opencivil.projekt.aufbau.BAUTEILE` -- gerechnet wird es hier am
+#: Projekt vorbei.
+ART = Bauteilart("balkensystem3d", "balkensysteme3d", Balkensystem3dEintrag, "u",
+                 "balkensystem3d", "3D-Balkensysteme", aufbau3d.bauen)
+
+
+def gerechnet(projekt: Projekt, s: Balkensystem3dEintrag):
+    """Das System und seine Loesung -- mit den Baustoffen des Projekts."""
+    aufbau = projekt.aufbauen()
+    teil = ART.bauen(ART, s, aufbau)
+    loesung = aufbau.werk.loese(*teil.weitere_ziele)
+    return loesung.befunde.get(teil.objekt.rechnung.id), loesung
+
+
+def kragarm(stahl="st1", **querschnitt):
+    """Ein Kragarm von 4 m in x, eingespannt, von Hand: A, I_y, I_z, I_T."""
+    s = Balkensystem3dEintrag(kennung="u1", name="Kragarm")
+    q = s.querschnitt_mit_kennwerten("Hand", **(querschnitt or dict(
+        A=10000.0, I_y=100.0, I_z=50.0, I_T=20.0)))
+    s.linie((0, 0, 0), (4, 0, 0), querschnitt=q, material=s.baustahl(stahl))
+    s.lager_an((0, 0, 0), "eingespannt")
+    return s
+
+
+class TestBeschreibung(unittest.TestCase):
+    def test_hin_und_zurueck(self):
+        s = kragarm()
+        l = s.linien[0]
+        s.stablast(s.lastfall("G"), l, wert=3.0, richtung="quer_y", wert_b=5.0)
+        s.knotenlast("LF1", (4, 0, 0), 2.0, art="moment", richtung="z")
+        self.assertEqual(Balkensystem3dEintrag.aus_dict(s.als_dict()), s)
+
+    def test_knoten_im_raum_werden_geteilt(self):
+        s = Balkensystem3dEintrag(kennung="u1", name="S")
+        s.linie((0, 0, 0), (0, 0, 3))
+        s.linie((0, 0, 3), (4, 2, 3))
+        self.assertEqual([(k.x, k.y, k.z) for k in s.knoten],
+                         [(0.0, 0.0, 0.0), (0.0, 0.0, 3.0), (4.0, 2.0, 3.0)])
+        self.assertEqual(s.linien[1].von, s.linien[0].bis)
+        self.assertAlmostEqual(s.laenge(s.linien[1]), math.sqrt(20.0))
+        self.assertAlmostEqual(s.stelle_auf("L2", (2, 1, 5)), math.sqrt(5.0))
+
+    def test_lagerarten_halten_im_raum(self):
+        s = Balkensystem3dEintrag(kennung="u1", name="S")
+        a = s.lager_an((0, 0, 0), "gelenkig", phi_x="fest")
+        b = s.lager_an((1, 0, 0), "verschieblich")
+        felder = ("x", "y", "z", "phi_x", "phi_y", "phi_z")
+        self.assertEqual([getattr(a, f) for f in felder], ["fest"] * 4 + ["frei"] * 2)
+        self.assertEqual([getattr(b, f) for f in felder], ["frei", "frei", "fest"] + ["frei"] * 3)
+
+    def test_neu_mit_den_diagrammen_des_raums(self):
+        s = Balkensystem3dEintrag.neu("u1", "Raum")
+        self.assertEqual([(d.fall, d.groesse) for d in s.diagramme],
+                         [("LK1", "M_y"), ("LK1", "M_z"), ("LK1", "N"), ("LK2", "verschiebung")])
+
+    def test_nur_was_der_raum_kennt(self):
+        s = Balkensystem3dEintrag(kennung="u1", name="S")
+        with self.assertRaisesRegex(ProjektFehler, "Möglich sind: senkrecht, x, y, z"):
+            s.knotenlast("LF1", (0, 0, 0), richtung="laengs")
+        with self.assertRaisesRegex(ProjektFehler, "Möglich sind: vorlage, profil, kennwerte"):
+            Balkensystem3dEintrag.aus_dict({"kennung": "u1", "name": "S",
+                                            "querschnitte": [{"art": "platte"}]})
+        with self.assertRaisesRegex(ProjektFehler, "'M' gibt es als 'groesse' nicht"):
+            s.diagramm("LF1", "M")
+
+    def test_kennwerte_von_hand(self):
+        s = Balkensystem3dEintrag(kennung="u1", name="S")
+        self.assertIsNone(s.querschnitt_mit_kennwerten("Q", A=1.0, I_y=1.0, I_z=1.0,
+                                                       I_T=1.0).fehler())
+        self.assertEqual(s.querschnitt_mit_kennwerten("Q", A=1.0, I_y=1.0).fehler(),
+                         "A, I_y, I_z und I_T müssen grösser als null sein.")
+        self.assertIn("einen Kennwert «I» gibt es nicht",
+                      s.querschnitt_mit_kennwerten("Q", A=1.0, I=1.0).fehler())
+
+    def test_ein_eigenes_material_mit_schubmodul(self):
+        s = Balkensystem3dEintrag(kennung="u1", name="S")
+        m = s.eigenes_material("Holz", E=11000.0, rho=500.0, G=690.0)
+        self.assertEqual((m.E, m.rho, m.G), (11000.0, 500.0, 690.0))
+        with self.assertRaisesRegex(ProjektFehler, "'G'"):
+            BalkensystemEintrag(kennung="r1", name="S").eigenes_material("Holz", G=690.0)
+
+
+class TestTeilenUndUmkehren(unittest.TestCase):
+    def system(self):
+        s = Balkensystem3dEintrag(kennung="u1", name="S")
+        l = s.linie((0, 0, 3), (6, 0, 3), drehung=30.0, gelenk_ende=True)
+        lf = s.lastfall("G")
+        for richtung in ("senkrecht", "y", "laengs", "quer_y", "quer_z"):
+            s.stablast(lf, l, wert=2.0, wert_b=4.0, richtung=richtung)
+        s.stablast(lf, l, "moment", wert=1.0, stelle=25.0, richtung="laengs")
+        s.stablast(lf, l, "moment", wert=1.0, stelle=25.0, richtung="quer_z")
+        return s, l
+
+    def test_umkehren_dreht_den_querschnitt_mit(self):
+        """Der Querschnitt steht wie vorher: β wird -β, und was an y und x des Stabs haengt, kehrt um."""
+        s, l = self.system()
+        s.umkehren(l.kennung)
+        self.assertEqual((l.von, l.bis, l.drehung, l.gelenk_anfang), ("K2", "K1", -30.0, True))
+        self.assertEqual([(last.richtung.value, last.wert_a, last.wert_b) for last in l.lasten[:5]],
+                         [("senkrecht", 4.0, 2.0), ("y", 4.0, 2.0), ("laengs", -4.0, -2.0),
+                          ("quer_y", -4.0, -2.0), ("quer_z", 4.0, 2.0)])
+        self.assertEqual([(last.stelle, last.wert_a) for last in l.lasten[5:]],
+                         [(75.0, -1.0), (75.0, 1.0)])
+
+    def test_lotrecht_wird_beta_zu_180_minus_beta(self):
+        s = Balkensystem3dEintrag(kennung="u1", name="S")
+        l = s.linie((0, 0, 0), (0, 0, 3), drehung=30.0)
+        s.umkehren(l.kennung)
+        self.assertEqual(l.drehung, 150.0)
+
+    def test_teilen_behaelt_den_drehwinkel(self):
+        s, l = self.system()
+        zweite = s.teilen(l.kennung, 2.0)
+        self.assertEqual((zweite.drehung, zweite.gelenk_ende, l.gelenk_ende), (30.0, True, False))
+        self.assertEqual(s.knoten[-1].x, 2.0)
+
+
+class TestRechnen(unittest.TestCase):
+    def setUp(self):
+        self.projekt = Projekt(name="Raum")
+        self.projekt.baustahl("S355")
+
+    def test_kragarm_in_alle_richtungen(self):
+        """Am Ende 10 kN nach unten, 5 kN in y und 2 kNm um x -- gegen die Handrechnung."""
+        s = kragarm()
+        lf = s.lastfall("P")
+        s.knotenlast(lf, (4, 0, 0), 10.0)
+        s.knotenlast(lf, (4, 0, 0), 5.0, richtung="y")
+        s.knotenlast(lf, (4, 0, 0), 2.0, art="moment", richtung="x")
+        befund, _ = gerechnet(self.projekt, s)
+        self.assertTrue(befund.ergebnis.gueltig)
+        E, G, L = 210000e6, 81000e6, 4.0
+        ux, uy, uz, phi_x, _, _ = befund.ergebnis.fall("P").verschiebungen["K2"]
+        self.assertAlmostEqual(uz, -10e3 * L ** 3 / (3 * E * 100e-6), places=12)
+        self.assertAlmostEqual(uy, 5e3 * L ** 3 / (3 * E * 50e-6), places=12)
+        self.assertAlmostEqual(phi_x, 2e3 * L / (G * 20e-6), places=12)
+        anfang = befund.verlaeufe("P")["L1"].bei(0.0)
+        # M_y zieht an +z, unten: der Kragarm zieht oben. y des Stabs ist -y des Systems.
+        for groesse, soll in (("M_y", -40e3), ("M_z", 20e3), ("T", 2e3), ("V_z", 10e3)):
+            self.assertAlmostEqual(anfang[groesse], soll, places=6)
+        (zeile,) = befund.lagerkraefte(befund.ergebnis.fall("P"))
+        self.assertEqual(zeile.wo, "A1 (K1)")
+        for ist, soll in zip(zeile.werte, (0.0, -5e3, 10e3, -2e3, -40e3, -20e3)):
+            self.assertAlmostEqual(ist, soll, places=6)
+
+    def test_steifigkeiten_aus_dem_baustahl(self):
+        _, loesung = gerechnet(self.projekt, kragarm())
+        for kurz, soll in (("EA", 210000e6 * 0.01), ("EI_y", 210000e6 * 100e-6),
+                           ("EI_z", 210000e6 * 50e-6), ("GI_T", 81000e6 * 20e-6)):
+            self.assertAlmostEqual(loesung.werte[f"balkensystem3d.u1.Q1.M1.{kurz}"].groesse.si,
+                                   soll, delta=1e-9 * soll)
+
+    def test_ein_stahlprofil_mit_seiner_torsion(self):
+        """HEB 300 nach den Tabellen: I_y 25170 cm⁴, I_z 8563 cm⁴, I_T 185 cm⁴."""
+        s = Balkensystem3dEintrag(kennung="u1", name="P")
+        s.linie((0, 0, 0), (4, 0, 0), querschnitt=s.stahlprofil("Träger", "HEB 300"),
+                material=s.baustahl("st1"))
+        s.lager_an((0, 0, 0), "eingespannt")
+        _, loesung = gerechnet(self.projekt, s)
+        for kurz, soll in (("I_y", 25170e-8), ("I_z", 8563e-8), ("I_T", 185e-8)):
+            self.assertAlmostEqual(loesung.werte[f"balkensystem3d.u1.Q1.{kurz}"].groesse.si,
+                                   soll, delta=0.002 * soll)
+
+    def test_beton_mit_seinem_schubmodul(self):
+        self.projekt.beton("C30/37")
+        s = Balkensystem3dEintrag(kennung="u1", name="B")
+        q = s.querschnitt("R", "rechteck", b=300.0, h=600.0)
+        s.linie((0, 0, 0), (4, 0, 0), querschnitt=q, material=s.beton("b1"))
+        s.lager_an((0, 0, 0), "eingespannt")
+        _, loesung = gerechnet(self.projekt, s)
+        G = loesung.werte["beton.b1.G_cm"].groesse.si
+        self.assertAlmostEqual(G, loesung.werte["beton.b1.E_cm"].groesse.si / 2.4, delta=1.0)
+        I_T = loesung.werte["balkensystem3d.u1.Q1.I_T"].groesse.si
+        self.assertAlmostEqual(loesung.werte["balkensystem3d.u1.Q1.M1.GI_T"].groesse.si,
+                               G * I_T, delta=1e-9 * G * I_T)
+
+    def test_eigenes_material_mit_g_von_hand(self):
+        s = kragarm()
+        s.linien[0].material = s.eigenes_material("Holz", E=11000.0, rho=500.0, G=690.0).kennung
+        _, loesung = gerechnet(self.projekt, s)
+        self.assertEqual(loesung.werte["balkensystem3d.u1.M2.G"].groesse.si, 690e6)
+        self.assertAlmostEqual(loesung.werte["balkensystem3d.u1.Q1.M2.GI_T"].groesse.si,
+                               690e6 * 20e-6, delta=1e-6)
+
+    def test_eigengewicht_senkrecht(self):
+        """7850 kg/m³ · 10 m/s² · 0.01 m² = 785 N/m, auf 4 m 3.14 kN und 6.28 kNm."""
+        s = kragarm()
+        s.lastfall("Eigengewicht", eigengewicht=True)
+        befund, _ = gerechnet(self.projekt, s)
+        (zeile,) = befund.lagerkraefte(befund.ergebnis.fall("Eigengewicht"))
+        self.assertAlmostEqual(zeile.werte[2], 3140.0, places=6)
+        self.assertAlmostEqual(zeile.werte[4], -6280.0, places=6)
+
+    def test_wie_das_2d_balkensystem(self):
+        """Ein Einfeldträger in x, mit Gabel: M_y wie M der Ebene, w wie dort."""
+        self.projekt.beton("C30/37")
+        p2 = Projekt(name="Eben")
+        p2.beton("C30/37")
+        eben = p2.balkensystem("T")
+        q = eben.querschnitt("R", "rechteck", b=300.0, h=600.0)
+        eben.linie((0, 0), (6, 0), querschnitt=q, material=eben.beton("b1"))
+        eben.lager_an((0, 0), "gelenkig")
+        eben.lager_an((6, 0), "verschieblich")
+        eben.stablast(eben.lastfall("G"), "L1", wert=10.0)
+        s = Balkensystem3dEintrag(kennung="u1", name="T")
+        q = s.querschnitt("R", "rechteck", b=300.0, h=600.0)
+        s.linie((0, 0, 0), (6, 0, 0), querschnitt=q, material=s.beton("b1"))
+        s.lager_an((0, 0, 0), "gelenkig", phi_x="fest")
+        s.lager_an((6, 0, 0), "verschieblich", y="fest")
+        s.stablast(s.lastfall("G"), "L1", wert=10.0)
+        befund, _ = gerechnet(self.projekt, s)
+        v2 = p2.rechnen().balkensystem("T").verlaeufe("G")["L1"]
+        v3 = befund.verlaeufe("G")["L1"]
+        for x in (0.0, 1.5, 3.0):
+            self.assertAlmostEqual(v3.bei(x)["M_y"], v2.bei(x)["M"], places=6)
+            self.assertAlmostEqual(v3.bei(x)["V_z"], v2.bei(x)["V"], places=6)
+            self.assertAlmostEqual(v3.bei(x)["f_z"], v2.bei(x)["w"], places=12)
+
+    def test_meldungen_wie_in_der_ebene(self):
+        s = kragarm()
+        s.linien[0].material = ""
+        s.lager[0].phi_x, s.lager[0].k_phi_x = "feder", 0.0
+        modell = aufbau3d.modell_von(s)
+        self.assertEqual([m.text for m in modell.meldungen if m.fehler],
+                         ["L1 ist ein Stab, hat aber kein Material.",
+                          "A1: eine Feder braucht eine Steifigkeit grösser als null."])
+
+    def test_drehwinkel_in_rad(self):
+        s = kragarm()
+        s.linien[0].drehung = 90.0
+        self.assertAlmostEqual(aufbau3d.modell_von(s).system.staebe[0].drehung, math.pi / 2)
+
+    def test_herleitung(self):
+        s = kragarm()
+        s.knotenlast(s.lastfall("P"), (4, 0, 0), 10.0)
+        _, loesung = gerechnet(self.projekt, s)
+        titel = [b.titel for b in loesung.protokoll.bloecke if isinstance(b, TabellenBlock)]
+        self.assertEqual(titel, ["Stäbe", "Lager", "Verschiebungen der Knoten",
+                                 "Schnittgrössen an den Stabenden", "Lagerkräfte, auf das Tragwerk",
+                                 "Extremwerte", "Gleichgewichtsprobe (Moment um den Ursprung)"])
+
+
+class TestMaterialkennwerte(unittest.TestCase):
+    def test_der_raum_nimmt_dazu_den_schubmodul(self):
+        self.assertEqual(RAUMKENNWERTE["beton"], {**STABKENNWERTE["beton"], "G": "G_cm"})
+        self.assertEqual(RAUMKENNWERTE["baustahl"], {**STABKENNWERTE["baustahl"], "G": "G_a"})
+
+    def test_richtungen_am_knoten(self):
+        from opencivil.projekt.balkensystem3d import KNOTENRICHTUNGEN
+        self.assertEqual(KNOTENRICHTUNGEN, (Richtung.SENKRECHT, Richtung.X, Richtung.Y, Richtung.Z))
+
+
+if __name__ == "__main__":
+    unittest.main()

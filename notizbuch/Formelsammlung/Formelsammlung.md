@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ee6764b8792
+erzeugt: f11e56fe1d8a
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -396,17 +396,17 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bezugsgrösse des Moments]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Biegebewehrung im Stützstreifen je Meter]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._m_Rd|Durchstanzen._m_Rd]]
 - [[Biegelinie eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
-- [[Biegesteifigkeit]] · [[opencivil.stabwerk.rechnung|_biegesteifigkeit]]
+- [[Biegesteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Biegesteifigkeit des Pfahls]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit._querschnitt|Pfahlsteifigkeit._querschnitt]]
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._waende_protokollieren]]
-- [[Dehnsteifigkeit]] · [[opencivil.stabwerk.rechnung|_dehnsteifigkeit]]
+- [[Dehnsteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Dehnsteifigkeit des Pfahls]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit._querschnitt|Pfahlsteifigkeit._querschnitt]]
 - [[Dicke des geneigten Flanschs am Steg]] · [[opencivil.stabwerk.profilformen]]
 - [[Dicke des geneigten Flanschs an der Spitze]] · [[opencivil.stabwerk.profilformen]]
 - [[Dickster Stab der Lage]] · [[opencivil.nachweis.mindestbewehrung#_protokoll_stahlspannung|_protokoll_stahlspannung]]
 - [[Drehfeder des Pfahlkopfs]] · [[opencivil.pfahl.steifigkeit#Pfahlsteifigkeit|Pfahlsteifigkeit._federn]]
 - [[Drehung in die Achsen des Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
-- [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#Balkensystem._eigengewicht|_eigengewicht]]
+- [[Eigengewicht eines Stabs]] · [[opencivil.stabwerk.rechnung#_gewicht_je_meter|_gewicht_je_meter]]
 - [[Einwirkung im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Erfüllungsgrad]] · [[opencivil.core.nachweis#Vergleich.zeile|Vergleich.zeile]]
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]

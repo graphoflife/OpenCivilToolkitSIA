@@ -1,5 +1,5 @@
 ---
-erzeugt: 7f82e48c398e
+erzeugt: c28600289a97
 art: modul
 tags: [modul]
 ---
@@ -144,3 +144,8 @@ Je Stab sein Verlauf in diesem Fall -- aus den Teilstaeben, der Reihe nach.
 - [[opencivil.stabwerk.verlauf]]
 - [[opencivil.stabwerk3d.raum]]
 - [[opencivil.stabwerk3d.stab]]
+
+## Gebraucht von
+
+- [[opencivil.stabwerk3d.herleitung]]
+- [[opencivil.stabwerk3d.rechnung]]

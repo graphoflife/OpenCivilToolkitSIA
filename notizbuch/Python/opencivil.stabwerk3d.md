@@ -1,5 +1,5 @@
 ---
-erzeugt: 765e341ed4a5
+erzeugt: 6eba315c3525
 art: modul
 tags: [modul]
 ---
@@ -29,8 +29,10 @@ der Verlauf laengs eines Stabs. Nur die Standardbibliothek.
 
 ## Module
 
+- [[opencivil.stabwerk3d.herleitung]] – wie ein 3D-Balkensystem seine Rechnung aufschreibt.
 - [[opencivil.stabwerk3d.modell]] – was gerechnet wird: das raeumliche Stabwerk in SI.
 - [[opencivil.stabwerk3d.raum]] – Vektoren, Richtungen und Strecken im Raum.
+- [[opencivil.stabwerk3d.rechnung]] – das 3D-Balkensystem im Rechenwerk.
 - [[opencivil.stabwerk3d.stab]] – der raeumliche Stab: drei ebene in einem.
 - [[opencivil.stabwerk3d.system]] – das raeumliche Stabwerk: Unbekannte, Zusammenbau, Loesen.
 - [[opencivil.stabwerk3d.verlauf]] – Schnittgroessen und Biegelinien laengs eines Stabs im Raum.

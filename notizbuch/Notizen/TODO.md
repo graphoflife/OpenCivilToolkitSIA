@@ -823,7 +823,21 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       mittleren Breite, das Rechteckrohr als dünne Wand nach Bredt, Kreis
       und Kreisring mit 2 · I_y. Ein Betonquerschnitt reisst unter Torsion,
       und seine Torsionssteifigkeit fällt dann stark ab; gerechnet wird
-      ungerissen. Prüfen, ob die Formeln so bleiben sollen.
+      ungerissen. Die Norm erlaubt, die Steifigkeit für Risse und Kriechen
+      abzumindern, und sagt dazu, dass das günstig oder ungünstig wirken
+      kann (SIA 262:2025, 4.1.4.1.3). Prüfen, ob die Formeln so bleiben
+      sollen.
+- [ ] **Die Vorwahlen der Lager im Raum, nach Vorgabe**
+      (`projekt/balkensystem3d.py`). «Gelenkig» hält die drei
+      Verschiebungen, «verschieblich» nur die lotrechte, «eingespannt» alle
+      sechs Richtungen. Danach lässt sich jede Richtung für sich frei, fest
+      oder federnd stellen, wie in der Ebene.
+- [ ] **Ein eigenes Material hat G = 80 000 N/mm², nach Vorgabe** -- wie
+      E = 200 000 N/mm² und ρ = 7850 kg/m³ ungefähr ein Stahl. Wer ein
+      eigenes Material nimmt, gibt G selbst ein.
+- [ ] **Im Raum fehlt ein Diagramm der Verdrehung.** Ein Knoten dreht sich
+      dort um drei Achsen; welches Bild es zeigen soll, ist offen. Die
+      Zahlen stehen in der Herleitung.
 
 ## Noch nicht gebaut
 

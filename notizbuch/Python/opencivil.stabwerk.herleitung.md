@@ -1,5 +1,5 @@
 ---
-erzeugt: 385c936878bd
+erzeugt: adce7d967bc7
 art: modul
 tags: [modul]
 ---
@@ -40,18 +40,68 @@ def schreiben(p: Protokoll, system: 'Balkensystem', befund: 'Systembefund') -> N
 
 Die ganze Herleitung eines gerechneten Systems.
 
-### _teilname
+### halt_text
 
 ```python
-def _teilname(e: Ergebnis, teil) -> str
+def halt_text(halt: Halt, einheit: str, faktor: float=1000.0) -> str
+```
+
+### gelenke_text
+
+```python
+def gelenke_text(stab) -> str
+```
+
+Wo ein Stab ein Gelenk hat -- in der Ebene und im Raum.
+
+### linienlager_text
+
+```python
+def linienlager_text(*richtungen: Tuple[str, Halt]) -> str
+```
+
+Wie ein Stab aufliegt, je Richtung -- `("quer", halt), ("längs", halt)`.
+
+### teilname
+
+```python
+def teilname(e: Ergebnis, teil) -> str
 ```
 
 Der Name eines Teilstabs: der seines Stabs -- mit Nummer, wenn dieser geteilt ist.
 
-### _gleichgewicht
+### unbekannte
 
 ```python
-def _gleichgewicht(p: Protokoll, fall: Fall) -> None
+def unbekannte(p: Protokoll, e: Ergebnis) -> None
+```
+
+### kopf_eines_falls
+
+```python
+def kopf_eines_falls(p: Protokoll, befund: 'Systembefund', fall) -> None
+```
+
+Titel, Beiwerte einer Kombination, Lastvektor und Loesung -- in der Ebene und im Raum.
+
+### lagerkraefte
+
+```python
+def lagerkraefte(p: Protokoll, befund: 'Systembefund', fall, groessen: Sequence[Tuple[str, str]]=LAGERKRAEFTE_DER_EBENE) -> None
+```
+
+### extremwerte
+
+```python
+def extremwerte(p: Protokoll, verlaeufe, groessen: Sequence[Tuple[str, str, float, int]]=EXTREMWERTE_DER_EBENE, durchbiegungen: Sequence[str]=('w',)) -> None
+```
+
+Kleinster und groesster Wert je Stab -- dazu die groesste der `durchbiegungen`.
+
+### gleichgewicht
+
+```python
+def gleichgewicht(p: Protokoll, fall, summen=SUMMEN_DER_EBENE) -> None
 ```
 
 Lasten und Lagerkraefte zusammen -- null bis auf Rundung.
@@ -64,6 +114,12 @@ def _zahl(x: float) -> str
 
 Vier gueltige Ziffern -- ab einer Million und unter einem Tausendstel mit Zehnerpotenz.
 
+### matrix_latex
+
+```python
+def matrix_latex(zeilen: Sequence[Sequence[float]], faktor: float) -> str
+```
+
 
 ## Konstanten
 
@@ -74,6 +130,9 @@ Vier gueltige Ziffern -- ab einer Million und unter einem Tausendstel mit Zehner
 - `GLEICHUNGSSYSTEM_LATEX = '\\mathbf{K} = \\sum_{\\text{Stäbe}} \\mathbf{T}^{\\mathsf{T}} \\cdot…` – Das Gleichungssystem in Zeichen.
 - `SCHNITTGROESSEN_LATEX = 'N(0) = -s_{u,a} \\qquad V(0) = s_{v,a} \\qquad M(0) = -s_{\\theta,a}…` – Von den Kraeften an den Stabenden zu den Schnittgroessen laengs des Stabs.
 - `BIEGELINIE_LATEX = "v'' = \\frac{M}{EI} \\qquad u' = \\frac{N}{EA}"` – Die Biegelinie aus Moment und Normalkraft.
+- `LAGERKRAEFTE_DER_EBENE = (('R_x', 'kN'), ('R_z', 'kN'), ('M', 'kNm'))` – Eine Lagerkraft in der Ebene, in der Folge des Rechenkerns: Zeichen und Einheit.
+- `EXTREMWERTE_DER_EBENE = (('N', 'kN', 0.001, 1), ('V', 'kN', 0.001, 1), ('M', 'kNm', 0.001, 1)…` – Die Extremwerte in der Ebene: Groesse, Einheit, Faktor von SI und Nachkommastellen.
+- `SUMMEN_DER_EBENE = (('\\sum F_x', 'kN'), ('\\sum F_z', 'kN'), ('\\sum M_0', 'kNm'))` – Die Summen der Gleichgewichtsprobe in der Ebene, in der Folge des Rechenkerns.
 
 ## Braucht
 
@@ -88,6 +147,7 @@ Vier gueltige Ziffern -- ab einer Million und unter einem Tausendstel mit Zehner
 ## Gebraucht von
 
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk3d.herleitung]]
 
 ## Formeln aus diesem Modul
 

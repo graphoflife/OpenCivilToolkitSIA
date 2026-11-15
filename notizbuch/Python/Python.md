@@ -1,5 +1,5 @@
 ---
-erzeugt: a645cddc405a
+erzeugt: b155aab7ca36
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -119,6 +119,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
   - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
       - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
+      - [[opencivil.projekt.aufbau.balkensystem3d]] – ein 3D-Balkensystem wird Rechnung.
       - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
       - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
       - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
@@ -129,6 +130,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
       - [[opencivil.projekt.aufbau.setzung]] – eine Setzungsberechnung wird Rechnung.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
+    - [[opencivil.projekt.balkensystem3d]] – ein 3D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.beispiele]] – die Prüfprojekte: das Beispiel und «Jeder Nachweis».
     - [[opencivil.projekt.decke]] – eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
@@ -143,6 +145,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
+    - [[opencivil.projekt.staebe]] – der Baukasten eines Stabwerks, eben und im Raum.
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
     - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
     - [[opencivil.querschnitt.bewehrungselemente]] – die gezeichnete Bewehrung, je nach Art.
@@ -181,8 +184,10 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
     - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.
 - [[opencivil.stabwerk3d]] – raeumliche Stabwerke nach der Steifigkeitsmethode.
+    - [[opencivil.stabwerk3d.herleitung]] – wie ein 3D-Balkensystem seine Rechnung aufschreibt.
     - [[opencivil.stabwerk3d.modell]] – was gerechnet wird: das raeumliche Stabwerk in SI.
     - [[opencivil.stabwerk3d.raum]] – Vektoren, Richtungen und Strecken im Raum.
+    - [[opencivil.stabwerk3d.rechnung]] – das 3D-Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk3d.stab]] – der raeumliche Stab: drei ebene in einem.
     - [[opencivil.stabwerk3d.system]] – das raeumliche Stabwerk: Unbekannte, Zusammenbau, Loesen.
     - [[opencivil.stabwerk3d.verlauf]] – Schnittgroessen und Biegelinien laengs eines Stabs im Raum.

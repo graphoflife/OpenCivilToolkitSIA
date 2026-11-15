@@ -1,5 +1,5 @@
 ---
-erzeugt: 515c3f61749d
+erzeugt: 9c11fe931cc9
 art: formel
 tags: [formel]
 ---
@@ -29,7 +29,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.stabwerk.rechnung|_biegesteifigkeit]]
+- [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 
 ## Themen
 

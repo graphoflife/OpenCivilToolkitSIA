@@ -1,5 +1,5 @@
 ---
-erzeugt: 25b5499e228b
+erzeugt: 6fc201ec785f
 art: modul
 tags: [modul]
 ---
@@ -360,7 +360,9 @@ Alle Lasten des Falls als Kraft auf das Tragwerk und Moment um den Ursprung.
 - [[opencivil.projekt.aufbau.faelle]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.raum]]
+- [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
 - [[opencivil.stabwerk3d.system]]
 - [[opencivil.web.balkendaten]]

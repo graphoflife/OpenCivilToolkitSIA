@@ -1,5 +1,5 @@
 ---
-erzeugt: b30ad215164a
+erzeugt: 53fd9195c6bc
 art: modul
 tags: [modul]
 ---
@@ -15,6 +15,16 @@ die Dehn- und die Biegesteifigkeit `EA` und `EI`, und eine Prozedur, die
 das System nach der Steifigkeitsmethode rechnet
 ([[opencivil.stabwerk.system|system]]) und ihre Herleitung schreibt
 ([[opencivil.stabwerk.herleitung|herleitung]]).
+
+
+## EBEN UND IM RAUM
+
+Das 3D-Balkensystem ([[opencivil.stabwerk3d.rechnung]]) tut dasselbe mit
+mehr Kennwerten und Steifigkeiten -- `I_y`, `I_z` und `I_T`, `EI_y`,
+`EI_z` und `GI_T` -- und rechnet im Raum. Was beide gleich tun, steht in
+[[opencivil.stabwerk.rechnung#Stabwerksrechnung|Stabwerksrechnung]]: welche Kennwerte, Steifigkeiten und
+Materialkennwerte, sagt je System eine Liste, wie es rechnet und schreibt,
+eine Methode.
 
 
 ## WOHER A UND I KOMMEN
@@ -35,7 +45,7 @@ oder Querschnittsanalyse.
 
 ## STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN
 
-`E_cm` eines Betons, `E_a` eines Baustahls ([[opencivil.stabwerk.rechnung#Konstanten|STABKENNWERTE]]) oder
+`E_cm` eines Betons, `E_a` eines Baustahls ([[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]]) oder
 E von Hand -- und bei
 einem Stab mit dem Material seiner Querschnittsanalyse auf Wunsch deren
 E_eq bei N und M (Benutzer, 2026-10-23) --, am ungerissenen
@@ -61,6 +71,48 @@ mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 
 ## Inhalt
 
+### Materialkennwert
+
+```python
+@dataclass(frozen=True)
+class Materialkennwert
+```
+
+Ein Kennwert, den ein Stab von seinem Material nimmt: je Art des
+Baustoffs, welcher es ist, und wie er bei einem eigenen Material von
+Hand heisst -- `kurzname` ist auch sein Feld dort.
+
+- `kurzname: str`
+- `symbol: str`
+- `einheit: Einheit`
+- `beschreibung: str`
+- `je_stoff: Mapping[Baustoffart, str]`
+
+### stoffkennwerte
+
+```python
+def stoffkennwerte(kennwerte: Sequence[Materialkennwert]) -> Dict[Baustoffart, Dict[str, str]]
+```
+
+Je Art des Baustoffs, welche seiner Kennwerte ein Stab nimmt: `{BETON: {"E": "E_cm"}}`.
+
+### Steifigkeitsformel
+
+```python
+@dataclass(frozen=True)
+class Steifigkeitsformel
+```
+
+Eine Steifigkeit eines Stabs: ein Modul seines Materials mal ein
+Kennwert seines Querschnitts. `kurzname` heisst auch das Feld des
+Stabs im Rechenkern, `beschreibung` auch die Formel.
+
+- `kurzname: str`
+- `einheit: Einheit`
+- `beschreibung: str`
+- `modul: str` – `E` oder `G` -- ein [[opencivil.stabwerk.rechnung#Materialkennwert|Materialkennwert]].
+- `kennwert: str` – Ein Kennwert des Querschnitts: `A`, `I`, `I_T` ...
+
 ### Stabmaterial
 
 ```python
@@ -68,14 +120,13 @@ mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 class Stabmaterial
 ```
 
-Ein Material der Staebe, aufgeloest: ein Beton oder Baustahl -- E und
-Dichte von ihm -- oder ein eigenes mit E und Dichte von Hand.
+Ein Material der Staebe, aufgeloest: ein Beton oder Baustahl -- seine
+Kennwerte von ihm -- oder ein eigenes mit Kennwerten von Hand.
 
 - `kennung: str` – Im System, `M1` -- bei einem Stab mit dem Material seines Querschnitts dessen Zeichen.
 - `name: str`
 - `stoff: Optional[Baustoff] = None` – Der Beton oder Baustahl -- `None` bei einem eigenen Material.
-- `E: float = 0.0` – Von Hand, N/mm² -- nur ohne `stoff`.
-- `rho: float = 0.0` – Von Hand, kg/m³ -- nur ohne `stoff`.
+- `werte: Mapping[str, float] = field(default_factory=dict)` – Von Hand, je [[opencivil.stabwerk.rechnung#Materialkennwert|Materialkennwert]] in seiner Einheit -- nur ohne `stoff`.
 - `vom_querschnitt: bool = False` – Das Material des Querschnitts: dann gilt dessen E_eq, wenn er eines hat.
 
 ### Steifigkeit
@@ -89,10 +140,9 @@ Ein Paar aus Querschnitt und Material und die Wert-IDs seiner Steifigkeiten.
 
 - `querschnitt: str`
 - `material: str` – Die Kennung des [[opencivil.stabwerk.rechnung#Stabmaterial|Stabmaterial]].
-- `EA: str`
-- `EI: str`
+- `werte: Mapping[str, str]` – Je [[opencivil.stabwerk.rechnung#Steifigkeitsformel|Steifigkeitsformel]] die Wert-ID: `{"EA": ..., "EI": ...}`.
 - `g_k: str = ''` – Das Eigengewicht je Meter -- leer, wenn kein Lastfall es bekommt.
-- `mit_eq: bool = False` – Ob E das E_eq des Querschnitts ist -- dann fehlen EA und EI, wo die Suche keines fand.
+- `mit_eq: bool = False` – Ob E das E_eq des Querschnitts ist -- dann fehlen die Steifigkeiten, wo die Suche keines fand.
 
 ### Lagerkraft
 
@@ -105,9 +155,7 @@ Eine Zeile der Lagerkraefte eines Falls, auf das Tragwerk wirkend -- in
 Herleitung und Bildschirm dieselbe.
 
 - `wo: str` – «A1 (K1)», «L2 bei 1.500 m», «L2: Bettung, Summe».
-- `R_x: float`
-- `R_z: float`
-- `M: float`
+- `werte: Tuple[float, ...]` – Wie der Rechenkern sie gibt: `(R_x, R_z, M)` in der Ebene, sechs im Raum -- in N und Nm.
 - `knoten: str = ''` – Der Knoten, an dem sie angreift -- leer auf einem Stab und bei einer Summe.
 - `summe: bool = False` – Die Summe ueber einen Stab, mit dem Moment um den Ursprung (siehe `SUMMEN`).
 
@@ -164,17 +212,23 @@ Das ganze System, gerechnet und aufgeschrieben.
 def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
-### Balkensystem
+### Stabwerksrechnung
 
 ```python
-class Balkensystem(Rechenobjekt)
+class Stabwerksrechnung(Rechenobjekt)
 ```
 
-Ein Balkensystem, fertig fuer das Rechenwerk.
+Ein Balkensystem, fertig fuer das Rechenwerk -- was die Ebene und der
+Raum gleich tun, siehe Dateikopf. Je System sagen die Klassenattribute,
+welche Kennwerte, Steifigkeiten und Materialkennwerte es hat, und die
+Methoden `_rechnen`, `_leer`, `_eigenlast`, `_befund` und
+`_schreiben`, wie es rechnet und schreibt.
 
-- `WAS = 'Balkensystem'`
+- `KENNWERTE: Tuple[Kennwert, ...]` – Was ein Querschnitt liefert ([[opencivil.stabwerk.stabquerschnitt|stabquerschnitt]]).
+- `STEIFIGKEITEN: Tuple[Steifigkeitsformel, ...]`
+- `MATERIALKENNWERTE: Tuple[Materialkennwert, ...]`
 
-#### Balkensystem.abschnitt
+#### Stabwerksrechnung.abschnitt
 
 ```python
 def abschnitt(self, thema: str=STEIFIGKEITSMETHODE) -> Abschnitt
@@ -182,7 +236,7 @@ def abschnitt(self, thema: str=STEIFIGKEITSMETHODE) -> Abschnitt
 
 Ein Abschnitt fuer alles -- das Thema sagt nur, wo die Formeln gesammelt stehen.
 
-#### Balkensystem.bezuege
+#### Stabwerksrechnung.bezuege
 
 ```python
 @property
@@ -191,16 +245,17 @@ def bezuege(self) -> List[str]
 
 Die Platten und Analysen, deren Werte das System liest.
 
-#### Balkensystem._kennwerte
+#### Stabwerksrechnung._kennwerte
 
 ```python
-def _kennwerte(self, m: Stabmaterial) -> Tuple[str, str]
+def _kennwerte(self, m: Stabmaterial) -> Dict[str, str]
 ```
 
-Die Wert-IDs von E und Dichte eines Materials: die seines Baustoffs --
-oder bei einem eigenen Vorgaben von Hand, einmal je Material.
+Die Wert-IDs der [[opencivil.stabwerk.rechnung#Stabwerksrechnung|MATERIALKENNWERTE]] eines Materials: die
+seines Baustoffs -- oder bei einem eigenen Vorgaben von Hand, einmal
+je Material.
 
-#### Balkensystem._erdbeschleunigung
+#### Stabwerksrechnung._erdbeschleunigung
 
 ```python
 def _erdbeschleunigung(self) -> str
@@ -208,17 +263,18 @@ def _erdbeschleunigung(self) -> str
 
 `g` als Vorgabe des Systems -- seine Wert-ID.
 
-#### Balkensystem._steifigkeit
+#### Stabwerksrechnung._steifigkeit
 
 ```python
 def _steifigkeit(self, q: str, m: Stabmaterial, index: str, g: Optional[str]=None) -> Steifigkeit
 ```
 
-EA und EI eines Paars aus Querschnitt und Material -- mit `g` dazu
-sein Eigengewicht. E und Dichte kommen vom Material; nimmt der Stab
-das Material seines Querschnitts und hat der ein E_eq, gilt dieses.
+Die [[opencivil.stabwerk.rechnung#Stabwerksrechnung|STEIFIGKEITEN]] eines Paars aus Querschnitt und Material --
+mit `g` dazu sein Eigengewicht. Module und Dichte kommen vom
+Material; nimmt der Stab das Material seines Querschnitts und hat der
+ein E_eq, gilt dieses.
 
-#### Balkensystem._eigengewicht
+#### Stabwerksrechnung._eigengewicht
 
 ```python
 def _eigengewicht(self, e: Eingaben) -> Dict[str, float]
@@ -228,7 +284,7 @@ Je tragenden Stab `g_k` in N/m -- es kommt senkrecht ueber seine
 ganze Laenge in den Lastfall des Eigengewichts, je Meter Stab und
 nicht je Meter Projektion. Leer ohne diesen Lastfall.
 
-#### Balkensystem.baustoffe
+#### Stabwerksrechnung.baustoffe
 
 ```python
 @property
@@ -237,7 +293,7 @@ def baustoffe(self) -> List[Baustoff]
 
 Die Betone der Stäbe, jeder einmal -- eigene Materialien bringen ihre Werte selbst.
 
-#### Balkensystem.ziele
+#### Stabwerksrechnung.ziele
 
 ```python
 def ziele(self) -> List[str]
@@ -247,7 +303,7 @@ Was ein Lauf rechnen muss: jeder Querschnitt -- auch einer, den kein
 Stab nimmt -- und das System. Von einem E_eq die Suche, nicht E: das
 fehlt, wo sie keinen Modul fand.
 
-#### Balkensystem.rechnen_und_schreiben
+#### Stabwerksrechnung.rechnen_und_schreiben
 
 ```python
 def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
@@ -257,7 +313,7 @@ Die Steifigkeiten in die Staebe, das System gerechnet, die Herleitung
 geschrieben. Haelt eine Meldung der Beschreibung die Rechnung auf --
 oder ein E_eq, das es nicht gibt --, bleibt es bei ihr.
 
-#### Balkensystem._ohne_modul
+#### Stabwerksrechnung._ohne_modul
 
 ```python
 def _ohne_modul(self, e: Eingaben) -> List[Meldung]
@@ -266,13 +322,78 @@ def _ohne_modul(self, e: Eingaben) -> List[Meldung]
 Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab mit
 seinem Material nimmt, eine Meldung.
 
+#### Stabwerksrechnung._rechnen
+
+```python
+def _rechnen(self, system: Any) -> Any
+```
+
+Das System, gerechnet -- ein Ergebnis des Rechenkerns.
+
+#### Stabwerksrechnung._leer
+
+```python
+def _leer(self, meldungen: List[Meldung]) -> Any
+```
+
+Ein Ergebnis ohne Rechnung, nur mit den Meldungen, die sie aufhalten.
+
+#### Stabwerksrechnung._eigenlast
+
+```python
+def _eigenlast(self, stab: str, g: float) -> Any
+```
+
+Das Eigengewicht eines Stabs als Last des Rechenkerns: senkrecht, `g` in N/m.
+
+#### Stabwerksrechnung._schreiben
+
+```python
+def _schreiben(self, p: Protokoll, befund: Systembefund) -> None
+```
+
+Die Herleitung.
+
+### Balkensystem
+
+```python
+class Balkensystem(Stabwerksrechnung)
+```
+
+Ein ebenes Balkensystem, fertig fuer das Rechenwerk.
+
+- `WAS = 'Balkensystem'`
+- `KENNWERTE = EBEN`
+- `STEIFIGKEITEN = (DEHNSTEIFIGKEIT, Steifigkeitsformel('EI', KNM2, 'Biegesteifigkeit', …`
+- `MATERIALKENNWERTE = (E_MODUL, DICHTE)`
+
+### _gewicht_je_meter
+
+```python
+def _gewicht_je_meter(rho: Groesse, g: Groesse, A: Groesse) -> Groesse
+```
+
+Das Eigengewicht eines Stabs je Meter: Dichte mal g mal Flaeche.
+
+### _modul_mal_kennwert
+
+```python
+def _modul_mal_kennwert(**faktoren: Groesse) -> Groesse
+```
+
+Modul mal Kennwert ([[opencivil.stabwerk.rechnung#Steifigkeitsformel|Steifigkeitsformel]]).
+
 
 ## Konstanten
 
-- `STABKENNWERTE = {Baustoffart.BETON: {'E': 'E_cm', 'rho': 'rho_sb'}, Baustoffart.BAUST…` – Welche Kennwerte eines Baustoffs ein Stab aus ihm nimmt. Beim Beton `E_cm` -- die Analyse rechnet in der Regel ungerissen (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert -- und die Dichte des Stahlbetons (Benutzer, 2026-10-23); beim Baustahl `E_a` und `rho_a`.
+- `E_MODUL = Materialkennwert('E', 'E', N_PRO_MM2, 'E-Modul', {Baustoffart.BETON: …` – Beim Beton `E_cm` -- die Analyse rechnet in der Regel ungerissen (SIA 262:2025, 4.1.4.1.3), mit dem Mittelwert --, beim Baustahl `E_a`.
+- `DICHTE = Materialkennwert('rho', '\\rho', KG_PRO_M3, 'Dichte', {Baustoffart.BE…` – Fuer das Eigengewicht: beim Beton die Dichte des Stahlbetons (Benutzer, 2026-10-23).
+- `SCHUBMODUL = Materialkennwert('G', 'G', N_PRO_MM2, 'Schubmodul', {Baustoffart.BETO…` – Fuer die Torsion, nur im Raum: `G_cm` des Betons, `G_a` des Baustahls.
+- `STABKENNWERTE = stoffkennwerte((E_MODUL, DICHTE))` – Welche Kennwerte eines Baustoffs ein Stab in der Ebene aus ihm nimmt.
 - `ERDBESCHLEUNIGUNG = Groesse(10.0, M_PRO_S2)` – Die Erdbeschleunigung des Eigengewichts -- 10 m/s² nach Vorgabe des Benutzers (2026-10-23): so wiegt Stahlbeton 25 kN/m³.
 - `QUERSCHNITTE = 'Stabquerschnitte'` – Die Themen der Formelsammlung: was am Querschnitt haengt, und die Rechnung.
 - `STEIFIGKEITSMETHODE = 'Steifigkeitsmethode'`
+- `DEHNSTEIFIGKEIT = Steifigkeitsformel('EA', MN, 'Dehnsteifigkeit', 'E', 'A')`
 
 ## Braucht
 
@@ -296,11 +417,12 @@ seinem Material nimmt, eine Meldung.
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.stabwerk.herleitung]]
+- [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]
 
 ## Formeln aus diesem Modul
 
-- [[Biegesteifigkeit]] · `_biegesteifigkeit`
-- [[Dehnsteifigkeit]] · `_dehnsteifigkeit`
-- [[Eigengewicht eines Stabs]] · `_eigengewicht`
+- [[Biegesteifigkeit]] · `_modul_mal_kennwert`
+- [[Dehnsteifigkeit]] · `_modul_mal_kennwert`
+- [[Eigengewicht eines Stabs]] · `_gewicht_je_meter`

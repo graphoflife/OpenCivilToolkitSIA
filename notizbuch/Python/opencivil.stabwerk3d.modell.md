@@ -1,5 +1,5 @@
 ---
-erzeugt: 1fa08aefb1d6
+erzeugt: 9ad1e6111703
 art: modul
 tags: [modul]
 ---
@@ -230,5 +230,9 @@ class System
 
 ## Gebraucht von
 
+- [[opencivil.projekt.aufbau.balkensystem3d]]
+- [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.stabwerk3d.herleitung]]
+- [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
 - [[opencivil.stabwerk3d.system]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: de1e745a0fc8
+erzeugt: db7fc969b037
 art: formel
 tags: [formel]
 ---
@@ -29,7 +29,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.stabwerk.rechnung|_dehnsteifigkeit]]
+- [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 
 ## Themen
 

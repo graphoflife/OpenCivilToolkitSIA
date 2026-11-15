@@ -1,5 +1,5 @@
 ---
-erzeugt: 90bf72c18b43
+erzeugt: adadd358045c
 art: modul
 tags: [modul]
 ---
@@ -76,17 +76,26 @@ def achsen(a, b, drehung: float=0.0) -> Tuple[float, Tuple[Vektor, Vektor, Vekto
 Laenge und Achsen `(x, y, z)` eines Stabs von `a` nach `b` --
 Einheitsvektoren im System, siehe Dateikopf.
 
+### _lotrecht
+
+```python
+def _lotrecht(d: Sequence[float]) -> bool
+```
+
+Ob ein Stab in Richtung `d` lotrecht steht -- waagrecht weniger lang als die Toleranz.
+
 ### drehung_umgekehrt
 
 ```python
-def drehung_umgekehrt(a, b, drehung: float) -> float
+def drehung_umgekehrt(d: Sequence[float], drehung: float, halbe_drehung: float=math.pi) -> float
 ```
 
-Der Drehwinkel des Stabs von `a` nach `b`, wenn er umgekehrt von
-`b` nach `a` laeuft -- so, dass der Querschnitt bleibt, wie er
-steht: `z` bleibt, `y` kehrt um wie `x`. Liegt der Stab nicht
-lotrecht, bleibt `z` bei `β = 0` dasselbe, und es ist `-β`;
-lotrecht kehrt es um, und es ist `π - β`. Zwischen `-π` und `π`.
+Der Drehwinkel eines Stabs in Richtung `d`, wenn er umgekehrt laeuft
+-- so, dass der Querschnitt bleibt, wie er steht: `z` bleibt, `y`
+kehrt um wie `x`. Liegt der Stab nicht lotrecht, bleibt `z` bei
+`β = 0` dasselbe, und es ist `-β`; lotrecht kehrt es um, und es ist
+`π - β`. Zwischen `-π` und `π` -- in Grad mit ``halbe_drehung =
+180``, ohne den Umweg ueber rad und seine Rundung.
 
 ### steifigkeit
 
@@ -213,5 +222,7 @@ tragen ihre Werte in den Achsen ihrer Ebene, siehe Dateikopf.
 
 ## Gebraucht von
 
+- [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.system]]
 - [[opencivil.stabwerk3d.verlauf]]

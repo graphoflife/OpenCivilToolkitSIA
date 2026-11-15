@@ -100,7 +100,7 @@ def achsen(a, b, drehung: float = 0.0) -> Tuple[float, Tuple[Vektor, Vektor, Vek
     d = (b.x - a.x, b.y - a.y, b.z - a.z)
     L = math.sqrt(sum(c * c for c in d))
     ex = tuple(c / L for c in d)
-    if math.hypot(d[0], d[1]) <= TOLERANZ:
+    if _lotrecht(d):
         ey0 = (0.0, -1.0, 0.0)
         ez0 = raum.kreuz(ex, ey0)
     else:
@@ -113,6 +113,24 @@ def achsen(a, b, drehung: float = 0.0) -> Tuple[float, Tuple[Vektor, Vektor, Vek
     ey = tuple(c * p + s * q for p, q in zip(ey0, ez0))
     ez = tuple(-s * p + c * q for p, q in zip(ey0, ez0))
     return L, (ex, ey, ez)
+
+
+def _lotrecht(d: Sequence[float]) -> bool:
+    """Ob ein Stab in Richtung ``d`` lotrecht steht -- waagrecht weniger lang als die Toleranz."""
+    return math.hypot(d[0], d[1]) <= TOLERANZ
+
+
+def drehung_umgekehrt(d: Sequence[float], drehung: float, halbe_drehung: float = math.pi) -> float:
+    """
+    Der Drehwinkel eines Stabs in Richtung ``d``, wenn er umgekehrt laeuft
+    -- so, dass der Querschnitt bleibt, wie er steht: ``z`` bleibt, ``y``
+    kehrt um wie ``x``. Liegt der Stab nicht lotrecht, bleibt ``z`` bei
+    ``β = 0`` dasselbe, und es ist ``-β``; lotrecht kehrt es um, und es ist
+    ``π - β``. Zwischen ``-π`` und ``π`` -- in Grad mit ``halbe_drehung =
+    180``, ohne den Umweg ueber rad und seine Rundung.
+    """
+    neu = halbe_drehung - drehung if _lotrecht(d) else -drehung
+    return math.remainder(neu, 2.0 * halbe_drehung)
 
 
 def _einsetzen(k: Matrix, eben: Matrix, ebene) -> None:

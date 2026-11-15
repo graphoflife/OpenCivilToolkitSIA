@@ -1,5 +1,5 @@
 ---
-erzeugt: f28fef8854ec
+erzeugt: 1af8a921755e
 art: formel
 tags: [formel]
 ---
@@ -30,7 +30,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.stabwerk.rechnung#Balkensystem._eigengewicht|_eigengewicht]]
+- [[opencivil.stabwerk.rechnung#_gewicht_je_meter|_gewicht_je_meter]]
 
 ## Themen
 

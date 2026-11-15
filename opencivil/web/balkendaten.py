@@ -36,6 +36,9 @@ PROBEN_JE_STAB = 24
 #: Die Einheit der Anzeige je Groesse eines Verlaufs.
 EINHEITEN = {"N": KN, "V": KN, "M": KNM, "w": MM, "ux": MM, "uz": MM, "phi": MRAD}
 
+#: Eine Lagerkraft, wie der Rechenkern sie gibt -- je Groesse ihr Name und ihre Einheit.
+LAGERKRAEFTE = (("R_x", KN), ("R_z", KN), ("M", KNM))
+
 
 def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
     """
@@ -79,7 +82,7 @@ def _fall(befund: Systembefund, fall: Fall) -> Dict[str, Any]:
         # Linienlager und Bettung, sonst gingen die Kraefte nicht auf.
         "lagerkraefte": [
             {"wo": k.wo, "knoten": k.knoten, "summe": k.summe,
-             "R_x": zahl(k.R_x, KN), "R_z": zahl(k.R_z, KN), "M": zahl(k.M, KNM)}
+             **{groesse: zahl(w, einheit) for (groesse, einheit), w in zip(LAGERKRAEFTE, k.werte)}}
             for k in befund.lagerkraefte(fall)],
     }
 

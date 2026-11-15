@@ -89,7 +89,7 @@ def schreiben(p: Protokoll, system: "Balkensystem", befund: "Systembefund") -> N
     if e.K is None:
         return
     _ansaetze(p, befund)
-    _unbekannte(p, e)
+    unbekannte(p, e)
     if not e.faelle:
         return
     for fall in e.faelle:
@@ -114,15 +114,13 @@ def _staebe(p: Protokoll, system: "Balkensystem", modell: System) -> None:
         paar = system.paare.get(stab.name)
         # Ohne Steifigkeit steht ein Stab da, dem ein E_eq fehlt: EA bleibt null.
         steif = paar is not None and stab.traegt and stab.EA > 0.0
-        gelenke = {(True, True): "beide", (True, False): "Anfang",
-                   (False, True): "Ende"}.get((stab.gelenk_a, stab.gelenk_b), "–")
         zeilen.append([
             stab.name, f"{stab.a} – {stab.b}", Mathe(fest(L, 3)), Mathe(fest(alpha, 1)),
             name[paar[0]] if paar is not None else ("kein Stab" if not stab.traegt else "–"),
             Mathe(fest(stab.EA / 1e6, 0)) if steif else "–",
             Mathe(fest(stab.EI / 1e3, 0)) if steif else "–",
-            gelenke if stab.traegt else "–",
-            _linienlager(stab.quer, stab.laengs),
+            gelenke_text(stab),
+            linienlager_text(("quer", stab.quer), ("längs", stab.laengs)),
         ])
     if zeilen:
         p.tabelle(["Stab", "Knoten", Mathe(r"L\ [\mathrm{m}]"), Mathe(r"\alpha\ [°]"),
@@ -130,7 +128,7 @@ def _staebe(p: Protokoll, system: "Balkensystem", modell: System) -> None:
                    "Gelenk", "Linienlager"], zeilen, titel="Stäbe")
 
 
-def _halt(halt: Halt, einheit: str, faktor: float = 1e3) -> str:
+def halt_text(halt: Halt, einheit: str, faktor: float = 1e3) -> str:
     if halt.fest:
         return "fest"
     if halt.frei:
@@ -138,9 +136,18 @@ def _halt(halt: Halt, einheit: str, faktor: float = 1e3) -> str:
     return f"Feder {halt.feder / faktor:g} {einheit}"
 
 
-def _linienlager(quer: Halt, laengs: Halt) -> str:
-    teile = [f"{richtung} {_halt(halt, 'kN/m²').replace('Feder', 'Bettung')}"
-             for richtung, halt in (("quer", quer), ("längs", laengs)) if not halt.frei]
+def gelenke_text(stab) -> str:
+    """Wo ein Stab ein Gelenk hat -- in der Ebene und im Raum."""
+    if not stab.traegt:
+        return "–"
+    return {(True, True): "beide", (True, False): "Anfang",
+            (False, True): "Ende"}.get((stab.gelenk_a, stab.gelenk_b), "–")
+
+
+def linienlager_text(*richtungen: Tuple[str, Halt]) -> str:
+    """Wie ein Stab aufliegt, je Richtung -- ``("quer", halt), ("längs", halt)``."""
+    teile = [f"{richtung} {halt_text(halt, 'kN/m²').replace('Feder', 'Bettung')}"
+             for richtung, halt in richtungen if not halt.frei]
     return ", ".join(teile) or "–"
 
 
@@ -149,8 +156,8 @@ def _lager(p: Protokoll, modell: System) -> None:
     if not lager:
         return
     p.tabelle(["Lager", "Knoten", Mathe("x"), Mathe("z"), Mathe(r"\varphi")],
-              [[l.name, l.knoten, _halt(l.x, "kN/m"), _halt(l.z, "kN/m"),
-                _halt(l.phi, "kNm/rad")] for l in lager], titel="Lager")
+              [[l.name, l.knoten, halt_text(l.x, "kN/m"), halt_text(l.z, "kN/m"),
+                halt_text(l.phi, "kNm/rad")] for l in lager], titel="Lager")
 
 
 def _ansaetze(p: Protokoll, befund: "Systembefund") -> None:
@@ -176,9 +183,9 @@ def _ansaetze(p: Protokoll, befund: "Systembefund") -> None:
                   f"angeschlossen; die Drehung ist gestrichen und null gesetzt.")
     if len(e.teilstaebe) <= STAEBE_MIT_MATRIX:
         for t in e.teilstaebe:
-            p.gleichung(rf"\mathbf{{k}}_{{\text{{{text_latex(_teilname(e, t))}}}}} = "
-                        + _matrix(t.k, 1e-3),
-                        titel=f"Steifigkeitsmatrix {_teilname(e, t)}, L = {t.L:.3f} m "
+            p.gleichung(rf"\mathbf{{k}}_{{\text{{{text_latex(teilname(e, t))}}}}} = "
+                        + matrix_latex(t.k, 1e-3),
+                        titel=f"Steifigkeitsmatrix {teilname(e, t)}, L = {t.L:.3f} m "
                               f"(kN, m)")
     p.ansatz(SCHNITTGROESSEN_LATEX, titel="Schnittgrössen aus den Kräften an den Stabenden",
              name="Schnittgrössen längs eines Stabs")
@@ -186,20 +193,20 @@ def _ansaetze(p: Protokoll, befund: "Systembefund") -> None:
              name="Biegelinie eines Stabs")
 
 
-def _teilname(e: Ergebnis, teil) -> str:
+def teilname(e: Ergebnis, teil) -> str:
     """Der Name eines Teilstabs: der seines Stabs -- mit Nummer, wenn dieser geteilt ist."""
     stuecke = sum(1 for t in e.teilstaebe if t.stab.name == teil.stab.name)
     return teil.stab.name if stuecke == 1 else f"{teil.stab.name}.{teil.nummer + 1}"
 
 
-def _unbekannte(p: Protokoll, e: Ergebnis) -> None:
+def unbekannte(p: Protokoll, e: Ergebnis) -> None:
     n = len(e.unbekannte)
     if n > UNBEKANNTE_MIT_MATRIX:
         p.text(f"{n} Unbekannte.")
         return
     p.text(f"{n} Unbekannte: " + ", ".join(f"{i + 1}. {u}" for i, u in enumerate(e.unbekannte))
            + ".")
-    p.gleichung(r"\mathbf{K} = " + _matrix(dicht(e.K), 1e-3),
+    p.gleichung(r"\mathbf{K} = " + matrix_latex(dicht(e.K), 1e-3),
                 titel="Gesamtsteifigkeitsmatrix (kN, m)")
 
 
@@ -209,24 +216,28 @@ def _unbekannte(p: Protokoll, e: Ergebnis) -> None:
 
 
 def _fall(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
+    kopf_eines_falls(p, befund, fall)
+    _verschiebungen(p, befund, fall)
+    verlaeufe = befund.verlaeufe(fall.name)
+    _stabenden(p, verlaeufe)
+    lagerkraefte(p, befund, fall)
+    extremwerte(p, verlaeufe)
+    gleichgewicht(p, fall)
+
+
+def kopf_eines_falls(p: Protokoll, befund: "Systembefund", fall) -> None:
+    """Titel, Beiwerte einer Kombination, Lastvektor und Loesung -- in der Ebene und im Raum."""
     modell = befund.gerechnet
     p.titel(f"{'Kombination' if fall.kombination else 'Lastfall'} «{fall.name}»", ebene=3)
     if fall.kombination:
         k = next(k for k in modell.kombinationen if k.name == fall.name)
         p.text(" + ".join(f"{beiwert:g} · {lf}" for lf, beiwert in k.faktoren.items())
                or "Keine Beiwerte – die Kombination ist leer.")
-    e = befund.ergebnis
-    if len(e.unbekannte) <= UNBEKANNTE_MIT_MATRIX:
-        p.gleichung(r"\mathbf{F} = " + _matrix([[f] for f in fall.F], 1e-3)
+    if len(befund.ergebnis.unbekannte) <= UNBEKANNTE_MIT_MATRIX:
+        p.gleichung(r"\mathbf{F} = " + matrix_latex([[f] for f in fall.F], 1e-3)
                     + r" \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = "
-                    + _matrix([[x] for x in fall.x], 1.0),
+                    + matrix_latex([[x] for x in fall.x], 1.0),
                     titel="Lastvektor (kN, kNm) und Lösung (m, rad)")
-    _verschiebungen(p, befund, fall)
-    verlaeufe = befund.verlaeufe(fall.name)
-    _stabenden(p, verlaeufe)
-    _lagerkraefte(p, befund, fall)
-    _extremwerte(p, verlaeufe)
-    _gleichgewicht(p, fall)
 
 
 def _verschiebungen(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
@@ -256,25 +267,35 @@ def _stabenden(p: Protokoll, verlaeufe) -> None:
     p.tabelle(kopf, zeilen, titel="Schnittgrössen an den Stabenden")
 
 
-def _lagerkraefte(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
+#: Eine Lagerkraft in der Ebene, in der Folge des Rechenkerns: Zeichen und Einheit.
+LAGERKRAEFTE_DER_EBENE = (("R_x", "kN"), ("R_z", "kN"), ("M", "kNm"))
+
+
+def lagerkraefte(p: Protokoll, befund: "Systembefund", fall,
+                 groessen: Sequence[Tuple[str, str]] = LAGERKRAEFTE_DER_EBENE) -> None:
     kraefte = befund.lagerkraefte(fall)
     if not kraefte:
         return
-    p.tabelle(["Lager", Mathe(r"R_x\ [\mathrm{kN}]"), Mathe(r"R_z\ [\mathrm{kN}]"),
-               Mathe(r"M\ [\mathrm{kNm}]")],
-              [[k.wo] + [Mathe(fest(w / 1e3, 1)) for w in (k.R_x, k.R_z, k.M)]
-               for k in kraefte],
+    p.tabelle(["Lager"] + [Mathe(rf"{g}\ [\mathrm{{{einheit}}}]") for g, einheit in groessen],
+              [[k.wo] + [Mathe(fest(w / 1e3, 1)) for w in k.werte] for k in kraefte],
               titel="Lagerkräfte, auf das Tragwerk")
     if any(k.summe for k in kraefte):
         p.text(SUMMEN)
 
 
-def _extremwerte(p: Protokoll, verlaeufe) -> None:
+#: Die Extremwerte in der Ebene: Groesse, Einheit, Faktor von SI und Nachkommastellen.
+EXTREMWERTE_DER_EBENE = (("N", "kN", 1e-3, 1), ("V", "kN", 1e-3, 1), ("M", "kNm", 1e-3, 1),
+                         ("w", "mm", 1e3, 2))
+
+
+def extremwerte(p: Protokoll, verlaeufe,
+                groessen: Sequence[Tuple[str, str, float, int]] = EXTREMWERTE_DER_EBENE,
+                durchbiegungen: Sequence[str] = ("w",)) -> None:
+    """Kleinster und groesster Wert je Stab -- dazu die groesste der ``durchbiegungen``."""
     zeilen = []
-    massgebend: Tuple[float, str, float] = (0.0, "", 0.0)
+    massgebend: Tuple[float, str, float, str] = (0.0, "", 0.0, "")
     for name, v in verlaeufe.items():
-        for groesse, einheit, faktor, stellen in (("N", "kN", 1e-3, 1), ("V", "kN", 1e-3, 1),
-                                                  ("M", "kNm", 1e-3, 1), ("w", "mm", 1e3, 2)):
+        for groesse, einheit, faktor, stellen in groessen:
             extrem = v.extrem(groesse)
             (x0, klein), (x1, gross) = extrem.kleinst, extrem.groesst
             zeilen.append([name, Mathe(groesse),
@@ -282,24 +303,27 @@ def _extremwerte(p: Protokoll, verlaeufe) -> None:
                            Mathe(fest(x0, 2)),
                            Mathe(f"{fest(gross * faktor, stellen)}\\ \\mathrm{{{einheit}}}"),
                            Mathe(fest(x1, 2))])
-            if groesse == "w":
+            if groesse in durchbiegungen:
                 for x, w in ((x0, klein), (x1, gross)):
                     if abs(w) > abs(massgebend[0]):
-                        massgebend = (w, name, x)
+                        massgebend = (w, name, x, groesse)
     p.tabelle(["Stab", "Grösse", "kleinst", Mathe(r"x\ [\mathrm{m}]"), "grösst",
                Mathe(r"x\ [\mathrm{m}]")], zeilen, titel="Extremwerte")
-    w, name, x = massgebend
+    w, name, x, groesse = massgebend
     if name and abs(w) > 0.0:
         p.text(f"Grösste Durchbiegung gegen die Sehne eines Stabs: {name}, "
-               f"w = {w * 1e3:.2f} mm bei x = {x:.2f} m.")
+               f"{groesse} = {w * 1e3:.2f} mm bei x = {x:.2f} m.")
 
 
-def _gleichgewicht(p: Protokoll, fall: Fall) -> None:
+#: Die Summen der Gleichgewichtsprobe in der Ebene, in der Folge des Rechenkerns.
+SUMMEN_DER_EBENE = ((r"\sum F_x", "kN"), (r"\sum F_z", "kN"), (r"\sum M_0", "kNm"))
+
+
+def gleichgewicht(p: Protokoll, fall, summen=SUMMEN_DER_EBENE) -> None:
     """Lasten und Lagerkraefte zusammen -- null bis auf Rundung."""
     lasten, rest = fall.lastsumme, fall.gleichgewicht
     zeilen = []
-    for i, (summe, einheit) in enumerate(((r"\sum F_x", "kN"), (r"\sum F_z", "kN"),
-                                          (r"\sum M_0", "kNm"))):
+    for i, (summe, einheit) in enumerate(summen):
         zeilen.append([Mathe(summe), Mathe(fest(lasten[i] / 1e3, 3)),
                        Mathe(fest((rest[i] - lasten[i]) / 1e3, 3)),
                        Mathe(fest(rest[i] / 1e3, 3)), einheit])
@@ -325,6 +349,6 @@ def _zahl(x: float) -> str:
     return rf"{fest(mantisse, 3)} \cdot 10^{{{hoch}}}"
 
 
-def _matrix(zeilen: Sequence[Sequence[float]], faktor: float) -> str:
+def matrix_latex(zeilen: Sequence[Sequence[float]], faktor: float) -> str:
     inhalt = r" \\ ".join(" & ".join(_zahl(w * faktor) for w in zeile) for zeile in zeilen)
     return rf"\begin{{bmatrix}} {inhalt} \end{{bmatrix}}"

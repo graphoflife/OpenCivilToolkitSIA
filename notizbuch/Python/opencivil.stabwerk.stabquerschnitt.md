@@ -1,5 +1,5 @@
 ---
-erzeugt: 9f13f4b23310
+erzeugt: 332b97f06fbf
 art: modul
 tags: [modul]
 ---
@@ -265,4 +265,7 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk3d.rechnung]]

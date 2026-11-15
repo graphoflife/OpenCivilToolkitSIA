@@ -1,5 +1,5 @@
 ---
-erzeugt: d10bbea42fad
+erzeugt: 36daaf120b65
 art: modul
 tags: [modul]
 ---
@@ -42,6 +42,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]

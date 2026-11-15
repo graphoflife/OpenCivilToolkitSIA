@@ -73,6 +73,20 @@ class Achsen(unittest.TestCase):
         self.gleich(ey, ez0)
         self.gleich(ez, raum.mal(-1.0, ey0))
 
+    def test_umgekehrt_steht_der_querschnitt_wie_vorher(self):
+        """Von b nach a: x und y kehren um, z bleibt -- lotrecht, schief und waagrecht."""
+        for a, b in (((0.5, -1.0, 0.0), (2.0, 1.0, 1.5)), ((1.0, 2.0, 0.0), (1.0, 2.0, 3.0)),
+                     ((1.0, 2.0, 3.0), (1.0, 2.0, 0.0)), ((0.0, 0.0, 0.0), (-3.0, 0.0, 0.0))):
+            for grad in (0.0, 30.0, -100.0, 180.0):
+                with self.subTest(a=a, b=b, grad=grad):
+                    drehung = math.radians(grad)
+                    _, ey, ez = self.achsen(b, a, drehung)
+                    zurueck = st3.drehung_umgekehrt(raum.minus(b, a), drehung)
+                    _, ey_, ez_ = self.achsen(a, b, zurueck)
+                    self.gleich(ey_, raum.mal(-1.0, ey))
+                    self.gleich(ez_, ez)
+                    self.assertLessEqual(abs(zurueck), math.pi)
+
 
 class Steifigkeit(unittest.TestCase):
     def setUp(self):

@@ -7,6 +7,45 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-15 · 3D-Balkensysteme: Beschreibung, Aufbau und Rechnung
+
+Ein 3D-Balkensystem lässt sich im Projekt beschreiben und rechnen, mit
+seiner Herleitung im Bericht -- noch ohne Oberfläche und noch nicht in der
+Liste der Bauteile. Es hat Knoten mit x, y und z, Linien mit einem
+Drehwinkel β, Lager in sechs Richtungen, Linienlager quer in y und z und
+längs, Lasten in jede Richtung des Systems oder des Stabs und Querschnitte
+nach Vorlage, als Stahlprofil oder mit A, I_y, I_z und I_T von Hand. Ein
+ebener Rahmen gibt darin dieselben Momente, Querkräfte und Durchbiegungen
+wie im 2D-Balkensystem. Dort ändert sich nichts; sein Bericht ist Zeichen
+für Zeichen derselbe.
+
+Warum so:
+
+- Beide Balkensysteme teilen, was gleich ist: zeichnen, teilen und
+  umkehren ohne Oberfläche (`projekt/staebe.py`), das Übersetzen in das
+  Stabwerk (`Uebersetzung` in `projekt/aufbau/balkensystem.py`) und die
+  Rechnung mit Steifigkeiten und Eigengewicht (`Stabwerksrechnung` in
+  `stabwerk/rechnung.py`). Was der Raum anders macht, steht in je einer
+  kleinen Datei daneben: drei Koordinaten, sechs Lagerrichtungen, EI_y,
+  EI_z und GI_T statt EI, der Drehwinkel.
+- Welche Steifigkeiten ein Stab bekommt, sagt eine Liste je System: EA und
+  EI in der Ebene, EA, EI_y, EI_z und GI_T im Raum. Jede schreibt ihre
+  Formel in die Herleitung, die Torsionssteifigkeit mit G. Die Namen
+  stimmen mit den Feldern des Rechenkerns überein; so braucht es keine
+  Übersetzungstabelle, die man nachführen müsste.
+- Kehrt man eine Linie im Raum um, bleiben ihre Lasten, wo sie sind:
+  Lasten quer in y und längs wechseln das Vorzeichen, weil die Achsen des
+  Stabs mitdrehen, und der Drehwinkel β wird −β, bei einem lotrechten Stab
+  180° − β. So liegt der Querschnitt danach gleich im Raum.
+- Die Bauteilart kommt erst mit der Oberfläche in die Liste: Die Seite
+  liest die Liste beim Laden und verlangte sonst eine App, die es noch
+  nicht gibt. Bis dahin prüfen die Tests das System mit einer eigenen
+  Bauteilart (`tests/test_balkensystem3d.py`).
+- Die Formelsammlung verweist über den Namen auf die Funktion einer
+  Formel. Die Hilfsfunktionen der Steifigkeit heissen darum
+  `_modul_mal_kennwert` und `_gewicht_je_meter`: gleichnamige Methoden
+  verdeckten sie.
+
 ## 2026-11-15 · Material: Schubmodul des Betons
 
 Ein Beton hat jetzt die Querdehnungszahl ν_c = 0.20 (SIA 262:2025,
