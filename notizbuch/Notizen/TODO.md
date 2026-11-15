@@ -167,6 +167,106 @@ gelernt wurde, steht in [[Entwicklung]].
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
 
+## Umbau: Befunde der Strukturdurchsicht vom 2026-11-15
+
+Drei Durchsichten: der Rechenkern der Balkensysteme in 2D und 3D, die
+Pfähle, die Oberfläche beider Balkensysteme -- jeder Punkt am Code
+nachgeprüft. Urteil: umbauen, bevor weiter darauf gebaut wird. Gerechnet
+wird richtig, aber den gebetteten Stab lösen drei Programme, und Regeln des
+Kerns stehen ein zweites Mal im JS. Empfohlene Reihenfolge: 1, dann 3a und
+3b, dann 2 -- vor Knicken oder 2. Ordnung am Pfahl; der Rest, wenn dort
+ohnehin gearbeitet wird.
+
+- [ ] **1. Der Rechenkern steht zweimal, eben und im Raum.**
+      `stabwerk/system.py` (914 Zeilen) und `stabwerk3d/system.py` (776)
+      gehen dieselben 14 Schritte in derselben Folge -- prüfen, Orte und
+      Teilstäbe, Halt, Drehungen, Unbekannte, Zusammenbau, Lasten,
+      beweglich, Auswerten, Linienlager --, meist zur Hälfte bis zu neun
+      Zehnteln gleich; fünf Meldungen stehen wörtlich in beiden. Über dem
+      Kern ist verallgemeinert (`projekt/staebe.py`, `Stabwerksrechnung`,
+      der Katalog), im Kern kopiert. Kosten: jede Regel des Ablaufs zweimal,
+      und die Kopien laufen schon auseinander -- die Drehung eines Orts ist
+      in der Ebene ein Wort, im Raum je Achse bestimmt. Umbau: ein Kern, der
+      liest, wie sich ein Ort bewegen kann und was ein Stab trägt. Die Ebene
+      ist dann eine Angabe: Verschiebung in x und z, Drehung um eine Achse,
+      je Stab nur seine Ebene x-z, z zur gestrichelten Faser.
+      `TestEbenerRahmen` zeigt schon, dass der Kern des Raums einen ebenen
+      Rahmen gleich rechnet. Es fallen weg: `stabwerk/system.py` bis auf
+      seine Konstanten, die ebene Klasse `Stabverlauf`, die doppelten Teile
+      der Herleitung, die fünf Weichen in `rechnung.py` und `_lage_eben` --
+      geschätzt 1000 Zeilen. Die Oberfläche behält ihre zwei Arten.
+- [ ] **2. Der Pfahl löst den gebetteten Stab ein drittes Mal.**
+      `pfahl/bettung.py` nummeriert, baut zusammen, löst und integriert die
+      Schnittkräfte selbst: `_schnittkraefte` mit den Beiwerten der
+      kubischen Form, N nach der Trapezregel, das Moment am eingespannten
+      Kopf nachgeschoben. `ebener_verlauf` in `stabwerk/verlauf.py` rechnet
+      dasselbe genau mit Polynomen, nur ohne linear wachsende Bettung. Zwei
+      Regeln, wie fein geteilt wird: Stücke höchstens 1/(2β) im
+      Balkensystem, min(0.1 m, 0.2/λ) beim Pfahl. Kosten: Knicken oder
+      2. Ordnung am Pfahl zweimal; Extremwerte nur am Raster. Umbau, klein:
+      `ebener_verlauf` mit linear wachsender Bettung (Polynom mal Polynom
+      gibt es), `bettung.py` ruft es, eine Teilungsregel für beide. Gross,
+      nach 1: der Pfahl als lotrechter Stab eines ebenen Systems.
+- [ ] **3a. Die Oberfläche rechnet Ergebnisse.** Die Grenzwerte über alle
+      Stäbe, die massgebende Durchbiegung und die grösste Verschiebung
+      rechnet `bs_diagramme.js` selbst (277, 284, 517–527, 582). Die
+      Durchbiegung mit einer anderen Regel als die Herleitung
+      (`extremwerte`): bei gleichem Betrag nach oben und unten zeigt die
+      Tabelle den positiven Wert, der Bericht den negativen. Die grösste
+      Verschiebung kommt aus den Proben des Bilds. Umbau: der Kern liefert
+      alle drei je Fall.
+- [ ] **3b. Die Seite der gestrichelten Faser steht viermal** -- und mit
+      ihr das Vorzeichen von M: `Lastrichtung.vektor` in
+      `stabwerk/modell.py`, `_lage_eben` in `web/balkendaten.py`,
+      `linienachsen` in `bs_zeichnung.js`, `zugseite` in `bs_teile.js`.
+      Umbau: `stabachsen` für beide Arten, wie im Raum schon.
+- [ ] **3c. Die Eingabe der Pfähle entscheidet selbst, welche Felder
+      gelten** -- drainiert, Mantel eingegeben, Bohrpfahl, Kopf frei --,
+      obwohl der Kern es weiss (`Pfahlschicht.kurznamen`, die Gruppen in
+      `pfahl.py`); Durchstanzen und Spannungsanalyse holen das schon aus dem
+      Kern. Die Texte laufen auseinander: «Durchmesser der Längsstäbe» im
+      Kern, «Durchmesser der Stäbe» im JS. Umbau: `pfahldaten` liefert je
+      Pfahl die Felder, die gelten.
+- [ ] **3d. Von Hand abgeschrieben:** `HALT` in `bs_eigenschaften.js` (der
+      Katalog schickt `halt`, und niemand liest es), die Vorgabe einer neuen
+      Last (`vorgabenNeu`), die Vorsilben L, A und P, das Vorzeichenbild im
+      Raum mit den Zahlen der Startansicht (`bs_texte.js` gegen `ANSICHTEN`
+      in `cad_raum.js`).
+- [ ] **4a. Die Pfahlart als Weiche:** rund 30 Abfragen im Kern, einige im
+      JS; `Masse` hat Nullen als Vorgabe, «je Pfahlart ein Teil davon», und
+      `innen.querschnitt` erkennt den Bohrpfahl an der Zahl der Werkstoffe.
+      Umbau: ein Pfahlquerschnitt mit zwei Formen, einmal gebaut, mit EA,
+      EI, Interaktion, Schub, Feldern und Bild.
+- [ ] **4b. «Im Raum?» gut zwei Dutzend Mal gefragt,** in vier Formen
+      (`a.bs.raum`, `a.raum`, `v.basis`, die Zahl der Achsen);
+      `cad_fenster.js` hatte vor der 3D-App keine solche Frage, jetzt
+      sechs. `systemart` sucht die Art zwölfmal in allen Listen, obwohl
+      `apps.js` sie kennt. Umbau: je Art ein Objekt, einmal gebaut, an
+      `a.bs`; die Ansicht als Objekt, eben in `cad_ansicht.js`, im Raum in
+      `cad_raum.js`; die Ebene immer mit Basis statt `null`.
+- [ ] **4c. Still umgedeutet:** eine Last «quer» aus der Palette wird an
+      einem Knoten senkrecht (`bs_zeichnung.js` 281); die massgebende Tiefe
+      quer fällt ohne Stelle auf den Kopf zurück (`pfahl/quer.py` 318).
+- [ ] **5. Feste Zahlen in den Herleitungen der Pfähle.** 0.42, 4.5,
+      γ_E = 1.5, b' = 3·D und γ_M,a = 1.4 stehen als Text in den Formeln
+      (`steifigkeit.py` 318, 357, 433; `quer.py` 181, 236), obwohl es die
+      Konstanten gibt; die Hilfe in `pfahl.js` wiederholt sie. Wird γ_E eine
+      Eingabe, zeigte die Herleitung 1.5 und rechnete mit etwas anderem.
+      Umbau: Platzhalter oder `fest()`, wie schon in `innen_quer.py`.
+- [ ] **6. Doppelte Bausteine.** Die Schichten des Pfahls zweimal
+      (`boden.Profil`, `steifigkeit.Baugrund`), `lagen` zeichengleich in
+      `pf_zeichnung.js` und `sz_zeichnung.js`; die Anbindung an den Kern in
+      Balkensystem und Decke zweimal (`uebersichtHolen`, `zeichnungHolen`);
+      `lagerSymbol` und `raumlagerSymbol` mit gleichen Teilen.
+- [ ] **7. `cad_fenster.js` hat 899 Zeilen**, 101 bis zur Grenze. Nähte:
+      die Aktionen der Auswahl nach `cad_auswahl.js` -- dann fällt der Haken
+      `a.aktionen` weg --, die Bedienung im Raum in die Ansicht aus 4b, die
+      Eingabe mit Maus und Tasten (rund 260 Zeilen) in eine eigene Datei.
+- [ ] **8. Klein.** `nur_drehung` in `_beweglich` (`stabwerk/system.py`)
+      und `transponiert_mal` (`stabwerk/stab.py`) sind tot. `profilformen.py`
+      schreibt `_flaeche`, `_iy`, `_iz` und `_it` aus `querschnitte.py` ab,
+      nur in cm, obwohl `_in_cm` genau das tut.
+
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-11-09
 
 Vier Durchsichten über das ganze Repo (Rechenkern; Projekt, Dienst und
@@ -179,10 +279,9 @@ schon dreifach da. 1 und 2 sind am 2026-11-09 erledigt, 3 bis 12 am
 
 **Im übrigen Repo, neu gefunden:**
 
-- [ ] **cad_fenster.js hat 1138 Zeilen** -- die einzige Datei über
-      tausend, schon vor der Durchsicht (bei Punkt 11 übersehen). Nähte an
-      den Abschnitten: Ändern und Rückgängig, Befehle, Zeichnen,
-      schwebendes Fenster mit Knöpfen, Bedienen, Aufbau.
+- **cad_fenster.js hatte 1138 Zeilen** -- am 2026-11-15 entlang dieser
+      Nähte geteilt, jetzt 899; was noch hinausgehört, steht in der
+      Durchsicht vom 2026-11-15, Punkt 7.
 
 **Stand der früheren Befunde:** fast alle offen. Teilweise behoben: die
 Grenze x/d kommt aus dem Katalog (nachweise.js), editor.js nennt keine
@@ -369,7 +468,7 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       `cad_fenster.js` (Bedienung, Rückgängig, Punkteingabe auslagern; die
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
       `stil.css` (ein Blatt je App). Stand 2026-10-25: stil.css 2348 Zeilen,
-      cad_fenster.js 1138. `querkraft.py` und `querschnitt/platte.py` sind
+      cad_fenster.js 1138 -- geteilt am 2026-11-15, jetzt 899. `querkraft.py` und `querschnitt/platte.py` sind
       geteilt (2026-10-25); die Regel für d_v steht in Kurve und Nachweis
       ohne Bügel noch je einmal.
       `nachweise.js`, `spannungsanalyse.py` und `aufbau.py` sind geteilt,
