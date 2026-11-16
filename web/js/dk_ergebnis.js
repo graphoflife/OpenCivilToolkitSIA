@@ -22,7 +22,9 @@
  * Mitte.
  *
  * Wählt eine Zeile einen Schnitt, zeigt ihr Bild die Grösse längs ihm wie
- * an einem Balken, mit den Lagern, die er kreuzt (dk_schnitt.js) -- die
+ * an einem Balken, mit den Lagern, die er kreuzt (dk_schnitt.js). Wählt sie
+ * einen Unterzug, zeigt sie sein M oder V über seine ganze Breite, auf den
+ * Lagern, auf denen er liegt (Benutzer, 2026-11-16) -- im selben Bild. Die
  * Lagerkräfte zeigen immer die ganze Decke.
  *
  * Im Bild der Lager stehen nur ihre Namen, die Zahlen in der Tabelle
@@ -185,24 +187,53 @@ function feldInhalt(decke, daten, ergebnis, groesse) {
 }
 
 /**
- * Das Bild längs des Schnitts `kennung`, darunter, wie es zu lesen ist.
- * Fehlt er in der Antwort, ist sie von vor dem Schnitt -- `frisch` nicht,
- * die neue kommt -- oder ihm fehlt ein Knoten.
+ * Was ein Bild längs zeigt: einen Schnitt oder einen Unterzug -- je wie er
+ * heisst, seine Liste in der Decke und in der Antwort (beide gleich
+ * benannt), wie der Titel ihn nennt und was der Hinweis unter dem Bild
+ * dazu sagt.
  */
-function schnittInhalt(decke, ergebnis, kennung, groesse, frisch) {
-  const s = (ergebnis.schnitte || []).find((x) => x.kennung === kennung);
-  if (!s) return [leerzustand(frisch ? `Dem Schnitt ${kennung} fehlt ein Knoten.` : 'Bild wird gerechnet …')];
-  if (!s.stuecke.length) {
-    return [leerzustand(s.L > 0 ? `Der Schnitt ${kennung} liegt neben den Platten.`
-      : `Der Schnitt ${kennung} hat keine Länge.`, 'Im Fenster seine Enden verschieben.')];
+const LAENGS = {
+  schnitt: { wort: 'Schnitt', liste: 'schnitte', titel: (k) => ` längs ${k}`, zusatz: () => '' },
+  unterzug: {
+    wort: 'Unterzug', liste: 'unterzuege', titel: (k) => ` im Unterzug ${k}`,
+    zusatz: (u) => ` über seine ganze Breite von ${zahlText(u.breite, 2)} m`,
+  },
+};
+
+/**
+ * Wo das Bild einer Zeile längs hinsieht: `{art, eintrag}`, ein Schnitt
+ * oder ein Unterzug der Decke; `eintrag` fehlt, wenn es ihn nicht mehr
+ * gibt. `null` über die ganze Platte -- die Lagerkräfte zeigen immer sie.
+ */
+function laengsOrt(decke, zeile) {
+  if (zeile.groesse === 'lager' || !zeile.schnitt) return null;
+  for (const art of Object.values(LAENGS)) {
+    const eintrag = decke[art.liste].find((x) => x.kennung === zeile.schnitt);
+    if (eintrag) return { art, eintrag };
   }
-  const { von, bis } = decke.schnitte.find((x) => x.kennung === kennung);
+  return { art: null, eintrag: null };
+}
+
+/**
+ * Das Bild längs eines Schnitts oder in einem Unterzug, darunter, wie es zu
+ * lesen ist. Fehlt er in der Antwort, ist sie von vor ihm -- `frisch`
+ * nicht, die neue kommt -- oder ihm fehlt ein Knoten.
+ */
+function laengsInhalt({ art, eintrag }, ergebnis, groesse, frisch) {
+  const { kennung, von, bis } = eintrag;
+  const s = (ergebnis[art.liste] || []).find((x) => x.kennung === kennung);
+  if (!s) return [leerzustand(frisch ? `Dem ${art.wort} ${kennung} fehlt ein Knoten.` : 'Bild wird gerechnet …')];
+  if (!s.stuecke.length) {
+    return [leerzustand(s.L > 0 ? `Der ${art.wort} ${kennung} liegt neben den Platten.`
+      : `Der ${art.wort} ${kennung} hat keine Länge.`, 'Im Fenster seine Enden verschieben.')];
+  }
   const zeichen = zeichenVon(groesse);
   const einheit = ergebnis.einheiten[groesse];
   return [
     schnittbild(s, groesse, { zeichen, einheit }),
     el('p.karte-hinweis', {
-      text: `Von ${von} nach ${bis}, die Stelle s ab ${von} · ${zeichen} in ${einheit}, positive Werte unten.`,
+      text: `Von ${von} nach ${bis}, die Stelle s ab ${von} · ${zeichen} in ${einheit}${art.zusatz(eintrag)}, `
+        + 'positive Werte unten.',
     }),
   ];
 }
@@ -292,20 +323,27 @@ function lagerInhalt(decke, daten, ergebnis) {
 
 /**
  * Ein Bild der Ergebnisse als Karte: der Fall der Zeile, die Grösse der
- * Zeile -- über die ganze Decke oder längs ihres Schnitts.
+ * Zeile -- über die ganze Decke, längs ihres Schnitts oder in ihrem
+ * Unterzug. M und V hat nur ein Unterzug, die Grössen der Platte nur sie:
+ * passt beides nicht zusammen, sagt es die Karte, statt etwas anderes zu
+ * zeigen.
  */
 function ergebnisKarte(kennung, decke, daten, zeile) {
-  const laengs = zeile.groesse !== 'lager' && zeile.schnitt ? zeile.schnitt : null;
-  const titel = `${katalog('decke', 'diagrammgroessen').find((g) => g.wert === zeile.groesse)?.titel
-    || zeile.groesse}${laengs ? ` längs ${laengs}` : ''}`;
+  const groesse = katalog('decke', 'diagrammgroessen').find((g) => g.wert === zeile.groesse);
+  const ort = laengsOrt(decke, zeile);
+  const titel = `${groesse?.titel || zeile.groesse}${ort?.art ? ort.art.titel(zeile.schnitt) : ''}`;
   const fall = fallname(decke, zeile.fall);
   if (fall === null) {
     return karte(titel, [leerzustand('Kein Fall gewählt.',
       'Unter «Ergebnisse» einen Lastfall oder eine Kombination wählen.')]);
   }
-  if (laengs && !decke.schnitte.some((s) => s.kennung === laengs)) {
-    return karte(titel, [leerzustand(`Einen Schnitt ${laengs} gibt es nicht mehr.`,
-      'Unter «Ergebnisse» einen anderen wählen oder die ganze Platte.')]);
+  if (ort && !ort.eintrag) {
+    return karte(titel, [leerzustand(`${zeile.schnitt} gibt es nicht mehr.`,
+      'Unter «Ergebnisse» einen anderen Schnitt oder Unterzug wählen oder die ganze Platte.')]);
+  }
+  if (Boolean(groesse?.unterzug) !== (ort?.art === LAENGS.unterzug)) {
+    return karte(titel, [leerzustand(groesse?.unterzug ? `${groesse.titel} gibt es nur in einem Unterzug.`
+      : `Im Unterzug ${zeile.schnitt} gibt es nur M und V.`, 'Unter «Ergebnisse» wählen, was das Bild zeigt.')]);
   }
   const eintrag = antwortZu(kennung, fall, (f) => api.deckeErgebnis(zustand.projekt, kennung, f));
   if (eintrag.fehler) return karte(`${titel} – ${fall}`, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })]);
@@ -313,7 +351,7 @@ function ergebnisKarte(kennung, decke, daten, zeile) {
   if (!ergebnis) return karte(`${titel} – ${fall}`, [leerzustand('Bild wird gerechnet …')]);
   let inhalt;
   if (zeile.groesse === 'lager') inhalt = lagerInhalt(decke, daten, ergebnis);
-  else if (laengs) inhalt = schnittInhalt(decke, ergebnis, laengs, zeile.groesse, Boolean(eintrag.daten));
+  else if (ort) inhalt = laengsInhalt(ort, ergebnis, zeile.groesse, Boolean(eintrag.daten));
   else inhalt = feldInhalt(decke, daten, ergebnis, zeile.groesse);
   return karte(`${titel} – ${ergebnis.fall}`, inhalt,
     { klasse: eintrag.daten ? 'ist-breit' : 'ist-breit ist-veraltet' });

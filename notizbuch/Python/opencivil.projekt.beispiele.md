@@ -1,5 +1,5 @@
 ---
-erzeugt: 3492a63ecc85
+erzeugt: 4a8e31f6a113
 art: modul
 tags: [modul]
 ---
@@ -74,7 +74,8 @@ und einer Stütze mit Stützenbereich von Hand -- daneben eine schiefe
 Platte, deren Streifen ihren Rändern folgen. Sie hat die Lastfälle und
 Kombinationen einer frischen Decke und jede Art Last: auf einer ganzen
 Platte, gezeichnet, längs einer Linie und an einem Punkt. Die erste
-zeigt m_x, m_y und die Lager, die zweite jedes Ergebnisbild einmal.
+zeigt m_x, m_y, die Lager und M und V des Unterzugs U4, der auf den drei
+anderen liegt; die zweite jedes Bild der Platte einmal.
 
 ### _durchstanzstellen
 
@@ -185,6 +186,7 @@ mit G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
 
 ## Braucht
 
+- [[opencivil.decke.schnitt]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]

@@ -42,7 +42,7 @@ const HILFE = {
       ['Platte', 'ein Umriss mit Dicke und Beton -- E_cm und Gewicht vom Beton, mit g = 10 m/s²; ihre Streifen tragen in Richtung 1 und 2, in Grad gegen x'],
       ['Linienlager', 'eine Wand oder ein Rand: vertikal gehalten, eingespannt oder beides -- eingespannt allein wie eine Symmetrieachse'],
       ['Stütze', 'an einem Knoten, b_x × b_y; die Streifen geben ihre Last über den Stützenbereich ab'],
-      ['Unterzug', 'versteckt in der Platte, ein starker Streifen der Breite b -- er liegt auf Lagern, Stützen und Unterzügen höherer Stufe'],
+      ['Unterzug', 'versteckt in der Platte, ein starker Streifen der Breite b -- er liegt auf Lagern, Stützen und Unterzügen höherer Stufe. Sein M und V unter «Ergebnisse»'],
       ['Zone', 'dort geht ihr Anteil der Last in Richtung 1, der Rest in Richtung 2'],
       ['Schnitt', 'eine Linie, längs der ein Ergebnisbild die Schnittkraft wie an einem Balken zeigt -- er rechnet nicht mit'],
     ],
@@ -60,7 +60,8 @@ const HILFE = {
   ergebnisse: {
     zeilen: [
       ['Fall', 'ein Lastfall oder eine Kombination -- gerechnet wird jeder Fall'],
-      ['Wo', 'über die ganze Platte oder längs eines Schnitts: dort wie an einem Balken, mit den Lagern, die er kreuzt, und den Unterzügen als Band -- positive Werte unten, die Stelle s ab seinem Anfang'],
+      ['Wo', 'über die ganze Platte, längs eines Schnitts oder in einem Unterzug -- längs wie an einem Balken, positive Werte unten, die Stelle s ab seinem Anfang. Ein Schnitt zeigt die Lager, die er kreuzt, und die Unterzüge als Band'],
+      ['M, V', 'Moment und Querkraft eines Unterzugs über seine ganze Breite, in kNm und kN -- wie er als Träger gerechnet ist, auf seinen Lagern'],
       ['m_x, m_y', 'die Momente je Meter in x und y, positiv mit Zug unten -- bei schiefen Streifen aus m_η umgerechnet'],
       ['m_xy', 'das Drillmoment je Meter: nur, wo ein Streifen schief zu x und y trägt'],
       ['v_x, v_y, v_0', 'die Querkräfte je Meter und die Hauptquerkraft v_0 = √(v_x² + v_y²)'],
@@ -203,22 +204,37 @@ function streifenInhalt(decke) {
   ].filter(Boolean);
 }
 
+/** Ob die Zeile das Bild eines Unterzugs zeigt -- dann gelten M und V statt der Grössen der Platte. */
+const imUnterzug = (decke, zeile) => decke.unterzuege.some((u) => u.kennung === zeile.schnitt);
+
+/** Die Grössen, die eine Zeile zeigen kann: die eines Unterzugs oder die der Platte. */
+const groessenDer = (decke, zeile) => katalog('decke', 'diagrammgroessen')
+  .filter((g) => g.unterzug === imUnterzug(decke, zeile));
+
 /**
- * Wo ein Ergebnisbild hinsieht: über die ganze Platte oder längs eines
- * Schnitts -- eine Wahl aus dem Projekt, darum eine Liste. Nur, wenn es
- * Schnitte gibt; die Lagerkräfte zeigen immer die ganze Decke. Ein Schnitt,
- * den es nicht mehr gibt, steht als «– Schnitt wählen –» da.
+ * Wo ein Ergebnisbild hinsieht: über die ganze Platte, längs eines Schnitts
+ * oder in einem Unterzug -- eine Wahl aus dem Projekt, darum eine Liste.
+ * Nur, wenn es Schnitte oder Unterzüge gibt; die Lagerkräfte zeigen immer
+ * die ganze Decke. Was es nicht mehr gibt, steht als «– wählen –» da. Wer
+ * zwischen Platte und Unterzug wechselt, bekommt dort die erste Grösse:
+ * m_x hat ein Unterzug nicht, M die Platte nicht.
  */
 function ortWahl(decke, zeile, aendern) {
-  if (zeile.groesse === 'lager' || !(decke.schnitte.length || zeile.schnitt)) return null;
+  if (zeile.groesse === 'lager' || !(decke.schnitte.length || decke.unterzuege.length || zeile.schnitt)) return null;
   const werte = [{ wert: '', beschriftung: 'ganze Platte' },
-    ...decke.schnitte.map((s) => ({ wert: s.kennung, beschriftung: `längs Schnitt ${s.kennung}` }))];
+    ...decke.schnitte.map((s) => ({ wert: s.kennung, beschriftung: `längs Schnitt ${s.kennung}` })),
+    ...decke.unterzuege.map((u) => ({ wert: u.kennung, beschriftung: `Unterzug ${u.kennung}` }))];
   return auswahl({
     werte: werte.some((x) => x.wert === zeile.schnitt) ? werte
-      : [{ wert: zeile.schnitt, beschriftung: '– Schnitt wählen –' }, ...werte],
+      : [{ wert: zeile.schnitt, beschriftung: '– wählen –' }, ...werte],
     gewaehlt: zeile.schnitt,
-    titel: 'Über die ganze Platte oder längs eines Schnitts -- zu zeichnen im Fenster mit «Schnitt»',
-    beiAenderung: (w) => aendern((z) => { z.schnitt = w; }),
+    titel: 'Über die ganze Platte, längs eines Schnitts -- zu zeichnen im Fenster mit «Schnitt» -- '
+      + 'oder in einem Unterzug: M und V über seine ganze Breite',
+    beiAenderung: (w) => aendern((z) => {
+      z.schnitt = w;
+      const moeglich = groessenDer(decke, z);
+      if (!moeglich.some((g) => g.wert === z.groesse)) z.groesse = moeglich[0].wert;
+    }),
   });
 }
 
@@ -255,7 +271,7 @@ const KAPITEL = [
       {
         schluessel: 'ergebnisse', name: 'Ergebnisse', titel: 'Ergebnisse', hilfe: HILFE.ergebnisse,
         inhalt: (d) => diagrammzeilen(d, {
-          groessen: katalog('decke', 'diagrammgroessen'), vorlage: 'deckendiagramm',
+          groessen: (zeile) => groessenDer(d, zeile), vorlage: 'deckendiagramm',
           zusatz: (zeile, aendern) => ortWahl(d, zeile, aendern),
         }),
         stand: (d) => zeilenstand(d.diagramme, 'Diagramm', 'Diagramme', 'kein Diagramm'),

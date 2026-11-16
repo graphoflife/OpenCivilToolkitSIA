@@ -221,8 +221,10 @@ export function fallname(eintrag, kennung) {
  * Zeile ein Fall, Lastfall oder Kombination, und was das Diagramm von ihm
  * zeigt (Benutzer, 2026-10-23), im Balkensystem wie in der Decke. Gerechnet
  * wird damit nichts, das Bauteil rechnet jeden Fall. Ein Fall, den es nicht
- * mehr gibt, steht als «– Fall wählen –» da. `groessen` sind die Stellungen
- * des Schalters aus dem Katalog, `vorlage` die Art einer neuen Zeile.
+ * mehr gibt, steht als «– Fall wählen –» da. `groessen(zeile)` gibt die
+ * Stellungen des Schalters aus dem Katalog -- je Zeile, denn in der Decke
+ * hat ein Unterzug andere als die Platte --, `vorlage` die Art einer neuen
+ * Zeile.
  * `zusatz(zeile, aendern)` gibt, was ein Bauteil unter dem Fall mehr
  * wählen lässt -- die Decke, wo das Bild hinsieht --, oder null.
  */
@@ -248,7 +250,7 @@ export function diagrammzeilen(eintrag, { groessen, vorlage, zusatz = () => null
     ]),
     zusatz(d, (veraenderer) => aendern((s) => veraenderer(s.diagramme[i]))),
     wahlSchalter({
-      werte: groessen.map((g) => ({ wert: g.wert, beschriftung: g.beschriftung, titel: g.titel })),
+      werte: groessen(d).map((g) => ({ wert: g.wert, beschriftung: g.beschriftung, titel: g.titel })),
       gewaehlt: d.groesse, titel: 'Was das Diagramm zeigt',
       setzen: (w) => aendern((s) => { s.diagramme[i].groesse = w; }),
       // Wie geschrieben: gross geschrieben würde aus m_x ein M_X, aus M_y ein M_Y.

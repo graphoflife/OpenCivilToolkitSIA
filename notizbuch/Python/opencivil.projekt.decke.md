@@ -1,5 +1,5 @@
 ---
-erzeugt: 6dba395829a2
+erzeugt: 7c201525f957
 art: modul
 tags: [modul]
 ---
@@ -242,13 +242,14 @@ class DeckendiagrammEintrag(Beschreibung)
 ```
 
 Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt -- über
-die ganze Platte oder längs eines Schnitts. Gerechnet wird damit nichts
+die ganze Platte, längs eines Schnitts oder in einem Unterzug, dort M
+und V über seine ganze Breite. Gerechnet wird damit nichts
 -- die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
 rechts stehen.
 
 - `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
 - `groesse: str = einer_von(DIAGRAMMGROESSEN, 'm_x')`
-- `schnitt: str = ''` – Die Kennung eines Schnitts (`SN1`) -- leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze.
+- `schnitt: str = ''` – Wo das Bild schneidet: die Kennung eines Schnitts (`SN1`) oder eines Unterzugs (`U1`) -- leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze; M und V gibt es nur in einem Unterzug, die Grössen der Platte nur ausserhalb. Der Name blieb, als der Unterzug dazukam: ein neuer machte heute gespeicherte Stände unlesbar.
 
 ### DeckeEintrag
 
@@ -396,8 +397,8 @@ def diagramm(self, fall: Any, groesse: str='m_x', schnitt: Any='') -> Deckendiag
 ```
 
 Ein Ergebnisbild -- `fall` ein Lastfall oder eine Kombination,
-`schnitt` einer der Schnitte (Eintrag oder Kennung), ohne ihn die
-ganze Platte.
+`schnitt` einer der Schnitte oder Unterzüge (Eintrag oder
+Kennung), ohne ihn die ganze Platte.
 
 #### DeckeEintrag.neu
 
@@ -416,7 +417,8 @@ GZG: die Streifenmethode gilt für die Tragsicherheit (Benutzer,
 ## Konstanten
 
 - `Ort = Union[str, Sequence[float]]` – Ein Ort im Baukasten: die Kennung eines Knotens oder `(x, y)` in m.
-- `DIAGRAMMGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte oder die Lagerkraefte.
+- `PLATTENGROESSEN = (*GROESSEN, 'lager')` – Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte -- oder Moment und Querkraft eines ganzen Unterzugs.
+- `DIAGRAMMGROESSEN = (*PLATTENGROESSEN, *BALKENGROESSEN)`
 - `VORSILBEN = {'platten': 'P', 'linienlager': 'L', 'stuetzen': 'S', 'unterzuege': '…` – Womit die Kennungen der Teile einer Decke beginnen.
 
 ## Braucht
@@ -425,6 +427,7 @@ GZG: die Streifenmethode gilt für die Tragsicherheit (Benutzer,
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
+- [[opencivil.decke.schnitt]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.lesen]]

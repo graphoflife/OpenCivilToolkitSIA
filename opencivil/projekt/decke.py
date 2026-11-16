@@ -49,6 +49,7 @@ from typing import Any, List, Sequence, Tuple, Union
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KN_PRO_M2, M, MM, PROZENT
 from opencivil.decke.feld import GROESSEN
 from opencivil.decke.geometrie import Punkt
+from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.decke.modell import VERTEILBREITE, Aufteilung
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
@@ -58,8 +59,10 @@ from opencivil.projekt.netz import Netz, naechste_kennung
 #: Ein Ort im Baukasten: die Kennung eines Knotens oder ``(x, y)`` in m.
 Ort = Union[str, Sequence[float]]
 
-#: Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte oder die Lagerkraefte.
-DIAGRAMMGROESSEN = (*GROESSEN, "lager")
+#: Was ein Ergebnisbild zeigt: eine Schnittkraft der Platte, die Lagerkraefte
+#: -- oder Moment und Querkraft eines ganzen Unterzugs.
+PLATTENGROESSEN = (*GROESSEN, "lager")
+DIAGRAMMGROESSEN = (*PLATTENGROESSEN, *BALKENGROESSEN)
 
 #: Womit die Kennungen der Teile einer Decke beginnen.
 VORSILBEN = {"platten": "P", "linienlager": "L", "stuetzen": "S", "unterzuege": "U",
@@ -222,7 +225,8 @@ class DeckenschnittEintrag(Beschreibung):
 class DeckendiagrammEintrag(Beschreibung):
     """
     Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt -- über
-    die ganze Platte oder längs eines Schnitts. Gerechnet wird damit nichts
+    die ganze Platte, längs eines Schnitts oder in einem Unterzug, dort M
+    und V über seine ganze Breite. Gerechnet wird damit nichts
     -- die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
     rechts stehen.
     """
@@ -232,7 +236,13 @@ class DeckendiagrammEintrag(Beschreibung):
 
     groesse: str = einer_von(DIAGRAMMGROESSEN, "m_x")
     schnitt: str = ""
-    """Die Kennung eines Schnitts (``SN1``) -- leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze."""
+    """
+    Wo das Bild schneidet: die Kennung eines Schnitts (``SN1``) oder eines
+    Unterzugs (``U1``) -- leer: die ganze Platte. Die Lagerkräfte zeigen
+    immer die ganze; M und V gibt es nur in einem Unterzug, die Grössen der
+    Platte nur ausserhalb. Der Name blieb, als der Unterzug dazukam: ein
+    neuer machte heute gespeicherte Stände unlesbar.
+    """
 
 
 @dataclass
@@ -374,8 +384,8 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     def diagramm(self, fall: Any, groesse: str = "m_x", schnitt: Any = "") -> DeckendiagrammEintrag:
         """
         Ein Ergebnisbild -- ``fall`` ein Lastfall oder eine Kombination,
-        ``schnitt`` einer der Schnitte (Eintrag oder Kennung), ohne ihn die
-        ganze Platte.
+        ``schnitt`` einer der Schnitte oder Unterzüge (Eintrag oder
+        Kennung), ohne ihn die ganze Platte.
         """
         eintrag = lesen(DeckendiagrammEintrag,
                         {"fall": kennung_von(fall), "groesse": groesse, "schnitt": kennung_von(schnitt)},

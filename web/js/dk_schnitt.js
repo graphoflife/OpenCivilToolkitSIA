@@ -3,7 +3,8 @@
  *
  * Ein Schnitt ist eine Linie im Grundriss (dk_zeichnung.js). Sein Bild
  * zeigt eine Grösse der Platte längs ihm wie an einem Balken des
- * Balkensystems (Benutzer, 2026-11-16), in zwei Zeilen:
+ * Balkensystems (Benutzer, 2026-11-16) -- ebenso das Bild eines Unterzugs
+ * sein M oder V, auf den Lagern, auf denen er liegt --, in zwei Zeilen:
  *
  *   oben    die Achse mit den Lagern, die er kreuzt -- Linienlager und
  *           Stützen ein Dreieck, eingespannt ein Balken mit Schraffur, eine
@@ -45,8 +46,8 @@ const NAMENSZEILE = 12;
 /** Stellen der angeschriebenen Werte. */
 const STELLEN = 1;
 
-/** Die Farbe eines Verlaufs: Momente wie M, Querkräfte wie V im Balkensystem. */
-const familie = (groesse) => (groesse.startsWith('m') ? 'bs-d-m' : 'bs-d-v');
+/** Die Farbe eines Verlaufs: Momente -- m_x der Platte, M eines Unterzugs -- wie M, Querkräfte wie V im Balkensystem. */
+const familie = (groesse) => (/^m/i.test(groesse) ? 'bs-d-m' : 'bs-d-v');
 
 function schrift([x, y], inhalt, klasse, anker = 'middle') {
   const t = svgEl('text', { x: x.toFixed(1), y: y.toFixed(1), class: klasse, 'text-anchor': anker });

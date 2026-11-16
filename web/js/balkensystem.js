@@ -602,7 +602,7 @@ export function balkensystemFenster(system, schluessel) {
 function statikInhalt(system) {
   const art = systemart(system.kennung);
   return diagrammzeilen(system, {
-    groessen: systemkatalog(art, 'diagrammgroessen'), vorlage: systemkatalog(art, 'klassen', 'diagramm'),
+    groessen: () => systemkatalog(art, 'diagrammgroessen'), vorlage: systemkatalog(art, 'klassen', 'diagramm'),
   });
 }
 

@@ -7,6 +7,37 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-16 · Decken: M und V eines Unterzugs
+
+Ein Ergebnisbild zeigt auch einen Unterzug selbst: sein Moment M und seine
+Querkraft V über die ganze Breite, in kNm und kN statt je Meter
+(Benutzer, selber Tag). Im Kolloquium 4 etwa liegt U4 auf U1, U2 und U3:
+über U2 ist M = −60.1 kNm, im Feld 47.9 kNm.
+
+Warum so:
+
+- Ein Unterzug ist im Kern ein Streifen mit eigenen Trägern; ihre Polynome
+  für M und V gelten für die ganze Breite. Das Bild nimmt sie unverändert,
+  statt das Feld der Platte über die Breite zu integrieren -- das gäbe
+  dasselbe nur ungenauer. Ein Bild der Platte teilt sie durch die Breite:
+  m = M/b (geprüft in `tests/test_decke_schnitt.py`).
+- Gewählt wird er wie ein Schnitt, in derselben Liste unter «Ergebnisse»:
+  «ganze Platte», «längs Schnitt SN1», «Unterzug U1». Der Schalter daneben
+  zeigt dann M und V statt m_x … v_0; wer zwischen Platte und Unterzug
+  wechselt, bekommt dort die erste Grösse. Das Feld der Zeile heisst weiter
+  `schnitt`: ein neuer Name hätte die heutigen Speicherstände unlesbar
+  gemacht, weil das Lesen unbekannte Felder abweist.
+- Das Bild ist das eines Schnitts (dk_schnitt.js), ohne Bänder: die Lager
+  sind die seiner Träger -- Linienlager, Stützen und Unterzüge höherer
+  Stufe. Die Stelle s läuft ab dem ersten Knoten des Unterzugs; zeigt die
+  Richtung seines Streifens anders herum, kehrt V das Vorzeichen, damit im
+  Bild V = dM/ds gilt.
+- Rechnet ein Fall einen Träger nicht -- er trägt keine Last, oder er trägt
+  nicht, und eine Meldung sagt es --, zeigt das Bild dort null.
+- Passen Grösse und Ort nicht zusammen, etwa M über die ganze Platte, sagt
+  die Karte es, statt etwas anderes zu zeigen. Das kommt nur aus einer von
+  Hand geänderten Datei vor; die Bedienung lässt es nicht zu.
+
 ## 2026-11-16 · 3D-Balkensystem: drehen mit Alt
 
 Im 3D-Fenster dreht auch die linke Maustaste die Ansicht, wenn dabei Alt

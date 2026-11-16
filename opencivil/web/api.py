@@ -44,6 +44,7 @@ from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import BAUTEILE, Aufbau, SkriptEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
+from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
@@ -94,11 +95,13 @@ _BETONGESETZE = [
 #: Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem
 #: Titel. Die Regel dahinter steht in :mod:`opencivil.decke.aufteilung`.
 #: Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber
-#: dem Bild -- je Groesse, die die Beschreibung kennt.
+#: dem Bild -- je Groesse, die die Beschreibung kennt. M und V sind die eines
+#: ganzen Unterzugs.
 _DECKENGROESSEN = {
     "m_x": ("m_x", "Moment m_x"), "m_y": ("m_y", "Moment m_y"), "m_xy": ("m_xy", "Drillmoment m_xy"),
     "v_x": ("v_x", "Querkraft v_x"), "v_y": ("v_y", "Querkraft v_y"),
     "v_0": ("v_0", "Hauptquerkraft v_0"), "lager": ("Lager", "Lagerkräfte"),
+    "M": ("M", "Moment M"), "V": ("V", "Querkraft V"),
 }
 _AUFTEILUNGEN = {
     Aufteilung.AUTOMATISCH: ("automatisch", "Je Stelle nach ihren Lagern: zum nahen Rand, sonst in "
@@ -203,9 +206,11 @@ def katalog() -> dict:
             "vorsilben": dict(DECKENVORSILBEN),
             "aufteilungen": [{"wert": a.value, "beschriftung": _AUFTEILUNGEN[a][0],
                               "titel": _AUFTEILUNGEN[a][1]} for a in Aufteilung],
-            # Was ein Ergebnisbild zeigt -- kurz im Schalter, lang ueber dem Bild.
+            # Was ein Ergebnisbild zeigt -- kurz im Schalter, lang ueber dem
+            # Bild; ``unterzug``, ob es das eines Unterzugs ist.
             "diagrammgroessen": [{"wert": wert, "beschriftung": _DECKENGROESSEN[wert][0],
-                                  "titel": _DECKENGROESSEN[wert][1]} for wert in DECKENGROESSEN],
+                                  "titel": _DECKENGROESSEN[wert][1],
+                                  "unterzug": wert in BALKENGROESSEN} for wert in DECKENGROESSEN],
         },
         # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
         "setzung": {

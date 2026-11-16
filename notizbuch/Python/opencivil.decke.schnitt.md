@@ -1,5 +1,5 @@
 ---
-erzeugt: fefea81d63f3
+erzeugt: 8a92c0c38eb2
 art: modul
 tags: [modul]
 ---
@@ -38,7 +38,36 @@ trägt -- wie in den Bildern der Platte ([[opencivil.decke.feld#stellen|stellen]
 Linienlager als Lager, Stützen auch -- wenn er durch ihren Querschnitt geht
 --, Unterzüge als Bereich. Alles in m ab `a`.
 
+
+## EIN UNTERZUG
+
+Längs seiner Achse zeigt ein Bild auch einen Unterzug selbst: sein Moment
+und seine Querkraft über die ganze Breite, nicht je Meter (Benutzer,
+2026-11-16) -- so, wie er als Träger gerechnet ist ([[opencivil.decke.schnitt#unterzug|unterzug]]). Hier
+braucht es keine Grenzen: jedes Stück seines Trägers hat seine eigenen
+Polynome, auch an den Enden.
+
 ## Inhalt
+
+### Balkenkraefte
+
+```python
+@dataclass(frozen=True)
+class Balkenkraefte
+```
+
+An einer Stelle eines Unterzugs sein Moment in Nm und seine Querkraft in N -- über die ganze Breite.
+
+- `M: float`
+- `V: float`
+
+#### Balkenkraefte.groesse
+
+```python
+def groesse(self, name: str) -> float
+```
+
+Die Grösse `name` aus [[opencivil.decke.schnitt#Konstanten|BALKENGROESSEN]].
 
 ### Lagerstelle
 
@@ -50,7 +79,7 @@ class Lagerstelle
 Wo ein Schnitt ein Lager kreuzt: `u` in m ab seinem Anfang, und was das Lager hält.
 
 - `u: float`
-- `art: str` – `linienlager` oder `stuetze`.
+- `art: str` – `linienlager`, `stuetze` oder -- unter einem Unterzug -- `unterzug`.
 - `name: str`
 - `vertikal: bool = True`
 - `eingespannt: bool = False`
@@ -64,12 +93,13 @@ class Verlauf
 
 Die Schnittkräfte längs eines Schnitts der Länge `L`, in m: wo er in
 einer Platte liegt (`stuecke`, von -- bis ab seinem Anfang), seine
-`proben` -- `(u, Schnittkräfte)`, aufsteigend --, die `lager`, die
-er kreuzt, und die `unterzuege` als `(von, bis, Name)`.
+`proben` -- `(u, Kräfte)`, aufsteigend; je Meter längs eines
+Schnitts, ganz längs eines Unterzugs --, die `lager`, die er kreuzt,
+und die `unterzuege` als `(von, bis, Name)`.
 
 - `L: float`
 - `stuecke: List[Tuple[float, float]]`
-- `proben: List[Tuple[float, Schnittkraefte]]`
+- `proben: List[Tuple[float, Union[Schnittkraefte, Balkenkraefte]]]`
 - `lager: List[Lagerstelle]`
 - `unterzuege: List[Tuple[float, float, str]]`
 
@@ -88,6 +118,21 @@ def verlauf(ergebnis: Ergebnis, fall: Fallergebnis, a: Punkt, b: Punkt) -> Verla
 ```
 
 Der Verlauf längs des Schnitts von `a` nach `b` im Fall `fall` -- ohne Länge leer.
+
+### unterzug
+
+```python
+def unterzug(fall: Fallergebnis, streifen: Streifen) -> Verlauf
+```
+
+Moment und Querkraft des Unterzugs `streifen` über seine ganze Breite,
+längs seiner Achse ab `a` -- aus den Stücken seiner Träger, je an
+ihren Enden, auf dem Raster und wo V oder die Last null wird. Ein Träger,
+den der Fall nicht rechnet, hat nichts: er trägt keine Last, oder er
+trägt nicht, und eine Meldung sagt es. Seine Lager sind die seiner
+Träger: Linienlager, Stützen und Unterzüge höherer Stufe. Zeigt die
+Richtung des Streifens von `b` nach `a`, kehrt die Querkraft ihr
+Vorzeichen: im Bild gilt `V = dM/du`.
 
 ### _stellen
 
@@ -145,6 +190,7 @@ Mitte am nächsten ist.
 
 - `SCHRITTE = 120` – In so viele gleiche Schritte teilt der Verlauf einen Schnitt mindestens.
 - `QUER = 1e-12` – Kleiner zählt eine Richtung als quer zum Schnitt -- ein Kosinus.
+- `BALKENGROESSEN = ('M', 'V')` – Was das Bild eines Unterzugs zeigt: sein Moment und seine Querkraft.
 
 ## Braucht
 
@@ -157,4 +203,7 @@ Mitte am nächsten ist.
 
 ## Gebraucht von
 
+- [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.decke]]
+- [[opencivil.web.api]]
 - [[opencivil.web.deckendaten]]

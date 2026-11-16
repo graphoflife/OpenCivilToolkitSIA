@@ -26,13 +26,20 @@ trägt -- wie in den Bildern der Platte (:func:`~opencivil.decke.feld.stellen`).
 WAS ER KREUZT:
 Linienlager als Lager, Stützen auch -- wenn er durch ihren Querschnitt geht
 --, Unterzüge als Bereich. Alles in m ab ``a``.
+
+EIN UNTERZUG:
+Längs seiner Achse zeigt ein Bild auch einen Unterzug selbst: sein Moment
+und seine Querkraft über die ganze Breite, nicht je Meter (Benutzer,
+2026-11-16) -- so, wie er als Träger gerechnet ist (:func:`unterzug`). Hier
+braucht es keine Grenzen: jedes Stück seines Trägers hat seine eigenen
+Polynome, auch an den Enden.
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.feld import INNEN, Schnittkraefte, an_stelle
@@ -48,6 +55,21 @@ SCHRITTE = 120
 #: Kleiner zählt eine Richtung als quer zum Schnitt -- ein Kosinus.
 QUER = 1e-12
 
+#: Was das Bild eines Unterzugs zeigt: sein Moment und seine Querkraft.
+BALKENGROESSEN = ("M", "V")
+
+
+@dataclass(frozen=True)
+class Balkenkraefte:
+    """An einer Stelle eines Unterzugs sein Moment in Nm und seine Querkraft in N -- über die ganze Breite."""
+
+    M: float
+    V: float
+
+    def groesse(self, name: str) -> float:
+        """Die Grösse ``name`` aus :data:`BALKENGROESSEN`."""
+        return getattr(self, name)
+
 
 @dataclass(frozen=True)
 class Lagerstelle:
@@ -55,7 +77,7 @@ class Lagerstelle:
 
     u: float
     art: str
-    """``linienlager`` oder ``stuetze``."""
+    """``linienlager``, ``stuetze`` oder -- unter einem Unterzug -- ``unterzug``."""
 
     name: str
     vertikal: bool = True
@@ -67,13 +89,14 @@ class Verlauf:
     """
     Die Schnittkräfte längs eines Schnitts der Länge ``L``, in m: wo er in
     einer Platte liegt (``stuecke``, von -- bis ab seinem Anfang), seine
-    ``proben`` -- ``(u, Schnittkräfte)``, aufsteigend --, die ``lager``, die
-    er kreuzt, und die ``unterzuege`` als ``(von, bis, Name)``.
+    ``proben`` -- ``(u, Kräfte)``, aufsteigend; je Meter längs eines
+    Schnitts, ganz längs eines Unterzugs --, die ``lager``, die er kreuzt,
+    und die ``unterzuege`` als ``(von, bis, Name)``.
     """
 
     L: float
     stuecke: List[Tuple[float, float]]
-    proben: List[Tuple[float, Schnittkraefte]]
+    proben: List[Tuple[float, Union[Schnittkraefte, Balkenkraefte]]]
     lager: List[Lagerstelle]
     unterzuege: List[Tuple[float, float, str]]
 
@@ -102,6 +125,48 @@ def verlauf(ergebnis: Ergebnis, fall: Fallergebnis, a: Punkt, b: Punkt) -> Verla
             orte += _im_teil(p, q, L / SCHRITTE, spitzen)
     proben = [(u, an_stelle(ergebnis, fall, (a[0] + u * e[0], a[1] + u * e[1]))) for u in orte]
     return Verlauf(L, stuecke, proben, _lager(ergebnis.decke, a, b, e, L), unterzuege)
+
+
+def unterzug(fall: Fallergebnis, streifen: Streifen) -> Verlauf:
+    """
+    Moment und Querkraft des Unterzugs ``streifen`` über seine ganze Breite,
+    längs seiner Achse ab ``a`` -- aus den Stücken seiner Träger, je an
+    ihren Enden, auf dem Raster und wo V oder die Last null wird. Ein Träger,
+    den der Fall nicht rechnet, hat nichts: er trägt keine Last, oder er
+    trägt nicht, und eine Meldung sagt es. Seine Lager sind die seiner
+    Träger: Linienlager, Stützen und Unterzüge höherer Stufe. Zeigt die
+    Richtung des Streifens von ``b`` nach ``a``, kehrt die Querkraft ihr
+    Vorzeichen: im Bild gilt ``V = dM/du``.
+    """
+    a, b = streifen.unterzug.a, streifen.unterzug.b
+    L = math.hypot(b[0] - a[0], b[1] - a[1])
+    n = streifen.richtung.n
+    vz = 1.0 if geo.skalar((b[0] - a[0], b[1] - a[1]), n) >= 0.0 else -1.0
+    sa = geo.skalar(a, n)
+
+    def ort(s: float) -> float:
+        return vz * (s - sa)
+
+    stuecke: List[Tuple[float, float]] = []
+    proben: List[Tuple[float, Union[Schnittkraefte, Balkenkraefte]]] = []
+    lager: List[Lagerstelle] = []
+    for t in streifen.traeger:
+        u0, u1 = sorted((ort(t.s0), ort(t.s1)))
+        stuecke.append((u0, u1))
+        lager += [Lagerstelle(ort(t.s0 + l.s), l.art, l.name, l.vertikal, l.eingespannt) for l in t.auflager]
+        traeger = fall.traeger.get(t.name)
+        if traeger is None:
+            proben += [(ort(s), Balkenkraefte(0.0, 0.0)) for s in (t.s0, t.s1)]
+            continue
+        for st in traeger.stuecke:
+            nullen = st.V.nullstellen(st.a, st.b) + st.p.nullstellen(st.a, st.b)
+            proben += [(ort(t.s0 + s), Balkenkraefte(st.M(s), vz * st.V(s)))
+                       for s in _im_teil(st.a, st.b, L / SCHRITTE, nullen)]
+    # Gegen die Richtung gesammelt: rückwärts aufsteigend, der Wert links eines Sprungs zuerst.
+    if vz < 0.0:
+        stuecke.reverse()
+        proben.reverse()
+    return Verlauf(L, stuecke, proben, sorted(lager, key=lambda x: x.u), [])
 
 
 def _stellen(z: Zerlegung, fall: Fallergebnis, a: Punkt, e: Punkt) -> Tuple[List[float], List[float]]:

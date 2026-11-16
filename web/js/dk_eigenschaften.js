@@ -108,6 +108,9 @@ const FELDER = {
     feldzeile('unterzug', 'stufe', 'Stufe', wert, setzen, {
       titel: 'Ein Unterzug liegt auf denen höherer Stufe, die ihn kreuzen',
     }),
+    el('p.cad-hinweis-klein', {
+      text: 'Sein M und V: unter «Ergebnisse» mit «+ Diagramm», dann statt «ganze Platte» den Unterzug wählen.',
+    }),
   ],
   zonen: (wert, setzen) => [
     feldzeile('zone', 'anteil', 'Richtung 1', wert, setzen, {
