@@ -791,6 +791,31 @@ class TestVorlagen(unittest.TestCase):
         self.assertIsNone(d["teile"])
         self.assertEqual(dienst.bearbeite("vorlage", {"wahl": {"art": "dreieck"}}).status, 400)
 
+    def test_der_kreis_mit_n_staeben(self):
+        """
+        Wie viele Stäbe der Kreis hat, stellt man ein (Benutzer, 2026-11-16):
+        gleich verteilt im Achsabstand vom Rand, der erste rechts. Eine halbe
+        Zahl wird nicht still gerundet.
+        """
+        kreis = vorlagen.vorlage("kreis")
+        teile = kreis.bauen({"D": 400.0, "n": 6.0}, randabstand=50.0)
+        self.assertEqual(len(teile.staebe), 6)
+        for k, s in enumerate(teile.staebe):
+            winkel = math.radians(60 * k)
+            self.assertAlmostEqual(s["lage"][0], 200 + 150 * math.cos(winkel), delta=1e-3)
+            self.assertAlmostEqual(s["lage"][1], 200 + 150 * math.sin(winkel), delta=1e-3)
+        self.assertEqual(len(kreis.bauen().staebe), 8)
+        with self.assertRaisesRegex(ValueError, "ganze Zahl sein, angegeben sind 7.5"):
+            kreis.bauen({"n": 7.5})
+        with self.assertRaisesRegex(ValueError, "grösser als null"):
+            kreis.bauen({"n": 0.0})
+        # Der Katalog sagt dem Fenster, dass n eine Anzahl ist: ohne Einheit,
+        # in ganzen Schritten.
+        katalog = {v["schluessel"]: v for v in api.katalog()["querschnittsanalyse"]["vorlagen"]}
+        self.assertEqual([(m["schluessel"], m["einheit"], m["schritt"])
+                          for m in katalog["kreis"]["masse"]],
+                         [("D", "mm", 10.0), ("n", "", 1.0)])
+
     def test_einsetzen_ueber_den_dienst(self):
         p = projekt()
         d = dienst.bearbeite("vorlage_einsetzen", {

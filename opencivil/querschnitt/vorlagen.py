@@ -3,8 +3,8 @@ opencivil/querschnitt/vorlagen.py -- Querschnitte zum Anfangen.
 
 VERANTWORTUNG:
 Vier Vorlagen -- Rechteck, T-Balken, Hohlkasten, Kreis. Jede kennt ihre
-Masse samt Vorgabe und baut daraus :class:`Teile` in mm, den Ursprung unten
-links: die Polygone, auf Wunsch die Bewehrung und die Schubwaende, und fuer
+Masse samt Vorgabe -- der Kreis auch, wie viele Staebe er hat -- und baut
+daraus :class:`Teile` in mm, den Ursprung unten links: die Polygone, auf Wunsch die Bewehrung und die Schubwaende, und fuer
 die Skizze im Zeichenfenster die Masslinien.
 
 Die Vorlagen stehen nur hier. :meth:`QuerschnittsanalyseEintrag.neu` baut
@@ -40,11 +40,25 @@ KREISECKEN = 48
 
 @dataclass(frozen=True)
 class Mass:
-    """Ein Mass einer Vorlage, in mm."""
+    """
+    Ein Mass einer Vorlage: eine Laenge in mm -- oder, ``ganzzahlig``, eine
+    Anzahl, wie die der Staebe im Kreis.
+    """
 
     schluessel: str
     beschriftung: str
     vorgabe: float
+    ganzzahlig: bool = False
+
+    @property
+    def einheit(self) -> str:
+        """Was neben dem Feld steht -- bei einer Anzahl nichts."""
+        return "" if self.ganzzahlig else "mm"
+
+    @property
+    def schritt(self) -> float:
+        """Um wie viel ein Pfeil am Feld den Wert aendert."""
+        return 1.0 if self.ganzzahlig else 10.0
 
 
 @dataclass
@@ -75,11 +89,15 @@ def _mass(von: Punkt, bis: Punkt, name: str, wert: float, seite: str) -> dict:
     return {"von": von, "bis": bis, "text": f"{name} = {wert:g}", "seite": seite}
 
 
-def kreispunkte(mitte: Punkt, radius: float) -> List[Punkt]:
-    """Ein Kreis als Vieleck mit :data:`KREISECKEN` Ecken, auf Tausendstel gerundet."""
-    return [(round(mitte[0] + radius * math.cos(2 * math.pi * k / KREISECKEN), 3),
-             round(mitte[1] + radius * math.sin(2 * math.pi * k / KREISECKEN), 3))
-            for k in range(KREISECKEN)]
+def kreispunkte(mitte: Punkt, radius: float, ecken: int = KREISECKEN) -> List[Punkt]:
+    """
+    ``ecken`` Punkte, gleich verteilt auf einem Kreis, der erste rechts, auf
+    Tausendstel gerundet: die Ecken eines Kreises als Vieleck -- oder die
+    Staebe darin.
+    """
+    return [(round(mitte[0] + radius * math.cos(2 * math.pi * k / ecken), 3),
+             round(mitte[1] + radius * math.sin(2 * math.pi * k / ecken), 3))
+            for k in range(ecken)]
 
 
 def rechteckpunkte(b: float, h: float, y: float = 0.0, z: float = 0.0) -> List[Punkt]:
@@ -204,9 +222,8 @@ def _kreis(m: Mapping[str, float], r: float) -> Teile:
     mitte = (d / 2, d / 2)
     return Teile(
         polygone=[{"punkte": kreispunkte(mitte, d / 2), "aussparung": False}],
-        staebe=[{"lage": (round(mitte[0] + (d / 2 - r) * math.cos(k * math.pi / 4), 3),
-                          round(mitte[1] + (d / 2 - r) * math.sin(k * math.pi / 4), 3)),
-                 "durchmesser": 16.0} for k in range(8)],
+        staebe=[{"lage": p, "durchmesser": 16.0}
+                for p in kreispunkte(mitte, d / 2 - r, int(m["n"]))],
         masslinien=[_mass((0.0, 0.0), (d, 0.0), "D", d, "unten")],
     )
 
@@ -239,8 +256,12 @@ class Vorlage:
         werte = {m.schluessel: float((masse or {}).get(m.schluessel, m.vorgabe))
                  for m in self.masse}
         for m in self.masse:
-            if not math.isfinite(werte[m.schluessel]) or werte[m.schluessel] <= 0:
+            wert = werte[m.schluessel]
+            if not math.isfinite(wert) or wert <= 0:
                 raise ValueError(f"{m.beschriftung} muss grösser als null sein.")
+            if m.ganzzahlig and wert != int(wert):
+                raise ValueError(f"{m.beschriftung} muss eine ganze Zahl sein, "
+                                 f"angegeben sind {wert:g}.")
         waende = schubwaende and self.hat_waende
         # Auch die Waende enden auf der Hoehe der Staebe.
         if (bewehrung or waende) and (not math.isfinite(randabstand) or randabstand <= 0):
@@ -268,7 +289,9 @@ VORLAGEN: Tuple[Vorlage, ...] = (
             (Mass("b", "Breite b", 1200.0), Mass("h", "Höhe h", 800.0),
              Mass("t", "Wanddicke t", 200.0)),
             _hohlkasten, _hohlkasten_pruefen),
-    Vorlage("kreis", "Kreis", (Mass("D", "Durchmesser D", 500.0),),
+    Vorlage("kreis", "Kreis",
+            (Mass("D", "Durchmesser D", 500.0),
+             Mass("n", "Anzahl Stäbe n", 8.0, ganzzahlig=True)),
             _kreis, _kreis_pruefen, hat_waende=False),
 )
 

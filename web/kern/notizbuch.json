@@ -7123,6 +7123,8 @@
       "kurz": "Querschnitte zum Anfangen.",
       "stichworte": [
         "Mass",
+        "Mass.einheit",
+        "Mass.schritt",
         "Teile",
         "Teile.als_dict",
         "kreispunkte",

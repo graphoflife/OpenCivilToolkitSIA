@@ -1,5 +1,5 @@
 ---
-erzeugt: 302fd1cbb6da
+erzeugt: b6390e2aecc3
 art: modul
 tags: [modul]
 ---
@@ -10,8 +10,8 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Vier Vorlagen -- Rechteck, T-Balken, Hohlkasten, Kreis. Jede kennt ihre
-Masse samt Vorgabe und baut daraus [[opencivil.querschnitt.vorlagen#Teile|Teile]] in mm, den Ursprung unten
-links: die Polygone, auf Wunsch die Bewehrung und die Schubwaende, und fuer
+Masse samt Vorgabe -- der Kreis auch, wie viele Staebe er hat -- und baut
+daraus [[opencivil.querschnitt.vorlagen#Teile|Teile]] in mm, den Ursprung unten links: die Polygone, auf Wunsch die Bewehrung und die Schubwaende, und fuer
 die Skizze im Zeichenfenster die Masslinien.
 
 Die Vorlagen stehen nur hier. [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.neu|QuerschnittsanalyseEintrag.neu]] baut
@@ -42,11 +42,31 @@ ein Steg so breit wie der Flansch galt im einen als T, im anderen nicht.
 class Mass
 ```
 
-Ein Mass einer Vorlage, in mm.
+Ein Mass einer Vorlage: eine Laenge in mm -- oder, `ganzzahlig`, eine
+Anzahl, wie die der Staebe im Kreis.
 
 - `schluessel: str`
 - `beschriftung: str`
 - `vorgabe: float`
+- `ganzzahlig: bool = False`
+
+#### Mass.einheit
+
+```python
+@property
+def einheit(self) -> str
+```
+
+Was neben dem Feld steht -- bei einer Anzahl nichts.
+
+#### Mass.schritt
+
+```python
+@property
+def schritt(self) -> float
+```
+
+Um wie viel ein Pfeil am Feld den Wert aendert.
 
 ### Teile
 
@@ -72,10 +92,12 @@ def als_dict(self) -> dict
 ### kreispunkte
 
 ```python
-def kreispunkte(mitte: Punkt, radius: float) -> List[Punkt]
+def kreispunkte(mitte: Punkt, radius: float, ecken: int=KREISECKEN) -> List[Punkt]
 ```
 
-Ein Kreis als Vieleck mit [[opencivil.querschnitt.vorlagen#Konstanten|KREISECKEN]] Ecken, auf Tausendstel gerundet.
+`ecken` Punkte, gleich verteilt auf einem Kreis, der erste rechts, auf
+Tausendstel gerundet: die Ecken eines Kreises als Vieleck -- oder die
+Staebe darin.
 
 ### rechteckpunkte
 

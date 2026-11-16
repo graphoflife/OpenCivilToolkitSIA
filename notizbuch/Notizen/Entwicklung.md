@@ -7,6 +7,25 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-16 · Querschnittsanalyse: wie viele Stäbe im Kreis
+
+Die runde Vorlage fragt neben dem Durchmesser nach der Zahl der Stäbe n
+(Benutzer, selber Tag); bisher waren es immer acht ⌀16.
+
+Warum so:
+
+- Eine Anzahl ist ein Mass der Vorlage wie eine Länge, nur ganzzahlig
+  (`Mass.ganzzahlig`): dieselbe Prüfung auf grösser als null, dazu eine auf
+  ganze Zahlen -- 7.5 Stäbe geben eine Meldung, keine stille Rundung. Einheit
+  und Schritt des Feldes sagt der Katalog; das Fenster schreibt nicht mehr
+  hinter jedes Mass «mm».
+- Die Stäbe liegen gleich verteilt wie die Ecken des Kreises, der erste
+  rechts: beide kommen aus `kreispunkte`, das jetzt die Zahl der Punkte
+  nimmt. Bei n = 8 liegen sie genau wie bisher.
+- Ob sich die Stäbe bei grossem n überlappen, prüft die Vorlage nicht; die
+  Analyse prüft es auch bei einer Stablinie nicht. Man sieht es in der
+  Skizze.
+
 ## 2026-11-15 · Der Pfahl rechnet mit dem Verlauf des Balkensystems
 
 Der gebettete Pfahl integriert seine Schnittkräfte nicht mehr selbst (Punkt

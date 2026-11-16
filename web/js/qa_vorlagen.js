@@ -131,8 +131,8 @@ function haken(text, an, setzen) {
 }
 
 /** Ein Zahlenfeld, das schon beim Tippen meldet -- die Skizze soll mitgehen. */
-function massfeld(wert, setzen) {
-  const feld = zahlfeld({ wert, schritt: 10, min: 1, beiAenderung: setzen });
+function massfeld(wert, setzen, schritt = 10) {
+  const feld = zahlfeld({ wert, schritt, min: 1, beiAenderung: setzen });
   feld.querySelector('input')?.addEventListener('input', (e) => {
     const w = Number(e.target.value);
     if (e.target.value.trim() !== '' && Number.isFinite(w)) setzen(w);
@@ -209,8 +209,8 @@ function vorlageZeichnen(a, knoten) {
       on: { click: () => { w.art = x.schluessel; neu(); } },
     }, [skizze(x.skizze, 52, 36, { masse: false }), el('span', { text: x.name })]))),
     bild,
-    ...v.masse.map((m) => zeile(m.beschriftung,
-      massfeld(w.masse[m.schluessel] ?? m.vorgabe, (x) => { w.masse[m.schluessel] = x; holen(); }), 'mm')),
+    ...v.masse.map((m) => zeile(m.beschriftung, massfeld(w.masse[m.schluessel] ?? m.vorgabe,
+      (x) => { w.masse[m.schluessel] = x; holen(); }, m.schritt), m.einheit)),
     zeile('Achsabstand', massfeld(w.randabstand, (x) => { w.randabstand = x; holen(); }), 'mm'),
     el('div.cad-wahlen', {}, [
       haken('mit Bewehrung', w.bewehrung, (x) => { w.bewehrung = x; holen(); }),

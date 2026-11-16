@@ -251,7 +251,8 @@ def katalog() -> dict:
             "vorlagen": [
                 {"schluessel": v.schluessel, "name": v.name, "hat_waende": v.hat_waende,
                  "masse": [{"schluessel": m.schluessel, "beschriftung": m.beschriftung,
-                            "vorgabe": m.vorgabe} for m in v.masse],
+                            "vorgabe": m.vorgabe, "einheit": m.einheit, "schritt": m.schritt}
+                           for m in v.masse],
                  "skizze": v.bauen().als_dict()}
                 for v in VORLAGEN
             ],
