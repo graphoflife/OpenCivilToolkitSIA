@@ -1,5 +1,5 @@
 ---
-erzeugt: 0477ae898802
+erzeugt: 00226134b9ab
 art: modul
 tags: [modul]
 ---
@@ -17,8 +17,9 @@ Meldungen -- die der Decke und je Lastfall und Kombination die eigenen,
 samt Last und Lagerkraft, auch je Lager.
 
 Auf Anfrage die Bilder eines Falls ([[opencivil.web.deckendaten#ergebnis|ergebnis]]): die Momente und
-Querkraefte in Zellen ueber die Platten, ihre groessten Werte mit Ort, die
-Kraft jeder Stuetze und der Verlauf laengs jedes Linienlagers. Die Zellen
+Querkraefte in Zellen ueber die Platten, je Zelle mit ihrem Gefaelle, ihre
+groessten Werte mit Ort, die Kraft jeder Stuetze und der Verlauf laengs
+jedes Linienlagers. Die Zellen
 sind gross; mit jeder Rechnung mitgeliefert, machten sie jede Eingabe
 langsamer -- dasselbe wie beim Verlauf des Balkensystems.
 
@@ -75,10 +76,12 @@ def ergebnis(befund: Deckenbefund, name: str) -> Dict[str, Any]
 ```
 
 Die Bilder des Falls `name`, Lastfall oder Kombination: `zellen`, je
-Zelle ihre Ecken, und `werte`, je Groesse
-([[opencivil.decke.feld#Konstanten|GROESSEN]]) der Wert am Schwerpunkt jeder
-Zelle; `extreme`, je Groesse der groesste und der kleinste Wert mit
-seinem Ort -- gesucht an den Proben des Falls
+Zelle ihre Ecken, `mitten`, je Zelle ihr Schwerpunkt, und `werte`,
+je Groesse ([[opencivil.decke.feld#Konstanten|GROESSEN]]) der Wert dort;
+`gefaelle`, je Groesse und Zelle `[∂/∂x, ∂/∂y]` in ihrer Einheit je
+m ([[opencivil.decke.feld#gefaelle|gefaelle]]) -- damit verlaeuft die Farbe
+ueber die Zelle; `extreme`, je Groesse der groesste und der kleinste
+Wert mit seinem Ort -- gesucht an den Proben des Falls
 ([[opencivil.decke.feld#proben|proben]]).
 Dazu je Stuetze ihre Kraft `F` und je Linienlager, was
 [[opencivil.web.deckendaten#_linienlager|_linienlager]] sagt. Momente in kNm/m, Querkraefte und `r` in

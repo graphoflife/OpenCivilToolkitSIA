@@ -12,7 +12,9 @@ An den Proben eines Falls (:func:`proben`): dem Schwerpunkt jeder Zelle der
 Bilder (:func:`zellen_von`) und den Stellen, an denen ein Träger springt
 oder seine grössten Werte hat (:func:`stellen`). Dort sucht :func:`extrem`
 den grössten und den kleinsten Wert -- für das Bild und den Bericht
-derselbe.
+derselbe. Wie sich die Werte über eine Zelle ändern, sagt
+:func:`gefaelle`; damit verläuft die Farbe im Bild, statt in jeder Zelle
+zu stehen (Benutzer, 2026-11-16).
 
 VOM STREIFEN ZUR PLATTE:
 Ein Streifen der Breite ``b`` in Richtung ``n`` trägt mit dem Moment ``M``
@@ -59,7 +61,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Callable, List, Sequence, Tuple
+from typing import Callable, Dict, List, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
@@ -83,6 +85,11 @@ INNEN = 1e-6
 #: 40 waren es für die Decke des Kolloquiums 4 (9 m, Streifen 0.25 m) 3168
 #: Zellen und 330 kB.
 ZELLEN = 24
+
+#: So weit rückt eine Ecke einer Zelle zu ihrem Schwerpunkt, bevor dort gerechnet wird, in m:
+#: weiter als :data:`~opencivil.decke.geometrie.TOLERANZ`, so dass sie in der Zelle liegt und
+#: nicht auf dem Rand des Streifens oder Unterzugs daneben.
+ECKE_INNEN = 1e-4
 
 #: Eine Stelle der Platte mit ihren Schnittkräften.
 Probe = Tuple[Punkt, "Schnittkraefte"]
@@ -238,6 +245,51 @@ def proben(ergebnis: Ergebnis, fall: Fallergebnis, zellen: Sequence[Sequence[Pun
     orte = [geo.schwerpunkt(z) for z in zellen]
     orte += [p for p in stellen(ergebnis, fall) if any(geo.innen(p, v) for v in platten)]
     return [(p, an_stelle(ergebnis, fall, p)) for p in orte]
+
+
+def gefaelle(ergebnis: Ergebnis, fall: Fallergebnis, zelle: Sequence[Punkt],
+             probe: Probe) -> Dict[str, Tuple[float, float]]:
+    """
+    Wie sich jede Grösse (:data:`GROESSEN`) über eine Zelle ändert, je
+    ``(∂/∂x, ∂/∂y)`` in ihrer Einheit je m: das Gefälle der Ebene durch den
+    Wert der ``probe`` in ihrem Schwerpunkt, die die Werte an ihren Ecken --
+    knapp innen, :data:`ECKE_INNEN` -- nach den kleinsten Quadraten am
+    besten trifft. Nur für das Bild.
+
+    In einer Zelle trägt je Richtung ein Streifen, und ein Unterzug deckt
+    sie ganz oder gar nicht (:func:`zellen_von`): ihre Werte folgen dort je
+    einem Polynom längs des Streifens. Auf einem Rechteck hat die Ebene
+    dann das Gefälle der Sehne, bei einer Parabel gleich der Ableitung im
+    Schwerpunkt, und Nachbarn im selben Streifen treffen sich an der
+    gemeinsamen Kante bis auf die Krümmung über eine Zelle.
+    """
+    mitte, k = probe
+    orte = [_nach_innen(p, mitte) for p in zelle]
+    abstaende = [(x - mitte[0], y - mitte[1]) for x, y in orte]
+    sxx = sum(dx * dx for dx, _ in abstaende)
+    sxy = sum(dx * dy for dx, dy in abstaende)
+    syy = sum(dy * dy for _, dy in abstaende)
+    det = sxx * syy - sxy * sxy
+    if det <= 1e-12 * (sxx + syy) ** 2:
+        return {g: (0.0, 0.0) for g in GROESSEN}
+    ecken = [an_stelle(ergebnis, fall, p) for p in orte]
+    heraus: Dict[str, Tuple[float, float]] = {}
+    for g in GROESSEN:
+        mittig = k.groesse(g)
+        dw = [e.groesse(g) - mittig for e in ecken]
+        bx = sum(dx * w for (dx, _), w in zip(abstaende, dw))
+        by = sum(dy * w for (_, dy), w in zip(abstaende, dw))
+        heraus[g] = ((syy * bx - sxy * by) / det, (sxx * by - sxy * bx) / det)
+    return heraus
+
+
+def _nach_innen(p: Punkt, mitte: Punkt) -> Punkt:
+    """``p``, um :data:`ECKE_INNEN` zur ``mitte`` gerückt -- höchstens um die Hälfte des Wegs."""
+    d = math.hypot(p[0] - mitte[0], p[1] - mitte[1])
+    if d <= 0.0:
+        return p
+    f = min(ECKE_INNEN, 0.5 * d) / d
+    return (p[0] + (mitte[0] - p[0]) * f, p[1] + (mitte[1] - p[1]) * f)
 
 
 def extrem(proben: Sequence[Probe],

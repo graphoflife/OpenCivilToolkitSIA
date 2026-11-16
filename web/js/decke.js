@@ -62,7 +62,8 @@ const HILFE = {
       ['m_xy', 'das Drillmoment je Meter: nur, wo ein Streifen schief zu x und y trägt'],
       ['v_x, v_y, v_0', 'die Querkräfte je Meter und die Hauptquerkraft v_0 = √(v_x² + v_y²)'],
       ['Lager', 'je Linienlager der Verlauf seiner Kraft über die Länge; darunter je Lager die Summe, eingespannt auch sein Moment, negativ, wo es oben zieht'],
-      ['Angeschrieben', 'der grösste und der kleinste Wert, mit Punkt an seiner Stelle; über einer Zelle ihr Wert'],
+      ['Farben', 'in jeder Zelle ein Verlauf -- längs eines Streifens glatt, quer springen die Werte an den Grenzen der Streifen, weil jeder seinen Teil der Last trägt'],
+      ['Angeschrieben', 'der grösste und der kleinste Wert, mit Punkt an seiner Stelle; über einer Zelle der Wert in ihrer Mitte'],
     ],
   },
 };

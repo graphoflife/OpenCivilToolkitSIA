@@ -7,6 +7,36 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-16 · Decken: glatte Ergebnisbilder
+
+Die Bilder der Momente und Querkräfte einer Decke sind nicht mehr gekachelt:
+in jeder Zelle verläuft die Farbe (Benutzer, selber Tag). Er fragte, warum
+das Bild gestuft sei, wo doch dahinter eine Parabel stehe.
+
+Warum so:
+
+- Gerechnet wird nach der Streifenmethode: längs eines Streifens ist m ein
+  Polynom, quer gilt im ganzen Streifen derselbe Wert. Gestuft war das Bild,
+  weil jede Zelle nur den Wert in ihrer Mitte zeigte. Jetzt gibt der Kern je
+  Zelle und Grösse dazu ein Gefälle (`feld.gefaelle`): das der Ebene durch
+  den Wert in der Mitte, die die Werte an den Ecken -- 0.1 mm innen -- nach
+  den kleinsten Quadraten am besten trifft. Die Oberfläche zeichnet daraus
+  einen linearen Verlauf, mit einem Halt bei null, wo die Farbe von blau
+  nach rot knickt.
+- Eine Zelle liegt in genau einem Streifen jeder Richtung, und Unterzüge,
+  Lagerenden und Stützenbereiche liegen auf ihren Rändern, weil die
+  Streifen dort geteilt werden. In einer Zelle ist darum jede Grösse ausser
+  v_0 eine Summe von Polynomen längs der Streifen. Auf einem Rechteck hat
+  die Ebene das Gefälle der Sehne -- bei einer Parabel die Ableitung in der
+  Mitte, das prüft ein Test --, und Nachbarn im selben Streifen treffen sich
+  an der gemeinsamen Kante. Quer zu den Streifen bleiben die Sprünge: die
+  rechnet die Streifenmethode wirklich.
+- Gefälle aus den Ecken statt feinerer Zellen: feinere wären wieder
+  gestuft, nur feiner, und die Antwort wüchse mit dem Quadrat. Mit den
+  Gefällen wächst sie im Kolloquium 4 von 68 auf 131 kB, und die Anfrage
+  dauert 0.22 statt 0.14 s. Ein SVG kann keine Farben zwischen den Ecken
+  eines Vielecks mischen; ein linearer Verlauf je Zelle ist, was es kann.
+
 ## 2026-11-16 · Querschnittsanalyse: wie viele Stäbe im Kreis
 
 Die runde Vorlage fragt neben dem Durchmesser nach der Zahl der Stäbe n

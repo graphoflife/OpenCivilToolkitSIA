@@ -10,8 +10,9 @@ Meldungen -- die der Decke und je Lastfall und Kombination die eigenen,
 samt Last und Lagerkraft, auch je Lager.
 
 Auf Anfrage die Bilder eines Falls (:func:`ergebnis`): die Momente und
-Querkraefte in Zellen ueber die Platten, ihre groessten Werte mit Ort, die
-Kraft jeder Stuetze und der Verlauf laengs jedes Linienlagers. Die Zellen
+Querkraefte in Zellen ueber die Platten, je Zelle mit ihrem Gefaelle, ihre
+groessten Werte mit Ort, die Kraft jeder Stuetze und der Verlauf laengs
+jedes Linienlagers. Die Zellen
 sind gross; mit jeder Rechnung mitgeliefert, machten sie jede Eingabe
 langsamer -- dasselbe wie beim Verlauf des Balkensystems.
 
@@ -104,10 +105,12 @@ def _je_lager(e: Ergebnis, f: Fallergebnis) -> List[Dict[str, Any]]:
 def ergebnis(befund: Deckenbefund, name: str) -> Dict[str, Any]:
     """
     Die Bilder des Falls ``name``, Lastfall oder Kombination: ``zellen``, je
-    Zelle ihre Ecken, und ``werte``, je Groesse
-    (:data:`~opencivil.decke.feld.GROESSEN`) der Wert am Schwerpunkt jeder
-    Zelle; ``extreme``, je Groesse der groesste und der kleinste Wert mit
-    seinem Ort -- gesucht an den Proben des Falls
+    Zelle ihre Ecken, ``mitten``, je Zelle ihr Schwerpunkt, und ``werte``,
+    je Groesse (:data:`~opencivil.decke.feld.GROESSEN`) der Wert dort;
+    ``gefaelle``, je Groesse und Zelle ``[∂/∂x, ∂/∂y]`` in ihrer Einheit je
+    m (:func:`~opencivil.decke.feld.gefaelle`) -- damit verlaeuft die Farbe
+    ueber die Zelle; ``extreme``, je Groesse der groesste und der kleinste
+    Wert mit seinem Ort -- gesucht an den Proben des Falls
     (:func:`~opencivil.decke.feld.proben`).
     Dazu je Stuetze ihre Kraft ``F`` und je Linienlager, was
     :func:`_linienlager` sagt. Momente in kNm/m, Querkraefte und ``r`` in
@@ -117,12 +120,19 @@ def ergebnis(befund: Deckenbefund, name: str) -> Dict[str, Any]:
     fall = e.fall(name)
     zellen = feld.zellen_von(e)
     proben = feld.proben(e, fall, zellen)
-    werte = [k for _, k in proben[:len(zellen)]]
+    mitten = proben[:len(zellen)]
+    gefaelle = [feld.gefaelle(e, fall, z, probe) for z, probe in zip(zellen, mitten)]
     return {
         "fall": name,
         "einheiten": {g: EINHEITEN[g].beschriftung for g in feld.GROESSEN},
         "zellen": [_punkte(z) for z in zellen],
-        "werte": {g: [_wert(k.groesse(g), g) for k in werte] for g in feld.GROESSEN},
+        "mitten": _punkte([p for p, _ in mitten]),
+        "werte": {g: [_wert(k.groesse(g), g) for _, k in mitten] for g in feld.GROESSEN},
+        # Je m gerechnet wie die Groesse selbst: dieselbe Umrechnung. Null als
+        # 0, nicht 0.0 oder -0.0 -- quer zu seinem Streifen hat fast jedes
+        # Gefaelle eine, und die Antwort bleibt kleiner.
+        "gefaelle": {g: [[_wert(f[g][0], g) or 0, _wert(f[g][1], g) or 0] for f in gefaelle]
+                     for g in feld.GROESSEN},
         "extreme": {g: _extreme(proben, g) for g in feld.GROESSEN} if proben else {},
         "stuetzen": [{"name": s.name, "F": zahl(fall.stuetzenkraft(s.name), KN)} for s in e.decke.stuetzen],
         "linienlager": [_linienlager(l, fall) for l in e.decke.linienlager],

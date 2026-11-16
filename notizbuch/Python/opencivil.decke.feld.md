@@ -1,5 +1,5 @@
 ---
-erzeugt: b71752594e7f
+erzeugt: cd99d19853fa
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,9 @@ An den Proben eines Falls ([[opencivil.decke.feld#proben|proben]]): dem Schwerpu
 Bilder ([[opencivil.decke.feld#zellen_von|zellen_von]]) und den Stellen, an denen ein Träger springt
 oder seine grössten Werte hat ([[opencivil.decke.feld#stellen|stellen]]). Dort sucht [[opencivil.decke.feld#extrem|extrem]]
 den grössten und den kleinsten Wert -- für das Bild und den Bericht
-derselbe.
+derselbe. Wie sich die Werte über eine Zelle ändern, sagt
+[[opencivil.decke.feld#gefaelle|gefaelle]]; damit verläuft die Farbe im Bild, statt in jeder Zelle
+zu stehen (Benutzer, 2026-11-16).
 
 
 ## VOM STREIFEN ZUR PLATTE
@@ -191,6 +193,33 @@ Schnittkräften dort: zuerst die Schwerpunkte der `zellen`
 ([[opencivil.decke.feld#zellen_von|zellen_von]]), in ihrer Folge, dann die Stellen
 ([[opencivil.decke.feld#stellen|stellen]]), die in einer Platte liegen.
 
+### gefaelle
+
+```python
+def gefaelle(ergebnis: Ergebnis, fall: Fallergebnis, zelle: Sequence[Punkt], probe: Probe) -> Dict[str, Tuple[float, float]]
+```
+
+Wie sich jede Grösse ([[opencivil.decke.feld#Konstanten|GROESSEN]]) über eine Zelle ändert, je
+`(∂/∂x, ∂/∂y)` in ihrer Einheit je m: das Gefälle der Ebene durch den
+Wert der `probe` in ihrem Schwerpunkt, die die Werte an ihren Ecken --
+knapp innen, [[opencivil.decke.feld#Konstanten|ECKE_INNEN]] -- nach den kleinsten Quadraten am
+besten trifft. Nur für das Bild.
+
+In einer Zelle trägt je Richtung ein Streifen, und ein Unterzug deckt
+sie ganz oder gar nicht ([[opencivil.decke.feld#zellen_von|zellen_von]]): ihre Werte folgen dort je
+einem Polynom längs des Streifens. Auf einem Rechteck hat die Ebene
+dann das Gefälle der Sehne, bei einer Parabel gleich der Ableitung im
+Schwerpunkt, und Nachbarn im selben Streifen treffen sich an der
+gemeinsamen Kante bis auf die Krümmung über eine Zelle.
+
+### _nach_innen
+
+```python
+def _nach_innen(p: Punkt, mitte: Punkt) -> Punkt
+```
+
+`p`, um [[opencivil.decke.feld#Konstanten|ECKE_INNEN]] zur `mitte` gerückt -- höchstens um die Hälfte des Wegs.
+
 ### extrem
 
 ```python
@@ -257,6 +286,7 @@ Die Einzellasten eines Lastfalls oder einer Kombination, mit ihrem Beiwert.
 - `GROESSEN = {'m_x': 'mx', 'm_y': 'my', 'm_xy': 'mxy', 'v_x': 'vx', 'v_y': 'vy', '…` – Was ein Bild der Platte zeigen kann: je Name das Feld von [[opencivil.decke.feld#Schnittkraefte|Schnittkraefte]].
 - `INNEN = 1e-06` – So weit innerhalb eines Stücks liegt die Stelle an seinem Ende, in m: weiter als [[opencivil.decke.traeger#Konstanten|GLEICH]], so dass links und rechts eines Sprungs beide zählen.
 - `ZELLEN = 24` – So viele Zellen hat ein Bild über die längere Seite der Decke mindestens -- breitere Streifen werden dafür geteilt. Mehr machten die Bilder gross: bei 40 waren es für die Decke des Kolloquiums 4 (9 m, Streifen 0.25 m) 3168 Zellen und 330 kB.
+- `ECKE_INNEN = 0.0001` – So weit rückt eine Ecke einer Zelle zu ihrem Schwerpunkt, bevor dort gerechnet wird, in m: weiter als [[opencivil.decke.geometrie#Konstanten|TOLERANZ]], so dass sie in der Zelle liegt und nicht auf dem Rand des Streifens oder Unterzugs daneben.
 - `Probe = Tuple[Punkt, 'Schnittkraefte']` – Eine Stelle der Platte mit ihren Schnittkräften.
 
 ## Braucht

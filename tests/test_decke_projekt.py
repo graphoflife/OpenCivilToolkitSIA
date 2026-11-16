@@ -297,6 +297,28 @@ class TestBilder(unittest.TestCase):
             self.assertEqual(l["r_max"], max((s[2] for s in l["stufen"]), key=abs))
             self.assertEqual((l["eingespannt"], l["m_max"]), (False, 0.0))
 
+    def test_das_gefaelle_folgt_dem_streifen(self):
+        """
+        Einfeldplatte 4 m in x auf zwei Wänden, fest ganz in x, q = 10 kN/m²:
+        m_x = q·x·(4 − x)/2. In jeder Zelle ist das Gefälle der Farbe die
+        Ableitung q·(2 − x) in ihrer Mitte -- die Sehne einer Parabel über ein
+        Rechteck --, das von v_x der Betrag von q. Quer zum Streifen ändert
+        sich nichts, und m_y bleibt ohne Gefälle.
+        """
+        p = Projekt(name="Einfeld")
+        d = p.decke("Einfeld", aufteilung="fest", anteil=100.0)
+        d.platte([(0, 0), (4, 0), (4, 1), (0, 1)], beton=p.beton("C30/37"), h=200)
+        d.lager((0, 0), (0, 1))
+        d.lager((4, 0), (4, 1))
+        d.plattenlast(d.lastfall("q"), "P1", 10.0)
+        e = bilder(p, "q").daten["ergebnis"]
+        self.assertEqual(len(e["mitten"]), len(e["zellen"]))
+        g = e["gefaelle"]
+        for (x, _), m_x, v_x, m_y in zip(e["mitten"], g["m_x"], g["v_x"], g["m_y"]):
+            self.assertAlmostEqual(m_x[0], 10.0 * (2.0 - x), delta=2e-3)
+            self.assertAlmostEqual(abs(v_x[0]), 10.0, delta=2e-3)
+            self.assertEqual((m_x[1], v_x[1], m_y), (0, 0, [0, 0]))
+
     def test_eingespannt_das_moment_mit_dem_vorzeichen_der_platte(self):
         """Kragplatte 2 m, an der Wand eingespannt: −q·L²/2 = −20 kNm/m, ob die Wand auf- oder abwärts gezeichnet ist."""
         for a, b in (((0, 0), (0, 1)), ((0, 1), (0, 0))):

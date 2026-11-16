@@ -13,9 +13,13 @@
  *
  * Die Schnittkräfte liegen in Farbe über dem Grundriss: positiv rot,
  * negativ blau, weiss bei null -- je kräftiger, desto näher am grössten
- * Betrag. Eine Zelle hat den Wert an ihrem Schwerpunkt; in einem Streifen
- * ist er über die Breite gleich. Angeschrieben sind der grösste und der
- * kleinste Wert, mit Punkt an ihrer Stelle; über einer Zelle steht ihr Wert.
+ * Betrag. In jeder Zelle verläuft die Farbe: durch den Wert in ihrer Mitte,
+ * mit dem Gefälle, das der Kern aus den Werten an ihren Ecken ausgleicht
+ * (Benutzer, 2026-11-16) -- längs eines Streifens so glatt wie sein Verlauf.
+ * Quer springt das Bild an den Grenzen der Streifen: jeder trägt seinen
+ * eigenen Teil der Last. Angeschrieben sind der grösste und der kleinste
+ * Wert, mit Punkt an ihrer Stelle; über einer Zelle steht der Wert in ihrer
+ * Mitte.
  *
  * Im Bild der Lager stehen nur ihre Namen, die Zahlen in der Tabelle
  * darunter: neben den Lagern deckten sie einander, wo zwei Lager nahe
@@ -78,15 +82,52 @@ function farbe(wert, { weit }) {
   return `color-mix(in srgb, var(${t < 0 ? '--feld-minus' : '--feld-plus'}) ${(100 * Math.abs(t)).toFixed(1)}%, var(--feld-null))`;
 }
 
-/** Die Zellen in ihrer Farbe -- über jeder ihr Wert. */
+/** Damit jedes Bild seinen Verläufen eigene Namen gibt: sie gelten im ganzen Dokument. */
+let bilder = 0;
+
+/**
+ * Die Füllung einer Zelle: ändert sich ihr Wert über sie, ein Verlauf längs
+ * ihres Gefälles, von der Ecke mit dem kleinsten bis zu der mit dem grössten
+ * Wert -- mit einem Halt, wo er null oder die Skala voll wird: dort knickt
+ * die Farbe. Sonst ihre Farbe.
+ */
+function fuellung(v, verlaeufe, name, ecken, mitte, wert, [gx, gy], s) {
+  const g2 = gx * gx + gy * gy;
+  // Wie weit jede Ecke längs des Gefälles liegt -- in Einheiten des Gefälles.
+  const t = ecken.map(([x, y]) => (gx * (x - mitte[0]) + gy * (y - mitte[1])) / (g2 || 1));
+  const von = Math.min(...t);
+  const bis = Math.max(...t);
+  const wa = wert + von * g2;
+  const wb = wert + bis * g2;
+  if (!(Math.abs(wb - wa) > 1e-9 * (s.weit || 1))) return farbe(wert, s);
+  const halte = [[0, wa], ...[-s.weit, 0, s.weit].filter((k) => (k - wa) * (k - wb) < 0)
+    .map((k) => [(k - wa) / (wb - wa), k]).sort((a, b) => a[0] - b[0]), [1, wb]];
+  const [x1, y1] = nachBild(v, [mitte[0] + von * gx, mitte[1] + von * gy]);
+  const [x2, y2] = nachBild(v, [mitte[0] + bis * gx, mitte[1] + bis * gy]);
+  const verlauf = svgEl('linearGradient', {
+    id: name, gradientUnits: 'userSpaceOnUse',
+    x1: x1.toFixed(1), y1: y1.toFixed(1), x2: x2.toFixed(1), y2: y2.toFixed(1),
+  });
+  for (const [anteil, w] of halte) {
+    verlauf.append(svgEl('stop', { offset: anteil.toFixed(4), style: `stop-color: ${farbe(w, s)}` }));
+  }
+  verlaeufe.append(verlauf);
+  return `url(#${name})`;
+}
+
+/** Die Zellen in ihrer Farbe, jede mit ihrem Verlauf -- über jeder der Wert in ihrer Mitte. */
 function zellen(v, ergebnis, groesse, s, zeichen, einheit) {
   const g = svgEl('g', { class: 'dk-zellen' });
+  const verlaeufe = svgEl('defs');
+  const bild = ++bilder;
   ergebnis.zellen.forEach((ecken, i) => {
     const wert = ergebnis.werte[groesse][i];
-    const f = farbe(wert, s);
+    const f = fuellung(v, verlaeufe, `dk-verlauf-${bild}-${i}`, ecken, ergebnis.mitten[i], wert,
+      ergebnis.gefaelle[groesse][i], s);
     g.append(mitTitel(svgEl('path', { d: pfad(v, ecken), class: 'dk-zelle', style: `fill: ${f}; stroke: ${f}` }),
-      [`${zeichen} = ${zahlText(wert, STELLEN)} ${einheit}`]));
+      [`${zeichen} = ${zahlText(wert, STELLEN)} ${einheit} in der Mitte der Zelle`]));
   });
+  g.prepend(verlaeufe);
   return g;
 }
 
