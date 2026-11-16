@@ -61,6 +61,27 @@ class HinweisArt(str, Enum):
         }[self]
 
 
+class Kurz(str, Enum):
+    """
+    Was eine Formel in der Kurzform eines Nachweises ist -- der Fassung in
+    zwei, drei Zeilen, die das Auge in der Zusammenfassung oben zeigt
+    (:mod:`opencivil.core.kurzform`). Eine Formel ohne Angabe ist dort ein
+    Symbol mit seiner Zahl.
+    """
+
+    EINSETZEN = "einsetzen"
+    """
+    Geht in die Formel ein, die ihren Wert braucht -- solange diese schmal
+    genug bleibt; sonst steht sie als eigene Zeile davor.
+    """
+
+    ZEILE = "zeile"
+    """Steht als eigene Zeile vor der Formel, die ihren Wert braucht."""
+
+    def __str__(self) -> str:
+        return self.value
+
+
 @dataclass
 class Block:
     """Basis aller Protokollbausteine."""
@@ -185,6 +206,9 @@ class GleichungBlock(Block):
     :func:`codestelle_aus`), nur die allgemeine Formel gibt sie mit.
     """
 
+    kurz: Optional[Kurz] = None
+    """Was die Formel in der Kurzform des Nachweises ist (:class:`Kurz`)."""
+
 
 @dataclass
 class TabellenBlock(Block):
@@ -281,6 +305,7 @@ class Protokoll:
         nachsatz: str = "",
         name: str = "",
         codestelle: str = "",
+        kurz: Optional[Kurz] = None,
     ) -> None:
         """
         Der Regelfall: ``Symbol = analytische Formel = Formel mit Zahlen = Resultat``.
@@ -297,6 +322,7 @@ class Protokoll:
 
         ``name`` und ``codestelle`` sind fuer das Notizbuch (siehe
         :class:`GleichungBlock`); die Codestelle ermittelt sich selbst.
+        ``kurz`` sagt, was die Formel in der Kurzform des Nachweises ist.
         """
         zeile = tex.Formelzeile.bauen(ergebnis, vorlage, eingaben,
                                       empirisch=empirisch, nachsatz=nachsatz)
@@ -309,6 +335,7 @@ class Protokoll:
                 formelzeile=zeile,
                 name=name,
                 codestelle=codestelle or _codestelle(),
+                kurz=kurz,
             )
         )
 

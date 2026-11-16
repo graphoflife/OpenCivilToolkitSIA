@@ -1,5 +1,5 @@
 ---
-erzeugt: 002ddd13c03c
+erzeugt: 758752d5cf9c
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $M_{Rd}(N_{Ed}=0)^{+}$ | – | kNm | Zwischenwert |
+| $M_{Rd}(N_{Ed}=0)^{+}$ | Momentenwiderstand bei N\_Ed = 0 | kNm | [[Momentenwiderstand bei reiner Biegung]] |
 | $M_1$ | – | kNm | Zwischenwert |
 | $N_{Ed}$ | – | kN | Zwischenwert |
 | $N_1$ | – | kN | Zwischenwert |

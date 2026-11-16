@@ -1,5 +1,5 @@
 ---
-erzeugt: 501c7004187f
+erzeugt: 143c37b70865
 art: formel
 tags: [formel]
 ---
@@ -30,6 +30,10 @@ $$
   &= 235.9\,\mathrm{kNm}
 \end{aligned}
 $$
+
+## Gebraucht von
+
+- [[Widerstand bei festgehaltenem N_Ed]]
 
 ## Im Code
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 117b844b7349
+erzeugt: b6586b533116
 art: modul
 tags: [modul]
 ---
@@ -298,6 +298,8 @@ def beschreibung(self) -> str
 - [[opencivil.bericht.konsole]]
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.berechnung]]
+- [[opencivil.core.formelbaum]]
+- [[opencivil.core.kurzform]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]

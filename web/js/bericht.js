@@ -22,7 +22,7 @@
 import { karte, panel } from './bausteine.js';
 import { el, ersetzen, leerzustand, svgEl } from './dom.js';
 import { setzen, span } from './mathe.js';
-import { werkzeugleiste } from './kopierleiste.js';
+import { formelnLeiste, werkzeugleiste } from './kopierleiste.js';
 import { adresse, seiteVorhanden } from './notizbuch.js';
 import { kurveZeichnen } from './diagramm.js';
 import { appVon } from './apps.js';
@@ -265,11 +265,25 @@ function herleitung(gesamt) {
     ...(loesung.warnungen || []).map((w) => el('div.hinweis.hinweis-warnung', {}, [
       el('b', { text: 'Warnung: ' }), w,
     ])),
+    verfolgung ? kurzform(loesung.kurzform) : null,
     ...abschnitte(bloecke).map((a) => panel({
       schluessel: `bericht/herleitung/${a.raum || a.titel}`, titel: a.titel,
     }, kapitelkarten(a.bloecke))),
     lueckenPanel(loesung),
   ]);
+}
+
+/**
+ * Die Kurzform des verfolgten Nachweises: seine Formeln in zwei, drei
+ * Zeilen, eingesetzt, wo es kurz bleibt -- so, wie der Kern sie aus der
+ * Herleitung darunter baut (opencivil/core/kurzform.py). Rechts im Kopf die
+ * Knöpfe für alle zusammen, zum Einfügen in einen Bericht. Ohne Kurzform --
+ * der Nachweis lässt sich nicht kürzer schreiben -- nichts.
+ */
+function kurzform(bloecke) {
+  if (!bloecke?.length) return null;
+  return panel({ schluessel: 'bericht/kurzform', titel: 'Kurzform', zusatz: formelnLeiste(bloecke) },
+    [karte(null, bloecke.map(gleichungBlock))]);
 }
 
 /**

@@ -1,5 +1,5 @@
 ---
-erzeugt: 79b4e6ee9b61
+erzeugt: dc29879fb524
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 | $M_1$ | – | kNm | Zwischenwert |
 | $M_2$ | – | kNm | Zwischenwert |
 | $N_2$ | – | kN | Zwischenwert |
-| $N_{Rd}^{-}$ | – | kN | Zwischenwert |
+| $N_{Rd}^{-}$ | Grösste aufnehmbare Druckkraft | kN | [[Gleichmässiger Druck, ohne Bewehrung]] |
 
 ## Beispiel
 

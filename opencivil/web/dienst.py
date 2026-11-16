@@ -138,7 +138,8 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
     Ohne ``ziele`` wird alles gerechnet, was die Nachweise brauchen. Mit
     ``ziele`` genau diese -- dann loest das Rechenwerk rueckwaerts auf und
-    meldet, welche Eingabe fehlt.
+    meldet, welche Eingabe fehlt; ``kurzform`` sind dann ihre Formeln in
+    zwei, drei Zeilen (:mod:`opencivil.core.kurzform`).
     """
     projekt = _projekt(rumpf)
     aufbau = projekt.aufbauen()
@@ -152,7 +153,10 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         # Teillauf darf den Speicher weder fuellen noch benutzen -- er rechnet
         # absichtlich nicht alles, und ein halbes Ergebnis als ganzes
         # aufzubewahren waere der Weg zu Zahlen, die niemand erklaeren kann.
-        return api.loesung_dict(aufbau.werk.loese(*gewaehlt), aufbau)
+        # Dazu die Kurzform: das Auge zeigt sie ueber der Herleitung.
+        loesung = aufbau.werk.loese(*gewaehlt)
+        return {**api.loesung_dict(loesung, aufbau),
+                "kurzform": api.kurzform_liste(loesung.protokoll, gewaehlt)}
 
     beschreibung = projekt.als_dict()
     if not aufbau.alle_ziele():

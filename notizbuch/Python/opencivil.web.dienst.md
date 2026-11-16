@@ -1,5 +1,5 @@
 ---
-erzeugt: 4dfa720cc27e
+erzeugt: 511f21bf0aff
 art: modul
 tags: [modul]
 ---
@@ -119,7 +119,8 @@ Rechnet ein Projekt durch.
 
 Ohne `ziele` wird alles gerechnet, was die Nachweise brauchen. Mit
 `ziele` genau diese -- dann loest das Rechenwerk rueckwaerts auf und
-meldet, welche Eingabe fehlt.
+meldet, welche Eingabe fehlt; `kurzform` sind dann ihre Formeln in
+zwei, drei Zeilen ([[opencivil.core.kurzform]]).
 
 ### _stromabwaerts
 

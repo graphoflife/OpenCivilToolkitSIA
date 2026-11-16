@@ -6,7 +6,9 @@
  */
 
 import { el, melden } from './dom.js';
-import { kopiereFuerWord, kopiereTabelleFuerWord, kopiereText } from './mathe.js';
+import {
+  kopiereFormelnFuerWord, kopiereFuerWord, kopiereTabelleFuerWord, kopiereText,
+} from './mathe.js';
 
 export function werkzeugKnopf(text, titel, tun) {
   return el('button.knopf.knopf-zart', {
@@ -44,5 +46,30 @@ export function werkzeugleiste(block) {
         melden('Markdown kopiert.');
       })
       : null,
+  ]);
+}
+
+/**
+ * Dieselben drei Knöpfe für mehrere Formeln auf einmal -- die Kurzform
+ * eines Nachweises. Word bekommt jede als eigene Gleichung, mit Titel und
+ * Normstelle davor; TeX jede in `\[ … \]`.
+ *
+ * @param bloecke  Gleichungen `{titel, referenz, latex, markdown}`
+ */
+export function formelnLeiste(bloecke) {
+  const titel = (b) => [b.titel, b.referenz ? `(${b.referenz})` : ''].filter(Boolean).join(' ');
+  return el('div.formeln-werkzeug', {}, [
+    werkzeugKnopf('Word', 'Alle Formeln für Word kopieren', async () => {
+      await kopiereFormelnFuerWord(bloecke.map((b) => ({ titel: titel(b), latex: b.latex })));
+      melden('Formeln kopiert → in Word Strg+V.');
+    }),
+    werkzeugKnopf('TeX', 'Alle Formeln als LaTeX kopieren', async () => {
+      await kopiereText(bloecke.map((b) => `\\[\n${b.latex}\n\\]`).join('\n\n'));
+      melden('LaTeX kopiert.');
+    }),
+    werkzeugKnopf('MD', 'Alle Formeln als Markdown kopieren', async () => {
+      await kopiereText(bloecke.map((b) => b.markdown).join('\n\n'));
+      melden('Markdown kopiert.');
+    }),
   ]);
 }

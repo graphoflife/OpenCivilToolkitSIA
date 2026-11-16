@@ -1,5 +1,5 @@
 ---
-erzeugt: 360dca9ef21f
+erzeugt: 8da88dd7162f
 art: modul
 tags: [modul]
 ---
@@ -48,6 +48,20 @@ class HinweisArt(str, Enum)
 @property
 def beschriftung(self) -> str
 ```
+
+### Kurz
+
+```python
+class Kurz(str, Enum)
+```
+
+Was eine Formel in der Kurzform eines Nachweises ist -- der Fassung in
+zwei, drei Zeilen, die das Auge in der Zusammenfassung oben zeigt
+([[opencivil.core.kurzform]]). Eine Formel ohne Angabe ist dort ein
+Symbol mit seiner Zahl.
+
+- `EINSETZEN = 'einsetzen'` – Geht in die Formel ein, die ihren Wert braucht -- solange diese schmal genug bleibt; sonst steht sie als eigene Zeile davor.
+- `ZEILE = 'zeile'` – Steht als eigene Zeile vor der Formel, die ihren Wert braucht.
 
 ### Block
 
@@ -124,6 +138,7 @@ Eine gesetzte Formel.
 - `thema: str = ''` – Thema der Berechnung, die den Block schrieb -- vom Rechenwerk gestempelt.
 - `name: str = field(default='', compare=False)` – Name der Formel im Notizbuch -- nie Fall, Sorte, Lage oder Richtung. Leer heisst: ihr Titel ohne Zahlenangabe (siehe [[opencivil.bericht.formelsammlung#formelname|opencivil.bericht.formelsammlung.formelname]]). Gesetzt wird er, wo der Titel je nach Fall wechselt oder fuer sich nichts sagt («Ansatz»).
 - `codestelle: str = field(default='', compare=False)` – Wo im Code die Gleichung geschrieben wird, als `modul:Funktion` -- das Notizbuch verlinkt damit Formel und Modul. Selbst ermittelt (siehe [[opencivil.core.protokoll#codestelle_aus|codestelle_aus]]), nur die allgemeine Formel gibt sie mit.
+- `kurz: Optional[Kurz] = None` – Was die Formel in der Kurzform des Nachweises ist ([[opencivil.core.protokoll#Kurz|Kurz]]).
 
 ### TabellenBlock
 
@@ -226,7 +241,7 @@ Eine Gleichung ohne Zahlen -- sie kommt auch in die Formelsammlung.
 #### Protokoll.formel
 
 ```python
-def formel(self, ergebnis: Wert, vorlage: str, eingaben: Mapping[str, Wert], titel: str='', referenz: Optional[str]=None, *, empirisch: Optional[Mapping[str, Einheit]]=None, nachsatz: str='', name: str='', codestelle: str='') -> None
+def formel(self, ergebnis: Wert, vorlage: str, eingaben: Mapping[str, Wert], titel: str='', referenz: Optional[str]=None, *, empirisch: Optional[Mapping[str, Einheit]]=None, nachsatz: str='', name: str='', codestelle: str='', kurz: Optional[Kurz]=None) -> None
 ```
 
 Der Regelfall: `Symbol = analytische Formel = Formel mit Zahlen = Resultat`.
@@ -243,6 +258,7 @@ Resultat, etwa ein Vergleich ([[opencivil.core.protokoll#Protokoll|latex.verglei
 
 `name` und `codestelle` sind fuer das Notizbuch (siehe
 [[opencivil.core.protokoll#GleichungBlock|GleichungBlock]]); die Codestelle ermittelt sich selbst.
+`kurz` sagt, was die Formel in der Kurzform des Nachweises ist.
 
 #### Protokoll.wert
 
@@ -567,6 +583,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.bericht.markdown]]
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.berechnung]]
+- [[opencivil.core.kurzform]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.decke.herleitung]]

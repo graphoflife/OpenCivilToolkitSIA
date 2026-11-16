@@ -29,7 +29,7 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import NachweisUrteil, Vergleich
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KNM, Groesse
-from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.protokoll import Kurz, Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.nachweis.querkraft import (
     Querkraft, Querkraftergebnis, Querkraftfall, _hoch, _ohne_zugbewehrung, protokoll_hoehen,
@@ -132,14 +132,14 @@ def protokoll_mit_buegeln(p: Protokoll, werte: Zwischenwerte, widerstand: Wert,
              {"A": e["a_s_V"], "s_x": e["s_x"], "s_y": s_y, "d": d,
               "f_yd": e["f_yd_V"], "alpha": alpha},
              titel=f"Widerstand der Bügel{zug}", referenz=REFERENZ_BUEGEL,
-             name="Widerstand der Bügel")
+             name="Widerstand der Bügel", kurz=Kurz.ZEILE)
     p.formel(diagonale,
              r"0.9 \cdot @d \cdot @k_c \cdot @f_cd \cdot \sin @alpha \cdot \cos @alpha",
              {"d": d, "k_c": e["k_c"], "f_cd": e["f_cd"], "alpha": alpha},
              titel=f"Widerstand der Druckdiagonalen{zug}", referenz=REFERENZ_DIAGONALE,
-             name="Widerstand der Druckdiagonalen")
+             name="Widerstand der Druckdiagonalen", kurz=Kurz.ZEILE)
     p.formel(widerstand, r"\min\left[@s;\ @c\right]", {"s": buegel, "c": diagonale},
-             titel=f"Querkraftwiderstand{zug}", name=MIT_BUEGELN)
+             titel=f"Querkraftwiderstand{zug}", name=MIT_BUEGELN, kurz=Kurz.EINSETZEN)
 
 
 @dataclass

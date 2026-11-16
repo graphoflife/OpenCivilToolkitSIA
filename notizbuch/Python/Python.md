@@ -1,5 +1,5 @@
 ---
-erzeugt: 53655f9e2c57
+erzeugt: 3aa1c0ffbe2a
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -21,6 +21,8 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.core]] – das Geruest, auf dem jede Rechnung steht.
     - [[opencivil.core.berechnung]] – Berechnungen als Objekte.
     - [[opencivil.core.einheiten]] – Dimensionen, Einheiten und Groessen.
+    - [[opencivil.core.formelbaum]] – die Vorlage einer Formel als Rechenbaum.
+    - [[opencivil.core.kurzform]] – ein Nachweis in zwei, drei Formeln.
     - [[opencivil.core.latex]] – Bausteine fuer die LaTeX-Ausgabe von Berechnungen.
     - [[opencivil.core.nachweis]] – der Nachweis: Einwirkung gegen Widerstand, mit Urteil.
     - [[opencivil.core.protokoll]] – Mitschrift einer Berechnung.

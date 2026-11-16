@@ -1,5 +1,5 @@
 ---
-erzeugt: f77036fc70e1
+erzeugt: 7be8d77c0495
 art: modul
 tags: [modul]
 ---
@@ -107,6 +107,15 @@ braucht mit Zahl und Einheit eine Klammer, `(300 mm)^2` und nicht
 `300 mm^2`. `nach_rechenzeichen`, ob davor ein Rechenzeichen steht --
 dann braucht eine negative Zahl eine.
 
+### platzhalter_symbol
+
+```python
+def platzhalter_symbol(wert: Wert, hoch: bool) -> str
+```
+
+Wie ein Platzhalter mit seinem Symbol dasteht; `hoch`: vor einem
+Exponenten. Ein Symbol mit eigenem Hochindex vertraegt keinen zweiten.
+
 ### einsetzen_symbolisch
 
 ```python
@@ -127,23 +136,44 @@ Die Stellen wandern mit: 248.1 mm auf eine Stelle sind in Metern 0.2481,
 nicht 0.2 -- sonst ginge in der Herleitung Genauigkeit verloren, die die
 Rechnung hatte.
 
+### platzhalter_zahl
+
+```python
+def platzhalter_zahl(wert: Wert, empirisch: Optional[Einheit], hoch: bool, nach_rechenzeichen: bool) -> str
+```
+
+Wie ein Platzhalter mit seiner Zahl dasteht: samt Einheit, in einer
+empirischen Formel als blanke Zahl in der Einheit `empirisch`.
+
+Eine negative Zahl wird hinter einem Rechenzeichen und vor einem
+Exponenten geklammert, damit nicht `a \cdot -5` entsteht; am Anfang
+eines Ausdrucks waere die Klammer reine Unruhe. Vor einem Exponenten
+braucht auch eine Zahl mit Einheit eine: `(300 mm)^2`, nicht `300 mm^2`.
+
 ### einsetzen_numerisch
 
 ```python
 def einsetzen_numerisch(vorlage: str, eingaben: Mapping[str, Wert], kontext: str='Formel', *, empirisch: Optional[Mapping[str, Einheit]]=None) -> str
 ```
 
-Ersetzt die Platzhalter durch Zahlenwerte samt Einheit.
-
-Negative Werte werden hinter einem Rechenzeichen geklammert, damit nicht
-`a \cdot -5` entsteht; am Anfang eines Ausdrucks waere die Klammer
-reine Unruhe.
+Ersetzt die Platzhalter durch Zahlenwerte samt Einheit
+([[opencivil.core.latex#platzhalter_zahl|platzhalter_zahl]]).
 
 `empirisch` nennt die Eingaben einer dimensionell inhomogenen
 Normformel mit der Einheit, in der die Norm sie verlangt. Sie stehen als
 blanke Zahl in dieser Einheit da: `\sqrt{30}` und nicht
 `\sqrt{30\,\mathrm{N}/\mathrm{mm}^{2}}` -- die Wurzel einer
 Spannung gibt es nicht, und so zu tun waere falsch.
+
+### einheitenhinweis
+
+```python
+def einheitenhinweis(paare: Iterable[Tuple[str, Einheit]]) -> str
+```
+
+In welchen Einheiten die blanken Zahlen einer empirischen Formel stehen,
+je `(Symbol, Einheit)`: `\quad \left(d\ \text{in}\ \mathrm{mm}\right)`
+-- am Ende ihrer Zeile, sonst liessen sie sich nicht lesen. Leer ohne.
 
 ### _gruppe
 
@@ -167,6 +197,16 @@ Zeichen, Formatierung (`\left`, `\,`, `\mathrm`, die Klammern
 einer Gruppe) fast nichts. Eine Umgebung mit Zeilen ist so breit wie ihre
 breiteste Zeile.
 
+### bruchtiefe
+
+```python
+def bruchtiefe(latex: str) -> int
+```
+
+Wie tief Brueche ineinander stehen: 0 ohne Bruch, 1 fuer `\frac{a}{b}`,
+2, wenn in Zaehler oder Nenner wieder einer steht -- der wird dort klein
+gesetzt.
+
 ### Formelzeile
 
 ```python
@@ -189,6 +229,8 @@ ging kaputt, sobald in einer Formel ein Gleichheitszeichen vorkam.
 - `vorlage: Optional[str] = None` – Die Vorlage mit `@name` -- dieselbe Formel, gleich welche Zahlen.
 - `einheiten: str = ''` – Bei empirischen Formeln: in welchen Einheiten die Zahlen eingehen.
 - `eingaben: Tuple[Tuple[str, Wert], ...] = field(default=(), compare=False, repr=False)` – Was die Vorlage einsetzt, je `(Platzhalter, Wert)` -- nur ihre Platzhalter, nicht jede Eingabe der Berechnung. Fuer das Notizbuch: welche Groessen eine Formel braucht, und welche Formel sie liefert.
+- `empirisch: Tuple[Tuple[str, Einheit], ...] = field(default=(), compare=False, repr=False)` – Die Platzhalter einer empirischen Formel mit der Einheit, in der sie als blanke Zahl eingehen ([[opencivil.core.latex#einsetzen_numerisch|einsetzen_numerisch]]).
+- `resultat: Optional[Wert] = field(default=None, compare=False, repr=False)` – Der Wert, den die Zeile ausrechnet -- daran rechnet die Kurzform eines Nachweises ihre Formel nach ([[opencivil.core.kurzform]]). Fehlt nur einer Zeile, die nicht mit [[opencivil.core.latex#Formelzeile.bauen|bauen]] entsteht.
 
 #### Formelzeile.bauen
 
@@ -395,7 +437,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 
 ## Konstanten
 
-- `_PLATZHALTER = re.compile('@\\{([A-Za-z_][A-Za-z0-9_]*)\\}|@([A-Za-z_][A-Za-z0-9_]*)…` – `@name` oder `@{name}`
+- `PLATZHALTER = re.compile('@\\{([A-Za-z_][A-Za-z0-9_]*)\\}|@([A-Za-z_][A-Za-z0-9_]*)…` – `@name` oder `@{name}` -- auch der Formelbaum liest damit.
 - `_SONDERZEICHEN = {'\\': '\\textbackslash{}', '&': '\\&', '%': '\\%', '$': '\\$', '#': …`
 - `_NAME_IM_INDEX = re.compile(',\\\\text\\{[^{}]*\\}')` – Ein Name im Index: `\alpha_{eff,x,\text{Feld}}`, `f_{cd,\text{C30/37}}`.
 - `_RECHENZEICHEN = ('+', '-', '\\cdot', '\\times', '/')` – Nach diesen Zeichen braucht eine negative Zahl eine Klammer: `a - (-5)`, `a \\cdot (-5)`. Am Anfang eines Ausdrucks nicht: `-300 - (-1484.6)`.
@@ -423,6 +465,8 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.bericht.latex_dokument]]
 - [[opencivil.bericht.markdown]]
 - [[opencivil.bericht.zusammenfassung]]
+- [[opencivil.core.formelbaum]]
+- [[opencivil.core.kurzform]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.decke.herleitung]]

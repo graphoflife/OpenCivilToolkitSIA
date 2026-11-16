@@ -1,5 +1,5 @@
 ---
-erzeugt: a08447b8729a
+erzeugt: 0affe2e6ebe2
 art: modul
 tags: [modul]
 ---
@@ -152,6 +152,7 @@ Ein von Hand nachrechenbarer Punkt der Resistenzlinie.
 - `M: float` – Moment in Nm (Zug unten positiv).
 - `x: Optional[Wert] = field(default=None, compare=False)`
 - `d: Optional[Wert] = field(default=None, compare=False)` – Druckzonenhoehe und statische Hoehe -- nur bei M_Rd(N = 0), wie sie dort hergeleitet sind. Daraus rechnen die Kennzahlen der Platte x/d.
+- `werte: Dict[str, Wert] = field(default_factory=dict, compare=False)` – N und M, wie die Mitschrift sie rechnet -- je Achse (`"N"`, `"M"`), soweit eine Zeile sie schreibt; bei reiner Biegung fehlt N = 0. Ein Widerstand, der genau auf den Punkt faellt, gibt diesen Wert weiter: so findet die Kurzform des Nachweises die Formel dahinter ([[opencivil.core.kurzform]]).
 
 ### Handrechnung
 

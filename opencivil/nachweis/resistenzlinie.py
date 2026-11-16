@@ -202,7 +202,12 @@ class Handlinie(Widerstandslinie):
         # Eine Seite im Notizbuch, gleich welcher Titel und welcher Fall.
         name = f"Widerstand bei festgehaltenem {lauf.name}_Ed"
         if genau is not None:
-            p.formel(rd, "@P", {"P": wert("P", genau.symbol, ziel.von(genau), ziel)},
+            # Der Wert, wie die Handrechnung ihn rechnet -- so fuehrt die Zeile
+            # zu seiner Formel. N = 0 bei reiner Biegung rechnet keine Zeile.
+            punkt = genau.werte.get(ziel.name)
+            if punkt is None:
+                punkt = wert("P", genau.symbol, ziel.von(genau), ziel)
+            p.formel(rd, "@P", {"P": punkt},
                      titel=titel or (f"Widerstand bei {lauf.name}_Ed = "
                                      f"{_k(fest)} {lauf.einheit.beschriftung} – "
                                      f"ein Eckpunkt liegt genau dort"), name=name)

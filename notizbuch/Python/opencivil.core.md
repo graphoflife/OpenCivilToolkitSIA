@@ -1,5 +1,5 @@
 ---
-erzeugt: 41f47fa54a26
+erzeugt: 3a89185e5b9d
 art: modul
 tags: [modul]
 ---
@@ -18,6 +18,8 @@ Berechnung ihre Herleitung schreibt ([[opencivil.core.protokoll]],
 
 - [[opencivil.core.berechnung]] – Berechnungen als Objekte.
 - [[opencivil.core.einheiten]] – Dimensionen, Einheiten und Groessen.
+- [[opencivil.core.formelbaum]] – die Vorlage einer Formel als Rechenbaum.
+- [[opencivil.core.kurzform]] – ein Nachweis in zwei, drei Formeln.
 - [[opencivil.core.latex]] – Bausteine fuer die LaTeX-Ausgabe von Berechnungen.
 - [[opencivil.core.nachweis]] – der Nachweis: Einwirkung gegen Widerstand, mit Urteil.
 - [[opencivil.core.protokoll]] – Mitschrift einer Berechnung.

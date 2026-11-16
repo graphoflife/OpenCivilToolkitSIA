@@ -7,6 +7,55 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-16 · Kurzform eines Nachweises
+
+Wer in der Zusammenfassung das Auge eines Nachweises anklickt, sieht über
+der Herleitung die Karte «Kurzform»: den Nachweis in zwei, drei Formeln,
+mit Word, TeX und MD im Kopf, um alle auf einmal zu kopieren (Benutzer,
+selber Tag). Die Biegung der Platte bei N = 0 steht dort als
+
+    M_Rd = A_s · f_yd · (d − A_s · f_yd / (2 · b · f_cd)) = 235.9 kNm
+    α = M_Rd / M_Ed = 1.57
+
+statt in den Zeilen der Handrechnung (x, Hebelarm, Moment). Die
+Plattenquerkraft steht als ε_v, V_Rd = τ_cd · d_v / (1 + ε_v · d · k_g)
+und α; die Querkraft mit Bügeln als V_Rd,s, V_Rd,c und
+α = min[V_Rd,s; V_Rd,c] / V_Ed.
+
+Warum so:
+
+- Die Kurzform rechnet nichts Neues, sie schreibt die Mitschrift kürzer
+  auf (`core/kurzform.py`). Vom Erfüllungsgrad aus sucht sie rückwärts je
+  Platzhalter die Zeile, die seinen Wert rechnet, und setzt deren Formel
+  ein. Was eine Zeile dabei ist, sagt die Berechnung, die sie schreibt:
+  `kurz=Kurz.EINSETZEN` geht ein, `Kurz.ZEILE` steht als eigene Zeile
+  davor, alles andere bleibt ein Symbol mit seiner Zahl. Eine Liste von
+  Hand, welcher Nachweis wie aussieht, gibt es so nicht.
+- Eingesetzt wird nur, solange die Formel schmal bleibt (`KURZBREITE`,
+  40 Zeichen) und kein Bruch dabei in Zähler oder Nenner eines anderen
+  gerät: dort setzt die Anzeige ihn klein, mit Einheiten in der
+  Zahlenzeile kaum lesbar. Die Plattenquerkraft am Rand (elastisch) stand
+  zuerst als eine Zeile mit Bruch im Bruch im Nenner; jetzt steht ε_v
+  davor, wie bei der plastischen.
+- Jede eingesetzte Formel wird nachgerechnet. Gibt sie nicht genau das
+  Ergebnis ihrer Zeile, bleibt es bei den Zeilen. Dafür liest ein kleiner
+  Formelbaum (`core/formelbaum.py`) das LaTeX der Vorlagen, setzt ein,
+  kürzt gleiche Faktoren (die 0.85 des Spannungsblocks steht in x und in
+  M_Rd) und schreibt die Formel wieder. sympy kam als fremdes Paket nicht
+  in Frage. Was der Baum nicht liest, bleibt eine eigene Zeile.
+- Eine Grösse, die als blanke Zahl in fester Einheit eingeht (d in mm bei
+  k_d), wird nie ersetzt; «(d in mm)» steht hinter der Formel.
+- Eine Zeile, die einen Wert nur weitergibt (M_Rd = M_Rd(N_Ed = 0)), wird
+  übersprungen. Damit die Resistenzlinie an einem Eckpunkt dorthin findet,
+  kennt `Eckpunkt.werte` die Werte der Handrechnung; nebenbei zeigt die
+  Formelsammlung dort jetzt «Gebraucht von».
+- Eine eingesetzte Formel hat keine Vorlage mehr und steht darum nicht in
+  der Formelsammlung. Ihre Normstellen sind die aller Zeilen, die in ihr
+  aufgingen, die Norm einmal genannt.
+- Gekennzeichnet ist heute nur die Platte: Biegung bei N = 0, Querkraft
+  mit und ohne Bügel. Wo nichts gekennzeichnet ist oder zwischen zwei
+  Eckpunkten interpoliert wird, fehlt die Karte.
+
 ## 2026-11-16 · Decken: M und V eines Unterzugs
 
 Ein Ergebnisbild zeigt auch einen Unterzug selbst: sein Moment M und seine

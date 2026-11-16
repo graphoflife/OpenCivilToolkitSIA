@@ -20,7 +20,7 @@ from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, M, MM, MM2, MPA, N_PRO_MM2, DimensionsFehler, Groesse,
 )
 from opencivil.core.latex import (
-    Formelzeile, LatexFehler, einsetzen_numerisch, einsetzen_symbolisch,
+    Formelzeile, LatexFehler, bruchtiefe, einsetzen_numerisch, einsetzen_symbolisch,
     sichtbare_breite, vergleich,
 )
 from opencivil.core.protokoll import GleichungBlock, Protokoll, StillesProtokoll, TabellenBlock
@@ -273,6 +273,13 @@ class TestSichtbareBreite(unittest.TestCase):
     def test_ein_bruch_ist_so_breit_wie_sein_breiterer_teil(self):
         self.assertAlmostEqual(sichtbare_breite(r"\frac{a}{bbbb}"),
                                sichtbare_breite("bbbb") + 0.4)
+
+    def test_bruchtiefe(self):
+        """Ein Bruch in Zähler oder Nenner eines anderen wird klein gesetzt."""
+        self.assertEqual(bruchtiefe(r"a \cdot b"), 0)
+        self.assertEqual(bruchtiefe(r"\frac{a}{b} + \frac{c}{d}"), 1)
+        self.assertEqual(bruchtiefe(r"\frac{a}{1 + \frac{b}{c}}"), 2)
+        self.assertEqual(bruchtiefe(r"\frac{\sqrt{\frac{a}{b}}}{c}"), 2)
 
     def test_eine_umgebung_so_breit_wie_ihre_breiteste_zeile(self):
         self.assertEqual(sichtbare_breite(r"\begin{aligned} a \\ bbb \end{aligned}"), 3)

@@ -18,7 +18,7 @@ from __future__ import annotations
 import dataclasses
 import inspect
 import math
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from opencivil.bewehrungssuche import DURCHMESSER, Suchmodus
 from opencivil.core.einheiten import MM
@@ -28,6 +28,7 @@ from opencivil.bericht.zusammenfassung import (
     GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, kennzahlen, nachweistabelle,
     stiller_hinweis, zusammenfassen,
 )
+from opencivil.core.kurzform import kurzform
 from opencivil.core.protokoll import (
     GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel, TextBlock,
     TitelBlock, darstellen,
@@ -429,6 +430,14 @@ TAFEL: Tafel[dict] = {
 
 def protokoll_liste(protokoll: Protokoll) -> List[dict]:
     return darstellen(protokoll, TAFEL)
+
+
+def kurzform_liste(protokoll: Protokoll, ziele: Sequence[str]) -> List[dict]:
+    """
+    Die Kurzform je Ziel (:func:`opencivil.core.kurzform.kurzform`) -- ihre
+    Zeilen als Gleichungen, wie die Herleitung sie bekommt.
+    """
+    return [_gleichung_dict(b) for ziel in ziele for b in kurzform(protokoll, ziel)]
 
 
 # ===========================================================================

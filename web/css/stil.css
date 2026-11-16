@@ -1023,6 +1023,12 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 /* Über der Herleitung eines einzelnen Nachweises: welcher, und zurück. */
 .hinweis.verfolgung { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .hinweis.verfolgung .knopf { margin-left: auto; }
+/* Im Kopf der Kurzform: Word, TeX und MD für alle Formeln -- immer
+   sichtbar, nicht erst beim Darüberfahren wie an einer einzelnen. */
+.formeln-werkzeug {
+  display: flex; gap: 2px;
+  text-transform: none; letter-spacing: 0; font-weight: 400;
+}
 .nachweis-tabelle th {
   font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
   color: var(--schrift-matt); text-align: right; padding: 5px 8px;

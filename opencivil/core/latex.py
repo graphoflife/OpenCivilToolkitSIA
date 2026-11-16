@@ -37,8 +37,8 @@ from typing import Iterable, Mapping, Optional, Sequence, Tuple, Union
 from opencivil.core.einheiten import EINHEITSLOS, Einheit
 from opencivil.core.wert import Wert
 
-#: ``@name`` oder ``@{name}``
-_PLATZHALTER = re.compile(r"@\{([A-Za-z_][A-Za-z0-9_]*)\}|@([A-Za-z_][A-Za-z0-9_]*)")
+#: ``@name`` oder ``@{name}`` -- auch der Formelbaum liest damit.
+PLATZHALTER = re.compile(r"@\{([A-Za-z_][A-Za-z0-9_]*)\}|@([A-Za-z_][A-Za-z0-9_]*)")
 
 _SONDERZEICHEN = {
     "\\": r"\textbackslash{}",
@@ -97,7 +97,7 @@ def ohne_namen_im_index(symbol: str) -> str:
 def platzhalter_namen(vorlage: str) -> list[str]:
     """Liefert alle in einer Vorlage vorkommenden Platzhalternamen."""
     namen: list[str] = []
-    for geklammert, blank in _PLATZHALTER.findall(vorlage):
+    for geklammert, blank in PLATZHALTER.findall(vorlage):
         name = geklammert or blank
         if name not in namen:
             namen.append(name)
@@ -124,7 +124,7 @@ def _ersetzen(vorlage: str, ersatz) -> str:
         return ersatz(m.group(1) or m.group(2), vorlage.startswith("^", m.end()),
                       davor.endswith(_RECHENZEICHEN))
 
-    return _PLATZHALTER.sub(_treffer, vorlage)
+    return PLATZHALTER.sub(_treffer, vorlage)
 
 
 def _pruefe_vollstaendig(vorlage: str, eingaben: Mapping[str, Wert], kontext: str) -> None:
@@ -136,18 +136,21 @@ def _pruefe_vollstaendig(vorlage: str, eingaben: Mapping[str, Wert], kontext: st
         )
 
 
+def platzhalter_symbol(wert: Wert, hoch: bool) -> str:
+    """
+    Wie ein Platzhalter mit seinem Symbol dasteht; ``hoch``: vor einem
+    Exponenten. Ein Symbol mit eigenem Hochindex vertraegt keinen zweiten.
+    """
+    symbol = wert.symbol
+    return f"{{{symbol}}}" if hoch and "^" in symbol else symbol
+
+
 def einsetzen_symbolisch(
     vorlage: str, eingaben: Mapping[str, Wert], kontext: str = "Formel"
 ) -> str:
     """Ersetzt die Platzhalter durch die Symbole der Eingaben."""
     _pruefe_vollstaendig(vorlage, eingaben, kontext)
-
-    def _symbol(name: str, hoch: bool, nach_rechenzeichen: bool) -> str:
-        # Ein Symbol mit eigenem Hochindex vertraegt keinen zweiten.
-        symbol = eingaben[name].symbol
-        return f"{{{symbol}}}" if hoch and "^" in symbol else symbol
-
-    return _ersetzen(vorlage, _symbol)
+    return _ersetzen(vorlage, lambda name, hoch, _: platzhalter_symbol(eingaben[name], hoch))
 
 
 def _blank(wert: Wert, einheit: Einheit) -> str:
@@ -162,16 +165,32 @@ def _blank(wert: Wert, einheit: Einheit) -> str:
     return wert.groesse.formatiert(max(0, wert.stellen - verschiebung), einheit)
 
 
+def platzhalter_zahl(wert: Wert, empirisch: Optional[Einheit], hoch: bool,
+                     nach_rechenzeichen: bool) -> str:
+    """
+    Wie ein Platzhalter mit seiner Zahl dasteht: samt Einheit, in einer
+    empirischen Formel als blanke Zahl in der Einheit ``empirisch``.
+
+    Eine negative Zahl wird hinter einem Rechenzeichen und vor einem
+    Exponenten geklammert, damit nicht ``a \\cdot -5`` entsteht; am Anfang
+    eines Ausdrucks waere die Klammer reine Unruhe. Vor einem Exponenten
+    braucht auch eine Zahl mit Einheit eine: ``(300 mm)^2``, nicht ``300 mm^2``.
+    """
+    blank = empirisch is not None or wert.einheit is EINHEITSLOS
+    text = _blank(wert, empirisch) if empirisch is not None else wert.zahl_latex()
+    negativ = wert.groesse.si < 0
+    if (negativ and (nach_rechenzeichen or hoch)) or (hoch and not blank):
+        return f"\\left({text}\\right)"
+    return text
+
+
 def einsetzen_numerisch(
     vorlage: str, eingaben: Mapping[str, Wert], kontext: str = "Formel",
     *, empirisch: Optional[Mapping[str, Einheit]] = None,
 ) -> str:
     """
-    Ersetzt die Platzhalter durch Zahlenwerte samt Einheit.
-
-    Negative Werte werden hinter einem Rechenzeichen geklammert, damit nicht
-    ``a \\cdot -5`` entsteht; am Anfang eines Ausdrucks waere die Klammer
-    reine Unruhe.
+    Ersetzt die Platzhalter durch Zahlenwerte samt Einheit
+    (:func:`platzhalter_zahl`).
 
     ``empirisch`` nennt die Eingaben einer dimensionell inhomogenen
     Normformel mit der Einheit, in der die Norm sie verlangt. Sie stehen als
@@ -181,17 +200,22 @@ def einsetzen_numerisch(
     """
     _pruefe_vollstaendig(vorlage, eingaben, kontext)
     empirisch = empirisch or {}
+    return _ersetzen(vorlage, lambda name, hoch, nach: platzhalter_zahl(
+        eingaben[name], empirisch.get(name), hoch, nach))
 
-    def _wert(name: str, hoch: bool, nach_rechenzeichen: bool) -> str:
-        wert = eingaben[name]
-        blank = name in empirisch or wert.einheit is EINHEITSLOS
-        text = _blank(wert, empirisch[name]) if name in empirisch else wert.zahl_latex()
-        negativ = wert.groesse.si < 0
-        if (negativ and (nach_rechenzeichen or hoch)) or (hoch and not blank):
-            return f"\\left({text}\\right)"
-        return text
 
-    return _ersetzen(vorlage, _wert)
+def einheitenhinweis(paare: Iterable[Tuple[str, Einheit]]) -> str:
+    """
+    In welchen Einheiten die blanken Zahlen einer empirischen Formel stehen,
+    je ``(Symbol, Einheit)``: ``\\quad \\left(d\\ \\text{in}\\ \\mathrm{mm}\\right)``
+    -- am Ende ihrer Zeile, sonst liessen sie sich nicht lesen. Leer ohne.
+    """
+    teile = [rf"{symbol}\ \text{{in}}\ {einheit.latex}"
+             for symbol, einheit in paare if einheit is not EINHEITSLOS]
+    if not teile:
+        return ""
+    trenner = r",\ "
+    return rf"\quad \left({trenner.join(teile)}\right)"
 
 
 # ===========================================================================
@@ -306,6 +330,27 @@ def sichtbare_breite(latex: str) -> float:
     return breite
 
 
+def bruchtiefe(latex: str) -> int:
+    """
+    Wie tief Brueche ineinander stehen: 0 ohne Bruch, 1 fuer ``\\frac{a}{b}``,
+    2, wenn in Zaehler oder Nenner wieder einer steht -- der wird dort klein
+    gesetzt.
+    """
+    tiefe = 0
+    i = 0
+    while i < len(latex):
+        treffer = _BEFEHL.match(latex, i)
+        if treffer is None:
+            i += 1
+            continue
+        i = treffer.end()
+        if treffer.group(1) in ("frac", "tfrac", "dfrac"):
+            oben, i = _gruppe(latex, i)
+            unten, i = _gruppe(latex, i)
+            tiefe = max(tiefe, 1 + bruchtiefe(oben), 1 + bruchtiefe(unten))
+    return tiefe
+
+
 # ===========================================================================
 # Formelzeile
 # ===========================================================================
@@ -351,6 +396,20 @@ class Formelzeile:
     Groessen eine Formel braucht, und welche Formel sie liefert.
     """
 
+    empirisch: Tuple[Tuple[str, Einheit], ...] = field(
+        default=(), compare=False, repr=False)
+    """
+    Die Platzhalter einer empirischen Formel mit der Einheit, in der sie als
+    blanke Zahl eingehen (:func:`einsetzen_numerisch`).
+    """
+
+    resultat: Optional[Wert] = field(default=None, compare=False, repr=False)
+    """
+    Der Wert, den die Zeile ausrechnet -- daran rechnet die Kurzform eines
+    Nachweises ihre Formel nach (:mod:`opencivil.core.kurzform`). Fehlt nur
+    einer Zeile, die nicht mit :meth:`bauen` entsteht.
+    """
+
     @classmethod
     def bauen(
         cls,
@@ -379,14 +438,10 @@ class Formelzeile:
                 numerisch=None,
                 ergebnis=ergebnis.zahl_latex(),
                 nachsatz=nachsatz,
+                resultat=ergebnis,
             )
-        einheiten = [rf"{eingaben[name].symbol}\ \text{{in}}\ {einheit.latex}"
-                     for name, einheit in (empirisch or {}).items()
-                     if einheit is not EINHEITSLOS and name in eingaben]
-        hinweis = ""
-        if einheiten:
-            trenner = r",\ "
-            hinweis = rf"\quad \left({trenner.join(einheiten)}\right)"
+        empirisch = {name: einheit for name, einheit in (empirisch or {}).items() if name in eingaben}
+        hinweis = einheitenhinweis((eingaben[name].symbol, einheit) for name, einheit in empirisch.items())
         return cls(
             symbol=ergebnis.symbol,
             analytisch=einsetzen_symbolisch(vorlage, eingaben, kontext),
@@ -398,6 +453,8 @@ class Formelzeile:
             einheiten=hinweis,
             eingaben=tuple((name, eingaben[name])
                            for name in platzhalter_namen(vorlage)),
+            empirisch=tuple(empirisch.items()),
+            resultat=ergebnis,
         )
 
     # -- Darstellung --------------------------------------------------------

@@ -46,7 +46,7 @@ from typing import Dict, List, Mapping, Optional, Tuple
 from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
 from opencivil.core.nachweis import NachweisUrteil, Vergleich
 from opencivil.core.einheiten import EINHEITSLOS, KNM, MM, N_PRO_MM2, Groesse, empirisch
-from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.protokoll import Kurz, Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.nachweis.biegung_normalkraft import MNBefund, protokoll_widerstand
 from opencivil.nachweis.querkraft import (
@@ -274,10 +274,11 @@ def protokoll_ohne_buegel(p: Protokoll, werte: Zwischenwerte, widerstand: Wert, 
     beiwert = werte.zahl(*_hoch("k_d", "k_d", zeichen), k_d, stellen=4)
     p.formel(beiwert, r"\frac{1}{1 + @eps_v \cdot @d \cdot @k_g}",
              {"eps_v": eps_v, "d": d, "k_g": k_g}, empirisch={"d": MM},
-             titel="Beiwert für den Querkraftwiderstand", referenz=REFERENZ_K_D)
+             titel="Beiwert für den Querkraftwiderstand", referenz=REFERENZ_K_D,
+             kurz=Kurz.EINSETZEN)
     p.formel(widerstand, r"@k_d \cdot @tau_cd \cdot @d_v",
              {"k_d": beiwert, "tau_cd": tau_cd, "d_v": d_v},
-             titel=titel, referenz=REFERENZ, name=OHNE_BUEGEL)
+             titel=titel, referenz=REFERENZ, name=OHNE_BUEGEL, kurz=Kurz.ZEILE)
 
 
 @dataclass
@@ -584,14 +585,14 @@ class QuerkraftOhneBuegel(Querkraft):
                    f"> m_{idx}(N_Ed) = {m_Rd.formatiert()} kNm → Bewehrung fliesst, "
                    f"ε_v fest.")
             p.formel(eps_v, rf"{PLASTISCH} \cdot \frac{{@f_yd}}{{@E_s}}", stahl,
-                     titel=DEHNUNG, referenz=REFERENZ_PLASTISCH)
+                     titel=DEHNUNG, referenz=REFERENZ_PLASTISCH, kurz=Kurz.EINSETZEN)
         else:
             p.formel(
                 eps_v,
                 r"\frac{@f_yd \cdot \left(\left|@m_Ed\right| - @m_Dd\right)}"
                 r"{@E_s \cdot \left(\left|@m_Rd\right| - @m_Dd\right)}",
                 {**stahl, "m_Ed": m_Ed, "m_Dd": m_Dd, "m_Rd": m_Rd},
-                titel=DEHNUNG, referenz=REFERENZ_DEHNUNG)
+                titel=DEHNUNG, referenz=REFERENZ_DEHNUNG, kurz=Kurz.EINSETZEN)
 
         protokoll_ohne_buegel(p, werte, self._widerstand(erg), k_d=erg.k_d, eps_v=eps_v,
                               d=d, d_v=d_v, k_g=k_g, tau_cd=tau_cd_wert(werte, e))

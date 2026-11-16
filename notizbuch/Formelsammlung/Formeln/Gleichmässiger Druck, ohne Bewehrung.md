@@ -1,5 +1,5 @@
 ---
-erzeugt: 83f0910584a6
+erzeugt: 671141d1637a
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.5, Figur 12"
@@ -26,6 +26,10 @@ Mit den Zahlen aus dem Beispielprojekt:
 $$
 N_{Rd}^{-} = -b \cdot h \cdot f_{cd} = -1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = -6000\,\mathrm{kN}
 $$
+
+## Gebraucht von
+
+- [[Widerstand bei festgehaltenem M_Ed]]
 
 ## Im Code
 

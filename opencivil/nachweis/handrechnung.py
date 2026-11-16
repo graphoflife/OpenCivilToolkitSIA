@@ -43,10 +43,10 @@ Dehnung hergibt: ``sigma_sd = min(E_s * eps_s; f_yd)``.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.latex import Mathe
-from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.protokoll import Kurz, Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import Stahllage, je_seite
@@ -141,6 +141,15 @@ class Eckpunkt:
     """
     Druckzonenhoehe und statische Hoehe -- nur bei M_Rd(N = 0), wie sie dort
     hergeleitet sind. Daraus rechnen die Kennzahlen der Platte x/d.
+    """
+
+    werte: Dict[str, Wert] = field(default_factory=dict, compare=False)
+    """
+    N und M, wie die Mitschrift sie rechnet -- je Achse (``"N"``, ``"M"``),
+    soweit eine Zeile sie schreibt; bei reiner Biegung fehlt N = 0. Ein
+    Widerstand, der genau auf den Punkt faellt, gibt diesen Wert weiter: so
+    findet die Kurzform des Nachweises die Formel dahinter
+    (:mod:`opencivil.core.kurzform`).
     """
 
 
@@ -285,9 +294,10 @@ class Handrechnung:
         """Reiner Beton ohne Stahl -- die einfachste aller Grenzen."""
         N = -self.b * self.h * self.f_cd
         p.titel("Grösste Druckkraft", ebene=3)
+        w_N = self.werte.kraft("N_Rd_druck", f"N_{{{self.R}}}^{{-}}", N,
+                               "Grösste aufnehmbare Druckkraft")
         p.formel(
-            self.werte.kraft("N_Rd_druck", f"N_{{{self.R}}}^{{-}}", N,
-                        "Grösste aufnehmbare Druckkraft"),
+            w_N,
             r"-@b \cdot @h \cdot @f_cd",
             {
                 "b": self.werte.laenge("b", "b", self.b),
@@ -296,9 +306,10 @@ class Handrechnung:
             },
             titel="Gleichmässiger Druck, ohne Bewehrung", referenz="SIA 262:2025, 4.2.1.5, Figur 12",
         )
-        p.wert(self.werte.moment("M_druck", f"M_{{{self.R}}}(N_{{{self.R}}}^{{-}})", 0.0),
-               titel="Zugehöriges Moment")
-        return Eckpunkt("druck", f"N_{{{self.R}}}^{{-}}", "grösste Druckkraft", N, 0.0)
+        w_M = self.werte.moment("M_druck", f"M_{{{self.R}}}(N_{{{self.R}}}^{{-}})", 0.0)
+        p.wert(w_M, titel="Zugehöriges Moment")
+        return Eckpunkt("druck", w_N.symbol, "grösste Druckkraft", N, 0.0,
+                        werte={"N": w_N, "M": w_M})
 
     def _groesste_zugkraft(self, p: Protokoll) -> Eckpunkt:
         """
@@ -320,16 +331,18 @@ class Handrechnung:
             "f_yd": self.werte.spannung("fyd_u", u.symbol_f_yd, u.f_yd),
             "f_yd2": self.werte.spannung("fyd_o", o.symbol_f_yd, o.f_yd),
         }
+        w_N = self.werte.kraft("N_Rd_zug", f"N_{{{self.R}}}^{{+}}", N,
+                               "Grösste aufnehmbare Zugkraft")
         p.formel(
-            self.werte.kraft("N_Rd_zug", f"N_{{{self.R}}}^{{+}}", N,
-                             "Grösste aufnehmbare Zugkraft"),
+            w_N,
             r"@A_s \cdot @f_yd + @A_s2 \cdot @f_yd2",
             eingaben,
             titel="Beide Lagen fliessen auf Zug", referenz="SIA 262:2025, 4.2.2.2, Figur 16",
         )
+        w_M = self.werte.moment("M_Rd_zug", f"M_{{{self.R}}}(N_{{{self.R}}}^{{+}})", M,
+                                "Moment bei grösster Zugkraft")
         p.formel(
-            self.werte.moment("M_Rd_zug", f"M_{{{self.R}}}(N_{{{self.R}}}^{{+}})", M,
-                         "Moment bei grösster Zugkraft"),
+            w_M,
             r"@A_s \cdot @f_yd \cdot \left(@z - \tfrac{@h}{2}\right) "
             r"+ @A_s2 \cdot @f_yd2 \cdot \left(@z2 - \tfrac{@h}{2}\right)",
             {
@@ -340,7 +353,8 @@ class Handrechnung:
             },
             titel="Kräfte mal Hebelarm um die halbe Höhe",
         )
-        return Eckpunkt("zug", f"N_{{{self.R}}}^{{+}}", "grösste Zugkraft", N, M)
+        return Eckpunkt("zug", w_N.symbol, "grösste Zugkraft", N, M,
+                        werte={"N": w_N, "M": w_M})
 
     def _seite(self, p: Protokoll, seite: Zugseite) -> List[Eckpunkt]:
         """Die beiden Punkte eines Momentenvorzeichens -- des Moments, das ``seite`` zieht."""
@@ -386,17 +400,19 @@ class Handrechnung:
             rf"\frac{{@A_s \cdot @f_yd}}{{{BLOCKANTEIL} \cdot @b \cdot @f_cd}}",
             eingaben,
             titel="Druckzonenhöhe aus dem Kräftegleichgewicht", referenz="SIA 262:2025, 4.2.1.5, Figur 12",
+            kurz=Kurz.EINSETZEN,
         )
+        w_M = self.werte.moment(f"M_Rd_N0_{marke}", rf"M_{{{self.R}}}(N_{{Ed}}=0)^{{{hoch}}}",
+                                vz * M, "Momentenwiderstand bei N_Ed = 0")
         p.formel(
-            self.werte.moment(f"M_Rd_N0_{marke}", rf"M_{{{self.R}}}(N_{{Ed}}=0)^{{{hoch}}}",
-                         vz * M, "Momentenwiderstand bei N_Ed = 0"),
+            w_M,
             rf"{minus}@A_s \cdot @f_yd \cdot "
             rf"\left(@d - \frac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right)",
             {**eingaben, "d": d, "x": w_x},
-            titel="Momentenwiderstand bei reiner Biegung",
+            titel="Momentenwiderstand bei reiner Biegung", kurz=Kurz.ZEILE,
         )
-        return Eckpunkt(f"n0_{marke}", rf"M_{{{self.R}}}(N_{{Ed}}=0)^{{{hoch}}}",
-                        f"M_{self.R}(N_Ed=0) {hoch}", 0.0, vz * M, x=w_x, d=d)
+        return Eckpunkt(f"n0_{marke}", w_M.symbol, f"M_{self.R}(N_Ed=0) {hoch}",
+                        0.0, vz * M, x=w_x, d=d, werte={"M": w_M})
 
     def _halbe_hoehe(self, p: Protokoll, zug: Lage, w_d: Wert,
                      seite: Zugseite) -> Optional[Eckpunkt]:
@@ -483,16 +499,18 @@ class Handrechnung:
             "A_s": self.werte.flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
             "sigma_sd": w_sigma,
         }
+        w_N = self.werte.kraft(f"N_halb_{marke}", rf"N_{{{self.R}}}^{{{hoch}}}", N,
+                               "Normalkraft in diesem Punkt")
         p.formel(
-            self.werte.kraft(f"N_halb_{marke}", rf"N_{{{self.R}}}^{{{hoch}}}", N,
-                        "Normalkraft in diesem Punkt"),
+            w_N,
             rf"-@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x + @A_s \cdot @sigma_sd",
             eingaben,
             titel="Kräftegleichgewicht",
         )
+        w_M = self.werte.moment(f"M_halb_{marke}", rf"M_{{{self.R}}}^{{{hoch}}}", vz * M,
+                                "Moment in diesem Punkt")
         p.formel(
-            self.werte.moment(f"M_halb_{marke}", rf"M_{{{self.R}}}^{{{hoch}}}", vz * M,
-                         "Moment in diesem Punkt"),
+            w_M,
             rf"{minus}\left[@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x \cdot "
             rf"\left(\tfrac{{@h}}{{2}} - \tfrac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right) "
             rf"+ @A_s \cdot @sigma_sd \cdot \left(@d - \tfrac{{@h}}{{2}}\right)\right]",
@@ -504,7 +522,7 @@ class Handrechnung:
             titel="Momentengleichgewicht um die halbe Höhe",
         )
         return Eckpunkt(f"halb_{marke}", rf"M_{{{self.R}}}(x=\tfrac{{h}}{{2}})^{{{hoch}}}",
-                        f"x = h/2 {hoch}", N, vz * M)
+                        f"x = h/2 {hoch}", N, vz * M, werte={"N": w_N, "M": w_M})
 
     def _uebersicht(self, p: Protokoll, punkte: List[Eckpunkt]) -> None:
         p.tabelle(

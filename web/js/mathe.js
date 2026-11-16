@@ -122,6 +122,40 @@ export function kopiereFuerWord(latex) {
 }
 
 /**
+ * Legt mehrere Formeln ab, jede als eigene Gleichung, mit ihrem Titel als
+ * Absatz davor -- so, wie sie in einen Bericht gehören. Als Rückfall die
+ * Titel und das LaTeX untereinander.
+ *
+ * @param formeln  `[{titel, latex}]`
+ */
+export function kopiereFormelnFuerWord(formeln) {
+  const huelle = document.createElement('div');
+  const zeilen = [];
+  const absatz = (inhalt, alsHtml) => {
+    const p = document.createElement('p');
+    if (alsHtml) p.innerHTML = inhalt;
+    else p.textContent = inhalt;
+    huelle.append(p);
+  };
+  for (const { titel, latex } of formeln) {
+    if (titel) {
+      absatz(titel, false);
+      zeilen.push(titel);
+    }
+    const mathml = alsMathML(latex);
+    absatz(mathml || latex, Boolean(mathml));
+    zeilen.push(latex);
+  }
+  const text = zeilen.join('\n\n');
+  return inZwischenablage(
+    {
+      'text/html': new Blob([huelle.innerHTML], { type: 'text/html' }),
+      'text/plain': new Blob([text], { type: 'text/plain' }),
+    },
+    text);
+}
+
+/**
  * Legt eine Tabelle ab, die Word als **Tabelle** einfügt.
  *
  * Textzellen stehen als Text in einer HTML-Tabelle, Formelzellen als MathML.

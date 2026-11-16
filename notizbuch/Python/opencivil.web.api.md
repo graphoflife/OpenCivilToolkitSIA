@@ -1,5 +1,5 @@
 ---
-erzeugt: 97c2906bee37
+erzeugt: 63a80bc41c2b
 art: modul
 tags: [modul]
 ---
@@ -79,6 +79,15 @@ def wert_dict(wert: Wert) -> dict
 ```python
 def protokoll_liste(protokoll: Protokoll) -> List[dict]
 ```
+
+### kurzform_liste
+
+```python
+def kurzform_liste(protokoll: Protokoll, ziele: Sequence[str]) -> List[dict]
+```
+
+Die Kurzform je Ziel ([[opencivil.core.kurzform#kurzform|opencivil.core.kurzform.kurzform]]) -- ihre
+Zeilen als Gleichungen, wie die Herleitung sie bekommt.
 
 ### loesung_dict
 
@@ -163,6 +172,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.bewehrungssuche]]
 - [[opencivil.core.einheiten]]
+- [[opencivil.core.kurzform]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
