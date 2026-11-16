@@ -1,5 +1,5 @@
 ---
-erzeugt: 00226134b9ab
+erzeugt: e92fecbc7b83
 art: modul
 tags: [modul]
 ---
@@ -18,14 +18,15 @@ samt Last und Lagerkraft, auch je Lager.
 
 Auf Anfrage die Bilder eines Falls ([[opencivil.web.deckendaten#ergebnis|ergebnis]]): die Momente und
 Querkraefte in Zellen ueber die Platten, je Zelle mit ihrem Gefaelle, ihre
-groessten Werte mit Ort, die Kraft jeder Stuetze und der Verlauf laengs
-jedes Linienlagers. Die Zellen
-sind gross; mit jeder Rechnung mitgeliefert, machten sie jede Eingabe
-langsamer -- dasselbe wie beim Verlauf des Balkensystems.
+groessten Werte mit Ort, die Kraft jeder Stuetze, der Verlauf laengs
+jedes Linienlagers und der laengs jedes Schnitts. Die Zellen sind gross;
+mit jeder Rechnung mitgeliefert, machten sie jede Eingabe langsamer --
+dasselbe wie beim Verlauf des Balkensystems.
 
 Was in eine Rechnung eingeht, rechnet hier niemand: Zellen, Werte und
 groesste Werte kommen aus [[opencivil.decke.feld]], derselben Stelle, an
-der auch der Bericht sie holt.
+der auch der Bericht sie holt -- laengs eines Schnitts ueber
+[[opencivil.decke.schnitt]].
 
 ## Inhalt
 
@@ -72,7 +73,7 @@ Was jedes Lager traegt, in kN: jede Stuetze, jedes Linienlager -- auch, was nich
 ### ergebnis
 
 ```python
-def ergebnis(befund: Deckenbefund, name: str) -> Dict[str, Any]
+def ergebnis(befund: Deckenbefund, name: str, schnitte: Sequence[Tuple[str, Punkt, Punkt]]=()) -> Dict[str, Any]
 ```
 
 Die Bilder des Falls `name`, Lastfall oder Kombination: `zellen`, je
@@ -83,9 +84,23 @@ m ([[opencivil.decke.feld#gefaelle|gefaelle]]) -- damit verlaeuft die Farbe
 ueber die Zelle; `extreme`, je Groesse der groesste und der kleinste
 Wert mit seinem Ort -- gesucht an den Proben des Falls
 ([[opencivil.decke.feld#proben|proben]]).
-Dazu je Stuetze ihre Kraft `F` und je Linienlager, was
-[[opencivil.web.deckendaten#_linienlager|_linienlager]] sagt. Momente in kNm/m, Querkraefte und `r` in
-kN/m, Kraefte in kN -- wie `einheiten` sagt.
+Dazu je Stuetze ihre Kraft `F`, je Linienlager, was
+[[opencivil.web.deckendaten#_linienlager|_linienlager]] sagt, und je der `schnitte` -- ``(Kennung, a,
+b)`` -- was [[opencivil.web.deckendaten#_schnitt|_schnitt]] sagt. Momente in kNm/m, Querkraefte und
+`r` in kN/m, Kraefte in kN -- wie `einheiten` sagt.
+
+### _schnitt
+
+```python
+def _schnitt(v: schnitt.Verlauf, kennung: str, a: Punkt, b: Punkt) -> Dict[str, Any]
+```
+
+Ein Schnitt im Bild eines Falls, alles in m ab `a`: seine Enden `a`
+und `b`, seine Laenge `L`, wo er in einer Platte liegt
+(`stuecke`), die `stellen`, an denen er hinsieht, und je Groesse
+die `werte` dort und die `extreme` mit Stelle `u`; die `lager`,
+die er kreuzt, und die `unterzuege`. Zwei Stellen eines Sprungs
+fallen in der Rundung zusammen -- im Bild steht er senkrecht.
 
 ### _linienlager
 
@@ -136,6 +151,7 @@ in der Platte -- in einem L zwei, wo die Grenze die Ecke quert.
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
+- [[opencivil.decke.schnitt]]
 - [[opencivil.decke.werk]]
 - [[opencivil.projekt]]
 - [[opencivil.stabwerk.system]]

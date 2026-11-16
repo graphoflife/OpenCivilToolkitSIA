@@ -7,6 +7,42 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-16 · Decken: Schnitte
+
+Im Grundriss einer Decke lassen sich Schnitte zeichnen, SN1, SN2 …; längs
+eines Schnitts zeigt ein Ergebnisbild eine Grösse der Platte wie an einem
+Balken des Balkensystems, mit den Lagern und Unterzügen, die er kreuzt
+(Benutzer, selber Tag).
+
+Warum so:
+
+- Ein Schnitt ist eine Linie zwischen zwei Knoten, gezeichnet wie ein
+  Linienlager (Werkzeug «Schnitt», Taste N). Welches Bild längs welchem
+  Schnitt, sagt die Zeile unter «Ergebnisse»: neben der Grösse die Wahl
+  «ganze Platte» oder «längs Schnitt SN1». Eine Auswahlliste, weil ihre
+  Einträge mit dem Projekt wachsen; sie erscheint erst, wenn es Schnitte
+  gibt. Die Lagerkräfte zeigen immer die ganze Platte.
+- Der Kern tastet den Schnitt mit derselben Funktion ab, die die Zellen des
+  ganzen Bildes füllt (`an_stelle`), nie genau auf einer Grenze: auf dem
+  Rand eines Unterzugs zählten Streifen und Unterzug beide, ein schräger
+  Schnitt zeigte dort einmal einen Ausreisser. Die Grenzen der Streifen, die
+  Ränder der Unterzüge und die Enden der Trägerstücke teilen den Schnitt;
+  abgetastet wird je Teil 10⁻⁶ m innen, dazwischen auf einem Raster von
+  L/120 und wo V oder die Last null wird, dort liegen die Spitzen. An einem
+  Sprung stehen so zwei Werte an derselben Stelle, und der Verlauf steht
+  dort senkrecht.
+- Lager im Bild: ein Linienlager, das der Schnitt kreuzt -- eines, das er
+  entlang läuft, nicht; eine Stütze nur, wenn er durch ihren Querschnitt
+  geht, an der Stelle nächst ihrer Mitte. Ein Unterzug ist ein Band über
+  der Achse; läuft der Schnitt in einem und kreuzt andere, stehen ihre
+  Namen in Zeilen übereinander.
+- Positive Werte unten, wie im Balkensystem das Moment auf der Zugseite.
+  Beschriftung und Zeiger teilt das Bild mit dem Balkensystem
+  (`anschreiben`, `zeigerEinrichten` in `bs_diagramme.js`).
+- Je Schnitt wächst die Antwort um etwa 9.5 kB. Im Kolloquium 4 längs U4:
+  m_x −60.1 kNm/m über S2, 47.9 kNm/m bei s = 2.04 m; längs U2 m_y
+  123.7 kNm/m bei s = 2.475 m.
+
 ## 2026-11-16 · Decken: glatte Ergebnisbilder
 
 Die Bilder der Momente und Querkräfte einer Decke sind nicht mehr gekachelt:

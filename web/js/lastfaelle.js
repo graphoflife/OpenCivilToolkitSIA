@@ -223,8 +223,10 @@ export function fallname(eintrag, kennung) {
  * wird damit nichts, das Bauteil rechnet jeden Fall. Ein Fall, den es nicht
  * mehr gibt, steht als «– Fall wählen –» da. `groessen` sind die Stellungen
  * des Schalters aus dem Katalog, `vorlage` die Art einer neuen Zeile.
+ * `zusatz(zeile, aendern)` gibt, was ein Bauteil unter dem Fall mehr
+ * wählen lässt -- die Decke, wo das Bild hinsieht --, oder null.
  */
-export function diagrammzeilen(eintrag, { groessen, vorlage }) {
+export function diagrammzeilen(eintrag, { groessen, vorlage, zusatz = () => null }) {
   const aendern = (veraenderer) => eintragAendern(eintrag.kennung, veraenderer);
   const faelle = [
     ...eintrag.lastfaelle.map((lf) => ({ wert: lf.kennung, beschriftung: lf.name })),
@@ -244,6 +246,7 @@ export function diagrammzeilen(eintrag, { groessen, vorlage }) {
         on: { click: () => aendern((s) => { s.diagramme.splice(i, 1); }) },
       }),
     ]),
+    zusatz(d, (veraenderer) => aendern((s) => veraenderer(s.diagramme[i]))),
     wahlSchalter({
       werte: groessen.map((g) => ({ wert: g.wert, beschriftung: g.beschriftung, titel: g.titel })),
       gewaehlt: d.groesse, titel: 'Was das Diagramm zeigt',

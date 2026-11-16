@@ -7,7 +7,8 @@
  *     Eingaben    Knöpfe, je mit einem Fenster (`KAPITEL`): die Streifen --
  *                 wie breit, und wie die Last auf die zwei Richtungen geht --,
  *                 die Lastfälle und Lastkombinationen (lastfaelle.js), und
- *                 welche Ergebnisbilder rechts stehen
+ *                 welche Ergebnisbilder rechts stehen -- über die ganze
+ *                 Platte oder längs eines Schnitts
  *
  * Rechts im Reiter «Diagramme» der Grundriss mit der Aufteilung und einer
  * mit den Streifen, darunter je Zeile der Ergebnisse ein Bild der
@@ -26,7 +27,7 @@ import { ergebnisKarten } from './dk_ergebnis.js';
 import { anteilText, grundrissBild, legende } from './dk_grundriss.js';
 import { waehlen, zeichenbereich } from './dk_zeichnung.js';
 import {
-  el, leerzustand, zahlfeld,
+  auswahl, el, leerzustand, zahlfeld,
 } from './dom.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { diagrammzeilen, lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
@@ -43,6 +44,7 @@ const HILFE = {
       ['Stütze', 'an einem Knoten, b_x × b_y; die Streifen geben ihre Last über den Stützenbereich ab'],
       ['Unterzug', 'versteckt in der Platte, ein starker Streifen der Breite b -- er liegt auf Lagern, Stützen und Unterzügen höherer Stufe'],
       ['Zone', 'dort geht ihr Anteil der Last in Richtung 1, der Rest in Richtung 2'],
+      ['Schnitt', 'eine Linie, längs der ein Ergebnisbild die Schnittkraft wie an einem Balken zeigt -- er rechnet nicht mit'],
     ],
     formel: 'Streifenmethode: jede Last in Streifen zweier Richtungen; die Streifen tragen ohne Drillmoment, schiefe Richtungen geben in x, y ein m_xy',
   },
@@ -58,6 +60,7 @@ const HILFE = {
   ergebnisse: {
     zeilen: [
       ['Fall', 'ein Lastfall oder eine Kombination -- gerechnet wird jeder Fall'],
+      ['Wo', 'über die ganze Platte oder längs eines Schnitts: dort wie an einem Balken, mit den Lagern, die er kreuzt, und den Unterzügen als Band -- positive Werte unten, die Stelle s ab seinem Anfang'],
       ['m_x, m_y', 'die Momente je Meter in x und y, positiv mit Zug unten -- bei schiefen Streifen aus m_η umgerechnet'],
       ['m_xy', 'das Drillmoment je Meter: nur, wo ein Streifen schief zu x und y trägt'],
       ['v_x, v_y, v_0', 'die Querkräfte je Meter und die Hauptquerkraft v_0 = √(v_x² + v_y²)'],
@@ -201,6 +204,25 @@ function streifenInhalt(decke) {
 }
 
 /**
+ * Wo ein Ergebnisbild hinsieht: über die ganze Platte oder längs eines
+ * Schnitts -- eine Wahl aus dem Projekt, darum eine Liste. Nur, wenn es
+ * Schnitte gibt; die Lagerkräfte zeigen immer die ganze Decke. Ein Schnitt,
+ * den es nicht mehr gibt, steht als «– Schnitt wählen –» da.
+ */
+function ortWahl(decke, zeile, aendern) {
+  if (zeile.groesse === 'lager' || !(decke.schnitte.length || zeile.schnitt)) return null;
+  const werte = [{ wert: '', beschriftung: 'ganze Platte' },
+    ...decke.schnitte.map((s) => ({ wert: s.kennung, beschriftung: `längs Schnitt ${s.kennung}` }))];
+  return auswahl({
+    werte: werte.some((x) => x.wert === zeile.schnitt) ? werte
+      : [{ wert: zeile.schnitt, beschriftung: '– Schnitt wählen –' }, ...werte],
+    gewaehlt: zeile.schnitt,
+    titel: 'Über die ganze Platte oder längs eines Schnitts -- zu zeichnen im Fenster mit «Schnitt»',
+    beiAenderung: (w) => aendern((z) => { z.schnitt = w; }),
+  });
+}
+
+/**
  * Die Eingaben, die nicht im Zeichenfenster stehen -- als Knöpfe, jeder mit
  * seinem Fenster, wie im Balkensystem. Unter dem Namen klein, was gilt.
  */
@@ -232,7 +254,10 @@ const KAPITEL = [
     kapitel: [
       {
         schluessel: 'ergebnisse', name: 'Ergebnisse', titel: 'Ergebnisse', hilfe: HILFE.ergebnisse,
-        inhalt: (d) => diagrammzeilen(d, { groessen: katalog('decke', 'diagrammgroessen'), vorlage: 'deckendiagramm' }),
+        inhalt: (d) => diagrammzeilen(d, {
+          groessen: katalog('decke', 'diagrammgroessen'), vorlage: 'deckendiagramm',
+          zusatz: (zeile, aendern) => ortWahl(d, zeile, aendern),
+        }),
         stand: (d) => zeilenstand(d.diagramme, 'Diagramm', 'Diagramme', 'kein Diagramm'),
       },
     ],

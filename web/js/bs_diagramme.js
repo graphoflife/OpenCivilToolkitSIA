@@ -40,6 +40,10 @@
  * kleinsten Schnittgrössen und die massgebenden Durchbiegungen über alle
  * Stäbe und die Lagerkräfte -- aus der Rechnung, die mit jeder Eingabe läuft.
  *
+ * Die Beschriftung (`anschreiben`) und das Fahren mit der Maus
+ * (`zeigerEinrichten`) teilt das Bild längs eines Schnitts durch eine Decke
+ * (dk_schnitt.js): es zeigt seine Grösse wie an einem Balken.
+ *
  * Die Verläufe kommen aus einer eigenen Anfrage (`balkensystem_verlauf`),
  * erst wenn jemand sie sehen will (fallantwort.js) -- wie die Diagramme der
  * Querschnittsanalyse. Gerechnet wird hier nichts: die Werte kommen fertig
@@ -137,7 +141,7 @@ function linie(r, p, q, klasse) {
   return svgEl('path', { d: `M${a[0].toFixed(1)} ${a[1].toFixed(1)} L${b[0].toFixed(1)} ${b[1].toFixed(1)}`, class: klasse });
 }
 
-const pfad = (punkte) => punkte.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+export const pfad = (punkte) => punkte.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
 
 function schrift(x, y, inhalt, klasse = 'bs-d-text', anker = 'middle') {
   const t = svgEl('text', { x: x.toFixed(1), y: y.toFixed(1), 'text-anchor': anker, class: klasse });
@@ -211,13 +215,16 @@ function freistellen(svg, zeilen, weg = 1) {
 /**
  * Ein Wert im Bild: die Zahl neben dem Punkt `p`, auf der Seite `n` -- mit
  * einem Punkt, wenn er ein Extremwert ist, und im Feld darunter seiner
- * Stelle. Deckt sie eine frühere, rückt sie vom Punkt weg (`freistellen`).
+ * Stelle, «x = 2.00 m»; längs eines Schnitts heisst sie s (`buchstabe`).
+ * Deckt sie eine frühere, rückt sie vom Punkt weg (`freistellen`).
  */
-function anschreiben(svg, p, n, text, { punkt = false, stelle = null, klasse = '' } = {}) {
+export function anschreiben(svg, p, n, text, {
+  punkt = false, stelle = null, klasse = '', buchstabe = 'x',
+} = {}) {
   if (punkt) svg.append(svgEl('circle', { cx: p[0].toFixed(1), cy: p[1].toFixed(1), r: 3.2, class: `bs-d-extrem ${klasse}` }));
   const [x, y] = [p[0] + n[0] * 11, p[1] + n[1] * 11 + 4];
   const zeilen = [schrift(x, y, text)];
-  if (stelle !== null) zeilen.push(schrift(x, y + 12, `x = ${fest(stelle, 2)} m`, 'bs-d-text bs-d-stelle'));
+  if (stelle !== null) zeilen.push(schrift(x, y + 12, `${buchstabe} = ${fest(stelle, 2)} m`, 'bs-d-text bs-d-stelle'));
   svg.append(...zeilen);
   // Steht die Zahl über dem Punkt, rückt sie nach oben, sonst nach unten.
   freistellen(svg, zeilen, n[1] < -0.1 ? -1 : 1);
@@ -389,8 +396,12 @@ function finden(r, daten, e, punkt, zeilen) {
   return { ort: beste.q, text: [`${beste.name} bei x = ${fest(beste.x, 2)} m`, ...zeilen(beste.s, beste.x)] };
 }
 
-/** Hängt das Fahren mit der Maus an ein Bild: ein Zettel und ein Punkt an der Stelle. */
-function zeigerEinrichten(huelle, svg, r, daten, e, zeilen) {
+/**
+ * Hängt das Fahren mit der Maus an ein Bild: ein Zettel und ein Punkt an
+ * der Stelle. `finden(punkt)` sagt, was unter dem Zeiger liegt -- `{ort,
+ * text}` in Bildpunkten und Zeilen, oder null.
+ */
+export function zeigerEinrichten(huelle, svg, finden) {
   const zettel = el('div.bs-zettel', { hidden: true });
   const marke = svgEl('circle', { r: 4, class: 'bs-d-marke', visibility: 'hidden' });
   svg.append(marke);
@@ -398,9 +409,9 @@ function zeigerEinrichten(huelle, svg, r, daten, e, zeilen) {
   const zeigen = (ereignis) => {
     const rahmen = svg.getBoundingClientRect();
     if (!rahmen.width) return;
-    const f = BREITE / rahmen.width;
+    const f = svg.viewBox.baseVal.width / rahmen.width;
     const punkt = [(ereignis.clientX - rahmen.left) * f, (ereignis.clientY - rahmen.top) * f];
-    const treffer = finden(r, daten, e, punkt, zeilen);
+    const treffer = finden(punkt);
     if (!treffer) {
       zettel.hidden = true;
       marke.setAttribute('visibility', 'hidden');
@@ -488,7 +499,7 @@ function diagrammKarte(kennung, system, zeile) {
     zeilen = (s, x) => [wertText(g, zwischen(s.proben, x, (p) => p[g.feld]))];
   }
   const huelle = el('div.bs-diagramm-huelle', {}, [svg]);
-  zeigerEinrichten(huelle, svg, r, daten, e, zeilen);
+  zeigerEinrichten(huelle, svg, (punkt) => finden(r, daten, e, punkt, zeilen));
   return karte(`${titel} – ${daten.fall}`, [huelle, ...unten], {
     klasse: eintrag.daten ? '' : 'ist-veraltet', zusatz: raum ? ansichtsschalter(zeile, ansicht.name) : null,
   });

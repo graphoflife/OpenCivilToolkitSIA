@@ -1,5 +1,5 @@
 ---
-erzeugt: 02a83c013073
+erzeugt: 63393864b236
 art: modul
 tags: [modul]
 ---
@@ -173,6 +173,17 @@ Wo die Strecke `a → b` den Rand des Vielecks trifft oder an einer Ecke
 vorbeigeht, als Parameter in `[0, 1]` -- mit 0 und 1, aufsteigend.
 Zwischen zwei Stellen liegt sie ganz innen, ganz aussen oder ganz auf dem Rand.
 
+### kreuzung
+
+```python
+def kreuzung(a: Punkt, b: Punkt, p: Punkt, q: Punkt) -> Optional[Tuple[float, float]]
+```
+
+Wo sich die Geraden durch `a → b` und `p → q` schneiden, als
+Parameter `(u, k)` mit `a + u·(b − a) = p + k·(q − p)` -- `None`,
+wenn sie parallel sind. Ob der Schnitt auf den Strecken liegt, sagen
+`u` und `k` in `[0, 1]`.
+
 ### rechteck
 
 ```python
@@ -210,6 +221,8 @@ Intervalle, die sich berühren oder überlappen, zu einem.
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
+- [[opencivil.decke.schnitt]]
 - [[opencivil.decke.streifen]]
 - [[opencivil.projekt.aufbau.decke]]
+- [[opencivil.projekt.decke]]
 - [[opencivil.web.deckendaten]]

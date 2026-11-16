@@ -1,5 +1,5 @@
 ---
-erzeugt: 83710025ca70
+erzeugt: e9014070bdf5
 art: modul
 tags: [modul]
 ---
@@ -44,6 +44,7 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 - [[opencivil.decke.lasten]] – die Lasten eines Lastfalls auf den Streifen.
 - [[opencivil.decke.modell]] – was gerechnet wird: die Decke in SI.
 - [[opencivil.decke.rechnung]] – die Streifenmethode, Fall für Fall.
+- [[opencivil.decke.schnitt]] – die Schnittkräfte längs eines Schnitts.
 - [[opencivil.decke.streifen]] – die Decke in Streifen zerlegt.
 - [[opencivil.decke.traeger]] – ein Streifen als Durchlaufträger.
 - [[opencivil.decke.werk]] – die Decke im Rechenwerk.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 08267471d952
+erzeugt: 4c791e96fc5b
 art: modul
 tags: [modul]
 ---
@@ -282,5 +282,6 @@ Wo die Resultierende einer Streckenlast liegt, ab ihrem Anfang.
 
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.herleitung]]
+- [[opencivil.decke.schnitt]]
 - [[opencivil.decke.werk]]
 - [[opencivil.web.deckendaten]]

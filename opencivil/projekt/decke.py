@@ -27,7 +27,11 @@ verteilt sich ueber ``l_x × l_y``. Nach unten positiv.
 ERGEBNISBILDER:
 Welche Bilder rechts stehen, sagt die Liste ``diagramme`` -- wie die
 Statik-Analyse des Balkensystems je Zeile ein Fall und eine Groesse. Eine
-frische Decke hat m_x, m_y, v_0 und die Lagerkraefte der GZT.
+frische Decke hat m_x, m_y, v_0 und die Lagerkraefte der GZT. Ein Bild
+zeigt die ganze Platte oder einen Schnitt: eine Linie von Knoten zu
+Knoten, laengs der die Groesse wie an einem Balken steht, mit den Lagern,
+die sie kreuzt (Benutzer, 2026-11-16). Ein Schnitt geht in keine Rechnung
+ein.
 
 KOORDINATEN UND EINHEITEN:
 x nach rechts, y nach oben, in m -- ebenso die Breite eines Unterzugs, der
@@ -40,10 +44,11 @@ Umgerechnet wird beim Bauen.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, List, Sequence, Union
+from typing import Any, List, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KN_PRO_M2, M, MM, PROZENT
 from opencivil.decke.feld import GROESSEN
+from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import VERTEILBREITE, Aufteilung
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
@@ -58,7 +63,8 @@ DIAGRAMMGROESSEN = (*GROESSEN, "lager")
 
 #: Womit die Kennungen der Teile einer Decke beginnen.
 VORSILBEN = {"platten": "P", "linienlager": "L", "stuetzen": "S", "unterzuege": "U",
-             "zonen": "Z", "flaechenlasten": "FL", "linienlasten": "LL", "punktlasten": "PL"}
+             "zonen": "Z", "flaechenlasten": "FL", "linienlasten": "LL", "punktlasten": "PL",
+             "schnitte": "SN"}
 
 
 @dataclass
@@ -200,17 +206,33 @@ class PunktlastEintrag(Beschreibung):
 
 
 @dataclass
+class DeckenschnittEintrag(Beschreibung):
+    """
+    Ein Schnitt von Knoten zu Knoten: längs ihm zeigt ein Ergebnisbild eine
+    Schnittkraft wie an einem Balken, mit den Lagern, die er kreuzt
+    (:mod:`opencivil.decke.schnitt`). Er geht in keine Rechnung ein.
+    """
+
+    kennung: str = ""
+    von: str = ""
+    bis: str = ""
+
+
+@dataclass
 class DeckendiagrammEintrag(Beschreibung):
     """
-    Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt. Gerechnet
-    wird damit nichts -- die Decke rechnet jeden Fall; die Liste sagt nur,
-    welche Bilder rechts stehen.
+    Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt -- über
+    die ganze Platte oder längs eines Schnitts. Gerechnet wird damit nichts
+    -- die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
+    rechts stehen.
     """
 
     fall: str = ""
     """Die Kennung eines Lastfalls (``LF1``) oder einer Kombination (``LK1``)."""
 
     groesse: str = einer_von(DIAGRAMMGROESSEN, "m_x")
+    schnitt: str = ""
+    """Die Kennung eines Schnitts (``SN1``) -- leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze."""
 
 
 @dataclass
@@ -239,6 +261,7 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     flaechenlasten: List[FlaechenlastEintrag] = field(default_factory=list)
     linienlasten: List[LinienlastEintrag] = field(default_factory=list)
     punktlasten: List[PunktlastEintrag] = field(default_factory=list)
+    schnitte: List[DeckenschnittEintrag] = field(default_factory=list)
     lastfaelle: List[LastfallEintrag] = field(default_factory=list)
     kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
     diagramme: List[DeckendiagrammEintrag] = field(default_factory=list)
@@ -257,6 +280,12 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     def lagen(self) -> dict:
         """Kennung -> ``(x, y)`` jedes Knotens, in m."""
         return {k.kennung: (k.x, k.y) for k in self.knoten}
+
+    def schnittlinien(self) -> List[Tuple[str, Punkt, Punkt]]:
+        """Je Schnitt seine Kennung und seine Enden, in m -- einer, dem ein Knoten fehlt, nicht."""
+        lagen = self.lagen()
+        return [(s.kennung, lagen[s.von], lagen[s.bis]) for s in self.schnitte
+                if s.von in lagen and s.bis in lagen]
 
     # -- Zeichnen ohne Oberflaeche --------------------------------------------
 
@@ -322,6 +351,12 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
                              {"lastfall": kennung_von(lastfall), "knoten": self._knoten(self.netz(), ort),
                               **felder}, "Punktlast")
 
+    def schnitt(self, von: Ort, bis: Ort) -> DeckenschnittEintrag:
+        """Ein Schnitt von ``von`` nach ``bis`` -- längs ihm zeigt ein Ergebnisbild eine Schnittkraft."""
+        netz = self.netz()
+        return self._anlegen("schnitte", DeckenschnittEintrag,
+                             {"von": self._knoten(netz, von), "bis": self._knoten(netz, bis)}, "Schnitt")
+
     def plattenlast(self, lastfall: Any, platte: Any, wert: float) -> PlattenlastEintrag:
         """
         Die Flächenlast auf der ganzen Platte ``platte`` (Eintrag oder
@@ -336,9 +371,14 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
         p.lasten = [q for q in p.lasten if q.lastfall != eintrag.lastfall] + [eintrag]
         return eintrag
 
-    def diagramm(self, fall: Any, groesse: str = "m_x") -> DeckendiagrammEintrag:
-        """Ein Ergebnisbild -- ``fall`` ein Lastfall oder eine Kombination."""
-        eintrag = lesen(DeckendiagrammEintrag, {"fall": kennung_von(fall), "groesse": groesse},
+    def diagramm(self, fall: Any, groesse: str = "m_x", schnitt: Any = "") -> DeckendiagrammEintrag:
+        """
+        Ein Ergebnisbild -- ``fall`` ein Lastfall oder eine Kombination,
+        ``schnitt`` einer der Schnitte (Eintrag oder Kennung), ohne ihn die
+        ganze Platte.
+        """
+        eintrag = lesen(DeckendiagrammEintrag,
+                        {"fall": kennung_von(fall), "groesse": groesse, "schnitt": kennung_von(schnitt)},
                         f"Decke '{self.name}', diagramme", DeckendiagrammEintrag())
         self.diagramme.append(eintrag)
         return eintrag

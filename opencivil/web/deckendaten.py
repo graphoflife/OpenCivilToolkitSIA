@@ -11,14 +11,15 @@ samt Last und Lagerkraft, auch je Lager.
 
 Auf Anfrage die Bilder eines Falls (:func:`ergebnis`): die Momente und
 Querkraefte in Zellen ueber die Platten, je Zelle mit ihrem Gefaelle, ihre
-groessten Werte mit Ort, die Kraft jeder Stuetze und der Verlauf laengs
-jedes Linienlagers. Die Zellen
-sind gross; mit jeder Rechnung mitgeliefert, machten sie jede Eingabe
-langsamer -- dasselbe wie beim Verlauf des Balkensystems.
+groessten Werte mit Ort, die Kraft jeder Stuetze, der Verlauf laengs
+jedes Linienlagers und der laengs jedes Schnitts. Die Zellen sind gross;
+mit jeder Rechnung mitgeliefert, machten sie jede Eingabe langsamer --
+dasselbe wie beim Verlauf des Balkensystems.
 
 Was in eine Rechnung eingeht, rechnet hier niemand: Zellen, Werte und
 groesste Werte kommen aus :mod:`opencivil.decke.feld`, derselben Stelle, an
-der auch der Bericht sie holt.
+der auch der Bericht sie holt -- laengs eines Schnitts ueber
+:mod:`opencivil.decke.schnitt`.
 """
 
 from __future__ import annotations
@@ -27,8 +28,9 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import KN, KN_PRO_M, KNM_PRO_M
 from opencivil.core.rechenwerk import Loesung
-from opencivil.decke import feld
+from opencivil.decke import feld, schnitt
 from opencivil.decke import geometrie as geo
+from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import Aufteilung, Linienlager
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis, lagerverlauf, spitzen
 from opencivil.decke.werk import Deckenbefund
@@ -102,7 +104,8 @@ def _je_lager(e: Ergebnis, f: Fallergebnis) -> List[Dict[str, Any]]:
                for l in e.decke.linienlager])
 
 
-def ergebnis(befund: Deckenbefund, name: str) -> Dict[str, Any]:
+def ergebnis(befund: Deckenbefund, name: str,
+             schnitte: Sequence[Tuple[str, Punkt, Punkt]] = ()) -> Dict[str, Any]:
     """
     Die Bilder des Falls ``name``, Lastfall oder Kombination: ``zellen``, je
     Zelle ihre Ecken, ``mitten``, je Zelle ihr Schwerpunkt, und ``werte``,
@@ -112,9 +115,10 @@ def ergebnis(befund: Deckenbefund, name: str) -> Dict[str, Any]:
     ueber die Zelle; ``extreme``, je Groesse der groesste und der kleinste
     Wert mit seinem Ort -- gesucht an den Proben des Falls
     (:func:`~opencivil.decke.feld.proben`).
-    Dazu je Stuetze ihre Kraft ``F`` und je Linienlager, was
-    :func:`_linienlager` sagt. Momente in kNm/m, Querkraefte und ``r`` in
-    kN/m, Kraefte in kN -- wie ``einheiten`` sagt.
+    Dazu je Stuetze ihre Kraft ``F``, je Linienlager, was
+    :func:`_linienlager` sagt, und je der ``schnitte`` -- ``(Kennung, a,
+    b)`` -- was :func:`_schnitt` sagt. Momente in kNm/m, Querkraefte und
+    ``r`` in kN/m, Kraefte in kN -- wie ``einheiten`` sagt.
     """
     e = befund.ergebnis
     fall = e.fall(name)
@@ -136,6 +140,31 @@ def ergebnis(befund: Deckenbefund, name: str) -> Dict[str, Any]:
         "extreme": {g: _extreme(proben, g) for g in feld.GROESSEN} if proben else {},
         "stuetzen": [{"name": s.name, "F": zahl(fall.stuetzenkraft(s.name), KN)} for s in e.decke.stuetzen],
         "linienlager": [_linienlager(l, fall) for l in e.decke.linienlager],
+        "schnitte": [_schnitt(schnitt.verlauf(e, fall, a, b), kennung, a, b) for kennung, a, b in schnitte],
+    }
+
+
+def _schnitt(v: schnitt.Verlauf, kennung: str, a: Punkt, b: Punkt) -> Dict[str, Any]:
+    """
+    Ein Schnitt im Bild eines Falls, alles in m ab ``a``: seine Enden ``a``
+    und ``b``, seine Laenge ``L``, wo er in einer Platte liegt
+    (``stuecke``), die ``stellen``, an denen er hinsieht, und je Groesse
+    die ``werte`` dort und die ``extreme`` mit Stelle ``u``; die ``lager``,
+    die er kreuzt, und die ``unterzuege``. Zwei Stellen eines Sprungs
+    fallen in der Rundung zusammen -- im Bild steht er senkrecht.
+    """
+    return {
+        "kennung": kennung, "a": _punkte([a])[0], "b": _punkte([b])[0], "L": round(v.L, STELLEN),
+        "stuecke": [[round(u0, STELLEN), round(u1, STELLEN)] for u0, u1 in v.stuecke],
+        "stellen": [round(u, STELLEN) for u, _ in v.proben],
+        "werte": {g: [_wert(k.groesse(g), g) for _, k in v.proben] for g in feld.GROESSEN},
+        "extreme": {g: {art: {"wert": _wert(w, g), "u": round(u, STELLEN)}
+                        for art, (u, w) in zip(("kleinst", "groesst"), v.extreme(g))}
+                    for g in feld.GROESSEN} if v.proben else {},
+        "lager": [{"u": round(l.u, STELLEN), "art": l.art, "name": l.name, "vertikal": l.vertikal,
+                   "eingespannt": l.eingespannt} for l in v.lager],
+        "unterzuege": [{"von": round(u0, STELLEN), "bis": round(u1, STELLEN), "name": name}
+                       for u0, u1, name in v.unterzuege],
     }
 
 

@@ -517,7 +517,8 @@ def decke_zeichnung(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Die Bilder einer Decke in einem Fall: Momente und Querkraefte in Zellen,
-    ihre groessten Werte, die Kraefte der Lager (:func:`deckendaten.ergebnis`).
+    ihre groessten Werte, die Kraefte der Lager und die Verlaeufe laengs der
+    Schnitte (:func:`deckendaten.ergebnis`).
     Eine eigene Anfrage wie der Verlauf des Balkensystems -- gross, und nur
     gebraucht, wenn jemand hinsieht.
 
@@ -525,7 +526,8 @@ def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     dann ist ``ergebnis`` leer, und die Uebersicht sagt warum.
     """
     projekt = _projekt(rumpf)
-    kennung = _decke(projekt, rumpf).kennung
+    decke = _decke(projekt, rumpf)
+    kennung = decke.kennung
     aufbau = projekt.aufbauen()
     loesung = _bauteil_rechnen(projekt, aufbau, kennung)
     befund = loesung.befunde.get(aufbau.decken[kennung].rechnung.id)
@@ -537,7 +539,8 @@ def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     if fall not in gerechnet:
         raise DienstFehler(400, f"Einen Fall «{fall}» gibt es in «{projekt.bauteil(kennung).name}» "
                                 f"nicht. Gerechnet sind: {', '.join(gerechnet)}.")
-    return {"ergebnis": endlich(deckendaten.ergebnis(befund, fall)), "uebersicht": uebersicht}
+    return {"ergebnis": endlich(deckendaten.ergebnis(befund, fall, decke.schnittlinien())),
+            "uebersicht": uebersicht}
 
 
 def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

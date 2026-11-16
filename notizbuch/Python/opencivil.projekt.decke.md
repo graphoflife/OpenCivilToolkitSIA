@@ -1,5 +1,5 @@
 ---
-erzeugt: b1bb78f7bb47
+erzeugt: 6dba395829a2
 art: modul
 tags: [modul]
 ---
@@ -40,7 +40,11 @@ verteilt sich ueber `l_x × l_y`. Nach unten positiv.
 
 Welche Bilder rechts stehen, sagt die Liste `diagramme` -- wie die
 Statik-Analyse des Balkensystems je Zeile ein Fall und eine Groesse. Eine
-frische Decke hat m_x, m_y, v_0 und die Lagerkraefte der GZT.
+frische Decke hat m_x, m_y, v_0 und die Lagerkraefte der GZT. Ein Bild
+zeigt die ganze Platte oder einen Schnitt: eine Linie von Knoten zu
+Knoten, laengs der die Groesse wie an einem Balken steht, mit den Lagern,
+die sie kreuzt (Benutzer, 2026-11-16). Ein Schnitt geht in keine Rechnung
+ein.
 
 
 ## KOORDINATEN UND EINHEITEN
@@ -215,6 +219,21 @@ Lastverteilelement.
 - `l_x: float = bereich(VERTEILBREITE, heisst='Verteilbreite l_x', einheit=M, ueber=0…`
 - `l_y: float = bereich(VERTEILBREITE, heisst='Verteilbreite l_y', einheit=M, ueber=0…`
 
+### DeckenschnittEintrag
+
+```python
+@dataclass
+class DeckenschnittEintrag(Beschreibung)
+```
+
+Ein Schnitt von Knoten zu Knoten: längs ihm zeigt ein Ergebnisbild eine
+Schnittkraft wie an einem Balken, mit den Lagern, die er kreuzt
+([[opencivil.decke.schnitt]]). Er geht in keine Rechnung ein.
+
+- `kennung: str = ''`
+- `von: str = ''`
+- `bis: str = ''`
+
 ### DeckendiagrammEintrag
 
 ```python
@@ -222,12 +241,14 @@ Lastverteilelement.
 class DeckendiagrammEintrag(Beschreibung)
 ```
 
-Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt. Gerechnet
-wird damit nichts -- die Decke rechnet jeden Fall; die Liste sagt nur,
-welche Bilder rechts stehen.
+Ein Ergebnisbild der Decke: ein Fall und was es von ihm zeigt -- über
+die ganze Platte oder längs eines Schnitts. Gerechnet wird damit nichts
+-- die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
+rechts stehen.
 
 - `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
 - `groesse: str = einer_von(DIAGRAMMGROESSEN, 'm_x')`
+- `schnitt: str = ''` – Die Kennung eines Schnitts (`SN1`) -- leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze.
 
 ### DeckeEintrag
 
@@ -257,6 +278,7 @@ stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
 - `flaechenlasten: List[FlaechenlastEintrag] = field(default_factory=list)`
 - `linienlasten: List[LinienlastEintrag] = field(default_factory=list)`
 - `punktlasten: List[PunktlastEintrag] = field(default_factory=list)`
+- `schnitte: List[DeckenschnittEintrag] = field(default_factory=list)`
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
 - `diagramme: List[DeckendiagrammEintrag] = field(default_factory=list)`
@@ -280,6 +302,14 @@ def lagen(self) -> dict
 ```
 
 Kennung -> `(x, y)` jedes Knotens, in m.
+
+#### DeckeEintrag.schnittlinien
+
+```python
+def schnittlinien(self) -> List[Tuple[str, Punkt, Punkt]]
+```
+
+Je Schnitt seine Kennung und seine Enden, in m -- einer, dem ein Knoten fehlt, nicht.
 
 #### DeckeEintrag.netz
 
@@ -341,6 +371,14 @@ def linienlast(self, lastfall: Any, von: Ort, bis: Ort, **felder: Any) -> Linien
 def punktlast(self, lastfall: Any, ort: Ort, **felder: Any) -> PunktlastEintrag
 ```
 
+#### DeckeEintrag.schnitt
+
+```python
+def schnitt(self, von: Ort, bis: Ort) -> DeckenschnittEintrag
+```
+
+Ein Schnitt von `von` nach `bis` -- längs ihm zeigt ein Ergebnisbild eine Schnittkraft.
+
 #### DeckeEintrag.plattenlast
 
 ```python
@@ -354,10 +392,12 @@ eine, wie in der Oberfläche: eine zweite ersetzt die erste.
 #### DeckeEintrag.diagramm
 
 ```python
-def diagramm(self, fall: Any, groesse: str='m_x') -> DeckendiagrammEintrag
+def diagramm(self, fall: Any, groesse: str='m_x', schnitt: Any='') -> DeckendiagrammEintrag
 ```
 
-Ein Ergebnisbild -- `fall` ein Lastfall oder eine Kombination.
+Ein Ergebnisbild -- `fall` ein Lastfall oder eine Kombination,
+`schnitt` einer der Schnitte (Eintrag oder Kennung), ohne ihn die
+ganze Platte.
 
 #### DeckeEintrag.neu
 
@@ -383,6 +423,7 @@ GZG: die Streifenmethode gilt für die Tragsicherheit (Benutzer,
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.decke.feld]]
+- [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]

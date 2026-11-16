@@ -1,5 +1,5 @@
 ---
-erzeugt: 645745185705
+erzeugt: 6c4cbd70717c
 art: modul
 tags: [modul]
 ---
@@ -232,4 +232,5 @@ zwei Orten, etwa in einem symmetrischen Träger, das Rauschen.
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]
+- [[opencivil.decke.schnitt]]
 - [[opencivil.decke.streifen]]

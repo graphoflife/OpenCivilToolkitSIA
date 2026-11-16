@@ -21,6 +21,10 @@
  * Wert, mit Punkt an ihrer Stelle; über einer Zelle steht der Wert in ihrer
  * Mitte.
  *
+ * Wählt eine Zeile einen Schnitt, zeigt ihr Bild die Grösse längs ihm wie
+ * an einem Balken, mit den Lagern, die er kreuzt (dk_schnitt.js) -- die
+ * Lagerkräfte zeigen immer die ganze Decke.
+ *
  * Im Bild der Lager stehen nur ihre Namen, die Zahlen in der Tabelle
  * darunter: neben den Lagern deckten sie einander, wo zwei Lager nahe
  * beisammen liegen, und am Rand liefen sie aus dem Bild.
@@ -38,6 +42,7 @@ import { nachBild, pfad, zahlText } from './cad_ansicht.js';
 import { mitTitel } from './cad_app.js';
 import { innen } from './cad_modell.js';
 import { grundrissBild } from './dk_grundriss.js';
+import { schnittbild } from './dk_schnitt.js';
 import { el, leerzustand, svgEl } from './dom.js';
 import { antwortZu } from './fallantwort.js';
 import { fallname } from './lastfaelle.js';
@@ -163,9 +168,13 @@ function farblegende(s, einheit) {
   ]);
 }
 
+/** Wie eine Grösse im Bild heisst: «m_x». */
+const zeichenVon = (groesse) => katalog('decke', 'diagrammgroessen').find((g) => g.wert === groesse)?.beschriftung
+  || groesse;
+
 function feldInhalt(decke, daten, ergebnis, groesse) {
   const einheit = ergebnis.einheiten[groesse];
-  const zeichen = katalog('decke', 'diagrammgroessen').find((g) => g.wert === groesse)?.beschriftung || groesse;
+  const zeichen = zeichenVon(groesse);
   const s = skala(ergebnis.werte[groesse], ergebnis.extreme[groesse]);
   const bild = grundrissBild(decke, daten, 'nichts', {
     rand: RAND.feld,
@@ -173,6 +182,29 @@ function feldInhalt(decke, daten, ergebnis, groesse) {
     oben: (v) => extremwerte(v, ergebnis, groesse, einheit),
   });
   return [el('div.gb-bildhuelle', {}, [bild]), farblegende(s, einheit)];
+}
+
+/**
+ * Das Bild längs des Schnitts `kennung`, darunter, wie es zu lesen ist.
+ * Fehlt er in der Antwort, ist sie von vor dem Schnitt -- `frisch` nicht,
+ * die neue kommt -- oder ihm fehlt ein Knoten.
+ */
+function schnittInhalt(decke, ergebnis, kennung, groesse, frisch) {
+  const s = (ergebnis.schnitte || []).find((x) => x.kennung === kennung);
+  if (!s) return [leerzustand(frisch ? `Dem Schnitt ${kennung} fehlt ein Knoten.` : 'Bild wird gerechnet …')];
+  if (!s.stuecke.length) {
+    return [leerzustand(s.L > 0 ? `Der Schnitt ${kennung} liegt neben den Platten.`
+      : `Der Schnitt ${kennung} hat keine Länge.`, 'Im Fenster seine Enden verschieben.')];
+  }
+  const { von, bis } = decke.schnitte.find((x) => x.kennung === kennung);
+  const zeichen = zeichenVon(groesse);
+  const einheit = ergebnis.einheiten[groesse];
+  return [
+    schnittbild(s, groesse, { zeichen, einheit }),
+    el('p.karte-hinweis', {
+      text: `Von ${von} nach ${bis}, die Stelle s ab ${von} · ${zeichen} in ${einheit}, positive Werte unten.`,
+    }),
+  ];
 }
 
 // ===========================================================================
@@ -258,20 +290,31 @@ function lagerInhalt(decke, daten, ergebnis) {
 // Karten
 // ===========================================================================
 
-/** Ein Bild der Ergebnisse als Karte: der Fall der Zeile, die Grösse der Zeile. */
+/**
+ * Ein Bild der Ergebnisse als Karte: der Fall der Zeile, die Grösse der
+ * Zeile -- über die ganze Decke oder längs ihres Schnitts.
+ */
 function ergebnisKarte(kennung, decke, daten, zeile) {
-  const titel = katalog('decke', 'diagrammgroessen').find((g) => g.wert === zeile.groesse)?.titel || zeile.groesse;
+  const laengs = zeile.groesse !== 'lager' && zeile.schnitt ? zeile.schnitt : null;
+  const titel = `${katalog('decke', 'diagrammgroessen').find((g) => g.wert === zeile.groesse)?.titel
+    || zeile.groesse}${laengs ? ` längs ${laengs}` : ''}`;
   const fall = fallname(decke, zeile.fall);
   if (fall === null) {
     return karte(titel, [leerzustand('Kein Fall gewählt.',
       'Unter «Ergebnisse» einen Lastfall oder eine Kombination wählen.')]);
   }
+  if (laengs && !decke.schnitte.some((s) => s.kennung === laengs)) {
+    return karte(titel, [leerzustand(`Einen Schnitt ${laengs} gibt es nicht mehr.`,
+      'Unter «Ergebnisse» einen anderen wählen oder die ganze Platte.')]);
+  }
   const eintrag = antwortZu(kennung, fall, (f) => api.deckeErgebnis(zustand.projekt, kennung, f));
   if (eintrag.fehler) return karte(`${titel} – ${fall}`, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })]);
   const ergebnis = (eintrag.daten || eintrag.alt)?.ergebnis;
   if (!ergebnis) return karte(`${titel} – ${fall}`, [leerzustand('Bild wird gerechnet …')]);
-  const inhalt = zeile.groesse === 'lager' ? lagerInhalt(decke, daten, ergebnis)
-    : feldInhalt(decke, daten, ergebnis, zeile.groesse);
+  let inhalt;
+  if (zeile.groesse === 'lager') inhalt = lagerInhalt(decke, daten, ergebnis);
+  else if (laengs) inhalt = schnittInhalt(decke, ergebnis, laengs, zeile.groesse, Boolean(eintrag.daten));
+  else inhalt = feldInhalt(decke, daten, ergebnis, zeile.groesse);
   return karte(`${titel} – ${ergebnis.fall}`, inhalt,
     { klasse: eintrag.daten ? 'ist-breit' : 'ist-breit ist-veraltet' });
 }

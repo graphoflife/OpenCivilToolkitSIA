@@ -4335,6 +4335,7 @@
         "strecke_in_konvex",
         "strecke_im_vieleck",
         "schnittstellen",
+        "kreuzung",
         "rechteck",
         "achsrechteck",
         "vereinigt"
@@ -4431,6 +4432,23 @@
         "_gehalten",
         "spitzen",
         "_schwerpunkt"
+      ]
+    },
+    {
+      "name": "opencivil.decke.schnitt",
+      "pfad": "Python/opencivil.decke.schnitt.md",
+      "art": "modul",
+      "kurz": "die Schnittkräfte längs eines Schnitts.",
+      "stichworte": [
+        "Lagerstelle",
+        "Verlauf",
+        "Verlauf.extreme",
+        "verlauf",
+        "_stellen",
+        "_im_streifen",
+        "_gerastert",
+        "_im_teil",
+        "_lager"
       ]
     },
     {
@@ -6362,10 +6380,12 @@
         "FlaechenlastEintrag",
         "LinienlastEintrag",
         "PunktlastEintrag",
+        "DeckenschnittEintrag",
         "DeckendiagrammEintrag",
         "DeckeEintrag",
         "DeckeEintrag.materialien",
         "DeckeEintrag.lagen",
+        "DeckeEintrag.schnittlinien",
         "DeckeEintrag.netz",
         "DeckeEintrag.platte",
         "DeckeEintrag.lager",
@@ -6375,6 +6395,7 @@
         "DeckeEintrag.flaechenlast",
         "DeckeEintrag.linienlast",
         "DeckeEintrag.punktlast",
+        "DeckeEintrag.schnitt",
         "DeckeEintrag.plattenlast",
         "DeckeEintrag.diagramm",
         "DeckeEintrag.neu"
@@ -7909,6 +7930,7 @@
         "faelle",
         "_je_lager",
         "ergebnis",
+        "_schnitt",
         "_linienlager",
         "_extreme",
         "_anteile",

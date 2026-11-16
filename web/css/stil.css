@@ -2228,8 +2228,13 @@ details.nb-callout > summary { cursor: pointer; }
 .dk-linienlast { fill: none; stroke: var(--last); stroke-width: 3; stroke-linecap: round; opacity: .85; }
 .dk-verteilflaeche { fill: none; stroke: var(--last); stroke-width: .8; stroke-dasharray: 3 2; }
 .dk-punktlast { fill: var(--flaeche); stroke: var(--last); stroke-width: 1.6; }
+/* Ein Schnitt wie im Plan: strichpunktiert, an den Enden kräftig quer, daneben sein Name -- in
+   der Farbe der Analyse, nicht im Blau der Auswahl. */
+.dk-schnitt { fill: none; stroke: var(--analyse); stroke-width: 1.6; stroke-dasharray: 14 3 2 3; }
+.dk-schnitt-ende { fill: none; stroke: var(--analyse); stroke-width: 3.2; stroke-linecap: round; pointer-events: none; }
 .dk-platte.ist-fehler, .dk-zone.ist-fehler, .dk-unterzug.ist-fehler, .dk-lager.ist-fehler,
-.dk-flaechenlast.ist-fehler, .dk-linienlast.ist-fehler, .dk-punktlast.ist-fehler { stroke: var(--schlecht); }
+.dk-flaechenlast.ist-fehler, .dk-linienlast.ist-fehler, .dk-punktlast.ist-fehler,
+.dk-schnitt.ist-fehler { stroke: var(--schlecht); }
 .dk-stuetze.ist-fehler { fill: var(--schlecht); }
 .dk-name {
   font-size: 11px; fill: var(--schrift-matt); text-anchor: middle; dominant-baseline: middle;
@@ -2238,6 +2243,7 @@ details.nb-callout > summary { cursor: pointer; }
 .dk-name.ist-klein { font-size: 10px; text-anchor: start; }
 .dk-name.ist-zone { fill: var(--beide); }
 .dk-name.ist-last { fill: var(--last); font-weight: 600; }
+.dk-name.ist-schnitt { fill: var(--analyse); font-weight: 700; }
 
 /* Die Ergebnisbilder: die Zellen in der Farbe ihres Werts, ohne Fuge
    zwischen zweien, der grösste und der kleinste Wert mit Punkt; die
@@ -2254,6 +2260,15 @@ details.nb-callout > summary { cursor: pointer; }
 .dk-lagerverlauf {
   fill: var(--schrift); fill-opacity: .12; stroke: var(--schrift); stroke-width: 1.2; stroke-linejoin: round;
 }
+/* Das Bild längs eines Schnitts: oben die Achse -- neben den Platten
+   gestrichelt -- mit den Lagern und den Unterzügen als Band, darunter der
+   Verlauf, über dessen Achse ein Strich, wo ein Lager steht. */
+.dk-s-achse { fill: none; stroke: var(--schrift); stroke-width: 2; }
+.dk-s-achse.ist-daneben { stroke: var(--rand-stark); stroke-width: 1; stroke-dasharray: 4 3; }
+.dk-s-unterzug { fill: var(--system); fill-opacity: .12; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }
+.dk-s-marke { fill: none; stroke: var(--schrift); stroke-width: 1.2; }
+.dk-s-symmetrie { fill: none; stroke: var(--schrift); stroke-width: 1.4; stroke-dasharray: 8 3 2 3; }
+.dk-s-name { font-size: 10.5px; fill: var(--schrift-matt); }
 .dk-farblegende { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--schrift-matt); margin: 4px 0; }
 .dk-farbbalken {
   flex: 0 1 220px; height: 10px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(16, 24, 40, .15);

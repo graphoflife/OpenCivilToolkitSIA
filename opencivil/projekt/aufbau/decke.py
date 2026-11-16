@@ -37,7 +37,8 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
     """
     Die Decke der Beschreibung in SI -- E und Gewicht der Platten null, die
     kommen beim Rechnen von ihrem Beton. Ein Teil, das auf einen Knoten
-    zeigt, den es nicht gibt, fehlt im Modell; die Meldung sagt es. Eine
+    zeigt, den es nicht gibt, fehlt im Modell; die Meldung sagt es -- auch
+    bei einem Schnitt, der sonst in keine Rechnung eingeht. Eine
     Last heisst im Modell nach ihrer Kennung, eine auf der ganzen Platte
     nach dieser; eine Last, deren Lastfall es nicht gibt, und ein Beiwert
     dafuer bleiben mit einem Hinweis weg.
@@ -48,6 +49,7 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
                        ("Linienlager", eintrag.linienlager), ("Stützen", eintrag.stuetzen),
                        ("Unterzüge", eintrag.unterzuege), ("Zonen", eintrag.zonen),
                        ("Lasten", [*eintrag.flaechenlasten, *eintrag.linienlasten, *eintrag.punktlasten]),
+                       ("Schnitte", eintrag.schnitte),
                        ("Lastfälle", eintrag.lastfaelle), ("Kombinationen", eintrag.kombinationen)):
         meldungen.extend(doppelte_kennungen(was, liste))
 
@@ -70,6 +72,8 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
                   for u in eintrag.unterzuege if (ab := orte(u, (u.von, u.bis))) is not None]
     zonen = [Zone(z.kennung, ecken, z.si("anteil"))
              for z in eintrag.zonen if (ecken := orte(z, z.knoten)) is not None]
+    for s in eintrag.schnitte:
+        orte(s, (s.von, s.bis))
     # Je Last ``(Kennung, Lastfall, Last)`` -- die auf einer ganzen Platte heisst nach dieser.
     lasten: List[Tuple[str, str, Last]] = [
         (p.kennung, q.lastfall, Flaechenlast(p.kennung, q.si("wert"), platte=p.kennung))

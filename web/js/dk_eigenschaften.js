@@ -4,7 +4,7 @@
  * Was ein Werkzeug als Nächstes anlegt (`neuEigenschaften`) und was gewählt
  * ist (`eigenschaften`): je Knoten -- mit seiner Stütze und Punktlast --,
  * Platte -- mit der Last auf ihr --, Linienlager, Unterzug, Zone oder Last
- * seine Felder. Sind mehrere derselben Art gewählt, ändert das Fenster alle
+ * seine Felder; ein Schnitt hat keine, nur wo sein Bild zu holen ist. Sind mehrere derselben Art gewählt, ändert das Fenster alle
  * zugleich; was sie gemeinsam haben, steht da, sonst «Var» -- wie im
  * Balkensystem. Eine Stütze und eine Punktlast wählt man nicht für sich:
  * sie stehen im Fenster ihres Knotens, wie ein Lager im Balkensystem. Die
@@ -127,6 +127,9 @@ const FELDER = {
     }),
     feldzeile('punktlast', 'l_y', 'l_y', wert, setzen, { schritt: 0.1 }),
   ],
+  schnitte: () => [el('p.cad-hinweis-klein', {
+    text: 'Sein Bild: unter «Ergebnisse» mit «+ Diagramm», dann statt «ganze Platte» den Schnitt wählen.',
+  })],
   stuetzen: (wert, setzen) => {
     const vonHand = wert('bereich_von_hand');
     return [
@@ -151,7 +154,7 @@ const FELDER = {
 /** Welche Liste ein Werkzeug füllt -- der Knoten keine. */
 const LISTE_VON = {
   platte: 'platten', lager: 'linienlager', stuetze: 'stuetzen', unterzug: 'unterzuege', zone: 'zonen',
-  flaechenlast: 'flaechenlasten', linienlast: 'linienlasten', punktlast: 'punktlasten',
+  flaechenlast: 'flaechenlasten', linienlast: 'linienlasten', punktlast: 'punktlasten', schnitt: 'schnitte',
 };
 
 /** Die Listen der gezeichneten Lasten -- jede in einem Lastfall. */

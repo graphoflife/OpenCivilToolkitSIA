@@ -1,5 +1,5 @@
 ---
-erzeugt: 4bd549fe3534
+erzeugt: 4dfa720cc27e
 art: modul
 tags: [modul]
 ---
@@ -320,7 +320,8 @@ def decke_ergebnis(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 ```
 
 Die Bilder einer Decke in einem Fall: Momente und Querkraefte in Zellen,
-ihre groessten Werte, die Kraefte der Lager ([[opencivil.web.deckendaten#ergebnis|deckendaten.ergebnis]]).
+ihre groessten Werte, die Kraefte der Lager und die Verlaeufe laengs der
+Schnitte ([[opencivil.web.deckendaten#ergebnis|deckendaten.ergebnis]]).
 Eine eigene Anfrage wie der Verlauf des Balkensystems -- gross, und nur
 gebraucht, wenn jemand hinsieht.
 

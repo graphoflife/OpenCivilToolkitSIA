@@ -1,5 +1,5 @@
 ---
-erzeugt: cd99d19853fa
+erzeugt: 13660811b0b6
 art: modul
 tags: [modul]
 ---
@@ -300,5 +300,6 @@ Die Einzellasten eines Lastfalls oder einer Kombination, mit ihrem Beiwert.
 ## Gebraucht von
 
 - [[opencivil.decke.herleitung]]
+- [[opencivil.decke.schnitt]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.web.deckendaten]]

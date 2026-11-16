@@ -3,7 +3,9 @@
  *
  * Gezeichnet wird ein Grundriss in Metern, x nach rechts und y nach oben
  * (Benutzer, 2026-10-23): Platten und Zonen als Umrisse, Linienlager und
- * versteckte Unterzüge als Linien, Stützen an einem Knoten. Alles hängt an
+ * versteckte Unterzüge als Linien, Stützen an einem Knoten -- dazu Schnitte,
+ * Linien, längs denen ein Ergebnisbild die Schnittkraft wie an einem Balken
+ * zeigt (Benutzer, 2026-11-16); sie rechnen nicht mit. Alles hängt an
  * Knoten (`verbunden`): wo zwei Platten sich eine Ecke teilen oder eine Wand
  * an einer Platte entlangläuft, verschiebt man sie zusammen. Eine Stütze ist
  * ein eigener Eintrag an ihrem Knoten, gewählt wird aber der Knoten -- wie
@@ -42,6 +44,7 @@ import { eintragVon, katalog, zustand } from './zustand.js';
 
 /** Was die Arten heissen, je Liste -- einzeln und mehrere. */
 const NAMEN = {
+  schnitte: ['Schnitt', 'Schnitte'],
   stuetzen: ['Stütze', 'Stützen'],
   punktlasten: ['Punktlast', 'Punktlasten'],
   linienlasten: ['Linienlast', 'Linienlasten'],
@@ -56,14 +59,16 @@ const NAMEN = {
  * Die Arten der Decke, ihre Vorsilben vom Kern (`VORSILBEN` in
  * opencivil/projekt/decke.py). Eine Stütze und eine Punktlast vor allem:
  * sie stehen auf dem Knoten, an dem sonst eine Platte gewählt würde --
- * gewählt wird aber ihr Knoten (`waehlbar`). Eine Last vor dem, worauf sie
- * liegt, und eine Zone vor ihrer Platte: sie liegen darauf.
+ * gewählt wird aber ihr Knoten (`waehlbar`). Ein Schnitt vor allem, was er
+ * kreuzt, eine Last vor dem, worauf sie liegt, und eine Zone vor ihrer
+ * Platte: sie liegen darauf.
  */
 function arten() {
   const vorsilben = katalog('decke', 'vorsilben');
   return [
-    ['stuetzen', 'punkt'], ['punktlasten', 'punkt'], ['linienlasten', 'linie'], ['linienlager', 'linie'],
-    ['unterzuege', 'linie'], ['flaechenlasten', 'flaeche'], ['zonen', 'flaeche'], ['platten', 'flaeche'],
+    ['stuetzen', 'punkt'], ['punktlasten', 'punkt'], ['schnitte', 'linie'], ['linienlasten', 'linie'],
+    ['linienlager', 'linie'], ['unterzuege', 'linie'], ['flaechenlasten', 'flaeche'], ['zonen', 'flaeche'],
+    ['platten', 'flaeche'],
   ].map(([liste, form], rang) => ({
     liste, form, rang, vorsilbe: vorsilben[liste], heisst: NAMEN[liste][0], mehrzahl: NAMEN[liste][1],
   }));
@@ -94,6 +99,8 @@ const EINSTELLUNG = {
       bereit: lastBereit, titel: 'Linienlast -- von Punkt zu Punkt, im gewählten Lastfall' },
     { name: 'punktlast', text: 'Punktlast', zeichen: 'cad-punktlast', taste: 'e', form: 'knoten',
       bereit: lastBereit, titel: 'Punktlast -- an einen Knoten oder eine freie Stelle, im gewählten Lastfall' },
+    { name: 'schnitt', text: 'Schnitt', zeichen: 'cad-schnitt', taste: 'n', form: 'linie',
+      titel: 'Schnitt -- längs dieser Linie zeigt ein Ergebnisbild die Schnittkraft wie an einem Balken' },
     { name: 'knoten', text: 'Knoten', zeichen: 'cad-knoten', taste: 'k', form: 'knoten' },
   ],
   einheit: 'm',
@@ -165,6 +172,7 @@ function vorgabenNeu() {
     flaechenlasten: vorlage('flaechenlast'),
     linienlasten: vorlage('linienlast'),
     punktlasten: vorlage('punktlast'),
+    schnitte: vorlage('deckenschnitt'),
   };
 }
 
@@ -241,7 +249,7 @@ function anlegen(a, z, liste, felder) {
 }
 
 function linieAnlegen(a, z, von, bis, werkzeug) {
-  const liste = { unterzug: 'unterzuege', linienlast: 'linienlasten' }[werkzeug] || 'linienlager';
+  const liste = { unterzug: 'unterzuege', linienlast: 'linienlasten', schnitt: 'schnitte' }[werkzeug] || 'linienlager';
   return anlegen(a, z, liste, { von, bis });
 }
 

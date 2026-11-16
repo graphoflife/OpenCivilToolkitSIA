@@ -3,7 +3,9 @@
  *
  * Was eine Decke im Bild zeigt, im Zeichenfenster wie auf ihrer Karte im
  * Reiter «Diagramme»: die Platten, die Zonen, die Unterzüge, die
- * Linienlager mit ihrem Zeichen und die Stützen -- und darunter, was der
+ * Linienlager mit ihrem Zeichen, die Stützen und die Schnitte -- wie im
+ * Plan strichpunktiert, an den Enden ein Strich quer und ihr Name -- und
+ * darunter, was der
  * Kern dazu sagt (`daten`, die Antwort auf `decke_zeichnung`): wie die Last
  * auf die zwei Richtungen geht oder wo die Streifen verlaufen. Beide Bilder
  * rufen dieselbe Funktion, jedes mit seiner Ansicht `v` (cad_ansicht.js).
@@ -310,8 +312,28 @@ export function grundriss(v, decke, daten, {
     namen.append(text([x + b / 2 + 3, y - h / 2 - 3], s.kennung, 'dk-name ist-klein'));
   }
 
+  const schnitte = svgEl('g');
+  for (const s of decke.schnitte || []) {
+    const punkte = orte([s.von, s.bis]);
+    if (!punkte) continue;
+    const [p, q] = punkte.map((x) => nachBild(v, x));
+    const lang = Math.hypot(q[0] - p[0], q[1] - p[1]);
+    schnitte.append(mitTitel(svgEl('path', { d: pfad(v, punkte, false), class: klasse('dk-schnitt', s.kennung) }),
+      [`Schnitt ${s.kennung}: ${s.von} → ${s.bis}`, ...texte(s.kennung)]));
+    if (lang < 1) continue;
+    const t = [(q[0] - p[0]) / lang, (q[1] - p[1]) / lang];
+    for (const [ende, weg] of [[p, -1], [q, 1]]) {
+      schnitte.append(svgEl('path', {
+        d: `M${(ende[0] - t[1] * 7).toFixed(1)} ${(ende[1] + t[0] * 7).toFixed(1)} `
+          + `L${(ende[0] + t[1] * 7).toFixed(1)} ${(ende[1] - t[0] * 7).toFixed(1)}`,
+        class: 'dk-schnitt-ende',
+      }));
+      namen.append(text([ende[0] + weg * t[0] * 16, ende[1] + weg * t[1] * 16], s.kennung, 'dk-name ist-schnitt'));
+    }
+  }
+
   g.append(flaechen, unter || unterlage(v, daten, was), zonen, umrisse, traeger, lager, stuetzen,
-    ...(lastfall ? [lasten(v, decke, lastfall, { orte, klasse, texte, namen })] : []), namen);
+    ...(lastfall ? [lasten(v, decke, lastfall, { orte, klasse, texte, namen })] : []), schnitte, namen);
   return g;
 }
 

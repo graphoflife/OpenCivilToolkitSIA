@@ -315,20 +315,33 @@ def schnittstellen(a: Punkt, b: Punkt, v: Vieleck) -> List[float]:
         return sorted(stellen)
     for i, p in enumerate(v):
         q = v[(i + 1) % len(v)]
-        e = (q[0] - p[0], q[1] - p[1])
-        nenner = d[0] * e[1] - d[1] * e[0]
-        w = (p[0] - a[0], p[1] - a[1])
-        if abs(nenner) <= 1e-12 * laenge * math.hypot(*e):
+        kreuz = kreuzung(a, b, p, q)
+        if kreuz is None:
             for ecke in (p, q):
                 u = skalar((ecke[0] - a[0], ecke[1] - a[1]), d) / (laenge * laenge)
                 if 0.0 < u < 1.0:
                     stellen.add(u)
             continue
-        u = (w[0] * e[1] - w[1] * e[0]) / nenner
-        k = (w[0] * d[1] - w[1] * d[0]) / nenner
+        u, k = kreuz
         if -1e-12 <= k <= 1.0 + 1e-12 and 0.0 < u < 1.0:
             stellen.add(u)
     return sorted(stellen)
+
+
+def kreuzung(a: Punkt, b: Punkt, p: Punkt, q: Punkt) -> Optional[Tuple[float, float]]:
+    """
+    Wo sich die Geraden durch ``a → b`` und ``p → q`` schneiden, als
+    Parameter ``(u, k)`` mit ``a + u·(b − a) = p + k·(q − p)`` -- ``None``,
+    wenn sie parallel sind. Ob der Schnitt auf den Strecken liegt, sagen
+    ``u`` und ``k`` in ``[0, 1]``.
+    """
+    d = (b[0] - a[0], b[1] - a[1])
+    e = (q[0] - p[0], q[1] - p[1])
+    nenner = d[0] * e[1] - d[1] * e[0]
+    if abs(nenner) <= 1e-12 * math.hypot(*d) * math.hypot(*e):
+        return None
+    w = (p[0] - a[0], p[1] - a[1])
+    return (w[0] * e[1] - w[1] * e[0]) / nenner, (w[0] * d[1] - w[1] * d[0]) / nenner
 
 
 def rechteck(a: Punkt, b: Punkt, breite_: float) -> List[Punkt]:

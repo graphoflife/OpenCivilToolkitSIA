@@ -237,6 +237,11 @@ const ZEICHEN = {
     pfade: ['M3 8.5h18 M3 15.5h18'],
     strich: ['M3 12h18'],
   },
+  // Ein Schnitt: oben die Linie, gestrichelt, mit ihren Enden -- darunter der Verlauf längs ihr.
+  'cad-schnitt': {
+    strich: ['M5 5h14'],
+    pfade: ['M3 3v4 M21 3v4', 'M3 12h18', 'M3 12c3.5 9.5 14.5 9.5 18 0'],
+  },
   // Eine Stütze im Grundriss: ein Quadrat mit Kreuz.
   'cad-stuetze': {
     pfade: ['M7 7h10v10H7z', 'M7 7l10 10 M17 7L7 17'],

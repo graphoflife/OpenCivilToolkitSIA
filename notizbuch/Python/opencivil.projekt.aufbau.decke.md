@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ee07baf5c9c
+erzeugt: 1a732c4dfcb9
 art: modul
 tags: [modul]
 ---
@@ -27,7 +27,8 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]
 
 Die Decke der Beschreibung in SI -- E und Gewicht der Platten null, die
 kommen beim Rechnen von ihrem Beton. Ein Teil, das auf einen Knoten
-zeigt, den es nicht gibt, fehlt im Modell; die Meldung sagt es. Eine
+zeigt, den es nicht gibt, fehlt im Modell; die Meldung sagt es -- auch
+bei einem Schnitt, der sonst in keine Rechnung eingeht. Eine
 Last heisst im Modell nach ihrer Kennung, eine auf der ganzen Platte
 nach dieser; eine Last, deren Lastfall es nicht gibt, und ein Beiwert
 dafuer bleiben mit einem Hinweis weg.
