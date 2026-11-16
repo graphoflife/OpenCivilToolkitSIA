@@ -154,7 +154,7 @@ const TEXTE = {
           ['Stab', 'x vom Anfang zum Ende, z nach unten in der lotrechten Ebene durch den Stab, y = z × x; an einem lotrechten Stab ist y die Achse −y des Systems. Der Drehwinkel β dreht y und z im Rechtssinn um x'],
           ['N, V, M, T', 'N > 0 Zug; M_y > 0 zieht an der gestrichelten Faser, auf der Seite von z; M_z > 0 an der Seite von y; T dreht im Rechtssinn um x'],
           ['Faser', 'auf der Seite von z: an einem Stab, der waagrecht liegt, unten -- «Umkehren» tauscht Anfang und Ende und dreht β so, dass der Querschnitt bleibt, wie er steht'],
-          ['Ansicht', 'mit der rechten Maustaste drehen, oder ein Knopf: 3D, x-y, x-z, y-z; E legt die Arbeitsebene durch den gefangenen Punkt'],
+          ['Ansicht', 'drehen: mit der rechten Maustaste ziehen, oder mit der linken bei gedrückter Alt-Taste -- Alt mit einem Klick setzt einen Punkt ohne Fangen; oder ein Knopf: 3D, x-y, x-z, y-z; E legt die Arbeitsebene durch den gefangenen Punkt'],
         ],
         formel: 'Lagerkraft positiv entlang der Achsen des Systems',
       },

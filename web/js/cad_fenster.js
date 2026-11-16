@@ -550,8 +550,11 @@ function druecken(a, e) {
   }
   if (a.druck || !a.v.massstab) return;
   const schieben = e.button === 1 || (e.button === 0 && a.leertaste);
-  // Im Raum dreht die rechte Maustaste die Ansicht -- um die Mitte der Zeichnung.
-  const dreht = e.button === 2 && a.raum ? { um: drehpunkt(a), zuletzt: bild } : null;
+  // Im Raum dreht die rechte Maustaste die Ansicht -- um die Mitte der
+  // Zeichnung --, ebenso die linke mit Alt (Benutzer, 2026-11-16). Mit Alt
+  // geklickt statt gezogen bleibt es ein Klick: ein Punkt ohne Fangen.
+  const dreht = a.raum && (e.button === 2 || (e.button === 0 && e.altKey))
+    ? { um: drehpunkt(a), zuletzt: bild, klick: e.button === 0 } : null;
   if (e.button !== 0 && !schieben && !dreht) return;
   if (e.button === 1) e.preventDefault();
   // Ein Feld im schwebenden Fenster gibt seinen Fokus ab: der Klick gehört der Zeichnung.
@@ -618,7 +621,7 @@ function loslassen(a, e) {
     zeichnen(a);
     return;
   }
-  if (d.bewegt || d.schieben || d.dreht) {
+  if (d.bewegt || d.schieben || (d.dreht && !d.dreht.klick)) {
     zeichnen(a);
     return;
   }

@@ -3,7 +3,8 @@
  *
  * Eine App mit drei Achsen (das 3D-Balkensystem) sieht ihre Zeichnung
  * parallel projiziert, aus einer Richtung, die sich drehen lässt: mit der
- * rechten Maustaste ziehen, oder ein Knopf für eine der Ansichten -- 3D,
+ * rechten Maustaste ziehen oder mit der linken bei gedrückter Alt-Taste
+ * (cad_fenster.js), oder ein Knopf für eine der Ansichten -- 3D,
  * Grundriss x-y, Ansicht x-z, Ansicht y-z. Wohin ein Klick ins Leere zeigt,
  * sagt die Arbeitsebene: der Grundriss in einer Höhe z, die Ansicht x-z bei
  * einem y, die Ansicht y-z bei einem x. Auf ihr liegt das Raster. Knoten,
@@ -133,7 +134,7 @@ export function ansichtsleiste(a, allesZeigen) {
     gezeigt = jetzt;
     knoten.replaceChildren(wahlSchalter({
       werte: ANSICHTEN.map((x) => ({ wert: x.name, beschriftung: x.text, titel: x.titel })),
-      gewaehlt: jetzt, titel: 'Ansicht -- drehen mit der rechten Maustaste',
+      gewaehlt: jetzt, titel: 'Ansicht -- drehen: mit der rechten Maustaste ziehen, oder mit der linken und Alt',
       setzen: (name) => ansichtSetzen(a, name, allesZeigen), klasse: '.cad-wahl.ist-wortlaut',
     }));
   };

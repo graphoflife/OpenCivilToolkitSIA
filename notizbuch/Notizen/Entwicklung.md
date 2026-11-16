@@ -7,6 +7,21 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-16 · 3D-Balkensystem: drehen mit Alt
+
+Im 3D-Fenster dreht auch die linke Maustaste die Ansicht, wenn dabei Alt
+gedrückt ist, nicht nur die rechte (Benutzer, selber Tag).
+
+Warum so:
+
+- Alt hiess im Zeichenfenster schon «nicht fangen». Beides geht zusammen,
+  weil das eine ein Ziehen ist und das andere ein Klick: mit Alt gezogen
+  dreht die Ansicht, mit Alt geklickt entsteht wie bisher ein Punkt ohne
+  Fangen. Es entscheidet, ob der Zeiger über die Zitterschwelle wandert.
+- Manche Linux-Oberflächen verschieben mit Alt und Ziehen das ganze
+  Fenster; dann kommt der Zug nie im Browser an. Die rechte Maustaste dreht
+  darum weiter.
+
 ## 2026-11-16 · Decken: Schnitte
 
 Im Grundriss einer Decke lassen sich Schnitte zeichnen, SN1, SN2 …; längs
