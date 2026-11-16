@@ -314,6 +314,9 @@ function vorgabenDer(art, schluessel) {
     .map((m) => [m.schluessel, m.vorgabe]));
 }
 
+/** Der kurze Name der Art eines Querschnitts -- wie in ihrem Schalter, aus dem Katalog. */
+const artKurz = (art, q) => systemkatalog(art, 'querschnittsarten').find((x) => x.wert === q.art)?.kurz || q.art;
+
 /**
  * Woher ein Querschnitt kommt, in Worten -- mit den Massen einer Vorlage;
  * ein Profil in der Ebene mit der Achse, um die es sich biegt. Im Raum
@@ -329,7 +332,7 @@ function herkunftText(art, q) {
   if (q.art === 'kennwerte') return 'Kennwerte von Hand';
   const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
   const bezug = liste.find((x) => x.kennung === q.bezug);
-  return `${q.art === 'platte' ? 'Platte' : 'Analyse'} ${bezug ? `«${bezug.name}»` : '– nicht gewählt –'}`;
+  return `${artKurz(art, q)} ${bezug ? `«${bezug.name}»` : '– nicht gewählt –'}`;
 }
 
 /** Der Schlüssel des Fensters eines Querschnitts. */
@@ -465,7 +468,7 @@ function querschnittFenster(system, kennung) {
   } else {
     const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
     zeilen.push(el('div.bs-qvorlage', {}, [
-      feld(q.art === 'platte' ? 'Platte' : 'Analyse', auswahl({
+      feld(artKurz(art, q), auswahl({
         werte: [{ wert: '', beschriftung: '– wählen –' }, ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
         gewaehlt: q.bezug,
         beiAenderung: setzen('bezug'),

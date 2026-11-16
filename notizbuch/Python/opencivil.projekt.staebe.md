@@ -1,5 +1,5 @@
 ---
-erzeugt: 12266a72f38d
+erzeugt: a82104b47f88
 art: modul
 tags: [modul]
 ---
@@ -68,7 +68,9 @@ def beschriftung(self) -> str
 def kurz(self) -> str
 ```
 
-Fuer den Schalter -- der lange Name steht in seinem Titel.
+Fuer den Schalter und die Zeile des Querschnitts -- der lange Name
+steht im Titel des Schalters. «Aus QS Analyse», nicht «Analyse»: im
+Balkensystem heisst auch die Statik-Analyse so (Benutzer, 2026-11-16).
 
 #### Querschnittsart.aus_bauteil
 
