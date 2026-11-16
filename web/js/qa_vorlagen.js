@@ -232,7 +232,7 @@ function stoffe(a) {
   const von = (art, kennung) => zustand.projekt.materialien.find((m) => m.art === art
     && (!kennung || m.kennung === kennung))?.kennung || '';
   return {
-    beton: von('beton', v.flaeche.material) || von('beton'),
+    beton: von('beton', v.flaechen.material) || von('beton'),
     stahl: von('betonstahl', v.stablinien.stahl) || von('betonstahl'),
   };
 }
