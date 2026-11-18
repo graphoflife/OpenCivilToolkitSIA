@@ -1,5 +1,5 @@
 ---
-erzeugt: 340bd5ca0b9c
+erzeugt: 6a447588290f
 art: modul
 tags: [modul]
 ---
@@ -285,9 +285,9 @@ ersten Lage.
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
-- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.web.api]]

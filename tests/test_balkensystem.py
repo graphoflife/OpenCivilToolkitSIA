@@ -13,7 +13,7 @@ from opencivil.projekt import (
     StablastEintrag,
 )
 from opencivil.projekt.aufbau.balkensystem import modell_von
-from opencivil.projekt.balkensystem import MATERIAL_DES_QUERSCHNITTS
+from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.linie import moment_kruemmung

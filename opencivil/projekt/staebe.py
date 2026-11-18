@@ -21,9 +21,11 @@ sagt die Beschreibung (:meth:`MitStaeben._kehrt_um`).
 
 QUERSCHNITTE:
 Ein Querschnitt der Staebe ist in beiden Systemen nach Vorlage, ein
-Stahlprofil aus der Tabelle oder mit Kennwerten von Hand
-(:class:`StabquerschnittBasis`); welche Kennwerte, sagt das System. Aus
-einer Platte oder Querschnittsanalyse nimmt ihn nur das 2D-Balkensystem.
+Stahlprofil aus der Tabelle, mit Kennwerten von Hand oder aus einer Platte
+oder Querschnittsanalyse des Projekts (:class:`StabquerschnittBasis`);
+welche Kennwerte, sagt das System. Seit 2026-11-18 nimmt ihn auch das
+3D-Balkensystem aus einer Platte oder Analyse (Benutzer: «genau gleich,
+einfach einmal in 3D»).
 """
 
 from __future__ import annotations
@@ -33,10 +35,13 @@ import math
 from dataclasses import dataclass, field, replace
 from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
+from opencivil.core.einheiten import KN, KNM
 from opencivil.core.wahl import Wahl
+from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.faelle import kennung_von
-from opencivil.projekt.lesen import ProjektFehler, einer_von
+from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.stabwerk import profiltabelle
 from opencivil.stabwerk import querschnitte as qs
@@ -102,6 +107,43 @@ class Querschnittsart(Wahl):
         return self in (Querschnittsart.PLATTE, Querschnittsart.ANALYSE)
 
 
+#: Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀,
+#: das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der
+#: Platte oder Querschnittsanalyse bei N und M (Benutzer, 2026-10-24).
+#: Einen E-Modul von Hand hat ein Querschnitt nicht mehr -- den hat ein
+#: eigenes Material.
+E_MODULE = ("e0", "e_eq")
+
+#: Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der
+#: Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine
+#: Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
+MATERIAL_DES_QUERSCHNITTS = "querschnitt"
+
+
+@dataclass
+class ModulEintrag(Beschreibung):
+    """
+    Wie das E_eq eines Querschnitts aus einer Platte oder Querschnittsanalyse
+    entsteht: bei ``N`` und ``M``, Zug positiv und ``M > 0`` mit Zug unten --
+    auf der gestrichelten Faser des Stabs, im Raum an der Seite +z, wo M_y
+    zieht; bei einer Platte immer in x-Richtung, und ``M`` zieht unten
+    (Benutzer, 2026-10-24). Gerechnet wie eine Momenten-Kruemmungs-Linie
+    ihrer Spannung-Dehnung-Analyse, mit Kriechzahl, Wertesatz und Rechenart
+    wie dort (Benutzer, 2026-10-23).
+    """
+
+    N: float = bereich(0.0, heisst="N für E_eq", einheit=KN)
+    M: float = bereich(0.0, heisst="M für E_eq", einheit=KNM)
+    kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
+    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)
+
+    @property
+    def wahl(self) -> Rechenwahl:
+        return Rechenwahl(kriechzahl=self.kriechzahl, satz=self.werkstoffsatz,
+                          art=self.rechenart)
+
+
 def _aufgezaehlt(namen: Sequence[str]) -> str:
     """«A und I», «A, I_y, I_z und I_T»."""
     return " und ".join(filter(None, (", ".join(namen[:-1]), namen[-1])))
@@ -111,9 +153,11 @@ def _aufgezaehlt(namen: Sequence[str]) -> str:
 class StabquerschnittBasis(Beschreibung):
     """
     Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, ein
-    Stahlprofil aus der Tabelle (``profil``) oder mit Kennwerten von Hand in
+    Stahlprofil aus der Tabelle (``profil``), mit Kennwerten von Hand in
     ``masse`` -- ``A`` in mm², Traegheitsmomente in 10⁶ mm⁴; welche, sagt
-    :attr:`KENNWERTE`. E und G kommen vom Material des Stabs.
+    :attr:`KENNWERTE` -- oder aus einer Platte oder Querschnittsanalyse des
+    Projekts (``bezug``). E und G kommen vom Material des Stabs; nimmt der
+    das Material des Querschnitts, sagt ``e_modul``, welches E.
     """
 
     KENNWERTE: ClassVar[Tuple[str, ...]]
@@ -130,6 +174,18 @@ class StabquerschnittBasis(Beschreibung):
     Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen
     unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
     """
+
+    bezug: str = ""
+    """Die Kennung der Platte oder Querschnittsanalyse -- nur, wenn er aus einer kommt."""
+
+    e_modul: str = einer_von(E_MODULE, "e0")
+    """
+    Welches E ein Stab hat, der das Material dieses Querschnitts nimmt:
+    ``e0`` -- E_cm seines Betons -- oder ``e_eq``, wie ``eq`` sagt.
+    """
+
+    eq: ModulEintrag = field(default_factory=ModulEintrag)
+    """Wie das E_eq entsteht -- es gilt nur bei ``e_modul = "e_eq"``."""
 
     @classmethod
     def neu(cls) -> "StabquerschnittBasis":
@@ -149,6 +205,9 @@ class StabquerschnittBasis(Beschreibung):
         Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
         2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
         """
+        if self.e_modul == "e_eq" and not self.art.aus_bauteil:
+            return ("ein E_eq gibt es nur bei einem Querschnitt aus einer Platte oder "
+                    "Querschnittsanalyse – nur sie haben eine Momenten-Krümmungs-Linie.")
         if self.art is Querschnittsart.VORLAGE:
             vorlage = self.stabvorlage()
             fremd = [k for k in self.masse if k not in vorlage.vorgaben()]
@@ -388,6 +447,29 @@ class MitStaeben:
                                    name=name, art="kennwerte", masse=dict(kennwerte))
         self.querschnitte.append(eintrag)
         return eintrag
+
+    def querschnitt_aus(self, name: str, art: str, bezug: Any, *,
+                        E_eq: Optional[Mapping[str, Any]] = None) -> Any:
+        """
+        Ein Querschnitt aus einer Platte (``platte``) oder einer
+        Querschnittsanalyse (``analyse``). Ein Stab «gemäss Querschnitt»
+        rechnet mit ``E_eq`` -- Felder wie :class:`ModulEintrag`, etwa
+        ``{"M": 80}`` -- mit ihrem aequivalenten E-Modul.
+        """
+        if art not in ("platte", "analyse"):
+            raise ProjektFehler(f"Ein Querschnitt kommt aus einer «platte» oder einer «analyse», "
+                                f"nicht aus «{art}».")
+        eintrag = self.QUERSCHNITT(kennung=self._neue_kennung(self.querschnitte, "Q"),
+                                   name=name, art=art, bezug=kennung_von(bezug))
+        if E_eq is not None:
+            eintrag.e_modul = "e_eq"
+            eintrag.eq = ModulEintrag.aus_dict(dict(E_eq), f"Querschnitt '{name}', E_eq")
+        self.querschnitte.append(eintrag)
+        return eintrag
+
+    def bezuege(self) -> List[str]:
+        """Die Platten und Querschnittsanalysen, deren Querschnitt ein Stab nimmt."""
+        return sorted({q.bezug for q in self.querschnitte if q.art.aus_bauteil and q.bezug})
 
     def diagramm(self, fall: Any, groesse: str) -> Any:
         """Ein Diagramm der Statik-Analyse -- ``fall`` ein Lastfall oder eine Kombination."""

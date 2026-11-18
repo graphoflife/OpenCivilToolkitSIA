@@ -18,8 +18,9 @@ from __future__ import annotations
 import dataclasses
 from typing import Any, Dict
 
-from opencivil.projekt.balkensystem import EINHEIT_DER_LAST, HALT, MATERIAL_DES_QUERSCHNITTS
+from opencivil.projekt.balkensystem import EINHEIT_DER_LAST, HALT
 from opencivil.projekt.lesen import katalogname, wahl_von
+from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.stabwerk import profiltabelle
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.rechnung import stoffkennwerte

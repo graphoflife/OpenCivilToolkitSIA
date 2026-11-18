@@ -1,5 +1,5 @@
 ---
-erzeugt: bede5c7bfc55
+erzeugt: 025787611401
 art: modul
 tags: [modul]
 ---
@@ -14,8 +14,10 @@ im Raum: aus einem
 [[opencivil.projekt.balkensystem3d#Balkensystem3dEintrag|Balkensystem3dEintrag]] das
 Stabwerk in SI ([[opencivil.projekt.aufbau.balkensystem3d#modell_von|modell_von]]) und daraus die Rechnung mit
 aufgeloesten Materialien und Querschnitten ([[opencivil.projekt.aufbau.balkensystem3d#bauen|bauen]]). Was beide gleich
-pruefen und aufloesen, kommt von dort; hier steht nur, was der Raum anders
-macht: der Drehwinkel in rad, eine Last an einem Knoten als Vektor.
+pruefen und aufloesen, kommt von dort -- auch ein Querschnitt aus einer
+Platte oder Querschnittsanalyse und das Material «gemäss Querschnitt»; hier
+steht nur, was der Raum anders macht: der Drehwinkel in rad, eine Last an
+einem Knoten als Vektor, ein Profil, das sich um beide Achsen biegt.
 
 ## Inhalt
 
@@ -41,7 +43,7 @@ Eine Kraft in ihre Richtung oder ein Moment um sie -- in den Achsen des Systems.
 def bauen(art: 'Bauteilart', eintrag: Balkensystem3dEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
-Ein 3D-Balkensystem -- seine Querschnitte nach Vorlage, als Profil oder von Hand.
+Ein 3D-Balkensystem -- seine Querschnitte aufgeloest wie in der Ebene.
 
 
 ## Braucht
@@ -50,6 +52,7 @@ Ein 3D-Balkensystem -- seine Querschnitte nach Vorlage, als Profil oder von Hand
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.raum]]
 - [[opencivil.stabwerk3d.rechnung]]

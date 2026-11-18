@@ -7,6 +7,29 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-18 · 3D-Balkensystem: Querschnitt aus einer Platte
+
+Im 3D-Balkensystem kann ein Querschnitt jetzt aus einer Platte kommen, wie
+in der Ebene (Benutzer, selber Tag: «Es soll eigentlich genau gleich
+funktionieren, einfach einmal in 3d»). Vorher standen dort nur Vorlage,
+Profil und Kennwerte von Hand; jetzt auch «Platte», mit dem Material
+«gemäss Querschnitt» an der Linie und auf Wunsch E_eq. Im Beispiel, Platte
+C30/37 mit h = 250 mm und einem Streifen von 1000 mm, rechnet ein Kragarm
+mit A = 250 000 mm², I_y = 1302 · 10⁶ mm⁴, I_z = 20 833 · 10⁶ mm⁴ und
+I_T = 4388 · 10⁶ mm⁴ -- den Formeln des Rechtecks --, E_cm und G_cm.
+
+- Was Ebene und Raum am Querschnitt teilen, steht jetzt einmal
+  (`projekt/staebe.py`): Bezug, E-Modul und die Frage nach E_eq beim
+  Eintrag, das Auflösen der Art beim Bauen (`stabquerschnitt_von`).
+  Der Raum fügt nur hinzu, dass ein Profil sich um beide Achsen biegt.
+- Der Streifen liegt mit b waagrecht, solange β null ist, wie eine Platte.
+- Ein E_eq gilt für EA, EI_y und EI_z; GI_T rechnet mit G_cm (nach
+  Vorgabe, in [[TODO]]). Die Herleitung sagt es.
+- «QS Analyse» fehlt im Raum noch: die Querschnittsanalyse rechnet kein
+  I_T. Das kommt als Nächstes.
+
+---
+
 ## 2026-11-18 · Rechenart mit Bild
 
 Wo man die Rechenart wählt -- Hand, 0.85·x, präzise, elastisch --, steht

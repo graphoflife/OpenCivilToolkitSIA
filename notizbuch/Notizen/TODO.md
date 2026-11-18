@@ -926,6 +926,17 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       abzumindern, und sagt dazu, dass das günstig oder ungünstig wirken
       kann (SIA 262:2025, 4.1.4.1.3). Prüfen, ob die Formeln so bleiben
       sollen.
+- [ ] **Ein E_eq gilt im Raum für EA, EI_y und EI_z, nach Vorgabe**
+      (`projekt/balkensystem3d.py`, `stabwerk3d/herleitung.py`). Ein
+      Querschnitt aus einer Platte nimmt sein E_eq wie in der Ebene, und es
+      ersetzt E_cm in allen drei Steifigkeiten; die Torsion behält G_cm,
+      ungerissen. Das E_eq kommt aber aus der Biegung des Streifens um seine
+      starke Achse, mit M und N der Platte -- für die Biegung quer dazu, in
+      der Ebene der Platte, und für die Torsion sagt es nichts. Beispiel:
+      Platte C30/37, h = 250 mm, Streifen b = 1000 mm, M = 40 kNm: E_eq =
+      3569 N/mm²; EI_z sinkt damit wie EI_y auf gut ein Zehntel, GI_T
+      bleibt. Prüfen, ob EI_z mit E_cm rechnen soll, und ob GI_T für Risse
+      abgemindert werden soll (SIA 262:2025, 4.1.4.1.3 lässt es zu).
 - [ ] **Die Vorwahlen der Lager im Raum, nach Vorgabe**
       (`projekt/balkensystem3d.py`). «Gelenkig» hält die drei
       Verschiebungen, «verschieblich» nur die lotrechte, «eingespannt» alle

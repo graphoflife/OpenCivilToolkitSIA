@@ -1,5 +1,5 @@
 ---
-erzeugt: e52ddd08dfa7
+erzeugt: 2f8d31ae1294
 art: modul
 tags: [modul]
 ---
@@ -32,9 +32,11 @@ sagt die Beschreibung ([[opencivil.projekt.staebe#MitStaeben._kehrt_um|MitStaebe
 ## QUERSCHNITTE
 
 Ein Querschnitt der Staebe ist in beiden Systemen nach Vorlage, ein
-Stahlprofil aus der Tabelle oder mit Kennwerten von Hand
-([[opencivil.projekt.staebe#StabquerschnittBasis|StabquerschnittBasis]]); welche Kennwerte, sagt das System. Aus
-einer Platte oder Querschnittsanalyse nimmt ihn nur das 2D-Balkensystem.
+Stahlprofil aus der Tabelle, mit Kennwerten von Hand oder aus einer Platte
+oder Querschnittsanalyse des Projekts ([[opencivil.projekt.staebe#StabquerschnittBasis|StabquerschnittBasis]]);
+welche Kennwerte, sagt das System. Seit 2026-11-18 nimmt ihn auch das
+3D-Balkensystem aus einer Platte oder Analyse (Benutzer: «genau gleich,
+einfach einmal in 3D»).
 
 ## Inhalt
 
@@ -88,6 +90,34 @@ Momenten-Kruemmungs-Linie mit ihrer Bewehrung, bei einer Platte immer
 in x-Richtung, Zug unten (Benutzer, 2026-10-24). Einer nach Vorlage
 oder von Hand ist nur eine Form.
 
+### ModulEintrag
+
+```python
+@dataclass
+class ModulEintrag(Beschreibung)
+```
+
+Wie das E_eq eines Querschnitts aus einer Platte oder Querschnittsanalyse
+entsteht: bei `N` und `M`, Zug positiv und `M > 0` mit Zug unten --
+auf der gestrichelten Faser des Stabs, im Raum an der Seite +z, wo M_y
+zieht; bei einer Platte immer in x-Richtung, und `M` zieht unten
+(Benutzer, 2026-10-24). Gerechnet wie eine Momenten-Kruemmungs-Linie
+ihrer Spannung-Dehnung-Analyse, mit Kriechzahl, Wertesatz und Rechenart
+wie dort (Benutzer, 2026-10-23).
+
+- `N: float = bereich(0.0, heisst='N für E_eq', einheit=KN)`
+- `M: float = bereich(0.0, heisst='M für E_eq', einheit=KNM)`
+- `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
+- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)`
+
+#### ModulEintrag.wahl
+
+```python
+@property
+def wahl(self) -> Rechenwahl
+```
+
 ### _aufgezaehlt
 
 ```python
@@ -104,9 +134,11 @@ class StabquerschnittBasis(Beschreibung)
 ```
 
 Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, ein
-Stahlprofil aus der Tabelle (`profil`) oder mit Kennwerten von Hand in
+Stahlprofil aus der Tabelle (`profil`), mit Kennwerten von Hand in
 `masse` -- `A` in mm², Traegheitsmomente in 10⁶ mm⁴; welche, sagt
-[[opencivil.projekt.staebe#StabquerschnittBasis|KENNWERTE]]. E und G kommen vom Material des Stabs.
+[[opencivil.projekt.staebe#StabquerschnittBasis|KENNWERTE]] -- oder aus einer Platte oder Querschnittsanalyse des
+Projekts (`bezug`). E und G kommen vom Material des Stabs; nimmt der
+das Material des Querschnitts, sagt `e_modul`, welches E.
 
 - `KENNWERTE: ClassVar[Tuple[str, ...]]` – Die Kennwerte von Hand, wie die Rechnung sie nimmt.
 - `kennung: str = ''`
@@ -115,6 +147,9 @@ Stahlprofil aus der Tabelle (`profil`) oder mit Kennwerten von Hand in
 - `vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)`
 - `masse: Dict[str, float] = field(default_factory=dict)`
 - `profil: str = 'IPE 300'` – Der Name des Stahlprofils ([[opencivil.stabwerk.profiltabelle]]). Kein Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
+- `bezug: str = ''` – Die Kennung der Platte oder Querschnittsanalyse -- nur, wenn er aus einer kommt.
+- `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt.
+- `eq: ModulEintrag = field(default_factory=ModulEintrag)` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
 
 #### StabquerschnittBasis.neu
 
@@ -329,6 +364,25 @@ def querschnitt_mit_kennwerten(self, name: str, **kennwerte: float) -> Any
 
 Ein Querschnitt mit Kennwerten von Hand -- A in mm², Traegheitsmomente in 10⁶ mm⁴.
 
+#### MitStaeben.querschnitt_aus
+
+```python
+def querschnitt_aus(self, name: str, art: str, bezug: Any, *, E_eq: Optional[Mapping[str, Any]]=None) -> Any
+```
+
+Ein Querschnitt aus einer Platte (`platte`) oder einer
+Querschnittsanalyse (`analyse`). Ein Stab «gemäss Querschnitt»
+rechnet mit `E_eq` -- Felder wie [[opencivil.projekt.staebe#ModulEintrag|ModulEintrag]], etwa
+`{"M": 80}` -- mit ihrem aequivalenten E-Modul.
+
+#### MitStaeben.bezuege
+
+```python
+def bezuege(self) -> List[str]
+```
+
+Die Platten und Querschnittsanalysen, deren Querschnitt ein Stab nimmt.
+
 #### MitStaeben.diagramm
 
 ```python
@@ -391,14 +445,19 @@ Ob eine Last ihr Vorzeichen wechselt, wenn ihre Linie umgekehrt wird.
 
 - `Ort = Union[str, Sequence[float]]` – Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.
 - `Punkt = Tuple[float, ...]` – Ein Punkt in m, mit so vielen Koordinaten, wie das System Achsen hat.
+- `E_MODULE = ('e0', 'e_eq')` – Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀, das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der Platte oder Querschnittsanalyse bei N und M (Benutzer, 2026-10-24). Einen E-Modul von Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
+- `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
 - [[opencivil.core.wahl]]
+- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.querschnitte]]
@@ -406,6 +465,9 @@ Ob eine Last ihr Vorzeichen wechselt, wenn ihre Linie umgekehrt wird.
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.projekt.beispiele]]
 - [[opencivil.web.dienst]]
+- [[opencivil.web.systemkatalog]]

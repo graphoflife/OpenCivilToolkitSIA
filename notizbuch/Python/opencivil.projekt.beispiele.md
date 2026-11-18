@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a8e31f6a113
+erzeugt: f474f1313b04
 art: modul
 tags: [modul]
 ---
@@ -195,6 +195,7 @@ mit G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.skript]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 

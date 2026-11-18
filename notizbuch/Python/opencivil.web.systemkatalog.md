@@ -1,5 +1,5 @@
 ---
-erzeugt: 5abe5c33cf9e
+erzeugt: 302ff06cc8a2
 art: modul
 tags: [modul]
 ---
@@ -49,6 +49,7 @@ Klasse, die sie rechnet, `darstellung` wie ihre Ergebnisse gezeigt werden.
 
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]

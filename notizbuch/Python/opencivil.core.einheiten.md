@@ -1,5 +1,5 @@
 ---
-erzeugt: 43d7c4621c96
+erzeugt: d82f36b078aa
 art: modul
 tags: [modul]
 ---
@@ -501,6 +501,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5aff1f8a8717
+erzeugt: 2a2c031950de
 art: modul
 tags: [modul]
 ---
@@ -28,8 +28,9 @@ Was das 3D-Balkensystem ([[opencivil.projekt.aufbau.balkensystem3d|balkensystem3
 gleich macht, steht hier und wird dort benutzt: die [[opencivil.projekt.aufbau.balkensystem#Uebersetzung|Uebersetzung]]
 prueft Faelle und Kennungen und uebersetzt Stabfelder, Lager und Lasten;
 [[opencivil.projekt.aufbau.balkensystem#stabwerk_bauen|stabwerk_bauen]] loest Materialien und Querschnitte auf;
-[[opencivil.projekt.aufbau.balkensystem#form_von|form_von]] macht aus einer Vorlage, einem Profil oder Kennwerten von
-Hand die Form eines Querschnitts.
+[[opencivil.projekt.aufbau.balkensystem#stabquerschnitt_von|stabquerschnitt_von]] loest die Art eines Querschnitts auf -- eine
+Vorlage, ein Profil oder Kennwerte von Hand ([[opencivil.projekt.aufbau.balkensystem#form_von|form_von]]), eine Platte
+oder eine Querschnittsanalyse.
 
 ## Inhalt
 
@@ -179,19 +180,21 @@ Ein Querschnitt nach Vorlage, als Stahlprofil oder von Hand -- in der
 Ebene und im Raum. Ein Profil biegt sich in der Ebene um `achse`, im
 Raum um beide.
 
-### _stabquerschnitt
+### stabquerschnitt_von
 
 ```python
-def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stabquerschnitt
+def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str, achse: Optional[Profilachse]=None) -> Stabquerschnitt
 ```
 
-Woher A und I eines Querschnitts kommen -- hier wird seine Art
-aufgeloest. Die Platte oder Analyse dazu muss es geben.
+Woher die Kennwerte eines Querschnitts kommen -- hier wird seine Art
+aufgeloest, in der Ebene und im Raum. Die Platte oder Analyse dazu muss
+es geben. Ein Profil biegt sich in der Ebene um `achse`, im Raum um
+beide ([[opencivil.projekt.aufbau.balkensystem#form_von|form_von]]).
 
 ### _modulfrage
 
 ```python
-def _modulfrage(q: StabquerschnittEintrag, quelle) -> Optional[Modulfrage]
+def _modulfrage(q: StabquerschnittBasis, quelle) -> Optional[Modulfrage]
 ```
 
 Die Frage nach dem E_eq eines Querschnitts -- nur, wenn er es nehmen soll.
@@ -228,7 +231,7 @@ beginnend, er folgt auf ein «aber».
 ### _material_des_querschnitts
 
 ```python
-def _material_des_querschnitts(q: StabquerschnittEintrag, aufbau: Aufbau) -> Tuple[Optional[Stabmaterial], str]
+def _material_des_querschnitts(q: StabquerschnittBasis, aufbau: Aufbau) -> Tuple[Optional[Stabmaterial], str]
 ```
 
 Das Material, das ein Querschnitt mitbringt: der Beton einer Platte, das

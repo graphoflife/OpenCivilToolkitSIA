@@ -1,5 +1,5 @@
 ---
-erzeugt: 8d636636b07d
+erzeugt: b47e536dccba
 art: modul
 tags: [modul]
 ---
@@ -26,10 +26,13 @@ ihre Achse und Linienlager laengs und quer in y und z des Querschnitts.
 Eine Last zeigt senkrecht, in x, y oder z des Systems oder laengs und quer
 in y oder z des Stabs ([[opencivil.stabwerk3d.modell#Richtung|Richtung]]),
 eine an einem Knoten nur in eine Richtung des Systems. Ein Querschnitt ist
-nach Vorlage, ein Stahlprofil -- y die starke Achse, gedreht wird mit β --
-oder von Hand, mit I_y, I_z und I_T; aus einer Platte oder
-Querschnittsanalyse kommt er nicht: beide kennen nur ihre Biegung um y. Ein
-eigenes Material hat dazu seinen Schubmodul G.
+nach Vorlage, ein Stahlprofil -- y die starke Achse, gedreht wird mit β --,
+von Hand mit I_y, I_z und I_T oder aus einer Platte, wie in der Ebene
+(Benutzer, 2026-11-18): der Streifen b × h mit den Formeln des Rechtecks,
+b waagrecht, wenn β null ist. Ein Stab «gemäss Querschnitt» nimmt deren
+Beton, mit G_cm fuer die Torsion; ein E_eq gilt fuer EA, EI_y und EI_z
+(nach Vorgabe, nicht nachgeschlagen).
+Ein eigenes Material hat dazu seinen Schubmodul G.
 
 
 ## KOORDINATEN UND EINHEITEN
@@ -86,7 +89,7 @@ oder ohne Stab, ein Linienlager laengs und quer in y und z.
 - `von: str = ''`
 - `bis: str = ''`
 - `querschnitt: str = ''` – Kennung des Querschnitts im System (`Q1`); leer: kein Stab, nur eine Linie.
-- `material: str = ''` – Kennung eines Materials des Systems (`M1`).
+- `material: str = ''` – Kennung eines Materials des Systems (`M1`) -- oder [[opencivil.projekt.staebe#Konstanten|MATERIAL_DES_QUERSCHNITTS]]: der Beton, den eine Platte oder Querschnittsanalyse als Querschnitt mitbringt.
 - `drehung: float = bereich(0.0, heisst='Drehwinkel β', einheit=GRAD)` – Wie weit der Querschnitt um die Achse des Stabs gedreht ist ([[opencivil.stabwerk3d.stab]]).
 - `gelenk_anfang: bool = False`
 - `gelenk_ende: bool = False`
@@ -239,7 +242,7 @@ Wie in der Ebene -- und der Drehwinkel so, dass der Querschnitt steht wie vorher
 
 - `EINHEIT_DER_FEDER = {**{f'k_{achse}': KN_PRO_M for achse in 'xyz'}, **{f'k_phi_{achse}': …` – Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad, Bettung in kN/m je m Stab.
 - `KNOTENRICHTUNGEN = tuple((r for r in Richtung if r.im_system))` – Wohin eine Last an einem Knoten zeigt -- in die Richtungen des Systems.
-- `QUERSCHNITTSARTEN = tuple((a for a in Querschnittsart if not a.aus_bauteil))` – Woher die Kennwerte eines Querschnitts kommen -- nicht aus einem Bauteil, siehe Dateikopf.
+- `QUERSCHNITTSARTEN = tuple((a for a in Querschnittsart if a is not Querschnittsart.ANALYSE…` – Woher die Kennwerte eines Querschnitts kommen -- noch nicht aus einer Querschnittsanalyse: sie rechnet kein I_T.
 - `KENNWERTE = tuple((k.kurzname for k in RAEUMLICH))` – Die Kennwerte eines Querschnitts von Hand -- wie die Rechnung sie nimmt.
 - `DIAGRAMMGROESSEN = ('N', 'V_y', 'V_z', 'T', 'M_y', 'M_z', 'verschiebung', 'lagerkraefte')` – Was ein Diagramm zeigt: je Stab den Verlauf einer Schnittgroesse, das verschobene System oder die Lagerkraefte.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'fest', 'frei', 'frei', 'frei'), 'versc…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest, in der Folge x, y, z, φ_x, φ_y, φ_z. Gelenkig haelt jede Verschiebung, verschieblich nur die lotrechte.

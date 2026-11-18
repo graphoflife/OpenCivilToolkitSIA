@@ -17,7 +17,7 @@ from __future__ import annotations
 import math
 
 from opencivil.decke.schnitt import BALKENGROESSEN
-from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN, MATERIAL_DES_QUERSCHNITTS
+from opencivil.projekt.balkensystem import DIAGRAMMGROESSEN
 from opencivil.projekt.balkensystem3d import DIAGRAMMGROESSEN as DIAGRAMMGROESSEN3D
 from opencivil.projekt.decke import PLATTENGROESSEN
 from opencivil.projekt.eintraege import (
@@ -27,6 +27,7 @@ from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag, WerkstoffwahlEintrag
 from opencivil.projekt.skript import VORLAGE
+from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
 

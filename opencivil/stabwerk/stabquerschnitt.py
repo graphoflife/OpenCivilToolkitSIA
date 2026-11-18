@@ -15,11 +15,11 @@ Welche Kennwerte, sagt das System: der ebene Rahmen braucht ``A`` und ``I``
   ist ihr ``I_y`` -- bei einem Profil, das sich um z biegt, ihr ``I_z``;
 * von Hand (:class:`VonHand`) -- die Kennwerte als Eingaben;
 * aus einer Platte (:class:`AusPlatte`) -- die Formeln des Rechtecks mit
-  ``b`` und ``h`` der Platte;
+  ``b`` und ``h`` der Platte, im Raum mit ``I_z`` und ``I_T`` dazu;
 * aus einer Querschnittsanalyse (:class:`AusAnalyse`) -- ``A`` und ``I_y``
-  ihres Bruttoquerschnitts.
+  ihres Bruttoquerschnitts, im Raum ``I_z`` dazu.
 
-Platte und Analyse gibt es nur im ebenen Rahmen: ``I_T`` haben sie nicht.
+Eine Querschnittsanalyse gibt es nur im ebenen Rahmen: ``I_T`` rechnet sie nicht.
 
 Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu. Nur ein Querschnitt aus
@@ -234,7 +234,7 @@ class AusPlatte(AusBauteil):
 
 @dataclass(frozen=True, kw_only=True)
 class AusAnalyse(AusBauteil):
-    """Der Bruttoquerschnitt einer Querschnittsanalyse -- ``quelle`` sind ``A`` und ``I``."""
+    """Der Bruttoquerschnitt einer Querschnittsanalyse -- ``quelle`` je Kennwert, ``I`` ist ``I_y``."""
 
     flaechen: Tuple[Sequence[Tuple[float, float]], ...] = ()
     """Die Polygone ihrer Flaechen, in mm -- Aussparungen mit, das Bild fuellt gerade-ungerade."""

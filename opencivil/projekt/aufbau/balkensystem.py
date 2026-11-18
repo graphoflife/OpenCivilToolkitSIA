@@ -19,8 +19,9 @@ Was das 3D-Balkensystem (:mod:`~opencivil.projekt.aufbau.balkensystem3d`)
 gleich macht, steht hier und wird dort benutzt: die :class:`Uebersetzung`
 prueft Faelle und Kennungen und uebersetzt Stabfelder, Lager und Lasten;
 :func:`stabwerk_bauen` loest Materialien und Querschnitte auf;
-:func:`form_von` macht aus einer Vorlage, einem Profil oder Kennwerten von
-Hand die Form eines Querschnitts.
+:func:`stabquerschnitt_von` loest die Art eines Querschnitts auf -- eine
+Vorlage, ein Profil oder Kennwerte von Hand (:func:`form_von`), eine Platte
+oder eine Querschnittsanalyse.
 """
 
 from __future__ import annotations
@@ -31,11 +32,10 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence,
 from opencivil.core.einheiten import Groesse
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.projekt.balkensystem import (
-    EINHEIT_DER_LAST, MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag,
-    Profilachse, Querschnittsart, StabmaterialEintrag, StabquerschnittEintrag,
+    EINHEIT_DER_LAST, BalkensystemEintrag, Profilachse, StabmaterialEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler
-from opencivil.projekt.staebe import StabquerschnittBasis
+from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS, Querschnittsart, StabquerschnittBasis
 from opencivil.spannungsanalyse.modul import ModulAusAnalyse, ModulAusPlatte, Modulfrage
 from opencivil.stabwerk.profiltabelle import PROFILE
 from opencivil.stabwerk.rechnung import Balkensystem, Materialkennwert, Stabmaterial
@@ -237,7 +237,8 @@ def bauen(art: "Bauteilart", eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Ba
     Projekts rechnet.
     """
     modell = modell_von(eintrag)
-    querschnitte = [_stabquerschnitt(q, aufbau, eintrag.wo) for q in eintrag.querschnitte]
+    querschnitte = [stabquerschnitt_von(q, aufbau, eintrag.wo, q.achse)
+                    for q in eintrag.querschnitte]
     return stabwerk_bauen(Balkensystem, art, eintrag, aufbau, modell, querschnitte)
 
 
@@ -279,13 +280,16 @@ def form_von(q: StabquerschnittBasis, wo: str,
                    fehler=q.fehler() or "", masse=dict(q.masse))
 
 
-def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stabquerschnitt:
+def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
+                        achse: Optional[Profilachse] = None) -> Stabquerschnitt:
     """
-    Woher A und I eines Querschnitts kommen -- hier wird seine Art
-    aufgeloest. Die Platte oder Analyse dazu muss es geben.
+    Woher die Kennwerte eines Querschnitts kommen -- hier wird seine Art
+    aufgeloest, in der Ebene und im Raum. Die Platte oder Analyse dazu muss
+    es geben. Ein Profil biegt sich in der Ebene um ``achse``, im Raum um
+    beide (:func:`form_von`).
     """
     if not q.art.aus_bauteil:
-        return form_von(q, wo, q.achse)
+        return form_von(q, wo, achse)
     if q.art is Querschnittsart.PLATTE:
         platte = aufbau.querschnitte.get(q.bezug)
         if platte is None:
@@ -308,12 +312,13 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
                             f"'{q.bezug}', die es im Projekt nicht gibt.")
     return AusAnalyse(kennung=q.kennung, name=q.name,
                       herkunft=f"Querschnittsanalyse «{analyse.name}»", bezug=q.bezug,
-                      quelle={"A": analyse.id_von("A"), "I": analyse.id_von("I_y")},
+                      quelle={"I": analyse.id_von("I_y"),
+                              **{k: analyse.id_von(k) for k in ("A", "I_y", "I_z")}},
                       eq=_modulfrage(q, ModulAusAnalyse(analyse)),
                       flaechen=tuple(f.punkte for f in analyse.flaechen))
 
 
-def _modulfrage(q: StabquerschnittEintrag, quelle) -> Optional[Modulfrage]:
+def _modulfrage(q: StabquerschnittBasis, quelle) -> Optional[Modulfrage]:
     """Die Frage nach dem E_eq eines Querschnitts -- nur, wenn er es nehmen soll."""
     return Modulfrage(quelle, q.eq.N, q.eq.M, q.eq.wahl) if q.e_modul == "e_eq" else None
 
@@ -374,7 +379,7 @@ def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau, wo: str,
     return Stabmaterial(m.kennung, stoff.name, stoff=stoff), ""
 
 
-def _material_des_querschnitts(q: StabquerschnittEintrag,
+def _material_des_querschnitts(q: StabquerschnittBasis,
                                aufbau: Aufbau) -> Tuple[Optional[Stabmaterial], str]:
     """
     Das Material, das ein Querschnitt mitbringt: der Beton einer Platte, das

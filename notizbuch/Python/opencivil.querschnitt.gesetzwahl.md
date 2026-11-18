@@ -1,5 +1,5 @@
 ---
-erzeugt: 6e666c0c8bd5
+erzeugt: f90381b23ef9
 art: modul
 tags: [modul]
 ---
@@ -342,10 +342,10 @@ ist der Modul der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.pfahl.innen]]
 - [[opencivil.pfahl.quer]]
-- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.spannungsanalyse.bild]]
 - [[opencivil.spannungsanalyse.herleitung]]

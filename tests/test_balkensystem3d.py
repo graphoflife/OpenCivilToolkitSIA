@@ -13,6 +13,7 @@ from opencivil.projekt import BalkensystemEintrag, Projekt, ProjektFehler
 from opencivil.projekt.aufbau import BALKENSYSTEM3D
 from opencivil.projekt.aufbau import balkensystem3d as aufbau3d
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
+from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.stabwerk.rechnung import STABKENNWERTE
 from opencivil.stabwerk3d.modell import Richtung
 from opencivil.stabwerk3d.rechnung import RAUMKENNWERTE
@@ -72,9 +73,9 @@ class TestBeschreibung(unittest.TestCase):
         s = Balkensystem3dEintrag(kennung="u1", name="S")
         with self.assertRaisesRegex(ProjektFehler, "Möglich sind: senkrecht, x, y, z"):
             s.knotenlast("LF1", (0, 0, 0), richtung="laengs")
-        with self.assertRaisesRegex(ProjektFehler, "Möglich sind: vorlage, profil, kennwerte"):
+        with self.assertRaisesRegex(ProjektFehler, "Möglich sind: vorlage, profil, kennwerte, platte"):
             Balkensystem3dEintrag.aus_dict({"kennung": "u1", "name": "S",
-                                            "querschnitte": [{"art": "platte"}]})
+                                            "querschnitte": [{"art": "analyse"}]})
         with self.assertRaisesRegex(ProjektFehler, "'M' gibt es als 'groesse' nicht"):
             s.diagramm("LF1", "M")
 
@@ -255,6 +256,72 @@ class TestRechnen(unittest.TestCase):
                                  "Extremwerte", "Gleichgewichtsprobe (Moment um den Ursprung)"])
 
 
+class TestAusEinerPlatte(unittest.TestCase):
+    """
+    Ein Querschnitt aus einer Platte, wie in der Ebene (Benutzer,
+    2026-11-18): der Streifen b × h, b waagrecht -- und ein Stab «gemäss
+    Querschnitt» mit ihrem Beton, G_cm für die Torsion.
+    """
+
+    def projekt(self, **eq):
+        """Ein Kragarm von 4 m aus dem Streifen der Platte «Decke», h = 250 mm, b = 1000 mm."""
+        p = Projekt(name="Raum")
+        p.beton("C30/37")
+        p.stahl("B500B")
+        s = p.balkensystem3d("Rahmen")
+        q = s.querschnitt_aus("Streifen", "platte", p.platte("Decke", h=250),
+                              **({"E_eq": eq} if eq else {}))
+        s.linie((0, 0, 0), (4, 0, 0), querschnitt=q, material=MATERIAL_DES_QUERSCHNITTS)
+        s.lager_an((0, 0, 0), "eingespannt")
+        lf = s.lastfall("P")
+        s.knotenlast(lf, (4, 0, 0), 10.0)
+        return p, s, q
+
+    def wert(self, e, s, q, kurz):
+        return e.wert(f"balkensystem3d.{s.kennung}.{q.kennung}.{kurz}").groesse.si
+
+    def test_der_streifen_mit_seinem_beton(self):
+        p, s, q = self.projekt()
+        e = p.rechnen()
+        self.assertTrue(e.balkensystem("Rahmen").ergebnis.gueltig,
+                        e.balkensystem("Rahmen").ergebnis.meldungen)
+        b, h = 1.0, 0.25
+        for kurz, soll in (("A", b * h), ("I_y", b * h ** 3 / 12), ("I_z", h * b ** 3 / 12)):
+            self.assertAlmostEqual(self.wert(e, s, q, kurz), soll, delta=1e-9 * soll)
+        # I_T wie das Rechteck nach Vorlage mit denselben Massen.
+        vergleich = Balkensystem3dEintrag(kennung="u9", name="R")
+        r = vergleich.querschnitt("R", "rechteck", b=1000.0, h=250.0)
+        vergleich.linie((0, 0, 0), (4, 0, 0), querschnitt=r, material=vergleich.beton("b1"))
+        vergleich.lager_an((0, 0, 0), "eingespannt")
+        _, loesung = gerechnet(p, vergleich)
+        I_T = loesung.werte["balkensystem3d.u9.Q1.I_T"].groesse.si
+        self.assertAlmostEqual(self.wert(e, s, q, "I_T"), I_T, delta=1e-12)
+        _, material = e.aufbau.balkensysteme3d[s.kennung].paare["L1"]
+        self.assertEqual(material.stoff.name, "C30/37")
+        G = e.wert("beton.b1.G_cm").groesse.si
+        self.assertAlmostEqual(self.wert(e, s, q, f"{MATERIAL_DES_QUERSCHNITTS}.GI_T"),
+                               G * I_T, delta=1e-9 * G * I_T)
+        self.assertEqual(s.bezuege(), ["q1"])
+        self.assertEqual(e.aufbau.balkensysteme3d[s.kennung].bezuege, ["q1"])
+
+    def test_e_eq_fuer_die_biegung_g_fuer_die_torsion(self):
+        """Gerissen bei M = 40 kNm: E_eq in EA, EI_y und EI_z, G_cm bleibt in GI_T."""
+        p, s, q = self.projekt(M=40.0)
+        e = p.rechnen()
+        self.assertTrue(e.balkensystem("Rahmen").ergebnis.gueltig,
+                        e.balkensystem("Rahmen").ergebnis.meldungen)
+        E = self.wert(e, s, q, "E")
+        self.assertLess(E, e.wert("beton.b1.E_cm").groesse.si)
+        for steifigkeit, kennwert in (("EA", "A"), ("EI_y", "I_y"), ("EI_z", "I_z")):
+            soll = E * self.wert(e, s, q, kennwert)
+            self.assertAlmostEqual(
+                self.wert(e, s, q, f"{MATERIAL_DES_QUERSCHNITTS}.{steifigkeit}"), soll,
+                delta=1e-9 * soll)
+        soll = e.wert("beton.b1.G_cm").groesse.si * self.wert(e, s, q, "I_T")
+        self.assertAlmostEqual(self.wert(e, s, q, f"{MATERIAL_DES_QUERSCHNITTS}.GI_T"), soll,
+                               delta=1e-9 * soll)
+
+
 class TestMaterialkennwerte(unittest.TestCase):
     def test_der_raum_nimmt_dazu_den_schubmodul(self):
         self.assertEqual(RAUMKENNWERTE["beton"], {**STABKENNWERTE["beton"], "G": "G_cm"})
@@ -306,7 +373,7 @@ class TestFuerDieOberflaeche(unittest.TestCase):
         self.assertEqual(raum["profilachsen"], [])
         self.assertEqual(raum["laufrichtungen"], [])        # wie gezeichnet
         self.assertEqual([q["wert"] for q in raum["querschnittsarten"]],
-                         ["vorlage", "profil", "kennwerte"])
+                         ["vorlage", "profil", "kennwerte", "platte"])
         self.assertEqual(raum["lagerarten"][0], {"wert": "gelenkig", "x": "fest", "y": "fest",
                                                  "z": "fest", "phi_x": "frei", "phi_y": "frei",
                                                  "phi_z": "frei"})

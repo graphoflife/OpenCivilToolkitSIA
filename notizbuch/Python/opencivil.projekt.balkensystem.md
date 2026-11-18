@@ -1,5 +1,5 @@
 ---
-erzeugt: b43694e42945
+erzeugt: a9e0211f0f88
 art: modul
 tags: [modul]
 ---
@@ -150,7 +150,7 @@ oder ohne Stab, ein Linienlager quer und laengs.
 - `von: str = ''`
 - `bis: str = ''`
 - `querschnitt: str = ''` – Kennung des Querschnitts im System (`Q1`); leer: kein Stab, nur eine Linie.
-- `material: str = ''` – Kennung eines Materials des Systems (`M1`) -- oder [[opencivil.projekt.balkensystem#Konstanten|MATERIAL_DES_QUERSCHNITTS]]: das Material, das eine Platte oder Querschnittsanalyse als Querschnitt mitbringt.
+- `material: str = ''` – Kennung eines Materials des Systems (`M1`) -- oder [[opencivil.projekt.staebe#Konstanten|MATERIAL_DES_QUERSCHNITTS]]: das Material, das eine Platte oder Querschnittsanalyse als Querschnitt mitbringt.
 - `gelenk_anfang: bool = False`
 - `gelenk_ende: bool = False`
 - `quer: str = einer_von(HALT, 'frei')`
@@ -222,33 +222,6 @@ mit `E` und `rho` von Hand.
 - `E: float = bereich(200000.0, heisst='E-Modul E', einheit=N_PRO_MM2, ueber=0.0)` – N/mm² -- nur bei `eigen`.
 - `rho: float = bereich(7850.0, heisst='Dichte ρ', einheit=KG_PRO_M3, ab=0.0)` – kg/m³, fuer das Eigengewicht -- nur bei `eigen`.
 
-### ModulEintrag
-
-```python
-@dataclass
-class ModulEintrag(Beschreibung)
-```
-
-Wie das E_eq eines Querschnitts aus einer Platte oder Querschnittsanalyse
-entsteht: bei `N` und `M`, Zug positiv und `M > 0` mit Zug unten --
-auf der gestrichelten Faser des Stabs; bei einer Platte immer in
-x-Richtung, und `M` zieht unten (Benutzer, 2026-10-24). Gerechnet wie
-eine Momenten-Kruemmungs-Linie ihrer Spannung-Dehnung-Analyse, mit
-Kriechzahl, Wertesatz und Rechenart wie dort (Benutzer, 2026-10-23).
-
-- `N: float = bereich(0.0, heisst='N für E_eq', einheit=KN)`
-- `M: float = bereich(0.0, heisst='M für E_eq', einheit=KNM)`
-- `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
-- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
-- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)`
-
-#### ModulEintrag.wahl
-
-```python
-@property
-def wahl(self) -> Rechenwahl
-```
-
 ### StabquerschnittEintrag
 
 ```python
@@ -256,22 +229,10 @@ def wahl(self) -> Rechenwahl
 class StabquerschnittEintrag(StabquerschnittBasis)
 ```
 
-Ein Querschnitt der Staebe in der Ebene: dazu aus einer Platte oder
-einer Querschnittsanalyse des Projekts (`bezug`), ein Stahlprofil
-gebogen um `achse`. E kommt vom Material des Stabs; nimmt der das
-Material des Querschnitts, sagt `e_modul`, welches E.
+Ein Querschnitt der Staebe in der Ebene: ein Stahlprofil biegt sich um `achse`.
 
 - `KENNWERTE = KENNWERTE`
 - `achse: Profilachse = Profilachse.Y`
-- `bezug: str = ''`
-- `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt.
-- `eq: ModulEintrag = field(default_factory=ModulEintrag)` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
-
-#### StabquerschnittEintrag.fehler
-
-```python
-def fehler(self) -> Optional[str]
-```
 
 ### StatikdiagrammEintrag
 
@@ -329,14 +290,6 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 - `QUERSCHNITT = StabquerschnittEintrag`
 - `DIAGRAMM = StatikdiagrammEintrag`
 
-#### BalkensystemEintrag.bezuege
-
-```python
-def bezuege(self) -> List[str]
-```
-
-Die Platten und Querschnittsanalysen, deren Querschnitt ein Stab nimmt.
-
 #### BalkensystemEintrag._kehrt_um
 
 ```python
@@ -355,17 +308,6 @@ def stahlprofil(self, name: str, profil: str, achse: str='y') -> Stabquerschnitt
 
 Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke.
 
-#### BalkensystemEintrag.querschnitt_aus
-
-```python
-def querschnitt_aus(self, name: str, art: str, bezug: Any, *, E_eq: Optional[Mapping[str, Any]]=None) -> StabquerschnittEintrag
-```
-
-Ein Querschnitt aus einer Platte (`platte`) oder einer
-Querschnittsanalyse (`analyse`). Bei einer Analyse rechnet ein Stab
-«gemäss Querschnitt» mit `E_eq` -- Felder wie [[opencivil.projekt.balkensystem#ModulEintrag|ModulEintrag]],
-etwa `{"M": 80}` -- mit ihrem aequivalenten E-Modul.
-
 
 ## Konstanten
 
@@ -376,8 +318,6 @@ etwa `{"M": 80}` -- mit ihrem aequivalenten E-Modul.
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `KENNWERTE = tuple((k.kurzname for k in EBEN))` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴ -- wie die Rechnung sie nimmt.
 - `STABMATERIALARTEN = (*(art.value for art in STABKENNWERTE), 'eigen')` – Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24; Baustahl seit 2026-11-15). Betonstahl ist keines: aus ihm ist kein Stab. Welche Arten des Projekts es gibt, sagen die Kennwerte, die ein Stab aus ihnen nimmt.
-- `E_MODULE = ('e0', 'e_eq')` – Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀, das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der Querschnittsanalyse bei N und M (Benutzer, 2026-10-24). Einen E-Modul von Hand hat ein Querschnitt nicht mehr -- den hat ein eigenes Material.
-- `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung eines Materials sein -- die beginnen mit «M» und einer Zahl.
 - `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 
@@ -385,12 +325,10 @@ etwa `{"M": 80}` -- mit ihrem aequivalenten E-Modul.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.wahl]]
-- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.staebe]]
-- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
