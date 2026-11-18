@@ -802,8 +802,9 @@ def _bruch(q, bauteil, punkt) -> dict:
 def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
     """
     Der Schubfluss je Stueck einer Wand, mit Vorzeichen entlang der Wand, in
-    kN/m -- und je Wand der Widerstand bei der Neigung, die der Nachweis
-    gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
+    kN/m -- und je Wand ihre ganze Kraft gegen ihren Widerstand, in kN, bei
+    der Neigung, die der Nachweis gewaehlt hat. Ohne Verteilung (keine Wand,
+    keine Last) nichts.
     """
     v = schub.verteilungen.get(fall.name)
     if v is None:
@@ -813,8 +814,8 @@ def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
                 "bis": [zahl(s.bis[0], MM), zahl(s.bis[1], MM)],
                 "q": zahl(fluss, KN_PRO_M)}
                for s, fluss in zip(schub.modell.stuecke, v.fluss)]
-    waende = [{"name": w.name, "q_max": zahl(vergleich.einwirkung.groesse.si, KN_PRO_M),
-               "v_Rd": zahl(r.v_Rd, KN_PRO_M), "alpha": r.alpha, "erfuellt": vergleich.erfuellt,
+    waende = [{"name": w.name, "V_Ed": zahl(vergleich.einwirkung.groesse.si, KN),
+               "V_Rd": zahl(r.V_Rd, KN), "alpha": r.alpha, "erfuellt": vergleich.erfuellt,
                "grad_text": grad_als_text(vergleich.grad, vergleich.erfuellt)}
               for w, r, vergleich in zip(schub.waende, schub.widerstaende[fall.name],
                                          schub.vergleiche[fall.name])]

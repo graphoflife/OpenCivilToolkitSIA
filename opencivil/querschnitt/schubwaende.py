@@ -5,8 +5,9 @@ VERANTWORTUNG:
 Eine Schubwand ist eine Linie im Querschnitt mit einer Dicke ``b_w`` und
 Buegeln. Sie traegt eine Kraft entlang ihrer Achse; ihre Laenge ist der
 Hebelarm ``z`` des Fachwerks. Hier wird ``(V_y, V_z, T)`` auf die Waende
-verteilt, der Widerstand jeder Wand bestimmt und -- auf Wunsch -- die
-Laengszugkraft, die das Druckfeld der Waende im Querschnitt weckt.
+verteilt, die Kraft und der Widerstand jeder Wand bestimmt und -- auf
+Wunsch -- die Laengszugkraft, die das Druckfeld der Waende im Querschnitt
+weckt.
 
 DIE VERTEILUNG, ELASTISCH:
 Jede Wand wirkt wie eine Feder entlang ihrer Achse, ihre Steifigkeit ist
@@ -38,15 +39,21 @@ alle Waende aus demselben Beton sind.
 In jedem Fall gilt: die Wandkraefte ergeben ``V_y`` und ``V_z``, und ihr
 Moment um den Schwerpunkt ist ``T``.
 
-WIDERSTAND:
-Je Wand das Fachwerk aus :func:`opencivil.querschnitt.fachwerk.fachwerk`, je
-Laenge der Wand -- SIA 262:2025, Gl. (45) und (47), durch den Hebelarm geteilt::
+KRAFT UND WIDERSTAND EINER WAND -- GANZ, NICHT JE METER (Benutzer, 2026-11-18):
+Je Wand das Fachwerk aus :func:`opencivil.querschnitt.fachwerk.fachwerk` mit
+ihrer Laenge ``l`` als Hebelarm -- SIA 262:2025, Gl. (45) und (47)::
 
-    v_Rd,s = A_sw/s · f_yd · cot α          v_Rd,c = b_w · k_c · f_cd · sin α · cos α
+    V_Rd,s = A_sw/s · l · f_yd · cot α      V_Rd,c = b_w · l · k_c · f_cd · sin α · cos α
 
-α ganzgradig zwischen den Grenzen, massgebend das groesste ``min``. Eine Wand,
-die zwischen zwei Zellen in Stuecke zerfaellt, traegt je Stueck einen anderen
-Fluss; nachgewiesen wird das staerkste Stueck.
+α ganzgradig zwischen den Grenzen, massgebend das groesste ``min``. Dagegen
+steht die Kraft der Wand, ``V_Ed = max|q| · l``: ihr staerkster Schubfluss
+ueber die ganze Laenge (:func:`wandkraefte`). Traegt sie ueberall denselben
+Fluss, ist das ihre Kraft -- bei einer Zelle die Kraft aus der Querkraft und
+die aus der Torsion zusammen, wie die Norm sie je Wand rechnet
+(:data:`REFERENZ_KRAFT`). Zerfaellt sie zwischen Zellen in Stuecke mit
+verschiedenem Fluss, zaehlt so das staerkste Stueck: nach Vorgabe, nicht
+nachgeschlagen. Der Erfuellungsgrad ist derselbe wie bis 2026-11-18, als je
+Laenge nachgewiesen wurde.
 
 VORZEICHEN:
 y nach rechts, z nach oben; ``V_y``, ``V_z`` in Achsrichtung; ``T`` im
@@ -55,9 +62,11 @@ Anfangs- zum Endpunkt. Einheiten in SI-Basis.
 
 WAS DIE NORM SAGT:
 - Eine einzelne Zelle traegt die Torsion mit dem Schubfluss ``T / (2 · A_k)``
-  rundum (SIA 262:2025, 4.3.5.2, Gl. (55)). ``A_k`` ist die Flaeche, die die
-  Laengsbewehrung umschliesst (Figur 20): die Wandachsen gehoeren darum durch
-  die Eckstaebe. Querkraft und Torsion zusammen: 4.3.5.5.
+  rundum; Gl. (55) schreibt ihn als Kraft je Wand, ``V_d,i = T_d / (2 · A_k)
+  · z_i`` mit der Laenge ``z_i`` der Wand (SIA 262:2025, 4.3.5.2). ``A_k`` ist
+  die Flaeche, die die Laengsbewehrung umschliesst (Figur 20): die
+  Wandachsen gehoeren darum durch die Eckstaebe. Querkraft und Torsion
+  zusammen, je Wand zusammengezaehlt: 4.3.5.5.
 - Die Laengszugkraft ``|q| · l · cot α`` je Stueck, halb in jedem Gurt, ihre
   Resultierende also in der Wandmitte: 4.3.3.4.11, Gl. (51), mit lotrechten
   Buegeln; fuer die Torsion 4.3.5.4.
@@ -85,6 +94,10 @@ REFERENZ_WAND = "SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)"
 
 #: Wo die Torsion einer Zelle steht.
 REFERENZ_ZELLE = "SIA 262:2025, 4.3.5.2, (55), Figur 20"
+
+#: Wo die Kraft einer Wand steht: die Torsion als Kraft je Wand, mit der
+#: Querkraft zusammengezaehlt.
+REFERENZ_KRAFT = "SIA 262:2025, 4.3.5.2, (55); 4.3.5.5"
 
 #: Querkraft und Torsion zusammen: die Zelle, kombiniert nach 4.3.5.5, und je
 #: Wand das Fachwerk.
@@ -542,40 +555,66 @@ def _bredt(waende: Sequence[Wand], modell: Zellenmodell, T: float) -> List[float
 
 
 # ===========================================================================
-# Widerstand und Laengszugkraft
+# Kraft, Widerstand und Laengszugkraft
 # ===========================================================================
+
+
+def wandkraefte(waende: Sequence[Wand], modell: Zellenmodell,
+                verteilung: Verteilung) -> List[float]:
+    """
+    Je Wand die Kraft, fuer die sie nachgewiesen wird: ihr staerkster
+    Schubfluss ueber ihre ganze Laenge, ``max|q| · l``, in N
+    (:data:`REFERENZ_KRAFT`; Stuecke mit verschiedenem Fluss nach Vorgabe --
+    siehe Dateikopf). Ein Fluss unter einem Millionstel N/m ist
+    Rundungsrauschen der Verteilung und zaehlt als null; sonst stuende beim
+    Erfuellungsgrad 8·10¹⁶ statt ∞.
+    """
+    staerkster = [0.0] * len(waende)
+    for s, q in zip(modell.stuecke, verteilung.fluss):
+        staerkster[s.wand] = max(staerkster[s.wand], abs(q))
+    return [(q if q > 1e-6 else 0.0) * w.laenge for q, w in zip(staerkster, waende)]
+
+
+def schwaechste(grade: Sequence[float]) -> int:
+    """
+    Die Wand mit dem kleinsten Grad. Bei Gleichstand -- bis auf die letzten
+    Stellen der Rechnung, etwa alle Waende einer Zelle unter Torsion -- die
+    erste, damit nicht Rundung entscheidet, welche Wand massgebend heisst.
+    """
+    kleinster = min(grade)
+    return next(i for i, g in enumerate(grade) if g <= kleinster * (1.0 + 1e-9))
 
 
 @dataclass(frozen=True)
 class Wandwiderstand:
-    """Was eine Wand je Laenge aufnimmt, bei der guenstigsten Neigung."""
+    """Was eine Wand ueber ihre ganze Laenge aufnimmt, bei der guenstigsten Neigung."""
 
     alpha: int
-    v_Rd_s: float
-    """Buegel, in N/m Wandlaenge."""
+    V_Rd_s: float
+    """Buegel, in N."""
 
-    v_Rd_c: float
-    """Druckdiagonale, in N/m Wandlaenge."""
+    V_Rd_c: float
+    """Druckdiagonale, in N."""
 
     @property
-    def v_Rd(self) -> float:
-        return min(self.v_Rd_s, self.v_Rd_c)
+    def V_Rd(self) -> float:
+        return min(self.V_Rd_s, self.V_Rd_c)
 
 
 def widerstand(w: Wand, *, alpha_min: int, alpha_max: int,
                zugkraft: bool) -> Wandwiderstand:
     """
-    Der Widerstand einer Wand je Laenge: das Fachwerk mit dem Hebelarm eins,
-    ganzgradig ueber α, massgebend das groesste ``min(v_Rd,s; v_Rd,c)``
+    Der Widerstand einer Wand: das Fachwerk mit ihrer Laenge als Hebelarm,
+    ganzgradig ueber α, massgebend das groesste ``min(V_Rd,s; V_Rd,c)``
     (:data:`REFERENZ_WAND`). Bei Normalzug gelten die gehobenen Grenzen der
     Platte (:func:`~opencivil.querschnitt.platte.druckfeldgrenzen`).
     """
     von, bis = druckfeldgrenzen(alpha_min, alpha_max, zugkraft)
-    punkte = [fachwerk(alpha=a, a_sw_s=w.a_sw_s, z=1.0, b_w=w.b_w,
+    punkte = [fachwerk(alpha=a, a_sw_s=w.a_sw_s, z=w.laenge, b_w=w.b_w,
                        f_yd=w.f_yd, f_cd=w.f_cd, k_c=w.k_c)
               for a in range(von, bis + 1)]
     beste = beste_neigung(punkte)
-    return Wandwiderstand(alpha=beste.alpha, v_Rd_s=beste.V_Rd_s, v_Rd_c=beste.V_Rd_c)
+    return Wandwiderstand(alpha=beste.alpha, V_Rd_s=beste.V_Rd_s, V_Rd_c=beste.V_Rd_c)
 
 
 @dataclass(frozen=True)

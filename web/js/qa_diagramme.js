@@ -281,9 +281,11 @@ function schubbild(daten, fall) {
     svg,
     el('div.mn-legende', {}, [
       el('span', { text: 'Pfeile: Schubfluss q in kN/m, in seiner Richtung' }),
+      // Je Wand ihre ganze Kraft gegen ihren Widerstand, nicht je Meter.
       ...s.waende.map((w) => el('span', {
         style: { color: w.erfuellt ? 'inherit' : SCHLECHT },
-        text: `${w.name}: |q| ≤ ${w.q_max.toFixed(1)}, v_Rd = ${w.v_Rd.toFixed(1)} (α = ${w.alpha}°)`,
+        text: `${w.name}: V_Ed = ${w.V_Ed.toFixed(1)} kN, V_Rd = ${w.V_Rd.toFixed(1)} kN, `
+          + `α_eff = ${w.grad_text} (α = ${w.alpha}°)`,
       })),
     ]),
   ]);

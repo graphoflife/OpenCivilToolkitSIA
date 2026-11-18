@@ -776,9 +776,13 @@ k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\,
 \begin{equation*}
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 \end{equation*}
-\noindent\textbf{Widerstand je Länge einer Wand (Fachwerk)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
+\noindent\textbf{Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5}
 \begin{equation*}
-v_{Rd,s} = \frac{A_{sw}}{s}\, f_{yd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
+V_{Ed} = \max |q| \cdot l
+\end{equation*}
+\noindent\textbf{Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
+\begin{equation*}
+V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad V_{Rd,c} = b_w\, l\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad V_{Rd} = \max_\alpha \min(V_{Rd,s};\ V_{Rd,c})
 \end{equation*}
 \noindent\textbf{Druckfeld}
 \begin{longtable}{lr}
@@ -832,23 +836,23 @@ Zelle & $A_k\ [\mathrm{mm}^2]$ & $q_k\ [\mathrm{kN/m}]$ \\
 Zelle 1 & $100000$ & $75.0$ \\
 \hline
 \end{longtable}
-\noindent\textbf{Je Wand: Kraft aus der Querkraft, stärkster Schubfluss, Widerstand}
+\noindent\textbf{Je Wand: Kraft der Feder, ganze Kraft, Widerstand}
 \begin{longtable}{lrrrrrrr}
 \hline
-Wand & $V_i\ [\mathrm{kN}]$ & $|q_{Ed}|\ [\mathrm{kN/m}]$ & $\alpha\ [{}^{\circ}]$ & $v_{Rd,s}\ [\mathrm{kN/m}]$ & $v_{Rd,c}\ [\mathrm{kN/m}]$ & $v_{Rd}\ [\mathrm{kN/m}]$ & $\alpha_{eff}$ \\
+Wand & $V_i\ [\mathrm{kN}]$ & $V_{Ed}\ [\mathrm{kN}]$ & $\alpha\ [{}^{\circ}]$ & $V_{Rd,s}\ [\mathrm{kN}]$ & $V_{Rd,c}\ [\mathrm{kN}]$ & $V_{Rd}\ [\mathrm{kN}]$ & $\alpha_{eff}$ \\
 \hline
 \endhead
-Wand 1 & $0.0$ & $75.0$ & $30$ & $394.3$ & $476.3$ & $394.3$ & $5.26$ \\
-Wand 2 & $75.0$ & $225.0$ & $30$ & $394.3$ & $476.3$ & $394.3$ & $1.75$ \\
-Wand 3 & $0.0$ & $75.0$ & $30$ & $394.3$ & $476.3$ & $394.3$ & $5.26$ \\
-Wand 4 & $-75.0$ & $75.0$ & $30$ & $394.3$ & $476.3$ & $394.3$ & $5.26$ \\
+Wand 1 & $0.0$ & $15.0$ & $30$ & $78.9$ & $95.3$ & $78.9$ & $5.26$ \\
+Wand 2 & $75.0$ & $112.5$ & $30$ & $197.2$ & $238.2$ & $197.2$ & $1.75$ \\
+Wand 3 & $0.0$ & $15.0$ & $30$ & $78.9$ & $95.3$ & $78.9$ & $5.26$ \\
+Wand 4 & $-75.0$ & $37.5$ & $30$ & $197.2$ & $238.2$ & $197.2$ & $5.26$ \\
 \hline
 \end{longtable}
 Massgebend: Wand 2.
 
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,V,\text{Feld}} = \frac{v_{Rd}}{q_{Ed}} = \frac{394.3\,\mathrm{kN}/\mathrm{m}}{225\,\mathrm{kN}/\mathrm{m}} = 1.75 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,\text{Feld}} = \frac{V_{Rd}}{V_{Ed}} = \frac{197.2\,\mathrm{kN}}{112.5\,\mathrm{kN}} = 1.75 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsection{Kennzahlen}
 \noindent\textbf{Bewehrungsmass je Kubikmeter Beton, ohne Bügel}
@@ -900,13 +904,13 @@ N_{Rd}^{-} = -4044.1\,\mathrm{kN}
 \noindent\textbf{Querkraftwiderstand in z: je Wand}
 \begin{longtable}{lrrrr}
 \hline
-Wand & $|q_1|\ [\mathrm{kN/m}\ \text{je}\ \mathrm{kN}]$ & $\alpha\ [{}^{\circ}]$ & $v_{Rd}\ [\mathrm{kN/m}]$ & $v_{Rd}/|q_1|\ [\mathrm{kN}]$ \\
+Wand & $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kN}]$ & $\alpha\ [{}^{\circ}]$ & $V_{Rd}\ [\mathrm{kN}]$ & $V_{Rd}/V_1\ [\mathrm{kN}]$ \\
 \hline
 \endhead
-Wand 1 & $0.000$ & $30$ & $394.3$ & $\infty$ \\
-Wand 2 & $1.000$ & $30$ & $394.3$ & $394.3$ \\
-Wand 3 & $0.000$ & $30$ & $394.3$ & $\infty$ \\
-Wand 4 & $1.000$ & $30$ & $394.3$ & $394.3$ \\
+Wand 1 & $0.000$ & $30$ & $78.9$ & $\infty$ \\
+Wand 2 & $0.500$ & $30$ & $197.2$ & $394.3$ \\
+Wand 3 & $0.000$ & $30$ & $78.9$ & $\infty$ \\
+Wand 4 & $0.500$ & $30$ & $197.2$ & $394.3$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Querkraftwiderstand in z, allein – massgebend Wand 2} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
@@ -916,13 +920,13 @@ V_{z,Rd} = 394.3\,\mathrm{kN}
 \noindent\textbf{Querkraftwiderstand in y: je Wand}
 \begin{longtable}{lrrrr}
 \hline
-Wand & $|q_1|\ [\mathrm{kN/m}\ \text{je}\ \mathrm{kN}]$ & $\alpha\ [{}^{\circ}]$ & $v_{Rd}\ [\mathrm{kN/m}]$ & $v_{Rd}/|q_1|\ [\mathrm{kN}]$ \\
+Wand & $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kN}]$ & $\alpha\ [{}^{\circ}]$ & $V_{Rd}\ [\mathrm{kN}]$ & $V_{Rd}/V_1\ [\mathrm{kN}]$ \\
 \hline
 \endhead
-Wand 1 & $2.500$ & $30$ & $394.3$ & $157.7$ \\
-Wand 2 & $0.000$ & $30$ & $394.3$ & $\infty$ \\
-Wand 3 & $2.500$ & $30$ & $394.3$ & $157.7$ \\
-Wand 4 & $0.000$ & $30$ & $394.3$ & $\infty$ \\
+Wand 1 & $0.500$ & $30$ & $78.9$ & $157.7$ \\
+Wand 2 & $0.000$ & $30$ & $197.2$ & $\infty$ \\
+Wand 3 & $0.500$ & $30$ & $78.9$ & $157.7$ \\
+Wand 4 & $0.000$ & $30$ & $197.2$ & $\infty$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Querkraftwiderstand in y, allein – massgebend Wand 1} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
@@ -932,13 +936,13 @@ V_{y,Rd} = 157.7\,\mathrm{kN}
 \noindent\textbf{Torsionswiderstand: je Wand}
 \begin{longtable}{lrrrr}
 \hline
-Wand & $|q_1|\ [\mathrm{kN/m}\ \text{je}\ \mathrm{kNm}]$ & $\alpha\ [{}^{\circ}]$ & $v_{Rd}\ [\mathrm{kN/m}]$ & $v_{Rd}/|q_1|\ [\mathrm{kNm}]$ \\
+Wand & $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kNm}]$ & $\alpha\ [{}^{\circ}]$ & $V_{Rd}\ [\mathrm{kN}]$ & $V_{Rd}/V_1\ [\mathrm{kNm}]$ \\
 \hline
 \endhead
-Wand 1 & $5.000$ & $30$ & $394.3$ & $78.9$ \\
-Wand 2 & $5.000$ & $30$ & $394.3$ & $78.9$ \\
-Wand 3 & $5.000$ & $30$ & $394.3$ & $78.9$ \\
-Wand 4 & $5.000$ & $30$ & $394.3$ & $78.9$ \\
+Wand 1 & $1.000$ & $30$ & $78.9$ & $78.9$ \\
+Wand 2 & $2.500$ & $30$ & $197.2$ & $78.9$ \\
+Wand 3 & $1.000$ & $30$ & $78.9$ & $78.9$ \\
+Wand 4 & $2.500$ & $30$ & $197.2$ & $78.9$ \\
 \hline
 \end{longtable}
 \noindent\textbf{Torsionswiderstand, allein – massgebend Wand 1} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5; 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
@@ -2717,7 +2721,7 @@ M_{z,Rd} = -\sum F_i \cdot (y_i - y_S)
 M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}}
 \end{equation*}
 \subsection{Querkraft und Torsion}
-Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T.
+Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T. Nachgewiesen wird jede Wand mit ihrer ganzen Kraft, nicht je Meter: bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. Trägt eine Wand zwischen zwei Zellen stückweise verschiedene Flüsse, zählt ihr stärkster über die ganze Länge -- nach Vorgabe, nicht nachgeschlagen.
 
 \noindent\textbf{Querkraft über die Federn der Wände}
 \begin{equation*}
@@ -2727,9 +2731,13 @@ k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\,
 \begin{equation*}
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 \end{equation*}
-\noindent\textbf{Widerstand je Länge einer Wand (Fachwerk)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
+\noindent\textbf{Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5}
 \begin{equation*}
-v_{Rd,s} = \frac{A_{sw}}{s}\, f_{yd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
+V_{Ed} = \max |q| \cdot l
+\end{equation*}
+\noindent\textbf{Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
+\begin{equation*}
+V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad V_{Rd,c} = b_w\, l\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad V_{Rd} = \max_\alpha \min(V_{Rd,s};\ V_{Rd,c})
 \end{equation*}
 \noindent\textbf{Versatz: Moment der Querkraftanteile um den Schwerpunkt}
 \begin{equation*}
@@ -3115,7 +3123,7 @@ Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die 
 
 Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass, die Widerstände bei N = 0 und bei reiner Normalkraft, die bezogene Druckzonenhöhe und, mit Schubwänden, der Widerstand gegen Querkraft und Torsion je allein. Gerechnet wird mit der Rechenwahl der Tragsicherheit.
 
-Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand v\_Rd, auf die je Einheitslast der Schubfluss q₁ fällt, trägt v\_Rd/q₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
+Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand V\_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V\_Rd/V₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
 
 \noindent\textbf{Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten}
 \begin{equation*}
@@ -3284,7 +3292,7 @@ Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
 \hline
 \endhead
 Biegung und Normalkraft & Feld & $M_{Rd} = 211.8\,\mathrm{kNm}$ & $M_{Ed} = 150.0\,\mathrm{kNm}$ & $1.41$ \\
-Querkraft und Torsion & Feld & $v_{Rd} = 394.3\,\mathrm{kN}/\mathrm{m}$ & $q_{Ed} = 225.0\,\mathrm{kN}/\mathrm{m}$ & $1.75$ \\
+Querkraft und Torsion & Feld & $V_{Rd} = 197.2\,\mathrm{kN}$ & $V_{Ed} = 112.5\,\mathrm{kN}$ & $1.75$ \\
 \hline
 \end{xltabular}
 \noindent\textbf{Kennzahlen}

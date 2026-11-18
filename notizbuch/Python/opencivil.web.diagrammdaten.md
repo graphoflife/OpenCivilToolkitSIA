@@ -1,5 +1,5 @@
 ---
-erzeugt: 33893d1f378d
+erzeugt: 6bd33d5ff19a
 art: modul
 tags: [modul]
 ---
@@ -328,8 +328,9 @@ def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]
 ```
 
 Der Schubfluss je Stueck einer Wand, mit Vorzeichen entlang der Wand, in
-kN/m -- und je Wand der Widerstand bei der Neigung, die der Nachweis
-gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
+kN/m -- und je Wand ihre ganze Kraft gegen ihren Widerstand, in kN, bei
+der Neigung, die der Nachweis gewaehlt hat. Ohne Verteilung (keine Wand,
+keine Last) nichts.
 
 
 ## Konstanten

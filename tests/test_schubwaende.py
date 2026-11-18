@@ -144,15 +144,53 @@ class TestVerteilung(unittest.TestCase):
         self.assertAlmostEqual(v.aus_querkraft[0], 50e3, delta=1e-3)
 
 
-class TestWiderstand(unittest.TestCase):
+class TestKraftUndWiderstand(unittest.TestCase):
+    """Je Wand die ganze Kraft gegen den ganzen Widerstand, nicht je Meter."""
 
-    def test_fachwerk_je_laenge(self):
+    def test_fachwerk_mit_der_laenge_als_hebelarm(self):
         w = wand("Steg", (0, 0), (0, 0.5), b_w=0.2, a_sw_s=1.0e-3)
         r = sw.widerstand(w, alpha_min=30, alpha_max=45, zugkraft=False)
         a = math.radians(r.alpha)
-        self.assertAlmostEqual(r.v_Rd_s, 1.0e-3 * 435e6 / math.tan(a))
-        self.assertAlmostEqual(r.v_Rd_c, 0.2 * 0.55 * 20e6 * math.sin(a) * math.cos(a))
+        self.assertAlmostEqual(r.V_Rd_s, 1.0e-3 * 0.5 * 435e6 / math.tan(a))
+        self.assertAlmostEqual(r.V_Rd_c, 0.2 * 0.5 * 0.55 * 20e6 * math.sin(a) * math.cos(a))
+        self.assertEqual(r.V_Rd, min(r.V_Rd_s, r.V_Rd_c))
         self.assertTrue(30 <= r.alpha <= 45)
+
+    def test_kasten_unter_torsion_ganze_kraft(self):
+        """Ein Fluss rundum: jede Wand trägt q · l."""
+        waende = kasten(0, 0, 0.3, 0.6)
+        modell = sw.zellen(waende)
+        v = sw.verteilen(waende, modell, V_y=0.0, V_z=0.0, T=36e3, bezug=(0.15, 0.3))
+        q = 36e3 / (2 * 0.18)
+        for w, kraft in zip(waende, sw.wandkraefte(waende, modell, v)):
+            self.assertAlmostEqual(kraft, q * w.laenge, delta=1e-6)
+
+    def test_stuecke_mit_verschiedenem_fluss_zaehlen_das_staerkste(self):
+        """Ein Deckel über zwei Zellen: sein stärkstes Stück über seine ganze Länge."""
+        deckel = wand("Deckel", (0.0, 0.4), (1.0, 0.4))
+        boden = wand("Boden", (1.0, 0.0), (0.0, 0.0))
+        waende = [deckel, boden, wand("links", (0.0, 0.0), (0.0, 0.4)),
+                  wand("Mitte", (0.3, 0.0), (0.3, 0.4)), wand("rechts", (1.0, 0.0), (1.0, 0.4))]
+        modell = sw.zellen(waende)
+        v = sw.verteilen(waende, modell, V_y=0.0, V_z=0.0, T=50e3, bezug=(0.5, 0.2))
+        fluesse = [abs(q) for s, q in zip(modell.stuecke, v.fluss) if s.wand == 0]
+        self.assertEqual(len(fluesse), 2)
+        self.assertGreater(max(fluesse) - min(fluesse), 1.0)
+        self.assertAlmostEqual(sw.wandkraefte(waende, modell, v)[0], max(fluesse) * 1.0)
+
+    def test_bei_gleichstand_die_erste_wand(self):
+        """Gleich bis auf Rundung: massgebend heisst die erste Wand, nicht die Rundung."""
+        self.assertEqual(sw.schwaechste([2.0, 1.0 + 1e-13, 1.0, 3.0]), 1)
+        self.assertEqual(sw.schwaechste([2.0, 1.1, 1.0]), 2)
+        self.assertEqual(sw.schwaechste([math.inf, math.inf]), 0)
+
+    def test_ohne_fluss_keine_kraft(self):
+        """Rundungsrauschen der Verteilung ist keine Kraft."""
+        waende = [wand("links", (0.0, 0.0), (0.0, 0.5)), wand("rechts", (0.5, 0.0), (0.5, 0.5)),
+                  wand("unten", (0.0, 0.0), (0.5, 0.0))]
+        modell = sw.zellen(waende)
+        v = sw.verteilen(waende, modell, V_y=0.0, V_z=100e3, T=0.0, bezug=(0.25, 0.25))
+        self.assertEqual(sw.wandkraefte(waende, modell, v)[2], 0.0)
 
     def test_zug_hebt_die_neigung(self):
         w = wand("Steg", (0, 0), (0, 0.5))

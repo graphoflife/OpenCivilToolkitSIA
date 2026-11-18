@@ -7,6 +7,38 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-18 · Querschnittsanalyse: Schubwände mit ganzer Kraft
+
+Der Nachweis «Querkraft und Torsion» der Querschnittsanalyse rechnet je
+Schubwand mit ihrer ganzen Kraft statt je Meter (Benutzer, selber Tag). Im
+Beispiel «Unterzug», Lastfall Feld, stand für Wand 2 |q_Ed| = 225 kN/m
+gegen v_Rd = 394.3 kN/m; jetzt V_Ed = 112.5 kN gegen V_Rd = 197.2 kN. Der
+Erfüllungsgrad bleibt 1.75 -- jeder bleibt, wie er war.
+
+Warum so:
+
+- Die Norm rechnet selbst so: (55) gibt die Torsion einer Zelle als Kraft
+  je Wand, V_d,i = T_d/(2·A_k)·z_i mit der Länge z_i der Wand, und 4.3.5.5
+  zählt sie mit der Querkraft zusammen (SIA 262:2025, S. 59, nachgeschlagen).
+  Der Widerstand ist das Fachwerk (45), (47) mit z = l.
+- Eine Regel an einer Stelle: `schubwaende.wandkraefte` gibt je Wand
+  V_Ed = max|q|·l, `widerstand` das Fachwerk mit z = l. Nachweis,
+  Kennzahlen und das Bild «Schubfluss» lesen beide. Vorher suchten Nachweis
+  und Kennzahlen das stärkste Stück je für sich, mit verschiedenen Schwellen
+  für das Rundungsrauschen.
+- Trägt eine Wand zwischen zwei Zellen stückweise verschiedene Flüsse,
+  zählt der stärkste über die ganze Länge: nach Vorgabe, auf der sicheren
+  Seite und mit demselben Grad wie je Meter. Steht in [[TODO]] bei
+  «Federmodell und Bredt».
+- Die Kennzahlen V_z,Rd, V_y,Rd und T_Rd zeigen je Wand ebenso V_1 und V_Rd
+  in kN; ihre Werte bleiben.
+- Bei Gleichstand heisst die erste Wand massgebend (`schwaechste`): mit der
+  Länge multipliziert wichen gleiche Werte in der letzten Stelle ab, und
+  unter Torsion hiess sonst Wand 2 statt Wand 1 massgebend.
+- Die Pfeile im Bild «Schubfluss» bleiben ein Fluss in kN/m -- das Bild
+  zeigt, wie er sich verteilt. Seine Legende nennt je Wand V_Ed, V_Rd und
+  α_eff.
+
 ## 2026-11-16 · Kurzform eines Nachweises
 
 Wer in der Zusammenfassung das Auge eines Nachweises anklickt, sieht über

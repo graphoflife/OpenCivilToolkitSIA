@@ -1,5 +1,5 @@
 ---
-erzeugt: 9165670083ce
+erzeugt: ba7413f0930b
 art: thema
 tags: [thema]
 ---
@@ -14,7 +14,7 @@ Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die 
 
 Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass, die Widerstände bei N = 0 und bei reiner Normalkraft, die bezogene Druckzonenhöhe und, mit Schubwänden, der Widerstand gegen Querkraft und Torsion je allein. Gerechnet wird mit der Rechenwahl der Tragsicherheit.
 
-Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand v\_Rd, auf die je Einheitslast der Schubfluss q₁ fällt, trägt v\_Rd/q₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
+Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand V\_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V\_Rd/V₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
 
 Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α\_max die Neigung mit dem grössten Widerstand. Ohne Normalkraft bleiben die Grenzen, wie sie eingegeben sind.
 

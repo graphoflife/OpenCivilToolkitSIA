@@ -5682,10 +5682,16 @@ $$
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 $$
 
-**Widerstand je Länge einer Wand (Fachwerk)** *(SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
+**Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge** *(SIA 262:2025, 4.3.5.2, (55); 4.3.5.5)*
 
 $$
-v_{Rd,s} = \frac{A_{sw}}{s}\, f_{yd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
+V_{Ed} = \max |q| \cdot l
+$$
+
+**Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)** *(SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
+
+$$
+V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad V_{Rd,c} = b_w\, l\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad V_{Rd} = \max_\alpha \min(V_{Rd,s};\ V_{Rd,c})
 $$
 
 **Druckfeld**
@@ -5733,21 +5739,21 @@ $$
 | :--- | ---: | ---: |
 | Zelle 1 | $292500$ | $102.6$ |
 
-**Je Wand: Kraft aus der Querkraft, stärkster Schubfluss, Widerstand**
+**Je Wand: Kraft der Feder, ganze Kraft, Widerstand**
 
-| Wand | $V_i\ [\mathrm{kN}]$ | $\vert q_{Ed}\vert \ [\mathrm{kN/m}]$ | $\alpha\ [{}^{\circ}]$ | $v_{Rd,s}\ [\mathrm{kN/m}]$ | $v_{Rd,c}\ [\mathrm{kN/m}]$ | $v_{Rd}\ [\mathrm{kN/m}]$ | $\alpha_{eff}$ |
+| Wand | $V_i\ [\mathrm{kN}]$ | $V_{Ed}\ [\mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd,s}\ [\mathrm{kN}]$ | $V_{Rd,c}\ [\mathrm{kN}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $\alpha_{eff}$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Wand 1 | $0.0$ | $102.6$ | $30$ | $394.3$ | $714.5$ | $394.3$ | $3.84$ |
-| Wand 2 | $125.0$ | $380.3$ | $30$ | $394.3$ | $714.5$ | $394.3$ | $1.04$ |
-| Wand 3 | $0.0$ | $102.6$ | $30$ | $394.3$ | $714.5$ | $394.3$ | $3.84$ |
-| Wand 4 | $-125.0$ | $175.2$ | $30$ | $394.3$ | $714.5$ | $394.3$ | $2.25$ |
+| Wand 1 | $0.0$ | $66.7$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $3.84$ |
+| Wand 2 | $125.0$ | $171.2$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $1.04$ |
+| Wand 3 | $0.0$ | $66.7$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $3.84$ |
+| Wand 4 | $-125.0$ | $78.8$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $2.25$ |
 
 Massgebend: Wand 2.
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,V,\text{Feld}} = \frac{v_{Rd}}{q_{Ed}} = \frac{394.3\,\mathrm{kN}/\mathrm{m}}{380.3\,\mathrm{kN}/\mathrm{m}} = 1.04 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,\text{Feld}} = \frac{V_{Rd}}{V_{Ed}} = \frac{177.4\,\mathrm{kN}}{171.2\,\mathrm{kN}} = 1.04 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte**
@@ -5788,21 +5794,21 @@ $$
 | :--- | ---: | ---: |
 | Zelle 1 | $292500$ | $0.0$ |
 
-**Je Wand: Kraft aus der Querkraft, stärkster Schubfluss, Widerstand**
+**Je Wand: Kraft der Feder, ganze Kraft, Widerstand**
 
-| Wand | $V_i\ [\mathrm{kN}]$ | $\vert q_{Ed}\vert \ [\mathrm{kN/m}]$ | $\alpha\ [{}^{\circ}]$ | $v_{Rd,s}\ [\mathrm{kN/m}]$ | $v_{Rd,c}\ [\mathrm{kN/m}]$ | $v_{Rd}\ [\mathrm{kN/m}]$ | $\alpha_{eff}$ |
+| Wand | $V_i\ [\mathrm{kN}]$ | $V_{Ed}\ [\mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd,s}\ [\mathrm{kN}]$ | $V_{Rd,c}\ [\mathrm{kN}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $\alpha_{eff}$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Wand 1 | $50.0$ | $76.9$ | $30$ | $394.3$ | $714.5$ | $394.3$ | $5.13$ |
-| Wand 2 | $0.0$ | $0.0$ | $30$ | $394.3$ | $714.5$ | $394.3$ | $\infty$ |
-| Wand 3 | $-50.0$ | $76.9$ | $30$ | $394.3$ | $714.5$ | $394.3$ | $5.13$ |
-| Wand 4 | $0.0$ | $0.0$ | $30$ | $394.3$ | $714.5$ | $394.3$ | $\infty$ |
+| Wand 1 | $50.0$ | $50.0$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $5.13$ |
+| Wand 2 | $0.0$ | $0.0$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $\infty$ |
+| Wand 3 | $-50.0$ | $50.0$ | $30$ | $256.3$ | $464.4$ | $256.3$ | $5.13$ |
+| Wand 4 | $0.0$ | $0.0$ | $30$ | $177.4$ | $321.5$ | $177.4$ | $\infty$ |
 
 Massgebend: Wand 1.
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,V,\text{Schief}} = \frac{v_{Rd}}{q_{Ed}} = \frac{394.3\,\mathrm{kN}/\mathrm{m}}{76.9\,\mathrm{kN}/\mathrm{m}} = 5.13 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,\text{Schief}} = \frac{V_{Rd}}{V_{Ed}} = \frac{256.3\,\mathrm{kN}}{50\,\mathrm{kN}} = 5.13 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte**
@@ -7185,12 +7191,12 @@ $$
 
 **Querkraftwiderstand in z: je Wand**
 
-| Wand | $\vert q_1\vert \ [\mathrm{kN/m}\ \text{je}\ \mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $v_{Rd}\ [\mathrm{kN/m}]$ | $v_{Rd}/\vert q_1\vert \ [\mathrm{kN}]$ |
+| Wand | $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $V_{Rd}/V_1\ [\mathrm{kN}]$ |
 | :--- | ---: | ---: | ---: | ---: |
-| Wand 1 | $0.000$ | $30$ | $394.3$ | $\infty$ |
-| Wand 2 | $1.111$ | $30$ | $394.3$ | $354.9$ |
-| Wand 3 | $0.000$ | $30$ | $394.3$ | $\infty$ |
-| Wand 4 | $1.111$ | $30$ | $394.3$ | $354.9$ |
+| Wand 1 | $0.000$ | $30$ | $256.3$ | $\infty$ |
+| Wand 2 | $0.500$ | $30$ | $177.4$ | $354.9$ |
+| Wand 3 | $0.000$ | $30$ | $256.3$ | $\infty$ |
+| Wand 4 | $0.500$ | $30$ | $177.4$ | $354.9$ |
 
 **Querkraftwiderstand in z, allein – massgebend Wand 2** *(SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
 
@@ -7200,12 +7206,12 @@ $$
 
 **Querkraftwiderstand in y: je Wand**
 
-| Wand | $\vert q_1\vert \ [\mathrm{kN/m}\ \text{je}\ \mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $v_{Rd}\ [\mathrm{kN/m}]$ | $v_{Rd}/\vert q_1\vert \ [\mathrm{kN}]$ |
+| Wand | $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $V_{Rd}/V_1\ [\mathrm{kN}]$ |
 | :--- | ---: | ---: | ---: | ---: |
-| Wand 1 | $0.769$ | $30$ | $394.3$ | $512.6$ |
-| Wand 2 | $0.000$ | $30$ | $394.3$ | $\infty$ |
-| Wand 3 | $0.769$ | $30$ | $394.3$ | $512.6$ |
-| Wand 4 | $0.000$ | $30$ | $394.3$ | $\infty$ |
+| Wand 1 | $0.500$ | $30$ | $256.3$ | $512.6$ |
+| Wand 2 | $0.000$ | $30$ | $177.4$ | $\infty$ |
+| Wand 3 | $0.500$ | $30$ | $256.3$ | $512.6$ |
+| Wand 4 | $0.000$ | $30$ | $177.4$ | $\infty$ |
 
 **Querkraftwiderstand in y, allein – massgebend Wand 1** *(SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
 
@@ -7215,12 +7221,12 @@ $$
 
 **Torsionswiderstand: je Wand**
 
-| Wand | $\vert q_1\vert \ [\mathrm{kN/m}\ \text{je}\ \mathrm{kNm}]$ | $\alpha\ [{}^{\circ}]$ | $v_{Rd}\ [\mathrm{kN/m}]$ | $v_{Rd}/\vert q_1\vert \ [\mathrm{kNm}]$ |
+| Wand | $V_1\ [\mathrm{kN}\ \text{je}\ \mathrm{kNm}]$ | $\alpha\ [{}^{\circ}]$ | $V_{Rd}\ [\mathrm{kN}]$ | $V_{Rd}/V_1\ [\mathrm{kNm}]$ |
 | :--- | ---: | ---: | ---: | ---: |
-| Wand 1 | $1.709$ | $30$ | $394.3$ | $230.7$ |
-| Wand 2 | $1.709$ | $30$ | $394.3$ | $230.7$ |
-| Wand 3 | $1.709$ | $30$ | $394.3$ | $230.7$ |
-| Wand 4 | $1.709$ | $30$ | $394.3$ | $230.7$ |
+| Wand 1 | $1.111$ | $30$ | $256.3$ | $230.7$ |
+| Wand 2 | $0.769$ | $30$ | $177.4$ | $230.7$ |
+| Wand 3 | $1.111$ | $30$ | $256.3$ | $230.7$ |
+| Wand 4 | $0.769$ | $30$ | $177.4$ | $230.7$ |
 
 **Torsionswiderstand, allein – massgebend Wand 1** *(SIA 262:2025, 4.3.5.2, (55); 4.3.5.5; 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
 
@@ -19099,7 +19105,7 @@ $$
 
 ### Querkraft und Torsion
 
-Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T.
+Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T. Nachgewiesen wird jede Wand mit ihrer ganzen Kraft, nicht je Meter: bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. Trägt eine Wand zwischen zwei Zellen stückweise verschiedene Flüsse, zählt ihr stärkster über die ganze Länge -- nach Vorgabe, nicht nachgeschlagen.
 
 **Querkraft über die Federn der Wände**
 
@@ -19113,10 +19119,16 @@ $$
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 $$
 
-**Widerstand je Länge einer Wand (Fachwerk)** *(SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
+**Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge** *(SIA 262:2025, 4.3.5.2, (55); 4.3.5.5)*
 
 $$
-v_{Rd,s} = \frac{A_{sw}}{s}\, f_{yd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
+V_{Ed} = \max |q| \cdot l
+$$
+
+**Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)** *(SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
+
+$$
+V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad V_{Rd,c} = b_w\, l\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad V_{Rd} = \max_\alpha \min(V_{Rd,s};\ V_{Rd,c})
 $$
 
 **Versatz: Moment der Querkraftanteile um den Schwerpunkt**
@@ -20259,7 +20271,7 @@ Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die 
 
 Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass, die Widerstände bei N = 0 und bei reiner Normalkraft, die bezogene Druckzonenhöhe und, mit Schubwänden, der Widerstand gegen Querkraft und Torsion je allein. Gerechnet wird mit der Rechenwahl der Tragsicherheit.
 
-Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand v\_Rd, auf die je Einheitslast der Schubfluss q₁ fällt, trägt v\_Rd/q₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
+Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand V\_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V\_Rd/V₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
 
 **Zugwiderstand bei M\_Ed = 0**
 
@@ -20973,8 +20985,8 @@ $$
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
-| Querkraft und Torsion | Feld | $v_{Rd} = 394.3\,\mathrm{kN}/\mathrm{m}$ | $q_{Ed} = 380.3\,\mathrm{kN}/\mathrm{m}$ | $1.04$ |
-| Querkraft und Torsion | Schief | $v_{Rd} = 394.3\,\mathrm{kN}/\mathrm{m}$ | $q_{Ed} = 76.9\,\mathrm{kN}/\mathrm{m}$ | $5.13$ |
+| Querkraft und Torsion | Feld | $V_{Rd} = 177.4\,\mathrm{kN}$ | $V_{Ed} = 171.2\,\mathrm{kN}$ | $1.04$ |
+| Querkraft und Torsion | Schief | $V_{Rd} = 256.3\,\mathrm{kN}$ | $V_{Ed} = 50.0\,\mathrm{kN}$ | $5.13$ |
 | Biegung und Normalkraft | Feld | $M_{Rd} = 201.3\,\mathrm{kNm}$ | $M_{Ed} = 304.5\,\mathrm{kNm}$ | $0.66$ |
 | Biegung und Normalkraft | Schief | $M_{Rd} = 679.0\,\mathrm{kNm}$ | $M_{Ed} = 291.5\,\mathrm{kNm}$ | $2.33$ |
 | Duktilität | Zug links | $\left(x/d\right)_{max} = 0.350$ | $x/d = 0.168$ | $2.09$ |

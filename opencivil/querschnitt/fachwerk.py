@@ -23,7 +23,8 @@ class Buegelpunkt:
     """
     Was bei einer bestimmten Neigung der Druckdiagonalen aufnehmbar ist.
 
-    Beide Anteile in N/m, also je Laufmeter -- wie ``V_Ed``.
+    Bei der Platte in N/m, je Laufmeter wie ihr ``V_Ed``; bei einer Schubwand
+    in N, fuer die ganze Wand.
     """
 
     alpha: int

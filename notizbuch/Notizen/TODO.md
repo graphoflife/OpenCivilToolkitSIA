@@ -766,8 +766,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Zusammenzählen mit der Querkraft deckt 4.3.5.5. Das Federmodell, die
       Aufteilung auf mehrere Zellen und die Torsion ohne Zelle stehen nicht
       darin: nach Vorgabe eingebaut, in SIA 262:2025 nicht gefunden. Einen
-      Vollquerschnitt rechnet die Norm als Zelle (4.3.5.1). Vom Benutzer
-      bestätigen lassen.
+      Vollquerschnitt rechnet die Norm als Zelle (4.3.5.1). Seit 2026-11-18
+      gilt je Wand die ganze Kraft, V_Ed = max|q|·l, gegen V_Rd mit der
+      Wandlänge als Hebelarm. Für eine Zelle ist das die Norm: (55) gibt die
+      Torsion als Kraft je Wand, V_d,i = T_d·z_i/(2·A_k), und 4.3.5.5 zählt
+      sie mit der Querkraft zusammen (nachgeschlagen, S. 59). Dass bei einer
+      Wand, deren Stücke verschiedene Flüsse tragen, der stärkste über die
+      ganze Länge zählt, ist nach Vorgabe. Vom Benutzer bestätigen lassen.
 - [ ] **Längszugkraft aus Querkraft und Torsion.** Die Formel ist bestätigt
       (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4): je Stück einer Wand
       `ΔN = |q|·l·cot α`, halb in jedem Gurt. Die Norm verlangt sie immer;

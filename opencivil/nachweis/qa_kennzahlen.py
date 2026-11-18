@@ -40,7 +40,7 @@ der Last, darum genuegt je Richtung eine Einheitslast.
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben, Prozedur
 from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, KN, KNM, Groesse
@@ -240,7 +240,7 @@ class KennzahlenQA(Prozedur):
         p.erklaerung(
             "Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im "
             "Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand "
-            "v_Rd, auf die je Einheitslast der Schubfluss q₁ fällt, trägt v_Rd/q₁. "
+            "V_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V_Rd/V₁. "
             "Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.")
         waende = self.analyse.schubwaende_mit(e)
         modell = sw.zellen(waende)
@@ -260,25 +260,20 @@ class KennzahlenQA(Prozedur):
                    einheit, beschriftung: str, waende: Sequence[sw.Wand],
                    modell: sw.Zellenmodell, v: sw.Verteilung,
                    widerstaende: Sequence[sw.Wandwiderstand]) -> None:
-        # Gezeigt je Einheit der Anzeige: q₁ in kN/m je kN (je kNm).
+        # Gezeigt je Einheit der Anzeige: V₁ in kN je kN (je kNm).
         anzeige = einheit.faktor
-        zeilen = []
-        massgebend: Optional[Tuple[float, sw.Wand]] = None
-        for i, (w, r) in enumerate(zip(waende, widerstaende)):
-            fluss = max((abs(q) for s, q in zip(modell.stuecke, v.fluss) if s.wand == i),
-                        default=0.0)
-            # Ein Fluss unter einem Millionstel ist Rundungsrauschen der Verteilung.
-            traegt = r.v_Rd / fluss if fluss > 1e-9 else math.inf
-            zeilen.append([w.name, Mathe(fest(fluss * anzeige / 1e3, 3)), Mathe(f"{r.alpha}"),
-                           Mathe(fest(r.v_Rd / 1e3, 1)),
-                           Mathe("\\infty" if math.isinf(traegt) else fest(traegt / anzeige, 1))])
-            if massgebend is None or traegt < massgebend[0]:
-                massgebend = (traegt, w)
+        kraefte = sw.wandkraefte(waende, modell, v)
+        traegt = [r.V_Rd / kraft if kraft > 0.0 else math.inf
+                  for r, kraft in zip(widerstaende, kraefte)]
+        zeilen = [[w.name, Mathe(fest(kraft * anzeige / 1e3, 3)), Mathe(f"{r.alpha}"),
+                   Mathe(fest(r.V_Rd / 1e3, 1)),
+                   Mathe("\\infty" if math.isinf(t) else fest(t / anzeige, 1))]
+                  for w, r, kraft, t in zip(waende, widerstaende, kraefte, traegt)]
         p.tabelle(
-            kopf=["Wand", Mathe(rf"|q_1|\ [\mathrm{{kN/m}}\ \text{{je}}\ {einheit.latex}]"),
-                  Mathe(r"\alpha\ [{}^{\circ}]"), Mathe(r"v_{Rd}\ [\mathrm{kN/m}]"),
-                  Mathe(rf"v_{{Rd}}/|q_1|\ [{einheit.latex}]")],
+            kopf=["Wand", Mathe(rf"V_1\ [\mathrm{{kN}}\ \text{{je}}\ {einheit.latex}]"),
+                  Mathe(r"\alpha\ [{}^{\circ}]"), Mathe(r"V_{Rd}\ [\mathrm{kN}]"),
+                  Mathe(rf"V_{{Rd}}/V_1\ [{einheit.latex}]")],
             zeilen=zeilen, ausrichtung="lrrrr", titel=f"{beschriftung}: je Wand")
-        wert, wand = massgebend
-        p.wert(self._belegen(ergebnis, kurz, wert),
-               titel=f"{beschriftung}, allein – massgebend {wand.name}")
+        k = sw.schwaechste(traegt)
+        p.wert(self._belegen(ergebnis, kurz, traegt[k]),
+               titel=f"{beschriftung}, allein – massgebend {waende[k].name}")

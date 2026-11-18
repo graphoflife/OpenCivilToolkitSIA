@@ -349,8 +349,9 @@ class TestSchub(unittest.TestCase):
         p = kasten(projekt())
         p.querschnittsanalysen[0].lastfall("Feld", V_z_Ed=150.0)
         u = urteile(p.rechnen(), "V+T")["Feld"]
-        # Je Steg 75 kN auf 500 mm: 150 kN/m.
-        self.assertAlmostEqual(u.einwirkung.groesse.si, 150e3, delta=1e-3)
+        # Je Steg seine ganze Kraft, 75 kN -- nicht 150 kN/m auf 500 mm.
+        self.assertAlmostEqual(u.einwirkung.groesse.si, 75e3, delta=1e-3)
+        self.assertEqual(u.einwirkung.einheit.name, "kN")
         self.assertAlmostEqual(u.erfuellungsgrad.si,
                                u.widerstand.groesse.si / u.einwirkung.groesse.si)
 
@@ -642,8 +643,8 @@ class TestDiagramme(unittest.TestCase):
         self.assertAlmostEqual(f_y, 0.0, places=6)
         self.assertAlmostEqual(f_z, 150.0, places=6)
         self.assertAlmostEqual(moment, 15.0, places=6)
-        # Dieselbe Wand wie im Nachweis ist massgebend.
-        schwach = min(schub["waende"], key=lambda w: w["v_Rd"] / w["q_max"])
+        # Dieselbe Wand wie im Nachweis ist massgebend -- mit ganzen Kräften.
+        schwach = min(schub["waende"], key=lambda w: w["V_Rd"] / w["V_Ed"])
         self.assertEqual(schwach["grad_text"], "1.75")
 
     def test_einachsig(self):

@@ -2013,6 +2013,15 @@
       ]
     },
     {
+      "name": "Kraft einer Wand – ihr stärkster Schubfluss über die ganze Länge",
+      "pfad": "Formelsammlung/Formeln/Kraft einer Wand – ihr stärkster Schubfluss über die ganze Länge.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
       "name": "Kräfte mal Hebelarm um die halbe Höhe",
       "pfad": "Formelsammlung/Formeln/Kräfte mal Hebelarm um die halbe Höhe.md",
       "art": "formel",
@@ -3482,6 +3491,15 @@
       ]
     },
     {
+      "name": "Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)",
+      "pfad": "Formelsammlung/Formeln/Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm).md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
       "name": "Widerstand im normierten Diagramm",
       "pfad": "Formelsammlung/Formeln/Widerstand im normierten Diagramm.md",
       "art": "formel",
@@ -3501,15 +3519,6 @@
       ],
       "themen": [
         "Schiefe Biegung"
-      ]
-    },
-    {
-      "name": "Widerstand je Länge einer Wand (Fachwerk)",
-      "pfad": "Formelsammlung/Formeln/Widerstand je Länge einer Wand (Fachwerk).md",
-      "art": "formel",
-      "zeichen": [],
-      "themen": [
-        "Querkraft und Torsion"
       ]
     },
     {
@@ -7196,8 +7205,10 @@
         "_verschieben",
         "_verschieben_und_drehen",
         "_bredt",
+        "wandkraefte",
+        "schwaechste",
         "Wandwiderstand",
-        "Wandwiderstand.v_Rd",
+        "Wandwiderstand.V_Rd",
         "widerstand",
         "Laengszug",
         "laengszug"

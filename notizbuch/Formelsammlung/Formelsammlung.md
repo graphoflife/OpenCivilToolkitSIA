@@ -1,5 +1,5 @@
 ---
-erzeugt: f1337076df26
+erzeugt: 40412c926e3c
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -33,7 +33,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 - [[Querschnittsanalyse]] · 5
 - [[Schiefe Biegung]] · 11
-- [[Querkraft und Torsion]] · 6
+- [[Querkraft und Torsion]] · 7
 - [[Duktilität je Richtung]] · 4
 - [[Sprödes Versagen je Richtung]] · 7
 
@@ -233,6 +233,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kleinerer Widerstand beider Seiten]] · $V_{Rd,max}$
 - [[Kohäsion für örtliches Abscheren]] · $c^{*}$
 - [[Kopplung am Pfahlkopf]] · $K_{HM}$
+- [[Kraft einer Wand – ihr stärkster Schubfluss über die ganze Länge]]
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · $M_{Rd}(N_{Rd}^{+})$
 - [[Kräftegleichgewicht]] · $N_{Rd}^{+}$
 - [[Kräftegleichgewicht bei M_Ed = 0]]
@@ -367,9 +368,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand der Druckdiagonalen im Pfahl]] · $V_{Rd,c}$
 - [[Widerstand der ersten Betondruckdiagonale]] · $V_{Rd,max}$
 - [[Widerstand der Wendel]] · $V_{Rd,s}$
+- [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)]]
 - [[Widerstand im normierten Diagramm]] · $\bar{R}_{d,x}$
 - [[Widerstand in der Richtung der Einwirkung]] · $M_{Rd}$
-- [[Widerstand je Länge einer Wand (Fachwerk)]]
 - [[Widerstandsmoment zum gezogenen Rand]] · $W$
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · $W$
 - [[Winkel der Einbindetiefe]] · $\vartheta_t$
@@ -392,7 +393,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-126 von 319 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+126 von 320 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

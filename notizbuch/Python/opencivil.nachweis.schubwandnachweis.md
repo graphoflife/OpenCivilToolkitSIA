@@ -1,5 +1,5 @@
 ---
-erzeugt: c3222ca41343
+erzeugt: 54088449d392
 art: modul
 tags: [modul]
 ---
@@ -20,8 +20,11 @@ zugeschaltet ist: der Nachweis von Biegung und Normalkraft liest sie.
 
 ## DER MASSSTAB
 
-Je Wand `v_Rd / |q_Ed|`, gemessen am staerksten Stueck der Wand; massgebend
-ist die schwaechste Wand.
+Je Wand `V_Rd / V_Ed` mit ihrer ganzen Kraft, nicht je Meter (Benutzer,
+2026-11-18): `V_Ed = max|q| · l` gegen das Fachwerk mit ihrer Laenge als
+Hebelarm ([[opencivil.querschnitt.schubwaende#wandkraefte|wandkraefte]],
+[[opencivil.querschnitt.schubwaende#widerstand|widerstand]]). Massgebend ist die
+schwaechste Wand.
 
 ## Inhalt
 
@@ -51,7 +54,7 @@ Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in allen dreien.
 - `modell: sw.Zellenmodell`
 - `verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)`
 - `widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)`
-- `vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)` – Je Wand ihr staerkster Schubfluss gegen ihren Widerstand.
+- `vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)` – Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand.
 
 ### Schubwandnachweis
 
@@ -91,8 +94,9 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Formeln aus diesem Modul
 
+- [[Kraft einer Wand – ihr stärkster Schubfluss über die ganze Länge]] · `Schubwandnachweis._protokoll_ansatz`
 - [[Querkraft über die Federn der Wände]] · `Schubwandnachweis._protokoll_ansatz`
 - [[Torsion in den Zellen (Bredt, mehrzellig)]] · `Schubwandnachweis._protokoll_ansatz`
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · `Schubwandnachweis._ein_fall`
 - [[Was die Zellen tragen]] · `Schubwandnachweis._ein_fall`
-- [[Widerstand je Länge einer Wand (Fachwerk)]] · `Schubwandnachweis._protokoll_ansatz`
+- [[Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)]] · `Schubwandnachweis._protokoll_ansatz`

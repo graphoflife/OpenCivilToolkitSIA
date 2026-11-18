@@ -1,5 +1,5 @@
 ---
-erzeugt: caf3a696abcd
+erzeugt: 9cdc2c3c2690
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,9 @@ tags: [modul]
 Eine Schubwand ist eine Linie im Querschnitt mit einer Dicke `b_w` und
 Buegeln. Sie traegt eine Kraft entlang ihrer Achse; ihre Laenge ist der
 Hebelarm `z` des Fachwerks. Hier wird `(V_y, V_z, T)` auf die Waende
-verteilt, der Widerstand jeder Wand bestimmt und -- auf Wunsch -- die
-Laengszugkraft, die das Druckfeld der Waende im Querschnitt weckt.
+verteilt, die Kraft und der Widerstand jeder Wand bestimmt und -- auf
+Wunsch -- die Laengszugkraft, die das Druckfeld der Waende im Querschnitt
+weckt.
 
 
 ## DIE VERTEILUNG, ELASTISCH
@@ -50,18 +51,24 @@ In jedem Fall gilt: die Wandkraefte ergeben `V_y` und `V_z`, und ihr
 Moment um den Schwerpunkt ist `T`.
 
 
-## WIDERSTAND
+## KRAFT UND WIDERSTAND EINER WAND -- GANZ, NICHT JE METER (Benutzer, 2026-11-18)
 
-Je Wand das Fachwerk aus [[opencivil.querschnitt.fachwerk#fachwerk|opencivil.querschnitt.fachwerk.fachwerk]], je
-Laenge der Wand -- SIA 262:2025, Gl. (45) und (47), durch den Hebelarm geteilt:
+Je Wand das Fachwerk aus [[opencivil.querschnitt.fachwerk#fachwerk|opencivil.querschnitt.fachwerk.fachwerk]] mit
+ihrer Laenge `l` als Hebelarm -- SIA 262:2025, Gl. (45) und (47):
 
 ```
-v_Rd,s = A_sw/s · f_yd · cot α          v_Rd,c = b_w · k_c · f_cd · sin α · cos α
+V_Rd,s = A_sw/s · l · f_yd · cot α      V_Rd,c = b_w · l · k_c · f_cd · sin α · cos α
 ```
 
-α ganzgradig zwischen den Grenzen, massgebend das groesste `min`. Eine Wand,
-die zwischen zwei Zellen in Stuecke zerfaellt, traegt je Stueck einen anderen
-Fluss; nachgewiesen wird das staerkste Stueck.
+α ganzgradig zwischen den Grenzen, massgebend das groesste `min`. Dagegen
+steht die Kraft der Wand, `V_Ed = max|q| · l`: ihr staerkster Schubfluss
+ueber die ganze Laenge ([[opencivil.querschnitt.schubwaende#wandkraefte|wandkraefte]]). Traegt sie ueberall denselben
+Fluss, ist das ihre Kraft -- bei einer Zelle die Kraft aus der Querkraft und
+die aus der Torsion zusammen, wie die Norm sie je Wand rechnet
+([[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_KRAFT]]). Zerfaellt sie zwischen Zellen in Stuecke mit
+verschiedenem Fluss, zaehlt so das staerkste Stueck: nach Vorgabe, nicht
+nachgeschlagen. Der Erfuellungsgrad ist derselbe wie bis 2026-11-18, als je
+Laenge nachgewiesen wurde.
 
 
 ## VORZEICHEN
@@ -74,9 +81,11 @@ Anfangs- zum Endpunkt. Einheiten in SI-Basis.
 ## WAS DIE NORM SAGT
 
 - Eine einzelne Zelle traegt die Torsion mit dem Schubfluss `T / (2 · A_k)`
-  rundum (SIA 262:2025, 4.3.5.2, Gl. (55)). `A_k` ist die Flaeche, die die
-  Laengsbewehrung umschliesst (Figur 20): die Wandachsen gehoeren darum durch
-  die Eckstaebe. Querkraft und Torsion zusammen: 4.3.5.5.
+  rundum; Gl. (55) schreibt ihn als Kraft je Wand, ``V_d,i = T_d / (2 · A_k)
+  · z_i` mit der Laenge `z_i` der Wand (SIA 262:2025, 4.3.5.2). `A_k`` ist
+  die Flaeche, die die Laengsbewehrung umschliesst (Figur 20): die
+  Wandachsen gehoeren darum durch die Eckstaebe. Querkraft und Torsion
+  zusammen, je Wand zusammengezaehlt: 4.3.5.5.
 - Die Laengszugkraft `|q| · l · cot α` je Stueck, halb in jedem Gurt, ihre
   Resultierende also in der Wandmitte: 4.3.3.4.11, Gl. (51), mit lotrechten
   Buegeln; fuer die Torsion 4.3.5.4.
@@ -316,6 +325,29 @@ Unbekannt sind `q_0 … q_(n-1)` und `θ`. Je Zelle:
 
 und dazu `Σ 2·A_k·q_k = T`.
 
+### wandkraefte
+
+```python
+def wandkraefte(waende: Sequence[Wand], modell: Zellenmodell, verteilung: Verteilung) -> List[float]
+```
+
+Je Wand die Kraft, fuer die sie nachgewiesen wird: ihr staerkster
+Schubfluss ueber ihre ganze Laenge, `max|q| · l`, in N
+([[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_KRAFT]]; Stuecke mit verschiedenem Fluss nach Vorgabe --
+siehe Dateikopf). Ein Fluss unter einem Millionstel N/m ist
+Rundungsrauschen der Verteilung und zaehlt als null; sonst stuende beim
+Erfuellungsgrad 8·10¹⁶ statt ∞.
+
+### schwaechste
+
+```python
+def schwaechste(grade: Sequence[float]) -> int
+```
+
+Die Wand mit dem kleinsten Grad. Bei Gleichstand -- bis auf die letzten
+Stellen der Rechnung, etwa alle Waende einer Zelle unter Torsion -- die
+erste, damit nicht Rundung entscheidet, welche Wand massgebend heisst.
+
 ### Wandwiderstand
 
 ```python
@@ -323,17 +355,17 @@ und dazu `Σ 2·A_k·q_k = T`.
 class Wandwiderstand
 ```
 
-Was eine Wand je Laenge aufnimmt, bei der guenstigsten Neigung.
+Was eine Wand ueber ihre ganze Laenge aufnimmt, bei der guenstigsten Neigung.
 
 - `alpha: int`
-- `v_Rd_s: float` – Buegel, in N/m Wandlaenge.
-- `v_Rd_c: float` – Druckdiagonale, in N/m Wandlaenge.
+- `V_Rd_s: float` – Buegel, in N.
+- `V_Rd_c: float` – Druckdiagonale, in N.
 
-#### Wandwiderstand.v_Rd
+#### Wandwiderstand.V_Rd
 
 ```python
 @property
-def v_Rd(self) -> float
+def V_Rd(self) -> float
 ```
 
 ### widerstand
@@ -342,8 +374,8 @@ def v_Rd(self) -> float
 def widerstand(w: Wand, *, alpha_min: int, alpha_max: int, zugkraft: bool) -> Wandwiderstand
 ```
 
-Der Widerstand einer Wand je Laenge: das Fachwerk mit dem Hebelarm eins,
-ganzgradig ueber α, massgebend das groesste `min(v_Rd,s; v_Rd,c)`
+Der Widerstand einer Wand: das Fachwerk mit ihrer Laenge als Hebelarm,
+ganzgradig ueber α, massgebend das groesste `min(V_Rd,s; V_Rd,c)`
 ([[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_WAND]]). Bei Normalzug gelten die gehobenen Grenzen der
 Platte ([[opencivil.querschnitt.platte#druckfeldgrenzen|druckfeldgrenzen]]).
 
@@ -385,6 +417,7 @@ die Mitten nicht im Schwerpunkt, gibt das auch Momente:
 
 - `REFERENZ_WAND = 'SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)'` – Wo der Widerstand einer Wand steht: Buegel und Druckdiagonale.
 - `REFERENZ_ZELLE = 'SIA 262:2025, 4.3.5.2, (55), Figur 20'` – Wo die Torsion einer Zelle steht.
+- `REFERENZ_KRAFT = 'SIA 262:2025, 4.3.5.2, (55); 4.3.5.5'` – Wo die Kraft einer Wand steht: die Torsion als Kraft je Wand, mit der Querkraft zusammengezaehlt.
 - `REFERENZ_TORSION = 'SIA 262:2025, 4.3.5.2, (55); 4.3.5.5; 4.3.3.4.3, (45); 4.3.3.4.6, (4…` – Querkraft und Torsion zusammen: die Zelle, kombiniert nach 4.3.5.5, und je Wand das Fachwerk.
 - `REFERENZ_LAENGSZUG = 'SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4'` – Wo die Laengszugkraft aus dem Druckfeld steht.
 - `KNOTEN_TOLERANZ = 1e-06` – Wann zwei Punkte im Graphen der Wandachsen derselbe Knoten sind, in Metern. Gezeichnet wird auf Millimeter; ein Tausendstel davon fasst alles Rundungsrauschen und trennt alles, was jemand absichtlich auseinanderlegt.

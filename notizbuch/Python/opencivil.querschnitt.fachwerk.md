@@ -1,5 +1,5 @@
 ---
-erzeugt: 79814ca83e17
+erzeugt: f25ab1fd3642
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,8 @@ class Buegelpunkt
 
 Was bei einer bestimmten Neigung der Druckdiagonalen aufnehmbar ist.
 
-Beide Anteile in N/m, also je Laufmeter -- wie `V_Ed`.
+Bei der Platte in N/m, je Laufmeter wie ihr `V_Ed`; bei einer Schubwand
+in N, fuer die ganze Wand.
 
 - `alpha: int` – Neigung der Druckdiagonalen in Grad.
 - `V_Rd_s: float` – Bügel: waechst, je flacher die Diagonale liegt.
