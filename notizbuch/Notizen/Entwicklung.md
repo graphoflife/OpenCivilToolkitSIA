@@ -7,6 +7,29 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-18 · Rechenart mit Bild
+
+Wo man die Rechenart wählt -- Hand, 0.85·x, präzise, elastisch --, steht
+vor dem Wort jetzt ein kleines Bild: wie die Art den Beton rechnet,
+Spannung über Dehnung (Benutzer, selber Tag: die Wörter allein seien
+verwirrend). 0.85·x ist eine Stufe, präzise eine Parabel mit waagrechtem
+Ende, elastisch eine Gerade; die Handrechnung eine Hand, die die Formel
+«x =» hält -- sie rechnet mit dem Block, aber in geschlossenen Formeln.
+Vorher stand dort nur «Hand | 0.85·x | präzise».
+
+- Die Bilder stehen bei den anderen Sinnbildern (`sinnbilder.js`,
+  `rechenart-…`), gezeichnet nach den Gesetzen in `werkstoffgesetz.py`: der
+  Block springt bei 0.15 · ε_c2d auf f_cd, die Parabel wird bei ε_c1d
+  waagrecht.
+- Ein Schalter trägt auf Wunsch zu jeder Stellung ein Bild (`wahlSchalter`,
+  `zeichen`); die Rechenarten bekommen es an einer Stelle
+  (`rechenartStellungen`) -- im Kapitel, in den Karten der Analysen und beim
+  Betongesetz je Material der Querschnittsanalyse.
+- Mit vier Bildern war die Rechenart einen Pixel zu breit für ihr Fenster;
+  sie nimmt jetzt die ganze Zeile, unter φ hindurch.
+
+---
+
 ## 2026-11-18 · Pfahl: Kurzform der Querkraft
 
 Das Auge zeigt die Querkraft im Bohrpfahl jetzt auch kurz, in drei Zeilen:

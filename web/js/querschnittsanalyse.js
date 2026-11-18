@@ -25,7 +25,9 @@ import { el, svgEl, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { span } from './mathe.js';
-import { analysenKapitel, mitKopf, nachweisKapitel } from './nachweise.js';
+import {
+  analysenKapitel, mitKopf, nachweisKapitel, rechenartStellungen,
+} from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { materialienVon, zeichenbereich } from './qa_zeichnung.js';
 import {
@@ -193,7 +195,7 @@ function werkstoffwahl(analyse) {
       }),
       istBeton
         ? wahlSchalter({
-          werte: kurz(wahlen.betongesetze),
+          werte: rechenartStellungen(wahlen.betongesetze),
           gewaehlt: wahl.betongesetz,
           titel: 'Spannungs-Dehnungs-Beziehung des Betons',
           setzen: (v) => setzen(kennung, 'betongesetz', v),

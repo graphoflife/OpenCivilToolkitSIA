@@ -1,6 +1,6 @@
 /**
  * sinnbilder.js -- die Zeichen auf den Knöpfen: die Kapitel eines Bauteils,
- * die Apps links und die Werkzeuge des Zeichenfensters.
+ * die Apps links, die Werkzeuge des Zeichenfensters und die Rechenarten.
  *
  * Einfache Linienbilder, 24 × 24, in der Farbe der Schrift: was das Kapitel
  * zeigt oder prüft, auf einen Blick -- die Interaktionslinie, der geknickte
@@ -284,6 +284,32 @@ const ZEICHEN = {
   },
   'cad-vollbild': {
     pfade: ['M14 4h6v6 M20 4l-6 6 M10 20H4v-6 M4 20l6-6'],
+  },
+
+  // -- Die Rechenarten --------------------------------------------------------
+  // Wie eine Rechenart den Beton rechnet: Spannung über Dehnung auf Druck,
+  // die Dehnung nach rechts (Benutzer, 2026-11-18: die Wörter allein sagen
+  // es nicht). Die Gesetze in querschnitt/werkstoffgesetz.py; das Bild
+  // zeichnet sie nach, mit ε_c1d = 2 ‰ und ε_c2d = 3 ‰ an der Achse.
+
+  // Der Spannungsblock: keine Spannung bis 0.15 · ε_c2d, dann f_cd bis ε_c2d.
+  'rechenart-block': {
+    pfade: [ACHSEN, 'M4 20H6.1V8H18'],
+  },
+  // Parabel bis ε_c1d, dann waagrecht bis ε_c2d.
+  'rechenart-parabel': {
+    pfade: [ACHSEN, 'M4 20Q8.67 8 13.33 8H18'],
+  },
+  // Gerade bis f_c, dann waagrecht -- ohne Ende.
+  'rechenart-elastisch': {
+    pfade: [ACHSEN, 'M4 20L15 6.5H20'],
+  },
+  // Die Handrechnung: eine Hand, die eine Formel hält. Sie rechnet mit dem
+  // Block, aber in geschlossenen Formeln.
+  'rechenart-handrechnung': {
+    pfade: ['M2.5 13h2.5v8.5H2.5z', 'M5 14h5.5a1.8 1.8 0 0 1 0 3.6H8',
+      'M5 20.5h8.5l6.3-3.6a1.5 1.5 0 0 0-1.5-2.6l-4.6 2.6',
+      'M7.5 3.5l3.5 5 M11 3.5l-3.5 5', 'M13.5 5h4 M13.5 7h4'],
   },
 };
 

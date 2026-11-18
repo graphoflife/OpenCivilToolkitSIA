@@ -570,11 +570,13 @@ dialog.materialwahl .fenster-kopf { top: 0; }
   background: var(--flaeche-2); font: inherit; cursor: pointer;
 }
 .schalter-halb {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
   border: none; border-radius: 5px; background: transparent; color: var(--schrift-zart);
   padding: 0 9px; font-size: 11px; font-weight: 700; cursor: pointer;
   text-transform: uppercase;
 }
+/* Eine Stellung mit Bild (`zeichen`), etwa die Rechenart: Spannung über Dehnung. */
+.schalter-halb > .sinnbild { width: 18px; height: 18px; flex: none; }
 .schalter:hover .schalter-halb:not(.ist-an) { color: var(--schrift-matt); }
 .schalter-halb.ist-an {
   background: var(--blau); color: #fff; box-shadow: 0 1px 2px rgba(16, 24, 40, .25);
@@ -1303,12 +1305,13 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 /* Die Rechenwahl eines Kapitels: ein kleiner Titel, darunter φ, Werte und
    Rechenart. φ so breit wie eine kurze Zahl; Werte und Rechenart sind
    Schalter und stehen untereinander -- nebeneinander fänden «Bemessung |
-   charakteristisch» und vier Rechenarten keinen Platz. */
+   charakteristisch» und vier Rechenarten keinen Platz. Die Rechenart nimmt
+   die ganze Breite, unter φ hindurch: mit ihren Bildern braucht sie sie. */
 .rechenwahl {
   display: grid; gap: 1px 6px; align-items: end; margin: 2px 0 8px;
   grid-template-columns: calc(5ch + var(--pfeilspur) + 10px) minmax(0, 1fr);
 }
-.rechenwahl > :nth-child(4) { grid-column: 2; }
+.rechenwahl > :nth-child(4) { grid-column: 1 / -1; }
 .rechenwahl-titel {
   grid-column: 1 / -1; font-size: 11px; font-weight: 600; color: var(--schrift-matt);
 }

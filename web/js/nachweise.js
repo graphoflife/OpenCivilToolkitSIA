@@ -510,6 +510,17 @@ export function mitKopf(kopf, eingabe, formel = false) {
  * Analysen rechnet der ungerissene Teil immer mit E_cm/(1+φ), dort wirkt φ
  * bei jeder Art.
  */
+/**
+ * Rechenarten -- oder Betongesetze, die wie sie heissen -- als Stellungen
+ * eines Schalters: ihr Bild, der kurze Name, der lange im Titel. Das Bild
+ * zeigt, wie die Art den Beton rechnet (sinnbilder.js, `rechenart-…`).
+ */
+export function rechenartStellungen(liste) {
+  return (liste || []).map((e) => ({
+    wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung, zeichen: `rechenart-${e.wert}`,
+  }));
+}
+
 function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = false } = {}) {
   const wahlen = katalog('rechenwahl');
   const liste = wahlen[arten] || [];
@@ -534,7 +545,7 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
       klasse: '.ist-wortlaut',
     })),
     mitKopf('Rechenart', wahlSchalter({
-      werte: kurz(liste),
+      werte: rechenartStellungen(liste),
       gewaehlt: ziel.rechenart,
       titel: 'Wie gerechnet wird',
       setzen: (v) => aendern((x) => { x.rechenart = v; }),
