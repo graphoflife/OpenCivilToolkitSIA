@@ -7,6 +7,14 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-18 · Balkensystem: «QS Analyse» statt «Aus QS Analyse»
+
+Der Schalter steht unter «A und I aus», und dort las man «A und I aus …
+Aus QS Analyse». Jetzt heisst die Stellung «QS Analyse», ebenso die Zeile
+in der Hilfe. Der Benutzer hatte die Wahl der Empfehlung überlassen.
+
+---
+
 ## 2026-11-18 · Querschnittsanalyse: jede Schubwand für sich
 
 Eine gezeichnete Wand ist dort geteilt, wo eine andere auf ihr endet oder

@@ -118,7 +118,7 @@ const TEXTE = {
           ['Vorlage', 'A und I nach den Formeln der Vorlage, Masse in mm'],
           ['Profil', 'ein Stahlprofil aus der Tabelle -- A und I_y oder I_z aus seinen Massen, in cm² und cm⁴; y ist die starke Achse, der Steg liegt dann in der Ebene des Rahmens'],
           ['Platte', 'ein Streifen b × h der gewählten Platte'],
-          ['Aus QS Analyse', 'A und I_y des Bruttoquerschnitts der gewählten Querschnittsanalyse'],
+          ['QS Analyse', 'A und I_y des Bruttoquerschnitts der gewählten Querschnittsanalyse'],
           ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, bei einer Analyse auf Wunsch E_eq bei N und M, für EA und EI (für EA eine Näherung)'],
           ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten -- bei einer Platte immer in x-Richtung, Zug unten'],
           ['Steifigkeit', 'EA, EI am Bruttoquerschnitt, beim Beton ungerissen und ohne Bewehrung (SIA 262:2025, 4.1.4.1.3); Theorie 1. Ordnung'],

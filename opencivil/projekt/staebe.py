@@ -76,15 +76,17 @@ class Querschnittsart(Wahl):
     def kurz(self) -> str:
         """
         Fuer den Schalter und die Zeile des Querschnitts -- der lange Name
-        steht im Titel des Schalters. «Aus QS Analyse», nicht «Analyse»: im
+        steht im Titel des Schalters. «QS Analyse», nicht «Analyse»: im
         Balkensystem heisst auch die Statik-Analyse so (Benutzer, 2026-11-16).
+        Ohne «Aus»: der Schalter steht unter «A und I aus» (Benutzer,
+        2026-11-18).
         """
         return {
             Querschnittsart.VORLAGE: "Vorlage",
             Querschnittsart.PROFIL: "Profil",
             Querschnittsart.KENNWERTE: "Kennwerte",
             Querschnittsart.PLATTE: "Platte",
-            Querschnittsart.ANALYSE: "Aus QS Analyse",
+            Querschnittsart.ANALYSE: "QS Analyse",
         }[self]
 
     @property
