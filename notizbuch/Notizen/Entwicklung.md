@@ -7,6 +7,35 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-18 · Querschnittsanalyse: jede Schubwand für sich
+
+Eine gezeichnete Wand ist dort geteilt, wo eine andere auf ihr endet oder
+sie kreuzt, und jedes Teil ist eine eigene Schubwand mit eigener Kraft und
+eigenem Widerstand (Benutzer, selber Tag: «jede Schubwand separat … die
+Einwirkung präzise verteilen»). Ein Deckel über zwei Zellen ist so zwei
+Wände, «Wand 1.1» und «Wand 1.2». Mit einer Mittelwand im Unterzug
+zerfällt der Boden, Wand 1, in Wand 1.1 (70 mm) mit 5.1 kN gegen 27.6 kN und
+Wand 1.2 (130 mm) mit 11.4 kN gegen 51.3 kN; vorher zählte er als eine Wand
+mit dem stärkeren Fluss über seine ganze Länge. In der Zusammenfassung steht
+die massgebende Wand.
+
+- Geteilt wird einmal, an der Grenze (`schubwaende.einzeln`, gerufen von
+  `zellen`): das Modell hält die geteilten Wände, und Verteilung, Kraft,
+  Längszug, Nachweis, Kennzahlen und Bild rechnen ohne den Umweg über
+  «Stücke einer Wand». Die Klasse `Stueck` ist weg.
+- Die Federn ändert das Teilen nicht: Teile auf einer Linie verschieben und
+  drehen sich gleich, ihr Fluss ist der der ganzen Wand -- ein Test zeichnet
+  denselben Kasten einmal mit ganzem, einmal mit geteiltem Deckel.
+- Das Bild «Schubfluss» zeichnet jede geteilte Wand mit Band, Pfeil und
+  Farbe; rot wird nur das Teil, das nicht hält. Es liest dafür nicht mehr
+  die gezeichneten Wände, sondern die des Nachweises.
+- Die Formel heisst jetzt V_Ed = |q|·l, «Kraft einer Wand: ihr Schubfluss
+  über ihre Länge»; die Regel «der stärkste Fluss über die ganze Länge» und
+  ihr Eintrag in [[TODO]] sind weg. In den Beispielen ist keine Wand geteilt,
+  ihre Zahlen bleiben.
+
+---
+
 ## 2026-11-18 · Querschnittsanalyse: Schubwände mit ganzer Kraft
 
 Der Nachweis «Querkraft und Torsion» der Querschnittsanalyse rechnet je

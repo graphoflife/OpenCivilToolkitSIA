@@ -39,21 +39,22 @@ alle Waende aus demselben Beton sind.
 In jedem Fall gilt: die Wandkraefte ergeben ``V_y`` und ``V_z``, und ihr
 Moment um den Schwerpunkt ist ``T``.
 
-KRAFT UND WIDERSTAND EINER WAND -- GANZ, NICHT JE METER (Benutzer, 2026-11-18):
-Je Wand das Fachwerk aus :func:`opencivil.querschnitt.fachwerk.fachwerk` mit
-ihrer Laenge ``l`` als Hebelarm -- SIA 262:2025, Gl. (45) und (47)::
+JEDE WAND FUER SICH, MIT IHRER GANZEN KRAFT (Benutzer, 2026-11-18):
+Eine gezeichnete Wand, auf der eine andere endet oder die eine andere
+kreuzt, zerfaellt dort in Waende von Knoten zu Knoten (:func:`einzeln`):
+«Wand 1.1», «Wand 1.2». Jede traegt so ueberall denselben Fluss ``q`` und
+wird fuer sich nachgewiesen -- der Deckel ueber zwei Zellen als zwei Waende.
+Ihre Kraft ist ``V_Ed = |q| · l`` (:func:`wandkraefte`), bei einer Zelle die
+Kraft aus der Querkraft und die aus der Torsion zusammen, wie die Norm sie
+je Wand rechnet (:data:`REFERENZ_KRAFT`). Ihr Widerstand ist das Fachwerk aus
+:func:`opencivil.querschnitt.fachwerk.fachwerk` mit ihrer Laenge ``l`` als
+Hebelarm -- SIA 262:2025, Gl. (45) und (47)::
 
     V_Rd,s = A_sw/s · l · f_yd · cot α      V_Rd,c = b_w · l · k_c · f_cd · sin α · cos α
 
-α ganzgradig zwischen den Grenzen, massgebend das groesste ``min``. Dagegen
-steht die Kraft der Wand, ``V_Ed = max|q| · l``: ihr staerkster Schubfluss
-ueber die ganze Laenge (:func:`wandkraefte`). Traegt sie ueberall denselben
-Fluss, ist das ihre Kraft -- bei einer Zelle die Kraft aus der Querkraft und
-die aus der Torsion zusammen, wie die Norm sie je Wand rechnet
-(:data:`REFERENZ_KRAFT`). Zerfaellt sie zwischen Zellen in Stuecke mit
-verschiedenem Fluss, zaehlt so das staerkste Stueck: nach Vorgabe, nicht
-nachgeschlagen. Der Erfuellungsgrad ist derselbe wie bis 2026-11-18, als je
-Laenge nachgewiesen wurde.
+α ganzgradig zwischen den Grenzen, massgebend das groesste ``min``. Die
+Verteilung aendert das Teilen nicht: Teile auf einer Linie verschieben und
+drehen sich gleich, ihr Fluss ist der der ganzen Wand.
 
 VORZEICHEN:
 y nach rechts, z nach oben; ``V_y``, ``V_z`` in Achsrichtung; ``T`` im
@@ -67,7 +68,7 @@ WAS DIE NORM SAGT:
   die Flaeche, die die Laengsbewehrung umschliesst (Figur 20): die
   Wandachsen gehoeren darum durch die Eckstaebe. Querkraft und Torsion
   zusammen, je Wand zusammengezaehlt: 4.3.5.5.
-- Die Laengszugkraft ``|q| · l · cot α`` je Stueck, halb in jedem Gurt, ihre
+- Die Laengszugkraft ``|q| · l · cot α`` je Wand, halb in jedem Gurt, ihre
   Resultierende also in der Wandmitte: 4.3.3.4.11, Gl. (51), mit lotrechten
   Buegeln; fuer die Torsion 4.3.5.4.
 - Das Federmodell, die Verteilung auf mehrere Zellen mit gleicher
@@ -81,7 +82,7 @@ WAS DIE NORM SAGT:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.querschnitt.fachwerk import beste_neigung, fachwerk
@@ -161,38 +162,23 @@ class Wand:
 
 
 @dataclass(frozen=True)
-class Stueck:
-    """Ein Stueck einer Wand zwischen zwei Knoten des Graphen."""
-
-    wand: int
-    von: Punkt
-    bis: Punkt
-
-    @property
-    def laenge(self) -> float:
-        return math.hypot(self.bis[0] - self.von[0], self.bis[1] - self.von[1])
-
-    @property
-    def mitte(self) -> Punkt:
-        return ((self.von[0] + self.bis[0]) / 2.0, (self.von[1] + self.bis[1]) / 2.0)
-
-
-@dataclass(frozen=True)
 class Zelle:
-    """Eine geschlossene Flaeche, umrandet von Wandstuecken."""
+    """Eine geschlossene Flaeche, umrandet von Waenden."""
 
     flaeche: float
     """``A_k``, umschlossen von den Wandachsen -- die Norm meint die Laengsbewehrung."""
 
     rand: Tuple[Tuple[int, int], ...]
-    """Je Randstueck: (Index, +1 wenn die Zelle es in seiner Richtung umlaeuft)."""
+    """Je Randwand: (Index, +1 wenn die Zelle sie in ihrer Richtung umlaeuft)."""
 
 
 @dataclass(frozen=True)
 class Zellenmodell:
-    """Die Waende als Graph: ihre Stuecke und die Zellen, die sie bilden."""
+    """Die Waende als Graph: jede einzeln, von Knoten zu Knoten, und die Zellen, die sie bilden."""
 
-    stuecke: Tuple[Stueck, ...]
+    waende: Tuple[Wand, ...]
+    """Die Schubwaende, wie der Nachweis sie sieht (:func:`einzeln`)."""
+
     zellen: Tuple[Zelle, ...]
 
 
@@ -224,21 +210,18 @@ def _kreuzung(a1: Punkt, a2: Punkt, b1: Punkt, b2: Punkt) -> Optional[Tuple[floa
     return None
 
 
-def zellen(waende: Sequence[Wand]) -> Zellenmodell:
+def einzeln(gezeichnet: Sequence[Wand]) -> List[Wand]:
     """
-    Die Wandachsen als ebener Graph, und die Zellen darin.
-
-    Knoten sind die Wandenden, die Stellen, an denen eine Wand auf einer
-    anderen endet, und Kreuzungen. Dazwischen liegen die Stuecke. Ein Stueck,
-    das zu keinem Kreis gehoert -- eine freie Wand, eine Bruecke zwischen zwei
-    Kaesten --, gehoert zu keiner Zelle. Die Zellen sind die beschraenkten
-    Flaechen des Graphen; gefunden, indem jeder Rand so umlaufen wird, dass die
-    Flaeche links liegt.
+    Jede Schubwand fuer sich (Benutzer, 2026-11-18): eine gezeichnete Wand,
+    auf der eine andere endet oder die eine andere kreuzt, zerfaellt dort in
+    Waende von Knoten zu Knoten. Jede traegt dann ueberall denselben Fluss --
+    der Deckel ueber zwei Zellen ist zwei Waende, jede mit ihrer Kraft und
+    ihrem Widerstand. Die Teile heissen nach ihrer Wand, gezaehlt von deren
+    Anfang: «Wand 1.1», «Wand 1.2». Eine Wand ohne Knoten behaelt ihren Namen.
     """
-    # -- Stuecke: jede Wand an allen Knoten auf ihr geteilt -----------------
-    teilungen: List[List[float]] = [[0.0, 1.0] for _ in waende]
-    for i, w in enumerate(waende):
-        for j, v in enumerate(waende):
+    teilungen: List[List[float]] = [[0.0, 1.0] for _ in gezeichnet]
+    for i, w in enumerate(gezeichnet):
+        for j, v in enumerate(gezeichnet):
             if i == j:
                 continue
             for p in (v.von, v.bis):
@@ -250,14 +233,30 @@ def zellen(waende: Sequence[Wand]) -> Zellenmodell:
                 if k is not None:
                     teilungen[i].append(k[0])
                     teilungen[j].append(k[1])
-    stuecke: List[Stueck] = []
-    for i, w in enumerate(waende):
+    waende: List[Wand] = []
+    for i, w in enumerate(gezeichnet):
         ts = sorted(set(round(t, 12) for t in teilungen[i]))
-        punkte = [(w.von[0] + t * (w.bis[0] - w.von[0]),
-                   w.von[1] + t * (w.bis[1] - w.von[1])) for t in ts]
-        for a, b in zip(punkte, punkte[1:]):
-            if math.hypot(b[0] - a[0], b[1] - a[1]) > KNOTEN_TOLERANZ:
-                stuecke.append(Stueck(wand=i, von=a, bis=b))
+        punkte = [w.bis if t == 1.0 else (w.von[0] + t * (w.bis[0] - w.von[0]),
+                                          w.von[1] + t * (w.bis[1] - w.von[1])) for t in ts]
+        teile = [(a, b) for a, b in zip(punkte, punkte[1:])
+                 if math.hypot(b[0] - a[0], b[1] - a[1]) > KNOTEN_TOLERANZ]
+        for k, (a, b) in enumerate(teile, start=1):
+            waende.append(w if len(teile) == 1 else replace(w, name=f"{w.name}.{k}", von=a, bis=b))
+    return waende
+
+
+def zellen(gezeichnet: Sequence[Wand]) -> Zellenmodell:
+    """
+    Die Schubwaende einzeln (:func:`einzeln`) als ebener Graph, und die
+    Zellen darin.
+
+    Knoten sind die Wandenden; dazwischen liegt je eine Wand. Eine Wand, die
+    zu keinem Kreis gehoert -- eine freie Wand, eine Bruecke zwischen zwei
+    Kaesten --, gehoert zu keiner Zelle. Die Zellen sind die beschraenkten
+    Flaechen des Graphen; gefunden, indem jeder Rand so umlaufen wird, dass die
+    Flaeche links liegt.
+    """
+    waende = einzeln(gezeichnet)
 
     # -- Knoten zusammenfassen ----------------------------------------------
     knoten: List[Punkt] = []
@@ -269,7 +268,7 @@ def zellen(waende: Sequence[Wand]) -> Zellenmodell:
         knoten.append(p)
         return len(knoten) - 1
 
-    kanten = [(knoten_von(s.von), knoten_von(s.bis)) for s in stuecke]
+    kanten = [(knoten_von(w.von), knoten_von(w.bis)) for w in waende]
 
     # -- Bruecken entfernen: Kanten auf keinem Kreis (Tarjan) ---------------
     nachbarn: Dict[int, List[Tuple[int, int]]] = {}
@@ -351,7 +350,7 @@ def zellen(waende: Sequence[Wand]) -> Zellenmodell:
             flaeche /= 2.0
             if flaeche > KNOTEN_TOLERANZ ** 2:
                 gefunden.append(Zelle(flaeche=flaeche, rand=tuple(rand)))
-    return Zellenmodell(stuecke=tuple(stuecke), zellen=tuple(gefunden))
+    return Zellenmodell(waende=tuple(waende), zellen=tuple(gefunden))
 
 
 # ===========================================================================
@@ -416,7 +415,7 @@ class Verteilung:
     """Je Wand die Kraft entlang ihrer Achse aus der Verschiebung, in N."""
 
     fluss: Tuple[float, ...]
-    """Je Stueck der Schubfluss entlang seiner Wand, in N/m -- alles zusammen."""
+    """Je Wand der Schubfluss entlang ihrer Achse, in N/m -- alles zusammen."""
 
     versatz: float
     """``ΔT``: das Moment der Querkraftanteile um den Schwerpunkt, in Nm."""
@@ -435,10 +434,8 @@ def _hebel(w: Wand, bezug: Punkt) -> float:
     return (p[0] - bezug[0]) * e[1] - (p[1] - bezug[1]) * e[0]
 
 
-def verteilen(
-    waende: Sequence[Wand], modell: Zellenmodell, *, V_y: float, V_z: float,
-    T: float, bezug: Punkt,
-) -> Verteilung:
+def verteilen(modell: Zellenmodell, *, V_y: float, V_z: float, T: float,
+              bezug: Punkt) -> Verteilung:
     """
     ``(V_y, V_z, T)`` auf die Waende, nach dem Modell im Kopf dieser Datei.
 
@@ -446,12 +443,13 @@ def verteilen(
     koennen -- etwa V_y bei lauter senkrechten Waenden, oder Torsion bei einer
     einzigen Wand.
     """
+    waende = modell.waende
     if not waende:
         raise WandFehler("Es gibt keine Schubwand.")
     if modell.zellen:
         kraefte = _verschieben(waende, V_y, V_z)
         versatz = sum(V * _hebel(w, bezug) for V, w in zip(kraefte, waende))
-        zellenfluss = _bredt(waende, modell, T - versatz)
+        zellenfluss = _bredt(modell, T - versatz)
         mit_drehung = False
     else:
         kraefte = _verschieben_und_drehen(waende, V_y, V_z, T, bezug)
@@ -459,14 +457,10 @@ def verteilen(
         zellenfluss = ()
         mit_drehung = True
 
-    fluss = []
-    for i, s in enumerate(modell.stuecke):
-        q = kraefte[s.wand] / waende[s.wand].laenge
-        for k, zelle in enumerate(modell.zellen):
-            for e, r in zelle.rand:
-                if e == i:
-                    q += r * zellenfluss[k]
-        fluss.append(q)
+    fluss = [V / w.laenge for V, w in zip(kraefte, waende)]
+    for k, zelle in enumerate(modell.zellen):
+        for e, r in zelle.rand:
+            fluss[e] += r * zellenfluss[k]
     return Verteilung(aus_querkraft=tuple(kraefte), fluss=tuple(fluss),
                       versatz=versatz, zellenfluss=tuple(zellenfluss),
                       mit_drehung=mit_drehung)
@@ -522,7 +516,7 @@ def _verschieben_und_drehen(waende: Sequence[Wand], V_y: float, V_z: float,
     return kraefte
 
 
-def _bredt(waende: Sequence[Wand], modell: Zellenmodell, T: float) -> List[float]:
+def _bredt(modell: Zellenmodell, T: float) -> List[float]:
     """
     Die Umlauf-Schubfluesse der Zellen: Gleichgewicht und gleiche Verdrillung.
     Eine Zelle allein ergibt ``T / (2 · A_k)`` (:data:`REFERENZ_ZELLE`); die
@@ -542,8 +536,8 @@ def _bredt(waende: Sequence[Wand], modell: Zellenmodell, T: float) -> List[float
     A = [[0.0] * (n + 1) for _ in range(n + 1)]
     for k, zelle in enumerate(modell.zellen):
         for e, r in zelle.rand:
-            s = modell.stuecke[e]
-            nachgiebig = s.laenge / waende[s.wand].b_w
+            w = modell.waende[e]
+            nachgiebig = w.laenge / w.b_w
             A[k][k] += nachgiebig
             nachbar = seite.get((e, -r))
             if nachbar is not None:
@@ -559,20 +553,15 @@ def _bredt(waende: Sequence[Wand], modell: Zellenmodell, T: float) -> List[float
 # ===========================================================================
 
 
-def wandkraefte(waende: Sequence[Wand], modell: Zellenmodell,
-                verteilung: Verteilung) -> List[float]:
+def wandkraefte(modell: Zellenmodell, verteilung: Verteilung) -> List[float]:
     """
-    Je Wand die Kraft, fuer die sie nachgewiesen wird: ihr staerkster
-    Schubfluss ueber ihre ganze Laenge, ``max|q| · l``, in N
-    (:data:`REFERENZ_KRAFT`; Stuecke mit verschiedenem Fluss nach Vorgabe --
-    siehe Dateikopf). Ein Fluss unter einem Millionstel N/m ist
-    Rundungsrauschen der Verteilung und zaehlt als null; sonst stuende beim
-    Erfuellungsgrad 8·10¹⁶ statt ∞.
+    Je Wand die Kraft, fuer die sie nachgewiesen wird: ihr Schubfluss ueber
+    ihre Laenge, ``|q| · l``, in N (:data:`REFERENZ_KRAFT`). Ein Fluss unter
+    einem Millionstel N/m ist Rundungsrauschen der Verteilung und zaehlt als
+    null; sonst stuende beim Erfuellungsgrad 8·10¹⁶ statt ∞.
     """
-    staerkster = [0.0] * len(waende)
-    for s, q in zip(modell.stuecke, verteilung.fluss):
-        staerkster[s.wand] = max(staerkster[s.wand], abs(q))
-    return [(q if q > 1e-6 else 0.0) * w.laenge for q, w in zip(staerkster, waende)]
+    return [(abs(q) if abs(q) > 1e-6 else 0.0) * w.laenge
+            for w, q in zip(modell.waende, verteilung.fluss)]
 
 
 def schwaechste(grade: Sequence[float]) -> int:
@@ -629,7 +618,7 @@ class Laengszug:
 def laengszug(modell: Zellenmodell, verteilung: Verteilung,
               neigungen: Sequence[int], bezug: Punkt) -> Laengszug:
     """
-    ``ΔN = Σ |q|·l·cot α`` ueber alle Wandstuecke, je Stueck in seiner Mitte
+    ``ΔN = Σ |q|·l·cot α`` ueber alle Waende, je Wand in ihrer Mitte
     (:data:`REFERENZ_LAENGSZUG`).
 
     Das Druckfeld einer Wand mit dem Fluss q braucht je Laenge den Zug
@@ -642,9 +631,9 @@ def laengszug(modell: Zellenmodell, verteilung: Verteilung,
     ``neigungen`` ist je Wand das α, das ihr Nachweis waehlt.
     """
     N = M_y = M_z = 0.0
-    for s, q in zip(modell.stuecke, verteilung.fluss):
-        kraft = abs(q) * s.laenge / math.tan(math.radians(neigungen[s.wand]))
-        mitte = s.mitte
+    for w, q, alpha in zip(modell.waende, verteilung.fluss, neigungen):
+        kraft = abs(q) * w.laenge / math.tan(math.radians(alpha))
+        mitte = w.mitte
         N += kraft
         M_y -= kraft * (mitte[1] - bezug[1])
         M_z -= kraft * (mitte[0] - bezug[0])

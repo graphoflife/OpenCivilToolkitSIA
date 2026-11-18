@@ -983,10 +983,10 @@ $$
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 $$
 
-**Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge** *(SIA 262:2025, 4.3.5.2, (55); 4.3.5.5)*
+**Kraft einer Wand: ihr Schubfluss über ihre Länge** *(SIA 262:2025, 4.3.5.2, (55); 4.3.5.5)*
 
 $$
-V_{Ed} = \max |q| \cdot l
+V_{Ed} = |q| \cdot l
 $$
 
 **Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)** *(SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
@@ -3468,7 +3468,7 @@ $$
 
 ### Querkraft und Torsion
 
-Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T. Nachgewiesen wird jede Wand mit ihrer ganzen Kraft, nicht je Meter: bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. Trägt eine Wand zwischen zwei Zellen stückweise verschiedene Flüsse, zählt ihr stärkster über die ganze Länge -- nach Vorgabe, nicht nachgeschlagen.
+Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T. Eine gezeichnete Wand ist dort geteilt, wo eine andere auf ihr endet oder sie kreuzt (Wand 1.1, Wand 1.2 …): jede trägt so überall denselben Fluss und wird für sich nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter -- bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. In der Zusammenfassung steht die massgebende Wand.
 
 **Querkraft über die Federn der Wände**
 
@@ -3482,10 +3482,10 @@ $$
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 $$
 
-**Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge** *(SIA 262:2025, 4.3.5.2, (55); 4.3.5.5)*
+**Kraft einer Wand: ihr Schubfluss über ihre Länge** *(SIA 262:2025, 4.3.5.2, (55); 4.3.5.5)*
 
 $$
-V_{Ed} = \max |q| \cdot l
+V_{Ed} = |q| \cdot l
 $$
 
 **Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)** *(SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47))*

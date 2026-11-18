@@ -25,15 +25,15 @@ def kasten(y0, z0, b, h, b_w=0.2, praefix="K"):
     return [wand(f"{praefix}{i + 1}", ecken[i], ecken[(i + 1) % 4], b_w) for i in range(4)]
 
 
-def summen(waende, modell, verteilung, bezug):
-    """Kraft in y, in z und Moment um den Bezugspunkt -- aus den Stücken."""
+def summen(modell, verteilung, bezug):
+    """Kraft in y, in z und Moment um den Bezugspunkt -- aus den Wänden."""
     F_y = F_z = M = 0.0
-    for s, q in zip(modell.stuecke, verteilung.fluss):
-        e = waende[s.wand].richtung
-        kraft = q * s.laenge
+    for w, q in zip(modell.waende, verteilung.fluss):
+        e = w.richtung
+        kraft = q * w.laenge
         F_y += kraft * e[0]
         F_z += kraft * e[1]
-        m = s.mitte
+        m = w.mitte
         M += kraft * ((m[0] - bezug[0]) * e[1] - (m[1] - bezug[1]) * e[0])
     return F_y, F_z, M
 
@@ -59,12 +59,45 @@ class TestZellen(unittest.TestCase):
         self.assertEqual(sw.zellen([wand("Steg", (0, 0), (0, 0.5))]).zellen, ())
 
 
+class TestEinzeln(unittest.TestCase):
+    """Jede Schubwand für sich: an ihren Knoten geteilt, sonst wie gezeichnet."""
+
+    def test_ohne_knoten_wie_gezeichnet(self):
+        waende = kasten(0, 0, 0.3, 0.6)
+        self.assertEqual(sw.einzeln(waende), waende)
+
+    def test_t_stoss_teilt_den_flansch(self):
+        flansch = wand("Wand 1", (0.0, 0.5), (1.0, 0.5))
+        steg = wand("Wand 2", (0.4, 0.5), (0.4, 0.0))
+        teile = sw.einzeln([flansch, steg])
+        self.assertEqual([w.name for w in teile], ["Wand 1.1", "Wand 1.2", "Wand 2"])
+        self.assertEqual([(w.von, w.bis) for w in teile[:2]],
+                         [((0.0, 0.5), (0.4, 0.5)), ((0.4, 0.5), (1.0, 0.5))])
+        self.assertEqual({(w.b_w, w.a_sw_s, w.f_yd) for w in teile}, {(0.2, 1.0e-3, 435e6)})
+
+    def test_kreuzung_teilt_beide(self):
+        teile = sw.einzeln([wand("A", (0.0, 0.0), (1.0, 1.0)), wand("B", (0.0, 1.0), (1.0, 0.0))])
+        self.assertEqual([w.name for w in teile], ["A.1", "A.2", "B.1", "B.2"])
+        self.assertAlmostEqual(teile[0].laenge, math.sqrt(0.5))
+
+    def test_geteilt_gezeichnet_derselbe_fluss(self):
+        """Teile auf einer Linie verschieben und drehen sich gleich: ihr Fluss ist der des Ganzen."""
+        ganz = kasten(0, 0, 0.8, 0.5)
+        oben, mitte = ganz[2], (0.4, 0.5)
+        geteilt = ganz[:2] + [wand("O1", oben.von, mitte), wand("O2", mitte, oben.bis)] + ganz[3:]
+        last = dict(V_y=120e3, V_z=-350e3, T=70e3, bezug=(0.4, 0.25))
+        v_ganz = sw.verteilen(sw.zellen(ganz), **last)
+        v_geteilt = sw.verteilen(sw.zellen(geteilt), **last)
+        self.assertAlmostEqual(v_geteilt.fluss[2], v_ganz.fluss[2], delta=1e-3)
+        self.assertAlmostEqual(v_geteilt.fluss[3], v_ganz.fluss[2], delta=1e-3)
+
+
 class TestVerteilung(unittest.TestCase):
 
     def test_zwei_stege_je_die_haelfte(self):
         waende = kasten(0, 0, 1.0, 0.5)
         modell = sw.zellen(waende)
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=600e3, T=0.0, bezug=(0.5, 0.25))
+        v = sw.verteilen(modell, V_y=0.0, V_z=600e3, T=0.0, bezug=(0.5, 0.25))
         stege = [abs(v.aus_querkraft[i]) for i in (1, 3)]  # rechts und links
         self.assertAlmostEqual(stege[0], 300e3, delta=1e-3)
         self.assertAlmostEqual(stege[1], 300e3, delta=1e-3)
@@ -76,7 +109,7 @@ class TestVerteilung(unittest.TestCase):
         waende = kasten(0, 0, 0.3, 0.6)
         modell = sw.zellen(waende)
         T = 50e3
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=0.0, T=T, bezug=(0.15, 0.3))
+        v = sw.verteilen(modell, V_y=0.0, V_z=0.0, T=T, bezug=(0.15, 0.3))
         for q in v.fluss:
             self.assertAlmostEqual(abs(q), T / (2 * 0.18), delta=1e-6)
 
@@ -84,9 +117,9 @@ class TestVerteilung(unittest.TestCase):
         waende = kasten(0, 0, 1.0, 0.5) + [wand("M", (0.5, 0.0), (0.5, 0.5))]
         modell = sw.zellen(waende)
         T = 80e3
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=0.0, T=T, bezug=(0.5, 0.25))
-        for s, q in zip(modell.stuecke, v.fluss):
-            if waende[s.wand].name == "M":
+        v = sw.verteilen(modell, V_y=0.0, V_z=0.0, T=T, bezug=(0.5, 0.25))
+        for w, q in zip(modell.waende, v.fluss):
+            if w.name == "M":
                 self.assertAlmostEqual(q, 0.0, delta=1e-6)
             else:
                 self.assertAlmostEqual(abs(q), T / (2 * 0.5), delta=1e-6)
@@ -96,7 +129,7 @@ class TestVerteilung(unittest.TestCase):
         waende = kasten(0, 0, 0.4, 0.4, praefix="A") + kasten(1.0, 0, 0.4, 0.4, praefix="B")
         modell = sw.zellen(waende)
         T = 40e3
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=0.0, T=T, bezug=(0.7, 0.2))
+        v = sw.verteilen(modell, V_y=0.0, V_z=0.0, T=T, bezug=(0.7, 0.2))
         for q in v.zellenfluss:
             self.assertAlmostEqual(q, (T / 2) / (2 * 0.16), delta=1e-6)
 
@@ -106,9 +139,9 @@ class TestVerteilung(unittest.TestCase):
                   wand("unten", (0.0, 0.0), (0.4, 0.0))]
         modell = sw.zellen(waende)
         bezug = (0.1, 0.3)
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=200e3, T=0.0, bezug=bezug)
+        v = sw.verteilen(modell, V_y=0.0, V_z=200e3, T=0.0, bezug=bezug)
         self.assertTrue(v.mit_drehung)
-        F_y, F_z, M = summen(waende, modell, v, bezug)
+        F_y, F_z, M = summen(modell, v, bezug)
         self.assertAlmostEqual(F_y, 0.0, delta=1e-3)
         self.assertAlmostEqual(F_z, 200e3, delta=1e-3)
         self.assertAlmostEqual(M, 0.0, delta=1e-3)
@@ -119,8 +152,8 @@ class TestVerteilung(unittest.TestCase):
         waende = kasten(0, 0, 0.8, 0.5) + [wand("Kragarm", (0.8, 0.5), (1.4, 0.5), b_w=0.15)]
         modell = sw.zellen(waende)
         bezug = (0.55, 0.3)
-        v = sw.verteilen(waende, modell, V_y=120e3, V_z=-350e3, T=70e3, bezug=bezug)
-        F_y, F_z, M = summen(waende, modell, v, bezug)
+        v = sw.verteilen(modell, V_y=120e3, V_z=-350e3, T=70e3, bezug=bezug)
+        F_y, F_z, M = summen(modell, v, bezug)
         self.assertAlmostEqual(F_y, 120e3, delta=1e-2)
         self.assertAlmostEqual(F_z, -350e3, delta=1e-2)
         self.assertAlmostEqual(M, 70e3, delta=1e-2)
@@ -128,18 +161,18 @@ class TestVerteilung(unittest.TestCase):
     def test_eine_wand_traegt_keine_torsion(self):
         waende = [wand("Steg", (0.0, 0.0), (0.0, 0.5))]
         with self.assertRaisesRegex(WandFehler, "Torsion"):
-            sw.verteilen(waende, sw.zellen(waende), V_y=0.0, V_z=100e3, T=10e3,
+            sw.verteilen(sw.zellen(waende), V_y=0.0, V_z=100e3, T=10e3,
                          bezug=(0.0, 0.25))
 
     def test_parallele_waende_tragen_nicht_quer(self):
         waende = [wand("links", (0.0, 0.0), (0.0, 0.5)), wand("rechts", (0.5, 0.0), (0.5, 0.5))]
         with self.assertRaisesRegex(WandFehler, "quer"):
-            sw.verteilen(waende, sw.zellen(waende), V_y=50e3, V_z=0.0, T=0.0,
+            sw.verteilen(sw.zellen(waende), V_y=50e3, V_z=0.0, T=0.0,
                          bezug=(0.25, 0.25))
 
     def test_parallele_waende_tragen_laengs(self):
         waende = [wand("links", (0.0, 0.0), (0.0, 0.5)), wand("rechts", (0.5, 0.0), (0.5, 0.5))]
-        v = sw.verteilen(waende, sw.zellen(waende), V_y=0.0, V_z=100e3, T=0.0,
+        v = sw.verteilen(sw.zellen(waende), V_y=0.0, V_z=100e3, T=0.0,
                          bezug=(0.25, 0.25))
         self.assertAlmostEqual(v.aus_querkraft[0], 50e3, delta=1e-3)
 
@@ -160,23 +193,24 @@ class TestKraftUndWiderstand(unittest.TestCase):
         """Ein Fluss rundum: jede Wand trägt q · l."""
         waende = kasten(0, 0, 0.3, 0.6)
         modell = sw.zellen(waende)
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=0.0, T=36e3, bezug=(0.15, 0.3))
+        v = sw.verteilen(modell, V_y=0.0, V_z=0.0, T=36e3, bezug=(0.15, 0.3))
         q = 36e3 / (2 * 0.18)
-        for w, kraft in zip(waende, sw.wandkraefte(waende, modell, v)):
+        for w, kraft in zip(modell.waende, sw.wandkraefte(modell, v)):
             self.assertAlmostEqual(kraft, q * w.laenge, delta=1e-6)
 
-    def test_stuecke_mit_verschiedenem_fluss_zaehlen_das_staerkste(self):
-        """Ein Deckel über zwei Zellen: sein stärkstes Stück über seine ganze Länge."""
-        deckel = wand("Deckel", (0.0, 0.4), (1.0, 0.4))
-        boden = wand("Boden", (1.0, 0.0), (0.0, 0.0))
-        waende = [deckel, boden, wand("links", (0.0, 0.0), (0.0, 0.4)),
-                  wand("Mitte", (0.3, 0.0), (0.3, 0.4)), wand("rechts", (1.0, 0.0), (1.0, 0.4))]
+    def test_ein_deckel_ueber_zwei_zellen_sind_zwei_waende(self):
+        """Jede Wand für sich: der Deckel zerfällt an der Mittelwand, jedes Teil mit seiner Kraft."""
+        waende = [wand("Deckel", (0.0, 0.4), (1.0, 0.4)), wand("Boden", (1.0, 0.0), (0.0, 0.0)),
+                  wand("links", (0.0, 0.0), (0.0, 0.4)), wand("Mitte", (0.3, 0.0), (0.3, 0.4)),
+                  wand("rechts", (1.0, 0.0), (1.0, 0.4))]
         modell = sw.zellen(waende)
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=0.0, T=50e3, bezug=(0.5, 0.2))
-        fluesse = [abs(q) for s, q in zip(modell.stuecke, v.fluss) if s.wand == 0]
-        self.assertEqual(len(fluesse), 2)
-        self.assertGreater(max(fluesse) - min(fluesse), 1.0)
-        self.assertAlmostEqual(sw.wandkraefte(waende, modell, v)[0], max(fluesse) * 1.0)
+        self.assertEqual([w.name for w in modell.waende],
+                         ["Deckel.1", "Deckel.2", "Boden.1", "Boden.2", "links", "Mitte", "rechts"])
+        self.assertEqual([round(w.laenge, 9) for w in modell.waende[:4]], [0.3, 0.7, 0.7, 0.3])
+        v = sw.verteilen(modell, V_y=0.0, V_z=0.0, T=50e3, bezug=(0.5, 0.2))
+        self.assertGreater(abs(abs(v.fluss[0]) - abs(v.fluss[1])), 1.0)
+        for w, q, kraft in zip(modell.waende, v.fluss, sw.wandkraefte(modell, v)):
+            self.assertAlmostEqual(kraft, abs(q) * w.laenge)
 
     def test_bei_gleichstand_die_erste_wand(self):
         """Gleich bis auf Rundung: massgebend heisst die erste Wand, nicht die Rundung."""
@@ -189,8 +223,8 @@ class TestKraftUndWiderstand(unittest.TestCase):
         waende = [wand("links", (0.0, 0.0), (0.0, 0.5)), wand("rechts", (0.5, 0.0), (0.5, 0.5)),
                   wand("unten", (0.0, 0.0), (0.5, 0.0))]
         modell = sw.zellen(waende)
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=100e3, T=0.0, bezug=(0.25, 0.25))
-        self.assertEqual(sw.wandkraefte(waende, modell, v)[2], 0.0)
+        v = sw.verteilen(modell, V_y=0.0, V_z=100e3, T=0.0, bezug=(0.25, 0.25))
+        self.assertEqual(sw.wandkraefte(modell, v)[2], 0.0)
 
     def test_zug_hebt_die_neigung(self):
         w = wand("Steg", (0, 0), (0, 0.5))
@@ -203,7 +237,7 @@ class TestLaengszug(unittest.TestCase):
     def test_mittiger_steg_nur_normalkraft(self):
         waende = [wand("Steg", (0.15, 0.05), (0.15, 0.55))]
         modell = sw.zellen(waende)
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=300e3, T=0.0, bezug=(0.15, 0.3))
+        v = sw.verteilen(modell, V_y=0.0, V_z=300e3, T=0.0, bezug=(0.15, 0.3))
         z = sw.laengszug(modell, v, [45], (0.15, 0.3))
         self.assertAlmostEqual(z.N, 300e3, delta=1e-3)
         self.assertAlmostEqual(z.M_y, 0.0, delta=1e-3)
@@ -211,7 +245,7 @@ class TestLaengszug(unittest.TestCase):
     def test_t_balken_steg_unter_dem_schwerpunkt(self):
         waende = [wand("Steg", (0.15, 0.05), (0.15, 0.55))]
         modell = sw.zellen(waende)
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=300e3, T=0.0, bezug=(0.15, 0.45))
+        v = sw.verteilen(modell, V_y=0.0, V_z=300e3, T=0.0, bezug=(0.15, 0.45))
         z = sw.laengszug(modell, v, [45], (0.15, 0.45))
         self.assertGreater(z.M_y, 0.0)  # Zug unten
         self.assertAlmostEqual(z.M_y, 300e3 * (0.45 - 0.30), delta=1e-3)
@@ -220,7 +254,7 @@ class TestLaengszug(unittest.TestCase):
         waende = kasten(0, 0, 0.3, 0.6)
         modell = sw.zellen(waende)
         T = 50e3
-        v = sw.verteilen(waende, modell, V_y=0.0, V_z=0.0, T=T, bezug=(0.15, 0.3))
+        v = sw.verteilen(modell, V_y=0.0, V_z=0.0, T=T, bezug=(0.15, 0.3))
         z = sw.laengszug(modell, v, [30] * 4, (0.15, 0.3))
         u_k = 2 * (0.3 + 0.6)
         self.assertAlmostEqual(z.N, T * u_k / math.tan(math.radians(30)) / (2 * 0.18),

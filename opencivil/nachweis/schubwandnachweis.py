@@ -11,17 +11,19 @@ Liefert zudem je Lastfall die Laengszugkraft ``ΔN, ΔM_y, ΔM_z``, wenn sie
 zugeschaltet ist: der Nachweis von Biegung und Normalkraft liest sie.
 
 DER MASSSTAB:
-Je Wand ``V_Rd / V_Ed`` mit ihrer ganzen Kraft, nicht je Meter (Benutzer,
-2026-11-18): ``V_Ed = max|q| · l`` gegen das Fachwerk mit ihrer Laenge als
-Hebelarm (:func:`~opencivil.querschnitt.schubwaende.wandkraefte`,
+Jede Schubwand fuer sich, mit ihrer ganzen Kraft, nicht je Meter (Benutzer,
+2026-11-18): die gezeichneten Waende an ihren Knoten geteilt
+(:func:`~opencivil.querschnitt.schubwaende.einzeln`), je Wand
+``V_Ed = |q| · l`` gegen das Fachwerk mit ihrer Laenge als Hebelarm
+(:func:`~opencivil.querschnitt.schubwaende.wandkraefte`,
 :func:`~opencivil.querschnitt.schubwaende.widerstand`). Massgebend ist die
-schwaechste Wand.
+schwaechste Wand; nur sie steht in der Zusammenfassung.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Eingaben
 from opencivil.core.nachweis import NICHT_FUEHRBAR, Nachweis, NachweisUrteil, Vergleich, grad_def
@@ -47,18 +49,21 @@ def schub_belastet(biegung: Biegung, fall: Lastfall) -> bool:
 @dataclass
 class Schubbefund:
     """
-    Was der Nachweis im Lauf fand: die Waende und ihre Zellen, je Lastfall
-    die Verteilung des Schubflusses und je Wand den Widerstand bei der
-    gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
+    Was der Nachweis im Lauf fand: die Waende einzeln und ihre Zellen, je
+    Lastfall die Verteilung des Schubflusses und je Wand den Widerstand bei
+    der gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
     Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in allen dreien.
     """
 
-    waende: List[sw.Wand]
     modell: sw.Zellenmodell
     verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)
     widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)
     vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)
     """Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand."""
+
+    @property
+    def waende(self) -> Tuple[sw.Wand, ...]:
+        return self.modell.waende
 
 
 class Schubwandnachweis(Nachweis):
@@ -105,8 +110,7 @@ class Schubwandnachweis(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         bezug = (e.g("y_S").si, e.g("z_S").si)
-        waende = self.analyse.schubwaende_mit(e)
-        befund = Schubbefund(waende, sw.zellen(waende) if waende else sw.Zellenmodell((), ()))
+        befund = Schubbefund(sw.zellen(self.analyse.schubwaende_mit(e)))
         alpha_min, alpha_max = self.analyse.neigungsgrenzen(e)
         self._protokoll_ansatz(p, e, befund)
 
@@ -149,8 +153,7 @@ class Schubwandnachweis(Nachweis):
             return self._ohne(p, fall, "Es gibt keine Schubwand, die Querkraft oder "
                                        "Torsion aufnehmen könnte.")
         try:
-            v = sw.verteilen(befund.waende, befund.modell, V_y=V_y, V_z=fall.V_z, T=fall.T,
-                             bezug=bezug)
+            v = sw.verteilen(befund.modell, V_y=V_y, V_z=fall.V_z, T=fall.T, bezug=bezug)
         except sw.WandFehler as fehler:
             return self._ohne(p, fall, str(fehler))
         befund.verteilungen[fall.name] = v
@@ -183,7 +186,7 @@ class Schubwandnachweis(Nachweis):
         vergleiche: List[Vergleich] = []
         befund.widerstaende[fall.name] = widerstaende
         befund.vergleiche[fall.name] = vergleiche
-        kraefte = sw.wandkraefte(befund.waende, befund.modell, v)
+        kraefte = sw.wandkraefte(befund.modell, v)
         for i, (w, V_Ed) in enumerate(zip(befund.waende, kraefte)):
             r = sw.widerstand(w, alpha_min=alpha_min, alpha_max=alpha_max, zugkraft=zugkraft)
             widerstaende.append(r)
@@ -221,9 +224,9 @@ class Schubwandnachweis(Nachweis):
                  Mathe(fest(laengs.M_y / 1e3, 1)), "kNm"],
                 [Mathe(r"\Delta M_z = -\sum \Delta N_i (y_i - y_S)"),
                  Mathe(fest(laengs.M_z / 1e3, 1)), "kNm"],
-            ], titel="Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte",
+            ], titel="Längszugkraft aus dem Druckfeld der Wände, je Wand in ihrer Mitte",
                 ausrichtung="lrl")
-            p.text(f"Je Stück ΔN_i = |q|·l·cot α, halb in jedem Gurt ({sw.REFERENZ_LAENGSZUG}).")
+            p.text(f"Je Wand ΔN_i = |q|·l·cot α, halb in jedem Gurt ({sw.REFERENZ_LAENGSZUG}).")
 
         return self.urteil(self.d_ausnutzung[fall.name], fall.name, massgebend,
                            f"Massgebend {w.name}, α = {r.alpha}°."), laengs
@@ -240,19 +243,20 @@ class Schubwandnachweis(Nachweis):
             "geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig "
             "mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion "
             "über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer "
-            "V_y, V_z und um den Schwerpunkt T. Nachgewiesen wird jede Wand mit "
-            "ihrer ganzen Kraft, nicht je Meter: bei einer Zelle die Kraft aus der "
-            "Querkraft und die aus der Torsion zusammen. Trägt eine Wand zwischen "
-            "zwei Zellen stückweise verschiedene Flüsse, zählt ihr stärkster über "
-            "die ganze Länge -- nach Vorgabe, nicht nachgeschlagen.")
+            "V_y, V_z und um den Schwerpunkt T. Eine gezeichnete Wand ist dort "
+            "geteilt, wo eine andere auf ihr endet oder sie kreuzt (Wand 1.1, "
+            "Wand 1.2 …): jede trägt so überall denselben Fluss und wird für sich "
+            "nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter -- bei einer "
+            "Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. "
+            "In der Zusammenfassung steht die massgebende Wand.")
         p.ansatz(r"k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V "
                  r"\qquad V_i = k_i\, e_i \cdot u \qquad \Delta T = \sum_i V_i\, r_i",
                  titel="Querkraft über die Federn der Wände")
         p.ansatz(r"T - \Delta T = \sum_k 2 A_k\, q_k \qquad "
                  r"\oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta",
                  titel="Torsion in den Zellen (Bredt, mehrzellig)", referenz=sw.REFERENZ_ZELLE)
-        p.ansatz(r"V_{Ed} = \max |q| \cdot l",
-                 titel="Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge",
+        p.ansatz(r"V_{Ed} = |q| \cdot l",
+                 titel="Kraft einer Wand: ihr Schubfluss über ihre Länge",
                  referenz=sw.REFERENZ_KRAFT)
         p.ansatz(r"V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad "
                  r"V_{Rd,c} = b_w\, l\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad "
@@ -267,8 +271,8 @@ class Schubwandnachweis(Nachweis):
         if befund.waende:
             zellen_von: Dict[int, List[int]] = {}
             for k, z in enumerate(befund.modell.zellen):
-                for stueck, _ in z.rand:
-                    zellen_von.setdefault(befund.modell.stuecke[stueck].wand, []).append(k + 1)
+                for wand, _ in z.rand:
+                    zellen_von.setdefault(wand, []).append(k + 1)
             p.tabelle(
                 kopf=["Wand", Mathe(r"l\ [\mathrm{mm}]"), Mathe(r"b_w\ [\mathrm{mm}]"),
                       Mathe(r"k = b_w l\ [\mathrm{mm}^2]"),

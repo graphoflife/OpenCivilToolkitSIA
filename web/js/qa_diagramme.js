@@ -13,7 +13,7 @@
  *
  *   Bruchzustand    der Schnitt mit Nulllinie, Druckzone und der Dehnung
  *                   jedes Stabs -- gezogen kupfer, gedrückt blau;
- *   Schubfluss      je Stück einer Wand ein Pfeil, so lang wie der Fluss.
+ *   Schubfluss      je Schubwand ein Pfeil, so lang wie ihr Fluss.
  *
  * Die Daten kommen aus einer eigenen Anfrage (`analysediagramme`): die
  * Fläche braucht Bruchzustände, die kein Nachweis braucht, und soll nicht
@@ -220,8 +220,9 @@ function bruchbild(daten, fall) {
 }
 
 /**
- * Der Schubfluss: die Wände als Band, je Stück ein Pfeil in Richtung des
- * Flusses, so lang wie er stark ist. Eine Wand, die nicht hält, ist rot.
+ * Der Schubfluss: je Schubwand, wie der Nachweis sie sieht -- an ihren
+ * Knoten geteilt --, ein Band und ein Pfeil in Richtung ihres Flusses, so
+ * lang wie er stark ist. Eine Wand, die nicht hält, ist rot.
  */
 function schubbild(daten, fall) {
   const z = daten.zeichnung;
@@ -233,43 +234,41 @@ function schubbild(daten, fall) {
   });
   const g = svgEl('g');
   polygoneZeichnen(g, z, bild);
-  const urteil = new Map(s.waende.map((w) => [w.name, w]));
-  for (const w of z.waende) {
+  for (const w of s.waende) {
     const l = Math.hypot(w.bis[0] - w.von[0], w.bis[1] - w.von[1]) || 1;
     const n = [(-(w.bis[1] - w.von[1]) / l) * (w.dicke / 2), ((w.bis[0] - w.von[0]) / l) * (w.dicke / 2)];
     const ecken = [
       [w.von[0] + n[0], w.von[1] + n[1]], [w.bis[0] + n[0], w.bis[1] + n[1]],
       [w.bis[0] - n[0], w.bis[1] - n[1]], [w.von[0] - n[0], w.von[1] - n[1]],
     ];
-    const gut = urteil.get(w.name)?.erfuellt !== false;
+    const gut = w.erfuellt !== false;
     g.append(svgEl('path', {
       d: pfad(bild, ecken), fill: gut ? 'rgba(139,92,246,.14)' : 'rgba(179,38,30,.14)',
       stroke: gut ? VIOLETT : SCHLECHT, 'stroke-opacity': 0.6,
     }));
   }
   // Pfeillänge: der stärkste Fluss bekommt 70 px, alle anderen im Verhältnis.
-  const groesster = Math.max(...s.stuecke.map((x) => Math.abs(x.q)), 1e-9);
-  for (const stueck of s.stuecke) {
-    if (Math.abs(stueck.q) < 1e-6 * groesster) continue;
-    const [ax, ay] = bild(stueck.von);
-    const [bx, by] = bild(stueck.bis);
+  const groesster = Math.max(...s.waende.map((w) => Math.abs(w.q)), 1e-9);
+  for (const w of s.waende) {
+    if (Math.abs(w.q) < 1e-6 * groesster) continue;
+    const [ax, ay] = bild(w.von);
+    const [bx, by] = bild(w.bis);
     const lang = Math.hypot(bx - ax, by - ay) || 1;
-    const richtung = [((bx - ax) / lang) * Math.sign(stueck.q), ((by - ay) / lang) * Math.sign(stueck.q)];
-    const laenge = Math.min(70 * Math.abs(stueck.q) / groesster, lang * 0.8);
+    const richtung = [((bx - ax) / lang) * Math.sign(w.q), ((by - ay) / lang) * Math.sign(w.q)];
+    const laenge = Math.min(70 * Math.abs(w.q) / groesster, lang * 0.8);
     const [mx, my] = [(ax + bx) / 2, (ay + by) / 2];
     const [x0, y0] = [mx - (richtung[0] * laenge) / 2, my - (richtung[1] * laenge) / 2];
     const [x1, y1] = [mx + (richtung[0] * laenge) / 2, my + (richtung[1] * laenge) / 2];
     const winkel = Math.atan2(richtung[1], richtung[0]);
     const spitze = (w) => `${(x1 - 9 * Math.cos(winkel + w)).toFixed(1)},${(y1 - 9 * Math.sin(winkel + w)).toFixed(1)}`;
-    const gut = urteil.get(stueck.wand)?.erfuellt !== false;
-    const farbe = gut ? '#5b3fb8' : SCHLECHT;
+    const farbe = w.erfuellt !== false ? '#5b3fb8' : SCHLECHT;
     g.append(
       svgEl('line', { x1: x0, y1: y0, x2: x1, y2: y1, stroke: farbe, 'stroke-width': 2.2 }),
       svgEl('polygon', { points: `${x1.toFixed(1)},${y1.toFixed(1)} ${spitze(0.4)} ${spitze(-0.4)}`, fill: farbe }),
     );
     // Die Zahl quer neben dem Pfeil, auf der Seite zur Mitte des Bildes hin.
     const quer = [-richtung[1], richtung[0]];
-    const t = text(mx + quer[0] * 14, my + quer[1] * 14 + 4, `${Math.abs(stueck.q).toFixed(1)}`, {
+    const t = text(mx + quer[0] * 14, my + quer[1] * 14 + 4, `${Math.abs(w.q).toFixed(1)}`, {
       'text-anchor': 'middle', 'font-weight': 600, fill: farbe,
       'paint-order': 'stroke', stroke: '#fff', 'stroke-width': 3,
     });

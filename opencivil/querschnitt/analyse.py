@@ -354,7 +354,7 @@ class Zeichnung:
         modell = zellen_finden(achsen)
         umrisse = []
         for zelle in modell.zellen:
-            ecken = [(modell.stuecke[e].von if r > 0 else modell.stuecke[e].bis)
+            ecken = [(modell.waende[e].von if r > 0 else modell.waende[e].bis)
                      for e, r in zelle.rand]
             umrisse.append(([(y / m, z / m) for y, z in ecken], zelle.flaeche / (m * m)))
         return umrisse

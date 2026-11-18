@@ -1,5 +1,5 @@
 ---
-erzeugt: 54088449d392
+erzeugt: 48a2ae18eeeb
 art: modul
 tags: [modul]
 ---
@@ -20,11 +20,13 @@ zugeschaltet ist: der Nachweis von Biegung und Normalkraft liest sie.
 
 ## DER MASSSTAB
 
-Je Wand `V_Rd / V_Ed` mit ihrer ganzen Kraft, nicht je Meter (Benutzer,
-2026-11-18): `V_Ed = max|q| · l` gegen das Fachwerk mit ihrer Laenge als
-Hebelarm ([[opencivil.querschnitt.schubwaende#wandkraefte|wandkraefte]],
+Jede Schubwand fuer sich, mit ihrer ganzen Kraft, nicht je Meter (Benutzer,
+2026-11-18): die gezeichneten Waende an ihren Knoten geteilt
+([[opencivil.querschnitt.schubwaende#einzeln|einzeln]]), je Wand
+`V_Ed = |q| · l` gegen das Fachwerk mit ihrer Laenge als Hebelarm
+([[opencivil.querschnitt.schubwaende#wandkraefte|wandkraefte]],
 [[opencivil.querschnitt.schubwaende#widerstand|widerstand]]). Massgebend ist die
-schwaechste Wand.
+schwaechste Wand; nur sie steht in der Zusammenfassung.
 
 ## Inhalt
 
@@ -45,16 +47,22 @@ braucht.
 class Schubbefund
 ```
 
-Was der Nachweis im Lauf fand: die Waende und ihre Zellen, je Lastfall
-die Verteilung des Schubflusses und je Wand den Widerstand bei der
-gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
+Was der Nachweis im Lauf fand: die Waende einzeln und ihre Zellen, je
+Lastfall die Verteilung des Schubflusses und je Wand den Widerstand bei
+der gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
 Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in allen dreien.
 
-- `waende: List[sw.Wand]`
 - `modell: sw.Zellenmodell`
 - `verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)`
 - `widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)`
 - `vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)` – Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand.
+
+#### Schubbefund.waende
+
+```python
+@property
+def waende(self) -> Tuple[sw.Wand, ...]
+```
 
 ### Schubwandnachweis
 
@@ -94,7 +102,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Formeln aus diesem Modul
 
-- [[Kraft einer Wand – ihr stärkster Schubfluss über die ganze Länge]] · `Schubwandnachweis._protokoll_ansatz`
+- [[Kraft einer Wand – ihr Schubfluss über ihre Länge]] · `Schubwandnachweis._protokoll_ansatz`
 - [[Querkraft über die Federn der Wände]] · `Schubwandnachweis._protokoll_ansatz`
 - [[Torsion in den Zellen (Bredt, mehrzellig)]] · `Schubwandnachweis._protokoll_ansatz`
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · `Schubwandnachweis._ein_fall`

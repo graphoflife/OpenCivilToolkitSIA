@@ -716,8 +716,6 @@ def _zeichnung(bauteil) -> dict:
                    for g in bauteil.bewehrungselemente for p in g.punkte],
         "flaechenlinien": [{"von": list(g.von), "bis": list(g.bis)}
                            for g in bauteil.bewehrungselemente if g.verschmiert],
-        "waende": [{"name": w.name, "von": list(w.von), "bis": list(w.bis), "dicke": w.dicke}
-                   for w in bauteil.waende],
         "schwerpunkt": [bauteil.brutto.y_S, bauteil.brutto.z_S],
     }
 
@@ -801,23 +799,22 @@ def _bruch(q, bauteil, punkt) -> dict:
 
 def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
     """
-    Der Schubfluss je Stueck einer Wand, mit Vorzeichen entlang der Wand, in
-    kN/m -- und je Wand ihre ganze Kraft gegen ihren Widerstand, in kN, bei
-    der Neigung, die der Nachweis gewaehlt hat. Ohne Verteilung (keine Wand,
-    keine Last) nichts.
+    Je Schubwand, wie der Nachweis sie sieht -- an ihren Knoten geteilt
+    (:func:`~opencivil.querschnitt.schubwaende.einzeln`) --, ihre Achse und
+    Dicke in mm, ihr Fluss mit Vorzeichen entlang der Achse in kN/m und ihre
+    ganze Kraft gegen ihren Widerstand in kN, bei der Neigung, die der
+    Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
     """
     v = schub.verteilungen.get(fall.name)
     if v is None:
         return None
-    stuecke = [{"wand": schub.waende[s.wand].name,
-                "von": [zahl(s.von[0], MM), zahl(s.von[1], MM)],
-                "bis": [zahl(s.bis[0], MM), zahl(s.bis[1], MM)],
-                "q": zahl(fluss, KN_PRO_M)}
-               for s, fluss in zip(schub.modell.stuecke, v.fluss)]
-    waende = [{"name": w.name, "V_Ed": zahl(vergleich.einwirkung.groesse.si, KN),
+    waende = [{"name": w.name,
+               "von": [zahl(w.von[0], MM), zahl(w.von[1], MM)],
+               "bis": [zahl(w.bis[0], MM), zahl(w.bis[1], MM)],
+               "dicke": zahl(w.b_w, MM), "q": zahl(q, KN_PRO_M),
+               "V_Ed": zahl(vergleich.einwirkung.groesse.si, KN),
                "V_Rd": zahl(r.V_Rd, KN), "alpha": r.alpha, "erfuellt": vergleich.erfuellt,
                "grad_text": grad_als_text(vergleich.grad, vergleich.erfuellt)}
-              for w, r, vergleich in zip(schub.waende, schub.widerstaende[fall.name],
-                                         schub.vergleiche[fall.name])]
-    return {"stuecke": stuecke, "waende": waende,
-            "zellen": [zahl(q_k, KN_PRO_M) for q_k in v.zellenfluss]}
+              for w, q, r, vergleich in zip(schub.waende, v.fluss, schub.widerstaende[fall.name],
+                                            schub.vergleiche[fall.name])]
+    return {"waende": waende, "zellen": [zahl(q_k, KN_PRO_M) for q_k in v.zellenfluss]}

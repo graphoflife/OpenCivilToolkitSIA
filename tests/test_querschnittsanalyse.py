@@ -577,7 +577,7 @@ class TestDiagramme(unittest.TestCase):
         z = self.d["zeichnung"]
         self.assertEqual(len(z["polygone"]), 1)
         self.assertEqual(len(z["staebe"]), 5)
-        self.assertEqual(len(z["waende"]), 4)
+        self.assertEqual(len(self.fall["schub"]["waende"]), 4)
         self.assertEqual(z["schwerpunkt"], [150.0, 300.0])
 
     def test_der_widerstand_des_nachweises(self):
@@ -631,7 +631,7 @@ class TestDiagramme(unittest.TestCase):
         """Die Wandkräfte zusammen sind V_y, V_z und T um den Schwerpunkt."""
         schub = self.fall["schub"]
         f_y = f_z = moment = 0.0
-        for s in schub["stuecke"]:
+        for s in schub["waende"]:
             dy, dz = s["bis"][0] - s["von"][0], s["bis"][1] - s["von"][1]
             laenge = math.hypot(dy, dz)
             kraft_y, kraft_z = s["q"] * dy / 1e3, s["q"] * dz / 1e3  # kN

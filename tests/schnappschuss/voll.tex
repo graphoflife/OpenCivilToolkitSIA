@@ -4174,9 +4174,9 @@ k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\,
 \begin{equation*}
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 \end{equation*}
-\noindent\textbf{Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5}
+\noindent\textbf{Kraft einer Wand: ihr Schubfluss über ihre Länge} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5}
 \begin{equation*}
-V_{Ed} = \max |q| \cdot l
+V_{Ed} = |q| \cdot l
 \end{equation*}
 \noindent\textbf{Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
 \begin{equation*}
@@ -4252,7 +4252,7 @@ Massgebend: Wand 2.
 \begin{equation*}
 \alpha_{eff,V,\text{Feld}} = \frac{V_{Rd}}{V_{Ed}} = \frac{177.4\,\mathrm{kN}}{171.2\,\mathrm{kN}} = 1.04 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
-\noindent\textbf{Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte}
+\noindent\textbf{Längszugkraft aus dem Druckfeld der Wände, je Wand in ihrer Mitte}
 \begin{longtable}{lrl}
 \hline
 Längszugkraft & Wert &  \\
@@ -4263,7 +4263,7 @@ $\Delta M_y = -\sum \Delta N_i (z_i - z_S)$ & $0.0$ & kNm \\
 $\Delta M_z = -\sum \Delta N_i (y_i - y_S)$ & $-52.0$ & kNm \\
 \hline
 \end{longtable}
-Je Stück ΔN\_i = |q|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
+Je Wand ΔN\_i = |q|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
 
 \subsubsection{Schief}
 \noindent\textbf{Einwirkung}
@@ -4312,7 +4312,7 @@ Massgebend: Wand 1.
 \begin{equation*}
 \alpha_{eff,V,\text{Schief}} = \frac{V_{Rd}}{V_{Ed}} = \frac{256.3\,\mathrm{kN}}{50\,\mathrm{kN}} = 5.13 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
-\noindent\textbf{Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte}
+\noindent\textbf{Längszugkraft aus dem Druckfeld der Wände, je Wand in ihrer Mitte}
 \begin{longtable}{lrl}
 \hline
 Längszugkraft & Wert &  \\
@@ -4323,7 +4323,7 @@ $\Delta M_y = -\sum \Delta N_i (z_i - z_S)$ & $0.0$ & kNm \\
 $\Delta M_z = -\sum \Delta N_i (y_i - y_S)$ & $0.0$ & kNm \\
 \hline
 \end{longtable}
-Je Stück ΔN\_i = |q|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
+Je Wand ΔN\_i = |q|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
 
 \noindent\textbf{Dehnungsebene und innere Kräfte} \hfill \normref{SIA 262:2025, 4.3.2.3}
 \begin{equation*}
@@ -14329,7 +14329,7 @@ A_s = \frac{L}{s} \cdot \frac{\pi\, \varnothing^2}{4}
 \frac{A_{sw}}{s} = \frac{n \cdot \pi\, \varnothing^2 / 4}{s}
 \end{equation*}
 \subsection{Querkraft und Torsion}
-Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T. Nachgewiesen wird jede Wand mit ihrer ganzen Kraft, nicht je Meter: bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. Trägt eine Wand zwischen zwei Zellen stückweise verschiedene Flüsse, zählt ihr stärkster über die ganze Länge -- nach Vorgabe, nicht nachgeschlagen.
+Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b\_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V\_y, V\_z und um den Schwerpunkt T. Eine gezeichnete Wand ist dort geteilt, wo eine andere auf ihr endet oder sie kreuzt (Wand 1.1, Wand 1.2 …): jede trägt so überall denselben Fluss und wird für sich nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter -- bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. In der Zusammenfassung steht die massgebende Wand.
 
 \noindent\textbf{Querkraft über die Federn der Wände}
 \begin{equation*}
@@ -14339,9 +14339,9 @@ k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\,
 \begin{equation*}
 T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 \end{equation*}
-\noindent\textbf{Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5}
+\noindent\textbf{Kraft einer Wand: ihr Schubfluss über ihre Länge} \hfill \normref{SIA 262:2025, 4.3.5.2, (55); 4.3.5.5}
 \begin{equation*}
-V_{Ed} = \max |q| \cdot l
+V_{Ed} = |q| \cdot l
 \end{equation*}
 \noindent\textbf{Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)} \hfill \normref{SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)}
 \begin{equation*}

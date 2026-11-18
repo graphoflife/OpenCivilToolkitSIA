@@ -1,5 +1,5 @@
 ---
-erzeugt: 40412c926e3c
+erzeugt: 6437e8138607
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -233,7 +233,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kleinerer Widerstand beider Seiten]] · $V_{Rd,max}$
 - [[Kohäsion für örtliches Abscheren]] · $c^{*}$
 - [[Kopplung am Pfahlkopf]] · $K_{HM}$
-- [[Kraft einer Wand – ihr stärkster Schubfluss über die ganze Länge]]
+- [[Kraft einer Wand – ihr Schubfluss über ihre Länge]]
 - [[Kräfte mal Hebelarm um die halbe Höhe]] · $M_{Rd}(N_{Rd}^{+})$
 - [[Kräftegleichgewicht]] · $N_{Rd}^{+}$
 - [[Kräftegleichgewicht bei M_Ed = 0]]

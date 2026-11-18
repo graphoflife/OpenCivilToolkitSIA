@@ -3571,8 +3571,8 @@ Querkraft über die Federn der Wände
 Torsion in den Zellen (Bredt, mehrzellig)   [SIA 262:2025, 4.3.5.2, (55), Figur 20]
     T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 
-Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge   [SIA 262:2025, 4.3.5.2, (55); 4.3.5.5]
-    V_{Ed} = \max |q| \cdot l
+Kraft einer Wand: ihr Schubfluss über ihre Länge   [SIA 262:2025, 4.3.5.2, (55); 4.3.5.5]
+    V_{Ed} = |q| \cdot l
 
 Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)   [SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)]
     V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad V_{Rd,c} = b_w\, l\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad V_{Rd} = \max_\alpha \min(V_{Rd,s};\ V_{Rd,c})
@@ -3626,14 +3626,14 @@ Massgebend: Wand 2.
 Erfüllungsgrad
     \alpha_{eff,V,\text{Feld}} = \frac{V_{Rd}}{V_{Ed}} = \frac{177.4\,\mathrm{kN}}{171.2\,\mathrm{kN}} = 1.04 \quad \Rightarrow \quad \text{erfüllt}
 
-Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte
+Längszugkraft aus dem Druckfeld der Wände, je Wand in ihrer Mitte
     Längszugkraft                               Wert
     -----------------------------------------  -----  ---
     \Delta N = \sum |q|\, l \cot\alpha         664.0  kN
     \Delta M_y = -\sum \Delta N_i (z_i - z_S)    0.0  kNm
     \Delta M_z = -\sum \Delta N_i (y_i - y_S)  -52.0  kNm
 
-Je Stück ΔN_i = |q|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
+Je Wand ΔN_i = |q|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
 
 Schief
 ------
@@ -3669,14 +3669,14 @@ Massgebend: Wand 1.
 Erfüllungsgrad
     \alpha_{eff,V,\text{Schief}} = \frac{V_{Rd}}{V_{Ed}} = \frac{256.3\,\mathrm{kN}}{50\,\mathrm{kN}} = 5.13 \quad \Rightarrow \quad \text{erfüllt}
 
-Längszugkraft aus dem Druckfeld der Wände, je Stück in seiner Mitte
+Längszugkraft aus dem Druckfeld der Wände, je Wand in ihrer Mitte
     Längszugkraft                               Wert
     -----------------------------------------  -----  ---
     \Delta N = \sum |q|\, l \cot\alpha         173.2  kN
     \Delta M_y = -\sum \Delta N_i (z_i - z_S)    0.0  kNm
     \Delta M_z = -\sum \Delta N_i (y_i - y_S)    0.0  kNm
 
-Je Stück ΔN_i = |q|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
+Je Wand ΔN_i = |q|·l·cot α, halb in jedem Gurt (SIA 262:2025, 4.3.3.4.11, (51); 4.3.5.4).
 
 Dehnungsebene und innere Kräfte   [SIA 262:2025, 4.3.2.3]
     \varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad v = n_y (y - y_S) + n_z (z - z_S) \qquad N = \int_A \sigma\,\mathrm{d}A \qquad M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A
@@ -12502,10 +12502,11 @@ Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt si
 mit der Steifigkeit b_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT;
 den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig
 mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit
-Drehung. Die Wandkräfte ergeben so immer V_y, V_z und um den Schwerpunkt T. Nachgewiesen wird jede
-Wand mit ihrer ganzen Kraft, nicht je Meter: bei einer Zelle die Kraft aus der Querkraft und die aus
-der Torsion zusammen. Trägt eine Wand zwischen zwei Zellen stückweise verschiedene Flüsse, zählt ihr
-stärkster über die ganze Länge -- nach Vorgabe, nicht nachgeschlagen.
+Drehung. Die Wandkräfte ergeben so immer V_y, V_z und um den Schwerpunkt T. Eine gezeichnete Wand
+ist dort geteilt, wo eine andere auf ihr endet oder sie kreuzt (Wand 1.1, Wand 1.2 …): jede trägt so
+überall denselben Fluss und wird für sich nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter --
+bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. In der Zusammenfassung
+steht die massgebende Wand.
 
 Querkraft über die Federn der Wände
     k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V \qquad V_i = k_i\, e_i \cdot u \qquad \Delta T = \sum_i V_i\, r_i
@@ -12513,8 +12514,8 @@ Querkraft über die Federn der Wände
 Torsion in den Zellen (Bredt, mehrzellig)   [SIA 262:2025, 4.3.5.2, (55), Figur 20]
     T - \Delta T = \sum_k 2 A_k\, q_k \qquad \oint_k \frac{q}{b_w}\, \mathrm{d}s = 2 A_k\, \theta
 
-Kraft einer Wand: ihr stärkster Schubfluss über die ganze Länge   [SIA 262:2025, 4.3.5.2, (55); 4.3.5.5]
-    V_{Ed} = \max |q| \cdot l
+Kraft einer Wand: ihr Schubfluss über ihre Länge   [SIA 262:2025, 4.3.5.2, (55); 4.3.5.5]
+    V_{Ed} = |q| \cdot l
 
 Widerstand einer Wand (Fachwerk, ihre Länge l als Hebelarm)   [SIA 262:2025, 4.3.3.4.3, (45); 4.3.3.4.6, (47)]
     V_{Rd,s} = \frac{A_{sw}}{s}\, l\, f_{yd} \cot\alpha \qquad V_{Rd,c} = b_w\, l\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad V_{Rd} = \max_\alpha \min(V_{Rd,s};\ V_{Rd,c})

@@ -88,7 +88,7 @@ def _getragen(analyse: Querschnittsanalyse) -> List[str]:
         if not any(einheit.values()):
             continue
         try:
-            sw.verteilen(waende, modell, **einheit, bezug=bezug)
+            sw.verteilen(modell, **einheit, bezug=bezug)
         except sw.WandFehler:
             continue
         getragen.append(last)
@@ -242,27 +242,25 @@ class KennzahlenQA(Prozedur):
             "Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand "
             "V_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V_Rd/V₁. "
             "Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.")
-        waende = self.analyse.schubwaende_mit(e)
-        modell = sw.zellen(waende)
+        modell = sw.zellen(self.analyse.schubwaende_mit(e))
         bezug = (e.g("y_S").si, e.g("z_S").si)
         alpha_min, alpha_max = self.analyse.neigungsgrenzen(e)
         widerstaende = [sw.widerstand(w, alpha_min=alpha_min, alpha_max=alpha_max,
-                                      zugkraft=False) for w in waende]
+                                      zugkraft=False) for w in modell.waende]
         for kurz, last, symbol, einheit, beschriftung, _ in SCHUB:
             if last not in self.getragen:
                 continue
-            v = sw.verteilen(waende, modell, **_einheit(last, self.analyse.biegung),
-                             bezug=bezug)
+            v = sw.verteilen(modell, **_einheit(last, self.analyse.biegung), bezug=bezug)
             self._eine_last(p, ergebnis, kurz, symbol, einheit, beschriftung,
-                            waende, modell, v, widerstaende)
+                            modell, v, widerstaende)
 
     def _eine_last(self, p: Protokoll, ergebnis: Dict[str, Groesse], kurz: str, symbol: str,
-                   einheit, beschriftung: str, waende: Sequence[sw.Wand],
-                   modell: sw.Zellenmodell, v: sw.Verteilung,
+                   einheit, beschriftung: str, modell: sw.Zellenmodell, v: sw.Verteilung,
                    widerstaende: Sequence[sw.Wandwiderstand]) -> None:
         # Gezeigt je Einheit der Anzeige: V₁ in kN je kN (je kNm).
         anzeige = einheit.faktor
-        kraefte = sw.wandkraefte(waende, modell, v)
+        waende = modell.waende
+        kraefte = sw.wandkraefte(modell, v)
         traegt = [r.V_Rd / kraft if kraft > 0.0 else math.inf
                   for r, kraft in zip(widerstaende, kraefte)]
         zeilen = [[w.name, Mathe(fest(kraft * anzeige / 1e3, 3)), Mathe(f"{r.alpha}"),

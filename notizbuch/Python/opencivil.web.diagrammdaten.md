@@ -1,5 +1,5 @@
 ---
-erzeugt: 6bd33d5ff19a
+erzeugt: 426704843030
 art: modul
 tags: [modul]
 ---
@@ -327,10 +327,11 @@ Zugrichtung. Ohne Kruemmung ist alles gedrueckt oder nichts.
 def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]
 ```
 
-Der Schubfluss je Stueck einer Wand, mit Vorzeichen entlang der Wand, in
-kN/m -- und je Wand ihre ganze Kraft gegen ihren Widerstand, in kN, bei
-der Neigung, die der Nachweis gewaehlt hat. Ohne Verteilung (keine Wand,
-keine Last) nichts.
+Je Schubwand, wie der Nachweis sie sieht -- an ihren Knoten geteilt
+([[opencivil.querschnitt.schubwaende#einzeln|einzeln]]) --, ihre Achse und
+Dicke in mm, ihr Fluss mit Vorzeichen entlang der Achse in kN/m und ihre
+ganze Kraft gegen ihren Widerstand in kN, bei der Neigung, die der
+Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
 
 
 ## Konstanten
