@@ -15,10 +15,12 @@ gelernt wurde, steht in [[Entwicklung]].
       «Steil», steht −9 kPa · 1.6 m · 4 m = 0 kN. Die Begrenzung in die
       Formel schreiben (\max[0; σ_f]) oder als Satz davor. Gefunden beim
       Bau der Kurzform, 2026-11-16.
-- [ ] Kurzform hinter dem Auge: weitere Nachweise kennzeichnen. Heute nur
-      die Platte -- Biegung bei N = 0, Querkraft mit und ohne Bügel. Nahe
-      läge die Querkraft im Pfahl (`pfahl/innen_quer.py`: V_Rd,s der
-      Wendel, V_Rd,c, das Minimum); der Benutzer entscheidet.
+- [ ] Kurzform hinter dem Auge: weitere Nachweise kennzeichnen. Heute die
+      Platte -- Biegung bei N = 0, Querkraft mit und ohne Bügel -- und seit
+      2026-11-18 die Querkraft im Bohrpfahl (Wendel, Druckdiagonalen, das
+      Minimum im Erfüllungsgrad). Der Mikropfahl bleibt ohne: sein
+      Widerstand ist schon zwei kurze Zeilen. Welche weiter, entscheidet der
+      Benutzer.
 - [ ] Decken: die Knoten der Lasten anderer Lastfälle bleiben in der
       Zeichnung als Punkte stehen, ohne ihre Last. Prüfen, ob sie mit ihr
       verschwinden sollen.

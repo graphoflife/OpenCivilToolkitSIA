@@ -3,7 +3,7 @@ Die Kurzform eines Nachweises: seine Formeln in zwei, drei Zeilen.
 
 Geprüft wird der Formelbaum -- lesen, einsetzen, kürzen, setzen, rechnen --
 und die Kurzform der häufigsten Nachweise der Platte: Biegung bei N = 0,
-Querkraft mit und ohne Bügel. Jede Kurzform rechnet dasselbe wie die
+Querkraft mit und ohne Bügel; dazu die Querkraft im Bohrpfahl. Jede Kurzform rechnet dasselbe wie die
 Herleitung; wo das nicht aufginge, bleibt es bei den einzelnen Zeilen.
 """
 
@@ -173,6 +173,36 @@ class TestKurzformDerPlatte(unittest.TestCase):
         """Interpoliert zwischen zwei Eckpunkten: dort gibt es keine kurze Formel."""
         self.assertEqual(self.kurz("querschnitt.q1.nachweis.mn.x.Feld_mit_Druck.erfuellungsgrad"), [])
         self.assertEqual(self.kurz("gibt.es.nicht"), [])
+
+
+class TestKurzformDesPfahls(unittest.TestCase):
+    """Die Querkraft im Bohrpfahl: Wendel, Druckdiagonalen, der Erfüllungsgrad mit dem Minimum."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.aufbau = beispiele.jeder_nachweis().aufbauen()
+
+    def kurz(self, ziel):
+        return kurzform(self.aufbau.werk.loese(ziel).protokoll, ziel)
+
+    def test_querkraft_im_bohrpfahl_in_drei_formeln(self):
+        zeilen = self.kurz("pfahl.t1.nachweis.innen_quer.Druck.querkraft")
+        self.assertEqual([z.formelzeile.symbol for z in zeilen][:2], ["V_{Rd,s}", "V_{Rd,c}"])
+        grad = zeilen[2].formelzeile
+        self.assertEqual(grad.analytisch, (
+            r"\frac{\eta_i \cdot \min\left[V_{Rd,s};\ V_{Rd,c}\right]}{\left|V\right|}"))
+        self.assertEqual(grad.ergebnis, "1.79")
+        self.assertEqual(len(zeilen), 3)
+        # Mit η_i geht seine Normstelle in die Zeile.
+        self.assertIn("SIA 267:2013", zeilen[2].referenz)
+        for z in zeilen:
+            with self.subTest(titel=z.titel):
+                self.assertLessEqual(sichtbare_breite(z.formelzeile.analytisch), KURZBREITE)
+                self.assertLessEqual(bruchtiefe(z.formelzeile.analytisch), 1)
+
+    def test_der_mikropfahl_hat_keine(self):
+        """Sein Widerstand ist schon zwei kurze Zeilen; gekennzeichnet ist dort nichts."""
+        self.assertEqual(self.kurz("pfahl.t4.nachweis.innen_quer.Zug.querkraft"), [])
 
 
 class TestKurzformRegeln(unittest.TestCase):

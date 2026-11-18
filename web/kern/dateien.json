@@ -110,7 +110,7 @@
     "opencivil/pfahl/buch.py": "4f5e8b858e1a",
     "opencivil/pfahl/erdwiderstand.py": "d08b46480954",
     "opencivil/pfahl/innen.py": "e06c84fe8077",
-    "opencivil/pfahl/innen_quer.py": "794bbfc1a0dd",
+    "opencivil/pfahl/innen_quer.py": "4b6980d3935c",
     "opencivil/pfahl/pfahl.py": "96aa095fd22e",
     "opencivil/pfahl/quer.py": "60fd4f4899ce",
     "opencivil/pfahl/steifigkeit.py": "d3cec017bc7f",

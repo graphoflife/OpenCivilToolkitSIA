@@ -7,6 +7,18 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-18 · Pfahl: Kurzform der Querkraft
+
+Das Auge zeigt die Querkraft im Bohrpfahl jetzt auch kurz, in drei Zeilen:
+der Widerstand der Wendel, der der Druckdiagonalen und der Erfüllungsgrad
+mit dem Minimum darin, im Beispiel «Jeder Nachweis einmal» beim ersten Pfahl
+η_i · min[335.9 kN; 1374.8 kN] / 150 kN = 1.79. Vorher stand dort nur die
+lange Herleitung. Der Benutzer hatte die Wahl der Empfehlung überlassen; es
+ist der Kandidat, den [[TODO]] nannte. Der Mikropfahl bleibt ohne Kurzform:
+sein Widerstand ist schon die Schubfläche und eine Zeile mit f_yd / √3.
+
+---
+
 ## 2026-11-18 · Balkensystem: «QS Analyse» statt «Aus QS Analyse»
 
 Der Schalter steht unter «A und I aus», und dort las man «A und I aus …

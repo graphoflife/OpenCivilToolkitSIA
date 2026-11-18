@@ -59,7 +59,7 @@ from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Ei
 from opencivil.core.einheiten import GRAD, M, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.nachweis import Nachweis, NachweisUrteil, Vergleich, grad_def
-from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.protokoll import Kurz, Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.nachweis.querkraft_buegel import REFERENZ_DIAGONALE
 from opencivil.pfahl.innen import WAHL, Innenbefund, biegewiderstand, querschnitt
@@ -302,17 +302,19 @@ class InnererQuerwiderstand(Nachweis):
         p.formel(V_s, rf"{fest(WENDEL, 1)} \cdot \frac{{@A}}{{@s}} \cdot @z \cdot @f_yd \cdot "
                       r"\cot @alpha", {**w, "alpha": alpha},
                  titel=f"Widerstand der Wendel{wo}: 70 % senkrechter Bügel",
-                 referenz=REFERENZ_WENDEL, name="Widerstand der Wendel")
+                 referenz=REFERENZ_WENDEL, name="Widerstand der Wendel", kurz=Kurz.ZEILE)
         V_c = werte.kraft(f"V_Rd_c{n}", f"V_{{Rd,c{i}}}", punkt.V_Rd_c,
                           "Widerstand der Druckdiagonalen")
         p.formel(V_c, r"@b_w \cdot @z \cdot @k_c \cdot @f_cd \cdot \sin @alpha \cdot \cos @alpha",
                  {**w, "alpha": alpha}, titel=f"Widerstand der Druckdiagonalen{wo}",
-                 referenz=REFERENZ_DIAGONALE, name="Widerstand der Druckdiagonalen im Pfahl")
+                 referenz=REFERENZ_DIAGONALE, name="Widerstand der Druckdiagonalen im Pfahl",
+                 kurz=Kurz.ZEILE)
         V_Rd = werte.kraft(f"V_Rd{n}", f"V_{{Rd{i}}}", e.g("eta_i").si * punkt.V_Rd,
                            "Querkraftwiderstand des Pfahls")
         p.formel(V_Rd, r"@eta \cdot \min\left[@s;\ @c\right]",
                  {"eta": e["eta_i"], "s": V_s, "c": V_c}, titel=f"Querkraftwiderstand{wo}",
-                 referenz=REFERENZ_ETA, name="Querkraftwiderstand des Pfahls")
+                 referenz=REFERENZ_ETA, name="Querkraftwiderstand des Pfahls",
+                 kurz=Kurz.EINSETZEN)
         return Schub(V_Rd, alpha)
 
     def _tragglied(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
