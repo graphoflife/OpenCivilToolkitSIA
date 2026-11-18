@@ -937,6 +937,25 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       3569 N/mm²; EI_z sinkt damit wie EI_y auf gut ein Zehntel, GI_T
       bleibt. Prüfen, ob EI_z mit E_cm rechnen soll, und ob GI_T für Risse
       abgemindert werden soll (SIA 262:2025, 4.1.4.1.3 lässt es zu).
+- [ ] **I_T einer Querschnittsanalyse, numerisch, nach Vorgabe**
+      (`querschnitt/torsion.py`). Die Spannungsfunktion von Prandtl auf
+      einem Gitter, zwei Gitter nach Richardson; gegen Rechteck, Dreieck,
+      Kreis und Rohr auf ein Promille. Gerechnet am ungerissenen
+      Bruttoquerschnitt ohne Bewehrung, wie bei den Vorlagen: ein
+      gerissener Betonquerschnitt ist unter Torsion viel weicher (SIA
+      262:2025, 4.1.4.1.3 lässt eine Abminderung zu). Beispiel: der
+      Kastenträger des Prüfprojekts, 800 × 600 mm mit Aussparung 500 × 300
+      mm, hat I_T = 27 477 · 10⁶ mm⁴; Bredt mit der Mittellinie gäbe
+      23 334 · 10⁶ mm⁴. Prüfen, ob es so bleiben soll.
+- [ ] **Im Raum gelten y und z als Hauptachsen, nach Vorgabe**
+      (`stabwerk3d/herleitung.py`). Ein Querschnitt aus einer Analyse
+      bringt A, I_y und I_z mit; sein Deviationsmoment I_yz bleibt aussen
+      vor. Bei einem unsymmetrischen Querschnitt, etwa einem L, biegt sich
+      der Stab dann falsch: eine Last in z verschöbe ihn in Wirklichkeit
+      auch in y. Vorlagen und Profile sind symmetrisch, für sie stimmt es.
+      Vorschlag: die Hauptachsen der Analyse rechnen und den Querschnitt um
+      ihren Winkel zusätzlich drehen, oder eine Warnung, wenn I_yz nicht
+      null ist. Entscheid des Benutzers.
 - [ ] **Die Vorwahlen der Lager im Raum, nach Vorgabe**
       (`projekt/balkensystem3d.py`). «Gelenkig» hält die drei
       Verschiebungen, «verschieblich» nur die lotrechte, «eingespannt» alle

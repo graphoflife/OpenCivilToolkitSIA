@@ -7,6 +7,37 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-18 · 3D-Balkensystem: Querschnitt aus einer Querschnittsanalyse
+
+Jetzt kann ein Stab im Raum seinen Querschnitt auch aus einer
+Querschnittsanalyse nehmen -- der letzte Unterschied zur Ebene bei der Wahl
+des Querschnitts (Benutzer, selber Tag: «genau gleich, einfach einmal in
+3d»). Dafür fehlte ein I_T: die Analyse kannte A, I_y und I_z, aber für ein
+beliebiges Polygon gibt es keine Formel der Torsion. Jetzt rechnet sie es
+selbst, numerisch, und zwar nur, wenn ein Stab im Raum es braucht -- das
+Rechenwerk rechnet nur, was ein Ziel verlangt, und die Ebene verlangt es
+nie. Beispiel: das Rechteck 300 × 600 mm einer frischen Analyse hat
+I_T = 3704.7 · 10⁶ mm⁴, die Reihe von St. Venant gibt 3704.6 · 10⁶ mm⁴;
+gerechnet in 0.1 s.
+
+- `querschnitt/torsion.py`: die Spannungsfunktion von Prandtl auf einem
+  Gitter durch die achsparallelen Kanten, schräge Kanten genau
+  geschnitten, jeder Hohlraum ein einziger Knoten, gelöst mit konjugierten
+  Gradienten; dazu ein zweites Gitter, halb so gross, und Richardson.
+  Warum zwei Gitter: eine dünne Wand mit n Zellen rechnet um 2/n² zu steif,
+  bei vier Zellen also 12 %; extrapoliert bleibt davon nichts. Liegen die
+  beiden über 5 % auseinander, wird feiner gerechnet -- das braucht nur eine
+  dünne schräge Wand.
+- Getrennte Teile tragen je für sich, eine Insel im Hohlraum zählt zu
+  seiner Fläche, eine Aussparung am Rand ist kein Hohlraum. Ohne fremde
+  Pakete, wie alles hier; Formeln und Theorie in der Formelsammlung.
+- Die Herleitung zeigt beide Gitter und I_T mit Zahlen. Im Raum gelten y
+  und z als Hauptachsen, I_yz bleibt aussen vor -- das sagt die Herleitung,
+  und [[TODO]] hat den Punkt mit einem Vorschlag.
+- Das Prüfprojekt hat im Raumrahmen je einen Stab aus Platte und Analyse.
+
+---
+
 ## 2026-11-18 · 3D-Balkensystem: Querschnitt aus einer Platte
 
 Im 3D-Balkensystem kann ein Querschnitt jetzt aus einer Platte kommen, wie
@@ -25,8 +56,8 @@ I_T = 4388 · 10⁶ mm⁴ -- den Formeln des Rechtecks --, E_cm und G_cm.
 - Der Streifen liegt mit b waagrecht, solange β null ist, wie eine Platte.
 - Ein E_eq gilt für EA, EI_y und EI_z; GI_T rechnet mit G_cm (nach
   Vorgabe, in [[TODO]]). Die Herleitung sagt es.
-- «QS Analyse» fehlt im Raum noch: die Querschnittsanalyse rechnet kein
-  I_T. Das kommt als Nächstes.
+- «QS Analyse» fehlte im Raum noch: die Querschnittsanalyse rechnete
+  kein I_T (siehe den Eintrag darüber).
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6437e8138607
+erzeugt: 526a241b224b
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -31,7 +31,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Querschnittsanalyse**
 
-- [[Querschnittsanalyse]] · 5
+- [[Querschnittsanalyse]] · 8
 - [[Schiefe Biegung]] · 11
 - [[Querkraft und Torsion]] · 7
 - [[Duktilität je Richtung]] · 4
@@ -327,6 +327,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Spannung im ungerissenen Querschnitt]]
 - [[Spannung in der Durchstanzbewehrung]] · $\sigma_{sd}$
 - [[Spannungsblock des Betons]]
+- [[Spannungsfunktion von Prandtl]]
 - [[Spitzendruck drainiert]] · $q_{b,k}$
 - [[Spitzendruck undrainiert]] · $q_{b,k}$
 - [[Spitzenwiderstand]] · $R_{b,k}$
@@ -344,8 +345,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Tiefenfaktor d_q]] · $d_q$
 - [[Torsion in den Zellen (Bredt, mehrzellig)]]
 - [[Torsionssteifigkeit]] · $GI_{T}$
+- [[Torsionsträgheitsmoment aus der Spannungsfunktion]]
 - [[Torsionsträgheitsmoment eines I-Profils]] · $I_{T}$
 - [[Torsionsträgheitsmoment eines Rechtecks]] · $I_{T}$
+- [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · $I_T$
 - [[Tragfähigkeitsfaktor des Pfahlfusses undrainiert]] · $N_c$
 - [[Tragfähigkeitsfaktor N_c]] · $N_c$
 - [[Tragfähigkeitsfaktor N_q]] · $N_q$
@@ -393,7 +396,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-126 von 320 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
+129 von 323 Formeln haben im Code keine Normstelle -- meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]
@@ -498,6 +501,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schwerpunkt eines U-Profils mit parallelen Flanschen]] · [[opencivil.stabwerk.profilformen]]
 - [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Spannung im ungerissenen Querschnitt]] · [[opencivil.nachweis.rissgroessen#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
+- [[Spannungsfunktion von Prandtl]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Statische Höhe]] · [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]
 - [[Statische Höhe der äusseren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
 - [[Statische Höhe der inneren Lage]] · [[opencivil.durchstanzen.nachweis#Durchstanzen._statische_hoehe|Durchstanzen._statische_hoehe]]
@@ -506,8 +510,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
 - [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]
 - [[Torsionssteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
+- [[Torsionsträgheitsmoment aus der Spannungsfunktion]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Torsionsträgheitsmoment eines I-Profils]] · [[opencivil.stabwerk.profilformen]]
 - [[Torsionsträgheitsmoment eines Rechtecks]] · [[opencivil.stabwerk.querschnitte#_torsion|_torsion]]
+- [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 - [[Umfang des Pfahls]] · [[opencivil.pfahl.aussen#AeussererWiderstand._mantel|AeussererWiderstand._mantel]]
 - [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]

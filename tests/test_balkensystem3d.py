@@ -73,9 +73,10 @@ class TestBeschreibung(unittest.TestCase):
         s = Balkensystem3dEintrag(kennung="u1", name="S")
         with self.assertRaisesRegex(ProjektFehler, "Möglich sind: senkrecht, x, y, z"):
             s.knotenlast("LF1", (0, 0, 0), richtung="laengs")
-        with self.assertRaisesRegex(ProjektFehler, "Möglich sind: vorlage, profil, kennwerte, platte"):
+        with self.assertRaisesRegex(
+                ProjektFehler, "Möglich sind: vorlage, profil, kennwerte, platte, analyse"):
             Balkensystem3dEintrag.aus_dict({"kennung": "u1", "name": "S",
-                                            "querschnitte": [{"art": "analyse"}]})
+                                            "querschnitte": [{"art": "zeichnung"}]})
         with self.assertRaisesRegex(ProjektFehler, "'M' gibt es als 'groesse' nicht"):
             s.diagramm("LF1", "M")
 
@@ -322,6 +323,58 @@ class TestAusEinerPlatte(unittest.TestCase):
                                delta=1e-9 * soll)
 
 
+class TestAusEinerAnalyse(unittest.TestCase):
+    """
+    Ein Querschnitt aus einer Querschnittsanalyse, wie in der Ebene (Benutzer,
+    2026-11-18): A, I_y und I_z ihres Bruttoquerschnitts, dazu ein I_T, das
+    sie dafür numerisch rechnet -- nur, wenn ein Stab im Raum es braucht.
+    """
+
+    def projekt(self, im_raum=True):
+        """Ein Kragarm von 4 m aus der Analyse «Balken», dem Rechteck 300 × 600 mm."""
+        p = Projekt(name="Raum")
+        p.beton("C30/37")
+        p.stahl("B500B")
+        a = p.analyse("Balken")
+        s = p.balkensystem3d("Rahmen") if im_raum else p.balkensystem("Rahmen")
+        q = s.querschnitt_aus("Balken", "analyse", a)
+        anfang, ende = ((0, 0, 0), (4, 0, 0)) if im_raum else ((0, 0), (4, 0))
+        s.linie(anfang, ende, querschnitt=q, material=MATERIAL_DES_QUERSCHNITTS)
+        s.lager_an(anfang, "eingespannt")
+        s.knotenlast(s.lastfall("P"), ende, 10.0)
+        return p, a, s, q
+
+    def test_die_kennwerte_der_analyse_und_ihr_I_T(self):
+        p, a, s, q = self.projekt()
+        e = p.rechnen()
+        self.assertTrue(e.balkensystem("Rahmen").ergebnis.gueltig,
+                        e.balkensystem("Rahmen").ergebnis.meldungen)
+        analyse = e.aufbau.querschnittsanalysen[a.kennung]
+
+        def wert(kurz):
+            return e.wert(f"balkensystem3d.{s.kennung}.{q.kennung}.{kurz}").groesse.si
+
+        for kurz in ("A", "I_y", "I_z", "I_T"):
+            self.assertEqual(wert(kurz), e.wert(analyse.id_von(kurz)).groesse.si)
+        b, h = 0.3, 0.6
+        self.assertAlmostEqual(wert("I_y"), b * h ** 3 / 12, delta=1e-12)
+        self.assertAlmostEqual(wert("I_z"), h * b ** 3 / 12, delta=1e-12)
+        # I_T des Rechtecks nach der Reihe von St. Venant: 3704.64 · 10⁶ mm⁴.
+        self.assertAlmostEqual(wert("I_T") / 3704.64e-6, 1.0, delta=1e-4)
+        G = e.wert("beton.b1.G_cm").groesse.si
+        self.assertAlmostEqual(wert(f"{MATERIAL_DES_QUERSCHNITTS}.GI_T"), G * wert("I_T"),
+                               delta=1e-9 * G * wert("I_T"))
+        self.assertEqual(s.bezuege(), [a.kennung])
+
+    def test_in_der_ebene_wird_I_T_nicht_gerechnet(self):
+        """Die Ebene braucht kein I_T -- und das Rechenwerk rechnet nur, was ein Ziel braucht."""
+        p, a, s, q = self.projekt(im_raum=False)
+        e = p.rechnen()
+        self.assertTrue(e.balkensystem("Rahmen").ergebnis.gueltig)
+        self.assertNotIn(e.aufbau.querschnittsanalysen[a.kennung].id_von("I_T"),
+                         e.loesung.werte)
+
+
 class TestMaterialkennwerte(unittest.TestCase):
     def test_der_raum_nimmt_dazu_den_schubmodul(self):
         self.assertEqual(RAUMKENNWERTE["beton"], {**STABKENNWERTE["beton"], "G": "G_cm"})
@@ -373,7 +426,7 @@ class TestFuerDieOberflaeche(unittest.TestCase):
         self.assertEqual(raum["profilachsen"], [])
         self.assertEqual(raum["laufrichtungen"], [])        # wie gezeichnet
         self.assertEqual([q["wert"] for q in raum["querschnittsarten"]],
-                         ["vorlage", "profil", "kennwerte", "platte"])
+                         ["vorlage", "profil", "kennwerte", "platte", "analyse"])
         self.assertEqual(raum["lagerarten"][0], {"wert": "gelenkig", "x": "fest", "y": "fest",
                                                  "z": "fest", "phi_x": "frei", "phi_y": "frei",
                                                  "phi_z": "frei"})

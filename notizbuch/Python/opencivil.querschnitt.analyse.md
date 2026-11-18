@@ -1,5 +1,5 @@
 ---
-erzeugt: 882a30ba8f10
+erzeugt: 13e5ac9492b9
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,9 @@ tags: [modul]
 Aus der Beschreibung einer Querschnittsanalyse wird hier ein Bauteil wie die
 Platte ([[opencivil.querschnitt.platte#Plattenquerschnitt|Plattenquerschnitt]]): mit
 Namensraum, Ueberschrift, Werten und einer Herleitung des Querschnitts --
-Polygone, Bruttoquerschnitt, Bewehrung, Schubwaende. Die Nachweise bekommen
+Polygone, Bruttoquerschnitt, Bewehrung, Schubwaende. Dazu, fuer sich,
+`I_T` ([[opencivil.querschnitt.torsion|torsion]]): es braucht nur ein Stab
+im Raum, und das Rechenwerk rechnet nur, was ein Ziel braucht. Die Nachweise bekommen
 das Bauteil und lesen daraus die Geometrie; seine Zahlen beziehen sie ueber
 das Rechenwerk, damit jede rueckverfolgbar bleibt.
 
@@ -218,15 +220,15 @@ Wandenden ein Knoten sind, ist eine Laenge. In Millimetern gesucht,
 hiesse sie hier etwas anderes als dort -- und das Fenster zeigte eine
 Zelle nicht, mit der gerechnet wird.
 
-### QuerschnittsaufbauProzedur
+### Herleitungsteil
 
 ```python
-class QuerschnittsaufbauProzedur(Prozedur)
+class Herleitungsteil(Prozedur)
 ```
 
-Polygone, Bruttoquerschnitt, Bewehrung und Schubwaende -- in Tabellen.
+Ein Teil der Herleitung des Querschnitts -- die Analyse schreibt ihn selbst.
 
-#### QuerschnittsaufbauProzedur.rechne
+#### Herleitungsteil.rechne
 
 ```python
 def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
@@ -280,6 +282,14 @@ Jeder Baustoff, den die Analyse benutzt: erst die der Flaechen, dann die Staehle
 ```python
 def aufbau_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]
 ```
+
+#### Querschnittsanalyse.torsion_protokollieren
+
+```python
+def torsion_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]
+```
+
+`I_T` nach St. Venant, numerisch -- mit den beiden Gittern, aus denen es kommt.
 
 #### Querschnittsanalyse.angaben
 
@@ -438,6 +448,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schubwaende]]
+- [[opencivil.querschnitt.torsion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]
 
@@ -463,6 +474,9 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · `Querschnittsanalyse._waende_protokollieren`
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]] · `Querschnittsanalyse.aufbau_protokollieren`
+- [[Spannungsfunktion von Prandtl]] · `Querschnittsanalyse.torsion_protokollieren`
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · `Querschnittsanalyse._bewehrung_protokollieren`
+- [[Torsionsträgheitsmoment aus der Spannungsfunktion]] · `Querschnittsanalyse.torsion_protokollieren`
+- [[Torsionsträgheitsmoment, nach Richardson aus beiden Gittern]] · `Querschnittsanalyse.torsion_protokollieren`
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · `Querschnittsanalyse.aufbau_protokollieren`
 - [[Verschmierte Stahlfläche aus Stäben]] · `Querschnittsanalyse._bewehrung_protokollieren`

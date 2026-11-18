@@ -1,6 +1,6 @@
 # Voll
 
-771 Berechnungen ausgeführt, 1078 Werte bestimmt.
+796 Berechnungen ausgeführt, 1102 Werte bestimmt.
 
 ## Herleitung
 
@@ -7232,6 +7232,37 @@ $$
 
 $$
 T_{Rd} = 230.7\,\mathrm{kNm}
+$$
+
+> **Annahme:** I\_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht nachgeschlagen).
+
+**Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k**
+
+$$
+\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad \oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k
+$$
+
+**Torsionsträgheitsmoment aus der Spannungsfunktion**
+
+$$
+I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k
+$$
+
+**Die beiden Gitter**
+
+| Gitter | Zellen | mit Material | $A_k\ [\mathrm{mm}^2]$ | $I_T\ [10^6\,\mathrm{mm}^4]$ |
+| :--- | ---: | ---: | ---: | ---: |
+| grob | $31 \times 24$ | $516$ | $150000$ | $27660.5$ |
+| fein | $62 \times 48$ | $2064$ | $150000$ | $27523.2$ |
+
+**Torsionsträgheitsmoment, nach Richardson aus beiden Gittern**
+
+$$
+\begin{aligned}
+  I_T &= \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} \\
+  &= \frac{4 \cdot 27523.2\,\cdot 10^{6}\,\mathrm{mm}^{4} - 27660.5\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} \\
+  &= 27477.5\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{aligned}
 $$
 
 ### Querschnittsanalyse: Stütze
@@ -17179,6 +17210,98 @@ $$
 I_{T,\text{Q3}} = 225\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
+**Querschnittsfläche, «Deckenstreifen» (Platte «Decke»)**
+
+$$
+A_{\text{Q4}} = b \cdot h = 1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} = 300000\,\mathrm{mm}^{2}
+$$
+
+**Flächenträgheitsmoment um y, «Deckenstreifen» (Platte «Decke»)**
+
+$$
+I_{y,\text{Q4}} = \frac{b \cdot \left(h\right)^{3}}{12} = \frac{1000\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 2250\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Flächenträgheitsmoment um z, «Deckenstreifen» (Platte «Decke»)**
+
+$$
+I_{z,\text{Q4}} = \frac{h \cdot \left(b\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(1000\,\mathrm{mm}\right)^{3}}{12} = 25000\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Längere Seite, «Deckenstreifen» (Platte «Decke»)**
+
+$$
+s_{\text{Q4}} = \max\left(b, h\right) = \max\left(1000\,\mathrm{mm}, 300\,\mathrm{mm}\right) = 1000\,\mathrm{mm}
+$$
+
+**Kürzere Seite, «Deckenstreifen» (Platte «Decke»)**
+
+$$
+t_{\text{Q4}} = \min\left(b, h\right) = \min\left(1000\,\mathrm{mm}, 300\,\mathrm{mm}\right) = 300\,\mathrm{mm}
+$$
+
+**Torsionsträgheitsmoment, «Deckenstreifen» (Platte «Decke»)**
+
+$$
+\begin{aligned}
+  I_{T,\text{Q4}} &= s_{\text{Q4}} \cdot \left(t_{\text{Q4}}\right)^{3} \cdot \left(\frac{1}{3} - 0.21 \cdot \frac{t_{\text{Q4}}}{s_{\text{Q4}}} \cdot \left(1 - \frac{\left(t_{\text{Q4}}\right)^{4}}{12 \cdot \left(s_{\text{Q4}}\right)^{4}}\right)\right) \\
+  &= 1000\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3} \cdot \left(\frac{1}{3} - 0.21 \cdot \frac{300\,\mathrm{mm}}{1000\,\mathrm{mm}} \cdot \left(1 - \frac{\left(300\,\mathrm{mm}\right)^{4}}{12 \cdot \left(1000\,\mathrm{mm}\right)^{4}}\right)\right) \\
+  &= 7300.15\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{aligned}
+$$
+
+**Querschnittsfläche, «Kasten» (Bruttoquerschnitt der Querschnittsanalyse «Kastenträger»)**
+
+$$
+A_{\text{Q5}} = 330000\,\mathrm{mm}^{2}
+$$
+
+**Flächenträgheitsmoment um y, «Kasten» (Bruttoquerschnitt der Querschnittsanalyse «Kastenträger»)**
+
+$$
+I_{y,\text{Q5}} = 13275\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Flächenträgheitsmoment um z, «Kasten» (Bruttoquerschnitt der Querschnittsanalyse «Kastenträger»)**
+
+$$
+I_{z,\text{Q5}} = 22475\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Torsionsträgheitsmoment, «Kasten» (Bruttoquerschnitt der Querschnittsanalyse «Kastenträger»)**
+
+$$
+I_{T,\text{Q5}} = 27477.49\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Normalkraft für E\_eq, «Deckenstreifen»**
+
+$$
+N_{\text{Q4}} = 0\,\mathrm{kN}
+$$
+
+**Moment für E\_eq, «Deckenstreifen»**
+
+$$
+M_{\text{Q4}} = 20\,\mathrm{kNm}
+$$
+
+Platte «Decke», x-Richtung, Zug unten, Präzise ohne Vereinfachung, φ = 0, Bemessung.
+
+**Rissmoment bei dieser Normalkraft**
+
+$$
+M_{Riss} = 41.4\,\mathrm{kNm}
+$$
+
+Das Moment liegt nicht über dem Rissmoment: der Querschnitt gilt ungerissen.
+
+**Äquivalenter E-Modul, «Deckenstreifen»**
+
+$$
+E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)} = \frac{20\,\mathrm{kNm}}{2250\,\cdot 10^{6}\,\mathrm{mm}^{4} \cdot \left(0.00025\,\mathrm{m}^{-1} - 0\,\mathrm{m}^{-1}\right)} = 35903\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
 **Dehnsteifigkeit, «Balken 300×500» aus C30/37**
 
 $$
@@ -17313,7 +17436,73 @@ $$
 \end{aligned}
 $$
 
-> **Annahme:** Steifigkeit: E\_cm und G\_cm des Betons, E\_a und G\_a des Baustahls oder E und G eines eigenen Materials, am ungerissenen Querschnitt ohne Bewehrung und ohne Schubverformung. Bei einem Querschnitt aus einer Platte wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2): es gilt für EA, EI\_y und EI\_z, die Torsion behält G\_cm (nach Vorgabe, nicht nachgeschlagen). Die Torsion nach St. Venant, ohne Wölbkrafttorsion und ohne den Abstand von Schubmittelpunkt und Schwerpunkt (nach Vorgabe, nicht nachgeschlagen). Beim Beton ungerissen auch die Torsion: Abminderungen für Risse und Kriechen lässt die Norm zu, sie können aber günstig oder ungünstig wirken (SIA 262:2025, 4.1.4.1.3). Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2); Kippen und Knicken sind nachzuweisen.
+**Dehnsteifigkeit, «Kasten» aus C30/37**
+
+$$
+EA_{\text{Q5}} = E_{cm} \cdot A_{\text{Q5}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 330000\,\mathrm{mm}^{2} = 11095\,\mathrm{MN}
+$$
+
+**Biegesteifigkeit um y, «Kasten» aus C30/37**
+
+$$
+EI_{y,\text{Q5}} = E_{cm} \cdot I_{y,\text{Q5}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 13275\,\cdot 10^{6}\,\mathrm{mm}^{4} = 446302\,\mathrm{kNm}^{2}
+$$
+
+**Biegesteifigkeit um z, «Kasten» aus C30/37**
+
+$$
+EI_{z,\text{Q5}} = E_{cm} \cdot I_{z,\text{Q5}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 22475\,\cdot 10^{6}\,\mathrm{mm}^{4} = 755604\,\mathrm{kNm}^{2}
+$$
+
+**Torsionssteifigkeit, «Kasten» aus C30/37**
+
+$$
+GI_{T,\text{Q5}} = G_{cm} \cdot I_{T,\text{Q5}} = 14008\,\mathrm{N}/\mathrm{mm}^{2} \cdot 27477.49\,\cdot 10^{6}\,\mathrm{mm}^{4} = 384911\,\mathrm{kNm}^{2}
+$$
+
+**Eigengewicht, «Kasten» aus C30/37**
+
+$$
+g_{k,\text{Q5}} = \rho_{sb} \cdot g \cdot A_{\text{Q5}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 330000\,\mathrm{mm}^{2} = 8.25\,\mathrm{kN}/\mathrm{m}
+$$
+
+**E-Modul, «Deckenstreifen» (E\_eq)**
+
+$$
+E_{\text{Q4}} = 35903\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Dehnsteifigkeit, «Deckenstreifen» mit E\_eq**
+
+$$
+EA_{\text{Q4}} = E_{\text{Q4}} \cdot A_{\text{Q4}} = 35903\,\mathrm{N}/\mathrm{mm}^{2} \cdot 300000\,\mathrm{mm}^{2} = 10771\,\mathrm{MN}
+$$
+
+**Biegesteifigkeit um y, «Deckenstreifen» mit E\_eq**
+
+$$
+EI_{y,\text{Q4}} = E_{\text{Q4}} \cdot I_{y,\text{Q4}} = 35903\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2250\,\cdot 10^{6}\,\mathrm{mm}^{4} = 80782\,\mathrm{kNm}^{2}
+$$
+
+**Biegesteifigkeit um z, «Deckenstreifen» mit E\_eq**
+
+$$
+EI_{z,\text{Q4}} = E_{\text{Q4}} \cdot I_{z,\text{Q4}} = 35903\,\mathrm{N}/\mathrm{mm}^{2} \cdot 25000\,\cdot 10^{6}\,\mathrm{mm}^{4} = 897572\,\mathrm{kNm}^{2}
+$$
+
+**Torsionssteifigkeit, «Deckenstreifen» mit E\_eq**
+
+$$
+GI_{T,\text{Q4}} = G_{cm} \cdot I_{T,\text{Q4}} = 14008\,\mathrm{N}/\mathrm{mm}^{2} \cdot 7300.15\,\cdot 10^{6}\,\mathrm{mm}^{4} = 102262\,\mathrm{kNm}^{2}
+$$
+
+**Eigengewicht, «Deckenstreifen» aus C30/37**
+
+$$
+g_{k,\text{Q4}} = \rho_{sb} \cdot g \cdot A_{\text{Q4}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 300000\,\mathrm{mm}^{2} = 7.5\,\mathrm{kN}/\mathrm{m}
+$$
+
+> **Annahme:** Steifigkeit: E\_cm und G\_cm des Betons, E\_a und G\_a des Baustahls oder E und G eines eigenen Materials, am ungerissenen Querschnitt ohne Bewehrung und ohne Schubverformung. Bei einem Querschnitt aus einer Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2): es gilt für EA, EI\_y und EI\_z, die Torsion behält G\_cm. y und z gelten als Hauptachsen des Querschnitts; das Deviationsmoment einer Querschnittsanalyse bleibt aussen vor (beides nach Vorgabe, nicht nachgeschlagen). Die Torsion nach St. Venant, ohne Wölbkrafttorsion und ohne den Abstand von Schubmittelpunkt und Schwerpunkt (nach Vorgabe, nicht nachgeschlagen). Beim Beton ungerissen auch die Torsion: Abminderungen für Risse und Kriechen lässt die Norm zu, sie können aber günstig oder ungünstig wirken (SIA 262:2025, 4.1.4.1.3). Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2); Kippen und Knicken sind nachzuweisen.
 
 > **Annahme:** Die Durchbiegungen f\_y und f\_z misst jeder Stab gegen die Gerade zwischen seinen Enden, in y und z seiner Achsen. Die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1): dasselbe nur, wo ein Stab von Auflager zu Auflager reicht. Und sie gelten kurzzeitig am ungerissenen Querschnitt; Risse und Kriechen fehlen.
 
@@ -17327,7 +17516,9 @@ $$
 | L4 | K2 – K4 | $6.000$ | $0.0$ | Stütze | $3131$ | $52848$ | $17982$ | $150$ | Ende | – |
 | L5 | K2 – K6 | $4.000$ | $30.0$ | Balken 300×500 | $5043$ | $105062$ | $37822$ | $39466$ | – | – |
 | L6 | K4 – K7 | $2.236$ | $0.0$ | Stütze | $3131$ | $52848$ | $17982$ | $150$ | – | – |
-| L7 | K1 – K3 | $6.000$ | $0.0$ | Balken 300×500 | $5043$ | $105062$ | $37822$ | $39466$ | – | quer z Bettung 20000 kN/m², längs Bettung 5000 kN/m² |
+| L7 | K6 – K4 | $7.211$ | $0.0$ | Kasten | $11095$ | $446302$ | $755604$ | $384911$ | – | – |
+| L8 | K6 – K8 | $2.000$ | $0.0$ | Deckenstreifen | $10771$ | $80782$ | $897572$ | $102262$ | – | – |
+| L9 | K1 – K3 | $6.000$ | $0.0$ | Balken 300×500 | $5043$ | $105062$ | $37822$ | $39466$ | – | quer z Bettung 20000 kN/m², längs Bettung 5000 kN/m² |
 
 **Lager**
 
@@ -17391,7 +17582,7 @@ $$
 w'' = -\frac{M_y}{EI_y} \qquad v'' = -\frac{M_z}{EI_z} \qquad u' = \frac{N}{EA} \qquad \theta_x' = \frac{T}{GI_T}
 $$
 
-118 Unbekannte.
+124 Unbekannte.
 
 #### Lastfall «Eigengewicht»
 
@@ -17400,40 +17591,45 @@ $$
 | Knoten | $u_x\ [\mathrm{mm}]$ | $u_y\ [\mathrm{mm}]$ | $u_z\ [\mathrm{mm}]$ | $\varphi_x\ [\mathrm{mrad}]$ | $\varphi_y\ [\mathrm{mrad}]$ | $\varphi_z\ [\mathrm{mrad}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | K1 | $0.00$ | $0.00$ | $0.00$ | $0.000$ | $0.000$ | $0.000$ |
-| K2 | $0.89$ | $0.15$ | $-0.03$ | $-0.104$ | $0.618$ | $0.216$ |
-| K3 | $0.00$ | $0.00$ | $0.00$ | $-0.400$ | $-0.022$ | $0.000$ |
-| K4 | $0.89$ | $1.43$ | $-0.03$ | $-0.549$ | $0.455$ | $0.000$ |
-| K5 | $-0.03$ | $0.00$ | $0.00$ | $-0.129$ | $-0.289$ | $0.289$ |
-| K6 | $-0.07$ | $0.15$ | $-0.05$ | $0.109$ | $0.533$ | $0.289$ |
-| K7 | $1.34$ | $2.00$ | $-1.18$ | $-0.586$ | $0.455$ | $0.000$ |
+| K2 | $0.60$ | $0.20$ | $-0.03$ | $-0.149$ | $0.486$ | $0.142$ |
+| K3 | $0.00$ | $0.00$ | $0.00$ | $-0.260$ | $0.003$ | $0.000$ |
+| K4 | $0.59$ | $0.90$ | $-0.05$ | $-0.331$ | $-0.097$ | $0.114$ |
+| K5 | $-0.01$ | $0.00$ | $0.00$ | $-0.110$ | $-0.031$ | $0.120$ |
+| K6 | $0.13$ | $0.20$ | $-0.34$ | $0.018$ | $0.198$ | $0.120$ |
+| K7 | $0.27$ | $1.26$ | $-0.77$ | $-0.368$ | $-0.097$ | $0.114$ |
+| K8 | $0.13$ | $-0.04$ | $-0.13$ | $0.018$ | $0.074$ | $0.120$ |
 
 **Schnittgrössen an den Stabenden**
 
 | Stab | Ende | $N\ [\mathrm{kN}]$ | $V_y\ [\mathrm{kN}]$ | $V_z\ [\mathrm{kN}]$ | $T\ [\mathrm{kNm}]$ | $M_y\ [\mathrm{kNm}]$ | $M_z\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | a | $-50.7$ | $0.1$ | $-1.6$ | $2.8$ | $-19.2$ | $1.2$ |
-| L1 | b | $-39.5$ | $0.1$ | $-1.6$ | $2.8$ | $-24.1$ | $1.4$ |
-| L2 | a | $-29.5$ | $1.9$ | $0.0$ | $0.0$ | $-2.6$ | $-5.7$ |
-| L2 | b | $-26.0$ | $1.9$ | $0.0$ | $0.0$ | $-2.6$ | $0.0$ |
-| L3 | a | $-7.8$ | $-0.1$ | $-0.3$ | $0.0$ | $0.0$ | $0.0$ |
-| L3 | b | $-7.2$ | $-0.1$ | $-0.3$ | $0.0$ | $-0.8$ | $-0.2$ |
-| L4 | a | $-1.9$ | $0.0$ | $31.7$ | $0.0$ | $-24.9$ | $0.0$ |
-| L4 | b | $-1.9$ | $0.0$ | $-23.4$ | $0.0$ | $0.0$ | $0.0$ |
-| L5 | a | $-0.1$ | $4.1$ | $6.6$ | $-0.8$ | $-0.7$ | $-1.7$ |
-| L5 | b | $-0.1$ | $-3.4$ | $-6.4$ | $-0.8$ | $-0.2$ | $-0.1$ |
+| L1 | a | $-51.6$ | $0.3$ | $-5.8$ | $1.9$ | $-8.3$ | $1.4$ |
+| L1 | b | $-40.4$ | $0.3$ | $-5.8$ | $1.9$ | $-25.7$ | $2.4$ |
+| L2 | a | $-58.1$ | $5.9$ | $0.3$ | $0.0$ | $-1.7$ | $-8.2$ |
+| L2 | b | $-54.6$ | $5.9$ | $0.3$ | $0.0$ | $-0.8$ | $9.4$ |
+| L3 | a | $-52.7$ | $0.0$ | $-0.1$ | $0.0$ | $0.0$ | $0.0$ |
+| L3 | b | $-52.1$ | $0.0$ | $-0.1$ | $0.0$ | $-0.2$ | $-0.1$ |
+| L4 | a | $-6.0$ | $0.0$ | $32.3$ | $0.0$ | $-28.5$ | $-0.2$ |
+| L4 | b | $-6.0$ | $0.0$ | $-22.8$ | $0.0$ | $0.0$ | $0.0$ |
+| L5 | a | $-0.3$ | $4.2$ | $6.9$ | $-2.8$ | $-1.1$ | $-2.8$ |
+| L5 | b | $-0.3$ | $-3.3$ | $-6.1$ | $-2.8$ | $0.6$ | $-0.9$ |
 | L6 | a | $-1.2$ | $0.0$ | $2.3$ | $0.0$ | $-2.6$ | $0.0$ |
 | L6 | b | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
-| L7 | a | $0.0$ | $0.0$ | $8.7$ | $-2.6$ | $-8.3$ | $0.0$ |
-| L7 | b | $0.0$ | $0.0$ | $-7.6$ | $-2.6$ | $-5.7$ | $0.0$ |
+| L7 | a | $0.2$ | $0.2$ | $30.2$ | $-6.7$ | $-10.4$ | $-1.1$ |
+| L7 | b | $0.2$ | $0.2$ | $-29.2$ | $-6.7$ | $-6.8$ | $0.0$ |
+| L8 | a | $0.0$ | $0.0$ | $15.0$ | $0.0$ | $-15.0$ | $0.0$ |
+| L8 | b | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
+| L9 | a | $0.0$ | $0.0$ | $8.6$ | $-1.7$ | $-7.9$ | $0.0$ |
+| L9 | b | $0.0$ | $0.0$ | $-8.8$ | $-1.7$ | $-8.2$ | $0.0$ |
 
 **Lagerkräfte, auf das Tragwerk**
 
 | Lager | $R_x\ [\mathrm{kN}]$ | $R_y\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M_x\ [\mathrm{kNm}]$ | $M_y\ [\mathrm{kNm}]$ | $M_z\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A1 (K1) | $1.6$ | $0.1$ | $59.5$ | $3.8$ | $-27.5$ | $-2.8$ |
-| A2 (K3) | $-1.9$ | $0.0$ | $37.1$ | $0.0$ | $0.0$ | $0.0$ |
-| A3 (K5) | $0.3$ | $-0.1$ | $7.8$ | $0.0$ | $0.0$ | $0.0$ |
-| L7: Bettung, Summe | $0.0$ | $0.0$ | $6.1$ | $0.0$ | $-19.1$ | $0.0$ |
+| A1 (K1) | $5.8$ | $0.3$ | $60.3$ | $3.1$ | $-16.2$ | $-1.9$ |
+| A2 (K3) | $-5.9$ | $-0.3$ | $66.9$ | $0.0$ | $0.0$ | $0.0$ |
+| A3 (K5) | $0.1$ | $0.0$ | $52.7$ | $0.0$ | $0.0$ | $0.0$ |
+| L9: Bettung, Summe | $0.0$ | $0.0$ | $5.1$ | $0.0$ | $-15.1$ | $0.0$ |
 
 Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
@@ -17441,64 +17637,80 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $-50.7\ \mathrm{kN}$ | $0.00$ | $-39.5\ \mathrm{kN}$ | $3.00$ |
-| L1 | $V_y$ | $0.1\ \mathrm{kN}$ | $0.00$ | $0.1\ \mathrm{kN}$ | $0.00$ |
-| L1 | $V_z$ | $-1.6\ \mathrm{kN}$ | $0.00$ | $-1.6\ \mathrm{kN}$ | $0.00$ |
-| L1 | $T$ | $2.8\ \mathrm{kNm}$ | $0.00$ | $2.8\ \mathrm{kNm}$ | $0.00$ |
-| L1 | $M_y$ | $-24.1\ \mathrm{kNm}$ | $3.00$ | $-19.2\ \mathrm{kNm}$ | $0.00$ |
-| L1 | $M_z$ | $1.2\ \mathrm{kNm}$ | $0.00$ | $1.4\ \mathrm{kNm}$ | $3.00$ |
-| L1 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.04\ \mathrm{mm}$ | $1.52$ |
-| L1 | $f_z$ | $-0.23\ \mathrm{mm}$ | $1.53$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L2 | $N$ | $-29.5\ \mathrm{kN}$ | $0.00$ | $-26.0\ \mathrm{kN}$ | $3.00$ |
-| L2 | $V_y$ | $1.9\ \mathrm{kN}$ | $0.00$ | $1.9\ \mathrm{kN}$ | $0.00$ |
-| L2 | $V_z$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L1 | $N$ | $-51.6\ \mathrm{kN}$ | $0.00$ | $-40.4\ \mathrm{kN}$ | $3.00$ |
+| L1 | $V_y$ | $0.3\ \mathrm{kN}$ | $0.00$ | $0.3\ \mathrm{kN}$ | $0.00$ |
+| L1 | $V_z$ | $-5.8\ \mathrm{kN}$ | $0.00$ | $-5.8\ \mathrm{kN}$ | $0.00$ |
+| L1 | $T$ | $1.9\ \mathrm{kNm}$ | $0.00$ | $1.9\ \mathrm{kNm}$ | $0.00$ |
+| L1 | $M_y$ | $-25.7\ \mathrm{kNm}$ | $3.00$ | $-8.3\ \mathrm{kNm}$ | $0.00$ |
+| L1 | $M_z$ | $1.4\ \mathrm{kNm}$ | $0.00$ | $2.4\ \mathrm{kNm}$ | $3.00$ |
+| L1 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.06\ \mathrm{mm}$ | $1.57$ |
+| L1 | $f_z$ | $-0.18\ \mathrm{mm}$ | $1.62$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L2 | $N$ | $-58.1\ \mathrm{kN}$ | $0.00$ | $-54.6\ \mathrm{kN}$ | $3.00$ |
+| L2 | $V_y$ | $5.9\ \mathrm{kN}$ | $0.00$ | $5.9\ \mathrm{kN}$ | $0.00$ |
+| L2 | $V_z$ | $0.3\ \mathrm{kN}$ | $0.00$ | $0.3\ \mathrm{kN}$ | $0.00$ |
 | L2 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L2 | $M_y$ | $-2.6\ \mathrm{kNm}$ | $0.00$ | $-2.6\ \mathrm{kNm}$ | $3.00$ |
-| L2 | $M_z$ | $-5.7\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $3.00$ |
-| L2 | $f_y$ | $-0.18\ \mathrm{mm}$ | $1.27$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L2 | $f_z$ | $-0.06\ \mathrm{mm}$ | $1.50$ | $0.00\ \mathrm{mm}$ | $3.00$ |
-| L3 | $N$ | $-7.8\ \mathrm{kN}$ | $0.00$ | $-7.2\ \mathrm{kN}$ | $3.00$ |
-| L3 | $V_y$ | $-0.1\ \mathrm{kN}$ | $0.00$ | $-0.1\ \mathrm{kN}$ | $0.00$ |
-| L3 | $V_z$ | $-0.3\ \mathrm{kN}$ | $0.00$ | $-0.3\ \mathrm{kN}$ | $0.00$ |
+| L2 | $M_y$ | $-1.7\ \mathrm{kNm}$ | $0.00$ | $-0.8\ \mathrm{kNm}$ | $3.00$ |
+| L2 | $M_z$ | $-8.2\ \mathrm{kNm}$ | $0.00$ | $9.4\ \mathrm{kNm}$ | $3.00$ |
+| L2 | $f_y$ | $-0.05\ \mathrm{mm}$ | $0.53$ | $0.10\ \mathrm{mm}$ | $2.27$ |
+| L2 | $f_z$ | $-0.03\ \mathrm{mm}$ | $1.41$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L3 | $N$ | $-52.7\ \mathrm{kN}$ | $0.00$ | $-52.1\ \mathrm{kN}$ | $3.00$ |
+| L3 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L3 | $V_z$ | $-0.1\ \mathrm{kN}$ | $0.00$ | $-0.1\ \mathrm{kN}$ | $0.00$ |
 | L3 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $M_y$ | $-0.8\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $M_z$ | $-0.2\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $f_y$ | $-0.09\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $3.00$ |
-| L3 | $f_z$ | $-0.32\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L4 | $N$ | $-1.9\ \mathrm{kN}$ | $0.00$ | $-1.9\ \mathrm{kN}$ | $0.00$ |
+| L3 | $M_y$ | $-0.2\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L3 | $M_z$ | $-0.1\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L3 | $f_y$ | $-0.05\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L3 | $f_z$ | $-0.09\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L4 | $N$ | $-6.0\ \mathrm{kN}$ | $0.00$ | $-6.0\ \mathrm{kN}$ | $0.00$ |
 | L4 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L4 | $V_z$ | $-23.4\ \mathrm{kN}$ | $6.00$ | $31.7\ \mathrm{kN}$ | $0.00$ |
+| L4 | $V_z$ | $-22.8\ \mathrm{kN}$ | $6.00$ | $32.3\ \mathrm{kN}$ | $0.00$ |
 | L4 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $M_y$ | $-24.9\ \mathrm{kNm}$ | $0.00$ | $29.7\ \mathrm{kNm}$ | $3.45$ |
-| L4 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
-| L4 | $f_y$ | $0.00\ \mathrm{mm}$ | $2.54$ | $0.00\ \mathrm{mm}$ | $6.00$ |
-| L4 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $1.88\ \mathrm{mm}$ | $3.21$ |
-| L5 | $N$ | $-0.1\ \mathrm{kN}$ | $0.00$ | $-0.1\ \mathrm{kN}$ | $0.00$ |
-| L5 | $V_y$ | $-3.4\ \mathrm{kN}$ | $4.00$ | $4.1\ \mathrm{kN}$ | $0.00$ |
-| L5 | $V_z$ | $-6.4\ \mathrm{kN}$ | $4.00$ | $6.6\ \mathrm{kN}$ | $0.00$ |
-| L5 | $T$ | $-0.8\ \mathrm{kNm}$ | $0.00$ | $-0.8\ \mathrm{kNm}$ | $0.00$ |
-| L5 | $M_y$ | $-0.7\ \mathrm{kNm}$ | $0.00$ | $6.1\ \mathrm{kNm}$ | $2.04$ |
-| L5 | $M_z$ | $-1.7\ \mathrm{kNm}$ | $0.00$ | $2.9\ \mathrm{kNm}$ | $2.21$ |
-| L5 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.12\ \mathrm{mm}$ | $2.09$ |
-| L5 | $f_z$ | $0.00\ \mathrm{mm}$ | $4.00$ | $0.09\ \mathrm{mm}$ | $2.01$ |
+| L4 | $M_y$ | $-28.5\ \mathrm{kNm}$ | $0.00$ | $28.2\ \mathrm{kNm}$ | $3.52$ |
+| L4 | $M_z$ | $-0.2\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
+| L4 | $f_y$ | $-0.03\ \mathrm{mm}$ | $2.54$ | $0.00\ \mathrm{mm}$ | $6.00$ |
+| L4 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $1.73\ \mathrm{mm}$ | $3.26$ |
+| L5 | $N$ | $-0.3\ \mathrm{kN}$ | $0.00$ | $-0.3\ \mathrm{kN}$ | $0.00$ |
+| L5 | $V_y$ | $-3.3\ \mathrm{kN}$ | $4.00$ | $4.2\ \mathrm{kN}$ | $0.00$ |
+| L5 | $V_z$ | $-6.1\ \mathrm{kN}$ | $4.00$ | $6.9\ \mathrm{kN}$ | $0.00$ |
+| L5 | $T$ | $-2.8\ \mathrm{kNm}$ | $0.00$ | $-2.8\ \mathrm{kNm}$ | $0.00$ |
+| L5 | $M_y$ | $-1.1\ \mathrm{kNm}$ | $0.00$ | $6.3\ \mathrm{kNm}$ | $2.13$ |
+| L5 | $M_z$ | $-2.8\ \mathrm{kNm}$ | $0.00$ | $1.9\ \mathrm{kNm}$ | $2.25$ |
+| L5 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.07\ \mathrm{mm}$ | $2.17$ |
+| L5 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.10\ \mathrm{mm}$ | $2.05$ |
 | L6 | $N$ | $-1.2\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $2.24$ |
 | L6 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $V_z$ | $0.0\ \mathrm{kN}$ | $2.24$ | $2.3\ \mathrm{kN}$ | $0.00$ |
 | L6 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $M_y$ | $-2.6\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
-| L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
-| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.97$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L6 | $f_z$ | $-0.01\ \mathrm{mm}$ | $0.83$ | $0.00\ \mathrm{mm}$ | $2.24$ |
-| L7 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L7 | $V_y$ | $0.0\ \mathrm{kN}$ | $4.80$ | $0.0\ \mathrm{kN}$ | $3.20$ |
-| L7 | $V_z$ | $-7.6\ \mathrm{kN}$ | $6.00$ | $8.7\ \mathrm{kN}$ | $0.00$ |
-| L7 | $T$ | $-2.6\ \mathrm{kNm}$ | $5.20$ | $-2.6\ \mathrm{kNm}$ | $3.20$ |
-| L7 | $M_y$ | $-8.3\ \mathrm{kNm}$ | $0.00$ | $3.7\ \mathrm{kNm}$ | $3.16$ |
-| L7 | $M_z$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L7 | $f_y$ | $0.00\ \mathrm{mm}$ | $4.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $6.00$ | $0.09\ \mathrm{mm}$ | $3.14$ |
+| L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $2.24$ | $0.00\ \mathrm{mm}$ | $1.07$ |
+| L6 | $f_z$ | $-0.01\ \mathrm{mm}$ | $0.83$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L7 | $N$ | $0.2\ \mathrm{kN}$ | $0.00$ | $0.2\ \mathrm{kN}$ | $0.00$ |
+| L7 | $V_y$ | $0.2\ \mathrm{kN}$ | $0.00$ | $0.2\ \mathrm{kN}$ | $0.00$ |
+| L7 | $V_z$ | $-29.2\ \mathrm{kN}$ | $7.21$ | $30.2\ \mathrm{kN}$ | $0.00$ |
+| L7 | $T$ | $-6.7\ \mathrm{kNm}$ | $0.00$ | $-6.7\ \mathrm{kNm}$ | $0.00$ |
+| L7 | $M_y$ | $-10.4\ \mathrm{kNm}$ | $0.00$ | $45.0\ \mathrm{kNm}$ | $3.67$ |
+| L7 | $M_z$ | $-1.1\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $7.21$ |
+| L7 | $f_y$ | $0.00\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $7.21$ |
+| L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.53\ \mathrm{mm}$ | $3.63$ |
+| L8 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L8 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L8 | $V_z$ | $0.0\ \mathrm{kN}$ | $2.00$ | $15.0\ \mathrm{kN}$ | $0.00$ |
+| L8 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $M_y$ | $-15.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $2.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.06$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $f_z$ | $-0.03\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $3.60$ | $0.0\ \mathrm{kN}$ | $4.00$ |
+| L9 | $V_z$ | $-8.8\ \mathrm{kN}$ | $6.00$ | $8.6\ \mathrm{kN}$ | $0.00$ |
+| L9 | $T$ | $-1.7\ \mathrm{kNm}$ | $5.60$ | $-1.7\ \mathrm{kNm}$ | $4.00$ |
+| L9 | $M_y$ | $-8.2\ \mathrm{kNm}$ | $6.00$ | $3.6\ \mathrm{kNm}$ | $2.98$ |
+| L9 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
+| L9 | $f_y$ | $0.00\ \mathrm{mm}$ | $6.00$ | $0.00\ \mathrm{mm}$ | $4.00$ |
+| L9 | $f_z$ | $0.00\ \mathrm{mm}$ | $5.96$ | $0.08\ \mathrm{mm}$ | $2.98$ |
 
-Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_z = 1.88 mm bei x = 3.21 m.
+Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_z = 1.73 mm bei x = 3.26 m.
 
 **Gleichgewichtsprobe (Moment um den Ursprung)**
 
@@ -17506,9 +17718,9 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_z = 1.88 mm bei x = 3.
 | ---: | ---: | ---: | ---: | ---: |
 | $\sum F_x$ | $0.000$ | $0.000$ | $0.000$ | kN |
 | $\sum F_y$ | $0.000$ | $0.000$ | $0.000$ | kN |
-| $\sum F_z$ | $-110.475$ | $110.475$ | $0.000$ | kN |
-| $\sum M_x$ | $-34.921$ | $34.921$ | $0.000$ | kNm |
-| $\sum M_y$ | $269.330$ | $-269.330$ | $0.000$ | kNm |
+| $\sum F_z$ | $-184.967$ | $184.967$ | $0.000$ | kN |
+| $\sum M_x$ | $-213.904$ | $213.904$ | $0.000$ | kNm |
+| $\sum M_y$ | $432.805$ | $-432.805$ | $0.000$ | kNm |
 | $\sum M_z$ | $4.000$ | $-4.000$ | $0.000$ | kNm |
 
 #### Lastfall «Nutzlast und Wind»
@@ -17518,40 +17730,45 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_z = 1.88 mm bei x = 3.
 | Knoten | $u_x\ [\mathrm{mm}]$ | $u_y\ [\mathrm{mm}]$ | $u_z\ [\mathrm{mm}]$ | $\varphi_x\ [\mathrm{mrad}]$ | $\varphi_y\ [\mathrm{mrad}]$ | $\varphi_z\ [\mathrm{mrad}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | K1 | $0.00$ | $0.00$ | $0.00$ | $0.000$ | $0.000$ | $0.000$ |
-| K2 | $0.09$ | $0.07$ | $0.01$ | $0.128$ | $-0.140$ | $-0.755$ |
-| K3 | $0.00$ | $0.00$ | $0.00$ | $-3.808$ | $0.005$ | $0.000$ |
-| K4 | $0.09$ | $13.45$ | $0.01$ | $-5.127$ | $0.045$ | $0.000$ |
-| K5 | $0.10$ | $0.00$ | $0.00$ | $-0.024$ | $3.112$ | $-1.929$ |
-| K6 | $6.49$ | $0.07$ | $-0.02$ | $-0.025$ | $0.165$ | $-1.929$ |
-| K7 | $0.14$ | $18.85$ | $-10.80$ | $-5.523$ | $0.045$ | $0.000$ |
+| K2 | $0.18$ | $0.54$ | $0.02$ | $-0.096$ | $-0.107$ | $-0.056$ |
+| K3 | $0.00$ | $0.00$ | $0.00$ | $-0.228$ | $0.003$ | $0.000$ |
+| K4 | $0.20$ | $0.90$ | $0.01$ | $-0.402$ | $0.171$ | $0.056$ |
+| K5 | $-0.01$ | $0.00$ | $0.00$ | $-0.210$ | $-0.081$ | $0.063$ |
+| K6 | $-0.02$ | $0.55$ | $-0.05$ | $-0.126$ | $0.144$ | $0.063$ |
+| K7 | $0.26$ | $1.57$ | $-1.34$ | $-0.798$ | $0.171$ | $0.056$ |
+| K8 | $-0.02$ | $0.42$ | $0.24$ | $-0.126$ | $0.144$ | $0.063$ |
 
 **Schnittgrössen an den Stabenden**
 
 | Stab | Ende | $N\ [\mathrm{kN}]$ | $V_y\ [\mathrm{kN}]$ | $V_z\ [\mathrm{kN}]$ | $T\ [\mathrm{kNm}]$ | $M_y\ [\mathrm{kNm}]$ | $M_z\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | a | $22.5$ | $-4.5$ | $14.2$ | $-9.9$ | $-16.4$ | $5.1$ |
-| L1 | b | $22.5$ | $-4.5$ | $14.2$ | $-9.9$ | $26.3$ | $-8.3$ |
-| L2 | a | $6.8$ | $0.2$ | $1.2$ | $0.0$ | $-25.0$ | $-0.5$ |
-| L2 | b | $6.8$ | $0.2$ | $1.2$ | $0.0$ | $-21.4$ | $0.0$ |
-| L3 | a | $-3.6$ | $0.0$ | $1.0$ | $0.0$ | $0.0$ | $0.0$ |
-| L3 | b | $-3.6$ | $0.0$ | $1.0$ | $0.0$ | $3.0$ | $0.0$ |
-| L4 | a | $-0.2$ | $-4.5$ | $-24.9$ | $2.0$ | $29.3$ | $26.8$ |
-| L4 | b | $-0.2$ | $-4.5$ | $20.1$ | $0.0$ | $0.0$ | $0.0$ |
-| L5 | a | $0.0$ | $13.7$ | $-5.1$ | $3.0$ | $23.9$ | $-28.7$ |
-| L5 | b | $0.0$ | $1.7$ | $-5.1$ | $3.0$ | $0.0$ | $0.0$ |
+| L1 | a | $26.2$ | $-6.7$ | $15.9$ | $-0.7$ | $-20.2$ | $11.3$ |
+| L1 | b | $26.2$ | $-6.7$ | $15.9$ | $-0.7$ | $27.7$ | $-8.8$ |
+| L2 | a | $7.3$ | $-0.5$ | $-1.0$ | $0.0$ | $-1.5$ | $-0.3$ |
+| L2 | b | $7.3$ | $-0.5$ | $-1.0$ | $0.0$ | $-4.6$ | $-1.7$ |
+| L3 | a | $-7.9$ | $0.0$ | $-0.1$ | $0.0$ | $0.0$ | $0.0$ |
+| L3 | b | $-7.9$ | $0.0$ | $-0.1$ | $0.0$ | $-0.2$ | $-0.1$ |
+| L4 | a | $10.7$ | $-0.2$ | $-25.0$ | $2.0$ | $30.1$ | $1.0$ |
+| L4 | b | $10.7$ | $-0.2$ | $20.0$ | $0.0$ | $0.0$ | $0.0$ |
+| L5 | a | $6.5$ | $4.0$ | $-3.7$ | $2.5$ | $6.8$ | $1.9$ |
+| L5 | b | $6.5$ | $-8.0$ | $-3.7$ | $2.5$ | $-11.3$ | $-8.2$ |
 | L6 | a | $-3.6$ | $0.0$ | $13.2$ | $0.0$ | $-21.4$ | $0.0$ |
 | L6 | b | $0.0$ | $0.0$ | $6.0$ | $0.0$ | $0.0$ | $0.0$ |
-| L7 | a | $6.0$ | $0.0$ | $0.0$ | $-25.0$ | $0.1$ | $0.0$ |
-| L7 | b | $-6.0$ | $0.0$ | $-0.2$ | $-25.0$ | $-0.5$ | $0.0$ |
+| L7 | a | $-12.1$ | $0.2$ | $0.7$ | $-13.0$ | $5.4$ | $-1.4$ |
+| L7 | b | $-12.1$ | $0.2$ | $0.7$ | $-13.0$ | $10.7$ | $0.0$ |
+| L8 | a | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
+| L8 | b | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
+| L9 | a | $6.0$ | $0.0$ | $0.0$ | $-1.5$ | $0.0$ | $0.0$ |
+| L9 | b | $-6.0$ | $0.0$ | $-0.1$ | $-1.5$ | $-0.3$ | $0.0$ |
 
 **Lagerkräfte, auf das Tragwerk**
 
 | Lager | $R_x\ [\mathrm{kN}]$ | $R_y\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M_x\ [\mathrm{kNm}]$ | $M_y\ [\mathrm{kNm}]$ | $M_z\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A1 (K1) | $-20.2$ | $-4.5$ | $-22.5$ | $30.1$ | $-16.4$ | $9.9$ |
-| A2 (K3) | $-6.1$ | $-1.2$ | $-6.5$ | $0.0$ | $0.0$ | $0.0$ |
-| A3 (K5) | $-1.0$ | $0.0$ | $3.6$ | $0.0$ | $0.0$ | $0.0$ |
-| L7: Bettung, Summe | $-0.1$ | $0.0$ | $-0.2$ | $0.0$ | $0.8$ | $0.0$ |
+| A1 (K1) | $-21.9$ | $-6.7$ | $-26.2$ | $12.8$ | $-20.1$ | $0.7$ |
+| A2 (K3) | $-5.5$ | $1.0$ | $-7.2$ | $0.0$ | $0.0$ | $0.0$ |
+| A3 (K5) | $0.1$ | $0.0$ | $7.9$ | $0.0$ | $0.0$ | $0.0$ |
+| L9: Bettung, Summe | $-0.1$ | $0.0$ | $-0.1$ | $0.0$ | $0.5$ | $0.0$ |
 
 Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
@@ -17559,64 +17776,80 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $22.5\ \mathrm{kN}$ | $0.00$ | $22.5\ \mathrm{kN}$ | $0.00$ |
-| L1 | $V_y$ | $-4.5\ \mathrm{kN}$ | $0.00$ | $-4.5\ \mathrm{kN}$ | $0.00$ |
-| L1 | $V_z$ | $14.2\ \mathrm{kN}$ | $0.00$ | $14.2\ \mathrm{kN}$ | $0.00$ |
-| L1 | $T$ | $-9.9\ \mathrm{kNm}$ | $0.00$ | $-9.9\ \mathrm{kNm}$ | $0.00$ |
-| L1 | $M_y$ | $-16.4\ \mathrm{kNm}$ | $0.00$ | $26.3\ \mathrm{kNm}$ | $3.00$ |
-| L1 | $M_z$ | $-8.3\ \mathrm{kNm}$ | $3.00$ | $5.1\ \mathrm{kNm}$ | $0.00$ |
-| L1 | $f_y$ | $-0.06\ \mathrm{mm}$ | $2.08$ | $0.00\ \mathrm{mm}$ | $0.20$ |
-| L1 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.22$ | $0.07\ \mathrm{mm}$ | $2.09$ |
-| L2 | $N$ | $6.8\ \mathrm{kN}$ | $0.00$ | $6.8\ \mathrm{kN}$ | $0.00$ |
-| L2 | $V_y$ | $0.2\ \mathrm{kN}$ | $0.00$ | $0.2\ \mathrm{kN}$ | $0.00$ |
-| L2 | $V_z$ | $1.2\ \mathrm{kN}$ | $0.00$ | $1.2\ \mathrm{kN}$ | $0.00$ |
+| L1 | $N$ | $26.2\ \mathrm{kN}$ | $0.00$ | $26.2\ \mathrm{kN}$ | $0.00$ |
+| L1 | $V_y$ | $-6.7\ \mathrm{kN}$ | $0.00$ | $-6.7\ \mathrm{kN}$ | $0.00$ |
+| L1 | $V_z$ | $15.9\ \mathrm{kN}$ | $0.00$ | $15.9\ \mathrm{kN}$ | $0.00$ |
+| L1 | $T$ | $-0.7\ \mathrm{kNm}$ | $0.00$ | $-0.7\ \mathrm{kNm}$ | $0.00$ |
+| L1 | $M_y$ | $-20.2\ \mathrm{kNm}$ | $0.00$ | $27.7\ \mathrm{kNm}$ | $3.00$ |
+| L1 | $M_z$ | $-8.8\ \mathrm{kNm}$ | $3.00$ | $11.3\ \mathrm{kNm}$ | $0.00$ |
+| L1 | $f_y$ | $-0.02\ \mathrm{mm}$ | $2.56$ | $0.06\ \mathrm{mm}$ | $0.80$ |
+| L1 | $f_z$ | $-0.01\ \mathrm{mm}$ | $0.37$ | $0.06\ \mathrm{mm}$ | $2.16$ |
+| L2 | $N$ | $7.3\ \mathrm{kN}$ | $0.00$ | $7.3\ \mathrm{kN}$ | $0.00$ |
+| L2 | $V_y$ | $-0.5\ \mathrm{kN}$ | $0.00$ | $-0.5\ \mathrm{kN}$ | $0.00$ |
+| L2 | $V_z$ | $-1.0\ \mathrm{kN}$ | $0.00$ | $-1.0\ \mathrm{kN}$ | $0.00$ |
 | L2 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L2 | $M_y$ | $-25.0\ \mathrm{kNm}$ | $0.00$ | $-21.4\ \mathrm{kNm}$ | $3.00$ |
-| L2 | $M_z$ | $-0.5\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $3.00$ |
-| L2 | $f_y$ | $-0.02\ \mathrm{mm}$ | $1.27$ | $0.00\ \mathrm{mm}$ | $3.00$ |
-| L2 | $f_z$ | $-0.49\ \mathrm{mm}$ | $1.48$ | $0.00\ \mathrm{mm}$ | $3.00$ |
-| L3 | $N$ | $-3.6\ \mathrm{kN}$ | $0.00$ | $-3.6\ \mathrm{kN}$ | $0.00$ |
+| L2 | $M_y$ | $-4.6\ \mathrm{kNm}$ | $3.00$ | $-1.5\ \mathrm{kNm}$ | $0.00$ |
+| L2 | $M_z$ | $-1.7\ \mathrm{kNm}$ | $3.00$ | $-0.3\ \mathrm{kNm}$ | $0.00$ |
+| L2 | $f_y$ | $-0.06\ \mathrm{mm}$ | $1.67$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L2 | $f_z$ | $-0.07\ \mathrm{mm}$ | $1.62$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L3 | $N$ | $-7.9\ \mathrm{kN}$ | $0.00$ | $-7.9\ \mathrm{kN}$ | $0.00$ |
 | L3 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L3 | $V_z$ | $1.0\ \mathrm{kN}$ | $0.00$ | $1.0\ \mathrm{kN}$ | $0.00$ |
+| L3 | $V_z$ | $-0.1\ \mathrm{kN}$ | $0.00$ | $-0.1\ \mathrm{kN}$ | $0.00$ |
 | L3 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $M_y$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $3.0\ \mathrm{kNm}$ | $3.00$ |
-| L3 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $3.00$ |
-| L3 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $1.73$ |
-| L3 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $1.13\ \mathrm{mm}$ | $1.73$ |
-| L4 | $N$ | $-0.2\ \mathrm{kN}$ | $0.00$ | $-0.2\ \mathrm{kN}$ | $0.00$ |
-| L4 | $V_y$ | $-4.5\ \mathrm{kN}$ | $0.00$ | $-4.5\ \mathrm{kN}$ | $0.00$ |
-| L4 | $V_z$ | $-24.9\ \mathrm{kN}$ | $0.00$ | $20.1\ \mathrm{kN}$ | $6.00$ |
+| L3 | $M_y$ | $-0.2\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L3 | $M_z$ | $-0.1\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L3 | $f_y$ | $-0.03\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L3 | $f_z$ | $-0.09\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L4 | $N$ | $10.7\ \mathrm{kN}$ | $0.00$ | $10.7\ \mathrm{kN}$ | $0.00$ |
+| L4 | $V_y$ | $-0.2\ \mathrm{kN}$ | $0.00$ | $-0.2\ \mathrm{kN}$ | $0.00$ |
+| L4 | $V_z$ | $-25.0\ \mathrm{kN}$ | $0.00$ | $20.0\ \mathrm{kN}$ | $6.00$ |
 | L4 | $T$ | $0.0\ \mathrm{kNm}$ | $3.00$ | $2.0\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $M_y$ | $-21.5\ \mathrm{kNm}$ | $3.78$ | $29.3\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $M_z$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $26.8\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $3.45\ \mathrm{mm}$ | $2.54$ |
-| L4 | $f_z$ | $-1.18\ \mathrm{mm}$ | $3.43$ | $0.00\ \mathrm{mm}$ | $6.00$ |
-| L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L5 | $V_y$ | $1.7\ \mathrm{kN}$ | $4.00$ | $13.7\ \mathrm{kN}$ | $0.00$ |
-| L5 | $V_z$ | $-5.1\ \mathrm{kN}$ | $0.00$ | $-5.1\ \mathrm{kN}$ | $0.00$ |
-| L5 | $T$ | $3.0\ \mathrm{kNm}$ | $0.00$ | $3.0\ \mathrm{kNm}$ | $0.00$ |
-| L5 | $M_y$ | $0.0\ \mathrm{kNm}$ | $4.00$ | $23.9\ \mathrm{kNm}$ | $0.00$ |
-| L5 | $M_z$ | $-28.7\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $4.00$ |
-| L5 | $f_y$ | $-0.53\ \mathrm{mm}$ | $1.53$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L5 | $f_z$ | $0.00\ \mathrm{mm}$ | $4.00$ | $0.23\ \mathrm{mm}$ | $1.69$ |
+| L4 | $M_y$ | $-21.2\ \mathrm{kNm}$ | $3.80$ | $30.1\ \mathrm{kNm}$ | $0.00$ |
+| L4 | $M_z$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $1.0\ \mathrm{kNm}$ | $0.00$ |
+| L4 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.13\ \mathrm{mm}$ | $2.54$ |
+| L4 | $f_z$ | $-1.15\ \mathrm{mm}$ | $3.45$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L5 | $N$ | $6.5\ \mathrm{kN}$ | $0.00$ | $6.5\ \mathrm{kN}$ | $0.00$ |
+| L5 | $V_y$ | $-8.0\ \mathrm{kN}$ | $4.00$ | $4.0\ \mathrm{kN}$ | $0.00$ |
+| L5 | $V_z$ | $-3.7\ \mathrm{kN}$ | $0.00$ | $-3.7\ \mathrm{kN}$ | $0.00$ |
+| L5 | $T$ | $2.5\ \mathrm{kNm}$ | $0.00$ | $2.5\ \mathrm{kNm}$ | $0.00$ |
+| L5 | $M_y$ | $-11.3\ \mathrm{kNm}$ | $4.00$ | $6.8\ \mathrm{kNm}$ | $0.00$ |
+| L5 | $M_z$ | $-8.2\ \mathrm{kNm}$ | $4.00$ | $3.9\ \mathrm{kNm}$ | $1.16$ |
+| L5 | $f_y$ | $-0.01\ \mathrm{mm}$ | $3.76$ | $0.11\ \mathrm{mm}$ | $1.50$ |
+| L5 | $f_z$ | $-0.06\ \mathrm{mm}$ | $2.76$ | $0.00\ \mathrm{mm}$ | $0.24$ |
 | L6 | $N$ | $-3.6\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $2.24$ |
 | L6 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $V_z$ | $6.0\ \mathrm{kN}$ | $2.24$ | $13.2\ \mathrm{kN}$ | $0.00$ |
 | L6 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $M_y$ | $-21.4\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
 | L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
-| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L6 | $f_z$ | $-0.11\ \mathrm{mm}$ | $0.91$ | $0.00\ \mathrm{mm}$ | $2.24$ |
-| L7 | $N$ | $-6.0\ \mathrm{kN}$ | $3.00$ | $6.0\ \mathrm{kN}$ | $3.00$ |
-| L7 | $V_y$ | $0.0\ \mathrm{kN}$ | $4.00$ | $0.0\ \mathrm{kN}$ | $2.00$ |
-| L7 | $V_z$ | $-0.2\ \mathrm{kN}$ | $6.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L7 | $T$ | $-25.0\ \mathrm{kNm}$ | $5.60$ | $-25.0\ \mathrm{kNm}$ | $3.20$ |
-| L7 | $M_y$ | $-0.5\ \mathrm{kNm}$ | $6.00$ | $0.1\ \mathrm{kNm}$ | $0.00$ |
-| L7 | $M_z$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L7 | $f_y$ | $0.00\ \mathrm{mm}$ | $4.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $4.38$ | $0.00\ \mathrm{mm}$ | $6.00$ |
+| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.08$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L6 | $f_z$ | $-0.11\ \mathrm{mm}$ | $0.91$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L7 | $N$ | $-12.1\ \mathrm{kN}$ | $0.00$ | $-12.1\ \mathrm{kN}$ | $0.00$ |
+| L7 | $V_y$ | $0.2\ \mathrm{kN}$ | $0.00$ | $0.2\ \mathrm{kN}$ | $0.00$ |
+| L7 | $V_z$ | $0.7\ \mathrm{kN}$ | $0.00$ | $0.7\ \mathrm{kN}$ | $0.00$ |
+| L7 | $T$ | $-13.0\ \mathrm{kNm}$ | $0.00$ | $-13.0\ \mathrm{kNm}$ | $0.00$ |
+| L7 | $M_y$ | $5.4\ \mathrm{kNm}$ | $0.00$ | $10.7\ \mathrm{kNm}$ | $7.21$ |
+| L7 | $M_z$ | $-1.4\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $7.21$ |
+| L7 | $f_y$ | $-0.01\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $7.21$ |
+| L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.12\ \mathrm{mm}$ | $3.80$ |
+| L8 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L8 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L8 | $V_z$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L8 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $M_y$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $2.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.57$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.95$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L9 | $N$ | $-6.0\ \mathrm{kN}$ | $3.00$ | $6.0\ \mathrm{kN}$ | $3.00$ |
+| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $4.00$ | $0.0\ \mathrm{kN}$ | $4.40$ |
+| L9 | $V_z$ | $-0.1\ \mathrm{kN}$ | $6.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L9 | $T$ | $-1.5\ \mathrm{kNm}$ | $5.60$ | $-1.5\ \mathrm{kNm}$ | $4.00$ |
+| L9 | $M_y$ | $-0.3\ \mathrm{kNm}$ | $6.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L9 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
+| L9 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $4.00$ |
+| L9 | $f_z$ | $0.00\ \mathrm{mm}$ | $4.38$ | $0.00\ \mathrm{mm}$ | $6.00$ |
 
-Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_y = 3.45 mm bei x = 2.54 m.
+Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_z = -1.15 mm bei x = 3.45 m.
 
 **Gleichgewichtsprobe (Moment um den Ursprung)**
 
@@ -17638,40 +17871,45 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_y = 3.45 mm bei x = 2.
 | Knoten | $u_x\ [\mathrm{mm}]$ | $u_y\ [\mathrm{mm}]$ | $u_z\ [\mathrm{mm}]$ | $\varphi_x\ [\mathrm{mrad}]$ | $\varphi_y\ [\mathrm{mrad}]$ | $\varphi_z\ [\mathrm{mrad}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | K1 | $0.00$ | $0.00$ | $0.00$ | $0.000$ | $0.000$ | $0.000$ |
-| K2 | $1.35$ | $0.31$ | $-0.02$ | $0.053$ | $0.624$ | $-0.840$ |
-| K3 | $0.00$ | $0.00$ | $0.00$ | $-6.252$ | $-0.023$ | $0.000$ |
-| K4 | $1.34$ | $22.10$ | $-0.03$ | $-8.432$ | $0.682$ | $0.000$ |
-| K5 | $0.11$ | $0.00$ | $0.00$ | $-0.211$ | $4.278$ | $-2.504$ |
-| K6 | $9.64$ | $0.31$ | $-0.10$ | $0.109$ | $0.967$ | $-2.504$ |
-| K7 | $2.02$ | $30.98$ | $-17.79$ | $-9.077$ | $0.682$ | $0.000$ |
+| K2 | $1.09$ | $1.09$ | $-0.01$ | $-0.344$ | $0.496$ | $0.107$ |
+| K3 | $0.00$ | $0.00$ | $0.00$ | $-0.692$ | $0.008$ | $0.000$ |
+| K4 | $1.10$ | $2.56$ | $-0.06$ | $-1.049$ | $0.126$ | $0.238$ |
+| K5 | $-0.02$ | $0.00$ | $0.00$ | $-0.464$ | $-0.162$ | $0.256$ |
+| K6 | $0.14$ | $1.09$ | $-0.54$ | $-0.166$ | $0.484$ | $0.256$ |
+| K7 | $0.75$ | $4.06$ | $-3.06$ | $-1.694$ | $0.126$ | $0.238$ |
+| K8 | $0.14$ | $0.58$ | $0.18$ | $-0.166$ | $0.317$ | $0.256$ |
 
 **Schnittgrössen an den Stabenden**
 
 | Stab | Ende | $N\ [\mathrm{kN}]$ | $V_y\ [\mathrm{kN}]$ | $V_z\ [\mathrm{kN}]$ | $T\ [\mathrm{kNm}]$ | $M_y\ [\mathrm{kNm}]$ | $M_z\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | a | $-34.8$ | $-6.6$ | $19.1$ | $-11.1$ | $-50.6$ | $9.2$ |
-| L1 | b | $-19.6$ | $-6.6$ | $19.1$ | $-11.1$ | $6.9$ | $-10.6$ |
-| L2 | a | $-29.7$ | $2.8$ | $1.8$ | $0.0$ | $-41.1$ | $-8.4$ |
-| L2 | b | $-24.9$ | $2.8$ | $1.8$ | $0.0$ | $-35.7$ | $0.0$ |
-| L3 | a | $-15.9$ | $-0.1$ | $1.1$ | $0.0$ | $0.0$ | $0.0$ |
-| L3 | b | $-15.1$ | $-0.1$ | $1.1$ | $0.0$ | $3.4$ | $-0.3$ |
-| L4 | a | $-2.8$ | $-6.7$ | $5.4$ | $3.0$ | $10.2$ | $40.2$ |
-| L4 | b | $-2.8$ | $-6.7$ | $-1.3$ | $0.0$ | $0.0$ | $0.0$ |
-| L5 | a | $-0.1$ | $26.1$ | $1.3$ | $3.4$ | $34.9$ | $-45.3$ |
-| L5 | b | $-0.1$ | $-2.0$ | $-16.3$ | $3.4$ | $-0.3$ | $-0.2$ |
+| L1 | a | $-30.4$ | $-9.6$ | $16.1$ | $1.4$ | $-41.5$ | $18.7$ |
+| L1 | b | $-15.2$ | $-9.6$ | $16.1$ | $1.4$ | $6.8$ | $-10.0$ |
+| L2 | a | $-67.5$ | $7.2$ | $-1.2$ | $0.0$ | $-4.6$ | $-11.5$ |
+| L2 | b | $-62.7$ | $7.2$ | $-1.2$ | $0.0$ | $-8.0$ | $10.1$ |
+| L3 | a | $-83.1$ | $-0.1$ | $-0.2$ | $0.0$ | $0.0$ | $0.0$ |
+| L3 | b | $-82.3$ | $-0.1$ | $-0.2$ | $0.0$ | $-0.7$ | $-0.3$ |
+| L4 | a | $7.9$ | $-0.2$ | $6.0$ | $3.0$ | $6.7$ | $1.3$ |
+| L4 | b | $7.9$ | $-0.2$ | $-0.8$ | $0.0$ | $0.0$ | $0.0$ |
+| L5 | a | $9.4$ | $11.7$ | $3.8$ | $-0.1$ | $8.7$ | $-1.0$ |
+| L5 | b | $9.4$ | $-16.5$ | $-13.7$ | $-0.1$ | $-16.2$ | $-13.6$ |
 | L6 | a | $-6.9$ | $0.0$ | $22.9$ | $0.0$ | $-35.7$ | $0.0$ |
 | L6 | b | $0.0$ | $0.0$ | $9.0$ | $0.0$ | $0.0$ | $0.0$ |
-| L7 | a | $9.0$ | $0.0$ | $11.8$ | $-41.1$ | $-11.0$ | $0.0$ |
-| L7 | b | $-9.0$ | $0.0$ | $-10.6$ | $-41.1$ | $-8.4$ | $0.0$ |
+| L7 | a | $-17.8$ | $0.5$ | $41.9$ | $-28.6$ | $-5.9$ | $-3.7$ |
+| L7 | b | $-17.8$ | $0.5$ | $-38.4$ | $-28.6$ | $6.9$ | $0.0$ |
+| L8 | a | $0.0$ | $0.0$ | $20.3$ | $0.0$ | $-20.3$ | $0.0$ |
+| L8 | b | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
+| L9 | a | $9.0$ | $0.0$ | $11.7$ | $-4.6$ | $-10.6$ | $0.0$ |
+| L9 | b | $-9.0$ | $0.0$ | $-12.1$ | $-4.6$ | $-11.5$ | $0.0$ |
 
 **Lagerkräfte, auf das Tragwerk**
 
 | Lager | $R_x\ [\mathrm{kN}]$ | $R_y\ [\mathrm{kN}]$ | $R_z\ [\mathrm{kN}]$ | $M_x\ [\mathrm{kNm}]$ | $M_y\ [\mathrm{kNm}]$ | $M_z\ [\mathrm{kNm}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A1 (K1) | $-28.1$ | $-6.6$ | $46.5$ | $50.4$ | $-61.6$ | $11.1$ |
-| A2 (K3) | $-11.8$ | $-1.8$ | $40.3$ | $0.0$ | $0.0$ | $0.0$ |
-| A3 (K5) | $-1.1$ | $-0.1$ | $15.9$ | $0.0$ | $0.0$ | $0.0$ |
-| L7: Bettung, Summe | $-0.1$ | $0.0$ | $8.0$ | $0.0$ | $-24.6$ | $0.0$ |
+| A1 (K1) | $-25.1$ | $-9.6$ | $42.0$ | $23.3$ | $-52.1$ | $-1.4$ |
+| A2 (K3) | $-16.2$ | $1.2$ | $79.5$ | $0.0$ | $0.0$ | $0.0$ |
+| A3 (K5) | $0.2$ | $-0.1$ | $83.1$ | $0.0$ | $0.0$ | $0.0$ |
+| L9: Bettung, Summe | $-0.1$ | $0.0$ | $6.6$ | $0.0$ | $-19.7$ | $0.0$ |
 
 Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
@@ -17679,64 +17917,80 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $-34.8\ \mathrm{kN}$ | $0.00$ | $-19.6\ \mathrm{kN}$ | $3.00$ |
-| L1 | $V_y$ | $-6.6\ \mathrm{kN}$ | $0.00$ | $-6.6\ \mathrm{kN}$ | $0.00$ |
-| L1 | $V_z$ | $19.1\ \mathrm{kN}$ | $0.00$ | $19.1\ \mathrm{kN}$ | $0.00$ |
-| L1 | $T$ | $-11.1\ \mathrm{kNm}$ | $0.00$ | $-11.1\ \mathrm{kNm}$ | $0.00$ |
-| L1 | $M_y$ | $-50.6\ \mathrm{kNm}$ | $0.00$ | $6.9\ \mathrm{kNm}$ | $3.00$ |
-| L1 | $M_z$ | $-10.6\ \mathrm{kNm}$ | $3.00$ | $9.2\ \mathrm{kNm}$ | $0.00$ |
-| L1 | $f_y$ | $-0.05\ \mathrm{mm}$ | $2.27$ | $0.03\ \mathrm{mm}$ | $0.53$ |
-| L1 | $f_z$ | $-0.24\ \mathrm{mm}$ | $1.21$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L2 | $N$ | $-29.7\ \mathrm{kN}$ | $0.00$ | $-24.9\ \mathrm{kN}$ | $3.00$ |
-| L2 | $V_y$ | $2.8\ \mathrm{kN}$ | $0.00$ | $2.8\ \mathrm{kN}$ | $0.00$ |
-| L2 | $V_z$ | $1.8\ \mathrm{kN}$ | $0.00$ | $1.8\ \mathrm{kN}$ | $0.00$ |
+| L1 | $N$ | $-30.4\ \mathrm{kN}$ | $0.00$ | $-15.2\ \mathrm{kN}$ | $3.00$ |
+| L1 | $V_y$ | $-9.6\ \mathrm{kN}$ | $0.00$ | $-9.6\ \mathrm{kN}$ | $0.00$ |
+| L1 | $V_z$ | $16.1\ \mathrm{kN}$ | $0.00$ | $16.1\ \mathrm{kN}$ | $0.00$ |
+| L1 | $T$ | $1.4\ \mathrm{kNm}$ | $0.00$ | $1.4\ \mathrm{kNm}$ | $0.00$ |
+| L1 | $M_y$ | $-41.5\ \mathrm{kNm}$ | $0.00$ | $6.8\ \mathrm{kNm}$ | $3.00$ |
+| L1 | $M_z$ | $-10.0\ \mathrm{kNm}$ | $3.00$ | $18.7\ \mathrm{kNm}$ | $0.00$ |
+| L1 | $f_y$ | $0.00\ \mathrm{mm}$ | $2.93$ | $0.16\ \mathrm{mm}$ | $0.98$ |
+| L1 | $f_z$ | $-0.19\ \mathrm{mm}$ | $1.20$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L2 | $N$ | $-67.5\ \mathrm{kN}$ | $0.00$ | $-62.7\ \mathrm{kN}$ | $3.00$ |
+| L2 | $V_y$ | $7.2\ \mathrm{kN}$ | $0.00$ | $7.2\ \mathrm{kN}$ | $0.00$ |
+| L2 | $V_z$ | $-1.2\ \mathrm{kN}$ | $0.00$ | $-1.2\ \mathrm{kN}$ | $0.00$ |
 | L2 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L2 | $M_y$ | $-41.1\ \mathrm{kNm}$ | $0.00$ | $-35.7\ \mathrm{kNm}$ | $3.00$ |
-| L2 | $M_z$ | $-8.4\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $3.00$ |
-| L2 | $f_y$ | $-0.27\ \mathrm{mm}$ | $1.27$ | $0.00\ \mathrm{mm}$ | $3.00$ |
-| L2 | $f_z$ | $-0.82\ \mathrm{mm}$ | $1.48$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L3 | $N$ | $-15.9\ \mathrm{kN}$ | $0.00$ | $-15.1\ \mathrm{kN}$ | $3.00$ |
+| L2 | $M_y$ | $-8.0\ \mathrm{kNm}$ | $3.00$ | $-4.6\ \mathrm{kNm}$ | $0.00$ |
+| L2 | $M_z$ | $-11.5\ \mathrm{kNm}$ | $0.00$ | $10.1\ \mathrm{kNm}$ | $3.00$ |
+| L2 | $f_y$ | $-0.12\ \mathrm{mm}$ | $0.73$ | $0.06\ \mathrm{mm}$ | $2.47$ |
+| L2 | $f_z$ | $-0.13\ \mathrm{mm}$ | $1.57$ | $0.00\ \mathrm{mm}$ | $3.00$ |
+| L3 | $N$ | $-83.1\ \mathrm{kN}$ | $0.00$ | $-82.3\ \mathrm{kN}$ | $3.00$ |
 | L3 | $V_y$ | $-0.1\ \mathrm{kN}$ | $0.00$ | $-0.1\ \mathrm{kN}$ | $0.00$ |
-| L3 | $V_z$ | $1.1\ \mathrm{kN}$ | $0.00$ | $1.1\ \mathrm{kN}$ | $0.00$ |
+| L3 | $V_z$ | $-0.2\ \mathrm{kN}$ | $0.00$ | $-0.2\ \mathrm{kN}$ | $0.00$ |
 | L3 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $M_y$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $3.4\ \mathrm{kNm}$ | $3.00$ |
+| L3 | $M_y$ | $-0.7\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L3 | $M_z$ | $-0.3\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $f_y$ | $-0.12\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L3 | $f_z$ | $0.00\ \mathrm{mm}$ | $3.00$ | $1.27\ \mathrm{mm}$ | $1.73$ |
-| L4 | $N$ | $-2.8\ \mathrm{kN}$ | $0.00$ | $-2.8\ \mathrm{kN}$ | $0.00$ |
-| L4 | $V_y$ | $-6.7\ \mathrm{kN}$ | $0.00$ | $-6.7\ \mathrm{kN}$ | $0.00$ |
-| L4 | $V_z$ | $-4.1\ \mathrm{kN}$ | $3.90$ | $5.4\ \mathrm{kN}$ | $0.00$ |
+| L3 | $f_y$ | $-0.11\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $3.00$ |
+| L3 | $f_z$ | $-0.25\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L4 | $N$ | $7.9\ \mathrm{kN}$ | $0.00$ | $7.9\ \mathrm{kN}$ | $0.00$ |
+| L4 | $V_y$ | $-0.2\ \mathrm{kN}$ | $0.00$ | $-0.2\ \mathrm{kN}$ | $0.00$ |
+| L4 | $V_z$ | $-3.5\ \mathrm{kN}$ | $3.90$ | $6.0\ \mathrm{kN}$ | $0.00$ |
 | L4 | $T$ | $0.0\ \mathrm{kNm}$ | $3.00$ | $3.0\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $M_y$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $13.6\ \mathrm{kNm}$ | $1.34$ |
-| L4 | $M_z$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $40.2\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $f_y$ | $0.00\ \mathrm{mm}$ | $6.00$ | $5.16\ \mathrm{mm}$ | $2.54$ |
-| L4 | $f_z$ | $0.00\ \mathrm{mm}$ | $6.00$ | $0.81\ \mathrm{mm}$ | $2.58$ |
-| L5 | $N$ | $-0.1\ \mathrm{kN}$ | $0.00$ | $-0.1\ \mathrm{kN}$ | $0.00$ |
-| L5 | $V_y$ | $-2.0\ \mathrm{kN}$ | $4.00$ | $26.1\ \mathrm{kN}$ | $0.00$ |
-| L5 | $V_z$ | $-16.3\ \mathrm{kN}$ | $4.00$ | $1.3\ \mathrm{kN}$ | $0.00$ |
-| L5 | $T$ | $3.4\ \mathrm{kNm}$ | $0.00$ | $3.4\ \mathrm{kNm}$ | $0.00$ |
-| L5 | $M_y$ | $-0.3\ \mathrm{kNm}$ | $4.00$ | $34.9\ \mathrm{kNm}$ | $0.00$ |
-| L5 | $M_z$ | $-45.3\ \mathrm{kNm}$ | $0.00$ | $0.4\ \mathrm{kNm}$ | $3.60$ |
-| L5 | $f_y$ | $-0.65\ \mathrm{mm}$ | $1.40$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L5 | $f_z$ | $0.00\ \mathrm{mm}$ | $4.00$ | $0.47\ \mathrm{mm}$ | $1.78$ |
+| L4 | $M_y$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $10.9\ \mathrm{kNm}$ | $1.54$ |
+| L4 | $M_z$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $1.3\ \mathrm{kNm}$ | $0.00$ |
+| L4 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.16\ \mathrm{mm}$ | $2.54$ |
+| L4 | $f_z$ | $0.00\ \mathrm{mm}$ | $6.00$ | $0.66\ \mathrm{mm}$ | $2.60$ |
+| L5 | $N$ | $9.4\ \mathrm{kN}$ | $0.00$ | $9.4\ \mathrm{kN}$ | $0.00$ |
+| L5 | $V_y$ | $-16.5\ \mathrm{kN}$ | $4.00$ | $11.7\ \mathrm{kN}$ | $0.00$ |
+| L5 | $V_z$ | $-13.7\ \mathrm{kN}$ | $4.00$ | $3.8\ \mathrm{kN}$ | $0.00$ |
+| L5 | $T$ | $-0.1\ \mathrm{kNm}$ | $0.00$ | $-0.1\ \mathrm{kNm}$ | $0.00$ |
+| L5 | $M_y$ | $-16.2\ \mathrm{kNm}$ | $4.00$ | $9.4\ \mathrm{kNm}$ | $0.58$ |
+| L5 | $M_z$ | $-13.6\ \mathrm{kNm}$ | $4.00$ | $7.4\ \mathrm{kNm}$ | $1.55$ |
+| L5 | $f_y$ | $0.00\ \mathrm{mm}$ | $3.99$ | $0.24\ \mathrm{mm}$ | $1.71$ |
+| L5 | $f_z$ | $-0.01\ \mathrm{mm}$ | $3.71$ | $0.08\ \mathrm{mm}$ | $1.38$ |
 | L6 | $N$ | $-6.9\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $2.24$ |
 | L6 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $V_z$ | $9.0\ \mathrm{kN}$ | $2.24$ | $22.9\ \mathrm{kN}$ | $0.00$ |
 | L6 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $M_y$ | $-35.7\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
-| L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
-| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.64$ | $0.00\ \mathrm{mm}$ | $2.24$ |
-| L6 | $f_z$ | $-0.18\ \mathrm{mm}$ | $0.91$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L7 | $N$ | $-9.0\ \mathrm{kN}$ | $3.00$ | $9.0\ \mathrm{kN}$ | $3.00$ |
-| L7 | $V_y$ | $0.0\ \mathrm{kN}$ | $2.40$ | $0.0\ \mathrm{kN}$ | $3.20$ |
-| L7 | $V_z$ | $-10.6\ \mathrm{kN}$ | $6.00$ | $11.8\ \mathrm{kN}$ | $0.00$ |
-| L7 | $T$ | $-41.1\ \mathrm{kNm}$ | $4.80$ | $-41.1\ \mathrm{kNm}$ | $3.60$ |
-| L7 | $M_y$ | $-11.0\ \mathrm{kNm}$ | $0.00$ | $5.0\ \mathrm{kNm}$ | $3.12$ |
-| L7 | $M_z$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L7 | $f_y$ | $0.00\ \mathrm{mm}$ | $4.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.12\ \mathrm{mm}$ | $3.11$ |
+| L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $2.24$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $2.24$ | $0.00\ \mathrm{mm}$ | $0.91$ |
+| L6 | $f_z$ | $-0.18\ \mathrm{mm}$ | $0.91$ | $0.00\ \mathrm{mm}$ | $2.24$ |
+| L7 | $N$ | $-17.8\ \mathrm{kN}$ | $0.00$ | $-17.8\ \mathrm{kN}$ | $0.00$ |
+| L7 | $V_y$ | $0.5\ \mathrm{kN}$ | $0.00$ | $0.5\ \mathrm{kN}$ | $0.00$ |
+| L7 | $V_z$ | $-38.4\ \mathrm{kN}$ | $7.21$ | $41.9\ \mathrm{kN}$ | $0.00$ |
+| L7 | $T$ | $-28.6\ \mathrm{kNm}$ | $0.00$ | $-28.6\ \mathrm{kNm}$ | $0.00$ |
+| L7 | $M_y$ | $-5.9\ \mathrm{kNm}$ | $0.00$ | $73.0\ \mathrm{kNm}$ | $3.77$ |
+| L7 | $M_z$ | $-3.7\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $7.21$ |
+| L7 | $f_y$ | $-0.02\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $7.21$ |
+| L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.89\ \mathrm{mm}$ | $3.66$ |
+| L8 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L8 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L8 | $V_z$ | $0.0\ \mathrm{kN}$ | $2.00$ | $20.3\ \mathrm{kN}$ | $0.00$ |
+| L8 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $M_y$ | $-20.3\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $2.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.07$ | $0.00\ \mathrm{mm}$ | $2.00$ |
+| L8 | $f_z$ | $-0.04\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L9 | $N$ | $-9.0\ \mathrm{kN}$ | $3.00$ | $9.0\ \mathrm{kN}$ | $3.00$ |
+| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $4.00$ | $0.0\ \mathrm{kN}$ | $4.80$ |
+| L9 | $V_z$ | $-12.1\ \mathrm{kN}$ | $6.00$ | $11.7\ \mathrm{kN}$ | $0.00$ |
+| L9 | $T$ | $-4.6\ \mathrm{kNm}$ | $5.60$ | $-4.6\ \mathrm{kNm}$ | $4.00$ |
+| L9 | $M_y$ | $-11.5\ \mathrm{kNm}$ | $6.00$ | $4.9\ \mathrm{kNm}$ | $2.96$ |
+| L9 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
+| L9 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $4.00$ |
+| L9 | $f_z$ | $0.00\ \mathrm{mm}$ | $5.92$ | $0.10\ \mathrm{mm}$ | $2.96$ |
 
-Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_y = 5.16 mm bei x = 2.54 m.
+Grösste Durchbiegung gegen die Sehne eines Stabs: L7, f\_z = 0.89 mm bei x = 3.66 m.
 
 **Gleichgewichtsprobe (Moment um den Ursprung)**
 
@@ -17744,9 +17998,9 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_y = 5.16 mm bei x = 2.
 | ---: | ---: | ---: | ---: | ---: |
 | $\sum F_x$ | $41.088$ | $-41.088$ | $0.000$ | kN |
 | $\sum F_y$ | $8.525$ | $-8.525$ | $0.000$ | kN |
-| $\sum F_z$ | $-110.691$ | $110.691$ | $0.000$ | kN |
-| $\sum M_x$ | $-113.842$ | $113.842$ | $0.000$ | kNm |
-| $\sum M_y$ | $328.160$ | $-328.160$ | $0.000$ | kNm |
+| $\sum F_z$ | $-211.255$ | $211.255$ | $0.000$ | kN |
+| $\sum M_x$ | $-355.470$ | $355.470$ | $0.000$ | kNm |
+| $\sum M_y$ | $548.851$ | $-548.851$ | $0.000$ | kNm |
 | $\sum M_z$ | $-4.627$ | $4.627$ | $0.000$ | kNm |
 
 ### Decke: Kolloquium 4
@@ -19073,6 +19327,8 @@ $$
 
 Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort -- eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach oben; alle Masse in Millimetern.
 
+Für ein beliebiges Polygon gibt es keine Formel für I\_T. Gerechnet wird mit der Spannungsfunktion φ von Prandtl, auf einem Gitter: seine Linien laufen durch jede waagrechte und lotrechte Kante, je Zelle gibt es einen Wert, und eine schräge Kante wird zwischen zwei Zellmitten genau geschnitten. Am Rand eines Hohlraums ist φ fest, und hinaus fliesst so viel, wie der Hohlraum Fläche hat. Der Fehler fällt mit dem Quadrat der Zellgrösse; ein zweites Gitter, jede Zelle halbiert, hebt ihn heraus.
+
 **Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
 
 $$
@@ -19101,6 +19357,24 @@ $$
 
 $$
 \frac{A_{sw}}{s} = \frac{n \cdot \pi\, \varnothing^2 / 4}{s}
+$$
+
+**Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k**
+
+$$
+\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad \oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k
+$$
+
+**Torsionsträgheitsmoment aus der Spannungsfunktion**
+
+$$
+I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k
+$$
+
+**Torsionsträgheitsmoment, nach Richardson aus beiden Gittern**
+
+$$
+I_T = \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3}
 $$
 
 ### Querkraft und Torsion
@@ -21828,6 +22102,29 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Biegesteifigkeit um z, Holzstütze, Brettschichtholz | $EI_{z,\text{Q3,Brettschichtholz}}$ | $1533$ | kNm² | berechnet |
 | Torsionssteifigkeit, Holzstütze, Brettschichtholz | $GI_{T,\text{Q3,Brettschichtholz}}$ | $146$ | kNm² | berechnet |
 | Eigengewicht je Meter, Holzstütze, Brettschichtholz | $g_{k,\text{Q3,Brettschichtholz}}$ | $0.19$ | kN/m | berechnet |
+| Querschnittsfläche, Deckenstreifen | $A_{\text{Q4}}$ | $300000$ | mm² | berechnet |
+| E-Modul, Deckenstreifen | $E_{\text{Q4}}$ | $35903$ | N/mm² | berechnet |
+| Torsionsträgheitsmoment, Deckenstreifen | $I_{T,\text{Q4}}$ | $7300.15$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Deckenstreifen | $I_{y,\text{Q4}}$ | $2250$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um z, Deckenstreifen | $I_{z,\text{Q4}}$ | $25000$ | ·10⁶ mm⁴ | berechnet |
+| Moment für E\_eq, Deckenstreifen | $M_{\text{Q4}}$ | $20$ | kNm | Eingabe |
+| Normalkraft für E\_eq, Deckenstreifen | $N_{\text{Q4}}$ | $0$ | kN | Eingabe |
+| Dehnsteifigkeit, Deckenstreifen, C30/37 | $EA_{\text{Q4}}$ | $10771$ | MN | berechnet |
+| Biegesteifigkeit um y, Deckenstreifen, C30/37 | $EI_{y,\text{Q4}}$ | $80782$ | kNm² | berechnet |
+| Biegesteifigkeit um z, Deckenstreifen, C30/37 | $EI_{z,\text{Q4}}$ | $897572$ | kNm² | berechnet |
+| Torsionssteifigkeit, Deckenstreifen, C30/37 | $GI_{T,\text{Q4}}$ | $102262$ | kNm² | berechnet |
+| Eigengewicht je Meter, Deckenstreifen, C30/37 | $g_{k,\text{Q4}}$ | $7.5$ | kN/m | berechnet |
+| Längere Seite, Deckenstreifen | $s_{\text{Q4}}$ | $1000$ | mm | berechnet |
+| Kürzere Seite, Deckenstreifen | $t_{\text{Q4}}$ | $300$ | mm | berechnet |
+| Querschnittsfläche, Kasten | $A_{\text{Q5}}$ | $330000$ | mm² | berechnet |
+| Torsionsträgheitsmoment, Kasten | $I_{T,\text{Q5}}$ | $27477.49$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um y, Kasten | $I_{y,\text{Q5}}$ | $13275$ | ·10⁶ mm⁴ | berechnet |
+| Flächenträgheitsmoment um z, Kasten | $I_{z,\text{Q5}}$ | $22475$ | ·10⁶ mm⁴ | berechnet |
+| Dehnsteifigkeit, Kasten, C30/37 | $EA_{\text{Q5}}$ | $11095$ | MN | berechnet |
+| Biegesteifigkeit um y, Kasten, C30/37 | $EI_{y,\text{Q5}}$ | $446302$ | kNm² | berechnet |
+| Biegesteifigkeit um z, Kasten, C30/37 | $EI_{z,\text{Q5}}$ | $755604$ | kNm² | berechnet |
+| Torsionssteifigkeit, Kasten, C30/37 | $GI_{T,\text{Q5}}$ | $384911$ | kNm² | berechnet |
+| Eigengewicht je Meter, Kasten, C30/37 | $g_{k,\text{Q5}}$ | $8.25$ | kN/m | berechnet |
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Elastizitätsmodul des Baustahls | $E_a$ | $210000$ | N/mm² | Vorgabe |
 | Schubmodul des Baustahls | $G_a$ | $81000$ | N/mm² | Vorgabe |
@@ -22593,6 +22890,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Vergrösserungsfaktor der Durchbiegung, Zug unten | $\omega_w$ | $11.61$ |  | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $330000$ | mm² | berechnet |
 | Stahlfläche der Bewehrung | $A_{s,tot}$ | $2491$ | mm² | berechnet |
+| Torsionsträgheitsmoment nach St. Venant | $I_T$ | $27477.5$ | ·10⁶ mm⁴ | berechnet |
 | Trägheitsmoment um y | $I_y$ | $13275$ | ·10⁶ mm⁴ | berechnet |
 | Deviationsmoment | $I_{yz}$ | $0$ | ·10⁶ mm⁴ | berechnet |
 | Trägheitsmoment um z | $I_z$ | $22475$ | ·10⁶ mm⁴ | berechnet |

@@ -18,6 +18,7 @@ const GEMEINSAM = {
     ['Baustahl', 'einer aus dem Projekt: E = E_a und ρ_a (SIA 263:2013, 3.2.2.1)'],
   ],
   rho: ['ρ', 'für das Eigengewicht ρ · g · A, mit g = 10 m/s²'],
+  eq: ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten -- bei einer Platte immer in x-Richtung, Zug unten'],
 };
 
 /** Ein kleines Bild der Vorzeichen in der Ebene: Achsen, Drehsinn, ein Stab mit Faser, M > 0. */
@@ -120,7 +121,7 @@ const TEXTE = {
           ['Platte', 'ein Streifen b × h der gewählten Platte'],
           ['QS Analyse', 'A und I_y des Bruttoquerschnitts der gewählten Querschnittsanalyse'],
           ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, bei einer Analyse auf Wunsch E_eq bei N und M, für EA und EI (für EA eine Näherung)'],
-          ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten -- bei einer Platte immer in x-Richtung, Zug unten'],
+          GEMEINSAM.eq,
           ['Steifigkeit', 'EA, EI am Bruttoquerschnitt, beim Beton ungerissen und ohne Bewehrung (SIA 262:2025, 4.1.4.1.3); Theorie 1. Ordnung'],
         ],
         formel: 'EA = E · A   EI = E · I',
@@ -164,7 +165,7 @@ const TEXTE = {
           ['G', 'der Schubmodul für die Torsion: G_cm = E_cm / (2 · (1 + ν_c)) des Betons, G_a des Baustahls (SIA 263:2013, 3.2.2.1)'],
           ['eigenes', 'E, ρ und G von Hand, etwa für Holz'],
           GEMEINSAM.rho,
-          ['gemäss Querschnitt', 'wählt man an der Linie: der Beton ihrer Platte, mit E_cm und G_cm'],
+          ['gemäss Querschnitt', 'wählt man an der Linie: der Beton ihrer Platte oder Analyse, mit E_cm und G_cm'],
         ],
         formel: 'g_k = ρ · g · A   g = 10 m/s²',
       },
@@ -174,8 +175,9 @@ const TEXTE = {
           ['Profil', 'ein Stahlprofil aus der Tabelle -- y ist die starke Achse; bei β = 0 steht der Steg in der lotrechten Ebene des Stabs, gedreht wird mit dem Drehwinkel β der Linie'],
           ['Kennwerte', 'A, I_y, I_z und I_T von Hand'],
           ['Platte', 'ein Streifen b × h der gewählten Platte -- b waagrecht bei β = 0: I_y = b · h³ / 12, I_z = h · b³ / 12, I_T des Rechtecks'],
-          ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte, auf Wunsch E_eq bei N und M, für EA, EI_y und EI_z (für EA und EI_z eine Näherung); GI_T bleibt bei G_cm'],
-          ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen -- bei einer Platte immer in x-Richtung, Zug unten'],
+          ['QS Analyse', 'A, I_y und I_z des Bruttoquerschnitts der gewählten Querschnittsanalyse, y waagrecht bei β = 0; I_T rechnet sie dafür numerisch, ohne Bewehrung. I_yz bleibt aussen vor'],
+          ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, auf Wunsch E_eq bei N und M, für EA, EI_y und EI_z (für EA und EI_z eine Näherung); GI_T bleibt bei G_cm'],
+          GEMEINSAM.eq,
           ['Steifigkeit', 'EA, EI_y, EI_z und GI_T am Bruttoquerschnitt, beim Beton ungerissen und ohne Bewehrung (SIA 262:2025, 4.1.4.1.3); Theorie 1. Ordnung, Torsion nach St. Venant ohne Wölbkrafttorsion'],
         ],
         formel: 'EA = E · A   EI_y = E · I_y   GI_T = G · I_T',

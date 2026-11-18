@@ -253,7 +253,7 @@ def jeder_nachweis() -> Projekt:
     # beim Durchstanzen und jede Spielart von Grundbruch, Setzung und Pfahl.
     _alles_einmal(p, decke, p.querschnittsanalysen[0])
     _beweglich(p)
-    _raumrahmen(p)
+    _raumrahmen(p, decke, p.querschnittsanalysen[0])
     _decken(p)
     _durchstanzstellen(p)
     _grundbrueche(p)
@@ -521,14 +521,17 @@ def _beweglich(p: Projekt) -> None:
     s.stablast(s.lastfall("Last"), traeger, wert=10.0)
 
 
-def _raumrahmen(p: Projekt) -> None:
+def _raumrahmen(p: Projekt, decke: QuerschnittEintrag,
+                analyse: QuerschnittsanalyseEintrag) -> None:
     """
     Ein Rahmen im Raum, der alles einmal braucht: Stützen aus Beton, Stahl
     und Holz, je mit anderem Lager -- eingespannt, gelenkig mit Drehfeder,
     verschieblich und in y gehalten --, Riegel in x und y, einer gedreht und
     einer mit Gelenk, ein geneigter Kragarm, ein gebetteter Fundamentbalken;
-    Querschnitte nach Vorlage, als Profil und von Hand, ein eigenes Material
-    mit G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
+    Querschnitte nach Vorlage, als Profil, von Hand, aus einer Platte mit
+    E_eq und aus einer Querschnittsanalyse, deren I_T sie dafür rechnet --
+    beide mit dem Material gemäss Querschnitt --, ein eigenes Material mit
+    G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
     """
     s = p.balkensystem3d("Raumrahmen")
     beton = s.beton("b1")
@@ -538,12 +541,16 @@ def _raumrahmen(p: Projekt) -> None:
     heb = s.stahlprofil("Stütze", "HEB 300")
     hand = s.querschnitt_mit_kennwerten("Holzstütze", A=40000.0, I_y=133.3, I_z=133.3,
                                         I_T=225.0)
+    streifen = s.querschnitt_aus("Deckenstreifen", "platte", decke, E_eq={"M": 20.0})
+    kasten = s.querschnitt_aus("Kasten", "analyse", analyse)
     s.linie((0, 0, 0), (0, 0, 3), querschnitt=balken, material=beton)
     s.linie((6, 0, 0), (6, 0, 3), querschnitt=heb, material=stahl, drehung=90.0)
     s.linie((0, 4, 0), (0, 4, 3), querschnitt=hand, material=holz)
     riegel_x = s.linie((0, 0, 3), (6, 0, 3), querschnitt=heb, material=stahl, gelenk_ende=True)
     riegel_y = s.linie((0, 0, 3), (0, 4, 3), querschnitt=balken, material=beton, drehung=30.0)
     kragarm = s.linie((6, 0, 3), (6, 2, 4), querschnitt=heb, material=stahl)
+    s.linie((0, 4, 3), (6, 0, 3), querschnitt=kasten, material=MATERIAL_DES_QUERSCHNITTS)
+    s.linie((0, 4, 3), (-2, 4, 3), querschnitt=streifen, material=MATERIAL_DES_QUERSCHNITTS)
     fundament = s.linie((0, 0, 0), (6, 0, 0), querschnitt=balken, material=beton,
                         quer_z="feder", k_quer_z=20000.0, laengs="feder", k_laengs=5000.0)
     s.lager_an((0, 0, 0), "eingespannt")

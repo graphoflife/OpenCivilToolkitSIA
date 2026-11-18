@@ -1,5 +1,5 @@
 ---
-erzeugt: bb60cbc6aa9a
+erzeugt: 12a7ce5c5b09
 art: formel
 tags: [formel]
 ---
@@ -17,7 +17,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $E_{cm}$ | Mittelwert des Elastizitätsmoduls | N/mm² | [[Mittelwert des Elastizitätsmoduls]] |
-| $I_{y}$ | Flächenträgheitsmoment um y, Balken 300×500 | ·10⁶ mm⁴ | [[Flächenträgheitsmoment eines Rechtecks]], [[Flächenträgheitsmoment eines I-Profils um y]], Eingabe |
+| $I_{y}$ | Flächenträgheitsmoment um y, Balken 300×500 | ·10⁶ mm⁴ | [[Flächenträgheitsmoment eines Rechtecks]], [[Flächenträgheitsmoment eines I-Profils um y]], Eingabe, Zwischenwert |
 
 ## Beispiel
 

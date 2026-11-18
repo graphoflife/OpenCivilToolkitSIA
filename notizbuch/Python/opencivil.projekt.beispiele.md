@@ -1,5 +1,5 @@
 ---
-erzeugt: f474f1313b04
+erzeugt: 9ef01f72ef6c
 art: modul
 tags: [modul]
 ---
@@ -173,15 +173,17 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 ### _raumrahmen
 
 ```python
-def _raumrahmen(p: Projekt) -> None
+def _raumrahmen(p: Projekt, decke: QuerschnittEintrag, analyse: QuerschnittsanalyseEintrag) -> None
 ```
 
 Ein Rahmen im Raum, der alles einmal braucht: Stützen aus Beton, Stahl
 und Holz, je mit anderem Lager -- eingespannt, gelenkig mit Drehfeder,
 verschieblich und in y gehalten --, Riegel in x und y, einer gedreht und
 einer mit Gelenk, ein geneigter Kragarm, ein gebetteter Fundamentbalken;
-Querschnitte nach Vorlage, als Profil und von Hand, ein eigenes Material
-mit G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
+Querschnitte nach Vorlage, als Profil, von Hand, aus einer Platte mit
+E_eq und aus einer Querschnittsanalyse, deren I_T sie dafür rechnet --
+beide mit dem Material gemäss Querschnitt --, ein eigenes Material mit
+G; Lasten in jeder Richtung, Torsion, projiziert, an Knoten.
 
 
 ## Braucht

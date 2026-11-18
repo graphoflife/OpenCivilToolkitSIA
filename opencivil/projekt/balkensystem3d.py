@@ -18,11 +18,13 @@ Eine Last zeigt senkrecht, in x, y oder z des Systems oder laengs und quer
 in y oder z des Stabs (:class:`~opencivil.stabwerk3d.modell.Richtung`),
 eine an einem Knoten nur in eine Richtung des Systems. Ein Querschnitt ist
 nach Vorlage, ein Stahlprofil -- y die starke Achse, gedreht wird mit β --,
-von Hand mit I_y, I_z und I_T oder aus einer Platte, wie in der Ebene
-(Benutzer, 2026-11-18): der Streifen b × h mit den Formeln des Rechtecks,
-b waagrecht, wenn β null ist. Ein Stab «gemäss Querschnitt» nimmt deren
-Beton, mit G_cm fuer die Torsion; ein E_eq gilt fuer EA, EI_y und EI_z
-(nach Vorgabe, nicht nachgeschlagen).
+von Hand mit I_y, I_z und I_T oder aus einer Platte oder
+Querschnittsanalyse, wie in der Ebene (Benutzer, 2026-11-18): der Streifen
+b × h mit den Formeln des Rechtecks, b waagrecht, wenn β null ist; die
+Analyse mit A, I_y und I_z ihres Bruttoquerschnitts und einem I_T, das sie
+dafuer numerisch rechnet (:mod:`~opencivil.querschnitt.torsion`). Ein Stab
+«gemäss Querschnitt» nimmt deren Beton, mit G_cm fuer die Torsion; ein
+E_eq gilt fuer EA, EI_y und EI_z (nach Vorgabe, nicht nachgeschlagen).
 Ein eigenes Material hat dazu seinen Schubmodul G.
 
 KOORDINATEN UND EINHEITEN:
@@ -48,7 +50,7 @@ from opencivil.projekt.balkensystem import (
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen
 from opencivil.projekt.lesen import bereich, einer_von
-from opencivil.projekt.staebe import MitStaeben, Querschnittsart, StabquerschnittBasis
+from opencivil.projekt.staebe import MitStaeben, StabquerschnittBasis
 from opencivil.stabwerk.stabquerschnitt import RAEUMLICH
 from opencivil.stabwerk3d.modell import Richtung
 from opencivil.stabwerk3d.raum import minus
@@ -64,10 +66,6 @@ EINHEIT_DER_FEDER = {
 
 #: Wohin eine Last an einem Knoten zeigt -- in die Richtungen des Systems.
 KNOTENRICHTUNGEN = tuple(r for r in Richtung if r.im_system)
-
-#: Woher die Kennwerte eines Querschnitts kommen -- noch nicht aus einer
-#: Querschnittsanalyse: sie rechnet kein I_T.
-QUERSCHNITTSARTEN = tuple(a for a in Querschnittsart if a is not Querschnittsart.ANALYSE)
 
 #: Die Kennwerte eines Querschnitts von Hand -- wie die Rechnung sie nimmt.
 KENNWERTE = tuple(k.kurzname for k in RAEUMLICH)
@@ -193,8 +191,6 @@ class RaumquerschnittEintrag(StabquerschnittBasis):
     """Ein Querschnitt der Staebe im Raum -- siehe Dateikopf."""
 
     KENNWERTE = KENNWERTE
-
-    art: Querschnittsart = einer_von(QUERSCHNITTSARTEN, Querschnittsart.VORLAGE)
 
 
 @dataclass

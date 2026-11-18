@@ -5,7 +5,9 @@ VERANTWORTUNG:
 Aus der Beschreibung einer Querschnittsanalyse wird hier ein Bauteil wie die
 Platte (:class:`~opencivil.querschnitt.platte.Plattenquerschnitt`): mit
 Namensraum, Ueberschrift, Werten und einer Herleitung des Querschnitts --
-Polygone, Bruttoquerschnitt, Bewehrung, Schubwaende. Die Nachweise bekommen
+Polygone, Bruttoquerschnitt, Bewehrung, Schubwaende. Dazu, fuer sich,
+``I_T`` (:mod:`~opencivil.querschnitt.torsion`): es braucht nur ein Stab
+im Raum, und das Rechenwerk rechnet nur, was ein Ziel braucht. Die Nachweise bekommen
 das Bauteil und lesen daraus die Geometrie; seine Zahlen beziehen sie ueber
 das Rechenwerk, damit jede rueckverfolgbar bleibt.
 
@@ -33,7 +35,9 @@ from opencivil.core.berechnung import (
 )
 from opencivil.core.einheiten import EINHEITSLOS, GRAD, MIO_MM4, MM, MM2, Groesse
 from opencivil.core.latex import Mathe, als_text
-from opencivil.core.protokoll import Abschnitt, GleichungBlock, Protokoll, TabellenBlock
+from opencivil.core.protokoll import (
+    Abschnitt, GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte,
+)
 from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
@@ -47,6 +51,7 @@ from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN
 from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz
+from opencivil.querschnitt.torsion import torsion
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 
@@ -360,15 +365,16 @@ class Zeichnung:
         return umrisse
 
 
-class QuerschnittsaufbauProzedur(Prozedur):
-    """Polygone, Bruttoquerschnitt, Bewehrung und Schubwaende -- in Tabellen."""
+class Herleitungsteil(Prozedur):
+    """Ein Teil der Herleitung des Querschnitts -- die Analyse schreibt ihn selbst."""
 
-    def __init__(self, analyse: "Querschnittsanalyse", **kwargs) -> None:
+    def __init__(self, schreiben: Callable[[Protokoll], Mapping[str, Groesse]],
+                 **kwargs) -> None:
         super().__init__(**kwargs)
-        self.analyse = analyse
+        self.schreiben = schreiben
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
-        return self.analyse.aufbau_protokollieren(p)
+        return self.schreiben(p)
 
 
 class Querschnittsanalyse(Rechenobjekt):
@@ -473,9 +479,14 @@ class Querschnittsanalyse(Rechenobjekt):
             "A_s": self._def("A_s", r"A_{s,tot}", MM2, "Stahlfläche der Bewehrung", 0),
         }
         abschnitt = self.abschnitt
-        self.berechnungen.append(QuerschnittsaufbauProzedur(
-            self, id=f"{self.id}.aufbau", ausgaben=list(self.d_brutto.values()),
-            titel="Querschnitt", abschnitt=abschnitt))
+        self.berechnungen.append(Herleitungsteil(
+            self.aufbau_protokollieren, id=f"{self.id}.aufbau",
+            ausgaben=list(self.d_brutto.values()), titel="Querschnitt", abschnitt=abschnitt))
+        self.d_torsion = self._def("I_T", "I_T", MIO_MM4,
+                                   "Torsionsträgheitsmoment nach St. Venant", 1)
+        self.berechnungen.append(Herleitungsteil(
+            self.torsion_protokollieren, id=f"{self.id}.torsion", ausgaben=[self.d_torsion],
+            titel="Torsion", abschnitt=abschnitt))
 
         gruppe = "Schubwände"
         for kurzname, symbol, einheit, groesse, beschreibung, stellen, referenz in (
@@ -555,6 +566,47 @@ class Querschnittsanalyse(Rechenobjekt):
         if self.waende:
             self._waende_protokollieren(p)
         return {self.d_brutto[k].id: g for k, g in werte.items()}
+
+    def torsion_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]:
+        """``I_T`` nach St. Venant, numerisch -- mit den beiden Gittern, aus denen es kommt."""
+        z = self.zeichnung
+        t = torsion(z.punkte, z.traegt, z.eltern)
+        p.erklaerung(
+            "Für ein beliebiges Polygon gibt es keine Formel für I_T. Gerechnet wird mit der "
+            "Spannungsfunktion φ von Prandtl, auf einem Gitter: seine Linien laufen durch jede "
+            "waagrechte und lotrechte Kante, je Zelle gibt es einen Wert, und eine schräge "
+            "Kante wird zwischen zwei Zellmitten genau geschnitten. Am Rand eines Hohlraums "
+            "ist φ fest, und hinaus fliesst so viel, wie der Hohlraum Fläche hat. Der Fehler "
+            "fällt mit dem Quadrat der Zellgrösse; ein zweites Gitter, jede Zelle halbiert, "
+            "hebt ihn heraus.")
+        p.annahme("I_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, "
+                  "numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht "
+                  "nachgeschlagen).")
+        p.ansatz(r"\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad "
+                 r"\oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k",
+                 titel="Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ_k",
+                 name="Spannungsfunktion von Prandtl")
+        p.ansatz(r"I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k",
+                 titel="Torsionsträgheitsmoment aus der Spannungsfunktion")
+        p.tabelle(
+            kopf=["Gitter", "Zellen", "mit Material", Mathe(r"A_k\ [\mathrm{mm}^2]"),
+                  Mathe(r"I_T\ [10^6\,\mathrm{mm}^4]")],
+            zeilen=[[name, Mathe(rf"{lauf.spalten} \times {lauf.zeilen}"),
+                     Mathe(f"{lauf.zellen}"),
+                     Mathe(", ".join(f"{a:.0f}" for a in lauf.hohlraeume))
+                     if lauf.hohlraeume else "–",
+                     Mathe(f"{lauf.I_T * 1e-6:.1f}")]
+                    for name, lauf in (("grob", t.grob), ("fein", t.fein))],
+            titel="Die beiden Gitter", ausrichtung="lrrrr")
+        werte = Zwischenwerte(self.d_torsion.id)
+        grob, fein = (werte.wert(name, rf"I_{{T,{name}}}",
+                                 Groesse.aus_si(lauf.I_T * 1e-12, MIO_MM4))
+                      for name, lauf in (("grob", t.grob), ("fein", t.fein)))
+        groesse = Groesse.aus_si(t.I_T * 1e-12, MIO_MM4)
+        p.formel(self.d_torsion.belegen(groesse), r"\frac{4 \cdot @fein - @grob}{3}",
+                 {"fein": fein, "grob": grob},
+                 titel="Torsionsträgheitsmoment, nach Richardson aus beiden Gittern")
+        return {self.d_torsion.id: groesse}
 
     def _bewehrung_protokollieren(self, p: Protokoll) -> float:
         if not self.bewehrungselemente:

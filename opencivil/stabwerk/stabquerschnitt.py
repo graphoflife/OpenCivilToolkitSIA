@@ -17,9 +17,8 @@ Welche Kennwerte, sagt das System: der ebene Rahmen braucht ``A`` und ``I``
 * aus einer Platte (:class:`AusPlatte`) -- die Formeln des Rechtecks mit
   ``b`` und ``h`` der Platte, im Raum mit ``I_z`` und ``I_T`` dazu;
 * aus einer Querschnittsanalyse (:class:`AusAnalyse`) -- ``A`` und ``I_y``
-  ihres Bruttoquerschnitts, im Raum ``I_z`` dazu.
-
-Eine Querschnittsanalyse gibt es nur im ebenen Rahmen: ``I_T`` rechnet sie nicht.
+  ihres Bruttoquerschnitts, im Raum ``I_z`` dazu und ``I_T``, das sie dafuer
+  numerisch rechnet (:mod:`~opencivil.querschnitt.torsion`).
 
 Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu. Nur ein Querschnitt aus

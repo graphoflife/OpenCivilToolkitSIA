@@ -1,5 +1,5 @@
 ---
-erzeugt: 242cdb7d8a5d
+erzeugt: 256f9354b0cb
 art: modul
 tags: [modul]
 ---
@@ -547,4 +547,5 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.randzone]]
+- [[opencivil.querschnitt.torsion]]
 - [[opencivil.web.api]]

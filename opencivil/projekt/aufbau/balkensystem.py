@@ -313,7 +313,7 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
     return AusAnalyse(kennung=q.kennung, name=q.name,
                       herkunft=f"Querschnittsanalyse «{analyse.name}»", bezug=q.bezug,
                       quelle={"I": analyse.id_von("I_y"),
-                              **{k: analyse.id_von(k) for k in ("A", "I_y", "I_z")}},
+                              **{k: analyse.id_von(k) for k in ("A", "I_y", "I_z", "I_T")}},
                       eq=_modulfrage(q, ModulAusAnalyse(analyse)),
                       flaechen=tuple(f.punkte for f in analyse.flaechen))
 

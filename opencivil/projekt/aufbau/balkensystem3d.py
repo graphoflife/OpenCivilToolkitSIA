@@ -8,7 +8,8 @@ im Raum: aus einem
 Stabwerk in SI (:func:`modell_von`) und daraus die Rechnung mit
 aufgeloesten Materialien und Querschnitten (:func:`bauen`). Was beide gleich
 pruefen und aufloesen, kommt von dort -- auch ein Querschnitt aus einer
-Platte oder Querschnittsanalyse und das Material «gemäss Querschnitt»; hier
+Platte oder Querschnittsanalyse, deren I_T sie dann rechnet, und das
+Material «gemäss Querschnitt»; hier
 steht nur, was der Raum anders macht: der Drehwinkel in rad, eine Last an
 einem Knoten als Vektor, ein Profil, das sich um beide Achsen biegt.
 """

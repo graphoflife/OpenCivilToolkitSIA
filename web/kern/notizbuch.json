@@ -3039,6 +3039,15 @@
       ]
     },
     {
+      "name": "Spannungsfunktion von Prandtl",
+      "pfad": "Formelsammlung/Formeln/Spannungsfunktion von Prandtl.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
       "name": "Spitzendruck drainiert",
       "pfad": "Formelsammlung/Formeln/Spitzendruck drainiert.md",
       "art": "formel",
@@ -3228,6 +3237,15 @@
       ]
     },
     {
+      "name": "Torsionsträgheitsmoment aus der Spannungsfunktion",
+      "pfad": "Formelsammlung/Formeln/Torsionsträgheitsmoment aus der Spannungsfunktion.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
       "name": "Torsionsträgheitsmoment eines I-Profils",
       "pfad": "Formelsammlung/Formeln/Torsionsträgheitsmoment eines I-Profils.md",
       "art": "formel",
@@ -3247,6 +3265,17 @@
       ],
       "themen": [
         "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Torsionsträgheitsmoment, nach Richardson aus beiden Gittern",
+      "pfad": "Formelsammlung/Formeln/Torsionsträgheitsmoment, nach Richardson aus beiden Gittern.md",
+      "art": "formel",
+      "zeichen": [
+        "I_T"
+      ],
+      "themen": [
+        "Querschnittsanalyse"
       ]
     },
     {
@@ -6852,14 +6881,15 @@
         "Zeichnung.innerstes",
         "Zeichnung._linie",
         "Zeichnung._zellen",
-        "QuerschnittsaufbauProzedur",
-        "QuerschnittsaufbauProzedur.rechne",
+        "Herleitungsteil",
+        "Herleitungsteil.rechne",
         "Querschnittsanalyse",
         "Querschnittsanalyse.beton_an",
         "Querschnittsanalyse.zugseiten",
         "Querschnittsanalyse.abschnitt",
         "Querschnittsanalyse.baustoffe",
         "Querschnittsanalyse.aufbau_protokollieren",
+        "Querschnittsanalyse.torsion_protokollieren",
         "Querschnittsanalyse.angaben",
         "Querschnittsanalyse.rechenwahl",
         "Querschnittsanalyse.werkstoffbezuege",
@@ -7210,6 +7240,35 @@
         "widerstand",
         "Laengszug",
         "laengszug"
+      ]
+    },
+    {
+      "name": "opencivil.querschnitt.torsion",
+      "pfad": "Python/opencivil.querschnitt.torsion.md",
+      "art": "modul",
+      "kurz": "das Torsionstraegheitsmoment eines gezeichneten Querschnitts.",
+      "stichworte": [
+        "Gitterlauf",
+        "Torsion",
+        "Torsion.I_T",
+        "torsion",
+        "_Umriss",
+        "_Umriss.waagrecht",
+        "_Umriss.lotrecht",
+        "_Umriss._strecken",
+        "_darin",
+        "_gitter",
+        "_halbiert",
+        "_lauf",
+        "_Zellen",
+        "_Zellen.flaeche",
+        "_Zellen.hohlraeume",
+        "_Zellen.fuellen",
+        "_System",
+        "_System._reihe",
+        "_System._zum_rand",
+        "_System._koppeln",
+        "_gradienten"
       ]
     },
     {

@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d8b72865b6a
+erzeugt: 942345daf0e4
 art: formel
 tags: [formel]
 ---
@@ -17,7 +17,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $G_{cm}$ | Mittelwert des Schubmoduls | N/mm² | [[Mittelwert des Schubmoduls]] |
-| $I_{T}$ | Torsionsträgheitsmoment, Balken 300×500 | ·10⁶ mm⁴ | [[Torsionsträgheitsmoment eines Rechtecks]], [[Torsionsträgheitsmoment eines I-Profils]], Eingabe |
+| $I_{T}$ | Torsionsträgheitsmoment, Balken 300×500 | ·10⁶ mm⁴ | [[Torsionsträgheitsmoment eines Rechtecks]], [[Torsionsträgheitsmoment eines I-Profils]], Eingabe, Zwischenwert |
 
 ## Beispiel
 
