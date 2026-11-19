@@ -189,7 +189,10 @@ async function bewehrungErmitteln(kennung) {
   aendern({}, 'bewehrungssuche-start');
   try {
     const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
-    if (antwort.gefunden) {
+    // Übernommen wird, was gefunden ist -- auch Bügel allein: mit ihnen
+    // findet ein zweiter Klick die Längsbewehrung, die mit den alten nicht
+    // aufging. Bis 2026-11-19 gingen sie dann verloren.
+    if (antwort.gefunden || antwort.buegel?.gefunden) {
       // Der Kern gibt das fertige Projekt zurück; übernommen wird die eine
       // gesuchte Platte, damit die anderen unberührt bleiben -- mit der
       // neuen Dicke, wenn sie gesucht wurde.
@@ -200,6 +203,10 @@ async function bewehrungErmitteln(kennung) {
       });
     }
     melden(antwort.begruendung, !antwort.gefunden);
+    // Was die Suche sonst sagt: zu den Bügeln und zur Duktilität, die sie
+    // nicht mitsucht. Bis 2026-11-19 verschwiegen.
+    if (antwort.buegel) melden(`Bügel: ${antwort.buegel.begruendung}`, !antwort.buegel.gefunden);
+    if (antwort.duktilitaet) melden(antwort.duktilitaet, antwort.duktilitaet_erfuellt === false);
   } catch (fehler) {
     melden(String(fehler.message || fehler), true);
   } finally {

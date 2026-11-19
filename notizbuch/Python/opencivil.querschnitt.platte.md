@@ -1,5 +1,5 @@
 ---
-erzeugt: 8aea4205ad77
+erzeugt: cd7e7e3b9e8f
 art: modul
 tags: [modul]
 ---
@@ -499,6 +499,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
 
 ## Formeln aus diesem Modul

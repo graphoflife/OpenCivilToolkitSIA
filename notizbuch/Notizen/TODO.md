@@ -76,6 +76,14 @@ gelernt wurde, steht in [[Entwicklung]].
       (116) (5.5.2.2, 5.5.3.4). Beispiel: h = 200 mm mit Teilung 250 mm --
       erlaubt wären 240 mm. Vorschlag: (116), 1.2·h und 300 mm als
       Bedingung, 5.2.1 und die 20 % als Meldung. Entscheid des Benutzers.
+- [ ] **Bügel und Längsbewehrung in einem Zug suchen.** Mit «Bügel
+      mitsuchen» sucht die Platte erst die Längsbewehrung, mit den alten
+      Bügeln, dann die Bügel. Bei V_Ed = 400 kN/m und Bügeln ⌀10@200
+      scheitert darum die Längssuche an der Querkraft, die Bügelsuche findet
+      ⌀12@200, und erst ein zweiter Klick findet die Längsbewehrung (gesehen
+      am 2026-11-19). Vorschlag: mit «Bügel mitsuchen» prüft die Längssuche
+      die Querkraft mit Bügeln nicht, die Bügelsuche danach schon. Entscheid
+      des Benutzers.
 - [ ] **Dichten aus SIA 261.** 2400 und 2500 kg/m³ für Beton und Stahlbeton,
       7850 kg/m³ für Stahl stehen so in SIA 261:2020, Anhang A, Tabelle 28
       (mit g = 10 m/s²); SIA 262 nennt keine. Ob der Verweis eingetragen wird,

@@ -24,7 +24,9 @@
 import { erklaerung, feld, hakenSchalter, wahlSchalter } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
-import { gebrauchsstand, schalter, zeilenstand } from './kapitel.js';
+import {
+  eingeschaltet, fehltHinweis, gebrauchsstand, schalter, standOhne, zeilenstand,
+} from './kapitel.js';
 import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
 
 // ===========================================================================
@@ -68,7 +70,7 @@ export function nachweisKapitel(ort) {
         formel: 'α_eff = N_Rd / |N_Ed|',
       },
       inhalt: (e) => knickInhalt(e, ort),
-      stand: (e) => zeilenstand(e.knickfaelle, 'Fall', 'Fälle', 'kein Fall'),
+      stand: (e) => standOhne(zeilenstand(e.knickfaelle, 'Fall', 'Fälle', 'kein Fall'), ort.knick.fehlt(e)),
     },
     {
       schluessel: 'duktilitaet',
@@ -103,7 +105,7 @@ export function nachweisKapitel(ort) {
         formel: 'σ_s ≤ σ_s,adm (Tab. 17)',
       },
       inhalt: (e) => quasistaendigInhalt(e, ort),
-      stand: (e) => gebrauchsstand(e.quasistaendig),
+      stand: (e) => gebrauchsstand(e.quasistaendig, e[ort.gebrauch.aus]),
     },
     {
       schluessel: 'haeufig',
@@ -116,7 +118,7 @@ export function nachweisKapitel(ort) {
         formel: 'σ_s ≤ f_yd − 80 N/mm²',
       },
       inhalt: (e) => haeufigInhalt(e, ort),
-      stand: (e) => (fliessenGefordert(e) ? gebrauchsstand(e.haeufig)
+      stand: (e) => (fliessenGefordert(e) ? gebrauchsstand(e.haeufig, e[ort.gebrauch.aus])
         : { an: false, text: 'entfällt' }),
     },
   ];
@@ -130,7 +132,7 @@ export function analysenKapitel(ort) {
   return katalog('spannungsanalyse', 'arten').map((a) => ({
     schluessel: a.wert,
     name: a.beschriftung, titel: a.titel,
-    bezug: (e) => `Spannung-Dehnung-Analyse · ${ort.bezug(e)}`,
+    bezug: (e) => `Spannung-Dehnung-Analyse · ${(ort.bezugAnalyse || ort.bezug)(e)}`,
     inhalt: (e) => analyseInhalt(e, a.wert, ort),
     stand: (e) => zeilenstand((e.spannungsfaelle || []).filter((k) => k.art === a.wert),
       'Diagramm', 'Diagramme', 'kein Diagramm'),
@@ -249,6 +251,7 @@ function knickInhalt(eintrag, ort) {
     rechenwahlZeile('Widerstand (N_Rd)', eintrag.knicken_wahl_widerstand,
       (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_widerstand)),
       { arten: 'faserarten' }),
+    faelle.length ? fehltHinweis(knick.fehlt(eintrag)) : null,
     faelle.length ? fallkopf(knick.kopf) : null,
     ...(faelle.length
       ? faelle.map((_, i) => knickZeile(eintrag, ort, i))
@@ -435,9 +438,9 @@ function gebrauchsKapitel(eintrag, ort, {
     ...(faelle.length
       ? faelle.map((_, i) => gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, i))
       : [el('div.leer', {
-        text: abgeleitet
-          ? 'Nur die abgeleiteten Fälle.'
-          : `Noch kein ${wort}er Lastfall.`,
+        text: !abgeleitet ? `Noch kein ${wort}er Lastfall.`
+          : eingeschaltet(eintrag[ort.gebrauch.aus]) ? 'Nur die abgeleiteten Fälle.'
+            : 'Noch keine eingeschaltete Einwirkung der Tragsicherheit -- abgeleitet wird nichts.',
       })]),
     anfuegenKnopf('Lastfall', () => aendern((l) => {
       l.faelle.push(ausVorlage(ort.gebrauch.vorlage, { name: naechsterName(neu, l.faelle) }));

@@ -1,5 +1,5 @@
 ---
-erzeugt: 63a80bc41c2b
+erzeugt: 8ddebbad074f
 art: modul
 tags: [modul]
 ---
@@ -198,6 +198,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]

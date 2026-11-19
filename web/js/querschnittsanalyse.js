@@ -466,11 +466,15 @@ const ORT = {
     richtung: (k, setzen) => zugseitenWahl(
       k.richtung, setzen, 'Zugseite: die Seite, zu der sich der Stab biegt'),
     leer: 'Kein Knicknachweis.',
+    // Gerechnet wird mit jeder Lage -- es fehlt keine Richtung.
+    fehlt: () => '',
   },
   // Die Lastfälle unter Gebrauchslast: wie die der Tragsicherheit, ohne
   // Querkraft und Torsion.
   gebrauch: {
     liste: 'qagebrauchsliste',
+    // Woraus «aus der Tragsicherheit» ableitet: die Lastfälle der Analyse.
+    aus: 'lastfaelle',
     vorlage: 'qagebrauchsfall',
     arten: 'faserspannungsarten',
     spalten: (a) => spalten(a).filter((s) => ['N_Ed', 'M_y_Ed', 'M_z_Ed'].includes(s.feld))

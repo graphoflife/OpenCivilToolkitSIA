@@ -36,7 +36,7 @@ function anzahl(n, eins, mehr) {
 }
 
 /** Wie viele Zeilen einer Liste gerechnet werden -- ausgeschaltete stehen nur da. */
-const eingeschaltet = (liste) => (liste || []).filter((k) => k.aktiv !== false).length;
+export const eingeschaltet = (liste) => (liste || []).filter((k) => k.aktiv !== false).length;
 
 /** Eine Liste als Stand: «2 Fälle», ohne eingeschaltete Zeile `keins` -- «kein Fall». */
 export function zeilenstand(liste, eins, mehr, keins) {
@@ -48,16 +48,34 @@ export function zeilenstand(liste, eins, mehr, keins) {
 export const schalter = (an) => ({ an, text: an ? 'ein' : 'aus' });
 
 /**
+ * Ein Stand, dem noch etwas fehlt: der Knopf sagt, was -- nicht «1 Fall» in
+ * Blau, wenn kein Fall rechnen kann (Benutzer, 2026-11-19: ein unfertiger
+ * Zustand sagt am Ort, was fehlt). `fehlt` leer: der Stand, wie er ist.
+ */
+export function standOhne(stand, fehlt) {
+  return stand.an && fehlt ? { an: false, text: fehlt } : stand;
+}
+
+/** Dasselbe im Fenster, über den Fällen -- oder nichts. */
+export function fehltHinweis(fehlt) {
+  return fehlt ? el('p.hinweis.hinweis-warnung', { text: `Noch ${fehlt} -- so rechnet kein Fall.` }) : null;
+}
+
+/**
  * Was eine Gebrauchsliste rechnet: der Anteil der Tragsicherheit, wenn er
  * eingeschaltet ist, und die eigenen Lastfälle -- «60 % + 1 Fall».
+ * Abgeleitet wird aus den eingeschalteten `einwirkungen` der Tragsicherheit;
+ * ohne eine rechnet der Anteil nichts. Bis 2026-11-19 stand dann trotzdem
+ * «60 %» in Blau.
  */
-export function gebrauchsstand(liste) {
+export function gebrauchsstand(liste, einwirkungen) {
   const eigene = eingeschaltet(liste.faelle);
   const teile = [
-    liste.aus_tragsicherheit ? `${liste.anteil} %` : null,
+    liste.aus_tragsicherheit && eingeschaltet(einwirkungen) ? `${liste.anteil} %` : null,
     eigene ? anzahl(eigene, 'Fall', 'Fälle') : null,
   ].filter(Boolean);
-  return { an: teile.length > 0, text: teile.join(' + ') || 'kein Fall' };
+  if (teile.length) return { an: true, text: teile.join(' + ') };
+  return { an: false, text: liste.aus_tragsicherheit ? 'keine Einwirkung' : 'kein Fall' };
 }
 
 /**

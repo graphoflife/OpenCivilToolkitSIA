@@ -353,13 +353,15 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     else:
         ergebnis = bewehrungssuche.suche(projekt, kennung, modus=modus, **wie)
     # Nur, was jemand liest: die Oberflaeche nimmt gefunden, Begruendung,
-    # Dicke und das fertige Projekt.
+    # Duktilitaet, Buegel, Dicke und das fertige Projekt.
     antwort: Dict[str, Any] = {
         "gefunden": ergebnis.gefunden and (dicke is None or dicke.gefunden),
         "begruendung": (dicke or ergebnis).begruendung,
         # Gesucht wird ohne Duktilitaet -- sie wird durch mehr Stahl
-        # schlechter. Verschwiegen wird sie darum nicht.
+        # schlechter. Verschwiegen wird sie darum nicht; ``None``: nichts
+        # zu sagen.
         "duktilitaet": ergebnis.duktilitaet,
+        "duktilitaet_erfuellt": ergebnis.duktilitaet_erfuellt,
     }
     if dicke is not None:
         antwort["dicke"] = {

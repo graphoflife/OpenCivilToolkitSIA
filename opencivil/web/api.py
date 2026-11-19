@@ -52,6 +52,7 @@ from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, w
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE, WerkstoffwahlEintrag
 from opencivil.querschnitt.analyse import Zeichnung
+from opencivil.querschnitt.platte import BREITE_Y_MM
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import (
     VERSCHMIERT, Linienart, aequivalenter_durchmesser, buegelgehalt, linie_in_ueberdeckung,
@@ -277,6 +278,9 @@ def katalog() -> dict:
                        "eingaben": list(a.eingaben),
                        "groessen": diagrammdaten.liniengroessen(a)}
                       for a in Analyseart],
+            # Worauf sich M und N einer Platte in y beziehen: stets auf den
+            # Laufmeter, nicht auf b -- fuer den Kopf des Fensters.
+            "breite_y": BREITE_Y_MM,
         },
         # Was ein Nachweis-Kapitel und eine Analyse waehlen: Wertesatz und
         # Rechenart -- die Stahlspannungen dazu «elastisch», das Knicken und

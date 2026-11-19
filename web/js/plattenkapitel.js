@@ -23,7 +23,7 @@ import {
 import { SUCHE } from './bewehrungssuche.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
-import { zeilenstand } from './kapitel.js';
+import { fehltHinweis, standOhne, zeilenstand } from './kapitel.js';
 import { xLagen } from './lagen.js';
 import { span } from './mathe.js';
 import {
@@ -133,7 +133,7 @@ const VERFORMUNG = {
   bezug: () => 'w in mm · L in m · nur x',
   hilfe: HILFE.verformung,
   inhalt: verformungInhalt,
-  stand: (q) => zeilenstand(q.verformung?.faelle, 'Fall', 'Fälle', 'kein Fall'),
+  stand: (q) => standOhne(zeilenstand(q.verformung?.faelle, 'Fall', 'Fälle', 'kein Fall'), ohneX(q)),
 };
 
 /**
@@ -157,6 +157,7 @@ export const PLATTE = {
   richtung: (k, setzen) => richtungsWahl(k.richtung || 'x', setzen, ['x', 'y']),
   raender: () => ['oben', 'unten'],
   bezug: jeB,
+  bezugAnalyse: jeBundY,
   hilfe: HILFE,
   // Nachgewiesen wird nur x: vor jedem Schalter die Marke der Tragrichtung,
   // wie in den Lagenzeilen -- dieselbe Angabe soll überall gleich aussehen,
@@ -167,7 +168,7 @@ export const PLATTE = {
   // Ein eingeschalteter Nachweis ohne Bewehrung ist kein Fehler der
   // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht. Hier
   // steht es trotzdem, damit man es beim Einschalten sieht.
-  hinweis: (q, feld) => (q[feld] && !xBewehrt(q) ? 'keine x-Bewehrung' : ''),
+  hinweis: (q, feld) => (q[feld] ? ohneX(q) : ''),
   // Womit Duktilität und sprödes Versagen rechnen, steht im Fragezeichen:
   // die beiden rechnen hier verschieden.
   rechenwerte: null,
@@ -183,10 +184,13 @@ export const PLATTE = {
     },
     richtung: null,
     leer: 'Kein Knicknachweis (nur x).',
+    fehlt: ohneX,
   },
   // Die Lastfälle unter Gebrauchslast: Moment und Normalkraft je b.
   gebrauch: {
     liste: 'gebrauchsliste',
+    // Woraus «aus der Tragsicherheit» ableitet: die Einwirkungen der Platte.
+    aus: 'kombinationen',
     vorlage: 'gebrauchsfall',
     arten: 'spannungsarten',
     spalten: () => [
@@ -214,6 +218,25 @@ function xBewehrt(querschnitt) {
  */
 function jeB(querschnitt) {
   return `M, N je b = ${querschnitt.b} mm`;
+}
+
+/**
+ * Bei den Analysen gibt es auch y, und dort rechnet der Kern stets je
+ * Laufmeter (`breite_y` im Katalog). Bis 2026-11-19 stand auch dort nur
+ * «je b»: wer bei b = 500 mm in y 20 kNm je b meinte, bekam die Spannungen
+ * zu 20 kNm je Meter -- für die Hälfte.
+ */
+function jeBundY(querschnitt) {
+  const y = katalog('spannungsanalyse', 'breite_y');
+  return querschnitt.b === y ? jeB(querschnitt) : `${jeB(querschnitt)} in x, je ${y} mm in y`;
+}
+
+/**
+ * Was Knicken, Verformung und die Schalterzeilen ohne x-Bewehrung sagen:
+ * nachgewiesen wird nur in x. Leer, wenn sie da ist.
+ */
+function ohneX(querschnitt) {
+  return xBewehrt(querschnitt) ? '' : 'keine x-Bewehrung';
 }
 
 /**
@@ -248,8 +271,19 @@ function querkraftAngaben(querschnitt) {
   const aendernAn = (veraenderer) => eintragAendern(querschnitt.kennung, veraenderer);
   const buegel = querschnitt.querkraftbewehrung;
   const aendernBuegel = (veraenderer) => aendernAn((q) => veraenderer(q.querkraftbewehrung));
-  return el('div.unterkapitel', {}, [
-    el('div.unterkapitel-kopf', {}, [el('span', { text: 'Querkraft ohne Bügel' })]),
+  // Je nach Bügeln wirkt nur einer der beiden Blöcke -- Bügel liegen, sobald
+  // ihr Durchmesser grösser als null ist. Der andere steht blass da, mit dem
+  // Grund im Kopf; bis 2026-11-19 sahen beide gleich aus.
+  const mitBuegeln = buegel.durchmesser > 0;
+  const kopf = (titel, gilt, warum, stil = {}) => el('div.unterkapitel-kopf', { style: stil }, [
+    el('span', { text: titel }),
+    gilt ? null : el('span', { text: warum, style: { textTransform: 'none', fontWeight: 400 } }),
+  ]);
+  const blass = (gilt, knoten) => {
+    if (!gilt) knoten.classList.add('ist-ohne-wirkung');
+    return knoten;
+  };
+  const ohne = [
     feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
       wert: querschnitt.d_max, schritt: 4, angabe: feldangabe('querschnitt', 'd_max'),
       titel: 'Für k_g, Querkraft ohne Bügel',
@@ -261,9 +295,8 @@ function querkraftAngaben(querschnitt) {
       leer: 0,
       beiAenderung: (v) => aendernAn((q) => { q.einlagenhoehe = v; }),
     }), 'mm', 'Breite oder Höhe der Einlage, das Grössere – über d/6 vermindert es d'),
-    el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
-      el('span', { text: 'Querkraft mit Bügeln' }),
-    ]),
+  ];
+  const mit = [
     feld(['Druckdiagonale ', span('k_c')], zahlfeld({
       wert: querschnitt.k_c, schritt: 0.05, angabe: feldangabe('querschnitt', 'k_c'),
       titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
@@ -278,6 +311,12 @@ function querkraftAngaben(querschnitt) {
         beiAenderung: (v) => aendernBuegel((x) => { x[schluessel] = v; }),
       }), angabe.einheit);
     }),
+  ];
+  return el('div.unterkapitel', {}, [
+    kopf('Querkraft ohne Bügel', !mitBuegeln, 'gilt nicht: es liegen Bügel'),
+    ...ohne.map((knoten) => blass(!mitBuegeln, knoten)),
+    kopf('Querkraft mit Bügeln', mitBuegeln, 'gilt erst mit Bügeln', { marginTop: '8px' }),
+    ...mit.map((knoten) => blass(mitBuegeln, knoten)),
   ]);
 }
 
@@ -317,6 +356,7 @@ function verformungInhalt(querschnitt) {
   const aendern = (veraenderer) => eintragAendern(querschnitt.kennung, (q) => veraenderer(q.verformung));
   const { kriechzahl, faelle } = querschnitt.verformung;
   return [
+    faelle.length ? fehltHinweis(ohneX(querschnitt)) : null,
     feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
       wert: kriechzahl, schritt: 0.1, angabe: feldangabe('verformung', 'kriechzahl'),
       titel: 'Kriechzahl φ im Vergrösserungsfaktor ω_w',

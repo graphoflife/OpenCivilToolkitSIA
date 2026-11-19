@@ -7,6 +7,38 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Platten: was die Fenster zeigen, stimmt wieder
+
+Siebter Schritt der Durchsicht, der erste Teil der Platten.
+
+- **Der Bezug einer Analyse in y:** im Fensterkopf stand «M, N je b =
+  500 mm», gerechnet wird in y aber je Meter. Wer in einer Zeile «y» 20 kNm
+  eintrug und 40 kNm/m meinte, bekam die Spannungen für die Hälfte. Jetzt:
+  «M, N je b = 500 mm in x, je 1000 mm in y». Bei b = 1000 mm bleibt es
+  beim alten Kopf.
+- **Die Bewehrungssuche sagt alles, was sie gefunden hat:**
+  - «Bügel mitsuchen» bei kleiner Querkraft: die Suche nahm die Bügel ⌀10
+    weg und meldete nur die Teilung. Jetzt dazu «Bügel: Ohne Bügel
+    erfüllt.» und «Duktilität erfüllt.» -- ist sie nicht erfüllt, in Rot.
+  - Grosse Querkraft: die Längssuche scheiterte, die Bügelsuche fand ⌀12@200
+    -- und das wurde verworfen, ein zweiter Klick half nicht. Jetzt nimmt
+    die Platte die Bügel, die Meldung nennt sie, und der zweite Klick findet
+    die Längsbewehrung. Dass die Suche nicht beides in einem Zug findet,
+    liegt an ihrer Reihenfolge im Kern (siehe [[TODO]]).
+- **Knicken und Verformung ohne x-Bewehrung:** der Knopf zeigte «1 Fall»
+  in Blau, das Fenster schwieg, gerechnet wurde nichts. Jetzt steht auf dem
+  Knopf «keine x-Bewehrung» und im Fenster «Noch keine x-Bewehrung -- so
+  rechnet kein Fall.»
+- **Gebrauchsfälle «aus der Tragsicherheit» ohne eingeschaltete
+  Einwirkung:** der Knopf zeigte «60 %» in Blau, das Fenster «Nur die
+  abgeleiteten Fälle.» Jetzt «keine Einwirkung» und im Fenster, dass nichts
+  abgeleitet wird, solange keine Einwirkung eingeschaltet ist. In der
+  Querschnittsanalyse ebenso, dort mit den Lastfällen.
+- **Welcher Querkraftblock gilt:** «ohne Bügel» (D_max, Einlage) und «mit
+  Bügeln» (k_c, α) standen gleich da, obwohl je nach Bügeln nur einer
+  wirkt. Jetzt ist der andere blass und sagt, warum: «gilt nicht: es liegen
+  Bügel» oder «gilt erst mit Bügeln».
+
 ## 2026-11-19 · Balkensysteme: Lager, Profile und Hinweise
 
 Sechster Schritt der Durchsicht, der zweite Teil der Balkensysteme.
