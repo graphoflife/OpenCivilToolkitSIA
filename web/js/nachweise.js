@@ -23,7 +23,7 @@
 
 import { erklaerung, feld, hakenSchalter, wahlSchalter } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
-import { fallkopf, fallzeile } from './faelle.js';
+import { fallkopf, fallzeile, formelkopf } from './faelle.js';
 import {
   eingeschaltet, fehltHinweis, gebrauchsstand, schalter, standOhne, zeilenstand,
 } from './kapitel.js';
@@ -493,11 +493,15 @@ function analyseInhalt(eintrag, art, ort) {
   ];
 }
 
-/** Ein Feld mit seiner Beschriftung darüber -- eine Formel bleibt klein geschrieben. */
+/**
+ * Ein Feld mit seiner Beschriftung darüber -- eine Formel bleibt klein
+ * geschrieben, ein Formelzeichen mit Einheit (`['N_{Ed}', 'kN']`) gesetzt.
+ */
 export function mitKopf(kopf, eingabe, formel = false) {
-  return el('div.mit-kopf', {}, [
-    el('span.spaltenkopf', { text: kopf, class: formel ? 'ist-formel' : '' }), eingabe,
-  ]);
+  const zelle = Array.isArray(kopf)
+    ? el('span.spaltenkopf.mit-zeichen', {}, [formelkopf(...kopf)])
+    : el('span.spaltenkopf', { text: kopf, class: formel ? 'ist-formel' : '' });
+  return el('div.mit-kopf', {}, [zelle, eingabe]);
 }
 
 /**
@@ -594,15 +598,21 @@ function spannungsZeile(eintrag, index, ort) {
   const frage = katalog('spannungsanalyse', 'arten').find((a) => a.wert === k.art);
   const linie = frage?.groessen;
   const FELDER = {
-    N_Ed: { kopf: 'N_Ed', schritt: 50, titel: (e) => `Normalkraft in ${e} – Zug positiv` },
-    M_Ed: { kopf: 'M_Ed', schritt: 10, titel: (e) => `Moment in ${e}${linie ? ', festgehalten' : ''}` },
-    eps_oben: { kopf: `ε ${oben}`, schritt: 0.5, titel: (e) => `Randdehnung ${oben} in ${e} – Zug positiv` },
-    eps_unten: { kopf: `ε ${unten}`, schritt: 0.5, titel: (e) => `Randdehnung ${unten} in ${e} – Zug positiv` },
+    N_Ed: { kopf: 'N_{Ed}', schritt: 50, titel: (e) => `Normalkraft in ${e} – Zug positiv` },
+    M_Ed: { kopf: 'M_{Ed}', schritt: 10, titel: (e) => `Moment in ${e}${linie ? ', festgehalten' : ''}` },
+    eps_oben: {
+      kopf: `\\varepsilon\\ \\text{${oben}}`, schritt: 0.5,
+      titel: (e) => `Randdehnung ${oben} in ${e} – Zug positiv`,
+    },
+    eps_unten: {
+      kopf: `\\varepsilon\\ \\text{${unten}}`, schritt: 0.5,
+      titel: (e) => `Randdehnung ${unten} in ${e} – Zug positiv`,
+    },
   };
   const spalten = (frage?.eingaben || []).map((feld) => {
-    const { einheit } = feldangabe('spannungsfall', feld);
+    const { einheit } = feldangabe(ort.vorlage, feld);
     const f = FELDER[feld];
-    return mitKopf(`${f.kopf} [${einheit}]`, zahl(feld, f.titel(einheit), f.schritt));
+    return mitKopf([f.kopf, einheit], zahl(feld, f.titel(einheit), f.schritt));
   });
   if (linie) {
     spalten.push(mitKopf('', el('span.kurvenhinweis', { text: `0 … ${linie.kraft.zeichen}_Rd` })));

@@ -175,7 +175,7 @@ export const PLATTE = {
   // Das Knicken: nur in x.
   knick: {
     vorlage: 'knick',
-    kopf: ['N_Ed,x [kN]', 'M_Ed,1,x [kNm]', 'l [m]', 'l_cr [m]'],
+    kopf: [['N_{Ed,x}', 'kN'], ['M_{Ed,1,x}', 'kNm'], ['l', 'm'], ['l_{cr}', 'm']],
     titel: {
       N_Ed: 'Druckkraft in kN – negativ, in x-Richtung',
       M_Ed_1: 'Moment 1. Ordnung in kNm, um die y-Achse (Tragrichtung x)',
@@ -195,11 +195,11 @@ export const PLATTE = {
     arten: 'spannungsarten',
     spalten: () => [
       {
-        feld: 'M_Ed', kopf: 'M_Ed [kNm]', schritt: 10,
+        feld: 'M_Ed', kopf: ['M_{Ed}', 'kNm'], schritt: 10,
         titel: (wort) => `Moment unter ${wort}er Einwirkung, in kNm`,
       },
       {
-        feld: 'N_Ed', kopf: 'N_Ed [kN]', schritt: 10,
+        feld: 'N_Ed', kopf: ['N_{Ed}', 'kN'], schritt: 10,
         titel: (wort) => `Normalkraft unter ${wort}er Einwirkung, in kN – Zug positiv`,
       },
     ],
@@ -249,7 +249,7 @@ function tragsicherheitInhalt(querschnitt) {
     rechenwahlZeile('Rechenwahl', querschnitt.tragsicherheit_wahl,
       (veraenderer) => aendernAn((q) => veraenderer(q.tragsicherheit_wahl))),
     querschnitt.kombinationen.length
-      ? fallkopf(['M_Ed [kNm]', 'N_Ed [kN]', 'V_Ed [kN/m]'])
+      ? fallkopf([['M_{Ed}', 'kNm'], ['N_{Ed}', 'kN'], ['V_{Ed}', 'kN/m']])
       : null,
     ...(querschnitt.kombinationen.length
       ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
@@ -366,7 +366,7 @@ function verformungInhalt(querschnitt) {
       ['Gilt für', 'alle Verformungsfälle dieser Platte: ω_w wird je gezogene Seite einmal gerechnet'],
     ], 'ω_w = (1 − 20ρ′)/(10ρ^0.7) · (0.75 + 0.1φ) · (h/d)³')),
     el('p.hinweis.hinweis-annahme', { text: 'w mit der Steifigkeit E_cm ermitteln.' }),
-    faelle.length ? fallkopf(['w [mm]', 'L [m]', 'Zug']) : null,
+    faelle.length ? fallkopf([['w', 'mm'], ['L', 'm'], 'Zug']) : null,
     ...(faelle.length
       ? faelle.map((_, i) => verformungsZeile(querschnitt, i))
       : [el('div.leer', { text: 'Noch kein Verformungsfall (nur x).' })]),

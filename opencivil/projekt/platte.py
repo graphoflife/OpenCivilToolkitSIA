@@ -96,9 +96,11 @@ class QuerschnittEintrag(Querschnittsangaben):
     damit: liegt y aussen, kostet ihr Durchmesser x die statische Hoehe.
     """
 
-    automatik_teilungen: List[float] = field(default_factory=lambda: [150.0])
+    automatik_teilungen: List[float] = bereich(
+        heisst="Teilung", einheit=MM, ueber=0.0, fabrik=lambda: [150.0])
     """
     Teilungen, die es versucht. Grundbewehrung und Zulage teilen sich eine.
+    Jede ueber null -- das Feld der Oberflaeche liest die Grenze von hier.
 
     Vorgabe ist die eine uebliche. Wer mehrere angibt, bekommt die mit der
     kleinsten Stahlflaeche -- das kostet aber je Teilung einen ganzen
@@ -125,8 +127,8 @@ class QuerschnittEintrag(Querschnittsangaben):
     automatik_querkraft: bool = False
     """Ob auch die Buegel gesucht werden."""
 
-    automatik_querkraft_teilungen: List[float] = field(
-        default_factory=lambda: [100.0, 150.0, 200.0])
+    automatik_querkraft_teilungen: List[float] = bereich(
+        heisst="Bügelteilung", einheit=MM, ueber=0.0, fabrik=lambda: [100.0, 150.0, 200.0])
 
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer."""

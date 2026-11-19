@@ -29,7 +29,7 @@ from opencivil.core.nachweis import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import Kennzahl
 from opencivil.material.arten import MATERIALARTEN
-from opencivil.material.basis import Baustoff, Baustoffart
+from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage
 from opencivil.nachweis.knicken import Knickfall
 from opencivil.nachweis.spannungsbegrenzung import Spannungsbegrenzung, Stahlspannungsort
 from opencivil.nachweis.spannungsgrenzen import GrenzeAusRissbreite, GrenzeGegenFliessen
@@ -41,7 +41,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.geotechnik.grundbruch import Fundament
 from opencivil.geotechnik.setzung import Setzungsfundament
 from opencivil.pfahl.pfahl import Pfahl
-from opencivil.projekt.lesen import ProjektFehler
+from opencivil.projekt.lesen import Bereich, ProjektFehler
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.decke.werk import Deckensystem
@@ -412,16 +412,28 @@ class Bauteil:
 # ===========================================================================
 
 
+def kennwertbereich(vorlage: KennwertVorlage) -> Bereich:
+    """
+    Wo ein Kennwert eines Baustoffs liegen muss: ueber null. Festigkeiten,
+    Moduln, Dehnungen, Teilsicherheitsbeiwerte sind ihrer Natur nach
+    positiv; eine Null oder ein negativer Wert liefert keine falsche Zahl,
+    sondern gar keine -- gamma_c = 0 endete in einem ZeroDivisionError, ein
+    negatives f_ck in einer komplexen Wurzel. Beides kam als Absturzmeldung
+    beim Benutzer an.
+
+    Der Aufbau prueft damit jede Abweichung und Ueberschreibung
+    (:func:`baustoff_bauen`), die Oberflaeche liest dieselbe Grenze aus dem
+    Katalog (``materialarten``) und weist eine Null schon am Feld ab. Bis
+    2026-11-19 fuehrten die Pfeile dort bis 0.
+    """
+    return Bereich(vorlage.beschreibung or vorlage.kurzname, vorlage.einheit, ueber=0.0)
+
+
 def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str, wo: str) -> Baustoff:
-    bauer = MATERIALARTEN[eintrag.art].bauen
+    art = MATERIALARTEN[eintrag.art]
+    bauer = art.bauen
     roh = bauer(eintrag.sorte, praefix=f"{eintrag.art}.{eintrag.kennung}")
-    # Jeder Kennwert eines Baustoffs ist seiner Natur nach positiv:
-    # Festigkeiten, Moduln, Dehnungen, Teilsicherheitsbeiwerte. Eine Null
-    # oder ein negativer Wert liefert keine falsche Zahl, sondern gar keine
-    # -- gamma_c = 0 endete in einem ZeroDivisionError, ein negatives f_ck
-    # in einer komplexen Wurzel. Beides kam als Absturzmeldung beim
-    # Benutzer an.
-    #
+    vorlagen = {v.kurzname: v for v in art.vorlagen}
     # Ein Kennwert, den es nicht gibt, ist ein Tippfehler: bis 2026-10-16 fiel
     # eine Abweichung «fck» still weg, und gerechnet wurde mit der Sorte.
     for topf, wie in ((eintrag.abweichungen, "abweichender Wert"),
@@ -431,10 +443,7 @@ def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str, wo: str) -> Baus
                 raise ProjektFehler(
                     f"{wo}: einen Kennwert '{kurzname}' gibt es nicht "
                     f"({wie}). Möglich sind: {', '.join(roh.definitionen)}.")
-            if zahl <= 0.0:
-                raise ProjektFehler(
-                    f"{wo}: {kurzname} muss grösser als null "
-                    f"sein, angegeben ist {zahl:g} ({wie}).")
+            kennwertbereich(vorlagen[kurzname]).pruefen(zahl, wo)
     abweichungen = {
         kurzname: Groesse(zahl, roh.definition(kurzname).einheit)
         for kurzname, zahl in eintrag.abweichungen.items()

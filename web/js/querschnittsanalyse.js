@@ -456,7 +456,7 @@ const ORT = {
   // Das Knicken je Fall zu seiner Zugseite -- sie steht neben dem Namen.
   knick: {
     vorlage: 'qaknick',
-    kopf: ['N_Ed [kN]', 'M_Ed,1 [kNm]', 'l [m]', 'l_cr [m]'],
+    kopf: [['N_{Ed}', 'kN'], ['M_{Ed,1}', 'kNm'], ['l', 'm'], ['l_{cr}', 'm']],
     titel: {
       N_Ed: 'Druckkraft in kN – negativ',
       M_Ed_1: 'Moment 1. Ordnung in kNm – es zieht die gewählte Seite',
@@ -479,7 +479,7 @@ const ORT = {
     arten: 'faserspannungsarten',
     spalten: (a) => spalten(a).filter((s) => ['N_Ed', 'M_y_Ed', 'M_z_Ed'].includes(s.feld))
       .map((s) => ({
-        feld: s.feld, kopf: `${s.symbol}${s.feld === 'N_Ed' ? ' [kN]' : ' [kNm]'}`,
+        feld: s.feld, kopf: [s.symbol, s.feld === 'N_Ed' ? 'kN' : 'kNm'],
         schritt: s.schritt, titel: (wort) => `${s.titel}, unter ${wort}er Einwirkung`,
       })),
   },

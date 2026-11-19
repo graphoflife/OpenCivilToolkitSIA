@@ -84,6 +84,22 @@ gelernt wurde, steht in [[Entwicklung]].
       am 2026-11-19). Vorschlag: mit «Bügel mitsuchen» prüft die Längssuche
       die Querkraft mit Bügeln nicht, die Bügelsuche danach schon. Entscheid
       des Benutzers.
+- [ ] **Zu dünne Platte: obere und untere Lagen kreuzen sich.** Die Platte
+      prüft nur, dass die Überdeckungen zusammen kleiner sind als h
+      (`QuerschnittEintrag.regeln`). Bei h = 80 mm und überall ⌀12 liegt die
+      3. Lage 32 mm über der Unterkante, die 2. bei 48 mm: «Höhe der
+      Distanzhalter −28 mm», und M_Rd wird gerechnet (Durchsicht vom
+      2026-11-19). Vorschlag: sind Überdeckungen und Lagen zusammen höher als
+      h, rechnet die Platte nicht und sagt es, wie heute bei den
+      Überdeckungen; die Bewehrungssuche prüft vorab nur Dicke und
+      Überdeckungen, damit sie eine zu dicke Bewehrung ersetzen kann.
+      Entscheid des Benutzers.
+- [ ] **Doppelte Namen von Fällen schon am Feld abweisen.** Heute hält ein
+      doppelter Name nur seine Platte oder Analyse an, und sie sagt es oben
+      im Fenster. Die sechs Fenster der Spannung-Dehnung-Analysen teilen sich
+      aber eine Namensliste: der Doppelgänger kann in einem Fenster stehen,
+      das man nicht offen hat. Vorschlag: das Namensfeld weist einen
+      vergebenen Namen ab und sagt, wo er steht. Entscheid des Benutzers.
 - [ ] **Dichten aus SIA 261.** 2400 und 2500 kg/m³ für Beton und Stahlbeton,
       7850 kg/m³ für Stahl stehen so in SIA 261:2020, Anhang A, Tabelle 28
       (mit g = 10 m/s²); SIA 262 nennt keine. Ob der Verweis eingetragen wird,

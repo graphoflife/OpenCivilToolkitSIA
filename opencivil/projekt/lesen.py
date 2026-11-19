@@ -60,7 +60,7 @@ import enum
 import functools
 import math
 import typing
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 
@@ -125,10 +125,16 @@ class Bereich:
 def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
             einheit: Optional[Einheit] = None, ueber: Optional[float] = None,
             ab: Optional[float] = None, bis: Optional[float] = None,
-            unter: Optional[float] = None) -> Any:
-    """Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine Kriechzahl ab null etwa."""
-    return dataclasses.field(default=vorgabe, metadata={
-        "bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter)})
+            unter: Optional[float] = None, fabrik: Optional[Callable[[], Any]] = None) -> Any:
+    """
+    Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine
+    Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede
+    (:func:`inhalt_pruefen`); ihre Vorgabe kommt dann aus ``fabrik``.
+    """
+    metadata = {"bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter)}
+    if fabrik is not None:
+        return dataclasses.field(default_factory=fabrik, metadata=metadata)
+    return dataclasses.field(default=vorgabe, metadata=metadata)
 
 
 def als_groesse(eintrag: Any, feld: str) -> Groesse:
@@ -159,20 +165,30 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     typen = _typen(cls)
     angaben: Dict[str, Dict[str, Any]] = {}
     for f in dataclasses.fields(cls):
-        angabe: Dict[str, Any] = {}
         b = f.metadata.get("bereich")
-        if b is not None:
-            if b.einheit is not None and b.einheit.name not in ("", "-"):
-                angabe["einheit"] = b.einheit.beschriftung
-            grenzen = {grenze: getattr(b, grenze) for grenze in ("ueber", "ab", "bis", "unter")
-                       if getattr(b, grenze) is not None}
-            if grenzen:
-                angabe.update(grenzen, heisst=b.heisst, verlangt=b.verlangt)
+        angabe = bereichsangabe(b) if b is not None else {}
         if typen.get(f.name) is int:
             angabe["ganz"] = True
         if angabe:
             angaben[f.name] = angabe
     return angaben
+
+
+def bereichsangabe(b: Bereich) -> Dict[str, Any]:
+    """
+    Was die Oberflaeche von einem :class:`Bereich` wissen muss -- die Einheit
+    und, hat er Grenzen, die Grenzen mit dem Satz, den eine verletzte sagt.
+    Fuer die Felder eines Eintrags (:func:`feldangaben`) und fuer die
+    Kennwerte eines Materials (``katalog.materialarten``).
+    """
+    angabe: Dict[str, Any] = {}
+    if b.einheit is not None and b.einheit.name not in ("", "-"):
+        angabe["einheit"] = b.einheit.beschriftung
+    grenzen = {grenze: getattr(b, grenze) for grenze in ("ueber", "ab", "bis", "unter")
+               if getattr(b, grenze) is not None}
+    if grenzen:
+        angabe.update(grenzen, heisst=b.heisst, verlangt=b.verlangt)
+    return angabe
 
 
 def katalogname(cls: type) -> str:

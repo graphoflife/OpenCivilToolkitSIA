@@ -7,6 +7,45 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Platten und Materialien: was der Kern abwiese, sagt schon das Feld
+
+Achter Schritt der Durchsicht, der zweite Teil der Platten und Materialien.
+
+- **Ein eigenes Material mit dem Namen einer Normsorte:** BE1 liess sich in
+  «C35/45» umbenennen, danach rechnete kein Bauteil mit BE1 mehr. Jetzt
+  weist das Feld den Namen ab: «Den Namen «C35/45» trägt eine Normsorte:
+  «BE1» bleibt.»
+- **Die Kennwerte eines eigenen Materials:** die Pfeile führten bis 0
+  (ν_c 0.2 → 0.1 → 0), und das Material rechnete nicht mehr. Jetzt halten
+  sie an der Grenze des Kerns, über null, und eine getippte 0 meldet sich am
+  Feld: «Querdehnungszahl des Betons muss grösser als null sein: 0 ist nicht
+  übernommen.» Die Grenze steht einmal, im Kern (`kennwertbereich`); seine
+  Meldung nennt den Kennwert jetzt wie das Fenster, «Teilsicherheitsbeiwert
+  für Beton» statt «gamma_c».
+- **«überschreiben» ohne gerechneten Wert:** der Haken setzte eine 0. Jetzt
+  ist er gesperrt, bis es einen Wert gibt, und sagt das.
+- **Die Teilungen der Bewehrungssuche:** aus «-150» wurde still 150, aus
+  «abc» nichts. Jetzt: «Teilung muss grösser als null sein: «150» bleibt.»
+  oder ««abc» ist keine Zahl: «150» bleibt.» Die Grenze steht am Feld der
+  Platte im Kern.
+- **Die Normalkraft unter der M-V-Kurve:** sprang nach jeder anderen Eingabe
+  auf 0 zurück, weil das Rechnen sie nicht mitgab. Jetzt bleibt sie, bis
+  man ein anderes Projekt öffnet.
+- **Spaltenköpfe:** standen als Text da und wurden gross geschrieben:
+  «M_ED [KNM]», «L_CR [M]», und aus «ε oben» wurde «Ε OBEN». Jetzt als
+  Formelzeichen mit Einheit -- M_Ed [kNm], l_cr [m], ε oben [‰] --, in der
+  Platte und in der Querschnittsanalyse.
+- **Kleineres:**
+  - die Bügel «Stk» versprachen «dann nur Nachweise in x» -- nachgewiesen
+    wird ohnehin nur x; der Satz ist weg;
+  - ein Haken-Schalter sagte «Bügel mitsuchen wird nicht geführt»; jetzt
+    «Bügel mitsuchen: aus -- Klicken schaltet ein», bei jedem dieser
+    Schalter;
+  - die Suche meldete «kleinste Stahlfläche von 1 Lösungen», jetzt «die
+    einzige Lösung».
+- **Offen** ([[TODO]]): eine zu dünne Platte, in der sich obere und untere
+  Lagen kreuzen, und doppelte Namen von Fällen schon am Feld.
+
 ## 2026-11-19 · Platten: was die Fenster zeigen, stimmt wieder
 
 Siebter Schritt der Durchsicht, der erste Teil der Platten.

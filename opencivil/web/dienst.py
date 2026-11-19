@@ -165,7 +165,10 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     else:
         loesung = _stromabwaerts(projekt, aufbau, beschreibung)
     analysen = _analysen(beschreibung, aufbau, loesung)
-    return {**api.loesung_dict(loesung, aufbau, spannungsanalysen=analysen),
+    # Die Normalkraft, die unter einer M-V-Kurve gewaehlt ist, rechnet mit --
+    # bis 2026-11-19 sprang sie nach jeder Eingabe auf die Vorgabe zurueck.
+    return {**api.loesung_dict(loesung, aufbau, spannungsanalysen=analysen,
+                               normalkraefte=_normalkraefte(rumpf)),
             "obergrenzen": api.obergrenzen(projekt)}
 
 
@@ -257,7 +260,12 @@ def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     aufbau = _projekt(rumpf).aufbauen()
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(), ohne_herleitung=True)
+    return {"querkraftkurven": diagrammdaten.querkraftkurven(
+        aufbau, loesung, _normalkraefte(rumpf))}
 
+
+def _normalkraefte(rumpf: Mapping[str, Any]) -> Dict[str, float]:
+    """Je M-V-Kurve die gewaehlte Normalkraft in kN (``n_ed``) -- leer gelassene fehlen."""
     gewaehlt = {}
     for kennung, wert in (rumpf.get("n_ed") or {}).items():
         if wert is None or wert == "":
@@ -271,8 +279,7 @@ def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
             raise DienstFehler(
                 400, f"Die Normalkraft der Kurve '{kennung}' ist keine Zahl, "
                      f"sondern {wert!r}.")
-
-    return {"querkraftkurven": diagrammdaten.querkraftkurven(aufbau, loesung, gewaehlt)}
+    return gewaehlt
 
 
 def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

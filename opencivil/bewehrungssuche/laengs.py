@@ -465,10 +465,11 @@ def suche(projekt, kennung: str, *,
     # Kleinste Stahlflaeche gewinnt. Bei Gleichstand die groessere Teilung:
     # weniger Staebe bei gleichem Querschnitt ist weniger Arbeit.
     ergebnis.beste = min(gefunden, key=lambda l: (l.stahlflaeche, -l.teilung))
+    wahl = ("die einzige Lösung" if len(gefunden) == 1
+            else f"kleinste Stahlfläche von {len(gefunden)} Lösungen")
     ergebnis.begruendung = (
         f"Teilung {ergebnis.beste.teilung:.0f} mm, "
-        f"{ergebnis.beste.stahlflaeche:.0f} mm² – kleinste Stahlfläche von "
-        f"{len(gefunden)} Lösungen.")
+        f"{ergebnis.beste.stahlflaeche:.0f} mm² – {wahl}.")
     ergebnis.duktilitaet, ergebnis.duktilitaet_erfuellt = _duktilitaetsbefund(
         projekt, kennung, ergebnis.beste)
     return ergebnis

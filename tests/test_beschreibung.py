@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from opencivil.core.einheiten import N_PRO_MM2
+from opencivil.material.arten import MATERIALARTEN
 from opencivil.projekt import (
     Aufbau, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag, KombinationEintrag, LageEintrag,
     MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt, ProjektFehler,
@@ -304,11 +305,13 @@ class TestVollstaendigeAblage(unittest.TestCase):
         gamma_c = 0 endete in einem ZeroDivisionError, ein negatives f_ck in
         einer komplexen Wurzel -- beides kam als Absturzmeldung beim Benutzer
         an. Jeder Kennwert dieser Baustoffe ist seiner Natur nach positiv.
+        Die Meldung nennt ihn, wie die Maske: mit seiner Beschreibung.
         """
         for kurzname, zahl in (("gamma_c", 0.0), ("f_ck", -30.0)):
             projekt = Projekt.beispiel()
             projekt.eigener_beton().abweichungen = {kurzname: zahl}
-            self.assertIn(kurzname, meldung(projekt))
+            vorlage = next(v for v in MATERIALARTEN["beton"].vorlagen if v.kurzname == kurzname)
+            self.assertIn(f"{vorlage.beschreibung} muss grösser als null sein", meldung(projekt))
 
     def test_fehlende_pflichtfelder_werden_benannt(self):
         """Vorher kam der nackte KeyError bis in die Oberfläche."""

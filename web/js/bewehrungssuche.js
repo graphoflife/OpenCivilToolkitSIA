@@ -10,8 +10,12 @@
 
 import { api } from './api.js';
 import { feld, hakenSchalter, wahlSchalter } from './bausteine.js';
-import { el, melden, zahlfeld } from './dom.js';
-import { aendern, eintragAendern, katalog, projektAendern, zustand } from './zustand.js';
+import {
+  el, grenzeVerletzt, melden, zahlfeld,
+} from './dom.js';
+import {
+  aendern, eintragAendern, feldangabe, katalog, projektAendern, zustand,
+} from './zustand.js';
 
 /**
  * Welche Platte gerade durchsucht wird.
@@ -53,16 +57,31 @@ function automatikInhalt(querschnitt) {
   const dicke = querschnitt.automatik_dicke === true;
 
   // Die Teilungen als Text: «100, 150» liest und tippt sich schneller als
-  // eine Liste aus Zahlenfeldern mit Plus- und Minusknöpfen.
-  const teilungsfeld = (feld, titel) => el('input', {
-    type: 'text', value: (querschnitt[feld] || []).join(', '), title: titel,
-    on: {
-      change: (e) => aendern((q) => {
-        q[feld] = e.target.value.split(/[^0-9.]+/)
-          .map(Number).filter((x) => x > 0);
-      }),
-    },
-  });
+  // eine Liste aus Zahlenfeldern mit Plus- und Minusknöpfen. Was keine
+  // Teilung ist, weist das Feld ab, und die alten bleiben -- bis 2026-11-19
+  // wurde aus «-150» still 150 und aus «abc» nichts. Leer gelassen: die
+  // alten wieder, wie bei einem Zahlenfeld.
+  const teilungsfeld = (feld, titel) => {
+    const alt = (querschnitt[feld] || []).join(', ');
+    return el('input', {
+      type: 'text', value: alt, title: titel,
+      on: {
+        change: (e) => {
+          const teile = e.target.value.split(/[\s,;]+/).filter(Boolean);
+          const zahlen = teile.map(Number);
+          const keine = teile.find((_, i) => !Number.isFinite(zahlen[i]));
+          const grund = keine !== undefined ? `«${keine}» ist keine Zahl`
+            : zahlen.map((z) => grenzeVerletzt(feldangabe('querschnitt', feld), z)).find(Boolean);
+          if (teile.length && !grund) {
+            aendern((q) => { q[feld] = zahlen; });
+            return;
+          }
+          if (grund) melden(`${grund}: «${alt}» bleibt.`, true);
+          e.target.value = alt;
+        },
+      },
+    });
+  };
   const hakenzeile = (an, setzen, text) => el('div.duktilitaetszeile.ist-breit', {}, [
     hakenSchalter(an, setzen, text),
     el('span.postenname', { text }),

@@ -253,10 +253,12 @@ export function wahlBlock(beschriftung, schalter) {
  * breit, und bei symmetrischem Innenabstand wurde der Schalter dadurch schief.
  */
 export function hakenSchalter(an, setzen, was = 'Nachweis') {
+  // Ein oder aus: «wird geführt» passte zum Nachweis, nicht zu «Bügel
+  // mitsuchen» oder «Längszugkraft» (bis 2026-11-19).
   return zweiSchalter({
     stellungen: [[true, '✓', 'ist-ja'], [false, '✗', 'ist-nein']],
     gewaehlt: !!an, setzen, klasse: '.schalter-haken',
-    titel: `${was} ${an ? 'wird geführt' : 'wird nicht geführt'} -- Klicken schaltet um`,
+    titel: `${was}: ${an ? 'ein -- Klicken schaltet aus' : 'aus -- Klicken schaltet ein'}`,
   });
 }
 

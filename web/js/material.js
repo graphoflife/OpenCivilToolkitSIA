@@ -41,9 +41,9 @@ function kennwertZeile(material, vorlage) {
   const eingabe = zahlfeld({
     wert: anzeige,
     schritt: vorlage.stellen >= 3 ? 0.001 : (vorlage.stellen >= 1 ? 0.1 : 1),
-    // Ein Baustoffkennwert ist nie negativ. Die Schnittgrössen daneben schon,
-    // darum sagt es jedes Feld für sich und nicht die Pfeillogik für alle.
-    min: 0,
+    // Über null, wie der Kern es verlangt: bis 2026-11-19 führten die
+    // Pfeile bis 0, und das Material rechnete nicht mehr.
+    angabe: vorlage.angabe,
     readonly: !schreibbar,
     titel: gesperrt ? 'Normsorte nach SIA – nicht änderbar'
       : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet. Haken setzen zum Überschreiben.' : ''),
@@ -56,13 +56,19 @@ function kennwertZeile(material, vorlage) {
     }),
   });
 
+  // Überschrieben wird der gerechnete Wert. Fehlt er, weil das Material
+  // nicht rechnet, gibt es nichts zu überschreiben -- bis 2026-11-19 setzte
+  // der Haken dann eine 0, die der Kern abweist.
+  const ohneWert = !istUeberschrieben && anzeige === null;
   const schalter = vorlage.berechnet
     ? el('input', {
-      type: 'checkbox', checked: istUeberschrieben, disabled: gesperrt,
-      title: gesperrt ? 'Normsorte nach SIA – nicht änderbar' : 'Von Hand überschreiben',
+      type: 'checkbox', checked: istUeberschrieben, disabled: gesperrt || ohneWert,
+      title: gesperrt ? 'Normsorte nach SIA – nicht änderbar'
+        : (ohneWert ? 'Noch kein gerechneter Wert – überschreiben lässt er sich, sobald er gerechnet ist'
+          : 'Von Hand überschreiben'),
       on: {
         change: (e) => eintragAendern(material.kennung, (m) => {
-          if (e.target.checked) m.ueberschreibungen[vorlage.kurzname] = anzeige ?? 0;
+          if (e.target.checked) m.ueberschreibungen[vorlage.kurzname] = anzeige;
           else delete m.ueberschreibungen[vorlage.kurzname];
         }),
       },
@@ -124,8 +130,12 @@ export function materialEditor(material) {
       feld('Bezeichnung', namensfeld({
         wert: material.name || material.sorte, gesperrt,
         titel: gesperrt ? 'Eine Normsorte trägt zwingend ihre Sortenbezeichnung' : '',
-        pruefen: (name) => (vergeben(material, name)
-          ? `Den Namen «${name}» trägt schon ein anderes Material` : ''),
+        pruefen: (name) => {
+          if (katalog('materialarten', material.art, 'anlegen').includes(name)) {
+            return `Den Namen «${name}» trägt eine Normsorte`;
+          }
+          return vergeben(material, name) ? `Den Namen «${name}» trägt schon ein anderes Material` : '';
+        },
         setzen: (name) => eintragAendern(material.kennung, (m) => { m.name = name; }),
       })),
     ]),
@@ -151,7 +161,10 @@ export function materialEditor(material) {
 /**
  * Ob ein anderes Material schon so heisst. Zwei gleich benannte hielten das
  * ganze Projekt an -- im Bericht liesse sich nicht erkennen, welches gemeint
- * ist (`Projekt.regeln`); darum weist schon das Feld den Namen ab.
+ * ist (`Projekt.regeln`); darum weist schon das Feld den Namen ab. Ebenso
+ * den einer Normsorte: ein eigenes Material darf nicht so heissen
+ * (`MaterialEintrag.regeln`), bis 2026-11-19 merkte man es erst am Bauteil,
+ * das nicht mehr rechnete.
  */
 function vergeben(material, name) {
   return zustand.projekt.materialien

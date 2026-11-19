@@ -206,7 +206,7 @@ export function projektAendern(veraenderer, anlass = 'projekt') {
  */
 export function projektSetzen(projekt, weiteres = {}) {
   ansichten.clear();
-  aendern({ projekt, fassung: zustand.fassung + 1, ...weiteres }, 'start');
+  aendern({ projekt, fassung: zustand.fassung + 1, kurvenNormalkraft: {}, ...weiteres }, 'start');
 }
 
 /** Je Kennung, was sich die Ansichten merken -- siehe `ansichtVon`. */

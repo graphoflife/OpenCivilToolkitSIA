@@ -125,7 +125,7 @@ export const api = {
   /** Die Bauteile, die auf diese Kennung zeigen -- als Material oder als Querschnitt. */
   verweise: (projekt, kennung) => ruf('verweise', { projekt, kennung }),
   /** Ohne `ziele` alles; mit `ziele` genau diese samt dem, was sie brauchen. */
-  rechnen: (projekt, ziele) => ruf('rechnen', { projekt, ziele }),
+  rechnen: (projekt, ziele, n_ed) => ruf('rechnen', { projekt, ziele, n_ed }),
   /** M-V-Kurven für selbst gewählte Normalkräfte: {Kennung: N_Ed in kN}. */
   querkraftkurven: (projekt, n_ed) => ruf('querkraftkurven', { projekt, n_ed }),
   /** Sucht die kleinste Bewehrung und gibt das geänderte Projekt zurück. */

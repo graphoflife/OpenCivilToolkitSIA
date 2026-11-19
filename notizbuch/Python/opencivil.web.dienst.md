@@ -1,5 +1,5 @@
 ---
-erzeugt: 511f21bf0aff
+erzeugt: dab161d61cc9
 art: modul
 tags: [modul]
 ---
@@ -191,6 +191,14 @@ Kennung der Kurve auf diese Normalkraft in kN ab.
 Eine eigene Anfrage, weil es eine eigene Frage ist -- und weil die
 Oberflaeche die Formel sonst ein zweites Mal enthalten muesste, um die
 Kurve selbst zu zeichnen. Gerechnet wird an genau einer Stelle.
+
+### _normalkraefte
+
+```python
+def _normalkraefte(rumpf: Mapping[str, Any]) -> Dict[str, float]
+```
+
+Je M-V-Kurve die gewaehlte Normalkraft in kN (`n_ed`) -- leer gelassene fehlen.
 
 ### bericht
 

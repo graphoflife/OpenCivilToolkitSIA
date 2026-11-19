@@ -1,5 +1,5 @@
 ---
-erzeugt: 48a851a31927
+erzeugt: ab0111a53d6d
 art: modul
 tags: [modul]
 ---
@@ -127,10 +127,12 @@ Eine Zahl mit der Einheit des Feldes: «300 mm», «30°», «0.9».
 ### bereich
 
 ```python
-def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None) -> Any
+def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
 ```
 
-Ein Feld, dessen Zahl in einem [[opencivil.projekt.lesen#Bereich|Bereich]] liegen muss -- eine Kriechzahl ab null etwa.
+Ein Feld, dessen Zahl in einem [[opencivil.projekt.lesen#Bereich|Bereich]] liegen muss -- eine
+Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede
+([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]); ihre Vorgabe kommt dann aus `fabrik`.
 
 ### als_groesse
 
@@ -160,6 +162,17 @@ Wahllisten des Katalogs, mit Beschriftung.
 Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
 des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
 und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
+
+### bereichsangabe
+
+```python
+def bereichsangabe(b: Bereich) -> Dict[str, Any]
+```
+
+Was die Oberflaeche von einem [[opencivil.projekt.lesen#Bereich|Bereich]] wissen muss -- die Einheit
+und, hat er Grenzen, die Grenzen mit dem Satz, den eine verletzte sagt.
+Fuer die Felder eines Eintrags ([[opencivil.projekt.lesen#feldangaben|feldangaben]]) und fuer die
+Kennwerte eines Materials (`katalog.materialarten`).
 
 ### katalogname
 

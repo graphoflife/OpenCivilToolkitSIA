@@ -125,6 +125,19 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
 }
 
 /**
+ * Warum der Kern eine Zahl abwiese -- leer, wenn er sie nimmt. `angabe` sind
+ * die Grenzen ihres Feldes aus dem Katalog (`feldangabe`): «Teilung muss
+ * grösser als null sein».
+ */
+export function grenzeVerletzt(angabe, zahl) {
+  if (angabe.ganz && !Number.isInteger(zahl)) return 'Nur ganze Zahlen';
+  const { ueber, ab, bis, unter } = angabe;
+  const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
+    || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
+  return draussen ? `${angabe.heisst} ${angabe.verlangt}` : '';
+}
+
+/**
  * Zahlenfeld mit einheitlichem Verhalten.
  *
  * Die Pfeile sind eigene Knöpfe statt des Browser-Drehfelds, weil das nur
@@ -158,16 +171,8 @@ export function zahlfeld({
 }) {
   const unten = min ?? angabe.ab ?? (angabe.ueber === undefined ? undefined : angabe.ueber + schritt);
   const oben = max ?? angabe.bis ?? (angabe.unter === undefined ? undefined : angabe.unter - schritt);
-  // Warum der Kern eine Zahl abwiese -- leer, wenn er sie nimmt.
-  const verletzt = (zahl) => {
-    if (angabe.ganz && !Number.isInteger(zahl)) return 'Nur ganze Zahlen';
-    const { ueber, ab, bis, unter } = angabe;
-    const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
-      || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
-    return draussen ? `${angabe.heisst} ${angabe.verlangt}` : '';
-  };
   const uebernehmen = (neu, getippt = String(neu)) => {
-    const grund = neu === null ? '' : verletzt(neu);
+    const grund = neu === null ? '' : grenzeVerletzt(angabe, neu);
     if (!grund) {
       beiAenderung(neu);
       return;

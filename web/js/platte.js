@@ -172,8 +172,8 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
  *
  * In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
  * stehen, in x nicht: der Widerstand gilt je Laufmeter, und eine Stabzahl
- * hätte darin keinen Bezug. Wer sie angibt, bekommt nur noch Nachweise in
- * x-Richtung -- der Nachweis sagt es dann selbst.
+ * hätte darin keinen Bezug. Bis 2026-11-19 hiess es am Feld, mit ihr gebe
+ * es nur noch Nachweise in x -- nachgewiesen wird aber ohnehin nur x.
  */
 function querkraftBlock(querschnitt) {
   // Vollständig: jede Platte kommt durch den Kern, und der setzt die Bügel
@@ -227,10 +227,10 @@ function querkraftBlock(querschnitt) {
         })
         : zahlfeld({
           wert: buegel.anzahl_y, schritt: 1, min: 1,
-          titel: 'Bügelzahl je b; dann nur Nachweise in x',
+          titel: 'Bügelzahl je b',
           beiAenderung: (v) => aendern((x) => { x.anzahl_y = v; }),
         }),
-      einheitsSchalter(ueberAbstand, 'je b – dann nur Nachweise in x', () => aendern((x) => {
+      einheitsSchalter(ueberAbstand, 'je b', () => aendern((x) => {
         x.art_y = ueberAbstand ? 'anzahl' : 'teilung';
       })),
       el('span'),

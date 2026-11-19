@@ -19,6 +19,7 @@
 
 import { hakenSchalter, namensfeld } from './bausteine.js';
 import { el } from './dom.js';
+import { span } from './mathe.js';
 
 /**
  * Eine Zeile. `fall` ist der Eintrag, `aendern(veraenderer)` ändert ihn im
@@ -52,13 +53,25 @@ export function fallzeile({
 }
 
 /**
- * Der Kopf über den Zeilen: je Zahlenspalte ihre Beschriftung, als Text oder
- * als Formelzeichen (ein Knoten) -- das bleibt, wie es ist: gross
- * geschrieben würde aus M_y ein M_Y. Dieselben Spalten wie die Zeilen darunter.
+ * Der Kopf über den Zeilen: je Zahlenspalte ihre Beschriftung -- als Text,
+ * als Formelzeichen (ein Knoten) oder als Formelzeichen mit Einheit
+ * (`['M_{Ed}', 'kNm']`). Ein Formelzeichen bleibt, wie es ist: gross
+ * geschrieben würde aus M_y ein M_Y, aus ε ein E und aus l ein L. Dieselben
+ * Spalten wie die Zeilen darunter.
  */
 export function fallkopf(koepfe, { spalten = koepfe.length } = {}) {
   return el('div.fallzeile.fallkopf', { style: { '--felder': spalten } }, [
     el('div.fall-zahlen', {}, koepfe.map((kopf) => (typeof kopf === 'string'
-      ? el('span', { text: kopf }) : el('span.ist-formel', {}, [kopf])))),
+      ? el('span', { text: kopf })
+      : el('span.ist-formel', {}, [Array.isArray(kopf) ? formelkopf(...kopf) : kopf])))),
   ]);
+}
+
+/**
+ * Ein Formelzeichen mit seiner Einheit: «M_Ed [kNm]», das Zeichen gesetzt.
+ * Bis 2026-11-19 standen die Köpfe der Platte als Text da und wurden gross
+ * geschrieben: «M_ED [KNM]», «L_CR [M]».
+ */
+export function formelkopf(zeichen, einheit = '') {
+  return el('span', {}, [span(zeichen), einheit ? ` [${einheit}]` : '']);
 }

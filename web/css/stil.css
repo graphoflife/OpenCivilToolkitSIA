@@ -1323,6 +1323,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .spaltenkopf.ist-formel {
   text-transform: none; font: italic 12px/1 KaTeX_Math, serif;
 }
+/* Ein Formelzeichen mit Einheit: das Zeichen gesetzt, die Einheit wie
+   geschrieben -- «ε oben» wurde gross geschrieben zu «Ε OBEN». */
+.spaltenkopf.mit-zeichen { text-transform: none; letter-spacing: 0; }
 
 /* Fragezeichen mit Erklärung. Die Blase hängt am Zeichen und erscheint beim
    Darüberfahren -- sie nimmt keinen Platz in der Zeile, solange niemand

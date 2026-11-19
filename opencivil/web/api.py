@@ -18,7 +18,7 @@ from __future__ import annotations
 import dataclasses
 import inspect
 import math
-from typing import Any, Callable, Dict, List, Optional, Sequence
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
 
 from opencivil.bewehrungssuche import DURCHMESSER, Suchmodus
 from opencivil.core.einheiten import MM
@@ -48,7 +48,10 @@ from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
-from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
+from opencivil.projekt.aufbau.kern import kennwertbereich
+from opencivil.projekt.lesen import (
+    bereichsangabe, eintragsklassen, feldangaben, katalogname, wahl_von,
+)
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE, WerkstoffwahlEintrag
 from opencivil.querschnitt.analyse import Zeichnung
@@ -344,6 +347,8 @@ def _vorlage_dict(vorlage) -> dict:
         "stellen": vorlage.stellen,
         "berechnet": vorlage.ist_berechnet,
         "aus_sorte": not vorlage.ist_berechnet and not vorlage.ist_festwert,
+        # Die Grenze, wie die Felder eines Eintrags sie tragen (``felder``).
+        "angabe": bereichsangabe(kennwertbereich(vorlage)),
     }
 
 
@@ -450,12 +455,13 @@ def kurzform_liste(protokoll: Protokoll, ziele: Sequence[str]) -> List[dict]:
 
 
 def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
-                 spannungsanalysen: Optional[dict] = None) -> dict:
+                 spannungsanalysen: Optional[dict] = None,
+                 normalkraefte: Optional[Mapping[str, float]] = None) -> dict:
     """
     Vollstaendige Abbildung eines Rechenlaufs. ``spannungsanalysen`` sind die
     Zeichendaten der Analysen, wo der Aufrufer sie schon hat -- aus dem
     Zwischenspeicher (:func:`opencivil.web.dienst.rechnen`); sonst werden sie
-    hier gerechnet.
+    hier gerechnet. ``normalkraefte`` je M-V-Kurve die gewaehlte, in kN.
     """
     ergebnis: Dict[str, Any] = {
         "werte": {wid: wert_dict(w) for wid, w in loesung.werte.items()},
@@ -515,7 +521,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
     if aufbau is not None:
         ergebnis["linien"] = diagrammdaten.linien(aufbau, loesung)
         ergebnis["werkstoffgesetze"] = diagrammdaten.werkstoffgesetze(aufbau, loesung)
-        ergebnis["querkraftkurven"] = diagrammdaten.querkraftkurven(aufbau, loesung)
+        ergebnis["querkraftkurven"] = diagrammdaten.querkraftkurven(aufbau, loesung, normalkraefte)
         ergebnis["neigungskurven"] = diagrammdaten.neigungskurven(aufbau, loesung)
         ergebnis["spannungsanalysen"] = (
             spannungsanalysen if spannungsanalysen is not None

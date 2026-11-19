@@ -17,7 +17,6 @@ import {
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
-import { span } from './mathe.js';
 import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
 
 const HILFE = {
@@ -117,9 +116,9 @@ function schichtZeile(s, i) {
   });
 }
 
-/** Ein Spaltenkopf mit Formelzeichen und der Einheit des Kerns: «M'_E [MN/m²]». */
+/** Ein Spaltenkopf aus Formelzeichen und der Einheit des Kerns: «M'_E [MN/m²]». */
 function kopf(schluessel, symbol) {
-  return el('span', {}, [span(symbol), ` [${feldangabe('schicht', schluessel).einheit || ''}]`]);
+  return [symbol, feldangabe('schicht', schluessel).einheit];
 }
 
 function schichtenPanel(s) {

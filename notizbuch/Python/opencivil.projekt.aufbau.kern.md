@@ -1,5 +1,5 @@
 ---
-erzeugt: 5589d464f45e
+erzeugt: e6b6147b44ca
 art: modul
 tags: [modul]
 ---
@@ -377,6 +377,24 @@ def ziele(self) -> List[str]
 Was ein Lauf fuer dieses Bauteil rechnet: die Nachweise in der Folge
 von [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau.NACHWEISFELDER]], dann die weiteren Ziele.
 
+### kennwertbereich
+
+```python
+def kennwertbereich(vorlage: KennwertVorlage) -> Bereich
+```
+
+Wo ein Kennwert eines Baustoffs liegen muss: ueber null. Festigkeiten,
+Moduln, Dehnungen, Teilsicherheitsbeiwerte sind ihrer Natur nach
+positiv; eine Null oder ein negativer Wert liefert keine falsche Zahl,
+sondern gar keine -- gamma_c = 0 endete in einem ZeroDivisionError, ein
+negatives f_ck in einer komplexen Wurzel. Beides kam als Absturzmeldung
+beim Benutzer an.
+
+Der Aufbau prueft damit jede Abweichung und Ueberschreibung
+([[opencivil.projekt.aufbau.kern#baustoff_bauen|baustoff_bauen]]), die Oberflaeche liest dieselbe Grenze aus dem
+Katalog (`materialarten`) und weist eine Null schon am Feld ab. Bis
+2026-11-19 fuehrten die Pfeile dort bis 0.
+
 ### baustoff_bauen
 
 ```python
@@ -506,3 +524,4 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
+- [[opencivil.web.api]]

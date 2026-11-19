@@ -59,7 +59,9 @@ export function plattenkarten(kennung, eintrag, loesung) {
  *
  * Gerechnet wird im Kern, nicht hier: `v_Rd` hängt über `m_Rd(N_Ed)` an der
  * Resistenzlinie, und die Formel steht im Querkraftnachweis. Die Oberfläche
- * fragt nach und zeichnet, was zurückkommt.
+ * fragt nach und zeichnet, was zurückkommt. Jedes weitere Rechnen gibt die
+ * gewählte mit (app.js) -- bis 2026-11-19 sprang sie nach jeder Eingabe
+ * zurück.
  */
 async function normalkraftWaehlen(kennung, N_Ed) {
   const gewaehlt = { ...zustand.kurvenNormalkraft, [kennung]: N_Ed };
