@@ -12,7 +12,9 @@
  * zusammen mit dem der Platte.
  */
 
-import { feld, namensfeld, panel } from './bausteine.js';
+import {
+  feld, namensfeld, panel, zweiSchalter,
+} from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { eintragAendern, katalog, kennwertId, zustand } from './zustand.js';
@@ -46,7 +48,7 @@ function kennwertZeile(material, vorlage) {
     angabe: vorlage.angabe,
     readonly: !schreibbar,
     titel: gesperrt ? 'Normsorte nach SIA – nicht änderbar'
-      : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet. Haken setzen zum Überschreiben.' : ''),
+      : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet – zum Überschreiben daneben «von Hand» wählen' : ''),
     // Leer: die eigene Zahl weg, der Wert der Sorte gilt wieder.
     leer: null,
     beiAenderung: (neu) => eintragAendern(material.kennung, (m) => {
@@ -58,22 +60,22 @@ function kennwertZeile(material, vorlage) {
 
   // Überschrieben wird der gerechnete Wert. Fehlt er, weil das Material
   // nicht rechnet, gibt es nichts zu überschreiben -- bis 2026-11-19 setzte
-  // der Haken dann eine 0, die der Kern abweist.
+  // der Haken dann eine 0, die der Kern abweist. Ein Schalter statt des
+  // Hakens (Benutzer, 2026-11-19), der sagt, woher die Zahl kommt; eine
+  // Normsorte hat keinen, an ihr ist nichts zu wählen.
   const ohneWert = !istUeberschrieben && anzeige === null;
-  const schalter = vorlage.berechnet
-    ? el('input', {
-      type: 'checkbox', checked: istUeberschrieben, disabled: gesperrt || ohneWert,
-      title: gesperrt ? 'Normsorte nach SIA – nicht änderbar'
-        : (ohneWert ? 'Noch kein gerechneter Wert – überschreiben lässt er sich, sobald er gerechnet ist'
-          : 'Von Hand überschreiben'),
-      on: {
-        change: (e) => eintragAendern(material.kennung, (m) => {
-          if (e.target.checked) m.ueberschreibungen[vorlage.kurzname] = anzeige;
-          else delete m.ueberschreibungen[vorlage.kurzname];
-        }),
-      },
+  const schalter = vorlage.berechnet && !gesperrt
+    ? zweiSchalter({
+      stellungen: [[false, 'gerechnet'], [true, 'von Hand']],
+      gewaehlt: istUeberschrieben, aus: ohneWert,
+      titel: ohneWert ? 'Noch kein gerechneter Wert – überschreiben lässt er sich, sobald er gerechnet ist'
+        : 'Gerechnet oder von Hand überschrieben – Klicken schaltet um',
+      setzen: (vonHand) => eintragAendern(material.kennung, (m) => {
+        if (vonHand) m.ueberschreibungen[vorlage.kurzname] = anzeige;
+        else delete m.ueberschreibungen[vorlage.kurzname];
+      }),
     })
-    : el('span');
+    : null;
 
   const zuruecksetzen = (istAbweichend && !vorlage.berechnet && !gesperrt)
     ? el('button.knopf.knopf-zart', {
@@ -87,11 +89,11 @@ function kennwertZeile(material, vorlage) {
     : el('span');
 
   return el('div.kennwert', {
-    class: istUeberschrieben ? 'ist-ueberschrieben' : '',
+    class: `${istUeberschrieben ? 'ist-ueberschrieben' : ''} ${schalter ? 'mit-schalter' : ''}`,
     title: [vorlage.beschreibung, vorlage.referenz].filter(Boolean).join(' — '),
   }, [
-    schalter,
     el('span.bezeichnung', {}, [span(vorlage.symbol), ' ', el('small', { text: vorlage.beschreibung })]),
+    schalter,
     eingabe,
     el('span.einheit', { text: vorlage.einheit === '-' ? '' : vorlage.einheit }),
     zuruecksetzen,
@@ -153,7 +155,7 @@ export function materialEditor(material) {
             click: () => eintragAendern(material.kennung, (m) => { m.ueberschreibungen = {}; }),
           },
         })
-        : (gesperrt ? 'gesperrt' : 'Haken setzen zum Überschreiben'),
+        : (gesperrt ? 'gesperrt' : ''),
     }, vorlagen.filter((v) => v.berechnet).map((v) => kennwertZeile(material, v))),
   ];
 }

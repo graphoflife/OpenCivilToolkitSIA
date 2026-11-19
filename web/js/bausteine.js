@@ -242,12 +242,13 @@ export function richtungsWahl(gewaehlt, setzen, nur = null) {
  * Ein Schalter mit zwei Stellungen: ein einziger Knopf, die gewählte Hälfte
  * farbig. Ein Klick irgendwo darauf schaltet um, nicht nur einer auf die
  * andere Hälfte (Benutzer, 2026-10-16). `stellungen` sind zwei
- * `[wert, text, klasse]`; `klasse` trägt die Farbe der Hälfte.
+ * `[wert, text, klasse]`; `klasse` trägt die Farbe der Hälfte. `aus`:
+ * es gibt noch nichts zu wählen, `titel` sagt warum.
  */
-export function zweiSchalter({ stellungen, gewaehlt, setzen, titel, klasse = '' }) {
+export function zweiSchalter({ stellungen, gewaehlt, setzen, titel, klasse = '', aus = false }) {
   const [[a], [b]] = stellungen;
   return el(`button.schalter${klasse}`, {
-    type: 'button', title: titel,
+    type: 'button', title: titel, disabled: aus,
     on: { click: () => setzen(gewaehlt === a ? b : a) },
   }, stellungen.map(([wert, text, k]) => el('span.schalter-halb', {
     text, class: `${k || ''} ${wert === gewaehlt ? 'ist-an' : ''}`,

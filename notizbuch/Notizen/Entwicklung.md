@@ -7,6 +7,31 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Schalter statt Häkchen
+
+Entscheid des Benutzers: auch eine Wahl ja/nein ist ein Schalter. Vier
+Häkchen waren übrig:
+
+- «überschreiben» bei einem abgeleiteten Kennwert eines eigenen Materials.
+  Jetzt steht unter der Bezeichnung «gerechnet | von Hand» neben der Zahl
+  – der Schalter sagt, woher die Zahl kommt. In einer Zeile neben der
+  Bezeichnung fand er keinen Platz (155 px in einer Zeile von 394 px), und
+  ✓/✗ hätte jede Zeile mit einem roten Kreuz gezeigt, obwohl nichts falsch
+  ist. Ohne gerechneten Wert ist er ausgegraut (`zweiSchalter` kann jetzt
+  `aus`); eine Normsorte hat keinen, an ihr ist nichts zu wählen. Die
+  leere erste Spalte der Kennwertzeile ist weg.
+- «mit Bewehrung», «mit Schubwänden» in der Vorlage der
+  Querschnittsanalyse: «Bewehrung ✓|✗», «Schubwände ✓|✗» in der Reihe der
+  Masse, wie die Ja/Nein-Wahlen in den Eigenschaften der Zeichnung. Das
+  Fenster baut sich beim Umschalten nicht neu, nur die Skizze; darum
+  ersetzt sich die Zeile selbst.
+- «Fang» in der Palette jeder Zeichnung: «Fang ✓|✗» neben «Raster in m».
+- Die vereinfachte Kurve im Betondiagramm: ✓|✗ vor ihrem Eintrag in der
+  Legende.
+
+Übrig ist nur das Kästchen einer Aufgabe im Notizbuch: es zeigt, ob eine
+Aufgabe erledigt ist, und lässt sich nicht anklicken.
+
 ## 2026-11-19 · Durchstanzen: nach dem Umschalten der Platte ein Hinweis
 
 Entscheid des Benutzers. Wer beim Durchstanzen von Decke auf Bodenplatte

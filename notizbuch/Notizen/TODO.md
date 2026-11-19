@@ -268,7 +268,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       - Querschnittsanalyse: die Linienart (verschmiert, Anzahl, Teilung),
         Start- und Endeisen; «nur einachsig» als Schalter mit zwei Bildern,
         Nulllinie waagrecht oder schief, statt Häkchen und Satz.
-- [ ] **Häkchen statt Schalter**: «überschreiben» beim eigenen Material
+- [x] **Häkchen statt Schalter**: «überschreiben» beim eigenen Material
       (`material.js`) und «mit Bewehrung», «mit Schubwänden» in der Vorlage
       der Querschnittsanalyse (`qa_vorlagen.js`). Sonst ist jede feste Wahl
       ein Schalter. Empfehlung: Schalter.

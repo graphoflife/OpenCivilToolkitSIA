@@ -17,7 +17,7 @@
  * bauen.
  */
 
-import { wahlSchalter } from './bausteine.js';
+import { hakenSchalter, wahlSchalter } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
 import {
   feldeinheiten, feldnamen, felderLeeren, hilfstext, taste as eingabeTaste, zeigerFang,
@@ -291,15 +291,15 @@ export function paletteZeichnen(a) {
     gewaehlt: a.raster, setzen: (w) => { a.raster = w; a.neuZeichnen(); },
     titel: `Raster in ${a.einstellung.einheit}: daran fängt der Zeiger`, klasse: '.cad-wahl.cad-rasterwahl',
   });
-  const fang = el('input', {
-    type: 'checkbox', checked: a.fang, title: 'Fang an Knoten, Linien und Raster (Alt hält ihn an)',
-    on: { change: (e) => { a.fang = e.target.checked; a.neuZeichnen(); } },
-  });
+  // Ein Schalter, kein Haken (Benutzer, 2026-11-19). Die Palette baut sich
+  // neu, wenn der Fang wechselt: er steht in ihrem Schlüssel.
+  const fang = hakenSchalter(a.fang, (w) => { a.fang = w; a.neuZeichnen(); },
+    'Fang an Knoten, Linien und Raster (Alt hält ihn an)');
   a.teile.lage = el('span.cad-lage');
   pal.setzen('Zeiger', [
     a.teile.lage,
     el('div.cad-ruhe', {}, [
-      el('span', { text: `Raster in ${a.einstellung.einheit}` }), el('label', {}, [fang, ' Fang']),
+      el('span', { text: `Raster in ${a.einstellung.einheit}` }), el('span.cad-fang', {}, ['Fang', fang]),
     ]),
     raster,
     ...ebenenzeilen(a),

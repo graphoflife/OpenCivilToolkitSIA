@@ -16,7 +16,9 @@
  */
 
 import { api } from './api.js';
+import { hakenSchalter } from './bausteine.js';
 import { pfad } from './cad_ansicht.js';
+import { schalterzeile } from './cad_palette.js';
 import { el, melden, svgEl, zahlfeld } from './dom.js';
 import { katalog, zustand } from './zustand.js';
 
@@ -122,12 +124,18 @@ function zeile(beschriftung, eingabe, einheit = '') {
   ]);
 }
 
-/** Ein Haken «mit …». */
-function haken(text, an, setzen) {
-  return el('label.cad-wahl', {}, [
-    el('input', { type: 'checkbox', checked: an, on: { change: (e) => setzen(e.target.checked) } }),
-    text,
-  ]);
+/**
+ * Mit oder ohne, etwa «Bewehrung» -- ein Schalter wie in den Eigenschaften
+ * der Zeichnung, kein Haken (Benutzer, 2026-11-19). Das Fenster zeichnet
+ * sich beim Umschalten nicht neu, nur die Skizze: darum ersetzt sich die
+ * Zeile selbst.
+ */
+function mitOhne(text, an, setzen) {
+  const zeile = schalterzeile(text, hakenSchalter(an, (x) => {
+    setzen(x);
+    zeile.replaceWith(mitOhne(text, x, setzen));
+  }, text));
+  return zeile;
 }
 
 /** Ein Zahlenfeld, das schon beim Tippen meldet -- die Skizze soll mitgehen. */
@@ -212,10 +220,8 @@ function vorlageZeichnen(a, knoten) {
     ...v.masse.map((m) => zeile(m.beschriftung, massfeld(w.masse[m.schluessel] ?? m.vorgabe,
       (x) => { w.masse[m.schluessel] = x; holen(); }, m.schritt), m.einheit)),
     zeile('Achsabstand', massfeld(w.randabstand, (x) => { w.randabstand = x; holen(); }), 'mm'),
-    el('div.cad-wahlen', {}, [
-      haken('mit Bewehrung', w.bewehrung, (x) => { w.bewehrung = x; holen(); }),
-      waende ? haken('mit Schubwänden', w.schubwaende, (x) => { w.schubwaende = x; holen(); }) : null,
-    ]),
+    mitOhne('Bewehrung', w.bewehrung, (x) => { w.bewehrung = x; holen(); }),
+    waende ? mitOhne('Schubwände', w.schubwaende, (x) => { w.schubwaende = x; holen(); }) : null,
     meldung,
     el('div.cad-dialog-fuss', {}, [einsetzen]),
   );

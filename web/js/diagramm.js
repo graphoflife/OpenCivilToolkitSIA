@@ -12,6 +12,7 @@
  */
 
 import { achsenkreuz, NR } from './achsen.js';
+import { hakenSchalter } from './bausteine.js';
 import { el, svgEl } from './dom.js';
 
 /** Farbe des vereinfachten Verlaufs -- grün, wie verlangt. */
@@ -124,14 +125,12 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
 
   if (!gesetz.vereinfacht) return el('div.diagramm-huelle', {}, [svg]);
 
-  const schalter = el('label.kurvenschalter', {
+  // Ein Schalter, kein Haken (Benutzer, 2026-11-19) -- und darum kein
+  // «label» um ihn: ein Klick auf den Text löste ihn sonst aus.
+  const schalter = el('span.kurvenschalter', {
     title: gesetz.vereinfacht.beschreibung || '',
   }, [
-    el('input', {
-      type: 'checkbox',
-      checked: zeigeVereinfacht,
-      on: { change: (e) => beiUmschalten?.(e.target.checked) },
-    }),
+    hakenSchalter(zeigeVereinfacht, (an) => beiUmschalten?.(an), gesetz.vereinfacht.titel),
     el('i', { style: { background: GRUEN } }),
     el('span', { text: gesetz.vereinfacht.titel }),
   ]);

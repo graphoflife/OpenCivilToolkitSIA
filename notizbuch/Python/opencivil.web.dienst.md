@@ -1,5 +1,5 @@
 ---
-erzeugt: dab161d61cc9
+erzeugt: 615a24594971
 art: modul
 tags: [modul]
 ---
@@ -361,7 +361,7 @@ der auf die Linie gelotet wird.
 def _vorlagenwahl(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 ```
 
-Was die Oberflaeche zu einer Vorlage eingestellt hat -- Masse, Achsabstand, die zwei Haken.
+Was die Oberflaeche zu einer Vorlage eingestellt hat -- Masse, Achsabstand, die zwei Schalter.
 
 ### vorlage
 

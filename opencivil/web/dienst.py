@@ -598,7 +598,7 @@ def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 def _vorlagenwahl(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
-    """Was die Oberflaeche zu einer Vorlage eingestellt hat -- Masse, Achsabstand, die zwei Haken."""
+    """Was die Oberflaeche zu einer Vorlage eingestellt hat -- Masse, Achsabstand, die zwei Schalter."""
     wahl = rumpf.get("wahl") or {}
     try:
         masse = {str(k): float(v) for k, v in (wahl.get("masse") or {}).items()

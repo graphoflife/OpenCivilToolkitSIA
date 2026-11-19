@@ -515,9 +515,15 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .materialwahl-marke { font-size: 12px; color: var(--schrift-matt); }
 
 .kennwert {
-  display: grid; grid-template-columns: 26px minmax(0, 1fr) auto 54px 26px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto 54px 26px;
   gap: 6px; align-items: center; padding: 3px 4px; border-radius: 5px;
 }
+/* Ein abgeleiteter Wert eines eigenen Materials: der Schalter «gerechnet |
+   von Hand» steht unter der Bezeichnung, neben seiner Zahl -- in einer Zeile
+   bliebe der Bezeichnung neben ihm kein Platz. */
+.kennwert.mit-schalter { row-gap: 3px; }
+.kennwert.mit-schalter .bezeichnung { grid-column: 1 / -1; }
+.kennwert.mit-schalter .schalter { justify-self: end; }
 .kennwert:hover { background: var(--flaeche-2); }
 .kennwert.ist-ueberschrieben { background: var(--warn-hell); box-shadow: inset 3px 0 0 var(--warn); }
 /* Die Beschreibung bricht um, statt abgeschnitten zu werden: das Panel ist
@@ -576,7 +582,10 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 }
 /* Eine Stellung mit Bild (`zeichen`), etwa die Rechenart: Spannung über Dehnung. */
 .schalter-halb > .sinnbild { width: 18px; height: 18px; flex: none; }
-.schalter:hover .schalter-halb:not(.ist-an) { color: var(--schrift-matt); }
+.schalter:hover:not(:disabled) .schalter-halb:not(.ist-an) { color: var(--schrift-matt); }
+/* Noch nichts zu wählen (`aus`), etwa «von Hand» ohne gerechneten Wert. */
+.schalter:disabled { opacity: .5; }
+.schalter:disabled, .schalter:disabled .schalter-halb { cursor: not-allowed; }
 .schalter-halb.ist-an {
   background: var(--blau); color: #fff; box-shadow: 0 1px 2px rgba(16, 24, 40, .25);
 }
@@ -1139,11 +1148,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
    des Erfüllungsgrads sonst ein grosses -- und damit ein anderes Zeichen. */
 .nachweis-tabelle th .katex { text-transform: none; }
 
-.kurvenschalter {
-  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-  user-select: none;
-}
-.kurvenschalter input { margin: 0; accent-color: var(--gut); cursor: pointer; }
+.kurvenschalter { display: inline-flex; align-items: center; gap: 6px; }
 
 /* ------------------------------------------------------------- Zahlfeld -- */
 /* Eigene Pfeile statt des Browser-Drehfelds: das kann nur gleichmässige
@@ -1621,7 +1626,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   display: flex; align-items: center; justify-content: space-between; gap: 6px;
   color: var(--schrift-matt);
 }
-.cad-ruhe label { display: inline-flex; align-items: center; gap: 5px; }
+.cad-ruhe .cad-fang { display: inline-flex; align-items: center; gap: 5px; }
 /* Das Raster: seine Stufen als Schalter, in einer eigenen Zeile. */
 .cad-wahl.cad-rasterwahl .schalter-halb { padding: 2px 5px; }
 
@@ -1715,7 +1720,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-vorlagenskizze.ist-alt { opacity: .4; }
 .cad-skizze { display: block; max-width: 100%; height: auto; }
 .cad-skizze-wand { stroke: var(--mat-wand-linie); stroke-opacity: .5; }
-.cad-wahlen { display: flex; flex-wrap: wrap; gap: 4px 14px; }
 .cad-wahl { display: inline-flex; align-items: center; gap: 5px; }
 
 /* Die Leiste neben der Auswahl: nur, was für sie geht. */
