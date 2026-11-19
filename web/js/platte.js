@@ -14,6 +14,7 @@
  */
 
 import { feld, namensfeld, panel, zweiSchalter } from './bausteine.js';
+import { sinnbild } from './sinnbilder.js';
 import { auswahl, el, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
@@ -118,7 +119,8 @@ function lagenBlock(querschnitt, nummer) {
 /**
  * Die Lage von Grundbewehrung und Zulage zueinander: ein Knopf, der zeigt,
  * was gilt, und umschaltet. Als Paar «ungünstig | günstig» war er breiter
- * als die Zahlen der Zeile.
+ * als die Zahlen der Zeile. Sein Bild zeigt die zwei Stäbe im Schnitt, an
+ * welcher Kante sie bündig liegen (Benutzer, 2026-11-19).
  *
  * Nur sichtbar, wenn die Lage überhaupt zwei Posten hat -- bei einer einzelnen
  * Bewehrung gibt es nichts zueinander zu legen.
@@ -132,8 +134,10 @@ function lageSchalter(querschnitt, nummer, lage) {
   const ist = lage.unguenstig !== false;
   const untere = nummer <= 2;
 
+  const bild = untere
+    ? (ist ? 'zulage-unten-unguenstig' : 'zulage-unten-guenstig')
+    : (ist ? 'zulage-oben-unguenstig' : 'zulage-oben-guenstig');
   return el('button.gunst-knopf', {
-    text: ist ? 'ungünstig' : 'günstig',
     class: ist ? '' : 'ist-guenstig',
     title: (untere
       ? 'Ungünstig: gleiche Oberkante, der dünnere Stab rückt nach oben. '
@@ -142,7 +146,7 @@ function lageSchalter(querschnitt, nummer, lage) {
         + 'Günstig: gleiche Oberkante, jeder um seinen Halbmesser eingerückt.')
       + ' Klicken schaltet um.',
     on: { click: () => setzen(!ist) },
-  });
+  }, [sinnbild(bild), ist ? 'ungünstig' : 'günstig']);
 }
 
 /** Zweistellungs-Schalter x|y. Die Partnerlage folgt zwingend der Gegenrichtung. */

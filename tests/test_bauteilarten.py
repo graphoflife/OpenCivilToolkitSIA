@@ -94,6 +94,10 @@ class TestSinnbilder(unittest.TestCase):
             "stuetzenform": k["durchstanzen"]["formen"],
             "kopf": k["pfahl"]["koepfe"],
             "tragglied": k["pfahl"]["tragglieder"],
+            "setzung": k["setzung"]["steifigkeiten"],
+            # Grund und Zulage, je in den unteren und den oberen Lagen (platte.js).
+            "zulage": [{"wert": f"{seite}-{gunst}"} for seite in ("unten", "oben")
+                       for gunst in ("unguenstig", "guenstig")],
         }
         for art, stellungen in familien.items():
             for stellung in stellungen:

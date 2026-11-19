@@ -7,6 +7,18 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Bilder an den Schaltern: Setzung und Platte
+
+Die Steifigkeit der Setzung zeigt das Fundament im Grundriss, mit dem Punkt,
+für den die Setzung gilt: starr im Punkt K nahe einer Ecke, schlaff in der
+Mitte. Der Knopf «ungünstig / günstig» einer Lage mit Grund und Zulage zeigt
+die zwei Stäbe im Schnitt mit der Seite der Platte – ungünstig hängen beide
+an derselben Kante weg von der Seite, günstig liegen beide an der
+Überdeckung, unten wie oben gespiegelt. Der Zug eines Verformungsfalls trägt
+den Pfeil, wie die Zugseite der Querschnittsanalyse («↓ unten», «↑ oben»);
+den Pfeil liefert der Kern mit. Vor «Einlage, grösstes Mass» steht die
+Einlage im Schnitt der Platte, mit ihrem Mass darüber.
+
 ## 2026-11-19 · Bilder an den Schaltern: Pfahl
 
 Wie beim Durchstanzen, nach dem Entscheid des Benutzers. Der Kopf des

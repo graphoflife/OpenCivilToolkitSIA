@@ -448,6 +448,8 @@ a.knopf { display: inline-block; text-decoration: none; }
 
 .feld { display: grid; grid-template-columns: minmax(0, 1fr) auto 48px; gap: 6px; align-items: center; margin-bottom: 5px; }
 .feld > label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Ein Bild vor der Beschriftung, wo Wörter nicht reichen -- etwa die Einlage im Schnitt. */
+.feld > label > .sinnbild { width: 18px; height: 18px; vertical-align: -4px; margin-right: 5px; }
 .feld .einheit { font-size: 12px; color: var(--schrift-zart); }
 /* Ein Name hat keine Einheit: er bekommt ihren Platz dazu. In gleich breiter
    Schrift passte «Decke über EG» sonst nicht mehr ganz in 112 Pixel. Er
@@ -707,6 +709,8 @@ dialog.materialwahl .fenster-kopf { top: 0; }
   border: 1px solid var(--eingabe-rand); border-radius: 7px;
   background: var(--flaeche); color: var(--schrift-matt);
 }
+.gunst-knopf { display: inline-flex; align-items: center; gap: 4px; }
+.gunst-knopf > .sinnbild { width: 16px; height: 16px; flex: none; }
 .gunst-knopf:hover { background: var(--blau-hell); }
 .gunst-knopf.ist-guenstig { background: var(--blau); border-color: var(--blau); color: #fff; }
 

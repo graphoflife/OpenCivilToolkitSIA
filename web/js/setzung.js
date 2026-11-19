@@ -13,7 +13,7 @@
  */
 
 import {
-  erklaerung, feld, karte, namensfeld, panel, wahlSchalter, zahlzeile,
+  erklaerung, feld, karte, mitBild, namensfeld, panel, wahlSchalter, zahlzeile,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
@@ -62,9 +62,9 @@ function situationPanel(s) {
       zahl('B', 'Breite', 'B', { schritt: 0.1 }),
       zahl('L', 'Länge', 'L', { schritt: 0.1 }),
       feld('Steifigkeit', wahlSchalter({
-        werte: katalog('setzung', 'steifigkeiten').map((x) => ({
+        werte: mitBild(katalog('setzung', 'steifigkeiten').map((x) => ({
           wert: x.wert, beschriftung: x.wert, titel: x.beschriftung,
-        })),
+        })), 'setzung'),
         gewaehlt: s.steifigkeit,
         setzen: (w) => aendern((x) => { x.steifigkeit = w; }),
         titel: 'Starr: im Punkt K, die mittlere Setzung – schlaff: unter der Mitte, die grösste',

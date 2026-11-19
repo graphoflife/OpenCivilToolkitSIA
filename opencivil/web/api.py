@@ -321,9 +321,10 @@ def katalog() -> dict:
         # Vorgabe und Hoechstwert des Beiwerts k der Grenze x/d -- fuer das
         # Feld; geprueft wird beim Bauen der Platte.
         "duktilitaet": {"vorgabe": DUKTILITAET_BEIWERT, "hoechstens": DUKTILITAET_HOECHSTENS},
-        # Die Seiten, die ein Verformungsfall ziehen kann.
-        "verformung": {"zugseiten": [{"wert": s.value, "beschriftung": s.value}
-                                     for s in UM_Y]},
+        # Die Seiten, die ein Verformungsfall ziehen kann -- mit dem Pfeil, wie
+        # die Zugseite der Querschnittsanalyse.
+        "verformung": {"zugseiten": [{"wert": s.value, "beschriftung": s.value,
+                                      "pfeil": s.pfeil} for s in UM_Y]},
     }
 
 

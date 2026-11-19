@@ -373,6 +373,37 @@ const ZEICHEN = {
   'tragglied-stab': {
     voll: [[12, 12, 7.5]],
   },
+  // Das Fundament im Grundriss und wo die Setzung gilt: starr im Punkt K,
+  // 0.13 L und 0.13 B von einer Ecke (gestrichelt die Abstände, hier
+  // grösser, damit man sie sieht), schlaff in der Mitte.
+  'setzung-starr': {
+    pfade: ['M3 6h18v12H3z'],
+    strich: ['M3 14.5h3.5 M7 18v-3'],
+    voll: [[7.2, 14.4, 1.9]],
+  },
+  'setzung-schlaff': {
+    pfade: ['M3 6h18v12H3z'],
+    voll: [[12, 12, 1.9]],
+  },
+  // Grund und Zulage einer Lage im Schnitt: ausgezogen die Seite der Platte,
+  // gestrichelt die Kante, an der beide Stäbe bündig liegen. Ungünstig rückt
+  // der dünnere von der Seite weg, günstig liegen beide an der Überdeckung.
+  'zulage-unten-unguenstig': {
+    pfade: ['M2 21h20'], strich: ['M2 7h20'], voll: [[8, 11, 4], [16.5, 9.2, 2.2]],
+  },
+  'zulage-unten-guenstig': {
+    pfade: ['M2 21h20'], strich: ['M2 15h20'], voll: [[8, 11, 4], [16.5, 12.8, 2.2]],
+  },
+  'zulage-oben-unguenstig': {
+    pfade: ['M2 3h20'], strich: ['M2 17h20'], voll: [[8, 13, 4], [16.5, 14.8, 2.2]],
+  },
+  'zulage-oben-guenstig': {
+    pfade: ['M2 3h20'], strich: ['M2 9h20'], voll: [[8, 13, 4], [16.5, 11.2, 2.2]],
+  },
+  // Eine Einlage in der Platte, im Schnitt, darüber ihr grösstes Mass.
+  einlage: {
+    pfade: ['M2 4h20 M2 20h20', 'M7 12.5h10v4.5H7z', 'M7 6.5v3 M17 6.5v3 M7 8h10'],
+  },
 };
 
 /** Ein Zeichen als SVG -- `name` aus der Liste oben. */

@@ -29,6 +29,7 @@ import { span } from './mathe.js';
 import {
   analysenKapitel, anfuegenKnopf, nachweisKapitel, rechenwahlZeile,
 } from './nachweise.js';
+import { sinnbild } from './sinnbilder.js';
 import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
 
 /**
@@ -289,7 +290,7 @@ function querkraftAngaben(querschnitt) {
       titel: 'Für k_g, Querkraft ohne Bügel',
       beiAenderung: (v) => aendernAn((q) => { q.d_max = v; }),
     }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
-    feld('Einlage, grösstes Mass', zahlfeld({
+    feld([sinnbild('einlage'), 'Einlage, grösstes Mass'], zahlfeld({
       wert: querschnitt.einlagenhoehe, schritt: 5, angabe: feldangabe('querschnitt', 'einlagenhoehe'),
       titel: 'Breite oder Höhe der Einlage, das Grössere. Über d/6 gilt d_v = d − e',
       leer: 0,
@@ -401,7 +402,8 @@ function verformungsZeile(querschnitt, index) {
       }),
       seiten.length === 2
         ? zweiSchalter({
-          stellungen: seiten.map((s) => [s.wert, s.beschriftung]),
+          // Mit dem Pfeil der Zugseite, wie in der Querschnittsanalyse.
+          stellungen: seiten.map((s) => [s.wert, `${s.pfeil} ${s.beschriftung}`]),
           gewaehlt: k.zugseite, klasse: '.schalter-richtung',
           setzen: (wert) => aendern((x) => { x.zugseite = wert; }),
           titel: `Zug ${k.zugseite}: danach richtet sich ω_w – Klicken schaltet um`,
