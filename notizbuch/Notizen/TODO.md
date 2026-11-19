@@ -213,6 +213,65 @@ gelernt wurde, steht in [[Entwicklung]].
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
 
+## Zur Wahl: Durchsicht der Fenster vom 2026-11-19
+
+Was die Durchsicht «Die Bedienung erklärt sich selbst» gefunden, aber nicht
+von sich aus entschieden hat. Je Punkt eine Empfehlung; der Benutzer wählt.
+Was sie behoben hat, steht in [[Entwicklung]] (Schritte 1 bis 13 und der
+Nachtrag zur Karte «Schubfluss»).
+
+- [ ] **Ein fehlendes Material: grau oder rot?** Die Querschnittsanalyse
+      zeigt «Linie 1: das Material … gibt es nicht mehr -- eines wählen.»
+      grau, weil nur etwas fehlt. Decke und Balkensystem zeigen denselben
+      Satz rot, und die ganze Decke bzw. das ganze System rechnet nicht:
+      dort hält eine Meldung die Rechnung nur an, wenn sie ein Fehler ist
+      (`Meldung.fehler` heisst beides). Empfehlung: grau für ein fehlendes
+      oder gelöschtes Material, rot nur für die falsche Art (ein Stahl als
+      Beton); dafür «hält an» und «ist falsch» trennen.
+- [ ] **Die Meldung nennt die interne Kennung.** «das Material 'b9' gibt es
+      nicht mehr»: 'b9' sieht der Benutzer nirgends, die Listen zeigen
+      Namen. Empfehlung: «das gewählte Material gibt es nicht mehr -- eines
+      wählen.» Der Satz steht an einer Stelle (`materialgrund` in
+      `opencivil/projekt/aufbau/kern.py`).
+- [ ] **«erfüllt, ∞» ohne Last.** Ein frisches Durchstanzen (V_d = 0) und
+      eine frische Setzung (ohne Last, s = 0) stehen in der Zusammenfassung
+      als «erfüllt» mit dem Grad ∞. Die Querschnittsanalyse sagt in
+      derselben Lage «Keine Einwirkung → kein Nachweis.». Empfehlung:
+      dasselbe hier; der Satz käme dann an eine
+      Stelle für alle Nachweise (heute `OHNE_EINWIRKUNG` in
+      `opencivil/nachweis/schiefe_biegung.py`).
+- [ ] **Durchstanzen: der Schalter Decke ↔ Bodenplatte lässt die Zahlen
+      stehen.** c, c_v, q_d und die Biegebewehrung behalten ihren Wert, nur
+      die Beschriftung wechselt: etwa q_d = 10 kN/m² «Eigengewicht und
+      Nutzlast» heisst danach «Bodenpressung». Jede Zahl behält ihre Rolle im
+      Nachweis, und 10 kN/m² als Bodenpressung liegt auf der sicheren
+      Seite, ist aber kaum gemeint. Die Vorgaben sind für beide Arten
+      dieselben, «die Vorgabe der neuen Art» gibt es also nicht. Empfehlung:
+      die Zahlen lassen und nach dem Umschalten am Schalter sagen, was
+      jetzt für die andere Seite gilt -- «c, c_v, q_d und die
+      Biegebewehrung gelten jetzt für die Bodenplatte: prüfen». Sonst: alles
+      auf die Vorgaben zurück.
+- [ ] **Bilder an Schaltern**, wo Wörter nicht reichen (`wahlSchalter` kann
+      Bilder zeigen), das stärkste zuerst:
+      - Durchstanzen «Lage» (`durchstanzen.js`): wo der Plattenrand liegt,
+        steht heute erst in der Hilfe -- je Stellung die Stütze mit dem Rand;
+      - Pfahl «Kopf frei / eingespannt» und «Tragglied Rohr / Stab»;
+      - Durchstanzen «Form»; Setzung «starr / schlaff» (Setzung im Punkt K
+        oder in der Mitte);
+      - Platte «ungünstig / günstig» (zwei Stäbe, oben bzw. unten bündig),
+        «Zug oben / unten» im Verformungsfall, «Einlage, grösstes Mass»;
+      - Querschnittsanalyse: die Linienart (verschmiert, Anzahl, Teilung),
+        Start- und Endeisen; «nur einachsig» als Schalter mit zwei Bildern,
+        Nulllinie waagrecht oder schief, statt Häkchen und Satz.
+- [ ] **Häkchen statt Schalter**: «überschreiben» beim eigenen Material
+      (`material.js`) und «mit Bewehrung», «mit Schubwänden» in der Vorlage
+      der Querschnittsanalyse (`qa_vorlagen.js`). Sonst ist jede feste Wahl
+      ein Schalter. Empfehlung: Schalter.
+- [ ] **Zwei Striche in sichtbaren Texten**: Meldungen und Hinweise
+      schreiben teils «--» («noch keine Kombination -- unter «Einwirkungen»
+      eine anlegen»), teils «–». Empfehlung: in allem, was der Benutzer
+      liest, «–»; im Code darf «--» bleiben.
+
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-11-19
 
 Neun Durchsichten über das ganze Repo -- Fundament und Ausgabe;
