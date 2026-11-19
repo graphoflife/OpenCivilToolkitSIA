@@ -3,14 +3,14 @@
  *
  * Von oben nach unten:
  *
- *     Grundbruch Situation   Bezeichnung; Boden, Fundament, Gelände und
- *                            Grundwasser, Sohlreibung je als Karte;
- *                            Beschreibung
+ *     Grundbruch Situation   Bezeichnung; Boden – drainiert oder undrainiert –,
+ *                            Fundament, Gelände und Grundwasser, drainiert
+ *                            die Sohlreibung, je als Karte; Beschreibung
  *     Einwirkungen           die Kombinationen: N_Ed normal zur Sohle, T_Ed
  *                            in ihrer Richtung, je mit Schalter
  *
- * Gerechnet wird nichts: φ_eff, c_eff und γ' unter den Feldern des Bodens
- * kommen aus der Lösung, die Widerstände rechts ebenso.
+ * Gerechnet wird nichts: φ_eff, c_eff und γ' – undrainiert s_u,d – unter den
+ * Feldern des Bodens kommen aus der Lösung, die Widerstände rechts ebenso.
  *
  * WINKEL wie in Bild 9.2.15 des Kapitels: T zeigt zur Seite, auf der das
  * Gelände um β abfällt, und die Sohle steigt um α in Richtung von T an. Das
@@ -22,7 +22,9 @@
  * Zahl still um 10³ anders, als die Maske sagte.
  */
 
-import { erklaerung, feld, karte, namensfeld, panel, zahlzeile as feldzeile } from './bausteine.js';
+import {
+  erklaerung, feld, karte, namensfeld, panel, verhaltenSchalter, zahlzeile as feldzeile,
+} from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
@@ -32,8 +34,9 @@ const HILFE = {
   situation: {
     zeilen: [
       ['φ_eff', 'arctan(tan φ_k / γ_φ) nach SIA 267:2013, 5.3.2.1; γ_φ nach 5.3.2.2, Tabelle 1'],
-      ['c_eff', 'c_k / γ_c – mit φ = 0 rechnet c als undrainierte Scherfestigkeit s_u'],
-      ['Feinkörnig', 'kurzzeitig undrainiert, langfristig drainiert: je ein Grundbruch mit φ = 0 und c = s_u und einer mit φ und c (SIA 267:2013, 8.5.1.5, 8.5.1.6)'],
+      ['c_eff', 'c_k / γ_c – die Kohäsion nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)'],
+      ['s_u,d', 's_u,k / γ_cu, undrainiert; γ_cu nach SIA 267:2013, 5.3.2.2, Tabelle 1'],
+      ['Feinkörnig', 'kurzzeitig undrainiert, langfristig drainiert: je ein Grundbruch für beide (SIA 267:2013, 8.5.1.5, 8.5.1.6)'],
       ['γ', 'eine Raumlast über und unter dem Wasser; das Buch nimmt unter ihm die gesättigte (Kap. 1.4), mit der feuchten wird γ\' etwas kleiner, auf der sicheren Seite'],
       ['t, t₁', 'ab Oberkante Terrain: bis zur Sohle, bis zum höchsten Grundwasserspiegel'],
       ['α', 'Neigung der Sohle, positiv, wenn sie in Richtung von T ansteigt (Bild 9.2.15)'],
@@ -47,7 +50,7 @@ const HILFE = {
       ['N_Ed', 'normal zur Sohle, Druck positiv; das günstige Eigengewicht von Fundament und Hinterfüllung mit γ_G,inf = 1.0 (SIA 267:2013, 8.5.2.4)'],
       ['T_Ed', 'in der Sohle, zur Seite, auf der das Gelände abfällt'],
       ['Grundbruch', 'N_Ed ≤ N_Rd = σ_f · b · L'],
-      ['Gleiten', 'T_Ed ≤ T_Rd = N_Ed · tan δ_d, undrainiert b · L · c_eff (SIA 267:2013, 8.5.2.2)'],
+      ['Gleiten', 'T_Ed ≤ T_Rd = N_Ed · tan δ_d, undrainiert b · L · s_u,d (SIA 267:2013, 8.5.2.2)'],
     ],
     formel: 'δ_R = arctan(T_Ed / N_Ed)',
   },
@@ -68,7 +71,7 @@ function zahlzeile(g, schluessel, text, symbol, { schritt = 1, titel } = {}) {
 function bemessungswerte(g) {
   const ids = zustand.loesung?.zuordnung?.grundbrueche?.[g.kennung]?.werte;
   const werte = zustand.loesung?.werte || {};
-  const gerechnet = ['phi_eff', 'c_eff', 'gamma_auftrieb'].map((k) => werte[ids?.[k]]).filter(Boolean);
+  const gerechnet = ['phi_eff', 'c_eff', 's_u_d', 'gamma_auftrieb'].map((k) => werte[ids?.[k]]).filter(Boolean);
   if (!gerechnet.length) return null;
   const alt = Boolean(zustand.rechenfehler);
   return el(alt ? 'p.gb-bemessung.ist-ohne-wirkung' : 'p.gb-bemessung', {}, [
@@ -82,6 +85,9 @@ function bemessungswerte(g) {
 
 function situationPanel(g) {
   const aendern = (veraenderer) => eintragAendern(g.kennung, veraenderer);
+  // Drainiert Reibung und Kohäsion, undrainiert s_u: was nicht gilt, steht
+  // nicht da (Benutzer, 2026-11-19) -- bis dahin hiess φ = 0 undrainiert.
+  const drainiert = g.verhalten === 'drainiert';
   return panel({
     schluessel: 'grundbruch/Situation', titel: 'Grundbruch Situation',
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
@@ -92,16 +98,25 @@ function situationPanel(g) {
       })),
     ]),
     karte('Boden', [
-      zahlzeile(g, 'phi_k', 'Reibungswinkel', String.raw`\varphi_k`,
-        { titel: 'Reibungswinkel, charakteristisch' }),
-      zahlzeile(g, 'gamma_phi', 'Partialfaktor', String.raw`\gamma_{\varphi}`,
-        { schritt: 0.05, titel: 'Partialfaktor des Reibungswinkels, SIA 267:2013, 5.3.2.2' }),
-      zahlzeile(g, 'c_k', 'Kohäsion', 'c_k',
-        { titel: 'Kohäsion, charakteristisch – mit φ = 0 die undrainierte Scherfestigkeit; neben φ nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)' }),
-      zahlzeile(g, 'gamma_c', 'Partialfaktor', String.raw`\gamma_c`,
-        { schritt: 0.05, titel: 'Partialfaktor der Kohäsion, SIA 267:2013, 5.3.2.2, Tabelle 1 – auch für s_u' }),
+      feld('Verhalten', verhaltenSchalter(g.verhalten, (w) => aendern((x) => { x.verhalten = w; })), ''),
+      ...(drainiert ? [
+        zahlzeile(g, 'phi_k', 'Reibungswinkel', String.raw`\varphi_k`,
+          { titel: 'Reibungswinkel, charakteristisch' }),
+        zahlzeile(g, 'gamma_phi', 'Partialfaktor', String.raw`\gamma_{\varphi}`,
+          { schritt: 0.05, titel: 'Partialfaktor des Reibungswinkels, SIA 267:2013, 5.3.2.2' }),
+        zahlzeile(g, 'c_k', 'Kohäsion', 'c_k',
+          { titel: 'Kohäsion, charakteristisch – nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)' }),
+        zahlzeile(g, 'gamma_c', 'Partialfaktor', String.raw`\gamma_c`,
+          { schritt: 0.05, titel: 'Partialfaktor der Kohäsion, SIA 267:2013, 5.3.2.2, Tabelle 1' }),
+      ] : [
+        zahlzeile(g, 's_u', 'Scherfestigkeit', 's_{u,k}',
+          { schritt: 5, titel: 'Undrainierte Scherfestigkeit, charakteristisch' }),
+        zahlzeile(g, 'gamma_cu', 'Partialfaktor', String.raw`\gamma_{cu}`,
+          { schritt: 0.05, titel: 'Partialfaktor der undrainierten Scherfestigkeit, SIA 267:2013, 5.3.2.2, Tabelle 1' }),
+      ]),
       zahlzeile(g, 'gamma', 'Raumlast Boden', String.raw`\gamma`, { schritt: 0.5 }),
-      zahlzeile(g, 'gamma_w', 'Raumlast Wasser', String.raw`\gamma_w`, { schritt: 0.5 }),
+      // Das Wasser zählt nur über γ': undrainiert gelten totale Spannungen.
+      ...(drainiert ? [zahlzeile(g, 'gamma_w', 'Raumlast Wasser', String.raw`\gamma_w`, { schritt: 0.5 })] : []),
       bemessungswerte(g),
     ]),
     karte('Fundament', [
@@ -120,10 +135,11 @@ function situationPanel(g) {
       zahlzeile(g, 'q_Ed', 'Auflast neben dem Fundament', 'q_{Ed}',
         { titel: 'Nur eine dauernde, auf beiden Seiten mindestens über L_Gl (Kap. 9.2.5); sie wirkt günstig' }),
     ]),
-    karte('Sohlreibung', [
+    // Die Sohlreibung hängt am Reibungswinkel: undrainiert gilt sie nicht.
+    ...(drainiert ? [karte('Sohlreibung', [
       zahlzeile(g, 'delta_faktor', 'Reibung der Sohle', String.raw`\delta_k/\varphi_k`,
         { schritt: 0.05, titel: '1 bei rauer Sohle mit dem Bruch im Boden, ½ bis ⅔ bei glatter mit dem Bruch in der Fuge; δ_k höchstens 35° (SIA 267:2013, 8.4.1.1)' }),
-    ]),
+    ])] : []),
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [
         el('label', { text: 'Beschreibung' }),

@@ -1,5 +1,5 @@
 ---
-erzeugt: e845bb1b774d
+erzeugt: 404a22c4d180
 art: formel
 tags: [formel]
 normstelle: ["Kap. 9.2.14", "Kap. 9.2.17"]
@@ -16,7 +16,7 @@ $$
 *In der Herleitung: «Lastneigungsfaktor, undrainiert»*
 
 $$
-i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{c_{eff} \cdot b \cdot L}}
+i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{s_{u,d} \cdot b \cdot L}}
 $$
 
 ## Grössen
@@ -26,7 +26,7 @@ $$
 | $i_q$ | Lastneigungsfaktor der seitlichen Auflast | – | [[Lastneigungsfaktor i_q]] |
 | $N_q$ | Tragfähigkeitsfaktor der seitlichen Auflast | – | [[Tragfähigkeitsfaktor N_q]] |
 | $T_{Ed}$ | Einwirkung in der Sohle | kN | Zwischenwert |
-| $c_{eff}$ | Kohäsion, Bemessungswert | kPa | [[Bemessungswert der Kohäsion]] |
+| $s_{u,d}$ | Undrainierte Scherfestigkeit, Bemessungswert | kPa | [[Bemessungswert der undrainierten Scherfestigkeit]] |
 | $b$ | Breite des Fundaments | m | Vorgabe |
 | $L$ | Länge des Fundaments | m | Vorgabe |
 
@@ -41,7 +41,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{c_{eff} \cdot b \cdot L}} = 0.5 - \frac{1}{2} \sqrt{1 - \frac{40\,\mathrm{kN}}{26.7\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 2\,\mathrm{m}}} = 0.15
+i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{s_{u,d} \cdot b \cdot L}} = 0.5 - \frac{1}{2} \sqrt{1 - \frac{40\,\mathrm{kN}}{26.7\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 2\,\mathrm{m}}} = 0.15
 $$
 
 ## Gebraucht von

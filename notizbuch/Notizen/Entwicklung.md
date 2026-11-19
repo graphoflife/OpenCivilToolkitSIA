@@ -7,6 +7,34 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Grundbruch: drainiert oder undrainiert als Schalter
+
+Entscheid des Benutzers. Bis dahin hiess im Grundbruch φ = 0 undrainiert,
+und die Kohäsion c galt dann als s_u; im Pfahl wählt ein Schalter, je
+Schicht. Jetzt hat der Grundbruch denselben Schalter im Kasten «Boden»:
+«drainiert» zeigt φ_k, γ_φ, c_k, γ_c und die Sohlreibung, «undrainiert»
+s_u,k und γ_cu. Beispiel: der Seeton der Beispiele hiess φ_k = 0,
+c_k = 40 kPa, jetzt «undrainiert», s_u,k = 40 kPa. Herleitung und Bericht
+zeigen dann s_u,k, γ_cu und s_u,d = s_u,k / γ_cu statt φ_k, c_k und c_eff;
+die Zahlen bleiben dieselben.
+
+γ_cu ist neu: SIA 267:2013, 5.3.2.2, Tabelle 1, führt für die undrainierte
+Scherfestigkeit einen eigenen Partialfaktor, 1.5 wie γ_c; bis dahin galt
+γ_c auch für s_u. Drainiert verlangt φ_k über null, undrainiert s_u,k über
+null, wie beim Pfahl. Was nicht gilt, steht weder in der Maske noch in der
+Herleitung; die Zahlen bleiben gespeichert und stehen nach dem
+Zurückschalten wieder da. Das gilt auch für γ_w: es wirkt nur über γ', und
+undrainiert gelten totale Spannungen – darum hält dort auch γ ≤ γ_w die
+Rechnung nicht mehr an. Unter dem Bild heisst es «Undrainiert: kein
+Gleitkörper gezeichnet.», ohne das φ = 0 von früher.
+
+`Verhalten` steht jetzt in `opencivil/geotechnik/verhalten.py`, unter
+Pfahl und Grundbruch; der Katalog führt die Stellungen unter `verhalten`,
+und beide Fenster bauen den Schalter mit `verhaltenSchalter`
+(bausteine.js). Die Erklärungen der Stellungen nennen keine Zeichen mehr:
+der Pfahl schreibt φ'_k, der Grundbruch φ_k. Die Typen `Drainiert(φ, c)`
+und `Undrainiert(s_u)` aus dem Umbauvorschlag bleiben offen.
+
 ## 2026-11-19 · Bügel und Längsbewehrung in einem Zug
 
 Entscheid des Benutzers. Mit «Bügel mitsuchen» suchte die Platte erst die

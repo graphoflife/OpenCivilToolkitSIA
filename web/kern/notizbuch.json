@@ -561,6 +561,17 @@
       ]
     },
     {
+      "name": "Bemessungswert der undrainierten Scherfestigkeit",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der undrainierten Scherfestigkeit.md",
+      "art": "formel",
+      "zeichen": [
+        "s_{u,d}"
+      ],
+      "themen": [
+        "Fundament"
+      ]
+    },
+    {
       "name": "Bemessungswert des äusseren Widerstands",
       "pfad": "Formelsammlung/Formeln/Bemessungswert des äusseren Widerstands.md",
       "art": "formel",
@@ -5027,6 +5038,17 @@
       ]
     },
     {
+      "name": "opencivil.geotechnik.verhalten",
+      "pfad": "Python/opencivil.geotechnik.verhalten.md",
+      "art": "modul",
+      "kurz": "wie ein Boden traegt.",
+      "stichworte": [
+        "Verhalten",
+        "Verhalten.beschriftung",
+        "Verhalten.erklaerung"
+      ]
+    },
+    {
       "name": "opencivil.konsole",
       "pfad": "Python/opencivil.konsole.md",
       "art": "modul",
@@ -6026,9 +6048,6 @@
       "art": "modul",
       "kurz": "der Baugrund um einen Pfahl.",
       "stichworte": [
-        "Verhalten",
-        "Verhalten.beschriftung",
-        "Verhalten.erklaerung",
         "Mantel",
         "Mantel.beschriftung",
         "Mantel.erklaerung",

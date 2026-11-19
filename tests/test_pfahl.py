@@ -354,8 +354,11 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
                          [("berechnung", 0.7, False), ("erfahrung", 0.9, False),
                           ("dynamisch", 0.9, True), ("statisch", 1.0, True)])
         # Auf dem Knopf ein Wort, die Erklärung darüber.
-        for liste in ("arten", "spitzen", "abscheren", "tragglieder", "verhalten", "mantel"):
-            for w in k["pfahl"][liste]:
+        # Das Verhalten teilt der Pfahl mit dem Grundbruch (2026-11-19).
+        listen = {liste: k["pfahl"][liste]
+                  for liste in ("arten", "spitzen", "abscheren", "tragglieder", "mantel")}
+        for liste, werte in {**listen, "verhalten": k["verhalten"]}.items():
+            for w in werte:
                 with self.subTest(liste=liste, wert=w["wert"]):
                     self.assertLessEqual(len(w["beschriftung"]), 12)
                     self.assertGreater(len(w["titel"]), len(w["beschriftung"]))

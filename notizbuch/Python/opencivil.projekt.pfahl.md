@@ -1,5 +1,5 @@
 ---
-erzeugt: 28c2e7e1b610
+erzeugt: ca2dc5b92b7d
 art: modul
 tags: [modul]
 ---
@@ -233,6 +233,7 @@ Das Tragglied muss nach der Abrostung noch Stahl haben und im Verpresskörper li
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.geotechnik.verhalten]]
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.eintraege]]

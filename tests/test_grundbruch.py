@@ -22,9 +22,12 @@ from tests.unfertig import meldung
 
 
 def rechnen(kombinationen=(("K", 1000.0, 0.0),), **felder):
-    """Ein Fundament mit gamma_phi = 1, wo nicht anders gesagt: phi_eff ist dann phi_k."""
+    """
+    Ein Fundament mit Partialfaktoren 1, wo nicht anders gesagt: phi_eff ist
+    dann phi_k, s_u,d ist s_u,k.
+    """
     p = Projekt(name="Probe")
-    g = p.grundbruch("F", **{"gamma_phi": 1.0, "gamma_c": 1.0, **felder})
+    g = p.grundbruch("F", **{"gamma_phi": 1.0, "gamma_c": 1.0, "gamma_cu": 1.0, **felder})
     for name, N, T in kombinationen:
         g.kombination(name, N_Ed=N, T_Ed=T)
     aufbau = p.aufbauen()
@@ -261,12 +264,41 @@ class TestLastneigung(unittest.TestCase):
 
 
 class TestUndrainiert(unittest.TestCase):
-    """Kap. 9.2.17: phi = 0, c = s_u, die Korrekturen als Summanden."""
+    """Kap. 9.2.17: undrainiert mit s_u, die Korrekturen als Summanden."""
+
+    def test_der_schalter_waehlt_die_festigkeit(self):
+        """
+        Drainiert φ_k und c_k, undrainiert s_u,k und γ_cu – was nicht gilt,
+        steht nicht in der Herleitung, auch γ_w nicht: es wirkt nur über γ'.
+        Bis 2026-11-19 hiess φ = 0 undrainiert, und c galt dann als s_u
+        (Benutzer: ein Schalter wie beim Pfahl).
+        """
+        drainiert = {"phi_k", "gamma_phi", "c_k", "gamma_c", "phi_eff", "c_eff",
+                     "gamma_w", "gamma_auftrieb", "delta_faktor"}
+        undrainiert = {"s_u", "gamma_cu", "s_u_d"}
+        for verhalten, da, weg in (("drainiert", drainiert, undrainiert),
+                                   ("undrainiert", undrainiert, drainiert)):
+            aufbau, _, befund = rechnen(verhalten=verhalten, phi_k=30.0, s_u=40.0)
+            namen = set(aufbau.grundbrueche["g1"].definitionen)
+            with self.subTest(verhalten=verhalten):
+                self.assertEqual(befund.undrainiert, verhalten == "undrainiert")
+                self.assertLessEqual(da, namen)
+                self.assertFalse(weg & namen)
+
+    def test_undrainiert_haelt_das_wasser_nicht_an(self):
+        """
+        γ ≤ γ_w hiesse ein γ' unter null -- undrainiert gibt es keines, und das
+        Feld γ_w ist ausgeblendet: es hält die Rechnung nicht an.
+        """
+        aufbau, _, befund = rechnen(verhalten="undrainiert", s_u=40.0, gamma=10.0,
+                                    gamma_w=10.0)
+        self.assertEqual(dict(aufbau.unfertige), {})
+        self.assertTrue(befund.undrainiert)
 
     def test_flach_eingebunden(self):
         s_u, b, L, t, T = 40.0, 2.0, 4.0, 1.0, 100.0
-        _, _, befund = rechnen(phi_k=0.0, c_k=s_u, b=b, L=L, t=t, beta=10.0, alpha=5.0,
-                               q_Ed=3.0, kombinationen=(("K", 600.0, T),))
+        _, _, befund = rechnen(verhalten="undrainiert", s_u=s_u, b=b, L=L, t=t, beta=10.0,
+                               alpha=5.0, q_Ed=3.0, kombinationen=(("K", 600.0, T),))
         self.assertTrue(befund.undrainiert)
         self.assertEqual(set(befund.spalten), {"c"})
         c = befund.spalten["c"]
@@ -283,11 +315,11 @@ class TestUndrainiert(unittest.TestCase):
         self.assertAlmostEqual(fall.N_Rd / 1e3, sigma_f * b * L, places=6)
 
     def test_tief_eingebunden(self):
-        c = rechnen(phi_k=0.0, c_k=50.0, b=1.0, L=1.0, t=2.0)[2].spalten["c"]
+        c = rechnen(verhalten="undrainiert", s_u=50.0, b=1.0, L=1.0, t=2.0)[2].spalten["c"]
         self.assertAlmostEqual(c.d, 0.007 * math.degrees(math.atan(2.0)))
 
     def test_zu_schraeg_gibt_keinen_widerstand(self):
-        _, loesung, befund = rechnen(phi_k=0.0, c_k=20.0, b=1.0, L=1.0,
+        _, loesung, befund = rechnen(verhalten="undrainiert", s_u=20.0, b=1.0, L=1.0,
                                      kombinationen=(("K", 100.0, 25.0),))
         fall = befund.ergebnisse[0]
         self.assertIsNone(fall.i["c"])
@@ -326,9 +358,13 @@ class TestGleiten(unittest.TestCase):
         self.assertEqual(urteil.erfuellungsgrad.si, math.inf)
 
     def test_undrainiert_aus_der_scherfestigkeit(self):
-        """Undrainiert trägt die Sohlfläche mit c_u,d: T_Rd = b · L · c_eff (8.5.2.2, (32))."""
-        _, loesung, _ = rechnen(phi_k=0.0, c_k=50.0, gamma_c=1.5, b=2.0, L=3.0,
-                                kombinationen=(("K", 300.0, 10.0),))
+        """
+        Undrainiert trägt die Sohlfläche mit s_u,d = s_u,k / γ_cu: T_Rd = b · L ·
+        s_u,d (8.5.2.2, (32)). γ_cu nach 5.3.2.2, Tabelle 1 -- γ_c, hier 1, gilt
+        dafür nicht mehr.
+        """
+        _, loesung, _ = rechnen(verhalten="undrainiert", s_u=50.0, gamma_cu=1.5, b=2.0,
+                                L=3.0, kombinationen=(("K", 300.0, 10.0),))
         urteil = next(u for u in loesung.urteile if u.art == "GL")
         self.assertAlmostEqual(urteil.widerstand.groesse.si, 2.0 * 3.0 * 50e3 / 1.5, delta=1e-6)
         self.assertTrue(urteil.erfuellt)
@@ -465,7 +501,8 @@ class TestEintrag(unittest.TestCase):
             "φ_k": {"phi_k": 90.0},
             "α": {"alpha": -1.0},
             "β": {"beta": 95.0},
-            "nur die Kohäsion": {"phi_k": 0.0, "c_k": 0.0},
+            "drainiert braucht φ_k über null; ohne Reibung undrainiert rechnen": {"phi_k": 0.0},
+            "undrainiert braucht s_u,k über null": {"verhalten": "undrainiert", "s_u": 0.0},
             "Tiefe t": {"t": -0.5},
             "δ_k/φ_k": {"delta_faktor": 0.0},
         }
@@ -516,8 +553,10 @@ class TestZusammenfassung(unittest.TestCase):
         self.assertEqual(len(nachweistabelle(bauteil).zeilen), 4)
 
     def test_undrainiert_nur_die_kohaesion(self):
-        aufbau, loesung, _ = rechnen(phi_k=0.0, c_k=40.0)
-        _, tabelle = angaben(aufbau, "g1", loesung)
+        aufbau, loesung, _ = rechnen(verhalten="undrainiert", s_u=40.0)
+        kopf, tabelle = angaben(aufbau, "g1", loesung)
+        self.assertIn("s_{u,d}", kopf.latex)
+        self.assertNotIn(r"\varphi", kopf.latex)
         for zeile in tabelle.zeilen:
             self.assertEqual(zeile[2:], ["–", "–", "–", "–"])
 

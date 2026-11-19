@@ -34,7 +34,8 @@ from dataclasses import dataclass, field
 from typing import Any, List
 
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KNM, KPA, M, MM, MN_PRO_M2
-from opencivil.pfahl.boden import Mantel, Verhalten
+from opencivil.geotechnik.verhalten import Verhalten
+from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import (
     ETA_I_HOECHSTENS, Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied, quer_belastet,
 )

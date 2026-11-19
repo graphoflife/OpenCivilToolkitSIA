@@ -13,6 +13,10 @@ delta_k/phi_k = 1 ist dazugekommen, damit sich T_Rd rechnen laesst: SIA
 267:2013, 8.4.1.1, nennt 1 fuer eine raue Sohle mit dem Bruch im Boden und
 1/2 bis 2/3 fuer eine glatte mit dem Bruch in der Fuge; das Buch etwa 2/3
 bis 1 (Kap. 9.2.18).
+
+Am 2026-11-19 der Schalter drainiert/undrainiert, wie beim Pfahl (Benutzer):
+undrainiert mit s_u = 50 kPa, der Vorgabe des Pfahls, und gamma_cu = 1.5
+nach SIA 267:2013, 5.3.2.2, Tabelle 1.
 """
 
 from __future__ import annotations
@@ -21,6 +25,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KPA, M
+from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import ProjektFehler, bereich
@@ -47,21 +52,36 @@ class GrundbruchEintrag(BauteilEintrag):
     kennung: str
     name: str
 
+    verhalten: Verhalten = Verhalten.DRAINIERT
+    """
+    Womit der Boden trägt: drainiert mit phi_k und c_k, undrainiert mit
+    s_u -- derselbe Schalter wie beim Pfahl (Benutzer, 2026-11-19). Bis
+    dahin hiess phi = 0 undrainiert, und c galt dann als s_u.
+    """
+
     phi_k: float = bereich(30.0, heisst="φ_k", einheit=GRAD, ab=0.0, unter=90.0)
-    """Reibungswinkel, charakteristisch, in Grad."""
+    """Reibungswinkel, charakteristisch, in Grad -- drainiert."""
 
     gamma_phi: float = bereich(1.2, heisst="Partialfaktor γ_φ", ueber=0.0)
     """Partialfaktor des Reibungswinkels -- SIA 267:2013, 5.3.2.2."""
 
     c_k: float = bereich(0.0, heisst="Kohäsion c", einheit=KPA, ab=0.0)
     """
-    Kohäsion, charakteristisch, in kPa -- mit phi = 0 die undrainierte
-    Scherfestigkeit. Neben phi nur, wo sie dauerhaft wirkt (SIA 267:2013,
-    8.5.1.6).
+    Kohäsion, charakteristisch, in kPa -- drainiert, und nur, wo sie
+    dauerhaft wirkt (SIA 267:2013, 8.5.1.6).
     """
 
     gamma_c: float = bereich(1.5, heisst="Partialfaktor γ_c", ueber=0.0)
     """Partialfaktor der Kohäsion."""
+
+    s_u: float = bereich(50.0, heisst="s_u,k", einheit=KPA, ab=0.0)
+    """Undrainierte Scherfestigkeit, charakteristisch, in kPa -- undrainiert."""
+
+    gamma_cu: float = bereich(1.5, heisst="Partialfaktor γ_cu", ueber=0.0)
+    """
+    Partialfaktor der undrainierten Scherfestigkeit -- SIA 267:2013, 5.3.2.2,
+    Tabelle 1. Bis 2026-11-19 galt dafür gamma_c, mit demselben Wert.
+    """
 
     gamma: float = bereich(21.0, heisst="Raumlast γ", einheit=KN_PRO_M3, ueber=0.0)
     """
@@ -72,7 +92,10 @@ class GrundbruchEintrag(BauteilEintrag):
     """
 
     gamma_w: float = bereich(10.0, heisst="γ_w", einheit=KN_PRO_M3, ab=0.0)
-    """Raumlast des Wassers in kN/m³."""
+    """
+    Raumlast des Wassers in kN/m³ -- nur drainiert, fuer gamma': undrainiert
+    gelten totale Spannungen, das Wasser wirkt dort nicht.
+    """
 
     q_Ed: float = bereich(0.0, heisst="Auflast q_Ed", einheit=KPA, ab=0.0)
     """
@@ -139,12 +162,15 @@ class GrundbruchEintrag(BauteilEintrag):
             raise ProjektFehler(
                 f"{wo}: b ist die kürzere Seite des Fundaments – die Länge L = {self.L:g} m "
                 f"muss mindestens so gross sein wie die Breite b = {self.b:g} m.")
-        if self.gamma <= self.gamma_w:
+        # Nur drainiert: undrainiert gibt es kein gamma', und gamma_w ist ausgeblendet.
+        if self.verhalten is Verhalten.DRAINIERT and self.gamma <= self.gamma_w:
             raise ProjektFehler(
                 f"{wo}: die Raumlast des Bodens γ = {self.gamma:g} kN/m³ muss grösser sein "
                 f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ – sonst ist γ' nicht "
                 f"positiv.")
-        if self.phi_k == 0.0 and self.c_k <= 0.0:
-            raise ProjektFehler(
-                f"{wo}: mit φ = 0 trägt nur die Kohäsion (undrainiert, c = s_u) – sie muss "
-                f"grösser als null sein.")
+        # Wie beim Pfahl, je Schicht (``PfahlEintrag._festigkeiten``).
+        if self.verhalten is Verhalten.DRAINIERT and self.phi_k <= 0.0:
+            raise ProjektFehler(f"{wo}: drainiert braucht φ_k über null; ohne Reibung "
+                                f"undrainiert rechnen, mit s_u,k.")
+        if self.verhalten is Verhalten.UNDRAINIERT and self.s_u <= 0.0:
+            raise ProjektFehler(f"{wo}: undrainiert braucht s_u,k über null.")

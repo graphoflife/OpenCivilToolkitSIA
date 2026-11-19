@@ -70,7 +70,8 @@ from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.geotechnik.setzung import Steifigkeit
-from opencivil.pfahl.boden import Mantel, Verhalten
+from opencivil.geotechnik.verhalten import Verhalten
+from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
 from opencivil.web import balkendaten, diagrammdaten, durchstanzdaten, systemkatalog
 from opencivil.web.anzeige import zelle_dict
@@ -222,6 +223,9 @@ def katalog() -> dict:
             "steifigkeiten": [{"wert": s.value, "beschriftung": s.beschriftung}
                               for s in Steifigkeit],
         },
+        # Wie ein Boden trägt -- der Schalter, den Pfahl und Grundbruch teilen.
+        "verhalten": [{"wert": w.value, "beschriftung": w.beschriftung, "titel": w.erklaerung}
+                      for w in Verhalten],
         # Die Wahlen eines Pfahls -- je ein Schalter, das Wort auf dem Knopf,
         # die Erklärung darüber --, bei der Grundlage dazu der Grenzwert von
         # eta_a und wo er steht.
@@ -230,8 +234,7 @@ def katalog() -> dict:
                       for w in wahl]
                for name, wahl in (("arten", Pfahlart), ("spitzen", Spitze),
                                   ("abscheren", Abscheren), ("tragglieder", Tragglied),
-                                  ("verhalten", Verhalten), ("mantel", Mantel),
-                                  ("koepfe", Kopf))},
+                                  ("mantel", Mantel), ("koepfe", Kopf))},
             "grundlagen": [{"wert": g.value, "beschriftung": g.beschriftung,
                             "titel": g.erklaerung, "grenze": g.eta_grenze,
                             "referenz": g.referenz, "versuch": g.aus_versuch}

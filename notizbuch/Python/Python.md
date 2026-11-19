@@ -1,5 +1,5 @@
 ---
-erzeugt: bfa5ab8c2e37
+erzeugt: eff87a4c6fdc
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -57,6 +57,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
     - [[opencivil.geotechnik.grundbruch]] – Grundbruch und Gleiten eines Flachfundaments.
     - [[opencivil.geotechnik.setzung]] – die Setzung eines Flachfundaments auf geschichtetem Baugrund.
+    - [[opencivil.geotechnik.verhalten]] – wie ein Boden traegt.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».
     - [[opencivil.konsole.dienst]] – die Konsole als Dienst für ihren Faden.
     - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.

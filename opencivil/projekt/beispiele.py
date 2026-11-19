@@ -365,11 +365,12 @@ def _grundbrueche(p: Projekt) -> None:
         "Tragsicherheit", N_Ed=1200.0, T_Ed=100.0)
     p.grundbruch("Kai", phi_k=28.0, c_k=3.0, b=2.0, L=20.0, t=1.5, t1=1.5).kombination(
         "Tragsicherheit", N_Ed=2000.0, T_Ed=80.0)
-    seeton = p.grundbruch("Seeton", phi_k=0.0, c_k=40.0, b=1.5, L=2.0, t=0.8,
-                          alpha=4.0, beta=10.0)
+    seeton = p.grundbruch("Seeton", verhalten="undrainiert", s_u=40.0, b=1.5, L=2.0,
+                          t=0.8, alpha=4.0, beta=10.0)
     seeton.kombination("Normal", N_Ed=300.0, T_Ed=40.0)
     seeton.kombination("Zu schräg", N_Ed=300.0, T_Ed=200.0)
-    p.grundbruch("Schacht", phi_k=0.0, c_k=60.0, b=1.2, L=1.2, t=2.0).kombination(
+    p.grundbruch("Schacht", verhalten="undrainiert", s_u=60.0, b=1.2, L=1.2,
+                 t=2.0).kombination(
         "Tragsicherheit", N_Ed=900.0, T_Ed=30.0)
 
 

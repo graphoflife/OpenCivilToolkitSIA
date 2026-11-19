@@ -1,24 +1,26 @@
 ---
-erzeugt: 0a4f419f22c0
+erzeugt: 1e6244e23ff7
 art: thema
 tags: [thema]
 ---
 > [!abstract] Grundbruch
-> 3 Formeln, in der Folge, in der gerechnet wird.
+> 4 Formeln, in der Folge, in der gerechnet wird.
 
 ## Formeln
 
 1. [[Bemessungswert des Reibungswinkels]]
 2. [[Bemessungswert der Kohäsion]]
 3. [[Raumlast unter Auftrieb]]
+4. [[Bemessungswert der undrainierten Scherfestigkeit]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
 ## Theorie
 
 Das Fundament mit seinem Baugrund: Boden, Masse, Gelände und Grundwasser,
-und was aus ihnen folgt, bevor ein Nachweis rechnet -- die Bemessungswerte
-$\varphi_{eff}$ und $c_{eff}$ und die Raumlast unter Auftrieb $\gamma'$.
+und was aus ihnen folgt, bevor ein Nachweis rechnet -- drainiert die
+Bemessungswerte $\varphi_{eff}$ und $c_{eff}$ und die Raumlast unter Auftrieb
+$\gamma'$, undrainiert allein $s_{u,d}$.
 
 Die Sicherheit steckt in den Partialfaktoren des Bodens (SIA 267:2013,
 Tabelle 1); $N_{Ed}$ und $T_{Ed}$ sind schon Bemessungswerte, ein günstiges

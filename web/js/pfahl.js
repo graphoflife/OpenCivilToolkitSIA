@@ -23,8 +23,8 @@
  */
 
 import {
-  erklaerung, feld, karte, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
-  zahlzeile as feldzeile,
+  erklaerung, feld, karte, materialliste, namensfeld, panel, verhaltenSchalter, wahlBlock,
+  wahlSchalter, zahlzeile as feldzeile,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
@@ -254,8 +254,7 @@ function schichtKarte(t, i) {
     })),
     zahl('d', 'Dicke', 'd', { schritt: 0.5 }),
     zahl('gamma', 'Raumlast', String.raw`\gamma`, { schritt: 0.5 }),
-    feld('Verhalten', schalter(s.verhalten, 'verhalten', (w) => aendern((x) => { x.verhalten = w; }),
-      'Drainiert mit wirksamen Spannungen, undrainiert mit s_u,k'), ''),
+    feld('Verhalten', verhaltenSchalter(s.verhalten, (w) => aendern((x) => { x.verhalten = w; })), ''),
     ...(drainiert
       ? [zahl('phi_k', 'Reibungswinkel', String.raw`\varphi'_k`),
         zahl('c_k', 'Kohäsion', "c'_k", { titel: 'Zählt am Fuss und im Erdwiderstand quer' })]

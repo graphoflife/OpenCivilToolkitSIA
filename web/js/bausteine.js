@@ -272,6 +272,18 @@ export function wahlSchalter({ werte, gewaehlt, setzen, titel = '', klasse = '' 
 }
 
 /**
+ * Wie der Boden trägt, drainiert oder undrainiert -- derselbe Schalter im
+ * Pfahl und im Grundbruch (Benutzer, 2026-11-19). Die Stellungen und was sie
+ * heissen, kommen aus dem Kern (`katalog.verhalten`).
+ */
+export function verhaltenSchalter(gewaehlt, setzen) {
+  return wahlSchalter({
+    werte: katalog('verhalten'), gewaehlt, setzen,
+    titel: 'Drainiert mit wirksamen Spannungen, undrainiert mit totalen',
+  });
+}
+
+/**
  * Eine Gruppe einer Liste, die auf- und zuklappt -- zu Beginn zu (Benutzer,
  * 2026-10-24). `offen` merkt sich die Titel der aufgeklappten; das ist
  * Ansichtssache, nicht Teil des Projekts. `klasse` gibt die Namen: die

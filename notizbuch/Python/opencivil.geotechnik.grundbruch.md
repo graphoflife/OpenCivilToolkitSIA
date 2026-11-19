@@ -1,5 +1,5 @@
 ---
-erzeugt: 944ba854c8d0
+erzeugt: 8d29a7a1501b
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,7 @@ Einwirkungskombination zwei Nachweise:
             + 1/2 gamma b N_gamma s_gamma d_gamma i_gamma g_gamma b_gamma
     N_Rd    = sigma_f · b · L
 
-und für phi = 0, undrainiert (Kap. 9.2.17)::
+und undrainiert, mit s_u (Kap. 9.2.17)::
 
     sigma_f = 5.1 s_u (1 + s_c + d_c - i_c - b_c - g_c) + (gamma t + q)
 ```
@@ -30,10 +30,11 @@ und für phi = 0, undrainiert (Kap. 9.2.17)::
 * [[opencivil.geotechnik.grundbruch#Gleiten|Gleiten]] -- der Gleitwiderstand in der Sohle nach SIA 267:2013,
   8.5.2.2: drainiert T_Rd = N_Ed · tan delta_d, mit delta_k = min(k_delta ·
   phi_k; 35°) nach 8.4.1.1 und tan delta_d = tan delta_k / gamma_phi;
-  undrainiert T_Rd = b · L · c_eff, Gl. (32).
+  undrainiert T_Rd = b · L · s_u,d, Gl. (32).
 
 Gerechnet wird mit Bemessungswerten: phi_eff = arctan(tan phi_k / gamma_phi)
-und c_eff = c_k / gamma_c (SIA 267:2013, 5.3.2.1). Ein globaler
+und c_eff = c_k / gamma_c, undrainiert s_u,d = s_u,k / gamma_cu (SIA
+267:2013, 5.3.2.1, 5.3.2.2). Ein globaler
 Sicherheitsgrad wie F_stat des Buches kommt nicht dazu; den
 Widerstandsbeiwert gamma_R der Norm (8.5.2.1) setzt die Rechnung 1.0
 (notizbuch/Notizen/TODO.md).
@@ -101,17 +102,21 @@ class Fundament(Rechenobjekt)
 ```
 
 Ein Flachfundament auf seinem Baugrund: die Eingaben als Vorgaben im
-Rechenwerk, dazu phi_eff, c_eff und gamma'.
+Rechenwerk, dazu die Bemessungswerte -- drainiert phi_eff, c_eff und
+gamma', undrainiert s_u,d.
 
 `b` ist die Breite, die kürzere Seite, `L` die Länge; ein
 Streifenfundament ist ein sehr langes.
 
 - `WAS = 'Grundbruch'`
 - `name: str`
+- `verhalten: Verhalten`
 - `phi_k: Groesse`
 - `gamma_phi: Groesse`
 - `c_k: Groesse`
 - `gamma_c: Groesse`
+- `s_u: Groesse`
+- `gamma_cu: Groesse`
 - `gamma: Groesse`
 - `gamma_w: Groesse`
 - `q_Ed: Groesse`
@@ -350,6 +355,7 @@ die Spalte der Kohäsion.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
+- [[opencivil.geotechnik.verhalten]]
 
 ## Gebraucht von
 
@@ -363,6 +369,7 @@ die Spalte der Kohäsion.
 
 - [[Abstand des Grundwassers unter der Sohle]] · `Grundbruch._grundwasser`
 - [[Bemessungswert der Kohäsion]] · `_c_eff`
+- [[Bemessungswert der undrainierten Scherfestigkeit]] · `_s_u_d`
 - [[Bemessungswert des Reibungswinkels]] · `_phi_eff`
 - [[Bemessungswert des Sohlreibungswinkels]] · `Gleiten._sohlreibung`
 - [[Bruchspannung in der Sohle]] · `Grundbruch._drainierter_fall`

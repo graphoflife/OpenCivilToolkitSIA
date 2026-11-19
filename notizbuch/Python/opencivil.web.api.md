@@ -1,5 +1,5 @@
 ---
-erzeugt: 6de398b6078f
+erzeugt: 29c9acde86c9
 art: modul
 tags: [modul]
 ---
@@ -181,6 +181,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.schnitt]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.geotechnik.verhalten]]
 - [[opencivil.material.arten]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]

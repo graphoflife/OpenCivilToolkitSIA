@@ -94,8 +94,8 @@ def _legende(fundament: grundbruch.Fundament, befund: Optional[grundbruch.Grundb
             " unter der Sohle, ", zahlformel("L_{Gl}", befund.L_gl, M, 2), " neben ihr",
             *((" – gezeichnet für ", Mathe(r"\alpha = \beta = 0")) if geneigt else ())))
     elif befund is not None and befund.undrainiert:
-        zeilen.append(zeile("Undrainiert, ", Mathe(r"\varphi = 0"),
-                            ": kein Gleitkörper gezeichnet."))
+        # Ohne phi = 0: das Feld phi_k ist ausgeblendet, kann aber 32° halten.
+        zeilen.append(zeile("Undrainiert: kein Gleitkörper gezeichnet."))
     zeilen.append(zeile("Länge des Fundaments ", zahlformel("L", fundament.L.si, M, 2),
                         ", senkrecht zum Bild."))
     return zeilen

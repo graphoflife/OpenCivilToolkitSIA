@@ -57,6 +57,8 @@ die Sohlneigung. Die Zusammenfassung zeigt sie als Tabelle.
 
 Je Kombination folgen die [[Bruchspannung in der Sohle]] und daraus
 $N_{Rd} = \sigma_f \cdot b \cdot L$. Das Grundwasser (Bild 9.2.10) mindert
-die Auflast und das Gewicht des Gleitkörpers, wo es über ihnen steht. Für
-$\varphi = 0$ gilt die eigene
-[[Tragfähigkeitsformel undrainiert|undrainierte Formel]].
+die Auflast und das Gewicht des Gleitkörpers, wo es über ihnen steht.
+Undrainiert gilt die eigene
+[[Tragfähigkeitsformel undrainiert|undrainierte Formel]], mit der
+[[Bemessungswert der undrainierten Scherfestigkeit|undrainierten Scherfestigkeit]]
+statt Reibung und Kohäsion.

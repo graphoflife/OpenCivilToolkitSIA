@@ -33,8 +33,9 @@ def bauen(art: "Bauteilart", eintrag: GrundbruchEintrag, aufbau: Aufbau) -> Baut
     """
     g = partial(als_groesse, eintrag)
     fundament = Fundament(
-        name=eintrag.name,
+        name=eintrag.name, verhalten=eintrag.verhalten,
         phi_k=g("phi_k"), gamma_phi=g("gamma_phi"), c_k=g("c_k"), gamma_c=g("gamma_c"),
+        s_u=g("s_u"), gamma_cu=g("gamma_cu"),
         gamma=g("gamma"), gamma_w=g("gamma_w"), q_Ed=g("q_Ed"), b=g("b"), L=g("L"),
         t1=g("t1"), t=g("t"), alpha=g("alpha"), beta=g("beta"),
         delta_faktor=g("delta_faktor"),

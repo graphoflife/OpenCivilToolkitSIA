@@ -14,17 +14,18 @@ Einwirkungskombination zwei Nachweise:
               + 1/2 gamma b N_gamma s_gamma d_gamma i_gamma g_gamma b_gamma
       N_Rd    = sigma_f · b · L
 
-  und für phi = 0, undrainiert (Kap. 9.2.17)::
+  und undrainiert, mit s_u (Kap. 9.2.17)::
 
       sigma_f = 5.1 s_u (1 + s_c + d_c - i_c - b_c - g_c) + (gamma t + q)
 
 * :class:`Gleiten` -- der Gleitwiderstand in der Sohle nach SIA 267:2013,
   8.5.2.2: drainiert T_Rd = N_Ed · tan delta_d, mit delta_k = min(k_delta ·
   phi_k; 35°) nach 8.4.1.1 und tan delta_d = tan delta_k / gamma_phi;
-  undrainiert T_Rd = b · L · c_eff, Gl. (32).
+  undrainiert T_Rd = b · L · s_u,d, Gl. (32).
 
 Gerechnet wird mit Bemessungswerten: phi_eff = arctan(tan phi_k / gamma_phi)
-und c_eff = c_k / gamma_c (SIA 267:2013, 5.3.2.1). Ein globaler
+und c_eff = c_k / gamma_c, undrainiert s_u,d = s_u,k / gamma_cu (SIA
+267:2013, 5.3.2.1, 5.3.2.2). Ein globaler
 Sicherheitsgrad wie F_stat des Buches kommt nicht dazu; den
 Widerstandsbeiwert gamma_R der Norm (8.5.2.1) setzt die Rechnung 1.0
 (notizbuch/Notizen/TODO.md).
@@ -76,6 +77,7 @@ from opencivil.core.protokoll import (
 )
 from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.geotechnik.verhalten import Verhalten
 
 #: Der Beiwert der undrainierten Tragfähigkeitsformel, Kap. 9.2.17 -- 5.1,
 #: wie das Kapitel ihn schreibt (pi + 2 = 5.14 gerundet).
@@ -143,7 +145,8 @@ def tragfaehigkeitsfaktoren(p: Protokoll, werte: Zwischenwerte, phi: Wert) -> Tu
 class Fundament(Rechenobjekt):
     """
     Ein Flachfundament auf seinem Baugrund: die Eingaben als Vorgaben im
-    Rechenwerk, dazu phi_eff, c_eff und gamma'.
+    Rechenwerk, dazu die Bemessungswerte -- drainiert phi_eff, c_eff und
+    gamma', undrainiert s_u,d.
 
     ``b`` ist die Breite, die kürzere Seite, ``L`` die Länge; ein
     Streifenfundament ist ein sehr langes.
@@ -152,10 +155,13 @@ class Fundament(Rechenobjekt):
     WAS = "Grundbruch"
 
     name: str
+    verhalten: Verhalten
     phi_k: Groesse
     gamma_phi: Groesse
     c_k: Groesse
     gamma_c: Groesse
+    s_u: Groesse
+    gamma_cu: Groesse
     gamma: Groesse
     gamma_w: Groesse
     q_Ed: Groesse
@@ -189,18 +195,28 @@ class Fundament(Rechenobjekt):
 
     def _aufbauen(self) -> None:
         abschnitt = self.abschnitt
+        drainiert = self.verhalten is Verhalten.DRAINIERT
+        # Je Verhalten seine Festigkeit; was nicht gilt, steht nicht in der Herleitung.
+        festigkeit = ((
+            ("phi_k", r"\varphi_k", GRAD, "Reibungswinkel, charakteristisch", 1, ""),
+            ("gamma_phi", r"\gamma_{\varphi}", EINHEITSLOS,
+             "Partialfaktor des Reibungswinkels", 2, "SIA 267:2013, 5.3.2.2, Tabelle 1"),
+            ("c_k", "c_k", KPA, "Kohäsion, charakteristisch", 1, ""),
+            ("gamma_c", r"\gamma_c", EINHEITSLOS, "Partialfaktor der Kohäsion", 2,
+             "SIA 267:2013, 5.3.2.2, Tabelle 1"),
+        ) if drainiert else (
+            ("s_u", "s_{u,k}", KPA, "Undrainierte Scherfestigkeit, charakteristisch", 1, ""),
+            ("gamma_cu", r"\gamma_{cu}", EINHEITSLOS, "Partialfaktor der undrainierten "
+             "Scherfestigkeit", 2, "SIA 267:2013, 5.3.2.2, Tabelle 1"),
+        ))
         # Je Gruppe ein Kasten in der Herleitung -- wie die Abmessungen der Platte.
         vorgaben = (
             ("Boden", (
-                ("phi_k", r"\varphi_k", GRAD, "Reibungswinkel, charakteristisch", 1, ""),
-                ("gamma_phi", r"\gamma_{\varphi}", EINHEITSLOS,
-                 "Partialfaktor des Reibungswinkels", 2, "SIA 267:2013, 5.3.2.2, Tabelle 1"),
-                ("c_k", "c_k", KPA, "Kohäsion, charakteristisch", 1, ""),
-                ("gamma_c", r"\gamma_c", EINHEITSLOS, "Partialfaktor der Kohäsion", 2,
-                 "SIA 267:2013, 5.3.2.2, Tabelle 1"),
+                *festigkeit,
                 ("gamma", r"\gamma", KN_PRO_M3, "Raumlast des Bodens, ohne Partialfaktor", 1,
                  "SIA 267:2013, 5.3.2.2, Tabelle 1"),
-                ("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1, ""),
+                *((("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1, ""),)
+                  if drainiert else ()),      # nur fuer gamma': undrainiert total
             )),
             ("Fundament", (
                 ("b", "b", M, "Breite des Fundaments", 2, ""),
@@ -214,11 +230,12 @@ class Fundament(Rechenobjekt):
                 ("beta", r"\beta", GRAD, "Neigung des Geländes", 1, ""),
                 ("q_Ed", "q_{Ed}", KPA, "Dauernde Auflast neben dem Fundament", 1, KAP_AUFLAST),
             )),
+            # Die Sohlreibung hängt am Reibungswinkel: undrainiert gilt sie nicht.
             ("Sohlreibung", (
                 ("delta_faktor", r"k_{\delta}", EINHEITSLOS,
                  "Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ_k/φ_k", 2,
                  "SIA 267:2013, 8.4.1.1"),
-            )),
+            ) if drainiert else ()),
         )
         for gruppe, eintraege in vorgaben:
             for kurz, symbol, einheit, beschreibung, stellen, referenz in eintraege:
@@ -227,6 +244,15 @@ class Fundament(Rechenobjekt):
                     id=d.id, ausgabe=d, groesse=getattr(self, kurz),
                     abschnitt=abschnitt, gruppe=gruppe))
 
+        if not drainiert:
+            d_s = self._def("s_u_d", "s_{u,d}", KPA, "Undrainierte Scherfestigkeit, "
+                            "Bemessungswert", 1, "SIA 267:2013, 5.3.2.1, (5)")
+            self.berechnungen.append(Formel(
+                id=d_s.id, ausgabe=d_s, abschnitt=abschnitt,
+                eingaben={"s_u": self.id_von("s_u"), "gamma_cu": self.id_von("gamma_cu")},
+                vorlage=r"\frac{@s_u}{@gamma_cu}", funktion=_s_u_d,
+                name="Bemessungswert der undrainierten Scherfestigkeit"))
+            return
         d_phi = self._def("phi_eff", r"\varphi_{eff}", GRAD,
                           "Reibungswinkel, Bemessungswert", 2, "SIA 267:2013, 5.3.2.1, (5)")
         d_c = self._def("c_eff", "c_{eff}", KPA, "Kohäsion, Bemessungswert", 1,
@@ -258,6 +284,10 @@ def _phi_eff(phi_k: Groesse, gamma_phi: Groesse) -> Groesse:
 
 def _c_eff(c_k: Groesse, gamma_c: Groesse) -> Groesse:
     return Groesse.aus_si(c_k.si / gamma_c.si, KPA)
+
+
+def _s_u_d(s_u: Groesse, gamma_cu: Groesse) -> Groesse:
+    return Groesse.aus_si(s_u.si / gamma_cu.si, KPA)
 
 
 def _gamma_auftrieb(gamma: Groesse, gamma_w: Groesse) -> Groesse:
@@ -354,9 +384,10 @@ class Grundbruch(Nachweis):
                              rf"\alpha_{{eff,GB,{als_text(k.name)}}}",
                              f"Erfüllungsgrad Grundbruch – {k.name}")
             for k in self.kombinationen}
+        boden = (("phi_eff", "c_eff", "gamma", "gamma_auftrieb")
+                 if fundament.verhalten is Verhalten.DRAINIERT else ("s_u_d", "gamma"))
         bezuege = [Eingabebezug(n, fundament.id_von(n)) for n in (
-            "phi_eff", "c_eff", "gamma", "gamma_auftrieb", "q_Ed", "b", "L", "t1", "t",
-            "alpha", "beta")]
+            *boden, "q_Ed", "b", "L", "t1", "t", "alpha", "beta")]
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()), bezuege=bezuege,
                          titel=f"Grundbruch – {fundament.name}",
                          abschnitt=fundament.abschnitt)
@@ -364,7 +395,7 @@ class Grundbruch(Nachweis):
     def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         p.titel("Grundbruch")
         p.annahme(OHNE_GAMMA_R)
-        if e.g("phi_eff").si <= 0.0:
+        if self.fundament.verhalten is Verhalten.UNDRAINIERT:
             befund = self._undrainiert(e, p)
         else:
             befund = self._drainiert(e, p)
@@ -653,7 +684,6 @@ class Grundbruch(Nachweis):
                  r" + \left(\gamma t + q\right) \qquad N_{Rd} = \sigma_f \cdot b \cdot L",
                  titel="Tragfähigkeitsformel undrainiert", referenz=KAP_UNDRAINIERT,
                  name="Tragfähigkeitsformel undrainiert")
-        p.text("Mit φ = 0 ist c_eff die undrainierte Scherfestigkeit s_u.")
         werte = Zwischenwerte(self.id)
         b, L, t = e["b"], e["L"], e["t"]
 
@@ -708,7 +738,7 @@ class Grundbruch(Nachweis):
                             **z: Wert) -> Fallergebnis:
         werte = Zwischenwerte(f"{self.id}.{k.kennung}")
         p.titel(f"Grundbruch – {k.name}", ebene=3)
-        s_u, b, L = e["c_eff"], e["b"], e["L"]
+        s_u, b, L = e["s_u_d"], e["b"], e["L"]
         N = werte.kraft("N_Ed", "N_{Ed}", k.N_Ed.si, "Einwirkung normal zur Sohle")
         T = werte.kraft("T_Ed", "T_{Ed}", k.T_Ed.si, "Einwirkung in der Sohle")
         erg = Fallergebnis(kombination=k, delta_R=math.atan2(k.T_Ed.si, k.N_Ed.si))
@@ -831,8 +861,9 @@ class Gleiten(Nachweis):
                              rf"\alpha_{{eff,GL,{als_text(k.name)}}}",
                              f"Erfüllungsgrad Gleiten – {k.name}")
             for k in self.kombinationen}
-        bezuege = [Eingabebezug(n, fundament.id_von(n)) for n in (
-            "phi_k", "gamma_phi", "delta_faktor", "c_eff", "b", "L")]
+        boden = (("phi_k", "gamma_phi", "delta_faktor", "c_eff")
+                 if fundament.verhalten is Verhalten.DRAINIERT else ("s_u_d",))
+        bezuege = [Eingabebezug(n, fundament.id_von(n)) for n in (*boden, "b", "L")]
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()), bezuege=bezuege,
                          titel=f"Gleiten – {fundament.name}", abschnitt=fundament.abschnitt)
 
@@ -844,7 +875,8 @@ class Gleiten(Nachweis):
             "Scherfestigkeit des Bodens. Ein Erdwiderstand vor dem Fundament wird "
             "nicht angesetzt."
         )
-        delta = self._sohlreibung(e, p) if e.g("phi_k").si > 0.0 else None
+        delta = (self._sohlreibung(e, p)
+                 if self.fundament.verhalten is Verhalten.DRAINIERT else None)
         urteile: List[NachweisUrteil] = []
         for k in self.kombinationen:
             zw = Zwischenwerte(f"{self.id}.{k.kennung}")
@@ -888,10 +920,10 @@ class Gleiten(Nachweis):
                     delta: Optional[Wert]) -> Wert:
         """Drainiert die Reibung unter N, undrainiert die Scherfestigkeit auf der Sohlfläche."""
         if delta is None:
-            b, L, c = e["b"], e["L"], e["c_eff"]
-            T_Rd = zw.kraft("T_Rd", "T_{Rd}", b.groesse.si * L.groesse.si * c.groesse.si,
+            b, L, s_u = e["b"], e["L"], e["s_u_d"]
+            T_Rd = zw.kraft("T_Rd", "T_{Rd}", b.groesse.si * L.groesse.si * s_u.groesse.si,
                             "Widerstand")
-            p.formel(T_Rd, r"@b \cdot @L \cdot @c", {"b": b, "L": L, "c": c},
+            p.formel(T_Rd, r"@b \cdot @L \cdot @s_u", {"b": b, "L": L, "s_u": s_u},
                      titel="Gleitwiderstand, undrainiert", referenz="SIA 267:2013, 8.5.2.2, (32)",
                      name="Gleitwiderstand")
             return T_Rd
@@ -916,9 +948,10 @@ def angaben(fundament: Fundament, werte: Dict[str, Wert]) -> GleichungBlock:
     """
     def zeile(namen: Sequence[str]) -> str:
         return r" \qquad ".join(angabe(werte[fundament.id_von(n)]) for n in namen
-                                if fundament.id_von(n) in werte)
+                                if n in fundament.definitionen
+                                and fundament.id_von(n) in werte)
 
-    boden = zeile(("phi_eff", "c_eff", "gamma", "gamma_auftrieb"))
+    boden = zeile(("phi_eff", "c_eff", "s_u_d", "gamma", "gamma_auftrieb"))
     masse = zeile(("b", "L", "t", "t1"))
     return GleichungBlock(latex=rf"\begin{{aligned}} & {boden} \\ & {masse} \end{{aligned}}",
                           titel="Angaben zum Fundament")

@@ -1,6 +1,6 @@
 # Voll
 
-797 Berechnungen ausgeführt, 1103 Werte bestimmt.
+785 Berechnungen ausgeführt, 1091 Werte bestimmt.
 
 ## Herleitung
 
@@ -12350,58 +12350,28 @@ $$
 
 ### Grundbruch: Seeton
 
-**Reibungswinkel, charakteristisch**
+**Undrainierte Scherfestigkeit, charakteristisch**
 
 $$
-\varphi_k = 0{}^{\circ}
+s_{u,k} = 40\,\mathrm{kPa}
 $$
 
-**Partialfaktor des Reibungswinkels** *(SIA 267:2013, 5.3.2.2, Tabelle 1)*
+**Partialfaktor der undrainierten Scherfestigkeit** *(SIA 267:2013, 5.3.2.2, Tabelle 1)*
 
 $$
-\gamma_{\varphi} = 1.2
+\gamma_{cu} = 1.5
 $$
 
-**Reibungswinkel, Bemessungswert** *(SIA 267:2013, 5.3.2.1, (5))*
+**Undrainierte Scherfestigkeit, Bemessungswert** *(SIA 267:2013, 5.3.2.1, (5))*
 
 $$
-\varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 0{}^{\circ}}{1.2}\right) = 0{}^{\circ}
-$$
-
-**Kohäsion, charakteristisch**
-
-$$
-c_k = 40\,\mathrm{kPa}
-$$
-
-**Partialfaktor der Kohäsion** *(SIA 267:2013, 5.3.2.2, Tabelle 1)*
-
-$$
-\gamma_c = 1.5
-$$
-
-**Kohäsion, Bemessungswert** *(SIA 267:2013, 5.3.2.1, (5))*
-
-$$
-c_{eff} = \frac{c_k}{\gamma_c} = \frac{40\,\mathrm{kPa}}{1.5} = 26.7\,\mathrm{kPa}
+s_{u,d} = \frac{s_{u,k}}{\gamma_{cu}} = \frac{40\,\mathrm{kPa}}{1.5} = 26.7\,\mathrm{kPa}
 $$
 
 **Raumlast des Bodens, ohne Partialfaktor** *(SIA 267:2013, 5.3.2.2, Tabelle 1)*
 
 $$
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
-$$
-
-**Raumlast des Wassers**
-
-$$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-$$
-
-**Raumlast des Bodens unter Auftrieb**
-
-$$
-\gamma' = \gamma - \gamma_w = 21\,\mathrm{kN}/\mathrm{m}^{3} - 10\,\mathrm{kN}/\mathrm{m}^{3} = 11\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 **Dauernde Auflast neben dem Fundament** *(Kap. 9.2.5)*
@@ -12456,8 +12426,6 @@ $$
 \sigma_f = 5.1 \, s_u \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \left(\gamma t + q\right) \qquad N_{Rd} = \sigma_f \cdot b \cdot L
 $$
 
-Mit φ = 0 ist c\_eff die undrainierte Scherfestigkeit s\_u.
-
 **Formfaktor, undrainiert** *(Kap. 9.2.17)*
 
 $$
@@ -12493,14 +12461,14 @@ $$
 **Lastneigungsfaktor, undrainiert** *(Kap. 9.2.17)*
 
 $$
-i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{c_{eff} \cdot b \cdot L}} = 0.5 - \frac{1}{2} \sqrt{1 - \frac{40\,\mathrm{kN}}{26.7\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 2\,\mathrm{m}}} = 0.15
+i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{s_{u,d} \cdot b \cdot L}} = 0.5 - \frac{1}{2} \sqrt{1 - \frac{40\,\mathrm{kN}}{26.7\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 2\,\mathrm{m}}} = 0.15
 $$
 
 **Bruchspannung in der Sohle, undrainiert** *(Kap. 9.2.17)*
 
 $$
 \begin{aligned}
-  \sigma_f &= 5.1 \cdot c_{eff} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0} \\
+  \sigma_f &= 5.1 \cdot s_{u,d} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0} \\
   &= 5.1 \cdot 26.7\,\mathrm{kPa} \cdot \left(1 + 0.15 + 0.21 - 0.15 - 0.03 - 0.07\right) + 16.8\,\mathrm{kPa} \\
   &= 169.3\,\mathrm{kPa}
 \end{aligned}
@@ -12528,12 +12496,6 @@ $$
 
 T\_Ed \> s\_u · b · L: die Last ist zu stark geneigt, der Lastneigungsfaktor ist nicht bestimmt – kein Grundbruchwiderstand.
 
-**Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ\_k/φ\_k** *(SIA 267:2013, 8.4.1.1)*
-
-$$
-k_{\delta} = 1
-$$
-
 ### Gleiten
 
 #### Gleiten – Normal
@@ -12541,7 +12503,7 @@ $$
 **Gleitwiderstand, undrainiert** *(SIA 267:2013, 8.5.2.2, (32))*
 
 $$
-T_{Rd} = b \cdot L \cdot c_{eff} = 1.5\,\mathrm{m} \cdot 2\,\mathrm{m} \cdot 26.7\,\mathrm{kPa} = 80\,\mathrm{kN}
+T_{Rd} = b \cdot L \cdot s_{u,d} = 1.5\,\mathrm{m} \cdot 2\,\mathrm{m} \cdot 26.7\,\mathrm{kPa} = 80\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -12561,7 +12523,7 @@ $$
 **Gleitwiderstand, undrainiert** *(SIA 267:2013, 8.5.2.2, (32))*
 
 $$
-T_{Rd} = b \cdot L \cdot c_{eff} = 1.5\,\mathrm{m} \cdot 2\,\mathrm{m} \cdot 26.7\,\mathrm{kPa} = 80\,\mathrm{kN}
+T_{Rd} = b \cdot L \cdot s_{u,d} = 1.5\,\mathrm{m} \cdot 2\,\mathrm{m} \cdot 26.7\,\mathrm{kPa} = 80\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -12578,58 +12540,28 @@ $$
 
 ### Grundbruch: Schacht
 
-**Reibungswinkel, charakteristisch**
+**Undrainierte Scherfestigkeit, charakteristisch**
 
 $$
-\varphi_k = 0{}^{\circ}
+s_{u,k} = 60\,\mathrm{kPa}
 $$
 
-**Partialfaktor des Reibungswinkels** *(SIA 267:2013, 5.3.2.2, Tabelle 1)*
+**Partialfaktor der undrainierten Scherfestigkeit** *(SIA 267:2013, 5.3.2.2, Tabelle 1)*
 
 $$
-\gamma_{\varphi} = 1.2
+\gamma_{cu} = 1.5
 $$
 
-**Reibungswinkel, Bemessungswert** *(SIA 267:2013, 5.3.2.1, (5))*
+**Undrainierte Scherfestigkeit, Bemessungswert** *(SIA 267:2013, 5.3.2.1, (5))*
 
 $$
-\varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 0{}^{\circ}}{1.2}\right) = 0{}^{\circ}
-$$
-
-**Kohäsion, charakteristisch**
-
-$$
-c_k = 60\,\mathrm{kPa}
-$$
-
-**Partialfaktor der Kohäsion** *(SIA 267:2013, 5.3.2.2, Tabelle 1)*
-
-$$
-\gamma_c = 1.5
-$$
-
-**Kohäsion, Bemessungswert** *(SIA 267:2013, 5.3.2.1, (5))*
-
-$$
-c_{eff} = \frac{c_k}{\gamma_c} = \frac{60\,\mathrm{kPa}}{1.5} = 40\,\mathrm{kPa}
+s_{u,d} = \frac{s_{u,k}}{\gamma_{cu}} = \frac{60\,\mathrm{kPa}}{1.5} = 40\,\mathrm{kPa}
 $$
 
 **Raumlast des Bodens, ohne Partialfaktor** *(SIA 267:2013, 5.3.2.2, Tabelle 1)*
 
 $$
 \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
-$$
-
-**Raumlast des Wassers**
-
-$$
-\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
-$$
-
-**Raumlast des Bodens unter Auftrieb**
-
-$$
-\gamma' = \gamma - \gamma_w = 21\,\mathrm{kN}/\mathrm{m}^{3} - 10\,\mathrm{kN}/\mathrm{m}^{3} = 11\,\mathrm{kN}/\mathrm{m}^{3}
 $$
 
 **Dauernde Auflast neben dem Fundament** *(Kap. 9.2.5)*
@@ -12684,8 +12616,6 @@ $$
 \sigma_f = 5.1 \, s_u \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \left(\gamma t + q\right) \qquad N_{Rd} = \sigma_f \cdot b \cdot L
 $$
 
-Mit φ = 0 ist c\_eff die undrainierte Scherfestigkeit s\_u.
-
 **Formfaktor, undrainiert** *(Kap. 9.2.17)*
 
 $$
@@ -12727,14 +12657,14 @@ $$
 **Lastneigungsfaktor, undrainiert** *(Kap. 9.2.17)*
 
 $$
-i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{c_{eff} \cdot b \cdot L}} = 0.5 - \frac{1}{2} \sqrt{1 - \frac{30\,\mathrm{kN}}{40\,\mathrm{kPa} \cdot 1.2\,\mathrm{m} \cdot 1.2\,\mathrm{m}}} = 0.15
+i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{s_{u,d} \cdot b \cdot L}} = 0.5 - \frac{1}{2} \sqrt{1 - \frac{30\,\mathrm{kN}}{40\,\mathrm{kPa} \cdot 1.2\,\mathrm{m} \cdot 1.2\,\mathrm{m}}} = 0.15
 $$
 
 **Bruchspannung in der Sohle, undrainiert** *(Kap. 9.2.17)*
 
 $$
 \begin{aligned}
-  \sigma_f &= 5.1 \cdot c_{eff} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0} \\
+  \sigma_f &= 5.1 \cdot s_{u,d} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0} \\
   &= 5.1 \cdot 40\,\mathrm{kPa} \cdot \left(1 + 0.2 + 0.41 - 0.15 - 0 - 0\right) + 42\,\mathrm{kPa} \\
   &= 339.7\,\mathrm{kPa}
 \end{aligned}
@@ -12758,12 +12688,6 @@ $$
 \alpha_{eff,GB,\text{Tragsicherheit}} = \frac{N_{Rd}}{N_{Ed}} = \frac{489.2\,\mathrm{kN}}{900\,\mathrm{kN}} = 0.54 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
-**Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ\_k/φ\_k** *(SIA 267:2013, 8.4.1.1)*
-
-$$
-k_{\delta} = 1
-$$
-
 ### Gleiten
 
 #### Gleiten – Tragsicherheit
@@ -12771,7 +12695,7 @@ $$
 **Gleitwiderstand, undrainiert** *(SIA 267:2013, 8.5.2.2, (32))*
 
 $$
-T_{Rd} = b \cdot L \cdot c_{eff} = 1.2\,\mathrm{m} \cdot 1.2\,\mathrm{m} \cdot 40\,\mathrm{kPa} = 57.6\,\mathrm{kN}
+T_{Rd} = b \cdot L \cdot s_{u,d} = 1.2\,\mathrm{m} \cdot 1.2\,\mathrm{m} \cdot 40\,\mathrm{kPa} = 57.6\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -19867,6 +19791,12 @@ $$
 \gamma' = \gamma - \gamma_w
 $$
 
+**Undrainierte Scherfestigkeit, Bemessungswert** *(SIA 267:2013, 5.3.2.1, (5))*
+
+$$
+s_{u,d} = \frac{s_{u,k}}{\gamma_{cu}}
+$$
+
 ### Grundbruch
 
 Unter der Sohle bildet sich beim Grundbruch ein Gleitkörper, der den Boden seitlich hinaus und nach oben drückt. Die erweiterte Tragfähigkeitsformel setzt seinen Widerstand aus drei Teilen zusammen: der Kohäsion, der seitlichen Auflast neben dem Fundament und dem Gewicht des Gleitkörpers – je mit einem Tragfähigkeitsfaktor und den Korrekturen für Form, Tiefe, Lastneigung, Geländeneigung und Sohlneigung.
@@ -20068,13 +19998,13 @@ $$
 **Lastneigungsfaktor, undrainiert** *(Kap. 9.2.17)*
 
 $$
-i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{c_{eff} \cdot b \cdot L}}
+i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{s_{u,d} \cdot b \cdot L}}
 $$
 
 **Bruchspannung in der Sohle, undrainiert** *(Kap. 9.2.17)*
 
 $$
-\sigma_f = 5.1 \cdot c_{eff} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0}
+\sigma_f = 5.1 \cdot s_{u,d} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0}
 $$
 
 **Tiefenfaktor, undrainiert, t ≥ b** *(Kap. 9.2.17)*
@@ -20108,7 +20038,7 @@ $$
 **Gleitwiderstand, undrainiert** *(SIA 267:2013, 8.5.2.2, (32))*
 
 $$
-T_{Rd} = b \cdot L \cdot c_{eff}
+T_{Rd} = b \cdot L \cdot s_{u,d}
 $$
 
 ### Setzung
@@ -21658,7 +21588,7 @@ $$
 **Angaben zum Fundament**
 
 $$
-\begin{aligned} & \varphi_{eff} = 0{}^{\circ} \qquad c_{eff} = 26.7\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \qquad \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 1.5\,\mathrm{m} \qquad L = 2\,\mathrm{m} \qquad t = 0.8\,\mathrm{m} \qquad t_1 = 0\,\mathrm{m} \end{aligned}
+\begin{aligned} & s_{u,d} = 26.7\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 1.5\,\mathrm{m} \qquad L = 2\,\mathrm{m} \qquad t = 0.8\,\mathrm{m} \qquad t_1 = 0\,\mathrm{m} \end{aligned}
 $$
 
 **Tragfähigkeitsfaktoren**
@@ -21689,7 +21619,7 @@ $$
 **Angaben zum Fundament**
 
 $$
-\begin{aligned} & \varphi_{eff} = 0{}^{\circ} \qquad c_{eff} = 40\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \qquad \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 1.2\,\mathrm{m} \qquad L = 1.2\,\mathrm{m} \qquad t = 2\,\mathrm{m} \qquad t_1 = 0\,\mathrm{m} \end{aligned}
+\begin{aligned} & s_{u,d} = 40\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 1.2\,\mathrm{m} \qquad L = 1.2\,\mathrm{m} \qquad t = 2\,\mathrm{m} \qquad t_1 = 0\,\mathrm{m} \end{aligned}
 $$
 
 **Tragfähigkeitsfaktoren**
@@ -22392,40 +22322,28 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Neigung der Sohle | $\alpha$ | $4$ | ° | Vorgabe |
 | Breite des Fundaments | $b$ | $1.5$ | m | Vorgabe |
 | Neigung des Geländes | $\beta$ | $10$ | ° | Vorgabe |
-| Kohäsion, Bemessungswert | $c_{eff}$ | $26.7$ | kPa | berechnet |
-| Kohäsion, charakteristisch | $c_k$ | $40$ | kPa | Vorgabe |
-| Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ\_k/φ\_k | $k_{\delta}$ | $1$ |  | Vorgabe |
 | Raumlast des Bodens, ohne Partialfaktor | $\gamma$ | $21$ | kN/m³ | Vorgabe |
-| Raumlast des Bodens unter Auftrieb | $\gamma'$ | $11$ | kN/m³ | berechnet |
-| Partialfaktor der Kohäsion | $\gamma_c$ | $1.5$ |  | Vorgabe |
-| Partialfaktor des Reibungswinkels | $\gamma_{\varphi}$ | $1.2$ |  | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Partialfaktor der undrainierten Scherfestigkeit | $\gamma_{cu}$ | $1.5$ |  | Vorgabe |
 | Erfüllungsgrad Gleiten – Normal | $\alpha_{eff,GL,\text{Normal}}$ | $2.00$ |  | berechnet |
 | Erfüllungsgrad Gleiten – Zu schräg | $\alpha_{eff,GL,\text{Zu schräg}}$ | $0.40$ |  | berechnet |
 | Erfüllungsgrad Grundbruch – Normal | $\alpha_{eff,GB,\text{Normal}}$ | $1.69$ |  | berechnet |
 | Erfüllungsgrad Grundbruch – Zu schräg | $\alpha_{eff,GB,\text{Zu schräg}}$ | $0.00$ |  | berechnet |
-| Reibungswinkel, Bemessungswert | $\varphi_{eff}$ | $0$ | ° | berechnet |
-| Reibungswinkel, charakteristisch | $\varphi_k$ | $0$ | ° | Vorgabe |
 | Dauernde Auflast neben dem Fundament | $q_{Ed}$ | $0$ | kPa | Vorgabe |
+| Undrainierte Scherfestigkeit, charakteristisch | $s_{u,k}$ | $40$ | kPa | Vorgabe |
+| Undrainierte Scherfestigkeit, Bemessungswert | $s_{u,d}$ | $26.7$ | kPa | berechnet |
 | Tiefe der Sohle unter Terrain | $t$ | $0.8$ | m | Vorgabe |
 | Tiefe des höchsten Grundwasserspiegels unter Terrain | $t_1$ | $0$ | m | Vorgabe |
 | Länge des Fundaments | $L$ | $1.2$ | m | Vorgabe |
 | Neigung der Sohle | $\alpha$ | $0$ | ° | Vorgabe |
 | Breite des Fundaments | $b$ | $1.2$ | m | Vorgabe |
 | Neigung des Geländes | $\beta$ | $0$ | ° | Vorgabe |
-| Kohäsion, Bemessungswert | $c_{eff}$ | $40$ | kPa | berechnet |
-| Kohäsion, charakteristisch | $c_k$ | $60$ | kPa | Vorgabe |
-| Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ\_k/φ\_k | $k_{\delta}$ | $1$ |  | Vorgabe |
 | Raumlast des Bodens, ohne Partialfaktor | $\gamma$ | $21$ | kN/m³ | Vorgabe |
-| Raumlast des Bodens unter Auftrieb | $\gamma'$ | $11$ | kN/m³ | berechnet |
-| Partialfaktor der Kohäsion | $\gamma_c$ | $1.5$ |  | Vorgabe |
-| Partialfaktor des Reibungswinkels | $\gamma_{\varphi}$ | $1.2$ |  | Vorgabe |
-| Raumlast des Wassers | $\gamma_w$ | $10$ | kN/m³ | Vorgabe |
+| Partialfaktor der undrainierten Scherfestigkeit | $\gamma_{cu}$ | $1.5$ |  | Vorgabe |
 | Erfüllungsgrad Gleiten – Tragsicherheit | $\alpha_{eff,GL,\text{Tragsicherheit}}$ | $1.92$ |  | berechnet |
 | Erfüllungsgrad Grundbruch – Tragsicherheit | $\alpha_{eff,GB,\text{Tragsicherheit}}$ | $0.54$ |  | berechnet |
-| Reibungswinkel, Bemessungswert | $\varphi_{eff}$ | $0$ | ° | berechnet |
-| Reibungswinkel, charakteristisch | $\varphi_k$ | $0$ | ° | Vorgabe |
 | Dauernde Auflast neben dem Fundament | $q_{Ed}$ | $0$ | kPa | Vorgabe |
+| Undrainierte Scherfestigkeit, charakteristisch | $s_{u,k}$ | $60$ | kPa | Vorgabe |
+| Undrainierte Scherfestigkeit, Bemessungswert | $s_{u,d}$ | $40$ | kPa | berechnet |
 | Tiefe der Sohle unter Terrain | $t$ | $2$ | m | Vorgabe |
 | Tiefe des höchsten Grundwasserspiegels unter Terrain | $t_1$ | $0$ | m | Vorgabe |
 | Durchmesser des Pfahls | $D$ | $900$ | mm | Vorgabe |

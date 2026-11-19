@@ -1,5 +1,5 @@
 ---
-erzeugt: 36daaf120b65
+erzeugt: 69f0836267a5
 art: modul
 tags: [modul]
 ---
@@ -36,6 +36,7 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.geotechnik.verhalten]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.rissanforderung]]

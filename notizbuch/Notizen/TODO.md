@@ -489,11 +489,12 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Decke). Dabei fällt weg: fünf Regeln `[hidden]` werden eine, 25
         Farbregeln der Verläufe eine Variable je Grösse, `.qa-element*` und
         `.bs-element*` eine Liste, sechs Formen von «leer» zwei.
-      - `grundbruch.py`, 963: Fundament mit einem gemeinsamen
+      - `grundbruch.py`, 996 seit dem Schalter drainiert/undrainiert
+        (2026-11-19): Fundament mit einem gemeinsamen
         `Fundamentnachweis` (Vorbild `pfahl/achse.Achsnachweis`), Gleiten und
         die Tragfähigkeitsfaktoren, die der Pfahl importiert, trennen --
-        rund 680 bleiben. Kippen und Erdwiderstand brächten die Datei sonst
-        über 1000.
+        rund 700 bleiben. Vor der nächsten Änderung daran: bis 1000 fehlen
+        vier Zeilen.
       - `platte_bilder.js`, 941: der Bemessungspunkt dreimal, das Farbpaar
         erfüllt/nicht erfüllt viermal, Legenden von Hand. Umbau:
         `bemessungspunkt` und `legende` neben `achsenkreuz`.
@@ -506,7 +507,8 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         vor dem Fundament bräuchte eine dritte Form. Umbau: `Drainiert(φ, c)`
         und `Undrainiert(s_u)` als Typen. Entschieden (Benutzer, 2026-11-19):
         der Grundbruch bekommt den Schalter des Pfahls, «drainiert» mit φ
-        und c, «undrainiert» mit s_u.
+        und c, «undrainiert» mit s_u. Erledigt (2026-11-19), siehe
+        [[Entwicklung]]; die Typen bleiben offen.
       - Durchstanzen: der `Ort` der Leisten führt fünf Werte der Herleitung
         als `None`; `_leisten_schreiben` hat 150 Zeilen.
       - Der Bericht baut die Angaben der Platte selbst; die Schreibweise

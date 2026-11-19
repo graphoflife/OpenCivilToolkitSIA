@@ -1,5 +1,5 @@
 ---
-erzeugt: c9b7c905c109
+erzeugt: ae195574ebaf
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,8 @@ tags: [modul]
 
 Die Schichten des Baugrunds, wie der Pfahl sie braucht ([[opencivil.pfahl.boden#Pfahlschicht|Pfahlschicht]]):
 Dicke, Raumlast, das Verhalten -- drainiert mit φ'_k und c'_k, undrainiert
-mit s_u,k ([[opencivil.pfahl.boden#Verhalten|Verhalten]]) --, woher die Mantelreibung kommt: gerechnet
+mit s_u,k ([[opencivil.geotechnik.verhalten#Verhalten|Verhalten]], wie im
+Grundbruch) --, woher die Mantelreibung kommt: gerechnet
 oder eingegeben ([[opencivil.pfahl.boden#Mantel|Mantel]]), und der Verformungsmodul, auf dem der
 Pfahl gebettet ist. Dazu als Zahlen die Spannungen
 im Boden und die Stücke des Mantels, über die die Mantelreibung summiert
@@ -42,31 +43,6 @@ teilt.
 Die Schichten als Grössen; das Profil in SI-Basis.
 
 ## Inhalt
-
-### Verhalten
-
-```python
-class Verhalten(Wahl)
-```
-
-Womit eine Schicht trägt: drainiert mit φ'_k und c'_k, undrainiert mit s_u,k.
-
-- `DRAINIERT = 'drainiert'`
-- `UNDRAINIERT = 'undrainiert'`
-
-#### Verhalten.beschriftung
-
-```python
-@property
-def beschriftung(self) -> str
-```
-
-#### Verhalten.erklaerung
-
-```python
-@property
-def erklaerung(self) -> str
-```
 
 ### Mantel
 
@@ -223,6 +199,7 @@ Der Mantel von `oben` bis `unten` in Stücken, je Schicht und Seite des Wassers.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.wahl]]
+- [[opencivil.geotechnik.verhalten]]
 
 ## Gebraucht von
 

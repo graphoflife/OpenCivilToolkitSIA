@@ -1,5 +1,5 @@
 ---
-erzeugt: a0030853d312
+erzeugt: fd840080ddc4
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -44,7 +44,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 **Grundbruch**
 
-- [[Fundament]] · 3
+- [[Fundament]] · 4
 - [[Grundbruch]] · 28
 - [[Gleiten]] · 4
 
@@ -101,6 +101,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert der Kohäsion]] · $c_{eff}$
 - [[Bemessungswert der Querkraft im Nachweisschnitt]] · $V_{d,red}$
 - [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
+- [[Bemessungswert der undrainierten Scherfestigkeit]] · $s_{u,d}$
 - [[Bemessungswert des äusseren Widerstands]] · $R_{a,d}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
 - [[Bemessungswert des Erdwiderstands am Pfahl]] · $p_{E,d}$
@@ -396,7 +397,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-129 von 323 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+129 von 324 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 157a1aa5690e
+erzeugt: da0208638f2f
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,10 @@ delta_k/phi_k = 1 ist dazugekommen, damit sich T_Rd rechnen laesst: SIA
 267:2013, 8.4.1.1, nennt 1 fuer eine raue Sohle mit dem Bruch im Boden und
 1/2 bis 2/3 fuer eine glatte mit dem Bruch in der Fuge; das Buch etwa 2/3
 bis 1 (Kap. 9.2.18).
+
+Am 2026-11-19 der Schalter drainiert/undrainiert, wie beim Pfahl (Benutzer):
+undrainiert mit s_u = 50 kPa, der Vorgabe des Pfahls, und gamma_cu = 1.5
+nach SIA 267:2013, 5.3.2.2, Tabelle 1.
 
 ## Inhalt
 
@@ -49,12 +53,15 @@ Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen.
 - `BEZEICHNUNG = 'Grundbruch'`
 - `kennung: str`
 - `name: str`
-- `phi_k: float = bereich(30.0, heisst='φ_k', einheit=GRAD, ab=0.0, unter=90.0)` – Reibungswinkel, charakteristisch, in Grad.
+- `verhalten: Verhalten = Verhalten.DRAINIERT` – Womit der Boden trägt: drainiert mit phi_k und c_k, undrainiert mit s_u -- derselbe Schalter wie beim Pfahl (Benutzer, 2026-11-19). Bis dahin hiess phi = 0 undrainiert, und c galt dann als s_u.
+- `phi_k: float = bereich(30.0, heisst='φ_k', einheit=GRAD, ab=0.0, unter=90.0)` – Reibungswinkel, charakteristisch, in Grad -- drainiert.
 - `gamma_phi: float = bereich(1.2, heisst='Partialfaktor γ_φ', ueber=0.0)` – Partialfaktor des Reibungswinkels -- SIA 267:2013, 5.3.2.2.
-- `c_k: float = bereich(0.0, heisst='Kohäsion c', einheit=KPA, ab=0.0)` – Kohäsion, charakteristisch, in kPa -- mit phi = 0 die undrainierte Scherfestigkeit. Neben phi nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6).
+- `c_k: float = bereich(0.0, heisst='Kohäsion c', einheit=KPA, ab=0.0)` – Kohäsion, charakteristisch, in kPa -- drainiert, und nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6).
 - `gamma_c: float = bereich(1.5, heisst='Partialfaktor γ_c', ueber=0.0)` – Partialfaktor der Kohäsion.
+- `s_u: float = bereich(50.0, heisst='s_u,k', einheit=KPA, ab=0.0)` – Undrainierte Scherfestigkeit, charakteristisch, in kPa -- undrainiert.
+- `gamma_cu: float = bereich(1.5, heisst='Partialfaktor γ_cu', ueber=0.0)` – Partialfaktor der undrainierten Scherfestigkeit -- SIA 267:2013, 5.3.2.2, Tabelle 1. Bis 2026-11-19 galt dafür gamma_c, mit demselben Wert.
 - `gamma: float = bereich(21.0, heisst='Raumlast γ', einheit=KN_PRO_M3, ueber=0.0)` – Raumlast des Bodens in kN/m³, über und unter dem Wasser dieselbe: unter ihm zählt gamma - gamma_w. Das Buch nimmt dort die gesättigte Raumlast (Kap. 1.4); mit der feuchten wird gamma' etwas kleiner, auf der sicheren Seite.
-- `gamma_w: float = bereich(10.0, heisst='γ_w', einheit=KN_PRO_M3, ab=0.0)` – Raumlast des Wassers in kN/m³.
+- `gamma_w: float = bereich(10.0, heisst='γ_w', einheit=KN_PRO_M3, ab=0.0)` – Raumlast des Wassers in kN/m³ -- nur drainiert, fuer gamma': undrainiert gelten totale Spannungen, das Wasser wirkt dort nicht.
 - `q_Ed: float = bereich(0.0, heisst='Auflast q_Ed', einheit=KPA, ab=0.0)` – Auflast neben dem Fundament in kPa. Sie zählt nur, wenn sie dauernd und auf beiden Seiten mindestens über L_Gl liegt (Kap. 9.2.5); sie wirkt günstig.
 - `b: float = bereich(1.0, heisst='Breite b', einheit=M, ueber=0.0)` – Breite des Fundaments in m -- die kürzere Seite.
 - `L: float = bereich(1.0, heisst='Länge L', einheit=M, ueber=0.0)` – Länge des Fundaments in m.
@@ -107,6 +114,7 @@ Kombinationen soll sich oeffnen und korrigieren lassen.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.geotechnik.verhalten]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]

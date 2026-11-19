@@ -4,7 +4,8 @@ opencivil/pfahl/boden.py -- der Baugrund um einen Pfahl.
 VERANTWORTUNG:
 Die Schichten des Baugrunds, wie der Pfahl sie braucht (:class:`Pfahlschicht`):
 Dicke, Raumlast, das Verhalten -- drainiert mit φ'_k und c'_k, undrainiert
-mit s_u,k (:class:`Verhalten`) --, woher die Mantelreibung kommt: gerechnet
+mit s_u,k (:class:`~opencivil.geotechnik.verhalten.Verhalten`, wie im
+Grundbruch) --, woher die Mantelreibung kommt: gerechnet
 oder eingegeben (:class:`Mantel`), und der Verformungsmodul, auf dem der
 Pfahl gebettet ist. Dazu als Zahlen die Spannungen
 im Boden und die Stücke des Mantels, über die die Mantelreibung summiert
@@ -36,22 +37,7 @@ from typing import List, Sequence, Tuple
 
 from opencivil.core.einheiten import Groesse
 from opencivil.core.wahl import Wahl
-
-
-class Verhalten(Wahl):
-    """Womit eine Schicht trägt: drainiert mit φ'_k und c'_k, undrainiert mit s_u,k."""
-
-    DRAINIERT = "drainiert"
-    UNDRAINIERT = "undrainiert"
-
-    @property
-    def beschriftung(self) -> str:
-        return {Verhalten.DRAINIERT: "drainiert", Verhalten.UNDRAINIERT: "undrainiert"}[self]
-
-    @property
-    def erklaerung(self) -> str:
-        return {Verhalten.DRAINIERT: "Wirksame Spannungen, mit φ'_k und c'_k",
-                Verhalten.UNDRAINIERT: "Totale Spannungen, mit s_u,k"}[self]
+from opencivil.geotechnik.verhalten import Verhalten
 
 
 class Mantel(Wahl):

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f0f100e0d46
+erzeugt: 64a5feae3f5e
 art: formel
 tags: [formel]
 normstelle: ["Kap. 9.2.10", "Kap. 9.2.17"]
@@ -16,7 +16,7 @@ $$
 *In der Herleitung: «Bruchspannung in der Sohle, undrainiert»*
 
 $$
-\sigma_f = 5.1 \cdot c_{eff} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0}
+\sigma_f = 5.1 \cdot s_{u,d} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0}
 $$
 
 ## Grössen
@@ -43,6 +43,7 @@ $$
 | $s_{\gamma}$ | Formfaktor des Gleitkörpergewichts | – | [[Formfaktor s_γ]] |
 | $i_{\gamma}$ | Lastneigungsfaktor des Gleitkörpergewichts | – | [[Lastneigungsfaktor i_γ]] |
 | $b_{\gamma}$ | Sohlneigungsfaktor des Gleitkörpergewichts | – | [[Sohlneigungsfaktor b_γ]] |
+| $s_{u,d}$ | Undrainierte Scherfestigkeit, Bemessungswert | kPa | [[Bemessungswert der undrainierten Scherfestigkeit]] |
 
 ## Beispiel
 
@@ -60,7 +61,7 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
 \begin{aligned}
-  \sigma_f &= 5.1 \cdot c_{eff} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0} \\
+  \sigma_f &= 5.1 \cdot s_{u,d} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0} \\
   &= 5.1 \cdot 26.7\,\mathrm{kPa} \cdot \left(1 + 0.15 + 0.21 - 0.15 - 0.03 - 0.07\right) + 16.8\,\mathrm{kPa} \\
   &= 169.3\,\mathrm{kPa}
 \end{aligned}
