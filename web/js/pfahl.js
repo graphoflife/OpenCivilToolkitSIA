@@ -321,8 +321,8 @@ function einwirkungenPanel(t) {
   }, [
     el('div.unterkapitel', {}, [
       t.kombinationen.length
-        ? fallkopf(kraefte(t).map(([schluessel]) =>
-          `${schluessel} [${feldangabe('pfahlkombination', schluessel).einheit}]`))
+        ? fallkopf(kraefte(t).map(([schluessel]) => [schluessel.replace('_Ed', '_{Ed}'),
+          feldangabe('pfahlkombination', schluessel).einheit]))
         : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
       ...t.kombinationen.map((_, i) => kombinationZeile(t, i)),
       el('button.knopf-anfuegen', { type: 'button', text: '+ Kombination', on: { click: neu } }),

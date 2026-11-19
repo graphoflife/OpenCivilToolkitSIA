@@ -163,8 +163,8 @@ function einwirkungenPanel(g) {
   }, [
     el('div.unterkapitel', {}, [
       g.kombinationen.length
-        ? fallkopf(['N_Ed', 'T_Ed'].map(
-          (s) => `${s} [${feldangabe('grundbruchkombination', s).einheit}]`))
+        ? fallkopf([['N_{Ed}', 'N_Ed'], ['T_{Ed}', 'T_Ed']].map(
+          ([zeichen, s]) => [zeichen, feldangabe('grundbruchkombination', s).einheit]))
         : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
       ...g.kombinationen.map((_, i) => kombinationZeile(g, i)),
       el('button.knopf-anfuegen', { type: 'button', text: '+ Kombination', on: { click: neu } }),

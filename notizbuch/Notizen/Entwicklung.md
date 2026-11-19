@@ -26,6 +26,10 @@ Der Satz kommt aus dem Kern (`_ohne_schub` in den Diagrammdaten); der
 Nachweis legt seinen Grund je Lastfall im Befund ab (`Schubbefund.ohne`),
 damit Urteil und Diagramm denselben Satz sagen.
 
+Ebenso nachgetragen: die Spaltenköpfe der Kombinationen bei Grundbruch und
+Pfahl standen als Text da und wurden gross geschrieben, «N_ED [KN]». Jetzt
+Formeln wie bei Platte, Setzung und Querschnittsanalyse: N_Ed [kN].
+
 ## 2026-11-19 · Grundbruch, Setzung, Pfahl: die Zusammenfassung sagt, was fehlt
 
 Dreizehnter und letzter Schritt der Durchsicht, die Bereiche Grundbruch
