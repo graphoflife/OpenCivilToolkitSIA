@@ -404,6 +404,41 @@ const ZEICHEN = {
   einlage: {
     pfade: ['M2 4h20 M2 20h20', 'M7 12.5h10v4.5H7z', 'M7 6.5v3 M17 6.5v3 M7 8h10'],
   },
+  // Wie die Stäbe auf einer Linie liegen: verschmiert ein Band; n Stäbe
+  // gleich verteilt, das Mass über die ganze Linie; im Abstand s, das Mass
+  // zwischen zweien.
+  'linie-flaeche': {
+    flaechen: ['M3 10.5h18v3H3z'],
+  },
+  'linie-anzahl': {
+    pfade: ['M4 13.5h16', 'M4 7.5h16 M4 6v3 M20 6v3'],
+    voll: [[4, 13.5, 1.8], [9.33, 13.5, 1.8], [14.67, 13.5, 1.8], [20, 13.5, 1.8]],
+  },
+  'linie-teilung': {
+    pfade: ['M4 13.5h16', 'M9.33 7.5h5.34 M9.33 6v3 M14.67 6v3'],
+    voll: [[4, 13.5, 1.8], [9.33, 13.5, 1.8], [14.67, 13.5, 1.8], [20, 13.5, 1.8]],
+  },
+  // Die Linie mit ihren Enden: ein Stab genau am Anfang, das Ende frei -- und
+  // umgekehrt. Der Strich steht nur am freien Ende; mit einem an beiden Enden
+  // sahen sich die zwei Bilder in 18 px zu ähnlich.
+  'linie-starteisen': {
+    pfade: ['M4 12h16', 'M20 8v8'],
+    voll: [[4, 12, 2.3], [9.33, 12, 1.6], [14.67, 12, 1.6]],
+  },
+  'linie-endeisen': {
+    pfade: ['M4 12h16', 'M4 8v8'],
+    voll: [[9.33, 12, 1.6], [14.67, 12, 1.6], [20, 12, 2.3]],
+  },
+  // Der Querschnitt mit seiner Druckzone, voll: über einer waagrechten
+  // Nulllinie, wenn er nur um y gebogen wird, sonst über einer schiefen.
+  'biegung-einachsig': {
+    pfade: ['M7 3h10v18H7z', 'M3 10h18'],
+    flaechen: ['M7 3h10v7H7z'],
+  },
+  'biegung-zweiachsig': {
+    pfade: ['M7 3h10v18H7z', 'M3 14L21 6'],
+    flaechen: ['M7 3h10v4.78L7 12.22z'],
+  },
 };
 
 /** Ein Zeichen als SVG -- `name` aus der Liste oben. */

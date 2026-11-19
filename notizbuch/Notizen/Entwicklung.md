@@ -7,6 +7,23 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Bilder an den Schaltern: Querschnittsanalyse
+
+Die letzte Gruppe. Die Art einer Bewehrungslinie zeigt je Stellung, wie die
+Stäbe liegen: verschmiert ein Band, «Anzahl» das Mass über die ganze Linie,
+«Teilung» das Mass zwischen zwei Stäben. Im kleinen Fenster des
+Zeichenbereichs stehen die drei Bilder über dem Wort, wie bei den
+Werkzeugen – nebeneinander waren sie breiter als das Fenster. Hinter
+Start- und Endeisen steht die Linie mit dem Stab am Anfang oder am Ende;
+der Strich markiert das freie Ende, denn mit einem Strich an beiden Enden
+sahen sich die zwei Bilder zu ähnlich.
+
+«Nur einachsig» war ein Häkchen mit einem Satz darunter; jetzt ist es der
+Schalter «Biegung: einachsig / zweiachsig», je mit dem Querschnitt und
+seiner Druckzone über einer waagrechten oder einer schiefen Nulllinie. Was
+sonst noch gilt – M_z und V_y zählen einachsig nicht –, steht im Titel der
+Stellung.
+
 ## 2026-11-19 · Bilder an den Schaltern: Setzung und Platte
 
 Die Steifigkeit der Setzung zeigt das Fundament im Grundriss, mit dem Punkt,

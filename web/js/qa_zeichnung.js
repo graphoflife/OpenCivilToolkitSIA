@@ -30,7 +30,7 @@
 
 import { api } from './api.js';
 import {
-  VAR, gemeinsam, hakenSchalter, materialliste, mitVar, wahlSchalter,
+  VAR, gemeinsam, hakenSchalter, materialliste, mitBild, mitVar, wahlSchalter,
 } from './bausteine.js';
 import {
   nachBild, pfad, text, zahlText,
@@ -44,6 +44,7 @@ import {
   abstand, auswahlTeil, eckeSchluessel, knotenname,
 } from './cad_modell.js';
 import { vorlageOeffnen } from './qa_vorlagen.js';
+import { sinnbild } from './sinnbilder.js';
 import {
   el, melden, svgEl, zahlfeld,
 } from './dom.js';
@@ -565,11 +566,12 @@ function felderVon(liste, werte, setzen, info = null) {
   const stahl = () => cadZeile('Stahl', materialliste({
     art: 'betonstahl', gewaehlt: werte.stahl, setzen: (w) => setzen('stahl', w),
   }));
-  const haken = (text, feld) => el('div.cad-zeile', {}, [
+  // Dahinter ein Bild, was die Wahl meint -- etwa der Stab am Anfang der Linie.
+  const haken = (text, feld, bild = null, bildtitel = '') => el('div.cad-zeile', {}, [
     el('span', { text }),
     werte[feld] === VAR ? jaNein(VAR, (w) => setzen(feld, w), text)
       : hakenSchalter(werte[feld] !== false, (w) => setzen(feld, w), text),
-    el('span'),
+    bild ? el('span.zeilenbild', { title: bildtitel }, [bild]) : el('span'),
   ]);
   // Verschiedene Arten zugleich gewählt: ihre Felder unterscheiden sich.
   const erstWaehlen = el('p.cad-hinweis-klein', {
@@ -590,9 +592,11 @@ function felderVon(liste, werte, setzen, info = null) {
       teilung: 'Stäbe im Abstand s – gerundet auf einen, der aufgeht',
     };
     const artWahl = wahlSchalter({
-      werte: mitVar(arten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: erklaert[x.wert] })), art),
+      werte: mitVar(mitBild(arten.map((x) => ({
+        wert: x.wert, beschriftung: x.beschriftung, titel: erklaert[x.wert],
+      })), 'linie'), art),
       gewaehlt: art, setzen: (w) => setzen('art', w),
-      titel: 'Wie die Stäbe auf der Linie verteilt sind', klasse: '.cad-wahl',
+      titel: 'Wie die Stäbe auf der Linie verteilt sind', klasse: '.cad-wahl.ist-gross',
     });
     if (art === VAR) return [artWahl, erstWaehlen, stahl()];
     const verschmierung = art === 'flaeche' ? wahlSchalter({
@@ -617,8 +621,10 @@ function felderVon(liste, werte, setzen, info = null) {
         wert: info?.punkte ? Math.round(info.flaeche) : null, readonly: true,
         titel: 'Die verschmierte Stahlfläche L/s · π⌀²/4 – vom Kern gerechnet',
       }), 'mm²') : null,
-      art !== 'flaeche' ? haken('Starteisen', 'starteisen') : null,
-      art !== 'flaeche' ? haken('Endeisen', 'endeisen') : null,
+      art !== 'flaeche' ? haken('Starteisen', 'starteisen', sinnbild('linie-starteisen'),
+        'Ein Stab genau am Anfang der Linie – aus: der Anfang bleibt frei') : null,
+      art !== 'flaeche' ? haken('Endeisen', 'endeisen', sinnbild('linie-endeisen'),
+        'Ein Stab genau am Ende der Linie – aus: das Ende bleibt frei') : null,
       stahl(),
     ];
   }

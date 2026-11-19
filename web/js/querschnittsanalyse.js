@@ -18,7 +18,9 @@
  * Lastfällen zeigt es.
  */
 
-import { erklaerung, feld, hakenSchalter, namensfeld, panel, wahlSchalter } from './bausteine.js';
+import {
+  erklaerung, feld, hakenSchalter, namensfeld, panel, wahlBlock, wahlSchalter,
+} from './bausteine.js';
 import { el, svgEl, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
@@ -259,18 +261,20 @@ function tragsicherheitInhalt(analyse) {
   return [
     ...werkstoffwahl(analyse),
     el('div.qa-kopfzeile', {}, [
+      // Je Stellung die Nulllinie im Bild, statt Häkchen und Satz (Benutzer,
+      // 2026-11-19); was sonst noch gilt, steht im Titel der Stellung.
       el('div.qa-schalter', {}, [
-        el('div.duktilitaetszeile.ist-breit', {}, [
-          hakenSchalter(!!analyse.einachsig,
-            (wert) => aendern((a) => { a.einachsig = wert; }), 'Einachsige Biegung'),
-          el('span.postenname', { text: 'nur einachsig (Biegung um y)' }),
-          el('span'),
-        ]),
-        el('p.qa-erlaeuterung', {
-          text: analyse.einachsig
-            ? 'Nulllinie waagrecht; M_z und V_y zählen nicht.'
-            : 'N, M_y und M_z gleichzeitig; die Nulllinie liegt schief.',
-        }),
+        wahlBlock('Biegung', wahlSchalter({
+          werte: [
+            { wert: true, beschriftung: 'einachsig', zeichen: 'biegung-einachsig',
+              titel: 'Nur um y: die Nulllinie bleibt waagrecht; M_z und V_y zählen nicht' },
+            { wert: false, beschriftung: 'zweiachsig', zeichen: 'biegung-zweiachsig',
+              titel: 'N, M_y und M_z gleichzeitig: die Nulllinie liegt schief' },
+          ],
+          gewaehlt: !!analyse.einachsig,
+          setzen: (wert) => aendern((a) => { a.einachsig = wert; }),
+          titel: 'Nur um y gebogen oder um beide Achsen',
+        })),
       ]),
       vorzeichenbild(analyse.einachsig),
     ]),

@@ -1508,8 +1508,8 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
-/* Über den Lastfällen: links der Schalter «nur einachsig», rechts das Bild
-   der Vorzeichen. In der schmalen Tafel rutscht das Bild darunter. */
+/* Über den Lastfällen: links der Schalter einachsig/zweiachsig, rechts das
+   Bild der Vorzeichen. In der schmalen Tafel rutscht das Bild darunter. */
 .qa-kopfzeile {
   display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
   margin-bottom: 8px;
@@ -1676,6 +1676,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-zeile .zahlfeld, .cad-zeile input[type="number"] { font-size: 12px; }
 .cad-zeile input[type="number"] { padding-block: 2px; }
 .cad-zeile .einheit { font-size: 11px; color: var(--schrift-zart); }
+/* Ein Bild hinter einem Schalter, was er meint -- etwa der Stab am Anfang der Linie. */
+.zeilenbild { display: inline-flex; color: var(--schrift-matt); }
+.zeilenbild > .sinnbild { width: 18px; height: 18px; }
 .cad-neu { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid var(--rand); }
 /* Ein Knopf, der selten gebrauchte Felder auf- und zuklappt -- die Bettung einer Linie. */
 .cad-aufklapper {
@@ -1688,6 +1691,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-wahl { align-self: flex-start; }
 .cad-wahl .schalter-halb { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; }
 .cad-wahl .sinnbild { width: 15px; height: 15px; }
+/* Drei Stellungen mit Bild passen nur so ins Fenster: das Zeichen über dem
+   Wort, wie bei den Werkzeugen der Leiste -- die Art einer Bewehrungslinie. */
+.cad-wahl.ist-gross .schalter-halb { flex-direction: column; gap: 1px; padding: 3px 5px 2px; }
 .cad-neu-titel {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
   color: var(--schrift-zart);
