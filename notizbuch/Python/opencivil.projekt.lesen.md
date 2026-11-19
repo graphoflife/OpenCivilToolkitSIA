@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e96e1b2e783
+erzeugt: 7cf12e08cba0
 art: modul
 tags: [modul]
 ---
@@ -100,6 +100,7 @@ vor dem Rechnen ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
 - `ab: Optional[float] = None`
 - `bis: Optional[float] = None`
 - `unter: Optional[float] = None`
+- `bis_feld: Optional[str] = None` – Ein Feld desselben Eintrags, dessen Zahl diese nicht uebersteigen darf: α_min nicht ueber α_max. Die Regel steht so einmal, beim kleineren Feld. Die Maske weist sie an beiden Feldern ab ([[opencivil.projekt.lesen#feldangaben|feldangaben]]), die Pruefung vor dem Rechnen haelt eine Datei damit auf -- mit denselben Worten ([[opencivil.projekt.lesen#Bereich.gegen|gegen]]).
 
 #### Bereich.pruefen
 
@@ -116,6 +117,24 @@ def verlangt(self) -> str
 
 Was die Grenzen verlangen: «muss grösser als null sein».
 
+#### Bereich.gegen
+
+```python
+def gegen(self, anderer: Bereich) -> Tuple[str, str]
+```
+
+Was [[opencivil.projekt.lesen#Bereich|bis_feld]] verlangt, an diesem Feld und am anderen
+(`anderer`): «α_min darf nicht grösser sein als α_max», «α_max darf
+nicht kleiner sein als α_min».
+
+#### Bereich.nicht_ueber
+
+```python
+def nicht_ueber(self, wert: Optional[float], anderer: Bereich, grenze: Optional[float], wo: str) -> None
+```
+
+Haelt auf, was [[opencivil.projekt.lesen#Bereich|bis_feld]] verletzt: die Zahl ueber der des anderen Feldes.
+
 #### Bereich._zahl
 
 ```python
@@ -127,7 +146,7 @@ Eine Zahl mit der Einheit des Feldes: «300 mm», «30°», «0.9».
 ### bereich
 
 ```python
-def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
+def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, bis_feld: Optional[str]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
 ```
 
 Ein Feld, dessen Zahl in einem [[opencivil.projekt.lesen#Bereich|Bereich]] liegen muss -- eine
@@ -159,9 +178,23 @@ sein») -- das Feld weist sie mit dem Satz ab, der sonst beim Rechnen
 kaeme. Was eine Wahl annehmen kann, steht nicht hier: das sagen die
 Wahllisten des Katalogs, mit Beschriftung.
 
+Begrenzt ein Feld ein anderes ([[opencivil.projekt.lesen#Bereich|Bereich.bis_feld]]), steht das an
+beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
+sagt: `bis_feld` bei α_min, `ab_feld` bei α_max. Die Zahl des anderen
+Feldes kennt erst die Maske.
+
 Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
 des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
 und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
+
+### _bereiche
+
+```python
+@functools.lru_cache(maxsize=None)
+def _bereiche(cls: type) -> Dict[str, Bereich]
+```
+
+Die Bereiche der Felder einer Klasse, nach Feldnamen -- je Klasse einmal.
 
 ### bereichsangabe
 
@@ -309,7 +342,8 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str]=()) -> None
 
 Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
 jede Zahl gegen ihren Bereich ([[opencivil.projekt.lesen#bereich|bereich]]), jeden Eintrag darin
-ebenso, und danach die Regeln des Eintrags ueber mehrere Felder,
+ebenso, jede gegen das Feld, das sie begrenzt ([[opencivil.projekt.lesen#Bereich|Bereich.bis_feld]]),
+und danach die Regeln des Eintrags ueber mehrere Felder,
 `regeln(wo)`. Die Form ist da schon geprueft: ein Eintrag steht, wo
 einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
 `ohne` prueft, wer sie einzeln prueft -- der Aufbau jedes Material und

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e64ec6ba23d
+erzeugt: ac5d335598a1
 art: modul
 tags: [modul]
 ---
@@ -331,8 +331,8 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `werkstoffwahl: List[WerkstoffwahlEintrag] = field(default_factory=list)` – Je Material eine Wahl; fehlt eine, gelten die Vorgaben.
 - `lastfaelle: List[QALastfallEintrag] = field(default_factory=list)`
 - `einachsig: bool = False` – Nur Biegung um y: die Nulllinie bleibt waagrecht, M_z und V_y zaehlen nicht, und Duktilitaet und sproedes Versagen gibt es nur in y. Torsion bleibt. Bei einem unsymmetrischen Querschnitt ist das eine Naeherung -- dasselbe, was die Platte immer tut.
-- `alpha_min: int = neigung(ALPHA_MIN, 'α_min')`
-- `alpha_max: int = neigung(ALPHA_MAX, 'α_max')` – Die Grenzen der Druckfeldneigung in den Schubwaenden -- wie bei den Buegeln der Platte.
+- `alpha_min: int = kleinste_neigung()`
+- `alpha_max: int = groesste_neigung()` – Die Grenzen der Druckfeldneigung in den Schubwaenden -- wie bei den Buegeln der Platte.
 - `laengszugkraft: bool = False` – Ob die Laengszugkraft aus Querkraft und Torsion in den M-N-Nachweis eingeht: das Druckfeld jeder Schubwand braucht in Laengsrichtung Zug.
 - `quasistaendig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_A…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
@@ -529,7 +529,6 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.projekt.netz]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
-- [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.zugseite]]
 

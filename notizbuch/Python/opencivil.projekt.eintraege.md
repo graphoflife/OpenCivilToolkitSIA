@@ -1,5 +1,5 @@
 ---
-erzeugt: e394d3f360a6
+erzeugt: ed9a94edf8ea
 art: modul
 tags: [modul]
 ---
@@ -192,10 +192,28 @@ Was eine Normsorte bleibt und wie ein eigenes Material heissen darf --
 vor dem Rechnen, nicht beim Oeffnen: ein abgelegtes Material mit
 falschem Namen soll sich oeffnen und umbenennen lassen.
 
-### neigung
+### kleinste_neigung
 
 ```python
-def neigung(vorgabe: int, heisst: str) -> Any
+def kleinste_neigung() -> Any
+```
+
+α_min, die kleinste Neigung der Druckdiagonalen -- und nicht ueber α_max:
+bei den Buegeln der Platte wie am gezeichneten Querschnitt. Eine
+groessere weist schon das Feld ab ([[opencivil.projekt.lesen#Bereich|bis_feld]]).
+
+### groesste_neigung
+
+```python
+def groesste_neigung() -> Any
+```
+
+α_max, die groesste -- eine unter α_min weist ihr Feld ebenso ab.
+
+### _neigung
+
+```python
+def _neigung(vorgabe: int, heisst: str, bis_feld: Optional[str]=None) -> Any
 ```
 
 Eine Grenze der Druckfeldneigung -- in ganzen Grad, 1° bis 89°.
@@ -345,8 +363,8 @@ eigenes Feld, wie beim [[opencivil.projekt.eintraege#PostenEintrag|PostenEintrag
 - `abstand_y: float = 200.0`
 - `anzahl_y: float = 5.0`
 - `art_y: Linienart = einer_von(MENGEN, Linienart.TEILUNG)`
-- `alpha_min: int = neigung(ALPHA_MIN, 'α_min')`
-- `alpha_max: int = neigung(ALPHA_MAX, 'α_max')`
+- `alpha_min: int = kleinste_neigung()`
+- `alpha_max: int = groesste_neigung()`
 
 #### QuerkraftbewehrungEintrag.vorhanden
 
@@ -383,15 +401,6 @@ def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung
 ```
 
 Die Buegel fuer den Querschnitt -- erst nach [[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.regeln|regeln]].
-
-### neigungen_ordnen
-
-```python
-def neigungen_ordnen(alpha_min: int, alpha_max: int, wo: str) -> None
-```
-
-α_min nicht ueber α_max -- bei den Buegeln der Platte wie am gezeichneten
-Querschnitt. Wo jede fuer sich liegt, steht am Feld ([[opencivil.projekt.eintraege#neigung|neigung]]).
 
 ### KnickEintrag
 

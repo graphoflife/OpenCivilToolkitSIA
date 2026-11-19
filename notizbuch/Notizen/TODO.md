@@ -111,9 +111,10 @@ gelernt wurde, steht in [[Entwicklung]].
       sein.»), statt nur seine Platte (Durchsicht vom 2026-11-19).
       Entschieden (Benutzer, 2026-11-19): nur seine Platte oder Analyse
       rechnet nicht und sagt am Ort, was fehlt.
-- [ ] **α_min über α_max schon am Feld abweisen.** Heute nimmt das Feld
-      α_min = 50° bei α_max = 40° an; die Analyse oder Platte hält an und
-      sagt es oben im Fenster (`neigungen_ordnen`). Ein Feld, dessen Grenze
+- [x] **α_min über α_max schon am Feld abweisen.** Erledigt (2026-11-19):
+      `bereich(..., bis_feld="alpha_max")`, siehe [[Entwicklung]]. Vorher
+      nahm das Feld α_min = 50° bei α_max = 40° an; die Analyse oder Platte
+      hielt an und sagte es oben im Fenster (`neigungen_ordnen`). Ein Feld, dessen Grenze
       ein anderes Feld ist, kennt der Katalog nicht: `bereich` hat nur feste
       Grenzen. Vorschlag: `bereich(..., hoechstens="alpha_max")`, daraus die
       Regel im Kern und die Grenze am Feld, an einer Stelle (Durchsicht vom

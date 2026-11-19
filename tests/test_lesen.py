@@ -333,8 +333,20 @@ class TestNichtsStill(unittest.TestCase):
                 setzen(q)
                 self.assertIn(text, self.fehler(p))
 
+    def test_die_neigungen_der_buegel_gegeneinander(self):
+        """Am Feld abgewiesen und vor dem Rechnen geprüft, mit denselben Worten."""
+        p = Projekt.beispiel()
+        buegel = p.querschnitt("q1").querkraftbewehrung
+        buegel.alpha_min, buegel.alpha_max = 50, 40
+        self.assertIn("querkraftbewehrung: α_min darf nicht grösser sein als α_max, "
+                      "angegeben sind 50° und 40°.", self.fehler(p))
+        buegel.alpha_min = 40
+        with self.assertRaisesRegex(AssertionError, "Alles rechnet"):
+            self.fehler(p)
+
     def test_die_grenzen_des_gezeichneten_querschnitts(self):
-        for feld, wert, text in (("alpha_min", 60, "α_min = 60° ist grösser als α_max"),
+        for feld, wert, text in (("alpha_min", 60, "α_min darf nicht grösser sein als α_max, "
+                                                    "angegeben sind 60° und 45°."),
                                  ("k_c", -1.0, "k_c muss grösser als null sein"),
                                  ("x_d_max", 0.9, "k der Grenze x/d muss grösser als null")):
             with self.subTest(feld=feld):

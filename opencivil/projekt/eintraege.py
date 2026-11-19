@@ -224,9 +224,23 @@ class MaterialEintrag(Beschreibung):
 # ===========================================================================
 
 
-def neigung(vorgabe: int, heisst: str) -> Any:
+def kleinste_neigung() -> Any:
+    """
+    α_min, die kleinste Neigung der Druckdiagonalen -- und nicht ueber α_max:
+    bei den Buegeln der Platte wie am gezeichneten Querschnitt. Eine
+    groessere weist schon das Feld ab (:attr:`~opencivil.projekt.lesen.Bereich.bis_feld`).
+    """
+    return _neigung(ALPHA_MIN, "α_min", bis_feld="alpha_max")
+
+
+def groesste_neigung() -> Any:
+    """α_max, die groesste -- eine unter α_min weist ihr Feld ebenso ab."""
+    return _neigung(ALPHA_MAX, "α_max")
+
+
+def _neigung(vorgabe: int, heisst: str, bis_feld: Optional[str] = None) -> Any:
     """Eine Grenze der Druckfeldneigung -- in ganzen Grad, 1° bis 89°."""
-    return bereich(vorgabe, heisst=heisst, einheit=GRAD, ab=1, bis=89)
+    return bereich(vorgabe, heisst=heisst, einheit=GRAD, ab=1, bis=89, bis_feld=bis_feld)
 
 
 def druckfeld() -> Any:
@@ -374,8 +388,8 @@ class QuerkraftbewehrungEintrag(Beschreibung):
     abstand_y: float = 200.0
     anzahl_y: float = 5.0
     art_y: Linienart = einer_von(MENGEN, Linienart.TEILUNG)
-    alpha_min: int = neigung(ALPHA_MIN, "α_min")
-    alpha_max: int = neigung(ALPHA_MAX, "α_max")
+    alpha_min: int = kleinste_neigung()
+    alpha_max: int = groesste_neigung()
 
     @property
     def vorhanden(self) -> bool:
@@ -393,7 +407,6 @@ class QuerkraftbewehrungEintrag(Beschreibung):
 
     def regeln(self, wo: str) -> None:
         """Was nicht stimmen kann, soll als Satz beim Benutzer ankommen."""
-        neigungen_ordnen(self.alpha_min, self.alpha_max, wo)
         if not self.vorhanden:
             return
         if self.abstand_x <= 0:
@@ -420,18 +433,6 @@ class QuerkraftbewehrungEintrag(Beschreibung):
             alpha_min=self.alpha_min,
             alpha_max=self.alpha_max,
         )
-
-
-def neigungen_ordnen(alpha_min: int, alpha_max: int, wo: str) -> None:
-    """
-    α_min nicht ueber α_max -- bei den Buegeln der Platte wie am gezeichneten
-    Querschnitt. Wo jede fuer sich liegt, steht am Feld (:func:`neigung`).
-    """
-    if alpha_min > alpha_max:
-        raise ProjektFehler(
-            f"{wo}: α_min = {alpha_min}° ist grösser als α_max = {alpha_max}°. "
-            f"Zwischen den beiden liegt dann keine Neigung, für die sich ein "
-            f"Widerstand rechnen liesse.")
 
 
 @dataclass

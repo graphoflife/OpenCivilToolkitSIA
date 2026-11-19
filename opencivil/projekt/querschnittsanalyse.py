@@ -40,13 +40,12 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import FASERSPANNUNGSARTEN
 from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
-from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste, Gebrauchswahl,
-    KnickEintrag, Querschnittsangaben, SpannungsfallEintrag, eindeutig, neigung,
-    neigungen_ordnen,
+    KnickEintrag, Querschnittsangaben, SpannungsfallEintrag, eindeutig, groesste_neigung,
+    kleinste_neigung,
 )
 from opencivil.core.einheiten import MM
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
@@ -375,8 +374,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
     dasselbe, was die Platte immer tut.
     """
 
-    alpha_min: int = neigung(ALPHA_MIN, "α_min")
-    alpha_max: int = neigung(ALPHA_MAX, "α_max")
+    alpha_min: int = kleinste_neigung()
+    alpha_max: int = groesste_neigung()
     """Die Grenzen der Druckfeldneigung in den Schubwaenden -- wie bei den Buegeln der Platte."""
 
     laengszugkraft: bool = False
@@ -628,7 +627,6 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
             gewaehlt.add(w.material)
         eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
         eindeutig((f.name for f in self.knickfaelle), wo, "Knicknachweis")
-        neigungen_ordnen(self.alpha_min, self.alpha_max, wo)
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""

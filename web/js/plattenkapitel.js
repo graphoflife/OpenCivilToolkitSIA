@@ -306,7 +306,7 @@ function querkraftAngaben(querschnitt) {
       ['alpha_max', String.raw`\alpha_{max}`, 'Grösste']].map(([schluessel, symbol, welche]) => {
       const angabe = feldangabe('querkraftbewehrung', schluessel);
       return feld(['Neigung ', span(symbol)], zahlfeld({
-        wert: buegel[schluessel], angabe,
+        wert: buegel[schluessel], angabe, neben: buegel,
         titel: `${welche} Neigung der Druckdiagonalen, ganze °`,
         beiAenderung: (v) => aendernBuegel((x) => { x[schluessel] = v; }),
       }), angabe.einheit);

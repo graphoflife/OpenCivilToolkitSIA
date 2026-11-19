@@ -228,7 +228,7 @@ function schubwandAngaben(analyse) {
         return [
           span(symbol),
           zahlfeld({
-            wert: analyse[schluessel], angabe, titel,
+            wert: analyse[schluessel], angabe, neben: analyse, titel,
             beiAenderung: (v) => aendern((a) => { a[schluessel] = v; }),
           }),
           el('span.einheit', { text: angabe.einheit }),

@@ -127,14 +127,25 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
 /**
  * Warum der Kern eine Zahl abwiese -- leer, wenn er sie nimmt. `angabe` sind
  * die Grenzen ihres Feldes aus dem Katalog (`feldangabe`): «Teilung muss
- * grösser als null sein».
+ * grösser als null sein». Begrenzt sie ein anderes Feld desselben Eintrags
+ * (`bis_feld`, `ab_feld`: α_min nicht über α_max), steht dessen Zahl in
+ * `neben`, dem Eintrag.
  */
-export function grenzeVerletzt(angabe, zahl) {
+export function grenzeVerletzt(angabe, zahl, neben = {}) {
   if (angabe.ganz && !Number.isInteger(zahl)) return 'Nur ganze Zahlen';
-  const { ueber, ab, bis, unter } = angabe;
+  const { ueber, ab, bis, unter, bis_feld: hoch, ab_feld: tief } = angabe;
   const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
     || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
-  return draussen ? `${angabe.heisst} ${angabe.verlangt}` : '';
+  if (draussen) return `${angabe.heisst} ${angabe.verlangt}`;
+  if (hoch && zahl > neben[hoch.feld]) return hoch.satz;
+  if (tief && zahl < neben[tief.feld]) return tief.satz;
+  return '';
+}
+
+/** Die engste der Grenzen, die es gibt -- `wahl` ist Math.max für unten, Math.min für oben. */
+function engste(wahl, ...grenzen) {
+  const da = grenzen.filter((g) => g !== undefined && g !== null);
+  return da.length ? wahl(...da) : undefined;
 }
 
 /**
@@ -157,22 +168,29 @@ export function grenzeVerletzt(angabe, zahl) {
  * Kommazahl in einem Feld für ganze. Es sagt es mit den Worten des Kerns und
  * behält seinen Wert: bis 2026-10-18 rundete die Oberfläche eine Neigung von
  * 37.5° still auf 38°, bis 2026-11-19 hielt eine Stelle von 150 % erst beim
- * Rechnen ihr Bauteil an.
+ * Rechnen ihr Bauteil an. Ebenso gegen ein anderes Feld, das es begrenzt --
+ * α_min nicht über α_max --, wenn `neben` den Eintrag mit dessen Zahl gibt.
  *
  * @param {number[]} [stufen]  erlaubte Werte; sonst wird `schritt` verwendet
  * @param {number|null} [leer] was ein geleertes Feld meldet; fehlt es, bleibt
  *                             der bisherige Wert
  * @param {string} [platzhalter] blass im leeren Feld -- was dann gilt
  * @param {Object} [angabe]    was der Kern über das Feld weiss: Grenzen, ganz
+ * @param {Object} [neben]     der Eintrag des Feldes, für die Grenze gegen ein
+ *                             anderes Feld (`grenzeVerletzt`)
  */
 export function zahlfeld({
   wert, schritt = 1, stufen, min, max, beiAenderung, titel, readonly, leer, platzhalter,
-  angabe = {},
+  angabe = {}, neben = {},
 }) {
-  const unten = min ?? angabe.ab ?? (angabe.ueber === undefined ? undefined : angabe.ueber + schritt);
-  const oben = max ?? angabe.bis ?? (angabe.unter === undefined ? undefined : angabe.unter - schritt);
+  const unten = engste(Math.max,
+    min ?? angabe.ab ?? (angabe.ueber === undefined ? undefined : angabe.ueber + schritt),
+    angabe.ab_feld && neben[angabe.ab_feld.feld]);
+  const oben = engste(Math.min,
+    max ?? angabe.bis ?? (angabe.unter === undefined ? undefined : angabe.unter - schritt),
+    angabe.bis_feld && neben[angabe.bis_feld.feld]);
   const uebernehmen = (neu, getippt = String(neu)) => {
-    const grund = neu === null ? '' : grenzeVerletzt(angabe, neu);
+    const grund = neu === null ? '' : grenzeVerletzt(angabe, neu, neben);
     if (!grund) {
       beiAenderung(neu);
       return;

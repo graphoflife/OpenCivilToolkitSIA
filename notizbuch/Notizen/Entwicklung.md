@@ -7,6 +7,20 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · α_min über α_max weist schon das Feld ab
+
+Entscheid des Benutzers. Vorher nahm das Feld α_min = 50° bei α_max = 40°
+an, und erst die Rechnung hielt Platte oder Analyse an. Jetzt sagt das Feld
+«α_min darf nicht grösser sein als α_max: 50 ist nicht übernommen.» und
+behält 30°; ebenso α_max unter α_min. Die Pfeile halten am anderen Wert.
+
+Die Regel steht einmal, am Feld des Kerns: `bereich(..., bis_feld=
+"alpha_max")` bei α_min (`kleinste_neigung`). Daraus macht der Katalog
+`bis_feld` bei α_min und `ab_feld` bei α_max, mit dem Satz des Kerns, und
+`inhalt_pruefen` hält eine Datei mit denselben Worten auf.
+`neigungen_ordnen` ist weg. Die Zahl des anderen Feldes kennt erst die
+Maske: `zahlfeld({..., neben: eintrag})`.
+
 ## 2026-11-19 · Eine Kennung kommt nie wieder
 
 Entscheid des Benutzers. Vorher war die nächste Kennung die grösste

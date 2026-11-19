@@ -378,15 +378,24 @@ class TestEinheitenAmFeld(unittest.TestCase):
                       meldung(p))
 
     def test_eine_neigung_ist_ganz(self):
-        """Die Maske nimmt dort keine Kommazahl an, statt sie still zu runden (2026-10-18)."""
+        """
+        Die Maske nimmt dort keine Kommazahl an, statt sie still zu runden
+        (2026-10-18), und keine kleinste über der grössten (2026-11-19).
+        """
         felder = katalog()["felder"]
+        gegen = {
+            "alpha_min": {"bis_feld": {"feld": "alpha_max",
+                                       "satz": "α_min darf nicht grösser sein als α_max"}},
+            "alpha_max": {"ab_feld": {"feld": "alpha_min",
+                                      "satz": "α_max darf nicht kleiner sein als α_min"}},
+        }
         for art in ("querkraftbewehrung", "querschnittsanalyse"):
             for feld in ("alpha_min", "alpha_max"):
                 with self.subTest(art=art, feld=feld):
                     self.assertEqual(felder[art][feld], {
                         "einheit": "°", "ab": 1, "bis": 89, "ganz": True,
                         "heisst": feld.replace("alpha_", "α_"),
-                        "verlangt": "muss mindestens 1° und höchstens 89° sein"})
+                        "verlangt": "muss mindestens 1° und höchstens 89° sein", **gegen[feld]})
 
     def test_die_rechnung_nimmt_die_einheit_des_feldes(self):
         """Jede Zahl der Maske kommt in der Einheit ihres Feldes in die Rechnung."""

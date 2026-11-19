@@ -60,7 +60,7 @@ import enum
 import functools
 import math
 import typing
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 
@@ -96,6 +96,15 @@ class Bereich:
     bis: Optional[float] = None
     unter: Optional[float] = None
 
+    bis_feld: Optional[str] = None
+    """
+    Ein Feld desselben Eintrags, dessen Zahl diese nicht uebersteigen darf:
+    α_min nicht ueber α_max. Die Regel steht so einmal, beim kleineren Feld.
+    Die Maske weist sie an beiden Feldern ab (:func:`feldangaben`), die
+    Pruefung vor dem Rechnen haelt eine Datei damit auf -- mit denselben
+    Worten (:meth:`gegen`).
+    """
+
     def pruefen(self, wert: float, wo: str) -> None:
         if ((self.ueber is None or wert > self.ueber) and (self.ab is None or wert >= self.ab)
                 and (self.bis is None or wert <= self.bis)
@@ -115,6 +124,22 @@ class Bereich:
         return "muss " + " und ".join(
             f"{wort} {'null' if g == 0.0 else self._zahl(g)}" for wort, g in grenzen) + " sein"
 
+    def gegen(self, anderer: Bereich) -> Tuple[str, str]:
+        """
+        Was :attr:`bis_feld` verlangt, an diesem Feld und am anderen
+        (``anderer``): «α_min darf nicht grösser sein als α_max», «α_max darf
+        nicht kleiner sein als α_min».
+        """
+        return (f"{self.heisst} darf nicht grösser sein als {anderer.heisst}",
+                f"{anderer.heisst} darf nicht kleiner sein als {self.heisst}")
+
+    def nicht_ueber(self, wert: Optional[float], anderer: Bereich,
+                    grenze: Optional[float], wo: str) -> None:
+        """Haelt auf, was :attr:`bis_feld` verletzt: die Zahl ueber der des anderen Feldes."""
+        if wert is not None and grenze is not None and wert > grenze:
+            raise ProjektFehler(f"{wo}: {self.gegen(anderer)[0]}, angegeben sind "
+                                f"{self._zahl(wert)} und {anderer._zahl(grenze)}.")
+
     def _zahl(self, wert: float) -> str:
         """Eine Zahl mit der Einheit des Feldes: «300 mm», «30°», «0.9»."""
         if self.einheit is None or self.einheit.name in ("", "-"):
@@ -125,13 +150,15 @@ class Bereich:
 def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
             einheit: Optional[Einheit] = None, ueber: Optional[float] = None,
             ab: Optional[float] = None, bis: Optional[float] = None,
-            unter: Optional[float] = None, fabrik: Optional[Callable[[], Any]] = None) -> Any:
+            unter: Optional[float] = None, bis_feld: Optional[str] = None,
+            fabrik: Optional[Callable[[], Any]] = None) -> Any:
     """
     Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine
     Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede
     (:func:`inhalt_pruefen`); ihre Vorgabe kommt dann aus ``fabrik``.
     """
-    metadata = {"bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter)}
+    metadata = {"bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter,
+                                   bis_feld=bis_feld)}
     if fabrik is not None:
         return dataclasses.field(default_factory=fabrik, metadata=metadata)
     return dataclasses.field(default=vorgabe, metadata=metadata)
@@ -158,20 +185,38 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     kaeme. Was eine Wahl annehmen kann, steht nicht hier: das sagen die
     Wahllisten des Katalogs, mit Beschriftung.
 
+    Begrenzt ein Feld ein anderes (:attr:`Bereich.bis_feld`), steht das an
+    beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
+    sagt: ``bis_feld`` bei α_min, ``ab_feld`` bei α_max. Die Zahl des anderen
+    Feldes kennt erst die Maske.
+
     Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
     des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
     und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
     """
     typen = _typen(cls)
+    bereiche = _bereiche(cls)
     angaben: Dict[str, Dict[str, Any]] = {}
     for f in dataclasses.fields(cls):
-        b = f.metadata.get("bereich")
+        b = bereiche.get(f.name)
         angabe = bereichsangabe(b) if b is not None else {}
         if typen.get(f.name) is int:
             angabe["ganz"] = True
         if angabe:
             angaben[f.name] = angabe
+    for name, b in bereiche.items():
+        if b.bis_feld is not None:
+            hier, dort = b.gegen(bereiche[b.bis_feld])
+            angaben.setdefault(name, {})["bis_feld"] = {"feld": b.bis_feld, "satz": hier}
+            angaben.setdefault(b.bis_feld, {})["ab_feld"] = {"feld": name, "satz": dort}
     return angaben
+
+
+@functools.lru_cache(maxsize=None)
+def _bereiche(cls: type) -> Dict[str, Bereich]:
+    """Die Bereiche der Felder einer Klasse, nach Feldnamen -- je Klasse einmal."""
+    return {f.name: f.metadata["bereich"] for f in dataclasses.fields(cls)
+            if "bereich" in f.metadata}
 
 
 def bereichsangabe(b: Bereich) -> Dict[str, Any]:
@@ -456,7 +501,8 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
     """
     Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
     jede Zahl gegen ihren Bereich (:func:`bereich`), jeden Eintrag darin
-    ebenso, und danach die Regeln des Eintrags ueber mehrere Felder,
+    ebenso, jede gegen das Feld, das sie begrenzt (:attr:`Bereich.bis_feld`),
+    und danach die Regeln des Eintrags ueber mehrere Felder,
     ``regeln(wo)``. Die Form ist da schon geprueft: ein Eintrag steht, wo
     einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
     ``ohne`` prueft, wer sie einzeln prueft -- der Aufbau jedes Material und
@@ -474,6 +520,9 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
                                else f"{wo}, {f.name}")
             elif bereich_ is not None and teil is not None:
                 bereich_.pruefen(teil, wo)
+        if bereich_ is not None and bereich_.bis_feld is not None:
+            bereich_.nicht_ueber(wert, _bereiche(type(eintrag))[bereich_.bis_feld],
+                                 getattr(eintrag, bereich_.bis_feld), wo)
     eintrag.regeln(wo)
 
 
