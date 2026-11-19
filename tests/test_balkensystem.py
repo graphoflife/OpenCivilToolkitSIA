@@ -806,12 +806,17 @@ class TestMaterialien(unittest.TestCase):
     def test_der_beton_ist_ein_verweis(self):
         """
         Den Beton eines Materials löscht man nicht; zeigt es ins Leere, rechnet
-        das System nicht und nennt die Kennung.
+        das System nicht und nennt die Kennung -- am Stab, nach derselben Regel
+        wie bei jedem Bauteil. Bis 2026-11-19 hielt das das ganze System an, und
+        das Zeichenfenster bekam nur einen Fehler.
         """
         p = traeger()
         self.assertEqual(p.verweise("b1"), [p.balkensysteme[0]])
         p.balkensysteme[0].stabmaterialien[0].stoff = "b7"
-        self.assertRegex(meldung(p), "b7")
+        self.assertEqual(self.meldungen(p), ["L1 nimmt das Material M1, aber das Material 'b7' gibt "
+                                             "es nicht mehr -- eines wählen."])
+        antwort = dienst.bearbeite("balkensystem_verlauf", {"projekt": p.als_dict(), "kennung": "r1"})
+        self.assertEqual(antwort.status, 200)
 
     def test_baustahl_des_projekts(self):
         """E_a = 210 000 N/mm² und ρ_a = 7850 kg/m³ (SIA 263:2013, 3.2.2.1)."""

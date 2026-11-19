@@ -1,5 +1,5 @@
 ---
-erzeugt: 1a732c4dfcb9
+erzeugt: be77b47a6965
 art: modul
 tags: [modul]
 ---
@@ -39,7 +39,10 @@ dafuer bleiben mit einem Hinweis weg.
 def _betone(eintrag: DeckeEintrag, aufbau: Aufbau) -> Tuple[Dict[str, Baustoff], List[Meldung]]
 ```
 
-Je Platte ihr Beton -- und eine Meldung je Platte, die keinen hat.
+Je Platte ihr Beton -- und eine Meldung an jeder Platte, deren Wahl nicht
+stimmt, nach derselben Regel wie bei jedem Bauteil ([[opencivil.projekt.aufbau.kern#materialgrund|materialgrund]]).
+Bis 2026-11-19 hielt ein geloeschter Beton die ganze Decke an, ohne zu
+sagen, an welcher Platte -- und das Zeichenfenster zeigte nichts mehr.
 
 ### bauen
 
@@ -60,7 +63,6 @@ Eine Decke: ihr Modell, ihre Betone, angemeldet im Rechenwerk.
 - [[opencivil.projekt.aufbau.faelle]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.decke]]
-- [[opencivil.projekt.lesen]]
 - [[opencivil.stabwerk.system]]
 
 ## Gebraucht von

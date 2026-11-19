@@ -265,6 +265,26 @@ class TestZeichnung(unittest.TestCase):
         ohne = [m for m in meldungen if "trägt keine der beiden Richtungen" in m["text"]]
         self.assertEqual([m["elemente"] for m in ohne], [["P3"]])
 
+    def test_der_beton_einer_platte_steht_an_der_platte(self):
+        """
+        Bis 2026-11-19 hielt ein gelöschter Beton die ganze Decke an, ohne die
+        Platte zu nennen, und das Zeichenfenster bekam nichts. Jetzt sagt es
+        die Platte, nach derselben Regel wie bei jedem Bauteil.
+        """
+        p = zwei_felder()
+        stahl = p.stahl().kennung
+        for wahl, grund in [("b9", "das Material 'b9' gibt es nicht mehr -- eines wählen"),
+                            ("", "noch kein Material gewählt"),
+                            (stahl, "«B500B» ist kein Beton")]:
+            with self.subTest(wahl=wahl):
+                p.decken[0].platten[1].beton = wahl
+                antwort = zeichnung(p)
+                self.assertEqual(antwort.status, 200)
+                uebersicht = antwort.daten["uebersicht"]
+                self.assertFalse(uebersicht["gerechnet"])
+                self.assertEqual([(m["text"], m["elemente"], m["fehler"]) for m in uebersicht["meldungen"]],
+                                 [(f"Platte P2: Beton: {grund}.", ["P2"], True)])
+
 
 class TestBilder(unittest.TestCase):
     """Die Bilder eines Falls: Schnittkräfte in Zellen, ihre grössten Werte und was die Lager tragen."""

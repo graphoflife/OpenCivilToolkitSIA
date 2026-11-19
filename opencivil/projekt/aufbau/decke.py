@@ -23,11 +23,10 @@ from opencivil.decke.modell import (
 from opencivil.decke.werk import Deckensystem
 from opencivil.material.basis import Baustoff
 from opencivil.projekt.decke import DeckeEintrag
-from opencivil.projekt.lesen import ProjektFehler
 from opencivil.stabwerk.system import Meldung
 
 from opencivil.projekt.aufbau.faelle import beiwerte, doppelte_kennungen, faelle_pruefen, ohne_lastfall
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil
+from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, materialgrund
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -103,21 +102,21 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
 
 
 def _betone(eintrag: DeckeEintrag, aufbau: Aufbau) -> Tuple[Dict[str, Baustoff], List[Meldung]]:
-    """Je Platte ihr Beton -- und eine Meldung je Platte, die keinen hat."""
+    """
+    Je Platte ihr Beton -- und eine Meldung an jeder Platte, deren Wahl nicht
+    stimmt, nach derselben Regel wie bei jedem Bauteil (:func:`materialgrund`).
+    Bis 2026-11-19 hielt ein geloeschter Beton die ganze Decke an, ohne zu
+    sagen, an welcher Platte -- und das Zeichenfenster zeigte nichts mehr.
+    """
     betone: Dict[str, Baustoff] = {}
     meldungen: List[Meldung] = []
     for p in eintrag.platten:
-        if not p.beton:
-            meldungen.append(Meldung(f"Platte {p.kennung}: kein Beton gewählt.", (p.kennung,)))
-            continue
         stoff = aufbau.baustoffe.get(p.beton)
-        if stoff is None:
-            raise ProjektFehler(f"Decke '{eintrag.name}': das Material '{p.beton}' gibt es im "
-                                f"Projekt nicht.")
-        if stoff.art.value != "beton":
-            meldungen.append(Meldung(f"Platte {p.kennung}: «{stoff.name}» ist kein Beton.", (p.kennung,)))
-            continue
-        betone[p.kennung] = stoff
+        grund = materialgrund(p.beton, None if stoff is None else (stoff.art.value, stoff.name), "beton")
+        if grund:
+            meldungen.append(Meldung(f"Platte {p.kennung}: Beton: {grund}.", (p.kennung,)))
+        else:
+            betone[p.kennung] = stoff
     return betone, meldungen
 
 

@@ -17,7 +17,7 @@
  * und eigenem Vergessen.
  */
 
-import { wahlSchalter } from './bausteine.js';
+import { VAR, mitVar, wahlSchalter } from './bausteine.js';
 import { imSpiel } from './cad_auswahl.js';
 import {
   cadBereich, cadFenster, cadVergessen, cadWaehlen,
@@ -93,25 +93,6 @@ export function mitTitel(knoten, texte) {
     knoten.append(t);
   }
   return knoten;
-}
-
-/**
- * Mehrere zugleich (Benutzer, 2026-10-24): was die gewählten gemeinsam
- * haben, steht da -- unterscheiden sie sich, steht «Var», und was man dann
- * wählt oder tippt, gilt für alle.
- */
-export const VAR = '*var*';
-
-/** Der gemeinsame Wert der gewählten -- oder VAR. */
-export function gemeinsam(werte) {
-  return werte.every((w) => w === werte[0]) ? werte[0] : VAR;
-}
-
-/** Die Stellungen eines Schalters oder einer Liste -- bei VAR mit «Var» vorneweg. */
-export function mitVar(werte, gewaehlt) {
-  return gewaehlt === VAR ? [{
-    wert: VAR, beschriftung: 'Var', titel: 'Die gewählten unterscheiden sich -- was man wählt, gilt für alle',
-  }, ...werte] : werte;
 }
 
 /** Ein Zahlenfeld, auch für mehrere: bei VAR leer, mit «Var» darin. */

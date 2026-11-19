@@ -17,15 +17,15 @@
  * Gerechnet wird hier nichts.
  */
 
-import { wahlBlock, wahlSchalter } from './bausteine.js';
+import {
+  VAR, gemeinsam, mitVar, wahlBlock, wahlSchalter,
+} from './bausteine.js';
 import {
   lastart, lastVon, materialname, passendeUebersicht, systemkatalog,
 } from './bs_teile.js';
 import { texte } from './bs_texte.js';
 import { zahlText } from './cad_ansicht.js';
-import {
-  VAR, gemeinsam, jaNein, mitVar, zahlfeldMitVar,
-} from './cad_app.js';
+import { jaNein, zahlfeldMitVar } from './cad_app.js';
 import { cadZeile, schalterzeile } from './cad_palette.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
 import { auswahl, el } from './dom.js';

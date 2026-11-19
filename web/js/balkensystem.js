@@ -24,7 +24,7 @@
 
 import { formelText } from './achsen.js';
 import {
-  erklaerung, feld, klappgruppe, namensfeld, panel, wahlBlock, wahlSchalter,
+  erklaerung, feld, klappgruppe, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
   lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart, systemkatalog,
@@ -191,13 +191,10 @@ function materialienInhalt(system) {
     return el('span.bs-gesperrt', { text: wert ? wert.wert : '–', title: 'Vom Material des Projekts -- zu ändern in der App «Materialien»' });
   };
   const ausDemProjekt = (m, setzen) => {
-    const wahl = stoffe(m.art);
-    const stoff = wahl.find((s) => s.kennung === m.stoff);
+    const stoff = stoffe(m.art).find((s) => s.kennung === m.stoff);
     return [
-      auswahl({
-        werte: [...(stoff ? [] : [{ wert: m.stoff, beschriftung: `– ${titel(m.art)} wählen –` }]),
-          ...wahl.map((s) => ({ wert: s.kennung, beschriftung: s.name || s.sorte }))],
-        gewaehlt: m.stoff, titel: `Ein ${titel(m.art)} des Projekts`, beiAenderung: setzen('stoff'),
+      materialliste({
+        art: m.art, gewaehlt: m.stoff, titel: `Ein ${titel(m.art)} des Projekts`, setzen: setzen('stoff'),
       }),
       el('span.bs-material-art', { text: titel(m.art) }),
       ...spalten.map((k) => gesperrt(stoff, k.kurz)),

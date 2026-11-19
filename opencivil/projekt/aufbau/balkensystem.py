@@ -30,7 +30,7 @@ from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import Groesse
-from opencivil.material.basis import Baustoff, Baustoffart
+from opencivil.material.basis import Baustoffart
 from opencivil.projekt.balkensystem import (
     EINHEIT_DER_LAST, BalkensystemEintrag, Profilachse, StabmaterialEintrag,
 )
@@ -49,7 +49,7 @@ from opencivil.stabwerk.modell import (
 from opencivil.stabwerk.system import Meldung
 
 from opencivil.projekt.aufbau.faelle import beiwerte, doppelte_kennungen, faelle_pruefen, ohne_lastfall
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, Unfertiges
+from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, Unfertiges, materialgrund
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -348,8 +348,7 @@ def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Mat
             if grund:
                 grund = f"{stab} nimmt das Material gemäss Querschnitt, aber {grund}"
         else:
-            material, grund = _stabmaterial(materialien[kennung], aufbau, eintrag.wo,
-                                            kennwerte)
+            material, grund = _stabmaterial(materialien[kennung], aufbau, kennwerte)
             if grund:
                 grund = f"{stab} nimmt das Material {kennung}, aber {grund}"
         if material is None:
@@ -359,31 +358,26 @@ def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Mat
     return paare, meldungen
 
 
-def _baustoff(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff:
-    """Ein Material des Projekts -- einen Verweis ins Leere gibt es nicht."""
-    stoff = aufbau.baustoffe.get(kennung)
-    if stoff is None:
-        raise ProjektFehler(f"{wo}: das Material '{kennung}' gibt es im Projekt nicht.")
-    return stoff
-
-
-def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau, wo: str,
+def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau,
                   kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], str]:
     """
     Ein Material des Systems, aufgeloest: ein Beton oder Baustahl des
     Projekts oder ein eigenes mit den ``kennwerte`` von Hand. Traegt es
     nicht, ist es ``None``, und der zweite Teil sagt warum -- klein
-    beginnend, er folgt auf ein «aber».
+    beginnend, er folgt auf ein «aber». Ob es den Stoff gibt und ob er von
+    der Art ist, sagt dieselbe Regel wie bei jedem Bauteil
+    (:func:`materialgrund`); bis 2026-11-19 hielt ein geloeschter das ganze
+    System an, und das Zeichenfenster bekam nur einen Fehler.
     """
     if m.art == "eigen":
         return Stabmaterial(m.kennung, m.name or m.kennung,
                             werte={k.kurzname: getattr(m, k.kurzname) for k in kennwerte}), ""
-    art = Baustoffart(m.art)
     if not m.stoff:
-        return None, f"bei ihm ist kein {art.beschriftung} gewählt."
-    stoff = _baustoff(m.stoff, aufbau, wo)
-    if stoff.art is not art:
-        return None, f"«{stoff.name}» ist kein {art.beschriftung}."
+        return None, f"bei ihm ist kein {Baustoffart(m.art).beschriftung} gewählt."
+    stoff = aufbau.baustoffe.get(m.stoff)
+    grund = materialgrund(m.stoff, None if stoff is None else (stoff.art.value, stoff.name), m.art)
+    if grund:
+        return None, f"{grund}."
     return Stabmaterial(m.kennung, stoff.name, stoff=stoff), ""
 
 

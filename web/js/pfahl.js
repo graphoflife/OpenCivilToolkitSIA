@@ -23,12 +23,13 @@
  */
 
 import {
-  erklaerung, feld, karte, namensfeld, panel, wahlBlock, wahlSchalter, zahlzeile as feldzeile,
+  erklaerung, feld, karte, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
+  zahlzeile as feldzeile,
 } from './bausteine.js';
-import { auswahl, el, zahlfeld } from './dom.js';
+import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import {
-  ausVorlage, eintragAendern, feldangabe, katalog, materialien, naechsterName,
+  ausVorlage, eintragAendern, feldangabe, katalog, naechsterName,
 } from './zustand.js';
 
 const HILFE = {
@@ -91,11 +92,9 @@ function schalter(gewaehlt, liste, setzen, titel = '') {
 
 /** Die Wahl eines Materials: eine Auswahlliste, wie beim Durchstanzen. */
 function materialfeld(t, schluessel, art, text) {
-  return feld(text, auswahl({
-    werte: materialien(art).map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
-    gewaehlt: t[schluessel],
-    titel: text,
-    beiAenderung: (k) => aenderer(t)((x) => { x[schluessel] = k; }),
+  return feld(text, materialliste({
+    art, gewaehlt: t[schluessel], titel: text,
+    setzen: (k) => aenderer(t)((x) => { x[schluessel] = k; }),
   }), '');
 }
 

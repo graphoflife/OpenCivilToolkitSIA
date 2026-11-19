@@ -19,11 +19,12 @@
  */
 
 import {
-  erklaerung, feld, karte, namensfeld, panel, wahlBlock, wahlSchalter, zahlzeile as feldzeile,
+  erklaerung, feld, karte, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
+  zahlzeile as feldzeile,
 } from './bausteine.js';
-import { auswahl, el } from './dom.js';
+import { el } from './dom.js';
 import { zeichenbereich } from './ds_zeichnung.js';
-import { eintragAendern, katalog, materialien } from './zustand.js';
+import { eintragAendern, katalog } from './zustand.js';
 
 const HILFE = {
   stelle: {
@@ -120,12 +121,9 @@ function schalter(d, schluessel, liste, titel = '') {
 
 /** Die Wahl eines Materials: eine Auswahlliste, wie bei der Platte. */
 function materialfeld(d, schluessel, art, text) {
-  const stoffe = materialien(art);
-  return feld(text, auswahl({
-    werte: stoffe.map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
-    gewaehlt: d[schluessel],
-    titel: text,
-    beiAenderung: (k) => aenderer(d)((x) => { x[schluessel] = k; }),
+  return feld(text, materialliste({
+    art, gewaehlt: d[schluessel], titel: text,
+    setzen: (k) => aenderer(d)((x) => { x[schluessel] = k; }),
   }), '');
 }
 

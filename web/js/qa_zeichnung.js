@@ -29,13 +29,15 @@
  */
 
 import { api } from './api.js';
-import { hakenSchalter, wahlSchalter } from './bausteine.js';
+import {
+  VAR, gemeinsam, hakenSchalter, materialliste, mitVar, wahlSchalter,
+} from './bausteine.js';
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
 import {
-  VAR, cadApp, cadBereichMitListe, gemeinsam, jaNein, lagefelder, listeZeichnen, mitTitel,
-  mitVar, umrissVon, zahlfeldMitVar,
+  cadApp, cadBereichMitListe, jaNein, lagefelder, listeZeichnen, mitTitel, umrissVon,
+  zahlfeldMitVar,
 } from './cad_app.js';
 import { cadZeile } from './cad_palette.js';
 import {
@@ -43,7 +45,7 @@ import {
 } from './cad_modell.js';
 import { vorlageOeffnen } from './qa_vorlagen.js';
 import {
-  auswahl, el, melden, svgEl, zahlfeld,
+  el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import {
   aendern, ausVorlage, eintragVon, feldangabe, katalog, materialien, zustand,
@@ -546,23 +548,6 @@ function linienVorschau(a, g, p, q, werkzeug) {
 // Felder im schwebenden Fenster
 // ===========================================================================
 
-function materialwahl(art, gewaehlt, setzen, mitLoch = false) {
-  const werte = [
-    ...materialien(art).map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
-    ...(mitLoch ? [{ wert: '', beschriftung: 'Aussparung' }] : []),
-  ];
-  // Ein Material, das es nicht (mehr) gibt, oder noch keines: die Liste sagt
-  // es, statt still ihren ersten Eintrag zu zeigen (bis 2026-11-19).
-  const titel = katalog('materialarten', art, 'titel');
-  const fehlt = materialien(art).length ? `– ${titel} wählen –` : `– noch kein ${titel} im Projekt –`;
-  return auswahl({
-    werte: gewaehlt === VAR || werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
-      : [{ wert: gewaehlt, beschriftung: fehlt }, ...werte],
-    gewaehlt,
-    beiAenderung: setzen,
-  });
-}
-
 /**
  * Die Felder einer Elementart. `werte` ist das Element (oder die Vorgabe),
  * bei mehreren gewählten je Feld der gemeinsame Wert oder VAR;
@@ -577,7 +562,9 @@ function felderVon(liste, werte, setzen, info = null) {
     wert: werte[feld], titel, schritt: 1, min: 0, ...optionen,
     beiAenderung: (w) => setzen(feld, w),
   });
-  const stahl = () => cadZeile('Stahl', materialwahl('betonstahl', werte.stahl, (w) => setzen('stahl', w)));
+  const stahl = () => cadZeile('Stahl', materialliste({
+    art: 'betonstahl', gewaehlt: werte.stahl, setzen: (w) => setzen('stahl', w),
+  }));
   const haken = (text, feld) => el('div.cad-zeile', {}, [
     el('span', { text }),
     werte[feld] === VAR ? jaNein(VAR, (w) => setzen(feld, w), text)
@@ -649,7 +636,10 @@ function felderVon(liste, werte, setzen, info = null) {
   }
   if (liste === 'flaechen') {
     return [
-      cadZeile('Material', materialwahl('beton', werte.material, (w) => setzen('material', w), true)),
+      cadZeile('Material', materialliste({
+        art: 'beton', gewaehlt: werte.material, setzen: (w) => setzen('material', w),
+        zusatz: [{ wert: '', beschriftung: 'Aussparung' }],
+      })),
       cadZeile('c', zahl('ueberdeckung', 'Überdeckung c: das Polygon erscheint so weit nach innen gerückt '
         + '-- eine Aussparung nach aussen --, mit Ecken zum Fangen. 0: nicht. Rechnet nicht mit.', {
         schritt: 5, angabe: feldangabe('flaeche', 'ueberdeckung'),

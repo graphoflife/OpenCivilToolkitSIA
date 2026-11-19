@@ -16,8 +16,7 @@
  * Ansichtssache, nicht Teil des Projekts.
  */
 
-import { namensfeld, wahlSchalter } from './bausteine.js';
-import { mitVar } from './cad_app.js';
+import { mitVar, namensfeld, wahlSchalter } from './bausteine.js';
 import { cadZeile } from './cad_palette.js';
 import {
   auswahl, el, melden, zahlfeld,

@@ -1,5 +1,5 @@
 ---
-erzeugt: 298bdc40bee9
+erzeugt: eb839a0c4001
 art: modul
 tags: [modul]
 ---
@@ -218,24 +218,19 @@ Je tragenden Stab sein Querschnitt und sein Material, aufgeloest --
 «gemäss Querschnitt» wird zum Beton der Platte oder Analyse. Traegt das
 Material nicht, sagt es eine Meldung, und das System rechnet nicht.
 
-### _baustoff
-
-```python
-def _baustoff(kennung: str, aufbau: Aufbau, wo: str) -> Baustoff
-```
-
-Ein Material des Projekts -- einen Verweis ins Leere gibt es nicht.
-
 ### _stabmaterial
 
 ```python
-def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau, wo: str, kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], str]
+def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau, kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], str]
 ```
 
 Ein Material des Systems, aufgeloest: ein Beton oder Baustahl des
 Projekts oder ein eigenes mit den `kennwerte` von Hand. Traegt es
 nicht, ist es `None`, und der zweite Teil sagt warum -- klein
-beginnend, er folgt auf ein «aber».
+beginnend, er folgt auf ein «aber». Ob es den Stoff gibt und ob er von
+der Art ist, sagt dieselbe Regel wie bei jedem Bauteil
+([[opencivil.projekt.aufbau.kern#materialgrund|materialgrund]]); bis 2026-11-19 hielt ein geloeschter das ganze
+System an, und das Zeichenfenster bekam nur einen Fehler.
 
 ### _material_des_querschnitts
 

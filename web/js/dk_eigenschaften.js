@@ -16,14 +16,14 @@
  * Gerechnet wird hier nichts.
  */
 
-import { wahlBlock, wahlSchalter } from './bausteine.js';
-import { zahlText } from './cad_ansicht.js';
 import {
-  gemeinsam, jaNein, mitVar, zahlfeldMitVar,
-} from './cad_app.js';
+  gemeinsam, materialliste, mitVar, wahlBlock, wahlSchalter,
+} from './bausteine.js';
+import { zahlText } from './cad_ansicht.js';
+import { jaNein, zahlfeldMitVar } from './cad_app.js';
 import { cadZeile, schalterzeile } from './cad_palette.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
-import { auswahl, el } from './dom.js';
+import { el } from './dom.js';
 import { aktiverLastfall, lastfallWaehlen, lastfallZeile } from './lastfaelle.js';
 import {
   eintragVon, feldangabe, materialien, zustand,
@@ -53,9 +53,15 @@ export function kernmeldungen(a) {
   return [...d.meldungen, ...(fall?.meldungen || []).map((m) => ({ ...m, text: `«${lf.name}»: ${m.text}` }))];
 }
 
-/** Der Beton, den eine neue Platte bekommt: der gewählte, sonst der erste des Projekts. */
+/**
+ * Der Beton, den eine neue Platte bekommt: der gewählte, sonst der erste des
+ * Projekts. Bis 2026-11-19 blieb ein gelöschter Beton gewählt, und jede neue
+ * Platte verwies ins Leere.
+ */
 export function vorgabeBeton(a) {
-  return a.dk.vorgaben.platten.beton || materialien('beton')[0]?.kennung || '';
+  const betone = materialien('beton');
+  const gewaehlt = a.dk.vorgaben.platten.beton;
+  return betone.some((m) => m.kennung === gewaehlt) ? gewaehlt : betone[0]?.kennung || '';
 }
 
 /**
@@ -70,16 +76,6 @@ function feldzeile(klasse, feld, beschriftung, wert, setzen, { schritt = 1, tite
   }), angabe.einheit || '');
 }
 
-/** Die Betone des Projekts -- eine Wahl aus dem Projekt, darum eine Liste. */
-function betonWahl(gewaehlt, setzen) {
-  const werte = materialien('beton').map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte }));
-  return auswahl({
-    werte: werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
-      : [{ wert: gewaehlt, beschriftung: '– Beton wählen –' }, ...werte],
-    gewaehlt, titel: 'E_cm und das Gewicht der Platte kommen von ihm', beiAenderung: setzen,
-  });
-}
-
 /**
  * Die Felder je Art -- für die Vorgabe eines Werkzeugs wie für gewählte
  * Teile; `wert` und `setzen` wie bei `feldzeile`.
@@ -87,7 +83,10 @@ function betonWahl(gewaehlt, setzen) {
 const FELDER = {
   platten: (wert, setzen) => [
     feldzeile('deckenplatte', 'h', 'Dicke h', wert, setzen, { schritt: 10 }),
-    cadZeile('Beton', betonWahl(wert('beton'), setzen('beton'))),
+    cadZeile('Beton', materialliste({
+      art: 'beton', gewaehlt: wert('beton'), setzen: setzen('beton'),
+      titel: 'E_cm und das Gewicht der Platte kommen von ihm',
+    })),
     feldzeile('deckenplatte', 'richtung_1', 'Richtung 1', wert, setzen, {
       schritt: 15, titel: 'In diese Richtung tragen die Streifen der Richtung 1 -- in Grad gegen x',
     }),

@@ -7,6 +7,34 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Materiallisten: überall dieselbe, und ein gelöschtes Material steht am Ort
+
+Elfter Schritt der Durchsicht, der erste der Bereiche Decke bis Python.
+
+- **Eine Liste statt fünf:** Die Wahl eines Materials des Projekts stand in
+  Querschnittsanalyse, Decke, Durchstanzen, Pfahl und Balkensystem je
+  anders da. Jetzt baut sie überall `materialliste` in `bausteine.js`, mit
+  allem, was eine davon schon konnte:
+  - ein gelöschtes Material: «– Beton wählen –». Pfahl und Durchstanzen
+    zeigten bis jetzt still den ersten Beton der Liste, als wäre er gewählt;
+  - noch keines im Projekt: «– noch kein Beton im Projekt –» statt einer
+    leeren Liste;
+  - mehrere gewählte mit verschiedenem Beton: «Var». Die Decke zeigte dann
+    «– Beton wählen –», als hätte keine Platte einen.
+
+  `VAR`, `gemeinsam` und `mitVar` sind dafür von `cad_app.js` nach
+  `bausteine.js` gezogen; die Liste braucht sie auch ausserhalb der
+  Zeichenfenster.
+- **Ein gelöschter Beton in der Decke:** hielt die ganze Decke an, mit
+  «das Material 'b9' gibt es im Projekt nicht», ohne die Platte zu nennen,
+  und das Zeichenfenster bekam nur einen Fehler. Jetzt steht an der Platte
+  «Platte P3: Beton: das Material 'b9' gibt es nicht mehr -- eines
+  wählen.», nach derselben Regel wie bei jedem Bauteil (`materialgrund`),
+  und die Zeichnung bleibt stehen. Ebenso im Balkensystem, am Stab. Ein
+  neuer Beton für neue Platten fällt auf den ersten des Projekts zurück,
+  wenn der vorgegebene gelöscht ist; bis jetzt bekam jede neue Platte den
+  gelöschten.
+
 ## 2026-11-19 · Querschnittsanalyse: Diagramme und Spannungsbild sagen, was sie zeigen
 
 Zehnter Schritt der Durchsicht, der zweite Teil der Querschnittsanalyse.

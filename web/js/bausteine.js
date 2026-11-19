@@ -9,10 +9,59 @@
  * ohnehin niemandem im Besonderen gehören.
  */
 
-import { el, melden, zahlfeld } from './dom.js';
+import {
+  auswahl, el, melden, zahlfeld,
+} from './dom.js';
 import { span } from './mathe.js';
 import { sinnbild } from './sinnbilder.js';
-import { feldangabe, panelUmschalten, zustand } from './zustand.js';
+import {
+  feldangabe, katalog, materialien, panelUmschalten, zustand,
+} from './zustand.js';
+
+/**
+ * Mehrere zugleich (Benutzer, 2026-10-24): was die gewählten gemeinsam
+ * haben, steht da -- unterscheiden sie sich, steht «Var», und was man dann
+ * wählt oder tippt, gilt für alle. Bis 2026-11-19 in cad_app.js; hier, weil
+ * auch die Materialliste es braucht, die nicht nur Zeichenfenster haben.
+ */
+export const VAR = '*var*';
+
+/** Der gemeinsame Wert der gewählten -- oder VAR. */
+export function gemeinsam(werte) {
+  return werte.every((w) => w === werte[0]) ? werte[0] : VAR;
+}
+
+/** Die Stellungen eines Schalters oder einer Liste -- bei VAR mit «Var» vorneweg. */
+export function mitVar(werte, gewaehlt) {
+  return gewaehlt === VAR ? [{
+    wert: VAR, beschriftung: 'Var', titel: 'Die gewählten unterscheiden sich -- was man wählt, gilt für alle',
+  }, ...werte] : werte;
+}
+
+/**
+ * Die Wahl eines Materials des Projekts -- eine Liste, weil ihre Zahl mit
+ * dem Projekt wächst. Was es nicht (mehr) gibt, steht als «– Beton wählen
+ * –» da, eine leere Liste als «– noch kein Beton im Projekt –», mehrere
+ * verschiedene als «Var». `zusatz` sind Stellungen, die kein Material sind
+ * («Aussparung»). Bis 2026-11-19 stand diese Liste fünfmal da, jede mit
+ * einem anderen Teil davon: der Pfahl zeigte bei einem gelöschten Beton
+ * still den ersten, die Decke bei zwei verschiedenen «– Beton wählen –».
+ */
+export function materialliste({
+  art, gewaehlt, setzen, titel = '', zusatz = [],
+}) {
+  const stoffe = materialien(art);
+  const werte = [...stoffe.map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })), ...zusatz];
+  const name = katalog('materialarten', art, 'titel');
+  const fehlt = stoffe.length ? `– ${name} wählen –` : `– noch kein ${name} im Projekt –`;
+  return auswahl({
+    werte: gewaehlt === VAR || werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
+      : [{ wert: gewaehlt, beschriftung: fehlt }, ...werte],
+    gewaehlt,
+    titel,
+    beiAenderung: setzen,
+  });
+}
 
 /**
  * Das Feld für den Namen eines Eintrags -- eines Bauteils, eines Lastfalls,
