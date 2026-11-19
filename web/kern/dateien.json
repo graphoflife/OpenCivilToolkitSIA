@@ -53,7 +53,7 @@
     "opencivil/geotechnik/__init__.py": "a767920c2f3a",
     "opencivil/geotechnik/fundament.py": "a577607f7953",
     "opencivil/geotechnik/gleiten.py": "d8262a1c22ac",
-    "opencivil/geotechnik/grundbruch.py": "1279ef347950",
+    "opencivil/geotechnik/grundbruch.py": "a7816ef7eb17",
     "opencivil/geotechnik/setzung.py": "90c530b39e16",
     "opencivil/geotechnik/tragfaehigkeit.py": "4aeebb65799d",
     "opencivil/geotechnik/verhalten.py": "8151776d9b75",

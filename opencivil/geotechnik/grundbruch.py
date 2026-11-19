@@ -91,14 +91,40 @@ def grad(winkel: Groesse) -> float:
 
 
 @dataclass
-class Faktoren:
-    """Eine Spalte der Tragfähigkeitsformel: N, s, d, g und b' -- i hängt am Fall."""
+class Spalte:
+    """
+    Eine Spalte der Tragfähigkeitsformel -- Kohäsion, seitliche Auflast oder
+    Gewicht des Gleitkörpers: der Tragfähigkeitsfaktor N und die Faktoren s,
+    d, g und b', die nicht an der Last hängen; die Lastneigung i bringt der
+    Fall. Aus ihr kommen die Zahl (:meth:`produkt`) und die Formel der
+    Herleitung (:meth:`vorlage`): ein Faktor, mit dem gerechnet wird, steht
+    darum auch da, und keiner steht da, mit dem nicht gerechnet wird. Bis
+    2026-11-19 stand die Formel in vier Formen -- d_γ = 1 als «1», als 1.0
+    und in der Rechnung gar nicht.
+    """
 
-    N: float
-    s: float
-    d: float
-    g: float
-    b: float
+    kurz: str
+    """«c», «q» oder «g» -- davor heissen die Platzhalter der Formel: ``c_N``."""
+
+    N: Wert
+    s: Wert
+    d: Wert
+    g: Wert
+    b: Wert
+
+    def _reihe(self, i: Wert) -> Dict[str, Wert]:
+        """Die Faktoren in der Folge der Formel, N s d i g b, unter ihren Platzhaltern."""
+        return {f"{self.kurz}_{n}": w for n, w in zip(
+            ("N", "s", "d", "i", "g", "b"), (self.N, self.s, self.d, i, self.g, self.b))}
+
+    def produkt(self, i: Wert) -> float:
+        """N · s · d · i · g · b' -- was die Spalte in einem Fall beiträgt, ohne Vorfaktor."""
+        return math.prod(w.groesse.si for w in self._reihe(i).values())
+
+    def vorlage(self, i: Wert) -> Tuple[str, Dict[str, Wert]]:
+        """Dasselbe Produkt als Vorlage der Herleitung, mit ihren Platzhaltern."""
+        reihe = self._reihe(i)
+        return r" \cdot ".join(f"@{n}" for n in reihe), reihe
 
 
 @dataclass
@@ -123,7 +149,7 @@ class Grundbruchbefund:
     """Was ausser den Erfüllungsgraden bleibt -- für die Zusammenfassung und das Bild."""
 
     undrainiert: bool
-    spalten: Dict[str, Faktoren]
+    spalten: Dict[str, Spalte]
     """Je Spalte der Formel (``c``, ``q``, ``g``) ihre Faktoren; undrainiert nur ``c``."""
 
     L_gl: Optional[float] = None
@@ -252,7 +278,9 @@ class Grundbruch(Fundamentnachweis):
                       r" \cdot @theta", {"phi": phi, "theta": theta},
                  titel="Tiefenfaktor der seitlichen Auflast", referenz=KAP_TIEFE,
                  name="Tiefenfaktor d_q")
-        p.text("Der Tiefenfaktor des Gleitkörpergewichts ist d_γ = 1.")
+        d_g = werte.zahl("d_gamma", r"d_{\gamma}", 1.0, "Tiefenfaktor des Gleitkörpergewichts",
+                         stellen=2)
+        p.wert(d_g, titel="Tiefenfaktor des Gleitkörpergewichts", referenz=KAP_TIEFE)
 
         beta = e["beta"]
         g_c = werte.zahl("g_c", "g_c", 1.0 - grad(beta.groesse) / 147.0,
@@ -287,19 +315,15 @@ class Grundbruch(Fundamentnachweis):
         p.annahme("b_γ mit tan φ wie in Tabelle 9.2.18 – im Text des Kapitels steht "
                   "tan α; die Tabelle und die Formel für b_q rechnen mit tan φ.")
 
-        spalten = {
-            "c": Faktoren(N_c.groesse.si, s_c.groesse.si, d_c.groesse.si, g_c.groesse.si,
-                          b_c.groesse.si),
-            "q": Faktoren(n_q, s_q.groesse.si, d_q.groesse.si, g_q.groesse.si, b_q.groesse.si),
-            "g": Faktoren(N_g.groesse.si, s_g.groesse.si, 1.0, g_q.groesse.si, b_g.groesse.si),
-        }
+        # Für das Gleitkörpergewicht gilt g_q (siehe oben), darum zweimal derselbe Wert.
+        spalten = {"c": Spalte("c", N_c, s_c, d_c, g_c, b_c),
+                   "q": Spalte("q", N_q, s_q, d_q, g_q, b_q),
+                   "g": Spalte("g", N_g, s_g, d_g, g_q, b_g)}
         befund = Grundbruchbefund(undrainiert=False, spalten=spalten, L_gl=L_gl.groesse.si,
                                   H_gl=H_gl.groesse.si, grundwasser=grundwasser)
-        z = {"N_c": N_c, "N_q": N_q, "N_g": N_g, "s_c": s_c, "s_q": s_q, "s_g": s_g,
-             "d_c": d_c, "d_q": d_q, "g_c": g_c, "g_q": g_q, "b_c": b_c, "b_q": b_q,
-             "b_g": b_g, "sigma0": sigma0, "gamma_G": gamma_G}
         for k in self.kombinationen:
-            befund.ergebnisse.append(self._drainierter_fall(e, p, k, z))
+            befund.ergebnisse.append(
+                self._drainierter_fall(e, p, k, spalten, sigma0=sigma0, gamma_G=gamma_G))
         return befund
 
     def _grundwasser(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
@@ -372,7 +396,8 @@ class Grundbruch(Fundamentnachweis):
         return theta
 
     def _drainierter_fall(self, e: Eingaben, p: Protokoll, k: Kombination,
-                          z: Dict[str, Wert]) -> Fallergebnis:
+                          spalten: Dict[str, Spalte], *, sigma0: Wert,
+                          gamma_G: Wert) -> Fallergebnis:
         werte = Zwischenwerte(f"{self.id}.{k.kennung}")
         p.titel(f"Grundbruch – {k.name}", ebene=3)
         phi, c, b, L, alpha = e["phi_eff"], e["c_eff"], e["b"], e["L"], e["alpha"]
@@ -396,10 +421,11 @@ class Grundbruch(Fundamentnachweis):
                  {"T": T, "N": N, "b": b, "L": L, "c": c, "phi": phi},
                  titel="Lastneigungsfaktor der seitlichen Auflast", referenz=KAP_LAST,
                  name="Lastneigungsfaktor i_q")
+        N_q = spalten["q"].N
         i_c = werte.zahl("i_c", "i_c", i_q.groesse.si
-                         - (1.0 - i_q.groesse.si) / (z["N_q"].groesse.si - 1.0),
+                         - (1.0 - i_q.groesse.si) / (N_q.groesse.si - 1.0),
                          "Lastneigungsfaktor der Kohäsion", stellen=2)
-        p.formel(i_c, r"@i_q - \frac{1 - @i_q}{@N_q - 1}", {"i_q": i_q, "N_q": z["N_q"]},
+        p.formel(i_c, r"@i_q - \frac{1 - @i_q}{@N_q - 1}", {"i_q": i_q, "N_q": N_q},
                  titel="Lastneigungsfaktor der Kohäsion", referenz=KAP_LAST,
                  name="Lastneigungsfaktor i_c")
         roh_g = 1.0 - (0.7 - grad(alpha.groesse) / 450.0) * x
@@ -416,19 +442,20 @@ class Grundbruch(Fundamentnachweis):
                       "Gleitkörpers nichts mehr trägt.")
         erg.i = {"c": i_c.groesse.si, "q": i_q.groesse.si, "g": i_g.groesse.si}
 
+        # Zahl und Formel aus denselben Spalten (siehe Spalte).
+        kohaesion, auflast, gewicht = spalten["c"], spalten["q"], spalten["g"]
         sigma_f = werte.wert("sigma_f", r"\sigma_f", Groesse.aus_si(
-            c.groesse.si * _produkt(z, "N_c", "s_c", "d_c", "g_c", "b_c") * i_c.groesse.si
-            + z["sigma0"].groesse.si * _produkt(z, "N_q", "s_q", "d_q", "g_q", "b_q")
-            * i_q.groesse.si
-            + 0.5 * z["gamma_G"].groesse.si * b.groesse.si
-            * _produkt(z, "N_g", "s_g", "g_q", "b_g") * i_g.groesse.si, KPA), 1,
+            c.groesse.si * kohaesion.produkt(i_c)
+            + sigma0.groesse.si * auflast.produkt(i_q)
+            + 0.5 * gamma_G.groesse.si * b.groesse.si * gewicht.produkt(i_g), KPA), 1,
             "Bruchspannung in der Sohle")
+        (vorlage_c, ein_c), (vorlage_q, ein_q), (vorlage_g, ein_g) = (
+            kohaesion.vorlage(i_c), auflast.vorlage(i_q), gewicht.vorlage(i_g))
         p.formel(sigma_f,
-                 r"@c \cdot @N_c \cdot @s_c \cdot @d_c \cdot @i_c \cdot @g_c \cdot @b_c"
-                 r" + @sigma0 \cdot @N_q \cdot @s_q \cdot @d_q \cdot @i_q \cdot @g_q \cdot @b_q"
-                 r" + \tfrac{1}{2} \cdot @gamma_G \cdot @b \cdot @N_g \cdot @s_g \cdot 1"
-                 r" \cdot @i_g \cdot @g_q \cdot @b_g",
-                 {"c": c, "b": b, "i_c": i_c, "i_q": i_q, "i_g": i_g, **z},
+                 rf"@c \cdot {vorlage_c} + @sigma0 \cdot {vorlage_q}"
+                 rf" + \tfrac{{1}}{{2}} \cdot @gamma_G \cdot @b \cdot {vorlage_g}",
+                 {"c": c, "sigma0": sigma0, "gamma_G": gamma_G, "b": b,
+                  **ein_c, **ein_q, **ein_g},
                  titel="Bruchspannung in der Sohle", referenz=KAP_FORMEL,
                  name="Bruchspannung in der Sohle")
         erg.sigma_f = sigma_f.groesse.si
@@ -487,18 +514,19 @@ class Grundbruch(Fundamentnachweis):
                  titel="Überlagerung auf Höhe der Sohle, totale Spannung",
                  referenz=KAP_UNDRAINIERT, name="Überlagerung auf Höhe der Sohle")
 
-        spalten = {"c": Faktoren(N_C_UNDRAINIERT, s_c.groesse.si, d_c.groesse.si,
-                                 g_c.groesse.si, b_c.groesse.si)}
+        # N_c ist die feste Zahl der Formel, 5.1 -- im Ansatz und unten in sigma_f.
+        N_c = werte.zahl("N_c", "N_c", N_C_UNDRAINIERT, "Tragfähigkeitsfaktor, undrainiert",
+                         stellen=2)
+        spalte = Spalte("c", N_c, s_c, d_c, g_c, b_c)
         befund = Grundbruchbefund(
-            undrainiert=True, spalten=spalten,
+            undrainiert=True, spalten={"c": spalte},
             grundwasser="Grundwasser ohne Einfluss: undrainiert, totale Spannungen")
         for k in self.kombinationen:
-            befund.ergebnisse.append(self._undrainierter_fall(
-                e, p, k, s_c=s_c, d_c=d_c, g_c=g_c, b_c=b_c, sigma0=sigma0))
+            befund.ergebnisse.append(self._undrainierter_fall(e, p, k, spalte, sigma0))
         return befund
 
     def _undrainierter_fall(self, e: Eingaben, p: Protokoll, k: Kombination,
-                            **z: Wert) -> Fallergebnis:
+                            spalte: Spalte, sigma0: Wert) -> Fallergebnis:
         werte = Zwischenwerte(f"{self.id}.{k.kennung}")
         p.titel(f"Grundbruch – {k.name}", ebene=3)
         s_u, b, L = e["s_u_d"], e["b"], e["L"]
@@ -521,13 +549,15 @@ class Grundbruch(Fundamentnachweis):
                  titel="Lastneigungsfaktor, undrainiert", referenz=KAP_UNDRAINIERT,
                  name="Lastneigungsfaktor i_c")
         erg.i = {"c": i_c.groesse.si}
-        summe = (1.0 + z["s_c"].groesse.si + z["d_c"].groesse.si - i_c.groesse.si
-                 - z["b_c"].groesse.si - z["g_c"].groesse.si)
+        # Undrainiert sind die Korrekturen Summanden, nicht Faktoren (Kap. 9.2.17).
+        summe = (1.0 + spalte.s.groesse.si + spalte.d.groesse.si - i_c.groesse.si
+                 - spalte.b.groesse.si - spalte.g.groesse.si)
         sigma_f = werte.wert("sigma_f", r"\sigma_f", Groesse.aus_si(
-            N_C_UNDRAINIERT * s_u.groesse.si * summe + z["sigma0"].groesse.si, KPA), 1,
+            spalte.N.groesse.si * s_u.groesse.si * summe + sigma0.groesse.si, KPA), 1,
             "Bruchspannung in der Sohle")
         p.formel(sigma_f, r"5.1 \cdot @s_u \cdot \left(1 + @s_c + @d_c - @i_c - @b_c - @g_c\right)"
-                          r" + @sigma0", {"s_u": s_u, "i_c": i_c, **z},
+                          r" + @sigma0", {"s_u": s_u, "i_c": i_c, "s_c": spalte.s, "d_c": spalte.d,
+                                          "b_c": spalte.b, "g_c": spalte.g, "sigma0": sigma0},
                  titel="Bruchspannung in der Sohle, undrainiert", referenz=KAP_UNDRAINIERT,
                  name="Bruchspannung in der Sohle")
         erg.sigma_f = sigma_f.groesse.si
@@ -588,12 +618,6 @@ def _hoch5(klammer: float) -> float:
     return max(0.0, klammer) ** 5
 
 
-def _produkt(z: Dict[str, Wert], *namen: str) -> float:
-    ergebnis = 1.0
-    for n in namen:
-        ergebnis *= z[n].groesse.si
-    return ergebnis
-
 
 # ===========================================================================
 # Für die Zusammenfassung
@@ -622,15 +646,18 @@ def faktortabelle(befund: Grundbruchbefund) -> TabellenBlock:
                 heraus += ["–", "–"]
         return heraus
 
+    def faktor(name: str):
+        return lambda s: getattr(befund.spalten[s], name).groesse.si
+
     mehrere = len(befund.ergebnisse) > 1
     zeilen = [
-        zeile("N", lambda s: befund.spalten[s].N),
-        zeile("s", lambda s: befund.spalten[s].s),
-        zeile("d", lambda s: befund.spalten[s].d),
+        zeile("N", faktor("N")),
+        zeile("s", faktor("s")),
+        zeile("d", faktor("d")),
         *[zeile("i", lambda s, r=r: r.i.get(s), r.kombination.name if mehrere else "")
           for r in befund.ergebnisse],
-        zeile("g", lambda s: befund.spalten[s].g),
-        zeile("b'", lambda s: befund.spalten[s].b),
+        zeile("g", faktor("g")),
+        zeile("b'", faktor("b")),
     ]
     kopf: List[Zelle] = []
     for _, titel in SPALTEN:

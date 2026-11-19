@@ -11424,7 +11424,11 @@ $$
 \end{aligned}
 $$
 
-Der Tiefenfaktor des Gleitkörpergewichts ist d\_γ = 1.
+**Tiefenfaktor des Gleitkörpergewichts** *(Kap. 9.2.13)*
+
+$$
+d_{\gamma} = 1
+$$
 
 **Geländeneigungsfaktor der Kohäsion** *(Kap. 9.2.15)*
 
@@ -11498,7 +11502,7 @@ $$
 
 $$
 \begin{aligned}
-  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
+  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot d_{\gamma} \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
   &= 4\,\mathrm{kPa} \cdot 26.64 \cdot 1.23 \cdot 1.19 \cdot 0.7 \cdot 0.9 \cdot 0.97 + 26.8\,\mathrm{kPa} \cdot 15.42 \cdot 1.22 \cdot 1.14 \cdot 0.72 \cdot 0.49 \cdot 0.91 + \tfrac{1}{2} \cdot 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot 1.6\,\mathrm{m} \cdot 14.05 \cdot 0.84 \cdot 1 \cdot 0.63 \cdot 0.49 \cdot 0.88 \\
   &= 305.7\,\mathrm{kPa}
 \end{aligned}
@@ -11562,7 +11566,7 @@ $$
 
 $$
 \begin{aligned}
-  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
+  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot d_{\gamma} \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
   &= 4\,\mathrm{kPa} \cdot 26.64 \cdot 1.23 \cdot 1.19 \cdot \left(-0.07\right) \cdot 0.9 \cdot 0.97 + 26.8\,\mathrm{kPa} \cdot 15.42 \cdot 1.22 \cdot 1.14 \cdot 0 \cdot 0.49 \cdot 0.91 + \tfrac{1}{2} \cdot 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot 1.6\,\mathrm{m} \cdot 14.05 \cdot 0.84 \cdot 1 \cdot 0 \cdot 0.49 \cdot 0.88 \\
   &= -9\,\mathrm{kPa}
 \end{aligned}
@@ -11860,7 +11864,11 @@ $$
 \end{aligned}
 $$
 
-Der Tiefenfaktor des Gleitkörpergewichts ist d\_γ = 1.
+**Tiefenfaktor des Gleitkörpergewichts** *(Kap. 9.2.13)*
+
+$$
+d_{\gamma} = 1
+$$
 
 **Geländeneigungsfaktor der Kohäsion** *(Kap. 9.2.15)*
 
@@ -11934,7 +11942,7 @@ $$
 
 $$
 \begin{aligned}
-  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
+  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot d_{\gamma} \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
   &= 0\,\mathrm{kPa} \cdot 21.77 \cdot 1.53 \cdot 1.24 \cdot 0.79 \cdot 1 \cdot 1 + 15\,\mathrm{kPa} \cdot 11.47 \cdot 1.48 \cdot 1.18 \cdot 0.81 \cdot 1 \cdot 1 + \tfrac{1}{2} \cdot 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot 1.5\,\mathrm{m} \cdot 9.07 \cdot 0.6 \cdot 1 \cdot 0.74 \cdot 1 \cdot 1 \\
   &= 276.8\,\mathrm{kPa}
 \end{aligned}
@@ -12208,7 +12216,11 @@ $$
 \end{aligned}
 $$
 
-Der Tiefenfaktor des Gleitkörpergewichts ist d\_γ = 1.
+**Tiefenfaktor des Gleitkörpergewichts** *(Kap. 9.2.13)*
+
+$$
+d_{\gamma} = 1
+$$
 
 **Geländeneigungsfaktor der Kohäsion** *(Kap. 9.2.15)*
 
@@ -12282,7 +12294,7 @@ $$
 
 $$
 \begin{aligned}
-  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
+  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot d_{\gamma} \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
   &= 2\,\mathrm{kPa} \cdot 19.19 \cdot 1.05 \cdot 1.26 \cdot 0.9 \cdot 1 \cdot 1 + 31.5\,\mathrm{kPa} \cdot 9.5 \cdot 1.04 \cdot 1.2 \cdot 0.91 \cdot 1 \cdot 1 + \tfrac{1}{2} \cdot 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot 2\,\mathrm{m} \cdot 6.78 \cdot 0.96 \cdot 1 \cdot 0.88 \cdot 1 \cdot 1 \\
   &= 451.1\,\mathrm{kPa}
 \end{aligned}
@@ -19950,7 +19962,7 @@ $$
 **Bruchspannung in der Sohle** *(Kap. 9.2.10)*
 
 $$
-\sigma_f = c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma}
+\sigma_f = c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot d_{\gamma} \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma}
 $$
 
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*

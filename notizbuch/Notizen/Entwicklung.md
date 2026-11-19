@@ -7,6 +7,21 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Grundbruch: Zahl und Formel aus derselben Spalte
+
+Die Tragfähigkeitsformel stand in vier Formen: ein Wörterbuch der Werte,
+Listen von Namen für das Produkt, die Vorlage der Herleitung und eine
+Klasse mit den Zahlen für die Tabelle. d_γ = 1 stand darin als «1», als 1.0
+und im Produkt gar nicht – wer dort einen Faktor ergänzt und eine Liste
+vergisst, hätte ihn gezeigt und ohne ihn gerechnet. Jetzt hält eine
+`Spalte` je Teil der Formel ihre Faktoren N, s, d, g und b' als Werte; aus
+ihr kommen die Zahl (`produkt`), die Vorlage der Herleitung (`vorlage`) und
+die Tabelle der Zusammenfassung.
+
+Für den Leser: d_γ = 1 steht in der Herleitung jetzt als eigene Zeile mit
+Kap. 9.2.13 statt als Satz, und in der Formel für σ_f steht d_γ, wo vorher
+eine «1» stand. Die Zahlen bleiben dieselben.
+
 ## 2026-11-19 · Grundbruch in vier Dateien
 
 `opencivil/geotechnik/grundbruch.py` stand bei 996 Zeilen; der Umbau der

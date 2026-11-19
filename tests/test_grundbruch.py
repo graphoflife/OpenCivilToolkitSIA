@@ -10,6 +10,7 @@ Oberflaeche davon zu sehen bekommt.
 
 import math
 import unittest
+from types import SimpleNamespace
 
 from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammenfassen
 from opencivil.core.protokoll import HinweisArt, HinweisBlock
@@ -35,8 +36,14 @@ def rechnen(kombinationen=(("K", 1000.0, 0.0),), **felder):
     return aufbau, loesung, loesung.befunde[aufbau.feld("grundbruch")["g1"].id]
 
 
+def zahlen(spalte):
+    """Die Faktoren einer Spalte als Zahlen: ``zahlen(c).N`` statt ``c.N.groesse.si``."""
+    return SimpleNamespace(**{n: getattr(spalte, n).groesse.si for n in "Nsdgb"})
+
+
 def faktoren(**felder):
-    return rechnen(**felder)[2].spalten
+    """Je Spalte der Formel ihre Faktoren als Zahlen."""
+    return {kurz: zahlen(s) for kurz, s in rechnen(**felder)[2].spalten.items()}
 
 
 def annahmen(loesung):
@@ -159,7 +166,7 @@ class TestTabellenDesKapitels(unittest.TestCase):
         """
         befund = rechnen(phi_k=31.195, b=2.0, L=2.5, t=1.24, t1=1.24,
                          kombinationen=(("K", 100.0, 250.0),))[2]
-        c, q, g = (befund.spalten[s] for s in "cqg")
+        c, q, g = (zahlen(befund.spalten[s]) for s in "cqg")
         i = befund.ergebnisse[0].i
         erwartet = {
             "N": ((c.N, 33.19), (q.N, 21.10), (g.N, 21.90)),
@@ -187,7 +194,7 @@ class TestGrundwasser(unittest.TestCase):
         return befund, befund.ergebnisse[0].sigma_f / 1e3, loesung
 
     def anteile(self, befund, sigma0, gamma_G):
-        q, g = befund.spalten["q"], befund.spalten["g"]
+        q, g = zahlen(befund.spalten["q"]), zahlen(befund.spalten["g"])
         return (sigma0 * q.N * q.s * q.d * q.g * q.b
                 + 0.5 * gamma_G * 2.0 * g.N * g.s * g.d * g.g * g.b)
 
@@ -222,7 +229,7 @@ class TestLastneigung(unittest.TestCase):
         fall = befund.ergebnisse[0]
         self.assertEqual(fall.i["q"], 0.0)
         self.assertEqual(fall.i["g"], 0.0)
-        self.assertAlmostEqual(fall.i["c"], -1.0 / (befund.spalten["q"].N - 1.0))
+        self.assertAlmostEqual(fall.i["c"], -1.0 / (zahlen(befund.spalten["q"]).N - 1.0))
         self.assertTrue(any("kleiner als null" in a for a in annahmen(loesung)))
 
     def test_ein_negatives_sigma_f_gibt_keinen_widerstand(self):
@@ -301,7 +308,7 @@ class TestUndrainiert(unittest.TestCase):
                                alpha=5.0, q_Ed=3.0, kombinationen=(("K", 600.0, T),))
         self.assertTrue(befund.undrainiert)
         self.assertEqual(set(befund.spalten), {"c"})
-        c = befund.spalten["c"]
+        c = zahlen(befund.spalten["c"])
         self.assertEqual(c.N, 5.1)
         self.assertAlmostEqual(c.s, 0.2 * b / L)
         self.assertAlmostEqual(c.d, 0.4 * t / b)
@@ -315,7 +322,7 @@ class TestUndrainiert(unittest.TestCase):
         self.assertAlmostEqual(fall.N_Rd / 1e3, sigma_f * b * L, places=6)
 
     def test_tief_eingebunden(self):
-        c = rechnen(verhalten="undrainiert", s_u=50.0, b=1.0, L=1.0, t=2.0)[2].spalten["c"]
+        c = zahlen(rechnen(verhalten="undrainiert", s_u=50.0, b=1.0, L=1.0, t=2.0)[2].spalten["c"])
         self.assertAlmostEqual(c.d, 0.007 * math.degrees(math.atan(2.0)))
 
     def test_zu_schraeg_gibt_keinen_widerstand(self):

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3aff95932c6e
+erzeugt: b1f8fe7dbb7b
 art: modul
 tags: [modul]
 ---
@@ -74,20 +74,52 @@ def grad(winkel: Groesse) -> float
 
 Ein Winkel in Grad -- so gehen alpha, beta und arctan(t/b) in die Faktoren ein.
 
-### Faktoren
+### Spalte
 
 ```python
 @dataclass
-class Faktoren
+class Spalte
 ```
 
-Eine Spalte der Tragfähigkeitsformel: N, s, d, g und b' -- i hängt am Fall.
+Eine Spalte der Tragfähigkeitsformel -- Kohäsion, seitliche Auflast oder
+Gewicht des Gleitkörpers: der Tragfähigkeitsfaktor N und die Faktoren s,
+d, g und b', die nicht an der Last hängen; die Lastneigung i bringt der
+Fall. Aus ihr kommen die Zahl ([[opencivil.geotechnik.grundbruch#Spalte.produkt|produkt]]) und die Formel der
+Herleitung ([[opencivil.geotechnik.grundbruch#Spalte.vorlage|vorlage]]): ein Faktor, mit dem gerechnet wird, steht
+darum auch da, und keiner steht da, mit dem nicht gerechnet wird. Bis
+2026-11-19 stand die Formel in vier Formen -- d_γ = 1 als «1», als 1.0
+und in der Rechnung gar nicht.
 
-- `N: float`
-- `s: float`
-- `d: float`
-- `g: float`
-- `b: float`
+- `kurz: str` – «c», «q» oder «g» -- davor heissen die Platzhalter der Formel: `c_N`.
+- `N: Wert`
+- `s: Wert`
+- `d: Wert`
+- `g: Wert`
+- `b: Wert`
+
+#### Spalte._reihe
+
+```python
+def _reihe(self, i: Wert) -> Dict[str, Wert]
+```
+
+Die Faktoren in der Folge der Formel, N s d i g b, unter ihren Platzhaltern.
+
+#### Spalte.produkt
+
+```python
+def produkt(self, i: Wert) -> float
+```
+
+N · s · d · i · g · b' -- was die Spalte in einem Fall beiträgt, ohne Vorfaktor.
+
+#### Spalte.vorlage
+
+```python
+def vorlage(self, i: Wert) -> Tuple[str, Dict[str, Wert]]
+```
+
+Dasselbe Produkt als Vorlage der Herleitung, mit ihren Platzhaltern.
 
 ### Fallergebnis
 
@@ -116,7 +148,7 @@ class Grundbruchbefund
 Was ausser den Erfüllungsgraden bleibt -- für die Zusammenfassung und das Bild.
 
 - `undrainiert: bool`
-- `spalten: Dict[str, Faktoren]` – Je Spalte der Formel (`c`, `q`, `g`) ihre Faktoren; undrainiert nur `c`.
+- `spalten: Dict[str, Spalte]` – Je Spalte der Formel (`c`, `q`, `g`) ihre Faktoren; undrainiert nur `c`.
 - `L_gl: Optional[float] = None` – Wie weit der Gleitkörper neben das Fundament reicht, in m -- drainiert.
 - `H_gl: Optional[float] = None` – Wie tief er unter die Sohle reicht, in m -- drainiert.
 - `grundwasser: str = ''`

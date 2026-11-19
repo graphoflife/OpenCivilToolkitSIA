@@ -317,14 +317,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       stumm gerechnet und daneben für die Herleitung ein zweites Mal
       zusammengestellt wird, kann der Bericht eine Rechnung zeigen, mit der
       nicht gerechnet ist.
-      - Grundbruch: die Formel in vier Formen -- das Wörterbuch `z`
-        (15 Schlüssel), die Schlüssellisten in `_produkt`, die LaTeX-Vorlage
-        und `Faktoren` (`grundbruch.py` 286, 496, 625, 801). d_γ = 1 steht
-        als «1», als 1.0 und in `_produkt` gar nicht. Wer d_γ oder ein
-        eigenes g_γ einführt und die Liste vergisst, zeigt den Faktor und
-        rechnet ohne ihn. Umbau: eine `Spalte(N, s, d, g, b)` mit
-        `produkt()` und `vorlage()`, dreimal gebaut und im Befund gehalten;
-        `z`, `_produkt` und `Faktoren` fallen weg.
+      - Erledigt (2026-11-19): Grundbruch, die Formel in vier Formen. Jetzt
+        `Spalte(N, s, d, g, b)` mit `produkt()` und `vorlage()`; `z`,
+        `_produkt` und `Faktoren` sind weg, d_γ ist ein Wert.
       - Durchstanzen, k_e: die Wahl Näherung oder (57) steht viermal
         (`mit_bewehrung.py` 205, 214, 487; `nachweis.py` 328), die Eingänge
         von (57) stellen `_k_e` stumm und `herleitung.k_e` laut je selbst
