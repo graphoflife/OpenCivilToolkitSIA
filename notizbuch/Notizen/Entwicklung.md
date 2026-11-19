@@ -7,6 +7,33 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Ein Zahlenfeld nimmt nur, was der Kern nähme
+
+Dritter Schritt der Durchsicht: was fehlt, soll man am Ort sehen -- bei einer
+Zahl ist das ihr Feld.
+
+- **Vorher:** die Pfeile hielten sich an die Grenzen des Kerns, Getipptes
+  nicht. Eine Stelle von 150 %, eine Dicke von −5 mm oder k_c = 0 kam in
+  die Rechnung und hielt dort ihr Bauteil an -- man sah es erst danach,
+  und nicht am Feld.
+- **Jetzt:** das Feld weist die Zahl gleich ab, mit dem Satz des Kerns, und
+  behält seinen Wert: «Dicke h muss grösser als null sein: -5 ist nicht
+  übernommen.» Ebenso ein geleertes Feld, das als 0 zählt, wo 0 nicht
+  geht (die Druckkraft N_Ed des Grundbruchs).
+- Der Satz steht einmal, im Kern: `feldangaben` gibt zu den Grenzen eines
+  Bereichs `heisst` und `verlangt` mit, `zahlfeld` setzt sie zusammen. Ein
+  Test hält fest, dass es derselbe Satz ist, den das Rechnen sagt.
+- Rund zwanzig Felder bekamen die Grenzen des Kerns erst jetzt -- vorher
+  hatten sie eigene `min`/`max` der Oberfläche oder keine: Dicke, Breite,
+  Überdeckungen, Grösstkorn, Einlage und k_c der Platte, die Durchmesser
+  von Lagen und Bügeln, die Kriechzahlen, k der Grenze x/d, die Anteile
+  der Gebrauchslisten, die Längen beim Knicken und bei der Verformung, k_c
+  der Querschnittsanalyse, die Stelle einer Einzellast im Balkensystem.
+  Bei k_c liess die Oberfläche 0 zu, der Kern nicht.
+- Was mehrere Felder zusammen betrifft -- α_min nicht über α_max, eine
+  Teilung, sobald ein Durchmesser da ist --, prüft weiter das Rechnen;
+  dann sagt es das Bauteil.
+
 ## 2026-11-19 · Eine Eingabe, die der Kern abweist, hält nur ihr Bauteil an
 
 Zweiter Schritt der Durchsicht. Der erste liess hart, «was eigentlich nur

@@ -19,7 +19,7 @@ import { span } from './mathe.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import { plattenKapitel } from './plattenkapitel.js';
-import { eintragAendern, katalog, materialien } from './zustand.js';
+import { eintragAendern, feldangabe, katalog, materialien } from './zustand.js';
 
 
 /**
@@ -56,7 +56,8 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
     el('span.postenname', { text: beschriftung }),
     el('span.zeichen', { text: '⌀' }),
     zahlfeld({
-      wert: posten.durchmesser || null, stufen: katalog('durchmesser'), min: 0,
+      wert: posten.durchmesser || null, stufen: katalog('durchmesser'),
+      angabe: feldangabe('posten', 'durchmesser'),
       titel: '⌀ in mm; leer oder 0: keine Bewehrung',
       leer: 0,
       beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),
@@ -197,7 +198,8 @@ function querkraftBlock(querschnitt) {
       el('span.postenname', { text: 'x' }),
       el('span.zeichen', { text: '⌀' }),
       zahlfeld({
-        wert: buegel.durchmesser || null, stufen: katalog('durchmesser'), min: 0,
+        wert: buegel.durchmesser || null, stufen: katalog('durchmesser'),
+        angabe: feldangabe('querkraftbewehrung', 'durchmesser'),
         titel: 'Bügel-⌀ in mm; leer oder 0: keine Bügel',
         leer: 0,
         beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),
@@ -245,7 +247,7 @@ function ueberdeckungsBlock(querschnitt, welche) {
   return el('div.ueberdeckung', {}, [
     feld(`Überdeckung ${welche}`, zahlfeld({
       wert: unten ? querschnitt.ueberdeckung_unten : querschnitt.ueberdeckung_oben,
-      schritt: 5, min: 0, beiAenderung: aendern,
+      schritt: 5, angabe: feldangabe('querschnitt', `ueberdeckung_${welche}`), beiAenderung: aendern,
     }), 'mm'),
   ]);
 }
@@ -277,11 +279,11 @@ export function plattenEditor(querschnitt) {
           beiAenderung: (v) => aendern((q) => { q.stahl = v; }),
         })),
         feld('Dicke h', zahlfeld({
-          wert: querschnitt.h, schritt: 10, min: 10,
+          wert: querschnitt.h, schritt: 10, angabe: feldangabe('querschnitt', 'h'),
           beiAenderung: (v) => aendern((q) => { q.h = v; }),
         }), 'mm'),
         feld(['Breite ', span('b_x')], zahlfeld({
-          wert: querschnitt.b, schritt: 100, min: 10,
+          wert: querschnitt.b, schritt: 100, min: 10, angabe: feldangabe('querschnitt', 'b'),
           titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
           beiAenderung: (v) => aendern((q) => { q.b = v; }),
         }), 'mm'),

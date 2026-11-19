@@ -140,9 +140,11 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
  * Was der Kern über das Feld weiss (`angabe`, aus `katalog.felder`), gilt
  * hier: die Pfeile gehen bis zu seinen Grenzen -- eine ausgeschlossene rückt
  * um einen Schritt nach innen, «grösser als null» heisst beim Schritt 0.1 ab
- * 0.1 --, und ein Feld für ganze Zahlen nimmt keine Kommazahl an. Es sagt es
- * und behält seinen Wert: bis 2026-10-18 rundete die Oberfläche eine Neigung
- * von 37.5° still auf 38°.
+ * 0.1 --, und eine Zahl ausserhalb nimmt das Feld nicht an, ebenso eine
+ * Kommazahl in einem Feld für ganze. Es sagt es mit den Worten des Kerns und
+ * behält seinen Wert: bis 2026-10-18 rundete die Oberfläche eine Neigung von
+ * 37.5° still auf 38°, bis 2026-11-19 hielt eine Stelle von 150 % erst beim
+ * Rechnen ihr Bauteil an.
  *
  * @param {number[]} [stufen]  erlaubte Werte; sonst wird `schritt` verwendet
  * @param {number|null} [leer] was ein geleertes Feld meldet; fehlt es, bleibt
@@ -156,7 +158,23 @@ export function zahlfeld({
 }) {
   const unten = min ?? angabe.ab ?? (angabe.ueber === undefined ? undefined : angabe.ueber + schritt);
   const oben = max ?? angabe.bis ?? (angabe.unter === undefined ? undefined : angabe.unter - schritt);
-  const uebernehmen = (neu) => beiAenderung(neu);
+  // Warum der Kern eine Zahl abwiese -- leer, wenn er sie nimmt.
+  const verletzt = (zahl) => {
+    if (angabe.ganz && !Number.isInteger(zahl)) return 'Nur ganze Zahlen';
+    const { ueber, ab, bis, unter } = angabe;
+    const draussen = (ueber !== undefined && !(zahl > ueber)) || (ab !== undefined && !(zahl >= ab))
+      || (bis !== undefined && !(zahl <= bis)) || (unter !== undefined && !(zahl < unter));
+    return draussen ? `${angabe.heisst} ${angabe.verlangt}` : '';
+  };
+  const uebernehmen = (neu, getippt = String(neu)) => {
+    const grund = neu === null ? '' : verletzt(neu);
+    if (!grund) {
+      beiAenderung(neu);
+      return;
+    }
+    melden(`${grund}: ${getippt} ist nicht übernommen.`, true);
+    feld.value = wert ?? '';
+  };
 
   const feld = el('input', {
     type: 'number',
@@ -166,11 +184,8 @@ export function zahlfeld({
     on: {
       change: (e) => {
         const roh = e.target.value.trim();
-        if (roh !== '' && angabe.ganz && !Number.isInteger(Number(roh))) {
-          melden(`Nur ganze Zahlen: ${roh} ist nicht übernommen.`, true);
-          e.target.value = wert ?? '';
-        } else if (roh !== '') uebernehmen(Number(roh));
-        else if (leer !== undefined) uebernehmen(leer);
+        if (roh !== '') uebernehmen(Number(roh), roh);
+        else if (leer !== undefined) uebernehmen(leer, 'ein leeres Feld');
         else e.target.value = wert ?? '';
       },
       keydown: (e) => {

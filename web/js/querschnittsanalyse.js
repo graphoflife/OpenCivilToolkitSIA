@@ -239,7 +239,7 @@ function schubwandAngaben(analyse) {
       }),
     ]),
     feld(['Druckdiagonale ', span('k_c')], zahlfeld({
-      wert: analyse.k_c, schritt: 0.05, min: 0,
+      wert: analyse.k_c, schritt: 0.05, angabe: feldangabe('querschnittsanalyse', 'k_c'),
       titel: 'Abminderung f_cd in der Druckdiagonalen',
       beiAenderung: (v) => aendern((a) => { a.k_c = v; }),
     }), '', 'Abminderung f_cd in der Druckdiagonalen'),
@@ -442,6 +442,7 @@ function zugseitenWahl(gewaehlt, setzen, titel) {
  * gegenüber.
  */
 const ORT = {
+  klasse: 'querschnittsanalyse',
   vorlage: 'qaspannungsfall',
   richtung: (k, setzen) => mitKopf('Zug', zugseitenWahl(
     k.richtung, setzen, 'Zugseite: die Seite, die ein positives Moment zieht')),
@@ -472,6 +473,7 @@ const ORT = {
   // Die Lastfälle unter Gebrauchslast: wie die der Tragsicherheit, ohne
   // Querkraft und Torsion.
   gebrauch: {
+    liste: 'qagebrauchsliste',
     vorlage: 'qagebrauchsfall',
     arten: 'faserspannungsarten',
     spalten: (a) => spalten(a).filter((s) => ['N_Ed', 'M_y_Ed', 'M_z_Ed'].includes(s.feld))

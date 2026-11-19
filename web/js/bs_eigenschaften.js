@@ -126,7 +126,7 @@ function lastFelder(a, last, setzen, { aufLinie = true, amKnoten = false } = {})
       titel: 'Wert am Ende der Linie -- leer: wie am Anfang', beiAenderung: (w) => setzen('wert_b', w),
     }), art.einheit) : null,
     !art.verteilt && aufLinie ? cadZeile('Stelle', zahlfeldMitVar({
-      wert: last.stelle, schritt: 5, min: 0, max: 100,
+      wert: last.stelle, schritt: 5, angabe: feldangabe(a.bs.klassen.stablast, 'stelle'),
       titel: 'Wo die Last steht: in % der Linie ab ihrem Anfang', beiAenderung: (w) => setzen('stelle', w),
     }), '%') : null,
     art.verteilt && art.kraft && alle.find((x) => x.wert === last.richtung)?.im_system && aufLinie

@@ -152,6 +152,7 @@ const VERFORMUNG = {
  * Bauteil anders zeigen.
  */
 export const PLATTE = {
+  klasse: 'querschnitt',
   vorlage: 'spannungsfall',
   richtung: (k, setzen) => richtungsWahl(k.richtung || 'x', setzen, ['x', 'y']),
   raender: () => ['oben', 'unten'],
@@ -185,6 +186,7 @@ export const PLATTE = {
   },
   // Die Lastfälle unter Gebrauchslast: Moment und Normalkraft je b.
   gebrauch: {
+    liste: 'gebrauchsliste',
     vorlage: 'gebrauchsfall',
     arten: 'spannungsarten',
     spalten: () => [
@@ -249,12 +251,12 @@ function querkraftAngaben(querschnitt) {
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [el('span', { text: 'Querkraft ohne Bügel' })]),
     feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
-      wert: querschnitt.d_max, schritt: 4, min: 1,
+      wert: querschnitt.d_max, schritt: 4, angabe: feldangabe('querschnitt', 'd_max'),
       titel: 'Für k_g, Querkraft ohne Bügel',
       beiAenderung: (v) => aendernAn((q) => { q.d_max = v; }),
     }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
     feld('Einlage, grösstes Mass', zahlfeld({
-      wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
+      wert: querschnitt.einlagenhoehe, schritt: 5, angabe: feldangabe('querschnitt', 'einlagenhoehe'),
       titel: 'Breite oder Höhe der Einlage, das Grössere. Über d/6 gilt d_v = d − e',
       leer: 0,
       beiAenderung: (v) => aendernAn((q) => { q.einlagenhoehe = v; }),
@@ -263,7 +265,7 @@ function querkraftAngaben(querschnitt) {
       el('span', { text: 'Querkraft mit Bügeln' }),
     ]),
     feld(['Druckdiagonale ', span('k_c')], zahlfeld({
-      wert: querschnitt.k_c, schritt: 0.05, min: 0,
+      wert: querschnitt.k_c, schritt: 0.05, angabe: feldangabe('querschnitt', 'k_c'),
       titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
       beiAenderung: (v) => aendernAn((q) => { q.k_c = v; }),
     }), '', 'Abminderung f_cd in der Druckdiagonalen'),
@@ -316,7 +318,7 @@ function verformungInhalt(querschnitt) {
   const { kriechzahl, faelle } = querschnitt.verformung;
   return [
     feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
-      wert: kriechzahl, schritt: 0.1, min: 0,
+      wert: kriechzahl, schritt: 0.1, angabe: feldangabe('verformung', 'kriechzahl'),
       titel: 'Kriechzahl φ im Vergrösserungsfaktor ω_w',
       beiAenderung: (v) => aendern((l) => { l.kriechzahl = v; }),
     }), erklaerung([
@@ -345,13 +347,13 @@ function verformungsZeile(querschnitt, index) {
     fall: k, aendern, was: 'Verformungsfall', nameTitel: 'Bezeichnung des Verformungsfalls',
     zahlen: [
       zahlfeld({
-        wert: k.w, schritt: 1, min: 0, leer: 0,
+        wert: k.w, schritt: 1, leer: 0, angabe: feldangabe('verformungsfall', 'w'),
         titel: 'Durchbiegung w in mm, mit der Steifigkeit E_cm ermittelt',
         beiAenderung: (v) => aendern((x) => { x.w = v; }),
       }),
       // Eine Spannweite null gibt es nicht -- geleert bleibt der bisherige Wert.
       zahlfeld({
-        wert: k.laenge, schritt: 0.5,
+        wert: k.laenge, schritt: 0.5, angabe: feldangabe('verformungsfall', 'laenge'),
         titel: 'Spannweite L in m – der Grenzwert ist L/350',
         beiAenderung: (v) => aendern((x) => { x.laenge = v; }),
       }),

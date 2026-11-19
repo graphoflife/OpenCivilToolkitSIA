@@ -204,8 +204,7 @@ function duktilitaetInhalt(eintrag, ort) {
       // Vorgabe und Höchstwert des Beiwerts kennt der Kern. Leer gelassen
       // bleibt der bisherige Wert -- eine Grenze von null gäbe es nicht.
       zusatz: zahlfeld({
-        wert: eintrag.x_d_max, schritt: 0.05, min: 0.05,
-        max: katalog('duktilitaet', 'hoechstens'),
+        wert: eintrag.x_d_max, schritt: 0.05, angabe: feldangabe(ort.klasse, 'x_d_max'),
         titel: `Beiwert k der Grenze x/d ≤ k · 435 N/mm² / f_yd (SIA 262:2025, 4.1.4.2.5); `
           + `Vorgabe ${katalog('duktilitaet', 'vorgabe')}, `
           + `höchstens ${katalog('duktilitaet', 'hoechstens')}`,
@@ -268,7 +267,7 @@ function knickZeile(eintrag, ort, index) {
   const titel = ort.knick.titel;
   // Eine Länge null gibt es nicht -- geleert bleibt der bisherige Wert.
   const zahl = (feld, schritt) => zahlfeld({
-    wert: k[feld], schritt, titel: titel[feld],
+    wert: k[feld], schritt, titel: titel[feld], angabe: feldangabe(ort.knick.vorlage, feld),
     beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
 
@@ -338,7 +337,8 @@ function zwangInhalt(eintrag, ort) {
       zusatz: el('span.zeilenfeld', {}, [
         el('span.zeichen', { text: 'φ' }),
         zahlfeld({
-          wert: eintrag.zwaengung_biegung_kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
+          wert: eintrag.zwaengung_biegung_kriechzahl ?? 0, schritt: 0.1, leer: 0,
+          angabe: feldangabe(ort.klasse, 'zwaengung_biegung_kriechzahl'),
           titel: 'Kriechzahl φ der Zwängung auf Biegung: E_c,eff = E_cm / (1 + φ)',
           beiAenderung: (v) => eintragAendern(eintrag.kennung, (e) => {
             e.zwaengung_biegung_kriechzahl = v;
@@ -418,7 +418,7 @@ function gebrauchsKapitel(eintrag, ort, {
         l.aus_tragsicherheit = wert;
       }), 'Ableitung'),
       zahlfeld({
-        wert: liste.anteil, schritt: 5, min: 5, max: 100,
+        wert: liste.anteil, schritt: 5, angabe: feldangabe(ort.gebrauch.liste, 'anteil'),
         titel: `Anteil der Tragsicherheitseinwirkungen als ${wort}, in %`,
         // Leer gelassen bleibt der bisherige Wert -- eine Null wäre kein
         // Anteil, und der Kern wiese sie ohnehin zurück.
@@ -528,7 +528,7 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
   // Im Schalter stehen die kurzen Namen, der lange im Titel der Stellung.
   const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung }));
   const phi = mitKopf('φ', zahlfeld({
-    wert: ziel.kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
+    wert: ziel.kriechzahl ?? 0, schritt: 0.1, leer: 0, angabe: feldangabe('rechenwahl', 'kriechzahl'),
     titel: phiImmer
       ? 'Kriechzahl φ – wirkt auf den ungerissenen Teil, präzise auch auf den gerissenen'
       : 'Kriechzahl φ – wirkt präzise und elastisch',
@@ -578,7 +578,7 @@ function spannungsZeile(eintrag, index, ort) {
     (e) => veraenderer(e.spannungsfaelle[index]));
   const [oben, unten] = ort.raender(k);
   const zahl = (feld, titel, schritt) => zahlfeld({
-    wert: k[feld], schritt, titel, leer: 0,
+    wert: k[feld], schritt, titel, leer: 0, angabe: feldangabe(ort.vorlage, feld),
     beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
 
