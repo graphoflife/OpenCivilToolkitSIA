@@ -198,6 +198,263 @@ gelernt wurde, steht in [[Entwicklung]].
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
 
+## Umbau: Befunde der Strukturdurchsicht vom 2026-11-19
+
+Neun Durchsichten über das ganze Repo -- Fundament und Ausgabe;
+Querschnitt, Spannungsanalyse und Suche; Nachweise; Balkensystem und
+Decke; Durchstanzen, Pfahl und Boden; Projekt und Dienst; die Apps mit
+Zeichenfenster; die übrigen Fachfenster und Bilder; Rahmen und Stilblatt.
+Die tragenden Punkte sind am Code nachgeprüft. Urteil: gutheissen mit
+Änderungen. Das Fundament trägt (ein Rechenwerk, ein Weg zur Formel samt
+Herleitung, `Art` im Balkensystem, `achsenkreuz`, der Steckbrief
+`BAUTEILE` mit seinen Wächtern, kein Code mehr für alte Speicherstände).
+Die Kosten liegen an drei Stellen, die durch alle Bereiche gehen: Zahl und
+Herleitung kommen an einigen Stellen aus getrennten Rechnungen (1); die
+Beschreibung eines Feldes steht nur halb im Katalog, den Rest schreibt die
+Oberfläche ab (2); die Platte rechnet als Sonderfall neben dem gezeichneten
+Querschnitt (3, 4). Empfohlene Reihenfolge: 1 und 6 (klein, still falsch
+oder still leer), 7 (aus der Arbeit vom 2026-11-19), 2 vor der nächsten
+Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
+4 sind der grosse Umbau -- Entscheid des Benutzers.
+
+- [ ] **1. Zahl und Herleitung aus getrennten Rechnungen.** Wo eine Zahl
+      stumm gerechnet und daneben für die Herleitung ein zweites Mal
+      zusammengestellt wird, kann der Bericht eine Rechnung zeigen, mit der
+      nicht gerechnet ist.
+      - Grundbruch: die Formel in vier Formen -- das Wörterbuch `z`
+        (15 Schlüssel), die Schlüssellisten in `_produkt`, die LaTeX-Vorlage
+        und `Faktoren` (`grundbruch.py` 286, 496, 625, 801). d_γ = 1 steht
+        als «1», als 1.0 und in `_produkt` gar nicht. Wer d_γ oder ein
+        eigenes g_γ einführt und die Liste vergisst, zeigt den Faktor und
+        rechnet ohne ihn. Umbau: eine `Spalte(N, s, d, g, b)` mit
+        `produkt()` und `vorlage()`, dreimal gebaut und im Befund gehalten;
+        `z`, `_produkt` und `Faktoren` fallen weg.
+      - Durchstanzen, k_e: die Wahl Näherung oder (57) steht viermal
+        (`mit_bewehrung.py` 205, 214, 487; `nachweis.py` 328), die Eingänge
+        von (57) stellen `_k_e` stumm und `herleitung.k_e` laut je selbst
+        zusammen -- gemeinsam ist nur `beiwert_k_e`. Das kehrt das Muster
+        vom 2026-11-09 für k_e um. Umbau: die k_e-Regel als Typ
+        (`Naeherung`, `Exzentrizitaet`) in `pruefung.py`, einmal gebaut;
+        `Schnittpruefung` hält k_e, die Herleitung schreibt nur.
+      - Kennzahlen der Platte: sie rechnen beide Querkraftansätze selbst
+        zusammen (Beiwerte, Stahl, Eingänge; ein `Kurvenbeiwerte` voller
+        Nullen, der Textfilter `startswith("m_Rd_")`, zwei Abfragen
+        `buegel is None`). Eine neue Bügelgrösse nur im Nachweis liesse den
+        Widerstand unter der Platte still abweichen. Umbau: der Kern von
+        `_einen_fall…` je Zugseite als Methode, die Fall und Kennzahl rufen.
+      - Decke: `traeger.statik`, `wert` und `extreme` integrieren V und M
+        ein zweites Mal neben `stabwerk/verlauf.py`, mit eigener Regel für
+        gleiche Extremwerte (Abweichung heute 6·10⁻¹¹). Umbau:
+        `ebener_verlauf(…, EI=∞)`, und `vorderste_extreme` wird die Regel
+        von `_extrem` -- das erledigt zugleich Punkt 10 vom 2026-11-15.
+      - Knicken und Kennzahlen entscheiden je selbst «eigene Linie oder die
+        der Tragsicherheit» (`gleiche_linie`, sechs Verzweigungen);
+        `gleiche_linie` vergleicht den Modul nicht. Umbau: eine
+        `Linienquelle` neben `resistenzlinie`, die Gleichheit als Methode
+        der `Rechenwahl`.
+- [ ] **2. Die Beschreibung eines Feldes steht nur halb im Katalog.**
+      Wo ein Feld seinen `bereich` hat, ist der Katalog die eine Quelle für
+      Einheit, Grenze und Satz. Daneben:
+      - 156 Zahlfelder mit Bereich, 70 ohne -- darunter Teilung und
+        Stabzahl der Posten, die Bügel, 14 Federn und Zahlen der Zeichnung.
+        Dort setzt das JS eigene `min: 25` und `min: 1`, die nur die Pfeile
+        bremsen; die Teilung 0 nimmt das Feld an, und erst die ganze Platte
+        wird unfertig. Umbau: `bereich(…)` an jedes Zahlfeld; es fallen
+        weg `PostenEintrag.regeln`, der Mengenteil von
+        `QuerkraftbewehrungEintrag.regeln`, beide `EINHEIT_DER_FEDER`,
+        `federeinheiten` und die `min` im JS.
+      - Vier Masken schreiben die Eingabetabellen des Kerns ab
+        (`durchstanzen.js` `MASSE` und `ROTATION`, `grundbruch.js`,
+        `setzung.js`, `pfahl.js`): Gruppen, Reihenfolge, Zeichen,
+        Normstellen. `ROTATION.filter(([k]) => felder.has(k))` verschluckt
+        ein neues Feld des Kerns still, bei Grundbruch und Setzung erscheint
+        es nie. Die Zeichen laufen schon auseinander (k_δ im Kern, δ_k/φ_k in
+        `grundbruch.js`), a_x hat drei Namen. Umbau: der Katalog liefert je
+        Art die Gruppen `{titel, felder: [{feld, zeichen, beschreibung,
+        referenz}]}` aus denselben Tabellen, ein Baustein
+        `eingabekarten(art, eintrag, gelesen)` baut die Karten. Vorbehalt:
+        «Das Zeichen bleibt in der Maske» (2026-10-16) -- Entscheid des
+        Benutzers; sein Grund trägt nicht mehr, seit die Tabellen Feld und
+        Zeichen eins zu eins führen. Erweitert Punkt 3c vom 2026-11-15.
+      - Bilder tippen Einheiten: `GROESSEN` in `pf_verlauf.js` spiegelt
+        `VERLAEUFE` samt Grenzschlüsseln (eine umbenannte Grösse
+        verschwindet still), `platte_bilder.js` rund 35 Einheiten, die
+        Pfahlskizze kN/m² neben kPa in der Maske. Umbau: die Grössen
+        (`Anzeigegroesse`) kommen mit den Daten.
+      - Knotenlasten: Art und Einheit von Hand, mit widersprüchlichen
+        Rückfällen (`lastFelder` kNm für alles ausser «kraft», Zeichnung
+        und Liste kN für alles ausser «moment»). Umbau: `knotenlastarten`
+        im Katalog wie die Stablasten.
+      - Dieselbe Grenze hinter dem Feld noch einmal: `streifen.pruefen`
+        (acht Prüfungen, die nie greifen, mit anderen Sätzen),
+        `teilungen_der_suche` im Dienst, `katalog.duktilitaet` neben Feld und
+        Vorlage, zwei Klassen `Mass` (Querschnitts- und Stabvorlage) mit
+        eigener Prüfung und eigener Ausfuhr. Umbau: der Bereich am Feld
+        prüft; was kein Feld sagen kann, bleibt.
+- [ ] **3. «Welche Seite zieht» in fünf Formen.** `Zugseite` ist der Typ;
+      daneben `positiv`, `moment_positiv` und `von_unten` als bool in 13
+      Signaturen (`Zugseite.positiv` wird 12-mal gelesen), Lagennummern und
+      Text. «Ein positives Moment zieht unten» steht in
+      `Zugseite.aus_moment` und noch zweimal (`modul.py` 281, versteckt in
+      `querkraft.py` 66). Ein bool kann «links» nicht sagen: darum bleibt,
+      was auf `je_seite` aufbaut (die Handrechnung), der Platte vorbehalten,
+      und die Bewehrungssuche fragt sechsmal selbst nach der Richtung.
+      Umbau: `Zugseite` als einzige Form -- `Bewehrungslage.seite` und
+      `Stahllage.seite` gespeichert, `je_seite` nach Zugseite, die Ränder
+      aus `Zugseite.raender`. Erweitert «Welche Seite x-Bewehrung hat»
+      (2026-10-18) und ist die Vorbedingung für 4.
+- [ ] **4. Die Platte rechnet sich als Rechteck ein zweites Mal** --
+      der grösste Gewinn, Entscheid des Benutzers. `dehnungsfaecher.grenzen`
+      und `interaktion._grenzen` bauen dieselbe Grenzregel (der Dateikopf
+      von `interaktion.py` sagt es selbst), `Loeserpaar` steht neben
+      `Schnittpaar`, das Rissmoment am Rechteck neben dem am
+      Bruttoquerschnitt; `test_schnittanalyse.py` 155–177 prüft nur, dass
+      beide gleich bleiben. Umbau: die Platte baut je Richtung einen
+      `interaktion.Querschnitt` (Rechteck b×h, je Lage ein Stab, einachsig),
+      wie der Pfahl in `pfahl/innen.py`. Es fallen weg `dehnungsfaecher.py`,
+      `Loeserpaar` und die Platten-Teile von `Querschnittsloeser`; es
+      bleiben `Dehnungsebene` und `Faserloeser`, die alle brauchen. Bleibt
+      als Parameter die rissaktive Dicke (t = h im Streifen). Verwandt:
+      - Platte und Analyse schreiben Gemeinsames von Hand ab: den Anfang
+        der Knicknachweise, Thema und Namen der Rissnormalkraft, `dazu` und
+        `_belegen` der Kennzahlen. Umbau: gemeinsame Oberklassen wie
+        `Biegezwang` und `Spannungsbegrenzung` es vormachen.
+      - Das Fachwerk liegt halb in `querschnitt/platte.py`: die
+        Druckfeldregeln (`ALPHA_MIN`, `ALPHA_MAX`, `K_C`, `druckfeldgrenzen`)
+        holen sieben Module dort, die Neigungssuche steht dreimal
+        (`schubwaende.py`, `pfahl/innen_quer.py`, `querkraft_buegel.py`),
+        `Wandwiderstand` ist Feld für Feld `Buegelpunkt`. Umbau:
+        `fachwerk.py` besitzt die Regeln und `guenstigste(…)`.
+      - «Ein Urteil je Teil»: `Lagennachweis` hat die Schleife einmal, die
+        Nachweise je Seite und je Fall bauen sie 13-mal selbst
+        (`begruendung` neunmal deklariert). Umbau: ein `Teilnachweis` mit
+        `teile()`, `begruendung` in `Fallausgang`.
+- [ ] **5. Nach dem Klick baut jede App mit Zeichenfenster selbst.** Die
+      Eigenschaften der Auswahl (die Querschnittsanalyse ohne «Var», mit
+      eigenem `finden`; die Lage der Knoten dreimal), die Liste unter der
+      Zeichnung (dreimal; «Lager, Stütze, Punktlast wählt man über ihren
+      Knoten» siebenmal) und die Meldungszeilen. Umbau: `cadApp` sortiert die
+      Auswahl einmal und baut `lagefelder`, `meldungszeilen` und die Liste
+      aus `[titel, zeilen]`; die Decke (`FELDER`, `feldzeile`) ist die
+      Zielform. Gehört zur offenen Grundlage der Apps mit Zeichenfenster.
+- [ ] **6. Still leer statt laut.**
+      - `sinnbild` zeichnet für einen unbekannten Namen ein leeres Bild:
+        heute sind die Kachel «Ergebnisse» der Decke und ihr Fensterkopf
+        leer, und der Test findet nur zwei Schreibweisen. Umbau: werfen wie
+        `katalog()`.
+      - Wo «⇒ erfüllt» steht, entscheiden zwei Schalter mit
+        entgegengesetzter Vorgabe (`Vergleich.zeile` False,
+        `tex.vergleich`/`tex.bedingung` True; 28 Aufrufe setzen ihn). In der
+        Herleitung von «Sprödes Versagen je Richtung» steht darum kein
+        Urteil. Umbau: das Urteil steht immer hinter dem Grad, der Schalter
+        fällt weg -- in 37 Zeilen rückt «⇒ erfüllt» eine Zeile tiefer
+        (Entscheid des Benutzers, Empfehlung: umbauen).
+      - Der Bericht hält jede Karte mit einem SVG für ein Diagramm
+        (`querySelector('svg')`); ein Schalter mit Sinnbild im Kopf einer
+        Karte würde zur Vorschau. Umbau: `karte(titel, inhalt, {bild})`.
+      - Der Anlass einer Änderung ist freier Text und zugleich Modus:
+        'zeichnung' und 'fenster' rechnen nicht. Umbau: ob gerechnet wird,
+        sagt die Zeile der App; «nur die Mitte neu zeichnen» wird eine
+        eigene Funktion.
+      - `zeichnen.js` übergibt `nurStriche`, `achsen.js` liest es nie:
+        `plt.grid(False)` wirkt nicht.
+- [ ] **7. Aus der Arbeit vom 2026-11-19.**
+      - Die Normalkraft der M-V-Kurve hat zwei Wege in den Kern -- `n_ed`
+        bei jedem Rechnen und die eigene Anfrage `querkraftkurven`, die das
+        ganze Projekt neu baut -- und lebt neben dem Projekt
+        (`zustand.kurvenNormalkraft`): nach dem Neuladen springt sie still
+        auf die des ersten Falls zurück. Umbau: ein Feld am Eintrag,
+        gespeichert mit dem Projekt; weg fallen `n_ed`, die Anfrage
+        `querkraftkurven`, `_normalkraefte`, `kurvenNormalkraft` und der
+        Wächter gegen überholte Antworten.
+      - «Unfertig» entsteht auf zwei Wegen: drei Baufunktionen geben
+        `aufbau.unfertig(…)` zurück, sonst fängt `aufbauen` einen
+        `ProjektFehler`. Darum sind drei von neun Baufunktionen `Optional`,
+        und der Ort heisst je nach Weg anders. Dazu schneidet `ohne_ort` den
+        Ort aus dem Text: 30 von 77 Meldungen tragen ihn als Vorsatz
+        `"{wo}: "`. Umbau: `ProjektFehler(wo, grund)`, die Baufunktionen
+        werfen, `ohne_ort` wird `fehler.grund` -- und der Ort kann in den
+        Worten der Maske stehen (offen seit 2026-10-16).
+      - Der Stabquerschnitt im Balkensystem: `masse` heisst je nach Art
+        Abmessungen oder A und I, `bezug` Platte oder Analyse; das JS räumt
+        beim Umschalten ab, was `fehler()` im Kern ablehnt -- dreimal
+        nachgebessert (2026-10-24, zweimal 2026-11-19). Umbau: je Art ein
+        eigenes Feld (`kennwerte` neben `masse`, ein Bezug je Art);
+        Umschalten ist dann `setzen('art')`. Frage an den Benutzer: Stehen
+        nach dem Zurückschalten die alten Zahlen wieder da? Empfehlung: ja.
+      - `tests/test_balkensystem.py` hat 1080 Zeilen -- über der Grenze
+        seit 2026-11-15, am 2026-11-19 weiter gewachsen --, und
+        `test_nachweis_mn.py` 1006. Naht: Ebene und Raum getrennt.
+- [ ] **8. Dateien nahe oder über 1000 Zeilen.**
+      - `stil.css`, 2510 Zeilen: nicht je App teilen, sondern nach
+        Bausteinen (Grundlage, Bausteine, Bericht, Zeichenfenster, Skizzen,
+        Verläufe, Notizbuch, Python) -- die Vorsilbe einer Klasse sagt, wo
+        sie zuerst stand, nicht wer sie braucht (`.bs-tabelle` dient der
+        Decke). Dabei fällt weg: fünf Regeln `[hidden]` werden eine, 25
+        Farbregeln der Verläufe eine Variable je Grösse, `.qa-element*` und
+        `.bs-element*` eine Liste, sechs Formen von «leer» zwei.
+      - `grundbruch.py`, 963: Fundament mit einem gemeinsamen
+        `Fundamentnachweis` (Vorbild `pfahl/achse.Achsnachweis`), Gleiten und
+        die Tragfähigkeitsfaktoren, die der Pfahl importiert, trennen --
+        rund 680 bleiben. Kippen und Erdwiderstand brächten die Datei sonst
+        über 1000.
+      - `platte_bilder.js`, 941: der Bemessungspunkt dreimal, das Farbpaar
+        erfüllt/nicht erfüllt viermal, Legenden von Hand. Umbau:
+        `bemessungspunkt` und `legende` neben `achsenkreuz`.
+      - `interaktion.py`, 901: die Fläche der Widerstände, die nur ein Bild
+        liest, in ein eigenes Modul. `eintraege.py`, 879: Posten, Lage und
+        Bügel, die nur die Platte braucht, nach `projekt/platte.py`.
+- [ ] **9. Kleiner.**
+      - Drainiert und undrainiert: im Pfahl ein Schalter, zwölfmal
+        abgefragt; im Grundbruch heisst φ = 0 undrainiert. Der Erdwiderstand
+        vor dem Fundament bräuchte eine dritte Form. Umbau: `Drainiert(φ, c)`
+        und `Undrainiert(s_u)` als Typen; beim Grundbruch ändert das die
+        Eingabe (Entscheid des Benutzers).
+      - Durchstanzen: der `Ort` der Leisten führt fünf Werte der Herleitung
+        als `None`; `_leisten_schreiben` hat 150 Zeilen.
+      - Der Bericht baut die Angaben der Platte selbst; die Schreibweise
+        einer Lage steht dreimal (`menge_text`, `zusammenfassung.py`,
+        `lagenaufbau.py`).
+      - Was eine Art des Balkensystems zeigt (Achsen, Zeichen, Einheiten),
+        steht in acht Tabellen der Herleitungen und in `EBEN`/`RAUM` von
+        Hand. Welches I die Ebene nimmt, entscheiden drei Mechanismen.
+      - Was auf null rundet, hat kein Vorzeichen -- in `fest` und
+        `einheiten.py`, nicht in `zusammenfassung._groesse` und
+        `Kennzahl.text` («-0.0»). Zwei Markdown-Maskierungen
+        (`bibliothek._maskieren`, `bericht/markdown.text_markdown`).
+      - Schalter fünfmal gebaut (`richtungsWahl` hat einen Nutzer und eine
+        tote Stellung «beide»); `zahlfeld` und `namensfeld` weisen mit zwei
+        Wortlauten ab.
+      - Versalien über Formelzeichen: 12-mal `uppercase`, 11-mal wieder
+        aufgehoben, 14-mal `ist-wortlaut`. Entscheid des Benutzers,
+        Empfehlung: Schalter ohne Versalien.
+      - In den Zeilen von `apps.js` steht Ableitbares doppelt (`fehlt` neben
+        `braucht`, `einrichten` dreimal gleich).
+      - Ungenutzt: `betonstahl_frei`; nur in Tests: `beton_frei`,
+        `formeln_sammeln` und `Formeleintrag`; der Alias `text_maskieren`.
+      - Kein Strukturbefund, ein Fehler: `naechsteKennung` vergibt die
+        grösste plus eins -- LK3 löschen, die nächste heisst wieder LK3, und
+        eine Diagrammzeile, die auf die gelöschte zeigte, zeigt still die
+        neue. Dieselbe Regel in `cad_modell.js` 144.
+
+**Stand früherer Befunde:**
+- Gewachsen: «Name oder Sorte» (18 Stellen, die Materialliste wird an 7
+  Orten gebaut); Kern-Wissen in Hilfetexten; Proben gerade verbinden (neu
+  `dk_schnitt.js` 127); der Adapter des Zeichenfensters (das Werkzeug
+  «Schnitt» der Decke brauchte sieben Einträge in zwei Dateien); `schnell`
+  (fünf Verhalten, zwei Nutzer); «Welche Seite x-Bewehrung hat» (siehe 3);
+  «Teilung oder Stabzahl» (eine Kopie im Bericht); `systemart(` 13 Aufrufe.
+- Geschrumpft oder erledigt: «Einheiten nicht an jedem Feld» (es bleiben
+  Schnittgrössen, Lasten, Koordinaten, Federn); die Masken von Verformung
+  und Knicken lesen `feldangabe`; Karten und Übersichten des Berichts hängen
+  an der Zeile der App; eine fehlende Bauteilart meldet sich beim Laden;
+  `querschnittsloeser.py` 914 → 827 Zeilen; `linie._grenze` ist weg (von
+  Hand halbiert wird noch an vier Stellen); Punkt 4c vom 2026-11-15 («quer»
+  am Knoten).
+- Unverändert: 2, 3d, 4a, 4b (43 Stellen), 5, 6, 8, 9 und 10 vom
+  2026-11-15; die Varianten im Kern; die dritte Zusammenfassung der
+  Konsole; «Kennung statt Name»; `namensraum` und `mitIndex` im JS.
+
 ## Umbau: Befunde der Strukturdurchsicht vom 2026-11-15
 
 Drei Durchsichten: der Rechenkern der Balkensysteme in 2D und 3D, die
