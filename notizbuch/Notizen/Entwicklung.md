@@ -7,6 +7,26 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Grundbruch, Setzung, Pfahl: die Zusammenfassung sagt, was fehlt
+
+Dreizehnter und letzter Schritt der Durchsicht, die Bereiche Grundbruch
+bis Python.
+
+- **Ohne Kombination oder Schicht** stand in der Zusammenfassung nur «Kein
+  Nachweis gerechnet.»; den Grund gab es nur als Warnung in der
+  Herleitung. Jetzt steht er dort: «Kein Nachweis: noch keine Kombination
+  -- unter «Einwirkungen» eine anlegen.», bei ausgeschalteten «jede
+  Kombination ist ausgeschaltet», bei der Setzung «noch keine Schicht --
+  unter «Schichten» eine anlegen». Der Satz steht einmal, am Bauteil
+  (`Aufbau.ohne_nachweis`, wie `unfertig`), und geht von dort in
+  Zusammenfassung und Warnung.
+- **Die Bemessungswerte des Grundbruchs** (φ_eff, c_eff, γ') blieben nach
+  einer Rechnung, die nicht ging, ohne Kennzeichen neben der neuen
+  Eingabe stehen. Jetzt blass, mit «aus der Rechnung davor».
+- Ein geleerter Name: Pfahl, Schicht, Setzung, Grundbruch und Python nehmen
+  alle das gemeinsame Namensfeld; es weist einen leeren Namen ab und lässt
+  den alten stehen. Nichts mehr zu tun.
+
 ## 2026-11-19 · Decke: eine Zeile je Grund, eine frische Decke ohne Fehler
 
 Zwölfter Schritt der Durchsicht.

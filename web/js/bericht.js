@@ -419,7 +419,11 @@ function nachweiskarten(kennung, tabelle, loesung, verfolgen) {
       // der Tabelle und nicht in der Herleitung. Geht einer nicht auf,
       // steht es hier -- leise, denn geführt wird er ja nicht.
       ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', { text: s.text }))]
-      : [el('div.leer', { text: 'Kein Nachweis gerechnet.' })]),
+      // Fehlt dem Bauteil etwas, sagt der Kern was (bis 2026-11-19 nur in der Herleitung).
+      : [el('div.leer', {
+        text: loesung.ohne_nachweis?.[kennung] ? `Kein Nachweis: ${loesung.ohne_nachweis[kennung]}.`
+          : 'Kein Nachweis gerechnet.',
+      })]),
     kennzahlen ? karte('Kennzahlen', [kennzahlen]) : null,
   ];
 }

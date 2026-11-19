@@ -60,16 +60,24 @@ function zahlzeile(g, schluessel, text, symbol, { schritt = 1, titel } = {}) {
   });
 }
 
-/** Die Bemessungswerte des Bodens, wie der Kern sie gerechnet hat -- oder nichts. */
+/**
+ * Die Bemessungswerte des Bodens, wie der Kern sie gerechnet hat -- oder
+ * nichts. Ging die letzte Rechnung nicht, gehören sie zur Eingabe davor:
+ * dann stehen sie blass und sagen es (bis 2026-11-19 ohne Kennzeichen).
+ */
 function bemessungswerte(g) {
   const ids = zustand.loesung?.zuordnung?.grundbrueche?.[g.kennung]?.werte;
   const werte = zustand.loesung?.werte || {};
   const gerechnet = ['phi_eff', 'c_eff', 'gamma_auftrieb'].map((k) => werte[ids?.[k]]).filter(Boolean);
   if (!gerechnet.length) return null;
-  return el('p.gb-bemessung', {}, gerechnet.flatMap((w, i) => [
-    i ? el('span.gb-trenner', { text: '·' }) : null,
-    span(`${w.symbol} = ${w.latex}`),
-  ]));
+  const alt = Boolean(zustand.rechenfehler);
+  return el(alt ? 'p.gb-bemessung.ist-ohne-wirkung' : 'p.gb-bemessung', {}, [
+    ...gerechnet.flatMap((w, i) => [
+      i ? el('span.gb-trenner', { text: '·' }) : null,
+      span(`${w.symbol} = ${w.latex}`),
+    ]),
+    alt ? el('span.gb-trenner', { text: '· aus der Rechnung davor' }) : null,
+  ]);
 }
 
 function situationPanel(g) {

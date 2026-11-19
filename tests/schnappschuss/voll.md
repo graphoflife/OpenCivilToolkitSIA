@@ -21904,7 +21904,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 
 > **Warnung:** Platte 'Ohne x': ohne x-Bewehrung kein Verformungsnachweis.
 
-> **Warnung:** Setzung 'Ohne Schicht': keine Schicht → kein Nachweis.
+> **Warnung:** Setzung 'Ohne Schicht': noch keine Schicht -- unter «Schichten» eine anlegen → kein Nachweis.
 
 > **Warnung:** Pfahl 'Mikropfahl, Versuch': die Schichten reichen nicht bis unter den Fuss → keine Steifigkeit.
 

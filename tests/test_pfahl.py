@@ -275,7 +275,10 @@ class TestEintrag(unittest.TestCase):
         aufbau = p.aufbauen()
         self.assertEqual(aufbau.feld("pfahl_aussen"), {})
         self.assertEqual(aufbau.feld("pfahl_innen"), {})
-        self.assertIn("Pfahl 'P': keine Kombination → kein Nachweis.", aufbau.warnungen)
+        self.assertIn("Pfahl 'P': noch keine Kombination -- unter «Einwirkungen» eine anlegen → kein "
+                      "Nachweis.", aufbau.warnungen)
+        self.assertEqual(aufbau.teile["t1"].ohne_nachweis,
+                         "noch keine Kombination -- unter «Einwirkungen» eine anlegen")
 
     def test_unmoegliche_zahlen_vor_dem_rechnen(self):
         faelle = {

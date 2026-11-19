@@ -16,7 +16,7 @@ from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.lesen import als_groesse
 from opencivil.geotechnik.grundbruch import Fundament, Gleiten, Grundbruch, Kombination
 
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil
+from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, ohne_kombination
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -48,6 +48,5 @@ def bauen(art: "Bauteilart", eintrag: GrundbruchEintrag, aufbau: Aufbau) -> Baut
         aufbau.eintragen(teil, "grundbruch", eintrag.kennung, Grundbruch(fundament, kombinationen))
         aufbau.eintragen(teil, "gleiten", eintrag.kennung, Gleiten(fundament, kombinationen))
     else:
-        aufbau.warnungen.append(
-            f"Grundbruch '{eintrag.name}': keine Kombination → kein Nachweis.")
+        aufbau.ohne_nachweis(teil, f"Grundbruch '{eintrag.name}'", ohne_kombination(eintrag.kombinationen))
     return teil

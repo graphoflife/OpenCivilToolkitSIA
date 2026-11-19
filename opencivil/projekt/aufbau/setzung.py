@@ -41,5 +41,6 @@ def bauen(art: "Bauteilart", eintrag: SetzungEintrag, aufbau: Aufbau) -> Bauteil
     if eintrag.schichten:
         aufbau.eintragen(teil, "setzung", eintrag.kennung, Setzung(fundament))
     else:
-        aufbau.warnungen.append(f"Setzung '{eintrag.name}': keine Schicht → kein Nachweis.")
+        aufbau.ohne_nachweis(teil, f"Setzung '{eintrag.name}'",
+                             "noch keine Schicht -- unter «Schichten» eine anlegen")
     return teil

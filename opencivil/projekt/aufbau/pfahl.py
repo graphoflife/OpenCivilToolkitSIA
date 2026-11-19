@@ -22,7 +22,7 @@ from opencivil.pfahl.steifigkeit import Pfahlsteifigkeit
 from opencivil.projekt.lesen import als_groesse, ort_von
 from opencivil.projekt.pfahl import PfahlEintrag
 
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, material
+from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, material, ohne_kombination
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -77,7 +77,7 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Optional[
         innen = InnererWiderstand(pfahl, kombinationen)
         aufbau.eintragen(teil, "pfahl_innen", eintrag.kennung, innen)
     else:
-        aufbau.warnungen.append(f"{wo}: keine Kombination → kein Nachweis.")
+        aufbau.ohne_nachweis(teil, wo, ohne_kombination(eintrag.kombinationen))
     if eintrag.boden_unter_dem_fuss:
         steifigkeit = Pfahlsteifigkeit(pfahl, kombinationen)
         aufbau.werk.registriere(steifigkeit)

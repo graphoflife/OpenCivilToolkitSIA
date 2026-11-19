@@ -133,6 +133,17 @@ class Aufbau:
         self.unfertige[eintrag.kennung] = Unfertiges(liste, name, wo, grund)
         self.warnungen.append(f"{wo}: {grund} → nichts zu rechnen.")
 
+    def ohne_nachweis(self, teil: "Bauteil", wo: str, grund: str) -> None:
+        """
+        Ein Bauteil, das gebaut ist, dem aber fuer jeden Nachweis noch etwas
+        fehlt -- eine Kombination, eine Schicht. Wie :meth:`unfertig` kein
+        Fehler: ``grund`` steht in der Zusammenfassung an seiner Stelle (bis
+        2026-11-19 dort nur «Kein Nachweis gerechnet.») und als Warnung in der
+        Herleitung. Ein Satzteil ohne Punkt.
+        """
+        teil.ohne_nachweis = grund
+        self.warnungen.append(f"{wo}: {grund} → kein Nachweis.")
+
     def objekte(self, art: str) -> Dict[str, Any]:
         """
         Die gebauten Objekte einer Bauteilart nach Kennung -- ``art`` ist ihr
@@ -390,6 +401,9 @@ class Bauteil:
     bezuege: Tuple[str, ...] = ()
     """Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt."""
 
+    ohne_nachweis: str = ""
+    """Warum es keinen seiner Nachweise fuehrt -- leer, wenn nichts fehlt (:meth:`Aufbau.ohne_nachweis`)."""
+
     @property
     def raum(self) -> str:
         """Der Namensraum seiner Werte und Urteile."""
@@ -474,6 +488,12 @@ def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str,
     if grund:
         raise ProjektFehler(f"{wo}: {feld}: {grund}.")
     return gefunden
+
+
+def ohne_kombination(kombinationen: Sequence[Any]) -> str:
+    """Warum ein Bauteil mit Einwirkungen keinen Nachweis fuehrt: es hat noch keine, oder jede ist aus."""
+    return ("jede Kombination ist ausgeschaltet" if kombinationen
+            else "noch keine Kombination -- unter «Einwirkungen» eine anlegen")
 
 
 def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[str]:

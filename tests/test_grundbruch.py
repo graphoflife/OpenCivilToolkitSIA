@@ -429,7 +429,14 @@ class TestEintrag(unittest.TestCase):
         aufbau = p.aufbauen()
         self.assertEqual(aufbau.feld("grundbruch"), {})
         self.assertEqual(aufbau.feld("gleiten"), {})
-        self.assertIn("Grundbruch 'F': keine Kombination → kein Nachweis.", aufbau.warnungen)
+        self.assertIn("Grundbruch 'F': jede Kombination ist ausgeschaltet → kein Nachweis.", aufbau.warnungen)
+        # Die Zusammenfassung sagt es an seiner Stelle.
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        self.assertEqual(antwort.daten["ohne_nachweis"], {"g1": "jede Kombination ist ausgeschaltet"})
+        g.kombinationen.clear()
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        self.assertEqual(antwort.daten["ohne_nachweis"],
+                         {"g1": "noch keine Kombination -- unter «Einwirkungen» eine anlegen"})
 
     def test_namen_eindeutig(self):
         for namen in (("A", "A"), ("Feld A", "Feld-A")):

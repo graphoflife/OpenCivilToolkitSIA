@@ -1,5 +1,5 @@
 ---
-erzeugt: 1a15035086be
+erzeugt: fc6b58eaeaaf
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,18 @@ eine halbfertige Zeichnung alles auf. `liste` ist seine Liste im
 Projekt; `grund` ein Satzteil («noch keine Bewehrung») oder ein
 Satz, ohne Punkt. `None` zurueck, damit eine Baufunktion damit
 enden kann.
+
+#### Aufbau.ohne_nachweis
+
+```python
+def ohne_nachweis(self, teil: 'Bauteil', wo: str, grund: str) -> None
+```
+
+Ein Bauteil, das gebaut ist, dem aber fuer jeden Nachweis noch etwas
+fehlt -- eine Kombination, eine Schicht. Wie [[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]] kein
+Fehler: `grund` steht in der Zusammenfassung an seiner Stelle (bis
+2026-11-19 dort nur «Kein Nachweis gerechnet.») und als Warnung in der
+Herleitung. Ein Satzteil ohne Punkt.
 
 #### Aufbau.objekte
 
@@ -350,6 +362,7 @@ steht hier -- niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 - `weitere_ziele: List[str] = field(default_factory=list)` – Was es ausser seinen Nachweisen rechnet -- ein Balkensystem seine Querschnitte und sich.
 - `kennzahlen: List[Kennzahl] = field(default_factory=list)` – Was es beschreibt, gleich welche Lastfaelle es gibt, in der Folge der Zusammenfassung -- jede so, wie ihr Erzeuger sie nennt.
 - `bezuege: Tuple[str, ...] = ()` – Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt.
+- `ohne_nachweis: str = ''` – Warum es keinen seiner Nachweise fuehrt -- leer, wenn nichts fehlt ([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|Aufbau.ohne_nachweis]]).
 
 #### Bauteil.raum
 
@@ -412,6 +425,14 @@ und es muss von dieser Art sein. Ohne Angabe gilt nicht «das erste im
 Projekt» -- bis 2026-10-16 bekamen Buegel und Staebe ohne Stahl still den
 ersten. `feld` heisst wie in der Oberflaeche: was nicht stimmt, steht
 am Bauteil ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]), dort genuegt das Feld.
+
+### ohne_kombination
+
+```python
+def ohne_kombination(kombinationen: Sequence[Any]) -> str
+```
+
+Warum ein Bauteil mit Einwirkungen keinen Nachweis fuehrt: es hat noch keine, oder jede ist aus.
 
 ### materialgrund
 

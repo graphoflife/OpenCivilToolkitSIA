@@ -541,6 +541,9 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
                       for k, wert in kennzahlen(aufbau, kennung, loesung)]
             for kennung in aufbau.teile}
         ergebnis["warnungen"] = list(aufbau.warnungen)
+        # Je Bauteil, dem fuer jeden Nachweis noch etwas fehlt, was -- die
+        # Zusammenfassung sagt es an seiner Stelle (Benutzer, 2026-11-19).
+        ergebnis["ohne_nachweis"] = {k: t.ohne_nachweis for k, t in aufbau.teile.items() if t.ohne_nachweis}
         ergebnis["zuordnung"] = zuordnung(aufbau)
         # Je Material und Bauteil, dem noch etwas fehlt, was -- unter seiner
         # Liste wie in der Zuordnung. Die Oberflaeche sagt es an seiner
