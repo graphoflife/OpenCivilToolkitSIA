@@ -1,5 +1,5 @@
 ---
-erzeugt: fc6b58eaeaaf
+erzeugt: 484e2d54b6b1
 art: modul
 tags: [modul]
 ---
@@ -434,16 +434,34 @@ def ohne_kombination(kombinationen: Sequence[Any]) -> str
 
 Warum ein Bauteil mit Einwirkungen keinen Nachweis fuehrt: es hat noch keine, oder jede ist aus.
 
+### Grund
+
+```python
+class Grund(NamedTuple)
+```
+
+Warum eine Wahl nicht rechnet, klein beginnend. `falsch`: sie
+widerspricht sich -- etwa ein Stahl, wo ein Beton hingehoert -- und steht
+rot. Sonst fehlt nur etwas, und sie steht grau, auch wo die Rechnung ohne
+sie anhaelt (Benutzer, 2026-11-19).
+
+- `text: str`
+- `falsch: bool = False`
+
 ### materialgrund
 
 ```python
-def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[str]
+def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[Grund]
 ```
 
 Was an der Wahl eines Materials nicht stimmt, ohne Ort -- `None`, wenn
 sie stimmt. `gefunden` sind Art und Name des gewaehlten, `None`, wenn
-es das nicht gibt. Die Regel fuer [[opencivil.projekt.aufbau.kern#material|material]] und fuer die
-Meldungen an der Zeichnung ([[opencivil.web.api#geometrie|opencivil.web.api.geometrie]]).
+es das nicht gibt. Falsch ist nur die falsche Art; ein geloeschtes oder
+noch nicht gewaehltes fehlt nur. Das geloeschte nennt der Satz nicht beim
+Namen: den kennt das Projekt nicht mehr, und die Kennung steht nirgends,
+wo der Benutzer sie saehe -- bis 2026-11-19 hiess es «das Material 'b9'».
+Die Regel fuer [[opencivil.projekt.aufbau.kern#material|material]] und fuer die Meldungen an der Zeichnung
+([[opencivil.web.api#geometrie|opencivil.web.api.geometrie]]).
 
 ### ueberschreibungen_setzen
 

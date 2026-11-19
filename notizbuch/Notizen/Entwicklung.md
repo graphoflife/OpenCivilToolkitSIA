@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Ein fehlendes Material steht grau, ohne Kennung
+
+Zwei Entscheide des Benutzers. Vorher stand ein gelöschter Beton an einer
+Platte der Decke oder an einem Stab des Balkensystems rot da, als wäre das
+Projekt falsch, und nannte eine Kennung, die man nirgends sieht: «Platte
+P3: Beton: das Material 'b9' gibt es nicht mehr – eines wählen.» Die
+Querschnittsanalyse zeigte denselben Fall grau. Jetzt steht es überall
+grau, «Platte P3: Beton: das gewählte Material gibt es nicht mehr – eines
+wählen.»; rot bleibt die falsche Art, etwa ein Stahl, wo ein Beton
+hingehört. Im Balkensystem heisst das Material wie in seiner Liste, «L1
+nimmt «C30/37», aber …», und ohne Stoff «einen Beton des Projekts» –
+vorher «das Material M1».
+
+Gerechnet wird trotzdem nicht: ohne Material fehlen Steifigkeit und
+Gewicht. Darum trennt die Meldung jetzt «hält an» von «ist falsch»:
+`fehler` steht rot und hält an, `unfertig` steht grau und hält auch an,
+sonst ist sie ein Hinweis (`Meldung.haelt_an`). Warum eine Wahl nicht
+rechnet, sagt ein `Grund` mit `falsch`; für Materialien steht die Regel
+einmal, in `materialgrund`, auch für die Zeichnung der
+Querschnittsanalyse. Ebenso grau: ein Stab, der noch kein Material hat,
+und «gemäss Querschnitt» bei einer Platte oder Analyse, die noch nicht
+rechnet. Rot: «gemäss Querschnitt» bei einem Querschnitt nach Vorlage oder
+einer Analyse aus zwei Betonen – dort widerspricht sich die Wahl.
+
 ## 2026-11-19 · Ein Gedankenstrich statt zwei Bindestrichen
 
 Entscheid des Benutzers: in allem, was er in der Software liest, steht

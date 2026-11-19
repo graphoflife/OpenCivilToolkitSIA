@@ -204,7 +204,7 @@ def _extreme(proben: Sequence[feld.Probe], groesse: str) -> Dict[str, Any]:
 
 
 def _meldungen(meldungen: Sequence[Meldung]) -> List[Dict[str, Any]]:
-    return [{"text": m.text, "elemente": list(m.elemente), "fehler": m.fehler} for m in meldungen]
+    return [m.als_dict() for m in meldungen]
 
 
 def _anteile(e: Ergebnis) -> List[Tuple[Sequence[Tuple[float, float]], float]]:

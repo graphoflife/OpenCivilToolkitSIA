@@ -168,7 +168,7 @@ def rechnen(decke: Decke) -> Ergebnis:
     zerlegung = zerlegen(decke)
     meldungen = list(zerlegung.meldungen)
     # Ohne Streifen ist nichts zu rechnen: noch keine Platte, oder es gäbe zu viele.
-    if not zerlegung.streifen or any(m.fehler for m in meldungen):
+    if not zerlegung.streifen or any(m.haelt_an for m in meldungen):
         return Ergebnis(decke, zerlegung, None, [], meldungen)
     aufteilungen = aufteilen(decke, zerlegung)
     meldungen.extend(aufteilungen.meldungen)

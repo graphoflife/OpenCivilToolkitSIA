@@ -111,11 +111,26 @@ SUMMEN = "Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Urspru
 
 @dataclass(frozen=True)
 class Meldung:
-    """Was die Rechnung zu sagen hat -- ``fehler`` haelt sie auf, ein Hinweis nicht."""
+    """
+    Was die Rechnung zu sagen hat. ``fehler``: etwas ist falsch -- rot, und
+    die Rechnung haelt an. ``unfertig``: es fehlt nur etwas, etwa ein
+    geloeschtes Material -- grau, aber ohne es haelt die Rechnung auch an
+    (Benutzer, 2026-11-19). Sonst ist es ein Hinweis, und es wird gerechnet.
+    """
 
     text: str
     elemente: Tuple[str, ...] = ()
     fehler: bool = True
+    unfertig: bool = False
+
+    @property
+    def haelt_an(self) -> bool:
+        return self.fehler or self.unfertig
+
+    def als_dict(self) -> Dict[str, Any]:
+        """Fuer die Oberflaeche: ``fehler`` steht rot, ``unfertig`` grau, und beide halten an."""
+        return {"text": self.text, "elemente": list(self.elemente), "fehler": self.fehler,
+                "unfertig": self.unfertig}
 
 
 # ===========================================================================
@@ -319,7 +334,7 @@ class Ergebnis:
 
     @property
     def gueltig(self) -> bool:
-        return not any(m.fehler for m in self.meldungen)
+        return not any(m.haelt_an for m in self.meldungen)
 
     def fall(self, name: str) -> Fall:
         return next(f for f in self.faelle if f.name == name)

@@ -1,5 +1,5 @@
 ---
-erzeugt: a2cd17242fa0
+erzeugt: 0f52eb0c0a15
 art: modul
 tags: [modul]
 ---
@@ -81,7 +81,7 @@ Beiwert dafuer bleiben mit einem Hinweis weg.
 #### Uebersetzung.melden
 
 ```python
-def melden(self, text: str, *elemente: str, fehler: bool=True) -> None
+def melden(self, text: str, *elemente: str, fehler: bool=True, unfertig: bool=False) -> None
 ```
 
 #### Uebersetzung.halt
@@ -224,7 +224,7 @@ Stab, und ein geloeschter Beton gab so viele gleiche Zeilen wie Staebe.
 ### _stabmaterial
 
 ```python
-def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau, kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], str]
+def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau, kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], Optional[Grund]]
 ```
 
 Ein Material des Systems, aufgeloest: ein Beton oder Baustahl des
@@ -235,10 +235,21 @@ der Art ist, sagt dieselbe Regel wie bei jedem Bauteil
 ([[opencivil.projekt.aufbau.kern#materialgrund|materialgrund]]); bis 2026-11-19 hielt ein geloeschter das ganze
 System an, und das Zeichenfenster bekam nur einen Fehler.
 
+### _stabmaterialname
+
+```python
+def _stabmaterialname(m: StabmaterialEintrag, aufbau: Aufbau) -> str
+```
+
+Wie eine Meldung ein Material des Systems nennt: wie die Liste der
+Materialien -- ein eigenes mit seinem Namen, eines des Projekts mit dem
+Namen des Stoffs. Gibt es den Stoff nicht, nur seine Art; die Kennung
+sieht der Benutzer nirgends (bis 2026-11-19 «das Material M1»).
+
 ### _material_des_querschnitts
 
 ```python
-def _material_des_querschnitts(q: StabquerschnittBasis, aufbau: Aufbau) -> Tuple[Optional[Stabmaterial], str]
+def _material_des_querschnitts(q: StabquerschnittBasis, aufbau: Aufbau) -> Tuple[Optional[Stabmaterial], Optional[Grund]]
 ```
 
 Das Material, das ein Querschnitt mitbringt: der Beton einer Platte, das

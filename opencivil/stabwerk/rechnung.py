@@ -531,7 +531,7 @@ class Stabwerksrechnung(Rechenobjekt):
                                 *lf.lasten])
             if lf.name == self.eigengewicht else lf
             for lf in self.system.lastfaelle])
-        if any(m.fehler for m in meldungen):
+        if any(m.haelt_an for m in meldungen):
             ergebnis = Ergebnis(self.ART, meldungen=meldungen)
         else:
             ergebnis = rechnen(gerechnet, self.ART)

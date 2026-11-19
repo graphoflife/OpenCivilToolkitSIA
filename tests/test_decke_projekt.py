@@ -263,7 +263,8 @@ class TestZeichnung(unittest.TestCase):
         uebersicht = antwort.daten["uebersicht"]
         self.assertFalse(uebersicht["gerechnet"])
         self.assertEqual(uebersicht["meldungen"], [
-            {"text": "Noch keine Platte – mit «Platte» zeichnen.", "elemente": [], "fehler": False}])
+            {"text": "Noch keine Platte – mit «Platte» zeichnen.", "elemente": [], "fehler": False,
+             "unfertig": False}])
 
     def test_die_meldung_nennt_die_kennung_im_projekt(self):
         p = zwei_felder()
@@ -276,21 +277,24 @@ class TestZeichnung(unittest.TestCase):
         """
         Bis 2026-11-19 hielt ein gelöschter Beton die ganze Decke an, ohne die
         Platte zu nennen, und das Zeichenfenster bekam nichts. Jetzt sagt es
-        die Platte, nach derselben Regel wie bei jedem Bauteil.
+        die Platte, nach derselben Regel wie bei jedem Bauteil: grau, wo nur
+        etwas fehlt, rot für die falsche Art -- gerechnet wird in beiden
+        Fällen nicht.
         """
         p = zwei_felder()
         stahl = p.stahl().kennung
-        for wahl, grund in [("b9", "das Material 'b9' gibt es nicht mehr – eines wählen"),
-                            ("", "noch kein Material gewählt"),
-                            (stahl, "«B500B» ist kein Beton")]:
+        for wahl, grund, falsch in [("b9", "das gewählte Material gibt es nicht mehr – eines wählen", False),
+                                    ("", "noch kein Material gewählt", False),
+                                    (stahl, "«B500B» ist kein Beton", True)]:
             with self.subTest(wahl=wahl):
                 p.decken[0].platten[1].beton = wahl
                 antwort = zeichnung(p)
                 self.assertEqual(antwort.status, 200)
                 uebersicht = antwort.daten["uebersicht"]
                 self.assertFalse(uebersicht["gerechnet"])
-                self.assertEqual([(m["text"], m["elemente"], m["fehler"]) for m in uebersicht["meldungen"]],
-                                 [(f"Platte P2: Beton: {grund}.", ["P2"], True)])
+                self.assertEqual([(m["text"], m["elemente"], m["fehler"], m["unfertig"])
+                                  for m in uebersicht["meldungen"]],
+                                 [(f"Platte P2: Beton: {grund}.", ["P2"], falsch, not falsch)])
 
 
 class TestBilder(unittest.TestCase):

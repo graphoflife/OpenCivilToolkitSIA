@@ -238,9 +238,9 @@ class TestRechnen(unittest.TestCase):
         s.linien[0].material = ""
         s.lager[0].phi_x, s.lager[0].k_phi_x = "feder", 0.0
         modell = aufbau3d.modell_von(s)
-        self.assertEqual([m.text for m in modell.meldungen if m.fehler],
-                         ["L1 ist ein Stab, hat aber kein Material.",
-                          "A1: eine Feder braucht eine Steifigkeit grösser als null."])
+        self.assertEqual([(m.text, m.fehler) for m in modell.meldungen if m.haelt_an],
+                         [("L1 ist ein Stab, hat aber noch kein Material.", False),
+                          ("A1: eine Feder braucht eine Steifigkeit grösser als null.", True)])
 
     def test_drehwinkel_in_rad(self):
         s = kragarm()

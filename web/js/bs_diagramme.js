@@ -513,8 +513,8 @@ export function systemKarten(kennung) {
   const system = eintragVon(kennung);
   const uebersicht = zustand.loesung?.zeichendaten?.[kennung]?.uebersicht;
   if (uebersicht && !uebersicht.gueltig) {
-    return [karte(null, (uebersicht.meldungen || []).filter((m) => m.fehler)
-      .map((m) => el('p.hinweis.hinweis-warnung', { text: m.text })))];
+    return [karte(null, (uebersicht.meldungen || []).filter((m) => m.fehler || m.unfertig)
+      .map((m) => el(m.fehler ? 'p.hinweis.hinweis-warnung' : 'p.hinweis', { text: m.text })))];
   }
   if (!system?.diagramme?.length) {
     return [karte(null, [leerzustand('Noch kein Diagramm.',

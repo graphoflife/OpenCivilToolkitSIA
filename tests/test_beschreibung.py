@@ -246,10 +246,12 @@ class TestVollstaendigeAblage(unittest.TestCase):
         self.assertAlmostEqual(loesung.groesse(a.id_von("f_ck")).in_einheit(N_PRO_MM2), 30)
         self.assertAlmostEqual(loesung.groesse(b.id_von("f_ck")).in_einheit(N_PRO_MM2), 40)
 
-    def test_fehlendes_material_wird_benannt(self):
+    def test_fehlendes_material_sagt_es_ohne_kennung(self):
         projekt = Projekt.beispiel()
         projekt.materialien = [m for m in projekt.materialien if m.kennung != "b1"]
-        self.assertIn("b1", meldung(projekt))
+        text = meldung(projekt)
+        self.assertIn("gibt es nicht mehr", text)
+        self.assertNotIn("b1", text)
 
     def test_unbekannte_sorte_wird_benannt(self):
         projekt = Projekt(materialien=[MaterialEintrag("b1", "beton", "C99/100", "C99/100")])

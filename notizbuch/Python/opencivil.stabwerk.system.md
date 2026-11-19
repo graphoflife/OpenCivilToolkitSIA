@@ -1,5 +1,5 @@
 ---
-erzeugt: 9f051cb2cf31
+erzeugt: e5ef14139f23
 art: modul
 tags: [modul]
 ---
@@ -108,11 +108,30 @@ zeigt die Meldungen an den Elementen; der Rest des Projekts rechnet weiter.
 class Meldung
 ```
 
-Was die Rechnung zu sagen hat -- `fehler` haelt sie auf, ein Hinweis nicht.
+Was die Rechnung zu sagen hat. `fehler`: etwas ist falsch -- rot, und
+die Rechnung haelt an. `unfertig`: es fehlt nur etwas, etwa ein
+geloeschtes Material -- grau, aber ohne es haelt die Rechnung auch an
+(Benutzer, 2026-11-19). Sonst ist es ein Hinweis, und es wird gerechnet.
 
 - `text: str`
 - `elemente: Tuple[str, ...] = ()`
 - `fehler: bool = True`
+- `unfertig: bool = False`
+
+#### Meldung.haelt_an
+
+```python
+@property
+def haelt_an(self) -> bool
+```
+
+#### Meldung.als_dict
+
+```python
+def als_dict(self) -> Dict[str, Any]
+```
+
+Fuer die Oberflaeche: `fehler` steht rot, `unfertig` grau, und beide halten an.
 
 ### Ort
 

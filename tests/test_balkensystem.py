@@ -443,11 +443,13 @@ class TestModell(unittest.TestCase):
                 s = einfeldtraeger("r1", "T", "b1")
                 aendern(s)
                 modell = modell_von(s)
-                fehler = [m for m in modell.meldungen if m.fehler]
+                fehler = [m for m in modell.meldungen if m.haelt_an]
                 self.assertEqual(len(fehler), 1)
                 self.assertIn(wort, fehler[0].text)
                 self.assertEqual(set(fehler[0].elemente), elemente)
                 self.assertEqual(modell.paare, {})
+                # Ein Material, das noch fehlt, steht grau (Benutzer, 2026-11-19).
+                self.assertEqual(fehler[0].fehler, wort != "kein Material")
 
     def test_last_ohne_lastfall_bleibt_mit_hinweis_weg(self):
         s = einfeldtraeger("r1", "T", "b1")
@@ -755,7 +757,7 @@ class TestMaterialien(unittest.TestCase):
     """
 
     def meldungen(self, p):
-        return [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
+        return [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.haelt_an]
 
     def test_eigenes_material_rechnet_mit_seinem_e(self):
         p = traeger()
@@ -813,23 +815,27 @@ class TestMaterialien(unittest.TestCase):
         s.linie((6, 0), (9, 0), querschnitt=s.linien[0].querschnitt, material=s.linien[0].material)
         s.linie((9, 0), (12, 0), querschnitt=s.linien[0].querschnitt, material=s.linien[0].material)
         s.stabmaterialien[0].stoff = ""
-        meldungen = [m for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
+        meldungen = [m for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.haelt_an]
         self.assertEqual([m.text for m in meldungen],
-                         ["L1, L2 und L3 nehmen das Material M1, aber bei ihm ist kein Beton gewählt."])
+                         ["L1, L2 und L3 nehmen einen Beton des Projekts, aber es ist noch keiner "
+                          "gewählt."])
         self.assertEqual(meldungen[0].elemente, ("L1", "L2", "L3", s.linien[0].querschnitt, "M1"))
+        self.assertEqual((meldungen[0].fehler, meldungen[0].unfertig), (False, True))
 
     def test_der_beton_ist_ein_verweis(self):
         """
         Den Beton eines Materials löscht man nicht; zeigt es ins Leere, rechnet
-        das System nicht und nennt die Kennung -- am Stab, nach derselben Regel
-        wie bei jedem Bauteil. Bis 2026-11-19 hielt das das ganze System an, und
-        das Zeichenfenster bekam nur einen Fehler.
+        das System nicht und sagt es am Stab, nach derselben Regel wie bei
+        jedem Bauteil -- grau und ohne Kennungen, die der Benutzer nirgends
+        sieht (bis 2026-11-19 «das Material M1, aber das Material 'b7'»). Bis
+        2026-11-19 hielt das auch das ganze System an, und das Zeichenfenster
+        bekam nur einen Fehler.
         """
         p = traeger()
         self.assertEqual(p.verweise("b1"), [p.balkensysteme[0]])
         p.balkensysteme[0].stabmaterialien[0].stoff = "b7"
-        self.assertEqual(self.meldungen(p), ["L1 nimmt das Material M1, aber das Material 'b7' gibt "
-                                             "es nicht mehr – eines wählen."])
+        self.assertEqual(self.meldungen(p), ["L1 nimmt einen Beton des Projekts, aber das gewählte "
+                                             "Material gibt es nicht mehr – eines wählen."])
         antwort = dienst.bearbeite("balkensystem_verlauf", {"projekt": p.als_dict(), "kennung": "r1"})
         self.assertEqual(antwort.status, 200)
 
@@ -862,15 +868,14 @@ class TestMaterialien(unittest.TestCase):
         p.balkensysteme[0].stabmaterialien[0].stoff = "s1"
         meldungen = self.meldungen(p)
         self.assertEqual(len(meldungen), 1)
-        self.assertIn("L1 nimmt das Material M1", meldungen[0])
-        self.assertIn("ist kein Beton", meldungen[0])
+        self.assertEqual(meldungen, ["L1 nimmt «B500B», aber «B500B» ist kein Beton."])
 
     def test_ohne_beton(self):
         p = traeger()
         p.balkensysteme[0].stabmaterialien[0].stoff = ""
         meldungen = self.meldungen(p)
         self.assertEqual(len(meldungen), 1)
-        self.assertIn("kein Beton gewählt", meldungen[0])
+        self.assertIn("es ist noch keiner gewählt", meldungen[0])
 
     def test_null_ist_kein_e_modul(self):
         p = traeger()
@@ -899,7 +904,7 @@ class TestMaterialDesQuerschnitts(unittest.TestCase):
         return p, q
 
     def meldungen(self, p):
-        return [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
+        return [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.haelt_an]
 
     def test_platte_und_analyse_bringen_ihren_beton(self):
         for art in ("platte", "analyse"):

@@ -114,7 +114,8 @@ def _betone(eintrag: DeckeEintrag, aufbau: Aufbau) -> Tuple[Dict[str, Baustoff],
         stoff = aufbau.baustoffe.get(p.beton)
         grund = materialgrund(p.beton, None if stoff is None else (stoff.art.value, stoff.name), "beton")
         if grund:
-            meldungen.append(Meldung(f"Platte {p.kennung}: Beton: {grund}.", (p.kennung,)))
+            meldungen.append(Meldung(f"Platte {p.kennung}: Beton: {grund.text}.", (p.kennung,),
+                                     fehler=grund.falsch, unfertig=not grund.falsch))
         else:
             betone[p.kennung] = stoff
     return betone, meldungen

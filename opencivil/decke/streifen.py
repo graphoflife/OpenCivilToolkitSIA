@@ -330,7 +330,7 @@ def _lang(u: Unterzug) -> bool:
 def zerlegen(decke: Decke) -> Zerlegung:
     """Die Streifen, ihre Träger und deren Lager -- oder, was dem im Weg steht."""
     meldungen = pruefen(decke)
-    if any(m.fehler for m in meldungen):
+    if any(m.haelt_an for m in meldungen):
         return Zerlegung([], [], [], {}, {}, meldungen)
     stuecke = {p.name: geo.dreiecke(p.ecken) for p in decke.platten}
     gruppen: List[Gruppe] = []
@@ -362,7 +362,7 @@ def zerlegen(decke: Decke) -> Zerlegung:
         if u.name in namen:
             meldungen.append(Meldung(f"Der Unterzug «{u.name}» heisst wie ein Feldstreifen – bitte umbenennen.",
                                      (u.name,)))
-    if any(m.fehler for m in meldungen):
+    if any(m.haelt_an for m in meldungen):
         return Zerlegung(richtungen, [], gruppen, bereiche, {}, meldungen)
     for s in feld:
         platten = [p for p in decke.platten if any(s.richtung.parallel(q) for q in richtungen_der_platte(p))]

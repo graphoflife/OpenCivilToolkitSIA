@@ -225,7 +225,7 @@ abgehakt, wenn er gebaut ist. Was die Durchsicht selbst behoben hat, steht
 in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
 «Schubfluss»).
 
-- [ ] **Ein fehlendes Material: grau oder rot?** Die Querschnittsanalyse
+- [x] **Ein fehlendes Material: grau oder rot?** Die Querschnittsanalyse
       zeigt «Linie 1: das Material … gibt es nicht mehr -- eines wählen.»
       grau, weil nur etwas fehlt. Decke und Balkensystem zeigen denselben
       Satz rot, und die ganze Decke bzw. das ganze System rechnet nicht:
@@ -233,7 +233,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       (`Meldung.fehler` heisst beides). Empfehlung: grau für ein fehlendes
       oder gelöschtes Material, rot nur für die falsche Art (ein Stahl als
       Beton); dafür «hält an» und «ist falsch» trennen.
-- [ ] **Die Meldung nennt die interne Kennung.** «das Material 'b9' gibt es
+- [x] **Die Meldung nennt die interne Kennung.** «das Material 'b9' gibt es
       nicht mehr»: 'b9' sieht der Benutzer nirgends, die Listen zeigen
       Namen. Empfehlung: «das gewählte Material gibt es nicht mehr -- eines
       wählen.» Der Satz steht an einer Stelle (`materialgrund` in
@@ -272,7 +272,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       (`material.js`) und «mit Bewehrung», «mit Schubwänden» in der Vorlage
       der Querschnittsanalyse (`qa_vorlagen.js`). Sonst ist jede feste Wahl
       ein Schalter. Empfehlung: Schalter.
-- [ ] **Zwei Striche in sichtbaren Texten**: Meldungen und Hinweise
+- [x] **Zwei Striche in sichtbaren Texten**: Meldungen und Hinweise
       schreiben teils «--» («noch keine Kombination -- unter «Einwirkungen»
       eine anlegen»), teils «–». Empfehlung: in allem, was der Benutzer
       liest, «–»; im Code darf «--» bleiben.

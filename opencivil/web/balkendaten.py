@@ -180,8 +180,7 @@ def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
     return {
         "gerechnet": True,
         "gueltig": e.gueltig,
-        "meldungen": [{"text": m.text, "elemente": list(m.elemente), "fehler": m.fehler}
-                      for m in e.meldungen],
+        "meldungen": [m.als_dict() for m in e.meldungen],
         "unbestimmt": e.unbestimmt(),
         "unbestimmt_text": UNBESTIMMT,
         "summen_text": SUMMEN,

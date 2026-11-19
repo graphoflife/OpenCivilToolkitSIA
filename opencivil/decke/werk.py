@@ -142,7 +142,7 @@ class Deckensystem(Rechenobjekt):
                 platte = replace(platte, E=e.g(f"E_{i}").si, wichte=e.g(f"rho_{i}").si * e.g("g").si)
             platten.append(platte)
         gerechnet = replace(self.decke, platten=platten)
-        ergebnis = None if any(m.fehler for m in self.meldungen) else rechnen(gerechnet)
+        ergebnis = None if any(m.haelt_an for m in self.meldungen) else rechnen(gerechnet)
         befund = Deckenbefund(gerechnet, self.meldungen + (ergebnis.meldungen if ergebnis else []),
                               ergebnis)
         herleitung.schreiben(p, self, befund)

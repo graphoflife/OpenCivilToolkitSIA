@@ -631,8 +631,8 @@ def geometrie(eintrag, projekt) -> dict:
         gefunden = stoffe.get(e[feld])
         grund = materialgrund(e[feld], gefunden, art)
         if grund:
-            vorab.append({"text": f"{e['name']}: {grund}.", "elemente": [e["kennung"]],
-                          "fehler": gefunden is not None})
+            vorab.append({"text": f"{e['name']}: {grund.text}.", "elemente": [e["kennung"]],
+                          "fehler": grund.falsch})
 
     for f in elemente.polygone:
         if f["material"]:  # ohne Material eine Aussparung

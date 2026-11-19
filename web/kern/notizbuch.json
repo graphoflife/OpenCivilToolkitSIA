@@ -6261,6 +6261,7 @@
         "_modulfrage",
         "_paare",
         "_stabmaterial",
+        "_stabmaterialname",
         "_material_des_querschnitts"
       ]
     },
@@ -6360,6 +6361,7 @@
         "baustoff_bauen",
         "material",
         "ohne_kombination",
+        "Grund",
         "materialgrund",
         "ueberschreibungen_setzen",
         "spannungsnachweise",
@@ -7815,6 +7817,8 @@
       "kurz": "das Stabwerk, eben und im Raum: Unbekannte, Zusammenbau, Loesen.",
       "stichworte": [
         "Meldung",
+        "Meldung.haelt_an",
+        "Meldung.als_dict",
         "Ort",
         "Ort.punkt",
         "Ort.gehalten",

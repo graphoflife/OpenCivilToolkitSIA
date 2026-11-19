@@ -23,7 +23,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import (
-    TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple,
+    TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, NamedTuple, Optional, Sequence,
+    Tuple,
 )
 
 from opencivil.core.einheiten import KN, KNM, M, Groesse
@@ -486,7 +487,7 @@ def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str,
     grund = materialgrund(kennung, None if gefunden is None
                           else (gefunden.art.value, gefunden.name), art)
     if grund:
-        raise ProjektFehler(f"{wo}: {feld}: {grund}.")
+        raise ProjektFehler(f"{wo}: {feld}: {grund.text}.")
     return gefunden
 
 
@@ -496,18 +497,34 @@ def ohne_kombination(kombinationen: Sequence[Any]) -> str:
             else "noch keine Kombination – unter «Einwirkungen» eine anlegen")
 
 
-def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[str]:
+class Grund(NamedTuple):
+    """
+    Warum eine Wahl nicht rechnet, klein beginnend. ``falsch``: sie
+    widerspricht sich -- etwa ein Stahl, wo ein Beton hingehoert -- und steht
+    rot. Sonst fehlt nur etwas, und sie steht grau, auch wo die Rechnung ohne
+    sie anhaelt (Benutzer, 2026-11-19).
+    """
+
+    text: str
+    falsch: bool = False
+
+
+def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[Grund]:
     """
     Was an der Wahl eines Materials nicht stimmt, ohne Ort -- ``None``, wenn
     sie stimmt. ``gefunden`` sind Art und Name des gewaehlten, ``None``, wenn
-    es das nicht gibt. Die Regel fuer :func:`material` und fuer die
-    Meldungen an der Zeichnung (:func:`opencivil.web.api.geometrie`).
+    es das nicht gibt. Falsch ist nur die falsche Art; ein geloeschtes oder
+    noch nicht gewaehltes fehlt nur. Das geloeschte nennt der Satz nicht beim
+    Namen: den kennt das Projekt nicht mehr, und die Kennung steht nirgends,
+    wo der Benutzer sie saehe -- bis 2026-11-19 hiess es «das Material 'b9'».
+    Die Regel fuer :func:`material` und fuer die Meldungen an der Zeichnung
+    (:func:`opencivil.web.api.geometrie`).
     """
     if gefunden is None:
-        return (f"das Material '{kennung}' gibt es nicht mehr – eines wählen" if kennung
-                else "noch kein Material gewählt")
+        return Grund("das gewählte Material gibt es nicht mehr – eines wählen" if kennung
+                     else "noch kein Material gewählt")
     if gefunden[0] != art:
-        return f"«{gefunden[1]}» ist kein {Baustoffart(art).beschriftung}"
+        return Grund(f"«{gefunden[1]}» ist kein {Baustoffart(art).beschriftung}", falsch=True)
     return None
 
 

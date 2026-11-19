@@ -258,7 +258,7 @@ class TestAufbau(unittest.TestCase):
         """Ein Verweis ins Leere hält die Analyse an und nennt, was fehlt -- nur sie."""
         p = projekt()
         p.querschnittsanalysen[0].flaechen[0].material = "b7"
-        self.assertRegex(meldung(p), "'b7'")
+        self.assertRegex(meldung(p), "Polygon 1: das gewählte Material gibt es nicht mehr")
 
 
 class TestBiegung(unittest.TestCase):
@@ -543,7 +543,7 @@ class TestGeometrieEndpunkt(unittest.TestCase):
         self.assertEqual([(m["elemente"], m["fehler"]) for m in d["meldungen"]],
                          [([linie.kennung], False)])
         self.assertEqual(d["meldungen"][0]["text"],
-                         "Linie 1: das Material 's9' gibt es nicht mehr – eines wählen.")
+                         "Linie 1: das gewählte Material gibt es nicht mehr – eines wählen.")
 
     def test_ein_beton_als_stahl_ist_falsch(self):
         p = projekt()

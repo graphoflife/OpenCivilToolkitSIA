@@ -51,7 +51,7 @@ from opencivil.stabwerk.modell import (
 from opencivil.stabwerk.system import Meldung
 
 from opencivil.projekt.aufbau.faelle import beiwerte, doppelte_kennungen, faelle_pruefen, ohne_lastfall
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, Unfertiges, materialgrund
+from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, Grund, Unfertiges, materialgrund
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -77,7 +77,7 @@ class Modell:
 
     @property
     def gueltig(self) -> bool:
-        return not any(m.fehler for m in self.meldungen)
+        return not any(m.haelt_an for m in self.meldungen)
 
 
 
@@ -123,8 +123,8 @@ class Uebersetzung:
         self.paare: Dict[str, Tuple[str, str]] = {}
         self.lasten: Dict[str, List[Any]] = {lf.kennung: [] for lf in eintrag.lastfaelle}
 
-    def melden(self, text: str, *elemente: str, fehler: bool = True) -> None:
-        self.meldungen.append(Meldung(text, tuple(elemente), fehler))
+    def melden(self, text: str, *elemente: str, fehler: bool = True, unfertig: bool = False) -> None:
+        self.meldungen.append(Meldung(text, tuple(elemente), fehler, unfertig))
 
     def halt(self, teil: Any, richtung: str) -> Halt:
         """Wie ein Lager oder eine Linie in ``richtung`` haelt -- die Feder im Feld ``k_<richtung>``."""
@@ -154,7 +154,8 @@ class Uebersetzung:
             elif q.kennung in self.unmoeglich:
                 pass
             elif not l.material:
-                self.melden(f"{l.kennung} ist ein Stab, hat aber kein Material.", l.kennung)
+                self.melden(f"{l.kennung} ist ein Stab, hat aber noch kein Material.", l.kennung,
+                            fehler=False, unfertig=True)
             elif l.material not in self.stoffe:
                 self.melden(f"{l.kennung} nimmt das Material «{l.material}», das es im System "
                             f"nicht gibt.", l.kennung)
@@ -347,7 +348,7 @@ def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Mat
     materialien = {m.kennung: m for m in eintrag.stabmaterialien}
     paare: Dict[str, Tuple[str, Stabmaterial]] = {}
     meldungen = list(modell.meldungen)
-    aufgeloest: Dict[Tuple[Optional[str], str], Tuple[Optional[Stabmaterial], str]] = {}
+    aufgeloest: Dict[Tuple[Optional[str], str], Tuple[Optional[Stabmaterial], Optional[Grund]]] = {}
     ohne: Dict[Tuple[Optional[str], str], List[Tuple[str, str]]] = {}
     for stab, (q, kennung) in modell.paare.items():
         gemaess = kennung == MATERIAL_DES_QUERSCHNITTS
@@ -364,14 +365,17 @@ def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Mat
         gemaess, kennung = schluessel
         namen = [stab for stab, _ in staebe]
         wer = f"{namen[0]} nimmt" if len(namen) == 1 else f"{aufgezaehlt(namen)} nehmen"
-        was = "das Material gemäss Querschnitt" if gemaess else f"das Material {kennung}"
-        meldungen.append(Meldung(f"{wer} {was}, aber {aufgeloest[schluessel][1]}",
-                                 (*namen, *dict.fromkeys(q for _, q in staebe), kennung), True))
+        was = ("das Material gemäss Querschnitt" if gemaess
+               else _stabmaterialname(materialien[kennung], aufbau))
+        grund = aufgeloest[schluessel][1]
+        meldungen.append(Meldung(f"{wer} {was}, aber {grund.text}",
+                                 (*namen, *dict.fromkeys(q for _, q in staebe), kennung),
+                                 fehler=grund.falsch, unfertig=not grund.falsch))
     return paare, meldungen
 
 
 def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau,
-                  kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], str]:
+                  kennwerte: Sequence[Materialkennwert]) -> Tuple[Optional[Stabmaterial], Optional[Grund]]:
     """
     Ein Material des Systems, aufgeloest: ein Beton oder Baustahl des
     Projekts oder ein eigenes mit den ``kennwerte`` von Hand. Traegt es
@@ -383,42 +387,57 @@ def _stabmaterial(m: StabmaterialEintrag, aufbau: Aufbau,
     """
     if m.art == "eigen":
         return Stabmaterial(m.kennung, m.name or m.kennung,
-                            werte={k.kurzname: getattr(m, k.kurzname) for k in kennwerte}), ""
+                            werte={k.kurzname: getattr(m, k.kurzname) for k in kennwerte}), None
     if not m.stoff:
-        return None, f"bei ihm ist kein {Baustoffart(m.art).beschriftung} gewählt."
+        return None, Grund("es ist noch keiner gewählt.")
     stoff = aufbau.baustoffe.get(m.stoff)
     grund = materialgrund(m.stoff, None if stoff is None else (stoff.art.value, stoff.name), m.art)
     if grund:
-        return None, f"{grund}."
-    return Stabmaterial(m.kennung, stoff.name, stoff=stoff), ""
+        return None, Grund(f"{grund.text}.", grund.falsch)
+    return Stabmaterial(m.kennung, stoff.name, stoff=stoff), None
+
+
+def _stabmaterialname(m: StabmaterialEintrag, aufbau: Aufbau) -> str:
+    """
+    Wie eine Meldung ein Material des Systems nennt: wie die Liste der
+    Materialien -- ein eigenes mit seinem Namen, eines des Projekts mit dem
+    Namen des Stoffs. Gibt es den Stoff nicht, nur seine Art; die Kennung
+    sieht der Benutzer nirgends (bis 2026-11-19 «das Material M1»).
+    """
+    if m.art == "eigen":
+        return f"das Material «{m.name or m.kennung}»"
+    stoff = aufbau.baustoffe.get(m.stoff)
+    return f"«{stoff.name}»" if stoff is not None else f"einen {Baustoffart(m.art).beschriftung} des Projekts"
 
 
 def _material_des_querschnitts(q: StabquerschnittBasis,
-                               aufbau: Aufbau) -> Tuple[Optional[Stabmaterial], str]:
+                               aufbau: Aufbau) -> Tuple[Optional[Stabmaterial], Optional[Grund]]:
     """
     Das Material, das ein Querschnitt mitbringt: der Beton einer Platte, das
     eine Material der Flaechen einer Analyse. Sonst ``None``, und der zweite
     Teil sagt, warum.
     """
     if not q.art.aus_bauteil:
-        return None, (f"«{q.name}» ist "
-                      f"{'nach Vorlage' if q.art is Querschnittsart.VORLAGE else 'von Hand'} und "
-                      f"bringt keines mit – das tut nur eine Platte oder Querschnittsanalyse.")
+        return None, Grund(f"«{q.name}» ist "
+                           f"{'nach Vorlage' if q.art is Querschnittsart.VORLAGE else 'von Hand'} und "
+                           f"bringt keines mit – das tut nur eine Platte oder Querschnittsanalyse.",
+                           falsch=True)
     unfertig = aufbau.unfertige.get(q.bezug)
     if unfertig is not None:
-        return None, _rechnet_nicht(q.art.bauteil, unfertig)
+        return None, Grund(_rechnet_nicht(q.art.bauteil, unfertig))
     if q.art is Querschnittsart.PLATTE:
         platte = aufbau.querschnitte.get(q.bezug)
         stoffe = [platte.beton] if platte is not None else []
     else:
         analyse = aufbau.querschnittsanalysen.get(q.bezug)
         if analyse is None:
-            return None, f"bei «{q.name}» ist noch keine Querschnittsanalyse gewählt."
+            return None, Grund(f"bei «{q.name}» ist noch keine Querschnittsanalyse gewählt.")
         stoffe = list({id(f.stoff): f.stoff for f in analyse.flaechen if f.stoff is not None}.values())
         if len(stoffe) > 1:
-            return None, (f"die Flächen von «{q.name}» sind aus "
-                          f"{' und '.join(s.name for s in stoffe)} – das Material von Hand wählen.")
+            return None, Grund(f"die Flächen von «{q.name}» sind aus "
+                               f"{' und '.join(s.name for s in stoffe)} – das Material von Hand "
+                               f"wählen.", falsch=True)
     if not stoffe:
-        return None, f"«{q.name}» bringt keines mit."
+        return None, Grund(f"«{q.name}» bringt keines mit.")
     return Stabmaterial(MATERIAL_DES_QUERSCHNITTS, stoffe[0].name, stoff=stoffe[0],
-                        vom_querschnitt=True), ""
+                        vom_querschnitt=True), None
