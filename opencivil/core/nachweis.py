@@ -148,6 +148,10 @@ class KeinVergleich:
 NICHT_FUEHRBAR = KeinVergleich(0.0, False)
 UNBESCHRAENKT = KeinVergleich(math.inf, True)
 
+#: Der Grund zu :data:`UNBESCHRAENKT`, wo nichts einwirkt -- fuer jeden
+#: Nachweis derselbe Satz statt «erfüllt, ∞» (Benutzer, 2026-11-19).
+OHNE_EINWIRKUNG = "Keine Einwirkung → kein Nachweis."
+
 #: Wie ein Fall ausgeht: verglichen, oder ohne Vergleich.
 Ausgang = Union[Vergleich, KeinVergleich]
 

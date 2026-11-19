@@ -7,6 +7,18 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Ohne Last kein Nachweis, auch beim Durchstanzen und der Setzung
+
+Entscheid des Benutzers. Vorher stand ein frisches Durchstanzen (V_d = 0)
+und eine Setzung ohne Pressung in der Zusammenfassung als «erfüllt» mit dem
+Grad ∞. Jetzt steht dort, wie schon in der Querschnittsanalyse, «Keine
+Einwirkung → kein Nachweis.», in der Herleitung und unter der Tabelle.
+
+Der Satz steht einmal, als `OHNE_EINWIRKUNG` in `opencivil/core/nachweis.py`,
+neben `UNBESCHRAENKT`, mit dem er geht. Beim Durchstanzen bekommt der
+Grundriss seinen Schnitt trotzdem; bei der Setzung genügt eine der beiden
+Pressungen, q_W oder q_E, damit gerechnet wird.
+
 ## 2026-11-19 · Ein fehlendes Material steht grau, ohne Kennung
 
 Zwei Entscheide des Benutzers. Vorher stand ein gelöschter Beton an einer

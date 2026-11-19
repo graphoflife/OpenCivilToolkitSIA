@@ -238,7 +238,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       Namen. Empfehlung: «das gewählte Material gibt es nicht mehr -- eines
       wählen.» Der Satz steht an einer Stelle (`materialgrund` in
       `opencivil/projekt/aufbau/kern.py`).
-- [ ] **«erfüllt, ∞» ohne Last.** Ein frisches Durchstanzen (V_d = 0) und
+- [x] **«erfüllt, ∞» ohne Last.** Ein frisches Durchstanzen (V_d = 0) und
       eine frische Setzung (ohne Last, s = 0) stehen in der Zusammenfassung
       als «erfüllt» mit dem Grad ∞. Die Querschnittsanalyse sagt in
       derselben Lage «Keine Einwirkung → kein Nachweis.». Empfehlung:

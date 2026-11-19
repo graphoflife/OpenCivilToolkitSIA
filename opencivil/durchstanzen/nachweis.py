@@ -53,7 +53,9 @@ from dataclasses import dataclass, replace
 from typing import Dict, List, Optional, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
-from opencivil.core.nachweis import NICHT_FUEHRBAR, Nachweis, NachweisUrteil, Vergleich, grad_def
+from opencivil.core.nachweis import (
+    NICHT_FUEHRBAR, OHNE_EINWIRKUNG, UNBESCHRAENKT, Nachweis, NachweisUrteil, Vergleich, grad_def,
+)
 from opencivil.core.einheiten import EINHEITSLOS, KNM_PRO_M, M2, MM, MM2_PRO_M, Groesse
 from opencivil.core.latex import Mathe, als_text, angabe
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte
@@ -208,9 +210,6 @@ class Durchstanzen(Nachweis):
         V_Rd_c = herleitung.widerstand(p, w, innen, ix=STUETZE, k_r=k_r, tau_cd=tau_cd, d_v=d_v,
                                        u=u, titel="Durchstanzwiderstand ohne Durchstanzbewehrung",
                                        referenz="SIA 262:2025, 4.3.6.3.1")
-        v = Vergleich(V_d, V_Rd_c)
-        v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
-        v.zeile(p, self.d_ohne, mit_urteil=True)
         umriss = tuple(f.umriss(masse, dv))
         befund = Durchstanzbefund(
             d=d.groesse.si, innen=innen, rotationen=rotationen, psi=psi.groesse.si,
@@ -218,6 +217,15 @@ class Durchstanzen(Nachweis):
             aussparungen=tuple(s.aussparungen),
             raender=tuple(((h.c * h.n[0], h.c * h.n[1]), math.atan2(-h.n[1], -h.n[0]))
                           for h in f.raender(masse)))
+        if e.g("V_d").si == 0.0:
+            # Ohne Stützenkraft ist nichts durchzustanzen -- bis 2026-11-19 stand
+            # eine frische Stelle als «erfüllt, ∞» in der Zusammenfassung.
+            p.text(OHNE_EINWIRKUNG)
+            return Ausfuehrung({}, [self.urteil(self.d_ohne, "ohne Durchstanzbewehrung",
+                                                UNBESCHRAENKT, OHNE_EINWIRKUNG)], befund)
+        v = Vergleich(V_d, V_Rd_c)
+        v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
+        v.zeile(p, self.d_ohne, mit_urteil=True)
         if not v.erfuellt and f.vorschlag:
             urteile, leisten, pilz = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
                 innen=innen, d=d, d_v=d_v, k_e=k_e, k_r=k_r, tau_cd=tau_cd, u=u, psi=psi,

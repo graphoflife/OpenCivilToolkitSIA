@@ -1,5 +1,5 @@
 ---
-erzeugt: f8afb61a907c
+erzeugt: ecb6f605de12
 art: modul
 tags: [modul]
 ---
@@ -362,6 +362,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 
 - `NICHT_FUEHRBAR = KeinVergleich(0.0, False)`
 - `UNBESCHRAENKT = KeinVergleich(math.inf, True)`
+- `OHNE_EINWIRKUNG = 'Keine Einwirkung → kein Nachweis.'` – Der Grund zu [[opencivil.core.nachweis#Konstanten|UNBESCHRAENKT]], wo nichts einwirkt -- fuer jeden Nachweis derselbe Satz statt «erfüllt, ∞» (Benutzer, 2026-11-19).
 - `Ausgang = Union[Vergleich, KeinVergleich]` – Wie ein Fall ausgeht: verglichen, oder ohne Vergleich.
 
 ## Braucht

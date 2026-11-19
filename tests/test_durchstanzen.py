@@ -15,6 +15,7 @@ import unittest
 from itertools import accumulate, product
 
 from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammenfassen
+from opencivil.core.nachweis import OHNE_EINWIRKUNG
 from opencivil.durchstanzen import produkte
 from opencivil.durchstanzen.bewehrung import (
     Leiste, Vorschlag, aeussere_kandidaten, anrechenbar, bemessen, leisten_anordnen, setzen,
@@ -66,6 +67,22 @@ def ergebnis(loesung, name):
     """Das Ergebnis des Zwischenwerts ``name``, wie es in der Herleitung steht."""
     return next(b.formelzeile.ergebnis for b in loesung.protokoll.bloecke
                 if getattr(b, "wert_id", "").endswith(f".{name}"))
+
+
+class TestOhneEinwirkung(unittest.TestCase):
+    """
+    Eine frische Stelle, V_d = 0: kein Nachweis, und die Zusammenfassung sagt
+    es mit dem Satz aller Nachweise -- bis 2026-11-19 stand «erfüllt, ∞» da.
+    Der Grundriss bekommt seinen Schnitt trotzdem.
+    """
+
+    def test_ohne_stuetzenkraft(self):
+        _, loesung, befund, urteil = rechnen(projekt(V_d=0.0))
+        self.assertTrue(urteil.erfuellt)
+        self.assertTrue(math.isinf(urteil.erfuellungsgrad.si))
+        self.assertEqual(urteil.hinweis, OHNE_EINWIRKUNG)
+        self.assertIn(OHNE_EINWIRKUNG, texte(loesung))
+        self.assertTrue(befund.umriss)
 
 
 class TestInnenstuetzeVonHand(unittest.TestCase):

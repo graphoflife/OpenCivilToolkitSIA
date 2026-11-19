@@ -37,7 +37,8 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
-    UNBESCHRAENKT, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
+    OHNE_EINWIRKUNG, UNBESCHRAENKT, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich,
+    grad_def,
 )
 from opencivil.core.einheiten import KN, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
@@ -74,8 +75,8 @@ class Fallergebnis(Fallausgang):
 
 
 #: Warum ein Lastfall keinen Bruchzustand hat -- dieselben Saetze in
-#: Herleitung, Zusammenfassung und Diagramm.
-OHNE_EINWIRKUNG = "Keine Einwirkung → kein Nachweis."
+#: Herleitung, Zusammenfassung und Diagramm; ohne Einwirkung der Satz aller
+#: Nachweise (:data:`~opencivil.core.nachweis.OHNE_EINWIRKUNG`).
 OHNE_MOMENT = ("Ohne Moment gibt es keinen Bruchzustand im Schnitt: nachgewiesen wird die "
                "Normalkraft gegen die gleichmässige Dehnung.")
 JENSEITS = ("Die Normalkraft liegt jenseits dessen, was der Querschnitt gleichmässig "

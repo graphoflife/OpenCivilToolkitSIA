@@ -11,6 +11,7 @@ import math
 import unittest
 
 from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammenfassen
+from opencivil.core.nachweis import OHNE_EINWIRKUNG
 from opencivil.geotechnik.setzung import K, einflussfaktor, einflussfaktor_ecke
 from opencivil.projekt import Projekt, ProjektFehler, SetzungEintrag
 from opencivil.web import dienst
@@ -196,10 +197,21 @@ class TestNachweis(unittest.TestCase):
         self.assertLess(urteil.erfuellungsgrad.si, 1.0)
 
     def test_ohne_pressung_keine_setzung(self):
-        _, _, befund, urteil = rechnen(q_E=0.0)
+        """
+        Ohne Pressung setzt sich nichts, und die Zusammenfassung sagt es mit
+        dem Satz aller Nachweise -- bis 2026-11-19 stand «erfüllt, ∞» da.
+        """
+        _, loesung, befund, urteil = rechnen(q_E=0.0, q_W=0.0)
         self.assertEqual(befund.s, 0.0)
         self.assertTrue(urteil.erfuellt)
         self.assertTrue(math.isinf(urteil.erfuellungsgrad.si))
+        self.assertEqual(urteil.hinweis, OHNE_EINWIRKUNG)
+        self.assertIn(OHNE_EINWIRKUNG, [getattr(b, "text", "") for b in loesung.protokoll.bloecke])
+
+    def test_nur_wiederbelastung_ist_eine_einwirkung(self):
+        _, _, befund, urteil = rechnen(q_E=0.0, q_W=50.0)
+        self.assertGreater(befund.s, 0.0)
+        self.assertEqual(urteil.hinweis, "")
 
     def test_ohne_schicht_kein_nachweis(self):
         p = Projekt(name="Probe")

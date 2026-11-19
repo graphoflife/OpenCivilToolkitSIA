@@ -55,7 +55,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Vorgabe
-from opencivil.core.nachweis import Nachweis, Vergleich, grad_def
+from opencivil.core.nachweis import OHNE_EINWIRKUNG, UNBESCHRAENKT, Nachweis, Vergleich, grad_def
 from opencivil.core.einheiten import KN_PRO_M2, M, MM, MN_PRO_M2, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text, angabe, fest
 from opencivil.core.protokoll import (
@@ -469,6 +469,12 @@ class Setzung(Nachweis):
 
     def _nachweis(self, e: Eingaben, p: Protokoll, befund: Setzungsbefund) -> Ausfuehrung:
         p.titel("Setzung gegen zulässige Setzung", ebene=3)
+        if e["q_W"].groesse.si == 0.0 and e["q_E"].groesse.si == 0.0:
+            # Ohne Pressung setzt sich nichts -- bis 2026-11-19 stand eine frische
+            # Setzung als «erfüllt, ∞» in der Zusammenfassung.
+            p.text(OHNE_EINWIRKUNG)
+            return Ausfuehrung({}, [self.urteil(self.d_grad, self._fall, UNBESCHRAENKT,
+                                                OHNE_EINWIRKUNG)], befund)
         werte = Zwischenwerte(self.id)
         s_W = werte.laenge("s_W", "s_W", befund.s_W, "Setzung aus Wiederbelastung", stellen=1)
         p.formel(s_W, r"\sum \Delta s_W", {}, titel="Setzung aus Wiederbelastung",

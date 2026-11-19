@@ -1,5 +1,5 @@
 ---
-erzeugt: 9a8a30c98aea
+erzeugt: 14f0b7ed9a65
 art: modul
 tags: [modul]
 ---
@@ -115,8 +115,7 @@ Die Einwirkung, wie nachgewiesen: mit der Laengszugkraft, wo sie zaehlt.
 ## Konstanten
 
 - `KEIN_MOMENT = 1e-06` – Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es reine Normalkraft -- eine Richtung des Moments gibt es dann nicht.
-- `OHNE_EINWIRKUNG = 'Keine Einwirkung → kein Nachweis.'` – Warum ein Lastfall keinen Bruchzustand hat -- dieselben Saetze in Herleitung, Zusammenfassung und Diagramm.
-- `OHNE_MOMENT = 'Ohne Moment gibt es keinen Bruchzustand im Schnitt: nachgewiesen wir…`
+- `OHNE_MOMENT = 'Ohne Moment gibt es keinen Bruchzustand im Schnitt: nachgewiesen wir…` – Warum ein Lastfall keinen Bruchzustand hat -- dieselben Saetze in Herleitung, Zusammenfassung und Diagramm; ohne Einwirkung der Satz aller Nachweise ([[opencivil.core.nachweis#Konstanten|OHNE_EINWIRKUNG]]).
 - `JENSEITS = 'Die Normalkraft liegt jenseits dessen, was der Querschnitt gleichmäs…`
 
 ## Braucht
