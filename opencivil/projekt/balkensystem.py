@@ -115,8 +115,9 @@ STABMATERIALARTEN = (*(art.value for art in STABKENNWERTE), "eigen")
 
 #: Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer
 #: Schnittgroesse oder der Verdrehung, das verschobene System oder die
-#: Lagerkraefte.
-DIAGRAMMGROESSEN = ("M", "V", "N", "verschiebung", "verdrehung", "lagerkraefte")
+#: Lagerkraefte. N, V, M wie im Raum und in der Tabelle der Grenzwerte --
+#: bis 2026-11-19 stand M zuerst.
+DIAGRAMMGROESSEN = ("N", "V", "M", "verschiebung", "verdrehung", "lagerkraefte")
 
 #: Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 LAGERARTEN = {

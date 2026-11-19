@@ -1,5 +1,5 @@
 ---
-erzeugt: a9e0211f0f88
+erzeugt: 163f96b942c1
 art: modul
 tags: [modul]
 ---
@@ -318,7 +318,7 @@ Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `KENNWERTE = tuple((k.kurzname for k in EBEN))` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴ -- wie die Rechnung sie nimmt.
 - `STABMATERIALARTEN = (*(art.value for art in STABKENNWERTE), 'eigen')` – Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24; Baustahl seit 2026-11-15). Betonstahl ist keines: aus ihm ist kein Stab. Welche Arten des Projekts es gibt, sagen die Kennwerte, die ein Stab aus ihnen nimmt.
-- `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte.
+- `DIAGRAMMGROESSEN = ('N', 'V', 'M', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte. N, V, M wie im Raum und in der Tabelle der Grenzwerte -- bis 2026-11-19 stand M zuerst.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 
 ## Braucht

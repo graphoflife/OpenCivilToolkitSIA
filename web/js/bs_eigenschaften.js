@@ -96,6 +96,20 @@ function querschnittWahl(art, z, gewaehlt, setzen, material = '') {
 }
 
 /**
+ * Warum die Liste der Querschnitte kürzer ist: mit dem Material «gemäss
+ * Querschnitt» stehen nur die zur Wahl, die einen Beton mitbringen. Bis
+ * 2026-11-19 fehlten die anderen ohne ein Wort.
+ */
+function nurMitMaterialHinweis(art, z, material) {
+  const fehlen = material === systemkatalog(art, 'material_des_querschnitts')
+    && (z.querschnitte || []).some((q) => !bringtMaterial(art, q));
+  return fehlen ? el('p.cad-hinweis-klein', {
+    text: 'Mit dem Material «gemäss Querschnitt» stehen nur Querschnitte aus einer Platte oder '
+      + 'Querschnittsanalyse zur Wahl -- nur sie bringen einen Beton mit.',
+  }) : null;
+}
+
+/**
  * Das Material einer Linie: eines des Systems -- oder «gemäss Querschnitt»,
  * wenn ihr Querschnitt eines mitbringt (`bringt`: Platte, Analyse).
  */
@@ -166,6 +180,7 @@ export function neuEigenschaften(a, werkzeug) {
     const querschnitt = vorgabeQuerschnitt(a, z);
     inhalt = [
       cadZeile('Querschnitt', querschnittWahl(art, z, querschnitt, (w) => { v.querschnitt = w; neu(); }, vorgabeMaterial(a, z))),
+      nurMitMaterialHinweis(art, z, vorgabeMaterial(a, z)),
       querschnitt ? cadZeile('Material', materialWahl(art, z, bringtMaterial(art, z.querschnitte.find((q) => q.kennung === querschnitt)),
         vorgabeMaterial(a, z), (w) => { v.material = w; neu(); })) : null,
     ];
@@ -245,14 +260,19 @@ function lagerFelder(a, z, knoten) {
   const lager = knoten.map((k) => z.lager.find((l) => l.knoten === k) || null);
   const art = gemeinsam(lager.map((l) => lagerart(a.bs.art, l)));
   const setzen = (w) => a.aendern((zz) => { for (const k of knoten) lagerSetzen(a, zz, k, w); });
+  // «je Richtung» ist keine Vorwahl, sondern was die Richtungen darunter
+  // ergeben, wenn sie zu keiner passen -- es steht nur dann da. Bis
+  // 2026-11-19 war es ein Knopf: ohne Lager legte er ein gelenkiges an, mit
+  // Lager tat er nichts.
   const werte = [
     { wert: 'kein', beschriftung: 'kein', titel: 'Kein Lager' },
     ...systemkatalog(a.bs.art, 'lagerarten').map((x) => ({ wert: x.wert, beschriftung: x.wert })),
-    { wert: 'eigen', beschriftung: 'je Richtung', titel: 'Je Richtung frei, fest oder eine Feder' },
+    ...(art === 'eigen' ? [{ wert: 'eigen', beschriftung: 'je Richtung', titel: 'Die Richtungen darunter passen zu keiner Vorwahl' }] : []),
   ];
   const zeilen = [wahlBlock('Lager', wahlSchalter({
     werte: mitVar(werte, art), gewaehlt: art, setzen, klasse: '.ist-umbruch',
-    titel: 'Lager des Knotens -- gelenkig hält jede Verschiebung, verschieblich nur die lotrechte, eingespannt alles',
+    titel: 'Lager des Knotens -- gelenkig hält jede Verschiebung, verschieblich nur die lotrechte, '
+      + 'eingespannt alles; darunter jede Richtung für sich',
   }))];
   // Je Richtung nur, wenn alle gewählten ein Lager haben -- sonst stünde da,
   // was nur für einige gilt.
@@ -295,7 +315,10 @@ function knotenEigenschaften(a, z, knoten) {
   for (const k of knoten) {
     if (u?.unbestimmt?.includes(k)) inhalt.push(el('p.cad-hinweis-klein', { text: `${k}: ${u.unbestimmt_text}.` }));
   }
-  inhalt.push(...meldungszeilen(a, knoten));
+  // Mit den Meldungen seiner Lager: hier tippt man ihr k. Bis 2026-11-19
+  // standen sie nur unter der Zeichnung.
+  const lager = z.lager.filter((l) => knoten.includes(l.knoten)).map((l) => l.kennung);
+  inhalt.push(...meldungszeilen(a, [...knoten, ...lager]));
   return {
     titel: knoten.length === 1 ? `Knoten ${knoten[0]}` : `${knoten.length} Knoten`,
     inhalt: inhalt.filter(Boolean),
@@ -391,7 +414,10 @@ function linienEigenschaften(a, z, linien) {
   const art = a.bs.art;
   const staebe = gewaehlt.filter((l) => l.querschnitt);
   const material = gemeinsam(staebe.map((l) => l.material));
-  const inhalt = [cadZeile('Querschnitt', querschnittWahl(art, z, wert('querschnitt'), setzen('querschnitt'), material))];
+  const inhalt = [
+    cadZeile('Querschnitt', querschnittWahl(art, z, wert('querschnitt'), setzen('querschnitt'), material)),
+    nurMitMaterialHinweis(art, z, material),
+  ];
   if (staebe.length) {
     // «gemäss Querschnitt» nur, wenn jeder Querschnitt der gewählten Stäbe eines mitbringt.
     const bringt = staebe.every((l) => bringtMaterial(art, z.querschnitte.find((q) => q.kennung === l.querschnitt)));

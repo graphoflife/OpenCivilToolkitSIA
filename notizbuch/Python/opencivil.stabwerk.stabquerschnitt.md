@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ba1a64f9557
+erzeugt: afb8f487351e
 art: modul
 tags: [modul]
 ---
@@ -146,6 +146,10 @@ def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str
 ```python
 def umriss(self, loesung: Any) -> Umriss
 ```
+
+Der Umriss der Vorlage -- um z gebogen liegt das Profil im ebenen
+Rahmen, das Bild dreht sich darum um 90°. Bis 2026-11-19 stand ein
+IPE 300 «um z» im Bild hoch wie «um y», gerechnet mit I_z.
 
 ### VonHand
 

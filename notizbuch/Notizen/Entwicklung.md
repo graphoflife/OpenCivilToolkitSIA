@@ -7,6 +7,32 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Balkensysteme: Lager, Profile und Hinweise
+
+Sechster Schritt der Durchsicht, der zweite Teil der Balkensysteme.
+
+- **Meldungen eines Lagers:** standen nur unter der Zeichnung, nicht im
+  Fenster des Knotens, wo man das k tippt; ein Klick auf eine solche Meldung
+  hob die Wahl sogar auf. Jetzt steht «A1: eine Feder braucht eine
+  Steifigkeit grösser als null.» auch beim Knoten, und der Klick wählt ihn.
+- **«je Richtung» beim Lager:** war ein Knopf, der nichts Sichtbares tat --
+  ohne Lager legte er ein gelenkiges an, mit Lager blieb alles, wie es war.
+  Jetzt steht «je Richtung» nur da, wenn die Richtungen darunter zu keiner
+  Vorwahl passen, und leuchtet dann.
+- **Ein Profil «um z»** stand im Bild hoch wie «um y», gerechnet aber mit
+  I_z. Jetzt liegt es: ein IPE 300 ist im Bild 300 breit und 150 hoch.
+- **Die Diagramme in 2D:** die Schalter lauteten «M V N …», im Raum «N V_y
+  V_z T M_y M_z …». Jetzt beide mit N zuerst, wie die Tabelle der
+  Grenzwerte.
+- **Hinweise, wo vorher nichts stand:**
+  - nimmt eine Linie das Material «gemäss Querschnitt», fehlen in ihrer
+    Liste die Vorlagen, Profile und Kennwerte -- jetzt sagt ein Satz, warum;
+  - im Fenster eines Querschnitts aus Platte oder Analyse steht, dass man
+    E₀ oder E_eq wählt, sobald ein Stab «gemäss Querschnitt» nimmt;
+  - im Fenster «Material» steht sichtbar, warum «+ Baustahl» gesperrt ist:
+    «Im Projekt gibt es keinen Baustahl -- anlegen in der App
+    «Materialien».» Vorher nur im Tooltip, den es auf dem Tablet nicht gibt.
+
 ## 2026-11-19 · Balkensysteme: was die Fenster zeigen, stimmt wieder
 
 Fünfter Schritt der Durchsicht, der erste Teil der Balkensysteme.

@@ -60,11 +60,17 @@ function uebersicht(a) {
   const teile = [];
   if (u?.fehler) teile.push(el('div.qa-meldungen', {}, [el('div.qa-meldung', { text: u.fehler })]));
   const meldungen = u?.meldungen || [];
+  // Ein Lager wählt seinen Knoten: bis 2026-11-19 liess der Klick nur
+  // Knoten und Linien durch, und eine Meldung zu einem Lager hob die Wahl auf.
+  const waehlbar = (k) => z.lager.find((l) => l.kennung === k)?.knoten ?? k;
   if (meldungen.length) {
     teile.push(el('div.qa-meldungen', {}, meldungen.map((m) => el('button.qa-meldung', {
       type: 'button', text: m.text, class: m.fehler ? '' : 'ist-hinweis',
       title: 'Wählt die Elemente, die die Meldung nennt',
-      on: { click: () => waehlen(a.bs.kennung, m.elemente.filter((k) => /^[KL]\d+$/.test(k))) },
+      on: {
+        click: () => waehlen(a.bs.kennung,
+          [...new Set(m.elemente.map(waehlbar))].filter((k) => /^[KL]\d+$/.test(k))),
+      },
     }))));
   }
   const name = (q) => z.querschnitte.find((x) => x.kennung === q)?.name || q || '–';
@@ -232,6 +238,7 @@ function materialienInhalt(system) {
     }));
   });
   const kopf = [['Material'], ['Art'], ...spalten.map((k) => [k.zeichen, angabe(k.kurz).einheit]), ['trägt'], ['']];
+  const fehlt = (stoffart) => `Im Projekt gibt es keinen ${titel(stoffart)} -- anlegen in der App «Materialien»`;
   return [
     system.stabmaterialien.length ? el('div.tabelle-huelle', {}, [el('table.bs-materialien', {}, [
       el('thead', {}, [el('tr', {}, kopf.map(([text, einheit]) => el('th', {}, [
@@ -242,8 +249,7 @@ function materialienInhalt(system) {
     el('div.bs-knopfreihe', {}, [
       ...Object.keys(kennwerte).map((stoffart) => el('button.knopf.knopf-klein', {
         type: 'button', text: `+ ${titel(stoffart)}`,
-        title: stoffe(stoffart).length ? `Ein ${titel(stoffart)} aus dem Projekt`
-          : `Im Projekt gibt es keinen ${titel(stoffart)} -- anlegen in der App «Materialien»`,
+        title: stoffe(stoffart).length ? `Ein ${titel(stoffart)} aus dem Projekt` : fehlt(stoffart),
         disabled: !stoffe(stoffart).length, on: { click: () => neu(stoffart) },
       })),
       el('button.knopf.knopf-klein', {
@@ -251,6 +257,10 @@ function materialienInhalt(system) {
         on: { click: () => neu('eigen') },
       }),
     ]),
+    // Warum ein Knopf gesperrt ist, sichtbar -- der Tooltip allein fehlt
+    // auf dem Tablet (bis 2026-11-19).
+    ...Object.keys(kennwerte).filter((stoffart) => !stoffe(stoffart).length)
+      .map((stoffart) => el('p.hinweis', { text: `${fehlt(stoffart)}.` })),
   ];
 }
 
@@ -509,6 +519,12 @@ function querschnittFenster(system, kennung) {
       gewaehlt: q.e_modul, titel: 'Das E der Stäbe «gemäss Querschnitt»', setzen: setzen('e_modul'),
       klasse: '.ist-wortlaut',
     })));
+  } else if (module.length > 1) {
+    // Sonst sucht man den Schalter (bis 2026-11-19 ohne ein Wort).
+    zeilen.push(el('p.hinweis', {
+      text: 'Ob E₀ oder E_eq, wählt man hier, sobald ein Stab das Material «gemäss Querschnitt» '
+        + 'nimmt -- sonst gilt das E seines Materials.',
+    }));
   }
   if (mitEigenem && q.e_modul === 'e_eq') {
     const eq = (veraenderer) => aendern((x) => veraenderer(x.eq));

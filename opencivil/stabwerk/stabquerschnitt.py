@@ -188,7 +188,15 @@ class NachVorlage(Stabquerschnitt):
         return berechnungen + formeln, werte
 
     def umriss(self, loesung: Any) -> Umriss:
-        return self.vorlage.umriss(self.masse)
+        """
+        Der Umriss der Vorlage -- um z gebogen liegt das Profil im ebenen
+        Rahmen, das Bild dreht sich darum um 90°. Bis 2026-11-19 stand ein
+        IPE 300 «um z» im Bild hoch wie «um y», gerechnet mit I_z.
+        """
+        umriss = self.vorlage.umriss(self.masse)
+        if self.traegheit != "I_z":
+            return umriss
+        return [[(-z, y) for y, z in polygon] for polygon in umriss]
 
 
 @dataclass(frozen=True, kw_only=True)
