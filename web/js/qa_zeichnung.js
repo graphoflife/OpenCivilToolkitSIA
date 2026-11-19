@@ -34,7 +34,8 @@ import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
 import {
-  cadApp, cadBereichMitListe, lagefelder, listeZeichnen, mitTitel, umrissVon,
+  VAR, cadApp, cadBereichMitListe, gemeinsam, jaNein, lagefelder, listeZeichnen, mitTitel,
+  mitVar, umrissVon, zahlfeldMitVar,
 } from './cad_app.js';
 import { cadZeile } from './cad_palette.js';
 import {
@@ -161,6 +162,26 @@ function vorgabenNeu() {
   };
 }
 
+/**
+ * Die Vorgaben, geprüft gegen das Projekt: einem Material, das es nicht
+ * mehr gibt, folgt das erste seiner Art -- wie in einem neuen Fenster. Bis
+ * 2026-11-19 blieb ein gelöschter Stahl in der Vorgabe, und jeder neue Stab
+ * verwies ins Leere. Gibt es keinen Beton, bleibt der alte Verweis stehen:
+ * ohne Material wäre das Polygon still eine Aussparung.
+ */
+function vorgaben(a) {
+  const v = a.qa.vorgaben;
+  const gibt = (art, kennung) => materialien(art).some((m) => m.kennung === kennung);
+  const erstes = (art) => materialien(art)[0]?.kennung;
+  for (const liste of ['staebe', 'stablinien', 'schubwaende']) {
+    if (!gibt('betonstahl', v[liste].stahl)) v[liste].stahl = erstes('betonstahl') || '';
+  }
+  if (v.flaechen.material && !gibt('beton', v.flaechen.material)) {
+    v.flaechen.material = erstes('beton') || v.flaechen.material;
+  }
+  return v;
+}
+
 /** Was der Adapter einer Analyse über die gemeinsame Grundlage hinaus weiss (cad_app.js). */
 function adapter(kennung) {
   const qa = {
@@ -231,20 +252,20 @@ function neuText(qa, werkzeug) {
 function punktAnlegen(a, z, knoten, werkzeug) {
   if (werkzeug !== 'bewehrung') return null;
   const kennung = a.modell.naechsteKennung(z, 'S');
-  z.staebe.push({ ...structuredClone(a.qa.vorgaben.staebe), kennung, knoten });
+  z.staebe.push({ ...structuredClone(vorgaben(a).staebe), kennung, knoten });
   return kennung;
 }
 
 function linieAnlegen(a, z, von, bis, werkzeug) {
   const liste = LINIE_VON[werkzeug];
   const kennung = a.modell.naechsteKennung(z, 'L');
-  z[liste].push({ ...structuredClone(a.qa.vorgaben[liste]), kennung, von, bis });
+  z[liste].push({ ...structuredClone(vorgaben(a)[liste]), kennung, von, bis });
   return kennung;
 }
 
 function flaecheAnlegen(a, z, knoten) {
   const kennung = a.modell.naechsteKennung(z, 'F');
-  z.flaechen.push({ ...structuredClone(a.qa.vorgaben.flaechen), kennung, knoten });
+  z.flaechen.push({ ...structuredClone(vorgaben(a).flaechen), kennung, knoten });
   return kennung;
 }
 
@@ -271,6 +292,7 @@ function geometrieHolen(a) {
   api.geometrie(zustand.projekt, a.qa.kennung).then((antwort) => {
     if (a.qa.gefragt !== jetzt) return;
     a.qa.geometrie = { ...antwort, fassung: jetzt };
+    a.qa.geometriefehler = null;
     const namen = new Map();
     for (const liste of [antwort.polygone, antwort.staebe, antwort.linien, antwort.waende, antwort.hilfslinien]) {
       for (const x of liste || []) namen.set(x.kennung, x.element);
@@ -282,14 +304,29 @@ function geometrieHolen(a) {
     // Materialien der Werkstoffwahl (`materialienVon`).
     if (zustand.fenster && zustand.auswahl?.kennung === a.qa.kennung) aendern({}, 'fenster');
   }).catch((fehler) => {
-    if (a.qa.gefragt === jetzt) melden(fehler.message, true);
+    if (a.qa.gefragt !== jetzt) return;
+    // Der Grund steht unter der Zeichnung, wie im Balkensystem -- bis
+    // 2026-11-19 nur kurz unten, und der Zeichnung fehlten still Schwerpunkt,
+    // Stäbe der Linien und Meldungen.
+    a.qa.geometriefehler = { text: fehler.message, fassung: jetzt };
+    listeZeichnen(a);
   });
 }
 
-/** Je Element, das eine Meldung nennt, ihre Sätze. */
+/** Warum die Antwort zur jetzigen Zeichnung ausbleibt -- leer, solange nichts schiefging. */
+export function geometriefehler(a) {
+  const f = a.qa.geometriefehler;
+  return f && f.fassung === zustand.fassung ? f.text : '';
+}
+
+/**
+ * Je Element, das etwas falsch hat, die Sätze der Meldungen. Was nur fehlt
+ * -- ein Material, das zu wählen ist --, färbt es nicht, wie im
+ * Balkensystem: die Meldung steht grau unter der Zeichnung.
+ */
 function fehlerhafte(g) {
   const je = new Map();
-  for (const m of g?.meldungen || []) {
+  for (const m of (g?.meldungen || []).filter((x) => x.fehler)) {
     for (const k of m.elemente) je.set(k, [...(je.get(k) || []), m.text]);
   }
   return je;
@@ -502,12 +539,17 @@ function linienVorschau(a, g, p, q, werkzeug) {
 // ===========================================================================
 
 function materialwahl(art, gewaehlt, setzen, mitLoch = false) {
+  const werte = [
+    ...materialien(art).map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
+    ...(mitLoch ? [{ wert: '', beschriftung: 'Aussparung' }] : []),
+  ];
+  // Ein Material, das es nicht (mehr) gibt, oder noch keines: die Liste sagt
+  // es, statt still ihren ersten Eintrag zu zeigen (bis 2026-11-19).
+  const titel = katalog('materialarten', art, 'titel');
+  const fehlt = materialien(art).length ? `– ${titel} wählen –` : `– noch kein ${titel} im Projekt –`;
   return auswahl({
-    werte: [
-      ...materialien(art)
-        .map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
-      ...(mitLoch ? [{ wert: '', beschriftung: 'Aussparung' }] : []),
-    ],
+    werte: gewaehlt === VAR || werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
+      : [{ wert: gewaehlt, beschriftung: fehlt }, ...werte],
     gewaehlt,
     beiAenderung: setzen,
   });
@@ -515,6 +557,7 @@ function materialwahl(art, gewaehlt, setzen, mitLoch = false) {
 
 /**
  * Die Felder einer Elementart. `werte` ist das Element (oder die Vorgabe),
+ * bei mehreren gewählten je Feld der gemeinsame Wert oder VAR;
  * `setzen(feld, wert)` schreibt -- beim gewählten Element ins Projekt, bei
  * der Vorgabe in die Ansicht. `info` ist, was der Kern zu einer gewählten
  * Linie weiss: ihre Stahlfläche steht grau unter den Stäben, aus denen sie
@@ -522,14 +565,21 @@ function materialwahl(art, gewaehlt, setzen, mitLoch = false) {
  */
 function felderVon(liste, werte, setzen, info = null) {
   const durchmesser = katalog('durchmesser');
-  const zahl = (feld, titel, optionen = {}) => zahlfeld({
+  const zahl = (feld, titel, optionen = {}) => zahlfeldMitVar({
     wert: werte[feld], titel, schritt: 1, min: 0, ...optionen,
     beiAenderung: (w) => setzen(feld, w),
   });
   const stahl = () => cadZeile('Stahl', materialwahl('betonstahl', werte.stahl, (w) => setzen('stahl', w)));
   const haken = (text, feld) => el('div.cad-zeile', {}, [
-    el('span', { text }), hakenSchalter(werte[feld] !== false, (w) => setzen(feld, w), text), el('span'),
+    el('span', { text }),
+    werte[feld] === VAR ? jaNein(VAR, (w) => setzen(feld, w), text)
+      : hakenSchalter(werte[feld] !== false, (w) => setzen(feld, w), text),
+    el('span'),
   ]);
+  // Verschiedene Arten zugleich gewählt: ihre Felder unterscheiden sich.
+  const erstWaehlen = el('p.cad-hinweis-klein', {
+    text: 'Die gewählten unterscheiden sich in der Art -- erst eine wählen, dann gelten ihre Felder für alle.',
+  });
   if (liste === 'staebe') {
     return [cadZeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm'), stahl()];
   }
@@ -544,17 +594,22 @@ function felderVon(liste, werte, setzen, info = null) {
       anzahl: 'n Stäbe, gleich verteilt',
       teilung: 'Stäbe im Abstand s -- gerundet auf einen, der aufgeht',
     };
+    const artWahl = wahlSchalter({
+      werte: mitVar(arten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: erklaert[x.wert] })), art),
+      gewaehlt: art, setzen: (w) => setzen('art', w),
+      titel: 'Wie die Stäbe auf der Linie verteilt sind', klasse: '.cad-wahl',
+    });
+    if (art === VAR) return [artWahl, erstWaehlen, stahl()];
+    const verschmierung = art === 'flaeche' ? wahlSchalter({
+      werte: mitVar(verschmierungen.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
+        werte.verschmiert),
+      gewaehlt: werte.verschmiert, setzen: (w) => setzen('verschmiert', w),
+      titel: 'Wie die Stahlfläche angegeben ist', klasse: '.cad-wahl',
+    }) : null;
+    if (werte.verschmiert === VAR && art === 'flaeche') return [artWahl, verschmierung, erstWaehlen, stahl()];
     return [
-      wahlSchalter({
-        werte: arten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: erklaert[x.wert] })),
-        gewaehlt: art, setzen: (w) => setzen('art', w),
-        titel: 'Wie die Stäbe auf der Linie verteilt sind', klasse: '.cad-wahl',
-      }),
-      art === 'flaeche' ? wahlSchalter({
-        werte: verschmierungen.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
-        gewaehlt: werte.verschmiert, setzen: (w) => setzen('verschmiert', w),
-        titel: 'Wie die Stahlfläche angegeben ist', klasse: '.cad-wahl',
-      }) : null,
+      artWahl,
+      verschmierung,
       art === 'flaeche' && !ausStaeben ? cadZeile('A_s', zahl('flaeche', 'Stahlfläche der ganzen Linie', { schritt: 100 }), 'mm²') : null,
       art === 'anzahl' ? cadZeile('n', zahl('anzahl', 'Anzahl Stäbe', { min: 1 })) : null,
       art === 'teilung' ? cadZeile('s', zahl('teilung', 'Gewünschte Teilung', { schritt: 25, min: 1 }), 'mm') : null,
@@ -617,7 +672,7 @@ function formWahl(a) {
 
 /** Die Vorgaben für das, was ein Werkzeug als Nächstes anlegt -- nur die seiner Art. */
 function neuEigenschaften(a, werkzeug) {
-  const v = a.qa.vorgaben;
+  const v = vorgaben(a);
   const vorgabeSetzen = (liste) => (feld, wert) => { v[liste][feld] = wert; a.neuZeichnen(); };
   const felder = (liste) => felderVon(liste, v[liste], vorgabeSetzen(liste));
   const hinweis = (text) => el('p.cad-hinweis-klein', { text });
@@ -705,8 +760,13 @@ function eigenschaften(a) {
   });
   const e = gewaehlt[0].e;
   const mehrere = gewaehlt.length > 1;
+  // Bei mehreren je Feld der gemeinsame Wert oder «Var», wie im Balkensystem
+  // und in der Decke -- bis 2026-11-19 standen die Werte des ersten da, und
+  // ein getippter Wert galt unsichtbar für alle.
+  const werte = mehrere ? Object.fromEntries(Object.keys(e).map((feld) => [
+    feld, gemeinsam(gewaehlt.map((x) => x.e[feld]))])) : e;
   let titel = `${elementname(a, e.kennung)} · ${artText(liste, e)}`;
-  if (mehrere) titel = `${gewaehlt.length} × ${artText(liste, e)}`;
+  if (mehrere) titel = `${gewaehlt.length} × ${artText(liste, werte)}`;
   else if (liste === 'knoten') titel = elementname(a, e.kennung);
 
   if (liste === 'knoten') {
@@ -717,7 +777,7 @@ function eigenschaften(a) {
     };
   }
   const info = mehrere ? null : passendeGeometrie(a)?.linien?.find((x) => x.kennung === e.kennung);
-  const inhalt = [...felderVon(liste, e, setzen, info)];
+  const inhalt = [...felderVon(liste, werte, setzen, info)];
   if (!mehrere) inhalt.push(...infozeilen(a, liste, e));
   // Neu, sobald die Antwort des Kerns da ist: die Zeilen darunter kommen von ihm.
   return { titel, inhalt: inhalt.filter(Boolean), schluessel: Boolean(passendeGeometrie(a)) };
@@ -727,7 +787,7 @@ function artText(liste, e) {
   return {
     knoten: 'Knoten', staebe: 'Punktbewehrung', stablinien: 'Linienbewehrung',
     schubwaende: 'Schubwand', hilfslinien: 'Hilfslinie',
-    flaechen: e.material ? stoffname(e.material) : 'Aussparung',
+    flaechen: e.material === VAR ? 'Flächen' : (e.material ? stoffname(e.material) : 'Aussparung'),
   }[liste];
 }
 
@@ -748,17 +808,18 @@ function infozeilen(a, liste, e) {
     const info = geo?.waende?.find((x) => x.kennung === e.kennung);
     if (info) zeilen.push(`A_sw/s = ${zahlText(info.a_sw_s, 0)} mm²/m`);
   }
-  const meldungen = (geo?.meldungen || []).filter((m) => m.elemente.includes(e.kennung)).map((m) => m.text);
+  const meldungen = (geo?.meldungen || []).filter((m) => m.elemente.includes(e.kennung));
   if (liste === 'flaechen') {
     zeilen.push(`${e.knoten.length} Ecken`);
     const p = geo?.polygone?.find((x) => x.kennung === e.kennung);
     if (e.ueberdeckung > 0 && p && !p.ueberdeckung) {
-      meldungen.push('Die Überdeckung ist zu gross: vom Polygon bleibt nichts übrig.');
+      meldungen.push({ text: 'Die Überdeckung ist zu gross: vom Polygon bleibt nichts übrig.', fehler: true });
     }
   }
+  // Rot, was nicht stimmt; grau, was nur noch fehlt -- wie im Balkensystem.
   return [
     ...zeilen.map((t) => el('p.cad-info', { text: t })),
-    ...meldungen.map((t) => el('p.cad-meldung', { text: t })),
+    ...meldungen.map((m) => el(m.fehler ? 'p.cad-meldung' : 'p.cad-hinweis-klein', { text: m.text })),
   ];
 }
 
@@ -848,8 +909,12 @@ function aktionen(a) {
   }
   const reihe = umlauf(z, a.auswahl);
   if (reihe) {
+    // Was entsteht, sagt die Vorgabe des Werkzeugs Polygon -- bis 2026-11-19
+    // sagte der Knopf es nicht.
+    const entsteht = vorgaben(a).flaechen.material ? neuText(a.qa, 'polygon') : 'Aussparung';
     liste.push({
-      zeichen: '▱', text: 'Fläche bilden', titel: 'Die geschlossenen Hilfslinien werden eine Fläche',
+      zeichen: '▱', text: 'Fläche bilden',
+      titel: `Die geschlossenen Hilfslinien werden eine ${entsteht} -- wie die Vorgabe des Werkzeugs Polygon`,
       tun: () => {
         const weg = new Set(a.auswahl);
         let neu = null;

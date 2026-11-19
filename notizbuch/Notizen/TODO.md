@@ -100,6 +100,10 @@ gelernt wurde, steht in [[Entwicklung]].
       aber eine Namensliste: der Doppelgänger kann in einem Fenster stehen,
       das man nicht offen hat. Vorschlag: das Namensfeld weist einen
       vergebenen Namen ab und sagt, wo er steht. Entscheid des Benutzers.
+      Strenger noch ein leerer Name: die Oberfläche lässt ihn nicht zu, aus
+      einer bearbeiteten Datei aber hält er beim Lesen das ganze Projekt an
+      («Platte 'Decke über EG', kombinationen 1: 'name' darf nicht leer
+      sein.»), statt nur seine Platte (Durchsicht vom 2026-11-19).
 - [ ] **Dichten aus SIA 261.** 2400 und 2500 kg/m³ für Beton und Stahlbeton,
       7850 kg/m³ für Stahl stehen so in SIA 261:2020, Anhang A, Tabelle 28
       (mit g = 10 m/s²); SIA 262 nennt keine. Ob der Verweis eingetragen wird,

@@ -1,5 +1,5 @@
 ---
-erzeugt: 13e5ac9492b9
+erzeugt: 5f4727fcf797
 art: modul
 tags: [modul]
 ---
@@ -158,6 +158,7 @@ Text nennt sie beim Namen, `elemente` traegt ihre Kennungen.
 
 - `text: str`
 - `elemente: Tuple[str, ...]`
+- `fehler: bool = True` – Ob etwas nicht stimmt -- sonst fehlt nur etwas, und die Zeichnung ist unfertig: «Es gibt kein Polygon mit Material» bei Bewehrung allein.
 
 ### Zeichnung
 

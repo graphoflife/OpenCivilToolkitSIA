@@ -22,7 +22,9 @@ einer Datei ``aufbau.py`` von ueber tausend Zeilen.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Sequence, Tuple
+from typing import (
+    TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple,
+)
 
 from opencivil.core.einheiten import KN, KNM, M, Groesse
 from opencivil.core.nachweis import Nachweis, NachweisUrteil
@@ -467,14 +469,26 @@ def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str,
     am Bauteil (:meth:`Aufbau.unfertig`), dort genuegt das Feld.
     """
     gefunden = baustoffe.get(kennung)
-    if gefunden is None:
-        raise ProjektFehler(
-            f"{wo}: {feld}: das Material '{kennung}' gibt es nicht mehr -- eines wählen."
-            if kennung else f"{wo}: {feld}: noch kein Material gewählt.")
-    if gefunden.art.value != art:
-        raise ProjektFehler(f"{wo}: {feld}: «{gefunden.name}» ist kein "
-                            f"{Baustoffart(art).beschriftung}.")
+    grund = materialgrund(kennung, None if gefunden is None
+                          else (gefunden.art.value, gefunden.name), art)
+    if grund:
+        raise ProjektFehler(f"{wo}: {feld}: {grund}.")
     return gefunden
+
+
+def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[str]:
+    """
+    Was an der Wahl eines Materials nicht stimmt, ohne Ort -- ``None``, wenn
+    sie stimmt. ``gefunden`` sind Art und Name des gewaehlten, ``None``, wenn
+    es das nicht gibt. Die Regel fuer :func:`material` und fuer die
+    Meldungen an der Zeichnung (:func:`opencivil.web.api.geometrie`).
+    """
+    if gefunden is None:
+        return (f"das Material '{kennung}' gibt es nicht mehr -- eines wählen" if kennung
+                else "noch kein Material gewählt")
+    if gefunden[0] != art:
+        return f"«{gefunden[1]}» ist kein {Baustoffart(art).beschriftung}"
+    return None
 
 
 def ueberschreibungen_setzen(projekt: "Projekt", werk: Rechenwerk,

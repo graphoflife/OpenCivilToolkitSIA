@@ -1,5 +1,5 @@
 ---
-erzeugt: e6b6147b44ca
+erzeugt: 1a15035086be
 art: modul
 tags: [modul]
 ---
@@ -412,6 +412,17 @@ und es muss von dieser Art sein. Ohne Angabe gilt nicht «das erste im
 Projekt» -- bis 2026-10-16 bekamen Buegel und Staebe ohne Stahl still den
 ersten. `feld` heisst wie in der Oberflaeche: was nicht stimmt, steht
 am Bauteil ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]), dort genuegt das Feld.
+
+### materialgrund
+
+```python
+def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[str]
+```
+
+Was an der Wahl eines Materials nicht stimmt, ohne Ort -- `None`, wenn
+sie stimmt. `gefunden` sind Art und Name des gewaehlten, `None`, wenn
+es das nicht gibt. Die Regel fuer [[opencivil.projekt.aufbau.kern#material|material]] und fuer die
+Meldungen an der Zeichnung ([[opencivil.web.api#geometrie|opencivil.web.api.geometrie]]).
 
 ### ueberschreibungen_setzen
 

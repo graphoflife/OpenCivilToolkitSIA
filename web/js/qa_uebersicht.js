@@ -19,7 +19,7 @@ import { imSpiel } from './cad_auswahl.js';
 import { el } from './dom.js';
 import { span } from './mathe.js';
 import {
-  elementname, linienText, passendeGeometrie, stoffname, waehlen,
+  elementname, geometriefehler, linienText, passendeGeometrie, stoffname, waehlen,
 } from './qa_zeichnung.js';
 
 /** Eine Zeile: Name, was es ist, und rechts die eine Zahl, die zählt. */
@@ -58,8 +58,9 @@ export function uebersicht(a) {
   const z = a.adapter.zeichnung();
   if (!z) return [];
   const g = passendeGeometrie(a);
+  // Rot nur, was nicht stimmt; was nur fehlt, steht grau darüber.
   const fehler = new Map();
-  for (const m of g?.meldungen || []) {
+  for (const m of (g?.meldungen || []).filter((x) => x.fehler)) {
     for (const k of m.elemente) fehler.set(k, [...(fehler.get(k) || []), m.text]);
   }
   const lagen = a.modell.lagen(z);
@@ -71,9 +72,14 @@ export function uebersicht(a) {
   const wandinfo = new Map((g?.waende || []).map((x) => [x.kennung, x]));
 
   const teile = [];
+  const kaputt = geometriefehler(a);
+  if (kaputt) {
+    teile.push(el('div.qa-meldungen', {}, [
+      el('div.qa-meldung', { text: `Die Zeichnung ist nicht geprüft: ${kaputt}` })]));
+  }
   if (g?.meldungen?.length) {
     teile.push(el('div.qa-meldungen', {}, g.meldungen.map((m) => el('button.qa-meldung', {
-      type: 'button', text: m.text, title: 'Im Zeichenfenster wählen',
+      type: 'button', text: m.text, class: m.fehler ? '' : 'ist-hinweis', title: 'Im Zeichenfenster wählen',
       on: { click: () => waehlen(a.qa.kennung, m.elemente) },
     }))));
   }

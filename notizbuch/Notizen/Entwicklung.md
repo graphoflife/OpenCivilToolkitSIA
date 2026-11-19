@@ -7,6 +7,37 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Querschnittsanalyse: was noch fehlt, ist kein Fehler
+
+Neunter Schritt der Durchsicht, der erste Teil der Querschnittsanalyse: die
+Zeichnung.
+
+- **Mehrere gewählt:** Wer zwei Bewehrungslinien wählte, 3 ⌀20 und 2 ⌀12,
+  sah im Fenster «n 3, ⌀ 20», die Werte der ersten, und ein getipptes ⌀ 16
+  galt unsichtbar für beide. Jetzt steht da, was sie gemeinsam haben, sonst
+  «Var», wie im Balkensystem und in der Decke. Verteilen sie ihre Stäbe
+  verschieden (Anzahl und Teilung), sagt das Fenster, dass erst eine Art zu
+  wählen ist.
+- **Ein Stahl, den es nicht mehr gibt:** Wer einen Betonstahl löschte,
+  bevor er gezeichnet hatte, und einen neuen anlegte, zeichnete mit dem
+  gelöschten weiter: das Werkzeug merkte ihn sich. Die Liste zeigte still
+  «B500B», unter der Zeichnung stand nichts. Jetzt nimmt das Werkzeug den
+  ersten Betonstahl des Projekts; und verweist ein Element (etwa aus einer
+  bearbeiteten Datei) ins Leere, zeigt die Liste «– Betonstahl wählen –»,
+  und unter der Zeichnung steht grau «Linie 1: das Material 's9' gibt es
+  nicht mehr -- eines wählen.» Grau, weil nur etwas fehlt; rot bleibt, was
+  falsch ist, etwa ein Beton als Stahl. Die Regel steht einmal, im Kern
+  (`materialgrund`), für das Rechnen und für die Zeichnung.
+- **Eine neue, leere Analyse:** stand rot «Es gibt kein Polygon mit
+  Material». Jetzt steht nur «Noch nichts gezeichnet …». Mit Bewehrung,
+  aber ohne Polygon, steht der Satz grau da, und die Liste links sagt «ohne
+  Polygon» statt «leer».
+- **Wenn der Kern die Zeichnung nicht prüfen kann:** der Grund blitzte 6 s
+  unten auf, danach fehlten still Schwerpunkt und Meldungen. Jetzt steht er
+  unter der Zeichnung, bis die nächste Antwort kommt.
+- **«Fläche bilden»** sagt, was entsteht: «Die geschlossenen Hilfslinien
+  werden eine Fläche C30/37 -- wie die Vorgabe des Werkzeugs Polygon».
+
 ## 2026-11-19 · Platten und Materialien: was der Kern abwiese, sagt schon das Feld
 
 Achter Schritt der Durchsicht, der zweite Teil der Platten und Materialien.

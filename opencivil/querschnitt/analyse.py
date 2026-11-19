@@ -178,6 +178,11 @@ class Meldung:
 
     text: str
     elemente: Tuple[str, ...]
+    fehler: bool = True
+    """
+    Ob etwas nicht stimmt -- sonst fehlt nur etwas, und die Zeichnung ist
+    unfertig: «Es gibt kein Polygon mit Material» bei Bewehrung allein.
+    """
 
 
 class Zeichnung:
@@ -207,6 +212,9 @@ class Zeichnung:
         self.meldungen: List[Meldung] = []
         self.eltern: Optional[Tuple[Optional[int], ...]] = None
         self.brutto: Optional[geo.Flaechenwerte] = None
+        # Noch nichts gezeichnet: so beginnt jede Analyse, und es fehlt nichts,
+        # was eine Meldung wert waere (QuerschnittsanalyseEintrag.leer).
+        self._leer = not (polygone or staebe or linien or waende)
         self._polygone_pruefen()
         self.staebe = [self._stab(s) for s in staebe]
         self.linien = [self._linie(l) for l in linien]
@@ -217,8 +225,8 @@ class Zeichnung:
     def gueltig(self) -> bool:
         return not self.meldungen
 
-    def _melden(self, text: str, *elemente: str) -> None:
-        self.meldungen.append(Meldung(text=text, elemente=tuple(elemente)))
+    def _melden(self, text: str, *elemente: str, fehler: bool = True) -> None:
+        self.meldungen.append(Meldung(text=text, elemente=tuple(elemente), fehler=fehler))
 
     def _geometriefehler(self, fehler: GeometrieFehler) -> None:
         self._melden(str(fehler), *(self._kennung_von.get(n, n) for n in fehler.elemente))
@@ -226,8 +234,8 @@ class Zeichnung:
     # -- Polygone -------------------------------------------------------------------
 
     def _polygone_pruefen(self) -> None:
-        if not any(self.traegt):
-            self._melden("Es gibt kein Polygon mit Material -- nichts, was trägt.")
+        if not any(self.traegt) and not self._leer:
+            self._melden("Es gibt kein Polygon mit Material -- nichts, was trägt.", fehler=False)
         gut = True
         for name, ecken in zip(self.namen, self.punkte):
             try:

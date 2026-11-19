@@ -48,7 +48,7 @@ from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
-from opencivil.projekt.aufbau.kern import kennwertbereich
+from opencivil.projekt.aufbau.kern import kennwertbereich, materialgrund
 from opencivil.projekt.lesen import (
     bereichsangabe, eintragsklassen, feldangaben, katalogname, wahl_von,
 )
@@ -614,18 +614,28 @@ def geometrie(eintrag, projekt) -> dict:
 
     Geprueft von :class:`~opencivil.querschnitt.analyse.Zeichnung`, denselben
     Pruefungen, die das Bauteil vor dem Rechnen macht; hier aber alle
-    Meldungen auf einmal statt nur der ersten. Ein Material, das es nicht
-    gibt, oder ein Stahl als Polygon kommt dazu -- das kann nur das Projekt
-    wissen. Ebenso ein Verweis auf einen Knoten, den es nicht gibt.
+    Meldungen auf einmal statt nur der ersten. Die Wahl der Materialien kommt
+    dazu, nach derselben Regel wie beim Bauen (:func:`materialgrund`) -- das
+    kann nur das Projekt wissen. Ebenso ein Verweis auf einen Knoten, den es
+    nicht gibt. ``fehler`` sagt je Meldung, ob etwas nicht stimmt oder nur
+    fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch.
     """
-    arten = {m.kennung: m.art for m in projekt.materialien}
+    stoffe = {m.kennung: (m.art, m.anzeigename) for m in projekt.materialien}
     elemente = eintrag.elemente()
-    vorab: List[dict] = list(elemente.fehler)
+    vorab: List[dict] = [{**m, "fehler": True} for m in elemente.fehler]
+
+    def stoff_pruefen(e: dict, feld: str, art: str) -> None:
+        gefunden = stoffe.get(e[feld])
+        grund = materialgrund(e[feld], gefunden, art)
+        if grund:
+            vorab.append({"text": f"{e['name']}: {grund}.", "elemente": [e["kennung"]],
+                          "fehler": gefunden is not None})
+
     for f in elemente.polygone:
-        if f["material"] and arten.get(f["material"]) != "beton":
-            vorab.append({"text": (f"{f['name']}: das Material '{f['material']}' gibt es "
-                                   f"nicht (mehr) oder es ist kein Beton."),
-                          "elemente": [f["kennung"]]})
+        if f["material"]:  # ohne Material eine Aussparung
+            stoff_pruefen(f, "material", "beton")
+    for e in (*elemente.staebe, *elemente.linien, *elemente.waende):
+        stoff_pruefen(e, "stahl", "betonstahl")
     z = Zeichnung(
         polygone=[{**f, "traegt": bool(f["material"])} for f in elemente.polygone],
         staebe=elemente.staebe, linien=elemente.linien, waende=elemente.waende)
@@ -676,8 +686,8 @@ def geometrie(eintrag, projekt) -> dict:
     b = z.brutto
     return {
         "gueltig": z.gueltig and not vorab,
-        "meldungen": vorab + [{"text": m.text, "elemente": list(m.elemente)}
-                              for m in z.meldungen],
+        "meldungen": vorab + [{"text": m.text, "elemente": list(m.elemente),
+                               "fehler": m.fehler} for m in z.meldungen],
         "polygone": [
             {"element": f["name"], "kennung": f["kennung"],
              "eltern": (z.eltern[i] if z.eltern is not None else None),

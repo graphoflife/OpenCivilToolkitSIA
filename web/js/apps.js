@@ -219,11 +219,15 @@ const MATERIAL = {
  * «300×600 mm» -- Breite und Höhe dessen, was gezeichnet ist. Die
  * Platte zeigt an derselben Stelle h × b; eine Analyse hat statt zweier
  * Masse die Ecken ihrer Flächen, und die äussersten davon sind dasselbe.
+ * Ohne Fläche heisst sie «leer» nur, wenn auch keine Bewehrung da ist.
  */
 function umriss(analyse) {
   const ecken = new Set(analyse.flaechen.flatMap((f) => f.knoten));
   const punkte = (analyse.knoten || []).filter((k) => ecken.has(k.kennung)).map((k) => [k.y, k.z]);
-  if (!punkte.length) return 'leer';
+  if (!punkte.length) {
+    const bewehrt = ['staebe', 'stablinien', 'schubwaende'].some((liste) => analyse[liste]?.length);
+    return bewehrt ? 'ohne Polygon' : 'leer';
+  }
   const spanne = (i) => Math.max(...punkte.map((p) => p[i])) - Math.min(...punkte.map((p) => p[i]));
   return `${Number(spanne(0).toFixed(1))}×${Number(spanne(1).toFixed(1))} mm`;
 }

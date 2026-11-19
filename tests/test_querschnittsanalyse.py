@@ -528,6 +528,44 @@ class TestGeometrieEndpunkt(unittest.TestCase):
     def test_unbekannte_analyse(self):
         self.assertEqual(self.frage(projekt(), "a9").status, 400)
 
+    def test_ein_geloeschter_stahl_steht_am_element(self):
+        """
+        Zeigt eine Linie auf einen Stahl, den es nicht mehr gibt, sagt es die
+        Zeichnung an ihr, mit dem Satz des Kerns -- grau, denn es fehlt nur
+        eine Wahl. Bis 2026-11-19 pruefte sie nur das Material der Polygone,
+        und die Linie stand still da.
+        """
+        p = projekt()
+        linie = p.querschnittsanalysen[0].stablinien[0]
+        linie.stahl = "s9"
+        d = self.frage(p).daten
+        self.assertFalse(d["gueltig"])
+        self.assertEqual([(m["elemente"], m["fehler"]) for m in d["meldungen"]],
+                         [([linie.kennung], False)])
+        self.assertEqual(d["meldungen"][0]["text"],
+                         "Linie 1: das Material 's9' gibt es nicht mehr -- eines wählen.")
+
+    def test_ein_beton_als_stahl_ist_falsch(self):
+        p = projekt()
+        p.querschnittsanalysen[0].stablinien[0].stahl = "b1"
+        m = self.frage(p).daten["meldungen"][0]
+        self.assertTrue(m["fehler"])
+        self.assertIn("ist kein Betonstahl", m["text"])
+
+    def test_noch_nichts_gezeichnet_meldet_nichts(self):
+        """Eine neue Analyse: nichts fehlt, was eine Meldung waere -- die Liste sagt «noch nichts»."""
+        p = projekt()
+        a = p.querschnittsanalysen[0]
+        a.flaechen, a.staebe, a.stablinien, a.schubwaende = [], [], [], []
+        self.assertEqual(self.frage(p).daten["meldungen"], [])
+
+    def test_bewehrung_ohne_polygon_ist_unfertig_nicht_falsch(self):
+        p = projekt()
+        p.querschnittsanalysen[0].flaechen = []
+        d = self.frage(p).daten
+        self.assertEqual([(m["text"], m["fehler"]) for m in d["meldungen"]],
+                         [("Es gibt kein Polygon mit Material -- nichts, was trägt.", False)])
+
     def test_ohne_ueberdeckung_nichts_dazu(self):
         d = self.frage(projekt()).daten
         self.assertIsNone(d["polygone"][0]["ueberdeckung"])

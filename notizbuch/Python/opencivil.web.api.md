@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a22c0908cf8
+erzeugt: 6de398b6078f
 art: modul
 tags: [modul]
 ---
@@ -124,9 +124,11 @@ Die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht -- in mm.
 
 Geprueft von [[opencivil.querschnitt.analyse#Zeichnung|Zeichnung]], denselben
 Pruefungen, die das Bauteil vor dem Rechnen macht; hier aber alle
-Meldungen auf einmal statt nur der ersten. Ein Material, das es nicht
-gibt, oder ein Stahl als Polygon kommt dazu -- das kann nur das Projekt
-wissen. Ebenso ein Verweis auf einen Knoten, den es nicht gibt.
+Meldungen auf einmal statt nur der ersten. Die Wahl der Materialien kommt
+dazu, nach derselben Regel wie beim Bauen ([[opencivil.projekt.aufbau.kern#materialgrund|materialgrund]]) -- das
+kann nur das Projekt wissen. Ebenso ein Verweis auf einen Knoten, den es
+nicht gibt. `fehler` sagt je Meldung, ob etwas nicht stimmt oder nur
+fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch.
 
 ### zuordnung
 
