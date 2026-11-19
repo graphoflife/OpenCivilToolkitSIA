@@ -920,15 +920,6 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       abzumindern, und sagt dazu, dass das günstig oder ungünstig wirken
       kann (SIA 262:2025, 4.1.4.1.3). Prüfen, ob die Formeln so bleiben
       sollen.
-- [ ] **Der Hinweis auf die Hauptachsen kommt ab 5 %, nach Vorgabe**
-      (`stabwerk/stabquerschnitt.py`, `KOPPLUNG`). Im Raum gelten y und z
-      als Hauptachsen, I_yz bleibt aussen vor; ist |I_yz| grösser als 5 %
-      von min(I_y; I_z), sagt es ein Hinweis (Benutzer, 2026-11-19: ein
-      Hinweis, keine Drehung). So stark krümmt ein Moment um die steifere
-      Achse den Stab in Wirklichkeit auch um die andere. Beispiel: das
-      Rechteck 300 × 600 mm mit einem Flansch 400 × 100 mm unten rechts hat
-      |I_yz| = 2864 · 10⁶ mm⁴, 49 % von I_z = 5892 · 10⁶ mm⁴. Prüfen, ob die
-      Grenze passt.
 - [ ] **Die Vorwahlen der Lager im Raum, nach Vorgabe**
       (`projekt/balkensystem3d.py`). «Gelenkig» hält die drei
       Verschiebungen, «verschieblich» nur die lotrechte, «eingespannt» alle
@@ -1026,6 +1017,11 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
 
 ## Erledigt zuletzt
+
+Der Hinweis auf die Hauptachsen kommt weiter ab 5 % von min(I_y; I_z)
+(Benutzer, 2026-11-19: «5 % lassen»; steht jetzt in [[Arbeitsweise]]) ·
+der Schalter «E-Modul» eines Querschnitts schreibt E_cm und E_eq, wie sie
+heissen, statt E_CM und E_EQ ·
 
 Aus der Strukturdurchsicht vom 2026-11-15, Punkt 2, der kleine Umbau: der
 Pfahl rechnet N, M und V mit `ebener_verlauf`, das dafür linear wachsende

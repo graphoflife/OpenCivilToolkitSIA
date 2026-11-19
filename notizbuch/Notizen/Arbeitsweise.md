@@ -118,8 +118,9 @@ Kopie der Datei mit der Endung `.mjs`.
   Feldern im Zeichenfenster steht «m», im Querschnitt «mm».
 - **Steifigkeit im Raum** (Benutzer, 2026-11-19): ein E_eq gilt für EA,
   EI_y und EI_z, GI_T behält G_cm; I_T gilt ungerissen. y und z gelten als
-  Hauptachsen -- ist I_yz gross, sagt es ein Hinweis; der Querschnitt wird
-  nicht von selbst auf seine Hauptachsen gedreht.
+  Hauptachsen -- ist |I_yz| grösser als 5 % von min(I_y; I_z), sagt es ein
+  Hinweis; der Querschnitt wird nicht von selbst auf seine Hauptachsen
+  gedreht. Die 5 % bleiben.
 
 ## Berichten und fragen
 

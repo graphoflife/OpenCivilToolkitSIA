@@ -502,9 +502,11 @@ function querschnittFenster(system, kennung) {
   const module = systemkatalog(art, 'e_module').filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul);
   const mitEigenem = system.linien.some((l) => l.querschnitt === q.kennung && l.material === eigenes);
   if (mitEigenem && module.length > 1) {
+    // Wie geschrieben: gross geschrieben würde aus E_cm ein E_CM.
     zeilen.push(wahlBlock('E-Modul', wahlSchalter({
       werte: module.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
       gewaehlt: q.e_modul, titel: 'Das E der Stäbe «gemäss Querschnitt»', setzen: setzen('e_modul'),
+      klasse: '.ist-wortlaut',
     })));
   }
   if (mitEigenem && q.e_modul === 'e_eq') {

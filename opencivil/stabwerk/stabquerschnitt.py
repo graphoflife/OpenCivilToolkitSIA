@@ -83,7 +83,8 @@ DEVIATIONSMOMENT = Kennwert("I_yz", MIO_MM4, 2, "Deviationsmoment", symbol="I_{y
 #: Ab so viel |I_yz| / min(I_y; I_z) sagt ein Hinweis, dass y und z keine
 #: Hauptachsen sind: so stark kruemmt ein Moment um die steifere Achse den
 #: Stab auch um die weichere, und die Rechnung laesst das weg. Nach Vorgabe,
-#: nicht nachgeschlagen (Benutzer, 2026-11-19: ein Hinweis, keine Drehung).
+#: nicht nachgeschlagen (Benutzer, 2026-11-19: ein Hinweis, keine Drehung;
+#: die 5 % bleiben).
 KOPPLUNG = 0.05
 
 #: Je Kennwert die Wert-ID, die ihn liefert.

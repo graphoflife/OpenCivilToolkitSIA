@@ -41,6 +41,9 @@ selbsterklärend sein». Das steht jetzt als Regel in [[Arbeitsweise]].
   «A, I»; die Hilfe der Ebene kennt «Kennwerte» und sagt nicht mehr, E_eq
   gebe es nur bei einer Analyse; der Schalter Linie/Punkt der Bewehrung ist
   ein gewöhnlicher `wahlSchalter`.
+- Danach, auf Wunsch: der Schalter «E-Modul» schreibt E_cm und E_eq, wie
+  sie heissen -- gross geschrieben stand dort E_CM und E_EQ, andere
+  Grössen. Die 5 % des Hinweises bleiben (Benutzer: «5 % lassen»).
 
 ---
 
