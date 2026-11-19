@@ -4918,6 +4918,7 @@
         "Plattenart.last",
         "Plattenart.zugseite",
         "Plattenart.druckseite",
+        "Plattenart.umgeschaltet",
         "Naeherungsstufe",
         "Naeherungsstufe.beschriftung",
         "Naeherungsstufe.faktor",

@@ -56,7 +56,8 @@ def wahlen() -> Dict[str, Any]:
         }
 
     return {
-        "plattenarten": stellungen(Plattenart),
+        "plattenarten": [{**s, "umgeschaltet": w.umgeschaltet}
+                         for w, s in zip(Plattenart, stellungen(Plattenart))],
         "lagen": [lage(l) for l in Lage],
         "formen": stellungen(Stuetzenform),
         "stufen": stellungen(Naeherungsstufe),

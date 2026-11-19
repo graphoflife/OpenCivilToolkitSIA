@@ -1,5 +1,5 @@
 ---
-erzeugt: 3cadc04f6c2a
+erzeugt: 1da0b1a85d66
 art: modul
 tags: [modul]
 ---
@@ -87,6 +87,17 @@ def druckseite(self) -> str
 ```
 
 Die andere Seite -- von ihr aus misst c_v die Verankerung der Anker.
+
+#### Plattenart.umgeschaltet
+
+```python
+@property
+def umgeschaltet(self) -> str
+```
+
+Was nach dem Umschalten auf diese Art zu pruefen ist: die Zahlen
+bleiben stehen, aber Zug- und Druckseite wechseln, und mit ihnen, was
+c, c_v, q_d und die Biegebewehrung meinen (Benutzer, 2026-11-19).
 
 ### Naeherungsstufe
 

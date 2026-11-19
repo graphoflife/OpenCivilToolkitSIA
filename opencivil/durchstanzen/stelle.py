@@ -81,6 +81,15 @@ class Plattenart(Wahl):
         """Die andere Seite -- von ihr aus misst c_v die Verankerung der Anker."""
         return "unten" if self is Plattenart.DECKE else "oben"
 
+    @property
+    def umgeschaltet(self) -> str:
+        """
+        Was nach dem Umschalten auf diese Art zu pruefen ist: die Zahlen
+        bleiben stehen, aber Zug- und Druckseite wechseln, und mit ihnen, was
+        c, c_v, q_d und die Biegebewehrung meinen (Benutzer, 2026-11-19).
+        """
+        return f"c, c_v, q_d und die Biegebewehrung gelten jetzt für die {self.beschriftung} – prüfen."
+
 
 class Naeherungsstufe(Wahl):
     """Wie die Plattenrotation geschätzt wird (SIA 262:2025, 4.3.6.4.2)."""

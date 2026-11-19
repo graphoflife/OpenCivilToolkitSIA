@@ -245,7 +245,7 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       dasselbe hier; der Satz käme dann an eine
       Stelle für alle Nachweise (heute `OHNE_EINWIRKUNG` in
       `opencivil/nachweis/schiefe_biegung.py`).
-- [ ] **Durchstanzen: der Schalter Decke ↔ Bodenplatte lässt die Zahlen
+- [x] **Durchstanzen: der Schalter Decke ↔ Bodenplatte lässt die Zahlen
       stehen.** c, c_v, q_d und die Biegebewehrung behalten ihren Wert, nur
       die Beschriftung wechselt: etwa q_d = 10 kN/m² «Eigengewicht und
       Nutzlast» heisst danach «Bodenpressung». Jede Zahl behält ihre Rolle im

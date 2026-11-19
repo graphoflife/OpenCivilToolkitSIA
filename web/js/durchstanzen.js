@@ -96,8 +96,19 @@ function gelesen(d) {
   return new Set([...lage.masse[d.form], ...lage.stufen[d.stufe], ...ke.eingaben]);
 }
 
+/**
+ * Die Stelle, deren Art eben zwischen Decke und Bodenplatte umgeschaltet
+ * wurde: bis zur nächsten Änderung sagt der Schalter, welche Zahlen jetzt
+ * für die andere Seite gelten (Benutzer, 2026-11-19).
+ */
+let umgeschaltet = null;
+
 function aenderer(d) {
-  return (veraenderer) => eintragAendern(d.kennung, veraenderer);
+  return (veraenderer) => eintragAendern(d.kennung, (x) => {
+    const vorher = x.plattenart;
+    veraenderer(x);
+    umgeschaltet = x.plattenart !== vorher ? x.kennung : null;
+  });
 }
 
 /** Eine Zahl des Eintrags als Feld: Beschriftung mit Symbol, Einheit aus dem Katalog. */
@@ -143,6 +154,9 @@ function stellePanel(d) {
       })),
       feld('Platte', schalter(d, 'plattenart', 'plattenarten',
         'Decke: Zug oben – Bodenplatte: Zug unten, gegen die Bodenpressung'), ''),
+      umgeschaltet === d.kennung ? el('p.hinweis', {
+        text: katalog('durchstanzen', 'plattenarten').find((w) => w.wert === d.plattenart).umgeschaltet,
+      }) : null,
     ]),
     wahlBlock('Lage', schalter(d, 'lage', 'lagen', 'Wo die gestützte Fläche in der Platte liegt')),
     karte(lage.titel, masse),

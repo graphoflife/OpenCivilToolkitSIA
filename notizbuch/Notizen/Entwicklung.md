@@ -7,6 +7,19 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Durchstanzen: nach dem Umschalten der Platte ein Hinweis
+
+Entscheid des Benutzers. Wer beim Durchstanzen von Decke auf Bodenplatte
+schaltet, behält seine Zahlen: Decke und Bodenplatte haben dieselben
+Vorgaben, eine «Vorgabe der neuen Art» gibt es nicht. Vorher wechselte nur
+still die Beschriftung, und q_d = 10 kN/m² «Eigengewicht und Auflast» hiess
+auf einmal Bodenpressung. Jetzt steht unter dem Schalter grau «c, c_v, q_d
+und die Biegebewehrung gelten jetzt für die Bodenplatte – prüfen.», bis zur
+nächsten Änderung der Stelle.
+
+Der Satz kommt aus dem Kern (`Plattenart.umgeschaltet`), über den Katalog;
+die Maske merkt sich nur, welche Stelle eben umgeschaltet wurde.
+
 ## 2026-11-19 · Ohne Last kein Nachweis, auch beim Durchstanzen und der Setzung
 
 Entscheid des Benutzers. Vorher stand ein frisches Durchstanzen (V_d = 0)

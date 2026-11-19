@@ -608,6 +608,17 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
             with self.subTest(lage=lage, form=form, stufe=stufe, ke=ke):
                 self.assertEqual(maske, set(eingaben_fuer(lage.flaeche(form), stufe, ke)) - fest)
 
+    def test_nach_dem_umschalten_sagt_der_schalter_was_zu_pruefen_ist(self):
+        """
+        Decke und Bodenplatte haben dieselben Vorgaben: die Zahlen bleiben
+        stehen, aber c, c_v, q_d und die Biegebewehrung meinen nach dem
+        Umschalten die andere Seite (Benutzer, 2026-11-19).
+        """
+        arten = {w["wert"]: w["umgeschaltet"] for w in katalog()["durchstanzen"]["plattenarten"]}
+        self.assertEqual(arten["bodenplatte"],
+                         "c, c_v, q_d und die Biegebewehrung gelten jetzt für die Bodenplatte – prüfen.")
+        self.assertIn("für die Decke", arten["decke"])
+
     def test_kurztext_der_liste(self):
         lagen = {l["wert"]: l for l in katalog()["durchstanzen"]["lagen"]}
         self.assertEqual(lagen["rand"]["kurz"]["rund"], "⌀{D} mm")
