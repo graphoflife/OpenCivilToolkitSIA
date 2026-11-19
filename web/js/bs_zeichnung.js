@@ -54,7 +54,9 @@
  */
 
 import { api } from './api.js';
-import { eigenschaften, neuEigenschaften, vorgabeMaterial } from './bs_eigenschaften.js';
+import {
+  eigenschaften, neuEigenschaften, vorgabeMaterial, vorgabeQuerschnitt,
+} from './bs_eigenschaften.js';
 import { nachBild, zahlText } from './cad_ansicht.js';
 import {
   cadApp, cadBereichMitListe, listeZeichnen, mitTitel, umrissVon,
@@ -134,14 +136,15 @@ export const waehlen = SYSTEME.waehlen;
 // ===========================================================================
 
 /**
- * Was die Werkzeuge als Nächstes anlegen. Das Material einer Linie: leer
- * heisst das erste des Systems (`vorgabeMaterial`) -- auch eines, das erst
- * nach dem Öffnen des Fensters dazukommt.
+ * Was die Werkzeuge als Nächstes anlegen. Querschnitt und Material einer
+ * Linie: noch keiner gewählt heisst der erste des Systems
+ * (`vorgabeQuerschnitt`, `vorgabeMaterial`) -- auch einer, der erst nach dem
+ * Öffnen des Fensters dazukommt. «– kein Stab –» ist eine Wahl, kein Rest.
  */
-function vorgabenNeu(system) {
+function vorgabenNeu() {
   return {
     linie: {
-      querschnitt: system?.querschnitte?.[0]?.kennung || '',
+      querschnitt: null,
       material: '',
     },
     last: {
@@ -159,7 +162,7 @@ function adapter(kennung) {
   const art = systemart(kennung);
   const bs = {
     kennung, art, raum: raeumlich(art), klassen: systemkatalog(art, 'klassen'),
-    vorgaben: vorgabenNeu(eintragVon(kennung)), uebersicht: null, gefragt: null, lastfall: null,
+    vorgaben: vorgabenNeu(), uebersicht: null, gefragt: null, lastfall: null,
     achsen: {},
   };
   const achsen = systemkatalog(art, 'achsen');
@@ -214,7 +217,7 @@ export function elementname(a, kennung) {
 }
 
 function neuText(a, werkzeug) {
-  if (werkzeug === 'linie') return a.bs.vorgaben.linie.querschnitt ? 'Stab' : 'Linie';
+  if (werkzeug === 'linie') return vorgabeQuerschnitt(a, a.adapter.zeichnung()) ? 'Stab' : 'Linie';
   if (werkzeug === 'last') return lastart(a.bs.art, a.bs.vorgaben.last.art).beschriftung;
   return 'Knoten';
 }
@@ -228,7 +231,7 @@ function neuText(a, werkzeug) {
  */
 function linieAnlegen(a, z, von, bis) {
   const kennung = a.modell.naechsteKennung(z, 'L');
-  const v = a.bs.vorgaben.linie;
+  const querschnitt = vorgabeQuerschnitt(a, z);
   const lagen = a.modell.lagen(z);
   const d = minus(lagen.get(bis), lagen.get(von));
   const r = systemkatalog(a.bs.art, 'laufrichtungen')
@@ -236,7 +239,7 @@ function linieAnlegen(a, z, von, bis) {
   if (r && skalar(d, r) < 0) [von, bis] = [bis, von];
   z.linien.push({
     ...ausVorlage(a.bs.klassen.linie), kennung, von, bis,
-    querschnitt: v.querschnitt, material: v.querschnitt ? vorgabeMaterial(a, z) : '',
+    querschnitt, material: querschnitt ? vorgabeMaterial(a, z) : '',
   });
   return kennung;
 }
@@ -272,7 +275,13 @@ function lastAnlegen(a, z, erg) {
   const lagen = a.modell.lagen(z);
   const bild = (k) => (lagen.get(k) ? nachBild(a.v, lagen.get(k)) : null);
   const geklickt = nachBild(a.v, erg.p);
-  if (!art.verteilt) {
+  // An einen Knoten nur, was dort eine Richtung hat: «quer» und «längs»
+  // beziehen sich auf einen Stab, die Last kommt dann auf die Linie. Bis
+  // 2026-11-19 wurde sie an einem Knoten still «senkrecht». Ein Moment in
+  // der Ebene hat keine Richtung -- es dreht um dieselbe Achse wie jedes.
+  const amKnoten = !(art.kraft || a.bs.raum)
+    || systemkatalog(a.bs.art, 'knotenrichtungen').includes(v.richtung);
+  if (!art.verteilt && amKnoten) {
     const knoten = erg.knoten || z.knoten.find((k) => {
       const p = bild(k.kennung);
       return p && abstand(p, geklickt) <= NAEHE;
@@ -299,7 +308,8 @@ function lastAnlegen(a, z, erg) {
   }
   if (!beste) {
     melden(art.verteilt ? 'Eine verteilte Last gehört auf eine Linie -- dort klicken.'
-      : 'Auf eine Linie oder einen Knoten klicken.');
+      : !amKnoten ? 'Diese Richtung bezieht sich auf einen Stab -- auf eine Linie klicken.'
+        : 'Auf eine Linie oder einen Knoten klicken.');
     return null;
   }
   const kennung = naechsteLast(z);

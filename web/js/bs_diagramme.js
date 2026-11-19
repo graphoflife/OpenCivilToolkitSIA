@@ -564,9 +564,10 @@ export function systemZusammenfassung(kennung) {
   const meldungen = (u.meldungen || []).map((m) => el('p', {
     class: m.fehler ? 'hinweis hinweis-warnung' : 'hinweis', text: m.text,
   }));
-  if (!u.gueltig || !u.faelle.length) {
-    return [karte(null, [...meldungen, u.faelle.length ? null : leerzustand('Kein Lastfall.')])];
-  }
+  // Ein System, das nicht rechnet, hat keine Fälle -- auch mit Lastfällen:
+  // dann sagen es seine Meldungen, nicht «Kein Lastfall.».
+  if (!u.gueltig) return [karte(null, meldungen)];
+  if (!u.faelle.length) return [karte(null, [...meldungen, leerzustand('Kein Lastfall.')])];
   const e = systemkatalog(systemart(kennung), 'ergebnisse');
   const schnitt = e.schnittgroessen.map((feld) => ({ feld, ...e.groessen[feld] }));
   const biegung = e.durchbiegungen.map(({ feld }) => ({ feld, ...e.groessen[feld] }));

@@ -7,6 +7,34 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Balkensysteme: was die Fenster zeigen, stimmt wieder
+
+Fünfter Schritt der Durchsicht, der erste Teil der Balkensysteme.
+
+- **Das Material in der Liste unter der Zeichnung:** stand bei jedem Stab
+  «–», weil es unter den Materialien des Projekts gesucht wurde statt unter
+  denen des Systems. Jetzt: «L1 K1 → K2 · Stütze 300×300 · C30/37».
+- **E_eq beim Umschalten der Querschnittsart:** blieb stehen. Wer einen
+  Querschnitt aus einer Platte mit E_eq auf «Vorlage» umstellte, hatte einen
+  Querschnitt, der nicht rechnete («ein E_eq gibt es nur …»), und solange
+  kein Stab «gemäss Querschnitt» nahm, keinen Schalter, um es abzuwählen.
+  Jetzt bekommt er das E eines neuen Querschnitts zurück, E₀.
+- **Was das Werkzeug «Linie» vorgibt:** galt, was beim Öffnen der erste
+  Querschnitt war. Ein neues System zeichnete darum auch nach dem ersten
+  Querschnitt jede Linie als «kein Stab», und ein gelöschter Querschnitt
+  blieb die Vorgabe -- die Linie bekam ihn trotzdem, und das System rechnete
+  nicht. Jetzt gilt der gewählte, solange es ihn gibt, sonst der erste;
+  «– kein Stab –» nur, wenn man es wählt. Ebenso beim Material.
+- **Eine Last «quer» oder «längs zum Stab» auf einem Knoten:** wurde still
+  «senkrecht». Jetzt kommt sie auf den Stab, an sein Ende, und behält ihre
+  Richtung. Ein Moment in der Ebene hat keine Richtung und geht weiter an
+  den Knoten.
+- **«Kein Lastfall.»** stand bei jedem System, das nicht rechnet, auch mit
+  drei Lastfällen. Jetzt nur, wenn es keinen gibt; sonst sagt die Meldung,
+  was fehlt.
+- **Leere Listen sagen es:** «– kein Stab: noch kein Querschnitt –», «– noch
+  kein Material im System –».
+
 ## 2026-11-19 · Ein Name kann nicht leer sein
 
 Vierter Schritt der Durchsicht.

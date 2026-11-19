@@ -68,10 +68,13 @@ function uebersicht(a) {
     }))));
   }
   const name = (q) => z.querschnitte.find((x) => x.kennung === q)?.name || q || '–';
+  // Das Material eines Stabs ist eines des Systems -- es heisst, wie es im
+  // Fenster «Material» heisst. Bis 2026-11-19 stand hier bei jedem «–»: es
+  // wurde unter den Materialien des Projekts gesucht.
   const stoff = (m) => {
     if (m === systemkatalog(art, 'material_des_querschnitts')) return 'gemäss Querschnitt';
-    const da = eintragVon(m);
-    return da ? (da.name || da.sorte) : '–';
+    const da = (z.stabmaterialien || []).find((x) => x.kennung === m);
+    return da ? materialname(da) : '–';
   };
   const zeile = (kennung, links, rechts, waehlbar = kennung) => el('div.bs-element', {
     dataset: { kennung },
@@ -408,11 +411,17 @@ function querschnittFenster(system, kennung) {
       // und «einen Kennwert «b» gibt es nicht» war die Folge. Ebenso die
       // gewählte Platte oder Analyse: bis 2026-11-19 blieb eine Analyse als
       // «Platte» stehen, und das ganze Projekt rechnete nicht mehr.
+      // Ebenso ein E_eq: es gibt es nur aus einer Platte oder Analyse. Blieb
+      // es stehen, rechnete der Querschnitt nicht, und ohne einen Stab
+      // «gemäss Querschnitt» zeigte kein Schalter den Weg zurück (bis
+      // 2026-11-19). Dann gilt wieder das E eines neuen Querschnitts.
       setzen: (w) => aendern((x) => {
         x.art = w;
         x.bezug = '';
         if (w === 'vorlage') x.masse = vorgabenDer(art, x.vorlage);
         if (w === 'kennwerte' || w === 'profil') x.masse = {};
+        const passt = systemkatalog(art, 'e_module').some((m) => m.wert === x.e_modul && m.arten.includes(w));
+        if (!passt) x.e_modul = katalog('vorlagen', systemkatalog(art, 'klassen', 'querschnitt')).e_modul;
       }),
     })),
   ];
