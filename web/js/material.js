@@ -12,8 +12,8 @@
  * zusammen mit dem der Platte.
  */
 
-import { feld, panel } from './bausteine.js';
-import { el, melden, zahlfeld } from './dom.js';
+import { feld, namensfeld, panel } from './bausteine.js';
+import { el, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { eintragAendern, katalog, kennwertId, zustand } from './zustand.js';
 
@@ -121,10 +121,12 @@ export function materialEditor(material) {
   return [
     kopf,
     panel({ schluessel: 'material/Material', titel: 'Material' }, [
-      feld('Bezeichnung', el('input', {
-        type: 'text', value: material.name || material.sorte, disabled: gesperrt,
-        title: gesperrt ? 'Eine Normsorte trägt zwingend ihre Sortenbezeichnung' : '',
-        on: { change: (e) => nameAendern(material, e.target.value, e.target) },
+      feld('Bezeichnung', namensfeld({
+        wert: material.name || material.sorte, gesperrt,
+        titel: gesperrt ? 'Eine Normsorte trägt zwingend ihre Sortenbezeichnung' : '',
+        pruefen: (name) => (vergeben(material, name)
+          ? `Den Namen «${name}» trägt schon ein anderes Material` : ''),
+        setzen: (name) => eintragAendern(material.kennung, (m) => { m.name = name; }),
       })),
     ]),
 
@@ -146,18 +148,14 @@ export function materialEditor(material) {
   ];
 }
 
-function nameAendern(material, wunsch, feldKnoten) {
-  const name = wunsch.trim();
-  const vergeben = zustand.projekt.materialien
+/**
+ * Ob ein anderes Material schon so heisst. Zwei gleich benannte hielten das
+ * ganze Projekt an -- im Bericht liesse sich nicht erkennen, welches gemeint
+ * ist (`Projekt.regeln`); darum weist schon das Feld den Namen ab.
+ */
+function vergeben(material, name) {
+  return zustand.projekt.materialien
     .some((m) => m.kennung !== material.kennung && (m.name || m.sorte) === name);
-  if (!name || vergeben) {
-    melden(vergeben
-      ? `Name „${name}" schon vergeben.`
-      : 'Name leer.', true);
-    feldKnoten.value = material.name;
-    return;
-  }
-  eintragAendern(material.kennung, (m) => { m.name = name; });
 }
 
 /** Was über dem Editor steht: die Art, und ob es eine Normsorte ist. */

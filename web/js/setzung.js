@@ -13,7 +13,7 @@
  */
 
 import {
-  erklaerung, feld, karte, panel, wahlSchalter, zahlzeile,
+  erklaerung, feld, karte, namensfeld, panel, wahlSchalter, zahlzeile,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
@@ -55,9 +55,8 @@ function situationPanel(s) {
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
   }, [
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', el('input', {
-        type: 'text', value: s.name,
-        on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+      feld('Bezeichnung', namensfeld({
+        wert: s.name, setzen: (name) => aendern((x) => { x.name = name; }),
       })),
     ]),
     karte('Fundament', [

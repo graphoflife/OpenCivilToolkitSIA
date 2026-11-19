@@ -9,10 +9,42 @@
  * ohnehin niemandem im Besonderen gehören.
  */
 
-import { el, zahlfeld } from './dom.js';
+import { el, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { sinnbild } from './sinnbilder.js';
 import { feldangabe, panelUmschalten, zustand } from './zustand.js';
+
+/**
+ * Das Feld für den Namen eines Eintrags -- eines Bauteils, eines Lastfalls,
+ * einer Schicht, eines Materials. Leer nimmt es nicht an: es sagt es und
+ * behält den bisherigen (Benutzer, 2026-11-19: die Bedienung erklärt sich
+ * selbst). Bis dahin galt ein leerer Name: bei den meisten Bauteilen hielt
+ * er das ganze Projekt an, ein Lastfall ohne Namen liess sein Diagramm
+ * ewig «wird gerechnet» sagen.
+ *
+ * Was getippt ist, gilt, wie getippt. `pruefen` sagt, was ein Name sonst
+ * nicht sein darf, und gibt den Grund zurück -- leer heisst: er darf.
+ * Gleiche Namen von Bauteilen meldet der Kern beim Eintrag, der sie hat.
+ */
+export function namensfeld({
+  wert, setzen, titel, klasse = '', gesperrt = false, pruefen = () => '',
+}) {
+  return el(`input${klasse}`, {
+    type: 'text', value: wert ?? '', title: titel, disabled: gesperrt,
+    on: {
+      change: (e) => {
+        const name = e.target.value;
+        const grund = name.trim() ? pruefen(name) : 'Ein Name kann nicht leer sein';
+        if (!grund) {
+          setzen(name);
+          return;
+        }
+        melden(`${grund}: «${wert ?? ''}» bleibt.`, true);
+        e.target.value = wert ?? '';
+      },
+    },
+  });
+}
 
 /**
  * Ein Panel der Eingaben: Kopf mit Titel, darunter der Inhalt.

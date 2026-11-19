@@ -24,7 +24,7 @@
 
 import { formelText } from './achsen.js';
 import {
-  erklaerung, feld, klappgruppe, panel, wahlBlock, wahlSchalter,
+  erklaerung, feld, klappgruppe, namensfeld, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
   lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart, systemkatalog,
@@ -136,9 +136,8 @@ function systemGruppe(system) {
   const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
   return panel({ schluessel: `${art}/System`, titel: 'System', zusatz: t.zusatz, breit: true }, [
     // Der Lastfall der Zeichnung steht in ihrer Leiste, neben «Last».
-    feld('Bezeichnung', el('input', {
-      type: 'text', value: system.name,
-      on: { change: (e) => aendern((s) => { s.name = e.target.value; }) },
+    feld('Bezeichnung', namensfeld({
+      wert: system.name, setzen: (name) => aendern((s) => { s.name = name; }),
     }), erklaerung(t.hilfe.vorzeichen.zeilen, t.hilfe.vorzeichen.formel)),
     zeichenbereich(system, uebersicht),
     el('div.unterkapitel', {}, [
@@ -196,9 +195,8 @@ function materialienInhalt(system) {
     ];
   };
   const eigenes = (m, setzen) => [
-    el('input', {
-      type: 'text', value: m.name, title: 'Name des Materials -- so steht es im Bericht',
-      on: { change: (e) => setzen('name')(e.target.value) },
+    namensfeld({
+      wert: m.name, setzen: setzen('name'), titel: 'Name des Materials -- so steht es im Bericht',
     }),
     el('span.bs-material-art', { text: 'eigenes' }),
     ...spalten.map((k) => zahlfeld({
@@ -374,13 +372,9 @@ function querschnittZeile(system, q, i) {
       on: { click: () => fensterOeffnen(fensterVon(q.kennung)) },
     }, [umrissBild(system, q, 44, 44)]),
     el('div.bs-qmitte', {}, [
-      el('input.bs-qname', {
-        type: 'text', value: q.name, title: 'Name des Querschnitts',
-        on: {
-          change: (e) => eintragAendern(system.kennung, (s) => {
-            s.querschnitte[i].name = e.target.value;
-          }),
-        },
+      namensfeld({
+        wert: q.name, titel: 'Name des Querschnitts', klasse: '.bs-qname',
+        setzen: (name) => eintragAendern(system.kennung, (s) => { s.querschnitte[i].name = name; }),
       }),
       werte ? el('div.bs-kennwerte', { text: werte })
         : el('div.bs-qfehler', { text: fehler?.text || `${kennwertnamen(art)}: –`, title: fehler?.text || '' }),
@@ -405,10 +399,7 @@ function querschnittFenster(system, kennung) {
   const aendern = (veraenderer) => eintragAendern(system.kennung, (s) => veraenderer(s.querschnitte[i], s));
   const setzen = (feldname) => (wert) => aendern((x) => { x[feldname] = wert; });
   const zeilen = [
-    feld('Name', el('input', {
-      type: 'text', value: q.name, title: 'Name des Querschnitts',
-      on: { change: (e) => setzen('name')(e.target.value) },
-    })),
+    feld('Name', namensfeld({ wert: q.name, setzen: setzen('name'), titel: 'Name des Querschnitts' })),
     wahlBlock(`${kennwertnamen(art)} aus`, wahlSchalter({
       werte: systemkatalog(art, 'querschnittsarten').map((x) => ({ wert: x.wert, beschriftung: x.kurz, titel: x.beschriftung })),
       gewaehlt: q.art, titel: `Woher ${kennwertnamen(art)} kommen`,

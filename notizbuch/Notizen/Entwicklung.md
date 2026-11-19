@@ -7,6 +7,29 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Ein Name kann nicht leer sein
+
+Vierter Schritt der Durchsicht.
+
+- **Vorher:** ein geleertes Namensfeld galt, und niemand sagte etwas. Bei
+  einer Platte, einer Querschnittsanalyse, einem Balkensystem, einem
+  Grundbruch, einer Setzung oder einem Pfahl hielt das dann das ganze
+  Projekt an: «Platte q1: 'name' darf nicht leer sein.» Ein Lastfall ohne
+  Namen liess sein Diagramm «wird gerechnet» sagen, ohne je fertig zu
+  werden; das Python-Skript behielt still den alten Namen.
+- **Jetzt:** jedes Namensfeld weist einen leeren Namen gleich ab und behält
+  den bisherigen: «Ein Name kann nicht leer sein: «Decke über EG» bleibt.»
+  So bei allen Bauteilen, Lastfällen und Kombinationen, Schichten, den
+  Querschnitten und Materialien eines Balkensystems, den Fällen und den
+  Skripten.
+- Das Feld eines eigenen Materials wies schon vorher ab, aber knapp («Name
+  leer.»). Es geht jetzt durch dasselbe Feld und sagt beim Namen eines
+  anderen Materials: «Den Namen «C30/37» trägt schon ein anderes Material:
+  «BE1» bleibt.» Leerzeichen am Rand schnitt es still weg; jetzt gilt, was
+  getippt ist.
+- Der Baustein ist `namensfeld` in `bausteine.js`. Gleiche Namen von
+  Bauteilen meldet weiter der Kern beim Eintrag, der sie hat.
+
 ## 2026-11-19 · Ein Zahlenfeld nimmt nur, was der Kern nähme
 
 Dritter Schritt der Durchsicht: was fehlt, soll man am Ort sehen -- bei einer

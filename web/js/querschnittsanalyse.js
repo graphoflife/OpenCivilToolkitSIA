@@ -18,9 +18,7 @@
  * Lastfällen zeigt es.
  */
 
-import {
-  erklaerung, feld, hakenSchalter, panel, wahlSchalter,
-} from './bausteine.js';
+import { erklaerung, feld, hakenSchalter, namensfeld, panel, wahlSchalter } from './bausteine.js';
 import { el, svgEl, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
@@ -133,9 +131,8 @@ function querschnittGruppe(analyse) {
     schluessel: 'analyse/Querschnitt', titel: 'Querschnitt', zusatz: 'y nach rechts, z nach oben, mm',
     breit: true,
   }, [
-    feld('Bezeichnung', el('input', {
-      type: 'text', value: analyse.name,
-      on: { change: (e) => aendern((a) => { a.name = e.target.value; }) },
+    feld('Bezeichnung', namensfeld({
+      wert: analyse.name, setzen: (name) => aendern((a) => { a.name = name; }),
     })),
     zeichenbereich(analyse, uebersicht),
     el('div.unterkapitel', {}, [

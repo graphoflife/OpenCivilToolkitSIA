@@ -19,7 +19,7 @@
  */
 
 import {
-  erklaerung, feld, karte, panel, wahlBlock, wahlSchalter, zahlzeile as feldzeile,
+  erklaerung, feld, karte, namensfeld, panel, wahlBlock, wahlSchalter, zahlzeile as feldzeile,
 } from './bausteine.js';
 import { auswahl, el } from './dom.js';
 import { zeichenbereich } from './ds_zeichnung.js';
@@ -140,9 +140,8 @@ function stellePanel(d) {
     zusatz: erklaerung(HILFE.stelle.zeilen, HILFE.stelle.formel),
   }, [
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', el('input', {
-        type: 'text', value: d.name,
-        on: { change: (e) => aenderer(d)((x) => { x.name = e.target.value; }) },
+      feld('Bezeichnung', namensfeld({
+        wert: d.name, setzen: (name) => aenderer(d)((x) => { x.name = name; }),
       })),
       feld('Platte', schalter(d, 'plattenart', 'plattenarten',
         'Decke: Zug oben -- Bodenplatte: Zug unten, gegen die Bodenpressung'), ''),

@@ -16,7 +16,7 @@
  * Ansichtssache, nicht Teil des Projekts.
  */
 
-import { wahlSchalter } from './bausteine.js';
+import { namensfeld, wahlSchalter } from './bausteine.js';
 import { mitVar } from './cad_app.js';
 import { cadZeile } from './cad_palette.js';
 import {
@@ -46,9 +46,9 @@ function lastfaelleInhalt(eintrag, { lastenVon, eigengewicht }) {
   const fall = (lf, i) => {
     const n = lastenVon(eintrag, lf.kennung);
     return el('div.bs-fall', {}, [
-      el('input', {
-        type: 'text', value: lf.name, title: 'Name des Lastfalls -- so steht er im Bericht',
-        on: { change: (e) => aendern((s) => { s.lastfaelle[i].name = e.target.value; }) },
+      namensfeld({
+        wert: lf.name, titel: 'Name des Lastfalls -- so steht er im Bericht',
+        setzen: (name) => aendern((s) => { s.lastfaelle[i].name = name; }),
       }),
       el('span.bs-fall-zahl', {
         text: lf.eigengewicht ? `von selbst, ${eigengewicht.text}${n ? ` · dazu ${lastenText(n)}` : ''}`
@@ -85,9 +85,8 @@ function lastfaelleInhalt(eintrag, { lastenVon, eigengewicht }) {
 function kombinationenInhalt(eintrag) {
   const aendern = (veraenderer) => eintragAendern(eintrag.kennung, veraenderer);
   const kombination = (k, i) => el('tr', {}, [
-    el('td', {}, [el('input', {
-      type: 'text', value: k.name,
-      on: { change: (e) => aendern((s) => { s.kombinationen[i].name = e.target.value; }) },
+    el('td', {}, [namensfeld({
+      wert: k.name, setzen: (name) => aendern((s) => { s.kombinationen[i].name = name; }),
     })]),
     ...eintrag.lastfaelle.map((lf) => el('td', {}, [zahlfeld({
       wert: k.faktoren[lf.kennung] ?? 0, schritt: 0.05,

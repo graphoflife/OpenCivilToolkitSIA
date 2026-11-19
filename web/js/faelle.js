@@ -17,7 +17,7 @@
  * verschob alle danach.
  */
 
-import { hakenSchalter } from './bausteine.js';
+import { hakenSchalter, namensfeld } from './bausteine.js';
 import { el } from './dom.js';
 
 /**
@@ -40,14 +40,9 @@ export function fallzeile({
     class: `${an ? '' : 'ist-aus'} ${oben ? 'mit-oben' : ''}`, style: { '--felder': spalten },
   }, [
     schalter,
-    el('input.fall-name', {
-      type: 'text', value: fall.name, title: nameTitel,
-      on: {
-        change: (e) => {
-          const name = e.target.value;
-          aendern((x) => { x.name = name; });
-        },
-      },
+    namensfeld({
+      wert: fall.name, titel: nameTitel, klasse: '.fall-name',
+      setzen: (name) => aendern((x) => { x.name = name; }),
     }),
     oben ? el('div.fall-oben', {}, [oben]) : null,
     el('div.fall-zahlen', {}, zahlen),

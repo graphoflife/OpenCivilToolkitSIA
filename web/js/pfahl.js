@@ -23,7 +23,7 @@
  */
 
 import {
-  erklaerung, feld, karte, panel, wahlBlock, wahlSchalter, zahlzeile as feldzeile,
+  erklaerung, feld, karte, namensfeld, panel, wahlBlock, wahlSchalter, zahlzeile as feldzeile,
 } from './bausteine.js';
 import { auswahl, el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
@@ -190,9 +190,8 @@ function situationPanel(t) {
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
   }, [
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', el('input', {
-        type: 'text', value: t.name,
-        on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+      feld('Bezeichnung', namensfeld({
+        wert: t.name, setzen: (name) => aendern((x) => { x.name = name; }),
       })),
       feld('Pfahl', schalter(t.art, 'arten', (w) => aendern((x) => { x.art = w; }),
         'Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem Tragglied aus Stahl'), ''),
@@ -251,9 +250,8 @@ function schichtKarte(t, i) {
     on: { click: () => eintragAendern(t.kennung, (x) => { x.schichten.splice(i, 1); }) },
   });
   return karte(`Schicht ${i + 1}`, [
-    feld('Bezeichnung', el('input', {
-      type: 'text', value: s.name,
-      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+    feld('Bezeichnung', namensfeld({
+      wert: s.name, setzen: (name) => aendern((x) => { x.name = name; }),
     })),
     zahl('d', 'Dicke', 'd', { schritt: 0.5 }),
     zahl('gamma', 'Raumlast', String.raw`\gamma`, { schritt: 0.5 }),

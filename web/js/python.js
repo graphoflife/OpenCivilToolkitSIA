@@ -13,7 +13,7 @@
  * jedem Lauf.
  */
 
-import { panel } from './bausteine.js';
+import { namensfeld, panel } from './bausteine.js';
 import { el, ersetzen } from './dom.js';
 import { abbrechen, ausfuehren, konsole, leeren, neuStarten } from './konsole.js';
 import { bildZeichnen } from './zeichnen.js';
@@ -181,13 +181,9 @@ function aufbauen(skript) {
     },
   });
   const nummern = el('div.py-nummern', { 'aria-hidden': 'true' });
-  const name = el('input', {
-    type: 'text', value: skript.name || '', title: 'Name des Skripts',
-    on: {
-      change: (e) => eintragAendern(kennung, (s) => {
-        s.name = e.target.value.trim() || s.name;
-      }, 'skript'),
-    },
+  const name = namensfeld({
+    wert: skript.name, titel: 'Name des Skripts',
+    setzen: (neu) => eintragAendern(kennung, (s) => { s.name = neu; }, 'skript'),
   });
   const ausfuehrenKnopf = el('button.knopf.knopf-haupt', {
     type: 'button', text: '▶ Ausführen', title: 'Das ganze Skript ausführen (Strg+Enter)',

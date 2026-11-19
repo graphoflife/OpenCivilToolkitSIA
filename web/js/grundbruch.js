@@ -22,9 +22,7 @@
  * Zahl still um 10³ anders, als die Maske sagte.
  */
 
-import {
-  erklaerung, feld, karte, panel, zahlzeile as feldzeile,
-} from './bausteine.js';
+import { erklaerung, feld, karte, namensfeld, panel, zahlzeile as feldzeile } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
@@ -81,9 +79,8 @@ function situationPanel(g) {
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
   }, [
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', el('input', {
-        type: 'text', value: g.name,
-        on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+      feld('Bezeichnung', namensfeld({
+        wert: g.name, setzen: (name) => aendern((x) => { x.name = name; }),
       })),
     ]),
     karte('Boden', [
