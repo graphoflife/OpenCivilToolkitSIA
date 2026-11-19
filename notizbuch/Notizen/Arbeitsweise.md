@@ -58,6 +58,8 @@ Kopie der Datei mit der Endung `.mjs`.
 - Die Zahlen des Benutzers werden nie still umgedeutet.
 - Das Werkzeug ist ein Prototyp: alte Speicherstände müssen nicht weiter
   funktionieren (Benutzer, 2026-10-11).
+- Eine Kennung wird nie wieder vergeben; wer auf eine gelöschte zeigt, sagt
+  es am Ort (Benutzer, 2026-11-19).
 
 ## Grundsätze der Oberfläche
 
@@ -80,7 +82,21 @@ Kopie der Datei mit der Endung `.mjs`.
     rechnet weiter;
   - nie alte Werte stehen lassen, wenn sich die Wahl geändert hat;
   - eine leere Liste sagt, dass es noch nichts zum Wählen gibt;
-  - was 2D und 3D gemeinsam haben, sieht in beiden gleich aus.
+  - was 2D und 3D gemeinsam haben, sieht in beiden gleich aus;
+  - was nur fehlt, steht grau, auch wo die Rechnung ohne es anhält; rot ist,
+    was falsch ist, etwa ein Stahl, wo ein Beton hingehört (Benutzer,
+    2026-11-19);
+  - eine Meldung nennt Namen, nie interne Kennungen wie 'b9';
+  - ohne Einwirkung steht «Keine Einwirkung → kein Nachweis.», nicht
+    «erfüllt, ∞».
+- Schalter in normaler Schrift, ohne Grossbuchstaben. Auch eine Wahl ja/nein
+  ist ein Schalter, kein Häkchen (Benutzer, 2026-11-19).
+- In allem, was der Benutzer in der Software liest, steht der Gedankenstrich
+  «–», nie «--»; in Kommentaren darf «--» bleiben (Benutzer, 2026-11-19).
+- Was ein Feld gegen ein anderes begrenzt, weist schon das Feld ab: α_min
+  über α_max, ein schon vergebener Name (Benutzer, 2026-11-19).
+- Felder, Gruppen und Zeichen einer Maske kommen aus dem Kern (Benutzer,
+  2026-11-19; ersetzt «Das Zeichen bleibt in der Maske» vom 2026-10-16).
 
 ## Normstellen
 

@@ -86,8 +86,8 @@ gelernt wurde, steht in [[Entwicklung]].
       scheitert darum die Längssuche an der Querkraft, die Bügelsuche findet
       ⌀12@200, und erst ein zweiter Klick findet die Längsbewehrung (gesehen
       am 2026-11-19). Vorschlag: mit «Bügel mitsuchen» prüft die Längssuche
-      die Querkraft mit Bügeln nicht, die Bügelsuche danach schon. Entscheid
-      des Benutzers.
+      die Querkraft mit Bügeln nicht, die Bügelsuche danach schon.
+      Entschieden (Benutzer, 2026-11-19): so.
 - [ ] **Zu dünne Platte: obere und untere Lagen kreuzen sich.** Die Platte
       prüft nur, dass die Überdeckungen zusammen kleiner sind als h
       (`QuerschnittEintrag.regeln`). Bei h = 80 mm und überall ⌀12 liegt die
@@ -97,24 +97,27 @@ gelernt wurde, steht in [[Entwicklung]].
       h, rechnet die Platte nicht und sagt es, wie heute bei den
       Überdeckungen; die Bewehrungssuche prüft vorab nur Dicke und
       Überdeckungen, damit sie eine zu dicke Bewehrung ersetzen kann.
-      Entscheid des Benutzers.
+      Entschieden (Benutzer, 2026-11-19): so.
 - [ ] **Doppelte Namen von Fällen schon am Feld abweisen.** Heute hält ein
       doppelter Name nur seine Platte oder Analyse an, und sie sagt es oben
       im Fenster. Die sechs Fenster der Spannung-Dehnung-Analysen teilen sich
       aber eine Namensliste: der Doppelgänger kann in einem Fenster stehen,
       das man nicht offen hat. Vorschlag: das Namensfeld weist einen
-      vergebenen Namen ab und sagt, wo er steht. Entscheid des Benutzers.
+      vergebenen Namen ab und sagt, wo er steht. Entschieden (Benutzer,
+      2026-11-19): so.
       Strenger noch ein leerer Name: die Oberfläche lässt ihn nicht zu, aus
       einer bearbeiteten Datei aber hält er beim Lesen das ganze Projekt an
       («Platte 'Decke über EG', kombinationen 1: 'name' darf nicht leer
       sein.»), statt nur seine Platte (Durchsicht vom 2026-11-19).
+      Entschieden (Benutzer, 2026-11-19): nur seine Platte oder Analyse
+      rechnet nicht und sagt am Ort, was fehlt.
 - [ ] **α_min über α_max schon am Feld abweisen.** Heute nimmt das Feld
       α_min = 50° bei α_max = 40° an; die Analyse oder Platte hält an und
       sagt es oben im Fenster (`neigungen_ordnen`). Ein Feld, dessen Grenze
       ein anderes Feld ist, kennt der Katalog nicht: `bereich` hat nur feste
       Grenzen. Vorschlag: `bereich(..., hoechstens="alpha_max")`, daraus die
-      Regel im Kern und die Grenze am Feld, an einer Stelle. Entscheid des
-      Benutzers (Durchsicht vom 2026-11-19).
+      Regel im Kern und die Grenze am Feld, an einer Stelle (Durchsicht vom
+      2026-11-19). Entschieden (Benutzer, 2026-11-19): so.
 - [ ] **Dichten aus SIA 261.** 2400 und 2500 kg/m³ für Beton und Stahlbeton,
       7850 kg/m³ für Stahl stehen so in SIA 261:2020, Anhang A, Tabelle 28
       (mit g = 10 m/s²); SIA 262 nennt keine. Ob der Verweis eingetragen wird,
@@ -213,12 +216,14 @@ gelernt wurde, steht in [[Entwicklung]].
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
 
-## Zur Wahl: Durchsicht der Fenster vom 2026-11-19
+## Entschieden: Durchsicht der Fenster vom 2026-11-19
 
 Was die Durchsicht «Die Bedienung erklärt sich selbst» gefunden, aber nicht
-von sich aus entschieden hat. Je Punkt eine Empfehlung; der Benutzer wählt.
-Was sie behoben hat, steht in [[Entwicklung]] (Schritte 1 bis 13 und der
-Nachtrag zur Karte «Schubfluss»).
+von sich aus entschieden hat. Der Benutzer hat am 2026-11-19 bei jedem Punkt
+die Empfehlung gewählt, bei den Bildern alle Gruppen. Ein Punkt wird
+abgehakt, wenn er gebaut ist. Was die Durchsicht selbst behoben hat, steht
+in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
+«Schubfluss»).
 
 - [ ] **Ein fehlendes Material: grau oder rot?** Die Querschnittsanalyse
       zeigt «Linie 1: das Material … gibt es nicht mehr -- eines wählen.»
@@ -289,7 +294,8 @@ Oberfläche ab (2); die Platte rechnet als Sonderfall neben dem gezeichneten
 Querschnitt (3, 4). Empfohlene Reihenfolge: 1 und 6 (klein, still falsch
 oder still leer), 7 (aus der Arbeit vom 2026-11-19), 2 vor der nächsten
 Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
-4 sind der grosse Umbau -- Entscheid des Benutzers.
+4 sind der grosse Umbau. Entschieden (Benutzer, 2026-11-19): alles, in der
+empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
 
 - [ ] **1. Zahl und Herleitung aus getrennten Rechnungen.** Wo eine Zahl
       stumm gerechnet und daneben für die Herleitung ein zweites Mal
@@ -346,10 +352,11 @@ Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
         `grundbruch.js`), a_x hat drei Namen. Umbau: der Katalog liefert je
         Art die Gruppen `{titel, felder: [{feld, zeichen, beschreibung,
         referenz}]}` aus denselben Tabellen, ein Baustein
-        `eingabekarten(art, eintrag, gelesen)` baut die Karten. Vorbehalt:
-        «Das Zeichen bleibt in der Maske» (2026-10-16) -- Entscheid des
-        Benutzers; sein Grund trägt nicht mehr, seit die Tabellen Feld und
-        Zeichen eins zu eins führen. Erweitert Punkt 3c vom 2026-11-15.
+        `eingabekarten(art, eintrag, gelesen)` baut die Karten. Entschieden
+        (Benutzer, 2026-11-19): die Masken holen Felder und Zeichen aus dem
+        Kern; das ersetzt «Das Zeichen bleibt in der Maske» vom 2026-10-16.
+        Wo Kern und Maske heute verschieden schreiben, bekommt der Benutzer
+        die Liste. Erweitert Punkt 3c vom 2026-11-15.
       - Bilder tippen Einheiten: `GROESSEN` in `pf_verlauf.js` spiegelt
         `VERLAEUFE` samt Grenzschlüsseln (eine umbenannte Grösse
         verschwindet still), `platte_bilder.js` rund 35 Einheiten, die
@@ -422,7 +429,7 @@ Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
         Herleitung von «Sprödes Versagen je Richtung» steht darum kein
         Urteil. Umbau: das Urteil steht immer hinter dem Grad, der Schalter
         fällt weg -- in 37 Zeilen rückt «⇒ erfüllt» eine Zeile tiefer
-        (Entscheid des Benutzers, Empfehlung: umbauen).
+        (entschieden, Benutzer 2026-11-19: umbauen).
       - Der Bericht hält jede Karte mit einem SVG für ein Diagramm
         (`querySelector('svg')`); ein Schalter mit Sinnbild im Kopf einer
         Karte würde zur Vorschau. Umbau: `karte(titel, inhalt, {bild})`.
@@ -454,8 +461,9 @@ Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
         beim Umschalten ab, was `fehler()` im Kern ablehnt -- dreimal
         nachgebessert (2026-10-24, zweimal 2026-11-19). Umbau: je Art ein
         eigenes Feld (`kennwerte` neben `masse`, ein Bezug je Art);
-        Umschalten ist dann `setzen('art')`. Frage an den Benutzer: Stehen
-        nach dem Zurückschalten die alten Zahlen wieder da? Empfehlung: ja.
+        Umschalten ist dann `setzen('art')`. Entschieden (Benutzer,
+        2026-11-19): nach dem Zurückschalten stehen die alten Zahlen wieder
+        da.
       - `tests/test_balkensystem.py` hat 1080 Zeilen -- über der Grenze
         seit 2026-11-15, am 2026-11-19 weiter gewachsen --, und
         `test_nachweis_mn.py` 1006. Naht: Ebene und Raum getrennt.
@@ -482,8 +490,9 @@ Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
       - Drainiert und undrainiert: im Pfahl ein Schalter, zwölfmal
         abgefragt; im Grundbruch heisst φ = 0 undrainiert. Der Erdwiderstand
         vor dem Fundament bräuchte eine dritte Form. Umbau: `Drainiert(φ, c)`
-        und `Undrainiert(s_u)` als Typen; beim Grundbruch ändert das die
-        Eingabe (Entscheid des Benutzers).
+        und `Undrainiert(s_u)` als Typen. Entschieden (Benutzer, 2026-11-19):
+        der Grundbruch bekommt den Schalter des Pfahls, «drainiert» mit φ
+        und c, «undrainiert» mit s_u.
       - Durchstanzen: der `Ort` der Leisten führt fünf Werte der Herleitung
         als `None`; `_leisten_schreiben` hat 150 Zeilen.
       - Der Bericht baut die Angaben der Platte selbst; die Schreibweise
@@ -500,8 +509,8 @@ Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
         tote Stellung «beide»); `zahlfeld` und `namensfeld` weisen mit zwei
         Wortlauten ab.
       - Versalien über Formelzeichen: 12-mal `uppercase`, 11-mal wieder
-        aufgehoben, 14-mal `ist-wortlaut`. Entscheid des Benutzers,
-        Empfehlung: Schalter ohne Versalien.
+        aufgehoben, 14-mal `ist-wortlaut`. Entschieden (Benutzer,
+        2026-11-19): Schalter ohne Versalien.
       - In den Zeilen von `apps.js` steht Ableitbares doppelt (`fehlt` neben
         `braucht`, `einrichten` dreimal gleich).
       - Ungenutzt: `betonstahl_frei`; nur in Tests: `beton_frei`,
@@ -509,7 +518,9 @@ Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
       - Kein Strukturbefund, ein Fehler: `naechsteKennung` vergibt die
         grösste plus eins -- LK3 löschen, die nächste heisst wieder LK3, und
         eine Diagrammzeile, die auf die gelöschte zeigte, zeigt still die
-        neue. Dieselbe Regel in `cad_modell.js` 144.
+        neue. Dieselbe Regel in `cad_modell.js` 144. Entschieden (Benutzer,
+        2026-11-19): eine Kennung wird nie wieder vergeben, und wer auf eine
+        gelöschte zeigt, sagt es am Ort.
 
 **Stand früherer Befunde:**
 - Gewachsen: «Name oder Sorte» (18 Stellen, die Materialliste wird an 7
