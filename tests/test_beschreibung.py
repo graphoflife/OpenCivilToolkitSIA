@@ -302,6 +302,24 @@ class TestVollstaendigeAblage(unittest.TestCase):
         projekt.querschnitt("q1").ueberdeckung_unten = 0.0
         projekt.aufbauen()          # wirft nicht
 
+    def test_die_lagen_muessen_in_die_platte_passen(self):
+        """
+        Bis 2026-11-19 rechnete eine Platte mit h = 80 mm und ⌀12 in jeder
+        Lage: die oberen und unteren Lagen kreuzten sich, und dastand «Höhe
+        der Distanzhalter −28 mm».
+        """
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.ueberdeckung_unten = q.ueberdeckung_oben = 30.0
+        for lage in q.lagen:
+            lage.grund.durchmesser, lage.zulage.durchmesser = 12.0, 0.0
+        q.h = 80.0
+        self.assertEqual(meldung(projekt), (
+            "Platte 'Decke über EG': Überdeckungen und Lagen ergeben zusammen 108 mm – "
+            "mehr als die Dicke h = 80 mm; die oberen und unteren Lagen kreuzten sich."))
+        q.h = 108.0         # Sie berühren sich: das geht noch.
+        self.assertNotIn("q1", projekt.aufbauen().unfertige)
+
     def test_materialkennwerte_muessen_positiv_sein(self):
         """
         gamma_c = 0 endete in einem ZeroDivisionError, ein negatives f_ck in

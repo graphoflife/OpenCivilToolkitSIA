@@ -7,6 +7,22 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Eine zu dünne Platte rechnet nicht
+
+Entscheid des Benutzers. Vorher prüfte die Platte nur, dass die
+Überdeckungen zusammen kleiner sind als h. Bei h = 80 mm und ⌀12 in jeder
+Lage kreuzten sich die oberen und unteren Lagen, dastand «Höhe der
+Distanzhalter −28 mm», und M_Rd wurde gerechnet. Jetzt sagt die Platte
+«Nichts zu rechnen: Überdeckungen und Lagen ergeben zusammen 108 mm – mehr
+als die Dicke h = 80 mm; die oberen und unteren Lagen kreuzten sich.» Wo sie
+sich gerade berühren (h = 108 mm), rechnet sie.
+
+Geprüft beim Bauen (`_querschnitt` in `aufbau/platte.py`, mit
+`stapelhoehe` neben `Bewehrungslage`), nicht in den Regeln der Platte: die
+Bewehrungssuche prüft vorab nur die Regeln (`vorab_pruefen` baut nicht) und
+kann so eine zu dicke Bewehrung ersetzen; ein Kandidat, der nicht passt,
+ist für sie ein Nein.
+
 ## 2026-11-19 · Ein leerer Name hält nur sein Bauteil an
 
 Entscheid des Benutzers. Die Oberfläche nimmt keinen leeren Namen an; aus

@@ -88,8 +88,9 @@ gelernt wurde, steht in [[Entwicklung]].
       am 2026-11-19). Vorschlag: mit «Bügel mitsuchen» prüft die Längssuche
       die Querkraft mit Bügeln nicht, die Bügelsuche danach schon.
       Entschieden (Benutzer, 2026-11-19): so.
-- [ ] **Zu dünne Platte: obere und untere Lagen kreuzen sich.** Die Platte
-      prüft nur, dass die Überdeckungen zusammen kleiner sind als h
+- [x] **Zu dünne Platte: obere und untere Lagen kreuzen sich.** Erledigt
+      (2026-11-19), siehe [[Entwicklung]]. Vorher prüfte die Platte
+      nur, dass die Überdeckungen zusammen kleiner sind als h
       (`QuerschnittEintrag.regeln`). Bei h = 80 mm und überall ⌀12 liegt die
       3. Lage 32 mm über der Unterkante, die 2. bei 48 mm: «Höhe der
       Distanzhalter −28 mm», und M_Rd wird gerechnet (Durchsicht vom

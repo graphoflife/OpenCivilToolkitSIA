@@ -7215,6 +7215,7 @@
         "Querkraftbewehrung.menge_text",
         "Querkraftbewehrung.grenzen",
         "druckfeldgrenzen",
+        "stapelhoehe",
         "Plattenquerschnitt",
         "Plattenquerschnitt.id_breite",
         "Plattenquerschnitt.lagen_in_richtung",

@@ -1,5 +1,5 @@
 ---
-erzeugt: fb4fa4ddec78
+erzeugt: 45bb6139dbad
 art: modul
 tags: [modul]
 ---
@@ -61,6 +61,15 @@ def _querschnitt(eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff],
 
 Der Querschnitt der Platte -- `None` ohne jede Bewehrung: ohne sie
 gibt es keinen Widerstand.
+
+Passen Ueberdeckungen und Lagen nicht in die Dicke, rechnet die Platte
+nicht und sagt es (Benutzer, 2026-11-19). Bis dahin rechnete sie mit
+h = 80 mm und ⌀12 in jeder Lage: die oberen und unteren Lagen kreuzten
+sich, dastand «Höhe der Distanzhalter −28 mm», und M_Rd wurde gerechnet.
+Geprueft beim Bauen und nicht in den Regeln der Platte: vor der
+Bewehrungssuche prueft niemand das (`vorab_pruefen` baut nicht) -- sie
+soll eine zu dicke Bewehrung ersetzen koennen, und eine, die nicht
+passt, ist fuer sie ein Nein.
 
 ### _verformungsfall
 

@@ -40,7 +40,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Dict, Iterable, Iterator, List, Optional, Tuple
 
 from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel, Vorgabe
 from opencivil.core.einheiten import (
@@ -338,6 +338,16 @@ def druckfeldgrenzen(alpha_min: int, alpha_max: int, zugkraft: bool) -> Tuple[in
 #: darum keine eigene Kette, an der sie haengen koennte -- als Aufschrift des
 #: Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
 UEBERDECKUNGEN = "Überdeckungen"
+
+
+def stapelhoehe(lagen: Iterable[Bewehrungslage]) -> Groesse:
+    """
+    Wie hoch die Lagen zusammen stehen, ohne die Ueberdeckungen: je Lage ihr
+    dickster Stab -- so stapelt sie der Lagenaufbau von beiden Seiten nach
+    innen (:mod:`~opencivil.querschnitt.lagenaufbau`). Mit den Ueberdeckungen
+    hoeher als h, kreuzten sich die oberen und unteren Lagen.
+    """
+    return sum((l.groesster_durchmesser for l in lagen), Groesse(0, MM))
 
 
 def _abmessungen(beton_name: str) -> str:

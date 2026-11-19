@@ -28,9 +28,11 @@ from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.nachweis.querkraft_buegel import QuerkraftMitBuegeln
 from opencivil.nachweis.querkraft_ohne_buegel import QuerkraftOhneBuegel
-from opencivil.querschnitt.platte import Bewehrungslage, Plattenquerschnitt, Richtung
+from opencivil.querschnitt.platte import (
+    Bewehrungslage, Plattenquerschnitt, Richtung, stapelhoehe,
+)
 from opencivil.projekt.eintraege import KombinationEintrag, VerformungsfallEintrag
-from opencivil.projekt.lesen import ort_von
+from opencivil.projekt.lesen import ProjektFehler, ort_von
 from opencivil.projekt.platte import QuerschnittEintrag
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, knickfall, material, spannungsnachweise
@@ -201,6 +203,15 @@ def _querschnitt(
     """
     Der Querschnitt der Platte -- ``None`` ohne jede Bewehrung: ohne sie
     gibt es keinen Widerstand.
+
+    Passen Ueberdeckungen und Lagen nicht in die Dicke, rechnet die Platte
+    nicht und sagt es (Benutzer, 2026-11-19). Bis dahin rechnete sie mit
+    h = 80 mm und ⌀12 in jeder Lage: die oberen und unteren Lagen kreuzten
+    sich, dastand «Höhe der Distanzhalter −28 mm», und M_Rd wurde gerechnet.
+    Geprueft beim Bauen und nicht in den Regeln der Platte: vor der
+    Bewehrungssuche prueft niemand das (``vorab_pruefen`` baut nicht) -- sie
+    soll eine zu dicke Bewehrung ersetzen koennen, und eine, die nicht
+    passt, ist fuer sie ein Nein.
     """
     wo = ort_von(eintrag)
     beton_stoff = material(baustoffe, eintrag.beton, "beton", wo, "Beton")
@@ -222,6 +233,12 @@ def _querschnitt(
 
     if not any(l.vorhanden for l in lagen):
         return None
+    stapel = (eintrag.ueberdeckung_unten + eintrag.ueberdeckung_oben
+              + stapelhoehe(lagen).in_einheit(MM))
+    if stapel > eintrag.h:
+        raise ProjektFehler(
+            f"{wo}: Überdeckungen und Lagen ergeben zusammen {stapel:g} mm – mehr als "
+            f"die Dicke h = {eintrag.h:g} mm; die oberen und unteren Lagen kreuzten sich.")
 
     buegel = eintrag.querkraftbewehrung
     return Plattenquerschnitt(

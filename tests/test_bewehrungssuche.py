@@ -279,6 +279,30 @@ class TestMindestdurchmesser(unittest.TestCase):
                       ergebnis.loesungen[0].begruendung)
 
 
+class TestEineBewehrungDieNichtPasst(unittest.TestCase):
+    """
+    Passt die Bewehrung nicht in die Platte, rechnet sie nicht (2026-11-19)
+    -- die Suche aber soll sie ersetzen können: vorab prüft sie nur Dicke
+    und Überdeckungen, und ein Kandidat, der nicht passt, ist ein Nein.
+    """
+
+    def zu_dick(self) -> Projekt:
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        for lage in q.lagen:
+            lage.grund.durchmesser = 40.0
+        q.h = 200.0
+        return projekt
+
+    def test_die_suche_beginnt(self):
+        vorab_pruefen(self.zu_dick(), "q1")      # wirft nicht
+
+    def test_ein_kandidat_der_nicht_passt_ist_ein_nein(self):
+        bewertung = bewerte(self.zu_dick())
+        self.assertEqual(bewertung.abstand(), math.inf)
+        self.assertIn("die oberen und unteren Lagen kreuzten sich", bewertung.fehler)
+
+
 class TestDieEbeneAufDerDieSucheStehenblieb(unittest.TestCase):
     """
     Der Fehler, an dem das Werkzeug zuerst scheiterte.

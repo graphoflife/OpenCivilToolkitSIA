@@ -1,5 +1,5 @@
 ---
-erzeugt: c21377d06d31
+erzeugt: 8066a05cbbcb
 art: modul
 tags: [modul]
 ---
@@ -319,6 +319,17 @@ Bei Normalzug steilt sich die Druckdiagonale auf: `alpha_min` ist dann
 mindestens 40°, und `alpha_max` wird notfalls mitgehoben, damit der
 Bereich nicht leer wird (SIA 262:2025, 4.3.3.3.3). Bis 2026-11-14 wurde
 `alpha_min` auf genau 40° gesetzt -- auch von 42° herunter.
+
+### stapelhoehe
+
+```python
+def stapelhoehe(lagen: Iterable[Bewehrungslage]) -> Groesse
+```
+
+Wie hoch die Lagen zusammen stehen, ohne die Ueberdeckungen: je Lage ihr
+dickster Stab -- so stapelt sie der Lagenaufbau von beiden Seiten nach
+innen ([[opencivil.querschnitt.lagenaufbau|lagenaufbau]]). Mit den Ueberdeckungen
+hoeher als h, kreuzten sich die oberen und unteren Lagen.
 
 ### Plattenquerschnitt
 
