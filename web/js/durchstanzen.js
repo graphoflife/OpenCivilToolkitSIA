@@ -118,11 +118,15 @@ function zahlzeile(d, schluessel, text, symbol, { schritt = 1, titel } = {}) {
   });
 }
 
-/** Ein Schalter mit den Stellungen aus dem Katalog. */
-function schalter(d, schluessel, liste, titel = '') {
+/**
+ * Ein Schalter mit den Stellungen aus dem Katalog. Mit `bild` zeigt jede ihr
+ * Sinnbild `bild-wert` (sinnbilder.js) -- etwa, wo der Plattenrand liegt.
+ */
+function schalter(d, schluessel, liste, titel = '', bild = null) {
   return wahlSchalter({
     werte: katalog('durchstanzen', liste).map((w) => ({
       wert: w.wert, beschriftung: w.beschriftung, titel: w.beschriftung,
+      zeichen: bild && `${bild}-${w.wert}`,
     })),
     gewaehlt: d[schluessel],
     setzen: (w) => aenderer(d)((x) => { x[schluessel] = w; }),
@@ -142,7 +146,8 @@ function stellePanel(d) {
   const lage = lageVon(d);
   const masse = lage.masse[d.form].map((k) => zahlzeile(d, k, MASSE[k][0], MASSE[k][1], { schritt: 10 }));
   if (lage.hat_form) {
-    masse.unshift(feld('Form', schalter(d, 'form', 'formen', 'Die Form der Stütze im Grundriss'), ''));
+    masse.unshift(feld('Form', schalter(d, 'form', 'formen', 'Die Form der Stütze im Grundriss',
+      'stuetzenform'), ''));
   }
   return panel({
     schluessel: 'durchstanzen/Stelle', titel: 'Durchstanzstelle',
@@ -158,7 +163,7 @@ function stellePanel(d) {
         text: katalog('durchstanzen', 'plattenarten').find((w) => w.wert === d.plattenart).umgeschaltet,
       }) : null,
     ]),
-    wahlBlock('Lage', schalter(d, 'lage', 'lagen', 'Wo die gestützte Fläche in der Platte liegt')),
+    wahlBlock('Lage', schalter(d, 'lage', 'lagen', 'Wo die gestützte Fläche in der Platte liegt', 'lage')),
     karte(lage.titel, masse),
   ]);
 }

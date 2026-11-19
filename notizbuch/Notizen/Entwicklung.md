@@ -7,6 +7,24 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Bilder an den Schaltern: Durchstanzen
+
+Entscheid des Benutzers: wo Wörter nicht reichen, zeigt jede Stellung ein
+Bild. Beim Durchstanzen stand «Randstütze», ohne zu sagen, wo der Rand
+liegt – das sagte erst die Hilfe. Jetzt zeigt jede Lage die Stütze von oben
+im Ausschnitt der Platte: gestrichelt läuft die Platte weiter, ausgezogen
+ist ihr Rand, unten bei der Randstütze, unten und links bei der Eckstütze –
+wie die Koordinaten des Kerns und das Feld «Abstand zum unteren Rand».
+Wandende und Wandecke zeigen die Wand, die Form Rechteck, Kreis und das
+Oval mit halbrunden Enden.
+
+Die Bilder heissen `art-wert` (`lage-rand`, `stuetzenform-oval`), wie schon
+die Rechenarten; ein Test prüft, dass jede Stellung des Katalogs ihres hat,
+auch eine neue. `sinnbild` kennt dazu volle Flächen (`flaechen`): in
+Schaltergrösse, 23 Bildpunkte, verschwamm das Kreuz in der Stütze zu einem
+Fleck. Die fünf Lagen mit Bild waren breiter als ihr Block; die Stellungen
+eines Wahlblocks brechen jetzt um, wie es sein Kommentar schon versprach.
+
 ## 2026-11-19 · Grundbruch: drainiert oder undrainiert als Schalter
 
 Entscheid des Benutzers. Bis dahin hiess im Grundbruch φ = 0 undrainiert,

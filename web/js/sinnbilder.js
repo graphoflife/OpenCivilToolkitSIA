@@ -1,6 +1,7 @@
 /**
  * sinnbilder.js -- die Zeichen auf den Knöpfen: die Kapitel eines Bauteils,
- * die Apps links, die Werkzeuge des Zeichenfensters und die Rechenarten.
+ * die Apps links, die Werkzeuge des Zeichenfensters, die Rechenarten und die
+ * Stellungen der Schalter, wo Wörter allein nicht sagen, was gemeint ist.
  *
  * Einfache Linienbilder, 24 × 24, in der Farbe der Schrift: was das Kapitel
  * zeigt oder prüft, auf einen Blick -- die Interaktionslinie, der geknickte
@@ -8,8 +9,9 @@
  * Werkzeugen, was sie zeichnen. Selbst gezeichnet; keine fremde Bibliothek
  * und keine Bilddatei.
  *
- * Jedes Zeichen ist eine Liste von Pfaden (`d`), Kreisen (`[cx, cy, r]`) und
- * vollen Punkten (`voll`, ebenso) -- ein Stab ist ein voller Punkt.
+ * Jedes Zeichen ist eine Liste von Pfaden (`d`), Kreisen (`[cx, cy, r]`),
+ * vollen Punkten (`voll`, ebenso) und vollen Flächen (`flaechen`, Pfade) --
+ * ein Stab ist ein voller Punkt, eine Stütze im Grundriss eine volle Fläche.
  * Gestrichelt wird, was eine Grenze meint oder nicht mitrechnet.
  */
 
@@ -311,6 +313,48 @@ const ZEICHEN = {
       'M5 20.5h8.5l6.3-3.6a1.5 1.5 0 0 0-1.5-2.6l-4.6 2.6',
       'M7.5 3.5l3.5 5 M11 3.5l-3.5 5', 'M13.5 5h4 M13.5 7h4'],
   },
+
+  // -- Die Stellungen der Schalter ---------------------------------------------
+  // Je Stellung ihr Bild, `art-wert` (Benutzer, 2026-11-19: die Bedienung
+  // erklärt sich selbst). Jede Stellung des Katalogs hat ihres -- das prüft
+  // tests/test_bauteilarten.py.
+
+  // Wo die Stütze in der Platte steht, von oben: gestrichelt läuft die Platte
+  // weiter, ausgezogen ist ihr Rand -- wie im Kern unten (y negativ), bei der
+  // Ecke dazu links. Die Wand läuft nach rechts, die Wandecke nach rechts und
+  // oben (durchstanzen/flaeche.py).
+  'lage-innen': {
+    strich: ['M3 3h18v18H3z'],
+    flaechen: ['M9 9h6v6H9z'],
+  },
+  'lage-rand': {
+    strich: ['M3 21V3h18v18'],
+    pfade: ['M3 21h18'],
+    flaechen: ['M9 11h6v6H9z'],
+  },
+  'lage-ecke': {
+    strich: ['M3 3h18v18'],
+    pfade: ['M3 3v18h18'],
+    flaechen: ['M7 11h6v6H7z'],
+  },
+  'lage-wandende': {
+    strich: ['M3 3h18v18H3z'],
+    flaechen: ['M21 10.5H10v3h11z'],
+  },
+  'lage-wandecke': {
+    strich: ['M3 3h18v18H3z'],
+    flaechen: ['M21 15H9V3h3v9h9z'],
+  },
+  // Die Form der Stütze im Grundriss; das Oval ist ein Rechteck mit halbrunden Enden.
+  'stuetzenform-rechteck': {
+    pfade: ['M6 8h12v8H6z'],
+  },
+  'stuetzenform-rund': {
+    kreise: [[12, 12, 6]],
+  },
+  'stuetzenform-oval': {
+    pfade: ['M10 8h4a4 4 0 0 1 0 8h-4a4 4 0 0 1 0-8z'],
+  },
 };
 
 /** Ein Zeichen als SVG -- `name` aus der Liste oben. */
@@ -327,5 +371,6 @@ export function sinnbild(name) {
   for (const [cx, cy, r] of z?.voll || []) {
     svg.append(svgEl('circle', { cx, cy, r, fill: 'currentColor', stroke: 'none' }));
   }
+  for (const d of z?.flaechen || []) svg.append(svgEl('path', { d, fill: 'currentColor' }));
   return svg;
 }

@@ -271,7 +271,9 @@ in [[Entwicklung]] (Schritte 1 bis 13 und der Nachtrag zur Karte
       Biegebewehrung gelten jetzt für die Bodenplatte: prüfen». Sonst: alles
       auf die Vorgaben zurück.
 - [ ] **Bilder an Schaltern**, wo Wörter nicht reichen (`wahlSchalter` kann
-      Bilder zeigen), das stärkste zuerst:
+      Bilder zeigen), das stärkste zuerst. Entschieden (Benutzer,
+      2026-11-19): alle. Erledigt: Durchstanzen «Lage» und «Form», siehe
+      [[Entwicklung]].
       - Durchstanzen «Lage» (`durchstanzen.js`): wo der Plattenrand liegt,
         steht heute erst in der Hilfe -- je Stellung die Stütze mit dem Rand;
       - Pfahl «Kopf frei / eingespannt» und «Tragglied Rohr / Stab»;

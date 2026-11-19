@@ -17,6 +17,7 @@ from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.projekt import Projekt
 from opencivil.projekt.aufbau import BAUTEILE
 from opencivil.projekt.eintraege import BauteilEintrag
+from opencivil.web.api import katalog
 from opencivil.web.zeichendaten import ZEICHENDATEN
 
 WURZEL = Path(__file__).resolve().parents[1]
@@ -58,11 +59,15 @@ class TestVertraege(unittest.TestCase):
 class TestSinnbilder(unittest.TestCase):
     """Jedes Zeichen, das die Oberflaeche nennt, gibt es in sinnbilder.js -- sonst bliebe der Knopf leer."""
 
-    def test_jedes_genannte_zeichen_gibt_es(self):
+    @classmethod
+    def setUpClass(cls):
         quelltext = (JS / "sinnbilder.js").read_text(encoding="utf-8")
         tabelle = quelltext[quelltext.index("const ZEICHEN = {"):]
         tabelle = tabelle[:tabelle.index("\n};\n")]
-        vorhanden = set(re.findall(r"^  '?([a-z_-]+)'?: \{", tabelle, flags=re.M))
+        cls.vorhanden = set(re.findall(r"^  '?([a-z_-]+)'?: \{", tabelle, flags=re.M))
+
+    def test_jedes_genannte_zeichen_gibt_es(self):
+        vorhanden = self.vorhanden
         genannt = {(pfad.name, m.group(1))
                    for pfad in JS.glob("*.js")
                    for muster in (r"zeichen: '([a-z_-]+)'", r"sinnbild\('([a-z_-]+)'\)")
@@ -71,6 +76,27 @@ class TestSinnbilder(unittest.TestCase):
         for datei, zeichen in sorted(genannt):
             with self.subTest(datei=datei, zeichen=zeichen):
                 self.assertIn(zeichen, vorhanden)
+
+    def test_jede_stellung_hat_ihr_bild(self):
+        """
+        Wo ein Schalter je Stellung ein Bild zeigt, heisst es `art-wert` --
+        jede Stellung des Katalogs hat ihres, auch eine, die neu dazukommt.
+        Sonst stünde sie ohne Bild da, und keiner merkte es.
+        """
+        k = katalog()
+        rechenwahl = k["rechenwahl"]
+        familien = {
+            "rechenart": [*rechenwahl["rechenarten"], *rechenwahl["spannungsarten"],
+                          *rechenwahl["faserarten"], *rechenwahl["faserspannungsarten"],
+                          *rechenwahl["verformungsarten"],
+                          *k["querschnittsanalyse"]["betongesetze"]],
+            "lage": k["durchstanzen"]["lagen"],
+            "stuetzenform": k["durchstanzen"]["formen"],
+        }
+        for art, stellungen in familien.items():
+            for stellung in stellungen:
+                with self.subTest(zeichen=f"{art}-{stellung['wert']}"):
+                    self.assertIn(f"{art}-{stellung['wert']}", self.vorhanden)
 
 
 if __name__ == "__main__":
