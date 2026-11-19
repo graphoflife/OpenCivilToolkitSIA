@@ -21,7 +21,8 @@ from dataclasses import dataclass, field
 from typing import List
 
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KPA, M
-from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung, eindeutig
+from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
+from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import ProjektFehler, bereich
 
 
@@ -122,6 +123,10 @@ class GrundbruchEintrag(BauteilEintrag):
         self.kombinationen.append(eintrag)
         return eintrag
 
+    def fallnamen(self) -> List[Fallnamen]:
+        """Die Namen der Kombinationen muessen sich unterscheiden."""
+        return [Fallnamen.aus("kombinationen", "Kombination", self.kombinationen)]
+
     def regeln(self, wo: str) -> None:
         """
         Haelt unmoegliche Zahlen und Namen auf, bevor daraus ein Widerstand
@@ -130,7 +135,6 @@ class GrundbruchEintrag(BauteilEintrag):
         eine abgelegte Datei mit b = 0 oder zwei gleich benannten
         Kombinationen soll sich oeffnen und korrigieren lassen.
         """
-        eindeutig((k.name for k in self.kombinationen), wo, "Kombination")
         if self.L < self.b:
             raise ProjektFehler(
                 f"{wo}: b ist die kürzere Seite des Fundaments – die Länge L = {self.L:g} m "

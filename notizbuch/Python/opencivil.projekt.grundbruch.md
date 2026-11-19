@@ -1,5 +1,5 @@
 ---
-erzeugt: 91566d8df6fd
+erzeugt: 157a1aa5690e
 art: modul
 tags: [modul]
 ---
@@ -83,6 +83,14 @@ def kombination(self, name: str, *, N_Ed: float, T_Ed: float=0.0) -> Grundbruchk
 
 Eine Kombination anfügen -- N normal zur Sohle, T in ihrer Richtung, in kN.
 
+#### GrundbruchEintrag.fallnamen
+
+```python
+def fallnamen(self) -> List[Fallnamen]
+```
+
+Die Namen der Kombinationen muessen sich unterscheiden.
+
 #### GrundbruchEintrag.regeln
 
 ```python
@@ -100,6 +108,7 @@ Kombinationen soll sich oeffnen und korrigieren lassen.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
 
 ## Gebraucht von

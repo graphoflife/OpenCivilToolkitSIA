@@ -38,7 +38,8 @@ from opencivil.pfahl.boden import Mantel, Verhalten
 from opencivil.pfahl.pfahl import (
     ETA_I_HOECHSTENS, Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied, quer_belastet,
 )
-from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung, eindeutig
+from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
+from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import ProjektFehler, bereich, lesen
 
 
@@ -183,6 +184,10 @@ class PfahlEintrag(BauteilEintrag):
         """Ob die Schichten tiefer reichen als der Fuss -- nur dann trägt ihn Boden."""
         return self.t_K + self.L < sum(s.d for s in self.schichten)
 
+    def fallnamen(self) -> List[Fallnamen]:
+        """Die Namen der Kombinationen muessen sich unterscheiden."""
+        return [Fallnamen.aus("kombinationen", "Kombination", self.kombinationen)]
+
     def regeln(self, wo: str) -> None:
         """
         Hält auf, was mehrere Felder zusammen unmöglich machen, bevor daraus
@@ -191,7 +196,6 @@ class PfahlEintrag(BauteilEintrag):
         korrigieren lassen. Was an Boden noch fehlt, hält nur den Pfahl auf
         (:meth:`fehlender_baugrund`).
         """
-        eindeutig((k.name for k in self.kombinationen), wo, "Kombination")
         if self.eta_a > self.grundlage.eta_grenze:
             raise ProjektFehler(
                 f"{wo}: η_a = {self.eta_a:g} liegt über {self.grundlage.eta_grenze:g}, dem "

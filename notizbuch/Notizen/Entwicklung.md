@@ -7,6 +7,28 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Ein doppelter Fallname weist schon das Feld ab
+
+Entscheid des Benutzers. Vorher nahm das Namensfeld jeden Namen, und erst
+das Bauteil sagte oben im Fenster, dass er doppelt ist. Die sechs Fenster
+der Spannung-Dehnung-Analysen teilen sich aber eine Liste: der andere stand
+oft in einem Fenster, das nicht offen war. Jetzt sagt das Feld ««Feld» ist
+als Tragsicherheitseinwirkung schon vergeben: «Stütze» bleibt.», bei einer
+Analyse dazu «im Fenster «Momenten-Krümmungs-Linie»», bei einem eigenen
+Gebrauchsfall «aus der Tragsicherheit abgeleitet».
+
+Die Regel steht einmal, in `opencivil/projekt/fallnamen.py`: jedes Bauteil
+nennt seine Listen (`fallnamen()`, ohne eigene keine), und dieselbe
+`Fallnamen` prüft vor dem Rechnen (`pruefen`, für eine Datei) und fürs Feld
+(`grund`). Das Feld fragt den Kern (`fallname` im Dienst), denn ob zwei
+Namen zusammenfallen, sagt erst die Kennung (`kennung_aus`): «Wand A» und
+«Wand-A» fallen zusammen. Antwortet der Kern nicht, gilt der Name – vor dem
+Rechnen fragt er ohnehin. `eindeutig` und `namen_pruefen` sind weg; die
+Meldung vor dem Rechnen heisst nun gleich wie am Feld.
+
+Ein Test liest die Pfade aus web/js und verlangt, dass ein Bauteil jede
+Liste kennt – sonst fragte ein Feld ins Leere und nähme jeden Namen.
+
 ## 2026-11-19 · α_min über α_max weist schon das Feld ab
 
 Entscheid des Benutzers. Vorher nahm das Feld α_min = 50° bei α_max = 40°

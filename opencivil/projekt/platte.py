@@ -24,8 +24,9 @@ from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Gebrauchsliste, KnickEintrag, KombinationEintrag,
     LageEintrag, ObergrenzeEintrag, PostenEintrag, QuerkraftbewehrungEintrag,
     Querschnittsangaben, RechenwahlEintrag, SpannungsfallEintrag, VerformungEintrag,
-    VerformungsfallEintrag, eindeutig,
+    VerformungsfallEintrag, spannungsfallnamen,
 )
+from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import ProjektFehler, bereich
 
 
@@ -208,25 +209,29 @@ class QuerschnittEintrag(Querschnittsangaben):
 
         **Nicht beim Oeffnen.** Eine abgelegte Platte mit ``h = 0`` liesse sich
         sonst nicht mehr oeffnen -- und damit nicht mehr korrigieren. Gefragt
-        wird vor dem Rechnen (:func:`~opencivil.projekt.lesen.inhalt_pruefen`).
-        Ebenso die Namen der Faelle (:func:`~opencivil.projekt.eintraege.eindeutig`),
-        die der Tragsicherheit zuerst: aus ihnen leiten sich die
-        Gebrauchslisten ab.
+        wird vor dem Rechnen (:func:`~opencivil.projekt.lesen.inhalt_pruefen`),
+        nach den Namen der Faelle (:meth:`fallnamen`).
         """
-        eindeutig((k.name for k in self.kombinationen), wo, "Tragsicherheitseinwirkung")
-        for liste, wort in ((self.haeufig, "häufige"),
-                            (self.quasistaendig, "quasi-ständige")):
-            liste.namen_pruefen(wo, self.kombinationen, wort)
-        eindeutig((k.name for k in self.knickfaelle), wo, "Knicknachweis")
-        eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
-        eindeutig((f.name for f in self.verformung.faelle), wo, "Verformungsfall")
-
         zusammen = self.ueberdeckung_unten + self.ueberdeckung_oben
         if zusammen >= self.h:
             raise ProjektFehler(
                 f"{wo}: die Überdeckungen ergeben zusammen {zusammen:g} mm "
                 f"und lassen in einer {self.h:g} mm dicken Platte keinen Platz für "
                 f"Bewehrung.")
+
+    def fallnamen(self) -> List[Fallnamen]:
+        """
+        Die Listen, deren Namen sich unterscheiden muessen -- die der
+        Tragsicherheit zuerst: aus ihnen leiten sich die Gebrauchslisten ab.
+        """
+        return [
+            Fallnamen.aus("kombinationen", "Tragsicherheitseinwirkung", self.kombinationen),
+            self.haeufig.namensliste("haeufig", self.kombinationen, "häufige"),
+            self.quasistaendig.namensliste("quasistaendig", self.kombinationen, "quasi-ständige"),
+            Fallnamen.aus("knickfaelle", "Knicknachweis", self.knickfaelle),
+            spannungsfallnamen(self.spannungsfaelle),
+            Fallnamen.aus("verformung.faelle", "Verformungsfall", self.verformung.faelle),
+        ]
 
     def ohne_lastfaelle(self) -> None:
         """

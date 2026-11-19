@@ -301,6 +301,7 @@ function kombinationZeile(t, i) {
   const aendern = (veraenderer) => eintragAendern(t.kennung, (x) => veraenderer(x.kombinationen[i]));
   return fallzeile({
     fall: k, aendern, was: 'Kombination', nameTitel: 'Bezeichnung der Kombination',
+    liste: { kennung: t.kennung, pfad: 'kombinationen', index: i },
     zahlen: kraefte(t).map(([schluessel, schritt, titel]) => zahlfeld({
       wert: k[schluessel], schritt, angabe: feldangabe('pfahlkombination', schluessel), titel,
       leer: 0, beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),

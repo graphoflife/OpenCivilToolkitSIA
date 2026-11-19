@@ -1,5 +1,5 @@
 ---
-erzeugt: b6586b533116
+erzeugt: c39afd861110
 art: modul
 tags: [modul]
 ---
@@ -349,7 +349,7 @@ def beschreibung(self) -> str
 - [[opencivil.pfahl.steifigkeit]]
 - [[opencivil.pfahl.uebersicht]]
 - [[opencivil.projekt.aufbau.kern]]
-- [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.fallnamen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]

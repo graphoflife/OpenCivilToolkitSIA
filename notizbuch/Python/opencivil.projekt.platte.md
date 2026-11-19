@@ -1,5 +1,5 @@
 ---
-erzeugt: 3d0a04408e57
+erzeugt: 05b973e08d42
 art: modul
 tags: [modul]
 ---
@@ -110,10 +110,17 @@ entscheidet der Ingenieur.
 
 **Nicht beim Oeffnen.** Eine abgelegte Platte mit `h = 0` liesse sich
 sonst nicht mehr oeffnen -- und damit nicht mehr korrigieren. Gefragt
-wird vor dem Rechnen ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
-Ebenso die Namen der Faelle ([[opencivil.projekt.eintraege#eindeutig|eindeutig]]),
-die der Tragsicherheit zuerst: aus ihnen leiten sich die
-Gebrauchslisten ab.
+wird vor dem Rechnen ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]),
+nach den Namen der Faelle ([[opencivil.projekt.platte#QuerschnittEintrag.fallnamen|fallnamen]]).
+
+#### QuerschnittEintrag.fallnamen
+
+```python
+def fallnamen(self) -> List[Fallnamen]
+```
+
+Die Listen, deren Namen sich unterscheiden muessen -- die der
+Tragsicherheit zuerst: aus ihnen leiten sich die Gebrauchslisten ab.
 
 #### QuerschnittEintrag.ohne_lastfaelle
 
@@ -191,6 +198,7 @@ Kraft: eine neue Zeile bringt keine Einwirkung mit (Benutzer,
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]

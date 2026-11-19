@@ -496,7 +496,8 @@ class TestDoppelteFallnamen(unittest.TestCase):
         q = projekt.querschnitt("q1")
         q.kombinationen = [KombinationEintrag(name="Feld", M_Ed=30.0),
                            KombinationEintrag(name="Feld", M_Ed=99.0)]
-        self.assertIn("'Feld' ist zweimal", meldung(projekt))
+        self.assertIn("«Feld» ist als Tragsicherheitseinwirkung schon vergeben",
+                      meldung(projekt))
 
     def test_auch_haeufige_und_knickfaelle(self):
         from opencivil.projekt import GebrauchsfallEintrag, KnickEintrag
@@ -515,7 +516,7 @@ class TestDoppelteFallnamen(unittest.TestCase):
                     q.haeufig.faelle = eintraege
                 else:
                     setattr(q, feld, eintraege)
-                self.assertIn("ist zweimal als", meldung(projekt))
+                self.assertIn("schon vergeben", meldung(projekt))
 
     def test_ein_eigener_fall_darf_nicht_wie_der_abgeleitete_heissen(self):
         """
@@ -529,7 +530,7 @@ class TestDoppelteFallnamen(unittest.TestCase):
         q.rissanforderung = "hoch"
         q.haeufig.faelle = [GebrauchsfallEintrag(
             f"{q.kombinationen[0].name} (70 %)", M_Ed=70.0)]
-        self.assertIn("abgeleitete", meldung(projekt))
+        self.assertIn("aus der Tragsicherheit abgeleitet", meldung(projekt))
 
     def test_verschiedene_namen_gehen_weiterhin(self):
         """Die Regel darf nicht mehr verbieten als sie muss."""

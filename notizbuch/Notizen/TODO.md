@@ -98,9 +98,10 @@ gelernt wurde, steht in [[Entwicklung]].
       Überdeckungen; die Bewehrungssuche prüft vorab nur Dicke und
       Überdeckungen, damit sie eine zu dicke Bewehrung ersetzen kann.
       Entschieden (Benutzer, 2026-11-19): so.
-- [ ] **Doppelte Namen von Fällen schon am Feld abweisen.** Heute hält ein
-      doppelter Name nur seine Platte oder Analyse an, und sie sagt es oben
-      im Fenster. Die sechs Fenster der Spannung-Dehnung-Analysen teilen sich
+- [x] **Doppelte Namen von Fällen schon am Feld abweisen.** Erledigt
+      (2026-11-19): `opencivil/projekt/fallnamen.py`, siehe [[Entwicklung]].
+      Vorher hielt ein doppelter Name nur seine Platte oder Analyse an, und
+      sie sagte es oben im Fenster. Die sechs Fenster der Spannung-Dehnung-Analysen teilen sich
       aber eine Namensliste: der Doppelgänger kann in einem Fenster stehen,
       das man nicht offen hat. Vorschlag: das Namensfeld weist einen
       vergebenen Namen ab und sagt, wo er steht. Entschieden (Benutzer,
@@ -110,7 +111,7 @@ gelernt wurde, steht in [[Entwicklung]].
       («Platte 'Decke über EG', kombinationen 1: 'name' darf nicht leer
       sein.»), statt nur seine Platte (Durchsicht vom 2026-11-19).
       Entschieden (Benutzer, 2026-11-19): nur seine Platte oder Analyse
-      rechnet nicht und sagt am Ort, was fehlt.
+      rechnet nicht und sagt am Ort, was fehlt. **Noch offen.**
 - [x] **α_min über α_max schon am Feld abweisen.** Erledigt (2026-11-19):
       `bereich(..., bis_feld="alpha_max")`, siehe [[Entwicklung]]. Vorher
       nahm das Feld α_min = 50° bei α_max = 40° an; die Analyse oder Platte

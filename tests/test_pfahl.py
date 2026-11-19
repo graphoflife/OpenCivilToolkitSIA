@@ -329,7 +329,7 @@ class TestEintrag(unittest.TestCase):
         t.schicht("Kies", d=20.0)
         t.kombination("A", N_Ed=100.0)
         t.kombination("A", N_Ed=200.0)
-        self.assertIn("der Name 'A' ist zweimal als Kombination vergeben", meldung(p))
+        self.assertIn("«A» ist als Kombination schon vergeben", meldung(p))
 
     def test_ein_wort_das_es_nicht_gibt(self):
         p, t = projekt()

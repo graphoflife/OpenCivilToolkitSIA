@@ -333,6 +333,7 @@ function einwirkungZeile(querschnitt, index) {
 
   return fallzeile({
     fall: k, aendern, was: 'Lastfall', nameTitel: 'Bezeichnung der Einwirkung',
+    liste: { kennung: querschnitt.kennung, pfad: 'kombinationen', index },
     zahlen: [
       zahl('M_Ed', 'Bemessungsmoment in kNm'),
       zahl('N_Ed', 'Normalkraft in kN – Zug positiv, Druck negativ'),
@@ -385,6 +386,7 @@ function verformungsZeile(querschnitt, index) {
   const seiten = katalog('verformung', 'zugseiten');
   return fallzeile({
     fall: k, aendern, was: 'Verformungsfall', nameTitel: 'Bezeichnung des Verformungsfalls',
+    liste: { kennung: querschnitt.kennung, pfad: 'verformung.faelle', index },
     zahlen: [
       zahlfeld({
         wert: k.w, schritt: 1, leer: 0, angabe: feldangabe('verformungsfall', 'w'),

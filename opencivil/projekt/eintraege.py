@@ -20,7 +20,6 @@ from dataclasses import KW_ONLY, asdict, dataclass, field, fields
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import GRAD, KN, KNM, M, MM, MM2, PROMILLE, PROZENT, Groesse
-from opencivil.core.wert import kennung_aus
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -28,6 +27,7 @@ from opencivil.nachweis.duktilitaet import BEIWERT as X_D_BEIWERT, HOECHSTENS as
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
+from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import (
     ProjektFehler, als_groesse, bereich, einer_von, lesen, ort, unbekanntes_feld,
     wahl_aus_text,
@@ -102,6 +102,15 @@ class Beschreibung:
 
     def regeln(self, wo: str) -> None:
         """Die Regeln ueber mehrere Felder -- ohne eigene keine. ``wo`` nennt den Eintrag."""
+
+    def fallnamen(self) -> List[Fallnamen]:
+        """
+        Die Listen von Faellen, deren Namen sich unterscheiden muessen
+        (:mod:`~opencivil.projekt.fallnamen`) -- ohne eigene keine. Geprueft
+        vor den Regeln (:func:`~opencivil.projekt.lesen.inhalt_pruefen`) und
+        vom Namensfeld, bevor es einen Namen uebernimmt.
+        """
+        return []
 
     def si(self, feld: str) -> float:
         """
@@ -581,6 +590,16 @@ class SpannungsfallEintrag(Beschreibung):
     aktiv: bool = True
 
 
+def spannungsfallnamen(faelle: Iterable[SpannungsfallEintrag]) -> Fallnamen:
+    """
+    Die Namen der Spannung-Dehnung-Analysen, bei der Platte wie am
+    gezeichneten Querschnitt -- eine Liste fuer sechs Fenster, darum sagt die
+    Meldung, in welchem der andere steht.
+    """
+    return Fallnamen.aus("spannungsfaelle", "Spannung-Dehnung-Analyse", faelle,
+                         ort=lambda f: f", im Fenster «{f.art.beschriftung}»")
+
+
 @dataclass
 class GebrauchsfallEintrag(Beschreibung):
     """
@@ -596,45 +615,6 @@ class GebrauchsfallEintrag(Beschreibung):
     N_Ed: float = 0.0
     aktiv: bool = True
     """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
-
-
-def eindeutig(namen: Iterable[str], wo: str, was: str) -> None:
-    """
-    Fallnamen muessen je Liste eindeutig sein -- auch als Kennung.
-
-    Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab -- M-N,
-    Querkraft und Stahlspannung alle drei. Zwei Kombinationen gleichen
-    Namens fielen darum auf einen Eintrag zusammen: der zweite ueberschrieb
-    den ersten, und in der Tabelle fehlte eine Zeile. Kein Fehler, keine
-    Warnung, eine Zahl weniger.
-
-    Verschiedene Namen koennen dieselbe Kennung ergeben: «Wand A» und
-    «Wand-A» werden beide zu «Wand_A» (:func:`kennung_aus`). Das Rechenwerk
-    wiese den zweiten zurueck, aber mit einer Meldung ueber Wert-IDs, die an
-    der Maske niemand versteht. Bis 2026-10-17 pruefte das nur drei der neun
-    Listen.
-
-    Gemeldet statt umbenannt: welcher der beiden gemeint war, weiss nur der
-    Benutzer, und ein automatisch angehaengtes «(2)» stuende danach in seinem
-    Bericht. Gefragt wird vor dem Rechnen, nicht beim Oeffnen: zwei gleiche
-    Namen sind schnell getippt, und ein Projekt, das sich darum nicht mehr
-    oeffnen liesse, waere schlimmer als eine Meldung beim Rechnen.
-    """
-    gesehen: Dict[str, str] = {}
-    for name in namen:
-        kennung = kennung_aus(name)
-        if kennung not in gesehen:
-            gesehen[kennung] = name
-        elif gesehen[kennung] == name:
-            raise ProjektFehler(
-                f"{wo}: der Name '{name}' ist zweimal als {was} vergeben. Die "
-                f"Nachweise legen ihre Ergebnisse unter dem Fallnamen ab – zwei "
-                f"gleiche Namen ergeben eine Zeile statt zwei.")
-        else:
-            raise ProjektFehler(
-                f"{wo}: '{gesehen[kennung]}' und '{name}' unterscheiden sich nur in "
-                f"Satz- oder Leerzeichen – als {was} fielen sie im Bericht auf "
-                f"denselben Eintrag. Bitte einen davon anders benennen.")
 
 
 @dataclass
@@ -745,28 +725,19 @@ class Gebrauchsliste(Beschreibung):
         self.faelle.append(eintrag)
         return eintrag
 
-    def namen_pruefen(self, wo: str, kombinationen: List[Any], wort: str) -> None:
+    def namensliste(self, feld: str, kombinationen: List[Any], wort: str) -> Fallnamen:
         """
-        Die Namen dieser Liste, vor dem Rechnen (siehe :func:`eindeutig`). Je
-        Liste fuer sich: die beiden Listen landen in getrennten Nachweisen und
-        damit in getrennten ID-Raeumen, ein Fall «Dauer» darf in beiden stehen.
-        ``kombinationen`` sind die Faelle der Tragsicherheit, aus denen
-        abgeleitet wird -- ihre eigenen Namen hat das Bauteil schon geprueft.
-        ``wo`` nennt das Bauteil.
+        Die Namen dieser Liste (:class:`~opencivil.projekt.fallnamen.Fallnamen`),
+        unter ``feld`` im Bauteil. Je Liste fuer sich: die beiden Listen
+        landen in getrennten Nachweisen und damit in getrennten ID-Raeumen,
+        ein Fall «Dauer» darf in beiden stehen. Schon vergeben sind die aus
+        den ``kombinationen`` der Tragsicherheit abgeleiteten: sie tragen den
+        Namen ihrer Kombination mit angehaengtem Anteil, und wer einen eigenen
+        Fall genau so nennt, traefe denselben Schluessel.
         """
-        eindeutig((f.name for f in self.faelle), wo, f"{wort}r Lastfall")
-        # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
-        # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
-        # traefe denselben Schluessel.
-        abgeleitet = [abgeleiteter_fallname(k.name, self.anteil) for k in kombinationen]
-        for f in self.faelle:
-            if f.name in abgeleitet:
-                raise ProjektFehler(
-                    f"{wo}: der {wort} Lastfall '{f.name}' heisst "
-                    f"wie der aus der Tragsicherheit abgeleitete. Bitte anders "
-                    f"benennen – sonst lässt sich nicht auseinanderhalten, "
-                    f"welcher gerechnet wurde.")
-        eindeutig(abgeleitet + [f.name for f in self.faelle], wo, f"{wort}r Lastfall")
+        return Fallnamen.aus(f"{feld}.faelle", f"{wort}r Lastfall", self.faelle, vergeben=[
+            (abgeleiteter_fallname(k.name, self.anteil), ", aus der Tragsicherheit abgeleitet")
+            for k in kombinationen])
 
 
 @dataclass

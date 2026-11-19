@@ -404,7 +404,8 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
 
         meldung = self.fehler(quasistaendig__faelle=[
             GebrauchsfallEintrag("Feld (60 %)", M_Ed=10.0)])
-        self.assertIn("quasi-ständige Lastfall 'Feld (60 %)'", meldung)
+        self.assertIn("«Feld (60 %)» ist als quasi-ständiger Lastfall schon vergeben, "
+                      "aus der Tragsicherheit abgeleitet", meldung)
 
     def test_gleiche_namen_in_beiden_listen_sind_erlaubt(self):
         """Sie landen in zwei Nachweisen und damit in zwei ID-Räumen."""
@@ -427,7 +428,8 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
         meldung = self.fehler(quasistaendig__faelle=[
             GebrauchsfallEintrag("Feld A", M_Ed=10.0),
             GebrauchsfallEintrag("Feld-A", M_Ed=20.0)])
-        self.assertIn("'Feld A' und 'Feld-A'", meldung)
+        self.assertIn("«Feld-A» ist als quasi-ständiger Lastfall schon vergeben, als «Feld A»",
+                      meldung)
 
     def test_ein_anteil_ausserhalb_von_null_bis_hundert(self):
         for feld, wert in (("quasistaendig__anteil", 0.0),

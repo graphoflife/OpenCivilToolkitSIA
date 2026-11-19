@@ -280,6 +280,7 @@ function knickZeile(eintrag, ort, index) {
   const richtung = ort.knick.richtung;
   return fallzeile({
     fall: k, aendern, was: 'Knicknachweis', nameTitel: 'Bezeichnung des Knicknachweises',
+    liste: { kennung: eintrag.kennung, pfad: 'knickfaelle', index },
     oben: richtung ? richtung(k, (wert) => aendern((x) => { x.richtung = wert; })) : null,
     zahlen: [zahl('N_Ed', 50), zahl('M_Ed_1', 10), zahl('laenge', 0.5), zahl('knicklaenge', 0.5)],
     entfernenTitel: 'Knicknachweis entfernen',
@@ -459,6 +460,7 @@ function gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, index) {
 
   return fallzeile({
     fall: k, aendern, was: 'Lastfall', nameTitel: `Bezeichnung des ${wort}en Lastfalls`,
+    liste: { kennung: eintrag.kennung, pfad: `${feld}.faelle`, index },
     zahlen: spalten.map((s) => zahlfeld({
       wert: k[s.feld], schritt: s.schritt, titel: s.titel(wort), leer: 0,
       beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
@@ -629,6 +631,7 @@ function spannungsZeile(eintrag, index, ort) {
   // Spalten breit in einer Zeile darunter -- in einer wären sie abgeschnitten.
   return fallzeile({
     fall: k, aendern, was: 'Analyse', nameTitel: 'Bezeichnung der Analyse',
+    liste: { kennung: eintrag.kennung, pfad: 'spannungsfaelle', index },
     zahlen: [...spalten, phi, ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; }))],
     unten: [werte, rechenart],
     entfernenTitel: 'Analyse entfernen',

@@ -290,7 +290,8 @@ class TestBeschreibung(unittest.TestCase):
         a = p.querschnittsanalysen[0]
         a.spannungsfall("Bild")
         a.spannungsfall("Bild", richtung="oben")
-        self.assertIn("der Name 'Bild' ist zweimal als Spannung-Dehnung-Analyse vergeben",
+        self.assertIn("«Bild» ist als Spannung-Dehnung-Analyse schon vergeben, "
+                      "im Fenster «Aus N und M»",
                       meldung(p))
 
 

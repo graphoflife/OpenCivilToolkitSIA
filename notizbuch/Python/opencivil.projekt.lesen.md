@@ -1,5 +1,5 @@
 ---
-erzeugt: 7cf12e08cba0
+erzeugt: d48423d31a7c
 art: modul
 tags: [modul]
 ---
@@ -343,8 +343,8 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str]=()) -> None
 Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
 jede Zahl gegen ihren Bereich ([[opencivil.projekt.lesen#bereich|bereich]]), jeden Eintrag darin
 ebenso, jede gegen das Feld, das sie begrenzt ([[opencivil.projekt.lesen#Bereich|Bereich.bis_feld]]),
-und danach die Regeln des Eintrags ueber mehrere Felder,
-`regeln(wo)`. Die Form ist da schon geprueft: ein Eintrag steht, wo
+und danach die Namen seiner Faelle (`fallnamen()`) und die Regeln des
+Eintrags ueber mehrere Felder, `regeln(wo)`. Die Form ist da schon geprueft: ein Eintrag steht, wo
 einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
 `ohne` prueft, wer sie einzeln prueft -- der Aufbau jedes Material und
 jedes Bauteil fuer sich ([[opencivil.projekt.aufbau#aufbauen|aufbauen]]).
@@ -444,6 +444,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]

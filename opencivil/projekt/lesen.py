@@ -502,8 +502,8 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
     Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
     jede Zahl gegen ihren Bereich (:func:`bereich`), jeden Eintrag darin
     ebenso, jede gegen das Feld, das sie begrenzt (:attr:`Bereich.bis_feld`),
-    und danach die Regeln des Eintrags ueber mehrere Felder,
-    ``regeln(wo)``. Die Form ist da schon geprueft: ein Eintrag steht, wo
+    und danach die Namen seiner Faelle (``fallnamen()``) und die Regeln des
+    Eintrags ueber mehrere Felder, ``regeln(wo)``. Die Form ist da schon geprueft: ein Eintrag steht, wo
     einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
     ``ohne`` prueft, wer sie einzeln prueft -- der Aufbau jedes Material und
     jedes Bauteil fuer sich (:func:`~opencivil.projekt.aufbau.aufbauen`).
@@ -523,6 +523,8 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
         if bereich_ is not None and bereich_.bis_feld is not None:
             bereich_.nicht_ueber(wert, _bereiche(type(eintrag))[bereich_.bis_feld],
                                  getattr(eintrag, bereich_.bis_feld), wo)
+    for liste in eintrag.fallnamen():
+        liste.pruefen(wo)
     eintrag.regeln(wo)
 
 

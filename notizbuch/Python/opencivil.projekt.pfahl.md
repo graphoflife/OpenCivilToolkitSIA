@@ -1,5 +1,5 @@
 ---
-erzeugt: 807561111b4d
+erzeugt: 28c2e7e1b610
 art: modul
 tags: [modul]
 ---
@@ -172,6 +172,14 @@ def boden_unter_dem_fuss(self) -> bool
 
 Ob die Schichten tiefer reichen als der Fuss -- nur dann trägt ihn Boden.
 
+#### PfahlEintrag.fallnamen
+
+```python
+def fallnamen(self) -> List[Fallnamen]
+```
+
+Die Namen der Kombinationen muessen sich unterscheiden.
+
 #### PfahlEintrag.regeln
 
 ```python
@@ -228,6 +236,7 @@ Das Tragglied muss nach der Abrostung noch Stahl haben und im Verpresskörper li
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
 
 ## Gebraucht von

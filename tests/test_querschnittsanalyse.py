@@ -61,7 +61,8 @@ class TestBeschreibung(unittest.TestCase):
         a = self.neu()
         a.lastfaelle.append(QALastfallEintrag(name="Tragsicherheit 1"))
         QuerschnittsanalyseEintrag.aus_dict(a.als_dict())  # Öffnen geht -- gemeldet wird vor dem Rechnen.
-        with self.assertRaisesRegex(ProjektFehler, "'Tragsicherheit 1' ist zweimal"):
+        with self.assertRaisesRegex(ProjektFehler,
+                                    "«Tragsicherheit 1» ist als Lastfall schon vergeben"):
             inhalt_pruefen(a, "Querschnitt 'Balken'")
 
     def test_unbekanntes_wird_gemeldet(self):

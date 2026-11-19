@@ -145,6 +145,7 @@ function kombinationZeile(g, i) {
   });
   return fallzeile({
     fall: k, aendern, was: 'Kombination', nameTitel: 'Bezeichnung der Kombination',
+    liste: { kennung: g.kennung, pfad: 'kombinationen', index: i },
     zahlen: [zahl('N_Ed', 'Normal zur Sohle, Druck positiv'),
       zahl('T_Ed', 'In der Sohle, zur Seite, auf der das Gelände abfällt')],
     entfernenTitel: 'Kombination entfernen',

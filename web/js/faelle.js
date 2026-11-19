@@ -17,9 +17,11 @@
  * verschob alle danach.
  */
 
+import { api } from './api.js';
 import { hakenSchalter, namensfeld } from './bausteine.js';
 import { el } from './dom.js';
 import { span } from './mathe.js';
+import { zustand } from './zustand.js';
 
 /**
  * Eine Zeile. `fall` ist der Eintrag, `aendern(veraenderer)` ändert ihn im
@@ -28,9 +30,15 @@ import { span } from './mathe.js';
  * und `entfernenTitel` sagen, was Name und Kreuz tun. `vorn` steht statt des
  * Schalters da, wo es keinen gibt: die Nummer einer Schicht -- eine Schicht
  * lässt sich nicht ausschalten, ohne dass die darunter nach oben rückten.
+ *
+ * `liste` sagt, wo der Fall steht -- `{ kennung, pfad, index }`, das Bauteil,
+ * seine Liste («knickfaelle», «verformung.faelle») und die Stelle darin.
+ * Dann weist das Namensfeld einen Namen ab, der dort schon vergeben ist, und
+ * sagt, wo der andere steht (`nameFrei`). Ohne `liste` darf jeder Name
+ * doppelt stehen: die Schichten einer Setzung.
  */
 export function fallzeile({
-  fall, aendern, was, nameTitel, zahlen, entfernen, entfernenTitel,
+  fall, aendern, was, nameTitel, zahlen, entfernen, entfernenTitel, liste = null,
   oben = null, unten = null, spalten = zahlen.length, klasse = '', vorn = null,
 }) {
   const an = vorn !== null || fall.aktiv !== false;
@@ -43,6 +51,7 @@ export function fallzeile({
     schalter,
     namensfeld({
       wert: fall.name, titel: nameTitel, klasse: '.fall-name',
+      pruefen: liste ? (name) => nameFrei(liste, name) : undefined,
       setzen: (name) => aendern((x) => { x.name = name; }),
     }),
     oben ? el('div.fall-oben', {}, [oben]) : null,
@@ -50,6 +59,19 @@ export function fallzeile({
     unten ? el('div.fall-unten', {}, unten) : null,
     el('button.weg.fall-weg', { text: '×', title: entfernenTitel, on: { click: entfernen } }),
   ]);
+}
+
+/**
+ * Warum der Kern den Namen an dieser Stelle abwiese -- leer, wenn er ihn
+ * nimmt; dieselbe Regel wie vor dem Rechnen (`fallname` im Dienst). Antwortet
+ * der Kern nicht, gilt der Name: vor dem Rechnen fragt er ohnehin.
+ */
+async function nameFrei({ kennung, pfad, index }, name) {
+  try {
+    return (await api.fallname(zustand.projekt, kennung, pfad, index, name)).grund;
+  } catch {
+    return '';
+  }
 }
 
 /**

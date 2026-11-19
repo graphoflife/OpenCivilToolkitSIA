@@ -1,5 +1,5 @@
 ---
-erzeugt: ac5d335598a1
+erzeugt: fe16d856914f
 art: modul
 tags: [modul]
 ---
@@ -476,6 +476,14 @@ mit einer unmoeglichen Grenze soll sich oeffnen und korrigieren
 lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c \< 0 und
 x/d = 0.9.
 
+#### QuerschnittsanalyseEintrag.fallnamen
+
+```python
+def fallnamen(self) -> List[Fallnamen]
+```
+
+Die Listen, deren Namen sich unterscheiden muessen -- wie bei der Platte.
+
 #### QuerschnittsanalyseEintrag.lastfall
 
 ```python
@@ -525,6 +533,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 - [[opencivil.core.einheiten]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
 - [[opencivil.querschnitt.geometrie]]

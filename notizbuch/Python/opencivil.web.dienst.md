@@ -1,5 +1,5 @@
 ---
-erzeugt: 615a24594971
+erzeugt: 2acf1f8295a7
 art: modul
 tags: [modul]
 ---
@@ -252,6 +252,19 @@ Wer auf einen Eintrag zeigt: `{projekt, kennung}` hinein, die Bauteile
 mit Kennung und Name hinaus ([[opencivil.projekt.projekt#Projekt.verweise|verweise]]).
 Die Oberflaeche fragt, bevor sie ein Material oder Bauteil loescht --
 eine eigene Liste dort kannte den Buegelstahl nicht.
+
+### fallname
+
+```python
+def fallname(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Ob ein Fall so heissen darf: `{projekt, kennung, pfad, index, name}`
+hinein -- das Bauteil, die Liste darin (`knickfaelle`,
+`verformung.faelle`), der Fall und der neue Name --, `{grund}` hinaus,
+leer, wenn er darf. Das Namensfeld fragt, bevor es einen Namen
+uebernimmt; die Regel ist dieselbe wie vor dem Rechnen
+([[opencivil.projekt.fallnamen|fallnamen]]).
 
 ### geometrie
 

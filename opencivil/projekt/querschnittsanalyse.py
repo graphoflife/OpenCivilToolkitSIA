@@ -44,9 +44,10 @@ from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste, Gebrauchswahl,
-    KnickEintrag, Querschnittsangaben, SpannungsfallEintrag, eindeutig, groesste_neigung,
-    kleinste_neigung,
+    KnickEintrag, Querschnittsangaben, SpannungsfallEintrag, groesste_neigung,
+    kleinste_neigung, spannungsfallnamen,
 )
+from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.core.einheiten import MM
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, neue_kennung
@@ -613,9 +614,6 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c < 0 und
         x/d = 0.9.
         """
-        eindeutig((f.name for f in self.lastfaelle), wo, "Lastfall")
-        for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
-            liste.namen_pruefen(wo, self.lastfaelle, wort)
         # Je Material eine Wahl. Zwei fuer dasselbe -- und welche gilt, hinge
         # davon ab, wer liest: der Aufbau nahm die letzte, die Maske die erste.
         gewaehlt = set()
@@ -625,8 +623,16 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
                     f"{wo}: für das Material '{w.material}' stehen zwei "
                     f"Werkstoffwahlen – es braucht genau eine.")
             gewaehlt.add(w.material)
-        eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
-        eindeutig((f.name for f in self.knickfaelle), wo, "Knicknachweis")
+
+    def fallnamen(self) -> List[Fallnamen]:
+        """Die Listen, deren Namen sich unterscheiden muessen -- wie bei der Platte."""
+        return [
+            Fallnamen.aus("lastfaelle", "Lastfall", self.lastfaelle),
+            self.haeufig.namensliste("haeufig", self.lastfaelle, "häufige"),
+            self.quasistaendig.namensliste("quasistaendig", self.lastfaelle, "quasi-ständige"),
+            spannungsfallnamen(self.spannungsfaelle),
+            Fallnamen.aus("knickfaelle", "Knicknachweis", self.knickfaelle),
+        ]
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""

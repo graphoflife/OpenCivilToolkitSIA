@@ -6537,6 +6537,7 @@
         "_feldnamen",
         "Beschreibung",
         "Beschreibung.regeln",
+        "Beschreibung.fallnamen",
         "Beschreibung.si",
         "Beschreibung.als_dict",
         "Beschreibung.aus_dict",
@@ -6575,8 +6576,8 @@
         "abgeleiteter_fallname",
         "SpannungsfallEintrag",
         "SpannungsfallEintrag.wahl",
+        "spannungsfallnamen",
         "GebrauchsfallEintrag",
-        "eindeutig",
         "RechenwahlEintrag",
         "RechenwahlEintrag.wahl",
         "Gebrauchswahl",
@@ -6584,7 +6585,7 @@
         "KnickWiderstandswahl",
         "Gebrauchsliste",
         "Gebrauchsliste.lastfall",
-        "Gebrauchsliste.namen_pruefen",
+        "Gebrauchsliste.namensliste",
         "Querschnittsangaben",
         "KombinationEintrag"
       ]
@@ -6606,6 +6607,19 @@
       ]
     },
     {
+      "name": "opencivil.projekt.fallnamen",
+      "pfad": "Python/opencivil.projekt.fallnamen.md",
+      "art": "modul",
+      "kurz": "Die Namen der Faelle eines Bauteils -- je Liste verschieden, auch als Kennung.",
+      "stichworte": [
+        "Fallnamen",
+        "Fallnamen.aus",
+        "Fallnamen.grund",
+        "Fallnamen.pruefen",
+        "Fallnamen._grund"
+      ]
+    },
+    {
       "name": "opencivil.projekt.grundbruch",
       "pfad": "Python/opencivil.projekt.grundbruch.md",
       "art": "modul",
@@ -6615,6 +6629,7 @@
         "GrundbruchEintrag",
         "GrundbruchEintrag.neu",
         "GrundbruchEintrag.kombination",
+        "GrundbruchEintrag.fallnamen",
         "GrundbruchEintrag.regeln"
       ]
     },
@@ -6689,6 +6704,7 @@
         "PfahlEintrag.schicht",
         "PfahlEintrag.kombination",
         "PfahlEintrag.boden_unter_dem_fuss",
+        "PfahlEintrag.fallnamen",
         "PfahlEintrag.regeln",
         "PfahlEintrag.fehlender_baugrund",
         "PfahlEintrag._festigkeiten",
@@ -6707,6 +6723,7 @@
         "QuerschnittEintrag.materialien",
         "QuerschnittEintrag.bezuege",
         "QuerschnittEintrag.regeln",
+        "QuerschnittEintrag.fallnamen",
         "QuerschnittEintrag.ohne_lastfaelle",
         "QuerschnittEintrag.einwirkung",
         "QuerschnittEintrag.knickfall",
@@ -6799,6 +6816,7 @@
         "QuerschnittsanalyseEintrag.lage",
         "QuerschnittsanalyseEintrag.vorlage_einsetzen",
         "QuerschnittsanalyseEintrag.regeln",
+        "QuerschnittsanalyseEintrag.fallnamen",
         "QuerschnittsanalyseEintrag.lastfall",
         "QuerschnittsanalyseEintrag.knickfall",
         "QuerschnittsanalyseEintrag.spannungsfall",
@@ -8154,6 +8172,7 @@
         "dateiname",
         "bewehrung_suchen",
         "verweise",
+        "fallname",
         "geometrie",
         "analysediagramme",
         "_balkensystem",

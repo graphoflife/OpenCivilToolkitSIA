@@ -1,5 +1,5 @@
 ---
-erzeugt: 734a6e7e2475
+erzeugt: bfa5ab8c2e37
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -139,6 +139,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
+    - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils -- je Liste verschieden, auch als Kennung.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
     - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.

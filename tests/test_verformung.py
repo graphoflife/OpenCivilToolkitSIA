@@ -274,10 +274,11 @@ class TestBeschreibung(unittest.TestCase):
             projekt.aufbauen()
         for aendern, satz in (
                 (lambda v: v.faelle.append(VerformungsfallEintrag("Feld")),
-                 "der Name 'Feld' ist zweimal als Verformungsfall vergeben"),
+                 "«Feld» ist als Verformungsfall schon vergeben."),
                 (lambda v: v.faelle.extend([VerformungsfallEintrag("Feld A"),
                                             VerformungsfallEintrag("Feld-A")]),
-                 "'Feld A' und 'Feld-A' unterscheiden sich nur in Satz- oder Leerzeichen"),
+                 "«Feld-A» ist als Verformungsfall schon vergeben, als «Feld A» – die "
+                 "beiden unterscheiden sich nur in Satz- oder Leerzeichen."),
                 (lambda v: setattr(v, "kriechzahl", -0.5),
                  "verformung: Kriechzahl φ kann nicht negativ sein, angegeben ist -0.5.")):
             with self.subTest(satz=satz):

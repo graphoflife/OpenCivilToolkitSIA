@@ -411,6 +411,25 @@ def verweise(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
                          for e in projekt.verweise(kennung)]}
 
 
+def fallname(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Ob ein Fall so heissen darf: ``{projekt, kennung, pfad, index, name}``
+    hinein -- das Bauteil, die Liste darin (``knickfaelle``,
+    ``verformung.faelle``), der Fall und der neue Name --, ``{grund}`` hinaus,
+    leer, wenn er darf. Das Namensfeld fragt, bevor es einen Namen
+    uebernimmt; die Regel ist dieselbe wie vor dem Rechnen
+    (:mod:`~opencivil.projekt.fallnamen`).
+    """
+    bauteil = _projekt(rumpf).bauteil(str(rumpf.get("kennung") or ""))
+    pfad, index, name = rumpf.get("pfad"), rumpf.get("index"), rumpf.get("name")
+    if not isinstance(index, int) or not isinstance(name, str):
+        raise DienstFehler(400, "Es fehlen der Fall und sein neuer Name.")
+    for liste in bauteil.fallnamen():
+        if liste.pfad == pfad and 0 <= index < len(liste.namen):
+            return {"grund": liste.grund(index, name)}
+    raise DienstFehler(400, f"Einen Fall {index + 1} unter '{pfad}' hat {bauteil.name} nicht.")
+
+
 def geometrie(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Was das Zeichenfenster einer Querschnittsanalyse zeigt -- ohne Nachweise.
@@ -665,6 +684,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "beispiel": beispiel,
     "pruefen": pruefen,
     "verweise": verweise,
+    "fallname": fallname,
     "rechnen": rechnen,
     "querkraftkurven": querkraftkurven,
     "bericht": bericht,

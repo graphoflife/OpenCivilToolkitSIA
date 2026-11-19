@@ -124,6 +124,12 @@ export const api = {
   pruefen: (projekt) => ruf('pruefen', { projekt }),
   /** Die Bauteile, die auf diese Kennung zeigen -- als Material oder als Querschnitt. */
   verweise: (projekt, kennung) => ruf('verweise', { projekt, kennung }),
+  /**
+   * Warum ein Fall nicht so heissen darf -- `{grund}`, leer, wenn er darf: der
+   * Fall `index` der Liste `pfad` («knickfaelle») im Bauteil `kennung`.
+   */
+  fallname: (projekt, kennung, pfad, index, name) =>
+    ruf('fallname', { projekt, kennung, pfad, index, name }),
   /** Ohne `ziele` alles; mit `ziele` genau diese samt dem, was sie brauchen. */
   rechnen: (projekt, ziele, n_ed) => ruf('rechnen', { projekt, ziele, n_ed }),
   /** M-V-Kurven für selbst gewählte Normalkräfte: {Kennung: N_Ed in kN}. */

@@ -72,7 +72,8 @@ export function materialliste({
  * ewig «wird gerechnet» sagen.
  *
  * Was getippt ist, gilt, wie getippt. `pruefen` sagt, was ein Name sonst
- * nicht sein darf, und gibt den Grund zurück -- leer heisst: er darf.
+ * nicht sein darf, und gibt den Grund zurück -- leer heisst: er darf; auch
+ * als Versprechen, wenn erst der Kern es weiss (ein Fallname, `fallzeile`).
  * Gleiche Namen von Bauteilen meldet der Kern beim Eintrag, der sie hat.
  */
 export function namensfeld({
@@ -81,9 +82,9 @@ export function namensfeld({
   return el(`input${klasse}`, {
     type: 'text', value: wert ?? '', title: titel, disabled: gesperrt,
     on: {
-      change: (e) => {
+      change: async (e) => {
         const name = e.target.value;
-        const grund = name.trim() ? pruefen(name) : 'Ein Name kann nicht leer sein';
+        const grund = name.trim() ? await pruefen(name) : 'Ein Name kann nicht leer sein';
         if (!grund) {
           setzen(name);
           return;

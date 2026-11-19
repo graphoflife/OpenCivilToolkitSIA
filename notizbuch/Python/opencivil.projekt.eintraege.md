@@ -1,5 +1,5 @@
 ---
-erzeugt: ed9a94edf8ea
+erzeugt: f5a9492a0b83
 art: modul
 tags: [modul]
 ---
@@ -76,6 +76,17 @@ def regeln(self, wo: str) -> None
 ```
 
 Die Regeln ueber mehrere Felder -- ohne eigene keine. `wo` nennt den Eintrag.
+
+#### Beschreibung.fallnamen
+
+```python
+def fallnamen(self) -> List[Fallnamen]
+```
+
+Die Listen von Faellen, deren Namen sich unterscheiden muessen
+([[opencivil.projekt.fallnamen|fallnamen]]) -- ohne eigene keine. Geprueft
+vor den Regeln ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]) und
+vom Namensfeld, bevor es einen Namen uebernimmt.
 
 #### Beschreibung.si
 
@@ -513,6 +524,16 @@ def wahl(self) -> Rechenwahl
 
 Womit die Analyse rechnet.
 
+### spannungsfallnamen
+
+```python
+def spannungsfallnamen(faelle: Iterable[SpannungsfallEintrag]) -> Fallnamen
+```
+
+Die Namen der Spannung-Dehnung-Analysen, bei der Platte wie am
+gezeichneten Querschnitt -- eine Liste fuer sechs Fenster, darum sagt die
+Meldung, in welchem der andere steht.
+
 ### GebrauchsfallEintrag
 
 ```python
@@ -530,32 +551,6 @@ haeufig oder quasi-staendig ist, sagt die Liste, in der er steht.
 - `M_Ed: float = 0.0`
 - `N_Ed: float = 0.0`
 - `aktiv: bool = True` – Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen.
-
-### eindeutig
-
-```python
-def eindeutig(namen: Iterable[str], wo: str, was: str) -> None
-```
-
-Fallnamen muessen je Liste eindeutig sein -- auch als Kennung.
-
-Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab -- M-N,
-Querkraft und Stahlspannung alle drei. Zwei Kombinationen gleichen
-Namens fielen darum auf einen Eintrag zusammen: der zweite ueberschrieb
-den ersten, und in der Tabelle fehlte eine Zeile. Kein Fehler, keine
-Warnung, eine Zahl weniger.
-
-Verschiedene Namen koennen dieselbe Kennung ergeben: «Wand A» und
-«Wand-A» werden beide zu «Wand_A» ([[opencivil.core.wert#kennung_aus|kennung_aus]]). Das Rechenwerk
-wiese den zweiten zurueck, aber mit einer Meldung ueber Wert-IDs, die an
-der Maske niemand versteht. Bis 2026-10-17 pruefte das nur drei der neun
-Listen.
-
-Gemeldet statt umbenannt: welcher der beiden gemeint war, weiss nur der
-Benutzer, und ein automatisch angehaengtes «(2)» stuende danach in seinem
-Bericht. Gefragt wird vor dem Rechnen, nicht beim Oeffnen: zwei gleiche
-Namen sind schnell getippt, und ein Projekt, das sich darum nicht mehr
-oeffnen liesse, waere schlimmer als eine Meldung beim Rechnen.
 
 ### RechenwahlEintrag
 
@@ -663,18 +658,19 @@ def lastfall(self, name: str, **werte: float)
 
 Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv.
 
-#### Gebrauchsliste.namen_pruefen
+#### Gebrauchsliste.namensliste
 
 ```python
-def namen_pruefen(self, wo: str, kombinationen: List[Any], wort: str) -> None
+def namensliste(self, feld: str, kombinationen: List[Any], wort: str) -> Fallnamen
 ```
 
-Die Namen dieser Liste, vor dem Rechnen (siehe [[opencivil.projekt.eintraege#eindeutig|eindeutig]]). Je
-Liste fuer sich: die beiden Listen landen in getrennten Nachweisen und
-damit in getrennten ID-Raeumen, ein Fall «Dauer» darf in beiden stehen.
-`kombinationen` sind die Faelle der Tragsicherheit, aus denen
-abgeleitet wird -- ihre eigenen Namen hat das Bauteil schon geprueft.
-`wo` nennt das Bauteil.
+Die Namen dieser Liste ([[opencivil.projekt.fallnamen#Fallnamen|Fallnamen]]),
+unter `feld` im Bauteil. Je Liste fuer sich: die beiden Listen
+landen in getrennten Nachweisen und damit in getrennten ID-Raeumen,
+ein Fall «Dauer» darf in beiden stehen. Schon vergeben sind die aus
+den `kombinationen` der Tragsicherheit abgeleiteten: sie tragen den
+Namen ihrer Kombination mit angehaengtem Anteil, und wer einen eigenen
+Fall genau so nennt, traefe denselben Schluessel.
 
 ### Querschnittsangaben
 
@@ -738,7 +734,6 @@ Eine zu pruefende Schnittgroessenkombination.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
-- [[opencivil.core.wert]]
 - [[opencivil.material.arten]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
@@ -746,6 +741,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.verformung]]
+- [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
