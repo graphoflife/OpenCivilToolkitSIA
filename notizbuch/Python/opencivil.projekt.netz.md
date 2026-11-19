@@ -1,5 +1,5 @@
 ---
-erzeugt: 3aa9e1c7bc37
+erzeugt: fa0b0d29fa6d
 art: modul
 tags: [modul]
 ---
@@ -12,10 +12,14 @@ tags: [modul]
 Eine Zeichnung aus Knoten und Elementen, die auf sie verweisen, braucht zwei
 Regeln. Jede steht hier einmal:
 
-1. **Eine Kennung kommt nie wieder.** Die naechste ist die groesste bisherige
-   plus eins, je Vorsilbe: nach K1, K2, K7 kommt K8, nicht K3. Eine Meldung
-   oder eine Auswahl, die auf ein geloeschtes Element zeigt, zeigt dann ins
-   Leere -- und nicht auf ein anderes, das zufaellig dieselbe Kennung erbte.
+1. **Eine Kennung kommt nie wieder** (Benutzer, 2026-11-19). Wer Kennungen
+   vergibt -- das Projekt, ein Bauteil --, merkt sich je Vorsilbe die
+   hoechste je vergebene Nummer (`vergeben`); die neue liegt darueber. Nach
+   K1, K2, K7 kommt K8, nicht K3 -- und nach dem Loeschen von K8 kommt K9,
+   nicht wieder K8. Bis 2026-11-19 zaehlte nur, was noch da war. Eine
+   Meldung, eine Auswahl oder eine Diagrammzeile, die auf ein geloeschtes
+   Element zeigt, zeigt dann ins Leere -- und nicht auf ein anderes, das
+   zufaellig dieselbe Kennung erbte.
 2. **Gleiche Koordinaten sind ein Knoten.** Wer einen Punkt anlegt, der genau
    auf einem bestehenden Knoten liegt, bekommt diesen. So haengen Elemente,
    die sich in einem Punkt treffen, am selben Knoten und bewegen sich
@@ -40,13 +44,15 @@ def nummer(kennung: str, vorsilbe: str) -> Optional[int]
 
 Die Zahl hinter der Vorsilbe -- `None`, wenn die Kennung anders gebaut ist.
 
-### naechste_kennung
+### neue_kennung
 
 ```python
-def naechste_kennung(vorhandene: Iterable[str], vorsilbe: str) -> str
+def neue_kennung(besitzer: Any, vorsilbe: str, vorhandene: Iterable[str]) -> str
 ```
 
-Die naechste Kennung mit dieser Vorsilbe: die groesste bisherige plus eins.
+Eine neue Kennung mit dieser Vorsilbe -- ueber jeder, die `besitzer` je
+vergeben hat, und ueber jeder der `vorhandene`n: eine Datei, die noch
+keine Zaehlung kennt, hat nur sie. Der Besitzer merkt sich die neue.
 
 ### Netz
 
@@ -56,8 +62,9 @@ class Netz
 
 Die Knoten einer Zeichnung -- mit dem Zusammenfuehren gleicher Koordinaten.
 
-`knoten` ist die Liste der Beschreibung; neue Knoten werden an sie
-angehaengt. Jeder Knoten hat `kennung` und seine Koordinaten -- wie sie
+`besitzer` ist das Bauteil: neue Knoten werden an seine Liste
+`knoten` angehaengt, ihre Kennung zaehlt es ([[opencivil.projekt.netz#neue_kennung|neue_kennung]]).
+Jeder Knoten hat `kennung` und seine Koordinaten -- wie sie
 heissen, sagt `achsen`: `y` und `z` im Querschnitt, `x` und `z`
 im Balkensystem, `x`, `y` und `z` im 3D-Balkensystem. `neu` baut
 einen aus Kennung und Lage -- so bleibt der Baukasten bei der Klasse, die
@@ -85,5 +92,6 @@ Wo der Knoten liegt -- `None`, wenn es ihn nicht gibt.
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.faelle]]
+- [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.staebe]]

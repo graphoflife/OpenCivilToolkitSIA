@@ -144,7 +144,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
                         durchmesser=10.0, abstand_x=250.0,
                         art_y="anzahl", anzahl_y=4.0,
                         alpha_min=35, alpha_max=42),
-                    richtung_lage1="x", richtung_lage4="x",
+                    richtung_lage1="x", richtung_lage4="x", vergeben={"K": 7},
                     lagen=[
                         LageEintrag(
                             grund=PostenEintrag(durchmesser=20.0, abstand=125.0),

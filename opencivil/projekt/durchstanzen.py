@@ -32,7 +32,7 @@ from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.lesen import bereich
-from opencivil.projekt.netz import Netz, naechste_kennung
+from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.querschnitt.platte import Richtung
 
 
@@ -140,14 +140,14 @@ class DurchstanzEintrag(BauteilEintrag):
 
     def netz(self) -> Netz:
         """Die Knoten, mit dem Zusammenführen gleicher Koordinaten -- wie im Zeichenfenster."""
-        return Netz(self.knoten, lambda k, x, y: GrundrissknotenEintrag(kennung=k, x=x, y=y),
+        return Netz(self, lambda k, x, y: GrundrissknotenEintrag(kennung=k, x=x, y=y),
                     achsen=("x", "y"))
 
     def aussparung(self, punkte: Sequence[Sequence[float]]) -> AussparungEintrag:
         """Eine Aussparung aus ihren Ecken ``[x, y]`` in mm."""
         netz = self.netz()
         eintrag = AussparungEintrag(
-            kennung=naechste_kennung([a.kennung for a in self.aussparungen], "A"),
+            kennung=neue_kennung(self, "A", [a.kennung for a in self.aussparungen]),
             knoten=[netz.an(x, y) for x, y in punkte])
         self.aussparungen.append(eintrag)
         return eintrag

@@ -72,10 +72,11 @@ def beiwerte(kombinationen: Sequence[LastkombinationEintrag], lastfaelle: Sequen
     heraus: List[Tuple[str, Dict[str, float]]] = []
     meldungen: List[Meldung] = []
     for k in kombinationen:
-        fremd = [lf for lf in k.faktoren if lf not in name_von]
-        if fremd:
-            meldungen.append(Meldung(f"Kombination «{k.name}»: einen Lastfall «{fremd[0]}» gibt es nicht – "
-                                     f"sein Beiwert zählt nicht.", fehler=False))
+        if any(lf not in name_von for lf in k.faktoren):
+            # Ohne die Kennung: der Lastfall hat keinen Namen mehr, und eine
+            # Kennung sieht der Benutzer nirgends (Benutzer, 2026-11-19).
+            meldungen.append(Meldung(f"Kombination «{k.name}»: ein Beiwert gehört zu einem Lastfall, "
+                                     f"den es nicht gibt – er zählt nicht.", fehler=False))
         heraus.append((k.name, {name_von[lf]: beiwert for lf, beiwert in k.faktoren.items()
                                 if lf in name_von}))
     return heraus, meldungen

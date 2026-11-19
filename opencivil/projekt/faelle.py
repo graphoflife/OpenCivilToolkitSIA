@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Tuple
 
 from opencivil.projekt.eintraege import Beschreibung
-from opencivil.projekt.netz import naechste_kennung
+from opencivil.projekt.netz import neue_kennung
 
 
 def kennung_von(eintrag: Any) -> str:
@@ -54,7 +54,7 @@ class MitFaellen:
     kombinationen: List[LastkombinationEintrag]
 
     def lastfall(self, name: str, *, eigengewicht: bool = False) -> LastfallEintrag:
-        eintrag = LastfallEintrag(kennung=naechste_kennung((lf.kennung for lf in self.lastfaelle), "LF"),
+        eintrag = LastfallEintrag(kennung=neue_kennung(self, "LF", (lf.kennung for lf in self.lastfaelle)),
                                   name=name, eigengewicht=eigengewicht)
         self.lastfaelle.append(eintrag)
         return eintrag
@@ -62,7 +62,7 @@ class MitFaellen:
     def kombination(self, name: str, *faktoren: Tuple[Any, float]) -> LastkombinationEintrag:
         """Eine Kombination -- je Lastfall (Eintrag oder Kennung) ein Beiwert: ``(g, 1.35), (w, 1.5)``."""
         eintrag = LastkombinationEintrag(
-            kennung=naechste_kennung((k.kennung for k in self.kombinationen), "LK"), name=name,
+            kennung=neue_kennung(self, "LK", (k.kennung for k in self.kombinationen)), name=name,
             faktoren={kennung_von(lf): float(beiwert) for lf, beiwert in faktoren})
         self.kombinationen.append(eintrag)
         return eintrag

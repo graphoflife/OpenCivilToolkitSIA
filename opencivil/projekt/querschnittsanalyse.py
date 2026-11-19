@@ -50,7 +50,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.core.einheiten import MM
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
-from opencivil.projekt.netz import Netz, naechste_kennung
+from opencivil.projekt.netz import Netz, neue_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
 SCHNITTE = range(1, 9)
@@ -510,7 +510,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
 
     def netz(self) -> Netz:
         """Die Knoten zum Weiterzeichnen: gleiche Koordinaten sind ein Knoten."""
-        return Netz(self.knoten, neu=lambda kennung, y, z: KnotenEintrag(kennung, y, z))
+        return Netz(self, neu=lambda kennung, y, z: KnotenEintrag(kennung, y, z))
 
     def _knoten(self, netz: Netz, ort: Ort) -> str:
         """Ein Knoten aus einem Punkt ``[y, z]`` -- oder die Kennung, wenn schon eine dasteht."""
@@ -523,7 +523,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         """Die naechste Kennung -- alle Linien zaehlen gemeinsam, ob Bewehrung, Wand oder Hilfslinie."""
         listen = {"F": [self.flaechen], "S": [self.staebe],
                   "L": [self.stablinien, self.schubwaende, self.hilfslinien]}[vorsilbe]
-        return naechste_kennung((e.kennung for liste in listen for e in liste), vorsilbe)
+        return neue_kennung(self, vorsilbe, (e.kennung for liste in listen for e in liste))
 
     def polygon(self, punkte: Sequence[Ort], material: str = "") -> FlaecheEintrag:
         """Ein Polygon aus Ecken ``[y, z]`` in mm; ohne Material eine Aussparung."""

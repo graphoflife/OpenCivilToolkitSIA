@@ -5,10 +5,14 @@ VERANTWORTUNG:
 Eine Zeichnung aus Knoten und Elementen, die auf sie verweisen, braucht zwei
 Regeln. Jede steht hier einmal:
 
-1. **Eine Kennung kommt nie wieder.** Die naechste ist die groesste bisherige
-   plus eins, je Vorsilbe: nach K1, K2, K7 kommt K8, nicht K3. Eine Meldung
-   oder eine Auswahl, die auf ein geloeschtes Element zeigt, zeigt dann ins
-   Leere -- und nicht auf ein anderes, das zufaellig dieselbe Kennung erbte.
+1. **Eine Kennung kommt nie wieder** (Benutzer, 2026-11-19). Wer Kennungen
+   vergibt -- das Projekt, ein Bauteil --, merkt sich je Vorsilbe die
+   hoechste je vergebene Nummer (``vergeben``); die neue liegt darueber. Nach
+   K1, K2, K7 kommt K8, nicht K3 -- und nach dem Loeschen von K8 kommt K9,
+   nicht wieder K8. Bis 2026-11-19 zaehlte nur, was noch da war. Eine
+   Meldung, eine Auswahl oder eine Diagrammzeile, die auf ein geloeschtes
+   Element zeigt, zeigt dann ins Leere -- und nicht auf ein anderes, das
+   zufaellig dieselbe Kennung erbte.
 2. **Gleiche Koordinaten sind ein Knoten.** Wer einen Punkt anlegt, der genau
    auf einem bestehenden Knoten liegt, bekommt diesen. So haengen Elemente,
    die sich in einem Punkt treffen, am selben Knoten und bewegen sich
@@ -35,44 +39,47 @@ def nummer(kennung: str, vorsilbe: str) -> Optional[int]:
     return int(rest) if kennung.startswith(vorsilbe) and rest.isdigit() else None
 
 
-def naechste_kennung(vorhandene: Iterable[str], vorsilbe: str) -> str:
-    """Die naechste Kennung mit dieser Vorsilbe: die groesste bisherige plus eins."""
-    groesste = max((n for n in (nummer(k, vorsilbe) for k in vorhandene) if n is not None),
-                   default=0)
-    return f"{vorsilbe}{groesste + 1}"
+def neue_kennung(besitzer: Any, vorsilbe: str, vorhandene: Iterable[str]) -> str:
+    """
+    Eine neue Kennung mit dieser Vorsilbe -- ueber jeder, die ``besitzer`` je
+    vergeben hat, und ueber jeder der ``vorhandene``n: eine Datei, die noch
+    keine Zaehlung kennt, hat nur sie. Der Besitzer merkt sich die neue.
+    """
+    n = max([besitzer.vergeben.get(vorsilbe, 0),
+             *(nummer(k, vorsilbe) or 0 for k in vorhandene)]) + 1
+    besitzer.vergeben[vorsilbe] = n
+    return f"{vorsilbe}{n}"
 
 
 class Netz:
     """
     Die Knoten einer Zeichnung -- mit dem Zusammenfuehren gleicher Koordinaten.
 
-    ``knoten`` ist die Liste der Beschreibung; neue Knoten werden an sie
-    angehaengt. Jeder Knoten hat ``kennung`` und seine Koordinaten -- wie sie
+    ``besitzer`` ist das Bauteil: neue Knoten werden an seine Liste
+    ``knoten`` angehaengt, ihre Kennung zaehlt es (:func:`neue_kennung`).
+    Jeder Knoten hat ``kennung`` und seine Koordinaten -- wie sie
     heissen, sagt ``achsen``: ``y`` und ``z`` im Querschnitt, ``x`` und ``z``
     im Balkensystem, ``x``, ``y`` und ``z`` im 3D-Balkensystem. ``neu`` baut
     einen aus Kennung und Lage -- so bleibt der Baukasten bei der Klasse, die
     die Beschreibung speichert, ohne sie zu kennen.
     """
 
-    def __init__(self, knoten: List[Any], neu: Callable[..., Any], vorsilbe: str = "K",
+    def __init__(self, besitzer: Any, neu: Callable[..., Any], vorsilbe: str = "K",
                  achsen: Tuple[str, ...] = ("y", "z")) -> None:
-        self.knoten = knoten
+        self.besitzer = besitzer
+        self.knoten: List[Any] = besitzer.knoten
         self.neu = neu
         self.vorsilbe = vorsilbe
         self.achsen = achsen
         self._an: Dict[Tuple[float, ...], str] = {}
         self._lage: Dict[str, Tuple[float, ...]] = {}
-        self._groesste = 0
-        for k in knoten:
+        for k in self.knoten:
             self._merken(k)
 
     def _merken(self, k: Any) -> None:
         lage = tuple(float(getattr(k, achse)) for achse in self.achsen)
         self._an.setdefault(lage, k.kennung)
         self._lage[k.kennung] = lage
-        n = nummer(k.kennung, self.vorsilbe)
-        if n is not None:
-            self._groesste = max(self._groesste, n)
 
     def an(self, *koordinaten: float) -> str:
         """Die Kennung des Knotens an diesen Koordinaten -- angelegt, wenn es dort noch keinen gibt."""
@@ -81,8 +88,7 @@ class Netz:
             raise ValueError(f"Ein Knoten hat {len(self.achsen)} Koordinaten "
                              f"({', '.join(self.achsen)}), nicht {len(lage)}.")
         if lage not in self._an:
-            self._groesste += 1
-            k = self.neu(f"{self.vorsilbe}{self._groesste}", *lage)
+            k = self.neu(neue_kennung(self.besitzer, self.vorsilbe, self._lage), *lage)
             self.knoten.append(k)
             self._merken(k)
         return self._an[lage]

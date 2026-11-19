@@ -11,8 +11,8 @@
  *
  * Zwei Regeln gelten wie im Kern (`opencivil/projekt/netz.py`), damit das
  * Fenster nichts anlegt, was der Kern anders sähe: eine Kennung kommt nie
- * wieder (die grösste plus eins), und genau gleiche Koordinaten sind ein
- * Knoten. Der Kern hängt nicht von diesen Funktionen ab; sie sind
+ * wieder (`neueKennung`: die Zeichnung merkt sich je Vorsilbe die höchste
+ * je vergebene), und genau gleiche Koordinaten sind ein Knoten. Der Kern hängt nicht von diesen Funktionen ab; sie sind
  * Eingabehilfe.
  *
  * EINE ECKE GEHÖRT IHREM ELEMENT:
@@ -42,6 +42,8 @@
  * `veraenderer`, der das Projekt ändert.
  */
 
+import { neueKennung, nummer } from './zustand.js';
+
 /** Auf einen Millionstel Millimeter: getippte Abstände sollen keine Rundungsreste hinterlassen. */
 export const rund = (x) => Math.round(x * 1e6) / 1e6;
 
@@ -63,13 +65,6 @@ const KNOTEN = 'K';
 /** «Knoten K3»: ein Knoten heisst in jeder Zeichnung nach seiner Kennung -- für anderes null. */
 export function knotenname(kennung) {
   return nummer(kennung, KNOTEN) === null ? null : `Knoten ${kennung}`;
-}
-
-/** Die Zahl hinter der Vorsilbe -- oder null. */
-function nummer(kennung, vorsilbe) {
-  if (typeof kennung !== 'string' || !kennung.startsWith(vorsilbe)) return null;
-  const rest = kennung.slice(vorsilbe.length);
-  return /^\d+$/.test(rest) ? Number(rest) : null;
 }
 
 /**
@@ -142,13 +137,9 @@ export function cadModell({ arten, achsen, verbunden = false }) {
   }
 
   function naechsteKennung(z, vorsilbe) {
-    let groesste = 0;
     const listen = vorsilbe === KNOTEN ? [z.knoten || []]
       : arten.filter((x) => x.vorsilbe === vorsilbe).map((x) => z[x.liste] || []);
-    for (const liste of listen) {
-      for (const e of liste) groesste = Math.max(groesste, nummer(e.kennung, vorsilbe) ?? 0);
-    }
-    return `${vorsilbe}${groesste + 1}`;
+    return neueKennung(z, vorsilbe, listen.flat());
   }
 
   /** Der Knoten an `p` -- angelegt, wenn es dort noch keinen gibt. */

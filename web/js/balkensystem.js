@@ -40,8 +40,8 @@ import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { diagrammzeilen, lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import { rechenwahlZeile } from './nachweise.js';
 import {
-  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsteKennung,
-  naechsterName, zustand,
+  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsterName,
+  neueKennung, zustand,
 } from './zustand.js';
 
 // ===========================================================================
@@ -229,7 +229,7 @@ function materialienInhalt(system) {
   };
   const neu = (stoffart) => aendern((s) => {
     s.stabmaterialien.push(ausVorlage(klasse, {
-      kennung: naechsteKennung(s.stabmaterialien, 'M'), art: stoffart,
+      kennung: neueKennung(s, 'M', s.stabmaterialien), art: stoffart,
       ...(stoffart === 'eigen' ? { name: naechsterName('Material', s.stabmaterialien) }
         : { stoff: stoffe(stoffart)[0]?.kennung || '' }),
     }));
@@ -561,8 +561,9 @@ function querschnittFenster(system, kennung) {
 function querschnitteInhalt(system) {
   const klasse = systemkatalog(systemart(system.kennung), 'klassen', 'querschnitt');
   const neu = () => {
-    const kennung = naechsteKennung(system.querschnitte, 'Q');
+    let kennung;
     eintragAendern(system.kennung, (s) => {
+      kennung = neueKennung(s, 'Q', s.querschnitte);
       s.querschnitte.push(ausVorlage(klasse, { kennung, name: naechsterName('Querschnitt', s.querschnitte) }));
     });
     fensterOeffnen(fensterVon(kennung));

@@ -42,7 +42,7 @@ from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.faelle import kennung_von
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
-from opencivil.projekt.netz import Netz, naechste_kennung
+from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.stabwerk import profiltabelle
 from opencivil.stabwerk import querschnitte as qs
 from opencivil.stabwerk.modell import Lastart
@@ -361,13 +361,13 @@ class MitStaeben:
     # -- Zeichnen ohne Oberflaeche --------------------------------------------
 
     def netz(self) -> Netz:
-        return Netz(self.knoten, neu=self.KNOTEN, achsen=self.ACHSEN)
+        return Netz(self, neu=self.KNOTEN, achsen=self.ACHSEN)
 
     def _knoten(self, netz: Netz, ort: Ort) -> str:
         return ort if isinstance(ort, str) else netz.an(*ort)
 
     def _neue_kennung(self, liste: Sequence[Any], vorsilbe: str) -> str:
-        return naechste_kennung((e.kennung for e in liste), vorsilbe)
+        return neue_kennung(self, vorsilbe, (e.kennung for e in liste))
 
     def linie(self, von: Ort, bis: Ort, *, querschnitt: Any = None, material: Any = None,
               **felder: Any) -> Any:
@@ -536,7 +536,7 @@ class MitStaeben:
         zweite.von, zweite.gelenk_anfang = schnitt, False
         linie.bis, linie.gelenk_ende = schnitt, False
         anteil = stelle / L
-        vergeben = {last.kennung for last in self.alle_lasten()}
+        lasten = [last.kennung for last in self.alle_lasten()]
         erste_lasten, zweite_lasten = [], []
         for last in linie.lasten:
             if not last.verteilt:
@@ -548,8 +548,7 @@ class MitStaeben:
                 continue
             mitte = None if last.wert_b is None else \
                 last.wert_a + (last.wert_b - last.wert_a) * anteil
-            neue = naechste_kennung(vergeben, "P")
-            vergeben.add(neue)
+            neue = neue_kennung(self, "P", lasten)
             erste_lasten.append(replace(last, wert_b=mitte))
             zweite_lasten.append(replace(last, kennung=neue,
                                          wert_a=last.wert_a if mitte is None else mitte))

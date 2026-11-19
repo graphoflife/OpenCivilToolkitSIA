@@ -30,6 +30,7 @@ from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
 from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort
+from opencivil.projekt.netz import neue_kennung
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.skript import SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
@@ -80,6 +81,13 @@ class Projekt(Beschreibung):
     skripte: List[SkriptEintrag] = field(default_factory=list)
     """Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet."""
 
+    vergeben: Dict[str, int] = field(default_factory=dict)
+    """
+    Je Vorsilbe die hoechste Nummer, die das Projekt je vergeben hat -- an
+    Materialien, Bauteile, Skripte: eine Kennung kommt nie wieder
+    (:func:`~opencivil.projekt.netz.neue_kennung`).
+    """
+
     # -- Zugriff ------------------------------------------------------------
 
     def material(self, kennung: str) -> MaterialEintrag:
@@ -126,12 +134,9 @@ class Projekt(Beschreibung):
         raise ProjektFehler(f"Ein Bauteil '{kennung}' gibt es im Projekt nicht.")
 
     def freie_kennung(self, vorsilbe: str) -> str:
-        vergeben = ({m.kennung for m in self.materialien} | {e.kennung for e in self.bauteile()}
-                    | {s.kennung for s in self.skripte})
-        i = 1
-        while f"{vorsilbe}{i}" in vergeben:
-            i += 1
-        return f"{vorsilbe}{i}"
+        """Eine Kennung, die es im Projekt nie gab -- siehe :func:`~opencivil.projekt.netz.neue_kennung`."""
+        return neue_kennung(self, vorsilbe, [e.kennung for e in (*self.materialien, *self.bauteile(),
+                                                                 *self.skripte)])
 
     def verweise(self, kennung: str) -> List[Any]:
         """

@@ -6664,7 +6664,7 @@
       "kurz": "Knoten mit Kennungen, und wie neue dazukommen.",
       "stichworte": [
         "nummer",
-        "naechste_kennung",
+        "neue_kennung",
         "Netz",
         "Netz.an",
         "Netz.lage"

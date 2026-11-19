@@ -215,9 +215,9 @@ const ansichten = new Map();
 /**
  * Was sich die Ansichten zu einem Eintrag merken: den gezeigten Fall, den
  * Schnitt eines Diagramms, die letzte Antwort des Kerns. Ansichtssache, nicht
- * Teil des Projekts. Wer einen Eintrag anlegt, kopiert oder löscht, vergisst
- * es (`ansichtVergessen`) -- ein neuer Eintrag mit einer Kennung, die es
- * schon gab, zeigt nichts vom alten.
+ * Teil des Projekts. Wer einen Eintrag löscht, vergisst es
+ * (`ansichtVergessen`); ein neuer hat eine Kennung, die es nie gab
+ * (`freieKennung`), und damit nichts vom alten.
  */
 export function ansichtVon(kennung) {
   if (!ansichten.has(kennung)) ansichten.set(kennung, {});
@@ -269,18 +269,37 @@ export function materialien(art) {
   return zustand.projekt.materialien.filter((m) => m.art === art);
 }
 
+/** Die Zahl hinter der Vorsilbe -- «LF12» gibt 12 -- oder null. */
+export function nummer(kennung, vorsilbe) {
+  if (typeof kennung !== 'string' || !kennung.startsWith(vorsilbe)) return null;
+  const rest = kennung.slice(vorsilbe.length);
+  return /^\d+$/.test(rest) ? Number(rest) : null;
+}
+
 /**
- * Die kleinste freie Kennung mit dieser Vorsilbe: «q3». Frei heisst, kein
- * Eintrag einer Liste des Projekts trägt sie -- gleich welcher App; eine
- * neue App braucht dafür hier nichts.
+ * Eine neue Kennung «LF4» -- über jeder, die `besitzer` je vergeben hat:
+ * eine Kennung kommt nie wieder (Benutzer, 2026-11-19). An ihr hängen
+ * Lasten, Beiwerte, Diagrammzeilen; bis dahin bekam eine neue die Nummer
+ * der zuletzt gelöschten und still, was auf jene zeigte. Der Besitzer --
+ * das Projekt oder ein Bauteil -- merkt sich je Vorsilbe die höchste
+ * (`vergeben`), wie im Kern (`neue_kennung` in opencivil/projekt/netz.py).
+ * `eintraege` sind die vorhandenen: eine Datei ohne Zählung hat nur sie.
+ */
+export function neueKennung(besitzer, vorsilbe, eintraege) {
+  const n = Math.max(besitzer.vergeben?.[vorsilbe] ?? 0,
+    ...eintraege.map((e) => nummer(e?.kennung, vorsilbe) ?? 0)) + 1;
+  besitzer.vergeben = { ...besitzer.vergeben, [vorsilbe]: n };
+  return `${vorsilbe}${n}`;
+}
+
+/**
+ * Die Kennung eines neuen Eintrags des Projekts: «q3», nie vergeben in
+ * einer Liste des Projekts -- gleich welcher App; eine neue App braucht
+ * dafür hier nichts.
  */
 export function freieKennung(vorsilbe) {
-  const vergeben = new Set(Object.values(zustand.projekt)
-    .filter(Array.isArray)
-    .flatMap((liste) => liste.map((e) => e?.kennung)));
-  let i = 1;
-  while (vergeben.has(`${vorsilbe}${i}`)) i += 1;
-  return `${vorsilbe}${i}`;
+  const p = zustand.projekt;
+  return neueKennung(p, vorsilbe, Object.values(p).filter(Array.isArray).flat());
 }
 
 /**
@@ -331,17 +350,6 @@ export function naechsterName(stamm, eintraege) {
   let i = 1;
   while (vergeben.has(`${stamm} ${i}`)) i += 1;
   return `${stamm} ${i}`;
-}
-
-/**
- * Die nächste Kennung einer Liste eines Bauteils -- «LF4»: die grösste
- * bisherige plus eins. Eine Kennung kommt nie wieder: an ihr hängen Lasten
- * und Beiwerte, die sonst an etwas anderes gerieten.
- */
-export function naechsteKennung(liste, vorsilbe) {
-  const nummern = liste.map((x) => Number(String(x.kennung).slice(vorsilbe.length)))
-    .filter(Number.isInteger);
-  return `${vorsilbe}${Math.max(0, ...nummern) + 1}`;
 }
 
 /** Der Namensraum eines Bestandteils im Rechenwerk: `beton.b1`, `querschnitt.q1`. */

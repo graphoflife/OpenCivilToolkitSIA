@@ -71,7 +71,6 @@ function nachVorlage(a, {
   }
   const vorlage = katalog('neu', a.liste);
   const kennung = freieKennung(a.vorsilbe);
-  ansichtVergessen(kennung);
   projektAendern((p) => {
     p[a.liste] = p[a.liste] || [];
     const neu = { ...structuredClone(vorlage), kennung, name: naechsterName(a.stamm, p[a.liste]) };
@@ -105,12 +104,10 @@ async function loeschenWennFrei(liste, eintrag, satz) {
 /**
  * Eine Kopie gleich hinter dem Original: alles wie dort, nur Kennung und Name
  * neu -- «Decke über EG (Kopie)» (Benutzer, 2026-10-19). Kopiert, nicht
- * verwiesen: sonst änderte die Kopie das Original mit. Wie beim Anlegen
- * vergessen die Ansichten, was sie von einer früheren Kennung wussten.
+ * verwiesen: sonst änderte die Kopie das Original mit.
  */
 function kopieren(a, eintrag) {
   const kennung = freieKennung(a.vorsilbe);
-  ansichtVergessen(kennung);
   projektAendern((p) => {
     const liste = p[a.liste];
     const i = liste.findIndex((x) => x.kennung === eintrag.kennung);

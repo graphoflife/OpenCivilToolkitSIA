@@ -24,7 +24,7 @@ import {
 import { zeilenstand } from './kapitel.js';
 import { anfuegenKnopf } from './nachweise.js';
 import {
-  aendern, ausVorlage, eintragAendern, eintragVon, naechsteKennung, naechsterName,
+  aendern, ausVorlage, eintragAendern, eintragVon, naechsterName, neueKennung,
 } from './zustand.js';
 
 const lastenText = (n) => `${n} ${n === 1 ? 'Last' : 'Lasten'}`;
@@ -72,7 +72,7 @@ function lastfaelleInhalt(eintrag, { lastenVon, eigengewicht }) {
     ]);
   };
   const neuerFall = () => aendern((s) => {
-    s.lastfaelle.push({ kennung: naechsteKennung(s.lastfaelle, 'LF'), name: naechsterName('Lastfall', s.lastfaelle) });
+    s.lastfaelle.push({ kennung: neueKennung(s, 'LF', s.lastfaelle), name: naechsterName('Lastfall', s.lastfaelle) });
   });
   return [
     ...eintrag.lastfaelle.map(fall),
@@ -99,7 +99,7 @@ function kombinationenInhalt(eintrag) {
   ]);
   const neueKombination = () => aendern((s) => {
     s.kombinationen.push({
-      kennung: naechsteKennung(s.kombinationen, 'LK'),
+      kennung: neueKennung(s, 'LK', s.kombinationen),
       name: naechsterName('Kombination', s.kombinationen),
       faktoren: Object.fromEntries(s.lastfaelle.map((lf) => [lf.kennung, 1.0])),
     });
@@ -218,11 +218,21 @@ export function fallname(eintrag, kennung) {
 }
 
 /**
+ * Was eine Diagrammzeile ohne ihren Fall sagt: er ist gelöscht -- oder es
+ * ist keiner gewählt. Eine Kennung kommt nie wieder (`neueKennung`): die
+ * Zeile zeigt ins Leere, bis man einen anderen wählt, und sagt es am Ort
+ * (Benutzer, 2026-11-19).
+ */
+export function ohneFall(zeile) {
+  return zeile.fall ? 'Der gewählte Fall ist gelöscht.' : 'Kein Fall gewählt.';
+}
+
+/**
  * Welche Diagramme rechts stehen -- wie in der Spannung-Dehnung-Analyse: je
  * Zeile ein Fall, Lastfall oder Kombination, und was das Diagramm von ihm
  * zeigt (Benutzer, 2026-10-23), im Balkensystem wie in der Decke. Gerechnet
  * wird damit nichts, das Bauteil rechnet jeden Fall. Ein Fall, den es nicht
- * mehr gibt, steht als «– Fall wählen –» da. `groessen(zeile)` gibt die
+ * mehr gibt, steht als «– gelöscht, einen Fall wählen –» da. `groessen(zeile)` gibt die
  * Stellungen des Schalters aus dem Katalog -- je Zeile, denn in der Decke
  * hat ein Unterzug andere als die Platte --, `vorlage` die Art einer neuen
  * Zeile.
@@ -239,7 +249,8 @@ export function diagrammzeilen(eintrag, { groessen, vorlage, zusatz = () => null
     el('div.bs-diagrammzeile-kopf', {}, [
       auswahl({
         werte: faelle.some((f) => f.wert === d.fall) ? faelle
-          : [{ wert: d.fall, beschriftung: '– Fall wählen –' }, ...faelle],
+          : [{ wert: d.fall, beschriftung: d.fall ? '– gelöscht, einen Fall wählen –' : '– Fall wählen –' },
+            ...faelle],
         gewaehlt: d.fall,
         titel: 'Welcher Lastfall oder welche Kombination',
         beiAenderung: (w) => aendern((s) => { s.diagramme[i].fall = w; }),

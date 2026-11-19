@@ -515,12 +515,12 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         `braucht`, `einrichten` dreimal gleich).
       - Ungenutzt: `betonstahl_frei`; nur in Tests: `beton_frei`,
         `formeln_sammeln` und `Formeleintrag`; der Alias `text_maskieren`.
-      - Kein Strukturbefund, ein Fehler: `naechsteKennung` vergibt die
-        grösste plus eins -- LK3 löschen, die nächste heisst wieder LK3, und
-        eine Diagrammzeile, die auf die gelöschte zeigte, zeigt still die
+      - Erledigt (2026-11-19): `naechsteKennung` vergab die
+        grösste plus eins -- LK3 löschen, die nächste hiess wieder LK3, und
+        eine Diagrammzeile, die auf die gelöschte zeigte, zeigte still die
         neue. Dieselbe Regel in `cad_modell.js` 144. Entschieden (Benutzer,
         2026-11-19): eine Kennung wird nie wieder vergeben, und wer auf eine
-        gelöschte zeigt, sagt es am Ort.
+        gelöschte zeigt, sagt es am Ort. Siehe [[Entwicklung]].
 
 **Stand früherer Befunde:**
 - Gewachsen: «Name oder Sorte» (18 Stellen, die Materialliste wird an 7

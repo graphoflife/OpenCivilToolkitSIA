@@ -134,6 +134,14 @@ class BauteilEintrag(Beschreibung):
     vergass, fiel erst beim Loeschen eines Materials auf.
     """
 
+    _: KW_ONLY
+    vergeben: Dict[str, int] = field(default_factory=dict)
+    """
+    Je Vorsilbe die hoechste Nummer, die das Bauteil je vergeben hat -- an
+    seine Knoten, Linien, Lastfaelle: eine Kennung kommt nie wieder
+    (:func:`~opencivil.projekt.netz.neue_kennung`).
+    """
+
     def materialien(self) -> List[str]:
         """Die Kennungen der Materialien, auf die das Bauteil zeigt."""
         return []

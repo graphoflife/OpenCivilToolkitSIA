@@ -47,6 +47,16 @@ const zwei = { knoten: [{ kennung: 'K1', x: 1, y: 2, z: 3 }, { kennung: 'K2', x:
 modell.zusammenfuehren(zwei);
 erg.zusammen = zwei.knoten.length;
 
+// Eine Kennung kommt nie wieder: K3 und S2 gelöscht, die nächsten heissen K4 und S3.
+const nie = { knoten: [], staebe: [] };
+const a1 = modell.knotenAn(nie, [0, 0, 0]);
+const a2 = modell.knotenAn(nie, [1, 0, 0]);
+modell.knotenAn(nie, [2, 0, 0]);
+nie.knoten.pop();
+for (let i = 0; i < 2; i += 1) nie.staebe.push({ kennung: modell.naechsteKennung(nie, 'S'), von: a1, bis: a2 });
+nie.staebe.pop();
+erg.nie = [modell.naechsteKennung(nie, 'S'), modell.knotenAn(nie, [3, 0, 0]), nie.vergeben];
+
 // Strecken im Raum: kreuzend, windschief, parallel -- und in der Ebene wie bisher.
 erg.kreuzung = [
   m.kreuzung([[0, 0, 0], [2, 2, 2]], [[2, 0, 0], [0, 2, 2]]),
@@ -143,6 +153,13 @@ class TestZeichenfensterMitAchsen(unittest.TestCase):
 
     def test_zusammenfuehren_vergleicht_alle_achsen(self):
         self.assertEqual(self.erg["zusammen"], 1)
+
+    def test_eine_kennung_kommt_nie_wieder(self):
+        """
+        Die Zeichnung merkt sich je Vorsilbe die höchste vergebene Nummer
+        (Benutzer, 2026-11-19) -- wie im Kern (``opencivil/projekt/netz.py``).
+        """
+        self.assertEqual(self.erg["nie"], ["S3", "K4", {"K": 4, "S": 3}])
 
     def test_kreuzung_im_raum_und_in_der_ebene(self):
         kreuzend, windschief, parallel, eben, daneben = self.erg["kreuzung"]

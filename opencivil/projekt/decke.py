@@ -54,7 +54,7 @@ from opencivil.decke.modell import VERTEILBREITE, Aufteilung
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen, kennung_von
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, lesen
-from opencivil.projekt.netz import Netz, naechste_kennung
+from opencivil.projekt.netz import Netz, neue_kennung
 
 #: Ein Ort im Baukasten: die Kennung eines Knotens oder ``(x, y)`` in m.
 Ort = Union[str, Sequence[float]]
@@ -300,7 +300,7 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     # -- Zeichnen ohne Oberflaeche --------------------------------------------
 
     def netz(self) -> Netz:
-        return Netz(self.knoten, neu=lambda kennung, x, y: DeckenknotenEintrag(kennung, x, y),
+        return Netz(self, neu=lambda kennung, x, y: DeckenknotenEintrag(kennung, x, y),
                     achsen=("x", "y"))
 
     def _knoten(self, netz: Netz, ort: Ort) -> str:
@@ -308,8 +308,8 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
 
     def _anlegen(self, liste: str, cls: type, felder: dict, wo: str) -> Any:
         eintrag = lesen(cls, felder, f"Decke '{self.name}': {wo}",
-                        cls(kennung=naechste_kennung((e.kennung for e in getattr(self, liste)),
-                                                     VORSILBEN[liste])))
+                        cls(kennung=neue_kennung(self, VORSILBEN[liste],
+                                                 (e.kennung for e in getattr(self, liste)))))
         getattr(self, liste).append(eintrag)
         return eintrag
 

@@ -214,7 +214,7 @@ const groessenDer = (decke, zeile) => katalog('decke', 'diagrammgroessen')
  * Wo ein Ergebnisbild hinsieht: über die ganze Platte, längs eines Schnitts
  * oder in einem Unterzug -- eine Wahl aus dem Projekt, darum eine Liste.
  * Nur, wenn es Schnitte oder Unterzüge gibt; die Lagerkräfte zeigen immer
- * die ganze Decke. Was es nicht mehr gibt, steht als «– wählen –» da. Wer
+ * die ganze Decke. Was es nicht mehr gibt, steht als «– gelöscht, neu wählen –» da. Wer
  * zwischen Platte und Unterzug wechselt, bekommt dort die erste Grösse:
  * m_x hat ein Unterzug nicht, M die Platte nicht.
  */
@@ -225,7 +225,7 @@ function ortWahl(decke, zeile, aendern) {
     ...decke.unterzuege.map((u) => ({ wert: u.kennung, beschriftung: `Unterzug ${u.kennung}` }))];
   return auswahl({
     werte: werte.some((x) => x.wert === zeile.schnitt) ? werte
-      : [{ wert: zeile.schnitt, beschriftung: '– wählen –' }, ...werte],
+      : [{ wert: zeile.schnitt, beschriftung: '– gelöscht, neu wählen –' }, ...werte],
     gewaehlt: zeile.schnitt,
     titel: 'Über die ganze Platte, längs eines Schnitts – zu zeichnen im Fenster mit «Schnitt» – '
       + 'oder in einem Unterzug: M und V über seine ganze Breite',

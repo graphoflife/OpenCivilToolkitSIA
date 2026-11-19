@@ -61,7 +61,7 @@ import { skalar } from './cad_modell.js';
 import { ANSICHTEN, achsenkreuz, basisAus } from './cad_raum.js';
 import { el, leerzustand, svgEl } from './dom.js';
 import { antwortZu } from './fallantwort.js';
-import { fallname } from './lastfaelle.js';
+import { fallname, ohneFall } from './lastfaelle.js';
 import { aendern, eintragVon, zustand } from './zustand.js';
 
 const BREITE = 640;
@@ -463,7 +463,7 @@ function diagrammKarte(kennung, system, zeile) {
   const titel = groesse?.titel || zeile.groesse;
   const fall = fallname(system, zeile.fall);
   if (fall === null) {
-    return karte(titel, [leerzustand('Kein Fall gewählt.',
+    return karte(titel, [leerzustand(ohneFall(zeile),
       'Unter «Statik-Analyse» einen Lastfall oder eine Kombination wählen.')]);
   }
   const eintrag = antwortZu(kennung, fall,

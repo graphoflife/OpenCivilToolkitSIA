@@ -47,7 +47,7 @@ import { grundrissBild } from './dk_grundriss.js';
 import { schnittbild } from './dk_schnitt.js';
 import { el, leerzustand, svgEl } from './dom.js';
 import { antwortZu } from './fallantwort.js';
-import { fallname } from './lastfaelle.js';
+import { fallname, ohneFall } from './lastfaelle.js';
 import { katalog, zustand } from './zustand.js';
 
 /** Stellen der angeschriebenen Werte. */
@@ -334,7 +334,7 @@ function ergebnisKarte(kennung, decke, daten, zeile) {
   const titel = `${groesse?.titel || zeile.groesse}${ort?.art ? ort.art.titel(zeile.schnitt) : ''}`;
   const fall = fallname(decke, zeile.fall);
   if (fall === null) {
-    return karte(titel, [leerzustand('Kein Fall gewählt.',
+    return karte(titel, [leerzustand(ohneFall(zeile),
       'Unter «Ergebnisse» einen Lastfall oder eine Kombination wählen.')]);
   }
   if (ort && !ort.eintrag) {

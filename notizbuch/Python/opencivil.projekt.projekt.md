@@ -1,5 +1,5 @@
 ---
-erzeugt: b9b489e3204c
+erzeugt: 72b03f261939
 art: modul
 tags: [modul]
 ---
@@ -42,6 +42,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `pfaehle: List[PfahlEintrag] = field(default_factory=list)` – Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand.
 - `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
+- `vergeben: Dict[str, int] = field(default_factory=dict)` – Je Vorsilbe die hoechste Nummer, die das Projekt je vergeben hat -- an Materialien, Bauteile, Skripte: eine Kennung kommt nie wieder ([[opencivil.projekt.netz#neue_kennung|neue_kennung]]).
 
 #### Projekt.material
 
@@ -93,6 +94,8 @@ Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System.
 ```python
 def freie_kennung(self, vorsilbe: str) -> str
 ```
+
+Eine Kennung, die es im Projekt nie gab -- siehe [[opencivil.projekt.netz#neue_kennung|neue_kennung]].
 
 #### Projekt.verweise
 
@@ -419,6 +422,7 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.netz]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]

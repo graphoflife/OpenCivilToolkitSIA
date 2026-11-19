@@ -7,6 +7,33 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Eine Kennung kommt nie wieder
+
+Entscheid des Benutzers. Vorher war die nächste Kennung die grösste
+vorhandene plus eins, bei den Bauteilen und Materialien des Projekts sogar
+die kleinste freie. Wer die letzte Kombination LK2 löschte und eine neue
+anlegte, bekam wieder LK2 – und die Diagrammzeile, die auf die gelöschte
+gezeigt hatte, zeigte still die neue. Jetzt merken sich das Projekt und
+jedes Bauteil je Vorsilbe die höchste je vergebene Nummer (`vergeben`, in
+der Datei gespeichert); die neue heisst LK3.
+
+Die Regel steht je Sprache einmal: `neue_kennung` in
+`opencivil/projekt/netz.py` (auch für die Knoten des `Netz`, das dafür sein
+Bauteil bekommt statt nur dessen Liste) und `neueKennung` in
+`web/js/zustand.js`, das auch das Zeichenfenster nimmt. Die vorhandenen
+Kennungen zählen weiter mit: eine Datei ohne Zählung hat nur sie.
+
+Wer auf etwas Gelöschtes zeigt, sagt es am Ort. Löschen lässt die
+Oberfläche fast nichts, was noch benutzt wird -- ein Material, einen
+Querschnitt, einen Lastfall mit Lasten weist sie ab. Was bleibt, ist die
+Diagrammzeile: sie zeigt «– gelöscht, einen Fall wählen –», ihre Karte
+«Der gewählte Fall ist gelöscht.»; in der Decke ein gelöschter Schnitt
+«– gelöscht, neu wählen –». Der Hinweis zu einem Beiwert ohne Lastfall
+nennt dessen Kennung nicht mehr.
+
+Dass ein neuer Eintrag nichts von einer früheren Ansicht zeigt, braucht
+kein Vergessen beim Anlegen mehr: seine Kennung gab es nie.
+
 ## 2026-11-19 · Schalter statt Häkchen
 
 Entscheid des Benutzers: auch eine Wahl ja/nein ist ein Schalter. Vier

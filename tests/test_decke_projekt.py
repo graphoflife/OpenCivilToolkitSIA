@@ -182,7 +182,8 @@ class TestLasten(unittest.TestCase):
         decke, meldungen = modell_von(d)
         self.assertEqual([(m.text, m.fehler) for m in meldungen], [
             ("PL2: die Last gehört zu keinem Lastfall – sie wird nicht gerechnet.", False),
-            ("Kombination «GZT»: einen Lastfall «LF9» gibt es nicht – sein Beiwert zählt nicht.", False)])
+            ("Kombination «GZT»: ein Beiwert gehört zu einem Lastfall, den es nicht gibt – "
+             "er zählt nicht.", False)])
         self.assertNotIn("PL2", [l.name for lf in decke.lastfaelle for l in lf.lasten])
         self.assertTrue(zeichnung(p).daten["uebersicht"]["gerechnet"])
 

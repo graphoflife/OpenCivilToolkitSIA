@@ -84,6 +84,20 @@ class TestBeschreibung(unittest.TestCase):
         with self.assertRaises(ProjektFehler):
             p.bauteil("r7")
 
+    def test_eine_kennung_kommt_nie_wieder(self):
+        """
+        Auch nicht nach dem Speichern: das Projekt und jedes Bauteil merken
+        sich, was sie vergeben haben (Benutzer, 2026-11-19).
+        """
+        p = rahmen()
+        p.balkensysteme.remove(p.balkensystem("Zweites"))
+        s = p.balkensysteme[0]
+        self.assertEqual([k.kennung for k in s.kombinationen], ["LK1"])
+        s.kombinationen.clear()
+        p = Projekt.aus_dict(json.loads(json.dumps(p.als_dict())))
+        self.assertEqual(p.balkensystem("Drittes").kennung, "r3")
+        self.assertEqual(p.balkensysteme[0].kombination("neu").kennung, "LK2")
+
     def test_neu_ohne_tragwerk_mit_lastfaellen(self):
         """
         Ein neues System hat kein Tragwerk (Benutzer, 2026-10-19), aber

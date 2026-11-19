@@ -1,5 +1,5 @@
 ---
-erzeugt: 0d6ad3205b8f
+erzeugt: e394d3f360a6
 art: modul
 tags: [modul]
 ---
@@ -118,6 +118,9 @@ Ohne eigene Angabe zeigt es auf nichts.
 Bis 2026-11-10 stand dieser Vertrag in keiner Klasse: jede Art schrieb
 beide Methoden selbst, viermal `return []`, und eine neue Art, die sie
 vergass, fiel erst beim Loeschen eines Materials auf.
+
+- `_: KW_ONLY`
+- `vergeben: Dict[str, int] = field(default_factory=dict)` – Je Vorsilbe die hoechste Nummer, die das Bauteil je vergeben hat -- an seine Knoten, Linien, Lastfaelle: eine Kennung kommt nie wieder ([[opencivil.projekt.netz#neue_kennung|neue_kennung]]).
 
 #### BauteilEintrag.materialien
 
