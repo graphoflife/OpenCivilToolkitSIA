@@ -160,7 +160,7 @@ function ebenenzeilen(a) {
     schalterzeile('Ebene', wahlSchalter({
       werte: EBENEN.map((x) => ({ wert: x.achse, beschriftung: x.kurz, titel: x.name })),
       gewaehlt: achse, titel: 'Wo ein Klick ins Leere hinzeigt -- E legt sie durch den gefangenen Punkt',
-      setzen: (w) => { ebeneSetzen(a, w); a.neuZeichnen(); }, klasse: '.cad-wahl.ist-wortlaut',
+      setzen: (w) => { ebeneSetzen(a, w); a.neuZeichnen(); }, klasse: '.cad-wahl',
     })),
     cadZeile(`bei ${name}`, zahlfeld({
       wert: lage, schritt: a.raster, titel: `Die Lage der Arbeitsebene auf der Achse ${name}`,

@@ -97,7 +97,7 @@ function automatikInhalt(querschnitt) {
       gewaehlt: querschnitt.automatik_modus,
       titel: 'Modus. Ohne Kräfte: Duktilität, sprödes Versagen, Riss unter Zwang',
       setzen: (v) => aendern((q) => { q.automatik_modus = v; }),
-      klasse: '.ist-wortlaut.ist-senkrecht',
+      klasse: '.ist-senkrecht',
     }),
     // Ein Schalter neben dem Modus: je Dicke sucht das Werkzeug im gewählten
     // Modus. Die Mindestdicke gehört dazu und steht nur dann da.

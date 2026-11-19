@@ -7,6 +7,18 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Schalter in normaler Schrift
+
+Entscheid des Benutzers: Schalter ohne Grossbuchstaben. Vorher stand jede
+Stellung gross da, «DECKE | BODENPLATTE», und wo ein Formelzeichen darin
+stand, hob eine eigene Klasse das wieder auf (`ist-wortlaut`, an 14
+Schaltern) -- sonst wurde aus E_cm «E_CM». Wer einen neuen Schalter mit
+Formelzeichen baute und die Klasse vergass, hatte den Fehler wieder; so war
+es beim Schalter «E-Modul». Jetzt steht jede Stellung, wie sie geschrieben
+ist, 12 px halbfett, und die Klasse samt ihren fünf Ausnahmen im Stilblatt
+ist weg. Überschriften von Gruppen und Spalten bleiben gross: dort ist es
+Gestaltung, kein Inhalt.
+
 ## 2026-11-19 · Querschnittsanalyse: die Karte «Schubfluss» sagt, warum sie leer ist
 
 Nachtrag zur Durchsicht. Unter «Diagramme» fehlte die Karte «Schubfluss»

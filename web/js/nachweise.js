@@ -553,14 +553,12 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
       gewaehlt: ziel.werkstoffsatz,
       titel: 'Bemessungswerte (f_cd, f_yd) oder charakteristische (f_ck, f_yk)',
       setzen: (v) => aendern((x) => { x.werkstoffsatz = v; }),
-      klasse: '.ist-wortlaut',
     })),
     mitKopf('Rechenart', wahlSchalter({
       werte: rechenartStellungen(liste),
       gewaehlt: ziel.rechenart,
       titel: 'Wie gerechnet wird',
       setzen: (v) => aendern((x) => { x.rechenart = v; }),
-      klasse: '.ist-wortlaut',
     })),
   ];
 }

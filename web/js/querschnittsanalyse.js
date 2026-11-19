@@ -188,7 +188,6 @@ function werkstoffwahl(analyse) {
         gewaehlt: wahl.satz,
         titel: 'Rechenwerte: Bemessung (f_cd, f_yd) oder charakteristisch (f_ck, f_yk)',
         setzen: (v) => setzen(kennung, 'satz', v),
-        klasse: '.ist-wortlaut',
       }),
       istBeton
         ? wahlSchalter({
@@ -196,7 +195,6 @@ function werkstoffwahl(analyse) {
           gewaehlt: wahl.betongesetz,
           titel: 'Spannungs-Dehnungs-Beziehung des Betons',
           setzen: (v) => setzen(kennung, 'betongesetz', v),
-          klasse: '.ist-wortlaut',
         })
         : null,
     ]);

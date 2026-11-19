@@ -572,8 +572,7 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .schalter-halb {
   display: inline-flex; align-items: center; justify-content: center; gap: 4px;
   border: none; border-radius: 5px; background: transparent; color: var(--schrift-zart);
-  padding: 0 9px; font-size: 11px; font-weight: 700; cursor: pointer;
-  text-transform: uppercase;
+  padding: 0 9px; font-size: 12px; font-weight: 600; cursor: pointer;
 }
 /* Eine Stellung mit Bild (`zeichen`), etwa die Rechenart: Spannung über Dehnung. */
 .schalter-halb > .sinnbild { width: 18px; height: 18px; flex: none; }
@@ -587,9 +586,6 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .schalter-halb.ist-x.ist-an     { background: var(--richtung-x); color: #fff; }
 .schalter-halb.ist-y.ist-an     { background: var(--richtung-y); color: var(--schrift); }
 .schalter-halb.ist-beide.ist-an { background: var(--beide); color: #fff; }
-/* Stellungen, wie sie geschrieben sind: gross geschrieben würde aus 0.85·x
-   ein 0.85·X und aus M_y ein M_Y. */
-.schalter.ist-wortlaut .schalter-halb { text-transform: none; font-size: 12px; font-weight: 600; }
 /* Viele Stellungen brechen um, lange stehen untereinander -- je eine Zeile. */
 .schalter.ist-umbruch { flex-wrap: wrap; }
 .schalter.ist-senkrecht { display: flex; flex-direction: column; }
@@ -1561,7 +1557,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-ansichten .schalter-halb { padding: 0 7px; }
 /* «x-y» bricht sonst am Bindestrich um, wo es eng wird -- auch in der
    Wahl der Arbeitsebene im schwebenden Fenster. */
-.cad-wahl.ist-wortlaut .schalter-halb { white-space: nowrap; }
+.cad-wahl .schalter-halb { white-space: nowrap; }
 /* Rückgängig, Wiederholen, Alles zeigen und Vollbild: klein, zu zweit
    übereinander -- was sie tun, sagt ihr Titel. */
 .cad-ansicht { display: grid; grid-template-columns: repeat(2, auto); gap: 1px 2px; }
@@ -1627,11 +1623,10 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 .cad-ruhe label { display: inline-flex; align-items: center; gap: 5px; }
 /* Das Raster: seine Stufen als Schalter, in einer eigenen Zeile. */
-.cad-wahl.cad-rasterwahl .schalter-halb { padding: 2px 5px; text-transform: none; }
+.cad-wahl.cad-rasterwahl .schalter-halb { padding: 2px 5px; }
 
 /* Die Punkteingabe: Modus, zwei Felder, die Hilfen R Y Z ∥ ⊥ M. */
 .cad-modus { align-self: flex-start; }
-.cad-modus .schalter-halb { text-transform: none; }
 /* Je Feld seine Einheit rechts daneben; damit alles in eine Zeile passt,
    sind die Felder 7 Zeichen breit. */
 .cad-felder { display: flex; align-items: center; gap: 4px; }
@@ -1887,7 +1882,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 /* Diagramme der Querschnittsanalyse: oben der Lastfall, darunter seine Bilder.
    Solange die Bilder zur Eingabe davor gehören, bleiben sie blass stehen. */
 .qa-fallkopf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 12.5px; }
-.qa-fallwahl .schalter-halb { text-transform: none; font-size: 12px; padding: 0 10px; }
+.qa-fallwahl .schalter-halb { padding: 0 10px; }
 .qa-nachfuehren { color: var(--schrift-zart); font-style: italic; }
 .ist-veraltet { opacity: .55; }
 

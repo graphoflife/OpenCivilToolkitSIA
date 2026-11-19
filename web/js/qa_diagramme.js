@@ -300,7 +300,6 @@ function achsenwahl(kennung, achse) {
     werte: Object.keys(GROESSE).map((g) => ({ wert: g, beschriftung: g, titel: GROESSE[g].titel })),
     gewaehlt: wahl[achse],
     titel: achse === 'x' ? 'Grösse auf der waagrechten Achse' : 'Grösse auf der senkrechten Achse',
-    klasse: '.ist-wortlaut',
     setzen: (neu) => {
       // Steht die Grösse schon auf der anderen Achse, tauschen die beiden.
       const andere = achse === 'x' ? 'y' : 'x';

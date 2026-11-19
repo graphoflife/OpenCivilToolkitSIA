@@ -148,7 +148,7 @@ function lastFelder(a, last, setzen, { aufLinie = true, amKnoten = false } = {})
   return [
     art.kraft || a.bs.raum ? wahlBlock(art.kraft ? 'Richtung' : 'Drehachse', wahlSchalter({
       werte: mitVar(richtungen, last.richtung), gewaehlt: last.richtung, setzen: (w) => setzen('richtung', w),
-      titel: art.kraft ? text.kraftrichtung : text.momentrichtung, klasse: '.ist-wortlaut.ist-umbruch',
+      titel: art.kraft ? text.kraftrichtung : text.momentrichtung, klasse: '.ist-umbruch',
     })) : null,
     cadZeile(art.verteilt ? 'Anfang' : 'Wert', zahlfeldMitVar({
       wert: last[wertFeld], schritt: 5,
@@ -193,7 +193,7 @@ export function neuEigenschaften(a, werkzeug) {
       }),
       wahlBlock('Art', wahlSchalter({
         werte: systemkatalog(a.bs.art, 'lastarten').map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: `${x.beschriftung} in ${x.einheit}` })),
-        gewaehlt: v.art, setzen: (w) => { v.art = w; neu(); }, klasse: '.ist-wortlaut.ist-umbruch',
+        gewaehlt: v.art, setzen: (w) => { v.art = w; neu(); }, klasse: '.ist-umbruch',
         titel: 'Verteilt liegt eine Last auf der ganzen Linie; einzeln dort, wo geklickt wird, oder an einem Knoten',
       })),
       ...lastFelder(a, v, (feld, w) => { v[feld] = w; neu(); }, { aufLinie: false }),

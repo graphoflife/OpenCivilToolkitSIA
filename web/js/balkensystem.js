@@ -479,7 +479,7 @@ function querschnittFenster(system, kennung) {
       // Wie geschrieben: die Achsen heissen y und z, nicht Y und Z.
       achsen.length ? wahlBlock('Biegung', wahlSchalter({
         werte: achsen, gewaehlt: q.achse, titel: 'Um welche Achse sich das Profil im Rahmen biegt',
-        setzen: setzen('achse'), klasse: '.ist-wortlaut',
+        setzen: setzen('achse'),
       })) : null,
     );
   } else if (q.art === 'kennwerte') {
@@ -510,11 +510,9 @@ function querschnittFenster(system, kennung) {
   const module = systemkatalog(art, 'e_module').filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul);
   const mitEigenem = system.linien.some((l) => l.querschnitt === q.kennung && l.material === eigenes);
   if (mitEigenem && module.length > 1) {
-    // Wie geschrieben: gross geschrieben würde aus E_cm ein E_CM.
     zeilen.push(wahlBlock('E-Modul', wahlSchalter({
       werte: module.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
       gewaehlt: q.e_modul, titel: 'Das E der Stäbe «gemäss Querschnitt»', setzen: setzen('e_modul'),
-      klasse: '.ist-wortlaut',
     })));
   } else if (module.length > 1) {
     // Sonst sucht man den Schalter (bis 2026-11-19 ohne ein Wort).
