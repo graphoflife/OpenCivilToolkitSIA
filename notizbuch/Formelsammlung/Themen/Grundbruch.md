@@ -1,5 +1,5 @@
 ---
-erzeugt: ed3a5aefc0f9
+erzeugt: e0788e267965
 art: thema
 tags: [thema]
 ---
@@ -8,7 +8,7 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Unter der Sohle bildet sich beim Grundbruch ein Gleitkörper, der den Boden seitlich hinaus und nach oben drückt. Die erweiterte Tragfähigkeitsformel setzt seinen Widerstand aus drei Teilen zusammen: der Kohäsion, der seitlichen Auflast neben dem Fundament und dem Gewicht des Gleitkörpers -- je mit einem Tragfähigkeitsfaktor und den Korrekturen für Form, Tiefe, Lastneigung, Geländeneigung und Sohlneigung.
+Unter der Sohle bildet sich beim Grundbruch ein Gleitkörper, der den Boden seitlich hinaus und nach oben drückt. Die erweiterte Tragfähigkeitsformel setzt seinen Widerstand aus drei Teilen zusammen: der Kohäsion, der seitlichen Auflast neben dem Fundament und dem Gewicht des Gleitkörpers – je mit einem Tragfähigkeitsfaktor und den Korrekturen für Form, Tiefe, Lastneigung, Geländeneigung und Sohlneigung.
 
 Wird ein gesättigter Ton schnell belastet, kann das Porenwasser nicht entweichen: es gilt φ = 0, und an die Stelle der Kohäsion tritt die undrainierte Scherfestigkeit s\_u. Die Korrekturen stehen dann nicht als Faktoren, sondern als Summanden in der Klammer.
 

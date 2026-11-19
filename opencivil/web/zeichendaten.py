@@ -56,7 +56,7 @@ ZEICHENDATEN: Dict[str, Optional[Callable[[Aufbau, str, Loesung], Any]]] = {
 _ohne = {a.name for a in BAUTEILE} - set(ZEICHENDATEN)
 if _ohne:
     raise RuntimeError(f"zeichendaten.py: fuer {', '.join(sorted(_ohne))} steht nicht, was "
-                       f"gezeichnet wird -- auch keine ist eine Angabe (None).")
+                       f"gezeichnet wird – auch keine ist eine Angabe (None).")
 
 
 def zeichendaten(aufbau: Aufbau, loesung: Loesung) -> Dict[str, Any]:

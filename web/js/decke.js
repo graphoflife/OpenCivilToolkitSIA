@@ -39,34 +39,34 @@ const HILFE = {
   decke: {
     zeilen: [
       ['Achsen', 'x nach rechts, y nach oben, in m; Dicken und Stützen in mm'],
-      ['Platte', 'ein Umriss mit Dicke und Beton -- E_cm und Gewicht vom Beton, mit g = 10 m/s²; ihre Streifen tragen in Richtung 1 und 2, in Grad gegen x'],
-      ['Linienlager', 'eine Wand oder ein Rand: vertikal gehalten, eingespannt oder beides -- eingespannt allein wie eine Symmetrieachse'],
+      ['Platte', 'ein Umriss mit Dicke und Beton – E_cm und Gewicht vom Beton, mit g = 10 m/s²; ihre Streifen tragen in Richtung 1 und 2, in Grad gegen x'],
+      ['Linienlager', 'eine Wand oder ein Rand: vertikal gehalten, eingespannt oder beides – eingespannt allein wie eine Symmetrieachse'],
       ['Stütze', 'an einem Knoten, b_x × b_y; die Streifen geben ihre Last über den Stützenbereich ab'],
-      ['Unterzug', 'versteckt in der Platte, ein starker Streifen der Breite b -- er liegt auf Lagern, Stützen und Unterzügen höherer Stufe. Sein M und V unter «Ergebnisse»'],
+      ['Unterzug', 'versteckt in der Platte, ein starker Streifen der Breite b – er liegt auf Lagern, Stützen und Unterzügen höherer Stufe. Sein M und V unter «Ergebnisse»'],
       ['Zone', 'dort geht ihr Anteil der Last in Richtung 1, der Rest in Richtung 2'],
-      ['Schnitt', 'eine Linie, längs der ein Ergebnisbild die Schnittkraft wie an einem Balken zeigt -- er rechnet nicht mit'],
+      ['Schnitt', 'eine Linie, längs der ein Ergebnisbild die Schnittkraft wie an einem Balken zeigt – er rechnet nicht mit'],
     ],
     formel: 'Streifenmethode: jede Last in Streifen zweier Richtungen; die Streifen tragen ohne Drillmoment, schiefe Richtungen geben in x, y ein m_xy',
   },
   streifen: {
     zeilen: [
       ['Breite', 'höchstens so breit; geteilt wird zudem an jeder Ecke, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers'],
-      ['automatisch', 'je Stelle die Richtung, die Lager hat; tragen beide, nahe einem Rand (ein Viertel der kürzeren Spannweite) zu ihm, sonst in die kürzere Spannweite, in den Ecken je zur Hälfte -- Folie 31, verallgemeinert nach Vorgabe'],
+      ['automatisch', 'je Stelle die Richtung, die Lager hat; tragen beide, nahe einem Rand (ein Viertel der kürzeren Spannweite) zu ihm, sonst in die kürzere Spannweite, in den Ecken je zur Hälfte – Folie 31, verallgemeinert nach Vorgabe'],
       ['fest', 'überall derselbe Anteil in Richtung 1'],
-      ['Zonen', 'gehen beidem vor: dort gilt ihr Anteil -- zu zeichnen im Fenster mit «Zone»'],
+      ['Zonen', 'gehen beidem vor: dort gilt ihr Anteil – zu zeichnen im Fenster mit «Zone»'],
     ],
     formel: 'q₁ = α · q   q₂ = (1 − α) · q',
   },
   ergebnisse: {
     zeilen: [
-      ['Fall', 'ein Lastfall oder eine Kombination -- gerechnet wird jeder Fall'],
-      ['Wo', 'über die ganze Platte, längs eines Schnitts oder in einem Unterzug -- längs wie an einem Balken, positive Werte unten, die Stelle s ab seinem Anfang. Ein Schnitt zeigt die Lager, die er kreuzt, und die Unterzüge als Band'],
-      ['M, V', 'Moment und Querkraft eines Unterzugs über seine ganze Breite, in kNm und kN -- wie er als Träger gerechnet ist, auf seinen Lagern'],
-      ['m_x, m_y', 'die Momente je Meter in x und y, positiv mit Zug unten -- bei schiefen Streifen aus m_η umgerechnet'],
+      ['Fall', 'ein Lastfall oder eine Kombination – gerechnet wird jeder Fall'],
+      ['Wo', 'über die ganze Platte, längs eines Schnitts oder in einem Unterzug – längs wie an einem Balken, positive Werte unten, die Stelle s ab seinem Anfang. Ein Schnitt zeigt die Lager, die er kreuzt, und die Unterzüge als Band'],
+      ['M, V', 'Moment und Querkraft eines Unterzugs über seine ganze Breite, in kNm und kN – wie er als Träger gerechnet ist, auf seinen Lagern'],
+      ['m_x, m_y', 'die Momente je Meter in x und y, positiv mit Zug unten – bei schiefen Streifen aus m_η umgerechnet'],
       ['m_xy', 'das Drillmoment je Meter: nur, wo ein Streifen schief zu x und y trägt'],
       ['v_x, v_y, v_0', 'die Querkräfte je Meter und die Hauptquerkraft v_0 = √(v_x² + v_y²)'],
       ['Lager', 'je Linienlager der Verlauf seiner Kraft über die Länge; darunter je Lager die Summe, eingespannt auch sein Moment, negativ, wo es oben zieht'],
-      ['Farben', 'in jeder Zelle ein Verlauf -- längs eines Streifens glatt, quer springen die Werte an den Grenzen der Streifen, weil jeder seinen Teil der Last trägt'],
+      ['Farben', 'in jeder Zelle ein Verlauf – längs eines Streifens glatt, quer springen die Werte an den Grenzen der Streifen, weil jeder seinen Teil der Last trägt'],
       ['Angeschrieben', 'der grösste und der kleinste Wert, mit Punkt an seiner Stelle; über einer Zelle der Wert in ihrer Mitte'],
     ],
   },
@@ -186,7 +186,7 @@ function streifenInhalt(decke) {
   return [
     feld('Streifenbreite', zahlfeld({
       wert: decke.streifenbreite, schritt: 0.05, angabe: feldangabe('decke', 'streifenbreite'),
-      titel: 'So breit sind die Streifen höchstens -- schmaler, wo eine Ecke oder ein Lager sie teilt',
+      titel: 'So breit sind die Streifen höchstens – schmaler, wo eine Ecke oder ein Lager sie teilt',
       beiAenderung: (w) => aendern((d) => { d.streifenbreite = w; }),
     }), feldangabe('decke', 'streifenbreite').einheit),
     wahlBlock('Aufteilung', wahlSchalter({
@@ -199,7 +199,7 @@ function streifenInhalt(decke) {
       titel: 'Dieser Anteil der Last geht in Richtung 1, der Rest in Richtung 2',
       beiAenderung: (w) => aendern((d) => { d.anteil = w; }),
     }), feldangabe('decke', 'anteil').einheit) : null,
-    el('p.karte-hinweis', { text: 'In einer Zone gilt ihr eigener Anteil -- gezeichnet im Fenster mit «Zone».' }),
+    el('p.karte-hinweis', { text: 'In einer Zone gilt ihr eigener Anteil – gezeichnet im Fenster mit «Zone».' }),
   ].filter(Boolean);
 }
 
@@ -227,7 +227,7 @@ function ortWahl(decke, zeile, aendern) {
     werte: werte.some((x) => x.wert === zeile.schnitt) ? werte
       : [{ wert: zeile.schnitt, beschriftung: '– wählen –' }, ...werte],
     gewaehlt: zeile.schnitt,
-    titel: 'Über die ganze Platte, längs eines Schnitts -- zu zeichnen im Fenster mit «Schnitt» -- '
+    titel: 'Über die ganze Platte, längs eines Schnitts – zu zeichnen im Fenster mit «Schnitt» – '
       + 'oder in einem Unterzug: M und V über seine ganze Breite',
     beiAenderung: (w) => aendern((z) => {
       z.schnitt = w;

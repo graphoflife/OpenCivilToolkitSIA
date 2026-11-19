@@ -1,5 +1,5 @@
 ---
-erzeugt: 07d904e8e5a6
+erzeugt: 3aaebba080db
 art: thema
 tags: [thema]
 ---
@@ -8,7 +8,7 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Der Pfahl gibt seine Last über den Mantel und den Fuss an den Boden ab. Am Mantel reibt er an jeder Schicht, durch die er geht; am Fuss drückt er auf die Schicht, in der er steht. Die Summe ist der charakteristische äussere Widerstand. Auf Zug trägt nur der Mantel. Der Bemessungswert folgt mit zwei Faktoren der Norm: der Umrechnungsfaktor η\_a sagt, wie verlässlich der Widerstand bestimmt ist -- aus einer Berechnung am wenigsten, aus einem statischen Versuch am meisten --, der Widerstandsbeiwert γ\_M,a deckt die Streuung des Bodens und der Ausführung.
+Der Pfahl gibt seine Last über den Mantel und den Fuss an den Boden ab. Am Mantel reibt er an jeder Schicht, durch die er geht; am Fuss drückt er auf die Schicht, in der er steht. Die Summe ist der charakteristische äussere Widerstand. Auf Zug trägt nur der Mantel. Der Bemessungswert folgt mit zwei Faktoren der Norm: der Umrechnungsfaktor η\_a sagt, wie verlässlich der Widerstand bestimmt ist – aus einer Berechnung am wenigsten, aus einem statischen Versuch am meisten –, der Widerstandsbeiwert γ\_M,a deckt die Streuung des Bodens und der Ausführung.
 
 ## Formeln
 

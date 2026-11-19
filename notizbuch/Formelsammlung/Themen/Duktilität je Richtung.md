@@ -1,5 +1,5 @@
 ---
-erzeugt: d4dfff0aca8c
+erzeugt: 337101f4591b
 art: thema
 tags: [thema]
 ---
@@ -8,7 +8,7 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Ein Querschnitt kann Schnittgrössen umlagern, wenn die Bewehrung fliesst, bevor der Beton bricht -- dann ist die Druckzone klein. Gemessen wird das an x/d bei reiner Biegung: x ist der Abstand der Nulllinie vom gedrücktesten Betonpunkt, d der des Schwerpunkts der Zugbewehrung, beide senkrecht zur Nulllinie. Zur Zugbewehrung zählen die gedehnten Stäbe auf der gezogenen Seite des Schwerpunkts; liegen dort verschiedene Stähle, gilt die Grenze des festesten.
+Ein Querschnitt kann Schnittgrössen umlagern, wenn die Bewehrung fliesst, bevor der Beton bricht – dann ist die Druckzone klein. Gemessen wird das an x/d bei reiner Biegung: x ist der Abstand der Nulllinie vom gedrücktesten Betonpunkt, d der des Schwerpunkts der Zugbewehrung, beide senkrecht zur Nulllinie. Zur Zugbewehrung zählen die gedehnten Stäbe auf der gezogenen Seite des Schwerpunkts; liegen dort verschiedene Stähle, gilt die Grenze des festesten.
 
 ## Formeln
 

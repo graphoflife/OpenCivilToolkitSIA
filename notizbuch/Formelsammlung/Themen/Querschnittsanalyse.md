@@ -1,5 +1,5 @@
 ---
-erzeugt: 75abb7b423d0
+erzeugt: e3fd7b70c75f
 art: thema
 tags: [thema]
 ---
@@ -8,7 +8,7 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort -- eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach oben; alle Masse in Millimetern.
+Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort – eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach oben; alle Masse in Millimetern.
 
 Für ein beliebiges Polygon gibt es keine Formel für I\_T. Gerechnet wird mit der Spannungsfunktion φ von Prandtl, auf einem Gitter: seine Linien laufen durch jede waagrechte und lotrechte Kante, je Zelle gibt es einen Wert, und eine schräge Kante wird zwischen zwei Zellmitten genau geschnitten. Am Rand eines Hohlraums ist φ fest, und hinaus fliesst so viel, wie der Hohlraum Fläche hat. Der Fehler fällt mit dem Quadrat der Zellgrösse; ein zweites Gitter, jede Zelle halbiert, hebt ihn heraus.
 

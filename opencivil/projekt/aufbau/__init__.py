@@ -156,7 +156,7 @@ def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau) -> None:
     for kennung in eintrag.materialien():
         stoff = aufbau.unfertige.get(kennung)
         if stoff is not None:
-            raise ProjektFehler(f"{wo}: das Material «{stoff.name}» rechnet nicht -- warum, "
+            raise ProjektFehler(f"{wo}: das Material «{stoff.name}» rechnet nicht – warum, "
                                 f"steht bei ihm.")
     inhalt_pruefen(eintrag, wo)
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 1c4193631320
+erzeugt: 006d91370a48
 art: thema
 tags: [thema]
 ---
@@ -30,7 +30,7 @@ Unter reiner Biegung kippt die Nulllinie, bis kein Moment um die andere Achse bl
 
 Am Ende ist die Nulllinie um ϑ gegen die Achse der Biegung gedreht, im Gegenuhrzeigersinn positiv: so bleibt kein Moment um die andere Achse. Die Randdehnungen gelten senkrecht zu ihr, über die Tiefe h\_ϑ des Betons in dieser Richtung.
 
-Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug gilt k\_t für die rissaktive Dicke t, die kleinere Abmessung des Betons -- nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen Rand: dann gilt dessen Abstand.
+Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug gilt k\_t für die rissaktive Dicke t, die kleinere Abmessung des Betons – nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen Rand: dann gilt dessen Abstand.
 
 Der reine Betonquerschnitt ist der Bruttoquerschnitt: A\_c = A.
 

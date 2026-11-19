@@ -380,7 +380,7 @@ class Grundbruch(Nachweis):
             "Boden seitlich hinaus und nach oben drückt. Die erweiterte "
             "Tragfähigkeitsformel setzt seinen Widerstand aus drei Teilen zusammen: "
             "der Kohäsion, der seitlichen Auflast neben dem Fundament und dem "
-            "Gewicht des Gleitkörpers -- je mit einem Tragfähigkeitsfaktor und den "
+            "Gewicht des Gleitkörpers – je mit einem Tragfähigkeitsfaktor und den "
             "Korrekturen für Form, Tiefe, Lastneigung, Geländeneigung und "
             "Sohlneigung."
         )
@@ -490,7 +490,7 @@ class Grundbruch(Nachweis):
         p.formel(b_g, r"e^{-0.047 \cdot @alpha \cdot \tan @phi}", {"alpha": alpha, "phi": phi},
                  titel="Sohlneigungsfaktor des Gleitkörpergewichts", referenz=KAP_SOHLE,
                  name="Sohlneigungsfaktor b_γ")
-        p.annahme("b_γ mit tan φ wie in Tabelle 9.2.18 -- im Text des Kapitels steht "
+        p.annahme("b_γ mit tan φ wie in Tabelle 9.2.18 – im Text des Kapitels steht "
                   "tan α; die Tabelle und die Formel für b_q rechnen mit tan φ.")
 
         spalten = {
@@ -718,7 +718,7 @@ class Grundbruch(Nachweis):
             erg.i = {"c": None}
             erg.begruendung = (
                 "T_Ed > s_u · b · L: die Last ist zu stark geneigt, der "
-                "Lastneigungsfaktor ist nicht bestimmt -- kein Grundbruchwiderstand.")
+                "Lastneigungsfaktor ist nicht bestimmt – kein Grundbruchwiderstand.")
             p.text(erg.begruendung)
             return erg
         i_c = werte.zahl("i_c", "i_c", 0.5 - 0.5 * math.sqrt(1.0 - x),

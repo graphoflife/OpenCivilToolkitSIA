@@ -354,13 +354,13 @@ def zerlegen(decke: Decke) -> Zerlegung:
         platten = [p for p in decke.platten if any(r.parallel(q) for q in richtungen_der_platte(p))]
         feld.extend(_feldstreifen(r, platten, decke, unterzuege, bereiche, stuecke))
     if len(feld) > STREIFEN_HOECHSTENS:
-        meldungen.append(Meldung(f"Das gäbe {len(feld)} Streifen -- mehr als {STREIFEN_HOECHSTENS}. "
+        meldungen.append(Meldung(f"Das gäbe {len(feld)} Streifen – mehr als {STREIFEN_HOECHSTENS}. "
                                  "Bitte die Streifenbreite grösser wählen."))
         return Zerlegung(richtungen, [], gruppen, bereiche, {}, meldungen)
     namen = {s.name for s in feld}
     for u in unterzuege:
         if u.name in namen:
-            meldungen.append(Meldung(f"Der Unterzug «{u.name}» heisst wie ein Feldstreifen -- bitte umbenennen.",
+            meldungen.append(Meldung(f"Der Unterzug «{u.name}» heisst wie ein Feldstreifen – bitte umbenennen.",
                                      (u.name,)))
     if any(m.fehler for m in meldungen):
         return Zerlegung(richtungen, [], gruppen, bereiche, {}, meldungen)
@@ -563,7 +563,7 @@ def pruefen(decke: Decke) -> List[Meldung]:
         # Es fehlt nur etwas, kein Widerspruch (bis 2026-11-19 ein roter
         # Fehler an jeder frischen Decke). Ohne Platte gibt es keine Streifen,
         # und ohne Streifen rechnet nichts (:func:`~opencivil.decke.rechnung.rechnen`).
-        heraus.append(Meldung("Noch keine Platte -- mit «Platte» zeichnen.", fehler=False))
+        heraus.append(Meldung("Noch keine Platte – mit «Platte» zeichnen.", fehler=False))
     if not decke.streifenbreite > 0.0:
         heraus.append(Meldung("Die Streifenbreite muss grösser als null sein."))
     stuecke: Dict[str, List[List[Punkt]]] = {}
@@ -583,7 +583,7 @@ def pruefen(decke: Decke) -> List[Meldung]:
         r1, r2 = richtungen_der_platte(p)
         if abs(math.sin(r1.winkel - r2.winkel)) < math.sin(math.radians(5.0)):
             heraus.append(Meldung(f"Die zwei Richtungen der Platte «{p.name}» liegen weniger als 5° "
-                                  "auseinander -- sie tragen dann kaum anders als eine.", (p.name,)))
+                                  "auseinander – sie tragen dann kaum anders als eine.", (p.name,)))
     namen = list(stuecke)
     for i, a in enumerate(namen):
         for b in namen[i + 1:]:
@@ -593,7 +593,7 @@ def pruefen(decke: Decke) -> List[Meldung]:
         if math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]) <= geo.TOLERANZ:
             heraus.append(Meldung(f"Das Linienlager «{w.name}» hat keine Länge.", (w.name,)))
         elif not (w.vertikal or w.eingespannt):
-            heraus.append(Meldung(f"Das Linienlager «{w.name}» hält weder Höhe noch Drehung -- "
+            heraus.append(Meldung(f"Das Linienlager «{w.name}» hält weder Höhe noch Drehung – "
                                   "es trägt nichts.", (w.name,), fehler=False))
     for s in decke.stuetzen:
         if not (s.bx > 0.0 and s.by > 0.0):

@@ -166,7 +166,7 @@ function vorlageZeichnen(a, knoten) {
   const bild = el('div.cad-vorlagenskizze');
   const meldung = el('p.cad-meldung', { hidden: true });
   const einsetzen = el('button.knopf.knopf-klein.knopf-haupt', {
-    type: 'button', text: 'Einsetzen', title: 'Danach den Einsetzpunkt wählen -- Enter: Ursprung',
+    type: 'button', text: 'Einsetzen', title: 'Danach den Einsetzpunkt wählen – Enter: Ursprung',
     on: {
       click: () => {
         const teile = a.qa.vorlagenteile;

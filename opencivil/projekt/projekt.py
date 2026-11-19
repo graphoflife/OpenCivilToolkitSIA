@@ -210,7 +210,7 @@ class Projekt(Beschreibung):
         if any(m.anzeigename == sorte for m in self.materialien):
             raise ProjektFehler(
                 f"'{sorte}' steht schon im Projekt. Eine Normsorte braucht es "
-                f"nur einmal -- mehrere Platten verwenden dieselbe.")
+                f"nur einmal – mehrere Platten verwenden dieselbe.")
         self.materialien.append(eintrag)
         return eintrag
 
@@ -266,7 +266,7 @@ class Projekt(Beschreibung):
                 if len(werte) != 2:
                     raise ProjektFehler(
                         f"Platte '{name}': je Richtung zwei Durchmesser, unten "
-                        f"und oben -- angegeben sind {len(werte)} ({was}).")
+                        f"und oben – angegeben sind {len(werte)} ({was}).")
             nummern = [n for n in range(1, LAGENZAHL + 1)
                        if eintrag.richtung_von(n) is richtung]
             for nummer, d, dz in zip(nummern, grund, zulage):
@@ -422,7 +422,7 @@ class Projekt(Beschreibung):
         wort = "Beton" if art == "beton" else "Betonstahl"
         if len(vorhanden) != 1:
             raise ProjektFehler(
-                f"Welcher {wort}? Im Projekt stehen {len(vorhanden)} -- bitte "
+                f"Welcher {wort}? Im Projekt stehen {len(vorhanden)} – bitte "
                 f"mit {'beton' if art == 'beton' else 'stahl'}=... angeben"
                 + ("." if vorhanden else
                    f", oder zuerst einen anlegen: "

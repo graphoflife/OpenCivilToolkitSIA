@@ -92,10 +92,10 @@ const ARTEN = [
 const EINSTELLUNG = {
   werkzeuge: [
     { name: 'linie', text: 'Linie', zeichen: 'cad-linie', taste: 'l', form: 'linie',
-      titel: 'Linie -- ein Stab, sobald sie einen Querschnitt hat' },
+      titel: 'Linie – ein Stab, sobald sie einen Querschnitt hat' },
     { name: 'knoten', text: 'Knoten', zeichen: 'cad-knoten', taste: 'k', form: 'knoten' },
     { name: 'last', text: 'Last', zeichen: 'cad-last', taste: 'q', form: 'anhang',
-      titel: 'Last -- auf eine Linie klicken, eine Einzellast oder ein Moment auch an einen Knoten' },
+      titel: 'Last – auf eine Linie klicken, eine Einzellast oder ein Moment auch an einen Knoten' },
   ],
   einheit: 'm',
   raster: { stufen: [0.05, 0.1, 0.25, 0.5, 1, 2], vorgabe: 0.5 },
@@ -307,8 +307,8 @@ function lastAnlegen(a, z, erg) {
     if (d <= NAEHE && (!beste || d < beste.d)) beste = { l, t, d };
   }
   if (!beste) {
-    melden(art.verteilt ? 'Eine verteilte Last gehört auf eine Linie -- dort klicken.'
-      : !amKnoten ? 'Diese Richtung bezieht sich auf einen Stab -- auf eine Linie klicken.'
+    melden(art.verteilt ? 'Eine verteilte Last gehört auf eine Linie – dort klicken.'
+      : !amKnoten ? 'Diese Richtung bezieht sich auf einen Stab – auf eine Linie klicken.'
         : 'Auf eine Linie oder einen Knoten klicken.');
     return null;
   }

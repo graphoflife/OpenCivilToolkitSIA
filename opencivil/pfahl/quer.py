@@ -183,7 +183,7 @@ class AeussererQuerwiderstand(Nachweis):
                        "dreifachen Breite", referenz=buch.KAP_SCHMAL,
                  name="Erdwiderstand je Meter Pfahl")
         p.annahme("Hinten drückt der Boden aktiv nach, wo e_a positiv ist, sonst klafft ein "
-                  "Spalt; beide Drücke wirken auf 3 · D -- nach Vorgabe, nicht nachgeschlagen. "
+                  "Spalt; beide Drücke wirken auf 3 · D – nach Vorgabe, nicht nachgeschlagen. "
                   "Das Buch nennt diese Breite für den passiven Druck vor einem schmalen "
                   "Träger. So hebt sich undrainiert σ_v vorne und hinten auf, und p_E,k "
                   "wächst nicht ohne Grenze mit der Tiefe.")
@@ -202,7 +202,7 @@ class AeussererQuerwiderstand(Nachweis):
                            Mathe(fest(li.oben, 2)), Mathe(fest(li.unten, 2)),
                            Mathe(fest(li.p_oben / 1e3, 0)), Mathe(fest(li.p_unten / 1e3, 0))]
                           for li in linien],
-                  titel="Erdwiderstand am Pfahl, charakteristisch, z ab Terrain -- geteilt an "
+                  titel="Erdwiderstand am Pfahl, charakteristisch, z ab Terrain – geteilt an "
                         "den Schichten, am Wasser und wo e_a null wird",
                   ausrichtung="lrrrr")
 
@@ -235,7 +235,7 @@ class AeussererQuerwiderstand(Nachweis):
                   "zählt dabei charakteristisch, mal η_i.")
         p.annahme("γ_M,a = 1.4 ist quer in der Regel der kleinste Wert; die Norm will den "
                   "Bemessungswert je Objekt bestimmt haben. Die Bettungskraft steht mit "
-                  "denselben Beiwerten gegen den Erdwiderstand -- beides nach Vorgabe, nicht "
+                  "denselben Beiwerten gegen den Erdwiderstand – beides nach Vorgabe, nicht "
                   "nachgeschlagen.")
 
     # -- Die Querkraft -----------------------------------------------------------
@@ -340,7 +340,7 @@ class AeussererQuerwiderstand(Nachweis):
         if not vergleich.erfuellt:
             p.hinweis("Der Boden gibt hier nach: die elastische Rechnung unterschätzt "
                       "Verschiebung und Moment. Bettung und Widerstand müssen über die Tiefe "
-                      "zusammenpassen (SIA 267:2013, 9.5.4.5) -- etwa mit einer grösseren "
+                      "zusammenpassen (SIA 267:2013, 9.5.4.5) – etwa mit einer grösseren "
                       "Abminderung t_red nahe dem Terrain.")
         return self.urteil(self.d_bettung[k.name], k.name, vergleich,
                            f"q_d = {q_d.formatiert()} kN/m "

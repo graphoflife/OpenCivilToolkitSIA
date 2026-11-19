@@ -133,14 +133,14 @@ class GrundbruchEintrag(BauteilEintrag):
         eindeutig((k.name for k in self.kombinationen), wo, "Kombination")
         if self.L < self.b:
             raise ProjektFehler(
-                f"{wo}: b ist die kürzere Seite des Fundaments -- die Länge L = {self.L:g} m "
+                f"{wo}: b ist die kürzere Seite des Fundaments – die Länge L = {self.L:g} m "
                 f"muss mindestens so gross sein wie die Breite b = {self.b:g} m.")
         if self.gamma <= self.gamma_w:
             raise ProjektFehler(
                 f"{wo}: die Raumlast des Bodens γ = {self.gamma:g} kN/m³ muss grösser sein "
-                f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ -- sonst ist γ' nicht "
+                f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ – sonst ist γ' nicht "
                 f"positiv.")
         if self.phi_k == 0.0 and self.c_k <= 0.0:
             raise ProjektFehler(
-                f"{wo}: mit φ = 0 trägt nur die Kohäsion (undrainiert, c = s_u) -- sie muss "
+                f"{wo}: mit φ = 0 trägt nur die Kohäsion (undrainiert, c = s_u) – sie muss "
                 f"grösser als null sein.")

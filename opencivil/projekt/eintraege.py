@@ -619,12 +619,12 @@ def eindeutig(namen: Iterable[str], wo: str, was: str) -> None:
         elif gesehen[kennung] == name:
             raise ProjektFehler(
                 f"{wo}: der Name '{name}' ist zweimal als {was} vergeben. Die "
-                f"Nachweise legen ihre Ergebnisse unter dem Fallnamen ab -- zwei "
+                f"Nachweise legen ihre Ergebnisse unter dem Fallnamen ab – zwei "
                 f"gleiche Namen ergeben eine Zeile statt zwei.")
         else:
             raise ProjektFehler(
                 f"{wo}: '{gesehen[kennung]}' und '{name}' unterscheiden sich nur in "
-                f"Satz- oder Leerzeichen -- als {was} fielen sie im Bericht auf "
+                f"Satz- oder Leerzeichen – als {was} fielen sie im Bericht auf "
                 f"denselben Eintrag. Bitte einen davon anders benennen.")
 
 
@@ -755,7 +755,7 @@ class Gebrauchsliste(Beschreibung):
                 raise ProjektFehler(
                     f"{wo}: der {wort} Lastfall '{f.name}' heisst "
                     f"wie der aus der Tragsicherheit abgeleitete. Bitte anders "
-                    f"benennen -- sonst lässt sich nicht auseinanderhalten, "
+                    f"benennen – sonst lässt sich nicht auseinanderhalten, "
                     f"welcher gerechnet wurde.")
         eindeutig(abgeleitet + [f.name for f in self.faelle], wo, f"{wort}r Lastfall")
 

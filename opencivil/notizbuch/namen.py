@@ -73,7 +73,7 @@ def seitenname(text: str) -> str:
     if len(name) > HOECHSTENS:
         raise NamensFehler(
             f"Der Name {name!r} ist {len(name)} Zeichen lang, erlaubt sind "
-            f"{HOECHSTENS}. Kuerzer benennen -- abgeschnitten wird nicht.")
+            f"{HOECHSTENS}. Kuerzer benennen – abgeschnitten wird nicht.")
     return name
 
 

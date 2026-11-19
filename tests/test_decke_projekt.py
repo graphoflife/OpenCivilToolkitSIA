@@ -263,7 +263,7 @@ class TestZeichnung(unittest.TestCase):
         uebersicht = antwort.daten["uebersicht"]
         self.assertFalse(uebersicht["gerechnet"])
         self.assertEqual(uebersicht["meldungen"], [
-            {"text": "Noch keine Platte -- mit «Platte» zeichnen.", "elemente": [], "fehler": False}])
+            {"text": "Noch keine Platte – mit «Platte» zeichnen.", "elemente": [], "fehler": False}])
 
     def test_die_meldung_nennt_die_kennung_im_projekt(self):
         p = zwei_felder()
@@ -280,7 +280,7 @@ class TestZeichnung(unittest.TestCase):
         """
         p = zwei_felder()
         stahl = p.stahl().kennung
-        for wahl, grund in [("b9", "das Material 'b9' gibt es nicht mehr -- eines wählen"),
+        for wahl, grund in [("b9", "das Material 'b9' gibt es nicht mehr – eines wählen"),
                             ("", "noch kein Material gewählt"),
                             (stahl, "«B500B» ist kein Beton")]:
             with self.subTest(wahl=wahl):

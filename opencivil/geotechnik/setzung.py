@@ -368,7 +368,7 @@ class Setzung(Nachweis):
         B, L = e["B"], e["L"]
         x_si, y_si = steifigkeit.lage(L.groesse.si, B.groesse.si)
         if starr:
-            p.text("Starres Fundament: gerechnet wird im kennzeichnenden Punkt K -- dort "
+            p.text("Starres Fundament: gerechnet wird im kennzeichnenden Punkt K – dort "
                    "setzt sich die schlaffe Last so stark, wie sich das starre Fundament "
                    "im Mittel setzt.")
             zeichen, wer, referenz = "K", "des Punktes K", KAP_STEIFIGKEIT

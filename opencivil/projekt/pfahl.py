@@ -223,10 +223,10 @@ class PfahlEintrag(BauteilEintrag):
         if self.grundlage.aus_versuch:
             return ""
         if not self.schichten:
-            return "noch keine Schicht -- eine anlegen oder R_a,k aus einem Versuch eingeben"
+            return "noch keine Schicht – eine anlegen oder R_a,k aus einem Versuch eingeben"
         if not self.boden_unter_dem_fuss:
             return (f"der Fuss liegt in {self.t_K + self.L:g} m, die Schichten reichen bis "
-                    f"{sum(s.d for s in self.schichten):g} m -- unter dem Fuss fehlt noch Boden, "
+                    f"{sum(s.d for s in self.schichten):g} m – unter dem Fuss fehlt noch Boden, "
                     f"der ihn trägt")
         return ""
 
@@ -236,7 +236,7 @@ class PfahlEintrag(BauteilEintrag):
             if s.gamma <= self.gamma_w:
                 raise ProjektFehler(
                     f"{wo}, Schicht {i}: die Raumlast γ = {s.gamma:g} kN/m³ muss grösser sein "
-                    f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ -- sonst ist γ' nicht "
+                    f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ – sonst ist γ' nicht "
                     f"positiv.")
             if s.verhalten is Verhalten.DRAINIERT and s.phi_k <= 0.0:
                 raise ProjektFehler(f"{wo}, Schicht {i}: drainiert braucht φ'_k über null; "
@@ -249,7 +249,7 @@ class PfahlEintrag(BauteilEintrag):
         r_s = self.D / 2.0 - self.c - self.phi_w - self.phi_l / 2.0
         if r_s <= 0.0:
             raise ProjektFehler(
-                f"{wo}: die Stäbe haben keinen Platz -- D/2 = {self.D / 2.0:g} mm reicht nicht "
+                f"{wo}: die Stäbe haben keinen Platz – D/2 = {self.D / 2.0:g} mm reicht nicht "
                 f"für Überdeckung, Wendel und den halben Stab.")
         if self.n >= 2 and 2.0 * r_s * math.sin(math.pi / self.n) <= self.phi_l:
             raise ProjektFehler(

@@ -134,7 +134,7 @@ export function ansichtsleiste(a, allesZeigen) {
     gezeigt = jetzt;
     knoten.replaceChildren(wahlSchalter({
       werte: ANSICHTEN.map((x) => ({ wert: x.name, beschriftung: x.text, titel: x.titel })),
-      gewaehlt: jetzt, titel: 'Ansicht -- drehen: mit der rechten Maustaste ziehen, oder mit der linken und Alt',
+      gewaehlt: jetzt, titel: 'Ansicht – drehen: mit der rechten Maustaste ziehen, oder mit der linken und Alt',
       setzen: (name) => ansichtSetzen(a, name, allesZeigen), klasse: '.cad-wahl',
     }));
   };

@@ -182,8 +182,8 @@ class InnererWiderstand(Achsnachweis):
         R_id = self._bemessung(e, p, werte, R_mat, zug=False)
         R_id_zug = self._bemessung(e, p, werte, R_mat_zug, zug=True)
         p.hinweis("Knicken ist nicht nachgewiesen. Ein schlanker Pfahl, der seitlich nicht "
-                  "oder nur schwach gebettet ist -- in sehr weichem Boden, frei über dem "
-                  "Terrain --, kann knicken (SIA 267:2013, 9.5.1.1).")
+                  "oder nur schwach gebettet ist – in sehr weichem Boden, frei über dem "
+                  "Terrain –, kann knicken (SIA 267:2013, 9.5.1.1).")
         befund = Innenbefund(masse, A_s.groesse.si, R_mat.groesse.si, R_mat_zug.groesse.si,
                              R_id.groesse.si, R_id_zug.groesse.si)
         return Ausfuehrung({}, self.faelle(p, R_id, R_id_zug), befund)
@@ -229,7 +229,7 @@ class InnererWiderstand(Achsnachweis):
                           r" - \left(@d_a - 2 \cdot @t\right)^{2}\right)}{4}",
                      {"d_a": d_a, "dt": dt, "t": t}, titel="Fläche des Tragrohrs nach der Abrostung",
                      referenz="SIA 267:2013, 9.6.1.5.2", name="Fläche des Tragrohrs nach Abrostung")
-            p.annahme("Der Mörtel im Rohr zählt nicht -- nach Vorgabe, nicht nachgeschlagen. "
+            p.annahme("Der Mörtel im Rohr zählt nicht – nach Vorgabe, nicht nachgeschlagen. "
                       "SIA 267:2013, 9.5.2.4.8, liesse ihn zu; nach SIA 262 gerechnet, endete "
                       "mit ihm aber das Ganze bei −ε_c1d, und das Rohr flösse nicht mehr.")
         else:
@@ -239,7 +239,7 @@ class InnererWiderstand(Achsnachweis):
             p.formel(A_s, r"\frac{\pi \cdot \left(@d - 2 \cdot @dt\right)^{2}}{4}",
                      {"d": d_a, "dt": dt}, titel="Fläche des Tragstabs nach der Abrostung",
                      referenz="SIA 267:2013, 9.6.1.5.2", name="Fläche des Tragstabs nach Abrostung")
-        p.annahme("Das Tragglied rechnet als Stahl nach SIA 262, mit dessen γ_s -- nach "
+        p.annahme("Das Tragglied rechnet als Stahl nach SIA 262, mit dessen γ_s – nach "
                   "Vorgabe, nicht nachgeschlagen; SIA 263 für Baustahl ist nicht eingearbeitet.")
         return Masse(d_aussen=d_aussen, d_innen=d_innen), A_s, None
 

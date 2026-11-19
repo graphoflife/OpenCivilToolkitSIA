@@ -41,7 +41,7 @@ const HILFE = {
   bewehrung: {
     zeilen: [
       ['Lage', 'die Biegebewehrung auf der Zugseite über der Stütze'],
-      ['aussen', 'welche Richtung näher am Rand liegt -- sie hat das grössere d'],
+      ['aussen', 'welche Richtung näher am Rand liegt – sie hat das grössere d'],
       ['d', 'das Mittel der beiden Lagen; d_v = d, solange die Stütze nicht in die Platte reicht'],
     ],
     formel: 'd = (d_x + d_y) / 2',
@@ -61,7 +61,7 @@ const HILFE = {
     zeilen: [
       ['V_d', 'der Bemessungswert der Auflagerkraft'],
       ['q_d', 'Flächenlast, die innerhalb des Nachweisschnitts abgezogen wird: bei der Decke '
-        + 'Eigengewicht und Nutzlast, bei der Bodenplatte die Bodenpressung -- je als '
+        + 'Eigengewicht und Nutzlast, bei der Bodenplatte die Bodenpressung – je als '
         + 'Bemessungswert'],
       ['k_e', 'die Näherung gilt für regelmässige Flachdecken; sonst aus der Exzentrizität'],
       ['e', 'wie weit die Auflagerkraft neben der Stützenachse angreift'],
@@ -142,7 +142,7 @@ function stellePanel(d) {
         wert: d.name, setzen: (name) => aenderer(d)((x) => { x.name = name; }),
       })),
       feld('Platte', schalter(d, 'plattenart', 'plattenarten',
-        'Decke: Zug oben -- Bodenplatte: Zug unten, gegen die Bodenpressung'), ''),
+        'Decke: Zug oben – Bodenplatte: Zug unten, gegen die Bodenpressung'), ''),
     ]),
     wahlBlock('Lage', schalter(d, 'lage', 'lagen', 'Wo die gestützte Fläche in der Platte liegt')),
     karte(lage.titel, masse),

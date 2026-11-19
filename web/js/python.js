@@ -191,7 +191,7 @@ function aufbauen(skript) {
   });
   const abbrechenKnopf = el('button.knopf', {
     type: 'button', text: '■ Abbrechen',
-    title: 'Hält an, was läuft -- die Sitzung beginnt neu, die Variablen sind weg',
+    title: 'Hält an, was läuft – die Sitzung beginnt neu, die Variablen sind weg',
     on: { click: abbrechen },
   });
   const ausgabe = el('div.py-ausgabe', { role: 'log', 'aria-live': 'polite' });
@@ -208,7 +208,7 @@ function aufbauen(skript) {
       el('div.py-editor', {}, [nummern, code]),
       el('p.py-tipp', {
         text: 'numpy, pandas, die Standardbibliothek und opencivil lassen sich einbinden; '
-          + 'Diagramme mit «import zeichnen as plt» -- plot, scatter, bar, xlabel, legend … '
+          + 'Diagramme mit «import zeichnen as plt» – plot, scatter, bar, xlabel, legend … '
           + 'wie bei matplotlib.',
       }),
     ]),
@@ -221,7 +221,7 @@ function aufbauen(skript) {
           on: { click: neuStarten },
         }),
         el('button.knopf', {
-          type: 'button', text: 'Leeren', title: 'Die Ausgaben löschen -- die Variablen bleiben',
+          type: 'button', text: 'Leeren', title: 'Die Ausgaben löschen – die Variablen bleiben',
           on: { click: leeren },
         }),
       ]),

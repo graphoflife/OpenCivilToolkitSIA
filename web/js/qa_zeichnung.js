@@ -92,7 +92,7 @@ const WERKZEUGE = [
   { name: 'hilfspunkt', text: 'Hilfspunkt', zeichen: 'cad-hilfspunkt', taste: 'k', form: 'knoten',
     titel: 'Hilfspunkt: ein Knoten ohne Element, zum Fangen' },
   { name: 'hilfslinie', text: 'Hilfslinie', zeichen: 'cad-hilfslinie', taste: 'h', form: 'linie',
-    titel: 'Hilfslinie: rechnet nicht mit -- geschlossen wird sie zur Fläche' },
+    titel: 'Hilfslinie: rechnet nicht mit – geschlossen wird sie zur Fläche' },
 ];
 
 /** Welche Liste eine Linie des Werkzeugs füllt. */
@@ -573,7 +573,7 @@ function felderVon(liste, werte, setzen, info = null) {
   ]);
   // Verschiedene Arten zugleich gewählt: ihre Felder unterscheiden sich.
   const erstWaehlen = el('p.cad-hinweis-klein', {
-    text: 'Die gewählten unterscheiden sich in der Art -- erst eine wählen, dann gelten ihre Felder für alle.',
+    text: 'Die gewählten unterscheiden sich in der Art – erst eine wählen, dann gelten ihre Felder für alle.',
   });
   if (liste === 'staebe') {
     return [cadZeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm'), stahl()];
@@ -587,7 +587,7 @@ function felderVon(liste, werte, setzen, info = null) {
     const erklaert = {
       flaeche: 'Eine Stahlfläche, über die Linie verschmiert',
       anzahl: 'n Stäbe, gleich verteilt',
-      teilung: 'Stäbe im Abstand s -- gerundet auf einen, der aufgeht',
+      teilung: 'Stäbe im Abstand s – gerundet auf einen, der aufgeht',
     };
     const artWahl = wahlSchalter({
       werte: mitVar(arten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: erklaert[x.wert] })), art),
@@ -610,12 +610,12 @@ function felderVon(liste, werte, setzen, info = null) {
       art === 'teilung' ? cadZeile('s', zahl('teilung', 'Gewünschte Teilung', { schritt: 25, min: 1 }), 'mm') : null,
       art !== 'flaeche' || ausStaeben ? cadZeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm') : null,
       ausStaeben ? cadZeile('s', zahl('teilung', 'Abstand der Stäbe', { schritt: 25, min: 1 }), 'mm') : null,
-      ausStaeben ? cadZeile('L', zahl('laenge', 'Länge, über die die Stäbe liegen -- leer: die der Linie', {
+      ausStaeben ? cadZeile('L', zahl('laenge', 'Länge, über die die Stäbe liegen – leer: die der Linie', {
         schritt: 100, leer: null, platzhalter: 'Linie',
       }), 'mm') : null,
       ausStaeben ? cadZeile('A_s', zahlfeld({
         wert: info?.punkte ? Math.round(info.flaeche) : null, readonly: true,
-        titel: 'Die verschmierte Stahlfläche L/s · π⌀²/4 -- vom Kern gerechnet',
+        titel: 'Die verschmierte Stahlfläche L/s · π⌀²/4 – vom Kern gerechnet',
       }), 'mm²') : null,
       art !== 'flaeche' ? haken('Starteisen', 'starteisen') : null,
       art !== 'flaeche' ? haken('Endeisen', 'endeisen') : null,
@@ -641,7 +641,7 @@ function felderVon(liste, werte, setzen, info = null) {
         zusatz: [{ wert: '', beschriftung: 'Aussparung' }],
       })),
       cadZeile('c', zahl('ueberdeckung', 'Überdeckung c: das Polygon erscheint so weit nach innen gerückt '
-        + '-- eine Aussparung nach aussen --, mit Ecken zum Fangen. 0: nicht. Rechnet nicht mit.', {
+        + '– eine Aussparung nach aussen –, mit Ecken zum Fangen. 0: nicht. Rechnet nicht mit.', {
         schritt: 5, angabe: feldangabe('flaeche', 'ueberdeckung'),
       }), 'mm'),
     ];
@@ -712,7 +712,7 @@ function eckenEigenschaften(a, z, teile) {
   if (teile.length > 1) {
     return {
       titel: `${teile.length} Ecken`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschieben mit V -- nur diese Ecken, was sonst dort liegt, bleibt.' })],
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschieben mit V – nur diese Ecken, was sonst dort liegt, bleibt.' })],
     };
   }
   const [{ kennung, i }] = teile;
@@ -723,7 +723,7 @@ function eckenEigenschaften(a, z, teile) {
     titel: `${elementname(a, kennung)} · ${eckeName(da.liste, i)}`,
     inhalt: [
       ...lagefelder(a, p, [...a.auswahl][0]),
-      el('p.cad-hinweis-klein', { text: 'Nur diese Ecke -- was sonst an diesem Punkt liegt, bleibt.' }),
+      el('p.cad-hinweis-klein', { text: 'Nur diese Ecke – was sonst an diesem Punkt liegt, bleibt.' }),
     ],
   };
 }
@@ -736,7 +736,7 @@ function eigenschaften(a) {
   if (ecken.length) {
     return {
       titel: `${teile.length} gewählt`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Elemente und einzelne Ecken -- verschieben mit V.' })],
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Elemente und einzelne Ecken – verschieben mit V.' })],
     };
   }
   const gewaehlt = [...a.auswahl].map((k) => finden(z, k)).filter(Boolean);
@@ -745,7 +745,7 @@ function eigenschaften(a) {
   if (listen.size > 1) {
     return {
       titel: `${gewaehlt.length} Elemente`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedene Arten -- gemeinsame Eigenschaften gibt es nur bei gleicher Art.' })],
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedene Arten – gemeinsame Eigenschaften gibt es nur bei gleicher Art.' })],
     };
   }
   const liste = [...listen][0];
@@ -864,7 +864,7 @@ function umlauf(z, kennungen) {
 function ueberdeckungBeachten(a, bewehrung) {
   const geo = passendeGeometrie(a);
   if (!geo) {
-    melden('Die Zeichnung wird noch geprüft -- gleich noch einmal.');
+    melden('Die Zeichnung wird noch geprüft – gleich noch einmal.');
     return;
   }
   const ziele = new Map([...geo.staebe, ...geo.linien].map((x) => [x.kennung, x.ueberdeckt]));
@@ -912,7 +912,7 @@ function aktionen(a) {
     const entsteht = vorgaben(a).flaechen.material ? neuText(a.qa, 'polygon') : 'Aussparung';
     liste.push({
       zeichen: '▱', text: 'Fläche bilden',
-      titel: `Die geschlossenen Hilfslinien werden eine ${entsteht} -- wie die Vorgabe des Werkzeugs Polygon`,
+      titel: `Die geschlossenen Hilfslinien werden eine ${entsteht} – wie die Vorgabe des Werkzeugs Polygon`,
       tun: () => {
         const weg = new Set(a.auswahl);
         let neu = null;

@@ -292,7 +292,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
     typ = vorschlag.typ
     p.erklaerung(
         f"Vorgeschlagen wird ancoPLUS von AncoTech{ort.zusatz and ' ' + ort.zusatz}: "
-        f"{vorschlag.name} -- Anker ⌀{typ.durchmesser * 1e3:.0f} aus {produkte.STAHL} mit "
+        f"{vorschlag.name} – Anker ⌀{typ.durchmesser * 1e3:.0f} aus {produkte.STAHL} mit "
         f"h_A = {werte.h_A.formatiert()} mm, vom Rand der gestützten Fläche "
         f"{' / '.join(f'{a * 1e3:.0f}' for a in vorschlag.abstaende)} mm. Die Abstände sind die "
         f"der Typen «D» nach dem Gutachten des Herstellers: 0.375·d zum ersten Anker, bis zum "
@@ -305,7 +305,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
             "Keine Leiste läuft über den Plattenrand oder durch eine Aussparung, auch nicht "
             "zwischen zwei Ankern; zu beiden hält sie die Überdeckung c_nom, sonst endet sie mit "
             "dem Anker davor. Im Schatten einer Aussparung zählt der Nachweisschnitt nicht "
-            "(Figur 23d) -- dort liegt auch keine Leiste: Bewehrung, die diesen Teil quert, "
+            "(Figur 23d) – dort liegt auch keine Leiste: Bewehrung, die diesen Teil quert, "
             "trüge nichts zur gestützten Fläche.")
     if not pruefung.reicht:
         p.hinweis("Kein ancoPLUS erfüllt alle Bedingungen; gerechnet ist der stärkste Versuch.")
@@ -525,8 +525,8 @@ def _mit_pilz(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte,
     p.titel("Stahlpilz", ebene=3)
     p.erklaerung(
         f"Ein Stahlpilz vergrössert die gestützte Fläche. Gewählt ist der kleinste, der "
-        f"zwischen die Überdeckungen passt -- unten {produkte.PILZ_UNTEN * 1e3:.0f} mm, oben "
-        f"{produkte.PILZ_OBEN * 1e3:.0f} mm, die Vorgaben der Software von AncoTech -- und mit "
+        f"zwischen die Überdeckungen passt – unten {produkte.PILZ_UNTEN * 1e3:.0f} mm, oben "
+        f"{produkte.PILZ_OBEN * 1e3:.0f} mm, die Vorgaben der Software von AncoTech – und mit "
         f"dem die Platte ausserhalb hält: {pilz.name} ({produkte.QUELLE_ZEUS}). Seine "
         f"gestützte Fläche reicht bis an die Enden der Stege (4.3.6.6.2). Den Widerstand des "
         f"Pilzes selbst (4.3.6.6.1) bestätigt der Hersteller.")

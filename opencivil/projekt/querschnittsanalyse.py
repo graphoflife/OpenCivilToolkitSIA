@@ -458,7 +458,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
                 if not isinstance(v, str):
                     # Von Hand gebaut, mit einem Punkt statt eines Knotens.
                     fehler.append({"text": f"{name} verweist mit {v!r} statt mit der Kennung "
-                                           f"eines Knotens -- gezeichnet wird mit dem "
+                                           f"eines Knotens – gezeichnet wird mit dem "
                                            f"Baukasten (polygon, stab, stablinie, …).",
                                    "elemente": [kennung or name]})
                     return None
@@ -624,7 +624,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
             if w.material in gewaehlt:
                 raise ProjektFehler(
                     f"{wo}: für das Material '{w.material}' stehen zwei "
-                    f"Werkstoffwahlen -- es braucht genau eine.")
+                    f"Werkstoffwahlen – es braucht genau eine.")
             gewaehlt.add(w.material)
         eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
         eindeutig((f.name for f in self.knickfaelle), wo, "Knicknachweis")

@@ -178,7 +178,7 @@ export function polygonBefehl(werkzeug) {
     frage(a) {
       const n = this.punkte.length;
       if (!n) return `${a.adapter.neuText(a, werkzeug)}: erster Punkt`;
-      return n < 3 ? `Punkt ${n + 1}` : `Punkt ${n + 1} -- oder Enter schliesst`;
+      return n < 3 ? `Punkt ${n + 1}` : `Punkt ${n + 1} – oder Enter schliesst`;
     },
     punkt(a, erg) {
       const n = this.punkte.length;

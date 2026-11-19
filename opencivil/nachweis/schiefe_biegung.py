@@ -79,7 +79,7 @@ OHNE_EINWIRKUNG = "Keine Einwirkung → kein Nachweis."
 OHNE_MOMENT = ("Ohne Moment gibt es keinen Bruchzustand im Schnitt: nachgewiesen wird die "
                "Normalkraft gegen die gleichmässige Dehnung.")
 JENSEITS = ("Die Normalkraft liegt jenseits dessen, was der Querschnitt gleichmässig "
-            "gedehnt aufnimmt -- es gibt keinen Bruchzustand mit diesem N.")
+            "gedehnt aufnimmt – es gibt keinen Bruchzustand mit diesem N.")
 
 
 @dataclass
@@ -104,7 +104,7 @@ def protokoll_dehnungsebene(p: Protokoll) -> None:
         "Abstand v in Zugrichtung n ab, gemessen ab dem Schwerpunkt; die "
         "Nulllinie steht senkrecht zu n und darf schräg liegen. Zu jeder "
         "Dehnungsebene ergeben sich N, M_y und M_z durch Integration über "
-        "die Fläche -- als Summe über Streifen quer zu n, deren Grenzen auf "
+        "die Fläche – als Summe über Streifen quer zu n, deren Grenzen auf "
         "jede Polygonecke fallen, und Stab für Stab.")
     p.ansatz(
         r"\varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad "
@@ -306,7 +306,7 @@ class SchiefeBiegung(Nachweis):
                     f"{'auf der Zugseite' if nulllinie > 0 else 'auf der Druckseite'} "
                     f"des Schwerpunkts.")
         else:
-            lage = "Die Dehnung ist gleichmässig -- keine Nulllinie."
+            lage = "Die Dehnung ist gleichmässig – keine Nulllinie."
         p.text(f"Bruchzustand: Zugrichtung n = ({n[0]:.3f}; {n[1]:.3f}), "
                f"{richtung:.1f}° gegen die y-Achse. {lage}")
         p.tabelle(kopf=[Mathe(r"\varepsilon_0\ [\text{‰}]"), Mathe(r"\kappa\ [\mathrm{1/m}]")],
@@ -345,7 +345,7 @@ class SchiefeBiegung(Nachweis):
                   Mathe(r"z\ [\mathrm{mm}]"), Mathe(r"\varepsilon\ [\text{‰}]"),
                   Mathe(r"\sigma\ [\mathrm{N/mm^2}]")],
             zeilen=zeilen, ausrichtung="lrrrrr",
-            titel="Kräfte im Bruchzustand -- Beton als Resultierende, Bewehrung je Element")
+            titel="Kräfte im Bruchzustand – Beton als Resultierende, Bewehrung je Element")
         y_S, z_S = q.bezug
         p.formel(werte.kraft("N_int", "N_{Rd}", sum(a.N for a in anteile)), r"\sum F_i", {},
                  titel="Probe: Normalkraft")

@@ -24,7 +24,7 @@ const HILFE = {
     zeilen: [
       ['B, L', 'die Seiten der Lastfläche'],
       ['q_W', 'Pressung aus Wiederbelastung: bis zu der Spannung, die der Boden schon '
-        + 'getragen hat -- etwa bis zum Gewicht des Aushubs'],
+        + 'getragen hat – etwa bis zum Gewicht des Aushubs'],
       ['q_E', 'Pressung aus Erstbelastung: was darüber hinausgeht'],
       ['starr', 'gerechnet im Punkt K, 0.13 L und 0.13 B von einer Ecke (Bild 8.15): die '
         + 'mittlere Setzung'],
@@ -38,8 +38,8 @@ const HILFE = {
     zeilen: [
       ['Folge', 'von der Sohle an nach unten; unter der letzten gilt der Baugrund als '
         + 'unzusammendrückbar'],
-      ['M_E', 'Modul der Erstbelastung -- rechnet mit q_E'],
-      ["M'_E", 'Modul der Wiederbelastung -- rechnet mit q_W; grob das 8- bis 10-Fache von M_E (Kap. 5.3)'],
+      ['M_E', 'Modul der Erstbelastung – rechnet mit q_E'],
+      ["M'_E", 'Modul der Wiederbelastung – rechnet mit q_W; grob das 8- bis 10-Fache von M_E (Kap. 5.3)'],
     ],
     formel: "Δs = J·q_W·Δz / M'_E + J·q_E·Δz / M_E",
   },
@@ -67,7 +67,7 @@ function situationPanel(s) {
         })),
         gewaehlt: s.steifigkeit,
         setzen: (w) => aendern((x) => { x.steifigkeit = w; }),
-        titel: 'Starr: im Punkt K, die mittlere Setzung -- schlaff: unter der Mitte, die grösste',
+        titel: 'Starr: im Punkt K, die mittlere Setzung – schlaff: unter der Mitte, die grösste',
       }), ''),
     ]),
     karte('Pressung in der Sohle', [

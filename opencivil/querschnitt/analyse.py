@@ -235,7 +235,7 @@ class Zeichnung:
 
     def _polygone_pruefen(self) -> None:
         if not any(self.traegt) and not self._leer:
-            self._melden("Es gibt kein Polygon mit Material -- nichts, was trägt.", fehler=False)
+            self._melden("Es gibt kein Polygon mit Material – nichts, was trägt.", fehler=False)
         gut = True
         for name, ecken in zip(self.namen, self.punkte):
             try:
@@ -253,7 +253,7 @@ class Zeichnung:
         for i, eltern in enumerate(self.eltern):
             if not self.traegt[i] and (eltern is None or not self.traegt[eltern]):
                 self._melden(f"{self.namen[i]} liegt in keinem Polygon mit Material. "
-                             f"Eine Aussparung nimmt Fläche weg -- sie muss in "
+                             f"Eine Aussparung nimmt Fläche weg – sie muss in "
                              f"einer liegen.", self.kennungen[i])
         if any(self.traegt) and not self.meldungen:
             self.brutto = geo.summe([(self.gewicht(i), geo.flaechenwerte(p))
@@ -526,7 +526,7 @@ class Querschnittsanalyse(Rechenobjekt):
     def aufbau_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]:
         p.erklaerung(
             "Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. "
-            "Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort -- "
+            "Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort – "
             "eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach "
             "oben; alle Masse in Millimetern.")
         p.ansatz(

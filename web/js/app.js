@@ -500,7 +500,7 @@ function geretteterStand(eintrag) {
     `${eintrag.grund} Er ist aufbewahrt (${wann}); gezeigt wird das Beispiel. `,
     eintrag.aufbewahrt
       ? ''
-      : 'Der Browser hat keinen Platz, ihn abzulegen -- bis er heruntergeladen '
+      : 'Der Browser hat keinen Platz, ihn abzulegen – bis er heruntergeladen '
         + 'oder verworfen ist, legt die Seite nichts im Browser ab. ',
     el('button.knopf.knopf-klein', {
       text: 'Als Datei herunterladen', on: { click: () => geretteteHerunterladen(eintrag) },

@@ -58,7 +58,7 @@ export function standOhne(stand, fehlt) {
 
 /** Dasselbe im Fenster, über den Fällen -- oder nichts. */
 export function fehltHinweis(fehlt) {
-  return fehlt ? el('p.hinweis.hinweis-warnung', { text: `Noch ${fehlt} -- so rechnet kein Fall.` }) : null;
+  return fehlt ? el('p.hinweis.hinweis-warnung', { text: `Noch ${fehlt} – so rechnet kein Fall.` }) : null;
 }
 
 /**

@@ -32,7 +32,7 @@ const ARTEN = [{ liste: 'aussparungen', form: 'flaeche', vorsilbe: 'A', rang: 0 
 const EINSTELLUNG = {
   werkzeuge: [
     { name: 'aussparung', text: 'Aussparung', zeichen: 'cad-polygon', taste: 'a', form: 'polygon',
-      titel: 'Aussparung: die Ecken der Reihe nach -- Enter oder ein Klick auf die erste schliesst' },
+      titel: 'Aussparung: die Ecken der Reihe nach – Enter oder ein Klick auf die erste schliesst' },
     { name: 'hilfspunkt', text: 'Hilfspunkt', zeichen: 'cad-hilfspunkt', taste: 'k', form: 'knoten',
       titel: 'Hilfspunkt: ein Knoten ohne Aussparung, zum Fangen' },
   ],
@@ -135,7 +135,7 @@ function eigenschaften(a) {
     return {
       titel: `${elementname(a, kennung)} · Ecke ${i + 1}`,
       inhalt: [...lagefelder(a, p, schluessel[0]),
-        el('p.cad-hinweis-klein', { text: 'Nur diese Ecke -- was sonst an diesem Punkt liegt, bleibt.' })],
+        el('p.cad-hinweis-klein', { text: 'Nur diese Ecke – was sonst an diesem Punkt liegt, bleibt.' })],
     };
   }
   if (lagen.has(kennung)) {

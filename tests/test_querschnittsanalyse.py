@@ -543,7 +543,7 @@ class TestGeometrieEndpunkt(unittest.TestCase):
         self.assertEqual([(m["elemente"], m["fehler"]) for m in d["meldungen"]],
                          [([linie.kennung], False)])
         self.assertEqual(d["meldungen"][0]["text"],
-                         "Linie 1: das Material 's9' gibt es nicht mehr -- eines wählen.")
+                         "Linie 1: das Material 's9' gibt es nicht mehr – eines wählen.")
 
     def test_ein_beton_als_stahl_ist_falsch(self):
         p = projekt()
@@ -564,7 +564,7 @@ class TestGeometrieEndpunkt(unittest.TestCase):
         p.querschnittsanalysen[0].flaechen = []
         d = self.frage(p).daten
         self.assertEqual([(m["text"], m["fehler"]) for m in d["meldungen"]],
-                         [("Es gibt kein Polygon mit Material -- nichts, was trägt.", False)])
+                         [("Es gibt kein Polygon mit Material – nichts, was trägt.", False)])
 
     def test_ohne_ueberdeckung_nichts_dazu(self):
         d = self.frage(projekt()).daten

@@ -105,7 +105,7 @@ function nurMitMaterialHinweis(art, z, material) {
     && (z.querschnitte || []).some((q) => !bringtMaterial(art, q));
   return fehlen ? el('p.cad-hinweis-klein', {
     text: 'Mit dem Material «gemäss Querschnitt» stehen nur Querschnitte aus einer Platte oder '
-      + 'Querschnittsanalyse zur Wahl -- nur sie bringen einen Beton mit.',
+      + 'Querschnittsanalyse zur Wahl – nur sie bringen einen Beton mit.',
   }) : null;
 }
 
@@ -123,7 +123,7 @@ function materialWahl(art, z, bringt, gewaehlt, setzen) {
     werte: gewaehlt === VAR || werte.some((x) => x.wert === gewaehlt) ? mitVar(werte, gewaehlt)
       : [{ wert: gewaehlt, beschriftung: werte.length ? '– Material wählen –' : '– noch kein Material im System –' }, ...werte],
     gewaehlt,
-    titel: 'Die Materialien: Knopf «Material» unter der Zeichnung -- «gemäss Querschnitt»: der Beton der Platte oder Analyse',
+    titel: 'Die Materialien: Knopf «Material» unter der Zeichnung – «gemäss Querschnitt»: der Beton der Platte oder Analyse',
     beiAenderung: setzen,
   });
 }
@@ -157,7 +157,7 @@ function lastFelder(a, last, setzen, { aufLinie = true, amKnoten = false } = {})
     }), art.einheit),
     art.verteilt ? cadZeile('Ende', zahlfeldMitVar({
       wert: last.wert_b, schritt: 5, leer: null, platzhalter: 'wie Anfang',
-      titel: 'Wert am Ende der Linie -- leer: wie am Anfang', beiAenderung: (w) => setzen('wert_b', w),
+      titel: 'Wert am Ende der Linie – leer: wie am Anfang', beiAenderung: (w) => setzen('wert_b', w),
     }), art.einheit) : null,
     !art.verteilt && aufLinie ? cadZeile('Stelle', zahlfeldMitVar({
       wert: last.stelle, schritt: 5, angabe: feldangabe(a.bs.klassen.stablast, 'stelle'),
@@ -189,7 +189,7 @@ export function neuEigenschaften(a, werkzeug) {
     // Der Lastfall steht oben neben «Last»; hier nur, wenn keiner gewählt ist.
     inhalt = [
       aktiverLastfall(a.bs) ? null : el('p.cad-hinweis-klein', {
-        text: 'Kein Lastfall gewählt -- oben neben «Last» einen wählen.',
+        text: 'Kein Lastfall gewählt – oben neben «Last» einen wählen.',
       }),
       wahlBlock('Art', wahlSchalter({
         werte: systemkatalog(a.bs.art, 'lastarten').map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: `${x.beschriftung} in ${x.einheit}` })),
@@ -218,7 +218,7 @@ export function eigenschaften(a) {
   if ((knoten.length && linien.length) || lasten.length) {
     return {
       titel: `${kennungen.length} gewählt`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedenes zugleich -- verschieben mit V, löschen mit Entf.' })],
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedenes zugleich – verschieben mit V, löschen mit Entf.' })],
       schluessel,
     };
   }
@@ -271,7 +271,7 @@ function lagerFelder(a, z, knoten) {
   ];
   const zeilen = [wahlBlock('Lager', wahlSchalter({
     werte: mitVar(werte, art), gewaehlt: art, setzen, klasse: '.ist-umbruch',
-    titel: 'Lager des Knotens -- gelenkig hält jede Verschiebung, verschieblich nur die lotrechte, '
+    titel: 'Lager des Knotens – gelenkig hält jede Verschiebung, verschieblich nur die lotrechte, '
       + 'eingespannt alles; darunter jede Richtung für sich',
   }))];
   // Je Richtung nur, wenn alle gewählten ein Lager haben -- sonst stünde da,
@@ -390,7 +390,7 @@ function drehwinkelzeile(a, wert, setzen) {
   const angabe = feldangabe(a.bs.klassen.linie, 'drehung');
   return cadZeile('Drehwinkel β', zahlfeldMitVar({
     wert: wert('drehung'), schritt: 15, angabe, beiAenderung: setzen('drehung'),
-    titel: 'Wie weit der Querschnitt um die Achse des Stabs gedreht ist -- er dreht y und z des Stabs, die gestrichelte Faser und die Linienlager quer',
+    titel: 'Wie weit der Querschnitt um die Achse des Stabs gedreht ist – er dreht y und z des Stabs, die gestrichelte Faser und die Linienlager quer',
   }), angabe.einheit);
 }
 
@@ -479,7 +479,7 @@ function lastEigenschaften(a, z, kennungen) {
       .map((feld) => [feld, gemeinsam(da.map((d) => d.last[feld]))]));
     inhalt.push(...lastFelder(a, felder, setzen, { amKnoten }));
   } else {
-    inhalt.push(el('p.cad-hinweis-klein', { text: 'Verschiedene Arten -- ihre Werte einzeln bearbeiten.' }));
+    inhalt.push(el('p.cad-hinweis-klein', { text: 'Verschiedene Arten – ihre Werte einzeln bearbeiten.' }));
   }
   if (da.length === 1) {
     inhalt.push(el('p.cad-info', { text: da[0].knoten ? `an ${da[0].knoten}` : `auf ${a.adapter.name(a, da[0].linie.kennung)}` }));

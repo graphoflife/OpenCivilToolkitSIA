@@ -166,7 +166,7 @@ class Loesung:
         try:
             return self.befunde[bid]
         except KeyError:
-            raise KeyError(f"'{bid}' hat in diesem Lauf keinen Befund hinterlassen -- "
+            raise KeyError(f"'{bid}' hat in diesem Lauf keinen Befund hinterlassen – "
                            f"sie lief nicht, oder sie haelt keinen fest.") from None
 
     def wert(self, wert_id: str) -> Wert:
@@ -632,7 +632,7 @@ class _Lauf:
             if bezug.berechnung_id not in self.loesung.befunde:
                 raise RechenwerkFehler(
                     f"'{berechnung.id}' liest den Befund von '{bezug.berechnung_id}', "
-                    f"die in diesem Lauf keinen hinterlassen hat -- ihre Ausgaben "
+                    f"die in diesem Lauf keinen hinterlassen hat – ihre Ausgaben "
                     f"waren schon bekannt, oder sie haelt keinen fest.")
             befunde[bezug.name] = self.loesung.befunde[bezug.berechnung_id]
         return Eingaben(gesammelt, befunde), fehlend

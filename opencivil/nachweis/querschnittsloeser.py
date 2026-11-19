@@ -200,7 +200,7 @@ def je_seite(lagen: Sequence[Stahllage]) -> Dict[bool, Stahllage]:
     ohne = [l.nummer for l in lagen if l.von_unten is None]
     if ohne:
         raise ValueError(
-            f"Je Seite zusammenfassen geht nur mit Lagen, die ihre Seite kennen -- "
+            f"Je Seite zusammenfassen geht nur mit Lagen, die ihre Seite kennen – "
             f"{len(ohne)} kennen sie nicht.")
     heraus: Dict[bool, Stahllage] = {}
     for unten in (True, False):
@@ -210,7 +210,7 @@ def je_seite(lagen: Sequence[Stahllage]) -> Dict[bool, Stahllage]:
         if any(l.stahl != teile[0].stahl for l in teile):
             raise ValueError(
                 f"Auf der {'unteren' if unten else 'oberen'} Seite liegen verschiedene "
-                f"Stähle -- je Seite eine Lage im Schwerpunkt gibt es nur mit einem.")
+                f"Stähle – je Seite eine Lage im Schwerpunkt gibt es nur mit einem.")
         a_s, z = schwerpunkt((l.a_s, l.z) for l in teile)
         heraus[unten] = Stahllage(
             a_s=a_s, z=z, stahl=teile[0].stahl, sorte=teile[0].sorte, nummer=teile[0].nummer,

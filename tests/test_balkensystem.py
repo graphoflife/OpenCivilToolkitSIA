@@ -829,7 +829,7 @@ class TestMaterialien(unittest.TestCase):
         self.assertEqual(p.verweise("b1"), [p.balkensysteme[0]])
         p.balkensysteme[0].stabmaterialien[0].stoff = "b7"
         self.assertEqual(self.meldungen(p), ["L1 nimmt das Material M1, aber das Material 'b7' gibt "
-                                             "es nicht mehr -- eines wählen."])
+                                             "es nicht mehr – eines wählen."])
         antwort = dienst.bearbeite("balkensystem_verlauf", {"projekt": p.als_dict(), "kennung": "r1"})
         self.assertEqual(antwort.status, 200)
 

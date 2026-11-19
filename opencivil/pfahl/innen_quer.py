@@ -201,7 +201,7 @@ class InnererQuerwiderstand(Nachweis):
         p.erklaerung(
             "Quer belastet biegt sich der Pfahl: in jeder Tiefe wirken ein Moment und eine "
             "Querkraft, so wie die Steifigkeit sie gerechnet hat. Der Querschnitt muss beide "
-            "tragen -- das Moment zusammen mit der Normalkraft in derselben Tiefe, die "
+            "tragen – das Moment zusammen mit der Normalkraft in derselben Tiefe, die "
             "Querkraft im Beton mit der Wendel oder im Stahl des Tragglieds. Beide "
             "Widerstände mindert η_i, wie längs.")
         innen: Innenbefund = e.befund("innen")
@@ -238,7 +238,7 @@ class InnererQuerwiderstand(Nachweis):
                "Druckdiagonalen im Beton, die Wendel als Zugglied, die Längsstäbe als Gurt.")
         D = e.g("D").si
         r_s = werte.laenge("r_s", "r_s", innen.masse.r_s, "Radius des Bewehrungskreises")
-        p.wert(r_s, titel="Radius des Kreises, auf dem die Längsstäbe liegen -- aus dem inneren "
+        p.wert(r_s, titel="Radius des Kreises, auf dem die Längsstäbe liegen – aus dem inneren "
                           "Widerstand", referenz="")
         d = werte.laenge("d", "d", D / 2.0 + 2.0 * innen.masse.r_s / math.pi,
                          "Statische Höhe des Pfahls")
@@ -321,7 +321,7 @@ class InnererQuerwiderstand(Nachweis):
                    innen: Innenbefund) -> Schub:
         """Der Mikropfahl: das Tragglied aus Stahl fliesst auf Schub."""
         A = werte.flaeche("A", "A", innen.A_s, "Querschnitt des Tragglieds")
-        p.wert(A, titel="Querschnitt des Tragglieds nach der Abrostung -- aus dem inneren "
+        p.wert(A, titel="Querschnitt des Tragglieds nach der Abrostung – aus dem inneren "
                         "Widerstand", referenz="")
         A_v = werte.flaeche("A_v", "A_v", 2.0 * innen.A_s / math.pi, "Wirksame Schubfläche")
         p.formel(A_v, r"\frac{2 \cdot @A}{\pi}", {"A": A},
@@ -337,7 +337,7 @@ class InnererQuerwiderstand(Nachweis):
                        "f_yd / √3", referenz=f"{REFERENZ_STAHL}; {REFERENZ_ETA}",
                  name="Querkraftwiderstand des Tragglieds")
         p.annahme("Nach Vorgabe, nicht nachgeschlagen: A_v = 2 · A / π für Rohr und Vollstab "
-                  "-- die Norm verlangt die Fläche, die in Richtung der Querkraft trägt; in "
+                  "– die Norm verlangt die Fläche, die in Richtung der Querkraft trägt; in "
                   "dünnen Ringen mit gleich grossem Schubfluss trägt der Kreis mindestens so "
                   "viel. Dazu f_yd nach SIA 262 statt f_y / γ_M1 nach SIA 263, wie längs.")
         return Schub(V_Rd)
@@ -410,7 +410,7 @@ class InnererQuerwiderstand(Nachweis):
         if not self.pfahl.bohrpfahl and any(abs(x) > SCHUB_BIEGUNG * g
                                             for x, g in zip(v.V, grenze)):
             p.hinweis("Die Querkraft erreicht mehr als die Hälfte ihres Widerstands: dort ist "
-                      "der Biegewiderstand des Stahls abzumindern (SIA 263:2013, 5.1.5.1) -- "
+                      "der Biegewiderstand des Stahls abzumindern (SIA 263:2013, 5.1.5.1) – "
                       "hier nicht berücksichtigt.")
         return self.urteil(self.d_querkraft[k.name], k.name, vergleich,
                            f"|V| = {V_Ed.formatiert()} kN "

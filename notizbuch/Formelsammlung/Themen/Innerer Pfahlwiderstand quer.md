@@ -1,5 +1,5 @@
 ---
-erzeugt: 6118ad2ccfd6
+erzeugt: 44f52f9d788d
 art: thema
 tags: [thema]
 ---
@@ -8,7 +8,7 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Quer belastet biegt sich der Pfahl: in jeder Tiefe wirken ein Moment und eine Querkraft, so wie die Steifigkeit sie gerechnet hat. Der Querschnitt muss beide tragen -- das Moment zusammen mit der Normalkraft in derselben Tiefe, die Querkraft im Beton mit der Wendel oder im Stahl des Tragglieds. Beide Widerstände mindert η\_i, wie längs.
+Quer belastet biegt sich der Pfahl: in jeder Tiefe wirken ein Moment und eine Querkraft, so wie die Steifigkeit sie gerechnet hat. Der Querschnitt muss beide tragen – das Moment zusammen mit der Normalkraft in derselben Tiefe, die Querkraft im Beton mit der Wendel oder im Stahl des Tragglieds. Beide Widerstände mindert η\_i, wie längs.
 
 ## Formeln
 

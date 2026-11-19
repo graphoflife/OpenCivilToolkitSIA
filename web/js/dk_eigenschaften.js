@@ -90,17 +90,17 @@ const FELDER = {
       titel: 'E_cm und das Gewicht der Platte kommen von ihm',
     })),
     feldzeile('deckenplatte', 'richtung_1', 'Richtung 1', wert, setzen, {
-      schritt: 15, titel: 'In diese Richtung tragen die Streifen der Richtung 1 -- in Grad gegen x',
+      schritt: 15, titel: 'In diese Richtung tragen die Streifen der Richtung 1 – in Grad gegen x',
     }),
     feldzeile('deckenplatte', 'richtung_2', 'Richtung 2', wert, setzen, {
-      schritt: 15, titel: 'Die zweite Richtung der Streifen -- in Grad gegen x, nicht gleich der ersten',
+      schritt: 15, titel: 'Die zweite Richtung der Streifen – in Grad gegen x, nicht gleich der ersten',
     }),
   ],
   linienlager: (wert, setzen) => [
     schalterzeile('vertikal', jaNein(wert('vertikal'), setzen('vertikal'),
-      'Hält die Platte in der Höhe -- eine Wand, ein Träger')),
+      'Hält die Platte in der Höhe – eine Wand, ein Träger')),
     schalterzeile('eingespannt', jaNein(wert('eingespannt'), setzen('eingespannt'),
-      'Hält die Drehung -- ohne vertikalen Halt wie an einer Symmetrieachse')),
+      'Hält die Drehung – ohne vertikalen Halt wie an einer Symmetrieachse')),
   ],
   unterzuege: (wert, setzen) => [
     feldzeile('unterzug', 'breite', 'Breite b', wert, setzen, {
@@ -173,7 +173,7 @@ function lastfallText(a) {
   const lf = gezeigterLastfall(a);
   if (lf) return el('p.cad-info', { text: `Lastfall «${lf.name}»` });
   return eintragVon(a.dk.kennung)?.lastfaelle.length
-    ? el('p.cad-hinweis-klein', { text: 'Kein Lastfall gewählt -- oben in der Leiste einen wählen.' })
+    ? el('p.cad-hinweis-klein', { text: 'Kein Lastfall gewählt – oben in der Leiste einen wählen.' })
     : ohneLastfall();
 }
 
@@ -214,7 +214,7 @@ export function eigenschaften(a) {
   if (listen.size > 1) {
     return {
       titel: `${kennungen.length} gewählt`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedenes zugleich -- verschieben mit V, löschen mit Entf.' })],
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedenes zugleich – verschieben mit V, löschen mit Entf.' })],
       schluessel,
     };
   }
@@ -326,7 +326,7 @@ function plattenlastFelder(a, platten) {
   return [lastfallText(a), cadZeile('q überall', zahlfeldMitVar({
     wert: gemeinsam(platten.map((p) => p.lasten.find((x) => x.lastfall === lf.kennung)?.wert ?? null)),
     schritt: 0.5, angabe, leer: null, platzhalter: 'keine', beiAenderung: setzen,
-    titel: `Flächenlast auf der ganzen Platte im Lastfall «${lf.name}», nach unten positiv -- leer: keine`,
+    titel: `Flächenlast auf der ganzen Platte im Lastfall «${lf.name}», nach unten positiv – leer: keine`,
   }), angabe.einheit)];
 }
 

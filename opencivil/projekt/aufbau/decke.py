@@ -55,7 +55,7 @@ def modell_von(eintrag: DeckeEintrag) -> Tuple[Decke, List[Meldung]]:
     def orte(teil, knoten: Sequence[str]) -> Optional[Tuple[Punkt, ...]]:
         fehlt = [k for k in knoten if k not in lagen]
         if fehlt:
-            meldungen.append(Meldung(f"{teil.kennung} zeigt auf {', '.join(fehlt)} -- einen solchen "
+            meldungen.append(Meldung(f"{teil.kennung} zeigt auf {', '.join(fehlt)} – einen solchen "
                                      f"Knoten gibt es nicht.", (teil.kennung,)))
             return None
         return tuple(lagen[k] for k in knoten)

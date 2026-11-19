@@ -113,7 +113,7 @@ export function uebersicht(a) {
     ? el('div.qa-elemente', {}, gruppen)
     : el('p.qa-leer', {
       text: 'Noch nichts gezeichnet: Polygon P, Bewehrung B, Schubwand W, Hilfspunkt K, '
-        + 'Hilfslinie H -- oder eine Vorlage T.',
+        + 'Hilfslinie H – oder eine Vorlage T.',
     }));
   return teile;
 }

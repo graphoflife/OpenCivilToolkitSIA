@@ -436,7 +436,7 @@ def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None:
             raise ProjektFehler(f"{wo}: '{f.name}' darf nicht leer sein.")
     elif typ is bool:
         if not isinstance(wert, bool):
-            raise ProjektFehler(f"{wo}: '{f.name}' ist ein Schalter, true oder false -- "
+            raise ProjektFehler(f"{wo}: '{f.name}' ist ein Schalter, true oder false – "
                                 f"nicht {_zeigen(wert)}.")
     elif typ is int:
         if isinstance(wert, bool) or not isinstance(wert, int):

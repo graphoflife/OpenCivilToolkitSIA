@@ -274,7 +274,7 @@ export function plattenEditor(querschnitt) {
         feld('Stahl', auswahl({
           werte: staehle.map((s) => ({ wert: s.kennung, beschriftung: s.name || s.sorte })),
           gewaehlt: querschnitt.stahl,
-          titel: 'Betonstahl der Platte -- aller Lagen und der Bügel',
+          titel: 'Betonstahl der Platte – aller Lagen und der Bügel',
           beiAenderung: (v) => aendern((q) => { q.stahl = v; }),
         })),
         feld('Dicke h', zahlfeld({

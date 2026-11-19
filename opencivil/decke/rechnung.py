@@ -218,8 +218,8 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
                 _weitergeben(k, ergebnis, zerlegung, heraus, uebertragen)
     for (einer, mehrere), traeger in ausfall.items():
         namen = tuple(n for n, _ in traeger)
-        wer = (f"Der Streifen «{namen[0]}» trägt nicht -- {einer}" if len(namen) == 1
-               else f"{len(namen)} Streifen tragen nicht -- {mehrere}")
+        wer = (f"Der Streifen «{namen[0]}» trägt nicht – {einer}" if len(namen) == 1
+               else f"{len(namen)} Streifen tragen nicht – {mehrere}")
         heraus.meldungen.append(Meldung(f"{wer} {sum(F for _, F in traeger) / 1e3:.3g} kN fallen aus.", namen))
     return heraus
 

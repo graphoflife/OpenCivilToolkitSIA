@@ -7,6 +7,18 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Ein Gedankenstrich statt zwei Bindestrichen
+
+Entscheid des Benutzers: in allem, was er in der Software liest, steht
+«–». Vorher schrieben Meldungen, Hinweise, Titel und Bericht teils
+«noch keine Kombination -- unter «Einwirkungen» eine anlegen», teils mit
+«–». Umgestellt sind 236 Stellen, nur in Zeichenketten -- Kommentare und
+Docstrings dürfen «--» behalten, und wo «--» etwas bedeutet, blieb es:
+die Linienstile der Konsole («--» heisst gestrichelt), CSS-Variablen
+(`--blau`) und der Kopf eines Moduls, den das Notizbuch am «--» zerlegt.
+Die Tests, die einen Satz der Software erwarten, gingen mit; Meldungen
+der Tests an Entwickler blieben.
+
 ## 2026-11-19 · Schalter in normaler Schrift
 
 Entscheid des Benutzers: Schalter ohne Grossbuchstaben. Vorher stand jede

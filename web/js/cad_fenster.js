@@ -640,7 +640,7 @@ function rad(a, e) {
   // Das Mausrad gehört der Tafel, bis man ins Fenster geklickt hat -- sonst
   // bliebe man beim Blättern an der Zeichnung hängen. Mit Strg zoomt es immer.
   if (aktive !== a && !e.ctrlKey && !a.vollbild) {
-    kurzMelden(a, 'Zum Zoomen ins Fenster klicken -- oder Strg + Mausrad.');
+    kurzMelden(a, 'Zum Zoomen ins Fenster klicken – oder Strg + Mausrad.');
     return;
   }
   e.preventDefault();

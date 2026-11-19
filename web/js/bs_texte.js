@@ -11,14 +11,14 @@
 import { svgEl } from './dom.js';
 
 const GEMEINSAM = {
-  fall: ['Fall', 'ein Lastfall oder eine Kombination -- gerechnet wird jeder Fall'],
+  fall: ['Fall', 'ein Lastfall oder eine Kombination – gerechnet wird jeder Fall'],
   angeschrieben: ['Angeschrieben', 'die Werte an den Enden und je Stab die grössten, mit Punkt und Stelle'],
   material: [
-    ['Beton', 'einer aus dem Projekt: E = E_cm und ρ des Stahlbetons, die Bewehrung steckt darin -- zu ändern in der App «Materialien»'],
+    ['Beton', 'einer aus dem Projekt: E = E_cm und ρ des Stahlbetons, die Bewehrung steckt darin – zu ändern in der App «Materialien»'],
     ['Baustahl', 'einer aus dem Projekt: E = E_a und ρ_a (SIA 263:2013, 3.2.2.1)'],
   ],
   rho: ['ρ', 'für das Eigengewicht ρ · g · A, mit g = 10 m/s²'],
-  eq: ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten -- bei einer Platte immer in x-Richtung, Zug unten'],
+  eq: ['E_eq', 'wie die Linie M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen; M > 0 zieht unten – bei einer Platte immer in x-Richtung, Zug unten'],
 };
 
 /** Ein kleines Bild der Vorzeichen in der Ebene: Achsen, Drehsinn, ein Stab mit Faser, M > 0. */
@@ -101,7 +101,7 @@ const TEXTE = {
           ['Drehung', 'im Gegenuhrzeigersinn positiv, ebenso Momentlasten'],
           ['Lasten', 'positiv in Pfeilrichtung: senkrecht nach unten, waagrecht nach rechts, quer zur gestrichelten Faser, längs vom Anfang zum Ende'],
           ['N, V, M', 'nach Baustatik: N > 0 Zug, M > 0 zieht an der gestrichelten Faser, dM/dx = V − m'],
-          ['Faser', 'die Zugseite: an einer neuen Linie unten, an einer senkrechten links -- im Fenster des Stabs umzuschalten; die Lasten bleiben dabei, wo sie wirken'],
+          ['Faser', 'die Zugseite: an einer neuen Linie unten, an einer senkrechten links – im Fenster des Stabs umzuschalten; die Lasten bleiben dabei, wo sie wirken'],
         ],
         formel: 'Lagerkraft nach oben positiv',
       },
@@ -117,11 +117,11 @@ const TEXTE = {
       querschnitte: {
         zeilen: [
           ['Vorlage', 'A und I nach den Formeln der Vorlage, Masse in mm'],
-          ['Profil', 'ein Stahlprofil aus der Tabelle -- A und I_y oder I_z aus seinen Massen, in cm² und cm⁴; y ist die starke Achse, der Steg liegt dann in der Ebene des Rahmens'],
+          ['Profil', 'ein Stahlprofil aus der Tabelle – A und I_y oder I_z aus seinen Massen, in cm² und cm⁴; y ist die starke Achse, der Steg liegt dann in der Ebene des Rahmens'],
           ['Kennwerte', 'A und I von Hand'],
           ['Platte', 'ein Streifen b × h der gewählten Platte'],
           ['QS Analyse', 'A und I_y des Bruttoquerschnitts der gewählten Querschnittsanalyse'],
-          ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, auf Wunsch E_eq bei N und M, für EA und EI (für EA eine Näherung)'],
+          ['E-Modul', 'vom Material des Stabs – «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, auf Wunsch E_eq bei N und M, für EA und EI (für EA eine Näherung)'],
           GEMEINSAM.eq,
           ['Steifigkeit', 'EA, EI am Bruttoquerschnitt, beim Beton ungerissen und ohne Bewehrung (SIA 262:2025, 4.1.4.1.3); Theorie 1. Ordnung'],
         ],
@@ -131,7 +131,7 @@ const TEXTE = {
         zeilen: [
           GEMEINSAM.fall,
           ['M, V, N', 'je Stab der Verlauf, positiv auf der Seite der gestrichelten Faser'],
-          ['Verschiebung', 'das verschobene System, überhöht -- je Stab die grösste Durchbiegung gegen die Sehne, kurzzeitig und ungerissen; die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1)'],
+          ['Verschiebung', 'das verschobene System, überhöht – je Stab die grösste Durchbiegung gegen die Sehne, kurzzeitig und ungerissen; die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1)'],
           ['Verdrehung', 'je Stab die Verdrehung φ des Querschnitts in mrad, im Gegenuhrzeigersinn positiv'],
           ['Lager', 'die Lagerkräfte auf das Tragwerk'],
           GEMEINSAM.angeschrieben,
@@ -143,9 +143,9 @@ const TEXTE = {
     zusatz: 'x und y waagrecht, z nach oben, m',
     vorzeichenbild: vorzeichenbildRaum,
     kraftrichtung: 'Positiv in Pfeilrichtung: senkrecht nach unten, in x, y oder z des Systems, längs vom Anfang zum Ende, quer in y oder z des Stabs',
-    momentrichtung: 'Um welche Achse das Moment dreht: senkrecht nach unten, x, y oder z des Systems, längs -- ein Torsionsmoment -- oder quer in y oder z des Stabs',
+    momentrichtung: 'Um welche Achse das Moment dreht: senkrecht nach unten, x, y oder z des Systems, längs – ein Torsionsmoment – oder quer in y oder z des Stabs',
     momentsinn: 'Ein Moment positiv im Rechtssinn um seine Drehachse',
-    projiziert: 'In einer Richtung des Systems je Meter Projektion statt je Meter Stab -- wie Schnee auf einem geneigten Dach',
+    projiziert: 'In einer Richtung des Systems je Meter Projektion statt je Meter Stab – wie Schnee auf einem geneigten Dach',
     gelenk: 'Keine Momente, wie ein Kugelgelenk',
     hilfe: {
       vorzeichen: {
@@ -155,8 +155,8 @@ const TEXTE = {
           ['Lasten', 'positiv in Pfeilrichtung: senkrecht nach unten, in x, y oder z des Systems, längs vom Anfang zum Ende, quer in y oder z des Stabs'],
           ['Stab', 'x vom Anfang zum Ende, z nach unten in der lotrechten Ebene durch den Stab, y = z × x; an einem lotrechten Stab ist y die Achse −y des Systems. Der Drehwinkel β dreht y und z im Rechtssinn um x'],
           ['N, V, M, T', 'N > 0 Zug; M_y > 0 zieht an der gestrichelten Faser, auf der Seite von z; M_z > 0 an der Seite von y; T dreht im Rechtssinn um x'],
-          ['Faser', 'auf der Seite von z: an einem Stab, der waagrecht liegt, unten -- «Umkehren» tauscht Anfang und Ende und dreht β so, dass der Querschnitt bleibt, wie er steht'],
-          ['Ansicht', 'drehen: mit der rechten Maustaste ziehen, oder mit der linken bei gedrückter Alt-Taste -- Alt mit einem Klick setzt einen Punkt ohne Fangen; oder ein Knopf: 3D, x-y, x-z, y-z; E legt die Arbeitsebene durch den gefangenen Punkt'],
+          ['Faser', 'auf der Seite von z: an einem Stab, der waagrecht liegt, unten – «Umkehren» tauscht Anfang und Ende und dreht β so, dass der Querschnitt bleibt, wie er steht'],
+          ['Ansicht', 'drehen: mit der rechten Maustaste ziehen, oder mit der linken bei gedrückter Alt-Taste – Alt mit einem Klick setzt einen Punkt ohne Fangen; oder ein Knopf: 3D, x-y, x-z, y-z; E legt die Arbeitsebene durch den gefangenen Punkt'],
         ],
         formel: 'Lagerkraft positiv entlang der Achsen des Systems',
       },
@@ -173,11 +173,11 @@ const TEXTE = {
       querschnitte: {
         zeilen: [
           ['Vorlage', 'A, I_y, I_z und I_T nach den Formeln der Vorlage, Masse in mm'],
-          ['Profil', 'ein Stahlprofil aus der Tabelle -- y ist die starke Achse; bei β = 0 steht der Steg in der lotrechten Ebene des Stabs, gedreht wird mit dem Drehwinkel β der Linie'],
+          ['Profil', 'ein Stahlprofil aus der Tabelle – y ist die starke Achse; bei β = 0 steht der Steg in der lotrechten Ebene des Stabs, gedreht wird mit dem Drehwinkel β der Linie'],
           ['Kennwerte', 'A, I_y, I_z und I_T von Hand'],
-          ['Platte', 'ein Streifen b × h der gewählten Platte -- b waagrecht bei β = 0: I_y = b · h³ / 12, I_z = h · b³ / 12, I_T des Rechtecks'],
+          ['Platte', 'ein Streifen b × h der gewählten Platte – b waagrecht bei β = 0: I_y = b · h³ / 12, I_z = h · b³ / 12, I_T des Rechtecks'],
           ['QS Analyse', 'A, I_y und I_z des Bruttoquerschnitts der gewählten Querschnittsanalyse, y waagrecht bei β = 0; I_T rechnet sie dafür numerisch, ohne Bewehrung. I_yz bleibt aussen vor; ist es gross, sagt es ein Hinweis'],
-          ['E-Modul', 'vom Material des Stabs -- «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, auf Wunsch E_eq bei N und M, für EA, EI_y und EI_z (für EA und EI_z eine Näherung); GI_T bleibt bei G_cm'],
+          ['E-Modul', 'vom Material des Stabs – «gemäss Querschnitt» E₀ = E_cm des Betons der Platte oder Analyse, auf Wunsch E_eq bei N und M, für EA, EI_y und EI_z (für EA und EI_z eine Näherung); GI_T bleibt bei G_cm'],
           GEMEINSAM.eq,
           ['Steifigkeit', 'EA, EI_y, EI_z und GI_T am Bruttoquerschnitt, beim Beton ungerissen und ohne Bewehrung (SIA 262:2025, 4.1.4.1.3); Theorie 1. Ordnung, Torsion nach St. Venant ohne Wölbkrafttorsion'],
         ],
@@ -187,9 +187,9 @@ const TEXTE = {
         zeilen: [
           GEMEINSAM.fall,
           ['N, V, M, T', 'je Stab der Verlauf: M_y und V_z zur Seite von z des Stabs, M_z und V_y zur Seite von y; N und T dort, wo man sie besser sieht'],
-          ['Verschiebung', 'das verschobene System, überhöht -- je Stab die grössten Durchbiegungen f_y und f_z gegen die Sehne, kurzzeitig und ungerissen'],
+          ['Verschiebung', 'das verschobene System, überhöht – je Stab die grössten Durchbiegungen f_y und f_z gegen die Sehne, kurzzeitig und ungerissen'],
           ['Lager', 'die Lagerkräfte und -momente auf das Tragwerk'],
-          ['Ansicht', 'über jedem Diagramm: 3D, x-y, x-z oder y-z -- nur fürs Auge, sie wird nicht gespeichert'],
+          ['Ansicht', 'über jedem Diagramm: 3D, x-y, x-z oder y-z – nur fürs Auge, sie wird nicht gespeichert'],
           GEMEINSAM.angeschrieben,
         ],
       },

@@ -275,10 +275,10 @@ class TestEintrag(unittest.TestCase):
         aufbau = p.aufbauen()
         self.assertEqual(aufbau.feld("pfahl_aussen"), {})
         self.assertEqual(aufbau.feld("pfahl_innen"), {})
-        self.assertIn("Pfahl 'P': noch keine Kombination -- unter «Einwirkungen» eine anlegen → kein "
+        self.assertIn("Pfahl 'P': noch keine Kombination – unter «Einwirkungen» eine anlegen → kein "
                       "Nachweis.", aufbau.warnungen)
         self.assertEqual(aufbau.teile["t1"].ohne_nachweis,
-                         "noch keine Kombination -- unter «Einwirkungen» eine anlegen")
+                         "noch keine Kombination – unter «Einwirkungen» eine anlegen")
 
     def test_unmoegliche_zahlen_vor_dem_rechnen(self):
         faelle = {
@@ -307,9 +307,9 @@ class TestEintrag(unittest.TestCase):
         2026-11-19): der Pfahl wird kein Bauteil, ein Hinweis sagt, was fehlt.
         """
         faelle = {
-            "noch keine Schicht -- eine anlegen oder R_a,k aus einem Versuch eingeben": (
+            "noch keine Schicht – eine anlegen oder R_a,k aus einem Versuch eingeben": (
                 {}, None),
-            "die Schichten reichen bis 20 m -- unter dem Fuss fehlt noch Boden": (
+            "die Schichten reichen bis 20 m – unter dem Fuss fehlt noch Boden": (
                 {"L": 19.0}, {}),
         }
         for satz, (felder, schicht) in faelle.items():

@@ -46,7 +46,7 @@ function lastfaelleInhalt(eintrag, { lastenVon, eigengewicht }) {
     const n = lastenVon(eintrag, lf.kennung);
     return el('div.bs-fall', {}, [
       namensfeld({
-        wert: lf.name, titel: 'Name des Lastfalls -- so steht er im Bericht',
+        wert: lf.name, titel: 'Name des Lastfalls – so steht er im Bericht',
         setzen: (name) => aendern((s) => { s.lastfaelle[i].name = name; }),
       }),
       el('span.bs-fall-zahl', {
@@ -59,7 +59,7 @@ function lastfaelleInhalt(eintrag, { lastenVon, eigengewicht }) {
         on: {
           click: () => {
             if (n) {
-              melden(`«${lf.name}» hat noch ${lastenText(n)} -- zuerst diese löschen.`, true);
+              melden(`«${lf.name}» hat noch ${lastenText(n)} – zuerst diese löschen.`, true);
               return;
             }
             aendern((s) => {
@@ -89,7 +89,7 @@ function kombinationenInhalt(eintrag) {
     })]),
     ...eintrag.lastfaelle.map((lf) => el('td', {}, [zahlfeld({
       wert: k.faktoren[lf.kennung] ?? 0, schritt: 0.05,
-      titel: `Beiwert für «${lf.name}» -- 0: zählt nicht`,
+      titel: `Beiwert für «${lf.name}» – 0: zählt nicht`,
       beiAenderung: (w) => aendern((s) => { s.kombinationen[i].faktoren[lf.kennung] = w; }),
     })])),
     el('td', {}, [el('button.weg', {

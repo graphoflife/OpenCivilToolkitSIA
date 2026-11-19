@@ -402,7 +402,7 @@ function verformungsZeile(querschnitt, index) {
           stellungen: seiten.map((s) => [s.wert, s.beschriftung]),
           gewaehlt: k.zugseite, klasse: '.schalter-richtung',
           setzen: (wert) => aendern((x) => { x.zugseite = wert; }),
-          titel: `Zug ${k.zugseite}: danach richtet sich ω_w -- Klicken schaltet um`,
+          titel: `Zug ${k.zugseite}: danach richtet sich ω_w – Klicken schaltet um`,
         })
         : el('span'),
     ],

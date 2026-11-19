@@ -612,7 +612,7 @@ class TestMaterialsperre(unittest.TestCase):
                 unfertige = antwort.daten["unfertige"]
                 self.assertEqual(unfertige["materialien"]["b1"], {"name": name, "grund": grund})
                 self.assertEqual(unfertige["querschnitte"]["q1"]["grund"],
-                                 f"das Material «{name}» rechnet nicht -- warum, steht bei ihm")
+                                 f"das Material «{name}» rechnet nicht – warum, steht bei ihm")
 
     def test_eine_unbekannte_sorte_haelt_das_oeffnen_auf(self):
         """Ohne Sorte keine Kennwerte -- das Material liesse sich nicht einmal zeigen."""

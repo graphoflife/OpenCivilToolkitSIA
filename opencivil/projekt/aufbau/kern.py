@@ -493,7 +493,7 @@ def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str,
 def ohne_kombination(kombinationen: Sequence[Any]) -> str:
     """Warum ein Bauteil mit Einwirkungen keinen Nachweis fuehrt: es hat noch keine, oder jede ist aus."""
     return ("jede Kombination ist ausgeschaltet" if kombinationen
-            else "noch keine Kombination -- unter «Einwirkungen» eine anlegen")
+            else "noch keine Kombination – unter «Einwirkungen» eine anlegen")
 
 
 def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -> Optional[str]:
@@ -504,7 +504,7 @@ def materialgrund(kennung: str, gefunden: Optional[Tuple[str, str]], art: str) -
     Meldungen an der Zeichnung (:func:`opencivil.web.api.geometrie`).
     """
     if gefunden is None:
-        return (f"das Material '{kennung}' gibt es nicht mehr -- eines wählen" if kennung
+        return (f"das Material '{kennung}' gibt es nicht mehr – eines wählen" if kennung
                 else "noch kein Material gewählt")
     if gefunden[0] != art:
         return f"«{gefunden[1]}» ist kein {Baustoffart(art).beschriftung}"

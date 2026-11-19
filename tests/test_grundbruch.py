@@ -436,7 +436,7 @@ class TestEintrag(unittest.TestCase):
         g.kombinationen.clear()
         antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
         self.assertEqual(antwort.daten["ohne_nachweis"],
-                         {"g1": "noch keine Kombination -- unter «Einwirkungen» eine anlegen"})
+                         {"g1": "noch keine Kombination – unter «Einwirkungen» eine anlegen"})
 
     def test_namen_eindeutig(self):
         for namen in (("A", "A"), ("Feld A", "Feld-A")):

@@ -336,7 +336,7 @@ export function klickPunkt(a, bild, e) {
     if (pe.warten === 'senkrecht') r = senkrecht(a, r);
     if (!r) {
       pe.warten = null;
-      return { fehler: 'Diese Linie steht senkrecht auf der Arbeitsebene -- darin gibt es keine Senkrechte zu ihr.' };
+      return { fehler: 'Diese Linie steht senkrecht auf der Arbeitsebene – darin gibt es keine Senkrechte zu ihr.' };
     }
     pe.bindung = {
       art: pe.warten, r,

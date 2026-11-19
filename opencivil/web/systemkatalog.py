@@ -50,11 +50,11 @@ _DIAGRAMME = {
 #: Stabs es haelt: quer in der Ebene zur gestrichelten Faser, in z.
 _LINIENLAGER = {
     "quer": ("Lager quer", "quer", "⊥",
-             "Quer zur Linie, auf der Seite der gestrichelten Faser: fest -- der Stab biegt "
-             "sich nicht --, oder gebettet", "z"),
+             "Quer zur Linie, auf der Seite der gestrichelten Faser: fest – der Stab biegt "
+             "sich nicht –, oder gebettet", "z"),
     "quer_y": ("Lager quer y", "quer y", "⊥y", "Quer zur Linie, in y des Stabs: fest oder gebettet", "y"),
     "quer_z": ("Lager quer z", "quer z", "⊥z",
-               "Quer zur Linie, in z des Stabs -- zur gestrichelten Faser: fest oder gebettet", "z"),
+               "Quer zur Linie, in z des Stabs – zur gestrichelten Faser: fest oder gebettet", "z"),
     "laengs": ("Lager längs", "längs", "∥", "Längs der Linie: fest oder gebettet", "x"),
 }
 

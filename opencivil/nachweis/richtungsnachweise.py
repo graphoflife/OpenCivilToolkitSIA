@@ -82,7 +82,7 @@ class DuktilitaetQA(Nachweis):
         q, _ = self.analyse.interaktion(e)
         p.erklaerung(
             "Ein Querschnitt kann Schnittgrössen umlagern, wenn die Bewehrung "
-            "fliesst, bevor der Beton bricht -- dann ist die Druckzone klein. "
+            "fliesst, bevor der Beton bricht – dann ist die Druckzone klein. "
             "Gemessen wird das an x/d bei reiner Biegung: x ist der Abstand der "
             "Nulllinie vom gedrücktesten Betonpunkt, d der des Schwerpunkts der "
             "Zugbewehrung, beide senkrecht zur Nulllinie. Zur Zugbewehrung "

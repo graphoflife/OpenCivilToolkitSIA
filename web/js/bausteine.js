@@ -34,7 +34,7 @@ export function gemeinsam(werte) {
 /** Die Stellungen eines Schalters oder einer Liste -- bei VAR mit «Var» vorneweg. */
 export function mitVar(werte, gewaehlt) {
   return gewaehlt === VAR ? [{
-    wert: VAR, beschriftung: 'Var', titel: 'Die gewählten unterscheiden sich -- was man wählt, gilt für alle',
+    wert: VAR, beschriftung: 'Var', titel: 'Die gewählten unterscheiden sich – was man wählt, gilt für alle',
   }, ...werte] : werte;
 }
 
@@ -307,7 +307,7 @@ export function hakenSchalter(an, setzen, was = 'Nachweis') {
   return zweiSchalter({
     stellungen: [[true, '✓', 'ist-ja'], [false, '✗', 'ist-nein']],
     gewaehlt: !!an, setzen, klasse: '.schalter-haken',
-    titel: `${was}: ${an ? 'ein -- Klicken schaltet aus' : 'aus -- Klicken schaltet ein'}`,
+    titel: `${was}: ${an ? 'ein – Klicken schaltet aus' : 'aus – Klicken schaltet ein'}`,
   });
 }
 

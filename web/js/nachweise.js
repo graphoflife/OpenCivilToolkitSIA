@@ -444,7 +444,7 @@ function gebrauchsKapitel(eintrag, ort, {
       : [el('div.leer', {
         text: !abgeleitet ? `Noch kein ${wort}er Lastfall.`
           : eingeschaltet(eintrag[ort.gebrauch.aus]) ? 'Nur die abgeleiteten Fälle.'
-            : 'Noch keine eingeschaltete Einwirkung der Tragsicherheit -- abgeleitet wird nichts.',
+            : 'Noch keine eingeschaltete Einwirkung der Tragsicherheit – abgeleitet wird nichts.',
       })]),
     anfuegenKnopf('Lastfall', () => aendern((l) => {
       l.faelle.push(ausVorlage(ort.gebrauch.vorlage, { name: naechsterName(neu, l.faelle) }));

@@ -258,7 +258,7 @@ class Schubwandnachweis(Nachweis):
             "V_y, V_z und um den Schwerpunkt T. Eine gezeichnete Wand ist dort "
             "geteilt, wo eine andere auf ihr endet oder sie kreuzt (Wand 1.1, "
             "Wand 1.2 …): jede trägt so überall denselben Fluss und wird für sich "
-            "nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter -- bei einer "
+            "nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter – bei einer "
             "Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. "
             "In der Zusammenfassung steht die massgebende Wand.")
         p.ansatz(r"k_i = b_{w,i} \cdot l_i \qquad \sum_i k_i\, e_i e_i^T\, u = V "

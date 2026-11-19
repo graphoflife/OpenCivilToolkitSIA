@@ -295,10 +295,10 @@ def _uebersicht(formeln: Dict[str, Formel], themen: Dict[str, Thema],
 
     offen = [f for f in formeln.values() if not f.referenzen]
     zeilen += ["## Normstelle fehlt noch", "",
-               f"{len(offen)} von {len(formeln)} Formeln haben im Code keine Normstelle -- "
+               f"{len(offen)} von {len(formeln)} Formeln haben im Code keine Normstelle – "
                "meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach "
                "Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle "
-               "dort nachgeschlagen und im Code eingetragen, an der genannten Stelle -- "
+               "dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – "
                "von dort kommt sie in Bericht und Notizbuch.", ""]
     for formel in sorted(offen, key=lambda f: sortierschluessel(f.name)):
         stellen = ", ".join(codestelle(c) for c in sorted(formel.codestellen))

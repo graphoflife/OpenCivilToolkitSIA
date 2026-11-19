@@ -229,7 +229,7 @@ class Pfahlsteifigkeit(Prozedur):
             "Reibung am Mantel und der Druck am Fuss, quer drückt er gegen den Boden "
             "neben sich. Wie stark die Federn sind, folgt aus dem Verformungsmodul der "
             "Schichten: am Mantel und am Fuss nach Cassan, quer nach der Norm. Die Federn "
-            "am Kopf -- wie weit er sich unter einer Last setzt, verschiebt und dreht -- "
+            "am Kopf – wie weit er sich unter einer Last setzt, verschiebt und dreht – "
             "braucht das Modell des Tragwerks darüber; sie gelten mit dem "
             "charakteristischen Modul. Für die Schnittkräfte rechnet die Norm mit einem "
             "kleineren: in weicherem Boden weicht der Pfahl weiter aus und biegt sich "
@@ -274,7 +274,7 @@ class Pfahlsteifigkeit(Prozedur):
             vorlagen = (r"@E \cdot \frac{\pi \cdot @D^{2}}{4}",
                         r"@E \cdot \frac{\pi \cdot @D^{4}}{64}")
             eingaben = {"E": E, "D": D}
-            p.annahme("Der Beton ungerissen und ohne die Bewehrung, mit E_cm -- nach Vorgabe, "
+            p.annahme("Der Beton ungerissen und ohne die Bewehrung, mit E_cm – nach Vorgabe, "
                       "nicht nachgeschlagen. Gerissen ist der Pfahl weicher: die "
                       "Verschiebungen werden grösser, die Momente etwas kleiner.")
         else:
@@ -296,7 +296,7 @@ class Pfahlsteifigkeit(Prozedur):
             a = math.pi * (aussen ** 2 - innen ** 2) / 4.0
             i = math.pi * (aussen ** 4 - innen ** 4) / 64.0
             p.annahme("Es trägt nur das Tragglied, nach der Abrostung; der Mörtel zählt nicht "
-                      "-- nach Vorgabe, nicht nachgeschlagen, wie beim inneren Widerstand.")
+                      "– nach Vorgabe, nicht nachgeschlagen, wie beim inneren Widerstand.")
         EA = werte.wert("EA", "EA", Groesse.aus_si(E.groesse.si * a, MN), 0,
                         "Dehnsteifigkeit des Pfahls")
         p.formel(EA, vorlagen[0], eingaben, titel="Dehnsteifigkeit des Pfahls", referenz="",
@@ -322,11 +322,11 @@ class Pfahlsteifigkeit(Prozedur):
                  titel="Bettung quer nahe dem Terrain abgemindert, z ab Terrain",
                  referenz="SIA 267:2013, 9.5.4.5", name="Abgeminderte Bettung am Terrain")
         p.annahme("Wie die Bettung nahe dem Terrain abnimmt, sagt die Norm nicht; hier linear "
-                  "von null am Terrain bis zum vollen Wert in t_red -- nach Vorgabe, nicht "
+                  "von null am Terrain bis zum vollen Wert in t_red – nach Vorgabe, nicht "
                   f"nachgeschlagen. An der Oberfläche stützt der Boden nicht ({buch.KAP_QUER}).")
         if not self.pfahl.bohrpfahl:
             p.annahme("Cassans Federn gelten für Bohrpfähle; der Mikropfahl rechnet mit "
-                      "denselben -- nach Vorgabe, nicht nachgeschlagen.")
+                      "denselben – nach Vorgabe, nicht nachgeschlagen.")
         zeilen: List[List[Zelle]] = []
         stuecke = grund.stuecke()
         for i, oben, unten in stuecke:
@@ -343,7 +343,7 @@ class Pfahlsteifigkeit(Prozedur):
         ohne = [str(i + 1) for i, _, _ in stuecke if not grund.mantel[i]]
         if ohne:
             p.text(f"Schicht {', '.join(ohne)}: die Mantelreibung ist null eingegeben, der "
-                   f"Mantel trägt dort nicht -- auch längs keine Feder. Cassan zählt nur die "
+                   f"Mantel trägt dort nicht – auch längs keine Feder. Cassan zählt nur die "
                    f"Schicht, in der der Pfahl trägt ({buch.KAP_FEDERN}).")
         if not self.pfahl.fuss_traegt:
             p.text("Der Fuss trägt nicht: er hat keine Feder.")
@@ -356,7 +356,7 @@ class Pfahlsteifigkeit(Prozedur):
                  titel=f"Feder am Fuss, in Schicht {j + 1}: A_b · R / D mit R = 4.5 · E_s,k",
                  referenz=buch.KAP_FEDERN, name="Feder am Pfahlfuss")
         if self.pfahl.grundlage.aus_versuch:
-            p.annahme("R_a,k kommt aus einem Versuch: der Fuss zählt mit seiner Feder mit -- "
+            p.annahme("R_a,k kommt aus einem Versuch: der Fuss zählt mit seiner Feder mit – "
                       "nach Vorgabe, nicht nachgeschlagen.")
         p.text("Der Fuss drückt nur: auf Zug hat er keine Feder.")
 
@@ -372,7 +372,7 @@ class Pfahlsteifigkeit(Prozedur):
                "t_red, dazwischen gleich weit, längs mit linearem, quer mit kubischem Ansatz; "
                "die abgeminderte Bettung wächst in jedem Element linear. Mit dem "
                "charakteristischen Verformungsmodul (SIA 267:2013, 5.3.2.8), unter einer "
-               "Probelast von 1 MN am Kopf -- das System ist linear, jede Last gibt dieselbe "
+               "Probelast von 1 MN am Kopf – das System ist linear, jede Last gibt dieselbe "
                "Feder.")
         p.wert(werte.wert("dz", r"\Delta z", Groesse.aus_si(schritt, M), 3,
                           "Länge der Elemente, höchstens"), referenz="")
@@ -432,10 +432,10 @@ class Pfahlsteifigkeit(Prozedur):
                        "zum Versagen", referenz=GAMMA_E_REFERENZ,
                  name="Bemessungswert des Verformungsmoduls")
         p.annahme("γ_E = 1.5 ist der kleinste Wert, den die Norm zulässt; sie verlangt ihn "
-                  "objektbezogen -- nach Vorgabe, nicht nachgeschlagen.")
+                  "objektbezogen – nach Vorgabe, nicht nachgeschlagen.")
         p.annahme("Längs und quer getrennt: die Normalkraft verstärkt die Biegung nicht. Wächst "
                   "die Wirkung nicht im Mass der Last, etwa durch Effekte zweiter Ordnung, "
-                  "verlangt die Norm eine eigene Untersuchung (SIA 267:2013, 9.5.3.4.3) -- "
+                  "verlangt die Norm eine eigene Untersuchung (SIA 267:2013, 9.5.3.4.3) – "
                   "hier nach Vorgabe, nicht nachgeschlagen, ohne sie.")
         strecken = grund.strecken(GAMMA_E)
         K_b = grund.fussfeder(GAMMA_E) if self.pfahl.fuss_traegt else 0.0
@@ -453,7 +453,7 @@ class Pfahlsteifigkeit(Prozedur):
             befund.verlaeufe.append(Verlauf(k.name, N, H, M, z, laengs.w, laengs.N,
                                             laengs.fusskraft, **felder))
             if eingespannt and M != 0.0:
-                p.hinweis(f"{k.name}: der Kopf ist eingespannt -- M_Ed = {M / 1e3:.1f} kNm "
+                p.hinweis(f"{k.name}: der Kopf ist eingespannt – M_Ed = {M / 1e3:.1f} kNm "
                           f"zählt nicht, das Moment am Kopf ist die Reaktion.")
         self._tabellen(p, befund)
 

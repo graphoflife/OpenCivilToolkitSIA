@@ -527,7 +527,7 @@ class MitStaeben:
         a, b = self.enden(linie)
         L = math.dist(a, b)
         if not 0.0 < stelle < L:
-            raise ProjektFehler(f"{linie.kennung} ist {L:.3f} m lang -- geteilt werden kann nur "
+            raise ProjektFehler(f"{linie.kennung} ist {L:.3f} m lang – geteilt werden kann nur "
                                 f"dazwischen, nicht bei {stelle:g} m.")
         schnitt = self._knoten(self.netz(), tuple(pa + (pb - pa) * stelle / L
                                                   for pa, pb in zip(a, b)))

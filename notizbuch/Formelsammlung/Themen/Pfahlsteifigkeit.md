@@ -1,5 +1,5 @@
 ---
-erzeugt: 98097e66323d
+erzeugt: 86efc6135a41
 art: thema
 tags: [thema]
 ---
@@ -8,7 +8,7 @@ tags: [thema]
 
 ## Was die Rechnung dazu sagt
 
-Der Pfahl steht im Boden wie ein Stab auf Federn. Längs halten ihn die Reibung am Mantel und der Druck am Fuss, quer drückt er gegen den Boden neben sich. Wie stark die Federn sind, folgt aus dem Verformungsmodul der Schichten: am Mantel und am Fuss nach Cassan, quer nach der Norm. Die Federn am Kopf -- wie weit er sich unter einer Last setzt, verschiebt und dreht -- braucht das Modell des Tragwerks darüber; sie gelten mit dem charakteristischen Modul. Für die Schnittkräfte rechnet die Norm mit einem kleineren: in weicherem Boden weicht der Pfahl weiter aus und biegt sich stärker.
+Der Pfahl steht im Boden wie ein Stab auf Federn. Längs halten ihn die Reibung am Mantel und der Druck am Fuss, quer drückt er gegen den Boden neben sich. Wie stark die Federn sind, folgt aus dem Verformungsmodul der Schichten: am Mantel und am Fuss nach Cassan, quer nach der Norm. Die Federn am Kopf – wie weit er sich unter einer Last setzt, verschiebt und dreht – braucht das Modell des Tragwerks darüber; sie gelten mit dem charakteristischen Modul. Für die Schnittkräfte rechnet die Norm mit einem kleineren: in weicherem Boden weicht der Pfahl weiter aus und biegt sich stärker.
 
 ## Formeln
 

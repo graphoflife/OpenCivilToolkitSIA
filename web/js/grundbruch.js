@@ -32,7 +32,7 @@ const HILFE = {
   situation: {
     zeilen: [
       ['φ_eff', 'arctan(tan φ_k / γ_φ) nach SIA 267:2013, 5.3.2.1; γ_φ nach 5.3.2.2, Tabelle 1'],
-      ['c_eff', 'c_k / γ_c -- mit φ = 0 rechnet c als undrainierte Scherfestigkeit s_u'],
+      ['c_eff', 'c_k / γ_c – mit φ = 0 rechnet c als undrainierte Scherfestigkeit s_u'],
       ['Feinkörnig', 'kurzzeitig undrainiert, langfristig drainiert: je ein Grundbruch mit φ = 0 und c = s_u und einer mit φ und c (SIA 267:2013, 8.5.1.5, 8.5.1.6)'],
       ['γ', 'eine Raumlast über und unter dem Wasser; das Buch nimmt unter ihm die gesättigte (Kap. 1.4), mit der feuchten wird γ\' etwas kleiner, auf der sicheren Seite'],
       ['t, t₁', 'ab Oberkante Terrain: bis zur Sohle, bis zum höchsten Grundwasserspiegel'],
@@ -97,9 +97,9 @@ function situationPanel(g) {
       zahlzeile(g, 'gamma_phi', 'Partialfaktor', String.raw`\gamma_{\varphi}`,
         { schritt: 0.05, titel: 'Partialfaktor des Reibungswinkels, SIA 267:2013, 5.3.2.2' }),
       zahlzeile(g, 'c_k', 'Kohäsion', 'c_k',
-        { titel: 'Kohäsion, charakteristisch -- mit φ = 0 die undrainierte Scherfestigkeit; neben φ nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)' }),
+        { titel: 'Kohäsion, charakteristisch – mit φ = 0 die undrainierte Scherfestigkeit; neben φ nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)' }),
       zahlzeile(g, 'gamma_c', 'Partialfaktor', String.raw`\gamma_c`,
-        { schritt: 0.05, titel: 'Partialfaktor der Kohäsion, SIA 267:2013, 5.3.2.2, Tabelle 1 -- auch für s_u' }),
+        { schritt: 0.05, titel: 'Partialfaktor der Kohäsion, SIA 267:2013, 5.3.2.2, Tabelle 1 – auch für s_u' }),
       zahlzeile(g, 'gamma', 'Raumlast Boden', String.raw`\gamma`, { schritt: 0.5 }),
       zahlzeile(g, 'gamma_w', 'Raumlast Wasser', String.raw`\gamma_w`, { schritt: 0.5 }),
       bemessungswerte(g),

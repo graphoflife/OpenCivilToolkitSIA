@@ -95,7 +95,7 @@ def aufteilen(decke: Decke, zerlegung: Zerlegung) -> Aufteilungen:
             grund, neue_zellen, ohne = _automatisch(zerlegung, gruppe, streifen1, streifen2)
             zellen.extend(neue_zellen)
             meldungen.extend(Meldung(
-                f"Platte {name}: an {n} Stellen trägt keine der beiden Richtungen -- dort fehlt ein "
+                f"Platte {name}: an {n} Stellen trägt keine der beiden Richtungen – dort fehlt ein "
                 "Lager oder ein Unterzug.", (name,)) for name, n in ohne.items())
         for (name, nummer), anteile in grund.items():
             heraus = list(anteile)

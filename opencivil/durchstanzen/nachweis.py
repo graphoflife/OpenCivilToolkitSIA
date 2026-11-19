@@ -231,7 +231,7 @@ class Durchstanzen(Nachweis):
         elif psi.groesse.si <= ROTATION_MINDEST:
             p.hinweis(
                 f"ψ = {psi.formatiert()} ≤ {ROTATION_MINDEST:.3f}: das Verformungsvermögen ist "
-                f"ohne Durchstanzbewehrung nach Gleichung (67) nicht nachgewiesen -- sonst "
+                f"ohne Durchstanzbewehrung nach Gleichung (67) nicht nachgewiesen – sonst "
                 f"sind die aufgezwungenen Verformungen nach 4.1.2 zu berücksichtigen "
                 f"(4.3.6.1.2).")
         if v.erfuellt:
@@ -335,8 +335,8 @@ class Durchstanzen(Nachweis):
             p.wert(k_e, titel=titel, referenz="SIA 262:2025, 4.3.6.2.5")
             return k_e
         p.erklaerung(
-            "e_u ist der Abstand zwischen der Resultierenden der Auflagerkraft -- in der "
-            "Stützenachse, verschoben um die Exzentrizität e_x, e_y -- und dem Schwerpunkt der "
+            "e_u ist der Abstand zwischen der Resultierenden der Auflagerkraft – in der "
+            "Stützenachse, verschoben um die Exzentrizität e_x, e_y – und dem Schwerpunkt der "
             "zählenden Teile des Nachweisschnitts.")
         return herleitung.k_e(p, w, a, e_u, ix=STUETZE)
 
@@ -403,7 +403,7 @@ class Durchstanzen(Nachweis):
                      referenz="SIA 262:2025, 4.3.6.4.1, (60)", name="Plattenrotation")
             if m_sd[r] is not None and verhaeltnis > 1.0:
                 p.hinweis(f"m_sd > m_Rd in {k}: die Biegebewehrung im Stützstreifen genügt "
-                          f"nicht -- der Biegenachweis gehört dazu.")
+                          f"nicht – der Biegenachweis gehört dazu.")
             rotationen.append(Rotation(r, r_s[r].groesse.si,
                                        None if m_sd[r] is None else m_sd[r].groesse.si,
                                        None if m_Rd[r] is None else m_Rd[r].groesse.si, psi_si))

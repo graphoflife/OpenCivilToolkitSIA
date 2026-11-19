@@ -61,7 +61,7 @@ GAMMA_M = {True: (1.3, "SIA 267:2013, 9.5.2.2.4, (43)"),
 
 #: Was beide Richtungen annehmen -- siehe Dateikopf.
 ZUG_WIE_DRUCK = ("Auf Zug trägt nur der Mantel, mit derselben Mantelreibung wie auf Druck "
-                 "-- nach Vorgabe, nicht nachgeschlagen. Ein Zugpfahl muss die Zugkraft "
+                 "– nach Vorgabe, nicht nachgeschlagen. Ein Zugpfahl muss die Zugkraft "
                  "über seine ganze Länge tragen (SIA 267:2013, 9.5.3.4.2).")
 
 
@@ -116,8 +116,8 @@ class AeussererWiderstand(Achsnachweis):
             "auf die Schicht, in der er steht. Die Summe ist der charakteristische "
             "äussere Widerstand. Auf Zug trägt nur der Mantel. Der Bemessungswert "
             "folgt mit zwei Faktoren der Norm: der Umrechnungsfaktor η_a sagt, wie "
-            "verlässlich der Widerstand bestimmt ist -- aus einer Berechnung am "
-            "wenigsten, aus einem statischen Versuch am meisten --, der "
+            "verlässlich der Widerstand bestimmt ist – aus einer Berechnung am "
+            "wenigsten, aus einem statischen Versuch am meisten –, der "
             "Widerstandsbeiwert γ_M,a deckt die Streuung des Bodens und der "
             "Ausführung.")
         werte = Zwischenwerte(self.id)
@@ -261,7 +261,7 @@ class AeussererWiderstand(Achsnachweis):
                    f"{schicht.name}; sie reicht noch {fest(profil.grenzen[j][1] - z_F, 2)} m "
                    f"tiefer.")
             p.annahme("Die Schicht unter dem Fuss ist mächtig genug, dass der Fuss sie nicht "
-                      f"durchstanzt -- die Voraussetzung des Spitzendrucks ({buch.KAP_MANTEL}).")
+                      f"durchstanzt – die Voraussetzung des Spitzendrucks ({buch.KAP_MANTEL}).")
             q_b = (self._fuss_drainiert(e, p, werte, profil, j, z_F) if schicht.drainiert
                    else self._fuss_undrainiert(e, p, werte, j))
         R_b = werte.kraft("R_bk", "R_{b,k}", A_b.groesse.si * q_b.groesse.si,
@@ -282,7 +282,7 @@ class AeussererWiderstand(Achsnachweis):
                    f"({buch.KAP_ABSCHEREN}).")
             p.annahme("Das Buch sieht danach keine weitere Sicherheit am Spitzendruck vor; hier "
                       "gelten η_a und γ_M,a der Norm trotzdem. X wird mit φ'_k abgelesen, nicht "
-                      "mit 2/3 davon -- beides nach Vorgabe, nicht nachgeschlagen.")
+                      "mit 2/3 davon – beides nach Vorgabe, nicht nachgeschlagen.")
             phi = werte.wert("phi_stern", r"\varphi^{*}", Groesse.aus_si(
                 buch.ABSCHEREN * phi.groesse.si, GRAD), 2, "Reibungswinkel am Fuss")
             p.formel(phi, r"\tfrac{2}{3} \cdot @phi", {"phi": e[f"phi_k_{i}"]},
@@ -336,7 +336,7 @@ class AeussererWiderstand(Achsnachweis):
                  referenz=buch.KAP_SPITZE_UNDRAINIERT,
                  name="Tragfähigkeitsfaktor des Pfahlfusses undrainiert")
         p.annahme("Undrainiert ohne die Überlagerung am Fuss: sie hebt sich etwa mit dem "
-                  "Gewicht des Pfahls auf, das auch nicht in der Einwirkung steht -- nach "
+                  "Gewicht des Pfahls auf, das auch nicht in der Einwirkung steht – nach "
                   "Vorgabe, nicht nachgeschlagen.")
         q_b = werte.wert("q_b", "q_{b,k}", Groesse.aus_si(s_u.groesse.si * N_c.groesse.si, KPA),
                          0, "Spitzendruck")

@@ -596,7 +596,7 @@ Dehnungsebene
     -------------------------  ----------------------
                        11.371                 0.04957
 
-Kräfte im Bruchzustand -- Beton als Resultierende, Bewehrung je Element
+Kräfte im Bruchzustand – Beton als Resultierende, Bewehrung je Element
     Teil     F\ [\mathrm{kN}]  y\ [\mathrm{mm}]  z\ [\mathrm{mm}]  \varepsilon\ [\text{‰}]  \sigma\ [\mathrm{N/mm^2}]
     -------  ----------------  ----------------  ----------------  -----------------------  -------------------------
     C30/37             -367.6             150.0             568.8                        –                          –
@@ -901,8 +901,8 @@ Sohlneigungsfaktor der seitlichen Auflast   [Kap. 9.2.16]
 
 Sohlneigungsfaktor des Gleitkörpergewichts   [Kap. 9.2.16]
     b_{\gamma} = e^{-0.047 \cdot \alpha \cdot \tan \varphi_{eff}} = e^{-0.047 \cdot 0{}^{\circ} \cdot \tan 27.51{}^{\circ}} = 1
-[*] Annahme: b_γ mit tan φ wie in Tabelle 9.2.18 -- im Text des Kapitels steht tan α; die Tabelle
-und die Formel für b_q rechnen mit tan φ.
+[*] Annahme: b_γ mit tan φ wie in Tabelle 9.2.18 – im Text des Kapitels steht tan α; die Tabelle und
+die Formel für b_q rechnen mit tan φ.
 
 Grundbruch – Tragsicherheit
 ---------------------------
@@ -1024,7 +1024,7 @@ Setzung einer Teilschicht   [Kap. 8.5]
 Einflussfaktor unter dem Punkt K
 --------------------------------
 
-Starres Fundament: gerechnet wird im kennzeichnenden Punkt K -- dort setzt sich die schlaffe Last so
+Starres Fundament: gerechnet wird im kennzeichnenden Punkt K – dort setzt sich die schlaffe Last so
 stark, wie sich das starre Fundament im Mittel setzt.
 
 Abstand des Punktes K von der Ecke, längs L   [Kap. 8.10, Bild 8.15]
@@ -1209,14 +1209,14 @@ Fläche des Fusses
     A_b = \frac{\pi \cdot D^{2}}{4} = \frac{\pi \cdot \left(900\,\mathrm{mm}\right)^{2}}{4} = 0.636\,\mathrm{m}^{2}
 
 Der Fuss steht in 13.50 m unter Terrain in Schicht 3, Moräne; sie reicht noch 9.50 m tiefer.
-[*] Annahme: Die Schicht unter dem Fuss ist mächtig genug, dass der Fuss sie nicht durchstanzt --
-die Voraussetzung des Spitzendrucks (Kap. 12.5).
+[*] Annahme: Die Schicht unter dem Fuss ist mächtig genug, dass der Fuss sie nicht durchstanzt – die
+Voraussetzung des Spitzendrucks (Kap. 12.5).
 
 Örtliches Abscheren: bis der Boden am Fuss ganz bricht, müsste sich der Pfahl stark setzen. Darum
 zählen nur 2/3 von φ'_k und c'_k (Kap. 9.2.7, 12.5).
 [*] Annahme: Das Buch sieht danach keine weitere Sicherheit am Spitzendruck vor; hier gelten η_a und
-γ_M,a der Norm trotzdem. X wird mit φ'_k abgelesen, nicht mit 2/3 davon -- beides nach Vorgabe,
-nicht nachgeschlagen.
+γ_M,a der Norm trotzdem. X wird mit φ'_k abgelesen, nicht mit 2/3 davon – beides nach Vorgabe, nicht
+nachgeschlagen.
 
 Reibungswinkel für örtliches Abscheren   [Kap. 9.2.7, 12.5]
     \varphi^{*} = \tfrac{2}{3} \cdot \varphi'_{k,3} = \tfrac{2}{3} \cdot 36{}^{\circ} = 24{}^{\circ}
@@ -1257,9 +1257,9 @@ Charakteristischer äusserer Widerstand
 
 Äusserer Widerstand auf Zug, charakteristisch: nur der Mantel   [SIA 267:2013, 9.4.4.1.1]
     R_{a,k,Z} = R_{s,k} = 1085\,\mathrm{kN}
-[*] Annahme: Auf Zug trägt nur der Mantel, mit derselben Mantelreibung wie auf Druck -- nach
-Vorgabe, nicht nachgeschlagen. Ein Zugpfahl muss die Zugkraft über seine ganze Länge tragen (SIA
-267:2013, 9.5.3.4.2).
+[*] Annahme: Auf Zug trägt nur der Mantel, mit derselben Mantelreibung wie auf Druck – nach Vorgabe,
+nicht nachgeschlagen. Ein Zugpfahl muss die Zugkraft über seine ganze Länge tragen (SIA 267:2013,
+9.5.3.4.2).
 
 Bemessungswert auf Druck
 ------------------------
@@ -1382,7 +1382,7 @@ Innerer Widerstand auf Druck, Bemessungswert   [SIA 267:2013, 9.5.2.4.1, (50)]
 Innerer Widerstand auf Zug, Bemessungswert   [SIA 267:2013, 9.5.2.4.1, (50)]
     R_{i,d,Z} = \eta_i \cdot R_{mat,d,Z} = 0.8 \cdot 1639\,\mathrm{kN} = 1311\,\mathrm{kN}
 [i] Hinweis: Knicken ist nicht nachgewiesen. Ein schlanker Pfahl, der seitlich nicht oder nur
-schwach gebettet ist -- in sehr weichem Boden, frei über dem Terrain --, kann knicken (SIA 267:2013,
+schwach gebettet ist – in sehr weichem Boden, frei über dem Terrain –, kann knicken (SIA 267:2013,
 9.5.1.1).
 
 Innerer Widerstand – Tragsicherheit
@@ -1405,7 +1405,7 @@ Steifigkeit
 
 Querschnitt
 -----------
-[*] Annahme: Der Beton ungerissen und ohne die Bewehrung, mit E_cm -- nach Vorgabe, nicht
+[*] Annahme: Der Beton ungerissen und ohne die Bewehrung, mit E_cm – nach Vorgabe, nicht
 nachgeschlagen. Gerissen ist der Pfahl weicher: die Verschiebungen werden grösser, die Momente etwas
 kleiner.
 
@@ -1427,7 +1427,7 @@ Bettung quer, je Meter Pfahl   [SIA 267:2013, 9.5.4.5, (53)]
 Bettung quer nahe dem Terrain abgemindert, z ab Terrain   [SIA 267:2013, 9.5.4.5]
     k_s(z) = k_s \cdot \min\left(1;\ \frac{z}{t_{red}}\right)
 [*] Annahme: Wie die Bettung nahe dem Terrain abnimmt, sagt die Norm nicht; hier linear von null am
-Terrain bis zum vollen Wert in t_red -- nach Vorgabe, nicht nachgeschlagen. An der Oberfläche stützt
+Terrain bis zum vollen Wert in t_red – nach Vorgabe, nicht nachgeschlagen. An der Oberfläche stützt
 der Boden nicht (Kap. 12.10, Bild 12.14).
 
 Federn je Schicht, charakteristisch, ohne Abminderung
@@ -1437,7 +1437,7 @@ Federn je Schicht, charakteristisch, ohne Abminderung
     2: Kies, sandig               2.00               8.00                          60                    71.3                    66.7
     3: Moräne                     8.00              13.50                         120                   142.5                   133.3
 
-Schicht 1: die Mantelreibung ist null eingegeben, der Mantel trägt dort nicht -- auch längs keine
+Schicht 1: die Mantelreibung ist null eingegeben, der Mantel trägt dort nicht – auch längs keine
 Feder. Cassan zählt nur die Schicht, in der der Pfahl trägt (Kap. 12.8, Bild 12.9).
 
 Feder am Fuss, in Schicht 3: A_b · R / D mit R = 4.5 · E_s,k   [Kap. 12.8, Bild 12.9]
@@ -1454,7 +1454,7 @@ Gebetteter Stab: längs die Setzung w, quer die Verschiebung y   [Kap. 12.8, Bil
 Gelöst mit finiten Elementen: Knoten an jeder Grenze einer Schicht und bei t_red, dazwischen gleich
 weit, längs mit linearem, quer mit kubischem Ansatz; die abgeminderte Bettung wächst in jedem
 Element linear. Mit dem charakteristischen Verformungsmodul (SIA 267:2013, 5.3.2.8), unter einer
-Probelast von 1 MN am Kopf -- das System ist linear, jede Last gibt dieselbe Feder.
+Probelast von 1 MN am Kopf – das System ist linear, jede Last gibt dieselbe Feder.
 
 Länge der Elemente, höchstens
     \Delta z = 0.1\,\mathrm{m}
@@ -1500,11 +1500,11 @@ Verformungen und Schnittkräfte je Kombination
 
 Verformungsmodul der Tragsicherheit: hier führt zu wenig Steifigkeit zum Versagen   [SIA 267:2013, 5.3.2.5]
     E_{s,d} = \frac{E_{s,k}}{\gamma_E} \qquad \gamma_E = 1.5
-[*] Annahme: γ_E = 1.5 ist der kleinste Wert, den die Norm zulässt; sie verlangt ihn objektbezogen
--- nach Vorgabe, nicht nachgeschlagen.
+[*] Annahme: γ_E = 1.5 ist der kleinste Wert, den die Norm zulässt; sie verlangt ihn objektbezogen –
+nach Vorgabe, nicht nachgeschlagen.
 [*] Annahme: Längs und quer getrennt: die Normalkraft verstärkt die Biegung nicht. Wächst die
 Wirkung nicht im Mass der Last, etwa durch Effekte zweiter Ordnung, verlangt die Norm eine eigene
-Untersuchung (SIA 267:2013, 9.5.3.4.3) -- hier nach Vorgabe, nicht nachgeschlagen, ohne sie.
+Untersuchung (SIA 267:2013, 9.5.3.4.3) – hier nach Vorgabe, nicht nachgeschlagen, ohne sie.
 
 Längs: Setzung des Kopfs und Kraft am Fuss
     Kombination     N_{Ed}\ [\mathrm{kN}]  w_0\ [\mathrm{mm}]  N_b\ [\mathrm{kN}]
@@ -1528,11 +1528,11 @@ Erddruck drainiert, vorne passiv und hinten aktiv: wirksame Spannungen, ohne Rei
 Erdwiderstand je Meter Pfahl: vor dem schmalen Pfahl auf der dreifachen Breite   [Kap. 10.8]
     p_{E,k} = b' \cdot \left(e_p - \max\left(0;\ e_a\right)\right) \qquad b' = 3 \cdot D
 [*] Annahme: Hinten drückt der Boden aktiv nach, wo e_a positiv ist, sonst klafft ein Spalt; beide
-Drücke wirken auf 3 · D -- nach Vorgabe, nicht nachgeschlagen. Das Buch nennt diese Breite für den
+Drücke wirken auf 3 · D – nach Vorgabe, nicht nachgeschlagen. Das Buch nennt diese Breite für den
 passiven Druck vor einem schmalen Träger. So hebt sich undrainiert σ_v vorne und hinten auf, und
 p_E,k wächst nicht ohne Grenze mit der Tiefe.
 
-Erdwiderstand am Pfahl, charakteristisch, z ab Terrain -- geteilt an den Schichten, am Wasser und wo e_a null wird
+Erdwiderstand am Pfahl, charakteristisch, z ab Terrain – geteilt an den Schichten, am Wasser und wo e_a null wird
     Schicht          z_o\ [\mathrm{m}]  z_u\ [\mathrm{m}]  p_{E,k,o}\ [\mathrm{kN/m}]  p_{E,k,u}\ [\mathrm{kN/m}]
     ---------------  -----------------  -----------------  --------------------------  --------------------------
     1: Auffüllung                 1.50               2.00                         205                         274
@@ -1556,7 +1556,7 @@ steht der Pfahl still. Der kleinste Bruch ist R_tr,k.
 nicht nachgeschlagen: die Norm verlangt nur, R_tr,k aus dem Erdwiderstand und dem inneren Widerstand
 zu bestimmen. Der Biegewiderstand zählt dabei charakteristisch, mal η_i.
 [*] Annahme: γ_M,a = 1.4 ist quer in der Regel der kleinste Wert; die Norm will den Bemessungswert
-je Objekt bestimmt haben. Die Bettungskraft steht mit denselben Beiwerten gegen den Erdwiderstand --
+je Objekt bestimmt haben. Die Bettungskraft steht mit denselben Beiwerten gegen den Erdwiderstand –
 beides nach Vorgabe, nicht nachgeschlagen.
 
 Äusserer Widerstand quer – Tragsicherheit
@@ -1617,7 +1617,7 @@ Querkraftwiderstand
 Der Pfahl trägt die Querkraft wie der Steg eines Balkens: schräge Druckdiagonalen im Beton, die
 Wendel als Zugglied, die Längsstäbe als Gurt.
 
-Radius des Kreises, auf dem die Längsstäbe liegen -- aus dem inneren Widerstand
+Radius des Kreises, auf dem die Längsstäbe liegen – aus dem inneren Widerstand
     r_s = 355\,\mathrm{mm}
 
 Statische Höhe: bis zum Schwerpunkt der Stäbe in der gezogenen Hälfte   [SIA 262:2025, 4.3.3.4.2]
@@ -2220,7 +2220,7 @@ Querschnittsanalyse
 -------------------
 
 Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein Polygon ganz in einem
-anderen, ersetzt es dieses dort -- eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach
+anderen, ersetzt es dieses dort – eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach
 oben; alle Masse in Millimetern.
 
 Fläche und Schwerpunkt eines Polygons (Satz von Gauss)
@@ -2240,7 +2240,7 @@ Schiefe Biegung
 
 Der Querschnitt bleibt eben (Bernoulli). Die Dehnung hängt nur vom Abstand v in Zugrichtung n ab,
 gemessen ab dem Schwerpunkt; die Nulllinie steht senkrecht zu n und darf schräg liegen. Zu jeder
-Dehnungsebene ergeben sich N, M_y und M_z durch Integration über die Fläche -- als Summe über
+Dehnungsebene ergeben sich N, M_y und M_z durch Integration über die Fläche – als Summe über
 Streifen quer zu n, deren Grenzen auf jede Polygonecke fallen, und Stab für Stab.
 
 Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an seiner Grenze steht und keiner
@@ -2286,8 +2286,8 @@ den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach 
 mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit
 Drehung. Die Wandkräfte ergeben so immer V_y, V_z und um den Schwerpunkt T. Eine gezeichnete Wand
 ist dort geteilt, wo eine andere auf ihr endet oder sie kreuzt (Wand 1.1, Wand 1.2 …): jede trägt so
-überall denselben Fluss und wird für sich nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter --
-bei einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. In der Zusammenfassung
+überall denselben Fluss und wird für sich nachgewiesen, mit ihrer ganzen Kraft, nicht je Meter – bei
+einer Zelle die Kraft aus der Querkraft und die aus der Torsion zusammen. In der Zusammenfassung
 steht die massgebende Wand.
 
 Querkraft über die Federn der Wände
@@ -2325,7 +2325,7 @@ Grundbruch
 
 Unter der Sohle bildet sich beim Grundbruch ein Gleitkörper, der den Boden seitlich hinaus und nach
 oben drückt. Die erweiterte Tragfähigkeitsformel setzt seinen Widerstand aus drei Teilen zusammen:
-der Kohäsion, der seitlichen Auflast neben dem Fundament und dem Gewicht des Gleitkörpers -- je mit
+der Kohäsion, der seitlichen Auflast neben dem Fundament und dem Gewicht des Gleitkörpers – je mit
 einem Tragfähigkeitsfaktor und den Korrekturen für Form, Tiefe, Lastneigung, Geländeneigung und
 Sohlneigung.
 
@@ -2460,7 +2460,7 @@ Der Pfahl gibt seine Last über den Mantel und den Fuss an den Boden ab. Am Mant
 Schicht, durch die er geht; am Fuss drückt er auf die Schicht, in der er steht. Die Summe ist der
 charakteristische äussere Widerstand. Auf Zug trägt nur der Mantel. Der Bemessungswert folgt mit
 zwei Faktoren der Norm: der Umrechnungsfaktor η_a sagt, wie verlässlich der Widerstand bestimmt ist
--- aus einer Berechnung am wenigsten, aus einem statischen Versuch am meisten --, der
+– aus einer Berechnung am wenigsten, aus einem statischen Versuch am meisten –, der
 Widerstandsbeiwert γ_M,a deckt die Streuung des Bodens und der Ausführung.
 
 Umfang des Pfahls
@@ -2538,7 +2538,7 @@ Pfahlsteifigkeit
 Der Pfahl steht im Boden wie ein Stab auf Federn. Längs halten ihn die Reibung am Mantel und der
 Druck am Fuss, quer drückt er gegen den Boden neben sich. Wie stark die Federn sind, folgt aus dem
 Verformungsmodul der Schichten: am Mantel und am Fuss nach Cassan, quer nach der Norm. Die Federn am
-Kopf -- wie weit er sich unter einer Last setzt, verschiebt und dreht -- braucht das Modell des
+Kopf – wie weit er sich unter einer Last setzt, verschiebt und dreht – braucht das Modell des
 Tragwerks darüber; sie gelten mit dem charakteristischen Modul. Für die Schnittkräfte rechnet die
 Norm mit einem kleineren: in weicherem Boden weicht der Pfahl weiter aus und biegt sich stärker.
 
@@ -2610,7 +2610,7 @@ Innerer Pfahlwiderstand quer
 ----------------------------
 
 Quer belastet biegt sich der Pfahl: in jeder Tiefe wirken ein Moment und eine Querkraft, so wie die
-Steifigkeit sie gerechnet hat. Der Querschnitt muss beide tragen -- das Moment zusammen mit der
+Steifigkeit sie gerechnet hat. Der Querschnitt muss beide tragen – das Moment zusammen mit der
 Normalkraft in derselben Tiefe, die Querkraft im Beton mit der Wendel oder im Stahl des Tragglieds.
 Beide Widerstände mindert η_i, wie längs.
 

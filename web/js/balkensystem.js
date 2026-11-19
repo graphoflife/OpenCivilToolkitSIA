@@ -188,7 +188,7 @@ function materialienInhalt(system) {
   const angabe = (feldname) => feldangabe(klasse, feldname);
   const gesperrt = (stoff, kurz) => {
     const wert = stoff ? zustand.loesung?.werte?.[kennwertId(stoff, kennwerte[stoff.art][kurz])] : null;
-    return el('span.bs-gesperrt', { text: wert ? wert.wert : '–', title: 'Vom Material des Projekts -- zu ändern in der App «Materialien»' });
+    return el('span.bs-gesperrt', { text: wert ? wert.wert : '–', title: 'Vom Material des Projekts – zu ändern in der App «Materialien»' });
   };
   const ausDemProjekt = (m, setzen) => {
     const stoff = stoffe(m.art).find((s) => s.kennung === m.stoff);
@@ -202,7 +202,7 @@ function materialienInhalt(system) {
   };
   const eigenes = (m, setzen) => [
     namensfeld({
-      wert: m.name, setzen: setzen('name'), titel: 'Name des Materials -- so steht es im Bericht',
+      wert: m.name, setzen: setzen('name'), titel: 'Name des Materials – so steht es im Bericht',
     }),
     el('span.bs-material-art', { text: 'eigenes' }),
     ...spalten.map((k) => zahlfeld({
@@ -235,14 +235,14 @@ function materialienInhalt(system) {
     }));
   });
   const kopf = [['Material'], ['Art'], ...spalten.map((k) => [k.zeichen, angabe(k.kurz).einheit]), ['trägt'], ['']];
-  const fehlt = (stoffart) => `Im Projekt gibt es keinen ${titel(stoffart)} -- anlegen in der App «Materialien»`;
+  const fehlt = (stoffart) => `Im Projekt gibt es keinen ${titel(stoffart)} – anlegen in der App «Materialien»`;
   return [
     system.stabmaterialien.length ? el('div.tabelle-huelle', {}, [el('table.bs-materialien', {}, [
       el('thead', {}, [el('tr', {}, kopf.map(([text, einheit]) => el('th', {}, [
         text, einheit ? el('span.einheit', { text: ` ${einheit}` }) : null,
       ].filter(Boolean))))]),
       el('tbody', {}, system.stabmaterialien.map(zeile)),
-    ])]) : el('p.bs-leer', { text: 'Noch kein Material -- ein Stab braucht eines.' }),
+    ])]) : el('p.bs-leer', { text: 'Noch kein Material – ein Stab braucht eines.' }),
     el('div.bs-knopfreihe', {}, [
       ...Object.keys(kennwerte).map((stoffart) => el('button.knopf.knopf-klein', {
         type: 'button', text: `+ ${titel(stoffart)}`,
@@ -471,7 +471,7 @@ function querschnittFenster(system, kennung) {
       el('div.bs-qvorlage', {}, [
         feld('Profil', auswahl({
           werte: reihe.profile.map((name) => ({ wert: name, beschriftung: name })),
-          gewaehlt: q.profil, titel: `${reihe.beschreibung} -- Masse nach der Tabelle`,
+          gewaehlt: q.profil, titel: `${reihe.beschreibung} – Masse nach der Tabelle`,
           beiAenderung: setzen('profil'),
         })),
         umrissBild(system, q, 120, 90),
@@ -518,7 +518,7 @@ function querschnittFenster(system, kennung) {
     // Sonst sucht man den Schalter (bis 2026-11-19 ohne ein Wort).
     zeilen.push(el('p.hinweis', {
       text: 'Ob E₀ oder E_eq, wählt man hier, sobald ein Stab das Material «gemäss Querschnitt» '
-        + 'nimmt -- sonst gilt das E seines Materials.',
+        + 'nimmt – sonst gilt das E seines Materials.',
     }));
   }
   if (mitEigenem && q.e_modul === 'e_eq') {
@@ -528,10 +528,10 @@ function querschnittFenster(system, kennung) {
       beiAenderung: (w) => eq((x) => { x[name] = w; }),
     }), feldangabe('modul', name).einheit);
     zeilen.push(
-      zahl('N', 50, 'Normalkraft, bei der E_eq gilt -- Zug positiv'),
+      zahl('N', 50, 'Normalkraft, bei der E_eq gilt – Zug positiv'),
       zahl('M', 10, q.art === 'platte'
-        ? 'Moment, bei dem E_eq gilt -- bei einer Platte in x-Richtung mit Zug unten, nicht negativ'
-        : 'Moment, bei dem E_eq gilt -- positiv zieht es unten, an der gestrichelten Faser'),
+        ? 'Moment, bei dem E_eq gilt – bei einer Platte in x-Richtung mit Zug unten, nicht negativ'
+        : 'Moment, bei dem E_eq gilt – positiv zieht es unten, an der gestrichelten Faser'),
       rechenwahlZeile('Rechenwerte wie in der Analyse', q.eq, eq,
         { arten: 'faserarten', phiImmer: true }),
     );
@@ -605,7 +605,7 @@ const kapitelVon = (art) => [
       + s.knotenlasten.filter((x) => x.lastfall === lf).length,
     eigengewicht: {
       text: 'ρ · g · A',
-      titel: 'Je Stab Dichte mal g = 10 m/s² mal Fläche -- beim Beton die Dichte des Stahlbetons',
+      titel: 'Je Stab Dichte mal g = 10 m/s² mal Fläche – beim Beton die Dichte des Stahlbetons',
     },
   }),
   {

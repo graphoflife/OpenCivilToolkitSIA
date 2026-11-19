@@ -528,7 +528,7 @@ class Schnittpaar:
             return
         p.erklaerung(
             "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug gilt "
-            "k_t für die rissaktive Dicke t, die kleinere Abmessung des Betons -- "
+            "k_t für die rissaktive Dicke t, die kleinere Abmessung des Betons – "
             "nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen "
             "Rand: dann gilt dessen Abstand.")
         t = w.laenge("t", "t", self.t_zug)
