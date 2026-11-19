@@ -40,11 +40,15 @@ THEMA = "Spannung-Dehnung-Analyse"
 
 def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
                 werte: Mapping[str, "Wert"], raum: str,
-                modul: Optional[Modullinie] = None) -> None:
+                modul: Optional[Modullinie] = None,
+                raender: Tuple[str, str] = ("oben", "unten")) -> None:
     """
     Wie die Linie entstand -- mit den Zahlen dieses Falls, und ohne sie in der
     Formelsammlung, die daraus «Spannung-Dehnung-Analyse» bildet. Mit
-    ``modul`` dazu, wie aus ihr der aequivalente E-Modul wird.
+    ``modul`` dazu, wie aus ihr der aequivalente E-Modul wird. ``raender``
+    nennt die Raender bei z = 0 und z = h, wie die Analyse sie nennt
+    (:attr:`~opencivil.spannungsanalyse.analysen.Analyse.raender`): bei Zug
+    links heisst die Randdehnung bei z = 0 «rechts», nicht «oben».
 
     ``paar`` ist das Loeserpaar einer Platte oder eines gezeichneten
     Querschnitts. Was nur die Art des Bauteils weiss -- die Tiefe, der Riss,
@@ -137,8 +141,8 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
              titel="Grenzdehnungen am Ende der Linie")
     if linie.bruch is not None:
         b = linie.bruch
-        oben = w.dehnung("eps_oben", r"\varepsilon_{oben}", b.eps_oben)
-        unten = w.dehnung("eps_unten", r"\varepsilon_{unten}", b.eps_unten)
+        oben = w.dehnung("eps_oben", rf"\varepsilon_{{{raender[0]}}}", b.eps_oben)
+        unten = w.dehnung("eps_unten", rf"\varepsilon_{{{raender[1]}}}", b.eps_unten)
         neigung = b.ebene.neigung if b.ebene is not None else 0.0
         tiefe, zeichen = h, ""
         if neigung != 0.0:

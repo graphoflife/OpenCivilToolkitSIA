@@ -27,7 +27,7 @@ import {
   analysenKapitel, mitKopf, nachweisKapitel, rechenartStellungen,
 } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
-import { materialienVon, zeichenbereich } from './qa_zeichnung.js';
+import { geometriefehler, materialienVon, zeichenbereich } from './qa_zeichnung.js';
 import {
   ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, naechsterName,
 } from './zustand.js';
@@ -202,8 +202,10 @@ function werkstoffwahl(analyse) {
     ]);
   };
 
+  const kaputt = kennungen === null ? geometriefehler(analyse.kennung) : '';
   let inhalt;
-  if (kennungen === null) inhalt = [el('div.leer', { text: 'Der Kern liest die Zeichnung …' })];
+  if (kaputt) inhalt = [el('div.leer', { text: `Die Zeichnung ist nicht geprüft: ${kaputt}` })];
+  else if (kennungen === null) inhalt = [el('div.leer', { text: 'Der Kern liest die Zeichnung …' })];
   else if (!kennungen.length) inhalt = [el('div.leer', { text: 'Noch kein Material im Querschnitt.' })];
   else inhalt = kennungen.map(zeile);
   return [el('span.rechenwahl-titel', { text: 'Rechenwerte je Material' }), ...inhalt];

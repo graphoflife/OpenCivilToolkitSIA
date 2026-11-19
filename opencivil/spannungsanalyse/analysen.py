@@ -15,6 +15,7 @@ from typing import (
 )
 
 from opencivil.core.protokoll import Protokoll, StillesProtokoll
+from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.art import Analyseart
 from opencivil.spannungsanalyse.bild import (
     Querschnittsbild, aus_dehnungen, aus_schnittgroessen,
@@ -49,6 +50,15 @@ class Analyse:
 
     richtung_text: str = ""
     """Wie sie neben dem Titel steht -- «x», «Zug unten»."""
+
+    raender: Tuple[str, str] = Zugseite.UNTEN.raender
+    """
+    Wie die Raender heissen, zwischen denen das Bild laeuft: der bei z = 0
+    und der bei z = h -- dieselben Namen wie die Randdehnungen der Eingabe.
+    Die Platte zaehlt z immer ab oben; der gezeichnete Querschnitt ab dem
+    Rand gegenueber seiner Zugseite. Bis 2026-11-19 schrieb das Bild immer
+    «ab Oberkante», auch bei Zug oben, links oder rechts.
+    """
 
     bild: Optional[Querschnittsbild] = None
     kurve: Optional[Union[Linie, "Modullinie"]] = None
@@ -96,13 +106,14 @@ def auswerten(fall, art: Analyseart, paar: Paar) -> Tuple[
 class _Bauteilart:
     """
     Wie eine Analyse zu ihrem Bauteil kommt: wo es im Aufbau steht, wie sein
-    Paar je Richtung entsteht, wie die Richtung neben dem Titel heisst und was
-    dasteht, wo es kein Paar gibt.
+    Paar je Richtung entsteht, wie die Richtung neben dem Titel heisst, wie
+    die Raender des Bildes heissen und was dasteht, wo es kein Paar gibt.
     """
 
     teile: Callable[["Aufbau"], Mapping[str, Any]]
     paar: Callable[..., Optional[Paar]]
     richtung_text: Callable[[Any], str]
+    raender: Callable[[Any], Tuple[str, str]]
     ohne_bewehrung: Callable[[Any], str]
 
 
@@ -111,12 +122,14 @@ _BAUTEILARTEN = (
     _Bauteilart(
         teile=lambda aufbau: aufbau.querschnitte, paar=loeserpaar,
         richtung_text=lambda richtung: richtung.value,
+        raender=lambda richtung: Zugseite.UNTEN.raender,
         ohne_bewehrung=lambda richtung: (
             f"In {richtung.beschriftung} liegt keine Bewehrung – ohne sie gibt es "
             f"keinen Querschnitt zum Auswerten.")),
     _Bauteilart(
         teile=lambda aufbau: aufbau.querschnittsanalysen, paar=schnittpaar,
         richtung_text=lambda seite: seite.beschriftung,
+        raender=lambda seite: seite.raender,
         ohne_bewehrung=lambda seite: (
             "Der Querschnitt hat keine Bewehrung – ohne sie gibt es nichts zum Auswerten.")),
 )
@@ -166,7 +179,8 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung", protokoll: Optional[Protokoll
                         paare[schluessel] = None
                 paar = paare[schluessel]
                 analyse = Analyse(fall=fall, art=fall.art, richtung=fall.richtung,
-                                  richtung_text=art.richtung_text(fall.richtung), paar=paar)
+                                  richtung_text=art.richtung_text(fall.richtung),
+                                  raender=art.raender(fall.richtung), paar=paar)
                 if paar is None:
                     analyse.hinweis = art.ohne_bewehrung(fall.richtung)
                 else:
@@ -175,7 +189,8 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung", protokoll: Optional[Protokoll
                     if kurve is not None:
                         modul = kurve if isinstance(kurve, Modullinie) else None
                         herleitung(p, fall, paar, kurve.linie if modul else kurve,
-                                   loesung.werte, teil.id, modul=modul)
+                                   loesung.werte, teil.id, modul=modul,
+                                   raender=analyse.raender)
                 liste.append(analyse)
             ergebnis[kennung] = liste
     return ergebnis

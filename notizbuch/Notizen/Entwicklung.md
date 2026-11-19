@@ -7,6 +7,42 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Querschnittsanalyse: Diagramme und Spannungsbild sagen, was sie zeigen
+
+Zehnter Schritt der Durchsicht, der zweite Teil der Querschnittsanalyse.
+
+- **Das Spannungsbild bei Zug oben, links oder rechts:** An der Höhenachse
+  stand immer «z [mm] (ab Oberkante)», an den Rändern «Oberkante» und
+  «Unterkante». Bei Zug links läuft das Bild aber vom rechten Rand zum
+  linken. Jetzt: «z [mm] (ab Rand rechts)», «Beton am Rand rechts:
+  −17.6 N/mm²» -- dieselben Namen wie die Felder «ε rechts» und «ε links»
+  darüber. Auch die Herleitung der M-χ-Linie schreibt ε_rechts statt
+  ε_oben. Die Namen kommen aus dem Kern (`Analyse.raender`). Bei der Platte
+  heisst es jetzt «ab Rand oben» statt «ab Oberkante».
+- **Ein Lastfall ohne Last** (etwa ein neuer, alles 0): fehlte in der
+  Zusammenfassung ohne ein Wort, und im Interaktionsdiagramm stand «α_eff =
+  ∞ – erfüllt». Jetzt steht er in der Zusammenfassung mit «Keine Einwirkung
+  → kein Nachweis.», wie ein Knickfall ohne Druck, und im Diagramm grau mit
+  demselben Satz.
+- **Die Karte «Bruchzustand»:** fehlte bei einem Lastfall ohne Moment ohne
+  ein Wort. Jetzt steht sie da und sagt warum: «Ohne Moment gibt es keinen
+  Bruchzustand im Schnitt: nachgewiesen wird die Normalkraft gegen die
+  gleichmässige Dehnung.» Ebenso bei einer Normalkraft jenseits der
+  Tragfähigkeit. Die Sätze stehen einmal, im Nachweis, für Herleitung,
+  Zusammenfassung und Diagramm.
+- **Achsen des Interaktionsdiagramms gewechselt:** Bis die Antwort kam,
+  stand blass die alte Fläche in den neuen Achsen, mit der Legende «bei M_z
+  = 0». Jetzt steht dort «Der Schnitt für die neuen Achsen wird gerechnet
+  …». Bleibt die feste Grösse dieselbe, bleibt das alte Bild blass stehen
+  wie bisher.
+- **Wenn der Kern die Zeichnung nicht prüfen kann:** im Fenster
+  Tragsicherheit stand dauerhaft «Der Kern liest die Zeichnung …». Jetzt
+  steht dort derselbe Grund wie unter der Zeichnung.
+- **«Begrenzung auf 500 mm»** steht ohne «Zwängung auf Normalkraft» blass
+  da und sagt «wirkt nur mit der Zwängung auf Normalkraft».
+- **Offen** ([[TODO]]): α_min über α_max weist erst die Rechnung ab, nicht
+  das Feld.
+
 ## 2026-11-19 · Querschnittsanalyse: was noch fehlt, ist kein Fehler
 
 Neunter Schritt der Durchsicht, der erste Teil der Querschnittsanalyse: die

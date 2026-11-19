@@ -1,5 +1,5 @@
 ---
-erzeugt: 4e636298935b
+erzeugt: 9a8a30c98aea
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,7 @@ Was ein Lastfall ergab -- fuer die Diagramme nach dem Lauf.
 - `M_z: float` – Die Einwirkung, wie nachgewiesen -- mit Laengszugkraft, wo zugeschaltet.
 - `punkt: Optional[Bruchpunkt]`
 - `ausgang: Ausgang`
+- `ohne_bruch: str = ''` – Warum es keinen Bruchzustand gibt, wo es keinen gibt -- das Diagramm zeigt den Satz an seiner Stelle. Bis 2026-11-19 fehlte dort die Karte ohne ein Wort.
 
 ### Bruchbefund
 
@@ -114,6 +115,9 @@ Die Einwirkung, wie nachgewiesen: mit der Laengszugkraft, wo sie zaehlt.
 ## Konstanten
 
 - `KEIN_MOMENT = 1e-06` – Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es reine Normalkraft -- eine Richtung des Moments gibt es dann nicht.
+- `OHNE_EINWIRKUNG = 'Keine Einwirkung → kein Nachweis.'` – Warum ein Lastfall keinen Bruchzustand hat -- dieselben Saetze in Herleitung, Zusammenfassung und Diagramm.
+- `OHNE_MOMENT = 'Ohne Moment gibt es keinen Bruchzustand im Schnitt: nachgewiesen wir…`
+- `JENSEITS = 'Die Normalkraft liegt jenseits dessen, was der Querschnitt gleichmäs…`
 
 ## Braucht
 

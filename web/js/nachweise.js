@@ -172,20 +172,21 @@ export function anfuegenKnopf(text, tun) {
  *
  * `nachweis: false` für einen Schalter, der keinen eigenen Nachweis führt,
  * sondern einen anderen ändert -- die Begrenzung auf 500 mm: ohne Marke und
- * ohne Hinweis.
+ * ohne Hinweis. `ohneWirkung` sagt, warum er gerade nichts ändert: dann
+ * steht die Zeile blass da, mit dem Satz an der Stelle des Hinweises.
  */
 function schalterZeile(eintrag, ort, {
-  feld, name, was = 'Nachweis', zusatz = null, nachweis = true,
+  feld, name, was = 'Nachweis', zusatz = null, nachweis = true, ohneWirkung = '',
 }) {
   const vorne = nachweis ? ort.marke() : null;
   const art = vorne ? (zusatz ? '.mit-feld' : '') : (zusatz ? '.mit-grenze' : '.ist-breit');
-  return el(`div.duktilitaetszeile${art}`, {}, [
+  return el(`div.duktilitaetszeile${art}`, { class: ohneWirkung ? 'ist-ohne-wirkung' : '' }, [
     hakenSchalter(!!eintrag[feld],
       (wert) => eintragAendern(eintrag.kennung, (e) => { e[feld] = wert; }), was),
     vorne,
     el('span.postenname', { text: name }),
     zusatz,
-    el('span.kurvenhinweis', { text: nachweis ? ort.hinweis(eintrag, feld) : '' }),
+    el('span.kurvenhinweis', { text: nachweis ? ort.hinweis(eintrag, feld) : ohneWirkung }),
   ]);
 }
 
@@ -351,9 +352,12 @@ function zwangInhalt(eintrag, ort) {
     }),
     // Ändert nur die Zwängung auf Normalkraft: die Dicke, über die der
     // Querschnitt unter Zug reisst.
+    // Bis 2026-11-19 stand sie auch ohne die Zwängung auf Normalkraft da,
+    // als wirkte sie.
     schalterZeile(eintrag, ort, {
       feld: 'zwaengung_begrenzt', name: 'Begrenzung auf 500 mm', was: 'Zwängung',
       nachweis: false,
+      ohneWirkung: eintrag.zwaengung ? '' : 'wirkt nur mit der Zwängung auf Normalkraft',
     }),
   ];
 }

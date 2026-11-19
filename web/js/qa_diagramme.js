@@ -393,7 +393,8 @@ function interaktionsbild(kennung, i, faelle, x, y, einachsig) {
   // Die blassen zuerst, damit die kräftigen obenauf liegen.
   for (const f of [...faelle].sort((a, b) => passt(a) - passt(b))) {
     const drin = passt(f);
-    const farbe = drin ? (f.erfuellt ? GUT : SCHLECHT) : '#8895a8';
+    // Ein Fall ohne Einwirkung hat nichts nachzuweisen: grau, mit seinem Satz.
+    const farbe = drin && !f.hinweis ? (f.erfuellt ? GUT : SCHLECHT) : '#8895a8';
     if (mitWeg(f)) {
       g.append(svgEl('line', {
         x1: sx(wert(f, x)), y1: sy(wert(f, y)), x2: sx(f.widerstand[x]), y2: sy(f.widerstand[y]),
@@ -413,7 +414,7 @@ function interaktionsbild(kennung, i, faelle, x, y, einachsig) {
     const t = svgEl('title');
     t.textContent = `${f.name}\nN = ${f.N_Ed.toFixed(1)} kN, M_y = ${f.M_y_Ed.toFixed(1)} kNm, `
       + `M_z = ${f.M_z_Ed.toFixed(1)} kNm\n`
-      + (drin ? `α_eff = ${f.grad_text} – ${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
+      + (drin ? f.hinweis || `α_eff = ${f.grad_text} – ${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
         : `liegt nicht in dieser Ebene (${i.fest} = ${wert(f, i.fest).toFixed(1)})`)
       + (einachsig ? '' : `\nKlick: Schnitt durch diesen Lastfall (${i.fest} = ${wert(f, i.fest).toFixed(1)})`);
     punkt.append(t);
@@ -441,13 +442,18 @@ function interaktionskarte(kennung, daten, veraltet) {
   const wahl = wahlVon(kennung);
   const x = daten.einachsig ? 'M_y' : wahl.x;
   const y = daten.einachsig ? 'N' : wahl.y;
+  // Die alte Fläche nur bis zur Antwort, und nur bei derselben festen
+  // Grösse: nach einem Wechsel der Achsen läge sonst der Schnitt bei
+  // M_z = 0 in den Achsen M_y und N (bis 2026-11-19).
+  const anderer = veraltet && !daten.einachsig && daten.interaktion?.fest !== festVon(wahl);
+  let bild = leerzustand('Kein Interaktionsdiagramm.');
+  if (anderer) bild = leerzustand('Der Schnitt für die neuen Achsen wird gerechnet …');
+  else if (daten.interaktion) {
+    bild = interaktionsbild(kennung, daten.interaktion, daten.faelle, x, y, daten.einachsig);
+  }
   return karte('Interaktionsdiagramm', [
     schnittsteuerung(kennung, daten.einachsig),
-    el('div', { class: veraltet ? 'ist-veraltet' : '' }, [
-      daten.interaktion
-        ? interaktionsbild(kennung, daten.interaktion, daten.faelle, x, y, daten.einachsig)
-        : leerzustand('Kein Interaktionsdiagramm.'),
-    ]),
+    el('div', { class: veraltet ? 'ist-veraltet' : '' }, [bild]),
   ]);
 }
 
@@ -512,7 +518,9 @@ export function analyseKarten(kennung) {
   return [
     interaktion,
     kopf,
-    gewaehlt.bruch ? bild('Bruchzustand', bruchbild(daten, gewaehlt)) : null,
+    // Ohne Bruchzustand sagt die Karte, warum -- bis 2026-11-19 fehlte sie still.
+    gewaehlt.bruch ? bild('Bruchzustand', bruchbild(daten, gewaehlt))
+      : bild('Bruchzustand', leerzustand(gewaehlt.ohne_bruch || 'Kein Bruchzustand.')),
     gewaehlt.schub ? bild('Schubfluss', schubbild(daten, gewaehlt)) : null,
   ].filter(Boolean);
 }

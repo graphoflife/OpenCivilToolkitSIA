@@ -72,7 +72,7 @@ export function uebersicht(a) {
   const wandinfo = new Map((g?.waende || []).map((x) => [x.kennung, x]));
 
   const teile = [];
-  const kaputt = geometriefehler(a);
+  const kaputt = geometriefehler(a.qa.kennung);
   if (kaputt) {
     teile.push(el('div.qa-meldungen', {}, [
       el('div.qa-meldung', { text: `Die Zeichnung ist nicht geprüft: ${kaputt}` })]));

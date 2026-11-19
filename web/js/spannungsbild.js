@@ -16,9 +16,11 @@
  * Diagramm: zwei Felder nebeneinander mit derselben Höhenachse -- die
  * Nulllinie läuft durch beide.
  *
- * Die Höhe läuft nach unten, wie man einen Schnitt zeichnet: z = 0 ist die
- * Oberkante. Das ist dieselbe Achse, die der Löser und der Lagenaufbau
- * benutzen -- ein Bild, das sie umdrehte, passte nicht zum Nachweis daneben.
+ * Die Höhe läuft nach unten, wie man einen Schnitt zeichnet: z = 0 ist der
+ * erste der Ränder, die der Kern nennt (`fall.raender`) -- bei der Platte
+ * oben, beim gezeichneten Querschnitt gegenüber der Zugseite. Das ist
+ * dieselbe Achse, die der Löser und der Lagenaufbau benutzen -- ein Bild,
+ * das sie umdrehte, passte nicht zum Nachweis daneben.
  *
  * Gerechnet wird hier nichts. Alle Zahlen kommen fertig aus dem Kern; diese
  * Datei setzt Striche.
@@ -181,7 +183,7 @@ function anschreiben(daten, x, feld, zettel, stellen) {
  * rechte Feld teilt sie, ohne sie ein zweites Mal anzuschreiben.
  */
 function hoehenfeld(bild, {
-  breite, rand, titel, hol, stahlHol, stellen, einheit, links,
+  breite, rand, titel, hol, stahlHol, stellen, einheit, links, raender,
 }) {
   // Um null herum aufgespannt: eine Spannungsverteilung ohne sichtbare
   // Nulllinie sagt nicht, wo Druck aufhört und Zug anfängt.
@@ -197,7 +199,8 @@ function hoehenfeld(bild, {
     y: {
       bereich: [bild.h, 0],
       teilung: links ? teilung([0, bild.h], 8) : { ziel: 8, format: () => '' },
-      titel: links ? 'z [mm]  (ab Oberkante)' : null,
+      // Bis 2026-11-19 stand hier immer «ab Oberkante», auch bei Zug oben.
+      titel: links ? `z [mm]  (ab Rand ${raender[0]})` : null,
     },
   });
   verlauf(daten, x, y, bild.beton, hol);
@@ -230,10 +233,10 @@ function hoehenfeld(bild, {
   const betonfarbe = (w) => (w < 0 ? DRUCK : w > 0 ? ZUG : VERGLEICH);
   const kopf = bild.beton[0];
   const fuss = bild.beton[bild.beton.length - 1];
-  for (const [p, wo] of [[kopf, 'Oberkante'], [fuss, 'Unterkante']]) {
+  for (const [p, wo] of [[kopf, raender[0]], [fuss, raender[1]]]) {
     daten.append(mitTitel(svgEl('circle', {
       cx: x(hol(p)), cy: y(p.z), r: 3.5, fill: betonfarbe(hol(p)), stroke: '#fff', 'stroke-width': 1.2,
-    }), `Beton an der ${wo}: ${zahl(hol(p), stellen)} ${einheit}`));
+    }), `Beton am Rand ${wo}: ${zahl(hol(p), stellen)} ${einheit}`));
   }
   anschreiben(daten, x, feld, [
     { wert: hol(kopf), punkt: y(0), soll: y(0) + 12, farbe: betonfarbe(hol(kopf)) },
@@ -252,19 +255,19 @@ function hoehenfeld(bild, {
  * und übereinander gezeichnet läse man die eine Kurve an der Achse der
  * anderen.
  */
-function verteilungsbild(bild) {
+function verteilungsbild(bild, raender) {
   const svg = svgEl('svg', {
     class: 'mn', xmlns: NR, viewBox: `0 0 ${BREITE} ${HOEHE}`, role: 'img',
     'aria-label': 'Dehnung und Spannung über die Höhe',
   });
   svg.append(
     hoehenfeld(bild, {
-      breite: TEILUNG_FELDER, rand: { ...RAND, rechts: 16 }, links: true,
+      breite: TEILUNG_FELDER, rand: { ...RAND, rechts: 16 }, links: true, raender,
       titel: 'Dehnung ε [‰]', einheit: '‰', stellen: 2,
       hol: (p) => p.eps, stahlHol: (s) => s.eps,
     }),
     hoehenfeld(bild, {
-      breite: BREITE - TEILUNG_FELDER, rand: { ...RAND, links: 16 }, links: false,
+      breite: BREITE - TEILUNG_FELDER, rand: { ...RAND, links: 16 }, links: false, raender,
       titel: 'Spannung σ [N/mm²]', einheit: 'N/mm²', stellen: 1,
       hol: (p) => p.sigma, stahlHol: (s) => s.sigma,
     }),
@@ -660,7 +663,7 @@ function inhalt(fall) {
       ['\\chi', mitEinheit(b.chi, 5, '1/m')],
       ['x', b.nulllinie === null ? '–' : mitEinheit(b.nulllinie, 0, 'mm')],
     ]),
-    verteilungsbild(b),
+    verteilungsbild(b, fall.raender),
     b.hinweis ? el('p.hinweis', { text: b.hinweis }) : null,
   ];
 }

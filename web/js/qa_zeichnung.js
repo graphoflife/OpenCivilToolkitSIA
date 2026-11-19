@@ -299,23 +299,31 @@ function geometrieHolen(a) {
     }
     a.qa.namen = namen;
     a.neuZeichnen();
-    listeZeichnen(a);
-    // Ein offenes Fenster zeigt vielleicht, was erst jetzt feststeht: die
-    // Materialien der Werkstoffwahl (`materialienVon`).
-    if (zustand.fenster && zustand.auswahl?.kennung === a.qa.kennung) aendern({}, 'fenster');
+    fensterNachfuehren(a);
   }).catch((fehler) => {
     if (a.qa.gefragt !== jetzt) return;
-    // Der Grund steht unter der Zeichnung, wie im Balkensystem -- bis
-    // 2026-11-19 nur kurz unten, und der Zeichnung fehlten still Schwerpunkt,
-    // Stäbe der Linien und Meldungen.
+    // Der Grund steht unter der Zeichnung, wie im Balkensystem, und in der
+    // Werkstoffwahl -- bis 2026-11-19 nur kurz unten, der Zeichnung fehlten
+    // still Schwerpunkt, Stäbe der Linien und Meldungen, und die
+    // Werkstoffwahl wartete auf eine Antwort, die nicht kam.
     a.qa.geometriefehler = { text: fehler.message, fassung: jetzt };
-    listeZeichnen(a);
+    fensterNachfuehren(a);
   });
 }
 
+/**
+ * Was an der Antwort hängt, neu: die Liste unter der Zeichnung und ein
+ * offenes Fenster -- es zeigt vielleicht, was erst jetzt feststeht, die
+ * Materialien der Werkstoffwahl (`materialienVon`) oder warum sie fehlen.
+ */
+function fensterNachfuehren(a) {
+  listeZeichnen(a);
+  if (zustand.fenster && zustand.auswahl?.kennung === a.qa.kennung) aendern({}, 'fenster');
+}
+
 /** Warum die Antwort zur jetzigen Zeichnung ausbleibt -- leer, solange nichts schiefging. */
-export function geometriefehler(a) {
-  const f = a.qa.geometriefehler;
+export function geometriefehler(kennung) {
+  const f = fensterVon(kennung).qa.geometriefehler;
   return f && f.fassung === zustand.fassung ? f.text : '';
 }
 

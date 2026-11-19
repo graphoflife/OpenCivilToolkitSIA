@@ -747,6 +747,44 @@ class TestDiagramme(unittest.TestCase):
         self.assertEqual(antwort.status, 400)
 
 
+class TestFaelleOhneBruchzustand(unittest.TestCase):
+    """
+    Ein Lastfall ohne Einwirkung und einer ohne Moment. Bis 2026-11-19
+    fehlte der erste in der Zusammenfassung still, das Diagramm sagte
+    «erfüllt, ∞», und beiden fehlte die Karte «Bruchzustand» ohne ein Wort.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        p = Projekt.beispiel()
+        a = p.querschnittsanalysen[0]
+        a.lastfall("Leer")
+        a.lastfall("Nur N", N_Ed=-500.0)
+        cls.projekt = p.als_dict()
+        d = dienst.bearbeite("analysediagramme", {"projekt": cls.projekt, "kennung": "a1"})
+        cls.faelle = {f["name"]: f for f in d.daten["diagramme"]["faelle"]}
+
+    def test_ohne_einwirkung_steht_er_mit_seinem_satz_in_der_zusammenfassung(self):
+        antwort = dienst.rechnen({"projekt": self.projekt})
+        zeilen = {z["bezeichnung"]: z for z in antwort["zusammenfassungen"]["a1"]["zeilen"]}
+        leer = zeilen["Biegung und Normalkraft – Leer"]
+        self.assertTrue(leer["erfuellt"])
+        self.assertEqual(leer["hinweis"], "Keine Einwirkung → kein Nachweis.")
+
+    def test_das_diagramm_sagt_den_satz_statt_eines_grades(self):
+        self.assertEqual(self.faelle["Leer"]["hinweis"], "Keine Einwirkung → kein Nachweis.")
+        # Ohne Moment wird N gegen N_Rd verglichen: ein echter Grad, kein Satz.
+        self.assertEqual(self.faelle["Nur N"]["hinweis"], "")
+        self.assertEqual(self.faelle["Feld"]["hinweis"], "")
+
+    def test_ohne_bruchzustand_sagt_er_warum(self):
+        self.assertIsNone(self.faelle["Nur N"]["bruch"])
+        self.assertIn("Ohne Moment gibt es keinen Bruchzustand", self.faelle["Nur N"]["ohne_bruch"])
+        self.assertEqual(self.faelle["Leer"]["ohne_bruch"], "Keine Einwirkung → kein Nachweis.")
+        self.assertIsNotNone(self.faelle["Feld"]["bruch"])
+        self.assertEqual(self.faelle["Feld"]["ohne_bruch"], "")
+
+
 # ===========================================================================
 # Vorlagen
 # ===========================================================================

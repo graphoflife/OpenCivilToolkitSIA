@@ -238,7 +238,7 @@ def spannungsanalysen(aufbau: Aufbau, loesung: Loesung, *,
 def _analyse_dict(analyse) -> dict:
     kopf = {"name": analyse.fall.name, "art": analyse.art.value,
             "richtung": analyse.richtung.value, "richtung_text": analyse.richtung_text,
-            "titel": analyse.art.beschriftung}
+            "raender": list(analyse.raender), "titel": analyse.art.beschriftung}
     if not analyse.moeglich:
         return {**kopf, "moeglich": False, "hinweis": analyse.hinweis}
     paar = analyse.paar
@@ -652,10 +652,14 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
             "M_z_Ed": zahl(erg.M_z, KNM),
             "erfuellt": erg.erfuellt,
             "grad_text": grad_als_text(erg.erfuellungsgrad, erg.erfuellt),
+            # Steht nichts gegeneinander, sagt der Satz warum -- statt «erfüllt, ∞».
+            "hinweis": "" if erg.machbar else erg.ohne_bruch,
             # Der Bruchzustand, gegen den der Nachweis misst -- bei N_Ed, in
-            # der Richtung des Moments. Ohne Moment gibt es keinen.
+            # der Richtung des Moments. Ohne Moment gibt es keinen, und
+            # ``ohne_bruch`` sagt es.
             "widerstand": None if p is None else _als_kn([(p.N, p.M_y, p.M_z)])[0],
             "bruch": _bruch(q, bauteil, p) if p is not None else None,
+            "ohne_bruch": erg.ohne_bruch,
             "schub": _schubfluss(geschoben, erg.fall) if geschoben is not None else None,
         })
     einachsig = bauteil.biegung.einachsig

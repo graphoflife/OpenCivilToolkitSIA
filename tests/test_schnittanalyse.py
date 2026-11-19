@@ -17,6 +17,7 @@ import math
 import unittest
 
 from opencivil import spannungsanalyse as sa
+from opencivil.core.protokoll import Protokoll
 from opencivil.nachweis.rissgroessen import bruttoquerschnitt, rissmoment
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.projekt import Projekt, ProjektFehler
@@ -305,6 +306,30 @@ class TestDurchDenDienst(unittest.TestCase):
         self.assertEqual(fall["richtung_text"], "Zug unten")
         self.assertEqual(fall["bezugsort"], "im Schwerpunkt")
         self.assertGreater(fall["kurve"]["bruch"]["kraft"], 0.0)
+
+    def test_die_raender_heissen_je_zugseite(self):
+        # z = 0 liegt gegenüber der Zugseite. Bis 2026-11-19 schrieb das Bild
+        # immer «ab Oberkante», auch bei Zug oben, links oder rechts.
+        p = Projekt.beispiel()
+        a = p.querschnittsanalysen[0]
+        for seite in Zugseite:
+            a.spannungsfall(seite.value, art="dehnungen", richtung=seite.value,
+                            eps_oben=-1.0, eps_unten=1.0)
+        faelle = dienst.rechnen({"projekt": p.als_dict()})["spannungsanalysen"]["a1"]
+        self.assertEqual({f["name"]: f["raender"] for f in faelle}, {
+            "unten": ["oben", "unten"], "oben": ["unten", "oben"],
+            "links": ["rechts", "links"], "rechts": ["links", "rechts"]})
+
+    def test_die_herleitung_nennt_die_randdehnungen_wie_die_eingabe(self):
+        p, kennung = rechteck()
+        p.querschnittsanalysen[0].spannungsfall("Links", art="moment_kruemmung", richtung="links")
+        aufbau, loesung = rechnen(p)
+        protokoll = Protokoll()
+        sa.analysen(aufbau, loesung, protokoll)
+        # repr verdoppelt den Backslash -- gesucht wird darum ohne ihn.
+        text = repr(protokoll.bloecke)
+        self.assertIn("varepsilon_{rechts}", text)
+        self.assertNotIn("varepsilon_{oben}", text)
 
     def test_fassade(self):
         p = Projekt.beispiel()

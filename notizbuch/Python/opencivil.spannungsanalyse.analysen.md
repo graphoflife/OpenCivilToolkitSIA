@@ -1,5 +1,5 @@
 ---
-erzeugt: 3946e4dbcca7
+erzeugt: 433895654887
 art: modul
 tags: [modul]
 ---
@@ -28,6 +28,7 @@ Ein Spannungsfall der Beschreibung -- und was die Auswertung ergab.
 - `art: Analyseart`
 - `richtung: Any` – Die Tragrichtung einer Platte ([[opencivil.spannungsanalyse.analysen#Analyse|Richtung]]) oder die Zugseite eines gezeichneten Querschnitts ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 - `richtung_text: str = ''` – Wie sie neben dem Titel steht -- «x», «Zug unten».
+- `raender: Tuple[str, str] = Zugseite.UNTEN.raender` – Wie die Raender heissen, zwischen denen das Bild laeuft: der bei z = 0 und der bei z = h -- dieselben Namen wie die Randdehnungen der Eingabe. Die Platte zaehlt z immer ab oben; der gezeichnete Querschnitt ab dem Rand gegenueber seiner Zugseite. Bis 2026-11-19 schrieb das Bild immer «ab Oberkante», auch bei Zug oben, links oder rechts.
 - `bild: Optional[Querschnittsbild] = None`
 - `kurve: Optional[Union[Linie, 'Modullinie']] = None` – Die M-chi- oder N-eps-Linie -- oder der aequivalente Modul daraus.
 - `paar: Optional[Paar] = None` – Womit gerechnet wurde -- das Paar mit Kriechzahl, Wertesatz, Betongesetz: das der Platte oder das des gezeichneten Querschnitts.
@@ -61,12 +62,13 @@ class _Bauteilart
 ```
 
 Wie eine Analyse zu ihrem Bauteil kommt: wo es im Aufbau steht, wie sein
-Paar je Richtung entsteht, wie die Richtung neben dem Titel heisst und was
-dasteht, wo es kein Paar gibt.
+Paar je Richtung entsteht, wie die Richtung neben dem Titel heisst, wie
+die Raender des Bildes heissen und was dasteht, wo es kein Paar gibt.
 
 - `teile: Callable[['Aufbau'], Mapping[str, Any]]`
 - `paar: Callable[..., Optional[Paar]]`
 - `richtung_text: Callable[[Any], str]`
+- `raender: Callable[[Any], Tuple[str, str]]`
 - `ohne_bewehrung: Callable[[Any], str]`
 
 ### analysen
@@ -101,6 +103,7 @@ einem Import in dieser Funktion.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt]]
+- [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.art]]
 - [[opencivil.spannungsanalyse.bild]]
 - [[opencivil.spannungsanalyse.herleitung]]

@@ -65,6 +65,22 @@ class Fallergebnis(Fallausgang):
     punkt: Optional[Bruchpunkt]
     ausgang: Ausgang
 
+    ohne_bruch: str = ""
+    """
+    Warum es keinen Bruchzustand gibt, wo es keinen gibt -- das Diagramm
+    zeigt den Satz an seiner Stelle. Bis 2026-11-19 fehlte dort die Karte
+    ohne ein Wort.
+    """
+
+
+#: Warum ein Lastfall keinen Bruchzustand hat -- dieselben Saetze in
+#: Herleitung, Zusammenfassung und Diagramm.
+OHNE_EINWIRKUNG = "Keine Einwirkung → kein Nachweis."
+OHNE_MOMENT = ("Ohne Moment gibt es keinen Bruchzustand im Schnitt: nachgewiesen wird die "
+               "Normalkraft gegen die gleichmässige Dehnung.")
+JENSEITS = ("Die Normalkraft liegt jenseits dessen, was der Querschnitt gleichmässig "
+            "gedehnt aufnimmt -- es gibt keinen Bruchzustand mit diesem N.")
+
 
 @dataclass
 class Bruchbefund:
@@ -196,30 +212,31 @@ class SchiefeBiegung(Nachweis):
         # -- Ohne Moment: reine Normalkraft ---------------------------------
         if moment <= KEIN_MOMENT:
             if N == 0.0:
-                p.text("Keine Einwirkung → kein Nachweis.")
-                return None, Fallergebnis(fall, N, M_y, M_z, None, UNBESCHRAENKT)
+                # In der Zusammenfassung mit dem Satz, wie beim Knicken ohne
+                # Druck -- bis 2026-11-19 fehlte der Fall dort still.
+                p.text(OHNE_EINWIRKUNG)
+                return (self.urteil(d_grad, fall.name, UNBESCHRAENKT, OHNE_EINWIRKUNG),
+                        Fallergebnis(fall, N, M_y, M_z, None, UNBESCHRAENKT, OHNE_EINWIRKUNG))
             grenze = zug if N > 0 else druck
             v = Vergleich(N_Ed, werte.kraft("N_Rd", "N_{Rd}^{+}" if N > 0 else "N_{Rd}^{-}",
                                             grenze))
             v.zeile(p, d_grad, mit_urteil=True)
             return (self.urteil(d_grad, fall.name, v,
                                 "Reine Normalkraft: gegen die gleichmässige Dehnung."),
-                    Fallergebnis(fall, N, M_y, M_z, None, v))
+                    Fallergebnis(fall, N, M_y, M_z, None, v, OHNE_MOMENT))
 
         M_Ed = werte.moment("M_Ed", "M_{Ed}", moment)
 
         # -- Jenseits der reinen Normalkraft: kein Bruchzustand -------------
         if N > zug or N < druck:
             grenze = zug if N > 0 else druck
-            p.text("Die Normalkraft liegt jenseits dessen, was der Querschnitt "
-                   "gleichmässig gedehnt aufnimmt -- es gibt keinen Bruchzustand "
-                   "mit diesem N.")
+            p.text(JENSEITS)
             v = Vergleich(N_Ed, werte.kraft("N_Rd", "N_{Rd}^{+}" if N > 0 else "N_{Rd}^{-}",
                                             grenze))
             v.zeile(p, d_grad, mit_urteil=True)
             return (self.urteil(d_grad, fall.name, v,
                                 "N_Ed jenseits der reinen Normalkraft-Tragfähigkeit."),
-                    Fallergebnis(fall, N, M_y, M_z, None, v))
+                    Fallergebnis(fall, N, M_y, M_z, None, v, JENSEITS))
 
         # -- Der Bruchzustand -------------------------------------------------
         punkt = biegung.bruchpunkt(q, N, M_y, M_z)

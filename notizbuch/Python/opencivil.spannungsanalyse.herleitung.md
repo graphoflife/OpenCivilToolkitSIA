@@ -1,5 +1,5 @@
 ---
-erzeugt: 1059450a041d
+erzeugt: 65d6919f0813
 art: modul
 tags: [modul]
 ---
@@ -18,12 +18,15 @@ des Bauteils weiss, schreibt das Paar ([[opencivil.spannungsanalyse.linie#Paar|P
 ### herleitung
 
 ```python
-def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie, werte: Mapping[str, 'Wert'], raum: str, modul: Optional[Modullinie]=None) -> None
+def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie, werte: Mapping[str, 'Wert'], raum: str, modul: Optional[Modullinie]=None, raender: Tuple[str, str]=('oben', 'unten')) -> None
 ```
 
 Wie die Linie entstand -- mit den Zahlen dieses Falls, und ohne sie in der
 Formelsammlung, die daraus «Spannung-Dehnung-Analyse» bildet. Mit
-`modul` dazu, wie aus ihr der aequivalente E-Modul wird.
+`modul` dazu, wie aus ihr der aequivalente E-Modul wird. `raender`
+nennt die Raender bei z = 0 und z = h, wie die Analyse sie nennt
+([[opencivil.spannungsanalyse.analysen#Analyse|raender]]): bei Zug
+links heisst die Randdehnung bei z = 0 «rechts», nicht «oben».
 
 `paar` ist das Loeserpaar einer Platte oder eines gezeichneten
 Querschnitts. Was nur die Art des Bauteils weiss -- die Tiefe, der Riss,

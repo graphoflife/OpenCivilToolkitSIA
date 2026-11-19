@@ -1,5 +1,5 @@
 ---
-erzeugt: 72a2ee5e7138
+erzeugt: 1662781ad6e1
 art: formel
 tags: [formel]
 ---
@@ -15,7 +15,7 @@ $$
 *In der Herleitung: «Grösste Krümmung»*
 
 $$
-\chi_{u} = \frac{\varepsilon_{unten} - \varepsilon_{oben}}{h_{\vartheta}} \cdot \cos\left(\vartheta\right)
+\chi_{u} = \frac{\varepsilon_{links} - \varepsilon_{rechts}}{h_{\vartheta}} \cdot \cos\left(\vartheta\right)
 $$
 
 ## Grössen
@@ -25,6 +25,8 @@ $$
 | $\varepsilon_{unten}$ | – | ‰ | Zwischenwert |
 | $\varepsilon_{oben}$ | – | ‰ | Zwischenwert |
 | $h$ | Plattendicke | mm | Vorgabe, Zwischenwert |
+| $\varepsilon_{links}$ | – | ‰ | Zwischenwert |
+| $\varepsilon_{rechts}$ | – | ‰ | Zwischenwert |
 | $h_{\vartheta}$ | Tiefe des Betons senkrecht zur Nulllinie | mm | Zwischenwert |
 | $\vartheta$ | – | ° | Zwischenwert |
 
@@ -40,7 +42,7 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
 \begin{aligned}
-  \chi_{u} &= \frac{\varepsilon_{unten} - \varepsilon_{oben}}{h_{\vartheta}} \cdot \cos\left(\vartheta\right) \\
+  \chi_{u} &= \frac{\varepsilon_{links} - \varepsilon_{rechts}}{h_{\vartheta}} \cdot \cos\left(\vartheta\right) \\
   &= \frac{17.08\,\text{‰} - \left(-3.5\,\text{‰}\right)}{845.1\,\mathrm{mm}} \cdot \cos\left(-4.6{}^{\circ}\right) \\
   &= 0.02427\,\mathrm{m}^{-1}
 \end{aligned}
