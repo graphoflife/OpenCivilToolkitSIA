@@ -11,7 +11,7 @@ Tragrichtung x (:func:`bauen`).
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Mapping, Sequence
+from typing import TYPE_CHECKING, List, Mapping, Optional, Sequence
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, KN_PRO_M, M, MM, Groesse
 from opencivil.material.basis import Baustoff
@@ -30,7 +30,6 @@ from opencivil.nachweis.querkraft_buegel import QuerkraftMitBuegeln
 from opencivil.nachweis.querkraft_ohne_buegel import QuerkraftOhneBuegel
 from opencivil.querschnitt.platte import Bewehrungslage, Plattenquerschnitt, Richtung
 from opencivil.projekt.eintraege import KombinationEintrag, VerformungsfallEintrag
-from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, knickfall, material, spannungsnachweise
@@ -39,9 +38,10 @@ if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
 
 
-def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bauteil:
+def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Optional[Bauteil]:
     """
-    Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen.
+    Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen --
+    ohne jede Bewehrung keiner, nur ein Hinweis (:meth:`Aufbau.unfertig`).
 
     Nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen im
     Querschnitt -- sie tragen zum Bewehrungsgehalt bei und druecken die
@@ -51,6 +51,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
     hatte.
     """
     querschnitt = _querschnitt(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
+    if querschnitt is None:
+        return aufbau.unfertig(art, eintrag, f"Platte '{eintrag.name}'", "noch keine Bewehrung")
     querschnitt.ins_rechenwerk(aufbau.werk)
     # Bewehrungsmass und Distanzhalter stehen als Kennzahlen da, auch bei
     # einer Platte ohne Nachweis -- ihr Lagenaufbau rechnet darum immer.
@@ -194,7 +196,11 @@ def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt
 
 def _querschnitt(
     eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str
-) -> Plattenquerschnitt:
+) -> Optional[Plattenquerschnitt]:
+    """
+    Der Querschnitt der Platte -- ``None`` ohne jede Bewehrung: ohne sie
+    gibt es keinen Widerstand.
+    """
     beton_stoff = material(baustoffe, eintrag.beton, "beton", f"Platte '{eintrag.name}'")
     # Ein Stahl fuer die ganze Platte, Lagen und Buegel (Benutzer, 2026-10-24)
     # -- auch fuer eine leere Lage: ihr Stahl erscheint nur, wo die
@@ -213,9 +219,7 @@ def _querschnitt(
         ))
 
     if not any(l.vorhanden for l in lagen):
-        raise ProjektFehler(
-            f"Platte '{eintrag.name}': ohne Bewehrung lässt sich kein "
-            f"Widerstand bestimmen.")
+        return None
 
     buegel = eintrag.querkraftbewehrung
     return Plattenquerschnitt(

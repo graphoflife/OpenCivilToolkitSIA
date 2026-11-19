@@ -469,9 +469,10 @@ function querschnittFenster(system, kennung) {
         })),
         umrissBild(system, q, 120, 90),
       ]),
+      // Wie geschrieben: die Achsen heissen y und z, nicht Y und Z.
       achsen.length ? wahlBlock('Biegung', wahlSchalter({
         werte: achsen, gewaehlt: q.achse, titel: 'Um welche Achse sich das Profil im Rahmen biegt',
-        setzen: setzen('achse'),
+        setzen: setzen('achse'), klasse: '.ist-wortlaut',
       })) : null,
     );
   } else if (q.art === 'kennwerte') {

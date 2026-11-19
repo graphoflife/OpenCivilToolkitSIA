@@ -262,6 +262,23 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertEqual(
             d["zuordnung"]["materialien"]["b1"]["kennwerte"]["f_cd"], "beton.b1.f_cd")
 
+    def test_unfertige_stehen_unter_ihrer_liste(self):
+        """
+        Ein Bauteil, dem noch etwas fehlt, kommt mit Name und Grund unter
+        seiner Liste an, wie in der Zuordnung -- die Oberfläche zeigt es an
+        seiner Stelle (Benutzer, 2026-11-19). Jede Liste ist da, auch leer.
+        """
+        p = dienst.bearbeite("beispiel", {}).daten
+        for lage in p["querschnitte"][0]["lagen"]:
+            lage["grund"]["durchmesser"] = lage["zulage"]["durchmesser"] = 0.0
+        antwort = dienst.bearbeite("rechnen", {"projekt": p})
+        self.assertEqual(antwort.status, 200)
+        unfertige = antwort.daten["unfertige"]
+        self.assertEqual(unfertige["querschnitte"],
+                         {"q1": {"name": "Decke über EG", "grund": "noch keine Bewehrung"}})
+        self.assertNotIn("q1", antwort.daten["zuordnung"]["querschnitte"])
+        self.assertEqual(set(unfertige), set(antwort.daten["zuordnung"]) - {"materialien"})
+
 
 class TestJsonTauglich(unittest.TestCase):
     """

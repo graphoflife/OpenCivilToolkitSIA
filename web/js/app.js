@@ -45,6 +45,31 @@ function zustandsanzeige(text, art = '') {
   knoten.zustandsanzeige.className = `zustandsanzeige ${art}`;
 }
 
+/**
+ * Was oben rechts steht, und in welcher Farbe: ob eine Eingabe fehlt, wie
+ * viele Nachweise nicht erfüllt sind -- und wie vielen Bauteilen noch etwas
+ * fehlt. Das ist kein Fehler (Benutzer, 2026-11-19), aber auch nicht grün:
+ * «alle Nachweise erfüllt» hiesse sonst auch, die Platte ohne Bewehrung sei
+ * nachgewiesen.
+ */
+function stand(antwort) {
+  const unfertig = Object.values(antwort.unfertige || {}).flatMap(Object.keys).length;
+  const dazu = !unfertig ? ''
+    : unfertig === 1 ? ' · einem Bauteil fehlt noch etwas' : ` · ${unfertig} Bauteilen fehlt noch etwas`;
+  const gut = unfertig ? '' : 'ist-gut';
+  if (!antwort.vollstaendig) {
+    const fehlt = antwort.fehlende.length;
+    return [`${fehlt === 1 ? 'Eine Eingabe fehlt' : `${fehlt} Eingaben fehlen`}${dazu}`, 'ist-fehler'];
+  }
+  if (antwort.urteile.length) {
+    const durchgefallen = antwort.urteile.filter((u) => !u.erfuellt).length;
+    const text = durchgefallen === 0 ? 'alle Nachweise erfüllt'
+      : durchgefallen === 1 ? 'ein Nachweis nicht erfüllt' : `${durchgefallen} Nachweise nicht erfüllt`;
+    return [`${text}${dazu}`, durchgefallen ? 'ist-fehler' : gut];
+  }
+  return [`${Object.keys(antwort.werte).length} Werte bestimmt${dazu}`, gut];
+}
+
 /** Ein einzelner Durchgang: hinschicken, Antwort übernehmen, Stand melden. */
 async function einDurchgang() {
   zustandsanzeige('rechnet …');
@@ -64,20 +89,7 @@ async function einDurchgang() {
       rechenfehler: null,
     }, 'loesung');
 
-    if (!antwort.vollstaendig) {
-      const fehlt = antwort.fehlende.length;
-      zustandsanzeige(fehlt === 1 ? 'Eine Eingabe fehlt' : `${fehlt} Eingaben fehlen`,
-        'ist-fehler');
-    } else if (antwort.urteile.length) {
-      const durchgefallen = antwort.urteile.filter((u) => !u.erfuellt).length;
-      zustandsanzeige(
-        durchgefallen === 0 ? 'alle Nachweise erfüllt'
-          : durchgefallen === 1 ? 'ein Nachweis nicht erfüllt'
-            : `${durchgefallen} Nachweise nicht erfüllt`,
-        durchgefallen ? 'ist-fehler' : 'ist-gut');
-    } else {
-      zustandsanzeige(`${Object.keys(antwort.werte).length} Werte bestimmt`, 'ist-gut');
-    }
+    zustandsanzeige(...stand(antwort));
   } catch (fehler) {
     zustandsanzeige('Fehler', 'ist-fehler');
     melden(fehler.message, true);

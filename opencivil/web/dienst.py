@@ -442,9 +442,9 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     except (TypeError, ValueError):
         raise DienstFehler(400, f"Der Wert des Schnitts ist keine Zahl: {wahl.get('wert')!r}.") from None
     aufbau = projekt.aufbauen()
-    if kennung in aufbau.leere_analysen:
-        raise DienstFehler(400, f"Querschnittsanalyse '{aufbau.leere_analysen[kennung]}': "
-                                f"noch nichts gezeichnet.")
+    unfertig = aufbau.unfertige.get(kennung)
+    if unfertig is not None:
+        raise DienstFehler(400, f"Querschnittsanalyse '{unfertig.name}': {unfertig.grund}.")
     stempel = f"{_abdruck(projekt.als_dict(), aufbau, kennung)}|{fest}|{wert!r}"
     daten = DIAGRAMME.hole(kennung, stempel)
     if daten is None:

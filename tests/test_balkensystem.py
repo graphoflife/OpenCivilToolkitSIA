@@ -525,6 +525,28 @@ class TestRechnen(unittest.TestCase):
                 self.assertIn(f"noch keine {welche} gewählt.",
                               [m["text"].split(": ", 1)[1] for m in uebersicht["meldungen"]])
 
+    def test_eine_platte_ohne_bewehrung_ist_eine_meldung(self):
+        """
+        Eine Platte ohne jede Bewehrung rechnet nicht, das Projekt schon
+        (Benutzer, 2026-11-19): der Hinweis nennt sie, und der Querschnitt,
+        der ihre Werte nimmt, sagt am Ort, warum er nicht rechnet.
+        """
+        p = traeger()
+        decke = p.platte("Decke", h=250)
+        for lage in decke.lagen:
+            lage.grund.durchmesser = lage.zulage.durchmesser = 0.0
+        s = p.balkensysteme[0]
+        s.querschnitte[0] = s.querschnitt_aus("Streifen", "platte", decke)
+        s.querschnitte.pop()
+        s.linien[0].querschnitt = s.querschnitte[0].kennung
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        self.assertEqual(antwort.status, 200)
+        self.assertIn("Platte 'Decke': noch keine Bewehrung → nichts zu rechnen.",
+                      antwort.daten["warnungen"])
+        texte = [m["text"] for m in antwort.daten["zeichendaten"]["r1"]["uebersicht"]["meldungen"]]
+        self.assertTrue(any("die Platte «Decke» rechnet nicht (noch keine Bewehrung)." in t
+                            for t in texte), texte)
+
     def test_beweglich_ist_eine_meldung(self):
         p = traeger()
         p.balkensysteme[0].lager[0].x = "frei"
@@ -891,8 +913,9 @@ class TestMaterialDesQuerschnitts(unittest.TestCase):
         p, q = self.projekt("analyse")
         p.querschnittsanalysen[0] = QuerschnittsanalyseEintrag.neu(kennung="a1", name="Leer")
         meldungen = self.meldungen(p)
-        self.assertTrue(any("gemäss Querschnitt" in m and "noch leer" in m for m in meldungen),
-                        meldungen)
+        self.assertTrue(any("gemäss Querschnitt" in m
+                            and "«Leer» rechnet nicht (noch nichts gezeichnet)" in m
+                            for m in meldungen), meldungen)
 
 
 class TestUmrisse(unittest.TestCase):

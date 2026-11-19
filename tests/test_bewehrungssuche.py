@@ -630,8 +630,7 @@ class TestUeberDenDienst(unittest.TestCase):
         projekt = platte()
         for lage in projekt.querschnitt("q1").lagen:
             lage.grund.durchmesser = lage.zulage.durchmesser = 0.0
-        with self.assertRaisesRegex(ProjektFehler, "ohne Bewehrung"):
-            projekt.aufbauen()
+        self.assertEqual(projekt.aufbauen().unfertige["q1"].grund, "noch keine Bewehrung")
         vorab_pruefen(projekt, "q1")
 
     def test_eine_unbekannte_platte_ist_ein_404(self):

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c5b51178a5a
+erzeugt: 298bdc40bee9
 art: modul
 tags: [modul]
 ---
@@ -188,9 +188,17 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str, achse:
 
 Woher die Kennwerte eines Querschnitts kommen -- hier wird seine Art
 aufgeloest, in der Ebene und im Raum. Die Platte oder Analyse dazu muss
-es geben; ist noch keine gewaehlt, rechnet er nicht, und die Meldung
-sagt es. Ein Profil biegt sich in der Ebene um `achse`, im Raum um
+es geben; ist noch keine gewaehlt oder fehlt ihr noch etwas
+([[opencivil.projekt.aufbau.kern#Aufbau|Aufbau.unfertige]]), rechnet er nicht, und die Meldung sagt es. Ein Profil biegt sich in der Ebene um `achse`, im Raum um
 beide ([[opencivil.projekt.aufbau.balkensystem#form_von|form_von]]).
+
+### _rechnet_nicht
+
+```python
+def _rechnet_nicht(welche: str, unfertig: Unfertiges) -> str
+```
+
+Der Satz zu einer Platte oder Analyse, der noch etwas fehlt -- klein beginnend.
 
 ### _modulfrage
 

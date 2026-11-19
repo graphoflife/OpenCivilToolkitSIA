@@ -72,8 +72,9 @@ export const zustand = {
   /**
    * Warum die letzte Eingabe sich nicht rechnen liess -- oder null. Die
    * Lösung bleibt dann die von davor, und die rechte Tafel sagt es dazu:
-   * ein Bauteil mit unfertiger Zeichnung soll nicht die Zahlen von vorher
-   * als gültig stehen lassen.
+   * eine Eingabe, die der Kern abweist, soll nicht die Zahlen von vorher
+   * als gültig stehen lassen. Einem Bauteil, dem nur noch etwas fehlt,
+   * geschieht das nicht mehr: es steht in `loesung.unfertige`.
    */
   rechenfehler: null,
   ungespeichert: false,

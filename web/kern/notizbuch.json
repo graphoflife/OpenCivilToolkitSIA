@@ -6255,6 +6255,7 @@
         "stabwerk_bauen",
         "form_von",
         "stabquerschnitt_von",
+        "_rechnet_nicht",
         "_modulfrage",
         "_paare",
         "_baustoff",
@@ -6322,6 +6323,7 @@
       "kurz": "was alle Bauteilarten beim Bauen teilen.",
       "stichworte": [
         "Aufbau",
+        "Aufbau.unfertig",
         "Aufbau.objekte",
         "Aufbau.querschnitte",
         "Aufbau.querschnittsanalysen",
@@ -6345,6 +6347,7 @@
         "Aufbau.berichtsziele",
         "Aufbau.urteile_von",
         "Aufbau.materialziele",
+        "Unfertiges",
         "Bauteil",
         "Bauteil.raum",
         "Bauteil.im_feld",
@@ -6374,6 +6377,7 @@
       "stichworte": [
         "bauen",
         "_lagennachweise",
+        "_querschnitt",
         "_verformungsfall",
         "_ausgefallene",
         "_kombination"
@@ -6670,7 +6674,7 @@
         "PfahlEintrag.kombination",
         "PfahlEintrag.boden_unter_dem_fuss",
         "PfahlEintrag.regeln",
-        "PfahlEintrag._baugrund",
+        "PfahlEintrag.fehlender_baugrund",
         "PfahlEintrag._festigkeiten",
         "PfahlEintrag._bewehrung",
         "PfahlEintrag._tragglied"
@@ -6817,6 +6821,7 @@
         "Querschnittsart.beschriftung",
         "Querschnittsart.kurz",
         "Querschnittsart.aus_bauteil",
+        "Querschnittsart.bauteil",
         "ModulEintrag",
         "ModulEintrag.wahl",
         "_aufgezaehlt",

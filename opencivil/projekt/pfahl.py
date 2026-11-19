@@ -187,8 +187,9 @@ class PfahlEintrag(BauteilEintrag):
         """
         Hält auf, was mehrere Felder zusammen unmöglich machen, bevor daraus
         ein Widerstand wird. Wie beim Grundbruch vor dem Rechnen und nicht
-        beim Öffnen: eine Datei mit einem zu kurzen Baugrund soll sich öffnen
-        und korrigieren lassen.
+        beim Öffnen: eine Datei mit unmöglichen Zahlen soll sich öffnen und
+        korrigieren lassen. Was an Boden noch fehlt, hält nur den Pfahl auf
+        (:meth:`fehlender_baugrund`).
         """
         eindeutig((k.name for k in self.kombinationen), wo, "Kombination")
         if self.eta_a > self.grundlage.eta_grenze:
@@ -201,9 +202,8 @@ class PfahlEintrag(BauteilEintrag):
                 f"{wo}: η_a,tr = {self.eta_tr:g} liegt über {berechnung.eta_grenze:g}, dem "
                 f"Grenzwert für einen gerechneten Widerstand ({berechnung.referenz}); quer "
                 f"wird er immer gerechnet.")
-        if not self.grundlage.aus_versuch:
-            self._baugrund(wo)
-        elif any(quer_belastet(k.H_Ed, k.M_Ed, self.kopf) for k in self.kombinationen if k.aktiv):
+        if not self.grundlage.aus_versuch or any(
+                quer_belastet(k.H_Ed, k.M_Ed, self.kopf) for k in self.kombinationen if k.aktiv):
             # Auch mit R_a,k aus dem Versuch: der Erdwiderstand quer kommt aus den Schichten.
             self._festigkeiten(wo)
         if self.bohrpfahl:
@@ -211,17 +211,24 @@ class PfahlEintrag(BauteilEintrag):
         else:
             self._tragglied(wo)
 
-    def _baugrund(self, wo: str) -> None:
-        """Was die Rechnung aus den Schichten braucht."""
+    def fehlender_baugrund(self) -> str:
+        """
+        Was einem gerechneten R_a,k an Boden noch fehlt, klein beginnend --
+        leer, wenn nichts. Ein unfertiger Baugrund hält nur diesen Pfahl auf,
+        nicht das Projekt (Benutzer, 2026-11-19; bis dahin war er ein Fehler
+        des ganzen Projekts, :meth:`~opencivil.projekt.aufbau.kern.Aufbau.unfertig`).
+        Mit R_a,k aus einem Versuch fehlt nichts: dann braucht es die
+        Schichten nur quer.
+        """
+        if self.grundlage.aus_versuch:
+            return ""
         if not self.schichten:
-            raise ProjektFehler(f"{wo}: ohne Schicht lässt sich R_a,k nicht rechnen -- "
-                                f"eine Schicht anlegen oder R_a,k aus einem Versuch eingeben.")
-        self._festigkeiten(wo)
+            return "noch keine Schicht -- eine anlegen oder R_a,k aus einem Versuch eingeben"
         if not self.boden_unter_dem_fuss:
-            raise ProjektFehler(
-                f"{wo}: der Fuss liegt in {self.t_K + self.L:g} m, die Schichten reichen bis "
-                f"{sum(s.d for s in self.schichten):g} m. Unter dem Fuss muss noch Boden "
-                f"sein, der ihn trägt.")
+            return (f"der Fuss liegt in {self.t_K + self.L:g} m, die Schichten reichen bis "
+                    f"{sum(s.d for s in self.schichten):g} m -- unter dem Fuss fehlt noch Boden, "
+                    f"der ihn trägt")
+        return ""
 
     def _festigkeiten(self, wo: str) -> None:
         """Was jede Schicht haben muss, damit ihr Widerstand eine Zahl wird."""

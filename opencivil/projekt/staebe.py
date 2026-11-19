@@ -106,6 +106,12 @@ class Querschnittsart(Wahl):
         """
         return self in (Querschnittsart.PLATTE, Querschnittsart.ANALYSE)
 
+    @property
+    def bauteil(self) -> str:
+        """Wie das Bauteil heisst, aus dem er seine Werte nimmt -- leer bei einer Form."""
+        return {Querschnittsart.PLATTE: "Platte",
+                Querschnittsart.ANALYSE: "Querschnittsanalyse"}.get(self, "")
+
 
 #: Womit ein Stab rechnet, der das Material seines Querschnitts nimmt: E₀,
 #: das E_cm des Betons, den der Querschnitt mitbringt, oder das E_eq der
@@ -213,8 +219,7 @@ class StabquerschnittBasis(Beschreibung):
             return ("ein E_eq gibt es nur bei einem Querschnitt aus einer Platte oder "
                     "Querschnittsanalyse – nur sie haben eine Momenten-Krümmungs-Linie.")
         if self.art.aus_bauteil and not self.bezug:
-            welche = "Platte" if self.art is Querschnittsart.PLATTE else "Querschnittsanalyse"
-            return f"noch keine {welche} gewählt."
+            return f"noch keine {self.art.bauteil} gewählt."
         if self.art is Querschnittsart.VORLAGE:
             vorlage = self.stabvorlage()
             fremd = [k for k in self.masse if k not in vorlage.vorgaben()]

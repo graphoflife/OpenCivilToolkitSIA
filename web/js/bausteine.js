@@ -70,6 +70,19 @@ export function karte(titel, inhalt, { zusatz = null, klasse = '' } = {}) {
 }
 
 /**
+ * Was einem Bauteil noch fehlt, an seiner Stelle: über seinem Editor und in
+ * der Zusammenfassung. `unfertig` ist sein Eintrag in `loesung.unfertige`
+ * (Name und Grund) oder nichts -- dann auch kein Hinweis. Ein unfertiger
+ * Zustand ist kein Fehler des Projekts (Benutzer, 2026-11-19): er sagt, was
+ * fehlt, und der Rest rechnet weiter.
+ */
+export function unfertigHinweis(unfertig) {
+  return unfertig
+    ? el('div.hinweis.hinweis-warnung', {}, [el('b', { text: 'Nichts zu rechnen: ' }), `${unfertig.grund}.`])
+    : null;
+}
+
+/**
  * Eine Zeile Beschriftung – Eingabe – Einheit.
  *
  * `beschriftung` ist entweder Klartext oder eine Liste von Knoten. Letzteres

@@ -49,7 +49,7 @@ from opencivil.stabwerk.modell import (
 from opencivil.stabwerk.system import Meldung
 
 from opencivil.projekt.aufbau.faelle import beiwerte, doppelte_kennungen, faelle_pruefen, ohne_lastfall
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil
+from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, Unfertiges
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -285,42 +285,45 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
     """
     Woher die Kennwerte eines Querschnitts kommen -- hier wird seine Art
     aufgeloest, in der Ebene und im Raum. Die Platte oder Analyse dazu muss
-    es geben; ist noch keine gewaehlt, rechnet er nicht, und die Meldung
-    sagt es. Ein Profil biegt sich in der Ebene um ``achse``, im Raum um
+    es geben; ist noch keine gewaehlt oder fehlt ihr noch etwas
+    (:attr:`Aufbau.unfertige`), rechnet er nicht, und die Meldung sagt es. Ein Profil biegt sich in der Ebene um ``achse``, im Raum um
     beide (:func:`form_von`).
     """
     if not q.art.aus_bauteil:
         return form_von(q, wo, achse)
+    platte = q.art is Querschnittsart.PLATTE
+    klasse = AusPlatte if platte else AusAnalyse
     if not q.bezug:
-        klasse = AusPlatte if q.art is Querschnittsart.PLATTE else AusAnalyse
         return klasse(kennung=q.kennung, name=q.name, herkunft=q.art.kurz, bezug="",
                       fehler=q.fehler() or "")
-    if q.art is Querschnittsart.PLATTE:
-        platte = aufbau.querschnitte.get(q.bezug)
-        if platte is None:
-            raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt die Platte "
+    welche = q.art.bauteil
+    bauteil = (aufbau.querschnitte if platte else aufbau.querschnittsanalysen).get(q.bezug)
+    if bauteil is None:
+        unfertig = aufbau.unfertige.get(q.bezug)
+        if unfertig is None:
+            raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt die {welche} "
                                 f"'{q.bezug}', die es im Projekt nicht gibt.")
-        return AusPlatte(kennung=q.kennung, name=q.name, herkunft=f"Platte «{platte.name}»",
+        # Es gibt sie, nur fehlt ihr noch etwas: der Stab rechnet nicht, das
+        # Projekt schon.
+        return klasse(kennung=q.kennung, name=q.name, herkunft=f"{welche} «{unfertig.name}»",
+                      bezug=q.bezug, fehler=_rechnet_nicht(welche, unfertig))
+    if platte:
+        return AusPlatte(kennung=q.kennung, name=q.name, herkunft=f"Platte «{bauteil.name}»",
                          bezug=q.bezug,
-                         quelle={"b": platte.id_von("b"), "h": platte.id_von("h")},
-                         eq=_modulfrage(q, ModulAusPlatte(platte)))
-    analyse = aufbau.querschnittsanalysen.get(q.bezug)
-    if analyse is None and q.bezug in aufbau.leere_analysen:
-        # Eine leere Analyse gibt es, nur traegt sie noch nichts: der Stab
-        # rechnet nicht, das Projekt schon.
-        name = aufbau.leere_analysen[q.bezug]
-        return AusAnalyse(kennung=q.kennung, name=q.name,
-                          herkunft=f"Querschnittsanalyse «{name}»", bezug=q.bezug,
-                          fehler=f"Die Querschnittsanalyse «{name}» ist noch leer.")
-    if analyse is None:
-        raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt die Querschnittsanalyse "
-                            f"'{q.bezug}', die es im Projekt nicht gibt.")
+                         quelle={"b": bauteil.id_von("b"), "h": bauteil.id_von("h")},
+                         eq=_modulfrage(q, ModulAusPlatte(bauteil)))
+    analyse = bauteil
     return AusAnalyse(kennung=q.kennung, name=q.name,
                       herkunft=f"Querschnittsanalyse «{analyse.name}»", bezug=q.bezug,
                       quelle={"I": analyse.id_von("I_y"),
                               **{k: analyse.id_von(k) for k in ("A", "I_y", "I_z", "I_T", "I_yz")}},
                       eq=_modulfrage(q, ModulAusAnalyse(analyse)),
                       flaechen=tuple(f.punkte for f in analyse.flaechen))
+
+
+def _rechnet_nicht(welche: str, unfertig: Unfertiges) -> str:
+    """Der Satz zu einer Platte oder Analyse, der noch etwas fehlt -- klein beginnend."""
+    return f"die {welche} «{unfertig.name}» rechnet nicht ({unfertig.grund})."
 
 
 def _modulfrage(q: StabquerschnittBasis, quelle) -> Optional[Modulfrage]:
@@ -395,13 +398,16 @@ def _material_des_querschnitts(q: StabquerschnittBasis,
         return None, (f"«{q.name}» ist "
                       f"{'nach Vorlage' if q.art is Querschnittsart.VORLAGE else 'von Hand'} und "
                       f"bringt keines mit – das tut nur eine Platte oder Querschnittsanalyse.")
+    unfertig = aufbau.unfertige.get(q.bezug)
+    if unfertig is not None:
+        return None, _rechnet_nicht(q.art.bauteil, unfertig)
     if q.art is Querschnittsart.PLATTE:
         platte = aufbau.querschnitte.get(q.bezug)
         stoffe = [platte.beton] if platte is not None else []
     else:
         analyse = aufbau.querschnittsanalysen.get(q.bezug)
         if analyse is None:
-            return None, f"die Querschnittsanalyse von «{q.name}» ist noch leer."
+            return None, f"bei «{q.name}» ist noch keine Querschnittsanalyse gewählt."
         stoffe = list({id(f.stoff): f.stoff for f in analyse.flaechen if f.stoff is not None}.values())
         if len(stoffe) > 1:
             return None, (f"die Flächen von «{q.name}» sind aus "

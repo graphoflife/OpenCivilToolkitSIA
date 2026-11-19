@@ -19,7 +19,7 @@
  * anderes als im Bericht.
  */
 
-import { karte, panel } from './bausteine.js';
+import { karte, panel, unfertigHinweis } from './bausteine.js';
 import { el, ersetzen, leerzustand, svgEl } from './dom.js';
 import { setzen, span } from './mathe.js';
 import { formelnLeiste, werkzeugleiste } from './kopierleiste.js';
@@ -325,8 +325,28 @@ function abschnitte(bloecke) {
 }
 
 /**
+ * Die Bauteile der Lösung im Raum `raum`, in der Reihenfolge der `arten` und
+ * des Projekts: gerechnete mit ihrem `eintrag` aus der Zuordnung, und die,
+ * denen noch etwas fehlt, mit `unfertig` (Name und Grund). Die stehen an
+ * ihrer Stelle und sagen, was (Benutzer, 2026-11-19) -- bis dahin fehlten
+ * sie in Zusammenfassung und Diagrammen einfach.
+ */
+function bauteileDer(loesung, raum, arten = ARTEN) {
+  return arten.flatMap((a) => (zustand.projekt[a.liste] || []).map(({ kennung }) => ({
+    art: a, kennung,
+    eintrag: loesung.zuordnung?.[a.liste]?.[kennung],
+    unfertig: loesung.unfertige?.[a.liste]?.[kennung],
+  })))
+    .filter(({ eintrag, unfertig }) => eintrag || unfertig)
+    .filter(({ art, kennung }) => imRaum(raum, namensraum(art.art, kennung)));
+}
+
+/** Ein Bauteil, dem noch etwas fehlt, in Zusammenfassung und Diagrammen: nur was. */
+const unfertigKarten = (unfertig) => [karte(null, [unfertigHinweis(unfertig)])];
+
+/**
  * Die Zusammenfassung: je Bauteil eine Tabelle, in der Reihenfolge von ARTEN
- * -- wie im Bericht.
+ * und des Projekts -- wie im Bericht.
  *
  * Welche Bauteile erscheinen, steuert der Schalter *Gesamt / Aktuelle Seite*.
  * Ist ein Material gewählt und "Aktuelle Seite" aktiv, bleibt sie leer -- ein
@@ -334,81 +354,74 @@ function abschnitte(bloecke) {
  * zu zeigen wäre irreführend.
  */
 function zusammenfassung(loesung, verfolgen) {
-  const zuordnung = loesung.zuordnung || {};
   const raum = eingrenzung();
-  const bauteile = (mitNachweisen) => ARTEN.filter((a) => a.nachweise === mitNachweisen)
-    .flatMap((a) => Object.entries(zuordnung[a.liste] || {}).map(([kennung, eintrag]) => (
-      { art: a, kennung, eintrag })))
-    .filter(({ eintrag }) => imRaum(raum, eintrag.namensraum));
+  // Die mit Nachweisen zuerst, die ohne danach -- ein Balkensystem führt
+  // keine, aber seine Grenzwerte und Lagerkräfte gehören in die Übersicht.
+  const bauteile = bauteileDer(loesung, raum, [
+    ...ARTEN.filter((a) => a.nachweise), ...ARTEN.filter((a) => !a.nachweise)]);
 
-  const gezeigt = bauteile(true);
-  // Die Bauteile ohne Nachweise danach -- ein Balkensystem führt keine, aber
-  // seine Grenzwerte und Lagerkräfte gehören in die Übersicht.
-  const ohne = bauteile(false);
-  if (raum && !gezeigt.length && !ohne.length) {
+  if (raum && !bauteile.length) {
     const arten = ARTEN.map((a) => a.einzahl);
     return leerzustand('Kein Bauteil gewählt.',
       `Links ${arten.slice(0, -1).join(', ')} oder ${arten.at(-1)} wählen oder oben «Gesamt».`);
   }
-  if (!gezeigt.length && !ohne.length) {
+  if (!bauteile.length) {
     return stapel([leerzustand('Kein Bauteil vorhanden.'), lueckenPanel(loesung)]);
   }
 
-  const tabellen = loesung.zusammenfassungen || {};
-
   // Je Bauteil ein Panel, wie in den Eingaben: darin die Angaben, die
   // Bewehrung, die Nachweise und die Kennzahlen je als Karte.
-  const panels = gezeigt.map(({ kennung, eintrag }) => {
-    // Zeilen und LaTeX kommen fertig aus dem Kern. Sie hier ein zweites Mal
-    // zusammenzustellen hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal
-    // fürs Auge, einmal für den Kopierknopf.
-    const tabelle = tabellen[kennung];
-    const kennzahlen = kennzahlenliste(kennung, loesung);
-
-    return panel({
-      schluessel: `bericht/zusammenfassung/${kennung}`, titel: `Zusammenfassung – ${eintrag.name}`,
-    }, [
-      // Was das Bauteil ist und wie es bewehrt ist, steht über der Tabelle --
-      // als gewöhnliche Gleichung und gewöhnliche Tabelle, mit denselben
-      // Kopierknöpfen wie alles andere. Ihr Titel steht im Kopf der Karte.
-      tabelle?.angaben
-        ? karte(tabelle.angaben.titel, [gleichungBlock({ ...tabelle.angaben, titel: '' })],
-          { klasse: 'ist-links' })
-        : null,
-      tabelle?.bewehrung
-        ? karte(tabelle.bewehrung.titel, [tabellenBlock({ ...tabelle.bewehrung, titel: '' })])
-        : null,
-      karte('Nachweise', tabelle
-        ? [el('div.tabelle-block', {}, [
-          el('div.tabelle-huelle', {}, [nachweistabelle(tabelle, verfolgen)]),
-          werkzeugleiste({
-            latex: tabelle.latex,
-            markdown: tabelle.markdown,
-            kopf: tabelle.kopf,
-            zeilen: tabelle.zeilen.map((z) => z.zellen),
-          }),
-        ]),
-        // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
-        // steht deshalb unter der Tabelle und nicht bloss im Tooltip, nach
-        // Grund gebündelt -- die Sätze kommen fertig aus dem Kern, derselbe
-        // Wortlaut wie im Bericht.
-        ...(tabelle.hinweise || []).map((text) => el('p.hinweis', { text })),
-        // Ausgeschaltete Nachweise: sie laufen mit, stehen aber nicht in
-        // der Tabelle und nicht in der Herleitung. Geht einer nicht auf,
-        // steht es hier -- leise, denn geführt wird er ja nicht.
-        ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', { text: s.text }))]
-        : [el('div.leer', { text: 'Kein Nachweis gerechnet.' })]),
-      kennzahlen ? karte('Kennzahlen', [kennzahlen]) : null,
-    ]);
-  });
-
+  const tabellen = loesung.zusammenfassungen || {};
   return stapel([
-    ...panels,
-    ...ohne.map(({ art, kennung, eintrag }) => panel({
-      schluessel: `bericht/zusammenfassung/${kennung}`, titel: `Zusammenfassung – ${eintrag.name}`,
-    }, appVon(art.art).uebersicht(kennung))),
+    ...bauteile.map(({ art, kennung, eintrag, unfertig }) => panel({
+      schluessel: `bericht/zusammenfassung/${kennung}`,
+      titel: `Zusammenfassung – ${(eintrag || unfertig).name}`,
+    }, unfertig ? unfertigKarten(unfertig)
+      : art.nachweise ? nachweiskarten(kennung, tabellen[kennung], loesung, verfolgen)
+        : appVon(art.art).uebersicht(kennung))),
     lueckenPanel(loesung),
   ]);
+}
+
+/** Die Karten eines Bauteils mit Nachweisen in der Zusammenfassung. */
+function nachweiskarten(kennung, tabelle, loesung, verfolgen) {
+  // Zeilen und LaTeX kommen fertig aus dem Kern. Sie hier ein zweites Mal
+  // zusammenzustellen hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal
+  // fürs Auge, einmal für den Kopierknopf.
+  const kennzahlen = kennzahlenliste(kennung, loesung);
+  return [
+    // Was das Bauteil ist und wie es bewehrt ist, steht über der Tabelle --
+    // als gewöhnliche Gleichung und gewöhnliche Tabelle, mit denselben
+    // Kopierknöpfen wie alles andere. Ihr Titel steht im Kopf der Karte.
+    tabelle?.angaben
+      ? karte(tabelle.angaben.titel, [gleichungBlock({ ...tabelle.angaben, titel: '' })],
+        { klasse: 'ist-links' })
+      : null,
+    tabelle?.bewehrung
+      ? karte(tabelle.bewehrung.titel, [tabellenBlock({ ...tabelle.bewehrung, titel: '' })])
+      : null,
+    karte('Nachweise', tabelle
+      ? [el('div.tabelle-block', {}, [
+        el('div.tabelle-huelle', {}, [nachweistabelle(tabelle, verfolgen)]),
+        werkzeugleiste({
+          latex: tabelle.latex,
+          markdown: tabelle.markdown,
+          kopf: tabelle.kopf,
+          zeilen: tabelle.zeilen.map((z) => z.zellen),
+        }),
+      ]),
+      // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
+      // steht deshalb unter der Tabelle und nicht bloss im Tooltip, nach
+      // Grund gebündelt -- die Sätze kommen fertig aus dem Kern, derselbe
+      // Wortlaut wie im Bericht.
+      ...(tabelle.hinweise || []).map((text) => el('p.hinweis', { text })),
+      // Ausgeschaltete Nachweise: sie laufen mit, stehen aber nicht in
+      // der Tabelle und nicht in der Herleitung. Geht einer nicht auf,
+      // steht es hier -- leise, denn geführt wird er ja nicht.
+      ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', { text: s.text }))]
+      : [el('div.leer', { text: 'Kein Nachweis gerechnet.' })]),
+    kennzahlen ? karte('Kennzahlen', [kennzahlen]) : null,
+  ];
 }
 
 /**
@@ -533,14 +546,10 @@ function diagrammgruppen(loesung) {
     gruppen.push({ schluessel: 'werkstoffe', name: 'Werkstoffe', titel: 'Werkstoffgesetze',
       karten: gesetzkarten });
   }
-  for (const art of ARTEN) {
-    for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.[art.liste] || {})) {
-      if (imRaum(raum, eintrag.namensraum)) {
-        gruppen.push({ schluessel: kennung, name: eintrag.name,
-          titel: `Diagramme – ${eintrag.name}`,
-          karten: appVon(art.art).karten(kennung, eintrag, loesung) });
-      }
-    }
+  for (const { art, kennung, eintrag, unfertig } of bauteileDer(loesung, raum)) {
+    const { name } = eintrag || unfertig;
+    gruppen.push({ schluessel: kennung, name, titel: `Diagramme – ${name}`,
+      karten: unfertig ? unfertigKarten(unfertig) : appVon(art.art).karten(kennung, eintrag, loesung) });
   }
   return gruppen;
 }

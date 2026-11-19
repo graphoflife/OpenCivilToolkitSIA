@@ -10,7 +10,7 @@ Steifigkeit und die beiden quer dazu (:func:`bauen`).
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from opencivil.pfahl.aussen import AeussererWiderstand
 from opencivil.pfahl.boden import Pfahlschicht
@@ -28,9 +28,11 @@ if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
 
 
-def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
+def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Optional[Bauteil]:
     """
-    Ein Pfahl und seine beiden Nachweise, sobald eine Kombination
+    Fehlt dem Pfahl noch Boden (:meth:`PfahlEintrag.fehlender_baugrund`),
+    rechnet er nicht, nur ein Hinweis sagt es (:meth:`Aufbau.unfertig`).
+    Sonst ein Pfahl und seine beiden Nachweise, sobald eine Kombination
     eingeschaltet ist -- ohne sie steht er allein da, wie ein Grundbruch
     ohne Kombination. Seine Steifigkeit, gleich ob mit Kombinationen, sobald
     unter dem Fuss Boden ist; sie liest nur die Schichten, auch wenn R_a,k
@@ -41,6 +43,9 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
     """
     g = partial(als_groesse, eintrag)
     wo = f"Pfahl '{eintrag.name}'"
+    fehlt = eintrag.fehlender_baugrund()
+    if fehlt:
+        return aufbau.unfertig(art, eintrag, wo, fehlt)
     schichten = [Pfahlschicht(name=s.name, verhalten=s.verhalten, mantel=s.mantel,
                               **{k: als_groesse(s, k) for k in (
                                   "d", "gamma", "phi_k", "c_k", "s_u", "q_s", "K",

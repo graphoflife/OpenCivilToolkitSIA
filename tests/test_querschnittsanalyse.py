@@ -130,8 +130,10 @@ class TestKnoten(unittest.TestCase):
         self.assertIn("K99", d["meldungen"][0]["text"])
         # Die übrigen Elemente heissen weiter wie vorher.
         self.assertEqual([l["element"] for l in d["linien"]], ["Linie 2"])
-        with self.assertRaisesRegex(ProjektFehler, "K99"):
-            p.rechnen()
+        # Die Analyse rechnet nicht, das Projekt schon: der Hinweis nennt den Knoten.
+        e = p.rechnen()
+        self.assertIn("a1", e.aufbau.unfertige)
+        self.assertTrue(any("K99" in w for w in e.warnungen), e.warnungen)
 
     def test_doppelte_kennung_wird_gemeldet(self):
         a = balken()
@@ -224,9 +226,13 @@ class TestAufbau(unittest.TestCase):
                                0.18 - 0.1 * 0.2)
 
     def meldung(self, p) -> str:
-        with self.assertRaises(ProjektFehler) as fehler:
-            p.rechnen()
-        return str(fehler.exception)
+        """
+        Eine Zeichnung, die sich nicht rechnen lässt, hält nur ihre Analyse
+        auf (Benutzer, 2026-11-19): sie wird kein Bauteil, ein Hinweis sagt warum.
+        """
+        e = p.rechnen()
+        self.assertIn("a1", e.aufbau.unfertige)
+        return "\n".join(e.warnungen)
 
     def test_stab_ausserhalb(self):
         p = projekt()
@@ -248,9 +254,11 @@ class TestAufbau(unittest.TestCase):
         self.assertIn("Wand 1", self.meldung(p))
 
     def test_geloeschtes_material(self):
+        """Ein Verweis ins Leere ist kein halbfertiger Stand: er hält alles auf."""
         p = projekt()
         p.querschnittsanalysen[0].flaechen[0].material = "b7"
-        self.assertIn("'b7'", self.meldung(p))
+        with self.assertRaisesRegex(ProjektFehler, "'b7'"):
+            p.rechnen()
 
 
 class TestBiegung(unittest.TestCase):
@@ -857,14 +865,34 @@ class TestLeereAnalyse(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": d})
         self.assertEqual(antwort.status, 200)
         meldungen = [m["text"] for m in antwort.daten["zeichendaten"]["r1"]["uebersicht"]["meldungen"]]
-        self.assertTrue(any("Die Querschnittsanalyse «Leer» ist noch leer." in m
-                            for m in meldungen))
+        self.assertTrue(any("die Querschnittsanalyse «Leer» rechnet nicht (noch nichts "
+                            "gezeichnet)." in m for m in meldungen), meldungen)
 
     def test_ihre_diagramme_sagen_es(self):
         antwort = dienst.bearbeite("analysediagramme",
                                    {"projekt": self.beschreibung(), "kennung": "a9"})
         self.assertEqual(antwort.status, 400)
         self.assertIn("noch nichts gezeichnet", antwort.daten["fehler"])
+
+    def test_bewehrung_ohne_polygon_haelt_nur_sie_auf(self):
+        """
+        Wer zuerst die Stäbe zeichnet, hat eine Weile Bewehrung ohne Beton
+        darum. Bis 2026-11-19 rechnete dann kein Bauteil mehr; jetzt rechnet
+        nur die Analyse nicht, und ihre Diagramme sagen warum.
+        """
+        p = Projekt.beispiel()
+        a = QuerschnittsanalyseEintrag.neu("a9", "Halb")
+        a.stab(100, 100, durchmesser=20, stahl=p.querschnittsanalysen[0].stablinien[0].stahl)
+        p.querschnittsanalysen.append(a)
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        self.assertEqual(antwort.status, 200)
+        self.assertTrue(any(w.startswith("Querschnittsanalyse 'Halb': Es gibt kein Polygon "
+                                         "mit Material") for w in antwort.daten["warnungen"]),
+                        antwort.daten["warnungen"])
+        self.assertTrue(antwort.daten["urteile"])
+        diagramme = dienst.bearbeite("analysediagramme", {"projekt": p.als_dict(), "kennung": "a9"})
+        self.assertEqual(diagramme.status, 400)
+        self.assertIn("kein Polygon mit Material", diagramme.daten["fehler"])
 
     def test_bauhilfen_allein_sind_noch_leer(self):
         a = QuerschnittsanalyseEintrag.neu("a9", "Leer")
@@ -917,10 +945,10 @@ class TestVerschmierteStaebe(unittest.TestCase):
                              ({"durchmesser": 0.0}, "der Durchmesser"),
                              ({"laenge": -1.0}, "die Länge")):
             with self.subTest(felder=felder):
-                with self.assertRaises(ProjektFehler) as fehler:
-                    self.projekt(**felder).rechnen()
+                warnungen = self.projekt(**felder).rechnen().warnungen
                 # Die Vorlage hat zwei Linien -- diese ist die dritte.
-                self.assertIn(f"Linie 3: {text} der verschmierten Stäbe", str(fehler.exception))
+                self.assertTrue(any(f"Linie 3: {text} der verschmierten Stäbe" in w
+                                    for w in warnungen), warnungen)
 
     def test_herleitung(self):
         text = str(self.projekt().rechnen().bericht())

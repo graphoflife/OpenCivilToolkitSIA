@@ -7,6 +7,40 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Ein unfertiges Bauteil hält nur sich auf
+
+Der Benutzer bat um beides: den Schalter «E-Modul» (unten) und eine
+Durchsicht aller Fenster nach der neuen Regel, ein Bereich nach dem
+anderen. Vier Durchsichten liefen nebeneinander; was zuerst auffiel,
+betrifft alle Bereiche: ein Bauteil, dem noch etwas fehlte, liess das
+ganze Projekt scheitern.
+
+- **Vorher:** eine Platte ohne Bewehrung, ein Pfahl ohne Schicht oder
+  ohne Boden unter dem Fuss und eine Querschnittsanalyse mit halbfertiger
+  Zeichnung -- etwa ein Stab, noch kein Polygon -- hielten alles an: oben
+  «Fehler», rechts das Ergebnis zur Eingabe davor.
+- **Jetzt:** nur dieses Bauteil rechnet nicht. Über seinen Eingaben, in
+  der Zusammenfassung und bei den Diagrammen steht «Nichts zu rechnen:
+  noch keine Bewehrung.», oben rechts «alle Nachweise erfüllt · einem
+  Bauteil fehlt noch etwas» -- nicht grün, denn die Platte ohne Bewehrung
+  ist nicht nachgewiesen. Ein Stab, der ihren Querschnitt nimmt, sagt
+  «die Platte «Decke» rechnet nicht (noch keine Bewehrung).»
+- Im Kern merkt sich `Aufbau.unfertig` Art, Name und Grund
+  (`Aufbau.unfertige`); es ersetzt `leere_analysen`, das nur die leere
+  Analyse kannte. Die Seite bekommt sie unter ihrer Liste wie die
+  Zuordnung, und Zusammenfassung und Diagramme gehen die Bauteile jetzt in
+  der Reihenfolge des Projekts durch (`bauteileDer`), gerechnete und
+  unfertige zusammen.
+- Hart bleibt, was eigentlich nur eine verdorbene Datei erzeugt: ein
+  Verweis ins Leere, eine Zahl ausserhalb ihres Bereichs. Die Durchsicht
+  fand aber Wege dorthin über die Bedienung -- ein Material, das gelöscht
+  wird, während es verborgen noch gewählt ist; ein Schalter, der eine
+  erlaubte Zahl unerlaubt macht. Die folgen bereichsweise.
+- Der Schalter «Biegung» eines Profils schreibt «um y – stark» wie
+  geschrieben, nicht gross, wie der Schalter «E-Modul».
+
+---
+
 ## 2026-11-19 · Empfehlungen umgesetzt, Bedienung erklärt sich selbst
 
 Der Benutzer nahm die Empfehlungen des Vortags an und bat, die vier

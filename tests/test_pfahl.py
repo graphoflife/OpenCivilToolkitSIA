@@ -282,11 +282,9 @@ class TestEintrag(unittest.TestCase):
 
     def test_unmoegliche_zahlen_vor_dem_rechnen(self):
         faelle = {
-            "ohne Schicht": ({}, None),
             "muss grösser sein als die des Wassers": ({}, {"gamma": 10.0}),
             "drainiert braucht φ'_k über null": ({}, {"phi_k": 0.0}),
             "undrainiert braucht s_u,k über null": ({}, {"verhalten": "undrainiert", "s_u": 0.0}),
-            "Unter dem Fuss muss noch Boden sein": ({"L": 19.0}, {}),
             "die Stäbe haben keinen Platz": ({"D": 150.0}, {}),
             "berühren sich": ({"n": 120}, {}),
             "muss im Verpresskörper liegen": ({"art": "mikropfahl", "D": 100.0}, {}),
@@ -304,6 +302,29 @@ class TestEintrag(unittest.TestCase):
                 with self.assertRaises(ProjektFehler) as fehler:
                     p.aufbauen()
                 self.assertIn(satz, str(fehler.exception))
+
+    def test_ohne_baugrund_rechnet_nur_der_pfahl_nicht(self):
+        """
+        Ein unfertiger Baugrund ist kein Fehler des Projekts (Benutzer,
+        2026-11-19): der Pfahl wird kein Bauteil, ein Hinweis sagt, was fehlt.
+        """
+        faelle = {
+            "noch keine Schicht -- eine anlegen oder R_a,k aus einem Versuch eingeben": (
+                {}, None),
+            "die Schichten reichen bis 20 m -- unter dem Fuss fehlt noch Boden": (
+                {"L": 19.0}, {}),
+        }
+        for satz, (felder, schicht) in faelle.items():
+            p, t = projekt(**felder)
+            if schicht is not None:
+                t.schicht("Kies", **{"d": 20.0, **schicht})
+            t.kombination("K", N_Ed=100.0)
+            with self.subTest(satz=satz):
+                aufbau = p.aufbauen()
+                self.assertNotIn(t.kennung, aufbau.teile)
+                self.assertIn(satz, aufbau.unfertige[t.kennung].grund)
+                self.assertTrue(any(w.startswith("Pfahl 'P': ") and satz in w
+                                    for w in aufbau.warnungen), aufbau.warnungen)
 
     def test_kombinationen_eindeutig(self):
         p, t = projekt()

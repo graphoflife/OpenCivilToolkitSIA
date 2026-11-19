@@ -3,11 +3,11 @@ opencivil/projekt/aufbau/querschnittsanalyse.py -- ein gezeichneter Querschnitt 
 
 VERANTWORTUNG:
 Aus einem :class:`~opencivil.projekt.querschnittsanalyse.QuerschnittsanalyseEintrag`
-die :class:`~opencivil.querschnitt.analyse.Querschnittsanalyse` -- jeder Fehler
-der Zeichnung als Satz, der sie nennt -- und ihre Nachweise: Biegung und
-Normalkraft, Querkraft und Torsion, Duktilitaet, sproedes Versagen, die
-Zwaengungen, die Stahlspannungen und das Knicken (:func:`bauen`) -- dazu die
-Kennzahlen.
+die :class:`~opencivil.querschnitt.analyse.Querschnittsanalyse` und ihre
+Nachweise: Biegung und Normalkraft, Querkraft und Torsion, Duktilitaet,
+sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
+(:func:`bauen`) -- dazu die Kennzahlen. Eine leere oder fehlerhafte
+Zeichnung wird kein Bauteil, nur ein Hinweis.
 """
 
 from __future__ import annotations
@@ -16,7 +16,6 @@ from typing import TYPE_CHECKING, Mapping, Optional
 
 from opencivil.core.einheiten import KN, KNM
 from opencivil.material.basis import Baustoff
-from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
 from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
@@ -50,14 +49,17 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
     ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
-    2026-10-19).
+    2026-10-19). Ebenso eine Zeichnung, die sich noch nicht rechnen laesst,
+    etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
+    stimmt, und der Rest rechnet weiter (:meth:`Aufbau.unfertig`).
     """
+    wo = f"Querschnittsanalyse '{eintrag.name}'"
     if eintrag.leer:
-        aufbau.leere_analysen[eintrag.kennung] = eintrag.name
-        aufbau.warnungen.append(
-            f"Querschnittsanalyse '{eintrag.name}': noch nichts gezeichnet → nichts zu rechnen.")
-        return None
-    analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
+        return aufbau.unfertig(art, eintrag, wo, "noch nichts gezeichnet")
+    try:
+        analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
+    except GeometrieFehler as fehler:
+        return aufbau.unfertig(art, eintrag, wo, str(fehler).rstrip("."))
     analyse.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag.kennung, eintrag.name, art, analyse)
 
@@ -121,8 +123,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
 def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Baustoff],
              *, praefix: str) -> Querschnittsanalyse:
     """
-    Aus der Beschreibung das Bauteil -- und aus jedem Fehler der Zeichnung
-    einen Satz, der die Analyse nennt.
+    Aus der Beschreibung das Bauteil. Laesst sich die Zeichnung nicht
+    rechnen, ein :class:`GeometrieFehler` mit dem ersten Grund.
     """
     wo = f"Querschnittsanalyse '{eintrag.name}'"
 
@@ -133,7 +135,7 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     if elemente.fehler:
         # Ein Element ohne Lage laesst sich nicht rechnen -- und es still
         # wegzulassen hiesse, mit einem anderen Querschnitt zu rechnen.
-        raise ProjektFehler(f"{wo}: {elemente.fehler[0]['text']}")
+        raise GeometrieFehler(elemente.fehler[0]["text"])
     flaechen = [Flaechenteil(name=f["name"], kennung=f["kennung"], punkte=f["punkte"],
                              stoff=stoff(f["material"], f["name"], "beton")
                              if f["material"] else None)
@@ -148,11 +150,8 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     # Jeder Baustoff bekommt seine Wahl, auch wer keine eigene hat: so steht
     # die Vorgabe nur an der Beschreibung.
     wahl = {b.id: eintrag.wahl(kennung).rechenwahl for kennung, b in baustoffe.items()}
-    try:
-        return Querschnittsanalyse(
-            name=eintrag.name, praefix=praefix,
-            flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,
-            alpha_min=eintrag.alpha_min, alpha_max=eintrag.alpha_max, k_c=eintrag.k_c,
-            wahl=wahl, biegung=EINACHSIG if eintrag.einachsig else SCHIEF)
-    except GeometrieFehler as fehler:
-        raise ProjektFehler(f"{wo}: {fehler}") from None
+    return Querschnittsanalyse(
+        name=eintrag.name, praefix=praefix,
+        flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,
+        alpha_min=eintrag.alpha_min, alpha_max=eintrag.alpha_max, k_c=eintrag.k_c,
+        wahl=wahl, biegung=EINACHSIG if eintrag.einachsig else SCHIEF)

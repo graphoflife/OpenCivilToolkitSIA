@@ -1,5 +1,5 @@
 ---
-erzeugt: 38981a8a4dc6
+erzeugt: 109e2efc5f37
 art: modul
 tags: [modul]
 ---
@@ -89,6 +89,15 @@ des Bauteils, und nur dann hat er ein E_eq -- eine
 Momenten-Kruemmungs-Linie mit ihrer Bewehrung, bei einer Platte immer
 in x-Richtung, Zug unten (Benutzer, 2026-10-24). Einer nach Vorlage
 oder von Hand ist nur eine Form.
+
+#### Querschnittsart.bauteil
+
+```python
+@property
+def bauteil(self) -> str
+```
+
+Wie das Bauteil heisst, aus dem er seine Werte nimmt -- leer bei einer Form.
 
 ### ModulEintrag
 

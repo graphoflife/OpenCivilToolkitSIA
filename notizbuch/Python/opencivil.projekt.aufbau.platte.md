@@ -1,5 +1,5 @@
 ---
-erzeugt: 12ae0ebcdf8e
+erzeugt: 03522e55667c
 art: modul
 tags: [modul]
 ---
@@ -20,10 +20,11 @@ Tragrichtung x ([[opencivil.projekt.aufbau.platte#bauen|bauen]]).
 ### bauen
 
 ```python
-def bauen(art: 'Bauteilart', eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bauteil
+def bauen(art: 'Bauteilart', eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Optional[Bauteil]
 ```
 
-Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen.
+Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen --
+ohne jede Bewehrung keiner, nur ein Hinweis ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
 
 Nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen im
 Querschnitt -- sie tragen zum Bewehrungsgehalt bei und druecken die
@@ -51,6 +52,15 @@ nachgewiesen und steht nicht in der Tabelle. Bis dahin bekam sie ein
 Urteil «ohne Bewehrung → kein Nachweis», das als nicht erfuellt zaehlte --
 eine Platte nur mit unterer Bewehrung galt so als nicht erfuellt. Die
 Zwaengung auf Normalkraft waehlt ihre Lagen selbst und prueft jede.
+
+### _querschnitt
+
+```python
+def _querschnitt(eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str) -> Optional[Plattenquerschnitt]
+```
+
+Der Querschnitt der Platte -- `None` ohne jede Bewehrung: ohne sie
+gibt es keinen Widerstand.
 
 ### _verformungsfall
 
@@ -103,7 +113,6 @@ Eine Einwirkung -- welche Massstaebe es gibt, prueft ihr Feld.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.querschnitt.platte]]
 

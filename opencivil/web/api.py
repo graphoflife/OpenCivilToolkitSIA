@@ -532,6 +532,12 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
             for kennung in aufbau.teile}
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
+        # Je Bauteil, dem noch etwas fehlt, was -- unter seiner Liste wie in
+        # der Zuordnung. Die Oberflaeche sagt es an seiner Stelle, nicht nur
+        # in der Herleitung (Benutzer, 2026-11-19).
+        ergebnis["unfertige"] = {art.liste: {} for art in BAUTEILE}
+        for kennung, u in aufbau.unfertige.items():
+            ergebnis["unfertige"][u.art.liste][kennung] = {"name": u.name, "grund": u.grund}
     return ergebnis
 
 

@@ -82,11 +82,12 @@ class Aufbau:
     anderes brauchen koennte, und nichts haengt von ihnen ab.
     """
 
-    leere_analysen: Dict[str, str] = field(default_factory=dict)
+    unfertige: Dict[str, "Unfertiges"] = field(default_factory=dict)
     """
-    Je Querschnittsanalyse, in der noch nichts gezeichnet ist, ihr Name. Sie
-    wird kein Bauteil -- es gibt nichts zu rechnen --, aber wer auf sie
-    zeigt, soll hoeren, dass sie leer ist, und nicht, es gebe sie nicht.
+    Je Bauteil, dem noch etwas fehlt, was: eine Querschnittsanalyse ohne
+    Zeichnung, eine Platte ohne Bewehrung, ein Pfahl ohne Schicht
+    (:meth:`unfertig`). Es wird kein Bauteil, aber wer auf es zeigt, soll
+    hoeren, was ihm fehlt, und nicht, es gebe es nicht.
     """
 
     warnungen: List[str] = field(default_factory=list)
@@ -113,6 +114,19 @@ class Aufbau:
     #
     # Bis 2026-10-25 legte jede Baufunktion ihr Objekt ein zweites Mal ab, in
     # einem Woerterbuch je Art. Jetzt steht es nur im Bauteil.
+
+    def unfertig(self, art: "Bauteilart", eintrag: Any, wo: str, grund: str) -> None:
+        """
+        Ein Bauteil, dem noch etwas fehlt: es rechnet nicht, das Projekt
+        schon, und ein Hinweis sagt, was fehlt -- ein unfertiger Zustand ist
+        kein Fehler des Projekts (Benutzer, 2026-11-19). Bis dahin hielten
+        eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und eine
+        halbfertige Zeichnung alles auf. ``grund`` ist ein Satzteil («noch
+        keine Bewehrung») oder ein Satz der Zeichnung, ohne Punkt; ``None``
+        zurueck, damit eine Baufunktion damit enden kann.
+        """
+        self.unfertige[eintrag.kennung] = Unfertiges(art, eintrag.name, grund)
+        self.warnungen.append(f"{wo}: {grund} → nichts zu rechnen.")
 
     def objekte(self, art: str) -> Dict[str, Any]:
         """
@@ -305,6 +319,15 @@ class Aufbau:
         folge = list(MATERIALARTEN)
         stoffe = sorted(self.baustoffe.values(), key=lambda s: folge.index(s.art.value))
         return [d.id for s in stoffe for d in s.definitionen.values()]
+
+
+@dataclass(frozen=True)
+class Unfertiges:
+    """Ein Bauteil, dem noch etwas fehlt -- seine Art, sein Name und was (:meth:`Aufbau.unfertig`)."""
+
+    art: "Bauteilart"
+    name: str
+    grund: str
 
 
 @dataclass

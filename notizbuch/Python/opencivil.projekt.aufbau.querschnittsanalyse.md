@@ -1,5 +1,5 @@
 ---
-erzeugt: 7014f3483ace
+erzeugt: 15a0bf98d70d
 art: modul
 tags: [modul]
 ---
@@ -10,11 +10,11 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Aus einem [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittsanalyseEintrag]]
-die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]] -- jeder Fehler
-der Zeichnung als Satz, der sie nennt -- und ihre Nachweise: Biegung und
-Normalkraft, Querkraft und Torsion, Duktilitaet, sproedes Versagen, die
-Zwaengungen, die Stahlspannungen und das Knicken ([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]) -- dazu die
-Kennzahlen.
+die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]] und ihre
+Nachweise: Biegung und Normalkraft, Querkraft und Torsion, Duktilitaet,
+sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
+([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]) -- dazu die Kennzahlen. Eine leere oder fehlerhafte
+Zeichnung wird kein Bauteil, nur ein Hinweis.
 
 ## Inhalt
 
@@ -37,7 +37,9 @@ Knicken, sobald ein Fall eingeschaltet ist.
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
 ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
-2026-10-19).
+2026-10-19). Ebenso eine Zeichnung, die sich noch nicht rechnen laesst,
+etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
+stimmt, und der Rest rechnet weiter ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
 
 ### _analyse
 
@@ -45,8 +47,8 @@ ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
 def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str) -> Querschnittsanalyse
 ```
 
-Aus der Beschreibung das Bauteil -- und aus jedem Fehler der Zeichnung
-einen Satz, der die Analyse nennt.
+Aus der Beschreibung das Bauteil. Laesst sich die Zeichnung nicht
+rechnen, ein [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]] mit dem ersten Grund.
 
 
 ## Braucht
@@ -61,7 +63,6 @@ einen Satz, der die Analyse nennt.
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
-- [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.biegung]]

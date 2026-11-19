@@ -16,6 +16,7 @@
 import { ARTEN, artVon } from './arten.js';
 import { el, ersetzen, melden } from './dom.js';
 import { api } from './api.js';
+import { unfertigHinweis } from './bausteine.js';
 import { materialAnlegen, materialKopieren } from './materialwahl.js';
 import { materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
@@ -140,9 +141,6 @@ function entfernen(liste, eintrag) {
   if (zustand.auswahl?.kennung === eintrag.kennung) waehlen(null);
 }
 
-/** Wie man die Teile über einen Editor setzt, der seine Knoten zurückgibt. */
-const einsetzen = (editor) => (behaelter, eintrag) => ersetzen(behaelter, ...editor(eintrag));
-
 // ===========================================================================
 // Die Zeilen
 // ===========================================================================
@@ -176,7 +174,10 @@ function bauteil(name, {
     loeschen: (e) => loeschenWennFrei(a.liste, e, `„${e.name}" ist Querschnitt in`),
     kopieren: (e) => kopieren(zeile, e),
     hinweis: () => a.bezeichnung,
-    editor: einsetzen(editor),
+    // Fehlt ihm noch etwas, steht es über seinen Eingaben -- dort, wo man
+    // es nachträgt (Benutzer, 2026-11-19).
+    editor: (behaelter, e) => ersetzen(behaelter,
+      unfertigHinweis(zustand.loesung?.unfertige?.[a.liste]?.[e.kennung]), ...editor(e)),
     fenster,
     karten,
     uebersicht,
@@ -204,7 +205,7 @@ const MATERIAL = {
   loeschen: (m) => loeschenWennFrei('materialien', m, `„${m.name || m.sorte}" verwendet von`),
   kopieren: materialKopieren,
   hinweis: materialHinweis,
-  editor: einsetzen(materialEditor),
+  editor: (behaelter, m) => ersetzen(behaelter, ...materialEditor(m)),
 };
 
 /**

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5dfe7816dbe1
+erzeugt: 8aa2fc106b64
 art: modul
 tags: [modul]
 ---
@@ -42,9 +42,23 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `baustoffe: Dict[str, Baustoff] = field(default_factory=dict)`
 - `kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)` – Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet.
 - `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
-- `leere_analysen: Dict[str, str] = field(default_factory=dict)` – Je Querschnittsanalyse, in der noch nichts gezeichnet ist, ihr Name. Sie wird kein Bauteil -- es gibt nichts zu rechnen --, aber wer auf sie zeigt, soll hoeren, dass sie leer ist, und nicht, es gebe sie nicht.
+- `unfertige: Dict[str, 'Unfertiges'] = field(default_factory=dict)` – Je Bauteil, dem noch etwas fehlt, was: eine Querschnittsanalyse ohne Zeichnung, eine Platte ohne Bewehrung, ein Pfahl ohne Schicht ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]]). Es wird kein Bauteil, aber wer auf es zeigt, soll hoeren, was ihm fehlt, und nicht, es gebe es nicht.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x` -- die Richtung steht noch im Schluessel der Platte, damit Wert-IDs in abgelegten Berichten nicht wechseln) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]). `fehlende` rechnet nichts: eine Richtung ohne Bewehrung mit Einwirkungen bekommt so eine Zeile mit Erfuellungsgrad null statt gar keiner.
+
+#### Aufbau.unfertig
+
+```python
+def unfertig(self, art: 'Bauteilart', eintrag: Any, wo: str, grund: str) -> None
+```
+
+Ein Bauteil, dem noch etwas fehlt: es rechnet nicht, das Projekt
+schon, und ein Hinweis sagt, was fehlt -- ein unfertiger Zustand ist
+kein Fehler des Projekts (Benutzer, 2026-11-19). Bis dahin hielten
+eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und eine
+halbfertige Zeichnung alles auf. `grund` ist ein Satzteil («noch
+keine Bewehrung») oder ein Satz der Zeichnung, ohne Punkt; `None`
+zurueck, damit eine Baufunktion damit enden kann.
 
 #### Aufbau.objekte
 
@@ -278,6 +292,19 @@ leere Felder, obwohl die Sorte alles hergibt.
 Die Reihenfolge bestimmt zugleich den Aufbau der Herleitung: der Loeser
 arbeitet die Ziele der Reihe nach ab, und das Protokoll folgt ihm. So
 stehen im Bericht erst die Baustoffe und dann die Bauteile.
+
+### Unfertiges
+
+```python
+@dataclass(frozen=True)
+class Unfertiges
+```
+
+Ein Bauteil, dem noch etwas fehlt -- seine Art, sein Name und was ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
+
+- `art: 'Bauteilart'`
+- `name: str`
+- `grund: str`
 
 ### Bauteil
 
