@@ -1,5 +1,5 @@
 ---
-erzeugt: eb839a0c4001
+erzeugt: a2cd17242fa0
 art: modul
 tags: [modul]
 ---
@@ -216,7 +216,10 @@ def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Mat
 
 Je tragenden Stab sein Querschnitt und sein Material, aufgeloest --
 «gemäss Querschnitt» wird zum Beton der Platte oder Analyse. Traegt das
-Material nicht, sagt es eine Meldung, und das System rechnet nicht.
+Material nicht, sagt es eine Meldung, und das System rechnet nicht: eine
+je Material, mit allen Staeben, die es nehmen -- bis 2026-11-19 eine je
+Stab, und ein geloeschter Beton gab so viele gleiche Zeilen wie Staebe.
+«gemäss Querschnitt» heisst je Querschnitt etwas anderes.
 
 ### _stabmaterial
 

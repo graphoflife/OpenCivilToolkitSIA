@@ -190,15 +190,18 @@ export function lastfallLeiste(a, ansicht, huelle) {
   }));
 }
 
+/** Was dort steht, wo Lasten hingehören, das Bauteil aber noch keinen Lastfall hat. */
+export function ohneLastfall() {
+  return el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst unter «Lastfälle» einen Lastfall anlegen.' });
+}
+
 /**
  * Der Lastfall gewählter Lasten im schwebenden Fenster -- mit «Var», wenn
  * sie sich unterscheiden. `eintrag` ist das Bauteil, `setzen(lastfall)`
  * schreibt.
  */
 export function lastfallZeile(eintrag, gewaehlt, setzen, titel) {
-  if (!eintrag.lastfaelle.length) {
-    return el('p.cad-hinweis-klein', { text: 'Für Lasten zuerst unter «Lastfälle» einen Lastfall anlegen.' });
-  }
+  if (!eintrag.lastfaelle.length) return ohneLastfall();
   return cadZeile('Lastfall', auswahl({
     werte: mitVar(eintrag.lastfaelle.map((x) => ({ wert: x.kennung, beschriftung: x.name })), gewaehlt),
     gewaehlt, titel, beiAenderung: setzen,

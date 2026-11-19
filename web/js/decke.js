@@ -303,6 +303,15 @@ function meldungszeilen(daten) {
 }
 
 /**
+ * Eine frische Decke, in Diagrammen und Zusammenfassung gleich. Die
+ * Zusammenfassung sagte bis 2026-11-19 «Nicht gerechnet.» unter einem
+ * roten Fehler.
+ */
+function ohnePlatte() {
+  return karte(null, [leerzustand('Noch keine Platte.', 'Zeichnen im Fenster mit «Platte».')]);
+}
+
+/**
  * Die Karten einer Decke im Reiter «Diagramme»: der Grundriss mit der
  * Aufteilung, einer mit den Streifen und die Ergebnisbilder. Das Panel
  * darum baut bericht.js.
@@ -310,9 +319,7 @@ function meldungszeilen(daten) {
 export function deckenKarten(kennung) {
   const decke = eintragVon(kennung);
   const daten = zeichendaten(kennung);
-  if (!decke?.platten.length) {
-    return [karte(null, [leerzustand('Noch keine Platte.', 'Zeichnen im Fenster mit «Platte».')])];
-  }
+  if (!decke?.platten.length) return [ohnePlatte()];
   if (!daten?.gerechnet) {
     return [karte(null, [...meldungszeilen(daten), leerzustand('Noch nicht gerechnet.')])];
   }
@@ -378,6 +385,7 @@ function lagerKarte(daten) {
  */
 export function deckenZusammenfassung(kennung) {
   const daten = zeichendaten(kennung);
+  if (!eintragVon(kennung)?.platten.length) return [ohnePlatte()];
   if (!daten) return [karte(null, [leerzustand('Noch nicht gerechnet.')])];
   if (!daten.gerechnet) return [karte(null, [...meldungszeilen(daten), leerzustand('Nicht gerechnet.')])];
   // Eine schräge Richtung heisst nach ihrem Winkel -- «71.57°» --, eine eigene Spalte dafür wiederholte ihn.

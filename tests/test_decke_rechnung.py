@@ -435,7 +435,10 @@ class TestEinachsig(Rechnung):
                           aufteilung=Aufteilung.FEST, anteil=1.0))
         f = e.faelle[0]
         self.assertAlmostEqual(f.nicht_getragen, f.summe)
-        self.assertTrue(any("trägt nicht" in m.text and m.fehler for m in f.meldungen))
+        # Eine Meldung für alle acht Streifen, nicht eine je Streifen (bis 2026-11-19).
+        self.assertEqual([(m.text, m.elemente, m.fehler) for m in f.meldungen], [(
+            "8 Streifen tragen nicht -- sie liegen nur auf «W3», und nichts hält ihre Drehung. "
+            "80 kN fallen aus.", tuple(f"x{i}" for i in range(1, 9)), True)])
 
     def test_die_meldung_nennt_nur_die_platte_ohne_lager(self):
         gelagert = rechteck(0, 0, 4, 2)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4c791e96fc5b
+erzeugt: 1e1445635d97
 art: modul
 tags: [modul]
 ---
@@ -191,7 +191,10 @@ Die Decke nach der Streifenmethode, je Lastfall und Kombination.
 def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis
 ```
 
-Ein Lastfall oder eine Kombination: alle Träger, von den Feldstreifen zu den Unterzügen.
+Ein Lastfall oder eine Kombination: alle Träger, von den Feldstreifen zu
+den Unterzügen. Was auf Trägern liegt, die nicht tragen, sagt eine
+Meldung je Grund -- bis 2026-11-19 eine je Träger, und eine Platte ohne
+Lager gab je Fall vierzig gleiche Zeilen.
 
 ### auf_traeger
 
@@ -262,6 +265,14 @@ def _schwerpunkt(l: Streckenlast) -> float
 ```
 
 Wo die Resultierende einer Streckenlast liegt, ab ihrem Anfang.
+
+### _warum
+
+```python
+def _warum(traeger: Traeger) -> Tuple[str, str]
+```
+
+Warum ein Träger nicht trägt -- von einem gesagt und von mehreren.
 
 
 ## Konstanten

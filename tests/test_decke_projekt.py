@@ -251,12 +251,19 @@ class TestZeichnung(unittest.TestCase):
         self.assertEqual((antwort.status, antwort.daten["fehler"]), (400, "'r1' ist keine Decke."))
 
     def test_ohne_platte_wird_nichts_gerechnet(self):
+        """
+        Eine frische Decke: es fehlt nur etwas -- ein Hinweis, kein Fehler
+        (bis 2026-11-19 rot) --, und gerechnet wird nichts, auch mit Lastfällen.
+        """
         p = Projekt(name="Leer")
         p.beton()
-        p.decke("Leer")
+        p.decke("Leer").standardfaelle()
         antwort = zeichnung(p)
         self.assertEqual(antwort.status, 200)
-        self.assertFalse(antwort.daten["uebersicht"]["gerechnet"])
+        uebersicht = antwort.daten["uebersicht"]
+        self.assertFalse(uebersicht["gerechnet"])
+        self.assertEqual(uebersicht["meldungen"], [
+            {"text": "Noch keine Platte -- mit «Platte» zeichnen.", "elemente": [], "fehler": False}])
 
     def test_die_meldung_nennt_die_kennung_im_projekt(self):
         p = zwei_felder()

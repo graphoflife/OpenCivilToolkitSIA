@@ -150,7 +150,7 @@ class ModulEintrag(Beschreibung):
                           art=self.rechenart)
 
 
-def _aufgezaehlt(namen: Sequence[str]) -> str:
+def aufgezaehlt(namen: Sequence[str]) -> str:
     """«A und I», «A, I_y, I_z und I_T»."""
     return " und ".join(filter(None, (", ".join(namen[:-1]), namen[-1])))
 
@@ -233,7 +233,7 @@ class StabquerschnittBasis(Beschreibung):
                 return (f"einen Kennwert «{fremd[0]}» gibt es nicht. "
                         f"Möglich sind: {', '.join(self.KENNWERTE)}.")
             if not all(self.masse.get(k, 0.0) > 0.0 for k in self.KENNWERTE):
-                return f"{_aufgezaehlt(self.KENNWERTE)} müssen grösser als null sein."
+                return f"{aufgezaehlt(self.KENNWERTE)} müssen grösser als null sein."
         return None
 
 

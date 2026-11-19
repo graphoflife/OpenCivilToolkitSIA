@@ -24,7 +24,9 @@ import { jaNein, zahlfeldMitVar } from './cad_app.js';
 import { cadZeile, schalterzeile } from './cad_palette.js';
 import { abstand, auswahlTeil } from './cad_modell.js';
 import { el } from './dom.js';
-import { aktiverLastfall, lastfallWaehlen, lastfallZeile } from './lastfaelle.js';
+import {
+  aktiverLastfall, lastfallWaehlen, lastfallZeile, ohneLastfall,
+} from './lastfaelle.js';
 import {
   eintragVon, feldangabe, materialien, zustand,
 } from './zustand.js';
@@ -162,11 +164,23 @@ const LISTE_VON = {
 /** Die Listen der gezeichneten Lasten -- jede in einem Lastfall. */
 export const LASTLISTEN = ['flaechenlasten', 'linienlasten', 'punktlasten'];
 
-/** In welchen Lastfall die Lasten gehen -- eine Zeile über ihren Feldern. */
+/**
+ * In welchen Lastfall die Lasten gehen -- eine Zeile über ihren Feldern --,
+ * oder was fehlt: keiner gewählt, oder es gibt noch keinen. Ohne Lastfall
+ * fehlten «q überall» und die Punktlast bis 2026-11-19 ohne ein Wort.
+ */
 function lastfallText(a) {
   const lf = gezeigterLastfall(a);
-  return lf ? el('p.cad-info', { text: `Lastfall «${lf.name}»` })
-    : el('p.cad-hinweis-klein', { text: 'Kein Lastfall gewählt -- oben in der Leiste einen wählen.' });
+  if (lf) return el('p.cad-info', { text: `Lastfall «${lf.name}»` });
+  return eintragVon(a.dk.kennung)?.lastfaelle.length
+    ? el('p.cad-hinweis-klein', { text: 'Kein Lastfall gewählt -- oben in der Leiste einen wählen.' })
+    : ohneLastfall();
+}
+
+/** Was am Lastfall die Felder ändert: welcher gezeigt ist, wie er heisst, ob es einen gibt. */
+function lastfallStand(a) {
+  return [aktiverLastfall(a.dk), gezeigterLastfall(a)?.name ?? null,
+    Boolean(eintragVon(a.dk.kennung)?.lastfaelle.length)];
 }
 
 /** Die Felder für das, was ein Werkzeug als Nächstes anlegt. */
@@ -179,7 +193,7 @@ export function neuEigenschaften(a, werkzeug) {
   return {
     inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...(LASTLISTEN.includes(liste) ? [lastfallText(a)] : []),
       ...FELDER[liste](wert, setzen)],
-    schluessel: JSON.stringify([werkzeug, v, vorgabeBeton(a), aktiverLastfall(a.dk)]),
+    schluessel: JSON.stringify([werkzeug, v, vorgabeBeton(a), lastfallStand(a)]),
   };
 }
 
@@ -195,7 +209,7 @@ export function eigenschaften(a) {
   const kennungen = [...new Set([...a.auswahl].map((s) => auswahlTeil(s).kennung))]
     .filter((k) => verzeichnis.has(k));
   const listen = new Set(kennungen.map((k) => verzeichnis.get(k).art?.liste ?? 'knoten'));
-  const schluessel = JSON.stringify([Boolean(frischeAntwort(a)), aktiverLastfall(a.dk)]);
+  const schluessel = JSON.stringify([Boolean(frischeAntwort(a)), lastfallStand(a)]);
   if (!kennungen.length) return { titel: '', inhalt: [] };
   if (listen.size > 1) {
     return {
@@ -240,7 +254,7 @@ export function punktlastSetzen(a, z, knoten, an, lastfall) {
 /** Die Punktlast der gewählten Knoten im gezeigten Lastfall -- wie die Stütze: ein Schalter, dann ihre Felder. */
 function punktlastFelder(a, z, knoten) {
   const lf = gezeigterLastfall(a);
-  if (!lf) return [];
+  if (!lf) return [lastfallText(a)];
   const lasten = knoten.map((k) => z.punktlasten.find((e) => e.knoten === k && e.lastfall === lf.kennung) || null);
   const zeilen = [lastfallText(a), schalterzeile('Punktlast', jaNein(gemeinsam(lasten.map(Boolean)), (w) => a.aendern((zz) => {
     for (const k of knoten) punktlastSetzen(a, zz, k, w, lf.kennung);
@@ -299,7 +313,7 @@ function knotenEigenschaften(a, z, knoten) {
  */
 function plattenlastFelder(a, platten) {
   const lf = gezeigterLastfall(a);
-  if (!lf) return [];
+  if (!lf) return [lastfallText(a)];
   const kennungen = platten.map((p) => p.kennung);
   const angabe = feldangabe('plattenlast', 'wert');
   const setzen = (w) => a.aendern((zz) => {

@@ -35,7 +35,9 @@ from opencivil.projekt.balkensystem import (
     EINHEIT_DER_LAST, BalkensystemEintrag, Profilachse, StabmaterialEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler
-from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS, Querschnittsart, StabquerschnittBasis
+from opencivil.projekt.staebe import (
+    MATERIAL_DES_QUERSCHNITTS, Querschnittsart, StabquerschnittBasis, aufgezaehlt,
+)
 from opencivil.spannungsanalyse.modul import ModulAusAnalyse, ModulAusPlatte, Modulfrage
 from opencivil.stabwerk.profiltabelle import PROFILE
 from opencivil.stabwerk.rechnung import Balkensystem, Materialkennwert, Stabmaterial
@@ -336,25 +338,35 @@ def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Mat
     """
     Je tragenden Stab sein Querschnitt und sein Material, aufgeloest --
     «gemäss Querschnitt» wird zum Beton der Platte oder Analyse. Traegt das
-    Material nicht, sagt es eine Meldung, und das System rechnet nicht.
+    Material nicht, sagt es eine Meldung, und das System rechnet nicht: eine
+    je Material, mit allen Staeben, die es nehmen -- bis 2026-11-19 eine je
+    Stab, und ein geloeschter Beton gab so viele gleiche Zeilen wie Staebe.
+    «gemäss Querschnitt» heisst je Querschnitt etwas anderes.
     """
     querschnitte = {q.kennung: q for q in eintrag.querschnitte}
     materialien = {m.kennung: m for m in eintrag.stabmaterialien}
     paare: Dict[str, Tuple[str, Stabmaterial]] = {}
     meldungen = list(modell.meldungen)
+    aufgeloest: Dict[Tuple[Optional[str], str], Tuple[Optional[Stabmaterial], str]] = {}
+    ohne: Dict[Tuple[Optional[str], str], List[Tuple[str, str]]] = {}
     for stab, (q, kennung) in modell.paare.items():
-        if kennung == MATERIAL_DES_QUERSCHNITTS:
-            material, grund = _material_des_querschnitts(querschnitte[q], aufbau)
-            if grund:
-                grund = f"{stab} nimmt das Material gemäss Querschnitt, aber {grund}"
-        else:
-            material, grund = _stabmaterial(materialien[kennung], aufbau, kennwerte)
-            if grund:
-                grund = f"{stab} nimmt das Material {kennung}, aber {grund}"
+        gemaess = kennung == MATERIAL_DES_QUERSCHNITTS
+        schluessel = (q if gemaess else None, kennung)
+        if schluessel not in aufgeloest:
+            aufgeloest[schluessel] = (_material_des_querschnitts(querschnitte[q], aufbau) if gemaess
+                                      else _stabmaterial(materialien[kennung], aufbau, kennwerte))
+        material = aufgeloest[schluessel][0]
         if material is None:
-            meldungen.append(Meldung(grund, (stab, q, kennung), True))
+            ohne.setdefault(schluessel, []).append((stab, q))
             continue
         paare[stab] = (q, material)
+    for schluessel, staebe in ohne.items():
+        gemaess, kennung = schluessel
+        namen = [stab for stab, _ in staebe]
+        wer = f"{namen[0]} nimmt" if len(namen) == 1 else f"{aufgezaehlt(namen)} nehmen"
+        was = "das Material gemäss Querschnitt" if gemaess else f"das Material {kennung}"
+        meldungen.append(Meldung(f"{wer} {was}, aber {aufgeloest[schluessel][1]}",
+                                 (*namen, *dict.fromkeys(q for _, q in staebe), kennung), True))
     return paare, meldungen
 
 

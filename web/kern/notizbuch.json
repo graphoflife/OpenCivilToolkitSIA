@@ -4530,7 +4530,8 @@
         "lagerverlauf",
         "_gehalten",
         "spitzen",
-        "_schwerpunkt"
+        "_schwerpunkt",
+        "_warum"
       ]
     },
     {
@@ -6830,7 +6831,7 @@
         "Querschnittsart.bauteil",
         "ModulEintrag",
         "ModulEintrag.wahl",
-        "_aufgezaehlt",
+        "aufgezaehlt",
         "StabquerschnittBasis",
         "StabquerschnittBasis.neu",
         "StabquerschnittBasis.stabvorlage",

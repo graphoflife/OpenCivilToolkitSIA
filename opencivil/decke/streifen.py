@@ -560,7 +560,10 @@ def pruefen(decke: Decke) -> List[Meldung]:
     """Was die Zerlegung aufhält -- Fehler -- und was auffällt -- Hinweise."""
     heraus: List[Meldung] = []
     if not decke.platten:
-        heraus.append(Meldung("Die Decke hat keine Platte."))
+        # Es fehlt nur etwas, kein Widerspruch (bis 2026-11-19 ein roter
+        # Fehler an jeder frischen Decke). Ohne Platte gibt es keine Streifen,
+        # und ohne Streifen rechnet nichts (:func:`~opencivil.decke.rechnung.rechnen`).
+        heraus.append(Meldung("Noch keine Platte -- mit «Platte» zeichnen.", fehler=False))
     if not decke.streifenbreite > 0.0:
         heraus.append(Meldung("Die Streifenbreite muss grösser als null sein."))
     stuecke: Dict[str, List[List[Punkt]]] = {}

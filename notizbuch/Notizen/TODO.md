@@ -24,6 +24,10 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Decken: «Knoten einfügen» auf einer Kante, die zwei Platten
       teilen, setzt den Knoten nur in die gewählte Platte; die andere
       behält ihre Kante ohne ihn. Prüfen, ob beide ihn bekommen sollen.
+- [ ] Decken: ein Klick auf «40 Streifen tragen nicht …» wählt nichts aus --
+      Streifen sind keine Teile der Zeichnung. Die Platten darunter wären
+      die Wahl; dafür müsste der Kern wissen, auf welcher Platte ein Träger
+      liegt. Gefunden bei der Durchsicht vom 2026-11-19.
 - [ ] Zeichenfenster: während eines Befehls heissen P und S «parallel»
       und «senkrecht», nicht Platte und Stütze. Erst Esc, dann die Taste.
 - [ ] Decken, nach Vorgabe (`opencivil/decke/`): die automatische

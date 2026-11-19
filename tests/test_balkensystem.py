@@ -803,6 +803,21 @@ class TestMaterialien(unittest.TestCase):
         self.assertIn("E-Modul, «Holz» (von Hand)", text)
         self.assertIn("Biegesteifigkeit, «R» aus Holz", text)
 
+    def test_eine_meldung_je_material(self):
+        """
+        Ein Material, das nicht trägt, nennt alle Stäbe, die es nehmen, in
+        einer Meldung -- bis 2026-11-19 stand sie je Stab da.
+        """
+        p = traeger()
+        s = p.balkensysteme[0]
+        s.linie((6, 0), (9, 0), querschnitt=s.linien[0].querschnitt, material=s.linien[0].material)
+        s.linie((9, 0), (12, 0), querschnitt=s.linien[0].querschnitt, material=s.linien[0].material)
+        s.stabmaterialien[0].stoff = ""
+        meldungen = [m for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
+        self.assertEqual([m.text for m in meldungen],
+                         ["L1, L2 und L3 nehmen das Material M1, aber bei ihm ist kein Beton gewählt."])
+        self.assertEqual(meldungen[0].elemente, ("L1", "L2", "L3", s.linien[0].querschnitt, "M1"))
+
     def test_der_beton_ist_ein_verweis(self):
         """
         Den Beton eines Materials löscht man nicht; zeigt es ins Leere, rechnet

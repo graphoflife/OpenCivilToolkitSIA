@@ -1,5 +1,5 @@
 ---
-erzeugt: 109e2efc5f37
+erzeugt: 76fedbe2a863
 art: modul
 tags: [modul]
 ---
@@ -127,10 +127,10 @@ wie dort (Benutzer, 2026-10-23).
 def wahl(self) -> Rechenwahl
 ```
 
-### _aufgezaehlt
+### aufgezaehlt
 
 ```python
-def _aufgezaehlt(namen: Sequence[str]) -> str
+def aufgezaehlt(namen: Sequence[str]) -> str
 ```
 
 «A und I», «A, I_y, I_z und I_T».

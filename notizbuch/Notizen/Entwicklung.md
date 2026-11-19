@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Decke: eine Zeile je Grund, eine frische Decke ohne Fehler
+
+Zwölfter Schritt der Durchsicht.
+
+- **Eine Platte ohne Lager** gab je Fall vierzig gleiche rote Zeilen, «Der
+  Streifen «x1» trägt nicht -- er liegt auf nichts. 4.5 kN fallen aus.»,
+  in der Zusammenfassung rund 160. Jetzt eine je Grund und Fall: «40
+  Streifen tragen nicht -- sie liegen auf nichts. 120 kN fallen aus.» Ein
+  einzelner Streifen heisst wie bisher. Ebenso im Balkensystem: ein
+  Material, das nicht trägt, nennt alle Stäbe in einer Meldung, «L1, L2
+  und L3 nehmen das Material M1, aber …», statt einer je Stab.
+- **Eine frische Decke** zeigte «Die Decke hat keine Platte.» als roten
+  Fehler und in der Zusammenfassung «Nicht gerechnet.». Jetzt grau «Noch
+  keine Platte -- mit «Platte» zeichnen.», und die Zusammenfassung sagt
+  dasselbe wie die Diagramme. Gerechnet wird weiter nichts: ohne Streifen
+  hält die Rechnung an, nicht mehr nur bei einem Fehler. Sonst hiesse die
+  leere Decke gerechnet, mit null Last in jedem Fall.
+- **Ohne Lastfall** fehlten im Fenster einer Platte «q überall» und im
+  Fenster eines Knotens die Punktlast ohne ein Wort. Jetzt steht dort, was
+  fehlt: «Für Lasten zuerst unter «Lastfälle» einen Lastfall anlegen.»
+  (derselbe Satz wie an einer gewählten Last) oder, gibt es Lastfälle,
+  «Kein Lastfall gewählt -- oben in der Leiste einen wählen.» Das Fenster
+  baut sich neu, wenn der erste Lastfall dazukommt.
+
 ## 2026-11-19 · Materiallisten: überall dieselbe, und ein gelöschtes Material steht am Ort
 
 Elfter Schritt der Durchsicht, der erste der Bereiche Decke bis Python.
