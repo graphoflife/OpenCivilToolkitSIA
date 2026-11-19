@@ -518,9 +518,12 @@ export function analyseKarten(kennung) {
   return [
     interaktion,
     kopf,
-    // Ohne Bruchzustand sagt die Karte, warum -- bis 2026-11-19 fehlte sie still.
+    // Ohne Bild sagt die Karte, warum -- bis 2026-11-19 fehlte sie still. Den
+    // Schubfluss zeigt sie nur, wo der Kern etwas zu sagen hat: ohne
+    // Schubwand und ohne Querkraft ist Schub kein Thema.
     gewaehlt.bruch ? bild('Bruchzustand', bruchbild(daten, gewaehlt))
       : bild('Bruchzustand', leerzustand(gewaehlt.ohne_bruch || 'Kein Bruchzustand.')),
-    gewaehlt.schub ? bild('Schubfluss', schubbild(daten, gewaehlt)) : null,
+    gewaehlt.schub ? bild('Schubfluss', schubbild(daten, gewaehlt))
+      : gewaehlt.ohne_schub ? bild('Schubfluss', leerzustand(gewaehlt.ohne_schub)) : null,
   ].filter(Boolean);
 }

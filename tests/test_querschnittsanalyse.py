@@ -784,6 +784,39 @@ class TestFaelleOhneBruchzustand(unittest.TestCase):
         self.assertIsNotNone(self.faelle["Feld"]["bruch"])
         self.assertEqual(self.faelle["Feld"]["ohne_bruch"], "")
 
+    def test_ohne_schubfluss_sagt_er_warum(self):
+        """
+        Der Unterzug hat Schubwände: wer sie ohne Querkraft und Torsion
+        belastet, sieht warum es kein Bild gibt. Bis 2026-11-19 fehlte die
+        Karte «Schubfluss» ohne ein Wort.
+        """
+        for name in ("Leer", "Nur N"):
+            with self.subTest(name):
+                self.assertIsNone(self.faelle[name]["schub"])
+                self.assertEqual(self.faelle[name]["ohne_schub"],
+                                 "Keine Querkraft und keine Torsion → kein Schubfluss.")
+        self.assertIsNotNone(self.faelle["Feld"]["schub"])
+        self.assertEqual(self.faelle["Feld"]["ohne_schub"], "")
+
+
+class TestFaelleOhneSchubwand(unittest.TestCase):
+    """
+    Derselbe Unterzug ohne Schubwände: belastet sagt der Lastfall, dass eine
+    fehlt; unbelastet ist Schub kein Thema, und es gibt keinen Satz.
+    """
+
+    def test_der_grund_des_nachweises(self):
+        p = Projekt.beispiel()
+        a = p.querschnittsanalysen[0]
+        a.schubwaende.clear()
+        a.lastfall("Nur N", N_Ed=-500.0)
+        d = dienst.bearbeite("analysediagramme", {"projekt": p.als_dict(), "kennung": "a1"})
+        faelle = {f["name"]: f for f in d.daten["diagramme"]["faelle"]}
+        self.assertIsNone(faelle["Feld"]["schub"])
+        self.assertEqual(faelle["Feld"]["ohne_schub"],
+                         "Es gibt keine Schubwand, die Querkraft oder Torsion aufnehmen könnte.")
+        self.assertEqual(faelle["Nur N"]["ohne_schub"], "")
+
 
 # ===========================================================================
 # Vorlagen

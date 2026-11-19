@@ -1,5 +1,5 @@
 ---
-erzeugt: 426704843030
+erzeugt: 7bd05d9f797d
 art: modul
 tags: [modul]
 ---
@@ -239,7 +239,8 @@ Einwirkung und der Widerstand seines Nachweises, ebenfalls mit allen
 drei Groessen.
 
 Je Lastfall ausserdem der Bruchzustand im Schnitt (Nulllinie, Druckzone,
-die Dehnung jedes Stabs) und der Schubfluss in den Waenden. Was die
+die Dehnung jedes Stabs) und der Schubfluss in den Waenden -- oder je ein
+Satz, warum es das Bild nicht gibt. Was die
 Nachweise schon wissen, kommt aus ihren Befunden in `loesung`; neu
 gerechnet wird nur die Flaeche, nach der kein Nachweis fragt -- an
 demselben Querschnitt.
@@ -321,6 +322,17 @@ Polygon und die Dehnung jedes Stabs -- in mm und ‰.
 Gedrueckt ist die Seite kleiner v: die Kruemmung zeigt nie gegen die
 Zugrichtung. Ohne Kruemmung ist alles gedrueckt oder nichts.
 
+### _ohne_schub
+
+```python
+def _ohne_schub(analyse, schub: Optional[Schubbefund], fall) -> str
+```
+
+Warum ein Lastfall kein Bild des Schubflusses hat, als Satz -- leer, wo
+er eines hat, und wo der Schnitt weder eine Schubwand noch Querkraft
+oder Torsion kennt: dort ist Schub kein Thema, und die Karte fehlt. Bis
+2026-11-19 fehlte sie immer ohne ein Wort.
+
 ### _schubfluss
 
 ```python
@@ -331,7 +343,8 @@ Je Schubwand, wie der Nachweis sie sieht -- an ihren Knoten geteilt
 ([[opencivil.querschnitt.schubwaende#einzeln|einzeln]]) --, ihre Achse und
 Dicke in mm, ihr Fluss mit Vorzeichen entlang der Achse in kN/m und ihre
 ganze Kraft gegen ihren Widerstand in kN, bei der Neigung, die der
-Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
+Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts;
+warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]].
 
 
 ## Konstanten

@@ -25,7 +25,7 @@ from opencivil.querschnitt.werkstoffgesetz import (
     BLOCKANTEIL, Betongesetz, Spannungsblock, Stahlgesetz,
 )
 from opencivil.nachweis.resistenzlinie import Handlinie
-from opencivil.nachweis.schubwandnachweis import Schubbefund
+from opencivil.nachweis.schubwandnachweis import OHNE_SCHUB, Schubbefund, schub_belastet
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web.anzeige import Anzeigegroesse, si, zahl
@@ -626,7 +626,8 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
     drei Groessen.
 
     Je Lastfall ausserdem der Bruchzustand im Schnitt (Nulllinie, Druckzone,
-    die Dehnung jedes Stabs) und der Schubfluss in den Waenden. Was die
+    die Dehnung jedes Stabs) und der Schubfluss in den Waenden -- oder je ein
+    Satz, warum es das Bild nicht gibt. Was die
     Nachweise schon wissen, kommt aus ihren Befunden in ``loesung``; neu
     gerechnet wird nur die Flaeche, nach der kein Nachweis fragt -- an
     demselben Querschnitt.
@@ -661,6 +662,7 @@ def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
             "bruch": _bruch(q, bauteil, p) if p is not None else None,
             "ohne_bruch": erg.ohne_bruch,
             "schub": _schubfluss(geschoben, erg.fall) if geschoben is not None else None,
+            "ohne_schub": _ohne_schub(bauteil, geschoben, erg.fall),
         })
     einachsig = bauteil.biegung.einachsig
     return {
@@ -801,13 +803,31 @@ def _bruch(q, bauteil, punkt) -> dict:
     }
 
 
+def _ohne_schub(analyse, schub: Optional[Schubbefund], fall) -> str:
+    """
+    Warum ein Lastfall kein Bild des Schubflusses hat, als Satz -- leer, wo
+    er eines hat, und wo der Schnitt weder eine Schubwand noch Querkraft
+    oder Torsion kennt: dort ist Schub kein Thema, und die Karte fehlt. Bis
+    2026-11-19 fehlte sie immer ohne ein Wort.
+    """
+    if schub is not None and fall.name in schub.verteilungen:
+        return ""
+    if not schub_belastet(analyse.biegung, fall):
+        return OHNE_SCHUB if analyse.waende else ""
+    if schub is not None:
+        return schub.ohne[fall.name]
+    # Belastet, aber der Nachweis lief nicht bis zu einem Befund.
+    return "Querkraft und Torsion sind nicht nachgewiesen → kein Schubfluss."
+
+
 def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
     """
     Je Schubwand, wie der Nachweis sie sieht -- an ihren Knoten geteilt
     (:func:`~opencivil.querschnitt.schubwaende.einzeln`) --, ihre Achse und
     Dicke in mm, ihr Fluss mit Vorzeichen entlang der Achse in kN/m und ihre
     ganze Kraft gegen ihren Widerstand in kN, bei der Neigung, die der
-    Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
+    Nachweis gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts;
+    warum, sagt :func:`_ohne_schub`.
     """
     v = schub.verteilungen.get(fall.name)
     if v is None:

@@ -7,6 +7,25 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Querschnittsanalyse: die Karte «Schubfluss» sagt, warum sie leer ist
+
+Nachtrag zur Durchsicht. Unter «Diagramme» fehlte die Karte «Schubfluss»
+ohne ein Wort, sobald ein Lastfall keine Querkraft und keine Torsion hatte
+-- die Karte «Bruchzustand» darüber sagt seit dem zehnten Schritt, warum
+sie leer ist. Jetzt sagt es auch diese:
+
+- Schubwände, aber weder Querkraft noch Torsion: «Keine Querkraft und
+  keine Torsion → kein Schubfluss.»
+- Querkraft, aber keine Schubwand: der Satz des Nachweises, «Es gibt keine
+  Schubwand, die Querkraft oder Torsion aufnehmen könnte.» Ebenso, wenn
+  die Wände nicht tragen: dann der Grund dafür.
+- Weder Schubwand noch Querkraft: keine Karte. Schub ist dann kein Thema
+  der Analyse, und ein Satz darüber wäre Lärm.
+
+Der Satz kommt aus dem Kern (`_ohne_schub` in den Diagrammdaten); der
+Nachweis legt seinen Grund je Lastfall im Befund ab (`Schubbefund.ohne`),
+damit Urteil und Diagramm denselben Satz sagen.
+
 ## 2026-11-19 · Grundbruch, Setzung, Pfahl: die Zusammenfassung sagt, was fehlt
 
 Dreizehnter und letzter Schritt der Durchsicht, die Bereiche Grundbruch

@@ -1,5 +1,5 @@
 ---
-erzeugt: 48a2ae18eeeb
+erzeugt: bdcfaae4226f
 art: modul
 tags: [modul]
 ---
@@ -50,12 +50,14 @@ class Schubbefund
 Was der Nachweis im Lauf fand: die Waende einzeln und ihre Zellen, je
 Lastfall die Verteilung des Schubflusses und je Wand den Widerstand bei
 der gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
-Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in allen dreien.
+Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in diesen dreien;
+war er belastet, sagt `ohne` warum.
 
 - `modell: sw.Zellenmodell`
 - `verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)`
 - `widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)`
 - `vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)` – Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand.
+- `ohne: Dict[str, str] = field(default_factory=dict)` – Je belasteter Lastfall ohne Verteilung der Grund -- es gibt keine Wand, oder die Waende tragen nicht. Derselbe Satz wie im Urteil.
 
 #### Schubbefund.waende
 
@@ -81,6 +83,10 @@ Querkraft und Torsion, je Lastfall auf die Schubwaende verteilt.
 def pruefe(self, e: Eingaben, p: Protokoll)
 ```
 
+
+## Konstanten
+
+- `OHNE_SCHUB = 'Keine Querkraft und keine Torsion → kein Schubfluss.'` – Warum ein Lastfall ohne Querkraft und Torsion keinen Schubfluss hat -- das Diagramm zeigt den Satz an Stelle des Bildes.
 
 ## Braucht
 

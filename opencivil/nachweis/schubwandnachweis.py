@@ -46,13 +46,19 @@ def schub_belastet(biegung: Biegung, fall: Lastfall) -> bool:
     return bool(fall.V_z or fall.T or biegung.querkraft_y(fall.V_y))
 
 
+#: Warum ein Lastfall ohne Querkraft und Torsion keinen Schubfluss hat -- das
+#: Diagramm zeigt den Satz an Stelle des Bildes.
+OHNE_SCHUB = "Keine Querkraft und keine Torsion → kein Schubfluss."
+
+
 @dataclass
 class Schubbefund:
     """
     Was der Nachweis im Lauf fand: die Waende einzeln und ihre Zellen, je
     Lastfall die Verteilung des Schubflusses und je Wand den Widerstand bei
     der gewaehlten Neigung und ihren Vergleich -- fuer die Diagramme. Ein
-    Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in allen dreien.
+    Lastfall ohne Verteilung (keine Last, keine Wand) fehlt in diesen dreien;
+    war er belastet, sagt ``ohne`` warum.
     """
 
     modell: sw.Zellenmodell
@@ -60,6 +66,11 @@ class Schubbefund:
     widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)
     vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)
     """Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand."""
+    ohne: Dict[str, str] = field(default_factory=dict)
+    """
+    Je belasteter Lastfall ohne Verteilung der Grund -- es gibt keine Wand,
+    oder die Waende tragen nicht. Derselbe Satz wie im Urteil.
+    """
 
     @property
     def waende(self) -> Tuple[sw.Wand, ...]:
@@ -137,8 +148,9 @@ class Schubwandnachweis(Nachweis):
             for teil, d in self.d_laengszug[fall.name].items():
                 ergebnis[d.id] = Groesse(0.0, KN if teil == "N" else KNM)
 
-    def _ohne(self, p: Protokoll, fall: Lastfall, grund: str):
+    def _ohne(self, p: Protokoll, befund: Schubbefund, fall: Lastfall, grund: str):
         p.warnung(grund)
+        befund.ohne[fall.name] = grund
         return self.urteil(self.d_ausnutzung[fall.name], fall.name, NICHT_FUEHRBAR, grund), None
 
     def _ein_fall(self, p: Protokoll, befund: Schubbefund, fall: Lastfall, V_y: float,
@@ -150,12 +162,12 @@ class Schubwandnachweis(Nachweis):
             ["T_Ed", Mathe(fest(fall.T / 1e3, 1)), "kNm"],
         ], titel="Einwirkung", ausrichtung="lrl")
         if not befund.waende:
-            return self._ohne(p, fall, "Es gibt keine Schubwand, die Querkraft oder "
+            return self._ohne(p, befund, fall, "Es gibt keine Schubwand, die Querkraft oder "
                                        "Torsion aufnehmen könnte.")
         try:
             v = sw.verteilen(befund.modell, V_y=V_y, V_z=fall.V_z, T=fall.T, bezug=bezug)
         except sw.WandFehler as fehler:
-            return self._ohne(p, fall, str(fehler))
+            return self._ohne(p, befund, fall, str(fehler))
         befund.verteilungen[fall.name] = v
 
         # -- Verteilung ---------------------------------------------------------
