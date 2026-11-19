@@ -1,5 +1,5 @@
 ---
-erzeugt: 88a7c493d563
+erzeugt: a1d8bcc279a9
 art: formel
 tags: [formel]
 normstelle: "Kap. 9.2.11; SIA 267:2013, 8.5.3.5"
@@ -8,7 +8,7 @@ normstelle: "Kap. 9.2.11; SIA 267:2013, 8.5.3.5"
 > Kap. 9.2.11; SIA 267:2013, 8.5.3.5
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L
 $$
 
 ## Grössen
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L = 568.8\,\mathrm{kPa} \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 568.8\,\mathrm{kPa}\right] \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
 $$
 
 ## Im Code

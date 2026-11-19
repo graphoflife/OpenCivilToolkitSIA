@@ -1,5 +1,5 @@
 ---
-erzeugt: 5b65081dcf48
+erzeugt: 2f83d646498b
 art: modul
 tags: [modul]
 ---
@@ -90,6 +90,14 @@ Hand heisst -- `kurzname` ist auch sein Feld dort.
 - `einheit: Einheit`
 - `beschreibung: str`
 - `je_stoff: Mapping[Baustoffart, str]`
+
+### _traegheit
+
+```python
+def _traegheit(si: float) -> str
+```
+
+Ein Traegheitsmoment in Worten: «1.06·10⁶ mm⁴».
 
 ### stoffkennwerte
 
@@ -325,6 +333,16 @@ def _ohne_modul(self, e: Eingaben) -> List[Meldung]
 
 Je Querschnitt, dessen Suche kein E_eq fand und den ein Stab mit
 seinem Material nimmt, eine Meldung.
+
+#### Stabwerksrechnung._keine_hauptachsen
+
+```python
+def _keine_hauptachsen(self, e: Eingaben) -> List[Meldung]
+```
+
+Je Querschnitt mit `I_yz`, den ein Stab nimmt und dessen y und z
+merklich keine Hauptachsen sind ([[opencivil.stabwerk.stabquerschnitt#Konstanten|KOPPLUNG]]), ein Hinweis --
+er haelt die Rechnung nicht auf.
 
 #### Stabwerksrechnung._eigenlast
 

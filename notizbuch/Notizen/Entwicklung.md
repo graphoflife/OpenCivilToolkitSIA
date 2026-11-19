@@ -7,6 +7,43 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Empfehlungen umgesetzt, Bedienung erklärt sich selbst
+
+Der Benutzer nahm die Empfehlungen des Vortags an und bat, die vier
+Aufräumpunkte auch zu machen: «generell sollte einfach die bedienung
+selbsterklärend sein». Das steht jetzt als Regel in [[Arbeitsweise]].
+
+- **Grundbruch:** ein negatives σ_f gibt keinen Widerstand. Die Zeile
+  zeigt es jetzt, statt dass die Zahlen nicht aufgehen: vorher
+  −9 kPa · 1.6 m · 4 m = 0 kN, jetzt max[0; −9 kPa] · 1.6 m · 4 m = 0 kN,
+  davor ein Satz, dass das nach Vorgabe ist -- das Buch sagt dazu nichts.
+- **Hauptachsen im Raum:** ein Querschnitt aus einer Analyse bringt im Raum
+  I_yz mit, und ab 5 % von min(I_y; I_z) sagt ein Hinweis, dass y und z
+  keine Hauptachsen sind. Er hält die Rechnung nicht auf und steht unter
+  der Zeichnung, im Fenster des Querschnitts und im Bericht. Warum dieses
+  Mass und nicht der Winkel der Hauptachsen: bei einem schlanken
+  Querschnitt verbiegt schon ein Drittel Grad den Stab merklich zur Seite,
+  bei einem fast quadratischen ist ein grosser Winkel harmlos. |I_yz| /
+  min(I_y; I_z) ist genau das Verhältnis der Krümmung quer zur Krümmung
+  um die steifere Achse.
+- **Noch ohne Platte oder Analyse:** wer auf «Platte» oder «QS Analyse»
+  umschaltete, liess bis heute das ganze Projekt scheitern, und das
+  Fenster zeigte weiter die Werte von vorher. Zwei Gründe: die leere Wahl
+  galt als Verweis auf etwas, das es nicht gibt, und beim Umschalten blieb
+  die alte Wahl stehen -- eine Analyse galt dann als «Platte» (im Browser
+  gefunden). Jetzt beginnt jede Art mit leerer Wahl; solange sie leer ist,
+  rechnet nur dieser Querschnitt nicht, die Meldung sagt «noch keine
+  Querschnittsanalyse gewählt», und eine leere Liste sagt «noch keine im
+  Projekt». Ein Verweis auf etwas, das es nicht gibt, scheitert weiter
+  hart.
+- Das Fenster eines Querschnitts zeigt die Meldungen des Kerns zu ihm; das
+  Bild von Kennwerten von Hand nennt im Raum A, I_y, I_z und I_T statt
+  «A, I»; die Hilfe der Ebene kennt «Kennwerte» und sagt nicht mehr, E_eq
+  gebe es nur bei einer Analyse; der Schalter Linie/Punkt der Bewehrung ist
+  ein gewöhnlicher `wahlSchalter`.
+
+---
+
 ## 2026-11-18 · 3D-Balkensystem: Querschnitt aus einer Querschnittsanalyse
 
 Jetzt kann ein Stab im Raum seinen Querschnitt auch aus einer

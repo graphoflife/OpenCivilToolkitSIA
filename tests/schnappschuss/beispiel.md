@@ -1475,7 +1475,7 @@ $$
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L = 568.8\,\mathrm{kPa} \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 568.8\,\mathrm{kPa}\right] \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -3683,7 +3683,7 @@ $$
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L
 $$
 
 ### Gleiten

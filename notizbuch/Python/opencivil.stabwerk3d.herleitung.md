@@ -1,5 +1,5 @@
 ---
-erzeugt: 765aee3b8df5
+erzeugt: 8df8c0c9eff7
 art: modul
 tags: [modul]
 ---
@@ -55,7 +55,7 @@ des Systems, die eine gestrichene Achse beruehrt, ist nicht bestimmbar.
 ## Konstanten
 
 - `STAEBE_MIT_MATRIX = 2` – Bis zu so vielen Teilstaeben steht die Matrix jedes einzelnen mit Zahlen da.
-- `ANNAHME = 'Steifigkeit: E_cm und G_cm des Betons, E_a und G_a des Baustahls ode…` – Was die Steifigkeit und das Gleichgewicht annehmen.
+- `ANNAHME = f'Steifigkeit: E_cm und G_cm des Betons, E_a und G_a des Baustahls od…` – Was die Steifigkeit und das Gleichgewicht annehmen.
 - `DURCHBIEGUNG = 'Die Durchbiegungen f_y und f_z misst jeder Stab gegen die Gerade zwi…` – Was die Durchbiegungen f_y und f_z sind -- und was sie nicht sind.
 - `SCHNITTGROESSEN_LATEX = '\\sigma = \\frac{N}{A} + \\frac{M_y \\cdot z}{I_y} + \\frac{M_z \\cd…` – Die Vorzeichen der Schnittgroessen, in den Achsen des Stabs.
 - `BIEGELINIE_LATEX = "w'' = -\\frac{M_y}{EI_y} \\qquad v'' = -\\frac{M_z}{EI_z} \\qquad u'…` – Die Biegelinien, die Laengsverschiebung und die Verdrillung.
@@ -71,6 +71,7 @@ des Systems, die eine gestrichene Achse beruehrt, ist nicht bestimmbar.
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stab]]
+- [[opencivil.stabwerk.stabquerschnitt]]
 - [[opencivil.stabwerk.system]]
 - [[opencivil.stabwerk.verlauf]]
 - [[opencivil.stabwerk3d.modell]]

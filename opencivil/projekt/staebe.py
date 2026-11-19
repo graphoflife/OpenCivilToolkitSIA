@@ -201,13 +201,20 @@ class StabquerschnittBasis(Beschreibung):
 
     def fehler(self) -> Optional[str]:
         """
-        Was an Massen oder Kennwerten nicht geht -- ``None``, wenn alles geht.
-        Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
-        2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
+        Was an Massen, Kennwerten oder der Wahl nicht geht -- ``None``, wenn
+        alles geht. Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler:
+        bis 2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
+        Ohne gewaehlte Platte oder Analyse rechnet der Querschnitt nicht, das
+        Projekt schon -- bis 2026-11-19 scheiterte daran das ganze Projekt,
+        gleich nach dem Umschalten, und die Oberflaeche zeigte weiter die
+        Werte der vorherigen Art.
         """
         if self.e_modul == "e_eq" and not self.art.aus_bauteil:
             return ("ein E_eq gibt es nur bei einem Querschnitt aus einer Platte oder "
                     "Querschnittsanalyse – nur sie haben eine Momenten-Krümmungs-Linie.")
+        if self.art.aus_bauteil and not self.bezug:
+            welche = "Platte" if self.art is Querschnittsart.PLATTE else "Querschnittsanalyse"
+            return f"noch keine {welche} gewählt."
         if self.art is Querschnittsart.VORLAGE:
             vorlage = self.stabvorlage()
             fremd = [k for k in self.masse if k not in vorlage.vorgaben()]

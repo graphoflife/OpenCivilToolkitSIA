@@ -18,7 +18,8 @@ Welche Kennwerte, sagt das System: der ebene Rahmen braucht ``A`` und ``I``
   ``b`` und ``h`` der Platte, im Raum mit ``I_z`` und ``I_T`` dazu;
 * aus einer Querschnittsanalyse (:class:`AusAnalyse`) -- ``A`` und ``I_y``
   ihres Bruttoquerschnitts, im Raum ``I_z`` dazu und ``I_T``, das sie dafuer
-  numerisch rechnet (:mod:`~opencivil.querschnitt.torsion`).
+  numerisch rechnet (:mod:`~opencivil.querschnitt.torsion`), und ``I_yz``:
+  daran prueft die Rechnung, ob y und z Hauptachsen sind.
 
 Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu. Nur ein Querschnitt aus
@@ -59,6 +60,8 @@ class Kennwert:
     einheit: Einheit
     stellen: int
     beschreibung: str
+    symbol: str = ""
+    """In LaTeX, wo es anders heisst als ``kurzname`` -- ``I_{yz}``."""
 
 
 _A = Kennwert("A", MM2, 0, "Querschnittsfläche")
@@ -70,6 +73,18 @@ EBEN = (_A, Kennwert("I", MIO_MM4, 2, "Flächenträgheitsmoment"))
 RAEUMLICH = (_A, Kennwert("I_y", MIO_MM4, 2, "Flächenträgheitsmoment um y"),
              Kennwert("I_z", MIO_MM4, 2, "Flächenträgheitsmoment um z"),
              Kennwert("I_T", MIO_MM4, 2, "Torsionsträgheitsmoment"))
+
+#: Kein Kennwert eines Stabs: wer mit ``I_y`` und ``I_z`` rechnet, nimmt y
+#: und z als Hauptachsen. Ein Querschnitt aus einer Analyse bringt es dann
+#: mit -- nur er kann unsymmetrisch sein --, und die Rechnung prueft, wie
+#: weit sie es nicht sind (:mod:`opencivil.stabwerk.rechnung`).
+DEVIATIONSMOMENT = Kennwert("I_yz", MIO_MM4, 2, "Deviationsmoment", symbol="I_{yz}")
+
+#: Ab so viel |I_yz| / min(I_y; I_z) sagt ein Hinweis, dass y und z keine
+#: Hauptachsen sind: so stark kruemmt ein Moment um die steifere Achse den
+#: Stab auch um die weichere, und die Rechnung laesst das weg. Nach Vorgabe,
+#: nicht nachgeschlagen (Benutzer, 2026-11-19: ein Hinweis, keine Drehung).
+KOPPLUNG = 0.05
 
 #: Je Kennwert die Wert-ID, die ihn liefert.
 Werte = Dict[str, str]
@@ -139,8 +154,8 @@ class Stabquerschnitt(ABC):
                      berechnung: Callable[[WertDef, Kennwert], Berechnung]
                      ) -> Tuple[List[Berechnung], Werte]:
         """Jeder Kennwert als eine Berechnung -- von Hand eine Vorgabe, sonst ein Bezug."""
-        berechnungen = [berechnung(self._wert(definieren, k.kurzname, k.kurzname, k.einheit,
-                                              k.beschreibung, k.stellen, index), k)
+        berechnungen = [berechnung(self._wert(definieren, k.kurzname, k.symbol or k.kurzname,
+                                              k.einheit, k.beschreibung, k.stellen, index), k)
                         for k in kennwerte]
         return berechnungen, {k.kurzname: b.id for k, b in zip(kennwerte, berechnungen)}
 
@@ -233,13 +248,19 @@ class AusPlatte(AusBauteil):
 
 @dataclass(frozen=True, kw_only=True)
 class AusAnalyse(AusBauteil):
-    """Der Bruttoquerschnitt einer Querschnittsanalyse -- ``quelle`` je Kennwert, ``I`` ist ``I_y``."""
+    """
+    Der Bruttoquerschnitt einer Querschnittsanalyse -- ``quelle`` je
+    Kennwert, ``I`` ist ``I_y``. Mit ``I_y`` und ``I_z`` gefragt, gibt er
+    ``I_yz`` dazu (:data:`DEVIATIONSMOMENT`).
+    """
 
     flaechen: Tuple[Sequence[Tuple[float, float]], ...] = ()
     """Die Polygone ihrer Flaechen, in mm -- Aussparungen mit, das Bild fuellt gerade-ungerade."""
 
     def flaechenwerte(self, definieren: Definieren, abschnitt: Abschnitt, index: str,
                       kennwerte: Sequence[Kennwert] = EBEN) -> Tuple[List[Berechnung], Werte]:
+        if {"I_y", "I_z"} <= {k.kurzname for k in kennwerte}:
+            kennwerte = (*kennwerte, DEVIATIONSMOMENT)
         return self._je_kennwert(definieren, index, kennwerte, lambda d, k: Formel(
             id=d.id, ausgabe=d, funktion=_derselbe, eingaben={"wert": self.quelle[k.kurzname]},
             titel=f"{k.beschreibung}, «{self.name}» (Bruttoquerschnitt der {self.herkunft})",

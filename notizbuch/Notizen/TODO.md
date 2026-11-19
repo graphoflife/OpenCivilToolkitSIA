@@ -8,13 +8,6 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] Grundbruch: die Zeile «Grundbruchwiderstand» zeigt
-      N_Rd = σ_f · b · L, gerechnet wird aber mit max(0, σ_f)
-      (`geotechnik/grundbruch.py`, `_widerstand`). Ist σ_f negativ, gehen
-      die Zahlen nicht auf: im Beispiel «Jeder Nachweis einmal», Fall
-      «Steil», steht −9 kPa · 1.6 m · 4 m = 0 kN. Die Begrenzung in die
-      Formel schreiben (\max[0; σ_f]) oder als Satz davor. Gefunden beim
-      Bau der Kurzform, 2026-11-16.
 - [ ] Kurzform hinter dem Auge: weitere Nachweise kennzeichnen. Heute die
       Platte -- Biegung bei N = 0, Querkraft mit und ohne Bügel -- und seit
       2026-11-18 die Querkraft im Bohrpfahl (Wendel, Druckdiagonalen, das
@@ -130,7 +123,8 @@ gelernt wurde, steht in [[Entwicklung]].
       ruhendem Wasser liegt das sicher, eine Strömung fehlt (SIA 267:2013,
       8.4.4.4 verlangt sie). Eine Klammer der Lastneigung unter null gilt
       null; das wird erst ab δ_R > 55° wirksam, wo das Gleiten längst nicht
-      mehr erfüllt ist. Bestätigt sind dagegen: b_γ mit tan φ (Tabelle
+      mehr erfüllt ist. Ein negatives σ_f gibt N_Rd = 0, die Formel zeigt es
+      mit max[0; σ_f] (seit 2026-11-19). Bestätigt sind dagegen: b_γ mit tan φ (Tabelle
       9.2.18 lässt sich nur so nachrechnen) und die Partialfaktoren statt
       F_stat (SIA 267:2013, 5.3.2.1, 5.3.2.2, Tabelle 1).
 - [ ] **Grundbruch und Gleiten, nicht gebaut** -- SIA 267:2013 verlangt
@@ -926,36 +920,15 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       abzumindern, und sagt dazu, dass das günstig oder ungünstig wirken
       kann (SIA 262:2025, 4.1.4.1.3). Prüfen, ob die Formeln so bleiben
       sollen.
-- [ ] **Ein E_eq gilt im Raum für EA, EI_y und EI_z, nach Vorgabe**
-      (`projekt/balkensystem3d.py`, `stabwerk3d/herleitung.py`). Ein
-      Querschnitt aus einer Platte nimmt sein E_eq wie in der Ebene, und es
-      ersetzt E_cm in allen drei Steifigkeiten; die Torsion behält G_cm,
-      ungerissen. Das E_eq kommt aber aus der Biegung des Streifens um seine
-      starke Achse, mit M und N der Platte -- für die Biegung quer dazu, in
-      der Ebene der Platte, und für die Torsion sagt es nichts. Beispiel:
-      Platte C30/37, h = 250 mm, Streifen b = 1000 mm, M = 40 kNm: E_eq =
-      3569 N/mm²; EI_z sinkt damit wie EI_y auf gut ein Zehntel, GI_T
-      bleibt. Prüfen, ob EI_z mit E_cm rechnen soll, und ob GI_T für Risse
-      abgemindert werden soll (SIA 262:2025, 4.1.4.1.3 lässt es zu).
-- [ ] **I_T einer Querschnittsanalyse, numerisch, nach Vorgabe**
-      (`querschnitt/torsion.py`). Die Spannungsfunktion von Prandtl auf
-      einem Gitter, zwei Gitter nach Richardson; gegen Rechteck, Dreieck,
-      Kreis und Rohr auf ein Promille. Gerechnet am ungerissenen
-      Bruttoquerschnitt ohne Bewehrung, wie bei den Vorlagen: ein
-      gerissener Betonquerschnitt ist unter Torsion viel weicher (SIA
-      262:2025, 4.1.4.1.3 lässt eine Abminderung zu). Beispiel: der
-      Kastenträger des Prüfprojekts, 800 × 600 mm mit Aussparung 500 × 300
-      mm, hat I_T = 27 477 · 10⁶ mm⁴; Bredt mit der Mittellinie gäbe
-      23 334 · 10⁶ mm⁴. Prüfen, ob es so bleiben soll.
-- [ ] **Im Raum gelten y und z als Hauptachsen, nach Vorgabe**
-      (`stabwerk3d/herleitung.py`). Ein Querschnitt aus einer Analyse
-      bringt A, I_y und I_z mit; sein Deviationsmoment I_yz bleibt aussen
-      vor. Bei einem unsymmetrischen Querschnitt, etwa einem L, biegt sich
-      der Stab dann falsch: eine Last in z verschöbe ihn in Wirklichkeit
-      auch in y. Vorlagen und Profile sind symmetrisch, für sie stimmt es.
-      Vorschlag: die Hauptachsen der Analyse rechnen und den Querschnitt um
-      ihren Winkel zusätzlich drehen, oder eine Warnung, wenn I_yz nicht
-      null ist. Entscheid des Benutzers.
+- [ ] **Der Hinweis auf die Hauptachsen kommt ab 5 %, nach Vorgabe**
+      (`stabwerk/stabquerschnitt.py`, `KOPPLUNG`). Im Raum gelten y und z
+      als Hauptachsen, I_yz bleibt aussen vor; ist |I_yz| grösser als 5 %
+      von min(I_y; I_z), sagt es ein Hinweis (Benutzer, 2026-11-19: ein
+      Hinweis, keine Drehung). So stark krümmt ein Moment um die steifere
+      Achse den Stab in Wirklichkeit auch um die andere. Beispiel: das
+      Rechteck 300 × 600 mm mit einem Flansch 400 × 100 mm unten rechts hat
+      |I_yz| = 2864 · 10⁶ mm⁴, 49 % von I_z = 5892 · 10⁶ mm⁴. Prüfen, ob die
+      Grenze passt.
 - [ ] **Die Vorwahlen der Lager im Raum, nach Vorgabe**
       (`projekt/balkensystem3d.py`). «Gelenkig» hält die drei
       Verschiebungen, «verschieblich» nur die lotrechte, «eingespannt» alle

@@ -285,11 +285,16 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
     """
     Woher die Kennwerte eines Querschnitts kommen -- hier wird seine Art
     aufgeloest, in der Ebene und im Raum. Die Platte oder Analyse dazu muss
-    es geben. Ein Profil biegt sich in der Ebene um ``achse``, im Raum um
+    es geben; ist noch keine gewaehlt, rechnet er nicht, und die Meldung
+    sagt es. Ein Profil biegt sich in der Ebene um ``achse``, im Raum um
     beide (:func:`form_von`).
     """
     if not q.art.aus_bauteil:
         return form_von(q, wo, achse)
+    if not q.bezug:
+        klasse = AusPlatte if q.art is Querschnittsart.PLATTE else AusAnalyse
+        return klasse(kennung=q.kennung, name=q.name, herkunft=q.art.kurz, bezug="",
+                      fehler=q.fehler() or "")
     if q.art is Querschnittsart.PLATTE:
         platte = aufbau.querschnitte.get(q.bezug)
         if platte is None:
@@ -313,7 +318,7 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
     return AusAnalyse(kennung=q.kennung, name=q.name,
                       herkunft=f"Querschnittsanalyse «{analyse.name}»", bezug=q.bezug,
                       quelle={"I": analyse.id_von("I_y"),
-                              **{k: analyse.id_von(k) for k in ("A", "I_y", "I_z", "I_T")}},
+                              **{k: analyse.id_von(k) for k in ("A", "I_y", "I_z", "I_T", "I_yz")}},
                       eq=_modulfrage(q, ModulAusAnalyse(analyse)),
                       flaechen=tuple(f.punkte for f in analyse.flaechen))
 

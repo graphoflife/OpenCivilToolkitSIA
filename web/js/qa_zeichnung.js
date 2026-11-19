@@ -30,7 +30,6 @@
 
 import { api } from './api.js';
 import { hakenSchalter, wahlSchalter } from './bausteine.js';
-import { sinnbild } from './sinnbilder.js';
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
@@ -604,21 +603,16 @@ function felderVon(liste, werte, setzen, info = null) {
  */
 function formWahl(a) {
   const v = a.qa.vorgaben;
-  const stellung = (wert, text, zeichen, titel) => el('button.schalter-halb', {
-    type: 'button', title: titel, class: v.bewehrung === wert ? 'ist-an' : '',
-    on: {
-      click: () => {
-        if (v.bewehrung === wert) return;
-        v.bewehrung = wert;
-        a.werkzeugStarten('bewehrung');
-      },
-    },
-  }, [sinnbild(zeichen), el('span', { text })]);
-  return el('span.schalter.cad-wahl', {}, [
-    stellung('linie', 'Linie', 'cad-linienbewehrung',
-      'Linienbewehrung: Stäbe auf einer Linie, nach Anzahl, Teilung oder verschmiert'),
-    stellung('punkt', 'Punkt', 'cad-punktbewehrung', 'Punktbewehrung: ein Stab je Klick'),
-  ]);
+  return wahlSchalter({
+    werte: [
+      { wert: 'linie', beschriftung: 'Linie', zeichen: 'cad-linienbewehrung',
+        titel: 'Linienbewehrung: Stäbe auf einer Linie, nach Anzahl, Teilung oder verschmiert' },
+      { wert: 'punkt', beschriftung: 'Punkt', zeichen: 'cad-punktbewehrung',
+        titel: 'Punktbewehrung: ein Stab je Klick' },
+    ],
+    gewaehlt: v.bewehrung, titel: 'Wie die Bewehrung gezeichnet wird', klasse: '.cad-wahl',
+    setzen: (w) => { v.bewehrung = w; a.werkzeugStarten('bewehrung'); },
+  });
 }
 
 /** Die Vorgaben für das, was ein Werkzeug als Nächstes anlegt -- nur die seiner Art. */

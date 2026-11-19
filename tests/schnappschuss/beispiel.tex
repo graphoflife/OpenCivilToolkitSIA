@@ -1156,7 +1156,7 @@ i_c = i_q - \frac{1 - i_q}{N_q - 1} = 0.77 - \frac{1 - 0.77}{13.95 - 1} = 0.76
 \end{equation*}
 \noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.11; SIA 267:2013, 8.5.3.5}
 \begin{equation*}
-N_{Rd} = \sigma_f \cdot b \cdot L = 568.8\,\mathrm{kPa} \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 568.8\,\mathrm{kPa}\right] \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
 \end{equation*}
 \noindent\textbf{Einwirkung gegen Widerstand}
 \begin{equation*}
@@ -2865,7 +2865,7 @@ i_{\gamma} = \left[1 - \frac{\left(0.7 - \frac{\alpha}{450^\circ}\right) \cdot T
 \end{equation*}
 \noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.11; SIA 267:2013, 8.5.3.5}
 \begin{equation*}
-N_{Rd} = \sigma_f \cdot b \cdot L
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L
 \end{equation*}
 \subsection{Gleiten}
 Die Kraft T in der Sohle muss die Sohlfuge aufnehmen: drainiert durch Reibung zwischen Fundament und Boden, undrainiert durch die Scherfestigkeit des Bodens. Ein Erdwiderstand vor dem Fundament wird nicht angesetzt.

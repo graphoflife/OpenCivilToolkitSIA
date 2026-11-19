@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f8d31ae1294
+erzeugt: 38981a8a4dc6
 art: modul
 tags: [modul]
 ---
@@ -180,9 +180,13 @@ Die Masse der Vorlage -- was fehlt, mit ihrer Vorgabe.
 def fehler(self) -> Optional[str]
 ```
 
-Was an Massen oder Kennwerten nicht geht -- `None`, wenn alles geht.
-Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
-2026-10-16 stand `B=500` still da, und gerechnet wurde mit b = 300.
+Was an Massen, Kennwerten oder der Wahl nicht geht -- `None`, wenn
+alles geht. Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler:
+bis 2026-10-16 stand `B=500` still da, und gerechnet wurde mit b = 300.
+Ohne gewaehlte Platte oder Analyse rechnet der Querschnitt nicht, das
+Projekt schon -- bis 2026-11-19 scheiterte daran das ganze Projekt,
+gleich nach dem Umschalten, und die Oberflaeche zeigte weiter die
+Werte der vorherigen Art.
 
 ### MitStaeben
 

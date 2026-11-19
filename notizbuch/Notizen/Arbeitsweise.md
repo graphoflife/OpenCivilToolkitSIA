@@ -70,6 +70,17 @@ Kopie der Datei mit der Endung `.mjs`.
   `zweiSchalter`, `wahlBlock` in `bausteine.js`), eine Zahl ein Zahlenfeld.
   Ein Schalter steht nie in einem `label`: ein Klick auf dessen Text löste
   seine erste Stellung aus.
+- **Die Bedienung erklärt sich selbst** (Benutzer, 2026-11-19). Wer ein
+  Fenster öffnet, soll ohne Hilfe sehen, was eine Wahl bewirkt und was noch
+  fehlt:
+  - eine Wahl mit Bild, wo Wörter nicht reichen -- etwa die Rechenart als
+    Spannung über Dehnung;
+  - ein unfertiger Zustand ist kein Fehler des Projekts: er sagt am Ort,
+    was fehlt («noch keine Querschnittsanalyse gewählt»), und der Rest
+    rechnet weiter;
+  - nie alte Werte stehen lassen, wenn sich die Wahl geändert hat;
+  - eine leere Liste sagt, dass es noch nichts zum Wählen gibt;
+  - was 2D und 3D gemeinsam haben, sieht in beiden gleich aus.
 
 ## Normstellen
 
@@ -105,6 +116,10 @@ Kopie der Datei mit der Endung `.mjs`.
   damit 25 kN/m³. Nicht auf 9.81 umstellen.
 - **Die Koordinaten des Balkensystems sind Meter** (2026-10-23): neben den
   Feldern im Zeichenfenster steht «m», im Querschnitt «mm».
+- **Steifigkeit im Raum** (Benutzer, 2026-11-19): ein E_eq gilt für EA,
+  EI_y und EI_z, GI_T behält G_cm; I_T gilt ungerissen. y und z gelten als
+  Hauptachsen -- ist I_yz gross, sagt es ein Hinweis; der Querschnitt wird
+  nicht von selbst auf seine Hauptachsen gedreht.
 
 ## Berichten und fragen
 

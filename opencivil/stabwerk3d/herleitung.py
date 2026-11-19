@@ -32,6 +32,7 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.stabwerk import herleitung as eben
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.system import UNBESTIMMT, Fall
+from opencivil.stabwerk.stabquerschnitt import KOPPLUNG
 from opencivil.stabwerk.verlauf import SCHNITTGROESSEN
 from opencivil.stabwerk3d import stab as st3
 from opencivil.stabwerk3d.modell import Stablast, System
@@ -51,7 +52,8 @@ ANNAHME = ("Steifigkeit: E_cm und G_cm des Betons, E_a und G_a des Baustahls ode
            "wahlweise sein E_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, "
            "4.1.4.1.2): es gilt für EA, EI_y und EI_z, die Torsion behält G_cm. y und z gelten "
            "als Hauptachsen des Querschnitts; das Deviationsmoment einer Querschnittsanalyse "
-           "bleibt aussen vor (beides nach Vorgabe, nicht nachgeschlagen). Die Torsion "
+           f"bleibt aussen vor, ab {100 * KOPPLUNG:.0f} % von min(I_y; I_z) mit einem "
+           "Hinweis (beides nach Vorgabe, nicht nachgeschlagen). Die Torsion "
            "nach St. Venant, ohne Wölbkrafttorsion und ohne den "
            "Abstand von Schubmittelpunkt und Schwerpunkt (nach Vorgabe, nicht nachgeschlagen). "
            "Beim Beton ungerissen auch die Torsion: Abminderungen für Risse und Kriechen "

@@ -1,6 +1,6 @@
 # Voll
 
-796 Berechnungen ausgeführt, 1102 Werte bestimmt.
+797 Berechnungen ausgeführt, 1103 Werte bestimmt.
 
 ## Herleitung
 
@@ -11507,7 +11507,7 @@ $$
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L = 305.7\,\mathrm{kPa} \cdot 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} = 1956.7\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 305.7\,\mathrm{kPa}\right] \cdot 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} = 1956.7\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -11568,10 +11568,12 @@ $$
 \end{aligned}
 $$
 
+σ\_f ist negativ: die Formel gibt keinen Widerstand, N\_Rd ist null (nach Vorgabe, nicht nachgeschlagen).
+
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L = -9\,\mathrm{kPa} \cdot 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} = 0\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ -9\,\mathrm{kPa}\right] \cdot 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} = 0\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -11941,7 +11943,7 @@ $$
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L = 276.8\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 1.5\,\mathrm{m} = 622.8\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 276.8\,\mathrm{kPa}\right] \cdot 1.5\,\mathrm{m} \cdot 1.5\,\mathrm{m} = 622.8\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -12289,7 +12291,7 @@ $$
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L = 451.1\,\mathrm{kPa} \cdot 2\,\mathrm{m} \cdot 20\,\mathrm{m} = 18045.2\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 451.1\,\mathrm{kPa}\right] \cdot 2\,\mathrm{m} \cdot 20\,\mathrm{m} = 18045.2\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -12507,7 +12509,7 @@ $$
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L = 169.3\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 2\,\mathrm{m} = 508\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 169.3\,\mathrm{kPa}\right] \cdot 1.5\,\mathrm{m} \cdot 2\,\mathrm{m} = 508\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -12741,7 +12743,7 @@ $$
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L = 339.7\,\mathrm{kPa} \cdot 1.2\,\mathrm{m} \cdot 1.2\,\mathrm{m} = 489.2\,\mathrm{kN}
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 339.7\,\mathrm{kPa}\right] \cdot 1.2\,\mathrm{m} \cdot 1.2\,\mathrm{m} = 489.2\,\mathrm{kN}
 $$
 
 **Einwirkung gegen Widerstand**
@@ -17274,6 +17276,12 @@ $$
 I_{T,\text{Q5}} = 27477.49\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
+**Deviationsmoment, «Kasten» (Bruttoquerschnitt der Querschnittsanalyse «Kastenträger»)**
+
+$$
+I_{yz,\text{Q5}} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
 **Normalkraft für E\_eq, «Deckenstreifen»**
 
 $$
@@ -17502,7 +17510,7 @@ $$
 g_{k,\text{Q4}} = \rho_{sb} \cdot g \cdot A_{\text{Q4}} = 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 300000\,\mathrm{mm}^{2} = 7.5\,\mathrm{kN}/\mathrm{m}
 $$
 
-> **Annahme:** Steifigkeit: E\_cm und G\_cm des Betons, E\_a und G\_a des Baustahls oder E und G eines eigenen Materials, am ungerissenen Querschnitt ohne Bewehrung und ohne Schubverformung. Bei einem Querschnitt aus einer Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2): es gilt für EA, EI\_y und EI\_z, die Torsion behält G\_cm. y und z gelten als Hauptachsen des Querschnitts; das Deviationsmoment einer Querschnittsanalyse bleibt aussen vor (beides nach Vorgabe, nicht nachgeschlagen). Die Torsion nach St. Venant, ohne Wölbkrafttorsion und ohne den Abstand von Schubmittelpunkt und Schwerpunkt (nach Vorgabe, nicht nachgeschlagen). Beim Beton ungerissen auch die Torsion: Abminderungen für Risse und Kriechen lässt die Norm zu, sie können aber günstig oder ungünstig wirken (SIA 262:2025, 4.1.4.1.3). Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2); Kippen und Knicken sind nachzuweisen.
+> **Annahme:** Steifigkeit: E\_cm und G\_cm des Betons, E\_a und G\_a des Baustahls oder E und G eines eigenen Materials, am ungerissenen Querschnitt ohne Bewehrung und ohne Schubverformung. Bei einem Querschnitt aus einer Platte oder Querschnittsanalyse wahlweise sein E\_eq bei N und M, eine Sekantensteifigkeit (SIA 262:2025, 4.1.4.1.2): es gilt für EA, EI\_y und EI\_z, die Torsion behält G\_cm. y und z gelten als Hauptachsen des Querschnitts; das Deviationsmoment einer Querschnittsanalyse bleibt aussen vor, ab 5 % von min(I\_y; I\_z) mit einem Hinweis (beides nach Vorgabe, nicht nachgeschlagen). Die Torsion nach St. Venant, ohne Wölbkrafttorsion und ohne den Abstand von Schubmittelpunkt und Schwerpunkt (nach Vorgabe, nicht nachgeschlagen). Beim Beton ungerissen auch die Torsion: Abminderungen für Risse und Kriechen lässt die Norm zu, sie können aber günstig oder ungünstig wirken (SIA 262:2025, 4.1.4.1.3). Gleichgewicht am unverformten System (Theorie 1. Ordnung): das gilt, solange die Wirkungen 2. Ordnung klein bleiben (4.1.3.2.2); Kippen und Knicken sind nachzuweisen.
 
 > **Annahme:** Die Durchbiegungen f\_y und f\_z misst jeder Stab gegen die Gerade zwischen seinen Enden, in y und z seiner Achsen. Die Norm misst gegenüber den Auflagern (SIA 262:2025, 4.4.3.1.1): dasselbe nur, wo ein Stab von Auflager zu Auflager reicht. Und sie gelten kurzzeitig am ungerissenen Querschnitt; Risse und Kriechen fehlen.
 
@@ -20018,7 +20026,7 @@ $$
 **Grundbruchwiderstand** *(Kap. 9.2.11; SIA 267:2013, 8.5.3.5)*
 
 $$
-N_{Rd} = \sigma_f \cdot b \cdot L
+N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L
 $$
 
 **Überlagerung auf Höhe der Sohle, Lage 1: Grundwasser über der Sohle** *(Kap. 9.2.8)*
@@ -22119,6 +22127,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Querschnittsfläche, Kasten | $A_{\text{Q5}}$ | $330000$ | mm² | berechnet |
 | Torsionsträgheitsmoment, Kasten | $I_{T,\text{Q5}}$ | $27477.49$ | ·10⁶ mm⁴ | berechnet |
 | Flächenträgheitsmoment um y, Kasten | $I_{y,\text{Q5}}$ | $13275$ | ·10⁶ mm⁴ | berechnet |
+| Deviationsmoment, Kasten | $I_{yz,\text{Q5}}$ | $0$ | ·10⁶ mm⁴ | berechnet |
 | Flächenträgheitsmoment um z, Kasten | $I_{z,\text{Q5}}$ | $22475$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Kasten, C30/37 | $EA_{\text{Q5}}$ | $11095$ | MN | berechnet |
 | Biegesteifigkeit um y, Kasten, C30/37 | $EI_{y,\text{Q5}}$ | $446302$ | kNm² | berechnet |

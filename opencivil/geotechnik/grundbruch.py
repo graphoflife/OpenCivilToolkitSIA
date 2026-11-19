@@ -744,9 +744,16 @@ class Grundbruch(Nachweis):
 
     def _widerstand(self, p: Protokoll, werte: Zwischenwerte, erg: Fallergebnis,
                     sigma_f: Wert, b: Wert, L: Wert, N: Wert) -> Fallergebnis:
+        # Ein negatives σ_f gibt keinen Widerstand, nicht einen negativen: die
+        # Begrenzung auf null steht in der Formel (Benutzer, 2026-11-19). Das
+        # Buch sagt dazu nichts -- nach Vorgabe, nicht nachgeschlagen.
+        if sigma_f.groesse.si < 0.0:
+            p.text("σ_f ist negativ: die Formel gibt keinen Widerstand, N_Rd ist null "
+                   "(nach Vorgabe, nicht nachgeschlagen).")
         N_Rd = werte.kraft("N_Rd", "N_{Rd}", max(0.0, sigma_f.groesse.si) * b.groesse.si
                            * L.groesse.si, "Widerstand")
-        p.formel(N_Rd, r"@sigma_f \cdot @b \cdot @L", {"sigma_f": sigma_f, "b": b, "L": L},
+        p.formel(N_Rd, r"\max\left[0;\ @sigma_f\right] \cdot @b \cdot @L",
+                 {"sigma_f": sigma_f, "b": b, "L": L},
                  titel="Grundbruchwiderstand", referenz="Kap. 9.2.11; SIA 267:2013, 8.5.3.5",
                  name="Grundbruchwiderstand")
         erg.N_Rd = N_Rd.groesse.si

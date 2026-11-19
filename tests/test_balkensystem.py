@@ -507,6 +507,24 @@ class TestRechnen(unittest.TestCase):
         with self.assertRaisesRegex(ProjektFehler, "q7"):
             p.aufbauen()
 
+    def test_noch_ohne_platte_oder_analyse_ist_eine_meldung(self):
+        """
+        Gleich nach dem Umschalten auf «Platte» oder «QS Analyse» ist noch keine
+        gewählt: der Querschnitt rechnet nicht, das Projekt schon. Bis
+        2026-11-19 scheiterte daran das ganze Projekt, und die Oberfläche
+        zeigte die Werte der Art vor dem Umschalten.
+        """
+        for art, welche in (("platte", "Platte"), ("analyse", "Querschnittsanalyse")):
+            with self.subTest(art=art):
+                d = traeger().als_dict()
+                d["balkensysteme"][0]["querschnitte"][0].update(art=art, bezug="")
+                antwort = dienst.bearbeite("rechnen", {"projekt": d})
+                self.assertEqual(antwort.status, 200)
+                uebersicht = antwort.daten["zeichendaten"]["r1"]["uebersicht"]
+                self.assertFalse(uebersicht["gueltig"])
+                self.assertIn(f"noch keine {welche} gewählt.",
+                              [m["text"].split(": ", 1)[1] for m in uebersicht["meldungen"]])
+
     def test_beweglich_ist_eine_meldung(self):
         p = traeger()
         p.balkensysteme[0].lager[0].x = "frei"

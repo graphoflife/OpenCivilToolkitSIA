@@ -935,7 +935,7 @@ Bruchspannung in der Sohle   [Kap. 9.2.10]
     \end{aligned}
 
 Grundbruchwiderstand   [Kap. 9.2.11; SIA 267:2013, 8.5.3.5]
-    N_{Rd} = \sigma_f \cdot b \cdot L = 568.8\,\mathrm{kPa} \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
+    N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L = \max\left[0;\ 568.8\,\mathrm{kPa}\right] \cdot 2\,\mathrm{m} \cdot 2.5\,\mathrm{m} = 2843.8\,\mathrm{kN}
 
 Einwirkung gegen Widerstand
     N_{Ed} = 1500\,\mathrm{kN} \quad \le \quad N_{Rd} = 2843.8\,\mathrm{kN}
@@ -2405,7 +2405,7 @@ Bruchspannung in der Sohle   [Kap. 9.2.10]
     \sigma_f = c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma}
 
 Grundbruchwiderstand   [Kap. 9.2.11; SIA 267:2013, 8.5.3.5]
-    N_{Rd} = \sigma_f \cdot b \cdot L
+    N_{Rd} = \max\left[0;\ \sigma_f\right] \cdot b \cdot L
 
 Gleiten
 -------

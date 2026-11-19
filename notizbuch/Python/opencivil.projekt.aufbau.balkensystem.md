@@ -1,5 +1,5 @@
 ---
-erzeugt: 2a2c031950de
+erzeugt: 6c5b51178a5a
 art: modul
 tags: [modul]
 ---
@@ -188,7 +188,8 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str, achse:
 
 Woher die Kennwerte eines Querschnitts kommen -- hier wird seine Art
 aufgeloest, in der Ebene und im Raum. Die Platte oder Analyse dazu muss
-es geben. Ein Profil biegt sich in der Ebene um `achse`, im Raum um
+es geben; ist noch keine gewaehlt, rechnet er nicht, und die Meldung
+sagt es. Ein Profil biegt sich in der Ebene um `achse`, im Raum um
 beide ([[opencivil.projekt.aufbau.balkensystem#form_von|form_von]]).
 
 ### _modulfrage

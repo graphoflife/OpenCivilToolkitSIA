@@ -1,5 +1,5 @@
 ---
-erzeugt: e449d5eede3d
+erzeugt: f1be1fd82656
 art: modul
 tags: [modul]
 ---
@@ -25,7 +25,8 @@ Welche Kennwerte, sagt das System: der ebene Rahmen braucht `A` und `I`
   `b` und `h` der Platte, im Raum mit `I_z` und `I_T` dazu;
 * aus einer Querschnittsanalyse ([[opencivil.stabwerk.stabquerschnitt#AusAnalyse|AusAnalyse]]) -- `A` und `I_y`
   ihres Bruttoquerschnitts, im Raum `I_z` dazu und `I_T`, das sie dafuer
-  numerisch rechnet ([[opencivil.querschnitt.torsion|torsion]]).
+  numerisch rechnet ([[opencivil.querschnitt.torsion|torsion]]), und `I_yz`:
+  daran prueft die Rechnung, ob y und z Hauptachsen sind.
 
 Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu. Nur ein Querschnitt aus
@@ -51,6 +52,7 @@ Ein Wert, den ein Stab von seinem Querschnitt braucht -- wie er heisst und gezei
 - `einheit: Einheit`
 - `stellen: int`
 - `beschreibung: str`
+- `symbol: str = ''` – In LaTeX, wo es anders heisst als `kurzname` -- `I_{yz}`.
 
 ### Stabquerschnitt
 
@@ -217,7 +219,9 @@ def umriss(self, loesung: Any) -> Umriss
 class AusAnalyse(AusBauteil)
 ```
 
-Der Bruttoquerschnitt einer Querschnittsanalyse -- `quelle` je Kennwert, `I` ist `I_y`.
+Der Bruttoquerschnitt einer Querschnittsanalyse -- `quelle` je
+Kennwert, `I` ist `I_y`. Mit `I_y` und `I_z` gefragt, gibt er
+`I_yz` dazu ([[opencivil.stabwerk.stabquerschnitt#Konstanten|DEVIATIONSMOMENT]]).
 
 - `flaechen: Tuple[Sequence[Tuple[float, float]], ...] = ()` – Die Polygone ihrer Flaechen, in mm -- Aussparungen mit, das Bild fuellt gerade-ungerade.
 
@@ -249,6 +253,8 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 - `_A = Kennwert('A', MM2, 0, 'Querschnittsfläche')`
 - `EBEN = (_A, Kennwert('I', MIO_MM4, 2, 'Flächenträgheitsmoment'))` – Was ein Stab des ebenen Rahmens braucht: `I` um die Achse senkrecht zur Ebene.
 - `RAEUMLICH = (_A, Kennwert('I_y', MIO_MM4, 2, 'Flächenträgheitsmoment um y'), Kenn…` – Was ein Stab im Raum braucht ([[opencivil.stabwerk3d]]).
+- `DEVIATIONSMOMENT = Kennwert('I_yz', MIO_MM4, 2, 'Deviationsmoment', symbol='I_{yz}')` – Kein Kennwert eines Stabs: wer mit `I_y` und `I_z` rechnet, nimmt y und z als Hauptachsen. Ein Querschnitt aus einer Analyse bringt es dann mit -- nur er kann unsymmetrisch sein --, und die Rechnung prueft, wie weit sie es nicht sind ([[opencivil.stabwerk.rechnung]]).
+- `KOPPLUNG = 0.05` – Ab so viel \|I_yz\| / min(I_y; I_z) sagt ein Hinweis, dass y und z keine Hauptachsen sind: so stark kruemmt ein Moment um die steifere Achse den Stab auch um die weichere, und die Rechnung laesst das weg. Nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-19: ein Hinweis, keine Drehung).
 - `Werte = Dict[str, str]` – Je Kennwert die Wert-ID, die ihn liefert.
 
 ## Braucht
@@ -267,4 +273,5 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.stabwerk.rechnung]]
+- [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.rechnung]]

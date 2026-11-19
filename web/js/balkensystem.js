@@ -22,6 +22,7 @@
  * erklärt, auch ihre Vorzeichen und deren kleines Bild, bs_texte.js.
  */
 
+import { formelText } from './achsen.js';
 import {
   erklaerung, feld, klappgruppe, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
@@ -281,20 +282,31 @@ function kennwerte(system, q) {
     ...(E ? [`E = ${text(E)}`] : [])].join(' · ');
 }
 
+/** Was der Kern zu einem Querschnitt meldet -- was ihm fehlt, oder ein Hinweis. */
+function meldungenZu(system, q) {
+  return (zustand.loesung?.zeichendaten?.[system.kennung]?.uebersicht?.meldungen || [])
+    .filter((m) => m.elemente.includes(q.kennung));
+}
+
 /**
  * Ein kleines Bild eines Querschnitts: sein Umriss vom Kern, in die Box
- * eingepasst -- Aussparungen gerade-ungerade gefüllt. Ohne Umriss
- * (Kennwerte von Hand, ein Querschnitt, der nicht geht) die Kennwerte als
- * Zeichen.
+ * eingepasst -- Aussparungen gerade-ungerade gefüllt. Ohne Umriss bei
+ * Kennwerten von Hand ihre Namen, je zwei auf einer Zeile -- in der Ebene
+ * «A, I», im Raum «A, I_y» und «I_z, I_T» --, sonst ein Fragezeichen: ein
+ * Querschnitt, der nicht geht, oder noch ohne Platte oder Analyse.
  */
 function umrissBild(system, q, breite, hoehe) {
   const polygone = zustand.loesung?.zeichendaten?.[system.kennung]?.umrisse?.[q.kennung] || [];
   const svg = svgEl('svg', { viewBox: `0 0 ${breite} ${hoehe}`, width: breite, height: hoehe, class: 'bs-umriss', 'aria-hidden': 'true' });
   const punkte = polygone.flat();
   if (!punkte.length) {
-    const t = svgEl('text', { x: breite / 2, y: hoehe / 2 + 4, class: 'bs-umriss-text' });
-    t.textContent = q.art === 'kennwerte' ? 'A, I' : '?';
-    svg.append(t);
+    const namen = q.art === 'kennwerte'
+      ? systemkatalog(systemart(system.kennung), 'kennwerte').map((k) => k.kurz) : ['?'];
+    const zeilen = [];
+    for (let i = 0; i < namen.length; i += 2) zeilen.push(namen.slice(i, i + 2).join(', '));
+    zeilen.forEach((zeile, i) => svg.append(formelText(svgEl('text', {
+      x: breite / 2, y: hoehe / 2 + 4 + (i - (zeilen.length - 1) / 2) * 13, class: 'bs-umriss-text',
+    }), zeile)));
     return svg;
   }
   const ys = punkte.map((p) => p[0]);
@@ -348,8 +360,7 @@ function querschnittZeile(system, q, i) {
   const benutzt = system.linien.filter((l) => l.querschnitt === q.kennung).map((l) => l.kennung);
   // Ohne Kennwerte sagt die Meldung des Kerns, was dem Querschnitt fehlt.
   const werte = kennwerte(system, q);
-  const fehler = (zustand.loesung?.zeichendaten?.[system.kennung]?.uebersicht?.meldungen || [])
-    .find((m) => m.fehler && m.elemente.includes(q.kennung));
+  const fehler = meldungenZu(system, q).find((m) => m.fehler);
   const weg = () => {
     if (benutzt.length) {
       melden(`«${q.name}» trägt noch ${benutzt.join(', ')}.`, true);
@@ -403,9 +414,12 @@ function querschnittFenster(system, kennung) {
       gewaehlt: q.art, titel: `Woher ${kennwertnamen(art)} kommen`,
       // Die Masse gehören zur Art: eine Vorlage bekommt ihre Vorgaben,
       // Kennwerte beginnen leer -- bis 2026-10-24 blieben b und h stehen,
-      // und «einen Kennwert «b» gibt es nicht» war die Folge.
+      // und «einen Kennwert «b» gibt es nicht» war die Folge. Ebenso die
+      // gewählte Platte oder Analyse: bis 2026-11-19 blieb eine Analyse als
+      // «Platte» stehen, und das ganze Projekt rechnete nicht mehr.
       setzen: (w) => aendern((x) => {
         x.art = w;
+        x.bezug = '';
         if (w === 'vorlage') x.masse = vorgabenDer(art, x.vorlage);
         if (w === 'kennwerte' || w === 'profil') x.masse = {};
       }),
@@ -467,9 +481,11 @@ function querschnittFenster(system, kennung) {
     }), k.einheit, k.beschriftung)));
   } else {
     const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
+    // Ohne eine im Projekt sagt es schon die Liste.
+    const leer = liste.length ? '– wählen –' : '– noch keine im Projekt –';
     zeilen.push(el('div.bs-qvorlage', {}, [
       feld(artKurz(art, q), auswahl({
-        werte: [{ wert: '', beschriftung: '– wählen –' }, ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
+        werte: [{ wert: '', beschriftung: leer }, ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
         gewaehlt: q.bezug,
         beiAenderung: setzen('bezug'),
       })),
@@ -506,8 +522,15 @@ function querschnittFenster(system, kennung) {
         { arten: 'faserarten', phiImmer: true }),
     );
   }
+  // Die Kennwerte, wie der Kern sie rechnete, und was er zum Querschnitt
+  // meldet: was ihm fehlt, oder dass y und z keine Hauptachsen sind. Bis
+  // 2026-11-19 stand ohne Kennwerte nichts da -- oder noch die Werte der
+  // Art vor dem Umschalten.
   const werte = kennwerte(system, q);
   if (werte) zeilen.push(el('p.bs-kennwerte', { text: werte }));
+  zeilen.push(...meldungenZu(system, q).map((m) => el('p', {
+    class: m.fehler ? 'hinweis hinweis-warnung' : 'hinweis', text: m.text,
+  })));
   return fenster({
     titel: 'Querschnitt', zeichen: 'querschnitte', zusatz: `${system.name} · ${q.name}`,
     hilfe: erklaerung(texte(art).hilfe.querschnitte.zeilen, texte(art).hilfe.querschnitte.formel),

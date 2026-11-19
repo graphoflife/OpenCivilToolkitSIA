@@ -63,7 +63,7 @@ from opencivil.core.berechnung import (
     Ausfuehrung, Befundbezug, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
 from opencivil.core.einheiten import (
-    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MN, N_PRO_MM2, Einheit, Groesse,
+    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MIO_MM4, MN, N_PRO_MM2, Einheit, Groesse,
 )
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.rechenobjekt import Rechenobjekt
@@ -71,7 +71,9 @@ from opencivil.core.wert import Quelle, WertDef
 from opencivil.material.basis import Baustoff, Baustoffart, mit_index
 from opencivil.stabwerk import herleitung
 from opencivil.stabwerk.modell import Lastart, Lastrichtung, Stablast, System
-from opencivil.stabwerk.stabquerschnitt import EBEN, Kennwert, Stabquerschnitt
+from opencivil.stabwerk.stabquerschnitt import (
+    DEVIATIONSMOMENT, EBEN, KOPPLUNG, Kennwert, Stabquerschnitt,
+)
 from opencivil.stabwerk.art import EBENE, Art
 from opencivil.stabwerk.system import Ergebnis, Fall, Meldung, rechnen
 from opencivil.stabwerk.verlauf import Stabverlauf, verlaeufe
@@ -104,6 +106,11 @@ DICHTE = Materialkennwert("rho", r"\rho", KG_PRO_M3, "Dichte",
 #: Fuer die Torsion, nur im Raum: ``G_cm`` des Betons, ``G_a`` des Baustahls.
 SCHUBMODUL = Materialkennwert("G", "G", N_PRO_MM2, "Schubmodul",
                               {Baustoffart.BETON: "G_cm", Baustoffart.BAUSTAHL: "G_a"})
+
+
+def _traegheit(si: float) -> str:
+    """Ein Traegheitsmoment in Worten: «1.06·10⁶ mm⁴»."""
+    return f"{Groesse.aus_si(si, MIO_MM4).formatiert(2)}{MIO_MM4.beschriftung}"
 
 
 def stoffkennwerte(kennwerte: Sequence[Materialkennwert]) -> Dict[Baustoffart, Dict[str, str]]:
@@ -306,7 +313,7 @@ class Stabwerksrechnung(Rechenobjekt):
         self.definitionen: Dict[str, WertDef] = {}
         self.berechnungen: List[Berechnung] = []
         self.flaechen: Dict[str, Dict[str, str]] = {}
-        """Je Querschnitt die Wert-IDs seiner :attr:`KENNWERTE`."""
+        """Je Querschnitt die Wert-IDs seiner :attr:`KENNWERTE` -- eine Analyse im Raum mit ``I_yz``."""
 
         self.module: Dict[str, str] = {}
         """Je Querschnitt mit E_eq die Wert-ID dieses E."""
@@ -391,6 +398,10 @@ class Stabwerksrechnung(Rechenobjekt):
                         for k, wert in s.werte.items()]
             if s.g_k:
                 bezuege.append(Eingabebezug(f"g_k_{i}", s.g_k))
+        # Wo ein Querschnitt I_yz mitbringt, prueft die Rechnung die Hauptachsen.
+        for q, werte in self.flaechen.items():
+            if DEVIATIONSMOMENT.kurzname in werte:
+                bezuege += [Eingabebezug(f"{k}_{q}", werte[k]) for k in ("I_y", "I_z", "I_yz")]
         self.rechnung = SteifigkeitsmethodeProzedur(
             self, id=f"{self.id}.rechnung", ausgaben=[], bezuege=bezuege,
             befunde=[Befundbezug(f"modul_{q}", suche) for q, suche in self.modulsuchen.items()],
@@ -504,7 +515,7 @@ class Stabwerksrechnung(Rechenobjekt):
         geschrieben. Haelt eine Meldung der Beschreibung die Rechnung auf --
         oder ein E_eq, das es nicht gibt --, bleibt es bei ihr.
         """
-        meldungen = list(self.meldungen) + self._ohne_modul(e)
+        meldungen = list(self.meldungen) + self._ohne_modul(e) + self._keine_hauptachsen(e)
         steif = {(s.querschnitt, s.material): {k: e.g(f"{k}_{i}").si for k in s.werte}
                  for i, s in enumerate(self.steifigkeiten)
                  if all(e.hat(f"{k}_{i}") for k in s.werte)}
@@ -543,6 +554,34 @@ class Stabwerksrechnung(Rechenobjekt):
                 name = next(x.name for x in self.querschnitte if x.kennung == q)
                 meldungen.append(Meldung(f"Querschnitt «{name}»: kein E_eq – {befund.grund}",
                                          (q, *staebe), True))
+        return meldungen
+
+    def _keine_hauptachsen(self, e: Eingaben) -> List[Meldung]:
+        """
+        Je Querschnitt mit ``I_yz``, den ein Stab nimmt und dessen y und z
+        merklich keine Hauptachsen sind (:data:`KOPPLUNG`), ein Hinweis --
+        er haelt die Rechnung nicht auf.
+        """
+        meldungen = []
+        for q in self.querschnitte:
+            if DEVIATIONSMOMENT.kurzname not in self.flaechen.get(q.kennung, {}):
+                continue
+            staebe = [stab for stab, (quer, _) in self.paare.items() if quer == q.kennung]
+            if not staebe:
+                continue
+            I_y, I_z, I_yz = (e.g(f"{k}_{q.kennung}") for k in ("I_y", "I_z", "I_yz"))
+            kleiner = min(I_y.si, I_z.si)
+            if kleiner <= 0.0 or abs(I_yz.si) <= KOPPLUNG * kleiner:
+                continue
+            anteil = f"{100.0 * abs(I_yz.si) / kleiner:.0f} %"
+            meldungen.append(Meldung(
+                f"Querschnitt «{q.name}»: y und z sind keine Hauptachsen – |I_yz| = "
+                f"{_traegheit(abs(I_yz.si))} ist {anteil} von min(I_y; I_z) = "
+                f"{_traegheit(kleiner)}. "
+                f"Gerechnet wird ohne I_yz; in Wirklichkeit krümmt ein Moment um die steifere "
+                f"Achse den Stab auch um die andere, um {anteil} davon. Verformungen und "
+                f"Schnittgrössen sind darum nur genähert.",
+                (q.kennung, *staebe), False))
         return meldungen
 
     # -- Je System ----------------------------------------------------------------

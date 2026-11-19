@@ -221,6 +221,23 @@ class TestLastneigung(unittest.TestCase):
         self.assertAlmostEqual(fall.i["c"], -1.0 / (befund.spalten["q"].N - 1.0))
         self.assertTrue(any("kleiner als null" in a for a in annahmen(loesung)))
 
+    def test_ein_negatives_sigma_f_gibt_keinen_widerstand(self):
+        """
+        Der Hang aus «Jeder Nachweis einmal», Fall «Steil»: σ_f ist negativ, N_Rd
+        null -- und die Formel sagt warum, mit max[0; σ_f] (Benutzer, 2026-11-19).
+        Bis dahin stand da −9 kPa · 1.6 m · 4 m = 0 kN.
+        """
+        _, loesung, befund = rechnen(phi_k=33.0, c_k=6.0, b=1.6, L=4.0, t=0.8, t1=2.0,
+                                     alpha=5.0, beta=15.0, q_Ed=10.0,
+                                     kombinationen=(("Steil", 150.0, 300.0),))
+        fall = befund.ergebnisse[0]
+        self.assertLess(fall.sigma_f, 0.0)
+        self.assertEqual(fall.N_Rd, 0.0)
+        zeile = next(b for b in loesung.protokoll.bloecke
+                     if getattr(b, "titel", "") == "Grundbruchwiderstand")
+        self.assertIn(r"\max\left[0;\ -10.7\,\mathrm{kPa}\right] \cdot 1.6", zeile.latex)
+        self.assertTrue(zeile.latex.endswith(r"= 0\,\mathrm{kN}"))
+
     def test_kohaesion_macht_die_last_weniger_schraeg(self):
         ohne = rechnen(phi_k=30.0, kombinationen=(("K", 500.0, 100.0),))[2].ergebnisse[0]
         mit = rechnen(phi_k=30.0, c_k=10.0, kombinationen=(("K", 500.0, 100.0),))[2].ergebnisse[0]

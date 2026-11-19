@@ -366,6 +366,32 @@ class TestAusEinerAnalyse(unittest.TestCase):
                                delta=1e-9 * G * wert("I_T"))
         self.assertEqual(s.bezuege(), [a.kennung])
 
+    def test_ein_winkel_bekommt_einen_hinweis(self):
+        """
+        y und z gelten als Hauptachsen (Benutzer, 2026-11-19): ist der
+        Querschnitt unsymmetrisch, sagt es ein Hinweis -- gerechnet wird
+        trotzdem. Unten rechts ein Flansch 400 × 100 mm am Rechteck.
+        """
+        p, a, s, q = self.projekt()
+        a.polygon([[300, 0], [700, 0], [700, 100], [300, 100]], material=a.flaechen[0].material)
+        e = p.rechnen()
+        ergebnis = e.balkensystem("Rahmen").ergebnis
+        self.assertTrue(ergebnis.gueltig, ergebnis.meldungen)
+        hinweise = [m for m in ergebnis.meldungen if "keine Hauptachsen" in m.text]
+        self.assertEqual(len(hinweise), 1, ergebnis.meldungen)
+        self.assertFalse(hinweise[0].fehler)
+        self.assertEqual(hinweise[0].elemente, (q.kennung, "L1"))
+        I_yz = e.wert(f"balkensystem3d.{s.kennung}.{q.kennung}.I_yz").groesse.si
+        self.assertEqual(I_yz, e.wert(e.aufbau.querschnittsanalysen[a.kennung].id_von("I_yz"))
+                         .groesse.si)
+        self.assertNotEqual(I_yz, 0.0)
+        self.assertIn("Hinweis", str(e.bericht()))
+
+    def test_ein_rechteck_bekommt_keinen(self):
+        p, a, s, q = self.projekt()
+        meldungen = p.rechnen().balkensystem("Rahmen").ergebnis.meldungen
+        self.assertFalse(any("Hauptachsen" in m.text for m in meldungen), meldungen)
+
     def test_in_der_ebene_wird_I_T_nicht_gerechnet(self):
         """Die Ebene braucht kein I_T -- und das Rechenwerk rechnet nur, was ein Ziel braucht."""
         p, a, s, q = self.projekt(im_raum=False)
