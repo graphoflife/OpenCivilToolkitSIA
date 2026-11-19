@@ -11,6 +11,7 @@ from opencivil.projekt import (
 )
 from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.web import api
+from tests.unfertig import meldung
 
 
 def balken() -> QuerschnittsanalyseEintrag:
@@ -254,11 +255,10 @@ class TestAufbau(unittest.TestCase):
         self.assertIn("Wand 1", self.meldung(p))
 
     def test_geloeschtes_material(self):
-        """Ein Verweis ins Leere ist kein halbfertiger Stand: er hält alles auf."""
+        """Ein Verweis ins Leere hält die Analyse an und nennt, was fehlt -- nur sie."""
         p = projekt()
         p.querschnittsanalysen[0].flaechen[0].material = "b7"
-        with self.assertRaisesRegex(ProjektFehler, "'b7'"):
-            p.rechnen()
+        self.assertRegex(meldung(p), "'b7'")
 
 
 class TestBiegung(unittest.TestCase):

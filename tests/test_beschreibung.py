@@ -20,6 +20,7 @@ from opencivil.projekt.querschnittsanalyse import (
 )
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.web import api, dienst
+from tests.unfertig import meldung
 
 
 class TestProjektBeschreibung(unittest.TestCase):
@@ -247,9 +248,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
     def test_fehlendes_material_wird_benannt(self):
         projekt = Projekt.beispiel()
         projekt.materialien = [m for m in projekt.materialien if m.kennung != "b1"]
-        with self.assertRaises(ProjektFehler) as ctx:
-            projekt.aufbauen()
-        self.assertIn("b1", str(ctx.exception))
+        self.assertIn("b1", meldung(projekt))
 
     def test_unbekannte_sorte_wird_benannt(self):
         projekt = Projekt(materialien=[MaterialEintrag("b1", "beton", "C99/100", "C99/100")])
@@ -261,8 +260,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
         projekt = Projekt(
             materialien=[MaterialEintrag("b1", "beton", "C30/37", "C30/37")],
             querschnitte=[QuerschnittEintrag("q1", "leer", "b1")])
-        with self.assertRaises(ProjektFehler):
-            projekt.aufbauen()
+        self.assertEqual(meldung(projekt), "Platte 'leer': Stahl: noch kein Material gewählt.")
 
     def test_eine_null_wird_nicht_durch_die_vorgabe_ersetzt(self):
         """
@@ -285,9 +283,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
             projekt = Projekt.beispiel()
             for feld, wert in aenderung.items():
                 setattr(projekt.querschnitt("q1"), feld, wert)
-            with self.assertRaises(ProjektFehler) as ctx:
-                projekt.aufbauen()
-            return str(ctx.exception)
+            return meldung(projekt)
 
         self.assertIn("Dicke h", mit(h=0.0))
         self.assertIn("Dicke h", mit(h=-300.0))
@@ -312,9 +308,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
         for kurzname, zahl in (("gamma_c", 0.0), ("f_ck", -30.0)):
             projekt = Projekt.beispiel()
             projekt.eigener_beton().abweichungen = {kurzname: zahl}
-            with self.assertRaises(ProjektFehler) as ctx:
-                projekt.aufbauen()
-            self.assertIn(kurzname, str(ctx.exception))
+            self.assertIn(kurzname, meldung(projekt))
 
     def test_fehlende_pflichtfelder_werden_benannt(self):
         """Vorher kam der nackte KeyError bis in die Oberfläche."""
@@ -497,9 +491,7 @@ class TestDoppelteFallnamen(unittest.TestCase):
         q = projekt.querschnitt("q1")
         q.kombinationen = [KombinationEintrag(name="Feld", M_Ed=30.0),
                            KombinationEintrag(name="Feld", M_Ed=99.0)]
-        with self.assertRaises(ProjektFehler) as fehler:
-            projekt.aufbauen()
-        self.assertIn("'Feld' ist zweimal", str(fehler.exception))
+        self.assertIn("'Feld' ist zweimal", meldung(projekt))
 
     def test_auch_haeufige_und_knickfaelle(self):
         from opencivil.projekt import GebrauchsfallEintrag, KnickEintrag
@@ -518,8 +510,7 @@ class TestDoppelteFallnamen(unittest.TestCase):
                     q.haeufig.faelle = eintraege
                 else:
                     setattr(q, feld, eintraege)
-                with self.assertRaises(ProjektFehler):
-                    projekt.aufbauen()
+                self.assertIn("ist zweimal als", meldung(projekt))
 
     def test_ein_eigener_fall_darf_nicht_wie_der_abgeleitete_heissen(self):
         """
@@ -533,9 +524,7 @@ class TestDoppelteFallnamen(unittest.TestCase):
         q.rissanforderung = "hoch"
         q.haeufig.faelle = [GebrauchsfallEintrag(
             f"{q.kombinationen[0].name} (70 %)", M_Ed=70.0)]
-        with self.assertRaises(ProjektFehler) as fehler:
-            projekt.aufbauen()
-        self.assertIn("abgeleitete", str(fehler.exception))
+        self.assertIn("abgeleitete", meldung(projekt))
 
     def test_verschiedene_namen_gehen_weiterhin(self):
         """Die Regel darf nicht mehr verbieten als sie muss."""
@@ -564,15 +553,12 @@ class TestMaterialsperre(unittest.TestCase):
     def test_normsorte_darf_nicht_abweichen(self):
         projekt = Projekt.beispiel()
         projekt.material("b1").abweichungen["f_ck"] = 45.0
-        with self.assertRaises(ProjektFehler) as ctx:
-            projekt.aufbauen()
-        self.assertIn("Normsorte", str(ctx.exception))
+        self.assertIn("Normsorte", meldung(projekt))
 
     def test_normsorte_darf_nicht_umbenannt_werden(self):
         projekt = Projekt.beispiel()
         projekt.material("b1").name = "Mein Beton"
-        with self.assertRaises(ProjektFehler):
-            projekt.aufbauen()
+        self.assertIn("eine unveränderte Normsorte muss 'C30/37' heissen", meldung(projekt))
 
     def test_eigenes_material_heisst_BE_und_BS(self):
         projekt = Projekt.beispiel()
@@ -593,9 +579,7 @@ class TestMaterialsperre(unittest.TestCase):
         projekt = Projekt.beispiel()
         projekt.materialien.append(
             MaterialEintrag("b2", "beton", "C30/37", "C25/30", eigenstaendig=True))
-        with self.assertRaises(ProjektFehler) as ctx:
-            projekt.aufbauen()
-        self.assertIn("Normsorte", str(ctx.exception))
+        self.assertIn("Normsorte", meldung(projekt))
 
     def test_doppelte_namen_verboten(self):
         projekt = Projekt.beispiel()
@@ -605,20 +589,27 @@ class TestMaterialsperre(unittest.TestCase):
         self.assertIn("zweimal vergeben", str(ctx.exception))
 
     def test_ein_falscher_name_oeffnet_sich_und_meldet_sich_beim_rechnen(self):
-        """Beim Öffnen zählen Kennung und Sorte; Name und Kennwerte erst beim Rechnen."""
-        for setzen, text in (
+        """
+        Beim Öffnen zählen Kennung und Sorte; Name und Kennwerte erst beim
+        Rechnen. Dann rechnet das Material nicht, und wer es nimmt, sagt es.
+        """
+        for setzen, name, grund in (
                 (lambda m: setattr(m, "name", "Mein Beton"),
-                 "Material 'Mein Beton': eine unveränderte Normsorte muss 'C30/37' heissen."),
+                 "Mein Beton", "eine unveränderte Normsorte muss 'C30/37' heissen"),
                 (lambda m: m.abweichungen.update(f_ck=45.0),
-                 "Material 'C30/37': eine Normsorte darf keine abweichenden Kennwerte haben.")):
+                 "C30/37", "eine Normsorte darf keine abweichenden Kennwerte haben. Bitte "
+                           "zuerst zu einem eigenen Material machen")):
             projekt = Projekt.beispiel()
             setzen(projekt.material("b1"))
             roh = projekt.als_dict()
-            with self.subTest(text=text):
+            with self.subTest(grund=grund):
                 self.assertEqual(dienst.bearbeite("pruefen", {"projekt": roh}).status, 200)
                 antwort = dienst.bearbeite("rechnen", {"projekt": roh})
-                self.assertEqual(antwort.status, 400)
-                self.assertIn(text, antwort.daten["fehler"])
+                self.assertEqual(antwort.status, 200)
+                unfertige = antwort.daten["unfertige"]
+                self.assertEqual(unfertige["materialien"]["b1"], {"name": name, "grund": grund})
+                self.assertEqual(unfertige["querschnitte"]["q1"]["grund"],
+                                 f"das Material «{name}» rechnet nicht -- warum, steht bei ihm")
 
     def test_eine_unbekannte_sorte_haelt_das_oeffnen_auf(self):
         """Ohne Sorte keine Kennwerte -- das Material liesse sich nicht einmal zeigen."""
@@ -947,9 +938,10 @@ class TestBuegelteilung(unittest.TestCase):
         return d
 
     def fehler(self, d) -> str:
+        """Was der Platte fehlt -- das Projekt rechnet weiter."""
         antwort = dienst.bearbeite("rechnen", {"projekt": d})
-        self.assertEqual(antwort.status, 400)
-        return antwort.daten["fehler"]
+        self.assertEqual(antwort.status, 200)
+        return antwort.daten["unfertige"]["querschnitte"]["q1"]["grund"]
 
     def test_eine_null_bleibt_beim_lesen_eine_null(self):
         d = self.buegel(abstand_x=0)

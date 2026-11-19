@@ -1,5 +1,5 @@
 ---
-erzeugt: 03522e55667c
+erzeugt: fb4fa4ddec78
 art: modul
 tags: [modul]
 ---
@@ -113,6 +113,7 @@ Eine Einwirkung -- welche Massstaebe es gibt, prueft ihr Feld.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.querschnitt.platte]]
 

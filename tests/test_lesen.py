@@ -20,6 +20,7 @@ from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import Bereich, felder_pruefen
 from opencivil.web import dienst
 from opencivil.projekt.aufbau.balkensystem import modell_von
+from tests import unfertig
 
 
 def platte_roh(**aenderung) -> dict:
@@ -113,10 +114,9 @@ class TestStreng(unittest.TestCase):
         roh["querschnitte"][0]["tragsicherheit_wahl"]["kriechzahl"] = -1
         projekt = Projekt.aus_dict(roh)
         projekt.pruefen()
-        with self.assertRaises(ProjektFehler) as fehler:
-            projekt.aufbauen()
+        text = unfertig.meldung(projekt)
         self.assertIn("tragsicherheit_wahl: Kriechzahl φ kann nicht negativ sein, angegeben "
-                      "ist -1.", str(fehler.exception))
+                      "ist -1.", text)
 
     def test_mehr_als_vier_lagen(self):
         roh = platte_roh()
@@ -267,10 +267,10 @@ class TestInhaltVorDemRechnen(unittest.TestCase):
         roh["querschnitte"][0]["haeufig"]["anteil"] = 0.0
         self.assertEqual(dienst.bearbeite("pruefen", {"projekt": roh}).status, 200)
         antwort = dienst.bearbeite("rechnen", {"projekt": roh})
-        self.assertEqual(antwort.status, 400)
-        self.assertIn("Platte 'Decke über EG', haeufig: Anteil aus der Tragsicherheit muss "
-                      "grösser als null und höchstens 100 % sein, angegeben ist 0 %.",
-                      antwort.daten["fehler"])
+        self.assertEqual(antwort.status, 200)
+        self.assertEqual(antwort.daten["unfertige"]["querschnitte"]["q1"]["grund"],
+                         "haeufig: Anteil aus der Tragsicherheit muss grösser als null und "
+                         "höchstens 100 % sein, angegeben ist 0 %")
 
     def test_was_ein_bereich_verlangt(self):
         for bereich, wert, text in (
@@ -297,9 +297,7 @@ class TestNichtsStill(unittest.TestCase):
     """
 
     def fehler(self, projekt: Projekt) -> str:
-        with self.assertRaises(ProjektFehler) as fehler:
-            projekt.aufbauen()
-        return str(fehler.exception)
+        return unfertig.meldung(projekt)
 
     def test_ein_posten_mit_durchmesser_braucht_eine_teilung(self):
         """Bis 2026-10-16 hiess eine Teilung von null still «kein Stab»."""
@@ -347,17 +345,17 @@ class TestNichtsStill(unittest.TestCase):
     def test_ein_stab_ohne_stahl_nimmt_nicht_den_ersten(self):
         p = Projekt.beispiel()
         p.querschnittsanalysen[0].stablinien[0].stahl = ""
-        self.assertIn("Linie 1 hat kein Material", self.fehler(p))
+        self.assertIn("Linie 1: noch kein Material gewählt", self.fehler(p))
 
     def test_eine_platte_ohne_stahl_nimmt_nicht_den_ersten(self):
         p = Projekt.beispiel()
         p.querschnitt("q1").stahl = ""
-        self.assertIn("Bewehrung von 'Decke über EG' hat kein Material", self.fehler(p))
+        self.assertIn("Platte 'Decke über EG': Stahl: noch kein Material gewählt", self.fehler(p))
 
     def test_ein_stahl_ist_kein_beton(self):
         p = Projekt.beispiel()
         p.querschnitt("q1").beton = "s1"
-        self.assertIn("braucht einen Beton, 'B500B' ist keiner", self.fehler(p))
+        self.assertIn("Beton: «B500B» ist kein Beton", self.fehler(p))
 
     def test_ein_kennwert_den_es_nicht_gibt(self):
         """Eine Abweichung «fck» fiel still weg -- gerechnet wurde mit der Sorte."""
@@ -366,10 +364,11 @@ class TestNichtsStill(unittest.TestCase):
         self.assertIn("einen Kennwert 'fck' gibt es nicht", self.fehler(p))
 
     def test_zwei_gleiche_kennungen(self):
-        """Das spätere Material ersetzte still das frühere."""
+        """Das spätere Material ersetzte still das frühere -- jetzt hält es das Projekt an."""
         p = Projekt.beispiel()
         p.beton("C50/60").kennung = "b1"
-        self.assertIn("dieselbe Kennung 'b1'", self.fehler(p))
+        with self.assertRaisesRegex(ProjektFehler, "dieselbe Kennung 'b1'"):
+            p.aufbauen()
 
     def test_zwei_werkstoffwahlen_fuer_ein_material(self):
         from opencivil.projekt import WerkstoffwahlEintrag

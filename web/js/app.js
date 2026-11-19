@@ -22,6 +22,7 @@ import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { konsoleVerbinden } from './konsole.js';
 import { appVon } from './apps.js';
+import { ARTEN } from './arten.js';
 import { editorZeichnen } from './editor.js';
 import { fensterEinrichten } from './fenster.js';
 import { notizbuchEinrichten } from './notizbuch.js';
@@ -47,16 +48,22 @@ function zustandsanzeige(text, art = '') {
 
 /**
  * Was oben rechts steht, und in welcher Farbe: ob eine Eingabe fehlt, wie
- * viele Nachweise nicht erfüllt sind -- und wie vielen Bauteilen noch etwas
- * fehlt. Das ist kein Fehler (Benutzer, 2026-11-19), aber auch nicht grün:
- * «alle Nachweise erfüllt» hiesse sonst auch, die Platte ohne Bewehrung sei
- * nachgewiesen.
+ * viele Nachweise nicht erfüllt sind -- und wie vielen Bauteilen und
+ * Materialien noch etwas fehlt. Das ist kein Fehler (Benutzer, 2026-11-19),
+ * aber auch nicht grün: «alle Nachweise erfüllt» hiesse sonst auch, die
+ * Platte ohne Bewehrung sei nachgewiesen.
  */
 function stand(antwort) {
-  const unfertig = Object.values(antwort.unfertige || {}).flatMap(Object.keys).length;
-  const dazu = !unfertig ? ''
-    : unfertig === 1 ? ' · einem Bauteil fehlt noch etwas' : ` · ${unfertig} Bauteilen fehlt noch etwas`;
-  const gut = unfertig ? '' : 'ist-gut';
+  const zahl = (listen) => listen
+    .reduce((n, liste) => n + Object.keys(antwort.unfertige?.[liste] || {}).length, 0);
+  const teile = zahl(ARTEN.map((a) => a.liste));
+  const stoffe = zahl(['materialien']);
+  const wem = [
+    teile && (teile === 1 ? 'einem Bauteil' : `${teile} Bauteilen`),
+    stoffe && (stoffe === 1 ? 'einem Material' : `${stoffe} Materialien`),
+  ].filter(Boolean);
+  const dazu = wem.length ? ` · ${wem.join(' und ')} fehlt noch etwas` : '';
+  const gut = wem.length ? '' : 'ist-gut';
   if (!antwort.vollstaendig) {
     const fehlt = antwort.fehlende.length;
     return [`${fehlt === 1 ? 'Eine Eingabe fehlt' : `${fehlt} Eingaben fehlen`}${dazu}`, 'ist-fehler'];

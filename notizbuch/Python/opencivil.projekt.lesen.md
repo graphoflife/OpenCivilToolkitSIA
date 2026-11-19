@@ -1,5 +1,5 @@
 ---
-erzeugt: efd4a8df7b01
+erzeugt: 0f6b29a02387
 art: modul
 tags: [modul]
 ---
@@ -233,6 +233,15 @@ def ort(cls: type, roh: Any) -> str
 Wie ein Eintrag fuer sich in Meldungen heisst: «Platte 'Decke'», ohne
 Namen mit seiner Kennung, sonst nur seine Art.
 
+### ort_von
+
+```python
+def ort_von(eintrag: Any) -> str
+```
+
+[[opencivil.projekt.lesen#ort|ort]] eines gelesenen Eintrags -- ein Material heisst nach seiner
+Anzeige, ohne eigenen Namen nach der Sorte.
+
 ### _ort_roh
 
 ```python
@@ -279,14 +288,16 @@ Ein Text, eine Zahl, ein Schalter, eine Wahl -- und was an seinem Feld steht.
 ### inhalt_pruefen
 
 ```python
-def inhalt_pruefen(eintrag: Any, wo: str) -> None
+def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str]=()) -> None
 ```
 
 Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
 jede Zahl gegen ihren Bereich ([[opencivil.projekt.lesen#bereich|bereich]]), jeden Eintrag darin
 ebenso, und danach die Regeln des Eintrags ueber mehrere Felder,
 `regeln(wo)`. Die Form ist da schon geprueft: ein Eintrag steht, wo
-einer hingehoert, eine Zahl, wo eine Zahl hingehoert.
+einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
+`ohne` prueft, wer sie einzeln prueft -- der Aufbau jedes Material und
+jedes Bauteil fuer sich ([[opencivil.projekt.aufbau#aufbauen|aufbauen]]).
 
 ### _ort_von
 
@@ -369,12 +380,15 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 ## Gebraucht von
 
 - [[opencivil.projekt]]
+- [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]
+- [[opencivil.projekt.aufbau.platte]]
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]

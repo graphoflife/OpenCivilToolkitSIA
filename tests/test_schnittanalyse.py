@@ -26,6 +26,7 @@ from opencivil.projekt.querschnittsanalyse import (
 from opencivil.spannungsanalyse import schnittpaar
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.web import dienst
+from tests.unfertig import meldung
 
 
 def rechnen(projekt):
@@ -288,8 +289,8 @@ class TestBeschreibung(unittest.TestCase):
         a = p.querschnittsanalysen[0]
         a.spannungsfall("Bild")
         a.spannungsfall("Bild", richtung="oben")
-        with self.assertRaises(ProjektFehler):
-            p.aufbauen()
+        self.assertIn("der Name 'Bild' ist zweimal als Spannung-Dehnung-Analyse vergeben",
+                      meldung(p))
 
 
 class TestDurchDenDienst(unittest.TestCase):

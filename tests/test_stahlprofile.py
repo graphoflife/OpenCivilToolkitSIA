@@ -10,6 +10,7 @@ from opencivil.projekt import Projekt
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.stabwerk.profiltabelle import PROFILE, PROFILREIHEN, profil
 from tests.profilwerte import WERTE
+from tests.unfertig import meldung
 
 GROESSEN = ("A", "I_y", "I_z", "I_T", "e_y")
 EINHEITEN = {"A": CM2, "I_y": CM4, "I_z": CM4, "I_T": CM4, "e_y": CM}
@@ -154,9 +155,7 @@ class TestImBalkensystem(unittest.TestCase):
             stahltraeger("HEB 333")
         p = stahltraeger()
         p.balkensysteme[0].querschnitte[0].profil = "HEB 333"
-        with self.assertRaisesRegex(ProjektFehler, "nimmt das Profil «HEB 333», das es in der "
-                                                   "Tabelle nicht gibt"):
-            p.aufbauen()
+        self.assertIn("nimmt das Profil «HEB 333», das es in der Tabelle nicht gibt", meldung(p))
 
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Dict, List, Tuple
 from opencivil.durchstanzen.nachweis import Durchstanzen
 from opencivil.durchstanzen.stelle import Durchstanzstelle
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
-from opencivil.projekt.lesen import ProjektFehler, als_groesse
+from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von
 from opencivil.querschnitt.geometrie import GeometrieFehler, polygon_pruefen
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, material
@@ -34,7 +34,7 @@ def aussparungen(eintrag: DurchstanzEintrag) -> List[List[Tuple[float, float]]]:
     lage: Dict[str, Tuple[float, float]] = {k.kennung: (k.x * MM, k.y * MM) for k in eintrag.knoten}
     ergebnis = []
     for a in eintrag.aussparungen:
-        wo = f"Durchstanzen '{eintrag.name}', Aussparung {a.kennung}"
+        wo = f"{ort_von(eintrag)}, Aussparung {a.kennung}"
         fehlt = [k for k in a.knoten if k not in lage]
         if fehlt:
             raise ProjektFehler(f"{wo}: die Knoten {', '.join(fehlt)} gibt es nicht.")
@@ -53,12 +53,12 @@ def bauen(art: "Bauteilart", eintrag: DurchstanzEintrag, aufbau: Aufbau) -> Baut
     Feldes (:func:`~opencivil.projekt.lesen.als_groesse`).
     """
     g = partial(als_groesse, eintrag)
-    wo = f"Durchstanzen '{eintrag.name}'"
+    wo = ort_von(eintrag)
     stelle = Durchstanzstelle(
         name=eintrag.name, praefix=f"{art.raum}.{eintrag.kennung}",
         plattenart=eintrag.plattenart,
-        beton=material(aufbau.baustoffe, eintrag.beton, "beton", wo),
-        stahl=material(aufbau.baustoffe, eintrag.stahl, "betonstahl", wo),
+        beton=material(aufbau.baustoffe, eintrag.beton, "beton", wo, "Beton"),
+        stahl=material(aufbau.baustoffe, eintrag.stahl, "betonstahl", wo, "Betonstahl"),
         h=g("h"), c=g("c"), c_v=g("c_v"), D_max=g("D_max"),
         phi_x=g("phi_x"), s_x=g("s_x"), phi_y=g("phi_y"), s_y=g("s_y"), aussen=eintrag.aussen,
         flaeche=eintrag.lage.flaeche(eintrag.form), b_x=g("b_x"), b_y=g("b_y"), D=g("D"), t=g("t"),

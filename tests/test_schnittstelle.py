@@ -277,7 +277,7 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertEqual(unfertige["querschnitte"],
                          {"q1": {"name": "Decke über EG", "grund": "noch keine Bewehrung"}})
         self.assertNotIn("q1", antwort.daten["zuordnung"]["querschnitte"])
-        self.assertEqual(set(unfertige), set(antwort.daten["zuordnung"]) - {"materialien"})
+        self.assertEqual(set(unfertige), set(antwort.daten["zuordnung"]))
 
 
 class TestJsonTauglich(unittest.TestCase):

@@ -10,6 +10,7 @@ from opencivil.material.basis import Baustoffart
 from opencivil.material.baustahl import BAUSTAHLSORTEN, baustahl, baustahlsorten_zum_anlegen
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.projekt import Projekt
+from tests.unfertig import meldung
 
 
 def werte(stoff, *kurznamen):
@@ -130,8 +131,7 @@ class TestImProjekt(unittest.TestCase):
         p = Projekt(name="Stahl")
         stahl = p.baustahl("S355")
         p.platte("Decke", beton=stahl.kennung, stahl=p.stahl("B500B").kennung)
-        with self.assertRaisesRegex(ProjektFehler, "braucht einen Beton, 'S355' ist keiner"):
-            p.aufbauen()
+        self.assertEqual(meldung(p), "Platte 'Decke': Beton: «S355» ist kein Beton.")
 
 
 class TestMaterialarten(unittest.TestCase):

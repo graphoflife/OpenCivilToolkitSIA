@@ -14,6 +14,7 @@ import unittest
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie, Handlinie
 from opencivil.projekt import Projekt, ProjektFehler, RechenwahlEintrag
+from tests.unfertig import meldung
 
 KENNUNG = "q1.x"
 BASIS = "querschnitt.q1.nachweis.mn.x"
@@ -172,11 +173,11 @@ class TestDatei(unittest.TestCase):
                       str(fehler.exception))
 
     def test_negatives_phi(self):
-        """Die Datei öffnet sich; gemeldet wird vor dem Rechnen."""
+        """Die Datei öffnet sich; die Platte rechnet nicht und sagt warum."""
         daten = Projekt.beispiel().als_dict()
         daten["querschnitte"][0]["tragsicherheit_wahl"] = {"kriechzahl": -1}
-        with self.assertRaises(ProjektFehler):
-            Projekt.aus_dict(daten).aufbauen()
+        self.assertIn("tragsicherheit_wahl: Kriechzahl φ kann nicht negativ sein, angegeben "
+                      "ist -1.", meldung(Projekt.aus_dict(daten)))
 
 
 if __name__ == "__main__":

@@ -18,6 +18,7 @@ from opencivil.projekt import GrundbruchEintrag, Projekt, ProjektFehler
 from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.web import dienst
 from opencivil.web.api import katalog
+from tests.unfertig import meldung
 
 
 def rechnen(kombinationen=(("K", 1000.0, 0.0),), **felder):
@@ -436,14 +437,14 @@ class TestEintrag(unittest.TestCase):
             p = Projekt(name="Probe")
             p.grundbruch("F", **felder).kombination("K", N_Ed=100.0)
             with self.subTest(wort=wort):
-                with self.assertRaises(ProjektFehler) as fehler:
-                    p.aufbauen()
-                self.assertIn(wort, str(fehler.exception))
-        for N, T in ((0.0, 0.0), (100.0, -1.0)):
+                self.assertIn(wort, meldung(p))
+        for N, T, satz in (
+                (0.0, 0.0, "Druckkraft N_Ed muss grösser als null sein, angegeben ist 0 kN"),
+                (100.0, -1.0, "T_Ed, in Richtung von Bild 9.2.15, kann nicht negativ sein")):
             p = Projekt(name="Probe")
             p.grundbruch("F").kombination("K", N_Ed=N, T_Ed=T)
-            with self.subTest(N=N, T=T), self.assertRaises(ProjektFehler):
-                p.aufbauen()
+            with self.subTest(N=N, T=T):
+                self.assertIn(f"kombinationen 'K': {satz}", meldung(p))
 
     def test_ein_bereich_nennt_seine_einheit(self):
         """Der Bereich steht am Feld, mit der Einheit, in der das Feld zählt."""
@@ -454,9 +455,8 @@ class TestEintrag(unittest.TestCase):
                 ({"t": -0.5}, "Tiefe t kann nicht negativ sein, angegeben ist -0.5 m.")):
             p = Projekt(name="Probe")
             p.grundbruch("F", **felder).kombination("K", N_Ed=100.0)
-            with self.subTest(text=text), self.assertRaises(ProjektFehler) as fehler:
-                p.aufbauen()
-            self.assertEqual(str(fehler.exception), f"Grundbruch 'F': {text}")
+            with self.subTest(text=text):
+                self.assertEqual(meldung(p), f"Grundbruch 'F': {text}")
 
 
 class TestZusammenfassung(unittest.TestCase):

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0dfd049f9508
+erzeugt: c3c80c18946f
 art: modul
 tags: [modul]
 ---
@@ -80,9 +80,13 @@ def aufbauen(projekt: 'Projekt', *, schnell: bool=False) -> Aufbau
 
 Baut aus der Beschreibung ein vollstaendiges Rechenwerk.
 
-Wirft [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]], wenn die
-Beschreibung nicht stimmig ist -- etwa wenn ein Querschnitt auf ein
-geloeschtes Material verweist.
+Wirft [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]], wenn die Form
+der Beschreibung nicht stimmt oder was alle teilen -- zwei Materialien
+mit demselben Namen. Was nur ein Material oder ein Bauteil betrifft,
+haelt nur dieses an ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]): ein Wert, den der Kern
+abweist, ein Verweis auf ein Material, das es nicht mehr gibt oder das
+selbst nicht rechnet, alles, was beim Bauen eines Bauteils scheitert
+(Benutzer, 2026-11-19: der Rest rechnet weiter).
 
 Mit `schnell` lassen Nachweise teure Nebenrechnungen weg, die das
 Urteil nicht aendern -- die Suche nach der Knickgrenzkraft und die
@@ -90,6 +94,22 @@ genaue Resistenzlinie --, und ganz stille Nachweise entstehen gar
 nicht erst. Gedacht fuer das Bewehrungswerkzeug, das hundertfach
 rechnet und nur wissen muss, ob es aufgeht. Fuer eine Herleitung ist
 das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
+
+### _vorab_pruefen
+
+```python
+def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau) -> None
+```
+
+Was ein Bauteil aufhaelt, bevor es gebaut wird: ein Material, das selbst
+nicht rechnet, und ein Wert, den der Kern abweist
+([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]). Ein Verweis auf ein
+Material, das es nicht mehr gibt, meldet sich beim Bauen, mit dem, was
+darauf zeigt ([[opencivil.projekt.aufbau.kern#material|material]]).
+
+Bis 2026-11-19 hielt jedes davon das ganze Projekt an -- auch einen
+Verweis ins Leere erreichte die Bedienung: der Beton eines Pfahls, der
+als Mikropfahl keinen braucht und darum loeschen liess.
 
 ### Bauteilart
 
@@ -143,6 +163,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.grundbruch]]
+- [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]

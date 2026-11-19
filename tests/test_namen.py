@@ -12,8 +12,9 @@ Projekt liess sich dann nicht mehr laden.
 
 import unittest
 
-from opencivil.projekt import Projekt, ProjektFehler
+from opencivil.projekt import Projekt
 from opencivil.web import dienst
+from tests.unfertig import meldung
 
 
 def platte(p):
@@ -52,9 +53,7 @@ class TestNamen(unittest.TestCase):
         for liste in LISTEN:
             for erster, zweiter in (("Wand A", "Wand A"), ("Wand A", "Wand-A")):
                 with self.subTest(liste=liste, namen=(erster, zweiter)):
-                    with self.assertRaises(ProjektFehler) as fehler:
-                        mit_zwei(liste, erster, zweiter).aufbauen()
-                    text = str(fehler.exception)
+                    text = meldung(mit_zwei(liste, erster, zweiter))
                     self.assertNotIn("abweichender Definition", text)
                     self.assertIn(f"'{zweiter}'", text)
                     if erster != zweiter:
@@ -64,15 +63,15 @@ class TestNamen(unittest.TestCase):
         roh = mit_zwei("Tragsicherheit der Platte", "Wand A", "Wand A").als_dict()
         self.assertEqual(dienst.bearbeite("pruefen", {"projekt": roh}).status, 200)
         gerechnet = dienst.bearbeite("rechnen", {"projekt": roh})
-        self.assertEqual(gerechnet.status, 400)
-        self.assertIn("'Wand A' ist zweimal", gerechnet.daten["fehler"])
+        self.assertEqual(gerechnet.status, 200)
+        self.assertIn("'Wand A' ist zweimal",
+                      gerechnet.daten["unfertige"]["querschnitte"]["q1"]["grund"])
 
     def test_die_tragsicherheit_zuerst(self):
         """Ihre Namen, nicht die daraus abgeleiteten häufigen Lastfälle «(70 %)»."""
-        with self.assertRaises(ProjektFehler) as fehler:
-            mit_zwei("Tragsicherheit der Platte", "Feld A", "Feld-A").aufbauen()
-        self.assertIn("'Feld A' und 'Feld-A'", str(fehler.exception))
-        self.assertNotIn("%", str(fehler.exception))
+        text = meldung(mit_zwei("Tragsicherheit der Platte", "Feld A", "Feld-A"))
+        self.assertIn("'Feld A' und 'Feld-A'", text)
+        self.assertNotIn("%", text)
 
     def test_gleiche_namen_in_verschiedenen_listen_gehen(self):
         p = Projekt.beispiel()

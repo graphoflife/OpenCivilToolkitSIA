@@ -310,6 +310,15 @@ def ort(cls: type, roh: Any) -> str:
     return _benannt(bezeichnung, roh.get("name"), roh.get("kennung")) or bezeichnung
 
 
+def ort_von(eintrag: Any) -> str:
+    """
+    :func:`ort` eines gelesenen Eintrags -- ein Material heisst nach seiner
+    Anzeige, ohne eigenen Namen nach der Sorte.
+    """
+    name = getattr(eintrag, "anzeigename", None) or eintrag.name
+    return ort(type(eintrag), {"name": name, "kennung": eintrag.kennung})
+
+
 def _ort_roh(element: Any, cls: type, wo: str, feld: str, i: int) -> str:
     """Wie ein Listenelement in Meldungen heisst -- aus der Datei, vor dem Lesen."""
     if not isinstance(element, Mapping):
@@ -422,15 +431,19 @@ def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None:
                             f"Möglich sind: {', '.join(str(m) for m in moeglich)}.")
 
 
-def inhalt_pruefen(eintrag: Any, wo: str) -> None:
+def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
     """
     Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
     jede Zahl gegen ihren Bereich (:func:`bereich`), jeden Eintrag darin
     ebenso, und danach die Regeln des Eintrags ueber mehrere Felder,
     ``regeln(wo)``. Die Form ist da schon geprueft: ein Eintrag steht, wo
-    einer hingehoert, eine Zahl, wo eine Zahl hingehoert.
+    einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
+    ``ohne`` prueft, wer sie einzeln prueft -- der Aufbau jedes Material und
+    jedes Bauteil fuer sich (:func:`~opencivil.projekt.aufbau.aufbauen`).
     """
     for f in dataclasses.fields(eintrag):
+        if f.name in ohne:
+            continue
         wert = getattr(eintrag, f.name)
         bereich_ = f.metadata.get("bereich")
         teile = wert if isinstance(wert, list) else [wert]

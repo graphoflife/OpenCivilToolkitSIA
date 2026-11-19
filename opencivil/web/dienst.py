@@ -442,9 +442,7 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     except (TypeError, ValueError):
         raise DienstFehler(400, f"Der Wert des Schnitts ist keine Zahl: {wahl.get('wert')!r}.") from None
     aufbau = projekt.aufbauen()
-    unfertig = aufbau.unfertige.get(kennung)
-    if unfertig is not None:
-        raise DienstFehler(400, f"Querschnittsanalyse '{unfertig.name}': {unfertig.grund}.")
+    # Einer unfertigen Analyse sagt schon der Abdruck, was fehlt (Aufbau.bauteil).
     stempel = f"{_abdruck(projekt.als_dict(), aufbau, kennung)}|{fest}|{wert!r}"
     daten = DIAGRAMME.hole(kennung, stempel)
     if daten is None:
@@ -480,7 +478,7 @@ def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     projekt = _projekt(rumpf)
     eintrag = _balkensystem(projekt, rumpf)
     aufbau = projekt.aufbauen()
-    teil = aufbau.teile[eintrag.kennung]
+    teil = aufbau.bauteil(eintrag.kennung)
     loesung = _bauteil_rechnen(projekt, aufbau, eintrag.kennung)
     daten = endlich(ZEICHENDATEN[teil.art.name](aufbau, eintrag.kennung, loesung))
     befund = loesung.befunde.get(teil.objekt.rechnung.id)

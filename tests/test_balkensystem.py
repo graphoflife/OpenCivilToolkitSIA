@@ -21,6 +21,7 @@ from opencivil.spannungsanalyse.modul import aequivalenter_modul
 from opencivil.spannungsanalyse.platte import loeserpaar
 from opencivil.spannungsanalyse.schnitt import schnittpaar
 from opencivil.web import api, dienst
+from tests.unfertig import meldung
 
 
 def einfeldtraeger(kennung: str = "r1", name: str = "T", beton: str = "b1") -> BalkensystemEintrag:
@@ -501,11 +502,11 @@ class TestRechnen(unittest.TestCase):
                          e.wert("querschnittsanalyse.a1.I_y").groesse.si)
         self.assertEqual(e.aufbau.balkensysteme["r1"].bezuege, ["a1", "q1"])
 
-    def test_ein_fremder_verweis_scheitert_hart(self):
+    def test_ein_fremder_verweis_haelt_das_system_an(self):
         p = traeger()
         p.balkensysteme[0].querschnitt_aus("Weg", "platte", "q7")
-        with self.assertRaisesRegex(ProjektFehler, "q7"):
-            p.aufbauen()
+        self.assertIn("der Querschnitt «Weg» nimmt die Platte 'q7', die es im Projekt nicht "
+                      "gibt", meldung(p))
 
     def test_noch_ohne_platte_oder_analyse_ist_eine_meldung(self):
         """
@@ -803,12 +804,14 @@ class TestMaterialien(unittest.TestCase):
         self.assertIn("Biegesteifigkeit, «R» aus Holz", text)
 
     def test_der_beton_ist_ein_verweis(self):
-        """Den Beton eines Materials löscht man nicht; zeigt es ins Leere, scheitert es hart."""
+        """
+        Den Beton eines Materials löscht man nicht; zeigt es ins Leere, rechnet
+        das System nicht und nennt die Kennung.
+        """
         p = traeger()
         self.assertEqual(p.verweise("b1"), [p.balkensysteme[0]])
         p.balkensysteme[0].stabmaterialien[0].stoff = "b7"
-        with self.assertRaisesRegex(ProjektFehler, "b7"):
-            p.aufbauen()
+        self.assertRegex(meldung(p), "b7")
 
     def test_baustahl_des_projekts(self):
         """E_a = 210 000 N/mm² und ρ_a = 7850 kg/m³ (SIA 263:2013, 3.2.2.1)."""
@@ -854,8 +857,7 @@ class TestMaterialien(unittest.TestCase):
         s = p.balkensysteme[0]
         s.linien[0].material = s.eigenes_material("Weich", E=10000.0, rho=0.0).kennung
         s.stabmaterialien[-1].E = 0.0
-        with self.assertRaisesRegex(ProjektFehler, "E-Modul"):
-            Projekt.aus_dict(p.als_dict()).rechnen()
+        self.assertRegex(meldung(Projekt.aus_dict(p.als_dict())), "E-Modul")
 
 
 class TestMaterialDesQuerschnitts(unittest.TestCase):

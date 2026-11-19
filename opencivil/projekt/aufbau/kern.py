@@ -84,10 +84,11 @@ class Aufbau:
 
     unfertige: Dict[str, "Unfertiges"] = field(default_factory=dict)
     """
-    Je Bauteil, dem noch etwas fehlt, was: eine Querschnittsanalyse ohne
-    Zeichnung, eine Platte ohne Bewehrung, ein Pfahl ohne Schicht
-    (:meth:`unfertig`). Es wird kein Bauteil, aber wer auf es zeigt, soll
-    hoeren, was ihm fehlt, und nicht, es gebe es nicht.
+    Je Bauteil oder Material, dem noch etwas fehlt, was: eine
+    Querschnittsanalyse ohne Zeichnung, eine Platte ohne Bewehrung, ein
+    Pfahl ohne Schicht, ein Wert, den der Kern abweist (:meth:`unfertig`).
+    Es wird nicht gebaut, aber wer auf es zeigt, soll hoeren, was ihm fehlt,
+    und nicht, es gebe es nicht.
     """
 
     warnungen: List[str] = field(default_factory=list)
@@ -115,17 +116,19 @@ class Aufbau:
     # Bis 2026-10-25 legte jede Baufunktion ihr Objekt ein zweites Mal ab, in
     # einem Woerterbuch je Art. Jetzt steht es nur im Bauteil.
 
-    def unfertig(self, art: "Bauteilart", eintrag: Any, wo: str, grund: str) -> None:
+    def unfertig(self, liste: str, eintrag: Any, wo: str, grund: str) -> None:
         """
-        Ein Bauteil, dem noch etwas fehlt: es rechnet nicht, das Projekt
-        schon, und ein Hinweis sagt, was fehlt -- ein unfertiger Zustand ist
-        kein Fehler des Projekts (Benutzer, 2026-11-19). Bis dahin hielten
-        eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und eine
-        halbfertige Zeichnung alles auf. ``grund`` ist ein Satzteil («noch
-        keine Bewehrung») oder ein Satz der Zeichnung, ohne Punkt; ``None``
-        zurueck, damit eine Baufunktion damit enden kann.
+        Ein Bauteil oder Material, dem noch etwas fehlt: es rechnet nicht,
+        das Projekt schon, und ein Hinweis sagt, was fehlt -- ein unfertiger
+        Zustand ist kein Fehler des Projekts (Benutzer, 2026-11-19). Bis
+        dahin hielten eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und
+        eine halbfertige Zeichnung alles auf. ``liste`` ist seine Liste im
+        Projekt; ``grund`` ein Satzteil («noch keine Bewehrung») oder ein
+        Satz, ohne Punkt. ``None`` zurueck, damit eine Baufunktion damit
+        enden kann.
         """
-        self.unfertige[eintrag.kennung] = Unfertiges(art, eintrag.name, grund)
+        name = getattr(eintrag, "anzeigename", eintrag.name)
+        self.unfertige[eintrag.kennung] = Unfertiges(liste, name, wo, grund)
         self.warnungen.append(f"{wo}: {grund} → nichts zu rechnen.")
 
     def objekte(self, art: str) -> Dict[str, Any]:
@@ -244,10 +247,14 @@ class Aufbau:
         return list(self.teile.values())
 
     def bauteil(self, kennung: str) -> "Bauteil":
-        try:
-            return self.teile[kennung]
-        except KeyError:
-            raise ProjektFehler(f"Ein Bauteil '{kennung}' gibt es im Aufbau nicht.") from None
+        """Ein gebautes Bauteil -- fuer eines, dem noch etwas fehlt, sagt der Fehler, was."""
+        teil = self.teile.get(kennung)
+        if teil is not None:
+            return teil
+        unfertig = self.unfertige.get(kennung)
+        if unfertig is not None:
+            raise ProjektFehler(unfertig.meldung)
+        raise ProjektFehler(f"Ein Bauteil '{kennung}' gibt es im Aufbau nicht.")
 
     def bauteil_von(self, nachweis: Nachweis) -> "Bauteil":
         """Das Bauteil, bei dem ein Nachweis angemeldet ist."""
@@ -323,11 +330,34 @@ class Aufbau:
 
 @dataclass(frozen=True)
 class Unfertiges:
-    """Ein Bauteil, dem noch etwas fehlt -- seine Art, sein Name und was (:meth:`Aufbau.unfertig`)."""
+    """
+    Ein Bauteil oder Material, dem noch etwas fehlt -- seine Liste im
+    Projekt, sein Name, wie es in Meldungen heisst, und was
+    (:meth:`Aufbau.unfertig`).
+    """
 
-    art: "Bauteilart"
+    liste: str
     name: str
+    wo: str
     grund: str
+
+    @property
+    def meldung(self) -> str:
+        """Für wen nach ihm fragt: «Platte 'Decke': noch keine Bewehrung.»"""
+        return f"{self.wo}: {self.grund}."
+
+
+def ohne_ort(fehler: Exception, wo: str) -> str:
+    """
+    Die Meldung eines Fehlers als Grund an seiner Stelle: ohne den Ort, der
+    dort schon steht, und ohne Punkt -- «k_c muss grösser als null sein,
+    angegeben ist 0» statt «Platte 'Decke': k_c muss …», «Schicht 2: …»
+    statt «Pfahl 'P', Schicht 2: …».
+    """
+    text = str(fehler)
+    for vorne in (f"{wo}: ", f"{wo}, "):
+        text = text.removeprefix(vorne)
+    return text.removesuffix(".")
 
 
 @dataclass
@@ -382,7 +412,7 @@ class Bauteil:
 # ===========================================================================
 
 
-def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
+def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str, wo: str) -> Baustoff:
     bauer = MATERIALARTEN[eintrag.art].bauen
     roh = bauer(eintrag.sorte, praefix=f"{eintrag.art}.{eintrag.kennung}")
     # Jeder Kennwert eines Baustoffs ist seiner Natur nach positiv:
@@ -399,11 +429,11 @@ def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
         for kurzname, zahl in topf.items():
             if kurzname not in roh.definitionen:
                 raise ProjektFehler(
-                    f"'{eintrag.anzeigename}': einen Kennwert '{kurzname}' gibt es nicht "
+                    f"{wo}: einen Kennwert '{kurzname}' gibt es nicht "
                     f"({wie}). Möglich sind: {', '.join(roh.definitionen)}.")
             if zahl <= 0.0:
                 raise ProjektFehler(
-                    f"'{eintrag.anzeigename}': {kurzname} muss grösser als null "
+                    f"{wo}: {kurzname} muss grösser als null "
                     f"sein, angegeben ist {zahl:g} ({wie}).")
     abweichungen = {
         kurzname: Groesse(zahl, roh.definition(kurzname).einheit)
@@ -418,28 +448,36 @@ def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
     )
 
 
-def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wer: str) -> Baustoff:
+def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str,
+             feld: str) -> Baustoff:
     """
-    Das Material, auf das ein Eintrag zeigt: es muss es geben, und es muss
-    von dieser Art sein. Ohne Angabe gilt nicht «das erste im Projekt» -- bis
-    2026-10-16 bekamen Buegel und Staebe ohne Stahl still den ersten.
+    Das Material, das ``feld`` des Bauteils ``wo`` waehlt: es muss es geben,
+    und es muss von dieser Art sein. Ohne Angabe gilt nicht «das erste im
+    Projekt» -- bis 2026-10-16 bekamen Buegel und Staebe ohne Stahl still den
+    ersten. ``feld`` heisst wie in der Oberflaeche: was nicht stimmt, steht
+    am Bauteil (:meth:`Aufbau.unfertig`), dort genuegt das Feld.
     """
     gefunden = baustoffe.get(kennung)
     if gefunden is None:
         raise ProjektFehler(
-            f"{wer} verweist auf das Material '{kennung}', das es nicht (mehr) gibt."
-            if kennung else f"{wer} hat kein Material.")
+            f"{wo}: {feld}: das Material '{kennung}' gibt es nicht mehr -- eines wählen."
+            if kennung else f"{wo}: {feld}: noch kein Material gewählt.")
     if gefunden.art.value != art:
-        raise ProjektFehler(f"{wer} braucht einen {Baustoffart(art).beschriftung}, "
-                            f"'{gefunden.name}' ist keiner.")
+        raise ProjektFehler(f"{wo}: {feld}: «{gefunden.name}» ist kein "
+                            f"{Baustoffart(art).beschriftung}.")
     return gefunden
 
 
 def ueberschreibungen_setzen(projekt: "Projekt", werk: Rechenwerk,
                               aufbau: Aufbau) -> None:
-    """Die von Hand ueberschriebenen Kennwerte -- dass es sie gibt, prueft ``baustoff_bauen``."""
+    """
+    Die von Hand ueberschriebenen Kennwerte -- dass es sie gibt, prueft
+    ``baustoff_bauen``. Ein Material, das nicht rechnet, hat keine.
+    """
     for eintrag in projekt.materialien:
-        baustoff = aufbau.baustoffe[eintrag.kennung]
+        baustoff = aufbau.baustoffe.get(eintrag.kennung)
+        if baustoff is None:
+            continue
         for kurzname, zahl in eintrag.ueberschreibungen.items():
             definition = baustoff.definition(kurzname)
             werk.setze(definition.id, Groesse(zahl, definition.einheit))

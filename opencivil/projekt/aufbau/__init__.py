@@ -66,7 +66,10 @@ from opencivil.projekt.aufbau import (
     balkensystem, balkensystem3d, decke, durchstanzen, grundbruch, pfahl, platte,
     querschnittsanalyse, setzung,
 )
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, baustoff_bauen, ueberschreibungen_setzen
+from opencivil.projekt.aufbau.kern import (
+    Aufbau, Bauteil, baustoff_bauen, ohne_ort, ueberschreibungen_setzen,
+)
+from opencivil.projekt.lesen import ProjektFehler, inhalt_pruefen, ort_von
 
 if TYPE_CHECKING:
     from opencivil.projekt.projekt import Projekt
@@ -82,9 +85,13 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     """
     Baut aus der Beschreibung ein vollstaendiges Rechenwerk.
 
-    Wirft :class:`~opencivil.projekt.lesen.ProjektFehler`, wenn die
-    Beschreibung nicht stimmig ist -- etwa wenn ein Querschnitt auf ein
-    geloeschtes Material verweist.
+    Wirft :class:`~opencivil.projekt.lesen.ProjektFehler`, wenn die Form
+    der Beschreibung nicht stimmt oder was alle teilen -- zwei Materialien
+    mit demselben Namen. Was nur ein Material oder ein Bauteil betrifft,
+    haelt nur dieses an (:meth:`Aufbau.unfertig`): ein Wert, den der Kern
+    abweist, ein Verweis auf ein Material, das es nicht mehr gibt oder das
+    selbst nicht rechnet, alles, was beim Bauen eines Bauteils scheitert
+    (Benutzer, 2026-11-19: der Rest rechnet weiter).
 
     Mit ``schnell`` lassen Nachweise teure Nebenrechnungen weg, die das
     Urteil nicht aendern -- die Suche nach der Knickgrenzkraft und die
@@ -94,7 +101,7 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
     """
     projekt.pruefen()
-    projekt.inhalt_pruefen()
+    inhalt_pruefen(projekt, "Projekt", ohne={"materialien", *(art.liste for art in BAUTEILE)})
     werk = Rechenwerk()
     aufbau = Aufbau(werk=werk, schnell=schnell)
 
@@ -105,14 +112,25 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
         je_art[m.art] = je_art.get(m.art, 0) + 1
     for eintrag in projekt.materialien:
         index = eintrag.anzeigename if je_art[eintrag.art] > 1 else ""
-        aufbau.baustoffe[eintrag.kennung] = baustoff_bauen(eintrag, index)
+        wo = ort_von(eintrag)
+        try:
+            inhalt_pruefen(eintrag, wo)
+            aufbau.baustoffe[eintrag.kennung] = baustoff_bauen(eintrag, index, wo)
+        except ProjektFehler as fehler:
+            aufbau.unfertig("materialien", eintrag, wo, ohne_ort(fehler, wo))
 
     # Auch im schnellen Aufbau jedes Bauteil: die Formelsammlung entsteht aus
     # ihm. Die Bewehrungssuche loest nur Nachweisziele, ein System kostet sie
     # also nur das Anmelden.
     for art in BAUTEILE:
         for eintrag in getattr(projekt, art.liste):
-            teil = art.bauen(art, eintrag, aufbau)
+            wo = ort_von(eintrag)
+            try:
+                _vorab_pruefen(eintrag, wo, aufbau)
+                teil = art.bauen(art, eintrag, aufbau)
+            except ProjektFehler as fehler:
+                aufbau.unfertig(art.liste, eintrag, wo, ohne_ort(fehler, wo))
+                continue
             if teil is not None:
                 aufbau.teile[eintrag.kennung] = teil
 
@@ -121,6 +139,26 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
 
     ueberschreibungen_setzen(projekt, werk, aufbau)
     return aufbau
+
+
+def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau) -> None:
+    """
+    Was ein Bauteil aufhaelt, bevor es gebaut wird: ein Material, das selbst
+    nicht rechnet, und ein Wert, den der Kern abweist
+    (:func:`~opencivil.projekt.lesen.inhalt_pruefen`). Ein Verweis auf ein
+    Material, das es nicht mehr gibt, meldet sich beim Bauen, mit dem, was
+    darauf zeigt (:func:`~opencivil.projekt.aufbau.kern.material`).
+
+    Bis 2026-11-19 hielt jedes davon das ganze Projekt an -- auch einen
+    Verweis ins Leere erreichte die Bedienung: der Beton eines Pfahls, der
+    als Mikropfahl keinen braucht und darum loeschen liess.
+    """
+    for kennung in eintrag.materialien():
+        stoff = aufbau.unfertige.get(kennung)
+        if stoff is not None:
+            raise ProjektFehler(f"{wo}: das Material «{stoff.name}» rechnet nicht -- warum, "
+                                f"steht bei ihm.")
+    inhalt_pruefen(eintrag, wo)
 
 
 # ===========================================================================

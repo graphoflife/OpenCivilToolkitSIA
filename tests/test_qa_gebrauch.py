@@ -27,6 +27,7 @@ from opencivil.projekt.querschnittsanalyse import (
 from opencivil.nachweis.stabgrenzen import stabangaben
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.interaktion import Querschnitt
+from tests.unfertig import meldung
 
 #: Die Kennwerte von C30/37 und B500B, wie das Rechenwerk sie liefert.
 E_S, F_YK, F_YD, F_CTM, E_CM = 200e9, 500e6, 500e6 / 1.15, 2.9e6, 33.62e9
@@ -317,9 +318,7 @@ class TestBeschreibung(unittest.TestCase):
         p, a = rechteck()
         a.haeufig.lastfall("H", M_y_Ed=1.0)
         a.haeufig.lastfall("H", M_y_Ed=2.0)
-        with self.assertRaises(ProjektFehler) as fehler:
-            p.aufbauen()
-        self.assertIn("Querschnitt 'Balken': der Name 'H' ist zweimal", str(fehler.exception))
+        self.assertIn("Querschnitt 'Balken': der Name 'H' ist zweimal", meldung(p))
 
 
 if __name__ == "__main__":

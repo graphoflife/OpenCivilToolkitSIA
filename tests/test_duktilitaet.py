@@ -8,6 +8,7 @@ from opencivil.nachweis import duktilitaet
 from opencivil.material.betonstahl import betonstahl
 from opencivil.projekt import MaterialEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
+from tests.unfertig import meldung
 
 
 def projekt_mit(an: bool = True, **abweichungen) -> Projekt:
@@ -332,10 +333,9 @@ class TestEigeneGrenze(unittest.TestCase):
     def test_ausserhalb_ist_ein_fehler_mit_grund(self):
         for grenze in (0.0, 0.6):
             with self.subTest(grenze=grenze):
-                with self.assertRaises(ProjektFehler) as fehler:
-                    projekt_mit(x_d_max=grenze).aufbauen()
-                self.assertIn("k der Grenze x/d", str(fehler.exception))
-                self.assertIn("höchstens 0.5", str(fehler.exception))
+                text = meldung(projekt_mit(x_d_max=grenze))
+                self.assertIn("k der Grenze x/d", text)
+                self.assertIn("höchstens 0.5", text)
 
     def test_eine_andere_grenze_steht_in_der_herleitung(self):
         """Ein geänderter Beiwert ist eine Annahme -- die muss man finden."""

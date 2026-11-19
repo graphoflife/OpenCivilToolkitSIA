@@ -13,6 +13,7 @@ from opencivil.decke.modell import Flaechenlast, Linienlast, Punktlast
 from opencivil.projekt import BalkensystemEintrag, DeckeEintrag, Projekt, ProjektFehler, beispiele
 from opencivil.projekt.aufbau.decke import modell_von
 from opencivil.web import dienst
+from tests.unfertig import meldung
 
 
 def zwei_felder() -> Projekt:
@@ -100,13 +101,15 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual([(z.fall, z.groesse) for z in d.diagramme],
                          [(gzt, "m_x"), (gzt, "m_y"), (gzt, "v_0"), (gzt, "lager")])
 
-    def test_ein_anteil_ueber_hundert_haelt_das_rechnen_auf(self):
-        """Die Grenzen eines Felds prüft das Rechnen, nicht schon das Zeichnen."""
+    def test_ein_anteil_ueber_hundert_haelt_die_decke_an(self):
+        """
+        Die Grenzen eines Felds prüft das Rechnen, nicht schon das Zeichnen --
+        und es hält nur diese Decke an.
+        """
         p = zwei_felder()
         p.decken[0].zone([(0, 0), (1, 0), (1, 1)], anteil=120.0)
-        with self.assertRaisesRegex(ProjektFehler, "zonen 2: Anteil in Richtung 1 muss mindestens null "
-                                                   "und höchstens 100 % sein, angegeben ist 120 %"):
-            p.aufbauen()
+        self.assertIn("zonen 2: Anteil in Richtung 1 muss mindestens null und höchstens 100 % "
+                      "sein, angegeben ist 120 %", meldung(p))
 
 
 class TestModell(unittest.TestCase):

@@ -7,6 +7,38 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Eine Eingabe, die der Kern abweist, hält nur ihr Bauteil an
+
+Zweiter Schritt der Durchsicht. Der erste liess hart, «was eigentlich nur
+eine verdorbene Datei erzeugt» -- aber die Durchsicht fand Wege dorthin über
+die Bedienung, und die Regel des Benutzers sagt: der Rest rechnet weiter.
+
+- **Vorher:** k_c = 0 bei einer Platte, eine Kriechzahl unter null, zwei
+  Lastfälle gleichen Namens, eine Normsorte mit eigenem Namen, ein
+  gelöschter Beton, den ein Pfahl noch wählt: oben «Fehler», und jedes
+  Bauteil zeigte das Ergebnis zur Eingabe davor.
+- **Jetzt:** nur das Material oder Bauteil, das es betrifft, rechnet nicht
+  und sagt über seinen Eingaben, warum -- «Nichts zu rechnen: k_c muss
+  grösser als null sein, angegeben ist 0.» Wer ein Material nimmt, das
+  nicht rechnet, sagt «das Material «Mein Beton» rechnet nicht -- warum,
+  steht bei ihm.» Oben rechts «alle Nachweise erfüllt · 4 Bauteilen und
+  einem Material fehlt noch etwas».
+- Ein Material, das ein Bauteil wählt, heisst in der Meldung nach seinem
+  Feld: «Beton: das Material 'b1' gibt es nicht mehr -- eines wählen.»,
+  «Stahl: noch kein Material gewählt.» Vorher stand der Name des Bauteils
+  doppelt, sobald die Meldung am Bauteil stand («Platte 'Decke': Platte
+  'Decke' verweist auf …»). Dafür gibt `ort_von` dem gelesenen Eintrag
+  denselben Ort wie die Prüfung der Datei.
+- Im Kern prüft `aufbauen` das Projekt ohne seine Listen. Jedes Material
+  und jedes Bauteil prüft und baut sich dann für sich, und was dabei
+  scheitert (`ProjektFehler`), wird `Aufbau.unfertig` -- mit seinem Ort,
+  damit es im Bericht lautet wie vorher (`Unfertiges.meldung`).
+- Hart bleibt, was alle betrifft: die Form der Datei, zwei gleiche
+  Kennungen, zwei Materialien desselben Namens. Die Bewehrungssuche nimmt
+  ein unfertiges Bauteil als Nein, wie vorher den Fehler.
+- Rund hundert Tests erwarteten den Fehler; sie prüfen jetzt die Meldung
+  des unfertigen Eintrags (`tests/unfertig.py`).
+
 ## 2026-11-19 · Ein unfertiges Bauteil hält nur sich auf
 
 Der Benutzer bat um beides: den Schalter «E-Modul» (unten) und eine

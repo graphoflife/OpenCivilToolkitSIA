@@ -4,6 +4,7 @@ import unittest
 
 from opencivil.nachweis import knicken as knick_modul
 from opencivil.projekt import KnickEintrag, Projekt, ProjektFehler
+from tests.unfertig import meldung
 
 
 def rechnen(projekt: Projekt):
@@ -396,9 +397,7 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
         projekt = Projekt.beispiel()
         for name, wert in abweichungen.items():
             setzen(projekt.querschnitte[0], name, wert)
-        with self.assertRaises(ProjektFehler) as fehler:
-            projekt.aufbauen()
-        return str(fehler.exception)
+        return meldung(projekt)
 
     def test_ein_eigener_fall_heisst_wie_ein_abgeleiteter(self):
         from opencivil.projekt import GebrauchsfallEintrag

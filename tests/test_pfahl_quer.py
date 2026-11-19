@@ -16,10 +16,11 @@ from opencivil.pfahl.boden import Profil
 from opencivil.pfahl.erdwiderstand import Erdwiderstand, Festigkeit, Linie, brueche
 from opencivil.pfahl.innen import Masse, biegewiderstand, querschnitt
 from opencivil.pfahl.quer import GAMMA_M_QUER
-from opencivil.projekt import Projekt, ProjektFehler
+from opencivil.projekt import Projekt
 from opencivil.querschnitt.interaktion import Werkstoff
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.web import dienst
+from tests.unfertig import meldung
 
 
 def projekt(**felder):
@@ -282,17 +283,14 @@ class TestNachweis(unittest.TestCase):
     def test_regeln(self):
         """η_a,tr höchstens wie gerechnet; mit R_a,k aus dem Versuch prüft quer die Schichten."""
         p, _ = im_kies(eta_tr=0.8)
-        with self.assertRaises(ProjektFehler) as fehler:
-            p.aufbauen()
-        self.assertIn("η_a,tr = 0.8 liegt über 0.7", str(fehler.exception))
+        text = meldung(p)
+        self.assertIn("η_a,tr = 0.8 liegt über 0.7", text)
         q, t = projekt(grundlage="statisch", eta_a=1.0, R_ak=3000.0, R_ak_zug=1000.0)
         t.schicht("Kies", d=20.0, phi_k=0.0)
         t.kombination("K", N_Ed=1000.0)
         q.aufbauen()
         t.kombinationen[0].H_Ed = 50.0
-        with self.assertRaises(ProjektFehler) as fehler:
-            q.aufbauen()
-        self.assertIn("drainiert braucht φ'_k über null", str(fehler.exception))
+        self.assertIn("drainiert braucht φ'_k über null", meldung(q))
 
 
 class TestWasDieOberflaecheSieht(unittest.TestCase):

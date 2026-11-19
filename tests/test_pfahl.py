@@ -16,6 +16,7 @@ from opencivil.pfahl import buch
 from opencivil.projekt import PfahlEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
 from opencivil.web.api import katalog
+from tests.unfertig import meldung
 
 #: f_yd von B500B in N/mm², f_cd von C30/37, E_s -- die Handrechnung nimmt sie so.
 F_YD = 500.0 / 1.15
@@ -191,9 +192,7 @@ class TestFaktorenDerNorm(unittest.TestCase):
             t.schicht("Kies", d=20.0)
             t.kombination("K", N_Ed=100.0)
             with self.subTest(grundlage=grundlage):
-                with self.assertRaises(ProjektFehler) as fehler:
-                    p.aufbauen()
-                self.assertIn(f"SIA 267:2013, 9.5.2.2.5, {gleichung}", str(fehler.exception))
+                self.assertIn(f"SIA 267:2013, 9.5.2.2.5, {gleichung}", meldung(p))
 
     def test_eta_i_ueber_0_8_mit_hinweis_hoechstens_0_9(self):
         p, t = projekt(eta_i=0.9)
@@ -203,9 +202,7 @@ class TestFaktorenDerNorm(unittest.TestCase):
         self.assertAlmostEqual(innen.R_id, 0.9 * innen.R_mat)
         self.assertTrue(any("9.5.2.4.9" in h for h in hinweise(loesung)))
         t.eta_i = 0.95
-        with self.assertRaises(ProjektFehler) as fehler:
-            p.aufbauen()
-        self.assertIn("η_i", str(fehler.exception))
+        self.assertIn("η_i", meldung(p))
 
 
 class TestInnererWiderstand(unittest.TestCase):
@@ -299,9 +296,7 @@ class TestEintrag(unittest.TestCase):
                 t.schicht("Kies", **{"d": 20.0, **schicht})
             t.kombination("K", N_Ed=100.0)
             with self.subTest(satz=satz):
-                with self.assertRaises(ProjektFehler) as fehler:
-                    p.aufbauen()
-                self.assertIn(satz, str(fehler.exception))
+                self.assertIn(satz, meldung(p))
 
     def test_ohne_baugrund_rechnet_nur_der_pfahl_nicht(self):
         """
@@ -331,8 +326,7 @@ class TestEintrag(unittest.TestCase):
         t.schicht("Kies", d=20.0)
         t.kombination("A", N_Ed=100.0)
         t.kombination("A", N_Ed=200.0)
-        with self.assertRaises(ProjektFehler):
-            p.aufbauen()
+        self.assertIn("der Name 'A' ist zweimal als Kombination vergeben", meldung(p))
 
     def test_ein_wort_das_es_nicht_gibt(self):
         p, t = projekt()

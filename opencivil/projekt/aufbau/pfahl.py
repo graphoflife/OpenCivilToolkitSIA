@@ -19,7 +19,7 @@ from opencivil.pfahl.innen_quer import InnererQuerwiderstand
 from opencivil.pfahl.pfahl import Kombination, Pfahl
 from opencivil.pfahl.quer import AeussererQuerwiderstand
 from opencivil.pfahl.steifigkeit import Pfahlsteifigkeit
-from opencivil.projekt.lesen import als_groesse
+from opencivil.projekt.lesen import als_groesse, ort_von
 from opencivil.projekt.pfahl import PfahlEintrag
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, material
@@ -42,10 +42,10 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Optional[
     (:func:`~opencivil.projekt.lesen.als_groesse`).
     """
     g = partial(als_groesse, eintrag)
-    wo = f"Pfahl '{eintrag.name}'"
+    wo = ort_von(eintrag)
     fehlt = eintrag.fehlender_baugrund()
     if fehlt:
-        return aufbau.unfertig(art, eintrag, wo, fehlt)
+        return aufbau.unfertig(art.liste, eintrag, wo, fehlt)
     schichten = [Pfahlschicht(name=s.name, verhalten=s.verhalten, mantel=s.mantel,
                               **{k: als_groesse(s, k) for k in (
                                   "d", "gamma", "phi_k", "c_k", "s_u", "q_s", "K",
@@ -57,9 +57,10 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Optional[
         schichten=schichten, grundlage=eintrag.grundlage, eta_a=g("eta_a"), R_ak=g("R_ak"),
         R_ak_zug=g("R_ak_zug"), spitze=eintrag.spitze, abscheren=eintrag.abscheren,
         q_b=g("q_b"), eta_i=g("eta_i"),
-        stahl=material(aufbau.baustoffe, eintrag.stahl, "betonstahl", wo),
-        beton=(material(aufbau.baustoffe, eintrag.beton, "beton", wo) if eintrag.bohrpfahl
-               else None),
+        stahl=material(aufbau.baustoffe, eintrag.stahl, "betonstahl", wo,
+                       "Längsbewehrung" if eintrag.bohrpfahl else "Stahl"),
+        beton=(material(aufbau.baustoffe, eintrag.beton, "beton", wo, "Beton")
+               if eintrag.bohrpfahl else None),
         n=g("n"), phi_l=g("phi_l"), c=g("c"), phi_w=g("phi_w"), s_w=g("s_w"),
         tragglied=eintrag.tragglied,
         d_a=g("d_a"), t_r=g("t_r"), dt=g("dt"), kopf=eintrag.kopf, t_red=g("t_red"),

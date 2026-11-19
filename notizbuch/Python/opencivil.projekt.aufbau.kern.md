@@ -1,5 +1,5 @@
 ---
-erzeugt: 8aa2fc106b64
+erzeugt: 5589d464f45e
 art: modul
 tags: [modul]
 ---
@@ -42,23 +42,24 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `baustoffe: Dict[str, Baustoff] = field(default_factory=dict)`
 - `kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)` – Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet.
 - `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
-- `unfertige: Dict[str, 'Unfertiges'] = field(default_factory=dict)` – Je Bauteil, dem noch etwas fehlt, was: eine Querschnittsanalyse ohne Zeichnung, eine Platte ohne Bewehrung, ein Pfahl ohne Schicht ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]]). Es wird kein Bauteil, aber wer auf es zeigt, soll hoeren, was ihm fehlt, und nicht, es gebe es nicht.
+- `unfertige: Dict[str, 'Unfertiges'] = field(default_factory=dict)` – Je Bauteil oder Material, dem noch etwas fehlt, was: eine Querschnittsanalyse ohne Zeichnung, eine Platte ohne Bewehrung, ein Pfahl ohne Schicht, ein Wert, den der Kern abweist ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]]). Es wird nicht gebaut, aber wer auf es zeigt, soll hoeren, was ihm fehlt, und nicht, es gebe es nicht.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x` -- die Richtung steht noch im Schluessel der Platte, damit Wert-IDs in abgelegten Berichten nicht wechseln) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]). `fehlende` rechnet nichts: eine Richtung ohne Bewehrung mit Einwirkungen bekommt so eine Zeile mit Erfuellungsgrad null statt gar keiner.
 
 #### Aufbau.unfertig
 
 ```python
-def unfertig(self, art: 'Bauteilart', eintrag: Any, wo: str, grund: str) -> None
+def unfertig(self, liste: str, eintrag: Any, wo: str, grund: str) -> None
 ```
 
-Ein Bauteil, dem noch etwas fehlt: es rechnet nicht, das Projekt
-schon, und ein Hinweis sagt, was fehlt -- ein unfertiger Zustand ist
-kein Fehler des Projekts (Benutzer, 2026-11-19). Bis dahin hielten
-eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und eine
-halbfertige Zeichnung alles auf. `grund` ist ein Satzteil («noch
-keine Bewehrung») oder ein Satz der Zeichnung, ohne Punkt; `None`
-zurueck, damit eine Baufunktion damit enden kann.
+Ein Bauteil oder Material, dem noch etwas fehlt: es rechnet nicht,
+das Projekt schon, und ein Hinweis sagt, was fehlt -- ein unfertiger
+Zustand ist kein Fehler des Projekts (Benutzer, 2026-11-19). Bis
+dahin hielten eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und
+eine halbfertige Zeichnung alles auf. `liste` ist seine Liste im
+Projekt; `grund` ein Satzteil («noch keine Bewehrung») oder ein
+Satz, ohne Punkt. `None` zurueck, damit eine Baufunktion damit
+enden kann.
 
 #### Aufbau.objekte
 
@@ -215,6 +216,8 @@ den Zwischenspeicher und die Zusammenfassung.
 def bauteil(self, kennung: str) -> 'Bauteil'
 ```
 
+Ein gebautes Bauteil -- fuer eines, dem noch etwas fehlt, sagt der Fehler, was.
+
 #### Aufbau.bauteil_von
 
 ```python
@@ -300,11 +303,34 @@ stehen im Bericht erst die Baustoffe und dann die Bauteile.
 class Unfertiges
 ```
 
-Ein Bauteil, dem noch etwas fehlt -- seine Art, sein Name und was ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
+Ein Bauteil oder Material, dem noch etwas fehlt -- seine Liste im
+Projekt, sein Name, wie es in Meldungen heisst, und was
+([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
 
-- `art: 'Bauteilart'`
+- `liste: str`
 - `name: str`
+- `wo: str`
 - `grund: str`
+
+#### Unfertiges.meldung
+
+```python
+@property
+def meldung(self) -> str
+```
+
+Für wen nach ihm fragt: «Platte 'Decke': noch keine Bewehrung.»
+
+### ohne_ort
+
+```python
+def ohne_ort(fehler: Exception, wo: str) -> str
+```
+
+Die Meldung eines Fehlers als Grund an seiner Stelle: ohne den Ort, der
+dort schon steht, und ohne Punkt -- «k_c muss grösser als null sein,
+angegeben ist 0» statt «Platte 'Decke': k_c muss …», «Schicht 2: …»
+statt «Pfahl 'P', Schicht 2: …».
 
 ### Bauteil
 
@@ -354,18 +380,20 @@ von [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau.NACHWEISFELDER]], dann die wei
 ### baustoff_bauen
 
 ```python
-def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff
+def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str, wo: str) -> Baustoff
 ```
 
 ### material
 
 ```python
-def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wer: str) -> Baustoff
+def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str, feld: str) -> Baustoff
 ```
 
-Das Material, auf das ein Eintrag zeigt: es muss es geben, und es muss
-von dieser Art sein. Ohne Angabe gilt nicht «das erste im Projekt» -- bis
-2026-10-16 bekamen Buegel und Staebe ohne Stahl still den ersten.
+Das Material, das `feld` des Bauteils `wo` waehlt: es muss es geben,
+und es muss von dieser Art sein. Ohne Angabe gilt nicht «das erste im
+Projekt» -- bis 2026-10-16 bekamen Buegel und Staebe ohne Stahl still den
+ersten. `feld` heisst wie in der Oberflaeche: was nicht stimmt, steht
+am Bauteil ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]), dort genuegt das Feld.
 
 ### ueberschreibungen_setzen
 
@@ -373,7 +401,8 @@ von dieser Art sein. Ohne Angabe gilt nicht «das erste im Projekt» -- bis
 def ueberschreibungen_setzen(projekt: 'Projekt', werk: Rechenwerk, aufbau: Aufbau) -> None
 ```
 
-Die von Hand ueberschriebenen Kennwerte -- dass es sie gibt, prueft `baustoff_bauen`.
+Die von Hand ueberschriebenen Kennwerte -- dass es sie gibt, prueft
+`baustoff_bauen`. Ein Material, das nicht rechnet, hat keine.
 
 ### spannungsnachweise
 

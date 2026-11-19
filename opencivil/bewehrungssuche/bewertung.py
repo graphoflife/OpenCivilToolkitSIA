@@ -98,6 +98,11 @@ def bewerte(projekt) -> Bewertung:
     """
     try:
         aufbau = projekt.aufbauen(schnell=True)
+        # Eine Platte, die nicht gebaut wird -- etwa ganz ohne Stahl --, ist
+        # ein Nein wie ein Fehler. Gezaehlt haette sie sonst so viel wie eine,
+        # deren Nachweise alle bei null stehen.
+        for unfertig in aufbau.unfertige.values():
+            return Bewertung(math.inf, 0.0, "", 0, unfertig.meldung)
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(),
                                     ohne_herleitung=True)
     except Exception as fehler:      # Eine unmoegliche Bewehrung ist kein

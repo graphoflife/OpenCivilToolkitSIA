@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Mapping, Optional
 
 from opencivil.core.einheiten import KN, KNM
 from opencivil.material.basis import Baustoff
+from opencivil.projekt.lesen import ort_von
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
 from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
@@ -55,11 +56,11 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     """
     wo = f"Querschnittsanalyse '{eintrag.name}'"
     if eintrag.leer:
-        return aufbau.unfertig(art, eintrag, wo, "noch nichts gezeichnet")
+        return aufbau.unfertig(art.liste, eintrag, wo, "noch nichts gezeichnet")
     try:
         analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     except GeometrieFehler as fehler:
-        return aufbau.unfertig(art, eintrag, wo, str(fehler).rstrip("."))
+        return aufbau.unfertig(art.liste, eintrag, wo, str(fehler).rstrip("."))
     analyse.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag.kennung, eintrag.name, art, analyse)
 
@@ -126,10 +127,10 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     Aus der Beschreibung das Bauteil. Laesst sich die Zeichnung nicht
     rechnen, ein :class:`GeometrieFehler` mit dem ersten Grund.
     """
-    wo = f"Querschnittsanalyse '{eintrag.name}'"
+    wo = ort_von(eintrag)
 
     def stoff(kennung: str, was: str, art: str) -> Baustoff:
-        return material(baustoffe, kennung, art, f"{wo}: {was}")
+        return material(baustoffe, kennung, art, wo, was)
 
     elemente = eintrag.elemente()
     if elemente.fehler:

@@ -18,6 +18,7 @@ from opencivil.bericht.zusammenfassung import zusammenfassen
 from opencivil.projekt import (
     Projekt, ProjektFehler, QuerschnittEintrag, VerformungEintrag, VerformungsfallEintrag,
 )
+from tests.unfertig import meldung
 
 RAUM = "querschnitt.{}.nachweis.verformung"
 FAKTOR = "querschnitt.{}.vergroesserung.omega_w_{}"
@@ -254,34 +255,41 @@ class TestBeschreibung(unittest.TestCase):
 
     def test_unmoegliche_zahlen_melden_sich_erst_beim_rechnen(self):
         """Wie die Masse der Platte: die Datei lässt sich öffnen und korrigieren."""
-        for feld, wert in (("w", -1.0), ("laenge", 0.0)):
+        for feld, wert, satz in (("w", -1.0, "Durchbiegung w kann nicht negativ sein"),
+                                 ("laenge", 0.0, "Spannweite L muss grösser als null sein")):
             with self.subTest(feld=feld):
                 projekt = beispiel(("Feld", 3.5, 6.0, "unten"))
                 setattr(projekt.querschnitte[0].verformung.faelle[0], feld, wert)
                 wieder = Projekt.aus_dict(projekt.als_dict())
-                with self.assertRaises(ProjektFehler):
-                    wieder.aufbauen()
+                self.assertIn(f"verformung, faelle 'Feld': {satz}", meldung(wieder))
 
     def test_was_es_nicht_gibt_meldet_sich(self):
-        for aendern in (
-                lambda v: setattr(v.faelle[0], "zugseite", "links"),
-                lambda v: v.faelle.append(VerformungsfallEintrag("Feld")),
-                lambda v: v.faelle.extend([VerformungsfallEintrag("Feld A"),
-                                           VerformungsfallEintrag("Feld-A")]),
-                lambda v: setattr(v, "kriechzahl", -0.5)):
-            with self.subTest():
+        """
+        Ein Wort, das es nicht gibt, hält schon das Öffnen auf; gleiche Namen
+        und eine Zahl, die der Kern abweist, nur diese Platte.
+        """
+        projekt = beispiel(("Feld", 3.5, 6.0, "unten"))
+        projekt.querschnitte[0].verformung.faelle[0].zugseite = "links"
+        with self.assertRaises(ProjektFehler):
+            projekt.aufbauen()
+        for aendern, satz in (
+                (lambda v: v.faelle.append(VerformungsfallEintrag("Feld")),
+                 "der Name 'Feld' ist zweimal als Verformungsfall vergeben"),
+                (lambda v: v.faelle.extend([VerformungsfallEintrag("Feld A"),
+                                            VerformungsfallEintrag("Feld-A")]),
+                 "'Feld A' und 'Feld-A' unterscheiden sich nur in Satz- oder Leerzeichen"),
+                (lambda v: setattr(v, "kriechzahl", -0.5),
+                 "verformung: Kriechzahl φ kann nicht negativ sein, angegeben ist -0.5.")):
+            with self.subTest(satz=satz):
                 projekt = beispiel(("Feld", 3.5, 6.0, "unten"))
                 aendern(projekt.querschnitte[0].verformung)
-                # Gleiche Namen erst beim Rechnen, das Übrige schon beim Öffnen --
-                # das Bauen prüft beides.
-                with self.assertRaises(ProjektFehler):
-                    projekt.aufbauen()
+                self.assertIn(satz, meldung(projekt))
 
     def test_eine_negative_kriechzahl_in_der_datei(self):
         roh = Projekt.beispiel().als_dict()
         roh["querschnitte"][0]["verformung"]["kriechzahl"] = -1.0
-        with self.assertRaises(ProjektFehler):
-            Projekt.aus_dict(roh).aufbauen()
+        self.assertIn("verformung: Kriechzahl φ kann nicht negativ sein, angegeben ist -1.",
+                      meldung(Projekt.aus_dict(roh)))
 
 
 if __name__ == "__main__":

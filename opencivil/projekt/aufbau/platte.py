@@ -30,6 +30,7 @@ from opencivil.nachweis.querkraft_buegel import QuerkraftMitBuegeln
 from opencivil.nachweis.querkraft_ohne_buegel import QuerkraftOhneBuegel
 from opencivil.querschnitt.platte import Bewehrungslage, Plattenquerschnitt, Richtung
 from opencivil.projekt.eintraege import KombinationEintrag, VerformungsfallEintrag
+from opencivil.projekt.lesen import ort_von
 from opencivil.projekt.platte import QuerschnittEintrag
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, knickfall, material, spannungsnachweise
@@ -52,7 +53,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Opt
     """
     querschnitt = _querschnitt(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     if querschnitt is None:
-        return aufbau.unfertig(art, eintrag, f"Platte '{eintrag.name}'", "noch keine Bewehrung")
+        return aufbau.unfertig(art.liste, eintrag, f"Platte '{eintrag.name}'", "noch keine Bewehrung")
     querschnitt.ins_rechenwerk(aufbau.werk)
     # Bewehrungsmass und Distanzhalter stehen als Kennzahlen da, auch bei
     # einer Platte ohne Nachweis -- ihr Lagenaufbau rechnet darum immer.
@@ -201,11 +202,12 @@ def _querschnitt(
     Der Querschnitt der Platte -- ``None`` ohne jede Bewehrung: ohne sie
     gibt es keinen Widerstand.
     """
-    beton_stoff = material(baustoffe, eintrag.beton, "beton", f"Platte '{eintrag.name}'")
+    wo = ort_von(eintrag)
+    beton_stoff = material(baustoffe, eintrag.beton, "beton", wo, "Beton")
     # Ein Stahl fuer die ganze Platte, Lagen und Buegel (Benutzer, 2026-10-24)
     # -- auch fuer eine leere Lage: ihr Stahl erscheint nur, wo die
     # Mindestbewehrung sie als leer meldet.
-    stahl = material(baustoffe, eintrag.stahl, "betonstahl", f"Die Bewehrung von '{eintrag.name}'")
+    stahl = material(baustoffe, eintrag.stahl, "betonstahl", wo, "Stahl")
 
     lagen: List[Bewehrungslage] = []
     for nummer, lage in enumerate(eintrag.lagen, start=1):

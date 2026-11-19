@@ -15,6 +15,7 @@ from opencivil.geotechnik.setzung import K, einflussfaktor, einflussfaktor_ecke
 from opencivil.projekt import Projekt, ProjektFehler, SetzungEintrag
 from opencivil.web import dienst
 from opencivil.web.api import katalog
+from tests.unfertig import meldung
 
 
 def rechnen(schichten=(("Ton", 4.0, 10.0, 30.0),), **felder):
@@ -228,9 +229,7 @@ class TestEingaben(unittest.TestCase):
                 p = Projekt(name="Probe")
                 s = p.setzung("F", **felder)
                 s.schicht("Ton", **{"d": 2.0, "M_E": 10.0, "M_E_strich": 30.0, **schicht})
-                with self.assertRaises(ProjektFehler) as fehler:
-                    p.aufbauen()
-                self.assertIn(satz, str(fehler.exception))
+                self.assertIn(satz, meldung(p))
 
     def test_eine_steifigkeit_die_es_nicht_gibt(self):
         with self.assertRaises(ProjektFehler) as fehler:

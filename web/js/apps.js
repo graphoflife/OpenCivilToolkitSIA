@@ -174,15 +174,22 @@ function bauteil(name, {
     loeschen: (e) => loeschenWennFrei(a.liste, e, `„${e.name}" ist Querschnitt in`),
     kopieren: (e) => kopieren(zeile, e),
     hinweis: () => a.bezeichnung,
-    // Fehlt ihm noch etwas, steht es über seinen Eingaben -- dort, wo man
-    // es nachträgt (Benutzer, 2026-11-19).
-    editor: (behaelter, e) => ersetzen(behaelter,
-      unfertigHinweis(zustand.loesung?.unfertige?.[a.liste]?.[e.kennung]), ...editor(e)),
+    editor: mitHinweis(a.liste, editor),
     fenster,
     karten,
     uebersicht,
   };
   return zeile;
+}
+
+/**
+ * Die Eingaben eines Eintrags aus ``liste`` -- und darüber, was ihm noch
+ * fehlt, dort, wo man es nachträgt (Benutzer, 2026-11-19): einem Material
+ * wie einem Bauteil.
+ */
+function mitHinweis(liste, editor) {
+  return (behaelter, e) => ersetzen(behaelter,
+    unfertigHinweis(zustand.loesung?.unfertige?.[liste]?.[e.kennung]), ...editor(e));
 }
 
 /**
@@ -205,7 +212,7 @@ const MATERIAL = {
   loeschen: (m) => loeschenWennFrei('materialien', m, `„${m.name || m.sorte}" verwendet von`),
   kopieren: materialKopieren,
   hinweis: materialHinweis,
-  editor: (behaelter, m) => ersetzen(behaelter, ...materialEditor(m)),
+  editor: mitHinweis('materialien', materialEditor),
 };
 
 /**

@@ -31,6 +31,7 @@ from opencivil.querschnitt.geometrie import abstand_strecke_polygon
 from opencivil.projekt import DurchstanzEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
 from opencivil.web.api import katalog
+from tests.unfertig import meldung
 
 #: C30/37 und B500B nach SIA 262 -- τ_cd = 0.3·√f_ck / γ_c, f_yd = f_sk / γ_s.
 TAU_CD = 0.3 * math.sqrt(30.0) / 1.5
@@ -519,18 +520,15 @@ class TestAussparungen(unittest.TestCase):
     def test_aussparung_mit_zwei_ecken(self):
         p = projekt()
         p.durchstanzstellen[0].aussparung([[500, 0], [700, 0]])
-        with self.assertRaises(ProjektFehler) as fehler:
-            p.aufbauen()
-        self.assertIn("Aussparung A1", str(fehler.exception))
+        self.assertEqual(meldung(p), "Durchstanzen 'S': Aussparung A1: ein Polygon braucht "
+                                     "mindestens drei Punkte.")
 
     def test_aussparung_mit_fehlendem_knoten(self):
         p = projekt()
         d = p.durchstanzstellen[0]
         d.aussparung([[500, 0], [700, 0], [700, 200]])
         d.aussparungen[0].knoten.append("K99")
-        with self.assertRaises(ProjektFehler) as fehler:
-            p.aufbauen()
-        self.assertIn("die Knoten K99 gibt es nicht", str(fehler.exception))
+        self.assertIn("die Knoten K99 gibt es nicht", meldung(p))
 
 
 class TestEingaben(unittest.TestCase):
@@ -545,9 +543,7 @@ class TestEingaben(unittest.TestCase):
                              ({"V_d": -1.0}, "Auflagerkraft V_d kann nicht negativ sein"),
                              ({"b_x": 0.0}, "Stütze b_x muss grösser als null sein")):
             with self.subTest(felder=felder):
-                with self.assertRaises(ProjektFehler) as fehler:
-                    projekt(**felder).aufbauen()
-                self.assertIn(satz, str(fehler.exception))
+                self.assertIn(satz, meldung(projekt(**felder)))
 
     def test_eine_lage_die_es_nicht_gibt(self):
         with self.assertRaises(ProjektFehler) as fehler:

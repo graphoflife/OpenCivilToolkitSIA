@@ -1,5 +1,5 @@
 ---
-erzeugt: 15a0bf98d70d
+erzeugt: 98f8d6d49866
 art: modul
 tags: [modul]
 ---
@@ -63,6 +63,7 @@ rechnen, ein [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.biegung]]

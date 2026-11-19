@@ -6230,6 +6230,7 @@
       "kurz": "aus der Beschreibung ein Rechenwerk.",
       "stichworte": [
         "aufbauen",
+        "_vorab_pruefen",
         "Bauteilart"
       ]
     },
@@ -6348,6 +6349,8 @@
         "Aufbau.urteile_von",
         "Aufbau.materialziele",
         "Unfertiges",
+        "Unfertiges.meldung",
+        "ohne_ort",
         "Bauteil",
         "Bauteil.raum",
         "Bauteil.im_feld",
@@ -6629,6 +6632,7 @@
         "_wert_lesen",
         "_zahl_lesen",
         "ort",
+        "ort_von",
         "_ort_roh",
         "_ort",
         "_benannt",
