@@ -7,6 +7,18 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Bilder an den Schaltern: Pfahl
+
+Wie beim Durchstanzen, nach dem Entscheid des Benutzers. Der Kopf des
+Pfahls zeigt «frei drehbar» als Pfahl auf einem Gelenk, «eingespannt» als
+Pfahl in einer Platte; das Tragglied des Mikropfahls im Schnitt das Rohr
+als Ring, den Vollstab als Scheibe. Volle Flächen dürfen dafür ein Loch
+haben (Regel evenodd).
+
+Dass ein Bild `art-wert` heisst, steht jetzt an einer Stelle, `mitBild` in
+bausteine.js – Durchstanzen, Pfahl und die Rechenarten, die das bis dahin
+selbst zusammensetzten, nehmen es von dort.
+
 ## 2026-11-19 · Bilder an den Schaltern: Durchstanzen
 
 Entscheid des Benutzers: wo Wörter nicht reichen, zeigt jede Stellung ein

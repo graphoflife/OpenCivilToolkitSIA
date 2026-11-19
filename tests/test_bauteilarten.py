@@ -92,6 +92,8 @@ class TestSinnbilder(unittest.TestCase):
                           *k["querschnittsanalyse"]["betongesetze"]],
             "lage": k["durchstanzen"]["lagen"],
             "stuetzenform": k["durchstanzen"]["formen"],
+            "kopf": k["pfahl"]["koepfe"],
+            "tragglied": k["pfahl"]["tragglieder"],
         }
         for art, stellungen in familien.items():
             for stellung in stellungen:

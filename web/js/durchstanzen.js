@@ -19,7 +19,7 @@
  */
 
 import {
-  erklaerung, feld, karte, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
+  erklaerung, feld, karte, materialliste, mitBild, namensfeld, panel, wahlBlock, wahlSchalter,
   zahlzeile as feldzeile,
 } from './bausteine.js';
 import { el } from './dom.js';
@@ -123,11 +123,11 @@ function zahlzeile(d, schluessel, text, symbol, { schritt = 1, titel } = {}) {
  * Sinnbild `bild-wert` (sinnbilder.js) -- etwa, wo der Plattenrand liegt.
  */
 function schalter(d, schluessel, liste, titel = '', bild = null) {
+  const werte = katalog('durchstanzen', liste).map((w) => ({
+    wert: w.wert, beschriftung: w.beschriftung, titel: w.beschriftung,
+  }));
   return wahlSchalter({
-    werte: katalog('durchstanzen', liste).map((w) => ({
-      wert: w.wert, beschriftung: w.beschriftung, titel: w.beschriftung,
-      zeichen: bild && `${bild}-${w.wert}`,
-    })),
+    werte: bild ? mitBild(werte, bild) : werte,
     gewaehlt: d[schluessel],
     setzen: (w) => aenderer(d)((x) => { x[schluessel] = w; }),
     titel,

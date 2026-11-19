@@ -10,8 +10,9 @@
  * und keine Bilddatei.
  *
  * Jedes Zeichen ist eine Liste von Pfaden (`d`), Kreisen (`[cx, cy, r]`),
- * vollen Punkten (`voll`, ebenso) und vollen Flächen (`flaechen`, Pfade) --
- * ein Stab ist ein voller Punkt, eine Stütze im Grundriss eine volle Fläche.
+ * vollen Punkten (`voll`, ebenso) und vollen Flächen (`flaechen`, Pfade,
+ * mit Loch nach der Regel evenodd) -- ein Stab ist ein voller Punkt, eine
+ * Stütze im Grundriss eine volle Fläche, ein Rohr im Schnitt ein Ring.
  * Gestrichelt wird, was eine Grenze meint oder nicht mitrechnet.
  */
 
@@ -355,6 +356,23 @@ const ZEICHEN = {
   'stuetzenform-oval': {
     pfade: ['M10 8h4a4 4 0 0 1 0 8h-4a4 4 0 0 1 0-8z'],
   },
+  // Der Kopf eines Pfahls: frei drehbar auf einem Gelenk, eingespannt in einer
+  // Platte -- gestrichelt, wie weit er in ihr steckt.
+  'kopf-frei': {
+    pfade: ['M10 7.5v14h4v-14'],
+    kreise: [[12, 5, 2.5]],
+  },
+  'kopf-eingespannt': {
+    pfade: ['M3 3h18v6H3z', 'M10 9v12.5h4V9'],
+    strich: ['M10 9V5 M14 9V5'],
+  },
+  // Das Tragglied im Schnitt: das Rohr ein Ring, der Vollstab eine Scheibe.
+  'tragglied-rohr': {
+    flaechen: ['M4.5 12a7.5 7.5 0 1 0 15 0a7.5 7.5 0 1 0-15 0z M7.5 12a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0z'],
+  },
+  'tragglied-stab': {
+    voll: [[12, 12, 7.5]],
+  },
 };
 
 /** Ein Zeichen als SVG -- `name` aus der Liste oben. */
@@ -371,6 +389,8 @@ export function sinnbild(name) {
   for (const [cx, cy, r] of z?.voll || []) {
     svg.append(svgEl('circle', { cx, cy, r, fill: 'currentColor', stroke: 'none' }));
   }
-  for (const d of z?.flaechen || []) svg.append(svgEl('path', { d, fill: 'currentColor' }));
+  for (const d of z?.flaechen || []) {
+    svg.append(svgEl('path', { d, fill: 'currentColor', 'fill-rule': 'evenodd' }));
+  }
   return svg;
 }

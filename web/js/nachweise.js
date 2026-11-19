@@ -21,7 +21,7 @@
  * dazu bildet der Kern, sobald der Nachweis läuft.
  */
 
-import { erklaerung, feld, hakenSchalter, wahlSchalter } from './bausteine.js';
+import { erklaerung, feld, hakenSchalter, mitBild, wahlSchalter } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile, formelkopf } from './faelle.js';
 import {
@@ -529,9 +529,9 @@ export function mitKopf(kopf, eingabe, formel = false) {
  * zeigt, wie die Art den Beton rechnet (sinnbilder.js, `rechenart-…`).
  */
 export function rechenartStellungen(liste) {
-  return (liste || []).map((e) => ({
-    wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung, zeichen: `rechenart-${e.wert}`,
-  }));
+  return mitBild((liste || []).map((e) => ({
+    wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung,
+  })), 'rechenart');
 }
 
 function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = false } = {}) {

@@ -23,8 +23,8 @@
  */
 
 import {
-  erklaerung, feld, karte, materialliste, namensfeld, panel, verhaltenSchalter, wahlBlock,
-  wahlSchalter, zahlzeile as feldzeile,
+  erklaerung, feld, karte, materialliste, mitBild, namensfeld, panel, verhaltenSchalter,
+  wahlBlock, wahlSchalter, zahlzeile as feldzeile,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
@@ -85,9 +85,13 @@ function zahlzeile(t, schluessel, text, symbol, { schritt = 1, titel } = {}) {
   return feldzeile('pfahl', t, schluessel, text, symbol, { schritt, titel, aendern: aenderer(t) });
 }
 
-/** Ein Schalter aus den Stellungen des Katalogs: das Wort auf dem Knopf, die Erklärung darüber. */
-function schalter(gewaehlt, liste, setzen, titel = '') {
-  return wahlSchalter({ werte: katalog('pfahl', liste), gewaehlt, setzen, titel });
+/**
+ * Ein Schalter aus den Stellungen des Katalogs: das Wort auf dem Knopf, die
+ * Erklärung darüber. Mit `bild` zeigt jede Stellung ihr Sinnbild `bild-wert`.
+ */
+function schalter(gewaehlt, liste, setzen, titel = '', bild = null) {
+  const werte = katalog('pfahl', liste);
+  return wahlSchalter({ werte: bild ? mitBild(werte, bild) : werte, gewaehlt, setzen, titel });
 }
 
 /** Die Wahl eines Materials: eine Auswahlliste, wie beim Durchstanzen. */
@@ -121,7 +125,8 @@ function querschnittKarte(t) {
   return karte('Tragglied', [
     materialfeld(t, 'stahl', 'betonstahl', 'Stahl'),
     feld('Tragglied', schalter(t.tragglied, 'tragglieder',
-      (w) => aenderer(t)((x) => { x.tragglied = w; }), 'Ein Stahlrohr oder ein Vollstab'), ''),
+      (w) => aenderer(t)((x) => { x.tragglied = w; }), 'Ein Stahlrohr oder ein Vollstab',
+      'tragglied'), ''),
     zahlzeile(t, 'd_a', rohr ? 'Aussendurchmesser' : 'Durchmesser',
       rohr ? 'd_a' : String.raw`\varnothing`, { schritt: 1 }),
     rohr ? zahlzeile(t, 't_r', 'Wanddicke', 't', { schritt: 0.5 }) : null,
@@ -170,7 +175,7 @@ function querlastKarte(t) {
   const berechnung = katalog('pfahl', 'grundlagen').find((g) => g.wert === 'berechnung');
   return karte('Querlast', [
     feld('Kopf', schalter(t.kopf, 'koepfe', (w) => aenderer(t)((x) => { x.kopf = w; }),
-      'Wie der Pfahlkopf gehalten ist'), ''),
+      'Wie der Pfahlkopf gehalten ist', 'kopf'), ''),
     zahlzeile(t, 't_red', 'Abminderung bis', 't_{red}', {
       schritt: 0.5, titel: 'Bis in diese Tiefe unter Terrain wächst die Bettung quer linear von null an (SIA 267:2013, 9.5.4.5)',
     }),

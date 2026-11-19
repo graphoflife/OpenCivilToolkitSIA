@@ -272,6 +272,16 @@ export function wahlSchalter({ werte, gewaehlt, setzen, titel = '', klasse = '' 
 }
 
 /**
+ * Die Stellungen eines Schalters, je mit ihrem Bild `art-wert` aus
+ * sinnbilder.js -- eine Wahl mit Bild, wo Wörter nicht reichen (Benutzer,
+ * 2026-11-19). Jede Stellung des Katalogs hat ihres: das prüft
+ * tests/test_bauteilarten.py.
+ */
+export function mitBild(werte, art) {
+  return werte.map((w) => ({ ...w, zeichen: `${art}-${w.wert}` }));
+}
+
+/**
  * Wie der Boden trägt, drainiert oder undrainiert -- derselbe Schalter im
  * Pfahl und im Grundbruch (Benutzer, 2026-11-19). Die Stellungen und was sie
  * heissen, kommen aus dem Kern (`katalog.verhalten`).
