@@ -7,6 +7,20 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Ein leerer Name hält nur sein Bauteil an
+
+Entscheid des Benutzers. Die Oberfläche nimmt keinen leeren Namen an; aus
+einer bearbeiteten Datei aber liess ein leerer Fallname das ganze Projekt
+nicht mehr öffnen («Platte 'Decke über EG', kombinationen 1: 'name' darf
+nicht leer sein.»). Jetzt öffnet sich die Datei, und nur die Platte sagt
+«Nichts zu rechnen: kombinationen 1: noch kein Name.»; der Rest rechnet.
+
+Der Name ist das eine Pflichtfeld, das nicht schon das Lesen prüft, sondern
+`inhalt_pruefen` vor dem Rechnen (`_ist_name` in `lesen.py`), und dort wie
+am Namensfeld: nur Leerzeichen sind auch kein Name. Andere Pflichttexte
+bleiben beim Lesen. Dass der Ort «kombinationen 1» heisst und nicht
+«Einwirkung 1», steht schon in [[TODO]] (die Wörter der Maske im Ort).
+
 ## 2026-11-19 · Ein doppelter Fallname weist schon das Feld ab
 
 Entscheid des Benutzers. Vorher nahm das Namensfeld jeden Namen, und erst

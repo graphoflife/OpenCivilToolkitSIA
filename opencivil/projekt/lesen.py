@@ -9,7 +9,9 @@ Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
   oder eine Wahl (:class:`~opencivil.core.wahl.Wahl`), deren Mitglieder es
   annimmt;
 * eine Teilmenge davon (:func:`einer_von`) -- die Werte, die es gibt;
-* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein;
+* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein -- ausser einem
+  Namen: ohne ihn haelt erst das Rechnen sein Bauteil an
+  (:func:`inhalt_pruefen`);
 * ein Bereich (:func:`bereich`) -- wo seine Zahl liegen muss.
 
 STRENG:
@@ -396,19 +398,20 @@ def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str:
     """
     Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
     und dort beginnt der Ort neu; alles darin nach seinem Feld und seinem
-    Namen, ohne Namen nach seiner Nummer: «lagen 2».
+    Namen, ohne Namen nach seiner Nummer: «lagen 2». Nur Leerzeichen sind
+    kein Name.
     """
     bezeichnung = getattr(cls, "BEZEICHNUNG", None)
     if bezeichnung:
         return _benannt(bezeichnung, name, kennung) or f"{bezeichnung} {i + 1}"
-    if isinstance(name, str) and name:
+    if isinstance(name, str) and name.strip():
         return f"{wo}, {feld} '{name}'"
     return f"{wo}, {feld} {i + 1}"
 
 
 def _benannt(bezeichnung: str, name: Any, kennung: Any) -> Optional[str]:
     """«Platte 'Decke'», ohne Namen «Platte q1» -- ``None`` ohne beides."""
-    if isinstance(name, str) and name:
+    if isinstance(name, str) and name.strip():
         return f"{bezeichnung} '{name}'"
     if isinstance(kennung, str) and kennung:
         return f"{bezeichnung} {kennung}"
@@ -477,7 +480,7 @@ def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None:
     if typ is str:
         if not isinstance(wert, str):
             raise ProjektFehler(f"{wo}: '{f.name}' muss ein Text sein, nicht {_zeigen(wert)}.")
-        if not wert and _vorgabe(f) is _KEINE:
+        if not wert and _vorgabe(f) is _KEINE and not _ist_name(f):
             raise ProjektFehler(f"{wo}: '{f.name}' darf nicht leer sein.")
     elif typ is bool:
         if not isinstance(wert, bool):
@@ -507,7 +510,12 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
     einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
     ``ohne`` prueft, wer sie einzeln prueft -- der Aufbau jedes Material und
     jedes Bauteil fuer sich (:func:`~opencivil.projekt.aufbau.aufbauen`).
+
+    Zuerst der Name, wo einer Pflicht ist (:func:`_ist_name`): leer oder nur
+    Leerzeichen sagt «noch kein Name», wie das Namensfeld ihn abweist.
     """
+    if any(_ist_name(f) for f in dataclasses.fields(eintrag)) and not eintrag.name.strip():
+        raise ProjektFehler(f"{wo}: noch kein Name.")
     for f in dataclasses.fields(eintrag):
         if f.name in ohne:
             continue
@@ -526,6 +534,17 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
     for liste in eintrag.fallnamen():
         liste.pruefen(wo)
     eintrag.regeln(wo)
+
+
+def _ist_name(f: dataclasses.Field) -> bool:
+    """
+    Ob ein Feld der Name seines Eintrags ist, ohne Vorgabe. Leer haelt er
+    nicht schon das Lesen auf, sondern erst das Rechnen seines Bauteils
+    (:func:`inhalt_pruefen`): bis 2026-11-19 liess ein leerer Fallname aus
+    einer bearbeiteten Datei das ganze Projekt nicht mehr oeffnen (Benutzer:
+    nur seine Platte oder Analyse rechnet nicht).
+    """
+    return f.name == "name" and _vorgabe(f) is _KEINE
 
 
 def _ort_von(element: Any, wo: str, feld: str, i: int) -> str:

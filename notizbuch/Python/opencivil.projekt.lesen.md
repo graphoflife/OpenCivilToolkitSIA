@@ -1,5 +1,5 @@
 ---
-erzeugt: d48423d31a7c
+erzeugt: 810905ca556b
 art: modul
 tags: [modul]
 ---
@@ -16,7 +16,9 @@ Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
   oder eine Wahl ([[opencivil.core.wahl#Wahl|Wahl]]), deren Mitglieder es
   annimmt;
 * eine Teilmenge davon ([[opencivil.projekt.lesen#einer_von|einer_von]]) -- die Werte, die es gibt;
-* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein;
+* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein -- ausser einem
+  Namen: ohne ihn haelt erst das Rechnen sein Bauteil an
+  ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]);
 * ein Bereich ([[opencivil.projekt.lesen#bereich|bereich]]) -- wo seine Zahl liegen muss.
 
 
@@ -307,7 +309,8 @@ def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str
 
 Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
 und dort beginnt der Ort neu; alles darin nach seinem Feld und seinem
-Namen, ohne Namen nach seiner Nummer: «lagen 2».
+Namen, ohne Namen nach seiner Nummer: «lagen 2». Nur Leerzeichen sind
+kein Name.
 
 ### _benannt
 
@@ -348,6 +351,21 @@ Eintrags ueber mehrere Felder, `regeln(wo)`. Die Form ist da schon geprueft: ein
 einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
 `ohne` prueft, wer sie einzeln prueft -- der Aufbau jedes Material und
 jedes Bauteil fuer sich ([[opencivil.projekt.aufbau#aufbauen|aufbauen]]).
+
+Zuerst der Name, wo einer Pflicht ist ([[opencivil.projekt.lesen#_ist_name|_ist_name]]): leer oder nur
+Leerzeichen sagt «noch kein Name», wie das Namensfeld ihn abweist.
+
+### _ist_name
+
+```python
+def _ist_name(f: dataclasses.Field) -> bool
+```
+
+Ob ein Feld der Name seines Eintrags ist, ohne Vorgabe. Leer haelt er
+nicht schon das Lesen auf, sondern erst das Rechnen seines Bauteils
+([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]): bis 2026-11-19 liess ein leerer Fallname aus
+einer bearbeiteten Datei das ganze Projekt nicht mehr oeffnen (Benutzer:
+nur seine Platte oder Analyse rechnet nicht).
 
 ### _ort_von
 

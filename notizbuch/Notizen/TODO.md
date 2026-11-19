@@ -111,7 +111,8 @@ gelernt wurde, steht in [[Entwicklung]].
       («Platte 'Decke über EG', kombinationen 1: 'name' darf nicht leer
       sein.»), statt nur seine Platte (Durchsicht vom 2026-11-19).
       Entschieden (Benutzer, 2026-11-19): nur seine Platte oder Analyse
-      rechnet nicht und sagt am Ort, was fehlt. **Noch offen.**
+      rechnet nicht und sagt am Ort, was fehlt. Erledigt (2026-11-19),
+      siehe [[Entwicklung]].
 - [x] **α_min über α_max schon am Feld abweisen.** Erledigt (2026-11-19):
       `bereich(..., bis_feld="alpha_max")`, siehe [[Entwicklung]]. Vorher
       nahm das Feld α_min = 50° bei α_max = 40° an; die Analyse oder Platte

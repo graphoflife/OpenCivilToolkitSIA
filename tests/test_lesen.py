@@ -87,12 +87,21 @@ class TestStreng(unittest.TestCase):
         del roh["querschnitte"][0]["beton"]
         self.assertIn("das Feld 'beton' fehlt", meldung(roh))
 
-    def test_ein_pflichtfeld_ist_leer(self):
-        roh = platte_roh()
-        roh["querschnitte"][0]["kombinationen"][0]["name"] = ""
-        text = meldung(roh)
-        self.assertIn("Platte 'Decke über EG', kombinationen 1", text)
-        self.assertIn("'name' darf nicht leer sein", text)
+    def test_ein_leerer_name_haelt_nur_sein_bauteil_an(self):
+        """
+        Aus einer bearbeiteten Datei liess er bis 2026-11-19 das ganze Projekt
+        nicht mehr öffnen (Benutzer: nur seine Platte oder Analyse).
+        """
+        for liste, feld, name in (("querschnitte", "kombinationen", ""),
+                                  ("querschnitte", "kombinationen", "  "),
+                                  ("setzungen", "schichten", "")):
+            with self.subTest(liste=liste, name=name):
+                roh = Projekt.beispiel().als_dict()
+                roh[liste][0][feld][0]["name"] = name
+                aufbau = Projekt.aus_dict(roh).aufbauen()
+                kennung = roh[liste][0]["kennung"]
+                self.assertEqual(list(aufbau.unfertige), [kennung])
+                self.assertEqual(aufbau.unfertige[kennung].grund, f"{feld} 1: noch kein Name")
 
     def test_null_nur_wo_leer_etwas_heisst(self):
         """
