@@ -6726,6 +6726,7 @@
         "QuerschnittEintrag.regeln",
         "QuerschnittEintrag.fallnamen",
         "QuerschnittEintrag.ohne_lastfaelle",
+        "QuerschnittEintrag.ohne_querkraft",
         "QuerschnittEintrag.einwirkung",
         "QuerschnittEintrag.knickfall",
         "QuerschnittEintrag.verformungsfall",

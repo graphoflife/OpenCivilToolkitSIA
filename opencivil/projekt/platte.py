@@ -251,6 +251,19 @@ class QuerschnittEintrag(Querschnittsangaben):
         self.quasistaendig.faelle = []
         self.verformung.faelle = []
 
+    def ohne_querkraft(self) -> None:
+        """
+        Die Querkraft aus jeder Tragsicherheitseinwirkung nehmen: der
+        Querkraftnachweis bleibt still, alles andere rechnet wie zuvor. Eine
+        Querkraft hat die Platte nur dort (``V_Ed``).
+
+        Die Laengssuche braucht das, wenn die Buegel mitgesucht werden
+        (``automatik_querkraft``): die Querkraft tragen dann die Buegel, die
+        die Buegelsuche danach findet.
+        """
+        for k in self.kombinationen:
+            k.V_Ed = 0.0
+
     # -- Ohne Oberflaeche ---------------------------------------------------
     #
     # Wer in Python rechnet, soll eine Einwirkung anfuegen koennen, ohne die

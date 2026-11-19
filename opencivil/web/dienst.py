@@ -353,12 +353,22 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
     wie = {"teilungen": eintrag.automatik_teilungen,
            "mindestdurchmesser": eintrag.automatik_mindestdurchmesser}
+    # Mit «Bügel mitsuchen» tragen die Querkraft die Buegel, die die
+    # Buegelsuche danach findet: die Laengssuche prueft sie nicht (Benutzer,
+    # 2026-11-19), auch ohne Buegel nicht -- sonst hinge ihr Ergebnis daran,
+    # ob vorher welche lagen. Bis dahin scheiterte sie bei V_Ed = 400 kN/m an
+    # der Querkraft, mit den alten Buegeln ⌀10@200 wie ohne, und erst ein
+    # zweiter Klick fand die Laengsbewehrung zu den neuen.
+    laengs = projekt
+    if eintrag.automatik_querkraft:
+        laengs = projekt.nur(kennung)
+        laengs.querschnitt(kennung).ohne_querkraft()
     dicke = None
     if eintrag.automatik_dicke:
-        dicke = bewehrungssuche.dicke_suchen(projekt, kennung, modus=modus, **wie)
+        dicke = bewehrungssuche.dicke_suchen(laengs, kennung, modus=modus, **wie)
         ergebnis = dicke.suche or bewehrungssuche.Suchergebnis(modus=modus)
     else:
-        ergebnis = bewehrungssuche.suche(projekt, kennung, modus=modus, **wie)
+        ergebnis = bewehrungssuche.suche(laengs, kennung, modus=modus, **wie)
     # Nur, was jemand liest: die Oberflaeche nimmt gefunden, Begruendung,
     # Duktilitaet, Buegel, Dicke und das fertige Projekt.
     antwort: Dict[str, Any] = {
@@ -380,8 +390,9 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
             eintrag.h = dicke.h
         bewehrungssuche.uebernehmen(projekt, kennung, ergebnis.beste)
 
-    # Die Buegel erst danach: sie haengen an der Laengsbewehrung, weil die
-    # statische Hoehe in den Querkraftwiderstand eingeht.
+    # Die Buegel erst danach, gegen die Querkraft: sie haengen an der
+    # Laengsbewehrung, weil die statische Hoehe in den Querkraftwiderstand
+    # eingeht.
     if eintrag.automatik_querkraft:
         buegel = bewehrungssuche.buegel_suchen(
             projekt, kennung, teilungen=eintrag.automatik_querkraft_teilungen)

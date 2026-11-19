@@ -1,5 +1,5 @@
 ---
-erzeugt: 05b973e08d42
+erzeugt: 34748a648f2c
 art: modul
 tags: [modul]
 ---
@@ -136,6 +136,20 @@ eine Lastfallliste anfuegt, findet sie hier. Ein Test sucht die Listen
 ueber die Typen der Felder und schlaegt an, wenn eine fehlt -- frueher
 stand diese Aufzaehlung in der Suche, und die quasi-staendigen waeren
 dort beinahe vergessen worden.
+
+#### QuerschnittEintrag.ohne_querkraft
+
+```python
+def ohne_querkraft(self) -> None
+```
+
+Die Querkraft aus jeder Tragsicherheitseinwirkung nehmen: der
+Querkraftnachweis bleibt still, alles andere rechnet wie zuvor. Eine
+Querkraft hat die Platte nur dort (`V_Ed`).
+
+Die Laengssuche braucht das, wenn die Buegel mitgesucht werden
+(`automatik_querkraft`): die Querkraft tragen dann die Buegel, die
+die Buegelsuche danach findet.
 
 #### QuerschnittEintrag.einwirkung
 

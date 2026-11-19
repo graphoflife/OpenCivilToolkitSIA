@@ -7,6 +7,28 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Bügel und Längsbewehrung in einem Zug
+
+Entscheid des Benutzers. Mit «Bügel mitsuchen» suchte die Platte erst die
+Längsbewehrung, mit den alten Bügeln, dann die Bügel. Bei V_Ed = 400 kN/m
+und ⌀10@200 scheiterte die Längssuche an der Querkraft, die Bügelsuche fand
+⌀12@200, und erst ein zweiter Klick fand die Längsbewehrung – ohne Bügel
+vorher ebenso. Jetzt prüft die Längssuche mit «Bügel mitsuchen» die
+Querkraft nicht, die Bügelsuche danach schon, zuerst ohne Bügel: ein Klick
+findet beides.
+
+Auch ohne Bügel vorher nicht: so hängt das Ergebnis nicht daran, ob vorher
+welche lagen, und es genügt immer ein Klick. Die Folge: wo etwas mehr
+Längsbewehrung die Bügel erspart hätte, kommen Bügel dazu (h = 300 mm,
+V_Ed = 200 kN/m: 3896 mm² und ⌀8@200 statt 4419 mm² ohne Bügel). Wer das
+nicht will, schaltet «Bügel mitsuchen» aus; das «?» neben dem Schalter sagt
+beides. Ob die Suche stattdessen zuerst ohne Bügel versuchen soll, steht
+in [[TODO]].
+
+Im Dienst (`bewehrung_suchen`), wo die beiden Suchen nacheinander laufen;
+die Querkraft nimmt `QuerschnittEintrag.ohne_querkraft` aus der Kopie der
+Längssuche.
+
 ## 2026-11-19 · Eine zu dünne Platte rechnet nicht
 
 Entscheid des Benutzers. Vorher prüfte die Platte nur, dass die

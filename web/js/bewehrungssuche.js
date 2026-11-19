@@ -9,7 +9,7 @@
  */
 
 import { api } from './api.js';
-import { feld, hakenSchalter, wahlSchalter } from './bausteine.js';
+import { erklaerung, feld, hakenSchalter, wahlSchalter } from './bausteine.js';
 import {
   el, grenzeVerletzt, melden, zahlfeld,
 } from './dom.js';
@@ -39,6 +39,15 @@ export const SUCHE = {
   stand: (q) => (laufendeSuche.has(q.kennung) ? { an: true, text: 'sucht …' }
     : { an: false, text: q.automatik_dicke ? 'mit Dicke' : '' }),
 };
+
+/**
+ * Was «Bügel mitsuchen» bewirkt. Seit 2026-11-19 trägt die Querkraft dann,
+ * was die Bügelsuche findet, und die Längssuche lässt sie weg (Benutzer).
+ */
+const BUEGEL_MITSUCHEN = [
+  ['an', 'erst die Längsbewehrung ohne die Querkraft, dann die Bügel für sie – keine, wo es ohne geht'],
+  ['aus', 'die Längsbewehrung wird auch gegen die Querkraft gesucht, mit den Bügeln, wie sie liegen'],
+];
 
 /**
  * «Automatische Bewehrung» -- die Bewehrung suchen lassen, statt sie zu setzen.
@@ -82,10 +91,10 @@ function automatikInhalt(querschnitt) {
       },
     });
   };
-  const hakenzeile = (an, setzen, text) => el('div.duktilitaetszeile.ist-breit', {}, [
+  const hakenzeile = (an, setzen, text, zusatz = el('span')) => el('div.duktilitaetszeile.ist-breit', {}, [
     hakenSchalter(an, setzen, text),
     el('span.postenname', { text }),
-    el('span'),
+    zusatz,
   ]);
 
   // Die Modi kommen aus dem Kern: ihre Namen stehen dort, wo sie gesucht
@@ -128,7 +137,7 @@ function automatikInhalt(querschnitt) {
     }), 'y-Grundbew. wie x'),
     hakenzeile(quer, (wert) => aendern((q) => {
       q.automatik_querkraft = wert;
-    }), 'Bügel mitsuchen'),
+    }), 'Bügel mitsuchen', erklaerung(BUEGEL_MITSUCHEN)),
     ...(quer ? [feld('Bügelteilungen',
       teilungsfeld('automatik_querkraft_teilungen', 'mm, Raster quadratisch: s_x = s_y'),
       'mm')] : []),
@@ -208,9 +217,9 @@ async function bewehrungErmitteln(kennung) {
   aendern({}, 'bewehrungssuche-start');
   try {
     const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
-    // Übernommen wird, was gefunden ist -- auch Bügel allein: mit ihnen
-    // findet ein zweiter Klick die Längsbewehrung, die mit den alten nicht
-    // aufging. Bis 2026-11-19 gingen sie dann verloren.
+    // Übernommen wird, was gefunden ist -- auch Bügel allein: geht die
+    // Längsbewehrung nicht auf, etwa an der Biegung, passen sie zu der, die
+    // liegen bleibt. Bis 2026-11-19 gingen sie dann verloren.
     if (antwort.gefunden || antwort.buegel?.gefunden) {
       // Der Kern gibt das fertige Projekt zurück; übernommen wird die eine
       // gesuchte Platte, damit die anderen unberührt bleiben -- mit der

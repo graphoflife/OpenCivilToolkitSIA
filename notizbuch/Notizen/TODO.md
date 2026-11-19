@@ -80,14 +80,24 @@ gelernt wurde, steht in [[Entwicklung]].
       (116) (5.5.2.2, 5.5.3.4). Beispiel: h = 200 mm mit Teilung 250 mm --
       erlaubt wären 240 mm. Vorschlag: (116), 1.2·h und 300 mm als
       Bedingung, 5.2.1 und die 20 % als Meldung. Entscheid des Benutzers.
-- [ ] **Bügel und Längsbewehrung in einem Zug suchen.** Mit «Bügel
+- [x] **Bügel und Längsbewehrung in einem Zug suchen.** Erledigt
+      (2026-11-19), siehe [[Entwicklung]]. Vorher: mit «Bügel
       mitsuchen» sucht die Platte erst die Längsbewehrung, mit den alten
       Bügeln, dann die Bügel. Bei V_Ed = 400 kN/m und Bügeln ⌀10@200
       scheitert darum die Längssuche an der Querkraft, die Bügelsuche findet
       ⌀12@200, und erst ein zweiter Klick findet die Längsbewehrung (gesehen
       am 2026-11-19). Vorschlag: mit «Bügel mitsuchen» prüft die Längssuche
       die Querkraft mit Bügeln nicht, die Bügelsuche danach schon.
-      Entschieden (Benutzer, 2026-11-19): so.
+      Entschieden (Benutzer, 2026-11-19): so. Umgesetzt ohne jede Querkraft
+      in der Längssuche, auch ohne Bügel vorher: sonst brauchte es dort
+      weiter zwei Klicks (h = 300 mm, V_Ed = 250 kN/m).
+- [ ] **Mehr Längsbewehrung statt Bügel?** Mit «Bügel mitsuchen» legt die
+      Suche die kleinste Längsbewehrung und dann Bügel, wo nötig: bei
+      h = 300 mm und V_Ed = 200 kN/m 3896 mm² und ⌀8@200. Mit 4419 mm² ginge
+      es ohne Bügel – so sucht sie, wenn der Schalter aus ist. Möglich wäre,
+      mit dem Schalter zuerst ohne Bügel zu suchen und nur, wo das nicht
+      geht, mit; das kostet dann eine zweite Suche. Vorschlag: lassen, der
+      Schalter sagt, wer die Querkraft trägt. Entscheid des Benutzers.
 - [x] **Zu dünne Platte: obere und untere Lagen kreuzen sich.** Erledigt
       (2026-11-19), siehe [[Entwicklung]]. Vorher prüfte die Platte
       nur, dass die Überdeckungen zusammen kleiner sind als h

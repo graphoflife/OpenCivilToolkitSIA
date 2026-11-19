@@ -15,7 +15,7 @@ from unittest import mock
 
 from opencivil import bewehrungssuche as suche
 from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte, vorab_pruefen
-from opencivil.bewehrungssuche.laengs import _ueber_grenze
+from opencivil.bewehrungssuche.laengs import _stahlflaeche, _ueber_grenze
 from opencivil.projekt import (
     KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt, ProjektFehler,
 )
@@ -667,6 +667,50 @@ class TestUeberDenDienst(unittest.TestCase):
             "projekt": platte(automatik_modus="raten").als_dict(), "kennung": "q1"})
         self.assertEqual(antwort.status, 400)
         self.assertIn("grund_ohne", antwort.daten["fehler"])
+
+
+class TestBuegelInEinemZug(unittest.TestCase):
+    """
+    Mit «Bügel mitsuchen» prüft die Längssuche die Querkraft nicht, die
+    Bügelsuche danach schon (Benutzer, 2026-11-19). Bis dahin scheiterte die
+    Längssuche bei V_Ed = 400 kN/m an der Querkraft, mit den alten Bügeln
+    ⌀10@200 wie ohne Bügel, und erst ein zweiter Klick fand die
+    Längsbewehrung.
+    """
+
+    def klick(self, *, buegel: float, V_Ed: float, mitsuchen: bool = True) -> dict:
+        projekt = platte(automatik_querkraft=mitsuchen)
+        q = projekt.querschnitt("q1")
+        for k in q.kombinationen:
+            k.V_Ed = V_Ed
+        q.querkraftbewehrung.durchmesser = buegel
+        q.querkraftbewehrung.abstand_x = q.querkraftbewehrung.abstand_y = 200.0
+        antwort = dienst.bearbeite("bewehrung_suchen", {
+            "projekt": projekt.als_dict(), "kennung": "q1"})
+        self.assertEqual(antwort.status, 200, antwort.daten)
+        return antwort.daten
+
+    def test_ein_klick_genuegt(self):
+        for buegel in (10.0, 0.0):
+            with self.subTest(buegel=buegel):
+                daten = self.klick(buegel=buegel, V_Ed=400.0)
+                self.assertTrue(daten["gefunden"], daten["begruendung"])
+                self.assertTrue(daten["buegel"]["gefunden"], daten["buegel"]["begruendung"])
+                # Mit der Querkraft, die der Längssuche fehlte: alles geht auf.
+                fertig = Projekt.aus_dict(daten["projekt"]).nur("q1")
+                self.assertTrue(ohne_duktilitaet(fertig).erfuellt())
+
+    def test_der_schalter_sagt_wer_die_querkraft_traegt(self):
+        """
+        Bei V_Ed = 200 kN/m, ohne Bügel vorher: ohne «Bügel mitsuchen» mehr
+        Längsbewehrung, damit es ohne Bügel geht; mit ihm die kleinste
+        Längsbewehrung und Bügel dazu.
+        """
+        aus, an = (Projekt.aus_dict(self.klick(buegel=0.0, V_Ed=200.0, mitsuchen=m)["projekt"])
+                   .querschnitt("q1") for m in (False, True))
+        self.assertGreater(_stahlflaeche(aus), _stahlflaeche(an))
+        self.assertEqual(aus.querkraftbewehrung.durchmesser, 0.0)
+        self.assertGreater(an.querkraftbewehrung.durchmesser, 0.0)
 
 
 class TestSchnellerKnicknachweis(unittest.TestCase):
