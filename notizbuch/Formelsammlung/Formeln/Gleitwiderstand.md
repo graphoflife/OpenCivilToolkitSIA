@@ -1,5 +1,5 @@
 ---
-erzeugt: b0f6dc1c5094
+erzeugt: f0d776f4fbe8
 art: formel
 tags: [formel]
 normstelle: ["SIA 267:2013, 8.5.2.2, (31)", "SIA 267:2013, 8.5.2.2, (32)"]
@@ -45,7 +45,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.geotechnik.grundbruch#Gleiten._widerstand|Gleiten._widerstand]]
+- [[opencivil.geotechnik.gleiten#Gleiten._widerstand|Gleiten._widerstand]]
 
 ## Themen
 

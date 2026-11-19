@@ -1,5 +1,5 @@
 ---
-erzeugt: 050de19da28c
+erzeugt: 6661a07efeb3
 art: modul
 tags: [modul]
 ---
@@ -30,6 +30,8 @@ Jede Zahl in der Einheit ihres Feldes ([[opencivil.projekt.lesen#als_groesse|als
 
 ## Braucht
 
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]

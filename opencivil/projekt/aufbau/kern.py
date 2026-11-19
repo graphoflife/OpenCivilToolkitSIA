@@ -41,7 +41,7 @@ from opencivil.querschnitt.platte import Plattenquerschnitt
 from opencivil.projekt.eintraege import (
     Gebrauchsliste, KnickEintrag, MaterialEintrag, SpannungsfallEintrag, abgeleiteter_fallname,
 )
-from opencivil.geotechnik.grundbruch import Fundament
+from opencivil.geotechnik.fundament import Fundament
 from opencivil.geotechnik.setzung import Setzungsfundament
 from opencivil.pfahl.pfahl import Pfahl
 from opencivil.projekt.lesen import Bereich, ProjektFehler

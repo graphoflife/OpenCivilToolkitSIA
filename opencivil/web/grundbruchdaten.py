@@ -25,6 +25,7 @@ from opencivil.core.einheiten import GRAD, KN, M
 from opencivil.core.latex import Mathe
 from opencivil.core.rechenwerk import Loesung
 from opencivil.geotechnik import grundbruch
+from opencivil.geotechnik.fundament import Fundament
 from opencivil.projekt import Aufbau
 from opencivil.web.anzeige import zahl, zahlformel, zeile
 
@@ -76,7 +77,7 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
     }
 
 
-def _legende(fundament: grundbruch.Fundament, befund: Optional[grundbruch.Grundbruchbefund],
+def _legende(fundament: Fundament, befund: Optional[grundbruch.Grundbruchbefund],
              *, gezeichnet: bool) -> List[list]:
     """
     Die Zeilen unter dem Bild, die fuer jede Kombination gelten: das

@@ -1,5 +1,5 @@
 ---
-erzeugt: ecb6f605de12
+erzeugt: 86952b59a1ac
 art: modul
 tags: [modul]
 ---
@@ -381,6 +381,8 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.ergebnis]]
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.nachweis.biegung_normalkraft]]

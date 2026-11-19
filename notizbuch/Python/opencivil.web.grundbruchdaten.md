@@ -1,5 +1,5 @@
 ---
-erzeugt: 9f750c812387
+erzeugt: 6f08080aca33
 art: modul
 tags: [modul]
 ---
@@ -37,7 +37,7 @@ sie nur das Fundament, ohne Gleitkörper und ohne Kräfte.
 ### _legende
 
 ```python
-def _legende(fundament: grundbruch.Fundament, befund: Optional[grundbruch.Grundbruchbefund], *, gezeichnet: bool) -> List[list]
+def _legende(fundament: Fundament, befund: Optional[grundbruch.Grundbruchbefund], *, gezeichnet: bool) -> List[list]
 ```
 
 Die Zeilen unter dem Bild, die fuer jede Kombination gelten: das
@@ -51,6 +51,7 @@ steht bei ihr.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.projekt]]
 - [[opencivil.web.anzeige]]

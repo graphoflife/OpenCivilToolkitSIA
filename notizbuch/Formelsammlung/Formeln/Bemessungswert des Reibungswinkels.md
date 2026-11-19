@@ -1,5 +1,5 @@
 ---
-erzeugt: 62a28229c083
+erzeugt: 3c84aa759b59
 art: formel
 tags: [formel]
 normstelle: "SIA 267:2013, 5.3.2.1, (5)"
@@ -44,7 +44,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.geotechnik.grundbruch|_phi_eff]]
+- [[opencivil.geotechnik.fundament|_phi_eff]]
 
 ## Themen
 

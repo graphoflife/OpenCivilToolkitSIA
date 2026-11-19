@@ -491,12 +491,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Decke). Dabei fällt weg: fünf Regeln `[hidden]` werden eine, 25
         Farbregeln der Verläufe eine Variable je Grösse, `.qa-element*` und
         `.bs-element*` eine Liste, sechs Formen von «leer» zwei.
-      - `grundbruch.py`, 996 seit dem Schalter drainiert/undrainiert
-        (2026-11-19): Fundament mit einem gemeinsamen
-        `Fundamentnachweis` (Vorbild `pfahl/achse.Achsnachweis`), Gleiten und
-        die Tragfähigkeitsfaktoren, die der Pfahl importiert, trennen --
-        rund 700 bleiben. Vor der nächsten Änderung daran: bis 1000 fehlen
-        vier Zeilen.
+      - Erledigt (2026-11-19): `grundbruch.py`, 996 Zeilen, ist geteilt in
+        `fundament.py` mit dem gemeinsamen `Fundamentnachweis`,
+        `grundbruch.py` (639 Zeilen), `gleiten.py` und `tragfaehigkeit.py`.
       - `platte_bilder.js`, 941: der Bemessungspunkt dreimal, das Farbpaar
         erfüllt/nicht erfüllt viermal, Legenden von Hand. Umbau:
         `bemessungspunkt` und `legende` neben `achsenkreuz`.

@@ -1,5 +1,5 @@
 ---
-erzeugt: bee5e13899e1
+erzeugt: c804d0a31a7a
 art: modul
 tags: [modul]
 ---
@@ -7,9 +7,15 @@ tags: [modul]
 > Nachweise im Baugrund.
 > Paket [[opencivil]] · [Quelltext](../../opencivil/geotechnik/__init__.py)
 
-* [[opencivil.geotechnik.grundbruch|grundbruch]] -- ein Flachfundament: die
-  Bemessungswerte des Bodens, der Grundbruchwiderstand N_Rd nach der
-  erweiterten Tragfähigkeitsformel und der Gleitwiderstand T_Rd in der Sohle.
+* [[opencivil.geotechnik.fundament|fundament]] -- ein Flachfundament: seine
+  Vorgaben, die Bemessungswerte des Bodens und was seine zwei Nachweise
+  teilen.
+* [[opencivil.geotechnik.grundbruch|grundbruch]] -- der Grundbruchwiderstand N_Rd
+  nach der erweiterten Tragfähigkeitsformel.
+* [[opencivil.geotechnik.gleiten|gleiten]] -- der Gleitwiderstand T_Rd in der
+  Sohle.
+* [[opencivil.geotechnik.tragfaehigkeit|tragfaehigkeit]] -- die Tragfähigkeitsfaktoren
+  N_q und N_c, die Fundament und Pfahl teilen.
 * [[opencivil.geotechnik.setzung|setzung]] -- ein Flachfundament auf
   geschichtetem Baugrund: die Setzung aus Wieder- und Erstbelastung, mit dem
   Einflussfaktor nach Boussinesq, gegen die zulässige Setzung.
@@ -18,6 +24,9 @@ tags: [modul]
 
 ## Module
 
-- [[opencivil.geotechnik.grundbruch]] – Grundbruch und Gleiten eines Flachfundaments.
+- [[opencivil.geotechnik.fundament]] – ein Flachfundament auf seinem Baugrund.
+- [[opencivil.geotechnik.gleiten]] – das Gleiten eines Flachfundaments in seiner Sohle.
+- [[opencivil.geotechnik.grundbruch]] – der Grundbruch eines Flachfundaments.
 - [[opencivil.geotechnik.setzung]] – die Setzung eines Flachfundaments auf geschichtetem Baugrund.
+- [[opencivil.geotechnik.tragfaehigkeit]] – die Tragfähigkeitsfaktoren N_q und N_c.
 - [[opencivil.geotechnik.verhalten]] – wie ein Boden traegt.

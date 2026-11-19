@@ -48,7 +48,7 @@ from opencivil.core.einheiten import GRAD, KN_PRO_M, KPA, M, M2, Groesse
 from opencivil.core.latex import Mathe, Zelle, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
-from opencivil.geotechnik.grundbruch import tragfaehigkeitsfaktoren
+from opencivil.geotechnik.tragfaehigkeit import tragfaehigkeitsfaktoren
 from opencivil.pfahl import buch
 from opencivil.pfahl.achse import Achsnachweis
 from opencivil.pfahl.boden import Mantel, Profil, Stueck

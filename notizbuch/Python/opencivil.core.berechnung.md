@@ -1,5 +1,5 @@
 ---
-erzeugt: 494395830734
+erzeugt: 5e96fed00254
 art: modul
 tags: [modul]
 ---
@@ -416,6 +416,8 @@ class Nulllinienlage(Prozedur):
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: fb3761368f7e
+erzeugt: 29d4abc60e15
 art: formel
 tags: [formel]
 normstelle: "SIA 267:2013, 5.3.2.1, (5)"
@@ -36,7 +36,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.geotechnik.grundbruch|_s_u_d]]
+- [[opencivil.geotechnik.fundament|_s_u_d]]
 
 ## Themen
 

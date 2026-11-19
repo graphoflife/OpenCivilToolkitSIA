@@ -1,5 +1,5 @@
 ---
-erzeugt: 677b42b57a24
+erzeugt: a2ace46c4f6e
 art: formel
 tags: [formel]
 normstelle: "Kap. 9.2.6"
@@ -36,7 +36,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.geotechnik.grundbruch#tragfaehigkeitsfaktoren|tragfaehigkeitsfaktoren]]
+- [[opencivil.geotechnik.tragfaehigkeit#tragfaehigkeitsfaktoren|tragfaehigkeitsfaktoren]]
 
 ## Themen
 

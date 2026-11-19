@@ -1,62 +1,52 @@
 ---
-erzeugt: 8d29a7a1501b
+erzeugt: 3aff95932c6e
 art: modul
 tags: [modul]
 ---
 > [!abstract] opencivil/geotechnik/grundbruch.py
-> Grundbruch und Gleiten eines Flachfundaments.
+> der Grundbruch eines Flachfundaments.
 > Paket [[opencivil.geotechnik]] · [Quelltext](../../opencivil/geotechnik/grundbruch.py)
 
 ## VERANTWORTUNG
 
-Das [[opencivil.geotechnik.grundbruch#Fundament|Fundament]] -- Boden, Abmessungen, Gelände und Grundwasser als
-Vorgaben, dazu die Bemessungswerte der Scherfestigkeit -- und je
-Einwirkungskombination zwei Nachweise:
-
-* [[opencivil.geotechnik.grundbruch#Grundbruch|Grundbruch]] -- der Grundbruchwiderstand nach der erweiterten
-  Tragfähigkeitsformel (Kap. 9.2.10):
+Der Nachweis [[opencivil.geotechnik.grundbruch#Grundbruch|Grundbruch]]: je Einwirkungskombination der
+Grundbruchwiderstand nach der erweiterten Tragfähigkeitsformel (Kap.
+9.2.10):
 
 ```
-    sigma_f = c N_c s_c d_c i_c g_c b_c
-            + (gamma t + q) N_q s_q d_q i_q g_q b_q
-            + 1/2 gamma b N_gamma s_gamma d_gamma i_gamma g_gamma b_gamma
-    N_Rd    = sigma_f · b · L
-
-und undrainiert, mit s_u (Kap. 9.2.17)::
-
-    sigma_f = 5.1 s_u (1 + s_c + d_c - i_c - b_c - g_c) + (gamma t + q)
+sigma_f = c N_c s_c d_c i_c g_c b_c
+        + (gamma t + q) N_q s_q d_q i_q g_q b_q
+        + 1/2 gamma b N_gamma s_gamma d_gamma i_gamma g_gamma b_gamma
+N_Rd    = sigma_f · b · L
 ```
 
-* [[opencivil.geotechnik.grundbruch#Gleiten|Gleiten]] -- der Gleitwiderstand in der Sohle nach SIA 267:2013,
-  8.5.2.2: drainiert T_Rd = N_Ed · tan delta_d, mit delta_k = min(k_delta ·
-  phi_k; 35°) nach 8.4.1.1 und tan delta_d = tan delta_k / gamma_phi;
-  undrainiert T_Rd = b · L · s_u,d, Gl. (32).
+und undrainiert, mit s_u (Kap. 9.2.17):
 
-Gerechnet wird mit Bemessungswerten: phi_eff = arctan(tan phi_k / gamma_phi)
-und c_eff = c_k / gamma_c, undrainiert s_u,d = s_u,k / gamma_cu (SIA
-267:2013, 5.3.2.1, 5.3.2.2). Ein globaler
-Sicherheitsgrad wie F_stat des Buches kommt nicht dazu; den
-Widerstandsbeiwert gamma_R der Norm (8.5.2.1) setzt die Rechnung 1.0
-(notizbuch/Notizen/TODO.md).
+```
+sigma_f = 5.1 s_u (1 + s_c + d_c - i_c - b_c - g_c) + (gamma t + q)
+```
+
+Dazu der Umriss des Gleitkörpers für das Bild ([[opencivil.geotechnik.grundbruch#gleitkoerper|gleitkoerper]]) und
+die Tabelle der Faktoren für die Zusammenfassung ([[opencivil.geotechnik.grundbruch#faktortabelle|faktortabelle]]).
+Das Fundament und seine Bemessungswerte stehen in
+[[opencivil.geotechnik.fundament|fundament]], N_q und N_c in
+[[opencivil.geotechnik.tragfaehigkeit|tragfaehigkeit]].
 
 
 ## QUELLE
 
-Die Formeln des Grundbruchs stammen aus Lang, Huder, Amann, Puzrin:
-Bodenmechanik und Grundbau, 8. Aufl. 2007, Kap. 9.2 «Tragfähigkeit»; der
-Abschnitt steht an jeder Formel, «Kap.» meint dieses Buch. Wo der Text und
-seine Tabellen auseinandergehen, steht es beim Faktor: b_gamma rechnet nach
-Tabelle 9.2.18 mit tan phi, im Text steht tan alpha. Das Gleiten und die
-Bemessungswerte folgen SIA 267:2013.
+Die Formeln stammen aus Lang, Huder, Amann, Puzrin: Bodenmechanik und
+Grundbau, 8. Aufl. 2007, Kap. 9.2 «Tragfähigkeit»; der Abschnitt steht an
+jeder Formel, «Kap.» meint dieses Buch. Wo der Text und seine Tabellen
+auseinandergehen, steht es beim Faktor: b_gamma rechnet nach Tabelle
+9.2.18 mit tan phi, im Text steht tan alpha.
 
 
 ## WINKEL (Bild 9.2.15)
 
-alpha ist die Neigung der Sohle, positiv, wenn sie gegen T ansteigt -- das
-Abgleiten wird schwerer; beta die Neigung des Geländes, positiv, wenn es vom
-Fundament weg abfällt; delta_R die Neigung der Last gegen die Sohlnormale.
-N steht normal zur Sohle, T in ihrer Richtung. Alle drei Winkel gehen in Grad
-in die Faktoren ein, wie das Kapitel sie schreibt («0.007 arctan t/b»).
+delta_R ist die Neigung der Last gegen die Sohlnormale; was alpha und beta
+sind, sagt [[opencivil.geotechnik.fundament|fundament]]. Alle drei Winkel gehen in
+Grad in die Faktoren ein, wie das Kapitel sie schreibt («0.007 arctan t/b»).
 
 
 ## GRUNDWASSER (Bild 9.2.10)
@@ -83,82 +73,6 @@ def grad(winkel: Groesse) -> float
 ```
 
 Ein Winkel in Grad -- so gehen alpha, beta und arctan(t/b) in die Faktoren ein.
-
-### tragfaehigkeitsfaktoren
-
-```python
-def tragfaehigkeitsfaktoren(p: Protokoll, werte: Zwischenwerte, phi: Wert) -> Tuple[Wert, Wert]
-```
-
-N_q und N_c für den Reibungswinkel `phi` (Kap. 9.2.6), in die
-Herleitung geschrieben -- unter einem Fundament und am Fuss eines Pfahls
-dieselben Formeln ([[opencivil.pfahl.aussen]]). `phi` grösser als null.
-
-### Fundament
-
-```python
-@dataclass
-class Fundament(Rechenobjekt)
-```
-
-Ein Flachfundament auf seinem Baugrund: die Eingaben als Vorgaben im
-Rechenwerk, dazu die Bemessungswerte -- drainiert phi_eff, c_eff und
-gamma', undrainiert s_u,d.
-
-`b` ist die Breite, die kürzere Seite, `L` die Länge; ein
-Streifenfundament ist ein sehr langes.
-
-- `WAS = 'Grundbruch'`
-- `name: str`
-- `verhalten: Verhalten`
-- `phi_k: Groesse`
-- `gamma_phi: Groesse`
-- `c_k: Groesse`
-- `gamma_c: Groesse`
-- `s_u: Groesse`
-- `gamma_cu: Groesse`
-- `gamma: Groesse`
-- `gamma_w: Groesse`
-- `q_Ed: Groesse`
-- `b: Groesse`
-- `L: Groesse`
-- `t1: Groesse`
-- `t: Groesse`
-- `alpha: Groesse`
-- `beta: Groesse`
-- `delta_faktor: Groesse`
-- `praefix: str`
-- `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
-- `berechnungen: List[Berechnung] = field(default_factory=list, init=False)`
-
-#### Fundament.abschnitt
-
-```python
-@property
-def abschnitt(self) -> Abschnitt
-```
-
-Ueberschrift, unter der das Fundament in der Herleitung steht.
-
-### Kombination
-
-```python
-@dataclass(frozen=True)
-class Kombination
-```
-
-Eine Einwirkung auf das Fundament: N normal zur Sohle, T in ihrer Richtung.
-
-- `name: str`
-- `N_Ed: Groesse`
-- `T_Ed: Groesse`
-
-#### Kombination.kennung
-
-```python
-@property
-def kennung(self) -> str
-```
 
 ### Faktoren
 
@@ -211,7 +125,7 @@ Was ausser den Erfüllungsgraden bleibt -- für die Zusammenfassung und das Bild
 ### Grundbruch
 
 ```python
-class Grundbruch(Nachweis)
+class Grundbruch(Fundamentnachweis)
 ```
 
 Der Grundbruchwiderstand N_Rd je Kombination, gegen N_Ed gehalten. Die
@@ -220,6 +134,9 @@ Lastneigung je Kombination.
 
 - `THEMA = 'Grundbruch'`
 - `ART = 'GB'`
+- `FELD = 'grundbruch'`
+- `BODEN = {Verhalten.DRAINIERT: ('phi_eff', 'c_eff', 'gamma', 'gamma_auftrieb')…`
+- `MASSE = ('q_Ed', 'b', 'L', 't1', 't', 'alpha', 'beta')`
 
 #### Grundbruch.pruefe
 
@@ -269,53 +186,6 @@ def _hoch5(klammer: float) -> float
 
 Eine Klammer hoch fünf -- unter null gilt null (siehe Herleitung).
 
-### Gleiten
-
-```python
-class Gleiten(Nachweis)
-```
-
-Der Gleitwiderstand in der Sohle je Kombination nach SIA 267:2013,
-8.5.2.2 -- drainiert aus der Reibung, undrainiert aus der Scherfestigkeit
---, ohne Erdwiderstand, wie im Buch für eine geneigte Sohle.
-
-- `THEMA = 'Gleiten'`
-- `ART = 'GL'`
-
-#### Gleiten.pruefe
-
-```python
-def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
-```
-
-#### Gleiten._sohlreibung
-
-```python
-def _sohlreibung(self, e: Eingaben, p: Protokoll) -> Wert
-```
-
-delta_k nach SIA 267:2013, 8.4.1.1, und daraus der Bemessungswert delta_d.
-
-#### Gleiten._widerstand
-
-```python
-@staticmethod
-def _widerstand(e: Eingaben, p: Protokoll, zw: Zwischenwerte, N: Wert, delta: Optional[Wert]) -> Wert
-```
-
-Drainiert die Reibung unter N, undrainiert die Scherfestigkeit auf der Sohlfläche.
-
-### angaben
-
-```python
-def angaben(fundament: Fundament, werte: Dict[str, Wert]) -> GleichungBlock
-```
-
-Die Angaben über der Tabelle, aus den Werten der Lösung, wie sie
-gerechnet wurden: in der ersten Zeile der Boden mit seinen
-Bemessungswerten, in der zweiten die Masse und das Grundwasser. In einer
-Zeile wären es acht Angaben -- breiter als die Spalte.
-
 ### faktortabelle
 
 ```python
@@ -331,9 +201,7 @@ die Spalte der Kohäsion.
 ## Konstanten
 
 - `N_C_UNDRAINIERT = 5.1` – Der Beiwert der undrainierten Tragfähigkeitsformel, Kap. 9.2.17 -- 5.1, wie das Kapitel ihn schreibt (pi + 2 = 5.14 gerundet).
-- `KAP_AUFLAST = 'Kap. 9.2.5'` – Die Abschnitte des Buches, an den Formeln als Referenz.
-- `KAP_FAKTOREN = 'Kap. 9.2.6'`
-- `KAP_GRUNDWASSER = 'Kap. 9.2.8'`
+- `KAP_GRUNDWASSER = 'Kap. 9.2.8'` – Die Abschnitte des Buches, an den Formeln als Referenz.
 - `KAP_FORMEL = 'Kap. 9.2.10'`
 - `KAP_FORM = 'Kap. 9.2.12'`
 - `KAP_TIEFE = 'Kap. 9.2.13'`
@@ -341,9 +209,6 @@ die Spalte der Kohäsion.
 - `KAP_GELAENDE = 'Kap. 9.2.15'`
 - `KAP_SOHLE = 'Kap. 9.2.16'`
 - `KAP_UNDRAINIERT = 'Kap. 9.2.17'`
-- `KAP_GLEITEN = 'Kap. 9.2.18'`
-- `SOHLREIBUNG_GRENZE = 35.0` – Wie gross der Sohlreibungswinkel delta_k höchstens ist, in Grad -- SIA 267:2013, 8.4.1.1.
-- `OHNE_GAMMA_R = 'Grundbruch- und Gleitwiderstand ohne Widerstandsbeiwert, γ_R = 1.0. …` – Was beide Widerstände annehmen -- die Norm teilt sie noch durch gamma_R.
 - `SPALTEN = (('c', 'Kohäsion'), ('q', 'Seitliche Auflast'), ('g', 'Gewicht Gleitk…` – Die Spalten der Tragfähigkeitsformel, wie die Zusammenfassung sie zeigt.
 
 ## Braucht
@@ -353,25 +218,20 @@ die Spalte der Kohäsion.
 - [[opencivil.core.latex]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
-- [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.wert]]
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.tragfaehigkeit]]
 - [[opencivil.geotechnik.verhalten]]
 
 ## Gebraucht von
 
 - [[opencivil.bericht.zusammenfassung]]
-- [[opencivil.pfahl.aussen]]
 - [[opencivil.projekt.aufbau.grundbruch]]
-- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.web.grundbruchdaten]]
 
 ## Formeln aus diesem Modul
 
 - [[Abstand des Grundwassers unter der Sohle]] · `Grundbruch._grundwasser`
-- [[Bemessungswert der Kohäsion]] · `_c_eff`
-- [[Bemessungswert der undrainierten Scherfestigkeit]] · `_s_u_d`
-- [[Bemessungswert des Reibungswinkels]] · `_phi_eff`
-- [[Bemessungswert des Sohlreibungswinkels]] · `Gleiten._sohlreibung`
 - [[Bruchspannung in der Sohle]] · `Grundbruch._drainierter_fall`
 - [[Bruchspannung in der Sohle]] · `Grundbruch._undrainierter_fall`
 - [[Erweiterte Tragfähigkeitsformel]] · `Grundbruch._drainiert`
@@ -382,7 +242,6 @@ die Spalte der Kohäsion.
 - [[Geländeneigungsfaktor g_c]] · `Grundbruch._drainiert`
 - [[Geländeneigungsfaktor g_c]] · `Grundbruch._undrainiert`
 - [[Geländeneigungsfaktor g_q]] · `Grundbruch._drainiert`
-- [[Gleitwiderstand]] · `Gleiten._widerstand`
 - [[Grundbruchwiderstand]] · `Grundbruch._widerstand`
 - [[Lastneigungsfaktor i_c]] · `Grundbruch._drainierter_fall`
 - [[Lastneigungsfaktor i_c]] · `Grundbruch._undrainierter_fall`
@@ -390,8 +249,6 @@ die Spalte der Kohäsion.
 - [[Lastneigungsfaktor i_γ]] · `Grundbruch._drainierter_fall`
 - [[Neigung der Last]] · `Grundbruch._drainierter_fall`
 - [[Raumlast im Gleitkörper]] · `Grundbruch._grundwasser`
-- [[Raumlast unter Auftrieb]] · `_gamma_auftrieb`
-- [[Reibungswinkel der Sohlfuge]] · `Gleiten._sohlreibung`
 - [[Reichweite des Gleitkörpers]] · `Grundbruch._drainiert`
 - [[Sohlneigungsfaktor b_c]] · `Grundbruch._drainiert`
 - [[Sohlneigungsfaktor b_c]] · `Grundbruch._undrainiert`
@@ -401,8 +258,6 @@ die Spalte der Kohäsion.
 - [[Tiefenfaktor d_c]] · `Grundbruch._drainiert`
 - [[Tiefenfaktor d_c]] · `Grundbruch._undrainiert`
 - [[Tiefenfaktor d_q]] · `Grundbruch._drainiert`
-- [[Tragfähigkeitsfaktor N_c]] · `tragfaehigkeitsfaktoren`
-- [[Tragfähigkeitsfaktor N_q]] · `tragfaehigkeitsfaktoren`
 - [[Tragfähigkeitsfaktor N_γ]] · `Grundbruch._drainiert`
 - [[Tragfähigkeitsformel undrainiert]] · `Grundbruch._undrainiert`
 - [[Überlagerung auf Höhe der Sohle]] · `Grundbruch._grundwasser`

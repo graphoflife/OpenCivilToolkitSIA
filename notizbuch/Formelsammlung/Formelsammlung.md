@@ -1,5 +1,5 @@
 ---
-erzeugt: fd840080ddc4
+erzeugt: fce1728aa1f2
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -491,7 +491,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 - [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
-- [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.grundbruch|_gamma_auftrieb]]
+- [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.fundament|_gamma_auftrieb]]
 - [[Rissmoment bei der Normalkraft]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Schnittgrössen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]

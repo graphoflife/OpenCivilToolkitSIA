@@ -1,5 +1,5 @@
 ---
-erzeugt: eff87a4c6fdc
+erzeugt: eabd818025e4
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -55,8 +55,11 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.durchstanzen.stelle]] – die Durchstanzstelle: Platte, gestützte Fläche, Bewehrung, Last.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
-    - [[opencivil.geotechnik.grundbruch]] – Grundbruch und Gleiten eines Flachfundaments.
+    - [[opencivil.geotechnik.fundament]] – ein Flachfundament auf seinem Baugrund.
+    - [[opencivil.geotechnik.gleiten]] – das Gleiten eines Flachfundaments in seiner Sohle.
+    - [[opencivil.geotechnik.grundbruch]] – der Grundbruch eines Flachfundaments.
     - [[opencivil.geotechnik.setzung]] – die Setzung eines Flachfundaments auf geschichtetem Baugrund.
+    - [[opencivil.geotechnik.tragfaehigkeit]] – die Tragfähigkeitsfaktoren N_q und N_c.
     - [[opencivil.geotechnik.verhalten]] – wie ein Boden traegt.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».
     - [[opencivil.konsole.dienst]] – die Konsole als Dienst für ihren Faden.

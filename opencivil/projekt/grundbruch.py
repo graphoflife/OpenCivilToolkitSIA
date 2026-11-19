@@ -4,7 +4,9 @@ opencivil/projekt/grundbruch.py -- ein Grundbruchnachweis, wie die Oberflaeche i
 VERANTWORTUNG:
 Der :class:`GrundbruchEintrag`: Boden, Fundament, Gelaende und Grundwasser
 als Zahlen, dazu die Einwirkungskombinationen -- als speicherbare
-Datenklasse. Gerechnet wird in :mod:`opencivil.geotechnik.grundbruch`.
+Datenklasse. Gerechnet wird in :mod:`opencivil.geotechnik.fundament` und den
+Nachweisen :mod:`~opencivil.geotechnik.grundbruch` und
+:mod:`~opencivil.geotechnik.gleiten`.
 
 Die Vorgaben der Felder hat der Benutzer genannt (2026-10-16): phi_k = 30°,
 gamma_phi = 1.2, c = 0, gamma_c = 1.5, gamma = 21 und gamma_w = 10 kN/m³,

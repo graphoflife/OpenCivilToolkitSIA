@@ -1,5 +1,5 @@
 ---
-erzeugt: dc3aab4d71a7
+erzeugt: 94a8cdf442ec
 art: formel
 tags: [formel]
 normstelle: "SIA 267:2013, 8.4.1.1, (27), (28)"
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.geotechnik.grundbruch#Gleiten._sohlreibung|Gleiten._sohlreibung]]
+- [[opencivil.geotechnik.gleiten#Gleiten._sohlreibung|Gleiten._sohlreibung]]
 
 ## Themen
 

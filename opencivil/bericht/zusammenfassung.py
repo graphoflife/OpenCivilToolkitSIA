@@ -34,7 +34,7 @@ from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Kennzahl, Wert
 from opencivil.durchstanzen import nachweis as durchstanzen
-from opencivil.geotechnik import grundbruch, setzung
+from opencivil.geotechnik import fundament, grundbruch, setzung
 from opencivil.pfahl import uebersicht as pfahluebersicht
 from opencivil.querschnitt.platte import BREITE_Y_MM, Plattenquerschnitt
 
@@ -262,7 +262,7 @@ def _befund(teil, feld: str, loesung: Loesung):
 
 def _grundbruchangaben(teil, loesung: Loesung) -> Angaben:
     befund = _befund(teil, "grundbruch", loesung)
-    return (grundbruch.angaben(teil.objekt, loesung.werte),
+    return (fundament.angaben(teil.objekt, loesung.werte),
             grundbruch.faktortabelle(befund) if befund is not None else None)
 
 

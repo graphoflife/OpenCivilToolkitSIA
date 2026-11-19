@@ -1,5 +1,5 @@
 ---
-erzeugt: 55a8e4af5845
+erzeugt: ebb96f206790
 art: formel
 tags: [formel]
 ---
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.geotechnik.grundbruch|_gamma_auftrieb]]
+- [[opencivil.geotechnik.fundament|_gamma_auftrieb]]
 
 ## Themen
 

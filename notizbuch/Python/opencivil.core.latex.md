@@ -1,5 +1,5 @@
 ---
-erzeugt: 7be8d77c0495
+erzeugt: 4101ca5e48c6
 art: modul
 tags: [modul]
 ---
@@ -471,6 +471,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.core.protokoll]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]

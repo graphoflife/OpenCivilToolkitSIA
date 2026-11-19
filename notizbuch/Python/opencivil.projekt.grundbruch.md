@@ -1,5 +1,5 @@
 ---
-erzeugt: da0208638f2f
+erzeugt: 0144cb501bec
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,9 @@ tags: [modul]
 
 Der [[opencivil.projekt.grundbruch#GrundbruchEintrag|GrundbruchEintrag]]: Boden, Fundament, Gelaende und Grundwasser
 als Zahlen, dazu die Einwirkungskombinationen -- als speicherbare
-Datenklasse. Gerechnet wird in [[opencivil.geotechnik.grundbruch]].
+Datenklasse. Gerechnet wird in [[opencivil.geotechnik.fundament]] und den
+Nachweisen [[opencivil.geotechnik.grundbruch|grundbruch]] und
+[[opencivil.geotechnik.gleiten|gleiten]].
 
 Die Vorgaben der Felder hat der Benutzer genannt (2026-10-16): phi_k = 30°,
 gamma_phi = 1.2, c = 0, gamma_c = 1.5, gamma = 21 und gamma_w = 10 kN/m³,

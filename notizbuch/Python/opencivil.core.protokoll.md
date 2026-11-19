@@ -1,5 +1,5 @@
 ---
-erzeugt: 8da88dd7162f
+erzeugt: 09c32e304c8b
 art: modul
 tags: [modul]
 ---
@@ -592,8 +592,11 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.geotechnik.tragfaehigkeit]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

@@ -4974,17 +4974,39 @@
       "stichworte": []
     },
     {
-      "name": "opencivil.geotechnik.grundbruch",
-      "pfad": "Python/opencivil.geotechnik.grundbruch.md",
+      "name": "opencivil.geotechnik.fundament",
+      "pfad": "Python/opencivil.geotechnik.fundament.md",
       "art": "modul",
-      "kurz": "Grundbruch und Gleiten eines Flachfundaments.",
+      "kurz": "ein Flachfundament auf seinem Baugrund.",
       "stichworte": [
-        "grad",
-        "tragfaehigkeitsfaktoren",
         "Fundament",
         "Fundament.abschnitt",
         "Kombination",
         "Kombination.kennung",
+        "Fundamentnachweis",
+        "Fundamentnachweis.vergleichen",
+        "angaben"
+      ]
+    },
+    {
+      "name": "opencivil.geotechnik.gleiten",
+      "pfad": "Python/opencivil.geotechnik.gleiten.md",
+      "art": "modul",
+      "kurz": "das Gleiten eines Flachfundaments in seiner Sohle.",
+      "stichworte": [
+        "Gleiten",
+        "Gleiten.pruefe",
+        "Gleiten._sohlreibung",
+        "Gleiten._widerstand"
+      ]
+    },
+    {
+      "name": "opencivil.geotechnik.grundbruch",
+      "pfad": "Python/opencivil.geotechnik.grundbruch.md",
+      "art": "modul",
+      "kurz": "der Grundbruch eines Flachfundaments.",
+      "stichworte": [
+        "grad",
         "Faktoren",
         "Fallergebnis",
         "Grundbruchbefund",
@@ -4994,11 +5016,6 @@
         "Grundbruch._einbindewinkel",
         "gleitkoerper",
         "_hoch5",
-        "Gleiten",
-        "Gleiten.pruefe",
-        "Gleiten._sohlreibung",
-        "Gleiten._widerstand",
-        "angaben",
         "faktortabelle"
       ]
     },
@@ -5035,6 +5052,15 @@
         "Setzung._fall",
         "angaben",
         "schichttabelle"
+      ]
+    },
+    {
+      "name": "opencivil.geotechnik.tragfaehigkeit",
+      "pfad": "Python/opencivil.geotechnik.tragfaehigkeit.md",
+      "art": "modul",
+      "kurz": "die Tragfähigkeitsfaktoren N_q und N_c.",
+      "stichworte": [
+        "tragfaehigkeitsfaktoren"
       ]
     },
     {

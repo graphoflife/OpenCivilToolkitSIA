@@ -1,5 +1,5 @@
 ---
-erzeugt: d46a24a6892c
+erzeugt: 3924d07aa8ff
 art: modul
 tags: [modul]
 ---
@@ -49,6 +49,8 @@ def erklaerung(self) -> str
 
 ## Gebraucht von
 
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.pfahl.boden]]
 - [[opencivil.projekt.grundbruch]]

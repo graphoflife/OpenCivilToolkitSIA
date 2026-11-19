@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c22b6516649
+erzeugt: 38a21974f514
 art: modul
 tags: [modul]
 ---
@@ -74,7 +74,7 @@ nicht, ob eine andere ihren Beton schon angemeldet hat.
 
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.stelle]]
-- [[opencivil.geotechnik.grundbruch]]
+- [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
 - [[opencivil.pfahl.pfahl]]

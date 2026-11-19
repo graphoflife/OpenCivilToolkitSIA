@@ -1,5 +1,5 @@
 ---
-erzeugt: d82f36b078aa
+erzeugt: fde255094630
 art: modul
 tags: [modul]
 ---
@@ -453,6 +453,8 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]

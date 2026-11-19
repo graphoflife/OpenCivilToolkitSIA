@@ -1,5 +1,5 @@
 ---
-erzeugt: ea24d9beb818
+erzeugt: b08c087ecee5
 art: modul
 tags: [modul]
 ---
@@ -250,6 +250,7 @@ hoch, beide, getrennt durch `/`.
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.pfahl.uebersicht]]

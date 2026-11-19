@@ -14,7 +14,9 @@ from functools import partial
 
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.lesen import als_groesse
-from opencivil.geotechnik.grundbruch import Fundament, Gleiten, Grundbruch, Kombination
+from opencivil.geotechnik.fundament import Fundament, Kombination
+from opencivil.geotechnik.gleiten import Gleiten
+from opencivil.geotechnik.grundbruch import Grundbruch
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, ohne_kombination
 

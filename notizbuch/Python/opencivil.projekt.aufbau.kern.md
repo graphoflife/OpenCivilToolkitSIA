@@ -1,5 +1,5 @@
 ---
-erzeugt: 484e2d54b6b1
+erzeugt: af517962bda8
 art: modul
 tags: [modul]
 ---
@@ -545,7 +545,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
 - [[opencivil.decke.werk]]
-- [[opencivil.geotechnik.grundbruch]]
+- [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.arten]]
 - [[opencivil.material.basis]]

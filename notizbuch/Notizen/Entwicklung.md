@@ -7,6 +7,25 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-19 · Grundbruch in vier Dateien
+
+`opencivil/geotechnik/grundbruch.py` stand bei 996 Zeilen; der Umbau der
+Tragfähigkeitsformel hätte die Grenze von 1000 überschritten. Jetzt:
+
+- `fundament.py`: das Fundament mit seinen Bemessungswerten, die
+  Kombination und was Grundbruch und Gleiten teilen – der
+  `Fundamentnachweis` mit dem Erfüllungsgrad je Kombination, den Eingängen
+  je Verhalten und dem Vergleich von Einwirkung und Widerstand samt dem Satz
+  für die Tabelle. Vorbild ist der Achsnachweis des Pfahls. Dazu die
+  Angaben über der Tabelle der Zusammenfassung.
+- `grundbruch.py`: der Grundbruch, 639 Zeilen.
+- `gleiten.py`: das Gleiten.
+- `tragfaehigkeit.py`: N_q und N_c, die auch der Fuss eines Pfahls braucht –
+  der Pfahl hängt damit nicht mehr am Grundbruch.
+
+Weggefallen ist der Verweis «Kap. 9.2.18», den keine Formel brauchte. Die
+Rechnung ist dieselbe; der Schnappschuss der Berichte bleibt.
+
 ## 2026-11-19 · Bilder an den Schaltern: Querschnittsanalyse
 
 Die letzte Gruppe. Die Art einer Bewehrungslinie zeigt je Stellung, wie die

@@ -1,5 +1,5 @@
 ---
-erzeugt: c39afd861110
+erzeugt: e94627a440d0
 art: modul
 tags: [modul]
 ---
@@ -312,8 +312,11 @@ def beschreibung(self) -> str
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
 - [[opencivil.ergebnis]]
+- [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.geotechnik.tragfaehigkeit]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

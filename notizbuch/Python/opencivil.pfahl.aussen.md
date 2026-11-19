@@ -1,5 +1,5 @@
 ---
-erzeugt: 1111b76e1804
+erzeugt: 34e416bb71cf
 art: modul
 tags: [modul]
 ---
@@ -144,7 +144,7 @@ R_a,d = η_a · R_a,k / γ_M,a (42) -- auf Druck oder auf Zug.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
-- [[opencivil.geotechnik.grundbruch]]
+- [[opencivil.geotechnik.tragfaehigkeit]]
 - [[opencivil.pfahl.achse]]
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.buch]]
