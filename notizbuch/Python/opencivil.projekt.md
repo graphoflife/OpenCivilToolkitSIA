@@ -1,5 +1,5 @@
 ---
-erzeugt: e781939b7351
+erzeugt: a45e3f619a56
 art: modul
 tags: [modul]
 ---
@@ -45,12 +45,13 @@ skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                gerechnet
 projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                Speichern, das Beispiel
+mappe.py       mehrere Projekte in einer Datei, jedes mit eigenem Namen
 aufbau/        aus der Beschreibung ein Rechenwerk: der Kern und je
                Bauteilart ein Modul
 ```
 
 Die Abhaengigkeit laeuft in eine Richtung: lesen \<- eintraege \<- platte \<-
-aufbau \<- projekt. Wer von aussen kommt, importiert aus dem Paket, nicht aus den
+aufbau \<- projekt \<- mappe. Wer von aussen kommt, importiert aus dem Paket, nicht aus den
 Modulen: `from opencivil.projekt import Projekt`.
 
 
@@ -84,6 +85,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils -- je Liste verschieden, auch als Kennung.
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
+- [[opencivil.projekt.mappe]] – mehrere Projekte in einer Datei.
 - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
 - [[opencivil.projekt.pfahl]] – ein Einzelpfahl, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
@@ -104,6 +106,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.mappe]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]

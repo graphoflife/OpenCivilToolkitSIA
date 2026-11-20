@@ -335,6 +335,30 @@ a.knopf { display: inline-block; text-decoration: none; }
 .griff { background: var(--rand); cursor: col-resize; }
 .griff:hover, .griff.ist-aktiv { background: var(--blau); }
 
+/* ----------------------------------------------------------- Projekte -- */
+
+/* Die Projekte: ein Reiter je Projekt, das gezeigte blau wie der Reiter der
+   Berechnung, daneben «+». Wer viele hat, bekommt eine zweite Zeile. */
+.projekt-wahl { flex: none; padding: 7px 20px 7px 12px; border-bottom: 1px solid var(--rand); }
+.projektreihe { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.projekt-reiter {
+  display: inline-flex; align-items: center; min-width: 0; max-width: 100%;
+  border: 1px solid var(--rand); border-radius: var(--radius); background: var(--flaeche);
+  color: var(--schrift-matt);
+}
+.projekt-reiter.ist-aktiv { background: var(--blau); border-color: var(--blau); color: #fff; }
+.projekt-knopf, .projekt-weg {
+  border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer;
+}
+.projekt-knopf {
+  padding: 4px 10px; font-size: 12.5px; min-width: 0; max-width: 16em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.projekt-reiter:not(.ist-aktiv):hover { background: var(--flaeche-2); border-color: var(--blau); }
+.projekt-reiter.ist-aktiv .projekt-knopf { cursor: default; font-weight: 500; }
+.projekt-weg { padding: 2px 8px 2px 0; font-size: 14px; line-height: 1; opacity: .75; }
+.projekt-weg:hover { opacity: 1; }
+
 /* --------------------------------------------------------------- Baum -- */
 
 /* Die Apps: dieselben Knöpfe wie die Kapitel einer Platte. Sie rollen nicht
@@ -508,14 +532,22 @@ input[readonly], input:disabled, select:disabled {
 }
 .gesperrt-hinweis b { display: block; }
 
-/* Das Fenster «Neues Material»: wie das Fenster eines Kapitels, aber über
-   der ganzen Seite. */
-dialog.materialwahl {
+/* Ein Fenster über der ganzen Seite -- «Neues Material», eine Rückfrage:
+   wie das Fenster eines Kapitels (`dialogFenster`, fenster.js). */
+dialog.dialogfenster {
   padding: 0; width: min(460px, calc(100vw - 24px)); max-width: none;
   color: var(--schrift);
 }
-dialog.materialwahl::backdrop { background: rgba(16, 24, 40, .35); }
-dialog.materialwahl .fenster-kopf { top: 0; }
+dialog.dialogfenster::backdrop { background: rgba(16, 24, 40, .35); }
+dialog.dialogfenster .fenster-kopf { top: 0; }
+/* Die Rückfrage: der Satz, darunter je Wahl ihr Knopf und was er bewirkt. */
+.rueckfrage-text { margin: 0 0 12px; font-size: 13px; }
+.rueckfrage-wahl {
+  display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 10px;
+  align-items: center; margin-bottom: 8px;
+}
+.rueckfrage-erklaerung { font-size: 12.5px; color: var(--schrift-matt); }
+.rueckfrage-fuss { display: flex; justify-content: flex-end; margin-top: 12px; }
 .materialwahl .unterkapitel + .unterkapitel { margin-top: 12px; }
 .materialwahl-text { margin: 2px 0 8px; font-size: 12.5px; color: var(--schrift-matt); }
 .materialwahl-zeile { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -1464,7 +1496,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
      was man antippen soll, ist hier mindestens 34 px hoch. Gilt für alles,
      was tippbar ist, damit nicht der nächste Knopf wieder zu klein anfängt. */
   .weg, .knopf-zart, .reiter-knopf, .erklaerung-zeichen,
-  .baum-eintrag > button, .fenster-zu {
+  .baum-eintrag > button, .fenster-zu, .projekt-knopf, .projekt-weg {
     min-height: 34px; min-width: 34px;
   }
   /* Die Halbschalter stehen paarweise in engen Zeilen -- ihnen genügt die

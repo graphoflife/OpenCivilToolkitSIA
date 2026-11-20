@@ -11,14 +11,15 @@
 
 import { api, kernBereitstellen, KernFehler } from './api.js';
 import {
-  ablageEinrichten, aendern, horchen, projektAendern, projektSetzen, zustand,
+  ablageEinrichten, aendern, horchen, projektSetzen, zustand,
 } from './zustand.js';
 import {
   alsDateiSichern, ausDateiLaden, gerettete, geretteteHerunterladen, geretteteVerwerfen,
-  imBrowserAblegen, projektHolen,
+  imBrowserAblegen, mappeHolen,
 } from './ablage.js';
 import { el, inhaltMarkieren, melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
+import { dateiAufnehmen, namensfeldEinrichten, projekteZeichnen } from './projekte.js';
 import { berichtZeichnen } from './bericht.js';
 import { konsoleVerbinden } from './konsole.js';
 import { APPS, appVon } from './apps.js';
@@ -202,15 +203,15 @@ function spaeterRechnen() {
 // ===========================================================================
 
 /**
- * Legt das Projekt als .json auf die Platte.
+ * Legt alle Projekte als .json auf die Platte.
  *
- * Im Browser liegt es ohnehin schon -- nach jeder Änderung. Dieser Knopf ist
- * für das, was der Browser nicht kann: eine Datei, die man weitergeben,
+ * Im Browser liegen sie ohnehin schon -- nach jeder Änderung. Dieser Knopf
+ * ist für das, was der Browser nicht kann: eine Datei, die man weitergeben,
  * ablegen und in ein Jahr wieder öffnen kann.
  */
 function speichern() {
   try {
-    const name = alsDateiSichern(zustand.projekt);
+    const name = alsDateiSichern(zustand.mappe, zustand.mappe.projekte.indexOf(zustand.projekt));
     aendern({ ungespeichert: false });
     melden(`${name} gespeichert.`);
   } catch (fehler) {
@@ -218,23 +219,11 @@ function speichern() {
   }
 }
 
+/** Öffnet eine Datei -- ob sie ersetzt oder dazukommt, fragt `dateiAufnehmen`. */
 async function oeffnen() {
   try {
-    const projekt = await ausDateiLaden();
-    if (projekt === null) return;  // abgebrochen
-
-    knoten.projektname.value = projekt.name;
-    // Kommt aus einer Datei, liegt also bereits auf der Platte.
-    imBrowserAblegen(projekt, true);
-    projektSetzen(projekt, {
-      ungespeichert: false,
-      auswahl: null,
-      fenster: null,
-      loesung: null,
-      verfolgung: null,
-    });
-    melden(`Projekt «${projekt.name}» geöffnet.`);
-    await rechnen();
+    const geladen = await ausDateiLaden();
+    if (geladen) await dateiAufnehmen(geladen);
   } catch (fehler) {
     melden(fehler.message, true);
   }
@@ -539,11 +528,17 @@ function geretteterStand(eintrag) {
   ]);
 }
 
-/** Zeichnet neu, was `was` sagt (`aendern`, zustand.js) -- und rechnet, wo es nötig ist. */
+/**
+ * Zeichnet neu, was `was` sagt (`aendern`, zustand.js) -- und rechnet, wo es
+ * nötig ist: ein anderes Projekt sofort, eine Eingabe nach einer Pause.
+ */
 function allesZeichnen(was) {
   const nurMitte = was === 'mitte';
   ohneSprung(() => {
-    if (!nurMitte) baumZeichnen(knoten.apps, knoten.baum);
+    if (!nurMitte) {
+      projekteZeichnen(knoten.projekte, knoten.projektname);
+      baumZeichnen(knoten.apps, knoten.baum);
+    }
     editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis, knoten.fenster);
     if (!nurMitte) rechtsZeichnen();
   });
@@ -565,6 +560,10 @@ function allesZeichnen(was) {
   // Geändert, was in die Rechnung eingeht -> neu rechnen. Nicht bei blossem
   // Blättern und nicht nach einer Änderung an einem Skript.
   if (was === 'projekt' && eingabe !== gerechnet) spaeterRechnen();
+  if (was === 'neu') {
+    clearTimeout(rechenUhr);
+    rechnen();
+  }
 }
 
 // ===========================================================================
@@ -597,6 +596,7 @@ async function starten() {
     umfang: document.getElementById('umfang'),
     reiter: document.getElementById('reiter'),
     projektname: document.getElementById('projektname'),
+    projekte: document.getElementById('projekte'),
     zustandsanzeige: document.getElementById('zustandsanzeige'),
     kernanzeige: document.getElementById('kernanzeige'),
     btnRechnen: document.getElementById('btn-rechnen'),
@@ -611,9 +611,7 @@ async function starten() {
   knoten.btnSpeichern.addEventListener('click', speichern);
   knoten.btnOeffnen.addEventListener('click', oeffnen);
 
-  knoten.projektname.addEventListener('change', (e) => {
-    projektAendern((p) => { p.name = e.target.value; });
-  });
+  namensfeldEinrichten(knoten.projektname);
 
   for (const k of knoten.reiterKnoepfe) {
     k.addEventListener('click', () => {
@@ -649,15 +647,11 @@ async function starten() {
     const kern = await kernBereitstellen(ladeanzeige);
     knoten.kernanzeige.textContent = kern.beschriftung;
 
-    const [katalog, abgelegt] = await Promise.all([api.katalog(), projektHolen()]);
-
-    knoten.projektname.value = abgelegt.projekt.name;
-    projektSetzen(abgelegt.projekt, {
-      katalog,
-      ungespeichert: !abgelegt.gesichert,
-      gerettet: gerettete(),
+    const [katalog, abgelegt] = await Promise.all([api.katalog(), mappeHolen()]);
+    const { mappe, gewaehlt, gesichert } = abgelegt;
+    projektSetzen(mappe.projekte[gewaehlt], {
+      mappe, katalog, ungespeichert: !gesichert, gerettet: gerettete(),
     });
-    await rechnen();
   } catch (fehler) {
     ladeanzeige('');
     zustandsanzeige('Kern nicht bereit', 'ist-fehler');

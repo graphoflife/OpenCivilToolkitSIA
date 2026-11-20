@@ -6799,6 +6799,22 @@
       ]
     },
     {
+      "name": "opencivil.projekt.mappe",
+      "pfad": "Python/opencivil.projekt.mappe.md",
+      "art": "modul",
+      "kurz": "mehrere Projekte in einer Datei.",
+      "stichworte": [
+        "projekt_aus_datei",
+        "_wer",
+        "_im",
+        "Mappe",
+        "Mappe.pruefen",
+        "Mappe._zwischen_pruefen",
+        "Mappe.als_dict",
+        "Mappe.aus_dict"
+      ]
+    },
+    {
       "name": "opencivil.projekt.netz",
       "pfad": "Python/opencivil.projekt.netz.md",
       "art": "modul",
@@ -6896,6 +6912,7 @@
         "Projekt.aufbauen",
         "Projekt.speichern",
         "Projekt.laden",
+        "Projekt.neu",
         "Projekt.beispiel",
         "Projekt.jeder_nachweis"
       ]
@@ -8301,6 +8318,7 @@
         "katalog",
         "beispiel",
         "pruefen",
+        "mappe_pruefen",
         "rechnen",
         "_stromabwaerts",
         "_analysen",

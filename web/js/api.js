@@ -120,8 +120,11 @@ export const api = {
   katalog: () => ruf('katalog', {}),
   /** Das Beispielprojekt -- der Start, wenn nichts abgelegt ist. */
   beispiel: () => ruf('beispiel', {}),
-  /** Prüft eine Beschreibung (aus der Ablage oder aus einer Datei). */
-  pruefen: (projekt) => ruf('pruefen', { projekt }),
+  /**
+   * Prüft eine Mappe, alle Projekte zusammen (aus der Ablage oder aus einer
+   * Datei) -- auch ein einzelnes Projekt, wie bis 2026-11-20 gespeichert.
+   */
+  mappePruefen: (mappe) => ruf('mappe_pruefen', { mappe }),
   /** Die Bauteile, die auf diese Kennung zeigen -- als Material oder als Querschnitt. */
   verweise: (projekt, kennung) => ruf('verweise', { projekt, kennung }),
   /**

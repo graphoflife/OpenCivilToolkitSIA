@@ -81,19 +81,25 @@ export function namensfeld({
 }) {
   return el(`input${klasse}`, {
     type: 'text', value: wert ?? '', title: titel, disabled: gesperrt,
-    on: {
-      change: async (e) => {
-        const name = e.target.value;
-        const grund = name.trim() ? await pruefen(name) : 'Ein Name kann nicht leer sein';
-        if (!grund) {
-          setzen(name);
-          return;
-        }
-        melden(`${grund}: «${wert ?? ''}» bleibt.`, true);
-        e.target.value = wert ?? '';
-      },
-    },
+    on: { change: (e) => nameUebernehmen(e.target, wert ?? '', { pruefen, setzen }) },
   });
+}
+
+/**
+ * Was ein Namensfeld tut, wenn ein Name getippt ist: ihn mit `setzen`
+ * übernehmen, wenn er darf -- sonst sagen, warum nicht, und `bisher` wieder
+ * hinschreiben. Auch für ein Feld, das bleibt, statt neu gezeichnet zu
+ * werden: den Namen des Projekts (index.html).
+ */
+export async function nameUebernehmen(feld, bisher, { pruefen = () => '', setzen }) {
+  const name = feld.value;
+  const grund = name.trim() ? await pruefen(name) : 'Ein Name kann nicht leer sein';
+  if (!grund) {
+    setzen(name);
+    return;
+  }
+  melden(`${grund}: «${bisher}» bleibt.`, true);
+  feld.value = bisher;
 }
 
 /**

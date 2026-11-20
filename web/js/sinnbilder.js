@@ -147,6 +147,10 @@ const ZEICHEN = {
     pfade: ['M10 6h4v15.5h-4z', 'M12 1v3.6 M10.5 3.2l1.5 1.5 1.5-1.5', 'M2.5 8h7.5 M14 8h7.5'],
     strich: ['M2.5 14.5h7.5 M14 14.5h7.5'],
   },
+  // Eine Mappe: die Projekte einer Datei.
+  projekte: {
+    pfade: ['M3 6h6l2 2.5h10V19H3z', 'M3 11h18'],
+  },
   // Eine Konsole: die Aufforderung und eine Zeile dahinter.
   python: {
     pfade: ['M3 4.5h18v15H3z', 'M6.5 9l3 3-3 3', 'M11.5 15.5h5'],

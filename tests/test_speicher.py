@@ -400,10 +400,47 @@ class TestPlaetze(unittest.TestCase):
     def test_der_speicher_waechst_nicht_ohne_ende(self):
         s = speicher.Ergebnisspeicher(plaetze=2)
         for i in range(5):
-            s.merken(f"q{i}", "a", Loesung())
+            s.merken("P", f"q{i}", "a", Loesung())
         self.assertEqual(s.belegt, 2)
-        self.assertIsNone(s.hole("q0", "a"))
-        self.assertIsNotNone(s.hole("q4", "a"))
+        self.assertIsNone(s.hole("P", "q0", "a"))
+        self.assertIsNotNone(s.hole("P", "q4", "a"))
+
+    def test_aufraeumen_laesst_die_anderen_projekte(self):
+        """Eine gelöschte Platte im einen Projekt nimmt dem anderen seine nicht."""
+        s = speicher.Ergebnisspeicher()
+        for projekt in ("Wohnhaus", "Halle"):
+            for kennung in ("q1", "q2"):
+                s.merken(projekt, kennung, "a", Loesung())
+        s.aufraeumen("Wohnhaus", ["q1"])
+        self.assertIsNone(s.hole("Wohnhaus", "q2", "a"))
+        self.assertIsNotNone(s.hole("Wohnhaus", "q1", "a"))
+        self.assertIsNotNone(s.hole("Halle", "q2", "a"))
+
+
+class TestZweiProjekte(unittest.TestCase):
+    """
+    Zwei Projekte mit denselben Kennungen -- jedes zählt von q1 an. Gerechnet
+    wird abwechselnd, wie beim Wechsel in der Oberfläche: jedes behält seine
+    Plätze, und keines bekommt die Zahlen des anderen.
+    """
+
+    def test_abwechselnd_gerechnet_aus_dem_speicher_und_richtig(self):
+        wohnhaus = projekt_mit_zwei_platten()
+        halle = copy.deepcopy(wohnhaus)
+        halle["name"] = "Halle"
+        halle["querschnitte"][0]["h"] = 340
+        dienst.SPEICHER.leeren()
+        for beschreibung in (wohnhaus, halle):
+            rechnen(beschreibung, frisch=False)
+        for beschreibung in (wohnhaus, halle):
+            dienst.SPEICHER.treffer = dienst.SPEICHER.fehlgriffe = 0
+            warm = rechnen(beschreibung, frisch=False)
+            with self.subTest(projekt=beschreibung["name"]):
+                self.assertEqual(dienst.SPEICHER.fehlgriffe, 0)
+                self.assertGreater(dienst.SPEICHER.treffer, 0)
+                self.assertEqual(als_text(warm), als_text(rechnen(beschreibung, frisch=True)))
+                # Kalt gerechnet ist der Speicher leer: das andere wieder auffüllen.
+                rechnen(halle if beschreibung is wohnhaus else wohnhaus, frisch=False)
 
 
 class TestMitgebrachteWerte(unittest.TestCase):

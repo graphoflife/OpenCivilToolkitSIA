@@ -1,5 +1,5 @@
 ---
-erzeugt: 83207a5c7c9a
+erzeugt: 2f5a52e7c80f
 art: modul
 tags: [modul]
 ---
@@ -53,6 +53,17 @@ Eintrag, die Materialien und die Werte, die daraus folgen. Bis 2026-10-18
 rechnete jede Rechnung alle Analysen neu, auch die unveraenderter Bauteile --
 am Pruefprojekt «jeder Nachweis» zwei Drittel jeder Rechnung.
 
+
+## JE PROJEKT
+
+Ein Platz gehoert einem Bauteil eines Projekts, nach dem Namen des Projekts
+und der Kennung -- in einer Mappe heisst jedes Projekt anders
+([[opencivil.projekt.mappe#Mappe|Mappe]]). Nur nach der Kennung verwechselte
+der Speicher nie etwas, das verhindert der Abdruck; aber zwei Projekte haben
+oft dieselben Kennungen, jedes zaehlt von `q1` an, und jeder Wechsel
+zwischen ihnen haette die Plaetze des anderen ueberschrieben und alles neu
+gerechnet.
+
 ## Inhalt
 
 ### abdruck
@@ -82,8 +93,8 @@ class Ergebnisspeicher(Generic[T])
 
 Das Gedaechtnis zwischen zwei Anfragen.
 
-Ein Eintrag je Bauteil, geschluesselt nach Kennung und nur gueltig,
-solange der Abdruck stimmt. Was darin liegt, sagt, wer ihn anlegt: die
+Ein Eintrag je Bauteil, geschluesselt nach Projekt und Kennung und nur
+gueltig, solange der Abdruck stimmt. Was darin liegt, sagt, wer ihn anlegt: die
 Loesung eines Laufs, der die Baustoffe mitgebracht bekam -- sie enthaelt
 nur, was das Bauteil selbst gerechnet hat --, oder die Zeichendaten
 seiner Analysen. Der Speicher liegt im Modul und damit im Prozess: beim
@@ -93,22 +104,22 @@ Ablage auf der Platte waere ein zweiter Ort fuer dieselbe Wahrheit.
 #### Ergebnisspeicher.hole
 
 ```python
-def hole(self, kennung: str, stempel: str) -> Optional[T]
+def hole(self, projekt: str, kennung: str, stempel: str) -> Optional[T]
 ```
 
 #### Ergebnisspeicher.merken
 
 ```python
-def merken(self, kennung: str, stempel: str, teil: T) -> None
+def merken(self, projekt: str, kennung: str, stempel: str, teil: T) -> None
 ```
 
 #### Ergebnisspeicher.aufraeumen
 
 ```python
-def aufraeumen(self, kennungen) -> None
+def aufraeumen(self, projekt: str, kennungen) -> None
 ```
 
-Eintraege zu geloeschten Platten wegwerfen.
+Eintraege zu geloeschten Bauteilen des Projekts wegwerfen -- die anderer Projekte bleiben.
 
 #### Ergebnisspeicher.leeren
 

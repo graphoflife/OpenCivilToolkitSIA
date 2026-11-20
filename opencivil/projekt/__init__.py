@@ -35,11 +35,12 @@ Aufgabe ein Modul::
                    gerechnet
     projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                    Speichern, das Beispiel
+    mappe.py       mehrere Projekte in einer Datei, jedes mit eigenem Namen
     aufbau/        aus der Beschreibung ein Rechenwerk: der Kern und je
                    Bauteilart ein Modul
 
 Die Abhaengigkeit laeuft in eine Richtung: lesen <- eintraege <- platte <-
-aufbau <- projekt. Wer von aussen kommt, importiert aus dem Paket, nicht aus den
+aufbau <- projekt <- mappe. Wer von aussen kommt, importiert aus dem Paket, nicht aus den
 Modulen: ``from opencivil.projekt import Projekt``.
 
 NORMSORTE ODER EIGENES MATERIAL:
@@ -92,6 +93,7 @@ from opencivil.projekt.decke import (
 )
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
+from opencivil.projekt.mappe import Mappe
 
 __all__ = [
     "Aufbau", "BAUTEILE", "Balkensystem3dEintrag", "BalkensystemEintrag", "Bauteil",
@@ -105,7 +107,7 @@ __all__ = [
     "Gebrauchsliste", "Gebrauchswahl", "KnickVerformungswahl", "KnickWiderstandswahl",
     "QAGebrauchswahl",
     "HAEUFIG_ANTEIL", "KnickEintrag", "KombinationEintrag", "LageEintrag",
-    "MaterialEintrag", "ObergrenzeEintrag", "PostenEintrag", "Projekt", "ProjektFehler",
+    "Mappe", "MaterialEintrag", "ObergrenzeEintrag", "PostenEintrag", "Projekt", "ProjektFehler",
     "QUASISTAENDIG_ANTEIL", "QuerkraftbewehrungEintrag", "QuerschnittEintrag",
     "RechenwahlEintrag", "SkriptEintrag", "SpannungsfallEintrag",
     "VerformungEintrag", "VerformungsfallEintrag", "abgeleiteter_fallname",

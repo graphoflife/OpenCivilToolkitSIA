@@ -1,5 +1,5 @@
 ---
-erzeugt: 72b03f261939
+erzeugt: 264af8c1ee03
 art: modul
 tags: [modul]
 ---
@@ -390,6 +390,19 @@ def speichern(self, pfad: str | Path) -> Path
 def laden(cls, pfad: str | Path) -> 'Projekt'
 ```
 
+#### Projekt.neu
+
+```python
+@classmethod
+def neu(cls, name: str='Neues Projekt') -> 'Projekt'
+```
+
+Ein neues Projekt, wie es «+» in der Oberflaeche anlegt: mit dem
+ersten Beton und dem ersten Betonstahl, den ein neues Material
+vorschlaegt ([[opencivil.material.beton#Konstanten|ERSTER_BETON]],
+[[opencivil.material.betonstahl#Konstanten|ERSTER_STAHL]]), und ohne
+Bauteile. So rechnet die erste Platte gleich.
+
 #### Projekt.beispiel
 
 ```python
@@ -413,6 +426,8 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 
 - [[opencivil.ergebnis]]
 - [[opencivil.material.arten]]
+- [[opencivil.material.beton]]
+- [[opencivil.material.betonstahl]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
@@ -436,4 +451,5 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.beispiele]]
+- [[opencivil.projekt.mappe]]
 - [[opencivil.web.api]]

@@ -64,11 +64,6 @@ export function lagertext(art, lager) {
   return systemkatalog(art, 'lagerfelder').map((x) => `${x.zeichen} ${lager[x.feld]}`).join(' · ');
 }
 
-/** «A und I», «A, I_y, I_z und I_T» -- die Kennwerte eines Querschnitts in Worten. */
-export function undListe(namen) {
-  return namen.length > 1 ? `${namen.slice(0, -1).join(', ')} und ${namen.at(-1)}` : namen.join('');
-}
-
 /** Die Last zu einer Kennung -- `{last, linie}` oder `{last, knoten}` -- oder null. */
 export function lastVon(z, kennung) {
   for (const l of z.linien) {

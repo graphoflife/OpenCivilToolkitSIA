@@ -1,5 +1,5 @@
 ---
-erzeugt: ccc07a24dca1
+erzeugt: 26482428a6e7
 art: modul
 tags: [modul]
 ---
@@ -95,19 +95,19 @@ Das Beispielprojekt, mit dem eine leere Oberflaeche startet.
 def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 ```
 
-Prueft eine Projektbeschreibung und gibt sie aufgeraeumt zurueck.
+Prueft ein Projekt, wie es in einer Datei steht, und gibt es aufgeraeumt
+zurueck ([[opencivil.projekt.mappe#projekt_aus_datei|projekt_aus_datei]]).
 
-Dafuer gedacht, dass eine hochgeladene oder im Browser abgelegte Datei
-durch denselben Leser und dieselben Pruefungen laeuft wie alles andere
-([[opencivil.projekt.lesen]]) -- nicht durch eine zweite, nachgebaute
-Pruefung in JavaScript. Alte Formate liest er nicht; eine solche Datei
-nennt das erste Feld, das er nicht kennt.
+### mappe_pruefen
 
-Die Vorpruefung auf [[opencivil.web.dienst#Konstanten|KENNFELDER]] haelt ein leeres Objekt auf: jedes
-Feld eines Projekts hat eine Vorgabe, `{}` liest sich darum als leeres
-Projekt. Beim Oeffnen einer Datei waere das verheerend -- wer eine falsche
-Datei erwischt, bekaeme wortlos ein leeres Projekt und haette seine Arbeit
-verloren.
+```python
+def mappe_pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Prueft eine Mappe -- die Projekte, die die Oberflaeche im Browser ablegt,
+speichert und oeffnet -- und gibt sie aufgeraeumt zurueck. Eine Datei mit
+einem einzelnen Projekt, wie bis 2026-11-20 gespeichert, kommt als Mappe
+mit diesem einen zurueck ([[opencivil.projekt.mappe#Mappe.aus_dict|aus_dict]]).
 
 ### rechnen
 
@@ -146,7 +146,7 @@ sondern eine andere Ausgabe.
 ### _analysen
 
 ```python
-def _analysen(beschreibung: Mapping[str, Any], aufbau, loesung: Loesung) -> Dict[str, list]
+def _analysen(projekt: str, beschreibung: Mapping[str, Any], aufbau, loesung: Loesung) -> Dict[str, list]
 ```
 
 Die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil -- aus dem
@@ -410,8 +410,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - `SPEICHER = speicher.Ergebnisspeicher()` – Das Gedaechtnis zwischen zwei Anfragen -- siehe [[opencivil.web.speicher]]. Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser der offene Reiter.
 - `ANALYSEN = speicher.Ergebnisspeicher()` – Dasselbe fuer die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil unter demselben Abdruck wie seine Loesung ([[opencivil.web.dienst#_analysen|_analysen]]).
 - `DIAGRAMME = speicher.Ergebnisspeicher()` – Und fuer die Diagramme einer Querschnittsanalyse, unter ihrem Abdruck und dem Schnitt ([[opencivil.web.dienst#analysediagramme|analysediagramme]]). Die Oberflaeche fragt nach jeder Aenderung am Projekt neu, gleich wo; ob sich fuer diese Analyse etwas geaendert hat, entscheidet erst der Abdruck hier.
-- `KENNFELDER = ('name', 'materialien', *(art.liste for art in BAUTEILE))` – Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
-- `ANFRAGEN = {'katalog': katalog, 'beispiel': beispiel, 'pruefen': pruefen, 'verwe…` – Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
+- `ANFRAGEN = {'katalog': katalog, 'beispiel': beispiel, 'pruefen': pruefen, 'mappe…` – Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 
 ## Braucht
 
@@ -420,6 +419,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.bewehrungssuche]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt]]
+- [[opencivil.projekt.mappe]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.vorlagen]]

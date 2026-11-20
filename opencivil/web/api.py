@@ -225,9 +225,10 @@ def katalog() -> dict:
         "vorgaben": _vorgaben(),
         # Was ein neuer Eintrag einer Liste des Projekts mitbringt -- je
         # Bauteilart und das Skript der App «Python». Eine neue Art hat ihre
-        # Vorlage damit von selbst.
+        # Vorlage damit von selbst. Dazu ein neues Projekt der Mappe, mit
+        # dem ersten Beton und Stahl (:meth:`Projekt.neu`).
         "neu": {**{art.liste: _vorlage(art.eintrag) for art in BAUTEILE},
-                "skripte": _vorlage(SkriptEintrag)},
+                "skripte": _vorlage(SkriptEintrag), "projekte": _vorlage(Projekt)},
         # Die Wahlen einer Durchstanzstelle -- je ein Schalter -- und welche
         # Felder der Nachweis mit jeder Stellung liest.
         "durchstanzen": durchstanzdaten.wahlen(),

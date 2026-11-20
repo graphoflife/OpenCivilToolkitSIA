@@ -295,3 +295,8 @@ export function melden(text, istFehler = false) {
 export function leerzustand(...zeilen) {
   return el('div.leer', {}, zeilen.map((z) => el('p', { text: z })));
 }
+
+/** «A und I», «A, I_y, I_z und I_T» -- Namen in einem Satz. */
+export function undListe(namen) {
+  return namen.length > 1 ? `${namen.slice(0, -1).join(', ')} und ${namen.at(-1)}` : namen.join('');
+}

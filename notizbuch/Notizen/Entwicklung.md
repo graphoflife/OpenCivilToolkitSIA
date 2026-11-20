@@ -7,6 +7,51 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Mehrere Projekte in einer Datei
+
+Der Benutzer wollte mehrere Projekte nebeneinander (2026-11-20). Oben in
+der linken Spalte steht je Projekt ein Reiter, dazu «+»; darunter stehen
+nur die Einträge des gewählten.
+
+Im Kern hält `Mappe` (`projekt/mappe.py`) die Projekte. Gerechnet wird
+weiter je Projekt; die Mappe prüft nur, was zwischen ihnen gilt: jedes hat
+einen Namen, keine zwei denselben, und es gibt mindestens eines. Am Namen
+wählt man ein Projekt -- ohne ihn stünde ein leerer Reiter da, mit einem
+doppelten zwei gleiche. Eine Meldung aus einem Projekt nennt es vorn:
+«Projekt 'Halle', Platte 'Decke über EG': …», denn in jedem Projekt kann
+eine Platte so heissen. Eine Datei mit einem einzelnen Projekt, wie sie
+bis 2026-11-20 geschrieben wurde, ist eine Mappe mit diesem einen, und ihre
+Meldungen bleiben, wie sie waren.
+
+Der Ergebnisspeicher (`web/speicher.py`) legt nach Projekt und Kennung ab.
+Richtig wäre es auch ohne -- der Stempel ist der Inhalt --, aber jedes
+Projekt räumte beim Rechnen die Ergebnisse des anderen weg, und der Wechsel
+zurück rechnete alles neu. Gemessen beim Beispiel: 0.02 s statt 0.2 s.
+
+Die Oberfläche hält die Mappe in `zustand.mappe`; `zustand.projekt` bleibt
+das gezeigte, und alles Bisherige rechnet und zeichnet weiter daran. Ein
+Wechsel geht über `projektSetzen`: es räumt Lösung, Auswahl und offene
+Fenster ab und meldet «neu», worauf die Seite rechnet. Kehrt man zurück,
+stehen App und Auswahl wieder, wie man sie verlassen hat -- bis die Seite
+neu lädt. Bis die erste Rechnung da ist, sagt die rechte Spalte «rechnet …».
+
+Im Browser liegt die ganze Mappe unter `opencivil.mappe`, mit dem gewählten
+Projekt. Was unter `opencivil.projekt` lag, wird beim ersten Laden das
+einzige Projekt der Mappe; der alte Schlüssel verschwindet beim ersten
+Ablegen.
+
+«Speichern» schreibt alle Projekte in eine Datei. Mit einem Projekt heisst
+sie wie das Projekt, wie bisher; mit mehreren «Projekte 2026-11-20», denn
+kein Projektname steht für alle. «Öffnen» fragt, ob die Datei ersetzt oder
+dazukommt (Benutzer, 2026-11-20). Kommt sie dazu, bekommt ein Name, den es
+schon gibt, eine Nummer: «Halle» wird «Halle 2». Die Frage stellt
+`rueckfrage` (fenster.js) im selben Dialogfenster wie die Wahl eines
+Materials.
+
+Ein neues Projekt baut der Kern, `Projekt.neu`: mit C25/30 und B500B, ohne
+Bauteile -- so rechnet die erste Platte gleich. × steht nur am gezeigten
+Reiter und nie am letzten: ohne Projekt gäbe es nichts zu zeigen.
+
 ## 2026-11-20 · Rechenwerte je Material, in jedem Modul
 
 Bis dahin wählte nur die Tragsicherheit der Querschnittsanalyse ihre Werte

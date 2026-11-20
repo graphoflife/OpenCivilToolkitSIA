@@ -13,8 +13,6 @@ und in jeder App ausser Materialien; «Öffnen» ersetzt alles oder fügt hinzu;
 offline nach dem ersten Besuch; MCP mit Projektdateien; Erdbeben mit
 Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
-- [ ] Mehrere Projekte: oben eine Reihe; «Speichern» schreibt alle in eine
-      Datei; «Öffnen» fragt «alles ersetzen | hinzufügen».
 - [ ] Sandbox: je Projekt und App zuoberst, golden, ↺ statt ×, beim Laden
       der Seite frisch; eine Kopie heisst wie ein neuer Eintrag.
 - [ ] Schneller Start und offline: den Kern sofort starten, die Quellen

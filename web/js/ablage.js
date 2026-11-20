@@ -2,20 +2,23 @@
  * ablage.js -- Wo die Eingaben bleiben.
  *
  * Drei Wege, und alle drei mit derselben Beschreibung: dem JSON, das
- * `Projekt.als_dict()` im Kern liefert.
+ * `Mappe.als_dict()` im Kern liefert -- alle Projekte zusammen,
+ * `{projekte: [...]}`.
  *
  *   1. Im Browser. Jede Änderung landet im localStorage, das Fenster darf
  *      also zugehen. Das ist kein Speichern im eigentlichen Sinn -- es ist
- *      das Netz darunter.
+ *      das Netz darunter. Dazu, welches Projekt gezeigt war.
  *   2. Als Datei auf die Platte, über den Download des Browsers.
- *   3. Von der Platte zurück, über einen Dateiwähler.
+ *   3. Von der Platte zurück, über einen Dateiwähler. Eine Datei mit einem
+ *      einzelnen Projekt, wie bis 2026-11-20 gespeichert, liest der Kern als
+ *      Mappe mit diesem einen.
  *
  * GEPRÜFT WIRD IM KERN:
- * Was aus der Ablage oder von der Platte kommt, geht durch `api.pruefen()` --
- * also durch `Projekt.aus_dict()` in Python. Damit greifen dieselbe Umwandlung
- * alter Formate und dieselben Prüfungen wie überall sonst. Eine zweite,
- * nachgebaute Prüfung in JavaScript gäbe es hier fast geschenkt, und sie wäre
- * genau darum falsch: sie würde irgendwann von der echten abweichen.
+ * Was aus der Ablage oder von der Platte kommt, geht durch
+ * `api.mappePruefen()` -- also durch `Mappe.aus_dict()` in Python. Damit
+ * greifen dieselben Prüfungen wie überall sonst. Eine zweite, nachgebaute
+ * Prüfung in JavaScript gäbe es hier fast geschenkt, und sie wäre genau
+ * darum falsch: sie würde irgendwann von der echten abweichen.
  *
  * WAS SICH NICHT ÖFFNEN LÄSST, BLEIBT:
  * Lehnt der Kern den abgelegten Stand ab -- oder ist er gar kein JSON --,
@@ -28,7 +31,14 @@
 
 import { api } from './api.js';
 
-const SCHLUESSEL = 'opencivil.projekt';
+const SCHLUESSEL = 'opencivil.mappe';
+
+/**
+ * Bis 2026-11-20 lag im Browser ein einzelnes Projekt, unter diesem
+ * Schlüssel. Fehlt die Mappe, wird es ihr erstes Projekt; sobald sie
+ * abgelegt ist, geht er weg.
+ */
+const FRUEHER = 'opencivil.projekt';
 
 /** Die Stände, die sich nicht öffnen liessen -- eine Liste, als Rohtext. */
 const GERETTET = 'opencivil.projekt.unlesbar';
@@ -45,18 +55,20 @@ const nichtAufbewahrt = [];
 // ===========================================================================
 
 /**
- * Legt die Beschreibung im Browser ab. Scheitert still -- es ist nur das Netz.
+ * Legt die Mappe im Browser ab, mit der Stelle des gezeigten Projekts
+ * (`gewaehlt`). Scheitert still -- es ist nur das Netz.
  *
  * `gesichert` merkt sich, ob dieser Stand schon als Datei auf der Platte liegt.
  * Dadurch stimmt der Punkt am Speichern-Knopf auch nach einem Neuladen noch:
  * ohne diese Notiz sähe jeder frisch geöffnete Tab so aus, als wäre alles
  * gesichert -- und das wäre schlicht gelogen.
  */
-export function imBrowserAblegen(projekt, gesichert = false) {
+export function imBrowserAblegen(mappe, gewaehlt, gesichert) {
   if (nichtAufbewahrt.length) return false;
   try {
     localStorage.setItem(SCHLUESSEL, JSON.stringify(
-      { fassung: 1, gesichert, projekt }));
+      { fassung: 1, gesichert, gewaehlt, mappe }));
+    localStorage.removeItem(FRUEHER);
     return true;
   } catch (fehler) {
     // Privater Modus oder voller Speicher. Kein Grund, die Arbeit anzuhalten;
@@ -71,13 +83,21 @@ export function imBrowserAblegen(projekt, gesichert = false) {
  *
  * Dabei steht immer der Rohtext, wie er dalag: lässt sich der Stand nicht
  * öffnen, wird genau er aufbewahrt. Ist er kein JSON, sagt `fehler` es.
+ * Liegt nur das einzelne Projekt von früher da, ist `mappe` dieses Projekt:
+ * der Kern liest es als Mappe mit ihm.
  *
- * @returns {{roh: string, projekt?: Object, gesichert?: boolean, fehler?: string}|null}
+ * @returns {{roh: string, mappe?: Object, gewaehlt?: number, gesichert?: boolean,
+ *   fehler?: string}|null}
  */
 export function ausDemBrowser() {
   let roh;
+  let frueher = false;
   try {
     roh = localStorage.getItem(SCHLUESSEL);
+    if (!roh) {
+      roh = localStorage.getItem(FRUEHER);
+      frueher = true;
+    }
   } catch (fehler) {
     console.warn('Die Ablage im Browser ist nicht erreichbar:', fehler);
     return null;
@@ -85,11 +105,9 @@ export function ausDemBrowser() {
   if (!roh) return null;
   try {
     const inhalt = JSON.parse(roh);
-    // Ohne Umschlag ist es eine Ablage aus der Zeit vor dieser Notiz --
-    // dann gilt der Stand als ungesichert, was die vorsichtigere Annahme ist.
-    return inhalt?.fassung === 1
-      ? { roh, projekt: inhalt.projekt, gesichert: !!inhalt.gesichert }
-      : { roh, projekt: inhalt, gesichert: false };
+    return frueher
+      ? { roh, mappe: inhalt?.projekt, gewaehlt: 0, gesichert: !!inhalt?.gesichert }
+      : { roh, mappe: inhalt?.mappe, gewaehlt: inhalt?.gewaehlt, gesichert: !!inhalt?.gesichert };
   } catch (fehler) {
     return { roh, fehler: `Kein lesbares JSON (${fehler.message}).` };
   }
@@ -141,7 +159,7 @@ export function geretteteHerunterladen(eintrag) {
   let name = '';
   try {
     const inhalt = JSON.parse(eintrag.roh);
-    name = (inhalt?.fassung === 1 ? inhalt.projekt : inhalt)?.name || '';
+    name = (inhalt?.mappe?.projekte?.[0] ?? inhalt?.projekt ?? inhalt)?.name || '';
   } catch {
     /* kein JSON: dann ohne Namen */
   }
@@ -166,28 +184,39 @@ export function geretteteVerwerfen(eintrag) {
 }
 
 /**
- * Holt die Beschreibung, mit der die Oberfläche startet.
+ * Holt die Mappe, mit der die Oberfläche startet, und welches ihrer
+ * Projekte gezeigt war.
  *
  * Erst der Browser, sonst das Beispiel. Lässt sich das Abgelegte nicht
  * öffnen, wird es aufbewahrt (`gerettete`), bevor das Beispiel kommt -- die
  * Oberfläche zeigt es an, solange es da ist.
  *
- * @returns {Promise<{projekt: Object, gesichert: boolean}>}
+ * @returns {Promise<{mappe: Object, gewaehlt: number, gesichert: boolean}>}
  */
-export async function projektHolen() {
+export async function mappeHolen() {
   const abgelegt = ausDemBrowser();
-  if (!abgelegt) return { projekt: await api.beispiel(), gesichert: true };
+  if (!abgelegt) return beispiel();
   let grund = abgelegt.fehler;
   if (!grund) {
     try {
-      const { projekt } = await api.pruefen(abgelegt.projekt);
-      return { projekt, gesichert: abgelegt.gesichert };
+      const { mappe } = await api.mappePruefen(abgelegt.mappe);
+      const { gewaehlt } = abgelegt;
+      return {
+        mappe,
+        gewaehlt: Number.isInteger(gewaehlt) && gewaehlt < mappe.projekte.length ? gewaehlt : 0,
+        gesichert: abgelegt.gesichert,
+      };
     } catch (fehler) {
       grund = fehler.message;
     }
   }
   retten(abgelegt.roh, grund);
-  return { projekt: await api.beispiel(), gesichert: true };
+  return beispiel();
+}
+
+/** Die Mappe mit dem Beispiel des Kerns -- der Start, wenn nichts abgelegt ist. */
+async function beispiel() {
+  return { mappe: { projekte: [await api.beispiel()] }, gewaehlt: 0, gesichert: true };
 }
 
 // ===========================================================================
@@ -205,17 +234,22 @@ export function dateiname(name) {
 }
 
 /**
- * Bietet die Beschreibung als .json zum Herunterladen an.
+ * Bietet die Mappe als .json zum Herunterladen an: mit einem Projekt unter
+ * seinem Namen, mit mehreren als «Projekte 2026-11-20».
  *
  * Eingerückt geschrieben: die Datei soll sich lesen und in einer Versions-
  * verwaltung vernünftig vergleichen lassen, nicht bloss klein sein.
  */
-export function alsDateiSichern(projekt) {
-  const name = herunterladen(JSON.stringify(projekt, null, 2),
-    `${dateiname(projekt.name)}.json`);
+export function alsDateiSichern(mappe, gewaehlt) {
+  const { projekte } = mappe;
+  const heute = new Date();
+  const datum = [heute.getFullYear(), heute.getMonth() + 1, heute.getDate()]
+    .map((z) => String(z).padStart(2, '0')).join('-');
+  const name = herunterladen(JSON.stringify(mappe, null, 2),
+    `${dateiname(projekte.length === 1 ? projekte[0].name : `Projekte ${datum}`)}.json`);
   // Dieser Stand liegt jetzt auf der Platte -- das merkt sich die Ablage, damit
   // der Punkt am Speichern-Knopf auch morgen noch die Wahrheit sagt.
-  imBrowserAblegen(projekt, true);
+  imBrowserAblegen(mappe, gewaehlt, true);
   return name;
 }
 
@@ -235,9 +269,10 @@ function herunterladen(text, name) {
 }
 
 /**
- * Lässt eine Datei wählen und gibt die geprüfte Beschreibung zurück.
+ * Lässt eine Datei wählen und gibt die geprüfte Mappe zurück, mit dem Namen
+ * der Datei.
  *
- * @returns {Promise<Object|null>} null, wenn abgebrochen wurde
+ * @returns {Promise<{mappe: Object, datei: string}|null>} null, wenn abgebrochen wurde
  */
 export function ausDateiLaden() {
   return new Promise((erfuellen, ablehnen) => {
@@ -252,8 +287,8 @@ export function ausDateiLaden() {
 
       try {
         const roh = JSON.parse(await datei.text());
-        const { projekt } = await api.pruefen(roh);
-        erfuellen(projekt);
+        const { mappe } = await api.mappePruefen(roh);
+        erfuellen({ mappe, datei: datei.name });
       } catch (fehler) {
         ablehnen(new Error(
           `«${datei.name}» ist keine brauchbare Projektdatei: ${fehler.message}`));

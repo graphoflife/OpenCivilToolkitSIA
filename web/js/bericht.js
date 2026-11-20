@@ -717,7 +717,9 @@ export function berichtZeichnen(behaelter, { verfolgen }) {
     ])
     : null;
   if (!loesung) {
-    return ersetzen(behaelter, fehler, leerzustand('Noch nichts gerechnet.', 'Oben «Rechnen».'));
+    // Ein anderes Projekt zeigt nicht die Zahlen des vorigen (`projektSetzen`).
+    return ersetzen(behaelter, fehler, zustand.rechnetGerade ? leerzustand('rechnet …')
+      : leerzustand('Noch nichts gerechnet.', 'Oben «Rechnen».'));
   }
   return ersetzen(behaelter, fehler, sicht());
 }

@@ -17,7 +17,7 @@
 
 import { karte } from './bausteine.js';
 import { auswahl, el, melden } from './dom.js';
-import { sinnbild } from './sinnbilder.js';
+import { dialogFenster } from './fenster.js';
 import { ausVorlage, freieKennung, katalog, projektAendern, waehlen, zustand } from './zustand.js';
 
 /** Was der Katalog über eine Materialart sagt. */
@@ -32,7 +32,7 @@ function eigenerName(art) {
   return `${vorsilbe}${i}`;
 }
 
-function anlegen(dialog, art, sorte, eigen) {
+function anlegen(schliessen, art, sorte, eigen) {
   const kennung = freieKennung(artVon(art).kennung);
   const name = eigen ? eigenerName(art) : sorte;
   projektAendern((p) => {
@@ -40,7 +40,7 @@ function anlegen(dialog, art, sorte, eigen) {
       kennung, art, sorte, name, eigenstaendig: eigen,
     }));
   });
-  dialog.close();
+  schliessen();
   waehlen({ art: 'material', kennung });
   melden(eigen ? `«${name}» angelegt, nach ${sorte}.` : `Normsorte ${sorte} angelegt.`);
 }
@@ -72,24 +72,12 @@ export function materialAnlegen(art) {
   let norm = frei[0];
   let vorlage = sorten[0];
 
-  const dialog = el('dialog.fenster.materialwahl', { 'aria-label': `Neuer ${titel}` });
-  dialog.addEventListener('close', () => dialog.remove());
-  // Ein Klick neben das Fenster schliesst es, wie Esc.
-  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
-
-  dialog.append(
-    el('div.fenster-kopf', {}, [
-      sinnbild('material'),
-      el('div.fenster-titel', {}, [
-        el('span', { text: `Neuer ${titel}` }),
-        el('span.fenster-zusatz', { text: 'Normsorte nach SIA oder eigenes Material' }),
-      ]),
-      el('button.fenster-zu', {
-        type: 'button', text: '×', title: 'Schliessen (Esc)',
-        on: { click: () => dialog.close() },
-      }),
-    ]),
-    el('div.fenster-inhalt', {}, [
+  dialogFenster({
+    titel: `Neuer ${titel}`,
+    zeichen: 'material',
+    zusatz: 'Normsorte nach SIA oder eigenes Material',
+    klasse: '.materialwahl',
+    inhalt: (schliessen) => [
       karte('Normsorte nach SIA', frei.length ? [
         el('p.materialwahl-text', {
           text: `${grundlage}. Das Material heisst wie die Sorte und lässt `
@@ -103,7 +91,7 @@ export function materialAnlegen(art) {
           }),
           el('button.knopf.knopf-haupt', {
             type: 'button', text: 'Normsorte anlegen',
-            on: { click: () => anlegen(dialog, art, norm, false) },
+            on: { click: () => anlegen(schliessen, art, norm, false) },
           }),
         ]),
       ] : [el('p.materialwahl-text', {
@@ -123,12 +111,10 @@ export function materialAnlegen(art) {
           }),
           el('button.knopf', {
             type: 'button', text: `${eigenerName(art)} anlegen`,
-            on: { click: () => anlegen(dialog, art, vorlage, true) },
+            on: { click: () => anlegen(schliessen, art, vorlage, true) },
           }),
         ]),
       ]),
-    ]),
-  );
-  document.body.append(dialog);
-  dialog.showModal();
+    ],
+  });
 }

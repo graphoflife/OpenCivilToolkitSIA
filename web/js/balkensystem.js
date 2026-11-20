@@ -28,12 +28,12 @@ import {
 } from './bausteine.js';
 import {
   knotenlastart, lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart,
-  systemkatalog, systemliste, undListe,
+  systemkatalog, systemliste,
 } from './bs_teile.js';
 import { texte } from './bs_texte.js';
 import { waehlen, zeichenbereich } from './bs_zeichnung.js';
 import {
-  auswahl, el, melden, svgEl, zahlfeld,
+  auswahl, el, melden, svgEl, undListe, zahlfeld,
 } from './dom.js';
 import { fenster, fensterOeffnen } from './fenster.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';

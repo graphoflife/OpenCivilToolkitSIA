@@ -14,6 +14,10 @@
  * rollt, und so retten Bildlauf und Fokus wie bei den Tafeln (`app.js`).
  *
  * Schliessen: mit ×, mit Escape oder mit einem Klick neben das Fenster.
+ *
+ * Was eine Antwort braucht, bevor es weitergeht -- ein neues Material, eine
+ * Rückfrage --, steht in einem Fenster über der ganzen Seite
+ * (`dialogFenster`), mit demselben Kopf.
  */
 
 import { el, ersetzen } from './dom.js';
@@ -65,18 +69,89 @@ export function fenster({
   return el('div.fenster', {
     class: breit ? 'ist-breit' : '', role: 'dialog', 'aria-label': titel, tabIndex: -1,
   }, [
-    el('div.fenster-kopf', {}, [
-      sinnbild(zeichen),
-      el('div.fenster-titel', {}, [
-        el('span', { text: titel }),
-        zusatz ? el('span.fenster-zusatz', { text: zusatz }) : null,
-      ]),
-      hilfe,
-      el('button.fenster-zu', {
-        type: 'button', text: '×', title: 'Schliessen (Esc)',
-        on: { click: fensterSchliessen },
-      }),
-    ]),
+    fensterkopf({ titel, zeichen, zusatz, hilfe, schliessen: fensterSchliessen }),
     el('div.fenster-inhalt', {}, inhalt),
   ]);
+}
+
+function fensterkopf({
+  titel, zeichen, zusatz, hilfe = null, schliessen,
+}) {
+  return el('div.fenster-kopf', {}, [
+    sinnbild(zeichen),
+    el('div.fenster-titel', {}, [
+      el('span', { text: titel }),
+      zusatz ? el('span.fenster-zusatz', { text: zusatz }) : null,
+    ]),
+    hilfe,
+    el('button.fenster-zu', {
+      type: 'button', text: '×', title: 'Schliessen (Esc)', on: { click: schliessen },
+    }),
+  ]);
+}
+
+/**
+ * Ein Fenster über der ganzen Seite, das erst zugeht, wenn man es schliesst:
+ * mit ×, Esc oder einem Klick daneben. Danach ist es weg. `klasse` ist die
+ * eigene Klasse, `.materialwahl`; `inhalt(schliessen)` baut, was darin
+ * steht -- ein Knopf darin schliesst es mit `schliessen()`.
+ */
+export function dialogFenster({
+  titel, zeichen, zusatz, klasse, inhalt,
+}) {
+  const dialog = el(`dialog.fenster.dialogfenster${klasse}`, { 'aria-label': titel });
+  const schliessen = () => dialog.close();
+  dialog.addEventListener('close', () => dialog.remove());
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) schliessen(); });
+  dialog.append(
+    fensterkopf({ titel, zeichen, zusatz, schliessen }),
+    el('div.fenster-inhalt', {}, inhalt(schliessen)),
+  );
+  document.body.append(dialog);
+  dialog.showModal();
+  return dialog;
+}
+
+/**
+ * Fragt, bevor etwas geschieht, das sich nicht zurücknehmen lässt: über den
+ * Knöpfen `text`, je Wahl ein Knopf mit dem, was er bewirkt, daneben. Gibt
+ * den `wert` der gewählten zurück -- null, wenn das Fenster ohne Wahl zuging
+ * (Abbrechen, Esc, daneben geklickt).
+ *
+ * @param {{titel: string, zeichen: string, zusatz?: string, text: string,
+ *   wahlen: Array<{wert: string, knopf: string, erklaerung: string, gefahr?: boolean}>}} frage
+ * @returns {Promise<string|null>}
+ */
+export function rueckfrage({
+  titel, zeichen, zusatz, text, wahlen,
+}) {
+  return new Promise((erfuellen) => {
+    let gewaehlt = null;
+    const dialog = dialogFenster({
+      titel,
+      zeichen,
+      zusatz,
+      klasse: '.rueckfrage',
+      inhalt: (schliessen) => [
+        el('p.rueckfrage-text', { text }),
+        ...wahlen.map((w) => el('div.rueckfrage-wahl', {}, [
+          el(`button.knopf${w.gefahr ? '.knopf-gefahr' : '.knopf-haupt'}`, {
+            type: 'button',
+            text: w.knopf,
+            on: {
+              click: () => {
+                gewaehlt = w.wert;
+                schliessen();
+              },
+            },
+          }),
+          el('span.rueckfrage-erklaerung', { text: w.erklaerung }),
+        ])),
+        el('div.rueckfrage-fuss', {}, [
+          el('button.knopf', { type: 'button', text: 'Abbrechen', on: { click: schliessen } }),
+        ]),
+      ],
+    });
+    dialog.addEventListener('close', () => erfuellen(gewaehlt));
+  });
 }

@@ -1,5 +1,5 @@
 ---
-erzeugt: aecf8331b884
+erzeugt: ffec9478e262
 art: modul
 tags: [modul]
 ---
@@ -470,6 +470,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.grundbruch]]
+- [[opencivil.projekt.mappe]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]

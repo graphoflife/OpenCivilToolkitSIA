@@ -6,7 +6,7 @@
  * Querschnittsanalyse, 2D Balkensysteme, Grundbruch, Setzung, Python. Darunter steht
  * die Liste der gewählten App, mit «+» zum Anlegen -- bei den Materialien je
  * eine für Beton und Betonstahl. Darüber, zuoberst in der Tafel, der Name des
- * Projekts (index.html).
+ * gezeigten Projekts (index.html) und die Reiter aller Projekte (projekte.js).
  *
  * Beim Löschen eines Materials wird geprüft, ob eine Platte,
  * eine Querschnittsanalyse oder ein Balkensystem es noch braucht -- und beim

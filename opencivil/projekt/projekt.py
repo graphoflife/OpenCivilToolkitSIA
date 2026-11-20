@@ -24,6 +24,8 @@ from typing import Any, Dict, List, Sequence, Union
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
 from opencivil.material.arten import MATERIALARTEN
+from opencivil.material.beton import ERSTER_BETON
+from opencivil.material.betonstahl import ERSTER_STAHL
 from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag, PostenEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
@@ -526,6 +528,20 @@ class Projekt(Beschreibung):
         return cls.aus_dict(json.loads(Path(pfad).read_text(encoding="utf-8")))
 
     # -- Startpunkt ---------------------------------------------------------
+
+    @classmethod
+    def neu(cls, name: str = "Neues Projekt") -> "Projekt":
+        """
+        Ein neues Projekt, wie es «+» in der Oberflaeche anlegt: mit dem
+        ersten Beton und dem ersten Betonstahl, den ein neues Material
+        vorschlaegt (:data:`~opencivil.material.beton.ERSTER_BETON`,
+        :data:`~opencivil.material.betonstahl.ERSTER_STAHL`), und ohne
+        Bauteile. So rechnet die erste Platte gleich.
+        """
+        projekt = cls(name=name)
+        projekt.beton(ERSTER_BETON)
+        projekt.stahl(ERSTER_STAHL)
+        return projekt
 
     @classmethod
     def beispiel(cls) -> "Projekt":

@@ -1,5 +1,5 @@
 ---
-erzeugt: f0b797c299fc
+erzeugt: 726e1605d2e0
 art: modul
 tags: [modul]
 ---
@@ -184,5 +184,6 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
+- [[opencivil.projekt.mappe]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.zeichendaten]]

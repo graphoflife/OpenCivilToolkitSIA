@@ -1,10 +1,10 @@
 /**
  * zustand.js -- Der Zustand der Oberfläche an einer Stelle.
  *
- * Enthält die Projektbeschreibung, das letzte Rechenergebnis und die Auswahl.
- * Wer etwas ändert, ruft `aendern()`, `mitteAendern()` oder, für die
- * Eingaben, `projektAendern()`; wer darauf reagieren will, meldet sich mit
- * `horchen()` an. Mehr Mechanik braucht es hier nicht.
+ * Enthält die Projekte, das letzte Rechenergebnis und die Auswahl. Wer etwas
+ * ändert, ruft `aendern()`, `mitteAendern()` oder, für die Eingaben,
+ * `projektAendern()` und `mappeAendern()`; wer darauf reagieren will, meldet
+ * sich mit `horchen()` an. Mehr Mechanik braucht es hier nicht.
  *
  * Die Projektbeschreibung ist die einzige Wahrheit über die Eingaben; alles
  * Gerechnete kommt ausschliesslich aus `loesung` und wird nie in der Oberfläche
@@ -26,10 +26,17 @@ function zugeklappteLesen() {
 }
 
 export const zustand = {
+  /**
+   * Die Projekte, die zusammen gespeichert und geöffnet werden:
+   * `{projekte: [...]}`, wie `Mappe.als_dict()` im Kern -- jedes heisst
+   * anders (opencivil/projekt/mappe.py).
+   */
+  mappe: null,
+  /** Das gezeigte Projekt: eines aus `mappe.projekte`, keine Kopie. */
   projekt: null,
   /**
    * Die Fassung des Projekts: zählt jede Änderung (`projektAendern`) und
-   * jedes neue Projekt (`projektSetzen`). Wer eine Antwort des Kerns
+   * jedes andere Projekt (`projektSetzen`). Wer eine Antwort des Kerns
    * aufbewahrt, merkt sich die Fassung, zu der er gefragt hat; stimmt sie
    * nicht mehr, fragt er neu. Ob sich für ihn etwas geändert hat, weiss der
    * Kern (speicher.py) -- bis 2026-11-10 entschieden das hier drei Abdrücke
@@ -151,14 +158,16 @@ export function waehlen(auswahl) {
   aendern({ auswahl, fenster: null, ...(auswahl ? { app: auswahl.art } : {}) });
 }
 
-/** Meldet `rueckruf` an: er erfährt 'alles', 'mitte' oder 'projekt' -- siehe `aendern`. */
+/** Meldet `rueckruf` an: er erfährt 'alles', 'mitte', 'projekt' oder 'neu' -- siehe `aendern`. */
 export function horchen(rueckruf) {
   zuhoerer.add(rueckruf);
   return () => zuhoerer.delete(rueckruf);
 }
 
 /**
- * Was nach jeder Eingabeänderung mit der Beschreibung geschehen soll.
+ * Was nach jeder Änderung mit der Mappe geschehen soll: `ablegen(mappe,
+ * gewaehlt, gesichert)` -- die Projekte, die Stelle des gezeigten und ob
+ * dieser Stand als Datei auf der Platte liegt.
  *
  * Eingehängt wird von `app.js` das Ablegen im Browser. Hier steht nur der
  * Haken, damit dieser Baustein nichts von der Ablage wissen muss -- und damit
@@ -170,14 +179,19 @@ export function ablageEinrichten(rueckruf) {
   ablegen = rueckruf;
 }
 
+function ablegenJetzt() {
+  ablegen(zustand.mappe, zustand.mappe.projekte.indexOf(zustand.projekt), !zustand.ungespeichert);
+}
+
 /**
  * Ändert den Zustand und zeichnet alles neu; gerechnet wird nicht. Ohne
  * `teil` zeichnet es bloss neu, etwa wenn eine Antwort des Kerns da ist.
  *
  * Wer horcht (`horchen`), erfährt, was neu ist: 'alles', 'mitte'
- * (`mitteAendern`) oder 'projekt' (`projektAendern`). Bis 2026-11-20 gab
- * jeder Aufruf einen «Anlass» mit, einen freien Text; von rund sechzehn
- * wirkten drei -- zwei zeichneten nur die Mitte, einer rechnete.
+ * (`mitteAendern`), 'projekt' (`projektAendern`) oder 'neu', ein anderes
+ * Projekt (`projektSetzen`). Bis 2026-11-20 gab jeder Aufruf einen «Anlass»
+ * mit, einen freien Text; von rund sechzehn wirkten drei -- zwei zeichneten
+ * nur die Mitte, einer rechnete.
  */
 export function aendern(teil = {}) {
   Object.assign(zustand, teil);
@@ -209,19 +223,55 @@ function weitersagen(was) {
  */
 export function projektAendern(veraenderer) {
   veraenderer(zustand.projekt);
-  ablegen(zustand.projekt);
   Object.assign(zustand, { ungespeichert: true, fassung: zustand.fassung + 1 });
+  ablegenJetzt();
   weitersagen('projekt');
 }
 
 /**
- * Ein neues Projekt -- beim Start und beim Öffnen einer Datei. `weiteres`
- * setzt, was dazugehört: den Katalog, ob es gespeichert ist, die Auswahl.
- * Keine Ansicht weiss danach noch etwas vom vorigen (`ansichtVon`).
+ * Ändert die Mappe -- ein Projekt dazu, eines weg -- und zeigt danach
+ * `gezeigt`, eines ihrer Projekte.
+ */
+export function mappeAendern(veraenderer, gezeigt) {
+  veraenderer(zustand.mappe);
+  zustand.ungespeichert = true;
+  projektSetzen(gezeigt);
+}
+
+/** Je Projekt, wie man es verliess: die App, die Auswahl, je App der zuletzt gewählte Eintrag. */
+const verlassen = new WeakMap();
+
+/**
+ * Zeigt ein Projekt der Mappe: beim Start, beim Öffnen einer Datei, beim
+ * Wechsel oben links. `weiteres` setzt, was dazugehört: die Mappe, den
+ * Katalog, ob sie gespeichert ist.
+ *
+ * Was zum vorigen gehörte, gilt nicht mehr: keine Ansicht weiss noch etwas
+ * von ihm (`ansichtVon`), seine Lösung und sein Fenster sind weg -- ohne
+ * Lösung steht rechts, dass gerechnet wird, nicht die Zahlen des anderen.
+ * Wer zu einem Projekt zurückkehrt, findet es, wie er es verliess: dieselbe
+ * App, derselbe Eintrag. Gerechnet wird sofort ('neu', `horchen`).
  */
 export function projektSetzen(projekt, weiteres = {}) {
+  if (zustand.projekt) {
+    verlassen.set(zustand.projekt,
+      { app: zustand.app, auswahl: zustand.auswahl, zuletzt: zustand.zuletzt });
+  }
   ansichten.clear();
-  aendern({ projekt, fassung: zustand.fassung + 1, ...weiteres });
+  Object.assign(zustand, {
+    projekt,
+    fassung: zustand.fassung + 1,
+    loesung: null,
+    verfolgung: null,
+    rechenfehler: null,
+    fenster: null,
+    auswahl: null,
+    zuletzt: {},
+    ...verlassen.get(projekt),
+    ...weiteres,
+  });
+  ablegenJetzt();
+  weitersagen('neu');
 }
 
 /** Je Kennung, was sich die Ansichten merken -- siehe `ansichtVon`. */

@@ -107,7 +107,7 @@ class TestKatalogpfade(unittest.TestCase):
         """Ein neuer Eintrag nimmt die Vorlage seiner Liste (`nachVorlage`, apps.js)."""
         from opencivil.projekt.aufbau import BAUTEILE
         self.assertEqual(set(self.katalog["neu"]),
-                         {art.liste for art in BAUTEILE} | {"skripte"})
+                         {art.liste for art in BAUTEILE} | {"skripte", "projekte"})
 
 
 if __name__ == "__main__":

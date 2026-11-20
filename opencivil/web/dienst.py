@@ -35,7 +35,8 @@ from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
-from opencivil.projekt import BAUTEILE, DeckeEintrag, Projekt, ProjektFehler
+from opencivil.projekt import DeckeEintrag, Mappe, Projekt, ProjektFehler
+from opencivil.projekt.mappe import projekt_aus_datei
 from opencivil.projekt.staebe import MitStaeben
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.interaktion import GROESSEN
@@ -99,37 +100,22 @@ def beispiel(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return Projekt.beispiel().als_dict()
 
 
-#: Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
-KENNFELDER = ("name", "materialien", *(art.liste for art in BAUTEILE))
-
-
 def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
-    Prueft eine Projektbeschreibung und gibt sie aufgeraeumt zurueck.
-
-    Dafuer gedacht, dass eine hochgeladene oder im Browser abgelegte Datei
-    durch denselben Leser und dieselben Pruefungen laeuft wie alles andere
-    (:mod:`opencivil.projekt.lesen`) -- nicht durch eine zweite, nachgebaute
-    Pruefung in JavaScript. Alte Formate liest er nicht; eine solche Datei
-    nennt das erste Feld, das er nicht kennt.
-
-    Die Vorpruefung auf :data:`KENNFELDER` haelt ein leeres Objekt auf: jedes
-    Feld eines Projekts hat eine Vorgabe, ``{}`` liest sich darum als leeres
-    Projekt. Beim Oeffnen einer Datei waere das verheerend -- wer eine falsche
-    Datei erwischt, bekaeme wortlos ein leeres Projekt und haette seine Arbeit
-    verloren.
+    Prueft ein Projekt, wie es in einer Datei steht, und gibt es aufgeraeumt
+    zurueck (:func:`~opencivil.projekt.mappe.projekt_aus_datei`).
     """
-    roh = rumpf.get("projekt")
-    if not isinstance(roh, Mapping):
-        raise DienstFehler(400, "Die Beschreibung muss ein JSON-Objekt sein.")
-    if not any(feld in roh for feld in KENNFELDER):
-        raise DienstFehler(400, (
-            "Das sieht nicht nach einem Projekt aus – keines der Felder "
-            + ", ".join(KENNFELDER) + " ist vorhanden."))
+    return {"projekt": projekt_aus_datei(rumpf.get("projekt")).als_dict()}
 
-    projekt = Projekt.aus_dict(roh)
-    projekt.pruefen()
-    return {"projekt": projekt.als_dict()}
+
+def mappe_pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Prueft eine Mappe -- die Projekte, die die Oberflaeche im Browser ablegt,
+    speichert und oeffnet -- und gibt sie aufgeraeumt zurueck. Eine Datei mit
+    einem einzelnen Projekt, wie bis 2026-11-20 gespeichert, kommt als Mappe
+    mit diesem einen zurueck (:meth:`~opencivil.projekt.mappe.Mappe.aus_dict`).
+    """
+    return {"mappe": Mappe.aus_dict(rumpf.get("mappe")).als_dict()}
 
 
 def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -164,7 +150,7 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         loesung = aufbau.werk.loese_alles()
     else:
         loesung = _stromabwaerts(projekt, aufbau, beschreibung)
-    analysen = _analysen(beschreibung, aufbau, loesung)
+    analysen = _analysen(projekt.name, beschreibung, aufbau, loesung)
     return {**api.loesung_dict(loesung, aufbau, spannungsanalysen=analysen),
             "obergrenzen": api.obergrenzen(projekt)}
 
@@ -186,7 +172,7 @@ def _stromabwaerts(projekt: Projekt, aufbau, beschreibung: Mapping[str, Any]) ->
     verschoebe, aenderte den Bericht, und das waere keine Beschleunigung mehr,
     sondern eine andere Ausgabe.
     """
-    SPEICHER.aufraeumen([e.kennung for e in projekt.bauteile()])
+    SPEICHER.aufraeumen(projekt.name, [e.kennung for e in projekt.bauteile()])
 
     materialziele = aufbau.materialziele()
     gesamt = aufbau.werk.loese(*materialziele)
@@ -196,16 +182,17 @@ def _stromabwaerts(projekt: Projekt, aufbau, beschreibung: Mapping[str, Any]) ->
         if not eigene:
             continue
         stempel = _abdruck(beschreibung, aufbau, kennung)
-        teil = SPEICHER.hole(kennung, stempel)
+        teil = SPEICHER.hole(projekt.name, kennung, stempel)
         if teil is None:
             teil = aufbau.werk.loese(*eigene, bekannt=bekannt)
-            SPEICHER.merken(kennung, stempel, teil)
+            SPEICHER.merken(projekt.name, kennung, stempel, teil)
         gesamt.anhaengen(teil)
         bekannt.update(teil.werte)
     return gesamt
 
 
-def _analysen(beschreibung: Mapping[str, Any], aufbau, loesung: Loesung) -> Dict[str, list]:
+def _analysen(projekt: str, beschreibung: Mapping[str, Any], aufbau,
+              loesung: Loesung) -> Dict[str, list]:
     """
     Die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil -- aus dem
     Speicher, solange sein Abdruck derselbe ist wie bei seiner Loesung: eine
@@ -215,13 +202,13 @@ def _analysen(beschreibung: Mapping[str, Any], aufbau, loesung: Loesung) -> Dict
     unveraenderter Bauteile -- am Pruefprojekt «jeder Nachweis» zwei Drittel
     jeder Rechnung.
     """
-    ANALYSEN.aufraeumen(aufbau.spannungsfaelle)
+    ANALYSEN.aufraeumen(projekt, aufbau.spannungsfaelle)
     stempel = {k: _abdruck(beschreibung, aufbau, k) for k in aufbau.spannungsfaelle}
-    daten = {k: ANALYSEN.hole(k, s) for k, s in stempel.items()}
+    daten = {k: ANALYSEN.hole(projekt, k, s) for k, s in stempel.items()}
     neu = diagrammdaten.spannungsanalysen(
         aufbau, loesung, nur={k for k, d in daten.items() if d is None})
     for kennung, d in neu.items():
-        ANALYSEN.merken(kennung, stempel[kennung], d)
+        ANALYSEN.merken(projekt, kennung, stempel[kennung], d)
     return {**daten, **neu}
 
 
@@ -237,7 +224,7 @@ def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung:
     sonst dieses eine, ohne Herleitung: wer hier fragt, will Werte und
     Bilder, und die Zeichnung fragt nach jeder Eingabe.
     """
-    teil = SPEICHER.hole(kennung, _abdruck(projekt.als_dict(), aufbau, kennung))
+    teil = SPEICHER.hole(projekt.name, kennung, _abdruck(projekt.als_dict(), aufbau, kennung))
     if teil is None:
         return aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung), ohne_herleitung=True)
     return teil
@@ -438,11 +425,11 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     aufbau = projekt.aufbauen()
     # Einer unfertigen Analyse sagt schon der Abdruck, was fehlt (Aufbau.bauteil).
     stempel = f"{_abdruck(projekt.als_dict(), aufbau, kennung)}|{fest}|{wert!r}"
-    daten = DIAGRAMME.hole(kennung, stempel)
+    daten = DIAGRAMME.hole(projekt.name, kennung, stempel)
     if daten is None:
         loesung = _bauteil_rechnen(projekt, aufbau, kennung)
         daten = endlich(diagrammdaten.analyse(aufbau, loesung, kennung, (fest, wert)))
-        DIAGRAMME.merken(kennung, stempel, daten)
+        DIAGRAMME.merken(projekt.name, kennung, stempel, daten)
     return {"diagramme": daten}
 
 
@@ -649,6 +636,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "katalog": katalog,
     "beispiel": beispiel,
     "pruefen": pruefen,
+    "mappe_pruefen": mappe_pruefen,
     "verweise": verweise,
     "fallname": fallname,
     "rechnen": rechnen,

@@ -39,6 +39,15 @@ Spannung-Dehnung-Analysen, unter demselben Abdruck: sie lesen nur seinen
 Eintrag, die Materialien und die Werte, die daraus folgen. Bis 2026-10-18
 rechnete jede Rechnung alle Analysen neu, auch die unveraenderter Bauteile --
 am Pruefprojekt «jeder Nachweis» zwei Drittel jeder Rechnung.
+
+JE PROJEKT:
+Ein Platz gehoert einem Bauteil eines Projekts, nach dem Namen des Projekts
+und der Kennung -- in einer Mappe heisst jedes Projekt anders
+(:class:`~opencivil.projekt.mappe.Mappe`). Nur nach der Kennung verwechselte
+der Speicher nie etwas, das verhindert der Abdruck; aber zwei Projekte haben
+oft dieselben Kennungen, jedes zaehlt von ``q1`` an, und jeder Wechsel
+zwischen ihnen haette die Plaetze des anderen ueberschrieben und alles neu
+gerechnet.
 """
 
 from __future__ import annotations
@@ -85,8 +94,8 @@ class Ergebnisspeicher(Generic[T]):
     """
     Das Gedaechtnis zwischen zwei Anfragen.
 
-    Ein Eintrag je Bauteil, geschluesselt nach Kennung und nur gueltig,
-    solange der Abdruck stimmt. Was darin liegt, sagt, wer ihn anlegt: die
+    Ein Eintrag je Bauteil, geschluesselt nach Projekt und Kennung und nur
+    gueltig, solange der Abdruck stimmt. Was darin liegt, sagt, wer ihn anlegt: die
     Loesung eines Laufs, der die Baustoffe mitgebracht bekam -- sie enthaelt
     nur, was das Bauteil selbst gerechnet hat --, oder die Zeichendaten
     seiner Analysen. Der Speicher liegt im Modul und damit im Prozess: beim
@@ -95,33 +104,34 @@ class Ergebnisspeicher(Generic[T]):
     """
 
     def __init__(self, plaetze: int = PLAETZE) -> None:
-        self._eintraege: Dict[str, Tuple[str, T]] = {}
+        self._eintraege: Dict[Tuple[str, str], Tuple[str, T]] = {}
         self._plaetze = plaetze
         self.treffer = 0
         self.fehlgriffe = 0
 
-    def hole(self, kennung: str, stempel: str) -> Optional[T]:
-        eintrag = self._eintraege.get(kennung)
+    def hole(self, projekt: str, kennung: str, stempel: str) -> Optional[T]:
+        eintrag = self._eintraege.get((projekt, kennung))
         if eintrag is None or eintrag[0] != stempel:
             self.fehlgriffe += 1
             return None
         self.treffer += 1
         return eintrag[1]
 
-    def merken(self, kennung: str, stempel: str, teil: T) -> None:
-        if kennung in self._eintraege:
-            del self._eintraege[kennung]
+    def merken(self, projekt: str, kennung: str, stempel: str, teil: T) -> None:
+        platz = (projekt, kennung)
+        if platz in self._eintraege:
+            del self._eintraege[platz]
         elif len(self._eintraege) >= self._plaetze:
             # Der aelteste geht. Ein Wörterbuch behaelt seine Reihenfolge,
             # also ist das der erste Schluessel.
             del self._eintraege[next(iter(self._eintraege))]
-        self._eintraege[kennung] = (stempel, teil)
+        self._eintraege[platz] = (stempel, teil)
 
-    def aufraeumen(self, kennungen) -> None:
-        """Eintraege zu geloeschten Platten wegwerfen."""
+    def aufraeumen(self, projekt: str, kennungen) -> None:
+        """Eintraege zu geloeschten Bauteilen des Projekts wegwerfen -- die anderer Projekte bleiben."""
         behalten = set(kennungen)
-        for k in [k for k in self._eintraege if k not in behalten]:
-            del self._eintraege[k]
+        for platz in [p for p in self._eintraege if p[0] == projekt and p[1] not in behalten]:
+            del self._eintraege[platz]
 
     def leeren(self) -> None:
         self._eintraege.clear()
