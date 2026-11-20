@@ -7,6 +7,37 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Schneller Start
+
+Der Benutzer fragte, warum der Start auf GitHub so lange dauert
+(2026-11-20). Gemessen wird jetzt bei jedem Laden: nach der ersten Rechnung
+schreibt die Seite in die Konsole, wann jeder Schritt fertig war, ab dem
+Aufruf der Seite («Start: Oberfläche geladen 0.07 s · Server gesucht 0.09 s
+· Python geladen 1.67 s · …»). Jeder Schritt setzt seine Marke selbst
+(`performance.mark`); der Faden des Kerns schickt die seinen mit «bereit»,
+und `api.js` rechnet sie auf die Uhr der Seite um.
+
+Bis dahin lief alles nacheinander: erst die Oberfläche, dann die Suche nach
+einem Server, dann Python, dann die Quellen, dann das Einlesen. Lokal, mit
+einem Dateiserver ohne Kern wie auf GitHub (`statisch` in
+`.claude/launch.json`), beim erneuten Laden: Oberfläche 0.10 s, Python
+2.12 s, Quellen 2.22 s, eingelesen 3.54 s, erste Rechnung 4.35 s.
+
+**Der Kern startet sofort.** Ein kleines Modul in `index.html` stösst ihn
+an, bevor die Oberfläche geladen ist -- mit `async`, damit es nicht auf sie
+wartet. `kernBereitstellen` startet nur beim ersten Aufruf; wer später
+fragt, bekommt dasselbe Versprechen, und die Anzeige des Ladeschirms
+bekommt nachgereicht, was vorher gemeldet wurde. Im Faden kommen die Quellen,
+während Python lädt. Danach, gleich gemessen: Python 1.7–1.8 s, die Quellen
+sind dann schon da, eingelesen 3.05 s, erste Rechnung 3.9 s. Die
+Oberfläche war ohnehin schneller fertig als Python; auf GitHub, wo jede
+Anfrage länger dauert, zählt der frühere Start mehr.
+
+Was übrig bleibt, ist Python selbst (gut 1.5 s, davon 0.1 s für die 13 MB)
+und das Einlesen des Kerns (1.3 s): Python übersetzt beim Einbinden jede
+Datei. Vorübersetzt mitliefern ginge nur aus demselben Python wie in
+Pyodide, 3.14; auf dem Rechner läuft 3.12.
+
 ## 2026-11-20 · Sandbox je App
 
 Der Benutzer wollte in jeder App einen Eintrag zum schnellen Ausprobieren

@@ -39,7 +39,9 @@ export class KernFehler extends Error {
  *
  * @param {(text: string) => void} [fortschritt]  bekommt kurze Standmeldungen
  * @param {{modul?: string}} [optionen]
- * @returns {Promise<{ruf: Function, beenden: Function, art: string, fassung: string}>}
+ * @returns {Promise<{ruf: Function, beenden: Function, art: string, fassung: string,
+ *   zeiten: Object<string, number>}>}  `zeiten`: wann im Faden jeder Schritt des
+ *   Starts fertig war, in Millisekunden seit 1970
  */
 export function kernStarten(fortschritt = () => {}, { modul = 'opencivil.web.dienst' } = {}) {
   // Beide Adressen kommen über die Importtafel in index.html, also mit
@@ -105,7 +107,9 @@ export function kernStarten(fortschritt = () => {}, { modul = 'opencivil.web.die
       else if (data.art === 'fortschritt') fortschritt(data.text);
       else if (data.art === 'bereit') {
         fortschritt('');
-        bereit({ ruf, beenden, art: 'pyodide', fassung: data.fassung });
+        bereit({
+          ruf, beenden, art: 'pyodide', fassung: data.fassung, zeiten: data.zeiten,
+        });
       } else if (data.art === 'gescheitert') {
         gescheitert(new KernFehler(data.meldung, data.spur));
       }

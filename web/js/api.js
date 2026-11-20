@@ -15,6 +15,12 @@
  * Welcher Weg es wird, entscheidet ein einziger Versuch: antwortet ein Server,
  * nehmen wir ihn (er startet ohne Ladezeit und kann PDF). Antwortet keiner,
  * rechnet der Browser selbst.
+ *
+ * SOFORT:
+ * Den Versuch stösst schon die Seite an (index.html), bevor die Oberfläche
+ * geladen ist -- Python braucht von allem am längsten, und auf die
+ * Oberfläche muss es nicht warten. `kernBereitstellen` startet darum nur
+ * einmal; wer später fragt, bekommt dasselbe Versprechen.
  */
 
 import { kernStarten, KernFehler } from './kern.js';
@@ -26,6 +32,22 @@ const WURZEL = new URL('../../', import.meta.url);
 const PROBE_MS = 1500;
 
 let kern = null;
+
+/** Der Start des Kerns: einmal, beim ersten Aufruf von `kernBereitstellen`. */
+let bereitstellung = null;
+
+/**
+ * Was der Start zuletzt meldete, und wer es anzeigt. Die Anzeige kommt erst
+ * mit der Oberfläche; was vorher gemeldet wurde, bekommt sie nachgereicht.
+ * Der erste Stand ist der, mit dem die Seite den Ladeschirm zeigt.
+ */
+let stand = 'Rechenkern wird gesucht …';
+let anzeige = () => {};
+
+function fortschritt(text) {
+  stand = text;
+  anzeige(text);
+}
 
 // ===========================================================================
 // Weg 1: ein laufender Server
@@ -85,15 +107,28 @@ async function serverDa() {
 // ===========================================================================
 
 /**
- * Sucht den Rechenkern und macht ihn bereit. Muss vor jedem Aufruf laufen.
+ * Sucht den Rechenkern und macht ihn bereit -- beim ersten Aufruf; jeder
+ * weitere bekommt dasselbe Versprechen. Muss vor jedem Aufruf laufen.
  *
- * @param {(text: string) => void} [fortschritt]
+ * @param {(text: string) => void} [zeigen]  bekommt den Stand des Starts:
+ *   gleich den letzten, dann jeden neuen; leer, sobald der Kern bereit ist
  * @returns {Promise<{art: 'server'|'pyodide', beschriftung: string}>}
  */
-export async function kernBereitstellen(fortschritt = () => {}) {
+export function kernBereitstellen(zeigen) {
+  if (zeigen) {
+    anzeige = zeigen;
+    zeigen(stand);
+  }
+  bereitstellung ??= bereitstellen();
+  return bereitstellung;
+}
+
+async function bereitstellen() {
   fortschritt('Rechenkern wird gesucht …');
 
-  if (await serverDa()) {
+  const da = await serverDa();
+  performance.mark('Server gesucht');
+  if (da) {
     kern = { ruf: ueberHttp, art: 'server' };
     fortschritt('');
     return { art: 'server', beschriftung: 'Kern: lokaler Server' };
@@ -101,6 +136,10 @@ export async function kernBereitstellen(fortschritt = () => {}) {
 
   const imBrowser = await kernStarten(fortschritt);
   kern = imBrowser;
+  // Die Uhr des Fadens, umgerechnet auf die der Seite.
+  for (const [name, zeit] of Object.entries(imBrowser.zeiten)) {
+    performance.mark(name, { startTime: zeit - performance.timeOrigin });
+  }
   return {
     art: 'pyodide',
     beschriftung: `Kern: Python ${imBrowser.fassung} im Browser`,

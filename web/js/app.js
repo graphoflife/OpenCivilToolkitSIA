@@ -92,6 +92,19 @@ function stand(antwort) {
   return [`${werte} Werte bestimmt${dazu}`, gut];
 }
 
+/**
+ * Nach der ersten Rechnung: wann jeder Schritt des Starts fertig war, ab dem
+ * Aufruf der Seite -- einmal, in die Konsole. Die Marken setzt jeder Schritt
+ * selbst (`performance.mark`), der Faden des Kerns die seinen über `api.js`.
+ */
+function startzeitenMelden() {
+  if (performance.getEntriesByName('erste Rechnung').length) return;
+  performance.mark('erste Rechnung');
+  const marken = performance.getEntriesByType('mark').sort((a, b) => a.startTime - b.startTime);
+  console.info(`Start: ${marken.map((m) => `${m.name} ${(m.startTime / 1000).toFixed(2)} s`)
+    .join(' · ')}`);
+}
+
 /** Ein einzelner Durchgang: hinschicken, Antwort übernehmen, Stand melden. */
 async function einDurchgang() {
   zustandsanzeige('rechnet …');
@@ -115,6 +128,7 @@ async function einDurchgang() {
     });
 
     zustandsanzeige(...stand(antwort));
+    startzeitenMelden();
   } catch (fehler) {
     zustandsanzeige('Fehler', 'ist-fehler');
     melden(fehler.message, true);
@@ -587,6 +601,7 @@ function ladeanzeige(text) {
 }
 
 async function starten() {
+  performance.mark('Oberfläche geladen');
   Object.assign(knoten, {
     apps: document.getElementById('apps'),
     baum: document.getElementById('baum'),
@@ -657,6 +672,7 @@ async function starten() {
     projektSetzen(mappe.projekte[gewaehlt], {
       mappe, katalog, ungespeichert: !gesichert, gerettet: gerettete(),
     });
+    performance.mark('Projekt gezeichnet');
   } catch (fehler) {
     ladeanzeige('');
     zustandsanzeige('Kern nicht bereit', 'ist-fehler');

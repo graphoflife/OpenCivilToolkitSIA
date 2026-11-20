@@ -14,8 +14,8 @@
     "imports": {
       "./js/ablage.js": "./js/ablage.js?v=2cff59319161",
       "./js/achsen.js": "./js/achsen.js?v=a18a53f82e92",
-      "./js/api.js": "./js/api.js?v=848c45d2c8c5",
-      "./js/app.js": "./js/app.js?v=4f6dbadb8d8a",
+      "./js/api.js": "./js/api.js?v=e90276978a0c",
+      "./js/app.js": "./js/app.js?v=ee95e256176c",
       "./js/apps.js": "./js/apps.js?v=45ddee282059",
       "./js/arten.js": "./js/arten.js?v=f8ac57ad3003",
       "./js/balkensystem.js": "./js/balkensystem.js?v=95040f5bde38",
@@ -58,8 +58,8 @@
       "./js/gb_zeichnung.js": "./js/gb_zeichnung.js?v=6895f6dc6243",
       "./js/grundbruch.js": "./js/grundbruch.js?v=959a960e9947",
       "./js/kapitel.js": "./js/kapitel.js?v=5943ba037490",
-      "./js/kern.js": "./js/kern.js?v=758d92952fe7",
-      "./js/kern_arbeiter.js": "./js/kern_arbeiter.js?v=89902732e200",
+      "./js/kern.js": "./js/kern.js?v=df77947e0508",
+      "./js/kern_arbeiter.js": "./js/kern_arbeiter.js?v=b0bc8d99be74",
       "./js/konsole.js": "./js/konsole.js?v=25434f6b739d",
       "./js/kopierleiste.js": "./js/kopierleiste.js?v=2af7c8ead463",
       "./js/lagen.js": "./js/lagen.js?v=d1de89b1b40b",
@@ -97,6 +97,9 @@
   }
   </script>
   <!-- Ende der Versionsmarken -->
+  <!-- Der Rechenkern startet sofort, während die Oberfläche noch lädt: Python
+       braucht von allem am längsten. «async», damit es nicht auf sie wartet. -->
+  <script type="module" async>import { kernBereitstellen } from './js/api.js'; kernBereitstellen();</script>
   <!-- Eingebunden statt mit src: nur so geht auch app.js über die Importtafel
        und bekommt seine Marke. -->
   <script type="module">import './js/app.js';</script>

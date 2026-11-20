@@ -34,13 +34,20 @@ const PYODIDE = new URL('../vendor/pyodide/', import.meta.url);
 
 const melden = (nachricht) => self.postMessage(nachricht);
 
+/**
+ * Jetzt, in Millisekunden seit 1970. Die Uhr eines Fadens zählt ab seinem
+ * eigenen Start; so lässt sie sich mit der der Seite vergleichen.
+ */
+const jetzt = () => performance.timeOrigin + performance.now();
+
 /** Ein Fehler mit Spur -- wie `KernFehler` im Hauptfaden, aber als Daten verschickbar. */
 function startfehler(meldung, spur = '') {
   return Object.assign(new Error(meldung), { spur });
 }
 
 /**
- * Holt die Liste der Quelldateien und legt sie ins Dateisystem von Pyodide.
+ * Holt die Quelldateien des Kerns: `[[Pfad, Inhalt], …]`, samt dem
+ * Verzeichnis selbst.
  *
  * Die Liste kommt aus `web/kern/dateien.json` und wird von
  * `opencivil/web/bruecke.py` geschrieben; ein Test wacht darüber, dass sie zu
@@ -61,7 +68,7 @@ function startfehler(meldung, spur = '') {
  *
  * @param {string} verzeichnis  Adresse von `web/kern/dateien.json`, mit Marke
  */
-async function quellenEinhaengen(pyodide, verzeichnis) {
+async function quellenHolen(verzeichnis) {
   const antwort = await fetch(verzeichnis);
   if (!antwort.ok) {
     throw startfehler(
@@ -83,18 +90,35 @@ async function quellenEinhaengen(pyodide, verzeichnis) {
   // Das Verzeichnis selbst liegt daneben, wo es auch auf dem Rechner liegt:
   // die Konsole liest darin, welche Fremdpakete beiliegen.
   geladen.push(['web/kern/dateien.json', verzeichnisText]);
-  const kodierer = new TextEncoder();
-  for (const [name, inhalt] of geladen) {
-    const pfad = `${EINHAENGEPUNKT}/${name}`;
-    pyodide.FS.mkdirTree(pfad.slice(0, pfad.lastIndexOf('/')));
-    pyodide.FS.writeFile(pfad, kodierer.encode(inhalt));
-  }
-  return eintraege.length;
+  return geladen;
 }
 
-/** Python laden, den Kern einhängen, den Dienst einbinden -- und melden, dass es geht. */
+/** Legt die Quelldateien ins Dateisystem von Pyodide, unter `EINHAENGEPUNKT`. */
+function quellenEinhaengen(pyodide, dateien) {
+  for (const [name, inhalt] of dateien) {
+    const pfad = `${EINHAENGEPUNKT}/${name}`;
+    pyodide.FS.mkdirTree(pfad.slice(0, pfad.lastIndexOf('/')));
+    pyodide.FS.writeFile(pfad, inhalt);
+  }
+}
+
+/**
+ * Python laden, den Kern einhängen, den Dienst einbinden -- und melden, dass
+ * es geht. Die Quellen kommen nebenher, während Python lädt: erst zum
+ * Einhängen braucht es Python.
+ */
 async function starten(verzeichnis, modul) {
   melden({ art: 'fortschritt', text: 'Python wird geladen …' });
+  // Wann jeder Schritt fertig war -- die Seite schreibt es in die Konsole.
+  const zeiten = {};
+  const quellen = quellenHolen(verzeichnis).then((dateien) => {
+    zeiten['Quellen geholt'] = jetzt();
+    return dateien;
+  });
+  // Scheitert das Holen, während Python noch lädt, gilt es erst, wenn auf die
+  // Quellen gewartet wird -- und wird dort gemeldet, nicht vorher als
+  // unbehandelt.
+  quellen.catch(() => {});
 
   let loadPyodide;
   try {
@@ -111,9 +135,11 @@ async function starten(verzeichnis, modul) {
     stdout: (zeile) => console.log('[Python]', zeile),
     stderr: (zeile) => console.warn('[Python]', zeile),
   });
+  zeiten['Python geladen'] = jetzt();
 
   melden({ art: 'fortschritt', text: 'Rechenkern wird eingelesen …' });
-  const anzahl = await quellenEinhaengen(pyodide, verzeichnis);
+  const dateien = await quellen;
+  quellenEinhaengen(pyodide, dateien);
 
   pyodide.runPython(`
 import sys
@@ -128,9 +154,10 @@ if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
     throw startfehler(`${modul} nicht einbindbar.`, String(ursache));
   }
 
+  zeiten['Kern eingelesen'] = jetzt();
   const fassung = pyodide.runPython('import sys; sys.version.split()[0]');
-  console.info(`${modul} bereit: Python ${fassung} über Pyodide, ${anzahl} Quelldateien.`);
-  melden({ art: 'bereit', fassung });
+  console.info(`${modul} bereit: Python ${fassung} über Pyodide, ${dateien.length} Dateien.`);
+  melden({ art: 'bereit', fassung, zeiten });
   return dienst;
 }
 
