@@ -1,5 +1,5 @@
 ---
-erzeugt: 60776538745b
+erzeugt: 4330a5f90d95
 art: modul
 tags: [modul]
 ---
@@ -112,6 +112,22 @@ def r(self) -> float
 
 Die Kraft je Meter des Lagers, in N/m.
 
+### Ausfall
+
+```python
+@dataclass(frozen=True)
+class Ausfall(Meldung)
+```
+
+Was in einem Fall ausfaellt, weil Streifen nicht tragen: der ganze Satz
+in `text` -- «… 80 kN fallen aus.» --, dazu `grund` ohne die Kraft
+und die Kraft `F` in N. Ueber die Faelle gesammelt
+([[opencivil.decke.rechnung#Ergebnis.fallmeldungen|Ergebnis.fallmeldungen]]), steht der Grund einmal und die Kraft
+je Fall dahinter.
+
+- `grund: str = ''`
+- `F: float = 0.0`
+
 ### Fallergebnis
 
 ```python
@@ -177,6 +193,19 @@ class Ergebnis
 def fall(self, name: str) -> Fallergebnis
 ```
 
+#### Ergebnis.fallmeldungen
+
+```python
+def fallmeldungen(self) -> List[Meldung]
+```
+
+Was die Faelle melden, jede Meldung einmal, vorn die Faelle, in denen
+sie steht: «In allen Fällen: …», sonst ««LF 1», «GZT»: …». Ein
+[[opencivil.decke.rechnung#Ausfall|Ausfall]] aus demselben Grund in mehreren Faellen steht einmal,
+die Kraft je Fall dahinter: «… Es fallen aus: «g» 80 kN, «GZT»
+228 kN.» Bis 2026-11-20 stand jede Meldung je Fall -- in vier
+Lastfaellen und drei Kombinationen siebenmal derselbe Satz (Benutzer).
+
 ### rechnen
 
 ```python
@@ -194,7 +223,8 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis
 Ein Lastfall oder eine Kombination: alle Träger, von den Feldstreifen zu
 den Unterzügen. Was auf Trägern liegt, die nicht tragen, sagt eine
 Meldung je Grund -- bis 2026-11-19 eine je Träger, und eine Platte ohne
-Lager gab je Fall vierzig gleiche Zeilen.
+Lager gab je Fall vierzig gleiche Zeilen. Ebenso eine für alle Streifen
+mit Last, die auf keiner Platte liegen (bis 2026-11-20 eine je Streifen).
 
 ### auf_traeger
 

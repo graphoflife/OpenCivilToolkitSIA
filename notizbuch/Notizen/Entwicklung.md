@@ -7,6 +7,41 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Decke sagt jede Meldung einmal
+
+Die Decke meldete je Fall: bei vier Lastfällen und drei Kombinationen stand
+derselbe Satz siebenmal da, und ein Streifen ohne Platte gab je Fall eine
+eigene Zeile (Benutzer, 2026-11-20).
+
+Jetzt sammelt der Kern (`Ergebnis.fallmeldungen` in `decke/rechnung.py`):
+gleiche Sätze stehen einmal, vorn die Fälle, in denen sie stehen --
+«In allen Fällen: …» oder ««g», «q»: …». Fällt aus demselben Grund in
+mehreren Fällen etwas aus, steht der Grund einmal, die Kraft je Fall
+dahinter: «12 Streifen tragen nicht – … Es fallen aus: «Eigengewicht»
+30 kN, «Auflast» 9 kN, «GZT» 79.7 kN.» Dafür ist ein Ausfall eine eigene
+`Meldung`, `Ausfall`, mit Grund und Kraft; im Fall selbst -- für die
+Zeichnung des gewählten Falls -- bleibt der ganze Satz. Streifen mit
+Last, die auf keiner Platte liegen, nennt eine Meldung je Fall, wie schon
+die ausgefallenen Träger («Auf 3 Streifen liegt Last, aber sie liegen auf
+keiner Platte.»). Die Herleitung und die Karte der Fälle nehmen dieselbe
+Liste; mehr als drei Meldungen klappen in der Karte zusammen, mit ihrer
+Anzahl, offen, solange eine ein Fehler ist. Eine Platte, die nur auf einer
+Wand liegt, gab bei drei Lastfällen und einer Kombination acht Zeilen,
+jetzt zwei.
+
+Nebenbei: eine Kraft in einer Meldung der Decke stand ab 1000 kN mit
+Exponent da, «1.5e+03 kN». Jetzt «1500 kN» (`lasten.kn`, drei gültige
+Stellen wie bisher).
+
+Die anderen Apps mit Lastfällen durchgesehen, dort wiederholt sich nichts:
+das Balkensystem meldet für das ganze System; je Fall nur eine Last an
+einem Ort ohne Stab, und eine Kombination meldet nicht noch einmal, was
+ihre Lastfälle schon melden (`melden=not kombination` in
+`stabwerk/system.py`). Platte, Querschnittsanalyse, Pfahl, Grundbruch und
+Setzung melden je Nachweis, und die Hinweise unter der Nachweistabelle
+stehen schon je Grund gebündelt (`hinweise` in
+`bericht/zusammenfassung.py`).
+
 ## 2026-11-20 · Ein eigenes Material beginnt mit den Werten des ersten Betons
 
 Ein eigenes Material im Balkensystem begann mit den Werten eines

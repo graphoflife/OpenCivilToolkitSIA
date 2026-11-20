@@ -26,8 +26,10 @@ from opencivil.decke.modell import (
     Aufteilung, Decke, Flaechenlast, Kombination, Lastfall, Linienlager, Linienlast, Platte, Punktlast,
     Stuetze, Unterzug, Zone,
 )
-from opencivil.decke.rechnung import Wandkraft, lagerverlauf, rechnen, spitzen
+from opencivil.decke.lasten import kn
+from opencivil.decke.rechnung import Ergebnis, Fallergebnis, Wandkraft, lagerverlauf, rechnen, spitzen
 from opencivil.decke.traeger import wert
+from opencivil.stabwerk.system import Meldung
 from opencivil.stabwerk.verlauf import extremwerte
 
 E, WICHTE = 30e9, 25e3
@@ -440,6 +442,42 @@ class TestEinachsig(Rechnung):
         self.assertEqual([(m.text, m.elemente, m.fehler) for m in f.meldungen], [(
             "8 Streifen tragen nicht – sie liegen nur auf «W3», und nichts hält ihre Drehung. "
             "80 kN fallen aus.", tuple(f"x{i}" for i in range(1, 9)), True)])
+
+    def test_gleiche_meldungen_stehen_einmal(self):
+        """
+        Was mehrere Fälle gleich melden, steht einmal, vorn ihre Namen -- bei
+        allen «In allen Fällen» (Benutzer, 2026-11-20).
+        """
+        def fall(name, *meldungen):
+            return Fallergebnis(name, 0.0, 0.0, meldungen=list(meldungen))
+
+        e = Ergebnis(Decke(), None, None, [fall("g", Meldung("A."), Meldung("B.", fehler=False)),
+                                           fall("q", Meldung("A.")),
+                                           fall("GZT", Meldung("A."), Meldung("B.", fehler=False))], [])
+        self.assertEqual([(m.text, m.fehler) for m in e.fallmeldungen()],
+                         [("In allen Fällen: A.", True), ("«g», «GZT»: B.", False)])
+
+    def test_ein_ausfall_steht_einmal_mit_der_kraft_je_fall(self):
+        """
+        Fällt in mehreren Fällen aus demselben Grund etwas aus, steht der
+        Grund einmal, die kN je Fall dahinter; im Fall selbst, für die
+        Zeichnung, der ganze Satz (Benutzer, 2026-11-20).
+        """
+        ecken = rechteck(0, 0, 4, 2)
+        last = Flaechenlast("q", q, platte="P")
+        e = rechnen(Decke(platten=[Platte("P", ecken, 0.2, E, WICHTE)], linienlager=waende(ecken, 3),
+                          lastfaelle=[Lastfall("g", [last]), Lastfall("q", [last])],
+                          kombinationen=[Kombination("GZT", {"g": 1.35, "q": 1.5})],
+                          aufteilung=Aufteilung.FEST, anteil=1.0))
+        grund = "8 Streifen tragen nicht – sie liegen nur auf «W3», und nichts hält ihre Drehung."
+        self.assertEqual([m.text for m in e.fallmeldungen()],
+                         [f"{grund} Es fallen aus: «g» 80 kN, «q» 80 kN, «GZT» 228 kN."])
+        self.assertEqual([m.text for m in e.fall("GZT").meldungen], [f"{grund} 228 kN fallen aus."])
+
+    def test_kn_ohne_exponent(self):
+        """Drei gültige Stellen, nie «1.5e+03» (bis 2026-11-20)."""
+        self.assertEqual([kn(F) for F in (1.5e6, 228.4e3, 80e3, 250.0, 0.0)],
+                         ["1500", "228", "80", "0.25", "0"])
 
     def test_die_meldung_nennt_nur_die_platte_ohne_lager(self):
         gelagert = rechteck(0, 0, 4, 2)

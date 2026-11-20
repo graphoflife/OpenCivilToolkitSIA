@@ -252,7 +252,7 @@ def _aufteilung(p: Protokoll, decke: Decke) -> None:
 
 
 def _faelle(p: Protokoll, e: Ergebnis) -> None:
-    """Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, und die Meldungen des Falls."""
+    """Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, und die Meldungen der Fälle."""
     if not e.faelle:
         return
     p.tabelle(["Fall", Mathe(r"Q\ [\mathrm{kN}]"), Mathe(r"Q_{\mathrm{daneben}}\ [\mathrm{kN}]"),
@@ -261,9 +261,8 @@ def _faelle(p: Protokoll, e: Ergebnis) -> None:
                for f in e.faelle], titel="Last und Lagerkräfte je Fall")
     p.text("Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem "
            "Streifen, der nicht trägt.")
-    for f in e.faelle:
-        for m in f.meldungen:
-            (p.warnung if m.fehler else p.hinweis)(f"«{f.name}»: {m.text}")
+    for m in e.fallmeldungen():
+        (p.warnung if m.fehler else p.hinweis)(m.text)
 
 
 # ===========================================================================

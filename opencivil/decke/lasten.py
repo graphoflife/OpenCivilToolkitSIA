@@ -50,6 +50,15 @@ LINIENBREITE = 1e-3
 DANEBEN = 1e-9
 
 
+def kn(F: float) -> str:
+    """
+    Eine Kraft in N als Zahl in kN fuer eine Meldung: drei gueltige Stellen,
+    nie mit Exponent -- «80», «0.25», «1500», nicht «1.5e+03» wie bis
+    2026-11-20.
+    """
+    return f"{float(f'{F / 1e3:.3g}'):f}".rstrip("0").rstrip(".")
+
+
 @dataclass
 class Belastung:
     """Je Streifen seine Lasten, in ``s = p·n`` seiner Richtung -- und die Summen."""
@@ -103,7 +112,7 @@ def belasten(decke: Decke, zerlegung: Zerlegung, aufteilungen: Aufteilungen, las
         if abs(gesamt - getragen) > DANEBEN * abs(gesamt):
             heraus.daneben += gesamt - getragen
             heraus.meldungen.append(Meldung(
-                f"Die Last «{name}» liegt zum Teil neben den Platten: {abs(gesamt - getragen) / 1e3:.3g} kN "
+                f"Die Last «{name}» liegt zum Teil neben den Platten: {kn(abs(gesamt - getragen))} kN "
                 "trägt niemand.", (name,), fehler=False))
     for last in lastfall.lasten:
         if isinstance(last, Linienlast) and last.wert:
@@ -122,7 +131,7 @@ def belasten(decke: Decke, zerlegung: Zerlegung, aufteilungen: Aufteilungen, las
                     heraus.daneben += gesamt - getragen
                     heraus.meldungen.append(Meldung(
                         f"Die Linienlast «{last.name}» liegt zum Teil neben den Platten: "
-                        f"{abs(gesamt - getragen) / 1e3:.3g} kN trägt niemand.", (last.name,), fehler=False))
+                        f"{kn(abs(gesamt - getragen))} kN trägt niemand.", (last.name,), fehler=False))
     return heraus
 
 

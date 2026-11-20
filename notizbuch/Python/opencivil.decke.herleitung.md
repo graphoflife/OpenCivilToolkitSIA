@@ -1,5 +1,5 @@
 ---
-erzeugt: 660d24405a9f
+erzeugt: 16e3298ca28d
 art: modul
 tags: [modul]
 ---
@@ -73,7 +73,7 @@ Name, Ort und Wert einer Last für die Tabelle.
 def _faelle(p: Protokoll, e: Ergebnis) -> None
 ```
 
-Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, und die Meldungen des Falls.
+Je Lastfall und Kombination die Last und was die Lager tragen -- die Probe --, und die Meldungen der Fälle.
 
 ### _ansaetze
 

@@ -340,6 +340,25 @@ export function deckenKarten(kennung) {
   ];
 }
 
+/** Welche zugeklappten Meldungen offen sind -- Ansichtssache, nicht Teil des Projekts. */
+const MELDUNGEN_OFFEN = new Set();
+
+/**
+ * Was der Kern zu den Fällen meldet, jede Meldung einmal, vorn ihre Fälle
+ * (`fallmeldungen`). Mehr als drei klappen zusammen, mit ihrer Anzahl --
+ * offen, solange eine davon ein Fehler ist (Benutzer, 2026-11-20).
+ */
+function fallmeldungen(daten) {
+  const meldungen = daten.fallmeldungen || [];
+  const zeilen = meldungen.map((m) => el('p', {
+    class: m.fehler ? 'hinweis hinweis-warnung' : 'hinweis', text: m.text,
+  }));
+  if (zeilen.length <= 3) return zeilen;
+  const titel = 'Meldungen zu den Fällen';
+  if (meldungen.some((m) => m.fehler)) MELDUNGEN_OFFEN.add(titel);
+  return [klappgruppe(titel, zeilen, MELDUNGEN_OFFEN, 'bs-elemente')];
+}
+
 /**
  * Je Lastfall und Kombination die Last und was die Lager davon tragen -- die
  * Probe des Kerns --, darunter, was er zu den Fällen meldet. Was neben den
@@ -354,9 +373,7 @@ function faelleKarte(daten) {
   return karte('Lasten und Lagerkräfte', [
     tabelle(['Fall', ...spalten.map(([t]) => `${t} [kN]`)],
       faelle.map((f) => [f.name, ...spalten.map(([, feld]) => zahlText(f[feld], 1))])),
-    ...faelle.flatMap((f) => f.meldungen.map((m) => el('p', {
-      class: m.fehler ? 'hinweis hinweis-warnung' : 'hinweis', text: `«${f.name}»: ${m.text}`,
-    }))),
+    ...fallmeldungen(daten),
     el('p.karte-hinweis', {
       text: 'Die Lager tragen die ganze Last ausser dem, was neben den Platten liegt oder auf einem Streifen, der nicht trägt.',
     }),

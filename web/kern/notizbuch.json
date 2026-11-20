@@ -4511,6 +4511,7 @@
       "art": "modul",
       "kurz": "die Lasten eines Lastfalls auf den Streifen.",
       "stichworte": [
+        "kn",
         "Belastung",
         "Belastung.hinzu",
         "kombiniert",
@@ -4557,6 +4558,7 @@
         "Wandkraft",
         "Wandkraft.laenge",
         "Wandkraft.r",
+        "Ausfall",
         "Fallergebnis",
         "Fallergebnis.stuetzenkraft",
         "Fallergebnis.wandkraft",
@@ -4564,6 +4566,7 @@
         "Fallergebnis.fehlbetrag",
         "Ergebnis",
         "Ergebnis.fall",
+        "Ergebnis.fallmeldungen",
         "rechnen",
         "fall",
         "auf_traeger",

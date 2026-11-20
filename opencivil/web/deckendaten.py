@@ -66,8 +66,9 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
     ``faelle``: je Lastfall und Kombination ``name``, die Last ``summe``,
     was davon ``daneben`` liegt und ``nicht_getragen`` wird, und was die
     ``lager`` tragen, in kN, auch ``je_lager`` (:func:`_je_lager`) -- und
-    seine ``meldungen``. Die Zonen und Lasten zeichnet die Oberflaeche nach
-    dem Projekt.
+    seine ``meldungen``; ``fallmeldungen`` sind dieselben, jede einmal, vorn
+    ihre Faelle (:meth:`~opencivil.decke.rechnung.Ergebnis.fallmeldungen`).
+    Die Zonen und Lasten zeichnet die Oberflaeche nach dem Projekt.
     """
     if befund is None:
         return {"gerechnet": False, "meldungen": []}
@@ -90,6 +91,7 @@ def uebersicht(befund: Optional[Deckenbefund]) -> Dict[str, Any]:
                     "nicht_getragen": zahl(f.nicht_getragen, KN), "lager": zahl(f.lagerkraft, KN),
                     "je_lager": _je_lager(e, f), "meldungen": _meldungen(f.meldungen)}
                    for f in e.faelle],
+        "fallmeldungen": _meldungen(e.fallmeldungen()),
     }
 
 

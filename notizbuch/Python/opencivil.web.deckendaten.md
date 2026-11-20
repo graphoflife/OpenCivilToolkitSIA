@@ -1,5 +1,5 @@
 ---
-erzeugt: 1a9d393d126a
+erzeugt: 3bce7abd8414
 art: modul
 tags: [modul]
 ---
@@ -52,8 +52,9 @@ zweier Streifen eine Strecke), `unterzuege`, `stuetzenbereiche` und
 `faelle`: je Lastfall und Kombination `name`, die Last `summe`,
 was davon `daneben` liegt und `nicht_getragen` wird, und was die
 `lager` tragen, in kN, auch `je_lager` ([[opencivil.web.deckendaten#_je_lager|_je_lager]]) -- und
-seine `meldungen`. Die Zonen und Lasten zeichnet die Oberflaeche nach
-dem Projekt.
+seine `meldungen`; `fallmeldungen` sind dieselben, jede einmal, vorn
+ihre Faelle ([[opencivil.decke.rechnung#Ergebnis.fallmeldungen|fallmeldungen]]).
+Die Zonen und Lasten zeichnet die Oberflaeche nach dem Projekt.
 
 ### faelle
 

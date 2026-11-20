@@ -30,13 +30,13 @@ längs des Lagers, das Moment mit dem Vorzeichen der Platte
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.aufteilung import Aufteilungen, aufteilen
 from opencivil.decke.geometrie import Punkt
-from opencivil.decke.lasten import Belastung, belasten, kombiniert
+from opencivil.decke.lasten import Belastung, belasten, kn, kombiniert
 from opencivil.decke.modell import Decke, Linienlager
 from opencivil.decke.streifen import (
     LINIENLAGER, STUETZE, UNTERZUG, Auflager, Streifen, Traeger, Zerlegung, pressung, zerlegen,
@@ -112,6 +112,20 @@ class Wandkraft:
         return self.F / self.laenge
 
 
+@dataclass(frozen=True)
+class Ausfall(Meldung):
+    """
+    Was in einem Fall ausfaellt, weil Streifen nicht tragen: der ganze Satz
+    in ``text`` -- «… 80 kN fallen aus.» --, dazu ``grund`` ohne die Kraft
+    und die Kraft ``F`` in N. Ueber die Faelle gesammelt
+    (:meth:`Ergebnis.fallmeldungen`), steht der Grund einmal und die Kraft
+    je Fall dahinter.
+    """
+
+    grund: str = ""
+    F: float = 0.0
+
+
 @dataclass
 class Fallergebnis:
     name: str
@@ -163,6 +177,33 @@ class Ergebnis:
                 return f
         raise KeyError(f"Einen Fall «{name}» gibt es nicht. Bekannt: {', '.join(f.name for f in self.faelle)}.")
 
+    def fallmeldungen(self) -> List[Meldung]:
+        """
+        Was die Faelle melden, jede Meldung einmal, vorn die Faelle, in denen
+        sie steht: «In allen Fällen: …», sonst ««LF 1», «GZT»: …». Ein
+        :class:`Ausfall` aus demselben Grund in mehreren Faellen steht einmal,
+        die Kraft je Fall dahinter: «… Es fallen aus: «g» 80 kN, «GZT»
+        228 kN.» Bis 2026-11-20 stand jede Meldung je Fall -- in vier
+        Lastfaellen und drei Kombinationen siebenmal derselbe Satz (Benutzer).
+        """
+        je: Dict[tuple, Tuple[Meldung, List[Tuple[str, Meldung]]]] = {}
+        for f in self.faelle:
+            for m in f.meldungen:
+                schluessel = (("ausfall", m.grund, m.elemente) if isinstance(m, Ausfall)
+                              else ("satz", m.text, m.fehler))
+                je.setdefault(schluessel, (m, []))[1].append((f.name, m))
+        heraus = []
+        for m, wo in je.values():
+            if isinstance(m, Ausfall) and len(wo) > 1:
+                kraefte = ", ".join(f"«{name}» {kn(a.F)} kN" for name, a in wo)
+                heraus.append(replace(m, text=f"{m.grund} Es fallen aus: {kraefte}."))
+                continue
+            namen = [name for name, _ in wo]
+            vorn = ("In allen Fällen" if 1 < len(namen) == len(self.faelle)
+                    else ", ".join(f"«{n}»" for n in namen))
+            heraus.append(replace(m, text=f"{vorn}: {m.text}"))
+        return heraus
+
 
 def rechnen(decke: Decke) -> Ergebnis:
     """Die Decke nach der Streifenmethode, je Lastfall und Kombination."""
@@ -189,19 +230,20 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
     Ein Lastfall oder eine Kombination: alle Träger, von den Feldstreifen zu
     den Unterzügen. Was auf Trägern liegt, die nicht tragen, sagt eine
     Meldung je Grund -- bis 2026-11-19 eine je Träger, und eine Platte ohne
-    Lager gab je Fall vierzig gleiche Zeilen.
+    Lager gab je Fall vierzig gleiche Zeilen. Ebenso eine für alle Streifen
+    mit Last, die auf keiner Platte liegen (bis 2026-11-20 eine je Streifen).
     """
     heraus = Fallergebnis(name, belastung.summe, belastung.daneben, meldungen=list(belastung.meldungen))
     uebertragen: Dict[str, List[Teillast]] = {}
     ausfall: Dict[Tuple[str, str], List[Tuple[str, float]]] = {}
+    ohne_platte: List[str] = []
     for streifen in sorted(zerlegung.streifen, key=lambda s: s.stufe):
         lasten = belastung.je_streifen.get(streifen.name, []) + uebertragen.get(streifen.name, [])
         if not lasten:
             continue
         if not streifen.traeger:
             heraus.nicht_getragen += sum(_summe(l) for l in lasten)
-            heraus.meldungen.append(Meldung(f"Auf «{streifen.name}» liegt Last, aber er liegt auf keiner Platte.",
-                                            (streifen.name,)))
+            ohne_platte.append(streifen.name)
             continue
         for traeger, lokal in auf_traeger(streifen, lasten):
             gesamt = sum(_summe(l) for l in lokal)
@@ -217,11 +259,16 @@ def fall(name: str, belastung: Belastung, zerlegung: Zerlegung) -> Fallergebnis:
             heraus.traeger[traeger.name] = ergebnis
             for k in kraefte:
                 _weitergeben(k, ergebnis, zerlegung, heraus, uebertragen)
+    if ohne_platte:
+        wer = (f"Auf «{ohne_platte[0]}» liegt Last, aber er liegt" if len(ohne_platte) == 1
+               else f"Auf {len(ohne_platte)} Streifen liegt Last, aber sie liegen")
+        heraus.meldungen.append(Meldung(f"{wer} auf keiner Platte.", tuple(ohne_platte)))
     for (einer, mehrere), traeger in ausfall.items():
         namen = tuple(n for n, _ in traeger)
-        wer = (f"Der Streifen «{namen[0]}» trägt nicht – {einer}" if len(namen) == 1
-               else f"{len(namen)} Streifen tragen nicht – {mehrere}")
-        heraus.meldungen.append(Meldung(f"{wer} {sum(F for _, F in traeger) / 1e3:.3g} kN fallen aus.", namen))
+        grund = (f"Der Streifen «{namen[0]}» trägt nicht – {einer}" if len(namen) == 1
+                 else f"{len(namen)} Streifen tragen nicht – {mehrere}")
+        F = sum(F for _, F in traeger)
+        heraus.meldungen.append(Ausfall(f"{grund} {kn(F)} kN fallen aus.", namen, grund=grund, F=F))
     return heraus
 
 

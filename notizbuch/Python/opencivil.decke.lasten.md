@@ -1,5 +1,5 @@
 ---
-erzeugt: 15140df9957f
+erzeugt: 9ce3b1b2f71e
 art: modul
 tags: [modul]
 ---
@@ -42,6 +42,16 @@ Was ausserhalb der Platten liegt, trägt nichts; die Summe steht in
 [[opencivil.decke.lasten#Belastung|Belastung.daneben]], und eine Meldung nennt die Last.
 
 ## Inhalt
+
+### kn
+
+```python
+def kn(F: float) -> str
+```
+
+Eine Kraft in N als Zahl in kN fuer eine Meldung: drei gueltige Stellen,
+nie mit Exponent -- «80», «0.25», «1500», nicht «1.5e+03» wie bis
+2026-11-20.
 
 ### Belastung
 
