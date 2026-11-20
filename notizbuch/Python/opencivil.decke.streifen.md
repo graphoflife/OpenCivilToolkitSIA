@@ -1,5 +1,5 @@
 ---
-erzeugt: 2a5259476782
+erzeugt: bbc5873d8d10
 art: modul
 tags: [modul]
 ---
@@ -381,6 +381,12 @@ def pruefen(decke: Decke) -> List[Meldung]
 ```
 
 Was die Zerlegung aufhält -- Fehler -- und was auffällt -- Hinweise.
+
+Nur, was kein Feld sagen kann: wie die Teile liegen und zueinander
+stehen, und der Elastizitätsmodul, der vom Beton kommt. Wo eine Zahl
+liegen muss -- eine Dicke, eine Breite, ein Anteil --, prüft ihr Feld
+vor dem Rechnen ([[opencivil.projekt.decke]]). Bis 2026-11-20 stand
+das hier ein zweites Mal, mit anderen Sätzen, und griff nie.
 
 ### _ueberlappen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5fccc0f96222
+erzeugt: 35ebe1bb9625
 art: modul
 tags: [modul]
 ---
@@ -169,8 +169,9 @@ def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[
 ```
 
 Ein Feld, dessen Zahl in einem [[opencivil.projekt.lesen#Bereich|Bereich]] liegen muss -- eine
-Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede
-([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]); ihre Vorgabe kommt dann aus `fabrik`.
+Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede,
+und leer ist sie nie ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]); ihre Vorgabe kommt dann
+aus `fabrik`.
 
 ### als_groesse
 
@@ -366,8 +367,9 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str]=()) -> None
 ```
 
 Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
-jede Zahl gegen ihren Bereich ([[opencivil.projekt.lesen#bereich|bereich]]), jeden Eintrag darin
-ebenso, jede gegen das Feld, das sie begrenzt ([[opencivil.projekt.lesen#Bereich|Bereich.bis_feld]]),
+jede Zahl gegen ihren Bereich ([[opencivil.projekt.lesen#bereich|bereich]]) -- eine Liste davon mit
+mindestens einer --, jeden Eintrag darin ebenso, jede gegen das Feld,
+das sie begrenzt ([[opencivil.projekt.lesen#Bereich|Bereich.bis_feld]]),
 und danach die Namen seiner Faelle (`fallnamen()`) und die Regeln des
 Eintrags ueber mehrere Felder, `regeln(wo)`. Die Form ist da schon geprueft: ein Eintrag steht, wo
 einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in

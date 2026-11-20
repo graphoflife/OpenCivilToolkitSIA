@@ -49,7 +49,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.decke import geometrie as geo
 from opencivil.decke.geometrie import Punkt
-from opencivil.decke.modell import Aufteilung, Decke, Platte, Stuetze, Unterzug
+from opencivil.decke.modell import Decke, Platte, Stuetze, Unterzug
 from opencivil.decke.traeger import Balken, Halt, Streckenlast
 from opencivil.stabwerk.system import Meldung
 
@@ -557,15 +557,21 @@ def _an_derselben_stelle(a: Auflager, b: Auflager) -> bool:
 
 
 def pruefen(decke: Decke) -> List[Meldung]:
-    """Was die Zerlegung aufhält -- Fehler -- und was auffällt -- Hinweise."""
+    """
+    Was die Zerlegung aufhält -- Fehler -- und was auffällt -- Hinweise.
+
+    Nur, was kein Feld sagen kann: wie die Teile liegen und zueinander
+    stehen, und der Elastizitätsmodul, der vom Beton kommt. Wo eine Zahl
+    liegen muss -- eine Dicke, eine Breite, ein Anteil --, prüft ihr Feld
+    vor dem Rechnen (:mod:`opencivil.projekt.decke`). Bis 2026-11-20 stand
+    das hier ein zweites Mal, mit anderen Sätzen, und griff nie.
+    """
     heraus: List[Meldung] = []
     if not decke.platten:
         # Es fehlt nur etwas, kein Widerspruch (bis 2026-11-19 ein roter
         # Fehler an jeder frischen Decke). Ohne Platte gibt es keine Streifen,
         # und ohne Streifen rechnet nichts (:func:`~opencivil.decke.rechnung.rechnen`).
         heraus.append(Meldung("Noch keine Platte – mit «Platte» zeichnen.", fehler=False))
-    if not decke.streifenbreite > 0.0:
-        heraus.append(Meldung("Die Streifenbreite muss grösser als null sein."))
     stuecke: Dict[str, List[List[Punkt]]] = {}
     for p in decke.platten:
         if len(geo.bereinigt(p.ecken)) < 3 or abs(geo.flaeche(p.ecken)) <= geo.TOLERANZ:
@@ -576,8 +582,6 @@ def pruefen(decke: Decke) -> List[Meldung]:
         except ValueError:
             heraus.append(Meldung(f"Der Rand der Platte «{p.name}» schneidet sich selbst.", (p.name,)))
             continue
-        if not p.h > 0.0:
-            heraus.append(Meldung(f"Die Platte «{p.name}» braucht eine Dicke.", (p.name,)))
         if not p.E > 0.0:
             heraus.append(Meldung(f"Der Beton der Platte «{p.name}» braucht einen Elastizitätsmodul.", (p.name,)))
         r1, r2 = richtungen_der_platte(p)
@@ -595,19 +599,10 @@ def pruefen(decke: Decke) -> List[Meldung]:
         elif not (w.vertikal or w.eingespannt):
             heraus.append(Meldung(f"Das Linienlager «{w.name}» hält weder Höhe noch Drehung – "
                                   "es trägt nichts.", (w.name,), fehler=False))
-    for s in decke.stuetzen:
-        if not (s.bx > 0.0 and s.by > 0.0):
-            heraus.append(Meldung(f"Die Stütze «{s.name}» braucht eine Grösse.", (s.name,)))
-        if (s.lx is not None and not s.lx > 0.0) or (s.ly is not None and not s.ly > 0.0):
-            heraus.append(Meldung(f"Der Stützenbereich von «{s.name}» braucht eine Grösse.", (s.name,)))
     for u in decke.unterzuege:
         if not _lang(u):
             heraus.append(Meldung(f"Der Unterzug «{u.name}» hat keine Länge.", (u.name,)))
-        if not u.breite > 0.0:
-            heraus.append(Meldung(f"Der Unterzug «{u.name}» braucht eine Breite.", (u.name,)))
-        if u.stufe < 1:
-            heraus.append(Meldung(f"Die Stufe des Unterzugs «{u.name}» beginnt bei 1.", (u.name,)))
-    gueltig = [u for u in decke.unterzuege if _lang(u) and u.breite > 0.0]
+    gueltig = [u for u in decke.unterzuege if _lang(u)]
     for i, a in enumerate(gueltig):
         for b in gueltig[i + 1:]:
             if richtung_der_strecke(a.a, a.b).parallel(richtung_der_strecke(b.a, b.b)) and _ueberlappen(
@@ -616,8 +611,6 @@ def pruefen(decke: Decke) -> List[Meldung]:
                                       "übereinander.", (a.name, b.name)))
     zonen = {}
     for z in decke.zonen:
-        if not 0.0 <= z.anteil <= 1.0:
-            heraus.append(Meldung(f"Der Anteil der Zone «{z.name}» liegt nicht zwischen 0 und 100 %.", (z.name,)))
         try:
             zonen[z.name] = geo.dreiecke(z.ecken)
         except ValueError:
@@ -627,8 +620,6 @@ def pruefen(decke: Decke) -> List[Meldung]:
         for b in namen[i + 1:]:
             if _ueberlappen(zonen[a], zonen[b]):
                 heraus.append(Meldung(f"Die Zonen «{a}» und «{b}» überlappen sich.", (a, b)))
-    if decke.aufteilung is Aufteilung.FEST and not 0.0 <= decke.anteil <= 1.0:
-        heraus.append(Meldung("Der feste Anteil liegt nicht zwischen 0 und 100 %."))
     return heraus
 
 

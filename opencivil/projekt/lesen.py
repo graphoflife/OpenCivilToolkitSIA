@@ -184,8 +184,9 @@ def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
             fabrik: Optional[Callable[[], Any]] = None) -> Any:
     """
     Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine
-    Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede
-    (:func:`inhalt_pruefen`); ihre Vorgabe kommt dann aus ``fabrik``.
+    Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede,
+    und leer ist sie nie (:func:`inhalt_pruefen`); ihre Vorgabe kommt dann
+    aus ``fabrik``.
     """
     metadata = {"bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter,
                                    bis_feld=bis_feld)}
@@ -544,8 +545,9 @@ def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None:
 def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
     """
     Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
-    jede Zahl gegen ihren Bereich (:func:`bereich`), jeden Eintrag darin
-    ebenso, jede gegen das Feld, das sie begrenzt (:attr:`Bereich.bis_feld`),
+    jede Zahl gegen ihren Bereich (:func:`bereich`) -- eine Liste davon mit
+    mindestens einer --, jeden Eintrag darin ebenso, jede gegen das Feld,
+    das sie begrenzt (:attr:`Bereich.bis_feld`),
     und danach die Namen seiner Faelle (``fallnamen()``) und die Regeln des
     Eintrags ueber mehrere Felder, ``regeln(wo)``. Die Form ist da schon geprueft: ein Eintrag steht, wo
     einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
@@ -563,6 +565,9 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
         wert = getattr(eintrag, f.name)
         bereich_ = f.metadata.get("bereich")
         teile = wert if isinstance(wert, list) else [wert]
+        if bereich_ is not None and not teile:
+            raise ProjektFehler(f"{bereich_.heisst}: noch keine Zahl – es braucht "
+                                f"mindestens eine.", wo=wo)
         for i, teil in enumerate(teile):
             if dataclasses.is_dataclass(teil):
                 inhalt_pruefen(teil, _ort_von(teil, wo, f.name, i) if teile is wert

@@ -301,16 +301,10 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         raise DienstFehler(404, f"Keine Platte mit der Kennung '{kennung}'.") from None
 
     eintrag = projekt.querschnitt(kennung)
-    # Der Modus ist beim Lesen geprueft; die Teilungen braucht nur die Suche.
+    # Der Modus ist beim Lesen geprueft. Die Teilungen prueft ihr Feld, vor
+    # jeder Suche (:func:`~opencivil.bewehrungssuche.bewertung.vorab_pruefen`);
+    # bis 2026-11-20 tat es hier ein zweites Mal ein eigener Satz.
     modus = eintrag.automatik_modus
-    gesucht = [eintrag.automatik_teilungen]
-    if eintrag.automatik_querkraft:
-        gesucht.append(eintrag.automatik_querkraft_teilungen)
-    try:
-        for teilungen in gesucht:
-            bewehrungssuche.teilungen_der_suche(teilungen)
-    except ValueError as fehler:
-        raise DienstFehler(400, f"Platte '{eintrag.name}': {fehler}") from None
 
     wie = {"teilungen": eintrag.automatik_teilungen,
            "mindestdurchmesser": eintrag.automatik_mindestdurchmesser}

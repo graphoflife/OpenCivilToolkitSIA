@@ -7,6 +7,27 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Dieselbe Grenze nur noch am Feld
+
+Drei Stellen prüften eine Zahl ein zweites Mal, die ihr Feld schon prüft,
+mit eigenen Sätzen:
+
+- die Decke acht Grenzen – Dicke, Streifenbreite, Grösse der Stützen,
+  Breite und Stufe der Unterzüge, die Anteile. Sie griffen nie: das Feld
+  hielt die Zahl vorher auf.
+- der Dienst der Bewehrungssuche die Teilungen, bevor die Suche sie mit dem
+  Feld prüfte. Eine Teilung 0 hiess dort «Eine Teilung muss grösser als
+  null sein, angegeben sind 0 mm.», überall sonst «Teilung muss grösser als
+  null sein, angegeben ist 0 mm.».
+- der Katalog Vorgabe und Höchstwert des Beiwerts k der Duktilität, neben
+  dem Feld, das beides schon trägt.
+
+Jetzt prüft nur das Feld. Was kein Feld sagen kann, bleibt, wo es war: wie
+die Teile der Decke liegen, der Elastizitätsmodul aus dem Beton. Eine Liste
+von Zahlen – die Teilungen der Suche – ist nie leer; das sagt jetzt ihr
+Feld («Teilung: noch keine Zahl – es braucht mindestens eine.») und nicht
+mehr die Suche.
+
 ## 2026-11-20 · Jedes Zahlenfeld kennt seine Grenzen
 
 66 Zahlenfelder hatten im Kern keine Grenze – darunter Teilung und

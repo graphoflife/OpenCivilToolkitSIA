@@ -1,5 +1,5 @@
 ---
-erzeugt: b402b85eb4a2
+erzeugt: e56cecd14862
 art: modul
 tags: [modul]
 ---
@@ -93,7 +93,9 @@ Die Teilungen, die eine Suche versucht -- aufsteigend, jede einmal.
 
 Leer oder nicht positiv ist ein Fehler und keine Vorgabe: bis 2026-10-16
 wurde eine leere Liste still zu 150 mm, und eine negative Teilung fiel
-still weg.
+still weg. Die Listen einer Platte prueft schon ihr Feld, vor jeder
+Suche ([[opencivil.bewehrungssuche.bewertung#vorab_pruefen|vorab_pruefen]]); hier
+geht es um die Teilungen, die ein Aufrufer selbst angibt.
 
 ### Loesung
 

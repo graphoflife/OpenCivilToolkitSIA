@@ -447,7 +447,17 @@ class TestNichtsStill(unittest.TestCase):
         p.querschnitt("q1").automatik_teilungen = []
         antwort = dienst.bearbeite("bewehrung_suchen", {"projekt": p.als_dict(), "kennung": "q1"})
         self.assertEqual(antwort.status, 400)
-        self.assertIn("mindestens eine Teilung", antwort.daten["fehler"])
+        self.assertIn("Teilung: noch keine Zahl – es braucht mindestens eine.",
+                      antwort.daten["fehler"])
+
+    def test_eine_teilung_null_der_suche(self):
+        """Mit dem Satz des Feldes -- bis 2026-11-20 sagte es die Suche mit einem eigenen."""
+        p = Projekt.beispiel()
+        p.querschnitt("q1").automatik_querkraft_teilungen = [150.0, 0.0]
+        antwort = dienst.bearbeite("bewehrung_suchen", {"projekt": p.als_dict(), "kennung": "q1"})
+        self.assertEqual(antwort.status, 400)
+        self.assertIn("Bügelteilung muss grösser als null sein, angegeben ist 0 mm.",
+                      antwort.daten["fehler"])
 
     def test_eine_unbekannte_rissanforderung_im_nachweis(self):
         from opencivil.nachweis.rissanforderung import Rissanforderung

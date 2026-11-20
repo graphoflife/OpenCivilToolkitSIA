@@ -204,13 +204,14 @@ function duktilitaetInhalt(eintrag, ort) {
   return [
     schalterZeile(eintrag, ort, {
       feld: 'duktilitaet', name: 'x/d ≤ k·435/f_yd, k =',
-      // Vorgabe und Höchstwert des Beiwerts kennt der Kern. Leer gelassen
-      // bleibt der bisherige Wert -- eine Grenze von null gäbe es nicht.
+      // Vorgabe und Höchstwert des Beiwerts stehen am Feld im Kern: die
+      // Vorgabe in der Vorlage des Eintrags, der Höchstwert in seiner
+      // Grenze. Leer gelassen bleibt der bisherige Wert.
       zusatz: zahlfeld({
         wert: eintrag.x_d_max, schritt: 0.05, angabe: feldangabe(ort.klasse, 'x_d_max'),
         titel: `Beiwert k der Grenze x/d ≤ k · 435 N/mm² / f_yd (SIA 262:2025, 4.1.4.2.5); `
-          + `Vorgabe ${katalog('duktilitaet', 'vorgabe')}, `
-          + `höchstens ${katalog('duktilitaet', 'hoechstens')}`,
+          + `Vorgabe ${katalog('vorlagen', ort.klasse).x_d_max}, `
+          + `höchstens ${feldangabe(ort.klasse, 'x_d_max').bis}`,
         beiAenderung: (v) => eintragAendern(eintrag.kennung, (e) => { e.x_d_max = v; }),
       }),
     }),
