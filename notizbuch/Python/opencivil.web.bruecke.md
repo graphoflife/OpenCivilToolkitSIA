@@ -1,5 +1,5 @@
 ---
-erzeugt: f7d74064560a
+erzeugt: 4233fdd613b6
 art: modul
 tags: [modul]
 ---
@@ -64,7 +64,7 @@ Dasselbe traf die Module der Oberflaeche: nach einer Aenderung kam einmal ein
 altes `nachweise.js` zum neuen Kern. Darum schreibt die Bruecke in
 `web/index.html` eine Importtafel (`<script type="importmap">`): je Modul
 unter `web/js/`, fuer das Paket und fuer das Verzeichnis des Notizbuchs
-die Adresse mit Marke, dazu das Stilblatt mit Marke. Die Module selbst bleiben, wie sie sind
+die Adresse mit Marke, dazu die Stilblaetter mit Marke. Die Module selbst bleiben, wie sie sind
 -- `import './dom.js'` fuehrt ueber die Tafel auf `./dom.js?v=Marke`.
 So haengt alles an der Seite: wer sie neu laedt, bekommt den Rest im selben
 Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter `web/vendor/`;
@@ -241,6 +241,16 @@ def notizbuch_stimmt() -> bool
 
 Ob Seiten und Verzeichnis dem entsprechen, was der Code heute ergibt.
 
+### stilblaetter
+
+```python
+def stilblaetter() -> List[Path]
+```
+
+Die Blaetter des Stils in der Reihenfolge ihrer Nummern -- so bindet die
+Seite sie ein, und so gelten sie: bei gleicher Spezifitaet gewinnt die
+Regel im spaeteren Blatt.
+
 ### tafeldateien
 
 ```python
@@ -256,8 +266,8 @@ Paket des Kerns und das Verzeichnis des Notizbuchs.
 def versionsmarken() -> str
 ```
 
-Was in der Seite zwischen [[opencivil.web.bruecke#Konstanten|ANFANG]] und [[opencivil.web.bruecke#Konstanten|ENDE]] steht: das
-Stilblatt und die Importtafel, jede Adresse mit der Marke ihrer Datei.
+Was in der Seite zwischen [[opencivil.web.bruecke#Konstanten|ANFANG]] und [[opencivil.web.bruecke#Konstanten|ENDE]] steht: die
+Stilblaetter und die Importtafel, jede Adresse mit der Marke ihrer Datei.
 
 ### _adresse
 
@@ -294,7 +304,7 @@ Was der Service Worker in seinen Speicher legt, damit die Seite auch ohne
 Netz startet -- Pfade von der Wurzel aus:
 
 - `seiten`: [[opencivil.web.bruecke#Konstanten|SEITEN]], die er zuerst aus dem Netz holt;
-- `dateien`: das Stilblatt und alles ueber die Importtafel, mit Marke;
+- `dateien`: die Stilblaetter und alles ueber die Importtafel, mit Marke;
 - `fremd`: je Ordner unter `web/vendor/` seine Marke und seine
   Dateien -- ohne die Pakete der Konsole (`.whl`): numpy und pandas
   holt er erst, wenn ein Skript sie braucht.
@@ -356,7 +366,7 @@ schreiben hiesse, die alten Marken blieben stehen.
 - `NOTIZBUCH = WURZEL / 'notizbuch'`
 - `VERZEICHNIS = WURZEL / 'web' / 'kern' / 'notizbuch.json'`
 - `SEITE = WURZEL / 'web' / 'index.html'`
-- `STILBLATT = WURZEL / 'web' / 'css' / 'stil.css'`
+- `STIL = WURZEL / 'web' / 'css'`
 - `SW = WURZEL / 'sw.js'`
 - `FREMD = WURZEL / 'web' / 'vendor'`
 - `SEITEN = ('./', 'web/', 'web/manifest.webmanifest', 'web/favicon.svg')` – Was der Service Worker zuerst aus dem Netz holt und nur ohne Netz aus seinem Speicher: die Seiten, in denen die Marken stehen, und was keine traegt. Der Rest des Vorrats kommt aus [[opencivil.web.bruecke#vorrat|vorrat]].

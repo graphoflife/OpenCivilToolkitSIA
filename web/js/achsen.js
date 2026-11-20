@@ -252,7 +252,7 @@ export function achsenkreuz({
 
 /**
  * Die Farbe eines Urteils: grün, wenn erfüllt, sonst rot -- dieselbe wie in
- * den Tabellen (`--gut`, `--schlecht` in stil.css). Bis 2026-11-20 stand das
+ * den Tabellen (`--gut`, `--schlecht` in 10-grundlage.css). Bis 2026-11-20 stand das
  * Paar in den Bildern als eigene Zahl, ein wenig anders als in den Tabellen.
  */
 export const urteilsfarbe = (erfuellt) => stilfarbe(erfuellt ? 'gut' : 'schlecht');

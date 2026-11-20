@@ -324,6 +324,16 @@ class TestBruecke(unittest.TestCase):
             with self.subTest(datei=datei):
                 self.assertIn(datei, tafel)
 
+    def test_jedes_stilblatt_traegt_seine_nummer(self):
+        """
+        Die Reihenfolge der Blätter gehört zum Stil – bei gleicher Spezifität
+        gewinnt die Regel im späteren –, und die Brücke ordnet sie nach dem
+        Namen. Ein Blatt ohne Nummer vorne landete still irgendwo.
+        """
+        for blatt in bruecke.stilblaetter():
+            with self.subTest(blatt=blatt.name):
+                self.assertRegex(blatt.name, r"^\d\d-[a-z]+\.css$")
+
     def test_marken_schreiben_laesst_den_rest_der_seite(self):
         kopf = f"<head>\n  {bruecke.ANFANG}\n"
         fuss = f"  {bruecke.ENDE}\n</head>\n"

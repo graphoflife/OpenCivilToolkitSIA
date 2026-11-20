@@ -523,14 +523,15 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Eine Naht Ebene/Raum gab es in beiden nicht. Den Träger und die
         Platten der Tests haben `tests/traeger.py` und `tests/platten.py`.
 - [ ] **8. Dateien nahe oder über 1000 Zeilen.**
-      - `stil.css`, 2510 Zeilen: nicht je App teilen, sondern nach
-        Bausteinen (Grundlage, Bausteine, Bericht, Zeichenfenster, Skizzen,
-        Verläufe, Notizbuch, Python) -- die Vorsilbe einer Klasse sagt, wo
-        sie zuerst stand, nicht wer sie braucht (`.bs-tabelle` dient der
-        Decke). Dabei fällt weg: fünf Regeln `[hidden]` werden eine, 25
-        Farbregeln der Verläufe eine Variable je Grösse, sechs Formen von
-        «leer» zwei. Die Listen unter den Zeichnungen sind schon eine
-        (`.cad-element*`, 2026-11-20).
+      - Erledigt (2026-11-20): `stil.css`, 2597 Zeilen, steht in neun
+        Blättern unter `web/css/`, nach Bausteinen statt je App (Grundlage,
+        Seite, Eingaben, Berechnung, schmale Geräte, Zeichenfenster,
+        Notizbuch, Skizzen, Python). Geschnitten an den Abschnitten, die es
+        schon gab: keine Regel hat ihren Platz gewechselt, die Brücke bindet
+        die Blätter in der Reihenfolge ihrer Nummern ein. Fünf Regeln
+        `[hidden]` sind eine, die 25 Farbregeln der Verläufe eine Variable je
+        Grösse (`--verlauf`), fünf Klassen für leere Listen eine
+        (`.leer-zeile`); das «…» der Vorschau bleibt, es ist ein Platzhalter.
       - Erledigt (2026-11-19): `grundbruch.py`, 996 Zeilen, ist geteilt in
         `fundament.py` mit dem gemeinsamen `Fundamentnachweis`,
         `grundbruch.py` (639 Zeilen), `gleiten.py` und `tragfaehigkeit.py`.
@@ -883,12 +884,12 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 - [ ] **Dateien über 1000 Zeilen**, je entlang einer Naht, die schon da ist:
       `cad_fenster.js` (Bedienung, Rückgängig, Punkteingabe auslagern; die
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
-      `stil.css` (ein Blatt je App). Stand 2026-10-25: stil.css 2348 Zeilen,
-      cad_fenster.js 1138 -- geteilt am 2026-11-15, jetzt 899. `querkraft.py` und `querschnitt/platte.py` sind
+      `stil.css` -- geteilt am 2026-11-20, nach Bausteinen statt je App.
+      cad_fenster.js 1138 -- geteilt am 2026-11-15, jetzt 902. `querkraft.py` und `querschnitt/platte.py` sind
       geteilt (2026-10-25); die Regel für d_v steht in Kurve und Nachweis
       ohne Bügel noch je einmal.
       `nachweise.js`, `spannungsanalyse.py` und `aufbau.py` sind geteilt,
-      `querschnittsloeser.py` liegt bei 914.
+      `querschnittsloeser.py` liegt bei 743.
 - [ ] **Kleineres:** `print(ergebnis)` hat eine
       dritte, abweichende Zusammenfassung (`konsole.py`) · die Herleitung am
       Bildschirm lässt unbekannte Blockarten still weg (`bericht.js`) ·

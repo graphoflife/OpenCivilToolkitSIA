@@ -281,7 +281,7 @@ export function listengruppen(a, gruppen) {
   if (da.length) return da.map(([titel, zeilen]) => klappgruppe(titel, zeilen, a.adapter.aufgeklappt, 'cad-elemente'));
   if (a.adapter.zeichnung()?.knoten.length) return [];
   const werkzeuge = a.einstellung.werkzeuge.map((w) => `${w.text} ${w.taste.toUpperCase()}`).join(', ');
-  return [el('p.qa-leer', {
+  return [el('p.leer-zeile', {
     text: `Noch nichts gezeichnet: ${werkzeuge}${a.adapter.vorlageOeffnen ? ' – oder eine Vorlage T' : ''}.`,
   })];
 }

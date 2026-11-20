@@ -70,7 +70,7 @@ function liste(a, { titel, eintraege, plus, leer }) {
       })]),
     ]),
     el('div.baum-koerper', {},
-      eintraege.length ? eintraege.map((e) => eintrag(a, e)) : [leerzeile(leer)]),
+      eintraege.length ? eintraege.map((e) => eintrag(a, e)) : [el('div.leer-zeile', { text: leer })]),
   ]);
 }
 
@@ -114,12 +114,6 @@ function knopf(text, title, tun, klasse = '') {
         tun();
       },
     },
-  });
-}
-
-function leerzeile(text) {
-  return el('div', {
-    text, style: { padding: '5px 10px', color: 'var(--schrift-zart)', fontSize: '12.5px' },
   });
 }
 

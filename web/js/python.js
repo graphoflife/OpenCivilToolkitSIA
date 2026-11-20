@@ -197,7 +197,7 @@ function aufbauen(skript) {
     on: { click: abbrechen },
   });
   const ausgabe = el('div.py-ausgabe', { role: 'log', 'aria-live': 'polite' });
-  const leer = el('p.py-leer', { text: 'Noch nichts ausgeführt. Strg+Enter im Code führt das Skript aus.' });
+  const leer = el('p.leer-zeile', { text: 'Noch nichts ausgeführt. Strg+Enter im Code führt das Skript aus.' });
   const stand = el('div.py-stand', { hidden: true });
   const eingabe = codefeld('textarea.py-zeile', {
     rows: 1, placeholder: '>>> Befehl, Enter führt aus', 'aria-label': 'Befehl für die Konsole',

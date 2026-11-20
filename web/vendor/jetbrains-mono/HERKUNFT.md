@@ -27,7 +27,7 @@ dazu jeder Aufruf die Adresse des Besuchers an Google.
 ## Was hier liegt und was nicht
 
 Eine Datei trägt alle Stärken von 100 bis 800; die Seite braucht 400, 600 und
-700. Eingebunden ist sie in `web/css/stil.css` (`@font-face`).
+700. Eingebunden ist sie in `web/css/10-grundlage.css` (`@font-face`).
 
 Weggelassen: die Kursive (`JetBrainsMono-Italic[wght].woff2`, 120 KB). Die
 Seite setzt nur an zwei Stellen kursiv, dort neigt der Browser die aufrechte

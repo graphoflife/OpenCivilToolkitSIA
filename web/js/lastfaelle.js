@@ -104,7 +104,7 @@ function kombinationenInhalt(eintrag) {
       faktoren: Object.fromEntries(s.lastfaelle.map((lf) => [lf.kennung, 1.0])),
     });
   });
-  if (!eintrag.lastfaelle.length) return [el('p.bs-leer', { text: 'Zuerst einen Lastfall anlegen.' })];
+  if (!eintrag.lastfaelle.length) return [el('p.leer-zeile', { text: 'Zuerst einen Lastfall anlegen.' })];
   return [
     eintrag.kombinationen.length ? el('div.tabelle-huelle', {}, [el('table.bs-kombinationen', {}, [
       el('thead', {}, [el('tr', {}, [
@@ -113,7 +113,7 @@ function kombinationenInhalt(eintrag) {
         el('th'),
       ])]),
       el('tbody', {}, eintrag.kombinationen.map(kombination)),
-    ])]) : el('p.bs-leer', { text: 'Noch keine Kombination.' }),
+    ])]) : el('p.leer-zeile', { text: 'Noch keine Kombination.' }),
     el('button.knopf.knopf-klein', { type: 'button', text: '+ Kombination', on: { click: neueKombination } }),
   ];
 }

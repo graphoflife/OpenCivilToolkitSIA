@@ -32,6 +32,21 @@ geteilt, nach dem, was zusammengehört.
   `achsen.js` (873 Zeilen bleiben). Sichtbar: eine Linie steht in der
   Legende als Strich mit ihrem Muster statt als Punkt, der Widerstand ist
   überall gleich gross, und die Punkte haben die Farben der Tabellen.
+- `web/css/stil.css` (2597 Zeilen) steht in neun Blättern nach Bausteinen:
+  Grundlage, Seite, Eingaben, Berechnung, schmale Geräte, Zeichenfenster,
+  Notizbuch, Skizzen, Python. Geschnitten an den Abschnitten, die es schon
+  gab, damit keine Regel ihren Platz wechselt: bei gleicher Spezifität
+  gewinnt die spätere, und die Brücke bindet die Blätter in der Reihenfolge
+  ihrer Nummern ein (`stilblaetter`). Im Browser verglichen: jedes Element
+  der Platte, des Balkensystems, des Pfahls mit seinen Verläufen, der
+  Setzung, des Erdbebens und von Python hat mit den neuen Blättern
+  denselben Stil wie mit der alten Datei. Dabei weggefallen: fünf Regeln
+  `[hidden]` (eine für alle, mit `!important`), 25 Farbregeln der Verläufe
+  (eine Variable `--verlauf` je Grösse) und fünf Klassen für eine leere
+  Liste (`.leer-zeile`; im Baum, unter der Zeichnung, bei Lastfällen und
+  Querschnitten, in der Suche und in der Konsole). Sichtbar ist nur, dass
+  eine leere Liste unter der Zeichnung 4 px mehr Luft hat und die bei den
+  Lastfällen etwas weniger.
 
 Warum: Wer die Platte liest, fand ihre Teile in einer anderen Datei, und
 wer die gemeinsamen Teile suchte, las an den Lagen der Platte vorbei. Wer

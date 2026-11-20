@@ -1,0 +1,514 @@
+/* ==========================================================================
+   Die Berechnung
+
+   Zusammenfassung, Herleitung, Tabellen und Diagramme der rechten Tafel,
+   dazu der Ladeschirm, das Zahlfeld mit seinen Pfeilen, die Kennzahlen
+   und die Hilfe am Fragezeichen.
+   ========================================================================== */
+
+/* ------------------------------------------------------------ Bericht -- */
+
+.reiter { display: flex; gap: 3px; margin-left: auto; flex-wrap: wrap; }
+.reiter-knopf {
+  padding: 5px 11px; border: 1px solid transparent; border-radius: var(--radius);
+  background: transparent; color: var(--schrift-matt); cursor: pointer; font-size: 12.5px;
+}
+.reiter-knopf:hover { background: var(--flaeche-2); }
+.reiter-knopf.ist-aktiv { background: var(--blau); color: #fff; border-color: var(--blau); font-weight: 500; }
+
+/* Die rechte Tafel wie die mittlere: graue Panels, darin weisse Karten --
+   dieselben `panel` und `karte` (Benutzer, 2026-10-16). Der Stapel ist so
+   breit wie `--berichtbreite`; ein Diagramm steht gross und darf die
+   Tafel bis 1100 px füllen. */
+.berichtstapel {
+  --stapelbreite: var(--berichtbreite);
+  display: grid; grid-template-columns: minmax(0, var(--stapelbreite));
+  justify-content: center; align-content: start;
+}
+.berichtstapel.ist-diagramm { --stapelbreite: 1100px; }
+.berichtstapel > .feldgruppe { min-width: 0; padding: 8px 10px 8px; }
+.berichtstapel .unterkapitel { padding: 8px; min-width: 0; }
+/* Was in einer Karte steht, braucht keinen eigenen Rand mehr: die Karte
+   rahmt es schon. Eine Tabelle bekommt so die ganze Breite der Karte. */
+.unterkapitel > .gleichung { margin: 2px 0; padding: 4px 6px; }
+.unterkapitel > .tabelle-block { margin: 2px 0; padding: 2px 0; border-left: 0; }
+.unterkapitel > .tabelle-block:hover { background: none; }
+.unterkapitel > .gleichung:first-child, .unterkapitel > .tabelle-block:first-child { margin-top: 0; }
+.karte-hinweis { font-size: 12px; color: var(--schrift-zart); margin: 0 0 6px; }
+/* Die Angaben zur Platte linksbündig wie eine Feldzeile der Eingaben, nicht
+   mittig wie eine Formel der Herleitung. */
+.unterkapitel.ist-links .katex-display,
+.unterkapitel.ist-links .katex-display > .katex { text-align: left; }
+
+/* Die Leiste der Diagramme: je Diagramm eine kleine Vorschau als Knopf, quer
+   rollend, oben festgehalten, wenn man im grossen Diagramm rollt. Der
+   gewählte trägt Rand und Grund der Auswahl, wie eine App links. */
+.vorschauleiste {
+  position: sticky; top: -12px; z-index: 3;
+  display: flex; gap: 8px; overflow-x: auto; overscroll-behavior-x: contain;
+  margin: -12px 0 10px; padding: 12px 2px 8px;
+  background: var(--flaeche); border-bottom: 1px solid var(--rand);
+}
+.vorschau {
+  flex: none; width: 124px; display: flex; flex-direction: column; gap: 3px;
+  padding: 5px; border: 1px solid var(--rand); border-radius: var(--radius);
+  background: var(--flaeche); color: inherit; font: inherit; text-align: left;
+  cursor: pointer; box-shadow: var(--schatten);
+}
+.vorschau:hover { border-color: var(--rand-stark); background: var(--flaeche-2); }
+.vorschau.ist-gewaehlt {
+  border-color: var(--blau); background: var(--blau-hell);
+  box-shadow: inset 0 0 0 1px var(--blau);
+}
+.vorschau-bild {
+  display: flex; align-items: center; justify-content: center;
+  height: 70px; overflow: hidden; border-radius: 4px;
+  background: #fff; border: 1px solid var(--rand);
+}
+.vorschau-bild svg { display: block; width: 100%; height: 100%; pointer-events: none; }
+.vorschau-leer { font-size: 18px; color: var(--schrift-zart); }
+.vorschau-gruppe {
+  font-size: 10px; color: var(--schrift-zart);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vorschau-titel {
+  font-size: 11px; line-height: 1.25; color: var(--schrift-matt);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ist-diagramm > .feldgruppe > .unterkapitel + .unterkapitel { margin-top: 10px; }
+
+/* Die Überschriften der Herleitung innerhalb eines Abschnitts. Ein neuer
+   Bestandteil -- ein Baustoff, eine Platte -- beginnt ein eigenes Panel,
+   sein Titel steht in dessen Kopf. Leichter, gedämpfter Akzent, keine Linie. */
+.b-untertitel {
+  font-size: 14px; font-weight: 500; color: var(--schrift-matt);
+  margin: 19px 0 7px; padding: 1px 0 1px 9px;
+  border-left: 3px solid var(--unterakzent);
+}
+.unterkapitel > .b-untertitel:first-child { margin-top: 4px; }
+/* Eine Ebene tiefer: eingerückt statt neu eingefärbt -- die Gliederung soll
+   sich an der Kante ablesen lassen, nicht an einer dritten Farbe. */
+.b-untertitel.ist-tief { font-size: 13px; margin: 14px 0 6px 14px; }
+
+.b-text { margin: 8px 0; }
+
+.gleichung {
+  position: relative; margin: 12px 0; padding: 8px 10px 8px 12px;
+  border-left: 3px solid transparent; border-radius: 0 5px 5px 0;
+}
+.gleichung:hover { background: var(--flaeche-2); border-left-color: var(--rand-stark); }
+.gleichung-kopf { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.gleichung-titel { font-size: 12.5px; font-weight: 600; color: var(--schrift-matt); }
+.gleichung-ref { font-size: 11.5px; color: var(--schrift-zart); margin-left: auto; white-space: nowrap; }
+.gleichung-mathe { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+.gleichung-werkzeug {
+  position: absolute; top: 4px; right: 6px; display: none; gap: 2px;
+  background: var(--flaeche); border: 1px solid var(--rand); border-radius: 5px;
+  padding: 2px; box-shadow: var(--schatten);
+}
+.gleichung:hover .gleichung-werkzeug,
+.tabelle-block:hover .gleichung-werkzeug { display: flex; }
+
+.hinweis {
+  margin: 8px 0; padding: 7px 10px; border-radius: 5px; font-size: 13px;
+  border-left: 3px solid var(--rand-stark); background: var(--flaeche-2);
+}
+.hinweis-annahme { border-left-color: var(--blau); background: var(--blau-hell); }
+/* Viele Meldungen klappen zusammen, mit ihrer Anzahl -- die zu den Fällen einer Decke. */
+.meldungsgruppe-titel {
+  font-size: 11px; font-weight: 700; color: var(--schrift-zart);
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; cursor: pointer;
+}
+.meldungsgruppe-zeilen { display: flex; flex-direction: column; gap: 1px; }
+.hinweis-warnung { border-left-color: var(--warn); background: var(--warn-hell); }
+.hinweis-sandbox { border-left-color: var(--sandbox); background: var(--sandbox-hell); }
+.hinweis-sandbox b { color: var(--sandbox-tief); }
+
+/* Ein Tabellenblock sieht aus wie ein Gleichungsblock -- gleicher Rahmen,
+   gleiche Kopfzeile, gleiche Kopierknöpfe. Es ist dieselbe Art Aussage. */
+.tabelle-block {
+  position: relative; margin: 12px 0; padding: 8px 10px 8px 12px;
+  border-left: 3px solid transparent; border-radius: 0 5px 5px 0;
+}
+.tabelle-block:hover { background: var(--flaeche-2); }
+
+.tabelle-titel { font-size: 12.5px; font-weight: 600; color: var(--schrift-matt); margin: 14px 0 4px; }
+table.gitter { border-collapse: collapse; font-size: 12.5px; }
+table.gitter th, table.gitter td { padding: 3px 10px; text-align: right; border-bottom: 1px solid var(--rand); }
+table.gitter th { font-weight: 600; color: var(--schrift-matt); border-bottom: 2px solid var(--rand-stark); }
+table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
+.tabelle-huelle { overflow-x: auto; }
+
+/* Nachweise -- kompakt. Keine Zelle mit mehr als zwei Zeilen: jede Zeile
+   bricht nicht weiter um. Die Tabelle ist immer gleich breit,
+   `--tabellenbreite`, gleich wie breit die Tafel ist. Breiter wird sie nur,
+   wo ihr Inhalt es verlangt -- schmaler als die Zeilen, die nicht umbrechen,
+   macht der Browser eine Tabelle nie; `min-width: max-content` braucht es
+   dafür nicht (und machte sie in Chrome fünfmal so breit). Ist die Tafel
+   schmaler, rollt die Hülle. */
+.nachweis-tabelle {
+  width: var(--tabellenbreite);
+  border-collapse: collapse; font-size: 12.5px;
+}
+.nachweis-tabelle .zeile { display: block; white-space: nowrap; }
+.nachweis-tabelle .links { text-align: left; }
+/* Das Auge je Zeile: genau dieser Nachweis in der Herleitung. Blass, bis
+   man darüberfährt -- ein Weg, keine Aussage. */
+.nachweis-tabelle td.auge-zelle { width: 1%; padding: 0 4px; }
+.auge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px;
+  background: none; color: var(--schrift-zart); cursor: pointer;
+}
+.auge:hover, .auge:focus-visible, .auge.ist-an {
+  background: var(--blau-hell); color: var(--blau);
+}
+/* Über der Herleitung eines einzelnen Nachweises: welcher, und zurück. */
+.hinweis.verfolgung { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.hinweis.verfolgung .knopf { margin-left: auto; }
+/* Im Kopf der Kurzform: Word, TeX und MD für alle Formeln -- immer
+   sichtbar, nicht erst beim Darüberfahren wie an einer einzelnen. */
+.formeln-werkzeug {
+  display: flex; gap: 2px;
+  text-transform: none; letter-spacing: 0; font-weight: 400;
+}
+.nachweis-tabelle th {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--schrift-matt); text-align: right; padding: 5px 8px;
+  border-bottom: 2px solid var(--rand-stark);
+}
+.nachweis-tabelle th:first-child { text-align: left; }
+.nachweis-tabelle td { padding: 6px 8px; border-bottom: 1px solid var(--rand); text-align: right; }
+.nachweis-tabelle td:first-child { text-align: left; font-weight: 500; }
+.nachweis-tabelle td.zahl { font-variant-numeric: tabular-nums; }
+.nachweis-tabelle tr.ist-gut td:first-child      { box-shadow: inset 4px 0 0 var(--gut); }
+.nachweis-tabelle tr.ist-schlecht td:first-child { box-shadow: inset 4px 0 0 var(--schlecht); }
+
+/* Der Erfüllungsgrad trägt das Urteil allein -- die Spalte daneben, die
+   „erfüllt" ausschrieb, sagte dasselbe ein zweites Mal. Hinterlegt wird
+   deshalb genau diese Zelle und nicht mehr die ganze Zeile. */
+.nachweis-tabelle td.grad { font-weight: 700; font-size: 13.5px; }
+.nachweis-tabelle .ist-gut      td.grad { background: var(--gut-hell);      color: var(--gut); }
+.nachweis-tabelle .ist-schlecht td.grad { background: var(--schlecht-hell); color: var(--schlecht); }
+
+.luecke { padding: 9px 12px; margin-bottom: 6px; border-radius: var(--radius);
+          border: 1px solid var(--warn); border-left-width: 4px; background: var(--warn-hell); }
+.luecke code { font-size: 12px; background: rgba(0,0,0,.05); padding: 1px 5px; border-radius: 3px; }
+.luecke .pfad { font-size: 11.5px; color: var(--schrift-matt); margin-top: 3px; }
+
+/* Diagramme */
+.diagramm-huelle { text-align: center; }
+svg.mn, svg.qs { max-width: 100%; height: auto; }
+.mn-legende { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 10px; font-size: 12.5px; }
+.mn-legende span { display: flex; align-items: center; gap: 5px; }
+.mn-legende i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+
+/* --------------------------------------------------------- Kleinkram -- */
+
+.leer { padding: 34px 20px; text-align: center; color: var(--schrift-zart); }
+.leer p { margin: 6px 0; }
+/* Eine Liste ohne Eintrag sagt es in einer leisen Zeile, überall gleich:
+   im Baum, unter einer Zeichnung, bei Lastfällen und Querschnitten, in der
+   Suche des Notizbuchs und in der Konsole. Bis 2026-11-20 hatte jede App
+   ihre eigene Klasse dafür, fünf Stück. */
+.leer-zeile { margin: 0; padding: 4px 0; font-size: 12px; color: var(--schrift-zart); }
+
+.melder {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 6px; align-items: center; z-index: 40; pointer-events: none;
+}
+.melder > div {
+  padding: 9px 17px; border-radius: var(--radius);
+  background: var(--blau-leiste); color: #fff; font-size: 13px; box-shadow: var(--schatten);
+  animation: auftauchen .18s ease-out; max-width: 70vw;
+}
+.melder > div.ist-fehler { background: var(--schlecht); }
+@keyframes auftauchen { from { opacity: 0; transform: translateY(6px); } }
+
+/* Die Formeln haben ihre eigene Schrift und erben die Angleichung nicht.
+   `position: relative` hält den unsichtbaren MathML-Teil jeder Formel (bei
+   KaTeX absolut gesetzt) in ihr. Sonst lag er, aus einer gerollten Tafel
+   heraus, auf der Seite selbst: die Seite war 1800 statt 768 px hoch, und ein
+   Feld, das den Fokus bekam, rollte Kopfleiste und Knöpfe aus dem Bild. */
+.katex { position: relative; font-size: 1.04em; font-size-adjust: none; }
+.katex-display { margin: 0; }
+
+.reihe { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+/* ------------------------------------------------------------ Ladeschirm -- */
+/* Liegt über allem, bis der Rechenkern antwortet. Pyodide bringt beim ersten
+   Aufruf rund 13 MB mit -- ohne Anzeige sähe das nach einer toten Seite aus. */
+
+.ladeschirm {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 24px; text-align: center;
+  background: var(--blau-leiste); color: #c8d6ea;
+}
+.lade-marke { font-size: 22px; font-weight: 600; color: #fff; }
+.lade-marke span { color: #6ea8fe; }
+.lade-marke em { color: #ff8a7a; font-style: normal; font-weight: 800; }
+
+.lade-balken {
+  width: min(320px, 70vw); height: 3px; border-radius: 2px; overflow: hidden;
+  background: rgba(255,255,255,.15);
+}
+.lade-balken i {
+  display: block; width: 40%; height: 100%; background: #6ea8fe;
+  animation: lade-lauf 1.25s ease-in-out infinite;
+}
+@keyframes lade-lauf {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+/* Wer bewegte Bilder abgestellt hat, bekommt einen ruhigen Balken. */
+@media (prefers-reduced-motion: reduce) {
+  .lade-balken i { animation: none; width: 100%; opacity: .5; }
+}
+
+.ladeschirm p { margin: 0; font-size: 13px; }
+.lade-fussnote { max-width: 44ch; color: #8ea3bf; font-size: 12px; line-height: 1.5; }
+/* Gehört zur Marke: näher an ihr als der Abstand der übrigen Zeilen. */
+.ladeschirm .lade-autor { margin-top: -8px; color: #8ea3bf; letter-spacing: .02em; }
+
+/* ------------------------------------------------------------- Fussnote -- */
+/* Steht ausserhalb des Rasters, damit die Höhenrechnung der Tafeln bleibt. */
+
+.fussleiste {
+  position: fixed; left: 10px; bottom: 6px; z-index: 4;
+  pointer-events: none;
+}
+.kernanzeige {
+  font-size: 11px; color: var(--schrift-zart); letter-spacing: .1px;
+  background: rgba(255,255,255,.8); padding: 1px 6px; border-radius: 4px;
+}
+
+/* ------------------------------------------------ Kurven und Diagramme -- */
+
+/* KaTeX vom Versalsatz ausnehmen. text-transform macht aus dem kleinen Alpha
+   des Erfüllungsgrads sonst ein grosses -- und damit ein anderes Zeichen. */
+.nachweis-tabelle th .katex { text-transform: none; }
+
+.kurvenschalter { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ------------------------------------------------------------- Zahlfeld -- */
+/* Eigene Pfeile statt des Browser-Drehfelds: das kann nur gleichmässige
+   Schritte, Durchmesser springen aber von 22 auf 26. */
+
+/* Die Pfeilspur ist einmal deklariert; das Feld hält seinen Text davor frei.
+   Vorher stand die Aussparung als feste Zahl im Eingabefeld -- und wurde von
+   `.postenzeile input[type=number]` überschrieben, weil das spezifischer ist.
+   Die Ziffern liefen dann unter die Pfeile. Darum trägt die Regel jetzt
+   dieselbe Form wie die überschreibende und steht nach ihr. */
+/* Die Breite steht am Rahmen um Feld und Pfeile, nicht am Feld: so kann eine
+   Zeile, die zu eng ist, ihn noch schmaler machen (max-width), und Feld und
+   Pfeile gehen mit. */
+.zahlfeld {
+  position: relative; display: flex;
+  width: var(--zahlbreite); max-width: 100%;
+}
+.zahlfeld > input[type=number] {
+  width: 100%;
+  padding-inline: 5px calc(var(--pfeilspur) + 3px);
+  -moz-appearance: textfield; appearance: textfield;
+}
+.zahlfeld > input::-webkit-outer-spin-button,
+.zahlfeld > input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.zahlpfeile {
+  position: absolute; right: 1px; top: 1px; bottom: 1px; width: var(--pfeilspur);
+  display: flex; flex-direction: column;
+}
+.zahlpfeil {
+  flex: 1; padding: 0; border: none; background: transparent; cursor: pointer;
+  font-size: 8px; line-height: 1; color: var(--schrift-zart);
+  display: flex; align-items: center; justify-content: center;
+}
+.zahlpfeil:hover { color: var(--blau); background: var(--blau-hell); }
+
+/* --------------------------------------------- Fuss der Querkraftkurve -- */
+/* Die Normalkraft, für die die Kurve gilt. Steht unter dem Diagramm, weil sie
+   die Kurve bestimmt und nicht umgekehrt. */
+.kurvenfuss {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin: 6px 0 2px; padding: 7px 10px;
+  background: var(--flaeche-2); border: 1px solid var(--rand);
+  border-radius: var(--radius);
+}
+.kurvenfuss-name { font-size: 12.5px; font-weight: 500; }
+.kurvenfuss .einheit { font-size: 12px; color: var(--schrift-zart); }
+.kurvenhinweis {
+  margin-left: auto; font-size: 11.5px; color: var(--schrift-zart);
+}
+
+/* ---------------------------------------------------- Kennzahlen je Platte -- */
+
+/* Die Kennzahlen einer Platte stehen in ihrer eigenen Karte; die rahmt sie. */
+/* Die Kennzahlen einer Platte: je eine Zeile -- Beschriftung, Zeichen,
+   Wert --, die Werte bündig rechts, damit sich die Zahlen vergleichen lassen. */
+.kennzahlen {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 3px 14px; align-items: baseline; max-width: 560px;
+}
+.kennzahl { display: contents; font-size: 12.5px; }
+.kennzahl-name { color: var(--schrift-matt); font-size: 12.5px; }
+.kennzahl-zeichen { font-size: 12.5px; }
+.kennzahl-wert { font-weight: 600; font-size: 12.5px; text-align: right; white-space: nowrap; }
+
+
+/* «Automatische Bewehrung» -- im eigenen Fenster. Die Modi stehen
+   untereinander: «Grundbew. ohne Kräfte, Zulage mit Kräften» passt in keine
+   Zahlenspalte. */
+.automatik > .schalter { margin-bottom: 6px; }
+
+/* Der Knopf, der die Bewehrung sucht. Ohne Meldung daneben: das Ergebnis
+   steht danach in den Lagen und in der Zusammenfassung, und ein Satz daneben
+   sagte dasselbe ein zweites Mal. Geht es nicht auf, meldet es die Zeile
+   oben rechts -- dort, wo auch sonst steht, was schiefging. */
+.automatik-leiste { margin-top: 8px; }
+
+/* Der Knopf, während gesucht wird. Derselbe laufende Balken wie beim Start
+   -- eine Bewegung, eine Bedeutung; ein zweites Ladebild wäre ein zweites
+   Konzept für dieselbe Sache. Und nicht auf .5 ausgegraut: der Knopf ist
+   nicht unverfügbar, er arbeitet. */
+.knopf.ist-am-suchen { display: inline-flex; align-items: center; gap: 8px; }
+.knopf.ist-am-suchen:disabled { opacity: .9; cursor: progress; }
+.laufbalken {
+  flex: none; width: 28px; height: 3px; border-radius: 2px; overflow: hidden;
+  background: rgba(255,255,255,.3);
+}
+.laufbalken::after {
+  content: ''; display: block; width: 45%; height: 100%; background: #fff;
+  animation: lade-lauf 1.1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .laufbalken::after { animation: none; width: 100%; opacity: .6; }
+}
+
+/* Über dem Diagramm einer Spannung-Dehnung-Analyse: womit gerechnet wurde
+   und die Zahlen, nach denen man fragt. */
+.sd-zahlen {
+  display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px;
+  color: var(--schrift-matt); margin-bottom: 6px;
+}
+.sd-zahlen b { color: var(--schrift-zart); font-weight: 600; }
+/* KaTeX setzt eine Spur grösser als der Text -- in der Zeile eine zu viel. */
+.sd-zahlen .katex, .sd-wahl-text .katex { font-size: 1.08em; }
+.sd-wahl-text { font-size: 11px; color: var(--schrift-zart); margin: 0 0 5px; }
+
+/* Freier Text zur Platte. Über die ganze Breite statt in der Feldspalte:
+   ein Satz ist kein Zahlenwert und passt nicht in 112 Pixel. */
+.beschreibung { margin-top: 10px; }
+.beschreibung > label {
+  display: block; font-size: 13px; margin-bottom: 4px;
+}
+/* Nur was am Textkasten anders ist als an jeder anderen Eingabe: mehr Hoehe,
+   verstellbar, etwas kleinere Schrift. Farbe und Rand kommen von dort, wo
+   sie fuer alle stehen. */
+.beschreibung > textarea {
+  font: inherit; font-size: 12.5px; line-height: 1.45;
+  resize: vertical; min-height: 58px;
+}
+
+/* Ein Knopf, der eine Liste verlängert: unter der Liste, über die ganze
+   Breite, mit gestricheltem Rand -- man sieht, dass dort noch etwas
+   hinkommt, und dass es ein Knopf ist. */
+.knopf-anfuegen {
+  display: block; width: 100%; margin-top: 6px;
+  padding: 7px 10px; font-size: 12px; font-weight: 600;
+  color: var(--blau); background: var(--flaeche);
+  border: 1px dashed var(--rand-stark); border-radius: var(--radius);
+  cursor: pointer; text-align: center;
+}
+.knopf-anfuegen:hover {
+  background: var(--blau-hell); border-color: var(--blau); border-style: solid;
+}
+
+/* Beschriftung über dem Zahlenfeld einer Analysezeile. Sie wechselt mit der
+   gewählten Art -- also steht sie in der Zeile und nicht in einer Kopfzeile,
+   die für alle gälte. Über dem Feld und nicht daneben: so bleibt das Raster
+   der Zeile dasselbe, gleich welche Art gewählt ist. */
+.mit-kopf { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.mit-kopf > .schalter { align-self: flex-start; }
+.mit-kopf > .schalter.ist-pfeile { align-self: stretch; }
+.spaltenkopf {
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .2px; color: var(--schrift-matt); text-align: right;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Eine Analyse als Karte in drei Zeilen: der Name; ihre Zahlen, die
+   Kriechzahl und die Richtung; die Werte und der Beton. Die Art steht über
+   dem Fenster. Unten bündig: ihre Felder tragen ihren Kopf über sich. */
+.fallzeile.ist-spannung, .fallzeile.ist-spannung .fall-zahlen { align-items: end; }
+/* Ein Feld, das bei der gewählten Rechenart nichts ändert -- etwa φ beim
+   Spannungsblock. Es bleibt stehen, damit seine Zahl nicht verloren geht. */
+.ist-ohne-wirkung { opacity: .45; }
+
+/* Die Rechenwahl eines Kapitels: ein kleiner Titel, darunter φ, die
+   Rechenart und die Werte je Material. φ so breit wie ein Zahlenfeld --
+   sein Kopf, «Kriechzahl φ», braucht den Platz (bis 2026-11-20 stand dort φ
+   allein, und die Spalte war so breit wie eine kurze Zahl). Die Rechenart
+   nimmt die ganze Breite, unter φ hindurch: mit ihren Bildern braucht sie
+   sie; die Werte je Material ebenso, eine Zeile je Material. */
+.rechenwahl {
+  display: grid; gap: 1px 6px; align-items: end; margin: 2px 0 8px;
+  grid-template-columns: var(--zahlbreite) minmax(0, 1fr);
+}
+.rechenwahl > .ist-rechenart, .rechenwahl > .werkstoffzeilen { grid-column: 1 / -1; }
+.rechenwahl-titel {
+  grid-column: 1 / -1; font-size: 11px; font-weight: 600; color: var(--schrift-matt);
+}
+.rechenwahl .spaltenkopf { text-align: left; }
+/* Der Kopf steht über einem Schalter links, wie seine Stellungen -- über
+   einer Zahl rechts. */
+.fall-unten .spaltenkopf { text-align: left; }
+/* Ein Formelzeichen in einem Text, etwa «Kriechzahl φ»: in der Formelschrift
+   und so gross wie in einer gesetzten Formel (KaTeX: 1.21em), klein, wo der
+   Kopf gross schreibt -- sonst würde aus φ ein Φ. */
+.formelzeichen {
+  font: italic 1.21em/1 KaTeX_Math, serif; text-transform: none; letter-spacing: 0;
+}
+/* Ein Formelzeichen mit Einheit: das Zeichen gesetzt, die Einheit wie
+   geschrieben -- «ε oben» wurde gross geschrieben zu «Ε OBEN». */
+.spaltenkopf.mit-zeichen { text-transform: none; letter-spacing: 0; }
+
+/* Fragezeichen mit Erklärung. Die Blase hängt am Zeichen und erscheint beim
+   Darüberfahren -- sie nimmt keinen Platz in der Zeile, solange niemand
+   fragt. `title` trägt denselben Text noch einmal, damit die Erklärung auch
+   ohne Maus erreichbar bleibt. */
+.erklaerung { position: relative; display: inline-flex; flex: none; }
+.erklaerung-zeichen {
+  width: 15px; height: 15px; padding: 0; border: none; border-radius: 50%;
+  background: var(--blau-hell); color: var(--blau);
+  font-size: 10px; font-weight: 800; line-height: 15px; text-align: center;
+  cursor: help; user-select: none;
+}
+.erklaerung:hover .erklaerung-zeichen,
+.erklaerung.ist-offen .erklaerung-zeichen { background: var(--blau); color: #fff; }
+.erklaerung-blase {
+  position: absolute; right: 0; top: 20px; z-index: 40;
+  display: none; flex-direction: column; gap: 6px;
+  width: max-content; max-width: 280px; padding: 8px 10px;
+  border: 1px solid var(--rand-stark); border-radius: var(--radius);
+  background: var(--flaeche); box-shadow: 0 6px 18px rgba(20, 32, 48, .16);
+  font-size: 11.5px; line-height: 1.45; color: var(--schrift-matt);
+  font-weight: 400; text-transform: none; letter-spacing: 0;
+}
+/* Darüberfahren *oder* angetippt: auf dem Telefon gibt es nur das zweite. */
+.erklaerung:hover .erklaerung-blase,
+.erklaerung.ist-offen .erklaerung-blase { display: flex; }
+.erklaerung-blase code {
+  font-size: 11.5px; color: var(--schrift); background: var(--flaeche-2);
+  padding: 4px 6px; border-radius: 4px; white-space: pre-wrap;
+}
+/* Stichworte: «Weg: …», «Werte: …», «φ: …» -- eng untereinander. */
+.erklaerung-zeilen { display: flex; flex-direction: column; gap: 2px; }
+.erklaerung-zeilen b { font-weight: 600; color: var(--schrift); }
+
+/* Ein ausgeschalteter Nachweis, der nicht aufgeht. Leiser als ein echtes
+   Urteil -- geführt wird er ja nicht --, aber deutlich genug, dass man ihn
+   nicht überliest. */
+.stiller-hinweis {
+  font-size: 11.5px; line-height: 1.45; margin: 4px 0 0;
+  color: #9a6a68;
+}

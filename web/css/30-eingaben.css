@@ -1,0 +1,522 @@
+/* ==========================================================================
+   Die Eingaben
+
+   Panels, Feldzeilen, Schalter, Lagen und Posten, die Zeilen der Fälle,
+   die Kapitel einer Platte und das Fenster über der mittleren Tafel.
+   ========================================================================== */
+
+/* ------------------------------------------------------------- Editor -- */
+
+/* Ein Kapitel sieht ueberall gleich aus: Linie links, fetter Titel darueber.
+   Die Linie sitzt an der Gruppe und nicht an einem eigenen Koerper-Element --
+   dann gilt sie fuer jedes Kapitel, ohne dass sieben Aufrufstellen davon
+   wissen muessen. Die Ueberschrift holt sich die Einrueckung mit einem
+   negativen Rand zurueck und steht buendig auf der Linie. */
+/* Die Panels stehen untereinander und sind alle gleich breit: so breit wie
+   `--panelbreite`, nicht wie die Tafel. Schmaler werden sie nur, wo das
+   Fenster selbst nicht reicht (Telefon).
+   Jedes Panel ist selbst der Bezug für die Umbrüche darin
+   (`container-type`). Sie richten sich damit nach seiner festen Breite --
+   nach der Tafel hätte ein breiteres Fenster sie wieder umgestellt. */
+.panelstapel {
+  display: grid; grid-template-columns: minmax(0, var(--panelbreite));
+  justify-content: center; align-content: start;
+  /* Die Rollleiste bekommt ihren Platz fest dazu. Sonst nähme sie ihn den
+     Panels weg, sobald sie erscheint: die Spalte misst ihre Breite ohne sie. */
+  scrollbar-gutter: stable;
+}
+/* Steht die Zeichnung im Stapel, ist er so breit wie sie; die anderen
+   Panels bleiben bei ihrer Breite, in der Mitte. Schmaler als der Platz
+   wird keines. Hat man die mittlere Tafel von Hand gezogen, füllt die
+   Zeichnung sie aus. */
+.panelstapel:has(> .feldgruppe.ist-breit) { grid-template-columns: minmax(0, var(--cadbreite)); }
+.raster[data-mitte="gezogen"] .panelstapel:has(> .feldgruppe.ist-breit) { grid-template-columns: minmax(0, 1fr); }
+.panelstapel > .feldgruppe:not(.ist-breit) { width: 100%; max-width: var(--panelbreite); justify-self: center; }
+/* Ein Panel ist eine graue Fläche mit Rand: so ist auf einen Blick klar, wo
+   eines aufhört und das nächste anfängt. Die Karten darin -- Lagen,
+   Kapitel, Einwirkungen -- bleiben weiss und heben sich davon ab. */
+.feldgruppe {
+  margin-bottom: 14px;
+  padding: 8px 12px 6px;
+  background: var(--panel);
+  border: 1px solid var(--rand);
+  border-radius: 9px;
+  container-type: inline-size;
+}
+.feldgruppe > h3 {
+  font-size: 12px; text-transform: uppercase; letter-spacing: .5px;
+  font-weight: 700; color: var(--schrift); margin: 0 0 8px;
+  padding: 2px 0 7px; border-bottom: 1px solid var(--rand);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  cursor: pointer; user-select: none;
+}
+.feldgruppe > h3:hover .panel-knopf { color: var(--blau-tief); }
+.feldgruppe > h3 > span:last-child {
+  font-weight: 400; text-transform: none; letter-spacing: 0;
+  color: var(--schrift-zart);
+}
+/* Ein Klick auf den Kopf klappt das Panel zu und auf. Pfeil und Titel
+   sind ein Knopf, damit auch die Tastatur ihn erreicht; die Maus darf den
+   ganzen Kopf treffen. Derselbe Pfeil wie im Projektbaum. */
+.panel-knopf {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit;
+}
+.panel-knopf:focus-visible { outline: 2px solid var(--blau); outline-offset: 3px; border-radius: 3px; }
+.panel-knopf .pfeil { font-size: 9px; width: 10px; color: var(--schrift-zart); transition: transform .12s; }
+.feldgruppe.ist-zu .panel-knopf .pfeil { transform: rotate(-90deg); }
+.feldgruppe.ist-zu > :not(h3) { display: none; }
+.feldgruppe.ist-zu > h3 { margin-bottom: 0; padding-bottom: 2px; border-bottom: none; }
+.feldgruppe.ist-zu { margin-bottom: 8px; padding-bottom: 8px; }
+
+.feld { display: grid; grid-template-columns: minmax(0, 1fr) auto 48px; gap: 6px; align-items: center; margin-bottom: 5px; }
+.feld > label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Ein Bild vor der Beschriftung, wo Wörter nicht reichen -- etwa die Einlage im Schnitt. */
+.feld > label > .sinnbild { width: 18px; height: 18px; vertical-align: -4px; margin-right: 5px; }
+.feld .einheit { font-size: 12px; color: var(--schrift-zart); }
+/* Ein Name hat keine Einheit: er bekommt ihren Platz dazu. In gleich breiter
+   Schrift passte «Decke über EG» sonst nicht mehr ganz in 112 Pixel. Er
+   beginnt dort, wo die Zahlenfelder und die Auswahl darunter beginnen --
+   bündig mit ihnen statt weiter links (Benutzer, 2026-10-16). */
+.feld:has(> .einheit:empty) > input[type="text"] {
+  grid-column: span 2; justify-self: end; width: calc(var(--zahlbreite) + 6px + 48px);
+}
+/* Eine Auswahl mit kurzen Namen ist mindestens so breit wie ein Zahlenfeld:
+   sonst begann «C30/37» zwei Pixel rechts vom Namensfeld darüber. */
+.feld > select { min-width: var(--zahlbreite); }
+.feld > .einheit:empty { display: none; }
+
+/* Alles, was man anfasst, sieht gleich aus: Zahlenfeld, Namensfeld,
+   Auswahlliste, Textkasten. Vorher trugen nur die Zahlenfelder den blauen
+   Akzent, und in derselben Zeile stand dann ein weisses Namensfeld daneben --
+   zwei Eingaben, die verschieden aussahen, ohne verschieden zu sein.
+
+   Der Textkasten steht mit in dieser Regel und nicht in einer eigenen: eine
+   zweite Stelle, die sagt, wie eine Eingabe aussieht, weicht mit dem ersten
+   Rundungswert davon ab. Genau so war der Kasten unter «Beschreibung» weiss
+   geblieben, als alles andere blau wurde. */
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; padding: 5px 8px; border-radius: 5px;
+  border: 1px solid var(--eingabe-rand); background: var(--blau-zart);
+  color: var(--schrift);
+}
+
+/* Zahlen stehen rechtsbündig, damit Stellen untereinander stehen. Ein Feld
+   ohne Pfeile (schreibgeschützt) ist gleich breit wie eines mit. */
+input[type="number"] {
+  width: var(--zahlbreite); max-width: 100%;
+  padding-inline: 5px; text-align: right;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--blau); box-shadow: 0 0 0 2px var(--blau-hell);
+}
+input[readonly], input:disabled, select:disabled {
+  background: var(--flaeche-2); border-color: var(--rand-stark);
+  color: var(--schrift-matt); cursor: not-allowed;
+}
+
+.gesperrt-hinweis {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 9px 11px; margin-bottom: 14px;
+  border-radius: var(--radius);
+  background: var(--blau-hell); border: 1px solid var(--blau);
+  font-size: 12.5px;
+}
+.gesperrt-hinweis b { display: block; }
+
+/* Ein Fenster über der ganzen Seite -- «Neues Material», eine Rückfrage:
+   wie das Fenster eines Kapitels (`dialogFenster`, fenster.js). */
+dialog.dialogfenster {
+  padding: 0; width: min(460px, calc(100vw - 24px)); max-width: none;
+  color: var(--schrift);
+}
+dialog.dialogfenster::backdrop { background: rgba(16, 24, 40, .35); }
+dialog.dialogfenster .fenster-kopf { top: 0; }
+/* Die Rückfrage: der Satz, darunter je Wahl ihr Knopf und was er bewirkt. */
+.rueckfrage-text { margin: 0 0 12px; font-size: 13px; }
+.rueckfrage-wahl {
+  display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 10px;
+  align-items: center; margin-bottom: 8px;
+}
+.rueckfrage-erklaerung { font-size: 12.5px; color: var(--schrift-matt); }
+.rueckfrage-fuss { display: flex; justify-content: flex-end; margin-top: 12px; }
+.materialwahl .unterkapitel + .unterkapitel { margin-top: 12px; }
+.materialwahl-text { margin: 2px 0 8px; font-size: 12.5px; color: var(--schrift-matt); }
+.materialwahl-zeile { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.materialwahl-zeile select { flex: 1 1 120px; min-width: 0; }
+.materialwahl-marke { font-size: 12px; color: var(--schrift-matt); }
+
+.kennwert {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto 54px 26px;
+  gap: 6px; align-items: center; padding: 3px 4px; border-radius: 5px;
+}
+/* Ein abgeleiteter Wert eines eigenen Materials: der Schalter «gerechnet |
+   von Hand» steht unter der Bezeichnung, neben seiner Zahl -- in einer Zeile
+   bliebe der Bezeichnung neben ihm kein Platz. */
+.kennwert.mit-schalter { row-gap: 3px; }
+.kennwert.mit-schalter .bezeichnung { grid-column: 1 / -1; }
+.kennwert.mit-schalter .schalter { justify-self: end; }
+.kennwert:hover { background: var(--flaeche-2); }
+.kennwert.ist-ueberschrieben { background: var(--warn-hell); box-shadow: inset 3px 0 0 var(--warn); }
+/* Die Beschreibung bricht um, statt abgeschnitten zu werden: das Panel ist
+   so breit wie alle anderen, nicht wie die längste Beschreibung. */
+.kennwert .bezeichnung { font-size: 12.5px; min-width: 0; overflow-wrap: break-word; }
+.kennwert .bezeichnung small { color: var(--schrift-zart); }
+.kennwert .einheit { font-size: 11.5px; color: var(--schrift-zart); }
+
+/* Lagen -- knapp: eine Lage ist so hoch wie ihre zwei Posten, Grund und
+   Zulage. Nummer und Richtung stehen links daneben, die Lage der Stäbe
+   zueinander auf einer Zeile darunter. Vorher trug jede Lage eine eigene
+   Kopfzeile, und vier Lagen brauchten zwölf Zeilen statt acht. */
+.lage {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: 8px; row-gap: 2px; align-items: center;
+  border: 1px solid var(--rand); border-left: 4px solid var(--rand-stark);
+  border-radius: var(--radius); padding: 3px 8px; margin-bottom: 4px; background: var(--flaeche);
+}
+.lage > .postenzeile { margin-top: 0; }
+.lage > .neigungszeile { grid-column: 1 / -1; }
+/* Unter den Zahlen -- in der letzten Spalte, auch wenn der Kopf am Telefon
+   über den Zeilen steht und es nur eine gibt. */
+.lage > .gunstzeile { grid-column: -2 / -1; }
+.gunstzeile { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 2px; }
+.gunstzeile-titel { font-size: 11.5px; color: var(--schrift-matt); }
+.lage-x { border-left-color: var(--richtung-x); }
+.lage-y { border-left-color: var(--richtung-y); }
+/* Die Bügel tragen quer zu beiden Tragrichtungen -- also weder grün noch
+   rot, sondern violett wie «beide». */
+.lage-querkraft { border-left-color: var(--beide); }
+.lage.ist-leer { opacity: .62; background: var(--flaeche-2); }
+.lage-kopf {
+  grid-row: span 2;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  font-size: 12px; font-weight: 700; color: var(--schrift-matt);
+}
+.lage-name { white-space: nowrap; }
+/* Am Telefon steht der Kopf über den Zeilen: daneben bliebe den Zahlen
+   kein Platz. */
+@container (max-width: 360px) {
+  .lage { grid-template-columns: minmax(0, 1fr); }
+  .lage-kopf { grid-row: auto; flex-direction: row; align-items: center; gap: 8px; }
+}
+
+/* Schalter -- so hoch wie die Eingabefelder daneben und mit ihrem Rand: auch
+   ein Schalter ist etwas, das man anfasst. Die gewählte Stellung ist eine
+   abgerundete farbige Fläche, die bis an den Rand reicht; die andere bleibt
+   blass auf dem grauen Grund (Benutzer, 2026-10-16). Mit zwei Stellungen
+   ist der ganze Schalter ein Knopf und schaltet bei jedem Klick um
+   (`zweiSchalter`); mit mehr wählt ein Klick seine Stellung. */
+.schalter {
+  display: inline-flex; align-items: stretch; gap: 2px;
+  min-height: 28px; padding: 2px;
+  border: 1px solid var(--eingabe-rand); border-radius: 7px;
+  background: var(--flaeche-2); font: inherit; cursor: pointer;
+}
+.schalter-halb {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  border: none; border-radius: 5px; background: transparent; color: var(--schrift-zart);
+  padding: 0 9px; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+/* Eine Stellung mit Bild (`zeichen`), etwa die Rechenart: Spannung über Dehnung. */
+.schalter-halb > .sinnbild { width: 18px; height: 18px; flex: none; }
+.schalter:hover:not(:disabled) .schalter-halb:not(.ist-an) { color: var(--schrift-matt); }
+/* Noch nichts zu wählen (`aus`), etwa «von Hand» ohne gerechneten Wert. */
+.schalter:disabled { opacity: .5; }
+.schalter:disabled, .schalter:disabled .schalter-halb { cursor: not-allowed; }
+.schalter-halb.ist-an {
+  background: var(--blau); color: #fff; box-shadow: 0 1px 2px rgba(16, 24, 40, .25);
+}
+/* Eine Hälfte, die eine Tragrichtung meint, trägt deren Farbe -- an der Lage
+   wie beim Lastfall. Die Hälfte sagt es selbst, nicht die Karte, in der sie
+   steht: sonst färbte eine y-Lage jeden anderen Schalter darin mit. */
+.schalter-halb.ist-x.ist-an     { background: var(--richtung-x); color: #fff; }
+.schalter-halb.ist-y.ist-an     { background: var(--richtung-y); color: var(--schrift); }
+.schalter-halb.ist-beide.ist-an { background: var(--beide); color: #fff; }
+/* Viele Stellungen brechen um, lange stehen untereinander -- je eine Zeile. */
+.schalter.ist-umbruch { flex-wrap: wrap; }
+.schalter.ist-senkrecht { display: flex; flex-direction: column; }
+.schalter.ist-senkrecht .schalter-halb { justify-content: flex-start; padding: 4px 9px; text-align: left; }
+/* Knapp, wo er in einer Zeile mit Zahlen steht -- «mm | Stk» einer Lage. */
+.schalter.ist-knapp .schalter-halb { padding: 0 5px; }
+/* Die Zugseite als Pfeile: schmal genug für eine Zahlenspalte. */
+.schalter.ist-pfeile .schalter-halb { flex: 1; padding: 0 3px; font-size: 13px; }
+/* Ein Schalter unter seiner Beschriftung (`wahlBlock`). */
+.wahlblock { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; margin-bottom: 5px; }
+/* Reicht der Platz nicht, brechen die Stellungen um -- bis 2026-11-19 ragte
+   die Lage beim Durchstanzen, fünf Stellungen mit Bild, über ihren Block. */
+.wahlblock > .schalter { flex-wrap: wrap; max-width: 100%; }
+.wahlblock-titel { font-size: 13px; }
+
+/* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm. Die Zahlenfelder sind
+   knapp -- ein Durchmesser oder eine Teilung braucht drei Ziffern. */
+.postenzeile {
+  display: grid;
+  grid-template-columns: 16px 40px 10px var(--zahlbreite-knapp) 12px var(--zahlbreite-knapp) auto;
+  gap: 4px; align-items: center; margin-top: 3px;
+}
+.postenzeile .zahlfeld { width: var(--zahlbreite-knapp); }
+.postenzeile > .schalter { justify-self: start; }
+.postenzeile.ist-leer { opacity: .55; }
+
+/* Nimmt den Posten heraus, indem es den Durchmesser auf null setzt. Ein runder
+   Knopf mit hellrotem Grund -- als blosses Zeichen war er kaum zu sehen und
+   sah nicht wie etwas Drückbares aus. Farbig nur, solange es etwas zu
+   entfernen gibt: sonst verspräche er eine Wirkung, die er nicht hat. */
+/* Der eine Löschknopf. Er stand einmal nur bei den Bewehrungslagen; jede
+   Liste hat sich danach ihren eigenen gebaut, und am Ende gab es drei, die
+   verschieden aussahen und dasselbe taten. Wer eine Zeile zum Löschen
+   braucht, nimmt diesen -- neue werden keine mehr definiert. */
+.weg {
+  width: 16px; height: 16px; padding: 0; border: none; border-radius: 50%;
+  background: var(--schlecht-hell); color: var(--schlecht);
+  font-size: 11px; font-weight: 700; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.weg:hover:not(:disabled) { background: var(--schlecht); color: #fff; }
+/* Stumpf: es gibt nichts zu löschen. Sichtbar bleibt er trotzdem, damit die
+   Zeile ihre Breite behält und nicht bei jedem Durchmesser springt. */
+.weg.ist-stumpf { background: transparent; color: var(--rand-stark); cursor: default; }
+
+/* Eine Lage, ein Schalter: Haken oder Kreuz. Ohne Richtungsmarke -- bei der
+   Zwängung gibt es keine -- bekommt der Name ihren Platz. */
+/* Der Name nimmt, was übrig ist. «Zwängung auf Biegung 4. Lage» und
+   «70 % der Tragsicherheitseinwirkungen» schreiben ihren Nachweis aus statt
+   ihn in einer Spalte daneben zu erklären -- eine feste Namensbreite hiesse,
+   dass der längste von ihnen umbricht und seine Zeile doppelt so hoch wird.
+   Die Hinweisspalte steht auf auto: leer ist sie null breit. */
+/* Schalter, Richtung, Name, Hinweis -- der Schalter ganz links wie bei den
+   Tragsicherheitsnachweisen. Das Auge sucht die Spalte einmal und findet sie
+   danach in jedem Kapitel wieder. */
+.duktilitaetszeile {
+  display: grid; grid-template-columns: 46px 18px minmax(0, 1fr) auto;
+  gap: 6px; align-items: center; margin-bottom: 4px;
+}
+.duktilitaetszeile.ist-breit { grid-template-columns: 46px minmax(0, 1fr) auto; }
+/* Der Anteil steht in der Zeile, die ihn verwendet: «[✓] [60] % der
+   Tragsicherheitseinwirkungen» liest sich als ein Satz. */
+.duktilitaetszeile.ist-anteil { grid-template-columns: 46px auto minmax(0, 1fr) auto; }
+/* Mit einem Feld hinter dem Namen: «[✓] x Max. x/d [0.35]». */
+.duktilitaetszeile.mit-feld { grid-template-columns: 46px 18px auto auto minmax(0, 1fr); }
+/* Dasselbe ohne Richtungsmarke -- die Querschnittsanalyse rechnet in jeder
+   Richtung, und welche es sind, steht im Hinweis dahinter. */
+.duktilitaetszeile.mit-grenze { grid-template-columns: 46px auto auto minmax(0, 1fr); }
+.duktilitaetszeile .schalter-haken .schalter-halb { width: 22px; }
+/* Ein Formelzeichen mit seinem Feld in einer Zeile: «φ [2.0]». Kursiv aus
+   der Formelschrift -- in JetBrains Mono gleichen manche Zeichen anderen. */
+.zeilenfeld { display: inline-flex; align-items: center; gap: 5px; }
+.zeilenfeld-name { font-size: 11.5px; color: var(--schrift-matt); white-space: nowrap; }
+.zeichen { font: italic 14px/1 KaTeX_Math, serif; color: var(--schrift-matt); }
+.duktilitaetszeile .postenname {
+  font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
+}
+.duktilitaetszeile .richtung {
+  font-size: 10.5px; font-weight: 700; text-align: center;
+  border-radius: 4px; padding: 1px 0;
+  background: var(--richtung-x-hell); color: var(--richtung-x-tief);
+}
+/* Ja|Nein: grüner Haken, rotes Kreuz. Beide Hälften gleich breit und die
+   Zeichen mittig: ✓ und ✗ sind verschieden breit, und bei symmetrischem
+   Innenabstand stand der Schalter dadurch schief. */
+.schalter-haken .schalter-halb { width: 24px; padding: 0; font-size: 12px; color: var(--rand-stark); }
+.schalter-haken .ist-ja.ist-an   { background: var(--haken-gut); color: #fff; }
+.schalter-haken .ist-nein.ist-an { background: var(--haken-schlecht); color: #fff; }
+
+/* Tragrichtung einer Einwirkung. Die Farben stehen bei .schalter-halb. */
+.schalter-richtung { width: 100%; }
+.schalter-richtung .schalter-halb { flex: 1; padding: 0 2px; }
+.postenzeile .postenname { font-size: 11.5px; font-weight: 600; color: var(--schrift-matt); }
+.postenzeile .zeichen { font-size: 12px; color: var(--schrift-zart); text-align: center; }
+.postenzeile .einheit { font-size: 11px; color: var(--schrift-zart); }
+.postenzeile input[type="number"] { padding-block: 3px; }
+
+
+.neigungszeile {
+  display: flex; align-items: center; gap: 6px; margin-top: 4px;
+  font-size: 11.5px;
+}
+.neigungszeile .postenname {
+  width: 52px; font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
+}
+.neigungszeile input[type="number"] { padding-block: 3px; }
+.neigungszeile .einheit { font-size: 11px; color: var(--schrift-zart); }
+
+/* Eine Karte wie die Lagen: weiss, gerahmt, mit der blauen Kante links.
+   Gestrichelt auf Grau ging sie zwischen den Lagen unter. */
+.ueberdeckung {
+  padding: 2px 8px; margin: 4px 0; border-radius: var(--radius);
+  background: var(--flaeche); border: 1px solid var(--rand);
+  border-left: 4px solid var(--blau);
+}
+.ueberdeckung .feld { margin-bottom: 0; }
+
+/* Ein Unterkapitel ist eine Karte wie eine Bewehrungslage -- gerahmt, mit
+   farbiger Kante links. Vorher war es ein blosser Strich, und bei fuenf
+   Nachweiskapiteln untereinander sah man nicht, wo eines aufhoert. */
+.unterkapitel {
+  border: 1px solid var(--rand); border-left: 4px solid var(--blau);
+  border-radius: var(--radius); padding: 8px 10px; margin-bottom: 8px;
+  background: var(--flaeche);
+}
+/* Zwischen den Nachweiskapiteln Luft: Tragsicherheit, Duktilität, sprödes
+   Versagen, Riss, Knicken sind verschiedene Fragen und sollen auch so
+   aussehen. Innerhalb eines Kapitels bleibt es eng. */
+.feldgruppe > .unterkapitel + .unterkapitel { margin-top: 14px; }
+.unterkapitel-kopf {
+  font-weight: 700; color: var(--schrift-matt);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .4px; color: var(--schrift-matt); margin-bottom: 5px;
+}
+
+/* Die Zeile eines Falls (faelle.js), in jeder Liste dieselbe: oben
+   Schalter, Name und Entfernen, darunter die Zahlen, je unter ihrem Kopf.
+   Eine Zahlenspalte ist so breit wie ein Zahlenfeld (`--zahlbreite`); wie
+   viele es sind, setzt die Zeile (`--felder`). Vier Felder passen nicht ganz
+   in die Karte; dort werden sie etwas schmaler (die Null in `minmax`).
+   Jede Zelle trägt ihre Klasse und steht danach -- bis 2026-10-18 nach
+   ihrer Nummer (`:nth-child`), und eine Zelle mehr verschob alle danach.
+   Die Zeile steht in der Schrift der Felder, auch der Kopf: die Spalten
+   rechnen in ihren Zeichen. Klein gesetzt sind erst die Beschriftungen. */
+.fallzeile {
+  --zahlspalte: var(--zahlbreite);
+  display: grid;
+  grid-template-columns: 38px repeat(var(--felder, 3), minmax(0, var(--zahlspalte))) 18px;
+  justify-content: start;
+  gap: 3px 4px; align-items: center; margin-bottom: 4px;
+}
+.fall-schalter { grid-row: 1; grid-column: 1; }
+.fall-name { grid-row: 1; grid-column: 2 / -2; padding: 3px 6px; font-weight: 500; }
+.fall-weg { grid-row: 1; grid-column: -2; }
+/* Die Zahlen übernehmen die Spalten der Zeile und brechen nach ihnen um --
+   der Lastfall des gezeichneten Querschnitts hat sechs in zwei Zeilen. */
+.fall-zahlen {
+  grid-row: 2; grid-column: 2 / -2;
+  display: grid; grid-template-columns: subgrid; gap: 3px 4px; align-items: center;
+}
+/* Was neben dem Namen steht -- die Zugseite beim Knicken des gezeichneten
+   Querschnitts, als Pfeile über der letzten Zahl. */
+.fallzeile.mit-oben > .fall-name { grid-column: 2 / -3; }
+.fall-oben { grid-row: 1; grid-column: -3 / -2; min-width: 0; }
+.fall-oben > * { width: 100%; }
+/* Was unter den Zahlen steht -- Werte und Rechenart einer Analyse, zwei
+   Schalter untereinander: nebeneinander fänden sie keinen Platz. */
+.fall-unten {
+  grid-row: 3; grid-column: 2 / -2;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px 4px;
+}
+/* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die
+   Breite nehmen, die die Zahlen brauchen. */
+.fallzeile .schalter-haken .schalter-halb { width: 18px; font-size: 11px; }
+/* Ein ausgeschalteter Lastfall bleibt stehen -- blass, damit man sieht, dass
+   er da ist und nicht gerechnet wird. */
+.fallzeile.ist-aus { opacity: .5; }
+/* Die Spaltenköpfe in derselben Farbe wie die Kapitelköpfe: im zarten Grau
+   las man sie als Beiwerk und suchte, welche Zahl welche ist. Der Kopf trägt
+   nur die Zahlen -- was der Name ist, sieht man. */
+.fallkopf { margin-bottom: 2px; }
+.fallkopf > .fall-zahlen { grid-row: 1; }
+.fallkopf .fall-zahlen > * {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .3px; color: var(--schrift-matt);
+  text-align: right; padding-right: calc(var(--pfeilspur) + 4px);
+}
+.fallkopf .fall-zahlen > .ist-formel { text-transform: none; letter-spacing: 0; }
+.fallzeile input[type="number"] { padding-block: 3px; }
+.fallzeile .schalter-richtung { justify-self: stretch; }
+/* Die Fälle einer Liste trennt eine feine Linie (Benutzer, 2026-11-20):
+   ein Fall mit Zahlen unter dem Namen -- zwei oder drei Zeilen -- lief
+   sonst in den nächsten über. Dieselbe Linie in jeder Liste, auch zwischen
+   den Lastfällen von Balkensystem und Decke. Der erste Fall unter dem Kopf
+   braucht keine. */
+.fallzeile:not(.fallkopf) + .fallzeile,
+.bs-fall + .bs-fall { border-top: 1px solid var(--rand); padding-top: 5px; }
+
+/* ------------------------------------------------- Kapitel und Fenster -- */
+
+/* Die Kapitel einer Platte als Knöpfe, vier in einer Reihe: Zeichen, Name
+   und darunter klein, was eingestellt ist. Weiss auf dem grauen Panel wie
+   die Lagen; ein Kapitel, das etwas rechnet, trägt sein Zeichen in Blau. */
+.kachel-gruppe {
+  margin: 6px 0 5px; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px; color: var(--schrift-matt);
+}
+/* Alle Reihen einer Gruppe gleich hoch: ein Knopf mit zweizeiligem Namen
+   macht nicht nur seine Reihe höher. */
+.kacheln {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr;
+  gap: 6px; margin-bottom: 10px;
+}
+@container (max-width: 360px) {
+  .kacheln { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.kachel {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-height: 78px; padding: 8px 4px 6px;
+  font: inherit; text-align: center; cursor: pointer;
+  color: var(--schrift); background: var(--flaeche);
+  border: 1px solid var(--rand); border-radius: 7px;
+}
+.kachel:hover { border-color: var(--blau); background: var(--blau-hell); }
+.kachel .sinnbild { width: 24px; height: 24px; flex: none; color: var(--schrift-zart); }
+.kachel.ist-an .sinnbild { color: var(--blau); }
+.kachel-name { font-size: 11.5px; font-weight: 600; line-height: 1.2; hyphens: manual; }
+.kachel-stand { margin-top: auto; font-size: 10.5px; color: var(--schrift-zart); }
+.kachel.ist-an .kachel-stand { color: var(--blau-tief); }
+
+/* Das Fenster legt sich über die ganze mittlere Tafel. Der Grund rollt,
+   nicht die Karte: so bleibt er beim Neuzeichnen stehen, und mit ihm die
+   Stelle, an der man war. Die Karte steht in seiner Mitte (Benutzer,
+   2026-10-16) -- mit Rändern «auto» statt mit Zentrieren: ist sie höher als
+   die Tafel, beginnt sie oben, und nichts wird abgeschnitten. */
+.fenster-grund {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; flex-direction: column;
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 12px 48px;
+  background: rgba(16, 24, 40, .3);
+}
+/* So breit wie ein Panel, damit darin alles steht wie dort. */
+.fenster {
+  width: 100%; max-width: calc(var(--panelbreite) + 2px); margin: auto;
+  background: var(--panel); border: 1px solid var(--rand-stark); border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(16, 24, 40, .22), 0 2px 6px rgba(16, 24, 40, .1);
+}
+/* Den Fokus bekommt es beim Öffnen nur, damit Tab hineinführt -- ein Rahmen
+   darum sagte nichts. */
+.fenster:focus { outline: none; }
+/* Der Kopf bleibt oben stehen, wenn man im Fenster rollt. */
+.fenster-kopf {
+  position: sticky; top: -12px; z-index: 2;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-bottom: 1px solid var(--rand);
+  background: var(--panel); border-radius: 10px 10px 0 0;
+}
+.fenster-kopf .sinnbild { width: 26px; height: 26px; flex: none; color: var(--blau); }
+.fenster-titel { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.fenster-titel > span:first-child { font-size: 14px; font-weight: 700; line-height: 1.25; }
+.fenster-zusatz { font-size: 11.5px; color: var(--schrift-zart); }
+.fenster-zu {
+  flex: none; width: 30px; height: 30px; padding: 0;
+  font-size: 19px; line-height: 1; cursor: pointer; color: var(--schrift-matt);
+  background: var(--flaeche); border: 1px solid var(--rand); border-radius: 50%;
+}
+.fenster-zu:hover { background: var(--schlecht); border-color: var(--schlecht); color: #fff; }
+/* Bezugsgrösse für die Umbrüche der Zeilen darin, wie im Panel. */
+.fenster-inhalt { padding: 10px 12px 8px; container-type: inline-size; }
+/* Ein breites Fenster: die Tragsicherheit der Querschnittsanalyse, sechs
+   Lasten auf einer Zeile (Benutzer, 2026-11-20). Solange es offen ist, wird
+   die Mitte so breit wie nötig, samt Platz für die Rollleiste -- aber nur,
+   wenn der rechten Tafel dann noch 300 px bleiben: ganz oder gar nicht.
+   `round(down, Platz, 672px)` ist 0, solange der Platz nicht reicht; dann
+   bleibt die Mitte, wie sie ist, und die Lasten brechen nach drei um. Hat
+   man die Mitte von Hand gezogen, bleibt sie ebenso. */
+.fenster.ist-breit { max-width: 628px; }
+.raster:not([data-mitte="gezogen"]) .tafel-mitte:has(> .fenster-grund > .fenster.ist-breit) {
+  min-width: min(672px, round(down, calc(100vw - var(--breite-links) - 310px), 672px));
+}
+@container (max-width: 599px) {
+  .fallzeile.ist-lastreihe { --felder: 3 !important; }
+}
+.fenster-inhalt > .unterkapitel { margin-top: 12px; }

@@ -49,7 +49,7 @@ Dasselbe traf die Module der Oberflaeche: nach einer Aenderung kam einmal ein
 altes ``nachweise.js`` zum neuen Kern. Darum schreibt die Bruecke in
 ``web/index.html`` eine Importtafel (``<script type="importmap">``): je Modul
 unter ``web/js/``, fuer das Paket und fuer das Verzeichnis des Notizbuchs
-die Adresse mit Marke, dazu das Stilblatt mit Marke. Die Module selbst bleiben, wie sie sind
+die Adresse mit Marke, dazu die Stilblaetter mit Marke. Die Module selbst bleiben, wie sie sind
 -- ``import './dom.js'`` fuehrt ueber die Tafel auf ``./dom.js?v=Marke``.
 So haengt alles an der Seite: wer sie neu laedt, bekommt den Rest im selben
 Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter ``web/vendor/``;
@@ -106,7 +106,7 @@ PYODIDE = WURZEL / "web" / "vendor" / "pyodide"
 NOTIZBUCH = WURZEL / "notizbuch"
 VERZEICHNIS = WURZEL / "web" / "kern" / "notizbuch.json"
 SEITE = WURZEL / "web" / "index.html"
-STILBLATT = WURZEL / "web" / "css" / "stil.css"
+STIL = WURZEL / "web" / "css"
 SW = WURZEL / "sw.js"
 FREMD = WURZEL / "web" / "vendor"
 
@@ -281,6 +281,15 @@ def _json_schreiben(ziel: Path, daten: dict) -> Path:
     return ziel
 
 
+def stilblaetter() -> List[Path]:
+    """
+    Die Blaetter des Stils in der Reihenfolge ihrer Nummern -- so bindet die
+    Seite sie ein, und so gelten sie: bei gleicher Spezifitaet gewinnt die
+    Regel im spaeteren Blatt.
+    """
+    return sorted(STIL.glob("*.css"))
+
+
 def tafeldateien() -> List[Path]:
     """
     Was ueber die Importtafel der Seite geht: jedes Modul der Oberflaeche, das
@@ -291,13 +300,14 @@ def tafeldateien() -> List[Path]:
 
 def versionsmarken() -> str:
     """
-    Was in der Seite zwischen :data:`ANFANG` und :data:`ENDE` steht: das
-    Stilblatt und die Importtafel, jede Adresse mit der Marke ihrer Datei.
+    Was in der Seite zwischen :data:`ANFANG` und :data:`ENDE` steht: die
+    Stilblaetter und die Importtafel, jede Adresse mit der Marke ihrer Datei.
     """
     tafel = {"imports": {_adresse(pfad): _adresse(pfad, mit_marke=True)
                          for pfad in tafeldateien()}}
     zeilen = [
-        f'<link rel="stylesheet" href="{_adresse(STILBLATT, mit_marke=True)}">',
+        *(f'<link rel="stylesheet" href="{_adresse(blatt, mit_marke=True)}">'
+          for blatt in stilblaetter()),
         '<script type="importmap">',
         *json.dumps(tafel, indent=2).splitlines(),
         "</script>",
@@ -333,7 +343,7 @@ def vorrat() -> dict:
     Netz startet -- Pfade von der Wurzel aus:
 
     - ``seiten``: :data:`SEITEN`, die er zuerst aus dem Netz holt;
-    - ``dateien``: das Stilblatt und alles ueber die Importtafel, mit Marke;
+    - ``dateien``: die Stilblaetter und alles ueber die Importtafel, mit Marke;
     - ``fremd``: je Ordner unter ``web/vendor/`` seine Marke und seine
       Dateien -- ohne die Pakete der Konsole (``.whl``): numpy und pandas
       holt er erst, wenn ein Skript sie braucht.
@@ -341,7 +351,7 @@ def vorrat() -> dict:
     return {
         "seiten": list(SEITEN),
         "dateien": [_adresse(pfad, mit_marke=True, von=WURZEL)
-                    for pfad in [STILBLATT, *tafeldateien()]],
+                    for pfad in [*stilblaetter(), *tafeldateien()]],
         "fremd": {
             f"{_adresse(ordner, von=WURZEL)}/": {
                 "marke": fremdmarke(ordner),
@@ -427,8 +437,9 @@ if __name__ == "__main__":
     # Zuletzt: die Marken der beiden Verzeichnisse haengen an dem, was eben
     # geschrieben wurde.
     seite = versionsmarken_schreiben()
-    print(f"{seite.relative_to(WURZEL)}: Marken für das Stilblatt und "
+    print(f"{seite.relative_to(WURZEL)}: Marken für {len(stilblaetter())} Stilblätter und "
           f"{len(tafeldateien())} Dateien")
     sw = vorrat_schreiben()
-    print(f"{sw.relative_to(WURZEL)}: Vorrat aus {len(tafeldateien()) + 1} Dateien mit Marke "
+    print(f"{sw.relative_to(WURZEL)}: Vorrat aus "
+          f"{len(stilblaetter()) + len(tafeldateien())} Dateien mit Marke "
           f"und den Ordnern unter {FREMD.relative_to(WURZEL)}/")

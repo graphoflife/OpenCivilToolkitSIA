@@ -168,7 +168,7 @@ const gleicheStelle = (s, a, b) => Math.abs(a - b) <= 1e-3 * s.L;
 
 /**
  * Wie gross eine Zahl im Bild ist, nachgemessen -- JetBrains Mono zu 13 px
- * (stil.css): je Zeichen die Breite, dazu wie weit die Schrift über und
+ * (80-skizzen.css): je Zeichen die Breite, dazu wie weit die Schrift über und
  * unter ihre Grundlinie reicht, mit der kleineren Stelle bis unter deren
  * Zeile.
  */

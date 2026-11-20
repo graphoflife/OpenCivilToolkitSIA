@@ -1,0 +1,200 @@
+/* ==========================================================================
+   OpenCivilToolkitSIA -- Oberfläche
+
+   Ruhige Grundfläche, farbige Leisten. Die Farbe trägt eine Aussage: Beton
+   grau, Betonstahl kupfer, Platte blau, Querschnittsanalyse türkis,
+   erfüllt grün, nicht erfüllt rot; die Materialien im gezeichneten
+   Querschnitt pastell -- Beton grün, Betonstahl rot, Schubwände gelb,
+   Baustahl blau;
+   überschrieben ocker; Tragrichtung x orange, y gelb, beide und die Bügel
+   violett; Ja/Nein-Schalter grün und rot. Wo nichts auszusagen ist, bleibt
+   es unbunt.
+
+   Der Stil steht in Blättern nach Bausteinen, nicht je App: die Vorsilbe
+   einer Klasse sagt, wo sie zuerst stand, nicht wer sie braucht
+   (`.bs-tabelle` dient auch der Decke). Die Brücke bindet die Blätter in
+   der Reihenfolge ihrer Nummern ein, und die Reihenfolge gehört zum Stil:
+   bei gleicher Spezifität gewinnt, was später steht. Bis 2026-11-20 stand
+   alles in einer Datei, stil.css.
+   ========================================================================== */
+
+:root {
+  --grund:        #eef1f5;
+  --flaeche:      #ffffff;
+  --flaeche-2:    #f2f5f9;
+  /* Der Grund eines Panels: grau genug, dass es sich von der weissen Tafel
+     abhebt und die weissen Karten darin hervortreten. */
+  --panel:        #eceff4;
+  --rand:         #d6dce6;
+  --rand-stark:   #b4becd;
+  --schrift:      #16202c;
+  --schrift-matt: #56657a;
+  --schrift-zart: #8895a8;
+
+  --blau:         #1f6feb;
+  --blau-tief:    #0d4ba8;
+  --blau-hell:    #e7f0fe;
+  --blau-leiste:  #12325c;
+  /* Der Grund der Eingabefelder: hell genug, dass die Ziffern ruhig lesbar
+     bleiben, und deutlich genug, dass ein Eingabefeld als solches auffällt.
+     --blau-hell wäre dafür schon zu kräftig. */
+  --blau-zart:    #f4f8ff;
+  /* Der Rand von allem, was man anfasst: Zahlenfeld, Namensfeld, Auswahl,
+     Textkasten, Schalter. Dunkel genug, dass man auf einen Blick sieht, wo
+     etwas einzugeben ist -- der zarte Rand davor ging auf Weiss unter. */
+  --eingabe-rand: #7a93c0;
+
+  --gut:          #16794a;
+  --gut-hell:     #e4f4ec;
+  --schlecht:     #c0281f;
+  /* Eigene Toene fuer die Ja/Nein-Schalter: frisch, aber heller als Gruen
+     und Rot der Urteile. Das kraeftige Rot gehoert dorthin, wo etwas nicht
+     aufgeht -- ein abgeschalteter Nachweis ist kein Fehler, sondern eine
+     Entscheidung. */
+  --haken-gut:      #2f9e44;
+  --haken-schlecht: #e5484d;
+  --schlecht-hell:#fdeceb;
+  --warn:         #8a6100;
+  --warn-hell:    #fdf4e0;
+  /* Die Sandbox zuoberst in jeder Liste (Benutzer, 2026-11-20): leicht
+     golden -- heller und gelber als eine Warnung, sie ist ja keine. */
+  --sandbox:      #c9a227;
+  --sandbox-rand: #ecdca4;
+  --sandbox-hell: #fcf5dc;
+  --sandbox-tief: #7a5c00;
+
+  --beton:        #7b8794;
+  --stahl:        #b8622a;
+  /* Die Materialien im gezeichneten Querschnitt (Benutzer, 2026-10-24):
+     je eine helle Fläche und eine kräftigere Linie derselben Farbe. Baustahl
+     gibt es noch nicht -- seine Farbe steht schon fest. */
+  --mat-beton:          #d5ebd1;
+  --mat-beton-linie:    #5e9b62;
+  --mat-stahl:          #f2a5a5;
+  --mat-stahl-linie:    #b5474a;
+  --mat-wand:           #fbe7a0;
+  --mat-wand-linie:     #c49a1c;
+  --mat-baustahl:       #c2daf3;
+  --mat-baustahl-linie: #4b7db5;
+  --platte:       var(--blau);
+  --analyse:      #0d9488;
+  --system:       #7048e8;
+  /* Die Lasten im Balkensystem: kräftig, aber nicht das Rot eines Fehlers. */
+  --last:         #c2410c;
+
+  /* Die Tragrichtungen: x kräftig orange, y kräftig gelb -- so gelb, dass es
+     auf Weiss noch zu sehen ist. Dieselben Farben an den Lagen, an den
+     Schaltern und im Querschnittsbild; man soll nicht überlegen müssen,
+     welche Richtung welche ist. Die tiefe Fassung ist für Schrift: auf Gelb
+     ist weisse Schrift nicht zu lesen, und gelbe auf Weiss auch nicht. */
+  --richtung-x:      #f76707;
+  --richtung-x-hell: #fff0e6;
+  --richtung-x-tief: #c2410c;
+  --richtung-y:      #eab308;
+  --richtung-y-hell: #fef7d6;
+  --richtung-y-tief: #8f6b00;
+  /* Beide Tragrichtungen zugleich -- und die Bügel, die quer zu beiden
+     tragen: ein leuchtendes Violett. */
+  --beide:        #8b5cf6;
+  /* Die Schnittkräfte einer Decke in Farbe: positiv rot, negativ blau, null
+     weiss. Nicht das Rot eines Fehlers: ein positives Moment ist keiner. */
+  --feld-plus:    #e03131;
+  --feld-minus:   #1c7ed6;
+  --feld-null:    #ffffff;
+
+  /* Akzent der Zwischenüberschriften. Eigene Variable, weil die Farben oben
+     je eine Bedeutung tragen (Beton, Betonstahl, Platte) -- eine davon hier
+     zu borgen hiesse, eine Aussage zu machen, die nicht gemeint ist. */
+  --unterakzent:  #9aabc4;
+
+  --radius:       7px;
+  /* Die Höhe der Köpfe aller drei Tafeln -- eine Zahl, damit sie gleich bleiben. */
+  --tafelkopf:    48px;
+  --schatten:     0 1px 2px rgba(16,24,40,.06), 0 2px 6px rgba(16,24,40,.08);
+
+  --breite-links: 300px;
+  /* So breit sind die Panels der Eingaben, in jeder App gleich. Ausgelegt
+     ist alles darin auf diese Breite: lange Beschreibungen brechen um, die
+     Lastfälle stehen in zwei Zeilen. */
+  --panelbreite: 420px;
+  /* So breit sind die Panels der rechten Tafel: so breit wie die Tabelle
+     der Nachweise in ihrer Karte, mehr nicht. Wie die Panels der Eingaben
+     stehen sie mittig und werden nur schmaler, wo die Tafel nicht reicht. */
+  --berichtbreite: 704px;
+  /* Die Tabelle der Nachweise hat eine feste Breite: sie skaliert nicht mit
+     der Tafel (Benutzer, 2026-10-16). Breiter wird sie nur, wo ihr Inhalt
+     es verlangt; ist die Tafel schmaler, rollt die Karte. */
+  --tabellenbreite: 660px;
+  /* Das Panel der Zeichnung wächst als einziges mit: etwa die Hälfte des
+     Platzes rechts vom Baum, nie schmaler als die anderen. */
+  --cadbreite: max(var(--panelbreite), calc((100vw - var(--breite-links) - 5px) / 2 - 40px));
+  /* Ein Zahlenfeld ist überall gleich breit: «99999.99» passt ganz hinein,
+     samt den Pfeilen daneben -- mehr nicht. In `ch` gerechnet, also in
+     Zeichen der Schrift des Feldes: in der gleich breiten Schrift ist jede
+     Ziffer und der Punkt genau eines, und bei 12 oder 16 px wächst das Feld
+     mit. Die 10 px sind Rand (2), links Luft (5) und Luft vor den Pfeilen (3).
+     Wo ein Raster eine Zahlenspalte braucht, nimmt es dieselbe Grösse --
+     dann muss die Zeile in der Schrift des Feldes gesetzt sein. */
+  --pfeilspur: 15px;
+  --zahlbreite: calc(8ch + var(--pfeilspur) + 10px);
+  /* Knapp: in den Lagen stehen Durchmesser und Teilungen -- «150» braucht
+     drei Zeichen, nicht acht. */
+  --zahlbreite-knapp: calc(4ch + var(--pfeilspur) + 10px);
+
+  /* Die Kopfleiste steht fest; das Raster darunter zieht sie ab. Als
+     Variable, weil sie auf schmalen Geraeten umbricht und dann hoeher ist --
+     zwei Zahlen an zwei Stellen liefen beim ersten Umbruch auseinander. */
+  --kopfhoehe: 50px;
+  /* Der Umschalter am unteren Rand -- am Schreibtisch gibt es ihn nicht,
+     also nimmt er dort auch keine Hoehe. */
+  --wahlhoehe: 0px;
+}
+
+/* Die Schrift: JetBrains Mono, mitgeliefert wie KaTeX (web/vendor/), damit
+   die Seite auch offline gleich aussieht. Eine Datei trägt alle Stärken von
+   100 bis 800. Jedes Zeichen gleich breit -- Zahlen stehen untereinander. Die
+   Formeln setzt KaTeX mit seiner eigenen Schrift; sie bleiben, wie sie sind. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../vendor/jetbrains-mono/JetBrainsMono-Variable.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+/* Nur die griechischen Buchstaben, aus der Formelschrift von KaTeX: in
+   JetBrains Mono sieht χ aus wie x. Steht vor JetBrains Mono, wo eine
+   Auswahl «M–χ» zeigt -- dort setzt KaTeX nichts. Die Datei ist kursiv,
+   gilt hier aber für die gerade Schrift: so wird nichts schräg gerechnet. */
+@font-face {
+  font-family: "Formelzeichen";
+  src: url("../vendor/katex/fonts/KaTeX_Math-Italic.woff2") format("woff2");
+  font-style: normal;
+  unicode-range: U+0391-03A9, U+03B1-03C9, U+03D1, U+03D5, U+03F5;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--grund);
+  color: var(--schrift);
+  font: 14px/1.5 "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas,
+    "DejaVu Sans Mono", monospace;
+  /* Gleich breite Zeichen brauchen Platz: bei derselben Grösse wäre der Text
+     ein Fünftel breiter als vorher, und JetBrains Mono wirkt dazu grösser
+     (Mittellänge 0.55 statt 0.50 der Schriftgrösse). Diese eine Zeile
+     gleicht die Mittellänge an die frühere Schrift an -- der Text wirkt so
+     gross wie vorher und wird nur noch etwa ein Zehntel breiter. Jede
+     einzelne Schriftgrösse im Stilblatt bleibt, wie sie ist. */
+  font-size-adjust: 0.5;
+  overflow: hidden;
+}
+
+/* Was `hidden` trägt, steht nicht da -- auch wenn eine Klasse ihm `display`
+   gibt. Ohne `!important` gewänne jede Klasse mit `display: flex`, die
+   später steht; bis 2026-11-20 stand darum je Klasse eine eigene Regel. */
+[hidden] { display: none !important; }
+
+h1, h2, h3, h4 { margin: 0; font-weight: 600; }
+button, input, select { font: inherit; color: inherit; }

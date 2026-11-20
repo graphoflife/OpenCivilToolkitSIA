@@ -1,0 +1,245 @@
+/* ==========================================================================
+   Die Seite
+
+   Kopfleiste, die drei Tafeln, die Projekte und der Baum mit den Apps
+   und ihren Listen.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- Kopf -- */
+
+.kopfleiste {
+  display: flex; align-items: center; gap: 12px;
+  height: var(--kopfhoehe); padding: 0 14px;
+  background: var(--blau-leiste);
+  border-bottom: 3px solid var(--blau);
+  position: relative; z-index: 5;
+}
+
+.marke { font-weight: 600; letter-spacing: -.2px; white-space: nowrap; color: #fff; }
+.marke span { color: #6ea8fe; }               /* CivilToolkit in angenehmem Blau */
+.marke em    { color: #ff8a7a; font-style: normal; font-weight: 800; }
+
+.kopf-knoepfe { display: flex; gap: 6px; margin-left: auto; }
+
+.knopf {
+  padding: 6px 12px;
+  border: 1px solid var(--rand-stark); border-radius: var(--radius);
+  background: var(--flaeche); cursor: pointer; white-space: nowrap;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.knopf:hover:not(:disabled) { background: var(--blau-hell); border-color: var(--blau); color: var(--blau-tief); }
+.knopf:disabled { opacity: .5; cursor: not-allowed; }
+
+.kopfleiste .knopf {
+  background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); color: #fff;
+}
+.kopfleiste .knopf:hover:not(:disabled) { background: rgba(255,255,255,.22); border-color: #fff; color: #fff; }
+.knopf-haupt { background: var(--blau); border-color: var(--blau); color: #fff; font-weight: 500; }
+.kopfleiste .knopf-haupt { background: var(--blau); border-color: var(--blau); }
+.knopf-haupt:hover:not(:disabled),
+.kopfleiste .knopf-haupt:hover:not(:disabled) { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+
+/* Ein Link, der wie ein Knopf aussieht -- etwa «Formel» an einer Gleichung,
+   der ins Notizbuch führt. */
+a.knopf { display: inline-block; text-decoration: none; }
+
+.knopf-klein { padding: 3px 8px; font-size: 12px; }
+.knopf-zart {
+  border-color: transparent; background: transparent; color: var(--schrift-matt);
+  padding: 3px 7px; font-size: 12px;
+}
+.knopf-zart:hover:not(:disabled) { background: var(--blau-hell); color: var(--blau-tief); }
+.knopf-gefahr:hover:not(:disabled) { background: var(--schlecht-hell); border-color: var(--schlecht); color: var(--schlecht); }
+
+.zustandsanzeige { font-size: 12px; color: rgba(255,255,255,.75); min-width: 140px; text-align: right; }
+.zustandsanzeige.ist-fehler { color: #ff9c90; font-weight: 600; }
+.zustandsanzeige.ist-gut    { color: #7ee0aa; }
+
+/* -------------------------------------------------------------- Raster -- */
+
+/* Die mittlere Spalte ist so breit wie ihre Panels (`auto`), die rechte
+   bekommt den Rest. Ein breiteres Fenster gibt also der Berechnung Platz,
+   nicht den Eingaben. Am Griff zwischen beiden zieht man die mittlere
+   breiter oder schmaler (`--breite-mitte`); die Panels stehen dann in ihrer
+   Mitte. */
+.raster {
+  display: grid;
+  grid-template-columns: var(--breite-links) 5px var(--breite-mitte, auto) 5px 1fr;
+  height: calc(100vh - var(--kopfhoehe));
+  /* dvh statt vh: auf dem Telefon zaehlt vh die Adressleiste mit, die beim
+     Scrollen verschwindet -- die Tafel waere unten abgeschnitten und der
+     Umschalter nicht erreichbar. Die vh-Zeile darueber bleibt als Rueckfall
+     fuer Browser ohne dvh stehen. */
+  height: calc(100dvh - var(--kopfhoehe));
+  min-height: 0;
+}
+
+
+/* min-height:0 ist entscheidend: ohne das behält der Flex-/Grid-Nachkomme
+   min-height:auto, wächst über den Container hinaus und der Inhalt lässt sich
+   nicht scrollen. */
+.tafel {
+  display: flex; flex-direction: column;
+  min-width: 0; min-height: 0;
+  background: var(--flaeche);
+  border-right: 1px solid var(--rand);
+}
+/* Weiss wie die anderen Tafeln; grau sind darin nur die Panels (Benutzer,
+   2026-10-16). */
+.tafel-rechts { border-right: none; }
+/* Bezug für das Fenster, das sich über die Eingaben legt. */
+.tafel-mitte { position: relative; }
+
+/* Die Köpfe der drei Tafeln sind gleich hoch und brechen nicht um (Benutzer,
+   2026-10-16): oben links der Projektname, in der Mitte der Name des
+   Bestandteils, rechts Umfang und Reiter -- auf einer Linie. Was rechts
+   nicht hineinpasst, rollt quer, statt den Kopf höher zu machen. */
+.tafel-kopf {
+  display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;
+  height: var(--tafelkopf); padding: 0 12px;
+  border-bottom: 1px solid var(--rand);
+  border-top: 3px solid var(--blau);
+  background: linear-gradient(var(--flaeche-2), var(--flaeche));
+  flex: none;
+}
+.tafel-rechts .tafel-kopf { overflow-x: auto; scrollbar-width: none; }
+.tafel-rechts .tafel-kopf > * { flex: none; }
+.tafel-kopf .reiter { flex-wrap: nowrap; }
+.tafel-kopf .reiter-knopf { padding-block: 4px; white-space: nowrap; }
+/* Ist die rechte Tafel schmal, fällt zuerst ihr Titel weg -- «Berechnung»
+   steht schon unten in der Wahl der Tafeln -- und die Reiter rücken
+   zusammen. So passt der Kopf noch bei 480 px auf eine Zeile. */
+.tafel-rechts { container: tafelrechts / inline-size; }
+@container tafelrechts (max-width: 600px) {
+  .tafel-rechts .tafel-kopf h2 { display: none; }
+  .tafel-rechts .tafel-kopf .reiter-knopf { padding-inline: 7px; }
+}
+/* Der Kopf der Eingaben bricht um, statt mit einem langen Namen die ganze
+   Spalte breiter zu machen. */
+.tafel-mitte .tafel-kopf { contain: inline-size; }
+.tafel-links  .tafel-kopf { border-top-color: var(--beton); }
+/* Zuoberst links der Name des Projekts, neben dem Titel der Tafel. Sonst wie
+   jede Eingabe -- nur fett, weil er das ganze Projekt benennt. */
+.tafel-kopf-projekt { flex-wrap: nowrap; }
+.tafel-kopf-projekt input.projektname {
+  flex: 1 1 auto; min-width: 0; height: 30px; font-weight: 600;
+}
+.tafel-mitte  .tafel-kopf { border-top-color: var(--stahl); }
+.tafel-rechts .tafel-kopf { border-top-color: var(--blau); }
+
+.tafel-kopf h2 {
+  font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--schrift-matt);
+}
+.tafel-hinweis { font-size: 12px; color: var(--schrift-zart); }
+
+.tafel-inhalt {
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 12px 12px 48px;
+  /* Bezugsgrösse für die Umbrüche darin. Sie richteten sich früher nach dem
+     Fenster, und das ist die falsche Zahl: die Tafeln sind in der Breite
+     verstellbar, ein breites Fenster sagt also nichts darüber, wie viel Platz
+     eine einzelne Tafel hat. Bei 1600 px Fenster und 420 px Tafel klappte der
+     Editor in zwei Spalten auf und lief über. */
+  container-type: inline-size;
+}
+/* Der Abstand zwischen zwei Tafeln entsteht nicht am Griff, sondern in den
+   Tafeln selbst: jede gibt auf der Seite nach, an der eine andere steht. So
+   bleibt der Griff schmal und greifbar, und der Inhalt hat trotzdem Luft. */
+.tafel-links  .tafel-inhalt { padding-right: 20px; }
+.tafel-mitte  .tafel-inhalt { padding-left: 20px; padding-right: 20px; }
+.tafel-rechts .tafel-inhalt { padding-left: 20px; transition: background-color .15s; }
+/* Die Antwort passt nicht mehr zur Eingabe: es wird gerechnet, oder es
+   scheiterte. Leicht rötlich, erst nach 0.3 s -- eine schnelle Rechnung
+   blitzt so nicht auf (Benutzer, 2026-11-20). */
+.tafel-rechts.ist-ueberholt .tafel-inhalt {
+  background-color: var(--schlecht-hell); transition: background-color .2s .3s;
+}
+
+.griff { background: var(--rand); cursor: col-resize; }
+.griff:hover, .griff.ist-aktiv { background: var(--blau); }
+
+/* ----------------------------------------------------------- Projekte -- */
+
+/* Die Projekte: ein Reiter je Projekt, das gezeigte blau wie der Reiter der
+   Berechnung, daneben «+». Wer viele hat, bekommt eine zweite Zeile. */
+.projekt-wahl { flex: none; padding: 7px 20px 7px 12px; border-bottom: 1px solid var(--rand); }
+.projektreihe { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.projekt-reiter {
+  display: inline-flex; align-items: center; min-width: 0; max-width: 100%;
+  border: 1px solid var(--rand); border-radius: var(--radius); background: var(--flaeche);
+  color: var(--schrift-matt);
+}
+.projekt-reiter.ist-aktiv { background: var(--blau); border-color: var(--blau); color: #fff; }
+.projekt-knopf, .projekt-weg {
+  border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer;
+}
+.projekt-knopf {
+  padding: 4px 10px; font-size: 12.5px; min-width: 0; max-width: 16em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.projekt-reiter:not(.ist-aktiv):hover { background: var(--flaeche-2); border-color: var(--blau); }
+.projekt-reiter.ist-aktiv .projekt-knopf { cursor: default; font-weight: 500; }
+.projekt-weg { padding: 2px 8px 2px 0; font-size: 14px; line-height: 1; opacity: .75; }
+.projekt-weg:hover { opacity: 1; }
+
+/* --------------------------------------------------------------- Baum -- */
+
+/* Die Apps: dieselben Knöpfe wie die Kapitel einer Platte. Sie rollen nicht
+   mit -- nur die Liste darunter. Die gewählte trägt den Rand der Auswahl. */
+.app-wahl {
+  flex: none; padding: 10px 20px 2px 12px;
+  border-bottom: 1px solid var(--rand);
+  container-type: inline-size;
+}
+.app-wahl .kacheln { margin-bottom: 8px; }
+.kachel.ist-gewaehlt { border-color: var(--blau); background: var(--blau-hell); }
+.kachel.ist-gewaehlt .sinnbild { color: var(--blau); }
+.kachel.ist-gewaehlt .kachel-stand { color: var(--blau-tief); }
+
+.baum-gruppe { margin-bottom: 6px; }
+
+/* Schlicht: über einer Liste eine Zeile Text mit Zähler und «+», auf hellem
+   Grund. */
+.baum-kopf {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 9px; border-radius: var(--radius); user-select: none;
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  background: var(--panel); color: var(--schrift);
+}
+.baum-kopf .titel { flex: 1; }
+.baum-kopf .zaehler {
+  font-size: 11px; font-weight: 600; letter-spacing: 0;
+  background: var(--flaeche); color: var(--schrift-matt);
+  border-radius: 9px; padding: 0 7px; border: 1px solid var(--rand);
+}
+.baum-kopf .werkzeuge { display: flex; gap: 2px; }
+
+.baum-koerper { padding: 3px 0 8px; }
+.baum-koerper > .leer-zeile { padding: 5px 10px; }
+
+.baum-eintrag {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; margin-bottom: 1px;
+  border: 1px solid transparent;
+  border-radius: var(--radius); cursor: pointer;
+}
+.baum-eintrag:hover     { background: var(--flaeche-2); }
+.baum-eintrag.ist-aktiv { background: var(--blau-hell); border-color: var(--blau); }
+.baum-eintrag .name     { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.baum-eintrag .art      { font-size: 11px; color: var(--schrift-zart); }
+.baum-eintrag.ist-sandbox {
+  background: linear-gradient(100deg, var(--sandbox-hell), var(--flaeche) 85%);
+  border-color: var(--sandbox-rand);
+}
+.baum-eintrag.ist-sandbox:hover     { background: var(--sandbox-hell); }
+.baum-eintrag.ist-sandbox.ist-aktiv { background: var(--sandbox-hell); border-color: var(--sandbox);
+                                      box-shadow: inset 3px 0 0 var(--sandbox); }
+.baum-eintrag.ist-sandbox .name     { color: var(--sandbox-tief); font-weight: 500; }
+
+/* Eine Normsorte trägt ein rotes «SIA» (Benutzer, 2026-10-16) -- sie ist
+   gesperrt und bleibt es; ein eigenes Material trägt «eigen». */
+.sia     { flex: none; font-size: 10px; font-weight: 800; letter-spacing: .4px; color: #fff;
+           background: var(--schlecht); border-radius: 3px; padding: 1px 5px; line-height: 1.3; }
+.eigen   { font-size: 10px; font-weight: 700; color: var(--warn);
+           background: var(--warn-hell); border-radius: 4px; padding: 0 5px; }

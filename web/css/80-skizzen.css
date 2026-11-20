@@ -1,0 +1,380 @@
+/* ==========================================================================
+   Skizzen und Verläufe
+
+   Die Bilder der Apps: Balkensysteme, Decken, Grundbruch, Setzung, Pfahl
+   und Durchstanzen.
+   ========================================================================== */
+
+/* ------------------------------------------------------ Balkensysteme -- */
+
+/* Ein Stab kräftig, eine Linie ohne Stab dünn gestrichelt, daneben die
+   gestrichelte Faser. Lager, Federn und Gelenke in Schrift, die Lasten in
+   ihrer eigenen Farbe. */
+.bs-stab { fill: none; stroke: var(--schrift); stroke-width: 3; stroke-linecap: round; }
+.bs-linie { fill: none; stroke: var(--schrift-matt); stroke-width: 1.3; stroke-dasharray: 7 4; }
+.ist-fehler.bs-stab, .ist-fehler.bs-linie { stroke: var(--schlecht); }
+.bs-faser { stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
+.bs-gelenk { fill: #fff; stroke: var(--schrift); stroke-width: 1.4; }
+.bs-dreieck { fill: #fff; stroke: var(--schrift); stroke-width: 1.3; }
+.bs-boden { fill: none; stroke: var(--schrift); stroke-width: 1.3; }
+.bs-einspannung { fill: none; stroke: var(--schrift); stroke-width: 2.6; }
+.bs-schraffur { stroke: var(--schrift-matt); stroke-width: 1; }
+.bs-feder { fill: none; stroke: var(--schrift); stroke-width: 1.2; }
+.bs-laengslager { stroke: var(--schrift-matt); stroke-width: 1.4; }
+.bs-lager.ist-fehler .bs-dreieck, .bs-lager.ist-fehler .bs-boden { stroke: var(--schlecht); }
+.bs-last { fill: none; stroke: var(--last); stroke-width: 1.3; }
+.bs-lastpfeil { stroke-width: 1; }
+.bs-umriss { stroke-width: 1.5; }
+.bs-spitze { fill: var(--last); stroke: none; }
+.bs-klein { stroke-width: 1; }
+.bs-lasttext {
+  font-size: 11px; font-weight: 600; fill: var(--last);
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+/* Eine gewählte Last steht blau, wie jede Auswahl -- ihre Zahl behält den
+   weissen Rand. */
+.bs-lastgruppe.ist-gewaehlt .bs-last:not(text) { stroke: var(--blau); stroke-width: 2; }
+.bs-lastgruppe.ist-gewaehlt .bs-spitze { fill: var(--blau); }
+.bs-lastgruppe.ist-gewaehlt text { fill: var(--blau); }
+/* Das Eigengewicht: grau, es kommt von selbst und ist nicht zu wählen. */
+.bs-eigengewicht:not(text) { stroke: var(--schrift-zart); }
+.bs-eigengewicht.bs-spitze { fill: var(--schrift-zart); }
+.bs-lasttext.bs-eigengewicht { fill: var(--schrift-matt); }
+/* Im Raum: eine Kraft, die man von vorne sieht, als Kreis -- weiss gefüllt,
+   damit der Punkt oder das Kreuz darin klar steht --, ein Moment als Pfeil
+   mit zwei Spitzen. */
+.bs-blick { fill: #fff; stroke-width: 1.2; }
+.bs-momentpfeil { stroke-width: 1.5; }
+.bs-unbestimmt circle { fill: none; stroke: var(--warn); stroke-width: 1.6; stroke-dasharray: 2 2; }
+.bs-unbestimmt-text { font-size: 12px; font-weight: 700; fill: var(--warn); }
+.bs-beweglich { fill: var(--schlecht); fill-opacity: .15; stroke: var(--schlecht); stroke-width: 1.6; }
+
+/* Die Wahl des Lastfalls in der Leiste, gleich neben «Last». */
+.bs-lastfallwahl { align-self: center; }
+.bs-lastfallwahl select { max-width: 11em; font-size: 12px; padding: 2px 4px; }
+
+.bs-vorzeichen-huelle summary { cursor: pointer; font-size: 12px; color: var(--schrift-matt); }
+.bs-vorzeichen { display: block; width: 100%; max-width: 380px; height: auto; margin-top: 4px; }
+.bs-vz-pfeil { fill: none; stroke: var(--schrift); stroke-width: 1.3; }
+.bs-vz-stab { stroke: var(--schrift); stroke-width: 3; }
+.bs-vz-faser { stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
+.bs-vz-text { font-size: 10px; fill: var(--schrift-matt); }
+.bs-vz-punkt { fill: var(--schrift); }
+
+/* Materialien, Querschnitte, Lastfälle, Kombinationen. Die Materialien als
+   Tabelle (Benutzer, 2026-10-24): ein Beton des Projekts mit gesperrten
+   Kennwerten, ein eigenes mit Feldern -- 200000 hat gerade Platz. */
+.bs-materialien { border-collapse: collapse; font-size: 12px; margin: 2px 0 6px; width: 100%; }
+.bs-materialien th { text-align: left; font-weight: 600; color: var(--schrift-matt); padding: 2px 4px; white-space: nowrap; }
+.bs-materialien th .einheit { font-weight: 400; color: var(--schrift-zart); }
+.bs-materialien td { padding: 2px 4px; }
+.bs-materialien select, .bs-materialien input[type="text"] { width: 100%; min-width: 6em; padding: 2px 4px; font-size: 12px; }
+.bs-materialien .zahlfeld { width: calc(3.6em + var(--pfeilspur) + 12px); }
+.bs-materialien .bs-benutzt { max-width: 7em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bs-material-art { font-size: 11px; color: var(--schrift-zart); }
+.bs-gesperrt { color: var(--schrift-matt); }
+.bs-knopfreihe { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Ein Querschnitt als Zeile (Benutzer, 2026-10-24): links sein Bild --
+   ein Knopf, der ihn im Fenster öffnet --, daneben Name, A und I. */
+.bs-qzeile { display: grid; grid-template-columns: 48px minmax(0, 1fr) 22px; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--rand); }
+.bs-qbild { padding: 1px; width: 48px; height: 48px; border: 1px solid var(--rand); border-radius: 6px; background: var(--flaeche); cursor: pointer; }
+.bs-qbild:hover { border-color: var(--blau); background: var(--blau-hell); }
+.bs-qmitte { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bs-qname { font-weight: 600; }
+.bs-qmitte .bs-kennwerte, .bs-qmitte .bs-benutzt, .bs-qfehler { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bs-qfehler { font-size: 12px; color: var(--warn); }
+.bs-zurueck { align-self: flex-start; margin-bottom: 4px; }
+.bs-qvorlage { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+/* Die Auswahl neben dem Bild hat keine Einheit: deren Platz geht an die
+   Beschriftung. Sonst kürzten die langen Namen der Rohre «Profil» zu «P…». */
+.bs-qvorlage > .feld { grid-template-columns: minmax(0, 1fr) auto; }
+.bs-umriss { display: block; }
+.bs-umriss-flaeche { fill: var(--blau-hell); stroke: var(--blau); stroke-width: 1.2; }
+.bs-umriss-text { font-size: 11px; fill: var(--schrift-matt); text-anchor: middle; }
+.bs-kennwerte { margin: 0; font-size: 12px; font-weight: 600; color: var(--stahl); }
+.bs-benutzt { margin: 0; font-size: 11px; color: var(--schrift-zart); }
+/* Die Spalten fest: so stehen die Namen gleich breit untereinander, auch
+   neben dem längeren Satz des Eigengewichts. */
+.bs-fall { display: grid; grid-template-columns: minmax(0, 1fr) 11.5em 22px; gap: 6px; align-items: center; margin-bottom: 4px; }
+.bs-fall-zahl { font-size: 11px; color: var(--schrift-zart); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bs-kombinationen { border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+.bs-kombinationen th { text-align: left; font-weight: 600; color: var(--schrift-matt); padding: 2px 4px; }
+.bs-kombinationen td { padding: 2px 4px; }
+/* Ein Beiwert wie 999.99 hat gerade Platz (Benutzer, 2026-10-24): sechs
+   Zeichen JetBrains Mono zu 0.6 em, dazu Innenabstand, Rand und Pfeile.
+   Mit «ch» war es schmaler -- es löst sich im Rahmen anders auf. */
+.bs-kombinationen .zahlfeld { width: calc(3.6em + var(--pfeilspur) + 12px); }
+/* Die Statik-Analyse: je Zeile oben der Fall, darunter die Grösse. */
+.bs-diagrammzeile { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
+.bs-diagrammzeile-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.bs-diagrammzeile-kopf select { min-width: 0; }
+
+/* Die Ergebnisse rechts: je Bild ein Blatt, Werte beim Darüberfahren. */
+.bs-diagramm-huelle { position: relative; }
+.bs-diagramm { display: block; width: 100%; height: auto; touch-action: manipulation; }
+.bs-d-system { stroke: var(--rand-stark); stroke-width: 2; fill: none; }
+/* Je Grösse ihre Farbe (`--verlauf`), in allen Verläufen dieselbe: im
+   Balkensystem, im Schnitt durch die Decke und über die Tiefe des Pfahls.
+   Fläche, Kurve, Extremwert und Grenze nehmen sie. Bis 2026-11-20 stand
+   sie je Grösse und Teil in einer eigenen Regel, 25-mal. */
+.bs-d-n { --verlauf: #1f5fa8; }
+.bs-d-v { --verlauf: #0d9488; }
+.bs-d-m { --verlauf: var(--system); }
+.bs-d-phi { --verlauf: #b45309; }
+.bs-d-t { --verlauf: #7b4fa0; }
+.bs-d-w, .pf-d-w { --verlauf: var(--blau); }
+.pf-d-p { --verlauf: #8a6d3b; }
+.bs-d-flaeche { stroke: none; fill: var(--verlauf); fill-opacity: .18; }
+.bs-d-kurve { fill: none; stroke: var(--verlauf); stroke-width: 1.6; }
+.bs-d-verformt { fill: none; stroke: var(--blau); stroke-width: 2; }
+.bs-d-knoten { fill: #fff; stroke: var(--blau); stroke-width: 1.2; }
+.bs-d-knoten.ist-unbestimmt { stroke: var(--warn); stroke-dasharray: 2 2; }
+.bs-d-text {
+  font-size: 13px; fill: var(--schrift);
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.bs-d-zusatz { fill: var(--schrift-matt); }
+/* Ein Extremwert: ein Punkt in der Farbe seiner Kurve, darunter klein die Stelle. */
+.bs-d-extrem { fill: var(--verlauf); stroke: #fff; stroke-width: 1.2; }
+/* Über einem Diagramm im Raum die Wahl der Ansicht -- klein, im Kopf der Karte. */
+.bs-d-ansicht { min-height: 22px; }
+.bs-d-ansicht .schalter-halb { padding: 0 6px; font-size: 11px; letter-spacing: 0; white-space: nowrap; }
+.bs-d-stelle { font-size: 10.5px; fill: var(--schrift-matt); }
+.bs-d-marke { fill: var(--blau); stroke: #fff; stroke-width: 1.5; pointer-events: none; }
+/* Die Lagerkräfte grün -- nur ihre Striche: die Zahl behält ihren weissen
+   Rand, sonst verschwimmt sie (bis 2026-10-24 bekam auch er die Farbe). Im
+   verkleinerten Diagramm so gross wie dessen übrige Zahlen. */
+.bs-reaktion:not(text) { stroke: #16794a; }
+.bs-diagramm .bs-lasttext { font-size: 13px; }
+.bs-reaktion.bs-spitze { fill: #16794a; }
+.bs-reaktion.bs-lasttext { fill: #16794a; }
+.bs-zettel {
+  position: absolute; z-index: 5; pointer-events: none; min-width: 150px; max-width: 240px;
+  padding: 5px 8px; border: 1px solid var(--rand-stark); border-radius: 6px;
+  background: var(--flaeche); box-shadow: 0 3px 10px rgba(16, 32, 44, .16);
+  font-size: 11.5px; line-height: 1.45; font-variant-numeric: tabular-nums;
+}
+.bs-zettel div:first-child { font-weight: 700; }
+.bs-tabelle { border-collapse: collapse; font-size: 12px; width: 100%; }
+.bs-tabelle th { text-align: right; font-weight: 600; color: var(--schrift-matt); padding: 3px 6px; border-bottom: 1px solid var(--rand); }
+.bs-tabelle th:first-child { text-align: left; }
+.bs-tabelle td { padding: 3px 6px; border-bottom: 1px solid var(--rand); }
+.bs-zahl { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bs-wo { font-size: 10px; color: var(--schrift-zart); }
+.bs-einheiten { margin: 0 0 6px; font-size: 11px; color: var(--schrift-zart); }
+
+/* ---------------------------------------------------------------- Decken -- */
+
+/* Ein Grundriss: die Platten hell mit kräftigem Rand, darunter die Aufteilung
+   -- Richtung 1 orange, Richtung 2 gelb, wie x und y --, die Zonen violett
+   gestrichelt, die Unterzüge in der Farbe der Systeme. Ein Linienlager
+   kräftig, eingespannt schraffiert, ohne vertikalen Halt strichpunktiert
+   wie eine Symmetrieachse; eines, das nichts hält, fein gepunktet. */
+.dk-platte-flaeche { fill: #f6f7f9; stroke: none; }
+.dk-platte { fill: none; stroke: var(--schrift); stroke-width: 1.6; stroke-linejoin: round; }
+.dk-anteil { stroke: none; fill-opacity: .5; }
+.dk-unterlage.ist-veraltet { opacity: .4; }
+.dk-grenze { fill: none; stroke-width: .8; }
+.dk-grenze.ist-richtung-1 { stroke: var(--richtung-x-tief); opacity: .55; }
+.dk-grenze.ist-richtung-2 { stroke: var(--richtung-y-tief); opacity: .55; }
+.dk-stuetzenbereich { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 3 2; }
+.dk-zone-grund { fill: var(--flaeche); stroke: none; }
+.dk-zone { fill: none; stroke: var(--beide); stroke-width: 1.4; stroke-dasharray: 6 3; }
+.dk-unterzug-band { fill: var(--system); fill-opacity: .1; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }
+.dk-unterzug { fill: none; stroke: var(--system); stroke-width: 2; stroke-dasharray: 10 4; }
+.dk-lager { fill: none; stroke: var(--schrift); stroke-width: 4; stroke-linecap: round; }
+.dk-lager.ist-symmetrie { stroke-width: 1.6; stroke-dasharray: 12 3 2 3; stroke-linecap: butt; }
+.dk-lager.ist-frei { stroke: var(--schrift-matt); stroke-width: 1.2; stroke-dasharray: 1 3; }
+.dk-schraffur { fill: none; stroke: var(--schrift); stroke-width: 1; }
+.dk-stuetze { fill: var(--schrift); stroke: var(--flaeche); stroke-width: 1; }
+.dk-flaechenlast { fill: var(--last); fill-opacity: .1; stroke: var(--last); stroke-width: 1.2; stroke-dasharray: 5 3; }
+.dk-flaechenlast.ist-platte { stroke: none; }
+.dk-linienlast { fill: none; stroke: var(--last); stroke-width: 3; stroke-linecap: round; opacity: .85; }
+.dk-verteilflaeche { fill: none; stroke: var(--last); stroke-width: .8; stroke-dasharray: 3 2; }
+.dk-punktlast { fill: var(--flaeche); stroke: var(--last); stroke-width: 1.6; }
+/* Ein Schnitt wie im Plan: strichpunktiert, an den Enden kräftig quer, daneben sein Name -- in
+   der Farbe der Analyse, nicht im Blau der Auswahl. */
+.dk-schnitt { fill: none; stroke: var(--analyse); stroke-width: 1.6; stroke-dasharray: 14 3 2 3; }
+.dk-schnitt-ende { fill: none; stroke: var(--analyse); stroke-width: 3.2; stroke-linecap: round; pointer-events: none; }
+.dk-platte.ist-fehler, .dk-zone.ist-fehler, .dk-unterzug.ist-fehler, .dk-lager.ist-fehler,
+.dk-flaechenlast.ist-fehler, .dk-linienlast.ist-fehler, .dk-punktlast.ist-fehler,
+.dk-schnitt.ist-fehler { stroke: var(--schlecht); }
+.dk-stuetze.ist-fehler { fill: var(--schlecht); }
+.dk-name {
+  font-size: 11px; fill: var(--schrift-matt); text-anchor: middle; dominant-baseline: middle;
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none;
+}
+.dk-name.ist-klein { font-size: 10px; text-anchor: start; }
+.dk-name.ist-zone { fill: var(--beide); }
+.dk-name.ist-last { fill: var(--last); font-weight: 600; }
+.dk-name.ist-schnitt { fill: var(--analyse); font-weight: 700; }
+
+/* Die Ergebnisbilder: die Zellen in der Farbe ihres Werts, ohne Fuge
+   zwischen zweien, der grösste und der kleinste Wert mit Punkt; die
+   Verläufe der Linienlager dunkel und blass, daneben ihre Zahlen. Unter
+   dem Bild die Skala der Farben. */
+.dk-zelle { stroke-width: .6; }
+.dk-extrem { stroke: #fff; stroke-width: 1.5; }
+.dk-extrem.ist-plus { fill: var(--feld-plus); }
+.dk-extrem.ist-minus { fill: var(--feld-minus); }
+.dk-extremtext, .dk-lagertext {
+  font-size: 11.5px; font-weight: 600; fill: var(--schrift); dominant-baseline: middle;
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none;
+}
+.dk-lagerverlauf {
+  fill: var(--schrift); fill-opacity: .12; stroke: var(--schrift); stroke-width: 1.2; stroke-linejoin: round;
+}
+/* Das Bild längs eines Schnitts: oben die Achse -- neben den Platten
+   gestrichelt -- mit den Lagern und den Unterzügen als Band, darunter der
+   Verlauf, über dessen Achse ein Strich, wo ein Lager steht. */
+.dk-s-achse { fill: none; stroke: var(--schrift); stroke-width: 2; }
+.dk-s-achse.ist-daneben { stroke: var(--rand-stark); stroke-width: 1; stroke-dasharray: 4 3; }
+.dk-s-unterzug { fill: var(--system); fill-opacity: .12; stroke: var(--system); stroke-width: .8; stroke-dasharray: 4 3; }
+.dk-s-marke { fill: none; stroke: var(--schrift); stroke-width: 1.2; }
+.dk-s-symmetrie { fill: none; stroke: var(--schrift); stroke-width: 1.4; stroke-dasharray: 8 3 2 3; }
+.dk-s-name { font-size: 10.5px; fill: var(--schrift-matt); }
+.dk-farblegende { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--schrift-matt); margin: 4px 0; }
+.dk-farbbalken {
+  flex: 0 1 220px; height: 10px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(16, 24, 40, .15);
+}
+
+/* Die Wahl der Unterlage in der Leiste, und unter der Zeichnung, was ihre Farben heissen. */
+.dk-unterlagewahl { align-self: center; }
+.dk-leistenzusatz { display: inline-flex; align-items: center; gap: 8px; }
+.dk-unterlagewahl .schalter { font-size: 12px; }
+.dk-legende { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--schrift-matt); margin: 4px 0; }
+.dk-legende-eintrag { display: inline-flex; align-items: center; gap: 5px; }
+.dk-legende-farbe {
+  display: inline-block; width: 14px; height: 10px; border-radius: 2px; opacity: .75;
+  box-shadow: inset 0 0 0 1px rgba(16, 24, 40, .15);
+}
+
+/* ----------------------------------------------------------- Grundbruch -- */
+
+/* Die Bemessungswerte des Bodens unter seinen Feldern, wie der Kern sie rechnet. */
+.gb-bemessung {
+  display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline;
+  margin: 4px 0 0; font-size: 12.5px; color: var(--schrift-matt);
+}
+.gb-trenner { color: var(--schrift-zart); }
+
+/* Die Situation: Gelände, Fundament, Wasser, Gleitkörper, Kräfte. */
+.gb-bildhuelle { position: relative; }
+.gb-bild { display: block; width: 100%; height: auto; }
+.gb-text {
+  font-size: 13px; fill: var(--schrift);
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.gb-index { font-size: 10px; }
+.gb-zart { fill: var(--schrift-matt); }
+.gb-gelaende { fill: none; stroke: var(--schrift); stroke-width: 1.6; }
+.gb-schraffur { fill: none; stroke: var(--schrift-zart); stroke-width: 1; }
+.gb-fundament { fill: #dfe3e8; stroke: var(--schrift); stroke-width: 1.8; stroke-linejoin: round; }
+.gb-wasser { fill: none; stroke: #1c7ed6; stroke-width: 1.4; stroke-dasharray: 9 5; }
+.gb-wasser-kurz { stroke: #1c7ed6; stroke-width: 1.3; }
+.gb-wasserzeichen { fill: none; stroke: #1c7ed6; stroke-width: 1.3; }
+.gb-wassertext { fill: #1864ab; }
+.gb-gleitkoerper { fill: none; stroke: var(--system); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.gb-hilfslinie { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
+.gb-bogen { fill: none; stroke: var(--schrift); stroke-width: 1.1; }
+.gb-pfeil-schaft { fill: none; stroke-width: 1.2; }
+.gb-masspfeil .gb-pfeil-schaft { stroke: var(--schrift-matt); stroke-width: 1; }
+.gb-masspfeil .gb-pfeil-spitze { fill: var(--schrift-matt); }
+.gb-masstext { font-size: 12px; fill: var(--schrift-matt); }
+.gb-masshilfe { fill: none; stroke: var(--schrift-zart); stroke-width: .8; }
+.gb-kraft .gb-pfeil-schaft { stroke: var(--last); stroke-width: 2.4; }
+.gb-kraft .gb-pfeil-spitze { fill: var(--last); }
+.gb-resultierende .gb-pfeil-schaft { stroke-width: 3; }
+.gb-krafttext { fill: var(--last); font-weight: 700; }
+.gb-auflast .gb-pfeil-schaft { stroke: var(--last); stroke-width: 1.2; }
+.gb-auflast .gb-pfeil-spitze { fill: var(--last); }
+.gb-lasttext { fill: var(--last); }
+.gb-legende { margin-top: 6px; }
+.gb-legende p { margin: 0 0 2px; font-size: 12px; color: var(--schrift-matt); }
+
+/* -------------------------------------------------------------- Setzung -- */
+
+/* Die Nummer einer Schicht, wo bei den Fällen der Schalter steht. */
+.schicht-nummer {
+  justify-self: center; min-width: 22px; padding: 1px 6px; border-radius: 10px;
+  background: var(--flaeche-2); color: var(--schrift-matt);
+  font-size: 11.5px; font-weight: 700; text-align: center;
+}
+
+/* Die Situation: die Schichten als Bänder, darin J über die Tiefe. Die
+   Bausteine -- Text, Pfeile, Masse, Fundament -- teilt sie mit dem
+   Grundbruch (gb_skizze.js). */
+.sz-schicht { stroke: none; }
+.sz-schicht-0 { fill: #f4efe4; }
+.sz-schicht-1 { fill: #e9e2d2; }
+.sz-strich { fill: none; stroke: var(--schrift-matt); stroke-width: 1; }
+.sz-name { font-weight: 600; }
+.sz-setzung { fill: var(--schrift); font-weight: 600; }
+.sz-lastflaeche { fill: #fbe6dc; stroke: var(--last); stroke-width: 1.2; }
+.sz-lastlinie { fill: none; stroke: var(--last); stroke-width: 3; }
+.sz-flaeche { fill: rgba(112, 72, 232, .10); stroke: none; }
+.sz-linie { fill: none; stroke: var(--system); stroke-width: 1.8; }
+.sz-linientext { fill: var(--system); font-size: 12px; }
+.sz-punkt { fill: var(--system); stroke: #fff; stroke-width: 1.2; }
+.sz-punkttext { fill: var(--system); font-weight: 700; }
+
+/* Erdbeben: je Richtung die Ansicht mit den Kräften, darunter die Wände; in
+   der Maske die Kriterien unter den Schaltern der Regelmässigkeit. */
+.eb-titel { font-weight: 700; }
+.eb-gebaeude { fill: var(--flaeche-2); stroke: var(--schrift); stroke-width: 1.6; }
+.eb-decke { fill: none; stroke: var(--schrift); stroke-width: 1.2; }
+.eb-name { font-size: 12px; }
+.eb-fuss { fill: var(--last); font-weight: 600; }
+.eb-waende { border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+.eb-waende th, .eb-waende td { padding: 2px 8px; text-align: right; white-space: nowrap; }
+.eb-waende th:first-child, .eb-waende td:first-child { text-align: left; }
+.eb-waende th { color: var(--schrift-matt); font-weight: 600; border-bottom: 1px solid var(--rand); }
+.eb-waende caption { caption-side: top; text-align: left; color: var(--schrift-matt); padding: 0 8px 2px; }
+.eb-regel + .eb-regel { margin-top: 8px; }
+.eb-kriterien { margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--schrift-matt); }
+.eb-folge { font-size: 12px; color: var(--schrift-zart); margin-bottom: 2px; }
+
+/* ---------------------------------------------------------------- Pfahl -- */
+
+/* Die Situation: der Pfahl in den Schichten, rechts die Mantelreibung je
+   Stück, unter dem Fuss der Spitzendruck (pf_zeichnung.js). Schichten,
+   Wasser und Masse teilt sie mit Setzung und Grundbruch. */
+.pf-verpresskoerper { fill: #eceff2; stroke: var(--schrift); stroke-width: 1.4; }
+.pf-stahl { fill: var(--schrift); stroke: none; }
+.pf-mantel { fill: rgba(112, 72, 232, .14); stroke: var(--system); stroke-width: 1.2; }
+.pf-widerstand { fill: var(--system); font-size: 12px; }
+.pf-spitze .gb-pfeil-schaft { stroke: var(--system); stroke-width: 1.6; }
+.pf-spitze .gb-pfeil-spitze { fill: var(--system); }
+
+/* Die Verläufe über die Tiefe, je Kombination nebeneinander (pf_verlauf.js),
+   so viele die Breite fasst -- im schmalen Fenster zwei, jedes so breit wie
+   seine Spalte, höchstens wie gezeichnet. Flächen und Kurven wie beim
+   Balkensystem, Setzung und Verschiebung blau, der Bettungsdruck in der Farbe
+   des Bodens, der Erdwiderstand daneben gestrichelt. */
+.pf-verlaeufe {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 4px 10px;
+}
+.pf-verlauf { display: block; width: 100%; max-width: 168px; height: auto; }
+.pf-d-grenze { fill: none; stroke: var(--verlauf); stroke-width: 1.2; stroke-dasharray: 5 3; }
+
+/* ---------------------------------------------------------- Durchstanzen -- */
+
+/* Der Grundriss: Stütze, Plattenrand, Aussparungen, Nachweisschnitt. Was
+   nicht zählt, gestrichelt (ds_grundriss.js) -- auch im Zeichenfenster. */
+.ds-jenseits { fill: var(--flaeche-2); stroke: none; }
+.ds-rand { fill: none; stroke: var(--schrift); stroke-width: 1.8; }
+.ds-stuetze { fill: #dfe3e8; stroke: var(--schrift); stroke-width: 1.8; stroke-linejoin: round; }
+.ds-aussparung { fill: #fff; stroke: var(--schrift); stroke-width: 1.4; stroke-linejoin: round; }
+.ds-aussparung-kreuz { fill: none; stroke: var(--schrift-zart); stroke-width: 1; pointer-events: none; }
+.ds-schnitt { fill: none; stroke: var(--system); stroke-width: 2.2; stroke-linejoin: round; }
+.ds-schnitt-nicht { fill: none; stroke: var(--system); stroke-width: 1.2; stroke-dasharray: 5 4; opacity: .7; }
+.ds-achse { fill: none; stroke: var(--schrift-matt); stroke-width: 1.2; }
+.ds-leiste { fill: none; stroke: var(--schrift); stroke-width: 2.4; stroke-linecap: round; opacity: .55; }
+.ds-anker { fill: var(--schrift); stroke: #fff; stroke-width: .8; }
+.ds-aussen { fill: none; stroke: var(--last); stroke-width: 1.8; stroke-linejoin: round; }
+.ds-aussen-nicht { fill: none; stroke: var(--last); stroke-width: 1.1; stroke-dasharray: 5 4; opacity: .7; }
+.ds-pilzflaeche { fill: rgba(73, 80, 87, .08); stroke: var(--schrift-zart); stroke-width: 1; stroke-dasharray: 3 3; }
+.ds-steg { fill: none; stroke: #495057; stroke-width: 4; stroke-linecap: square; }
+.ds-pilzschnitt { fill: none; stroke: var(--system); stroke-width: 1.8; stroke-linejoin: round; }
+.ds-pilzschnitt-nicht { fill: none; stroke: var(--system); stroke-width: 1.1; stroke-dasharray: 5 4; opacity: .7; }

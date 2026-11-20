@@ -72,7 +72,7 @@ export function svgEl(name, attribute = {}) {
  * Eine Farbe aus dem Stil, etwa `stilfarbe('richtung-x')` für `--richtung-x`.
  *
  * Für die Zeichnungen, die ihre Farben als SVG-Attribut setzen: sie nehmen
- * den fertigen Wert aus `stil.css`, damit jede Farbe nur dort festgelegt ist.
+ * den fertigen Wert aus dem Stil (`web/css/`), damit jede Farbe nur dort festgelegt ist.
  * Vorher stand das Blau der x-Lagen einmal im Stil und einmal hier -- und
  * eine neue Farbe hätte die Maske umgefärbt und das Querschnittsbild nicht.
  */

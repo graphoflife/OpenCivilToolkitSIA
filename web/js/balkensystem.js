@@ -216,7 +216,7 @@ function materialienInhalt(system) {
         text, einheit ? el('span.einheit', { text: ` ${einheit}` }) : null,
       ].filter(Boolean))))]),
       el('tbody', {}, system.stabmaterialien.map(zeile)),
-    ])]) : el('p.bs-leer', { text: 'Noch kein Material – ein Stab braucht eines.' }),
+    ])]) : el('p.leer-zeile', { text: 'Noch kein Material – ein Stab braucht eines.' }),
     el('div.bs-knopfreihe', {}, [
       ...Object.keys(kennwerte).map((stoffart) => el('button.knopf.knopf-klein', {
         type: 'button', text: `+ ${titel(stoffart)}`,
@@ -546,7 +546,7 @@ function querschnitteInhalt(system) {
   };
   return [
     ...(system.querschnitte.length ? system.querschnitte.map((q, i) => querschnittZeile(system, q, i))
-      : [el('p.bs-leer', { text: 'Noch kein Querschnitt.' })]),
+      : [el('p.leer-zeile', { text: 'Noch kein Querschnitt.' })]),
     el('button.knopf.knopf-klein', { type: 'button', text: '+ Querschnitt', on: { click: neu } }),
   ];
 }

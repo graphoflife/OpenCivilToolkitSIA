@@ -372,7 +372,7 @@ async function sucheZeigen() {
     ? el('div.nb-treffer', {}, liste.slice(0, 60).map((s) => el('a.nb-eintrag', {
       href: adresse(s.name), dataset: { pfad: s.pfad },
     }, [s.name, el('span.nb-art', { text: s.art })])))
-    : el('p.nb-leer', { text: 'Nichts gefunden.' }));
+    : el('p.leer-zeile', { text: 'Nichts gefunden.' }));
 }
 
 async function sucheTaste(e) {

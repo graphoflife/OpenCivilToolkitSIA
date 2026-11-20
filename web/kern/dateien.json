@@ -213,7 +213,7 @@
     "opencivil/web/anzeige.py": "00234b95ece2",
     "opencivil/web/api.py": "96ed8a1b2d8e",
     "opencivil/web/balkendaten.py": "e79ed47f1397",
-    "opencivil/web/bruecke.py": "0cfa149b772b",
+    "opencivil/web/bruecke.py": "9f787b297de7",
     "opencivil/web/deckendaten.py": "ac101a106c77",
     "opencivil/web/diagrammdaten.py": "cccdefcbfa1d",
     "opencivil/web/dienst.py": "90a53aba90cc",
