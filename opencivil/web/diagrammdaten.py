@@ -9,7 +9,9 @@ damit nur noch Katalog, Mitschrift, Loesung und Zusammenfassung abbildet.
 
 Wie dort wird hier nichts nachgerechnet, was der Kern schon weiss: die Kurven
 kommen aus denselben Funktionen wie die Nachweise, hier werden sie in kN,
-kNm und mm umgesetzt.
+kNm und mm umgesetzt. Die Diagramme der Platte bringen ihre Grössen mit
+(:data:`MN`, :data:`MV`, :data:`NEIGUNG`): Achsentitel und Zahlen setzt das
+Bild aus ihnen zusammen, statt die Einheiten selbst zu schreiben.
 """
 
 from __future__ import annotations
@@ -19,7 +21,9 @@ from typing import Any, Callable, Collection, Dict, List, Optional, Sequence, Tu
 
 from opencivil import spannungsanalyse
 from opencivil.core.wert import grad_als_text
-from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, MM2, N_PRO_MM2, PRO_M, PROMILLE
+from opencivil.core.einheiten import (
+    GRAD, KN, KNM, KN_PRO_M, MM, MM2, N_PRO_MM2, PRO_M, PROMILLE,
+)
 from opencivil.core.rechenwerk import Loesung
 from opencivil.querschnitt.werkstoffgesetz import (
     BLOCKANTEIL, Betongesetz, Spannungsblock, Stahlgesetz,
@@ -29,6 +33,24 @@ from opencivil.nachweis.schubwandnachweis import OHNE_SCHUB, Schubbefund, schub_
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web.anzeige import Anzeigegroesse, si, zahl
+
+#: Das M-N-Diagramm: jeder Punkt in Moment und Normalkraft -- der Linien, der
+#: Fälle und des Knickens.
+MN = {"M": Anzeigegroesse("M", KNM), "N": Anzeigegroesse("N", KN)}
+
+#: Querkraft über Moment: das Moment, der Widerstand und die Einwirkung je
+#: Meter, die Normalkraft, für die die Kurve gilt.
+MV = {"M": Anzeigegroesse("M_Ed", KNM, "M_{Ed}"), "v": Anzeigegroesse("v_Rd", KN_PRO_M, "v_{Rd}"),
+      "N": Anzeigegroesse("N_Ed", KN, "N_{Ed}")}
+
+#: Querkraft über Neigung: die Neigung steht schon in ganzen Grad (die Suche
+#: geht gradweise), Widerstand und Einwirkung je Meter, die statische Höhe.
+NEIGUNG = {"alpha": Anzeigegroesse("α", GRAD, r"\alpha", 0),
+           "V": Anzeigegroesse("V_Rd", KN_PRO_M, "V_{Rd}"), "d": Anzeigegroesse("d", MM)}
+
+
+def _als_dict(groessen: Dict[str, Anzeigegroesse]) -> Dict[str, dict]:
+    return {feld: g.als_dict() for feld, g in groessen.items()}
 
 
 def linien(aufbau: Aufbau, loesung: Loesung) -> dict:
@@ -63,7 +85,7 @@ def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict:
     dieser Richtung -- dann liegen dessen Punkte auf der Kurve --, ohne Fall
     null; was gilt, sagt ``hinweis`` unter dem Feld.
 
-    Einheiten wie in den anderen Diagrammen: kNm und kN/m.
+    Die Einheiten stehen in :data:`MV`.
     """
     kurven: Dict[str, Any] = {}
 
@@ -81,7 +103,8 @@ def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict:
         if gewaehlt is not None:
             n_ed, woher = gewaehlt, ""
         elif erster is not None:
-            n_ed, woher = erster.N_Ed.in_einheit(KN), f"Leer: die des ersten Falls, «{erster.name}»."
+            n_ed = MV["N"].zahl(erster.N_Ed.si)
+            woher = f"Leer: die des ersten Falls, «{erster.name}»."
         else:
             n_ed, woher = 0.0, "Leer: ohne Fall N = 0."
         kurve = befund.kurve(si(n_ed, KN))
@@ -92,6 +115,7 @@ def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict:
             "name": teil.name,
             "richtung": nachweis.richtung.value,
             "N_Ed": n_ed,
+            "groessen": _als_dict(MV),
             "hinweis": " ".join(t for t in (
                 woher, "Blass: Punkte mit anderem N." if erster is not None else "") if t),
             # Wie der Momentenwiderstand heisst: m_Rd, oder m_Rk, wenn die
@@ -100,10 +124,9 @@ def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict:
             "aeste": [
                 {
                     "moment_positiv": ast["moment_positiv"],
-                    "m_Rd": zahl(ast["m_Rd"], KNM),
-                    "d": zahl(ast["d"], MM),
+                    "m_Rd": MV["M"].zahl(ast["m_Rd"]),
                     "punkte": [
-                        {"M_Ed": zahl(M, KNM), "v_Rd": zahl(v, KN_PRO_M), "plastisch": pl}
+                        {"M_Ed": MV["M"].zahl(M), "v_Rd": MV["v"].zahl(v), "plastisch": pl}
                         for M, v, pl in ast["punkte"]
                     ],
                 }
@@ -115,10 +138,10 @@ def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict:
             "faelle": [
                 {
                     "name": erg.fall.name,
-                    "M_Ed": erg.fall.M_Ed.in_einheit(KNM),
-                    "N_Ed": erg.fall.N_Ed.in_einheit(KN),
-                    "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
-                    "v_Rd": zahl(erg.v_Rd, KN_PRO_M),
+                    "M_Ed": MV["M"].zahl(erg.fall.M_Ed.si),
+                    "N_Ed": MV["N"].zahl(erg.fall.N_Ed.si),
+                    "V_Ed": abs(MV["v"].zahl(erg.fall.V_Ed.si)),
+                    "v_Rd": MV["v"].zahl(erg.v_Rd),
                     "erfuellt": erg.erfuellt,
                     "plastisch": erg.plastisch,
                     "begruendung": erg.begruendung,
@@ -180,24 +203,25 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
                 "namensraum": teil.raum,
                 "name": teil.name,
                 "richtung": nachweis.richtung.value,
-                "d": zahl(d, MM),
+                "d": NEIGUNG["d"].zahl(d),
                 "alpha_min": a_min,
                 "alpha_max": a_max,
                 "zug": gruppe[0].zug_hebt_alpha,
+                "groessen": _als_dict(NEIGUNG),
                 "punkte": [
                     {"alpha": q.alpha,
-                     "V_Rd_s": zahl(q.V_Rd_s, KN_PRO_M),
-                     "V_Rd_c": zahl(q.V_Rd_c, KN_PRO_M),
-                     "V_Rd": zahl(q.V_Rd, KN_PRO_M),
+                     "V_Rd_s": NEIGUNG["V"].zahl(q.V_Rd_s),
+                     "V_Rd_c": NEIGUNG["V"].zahl(q.V_Rd_c),
+                     "V_Rd": NEIGUNG["V"].zahl(q.V_Rd),
                      "im_bereich": a_min <= q.alpha <= a_max}
                     for q in punkte
                 ],
                 "faelle": [
                     {
                         "name": erg.fall.name,
-                        "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
+                        "V_Ed": abs(NEIGUNG["V"].zahl(erg.fall.V_Ed.si)),
                         "alpha": erg.massgebend.alpha,
-                        "V_Rd": zahl(erg.v_Rd, KN_PRO_M),
+                        "V_Rd": NEIGUNG["V"].zahl(erg.v_Rd),
                         "erfuellt": erg.erfuellt,
                         "begruendung": erg.begruendung,
                     }
@@ -519,11 +543,11 @@ def _knickpunkte(aufbau, nachweis, loesung) -> list:
             continue
         punkte.append({
             "name": erg.fall.name,
-            "N_Ed": erg.fall.N_Ed.in_einheit(KN),
-            "M_Ed_1": abs(erg.fall.M_Ed_1.in_einheit(KNM)),
-            "M_Ed_II": zahl(abs(erg.M_ges), KNM),
-            "N_Rd": zahl(erg.N_Rd, KN),
-            "M_bei_N_Rd": zahl(erg.M_bei_N_Rd, KNM),
+            "N_Ed": MN["N"].zahl(erg.fall.N_Ed.si),
+            "M_Ed_1": abs(MN["M"].zahl(erg.fall.M_Ed_1.si)),
+            "M_Ed_II": MN["M"].zahl(abs(erg.M_ges)),
+            "N_Rd": MN["N"].zahl(erg.N_Rd),
+            "M_bei_N_Rd": MN["M"].zahl(erg.M_bei_N_Rd),
             "erfuellungsgrad": erg.erfuellungsgrad,
             "grad_text": grad_als_text(erg.erfuellungsgrad, erg.erfuellt),
             "erfuellt": erg.erfuellt,
@@ -553,7 +577,7 @@ def _linienzug(linie) -> Optional[dict]:
     return {
         "beschriftung": linie.beschriftung,
         "ecken": ecken,
-        "punkte": [{"N": zahl(p.N, KN), "M": zahl(p.M, KNM),
+        "punkte": [{"N": MN["N"].zahl(p.N), "M": MN["M"].zahl(p.M),
                     **({"name": p.name} if ecken else {})}
                    for p in linie.punkte],
     }
@@ -561,7 +585,7 @@ def _linienzug(linie) -> Optional[dict]:
 
 def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
     """
-    Die M-N-Interaktionslinien zum Zeichnen -- in kN und kNm.
+    Die M-N-Interaktionslinien zum Zeichnen -- in den Grössen von :data:`MN`.
 
     Die massgebende Linie, gegen die nachgewiesen wird, und daneben die zum
     Vergleich: die Parabel neben der Handrechnung, sonst die Handrechnung.
@@ -574,6 +598,7 @@ def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
     return {
         "richtung": nachweis.richtung.value,
         "querschnitt": nachweis.querschnitt.name,
+        "groessen": _als_dict(MN),
         "massgebend": _linienzug(befund.massgebend),
         "vergleich": _linienzug(befund.vergleich),
         # Waehlt das Knicken fuer seinen Widerstand anders als die
@@ -583,8 +608,8 @@ def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
         "kombinationen": [
             {
                 "name": a.schnittgroessen.name,
-                "M_Ed": a.schnittgroessen.M_Ed.in_einheit(KNM),
-                "N_Ed": a.schnittgroessen.N_Ed.in_einheit(KN),
+                "M_Ed": MN["M"].zahl(a.schnittgroessen.M_Ed.si),
+                "N_Ed": MN["N"].zahl(a.schnittgroessen.N_Ed.si),
                 "art": a.schnittgroessen.art.value,
                 "art_text": a.schnittgroessen.art.beschriftung,
                 "innerhalb": a.innerhalb,
@@ -594,7 +619,7 @@ def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
                 "massstab": a.massstab.value,
                 "massstab_text": a.massstab.beschriftung,
                 "widerstand": (
-                    {"N": zahl(a.widerstand[0], KN), "M": zahl(a.widerstand[1], KNM)}
+                    {"N": MN["N"].zahl(a.widerstand[0]), "M": MN["M"].zahl(a.widerstand[1])}
                     if a.widerstand
                     else None
                 ),

@@ -8,6 +8,11 @@
  *
  * Die Reihenfolge im Bild ist fest: Gitter und Nulllinien zuunterst, darüber
  * die Daten (`daten`), zuoberst die Achsentitel.
+ *
+ * Titel und Zahlen setzen die Bilder aus den Grössen des Kerns zusammen
+ * (`achsentitel`, `masszahl`): Zeichen, Einheit und Stellen kommen mit den
+ * Daten. Bis 2026-11-20 schrieb jedes Bild sie selbst, und die Pfahlskizze
+ * sagte kN/m², wo die Maske kPa zeigt.
  */
 
 import { svgEl } from './dom.js';
@@ -21,6 +26,19 @@ const TITEL = '#1a1f27';
 const RAHMEN = '#8895a8';
 /** Wie weit ein Strich der Teilung ohne Gitter aus dem Rahmen ragt. */
 const STRICH = 4;
+
+/** «M [kNm]» -- der Achsentitel einer Grösse des Kerns (`Anzeigegroesse`). */
+export const achsentitel = (g) => `${g.zeichen} [${g.einheit}]`;
+
+/**
+ * «12.3 kNm», «30°» -- eine Zahl mit der Einheit, die der Kern ihr gibt:
+ * einer Grösse (`Anzeigegroesse`) mit deren Stellen, oder eines Felds
+ * (`feldangabe`) mit `stellen`.
+ */
+export function masszahl(wert, angabe, stellen = angabe.stellen) {
+  const { einheit = '', klebt = false } = angabe;
+  return `${Number(wert).toFixed(stellen)}${einheit && !klebt ? ' ' : ''}${einheit}`;
+}
 
 /** Sucht einen runden Schrittabstand für die Achsenteilung. */
 export function schrittweite(spanne, zielAnzahl = 8) {

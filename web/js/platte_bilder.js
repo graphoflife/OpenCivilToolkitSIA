@@ -8,11 +8,13 @@
  * sie zeigt (`plattenkarten`). Bis 2026-11-10 standen die Bilder in
  * diagramm.js und die Karten in bericht.js.
  *
- * Es wird nichts nachgerechnet: sämtliche Koordinaten kommen aus der Lösung.
+ * Es wird nichts nachgerechnet: sämtliche Koordinaten kommen aus der Lösung,
+ * jedes Diagramm mit seinen Grössen (opencivil/web/diagrammdaten.py) -- aus
+ * ihnen stehen Achsentitel und Zahlen da.
  * Ändert man die Normalkraft einer M-V-Kurve, rechnet der Kern sie neu.
  */
 
-import { achsenkreuz, NR, schrittweite } from './achsen.js';
+import { achsenkreuz, achsentitel, masszahl, NR, schrittweite } from './achsen.js';
 import { karte } from './bausteine.js';
 import { beschriftungenEntzerren } from './diagramm.js';
 import {
@@ -86,7 +88,7 @@ function querkraftkurven(loesung, querschnitt) {
         zahlfeld({
           wert: gewaehlt, schritt: 50, angabe,
           leer: null, platzhalter: String(kurve.N_Ed),
-          titel: 'N in kN, Zug positiv; leer: die des ersten Falls. '
+          titel: `N in ${angabe.einheit}, Zug positiv; leer: die des ersten Falls. `
             + 'Nur Punkte mit genau diesem N liegen auf der Kurve.',
           beiAenderung: (v) => eintragAendern(querschnitt, (q) => {
             q.querkraftkurve_normalkraft = v;
@@ -116,11 +118,11 @@ function neigungskurven(loesung, querschnitt) {
     return karte(`Querkraft über Neigung – ${kurve.name}`, [
       bild,
       el('div.kurvenfuss', {}, [
-        el('span.kurvenfuss-name', { text: `d = ${kurve.d.toFixed(1)} mm` }),
+        el('span.kurvenfuss-name', { text: `d = ${masszahl(kurve.d, kurve.groessen.d)}` }),
         el('span.kurvenhinweis', {
           text: kurve.zug
-            ? `Normalzug: α_min = ${kurve.alpha_min}° – unter Zug mindestens 40°. `
-              + 'Ausserhalb der Grenzen ist die Kurve blass gezeichnet.'
+            ? `Normalzug: α_min = ${masszahl(kurve.alpha_min, kurve.groessen.alpha)}`
+              + ' – unter Zug mindestens 40°. Ausserhalb der Grenzen ist die Kurve blass gezeichnet.'
             : 'Ausserhalb von α_min und α_max ist die Kurve blass gezeichnet.',
         }),
       ]),
@@ -251,6 +253,7 @@ export function querschnittZeichnen(eintrag, werte) {
   const zahl = (id) => (werte[id] ? werte[id].zahl : null);
   const h = zahl(eintrag.werte.h);
   const b = zahl(eintrag.werte.b);
+  const mass = (name, id) => `${name} = ${masszahl(werte[id].zahl, werte[id], 0)}`;
   if (!h || !b) return el('div.leer', { text: 'Geometrie fehlt.' });
 
   const BREITE = 660;
@@ -406,14 +409,14 @@ export function querschnittZeichnen(eintrag, werte) {
     'font-weight': 600, 'text-anchor': 'middle',
     transform: `rotate(-90 14 ${RAND.oben + zeichenHoehe / 2})`,
   });
-  masstext.textContent = `h = ${h.toFixed(0)} mm`;
+  masstext.textContent = mass('h', eintrag.werte.h);
   svg.append(masstext);
 
   const breitentext = svgEl('text', {
     x: RAND.links + (b * massstab) / 2, y: HOEHE - 12,
     'text-anchor': 'middle', 'font-size': 11, fill: '#16202c', 'font-weight': 600,
   });
-  breitentext.textContent = `b = ${b.toFixed(0)} mm`;
+  breitentext.textContent = mass('b', eintrag.werte.b);
   svg.append(breitentext);
 
   return el('div.diagramm-huelle', {}, [
@@ -432,6 +435,7 @@ export function querschnittZeichnen(eintrag, werte) {
 }
 
 export function diagrammZeichnen(linie) {
+  const { M: gM, N: gN } = linie.groessen;
   const massgebend = linie.massgebend;
   const vergleich = linie.vergleich;
   const knicklinie = linie.knicklinie;
@@ -461,8 +465,10 @@ export function diagrammZeichnen(linie) {
     attribute: {
       class: 'mn', xmlns: NR, role: 'img', 'aria-label': 'M-N-Interaktionsdiagramm',
     },
-    x: { bereich: [mMin, mMax], teilung: {}, null: true, titel: 'M [kNm]' },
-    y: { bereich: [nMin, nMax], teilung: {}, null: true, titel: 'N [kN]   (Zug positiv)' },
+    x: { bereich: [mMin, mMax], teilung: {}, null: true, titel: achsentitel(gM) },
+    y: {
+      bereich: [nMin, nMax], teilung: {}, null: true, titel: `${achsentitel(gN)}   (Zug positiv)`,
+    },
   });
 
   // -- Die beiden Resistenzlinien ------------------------------------------
@@ -496,7 +502,7 @@ export function diagrammZeichnen(linie) {
         stroke: '#fff', 'stroke-width': 1.2,
       });
       const t = svgEl('title');
-      t.textContent = `${p.name}\nM = ${p.M.toFixed(1)} kNm, N = ${p.N.toFixed(1)} kN`;
+      t.textContent = `${p.name}\nM = ${masszahl(p.M, gM)}, N = ${masszahl(p.N, gN)}`;
       ecke.append(t);
       daten.append(ecke);
     }
@@ -525,7 +531,7 @@ export function diagrammZeichnen(linie) {
     // Der Grad kommt fertig gesetzt aus dem Kern: gerundet stuende bei
     // 0.9996 «1.000» neben «NICHT erfüllt».
     titel.textContent =
-      `${k.name}\nM_Ed = ${k.M_Ed.toFixed(1)} kNm, N_Ed = ${k.N_Ed.toFixed(1)} kN`
+      `${k.name}\nM_Ed = ${masszahl(k.M_Ed, gM)}, N_Ed = ${masszahl(k.N_Ed, gN)}`
       + `\nErfüllungsgrad α_eff = ${k.grad_text} (${k.massstab_text})`
       + `\n${k.innerhalb ? 'erfüllt' : 'NICHT erfüllt'}`;
     punkt.append(titel);
@@ -575,9 +581,9 @@ export function diagrammZeichnen(linie) {
     });
     const kt = svgEl('title');
     kt.textContent =
-      `Knicken – ${k.name}\nN_Ed = ${k.N_Ed.toFixed(1)} kN`
-      + `\nM_Ed,1 = ${k.M_Ed_1.toFixed(1)} kNm → M_Ed,II = ${k.M_Ed_II.toFixed(1)} kNm`
-      + `\nN_Rd = ${k.N_Rd.toFixed(1)} kN bei M = ${k.M_bei_N_Rd.toFixed(1)} kNm`
+      `Knicken – ${k.name}\nN_Ed = ${masszahl(k.N_Ed, gN)}`
+      + `\nM_Ed,1 = ${masszahl(k.M_Ed_1, gM)} → M_Ed,II = ${masszahl(k.M_Ed_II, gM)}`
+      + `\nN_Rd = ${masszahl(k.N_Rd, gN)} bei M = ${masszahl(k.M_bei_N_Rd, gM)}`
       + `\nα_eff = ${k.grad_text} – ${k.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`;
     raute.append(kt);
     daten.append(raute);
@@ -640,6 +646,7 @@ export function diagrammZeichnen(linie) {
  * Funktion wie der Nachweis.
  */
 export function querkraftkurveZeichnen(kurve) {
+  const { M: gM, v: gv, N: gN } = kurve.groessen;
   const aeste = kurve.aeste || [];
   const faelle = kurve.faelle || [];
   if (!aeste.length) {
@@ -663,8 +670,8 @@ export function querkraftkurveZeichnen(kurve) {
     attribute: {
       class: 'mv', xmlns: NR, role: 'img', 'aria-label': 'Querkraftwiderstand über dem Moment',
     },
-    x: { bereich: [mMin, mMax], teilung: {}, null: true, titel: 'M_Ed [kNm]' },
-    y: { bereich: [0, vMax], teilung: {}, titel: 'v_Rd [kN/m]' },
+    x: { bereich: [mMin, mMax], teilung: {}, null: true, titel: achsentitel(gM) },
+    y: { bereich: [0, vMax], teilung: {}, titel: achsentitel(gv) },
   });
 
   for (const [m, text] of [[mMin, 'Zug oben'], [mMax, 'Zug unten']]) {
@@ -726,7 +733,7 @@ export function querkraftkurveZeichnen(kurve) {
       'text-anchor': rechts ? 'end' : 'start',
       'font-size': 11, 'font-weight': 600, fill: '#1f5fa8',
     });
-    t.textContent = `${name} = ${p.v_Rd.toFixed(1)} kN/m`;
+    t.textContent = `${name} = ${masszahl(p.v_Rd, gv)}`;
     daten.append(t);
   }
 
@@ -753,12 +760,12 @@ export function querkraftkurveZeichnen(kurve) {
     });
     const titel = svgEl('title');
     titel.textContent =
-      `${f.name}\nM_Ed = ${f.M_Ed.toFixed(1)} kNm, |V_Ed| = ${f.V_Ed.toFixed(1)} kN/m`
-      + `\nN_Ed = ${f.N_Ed.toFixed(1)} kN, v_Rd = ${f.v_Rd.toFixed(1)} kN/m`
+      `${f.name}\nM_Ed = ${masszahl(f.M_Ed, gM)}, |V_Ed| = ${masszahl(f.V_Ed, gv)}`
+      + `\nN_Ed = ${masszahl(f.N_Ed, gN)}, v_Rd = ${masszahl(f.v_Rd, gv)}`
       + `\n${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
       + (f.begruendung ? `\n${f.begruendung}` : '')
-      + (gilt ? '' : `\nGilt für N_Ed = ${f.N_Ed.toFixed(1)} kN, `
-                   + `gezeigt ist ${kurve.N_Ed.toFixed(1)} kN.`);
+      + (gilt ? '' : `\nGilt für N_Ed = ${masszahl(f.N_Ed, gN)}, `
+                   + `gezeigt ist ${masszahl(kurve.N_Ed, gN)}.`);
     punkt.append(titel);
     daten.append(punkt);
 
@@ -789,6 +796,7 @@ export function querkraftkurveZeichnen(kurve) {
  * Funktion wie der Nachweis.
  */
 export function neigungskurveZeichnen(kurve) {
+  const { alpha: gAlpha, V: gV } = kurve.groessen;
   const punkte = kurve.punkte || [];
   const faelle = kurve.faelle || [];
   if (punkte.length < 2) {
@@ -816,11 +824,11 @@ export function neigungskurveZeichnen(kurve) {
       // die Suche nicht hat -- sie geht gradweise.
       teilung: {
         schritt: Math.max(1, schrittweite((aMax - aMin) || 1)),
-        format: (a) => `${Math.round(a)}°`,
+        format: (a) => masszahl(Math.round(a), gAlpha),
       },
-      titel: 'α – Neigung der Druckdiagonalen [°]',
+      titel: `${gAlpha.zeichen} – Neigung der Druckdiagonalen [${gAlpha.einheit}]`,
     },
-    y: { bereich: [0, vMax], teilung: {}, titel: 'V_Rd [kN/m]' },
+    y: { bereich: [0, vMax], teilung: {}, titel: achsentitel(gV) },
   });
 
   // -- Der zulässige Bereich -----------------------------------------------
@@ -838,7 +846,7 @@ export function neigungskurveZeichnen(kurve) {
     const t = svgEl('text', {
       x: x(a) + 5, y: feld.oben + 13, 'font-size': 11, fill: '#5c6773',
     });
-    t.textContent = `${text} = ${a}°`;
+    t.textContent = `${text} = ${masszahl(a, gAlpha)}`;
     daten.append(t);
   }
 
@@ -909,8 +917,8 @@ export function neigungskurveZeichnen(kurve) {
     });
     const titel = svgEl('title');
     titel.textContent =
-      `${f.name}\nV_Ed = ${f.V_Ed.toFixed(1)} kN/m bei α = ${f.alpha}°`
-      + `\nV_Rd = ${f.V_Rd.toFixed(1)} kN/m`
+      `${f.name}\nV_Ed = ${masszahl(f.V_Ed, gV)} bei α = ${masszahl(f.alpha, gAlpha)}`
+      + `\nV_Rd = ${masszahl(f.V_Rd, gV)}`
       + `\n${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
       + (f.begruendung ? `\n${f.begruendung}` : '');
     punkt.append(titel);

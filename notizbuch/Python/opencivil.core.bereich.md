@@ -1,5 +1,5 @@
 ---
-erzeugt: 3788467675b2
+erzeugt: 2dbd81474d3a
 art: modul
 tags: [modul]
 ---
@@ -94,8 +94,9 @@ Eine Zahl mit der Einheit: «300 mm», «30°», «0.9».
 def angabe(self) -> Dict[str, Any]
 ```
 
-Was die Oberflaeche von ihm wissen muss -- die Einheit und, hat er
-Grenzen, die Grenzen mit dem Satz, den eine verletzte sagt.
+Was die Oberflaeche von ihm wissen muss -- die Einheit, ob sie an der
+Zahl klebt («30°»), und, hat er Grenzen, die Grenzen mit dem Satz, den
+eine verletzte sagt.
 
 
 ## Braucht

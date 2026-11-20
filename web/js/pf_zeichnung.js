@@ -10,18 +10,22 @@
  *
  * Masse und Schichten kommen aus dem Eintrag, wie sie eingegeben sind; die
  * Mantelreibung je Stück, der Spitzendruck und die Legende aus der Lösung
- * (opencivil/web/pfahldaten.py). Die Tiefen sind massstäblich; der Pfahl
- * ist es in der Breite nur, solange er so weder verschwindet noch die
- * Schichten verdeckt -- sonst sagt es die Legende.
+ * (opencivil/web/pfahldaten.py). Die Masse zeichnet das Bild in m und mm und
+ * schreibt sie so an; was es nur anschreibt -- die Kennwerte der Schichten,
+ * Mantelreibung und Spitzendruck --, steht in der Einheit seines Felds
+ * (`feldangabe`) oder der Grösse des Kerns. Die Tiefen sind massstäblich;
+ * der Pfahl ist es in der Breite nur, solange er so weder verschwindet noch
+ * die Schichten verdeckt -- sonst sagt es die Legende.
  */
 
+import { masszahl } from './achsen.js';
 import { karte } from './bausteine.js';
 import { el, svgEl } from './dom.js';
 import {
   BREITE, legende, linie, mass, pfeil, text, textzeile, wasserzeichen, zahl,
 } from './gb_skizze.js';
 import { verlaufKarten } from './pf_verlauf.js';
-import { eintragVon, zustand } from './zustand.js';
+import { eintragVon, feldangabe, zustand } from './zustand.js';
 
 const RAND = 16;
 /** Links Platz für die Tiefen, oben für den Durchmesser, unten für den Spitzendruck, in px. */
@@ -58,11 +62,15 @@ function massstab(t) {
   return { schichten, tiefe, fuss, k, breite, verzerrt: Math.abs(breite - echt) > 0.05 * echt };
 }
 
+/** Ein Kennwert einer Schicht in der Einheit seines Felds: «12.0 kPa», «30.0°». */
+const kennwert = (s, feld) => masszahl(s[feld], feldangabe('pfahlschicht', feld), 1);
+
 /** Die Kennwerte einer Schicht, mit denen sie trägt -- drainiert oder undrainiert. */
 function festigkeit(s) {
   return s.verhalten === 'drainiert'
-    ? ["φ'", { unten: 'k' }, ` = ${zahl(s.phi_k, 1)}°, c'`, { unten: 'k' }, ` = ${zahl(s.c_k, 1)} kN/m²`]
-    : ['s', { unten: 'u,k' }, ` = ${zahl(s.s_u, 1)} kN/m²`];
+    ? ["φ'", { unten: 'k' }, ` = ${kennwert(s, 'phi_k')}, c'`, { unten: 'k' },
+      ` = ${kennwert(s, 'c_k')}`]
+    : ['s', { unten: 'u,k' }, ` = ${kennwert(s, 's_u')}`];
 }
 
 /**
@@ -90,7 +98,7 @@ function situationsbild(t, d) {
       height: dicke.toFixed(1), class: `sz-schicht sz-schicht-${i % 2}`,
     }));
     const zeilen = dicke >= 50
-      ? [[schicht.name], [`d = ${zahl(schicht.d, 2)} m, γ = ${zahl(schicht.gamma, 1)} kN/m³`],
+      ? [[schicht.name], [`d = ${zahl(schicht.d, 2)} m, γ = ${kennwert(schicht, 'gamma')}`],
         festigkeit(schicht)]
       : dicke >= 36 ? [[schicht.name], festigkeit(schicht)] : dicke >= 16 ? [[schicht.name]] : [];
     zeilen.forEach((teile, j) => zeichne(text(LINKS + 6, oben + 17 + 15 * j, teile,
@@ -150,15 +158,15 @@ function situationsbild(t, d) {
       height: (e - a).toFixed(1), class: 'pf-mantel',
     }));
     if (e - a >= 14) {
-      zeichne(text(r + 9 + lang, (a + e) / 2 + 4, ['q', { unten: 's,k' }, ` = ${zahl(s.q_s, 1)} kN/m²`],
-        { klasse: 'pf-widerstand' }));
+      zeichne(text(r + 9 + lang, (a + e) / 2 + 4,
+        ['q', { unten: 's,k' }, ` = ${masszahl(s.q_s, d.groessen.q_s)}`], { klasse: 'pf-widerstand' }));
     }
   }
   if (d?.q_b != null) {
     const xs = breite >= 30 ? [l + breite / 6, ACHSE, r - breite / 6] : [ACHSE];
     zeichne(
       ...xs.map((x) => pfeil([x, unten + 26], [x, unten + 1], 'pf-spitze')),
-      text(r + 9, unten + 20, ['q', { unten: 'b,k' }, ` = ${zahl(d.q_b, 0)} kN/m²`],
+      text(r + 9, unten + 20, ['q', { unten: 'b,k' }, ` = ${masszahl(d.q_b, d.groessen.q_b)}`],
         { klasse: 'pf-widerstand' }),
     );
   }

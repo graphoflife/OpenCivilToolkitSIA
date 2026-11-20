@@ -390,7 +390,15 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         `VERLAEUFE` samt Grenzschlüsseln (eine umbenannte Grösse
         verschwindet still), `platte_bilder.js` rund 35 Einheiten, die
         Pfahlskizze kN/m² neben kPa in der Maske. Umbau: die Grössen
-        (`Anzeigegroesse`) kommen mit den Daten.
+        (`Anzeigegroesse`) kommen mit den Daten. Erledigt (2026-11-20):
+        Verläufe, Diagramme der Platte und Pfahlskizze nehmen Zeichen,
+        Einheit und Stellen aus den Daten (`achsentitel`, `masszahl` in
+        `achsen.js`), die Skizze die Kennwerte der Schichten aus dem Feld.
+        Noch selbst geschrieben, heute gleich wie im Kern: `GROESSE` in
+        `qa_diagramme.js` (N, M_y, M_z), die Achsen von `spannungsbild.js`
+        (ε, σ, z) und die Kennwerte in den Skizzen von Grundbruch und
+        Setzung -- derselbe Schritt, falls gewünscht. Der Hinweis «unter Zug
+        mindestens 40°» unter der Neigungskurve steht als Text im JS.
       - Knotenlasten: Art und Einheit von Hand, mit widersprüchlichen
         Rückfällen (`lastFelder` kNm für alles ausser «kraft», Zeichnung
         und Liste kN für alles ausser «moment»). Erledigt (2026-11-20): die

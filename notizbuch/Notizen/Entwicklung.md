@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Bilder nehmen ihre Einheiten aus den Daten
+
+Drei Bilder schrieben Zeichen und Einheiten selbst: die Verläufe des Pfahls
+(`GROESSEN` in `pf_verlauf.js`, ein Spiegel von `pfahldaten.VERLAEUFE` samt
+Schlüsseln der Grenzen), die Diagramme der Platte (rund 35 Einheiten in
+`platte_bilder.js`) und die Pfahlskizze. Benennt der Kern eine Grösse um,
+verschwand ihr Bild still; die Skizze sagte schon kN/m², wo die Maske kPa
+zeigt.
+
+Jetzt bringen die Daten ihre Grössen mit (`Anzeigegroesse`): je Verlauf des
+Pfahls Zeichen, Einheit, Stellen, Werte und Grenze; je Diagramm der Platte
+`groessen` (`diagrammdaten.MN`, `MV`, `NEIGUNG`), mit denen der Kern auch
+umrechnet -- Einheit der Zahl und Einheit daneben können nicht mehr
+auseinanderlaufen. Die Bilder setzen sie mit `achsentitel` und `masszahl`
+(`achsen.js`) zusammen. Die Pfahlskizze schreibt die Kennwerte der
+Schichten in der Einheit ihres Felds (`feldangabe`) -- dafür sagt der
+Katalog jetzt auch, ob eine Einheit an der Zahl klebt (`klebt`, «30°»).
+Masse, die eine Skizze massstäblich zeichnet, schreibt sie weiter selbst
+an: ihr Massstab hängt ohnehin an der Einheit.
+
+Sichtbar anders: in der Pfahlskizze kPa statt kN/m² bei c'_k, s_u,k, q_s,k
+und q_b,k, unter den Verläufen «p [kPa]». Sonst steht da dasselbe wie
+vorher. Ein Verlauf ohne Farbe meldet sich laut, statt unsichtbar zu sein.
+
 ## 2026-11-20 · Das Durchstanzen holt seine Maske aus dem Kern
 
 Der letzte der vier: die Tafel steht in `opencivil/durchstanzen/stelle.py`

@@ -13,24 +13,25 @@
  *
  * Gerechnet wird nichts: die Werte kommen fertig aus dem Kern
  * (opencivil/web/pfahldaten.py), mit dem Bemessungswert des
- * Verformungsmoduls, wie die Legende sagt.
+ * Verformungsmoduls, wie die Legende sagt -- je Grösse mit Zeichen,
+ * Einheit, Stellen und Grenze. Hier steht nur ihre Farbe.
  */
 
-import { achsenkreuz } from './achsen.js';
+import { achsenkreuz, achsentitel } from './achsen.js';
 import { karte } from './bausteine.js';
 import { el, svgEl } from './dom.js';
 import { legende, zahl } from './gb_skizze.js';
 
-/** Die Verläufe: Feld der Daten, Achsentitel, Stellen der Beschriftung, Farbe, Feld der Grenze. */
-const GROESSEN = [
-  { feld: 'N', titel: 'N [kN]', stellen: 0, klasse: 'bs-d-n' },
-  { feld: 'w', titel: 'w [mm]', stellen: 2, klasse: 'pf-d-w' },
-  { feld: 'y', titel: 'y [mm]', stellen: 2, klasse: 'pf-d-w' },
-  { feld: 'theta', titel: 'θ [mrad]', stellen: 2, klasse: 'bs-d-phi' },
-  { feld: 'M', titel: 'M [kNm]', stellen: 1, klasse: 'bs-d-m', grenze: 'M_grenze' },
-  { feld: 'V', titel: 'V [kN]', stellen: 1, klasse: 'bs-d-v', grenze: 'V_grenze' },
-  { feld: 'p', titel: 'p [kN/m²]', stellen: 0, klasse: 'pf-d-p', grenze: 'p_grenze' },
-];
+/** Die Farbe je Grösse des Kerns, nach ihrem Feld. */
+const FARBEN = {
+  N: 'bs-d-n', w: 'pf-d-w', y: 'pf-d-w', theta: 'bs-d-phi', M: 'bs-d-m', V: 'bs-d-v', p: 'pf-d-p',
+};
+
+/** Die Farbe einer Grösse -- ohne eine bliebe ihre Linie unsichtbar. */
+function farbe(feld) {
+  if (!FARBEN[feld]) throw new Error(`Der Verlauf «${feld}» des Pfahls hat keine Farbe.`);
+  return FARBEN[feld];
+}
 
 /** So weit, gemessen am grössten Wert, reicht das Bild für die Grenze. */
 const GRENZE_IM_BILD = 2;
@@ -70,7 +71,10 @@ function bisZu(z, w, oben) {
  * Ein Verlauf über die Tiefe: die Fläche zwischen null und der Kurve, der
  * grösste Wert -- und, wo es eine gibt, die Grenze beidseits gestrichelt.
  */
-function verlaufsbild(z, werte, { titel, stellen, klasse }, grenze) {
+function verlaufsbild(z, g) {
+  const { werte, grenze, stellen } = g;
+  const titel = achsentitel(g);
+  const klasse = farbe(g.feld);
   const i = groesster(werte);
   const spitze = Math.abs(werte[i]);
   let [von, bis] = [Math.min(0, ...werte), Math.max(0, ...werte)];
@@ -127,9 +131,9 @@ function verlaufsbild(z, werte, { titel, stellen, klasse }, grenze) {
 export function verlaufKarten(d) {
   return (d?.verlaeufe || []).map((v) => {
     // Die Verläufe nebeneinander sind ein Bild; die Vorschau zeigt den ersten.
-    const bild = el('div.pf-verlaeufe', {}, GROESSEN
-      .filter((g) => v[g.feld] && v[g.feld].some((x) => Math.abs(x) > 1e-9))
-      .map((g) => verlaufsbild(v.z, v[g.feld], g, g.grenze && v[g.grenze])));
+    const bild = el('div.pf-verlaeufe', {}, v.groessen
+      .filter((g) => g.werte.some((x) => Math.abs(x) > 1e-9))
+      .map((g) => verlaufsbild(v.z, g)));
     return karte(`Verläufe – ${v.name}`, [bild, legende(d.verlaufslegende || [])],
       { bild, klasse: 'ist-breit' });
   });

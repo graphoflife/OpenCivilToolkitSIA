@@ -313,11 +313,15 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         daten = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["t1"]
         laengs_, quer_ = daten["verlaeufe"]
         self.assertEqual(laengs_["name"], "Kombination 1")
-        self.assertNotIn("y", laengs_)
-        self.assertAlmostEqual(quer_["N"][0], 800.0)
-        self.assertAlmostEqual(quer_["V"][0], 120.0)
+        self.assertEqual([g["feld"] for g in laengs_["groessen"]], ["N", "w"])
+        self.assertEqual([g["feld"] for g in quer_["groessen"]],
+                         ["N", "w", "y", "theta", "M", "V", "p"])
+        quer_ = {"z": quer_["z"], **{g["feld"]: g for g in quer_["groessen"]}}
+        self.assertAlmostEqual(quer_["N"]["werte"][0], 800.0)
+        self.assertAlmostEqual(quer_["V"]["werte"][0], 120.0)
+        self.assertEqual((quer_["theta"]["zeichen"], quer_["theta"]["einheit"]), ("θ", "mrad"))
         self.assertAlmostEqual(quer_["z"][0], 1.0)
-        self.assertEqual(len(quer_["z"]), len(quer_["M"]))
+        self.assertEqual(len(quer_["z"]), len(quer_["M"]["werte"]))
 
 
 if __name__ == "__main__":

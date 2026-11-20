@@ -1,5 +1,5 @@
 ---
-erzeugt: e831fe55fc3e
+erzeugt: d5dd09ee521d
 art: modul
 tags: [modul]
 ---
@@ -16,7 +16,9 @@ damit nur noch Katalog, Mitschrift, Loesung und Zusammenfassung abbildet.
 
 Wie dort wird hier nichts nachgerechnet, was der Kern schon weiss: die Kurven
 kommen aus denselben Funktionen wie die Nachweise, hier werden sie in kN,
-kNm und mm umgesetzt.
+kNm und mm umgesetzt. Die Diagramme der Platte bringen ihre Grössen mit
+([[opencivil.web.diagrammdaten#Konstanten|MN]], [[opencivil.web.diagrammdaten#Konstanten|MV]], [[opencivil.web.diagrammdaten#Konstanten|NEIGUNG]]): Achsentitel und Zahlen setzt das
+Bild aus ihnen zusammen, statt die Einheiten selbst zu schreiben.
 
 ## Inhalt
 
@@ -52,7 +54,7 @@ waehlt der Benutzer unter dem Diagramm, und sie steht an der Platte
 dieser Richtung -- dann liegen dessen Punkte auf der Kurve --, ohne Fall
 null; was gilt, sagt `hinweis` unter dem Feld.
 
-Einheiten wie in den anderen Diagrammen: kNm und kN/m.
+Die Einheiten stehen in [[opencivil.web.diagrammdaten#Konstanten|MV]].
 
 ### neigungskurven
 
@@ -216,7 +218,7 @@ Randes, die man nicht einzeln markiert.
 def linie(nachweis, loesung: Loesung, aufbau=None) -> dict
 ```
 
-Die M-N-Interaktionslinien zum Zeichnen -- in kN und kNm.
+Die M-N-Interaktionslinien zum Zeichnen -- in den Grössen von [[opencivil.web.diagrammdaten#Konstanten|MN]].
 
 Die massgebende Linie, gegen die nachgewiesen wird, und daneben die zum
 Vergleich: die Parabel neben der Handrechnung, sonst die Handrechnung.
@@ -350,6 +352,9 @@ warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]].
 
 ## Konstanten
 
+- `MN = {'M': Anzeigegroesse('M', KNM), 'N': Anzeigegroesse('N', KN)}` – Das M-N-Diagramm: jeder Punkt in Moment und Normalkraft -- der Linien, der Fälle und des Knickens.
+- `MV = {'M': Anzeigegroesse('M_Ed', KNM, 'M_{Ed}'), 'v': Anzeigegroesse('v_R…` – Querkraft über Moment: das Moment, der Widerstand und die Einwirkung je Meter, die Normalkraft, für die die Kurve gilt.
+- `NEIGUNG = {'alpha': Anzeigegroesse('α', GRAD, '\\alpha', 0), 'V': Anzeigegroess…` – Querkraft über Neigung: die Neigung steht schon in ganzen Grad (die Suche geht gradweise), Widerstand und Einwirkung je Meter, die statische Höhe.
 - `NEIGUNG_VON = 25` – Wie weit die Neigungskurve mindestens reicht, in Grad. Die beiden Grenzen des Benutzers liegen normalerweise darin; gehen sie darueber hinaus, waechst die Achse mit -- ein abgeschnittener Ast waere schlimmer als eine breite Achse.
 - `NEIGUNG_BIS = 45`
 - `_LINIENGROESSEN = {spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (Anzeigegroesse('M', K…` – Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die festgehaltene und die Verformung. Massstab und Beschriftung an einer Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).

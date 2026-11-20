@@ -98,12 +98,15 @@ class Bereich:
 
     def angabe(self) -> Dict[str, Any]:
         """
-        Was die Oberflaeche von ihm wissen muss -- die Einheit und, hat er
-        Grenzen, die Grenzen mit dem Satz, den eine verletzte sagt.
+        Was die Oberflaeche von ihm wissen muss -- die Einheit, ob sie an der
+        Zahl klebt («30°»), und, hat er Grenzen, die Grenzen mit dem Satz, den
+        eine verletzte sagt.
         """
         angabe: Dict[str, Any] = {}
         if self.einheit is not None and self.einheit.name not in ("", "-"):
             angabe["einheit"] = self.einheit.beschriftung
+            if self.einheit.klebt:
+                angabe["klebt"] = True
         grenzen = {grenze: getattr(self, grenze) for grenze in ("ueber", "ab", "bis", "unter")
                    if getattr(self, grenze) is not None}
         if grenzen:

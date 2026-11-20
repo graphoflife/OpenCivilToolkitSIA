@@ -4,7 +4,7 @@ opencivil/web/pfahldaten.py -- was die Oberflaeche von einem Pfahl zeichnet.
 VERANTWORTUNG:
 Je Pfahl die Zahlen der Situationszeichnung, in den Einheiten der Anzeige:
 die Mantelreibung je Stück und der Spitzendruck, wie der äussere Widerstand
-sie gerechnet hat. Dazu die Legende unter dem Bild
+sie gerechnet hat, mit ihren Grössen (:data:`SITUATION`). Dazu die Legende unter dem Bild
 (:mod:`opencivil.web.anzeige`): Mantel und Fuss, die Bemessungswerte beider
 Nachweise auf Druck und auf Zug, quer je Kombination, und der Fall, der
 entscheidet. Masse, Schichten und Grundwasser liest die Oberflaeche aus dem
@@ -14,7 +14,8 @@ Und je Kombination die Verläufe über die Tiefe, wie die Steifigkeit sie
 gerechnet hat (:func:`verlaeufe`), mit dem Satz, der unter ihnen steht --
 neben Moment und Querkraft der Widerstand des Pfahls, neben dem
 Bettungsdruck der Erdwiderstand: die Grenzen, die sie nicht übersteigen
-dürfen.
+dürfen. Jede Grösse bringt Zeichen, Einheit und Stellen mit
+(:data:`VERLAEUFE`); das Bild schreibt keine davon selbst.
 
 Gerechnet wird hier nichts: alles steht in den Befunden.
 """
@@ -30,13 +31,25 @@ from opencivil.pfahl.aussen import Aussenbefund
 from opencivil.pfahl.innen import Innenbefund
 from opencivil.pfahl.innen_quer import Innenquerbefund
 from opencivil.pfahl.quer import Querbefund
-from opencivil.pfahl.steifigkeit import GAMMA_E, Pfahlsteifigkeit, Steifigkeitsbefund
+from opencivil.pfahl.steifigkeit import GAMMA_E, Pfahlsteifigkeit, Steifigkeitsbefund, Verlauf
 from opencivil.projekt import Aufbau
-from opencivil.web.anzeige import zahl, zahlformel, zeile
+from opencivil.web.anzeige import Anzeigegroesse, zahlformel, zeile
 
-#: Die Verläufe über die Tiefe: Feld des Befunds und Einheit der Anzeige.
-VERLAEUFE = (("N", KN), ("w", MM), ("y", MM), ("theta", MRAD), ("M", KNM), ("V", KN),
-             ("p", KPA))
+#: Die Verläufe über die Tiefe, in der Folge der Bilder: Feld des Befunds und
+#: Grösse der Anzeige. Eine Grenze steht in derselben Einheit wie ihr Verlauf.
+VERLAEUFE = (
+    ("N", Anzeigegroesse("N", KN, stellen=0)),
+    ("w", Anzeigegroesse("w", MM, stellen=2)),
+    ("y", Anzeigegroesse("y", MM, stellen=2)),
+    ("theta", Anzeigegroesse("θ", MRAD, r"\theta", 2)),
+    ("M", Anzeigegroesse("M", KNM)),
+    ("V", Anzeigegroesse("V", KN)),
+    ("p", Anzeigegroesse("p", KPA, stellen=0)),
+)
+
+#: Was die Situationszeichnung aus der Lösung anschreibt.
+SITUATION = {"q_s": Anzeigegroesse("q_s,k", KPA, "q_{s,k}"),
+             "q_b": Anzeigegroesse("q_b,k", KPA, "q_{b,k}", 0)}
 
 
 def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
@@ -56,9 +69,10 @@ def situation(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
     raeume = {n.id for n in [*nachweise, *quer] if n is not None}
     urteile = [u for u in loesung.urteile if u.raum in raeume and not u.still]
     return {
-        "stuecke": [{"z_o": s.stueck.z_o, "z_u": s.stueck.z_u, "q_s": zahl(s.q_s, KPA)}
+        "stuecke": [{"z_o": s.stueck.z_o, "z_u": s.stueck.z_u, "q_s": SITUATION["q_s"].zahl(s.q_s)}
                     for s in aussen.stuecke],
-        "q_b": zahl(aussen.q_b, KPA),
+        "q_b": SITUATION["q_b"].zahl(aussen.q_b),
+        "groessen": {feld: g.als_dict() for feld, g in SITUATION.items()},
         "legende": _legende(aussen, innen, _befund(aufbau, kennung, loesung, "pfahl_quer"),
                             urteile),
         **verlaeufe(aufbau, kennung, loesung),
@@ -93,26 +107,32 @@ def verlaeufe(aufbau: Aufbau, kennung: str, loesung: Loesung) -> Dict[str, Any]:
         legende.append(zeile("Gestrichelt, so weit sie ins Bild fallen, die Grenzen: neben M "
                              "und V der Widerstand des Pfahls mit der Normalkraft in derselben "
                              "Tiefe, neben p der Erdwiderstand ", Mathe(r"p_{E,d} / D"), "."))
-    return {
-        "verlaeufe": [{"name": v.name, "z": v.z,
-                       **{feld: [zahl(x, einheit) for x in getattr(v, feld)]
-                          for feld, einheit in VERLAEUFE if getattr(v, feld) is not None},
-                       **_grenzen(v.name, aussen, innen)}
-                      for v in befund.verlaeufe],
-        "verlaufslegende": legende,
-    }
+    return {"verlaeufe": [_verlauf(v, aussen, innen) for v in befund.verlaeufe],
+            "verlaufslegende": legende}
+
+
+def _verlauf(v: Verlauf, aussen: Optional[Querbefund],
+             innen: Optional[Innenquerbefund]) -> Dict[str, Any]:
+    """
+    Eine Kombination: die Tiefen und je gerechnete Grösse ihre Werte, mit der
+    Grenze, wo es eine gibt (sonst ``None``).
+    """
+    grenzen = _grenzen(v.name, aussen, innen)
+    return {"name": v.name, "z": v.z, "groessen": [
+        {"feld": feld, **g.als_dict(), "werte": [g.zahl(x) for x in getattr(v, feld)],
+         "grenze": [g.zahl(x) for x in grenzen[feld]] if feld in grenzen else None}
+        for feld, g in VERLAEUFE if getattr(v, feld) is not None]}
 
 
 def _grenzen(name: str, aussen: Optional[Querbefund],
              innen: Optional[Innenquerbefund]) -> Dict[str, List[float]]:
-    """Die Grenzen einer Kombination neben M, V und p -- leer, wo sie nicht quer belastet."""
+    """Die Grenzen einer Kombination neben M, V und p, in SI -- leer, wo sie nicht quer belastet."""
     heraus = {}
     if aussen is not None and name in aussen.faelle:
-        heraus["p_grenze"] = [zahl(x, KPA) for x in aussen.faelle[name].grenze]
+        heraus["p"] = aussen.faelle[name].grenze
     if innen is not None and name in innen.faelle:
         fall = innen.faelle[name]
-        heraus["M_grenze"] = [zahl(x, KNM) for x in fall.M_grenze]
-        heraus["V_grenze"] = [zahl(x, KN) for x in fall.V_grenze]
+        heraus["M"], heraus["V"] = fall.M_grenze, fall.V_grenze
     return heraus
 
 

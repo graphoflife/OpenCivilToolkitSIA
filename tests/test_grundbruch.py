@@ -401,7 +401,7 @@ class TestEinheitenAmFeld(unittest.TestCase):
             "einheit": "kPa", "ab": 0.0,
             "heisst": "Kohäsion c", "verlangt": "kann nicht negativ sein"})
         self.assertEqual(felder["grundbruch"]["phi_k"], {
-            "einheit": "°", "ab": 0.0, "unter": 90.0,
+            "einheit": "°", "klebt": True, "ab": 0.0, "unter": 90.0,
             "heisst": "φ_k", "verlangt": "muss mindestens null und kleiner als 90° sein"})
         self.assertEqual(felder["grundbruch"]["gamma_phi"], {
             "ueber": 0.0, "heisst": "Partialfaktor γ_φ", "verlangt": "muss grösser als null sein"})
@@ -436,7 +436,7 @@ class TestEinheitenAmFeld(unittest.TestCase):
             for feld in ("alpha_min", "alpha_max"):
                 with self.subTest(art=art, feld=feld):
                     self.assertEqual(felder[art][feld], {
-                        "einheit": "°", "ab": 1, "bis": 89, "ganz": True,
+                        "einheit": "°", "klebt": True, "ab": 1, "bis": 89, "ganz": True,
                         "heisst": feld.replace("alpha_", "α_"),
                         "verlangt": "muss mindestens 1° und höchstens 89° sein", **gegen[feld]})
 

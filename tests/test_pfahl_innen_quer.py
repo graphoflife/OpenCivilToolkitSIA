@@ -244,9 +244,12 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         p, _ = im_kies()
         d = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["t1"]
         v = d["verlaeufe"][0]
-        self.assertEqual(len(v["M_grenze"]), len(v["z"]))
-        self.assertTrue(all(g > 0.0 for g in v["M_grenze"]))
-        self.assertEqual({round(g, 1) for g in v["V_grenze"]}, {268.7})
+        groessen = {g["feld"]: g for g in v["groessen"]}
+        self.assertEqual(len(groessen["M"]["grenze"]), len(v["z"]))
+        self.assertTrue(all(g > 0.0 for g in groessen["M"]["grenze"]))
+        self.assertEqual({round(g, 1) for g in groessen["V"]["grenze"]}, {268.7})
+        self.assertEqual((groessen["M"]["einheit"], groessen["V"]["einheit"]), ("kNm", "kN"))
+        self.assertIsNone(groessen["N"]["grenze"])
         legende = ["".join(z.get("text") or z["mathe"] for z in zeile)
                    for zeile in d["verlaufslegende"]]
         self.assertTrue(any("neben M und V der Widerstand des Pfahls" in z for z in legende))

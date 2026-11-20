@@ -299,8 +299,10 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         p, _ = im_kies()
         d = dienst.rechnen({"projekt": p.als_dict()})["zeichendaten"]["t1"]
         v = d["verlaeufe"][0]
-        self.assertEqual(len(v["p_grenze"]), len(v["z"]))
-        self.assertTrue(all(g >= 0.0 for g in v["p_grenze"]))
+        p = next(g for g in v["groessen"] if g["feld"] == "p")
+        self.assertEqual((p["zeichen"], p["einheit"]), ("p", "kPa"))
+        self.assertEqual(len(p["grenze"]), len(v["z"]))
+        self.assertTrue(all(g >= 0.0 for g in p["grenze"]))
         zeilen = ["".join(z.get("text") or z["mathe"] for z in zeile) for zeile in d["legende"]]
         self.assertTrue(any(z.startswith("Quer, in «K» R_{tr,d} = ") for z in zeilen))
         legende = ["".join(z.get("text") or z["mathe"] for z in zeile)

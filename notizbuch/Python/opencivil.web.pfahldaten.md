@@ -1,5 +1,5 @@
 ---
-erzeugt: 7991016ee03c
+erzeugt: ab348515844b
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,7 @@ tags: [modul]
 
 Je Pfahl die Zahlen der Situationszeichnung, in den Einheiten der Anzeige:
 die Mantelreibung je Stück und der Spitzendruck, wie der äussere Widerstand
-sie gerechnet hat. Dazu die Legende unter dem Bild
+sie gerechnet hat, mit ihren Grössen ([[opencivil.web.pfahldaten#Konstanten|SITUATION]]). Dazu die Legende unter dem Bild
 ([[opencivil.web.anzeige]]): Mantel und Fuss, die Bemessungswerte beider
 Nachweise auf Druck und auf Zug, quer je Kombination, und der Fall, der
 entscheidet. Masse, Schichten und Grundwasser liest die Oberflaeche aus dem
@@ -21,7 +21,8 @@ Und je Kombination die Verläufe über die Tiefe, wie die Steifigkeit sie
 gerechnet hat ([[opencivil.web.pfahldaten#verlaeufe|verlaeufe]]), mit dem Satz, der unter ihnen steht --
 neben Moment und Querkraft der Widerstand des Pfahls, neben dem
 Bettungsdruck der Erdwiderstand: die Grenzen, die sie nicht übersteigen
-dürfen.
+dürfen. Jede Grösse bringt Zeichen, Einheit und Stellen mit
+([[opencivil.web.pfahldaten#Konstanten|VERLAEUFE]]); das Bild schreibt keine davon selbst.
 
 Gerechnet wird hier nichts: alles steht in den Befunden.
 
@@ -54,13 +55,22 @@ Je Kombination Setzung, Normalkraft und -- wo quer gerechnet ist --
 Verschiebung, Verdrehung, Moment, Querkraft und Bettungsdruck über die
 Tiefe ab Terrain, dazu der Satz darunter. Leer ohne Steifigkeit.
 
+### _verlauf
+
+```python
+def _verlauf(v: Verlauf, aussen: Optional[Querbefund], innen: Optional[Innenquerbefund]) -> Dict[str, Any]
+```
+
+Eine Kombination: die Tiefen und je gerechnete Grösse ihre Werte, mit der
+Grenze, wo es eine gibt (sonst `None`).
+
 ### _grenzen
 
 ```python
 def _grenzen(name: str, aussen: Optional[Querbefund], innen: Optional[Innenquerbefund]) -> Dict[str, List[float]]
 ```
 
-Die Grenzen einer Kombination neben M, V und p -- leer, wo sie nicht quer belastet.
+Die Grenzen einer Kombination neben M, V und p, in SI -- leer, wo sie nicht quer belastet.
 
 ### _legende
 
@@ -73,7 +83,8 @@ Mantel und Fuss, die Bemessungswerte, quer je Kombination, der entscheidende Fal
 
 ## Konstanten
 
-- `VERLAEUFE = (('N', KN), ('w', MM), ('y', MM), ('theta', MRAD), ('M', KNM), ('V', …` – Die Verläufe über die Tiefe: Feld des Befunds und Einheit der Anzeige.
+- `VERLAEUFE = (('N', Anzeigegroesse('N', KN, stellen=0)), ('w', Anzeigegroesse('w',…` – Die Verläufe über die Tiefe, in der Folge der Bilder: Feld des Befunds und Grösse der Anzeige. Eine Grenze steht in derselben Einheit wie ihr Verlauf.
+- `SITUATION = {'q_s': Anzeigegroesse('q_s,k', KPA, 'q_{s,k}'), 'q_b': Anzeigegroess…` – Was die Situationszeichnung aus der Lösung anschreibt.
 
 ## Braucht
 

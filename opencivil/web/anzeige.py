@@ -60,9 +60,10 @@ class Anzeigegroesse:
         return zahl(si_wert, self.einheit)
 
     def als_dict(self) -> dict:
+        """Was ein Bild von ihr braucht; ``klebt``: die Einheit ohne Abstand, «30°»."""
         return {"zeichen": self.zeichen, "latex": self.latex or self.zeichen,
-                "einheit": self.einheit.beschriftung, "stellen": self.stellen,
-                "am_bezugsort": self.am_bezugsort}
+                "einheit": self.einheit.beschriftung, "klebt": self.einheit.klebt,
+                "stellen": self.stellen, "am_bezugsort": self.am_bezugsort}
 
 
 def zelle_dict(zelle: Zelle) -> dict:

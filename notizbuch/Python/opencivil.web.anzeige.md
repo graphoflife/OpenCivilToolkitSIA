@@ -1,5 +1,5 @@
 ---
-erzeugt: c0a85540502f
+erzeugt: 7bfc4b78470b
 art: modul
 tags: [modul]
 ---
@@ -80,6 +80,8 @@ Ein Wert in SI, in der Einheit dieser Groesse.
 ```python
 def als_dict(self) -> dict
 ```
+
+Was ein Bild von ihr braucht; `klebt`: die Einheit ohne Abstand, «30°».
 
 ### zelle_dict
 
