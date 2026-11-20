@@ -5,6 +5,42 @@ gelernt wurde, steht in [[Entwicklung]].
 
 ---
 
+## Wünsche vom 2026-11-20
+
+Sechzehn Wünsche des Benutzers, geplant am 2026-11-20: kleines Sichtbares
+zuerst, ein Commit je Punkt. Seine Entscheidungen: Sandbox in jedem Projekt
+und in jeder App ausser Materialien; «Öffnen» ersetzt alles oder fügt hinzu;
+offline nach dem ersten Besuch; MCP mit Projektdateien; Erdbeben mit
+Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
+
+- [ ] Oberfläche: «mm | Stk» als Schalter wie alle anderen; in der
+      Tragsicherheit der Querschnittsanalyse die sechs Lasten auf einer
+      Zeile, das Fenster breiter; die Fälle einer Liste sichtbar getrennt;
+      «Kriechzahl φ» überall gleich, φ als Formel; die rechte Spalte
+      rötlich, solange sie nicht zur Eingabe passt; Neues heisst wie sein
+      Knopf («Einwirkung 1», «Lastfall 1», «Schicht 1») -- die
+      Standardfälle und die Gebrauchsfälle bleiben; ein eigenes Material im
+      Balkensystem beginnt mit den Werten des ersten Betons (C25/30); die
+      Meldungen der Decke je Fall zusammengefasst; die Rechenwerte in allen
+      Modulen je Material wie in der Querschnittsanalyse.
+- [ ] Mehrere Projekte: oben eine Reihe; «Speichern» schreibt alle in eine
+      Datei; «Öffnen» fragt «alles ersetzen | hinzufügen».
+- [ ] Sandbox: je Projekt und App zuoberst, golden, ↺ statt ×, beim Laden
+      der Seite frisch; eine Kopie heisst wie ein neuer Eintrag.
+- [ ] Schneller Start und offline: den Kern sofort starten, die Quellen
+      als ein Paket, `modulepreload`, Service Worker und Manifest. Vorher
+      und nachher messen.
+- [ ] MCP-Server `python3 -m opencivil.mcp`, nur Standardbibliothek, über
+      `dienst.bearbeite`; ohne Ausführen von Skripten.
+- [ ] App «Erdbeben», Ersatzkraftverfahren nach SIA 261:2020, 16.5.2:
+      Geschosse mit G_k, Q_k und ψ₂; Wände aus Querschnittsanalysen mit
+      EI = κ·E_cm·I (κ vorgegeben 0,5); T₁ = 2·√u (40); F_d und F_di (41),
+      (42); Anteile je Wand nach EI; (39) als Urteil.
+- [ ] Tests: elf triviale löschen (Liste im Plan); `unittest.main()` in
+      neun Dateien ans Ende; `test_schnittstelle` mit `setUpClass`; zwei
+      gleiche Prüfungen in `test_decke_projekt` zusammenlegen.
+- Danach die Umbauten 5, 3, 4 und 8 der Durchsicht vom 2026-11-19.
+
 ## Offen
 
 

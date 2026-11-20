@@ -7,6 +7,16 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Zulage liegt auf einer eigenen Zeile
+
+Der Knopf «ungünstig/günstig» einer Lage stand am Ende der Zeile der
+Zulage, in einer Spalte, die schmaler war als er -- er ragte über «mm».
+Jetzt steht er unter den beiden Posten, als Schalter «ungünstig | günstig»
+wie jeder andere, je Stellung mit dem Bild der zwei Stäbe im Schnitt; der
+Titel einer Stellung sagt, welche Kante bündig liegt. Auf der eigenen Zeile
+hat das Paar den Platz, den es am 2026-11-19 neben den Zahlen nicht hatte
+(Benutzer, 2026-11-20). Die Zeile der Posten hat damit eine Spalte weniger.
+
 ## 2026-11-20 · Die Bilder nehmen ihre Einheiten aus den Daten
 
 Drei Bilder schrieben Zeichen und Einheiten selbst: die Verläufe des Pfahls

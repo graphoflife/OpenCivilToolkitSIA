@@ -13,8 +13,7 @@
  * zusammen mit dem des Materials.
  */
 
-import { feld, namensfeld, panel, zweiSchalter } from './bausteine.js';
-import { sinnbild } from './sinnbilder.js';
+import { feld, namensfeld, panel, wahlSchalter, zweiSchalter } from './bausteine.js';
 import { auswahl, el, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
@@ -30,15 +29,14 @@ import { eintragAendern, feldangabe, katalog, materialien } from './zustand.js';
  *
  * Die Einheit ist zugleich der Umschalter: «mm» heisst Teilung, «Stk»
  * Stabzahl -- das Trennzeichen wechselt mit (`@` bzw. `×`). Ein eigener Knopf
- * dafür kostete jede Zeile eine Spalte. `ende` steht ganz rechts: bei der
- * Grundbewehrung der Stahl, bei der Zulage die Lage der Stäbe zueinander.
+ * dafür kostete jede Zeile eine Spalte.
  *
  * Das × vorne setzt den Durchmesser auf null und nimmt den Posten damit heraus.
  * Es ist nur rot, solange es etwas zu entfernen gibt; bei leerem Posten bleibt
  * es blass, statt ganz zu verschwinden -- sonst rutschte die Zeile bei jeder
  * Eingabe um seine Breite.
  */
-function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
+function postenZeile(querschnitt, nummer, welcher, beschriftung) {
   const posten = querschnitt.lagen[nummer - 1][welcher];
   const ueberAbstand = posten.art === 'teilung';
   const leer = !(posten.durchmesser > 0);
@@ -76,7 +74,6 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
     einheitsSchalter(ueberAbstand, 'je b', () => aendern((x) => {
       x.art = ueberAbstand ? 'anzahl' : 'teilung';
     })),
-    ende || el('span'),
   ]);
 }
 
@@ -102,25 +99,27 @@ function lagenBlock(querschnitt, nummer) {
   const partner = partnerVon(nummer);
   const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
 
-  // Zwei Zeilen je Lage, Grund und Zulage. Was die Lage selbst angeht, steht
-  // am Rand: links Nummer und Richtung, rechts die Lage der Stäbe
-  // zueinander. Der Stahl gilt für alle Lagen und steht oben bei der Platte
-  // (Benutzer, 2026-10-24).
+  // Zwei Zeilen je Lage, Grund und Zulage, links Nummer und Richtung;
+  // darunter, wo es zwei Posten gibt, ihre Lage zueinander. Der Stahl gilt
+  // für alle Lagen und steht oben bei der Platte (Benutzer, 2026-10-24).
   return el('div.lage', { class: `lage-${richtung} ${leer ? 'ist-leer' : ''}` }, [
     el('div.lage-kopf', {}, [
       el('span.lage-name', { text: `${nummer}. Lage` }),
       richtungsSchalter(querschnitt, nummer, richtung, partner),
     ]),
     postenZeile(querschnitt, nummer, 'grund', 'Grund'),
-    postenZeile(querschnitt, nummer, 'zulage', 'Zulage', lageSchalter(querschnitt, nummer, lage)),
+    postenZeile(querschnitt, nummer, 'zulage', 'Zulage'),
+    lageSchalter(querschnitt, nummer, lage),
   ]);
 }
 
 /**
- * Die Lage von Grundbewehrung und Zulage zueinander: ein Knopf, der zeigt,
- * was gilt, und umschaltet. Als Paar «ungünstig | günstig» war er breiter
- * als die Zahlen der Zeile. Sein Bild zeigt die zwei Stäbe im Schnitt, an
- * welcher Kante sie bündig liegen (Benutzer, 2026-11-19).
+ * Die Lage von Grundbewehrung und Zulage zueinander, auf einer eigenen Zeile
+ * unter den Posten: ein Schalter «ungünstig | günstig» wie jeder andere, je
+ * Stellung mit dem Bild der zwei Stäbe im Schnitt, an welcher Kante sie
+ * bündig liegen (Benutzer, 2026-11-20). Bis dahin ein einzelner Knopf am
+ * Ende der Zeile der Zulage -- er war breiter als seine Spalte und ragte
+ * über «mm».
  *
  * Nur sichtbar, wenn die Lage überhaupt zwei Posten hat -- bei einer einzelnen
  * Bewehrung gibt es nichts zueinander zu legen.
@@ -128,25 +127,25 @@ function lagenBlock(querschnitt, nummer) {
 function lageSchalter(querschnitt, nummer, lage) {
   if (!(lage.grund?.durchmesser > 0 && lage.zulage?.durchmesser > 0)) return null;
 
-  const setzen = (unguenstig) => eintragAendern(querschnitt.kennung, (q) => {
-    q.lagen[nummer - 1].unguenstig = unguenstig;
-  });
-  const ist = lage.unguenstig !== false;
-  const untere = nummer <= 2;
-
-  const bild = untere
-    ? (ist ? 'zulage-unten-unguenstig' : 'zulage-unten-guenstig')
-    : (ist ? 'zulage-oben-unguenstig' : 'zulage-oben-guenstig');
-  return el('button.gunst-knopf', {
-    class: ist ? '' : 'ist-guenstig',
-    title: (untere
-      ? 'Ungünstig: gleiche Oberkante, der dünnere Stab rückt nach oben. '
-        + 'Günstig: gleiche Unterkante, jeder um seinen Halbmesser eingerückt.'
-      : 'Ungünstig: gleiche Unterkante, der dünnere Stab rückt nach unten. '
-        + 'Günstig: gleiche Oberkante, jeder um seinen Halbmesser eingerückt.')
-      + ' Klicken schaltet um.',
-    on: { click: () => setzen(!ist) },
-  }, [sinnbild(bild), ist ? 'ungünstig' : 'günstig']);
+  const seite = nummer <= 2 ? 'unten' : 'oben';
+  const gegen = nummer <= 2 ? 'oben' : 'unten';
+  const kante = { unten: 'Unterkante', oben: 'Oberkante' };
+  return el('div.gunstzeile', {}, [
+    el('span.gunstzeile-titel', { text: 'Zulage zur Grundbewehrung' }),
+    wahlSchalter({
+      werte: [
+        { wert: true, beschriftung: 'ungünstig', zeichen: `zulage-${seite}-unguenstig`,
+          titel: `Gleiche ${kante[gegen]}, der dünnere Stab rückt nach ${gegen}` },
+        { wert: false, beschriftung: 'günstig', zeichen: `zulage-${seite}-guenstig`,
+          titel: `Gleiche ${kante[seite]}, jeder um seinen Halbmesser eingerückt` },
+      ],
+      gewaehlt: lage.unguenstig !== false,
+      setzen: (unguenstig) => eintragAendern(querschnitt.kennung, (q) => {
+        q.lagen[nummer - 1].unguenstig = unguenstig;
+      }),
+      titel: 'Wie Grund und Zulage dieser Lage zueinander liegen',
+    }),
+  ]);
 }
 
 /** Zweistellungs-Schalter x|y. Die Partnerlage folgt zwingend der Gegenrichtung. */
@@ -215,7 +214,6 @@ function querkraftBlock(querschnitt) {
         beiAenderung: (v) => aendern((x) => { x.abstand_x = v; }),
       }),
       el('span.einheit', { text: 'mm' }),
-      el('span'),
     ]),
     el('div.postenzeile', { class: leer ? 'ist-leer' : '' }, [
       el('span'),
@@ -237,7 +235,6 @@ function querkraftBlock(querschnitt) {
       einheitsSchalter(ueberAbstand, 'je b', () => aendern((x) => {
         x.art_y = ueberAbstand ? 'anzahl' : 'teilung';
       })),
-      el('span'),
     ]),
   ]);
 }

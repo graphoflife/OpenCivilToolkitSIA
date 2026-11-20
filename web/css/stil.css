@@ -535,9 +535,9 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .kennwert .einheit { font-size: 11.5px; color: var(--schrift-zart); }
 
 /* Lagen -- knapp: eine Lage ist so hoch wie ihre zwei Posten, Grund und
-   Zulage. Nummer und Richtung stehen links daneben, der Stahl und die Lage
-   der Stäbe zueinander rechts in den Zeilen. Vorher trug jede Lage eine
-   eigene Kopfzeile, und vier Lagen brauchten zwölf Zeilen statt acht. */
+   Zulage. Nummer und Richtung stehen links daneben, die Lage der Stäbe
+   zueinander auf einer Zeile darunter. Vorher trug jede Lage eine eigene
+   Kopfzeile, und vier Lagen brauchten zwölf Zeilen statt acht. */
 .lage {
   display: grid; grid-template-columns: 52px minmax(0, 1fr);
   column-gap: 8px; row-gap: 2px; align-items: center;
@@ -546,6 +546,11 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 }
 .lage > .postenzeile { margin-top: 0; }
 .lage > .neigungszeile { grid-column: 1 / -1; }
+/* Unter den Zahlen -- in der letzten Spalte, auch wenn der Kopf am Telefon
+   über den Zeilen steht und es nur eine gibt. */
+.lage > .gunstzeile { grid-column: -2 / -1; }
+.gunstzeile { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 2px; }
+.gunstzeile-titel { font-size: 11.5px; color: var(--schrift-matt); }
 .lage-x { border-left-color: var(--richtung-x); }
 .lage-y { border-left-color: var(--richtung-y); }
 /* Die Bügel tragen quer zu beiden Tragrichtungen -- also weder grün noch
@@ -610,16 +615,14 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .wahlblock > .schalter { flex-wrap: wrap; max-width: 100%; }
 .wahlblock-titel { font-size: 13px; }
 
-/* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm [Stahl oder Lage]. Die
-   Zahlenfelder sind knapp -- ein Durchmesser oder eine Teilung braucht
-   drei Ziffern. Rechts steht, was zur Lage gehört, bündig am Rand. */
+/* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm. Die Zahlenfelder sind
+   knapp -- ein Durchmesser oder eine Teilung braucht drei Ziffern. */
 .postenzeile {
   display: grid;
-  grid-template-columns: 16px 40px 10px var(--zahlbreite-knapp) 12px var(--zahlbreite-knapp) 28px minmax(0, 1fr);
+  grid-template-columns: 16px 40px 10px var(--zahlbreite-knapp) 12px var(--zahlbreite-knapp) 28px;
   gap: 4px; align-items: center; margin-top: 3px;
 }
 .postenzeile .zahlfeld { width: var(--zahlbreite-knapp); }
-.postenzeile > :nth-child(8) { justify-self: end; }
 .postenzeile.ist-leer { opacity: .55; }
 
 /* Nimmt den Posten heraus, indem es den Durchmesser auf null setzt. Ein runder
@@ -700,21 +703,6 @@ dialog.materialwahl .fenster-kopf { top: 0; }
   font-size: 11px; color: var(--blau-tief); border-bottom: 1px dashed var(--eingabe-rand);
 }
 .einheit-knopf:hover { color: var(--blau); border-bottom-style: solid; }
-
-/* Die Lage von Grund und Zulage zueinander: ein Knopf, der zeigt, was gilt.
-   Im Blau der gewöhnlichen Schalter -- es geht um die Höhenlage innerhalb
-   einer Lage, nicht um die Tragrichtung. */
-.gunst-knopf {
-  min-height: 28px; padding: 0 9px; font-size: 10.5px; font-weight: 700; cursor: pointer;
-  border: 1px solid var(--eingabe-rand); border-radius: 7px;
-  background: var(--flaeche); color: var(--schrift-matt);
-}
-.gunst-knopf { display: inline-flex; align-items: center; gap: 4px; }
-.gunst-knopf > .sinnbild { width: 16px; height: 16px; flex: none; }
-.gunst-knopf:hover { background: var(--blau-hell); }
-.gunst-knopf.ist-guenstig { background: var(--blau); border-color: var(--blau); color: #fff; }
-
-/* Der Stahl einer Seite, klein am Ende der Zeile der Grundbewehrung. */
 
 .neigungszeile {
   display: flex; align-items: center; gap: 6px; margin-top: 4px;
@@ -1455,12 +1443,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   }
   /* Die Halbschalter stehen paarweise in engen Zeilen -- ihnen genügt die
      Höhe. Eine Mindestbreite schob die Lagenzeile über den Rand hinaus. */
-  .schalter, .gunst-knopf { min-height: 34px; }
+  .schalter { min-height: 34px; }
   /* Der Löschknopf einer Postenzeile ist hier 34 px gross; seine Spalte
      wächst mit, sonst läge er über dem Namen. */
   .postenzeile {
     grid-template-columns: 34px 40px 10px var(--zahlbreite-knapp) 12px
-                           var(--zahlbreite-knapp) 28px minmax(0, 1fr);
+                           var(--zahlbreite-knapp) 28px;
   }
   .erklaerung-zeichen {
     width: 34px; height: 34px; line-height: 34px; font-size: 14px;
