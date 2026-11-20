@@ -1,5 +1,5 @@
 ---
-erzeugt: ddd923a566be
+erzeugt: 5c94bf3e2f37
 art: modul
 tags: [modul]
 ---
@@ -44,8 +44,8 @@ class GrundrissknotenEintrag(Beschreibung)
 Ein Knoten im Grundriss, in mm, die Achse der Stütze im Ursprung.
 
 - `kennung: str = ''`
-- `x: float = 0.0`
-- `y: float = 0.0`
+- `x: float = bereich(0.0, heisst='x', einheit=MM)`
+- `y: float = bereich(0.0, heisst='y', einheit=MM)`
 
 ### AussparungEintrag
 

@@ -75,8 +75,8 @@ class DeckenknotenEintrag(Beschreibung):
     """Ein Punkt des Grundrisses, in m."""
 
     kennung: str = ""
-    x: float = 0.0
-    y: float = 0.0
+    x: float = bereich(0.0, heisst="x", einheit=M)
+    y: float = bereich(0.0, heisst="y", einheit=M)
 
 
 @dataclass

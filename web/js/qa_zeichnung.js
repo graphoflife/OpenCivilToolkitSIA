@@ -62,17 +62,25 @@ import {
  * `rang`: welche Ecke ein Klick nimmt, wo mehrere aufeinander liegen und
  * keines ihrer Elemente gewählt ist -- zuerst die Bewehrung, dann die
  * anderen Linien, zuletzt die Flächen; je Art die zuletzt gezeichnete.
+ *
+ * `klasse`: unter welchem Namen der Katalog Vorlage und Felder der Elemente
+ * führt (`ausVorlage`, `feldangabe`).
  */
 const ARTEN = [
-  { liste: 'flaechen', form: 'flaeche', vorsilbe: 'F', rang: 4 },
-  { liste: 'staebe', form: 'punkt', vorsilbe: 'S', rang: 1 },
+  { liste: 'flaechen', klasse: 'flaeche', form: 'flaeche', vorsilbe: 'F', rang: 4 },
+  { liste: 'staebe', klasse: 'stab', form: 'punkt', vorsilbe: 'S', rang: 1 },
   {
-    liste: 'stablinien', form: 'linie', vorsilbe: 'L', rang: 0, teilbar: false,
+    liste: 'stablinien', klasse: 'stablinie', form: 'linie', vorsilbe: 'L', rang: 0, teilbar: false,
     umkehren: (e) => { [e.starteisen, e.endeisen] = [e.endeisen, e.starteisen]; },
   },
-  { liste: 'schubwaende', form: 'linie', vorsilbe: 'L', rang: 2 },
-  { liste: 'hilfslinien', form: 'linie', vorsilbe: 'L', rang: 3 },
+  { liste: 'schubwaende', klasse: 'schubwand', form: 'linie', vorsilbe: 'L', rang: 2 },
+  { liste: 'hilfslinien', klasse: 'hilfslinie', form: 'linie', vorsilbe: 'L', rang: 3 },
 ];
+
+/** Unter welchem Namen der Katalog die Elemente einer Liste führt. */
+function klasseVon(liste) {
+  return ARTEN.find((x) => x.liste === liste).klasse;
+}
 
 /** Die Listen, deren Elemente Linien sind -- sie haben Anfang und Ende. */
 const LINIENLISTEN = ARTEN.filter((x) => x.form === 'linie').map((x) => x.liste);
@@ -154,14 +162,14 @@ export function passendeGeometrie(a) {
 function vorgabenNeu() {
   const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
-  const mit = (art, felder = {}) => ausVorlage(art, felder);
+  const mit = (liste, felder = {}) => ausVorlage(klasseVon(liste), felder);
   return {
     bewehrung: 'linie',
-    staebe: mit('stab', { stahl: stahl?.kennung || '' }),
-    stablinien: mit('stablinie', { stahl: stahl?.kennung || '' }),
-    schubwaende: mit('schubwand', { stahl: stahl?.kennung || '' }),
-    hilfslinien: mit('hilfslinie'),
-    flaechen: mit('flaeche', { material: beton?.kennung || '' }),
+    staebe: mit('staebe', { stahl: stahl?.kennung || '' }),
+    stablinien: mit('stablinien', { stahl: stahl?.kennung || '' }),
+    schubwaende: mit('schubwaende', { stahl: stahl?.kennung || '' }),
+    hilfslinien: mit('hilfslinien'),
+    flaechen: mit('flaechen', { material: beton?.kennung || '' }),
   };
 }
 
@@ -555,12 +563,13 @@ function linienVorschau(a, g, p, q, werkzeug) {
  * `setzen(feld, wert)` schreibt -- beim gewählten Element ins Projekt, bei
  * der Vorgabe in die Ansicht. `info` ist, was der Kern zu einer gewählten
  * Linie weiss: ihre Stahlfläche steht grau unter den Stäben, aus denen sie
- * kommt -- gerechnet wird sie dort, nicht hier.
+ * kommt -- gerechnet wird sie dort, nicht hier. Die Grenzen jeder Zahl
+ * kommen aus dem Kern.
  */
 function felderVon(liste, werte, setzen, info = null) {
   const durchmesser = katalog('durchmesser');
   const zahl = (feld, titel, optionen = {}) => zahlfeldMitVar({
-    wert: werte[feld], titel, schritt: 1, min: 0, ...optionen,
+    wert: werte[feld], titel, schritt: 1, angabe: feldangabe(klasseVon(liste), feld), ...optionen,
     beiAenderung: (w) => setzen(feld, w),
   });
   const stahl = () => cadZeile('Stahl', materialliste({
@@ -610,10 +619,10 @@ function felderVon(liste, werte, setzen, info = null) {
       artWahl,
       verschmierung,
       art === 'flaeche' && !ausStaeben ? cadZeile('A_s', zahl('flaeche', 'Stahlfläche der ganzen Linie', { schritt: 100 }), 'mm²') : null,
-      art === 'anzahl' ? cadZeile('n', zahl('anzahl', 'Anzahl Stäbe', { min: 1 })) : null,
-      art === 'teilung' ? cadZeile('s', zahl('teilung', 'Gewünschte Teilung', { schritt: 25, min: 1 }), 'mm') : null,
+      art === 'anzahl' ? cadZeile('n', zahl('anzahl', 'Anzahl Stäbe')) : null,
+      art === 'teilung' ? cadZeile('s', zahl('teilung', 'Gewünschte Teilung', { schritt: 25 }), 'mm') : null,
       art !== 'flaeche' || ausStaeben ? cadZeile('⌀', zahl('durchmesser', 'Stabdurchmesser', { stufen: durchmesser }), 'mm') : null,
-      ausStaeben ? cadZeile('s', zahl('teilung', 'Abstand der Stäbe', { schritt: 25, min: 1 }), 'mm') : null,
+      ausStaeben ? cadZeile('s', zahl('teilung', 'Abstand der Stäbe', { schritt: 25 }), 'mm') : null,
       ausStaeben ? cadZeile('L', zahl('laenge', 'Länge, über die die Stäbe liegen – leer: die der Linie', {
         schritt: 100, leer: null, platzhalter: 'Linie',
       }), 'mm') : null,
@@ -631,11 +640,11 @@ function felderVon(liste, werte, setzen, info = null) {
   if (liste === 'schubwaende') {
     const schnitte = katalog('querschnittsanalyse', 'schnitte');
     return [
-      cadZeile('b_w', zahl('dicke', 'Dicke der Schubwand', { schritt: 10, min: 1 }), 'mm'),
+      cadZeile('b_w', zahl('dicke', 'Dicke der Schubwand', { schritt: 10 }), 'mm'),
       cadZeile('Bügel ⌀', zahl('durchmesser', 'Bügeldurchmesser; 0: ohne Bügel', { stufen: durchmesser }), 'mm'),
-      cadZeile('s', zahl('teilung', 'Bügelteilung in Längsrichtung', { schritt: 25, min: 1 }), 'mm'),
+      cadZeile('s', zahl('teilung', 'Bügelteilung in Längsrichtung', { schritt: 25 }), 'mm'),
       cadZeile('Schnitte', zahl('schnitte', 'Wie viele Bügelschenkel die Wand kreuzen', {
-        min: schnitte[0], max: schnitte.at(-1), angabe: { ganz: true },
+        min: schnitte[0], max: schnitte.at(-1),
       })),
       stahl(),
     ];
@@ -648,7 +657,7 @@ function felderVon(liste, werte, setzen, info = null) {
       })),
       cadZeile('c', zahl('ueberdeckung', 'Überdeckung c: das Polygon erscheint so weit nach innen gerückt '
         + '– eine Aussparung nach aussen –, mit Ecken zum Fangen. 0: nicht. Rechnet nicht mit.', {
-        schritt: 5, angabe: feldangabe('flaeche', 'ueberdeckung'),
+        schritt: 5,
       }), 'mm'),
     ];
   }

@@ -65,8 +65,12 @@ class TestKatalogpfade(unittest.TestCase):
                 self.nachschlagen(pfad)
 
     def test_feldangaben_und_vorlagen(self):
-        """Die Art als festes Argument -- dazu die Vorlagen, die ein Ort nennt (`vorlage: '…'`)."""
+        """
+        Die Art als festes Argument -- dazu die Klassen und Vorlagen, die eine
+        Tabelle nennt (`klasse: '…'`, `vorlage: '…'`).
+        """
         for muster, wurzel in ((r"(?<![.\w])feldangabe\(\s*'(\w+)'", "felder"),
+                               (r"\bklasse: '(\w+)'", "felder"),
                                (r"(?<![.\w])ausVorlage\(\s*'(\w+)'", "vorlagen"),
                                (r"\bvorlage: '(\w+)'", "vorlagen")):
             arten = {(pfad.name, m.group(1))

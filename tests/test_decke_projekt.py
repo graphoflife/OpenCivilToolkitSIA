@@ -108,7 +108,7 @@ class TestBeschreibung(unittest.TestCase):
         """
         p = zwei_felder()
         p.decken[0].zone([(0, 0), (1, 0), (1, 1)], anteil=120.0)
-        self.assertIn("zonen 2: Anteil in Richtung 1 muss mindestens null und höchstens 100 % "
+        self.assertIn("Z2: Anteil in Richtung 1 muss mindestens null und höchstens 100 % "
                       "sein, angegeben ist 120 %", meldung(p))
 
 

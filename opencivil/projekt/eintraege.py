@@ -19,7 +19,9 @@ import math
 from dataclasses import KW_ONLY, asdict, dataclass, field, fields
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
-from opencivil.core.einheiten import GRAD, KN, KNM, M, MM, MM2, PROMILLE, PROZENT, Groesse
+from opencivil.core.einheiten import (
+    GRAD, KN, KN_PRO_M, KNM, M, MM, MM2, PROMILLE, PROZENT, Groesse,
+)
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -80,7 +82,8 @@ class Beschreibung:
     vorbei: ein «festt» aus Python wurde still zur Feder (2026-10-16).
 
     ``BEZEICHNUNG``, wo es sie gibt, nennt den Eintrag in Meldungen so wie
-    die Oberflaeche: «Platte 'Decke'».
+    die Oberflaeche: «Platte 'Decke'». ``IM_ORT`` nennt ein Element einer
+    Liste ohne Namen mit seiner Nummer, wie die Maske: «Lage 2».
 
     Ein Wahlfeld haelt das Mitglied seiner Wahl; wer Text zuweist -- die
     Datei, der Konstruktor, die Fassade --, bekommt hier das Mitglied
@@ -292,10 +295,15 @@ class PostenEintrag(Beschreibung):
     durchmesser: float = bereich(0.0, heisst="Durchmesser", einheit=MM, ab=0.0)
     """in mm; 0 bedeutet: nicht vorhanden."""
 
-    abstand: float = 150.0
-    """Teilung in mm -- bei Art «Teilung»."""
+    abstand: float = bereich(150.0, heisst="Teilung", einheit=MM, ueber=0.0)
+    """
+    Teilung in mm -- bei Art «Teilung». Null weist schon das Feld ab, auch
+    ohne Durchmesser: bis 2026-10-16 hiess eine Teilung von null still «kein
+    Stab», bis 2026-11-20 nahm das Feld sie an, und erst die ganze Platte
+    rechnete nicht.
+    """
 
-    anzahl: float = 5.0
+    anzahl: float = bereich(5.0, heisst="Stabzahl", ueber=0.0)
     """Stabzahl auf der Breite b -- bei Art «Anzahl»."""
 
     art: Linienart = einer_von(MENGEN, Linienart.TEILUNG)
@@ -307,28 +315,13 @@ class PostenEintrag(Beschreibung):
 
     @property
     def vorhanden(self) -> bool:
-        return self.durchmesser > 0 and (self.abstand if self.ueber_abstand else self.anzahl) > 0
-
-    def regeln(self, wo: str) -> None:
-        """
-        Ein Posten mit Durchmesser braucht eine Teilung oder eine Stabzahl
-        groesser als null -- die, die gilt. Bis 2026-10-16 hiess eine Teilung
-        von null still «kein Stab»: die Maske zeigte ⌀16, gerechnet wurde
-        ohne. Ohne Durchmesser ist der Posten leer, was sonst auch dasteht.
-        """
-        if self.durchmesser == 0.0:
-            return
-        if self.ueber_abstand and self.abstand <= 0.0:
-            raise ProjektFehler(f"die Teilung muss grösser als null sein, "
-                                f"angegeben sind {self.abstand:g} mm.", wo=wo)
-        if not self.ueber_abstand and self.anzahl <= 0.0:
-            raise ProjektFehler(f"⌀{self.durchmesser:g} braucht eine Stabzahl grösser "
-                                f"als null, angegeben sind {self.anzahl:g}.", wo=wo)
+        """Ob Staebe liegen -- das sagt der Durchmesser; Teilung und Stabzahl sind nie null."""
+        return self.durchmesser > 0
 
     def als_posten(self) -> Bewehrungsposten:
         return Bewehrungsposten(
-            durchmesser=Groesse(self.durchmesser, MM),
-            abstand=Groesse(self.abstand, MM) if self.ueber_abstand else None,
+            durchmesser=als_groesse(self, "durchmesser"),
+            abstand=als_groesse(self, "abstand") if self.ueber_abstand else None,
             anzahl=None if self.ueber_abstand else self.anzahl,
         )
 
@@ -343,6 +336,8 @@ class PostenEintrag(Beschreibung):
 @dataclass
 class LageEintrag(Beschreibung):
     """Eine der vier Lagen -- ihr Stahl ist der der Platte."""
+
+    IM_ORT = "Lage"
 
     grund: PostenEintrag = field(default_factory=PostenEintrag)
     zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))
@@ -393,9 +388,14 @@ class QuerkraftbewehrungEintrag(Beschreibung):
     durchmesser: float = bereich(0.0, heisst="Bügeldurchmesser", einheit=MM, ab=0.0)
     """in mm; 0 bedeutet: keine Querkraftbewehrung."""
 
-    abstand_x: float = 200.0
-    abstand_y: float = 200.0
-    anzahl_y: float = 5.0
+    abstand_x: float = bereich(200.0, heisst="Bügelteilung in x", einheit=MM, ueber=0.0)
+    abstand_y: float = bereich(200.0, heisst="Bügelteilung in y", einheit=MM, ueber=0.0)
+    anzahl_y: float = bereich(5.0, heisst="Bügelzahl in y", ueber=0.0)
+    """
+    Teilungen und Stabzahl weist schon ihr Feld ab, wenn sie nicht ueber
+    null liegen, auch ohne Buegel -- bis 2026-11-20 erst die ganze Platte.
+    """
+
     art_y: Linienart = einer_von(MENGEN, Linienart.TEILUNG)
     alpha_min: int = kleinste_neigung()
     alpha_max: int = groesste_neigung()
@@ -404,8 +404,7 @@ class QuerkraftbewehrungEintrag(Beschreibung):
     def vorhanden(self) -> bool:
         """
         Ob Buegel liegen -- das sagt allein der Durchmesser. Eine Teilung von
-        null heisst nicht «keine Buegel», sondern ist ein Fehler, und
-        :meth:`regeln` sagt es.
+        null heisst nicht «keine Buegel»: ihr Feld weist sie ab.
         """
         return self.durchmesser > 0
 
@@ -414,30 +413,14 @@ class QuerkraftbewehrungEintrag(Beschreibung):
         """In y eine Teilung -- sonst eine Stabzahl."""
         return self.art_y is Linienart.TEILUNG
 
-    def regeln(self, wo: str) -> None:
-        """Was nicht stimmen kann, soll als Satz beim Benutzer ankommen."""
-        if not self.vorhanden:
-            return
-        if self.abstand_x <= 0:
-            raise ProjektFehler(
-                f"die Bügelteilung in x muss grösser als null sein, "
-                f"angegeben ist {self.abstand_x:g} mm.", wo=wo)
-        if self.ueber_teilung_y and self.abstand_y <= 0:
-            raise ProjektFehler(
-                f"die Bügelteilung in y muss grösser als null sein, "
-                f"angegeben ist {self.abstand_y:g} mm.", wo=wo)
-        if not self.ueber_teilung_y and self.anzahl_y <= 0:
-            raise ProjektFehler(
-                f"die Bügelzahl in y muss grösser als null sein, "
-                f"angegeben ist {self.anzahl_y:g}.", wo=wo)
-
     def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung:
-        """Die Buegel fuer den Querschnitt -- erst nach :meth:`regeln`."""
+        """Die Buegel fuer den Querschnitt."""
+        g = functools.partial(als_groesse, self)
         return Querkraftbewehrung(
-            durchmesser=Groesse(self.durchmesser, MM),
+            durchmesser=g("durchmesser"),
             stahl=stahl,
-            abstand_x=Groesse(self.abstand_x, MM),
-            abstand_y=Groesse(self.abstand_y, MM) if self.ueber_teilung_y else None,
+            abstand_x=g("abstand_x"),
+            abstand_y=g("abstand_y") if self.ueber_teilung_y else None,
             anzahl_y=None if self.ueber_teilung_y else self.anzahl_y,
             alpha_min=self.alpha_min,
             alpha_max=self.alpha_max,
@@ -454,10 +437,10 @@ class KnickEintrag(Beschreibung):
     """
 
     name: str
-    N_Ed: float = 0.0
-    """in kN, Druck negativ."""
+    N_Ed: float = bereich(0.0, heisst="Normalkraft N_Ed", einheit=KN)
+    """Druck negativ."""
 
-    M_Ed_1: float = 0.0
+    M_Ed_1: float = bereich(0.0, heisst="Moment 1. Ordnung M_Ed,1", einheit=KNM)
     laenge: float = bereich(3.0, heisst="Höhe des Druckglieds", einheit=M, ueber=0.0)
     """
     Hoehe des Druckglieds in m, bei mehreren uebereinander ihre ganze Hoehe
@@ -611,8 +594,8 @@ class GebrauchsfallEintrag(Beschreibung):
     """
 
     name: str
-    M_Ed: float = 0.0
-    N_Ed: float = 0.0
+    M_Ed: float = bereich(0.0, heisst="Moment M_Ed", einheit=KNM)
+    N_Ed: float = bereich(0.0, heisst="Normalkraft N_Ed", einheit=KN)
     aktiv: bool = True
     """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
 
@@ -848,10 +831,10 @@ class KombinationEintrag(Beschreibung):
     """Eine zu pruefende Schnittgroessenkombination."""
 
     name: str
-    M_Ed: float = 0.0
-    N_Ed: float = 0.0
-    V_Ed: float = 0.0
-    """Querkraft in kN/m -- für den Querkraftnachweis."""
+    M_Ed: float = bereich(0.0, heisst="Moment M_Ed", einheit=KNM)
+    N_Ed: float = bereich(0.0, heisst="Normalkraft N_Ed", einheit=KN)
+    V_Ed: float = bereich(0.0, heisst="Querkraft V_Ed", einheit=KN_PRO_M)
+    """Je Meter, nicht je Streifen b -- für den Querkraftnachweis."""
 
     art: Erfuellungsart = Erfuellungsart.AUTOMATISCH
 

@@ -345,14 +345,19 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
 - [ ] **2. Die Beschreibung eines Feldes steht nur halb im Katalog.**
       Wo ein Feld seinen `bereich` hat, ist der Katalog die eine Quelle für
       Einheit, Grenze und Satz. Daneben:
-      - 156 Zahlfelder mit Bereich, 70 ohne -- darunter Teilung und
-        Stabzahl der Posten, die Bügel, 14 Federn und Zahlen der Zeichnung.
-        Dort setzt das JS eigene `min: 25` und `min: 1`, die nur die Pfeile
-        bremsen; die Teilung 0 nimmt das Feld an, und erst die ganze Platte
-        wird unfertig. Umbau: `bereich(…)` an jedes Zahlfeld; es fallen
-        weg `PostenEintrag.regeln`, der Mengenteil von
-        `QuerkraftbewehrungEintrag.regeln`, beide `EINHEIT_DER_FEDER`,
-        `federeinheiten` und die `min` im JS.
+      - Erledigt (2026-11-20): jedes Zahlfeld hat seinen `bereich` oder ist
+        eine Wahl, `TestJedesZahlfeld` wacht darüber; die Masken nehmen die
+        Grenzen aus dem Katalog statt eigener `min`. Weg sind
+        `PostenEintrag.regeln`, `QuerkraftbewehrungEintrag.regeln`, beide
+        `EINHEIT_DER_FEDER` und `federeinheiten`; Platte, Knicken und
+        Querschnittsanalyse nehmen die Einheit vom Feld (`als_groesse`).
+        Ohne Einheit am Feld bleibt der Wert einer Last im Balkensystem:
+        seine hängt an der Art (`EINHEIT_DER_LAST`). Die Masse der Vorlagen
+        und die Kennwerte von Hand sind Zuordnungen, keine Felder – sie
+        gehören zum letzten Punkt hier. Die Prüfungen in `Zeichnung._stab`,
+        `_linie` und `_wand` bleiben: das Zeichenfenster liest die Elemente
+        ohne die Prüfung der Felder, und eine Teilung null teilte dort
+        durch null.
       - Vier Masken schreiben die Eingabetabellen des Kerns ab
         (`durchstanzen.js` `MASSE` und `ROTATION`, `grundbruch.js`,
         `setzung.js`, `pfahl.js`): Gruppen, Reihenfolge, Zeichen,
@@ -457,9 +462,11 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         `fehler.grund_bei(wo)`. Weg sind `ohne_ort` und das `Optional` der
         Baufunktionen; was dem Pfahl an Boden fehlt, steht bei seinen
         Regeln. Eine Querschnittsanalyse heisst in jeder Meldung so, nie mehr
-        «Querschnitt». Offen bleibt der Ort in den Worten der Maske – «Lage
-        2» statt «lagen 2» (offen seit 2026-10-16); das ist jetzt eine
-        Übersetzung von `wo`, kein Schnitt im Text.
+        «Querschnitt». Der Ort in den Worten der Maske, offen seit
+        2026-10-16, ist erledigt (2026-11-20): ein Element ohne Namen heisst
+        mit dem Wort seiner Klasse und seiner Nummer (`IM_ORT`: «Lage 2»,
+        «Linie 3»), sonst mit seiner Kennung («A1»). Feldnamen bleiben, wie
+        sie sind: «Lage 2, grund».
       - Erledigt (2026-11-20): der Stabquerschnitt hat je Art ein eigenes
         Feld – `masse`, `kennwerte`, `profil`, `platte`, `analyse` –, und
         umschalten ist `setzen('art')`. Nach dem Zurückschalten stehen die

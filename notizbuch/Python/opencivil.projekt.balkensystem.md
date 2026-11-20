@@ -1,5 +1,5 @@
 ---
-erzeugt: 163f96b942c1
+erzeugt: 2aaccce8c762
 art: modul
 tags: [modul]
 ---
@@ -57,6 +57,16 @@ zum Ende. Momente drehen im Gegenuhrzeigersinn ([[opencivil.stabwerk.modell]]).
 
 ## Inhalt
 
+### federfeld
+
+```python
+def federfeld(heisst: str, einheit: Einheit) -> Any
+```
+
+Das Feld einer Feder: Lager in kN/m und kNm/rad, Bettung in kN/m je m
+Stab -- nie negativ. Null nimmt das Feld an, frei heisst die Richtung
+damit nicht: eine Feder ohne Steifigkeit meldet das System.
+
 ### Profilachse
 
 ```python
@@ -104,8 +114,8 @@ class SystemknotenEintrag(Beschreibung)
 Ein Punkt des Systems, in m.
 
 - `kennung: str = ''`
-- `x: float = 0.0`
-- `z: float = 0.0`
+- `x: float = bereich(0.0, heisst='x', einheit=M)`
+- `z: float = bereich(0.0, heisst='z', einheit=M)`
 
 ### StablastEintrag
 
@@ -124,8 +134,8 @@ ihrem Anfang (Benutzer, 2026-10-23).
 - `lastfall: str = ''`
 - `art: Lastart = Lastart.LINIENLAST`
 - `richtung: Lastrichtung = Lastrichtung.SENKRECHT`
-- `wert_a: float = 10.0`
-- `wert_b: Optional[float] = None`
+- `wert_a: float = bereich(10.0, heisst='Wert am Anfang')`
+- `wert_b: Optional[float] = bereich(None, heisst='Wert am Ende')`
 - `stelle: float = bereich(50.0, heisst='Stelle', einheit=PROZENT, ab=0.0, bis=100.0)`
 - `projiziert: bool = False` – Senkrecht und waagrecht je Meter Projektion statt je Meter Stab.
 
@@ -154,9 +164,9 @@ oder ohne Stab, ein Linienlager quer und laengs.
 - `gelenk_anfang: bool = False`
 - `gelenk_ende: bool = False`
 - `quer: str = einer_von(HALT, 'frei')`
-- `k_quer: float = 0.0` – Bettung quer, kN/m².
+- `k_quer: float = federfeld('Bettung quer', KN_PRO_M2)`
 - `laengs: str = einer_von(HALT, 'frei')`
-- `k_laengs: float = 0.0`
+- `k_laengs: float = federfeld('Bettung längs', KN_PRO_M2)`
 - `lasten: List[StablastEintrag] = field(default_factory=list)`
 
 #### SystemlinieEintrag.stab
@@ -180,11 +190,11 @@ Ein Lager an einem Knoten: je Richtung frei, fest oder Feder.
 - `kennung: str = ''`
 - `knoten: str = ''`
 - `x: str = einer_von(HALT, 'fest')`
-- `k_x: float = 0.0` – kN/m.
+- `k_x: float = federfeld('Federsteifigkeit k_x', KN_PRO_M)`
 - `z: str = einer_von(HALT, 'fest')`
-- `k_z: float = 0.0`
+- `k_z: float = federfeld('Federsteifigkeit k_z', KN_PRO_M)`
 - `phi: str = einer_von(HALT, 'frei')`
-- `k_phi: float = 0.0` – kNm/rad.
+- `k_phi: float = federfeld('Federsteifigkeit k_φ', KNM_PRO_RAD)`
 
 ### KnotenlastEintrag
 
@@ -201,7 +211,7 @@ oder ein Moment. Ihre Kennung zaehlt mit denen der Stablasten (`P1`).
 - `lastfall: str = ''`
 - `art: str = einer_von(KNOTENLASTEN, 'kraft')`
 - `richtung: Lastrichtung = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT)`
-- `wert: float = 10.0` – kN oder kNm.
+- `wert: float = bereich(10.0, heisst='Wert')` – kN oder kNm, nach der Art; ohne Grenze wie jede Last.
 
 ### StabmaterialEintrag
 
@@ -278,7 +288,6 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 - `LAGERFELDER = ('x', 'z', 'phi')`
 - `LINIENLAGER = ('quer', 'laengs')`
 - `LAGERARTEN = LAGERARTEN`
-- `EINHEIT_DER_FEDER = EINHEIT_DER_FEDER`
 - `NEUE_DIAGRAMME = ('M', 'V', 'N')`
 - `LAUFRICHTUNGEN = ((1.0, 0.0), (0.0, -1.0))` – Nach rechts, steht sie senkrecht, nach unten: so liegt die gestrichelte Faser einer neuen Linie unten bzw. links (Benutzer, 2026-10-24). Wohin die Faser zeigt, legt der Kern ([[opencivil.stabwerk3d.stab#achsen_eben|achsen_eben]]); ein Test prueft beides zusammen.
 - `KNOTEN = SystemknotenEintrag`
@@ -313,7 +322,6 @@ Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke
 
 - `HALT = ('frei', 'fest', 'feder')` – Wie ein Lager oder Linienlager je Richtung haelt.
 - `EINHEIT_DER_LAST = {Lastart.LINIENLAST: KN_PRO_M, Lastart.EINZELLAST: KN, Lastart.MOMENT…` – Die Einheit jeder Last in der Beschreibung, nach ihrer Art -- an einem Stab oder Knoten. Umgerechnet wird beim Bauen, mit diesen.
-- `EINHEIT_DER_FEDER = {'k_x': KN_PRO_M, 'k_z': KN_PRO_M, 'k_phi': KNM_PRO_RAD, 'k_quer': KN…` – Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad, Bettung in kN/m je m Stab.
 - `KNOTENLASTEN = ('kraft', 'moment')` – Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede [[opencivil.stabwerk.modell#Lastart|Lastart]].
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `KENNWERTE = tuple((k.kurzname for k in EBEN))` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴ -- wie die Rechnung sie nimmt.

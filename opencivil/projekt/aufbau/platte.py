@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Mapping, Optional, Sequence
 
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, KN_PRO_M, M, MM, Groesse
+from opencivil.core.einheiten import KNM, KN_PRO_M, MM
 from opencivil.material.basis import Baustoff
 from opencivil.nachweis.biegung_normalkraft import BiegungNormalkraft, Schnittgroessen
 from opencivil.nachweis.duktilitaet import Duktilitaet
@@ -32,7 +32,7 @@ from opencivil.querschnitt.platte import (
     Bewehrungslage, Plattenquerschnitt, Richtung, stapelhoehe,
 )
 from opencivil.projekt.eintraege import KombinationEintrag, VerformungsfallEintrag
-from opencivil.projekt.lesen import ProjektFehler, ort_von
+from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von
 from opencivil.projekt.platte import QuerschnittEintrag
 
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, knickfall, material, spannungsnachweise
@@ -98,8 +98,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, aufbau, teil)
         spannungsnachweise(
             eintrag, PlattenStellen(querschnitt, richtung), eintrag.kombinationen,
-            lambda name, k, faktor: Gebrauchsfall(name=name, M_Ed=Groesse(faktor * k.M_Ed, KNM),
-                                                   N_Ed=Groesse(faktor * k.N_Ed, KN)),
+            lambda name, k, faktor: Gebrauchsfall(name=name, M_Ed=faktor * als_groesse(k, "M_Ed"),
+                                                   N_Ed=faktor * als_groesse(k, "N_Ed")),
             praefix="", kennung=kennung_x, aufbau=aufbau, teil=teil)
 
         # Der Vergroesserungsfaktor gehoert der Platte, nicht einem Fall: er
@@ -117,10 +117,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
         ansatz = QuerkraftMitBuegeln if querschnitt.hat_buegel else QuerkraftOhneBuegel
         querkraft = ansatz(
             querschnitt,
-            [Querkraftfall(name=k.name,
-                           V_Ed=Groesse(k.V_Ed, KN_PRO_M),
-                           M_Ed=Groesse(k.M_Ed, KNM),
-                           N_Ed=Groesse(k.N_Ed, KN))
+            [Querkraftfall(name=k.name, **{f: als_groesse(k, f) for f in ("V_Ed", "M_Ed", "N_Ed")})
              for k in aktiv if k.V_Ed],
             richtung, nachweis)
         aufbau.eintragen(teil, "querkraft", kennung_x, querkraft)
@@ -241,25 +238,21 @@ def _querschnitt(
             f"die Dicke h = {eintrag.h:g} mm; die oberen und unteren Lagen kreuzten sich.", wo=wo)
 
     buegel = eintrag.querkraftbewehrung
+    # Jede Zahl in der Einheit ihres Feldes.
     return Plattenquerschnitt(
         name=eintrag.name,
-        h=Groesse(eintrag.h, MM),
-        b=Groesse(eintrag.b, MM),
         beton=beton_stoff,
         lagen=lagen,
-        ueberdeckung_unten=Groesse(eintrag.ueberdeckung_unten, MM),
-        ueberdeckung_oben=Groesse(eintrag.ueberdeckung_oben, MM),
-        d_max=Groesse(eintrag.d_max, MM),
-        einlagenhoehe=Groesse(eintrag.einlagenhoehe, MM),
-        k_c=Groesse(eintrag.k_c, EINHEITSLOS),
+        **{f: als_groesse(eintrag, f) for f in (
+            "h", "b", "ueberdeckung_unten", "ueberdeckung_oben", "d_max", "einlagenhoehe", "k_c")},
         querkraftbewehrung=buegel.als_bewehrung(stahl) if buegel.vorhanden else None,
         praefix=praefix,
     )
 
 
 def _verformungsfall(f: VerformungsfallEintrag) -> Verformungsfall:
-    """Ein Verformungsfall aus seiner Beschreibung -- w in mm, die Spannweite in m."""
-    return Verformungsfall(name=f.name, w=Groesse(f.w, MM), laenge=Groesse(f.laenge, M),
+    """Ein Verformungsfall aus seiner Beschreibung -- jede Zahl in der Einheit ihres Feldes."""
+    return Verformungsfall(name=f.name, w=als_groesse(f, "w"), laenge=als_groesse(f, "laenge"),
                            zugseite=f.zugseite)
 
 
@@ -285,14 +278,14 @@ def _ausgefallene(
             fall=k.name,
             symbol=f"M_{{Rd,{r}}}",
             einwirkung_symbol=f"M_{{Ed,{r}}}",
-            einwirkung=Groesse(k.M_Ed, KNM), einheit=KNM)
+            einwirkung=als_groesse(k, "M_Ed"), einheit=KNM)
         for k in kombinationen
     ] + [
         Ausgefallen(
             art="V", langname=Querkraft.THEMA, fall=k.name,
             symbol=f"V_{{Rd,{r}}}",
             einwirkung_symbol=f"V_{{Ed,{r}}}",
-            einwirkung=Groesse(abs(k.V_Ed), KN_PRO_M), einheit=KN_PRO_M)
+            einwirkung=abs(als_groesse(k, "V_Ed")), einheit=KN_PRO_M)
         for k in kombinationen if k.V_Ed
     ]
 
@@ -301,7 +294,7 @@ def _kombination(eintrag: KombinationEintrag) -> Schnittgroessen:
     """Eine Einwirkung -- welche Massstaebe es gibt, prueft ihr Feld."""
     return Schnittgroessen(
         name=eintrag.name,
-        M_Ed=Groesse(eintrag.M_Ed, KNM),
-        N_Ed=Groesse(eintrag.N_Ed, KN),
+        M_Ed=als_groesse(eintrag, "M_Ed"),
+        N_Ed=als_groesse(eintrag, "N_Ed"),
         art=eintrag.art,
     )

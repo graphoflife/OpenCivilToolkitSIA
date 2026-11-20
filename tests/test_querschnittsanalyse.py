@@ -69,7 +69,7 @@ class TestBeschreibung(unittest.TestCase):
         roh = self.neu().als_dict()
         roh["stablinien"][0]["art"] = "stueckweise"
         with self.assertRaisesRegex(ProjektFehler,
-                                    "Querschnittsanalyse 'Balken', stablinien 1: 'stueckweise' "
+                                    "Querschnittsanalyse 'Balken', Linie 1: 'stueckweise' "
                                     "gibt es als 'art' nicht"):
             QuerschnittsanalyseEintrag.aus_dict(roh)
         roh = self.neu().als_dict()
@@ -164,7 +164,7 @@ class TestKnoten(unittest.TestCase):
         """Bis 2026-10-08 trugen die Elemente ihre Punkte selbst -- das liest niemand mehr."""
         alt = {"kennung": "a1", "name": "Alt",
                "flaechen": [{"punkte": [[0, 0], [300, 0], [300, 600]], "material": "b1"}]}
-        with self.assertRaisesRegex(ProjektFehler, "flaechen 1: ein Feld 'punkte' gibt es nicht"):
+        with self.assertRaisesRegex(ProjektFehler, "Polygon 1: ein Feld 'punkte' gibt es nicht"):
             QuerschnittsanalyseEintrag.aus_dict(alt)
 
 
@@ -1051,14 +1051,17 @@ class TestVerschmierteStaebe(unittest.TestCase):
         self.assertEqual(self.flaeche(p), 999.0)
 
     def test_falsche_zahlen(self):
-        for felder, text in (({"teilung": 0.0}, "die Teilung"),
-                             ({"durchmesser": 0.0}, "der Durchmesser"),
-                             ({"laenge": -1.0}, "die Länge")):
+        """
+        Die Grenzen stehen an den Feldern; die Meldung nennt die Linie, wie
+        die Zeichnung sie nennt.
+        """
+        for felder, text in (({"teilung": 0.0}, "Teilung muss grösser als null sein"),
+                             ({"durchmesser": 0.0}, "Durchmesser muss grösser als null sein"),
+                             ({"laenge": -1.0}, "Länge muss grösser als null sein")):
             with self.subTest(felder=felder):
                 warnungen = self.projekt(**felder).rechnen().warnungen
                 # Die Vorlage hat zwei Linien -- diese ist die dritte.
-                self.assertTrue(any(f"Linie 3: {text} der verschmierten Stäbe" in w
-                                    for w in warnungen), warnungen)
+                self.assertTrue(any(f"Linie 3: {text}" in w for w in warnungen), warnungen)
 
     def test_herleitung(self):
         text = str(self.projekt().rechnen().bericht())

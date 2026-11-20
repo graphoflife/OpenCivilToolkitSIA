@@ -66,11 +66,11 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
     el('span.zeichen', { text: ueberAbstand ? '@' : '×' }),
     ueberAbstand
       ? zahlfeld({
-        wert: posten.abstand, schritt: 25, min: 25, titel: 'Teilung in mm',
+        wert: posten.abstand, schritt: 25, angabe: feldangabe('posten', 'abstand'), titel: 'Teilung in mm',
         beiAenderung: (v) => aendern((x) => { x.abstand = v; }),
       })
       : zahlfeld({
-        wert: posten.anzahl, schritt: 1, min: 1, titel: 'Stabzahl je b',
+        wert: posten.anzahl, schritt: 1, angabe: feldangabe('posten', 'anzahl'), titel: 'Stabzahl je b',
         beiAenderung: (v) => aendern((x) => { x.anzahl = v; }),
       }),
     einheitsSchalter(ueberAbstand, 'je b', () => aendern((x) => {
@@ -210,7 +210,7 @@ function querkraftBlock(querschnitt) {
       }),
       el('span.zeichen', { text: '@' }),
       zahlfeld({
-        wert: buegel.abstand_x, schritt: 25, min: 25,
+        wert: buegel.abstand_x, schritt: 25, angabe: feldangabe('querkraftbewehrung', 'abstand_x'),
         titel: 'Bügelteilung x in mm',
         beiAenderung: (v) => aendern((x) => { x.abstand_x = v; }),
       }),
@@ -225,12 +225,12 @@ function querkraftBlock(querschnitt) {
       el('span.zeichen', { text: ueberAbstand ? '@' : '×' }),
       ueberAbstand
         ? zahlfeld({
-          wert: buegel.abstand_y, schritt: 25, min: 25,
+          wert: buegel.abstand_y, schritt: 25, angabe: feldangabe('querkraftbewehrung', 'abstand_y'),
           titel: 'Bügelteilung y in mm',
           beiAenderung: (v) => aendern((x) => { x.abstand_y = v; }),
         })
         : zahlfeld({
-          wert: buegel.anzahl_y, schritt: 1, min: 1,
+          wert: buegel.anzahl_y, schritt: 1, angabe: feldangabe('querkraftbewehrung', 'anzahl_y'),
           titel: 'Bügelzahl je b',
           beiAenderung: (v) => aendern((x) => { x.anzahl_y = v; }),
         }),
@@ -286,7 +286,7 @@ export function plattenEditor(querschnitt) {
           beiAenderung: (v) => aendern((q) => { q.h = v; }),
         }), 'mm'),
         feld(['Breite ', span('b_x')], zahlfeld({
-          wert: querschnitt.b, schritt: 100, min: 10, angabe: feldangabe('querschnitt', 'b'),
+          wert: querschnitt.b, schritt: 100, angabe: feldangabe('querschnitt', 'b'),
           titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
           beiAenderung: (v) => aendern((q) => { q.b = v; }),
         }), 'mm'),

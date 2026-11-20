@@ -44,10 +44,11 @@ zum Ende. Momente drehen im Gegenuhrzeigersinn (:mod:`opencivil.stabwerk.modell`
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from opencivil.core.einheiten import (
-    KG_PRO_M3, KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, N_PRO_MM2, PROZENT,
+    KG_PRO_M3, KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, M, N_PRO_MM2, PROZENT,
+    Einheit,
 )
 from opencivil.core.wahl import Wahl
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
@@ -68,10 +69,14 @@ EINHEIT_DER_LAST = {
     Lastart.MOMENT: KNM, Lastart.LINIENMOMENT: KNM_PRO_M, "kraft": KN,
 }
 
-#: Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad,
-#: Bettung in kN/m je m Stab.
-EINHEIT_DER_FEDER = {"k_x": KN_PRO_M, "k_z": KN_PRO_M, "k_phi": KNM_PRO_RAD,
-                     "k_quer": KN_PRO_M2, "k_laengs": KN_PRO_M2}
+
+def federfeld(heisst: str, einheit: Einheit) -> Any:
+    """
+    Das Feld einer Feder: Lager in kN/m und kNm/rad, Bettung in kN/m je m
+    Stab -- nie negativ. Null nimmt das Feld an, frei heisst die Richtung
+    damit nicht: eine Feder ohne Steifigkeit meldet das System.
+    """
+    return bereich(0.0, heisst=heisst, einheit=einheit, ab=0.0)
 
 #: Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede :class:`Lastart`.
 KNOTENLASTEN = ("kraft", "moment")
@@ -137,8 +142,8 @@ class SystemknotenEintrag(Beschreibung):
     """Ein Punkt des Systems, in m."""
 
     kennung: str = ""
-    x: float = 0.0
-    z: float = 0.0
+    x: float = bereich(0.0, heisst="x", einheit=M)
+    z: float = bereich(0.0, heisst="z", einheit=M)
 
 
 @dataclass
@@ -155,8 +160,8 @@ class StablastEintrag(Beschreibung):
     lastfall: str = ""
     art: Lastart = Lastart.LINIENLAST
     richtung: Lastrichtung = Lastrichtung.SENKRECHT
-    wert_a: float = 10.0
-    wert_b: Optional[float] = None
+    wert_a: float = bereich(10.0, heisst="Wert am Anfang")
+    wert_b: Optional[float] = bereich(None, heisst="Wert am Ende")
     stelle: float = bereich(50.0, heisst="Stelle", einheit=PROZENT, ab=0.0, bis=100.0)
     projiziert: bool = False
     """Senkrecht und waagrecht je Meter Projektion statt je Meter Stab."""
@@ -189,11 +194,9 @@ class SystemlinieEintrag(Beschreibung):
     gelenk_anfang: bool = False
     gelenk_ende: bool = False
     quer: str = einer_von(HALT, "frei")
-    k_quer: float = 0.0
-    """Bettung quer, kN/m²."""
-
+    k_quer: float = federfeld("Bettung quer", KN_PRO_M2)
     laengs: str = einer_von(HALT, "frei")
-    k_laengs: float = 0.0
+    k_laengs: float = federfeld("Bettung längs", KN_PRO_M2)
     lasten: List[StablastEintrag] = field(default_factory=list)
 
     @property
@@ -209,14 +212,11 @@ class LagerEintrag(Beschreibung):
     kennung: str = ""
     knoten: str = ""
     x: str = einer_von(HALT, "fest")
-    k_x: float = 0.0
-    """kN/m."""
-
+    k_x: float = federfeld("Federsteifigkeit k_x", KN_PRO_M)
     z: str = einer_von(HALT, "fest")
-    k_z: float = 0.0
+    k_z: float = federfeld("Federsteifigkeit k_z", KN_PRO_M)
     phi: str = einer_von(HALT, "frei")
-    k_phi: float = 0.0
-    """kNm/rad."""
+    k_phi: float = federfeld("Federsteifigkeit k_φ", KNM_PRO_RAD)
 
 
 @dataclass
@@ -231,8 +231,8 @@ class KnotenlastEintrag(Beschreibung):
     lastfall: str = ""
     art: str = einer_von(KNOTENLASTEN, "kraft")
     richtung: Lastrichtung = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT)
-    wert: float = 10.0
-    """kN oder kNm."""
+    wert: float = bereich(10.0, heisst="Wert")
+    """kN oder kNm, nach der Art; ohne Grenze wie jede Last."""
 
 
 @dataclass
@@ -317,7 +317,6 @@ class BalkensystemEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     LAGERFELDER = ("x", "z", "phi")
     LINIENLAGER = ("quer", "laengs")
     LAGERARTEN = LAGERARTEN
-    EINHEIT_DER_FEDER = EINHEIT_DER_FEDER
     NEUE_DIAGRAMME = ("M", "V", "N")
     #: Nach rechts, steht sie senkrecht, nach unten: so liegt die gestrichelte
     #: Faser einer neuen Linie unten bzw. links (Benutzer, 2026-10-24). Wohin

@@ -1,5 +1,5 @@
 ---
-erzeugt: 96ab170c809a
+erzeugt: 9b5ffef844ea
 art: modul
 tags: [modul]
 ---
@@ -65,9 +65,10 @@ class KnotenEintrag(Beschreibung)
 
 Ein Punkt der Zeichnung, in mm. Die Elemente verweisen mit seiner Kennung auf ihn.
 
+- `IM_ORT = 'Knoten'`
 - `kennung: str = ''`
-- `y: float = 0.0`
-- `z: float = 0.0`
+- `y: float = bereich(0.0, heisst='y', einheit=MM)`
+- `z: float = bereich(0.0, heisst='z', einheit=MM)`
 
 ### FlaecheEintrag
 
@@ -78,6 +79,7 @@ class FlaecheEintrag(Beschreibung)
 
 Ein Polygon des Querschnitts. Ohne Material ist es eine Aussparung.
 
+- `IM_ORT = 'Polygon'` – In der Zeichnung heisst eines ohne Material «Aussparung» ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.elemente|QuerschnittsanalyseEintrag.elemente]]).
 - `kennung: str = ''`
 - `knoten: List[str] = field(default_factory=list)` – Die Ecken als Knoten, der Reihe nach; die erste wird am Ende nicht wiederholt.
 - `material: str = ''` – Kennung des Materials; leer heisst Aussparung.
@@ -99,9 +101,10 @@ class StabEintrag(Beschreibung)
 
 Ein einzelner Bewehrungsstab, an einem Knoten.
 
+- `IM_ORT = 'Stab'`
 - `kennung: str = ''`
 - `knoten: str = ''`
-- `durchmesser: float = 16.0`
+- `durchmesser: float = bereich(16.0, heisst='Durchmesser', einheit=MM, ueber=0.0)`
 - `stahl: str = ''`
 
 ### StablinieEintrag
@@ -116,16 +119,17 @@ Eine Linie von Staeben -- oder eine verschmierte Stahlflaeche.
 Je Art ein eigenes Feld fuer die Menge: wer die Art wechselt und wieder
 zurueck, findet seine Zahl noch vor. Welche gilt, sagt `art`.
 
+- `IM_ORT = 'Linie'`
 - `kennung: str = ''`
 - `von: str = ''`
 - `bis: str = ''` – Anfang und Ende als Knoten.
 - `art: Linienart = Linienart.TEILUNG`
-- `durchmesser: float = 16.0` – Bei Anzahl und Teilung -- und bei verschmierten Staeben -- der Stabdurchmesser in mm.
-- `flaeche: float = 1000.0` – Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm² -- von Hand.
+- `durchmesser: float = bereich(16.0, heisst='Durchmesser', einheit=MM, ueber=0.0)` – Bei Anzahl und Teilung -- und bei verschmierten Staeben -- der Stabdurchmesser in mm.
+- `flaeche: float = bereich(1000.0, heisst='Stahlfläche', einheit=MM2, ueber=0.0)` – Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm² -- von Hand.
 - `verschmiert: str = einer_von(VERSCHMIERT, 'flaeche')` – Bei Art «Fläche», wie die Stahlflaeche angegeben ist: `flaeche` von Hand -- oder `staebe`: Staebe `durchmesser` im Abstand `teilung` ueber `laenge`, verschmiert (Benutzer, 2026-10-24).
-- `laenge: Optional[float] = None` – Bei verschmierten Staeben die Laenge in mm, ueber die sie liegen -- leer: die der Linie.
-- `anzahl: float = 5.0`
-- `teilung: float = 150.0` – Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der aufgeht; bei verschmierten Staeben ihr Abstand, wie er ist.
+- `laenge: Optional[float] = bereich(None, heisst='Länge', einheit=MM, ueber=0.0)` – Bei verschmierten Staeben die Laenge in mm, ueber die sie liegen -- leer: die der Linie.
+- `anzahl: float = bereich(5.0, heisst='Stabzahl', ab=1.0)`
+- `teilung: float = bereich(150.0, heisst='Teilung', einheit=MM, ueber=0.0)` – Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der aufgeht; bei verschmierten Staeben ihr Abstand, wie er ist.
 - `starteisen: bool = True`
 - `endeisen: bool = True`
 - `stahl: str = ''`
@@ -143,12 +147,13 @@ Ihre Laenge ist der Hebelarm des Fachwerks -- gezeichnet wird sie darum
 von Gurt zu Gurt. Die Teilung `s` gilt in Laengsrichtung des Bauteils;
 im Schnitt ist sie nicht zu sehen.
 
+- `IM_ORT = 'Wand'`
 - `kennung: str = ''`
 - `von: str = ''`
 - `bis: str = ''` – Anfang und Ende als Knoten. Die Richtung zaehlt: sie gibt dem Schubfluss sein Vorzeichen.
-- `dicke: float = 200.0` – `b_w` in mm.
-- `durchmesser: float = 10.0` – Buegeldurchmesser in mm.
-- `teilung: float = 150.0` – Buegelteilung in Laengsrichtung in mm.
+- `dicke: float = bereich(200.0, heisst='Dicke b_w', einheit=MM, ueber=0.0)`
+- `durchmesser: float = bereich(10.0, heisst='Bügeldurchmesser', einheit=MM, ab=0.0)` – Null: ohne Buegel.
+- `teilung: float = bereich(150.0, heisst='Bügelteilung', einheit=MM, ueber=0.0)` – In Laengsrichtung.
 - `schnitte: int = einer_von(SCHNITTE, 2)` – Wie viele Buegelschenkel die Wand kreuzen, 1 bis 8.
 - `stahl: str = ''`
 
@@ -163,6 +168,7 @@ Eine Linie, die nur der Konstruktion dient: an ihr fangen, an ihr messen.
 Gerechnet wird mit ihr nicht. Geschlossene Hilfslinien lassen sich im
 Zeichenfenster zu einer Flaeche machen.
 
+- `IM_ORT = 'Hilfslinie'`
 - `kennung: str = ''`
 - `von: str = ''`
 - `bis: str = ''`
@@ -177,12 +183,12 @@ class QALastfallEintrag(Beschreibung)
 Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
 
 - `name: str`
-- `N_Ed: float = 0.0`
-- `M_y_Ed: float = 0.0`
-- `M_z_Ed: float = 0.0`
-- `V_y_Ed: float = 0.0`
-- `V_z_Ed: float = 0.0`
-- `T_Ed: float = 0.0`
+- `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)`
+- `M_y_Ed: float = bereich(0.0, heisst='Moment M_y,Ed', einheit=KNM)`
+- `M_z_Ed: float = bereich(0.0, heisst='Moment M_z,Ed', einheit=KNM)`
+- `V_y_Ed: float = bereich(0.0, heisst='Querkraft V_y,Ed', einheit=KN)`
+- `V_z_Ed: float = bereich(0.0, heisst='Querkraft V_z,Ed', einheit=KN)`
+- `T_Ed: float = bereich(0.0, heisst='Torsion T_Ed', einheit=KNM)`
 - `aktiv: bool = True`
 
 ### QAGebrauchsfallEintrag
@@ -197,9 +203,9 @@ ohne Querkraft und Torsion: begrenzt wird die Stahlspannung, und dafuer
 zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
 
 - `name: str`
-- `N_Ed: float = 0.0`
-- `M_y_Ed: float = 0.0`
-- `M_z_Ed: float = 0.0`
+- `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)`
+- `M_y_Ed: float = bereich(0.0, heisst='Moment M_y,Ed', einheit=KNM)`
+- `M_z_Ed: float = bereich(0.0, heisst='Moment M_z,Ed', einheit=KNM)`
 - `aktiv: bool = True`
 
 ### QAGebrauchswahl

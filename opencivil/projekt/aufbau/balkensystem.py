@@ -34,7 +34,7 @@ from opencivil.material.basis import Baustoffart
 from opencivil.projekt.balkensystem import (
     EINHEIT_DER_LAST, BalkensystemEintrag, Profilachse, StabmaterialEintrag,
 )
-from opencivil.projekt.lesen import ProjektFehler
+from opencivil.projekt.lesen import ProjektFehler, als_groesse
 from opencivil.projekt.staebe import (
     MATERIAL_DES_QUERSCHNITTS, Querschnittsart, StabquerschnittBasis, aufgezaehlt,
 )
@@ -127,17 +127,20 @@ class Uebersetzung:
         self.meldungen.append(Meldung(text, tuple(elemente), fehler, unfertig))
 
     def halt(self, teil: Any, richtung: str) -> Halt:
-        """Wie ein Lager oder eine Linie in ``richtung`` haelt -- die Feder im Feld ``k_<richtung>``."""
-        art, k = getattr(teil, richtung), getattr(teil, f"k_{richtung}")
+        """
+        Wie ein Lager oder eine Linie in ``richtung`` haelt -- die Feder im
+        Feld ``k_<richtung>``, in dessen Einheit.
+        """
+        art, k = getattr(teil, richtung), als_groesse(teil, f"k_{richtung}")
         if art == "frei":
             return FREI
         if art == "fest":
             return FEST
-        if k <= 0.0:
+        if k.si <= 0.0:
             self.melden(f"{teil.kennung}: eine Feder braucht eine Steifigkeit grösser als null.",
                         teil.kennung)
             return FREI
-        return feder(Groesse(k, self.eintrag.EINHEIT_DER_FEDER[f"k_{richtung}"]).si)
+        return feder(k.si)
 
     def stab(self, l: Any) -> Dict[str, Any]:
         """

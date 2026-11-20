@@ -1,5 +1,5 @@
 ---
-erzeugt: 14d16bf37741
+erzeugt: e2bda7d1c1d8
 art: modul
 tags: [modul]
 ---
@@ -77,7 +77,7 @@ passt, ist fuer sie ein Nein.
 def _verformungsfall(f: VerformungsfallEintrag) -> Verformungsfall
 ```
 
-Ein Verformungsfall aus seiner Beschreibung -- w in mm, die Spannweite in m.
+Ein Verformungsfall aus seiner Beschreibung -- jede Zahl in der Einheit ihres Feldes.
 
 ### _ausgefallene
 

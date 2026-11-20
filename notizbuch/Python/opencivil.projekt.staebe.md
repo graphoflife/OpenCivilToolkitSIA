@@ -1,5 +1,5 @@
 ---
-erzeugt: e7900730115d
+erzeugt: 758efd9c73c0
 art: modul
 tags: [modul]
 ---
@@ -229,7 +229,6 @@ und die Arten der Lager stehen in ihr als Klassenattribute.
 - `LAGERFELDER: Tuple[str, ...]` – Die Richtungen eines Lagers, in der Folge der Vorwahlen in [[opencivil.projekt.staebe#MitStaeben|LAGERARTEN]] -- Felder des Lagers wie des Lagers im Rechenkern.
 - `LAGERARTEN: Mapping[str, Tuple[str, ...]]` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 - `LINIENLAGER: Tuple[str, ...]` – Die Richtungen eines Linienlagers -- Felder der Linie wie des Stabs im Rechenkern.
-- `EINHEIT_DER_FEDER: Mapping[str, Any]` – Die Einheit jeder Feder, nach ihrem Feld -- an Lager und Linie.
 - `NEUE_DIAGRAMME: Tuple[str, ...]` – Was ein frisches System von der GZT zeigt -- dazu die Verschiebung der GZG.
 - `LAUFRICHTUNGEN: Tuple[Tuple[float, ...], ...]` – Wohin eine neue Linie laeuft, wie herum sie auch gezeichnet ist: in die erste dieser Richtungen, auf der sie nicht senkrecht steht. Keine: wie gezeichnet. Die Oberflaeche legt danach Anfang und Ende.
 - `KNOTEN: type`

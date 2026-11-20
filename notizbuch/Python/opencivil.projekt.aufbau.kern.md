@@ -1,5 +1,5 @@
 ---
-erzeugt: 37a68e919b31
+erzeugt: bafcad9476e6
 art: modul
 tags: [modul]
 ---
@@ -537,7 +537,8 @@ eine zweite Wahrheit.
 def knickfall(k: KnickEintrag, klasse: type=Knickfall, **mehr: Any) -> Knickfall
 ```
 
-Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
+Ein Knickfall aus seiner Beschreibung -- jede Zahl in der Einheit ihres
+Feldes; `mehr` fuer die Analyse.
 
 
 ## Braucht

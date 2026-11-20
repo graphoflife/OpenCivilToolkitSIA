@@ -43,9 +43,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List
 
-from opencivil.core.einheiten import GRAD, KN_PRO_M, KN_PRO_M2, KNM_PRO_RAD, N_PRO_MM2
+from opencivil.core.einheiten import GRAD, KN_PRO_M, KN_PRO_M2, KNM_PRO_RAD, M, N_PRO_MM2
 from opencivil.projekt.balkensystem import (
-    HALT, KnotenlastEintrag, StablastEintrag, StabmaterialEintrag, StatikdiagrammEintrag,
+    HALT, KnotenlastEintrag, StablastEintrag, StabmaterialEintrag, StatikdiagrammEintrag, federfeld,
 )
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen
@@ -55,14 +55,6 @@ from opencivil.stabwerk.stabquerschnitt import RAEUMLICH
 from opencivil.stabwerk3d.modell import Richtung
 from opencivil.stabwerk3d.raum import minus
 from opencivil.stabwerk3d.stab import drehung_umgekehrt
-
-#: Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad,
-#: Bettung in kN/m je m Stab.
-EINHEIT_DER_FEDER = {
-    **{f"k_{achse}": KN_PRO_M for achse in "xyz"},
-    **{f"k_phi_{achse}": KNM_PRO_RAD for achse in "xyz"},
-    "k_quer_y": KN_PRO_M2, "k_quer_z": KN_PRO_M2, "k_laengs": KN_PRO_M2,
-}
 
 #: Wohin eine Last an einem Knoten zeigt -- in die Richtungen des Systems.
 KNOTENRICHTUNGEN = tuple(r for r in Richtung if r.im_system)
@@ -94,9 +86,9 @@ class RaumknotenEintrag(Beschreibung):
     """Ein Punkt des Systems, in m."""
 
     kennung: str = ""
-    x: float = 0.0
-    y: float = 0.0
-    z: float = 0.0
+    x: float = bereich(0.0, heisst="x", einheit=M)
+    y: float = bereich(0.0, heisst="y", einheit=M)
+    z: float = bereich(0.0, heisst="z", einheit=M)
 
 
 @dataclass
@@ -132,13 +124,11 @@ class RaumlinieEintrag(Beschreibung):
     gelenk_anfang: bool = False
     gelenk_ende: bool = False
     quer_y: str = einer_von(HALT, "frei")
-    k_quer_y: float = 0.0
-    """Bettung quer in y, kN/m²."""
-
+    k_quer_y: float = federfeld("Bettung quer in y", KN_PRO_M2)
     quer_z: str = einer_von(HALT, "frei")
-    k_quer_z: float = 0.0
+    k_quer_z: float = federfeld("Bettung quer in z", KN_PRO_M2)
     laengs: str = einer_von(HALT, "frei")
-    k_laengs: float = 0.0
+    k_laengs: float = federfeld("Bettung längs", KN_PRO_M2)
     lasten: List[RaumstablastEintrag] = field(default_factory=list)
 
     @property
@@ -154,21 +144,17 @@ class RaumlagerEintrag(Beschreibung):
     kennung: str = ""
     knoten: str = ""
     x: str = einer_von(HALT, "fest")
-    k_x: float = 0.0
-    """kN/m."""
-
+    k_x: float = federfeld("Federsteifigkeit k_x", KN_PRO_M)
     y: str = einer_von(HALT, "fest")
-    k_y: float = 0.0
+    k_y: float = federfeld("Federsteifigkeit k_y", KN_PRO_M)
     z: str = einer_von(HALT, "fest")
-    k_z: float = 0.0
+    k_z: float = federfeld("Federsteifigkeit k_z", KN_PRO_M)
     phi_x: str = einer_von(HALT, "frei")
-    k_phi_x: float = 0.0
-    """kNm/rad."""
-
+    k_phi_x: float = federfeld("Federsteifigkeit k_φx", KNM_PRO_RAD)
     phi_y: str = einer_von(HALT, "frei")
-    k_phi_y: float = 0.0
+    k_phi_y: float = federfeld("Federsteifigkeit k_φy", KNM_PRO_RAD)
     phi_z: str = einer_von(HALT, "frei")
-    k_phi_z: float = 0.0
+    k_phi_z: float = federfeld("Federsteifigkeit k_φz", KNM_PRO_RAD)
 
 
 @dataclass
@@ -218,7 +204,6 @@ class Balkensystem3dEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     LAGERFELDER = ("x", "y", "z", "phi_x", "phi_y", "phi_z")
     LINIENLAGER = ("quer_y", "quer_z", "laengs")
     LAGERARTEN = LAGERARTEN
-    EINHEIT_DER_FEDER = EINHEIT_DER_FEDER
     NEUE_DIAGRAMME = ("M_y", "M_z", "N")
     #: Keine: eine neue Linie laeuft, wie sie gezeichnet ist -- ihre Faser legt der Drehwinkel β.
     LAUFRICHTUNGEN = ()

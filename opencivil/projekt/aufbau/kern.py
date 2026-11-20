@@ -27,7 +27,7 @@ from typing import (
     Tuple,
 )
 
-from opencivil.core.einheiten import KN, KNM, M, Groesse
+from opencivil.core.einheiten import Groesse
 from opencivil.core.nachweis import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import Kennzahl
@@ -44,7 +44,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.geotechnik.fundament import Fundament
 from opencivil.geotechnik.setzung import Setzungsfundament
 from opencivil.pfahl.pfahl import Pfahl
-from opencivil.projekt.lesen import Bereich, ProjektFehler
+from opencivil.projekt.lesen import Bereich, ProjektFehler, als_groesse
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.decke.werk import Deckensystem
@@ -620,6 +620,9 @@ def _gebrauchsfaelle(
 
 
 def knickfall(k: KnickEintrag, klasse: type = Knickfall, **mehr: Any) -> Knickfall:
-    """Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; ``mehr`` fuer die Analyse."""
-    return klasse(name=k.name, N_Ed=Groesse(k.N_Ed, KN), M_Ed_1=Groesse(k.M_Ed_1, KNM),
-                  laenge=Groesse(k.laenge, M), knicklaenge=Groesse(k.knicklaenge, M), **mehr)
+    """
+    Ein Knickfall aus seiner Beschreibung -- jede Zahl in der Einheit ihres
+    Feldes; ``mehr`` fuer die Analyse.
+    """
+    return klasse(name=k.name, **{f: als_groesse(k, f) for f in (
+        "N_Ed", "M_Ed_1", "laenge", "knicklaenge")}, **mehr)

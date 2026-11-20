@@ -7,6 +7,27 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Jedes Zahlenfeld kennt seine Grenzen
+
+66 Zahlenfelder hatten im Kern keine Grenze – darunter Teilung und
+Stabzahl der Bewehrung, die Bügel, die Federn und die Zahlen der Zeichnung.
+Die Oberfläche setzte eigene Mindestwerte, die nur die Pfeile bremsten:
+eine getippte Teilung 0 nahm das Feld an, und erst die ganze Platte
+rechnete nicht mehr.
+
+Jetzt hat jedes Zahlenfeld seinen Bereich, und die Maske weist ab, was
+ausserhalb liegt, mit dem Satz des Kerns: «Teilung muss grösser als null
+sein: 0 ist nicht übernommen.» Ein Test wacht, dass jedes neue Zahlenfeld
+einen bekommt. Die Einheiten der Federn stehen am Feld statt in einer
+eigenen Tabelle; Platte, Knicken und Querschnittsanalyse lesen ihre
+Einheiten ebenso vom Feld. Eine Teilung von null weist das Feld auch ohne
+Bügel ab: es kennt den Durchmesser nicht, und null ist nie eine Teilung.
+
+Kommt eine falsche Zahl doch an – aus einer Datei oder einem Skript –,
+nennt die Meldung das Element jetzt wie die Maske: «Lage 2» statt «lagen
+2», «Linie 3» wie in der Zeichnung der Querschnittsanalyse statt
+«stablinien 3», «A1» wie im Balkensystem statt «lager 1».
+
 ## 2026-11-20 · Zwei Testdateien geteilt
 
 `tests/test_balkensystem.py` hatte 1146 Zeilen, `tests/test_nachweis_mn.py`

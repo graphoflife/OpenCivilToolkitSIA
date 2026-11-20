@@ -12,11 +12,10 @@ Zeichnung wird kein Bauteil, nur ein Hinweis.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping
+from typing import TYPE_CHECKING, Any, Dict, Mapping
 
-from opencivil.core.einheiten import KN, KNM
 from opencivil.material.basis import Baustoff
-from opencivil.projekt.lesen import ProjektFehler, ort_von
+from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
 from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
@@ -63,12 +62,10 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     analyse.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag, art, analyse)
 
-    # Die Lastfaelle in kN und kNm, wie eingetippt -- gerechnet wird in SI.
-    kN, kNm = KN.faktor, KNM.faktor
-    lastfaelle = [
-        Lastfall(name=l.name, N=l.N_Ed * kN, M_y=l.M_y_Ed * kNm, M_z=l.M_z_Ed * kNm,
-                 V_y=l.V_y_Ed * kN, V_z=l.V_z_Ed * kN, T=l.T_Ed * kNm)
-        for l in eintrag.lastfaelle if l.aktiv]
+    # Die Lastfaelle in SI, aus der Einheit ihrer Felder: N, M_y ... aus
+    # N_Ed, M_y_Ed ...
+    lastfaelle = [Lastfall(name=l.name, **_in_si(l, "N", "M_y", "M_z", "V_y", "V_z", "T"))
+                  for l in eintrag.lastfaelle if l.aktiv]
 
     schub = None
     if any(schub_belastet(analyse.biegung, l) for l in lastfaelle) \
@@ -95,8 +92,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     aufbau.eintragen(teil, "qa_zwaengung_biegung", eintrag.kennung, biegung)
     spannungsnachweise(
         eintrag, AnalyseStellen(analyse), eintrag.lastfaelle,
-        lambda name, l, faktor: Lastfall(name=name, N=faktor * l.N_Ed * kN,
-                                         M_y=faktor * l.M_y_Ed * kNm, M_z=faktor * l.M_z_Ed * kNm),
+        lambda name, l, faktor: Lastfall(name=name, **{
+            k: faktor * v for k, v in _in_si(l, "N", "M_y", "M_z").items()}),
         praefix="qa_", kennung=eintrag.kennung, aufbau=aufbau, teil=teil)
 
     knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
@@ -118,6 +115,14 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     if aktive:
         aufbau.spannungsfaelle[eintrag.kennung] = aktive
     return teil
+
+
+def _in_si(fall: Any, *groessen: str) -> Dict[str, float]:
+    """
+    Je Groesse ``N``, ``M_y`` ... die Zahl ihres Feldes ``N_Ed``, ``M_y_Ed``
+    ... in SI, aus der Einheit des Feldes.
+    """
+    return {g: als_groesse(fall, f"{g}_Ed").si for g in groessen}
 
 
 def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Baustoff],

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f52eb0c0a15
+erzeugt: e5df6acc70dd
 art: modul
 tags: [modul]
 ---
@@ -90,7 +90,8 @@ def melden(self, text: str, *elemente: str, fehler: bool=True, unfertig: bool=Fa
 def halt(self, teil: Any, richtung: str) -> Halt
 ```
 
-Wie ein Lager oder eine Linie in `richtung` haelt -- die Feder im Feld `k_<richtung>`.
+Wie ein Lager oder eine Linie in `richtung` haelt -- die Feder im
+Feld `k_<richtung>`, in dessen Einheit.
 
 #### Uebersetzung.stab
 

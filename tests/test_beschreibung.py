@@ -953,7 +953,8 @@ class TestBuegelteilung(unittest.TestCase):
     """
     Eine Bügelteilung von null ist ein Fehler und wird gemeldet. Bis
     2026-10-15 wurde sie beim Lesen still zu 200 mm -- die Maske zeigte 0,
-    gerechnet wurde mit 200.
+    gerechnet wurde mit 200. Seit 2026-11-20 weist sie ihr Feld ab, auch
+    ohne Bügel.
     """
 
     def buegel(self, **felder):
@@ -990,9 +991,10 @@ class TestBuegelteilung(unittest.TestCase):
         self.assertIn("Bügelzahl in y muss grösser als null sein",
                       self.fehler(self.buegel(art_y="anzahl", anzahl_y=0)))
 
-    def test_ohne_buegel_spielt_die_teilung_keine_rolle(self):
-        d = self.buegel(durchmesser=0.0, abstand_x=0)
-        self.assertEqual(dienst.bearbeite("rechnen", {"projekt": d}).status, 200)
+    def test_auch_ohne_buegel_gilt_die_grenze(self):
+        """Das Feld kennt den Durchmesser nicht -- eine Teilung von null ist nie eine."""
+        self.assertIn("Bügelteilung in x muss grösser als null sein",
+                      self.fehler(self.buegel(durchmesser=0.0, abstand_x=0)))
 
 
 if __name__ == "__main__":

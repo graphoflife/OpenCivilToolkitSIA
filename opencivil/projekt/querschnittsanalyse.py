@@ -48,7 +48,7 @@ from opencivil.projekt.eintraege import (
     kleinste_neigung, spannungsfallnamen,
 )
 from opencivil.projekt.fallnamen import Fallnamen
-from opencivil.core.einheiten import MM
+from opencivil.core.einheiten import KN, KNM, MM, MM2
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, ort_von
 from opencivil.projekt.netz import Netz, neue_kennung
 
@@ -78,14 +78,19 @@ def _punkt(roh: Any, wo: str) -> List[float]:
 class KnotenEintrag(Beschreibung):
     """Ein Punkt der Zeichnung, in mm. Die Elemente verweisen mit seiner Kennung auf ihn."""
 
+    IM_ORT = "Knoten"
+
     kennung: str = ""
-    y: float = 0.0
-    z: float = 0.0
+    y: float = bereich(0.0, heisst="y", einheit=MM)
+    z: float = bereich(0.0, heisst="z", einheit=MM)
 
 
 @dataclass
 class FlaecheEintrag(Beschreibung):
     """Ein Polygon des Querschnitts. Ohne Material ist es eine Aussparung."""
+
+    IM_ORT = "Polygon"
+    """In der Zeichnung heisst eines ohne Material «Aussparung» (:meth:`QuerschnittsanalyseEintrag.elemente`)."""
 
     kennung: str = ""
     knoten: List[str] = field(default_factory=list)
@@ -112,9 +117,11 @@ class FlaecheEintrag(Beschreibung):
 class StabEintrag(Beschreibung):
     """Ein einzelner Bewehrungsstab, an einem Knoten."""
 
+    IM_ORT = "Stab"
+
     kennung: str = ""
     knoten: str = ""
-    durchmesser: float = 16.0
+    durchmesser: float = bereich(16.0, heisst="Durchmesser", einheit=MM, ueber=0.0)
     stahl: str = ""
 
 
@@ -127,16 +134,18 @@ class StablinieEintrag(Beschreibung):
     zurueck, findet seine Zahl noch vor. Welche gilt, sagt ``art``.
     """
 
+    IM_ORT = "Linie"
+
     kennung: str = ""
     von: str = ""
     bis: str = ""
     """Anfang und Ende als Knoten."""
 
     art: Linienart = Linienart.TEILUNG
-    durchmesser: float = 16.0
+    durchmesser: float = bereich(16.0, heisst="Durchmesser", einheit=MM, ueber=0.0)
     """Bei Anzahl und Teilung -- und bei verschmierten Staeben -- der Stabdurchmesser in mm."""
 
-    flaeche: float = 1000.0
+    flaeche: float = bereich(1000.0, heisst="Stahlfläche", einheit=MM2, ueber=0.0)
     """Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm² -- von Hand."""
 
     verschmiert: str = einer_von(VERSCHMIERT, "flaeche")
@@ -146,11 +155,11 @@ class StablinieEintrag(Beschreibung):
     ``laenge``, verschmiert (Benutzer, 2026-10-24).
     """
 
-    laenge: Optional[float] = None
+    laenge: Optional[float] = bereich(None, heisst="Länge", einheit=MM, ueber=0.0)
     """Bei verschmierten Staeben die Laenge in mm, ueber die sie liegen -- leer: die der Linie."""
 
-    anzahl: float = 5.0
-    teilung: float = 150.0
+    anzahl: float = bereich(5.0, heisst="Stabzahl", ab=1.0)
+    teilung: float = bereich(150.0, heisst="Teilung", einheit=MM, ueber=0.0)
     """
     Bei Art «Teilung» der Wunschabstand in mm -- gerundet auf einen, der
     aufgeht; bei verschmierten Staeben ihr Abstand, wie er ist.
@@ -171,19 +180,19 @@ class SchubwandEintrag(Beschreibung):
     im Schnitt ist sie nicht zu sehen.
     """
 
+    IM_ORT = "Wand"
+
     kennung: str = ""
     von: str = ""
     bis: str = ""
     """Anfang und Ende als Knoten. Die Richtung zaehlt: sie gibt dem Schubfluss sein Vorzeichen."""
 
-    dicke: float = 200.0
-    """``b_w`` in mm."""
+    dicke: float = bereich(200.0, heisst="Dicke b_w", einheit=MM, ueber=0.0)
+    durchmesser: float = bereich(10.0, heisst="Bügeldurchmesser", einheit=MM, ab=0.0)
+    """Null: ohne Buegel."""
 
-    durchmesser: float = 10.0
-    """Buegeldurchmesser in mm."""
-
-    teilung: float = 150.0
-    """Buegelteilung in Laengsrichtung in mm."""
+    teilung: float = bereich(150.0, heisst="Bügelteilung", einheit=MM, ueber=0.0)
+    """In Laengsrichtung."""
 
     schnitte: int = einer_von(SCHNITTE, 2)
     """Wie viele Buegelschenkel die Wand kreuzen, 1 bis 8."""
@@ -199,6 +208,8 @@ class HilfslinieEintrag(Beschreibung):
     Zeichenfenster zu einer Flaeche machen.
     """
 
+    IM_ORT = "Hilfslinie"
+
     kennung: str = ""
     von: str = ""
     bis: str = ""
@@ -209,12 +220,12 @@ class QALastfallEintrag(Beschreibung):
     """Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben."""
 
     name: str
-    N_Ed: float = 0.0
-    M_y_Ed: float = 0.0
-    M_z_Ed: float = 0.0
-    V_y_Ed: float = 0.0
-    V_z_Ed: float = 0.0
-    T_Ed: float = 0.0
+    N_Ed: float = bereich(0.0, heisst="Normalkraft N_Ed", einheit=KN)
+    M_y_Ed: float = bereich(0.0, heisst="Moment M_y,Ed", einheit=KNM)
+    M_z_Ed: float = bereich(0.0, heisst="Moment M_z,Ed", einheit=KNM)
+    V_y_Ed: float = bereich(0.0, heisst="Querkraft V_y,Ed", einheit=KN)
+    V_z_Ed: float = bereich(0.0, heisst="Querkraft V_z,Ed", einheit=KN)
+    T_Ed: float = bereich(0.0, heisst="Torsion T_Ed", einheit=KNM)
     aktiv: bool = True
 
 
@@ -227,9 +238,9 @@ class QAGebrauchsfallEintrag(Beschreibung):
     """
 
     name: str
-    N_Ed: float = 0.0
-    M_y_Ed: float = 0.0
-    M_z_Ed: float = 0.0
+    N_Ed: float = bereich(0.0, heisst="Normalkraft N_Ed", einheit=KN)
+    M_y_Ed: float = bereich(0.0, heisst="Moment M_y,Ed", einheit=KNM)
+    M_z_Ed: float = bereich(0.0, heisst="Moment M_z,Ed", einheit=KNM)
     aktiv: bool = True
 
 
@@ -469,20 +480,22 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
             return [lage[v] for v in verweise]
 
         polygone, staebe, linien, waende, hilfslinien = [], [], [], [], []
+        # Je Element sein Wort und seine Nummer, wie in Meldungen ueber seine
+        # Felder (``IM_ORT``); ein Polygon ohne Material ist eine Aussparung.
         for i, f in enumerate(self.flaechen, start=1):
-            name = f"{'Polygon' if f.material else 'Aussparung'} {i}"
+            name = f"{f.IM_ORT if f.material else 'Aussparung'} {i}"
             ecken = orte(name, f.kennung, *f.knoten)
             if ecken is not None:
                 polygone.append(benannt(name, f.kennung, punkte=tuple(ecken),
                                         material=f.material, ueberdeckung=f.ueberdeckung))
         for i, s in enumerate(self.staebe, start=1):
-            name = f"Stab {i}"
+            name = f"{s.IM_ORT} {i}"
             ort = orte(name, s.kennung, s.knoten)
             if ort is not None:
                 staebe.append(benannt(name, s.kennung, lage=ort[0],
                                       durchmesser=s.durchmesser, stahl=s.stahl))
         for i, l in enumerate(self.stablinien, start=1):
-            name = f"Linie {i}"
+            name = f"{l.IM_ORT} {i}"
             ende = orte(name, l.kennung, l.von, l.bis)
             if ende is not None:
                 linien.append(benannt(
@@ -491,7 +504,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
                     laenge=l.laenge, anzahl=l.anzahl, teilung=l.teilung,
                     starteisen=l.starteisen, endeisen=l.endeisen, stahl=l.stahl))
         for i, w in enumerate(self.schubwaende, start=1):
-            name = f"Wand {i}"
+            name = f"{w.IM_ORT} {i}"
             ende = orte(name, w.kennung, w.von, w.bis)
             if ende is not None:
                 waende.append(benannt(
@@ -499,7 +512,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
                     durchmesser=w.durchmesser, teilung=w.teilung, schnitte=w.schnitte,
                     stahl=w.stahl))
         for i, h in enumerate(self.hilfslinien, start=1):
-            name = f"Hilfslinie {i}"
+            name = f"{h.IM_ORT} {i}"
             ende = orte(name, h.kennung, h.von, h.bis)
             if ende is not None:
                 hilfslinien.append(benannt(name, h.kennung, von=ende[0], bis=ende[1]))

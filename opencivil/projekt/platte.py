@@ -117,7 +117,8 @@ class QuerschnittEintrag(Querschnittsangaben):
     Suchlauf, und meistens steht die Teilung ohnehin fest.
     """
 
-    automatik_mindestdurchmesser: float = 10.0
+    automatik_mindestdurchmesser: float = bereich(10.0, heisst="Mindestdurchmesser",
+                                                  einheit=MM, ab=0.0)
     """
     Duennster Stab, den die Suche einbaut -- in mm. Die Grundbewehrung jeder
     Lage hat ihn mindestens, in x wie in y; die Zulage darf fehlen.
@@ -131,7 +132,7 @@ class QuerschnittEintrag(Querschnittsangaben):
     auch beim Optimieren der Plattendicke. Vorgabe ⌀30@150, 4712 mm²/m.
     """
 
-    automatik_mindestdicke: float = 150.0
+    automatik_mindestdicke: float = bereich(150.0, heisst="Mindestdicke", einheit=MM, ueber=0.0)
     """Duenner sucht die Dickenoptimierung keine Platte -- in mm."""
 
     automatik_querkraft: bool = False

@@ -1,5 +1,5 @@
 ---
-erzeugt: 426f7a920194
+erzeugt: 1c188983f118
 art: modul
 tags: [modul]
 ---
@@ -62,9 +62,9 @@ class RaumknotenEintrag(Beschreibung)
 Ein Punkt des Systems, in m.
 
 - `kennung: str = ''`
-- `x: float = 0.0`
-- `y: float = 0.0`
-- `z: float = 0.0`
+- `x: float = bereich(0.0, heisst='x', einheit=M)`
+- `y: float = bereich(0.0, heisst='y', einheit=M)`
+- `z: float = bereich(0.0, heisst='z', einheit=M)`
 
 ### RaumstablastEintrag
 
@@ -96,11 +96,11 @@ oder ohne Stab, ein Linienlager laengs und quer in y und z.
 - `gelenk_anfang: bool = False`
 - `gelenk_ende: bool = False`
 - `quer_y: str = einer_von(HALT, 'frei')`
-- `k_quer_y: float = 0.0` – Bettung quer in y, kN/m².
+- `k_quer_y: float = federfeld('Bettung quer in y', KN_PRO_M2)`
 - `quer_z: str = einer_von(HALT, 'frei')`
-- `k_quer_z: float = 0.0`
+- `k_quer_z: float = federfeld('Bettung quer in z', KN_PRO_M2)`
 - `laengs: str = einer_von(HALT, 'frei')`
-- `k_laengs: float = 0.0`
+- `k_laengs: float = federfeld('Bettung längs', KN_PRO_M2)`
 - `lasten: List[RaumstablastEintrag] = field(default_factory=list)`
 
 #### RaumlinieEintrag.stab
@@ -124,17 +124,17 @@ Ein Lager an einem Knoten: je Richtung des Systems frei, fest oder Feder.
 - `kennung: str = ''`
 - `knoten: str = ''`
 - `x: str = einer_von(HALT, 'fest')`
-- `k_x: float = 0.0` – kN/m.
+- `k_x: float = federfeld('Federsteifigkeit k_x', KN_PRO_M)`
 - `y: str = einer_von(HALT, 'fest')`
-- `k_y: float = 0.0`
+- `k_y: float = federfeld('Federsteifigkeit k_y', KN_PRO_M)`
 - `z: str = einer_von(HALT, 'fest')`
-- `k_z: float = 0.0`
+- `k_z: float = federfeld('Federsteifigkeit k_z', KN_PRO_M)`
 - `phi_x: str = einer_von(HALT, 'frei')`
-- `k_phi_x: float = 0.0` – kNm/rad.
+- `k_phi_x: float = federfeld('Federsteifigkeit k_φx', KNM_PRO_RAD)`
 - `phi_y: str = einer_von(HALT, 'frei')`
-- `k_phi_y: float = 0.0`
+- `k_phi_y: float = federfeld('Federsteifigkeit k_φy', KNM_PRO_RAD)`
 - `phi_z: str = einer_von(HALT, 'frei')`
-- `k_phi_z: float = 0.0`
+- `k_phi_z: float = federfeld('Federsteifigkeit k_φz', KNM_PRO_RAD)`
 
 ### RaumknotenlastEintrag
 
@@ -196,7 +196,6 @@ Lastfaelle, Kombinationen -- was nicht stimmt, steht wie beim
 - `LAGERFELDER = ('x', 'y', 'z', 'phi_x', 'phi_y', 'phi_z')`
 - `LINIENLAGER = ('quer_y', 'quer_z', 'laengs')`
 - `LAGERARTEN = LAGERARTEN`
-- `EINHEIT_DER_FEDER = EINHEIT_DER_FEDER`
 - `NEUE_DIAGRAMME = ('M_y', 'M_z', 'N')`
 - `LAUFRICHTUNGEN = ()` – Keine: eine neue Linie laeuft, wie sie gezeichnet ist -- ihre Faser legt der Drehwinkel β.
 - `KNOTEN = RaumknotenEintrag`
@@ -241,7 +240,6 @@ Wie in der Ebene -- und der Drehwinkel so, dass der Querschnitt steht wie vorher
 
 ## Konstanten
 
-- `EINHEIT_DER_FEDER = {**{f'k_{achse}': KN_PRO_M for achse in 'xyz'}, **{f'k_phi_{achse}': …` – Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad, Bettung in kN/m je m Stab.
 - `KNOTENRICHTUNGEN = tuple((r for r in Richtung if r.im_system))` – Wohin eine Last an einem Knoten zeigt -- in die Richtungen des Systems.
 - `KENNWERTE = tuple((k.kurzname for k in RAEUMLICH))` – Die Kennwerte eines Querschnitts von Hand -- wie die Rechnung sie nimmt.
 - `DIAGRAMMGROESSEN = ('N', 'V_y', 'V_z', 'T', 'M_y', 'M_z', 'verschiebung', 'lagerkraefte')` – Was ein Diagramm zeigt: je Stab den Verlauf einer Schnittgroesse, das verschobene System oder die Lagerkraefte.

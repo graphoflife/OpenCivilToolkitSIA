@@ -419,7 +419,7 @@ def ort_von(eintrag: Any) -> str:
 def _ort_roh(element: Any, cls: type, wo: str, feld: str, i: int) -> str:
     """Wie ein Listenelement in Meldungen heisst -- aus der Datei, vor dem Lesen."""
     if not isinstance(element, Mapping):
-        return f"{wo}, {feld} {i + 1}"
+        return _ort(cls, None, None, wo, feld, i)
     return _ort(cls, element.get("name"), element.get("kennung"), wo, feld, i)
 
 
@@ -427,14 +427,23 @@ def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str:
     """
     Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
     und dort beginnt der Ort neu; alles darin nach seinem Feld und seinem
-    Namen, ohne Namen nach seiner Nummer: «lagen 2». Nur Leerzeichen sind
-    kein Name.
+    Namen: «kombinationen 'GZT'». Nur Leerzeichen sind kein Name.
+
+    Ohne Namen heisst ein Element, wie die Maske es nennt: mit dem Wort
+    seiner Klasse und seiner Nummer, wo sie eines hat (``IM_ORT``: «Lage 2»,
+    «Linie 3» wie in der Zeichnung einer Querschnittsanalyse), sonst mit
+    seiner Kennung («A1», wie im Balkensystem), sonst nach Feld und Nummer.
+    Bis 2026-11-20 hiess es immer nach Feld und Nummer: «lagen 2», «lager 1».
     """
     bezeichnung = getattr(cls, "BEZEICHNUNG", None)
     if bezeichnung:
         return _benannt(bezeichnung, name, kennung) or f"{bezeichnung} {i + 1}"
     if isinstance(name, str) and name.strip():
         return f"{wo}, {feld} '{name}'"
+    if getattr(cls, "IM_ORT", None):
+        return f"{wo}, {cls.IM_ORT} {i + 1}"
+    if isinstance(kennung, str) and kennung:
+        return f"{wo}, {kennung}"
     return f"{wo}, {feld} {i + 1}"
 
 

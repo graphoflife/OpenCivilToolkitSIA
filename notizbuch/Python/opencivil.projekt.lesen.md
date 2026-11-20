@@ -1,5 +1,5 @@
 ---
-erzeugt: 31126bd4ff07
+erzeugt: 5fccc0f96222
 art: modul
 tags: [modul]
 ---
@@ -326,8 +326,13 @@ def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str
 
 Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
 und dort beginnt der Ort neu; alles darin nach seinem Feld und seinem
-Namen, ohne Namen nach seiner Nummer: «lagen 2». Nur Leerzeichen sind
-kein Name.
+Namen: «kombinationen 'GZT'». Nur Leerzeichen sind kein Name.
+
+Ohne Namen heisst ein Element, wie die Maske es nennt: mit dem Wort
+seiner Klasse und seiner Nummer, wo sie eines hat (`IM_ORT`: «Lage 2»,
+«Linie 3» wie in der Zeichnung einer Querschnittsanalyse), sonst mit
+seiner Kennung («A1», wie im Balkensystem), sonst nach Feld und Nummer.
+Bis 2026-11-20 hiess es immer nach Feld und Nummer: «lagen 2», «lager 1».
 
 ### _benannt
 

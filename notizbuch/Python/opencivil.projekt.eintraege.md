@@ -1,5 +1,5 @@
 ---
-erzeugt: f5a9492a0b83
+erzeugt: b286b73f42e5
 art: modul
 tags: [modul]
 ---
@@ -59,7 +59,8 @@ Vorgaben, Pruefungen und alten Formaten, und die Fassade ging an ihnen
 vorbei: ein «festt» aus Python wurde still zur Feder (2026-10-16).
 
 `BEZEICHNUNG`, wo es sie gibt, nennt den Eintrag in Meldungen so wie
-die Oberflaeche: «Platte 'Decke'».
+die Oberflaeche: «Platte 'Decke'». `IM_ORT` nennt ein Element einer
+Liste ohne Namen mit seiner Nummer, wie die Maske: «Lage 2».
 
 Ein Wahlfeld haelt das Mitglied seiner Wahl; wer Text zuweist -- die
 Datei, der Konstruktor, die Fassade --, bekommt hier das Mitglied
@@ -263,8 +264,8 @@ gesetzt, und beim Umschalten setzte die Oberflaeche die andere mit eigenen
 Vorgaben (5 Staebe, 150 mm).
 
 - `durchmesser: float = bereich(0.0, heisst='Durchmesser', einheit=MM, ab=0.0)` – in mm; 0 bedeutet: nicht vorhanden.
-- `abstand: float = 150.0` – Teilung in mm -- bei Art «Teilung».
-- `anzahl: float = 5.0` – Stabzahl auf der Breite b -- bei Art «Anzahl».
+- `abstand: float = bereich(150.0, heisst='Teilung', einheit=MM, ueber=0.0)` – Teilung in mm -- bei Art «Teilung». Null weist schon das Feld ab, auch ohne Durchmesser: bis 2026-10-16 hiess eine Teilung von null still «kein Stab», bis 2026-11-20 nahm das Feld sie an, und erst die ganze Platte rechnete nicht.
+- `anzahl: float = bereich(5.0, heisst='Stabzahl', ueber=0.0)` – Stabzahl auf der Breite b -- bei Art «Anzahl».
 - `art: Linienart = einer_von(MENGEN, Linienart.TEILUNG)` – Welche der beiden gilt -- nach den Zahlen, damit `PostenEintrag(⌀, s)` bleibt.
 
 #### PostenEintrag.ueber_abstand
@@ -281,16 +282,7 @@ def ueber_abstand(self) -> bool
 def vorhanden(self) -> bool
 ```
 
-#### PostenEintrag.regeln
-
-```python
-def regeln(self, wo: str) -> None
-```
-
-Ein Posten mit Durchmesser braucht eine Teilung oder eine Stabzahl
-groesser als null -- die, die gilt. Bis 2026-10-16 hiess eine Teilung
-von null still «kein Stab»: die Maske zeigte ⌀16, gerechnet wurde
-ohne. Ohne Durchmesser ist der Posten leer, was sonst auch dasteht.
+Ob Staebe liegen -- das sagt der Durchmesser; Teilung und Stabzahl sind nie null.
 
 #### PostenEintrag.als_posten
 
@@ -316,6 +308,7 @@ class LageEintrag(Beschreibung)
 
 Eine der vier Lagen -- ihr Stahl ist der der Platte.
 
+- `IM_ORT = 'Lage'`
 - `grund: PostenEintrag = field(default_factory=PostenEintrag)`
 - `zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))`
 - `unguenstig: bool = True` – Ob die inneren Kanten von Grundbewehrung und Zulage fluchten -- siehe [[opencivil.querschnitt.platte#Bewehrungslage|opencivil.querschnitt.platte.Bewehrungslage]].
@@ -370,9 +363,9 @@ stehen; in x nicht. Siehe
 eigenes Feld, wie beim [[opencivil.projekt.eintraege#PostenEintrag|PostenEintrag]]; welches gilt, sagt `art_y`.
 
 - `durchmesser: float = bereich(0.0, heisst='Bügeldurchmesser', einheit=MM, ab=0.0)` – in mm; 0 bedeutet: keine Querkraftbewehrung.
-- `abstand_x: float = 200.0`
-- `abstand_y: float = 200.0`
-- `anzahl_y: float = 5.0`
+- `abstand_x: float = bereich(200.0, heisst='Bügelteilung in x', einheit=MM, ueber=0.0)`
+- `abstand_y: float = bereich(200.0, heisst='Bügelteilung in y', einheit=MM, ueber=0.0)`
+- `anzahl_y: float = bereich(5.0, heisst='Bügelzahl in y', ueber=0.0)` – Teilungen und Stabzahl weist schon ihr Feld ab, wenn sie nicht ueber null liegen, auch ohne Buegel -- bis 2026-11-20 erst die ganze Platte.
 - `art_y: Linienart = einer_von(MENGEN, Linienart.TEILUNG)`
 - `alpha_min: int = kleinste_neigung()`
 - `alpha_max: int = groesste_neigung()`
@@ -385,8 +378,7 @@ def vorhanden(self) -> bool
 ```
 
 Ob Buegel liegen -- das sagt allein der Durchmesser. Eine Teilung von
-null heisst nicht «keine Buegel», sondern ist ein Fehler, und
-[[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.regeln|regeln]] sagt es.
+null heisst nicht «keine Buegel»: ihr Feld weist sie ab.
 
 #### QuerkraftbewehrungEintrag.ueber_teilung_y
 
@@ -397,21 +389,13 @@ def ueber_teilung_y(self) -> bool
 
 In y eine Teilung -- sonst eine Stabzahl.
 
-#### QuerkraftbewehrungEintrag.regeln
-
-```python
-def regeln(self, wo: str) -> None
-```
-
-Was nicht stimmen kann, soll als Satz beim Benutzer ankommen.
-
 #### QuerkraftbewehrungEintrag.als_bewehrung
 
 ```python
 def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung
 ```
 
-Die Buegel fuer den Querschnitt -- erst nach [[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.regeln|regeln]].
+Die Buegel fuer den Querschnitt.
 
 ### KnickEintrag
 
@@ -426,8 +410,8 @@ Nur in x-Richtung -- eine Knicklaenge gehoert zu einer Tragrichtung, und
 in y waere die Breite der Platte die Laenge.
 
 - `name: str`
-- `N_Ed: float = 0.0` – in kN, Druck negativ.
-- `M_Ed_1: float = 0.0`
+- `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)` – Druck negativ.
+- `M_Ed_1: float = bereich(0.0, heisst='Moment 1. Ordnung M_Ed,1', einheit=KNM)`
 - `laenge: float = bereich(3.0, heisst='Höhe des Druckglieds', einheit=M, ueber=0.0)` – Hoehe des Druckglieds in m, bei mehreren uebereinander ihre ganze Hoehe (SIA 262:2025, 4.1.3.2.3) -- sie bestimmt die Schiefstellung. Bis 2026-11-14 hiess sie Systemlaenge; bis 2026-10-16 rechnete eine Laenge von null und hiess «erfuellt».
 - `knicklaenge: float = bereich(3.0, heisst='Knicklänge', einheit=M, ueber=0.0)` – Knicklaenge in m.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen.
@@ -548,8 +532,8 @@ Stahlspannung, und dafuer zaehlen Moment und Normalkraft. Ob der Fall
 haeufig oder quasi-staendig ist, sagt die Liste, in der er steht.
 
 - `name: str`
-- `M_Ed: float = 0.0`
-- `N_Ed: float = 0.0`
+- `M_Ed: float = bereich(0.0, heisst='Moment M_Ed', einheit=KNM)`
+- `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)`
 - `aktiv: bool = True` – Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen.
 
 ### RechenwahlEintrag
@@ -718,9 +702,9 @@ class KombinationEintrag(Beschreibung)
 Eine zu pruefende Schnittgroessenkombination.
 
 - `name: str`
-- `M_Ed: float = 0.0`
-- `N_Ed: float = 0.0`
-- `V_Ed: float = 0.0` – Querkraft in kN/m -- für den Querkraftnachweis.
+- `M_Ed: float = bereich(0.0, heisst='Moment M_Ed', einheit=KNM)`
+- `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)`
+- `V_Ed: float = bereich(0.0, heisst='Querkraft V_Ed', einheit=KN_PRO_M)` – Je Meter, nicht je Streifen b -- für den Querkraftnachweis.
 - `art: Erfuellungsart = Erfuellungsart.AUTOMATISCH`
 - `aktiv: bool = True` – Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen.
 

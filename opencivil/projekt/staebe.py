@@ -279,9 +279,6 @@ class MitStaeben:
     LINIENLAGER: Tuple[str, ...]
     """Die Richtungen eines Linienlagers -- Felder der Linie wie des Stabs im Rechenkern."""
 
-    EINHEIT_DER_FEDER: Mapping[str, Any]
-    """Die Einheit jeder Feder, nach ihrem Feld -- an Lager und Linie."""
-
     NEUE_DIAGRAMME: Tuple[str, ...]
     """Was ein frisches System von der GZT zeigt -- dazu die Verschiebung der GZG."""
 

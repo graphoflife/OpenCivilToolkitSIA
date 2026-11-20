@@ -277,7 +277,6 @@ function lagerFelder(a, z, knoten) {
   // Je Richtung nur, wenn alle gewählten ein Lager haben -- sonst stünde da,
   // was nur für einige gilt.
   if (lager.some((l) => !l)) return zeilen;
-  const einheiten = systemkatalog(a.bs.art, 'federeinheiten');
   const richtungSetzen = (feld) => (wert) => a.aendern((zz) => {
     for (const l of zz.lager) if (knoten.includes(l.knoten)) l[feld] = wert;
   });
@@ -287,10 +286,11 @@ function lagerFelder(a, z, knoten) {
       werte: mitVar(HALT, halt), gewaehlt: halt, setzen: richtungSetzen(feld), titel: `Halt in ${zeichen}`,
     })));
     if (halt === 'feder') {
+      const angabe = feldangabe(a.bs.klassen.lager, `k_${feld}`);
       zeilen.push(cadZeile(`  k_${zeichen}`, zahlfeldMitVar({
-        wert: gemeinsam(lager.map((l) => l[`k_${feld}`])), schritt: 1000, min: 0,
+        wert: gemeinsam(lager.map((l) => l[`k_${feld}`])), schritt: 1000, angabe,
         titel: `Federsteifigkeit in ${zeichen}`, beiAenderung: richtungSetzen(`k_${feld}`),
-      }), einheiten[`k_${feld}`] || ''));
+      }), angabe.einheit));
     }
   }
   return zeilen;
@@ -328,7 +328,6 @@ function knotenEigenschaften(a, z, knoten) {
 // -- Linien ------------------------------------------------------------------
 
 function lagerAnLinie(a, linien, wert) {
-  const einheiten = systemkatalog(a.bs.art, 'federeinheiten');
   const setzen = (feld) => (w) => a.aendern((zz) => {
     for (const l of zz.linien) if (linien.includes(l.kennung)) l[feld] = w;
   });
@@ -338,10 +337,11 @@ function lagerAnLinie(a, linien, wert) {
     const halt = wert(feld);
     zeilen.push(wahlBlock(beschriftung, wahlSchalter({ werte: mitVar(werte, halt), gewaehlt: halt, titel, setzen: setzen(feld) })));
     if (halt === 'feder') {
+      const angabe = feldangabe(a.bs.klassen.linie, `k_${feld}`);
       zeilen.push(cadZeile(`  k_${zeichen}`, zahlfeldMitVar({
-        wert: wert(`k_${feld}`), schritt: 1000, min: 0, titel: 'Bettungsziffer je Meter Stab',
+        wert: wert(`k_${feld}`), schritt: 1000, angabe, titel: 'Bettungsziffer je Meter Stab',
         beiAenderung: setzen(`k_${feld}`),
-      }), einheiten[`k_${feld}`] || ''));
+      }), angabe.einheit));
     }
   }
   return zeilen;

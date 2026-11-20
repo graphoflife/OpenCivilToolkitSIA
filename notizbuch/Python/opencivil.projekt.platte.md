@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e97e333b50f
+erzeugt: 1c335e4791fa
 art: modul
 tags: [modul]
 ---
@@ -50,9 +50,9 @@ gezeichneten Querschnitt gleich angibt, steht in der Grundlage
 - `automatik_dicke: bool = False` – Ob das Werkzeug dazu die duennste Plattendicke sucht («Plattendicke optimieren»). Ein Schalter neben dem Modus und nicht ein eigener Modus: je Dicke laeuft dieselbe Suche im gewaehlten Modus.
 - `automatik_y_wie_x: bool = False` – Ob die y-Grundbewehrung jeder Seite der x-Grundbewehrung dieser Seite folgt -- gleicher Durchmesser, gleiche Teilung. Ein Netz, wie es verlegt wird. Die Suche rechnet schon waehrend des Suchens damit: liegt y aussen, kostet ihr Durchmesser x die statische Hoehe.
 - `automatik_teilungen: List[float] = bereich(heisst='Teilung', einheit=MM, ueber=0.0, fabrik=lambda: [150.…` – Teilungen, die es versucht. Grundbewehrung und Zulage teilen sich eine. Jede ueber null -- das Feld der Oberflaeche liest die Grenze von hier. Vorgabe ist die eine uebliche. Wer mehrere angibt, bekommt die mit der kleinsten Stahlflaeche -- das kostet aber je Teilung einen ganzen Suchlauf, und meistens steht die Teilung ohnehin fest.
-- `automatik_mindestdurchmesser: float = 10.0` – Duennster Stab, den die Suche einbaut -- in mm. Die Grundbewehrung jeder Lage hat ihn mindestens, in x wie in y; die Zulage darf fehlen. Null heisst: kein Mindestdurchmesser, eine Lage darf auch leer bleiben.
+- `automatik_mindestdurchmesser: float = bereich(10.0, heisst='Mindestdurchmesser', einheit=MM, ab=0.0)` – Duennster Stab, den die Suche einbaut -- in mm. Die Grundbewehrung jeder Lage hat ihn mindestens, in x wie in y; die Zulage darf fehlen. Null heisst: kein Mindestdurchmesser, eine Lage darf auch leer bleiben.
 - `automatik_grenze: ObergrenzeEintrag = field(default_factory=ObergrenzeEintrag)` – Mehr Querschnitt bekommt keine x-Lage von der Suche -- in allen Modi, auch beim Optimieren der Plattendicke. Vorgabe ⌀30@150, 4712 mm²/m.
-- `automatik_mindestdicke: float = 150.0` – Duenner sucht die Dickenoptimierung keine Platte -- in mm.
+- `automatik_mindestdicke: float = bereich(150.0, heisst='Mindestdicke', einheit=MM, ueber=0.0)` – Duenner sucht die Dickenoptimierung keine Platte -- in mm.
 - `automatik_querkraft: bool = False` – Ob auch die Buegel gesucht werden.
 - `automatik_querkraft_teilungen: List[float] = bereich(heisst='Bügelteilung', einheit=MM, ueber=0.0, fabrik=lambda: …`
 - `lagen: List[LageEintrag] = field(default_factory=list)` – Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer.

@@ -157,7 +157,6 @@ def katalog(eintrag: type, rechnung: type, darstellung: Darstellung) -> Dict[str
         "linienlager": [dict(zip(("beschriftung", "kurz", "zeichen", "titel", "achse"), _LINIENLAGER[f]),
                              feld=f)
                         for f in eintrag.LINIENLAGER],
-        "federeinheiten": {feld: e.beschriftung for feld, e in eintrag.EINHEIT_DER_FEDER.items()},
         # Wie die Ergebnisse heissen: Zeichen, Einheit, Stellen.
         "ergebnisse": darstellung.als_dict(),
     }

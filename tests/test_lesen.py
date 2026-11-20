@@ -6,7 +6,9 @@ Prüfung für eine Datei wie für ein Projekt, das in Python gebaut wurde. Was
 nicht stimmt, meldet sich mit Ort und Wert; umgedeutet wird nichts.
 """
 
+import dataclasses
 import json
+import typing
 import unittest
 
 from opencivil.core.einheiten import GRAD, MM
@@ -17,7 +19,7 @@ from opencivil.projekt import (
 )
 from opencivil.projekt.querschnittsanalyse import SchubwandEintrag
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt.lesen import Bereich, felder_pruefen
+from opencivil.projekt.lesen import Bereich, eintragsklassen, felder_pruefen
 from opencivil.web import dienst
 from opencivil.projekt.aufbau.balkensystem import modell_von
 from tests import unfertig
@@ -201,7 +203,8 @@ class TestEineTuer(unittest.TestCase):
         projekt.balkensysteme[0].linien[0].quer = "festt"
         with self.assertRaises(ProjektFehler) as fehler:
             projekt.rechnen()
-        self.assertIn("Balkensystem 'Rahmen', linien 1", str(fehler.exception))
+        # Die Linie heisst, wie im Zeichenfenster: L1.
+        self.assertIn("Balkensystem 'Rahmen', L1:", str(fehler.exception))
         self.assertIn("'festt' gibt es als 'quer' nicht", str(fehler.exception))
 
     def test_dieselbe_meldung_ueber_den_dienst(self):
@@ -298,6 +301,29 @@ class TestInhaltVorDemRechnen(unittest.TestCase):
                 self.assertEqual(str(fehler.exception), f"Hier: {text}")
 
 
+class TestJedesZahlfeld(unittest.TestCase):
+    """
+    Jede Zahl eines Eintrags hat ihren Bereich oder ist eine Wahl: so kennt
+    der Katalog Einheit und Grenzen jedes Feldes, und die Maske setzt keine
+    eigenen. Bis 2026-11-20 hatten 66 Zahlfelder keinen; die Teilung eines
+    Postens etwa nahm 0 an, und erst die ganze Platte rechnete nicht.
+    """
+
+    @staticmethod
+    def zahl(typ) -> bool:
+        while typing.get_origin(typ) in (list, typing.Union):
+            typ = next(t for t in typing.get_args(typ) if t is not type(None))
+        return typ in (int, float)
+
+    def test_jedes_zahlfeld_hat_seinen_bereich(self):
+        ohne = [f"{klasse.__name__}.{f.name}"
+                for klasse in eintragsklassen(Projekt)
+                for f in dataclasses.fields(klasse)
+                if self.zahl(typing.get_type_hints(klasse)[f.name])
+                and not {"bereich", "wahl"} & set(f.metadata)]
+        self.assertEqual(ohne, [])
+
+
 class TestNichtsStill(unittest.TestCase):
     """
     Was beim Rechnen bisher still einen Ersatz bekam, meldet sich: ein Posten
@@ -308,15 +334,18 @@ class TestNichtsStill(unittest.TestCase):
     def fehler(self, projekt: Projekt) -> str:
         return unfertig.meldung(projekt)
 
-    def test_ein_posten_mit_durchmesser_braucht_eine_teilung(self):
-        """Bis 2026-10-16 hiess eine Teilung von null still «kein Stab»."""
+    def test_ein_posten_braucht_eine_teilung(self):
+        """
+        Bis 2026-10-16 hiess eine Teilung von null still «kein Stab»; seit
+        2026-11-20 weist sie schon ihr Feld ab, mit oder ohne Durchmesser.
+        """
         p = Projekt.beispiel()
         p.querschnitt("q1").lagen[1].grund.abstand = 0.0
-        self.assertIn("lagen 2, grund: die Teilung muss grösser als null sein",
+        self.assertIn("Lage 2, grund: Teilung muss grösser als null sein, angegeben ist 0 mm.",
                       self.fehler(p))
         grund = p.querschnitt("q1").lagen[1].grund
-        grund.art, grund.anzahl = "anzahl", 0.0
-        self.assertIn("braucht eine Stabzahl grösser als null", self.fehler(p))
+        grund.abstand, grund.art, grund.anzahl = 150.0, "anzahl", 0.0
+        self.assertIn("Stabzahl muss grösser als null sein, angegeben ist 0.", self.fehler(p))
 
     def test_eine_knicklaenge_von_null(self):
         """Sie rechnete und hiess «erfüllt»."""

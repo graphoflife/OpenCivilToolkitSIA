@@ -114,7 +114,8 @@ function automatikInhalt(querschnitt) {
       q.automatik_dicke = wert;
     }), 'Plattendicke optimieren'),
     ...(dicke ? [feld('Mindestdicke', zahlfeld({
-      wert: querschnitt.automatik_mindestdicke, schritt: 10, min: 10,
+      wert: querschnitt.automatik_mindestdicke, schritt: 10,
+      angabe: feldangabe('querschnitt', 'automatik_mindestdicke'),
       titel: 'Dünner sucht die Dickenoptimierung keine Platte',
       beiAenderung: (v) => aendern((q) => { q.automatik_mindestdicke = v; }),
     }), 'mm')] : []),
@@ -126,7 +127,7 @@ function automatikInhalt(querschnitt) {
     // hiesse einen Stab, den es nicht gibt.
     feld('Mindestdurchmesser', zahlfeld({
       wert: querschnitt.automatik_mindestdurchmesser || null,
-      stufen: katalog('durchmesser'), min: 0,
+      stufen: katalog('durchmesser'), angabe: feldangabe('querschnitt', 'automatik_mindestdurchmesser'),
       titel: 'Grundbew. jeder Lage mindestens mit diesem ⌀; leer: Lage darf leer bleiben',
       leer: 0,
       beiAenderung: (v) => aendern((q) => { q.automatik_mindestdurchmesser = v; }),
@@ -161,14 +162,15 @@ function obergrenze(querschnitt, aendern) {
       el('span.postenname', { text: name }),
       el('span.zeichen', { text: '⌀' }),
       zahlfeld({
-        wert: posten.durchmesser || null, stufen: katalog('durchmesser'), min: 0,
+        wert: posten.durchmesser || null, stufen: katalog('durchmesser'),
+        angabe: feldangabe('posten', 'durchmesser'),
         titel: '⌀ in mm; Grund und Zulage leer: keine Obergrenze',
         leer: 0,
         beiAenderung: (v) => setzen('durchmesser', v),
       }),
       el('span.zeichen', { text: '@' }),
       zahlfeld({
-        wert: posten.abstand, schritt: 25, min: 25, titel: 'Teilung in mm',
+        wert: posten.abstand, schritt: 25, angabe: feldangabe('posten', 'abstand'), titel: 'Teilung in mm',
         beiAenderung: (v) => setzen('abstand', v),
       }),
       el('span.einheit', { text: 'mm' }),

@@ -1,5 +1,5 @@
 ---
-erzeugt: ae03b7c92458
+erzeugt: 4a3eaa279688
 art: modul
 tags: [modul]
 ---
@@ -41,6 +41,15 @@ ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
 etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
 stimmt, und der Rest rechnet weiter ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
 
+### _in_si
+
+```python
+def _in_si(fall: Any, *groessen: str) -> Dict[str, float]
+```
+
+Je Groesse `N`, `M_y` ... die Zahl ihres Feldes `N_Ed`, `M_y_Ed`
+... in SI, aus der Einheit des Feldes.
+
 ### _analyse
 
 ```python
@@ -53,7 +62,6 @@ rechnen, ein [[opencivil.querschnitt.geometrie#GeometrieFehler|GeometrieFehler]]
 
 ## Braucht
 
-- [[opencivil.core.einheiten]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]

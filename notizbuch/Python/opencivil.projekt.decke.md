@@ -1,5 +1,5 @@
 ---
-erzeugt: 7c201525f957
+erzeugt: 31a79fb78fe3
 art: modul
 tags: [modul]
 ---
@@ -67,8 +67,8 @@ class DeckenknotenEintrag(Beschreibung)
 Ein Punkt des Grundrisses, in m.
 
 - `kennung: str = ''`
-- `x: float = 0.0`
-- `y: float = 0.0`
+- `x: float = bereich(0.0, heisst='x', einheit=M)`
+- `y: float = bereich(0.0, heisst='y', einheit=M)`
 
 ### PlattenlastEintrag
 
