@@ -1,5 +1,5 @@
 ---
-erzeugt: eaea8bf49c8b
+erzeugt: 6a927a6a0d99
 art: modul
 tags: [modul]
 ---
@@ -301,6 +301,7 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 ([[opencivil.projekt.eintraege#Querschnittsangaben|Querschnittsangaben]]).
 
 - `BEZEICHNUNG = 'Querschnittsanalyse'`
+- `STAMM = 'Querschnitt'`
 - `knoten: List[KnotenEintrag] = field(default_factory=list)`
 - `flaechen: List[FlaecheEintrag] = field(default_factory=list)`
 - `staebe: List[StabEintrag] = field(default_factory=list)`

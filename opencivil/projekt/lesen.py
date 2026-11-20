@@ -212,6 +212,37 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     return angaben
 
 
+#: Wie ein Blatt in :func:`feldtypen` heisst, nach seinem Typ.
+_BLAETTER = {bool: "ja/nein", int: "ganz", float: "zahl", str: "text"}
+
+
+def feldtypen(cls: type) -> Dict[str, Dict[str, Any]]:
+    """
+    Was jedes Feld einer Klasse von Eintraegen haelt -- fuer wer ohne Maske
+    schreibt, den MCP-Zugang (:mod:`opencivil.mcp`). ``art`` ist ``zahl``,
+    ``ganz``, ``text``, ``ja/nein``, ``wahl`` (mit ``wahl``: was sie annehmen
+    kann, :func:`wahl_von`), ``eintrag`` (mit ``klasse``: ihr Name im Katalog,
+    :func:`katalogname`), ``liste`` oder ``zuordnung`` (mit ``von``: was darin
+    steht). ``leer``, wo statt eines Wertes auch keiner stehen darf. Einheit
+    und Grenzen sagt :func:`feldangaben`.
+    """
+    typen = _typen(cls)
+    return {f.name: _feldtyp(typen[f.name], f) for f in dataclasses.fields(cls)}
+
+
+def _feldtyp(typ: Any, f: dataclasses.Field) -> Dict[str, Any]:
+    art, innen = _art(typ)
+    if art == "optional":
+        return {**_feldtyp(innen, f), "leer": True}
+    if art in ("liste", "zuordnung"):
+        return {"art": art, "von": _feldtyp(innen, f)}
+    if art == "eintrag":
+        return {"art": "eintrag", "klasse": katalogname(innen)}
+    if _ist_wahl(innen):
+        return {"art": "wahl", "wahl": [m.value for m in f.metadata.get("wahl") or innen]}
+    return {"art": _BLAETTER.get(innen, "wert")}
+
+
 @functools.lru_cache(maxsize=None)
 def _bereiche(cls: type) -> Dict[str, Bereich]:
     """Die Bereiche der Felder einer Klasse, nach Feldnamen -- je Klasse einmal."""

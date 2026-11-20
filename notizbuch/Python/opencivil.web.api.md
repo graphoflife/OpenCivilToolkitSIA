@@ -1,5 +1,5 @@
 ---
-erzeugt: df8f2f790702
+erzeugt: f382933a52d4
 art: modul
 tags: [modul]
 ---
@@ -47,10 +47,10 @@ def _neues_projekt() -> Dict[str, Any]
 Ein neues Projekt der Mappe, wie «+» oben links es anlegt: mit dem ersten
 Beton und Stahl ([[opencivil.projekt.projekt#Projekt.neu|Projekt.neu]]) und mit den Sandboxen.
 
-### _klassen
+### klassen
 
 ```python
-def _klassen() -> Dict[str, type]
+def klassen() -> Dict[str, type]
 ```
 
 Jede Klasse von Eintraegen unter dem Projekt, unter ihrem Namen ohne
@@ -241,4 +241,5 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 
 ## Gebraucht von
 
+- [[opencivil.mcp.werkzeuge]]
 - [[opencivil.web.dienst]]

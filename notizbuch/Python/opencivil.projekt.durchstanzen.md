@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f0c6783adfa
+erzeugt: f3f29c2a5e99
 art: modul
 tags: [modul]
 ---
@@ -69,6 +69,7 @@ class DurchstanzEintrag(BauteilEintrag)
 Eine Durchstanzstelle -- siehe Dateikopf.
 
 - `BEZEICHNUNG = 'Durchstanzen'`
+- `STAMM = 'Stütze'`
 - `ERSTE_MATERIALIEN = {'beton': 'beton', 'stahl': 'betonstahl'}`
 - `kennung: str`
 - `name: str`

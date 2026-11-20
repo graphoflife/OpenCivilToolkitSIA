@@ -103,6 +103,14 @@ class Beschreibung:
     damit die Regel an einer Stelle steht. Ohne eigene keines.
     """
 
+    STAMM: ClassVar[str] = ""
+    """
+    Wie ein neuer Eintrag einer App heisst, vor seiner Nummer: «Platte» in
+    «Platte 1» (:func:`~opencivil.projekt.projekt.naechster_name`). Nur die
+    Klassen der Apps haben einen (:data:`~opencivil.projekt.projekt.APPLISTEN`),
+    und das Projekt: «Projekt 2». Die Oberflaeche liest ihn aus dem Katalog.
+    """
+
     def __setattr__(self, name: str, wert: Any) -> None:
         # Nur Felder (2026-10-25): eine Zuweisung an einen Namen, den es nicht
         # gibt, legte still ein neues Attribut an -- ein Tippfehler im

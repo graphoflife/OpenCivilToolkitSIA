@@ -37,6 +37,7 @@ class SkriptEintrag(Beschreibung):
     """Ein Skript: Name und Code."""
 
     BEZEICHNUNG = "Skript"
+    STAMM = "Skript"
 
     kennung: str
     name: str = ""

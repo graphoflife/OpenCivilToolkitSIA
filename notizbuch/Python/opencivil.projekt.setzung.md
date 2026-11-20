@@ -1,5 +1,5 @@
 ---
-erzeugt: 125e662d50ae
+erzeugt: 108530005928
 art: modul
 tags: [modul]
 ---
@@ -54,6 +54,7 @@ class SetzungEintrag(BauteilEintrag)
 Ein Flachfundament auf geschichtetem Baugrund, mit seinen Pressungen.
 
 - `BEZEICHNUNG = 'Setzung'`
+- `STAMM = 'Fundament'`
 - `kennung: str`
 - `name: str`
 - `B: float = bereich(1.0, heisst='Breite B', einheit=M, ueber=0.0)` – Breite des Fundaments in m.

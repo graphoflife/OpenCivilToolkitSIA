@@ -72,7 +72,7 @@ export function namensfeldEinrichten(feld) {
 function projektNeu(namensfeld) {
   const neu = {
     ...structuredClone(katalog('neu', 'projekte')),
-    name: naechsterName('Projekt', zustand.mappe.projekte),
+    name: naechsterName(katalog('staemme', 'projekte'), zustand.mappe.projekte),
   };
   mappeAendern((m) => m.projekte.push(neu), neu);
   namensfeld.focus();

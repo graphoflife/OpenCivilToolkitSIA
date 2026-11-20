@@ -198,6 +198,7 @@ class Balkensystem3dEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     """
 
     BEZEICHNUNG = "3D-Balkensystem"
+    STAMM = "System"
     ACHSEN = ("x", "y", "z")
     LAGERFELDER = ("x", "y", "z", "phi_x", "phi_y", "phi_z")
     LINIENLAGER = ("quer_y", "quer_z", "laengs")

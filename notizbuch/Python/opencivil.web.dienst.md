@@ -1,5 +1,5 @@
 ---
-erzeugt: d656054ab319
+erzeugt: f4367ce2a07e
 art: modul
 tags: [modul]
 ---
@@ -201,6 +201,11 @@ Zeichenkette.
 Geschrieben wird hier nichts. Der Browser macht daraus einen Download, der
 Server legt es zusaetzlich in `ausgabe/` ab und versucht die Uebersetzung
 zu PDF -- das `.tex` ist auf beiden Wegen dasselbe.
+
+Mit `nur`, der Kennung eines Bauteils, steht nur dieses darin, mit den
+Materialien ([[opencivil.projekt.projekt#Projekt.nur|nur]]) -- auch eine
+Sandbox: wer nach ihr fragt, meint sie. So holt der MCP-Zugang die
+Herleitung eines Eintrags.
 
 ### dateiname
 
@@ -446,4 +451,5 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 
 ## Gebraucht von
 
+- [[opencivil.mcp.sitzung]]
 - [[opencivil.web.server]]

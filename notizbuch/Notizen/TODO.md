@@ -18,8 +18,6 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dazu in Chrome prüfen, ob sich die Seite als App installieren lässt;
       verlangt Chrome ein PNG als Zeichen, schreibt ein kleines Skript ohne
       Fremdpakete die Bilder.
-- [ ] MCP-Server `python3 -m opencivil.mcp`, nur Standardbibliothek, über
-      `dienst.bearbeite`; ohne Ausführen von Skripten.
 - [ ] App «Erdbeben», Ersatzkraftverfahren nach SIA 261:2020, 16.5.2:
       Geschosse mit G_k, Q_k und ψ₂; Wände aus Querschnittsanalysen mit
       EI = κ·E_cm·I (κ vorgegeben 0,5); T₁ = 2·√u (40); F_d und F_di (41),

@@ -1,5 +1,5 @@
 ---
-erzeugt: ffec9478e262
+erzeugt: 21c1b6e88c1e
 art: modul
 tags: [modul]
 ---
@@ -181,6 +181,20 @@ was ein Material ohne eigene waehlt: `vorgabe`.
 Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
 des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
 und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
+
+### feldtypen
+
+```python
+def feldtypen(cls: type) -> Dict[str, Dict[str, Any]]
+```
+
+Was jedes Feld einer Klasse von Eintraegen haelt -- fuer wer ohne Maske
+schreibt, den MCP-Zugang ([[opencivil.mcp]]). `art` ist `zahl`,
+`ganz`, `text`, `ja/nein`, `wahl` (mit `wahl`: was sie annehmen
+kann, [[opencivil.projekt.lesen#wahl_von|wahl_von]]), `eintrag` (mit `klasse`: ihr Name im Katalog,
+[[opencivil.projekt.lesen#katalogname|katalogname]]), `liste` oder `zuordnung` (mit `von`: was darin
+steht). `leer`, wo statt eines Wertes auch keiner stehen darf. Einheit
+und Grenzen sagt [[opencivil.projekt.lesen#feldangaben|feldangaben]].
 
 ### _bereiche
 
@@ -444,6 +458,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 
 ## Konstanten
 
+- `_BLAETTER = {bool: 'ja/nein', int: 'ganz', float: 'zahl', str: 'text'}` – Wie ein Blatt in [[opencivil.projekt.lesen#feldtypen|feldtypen]] heisst, nach seinem Typ.
 - `_KEINE = object()` – Ein Feld ohne Vorgabe.
 
 ## Braucht
@@ -453,6 +468,10 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 
 ## Gebraucht von
 
+- [[opencivil.mcp.ausgabe]]
+- [[opencivil.mcp.sitzung]]
+- [[opencivil.mcp.werkzeuge]]
+- [[opencivil.mcp.zeiger]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
@@ -471,6 +490,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.mappe]]
+- [[opencivil.projekt.netz]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]

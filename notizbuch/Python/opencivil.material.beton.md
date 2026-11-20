@@ -1,5 +1,5 @@
 ---
-erzeugt: 2c7933301893
+erzeugt: 87ea940f5c9e
 art: modul
 tags: [modul]
 ---
@@ -124,6 +124,7 @@ werden, um Normvorgaben zu ersetzen.
 ## Gebraucht von
 
 - [[opencivil.material.arten]]
+- [[opencivil.mcp.werkzeuge]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]

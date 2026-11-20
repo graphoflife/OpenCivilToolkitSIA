@@ -20,7 +20,7 @@ from opencivil.projekt import (
 )
 from opencivil.projekt.querschnittsanalyse import SchubwandEintrag
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt.lesen import eintragsklassen, felder_pruefen
+from opencivil.projekt.lesen import eintragsklassen, felder_pruefen, feldtypen
 from opencivil.web import dienst
 from opencivil.projekt.aufbau.balkensystem import modell_von
 from tests import unfertig
@@ -528,6 +528,24 @@ class TestOrtUndGrund(unittest.TestCase):
                 ("Pfahl 'Pf'", "Pfahl 'P', Schicht 2: undrainiert braucht s_u,k über null")):
             with self.subTest(wo=wo):
                 self.assertEqual(fehler.grund_bei(wo), text)
+
+
+class TestFeldtypen(unittest.TestCase):
+    """Was jedes Feld hält -- für wer ohne Maske schreibt, den MCP-Zugang."""
+
+    def test_blaetter_wahlen_und_listen(self):
+        typen = feldtypen(QuerschnittEintrag)
+        self.assertEqual(typen["h"], {"art": "zahl"})
+        self.assertEqual(typen["zwaengung"], {"art": "ja/nein"})
+        self.assertEqual(typen["rissanforderung"],
+                         {"art": "wahl", "wahl": [r.value for r in Rissanforderung]})
+        self.assertEqual(typen["kombinationen"],
+                         {"art": "liste", "von": {"art": "eintrag", "klasse": "kombination"}})
+        self.assertEqual(typen["querkraftkurve_normalkraft"], {"art": "zahl", "leer": True})
+
+    def test_eine_teilmenge_ihrer_wahl(self):
+        """Ein Posten in mm oder Stk -- die übrigen Linienarten nimmt sein Feld nicht."""
+        self.assertEqual(feldtypen(PostenEintrag)["art"], {"art": "wahl", "wahl": ["teilung", "anzahl"]})
 
 
 if __name__ == "__main__":

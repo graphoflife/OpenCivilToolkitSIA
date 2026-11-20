@@ -344,6 +344,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     """
 
     BEZEICHNUNG = "Querschnittsanalyse"
+    STAMM = "Querschnitt"
 
     knoten: List[KnotenEintrag] = field(default_factory=list)
     flaechen: List[FlaecheEintrag] = field(default_factory=list)

@@ -426,6 +426,9 @@ export function ausVorlage(art, felder) {
 
 /**
  * «Tragsicherheit 3» -- die kleinste Nummer, die in der Liste noch frei ist.
+ * Wie ein neuer Eintrag einer App heisst, legt der Kern fest (`naechster_name`
+ * in opencivil/projekt/projekt.py, der Stamm im Katalog unter `staemme`);
+ * hier dasselbe, damit «+» nicht auf ihn wartet. Ein Test hält beide gleich.
  *
  * Nicht `länge + 1`: nach dem Löschen eines Eintrags ergäbe das einen Namen,
  * den es schon gibt, und der Kern weist doppelte Namen ab.
@@ -435,6 +438,17 @@ export function naechsterName(stamm, eintraege) {
   let i = 1;
   while (vergeben.has(`${stamm} ${i}`)) i += 1;
   return `${stamm} ${i}`;
+}
+
+/**
+ * «Decke über EG (Kopie)», dann «… (Kopie 2)» -- der erste Name, den die
+ * Liste noch nicht hat. Wie `kopie_name` im Kern; ein Test hält beide gleich.
+ */
+export function kopieName(name, eintraege) {
+  const vergeben = new Set(eintraege.map((e) => e.name));
+  let kandidat = `${name} (Kopie)`;
+  for (let i = 2; vergeben.has(kandidat); i += 1) kandidat = `${name} (Kopie ${i})`;
+  return kandidat;
 }
 
 /** Der Namensraum eines Bestandteils im Rechenwerk: `beton.b1`, `querschnitt.q1`. */

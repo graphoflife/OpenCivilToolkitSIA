@@ -94,6 +94,7 @@ class PfahlEintrag(BauteilEintrag):
     """Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf."""
 
     BEZEICHNUNG = "Pfahl"
+    STAMM = "Pfahl"
     #: Angelegt wird ein Bohrpfahl, und er braucht den Beton.
     ERSTE_MATERIALIEN = {"beton": "beton", "stahl": "betonstahl"}
 

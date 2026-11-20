@@ -1,5 +1,5 @@
 ---
-erzeugt: fa0b0d29fa6d
+erzeugt: 3fe779925de2
 art: modul
 tags: [modul]
 ---
@@ -19,7 +19,9 @@ Regeln. Jede steht hier einmal:
    nicht wieder K8. Bis 2026-11-19 zaehlte nur, was noch da war. Eine
    Meldung, eine Auswahl oder eine Diagrammzeile, die auf ein geloeschtes
    Element zeigt, zeigt dann ins Leere -- und nicht auf ein anderes, das
-   zufaellig dieselbe Kennung erbte.
+   zufaellig dieselbe Kennung erbte. Wer Kennungen selbst schreibt, statt
+   sie vergeben zu lassen -- der MCP-Zugang --, haelt sich an dieselbe
+   Regel ([[opencivil.projekt.netz#von_hand|von_hand]]).
 2. **Gleiche Koordinaten sind ein Knoten.** Wer einen Punkt anlegt, der genau
    auf einem bestehenden Knoten liegt, bekommt diesen. So haengen Elemente,
    die sich in einem Punkt treffen, am selben Knoten und bewegen sich
@@ -54,6 +56,36 @@ Eine neue Kennung mit dieser Vorsilbe -- ueber jeder, die `besitzer` je
 vergeben hat, und ueber jeder der `vorhandene`n: eine Datei, die noch
 keine Zaehlung kennt, hat nur sie. Der Besitzer merkt sich die neue.
 
+### von_hand
+
+```python
+def von_hand(alt: Any, neu: Any, wo: str) -> None
+```
+
+Regel 1 fuer ein Bauteil, das jemand als Ganzes selbst schreibt, mit den
+Kennungen seiner Elemente -- ueber den MCP-Zugang ([[opencivil.mcp]]):
+jede Kennung in `neu`, die `alt` nicht hat, liegt ueber jeder Nummer,
+die `alt` je vergeben hat. Sonst traefe ein Diagramm, das noch auf
+einen geloeschten Lastfall zeigt, einen neuen. `neu` merkt sich danach
+je Vorsilbe die hoechste Nummer. Eine Kennung anderer Form als `LF3`
+vergibt [[opencivil.projekt.netz#neue_kennung|neue_kennung]] nie; sie zaehlt hier nicht.
+
+### _hoechste
+
+```python
+def _hoechste(vergeben: Mapping[str, int], kennungen: Iterable[str]) -> Dict[str, int]
+```
+
+`vergeben`, hochgezaehlt auf die Nummer jeder dieser Kennungen, wo sie darueber liegt.
+
+### _kennungen
+
+```python
+def _kennungen(eintrag: Any) -> Iterator[str]
+```
+
+Die Kennungen der Elemente unter `eintrag`, auch tiefer -- nicht seine eigene.
+
 ### Netz
 
 ```python
@@ -87,8 +119,17 @@ def lage(self, kennung: str) -> Optional[Tuple[float, ...]]
 Wo der Knoten liegt -- `None`, wenn es ihn nicht gibt.
 
 
+## Konstanten
+
+- `_GEBAUT = re.compile('(\\D+)(\\d+)')` – Wie eine Kennung gebaut ist, die [[opencivil.projekt.netz#neue_kennung|neue_kennung]] vergibt: Vorsilbe und Nummer, `LF3`.
+
+## Braucht
+
+- [[opencivil.projekt.lesen]]
+
 ## Gebraucht von
 
+- [[opencivil.mcp.sitzung]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.faelle]]

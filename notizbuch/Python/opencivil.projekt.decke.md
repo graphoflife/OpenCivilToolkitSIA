@@ -1,5 +1,5 @@
 ---
-erzeugt: 31a79fb78fe3
+erzeugt: f8c94bac2c5e
 art: modul
 tags: [modul]
 ---
@@ -268,6 +268,7 @@ Ohne Regeln, die das ganze Projekt aufhielten: was an einer Decke nicht
 stimmt, steht in ihren Meldungen, und die anderen Bauteile rechnen weiter.
 
 - `BEZEICHNUNG = 'Decke'`
+- `STAMM = 'Decke'`
 - `kennung: str`
 - `name: str`
 - `knoten: List[DeckenknotenEintrag] = field(default_factory=list)`

@@ -43,8 +43,8 @@ import { situationKarten } from './gb_zeichnung.js';
 import { setzungKarten } from './sz_zeichnung.js';
 import { pfahlKarten } from './pf_zeichnung.js';
 import {
-  ansichtVergessen, eintragVon, freieKennung, istSandbox, katalog, naechsterName, projektAendern,
-  waehlen, zustand,
+  ansichtVergessen, eintragVon, freieKennung, istSandbox, katalog, kopieName, naechsterName,
+  projektAendern, waehlen, zustand,
 } from './zustand.js';
 
 // ===========================================================================
@@ -78,7 +78,8 @@ function nachVorlage(a, braucht = Object.values(katalog('erste_materialien', a.l
   projektAendern((p) => {
     p[a.liste] = p[a.liste] || [];
     const neu = {
-      ...structuredClone(katalog('neu', a.liste)), kennung, name: naechsterName(a.stamm, p[a.liste]),
+      ...structuredClone(katalog('neu', a.liste)), kennung,
+      name: naechsterName(katalog('staemme', a.liste), p[a.liste]),
     };
     for (const [pfad, art] of Object.entries(katalog('erste_materialien', a.liste))) {
       const weg = pfad.split('/');
@@ -124,7 +125,7 @@ function kopieren(a, eintrag) {
     const liste = p[a.liste];
     const i = liste.findIndex((x) => x.kennung === eintrag.kennung);
     const name = istSandbox(eintrag.kennung)
-      ? naechsterName(a.stamm, liste) : kopieName(liste[i].name, liste);
+      ? naechsterName(katalog('staemme', a.liste), liste) : kopieName(liste[i].name, liste);
     liste.splice(i + 1, 0, { ...structuredClone(liste[i]), kennung, name });
   });
   waehlen({ art: a.app, kennung });
@@ -152,14 +153,6 @@ async function zuruecksetzen(a, sandbox) {
     if (i >= 0) p[a.liste][i] = eintrag;
   });
   melden('Die Sandbox beginnt neu.');
-}
-
-/** «Decke über EG (Kopie)», dann «… (Kopie 2)» -- der erste Name, den die Liste noch nicht hat. */
-function kopieName(name, eintraege) {
-  const vergeben = new Set(eintraege.map((e) => e.name));
-  let kandidat = `${name} (Kopie)`;
-  for (let i = 2; vergeben.has(kandidat); i += 1) kandidat = `${name} (Kopie ${i})`;
-  return kandidat;
 }
 
 /**
@@ -198,7 +191,7 @@ function bauteil(name, {
   }
   const zeile = {
     app: a.art, liste: a.liste, knopf: a.knopf, zeichen: a.zeichen,
-    vorsilbe: a.vorsilbe, stamm: a.stamm,
+    vorsilbe: a.vorsilbe,
     gruppen: (p) => [{
       titel: a.titel, leer: a.leer, eintraege: p[a.liste] || [],
       plus: { titel: `${a.einzahl} hinzufügen`, tun: () => nachVorlage(zeile, braucht) },
@@ -368,7 +361,7 @@ const PFAHL = bauteil('pfahl', {
  */
 const SKRIPT = {
   app: 'skript', liste: 'skripte', knopf: 'Python', zeichen: 'python',
-  vorsilbe: 'p', stamm: 'Skript',
+  vorsilbe: 'p',
   gruppen: (p) => [{
     titel: 'Python-Skripte', leer: 'kein Skript', eintraege: p.skripte || [],
     plus: { titel: 'Skript hinzufügen', tun: () => nachVorlage(SKRIPT) },

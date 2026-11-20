@@ -39,6 +39,7 @@ class QuerschnittEintrag(Querschnittsangaben):
     """
 
     BEZEICHNUNG = "Platte"
+    STAMM = "Platte"
     ERSTE_MATERIALIEN = {"beton": "beton", "stahl": "betonstahl"}
 
     beton: str = ""

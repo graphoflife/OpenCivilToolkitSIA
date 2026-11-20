@@ -1,5 +1,5 @@
 ---
-erzeugt: 8f205bddfdf2
+erzeugt: 905a15e7538b
 art: modul
 tags: [modul]
 ---
@@ -175,6 +175,7 @@ Oberflaeche, siehe Dateikopf.
 
 ## Gebraucht von
 
+- [[opencivil.mcp.sitzung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.balkensystem]]

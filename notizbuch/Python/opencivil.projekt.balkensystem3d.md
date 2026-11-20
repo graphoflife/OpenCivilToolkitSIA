@@ -1,5 +1,5 @@
 ---
-erzeugt: 230281ae8772
+erzeugt: e2958d5dd165
 art: modul
 tags: [modul]
 ---
@@ -192,6 +192,7 @@ Lastfaelle, Kombinationen -- was nicht stimmt, steht wie beim
 2D-Balkensystem in seinen Meldungen.
 
 - `BEZEICHNUNG = '3D-Balkensystem'`
+- `STAMM = 'System'`
 - `ACHSEN = ('x', 'y', 'z')`
 - `LAGERFELDER = ('x', 'y', 'z', 'phi_x', 'phi_y', 'phi_z')`
 - `LINIENLAGER = ('quer_y', 'quer_z', 'laengs')`

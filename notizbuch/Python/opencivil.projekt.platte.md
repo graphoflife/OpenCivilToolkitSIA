@@ -1,5 +1,5 @@
 ---
-erzeugt: 2b94eb65d7b7
+erzeugt: ed08910d39c6
 art: modul
 tags: [modul]
 ---
@@ -31,6 +31,7 @@ gezeichneten Querschnitt gleich angibt, steht in der Grundlage
 ([[opencivil.projekt.eintraege#Querschnittsangaben|Querschnittsangaben]]).
 
 - `BEZEICHNUNG = 'Platte'`
+- `STAMM = 'Platte'`
 - `ERSTE_MATERIALIEN = {'beton': 'beton', 'stahl': 'betonstahl'}`
 - `beton: str = ''` – Leer, solange keiner gewaehlt ist -- etwa in der Sandbox eines Projekts ohne Beton: dann rechnet die Platte nicht, das Projekt schon.
 - `stahl: str = ''` – Der Betonstahl der Platte: aller vier Lagen und der Bügel -- einer für alle (Benutzer, 2026-10-24).

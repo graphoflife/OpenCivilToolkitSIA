@@ -53,6 +53,7 @@ class SetzungEintrag(BauteilEintrag):
     """Ein Flachfundament auf geschichtetem Baugrund, mit seinen Pressungen."""
 
     BEZEICHNUNG = "Setzung"
+    STAMM = "Fundament"
 
     kennung: str
     name: str

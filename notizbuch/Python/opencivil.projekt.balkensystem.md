@@ -1,5 +1,5 @@
 ---
-erzeugt: dc94f745b546
+erzeugt: c1387a7d39df
 art: modul
 tags: [modul]
 ---
@@ -314,6 +314,7 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 ([[opencivil.projekt.balkensystem#BalkensystemEintrag|modell]]), und die anderen Bauteile rechnen weiter.
 
 - `BEZEICHNUNG = 'Balkensystem'`
+- `STAMM = 'System'`
 - `kennung: str`
 - `name: str`
 - `knoten: List[SystemknotenEintrag] = field(default_factory=list)`

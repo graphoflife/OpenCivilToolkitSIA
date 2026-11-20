@@ -336,6 +336,7 @@ class BalkensystemEintrag(MitStaeben, MitFaellen, BauteilEintrag):
     """
 
     BEZEICHNUNG = "Balkensystem"
+    STAMM = "System"
 
     kennung: str
     name: str

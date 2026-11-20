@@ -1,12 +1,14 @@
 """
-Der Baukasten für Knoten: Kennungen, die nie wiederkommen, und gleiche
-Koordinaten, die ein Knoten sind.
+Der Baukasten für Knoten: Kennungen, die nie wiederkommen -- auch wenn
+jemand sie selbst schreibt --, und gleiche Koordinaten, die ein Knoten sind.
 """
 
+import copy
 import unittest
 from dataclasses import dataclass, field
 
-from opencivil.projekt.netz import Netz, neue_kennung
+from opencivil.projekt import Projekt, ProjektFehler
+from opencivil.projekt.netz import Netz, neue_kennung, von_hand
 
 
 @dataclass
@@ -52,6 +54,39 @@ class TestKennungen(unittest.TestCase):
         bauteil = Bauteil(vergeben={"L": 12})
         self.assertEqual(neue_kennung(bauteil, "K", ["L9", "K2", "KX", "K"]), "K3")
         self.assertEqual(neue_kennung(bauteil, "F", []), "F1")
+
+
+class TestVonHand(unittest.TestCase):
+    """Ein Bauteil, als Ganzes neu geschrieben -- wie der MCP-Zugang es tut."""
+
+    def setUp(self):
+        self.alt = Projekt.beispiel().balkensysteme[0]
+        self.alt.lastfaelle.pop()          # LF3 ist gelöscht, gezählt bleibt er
+        self.neu = copy.deepcopy(self.alt)
+
+    def lastfall(self, kennung):
+        lastfall = copy.deepcopy(self.neu.lastfaelle[0])
+        lastfall.kennung, lastfall.name = kennung, f"Neu {kennung}"
+        self.neu.lastfaelle.append(lastfall)
+
+    def test_eine_geloeschte_kommt_nicht_wieder(self):
+        self.lastfall("LF3")
+        with self.assertRaisesRegex(ProjektFehler, "Balkensystem 'Rahmen': die Kennung 'LF3' gab "
+                                                   "es hier schon – eine Kennung kommt nie wieder. "
+                                                   "Frei ist 'LF4'."):
+            von_hand(self.alt, self.neu, "Balkensystem 'Rahmen'")
+
+    def test_eine_neue_wird_gezaehlt(self):
+        self.lastfall("LF7")
+        von_hand(self.alt, self.neu, "Balkensystem 'Rahmen'")
+        self.assertEqual(self.neu.vergeben["LF"], 7)
+
+    def test_was_blieb_bleibt_und_die_zaehlung_sinkt_nie(self):
+        """Ein Element mit seiner alten Kennung ist dasselbe -- auch geändert."""
+        self.neu.lastfaelle[0].name = "Umbenannt"
+        self.neu.vergeben = {}
+        von_hand(self.alt, self.neu, "Balkensystem 'Rahmen'")
+        self.assertEqual(self.neu.vergeben, self.alt.vergeben)
 
 
 class TestNetz(unittest.TestCase):

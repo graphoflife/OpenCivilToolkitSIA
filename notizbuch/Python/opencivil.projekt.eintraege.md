@@ -1,5 +1,5 @@
 ---
-erzeugt: 4046b5769d94
+erzeugt: b696c0ff84eb
 art: modul
 tags: [modul]
 ---
@@ -71,6 +71,7 @@ dem Rechnen, nach den Bereichen der Felder
 ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
 
 - `ERSTE_MATERIALIEN: ClassVar[Mapping[str, str]] = {}` – Was ein neuer Eintrag vom Projekt nimmt ([[opencivil.projekt.eintraege#Beschreibung.frisch|frisch]]): je Feld, als Pfad wie `stabmaterialien/0/stoff`, die Art des Materials, von der er das erste bekommt. «+» in der Oberflaeche liest es aus dem Katalog, damit die Regel an einer Stelle steht. Ohne eigene keines.
+- `STAMM: ClassVar[str] = ''` – Wie ein neuer Eintrag einer App heisst, vor seiner Nummer: «Platte» in «Platte 1» ([[opencivil.projekt.projekt#naechster_name|naechster_name]]). Nur die Klassen der Apps haben einen ([[opencivil.projekt.projekt#Konstanten|APPLISTEN]]), und das Projekt: «Projekt 2». Die Oberflaeche liest ihn aus dem Katalog.
 
 #### Beschreibung.regeln
 
@@ -782,6 +783,8 @@ Eine zu pruefende Schnittgroessenkombination.
 
 ## Gebraucht von
 
+- [[opencivil.mcp.ausgabe]]
+- [[opencivil.mcp.sitzung]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]

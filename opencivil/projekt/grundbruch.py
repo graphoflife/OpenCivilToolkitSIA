@@ -50,6 +50,7 @@ class GrundbruchEintrag(BauteilEintrag):
     """Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen."""
 
     BEZEICHNUNG = "Grundbruch"
+    STAMM = "Fundament"
 
     kennung: str
     name: str

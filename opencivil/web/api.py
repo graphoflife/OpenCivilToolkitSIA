@@ -147,7 +147,7 @@ def _neues_projekt() -> Dict[str, Any]:
     return projekt.als_dict()
 
 
-def _klassen() -> Dict[str, type]:
+def klassen() -> Dict[str, type]:
     """
     Jede Klasse von Eintraegen unter dem Projekt, unter ihrem Namen ohne
     «Eintrag», klein: ``grundbruch``, ``schicht``, ``kombination`` -- so
@@ -210,13 +210,13 @@ def katalog() -> dict:
         ],
         # Je Klasse von Eintraegen, was der Kern ueber ihre Felder weiss --
         # Einheit, Grenzen, ob ganz -- und wie ein frischer Eintrag aussieht,
-        # beides unter demselben Namen (:func:`_klassen`). Die Oberflaeche
+        # beides unter demselben Namen (:func:`klassen`). Die Oberflaeche
         # setzt an einer Vorlage nur Kennung, Name und Materialien. Bis
         # 2026-11-10 standen die Vorlagen von Hand da, unter eigenen Namen:
         # die Einwirkung einer Platte hiess dort «einwirkung», ihre Felder
         # «kombination».
-        "felder": {name: feldangaben(cls) for name, cls in _klassen().items()},
-        "vorlagen": {name: _vorlage(cls) for name, cls in _klassen().items()},
+        "felder": {name: feldangaben(cls) for name, cls in klassen().items()},
+        "vorlagen": {name: _vorlage(cls) for name, cls in klassen().items()},
         # Was ein Nachweis aus seinem Eintrag liest, in den Gruppen seiner
         # Herleitung: die Karten seiner Maske, mit Zeichen, Beschriftung und
         # Hinweis (:func:`_vorgaben`). Bis 2026-11-20 schrieben die Masken
@@ -228,6 +228,10 @@ def katalog() -> dict:
         # (:func:`_neues_projekt`).
         "neu": {**{liste: _vorlage(klasse) for liste, (klasse, _) in APPLISTEN.items()},
                 "projekte": _neues_projekt()},
+        # Wie ein neuer Eintrag einer App heisst, vor seiner Nummer: «Platte 1»
+        # -- und ein neues Projekt der Mappe.
+        "staemme": {**{liste: klasse.STAMM for liste, (klasse, _) in APPLISTEN.items()},
+                    "projekte": Projekt.STAMM},
         # Welche Felder eines neuen Eintrags das erste Material welcher Art
         # nehmen -- «+» setzt sie, wie die Sandbox im Kern
         # (:attr:`~opencivil.projekt.eintraege.Beschreibung.ERSTE_MATERIALIEN`).

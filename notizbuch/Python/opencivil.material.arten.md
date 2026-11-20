@@ -1,5 +1,5 @@
 ---
-erzeugt: 158b81216390
+erzeugt: 2aa4a1ad0f01
 art: modul
 tags: [modul]
 ---
@@ -57,6 +57,8 @@ def titel(self) -> str
 
 ## Gebraucht von
 
+- [[opencivil.mcp.ausgabe]]
+- [[opencivil.mcp.werkzeuge]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.projekt]]

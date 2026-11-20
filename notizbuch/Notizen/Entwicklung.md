@@ -7,6 +7,56 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Der MCP-Zugang
+
+Der Benutzer wünschte sich, dass eine KI mit dem Werkzeug arbeiten kann,
+mit Projektdateien (2026-11-20). `python3 -m opencivil.mcp` startet einen
+Server, der das Model Context Protocol über stdin und stdout spricht --
+JSON-RPC 2.0, eine Nachricht je Zeile, nur mit der Standardbibliothek. Er
+kennt `initialize`, `ping`, `tools/list` und `tools/call`; Claude Code
+findet ihn über `.mcp.json`.
+
+**Ein Rechenweg.** Geöffnet und gerechnet wird über `dienst.bearbeite`, wie
+in der Seite; angelegt, kopiert und gelöscht mit Methoden des Projekts
+(`eintrag_anlegen`, `eintrag_kopieren`, `eintrag_loeschen`,
+`material_anlegen`). Was die Seite dabei in JavaScript tut, ohne auf den
+Kern zu warten, folgt ihm: der Stamm eines neuen Namens -- «Platte» in
+«Platte 1» -- stand bis dahin in `arten.js` und steht jetzt an der Klasse
+(`STAMM`), die Seite liest ihn aus dem Katalog (`staemme`), und ein Test
+hält die Namen beider gleich, auch die der Kopien.
+
+**Eine Tür für jede Änderung.** Jedes Werkzeug ändert eine Kopie des
+Projekts; erst wenn der Kern sie geprüft hat, ersetzt sie das Projekt.
+Abgewiesen wird, was er nicht lesen kann -- «ein Feld 'hh' gibt es nicht.
+Gemeint ist vielleicht 'h'?» -- und was das ganze Projekt anhielte, wo es
+vorher rechnete, etwa zwei Materialien mit einem Namen. Was nur den Eintrag
+anhält, gilt: der Rest rechnet weiter, wie seit 2026-11-19 überall, und die
+Antwort sagt gleich, was fehlt, in den Worten des Kerns. Anders als ein Feld
+der Seite nimmt der Zugang darum auch eine Dicke von −5 mm an -- und meldet
+sie im selben Satz, der sonst beim Rechnen käme. Mehrere Änderungen in einem
+Aufruf gelten zusammen oder keine.
+
+**Kennungen, die jemand selbst schreibt.** Mit `eintrag_setzen` und
+`eintrag_aendern` schreibt eine KI die Elemente eines Bauteils selbst, mit
+ihren Kennungen. Eine gelöschte darf dabei nicht wiederkommen
+(`netz.von_hand`, Regel 1 der Kennungen): sonst träfe ein Diagramm, das noch
+auf einen gelöschten Lastfall zeigt, einen neuen. Die Meldung nennt die
+nächste freie.
+
+**Die Herleitung eines Bauteils.** `herleitung` holt den Bericht mit `nur`;
+`Projekt.nur` behält dafür die Bauteile, deren Querschnitt das Bauteil
+nimmt -- ein Stab, dessen Querschnitt eine Analyse ist, rechnete ohne sie
+nicht. Die Bewehrungssuche, die `nur` auch braucht, rechnet Platten, und die
+nehmen keinen.
+
+**Bewusst nicht.** Skripte der App «Python» führt der Zugang nicht aus --
+die Konsole führt beliebigen Code aus. Und `rechnen` gibt nicht die ganze
+Antwort des Dienstes zurück, beim Beispiel rund 870 kB, sondern je Bauteil
+die Tabelle seiner Nachweise aus der Zusammenfassung, mit dem, was der Kern
+dazu sagt. Eine Datei, die es schon gibt, überschreibt der Zugang nur mit
+`ueberschreiben`, und wer ungespeicherte Änderungen hat, muss sie zum
+Öffnen einer anderen Datei ausdrücklich verwerfen.
+
 ## 2026-11-20 · Schneller Start
 
 Der Benutzer fragte, warum der Start auf GitHub so lange dauert

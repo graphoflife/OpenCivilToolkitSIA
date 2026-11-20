@@ -12,7 +12,9 @@ Regeln. Jede steht hier einmal:
    nicht wieder K8. Bis 2026-11-19 zaehlte nur, was noch da war. Eine
    Meldung, eine Auswahl oder eine Diagrammzeile, die auf ein geloeschtes
    Element zeigt, zeigt dann ins Leere -- und nicht auf ein anderes, das
-   zufaellig dieselbe Kennung erbte.
+   zufaellig dieselbe Kennung erbte. Wer Kennungen selbst schreibt, statt
+   sie vergeben zu lassen -- der MCP-Zugang --, haelt sich an dieselbe
+   Regel (:func:`von_hand`).
 2. **Gleiche Koordinaten sind ein Knoten.** Wer einen Punkt anlegt, der genau
    auf einem bestehenden Knoten liegt, bekommt diesen. So haengen Elemente,
    die sich in einem Punkt treffen, am selben Knoten und bewegen sich
@@ -30,7 +32,14 @@ Kern anders saehe; der Kern haengt von ihm nicht ab.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
+import dataclasses
+import re
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional, Tuple
+
+from opencivil.projekt.lesen import ProjektFehler
+
+#: Wie eine Kennung gebaut ist, die :func:`neue_kennung` vergibt: Vorsilbe und Nummer, ``LF3``.
+_GEBAUT = re.compile(r"(\D+)(\d+)")
 
 
 def nummer(kennung: str, vorsilbe: str) -> Optional[int]:
@@ -49,6 +58,57 @@ def neue_kennung(besitzer: Any, vorsilbe: str, vorhandene: Iterable[str]) -> str
              *(nummer(k, vorsilbe) or 0 for k in vorhandene)]) + 1
     besitzer.vergeben[vorsilbe] = n
     return f"{vorsilbe}{n}"
+
+
+def von_hand(alt: Any, neu: Any, wo: str) -> None:
+    """
+    Regel 1 fuer ein Bauteil, das jemand als Ganzes selbst schreibt, mit den
+    Kennungen seiner Elemente -- ueber den MCP-Zugang (:mod:`opencivil.mcp`):
+    jede Kennung in ``neu``, die ``alt`` nicht hat, liegt ueber jeder Nummer,
+    die ``alt`` je vergeben hat. Sonst traefe ein Diagramm, das noch auf
+    einen geloeschten Lastfall zeigt, einen neuen. ``neu`` merkt sich danach
+    je Vorsilbe die hoechste Nummer. Eine Kennung anderer Form als ``LF3``
+    vergibt :func:`neue_kennung` nie; sie zaehlt hier nicht.
+    """
+    alte = set(_kennungen(alt))
+    hoechste = _hoechste(alt.vergeben, alte)
+    for kennung in _kennungen(neu):
+        gebaut = _GEBAUT.fullmatch(kennung)
+        if kennung in alte or gebaut is None:
+            continue
+        vorsilbe, n = gebaut[1], int(gebaut[2])
+        if n <= hoechste.get(vorsilbe, 0):
+            raise ProjektFehler(f"die Kennung '{kennung}' gab es hier schon – eine Kennung kommt "
+                                f"nie wieder. Frei ist '{vorsilbe}{hoechste[vorsilbe] + 1}'.", wo=wo)
+    for vorsilbe, n in neu.vergeben.items():
+        hoechste[vorsilbe] = max(n, hoechste.get(vorsilbe, 0))
+    neu.vergeben = _hoechste(hoechste, _kennungen(neu))
+
+
+def _hoechste(vergeben: Mapping[str, int], kennungen: Iterable[str]) -> Dict[str, int]:
+    """``vergeben``, hochgezaehlt auf die Nummer jeder dieser Kennungen, wo sie darueber liegt."""
+    hoechste = dict(vergeben)
+    for kennung in kennungen:
+        gebaut = _GEBAUT.fullmatch(kennung)
+        if gebaut is not None:
+            hoechste[gebaut[1]] = max(int(gebaut[2]), hoechste.get(gebaut[1], 0))
+    return hoechste
+
+
+def _kennungen(eintrag: Any) -> Iterator[str]:
+    """Die Kennungen der Elemente unter ``eintrag``, auch tiefer -- nicht seine eigene."""
+    for f in dataclasses.fields(eintrag):
+        yield from _darin(getattr(eintrag, f.name))
+
+
+def _darin(wert: Any) -> Iterator[str]:
+    if dataclasses.is_dataclass(wert):
+        if isinstance(getattr(wert, "kennung", None), str):
+            yield wert.kennung
+        yield from _kennungen(wert)
+    elif isinstance(wert, (list, tuple, dict)):
+        for teil in wert.values() if isinstance(wert, dict) else wert:
+            yield from _darin(teil)
 
 
 class Netz:

@@ -20,7 +20,7 @@ import copy
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple, Union
+from typing import Any, Dict, Iterable, List, Sequence, Tuple, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
@@ -62,6 +62,33 @@ APPLISTEN: Dict[str, Tuple[type, str]] = {
 SANDBOX = "Sandbox"
 
 
+def naechster_name(stamm: str, namen: Iterable[str]) -> str:
+    """
+    Der Name eines neuen Eintrags: «Platte 1», «Platte 2» … -- der erste, den
+    es unter ``namen`` noch nicht gibt. So nennt auch die Oberflaeche, was
+    «+» anlegt (``naechsterName``, web/js/zustand.js); ein Test haelt beide
+    gleich.
+    """
+    vergeben = set(namen)
+    i = 1
+    while f"{stamm} {i}" in vergeben:
+        i += 1
+    return f"{stamm} {i}"
+
+
+def kopie_name(name: str, namen: Iterable[str]) -> str:
+    """
+    Der Name einer Kopie: «Decke über EG (Kopie)», dann «… (Kopie 2)» -- der
+    erste, den es unter ``namen`` noch nicht gibt. Wie ⧉ in der Oberflaeche
+    (``kopieName``, web/js/zustand.js); ein Test haelt beide gleich.
+    """
+    vergeben = set(namen)
+    kandidat, i = f"{name} (Kopie)", 2
+    while kandidat in vergeben:
+        kandidat, i = f"{name} (Kopie {i})", i + 1
+    return kandidat
+
+
 # ===========================================================================
 # Projekt
 # ===========================================================================
@@ -69,6 +96,8 @@ SANDBOX = "Sandbox"
 @dataclass
 class Projekt(Beschreibung):
     """Die vollstaendige, speicherbare Beschreibung eines Projekts."""
+
+    STAMM = "Projekt"
 
     name: str = "Neues Projekt"
     materialien: List[MaterialEintrag] = field(default_factory=list)
@@ -141,16 +170,26 @@ class Projekt(Beschreibung):
 
     def nur(self, kennung: str) -> "Projekt":
         """
-        Eine Kopie, in der von den Bauteilen nur dieses eine steht --
-        die Materialien bleiben. So rechnet die Bewehrungssuche: die
+        Eine Kopie, in der von den Bauteilen nur dieses eine steht -- mit
+        denen, deren Querschnitt es nimmt (``bezuege``), auch ueber mehrere
+        Stufen; die Materialien bleiben. So rechnet die Bewehrungssuche: die
         anderen Bauteile kann sie nicht beeinflussen, und ihre Urteile
-        zaehlten sonst mit.
+        zaehlten sonst mit. Und so holt der MCP-Zugang die Herleitung eines
+        Bauteils -- ein Stab, dessen Querschnitt eine Analyse ist, rechnete
+        ohne sie nicht.
         """
         self.bauteil(kennung)
+        alle = {e.kennung: e for e in self.bauteile()}
+        behalten, offen = set(), [kennung]
+        while offen:
+            k = offen.pop()
+            if k in alle and k not in behalten:
+                behalten.add(k)
+                offen.extend(alle[k].bezuege())
         kopie = copy.deepcopy(self)
         for art in BAUTEILE:
             setattr(kopie, art.liste,
-                    [e for e in getattr(kopie, art.liste) if e.kennung == kennung])
+                    [e for e in getattr(kopie, art.liste) if e.kennung in behalten])
         kopie.sandboxen = {liste: k for liste, k in kopie.sandboxen.items()
                            if any(e.kennung == k for e in getattr(kopie, liste))}
         return kopie
@@ -227,6 +266,18 @@ class Projekt(Beschreibung):
     def eigener_baustahl(self, vorlage: str = "S235") -> MaterialEintrag:
         """Ein eigener Baustahl, ``ST1``, ``ST2`` ... -- siehe :meth:`eigener_beton`."""
         return self._eigenes("baustahl", vorlage)
+
+    def material_anlegen(self, art: str, sorte: str, *, eigen: bool = False) -> MaterialEintrag:
+        """
+        «+ Material»: eine Normsorte der Art ``art`` -- mit ``eigen`` ein
+        eigenes Material, die Sorte als Vorlage (:meth:`eigener_beton`). Fuer
+        wer die Art als Text hat, den MCP-Zugang; :meth:`beton` und die
+        anderen sagen sie im Namen.
+        """
+        if art not in MATERIALARTEN:
+            raise ProjektFehler(f"Eine Materialart '{art}' gibt es nicht. Möglich sind: "
+                                f"{', '.join(MATERIALARTEN)}.")
+        return self._eigenes(art, sorte) if eigen else self._normsorte(art, sorte)
 
     def _eigenes(self, art: str, vorlage: str) -> MaterialEintrag:
         eintrag = MaterialEintrag(kennung=self.freie_kennung(MATERIALARTEN[art].kennung), art=art,
@@ -480,6 +531,89 @@ class Projekt(Beschreibung):
         aufbau = self.ohne_sandboxen().aufbauen()
         return Ergebnis(projekt=self, aufbau=aufbau,
                         loesung=aufbau.werk.loese(*aufbau.alle_ziele()))
+
+    # -- Eintraege der Apps -------------------------------------------------
+    #
+    # Was «+», ⧉ und × in einer App tun -- fuer wer ohne Oberflaeche arbeitet,
+    # etwa ueber den MCP-Zugang (:mod:`opencivil.mcp`). Die Oberflaeche tut
+    # dasselbe in JavaScript, ohne auf den Kern zu warten (``nachVorlage``
+    # und ``kopieren`` in web/js/apps.js); Vorlage, erste Materialien und den
+    # Stamm des Namens liest sie aus dem Katalog, also von hier.
+
+    def eintrag_anlegen(self, liste: str) -> Any:
+        """
+        «+» einer App: ein frischer Eintrag nach der Vorlage seiner Klasse und
+        mit dem ersten Material jeder Art, die er nimmt
+        (:meth:`~opencivil.projekt.eintraege.Beschreibung.frisch`), unter einer
+        Kennung, die es im Projekt nie gab, am Ende der Liste -- und mit dem
+        Namen, den «+» gibt: «Platte 1» (:func:`naechster_name`). Fehlt ein
+        Material, das er nimmt, rechnet er erst, wenn eines da ist, wie die
+        Sandbox.
+        """
+        klasse, vorsilbe = self._app(liste)
+        eintraege = getattr(self, liste)
+        eintrag = klasse.frisch(self.materialien)
+        eintrag.kennung = self.freie_kennung(vorsilbe)
+        eintrag.name = naechster_name(klasse.STAMM, (e.name for e in eintraege))
+        eintraege.append(eintrag)
+        return eintrag
+
+    def eintrag_kopieren(self, kennung: str) -> Any:
+        """
+        ⧉: eine Kopie gleich hinter dem Original, alles wie dort, nur Kennung
+        und Name neu -- «Decke über EG (Kopie)» (:func:`kopie_name`). Die
+        Kopie der Sandbox ist ein gewoehnlicher Eintrag und heisst wie ein
+        neuer, «Platte 1».
+        """
+        liste, i = self._ort_in_app(kennung)
+        klasse, vorsilbe = APPLISTEN[liste]
+        eintraege = getattr(self, liste)
+        namen = [e.name for e in eintraege]
+        kopie = copy.deepcopy(eintraege[i])
+        kopie.kennung = self.freie_kennung(vorsilbe)
+        kopie.name = (naechster_name(klasse.STAMM, namen) if self.ist_sandbox(kennung)
+                      else kopie_name(eintraege[i].name, namen))
+        eintraege.insert(i + 1, kopie)
+        return kopie
+
+    def eintrag_loeschen(self, kennung: str) -> Any:
+        """
+        ×: ein Eintrag einer App oder ein Material geht -- nicht die Sandbox,
+        die nur zurueckgesetzt wird, und nicht, solange ein Bauteil auf ihn
+        zeigt (:meth:`verweise`); der Fehler nennt dann die Bauteile. Gibt den
+        geloeschten Eintrag zurueck.
+        """
+        for liste in ("materialien", *APPLISTEN):
+            eintraege = getattr(self, liste)
+            eintrag = next((e for e in eintraege if e.kennung == kennung), None)
+            if eintrag is None:
+                continue
+            if self.ist_sandbox(kennung):
+                raise ProjektFehler("die Sandbox lässt sich nicht löschen, nur zurücksetzen.",
+                                    wo=ort_von(eintrag))
+            verweise = self.verweise(kennung)
+            if verweise:
+                raise ProjektFehler("bleibt, solange noch darauf zeigt: "
+                                    + ", ".join(ort_von(v) for v in verweise) + ".",
+                                    wo=ort_von(eintrag))
+            eintraege.remove(eintrag)
+            return eintrag
+        raise ProjektFehler(f"Einen Eintrag '{kennung}' gibt es im Projekt nicht.")
+
+    def _app(self, liste: str) -> Tuple[type, str]:
+        """Klasse und Vorsilbe der App mit dieser Liste (:data:`APPLISTEN`)."""
+        if liste not in APPLISTEN:
+            raise ProjektFehler(f"Eine App mit der Liste '{liste}' gibt es nicht. Möglich sind: "
+                                f"{', '.join(APPLISTEN)}.")
+        return APPLISTEN[liste]
+
+    def _ort_in_app(self, kennung: str) -> Tuple[str, int]:
+        """In welcher Liste einer App der Eintrag steht, und an welcher Stelle."""
+        for liste in APPLISTEN:
+            for i, e in enumerate(getattr(self, liste)):
+                if e.kennung == kennung:
+                    return liste, i
+        raise ProjektFehler(f"Einen Eintrag '{kennung}' gibt es in keiner App des Projekts.")
 
     # -- Sandbox ------------------------------------------------------------
     #

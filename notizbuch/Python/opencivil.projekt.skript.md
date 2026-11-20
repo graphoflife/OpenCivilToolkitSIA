@@ -1,5 +1,5 @@
 ---
-erzeugt: 988cb9874912
+erzeugt: 282025d665e7
 art: modul
 tags: [modul]
 ---
@@ -29,6 +29,7 @@ class SkriptEintrag(Beschreibung)
 Ein Skript: Name und Code.
 
 - `BEZEICHNUNG = 'Skript'`
+- `STAMM = 'Skript'`
 - `kennung: str`
 - `name: str = ''`
 - `code: str = ''`

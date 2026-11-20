@@ -190,6 +190,33 @@ Wahl, die es nicht gibt -- jedes wird mit seinem Ort genannt, etwa «Platte
 'Decke', lagen 2, grund: 'abstand' muss eine Zahl sein». Was fehlt, bekommt
 die Vorgabe. Dateien aus älteren Fassungen werden nicht mehr umgerechnet.
 
+## Für eine KI: der MCP-Zugang
+
+Eine KI – Claude Code oder ein anderes Programm, das das Model Context
+Protocol spricht – arbeitet mit dem Werkzeug wie jemand an der Seite: sie
+öffnet eine Projektdatei, legt Einträge an und ändert sie, rechnet und holt
+den Bericht. Der Server ist reines Python, ohne Fremdpaket:
+
+```bash
+python3 -m opencivil.mcp
+```
+
+Claude Code findet ihn über `.mcp.json` im Repo und fragt beim ersten Mal,
+ob es ihn starten darf. Ein anderes Programm startet denselben Befehl im
+Verzeichnis des Repos und spricht mit ihm über stdin und stdout, eine
+JSON-RPC-Nachricht je Zeile.
+
+Die Werkzeuge: `datei_oeffnen`, `datei_neu`, `datei_speichern`; `projekte`,
+`projekt_waehlen`, `projekt_anlegen`; `arten`, `felder`, `eintraege`;
+`eintrag_lesen`, `eintrag_setzen`, `eintrag_aendern` – über Pfade wie
+`/kombinationen/0/M_Ed` –, `eintrag_anlegen`, `material_anlegen`,
+`eintrag_kopieren`, `eintrag_loeschen`, `sandbox_zuruecksetzen`; `rechnen`,
+`herleitung`, `bericht`. Gerechnet wird mit demselben Dienst wie in der
+Seite. Jede Änderung prüft der Kern sofort: was er nicht lesen kann, ändert
+nichts, und seine Meldung kommt unverändert zurück. Eine Datei, die es schon
+gibt, überschreibt der Zugang nur auf Wunsch, und ungespeicherte Änderungen
+verwirft er nicht still. Python-Skripte der App «Python» führt er nicht aus.
+
 ## Notizbuch und Obsidian
 
 Wie gerechnet wird, wie die Bibliothek gebaut ist und was beim Bauen gelernt
@@ -269,6 +296,7 @@ Fertig und getestet (1229 Tests):
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
+| `mcp/` | der Zugang für eine KI: das Protokoll (`server`), die Werkzeuge (`werkzeuge`), die offene Datei und jede Änderung durch die Prüfung des Kerns (`sitzung`), Pfade in einen Eintrag (`zeiger`), was zurückgeht (`ausgabe`) |
 | `web/uebersetzt.py` | was Python im Browser vom Kern übersetzt hat, für den nächsten Start: in einem Stück, am Inhalt der Quellen geprüft |
 | `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
 | `sw.js`, `web/js/offline.js`, `web/manifest.webmanifest` | die Seite ohne Netz und als App: der Service Worker, wo er angemeldet wird, was ein installiertes Fenster zeigt |

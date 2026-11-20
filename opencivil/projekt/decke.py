@@ -259,6 +259,7 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
     """
 
     BEZEICHNUNG = "Decke"
+    STAMM = "Decke"
 
     kennung: str
     name: str

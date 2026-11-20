@@ -5,8 +5,8 @@ gibt es ihn nicht mehr, geschieht nichts. Jede Aenderung zaehlt die Fassung
 des Projekts, wer horcht, erfaehrt, ob alles, nur die Mitte oder das Projekt
 neu ist, ein anderes Projekt leert, was sich die Ansichten merkten, und wer
 zurueckkehrt, findet seine Auswahl wieder. Der Katalog nennt einen fehlenden
-Schluessel mit seinem Pfad, und was zu einer Sandbox gehoert, sagt ihre
-Kennung.
+Schluessel mit seinem Pfad, was zu einer Sandbox gehoert, sagt ihre
+Kennung, und ein neuer Eintrag und eine Kopie heissen wie im Kern.
 
 Das Modul wird node als ``data:``-Adresse gegeben, wie in
 ``test_arten_js.py``. Ohne node wird uebersprungen.
@@ -18,6 +18,8 @@ import shutil
 import subprocess
 import unittest
 from pathlib import Path
+
+from opencivil.projekt.projekt import kopie_name, naechster_name
 
 WURZEL = Path(__file__).resolve().parents[1]
 NODE = shutil.which("node")
@@ -75,8 +77,17 @@ z.projektSetzen(spiel, { mappe: { projekte: [spiel] } });
 ergebnis.sandbox = [z.istSandbox('q2'), z.istSandbox('q1'),
                     z.inSandbox('querschnitt.q2.nachweis.mn.x'),
                     z.inSandbox('querschnitt.q1.nachweis.mn.x'), z.inSandbox('beton.b1.f_ck')];
+
+const liste = (namen) => namen.map((name) => ({ name }));
+ergebnis.namen = NAMEN.map(([stamm, namen]) => [z.naechsterName(stamm, liste(namen)),
+                                                z.kopieName(stamm, liste(namen))]);
 process.stdout.write(JSON.stringify(ergebnis));
 """
+
+#: Je ein Name und die Namen, die die Liste schon hat -- für einen neuen
+#: Eintrag der Stamm, für eine Kopie das Original.
+NAMEN = [["Platte", []], ["Platte", ["Platte 1", "Platte 3"]],
+         ["Decke", ["Decke", "Decke (Kopie)", "Decke (Kopie 3)"]], ["Decke", ["Decke (Kopie 2)"]]]
 
 
 @unittest.skipUnless(NODE, "ohne node")
@@ -84,7 +95,8 @@ class TestEintraegeUeberIhreKennung(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         modul = base64.b64encode((WURZEL / "web" / "js" / "zustand.js").read_bytes()).decode()
-        lauf = subprocess.run([NODE, "--input-type=module", "-e", PROGRAMM % modul],
+        programm = f"const NAMEN = {json.dumps(NAMEN)};\n" + PROGRAMM % modul
+        lauf = subprocess.run([NODE, "--input-type=module", "-e", programm],
                               capture_output=True, text=True, timeout=60)
         if lauf.returncode:
             raise AssertionError(lauf.stderr)
@@ -133,6 +145,12 @@ class TestEintraegeUeberIhreKennung(unittest.TestCase):
     def test_was_zur_sandbox_gehoert(self):
         """Ihre Kennung und was im Rechenwerk unter ihr steht -- nicht der Beton, den sie nimmt."""
         self.assertEqual(self.ergebnis["sandbox"], [True, False, True, False, False])
+
+    def test_namen_wie_im_kern(self):
+        """«+» und ⧉ benennen in der Seite, ohne auf den Kern zu warten -- gleich wie er."""
+        self.assertEqual(self.ergebnis["namen"],
+                         [[naechster_name(name, namen), kopie_name(name, namen)]
+                          for name, namen in NAMEN])
 
 
 if __name__ == "__main__":

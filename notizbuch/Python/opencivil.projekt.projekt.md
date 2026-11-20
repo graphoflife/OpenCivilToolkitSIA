@@ -1,5 +1,5 @@
 ---
-erzeugt: b06abce20098
+erzeugt: 8b45391ac605
 art: modul
 tags: [modul]
 ---
@@ -22,6 +22,27 @@ reicht nur weiter.
 
 ## Inhalt
 
+### naechster_name
+
+```python
+def naechster_name(stamm: str, namen: Iterable[str]) -> str
+```
+
+Der Name eines neuen Eintrags: «Platte 1», «Platte 2» … -- der erste, den
+es unter `namen` noch nicht gibt. So nennt auch die Oberflaeche, was
+«+» anlegt (`naechsterName`, web/js/zustand.js); ein Test haelt beide
+gleich.
+
+### kopie_name
+
+```python
+def kopie_name(name: str, namen: Iterable[str]) -> str
+```
+
+Der Name einer Kopie: «Decke über EG (Kopie)», dann «… (Kopie 2)» -- der
+erste, den es unter `namen` noch nicht gibt. Wie ⧉ in der Oberflaeche
+(`kopieName`, web/js/zustand.js); ein Test haelt beide gleich.
+
 ### Projekt
 
 ```python
@@ -31,6 +52,7 @@ class Projekt(Beschreibung)
 
 Die vollstaendige, speicherbare Beschreibung eines Projekts.
 
+- `STAMM = 'Projekt'`
 - `name: str = 'Neues Projekt'`
 - `materialien: List[MaterialEintrag] = field(default_factory=list)`
 - `querschnitte: List[QuerschnittEintrag] = field(default_factory=list)`
@@ -78,10 +100,13 @@ Alle Bauteile in der Reihenfolge der Beschreibung -- siehe [[opencivil.projekt.a
 def nur(self, kennung: str) -> 'Projekt'
 ```
 
-Eine Kopie, in der von den Bauteilen nur dieses eine steht --
-die Materialien bleiben. So rechnet die Bewehrungssuche: die
+Eine Kopie, in der von den Bauteilen nur dieses eine steht -- mit
+denen, deren Querschnitt es nimmt (`bezuege`), auch ueber mehrere
+Stufen; die Materialien bleiben. So rechnet die Bewehrungssuche: die
 anderen Bauteile kann sie nicht beeinflussen, und ihre Urteile
-zaehlten sonst mit.
+zaehlten sonst mit. Und so holt der MCP-Zugang die Herleitung eines
+Bauteils -- ein Stab, dessen Querschnitt eine Analyse ist, rechnete
+ohne sie nicht.
 
 #### Projekt.bauteil
 
@@ -173,6 +198,17 @@ def eigener_baustahl(self, vorlage: str='S235') -> MaterialEintrag
 ```
 
 Ein eigener Baustahl, `ST1`, `ST2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+
+#### Projekt.material_anlegen
+
+```python
+def material_anlegen(self, art: str, sorte: str, *, eigen: bool=False) -> MaterialEintrag
+```
+
+«+ Material»: eine Normsorte der Art `art` -- mit `eigen` ein
+eigenes Material, die Sorte als Vorlage ([[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]]). Fuer
+wer die Art als Text hat, den MCP-Zugang; [[opencivil.projekt.projekt#Projekt.beton|beton]] und die
+anderen sagen sie im Namen.
 
 #### Projekt._normsorte
 
@@ -338,6 +374,58 @@ also derselbe Bericht -- ohne die Sandboxen, wie dort
 ([[opencivil.projekt.projekt#Projekt.ohne_sandboxen|ohne_sandboxen]]). Ohne Zwischenspeicher: der lohnt sich erst,
 wenn man dieselbe Platte hundertmal rechnet.
 
+#### Projekt.eintrag_anlegen
+
+```python
+def eintrag_anlegen(self, liste: str) -> Any
+```
+
+«+» einer App: ein frischer Eintrag nach der Vorlage seiner Klasse und
+mit dem ersten Material jeder Art, die er nimmt
+([[opencivil.projekt.eintraege#Beschreibung.frisch|frisch]]), unter einer
+Kennung, die es im Projekt nie gab, am Ende der Liste -- und mit dem
+Namen, den «+» gibt: «Platte 1» ([[opencivil.projekt.projekt#naechster_name|naechster_name]]). Fehlt ein
+Material, das er nimmt, rechnet er erst, wenn eines da ist, wie die
+Sandbox.
+
+#### Projekt.eintrag_kopieren
+
+```python
+def eintrag_kopieren(self, kennung: str) -> Any
+```
+
+⧉: eine Kopie gleich hinter dem Original, alles wie dort, nur Kennung
+und Name neu -- «Decke über EG (Kopie)» ([[opencivil.projekt.projekt#kopie_name|kopie_name]]). Die
+Kopie der Sandbox ist ein gewoehnlicher Eintrag und heisst wie ein
+neuer, «Platte 1».
+
+#### Projekt.eintrag_loeschen
+
+```python
+def eintrag_loeschen(self, kennung: str) -> Any
+```
+
+×: ein Eintrag einer App oder ein Material geht -- nicht die Sandbox,
+die nur zurueckgesetzt wird, und nicht, solange ein Bauteil auf ihn
+zeigt ([[opencivil.projekt.projekt#Projekt.verweise|verweise]]); der Fehler nennt dann die Bauteile. Gibt den
+geloeschten Eintrag zurueck.
+
+#### Projekt._app
+
+```python
+def _app(self, liste: str) -> Tuple[type, str]
+```
+
+Klasse und Vorsilbe der App mit dieser Liste ([[opencivil.projekt.projekt#Konstanten|APPLISTEN]]).
+
+#### Projekt._ort_in_app
+
+```python
+def _ort_in_app(self, kennung: str) -> Tuple[str, int]
+```
+
+In welcher Liste einer App der Eintrag steht, und an welcher Stelle.
+
 #### Projekt.ist_sandbox
 
 ```python
@@ -501,6 +589,8 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 
 ## Gebraucht von
 
+- [[opencivil.mcp.sitzung]]
+- [[opencivil.mcp.werkzeuge]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: c4c5af466bae
+erzeugt: e3f2859d05f4
 art: modul
 tags: [modul]
 ---
@@ -53,6 +53,7 @@ class GrundbruchEintrag(BauteilEintrag)
 Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen.
 
 - `BEZEICHNUNG = 'Grundbruch'`
+- `STAMM = 'Fundament'`
 - `kennung: str`
 - `name: str`
 - `verhalten: Verhalten = Verhalten.DRAINIERT` – Womit der Boden trägt: drainiert mit phi_k und c_k, undrainiert mit s_u -- derselbe Schalter wie beim Pfahl (Benutzer, 2026-11-19). Bis dahin hiess phi = 0 undrainiert, und c galt dann als s_u.

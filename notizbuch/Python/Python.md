@@ -1,5 +1,5 @@
 ---
-erzeugt: ee370d52ed00
+erzeugt: b8ce0dd691d8
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -74,6 +74,13 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.material.baustahl]] – Baustahl nach SIA 263:2013.
     - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
     - [[opencivil.material.betonstahl]] – Betonstahl nach SIA 262:2025.
+- [[opencivil.mcp]] – das Werkzeug fuer eine KI, ueber das Model Context Protocol.
+    - [[opencivil.mcp.__main__]] – startet den Server: `python3 -m opencivil.mcp`.
+    - [[opencivil.mcp.ausgabe]] – was die Werkzeuge als Text zurueckgeben.
+    - [[opencivil.mcp.server]] – das Protokoll: JSON-RPC 2.0 ueber stdin und stdout.
+    - [[opencivil.mcp.sitzung]] – die offene Projektdatei, und wie sie sich aendert.
+    - [[opencivil.mcp.werkzeuge]] – was eine KI mit dem Werkzeug tun kann, und mit welchen Angaben.
+    - [[opencivil.mcp.zeiger]] – einzelne Felder eines Eintrags aendern, ueber Pfade.
 - [[opencivil.nachweis]] – die Nachweise der Platte und des gezeichneten Querschnitts.
     - [[opencivil.nachweis.biegung_normalkraft]] – Nachweis für Biegung mit Normalkraft.
     - [[opencivil.nachweis.dehnungsfaecher]] – Die zulaessigen Dehnungsebenen einer Platte.

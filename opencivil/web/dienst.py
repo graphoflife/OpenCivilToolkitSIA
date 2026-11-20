@@ -256,9 +256,16 @@ def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Geschrieben wird hier nichts. Der Browser macht daraus einen Download, der
     Server legt es zusaetzlich in ``ausgabe/`` ab und versucht die Uebersetzung
     zu PDF -- das ``.tex`` ist auf beiden Wegen dasselbe.
+
+    Mit ``nur``, der Kennung eines Bauteils, steht nur dieses darin, mit den
+    Materialien (:meth:`~opencivil.projekt.projekt.Projekt.nur`) -- auch eine
+    Sandbox: wer nach ihr fragt, meint sie. So holt der MCP-Zugang die
+    Herleitung eines Eintrags.
     """
-    # Ohne die Sandboxen: sie sind zum Ausprobieren da (Benutzer, 2026-11-20).
-    projekt = _projekt(rumpf).ohne_sandboxen()
+    projekt = _projekt(rumpf)
+    nur = str(rumpf.get("nur") or "")
+    # Sonst ohne die Sandboxen: sie sind zum Ausprobieren da (Benutzer, 2026-11-20).
+    projekt = projekt.nur(nur) if nur else projekt.ohne_sandboxen()
     aufbau = projekt.aufbauen()
     gewuenscht = aufbau.berichtsziele()
     loesung = (aufbau.werk.loese(*gewuenscht) if gewuenscht
