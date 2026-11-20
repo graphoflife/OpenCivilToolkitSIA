@@ -1050,6 +1050,12 @@ dialog.dialogfenster .fenster-kopf { top: 0; }
   border-left: 3px solid var(--rand-stark); background: var(--flaeche-2);
 }
 .hinweis-annahme { border-left-color: var(--blau); background: var(--blau-hell); }
+/* Viele Meldungen klappen zusammen, mit ihrer Anzahl -- die zu den Fällen einer Decke. */
+.meldungsgruppe-titel {
+  font-size: 11px; font-weight: 700; color: var(--schrift-zart);
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; cursor: pointer;
+}
+.meldungsgruppe-zeilen { display: flex; flex-direction: column; gap: 1px; }
 .hinweis-warnung { border-left-color: var(--warn); background: var(--warn-hell); }
 .hinweis-sandbox { border-left-color: var(--sandbox); background: var(--sandbox-hell); }
 .hinweis-sandbox b { color: var(--sandbox-tief); }
@@ -1930,6 +1936,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   background: var(--schlecht-hell); color: var(--schlecht); cursor: pointer;
 }
 .qa-meldung:hover { background: #fbd9d6; }
+.qa-meldung.ist-hinweis { border-color: var(--rand-stark); background: var(--flaeche-2); color: var(--schrift-matt); }
 /* Zwei Spalten -- A, y_S, z_S und die Trägheitsmomente --, die Ziffern
    rechtsbündig untereinander. */
 .qa-werte {
@@ -1939,25 +1946,30 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 .qa-wert-zahl { text-align: right; font-variant-numeric: tabular-nums; }
 .qa-wert-einheit { font-size: 11px; color: var(--schrift-zart); }
-.qa-elemente { display: flex; flex-direction: column; gap: 6px; }
-.qa-gruppe-zeilen { display: flex; flex-direction: column; }
-.qa-gruppe-titel {
+/* Je Teil eine Zeile, die Spalten über alle Zeilen einer Gruppe gleich: wie
+   es heisst, was es ist, rechts eine Zahl -- in jeder App mit Zeichenfenster
+   (cad_app.js). Jede Gruppe klappt auf und zu, zu Beginn zu. */
+.cad-elemente { font-size: 12px; }
+.cad-elemente-titel {
   padding: 0 6px 2px; font-size: 10.5px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .4px; color: var(--schrift-zart); cursor: pointer;
 }
-.qa-element {
-  display: grid; grid-template-columns: 13ch minmax(0, 1fr) auto; gap: 8px; align-items: baseline;
-  padding: 2px 6px; border: none; border-radius: 4px; background: transparent;
-  text-align: left; font: inherit; font-size: 12px; color: var(--schrift); cursor: pointer;
+.cad-elemente-zeilen {
+  display: grid; grid-template-columns: max-content minmax(0, 1fr) minmax(0, auto); gap: 1px 0;
 }
-.qa-element:hover { background: var(--blau-hell); }
-.qa-element.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
-.qa-element > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.qa-element-name { font-weight: 600; }
-.qa-element-was { color: var(--schrift-matt); }
-.qa-element-wert { text-align: right; font-variant-numeric: tabular-nums; color: var(--schrift-matt); }
-.qa-element.ist-fehler { background: var(--schlecht-hell); }
-.qa-element.ist-fehler > span { color: var(--schlecht); }
+.cad-element {
+  grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; column-gap: 8px; align-items: baseline;
+  padding: 2px 6px; border: none; border-radius: 4px; background: transparent;
+  text-align: left; font: inherit; color: var(--schrift); cursor: pointer;
+}
+.cad-element:hover { background: var(--blau-hell); }
+.cad-element.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
+.cad-element > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cad-element-name { font-weight: 600; }
+.cad-element-was { color: var(--schrift-matt); }
+.cad-element-wert { text-align: right; font-variant-numeric: tabular-nums; color: var(--schrift-matt); }
+.cad-element.ist-fehler { background: var(--schlecht-hell); }
+.cad-element.ist-fehler > span { color: var(--schlecht); }
 .qa-leer { margin: 0; font-size: 12px; color: var(--schrift-zart); }
 
 /* Diagramme der Querschnittsanalyse: oben der Lastfall, darunter seine Bilder.
@@ -2157,23 +2169,6 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-lastfallwahl { align-self: center; }
 .bs-lastfallwahl select { max-width: 11em; font-size: 12px; padding: 2px 4px; }
 
-/* Unter der Zeichnung: je Linie, Lager und Last eine Zeile; ein Klick
-   wählt. Jede Gruppe klappt auf und zu, zu Beginn zu. */
-.bs-elemente { font-size: 12px; }
-.bs-elemente-zeilen { display: flex; flex-direction: column; gap: 1px; }
-.bs-elemente-titel {
-  font-size: 11px; font-weight: 700; color: var(--schrift-zart);
-  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; cursor: pointer;
-}
-.bs-element {
-  display: grid; grid-template-columns: 34px auto minmax(0, 1fr); gap: 8px;
-  padding: 2px 6px; border-radius: 4px; cursor: pointer;
-}
-.bs-element:hover { background: var(--blau-hell); }
-.bs-element.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
-.bs-element-name { font-weight: 700; }
-.bs-element-zusatz { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--schrift-matt); }
-.qa-meldung.ist-hinweis { border-color: var(--rand-stark); background: var(--flaeche-2); color: var(--schrift-matt); }
 .bs-leer { font-size: 12px; color: var(--schrift-zart); }
 
 .bs-vorzeichen-huelle summary { cursor: pointer; font-size: 12px; color: var(--schrift-matt); }

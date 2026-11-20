@@ -9,13 +9,10 @@
  * Liste des Projekts, in der es steht (`systemart`).
  *
  * Dazu die Art einer Last nach dem Katalog des Kerns, die Last zu einer
- * Kennung, die Zugseite einer Linie in der Ebene und der Name eines
- * Materials -- und die Antwort des Kerns, solange sie zur Fassung des
- * Projekts passt: was ein Fenster betrifft, nimmt das Fenster `a`
- * (bs_zeichnung.js), nicht seine Kennung -- so liest das schwebende Fenster
- * es ohne Umweg über den Adapter. Den Lastfall, den ein Fenster zeigt, führt
- * lastfaelle.js. Nichts davon rechnet: es liest die Beschreibung, den
- * Katalog und die Materialien des Projekts.
+ * Kennung und der Name eines Materials. Die Antwort des Kerns zum Fenster
+ * führt cad_app.js, den Lastfall, den es zeigt, lastfaelle.js. Nichts davon
+ * rechnet: es liest die Beschreibung, den Katalog und die Materialien des
+ * Projekts.
  */
 
 import { ARTEN } from './arten.js';
@@ -82,10 +79,4 @@ export function materialname(m) {
   if (m.art === 'eigen') return m.name || m.kennung;
   const stoff = eintragVon(m.stoff);
   return stoff ? stoff.name || stoff.sorte : `– kein ${katalog('materialarten', m.art, 'titel')} –`;
-}
-
-/** Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu sehen ist. */
-export function passendeUebersicht(a) {
-  const u = a.bs.uebersicht;
-  return u && u.fassung === zustand.fassung ? u : null;
 }

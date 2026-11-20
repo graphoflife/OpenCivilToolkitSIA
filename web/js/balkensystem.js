@@ -24,15 +24,14 @@
 
 import { formelText } from './achsen.js';
 import {
-  bauteilliste, bezeichnung, erklaerung, feld, klappgruppe, materialliste, namensfeld, panel,
-  wahlBlock, wahlSchalter,
+  bauteilliste, bezeichnung, erklaerung, feld, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
-  knotenlastart, lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart,
-  systemkatalog, systemliste,
+  knotenlastart, lagertext, lastart, lastrichtung, materialname, systemart, systemkatalog, systemliste,
 } from './bs_teile.js';
 import { texte } from './bs_texte.js';
-import { waehlen, zeichenbereich } from './bs_zeichnung.js';
+import { zeichenbereich } from './bs_zeichnung.js';
+import { listengruppen, listenzeilen, meldungsliste } from './cad_app.js';
 import {
   auswahl, el, melden, svgEl, undListe, zahlfeld,
 } from './dom.js';
@@ -52,30 +51,15 @@ import {
 // ===========================================================================
 
 /**
- * Meldungen des Kerns und je Linie, Lager und Last eine Zeile -- ein Klick
- * wählt im Fenster; bei einer Last zeigt die Zeichnung dann ihren Lastfall.
+ * Meldungen des Kerns und je Linie, Lager und Last eine Zeile (cad_app.js)
+ * -- ein Klick wählt im Fenster, ein Lager über seinen Knoten; bei einer
+ * Last zeigt die Zeichnung dann ihren Lastfall.
  */
 function uebersicht(a) {
   const z = eintragVon(a.bs.kennung);
   if (!z) return [];
   const { art } = a.bs;
-  const u = passendeUebersicht(a);
-  const teile = [];
-  if (u?.fehler) teile.push(el('div.qa-meldungen', {}, [el('div.qa-meldung', { text: u.fehler })]));
-  const meldungen = u?.meldungen || [];
-  // Ein Lager wählt seinen Knoten: bis 2026-11-19 liess der Klick nur
-  // Knoten und Linien durch, und eine Meldung zu einem Lager hob die Wahl auf.
-  const waehlbar = (k) => z.lager.find((l) => l.kennung === k)?.knoten ?? k;
-  if (meldungen.length) {
-    teile.push(el('div.qa-meldungen', {}, meldungen.map((m) => el('button.qa-meldung', {
-      type: 'button', text: m.text, class: m.fehler ? '' : 'ist-hinweis',
-      title: 'Wählt die Elemente, die die Meldung nennt',
-      on: {
-        click: () => waehlen(a.bs.kennung,
-          [...new Set(m.elemente.map(waehlbar))].filter((k) => /^[KL]\d+$/.test(k))),
-      },
-    }))));
-  }
+  const zeile = listenzeilen(a);
   const name = (q) => z.querschnitte.find((x) => x.kennung === q)?.name || q || '–';
   // Das Material eines Stabs ist eines des Systems -- es heisst, wie es im
   // Fenster «Material» heisst. Bis 2026-11-19 stand hier bei jedem «–»: es
@@ -85,35 +69,29 @@ function uebersicht(a) {
     const da = (z.stabmaterialien || []).find((x) => x.kennung === m);
     return da ? materialname(da) : '–';
   };
-  const zeile = (kennung, links, rechts, waehlbar = kennung) => el('div.bs-element', {
-    dataset: { kennung },
-    on: { click: () => waehlen(a.bs.kennung, [waehlbar]) },
-  }, [el('span.bs-element-name', { text: kennung }), el('span', { text: links }), el('span.bs-element-zusatz', { text: rechts })]);
   const linienlager = systemkatalog(art, 'linienlager');
   const linien = z.linien.map((l) => {
     const gelenke = [l.gelenk_anfang ? 'Anfang' : '', l.gelenk_ende ? 'Ende' : ''].filter(Boolean);
     const lager = linienlager.filter((x) => l[x.feld] !== 'frei')
       .map((x) => `${x.kurz} ${l[x.feld] === 'feder' ? 'gebettet' : 'fest'}`);
-    return zeile(l.kennung, `${l.von} → ${l.bis}`, [
-      l.querschnitt ? `${name(l.querschnitt)} · ${stoff(l.material)}` : 'kein Stab',
-      // Der Drehwinkel β einer Linie im Raum, wenn sie gedreht ist.
-      l.drehung ? `β = ${l.drehung}°` : '',
-      gelenke.length ? `Gelenk ${gelenke.join(', ')}` : '',
-      ...lager,
-    ].filter(Boolean).join(' · '));
+    return zeile({
+      kennung: l.kennung,
+      was: `${l.von} → ${l.bis}`,
+      wert: [
+        l.querschnitt ? `${name(l.querschnitt)} · ${stoff(l.material)}` : 'kein Stab',
+        // Der Drehwinkel β einer Linie im Raum, wenn sie gedreht ist.
+        l.drehung ? `β = ${l.drehung}°` : '',
+        gelenke.length ? `Gelenk ${gelenke.join(', ')}` : '',
+        ...lager,
+      ].filter(Boolean).join(' · '),
+    });
   });
-  const lager = z.lager.map((l) => zeile(l.kennung, `an ${l.knoten}`, lagertext(art, l), l.knoten));
+  const lager = z.lager.map((l) => zeile({ kennung: l.kennung, was: `an ${l.knoten}`, wert: lagertext(art, l) }));
   const lastfall = (lf) => z.lastfaelle.find((x) => x.kennung === lf)?.name || lf;
-  const lastzeile = (last, wo, text) => el('div.bs-element', {
-    dataset: { kennung: last.kennung },
-    on: {
-      click: () => {
-        lastfallWaehlen(a, a.bs, last.lastfall);
-        waehlen(a.bs.kennung, [last.kennung]);
-      },
-    },
-  }, [el('span.bs-element-name', { text: last.kennung }), el('span', { text: wo }),
-    el('span.bs-element-zusatz', { text: `${text} · ${lastfall(last.lastfall)}` })]);
+  const lastzeile = (last, wo, text) => zeile({
+    kennung: last.kennung, was: wo, wert: `${text} · ${lastfall(last.lastfall)}`,
+    vorher: () => lastfallWaehlen(a, a.bs, last.lastfall),
+  });
   // Die Richtung einer Kraft -- im Raum auch die Achse eines Moments; in
   // der Ebene dreht jedes Moment um dieselbe.
   const richtung = (last, kraft) => (kraft || a.bs.raum
@@ -130,12 +108,7 @@ function uebersicht(a) {
       return lastzeile(p, `an ${p.knoten}`, `${la.beschriftung} ${p.wert} ${la.einheit}${richtung(p, la.kraft)}`);
     }),
   ];
-  // Jede Gruppe klappt auf und zu, zu Beginn zu (Benutzer, 2026-10-24).
-  const offen = a.bs.aufgeklappt || (a.bs.aufgeklappt = new Set());
-  for (const [titel, zeilen] of [['Linien', linien], ['Lager', lager], ['Lasten', lasten]]) {
-    if (zeilen.length) teile.push(klappgruppe(titel, zeilen, offen, 'bs-elemente'));
-  }
-  return teile;
+  return [meldungsliste(a), ...listengruppen(a, [['Linien', linien], ['Lager', lager], ['Lasten', lasten]])];
 }
 
 // ===========================================================================

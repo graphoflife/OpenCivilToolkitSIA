@@ -59,7 +59,7 @@ import {
 } from './bs_eigenschaften.js';
 import { nachBild, zahlText } from './cad_ansicht.js';
 import {
-  cadApp, cadBereichMitListe, listeZeichnen, mitTitel, umrissVon,
+  cadApp, cadBereichMitListe, frischeAntwort, meldungenJe, mitTitel, umrissVon,
 } from './cad_app.js';
 import { NAEHE } from './cad_eingabe.js';
 import {
@@ -70,8 +70,7 @@ import {
   moment, momentband, raumlagerSymbol, unbestimmtSymbol,
 } from './bs_symbole.js';
 import {
-  knotenlastart, lagertext, lastart, lastrichtung, lastVon, passendeUebersicht, raeumlich,
-  systemart, systemkatalog, systemliste,
+  knotenlastart, lagertext, lastart, lastrichtung, lastVon, raeumlich, systemart, systemkatalog, systemliste,
 } from './bs_teile.js';
 import { el, melden, svgEl } from './dom.js';
 import { aktiverLastfall, lastfallFuerNeue, lastfallLeiste } from './lastfaelle.js';
@@ -108,15 +107,10 @@ const EINSTELLUNG = {
 // Das Fenster eines Systems
 // ===========================================================================
 
-/**
- * Das Zeichenfenster eines Systems, samt der Liste darunter. Die Tafel ruft
- * das bei jedem Neubau -- dann fragt es auch den Kern, wenn sich nicht die
- * Zeichnung geändert hat, aber ein Querschnitt oder Material.
- */
+/** Das Zeichenfenster eines Systems, samt der Liste darunter. Die Tafel ruft das bei jedem Neubau. */
 export function zeichenbereich(system, listeBauen) {
   const a = fensterVon(system.kennung);
   const bereich = cadBereichMitListe(a, listeBauen);
-  uebersichtHolen(a);
   lastfallLeiste(a, a.bs, a.bs.lastfallHuelle);
   return bereich;
 }
@@ -124,12 +118,10 @@ export function zeichenbereich(system, listeBauen) {
 /**
  * Die Zeichenfenster der Systeme, je Kennung eines (cad_app.js) -- eben und
  * im Raum: die Kennungen beider Arten sind verschieden. Was das System an
- * der Ansicht braucht -- Art, Vorgaben, Antwort des Kerns, Lastfall --,
+ * der Ansicht braucht -- Art, Vorgaben, Lastfall, die Achsen der Linien --,
  * hängt als `a.bs` am Fenster.
  */
-const SYSTEME = cadApp('bs', adapter, (a) => { a.bs = a.adapter.bs; });
-const fensterVon = SYSTEME.fensterVon;
-export const waehlen = SYSTEME.waehlen;
+const fensterVon = cadApp('bs', adapter, (a) => { a.bs = a.adapter.bs; });
 
 // ===========================================================================
 // Der Adapter
@@ -157,13 +149,16 @@ function vorgabenNeu() {
  * Was der Adapter eines Systems über die gemeinsame Grundlage hinaus weiss
  * (cad_app.js). `raum`: ob es im Raum liegt; `klassen`: unter welchem Namen
  * die Vorlagen seiner Teile stehen; `achsen`: je Linie ihre Achsen vom Kern.
+ * Ihn fragt der Adapter nach dem System (Anfrage `balkensystem_verlauf`);
+ * die Achsen gelten, bis die nächste Antwort neue bringt -- auch wenn sich
+ * die Zeichnung inzwischen geändert hat: so springt die Faser nicht bei
+ * jeder Eingabe weg und wieder her.
  */
 function adapter(kennung) {
   const art = systemart(kennung);
   const bs = {
     kennung, art, raum: raeumlich(art), klassen: systemkatalog(art, 'klassen'),
-    vorgaben: vorgabenNeu(), uebersicht: null, gefragt: null, lastfall: null,
-    achsen: {},
+    vorgaben: vorgabenNeu(), lastfall: null, achsen: {},
   };
   const achsen = systemkatalog(art, 'achsen');
   return {
@@ -192,7 +187,11 @@ function adapter(kennung) {
       rahmen: lastenRahmen,
     },
     umriss: () => umriss(eintragVon(kennung), achsen),
-    geaendert: uebersichtHolen,
+    fragen: () => api.balkensystemVerlauf(zustand.projekt, kennung),
+    nehmen: (_, antwort) => {
+      if (antwort.achsen) bs.achsen = antwort.achsen;
+      return antwort.uebersicht;
+    },
     eigenschaften,
     neuEigenschaften,
     teilen: (a, kennungen) => kernBearbeiten(a, kennungen
@@ -376,36 +375,6 @@ function umriss(system, achsen) {
 // ===========================================================================
 
 /**
- * Fragt den Kern nach dem System, wenn es sich seit der letzten Frage
- * geändert hat. Kommt eine Antwort zu spät -- es wurde inzwischen wieder
- * gefragt --, gilt sie nicht mehr.
- */
-function uebersichtHolen(a) {
-  const system = eintragVon(a.bs.kennung);
-  if (!system) return;
-  const jetzt = zustand.fassung;
-  if (a.bs.gefragt === jetzt) return;
-  a.bs.gefragt = jetzt;
-  api.balkensystemVerlauf(zustand.projekt, a.bs.kennung).then((antwort) => {
-    if (a.bs.gefragt !== jetzt) return;
-    a.bs.uebersicht = { ...antwort.uebersicht, fassung: jetzt };
-    // Die Achsen der Linien gelten, bis die nächste Antwort neue bringt --
-    // auch wenn sich die Zeichnung inzwischen geändert hat: so springt die
-    // Faser nicht bei jeder Eingabe weg und wieder her.
-    if (antwort.achsen) a.bs.achsen = antwort.achsen;
-    a.neuZeichnen();
-    listeZeichnen(a);
-  }).catch((fehler) => {
-    if (a.bs.gefragt !== jetzt) return;
-    // Ein Verweis, den es nicht gibt, hält das ganze Projekt auf -- dann
-    // steht der Satz des Kerns unter der Zeichnung.
-    a.bs.uebersicht = { fehler: fehler.message, meldungen: [], fassung: jetzt };
-    a.neuZeichnen();
-    listeZeichnen(a);
-  });
-}
-
-/**
  * Lässt den Kern Linien teilen oder umkehren -- Auftrag für Auftrag, jeder
  * auf dem Ergebnis des vorigen -- und übernimmt das Ergebnis in einem
  * Schritt, den man rückgängig machen kann. Hat sich die Zeichnung
@@ -439,15 +408,6 @@ function kernBearbeiten(a, auftraege, auswahlDanach = []) {
   }).catch((fehler) => melden(fehler.message, true));
 }
 
-/** Je Element, das eine Meldung nennt, ihre Sätze. */
-function meldungenJe(u) {
-  const je = new Map();
-  for (const m of u?.meldungen || []) {
-    for (const k of m.elemente) je.set(k, [...(je.get(k) || []), m]);
-  }
-  return je;
-}
-
 // ===========================================================================
 // Zeichnen
 // ===========================================================================
@@ -469,10 +429,8 @@ function lastvektor(a, richtung, achsen) {
 function zeichnen(a, g) {
   const z = eintragVon(a.bs.kennung);
   if (!z) return;
-  const u = passendeUebersicht(a);
-  const meldungen = meldungenJe(u);
-  const fehler = (k) => (meldungen.get(k) || []).some((m) => m.fehler);
-  const texte = (k) => (meldungen.get(k) || []).map((m) => m.text);
+  const u = frischeAntwort(a);
+  const { fehler, texte } = meldungenJe(a);
   const beweglich = new Set(u?.beweglich || []);
   const lagen = a.modell.lagen(z);
   const bild = (k) => {
@@ -568,7 +526,7 @@ function lastenZeichnen(a, z, lf, lagen) {
     formen.push({ kennung, knoten: zeichen, formen: zeichen.formen, mitte, text: zeichen.querySelector('text') });
   };
   const eigen = z.lastfaelle.find((x) => x.kennung === lf)?.eigengewicht
-    ? passendeUebersicht(a)?.eigengewicht || {} : {};
+    ? frischeAntwort(a)?.eigengewicht || {} : {};
   const groesste = { linienlast: Math.max(0, ...Object.values(eigen)), linienmoment: 0 };
   for (const l of z.linien) {
     for (const last of l.lasten) {

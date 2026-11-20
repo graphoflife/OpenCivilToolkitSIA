@@ -8,35 +8,18 @@
  *   Elemente           je Art eine Gruppe, je Element eine Zeile -- jede
  *                      klappt auf und zu, zu Beginn zu
  *
- * Ein Klick auf eine Meldung oder eine Zeile wählt das Element im Fenster.
- * Jede Zahl steht so in der Eingabe oder kommt vom Kern; gerechnet wird hier
- * nichts.
+ * Meldungen, Gruppen und Zeilen baut cad_app.js, wie im Balkensystem und in
+ * der Decke; ein Klick wählt das Element im Fenster. Jede Zahl steht so in
+ * der Eingabe oder kommt vom Kern; gerechnet wird hier nichts.
  */
 
-import { klappgruppe } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
-import { imSpiel } from './cad_auswahl.js';
+import {
+  frischeAntwort, listengruppen, listenzeilen, meldungsliste,
+} from './cad_app.js';
 import { el } from './dom.js';
 import { span } from './mathe.js';
-import {
-  elementname, geometriefehler, linienText, passendeGeometrie, stoffname, waehlen,
-} from './qa_zeichnung.js';
-
-/** Eine Zeile: Name, was es ist, und rechts die eine Zahl, die zählt. */
-function zeile(a, fehler, kennung, was, wert = '') {
-  return el('button.qa-element', {
-    type: 'button',
-    class: [fehler.has(kennung) ? 'ist-fehler' : '', imSpiel(a).has(kennung) ? 'ist-gewaehlt' : ''].join(' '),
-    dataset: { kennung },
-    title: fehler.get(kennung)?.join('\n') || 'Im Zeichenfenster wählen',
-    on: { click: () => waehlen(a.qa.kennung, [kennung]) },
-  }, [
-    el('span.qa-element-name', { text: elementname(a, kennung) }),
-    el('span.qa-element-was', { text: was }),
-    el('span.qa-element-wert', { text: wert }),
-  ]);
-}
-
+import { elementname, linienText, stoffname } from './qa_zeichnung.js';
 
 /** Die Werte des Bruttoquerschnitts in zwei Spalten, die Ziffern untereinander. */
 function werte(b) {
@@ -53,16 +36,11 @@ function werte(b) {
   ]);
 }
 
-/** Die Liste zur Analyse des Fensters `a`. */
+/** Die Liste zur Analyse des Fensters `a`: je Element sein Name, was es ist, und rechts die eine Zahl, die zählt. */
 export function uebersicht(a) {
   const z = a.adapter.zeichnung();
   if (!z) return [];
-  const g = passendeGeometrie(a);
-  // Rot nur, was nicht stimmt; was nur fehlt, steht grau darüber.
-  const fehler = new Map();
-  for (const m of (g?.meldungen || []).filter((x) => x.fehler)) {
-    for (const k of m.elemente) fehler.set(k, [...(fehler.get(k) || []), m.text]);
-  }
+  const g = frischeAntwort(a);
   const lagen = a.modell.lagen(z);
   const lage = (k) => {
     const p = lagen.get(k);
@@ -70,50 +48,27 @@ export function uebersicht(a) {
   };
   const linieninfo = new Map((g?.linien || []).map((x) => [x.kennung, x]));
   const wandinfo = new Map((g?.waende || []).map((x) => [x.kennung, x]));
-
-  const teile = [];
-  const kaputt = geometriefehler(a.qa.kennung);
-  if (kaputt) {
-    teile.push(el('div.qa-meldungen', {}, [
-      el('div.qa-meldung', { text: `Die Zeichnung ist nicht geprüft: ${kaputt}` })]));
-  }
-  if (g?.meldungen?.length) {
-    teile.push(el('div.qa-meldungen', {}, g.meldungen.map((m) => el('button.qa-meldung', {
-      type: 'button', text: m.text, class: m.fehler ? '' : 'ist-hinweis', title: 'Im Zeichenfenster wählen',
-      on: { click: () => waehlen(a.qa.kennung, m.elemente) },
-    }))));
-  }
-  if (g?.brutto) teile.push(werte(g.brutto));
-
-  // Je Art eine Gruppe, die auf- und zuklappt -- zu Beginn zu (Benutzer,
-  // 2026-10-24).
-  const offen = a.qa.aufgeklappt || (a.qa.aufgeklappt = new Set());
-  const gruppe = (titel, zeilen) => (zeilen.length ? klappgruppe(titel, zeilen, offen, 'qa-gruppe') : null);
-  const gruppen = [
-    gruppe('Flächen', z.flaechen.map((f) => zeile(a, fehler, f.kennung,
-      f.material ? stoffname(f.material) : 'nimmt Fläche weg', `${f.knoten.length} Ecken`))),
-    gruppe('Stäbe', z.staebe.map((s) => zeile(a, fehler, s.kennung,
-      `⌀${zahlText(s.durchmesser)} ${stoffname(s.stahl)}`, lage(s.knoten)))),
-    gruppe('Bewehrung', z.stablinien.map((l) => {
-      const info = linieninfo.get(l.kennung);
-      return zeile(a, fehler, l.kennung, linienText(l, info) || '–',
-        info?.punkte ? `A_s ${zahlText(info.flaeche, 0)} mm²` : '');
-    })),
-    gruppe('Schubwände', z.schubwaende.map((w) => {
-      const info = wandinfo.get(w.kennung);
-      return zeile(a, fehler, w.kennung,
-        `b_w ${zahlText(w.dicke)} · ⌀${zahlText(w.durchmesser)} @ ${zahlText(w.teilung)} · ${w.schnitte}-schnittig`,
-        info ? `A_sw/s ${zahlText(info.a_sw_s, 0)} mm²/m` : '');
-    })),
-    gruppe('Hilfslinien', (z.hilfslinien || []).map((h) => zeile(a, fehler, h.kennung,
-      `${h.von} – ${h.bis}`))),
-  ].filter(Boolean);
-
-  teile.push(gruppen.length
-    ? el('div.qa-elemente', {}, gruppen)
-    : el('p.qa-leer', {
-      text: 'Noch nichts gezeichnet: Polygon P, Bewehrung B, Schubwand W, Hilfspunkt K, '
-        + 'Hilfslinie H – oder eine Vorlage T.',
-    }));
-  return teile;
+  const zeile = listenzeilen(a);
+  const element = (kennung, was, wert = '') => zeile({ kennung, name: elementname(a, kennung), was, wert });
+  return [
+    meldungsliste(a),
+    g?.brutto ? werte(g.brutto) : null,
+    ...listengruppen(a, [
+      ['Flächen', z.flaechen.map((f) => element(f.kennung,
+        f.material ? stoffname(f.material) : 'nimmt Fläche weg', `${f.knoten.length} Ecken`))],
+      ['Stäbe', z.staebe.map((s) => element(s.kennung,
+        `⌀${zahlText(s.durchmesser)} ${stoffname(s.stahl)}`, lage(s.knoten)))],
+      ['Bewehrung', z.stablinien.map((l) => {
+        const info = linieninfo.get(l.kennung);
+        return element(l.kennung, linienText(l, info) || '–', info?.punkte ? `A_s ${zahlText(info.flaeche, 0)} mm²` : '');
+      })],
+      ['Schubwände', z.schubwaende.map((w) => {
+        const info = wandinfo.get(w.kennung);
+        return element(w.kennung,
+          `b_w ${zahlText(w.dicke)} · ⌀${zahlText(w.durchmesser)} @ ${zahlText(w.teilung)} · ${w.schnitte}-schnittig`,
+          info ? `A_sw/s ${zahlText(info.a_sw_s, 0)} mm²/m` : '');
+      })],
+      ['Hilfslinien', (z.hilfslinien || []).map((h) => element(h.kennung, `${h.von} – ${h.bis}`))],
+    ]),
+  ];
 }

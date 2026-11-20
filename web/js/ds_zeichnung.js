@@ -17,10 +17,10 @@
  * wie weit ihr Schatten reicht und ob sie gültig ist, sagt der Kern.
  */
 
-import { cadApp, lagefelder, umrissVon } from './cad_app.js';
+import { auswahlEigenschaften, cadApp, umrissVon } from './cad_app.js';
 import { nachBild, nachWelt } from './cad_ansicht.js';
 import { cadBereich } from './cad_fenster.js';
-import { auswahlTeil, knotenname } from './cad_modell.js';
+import { knotenname } from './cad_modell.js';
 import { el } from './dom.js';
 import { aussparungTeile, grundrissTeile, grundrissUmfang } from './ds_grundriss.js';
 import { eintragVon, zustand } from './zustand.js';
@@ -49,7 +49,7 @@ function situationVon(kennung) {
 
 /** Das Zeichenfenster einer Stelle, samt einer Zeile darunter. Die Tafel ruft das bei jedem Neubau. */
 export function zeichenbereich(stelle) {
-  return cadBereich(STELLEN.fensterVon(stelle.kennung), [el('p.cad-hinweis-klein', {
+  return cadBereich(fensterVon(stelle.kennung), [el('p.cad-hinweis-klein', {
     text: 'Ausgezogen, was vom Nachweisschnitt zählt; gestrichelt, was nicht zählt. '
       + 'Der Schnitt kommt aus der letzten Rechnung.',
   })]);
@@ -78,7 +78,7 @@ function adapter(kennung) {
 }
 
 /** Die Zeichenfenster der Durchstanzstellen, je Kennung eines. */
-const STELLEN = cadApp('ds', adapter);
+const fensterVon = cadApp('ds', adapter);
 
 /** «Aussparung A1», «Knoten K3». */
 function elementname(a, kennung) {
@@ -114,38 +114,21 @@ function umriss(kennung) {
 }
 
 /**
- * Das schwebende Fenster zur Auswahl: eine Ecke oder ein Knoten mit seiner
- * Lage, eine Aussparung mit dem, was man mit ihr tun kann.
+ * Das schwebende Fenster zur Auswahl (cad_app.js): Ecken und Knoten mit
+ * ihrer Lage, Aussparungen mit dem, was man mit ihnen tun kann.
  */
 function eigenschaften(a) {
-  const z = a.adapter.zeichnung();
-  const schluessel = [...a.auswahl];
-  if (schluessel.length > 1) {
-    return {
-      titel: `${schluessel.length} gewählt`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschieben mit V, kopieren mit C, löschen mit Entf.' })],
-    };
-  }
-  const { kennung, i } = auswahlTeil(schluessel[0]);
-  const lagen = a.modell.lagen(z);
-  if (i !== null) {
-    const f = z.aussparungen.find((x) => x.kennung === kennung);
-    const p = f && lagen.get(f.knoten[i]);
-    if (!p) return { titel: '', inhalt: [] };
-    return {
-      titel: `${elementname(a, kennung)} · Ecke ${i + 1}`,
-      inhalt: [...lagefelder(a, p, schluessel[0]),
-        el('p.cad-hinweis-klein', { text: 'Nur diese Ecke – was sonst an diesem Punkt liegt, bleibt.' })],
-    };
-  }
-  if (lagen.has(kennung)) {
-    return { titel: elementname(a, kennung), inhalt: lagefelder(a, lagen.get(kennung), kennung) };
-  }
+  return auswahlEigenschaften(a, { sonst: aussparungEigenschaften });
+}
+
+/** Gewählte Aussparungen: was man mit ihnen tun kann -- Felder haben sie keine. */
+function aussparungEigenschaften(a, z, kennungen) {
+  const einzeln = kennungen.length === 1;
   return {
-    titel: elementname(a, kennung),
+    titel: einzeln ? elementname(a, kennungen[0]) : `${kennungen.length} Aussparungen`,
     inhalt: [el('p.cad-hinweis-klein', {
-      text: 'Eine Ecke verschiebt man, indem man auf sie klickt; die ganze Aussparung mit V. '
-        + 'Entf löscht sie.',
+      text: einzeln ? 'Eine Ecke verschiebt man, indem man auf sie klickt; die ganze Aussparung mit V. '
+        + 'Entf löscht sie.' : 'Verschieben mit V, kopieren mit C, löschen mit Entf.',
     })],
   };
 }

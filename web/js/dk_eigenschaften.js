@@ -11,31 +11,25 @@
  * Lasten gelten dem Lastfall, den das Fenster zeigt (lastfaelle.js).
  *
  * Vom Zeichenfenster kennt es nur `a`: was die Werkzeuge vorgeben
- * (`a.dk.vorgaben`), die letzte Antwort des Kerns (`a.dk.daten`) und das
- * Modell. Einheiten und Grenzen der Felder sagt der Kern (`katalog.felder`).
- * Gerechnet wird hier nichts.
+ * (`a.dk.vorgaben`) und das Modell. Was jedes Fenster mit Zeichnung gleich
+ * hat -- die Antwort des Kerns, die Auswahl nach Listen, Felder für mehrere,
+ * die Lage der Knoten, die Meldungen --, steht in cad_app.js. Einheiten und
+ * Grenzen der Felder sagt der Kern (`katalog.felder`). Gerechnet wird hier
+ * nichts.
  */
 
 import {
   gemeinsam, materialliste, mitVar, wahlBlock, wahlSchalter,
 } from './bausteine.js';
-import { zahlText } from './cad_ansicht.js';
-import { jaNein, zahlfeldMitVar } from './cad_app.js';
+import {
+  auswahlEigenschaften, jaNein, laengenzeile, lagefelder, meldungszeilen, vorgabe, zahlfeldMitVar, zugleich,
+} from './cad_app.js';
 import { cadZeile, schalterzeile } from './cad_palette.js';
-import { abstand, auswahlTeil } from './cad_modell.js';
 import { el } from './dom.js';
 import {
   aktiverLastfall, lastfallWaehlen, lastfallZeile, ohneLastfall,
 } from './lastfaelle.js';
-import {
-  eintragVon, feldangabe, materialien, zustand,
-} from './zustand.js';
-
-/** Die Antwort des Kerns, wenn sie zur Zeichnung gehört, wie sie jetzt ist -- sonst null. */
-export function frischeAntwort(a) {
-  const d = a.dk.daten;
-  return d && d.fassung === zustand.fassung ? d : null;
-}
+import { eintragVon, feldangabe, materialien } from './zustand.js';
 
 /** Der Lastfall, den das Fenster zeigt, als Eintrag -- oder null. */
 export function gezeigterLastfall(a) {
@@ -44,15 +38,13 @@ export function gezeigterLastfall(a) {
 }
 
 /**
- * Was der Kern meldet, wenn seine Antwort zur Zeichnung gehört: zur Decke,
- * und zum Lastfall, den das Fenster zeigt -- mit dessen Namen davor.
+ * Was der Kern in seiner Antwort meldet (cad_app.js): zur Decke, und zum
+ * Lastfall, den das Fenster zeigt -- mit dessen Namen davor.
  */
-export function kernmeldungen(a) {
-  const d = frischeAntwort(a);
-  if (!d) return [];
+export function deckenmeldungen(a, antwort) {
   const lf = gezeigterLastfall(a);
-  const fall = lf && (d.faelle || []).find((f) => f.name === lf.name);
-  return [...d.meldungen, ...(fall?.meldungen || []).map((m) => ({ ...m, text: `«${lf.name}»: ${m.text}` }))];
+  const fall = lf && (antwort.faelle || []).find((f) => f.name === lf.name);
+  return [...antwort.meldungen, ...(fall?.meldungen || []).map((m) => ({ ...m, text: `«${lf.name}»: ${m.text}` }))];
 }
 
 /**
@@ -188,39 +180,17 @@ export function neuEigenschaften(a, werkzeug) {
   const liste = LISTE_VON[werkzeug];
   if (!liste) return { inhalt: [], schluessel: werkzeug };
   const v = a.dk.vorgaben[liste];
+  const { setzen } = vorgabe(a, v);
   const wert = (feld) => (feld === 'beton' ? vorgabeBeton(a) : v[feld]);
-  const setzen = (feld) => (w) => { v[feld] = w; a.neuZeichnen(); };
   return {
-    inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...(LASTLISTEN.includes(liste) ? [lastfallText(a)] : []),
-      ...FELDER[liste](wert, setzen)],
+    inhalt: [...(LASTLISTEN.includes(liste) ? [lastfallText(a)] : []), ...FELDER[liste](wert, setzen)],
     schluessel: JSON.stringify([werkzeug, v, vorgabeBeton(a), lastfallStand(a)]),
   };
 }
 
-/** Was der Kern zu diesen Teilen meldet -- nur, wenn seine Antwort zur Zeichnung gehört. */
-function meldungszeilen(a, kennungen) {
-  return kernmeldungen(a).filter((m) => m.elemente.some((k) => kennungen.includes(k)))
-    .map((m) => el(m.fehler ? 'p.cad-meldung' : 'p.cad-hinweis-klein', { text: m.text }));
-}
-
+/** Was gewählt ist (cad_app.js): Knoten oder Teile einer Liste -- neu auch, wenn der gezeigte Lastfall wechselt. */
 export function eigenschaften(a) {
-  const z = a.adapter.zeichnung();
-  const verzeichnis = a.modell.verzeichnis(z);
-  const kennungen = [...new Set([...a.auswahl].map((s) => auswahlTeil(s).kennung))]
-    .filter((k) => verzeichnis.has(k));
-  const listen = new Set(kennungen.map((k) => verzeichnis.get(k).art?.liste ?? 'knoten'));
-  const schluessel = JSON.stringify([Boolean(frischeAntwort(a)), lastfallStand(a)]);
-  if (!kennungen.length) return { titel: '', inhalt: [] };
-  if (listen.size > 1) {
-    return {
-      titel: `${kennungen.length} gewählt`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedenes zugleich – verschieben mit V, löschen mit Entf.' })],
-      schluessel,
-    };
-  }
-  const [liste] = listen;
-  if (liste === 'knoten') return { ...knotenEigenschaften(a, z, kennungen), schluessel };
-  return { ...teilEigenschaften(a, z, liste, kennungen), schluessel };
+  return auswahlEigenschaften(a, { knoten: knotenEigenschaften, sonst: teilEigenschaften }, lastfallStand(a));
 }
 
 // -- Knoten und ihre Stützen -------------------------------------------------
@@ -261,10 +231,7 @@ function punktlastFelder(a, z, knoten) {
   }), `Eine Punktlast an diesem Knoten im Lastfall «${lf.name}»`))];
   if (lasten.some((e) => !e)) return zeilen;
   const kennungen = lasten.map((e) => e.kennung);
-  const wert = (feld) => gemeinsam(lasten.map((e) => e[feld]));
-  const setzen = (feld) => (w) => a.aendern((zz) => {
-    for (const e of zz.punktlasten) if (kennungen.includes(e.kennung)) e[feld] = w;
-  });
+  const { wert, setzen } = zugleich(a, z, 'punktlasten', kennungen);
   return [...zeilen, ...FELDER.punktlasten(wert, setzen), ...meldungszeilen(a, kennungen)];
 }
 
@@ -276,28 +243,17 @@ function stuetzeFelder(a, z, knoten) {
   // Ihre Felder nur, wenn jeder gewählte Knoten eine hat -- sonst stünde
   // da, was nur für einige gilt.
   if (stuetzen.some((s) => !s)) return zeilen;
-  const wert = (feld) => gemeinsam(stuetzen.map((s) => s[feld]));
-  const setzen = (feld) => (w) => a.aendern((zz) => {
-    for (const s of zz.stuetzen) if (knoten.includes(s.knoten)) s[feld] = w;
-  });
-  return [...zeilen, ...FELDER.stuetzen(wert, setzen), ...meldungszeilen(a, stuetzen.map((s) => s.kennung))];
+  const kennungen = stuetzen.map((s) => s.kennung);
+  const { wert, setzen } = zugleich(a, z, 'stuetzen', kennungen);
+  return [...zeilen, ...FELDER.stuetzen(wert, setzen), ...meldungszeilen(a, kennungen)];
 }
 
+/** Gewählte Knoten: ihre Lage (cad_app.js), ihre Stütze und ihre Punktlast im gezeigten Lastfall. */
 function knotenEigenschaften(a, z, knoten) {
-  const gewaehlt = z.knoten.filter((x) => knoten.includes(x.kennung));
-  // Eine getippte Lage gilt für alle gewählten -- so stehen sie danach in einer Flucht.
-  const lageSetzen = (feld) => (w) => a.aendern((zz) => {
-    for (const kennung of knoten) {
-      const da = zz.knoten.find((x) => x.kennung === kennung);
-      if (da) a.modell.verschieben(zz, new Set([kennung]), feld === 'x' ? [w - da.x, 0] : [0, w - da.y]);
-    }
-  });
   return {
     titel: knoten.length === 1 ? `Knoten ${knoten[0]}` : `${knoten.length} Knoten`,
     inhalt: [
-      ...['x', 'y'].map((feld) => cadZeile(feld, zahlfeldMitVar({
-        wert: gemeinsam(gewaehlt.map((k) => k[feld])), schritt: a.raster, beiAenderung: lageSetzen(feld),
-      }), a.einstellung.einheit)),
+      ...lagefelder(a, z, knoten),
       ...stuetzeFelder(a, z, knoten),
       ...punktlastFelder(a, z, knoten),
       ...meldungszeilen(a, knoten),
@@ -330,12 +286,8 @@ function plattenlastFelder(a, platten) {
   }), angabe.einheit)];
 }
 
-function teilEigenschaften(a, z, liste, kennungen) {
-  const gewaehlt = z[liste].filter((x) => kennungen.includes(x.kennung));
-  const wert = (feld) => gemeinsam(gewaehlt.map((e) => e[feld]));
-  const setzen = (feld) => (w) => a.aendern((zz) => {
-    for (const e of zz[liste]) if (kennungen.includes(e.kennung)) e[feld] = w;
-  });
+function teilEigenschaften(a, z, kennungen, liste) {
+  const { gewaehlt, wert, setzen } = zugleich(a, z, liste, kennungen);
   // Ändert man den Lastfall einer Last, zeigt das Fenster danach dessen Lasten -- sonst verschwände sie.
   const inhalt = [
     ...(LASTLISTEN.includes(liste) ? [lastfallZeile(z, wert('lastfall'), (w) => {
@@ -346,15 +298,10 @@ function teilEigenschaften(a, z, liste, kennungen) {
     ...(liste === 'platten' ? plattenlastFelder(a, gewaehlt) : []),
   ];
   const art = a.adapter.arten.find((x) => x.liste === liste);
-  if (gewaehlt.length === 1 && art.form === 'linie') {
-    const [e] = gewaehlt;
-    const lagen = a.modell.lagen(z);
-    const [p, q] = [lagen.get(e.von), lagen.get(e.bis)];
-    if (p && q) inhalt.push(el('p.cad-info', { text: `L = ${zahlText(abstand(p, q), 3)} m · ${e.von} → ${e.bis}` }));
-  }
+  if (gewaehlt.length === 1 && art.form === 'linie') inhalt.push(laengenzeile(a, z, gewaehlt[0]));
   inhalt.push(...meldungszeilen(a, kennungen));
   return {
     titel: gewaehlt.length === 1 ? a.adapter.name(a, gewaehlt[0].kennung) : `${gewaehlt.length} ${art.mehrzahl}`,
-    inhalt,
+    inhalt: inhalt.filter(Boolean),
   };
 }

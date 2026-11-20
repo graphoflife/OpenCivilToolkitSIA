@@ -31,11 +31,12 @@
 
 import { api } from './api.js';
 import { wahlSchalter } from './bausteine.js';
-import { cadApp, cadBereichMitListe, listeZeichnen, umrissVon } from './cad_app.js';
+import {
+  cadApp, cadBereichMitListe, frischeAntwort, listeZeichnen, meldungenJe, umrissVon,
+} from './cad_app.js';
 import { knotenname } from './cad_modell.js';
 import {
-  LASTLISTEN, eigenschaften, frischeAntwort, kernmeldungen, neuEigenschaften, punktlastSetzen, stuetzeSetzen,
-  vorgabeBeton,
+  LASTLISTEN, deckenmeldungen, eigenschaften, neuEigenschaften, punktlastSetzen, stuetzeSetzen, vorgabeBeton,
 } from './dk_eigenschaften.js';
 import { anteilText, grundriss } from './dk_grundriss.js';
 import { el } from './dom.js';
@@ -124,19 +125,12 @@ const UNTERLAGEN = [
 // ===========================================================================
 
 /** Die Zeichenfenster der Decken, je Kennung eines (cad_app.js); ihr Zustand hängt als `a.dk` daran. */
-const DECKEN = cadApp('dk', adapter, (a) => { a.dk = a.adapter.dk; });
-const fensterVon = DECKEN.fensterVon;
-export const waehlen = DECKEN.waehlen;
+const fensterVon = cadApp('dk', adapter, (a) => { a.dk = a.adapter.dk; });
 
-/**
- * Das Zeichenfenster einer Decke, samt der Liste darunter. Die Tafel ruft
- * das bei jedem Neubau -- dann fragt es auch den Kern, wenn sich nicht die
- * Zeichnung geändert hat, aber ein Beton.
- */
+/** Das Zeichenfenster einer Decke, samt der Liste darunter. Die Tafel ruft das bei jedem Neubau. */
 export function zeichenbereich(decke, listeBauen) {
   const a = fensterVon(decke.kennung);
   const bereich = cadBereichMitListe(a, listeBauen);
-  zeichnungHolen(a);
   unterlageLeiste(a);
   lastfallLeiste(a, a.dk, a.dk.lastfallHuelle);
   return bereich;
@@ -176,10 +170,15 @@ function vorgabenNeu() {
   };
 }
 
-/** Was der Adapter einer Decke über die gemeinsame Grundlage hinaus weiss (cad_app.js). */
+/**
+ * Was der Adapter einer Decke über die gemeinsame Grundlage hinaus weiss
+ * (cad_app.js). Den Kern fragt er nach der Zeichnung (Anfrage
+ * `decke_zeichnung`); zu seinen Meldungen nimmt er die des Lastfalls, den
+ * das Fenster zeigt.
+ */
 function adapter(kennung) {
   const dk = {
-    kennung, vorgaben: vorgabenNeu(), vorsilben: katalog('decke', 'vorsilben'), daten: null, gefragt: null,
+    kennung, vorgaben: vorgabenNeu(), vorsilben: katalog('decke', 'vorsilben'),
     unterlage: 'aufteilung', leiste: null, lastfall: null, lastfallHuelle: null,
   };
   return {
@@ -203,7 +202,9 @@ function adapter(kennung) {
     waehlbar: (art, e) => !['stuetzen', 'punktlasten'].includes(art.liste)
       && (!LASTLISTEN.includes(art.liste) || e.lastfall === aktiverLastfall(dk)),
     umriss: () => umrissVon((eintragVon(kennung)?.knoten || []).map((k) => [k.x, k.y]), [[0, 0], [10, 8]]),
-    geaendert: zeichnungHolen,
+    fragen: () => api.deckeZeichnung(zustand.projekt, kennung),
+    nehmen: (_, antwort) => antwort.uebersicht,
+    meldungen: deckenmeldungen,
     eigenschaften,
     neuEigenschaften,
   };
@@ -259,50 +260,20 @@ function flaecheAnlegen(a, z, knoten, werkzeug) {
 }
 
 // ===========================================================================
-// Der Kern
-// ===========================================================================
-
-/**
- * Fragt den Kern nach der Decke, wenn sie sich seit der letzten Frage
- * geändert hat. Kommt eine Antwort zu spät -- es wurde inzwischen wieder
- * gefragt --, gilt sie nicht mehr.
- */
-function zeichnungHolen(a) {
-  if (!eintragVon(a.dk.kennung)) return;
-  const jetzt = zustand.fassung;
-  if (a.dk.gefragt === jetzt) return;
-  a.dk.gefragt = jetzt;
-  api.deckeZeichnung(zustand.projekt, a.dk.kennung).then((antwort) => {
-    if (a.dk.gefragt !== jetzt) return;
-    a.dk.daten = { ...antwort.uebersicht, fassung: jetzt };
-    a.neuZeichnen();
-    listeZeichnen(a);
-  }).catch((fehler) => {
-    if (a.dk.gefragt !== jetzt) return;
-    // Ein Verweis, den es nicht gibt, hält das ganze Projekt auf -- dann
-    // steht der Satz des Kerns unter der Zeichnung.
-    a.dk.daten = { gerechnet: false, fehler: fehler.message, meldungen: [], fassung: jetzt };
-    a.neuZeichnen();
-    listeZeichnen(a);
-  });
-}
-
-// ===========================================================================
 // Zeichnen
 // ===========================================================================
 
+/**
+ * Die Teile auf dem, was der Kern zuletzt sagte -- blass, bis die Antwort
+ * auf die letzte Änderung da ist, statt bei jedem Strich zu flackern.
+ */
 function zeichnen(a, g) {
   const z = eintragVon(a.dk.kennung);
   if (!z) return;
-  const je = new Map();
-  for (const m of kernmeldungen(a)) {
-    for (const k of m.elemente) je.set(k, [...(je.get(k) || []), m]);
-  }
-  const daten = a.dk.daten && { ...a.dk.daten, veraltet: !frischeAntwort(a) };
+  const { fehler, texte } = meldungenJe(a);
+  const letzte = a.adapter.kern.antwort;
+  const daten = letzte && { ...letzte, veraltet: !frischeAntwort(a) };
   g.append(grundriss(a.v, z, daten, {
-    was: a.dk.unterlage,
-    fehler: (k) => (je.get(k) || []).some((m) => m.fehler),
-    texte: (k) => (je.get(k) || []).map((m) => m.text),
-    lastfall: aktiverLastfall(a.dk),
+    was: a.dk.unterlage, fehler, texte, lastfall: aktiverLastfall(a.dk),
   }));
 }

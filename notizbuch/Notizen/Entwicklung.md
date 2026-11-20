@@ -7,6 +7,44 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Apps mit Zeichenfenster antworten gleich
+
+Querschnittsanalyse, Balkensystem und Decke hatten dasselbe dreimal
+geschrieben (Punkt 5 der Durchsicht vom 2026-11-19): die Frage an den Kern,
+die Liste unter der Zeichnung, die Meldungen und das schwebende Fenster zur
+Auswahl. Das steht jetzt einmal in `cad_app.js`; die Apps geben nur dazu,
+was sie selbst wissen. Das Durchstanzen nutzt dasselbe Fenster, ohne Liste.
+
+- **Die Antwort des Kerns.** `kernFragen` fragt einmal je Fassung des
+  Projekts; was gefragt wird und was von der Antwort bleibt, sagt der
+  Adapter (`fragen`, `nehmen`, `meldungen`). Scheitert die Frage, steht ihr
+  Grund unter der Zeichnung, «Die Zeichnung ist nicht geprüft: …» – das
+  hatte bisher nur die Querschnittsanalyse –, und keine alte Antwort bleibt
+  stehen. Das Durchstanzen fragt nicht: es liest seinen Grundriss aus der
+  letzten Lösung.
+- **Was ein Klick wählt.** `waehlbarVon` ist die eine Regel für Zeilen und
+  Meldungen: ein Lager, eine Stütze, eine Punktlast über ihren Knoten, eine
+  Last des Balkensystems selbst. Bisher stand sie siebenmal da; im
+  Balkensystem wählte eine Meldung zu einer Last nichts, und eine Lagerzeile
+  war nie markiert, wenn ihr Knoten gewählt war.
+- **Die Liste.** Je Teil eine Zeile: der Name, was es ist, rechts eine Zahl;
+  die Spalten einer Gruppe stehen untereinander (`subgrid`). Vorher sah sie
+  in jeder App anders aus. Ist nichts gezeichnet, nennt sie die Werkzeuge
+  mit ihren Tasten. Die zugeklappten Meldungen der Decke im Ergebnis haben
+  eine eigene Form (`.meldungsgruppe`), statt die der Liste zu borgen.
+- **Das schwebende Fenster.** `auswahlEigenschaften` sortiert die Auswahl
+  nach Listen. Knoten und Ecken zeigen ihre Lage, auch mehrere zugleich
+  mit «Var» – die Querschnittsanalyse zeigte bei mehreren nichts, das
+  Durchstanzen nur einen Hinweis. `zugleich` gibt jedem Feld mehrerer
+  Einträge den gemeinsamen Wert oder «Var». «Neu» über den Vorgaben eines
+  Werkzeugs setzt die Palette, und nur, wenn es Vorgaben gibt: das Werkzeug
+  «Knoten» zeigte ein einsames «Neu».
+
+Warum: Die Bedienung soll sich selbst erklären (Benutzer, 2026-11-19), und
+das geht nur, wenn alle Apps gleich antworten. Dreimal geschrieben, kam
+jede Verbesserung nur in einer App an. `qa_zeichnung.js` ist dabei von 959
+auf 820 Zeilen geschrumpft.
+
 ## 2026-11-20 · Tests aufgeräumt
 
 Elf Tests prüften nichts, was nicht schon ein anderer prüft. Der Benutzer

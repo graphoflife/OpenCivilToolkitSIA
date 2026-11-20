@@ -11,9 +11,10 @@
  * Systems), das Modell (`a.modell`) und den Adapter (`a.adapter`), über den
  * es die Zeichnung liest und Linien umkehrt. Welche Felder ein Lager, ein
  * Linienlager und eine Last haben, sagt der Katalog der Art -- eben und im
- * Raum derselbe Code. Den Lastfall und die Antwort des Kerns liest es wie
- * das Zeichenfenster über `bs_teile.js`. So hängt `bs_zeichnung.js` an
- * dieser Datei und nicht umgekehrt.
+ * Raum derselbe Code. Was jedes Fenster mit Zeichnung gleich hat -- die
+ * Auswahl nach Listen, Felder für mehrere, die Lage der Knoten, die
+ * Meldungen --, steht in cad_app.js. So hängt `bs_zeichnung.js` an dieser
+ * Datei und nicht umgekehrt.
  * Gerechnet wird hier nichts.
  */
 
@@ -21,13 +22,14 @@ import {
   VAR, gemeinsam, mitVar, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
-  knotenlastart, lastart, lastVon, materialname, passendeUebersicht, systemkatalog,
+  knotenlastart, lastart, lastVon, materialname, systemkatalog,
 } from './bs_teile.js';
 import { texte } from './bs_texte.js';
-import { zahlText } from './cad_ansicht.js';
-import { jaNein, zahlfeldMitVar } from './cad_app.js';
+import {
+  auswahlEigenschaften, frischeAntwort, jaNein, laengenzeile, lagefelder, meldungszeilen, vorgabe,
+  zahlfeldMitVar, zugleich,
+} from './cad_app.js';
 import { cadZeile, schalterzeile } from './cad_palette.js';
-import { abstand, auswahlTeil } from './cad_modell.js';
 import { auswahl, el } from './dom.js';
 import { aktiverLastfall, lastfallWaehlen, lastfallZeile } from './lastfaelle.js';
 import { ausVorlage, feldangabe } from './zustand.js';
@@ -131,19 +133,19 @@ function materialWahl(art, z, bringt, gewaehlt, setzen) {
 /**
  * Die Felder einer Last: Richtung, Wert -- verteilt Anfang und Ende --,
  * die Stelle einer einzelnen in % der Linie, und ob eine verteilte je Meter
- * Projektion zählt. `last` ist die Last, die Vorgabe des Werkzeugs oder das
- * Gemeinsame mehrerer Lasten derselben Art (mit VAR, wo sie sich
- * unterscheiden); `setzen(feld, wert)` schreibt; `ort`: wo sie liegt --
+ * Projektion zählt. `wert(feld)` ist der Wert der Last, der Vorgabe des
+ * Werkzeugs oder das Gemeinsame mehrerer Lasten derselben Art (VAR, wo sie
+ * sich unterscheiden); `setzen(feld)(w)` schreibt; `ort`: wo sie liegt --
  * 'linie', 'knoten' oder, als Vorgabe des Werkzeugs, noch nirgends (null).
  * Eine Stelle hat nur eine Last auf einer Linie: bis 2026-11-20 zeigte
  * auch eine an einem Knoten das Feld, und eine Zahl darin hielt das System
  * an. Eine Richtung hat in der Ebene nur eine Kraft, im Raum auch ein
  * Moment: es dreht um sie.
  */
-function lastFelder(a, last, setzen, ort) {
+function lastFelder(a, wert, setzen, ort) {
   const amKnoten = ort === 'knoten';
   const aufLinie = ort === 'linie';
-  const art = (amKnoten ? knotenlastart : lastart)(a.bs.art, last.art);
+  const art = (amKnoten ? knotenlastart : lastart)(a.bs.art, wert('art'));
   const alle = systemkatalog(a.bs.art, 'richtungen');
   const knotenrichtungen = systemkatalog(a.bs.art, 'knotenrichtungen');
   const richtungen = amKnoten ? alle.filter((x) => knotenrichtungen.includes(x.wert)) : alle;
@@ -151,24 +153,24 @@ function lastFelder(a, last, setzen, ort) {
   const text = texte(a.bs.art);
   return [
     art.kraft || a.bs.raum ? wahlBlock(art.kraft ? 'Richtung' : 'Drehachse', wahlSchalter({
-      werte: mitVar(richtungen, last.richtung), gewaehlt: last.richtung, setzen: (w) => setzen('richtung', w),
+      werte: mitVar(richtungen, wert('richtung')), gewaehlt: wert('richtung'), setzen: setzen('richtung'),
       titel: art.kraft ? text.kraftrichtung : text.momentrichtung, klasse: '.ist-umbruch',
     })) : null,
     cadZeile(art.verteilt ? 'Anfang' : 'Wert', zahlfeldMitVar({
-      wert: last[wertFeld], schritt: 5,
+      wert: wert(wertFeld), schritt: 5,
       titel: art.kraft ? 'Positiv in Pfeilrichtung' : text.momentsinn,
-      beiAenderung: (w) => setzen(wertFeld, w),
+      beiAenderung: setzen(wertFeld),
     }), art.einheit),
     art.verteilt ? cadZeile('Ende', zahlfeldMitVar({
-      wert: last.wert_b, schritt: 5, leer: null, platzhalter: 'wie Anfang',
-      titel: 'Wert am Ende der Linie – leer: wie am Anfang', beiAenderung: (w) => setzen('wert_b', w),
+      wert: wert('wert_b'), schritt: 5, leer: null, platzhalter: 'wie Anfang',
+      titel: 'Wert am Ende der Linie – leer: wie am Anfang', beiAenderung: setzen('wert_b'),
     }), art.einheit) : null,
     !art.verteilt && aufLinie ? cadZeile('Stelle', zahlfeldMitVar({
-      wert: last.stelle, schritt: 5, angabe: feldangabe(a.bs.klassen.stablast, 'stelle'),
-      titel: 'Wo die Last steht: in % der Linie ab ihrem Anfang', beiAenderung: (w) => setzen('stelle', w),
+      wert: wert('stelle'), schritt: 5, angabe: feldangabe(a.bs.klassen.stablast, 'stelle'),
+      titel: 'Wo die Last steht: in % der Linie ab ihrem Anfang', beiAenderung: setzen('stelle'),
     }), '%') : null,
-    art.verteilt && art.kraft && alle.find((x) => x.wert === last.richtung)?.im_system && aufLinie
-      ? schalterzeile('projiziert', jaNein(last.projiziert, (w) => setzen('projiziert', w),
+    art.verteilt && art.kraft && alle.find((x) => x.wert === wert('richtung'))?.im_system && aufLinie
+      ? schalterzeile('projiziert', jaNein(wert('projiziert'), setzen('projiziert'),
         text.projiziert), 'je m Projektion') : null,
   ];
 }
@@ -189,7 +191,7 @@ export function neuEigenschaften(a, werkzeug) {
         vorgabeMaterial(a, z), (w) => { v.material = w; neu(); })) : null,
     ];
   } else if (werkzeug === 'last') {
-    const v = a.bs.vorgaben.last;
+    const { wert, setzen } = vorgabe(a, a.bs.vorgaben.last);
     // Der Lastfall steht oben neben «Last»; hier nur, wenn keiner gewählt ist.
     inhalt = [
       aktiverLastfall(a.bs) ? null : el('p.cad-hinweis-klein', {
@@ -197,44 +199,25 @@ export function neuEigenschaften(a, werkzeug) {
       }),
       wahlBlock('Art', wahlSchalter({
         werte: systemkatalog(a.bs.art, 'lastarten').map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: `${x.beschriftung} in ${x.einheit}` })),
-        gewaehlt: v.art, setzen: (w) => { v.art = w; neu(); }, klasse: '.ist-umbruch',
+        gewaehlt: wert('art'), setzen: setzen('art'), klasse: '.ist-umbruch',
         titel: 'Verteilt liegt eine Last auf der ganzen Linie; einzeln dort, wo geklickt wird, oder an einem Knoten',
       })),
-      ...lastFelder(a, v, (feld, w) => { v[feld] = w; neu(); }, null),
+      ...lastFelder(a, wert, setzen, null),
     ];
   }
   return {
-    inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...inhalt.filter(Boolean)],
+    inhalt: inhalt.filter(Boolean),
     schluessel: JSON.stringify([werkzeug, a.bs.vorgaben, aktiverLastfall(a.bs),
       (z.querschnitte || []).map((q) => [q.kennung, q.name, q.art]),
       (z.stabmaterialien || []).map((m) => [m.kennung, materialname(m)])]),
   };
 }
 
+/** Was gewählt ist (cad_app.js): Knoten, Linien oder Lasten. */
 export function eigenschaften(a) {
-  const z = a.adapter.zeichnung();
-  const kennungen = [...a.auswahl].map((s) => auswahlTeil(s).kennung);
-  const lasten = kennungen.filter((k) => lastVon(z, k));
-  const knoten = kennungen.filter((k) => z.knoten.some((x) => x.kennung === k));
-  const linien = kennungen.filter((k) => z.linien.some((x) => x.kennung === k));
-  const schluessel = JSON.stringify([aktiverLastfall(a.bs), Boolean(passendeUebersicht(a)), a.bs.bettungOffen]);
-  if (lasten.length && lasten.length === kennungen.length) return { ...lastEigenschaften(a, z, lasten), schluessel };
-  if ((knoten.length && linien.length) || lasten.length) {
-    return {
-      titel: `${kennungen.length} gewählt`,
-      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschiedenes zugleich – verschieben mit V, löschen mit Entf.' })],
-      schluessel,
-    };
-  }
-  if (knoten.length) return { ...knotenEigenschaften(a, z, knoten), schluessel };
-  if (linien.length) return { ...linienEigenschaften(a, z, linien), schluessel };
-  return { titel: '', inhalt: [] };
-}
-
-function meldungszeilen(a, kennungen) {
-  const u = passendeUebersicht(a);
-  return (u?.meldungen || []).filter((m) => m.elemente.some((k) => kennungen.includes(k)))
-    .map((m) => el(m.fehler ? 'p.cad-meldung' : 'p.cad-hinweis-klein', { text: m.text }));
+  return auswahlEigenschaften(a, {
+    knoten: knotenEigenschaften, linien: linienEigenschaften, anhaenge: lastEigenschaften,
+  }, [aktiverLastfall(a.bs), a.bs.bettungOffen]);
 }
 
 
@@ -281,18 +264,16 @@ function lagerFelder(a, z, knoten) {
   // Je Richtung nur, wenn alle gewählten ein Lager haben -- sonst stünde da,
   // was nur für einige gilt.
   if (lager.some((l) => !l)) return zeilen;
-  const richtungSetzen = (feld) => (wert) => a.aendern((zz) => {
-    for (const l of zz.lager) if (knoten.includes(l.knoten)) l[feld] = wert;
-  });
+  const { wert, setzen: richtungSetzen } = zugleich(a, z, 'lager', lager.map((l) => l.kennung));
   for (const { feld, zeichen } of systemkatalog(a.bs.art, 'lagerfelder')) {
-    const halt = gemeinsam(lager.map((l) => l[feld]));
+    const halt = wert(feld);
     zeilen.push(richtungszeile(zeichen, wahlSchalter({
       werte: mitVar(HALT, halt), gewaehlt: halt, setzen: richtungSetzen(feld), titel: `Halt in ${zeichen}`,
     })));
     if (halt === 'feder') {
       const angabe = feldangabe(a.bs.klassen.lager, `k_${feld}`);
       zeilen.push(cadZeile(`  k_${zeichen}`, zahlfeldMitVar({
-        wert: gemeinsam(lager.map((l) => l[`k_${feld}`])), schritt: 1000, angabe,
+        wert: wert(`k_${feld}`), schritt: 1000, angabe,
         titel: `Federsteifigkeit in ${zeichen}`, beiAenderung: richtungSetzen(`k_${feld}`),
       }), angabe.einheit));
     }
@@ -300,41 +281,29 @@ function lagerFelder(a, z, knoten) {
   return zeilen;
 }
 
+/**
+ * Gewählte Knoten: ihre Lage (cad_app.js), ihr Lager, ob sie sich drehen
+ * können, und die Meldungen zu ihnen und ihren Lagern -- hier tippt man ihr
+ * k. Bis 2026-11-19 standen die Meldungen nur unter der Zeichnung.
+ */
 function knotenEigenschaften(a, z, knoten) {
-  const gewaehlt = z.knoten.filter((x) => knoten.includes(x.kennung));
-  // Eine getippte Lage gilt für alle gewählten -- so stehen sie danach in
-  // einer Flucht.
-  const achsen = a.adapter.achsen;
-  const lageSetzen = (feld) => (w) => a.aendern((zz) => {
-    for (const kennung of knoten) {
-      const da = zz.knoten.find((x) => x.kennung === kennung);
-      if (da) a.modell.verschieben(zz, new Set([kennung]), achsen.map((x) => (x === feld ? w - da[x] : 0)));
-    }
-  });
-  const inhalt = achsen.map((feld) => cadZeile(feld, zahlfeldMitVar({
-    wert: gemeinsam(gewaehlt.map((k) => k[feld])), schritt: a.raster, beiAenderung: lageSetzen(feld),
-  }), 'm'));
-  inhalt.push(...lagerFelder(a, z, knoten));
-  const u = passendeUebersicht(a);
-  for (const k of knoten) {
-    if (u?.unbestimmt?.includes(k)) inhalt.push(el('p.cad-hinweis-klein', { text: `${k}: ${u.unbestimmt_text}.` }));
-  }
-  // Mit den Meldungen seiner Lager: hier tippt man ihr k. Bis 2026-11-19
-  // standen sie nur unter der Zeichnung.
+  const u = frischeAntwort(a);
   const lager = z.lager.filter((l) => knoten.includes(l.knoten)).map((l) => l.kennung);
-  inhalt.push(...meldungszeilen(a, [...knoten, ...lager]));
   return {
     titel: knoten.length === 1 ? `Knoten ${knoten[0]}` : `${knoten.length} Knoten`,
-    inhalt: inhalt.filter(Boolean),
+    inhalt: [
+      ...lagefelder(a, z, knoten),
+      ...lagerFelder(a, z, knoten),
+      ...knoten.filter((k) => u?.unbestimmt?.includes(k))
+        .map((k) => el('p.cad-hinweis-klein', { text: `${k}: ${u.unbestimmt_text}.` })),
+      ...meldungszeilen(a, [...knoten, ...lager]),
+    ].filter(Boolean),
   };
 }
 
 // -- Linien ------------------------------------------------------------------
 
-function lagerAnLinie(a, linien, wert) {
-  const setzen = (feld) => (w) => a.aendern((zz) => {
-    for (const l of zz.linien) if (linien.includes(l.kennung)) l[feld] = w;
-  });
+function lagerAnLinie(a, wert, setzen) {
   const werte = HALT.map((x) => (x.wert === 'feder' ? { ...x, beschriftung: 'Bettung' } : x));
   const zeilen = [];
   for (const { feld, beschriftung, zeichen, titel } of systemkatalog(a.bs.art, 'linienlager')) {
@@ -405,15 +374,9 @@ function drehwinkelzeile(a, wert, setzen) {
  * (Benutzer, 2026-10-23).
  */
 function linienEigenschaften(a, z, linien) {
-  const gewaehlt = z.linien.filter((x) => linien.includes(x.kennung));
-  const wert = (feld) => gemeinsam(gewaehlt.map((l) => l[feld]));
-  const setzen = (feld) => (w) => a.aendern((zz) => {
-    for (const l of zz.linien) {
-      if (!linien.includes(l.kennung)) continue;
-      l[feld] = w;
-      // Ein neuer Stab bekommt das Material, das das Werkzeug vorgibt -- sonst fehlte es ihm.
-      if (feld === 'querschnitt' && w && !l.material) l.material = vorgabeMaterial(a, zz);
-    }
+  // Ein neuer Stab bekommt das Material, das das Werkzeug vorgibt -- sonst fehlte es ihm.
+  const { gewaehlt, wert, setzen } = zugleich(a, z, 'linien', linien, (l, feld, zz) => {
+    if (feld === 'querschnitt' && l.querschnitt && !l.material) l.material = vorgabeMaterial(a, zz);
   });
   const art = a.bs.art;
   const staebe = gewaehlt.filter((l) => l.querschnitt);
@@ -442,13 +405,8 @@ function linienEigenschaften(a, z, linien) {
     title: `Linienlager ${linienlager.map((x) => x.kurz).join(', ')}: fest oder gebettet`,
     on: { click: () => { a.bs.bettungOffen = !a.bs.bettungOffen; a.neuZeichnen(); } },
   }));
-  if (a.bs.bettungOffen) inhalt.push(...lagerAnLinie(a, linien, wert));
-  if (gewaehlt.length === 1) {
-    const [e] = gewaehlt;
-    const lagen = a.modell.lagen(z);
-    const [p, q] = [lagen.get(e.von), lagen.get(e.bis)];
-    if (p && q) inhalt.push(el('p.cad-info', { text: `L = ${zahlText(abstand(p, q), 3)} m · ${e.von} → ${e.bis}` }));
-  }
+  if (a.bs.bettungOffen) inhalt.push(...lagerAnLinie(a, wert, setzen));
+  if (gewaehlt.length === 1) inhalt.push(laengenzeile(a, z, gewaehlt[0]));
   inhalt.push(...meldungszeilen(a, linien));
   return {
     titel: gewaehlt.length === 1 ? a.adapter.name(a, gewaehlt[0].kennung) : `${gewaehlt.length} Linien`,
@@ -466,22 +424,21 @@ function linienEigenschaften(a, z, linien) {
  */
 function lastEigenschaften(a, z, kennungen) {
   const da = kennungen.map((k) => lastVon(z, k));
-  const setzen = (feld, wert) => a.aendern((zz) => {
+  // Die Lasten hängen an ihren Linien, nicht in einer Liste -- darum nicht `zugleich`.
+  const wert = (feld) => gemeinsam(da.map((d) => d.last[feld]));
+  const setzen = (feld) => (w) => a.aendern((zz) => {
     for (const k of kennungen) {
       const neu = lastVon(zz, k);
-      if (neu) neu.last[feld] = wert;
+      if (neu) neu.last[feld] = w;
     }
   });
   const amKnoten = gemeinsam(da.map((d) => Boolean(d.knoten)));
-  const art = gemeinsam(da.map((d) => d.last.art));
-  const inhalt = [lastfallZeile(z, gemeinsam(da.map((d) => d.last.lastfall)), (w) => {
-    setzen('lastfall', w);
+  const inhalt = [lastfallZeile(z, wert('lastfall'), (w) => {
+    setzen('lastfall')(w);
     lastfallWaehlen(a, a.bs, w);
   }, 'Zu welchem Lastfall die Lasten gehören')];
-  if (amKnoten !== VAR && art !== VAR) {
-    const felder = Object.fromEntries(Object.keys(da[0].last)
-      .map((feld) => [feld, gemeinsam(da.map((d) => d.last[feld]))]));
-    inhalt.push(...lastFelder(a, felder, setzen, amKnoten ? 'knoten' : 'linie'));
+  if (amKnoten !== VAR && wert('art') !== VAR) {
+    inhalt.push(...lastFelder(a, wert, setzen, amKnoten ? 'knoten' : 'linie'));
   } else {
     inhalt.push(el('p.cad-hinweis-klein', { text: 'Verschiedene Arten – ihre Werte einzeln bearbeiten.' }));
   }

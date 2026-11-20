@@ -22,10 +22,11 @@ import {
   bezeichnung, erklaerung, feld, karte, klappgruppe, panel, tabelle, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
-import { LASTLISTEN, kernmeldungen } from './dk_eigenschaften.js';
+import { listengruppen, listenzeilen, meldungsliste } from './cad_app.js';
+import { LASTLISTEN } from './dk_eigenschaften.js';
 import { ergebnisKarten } from './dk_ergebnis.js';
 import { anteilText, grundrissBild, legende } from './dk_grundriss.js';
-import { waehlen, zeichenbereich } from './dk_zeichnung.js';
+import { zeichenbereich } from './dk_zeichnung.js';
 import {
   auswahl, el, leerzustand, zahlfeld,
 } from './dom.js';
@@ -78,34 +79,16 @@ const HILFE = {
 
 /**
  * Meldungen des Kerns -- zur Decke und zum gezeigten Lastfall -- und je Teil
- * eine Zeile: ein Klick wählt im Fenster, bei einer Stütze oder Punktlast
- * ihren Knoten; bei einer Last zeigt die Zeichnung dann ihren Lastfall.
+ * eine Zeile (cad_app.js): ein Klick wählt im Fenster, eine Stütze oder
+ * Punktlast über ihren Knoten; bei einer Last zeigt die Zeichnung dann
+ * ihren Lastfall.
  */
 function liste(a) {
   const z = eintragVon(a.dk.kennung);
   if (!z) return [];
-  const teile = [];
-  if (a.dk.unterlage === 'aufteilung') teile.push(legende());
-  if (a.dk.daten?.fehler) teile.push(el('div.qa-meldungen', {}, [el('div.qa-meldung', { text: a.dk.daten.fehler })]));
-  const knotenVon = new Map([...z.stuetzen, ...z.punktlasten].map((s) => [s.kennung, s.knoten]));
-  const meldungen = kernmeldungen(a);
-  if (meldungen.length) {
-    teile.push(el('div.qa-meldungen', {}, meldungen.map((m) => el('button.qa-meldung', {
-      type: 'button', text: m.text, class: m.fehler ? '' : 'ist-hinweis',
-      title: 'Wählt die Teile, die die Meldung nennt',
-      on: { click: () => waehlen(a.dk.kennung, m.elemente.map((k) => knotenVon.get(k) || k)) },
-    }))));
-  }
-  const zeile = (kennung, links, rechts, waehlbar = kennung, lastfall = undefined) => el('div.bs-element', {
-    dataset: { kennung: waehlbar },
-    on: {
-      click: () => {
-        if (lastfall !== undefined) lastfallWaehlen(a, a.dk, lastfall);
-        waehlen(a.dk.kennung, [waehlbar]);
-      },
-    },
-  }, [el('span.bs-element-name', { text: kennung }), el('span', { text: links }),
-    el('span.bs-element-zusatz', { text: rechts })]);
+  const zeile = (kennung, was, wert, lastfall = undefined) => listenzeilen(a)({
+    kennung, was, wert, vorher: lastfall === undefined ? undefined : () => lastfallWaehlen(a, a.dk, lastfall),
+  });
   const fall = (lf) => z.lastfaelle.find((x) => x.kennung === lf)?.name || 'kein Lastfall';
   const flaeche = (w) => `q = ${zahlText(w, 2)} kN/m²`;
   const beton = (k) => {
@@ -119,29 +102,27 @@ function liste(a) {
       `${beton(p.beton)} · ${p.knoten.length} Ecken · Richtungen ${zahlText(p.richtung_1, 1)}°, ${zahlText(p.richtung_2, 1)}°`))],
     ['Linienlager', z.linienlager.map((l) => zeile(l.kennung, `${l.von} → ${l.bis}`, halt(l)))],
     ['Stützen', z.stuetzen.map((s) => zeile(s.kennung, `an ${s.knoten}`,
-      `${zahlText(s.b_x, 0)} × ${zahlText(s.b_y, 0)} mm${s.bereich_von_hand ? ` · Bereich ${zahlText(s.l_x, 2)} × ${zahlText(s.l_y, 2)} m` : ''}`,
-      s.knoten))],
+      `${zahlText(s.b_x, 0)} × ${zahlText(s.b_y, 0)} mm${s.bereich_von_hand ? ` · Bereich ${zahlText(s.l_x, 2)} × ${zahlText(s.l_y, 2)} m` : ''}`))],
     ['Unterzüge', z.unterzuege.map((u) => zeile(u.kennung, `${u.von} → ${u.bis}`,
       `b = ${zahlText(u.breite, 2)} m · Stufe ${u.stufe}`))],
     ['Zonen', z.zonen.map((x) => zeile(x.kennung, anteilText(x.anteil), `${x.knoten.length} Ecken`))],
     ['Lasten', [
       ...z.platten.flatMap((p) => p.lasten.map((q) => zeile(p.kennung, 'ganze Platte',
-        `${flaeche(q.wert)} · ${fall(q.lastfall)}`, p.kennung, q.lastfall))),
+        `${flaeche(q.wert)} · ${fall(q.lastfall)}`, q.lastfall))),
       ...z.flaechenlasten.map((f) => zeile(f.kennung, `${f.knoten.length} Ecken`,
-        `${flaeche(f.wert)} · ${fall(f.lastfall)}`, f.kennung, f.lastfall)),
+        `${flaeche(f.wert)} · ${fall(f.lastfall)}`, f.lastfall)),
       ...z.linienlasten.map((l) => zeile(l.kennung, `${l.von} → ${l.bis}`,
-        `q = ${zahlText(l.wert, 2)} kN/m · ${fall(l.lastfall)}`, l.kennung, l.lastfall)),
+        `q = ${zahlText(l.wert, 2)} kN/m · ${fall(l.lastfall)}`, l.lastfall)),
       ...z.punktlasten.map((e) => zeile(e.kennung, `an ${e.knoten}`,
         `Q = ${zahlText(e.wert, 1)} kN über ${zahlText(e.l_x, 2)} × ${zahlText(e.l_y, 2)} m · ${fall(e.lastfall)}`,
-        e.knoten, e.lastfall)),
+        e.lastfall)),
     ]],
   ];
-  // Jede Gruppe klappt auf und zu, zu Beginn zu -- wie im Balkensystem.
-  const offen = a.dk.aufgeklappt || (a.dk.aufgeklappt = new Set());
-  for (const [titel, zeilen] of gruppen) {
-    if (zeilen.length) teile.push(klappgruppe(titel, zeilen, offen, 'bs-elemente'));
-  }
-  return teile;
+  return [
+    a.dk.unterlage === 'aufteilung' ? legende() : null,
+    meldungsliste(a),
+    ...listengruppen(a, gruppen),
+  ];
 }
 
 // ===========================================================================
@@ -354,7 +335,7 @@ function fallmeldungen(daten) {
   if (zeilen.length <= 3) return zeilen;
   const titel = 'Meldungen zu den Fällen';
   if (meldungen.some((m) => m.fehler)) MELDUNGEN_OFFEN.add(titel);
-  return [klappgruppe(titel, zeilen, MELDUNGEN_OFFEN, 'bs-elemente')];
+  return [klappgruppe(titel, zeilen, MELDUNGEN_OFFEN, 'meldungsgruppe')];
 }
 
 /**

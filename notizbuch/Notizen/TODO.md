@@ -18,7 +18,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dazu in Chrome prüfen, ob sich die Seite als App installieren lässt;
       verlangt Chrome ein PNG als Zeichen, schreibt ein kleines Skript ohne
       Fremdpakete die Bilder.
-- Danach die Umbauten 5, 3, 4 und 8 der Durchsicht vom 2026-11-19.
+- Danach die Umbauten 3, 4 und 8 der Durchsicht vom 2026-11-19.
 
 ## Offen
 
@@ -465,14 +465,12 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Nachweise je Seite und je Fall bauen sie 13-mal selbst
         (`begruendung` neunmal deklariert). Umbau: ein `Teilnachweis` mit
         `teile()`, `begruendung` in `Fallausgang`.
-- [ ] **5. Nach dem Klick baut jede App mit Zeichenfenster selbst.** Die
-      Eigenschaften der Auswahl (die Querschnittsanalyse ohne «Var», mit
-      eigenem `finden`; die Lage der Knoten dreimal), die Liste unter der
-      Zeichnung (dreimal; «Lager, Stütze, Punktlast wählt man über ihren
-      Knoten» siebenmal) und die Meldungszeilen. Umbau: `cadApp` sortiert die
-      Auswahl einmal und baut `lagefelder`, `meldungszeilen` und die Liste
-      aus `[titel, zeilen]`; die Decke (`FELDER`, `feldzeile`) ist die
-      Zielform. Gehört zur offenen Grundlage der Apps mit Zeichenfenster.
+- [x] **5. Nach dem Klick baut jede App mit Zeichenfenster selbst.**
+      Erledigt (2026-11-20): `cad_app.js` fragt den Kern, baut die Liste
+      unter der Zeichnung und das schwebende Fenster zur Auswahl für alle
+      vier Apps mit Zeichenfenster, das Durchstanzen eingeschlossen; was
+      ein Klick wählt, sagt `waehlbarVon` an einer Stelle. Siehe
+      [[Entwicklung]].
 - [x] **6. Still leer statt laut.** Erledigt (2026-11-20), alle fünf
       Stellen.
       - Erledigt (2026-11-20): `sinnbild` wirft für einen unbekannten
@@ -525,8 +523,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Verläufe, Notizbuch, Python) -- die Vorsilbe einer Klasse sagt, wo
         sie zuerst stand, nicht wer sie braucht (`.bs-tabelle` dient der
         Decke). Dabei fällt weg: fünf Regeln `[hidden]` werden eine, 25
-        Farbregeln der Verläufe eine Variable je Grösse, `.qa-element*` und
-        `.bs-element*` eine Liste, sechs Formen von «leer» zwei.
+        Farbregeln der Verläufe eine Variable je Grösse, sechs Formen von
+        «leer» zwei. Die Listen unter den Zeichnungen sind schon eine
+        (`.cad-element*`, 2026-11-20).
       - Erledigt (2026-11-19): `grundbruch.py`, 996 Zeilen, ist geteilt in
         `fundament.py` mit dem gemeinsamen `Fundamentnachweis`,
         `grundbruch.py` (639 Zeilen), `gleiten.py` und `tragfaehigkeit.py`.
@@ -648,9 +647,9 @@ der grosse.
       Umbau: Platzhalter oder `fest()`, wie schon in `innen_quer.py`.
 - [ ] **6. Doppelte Bausteine.** Die Schichten des Pfahls zweimal
       (`boden.Profil`, `steifigkeit.Baugrund`), `lagen` zeichengleich in
-      `pf_zeichnung.js` und `sz_zeichnung.js`; die Anbindung an den Kern in
-      Balkensystem und Decke zweimal (`uebersichtHolen`, `zeichnungHolen`);
-      `lagerSymbol` und `raumlagerSymbol` mit gleichen Teilen.
+      `pf_zeichnung.js` und `sz_zeichnung.js`; `lagerSymbol` und
+      `raumlagerSymbol` mit gleichen Teilen. Die Anbindung an den Kern steht
+      seit 2026-11-20 einmal (`kernFragen` in `cad_app.js`).
 - [ ] **7. `cad_fenster.js` hat 899 Zeilen**, 101 bis zur Grenze. Nähte:
       die Aktionen der Auswahl nach `cad_auswahl.js` -- dann fällt der Haken
       `a.aktionen` weg --, die Bedienung im Raum in die Ansicht aus 4b, die

@@ -275,7 +275,7 @@ export function paletteZeichnen(a) {
     pal.setzen(hilfstext(a) || a.befehl.frage(a), [
       ...punkteingabe(a),
       ...ebenenzeilen(a),
-      neuTeil ? el('div.cad-neu', {}, neuTeil.inhalt) : null,
+      neuTeil?.inhalt.length ? el('div.cad-neu', {}, [el('div.cad-neu-titel', { text: 'Neu' }), ...neuTeil.inhalt]) : null,
     ], schluessel);
     return;
   }
