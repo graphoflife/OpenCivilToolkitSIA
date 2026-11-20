@@ -430,13 +430,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Erledigt (2026-11-20): `sinnbild` wirft für einen unbekannten
         Namen; «Ergebnisse» der Decke hat sein Bild, und der Test findet
         auch die Kapitel und die Knöpfe des Zeichenfensters.
-      - Wo «⇒ erfüllt» steht, entscheiden zwei Schalter mit
-        entgegengesetzter Vorgabe (`Vergleich.zeile` False,
-        `tex.vergleich`/`tex.bedingung` True; 28 Aufrufe setzen ihn). In der
-        Herleitung von «Sprödes Versagen je Richtung» steht darum kein
-        Urteil. Umbau: das Urteil steht immer hinter dem Grad, der Schalter
-        fällt weg -- in 37 Zeilen rückt «⇒ erfüllt» eine Zeile tiefer
-        (entschieden, Benutzer 2026-11-19: umbauen).
+      - Erledigt (2026-11-20): «⇒ erfüllt» steht immer hinter dem Grad;
+        der Schalter `mit_urteil` ist weg, «Sprödes Versagen je Richtung»
+        hat sein Urteil.
       - Der Bericht hält jede Karte mit einem SVG für ein Diagramm
         (`querySelector('svg')`); ein Schalter mit Sinnbild im Kopf einer
         Karte würde zur Vorschau. Umbau: `karte(titel, inhalt, {bild})`.

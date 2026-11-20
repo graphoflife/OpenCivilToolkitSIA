@@ -1,5 +1,5 @@
 ---
-erzeugt: 432350d8fe97
+erzeugt: fffad2b09808
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, Tabelle 17"
@@ -52,7 +52,7 @@ $$
 \begin{aligned}
   N_{s,adm,2,x} &= A_{s,2,x} \cdot \sigma_{s,adm,2,x} \\
   &= 2450\,\mathrm{mm}^{2} \cdot 381\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 933.1\,\mathrm{kN} \quad \ge \quad N_{Riss} = 378.3\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
+  &= 933.1\,\mathrm{kN} \quad \ge \quad N_{Riss} = 378.3\,\mathrm{kN}
 \end{aligned}
 $$
 
@@ -62,18 +62,14 @@ $$
 \begin{aligned}
   N_{s,adm} &= A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} + A_{s,5} \cdot \sigma_{s,adm,5} \\
   &= 314\,\mathrm{mm}^{2} \cdot 361\,\mathrm{N}/\mathrm{mm}^{2} + 1206\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 452\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} + 400\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 118\,\mathrm{mm}^{2} \cdot 500\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 1032.4\,\mathrm{kN} \quad \ge \quad N_{Riss} = 765.6\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
+  &= 1032.4\,\mathrm{kN} \quad \ge \quad N_{Riss} = 765.6\,\mathrm{kN}
 \end{aligned}
 $$
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\begin{aligned}
-  N_{s,adm} &= A_s \cdot \sigma_{s,adm} \\
-  &= 1885\,\mathrm{mm}^{2} \cdot 500\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 942.5\,\mathrm{kN} \quad \ge \quad N_{Riss} = 386.7\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
-\end{aligned}
+N_{s,adm} = A_s \cdot \sigma_{s,adm} = 1885\,\mathrm{mm}^{2} \cdot 500\,\mathrm{N}/\mathrm{mm}^{2} = 942.5\,\mathrm{kN} \quad \ge \quad N_{Riss} = 386.7\,\mathrm{kN}
 $$
 
 ## Im Code

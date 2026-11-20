@@ -298,7 +298,7 @@ class AeussererQuerwiderstand(Nachweis):
                                "Querkraft am Kopf, als Betrag")
         vergleich = Vergleich(H_Ed, R_trd)
         vergleich.bedingung(p, "Querkraft gegen Widerstand quer")
-        vergleich.zeile(p, self.d_quer[k.name], mit_urteil=True)
+        vergleich.zeile(p, self.d_quer[k.name])
         return self.urteil(self.d_quer[k.name], k.name, vergleich,
                            f"|H_Ed| = {H_Ed.formatiert()} kN "
                            f"{'≤' if vergleich.erfuellt else '>'} R_tr,d = "
@@ -336,7 +336,7 @@ class AeussererQuerwiderstand(Nachweis):
         p.wert(q_d, referenz="SIA 267:2013, 9.5.4.5")
         vergleich = Vergleich(q_d, p_d)
         vergleich.bedingung(p, "Bettungskraft gegen Erdwiderstand")
-        vergleich.zeile(p, self.d_bettung[k.name], mit_urteil=True)
+        vergleich.zeile(p, self.d_bettung[k.name])
         if not vergleich.erfuellt:
             p.hinweis("Der Boden gibt hier nach: die elastische Rechnung unterschätzt "
                       "Verschiebung und Moment. Bettung und Widerstand müssen über die Tiefe "

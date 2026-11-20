@@ -231,7 +231,7 @@ class Durchstanzen(Nachweis):
                                                 UNBESCHRAENKT, OHNE_EINWIRKUNG)], befund)
         v = Vergleich(V_d, V_Rd_c)
         v.bedingung(p, "Querkraft gegen Durchstanzwiderstand")
-        v.zeile(p, self.d_ohne, mit_urteil=True)
+        v.zeile(p, self.d_ohne)
         if not v.erfuellt and f.vorschlag:
             urteile, leisten, pilz = mit_bewehrung.nachweisen(self, e, p, w, Grundlage(
                 innen=innen, d=d, d_v=d_v, k_e=k_e, k_r=k_r, tau_cd=tau_cd, u=u, psi=psi,

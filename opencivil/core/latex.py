@@ -550,30 +550,28 @@ def folgerung(erfuellt: bool) -> str:
     return rf"\quad \Rightarrow \quad {urteil(erfuellt)}"
 
 
-def vergleich(soll: str, rechts: str, erfuellt: bool, *,
-              mit_urteil: bool = True) -> str:
+def vergleich(soll: str, rechts: str, erfuellt: bool) -> str:
     """
     Der Nachsatz einer Formel, deren Resultat gegen etwas gehalten wird::
 
         \\quad \\ge \\quad N_{Riss} = 378.3\\,\\mathrm{kN}
-        \\quad \\Rightarrow \\quad \\text{NICHT erfüllt}
 
     ``soll`` ist das Zeichen, das gelten muss; geht der Vergleich nicht auf,
-    steht sein Gegenteil da -- im Beispiel ``<``.
+    steht sein Gegenteil da -- im Beispiel ``<``. Das Urteil steht nicht hier,
+    sondern hinter dem Erfüllungsgrad (:meth:`.nachweis.Vergleich.zeile`).
     """
-    nachsatz = rf"\quad {vergleichszeichen(soll, erfuellt)} \quad {rechts}"
-    return f"{nachsatz} {folgerung(erfuellt)}" if mit_urteil else nachsatz
+    return rf"\quad {vergleichszeichen(soll, erfuellt)} \quad {rechts}"
 
 
-def bedingung(links: str, soll: str, rechts: str, erfuellt: bool, *,
-              mit_urteil: bool = True) -> str:
+def bedingung(links: str, soll: str, rechts: str, erfuellt: bool) -> str:
     """
     Ein Vergleich mit sichtbarem Ergebnis, z.B. fuer Nachweise::
 
         M_{Ed} = 120\\,\\mathrm{kNm} \\quad \\le \\quad M_{Rd} = 145\\,\\mathrm{kNm}
-        \\quad \\Rightarrow \\quad \\text{erfüllt}
+
+    Das Urteil steht hinter dem Erfüllungsgrad, wie bei :func:`vergleich`.
     """
-    return f"{links} {vergleich(soll, rechts, erfuellt, mit_urteil=mit_urteil)}"
+    return f"{links} {vergleich(soll, rechts, erfuellt)}"
 
 
 @dataclass(frozen=True)

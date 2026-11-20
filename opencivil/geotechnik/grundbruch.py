@@ -363,7 +363,7 @@ class Grundbruch(Fundamentnachweis):
                  name="Abstand des Grundwassers unter der Sohle")
         if tief >= H_gl.groesse.si:
             lage = "Lage 3: Grundwasser tiefer als der Gleitkörper"
-            p.gleichung(bedingung(angabe(T), r"\ge", angabe(H_gl), True, mit_urteil=False),
+            p.gleichung(bedingung(angabe(T), r"\ge", angabe(H_gl), True),
                         titel=lage)
             gamma_G = werte.wert("gamma_G", r"\gamma_G", gamma.groesse, 1,
                                  "Raumlast im Gleitkörper")
@@ -372,7 +372,7 @@ class Grundbruch(Fundamentnachweis):
                      referenz=KAP_GRUNDWASSER, name="Raumlast im Gleitkörper")
             return sigma0, gamma_G, lage
         lage = "Grundwasser im Gleitkörper, unter der Sohle"
-        p.gleichung(bedingung(angabe(T), r"\ge", angabe(H_gl), False, mit_urteil=False),
+        p.gleichung(bedingung(angabe(T), r"\ge", angabe(H_gl), False),
                     titel=lage)
         p.annahme("Der Grundwasserspiegel liegt im Gleitkörper (T < H). Das Kapitel "
                   "verlangt dafür eine Stabilitätsberechnung; gerechnet wird mit γ' wie in "

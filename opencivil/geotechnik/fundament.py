@@ -266,7 +266,7 @@ class Fundamentnachweis(Nachweis):
         """
         v = Vergleich(E, R)
         v.bedingung(p, "Einwirkung gegen Widerstand")
-        v.zeile(p, self.d_ausnutzung[k.name], mit_urteil=True)
+        v.zeile(p, self.d_ausnutzung[k.name])
         return v, (f"{namen[1]} = {R.formatiert()} kN {'≥' if v.erfuellt else '<'} "
                    f"{namen[0]} = {E.formatiert()} kN.")
 

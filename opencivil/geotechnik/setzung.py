@@ -488,7 +488,7 @@ class Setzung(Nachweis):
         s_zul = e["s_zul"]
         v = Vergleich(s, s_zul)
         v.bedingung(p, "Setzung gegen zulässige Setzung")
-        v.zeile(p, self.d_grad, mit_urteil=True)
+        v.zeile(p, self.d_grad)
         urteil = self.urteil(self.d_grad, self._fall, v,
                              f"s = {s.formatiert()} mm {'≤' if v.erfuellt else '>'} "
                              f"s_zul = {s_zul.formatiert()} mm.")

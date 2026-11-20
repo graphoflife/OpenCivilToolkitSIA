@@ -108,12 +108,15 @@ class Vergleich:
     def bedingung(self, p: Protokoll, titel: str) -> None:
         """«E ≤ R» als Zeile, ohne Urteil -- das steht in der Zeile des Grads (:meth:`zeile`)."""
         p.gleichung(tex.bedingung(tex.angabe(self.einwirkung), r"\le", tex.angabe(self.widerstand),
-                                  self.erfuellt, mit_urteil=False), titel=titel)
+                                  self.erfuellt), titel=titel)
 
-    def zeile(self, p: Protokoll, definition: WertDef, *, mit_urteil: bool = False) -> None:
+    def zeile(self, p: Protokoll, definition: WertDef) -> None:
         """
-        Die Zeile mit dem Erfuellungsgrad -- in jedem Nachweis dieselbe Form,
-        Widerstand durch Einwirkung.
+        Die Zeile mit dem Erfuellungsgrad und dem Urteil -- in jedem Nachweis
+        dieselbe Form, Widerstand durch Einwirkung, «⇒ erfüllt» dahinter.
+        Bis 2026-11-20 stand das Urteil je nach Nachweis hier oder in der
+        Zeile davor, entschieden von zwei Schaltern mit entgegengesetzter
+        Vorgabe; in «Sprödes Versagen je Richtung» stand darum keines.
 
         Der Grad setzt sich selbst (:func:`grad_als_text`). Stuende im Nenner
         eine Null, bleibt es bei den Symbolen. Ohne Normverweis -- den traegt
@@ -126,7 +129,7 @@ class Vergleich:
             vorlage, eingaben = r"\frac{@R}{@E}", {"R": widerstand, "E": einwirkung}
         p.formel(definition.belegen(Groesse(self.grad, EINHEITSLOS)), vorlage, eingaben,
                  titel="Erfüllungsgrad", referenz="",
-                 nachsatz=tex.folgerung(self.erfuellt) if mit_urteil else "")
+                 nachsatz=tex.folgerung(self.erfuellt))
 
 
 @dataclass(frozen=True)

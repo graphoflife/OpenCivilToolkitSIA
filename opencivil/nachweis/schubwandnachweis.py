@@ -225,7 +225,7 @@ class Schubwandnachweis(Nachweis):
         i = sw.schwaechste([vergleich.grad for vergleich in vergleiche])
         w, r, massgebend = befund.waende[i], widerstaende[i], vergleiche[i]
         p.text(f"Massgebend: {w.name}.")
-        massgebend.zeile(p, self.d_ausnutzung[fall.name], mit_urteil=True)
+        massgebend.zeile(p, self.d_ausnutzung[fall.name])
 
         laengs = None
         if self.mit_laengszug:

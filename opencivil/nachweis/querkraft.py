@@ -337,4 +337,4 @@ class Querkraft(Nachweis):
         name = erg.fall.name
         kurz = erg.ausgang.benannt(widerstand=self.d_v_rd[name].belegen(
             erg.ausgang.widerstand.groesse))
-        kurz.zeile(p, self.d_ausnutzung[name], mit_urteil=True)
+        kurz.zeile(p, self.d_ausnutzung[name])

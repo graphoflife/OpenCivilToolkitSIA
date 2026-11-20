@@ -593,7 +593,7 @@ class Knickverfahren(Nachweis):
                 bedingung(angabe(werte.moment("M_Rd", self._m_rd_symbol(erg), erg.M_Rd)),
                           r"\ge",
                           angabe(werte.moment("M_II", "M_{Ed,II}", abs(erg.M_ges))),
-                          erg.M_Rd >= abs(erg.M_ges), mit_urteil=False),
+                          erg.M_Rd >= abs(erg.M_ges)),
                 titel="Querschnitt am verformten System")
 
         self._protokoll_grenzkraft(p, erg)
@@ -660,10 +660,9 @@ class Knickverfahren(Nachweis):
         # In der Herleitung mit Betragsstrichen: darueber steht N_Ed mit Vorzeichen.
         v = erg.ausgang.benannt(einwirkung=Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
             "N_Ed_betrag", r"\left|N_{Ed}\right|", erg.ausgang.einwirkung.groesse.si))
-        p.gleichung(bedingung(angabe(v.widerstand), r"\ge", angabe(v.einwirkung), v.erfuellt,
-                              mit_urteil=False),
+        p.gleichung(bedingung(angabe(v.widerstand), r"\ge", angabe(v.einwirkung), v.erfuellt),
                     titel="Grenzkraft des Stabes")
-        v.zeile(p, self.d_ausnutzung[erg.fall.name], mit_urteil=True)
+        v.zeile(p, self.d_ausnutzung[erg.fall.name])
 
 
 class Knicken(Knickverfahren):

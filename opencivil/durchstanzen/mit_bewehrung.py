@@ -320,7 +320,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
              name="Querkraft für die Durchstanzbewehrung")
     v_s = Vergleich(V_d_s, V_Rd_s)
     v_s.bedingung(p, "Querkraft für die Bewehrung gegen ihren Beitrag")
-    v_s.zeile(p, n.d_mit, mit_urteil=True)
+    v_s.zeile(p, n.d_mit)
 
     # -- Verformungsvermögen (67) ------------------------------------------
     V_halb = w.kraft(f"{k}V_d_halb", r"V_d / 2", pruefung.V_halb)
@@ -333,7 +333,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
              name="Durchstanzbewehrung an der Fliessgrenze")
     v_v = Vergleich(V_halb, V_Rd_v)
     v_v.bedingung(p, "Verformungsvermögen: die halbe Querkraft gegen die fliessende Bewehrung")
-    v_v.zeile(p, n.d_verformung, mit_urteil=True)
+    v_v.zeile(p, n.d_verformung)
 
     # -- Betondruckdiagonale (70) ------------------------------------------
     d = g.d.groesse.si
@@ -357,7 +357,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
              name="Widerstand der ersten Betondruckdiagonale")
     v_m = Vergleich(ort.V_d, V_Rd_max)
     v_m.bedingung(p, "Querkraft gegen die erste Betondruckdiagonale")
-    v_m.zeile(p, n.d_diagonale, mit_urteil=True)
+    v_m.zeile(p, n.d_diagonale)
     if not v_m.erfuellt:
         p.hinweis("Die erste Betondruckdiagonale an der gestützten Fläche bricht vor der "
                   "Bewehrung: mehr Durchstanzbewehrung hilft nicht.")
@@ -392,7 +392,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
         referenz="SIA 262:2025, 4.3.6.5.10, (58)")
     v_a = Vergleich(V_d_out, V_Rd_out)
     v_a.bedingung(p, "Querkraft gegen den Widerstand ausserhalb der Bewehrung")
-    v_a.zeile(p, n.d_aussen, mit_urteil=True)
+    v_a.zeile(p, n.d_aussen)
 
     z = f" {ort.zusatz}" if ort.zusatz else ""
     return [
@@ -532,7 +532,7 @@ def _mit_pilz(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte,
     v = Vergleich(V_d, V_Rd_c)
     v.bedingung(p, "Querkraft gegen den Widerstand um den Stahlpilz")
     if leisten is None:
-        v.zeile(p, n.d_aussen, mit_urteil=True)
+        v.zeile(p, n.d_aussen)
         return [n.urteil(n.d_aussen, "ausserhalb des Stahlpilzes", v,
                          f"{pilz.name}: V_d,P = {V_d.formatiert()} kN ≤ "
                          f"V_Rd,c,P = {V_Rd_c.formatiert()} kN.")], None, befund

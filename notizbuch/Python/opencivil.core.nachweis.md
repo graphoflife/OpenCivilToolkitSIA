@@ -1,5 +1,5 @@
 ---
-erzeugt: 86952b59a1ac
+erzeugt: 683593bb71b2
 art: modul
 tags: [modul]
 ---
@@ -107,11 +107,14 @@ def bedingung(self, p: Protokoll, titel: str) -> None
 #### Vergleich.zeile
 
 ```python
-def zeile(self, p: Protokoll, definition: WertDef, *, mit_urteil: bool=False) -> None
+def zeile(self, p: Protokoll, definition: WertDef) -> None
 ```
 
-Die Zeile mit dem Erfuellungsgrad -- in jedem Nachweis dieselbe Form,
-Widerstand durch Einwirkung.
+Die Zeile mit dem Erfuellungsgrad und dem Urteil -- in jedem Nachweis
+dieselbe Form, Widerstand durch Einwirkung, «⇒ erfüllt» dahinter.
+Bis 2026-11-20 stand das Urteil je nach Nachweis hier oder in der
+Zeile davor, entschieden von zwei Schaltern mit entgegengesetzter
+Vorgabe; in «Sprödes Versagen je Richtung» stand darum keines.
 
 Der Grad setzt sich selbst ([[opencivil.core.wert#grad_als_text|grad_als_text]]). Stuende im Nenner
 eine Null, bleibt es bei den Symbolen. Ohne Normverweis -- den traegt

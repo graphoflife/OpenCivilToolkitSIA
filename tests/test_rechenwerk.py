@@ -14,7 +14,7 @@ from opencivil.core.berechnung import (
     Prozedur, Vorgabe,
 )
 from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, UNBESCHRAENKT, Nachweis, NachweisUrteil, Vergleich, grad_def,
+    NICHT_FUEHRBAR, UNBESCHRAENKT, Nachweis, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, M, MM, MM2, MPA, N_PRO_MM2, DimensionsFehler, Groesse,
@@ -245,9 +245,9 @@ class TestEmpirischUndNachsatz(unittest.TestCase):
         zeile = Formelzeile.bauen(
             D_F_CD.belegen(Groesse(20, MPA)), r"\frac{@f_ck}{@gamma_c}", self.eingaben(),
             nachsatz=vergleich(r"\ge", r"f_{grenz} = 15\,\mathrm{MPa}", True))
-        self.assertTrue(zeile.einzeilig().endswith(r"\Rightarrow \quad \text{erfüllt}"))
+        self.assertTrue(zeile.einzeilig().endswith(r"\quad \ge \quad f_{grenz} = 15\,\mathrm{MPa}"))
         self.assertTrue(zeile.mehrzeilig().rstrip().endswith(r"\end{aligned}"))
-        self.assertIn(r"\text{erfüllt}", zeile.mehrzeilig())
+        self.assertIn(r"f_{grenz} = 15", zeile.mehrzeilig())
 
     def test_die_formel_eines_baustoffs_setzt_empirisch_ein(self):
         """E_cm = k_e * f_cm^(1/3) mit f_cm in N/mm2 -- wie im Rechenwerk selbst."""
@@ -794,6 +794,21 @@ class TestVergleich(unittest.TestCase):
         v = Vergleich(_wert(120e3), _wert(150e3), entscheid=False)
         self.assertAlmostEqual(v.grad, 1.25)
         self.assertFalse(v.erfuellt)
+
+    def test_das_urteil_steht_hinter_dem_grad(self):
+        """
+        «⇒ erfüllt» steht immer hinter dem Erfüllungsgrad, nie in der
+        Bedingung davor -- bis 2026-11-20 entschieden das zwei Schalter.
+        """
+        for E, urteil in ((120e3, r"\text{erfüllt}"), (200e3, r"\text{NICHT erfüllt}")):
+            with self.subTest(E=E):
+                p = Protokoll()
+                v = Vergleich(_wert(E, "E"), _wert(150e3, "R"))
+                v.bedingung(p, "Einwirkung gegen Widerstand")
+                v.zeile(p, grad_def("v.grad", r"\alpha", "Erfüllungsgrad"))
+                bedingung, grad = (b.latex for b in p.bloecke)
+                self.assertNotIn(r"\Rightarrow", bedingung)
+                self.assertTrue(grad.endswith(rf"\Rightarrow \quad {urteil}"), grad)
 
     def test_ohne_vergleich(self):
         self.assertEqual((NICHT_FUEHRBAR.grad, NICHT_FUEHRBAR.erfuellt), (0.0, False))

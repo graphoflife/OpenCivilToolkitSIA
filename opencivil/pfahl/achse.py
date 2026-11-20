@@ -69,7 +69,7 @@ class Achsnachweis(Nachweis):
             R, was, namen = R_zug, "Zug", ("Z_Ed", f"R_{self.INDEX},d,Z")
         v = Vergleich(E, R)
         v.bedingung(p, f"Einwirkung gegen Widerstand auf {was}")
-        v.zeile(p, self.d_ausnutzung[k.name], mit_urteil=True)
+        v.zeile(p, self.d_ausnutzung[k.name])
         return self.urteil(self.d_ausnutzung[k.name], k.name, v,
                            f"{namen[0]} = {E.formatiert()} kN {'≤' if v.erfuellt else '>'} "
                            f"{namen[1]} = {R.formatiert()} kN.")

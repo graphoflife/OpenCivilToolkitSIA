@@ -566,13 +566,13 @@ $$
 **Bezogene Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*
 
 $$
-\left(x/d\right)_{2} = \frac{x}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+\left(x/d\right)_{2} = \frac{x}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253 \quad \le \quad \left(x/d\right)_{max} = 0.35
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,D,2} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{2}} = \frac{0.35}{0.253} = 1.39
+\alpha_{eff,D,2} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{2}} = \frac{0.35}{0.253} = 1.39 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Duktilität – 3. Lage
@@ -598,13 +598,13 @@ $$
 **Bezogene Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*
 
 $$
-\left(x/d\right)_{3} = \frac{x}{d_{3,x,g}} = \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} = 0.077 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+\left(x/d\right)_{3} = \frac{x}{d_{3,x,g}} = \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} = 0.077 \quad \le \quad \left(x/d\right)_{max} = 0.35
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,D,3} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{3}} = \frac{0.35}{0.077} = 4.58
+\alpha_{eff,D,3} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{3}} = \frac{0.35}{0.077} = 4.58 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 Massgebend: 2. Lage (kleinster Erfüllungsgrad).
@@ -665,14 +665,14 @@ $$
 \begin{aligned}
   N_{s,adm,2,x} &= A_{s,2,x} \cdot \sigma_{s,adm,2,x} \\
   &= 2450\,\mathrm{mm}^{2} \cdot 381\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 933.1\,\mathrm{kN} \quad \ge \quad N_{Riss} = 378.3\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
+  &= 933.1\,\mathrm{kN} \quad \ge \quad N_{Riss} = 378.3\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,NR,2,x} = \frac{N_{s,adm,2,x}}{N_{Riss}} = \frac{933.1\,\mathrm{kN}}{378.3\,\mathrm{kN}} = 2.47
+\alpha_{eff,NR,2,x} = \frac{N_{s,adm,2,x}}{N_{Riss}} = \frac{933.1\,\mathrm{kN}}{378.3\,\mathrm{kN}} = 2.47 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Rissnormalkraft – 3. Lage x
@@ -693,14 +693,14 @@ $$
 \begin{aligned}
   N_{s,adm,3,x} &= A_{s,3,x,g} \cdot \sigma_{s,adm,3,x} \\
   &= 754\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 351.6\,\mathrm{kN} \quad < \quad N_{Riss} = 378.3\,\mathrm{kN} \quad \Rightarrow \quad \text{NICHT erfüllt}
+  &= 351.6\,\mathrm{kN} \quad < \quad N_{Riss} = 378.3\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,NR,3,x} = \frac{N_{s,adm,3,x}}{N_{Riss}} = \frac{351.6\,\mathrm{kN}}{378.3\,\mathrm{kN}} = 0.93
+\alpha_{eff,NR,3,x} = \frac{N_{s,adm,3,x}}{N_{Riss}} = \frac{351.6\,\mathrm{kN}}{378.3\,\mathrm{kN}} = 0.93 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
 Massgebend: 3. Lage (kleinster Erfüllungsgrad).
@@ -730,13 +730,13 @@ $$
 **Biegewiderstand gegen Rissmoment**
 
 $$
-M_{Rd,x}(N_{Ed} = 0)_{2} = 235.9\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{Rd,x}(N_{Ed} = 0)_{2} = 235.9\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,SV,2,x} = \frac{M_{Rd,x}(N_{Ed} = 0)_{2}}{M_{Riss}} = \frac{235.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 5.69
+\alpha_{eff,SV,2,x} = \frac{M_{Rd,x}(N_{Ed} = 0)_{2}}{M_{Riss}} = \frac{235.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 5.69 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Sprödes Versagen – 3. Lage x
@@ -744,13 +744,13 @@ $$
 **Biegewiderstand gegen Rissmoment**
 
 $$
-M_{Rd,x}(N_{Ed} = 0)_{3} = 79.9\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{Rd,x}(N_{Ed} = 0)_{3} = 79.9\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,SV,3,x} = \frac{M_{Rd,x}(N_{Ed} = 0)_{3}}{M_{Riss}} = \frac{79.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.93
+\alpha_{eff,SV,3,x} = \frac{M_{Rd,x}(N_{Ed} = 0)_{3}}{M_{Riss}} = \frac{79.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.93 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 Massgebend: 3. Lage (kleinster Erfüllungsgrad).
@@ -849,14 +849,14 @@ $$
 \begin{aligned}
   M_{s,adm,2,x} &= \sigma_{s,adm,2,x} \cdot A_{s,2,x} \cdot z \\
   &= 381\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2450\,\mathrm{mm}^{2} \cdot 211.4\,\mathrm{mm} \\
-  &= 197.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+  &= 197.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm}
 \end{aligned}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,2,x} = \frac{M_{s,adm,2,x}}{M_{Riss}} = \frac{197.3\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 4.76
+\alpha_{eff,ZB,2,x} = \frac{M_{s,adm,2,x}}{M_{Riss}} = \frac{197.3\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 4.76 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zwängung auf Biegung – 3. Lage x
@@ -905,14 +905,14 @@ $$
 \begin{aligned}
   M_{s,adm,3,x} &= \sigma_{s,adm,3,x} \cdot A_{s,3,x,g} \cdot z \\
   &= 466\,\mathrm{N}/\mathrm{mm}^{2} \cdot 754\,\mathrm{mm}^{2} \cdot 228.7\,\mathrm{mm} \\
-  &= 80.4\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+  &= 80.4\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm}
 \end{aligned}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,3,x} = \frac{M_{s,adm,3,x}}{M_{Riss}} = \frac{80.4\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.94
+\alpha_{eff,ZB,3,x} = \frac{M_{s,adm,3,x}}{M_{Riss}} = \frac{80.4\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.94 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 Massgebend: 3. Lage (kleinster Erfüllungsgrad).
@@ -1006,13 +1006,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.18
+\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.18 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Feld mit Druck (60 %)
@@ -1038,13 +1038,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 106\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 106\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{106\,\mathrm{N}/\mathrm{mm}^{2}} = 3.60
+\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{106\,\mathrm{N}/\mathrm{mm}^{2}} = 3.60 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Stütze (60 %)
@@ -1070,13 +1070,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 212\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 212\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{212\,\mathrm{N}/\mathrm{mm}^{2}} = 1.79
+\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{212\,\mathrm{N}/\mathrm{mm}^{2}} = 1.79 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Dauerlast
@@ -1102,13 +1102,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 136\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 136\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{136\,\mathrm{N}/\mathrm{mm}^{2}} = 2.80
+\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{136\,\mathrm{N}/\mathrm{mm}^{2}} = 2.80 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Stahlspannung unter häufiger Einwirkung – x-Richtung
@@ -1188,13 +1188,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 204\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 204\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Feld (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{204\,\mathrm{N}/\mathrm{mm}^{2}} = 1.74
+\alpha_{eff,\sigma,x,\text{Feld (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{204\,\mathrm{N}/\mathrm{mm}^{2}} = 1.74 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Häufiger Lastfall – Feld mit Druck (70 %)
@@ -1220,13 +1220,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{123\,\mathrm{N}/\mathrm{mm}^{2}} = 2.88
+\alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{123\,\mathrm{N}/\mathrm{mm}^{2}} = 2.88 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Häufiger Lastfall – Stütze (70 %)
@@ -1252,13 +1252,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Stütze (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{248\,\mathrm{N}/\mathrm{mm}^{2}} = 1.43
+\alpha_{eff,\sigma,x,\text{Stütze (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{248\,\mathrm{N}/\mathrm{mm}^{2}} = 1.43 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Häufiger Lastfall – Gebrauch
@@ -1284,13 +1284,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Gebrauch}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.03
+\alpha_{eff,\sigma,x,\text{Gebrauch}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.03 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Vergrösserungsfaktor der Durchbiegung
@@ -2469,17 +2469,13 @@ $$
 **Zulässige Dehnung**
 
 $$
-\begin{aligned}
-  \varepsilon_{s,adm} &= \frac{\sigma_{s,adm}}{E_s} \\
-  &= \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰} \quad \Rightarrow \quad \text{NICHT erfüllt}
-\end{aligned}
+\varepsilon_{s,adm} = \frac{\sigma_{s,adm}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\varepsilon_{s,adm}}{\varepsilon_{s,x}} = \frac{2.5\,\text{‰}}{4.67\,\text{‰}} = 0.54
+\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\varepsilon_{s,adm}}{\varepsilon_{s,x}} = \frac{2.5\,\text{‰}}{4.67\,\text{‰}} = 0.54 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
 ### Vergrösserungsfaktor der Durchbiegung
@@ -3049,13 +3045,13 @@ $$
 **Biegewiderstand gegen Rissmoment**
 
 $$
-M_{Rk,x}(N_{Ed} = 0)_{2} = 81.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 29\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{Rk,x}(N_{Ed} = 0)_{2} = 81.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 29\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,SV,2,x} = \frac{M_{Rk,x}(N_{Ed} = 0)_{2}}{M_{Riss}} = \frac{81.3\,\mathrm{kNm}}{29\,\mathrm{kNm}} = 2.80
+\alpha_{eff,SV,2,x} = \frac{M_{Rk,x}(N_{Ed} = 0)_{2}}{M_{Riss}} = \frac{81.3\,\mathrm{kNm}}{29\,\mathrm{kNm}} = 2.80 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Sprödes Versagen – 3. Lage x
@@ -3063,13 +3059,13 @@ $$
 **Biegewiderstand gegen Rissmoment**
 
 $$
-M_{Rk,x}(N_{Ed} = 0)_{3} = 63.7\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 29\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{Rk,x}(N_{Ed} = 0)_{3} = 63.7\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 29\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,SV,3,x} = \frac{M_{Rk,x}(N_{Ed} = 0)_{3}}{M_{Riss}} = \frac{63.7\,\mathrm{kNm}}{29\,\mathrm{kNm}} = 2.20
+\alpha_{eff,SV,3,x} = \frac{M_{Rk,x}(N_{Ed} = 0)_{3}}{M_{Riss}} = \frac{63.7\,\mathrm{kNm}}{29\,\mathrm{kNm}} = 2.20 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 Massgebend: 3. Lage (kleinster Erfüllungsgrad).
@@ -3157,13 +3153,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 203\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 466\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 203\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 466\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{466\,\mathrm{N}/\mathrm{mm}^{2}}{203\,\mathrm{N}/\mathrm{mm}^{2}} = 2.29
+\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{466\,\mathrm{N}/\mathrm{mm}^{2}}{203\,\mathrm{N}/\mathrm{mm}^{2}} = 2.29 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Stahlspannung unter häufiger Einwirkung – x-Richtung
@@ -3249,13 +3245,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 323\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 323\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Gebrauch}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{323\,\mathrm{N}/\mathrm{mm}^{2}} = 1.10
+\alpha_{eff,\sigma,x,\text{Gebrauch}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{323\,\mathrm{N}/\mathrm{mm}^{2}} = 1.10 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Knicken
@@ -4262,13 +4258,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 131\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_{s,x} = 131\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{131\,\mathrm{N}/\mathrm{mm}^{2}} = 3.82
+\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{131\,\mathrm{N}/\mathrm{mm}^{2}} = 3.82 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Knicken
@@ -6011,13 +6007,13 @@ $$
 **Bezogene Druckzonenhöhe bei reiner Biegung**
 
 $$
-x/d = \frac{x}{d} = \frac{75.5\,\mathrm{mm}}{495.2\,\mathrm{mm}} = 0.153 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{75.5\,\mathrm{mm}}{495.2\,\mathrm{mm}} = 0.153 \quad \le \quad \left(x/d\right)_{max} = 0.35
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,x/d,\text{Zug unten}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.153} = 2.30
+\alpha_{eff,x/d,\text{Zug unten}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.153} = 2.30 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug oben
@@ -6031,13 +6027,13 @@ $$
 **Bezogene Druckzonenhöhe bei reiner Biegung**
 
 $$
-x/d = \frac{x}{d} = \frac{52.8\,\mathrm{mm}}{435.9\,\mathrm{mm}} = 0.121 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{52.8\,\mathrm{mm}}{435.9\,\mathrm{mm}} = 0.121 \quad \le \quad \left(x/d\right)_{max} = 0.35
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,x/d,\text{Zug oben}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.121} = 2.89
+\alpha_{eff,x/d,\text{Zug oben}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.121} = 2.89 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug links
@@ -6051,13 +6047,13 @@ $$
 **Bezogene Druckzonenhöhe bei reiner Biegung**
 
 $$
-x/d = \frac{x}{d} = \frac{112.7\,\mathrm{mm}}{671.9\,\mathrm{mm}} = 0.168 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{112.7\,\mathrm{mm}}{671.9\,\mathrm{mm}} = 0.168 \quad \le \quad \left(x/d\right)_{max} = 0.35
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,x/d,\text{Zug links}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.168} = 2.09
+\alpha_{eff,x/d,\text{Zug links}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.168} = 2.09 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug rechts
@@ -6071,13 +6067,13 @@ $$
 **Bezogene Druckzonenhöhe bei reiner Biegung**
 
 $$
-x/d = \frac{x}{d} = \frac{105\,\mathrm{mm}}{657.3\,\mathrm{mm}} = 0.16 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+x/d = \frac{x}{d} = \frac{105\,\mathrm{mm}}{657.3\,\mathrm{mm}} = 0.16 \quad \le \quad \left(x/d\right)_{max} = 0.35
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,x/d,\text{Zug rechts}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.16} = 2.19
+\alpha_{eff,x/d,\text{Zug rechts}} = \frac{\left(x/d\right)_{max}}{x/d} = \frac{0.35}{0.16} = 2.19 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 Massgebend: Zug links (kleinster Erfüllungsgrad).
@@ -6135,7 +6131,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,Riss,\text{Zug unten}} = \frac{M_{Rd}}{M_{Riss}} = \frac{372.3\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 3.19
+\alpha_{eff,Riss,\text{Zug unten}} = \frac{M_{Rd}}{M_{Riss}} = \frac{372.3\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 3.19 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug oben
@@ -6179,7 +6175,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,Riss,\text{Zug oben}} = \frac{M_{Rd}}{M_{Riss}} = \frac{207.6\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.78
+\alpha_{eff,Riss,\text{Zug oben}} = \frac{M_{Rd}}{M_{Riss}} = \frac{207.6\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.78 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug links
@@ -6223,7 +6219,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,Riss,\text{Zug links}} = \frac{M_{Rd}}{M_{Riss}} = \frac{421.1\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 2.93
+\alpha_{eff,Riss,\text{Zug links}} = \frac{M_{Rd}}{M_{Riss}} = \frac{421.1\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 2.93 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug rechts
@@ -6267,7 +6263,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,Riss,\text{Zug rechts}} = \frac{M_{Rd}}{M_{Riss}} = \frac{364.4\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 2.53
+\alpha_{eff,Riss,\text{Zug rechts}} = \frac{M_{Rd}}{M_{Riss}} = \frac{364.4\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 2.53 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 Massgebend: Zug oben (kleinster Erfüllungsgrad).
@@ -6370,14 +6366,14 @@ $$
 \begin{aligned}
   N_{s,adm} &= A_{s,1} \cdot \sigma_{s,adm,1} + A_{s,2} \cdot \sigma_{s,adm,2} + A_{s,3} \cdot \sigma_{s,adm,3} + A_{s,4} \cdot \sigma_{s,adm,4} + A_{s,5} \cdot \sigma_{s,adm,5} \\
   &= 314\,\mathrm{mm}^{2} \cdot 361\,\mathrm{N}/\mathrm{mm}^{2} + 1206\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 452\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} + 400\,\mathrm{mm}^{2} \cdot 404\,\mathrm{N}/\mathrm{mm}^{2} + 118\,\mathrm{mm}^{2} \cdot 500\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 1032.4\,\mathrm{kN} \quad \ge \quad N_{Riss} = 765.6\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
+  &= 1032.4\,\mathrm{kN} \quad \ge \quad N_{Riss} = 765.6\,\mathrm{kN}
 \end{aligned}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,NR} = \frac{N_{s,adm}}{N_{Riss}} = \frac{1032.4\,\mathrm{kN}}{765.6\,\mathrm{kN}} = 1.35
+\alpha_{eff,NR} = \frac{N_{s,adm}}{N_{Riss}} = \frac{1032.4\,\mathrm{kN}}{765.6\,\mathrm{kN}} = 1.35 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Zwängung auf Biegung
@@ -6561,13 +6557,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = 280.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{s,adm} = 280.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug unten}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{280.2\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 2.40
+\alpha_{eff,ZB,\text{Zug unten}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{280.2\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 2.40 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug oben
@@ -6629,13 +6625,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = 156.6\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{s,adm} = 156.6\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{156.6\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.34
+\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{156.6\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.34 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug links
@@ -6697,13 +6693,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = 273.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{s,adm} = 273.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug links}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{273.3\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.90
+\alpha_{eff,ZB,\text{Zug links}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{273.3\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.90 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug rechts
@@ -6765,13 +6761,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = 208.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{s,adm} = 208.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug rechts}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{208.2\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.45
+\alpha_{eff,ZB,\text{Zug rechts}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{208.2\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.45 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 Massgebend: Zug oben (kleinster Erfüllungsgrad).
@@ -6926,13 +6922,13 @@ Massgebend: Linie 1 (y = 750 mm, z = 50 mm).
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 250\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_s = 250\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{250\,\mathrm{N}/\mathrm{mm}^{2}} = 1.62
+\alpha_{eff,\sigma,w,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{250\,\mathrm{N}/\mathrm{mm}^{2}} = 1.62 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Schief (60 %)
@@ -6968,13 +6964,13 @@ Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 15\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_s = 15\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,\text{Schief (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{15\,\mathrm{N}/\mathrm{mm}^{2}} = 26.55
+\alpha_{eff,\sigma,w,\text{Schief (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{15\,\mathrm{N}/\mathrm{mm}^{2}} = 26.55 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Dauer
@@ -7011,13 +7007,13 @@ Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 88\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_s = 88\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{88\,\mathrm{N}/\mathrm{mm}^{2}} = 4.60
+\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{88\,\mathrm{N}/\mathrm{mm}^{2}} = 4.60 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Stahlspannung unter häufiger Einwirkung
@@ -7108,13 +7104,13 @@ Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 146\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_s = 146\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,\text{Häufig schief}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{146\,\mathrm{N}/\mathrm{mm}^{2}} = 2.43
+\alpha_{eff,\sigma,\text{Häufig schief}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{146\,\mathrm{N}/\mathrm{mm}^{2}} = 2.43 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Kennzahlen
@@ -7482,17 +7478,13 @@ $$
 **Aufnehmbare Risskraft** *(SIA 262:2025, Tabelle 17)*
 
 $$
-\begin{aligned}
-  N_{s,adm} &= A_s \cdot \sigma_{s,adm} \\
-  &= 1885\,\mathrm{mm}^{2} \cdot 500\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 942.5\,\mathrm{kN} \quad \ge \quad N_{Riss} = 386.7\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
-\end{aligned}
+N_{s,adm} = A_s \cdot \sigma_{s,adm} = 1885\,\mathrm{mm}^{2} \cdot 500\,\mathrm{N}/\mathrm{mm}^{2} = 942.5\,\mathrm{kN} \quad \ge \quad N_{Riss} = 386.7\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,NR} = \frac{N_{s,adm}}{N_{Riss}} = \frac{942.5\,\mathrm{kN}}{386.7\,\mathrm{kN}} = 2.44
+\alpha_{eff,NR} = \frac{N_{s,adm}}{N_{Riss}} = \frac{942.5\,\mathrm{kN}}{386.7\,\mathrm{kN}} = 2.44 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Stahlspannung unter quasi-ständiger Einwirkung
@@ -7586,13 +7578,13 @@ Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 31\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+\sigma_s = 31\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{31\,\mathrm{N}/\mathrm{mm}^{2}} = 16.04
+\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{31\,\mathrm{N}/\mathrm{mm}^{2}} = 16.04 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Knicken

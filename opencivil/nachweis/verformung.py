@@ -317,7 +317,7 @@ class Verformung(Nachweis):
             f"{w_eff.formatiert()} mm {'≤' if v.erfuellt else '>'} "
             f"w_max = L/{GRENZE:g} = {w_max.formatiert()} mm.")
         v.bedingung(p, "Durchbiegung gegen Grenzwert")
-        v.zeile(p, self.d_ausnutzung[fall.name], mit_urteil=True)
+        v.zeile(p, self.d_ausnutzung[fall.name])
         return erg
 
     # -- Mitschrift ---------------------------------------------------------

@@ -1,5 +1,5 @@
 ---
-erzeugt: e3f97f4ec91d
+erzeugt: a64240b61884
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, Tabelle 17"
@@ -27,7 +27,7 @@ $$
 \begin{aligned}
   M_{s,adm,2,x} &= \sigma_{s,adm,2,x} \cdot A_{s,2,x} \cdot z \\
   &= 381\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2450\,\mathrm{mm}^{2} \cdot 211.4\,\mathrm{mm} \\
-  &= 197.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+  &= 197.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm}
 \end{aligned}
 $$
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4101ca5e48c6
+erzeugt: 095a7544e6ad
 art: modul
 tags: [modul]
 ---
@@ -338,31 +338,32 @@ def folgerung(erfuellt: bool) -> str
 ### vergleich
 
 ```python
-def vergleich(soll: str, rechts: str, erfuellt: bool, *, mit_urteil: bool=True) -> str
+def vergleich(soll: str, rechts: str, erfuellt: bool) -> str
 ```
 
 Der Nachsatz einer Formel, deren Resultat gegen etwas gehalten wird:
 
 ```
 \quad \ge \quad N_{Riss} = 378.3\,\mathrm{kN}
-\quad \Rightarrow \quad \text{NICHT erfüllt}
 ```
 
 `soll` ist das Zeichen, das gelten muss; geht der Vergleich nicht auf,
-steht sein Gegenteil da -- im Beispiel `<`.
+steht sein Gegenteil da -- im Beispiel `<`. Das Urteil steht nicht hier,
+sondern hinter dem Erfüllungsgrad ([[opencivil.core.nachweis#Vergleich.zeile|.nachweis.Vergleich.zeile]]).
 
 ### bedingung
 
 ```python
-def bedingung(links: str, soll: str, rechts: str, erfuellt: bool, *, mit_urteil: bool=True) -> str
+def bedingung(links: str, soll: str, rechts: str, erfuellt: bool) -> str
 ```
 
 Ein Vergleich mit sichtbarem Ergebnis, z.B. fuer Nachweise:
 
 ```
 M_{Ed} = 120\,\mathrm{kNm} \quad \le \quad M_{Rd} = 145\,\mathrm{kNm}
-\quad \Rightarrow \quad \text{erfüllt}
 ```
+
+Das Urteil steht hinter dem Erfüllungsgrad, wie bei [[opencivil.core.latex#vergleich|vergleich]].
 
 ### Mathe
 

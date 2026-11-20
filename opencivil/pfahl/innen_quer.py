@@ -387,7 +387,7 @@ class InnererQuerwiderstand(Nachweis):
                            f"Stützstellen gelesen", referenz=REFERENZ_ETA)
         vergleich = Vergleich(M_Ed, M_Rd)
         vergleich.bedingung(p, "Moment gegen Biegewiderstand")
-        vergleich.zeile(p, self.d_biegung[k.name], mit_urteil=True)
+        vergleich.zeile(p, self.d_biegung[k.name])
         return self.urteil(self.d_biegung[k.name], k.name, vergleich,
                            f"|M| = {M_Ed.formatiert()} kNm "
                            f"{'≤' if vergleich.erfuellt else '>'} M_Rd = {M_Rd.formatiert()} kNm "
@@ -406,7 +406,7 @@ class InnererQuerwiderstand(Nachweis):
         p.wert(V_Ed, referenz="")
         vergleich = Vergleich(V_Ed, schub[gezogen(v.N[j])].V_Rd)
         vergleich.bedingung(p, "Querkraft gegen Querkraftwiderstand")
-        vergleich.zeile(p, self.d_querkraft[k.name], mit_urteil=True)
+        vergleich.zeile(p, self.d_querkraft[k.name])
         if not self.pfahl.bohrpfahl and any(abs(x) > SCHUB_BIEGUNG * g
                                             for x, g in zip(v.V, grenze)):
             p.hinweis("Die Querkraft erreicht mehr als die Hälfte ihres Widerstands: dort ist "

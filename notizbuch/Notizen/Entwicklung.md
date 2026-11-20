@@ -7,6 +7,19 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Das Urteil steht hinter dem Grad
+
+Wo «⇒ erfüllt» in einer Herleitung steht, entschieden zwei Schalter mit
+entgegengesetzter Vorgabe: die Zeile des Erfüllungsgrads schrieb es nur auf
+Wunsch, die Bedingung davor von selbst. Die meisten Nachweise setzten den
+Schalter, einige nicht – in «Sprödes Versagen je Richtung» stand darum gar
+kein Urteil. Jetzt steht es immer in der Zeile des Grads, und der Schalter
+ist weg (entschieden vom Benutzer am 2026-11-19).
+
+Für den Leser: wo das Urteil bisher in der Bedingung stand – Rissnormalkraft,
+Duktilität, Spannungsbegrenzung, Mindestbewehrung, sprödes Versagen –, rückt
+es eine Zeile tiefer, hinter den Grad.
+
 ## 2026-11-20 · Ein fehlendes Bild meldet sich
 
 `sinnbild` zeichnete für einen Namen, den es nicht kennt, ein leeres Bild.

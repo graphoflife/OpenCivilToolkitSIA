@@ -221,7 +221,7 @@ class SchiefeBiegung(Nachweis):
             grenze = zug if N > 0 else druck
             v = Vergleich(N_Ed, werte.kraft("N_Rd", "N_{Rd}^{+}" if N > 0 else "N_{Rd}^{-}",
                                             grenze))
-            v.zeile(p, d_grad, mit_urteil=True)
+            v.zeile(p, d_grad)
             return (self.urteil(d_grad, fall.name, v,
                                 "Reine Normalkraft: gegen die gleichmässige Dehnung."),
                     Fallergebnis(fall, N, M_y, M_z, None, v, OHNE_MOMENT))
@@ -234,7 +234,7 @@ class SchiefeBiegung(Nachweis):
             p.text(JENSEITS)
             v = Vergleich(N_Ed, werte.kraft("N_Rd", "N_{Rd}^{+}" if N > 0 else "N_{Rd}^{-}",
                                             grenze))
-            v.zeile(p, d_grad, mit_urteil=True)
+            v.zeile(p, d_grad)
             return (self.urteil(d_grad, fall.name, v,
                                 "N_Ed jenseits der reinen Normalkraft-Tragfähigkeit."),
                     Fallergebnis(fall, N, M_y, M_z, None, v, JENSEITS))
@@ -258,7 +258,7 @@ class SchiefeBiegung(Nachweis):
                       "Mz": werte.moment("M_z_Rd", "M_{z,Rd}", punkt.M_z)},
                      titel="Widerstand in der Richtung der Einwirkung")
         v = Vergleich(M_Ed, M_Rd)
-        v.zeile(p, d_grad, mit_urteil=True)
+        v.zeile(p, d_grad)
         return (self.urteil(d_grad, fall.name, v,
                             f"Bei N_Ed = {N / 1e3:.1f} kN, in der Richtung des Moments."),
                 Fallergebnis(fall, N, M_y, M_z, punkt, v))

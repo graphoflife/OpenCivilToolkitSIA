@@ -601,7 +601,7 @@ class BiegungNormalkraft(Nachweis):
                 widerstand=werte.wert("Rd", f"{achse.name}_{{{self.wahl.index}}}",
                                       v.widerstand.groesse),
                 einwirkung=werte.wert("Ed", f"{achse.name}_{{Ed}}", v.einwirkung.groesse))
-        v.zeile(p, self.d_ausnutzung[k.name], mit_urteil=True)
+        v.zeile(p, self.d_ausnutzung[k.name])
 
     def _protokoll_naechster(
         self, p: Protokoll, auswertung: Auswertung, eckwerte: Mapping[str, float],
