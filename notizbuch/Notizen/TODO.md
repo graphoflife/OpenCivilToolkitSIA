@@ -13,8 +13,7 @@ und in jeder App ausser Materialien; «Öffnen» ersetzt alles oder fügt hinzu;
 offline nach dem ersten Besuch; MCP mit Projektdateien; Erdbeben mit
 Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
-- [ ] Oberfläche: «mm | Stk» als Schalter wie alle anderen; in der
-      Tragsicherheit der Querschnittsanalyse die sechs Lasten auf einer
+- [ ] Oberfläche: in der Tragsicherheit der Querschnittsanalyse die sechs Lasten auf einer
       Zeile, das Fenster breiter; die Fälle einer Liste sichtbar getrennt;
       «Kriechzahl φ» überall gleich, φ als Formel; die rechte Spalte
       rötlich, solange sie nicht zur Eingabe passt; Neues heisst wie sein

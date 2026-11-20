@@ -606,6 +606,8 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .schalter.ist-umbruch { flex-wrap: wrap; }
 .schalter.ist-senkrecht { display: flex; flex-direction: column; }
 .schalter.ist-senkrecht .schalter-halb { justify-content: flex-start; padding: 4px 9px; text-align: left; }
+/* Knapp, wo er in einer Zeile mit Zahlen steht -- «mm | Stk» einer Lage. */
+.schalter.ist-knapp .schalter-halb { padding: 0 5px; }
 /* Die Zugseite als Pfeile: schmal genug für eine Zahlenspalte. */
 .schalter.ist-pfeile .schalter-halb { flex: 1; padding: 0 3px; font-size: 13px; }
 /* Ein Schalter unter seiner Beschriftung (`wahlBlock`). */
@@ -619,10 +621,11 @@ dialog.materialwahl .fenster-kopf { top: 0; }
    knapp -- ein Durchmesser oder eine Teilung braucht drei Ziffern. */
 .postenzeile {
   display: grid;
-  grid-template-columns: 16px 40px 10px var(--zahlbreite-knapp) 12px var(--zahlbreite-knapp) 28px;
+  grid-template-columns: 16px 40px 10px var(--zahlbreite-knapp) 12px var(--zahlbreite-knapp) auto;
   gap: 4px; align-items: center; margin-top: 3px;
 }
 .postenzeile .zahlfeld { width: var(--zahlbreite-knapp); }
+.postenzeile > .schalter { justify-self: start; }
 .postenzeile.ist-leer { opacity: .55; }
 
 /* Nimmt den Posten heraus, indem es den Durchmesser auf null setzt. Ein runder
@@ -695,14 +698,6 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .postenzeile .einheit { font-size: 11px; color: var(--schrift-zart); }
 .postenzeile input[type="number"] { padding-block: 3px; }
 
-/* Die Einheit, die umschaltet: «mm» heisst Teilung, «Stk» Stabzahl. Sie
-   sieht aus wie eine Einheit und ist gestrichelt unterstrichen -- man sieht,
-   dass sie sich anklicken lässt, ohne dass ein Knopf Platz nimmt. */
-.einheit-knopf {
-  justify-self: start; padding: 0 1px; border: 0; background: none; cursor: pointer;
-  font-size: 11px; color: var(--blau-tief); border-bottom: 1px dashed var(--eingabe-rand);
-}
-.einheit-knopf:hover { color: var(--blau); border-bottom-style: solid; }
 
 .neigungszeile {
   display: flex; align-items: center; gap: 6px; margin-top: 4px;
@@ -1448,7 +1443,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
      wächst mit, sonst läge er über dem Namen. */
   .postenzeile {
     grid-template-columns: 34px 40px 10px var(--zahlbreite-knapp) 12px
-                           var(--zahlbreite-knapp) 28px;
+                           var(--zahlbreite-knapp) auto;
   }
   .erklaerung-zeichen {
     width: 34px; height: 34px; line-height: 34px; font-size: 14px;

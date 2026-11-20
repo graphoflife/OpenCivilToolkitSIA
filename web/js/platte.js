@@ -27,9 +27,8 @@ import { eintragAendern, feldangabe, katalog, materialien } from './zustand.js';
  *
  *     ×  Grund   ⌀ [18] @ [150] mm   [B500B]
  *
- * Die Einheit ist zugleich der Umschalter: «mm» heisst Teilung, «Stk»
- * Stabzahl -- das Trennzeichen wechselt mit (`@` bzw. `×`). Ein eigener Knopf
- * dafür kostete jede Zeile eine Spalte.
+ * Am Ende der Schalter «mm | Stk»: «mm» heisst Teilung, «Stk» Stabzahl --
+ * das Trennzeichen wechselt mit (`@` bzw. `×`).
  *
  * Das × vorne setzt den Durchmesser auf null und nimmt den Posten damit heraus.
  * Es ist nur rot, solange es etwas zu entfernen gibt; bei leerem Posten bleibt
@@ -71,25 +70,22 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
         wert: posten.anzahl, schritt: 1, angabe: feldangabe('posten', 'anzahl'), titel: 'Stabzahl je b',
         beiAenderung: (v) => aendern((x) => { x.anzahl = v; }),
       }),
-    einheitsSchalter(ueberAbstand, 'je b', () => aendern((x) => {
-      x.art = ueberAbstand ? 'anzahl' : 'teilung';
-    })),
+    einheitsSchalter(posten.art, (art) => aendern((x) => { x.art = art; })),
   ]);
 }
 
 /**
- * Die Einheit hinter einer Teilung, die zugleich umschaltet: «mm» ist eine
- * Teilung, «Stk» eine Stabzahl. Umgeschaltet wird nur, welche gilt (`art`);
- * beide Zahlen bleiben stehen, und ihre Vorgaben kommen aus dem Kern -- bis
- * 2026-10-18 setzte das Umschalten hier eigene (5 Stäbe, 150 und 200 mm).
+ * «mm | Stk» hinter der Teilung: ein Schalter wie jeder andere, knapp, damit
+ * er in die Zeile passt (Benutzer, 2026-11-20). Bis dahin war es die Einheit
+ * selbst, gestrichelt unterstrichen. Umgeschaltet wird nur, welche gilt
+ * (`art`); beide Zahlen bleiben stehen, und ihre Vorgaben kommen aus dem
+ * Kern -- bis 2026-10-18 setzte das Umschalten hier eigene (5 Stäbe, 150
+ * und 200 mm).
  */
-function einheitsSchalter(ueberAbstand, bezug, umschalten) {
-  return el('button.einheit-knopf', {
-    text: ueberAbstand ? 'mm' : 'Stk',
-    title: ueberAbstand
-      ? `Teilung in mm – klicken für Stabzahl ${bezug}`
-      : `Stabzahl ${bezug} – klicken für Teilung in mm`,
-    on: { click: umschalten },
+function einheitsSchalter(art, setzen) {
+  return zweiSchalter({
+    stellungen: [['teilung', 'mm'], ['anzahl', 'Stk']], gewaehlt: art, setzen, klasse: '.ist-knapp',
+    titel: 'Teilung in mm oder Stabzahl je b – Klicken schaltet um',
   });
 }
 
@@ -232,9 +228,7 @@ function querkraftBlock(querschnitt) {
           titel: 'Bügelzahl je b',
           beiAenderung: (v) => aendern((x) => { x.anzahl_y = v; }),
         }),
-      einheitsSchalter(ueberAbstand, 'je b', () => aendern((x) => {
-        x.art_y = ueberAbstand ? 'anzahl' : 'teilung';
-      })),
+      einheitsSchalter(buegel.art_y, (art) => aendern((x) => { x.art_y = art; })),
     ]),
   ]);
 }

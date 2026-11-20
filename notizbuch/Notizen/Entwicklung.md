@@ -7,6 +7,15 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · «mm | Stk» ist ein Schalter wie alle anderen
+
+Hinter der Teilung einer Lage und der Bügel in y stand die Einheit selbst
+als Umschalter -- blau, gestrichelt unterstrichen, nur die geltende Stellung
+zu sehen; so sparte sie 2026-10 eine Spalte. Der Benutzer will ihn wie alle
+anderen Schalter (2026-11-20): jetzt `zweiSchalter` mit den Stellungen
+«mm | Stk», knapp (`ist-knapp`), in der Spalte, die der Knopf «günstig» bis
+dahin belegte.
+
 ## 2026-11-20 · Die Zulage liegt auf einer eigenen Zeile
 
 Der Knopf «ungünstig/günstig» einer Lage stand am Ende der Zeile der
