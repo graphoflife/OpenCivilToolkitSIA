@@ -419,12 +419,22 @@ class TestNichtsStill(unittest.TestCase):
         with self.assertRaisesRegex(ProjektFehler, "dieselbe Kennung 'b1'"):
             p.aufbauen()
 
-    def test_zwei_werkstoffwahlen_fuer_ein_material(self):
-        from opencivil.projekt import WerkstoffwahlEintrag
+    def test_eine_unbekannte_wahl_je_material(self):
+        """
+        Je Material eine Wahl, unter seiner Kennung -- zwei für dasselbe kann
+        es so nicht geben. Eine Wahl, die es nicht gibt, nennt ihren Ort.
+        """
         p = Projekt.beispiel()
         a = p.querschnittsanalysen[0]
-        a.werkstoffwahl = [WerkstoffwahlEintrag("b1"), WerkstoffwahlEintrag("b1", betongesetz="block")]
-        self.assertIn("zwei Werkstoffwahlen", self.fehler(p))
+        a.werkstoffsaetze = {"b1": "mittel"}
+        with self.assertRaisesRegex(
+                ProjektFehler, "werkstoffsaetze 'b1': 'mittel' gibt es als 'werkstoffsaetze' nicht"):
+            p.pruefen()
+        a.werkstoffsaetze = {}
+        a.betongesetze = {"b1": "handrechnung"}
+        with self.assertRaisesRegex(ProjektFehler, "'handrechnung' gibt es als 'betongesetze' "
+                                                   "nicht. Möglich sind: parabel, block"):
+            p.pruefen()
 
     def test_zwei_lastfaelle_mit_derselben_kennung_im_rahmen(self):
         """Eine Last fiel still in beide -- jetzt rechnet das System nicht und sagt warum."""

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0affe2e6ebe2
+erzeugt: 186c509c1b88
 art: modul
 tags: [modul]
 ---
@@ -77,7 +77,7 @@ Die zu einer Seite zusammengefasste Bewehrung.
 - `index: str = ''` – Index der zusammengefassten Lage, z.B. `1,x`.
 - `stahl_index: str = ''` – Index der Stahlsorte ihrer Seite -- leer, solange es nur eine gibt. Ohne ihn stuende bei zwei Platten aus verschiedenen Sorten zweimal `f_yd` mit verschiedenen Zahlen im selben Bericht, und niemand koennte sagen, welche Sorte gemeint ist.
 - `teile: Tuple[Stahllage, ...] = ()` – Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift.
-- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG` – Der Wertesatz ihres Stahls -- `f_yd` oder `f_yk`.
 
 #### Lage.symbol_flaeche
 
@@ -252,14 +252,15 @@ Platte nur mit unterer Bewehrung wies so ein negatives Moment von
 ### seiten
 
 ```python
-def seiten(lagen: Sequence[Stahllage], *, satz: Werkstoffsatz, stahl_index: Mapping[str, str]) -> Tuple[Lage, Lage]
+def seiten(lagen: Sequence[Stahllage], *, saetze: Mapping[str, Werkstoffsatz], stahl_index: Mapping[str, str]) -> Tuple[Lage, Lage]
 ```
 
 Die beiden Seiten der Handrechnung, unten und oben: je Seite eine Lage im
 Schwerpunkt, nach derselben Regel wie der Loeser in der Handrechnung
-([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]). `stahl_index`
-gibt je Sorte ([[opencivil.nachweis.querschnittsloeser#Stahllage|sorte]])
-den Index ihrer Symbole.
+([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]). `saetze`
+und `stahl_index` geben je Sorte
+([[opencivil.nachweis.querschnittsloeser#Stahllage|sorte]]) ihren
+Wertesatz und den Index ihrer Symbole.
 
 Ist nur eine Seite bewehrt, zaehlt die andere mit null Flaeche, damit die
 Formeln unveraendert gelten -- mit den Kennwerten des Stahls der anderen.

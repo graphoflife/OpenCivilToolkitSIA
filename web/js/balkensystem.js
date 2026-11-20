@@ -39,6 +39,8 @@ import { fenster, fensterOeffnen } from './fenster.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { diagrammzeilen, lastenKapitel, lastfallWaehlen } from './lastfaelle.js';
 import { rechenwahlZeile } from './nachweise.js';
+import { plattenmaterialien } from './plattenkapitel.js';
+import { werkstoffeVon } from './qa_zeichnung.js';
 import {
   ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsterName,
   neueKennung, zustand,
@@ -273,6 +275,20 @@ function reiheVon(art, profil) {
 
 /** Die Kennwerte eines Querschnitts in Worten: «A und I», im Raum «A, I_y, I_z und I_T». */
 const kennwertnamen = (art) => undListe(systemkatalog(art, 'kennwerte').map((k) => k.kurz));
+
+/**
+ * Die Materialien der Platte oder Querschnittsanalyse, aus der ein
+ * Querschnitt kommt -- für sie wählt E_eq seine Werte, wie in ihren eigenen
+ * Kapiteln. Ist noch keine gewählt, sagt es die Zeile.
+ */
+function werkstoffeDerQuelle(q) {
+  const kennung = q[q.art];
+  if (!kennung) {
+    const welche = q.art === 'platte' ? 'Platte' : 'Querschnittsanalyse';
+    return { materialien: [], leer: `Noch keine ${welche} gewählt.` };
+  }
+  return q.art === 'platte' ? { materialien: plattenmaterialien(eintragVon(kennung)) } : werkstoffeVon(kennung);
+}
 
 /**
  * Was der Kern zu einem Querschnitt gerechnet hat: seine Kennwerte, wie der
@@ -523,8 +539,9 @@ function querschnittFenster(system, kennung) {
       zahl('M', 10, q.art === 'platte'
         ? 'Moment, bei dem E_eq gilt – bei einer Platte in x-Richtung mit Zug unten, nicht negativ'
         : 'Moment, bei dem E_eq gilt – positiv zieht es unten, an der gestrichelten Faser'),
-      rechenwahlZeile('Rechenwerte wie in der Analyse', q.eq, eq,
-        { arten: 'faserarten', phiImmer: true }),
+      rechenwahlZeile('Rechenwerte wie in der Analyse', q.eq, eq, {
+        arten: 'faserarten', phiImmer: true, werkstoffe: { ...werkstoffeDerQuelle(q), klasse: 'modul' },
+      }),
     );
   }
   // Die Kennwerte, wie der Kern sie rechnete, und was er zum Querschnitt

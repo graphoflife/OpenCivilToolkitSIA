@@ -1,5 +1,5 @@
 ---
-erzeugt: ca54d6d6d1a0
+erzeugt: 369942ea307f
 art: modul
 tags: [modul]
 ---
@@ -256,7 +256,7 @@ Welche Grenzen diese Ebene erreicht -- die, die ihren Bruchzustand bestimmen.
 #### Ebenenlinie.protokoll_ansatz
 
 ```python
-def protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, posten, phi: Wert, basis: str) -> None
+def protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, beton, posten, phi: Wert, basis: str) -> None
 ```
 
 Wie die Linie entsteht -- einmal je Nachweis, vor den Kombinationen.

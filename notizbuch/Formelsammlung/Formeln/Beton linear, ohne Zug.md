@@ -1,5 +1,5 @@
 ---
-erzeugt: 320b7a8d859d
+erzeugt: 4a963b1eb6e0
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.1.4.1.4"
@@ -11,6 +11,12 @@ normstelle: "SIA 262:2025, 4.1.4.1.4"
 
 $$
 \sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+*In der Herleitung: «Werkstoffgesetze im Gebrauchszustand: Beton, linear ohne Zug»*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{cd}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 ## Im Code

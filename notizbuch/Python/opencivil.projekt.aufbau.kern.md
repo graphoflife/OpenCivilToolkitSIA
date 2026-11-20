@@ -1,5 +1,5 @@
 ---
-erzeugt: 502bee511f27
+erzeugt: 685ed7490096
 art: modul
 tags: [modul]
 ---
@@ -41,7 +41,7 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `teile: Dict[str, 'Bauteil'] = field(default_factory=dict)` – Jedes Bauteil nach Kennung, in der Reihenfolge von [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] und der Beschreibung.
 - `baustoffe: Dict[str, Baustoff] = field(default_factory=dict)`
 - `kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)` – Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet.
-- `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
+- `spannungsfaelle: Dict[str, List[Tuple['SpannungsfallEintrag', Rechenwahl]]] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis, jede mit ihrer Wahl am Bauteil. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
 - `unfertige: Dict[str, 'Unfertiges'] = field(default_factory=dict)` – Je Bauteil oder Material, dem noch etwas fehlt, was: eine Querschnittsanalyse ohne Zeichnung, eine Platte ohne Bewehrung, ein Pfahl ohne Schicht, ein Wert, den der Kern abweist ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]]). Es wird nicht gebaut, aber wer auf es zeigt, soll hoeren, was ihm fehlt, und nicht, es gebe es nicht.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x` -- die Richtung steht noch im Schluessel der Platte, damit Wert-IDs in abgelegten Berichten nicht wechseln) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]). `fehlende` rechnet nichts: eine Richtung ohne Bewehrung mit Einwirkungen bekommt so eine Zeile mit Erfuellungsgrad null statt gar keiner.
@@ -474,6 +474,24 @@ def ueberschreibungen_setzen(projekt: 'Projekt', werk: Rechenwerk, aufbau: Aufba
 Die von Hand ueberschriebenen Kennwerte -- dass es sie gibt, prueft
 `baustoff_bauen`. Ein Material, das nicht rechnet, hat keine.
 
+### stoffe_von
+
+```python
+def stoffe_von(aufbau: Aufbau, baustoffe: Iterable[Baustoff]) -> Dict[str, Baustoff]
+```
+
+Die Baustoffe eines Bauteils unter ihrer Kennung im Projekt -- danach
+waehlt ein Kapitel seine Werte je Material
+([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]]).
+
+### spannungsfaelle
+
+```python
+def spannungsfaelle(eintrag, stoffe: Mapping[str, Baustoff], aufbau: Aufbau) -> None
+```
+
+Die eingeschalteten Spannung-Dehnung-Analysen eines Bauteils, jede mit ihrer Wahl an ihm.
+
 ### spannungsnachweise
 
 ```python
@@ -562,6 +580,7 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk3d.rechnung]]

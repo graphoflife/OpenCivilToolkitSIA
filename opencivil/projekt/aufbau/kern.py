@@ -38,6 +38,7 @@ from opencivil.nachweis.knicken import Knickfall
 from opencivil.nachweis.spannungsbegrenzung import Spannungsbegrenzung, Stahlspannungsort
 from opencivil.nachweis.spannungsgrenzen import GrenzeAusRissbreite, GrenzeGegenFliessen
 from opencivil.nachweis.kennzahlen import Plattenkennzahlen
+from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.platte import Plattenquerschnitt
 from opencivil.projekt.eintraege import (
     Gebrauchsliste, KnickEintrag, MaterialEintrag, SpannungsfallEintrag, abgeleiteter_fallname,
@@ -78,12 +79,13 @@ class Aufbau:
     kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)
     """Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet."""
 
-    spannungsfaelle: Dict[str, List["SpannungsfallEintrag"]] = field(
+    spannungsfaelle: Dict[str, List[Tuple["SpannungsfallEintrag", Rechenwahl]]] = field(
         default_factory=dict)
     """
     Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als
-    Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand
-    anderes brauchen koennte, und nichts haengt von ihnen ab.
+    Nachweis, jede mit ihrer Wahl am Bauteil. Sie laufen nicht im Rechenwerk:
+    sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts
+    haengt von ihnen ab.
     """
 
     unfertige: Dict[str, "Unfertiges"] = field(default_factory=dict)
@@ -542,6 +544,23 @@ def ueberschreibungen_setzen(projekt: "Projekt", werk: Rechenwerk,
             werk.setze(definition.id, Groesse(zahl, definition.einheit))
 
 
+def stoffe_von(aufbau: Aufbau, baustoffe: Iterable[Baustoff]) -> Dict[str, Baustoff]:
+    """
+    Die Baustoffe eines Bauteils unter ihrer Kennung im Projekt -- danach
+    waehlt ein Kapitel seine Werte je Material
+    (:class:`~opencivil.projekt.eintraege.JeMaterial`).
+    """
+    ids = {b.id for b in baustoffe}
+    return {kennung: b for kennung, b in aufbau.baustoffe.items() if b.id in ids}
+
+
+def spannungsfaelle(eintrag, stoffe: Mapping[str, Baustoff], aufbau: Aufbau) -> None:
+    """Die eingeschalteten Spannung-Dehnung-Analysen eines Bauteils, jede mit ihrer Wahl an ihm."""
+    aktive = [(s, s.wahl(stoffe)) for s in eintrag.spannungsfaelle if s.aktiv]
+    if aktive:
+        aufbau.spannungsfaelle[eintrag.kennung] = aktive
+
+
 def spannungsnachweise(eintrag, ort: Stahlspannungsort, kombinationen: Sequence[Any],
                         fall: Callable[[str, Any, float], Any], *, praefix: str, kennung: str,
                         aufbau: Aufbau, teil: Bauteil) -> None:
@@ -565,7 +584,7 @@ def spannungsnachweise(eintrag, ort: Stahlspannungsort, kombinationen: Sequence[
             continue
         spannung = Spannungsbegrenzung(ort, faelle, grenze=grenze,
                                        anforderung=eintrag.rissanforderung,
-                                       wahl=liste.wahl.wahl)
+                                       wahl=liste.wahl.wahl(stoffe_von(aufbau, ort.baustoffe)))
         spannung.stillstellen([f.name for f in faelle], laute)
         aufbau.eintragen(teil, f"{praefix}{feld}", kennung, spannung)
 

@@ -31,10 +31,10 @@ from opencivil.querschnitt.platte import (
 )
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import (
-    ProjektFehler, als_groesse, bereich, einer_von, lesen, ort, unbekanntes_feld,
-    wahl_aus_text,
+    ProjektFehler, als_groesse, bereich, einer_von, je_material, lesen, ort, unbekanntes_feld,
+    vorgabe_je_material, wahl_aus_text,
 )
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.rechenwahl import (
     FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
 )
@@ -523,8 +523,31 @@ def abgeleiteter_fallname(name: str, anteil: float) -> str:
     return f"{name} ({anteil:g} %)"
 
 
+class JeMaterial:
+    """
+    Was die Werte je Material waehlt (Benutzer, 2026-11-20): im Feld
+    ``werkstoffsaetze`` (:func:`~opencivil.projekt.lesen.je_material`) je
+    Kennung eines Materials sein Wertesatz. Ein Material ohne eigene Wahl
+    rechnet mit der Vorgabe des Feldes -- die Stahlspannungen
+    charakteristisch, alles andere mit Bemessungswerten. Fuer die Rechnung
+    wird daraus je Baustoff des Bauteils sein Satz (:meth:`wertesaetze`).
+    Bis dahin waehlte nur die Querschnittsanalyse je Material, jedes andere
+    Kapitel einen Satz fuer alle.
+    """
+
+    def von(self, feld: str, material: str) -> Any:
+        """Die Wahl eines Materials in diesem Feld -- die Vorgabe des Feldes, wenn es keine eigene hat."""
+        return getattr(self, feld).get(material, vorgabe_je_material(type(self), feld))
+
+    def wertesaetze(self, stoffe: Mapping[str, Baustoff]) -> Wertesaetze:
+        """Je Baustoff eines Bauteils -- ``stoffe`` nach ihrer Kennung im Projekt -- sein Wertesatz."""
+        return Wertesaetze.je({b.id: self.von("werkstoffsaetze", kennung)
+                               for kennung, b in stoffe.items()},
+                              vorgabe_je_material(type(self), "werkstoffsaetze"))
+
+
 @dataclass
-class SpannungsfallEintrag(Beschreibung):
+class SpannungsfallEintrag(Beschreibung, JeMaterial):
     """
     Eine Auswertung am Querschnitt -- kein Nachweis.
 
@@ -533,8 +556,9 @@ class SpannungsfallEintrag(Beschreibung):
     der einen oder der anderen Seite -- aus Schnittgroessen, aus Dehnungen,
     als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
 
-    Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
-    Wertesatz und die Rechenart (:class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`).
+    Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, je
+    Material den Wertesatz (:class:`JeMaterial`) und die Rechenart
+    (:class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`).
     """
 
     name: str
@@ -556,18 +580,17 @@ class SpannungsfallEintrag(Beschreibung):
     kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
     """Die Kriechzahl φ dieser Analyse."""
 
-    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
-    """``bemessung`` (f_cd, f_yd) oder ``charakteristisch`` (f_ck, f_yk)."""
+    werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)
+    """Je Material ``bemessung`` (f_cd, f_yd) oder ``charakteristisch`` (f_ck, f_yk)."""
 
     rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)
     """``block`` oder ``parabel`` -- siehe
     :class:`~opencivil.querschnitt.gesetzwahl.Rechenart`. Die Handrechnung gibt
     es hier nicht (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`)."""
 
-    @property
-    def wahl(self) -> Rechenwahl:
-        """Womit die Analyse rechnet."""
-        return Rechenwahl(kriechzahl=self.kriechzahl, satz=self.werkstoffsatz,
+    def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl:
+        """Womit die Analyse an einem Bauteil aus diesen Baustoffen rechnet (:meth:`JeMaterial.wertesaetze`)."""
+        return Rechenwahl(kriechzahl=self.kriechzahl, saetze=self.wertesaetze(stoffe),
                           art=self.rechenart)
 
     aktiv: bool = True
@@ -601,10 +624,11 @@ class GebrauchsfallEintrag(Beschreibung):
 
 
 @dataclass
-class RechenwahlEintrag(Beschreibung):
+class RechenwahlEintrag(Beschreibung, JeMaterial):
     """
-    Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
-    siehe :class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`. So steht sie in
+    Womit ein Nachweis-Kapitel rechnet: Kriechzahl, je Material der
+    Wertesatz (:class:`JeMaterial`), Rechenart -- siehe
+    :class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`. So steht sie in
     der Tragsicherheit.
 
     Jedes andere Kapitel hat seine Unterklasse, und welche Rechenarten es
@@ -615,13 +639,12 @@ class RechenwahlEintrag(Beschreibung):
     """
 
     kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
-    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)
     rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.HANDRECHNUNG)
 
-    @property
-    def wahl(self) -> Rechenwahl:
-        """Was der Kern daraus rechnet."""
-        return Rechenwahl(kriechzahl=self.kriechzahl, satz=self.werkstoffsatz,
+    def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl:
+        """Was der Kern daraus rechnet, an einem Bauteil aus diesen Baustoffen (:meth:`JeMaterial.wertesaetze`)."""
+        return Rechenwahl(kriechzahl=self.kriechzahl, saetze=self.wertesaetze(stoffe),
                           art=self.rechenart)
 
 
@@ -629,7 +652,7 @@ class RechenwahlEintrag(Beschreibung):
 class Gebrauchswahl(RechenwahlEintrag):
     """Die Stahlspannungen: elastisch, mit charakteristischen Werten -- dazu die Rechenarten der Tragsicherheit."""
 
-    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.CHARAKTERISTISCH
+    werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.CHARAKTERISTISCH)
     rechenart: Rechenart = einer_von(SPANNUNGSARTEN, Rechenart.ELASTISCH)
 
 

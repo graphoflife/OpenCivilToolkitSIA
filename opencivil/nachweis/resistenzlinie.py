@@ -52,7 +52,7 @@ from opencivil.nachweis.dehnungsfaecher import Linienpunkt
 from opencivil.nachweis.querschnittsloeser import (
     Stahllage, plattenfasern, protokoll_wirksamer_modul,
 )
-from opencivil.nachweis.rechenwahl import protokoll_gesetze
+from opencivil.nachweis.rechenwahl import protokoll_gesetze, staehle
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 
@@ -406,14 +406,14 @@ class Ebenenlinie(Widerstandslinie):
                 namen.append(grenze.name)
         return namen
 
-    def protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, posten, phi: Wert,
+    def protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, beton, posten, phi: Wert,
                          basis: str) -> None:
         """
         Wie die Linie entsteht -- einmal je Nachweis, vor den Kombinationen.
         Den Titel setzt der Nachweis; ``e`` und ``posten`` sind die der Linie
         (:func:`~opencivil.nachweis.biegung_normalkraft.linienbezuege`).
         """
-        wahl, satz = self.wahl, self.wahl.satz
+        wahl = self.wahl
         p.erklaerung(
             "Der Querschnitt bleibt eben (Bernoulli). Zu jeder Dehnungsebene ergeben "
             "sich Normalkraft und Moment aus den Spannungen über die Höhe; Zug ist "
@@ -425,7 +425,7 @@ class Ebenenlinie(Widerstandslinie):
         if wahl.art is Rechenart.PARABEL:
             protokoll_wirksamer_modul(p, e["E_cm"], phi, basis,
                                       titel="Wirksamer Modul der Parabel")
-        protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze", posten=posten)
+        protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze", beton=beton, posten=posten)
         p.ansatz(
             r"N = \int_A \sigma\,\mathrm{d}A \qquad "
             r"M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A",
@@ -439,9 +439,13 @@ class Ebenenlinie(Widerstandslinie):
             f"einer Einwirkung sucht die Rechnung auf dem Rand selbst, zwischen zwei "
             f"benachbarten Ebenen; was dort gilt, zeigt bei jeder Kombination die Probe."
         )
+        # Rechnen alle Staehle im selben Wertesatz, steht sein Zeichen im
+        # Kopf -- sonst schlicht die Fliessgrenze, wie in der Handrechnung.
+        zeichen = {wahl.satz(stahl).stahl_zeichen for stahl in staehle(posten)}
+        f_y = zeichen.pop() if len(zeichen) == 1 else "f_y"
         p.tabelle(
             kopf=["Lage", Mathe(r"a_s\ [\mathrm{mm}^2]"), Mathe(r"z\ [\mathrm{mm}]"),
-                  Mathe(rf"{satz.stahl_zeichen}\ [\mathrm{{N/mm^2}}]")],
+                  Mathe(rf"{f_y}\ [\mathrm{{N/mm^2}}]")],
             zeilen=[[l.text, Mathe(f"{l.a_s * 1e6:.0f}"), Mathe(f"{l.z * 1e3:.1f}"),
                      Mathe(f"{l.stahl.f_yd / 1e6:.0f}")]
                     for l in self.lagen],

@@ -35,12 +35,21 @@ Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
 haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
 (:class:`Werkstoffsatz`), und wie ein Widerstand heisst -- ``R_d`` oder
 ``R_k``.
+
+JE MATERIAL:
+Den Wertesatz waehlt ein Kapitel je Material (:class:`Wertesaetze`), wie
+die Tragsicherheit der Querschnittsanalyse es schon tat -- in jedem Modul
+dieselbe Wahl (Benutzer, 2026-11-20). Bis dahin galt in der Platte, beim
+Knicken, in den Stahlspannungen, den Analysen und beim E_eq eines Stabs ein
+Satz fuer alle Materialien. Rechnen Beton und Stahl mit verschiedenen
+Saetzen, ist ein Widerstand weder ``R_d`` noch ``R_k``; er heisst dann
+schlicht ``R`` (nach Vorgabe, nicht nachgeschlagen).
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, FrozenSet, Mapping, Optional, Tuple
 
 from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.werkstoffgesetz import (
@@ -203,11 +212,91 @@ class Rechenart(Wahl):
 
 
 @dataclass(frozen=True)
+class Wertesaetze:
+    """
+    Je Baustoff sein Wertesatz (:class:`Werkstoffsatz`). ``je_baustoff``
+    nennt die Baustoffe eines Bauteils mit ihrem Satz, nach Baustoff-ID
+    geordnet; ein anderer Baustoff rechnet mit ``vorgabe`` -- so auch jeder,
+    wo ein Kapitel einen Satz fuer alle festlegt (:meth:`alle`).
+    Unveraenderlich und vergleichbar: eine Wahl ist Schluessel von
+    Zwischenspeichern, und zwei gleiche Wahlen teilen sich eine Linie. Darum
+    wird ein Satz fuer alle immer zu :meth:`alle` (:meth:`je`) -- sonst
+    rechneten die Kennzahlen, die mit Bemessungswerten fest waehlen, ihre
+    eigene Linie neben der gleichen der Tragsicherheit.
+    """
+
+    vorgabe: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    je_baustoff: Tuple[Tuple[str, Werkstoffsatz], ...] = ()
+
+    @classmethod
+    def alle(cls, satz: Werkstoffsatz) -> "Wertesaetze":
+        """Jeder Baustoff mit demselben Satz."""
+        return cls(vorgabe=satz)
+
+    @classmethod
+    def je(cls, saetze: Mapping[str, Werkstoffsatz],
+           vorgabe: Werkstoffsatz = Werkstoffsatz.BEMESSUNG) -> "Wertesaetze":
+        """
+        Aus Baustoff-ID und Satz -- je Baustoff des Bauteils einer. Haben alle
+        denselben, ist es :meth:`alle` mit ihm.
+        """
+        verschieden = set(saetze.values())
+        if len(verschieden) <= 1:
+            return cls.alle(next(iter(verschieden), vorgabe))
+        return cls(vorgabe, tuple(sorted(saetze.items())))
+
+    def von(self, stoff) -> Werkstoffsatz:
+        """Der Satz eines Baustoffs (:attr:`~opencivil.material.basis.Baustoff.id`)."""
+        for kennung, satz in self.je_baustoff:
+            if kennung == stoff.id:
+                return satz
+        return self.vorgabe
+
+    @property
+    def gewaehlt(self) -> FrozenSet[Werkstoffsatz]:
+        """Die Saetze, mit denen gerechnet wird."""
+        return frozenset(s for _, s in self.je_baustoff) or frozenset((self.vorgabe,))
+
+    @property
+    def einheitlich(self) -> Optional[Werkstoffsatz]:
+        """Der Satz, wenn alle Baustoffe denselben haben -- sonst ``None``."""
+        return next(iter(self.gewaehlt)) if len(self.gewaehlt) == 1 else None
+
+    @property
+    def index(self) -> str:
+        """
+        Wie ein Widerstand heisst: ``Rd`` mit Bemessungswerten, ``Rk`` mit
+        charakteristischen -- gemischt weder das eine noch das andere,
+        ``R`` (nach Vorgabe, nicht nachgeschlagen).
+        """
+        satz = self.einheitlich
+        return satz.widerstandsindex if satz else "R"
+
+    @property
+    def kuerzel(self) -> str:
+        """Der Buchstabe am Index, ``d`` oder ``k`` -- gemischt keiner."""
+        satz = self.einheitlich
+        return satz.kuerzel if satz else ""
+
+    @property
+    def kurz(self) -> str:
+        """Fuer Legenden: «Bemessung», «charakteristisch» -- oder «gemischt»."""
+        satz = self.einheitlich
+        return satz.kurz if satz else "gemischt"
+
+    @property
+    def beschriftung(self) -> str:
+        """Ueber einem Bild: «Bemessungswerte», «charakteristisch» -- oder «gemischte Werte»."""
+        satz = self.einheitlich
+        return satz.beschriftung if satz else "gemischte Werte"
+
+
+@dataclass(frozen=True)
 class Rechenwahl:
-    """Was ein Kapitel waehlt: Kriechzahl, Wertesatz, Rechenart."""
+    """Was ein Kapitel waehlt: Kriechzahl, Wertesatz je Baustoff, Rechenart."""
 
     kriechzahl: float = 0.0
-    satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    saetze: Wertesaetze = Wertesaetze()
     art: Rechenart = Rechenart.HANDRECHNUNG
     modul: str = "E_cm"
     """
@@ -216,15 +305,18 @@ class Rechenwahl:
     Wahl des Benutzers -- das Kapitel setzt ihn.
     """
 
-    @property
-    def betonkennwerte(self) -> Dict[str, str]:
-        """Die Kennwerte des Betongesetzes (:attr:`Werkstoffsatz.betonkennwerte`) mit diesem Modul."""
-        return {**self.satz.betonkennwerte, "E_c": self.modul}
+    def satz(self, stoff) -> Werkstoffsatz:
+        """Der Wertesatz eines Baustoffs (:meth:`Wertesaetze.von`)."""
+        return self.saetze.von(stoff)
+
+    def betonkennwerte(self, beton) -> Dict[str, str]:
+        """Die Kennwerte des Betongesetzes (:attr:`Werkstoffsatz.betonkennwerte`) dieses Betons, mit dem Modul der Wahl."""
+        return {**self.satz(beton).betonkennwerte, "E_c": self.modul}
 
     @property
     def index(self) -> str:
-        """``Rd`` oder ``Rk`` -- wie ein Widerstand dieser Wahl heisst."""
-        return self.satz.widerstandsindex
+        """``Rd``, ``Rk`` oder gemischt ``R`` -- wie ein Widerstand dieser Wahl heisst (:attr:`Wertesaetze.index`)."""
+        return self.saetze.index
 
     @property
     def beschriftung(self) -> str:
@@ -232,17 +324,17 @@ class Rechenwahl:
         teile = [self.art.beschriftung]
         if self.art.mit_kriechzahl:
             teile.append(f"φ = {self.kriechzahl:g}")
-        return ", ".join(teile + [self.satz.kurz])
+        return ", ".join(teile + [self.saetze.kurz])
 
     def gleiche_linie(self, andere: "Rechenwahl") -> bool:
         """
         Ob ``andere`` dieselbe Resistenzlinie ergibt: dieselbe Rechenart und
-        derselbe Wertesatz, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
+        dieselben Wertesaetze, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
         haengt (:attr:`Rechenart.mit_kriechzahl`). Bis 2026-11-20 eine freie
         Funktion der M-N-Interaktion, die den Modul nicht verglich: eine
         Parabel mit ``E_cd`` haette die Linie einer mit ``E_cm`` bekommen.
         """
-        return (self.art is andere.art and self.satz is andere.satz
+        return (self.art is andere.art and self.saetze == andere.saetze
                 and (not self.art.mit_kriechzahl
                      or (self.kriechzahl, self.modul) == (andere.kriechzahl, andere.modul)))
 

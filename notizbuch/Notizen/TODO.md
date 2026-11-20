@@ -13,8 +13,6 @@ und in jeder App ausser Materialien; «Öffnen» ersetzt alles oder fügt hinzu;
 offline nach dem ersten Besuch; MCP mit Projektdateien; Erdbeben mit
 Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
-- [ ] Oberfläche: die Rechenwerte in allen Modulen je Material wie in der
-      Querschnittsanalyse.
 - [ ] Mehrere Projekte: oben eine Reihe; «Speichern» schreibt alle in eine
       Datei; «Öffnen» fragt «alles ersetzen | hinzufügen».
 - [ ] Sandbox: je Projekt und App zuoberst, golden, ↺ statt ×, beim Laden
@@ -1126,7 +1124,17 @@ Norm dazu sagt.
         heissen aber weiter `v_Rd`. Die Platte nimmt immer Bemessungswerte.
 
       Vorschlag: alle drei immer mit Bemessungswerten, gleich, wie der
-      M-N-Nachweis rechnet. Entscheid des Benutzers.
+      M-N-Nachweis rechnet. Entscheid des Benutzers. Seit 2026-11-20 gilt
+      dasselbe, wenn nur ein Baustoff charakteristisch rechnet.
+- [ ] **Wie heisst ein Widerstand mit gemischten Werten?** Seit 2026-11-20
+      wählt jedes Modul seine Werte je Material. Rechnet etwa der Beton
+      charakteristisch und der Stahl mit Bemessungswerten, heisst der
+      Widerstand R, weder Rd noch Rk (nach Vorgabe, nicht nachgeschlagen;
+      `Wertesaetze.index`). Entscheid des Benutzers.
+- [ ] Die Querschnittsanalyse nennt ihre Widerstände in vier Dateien fest
+      «Rd», auch wenn sie charakteristisch oder gemischt rechnet:
+      `schiefe_biegung.py`, `richtungsnachweise.py`, `qa_kennzahlen.py`,
+      `schubwandnachweis.py`. Die Platte nennt sie nach der Wahl.
 - [ ] **Durchbiegung nach (103) oder (104)?** Gerechnet wird immer der
       gerissene Zustand, (104). Ungerissen gilt `w = w_c·(1 + φ)`, (103); die
       wahre Durchbiegung liegt dazwischen (SIA 262:2025, 4.4.3.2.4 bis

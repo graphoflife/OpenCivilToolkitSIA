@@ -735,7 +735,7 @@ class TestSortenindex(unittest.TestCase):
                            text="Grund", index="1,x,g"),
                  Stahllage(a_s=1e-3, z=0.25, stahl=stahl, sorte="s2", von_unten=True,
                            text="Zulage", index="1,x,z")]
-        unten, oben = seiten(teile, satz=Werkstoffsatz.BEMESSUNG,
+        unten, oben = seiten(teile, saetze={"s2": Werkstoffsatz.BEMESSUNG},
                              stahl_index={"s2": "B500A"})
         self.assertAlmostEqual(unten.z, 0.255)
         self.assertEqual((unten.index, unten.text), ("1,x", "Grund + Zulage"))

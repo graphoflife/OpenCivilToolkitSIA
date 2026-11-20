@@ -1321,18 +1321,17 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
    Spannungsblock. Es bleibt stehen, damit seine Zahl nicht verloren geht. */
 .ist-ohne-wirkung { opacity: .45; }
 
-/* Die Rechenwahl eines Kapitels: ein kleiner Titel, darunter φ, Werte und
-   Rechenart. φ so breit wie ein Zahlenfeld -- sein Kopf, «Kriechzahl φ»,
-   braucht den Platz (bis 2026-11-20 stand dort φ allein, und die Spalte
-   war so breit wie eine kurze Zahl). Werte und Rechenart sind
-   Schalter und stehen untereinander -- nebeneinander fänden «Bemessung |
-   charakteristisch» und vier Rechenarten keinen Platz. Die Rechenart nimmt
-   die ganze Breite, unter φ hindurch: mit ihren Bildern braucht sie sie. */
+/* Die Rechenwahl eines Kapitels: ein kleiner Titel, darunter φ, die
+   Rechenart und die Werte je Material. φ so breit wie ein Zahlenfeld --
+   sein Kopf, «Kriechzahl φ», braucht den Platz (bis 2026-11-20 stand dort φ
+   allein, und die Spalte war so breit wie eine kurze Zahl). Die Rechenart
+   nimmt die ganze Breite, unter φ hindurch: mit ihren Bildern braucht sie
+   sie; die Werte je Material ebenso, eine Zeile je Material. */
 .rechenwahl {
   display: grid; gap: 1px 6px; align-items: end; margin: 2px 0 8px;
   grid-template-columns: var(--zahlbreite) minmax(0, 1fr);
 }
-.rechenwahl > :nth-child(4) { grid-column: 1 / -1; }
+.rechenwahl > .ist-rechenart, .rechenwahl > .werkstoffzeilen { grid-column: 1 / -1; }
 .rechenwahl-titel {
   grid-column: 1 / -1; font-size: 11px; font-weight: 600; color: var(--schrift-matt);
 }
@@ -1507,9 +1506,11 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 
 /* ------------------------------------------------- Querschnittsanalyse -- */
 
-/* Je Material im Querschnitt eine Zeile: Name, Rechenwerte, beim Beton
+/* Je Material des Bauteils eine Zeile, in jeder Rechenwahl: Name und
+   Rechenwerte, in der Tragsicherheit der Querschnittsanalyse beim Beton
    darunter das Gesetz -- zwei Schalter. Die Kante links in der Farbe des
    Materials, wie im Baum. */
+.werkstoffzeilen { display: grid; gap: 2px; margin-top: 3px; }
 .werkstoffzeile {
   display: grid; grid-template-columns: minmax(60px, max-content) minmax(0, 1fr);
   gap: 4px 10px; align-items: center; margin-bottom: 6px;

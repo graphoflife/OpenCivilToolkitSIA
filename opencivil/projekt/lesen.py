@@ -50,7 +50,8 @@ zuweist, bekommt ebenso das Mitglied (:func:`wahl_aus_text`, aufgerufen von
 ``Beschreibung.__setattr__``). Geschrieben wird der Text -- ``json.dumps``
 schreibt eine Wahl als ihren Wert, die Dateien bleiben Zeichen fuer Zeichen
 gleich. Bis 2026-10-17 hielten die Felder Text, und rund dreissig Stellen
-machten daraus wieder das Mitglied.
+machten daraus wieder das Mitglied. Dasselbe gilt fuer jeden Wert einer
+Zuordnung von Wahlen, etwa den Wertesatz je Material (:func:`je_material`).
 """
 
 from __future__ import annotations
@@ -120,6 +121,26 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any = dataclasses.MISSING) -> An
     return dataclasses.field(default=vorgabe, metadata={"wahl": tuple(moeglich)})
 
 
+def je_material(vorgabe: Any, moeglich: Optional[Iterable[Any]] = None) -> Any:
+    """
+    Ein Feld, das je Material eine Wahl haelt, unter der Kennung des
+    Materials -- den Wertesatz etwa. Ein Material ohne eigene Wahl waehlt
+    ``vorgabe`` (:func:`vorgabe_je_material`); ``moeglich`` begrenzt die Wahl
+    wie bei :func:`einer_von`. Eine Zuordnung und keine Liste: zwei Wahlen
+    fuer dasselbe Material kann es so nicht geben. Bis 2026-11-20 hielt die
+    Querschnittsanalyse eine Liste und wies doppelte Eintraege eigens ab.
+    """
+    metadata: Dict[str, Any] = {"je_material": vorgabe}
+    if moeglich is not None:
+        metadata["wahl"] = tuple(moeglich)
+    return dataclasses.field(default_factory=dict, metadata=metadata)
+
+
+def vorgabe_je_material(cls: type, feld: str) -> Any:
+    """Was ein Material im Feld ``feld`` (:func:`je_material`) waehlt, solange es keine eigene Wahl hat."""
+    return next(f for f in dataclasses.fields(cls) if f.name == feld).metadata["je_material"]
+
+
 def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
             einheit: Optional[Einheit] = None, ueber: Optional[float] = None,
             ab: Optional[float] = None, bis: Optional[float] = None,
@@ -164,6 +185,9 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     sagt: ``bis_feld`` bei α_min, ``ab_feld`` bei α_max. Die Zahl des anderen
     Feldes kennt erst die Maske.
 
+    Haelt ein Feld je Material eine Wahl (:func:`je_material`), steht dort,
+    was ein Material ohne eigene waehlt: ``vorgabe``.
+
     Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
     des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
     und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
@@ -176,6 +200,8 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
         angabe = b.angabe() if b is not None else {}
         if typen.get(f.name) is int:
             angabe["ganz"] = True
+        if "je_material" in f.metadata:
+            angabe["vorgabe"] = f.metadata["je_material"]
         if angabe:
             angaben[f.name] = angabe
     for name, b in bereiche.items():
@@ -546,6 +572,17 @@ def _wahlfelder(cls: type) -> Dict[str, type]:
     return {name: typ for name, typ in _typen(cls).items() if _ist_wahl(typ)}
 
 
+@functools.lru_cache(maxsize=None)
+def _wahlzuordnungen(cls: type) -> Dict[str, type]:
+    """Je Feld, das eine Zuordnung von Wahlen haelt (:func:`je_material`), die Wahl seiner Werte."""
+    heraus = {}
+    for name, typ in _typen(cls).items():
+        art, innen = _art(typ)
+        if art == "zuordnung" and _ist_wahl(innen):
+            heraus[name] = innen
+    return heraus
+
+
 def wahl_von(cls: type, feld: str) -> tuple:
     """Was ein Wahlfeld annehmen kann -- seine Teilmenge, sonst jedes Mitglied seiner Wahl."""
     f = next(f for f in dataclasses.fields(cls) if f.name == feld)
@@ -559,7 +596,17 @@ def wahl_aus_text(cls: type, feld: str, wert: Any) -> Any:
     die Pruefung meldet ihn dann mit seinem Ort (:func:`felder_pruefen`).
     """
     wahl = _wahlfelder(cls).get(feld)
-    if wahl is None or not isinstance(wert, str) or isinstance(wert, wahl):
+    if wahl is not None:
+        return _mitglied(wahl, wert)
+    wahl = _wahlzuordnungen(cls).get(feld)
+    if wahl is not None and isinstance(wert, dict):
+        return {schluessel: _mitglied(wahl, w) for schluessel, w in wert.items()}
+    return wert
+
+
+def _mitglied(wahl: type, wert: Any) -> Any:
+    """Ein Text als Mitglied der Wahl -- ein Text, den es nicht gibt, bleibt Text."""
+    if not isinstance(wert, str) or isinstance(wert, wahl):
         return wert
     try:
         return wahl(wert)

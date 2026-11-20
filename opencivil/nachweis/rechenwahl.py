@@ -9,6 +9,13 @@ Querschnittsloeser baut, und welche Rechenarten ein Kapitel anbietet. Die
 Kapitel der Platte und die Spannung-Dehnung-Analyse fragen hier, keines baut
 seine Gesetze oder Lagen selbst.
 
+JE MATERIAL SEIN WERTESATZ:
+Ein Kapitel waehlt den Wertesatz je Baustoff
+(:class:`~opencivil.querschnitt.gesetzwahl.Wertesaetze`): der Beton liest
+``f_cd`` oder ``f_ck`` nach seinem, jeder Stahl ``f_yd`` oder ``f_yk``
+nach seinem (Benutzer, 2026-11-20). Die Herleitung nennt ihn einmal, wenn
+alle denselben haben, sonst je Baustoff (:func:`protokoll_rechenwahl`).
+
 JEDE LAGE MIT IHREM STAHL:
 Der Editor laesst je Seite einen eigenen Stahl waehlen. Jede Lage traegt
 darum ihren Stahl (:class:`Stahllage`), angemeldet wird je Sorte unter
@@ -41,7 +48,7 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
-from opencivil.core.latex import angabe
+from opencivil.core.latex import als_text, angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import HALBIEREN, Suche
 from opencivil.core.wert import Wert, kennung_aus
@@ -84,8 +91,8 @@ VERFORMUNGSARTEN = (Rechenart.PARABEL,)
 @dataclass(frozen=True)
 class Betonkennwerte:
     """
-    Die Zahlen, aus denen das Betongesetz entsteht -- SI, im Wertesatz der
-    Wahl. Den Stahl traegt jede Lage selbst (:func:`stahllagen`).
+    Die Zahlen, aus denen das Betongesetz entsteht -- SI, im Wertesatz des
+    Betons. Den Stahl traegt jede Lage selbst (:func:`stahllagen`).
     """
 
     f_c: float
@@ -98,16 +105,16 @@ class Betonkennwerte:
     eps_c2d: float
 
     @classmethod
-    def aus_eingaben(cls, e: Eingaben, wahl: Rechenwahl) -> "Betonkennwerte":
-        """Aus den Eingaben, die :func:`betonbezuege` anmeldet."""
-        return cls(f_c=e.g(wahl.satz.beton).si, E_c=e.g(wahl.modul).si,
+    def aus_eingaben(cls, e: Eingaben, wahl: Rechenwahl, beton) -> "Betonkennwerte":
+        """Aus den Eingaben, die :func:`betonbezuege` fuer ``beton`` anmeldet."""
+        return cls(f_c=e.g(wahl.satz(beton).beton).si, E_c=e.g(wahl.modul).si,
                    eps_c1d=e.g("eps_c1d").si, eps_c2d=e.g("eps_c2d").si)
 
 
 def betonbezuege(satz: Werkstoffsatz, beton, *, modul: str = "E_cm") -> List[Eingabebezug]:
     """
     Was das Betongesetz einer Wahl braucht -- unter den Kurznamen des
-    Wertesatzes, ``f_cd`` oder ``f_ck``, und des Moduls der Wahl
+    Wertesatzes dieses Betons, ``f_cd`` oder ``f_ck``, und des Moduls der Wahl
     (:attr:`~opencivil.querschnitt.gesetzwahl.Rechenwahl.modul`). So steht in
     der Herleitung das Zeichen, mit dem gerechnet wird. Die Reihenfolge ist
     die, in der die Werte in der Herleitung der Baustoffe erscheinen.
@@ -130,20 +137,22 @@ def stahlbezuege(posten: Sequence[Postenbezug], kennwerte: Sequence[str]) -> Lis
     return [stahl.bezug(kennwert) for stahl in staehle(posten) for kennwert in kennwerte]
 
 
-def lagenbezuege(posten: Sequence[Postenbezug], satz: Werkstoffsatz) -> List[Eingabebezug]:
+def lagenbezuege(posten: Sequence[Postenbezug], wahl: Rechenwahl) -> List[Eingabebezug]:
     """
     Was :func:`stahllagen` liest: je Posten Flaeche und Tiefe, je Stahl
-    seine Kennwerte im Wertesatz der Wahl.
+    seine Kennwerte in seinem Wertesatz.
     """
     bezuege = [b for q in posten for b in q.bezuege("a_s", "z")]
-    return bezuege + stahlbezuege(posten, ("E_s", satz.stahl, satz.stahl_druck, "eps_ud"))
+    return bezuege + [stahl.bezug(kennwert) for stahl in staehle(posten)
+                      for kennwert in ("E_s", wahl.satz(stahl).stahl,
+                                       wahl.satz(stahl).stahl_druck, "eps_ud")]
 
 
-def stahllagen(posten: Sequence[Postenbezug], satz: Werkstoffsatz,
+def stahllagen(posten: Sequence[Postenbezug], wahl: Rechenwahl,
                wert: Callable[[str], float]) -> List[Stahllage]:
     """
-    Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage im Wertesatz der
-    Wahl -- die eine Stelle, die Lagen baut.
+    Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage in dessen
+    Wertesatz -- die eine Stelle, die Lagen baut.
 
     ``wert`` liefert zu einer Wert-ID die Zahl in SI: in einem Nachweis aus
     seinen Eingaben (``Eingaben.si_nach_id`` ueber :func:`lagenbezuege`), in
@@ -154,6 +163,7 @@ def stahllagen(posten: Sequence[Postenbezug], satz: Werkstoffsatz,
     for q in posten:
         stahl = q.lage.stahl
         if stahl.id not in gesetze:
+            satz = wahl.satz(stahl)
             gesetze[stahl.id] = Stahlgesetz(
                 E_s=wert(stahl.id_von("E_s")),
                 f_yd=abs(wert(stahl.id_von(satz.stahl))),
@@ -244,36 +254,43 @@ class Gesetze:
             grenzen=self.grenzen(lagen, h))
 
 
-def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, *,
+def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, stoffe: Sequence, *,
                          titel: str = "Rechenwahl") -> Wert:
     """
     Womit das Kapitel rechnet, in einer Zeile: phi (nur wo es wirkt), Werte,
-    Rechenart. Zurueck kommt phi als Wert -- fuer die Formeln danach.
+    Rechenart. Rechnen alle ``stoffe`` mit demselben Wertesatz, steht er
+    einmal da, sonst je Baustoff mit seinem Namen. Zurueck kommt phi als
+    Wert -- fuer die Formeln danach.
     """
     phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
-    satz = wahl.satz
-    teile = ([angabe(phi)] if wahl.art.mit_kriechzahl else []) + [
-        rf"\text{{{satz.beschriftung}}}\ {satz.beton_zeichen},\ {satz.stahl_zeichen}",
-        wahl.art.latex]
+    satz = wahl.saetze.einheitlich
+    if satz is not None:
+        werte = rf"\text{{{satz.beschriftung}}}\ {satz.beton_zeichen},\ {satz.stahl_zeichen}"
+    else:
+        werte = r",\ ".join(
+            rf"{als_text(f'{s.name}: {wahl.satz(s).beschriftung}')}\ "
+            rf"{wahl.satz(s).beton_zeichen if s.art is Baustoffart.BETON else wahl.satz(s).stahl_zeichen}"
+            for s in stoffe)
+    teile = ([angabe(phi)] if wahl.art.mit_kriechzahl else []) + [werte, wahl.art.latex]
     p.gleichung(r" \qquad ".join(teile), titel=titel)
     return phi
 
 
 def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *,
-                      titel: str, posten) -> None:
+                      titel: str, beton, posten) -> None:
     """
     Die Werkstoffgesetze der Wahl, so wie gerechnet wird: jedes Gesetz
     schreibt sich selbst
     (:meth:`~opencivil.querschnitt.werkstoffgesetz.Gesetz.protokoll`), mit den
     Werten, mit denen es rechnet -- der Beton mit dem wirksamen Modul, jeder
-    Stahl der Posten mit seinen; bei mehreren Staehlen mit dem Namen im Titel.
+    Stahl der Posten mit seinen, jeder in seinem Wertesatz; bei mehreren
+    Staehlen mit dem Namen im Titel.
 
     Der wirksame Modul selbst steht nicht hier: wo er gebraucht wird, schreibt
     ihn das Kapitel an der Stelle, an der er erklaert wird
     (:func:`~opencivil.nachweis.querschnittsloeser.protokoll_wirksamer_modul`).
     """
-    satz = wahl.satz
-    g = gesetze(wahl, Betonkennwerte.aus_eingaben(e, wahl))
+    g = gesetze(wahl, Betonkennwerte.aus_eingaben(e, wahl, beton))
     if wahl.art is Rechenart.HANDRECHNUNG:
         p.erklaerung(
             "Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie "
@@ -281,15 +298,16 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
             "Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in "
             "ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, "
             "wo der Stahl liegt.")
-    beton = {rolle: e[name] for rolle, name in wahl.betonkennwerte.items()}
-    beton["E_c"] = wirksamer_modul_wert(beton["E_c"], wahl.kriechzahl, basis)
-    g.beton.protokoll(p, beton, titel=titel, basis=basis)
+    werte = {rolle: e[name] for rolle, name in wahl.betonkennwerte(beton).items()}
+    werte["E_c"] = wirksamer_modul_wert(werte["E_c"], wahl.kriechzahl, basis)
+    g.beton.protokoll(p, werte, titel=titel, basis=basis)
 
     sorten = staehle(posten)
-    gesetz_von = {l.sorte: l.stahl for l in stahllagen(posten, satz, e.si_nach_id())}
+    gesetz_von = {l.sorte: l.stahl for l in stahllagen(posten, wahl, e.si_nach_id())}
     for stahl in sorten:
         g.stahl(gesetz_von[kennung_aus(stahl.id)]).protokoll(
-            p, {rolle: e[stahl.eingabename(name)] for rolle, name in satz.stahlkennwerte.items()},
+            p, {rolle: e[stahl.eingabename(name)]
+                for rolle, name in wahl.satz(stahl).stahlkennwerte.items()},
             titel=titel if len(sorten) == 1 else f"{titel}, {stahl.name}")
 
 
@@ -304,21 +322,20 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
     Gesetz an ihm haengt. Fuer die Gebrauchsnachweise und das Knicken des
     gezeichneten Querschnitts.
     """
-    satz = wahl.satz
     phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
     werkstoffe, index = analyse.werkstoffe(e.si_nach_id(), lambda stoff: wahl)
     for stoff in analyse.baustoffe:
         unter = f"{basis}.{kennung_aus(stoff.id)}"
         if stoff.art is Baustoffart.BETON:
             werte = {rolle: e[stoff.eingabename(name)]
-                     for rolle, name in wahl.betonkennwerte.items()}
+                     for rolle, name in wahl.betonkennwerte(stoff).items()}
             if wahl.art.mit_kriechzahl:
                 protokoll_wirksamer_modul(p, werte["E_c"], phi, unter,
                                           titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
             werte["E_c"] = wirksamer_modul_wert(werte["E_c"], wahl.kriechzahl, unter)
         else:
             werte = {rolle: e[stoff.eingabename(name)]
-                     for rolle, name in satz.stahlkennwerte.items()}
+                     for rolle, name in wahl.satz(stoff).stahlkennwerte.items()}
         werkstoffe[index(stoff)].gesetz.protokoll(p, werte, titel=f"{titel}, {stoff.name}",
                                                   basis=unter)
 

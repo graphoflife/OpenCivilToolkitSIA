@@ -589,15 +589,14 @@ function zahlenzeile(eintraege) {
     el('span', {}, [el('b', {}, [span(`${latex} =`)]), ` ${wert}`])));
 }
 
-/** Womit gerechnet wurde: Kriechzahl, Werte, Rechenart. */
+/** Womit gerechnet wurde: Kriechzahl, Werte (wie der Kern sie nennt), Rechenart. */
 function wahlzeile(wahl) {
   if (!wahl) return null;
   const wahlen = katalog('rechenwahl');
   const name = (liste, wert) => (liste || []).find((e) => e.wert === wert)?.beschriftung ?? wert;
   return el('div.sd-wahl-text', {}, [
     span('\\varphi'),
-    ` = ${wahl.phi.toFixed(2)} · `
-      + `${name(wahlen.werkstoffsaetze, wahl.satz)} · ${name(wahlen.rechenarten, wahl.rechenart)}`,
+    ` = ${wahl.phi.toFixed(2)} · ${wahl.werte} · ${name(wahlen.rechenarten, wahl.rechenart)}`,
   ]);
 }
 

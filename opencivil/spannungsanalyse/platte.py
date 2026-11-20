@@ -209,12 +209,11 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     posten = querschnitt.posten_in_richtung(richtung)
     if not posten:
         return None
-    satz = wahl.satz
-    lagen = stahllagen(posten, satz, wert)
+    lagen = stahllagen(posten, wahl, wert)
     beton = querschnitt.beton
     ids = {
         "h": querschnitt.id_von("h"), "b": querschnitt.id_breite(richtung),
-        "E_cm": beton.id_von("E_cm"), "f_c": beton.id_von(satz.beton),
+        "E_cm": beton.id_von("E_cm"), "f_c": beton.id_von(wahl.satz(beton).beton),
         "eps_c1d": beton.id_von("eps_c1d"), "eps_c2d": beton.id_von("eps_c2d"),
         "f_ctm": beton.id_von("f_ctm"),
     }

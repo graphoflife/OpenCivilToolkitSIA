@@ -35,7 +35,9 @@ from opencivil.projekt.eintraege import KombinationEintrag, VerformungsfallEintr
 from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von
 from opencivil.projekt.platte import QuerschnittEintrag
 
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, knickfall, material, spannungsnachweise
+from opencivil.projekt.aufbau.kern import (
+    Aufbau, Bauteil, knickfall, material, spannungsfaelle, spannungsnachweise, stoffe_von,
+)
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -57,6 +59,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
     if querschnitt is None:
         raise ProjektFehler("noch keine Bewehrung.", wo=ort_von(eintrag))
     querschnitt.ins_rechenwerk(aufbau.werk)
+    stoffe = stoffe_von(aufbau, querschnitt.baustoffe)
     # Bewehrungsmass und Distanzhalter stehen als Kennzahlen da, auch bei
     # einer Platte ohne Nachweis -- ihr Lagenaufbau rechnet darum immer.
     teil = Bauteil(eintrag, art, querschnitt,
@@ -91,7 +94,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
         # Diagramm an.
         nachweis = BiegungNormalkraft(
             querschnitt, [_kombination(k) for k in aktiv], richtung,
-            wahl=eintrag.tragsicherheit_wahl.wahl, mit_vergleich=not schnell,
+            wahl=eintrag.tragsicherheit_wahl.wahl(stoffe), mit_vergleich=not schnell,
             schritte=dehnungsfaecher.SCHRITTE_SUCHE if schnell else dehnungsfaecher.SCHRITTE)
         aufbau.eintragen(teil, "nachweise", kennung_x, nachweis)
 
@@ -134,12 +137,10 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
         if knickfaelle:
             aufbau.eintragen(teil, "knicken", eintrag.kennung, Knicken(
                 querschnitt, [knickfall(k) for k in knickfaelle],
-                nachweis, verformung=eintrag.knicken_wahl_verformung.wahl,
-                widerstand=eintrag.knicken_wahl_widerstand.wahl, schnell=schnell))
+                nachweis, verformung=eintrag.knicken_wahl_verformung.wahl(stoffe),
+                widerstand=eintrag.knicken_wahl_widerstand.wahl(stoffe), schnell=schnell))
 
-    aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
-    if aktive:
-        aufbau.spannungsfaelle[eintrag.kennung] = aktive
+    spannungsfaelle(eintrag, stoffe, aufbau)
 
     if not eintrag.kombinationen:
         aufbau.warnungen.append(

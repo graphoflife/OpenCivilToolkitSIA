@@ -1,5 +1,5 @@
 ---
-erzeugt: bd77eea02aab
+erzeugt: ef420f01ed55
 art: modul
 tags: [modul]
 ---
@@ -103,7 +103,7 @@ Wie das Bauteil heisst, aus dem er seine Werte nimmt -- leer bei einer Form.
 
 ```python
 @dataclass
-class ModulEintrag(Beschreibung)
+class ModulEintrag(Beschreibung, JeMaterial)
 ```
 
 Wie das E_eq eines Querschnitts aus einer Platte oder Querschnittsanalyse
@@ -111,21 +111,22 @@ entsteht: bei `N` und `M`, Zug positiv und `M > 0` mit Zug unten --
 auf der gestrichelten Faser des Stabs, im Raum an der Seite +z, wo M_y
 zieht; bei einer Platte immer in x-Richtung, und `M` zieht unten
 (Benutzer, 2026-10-24). Gerechnet wie eine Momenten-Kruemmungs-Linie
-ihrer Spannung-Dehnung-Analyse, mit Kriechzahl, Wertesatz und Rechenart
-wie dort (Benutzer, 2026-10-23).
+ihrer Spannung-Dehnung-Analyse, mit Kriechzahl, Werten je Material und
+Rechenart wie dort (Benutzer, 2026-10-23, je Material 2026-11-20).
 
 - `N: float = bereich(0.0, heisst='N für E_eq', einheit=KN)`
 - `M: float = bereich(0.0, heisst='M für E_eq', einheit=KNM)`
 - `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
-- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)`
 - `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)`
 
 #### ModulEintrag.wahl
 
 ```python
-@property
-def wahl(self) -> Rechenwahl
+def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl
 ```
+
+Womit das E_eq gerechnet wird, an der Platte oder Analyse aus diesen Baustoffen.
 
 ### aufgezaehlt
 
@@ -480,6 +481,7 @@ Ob eine Last ihr Vorzeichen wechselt, wenn ihre Linie umgekehrt wird.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.wahl]]
+- [[opencivil.material.basis]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]

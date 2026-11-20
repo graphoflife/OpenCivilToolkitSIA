@@ -25,7 +25,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.projekt import Projekt
-from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag, WerkstoffwahlEintrag
+from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.projekt.skript import VORLAGE
 from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.querschnitt.geometrie import Linienart
@@ -174,14 +174,14 @@ def jeder_nachweis() -> Projekt:
     decke.spannungsfall("Biegung mit Druck", art="moment_kruemmung", N_Ed=-300,
                         kriechzahl=2.0)
     decke.spannungsfall("Zug mit Moment", art="normalkraft_dehnung", M_Ed=30,
-                        kriechzahl=1.0, werkstoffsatz="charakteristisch",
+                        kriechzahl=1.0, werkstoffsaetze=charakteristisch(decke),
                         rechenart="block")
     # Der äquivalente E-Modul, einmal über dem Moment und einmal über der
     # Normalkraft bei festem Moment -- dort zählt er ab dem Zustand ohne N.
     decke.spannungsfall("Biegesteifigkeit", art="moment_emodul",
-                        werkstoffsatz="charakteristisch")
+                        werkstoffsaetze=charakteristisch(decke))
     decke.spannungsfall("Dehnsteifigkeit", art="normalkraft_emodul", M_Ed=30,
-                        werkstoffsatz="charakteristisch")
+                        werkstoffsaetze=charakteristisch(decke))
 
     # Ein Streifen von 500 mm: M und N je b, V je Meter. Mit halben
     # Momenten sind es dieselben Grade wie bei 1000 mm -- nur die
@@ -207,7 +207,7 @@ def jeder_nachweis() -> Projekt:
     genau = p.platte("Parabel", h=250, x=[12, 10], y=[10, 10],
                      rissanforderung="erhoeht", sproede=True)
     genau.tragsicherheit_wahl = RechenwahlEintrag(
-        kriechzahl=1.0, werkstoffsatz=Werkstoffsatz.CHARAKTERISTISCH,
+        kriechzahl=1.0, werkstoffsaetze=charakteristisch(genau),
         rechenart=Rechenart.PARABEL)
     genau.einwirkung("Feld", M_Ed=60, N_Ed=-200, V_Ed=50)
     genau.quasistaendig.lastfall("Dauerlast", M_Ed=30)
@@ -216,7 +216,7 @@ def jeder_nachweis() -> Projekt:
     genau.haeufig.wahl = Gebrauchswahl(kriechzahl=2.0, rechenart=Rechenart.PARABEL)
     genau.knickfall("Stütze", N_Ed=-600, M_Ed_1=10, laenge=3.0)
     genau.knicken_wahl_verformung = KnickVerformungswahl(
-        werkstoffsatz=Werkstoffsatz.CHARAKTERISTISCH)
+        werkstoffsaetze=charakteristisch(genau))
     genau.knicken_wahl_widerstand = KnickWiderstandswahl(rechenart=Rechenart.PARABEL)
 
     # Die Platte «Block» haelt die Tragsicherheit mit der 0.85·x-Vereinfachung,
@@ -238,6 +238,20 @@ def jeder_nachweis() -> Projekt:
     konsole = p.platte("Konsole", h=250, x=[12, 12], y=[40, 10])
     konsole.einwirkung("Feld", M_Ed=40, V_Ed=50)
     konsole.einwirkung("Schräg", M_Ed=30, N_Ed=-500).art = "naechster_Punkt"
+
+    # Gemischte Werte, je Material gewählt (2026-11-20): in der Tragsicherheit
+    # der Beton charakteristisch und der Stahl mit Bemessungswerten, von
+    # Hand -- ein Widerstand heisst dann R --, in der Stahlspannung umgekehrt,
+    # dazu eine Spannung-Dehnung-Analyse.
+    gemischt = p.platte("Gemischt", h=250, x=[12, 10], y=[10, 10])
+    gemischt.tragsicherheit_wahl = RechenwahlEintrag(
+        werkstoffsaetze={gemischt.beton: Werkstoffsatz.CHARAKTERISTISCH})
+    gemischt.einwirkung("Feld", M_Ed=50, V_Ed=40)
+    gemischt.quasistaendig.lastfall("Dauerlast", M_Ed=25)
+    gemischt.quasistaendig.wahl = Gebrauchswahl(
+        werkstoffsaetze={gemischt.beton: Werkstoffsatz.BEMESSUNG})
+    gemischt.spannungsfall("Gemischt", art="moment_kruemmung",
+                           werkstoffsaetze={gemischt.beton: Werkstoffsatz.CHARAKTERISTISCH})
 
     # Zwei gezeichnete Querschnitte. Ein Kastenträger mit Aussparung,
     # Bewehrung in allen drei Arten, vier Schubwänden als Zelle, Torsion,
@@ -444,6 +458,11 @@ def _erstes(p: Projekt, art: str) -> str:
     return next(m.kennung for m in p.materialien if m.art == art)
 
 
+def charakteristisch(eintrag) -> dict:
+    """Charakteristische Werte fuer jedes Material, auf das der Eintrag zeigt."""
+    return {kennung: Werkstoffsatz.CHARAKTERISTISCH for kennung in eintrag.materialien()}
+
+
 def _alles_einmal(p: Projekt, decke: QuerschnittEintrag,
                   analyse: QuerschnittsanalyseEintrag) -> None:
     """
@@ -580,7 +599,7 @@ def _raumrahmen(p: Projekt, decke: QuerschnittEintrag,
 def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     a = QuerschnittsanalyseEintrag(
         kennung=kennung, name="Kastenträger",
-        werkstoffwahl=[WerkstoffwahlEintrag(material="b1", betongesetz="block")],
+        betongesetze={"b1": "block"},
         laengszugkraft=True, duktilitaet=True, sproede=True,
         rissanforderung="erhoeht", zwaengung=True, zwaengung_begrenzt=True,
         zwaengung_biegung=True, zwaengung_biegung_kriechzahl=1.0)
@@ -606,7 +625,7 @@ def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     a.spannungsfall("Seitlich", art="moment_kruemmung", N_Ed=-500.0, richtung="links",
                     kriechzahl=1.0)
     a.spannungsfall("Zugsteifigkeit", art="normalkraft_emodul", M_Ed=-50.0,
-                    werkstoffsatz="charakteristisch", rechenart="block")
+                    werkstoffsaetze=charakteristisch(a), rechenart="block")
     # Die Stahlspannungen: quasi-ständig aus der Tragsicherheit und ein
     # eigener Fall, häufig ein schiefer -- die Nulllinie dreht.
     a.quasistaendig.aus_tragsicherheit = True
@@ -618,8 +637,7 @@ def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:
 def _stuetze(kennung: str) -> QuerschnittsanalyseEintrag:
     a = QuerschnittsanalyseEintrag(
         kennung=kennung, name="Stütze",
-        werkstoffwahl=[WerkstoffwahlEintrag(material="b1", satz="charakteristisch"),
-                       WerkstoffwahlEintrag(material="s1", satz="charakteristisch")],
+        werkstoffsaetze={"b1": "charakteristisch", "s1": "charakteristisch"},
         einachsig=True, zwaengung=True)
     a.polygon([[0, 0], [400, 0], [400, 400], [0, 400]], material="b1")
     for z in (50, 350):
@@ -629,7 +647,7 @@ def _stuetze(kennung: str) -> QuerschnittsanalyseEintrag:
     a.spannungsfall("Randdehnungen", art="dehnungen", eps_oben=-2.0, eps_unten=5.0,
                     richtung="oben")
     a.spannungsfall("Biegesteifigkeit", art="moment_emodul", N_Ed=-800.0,
-                    richtung="oben", werkstoffsatz="charakteristisch")
+                    richtung="oben", werkstoffsaetze=charakteristisch(a))
     # Quasi-ständig mit der Parabel: σ_s,adm ist bei normaler Anforderung f_yk.
     a.quasistaendig.wahl.rechenart = "parabel"
     a.quasistaendig.lastfall("Dauer", N_Ed=-600.0, M_y_Ed=80.0)

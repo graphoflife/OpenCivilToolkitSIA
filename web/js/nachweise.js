@@ -30,7 +30,9 @@ import {
   eingeschaltet, fehltHinweis, gebrauchsstand, schalter, standOhne, zeilenstand,
 } from './kapitel.js';
 import { mitFormelzeichen } from './mathe.js';
-import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
+import {
+  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, naechsterName,
+} from './zustand.js';
 
 // ===========================================================================
 // Die Kapitel -- je ein Knopf, die Eingaben im Fenster (kapitel.js)
@@ -53,7 +55,7 @@ import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from '
 export function nachweisKapitel(ort) {
   // Die beiden Stahlspannungen sind dieselbe Rechnung mit anderer Grenze.
   const stahlspannung = [
-    ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
+    ['Werte', 'je Material nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
     ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), präzise und elastisch'],
   ];
   return [
@@ -240,10 +242,10 @@ function knickInhalt(eintrag, ort) {
     // Spannungsblock wäre die Ausmitte nahe der Grenzkraft nicht eindeutig.
     rechenwahlZeile('Verformung (e_2d)', eintrag.knicken_wahl_verformung,
       (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_verformung)),
-      { arten: 'verformungsarten' }),
+      { arten: 'verformungsarten', werkstoffe: { ...ort.werkstoffe(eintrag), klasse: 'knickverformungswahl' } }),
     rechenwahlZeile('Widerstand (N_Rd)', eintrag.knicken_wahl_widerstand,
       (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_widerstand)),
-      { arten: 'faserarten' }),
+      { arten: 'faserarten', werkstoffe: { ...ort.werkstoffe(eintrag), klasse: 'knickwiderstandswahl' } }),
     faelle.length ? fehltHinweis(knick.fehlt(eintrag)) : null,
     faelle.length ? fallkopf(knick.kopf) : null,
     ...(faelle.length
@@ -410,7 +412,10 @@ function gebrauchsKapitel(eintrag, ort, {
     rissanforderungZeile(eintrag, ort),
     hinweis ? el('p.hinweis.hinweis-annahme', { text: hinweis }) : null,
     rechenwahlZeile('Rechenwahl', liste.wahl,
-      (veraenderer) => aendern((l) => veraenderer(l.wahl)), { arten: ort.gebrauch.arten }),
+      (veraenderer) => aendern((l) => veraenderer(l.wahl)), {
+        arten: ort.gebrauch.arten,
+        werkstoffe: { ...ort.werkstoffe(eintrag), klasse: ort.gebrauch.wahl },
+      }),
 
     el('div.duktilitaetszeile.ist-anteil', {}, [
       hakenSchalter(abgeleitet, (wert) => aendern((l) => {
@@ -514,19 +519,6 @@ export function kriechzahlName(klasse, feldname = 'kriechzahl') {
 }
 
 /**
- * Die Felder einer Rechenwahl: Kriechzahl φ, Werte und Rechenart -- in jedem
- * Kapitel und in jeder Analyse dieselben drei. `ziel` trägt die Felder
- * `kriechzahl`, `werkstoffsatz` und `rechenart`, `aendern` ändert es im
- * Projekt. `arten` sagt, welche Rechenarten gelten: `rechenarten`, bei den
- * Stahlspannungen `spannungsarten`, beim Knicken und in den Analysen
- * `faserarten` (ohne Handrechnung), bei der Verformung des Knickens
- * `verformungsarten` (nur präzise). Wirkt φ bei der gewählten Art
- * nicht, steht das Feld blass da -- es bleibt aber stehen, damit die Zahl
- * nicht verloren geht, wenn man die Art wieder wechselt. `phiImmer`: in den
- * Analysen rechnet der ungerissene Teil immer mit E_cm/(1+φ), dort wirkt φ
- * bei jeder Art.
- */
-/**
  * Rechenarten -- oder Betongesetze, die wie sie heissen -- als Stellungen
  * eines Schalters: ihr Bild, der kurze Name, der lange im Titel. Das Bild
  * zeigt, wie die Art den Beton rechnet (sinnbilder.js, `rechenart-…`).
@@ -537,12 +529,80 @@ export function rechenartStellungen(liste) {
   })), 'rechenart');
 }
 
-function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = false } = {}) {
-  const wahlen = katalog('rechenwahl');
-  const liste = wahlen[arten] || [];
-  const art = liste.find((a) => a.wert === ziel.rechenart);
-  // Im Schalter stehen die kurzen Namen, der lange im Titel der Stellung.
+/**
+ * Je Material eine Zeile: sein Name und womit es rechnet, mit Bemessungs-
+ * oder mit charakteristischen Werten -- mit `mitGesetz` beim Beton dazu sein
+ * Gesetz, wie in der Tragsicherheit der Querschnittsanalyse. So wählt seit
+ * 2026-11-20 jedes Modul (Benutzer: die Darstellung der Querschnittsanalyse
+ * überall); bis dahin galt ausser dort ein Wertesatz für alle Materialien.
+ *
+ * `ziel` hält `werkstoffsaetze` und `betongesetze`, je Kennung eines
+ * Materials seine Wahl; was eines ohne eigene wählt, sagt der Kern
+ * (`feldangabe(klasse, …).vorgabe`). `materialien` sind die Kennungen der
+ * Materialien des Bauteils -- `null`, solange der Kern sie nicht kennt, dann
+ * sagt `wartet` warum; leer sagt es `leer`. Eine Wahl schreibt nur die
+ * Materialien, die das Bauteil jetzt hat: die eines ausgewechselten fällt
+ * dabei weg und kehrt mit ihm nicht still zurück.
+ */
+export function werkstoffzeilen(ziel, aendern, {
+  materialien, klasse, mitGesetz = false, wartet = 'Der Kern sucht die Materialien …',
+  leer = 'Noch kein Material im Querschnitt.',
+}) {
+  const kopf = el('span.spaltenkopf', { text: 'Werte je Material' });
+  if (materialien === null) return el('div.werkstoffzeilen', {}, [kopf, el('div.leer', { text: wartet })]);
+  if (!materialien.length) return el('div.werkstoffzeilen', {}, [kopf, el('div.leer', { text: leer })]);
+
+  const gewaehlt = (feld, kennung) => ziel[feld]?.[kennung] ?? feldangabe(klasse, feld).vorgabe;
+  const setzen = (feld, kennung, wert) => aendern((x) => {
+    const bisher = x[feld] || {};
+    x[feld] = Object.fromEntries(materialien
+      .filter((k) => k === kennung || k in bisher)
+      .map((k) => [k, k === kennung ? wert : bisher[k]]));
+  });
+  // Im Schalter die kurzen Namen, die langen in den Titeln seiner Stellungen.
   const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung }));
+  const zeile = (kennung) => {
+    const material = eintragVon(kennung);
+    if (!material) return null;
+    const beton = material.art === 'beton';
+    return el('div.werkstoffzeile', { class: beton ? 'ist-beton' : 'ist-stahl' }, [
+      el('span.werkstoffname', { text: material.name || material.sorte }),
+      wahlSchalter({
+        werte: kurz(katalog('rechenwahl', 'werkstoffsaetze')),
+        gewaehlt: gewaehlt('werkstoffsaetze', kennung),
+        titel: beton ? 'Bemessungswert f_cd oder charakteristischer f_ck'
+          : 'Bemessungswert f_yd oder charakteristischer f_yk',
+        setzen: (v) => setzen('werkstoffsaetze', kennung, v),
+      }),
+      beton && mitGesetz ? wahlSchalter({
+        werte: rechenartStellungen(katalog('querschnittsanalyse', 'betongesetze')),
+        gewaehlt: gewaehlt('betongesetze', kennung),
+        titel: 'Spannungs-Dehnungs-Beziehung des Betons',
+        setzen: (v) => setzen('betongesetze', kennung, v),
+      }) : null,
+    ]);
+  };
+  return el('div.werkstoffzeilen', {}, [kopf, ...materialien.map(zeile)]);
+}
+
+/**
+ * Die Felder einer Rechenwahl: Kriechzahl φ, Rechenart und die Werte je
+ * Material -- in jedem Kapitel und in jeder Analyse dieselben. `ziel` trägt
+ * die Felder `kriechzahl`, `rechenart` und `werkstoffsaetze`, `aendern`
+ * ändert es im Projekt; `werkstoffe` sagt, welche Materialien das Bauteil
+ * hat und zu welcher Klasse des Kerns die Wahl gehört (`werkstoffzeilen`).
+ * `arten` sagt, welche Rechenarten gelten: `rechenarten`, bei den
+ * Stahlspannungen `spannungsarten`, beim Knicken und in den Analysen
+ * `faserarten` (ohne Handrechnung), bei der Verformung des Knickens
+ * `verformungsarten` (nur präzise). Wirkt φ bei der gewählten Art
+ * nicht, steht das Feld blass da -- es bleibt aber stehen, damit die Zahl
+ * nicht verloren geht, wenn man die Art wieder wechselt. `phiImmer`: in den
+ * Analysen rechnet der ungerissene Teil immer mit E_cm/(1+φ), dort wirkt φ
+ * bei jeder Art.
+ */
+function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = false, werkstoffe }) {
+  const liste = katalog('rechenwahl', arten) || [];
+  const art = liste.find((a) => a.wert === ziel.rechenart);
   const phi = mitKopf(kriechzahlName('rechenwahl'), zahlfeld({
     wert: ziel.kriechzahl ?? 0, schritt: 0.1, leer: 0, angabe: feldangabe('rechenwahl', 'kriechzahl'),
     titel: phiImmer
@@ -551,26 +611,19 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
     beiAenderung: (v) => aendern((x) => { x.kriechzahl = v; }),
   }));
   if (art && !art.mit_kriechzahl && !phiImmer) phi.classList.add('ist-ohne-wirkung');
-  return [
-    phi,
-    mitKopf('Werte', wahlSchalter({
-      werte: kurz(wahlen.werkstoffsaetze),
-      gewaehlt: ziel.werkstoffsatz,
-      titel: 'Bemessungswerte (f_cd, f_yd) oder charakteristische (f_ck, f_yk)',
-      setzen: (v) => aendern((x) => { x.werkstoffsatz = v; }),
-    })),
-    mitKopf('Rechenart', wahlSchalter({
-      werte: rechenartStellungen(liste),
-      gewaehlt: ziel.rechenart,
-      titel: 'Wie gerechnet wird',
-      setzen: (v) => aendern((x) => { x.rechenart = v; }),
-    })),
-  ];
+  const rechenart = mitKopf('Rechenart', wahlSchalter({
+    werte: rechenartStellungen(liste),
+    gewaehlt: ziel.rechenart,
+    titel: 'Wie gerechnet wird',
+    setzen: (v) => aendern((x) => { x.rechenart = v; }),
+  }));
+  rechenart.classList.add('ist-rechenart');
+  return [phi, rechenart, werkstoffzeilen(ziel, aendern, werkstoffe)];
 }
 
 /**
  * Eine Zeile «Rechenwahl» unter einem Kapitelkopf: ein kleiner Titel, darunter
- * die drei Felder. Beim Knicken stehen zwei solche Zeilen, mit «Verformung»
+ * die Felder. Beim Knicken stehen zwei solche Zeilen, mit «Verformung»
  * und «Widerstand» als Titel. `aendern` bekommt eine Funktion, die die Wahl
  * selbst ändert.
  */
@@ -626,17 +679,19 @@ function spannungsZeile(eintrag, index, ort) {
   }
   // Womit gerechnet wird -- je Analyse, wie in den Kapiteln, aber ohne
   // Handrechnung: eine Linie rechnet die Normalkraft genau.
-  const [phi, werte, rechenart] = rechenwahlFelder(
-    k, aendern, { arten: 'faserarten', phiImmer: true });
+  const [phi, rechenart, werte] = rechenwahlFelder(k, aendern, {
+    arten: 'faserarten', phiImmer: true,
+    werkstoffe: { ...ort.werkstoffe(eintrag), klasse: ort.vorlage },
+  });
 
   // Beschriftung über dem Feld, nicht daneben: so bleibt das Raster der
-  // Zeile dasselbe, gleich welche Art es ist. Werte und Rechenart je zwei
-  // Spalten breit in einer Zeile darunter -- in einer wären sie abgeschnitten.
+  // Zeile dasselbe, gleich welche Art es ist. Rechenart und Werte je Material
+  // darunter, über die ganze Breite -- in einer Zeile wären sie abgeschnitten.
   return fallzeile({
     fall: k, aendern, was: 'Analyse', nameTitel: 'Bezeichnung der Analyse',
     liste: { kennung: eintrag.kennung, pfad: 'spannungsfaelle', index },
     zahlen: [...spalten, phi, ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; }))],
-    unten: [werte, rechenart],
+    unten: [rechenart, werte],
     entfernenTitel: 'Analyse entfernen',
     entfernen: () => eintragAendern(eintrag.kennung, (e) => { e.spannungsfaelle.splice(index, 1); }),
     klasse: '.ist-spannung',

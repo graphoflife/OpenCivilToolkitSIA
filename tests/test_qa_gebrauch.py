@@ -16,7 +16,7 @@ import unittest
 from opencivil.nachweis.gebrauchsebene import gebrauchsebene
 from opencivil.nachweis.mindestbewehrung import zulaessige_stahlspannung
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.spannungsbegrenzung import VORGABE
 from opencivil.nachweis.zustand2 import gerissen
 from opencivil.projekt import Projekt, ProjektFehler, QAGebrauchswahl
@@ -103,7 +103,7 @@ class TestVerfehlteEbene(unittest.TestCase):
     das, statt eine verfehlte Ebene abzuhaken.
     """
 
-    BLOCK = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.BLOCK)
+    BLOCK = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), art=Rechenart.BLOCK)
 
     def stuetze(self):
         """400 × 400, je drei ⌀16 oben und unten."""

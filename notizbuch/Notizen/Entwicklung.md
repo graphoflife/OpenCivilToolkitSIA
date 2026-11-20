@@ -7,6 +7,54 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Rechenwerte je Material, in jedem Modul
+
+Bis dahin wählte nur die Tragsicherheit der Querschnittsanalyse ihre Werte
+je Material. Jedes andere Modul hatte einen Wertesatz für alle: die
+Tragsicherheit, das Knicken, die Stahlspannungen und die
+Spannung-Dehnung-Analysen der Platte, dieselben Kapitel der Analyse und
+E_eq im Balkensystem. Der Benutzer wollte die Darstellung der
+Querschnittsanalyse überall (2026-11-20).
+
+Ein Modell im Kern: `Wertesaetze` in `querschnitt/gesetzwahl.py`, je
+Baustoff sein Satz, unveränderlich und vergleichbar -- eine Wahl ist
+Schlüssel von Zwischenspeichern, und zwei gleiche Wahlen teilen sich eine
+Linie. Haben alle Baustoffe denselben Satz, ist es dieselbe Wahl wie ein
+Satz für alle (`Wertesaetze.je`). Ohne das rechneten die Kennzahlen, die
+fest mit Bemessungswerten wählen, eine zweite Linie neben der gleichen der
+Tragsicherheit, und der Bericht hatte einen Abschnitt mehr.
+
+Im Projekt hält jedes Modul `werkstoffsaetze`, je Kennung eines Materials
+seinen Satz (`je_material` in `projekt/lesen.py`). Eine Zuordnung, keine
+Liste: zwei Wahlen für dasselbe Material gibt es so nicht, und die Prüfung
+dafür fiel weg, mit ihr `WerkstoffwahlEintrag`. Was ein Material ohne
+eigene Wahl nimmt, steht am Feld -- Bemessungswerte, im Gebrauch
+charakteristische -- und geht als `vorgabe` in den Katalog. Die
+Querschnittsanalyse hält dazu `betongesetze`, je Beton Parabel oder Block.
+
+Gemischt heisst ein Widerstand R, weder Rd noch Rk (nach Vorgabe, nicht
+nachgeschlagen), und die Rechenwahl der Herleitung nennt jeden Baustoff:
+«C30/37: charakteristisch f_ck, B500B: Bemessungswerte f_yd». Mit einem
+Satz für alle bleibt die Zeile, wie sie war; der Bericht des Beispiels ist
+Zeichen für Zeichen gleich. «Jeder Nachweis» hat dafür eine Platte
+«Gemischt».
+
+Die Rechenart bleibt je Modul. Nur die Tragsicherheit der Analyse wählt das
+Gesetz je Beton, wie bisher: eine Platte hat ohnehin einen Beton, und im
+Gebrauch und beim Knicken gehören Handrechnung und elastisch zum ganzen
+Querschnitt, nicht zu einem Baustoff.
+
+In der Oberfläche baut `werkstoffzeilen` (nachweise.js) die Zeilen für
+alle Module: Name, Schalter «Bemessung | charakteristisch», in der
+Tragsicherheit der Analyse beim Beton das Gesetz darunter. Welche
+Materialien es sind, sagt der Ort: die Platte ihre beiden Felder, die
+Analyse der Kern mit ihrer Zeichnung, E_eq die Platte oder Analyse, aus
+der sein Querschnitt kommt. Kommt die Antwort zu einer Zeichnung, zeichnet
+jedes offene Fenster neu -- auch der Querschnitt eines Balkensystems wartet
+auf sie. Eine Wahl schreibt nur die Materialien, die das Bauteil jetzt hat:
+sonst kehrte die Wahl eines ausgewechselten Materials still zurück, sobald
+man es wieder wählt.
+
 ## 2026-11-20 · Die Decke sagt jede Meldung einmal
 
 Die Decke meldete je Fall: bei vier Lastfällen und drei Kombinationen stand

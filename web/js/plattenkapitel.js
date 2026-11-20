@@ -47,7 +47,7 @@ const HILFE = {
     zeilen: [
       ['M-N', 'Resistenzlinie nach Rechenwahl; Vorgabe Handrechnung: Block 0.85·x, Druckstahl weggelassen'],
       ['V', 'ohne Bügel k_d·τ_cd·d_v mit m_R aus derselben Linie, mit Bügeln Fachwerk bei günstigster Neigung'],
-      ['Werte', 'M-N nach Rechenwahl: Bemessung (f_cd, f_yd → M_Rd) oder charakteristisch (f_ck, f_yk → M_Rk); V mit τ_cd, f_yd'],
+      ['Werte', 'M-N je Material nach Rechenwahl: Bemessung (f_cd, f_yd → M_Rd), charakteristisch (f_ck, f_yk → M_Rk), gemischt M_R; V mit τ_cd, f_yd'],
       ['φ', 'nach Rechenwahl, nur präzise → E_c,eff = E_cm / (1 + φ)'],
       ['Drillung', 'nicht gerechnet – ein Drillmoment selbst zum Moment zählen: m_xd + |m_xyd| ≤ m_xRd (SIA 262:2025, 4.3.2.6)'],
     ],
@@ -64,7 +64,7 @@ const HILFE = {
   sproede: {
     zeilen: [
       ['Weg', 'M_Rd bei N = 0 aus der Linie der Tragsicherheit gegen Rissmoment des ungerissenen Querschnitts'],
-      ['Werte', 'M_Rd wie die Tragsicherheit (charakteristisch: M_Rk), M_Riss Mittelwert (f_ctm)'],
+      ['Werte', 'M_Rd wie die Tragsicherheit (charakteristisch: M_Rk, gemischt: M_R), M_Riss Mittelwert (f_ctm)'],
       ['φ', '–'],
     ],
     formel: 'M_Rd(N_Ed = 0) ≥ M_Riss = f_ct,eff · h²·b / 6',
@@ -149,12 +149,14 @@ const VERFORMUNG = {
  * unter dem Titel eines Fensters, `hilfe` hinter seinem Fragezeichen.
  * `marke()` und `hinweis(e, feld)` stehen vor und hinter den Zeilen mit
  * einem Schalter, `rechenwerte` unter Duktilität und sprödem Versagen.
- * `gebrauch` und `knick` sind, was die Stahlspannungen und das Knicken beim
- * Bauteil anders zeigen.
+ * `werkstoffe(e)` sagt, für welche Materialien eine Rechenwahl ihre Werte
+ * wählt (`werkstoffzeilen` in nachweise.js). `gebrauch` und `knick` sind,
+ * was die Stahlspannungen und das Knicken beim Bauteil anders zeigen.
  */
 export const PLATTE = {
   klasse: 'querschnitt',
   vorlage: 'spannungsfall',
+  werkstoffe: (q) => ({ materialien: plattenmaterialien(q) }),
   richtung: (k, setzen) => richtungsWahl(k.richtung || 'x', setzen, ['x', 'y']),
   raender: () => ['oben', 'unten'],
   bezug: jeB,
@@ -190,6 +192,7 @@ export const PLATTE = {
   // Die Lastfälle unter Gebrauchslast: Moment und Normalkraft je b.
   gebrauch: {
     liste: 'gebrauchsliste',
+    wahl: 'gebrauchswahl',
     // Woraus «aus der Tragsicherheit» ableitet: die Einwirkungen der Platte.
     aus: 'kombinationen',
     vorlage: 'gebrauchsfall',
@@ -206,6 +209,15 @@ export const PLATTE = {
     ],
   },
 };
+
+/**
+ * Die Materialien einer Platte: ihr Beton und, wenn sie einen hat, ihr
+ * Stahl -- die beiden Felder, die sie wählt, in der Folge des Kerns
+ * (`QuerschnittEintrag.materialien`). Ohne Platte keines.
+ */
+export function plattenmaterialien(q) {
+  return q ? [q.beton, q.stahl].filter(Boolean) : [];
+}
 
 /** Ob in x Bewehrung liegt -- Grund oder Zulage einer x-Lage. */
 function xBewehrt(querschnitt) {
@@ -248,7 +260,8 @@ function tragsicherheitInhalt(querschnitt) {
   const aendernAn = (veraenderer) => eintragAendern(querschnitt.kennung, veraenderer);
   return [
     rechenwahlZeile('Rechenwahl', querschnitt.tragsicherheit_wahl,
-      (veraenderer) => aendernAn((q) => veraenderer(q.tragsicherheit_wahl))),
+      (veraenderer) => aendernAn((q) => veraenderer(q.tragsicherheit_wahl)),
+      { werkstoffe: { ...PLATTE.werkstoffe(querschnitt), klasse: 'rechenwahl' } }),
     querschnitt.kombinationen.length
       ? fallkopf([['M_{Ed}', 'kNm'], ['N_{Ed}', 'kN'], ['V_{Ed}', 'kN/m']])
       : null,

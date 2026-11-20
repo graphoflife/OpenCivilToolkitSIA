@@ -305,8 +305,8 @@ class ModulAusPlatte:
         beton = self.platte.beton
         return [Eingabebezug("h", self.platte.id_von("h")),
                 Eingabebezug("b", self.platte.id_breite(Richtung.X)),
-                *betonbezuege(wahl.satz, beton), Eingabebezug("f_ctm", beton.id_von("f_ctm")),
-                *lagenbezuege(self.platte.posten_in_richtung(Richtung.X), wahl.satz)]
+                *betonbezuege(wahl.satz(beton), beton), Eingabebezug("f_ctm", beton.id_von("f_ctm")),
+                *lagenbezuege(self.platte.posten_in_richtung(Richtung.X), wahl)]
 
     def paar(self, M: float, wert: Callable[[str], float],
              wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]:

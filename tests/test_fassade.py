@@ -13,7 +13,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart
 from opencivil.projekt import (
     GebrauchsfallEintrag, KnickEintrag, KombinationEintrag, Projekt, ProjektFehler,
     RechenwahlEintrag,
@@ -79,7 +79,7 @@ class TestAnlegen(unittest.TestCase):
         """Wie in einer Datei: was fehlt, bleibt, wie es die Vorlage hat."""
         q = einfach().platte("P", tragsicherheit_wahl={"rechenart": "parabel"})
         self.assertIs(q.tragsicherheit_wahl.rechenart, Rechenart.PARABEL)
-        self.assertIs(q.tragsicherheit_wahl.werkstoffsatz, Werkstoffsatz.BEMESSUNG)
+        self.assertEqual(q.tragsicherheit_wahl.werkstoffsaetze, {})
 
     def test_ein_teil_als_eintrag(self):
         wahl = RechenwahlEintrag(rechenart="parabel")

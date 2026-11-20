@@ -107,9 +107,10 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual(p.aufbauen().feld("qa_knicken"), {})
 
     def test_vorgaben_wie_bei_der_platte(self):
-        _, a = stuetze()
-        self.assertEqual(a.knicken_wahl_verformung.wahl, VERFORMUNG)
-        self.assertEqual(a.knicken_wahl_widerstand.wahl, WIDERSTAND)
+        p, a = stuetze()
+        stoffe = p.aufbauen().baustoffe
+        self.assertEqual(a.knicken_wahl_verformung.wahl(stoffe), VERFORMUNG)
+        self.assertEqual(a.knicken_wahl_widerstand.wahl(stoffe), WIDERSTAND)
 
 
 if __name__ == "__main__":

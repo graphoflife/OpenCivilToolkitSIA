@@ -44,12 +44,12 @@ from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste, Gebrauchswahl,
-    KnickEintrag, Querschnittsangaben, SpannungsfallEintrag, groesste_neigung,
+    JeMaterial, KnickEintrag, Querschnittsangaben, SpannungsfallEintrag, groesste_neigung,
     kleinste_neigung, spannungsfallnamen,
 )
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.core.einheiten import KN, KNM, MM, MM2
-from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, ort_von
+from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, je_material, ort_von
 from opencivil.projekt.netz import Netz, neue_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
@@ -279,28 +279,6 @@ class QAKnickEintrag(KnickEintrag):
 
 
 @dataclass
-class WerkstoffwahlEintrag(Beschreibung):
-    """
-    Mit welchen Werten ein Material in dieser Analyse rechnet.
-
-    ``satz``: Bemessungs- oder charakteristische Werte -- das legt fest, wo
-    die Plateaus liegen (``f_cd`` oder ``f_ck``, ``f_yd`` oder ``f_yk``).
-    ``betongesetz``: beim Beton die Parabel-Rechteck-Beziehung oder der
-    vereinfachte Spannungsblock 0.85·x.
-    """
-
-    material: str
-    satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
-    betongesetz: Rechenart = einer_von((Rechenart.PARABEL, Rechenart.BLOCK), Rechenart.PARABEL)
-    """Die beiden genauen Rechenarten -- die Parabel zuerst, sie ist die Vorgabe."""
-
-    @property
-    def rechenwahl(self) -> Rechenwahl:
-        """Fuer die Rechnung: Wertesatz und Rechenart, ohne Kriechen -- der Bruchzustand."""
-        return Rechenwahl(satz=self.satz, art=self.betongesetz)
-
-
-@dataclass
 class QASpannungsfallEintrag(SpannungsfallEintrag):
     """
     Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts -- dieselben
@@ -358,7 +336,7 @@ class Elemente:
 
 
 @dataclass
-class QuerschnittsanalyseEintrag(Querschnittsangaben):
+class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     """
     Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
     Was er mit der Platte gleich angibt, steht in der Grundlage
@@ -373,8 +351,21 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
     stablinien: List[StablinieEintrag] = field(default_factory=list)
     schubwaende: List[SchubwandEintrag] = field(default_factory=list)
     hilfslinien: List[HilfslinieEintrag] = field(default_factory=list)
-    werkstoffwahl: List[WerkstoffwahlEintrag] = field(default_factory=list)
-    """Je Material eine Wahl; fehlt eine, gelten die Vorgaben."""
+    werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)
+    """
+    Je Material die Werte der Tragsicherheit: Bemessungs- oder
+    charakteristische -- das legt fest, wo die Plateaus liegen (``f_cd`` oder
+    ``f_ck``, ``f_yd`` oder ``f_yk``). Duktilitaet und sproedes Versagen
+    rechnen am selben Querschnitt.
+    """
+
+    betongesetze: Dict[str, Rechenart] = je_material(
+        Rechenart.PARABEL, (Rechenart.PARABEL, Rechenart.BLOCK))
+    """
+    Je Beton das Gesetz der Tragsicherheit: die Parabel-Rechteck-Beziehung
+    oder der vereinfachte Spannungsblock 0.85·x -- die Parabel zuerst, sie
+    ist die Vorgabe.
+    """
 
     lastfaelle: List[QALastfallEintrag] = field(default_factory=list)
 
@@ -410,12 +401,15 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
 
-    def wahl(self, material: str) -> WerkstoffwahlEintrag:
-        """Die Wahl fuer dieses Material -- die Vorgaben, wenn keine dasteht."""
-        for w in self.werkstoffwahl:
-            if w.material == material:
-                return w
-        return WerkstoffwahlEintrag(material=material)
+    def rechenwahl(self, stoffe: Mapping[str, Any]) -> Dict[str, Rechenwahl]:
+        """
+        Fuer die Rechnung je Baustoff seine Wahl im Bruchzustand, ohne
+        Kriechen: die Wertesaetze aller ``stoffe`` -- nach ihrer Kennung im
+        Projekt -- und beim Beton sein Gesetz.
+        """
+        saetze = self.wertesaetze(stoffe)
+        return {b.id: Rechenwahl(saetze=saetze, art=self.von("betongesetze", kennung))
+                for kennung, b in stoffe.items()}
 
     def materialien(self) -> List[str]:
         """
@@ -619,24 +613,6 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
             neu.append(self.schubwand(an(w["von"]), an(w["bis"]), dicke=w["dicke"],
                                       stahl=stahl).kennung)
         return neu
-
-    def regeln(self, wo: str) -> None:
-        """
-        Was erst das Rechnen braucht, wie bei der Platte
-        (:meth:`QuerschnittEintrag.regeln`): eine abgelegte Analyse
-        mit einer unmoeglichen Grenze soll sich oeffnen und korrigieren
-        lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c < 0 und
-        x/d = 0.9.
-        """
-        # Je Material eine Wahl. Zwei fuer dasselbe -- und welche gilt, hinge
-        # davon ab, wer liest: der Aufbau nahm die letzte, die Maske die erste.
-        gewaehlt = set()
-        for w in self.werkstoffwahl:
-            if w.material in gewaehlt:
-                raise ProjektFehler(
-                    f"für das Material '{w.material}' stehen zwei "
-                    f"Werkstoffwahlen – es braucht genau eine.", wo=wo)
-            gewaehlt.add(w.material)
 
     def fallnamen(self) -> List[Fallnamen]:
         """Die Listen, deren Namen sich unterscheiden muessen -- wie bei der Platte."""

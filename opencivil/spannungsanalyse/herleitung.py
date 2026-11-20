@@ -104,8 +104,12 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
             "ansteigenden Ast eine Nullstelle. So weit kommt es mit dem kriechweichen "
             "Modul und charakteristischen Werten; mit k_σ = 1 ist der Beton bis f_c "
             "bei ε_c1d linear.")
-    if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
+    satz = wahl.saetze.einheitlich
+    if satz is Werkstoffsatz.CHARAKTERISTISCH:
         p.text("Mit charakteristischen Werten: f_ck statt f_cd, f_yk statt f_yd.")
+    elif satz is None:
+        p.text("Mit gemischten Werten: jeder Baustoff rechnet mit seinem Wertesatz, wie "
+               "gewählt. Ein Widerstand heisst darum weder Rd noch Rk, sondern schlicht R.")
 
     h = paar.tiefe(w, ein)
     paar.herleitung_riss(p, w, linie, ein, h)
@@ -120,7 +124,7 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
         "Tragsicherheit, wenn sie dieselbe Rechenwahl trifft.")
     # Je Stahl seine Fliessdehnung -- unten und oben duerfen verschiedene liegen.
     for stahl in paar.staehle:
-        f_s, E_s = werte[stahl.id_von(wahl.satz.stahl)], werte[stahl.id_von("E_s")]
+        f_s, E_s = werte[stahl.id_von(wahl.satz(stahl).stahl)], werte[stahl.id_von("E_s")]
         name, symbol = (("eps_y", r"\varepsilon_{y}") if len(paar.staehle) == 1 else
                         (f"eps_y_{kennung_aus(stahl.id)}",
                          mit_index(r"\varepsilon_{y}", stahl.symbol_index)))

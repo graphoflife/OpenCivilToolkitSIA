@@ -27,10 +27,10 @@ oder eine Querschnittsanalyse.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import Groesse
-from opencivil.material.basis import Baustoffart
+from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.projekt.balkensystem import (
     EINHEIT_DER_LAST, BalkensystemEintrag, Knotenlastart, Profilachse, StabmaterialEintrag,
 )
@@ -51,7 +51,9 @@ from opencivil.stabwerk.modell import (
 from opencivil.stabwerk.system import Meldung
 
 from opencivil.projekt.aufbau.faelle import beiwerte, doppelte_kennungen, faelle_pruefen, ohne_lastfall
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, Grund, Unfertiges, materialgrund
+from opencivil.projekt.aufbau.kern import (
+    Aufbau, Bauteil, Grund, Unfertiges, materialgrund, stoffe_von,
+)
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -317,13 +319,15 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
         return AusPlatte(kennung=q.kennung, name=q.name, herkunft=f"Platte «{bauteil.name}»",
                          bezug=q.bezug,
                          quelle={"b": bauteil.id_von("b"), "h": bauteil.id_von("h")},
-                         eq=_modulfrage(q, ModulAusPlatte(bauteil)))
+                         eq=_modulfrage(q, ModulAusPlatte(bauteil),
+                                        stoffe_von(aufbau, bauteil.baustoffe)))
     analyse = bauteil
     return AusAnalyse(kennung=q.kennung, name=q.name,
                       herkunft=f"Querschnittsanalyse «{analyse.name}»", bezug=q.bezug,
                       quelle={"I": analyse.id_von("I_y"),
                               **{k: analyse.id_von(k) for k in ("A", "I_y", "I_z", "I_T", "I_yz")}},
-                      eq=_modulfrage(q, ModulAusAnalyse(analyse)),
+                      eq=_modulfrage(q, ModulAusAnalyse(analyse),
+                                     stoffe_von(aufbau, analyse.baustoffe)),
                       flaechen=tuple(f.punkte for f in analyse.flaechen))
 
 
@@ -332,9 +336,15 @@ def _rechnet_nicht(welche: str, unfertig: Unfertiges) -> str:
     return f"die {welche} «{unfertig.name}» rechnet nicht ({unfertig.grund})."
 
 
-def _modulfrage(q: StabquerschnittBasis, quelle) -> Optional[Modulfrage]:
-    """Die Frage nach dem E_eq eines Querschnitts -- nur, wenn er es nehmen soll."""
-    return Modulfrage(quelle, q.eq.N, q.eq.M, q.eq.wahl) if q.e_modul == "e_eq" else None
+def _modulfrage(q: StabquerschnittBasis, quelle,
+                stoffe: Mapping[str, Baustoff]) -> Optional[Modulfrage]:
+    """
+    Die Frage nach dem E_eq eines Querschnitts -- nur, wenn er es nehmen soll;
+    mit den Werten je Material der Platte oder Analyse, aus der er kommt.
+    """
+    if q.e_modul != "e_eq":
+        return None
+    return Modulfrage(quelle, q.eq.N, q.eq.M, q.eq.wahl(stoffe))
 
 
 def _paare(eintrag: Any, modell: Modell, aufbau: Aufbau, kennwerte: Sequence[Materialkennwert]

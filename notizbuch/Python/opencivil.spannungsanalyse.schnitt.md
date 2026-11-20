@@ -1,5 +1,5 @@
 ---
-erzeugt: f6fa4c349f75
+erzeugt: 3e7e170e1b59
 art: modul
 tags: [modul]
 ---
@@ -41,9 +41,9 @@ der rechte Rand. Kippt die Nulllinie, gelten oben und unten senkrecht zu ihr.
 
 ## WOMIT GERECHNET WIRD
 
-Je Analyse eine Rechenwahl wie bei der Platte -- Kriechzahl, Wertesatz,
-Rechenart --, fuer jeden Werkstoff des Querschnitts dieselbe. Die
-Werkstoffwahl der Tragsicherheit gilt hier nicht. Staebe in derselben Tiefe,
+Je Analyse eine Rechenwahl wie bei der Platte -- Kriechzahl, Rechenart und
+je Werkstoff sein Wertesatz; die Rechenart gilt fuer jeden Beton des
+Querschnitts. Die Wahl der Tragsicherheit gilt hier nicht. Staebe in derselben Tiefe,
 aus demselben Stahl, werden zu einer Lage: sie haben dieselbe Dehnung.
 Zerlegt wird in so viele Streifen wie die Platte in Fasern
 ([[opencivil.querschnitt.fasern#Konstanten|FASERN]]), dazu die Grenzen an jeder

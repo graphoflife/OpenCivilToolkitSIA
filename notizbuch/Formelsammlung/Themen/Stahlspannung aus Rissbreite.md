@@ -1,5 +1,5 @@
 ---
-erzeugt: ca7a9edd7505
+erzeugt: 11fafec64941
 art: thema
 tags: [thema]
 ---
@@ -35,6 +35,8 @@ Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε\_c2d nichts. Unte
 Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, wo der Stahl liegt.
 
 Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in der Handrechnung zählt der Beton auch dort, wo der Stahl liegt.
+
+Zweitens die Werkstoffgesetze: jeder Baustoff rechnet mit seinen Werten, wie oben gewählt – charakteristisch ohne Teilsicherheitsbeiwerte, mit Bemessungswerten mit ihnen. Ein Stahl mit f\_yd hat sein Plateau dort: eine Stahlspannung darüber gibt es bei ihm nicht, und eine Grenze darüber kann nicht überschritten werden.
 
 Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf (SIA 262:2025, 4.1.4.1.4), die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
 

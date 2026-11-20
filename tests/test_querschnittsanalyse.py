@@ -54,8 +54,10 @@ class TestBeschreibung(unittest.TestCase):
     def test_materialien_und_wahl(self):
         a = self.neu()
         self.assertEqual(a.materialien(), ["b1", "s1"])
-        self.assertEqual(a.wahl("b1").satz, "bemessung")
-        self.assertEqual(a.wahl("b1").betongesetz, "parabel")
+        # Ohne eigene Wahl die Vorgabe: Bemessungswerte und die Parabel.
+        self.assertEqual((a.werkstoffsaetze, a.betongesetze), ({}, {}))
+        self.assertEqual(a.von("werkstoffsaetze", "b1"), "bemessung")
+        self.assertEqual(a.von("betongesetze", "b1"), "parabel")
 
     def test_doppelte_lastfaelle(self):
         a = self.neu()
@@ -178,9 +180,8 @@ if __name__ == "__main__":
 
 import math
 
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze
-from opencivil.projekt import WerkstoffwahlEintrag
 from opencivil.web import dienst
 
 
@@ -311,15 +312,14 @@ class TestBiegung(unittest.TestCase):
 
     def test_charakteristisch_traegt_mehr(self):
         def grad(satz):
-            p = projekt(werkstoffwahl=[WerkstoffwahlEintrag("b1", satz=satz),
-                                       WerkstoffwahlEintrag("s1", satz=satz)])
+            p = projekt(werkstoffsaetze={"b1": satz, "s1": satz})
             p.querschnittsanalysen[0].lastfall("Feld", M_y_Ed=150.0)
             return urteile(p.rechnen(), "M-N")["Feld"].erfuellungsgrad.si
         self.assertGreater(grad("charakteristisch"), grad("bemessung"))
 
     def test_spannungsblock_nahe_der_parabel(self):
         def grad(gesetz):
-            p = projekt(werkstoffwahl=[WerkstoffwahlEintrag("b1", betongesetz=gesetz)])
+            p = projekt(betongesetze={"b1": gesetz})
             p.querschnittsanalysen[0].lastfall("Feld", N_Ed=-800.0, M_y_Ed=150.0)
             return urteile(p.rechnen(), "M-N")["Feld"].erfuellungsgrad.si
         self.assertAlmostEqual(grad("block") / grad("parabel"), 1.0, delta=0.05)
@@ -336,8 +336,8 @@ class TestGesetzeWieDiePlatte(unittest.TestCase):
         for satz in Werkstoffsatz:
             for art in (Rechenart.PARABEL, Rechenart.BLOCK):
                 with self.subTest(satz=satz.value, art=art.value):
-                    p = projekt(werkstoffwahl=[WerkstoffwahlEintrag(
-                        "b1", satz=satz.value, betongesetz=art.value)])
+                    p = projekt(werkstoffsaetze={"b1": satz.value},
+                                betongesetze={"b1": art.value})
                     aufbau = p.aufbauen()
                     analyse = aufbau.querschnittsanalysen["a1"]
                     loesung = aufbau.werk.loese(
@@ -346,7 +346,7 @@ class TestGesetzeWieDiePlatte(unittest.TestCase):
                     werkstoffe, index = analyse.werkstoffe(wert, analyse.rechenwahl)
                     stoff = aufbau.baustoffe["b1"]
                     w = lambda k: abs(wert(stoff.id_von(k)))
-                    platte = gesetze(Rechenwahl(satz=satz, art=art), Betonkennwerte(
+                    platte = gesetze(Rechenwahl(saetze=Wertesaetze.alle(satz), art=art), Betonkennwerte(
                         f_c=w(satz.beton), E_c=w("E_cm"), eps_c1d=w("eps_c1d"),
                         eps_c2d=w("eps_c2d"))).beton
                     self.assertEqual(werkstoffe[index(stoff)].gesetz, platte)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 9d3320e39a32
+erzeugt: e8b8f3dca142
 art: modul
 tags: [modul]
 ---
@@ -173,6 +173,7 @@ der Zusammenlegung waren (2026-10-17).
 - `stahlindex: str = 's'` – Der Index an ε_s und σ_s -- bei der Platte «{s,x}».
 - `messung: str = ''` – Woran gemessen wird: der zweite Satz der Herleitung.
 - `regel_der_rissbreite: str = ''` – Mit welchem Durchmesser die Grenze aus der Rissbreite gilt, als Satz.
+- `baustoffe: Tuple[Baustoff, ...] = ()` – Die Baustoffe, mit denen gerechnet wird -- die Rechenwahl nennt sie, wenn ihre Wertesaetze verschieden sind.
 
 #### Stahlspannungsort.basis
 
@@ -545,7 +546,7 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 
 ## Konstanten
 
-- `VORGABE = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.ELASTIS…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege f_cm hoeher als f_ck -- f_ck liegt sicher (`notizbuch/Notizen/TODO.md`).
+- `VORGABE = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), a…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege f_cm hoeher als f_ck -- f_ck liegt sicher (`notizbuch/Notizen/TODO.md`).
 - `VERGLEICH_BEIM_FLIESSEN = 'Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, währe…` – Was verglichen wird, wenn die Bewehrung fliesst -- siehe Dateikopf.
 
 ## Braucht

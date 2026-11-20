@@ -82,6 +82,7 @@ class Lage:
     """Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift."""
 
     satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    """Der Wertesatz ihres Stahls -- ``f_yd`` oder ``f_yk``."""
 
     @property
     def symbol_flaeche(self) -> str:
@@ -165,7 +166,8 @@ class Handrechnung:
         self, *,
         h: float, b: float, f_cd: float, eps_c2d: float,
         unten: Lage, oben: Lage, basis: str,
-        beton_index: str = "", satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG,
+        beton_index: str = "", beton_satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG,
+        index: str = "Rd",
     ) -> None:
         self.h = h
         self.b = b
@@ -173,16 +175,19 @@ class Handrechnung:
         self.eps_c2d = abs(eps_c2d)
         self.unten = unten
         self.oben = oben
-        self.satz = satz
-        #: Wie die Eckpunkte heissen: ``R_d`` -- oder ``R_k`` mit
-        #: charakteristischen Werten. Die Namen der Zwischenwerte bleiben.
-        self.R = satz.widerstandsindex
+        #: Der Wertesatz des Betons -- den des Stahls traegt jede Seite.
+        self.beton_satz = beton_satz
+        #: Wie die Eckpunkte heissen: ``Rd`` -- ``Rk`` mit charakteristischen
+        #: Werten, ``R`` mit gemischten
+        #: (:attr:`~opencivil.querschnitt.gesetzwahl.Rechenwahl.index`). Die
+        #: Namen der Zwischenwerte bleiben.
+        self.R = index
         # Zwischenwerte der Mitschrift, unter der Kennung des Nachweises.
         self.werte = Zwischenwerte(f"{basis}.hand")
 
         # Symbole der Betonkennwerte: mit Sortenindex, sobald mehrere Betone
         # im Projekt sind. Sonst stuende f_cd zweimal mit anderen Zahlen da.
-        self.s_f_cd = mit_index(satz.beton_zeichen, beton_index)
+        self.s_f_cd = mit_index(beton_satz.beton_zeichen, beton_index)
         self.s_eps_c2d = mit_index(r"\varepsilon_{c2d}", beton_index)
         # Eine Stelle wie in der Baustofftabelle: mit keiner stuende bei C25/30
         # «17» da, gerechnet wird mit 16.7 -- die Nachrechnung ginge daneben.
@@ -230,7 +235,7 @@ class Handrechnung:
         # Den Titel setzt der Nachweis, mit der Rechenwahl darunter.
         p.erklaerung(
             f"Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend "
-            f"{self.satz.beton}; gedrückter Stahl bleibt unberücksichtigt. Die "
+            f"{self.beton_satz.beton}; gedrückter Stahl bleibt unberücksichtigt. Die "
             f"Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment "
             f"bezieht sich auf die halbe Querschnittshöhe."
         )
@@ -247,12 +252,16 @@ class Handrechnung:
         # dastehen, sobald es mehr als eine gibt.
         seiten = (self.unten, self.oben)
         mit_stahl = any(lage.stahl_index for lage in seiten)
+        # Rechnen beide Seiten im selben Wertesatz, steht sein Zeichen im
+        # Kopf -- sonst schlicht die Fliessgrenze.
+        zeichen = {lage.satz.stahl_zeichen for lage in seiten}
+        f_y = zeichen.pop() if len(zeichen) == 1 else "f_y"
 
         p.tabelle(
             kopf=(["Seite"]
                   + (["Stahl"] if mit_stahl else [])
                   + [Mathe(r"A_s\ [\mathrm{mm}^2]"), Mathe(r"z\ [\mathrm{mm}]"),
-                     Mathe(rf"{self.satz.stahl_zeichen}\ [\mathrm{{N/mm^2}}]")]),
+                     Mathe(rf"{f_y}\ [\mathrm{{N/mm^2}}]")]),
             zeilen=[
                 [lage.text]
                 + ([lage.stahl_index or "–"] if mit_stahl else [])
@@ -536,14 +545,15 @@ class Handrechnung:
         )
 
 
-def seiten(lagen: Sequence[Stahllage], *, satz: Werkstoffsatz,
+def seiten(lagen: Sequence[Stahllage], *, saetze: Mapping[str, Werkstoffsatz],
            stahl_index: Mapping[str, str]) -> Tuple[Lage, Lage]:
     """
     Die beiden Seiten der Handrechnung, unten und oben: je Seite eine Lage im
     Schwerpunkt, nach derselben Regel wie der Loeser in der Handrechnung
-    (:func:`~opencivil.nachweis.querschnittsloeser.je_seite`). ``stahl_index``
-    gibt je Sorte (:attr:`~opencivil.nachweis.querschnittsloeser.Stahllage.sorte`)
-    den Index ihrer Symbole.
+    (:func:`~opencivil.nachweis.querschnittsloeser.je_seite`). ``saetze``
+    und ``stahl_index`` geben je Sorte
+    (:attr:`~opencivil.nachweis.querschnittsloeser.Stahllage.sorte`) ihren
+    Wertesatz und den Index ihrer Symbole.
 
     Ist nur eine Seite bewehrt, zaehlt die andere mit null Flaeche, damit die
     Formeln unveraendert gelten -- mit den Kennwerten des Stahls der anderen.
@@ -553,8 +563,8 @@ def seiten(lagen: Sequence[Stahllage], *, satz: Werkstoffsatz,
         raise ValueError("Ohne Bewehrung lässt sich nichts von Hand rechnen.")
     gebaut = {
         unten: Lage(s.a_s, s.z, s.stahl.f_yd, s.stahl.E_s, s.text, index=s.index,
-                    stahl_index=stahl_index[s.sorte], teile=s.teile, satz=satz)
+                    stahl_index=stahl_index[s.sorte], teile=s.teile, satz=saetze[s.sorte])
         for unten, s in gefunden.items()}
     eine = next(iter(gebaut.values()))
-    leer = Lage(0.0, 0.0, eine.f_yd, eine.E_s, "keine", satz=satz)
+    leer = Lage(0.0, 0.0, eine.f_yd, eine.E_s, "keine", satz=eine.satz)
     return gebaut.get(True, leer), gebaut.get(False, leer)

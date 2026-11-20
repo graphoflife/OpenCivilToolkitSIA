@@ -1,5 +1,5 @@
 ---
-erzeugt: 3e23b3c10151
+erzeugt: 4c44583dbe0b
 art: modul
 tags: [modul]
 ---
@@ -135,7 +135,7 @@ In jeder Tiefe der Verläufe die Bettungskraft gegen p_E,d -- massgebend die kna
 
 - `GAMMA_M_QUER = 1.4` – Der Widerstandsbeiwert quer zur Achse -- der kleinste, den die Norm zulässt.
 - `GAMMA_M_QUER_REFERENZ = 'SIA 267:2013, 9.5.2.3.1, (49)'`
-- `WAHL_BRUCH = Rechenwahl(art=Rechenart.PARABEL, satz=Werkstoffsatz.CHARAKTERISTISCH)` – Womit der Pfahl im Bruch biegt: charakteristische Werte, der Beton als Parabel.
+- `WAHL_BRUCH = Rechenwahl(art=Rechenart.PARABEL, saetze=Wertesaetze.alle(Werkstoffsa…` – Womit der Pfahl im Bruch biegt: charakteristische Werte, der Beton als Parabel.
 
 ## Braucht
 

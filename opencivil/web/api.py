@@ -51,7 +51,7 @@ from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.aufbau.kern import kennwertbereich, materialgrund
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import Projekt
-from opencivil.projekt.querschnittsanalyse import SCHNITTE, WerkstoffwahlEintrag
+from opencivil.projekt.querschnittsanalyse import SCHNITTE, QuerschnittsanalyseEintrag
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.platte import BREITE_Y_MM
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
@@ -97,10 +97,10 @@ _VERSCHMIERUNGEN = {
     "staebe": ("⌀ und Teilung", "Stäbe ⌀ im Abstand s über die Länge L, verschmiert: L/s · π⌀²/4"),
 }
 #: Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche
-#: es gibt, steht am Feld der Werkstoffwahl.
+#: es gibt, steht am Feld der Betongesetze je Beton.
 _BETONGESETZE = [
     {"wert": a.value, "beschriftung": a.beschriftung, "kurz": a.kurz}
-    for a in wahl_von(WerkstoffwahlEintrag, "betongesetz")
+    for a in wahl_von(QuerschnittsanalyseEintrag, "betongesetze")
 ]
 #: Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem
 #: Titel. Die Regel dahinter steht in :mod:`opencivil.decke.aufteilung`.
@@ -740,8 +740,10 @@ def geometrie(eintrag, projekt) -> dict:
                    for ecken, flaeche in z.zellen],
         "hilfslinien": [{"element": h["name"], "kennung": h["kennung"]}
                         for h in elemente.hilfslinien],
-        # Die Materialien, auf die die Zeichnung zeigt -- fuer die Werkstoffwahl
-        # je Material. Bis 2026-10-18 zaehlte die Oberflaeche sie ein zweites Mal.
+        # Die Materialien, auf die die Zeichnung zeigt -- fuer die Werte je
+        # Material jeder Rechenwahl der Analyse und eines Balkensystems, das
+        # einen Querschnitt aus ihr nimmt. Bis 2026-10-18 zaehlte die
+        # Oberflaeche sie ein zweites Mal.
         "materialien": eintrag.materialien(),
     }
 

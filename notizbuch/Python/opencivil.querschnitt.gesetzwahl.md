@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c23f3e2996a
+erzeugt: 44d20ac10f42
 art: modul
 tags: [modul]
 ---
@@ -44,6 +44,17 @@ Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
 haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
 ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]), und wie ein Widerstand heisst -- `R_d` oder
 `R_k`.
+
+
+## JE MATERIAL
+
+Den Wertesatz waehlt ein Kapitel je Material ([[opencivil.querschnitt.gesetzwahl#Wertesaetze|Wertesaetze]]), wie
+die Tragsicherheit der Querschnittsanalyse es schon tat -- in jedem Modul
+dieselbe Wahl (Benutzer, 2026-11-20). Bis dahin galt in der Platte, beim
+Knicken, in den Stahlspannungen, den Analysen und beim E_eq eines Stabs ein
+Satz fuer alle Materialien. Rechnen Beton und Stahl mit verschiedenen
+Saetzen, ist ein Widerstand weder `R_d` noch `R_k`; er heisst dann
+schlicht `R` (nach Vorgabe, nicht nachgeschlagen).
 
 ## Inhalt
 
@@ -254,6 +265,109 @@ Was statt der Probe dasteht, wenn die Suche ihre Ebene verfehlt
 mit dem Spannungsblock bei viel Druck und wenig Moment. Mit der
 Parabel gibt es die Ebene dort.
 
+### Wertesaetze
+
+```python
+@dataclass(frozen=True)
+class Wertesaetze
+```
+
+Je Baustoff sein Wertesatz ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]). `je_baustoff`
+nennt die Baustoffe eines Bauteils mit ihrem Satz, nach Baustoff-ID
+geordnet; ein anderer Baustoff rechnet mit `vorgabe` -- so auch jeder,
+wo ein Kapitel einen Satz fuer alle festlegt ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.alle|alle]]).
+Unveraenderlich und vergleichbar: eine Wahl ist Schluessel von
+Zwischenspeichern, und zwei gleiche Wahlen teilen sich eine Linie. Darum
+wird ein Satz fuer alle immer zu [[opencivil.querschnitt.gesetzwahl#Wertesaetze.alle|alle]] ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.je|je]]) -- sonst
+rechneten die Kennzahlen, die mit Bemessungswerten fest waehlen, ihre
+eigene Linie neben der gleichen der Tragsicherheit.
+
+- `vorgabe: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `je_baustoff: Tuple[Tuple[str, Werkstoffsatz], ...] = ()`
+
+#### Wertesaetze.alle
+
+```python
+@classmethod
+def alle(cls, satz: Werkstoffsatz) -> 'Wertesaetze'
+```
+
+Jeder Baustoff mit demselben Satz.
+
+#### Wertesaetze.je
+
+```python
+@classmethod
+def je(cls, saetze: Mapping[str, Werkstoffsatz], vorgabe: Werkstoffsatz=Werkstoffsatz.BEMESSUNG) -> 'Wertesaetze'
+```
+
+Aus Baustoff-ID und Satz -- je Baustoff des Bauteils einer. Haben alle
+denselben, ist es [[opencivil.querschnitt.gesetzwahl#Wertesaetze.alle|alle]] mit ihm.
+
+#### Wertesaetze.von
+
+```python
+def von(self, stoff) -> Werkstoffsatz
+```
+
+Der Satz eines Baustoffs ([[opencivil.material.basis#Baustoff|id]]).
+
+#### Wertesaetze.gewaehlt
+
+```python
+@property
+def gewaehlt(self) -> FrozenSet[Werkstoffsatz]
+```
+
+Die Saetze, mit denen gerechnet wird.
+
+#### Wertesaetze.einheitlich
+
+```python
+@property
+def einheitlich(self) -> Optional[Werkstoffsatz]
+```
+
+Der Satz, wenn alle Baustoffe denselben haben -- sonst `None`.
+
+#### Wertesaetze.index
+
+```python
+@property
+def index(self) -> str
+```
+
+Wie ein Widerstand heisst: `Rd` mit Bemessungswerten, `Rk` mit
+charakteristischen -- gemischt weder das eine noch das andere,
+`R` (nach Vorgabe, nicht nachgeschlagen).
+
+#### Wertesaetze.kuerzel
+
+```python
+@property
+def kuerzel(self) -> str
+```
+
+Der Buchstabe am Index, `d` oder `k` -- gemischt keiner.
+
+#### Wertesaetze.kurz
+
+```python
+@property
+def kurz(self) -> str
+```
+
+Fuer Legenden: «Bemessung», «charakteristisch» -- oder «gemischt».
+
+#### Wertesaetze.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+Ueber einem Bild: «Bemessungswerte», «charakteristisch» -- oder «gemischte Werte».
+
 ### Rechenwahl
 
 ```python
@@ -261,21 +375,28 @@ Parabel gibt es die Ebene dort.
 class Rechenwahl
 ```
 
-Was ein Kapitel waehlt: Kriechzahl, Wertesatz, Rechenart.
+Was ein Kapitel waehlt: Kriechzahl, Wertesatz je Baustoff, Rechenart.
 
 - `kriechzahl: float = 0.0`
-- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `saetze: Wertesaetze = Wertesaetze()`
 - `art: Rechenart = Rechenart.HANDRECHNUNG`
 - `modul: str = 'E_cm'` – Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: `E_cm`, bei der Verformung des Knickens `E_cd` (SIA 262:2025, 4.2.1.17). Keine Wahl des Benutzers -- das Kapitel setzt ihn.
+
+#### Rechenwahl.satz
+
+```python
+def satz(self, stoff) -> Werkstoffsatz
+```
+
+Der Wertesatz eines Baustoffs ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.von|Wertesaetze.von]]).
 
 #### Rechenwahl.betonkennwerte
 
 ```python
-@property
-def betonkennwerte(self) -> Dict[str, str]
+def betonkennwerte(self, beton) -> Dict[str, str]
 ```
 
-Die Kennwerte des Betongesetzes ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz.betonkennwerte|Werkstoffsatz.betonkennwerte]]) mit diesem Modul.
+Die Kennwerte des Betongesetzes ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz.betonkennwerte|Werkstoffsatz.betonkennwerte]]) dieses Betons, mit dem Modul der Wahl.
 
 #### Rechenwahl.index
 
@@ -284,7 +405,7 @@ Die Kennwerte des Betongesetzes ([[opencivil.querschnitt.gesetzwahl#Werkstoffsat
 def index(self) -> str
 ```
 
-`Rd` oder `Rk` -- wie ein Widerstand dieser Wahl heisst.
+`Rd`, `Rk` oder gemischt `R` -- wie ein Widerstand dieser Wahl heisst ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.index|Wertesaetze.index]]).
 
 #### Rechenwahl.beschriftung
 
@@ -302,7 +423,7 @@ def gleiche_linie(self, andere: 'Rechenwahl') -> bool
 ```
 
 Ob `andere` dieselbe Resistenzlinie ergibt: dieselbe Rechenart und
-derselbe Wertesatz, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
+dieselben Wertesaetze, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
 haengt ([[opencivil.querschnitt.gesetzwahl#Rechenart.mit_kriechzahl|Rechenart.mit_kriechzahl]]). Bis 2026-11-20 eine freie
 Funktion der M-N-Interaktion, die den Modul nicht verglich: eine
 Parabel mit `E_cd` haette die Linie einer mit `E_cm` bekommen.
@@ -354,6 +475,7 @@ ist der Modul der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.pfahl.innen]]
 - [[opencivil.pfahl.quer]]
+- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]

@@ -138,6 +138,20 @@ export function materialienVon(kennung) {
 }
 
 /**
+ * Für die Werte je Material einer Rechenwahl (`werkstoffzeilen` in
+ * nachweise.js): die Materialien der Analyse -- und solange sie fehlen,
+ * warum. Auch für ein Balkensystem, dessen Querschnitt aus ihr kommt.
+ */
+export function werkstoffeVon(kennung) {
+  const materialien = materialienVon(kennung);
+  const kaputt = materialien === null ? geometriefehler(kennung) : '';
+  return {
+    materialien,
+    wartet: kaputt ? `Die Zeichnung ist nicht geprüft: ${kaputt}` : 'Der Kern liest die Zeichnung …',
+  };
+}
+
+/**
  * Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu
  * sehen ist. Passt sie nicht, wird gefragt, einmal je Fassung des Projekts:
  * die Antwort hängt auch an den Materialien, und die ändern sich anderswo.
@@ -325,11 +339,13 @@ function geometrieHolen(a) {
 /**
  * Was an der Antwort hängt, neu: die Liste unter der Zeichnung und ein
  * offenes Fenster -- es zeigt vielleicht, was erst jetzt feststeht, die
- * Materialien der Werkstoffwahl (`materialienVon`) oder warum sie fehlen.
+ * Materialien einer Rechenwahl (`werkstoffeVon`) oder warum sie fehlen.
+ * Gleich welches Fenster: auch der Querschnitt eines Balkensystems wählt
+ * die Werte je Material der Analyse, aus der er kommt.
  */
 function fensterNachfuehren(a) {
   listeZeichnen(a);
-  if (zustand.fenster && zustand.auswahl?.kennung === a.qa.kennung) mitteAendern();
+  if (zustand.fenster) mitteAendern();
 }
 
 /** Warum die Antwort zur jetzigen Zeichnung ausbleibt -- leer, solange nichts schiefging. */

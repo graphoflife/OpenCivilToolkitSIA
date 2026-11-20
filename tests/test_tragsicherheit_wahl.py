@@ -20,11 +20,17 @@ KENNUNG = "q1.x"
 BASIS = "querschnitt.q1.nachweis.mn.x"
 
 
-def gerechnet(rechenart="handrechnung", werkstoffsatz="bemessung", kriechzahl=0.0):
+def gerechnet(rechenart="handrechnung", werkstoffsatz="bemessung", kriechzahl=0.0, *,
+              je_material=None):
+    """
+    Das Beispiel mit dieser Wahl: ``werkstoffsatz`` für Beton und Stahl,
+    ``je_material`` je Kennung -- wie die Oberfläche es schreibt.
+    """
     projekt = Projekt.beispiel()
     q = projekt.querschnitte[0]
     q.tragsicherheit_wahl = RechenwahlEintrag(
-        kriechzahl=kriechzahl, werkstoffsatz=werkstoffsatz, rechenart=rechenart)
+        kriechzahl=kriechzahl, rechenart=rechenart,
+        werkstoffsaetze=je_material or {k: werkstoffsatz for k in q.materialien()})
     # Eine Querkraft, damit ihr Nachweis laut rechnet und m_R herleitet.
     q.kombinationen[1].V_Ed = 120.0
     aufbau = projekt.aufbauen()
@@ -86,6 +92,40 @@ class TestCharakteristisch(unittest.TestCase):
         unten = next(e for e in self.loesung.befund(sv).ergebnisse if e.lage.von_unten)
         self.assertEqual(unten.M_Rd, M)
         self.assertIn("M_Rk(N_Ed = 0)", unten.begruendung)
+
+
+class TestGemischt(unittest.TestCase):
+    """
+    Je Material sein Wertesatz (2026-11-20): der Beton charakteristisch, der
+    Stahl mit Bemessungswerten. Ein Widerstand heisst dann weder R_d noch
+    R_k, sondern R (nach Vorgabe, nicht nachgeschlagen).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.aufbau, cls.loesung = gerechnet(je_material={"b1": "charakteristisch"})
+        cls.mn = cls.aufbau.feld("nachweise")[KENNUNG]
+
+    def test_die_wahl_nennt_jeden_baustoff(self):
+        self.assertEqual(self.mn.wahl.index, "R")
+        self.assertIn(r"\text{C30/37: charakteristisch}\ f_{ck},\ "
+                      r"\text{B500B: Bemessungswerte}\ f_{yd}", text(self.loesung))
+
+    def test_der_beton_mit_f_ck_der_stahl_mit_f_yd(self):
+        """N_R^- = -b·h·f_ck wie charakteristisch, der Zug mit f_yd wie mit Bemessungswerten."""
+        _, bemessung = gerechnet()
+        _, charakteristisch = gerechnet(werkstoffsatz="charakteristisch")
+        for kennung, wie in (("N_Rd_druck", charakteristisch), ("N_Rd_zug", bemessung)):
+            with self.subTest(kennung=kennung):
+                schluessel = f"{BASIS}.{kennung}"
+                self.assertAlmostEqual(self.loesung.werte[schluessel].groesse.si,
+                                       wie.werte[schluessel].groesse.si, delta=1e-3)
+
+    def test_die_zeichen_heissen_r(self):
+        self.assertIn("M_{R,x}", self.loesung.werte[f"{BASIS}.M_Rd_N0_pos"].symbol)
+        t = text(self.loesung)
+        self.assertIn("m_{R}(N_{Ed})", t)
+        self.assertNotIn("M_{Rk}", t)
 
 
 class TestGenaueLinie(unittest.TestCase):
@@ -152,7 +192,7 @@ class TestDatei(unittest.TestCase):
     def test_hin_und_zurueck(self):
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(
-            kriechzahl=1.5, werkstoffsatz="charakteristisch", rechenart="parabel")
+            kriechzahl=1.5, werkstoffsaetze={"b1": "charakteristisch"}, rechenart="parabel")
         kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
         self.assertEqual(kopie.querschnitte[0].tragsicherheit_wahl,
                          projekt.querschnitte[0].tragsicherheit_wahl)

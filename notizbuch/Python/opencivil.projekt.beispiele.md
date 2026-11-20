@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ef01f72ef6c
+erzeugt: 74fe5243c524
 art: modul
 tags: [modul]
 ---
@@ -146,6 +146,14 @@ def _erstes(p: Projekt, art: str) -> str
 ```
 
 Die Kennung des ersten Materials dieser Art im Projekt.
+
+### charakteristisch
+
+```python
+def charakteristisch(eintrag) -> dict
+```
+
+Charakteristische Werte fuer jedes Material, auf das der Eintrag zeigt.
 
 ### _alles_einmal
 

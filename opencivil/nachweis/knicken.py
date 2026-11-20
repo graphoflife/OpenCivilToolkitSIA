@@ -726,8 +726,8 @@ class Knicken(Knickverfahren):
         bezuege = self.linienquelle.bezuege([
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
-        ] + betonbezuege(verformung.satz, querschnitt.beton,
-                         modul=self.verformung.modul) + lagenbezuege(self.posten, verformung.satz))
+        ] + betonbezuege(verformung.satz(querschnitt.beton), querschnitt.beton,
+                         modul=self.verformung.modul) + lagenbezuege(self.posten, verformung))
 
         super().__init__(
             basis,
@@ -759,11 +759,11 @@ class Knicken(Knickverfahren):
         h = e.g("h").si
         b = e.g("b").si
         wahl = self.verformung
-        w = Betonkennwerte.aus_eingaben(e, wahl)
+        w = Betonkennwerte.aus_eingaben(e, wahl, self.querschnitt.beton)
 
         # Jede Lage mit ihrem Stahl; das Fenster reicht im Zug bis zur
         # kleinsten Bruchdehnung der Lagen, an beiden Raendern.
-        lagen = stahllagen(self.posten, wahl.satz, e.si_nach_id())
+        lagen = stahllagen(self.posten, wahl, e.si_nach_id())
         # Kriechen weicht den Beton auf; das Gesetz rechnet mit dem wirksamen
         # Modul aus E_cd. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
         g = gesetze(wahl, w)
@@ -802,7 +802,7 @@ class Knicken(Knickverfahren):
         """Mit der Linie der Tragsicherheit: was das Knicken waehlt und woher sein Widerstand kommt."""
         p.titel("Widerstand", ebene=3)
         protokoll_rechenwahl(p, self.widerstand, f"{self.id}.widerstand",
-                             titel="Rechenwahl – Widerstand (N_Rd)")
+                             self.querschnitt.baustoffe, titel="Rechenwahl – Widerstand (N_Rd)")
         p.text("Dieselbe Wahl wie die Tragsicherheit: der Momentenwiderstand bei "
                "der Druckkraft kommt aus deren Resistenzlinie.")
 
@@ -811,13 +811,15 @@ class Knicken(Knickverfahren):
         self._protokoll_verfahren(p)
         p.titel("Verformung", ebene=3)
         wahl, basis = self.verformung, f"{self.id}.verformung"
-        phi = protokoll_rechenwahl(p, wahl, basis, titel="Rechenwahl – Verformung (e_2d)")
+        beton = self.querschnitt.beton
+        phi = protokoll_rechenwahl(p, wahl, basis, self.querschnitt.baustoffe,
+                                   titel="Rechenwahl – Verformung (e_2d)")
         if wahl.art.mit_kriechzahl:
             protokoll_wirksamer_modul(p, e[wahl.modul], phi, basis,
                                       titel="Steifigkeit des Betons",
-                                      nachsatz=rf"\qquad {angabe(e[wahl.satz.beton])}")
+                                      nachsatz=rf"\qquad {angabe(e[wahl.satz(beton).beton])}")
         protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze der Verformung",
-                          posten=self.posten)
+                          beton=beton, posten=self.posten)
         p.erklaerung(VERFORMUNG_NACH_WAHL)
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
         protokoll_verfahren(p, eps_c2d=eps_c2d, verdraengt=verdraengt, suche=suche)

@@ -1,5 +1,5 @@
 ---
-erzeugt: ba30b0cd5eef
+erzeugt: 2c6a9a78a7d5
 art: thema
 tags: [thema]
 ---
@@ -11,6 +11,8 @@ tags: [thema]
 Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe.
 
 Der Beton ist in 200 Fasern über die Höhe geteilt, die Bewehrung zählt Lage für Lage, und an ihrer Stelle zählt der Stahl statt des Betons – auch die gedrückte Bewehrung wirkt mit. Den Widerstand bei einer Einwirkung sucht die Rechnung auf dem Rand selbst, zwischen zwei benachbarten Ebenen; was dort gilt, zeigt bei jeder Kombination die Probe.
+
+Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_ck; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe.
 
 ## Formeln
 

@@ -75,7 +75,6 @@ from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchswahl, QALastfallEintrag,
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
-    WerkstoffwahlEintrag,
 )
 from opencivil.projekt.skript import SkriptEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag, GrundbruchkombinationEintrag
@@ -102,7 +101,7 @@ __all__ = [
     "StatikdiagrammEintrag", "SystemknotenEintrag", "SystemlinieEintrag",
     "GebrauchsfallEintrag", "HilfslinieEintrag", "KnotenEintrag",
     "QALastfallEintrag", "QuerschnittsanalyseEintrag",
-    "SchubwandEintrag", "StabEintrag", "StablinieEintrag", "WerkstoffwahlEintrag",
+    "SchubwandEintrag", "StabEintrag", "StablinieEintrag",
     "Gebrauchsliste", "Gebrauchswahl", "KnickVerformungswahl", "KnickWiderstandswahl",
     "QAGebrauchswahl",
     "HAEUFIG_ANTEIL", "KnickEintrag", "KombinationEintrag", "LageEintrag",

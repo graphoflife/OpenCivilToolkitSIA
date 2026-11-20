@@ -1,5 +1,5 @@
 ---
-erzeugt: b8a0bbd378c1
+erzeugt: 648f59a744fe
 art: modul
 tags: [modul]
 ---
@@ -470,11 +470,42 @@ Die eine Stelle dafuer: der Aufbau benennt die Faelle so, und die
 Namenspruefung muss genau denselben Namen bilden, um einen gleichlautenden
 eigenen Fall zu erkennen. `70.0` wird zu «70 %», `62.5` zu «62.5 %».
 
+### JeMaterial
+
+```python
+class JeMaterial
+```
+
+Was die Werte je Material waehlt (Benutzer, 2026-11-20): im Feld
+`werkstoffsaetze` ([[opencivil.projekt.lesen#je_material|je_material]]) je
+Kennung eines Materials sein Wertesatz. Ein Material ohne eigene Wahl
+rechnet mit der Vorgabe des Feldes -- die Stahlspannungen
+charakteristisch, alles andere mit Bemessungswerten. Fuer die Rechnung
+wird daraus je Baustoff des Bauteils sein Satz ([[opencivil.projekt.eintraege#JeMaterial.wertesaetze|wertesaetze]]).
+Bis dahin waehlte nur die Querschnittsanalyse je Material, jedes andere
+Kapitel einen Satz fuer alle.
+
+#### JeMaterial.von
+
+```python
+def von(self, feld: str, material: str) -> Any
+```
+
+Die Wahl eines Materials in diesem Feld -- die Vorgabe des Feldes, wenn es keine eigene hat.
+
+#### JeMaterial.wertesaetze
+
+```python
+def wertesaetze(self, stoffe: Mapping[str, Baustoff]) -> Wertesaetze
+```
+
+Je Baustoff eines Bauteils -- `stoffe` nach ihrer Kennung im Projekt -- sein Wertesatz.
+
 ### SpannungsfallEintrag
 
 ```python
 @dataclass
-class SpannungsfallEintrag(Beschreibung)
+class SpannungsfallEintrag(Beschreibung, JeMaterial)
 ```
 
 Eine Auswertung am Querschnitt -- kein Nachweis.
@@ -484,8 +515,9 @@ Gefragt wird, was im Querschnitt geschieht, und je nach [[opencivil.projekt.eint
 der einen oder der anderen Seite -- aus Schnittgroessen, aus Dehnungen,
 als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
 
-Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
-Wertesatz und die Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]).
+Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, je
+Material den Wertesatz ([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]]) und die Rechenart
+([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]).
 
 - `name: str`
 - `art: Analyseart = Analyseart.SCHNITTGROESSEN` – Was gefragt wird -- siehe [[opencivil.spannungsanalyse.art#Analyseart|Analyseart]].
@@ -495,18 +527,17 @@ Wertesatz und die Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Reche
 - `eps_oben: float = bereich(-1.0, heisst='ε oben', einheit=PROMILLE)`
 - `eps_unten: float = bereich(2.0, heisst='ε unten', einheit=PROMILLE)` – Die Randdehnungen.
 - `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl φ dieser Analyse.
-- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG` – `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
+- `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)` – Je Material `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
 - `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)` – `block` oder `parabel` -- siehe [[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
 - `aktiv: bool = True`
 
 #### SpannungsfallEintrag.wahl
 
 ```python
-@property
-def wahl(self) -> Rechenwahl
+def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl
 ```
 
-Womit die Analyse rechnet.
+Womit die Analyse an einem Bauteil aus diesen Baustoffen rechnet ([[opencivil.projekt.eintraege#JeMaterial.wertesaetze|JeMaterial.wertesaetze]]).
 
 ### spannungsfallnamen
 
@@ -540,11 +571,12 @@ haeufig oder quasi-staendig ist, sagt die Liste, in der er steht.
 
 ```python
 @dataclass
-class RechenwahlEintrag(Beschreibung)
+class RechenwahlEintrag(Beschreibung, JeMaterial)
 ```
 
-Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
-siehe [[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]. So steht sie in
+Womit ein Nachweis-Kapitel rechnet: Kriechzahl, je Material der
+Wertesatz ([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]]), Rechenart -- siehe
+[[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]. So steht sie in
 der Tragsicherheit.
 
 Jedes andere Kapitel hat seine Unterklasse, und welche Rechenarten es
@@ -554,17 +586,16 @@ Die Kriechzahl des Vergroesserungsfaktors gehoert dem Verformungsnachweis
 ([[opencivil.projekt.eintraege#VerformungEintrag|VerformungEintrag]]).
 
 - `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
-- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)`
 - `rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.HANDRECHNUNG)`
 
 #### RechenwahlEintrag.wahl
 
 ```python
-@property
-def wahl(self) -> Rechenwahl
+def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl
 ```
 
-Was der Kern daraus rechnet.
+Was der Kern daraus rechnet, an einem Bauteil aus diesen Baustoffen ([[opencivil.projekt.eintraege#JeMaterial.wertesaetze|JeMaterial.wertesaetze]]).
 
 ### Gebrauchswahl
 
@@ -575,7 +606,7 @@ class Gebrauchswahl(RechenwahlEintrag)
 
 Die Stahlspannungen: elastisch, mit charakteristischen Werten -- dazu die Rechenarten der Tragsicherheit.
 
-- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.CHARAKTERISTISCH`
+- `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.CHARAKTERISTISCH)`
 - `rechenart: Rechenart = einer_von(SPANNUNGSARTEN, Rechenart.ELASTISCH)`
 
 ### KnickVerformungswahl

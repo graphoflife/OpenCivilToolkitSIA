@@ -68,7 +68,7 @@ SI-Basis wie im ganzen Querschnittsmodul; die Zeichnung in mm.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Dict, List, Optional, Sequence, Tuple, Type
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
@@ -151,6 +151,7 @@ class AnalyseStellen(Stahlspannungsort):
         self.analyse = analyse
         self.name = analyse.name
         self.abschnitt = analyse.abschnitt
+        self.baustoffe = tuple(analyse.baustoffe)
 
     def basis(self, grenze: Type[Spannungsgrenze]) -> str:
         return f"{self.analyse.id}.nachweis.{grenze.idteil}"
@@ -166,7 +167,7 @@ class AnalyseStellen(Stahlspannungsort):
         for s in staebe:
             E_s = a.kennwert(e, s.stahl, "E_s")
             stellen.append(Stelle(stahl=s.stahl, E_s=E_s,
-                                  eps_y=abs(a.kennwert(e, s.stahl, wahl.satz.stahl)) / E_s))
+                                  eps_y=abs(a.kennwert(e, s.stahl, wahl.satz(s.stahl).stahl)) / E_s))
         return _Analysezustand(
             stellen=tuple(stellen), staehle=tuple({s.stahl.id: s.stahl for s in staebe}.values()),
             querschnitt=q, staebe=staebe)
@@ -414,7 +415,7 @@ class ZwaengungBiegungQA(Biegezwang):
                  kriechzahl: float) -> None:
         self.analyse = analyse
         self.anforderung = anforderung
-        self.wahl = Rechenwahl(kriechzahl=kriechzahl, satz=VORGABE.satz, art=VORGABE.art)
+        self.wahl = replace(VORGABE, kriechzahl=kriechzahl)
         basis = f"{analyse.id}.nachweis.zwang_biegung"
         self.d_ausnutzung = grade_je_seite(basis, "ZB", f"Erfüllungsgrad {self.THEMA}",
                                            self.REFERENZ, analyse)
@@ -541,7 +542,7 @@ class ZwaengungBiegungQA(Biegezwang):
                  titel=f"{self.THEMA}, je Stab", referenz=self.REFERENZ,
                  name="Moment der Bewehrung bei zulässiger Stahlspannung")
         protokoll_spannung_ungerissen(p, self.analyse.biegung)
-        protokoll_rechenwahl(p, self.wahl, self.id)
+        protokoll_rechenwahl(p, self.wahl, self.id, self.analyse.baustoffe)
         protokoll_gesetze_nach_wahl(p, e, self.analyse, self.wahl, self.id,
                           titel="Werkstoffgesetze im gerissenen Zustand")
         p.erklaerung(GRENZE_JE_STAB)

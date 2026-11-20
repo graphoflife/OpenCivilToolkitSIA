@@ -38,9 +38,10 @@ from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence, Tuple
 from opencivil.core.einheiten import KN, KNM
 from opencivil.core.wahl import Wahl
 from opencivil.nachweis.rechenwahl import FASERARTEN
-from opencivil.projekt.eintraege import Beschreibung
+from opencivil.material.basis import Baustoff
+from opencivil.projekt.eintraege import Beschreibung, JeMaterial
 from opencivil.projekt.faelle import kennung_von
-from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
+from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, je_material
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.stabwerk import profiltabelle
@@ -128,26 +129,26 @@ MATERIAL_DES_QUERSCHNITTS = "querschnitt"
 
 
 @dataclass
-class ModulEintrag(Beschreibung):
+class ModulEintrag(Beschreibung, JeMaterial):
     """
     Wie das E_eq eines Querschnitts aus einer Platte oder Querschnittsanalyse
     entsteht: bei ``N`` und ``M``, Zug positiv und ``M > 0`` mit Zug unten --
     auf der gestrichelten Faser des Stabs, im Raum an der Seite +z, wo M_y
     zieht; bei einer Platte immer in x-Richtung, und ``M`` zieht unten
     (Benutzer, 2026-10-24). Gerechnet wie eine Momenten-Kruemmungs-Linie
-    ihrer Spannung-Dehnung-Analyse, mit Kriechzahl, Wertesatz und Rechenart
-    wie dort (Benutzer, 2026-10-23).
+    ihrer Spannung-Dehnung-Analyse, mit Kriechzahl, Werten je Material und
+    Rechenart wie dort (Benutzer, 2026-10-23, je Material 2026-11-20).
     """
 
     N: float = bereich(0.0, heisst="N für E_eq", einheit=KN)
     M: float = bereich(0.0, heisst="M für E_eq", einheit=KNM)
     kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
-    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)
     rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)
 
-    @property
-    def wahl(self) -> Rechenwahl:
-        return Rechenwahl(kriechzahl=self.kriechzahl, satz=self.werkstoffsatz,
+    def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl:
+        """Womit das E_eq gerechnet wird, an der Platte oder Analyse aus diesen Baustoffen."""
+        return Rechenwahl(kriechzahl=self.kriechzahl, saetze=self.wertesaetze(stoffe),
                           art=self.rechenart)
 
 

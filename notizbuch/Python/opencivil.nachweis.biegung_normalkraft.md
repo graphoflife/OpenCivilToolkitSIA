@@ -1,5 +1,5 @@
 ---
-erzeugt: 305b35195366
+erzeugt: f8ff7de70afd
 art: modul
 tags: [modul]
 ---
@@ -325,13 +325,14 @@ Widerstand im normierten Diagramm, deren Quotient der Grad ist.
 ### linienbezuege
 
 ```python
-def linienbezuege(querschnitt: Plattenquerschnitt, posten, richtung: Richtung, satz: Werkstoffsatz) -> List[Eingabebezug]
+def linienbezuege(querschnitt: Plattenquerschnitt, posten, richtung: Richtung, wahl: Rechenwahl) -> List[Eingabebezug]
 ```
 
 Was eine Resistenzlinie dieser Richtung braucht -- unter den Namen, die
-[[opencivil.nachweis.biegung_normalkraft#resistenzlinie|resistenzlinie]] liest: die Festigkeiten des Wertesatzes, `f_cd`
-und `f_yd` oder `f_ck` und `f_yk`, `E_cm` fuer die Parabel, die
-Bewehrung dieser Richtung und je Stahlsorte ihre Kennwerte.
+[[opencivil.nachweis.biegung_normalkraft#resistenzlinie|resistenzlinie]] liest: die Festigkeiten der Wertesaetze, `f_cd`
+oder `f_ck` des Betons, `f_yd` oder `f_yk` jedes Stahls, `E_cm`
+fuer die Parabel, die Bewehrung dieser Richtung und je Stahlsorte ihre
+Kennwerte.
 
 ### resistenzlinie
 

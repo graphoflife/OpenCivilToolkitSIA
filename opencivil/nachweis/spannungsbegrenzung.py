@@ -99,7 +99,7 @@ from opencivil.nachweis.mindestbewehrung import (
 from opencivil.nachweis.querschnittsloeser import (
     Ebene, Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
 )
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, betonbezuege, bezuege_vereinen, gesetze, lagenbezuege, protokoll_gesetze,
     protokoll_rechenwahl, staehle, stahlbezuege, stahllagen,
@@ -116,7 +116,8 @@ from opencivil.querschnitt.platte import Richtung
 #: was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte
 #: (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege
 #: f_cm hoeher als f_ck -- f_ck liegt sicher (``notizbuch/Notizen/TODO.md``).
-VORGABE = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.ELASTISCH)
+VORGABE = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH),
+                     art=Rechenart.ELASTISCH)
 
 
 @dataclass(frozen=True)
@@ -160,7 +161,8 @@ def protokoll_festlegungen(p: Protokoll, wahl: Rechenwahl) -> None:
         "Spannungen zurück, und der Nachweis geht leichter auf. Mit dem "
         "Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht."
     )
-    if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
+    satz = wahl.saetze.einheitlich
+    if satz is Werkstoffsatz.CHARAKTERISTISCH:
         p.erklaerung(
             "Zweitens die Werkstoffgesetze: sie rechnen ohne "
             "Teilsicherheitsbeiwerte. Der Stahl ist linear bis f_yk und "
@@ -173,12 +175,20 @@ def protokoll_festlegungen(p: Protokoll, wahl: Rechenwahl) -> None:
             "Stahlspannung darunter, und eine Grenze darüber könnte nie "
             "überschritten werden."
         )
-    else:
+    elif satz is Werkstoffsatz.BEMESSUNG:
         p.erklaerung(
             "Zweitens die Werkstoffgesetze: sie rechnen hier mit den "
             "Bemessungswerten f_cd und f_yd. Das Plateau des Stahls liegt "
             "damit bei f_yd – eine Stahlspannung darüber gibt es nicht, und "
             "eine Grenze darüber kann nicht überschritten werden."
+        )
+    else:
+        p.erklaerung(
+            "Zweitens die Werkstoffgesetze: jeder Baustoff rechnet mit seinen "
+            "Werten, wie oben gewählt – charakteristisch ohne "
+            "Teilsicherheitsbeiwerte, mit Bemessungswerten mit ihnen. Ein Stahl "
+            "mit f_yd hat sein Plateau dort: eine Stahlspannung darüber gibt es "
+            "bei ihm nicht, und eine Grenze darüber kann nicht überschritten werden."
         )
     if wahl.art.mit_block:
         p.erklaerung(
@@ -248,6 +258,9 @@ class Stahlspannungsort(ABC):
     messung: str = ""
     #: Mit welchem Durchmesser die Grenze aus der Rissbreite gilt, als Satz.
     regel_der_rissbreite: str = ""
+    #: Die Baustoffe, mit denen gerechnet wird -- die Rechenwahl nennt sie,
+    #: wenn ihre Wertesaetze verschieden sind.
+    baustoffe: Tuple[Baustoff, ...] = ()
 
     @abstractmethod
     def basis(self, grenze: Type[Spannungsgrenze]) -> str:
@@ -418,6 +431,7 @@ class PlattenStellen(Stahlspannungsort):
         Die Staehle dieser Richtung -- je Seite einer, der Editor laesst sie
         verschieden waehlen. Jeder bekommt seine eigene Grenze.
         """
+        self.baustoffe = (querschnitt.beton, *self.staehle)
         self.name = querschnitt.name
         self.abschnitt = querschnitt.abschnitt
         r = richtung.value
@@ -443,7 +457,7 @@ class PlattenStellen(Stahlspannungsort):
         return [
             Eingabebezug("h", q.id_von("h")),
             Eingabebezug("b", q.id_breite(self.richtung)),
-        ] + betonbezuege(wahl.satz, q.beton) + lagenbezuege(self.posten, wahl.satz)
+        ] + betonbezuege(wahl.satz(q.beton), q.beton) + lagenbezuege(self.posten, wahl)
 
     def stahlbezuege(self, kennwerte: Sequence[str]) -> List[Eingabebezug]:
         return stahlbezuege(self.posten, kennwerte)
@@ -454,8 +468,8 @@ class PlattenStellen(Stahlspannungsort):
         ] + [b for q in self.posten for b in q.bezuege("phi")]
 
     def zustand(self, e: Eingaben, wahl: Rechenwahl) -> _Plattenzustand:
-        w = Betonkennwerte.aus_eingaben(e, wahl)
-        lagen = stahllagen(self.posten, wahl.satz, e.si_nach_id())
+        w = Betonkennwerte.aus_eingaben(e, wahl, self.querschnitt.beton)
+        lagen = stahllagen(self.posten, wahl, e.si_nach_id())
         loeser = gesetze(wahl, w).loeser(h=e.g("h").si, b=e.g("b").si, lagen=lagen)
         nach_sorte = {kennung_aus(s.id): s for s in self.staehle}
         return _Plattenzustand(
@@ -532,7 +546,7 @@ class PlattenStellen(Stahlspannungsort):
     def protokoll_gesetze(self, p: Protokoll, e: Eingaben, zustand: Stahlzustand,
                           wahl: Rechenwahl, basis: str) -> None:
         protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze im Gebrauchszustand",
-                          posten=self.posten)
+                          beton=self.querschnitt.beton, posten=self.posten)
 
     def protokoll_verfahren(self, p: Protokoll, zustand: _Plattenzustand,
                             wahl: Rechenwahl) -> None:
@@ -719,7 +733,7 @@ class Spannungsbegrenzung(Nachweis):
         g, ort, wahl = self.grenze, self.ort, self.wahl
         p.titel(f"Stahlspannung unter {g.einwirkung} Einwirkung{ort.titelzusatz}")
         p.erklaerung(f"{g.einleitung} {ort.messung}")
-        phi = protokoll_rechenwahl(p, wahl, self.id)
+        phi = protokoll_rechenwahl(p, wahl, self.id, ort.baustoffe)
         ort.protokoll_vor_den_grenzen(p, e, zustand, wahl, phi, self.id)
         grenzen = g.bestimmen(ort, zustand, e, p, self.anforderung, self.id)
         protokoll_festlegungen(p, wahl)
@@ -757,7 +771,7 @@ class Spannungsbegrenzung(Nachweis):
         p.text(f"Stahl fliesst (σ_s = {erg.sigma_s / 1e6:.0f} N/mm²) → "
                f"Vergleich über die Dehnung.")
         p.formel(werte.dehnung("eps_y", r"\varepsilon_y", erg.eps_y),
-                 r"\frac{@f_s}{@E_s}", {"f_s": e[erg.stahl.eingabename(self.wahl.satz.stahl)],
+                 r"\frac{@f_s}{@E_s}", {"f_s": e[erg.stahl.eingabename(self.wahl.satz(erg.stahl).stahl)],
                                         "E_s": E_s},
                  titel="Grösste Zugdehnung in der Bewehrung", name=FLIESSDEHNUNG,
                  nachsatz=rf"\quad < \quad {angabe(wirkt)}")

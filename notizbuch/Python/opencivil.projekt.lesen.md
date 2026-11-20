@@ -1,5 +1,5 @@
 ---
-erzeugt: 8f50fa330558
+erzeugt: aecf8331b884
 art: modul
 tags: [modul]
 ---
@@ -65,7 +65,8 @@ zuweist, bekommt ebenso das Mitglied ([[opencivil.projekt.lesen#wahl_aus_text|wa
 `Beschreibung.__setattr__`). Geschrieben wird der Text -- `json.dumps`
 schreibt eine Wahl als ihren Wert, die Dateien bleiben Zeichen fuer Zeichen
 gleich. Bis 2026-10-17 hielten die Felder Text, und rund dreissig Stellen
-machten daraus wieder das Mitglied.
+machten daraus wieder das Mitglied. Dasselbe gilt fuer jeden Wert einer
+Zuordnung von Wahlen, etwa den Wertesatz je Material ([[opencivil.projekt.lesen#je_material|je_material]]).
 
 ## Inhalt
 
@@ -112,6 +113,27 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any=dataclasses.MISSING) -> Any
 
 Ein Feld, das nur einen dieser Werte annimmt -- die Pruefung kennt sie von hier.
 
+### je_material
+
+```python
+def je_material(vorgabe: Any, moeglich: Optional[Iterable[Any]]=None) -> Any
+```
+
+Ein Feld, das je Material eine Wahl haelt, unter der Kennung des
+Materials -- den Wertesatz etwa. Ein Material ohne eigene Wahl waehlt
+`vorgabe` ([[opencivil.projekt.lesen#vorgabe_je_material|vorgabe_je_material]]); `moeglich` begrenzt die Wahl
+wie bei [[opencivil.projekt.lesen#einer_von|einer_von]]. Eine Zuordnung und keine Liste: zwei Wahlen
+fuer dasselbe Material kann es so nicht geben. Bis 2026-11-20 hielt die
+Querschnittsanalyse eine Liste und wies doppelte Eintraege eigens ab.
+
+### vorgabe_je_material
+
+```python
+def vorgabe_je_material(cls: type, feld: str) -> Any
+```
+
+Was ein Material im Feld `feld` ([[opencivil.projekt.lesen#je_material|je_material]]) waehlt, solange es keine eigene Wahl hat.
+
 ### bereich
 
 ```python
@@ -152,6 +174,9 @@ Begrenzt ein Feld ein anderes ([[opencivil.core.bereich#Bereich|Bereich.bis_feld
 beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
 sagt: `bis_feld` bei α_min, `ab_feld` bei α_max. Die Zahl des anderen
 Feldes kennt erst die Maske.
+
+Haelt ein Feld je Material eine Wahl ([[opencivil.projekt.lesen#je_material|je_material]]), steht dort,
+was ein Material ohne eigene waehlt: `vorgabe`.
 
 Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
 des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
@@ -356,6 +381,15 @@ def _wahlfelder(cls: type) -> Dict[str, type]
 
 Je Wahlfeld einer Datenklasse seine Wahl -- je Klasse einmal.
 
+### _wahlzuordnungen
+
+```python
+@functools.lru_cache(maxsize=None)
+def _wahlzuordnungen(cls: type) -> Dict[str, type]
+```
+
+Je Feld, das eine Zuordnung von Wahlen haelt ([[opencivil.projekt.lesen#je_material|je_material]]), die Wahl seiner Werte.
+
 ### wahl_von
 
 ```python
@@ -373,6 +407,14 @@ def wahl_aus_text(cls: type, feld: str, wert: Any) -> Any
 Text in einem Wahlfeld wird sein Mitglied -- beim Lesen einer Datei und
 wo Python einen Text zuweist. Ein Text, den es nicht gibt, bleibt Text:
 die Pruefung meldet ihn dann mit seinem Ort ([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]).
+
+### _mitglied
+
+```python
+def _mitglied(wahl: type, wert: Any) -> Any
+```
+
+Ein Text als Mitglied der Wahl -- ein Text, den es nicht gibt, bleibt Text.
 
 ### _art
 

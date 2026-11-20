@@ -22,6 +22,11 @@ from opencivil.web import diagrammdaten, dienst
 STUETZE = KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0, laenge=4.0, knicklaenge=4.0)
 
 
+def beide(satz: str) -> dict:
+    """Derselbe Wertesatz für den Beton und den Stahl des Beispiels."""
+    return {"b1": satz, "s1": satz}
+
+
 def gerechnet(*, verformung=None, widerstand=None, tragsicherheit=None):
     """Nur das Knicken und was es braucht -- der Teillauf des Auges."""
     projekt = Projekt.beispiel()
@@ -101,7 +106,8 @@ class TestEigeneLinie(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.aufbau, cls.knicken, cls.loesung = gerechnet(
-            widerstand=KnickWiderstandswahl(werkstoffsatz="charakteristisch", rechenart="parabel"))
+            widerstand=KnickWiderstandswahl(werkstoffsaetze=beide("charakteristisch"),
+                                            rechenart="parabel"))
 
     def test_mit_eigener_herleitung(self):
         self.assertTrue(self.knicken.linienquelle.eigen)
@@ -196,7 +202,7 @@ class TestVerformung(unittest.TestCase):
         e_2d = {}
         for satz in ("bemessung", "charakteristisch"):
             _, knicken, loesung = gerechnet(
-                verformung=KnickVerformungswahl(werkstoffsatz=satz))
+                verformung=KnickVerformungswahl(werkstoffsaetze=beide(satz)))
             e_2d[satz] = loesung.befund(knicken).ergebnisse[0].e_2d
         self.assertLess(e_2d["charakteristisch"], e_2d["bemessung"])
 
@@ -231,10 +237,10 @@ class TestDatei(unittest.TestCase):
     def test_eine_teilweise_wahl_rechnet_wie_ihr_kapitel(self):
         daten = Projekt.beispiel().als_dict()
         daten["querschnitte"][0]["knicken_wahl_verformung"] = {
-            "kriechzahl": 1.5, "werkstoffsatz": "charakteristisch"}
+            "kriechzahl": 1.5, "werkstoffsaetze": {"b1": "charakteristisch"}}
         wahl = Projekt.aus_dict(daten).querschnitte[0].knicken_wahl_verformung
-        self.assertEqual((wahl.rechenart, wahl.kriechzahl, wahl.werkstoffsatz),
-                         ("parabel", 1.5, "charakteristisch"))
+        self.assertEqual((wahl.rechenart, wahl.kriechzahl, wahl.werkstoffsaetze),
+                         ("parabel", 1.5, {"b1": "charakteristisch"}))
 
     def test_von_hand_gesetzt_meldet_sich(self):
         p = Projekt.beispiel()

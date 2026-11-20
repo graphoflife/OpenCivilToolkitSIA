@@ -1,5 +1,5 @@
 ---
-erzeugt: b3036fb6b49f
+erzeugt: 85f1715ed709
 art: modul
 tags: [modul]
 ---
@@ -15,6 +15,15 @@ eine Stelle, die daraus die Werkstoffgesetze, die Bewehrungslagen und den
 Querschnittsloeser baut, und welche Rechenarten ein Kapitel anbietet. Die
 Kapitel der Platte und die Spannung-Dehnung-Analyse fragen hier, keines baut
 seine Gesetze oder Lagen selbst.
+
+
+## JE MATERIAL SEIN WERTESATZ
+
+Ein Kapitel waehlt den Wertesatz je Baustoff
+([[opencivil.querschnitt.gesetzwahl#Wertesaetze|Wertesaetze]]): der Beton liest
+`f_cd` oder `f_ck` nach seinem, jeder Stahl `f_yd` oder `f_yk`
+nach seinem (Benutzer, 2026-11-20). Die Herleitung nennt ihn einmal, wenn
+alle denselben haben, sonst je Baustoff ([[opencivil.nachweis.rechenwahl#protokoll_rechenwahl|protokoll_rechenwahl]]).
 
 
 ## JEDE LAGE MIT IHREM STAHL
@@ -54,8 +63,8 @@ N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 class Betonkennwerte
 ```
 
-Die Zahlen, aus denen das Betongesetz entsteht -- SI, im Wertesatz der
-Wahl. Den Stahl traegt jede Lage selbst ([[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]]).
+Die Zahlen, aus denen das Betongesetz entsteht -- SI, im Wertesatz des
+Betons. Den Stahl traegt jede Lage selbst ([[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]]).
 
 - `f_c: float` – `f_cd` oder `f_ck`.
 - `E_c: float` – Der Modul der Wahl, ohne Kriechen: `E_cm`, beim Knicken `E_cd`.
@@ -66,10 +75,10 @@ Wahl. Den Stahl traegt jede Lage selbst ([[opencivil.nachweis.rechenwahl#stahlla
 
 ```python
 @classmethod
-def aus_eingaben(cls, e: Eingaben, wahl: Rechenwahl) -> 'Betonkennwerte'
+def aus_eingaben(cls, e: Eingaben, wahl: Rechenwahl, beton) -> 'Betonkennwerte'
 ```
 
-Aus den Eingaben, die [[opencivil.nachweis.rechenwahl#betonbezuege|betonbezuege]] anmeldet.
+Aus den Eingaben, die [[opencivil.nachweis.rechenwahl#betonbezuege|betonbezuege]] fuer `beton` anmeldet.
 
 ### betonbezuege
 
@@ -78,7 +87,7 @@ def betonbezuege(satz: Werkstoffsatz, beton, *, modul: str='E_cm') -> List[Einga
 ```
 
 Was das Betongesetz einer Wahl braucht -- unter den Kurznamen des
-Wertesatzes, `f_cd` oder `f_ck`, und des Moduls der Wahl
+Wertesatzes dieses Betons, `f_cd` oder `f_ck`, und des Moduls der Wahl
 ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|modul]]). So steht in
 der Herleitung das Zeichen, mit dem gerechnet wird. Die Reihenfolge ist
 die, in der die Werte in der Herleitung der Baustoffe erscheinen.
@@ -102,20 +111,20 @@ Je Stahl der Posten diese Kennwerte, unter seinem [[opencivil.material.basis#Bau
 ### lagenbezuege
 
 ```python
-def lagenbezuege(posten: Sequence[Postenbezug], satz: Werkstoffsatz) -> List[Eingabebezug]
+def lagenbezuege(posten: Sequence[Postenbezug], wahl: Rechenwahl) -> List[Eingabebezug]
 ```
 
 Was [[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]] liest: je Posten Flaeche und Tiefe, je Stahl
-seine Kennwerte im Wertesatz der Wahl.
+seine Kennwerte in seinem Wertesatz.
 
 ### stahllagen
 
 ```python
-def stahllagen(posten: Sequence[Postenbezug], satz: Werkstoffsatz, wert: Callable[[str], float]) -> List[Stahllage]
+def stahllagen(posten: Sequence[Postenbezug], wahl: Rechenwahl, wert: Callable[[str], float]) -> List[Stahllage]
 ```
 
-Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage im Wertesatz der
-Wahl -- die eine Stelle, die Lagen baut.
+Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage in dessen
+Wertesatz -- die eine Stelle, die Lagen baut.
 
 `wert` liefert zu einer Wert-ID die Zahl in SI: in einem Nachweis aus
 seinen Eingaben (`Eingaben.si_nach_id` ueber [[opencivil.nachweis.rechenwahl#lagenbezuege|lagenbezuege]]), in
@@ -202,23 +211,26 @@ Der Loeser zu dieser Wahl, im Fenster der Gesetze ([[opencivil.nachweis.rechenwa
 ### protokoll_rechenwahl
 
 ```python
-def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, *, titel: str='Rechenwahl') -> Wert
+def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, stoffe: Sequence, *, titel: str='Rechenwahl') -> Wert
 ```
 
 Womit das Kapitel rechnet, in einer Zeile: phi (nur wo es wirkt), Werte,
-Rechenart. Zurueck kommt phi als Wert -- fuer die Formeln danach.
+Rechenart. Rechnen alle `stoffe` mit demselben Wertesatz, steht er
+einmal da, sonst je Baustoff mit seinem Namen. Zurueck kommt phi als
+Wert -- fuer die Formeln danach.
 
 ### protokoll_gesetze
 
 ```python
-def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *, titel: str, posten) -> None
+def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *, titel: str, beton, posten) -> None
 ```
 
 Die Werkstoffgesetze der Wahl, so wie gerechnet wird: jedes Gesetz
 schreibt sich selbst
 ([[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|protokoll]]), mit den
 Werten, mit denen es rechnet -- der Beton mit dem wirksamen Modul, jeder
-Stahl der Posten mit seinen; bei mehreren Staehlen mit dem Namen im Titel.
+Stahl der Posten mit seinen, jeder in seinem Wertesatz; bei mehreren
+Staehlen mit dem Namen im Titel.
 
 Der wirksame Modul selbst steht nicht hier: wo er gebraucht wird, schreibt
 ihn das Kapitel an der Stelle, an der er erklaert wird

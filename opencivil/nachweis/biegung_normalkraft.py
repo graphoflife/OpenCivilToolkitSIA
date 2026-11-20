@@ -59,7 +59,7 @@ from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher, linie as geo
 from opencivil.nachweis.dehnungsfaecher import Linienpunkt
 from opencivil.nachweis.handrechnung import Eckpunkt, Handrechnung, seiten
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, betongesetz
 from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, betonbezuege, bezuege_vereinen, lagenbezuege, protokoll_rechenwahl, stahllagen,
 )
@@ -366,7 +366,7 @@ class BiegungNormalkraft(Nachweis):
             basis,
             ausgaben=(list(self.d_ausnutzung.values()) + list(self.d_eckwerte.values())
                       + list(self.d_m_rd.values())),
-            bezuege=linienbezuege(querschnitt, self.posten, richtung, wahl.satz),
+            bezuege=linienbezuege(querschnitt, self.posten, richtung, wahl),
             titel=f"M-N-Nachweis {richtung.beschriftung} – {querschnitt.name}",
             referenz="SIA 262:2025, 4.3.2.3",
             # Siehe Querkraft: ohne Abschnitt landet der Nachweis unter der
@@ -385,7 +385,7 @@ class BiegungNormalkraft(Nachweis):
             art = (Rechenart.PARABEL if wahl.art is Rechenart.HANDRECHNUNG
                    else Rechenart.HANDRECHNUNG)
             befund.vergleich = self._linie(
-                Rechenwahl(kriechzahl=wahl.kriechzahl, satz=wahl.satz, art=art),
+                Rechenwahl(kriechzahl=wahl.kriechzahl, saetze=wahl.saetze, art=art),
                 e, StillesProtokoll())
 
         linie = befund.massgebend
@@ -572,9 +572,10 @@ class BiegungNormalkraft(Nachweis):
         """Einwirkung und Widerstand im normierten Diagramm -- fuer Tabelle und Herleitung."""
         n, r = auswertung.normierung, self.richtung.value
         werte = Zwischenwerte(f"{self.id}.{auswertung.schnittgroessen.kennung}")
+        # Mit gemischten Wertesaetzen hat R keinen Buchstaben am Index.
+        index = ",".join(filter(None, (self.wahl.saetze.kuerzel, r)))
         return (werte.zahl("E_norm", rf"\bar{{E}}_{{d,{r}}}", n.laenge, "Einwirkung"),
-                werte.zahl("R_norm", rf"\bar{{R}}_{{{self.wahl.satz.kuerzel},{r}}}", n.rand,
-                           "Widerstand"))
+                werte.zahl("R_norm", rf"\bar{{R}}_{{{index}}}", n.rand, "Widerstand"))
 
     def _protokoll_kombination(self, p: Protokoll, auswertung: Auswertung,
                                eckwerte: Mapping[str, float]) -> None:
@@ -652,19 +653,20 @@ class BiegungNormalkraft(Nachweis):
 
 
 def linienbezuege(querschnitt: Plattenquerschnitt, posten, richtung: Richtung,
-                  satz: Werkstoffsatz) -> List[Eingabebezug]:
+                  wahl: Rechenwahl) -> List[Eingabebezug]:
     """
     Was eine Resistenzlinie dieser Richtung braucht -- unter den Namen, die
-    :func:`resistenzlinie` liest: die Festigkeiten des Wertesatzes, ``f_cd``
-    und ``f_yd`` oder ``f_ck`` und ``f_yk``, ``E_cm`` fuer die Parabel, die
-    Bewehrung dieser Richtung und je Stahlsorte ihre Kennwerte.
+    :func:`resistenzlinie` liest: die Festigkeiten der Wertesaetze, ``f_cd``
+    oder ``f_ck`` des Betons, ``f_yd`` oder ``f_yk`` jedes Stahls, ``E_cm``
+    fuer die Parabel, die Bewehrung dieser Richtung und je Stahlsorte ihre
+    Kennwerte.
     """
     # Nur die Bewehrung dieser Richtung geht ein -- Querbewehrung traegt
     # nichts zum Momentenwiderstand um diese Achse bei.
     return [
         Eingabebezug("h", querschnitt.id_von("h")),
         Eingabebezug("b", querschnitt.id_breite(richtung)),
-    ] + betonbezuege(satz, querschnitt.beton) + lagenbezuege(posten, satz)
+    ] + betonbezuege(wahl.satz(querschnitt.beton), querschnitt.beton) + lagenbezuege(posten, wahl)
 
 
 def resistenzlinie(
@@ -682,20 +684,21 @@ def resistenzlinie(
     hand = wahl.art is Rechenart.HANDRECHNUNG
     p.titel(f"{vorsatz}Resistenzlinie aus {'Handrechnung' if hand else 'Dehnungsebenen'} – "
             f"{richtung.beschriftung}", ebene=ebene)
-    phi = protokoll_rechenwahl(p, wahl, basis, titel=wahltitel)
-    satz = wahl.satz
+    phi = protokoll_rechenwahl(p, wahl, basis, querschnitt.baustoffe, titel=wahltitel)
+    beton_satz = wahl.satz(querschnitt.beton)
     h, b = e.g("h").si, e.g("b").si
-    f_c = abs(e.g(satz.beton).si)
+    f_c = abs(e.g(beton_satz.beton).si)
     eps_c1d, eps_c2d = abs(e.g("eps_c1d").si), abs(e.g("eps_c2d").si)
-    lagen = stahllagen(posten, satz, e.si_nach_id())
+    lagen = stahllagen(posten, wahl, e.si_nach_id())
 
     if hand:
         unten, oben = seiten(
-            lagen, satz=satz,
+            lagen, saetze={kennung_aus(s.id): wahl.satz(s) for s in querschnitt.staehle},
             stahl_index={kennung_aus(s.id): s.symbol_index for s in querschnitt.staehle})
         handrechnung = Handrechnung(
             h=h, b=b, f_cd=f_c, eps_c2d=eps_c2d, unten=unten, oben=oben, basis=basis,
-            beton_index=querschnitt.beton.symbol_index, satz=satz,
+            beton_index=querschnitt.beton.symbol_index, beton_satz=beton_satz,
+            index=wahl.index,
         )
         return Handlinie(wahl, handrechnung.rechnen(p))
 
@@ -704,7 +707,7 @@ def resistenzlinie(
         beton=betongesetz(wahl, f_c=f_c, E_c=e.g(wahl.modul).si,
                           eps_c1d=eps_c1d, eps_c2d=eps_c2d),
         schritte=schritte, fasern=fasern)
-    linie.protokoll_ansatz(p, e, posten=posten, phi=phi, basis=basis)
+    linie.protokoll_ansatz(p, e, beton=querschnitt.beton, posten=posten, phi=phi, basis=basis)
     return linie
 
 
@@ -738,7 +741,7 @@ class Linienquelle:
         if not self.eigen:
             return bezuege
         return bezuege_vereinen(bezuege, linienbezuege(self.querschnitt, self.posten, self.richtung,
-                                                       self.wahl.satz))
+                                                       self.wahl))
 
     @property
     def befunde(self) -> List[Befundbezug]:

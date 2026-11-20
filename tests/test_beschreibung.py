@@ -17,7 +17,6 @@ from opencivil.projekt import (
 from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag, QAKnickEintrag,
     QALastfallEintrag, QASpannungsfallEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
-    WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.web import api, dienst
@@ -135,11 +134,14 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     sproede=True, zwaengung_biegung=True, duktilitaet=True, x_d_max=0.42,
                     zwaengung_biegung_kriechzahl=1.2,
                     tragsicherheit_wahl=RechenwahlEintrag(
-                        kriechzahl=1.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
+                        kriechzahl=1.5, rechenart="parabel",
+                        werkstoffsaetze={"b1": "charakteristisch", "s2": "bemessung"}),
                     knicken_wahl_verformung=KnickVerformungswahl(
-                        kriechzahl=2.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
+                        kriechzahl=2.5, werkstoffsaetze={"b1": "charakteristisch"},
+                        rechenart="parabel"),
                     knicken_wahl_widerstand=KnickWiderstandswahl(
-                        kriechzahl=0.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
+                        kriechzahl=0.5, werkstoffsaetze={"s2": "charakteristisch"},
+                        rechenart="parabel"),
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
                         durchmesser=10.0, abstand_x=250.0,
                         art_y="anzahl", anzahl_y=4.0,
@@ -430,8 +432,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
                 ("qaknick", QAKnickEintrag, {"name": "Neu"}),
                 ("knoten", KnotenEintrag, {}), ("flaeche", FlaecheEintrag, {}),
                 ("stab", StabEintrag, {}), ("stablinie", StablinieEintrag, {}),
-                ("schubwand", SchubwandEintrag, {}), ("hilfslinie", HilfslinieEintrag, {}),
-                ("werkstoffwahl", WerkstoffwahlEintrag, {"material": "b1"})):
+                ("schubwand", SchubwandEintrag, {}), ("hilfslinie", HilfslinieEintrag, {})):
             with self.subTest(art=art):
                 roh = {**zeilen[art], **pflicht}
                 self.assertEqual(cls.aus_dict(roh).als_dict(), roh)

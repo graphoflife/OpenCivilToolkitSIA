@@ -1,5 +1,5 @@
 ---
-erzeugt: f339d4f4fe45
+erzeugt: eaea8bf49c8b
 art: modul
 tags: [modul]
 ---
@@ -249,33 +249,6 @@ Moment 1. Ordnung zieht ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 
 - `richtung: Zugseite = Zugseite.UNTEN`
 
-### WerkstoffwahlEintrag
-
-```python
-@dataclass
-class WerkstoffwahlEintrag(Beschreibung)
-```
-
-Mit welchen Werten ein Material in dieser Analyse rechnet.
-
-`satz`: Bemessungs- oder charakteristische Werte -- das legt fest, wo
-die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`).
-`betongesetz`: beim Beton die Parabel-Rechteck-Beziehung oder der
-vereinfachte Spannungsblock 0.85·x.
-
-- `material: str`
-- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
-- `betongesetz: Rechenart = einer_von((Rechenart.PARABEL, Rechenart.BLOCK), Rechenart.PARABEL)` – Die beiden genauen Rechenarten -- die Parabel zuerst, sie ist die Vorgabe.
-
-#### WerkstoffwahlEintrag.rechenwahl
-
-```python
-@property
-def rechenwahl(self) -> Rechenwahl
-```
-
-Fuer die Rechnung: Wertesatz und Rechenart, ohne Kriechen -- der Bruchzustand.
-
 ### QASpannungsfallEintrag
 
 ```python
@@ -320,7 +293,7 @@ Elemente danach heissen weiter so wie vorher.
 
 ```python
 @dataclass
-class QuerschnittsanalyseEintrag(Querschnittsangaben)
+class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial)
 ```
 
 Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
@@ -334,7 +307,8 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `stablinien: List[StablinieEintrag] = field(default_factory=list)`
 - `schubwaende: List[SchubwandEintrag] = field(default_factory=list)`
 - `hilfslinien: List[HilfslinieEintrag] = field(default_factory=list)`
-- `werkstoffwahl: List[WerkstoffwahlEintrag] = field(default_factory=list)` – Je Material eine Wahl; fehlt eine, gelten die Vorgaben.
+- `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)` – Je Material die Werte der Tragsicherheit: Bemessungs- oder charakteristische -- das legt fest, wo die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`). Duktilitaet und sproedes Versagen rechnen am selben Querschnitt.
+- `betongesetze: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, (Rechenart.PARABEL, Rechenart.BLOCK))` – Je Beton das Gesetz der Tragsicherheit: die Parabel-Rechteck-Beziehung oder der vereinfachte Spannungsblock 0.85·x -- die Parabel zuerst, sie ist die Vorgabe.
 - `lastfaelle: List[QALastfallEintrag] = field(default_factory=list)`
 - `einachsig: bool = False` – Nur Biegung um y: die Nulllinie bleibt waagrecht, M_z und V_y zaehlen nicht, und Duktilitaet und sproedes Versagen gibt es nur in y. Torsion bleibt. Bei einem unsymmetrischen Querschnitt ist das eine Naeherung -- dasselbe, was die Platte immer tut.
 - `alpha_min: int = kleinste_neigung()`
@@ -345,13 +319,15 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 
-#### QuerschnittsanalyseEintrag.wahl
+#### QuerschnittsanalyseEintrag.rechenwahl
 
 ```python
-def wahl(self, material: str) -> WerkstoffwahlEintrag
+def rechenwahl(self, stoffe: Mapping[str, Any]) -> Dict[str, Rechenwahl]
 ```
 
-Die Wahl fuer dieses Material -- die Vorgaben, wenn keine dasteht.
+Fuer die Rechnung je Baustoff seine Wahl im Bruchzustand, ohne
+Kriechen: die Wertesaetze aller `stoffe` -- nach ihrer Kennung im
+Projekt -- und beim Beton sein Gesetz.
 
 #### QuerschnittsanalyseEintrag.materialien
 
@@ -469,18 +445,6 @@ ist, wohin ihre Ecke unten links kommt; die Lagen auf einen
 Millionstel Millimeter wie im Zeichenfenster, damit die Summe keinen
 Rundungsrest behaelt. Gibt die Kennungen der neuen Elemente zurueck.
 Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
-
-#### QuerschnittsanalyseEintrag.regeln
-
-```python
-def regeln(self, wo: str) -> None
-```
-
-Was erst das Rechnen braucht, wie bei der Platte
-([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittEintrag.regeln]]): eine abgelegte Analyse
-mit einer unmoeglichen Grenze soll sich oeffnen und korrigieren
-lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c \< 0 und
-x/d = 0.9.
 
 #### QuerschnittsanalyseEintrag.fallnamen
 

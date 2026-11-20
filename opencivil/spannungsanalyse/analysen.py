@@ -168,11 +168,11 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung", protokoll: Optional[Protokoll
                 continue
             paare: Dict[tuple, Optional[Paar]] = {}
             liste: List[Analyse] = []
-            for fall in faelle:
-                schluessel = (fall.richtung, fall.wahl)
+            for fall, wahl in faelle:
+                schluessel = (fall.richtung, wahl)
                 if schluessel not in paare:
                     try:
-                        paare[schluessel] = art.paar(teil, fall.richtung, wert, fall.wahl)
+                        paare[schluessel] = art.paar(teil, fall.richtung, wert, wahl)
                     except KeyError:
                         # Ein Wert wurde nicht gerechnet -- etwa in einer
                         # Richtung ohne Bewehrung. Dann gibt es nichts auszuwerten.

@@ -1,5 +1,5 @@
 ---
-erzeugt: e5df6acc70dd
+erzeugt: 2139e217c59d
 art: modul
 tags: [modul]
 ---
@@ -204,10 +204,11 @@ Der Satz zu einer Platte oder Analyse, der noch etwas fehlt -- klein beginnend.
 ### _modulfrage
 
 ```python
-def _modulfrage(q: StabquerschnittBasis, quelle) -> Optional[Modulfrage]
+def _modulfrage(q: StabquerschnittBasis, quelle, stoffe: Mapping[str, Baustoff]) -> Optional[Modulfrage]
 ```
 
-Die Frage nach dem E_eq eines Querschnitts -- nur, wenn er es nehmen soll.
+Die Frage nach dem E_eq eines Querschnitts -- nur, wenn er es nehmen soll;
+mit den Werten je Material der Platte oder Analyse, aus der er kommt.
 
 ### _paare
 

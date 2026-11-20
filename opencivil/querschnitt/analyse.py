@@ -86,7 +86,7 @@ def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *
     selbst, und der Bruchzustand nahm den Beiwert der Parabel aus ``E_cd``.
     """
     w = lambda k: abs(wert(stoff.id_von(k)))
-    satz = wahl.satz
+    satz = wahl.satz(stoff)
     if stoff.art is Baustoffart.BETON:
         eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
         gesetz = betongesetz(wahl, f_c=w(satz.beton), E_c=w(wahl.modul),
@@ -105,8 +105,8 @@ def gesetz_protokollieren(p: Protokoll, e: Eingaben, stoff: Baustoff, gesetz: Ge
     denen es gebaut ist (:func:`werkstoff`) -- gelesen aus ``e`` unter
     :meth:`~opencivil.material.basis.Baustoff.eingabename`.
     """
-    satz = wahl.satz
-    kennwerte = wahl.betonkennwerte if stoff.art is Baustoffart.BETON else satz.stahlkennwerte
+    satz = wahl.satz(stoff)
+    kennwerte = wahl.betonkennwerte(stoff) if stoff.art is Baustoffart.BETON else satz.stahlkennwerte
     gesetz.protokoll(p, {rolle: e[stoff.eingabename(name)] for rolle, name in kennwerte.items()},
                      titel=f"Werkstoffgesetz {stoff.name}, {satz.beschriftung}",
                      basis=f"{basis}.{kennung_aus(stoff.id)}")
@@ -415,7 +415,10 @@ class Querschnittsanalyse(Rechenobjekt):
         (:func:`~opencivil.nachweis.rissgroessen.bruttoquerschnitt`).
         """
         self.wahl = dict(wahl)
-        """Je Baustoff-ID der Wertesatz und beim Beton die Rechenart -- ohne Kriechen."""
+        """
+        Je Baustoff-ID seine Wahl im Bruchzustand: die Wertesaetze aller
+        Baustoffe und beim Beton seine Rechenart -- ohne Kriechen.
+        """
         self.flaechen = tuple(flaechen)
         self.definitionen: Dict[str, WertDef] = {}
         self.berechnungen: List[Berechnung] = []
@@ -797,10 +800,10 @@ class Querschnittsanalyse(Rechenobjekt):
         def f_yd(w: Wandangabe) -> float:
             if w.stahl is None:
                 return 0.0
-            return abs(self.kennwert(e, w.stahl, self.rechenwahl(w.stahl).satz.stahl))
+            return abs(self.kennwert(e, w.stahl, self.rechenwahl(w.stahl).satz(w.stahl).stahl))
 
         def f_cd(w: Wandangabe) -> float:
-            return abs(self.kennwert(e, w.beton, self.rechenwahl(w.beton).satz.beton))
+            return abs(self.kennwert(e, w.beton, self.rechenwahl(w.beton).satz(w.beton).beton))
 
         return self.schubwaende(f_yd=f_yd, f_cd=f_cd, k_c=e.g("k_c").si)
 

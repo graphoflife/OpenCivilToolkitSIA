@@ -11,7 +11,7 @@ import unittest
 
 from opencivil.core.berechnung import Eingabebezug
 from opencivil.nachweis.querschnittsloeser import Stahllage, je_seite
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, bezuege_vereinen, gesetze,
 )
@@ -32,14 +32,67 @@ class TestRechenarten(unittest.TestCase):
         self.assertEqual([a.value for a in RECHENARTEN], ["handrechnung", "block", "parabel"])
         self.assertEqual(SPANNUNGSARTEN[-1], Rechenart.ELASTISCH)
         self.assertEqual(Rechenwahl().index, "Rd")
-        self.assertEqual(Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH).index, "Rk")
+        self.assertEqual(Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH)).index,
+                         "Rk")
 
     def test_aus_den_feldern_einer_beschreibung(self):
-        """Die Felder halten schon die Wahlen -- die Rechenwahl entsteht ohne Umwandlung."""
-        from opencivil.projekt import RechenwahlEintrag
-        wahl = RechenwahlEintrag(kriechzahl=1.5, werkstoffsatz="charakteristisch",
-                                 rechenart="parabel").wahl
-        self.assertEqual(wahl, Rechenwahl(1.5, Werkstoffsatz.CHARAKTERISTISCH, Rechenart.PARABEL))
+        """
+        Die Felder halten schon die Wahlen -- die Rechenwahl entsteht ohne
+        Umwandlung, je Material. Ein Material ohne eigene Wahl rechnet mit der
+        Vorgabe seines Kapitels.
+        """
+        from opencivil.projekt import Projekt, RechenwahlEintrag
+        stoffe = Projekt.beispiel().aufbauen().baustoffe
+        eintrag = RechenwahlEintrag(kriechzahl=1.5, werkstoffsaetze={"b1": "charakteristisch"},
+                                    rechenart="parabel")
+        wahl = eintrag.wahl(stoffe)
+        self.assertEqual((wahl.kriechzahl, wahl.art), (1.5, Rechenart.PARABEL))
+        self.assertIs(wahl.satz(stoffe["b1"]), Werkstoffsatz.CHARAKTERISTISCH)
+        self.assertIs(wahl.satz(stoffe["s1"]), Werkstoffsatz.BEMESSUNG)
+        self.assertEqual(wahl.index, "R")
+        # Alle gleich: dieselbe Wahl wie ein Satz für alle -- sonst rechnete
+        # ein Kapitel seine eigene Linie neben der gleichen eines anderen.
+        eintrag.werkstoffsaetze = {"b1": "charakteristisch", "s1": "charakteristisch"}
+        self.assertEqual(eintrag.wahl(stoffe), Rechenwahl(
+            1.5, Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), Rechenart.PARABEL))
+
+
+class TestWertesaetze(unittest.TestCase):
+    """Je Baustoff sein Satz -- und wie eine Wahl heisst, die beide mischt."""
+
+    class Stoff:
+        def __init__(self, id):
+            self.id = id
+
+    BETON, STAHL, ANDERER = Stoff("C30/37"), Stoff("B500B"), Stoff("S355")
+
+    def test_ein_satz_fuer_alle(self):
+        for satz in Werkstoffsatz:
+            with self.subTest(satz=satz.value):
+                alle = Wertesaetze.alle(satz)
+                self.assertEqual(Wertesaetze.je({"C30/37": satz, "B500B": satz}), alle)
+                self.assertIs(alle.einheitlich, satz)
+                self.assertIs(alle.von(self.ANDERER), satz)
+                self.assertEqual((alle.index, alle.kuerzel), (satz.widerstandsindex, satz.kuerzel))
+        # Ohne Baustoff gilt die Vorgabe.
+        self.assertEqual(Wertesaetze.je({}, Werkstoffsatz.CHARAKTERISTISCH),
+                         Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH))
+
+    def test_gemischt(self):
+        """Weder Rd noch Rk: ein Widerstand mit gemischten Werten heisst R."""
+        gemischt = Wertesaetze.je({"C30/37": Werkstoffsatz.CHARAKTERISTISCH,
+                                   "B500B": Werkstoffsatz.BEMESSUNG})
+        self.assertIs(gemischt.von(self.BETON), Werkstoffsatz.CHARAKTERISTISCH)
+        self.assertIs(gemischt.von(self.STAHL), Werkstoffsatz.BEMESSUNG)
+        self.assertIs(gemischt.von(self.ANDERER), Werkstoffsatz.BEMESSUNG)
+        self.assertIsNone(gemischt.einheitlich)
+        self.assertEqual((gemischt.index, gemischt.kuerzel, gemischt.kurz, gemischt.beschriftung),
+                         ("R", "", "gemischt", "gemischte Werte"))
+        # Die Reihenfolge der Eingabe zählt nicht: dieselbe Wahl, ein Schlüssel.
+        self.assertEqual(gemischt, Wertesaetze.je({"B500B": Werkstoffsatz.BEMESSUNG,
+                                                   "C30/37": Werkstoffsatz.CHARAKTERISTISCH}))
+        self.assertEqual(Rechenwahl(saetze=gemischt).beschriftung,
+                         "Handrechnung, gemischt")
 
     def test_ohne_ebene_nennt_die_wahl(self):
         """Verfehlt die Suche ihre Ebene, steht da, womit -- und was hilft."""
@@ -172,13 +225,14 @@ class TestJederNachweis(unittest.TestCase):
         cls.projekt = Projekt.jeder_nachweis()
 
     def test_tragsicherheit_jede_rechenart_und_beide_werte(self):
-        wahlen = [q.tragsicherheit_wahl.wahl for q in self.projekt.querschnitte
-                  if q.kombinationen]
+        aufbau = self.projekt.aufbauen()
+        wahlen = [n.wahl for n in aufbau.feld("nachweise").values()]
         self.assertEqual({w.art for w in wahlen}, set(RECHENARTEN))
-        self.assertEqual({w.satz for w in wahlen}, set(Werkstoffsatz))
+        # Beide Sätze für alle, und einmal gemischt.
+        self.assertEqual({w.saetze.einheitlich for w in wahlen}, {*Werkstoffsatz, None})
 
     def test_stahlspannung_jede_rechenart(self):
-        arten = {liste.wahl.wahl.art for q in self.projekt.querschnitte
+        arten = {liste.wahl.rechenart for q in self.projekt.querschnitte
                  for liste in (q.haeufig, q.quasistaendig) if liste.faelle}
         self.assertEqual(arten, set(SPANNUNGSARTEN))
 
@@ -188,5 +242,5 @@ class TestJederNachweis(unittest.TestCase):
         # Die Verformung kennt nur eine Rechenart, darum beide Wertesaetze.
         self.assertEqual({k.verformung.art for k in aufbau.feld("knicken").values()},
                          set(VERFORMUNGSARTEN))
-        self.assertEqual({k.verformung.satz for k in aufbau.feld("knicken").values()},
+        self.assertEqual({k.verformung.saetze.einheitlich for k in aufbau.feld("knicken").values()},
                          set(Werkstoffsatz))

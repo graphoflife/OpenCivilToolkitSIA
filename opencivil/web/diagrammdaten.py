@@ -272,9 +272,9 @@ def _analyse_dict(analyse) -> dict:
     # Wo die Mitteldehnung gilt -- an der Achse der N-eps-Linie.
     kopf["bezugsort"] = paar.bezugsort
     # Womit gerechnet wurde, beim Bild angeschrieben -- und wie ein Widerstand
-    # darum heisst: R_d oder R_k sagt der Kern, nicht die Oberflaeche.
+    # darum heisst: Rd, Rk oder gemischt R sagt der Kern, nicht die Oberflaeche.
     wahl = paar.wahl
-    kopf["wahl"] = {"phi": wahl.kriechzahl, "satz": wahl.satz.value,
+    kopf["wahl"] = {"phi": wahl.kriechzahl, "werte": wahl.saetze.beschriftung,
                     "rechenart": wahl.art.value, "index": wahl.index}
     if isinstance(analyse.kurve, spannungsanalyse.Modullinie):
         return {**kopf, "moeglich": True, "kurve": _modul_dict(analyse.kurve)}

@@ -27,7 +27,9 @@ from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsan
 from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF
 from opencivil.querschnitt.geometrie import GeometrieFehler
 
-from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, knickfall, material, spannungsnachweise
+from opencivil.projekt.aufbau.kern import (
+    Aufbau, Bauteil, knickfall, material, spannungsfaelle, spannungsnachweise, stoffe_von,
+)
 
 if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
@@ -61,6 +63,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         raise ProjektFehler(str(fehler), wo=ort_von(eintrag)) from None
     analyse.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag, art, analyse)
+    stoffe = stoffe_von(aufbau, analyse.baustoffe)
 
     # Die Lastfaelle in SI, aus der Einheit ihrer Felder: N, M_y ... aus
     # N_Ed, M_y_Ed ...
@@ -101,8 +104,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         aufbau.eintragen(teil, "qa_knicken", eintrag.kennung, KnickenQA(
             analyse, [knickfall(k, QAKnickfall, richtung=k.richtung)
                       for k in knickfaelle],
-            verformung=eintrag.knicken_wahl_verformung.wahl,
-            widerstand=eintrag.knicken_wahl_widerstand.wahl, schnell=aufbau.schnell))
+            verformung=eintrag.knicken_wahl_verformung.wahl(stoffe),
+            widerstand=eintrag.knicken_wahl_widerstand.wahl(stoffe), schnell=aufbau.schnell))
 
     # Was der Querschnitt aufnimmt, ohne Einwirkung -- immer, wie bei der
     # Platte (Benutzer, 2026-10-23). Am Ende, nach seinen Nachweisen.
@@ -111,9 +114,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     teil.weitere_ziele.append(kennzahlen.id)
     teil.kennzahlen += kennzahlen.kennzahlen
 
-    aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
-    if aktive:
-        aufbau.spannungsfaelle[eintrag.kennung] = aktive
+    spannungsfaelle(eintrag, stoffe, aufbau)
     return teil
 
 
@@ -154,7 +155,7 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
               for w in elemente.waende]
     # Jeder Baustoff bekommt seine Wahl, auch wer keine eigene hat: so steht
     # die Vorgabe nur an der Beschreibung.
-    wahl = {b.id: eintrag.wahl(kennung).rechenwahl for kennung, b in baustoffe.items()}
+    wahl = eintrag.rechenwahl({k: baustoffe[k] for k in eintrag.materialien() if k in baustoffe})
     return Querschnittsanalyse(
         name=eintrag.name, praefix=praefix,
         flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,

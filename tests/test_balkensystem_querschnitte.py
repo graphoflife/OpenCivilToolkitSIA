@@ -10,6 +10,7 @@ import unittest
 
 from opencivil.projekt import BalkensystemEintrag, Projekt, QuerschnittsanalyseEintrag
 from opencivil.projekt.balkensystem import StabmaterialEintrag
+from opencivil.projekt.aufbau.kern import stoffe_von
 from opencivil.projekt.balkensystem3d import RaummaterialEintrag
 from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.querschnitt.platte import Richtung
@@ -290,8 +291,9 @@ class TestEeq(unittest.TestCase):
     def linie(self, e, q, N=0.0):
         """Die Linie M–E_eq der Analyse selbst, gerechnet wie in ihrer Spannung-Dehnung-Analyse."""
         werte = e.loesung.werte
-        paar = schnittpaar(e.aufbau.querschnittsanalysen["a1"], Zugseite.UNTEN,
-                           lambda kid: werte[kid].groesse.si, q.eq.wahl)
+        analyse = e.aufbau.querschnittsanalysen["a1"]
+        paar = schnittpaar(analyse, Zugseite.UNTEN, lambda kid: werte[kid].groesse.si,
+                           q.eq.wahl(stoffe_von(e.aufbau, analyse.baustoffe)))
         return aequivalenter_modul(moment_kruemmung(paar, N=N), I_c=paar.I_c, A_c=paar.A_c,
                                    E_cm=paar.E_cm)
 
@@ -376,8 +378,9 @@ class TestEeqPlatte(unittest.TestCase):
     def linie(self, e, q):
         """Die Linie M–E_eq der Platte in x, gerechnet wie in ihrer Spannung-Dehnung-Analyse."""
         werte = e.loesung.werte
-        paar = loeserpaar(e.aufbau.querschnitte["q1"], Richtung.X,
-                          lambda kid: werte[kid].groesse.si, q.eq.wahl)
+        platte = e.aufbau.querschnitte["q1"]
+        paar = loeserpaar(platte, Richtung.X, lambda kid: werte[kid].groesse.si,
+                          q.eq.wahl(stoffe_von(e.aufbau, platte.baustoffe)))
         return aequivalenter_modul(moment_kruemmung(paar, N=0.0), I_c=paar.I_c, A_c=paar.A_c,
                                    E_cm=paar.E_cm)
 

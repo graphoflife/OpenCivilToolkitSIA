@@ -1,5 +1,5 @@
 ---
-erzeugt: 1ef0c77c6920
+erzeugt: accd6e16261c
 art: modul
 tags: [modul]
 ---
@@ -172,7 +172,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 
 - `_WERKSTOFFSAETZE = [{'wert': s.value, 'beschriftung': s.beschriftung, 'kurz': s.kurz} fo…` – Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. `kurz` fuer die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter stehen beim Wertesatz selbst.
 - `_VERSCHMIERUNGEN = {'flaeche': ('Stahlfläche', 'Die Stahlfläche der ganzen Linie, von Ha…` – Wie die Angaben einer verschmierten Stablinie heissen: kurz im Schalter, lang in seinem Titel -- je Angabe, die die Beschreibung kennt.
-- `_BETONGESETZE = [{'wert': a.value, 'beschriftung': a.beschriftung, 'kurz': a.kurz} fo…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche es gibt, steht am Feld der Werkstoffwahl.
+- `_BETONGESETZE = [{'wert': a.value, 'beschriftung': a.beschriftung, 'kurz': a.kurz} fo…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche es gibt, steht am Feld der Betongesetze je Beton.
 - `_DECKENGROESSEN = {'m_x': ('m_x', 'Moment m_x'), 'm_y': ('m_y', 'Moment m_y'), 'm_xy': …` – Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem Titel. Die Regel dahinter steht in [[opencivil.decke.aufteilung]]. Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber dem Bild -- je Groesse, die die Beschreibung kennt. M und V sind die eines ganzen Unterzugs.
 - `_AUFTEILUNGEN = {Aufteilung.AUTOMATISCH: ('automatisch', 'Je Stelle nach ihren Lagern…`
 - `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.

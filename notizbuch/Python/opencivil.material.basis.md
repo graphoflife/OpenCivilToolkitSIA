@@ -1,5 +1,5 @@
 ---
-erzeugt: 9c96dda62328
+erzeugt: 4ec53133d849
 art: modul
 tags: [modul]
 ---
@@ -253,6 +253,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.platte]]

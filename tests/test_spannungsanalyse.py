@@ -15,7 +15,7 @@ import unittest
 
 from opencivil import spannungsanalyse as sa
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TitelBlock
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.projekt import (
     Projekt, ProjektFehler, RechenwahlEintrag, SpannungsfallEintrag,
 )
@@ -45,7 +45,7 @@ def loeserpaar(projekt=None, *, kriechzahl=2.0, satz=Werkstoffsatz.BEMESSUNG,
     aufbau, loesung = rechnen(projekt)
     return sa.loeserpaar(aufbau.querschnitte["q1"], Richtung.X,
                          lambda kid: loesung.werte[kid].groesse.si,
-                         wahl=Rechenwahl(kriechzahl, satz, art))
+                         wahl=Rechenwahl(kriechzahl, Wertesaetze.alle(satz), art))
 
 
 def platte(name, **felder):
@@ -445,11 +445,11 @@ class TestEndeIstTragwiderstand(unittest.TestCase):
                 for satz in ("bemessung", "charakteristisch"):
                     q = projekt.platte(f"{art} {phi} {satz}", h=300, x=[18, 12],
                                        x_zulage=[12, 0], y=[12, 12])
-                    q.tragsicherheit_wahl = RechenwahlEintrag(
-                        kriechzahl=phi, werkstoffsatz=satz, rechenart=art)
+                    wahl = dict(kriechzahl=phi, rechenart=art,
+                                werkstoffsaetze={kennung: satz for kennung in q.materialien()})
+                    q.tragsicherheit_wahl = RechenwahlEintrag(**wahl)
                     q.einwirkung("Druck", M_Ed=50.0, N_Ed=-300.0)
                     q.einwirkung("Zug", N_Ed=200.0).art = "M_konstant"
-                    wahl = dict(kriechzahl=phi, werkstoffsatz=satz, rechenart=art)
                     q.spannungsfall("M-χ", art="moment_kruemmung", N_Ed=-300.0, **wahl)
                     q.spannungsfall("N-ε", art="normalkraft_dehnung", M_Ed=0.0, **wahl)
                     cls.wahlen.append((q.kennung, art, phi, satz))
@@ -510,8 +510,8 @@ class TestWahl(unittest.TestCase):
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].spannungsfall("neu", art="moment_kruemmung")
         analyse = projekt.rechnen().analysen()["q1"][0]
-        self.assertEqual(analyse.paar.wahl, Rechenwahl(0.0, Werkstoffsatz.BEMESSUNG,
-                                                       Rechenart.PARABEL))
+        self.assertEqual(analyse.paar.wahl, Rechenwahl(
+            0.0, Wertesaetze.alle(Werkstoffsatz.BEMESSUNG), Rechenart.PARABEL))
 
     def test_die_kriechzahl_der_analyse_gilt(self):
         """Ohne Kriechen ist der Beton steifer, und die Linie krümmt sich weniger."""
@@ -551,7 +551,7 @@ class TestWahl(unittest.TestCase):
         self.assertEqual([f.rechenart for f in faelle], ["parabel", "parabel"])
 
     def test_was_es_nicht_gibt_meldet_sich(self):
-        for feld, wert in (("art", "kreis"), ("werkstoffsatz", "mittel"),
+        for feld, wert in (("art", "kreis"), ("werkstoffsaetze", {"b1": "mittel"}),
                            ("rechenart", "dreieck"), ("betongesetz", "dreieck")):
             with self.subTest(feld=feld):
                 with self.assertRaises(ProjektFehler):
@@ -730,7 +730,9 @@ class TestAequivalenterModul(unittest.TestCase):
     def test_ueber_den_dienst(self):
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].spannungsfaelle = [
-            SpannungsfallEintrag(name="M", art="moment_emodul", werkstoffsatz="charakteristisch"),
+            SpannungsfallEintrag(name="M", art="moment_emodul",
+                                 werkstoffsaetze={"b1": "charakteristisch",
+                                                  "s1": "charakteristisch"}),
             SpannungsfallEintrag(name="N", art="normalkraft_emodul", M_Ed=30.0)]
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         self.assertEqual(antwort.status, 200)
@@ -813,7 +815,7 @@ class TestUeberDenDienst(unittest.TestCase):
         self.assertGreater(kurve["sprung"]["nach"], kurve["sprung"]["vor"])
         self.assertLess(kurve["fliessen"]["kraft"], kurve["bruch"]["kraft"])
         self.assertIn("massgebend", kurve["bruch"])
-        self.assertEqual(faelle[2]["wahl"], {"phi": 0.0, "satz": "bemessung",
+        self.assertEqual(faelle[2]["wahl"], {"phi": 0.0, "werte": "Bemessungswerte",
                                              "rechenart": "parabel", "index": "Rd"})
         # Die N-ε-Linie in kN und Promille: N_Riss(20 kNm) mit k_t für die
         # ganze Dicke, 2.9/1.15 N/mm² · 1000 · 300 mm² − 6·20/0.3 = 356.5 kN.

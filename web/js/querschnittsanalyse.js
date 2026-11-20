@@ -26,12 +26,12 @@ import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { span } from './mathe.js';
 import {
-  analysenKapitel, mitKopf, nachweisKapitel, rechenartStellungen,
+  analysenKapitel, mitKopf, nachweisKapitel, werkstoffzeilen,
 } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
-import { geometriefehler, materialienVon, zeichenbereich } from './qa_zeichnung.js';
+import { werkstoffeVon, zeichenbereich } from './qa_zeichnung.js';
 import {
-  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog,
+  ausVorlage, eintragAendern, feldangabe, katalog,
 } from './zustand.js';
 
 /**
@@ -155,60 +155,19 @@ function querschnittGruppe(analyse) {
 // ===========================================================================
 
 /**
- * Je Material im Querschnitt eine Zeile: Bemessungs- oder charakteristische
- * Werte, beim Beton dazu das Gesetz. Welche Materialien es sind, zählt der
- * Kern (`materialienVon`) -- bis 2026-10-18 zählte die Oberfläche sie ein
- * zweites Mal. Die Beschriftungen kommen aus dem Kern, die Vorgaben einer
- * fehlenden Wahl aus seiner Vorlage. Es ist die Wahl der Tragsicherheit;
- * Duktilität und sprödes Versagen rechnen am selben Querschnitt.
+ * Womit die Tragsicherheit rechnet: je Material im Querschnitt seine Werte,
+ * beim Beton dazu sein Gesetz -- dieselben Zeilen wie die Rechenwahl jedes
+ * Moduls (`werkstoffzeilen`), ohne Kriechzahl und ohne Rechenart: die
+ * Rechenart ist hier das Gesetz je Beton. Duktilität und sprödes Versagen
+ * rechnen am selben Querschnitt.
  */
-function werkstoffwahl(analyse) {
-  const kennungen = materialienVon(analyse.kennung);
-  const wahlen = katalog('querschnittsanalyse');
-  const vorgabe = katalog('vorlagen', 'werkstoffwahl');
-
-  const setzen = (material, feldname, wert) => eintragAendern(analyse.kennung, (a) => {
-    let w = a.werkstoffwahl.find((x) => x.material === material);
-    if (!w) {
-      w = ausVorlage('werkstoffwahl', { material });
-      a.werkstoffwahl.push(w);
-    }
-    w[feldname] = wert;
-  });
-
-  const zeile = (kennung) => {
-    const material = eintragVon(kennung);
-    if (!material) return null;
-    const wahl = analyse.werkstoffwahl.find((w) => w.material === kennung) || vorgabe;
-    const istBeton = material.art === 'beton';
-    // Die kurzen Namen im Schalter, die langen in den Titeln seiner Stellungen.
-    const kurz = (liste) => (liste || []).map((x) => ({ wert: x.wert, beschriftung: x.kurz, titel: x.beschriftung }));
-    return el('div.werkstoffzeile', { class: istBeton ? 'ist-beton' : 'ist-stahl' }, [
-      el('span.werkstoffname', { text: material.name || material.sorte }),
-      wahlSchalter({
-        werte: kurz(wahlen.werkstoffsaetze),
-        gewaehlt: wahl.satz,
-        titel: 'Rechenwerte: Bemessung (f_cd, f_yd) oder charakteristisch (f_ck, f_yk)',
-        setzen: (v) => setzen(kennung, 'satz', v),
-      }),
-      istBeton
-        ? wahlSchalter({
-          werte: rechenartStellungen(wahlen.betongesetze),
-          gewaehlt: wahl.betongesetz,
-          titel: 'Spannungs-Dehnungs-Beziehung des Betons',
-          setzen: (v) => setzen(kennung, 'betongesetz', v),
-        })
-        : null,
-    ]);
-  };
-
-  const kaputt = kennungen === null ? geometriefehler(analyse.kennung) : '';
-  let inhalt;
-  if (kaputt) inhalt = [el('div.leer', { text: `Die Zeichnung ist nicht geprüft: ${kaputt}` })];
-  else if (kennungen === null) inhalt = [el('div.leer', { text: 'Der Kern liest die Zeichnung …' })];
-  else if (!kennungen.length) inhalt = [el('div.leer', { text: 'Noch kein Material im Querschnitt.' })];
-  else inhalt = kennungen.map(zeile);
-  return [el('span.rechenwahl-titel', { text: 'Rechenwerte je Material' }), ...inhalt];
+function rechenwahl(analyse) {
+  return el('div.rechenwahl', {}, [
+    el('span.rechenwahl-titel', { text: 'Rechenwahl' }),
+    werkstoffzeilen(analyse, (veraenderer) => eintragAendern(analyse.kennung, veraenderer), {
+      ...werkstoffeVon(analyse.kennung), klasse: 'querschnittsanalyse', mitGesetz: true,
+    }),
+  ]);
 }
 
 /**
@@ -259,7 +218,7 @@ function tragsicherheitInhalt(analyse) {
   const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
   const faelle = analyse.lastfaelle;
   return [
-    ...werkstoffwahl(analyse),
+    rechenwahl(analyse),
     el('div.qa-kopfzeile', {}, [
       // Je Stellung die Nulllinie im Bild, statt Häkchen und Satz (Benutzer,
       // 2026-11-19); was sonst noch gilt, steht im Titel der Stellung.
@@ -441,6 +400,8 @@ function zugseitenWahl(gewaehlt, setzen, titel) {
 const ORT = {
   klasse: 'querschnittsanalyse',
   vorlage: 'qaspannungsfall',
+  // Welche Materialien es sind, zählt der Kern mit der Zeichnung.
+  werkstoffe: (a) => werkstoffeVon(a.kennung),
   richtung: (k, setzen) => mitKopf('Zug', zugseitenWahl(
     k.richtung, setzen, 'Zugseite: die Seite, die ein positives Moment zieht')),
   raender: (k) => zugseite(k.richtung)?.raender || ['oben', 'unten'],
@@ -473,6 +434,7 @@ const ORT = {
   // Querkraft und Torsion.
   gebrauch: {
     liste: 'qagebrauchsliste',
+    wahl: 'qagebrauchswahl',
     // Woraus «aus der Tragsicherheit» ableitet: die Lastfälle der Analyse.
     aus: 'lastfaelle',
     vorlage: 'qagebrauchsfall',

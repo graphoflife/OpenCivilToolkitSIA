@@ -143,7 +143,8 @@ class KnickenQA(Knickverfahren):
                                   ("Widerstand (N_Rd)", self.widerstand, "widerstand")):
             p.titel(titel.split(" ")[0], ebene=3)
             basis = f"{self.id}.{teil}"
-            protokoll_rechenwahl(p, wahl, basis, titel=f"Rechenwahl – {titel}")
+            protokoll_rechenwahl(p, wahl, basis, self.analyse.baustoffe,
+                                 titel=f"Rechenwahl – {titel}")
             protokoll_gesetze_nach_wahl(p, e, self.analyse, wahl, basis,
                                         titel=f"Werkstoffgesetze – {titel.split(' ')[0]}")
         p.erklaerung(VERFORMUNG_NACH_WAHL)
