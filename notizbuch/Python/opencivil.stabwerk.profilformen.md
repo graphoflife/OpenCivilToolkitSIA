@@ -1,5 +1,5 @@
 ---
-erzeugt: 7540024873f4
+erzeugt: 0792435819fc
 art: modul
 tags: [modul]
 ---
@@ -123,6 +123,7 @@ Eine Formel der Vorlagen, in den Einheiten der Profile: Flaechen in cm², Moment
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.stabwerk.querschnitte]]
 
 ## Gebraucht von

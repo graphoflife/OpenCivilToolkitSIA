@@ -4027,6 +4027,21 @@
       ]
     },
     {
+      "name": "opencivil.core.bereich",
+      "pfad": "Python/opencivil.core.bereich.md",
+      "art": "modul",
+      "kurz": "wo eine Zahl liegen muss.",
+      "stichworte": [
+        "Bereich",
+        "Bereich.grund",
+        "Bereich.verlangt",
+        "Bereich.gegen",
+        "Bereich.grund_gegen",
+        "Bereich.zahl",
+        "Bereich.angabe"
+      ]
+    },
+    {
       "name": "opencivil.core.einheiten",
       "pfad": "Python/opencivil.core.einheiten.md",
       "art": "modul",
@@ -6711,18 +6726,12 @@
       "stichworte": [
         "ProjektFehler",
         "ProjektFehler.grund_bei",
+        "anhalten",
         "einer_von",
-        "Bereich",
-        "Bereich.pruefen",
-        "Bereich.verlangt",
-        "Bereich.gegen",
-        "Bereich.nicht_ueber",
-        "Bereich._zahl",
         "bereich",
         "als_groesse",
         "feldangaben",
         "_bereiche",
-        "bereichsangabe",
         "katalogname",
         "eintragsklassen",
         "unbekanntes_feld",
@@ -7392,8 +7401,11 @@
       "kurz": "Querschnitte zum Anfangen.",
       "stichworte": [
         "Mass",
-        "Mass.einheit",
+        "Mass.heisst",
+        "Mass.bereich",
         "Mass.schritt",
+        "Mass.grund",
+        "Mass.als_dict",
         "Teile",
         "Teile.als_dict",
         "kreispunkte",
@@ -7802,7 +7814,6 @@
       "art": "modul",
       "kurz": "die Querschnitte der Staebe, nach Vorlage.",
       "stichworte": [
-        "Mass",
         "Kennformel",
         "Stabvorlage",
         "Stabvorlage.vorgaben",
@@ -7884,6 +7895,7 @@
       "kurz": "woher A und I eines Stabs kommen.",
       "stichworte": [
         "Kennwert",
+        "Kennwert.bereich",
         "Stabquerschnitt",
         "Stabquerschnitt.bauteil",
         "Stabquerschnitt.modulfrage",

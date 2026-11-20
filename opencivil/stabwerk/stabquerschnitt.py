@@ -37,6 +37,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
+from opencivil.core.bereich import Bereich
 from opencivil.core.berechnung import Berechnung, Formel, Vorgabe
 from opencivil.core.einheiten import MIO_MM4, MM, MM2, Einheit, Groesse
 from opencivil.core.latex import platzhalter_namen
@@ -63,6 +64,18 @@ class Kennwert:
     symbol: str = ""
     """In LaTeX, wo es anders heisst als ``kurzname`` -- ``I_{yz}``."""
 
+    positiv: bool = True
+    """Ob er groesser als null ist -- eine Flaeche, ein Traegheitsmoment; ein Deviationsmoment nicht."""
+
+    @property
+    def bereich(self) -> Bereich:
+        """
+        Wo er liegen muss, wenn ihn jemand von Hand angibt -- wie das Feld
+        eines Eintrags, mit demselben Satz und derselben Angabe fuer die Maske.
+        """
+        return Bereich(f"{self.beschreibung} {self.kurzname}", self.einheit,
+                       ueber=0.0 if self.positiv else None)
+
 
 _A = Kennwert("A", MM2, 0, "Querschnittsfläche")
 
@@ -78,7 +91,8 @@ RAEUMLICH = (_A, Kennwert("I_y", MIO_MM4, 2, "Flächenträgheitsmoment um y"),
 #: und z als Hauptachsen. Ein Querschnitt aus einer Analyse bringt es dann
 #: mit -- nur er kann unsymmetrisch sein --, und die Rechnung prueft, wie
 #: weit sie es nicht sind (:mod:`opencivil.stabwerk.rechnung`).
-DEVIATIONSMOMENT = Kennwert("I_yz", MIO_MM4, 2, "Deviationsmoment", symbol="I_{yz}")
+DEVIATIONSMOMENT = Kennwert("I_yz", MIO_MM4, 2, "Deviationsmoment", symbol="I_{yz}",
+                            positiv=False)
 
 #: Ab so viel |I_yz| / min(I_y; I_z) sagt ein Hinweis, dass y und z keine
 #: Hauptachsen sind: so stark kruemmt ein Moment um die steifere Achse den

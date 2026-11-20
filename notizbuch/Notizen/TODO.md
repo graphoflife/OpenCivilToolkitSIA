@@ -384,10 +384,10 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Dieselbe Grenze hinter dem Feld noch einmal. Erledigt (2026-11-20):
         `streifen.pruefen` (acht Prüfungen, die nie griffen), die Teilungen
         im Dienst der Suche, `katalog.duktilitaet`; eine Liste von Zahlen
-        mit Bereich ist nie leer, das sagt ihr Feld. Offen: zwei Klassen
-        `Mass` (Querschnitts- und Stabvorlage) mit eigener Prüfung und
-        eigener Ausfuhr, dazu die Kennwerte von Hand. Umbau: der Bereich am
-        Feld prüft; was kein Feld sagen kann, bleibt.
+        mit Bereich ist nie leer, das sagt ihr Feld. Der `Bereich` steht
+        jetzt im Kern (`opencivil/core/bereich.py`): ein `Mass` für beide
+        Arten von Vorlagen samt Achsabstand, die Kennwerte von Hand und
+        jedes Feld prüfen mit ihm und geben der Maske dieselbe Angabe.
 - [ ] **3. «Welche Seite zieht» in fünf Formen.** `Zugseite` ist der Typ;
       daneben `positiv`, `moment_positiv` und `von_unten` als bool in 13
       Signaturen (`Zugseite.positiv` wird 12-mal gelesen), Lagennummern und

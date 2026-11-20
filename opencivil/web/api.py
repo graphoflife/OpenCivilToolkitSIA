@@ -48,9 +48,7 @@ from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.aufbau.kern import kennwertbereich, materialgrund
-from opencivil.projekt.lesen import (
-    bereichsangabe, eintragsklassen, feldangaben, katalogname, wahl_von,
-)
+from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE, WerkstoffwahlEintrag
 from opencivil.querschnitt.analyse import Zeichnung
@@ -60,7 +58,7 @@ from opencivil.querschnitt.geometrie import (
     VERSCHMIERT, Linienart, aequivalenter_durchmesser, buegelgehalt, linie_in_ueberdeckung,
     linienflaeche, stab_in_ueberdeckung, ueberdeckungspolygon,
 )
-from opencivil.querschnitt.vorlagen import VORLAGEN
+from opencivil.querschnitt.vorlagen import RANDABSTAND, VORLAGEN
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
     FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
@@ -259,15 +257,15 @@ def katalog() -> dict:
             "zugseiten": [{"wert": z.value, "beschriftung": z.beschriftung,
                            "pfeil": z.pfeil, "raender": list(z.raender)} for z in Zugseite],
             # Die Vorlagen mit ihren Massen -- und je eine Skizze nach
-            # Vorgabe fuer das Bildchen auf ihrem Knopf.
+            # Vorgabe fuer das Bildchen auf ihrem Knopf. Der Achsabstand der
+            # Staebe ist ein Mass aller Vorlagen.
             "vorlagen": [
                 {"schluessel": v.schluessel, "name": v.name, "hat_waende": v.hat_waende,
-                 "masse": [{"schluessel": m.schluessel, "beschriftung": m.beschriftung,
-                            "vorgabe": m.vorgabe, "einheit": m.einheit, "schritt": m.schritt}
-                           for m in v.masse],
+                 "masse": [m.als_dict() for m in v.masse],
                  "skizze": v.bauen().als_dict()}
                 for v in VORLAGEN
             ],
+            "randabstand": RANDABSTAND.als_dict(),
         },
         # Die Wahlmoeglichkeiten der Balkensysteme, eben und im Raum -- mit
         # Beschriftung und Einheit, aus der Beschreibung, die mit ihnen rechnet.
@@ -348,7 +346,7 @@ def _vorlage_dict(vorlage) -> dict:
         "berechnet": vorlage.ist_berechnet,
         "aus_sorte": not vorlage.ist_berechnet and not vorlage.ist_festwert,
         # Die Grenze, wie die Felder eines Eintrags sie tragen (``felder``).
-        "angabe": bereichsangabe(kennwertbereich(vorlage)),
+        "angabe": kennwertbereich(vorlage).angabe(),
     }
 
 

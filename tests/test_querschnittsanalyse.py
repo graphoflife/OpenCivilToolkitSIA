@@ -903,8 +903,14 @@ class TestVorlagen(unittest.TestCase):
     def test_masse_die_nicht_passen(self):
         with self.assertRaisesRegex(ValueError, "Steg"):
             vorlagen.vorlage("tbalken").bauen({"b": 200.0, "b_w": 300.0})
-        with self.assertRaisesRegex(ValueError, "grösser als null"):
+        with self.assertRaisesRegex(ValueError, "^Höhe h muss grösser als null sein, angegeben ist 0 mm.$"):
             vorlagen.vorlage("rechteck").bauen({"h": 0.0})
+        # Der Achsabstand ist ein Mass wie die anderen: derselbe Satz, und die
+        # Maske bekommt Vorgabe und Grenze aus dem Katalog.
+        with self.assertRaisesRegex(ValueError, "^Achsabstand muss grösser als null sein"):
+            vorlagen.vorlage("rechteck").bauen(randabstand=0.0)
+        rand = api.katalog()["querschnittsanalyse"]["randabstand"]
+        self.assertEqual((rand["vorgabe"], rand["angabe"]["ueber"]), (50.0, 0.0))
         d = dienst.bearbeite("vorlage", {"wahl": {"art": "hohlkasten", "masse": {"t": 700}}}).daten
         self.assertIn("Wände", d["fehler"])
         self.assertIsNone(d["teile"])
@@ -924,16 +930,17 @@ class TestVorlagen(unittest.TestCase):
             self.assertAlmostEqual(s["lage"][0], 200 + 150 * math.cos(winkel), delta=1e-3)
             self.assertAlmostEqual(s["lage"][1], 200 + 150 * math.sin(winkel), delta=1e-3)
         self.assertEqual(len(kreis.bauen().staebe), 8)
-        with self.assertRaisesRegex(ValueError, "ganze Zahl sein, angegeben sind 7.5"):
+        with self.assertRaisesRegex(ValueError, "ganze Zahl sein, angegeben ist 7.5"):
             kreis.bauen({"n": 7.5})
         with self.assertRaisesRegex(ValueError, "grösser als null"):
             kreis.bauen({"n": 0.0})
         # Der Katalog sagt dem Fenster, dass n eine Anzahl ist: ohne Einheit,
         # in ganzen Schritten.
         katalog = {v["schluessel"]: v for v in api.katalog()["querschnittsanalyse"]["vorlagen"]}
-        self.assertEqual([(m["schluessel"], m["einheit"], m["schritt"])
+        self.assertEqual([(m["schluessel"], m["angabe"].get("einheit"), m["schritt"],
+                           m["angabe"].get("ganz", False))
                           for m in katalog["kreis"]["masse"]],
-                         [("D", "mm", 10.0), ("n", "", 1.0)])
+                         [("D", "mm", 10.0, False), ("n", None, 1.0, True)])
 
     def test_einsetzen_ueber_den_dienst(self):
         p = projekt()

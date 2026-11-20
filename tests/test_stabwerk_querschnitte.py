@@ -12,7 +12,10 @@ import math
 import unittest
 
 from opencivil.core.einheiten import MIO_MM4, MM, MM2, Groesse
+from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.geometrie import flaechenwerte, summe
+from opencivil.stabwerk.stabquerschnitt import RAEUMLICH
+from opencivil.web import systemkatalog
 from opencivil.stabwerk.querschnitte import (
     DOPPEL_T, KREIS, KREISRING, RECHTECK, RECHTECKROHR, T_QUERSCHNITT, TRAPEZ, VORLAGEN,
     rechtecktorsion, vorlage,
@@ -110,6 +113,31 @@ class TestPruefen(unittest.TestCase):
                 ("rechteck", {"b": 0.0, "h": 600.0}, "grösser als null")):
             with self.subTest(vorlage=schluessel):
                 self.assertIn(wort, vorlage(schluessel).pruefen(masse))
+
+    def test_ein_mass_wie_ein_feld(self):
+        """
+        Die Masse beider Arten von Vorlagen und die Kennwerte von Hand sagen
+        ihre Grenze wie ein Feld: mit seinem Satz, und der Maske mit seiner
+        Angabe. Bis 2026-11-20 hatten Stab und Analyse je eine eigene Klasse
+        Mass, einen eigenen Satz und im Fenster einen eigenen Mindestwert.
+        """
+        satz = "Breite b muss grösser als null sein, angegeben ist 0 mm."
+        self.assertEqual(RECHTECK.pruefen({"b": 0.0, "h": 600.0}), satz)
+        with self.assertRaisesRegex(ValueError, f"^{satz}$"):
+            vorlagen.vorlage("rechteck").bauen({"b": 0.0})
+        angabe = {"einheit": "mm", "ueber": 0.0, "heisst": "Breite b",
+                  "verlangt": "muss grösser als null sein"}
+        self.assertEqual(RECHTECK.masse[0].als_dict()["angabe"], angabe)
+        self.assertEqual(vorlagen.vorlage("rechteck").masse[0].als_dict()["angabe"], angabe)
+        self.assertEqual(RAEUMLICH[0].bereich.angabe(),
+                         {"einheit": "mm²", "ueber": 0.0, "heisst": "Querschnittsfläche A",
+                          "verlangt": "muss grösser als null sein"})
+        from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
+        from opencivil.stabwerk3d.rechnung import Balkensystem3d
+        from opencivil.web import balkendaten
+        katalog = systemkatalog.katalog(Balkensystem3dEintrag, Balkensystem3d, balkendaten.RAUM)
+        self.assertEqual([k["angabe"]["einheit"] for k in katalog["kennwerte"]],
+                         ["mm²", "·10⁶ mm⁴", "·10⁶ mm⁴", "·10⁶ mm⁴"])
 
     def test_die_vorgaben_gehen(self):
         for v in VORLAGEN:

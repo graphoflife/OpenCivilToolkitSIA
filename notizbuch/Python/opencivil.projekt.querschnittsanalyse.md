@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b5ffef844ea
+erzeugt: f339d4f4fe45
 art: modul
 tags: [modul]
 ---
@@ -459,7 +459,7 @@ Wo ein Knoten liegt, in mm -- `None`, wenn es ihn nicht gibt.
 #### QuerschnittsanalyseEintrag.vorlage_einsetzen
 
 ```python
-def vorlage_einsetzen(self, schluessel: str, *, beton: str, stahl: str, masse: Optional[Mapping[str, float]]=None, randabstand: float=50.0, bewehrung: bool=True, schubwaende: bool=True, ursprung: Tuple[float, float]=(0.0, 0.0)) -> List[str]
+def vorlage_einsetzen(self, schluessel: str, *, beton: str, stahl: str, masse: Optional[Mapping[str, float]]=None, randabstand: float=vorlagen.RANDABSTAND.vorgabe, bewehrung: bool=True, schubwaende: bool=True, ursprung: Tuple[float, float]=(0.0, 0.0)) -> List[str]
 ```
 
 Setzt eine Vorlage ein ([[opencivil.querschnitt.vorlagen]]) -- dazu,

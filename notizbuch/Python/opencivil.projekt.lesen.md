@@ -1,5 +1,5 @@
 ---
-erzeugt: 35ebe1bb9625
+erzeugt: 8f50fa330558
 art: modul
 tags: [modul]
 ---
@@ -94,6 +94,16 @@ Der Fehler, wie er an der Stelle `wo` steht, ohne Punkt am Ende:
 dort nur der Grund, unter ihr mit dem Rest des Orts -- «Schicht 2:
 …» bei «Pfahl 'P'» --, anderswo die ganze Meldung.
 
+### anhalten
+
+```python
+def anhalten(grund: str, wo: str) -> None
+```
+
+Haelt mit `grund` an der Stelle `wo` an -- nichts, wenn `grund`
+leer ist: was ein [[opencivil.core.bereich#Bereich|Bereich]] abweist, als
+[[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]].
+
 ### einer_von
 
 ```python
@@ -102,73 +112,13 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any=dataclasses.MISSING) -> Any
 
 Ein Feld, das nur einen dieser Werte annimmt -- die Pruefung kennt sie von hier.
 
-### Bereich
-
-```python
-@dataclasses.dataclass(frozen=True)
-class Bereich
-```
-
-Wo die Zahl eines Feldes liegen muss -- jede Grenze darf fehlen, `ueber`
-und `unter` schliessen die Grenze aus, `ab` und `bis` ein. Geprueft
-vor dem Rechnen ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
-
-- `heisst: str` – Wie das Feld in der Meldung heisst -- wie an der Maske: «Dicke h».
-- `einheit: Optional[Einheit] = None`
-- `ueber: Optional[float] = None`
-- `ab: Optional[float] = None`
-- `bis: Optional[float] = None`
-- `unter: Optional[float] = None`
-- `bis_feld: Optional[str] = None` – Ein Feld desselben Eintrags, dessen Zahl diese nicht uebersteigen darf: α_min nicht ueber α_max. Die Regel steht so einmal, beim kleineren Feld. Die Maske weist sie an beiden Feldern ab ([[opencivil.projekt.lesen#feldangaben|feldangaben]]), die Pruefung vor dem Rechnen haelt eine Datei damit auf -- mit denselben Worten ([[opencivil.projekt.lesen#Bereich.gegen|gegen]]).
-
-#### Bereich.pruefen
-
-```python
-def pruefen(self, wert: float, wo: str) -> None
-```
-
-#### Bereich.verlangt
-
-```python
-@property
-def verlangt(self) -> str
-```
-
-Was die Grenzen verlangen: «muss grösser als null sein».
-
-#### Bereich.gegen
-
-```python
-def gegen(self, anderer: Bereich) -> Tuple[str, str]
-```
-
-Was [[opencivil.projekt.lesen#Bereich|bis_feld]] verlangt, an diesem Feld und am anderen
-(`anderer`): «α_min darf nicht grösser sein als α_max», «α_max darf
-nicht kleiner sein als α_min».
-
-#### Bereich.nicht_ueber
-
-```python
-def nicht_ueber(self, wert: Optional[float], anderer: Bereich, grenze: Optional[float], wo: str) -> None
-```
-
-Haelt auf, was [[opencivil.projekt.lesen#Bereich|bis_feld]] verletzt: die Zahl ueber der des anderen Feldes.
-
-#### Bereich._zahl
-
-```python
-def _zahl(self, wert: float) -> str
-```
-
-Eine Zahl mit der Einheit des Feldes: «300 mm», «30°», «0.9».
-
 ### bereich
 
 ```python
 def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None, bis_feld: Optional[str]=None, fabrik: Optional[Callable[[], Any]]=None) -> Any
 ```
 
-Ein Feld, dessen Zahl in einem [[opencivil.projekt.lesen#Bereich|Bereich]] liegen muss -- eine
+Ein Feld, dessen Zahl in einem [[opencivil.core.bereich#Bereich|Bereich]] liegen muss -- eine
 Kriechzahl ab null etwa. Bei einer Liste von Zahlen gilt er fuer jede,
 und leer ist sie nie ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]); ihre Vorgabe kommt dann
 aus `fabrik`.
@@ -191,14 +141,14 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]
 
 Was die Oberflaeche je Feld eines Eintrags vom Kern wissen muss, fuer den
 Katalog: die Einheit, in der eine Zahl gemeint ist, wo sie liegen muss
-(`ueber`, `ab`, `bis`, `unter` wie [[opencivil.projekt.lesen#Bereich|Bereich]]) und ob sie
+(`ueber`, `ab`, `bis`, `unter` wie [[opencivil.core.bereich#Bereich|Bereich]]) und ob sie
 ganz sein muss. Hat das Feld Grenzen, dazu, was es sagt, wenn eine Zahl
 sie verletzt (`heisst`, `verlangt`: «Dicke h» «muss grösser als null
 sein») -- das Feld weist sie mit dem Satz ab, der sonst beim Rechnen
 kaeme. Was eine Wahl annehmen kann, steht nicht hier: das sagen die
 Wahllisten des Katalogs, mit Beschriftung.
 
-Begrenzt ein Feld ein anderes ([[opencivil.projekt.lesen#Bereich|Bereich.bis_feld]]), steht das an
+Begrenzt ein Feld ein anderes ([[opencivil.core.bereich#Bereich|Bereich.bis_feld]]), steht das an
 beiden, mit dem Namen des anderen Feldes und dem Satz, den das Feld
 sagt: `bis_feld` bei α_min, `ab_feld` bei α_max. Die Zahl des anderen
 Feldes kennt erst die Maske.
@@ -215,17 +165,6 @@ def _bereiche(cls: type) -> Dict[str, Bereich]
 ```
 
 Die Bereiche der Felder einer Klasse, nach Feldnamen -- je Klasse einmal.
-
-### bereichsangabe
-
-```python
-def bereichsangabe(b: Bereich) -> Dict[str, Any]
-```
-
-Was die Oberflaeche von einem [[opencivil.projekt.lesen#Bereich|Bereich]] wissen muss -- die Einheit
-und, hat er Grenzen, die Grenzen mit dem Satz, den eine verletzte sagt.
-Fuer die Felder eines Eintrags ([[opencivil.projekt.lesen#feldangaben|feldangaben]]) und fuer die
-Kennwerte eines Materials (`katalog.materialarten`).
 
 ### katalogname
 
@@ -369,7 +308,7 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str]=()) -> None
 Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
 jede Zahl gegen ihren Bereich ([[opencivil.projekt.lesen#bereich|bereich]]) -- eine Liste davon mit
 mindestens einer --, jeden Eintrag darin ebenso, jede gegen das Feld,
-das sie begrenzt ([[opencivil.projekt.lesen#Bereich|Bereich.bis_feld]]),
+das sie begrenzt ([[opencivil.core.bereich#Bereich|Bereich.bis_feld]]),
 und danach die Namen seiner Faelle (`fallnamen()`) und die Regeln des
 Eintrags ueber mehrere Felder, `regeln(wo)`. Die Form ist da schon geprueft: ein Eintrag steht, wo
 einer hingehoert, eine Zahl, wo eine Zahl hingehoert. Die Felder in
@@ -467,6 +406,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 
 ## Braucht
 
+- [[opencivil.core.bereich]]
 - [[opencivil.core.einheiten]]
 
 ## Gebraucht von

@@ -59,9 +59,6 @@ from opencivil.stabwerk3d.stab import drehung_umgekehrt
 #: Wohin eine Last an einem Knoten zeigt -- in die Richtungen des Systems.
 KNOTENRICHTUNGEN = tuple(r for r in Richtung if r.im_system)
 
-#: Die Kennwerte eines Querschnitts von Hand -- wie die Rechnung sie nimmt.
-KENNWERTE = tuple(k.kurzname for k in RAEUMLICH)
-
 #: Was ein Diagramm zeigt: je Stab den Verlauf einer Schnittgroesse, das
 #: verschobene System oder die Lagerkraefte.
 DIAGRAMMGROESSEN = ("N", "V_y", "V_z", "T", "M_y", "M_z", "verschiebung", "lagerkraefte")
@@ -176,7 +173,7 @@ class RaummaterialEintrag(StabmaterialEintrag):
 class RaumquerschnittEintrag(StabquerschnittBasis):
     """Ein Querschnitt der Staebe im Raum -- siehe Dateikopf."""
 
-    KENNWERTE = KENNWERTE
+    KENNWERTE = RAEUMLICH
 
 
 @dataclass

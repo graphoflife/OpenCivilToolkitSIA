@@ -27,6 +27,7 @@ from typing import (
     Tuple,
 )
 
+from opencivil.core.bereich import Bereich
 from opencivil.core.einheiten import Groesse
 from opencivil.core.nachweis import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
@@ -44,7 +45,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.geotechnik.fundament import Fundament
 from opencivil.geotechnik.setzung import Setzungsfundament
 from opencivil.pfahl.pfahl import Pfahl
-from opencivil.projekt.lesen import Bereich, ProjektFehler, als_groesse
+from opencivil.projekt.lesen import ProjektFehler, als_groesse, anhalten
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
 from opencivil.decke.werk import Deckensystem
@@ -458,7 +459,7 @@ def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str, wo: str) -> Baus
                 raise ProjektFehler(
                     f"einen Kennwert '{kurzname}' gibt es nicht "
                     f"({wie}). Möglich sind: {', '.join(roh.definitionen)}.", wo=wo)
-            kennwertbereich(vorlagen[kurzname]).pruefen(zahl, wo)
+            anhalten(kennwertbereich(vorlagen[kurzname]).grund(zahl), wo)
     abweichungen = {
         kurzname: Groesse(zahl, roh.definition(kurzname).einheit)
         for kurzname, zahl in eintrag.abweichungen.items()

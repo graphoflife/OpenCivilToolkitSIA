@@ -46,6 +46,7 @@ from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.stabwerk import profiltabelle
 from opencivil.stabwerk import querschnitte as qs
 from opencivil.stabwerk.modell import Lastart
+from opencivil.stabwerk.stabquerschnitt import Kennwert
 
 #: Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.
 Ort = Union[str, Sequence[float]]
@@ -171,8 +172,8 @@ class StabquerschnittBasis(Beschreibung):
     abwies -- dreimal nachgebessert.
     """
 
-    KENNWERTE: ClassVar[Tuple[str, ...]]
-    """Die Kennwerte von Hand, wie die Rechnung sie nimmt."""
+    KENNWERTE: ClassVar[Tuple[Kennwert, ...]]
+    """Die Kennwerte von Hand, wie die Rechnung sie nimmt -- mit ihrer Grenze."""
 
     kennung: str = ""
     name: str = ""
@@ -246,12 +247,15 @@ class StabquerschnittBasis(Beschreibung):
                         f"Möglich sind: {', '.join(vorlage.vorgaben())}.")
             return vorlage.pruefen(self.masse_mit_vorgaben())
         if self.art is Querschnittsart.KENNWERTE:
-            fremd = [k for k in self.kennwerte if k not in self.KENNWERTE]
+            namen = [k.kurzname for k in self.KENNWERTE]
+            fremd = [k for k in self.kennwerte if k not in namen]
             if fremd:
                 return (f"einen Kennwert «{fremd[0]}» gibt es nicht. "
-                        f"Möglich sind: {', '.join(self.KENNWERTE)}.")
-            if not all(self.kennwerte.get(k, 0.0) > 0.0 for k in self.KENNWERTE):
-                return f"{aufgezaehlt(self.KENNWERTE)} müssen grösser als null sein."
+                        f"Möglich sind: {', '.join(namen)}.")
+            for k in self.KENNWERTE:
+                grund = k.bereich.grund(self.kennwerte.get(k.kurzname, 0.0))
+                if grund:
+                    return grund
         return None
 
 

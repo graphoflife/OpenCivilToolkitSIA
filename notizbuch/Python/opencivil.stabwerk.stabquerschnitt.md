@@ -1,5 +1,5 @@
 ---
-erzeugt: afb8f487351e
+erzeugt: 9be6bc78a6a1
 art: modul
 tags: [modul]
 ---
@@ -53,6 +53,17 @@ Ein Wert, den ein Stab von seinem Querschnitt braucht -- wie er heisst und gezei
 - `stellen: int`
 - `beschreibung: str`
 - `symbol: str = ''` – In LaTeX, wo es anders heisst als `kurzname` -- `I_{yz}`.
+- `positiv: bool = True` – Ob er groesser als null ist -- eine Flaeche, ein Traegheitsmoment; ein Deviationsmoment nicht.
+
+#### Kennwert.bereich
+
+```python
+@property
+def bereich(self) -> Bereich
+```
+
+Wo er liegen muss, wenn ihn jemand von Hand angibt -- wie das Feld
+eines Eintrags, mit demselben Satz und derselben Angabe fuer die Maske.
 
 ### Stabquerschnitt
 
@@ -257,13 +268,14 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 - `_A = Kennwert('A', MM2, 0, 'Querschnittsfläche')`
 - `EBEN = (_A, Kennwert('I', MIO_MM4, 2, 'Flächenträgheitsmoment'))` – Was ein Stab des ebenen Rahmens braucht: `I` um die Achse senkrecht zur Ebene.
 - `RAEUMLICH = (_A, Kennwert('I_y', MIO_MM4, 2, 'Flächenträgheitsmoment um y'), Kenn…` – Was ein Stab im Raum braucht ([[opencivil.stabwerk3d]]).
-- `DEVIATIONSMOMENT = Kennwert('I_yz', MIO_MM4, 2, 'Deviationsmoment', symbol='I_{yz}')` – Kein Kennwert eines Stabs: wer mit `I_y` und `I_z` rechnet, nimmt y und z als Hauptachsen. Ein Querschnitt aus einer Analyse bringt es dann mit -- nur er kann unsymmetrisch sein --, und die Rechnung prueft, wie weit sie es nicht sind ([[opencivil.stabwerk.rechnung]]).
+- `DEVIATIONSMOMENT = Kennwert('I_yz', MIO_MM4, 2, 'Deviationsmoment', symbol='I_{yz}', pos…` – Kein Kennwert eines Stabs: wer mit `I_y` und `I_z` rechnet, nimmt y und z als Hauptachsen. Ein Querschnitt aus einer Analyse bringt es dann mit -- nur er kann unsymmetrisch sein --, und die Rechnung prueft, wie weit sie es nicht sind ([[opencivil.stabwerk.rechnung]]).
 - `KOPPLUNG = 0.05` – Ab so viel \|I_yz\| / min(I_y; I_z) sagt ein Hinweis, dass y und z keine Hauptachsen sind: so stark kruemmt ein Moment um die steifere Achse den Stab auch um die weichere, und die Rechnung laesst das weg. Nach Vorgabe, nicht nachgeschlagen (Benutzer, 2026-11-19: ein Hinweis, keine Drehung; die 5 % bleiben).
 - `Werte = Dict[str, str]` – Je Kennwert die Wert-ID, die ihn liefert.
 
 ## Braucht
 
 - [[opencivil.core.berechnung]]
+- [[opencivil.core.bereich]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
@@ -276,6 +288,7 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
+- [[opencivil.projekt.staebe]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk3d.herleitung]]
 - [[opencivil.stabwerk3d.rechnung]]

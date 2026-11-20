@@ -1,5 +1,5 @@
 ---
-erzeugt: b286b73f42e5
+erzeugt: b8a0bbd378c1
 art: modul
 tags: [modul]
 ---
@@ -212,7 +212,7 @@ def kleinste_neigung() -> Any
 
 α_min, die kleinste Neigung der Druckdiagonalen -- und nicht ueber α_max:
 bei den Buegeln der Platte wie am gezeichneten Querschnitt. Eine
-groessere weist schon das Feld ab ([[opencivil.projekt.lesen#Bereich|bis_feld]]).
+groessere weist schon das Feld ab ([[opencivil.core.bereich#Bereich|bis_feld]]).
 
 ### groesste_neigung
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a89185e5b9d
+erzeugt: 3be30c87226d
 art: modul
 tags: [modul]
 ---
@@ -17,6 +17,7 @@ Berechnung ihre Herleitung schreibt ([[opencivil.core.protokoll]],
 ## Module
 
 - [[opencivil.core.berechnung]] – Berechnungen als Objekte.
+- [[opencivil.core.bereich]] – wo eine Zahl liegen muss.
 - [[opencivil.core.einheiten]] – Dimensionen, Einheiten und Groessen.
 - [[opencivil.core.formelbaum]] – die Vorlage einer Formel als Rechenbaum.
 - [[opencivil.core.kurzform]] – ein Nachweis in zwei, drei Formeln.

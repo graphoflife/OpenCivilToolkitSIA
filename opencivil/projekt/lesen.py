@@ -62,8 +62,9 @@ import enum
 import functools
 import math
 import typing
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional
 
+from opencivil.core.bereich import Bereich
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 
 
@@ -99,6 +100,16 @@ class ProjektFehler(Exception):
         return text.removesuffix(".")
 
 
+def anhalten(grund: str, wo: str) -> None:
+    """
+    Haelt mit ``grund`` an der Stelle ``wo`` an -- nichts, wenn ``grund``
+    leer ist: was ein :class:`~opencivil.core.bereich.Bereich` abweist, als
+    :class:`ProjektFehler`.
+    """
+    if grund:
+        raise ProjektFehler(grund, wo=wo)
+
+
 # ===========================================================================
 # Was an einem Feld steht
 # ===========================================================================
@@ -107,74 +118,6 @@ class ProjektFehler(Exception):
 def einer_von(moeglich: Iterable[Any], vorgabe: Any = dataclasses.MISSING) -> Any:
     """Ein Feld, das nur einen dieser Werte annimmt -- die Pruefung kennt sie von hier."""
     return dataclasses.field(default=vorgabe, metadata={"wahl": tuple(moeglich)})
-
-
-@dataclasses.dataclass(frozen=True)
-class Bereich:
-    """
-    Wo die Zahl eines Feldes liegen muss -- jede Grenze darf fehlen, ``ueber``
-    und ``unter`` schliessen die Grenze aus, ``ab`` und ``bis`` ein. Geprueft
-    vor dem Rechnen (:func:`inhalt_pruefen`).
-    """
-
-    heisst: str
-    """Wie das Feld in der Meldung heisst -- wie an der Maske: «Dicke h»."""
-
-    einheit: Optional[Einheit] = None
-    ueber: Optional[float] = None
-    ab: Optional[float] = None
-    bis: Optional[float] = None
-    unter: Optional[float] = None
-
-    bis_feld: Optional[str] = None
-    """
-    Ein Feld desselben Eintrags, dessen Zahl diese nicht uebersteigen darf:
-    α_min nicht ueber α_max. Die Regel steht so einmal, beim kleineren Feld.
-    Die Maske weist sie an beiden Feldern ab (:func:`feldangaben`), die
-    Pruefung vor dem Rechnen haelt eine Datei damit auf -- mit denselben
-    Worten (:meth:`gegen`).
-    """
-
-    def pruefen(self, wert: float, wo: str) -> None:
-        if ((self.ueber is None or wert > self.ueber) and (self.ab is None or wert >= self.ab)
-                and (self.bis is None or wert <= self.bis)
-                and (self.unter is None or wert < self.unter)):
-            return
-        raise ProjektFehler(f"{self.heisst} {self.verlangt}, angegeben ist "
-                            f"{self._zahl(wert)}.", wo=wo)
-
-    @property
-    def verlangt(self) -> str:
-        """Was die Grenzen verlangen: «muss grösser als null sein»."""
-        grenzen = [(wort, g) for wort, g in (("grösser als", self.ueber), ("mindestens", self.ab),
-                                             ("kleiner als", self.unter), ("höchstens", self.bis))
-                   if g is not None]
-        if grenzen == [("mindestens", 0.0)]:
-            return "kann nicht negativ sein"
-        return "muss " + " und ".join(
-            f"{wort} {'null' if g == 0.0 else self._zahl(g)}" for wort, g in grenzen) + " sein"
-
-    def gegen(self, anderer: Bereich) -> Tuple[str, str]:
-        """
-        Was :attr:`bis_feld` verlangt, an diesem Feld und am anderen
-        (``anderer``): «α_min darf nicht grösser sein als α_max», «α_max darf
-        nicht kleiner sein als α_min».
-        """
-        return (f"{self.heisst} darf nicht grösser sein als {anderer.heisst}",
-                f"{anderer.heisst} darf nicht kleiner sein als {self.heisst}")
-
-    def nicht_ueber(self, wert: Optional[float], anderer: Bereich,
-                    grenze: Optional[float], wo: str) -> None:
-        """Haelt auf, was :attr:`bis_feld` verletzt: die Zahl ueber der des anderen Feldes."""
-        if wert is not None and grenze is not None and wert > grenze:
-            raise ProjektFehler(f"{self.gegen(anderer)[0]}, angegeben sind "
-                                f"{self._zahl(wert)} und {anderer._zahl(grenze)}.", wo=wo)
-
-    def _zahl(self, wert: float) -> str:
-        """Eine Zahl mit der Einheit des Feldes: «300 mm», «30°», «0.9»."""
-        if self.einheit is None or self.einheit.name in ("", "-"):
-            return f"{wert:g}"
-        return f"{wert:g}{'' if self.einheit.klebt else ' '}{self.einheit.beschriftung}"
 
 
 def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
@@ -230,7 +173,7 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     angaben: Dict[str, Dict[str, Any]] = {}
     for f in dataclasses.fields(cls):
         b = bereiche.get(f.name)
-        angabe = bereichsangabe(b) if b is not None else {}
+        angabe = b.angabe() if b is not None else {}
         if typen.get(f.name) is int:
             angabe["ganz"] = True
         if angabe:
@@ -248,23 +191,6 @@ def _bereiche(cls: type) -> Dict[str, Bereich]:
     """Die Bereiche der Felder einer Klasse, nach Feldnamen -- je Klasse einmal."""
     return {f.name: f.metadata["bereich"] for f in dataclasses.fields(cls)
             if "bereich" in f.metadata}
-
-
-def bereichsangabe(b: Bereich) -> Dict[str, Any]:
-    """
-    Was die Oberflaeche von einem :class:`Bereich` wissen muss -- die Einheit
-    und, hat er Grenzen, die Grenzen mit dem Satz, den eine verletzte sagt.
-    Fuer die Felder eines Eintrags (:func:`feldangaben`) und fuer die
-    Kennwerte eines Materials (``katalog.materialarten``).
-    """
-    angabe: Dict[str, Any] = {}
-    if b.einheit is not None and b.einheit.name not in ("", "-"):
-        angabe["einheit"] = b.einheit.beschriftung
-    grenzen = {grenze: getattr(b, grenze) for grenze in ("ueber", "ab", "bis", "unter")
-               if getattr(b, grenze) is not None}
-    if grenzen:
-        angabe.update(grenzen, heisst=b.heisst, verlangt=b.verlangt)
-    return angabe
 
 
 def katalogname(cls: type) -> str:
@@ -573,10 +499,10 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
                 inhalt_pruefen(teil, _ort_von(teil, wo, f.name, i) if teile is wert
                                else f"{wo}, {f.name}")
             elif bereich_ is not None and teil is not None:
-                bereich_.pruefen(teil, wo)
+                anhalten(bereich_.grund(teil), wo)
         if bereich_ is not None and bereich_.bis_feld is not None:
-            bereich_.nicht_ueber(wert, _bereiche(type(eintrag))[bereich_.bis_feld],
-                                 getattr(eintrag, bereich_.bis_feld), wo)
+            anhalten(bereich_.grund_gegen(wert, _bereiche(type(eintrag))[bereich_.bis_feld],
+                                          getattr(eintrag, bereich_.bis_feld)), wo)
     for liste in eintrag.fallnamen():
         liste.pruefen(wo)
     eintrag.regeln(wo)

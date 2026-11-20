@@ -1,5 +1,5 @@
 ---
-erzeugt: eabd818025e4
+erzeugt: d9d1c0106957
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -20,6 +20,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.bewehrungssuche.laengs]] – die Laengsbewehrung suchen.
 - [[opencivil.core]] – das Geruest, auf dem jede Rechnung steht.
     - [[opencivil.core.berechnung]] – Berechnungen als Objekte.
+    - [[opencivil.core.bereich]] – wo eine Zahl liegen muss.
     - [[opencivil.core.einheiten]] – Dimensionen, Einheiten und Groessen.
     - [[opencivil.core.formelbaum]] – die Vorlage einer Formel als Rechenbaum.
     - [[opencivil.core.kurzform]] – ein Nachweis in zwei, drei Formeln.

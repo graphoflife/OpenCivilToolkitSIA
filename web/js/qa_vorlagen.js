@@ -19,7 +19,7 @@ import { api } from './api.js';
 import { hakenSchalter } from './bausteine.js';
 import { pfad } from './cad_ansicht.js';
 import { schalterzeile } from './cad_palette.js';
-import { el, melden, svgEl, zahlfeld } from './dom.js';
+import { el, grenzeVerletzt, melden, svgEl, zahlfeld } from './dom.js';
 import { katalog, zustand } from './zustand.js';
 
 /** Die Vorlagen, wie der Kern sie kennt. */
@@ -27,10 +27,16 @@ function vorlagen() {
   return katalog('querschnittsanalyse', 'vorlagen');
 }
 
+/** Der Achsabstand der Stäbe vom Rand -- ein Mass aller Vorlagen. */
+function randabstand() {
+  return katalog('querschnittsanalyse', 'randabstand');
+}
+
 /** Was zuletzt eingestellt war -- je Analyse in der Ansicht, nicht im Projekt. */
 function wahlVon(a) {
   a.qa.vorlage = a.qa.vorlage || {
-    art: 'rechteck', masse: {}, randabstand: 50, bewehrung: true, schubwaende: true,
+    art: 'rechteck', masse: {}, randabstand: randabstand().vorgabe, bewehrung: true,
+    schubwaende: true,
   };
   return a.qa.vorlage;
 }
@@ -138,14 +144,30 @@ function mitOhne(text, an, setzen) {
   return zeile;
 }
 
-/** Ein Zahlenfeld, das schon beim Tippen meldet -- die Skizze soll mitgehen. */
-function massfeld(wert, setzen, schritt = 10) {
-  const feld = zahlfeld({ wert, schritt, min: 1, beiAenderung: setzen });
-  feld.querySelector('input')?.addEventListener('input', (e) => {
+/**
+ * Die Zeile eines Masses: ein Zahlenfeld, das schon beim Tippen meldet --
+ * die Skizze soll mitgehen. Name, Grenze, Satz und Einheit kommen mit dem
+ * Mass aus dem Kern (`angabe`), wie bei jedem Feld.
+ *
+ * Beim Tippen geht nur eine Zahl in die Skizze, die das Feld auch nimmt.
+ * Nimmt es eine nicht, zeigt es wieder die zuletzt übernommene: das Fenster
+ * zeichnet sich beim Tippen nicht neu, und das Feld kennt sonst nur die
+ * Zahl, mit der es aufging.
+ */
+function massZeile(mass, wert, setzen) {
+  let gilt = wert;
+  const nehmen = (x) => {
+    gilt = x;
+    setzen(x);
+  };
+  const feld = zahlfeld({ wert, schritt: mass.schritt, angabe: mass.angabe, beiAenderung: nehmen });
+  const eingabe = feld.querySelector('input');
+  eingabe?.addEventListener('input', (e) => {
     const w = Number(e.target.value);
-    if (e.target.value.trim() !== '' && Number.isFinite(w)) setzen(w);
+    if (e.target.value.trim() !== '' && Number.isFinite(w) && !grenzeVerletzt(mass.angabe, w)) nehmen(w);
   });
-  return feld;
+  eingabe?.addEventListener('change', () => { eingabe.value = String(gilt); });
+  return zeile(mass.heisst, feld, mass.angabe.einheit || '');
 }
 
 /** Öffnet das Fenster der Vorlagen -- oder schliesst es, wenn es schon offen ist. */
@@ -217,9 +239,9 @@ function vorlageZeichnen(a, knoten) {
       on: { click: () => { w.art = x.schluessel; neu(); } },
     }, [skizze(x.skizze, 52, 36, { masse: false }), el('span', { text: x.name })]))),
     bild,
-    ...v.masse.map((m) => zeile(m.beschriftung, massfeld(w.masse[m.schluessel] ?? m.vorgabe,
-      (x) => { w.masse[m.schluessel] = x; holen(); }, m.schritt), m.einheit)),
-    zeile('Achsabstand', massfeld(w.randabstand, (x) => { w.randabstand = x; holen(); }), 'mm'),
+    ...v.masse.map((m) => massZeile(m, w.masse[m.schluessel] ?? m.vorgabe,
+      (x) => { w.masse[m.schluessel] = x; holen(); })),
+    massZeile(randabstand(), w.randabstand, (x) => { w.randabstand = x; holen(); }),
     mitOhne('Bewehrung', w.bewehrung, (x) => { w.bewehrung = x; holen(); }),
     waende ? mitOhne('Schubwände', w.schubwaende, (x) => { w.schubwaende = x; holen(); }) : null,
     meldung,

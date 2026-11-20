@@ -85,9 +85,7 @@ def katalog(eintrag: type, rechnung: type, darstellung: Darstellung) -> Dict[str
                                   "material", "querschnitt", "diagramm")},
         "vorlagen": [
             {"schluessel": v.schluessel, "name": v.name,
-             "masse": [{"schluessel": m.schluessel, "symbol": m.symbol,
-                        "beschriftung": m.beschriftung, "vorgabe": m.vorgabe}
-                       for m in v.masse],
+             "masse": [m.als_dict() for m in v.masse],
              "skizze": [[[round(y, 1), round(z, 1)] for y, z in umriss]
                         for umriss in v.umriss(v.vorgaben())]}
             for v in stabquerschnitte.VORLAGEN
@@ -112,7 +110,7 @@ def katalog(eintrag: type, rechnung: type, darstellung: Darstellung) -> Dict[str
         ],
         # Die Kennwerte eines Querschnitts von Hand, wie die Rechnung sie nimmt.
         "kennwerte": [{"kurz": k.kurzname, "beschriftung": k.beschreibung,
-                       "einheit": k.einheit.beschriftung} for k in rechnung.KENNWERTE],
+                       "angabe": k.bereich.angabe()} for k in rechnung.KENNWERTE],
         # Je Art, aus der ein Stab sein kann -- Beton und Baustahl des
         # Projekts --, die Kennwerte, die er nimmt; die Tabelle der
         # Materialien zeigt sie gesperrt. Ein eigenes Material hat sie von Hand.

@@ -16,6 +16,14 @@ Was eine Vorlage nicht sagt, kommt aus den Vorgaben der Eintraege -- der
 Stahl, die Buegel einer Schubwand, ihre Schnitte. Eine Vorlage ist ein
 Anfang, kein Entwurf.
 
+DAS MASS:
+Ein :class:`Mass` steht fuer die Vorlagen hier und die der Stabquerschnitte
+(:mod:`opencivil.stabwerk.querschnitte`). Seine Grenze ist ein
+:class:`~opencivil.core.bereich.Bereich` wie die eines Feldes: derselbe
+Satz, dieselbe Angabe fuer die Maske. Bis 2026-11-20 hatte jede Seite ihre
+eigene Klasse, ihren eigenen Satz und im Fenster ihren eigenen Mindestwert --
+1 hier, 0 beim Stab.
+
 DIE UMRISSE:
 Rechteck, T und Kreis zeichnet auch das Balkensystem fuer seine
 Stabquerschnitte (:mod:`opencivil.stabwerk.querschnitte`). Ihre Umrisse und
@@ -29,7 +37,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import asdict, dataclass, field
-from typing import Callable, List, Mapping, Optional, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
+
+from opencivil.core.bereich import Bereich
+from opencivil.core.einheiten import EINHEITSLOS, MM, Einheit
 
 Punkt = Tuple[float, float]
 
@@ -41,24 +52,61 @@ KREISECKEN = 48
 @dataclass(frozen=True)
 class Mass:
     """
-    Ein Mass einer Vorlage: eine Laenge in mm -- oder, ``ganzzahlig``, eine
-    Anzahl, wie die der Staebe im Kreis.
+    Ein Mass einer Vorlage: eine Laenge in mm, wo ``einheit`` nichts anderes
+    sagt -- oder, ``ganzzahlig``, eine Anzahl, wie die der Staebe im Kreis.
+    Jedes ist groesser als null; was die Masse untereinander verlangen,
+    prueft die Vorlage.
     """
 
     schluessel: str
+    symbol: str
+    """Wie es in der Skizze heisst -- leer, wo es dort nicht steht."""
+
     beschriftung: str
     vorgabe: float
+    einheit: Einheit = MM
     ganzzahlig: bool = False
 
     @property
-    def einheit(self) -> str:
-        """Was neben dem Feld steht -- bei einer Anzahl nichts."""
-        return "" if self.ganzzahlig else "mm"
+    def heisst(self) -> str:
+        """Wie es an der Maske und in einer Meldung heisst: «Breite b»."""
+        return " ".join(filter(None, (self.beschriftung, self.symbol)))
+
+    @property
+    def bereich(self) -> Bereich:
+        return Bereich(self.heisst, self.einheit, ueber=0.0)
 
     @property
     def schritt(self) -> float:
         """Um wie viel ein Pfeil am Feld den Wert aendert."""
         return 1.0 if self.ganzzahlig else 10.0
+
+    def grund(self, wert: float) -> str:
+        """Was an ``wert`` nicht geht, als Satz mit Punkt -- leer, wenn er geht."""
+        if not math.isfinite(wert):
+            return f"{self.heisst} muss eine Zahl sein, nicht {wert:g}."
+        if self.ganzzahlig and not float(wert).is_integer():
+            return (f"{self.heisst} muss eine ganze Zahl sein, "
+                    f"angegeben ist {self.bereich.zahl(wert)}.")
+        return self.bereich.grund(wert)
+
+    def als_dict(self) -> Dict[str, Any]:
+        """
+        Fuer den Katalog: wie es heisst, seine Vorgabe, der Schritt der
+        Pfeile und, was die Maske wie bei einem Feld braucht (``angabe``:
+        Einheit, Grenze, Satz, bei einer Anzahl ``ganz``).
+        """
+        angabe = self.bereich.angabe()
+        if self.ganzzahlig:
+            angabe["ganz"] = True
+        return {"schluessel": self.schluessel, "symbol": self.symbol,
+                "beschriftung": self.beschriftung, "heisst": self.heisst,
+                "vorgabe": self.vorgabe, "schritt": self.schritt, "angabe": angabe}
+
+
+#: Der Achsabstand der Staebe vom Rand -- ein Mass jeder Vorlage hier. Auch
+#: die Schubwaende enden auf seiner Hoehe.
+RANDABSTAND = Mass("randabstand", "", "Achsabstand", 50.0)
 
 
 @dataclass
@@ -245,7 +293,8 @@ class Vorlage:
     pruefen: Callable[[Mapping[str, float], float], Optional[str]]
     hat_waende: bool = True
 
-    def bauen(self, masse: Optional[Mapping[str, float]] = None, randabstand: float = 50.0,
+    def bauen(self, masse: Optional[Mapping[str, float]] = None,
+              randabstand: float = RANDABSTAND.vorgabe,
               bewehrung: bool = True, schubwaende: bool = True) -> Teile:
         """
         Die Teile zu diesen Massen -- was fehlt, nach Vorgabe. ``randabstand``
@@ -255,18 +304,15 @@ class Vorlage:
         """
         werte = {m.schluessel: float((masse or {}).get(m.schluessel, m.vorgabe))
                  for m in self.masse}
-        for m in self.masse:
-            wert = werte[m.schluessel]
-            if not math.isfinite(wert) or wert <= 0:
-                raise ValueError(f"{m.beschriftung} muss grösser als null sein.")
-            if m.ganzzahlig and wert != int(wert):
-                raise ValueError(f"{m.beschriftung} muss eine ganze Zahl sein, "
-                                 f"angegeben sind {wert:g}.")
         waende = schubwaende and self.hat_waende
         # Auch die Waende enden auf der Hoehe der Staebe.
-        if (bewehrung or waende) and (not math.isfinite(randabstand) or randabstand <= 0):
-            raise ValueError("Der Achsabstand der Stäbe muss grösser als null sein.")
-        grund = self.pruefen(werte, randabstand if (bewehrung or waende) else 0.0)
+        mit_rand = bewehrung or waende
+        for m, wert in [*((m, werte[m.schluessel]) for m in self.masse),
+                        *([(RANDABSTAND, randabstand)] if mit_rand else [])]:
+            grund = m.grund(wert)
+            if grund:
+                raise ValueError(grund)
+        grund = self.pruefen(werte, randabstand if mit_rand else 0.0)
         if grund:
             raise ValueError(grund)
         teile = self.teile(werte, randabstand)
@@ -279,19 +325,19 @@ class Vorlage:
 
 VORLAGEN: Tuple[Vorlage, ...] = (
     Vorlage("rechteck", "Rechteck",
-            (Mass("b", "Breite b", 300.0), Mass("h", "Höhe h", 600.0)),
+            (Mass("b", "b", "Breite", 300.0), Mass("h", "h", "Höhe", 600.0)),
             _rechteck, _rechteck_pruefen),
     Vorlage("tbalken", "T-Balken",
-            (Mass("b", "Flanschbreite b", 1200.0), Mass("h", "Höhe h", 700.0),
-             Mass("b_w", "Stegbreite b_w", 300.0), Mass("h_f", "Flanschdicke h_f", 200.0)),
+            (Mass("b", "b", "Flanschbreite", 1200.0), Mass("h", "h", "Höhe", 700.0),
+             Mass("b_w", "b_w", "Stegbreite", 300.0), Mass("h_f", "h_f", "Flanschdicke", 200.0)),
             _tbalken, _tbalken_pruefen),
     Vorlage("hohlkasten", "Hohlkasten",
-            (Mass("b", "Breite b", 1200.0), Mass("h", "Höhe h", 800.0),
-             Mass("t", "Wanddicke t", 200.0)),
+            (Mass("b", "b", "Breite", 1200.0), Mass("h", "h", "Höhe", 800.0),
+             Mass("t", "t", "Wanddicke", 200.0)),
             _hohlkasten, _hohlkasten_pruefen),
     Vorlage("kreis", "Kreis",
-            (Mass("D", "Durchmesser D", 500.0),
-             Mass("n", "Anzahl Stäbe n", 8.0, ganzzahlig=True)),
+            (Mass("D", "D", "Durchmesser", 500.0),
+             Mass("n", "n", "Anzahl Stäbe", 8.0, EINHEITSLOS, ganzzahlig=True)),
             _kreis, _kreis_pruefen, hat_waende=False),
 )
 

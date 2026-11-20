@@ -588,7 +588,7 @@ def _vorlagenwahl(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     try:
         masse = {str(k): float(v) for k, v in (wahl.get("masse") or {}).items()
                  if v is not None and v != ""}
-        randabstand = float(wahl.get("randabstand", 50.0))
+        randabstand = float(wahl.get("randabstand", vorlagen.RANDABSTAND.vorgabe))
     except (TypeError, ValueError):
         raise DienstFehler(400, "Die Masse einer Vorlage müssen Zahlen sein.") from None
     return {"masse": masse, "randabstand": randabstand,

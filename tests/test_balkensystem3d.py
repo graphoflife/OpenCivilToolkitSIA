@@ -85,7 +85,8 @@ class TestBeschreibung(unittest.TestCase):
         self.assertIsNone(s.querschnitt_mit_kennwerten("Q", A=1.0, I_y=1.0, I_z=1.0,
                                                        I_T=1.0).fehler())
         self.assertEqual(s.querschnitt_mit_kennwerten("Q", A=1.0, I_y=1.0).fehler(),
-                         "A, I_y, I_z und I_T müssen grösser als null sein.")
+                         "Flächenträgheitsmoment um z I_z muss grösser als null sein, "
+                         "angegeben ist 0 ·10⁶ mm⁴.")
         self.assertIn("einen Kennwert «I» gibt es nicht",
                       s.querschnitt_mit_kennwerten("Q", A=1.0, I=1.0).fehler())
 

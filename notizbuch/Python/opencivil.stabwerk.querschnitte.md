@@ -1,5 +1,5 @@
 ---
-erzeugt: ebecbe62f6df
+erzeugt: bd9431937c5a
 art: modul
 tags: [modul]
 ---
@@ -53,26 +53,12 @@ das TODO fuehrt es.
 Masse in mm, `A` in mm², die Traegheitsmomente in 10⁶ mm⁴ -- wie in der
 Querschnittsanalyse.
 
-Die Umrisse von Rechteck, T und Kreis und was an einem T nicht geht, teilen
-sich die Vorlagen hier mit denen der Querschnittsanalyse
+Die Umrisse von Rechteck, T und Kreis, was an einem T nicht geht, und das
+[[opencivil.querschnitt.vorlagen#Mass|Mass]] mit seiner Grenze teilen sich
+die Vorlagen hier mit denen der Querschnittsanalyse
 ([[opencivil.querschnitt.vorlagen]]).
 
 ## Inhalt
-
-### Mass
-
-```python
-@dataclass(frozen=True)
-class Mass
-```
-
-Ein Mass einer Vorlage -- in mm, wo nicht `einheit` anderes sagt.
-
-- `schluessel: str`
-- `symbol: str`
-- `beschriftung: str`
-- `vorgabe: float`
-- `einheit: Einheit = MM`
 
 ### Kennformel
 

@@ -7,6 +7,26 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Ein Mass prüft sich wie ein Feld
+
+Die Masse der Vorlagen – in der Querschnittsanalyse und bei den
+Stabquerschnitten des Balkensystems – und die Kennwerte von Hand hatten
+keine Beschreibung wie ein Feld. Zwei Klassen `Mass` prüften selbst, mit
+eigenen Sätzen, und die Fenster setzten eigene Mindestwerte: 1 in der
+Querschnittsanalyse, 0 im Balkensystem, wo eine 0 erst beim Rechnen
+auffiel. Die Kennwerte von Hand sagten «A, I_y, I_z und I_T müssen grösser
+als null sein.», ohne zu sagen, welcher.
+
+Jetzt beschreibt jedes Mass und jeder Kennwert seine Grenze wie ein Feld,
+mit demselben Baustein im Kern (`opencivil/core/bereich.py`). Die Maske
+weist eine 0 sofort ab, mit dem Satz des Kerns («Breite b muss grösser als
+null sein: 0 ist nicht übernommen.»), und die Einheit kommt mit. Der
+Achsabstand der Stäbe im Vorlagenfenster ist ein Mass wie die anderen;
+seine Vorgabe von 50 mm stand vorher an vier Stellen.
+
+Nimmt das Vorlagenfenster eine Zahl nicht, zeigt es wieder die zuletzt
+übernommene – nicht die, mit der es aufging.
+
 ## 2026-11-20 · Dieselbe Grenze nur noch am Feld
 
 Drei Stellen prüften eine Zahl ein zweites Mal, die ihr Feld schon prüft,

@@ -1,5 +1,5 @@
 ---
-erzeugt: bc7a39dcdebf
+erzeugt: cc510541b719
 art: modul
 tags: [modul]
 ---
@@ -442,6 +442,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.berechnung]]
+- [[opencivil.core.bereich]]
 - [[opencivil.core.formelbaum]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.nachweis]]
@@ -506,6 +507,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]

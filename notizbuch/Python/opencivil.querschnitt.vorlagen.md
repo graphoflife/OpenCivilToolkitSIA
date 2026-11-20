@@ -1,5 +1,5 @@
 ---
-erzeugt: b6390e2aecc3
+erzeugt: 703c422bbb3f
 art: modul
 tags: [modul]
 ---
@@ -24,6 +24,16 @@ Stahl, die Buegel einer Schubwand, ihre Schnitte. Eine Vorlage ist ein
 Anfang, kein Entwurf.
 
 
+## DAS MASS
+
+Ein [[opencivil.querschnitt.vorlagen#Mass|Mass]] steht fuer die Vorlagen hier und die der Stabquerschnitte
+([[opencivil.stabwerk.querschnitte]]). Seine Grenze ist ein
+[[opencivil.core.bereich#Bereich|Bereich]] wie die eines Feldes: derselbe
+Satz, dieselbe Angabe fuer die Maske. Bis 2026-11-20 hatte jede Seite ihre
+eigene Klasse, ihren eigenen Satz und im Fenster ihren eigenen Mindestwert --
+1 hier, 0 beim Stab.
+
+
 ## DIE UMRISSE
 
 Rechteck, T und Kreis zeichnet auch das Balkensystem fuer seine
@@ -42,22 +52,33 @@ ein Steg so breit wie der Flansch galt im einen als T, im anderen nicht.
 class Mass
 ```
 
-Ein Mass einer Vorlage: eine Laenge in mm -- oder, `ganzzahlig`, eine
-Anzahl, wie die der Staebe im Kreis.
+Ein Mass einer Vorlage: eine Laenge in mm, wo `einheit` nichts anderes
+sagt -- oder, `ganzzahlig`, eine Anzahl, wie die der Staebe im Kreis.
+Jedes ist groesser als null; was die Masse untereinander verlangen,
+prueft die Vorlage.
 
 - `schluessel: str`
+- `symbol: str` – Wie es in der Skizze heisst -- leer, wo es dort nicht steht.
 - `beschriftung: str`
 - `vorgabe: float`
+- `einheit: Einheit = MM`
 - `ganzzahlig: bool = False`
 
-#### Mass.einheit
+#### Mass.heisst
 
 ```python
 @property
-def einheit(self) -> str
+def heisst(self) -> str
 ```
 
-Was neben dem Feld steht -- bei einer Anzahl nichts.
+Wie es an der Maske und in einer Meldung heisst: «Breite b».
+
+#### Mass.bereich
+
+```python
+@property
+def bereich(self) -> Bereich
+```
 
 #### Mass.schritt
 
@@ -67,6 +88,24 @@ def schritt(self) -> float
 ```
 
 Um wie viel ein Pfeil am Feld den Wert aendert.
+
+#### Mass.grund
+
+```python
+def grund(self, wert: float) -> str
+```
+
+Was an `wert` nicht geht, als Satz mit Punkt -- leer, wenn er geht.
+
+#### Mass.als_dict
+
+```python
+def als_dict(self) -> Dict[str, Any]
+```
+
+Fuer den Katalog: wie es heisst, seine Vorgabe, der Schritt der
+Pfeile und, was die Maske wie bei einem Feld braucht (`angabe`:
+Einheit, Grenze, Satz, bei einer Anzahl `ganz`).
 
 ### Teile
 
@@ -144,7 +183,7 @@ Eine Vorlage: ihre Masse und wie sie daraus Teile baut.
 #### Vorlage.bauen
 
 ```python
-def bauen(self, masse: Optional[Mapping[str, float]]=None, randabstand: float=50.0, bewehrung: bool=True, schubwaende: bool=True) -> Teile
+def bauen(self, masse: Optional[Mapping[str, float]]=None, randabstand: float=RANDABSTAND.vorgabe, bewehrung: bool=True, schubwaende: bool=True) -> Teile
 ```
 
 Die Teile zu diesen Massen -- was fehlt, nach Vorgabe. `randabstand`
@@ -164,12 +203,19 @@ Die Vorlage zu einem Schluessel -- `ValueError`, wenn es sie nicht gibt.
 ## Konstanten
 
 - `KREISECKEN = 48` – Ecken eines Kreises. Sie liegen auf dem Kreis; was das an Flaeche kostet, rechnet die Geometrie wie bei jedem anderen Polygon.
-- `VORLAGEN = (Vorlage('rechteck', 'Rechteck', (Mass('b', 'Breite b', 300.0), Mass(…`
+- `RANDABSTAND = Mass('randabstand', '', 'Achsabstand', 50.0)` – Der Achsabstand der Staebe vom Rand -- ein Mass jeder Vorlage hier. Auch die Schubwaende enden auf seiner Hoehe.
+- `VORLAGEN = (Vorlage('rechteck', 'Rechteck', (Mass('b', 'b', 'Breite', 300.0), Ma…`
+
+## Braucht
+
+- [[opencivil.core.bereich]]
+- [[opencivil.core.einheiten]]
 
 ## Gebraucht von
 
 - [[opencivil.pfahl.innen]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.stabwerk.profilformen]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.web.api]]
 - [[opencivil.web.dienst]]

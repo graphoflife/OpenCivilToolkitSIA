@@ -40,8 +40,9 @@ EINHEITEN:
 Masse in mm, ``A`` in mm², die Traegheitsmomente in 10⁶ mm⁴ -- wie in der
 Querschnittsanalyse.
 
-Die Umrisse von Rechteck, T und Kreis und was an einem T nicht geht, teilen
-sich die Vorlagen hier mit denen der Querschnittsanalyse
+Die Umrisse von Rechteck, T und Kreis, was an einem T nicht geht, und das
+:class:`~opencivil.querschnitt.vorlagen.Mass` mit seiner Grenze teilen sich
+die Vorlagen hier mit denen der Querschnittsanalyse
 (:mod:`opencivil.querschnitt.vorlagen`).
 """
 
@@ -52,20 +53,9 @@ from dataclasses import dataclass
 from typing import Callable, Dict, List, Mapping, Optional, Tuple
 
 from opencivil.core.einheiten import EINHEITSLOS, MIO_MM4, MM, MM2, Einheit, Groesse
-from opencivil.querschnitt.vorlagen import kreispunkte, rechteckpunkte, t_punkte, t_pruefen
+from opencivil.querschnitt.vorlagen import Mass, kreispunkte, rechteckpunkte, t_punkte, t_pruefen
 
 Masse = Mapping[str, float]
-
-
-@dataclass(frozen=True)
-class Mass:
-    """Ein Mass einer Vorlage -- in mm, wo nicht ``einheit`` anderes sagt."""
-
-    schluessel: str
-    symbol: str
-    beschriftung: str
-    vorgabe: float
-    einheit: Einheit = MM
 
 
 @dataclass(frozen=True)
@@ -109,8 +99,9 @@ class Stabvorlage:
     def pruefen(self, masse: Masse) -> Optional[str]:
         """Was an den Massen nicht geht -- ``None``, wenn alles geht."""
         for m in self.masse:
-            if masse.get(m.schluessel, 0.0) <= 0.0:
-                return f"{m.beschriftung} {m.symbol} muss grösser als null sein."
+            grund = m.grund(masse.get(m.schluessel, 0.0))
+            if grund:
+                return grund
         return self.pruefung(masse)
 
     def kennwerte(self, masse: Masse) -> Dict[str, Groesse]:

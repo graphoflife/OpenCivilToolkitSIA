@@ -84,10 +84,6 @@ KNOTENLASTEN = ("kraft", "moment")
 #: Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)
 
-#: Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴ -- wie die Rechnung sie nimmt.
-KENNWERTE = tuple(k.kurzname for k in EBEN)
-
-
 class Profilachse(Wahl):
     """
     Um welche Achse ein Stahlprofil sich im Rahmen biegt: um ``y``, die
@@ -263,7 +259,8 @@ class StabmaterialEintrag(Beschreibung):
 class StabquerschnittEintrag(StabquerschnittBasis):
     """Ein Querschnitt der Staebe in der Ebene: ein Stahlprofil biegt sich um ``achse``."""
 
-    KENNWERTE = KENNWERTE
+    # A in mm², I in 10⁶ mm⁴ -- wie die Rechnung sie nimmt.
+    KENNWERTE = EBEN
 
     achse: Profilachse = Profilachse.Y
 

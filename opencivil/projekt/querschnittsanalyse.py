@@ -587,7 +587,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
 
     def vorlage_einsetzen(self, schluessel: str, *, beton: str, stahl: str,
                           masse: Optional[Mapping[str, float]] = None,
-                          randabstand: float = 50.0, bewehrung: bool = True,
+                          randabstand: float = vorlagen.RANDABSTAND.vorgabe,
+                          bewehrung: bool = True,
                           schubwaende: bool = True,
                           ursprung: Tuple[float, float] = (0.0, 0.0)) -> List[str]:
         """

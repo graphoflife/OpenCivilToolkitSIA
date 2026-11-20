@@ -1,5 +1,5 @@
 ---
-erzeugt: bafcad9476e6
+erzeugt: 502bee511f27
 art: modul
 tags: [modul]
 ---
@@ -543,6 +543,7 @@ Feldes; `mehr` fuer die Analyse.
 
 ## Braucht
 
+- [[opencivil.core.bereich]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]

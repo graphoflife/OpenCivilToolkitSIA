@@ -1,5 +1,5 @@
 ---
-erzeugt: 2aaccce8c762
+erzeugt: 857888643a62
 art: modul
 tags: [modul]
 ---
@@ -241,7 +241,7 @@ class StabquerschnittEintrag(StabquerschnittBasis)
 
 Ein Querschnitt der Staebe in der Ebene: ein Stahlprofil biegt sich um `achse`.
 
-- `KENNWERTE = KENNWERTE`
+- `KENNWERTE = EBEN`
 - `achse: Profilachse = Profilachse.Y`
 
 ### StatikdiagrammEintrag
@@ -324,7 +324,6 @@ Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke
 - `EINHEIT_DER_LAST = {Lastart.LINIENLAST: KN_PRO_M, Lastart.EINZELLAST: KN, Lastart.MOMENT…` – Die Einheit jeder Last in der Beschreibung, nach ihrer Art -- an einem Stab oder Knoten. Umgerechnet wird beim Bauen, mit diesen.
 - `KNOTENLASTEN = ('kraft', 'moment')` – Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede [[opencivil.stabwerk.modell#Lastart|Lastart]].
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
-- `KENNWERTE = tuple((k.kurzname for k in EBEN))` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴ -- wie die Rechnung sie nimmt.
 - `STABMATERIALARTEN = (*(art.value for art in STABKENNWERTE), 'eigen')` – Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24; Baustahl seit 2026-11-15). Betonstahl ist keines: aus ihm ist kein Stab. Welche Arten des Projekts es gibt, sagen die Kennwerte, die ein Stab aus ihnen nimmt.
 - `DIAGRAMMGROESSEN = ('N', 'V', 'M', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte. N, V, M wie im Raum und in der Tabelle der Grenzwerte -- bis 2026-11-19 stand M zuerst.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.

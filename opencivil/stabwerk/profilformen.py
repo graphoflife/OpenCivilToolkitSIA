@@ -39,8 +39,9 @@ from dataclasses import replace
 from typing import List, Mapping, Sequence, Tuple
 
 from opencivil.core.einheiten import CM2, CM4, EINHEITSLOS, MIO_MM4, MM, MM2, PROZENT, Groesse
+from opencivil.querschnitt.vorlagen import Mass
 from opencivil.stabwerk.querschnitte import (
-    EINS, KREISRING, ROHRTORSION, Kennformel, Mass, Stabvorlage,
+    EINS, KREISRING, ROHRTORSION, Kennformel, Stabvorlage,
 )
 
 Punkt = Tuple[float, float]

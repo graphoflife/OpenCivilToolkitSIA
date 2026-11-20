@@ -439,12 +439,13 @@ function querschnittFenster(system, kennung) {
       })),
       umrissBild(system, q, 120, 90),
     ]));
+    // Grenze, Satz und Einheit jedes Masses kommen mit ihm aus dem Kern.
     for (const m of vorlage?.masse || []) {
       zeilen.push(feld(m.beschriftung, zahlfeld({
-        wert: q.masse?.[m.schluessel] ?? m.vorgabe, schritt: 10, min: 0,
-        titel: `${m.beschriftung} ${m.symbol} in mm`,
+        wert: q.masse?.[m.schluessel] ?? m.vorgabe, schritt: m.schritt, angabe: m.angabe,
+        titel: m.heisst,
         beiAenderung: (w) => aendern((x) => { x.masse = { ...x.masse, [m.schluessel]: w }; }),
-      }), 'mm'));
+      }), m.angabe.einheit));
     }
   } else if (q.art === 'profil') {
     // Die Reihe als Schalter, die Grösse als Liste mit dem Bild daneben --
@@ -474,9 +475,10 @@ function querschnittFenster(system, kennung) {
     );
   } else if (q.art === 'kennwerte') {
     zeilen.push(...systemkatalog(art, 'kennwerte').map((k) => feld(k.kurz, zahlfeld({
-      wert: q.kennwerte?.[k.kurz] ?? 0, schritt: k.kurz === 'A' ? 1000 : 10, min: 0, titel: k.beschriftung,
+      wert: q.kennwerte?.[k.kurz] ?? 0, schritt: k.kurz === 'A' ? 1000 : 10, angabe: k.angabe,
+      titel: k.beschriftung,
       beiAenderung: (w) => aendern((x) => { x.kennwerte = { ...x.kennwerte, [k.kurz]: w }; }),
-    }), k.einheit, k.beschriftung)));
+    }), k.angabe.einheit, k.beschriftung)));
   } else {
     const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
     // Ohne eine im Projekt sagt es schon die Liste.

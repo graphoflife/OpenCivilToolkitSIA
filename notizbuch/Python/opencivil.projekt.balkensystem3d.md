@@ -1,5 +1,5 @@
 ---
-erzeugt: 1c188983f118
+erzeugt: e07cb5574782
 art: modul
 tags: [modul]
 ---
@@ -167,7 +167,7 @@ class RaumquerschnittEintrag(StabquerschnittBasis)
 
 Ein Querschnitt der Staebe im Raum -- siehe Dateikopf.
 
-- `KENNWERTE = KENNWERTE`
+- `KENNWERTE = RAEUMLICH`
 
 ### RaumdiagrammEintrag
 
@@ -241,7 +241,6 @@ Wie in der Ebene -- und der Drehwinkel so, dass der Querschnitt steht wie vorher
 ## Konstanten
 
 - `KNOTENRICHTUNGEN = tuple((r for r in Richtung if r.im_system))` – Wohin eine Last an einem Knoten zeigt -- in die Richtungen des Systems.
-- `KENNWERTE = tuple((k.kurzname for k in RAEUMLICH))` – Die Kennwerte eines Querschnitts von Hand -- wie die Rechnung sie nimmt.
 - `DIAGRAMMGROESSEN = ('N', 'V_y', 'V_z', 'T', 'M_y', 'M_z', 'verschiebung', 'lagerkraefte')` – Was ein Diagramm zeigt: je Stab den Verlauf einer Schnittgroesse, das verschobene System oder die Lagerkraefte.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'fest', 'frei', 'frei', 'frei'), 'versc…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest, in der Folge x, y, z, φ_x, φ_y, φ_z. Gelenkig haelt jede Verschiebung, verschieblich nur die lotrechte.
 

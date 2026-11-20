@@ -11,6 +11,7 @@ import json
 import typing
 import unittest
 
+from opencivil.core.bereich import Bereich
 from opencivil.core.einheiten import GRAD, MM
 from opencivil.querschnitt.gesetzwahl import Rechenart
 from opencivil.projekt import (
@@ -19,7 +20,7 @@ from opencivil.projekt import (
 )
 from opencivil.projekt.querschnittsanalyse import SchubwandEintrag
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt.lesen import Bereich, eintragsklassen, felder_pruefen
+from opencivil.projekt.lesen import eintragsklassen, felder_pruefen
 from opencivil.web import dienst
 from opencivil.projekt.aufbau.balkensystem import modell_von
 from tests import unfertig
@@ -295,10 +296,8 @@ class TestInhaltVorDemRechnen(unittest.TestCase):
                 (Bereich("φ_k", GRAD, ab=0.0, unter=90.0), 90.0,
                  "φ_k muss mindestens null und kleiner als 90° sein, angegeben ist 90°.")):
             with self.subTest(text=text):
-                bereich.pruefen(wert - 1 if wert > 0 else wert + 1, "Hier")
-                with self.assertRaises(ProjektFehler) as fehler:
-                    bereich.pruefen(wert, "Hier")
-                self.assertEqual(str(fehler.exception), f"Hier: {text}")
+                self.assertEqual(bereich.grund(wert - 1 if wert > 0 else wert + 1), "")
+                self.assertEqual(bereich.grund(wert), text)
 
 
 class TestJedesZahlfeld(unittest.TestCase):

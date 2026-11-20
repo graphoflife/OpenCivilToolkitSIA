@@ -1,5 +1,5 @@
 ---
-erzeugt: 758efd9c73c0
+erzeugt: 0ba8582d3b8b
 art: modul
 tags: [modul]
 ---
@@ -154,7 +154,7 @@ nach dem Zurueckschalten stehen die alten Zahlen wieder da (Benutzer,
 und die Oberflaeche raeumte beim Umschalten ab, was [[opencivil.projekt.staebe#StabquerschnittBasis.fehler|fehler]] sonst
 abwies -- dreimal nachgebessert.
 
-- `KENNWERTE: ClassVar[Tuple[str, ...]]` – Die Kennwerte von Hand, wie die Rechnung sie nimmt.
+- `KENNWERTE: ClassVar[Tuple[Kennwert, ...]]` – Die Kennwerte von Hand, wie die Rechnung sie nimmt -- mit ihrer Grenze.
 - `kennung: str = ''`
 - `name: str = ''`
 - `art: Querschnittsart = einer_von(tuple(Querschnittsart), Querschnittsart.VORLAGE)`
@@ -489,6 +489,7 @@ Ob eine Last ihr Vorzeichen wechselt, wenn ihre Linie umgekehrt wird.
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.querschnitte]]
+- [[opencivil.stabwerk.stabquerschnitt]]
 
 ## Gebraucht von
 
