@@ -218,8 +218,8 @@ class TestNachweis(unittest.TestCase):
         p.setzung("Leer", q_E=100.0)
         aufbau = p.aufbauen()
         self.assertEqual(aufbau.feld("setzung"), {})
-        self.assertIn("Setzung 'Leer': noch keine Schicht – unter «Schichten» eine anlegen → kein "
-                      "Nachweis.", aufbau.warnungen)
+        self.assertIn(("setzung.w1", "Setzung 'Leer': noch keine Schicht – unter «Schichten» "
+                                     "eine anlegen → kein Nachweis."), aufbau.warnungen)
         self.assertEqual(aufbau.teile["w1"].ohne_nachweis, "noch keine Schicht – unter «Schichten» eine anlegen")
 
 

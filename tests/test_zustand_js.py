@@ -5,7 +5,8 @@ gibt es ihn nicht mehr, geschieht nichts. Jede Aenderung zaehlt die Fassung
 des Projekts, wer horcht, erfaehrt, ob alles, nur die Mitte oder das Projekt
 neu ist, ein anderes Projekt leert, was sich die Ansichten merkten, und wer
 zurueckkehrt, findet seine Auswahl wieder. Der Katalog nennt einen fehlenden
-Schluessel mit seinem Pfad.
+Schluessel mit seinem Pfad, und was zu einer Sandbox gehoert, sagt ihre
+Kennung.
 
 Das Modul wird node als ``data:``-Adresse gegeben, wie in
 ``test_arten_js.py``. Ohne node wird uebersprungen.
@@ -68,6 +69,12 @@ ergebnis.zurueck.push(z.zustand.auswahl, z.zustand.app, z.zustand.projekt.name);
 const meldung = (f) => { try { f(); return null; } catch (e) { return e.message; } };
 ergebnis.katalog = [z.katalog('a', 'b'), meldung(() => z.katalog('a', 'c')),
                     meldung(() => z.katalog('x'))];
+
+const spiel = { name: 'Spiel', materialien: [], sandboxen: { querschnitte: 'q2' } };
+z.projektSetzen(spiel, { mappe: { projekte: [spiel] } });
+ergebnis.sandbox = [z.istSandbox('q2'), z.istSandbox('q1'),
+                    z.inSandbox('querschnitt.q2.nachweis.mn.x'),
+                    z.inSandbox('querschnitt.q1.nachweis.mn.x'), z.inSandbox('beton.b1.f_ck')];
 process.stdout.write(JSON.stringify(ergebnis));
 """
 
@@ -122,6 +129,10 @@ class TestEintraegeUeberIhreKennung(unittest.TestCase):
     def test_katalog_nennt_den_fehlenden_pfad(self):
         self.assertEqual(self.ergebnis["katalog"], [[1], "Im Katalog fehlt a.c.",
                                                     "Im Katalog fehlt x."])
+
+    def test_was_zur_sandbox_gehoert(self):
+        """Ihre Kennung und was im Rechenwerk unter ihr steht -- nicht der Beton, den sie nimmt."""
+        self.assertEqual(self.ergebnis["sandbox"], [True, False, True, False, False])
 
 
 if __name__ == "__main__":

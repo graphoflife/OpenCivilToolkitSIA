@@ -13,7 +13,9 @@
  * jedem Lauf.
  */
 
-import { namensfeld, panel } from './bausteine.js';
+import {
+  namensfeld, panel, sandboxHinweis, sandboxName,
+} from './bausteine.js';
 import { el, ersetzen } from './dom.js';
 import { abbrechen, ausfuehren, konsole, leeren, neuStarten } from './konsole.js';
 import { bildZeichnen } from './zeichnen.js';
@@ -183,6 +185,7 @@ function aufbauen(skript) {
   const name = namensfeld({
     wert: skript.name, titel: 'Name des Skripts',
     setzen: (neu) => eintragAendern(kennung, (s) => { s.name = neu; }),
+    ...sandboxName(skript),
   });
   const ausfuehrenKnopf = el('button.knopf.knopf-haupt', {
     type: 'button', text: '▶ Ausführen', title: 'Das ganze Skript ausführen (Strg+Enter)',
@@ -203,6 +206,7 @@ function aufbauen(skript) {
 
   const wurzel = el('div.py-app', {}, [
     panel({ schluessel: 'python/Skript', titel: 'Skript', zusatz: 'Python im Browser' }, [
+      sandboxHinweis(skript),
       el('div.py-kopf', {}, [name, ausfuehrenKnopf, abbrechenKnopf]),
       el('div.py-editor', {}, [nummern, code]),
       el('p.py-tipp', {

@@ -115,12 +115,14 @@ export const zustand = {
 
 /**
  * Wählt links eine App -- unter den Knöpfen steht dann ihre Liste -- und
- * darin den Eintrag, der dort zuletzt gewählt war, sonst den ersten.
- * `eintraege` ist die Liste der App; ist sie leer, ist nichts gewählt.
+ * darin den Eintrag, der dort zuletzt gewählt war, sonst den ersten des
+ * Projekts; die Sandbox nur, wenn es keinen gibt. `eintraege` ist die Liste
+ * der App; ist sie leer, ist nichts gewählt.
  */
 export function appWaehlen(app, eintraege) {
   const kennungen = eintraege.map((e) => e.kennung);
-  const kennung = kennungen.includes(zustand.zuletzt[app]) ? zustand.zuletzt[app] : kennungen[0];
+  const kennung = kennungen.includes(zustand.zuletzt[app]) ? zustand.zuletzt[app]
+    : kennungen.find((k) => !istSandbox(k)) ?? kennungen[0];
   aendern({ app, fenster: null, auswahl: kennung ? { art: app, kennung } : null });
 }
 
@@ -326,6 +328,24 @@ export function eintragVon(kennung) {
 export function eintragAendern(kennung, veraenderer) {
   const eintrag = eintragVon(kennung);
   if (eintrag) projektAendern(() => veraenderer(eintrag));
+}
+
+/**
+ * Ist dieser Eintrag die Sandbox seiner App? Welche es ist, hält das Projekt
+ * je Liste (`sandboxen`, opencivil/projekt/projekt.py): eine Kopie ist so von
+ * selbst ein gewöhnlicher Eintrag.
+ */
+export function istSandbox(kennung) {
+  return Object.values(zustand.projekt?.sandboxen ?? {}).includes(kennung);
+}
+
+/**
+ * Gehört ein Name im Rechenwerk -- `querschnitt.q1.biegung` -- zu einer
+ * Sandbox? Was das ganze Projekt zusammenfasst, lässt sie aus, wie der
+ * Bericht: «Gesamt» und der Stand oben rechts.
+ */
+export function inSandbox(id) {
+  return istSandbox(String(id).split('.')[1]);
 }
 
 // -- Zugriffshilfen ---------------------------------------------------------

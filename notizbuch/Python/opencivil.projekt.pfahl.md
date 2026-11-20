@@ -1,5 +1,5 @@
 ---
-erzeugt: 4710e5d13ae5
+erzeugt: bc8871f7e73f
 art: modul
 tags: [modul]
 ---
@@ -87,6 +87,7 @@ class PfahlEintrag(BauteilEintrag)
 Ein Einzelpfahl in seinem Baugrund, mit seinen Einwirkungen -- siehe Dateikopf.
 
 - `BEZEICHNUNG = 'Pfahl'`
+- `ERSTE_MATERIALIEN = {'beton': 'beton', 'stahl': 'betonstahl'}` – Angelegt wird ein Bohrpfahl, und er braucht den Beton.
 - `kennung: str`
 - `name: str`
 - `art: Pfahlart = Pfahlart.BOHRPFAHL`

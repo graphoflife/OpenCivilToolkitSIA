@@ -1,5 +1,5 @@
 ---
-erzeugt: 264af8c1ee03
+erzeugt: b06abce20098
 art: modul
 tags: [modul]
 ---
@@ -12,9 +12,10 @@ tags: [modul]
 Das [[opencivil.projekt.projekt#Projekt|Projekt]] haelt Materialien und Bauteile zusammen und ist das, was
 gespeichert, geoeffnet und gerechnet wird. Hier stehen der Zugriff auf die
 Teile, die Methoden fuer das Rechnen ohne Oberflaeche, die Pruefungen ueber
-mehrere Teile hinweg (eindeutige Kennungen und Materialnamen), Speichern und
-Laden. Das Beispiel, mit dem die Oberflaeche startet, und das Pruefprojekt
-«Jeder Nachweis» baut [[opencivil.projekt.beispiele]].
+mehrere Teile hinweg (eindeutige Kennungen und Materialnamen), die Sandbox
+jeder App, Speichern und Laden. Das Beispiel, mit dem die Oberflaeche
+startet, und das Pruefprojekt «Jeder Nachweis» baut
+[[opencivil.projekt.beispiele]].
 
 Gebaut wird in [[opencivil.projekt.aufbau]]; [[opencivil.projekt.projekt#Projekt.aufbauen|Projekt.aufbauen]]
 reicht nur weiter.
@@ -42,6 +43,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `pfaehle: List[PfahlEintrag] = field(default_factory=list)` – Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand.
 - `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
+- `sandboxen: Dict[str, str] = field(default_factory=dict)` – Je Liste einer App ([[opencivil.projekt.projekt#Konstanten|APPLISTEN]]) die Kennung ihrer Sandbox, des Eintrags zum Ausprobieren -- siehe [[opencivil.projekt.projekt#Projekt.sandbox_zuruecksetzen|sandbox_zuruecksetzen]]. Hier und nicht an den Eintraegen: so steht die Regel an einer Stelle, und eine Kopie der Sandbox ist von selbst ein gewoehnlicher Eintrag.
 - `vergeben: Dict[str, int] = field(default_factory=dict)` – Je Vorsilbe die hoechste Nummer, die das Projekt je vergeben hat -- an Materialien, Bauteile, Skripte: eine Kennung kommt nie wieder ([[opencivil.projekt.netz#neue_kennung|neue_kennung]]).
 
 #### Projekt.material
@@ -108,6 +110,11 @@ Querschnitt ([[opencivil.projekt.projekt#Projekt|materialien]] und [[opencivil.p
 Was hier steht, darf nicht geloescht werden; die Oberflaeche fragt hier,
 bevor sie loescht (Dienst `verweise`), statt es in einer eigenen
 Liste nachzubauen.
+
+Eine Sandbox haelt nichts fest: zeigt sie auf etwas Geloeschtes, sagt
+sie es selbst, und zurueckgesetzt nimmt sie wieder das erste Material.
+Sonst liesse sich der einzige Beton nicht loeschen, weil die Sandbox
+der Platten ihn nimmt.
 
 #### Projekt.eigener_name
 
@@ -327,8 +334,48 @@ def rechnen(self) -> Ergebnis
 Alles rechnen, was die Oberflaeche auch rechnet -- ohne sie.
 
 Dieselben Ziele in derselben Reihenfolge ([[opencivil.projekt.aufbau.kern#Aufbau.alle_ziele|Aufbau.alle_ziele]]),
-also derselbe Bericht. Ohne Zwischenspeicher: der lohnt sich erst,
+also derselbe Bericht -- ohne die Sandboxen, wie dort
+([[opencivil.projekt.projekt#Projekt.ohne_sandboxen|ohne_sandboxen]]). Ohne Zwischenspeicher: der lohnt sich erst,
 wenn man dieselbe Platte hundertmal rechnet.
+
+#### Projekt.ist_sandbox
+
+```python
+def ist_sandbox(self, kennung: str) -> bool
+```
+
+Ob dieser Eintrag die Sandbox seiner App ist.
+
+#### Projekt.sandbox_zuruecksetzen
+
+```python
+def sandbox_zuruecksetzen(self, liste: str) -> Any
+```
+
+Die Sandbox einer App, frisch: nach der Vorlage ihrer Klasse und mit
+dem ersten Material jeder Art, das sie nimmt, wie ein neuer Eintrag
+der Oberflaeche ([[opencivil.projekt.eintraege#Beschreibung.frisch|frisch]]).
+Eine vorhandene wird an ihrem Platz ersetzt und behaelt ihre Kennung
+-- wer auf sie zeigt, zeigt weiter auf sie. Eine fehlende kommt
+zuoberst in die Liste.
+
+#### Projekt.sandboxen_anlegen
+
+```python
+def sandboxen_anlegen(self, *, frisch: bool=False) -> None
+```
+
+Jede Sandbox, die fehlt -- in einem neuen Projekt, in einer Datei, die
+noch keine kennt. Mit `frisch` beginnt auch jede vorhandene neu: so
+startet die Seite (Benutzer, 2026-11-20).
+
+#### Projekt.ohne_sandboxen
+
+```python
+def ohne_sandboxen(self) -> 'Projekt'
+```
+
+Eine Kopie ohne die Sandboxen -- das Projekt, wie es im Bericht steht.
 
 #### Projekt.pruefen
 
@@ -401,7 +448,9 @@ Ein neues Projekt, wie es «+» in der Oberflaeche anlegt: mit dem
 ersten Beton und dem ersten Betonstahl, den ein neues Material
 vorschlaegt ([[opencivil.material.beton#Konstanten|ERSTER_BETON]],
 [[opencivil.material.betonstahl#Konstanten|ERSTER_STAHL]]), und ohne
-Bauteile. So rechnet die erste Platte gleich.
+Bauteile. So rechnet die erste Platte gleich. Die Sandboxen legt die
+Oberflaeche dazu an ([[opencivil.projekt.projekt#Projekt.sandboxen_anlegen|sandboxen_anlegen]]); wer in Python
+rechnet, braucht sie nicht.
 
 #### Projekt.beispiel
 
@@ -421,6 +470,11 @@ def jeder_nachweis(cls) -> 'Projekt'
 
 Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele]].
 
+
+## Konstanten
+
+- `APPLISTEN = {**{art.liste: (art.eintrag, art.vorsilbe) for art in BAUTEILE}, 'skr…` – Die Listen der Apps ausser den Materialien, je mit der Klasse ihrer Eintraege und der Vorsilbe ihrer Kennungen: die Bauteilarten ([[opencivil.projekt.aufbau#Konstanten|BAUTEILE]]) und die Skripte der App «Python». Was «+» in ihnen anlegt, steht im Katalog (`neu`); jede hat eine Sandbox.
+- `SANDBOX = 'Sandbox'` – Wie die Sandbox jeder App heisst (Benutzer, 2026-11-20).
 
 ## Braucht
 

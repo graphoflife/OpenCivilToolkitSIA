@@ -284,6 +284,10 @@ class MitStaeben:
     LINIENLAGER: Tuple[str, ...]
     """Die Richtungen eines Linienlagers -- Felder der Linie wie des Stabs im Rechenkern."""
 
+    #: Das Material M1 eines frischen Systems (:meth:`neu`) nimmt den ersten
+    #: Beton des Projekts -- damit ein gezeichneter Stab gleich eines hat.
+    ERSTE_MATERIALIEN = {"stabmaterialien/0/stoff": "beton"}
+
     NEUE_DIAGRAMME: Tuple[str, ...]
     """Was ein frisches System von der GZT zeigt -- dazu die Verschiebung der GZG."""
 
@@ -320,9 +324,13 @@ class MitStaeben:
         den Lastfaellen Eigengewicht -- es kommt von selbst --, Auflast und
         Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
         1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23). Dazu die
-        Diagramme :attr:`NEUE_DIAGRAMME` der GZT und die Verschiebung der GZG.
+        Diagramme :attr:`NEUE_DIAGRAMME` der GZT und die Verschiebung der GZG,
+        und das Material M1, ein Beton: welcher, sagt
+        :attr:`ERSTE_MATERIALIEN`.
         """
         s = cls(kennung=kennung, name=name)
+        s.stabmaterialien.append(cls.MATERIAL(kennung=s._neue_kennung(s.stabmaterialien, "M"),
+                                              art="beton"))
         gzt = s.standardfaelle()
         gzg = s.gebrauchskombination()
         for groesse in cls.NEUE_DIAGRAMME:
@@ -423,7 +431,9 @@ class MitStaeben:
     def beton(self, beton: Any) -> Any:
         """
         Das Material des Systems aus einem Beton des Projekts (Eintrag oder
-        Kennung) -- das schon da ist, sonst ein neues.
+        Kennung) -- das schon da ist, sonst ein neues. Ein Beton, der noch
+        keinen gewaehlt hat wie M1 eines frischen Systems (:meth:`neu`),
+        bekommt diesen.
         """
         return self._aus_projekt("beton", beton)
 
@@ -433,9 +443,12 @@ class MitStaeben:
 
     def _aus_projekt(self, art: str, stoff: Any) -> Any:
         kennung = kennung_von(stoff)
-        for m in self.stabmaterialien:
-            if m.art == art and m.stoff == kennung:
-                return m
+        passend = [m for m in self.stabmaterialien if m.art == art and m.stoff in (kennung, "")]
+        if passend:
+            # Das mit diesem Stoff zuerst, sonst eines, das noch keinen hat.
+            gewaehlt = min(passend, key=lambda m: m.stoff != kennung)
+            gewaehlt.stoff = kennung
+            return gewaehlt
         eintrag = self.MATERIAL(kennung=self._neue_kennung(self.stabmaterialien, "M"),
                                 art=art, stoff=kennung)
         self.stabmaterialien.append(eintrag)

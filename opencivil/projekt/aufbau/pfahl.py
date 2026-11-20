@@ -86,6 +86,6 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil:
                              InnererQuerwiderstand(pfahl, kombinationen, **befunde))
     else:
         quer = any(pfahl.quer_belastet(k) for k in kombinationen)
-        aufbau.warnungen.append(f"{wo}: die Schichten reichen nicht bis unter den Fuss → "
+        aufbau.warnen(teil.raum, f"{wo}: die Schichten reichen nicht bis unter den Fuss → "
                                 f"keine Steifigkeit{' und kein Widerstand quer' if quer else ''}.")
     return teil

@@ -61,6 +61,20 @@ if TYPE_CHECKING:
 # ===========================================================================
 
 
+class Warnung(NamedTuple):
+    """
+    Ein Hinweis aus dem Aufbau: ``raum`` ist der Namensraum des Eintrags, dem
+    er gilt -- «querschnitt.q1» --, ``text`` der Satz. Am Namensraum grenzt
+    die Oberflaeche ihn ein wie alles andere: unter «Aktuelle Seite» stehen
+    die Hinweise des gewaehlten Eintrags, unter «Gesamt» alle ausser denen
+    der Sandboxen. Bis 2026-11-20 standen alle ueber jeder Herleitung -- mit
+    der Sandbox auch ihr «noch nichts gezeichnet», in jedem Projekt.
+    """
+
+    raum: str
+    text: str
+
+
 @dataclass
 class Aufbau:
     """Was beim Zusammenbauen eines Projekts entsteht."""
@@ -97,7 +111,9 @@ class Aufbau:
     und nicht, es gebe es nicht.
     """
 
-    warnungen: List[str] = field(default_factory=list)
+    warnungen: List[Warnung] = field(default_factory=list)
+    """Was beim Aufbau auffiel, je Eintrag (:meth:`warnen`)."""
+
 
     #: Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der
     #: ein neuer Nachweis eingetragen wird. Alle sind nach Kennung
@@ -122,7 +138,11 @@ class Aufbau:
     # Bis 2026-10-25 legte jede Baufunktion ihr Objekt ein zweites Mal ab, in
     # einem Woerterbuch je Art. Jetzt steht es nur im Bauteil.
 
-    def unfertig(self, liste: str, eintrag: Any, wo: str, grund: str) -> None:
+    def warnen(self, raum: str, text: str) -> None:
+        """Ein Hinweis zum Eintrag mit dem Namensraum ``raum`` (:class:`Warnung`)."""
+        self.warnungen.append(Warnung(raum, text))
+
+    def unfertig(self, liste: str, eintrag: Any, wo: str, grund: str, *, raum: str) -> None:
         """
         Ein Bauteil oder Material, dem noch etwas fehlt: es rechnet nicht,
         das Projekt schon, und ein Hinweis sagt, was fehlt -- ein unfertiger
@@ -130,12 +150,13 @@ class Aufbau:
         dahin hielten eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und
         eine halbfertige Zeichnung alles auf. ``liste`` ist seine Liste im
         Projekt; ``grund`` ein Satzteil («noch keine Bewehrung») oder ein
-        Satz, ohne Punkt. Eine Baufunktion meldet es, indem sie einen
-        :class:`ProjektFehler` wirft (:func:`~opencivil.projekt.aufbau.aufbauen`).
+        Satz, ohne Punkt; ``raum`` sein Namensraum, «beton.b1». Eine
+        Baufunktion meldet es, indem sie einen :class:`ProjektFehler` wirft
+        (:func:`~opencivil.projekt.aufbau.aufbauen`).
         """
         name = getattr(eintrag, "anzeigename", eintrag.name)
         self.unfertige[eintrag.kennung] = Unfertiges(liste, name, wo, grund)
-        self.warnungen.append(f"{wo}: {grund} → nichts zu rechnen.")
+        self.warnen(raum, f"{wo}: {grund} → nichts zu rechnen.")
 
     def ohne_nachweis(self, teil: "Bauteil", wo: str, grund: str) -> None:
         """
@@ -146,7 +167,7 @@ class Aufbau:
         Herleitung. Ein Satzteil ohne Punkt.
         """
         teil.ohne_nachweis = grund
-        self.warnungen.append(f"{wo}: {grund} → kein Nachweis.")
+        self.warnen(teil.raum, f"{wo}: {grund} → kein Nachweis.")
 
     def objekte(self, art: str) -> Dict[str, Any]:
         """

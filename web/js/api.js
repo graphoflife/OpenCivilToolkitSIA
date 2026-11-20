@@ -118,13 +118,16 @@ function ruf(name, rumpf) {
 
 export const api = {
   katalog: () => ruf('katalog', {}),
-  /** Das Beispielprojekt -- der Start, wenn nichts abgelegt ist. */
+  /** Das Beispielprojekt, mit seinen Sandboxen -- der Start, wenn nichts abgelegt ist. */
   beispiel: () => ruf('beispiel', {}),
   /**
-   * Prüft eine Mappe, alle Projekte zusammen (aus der Ablage oder aus einer
-   * Datei) -- auch ein einzelnes Projekt, wie bis 2026-11-20 gespeichert.
+   * Eine Mappe, alle Projekte zusammen (aus der Ablage oder aus einer
+   * Datei), geprüft und mit allen Sandboxen -- auch ein einzelnes Projekt,
+   * wie bis 2026-11-20 gespeichert. Mit `frisch` beginnt jede Sandbox neu.
    */
-  mappePruefen: (mappe) => ruf('mappe_pruefen', { mappe }),
+  mappeOeffnen: (mappe, frisch = false) => ruf('mappe_oeffnen', { mappe, frisch }),
+  /** Die Sandbox der Liste `liste`, frisch -- mit ihrer Kennung, an ihrem Platz. */
+  sandboxZuruecksetzen: (projekt, liste) => ruf('sandbox_zuruecksetzen', { projekt, liste }),
   /** Die Bauteile, die auf diese Kennung zeigen -- als Material oder als Querschnitt. */
   verweise: (projekt, kennung) => ruf('verweise', { projekt, kennung }),
   /**

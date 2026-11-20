@@ -165,7 +165,8 @@ class TestFaktor(unittest.TestCase):
         projekt, platte = platte_mit([0, 0], ("Feld", 2.0, 5.0, "unten"))
         aufbau, _ = rechnen(projekt)
         self.assertEqual(aufbau.feld("verformung"), {})
-        self.assertIn("Platte 'Platte': ohne x-Bewehrung kein Verformungsnachweis.",
+        self.assertIn((f"querschnitt.{platte.kennung}",
+                       "Platte 'Platte': ohne x-Bewehrung kein Verformungsnachweis."),
                       aufbau.warnungen)
 
 

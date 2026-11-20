@@ -49,6 +49,12 @@
   --schlecht-hell:#fdeceb;
   --warn:         #8a6100;
   --warn-hell:    #fdf4e0;
+  /* Die Sandbox zuoberst in jeder Liste (Benutzer, 2026-11-20): leicht
+     golden -- heller und gelber als eine Warnung, sie ist ja keine. */
+  --sandbox:      #c9a227;
+  --sandbox-rand: #ecdca4;
+  --sandbox-hell: #fcf5dc;
+  --sandbox-tief: #7a5c00;
 
   --beton:        #7b8794;
   --stahl:        #b8622a;
@@ -403,6 +409,14 @@ a.knopf { display: inline-block; text-decoration: none; }
 .baum-eintrag.ist-aktiv { background: var(--blau-hell); border-color: var(--blau); }
 .baum-eintrag .name     { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .baum-eintrag .art      { font-size: 11px; color: var(--schrift-zart); }
+.baum-eintrag.ist-sandbox {
+  background: linear-gradient(100deg, var(--sandbox-hell), var(--flaeche) 85%);
+  border-color: var(--sandbox-rand);
+}
+.baum-eintrag.ist-sandbox:hover     { background: var(--sandbox-hell); }
+.baum-eintrag.ist-sandbox.ist-aktiv { background: var(--sandbox-hell); border-color: var(--sandbox);
+                                      box-shadow: inset 3px 0 0 var(--sandbox); }
+.baum-eintrag.ist-sandbox .name     { color: var(--sandbox-tief); font-weight: 500; }
 
 /* Eine Normsorte trägt ein rotes «SIA» (Benutzer, 2026-10-16) -- sie ist
    gesperrt und bleibt es; ein eigenes Material trägt «eigen». */
@@ -1037,6 +1051,8 @@ dialog.dialogfenster .fenster-kopf { top: 0; }
 }
 .hinweis-annahme { border-left-color: var(--blau); background: var(--blau-hell); }
 .hinweis-warnung { border-left-color: var(--warn); background: var(--warn-hell); }
+.hinweis-sandbox { border-left-color: var(--sandbox); background: var(--sandbox-hell); }
+.hinweis-sandbox b { color: var(--sandbox-tief); }
 
 /* Ein Tabellenblock sieht aus wie ein Gleichungsblock -- gleicher Rahmen,
    gleiche Kopfzeile, gleiche Kopierknöpfe. Es ist dieselbe Art Aussage. */

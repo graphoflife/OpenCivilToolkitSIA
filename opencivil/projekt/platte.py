@@ -39,8 +39,13 @@ class QuerschnittEintrag(Querschnittsangaben):
     """
 
     BEZEICHNUNG = "Platte"
+    ERSTE_MATERIALIEN = {"beton": "beton", "stahl": "betonstahl"}
 
-    beton: str
+    beton: str = ""
+    """
+    Leer, solange keiner gewaehlt ist -- etwa in der Sandbox eines Projekts
+    ohne Beton: dann rechnet die Platte nicht, das Projekt schon.
+    """
     stahl: str = ""
     """
     Der Betonstahl der Platte: aller vier Lagen und der Bügel -- einer für

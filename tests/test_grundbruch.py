@@ -481,7 +481,9 @@ class TestEintrag(unittest.TestCase):
         aufbau = p.aufbauen()
         self.assertEqual(aufbau.feld("grundbruch"), {})
         self.assertEqual(aufbau.feld("gleiten"), {})
-        self.assertIn("Grundbruch 'F': jede Kombination ist ausgeschaltet → kein Nachweis.", aufbau.warnungen)
+        self.assertIn((f"grundbruch.{g.kennung}",
+                       "Grundbruch 'F': jede Kombination ist ausgeschaltet → kein Nachweis."),
+                      aufbau.warnungen)
         # Die Zusammenfassung sagt es an seiner Stelle.
         antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
         self.assertEqual(antwort.daten["ohne_nachweis"], {"g1": "jede Kombination ist ausgeschaltet"})

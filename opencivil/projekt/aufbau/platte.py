@@ -79,11 +79,11 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
             aufbau.eintragen(teil, "fehlende", kennung_x, FehlendeBewehrung(
                 querschnitt, richtung, _ausgefallene(aktiv, richtung)))
         if eintrag.knickfaelle:
-            aufbau.warnungen.append(
-                f"Platte '{eintrag.name}': ohne x-Bewehrung kein Knicknachweis.")
+            aufbau.warnen(teil.raum,
+                          f"Platte '{eintrag.name}': ohne x-Bewehrung kein Knicknachweis.")
         if eintrag.verformung.faelle:
-            aufbau.warnungen.append(
-                f"Platte '{eintrag.name}': ohne x-Bewehrung kein Verformungsnachweis.")
+            aufbau.warnen(teil.raum,
+                          f"Platte '{eintrag.name}': ohne x-Bewehrung kein Verformungsnachweis.")
     else:
         # Der M-N-Nachweis entsteht auch ohne Schnittgroessen: seine
         # Eckwerte gehoeren dem Querschnitt, nicht der Einwirkung, und der
@@ -143,9 +143,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
     spannungsfaelle(eintrag, stoffe, aufbau)
 
     if not eintrag.kombinationen:
-        aufbau.warnungen.append(
-            f"Platte '{eintrag.name}': keine Schnittgrössen → kein "
-            f"Tragsicherheitsnachweis.")
+        aufbau.warnen(teil.raum, f"Platte '{eintrag.name}': keine Schnittgrössen → kein "
+                                 f"Tragsicherheitsnachweis.")
     return teil
 
 

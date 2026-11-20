@@ -973,7 +973,7 @@ class TestLeereAnalyse(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": self.beschreibung()})
         self.assertEqual(antwort.status, 200)
         self.assertIn("Querschnittsanalyse 'Leer': noch nichts gezeichnet → nichts zu rechnen.",
-                      antwort.daten["warnungen"])
+                      [w["text"] for w in antwort.daten["warnungen"]])
         self.assertTrue(antwort.daten["urteile"])
 
     def test_ein_system_mit_ihr_als_querschnitt_meldet_es(self):
@@ -1003,8 +1003,8 @@ class TestLeereAnalyse(unittest.TestCase):
         p.querschnittsanalysen.append(a)
         antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
         self.assertEqual(antwort.status, 200)
-        self.assertTrue(any(w.startswith("Querschnittsanalyse 'Halb': Es gibt kein Polygon "
-                                         "mit Material") for w in antwort.daten["warnungen"]),
+        self.assertTrue(any(w["text"].startswith("Querschnittsanalyse 'Halb': Es gibt kein Polygon "
+                                                 "mit Material") for w in antwort.daten["warnungen"]),
                         antwort.daten["warnungen"])
         self.assertTrue(antwort.daten["urteile"])
         diagramme = dienst.bearbeite("analysediagramme", {"projekt": p.als_dict(), "kennung": "a9"})

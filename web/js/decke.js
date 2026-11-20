@@ -19,7 +19,7 @@
  */
 
 import {
-  erklaerung, feld, karte, klappgruppe, namensfeld, panel, tabelle, wahlBlock, wahlSchalter,
+  bezeichnung, erklaerung, feld, karte, klappgruppe, panel, tabelle, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { zahlText } from './cad_ansicht.js';
 import { LASTLISTEN, kernmeldungen } from './dk_eigenschaften.js';
@@ -153,9 +153,7 @@ function deckeGruppe(decke) {
   return panel({
     schluessel: 'decke/Decke', titel: 'Decke', zusatz: 'x nach rechts, y nach oben, m', breit: true,
   }, [
-    feld('Bezeichnung', namensfeld({
-      wert: decke.name, setzen: (name) => aendern((d) => { d.name = name; }),
-    }), erklaerung(HILFE.decke.zeilen, HILFE.decke.formel)),
+    bezeichnung(decke, aendern, erklaerung(HILFE.decke.zeilen, HILFE.decke.formel)),
     zeichenbereich(decke, liste),
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [

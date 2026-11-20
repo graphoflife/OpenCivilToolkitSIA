@@ -269,7 +269,8 @@ class TestApiAbbildung(unittest.TestCase):
         seiner Stelle (Benutzer, 2026-11-19). Jede Liste ist da, auch leer.
         """
         p = dienst.bearbeite("beispiel", {}).daten
-        for lage in p["querschnitte"][0]["lagen"]:
+        platte = next(q for q in p["querschnitte"] if q["kennung"] == "q1")
+        for lage in platte["lagen"]:
             lage["grund"]["durchmesser"] = lage["zulage"]["durchmesser"] = 0.0
         antwort = dienst.bearbeite("rechnen", {"projekt": p})
         self.assertEqual(antwort.status, 200)

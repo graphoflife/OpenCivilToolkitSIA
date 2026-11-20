@@ -26,7 +26,8 @@
  */
 
 import {
-  eingabekarten, eingabezeilen, erklaerung, feld, karte, materialliste, mitBild, namensfeld,
+  bezeichnung, eingabekarten, eingabezeilen, erklaerung, feld, karte, materialliste, mitBild,
+  namensfeld,
   panel, verhaltenSchalter, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
@@ -139,9 +140,7 @@ function situationPanel(t) {
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
   }, [
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', namensfeld({
-        wert: t.name, setzen: (name) => aendern((x) => { x.name = name; }),
-      })),
+      bezeichnung(t, aendern),
       feld('Pfahl', schalter(t.art, 'arten', (w) => aendern((x) => { x.art = w; }),
         'Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem Tragglied aus Stahl'), ''),
     ]),

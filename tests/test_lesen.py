@@ -87,8 +87,8 @@ class TestStreng(unittest.TestCase):
 
     def test_ein_pflichtfeld_fehlt(self):
         roh = platte_roh()
-        del roh["querschnitte"][0]["beton"]
-        self.assertIn("das Feld 'beton' fehlt", meldung(roh))
+        del roh["querschnitte"][0]["name"]
+        self.assertIn("das Feld 'name' fehlt", meldung(roh))
 
     def test_ein_leerer_name_haelt_nur_sein_bauteil_an(self):
         """

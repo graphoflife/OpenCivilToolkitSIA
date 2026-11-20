@@ -146,7 +146,7 @@ def zusammenfassen(aufbau: Optional["Aufbau"], loesung: Loesung) -> Zusammenfass
         bauteile=bauteile,
         erfuellt=loesung.alle_nachweise_erfuellt,
         gefuehrt=bool(loesung.gefuehrte_urteile),
-        warnungen=list(aufbau.warnungen) if aufbau is not None else [],
+        warnungen=[w.text for w in aufbau.warnungen] if aufbau is not None else [],
     )
 
 

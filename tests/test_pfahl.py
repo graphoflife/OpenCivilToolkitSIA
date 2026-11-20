@@ -275,8 +275,8 @@ class TestEintrag(unittest.TestCase):
         aufbau = p.aufbauen()
         self.assertEqual(aufbau.feld("pfahl_aussen"), {})
         self.assertEqual(aufbau.feld("pfahl_innen"), {})
-        self.assertIn("Pfahl 'P': noch keine Kombination – unter «Einwirkungen» eine anlegen → kein "
-                      "Nachweis.", aufbau.warnungen)
+        self.assertIn(("pfahl.t1", "Pfahl 'P': noch keine Kombination – unter «Einwirkungen» "
+                                   "eine anlegen → kein Nachweis."), aufbau.warnungen)
         self.assertEqual(aufbau.teile["t1"].ohne_nachweis,
                          "noch keine Kombination – unter «Einwirkungen» eine anlegen")
 
@@ -321,8 +321,8 @@ class TestEintrag(unittest.TestCase):
                 aufbau = p.aufbauen()
                 self.assertNotIn(t.kennung, aufbau.teile)
                 self.assertIn(satz, aufbau.unfertige[t.kennung].grund)
-                self.assertTrue(any(w.startswith("Pfahl 'P': ") and satz in w
-                                    for w in aufbau.warnungen), aufbau.warnungen)
+                self.assertTrue(any(w.raum == f"pfahl.{t.kennung}" and w.text.startswith("Pfahl 'P': ")
+                                    and satz in w.text for w in aufbau.warnungen), aufbau.warnungen)
 
     def test_kombinationen_eindeutig(self):
         p, t = projekt()

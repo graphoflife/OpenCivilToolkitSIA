@@ -7,7 +7,8 @@
  *
  *   1. Im Browser. Jede Änderung landet im localStorage, das Fenster darf
  *      also zugehen. Das ist kein Speichern im eigentlichen Sinn -- es ist
- *      das Netz darunter. Dazu, welches Projekt gezeigt war.
+ *      das Netz darunter. Dazu, welches Projekt gezeigt war. Die Sandboxen
+ *      beginnen beim Laden der Seite trotzdem neu (Benutzer, 2026-11-20).
  *   2. Als Datei auf die Platte, über den Download des Browsers.
  *   3. Von der Platte zurück, über einen Dateiwähler. Eine Datei mit einem
  *      einzelnen Projekt, wie bis 2026-11-20 gespeichert, liest der Kern als
@@ -15,7 +16,7 @@
  *
  * GEPRÜFT WIRD IM KERN:
  * Was aus der Ablage oder von der Platte kommt, geht durch
- * `api.mappePruefen()` -- also durch `Mappe.aus_dict()` in Python. Damit
+ * `api.mappeOeffnen()` -- also durch `Mappe.aus_dict()` in Python. Damit
  * greifen dieselben Prüfungen wie überall sonst. Eine zweite, nachgebaute
  * Prüfung in JavaScript gäbe es hier fast geschenkt, und sie wäre genau
  * darum falsch: sie würde irgendwann von der echten abweichen.
@@ -189,7 +190,7 @@ export function geretteteVerwerfen(eintrag) {
  *
  * Erst der Browser, sonst das Beispiel. Lässt sich das Abgelegte nicht
  * öffnen, wird es aufbewahrt (`gerettete`), bevor das Beispiel kommt -- die
- * Oberfläche zeigt es an, solange es da ist.
+ * Oberfläche zeigt es an, solange es da ist. Jede Sandbox beginnt neu.
  *
  * @returns {Promise<{mappe: Object, gewaehlt: number, gesichert: boolean}>}
  */
@@ -199,7 +200,7 @@ export async function mappeHolen() {
   let grund = abgelegt.fehler;
   if (!grund) {
     try {
-      const { mappe } = await api.mappePruefen(abgelegt.mappe);
+      const { mappe } = await api.mappeOeffnen(abgelegt.mappe, true);
       const { gewaehlt } = abgelegt;
       return {
         mappe,
@@ -287,7 +288,8 @@ export function ausDateiLaden() {
 
       try {
         const roh = JSON.parse(await datei.text());
-        const { mappe } = await api.mappePruefen(roh);
+        // Die Sandboxen wie gespeichert; fehlt eine, legt der Kern sie an.
+        const { mappe } = await api.mappeOeffnen(roh);
         erfuellen({ mappe, datei: datei.name });
       } catch (fehler) {
         ablehnen(new Error(

@@ -290,7 +290,7 @@ class TestEintrag(unittest.TestCase):
         t.kombination("K", N_Ed=500.0)
         aufbau, loesung, federn, befund = rechnen(p)
         self.assertEqual((federn, befund), ({}, None))
-        self.assertTrue(any("keine Steifigkeit" in w for w in aufbau.warnungen))
+        self.assertTrue(any("keine Steifigkeit" in w.text for w in aufbau.warnungen))
 
     def test_aus_dem_versuch_traegt_der_fuss(self):
         p, t = projekt(grundlage="statisch", eta_a=1.0, spitze="keine")

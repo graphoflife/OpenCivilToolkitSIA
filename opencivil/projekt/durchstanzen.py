@@ -58,6 +58,7 @@ class DurchstanzEintrag(BauteilEintrag):
     """Eine Durchstanzstelle -- siehe Dateikopf."""
 
     BEZEICHNUNG = "Durchstanzen"
+    ERSTE_MATERIALIEN = {"beton": "beton", "stahl": "betonstahl"}
 
     kennung: str
     name: str

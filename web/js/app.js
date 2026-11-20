@@ -11,7 +11,7 @@
 
 import { api, kernBereitstellen, KernFehler } from './api.js';
 import {
-  ablageEinrichten, aendern, horchen, projektSetzen, zustand,
+  ablageEinrichten, aendern, horchen, inSandbox, istSandbox, projektSetzen, zustand,
 } from './zustand.js';
 import {
   alsDateiSichern, ausDateiLaden, gerettete, geretteteHerunterladen, geretteteVerwerfen,
@@ -62,10 +62,13 @@ function zustandsanzeige(text, art = '') {
  * Materialien noch etwas fehlt. Das ist kein Fehler (Benutzer, 2026-11-19),
  * aber auch nicht grün: «alle Nachweise erfüllt» hiesse sonst auch, die
  * Platte ohne Bewehrung sei nachgewiesen.
+ *
+ * Die Sandboxen zählen nicht mit, wie im Bericht und unter «Gesamt»: was
+ * dort ausprobiert wird, ist nicht das Projekt.
  */
 function stand(antwort) {
-  const zahl = (listen) => listen
-    .reduce((n, liste) => n + Object.keys(antwort.unfertige?.[liste] || {}).length, 0);
+  const zahl = (listen) => listen.reduce((n, liste) => n
+    + Object.keys(antwort.unfertige?.[liste] || {}).filter((k) => !istSandbox(k)).length, 0);
   const teile = zahl(ARTEN.map((a) => a.liste));
   const stoffe = zahl(['materialien']);
   const wem = [
@@ -74,17 +77,19 @@ function stand(antwort) {
   ].filter(Boolean);
   const dazu = wem.length ? ` · ${wem.join(' und ')} fehlt noch etwas` : '';
   const gut = wem.length ? '' : 'ist-gut';
-  if (!antwort.vollstaendig) {
-    const fehlt = antwort.fehlende.length;
+  const fehlt = antwort.fehlende.filter((f) => !inSandbox(f.id)).length;
+  if (fehlt || antwort.nicht_berechenbar.some((s) => !inSandbox(s.ziel))) {
     return [`${fehlt === 1 ? 'Eine Eingabe fehlt' : `${fehlt} Eingaben fehlen`}${dazu}`, 'ist-fehler'];
   }
-  if (antwort.urteile.length) {
-    const durchgefallen = antwort.urteile.filter((u) => !u.erfuellt).length;
+  const urteile = antwort.urteile.filter((u) => !inSandbox(u.raum));
+  if (urteile.length) {
+    const durchgefallen = urteile.filter((u) => !u.erfuellt).length;
     const text = durchgefallen === 0 ? 'alle Nachweise erfüllt'
       : durchgefallen === 1 ? 'ein Nachweis nicht erfüllt' : `${durchgefallen} Nachweise nicht erfüllt`;
     return [`${text}${dazu}`, durchgefallen ? 'ist-fehler' : gut];
   }
-  return [`${Object.keys(antwort.werte).length} Werte bestimmt${dazu}`, gut];
+  const werte = Object.keys(antwort.werte).filter((w) => !inSandbox(w)).length;
+  return [`${werte} Werte bestimmt${dazu}`, gut];
 }
 
 /** Ein einzelner Durchgang: hinschicken, Antwort übernehmen, Stand melden. */

@@ -23,7 +23,7 @@
  */
 
 import {
-  eingabegruppen, erklaerung, feld, karte, materialliste, mitBild, namensfeld, panel, wahlBlock,
+  bezeichnung, eingabegruppen, erklaerung, feld, karte, materialliste, mitBild, panel, wahlBlock,
   wahlSchalter,
 } from './bausteine.js';
 import { el } from './dom.js';
@@ -140,9 +140,7 @@ function stellePanel(d, vorgaben) {
     zusatz: erklaerung(HILFE.stelle.zeilen, HILFE.stelle.formel),
   }, [
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', namensfeld({
-        wert: d.name, setzen: (name) => aenderer(d)((x) => { x.name = name; }),
-      })),
+      bezeichnung(d, aenderer(d)),
       feld('Platte', schalter(d, 'plattenart', 'plattenarten',
         'Decke: Zug oben – Bodenplatte: Zug unten, gegen die Bodenpressung'), ''),
       umgeschaltet === d.kennung ? el('p.hinweis', {

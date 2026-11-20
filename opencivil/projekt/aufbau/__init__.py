@@ -117,19 +117,22 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
             inhalt_pruefen(eintrag, wo)
             aufbau.baustoffe[eintrag.kennung] = baustoff_bauen(eintrag, index, wo)
         except ProjektFehler as fehler:
-            aufbau.unfertig("materialien", eintrag, wo, fehler.grund_bei(wo))
+            aufbau.unfertig("materialien", eintrag, wo, fehler.grund_bei(wo),
+                            raum=f"{eintrag.art}.{eintrag.kennung}")
 
     # Auch im schnellen Aufbau jedes Bauteil: die Formelsammlung entsteht aus
     # ihm. Die Bewehrungssuche loest nur Nachweisziele, ein System kostet sie
     # also nur das Anmelden.
+    sandboxen = {e.kennung: e for e in projekt.bauteile() if projekt.ist_sandbox(e.kennung)}
     for art in BAUTEILE:
         for eintrag in getattr(projekt, art.liste):
             wo = ort_von(eintrag)
             try:
-                _vorab_pruefen(eintrag, wo, aufbau)
+                _vorab_pruefen(eintrag, wo, aufbau, sandboxen)
                 aufbau.teile[eintrag.kennung] = art.bauen(art, eintrag, aufbau)
             except ProjektFehler as fehler:
-                aufbau.unfertig(art.liste, eintrag, wo, fehler.grund_bei(wo))
+                aufbau.unfertig(art.liste, eintrag, wo, fehler.grund_bei(wo),
+                                raum=f"{art.raum}.{eintrag.kennung}")
 
     for baustoff in aufbau.baustoffe.values():
         baustoff.ins_rechenwerk(werk)
@@ -138,11 +141,14 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     return aufbau
 
 
-def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau) -> None:
+def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau, sandboxen: Dict[str, Any]) -> None:
     """
     Was ein Bauteil aufhaelt, bevor es gebaut wird: ein Material, das selbst
-    nicht rechnet, und ein Wert, den der Kern abweist
-    (:func:`~opencivil.projekt.lesen.inhalt_pruefen`). Ein Verweis auf ein
+    nicht rechnet, ein Wert, den der Kern abweist
+    (:func:`~opencivil.projekt.lesen.inhalt_pruefen`), und der Querschnitt
+    einer Sandbox (``sandboxen``, je Kennung der Eintrag) in einem Bauteil, das
+    selbst keine ist: die Sandbox beginnt nach jedem Laden der Seite neu,
+    und das Bauteil rechnete dann still mit anderem. Ein Verweis auf ein
     Material, das es nicht mehr gibt, meldet sich beim Bauen, mit dem, was
     darauf zeigt (:func:`~opencivil.projekt.aufbau.kern.material`).
 
@@ -155,6 +161,14 @@ def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau) -> None:
         if stoff is not None:
             raise ProjektFehler(f"das Material «{stoff.name}» rechnet nicht – warum, "
                                 f"steht bei ihm.", wo=wo)
+    if eintrag.kennung not in sandboxen:
+        for bezug in eintrag.bezuege():
+            sandbox = sandboxen.get(bezug)
+            if sandbox is not None:
+                raise ProjektFehler(
+                    f"ein Querschnitt nimmt die {type(sandbox).BEZEICHNUNG} «{sandbox.name}». "
+                    f"Sie beginnt nach jedem Laden der Seite neu, und hier rechnete es dann "
+                    f"still mit anderem – eine Kopie von ihr nehmen (⧉) und die wählen.", wo=wo)
     inhalt_pruefen(eintrag, wo)
 
 

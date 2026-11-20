@@ -1,5 +1,5 @@
 ---
-erzeugt: 685ed7490096
+erzeugt: 650a4a20b0e3
 art: modul
 tags: [modul]
 ---
@@ -27,6 +27,22 @@ einer Datei `aufbau.py` von ueber tausend Zeilen.
 
 ## Inhalt
 
+### Warnung
+
+```python
+class Warnung(NamedTuple)
+```
+
+Ein Hinweis aus dem Aufbau: `raum` ist der Namensraum des Eintrags, dem
+er gilt -- «querschnitt.q1» --, `text` der Satz. Am Namensraum grenzt
+die Oberflaeche ihn ein wie alles andere: unter «Aktuelle Seite» stehen
+die Hinweise des gewaehlten Eintrags, unter «Gesamt» alle ausser denen
+der Sandboxen. Bis 2026-11-20 standen alle ueber jeder Herleitung -- mit
+der Sandbox auch ihr «noch nichts gezeichnet», in jedem Projekt.
+
+- `raum: str`
+- `text: str`
+
 ### Aufbau
 
 ```python
@@ -43,13 +59,21 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)` – Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet.
 - `spannungsfaelle: Dict[str, List[Tuple['SpannungsfallEintrag', Rechenwahl]]] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis, jede mit ihrer Wahl am Bauteil. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
 - `unfertige: Dict[str, 'Unfertiges'] = field(default_factory=dict)` – Je Bauteil oder Material, dem noch etwas fehlt, was: eine Querschnittsanalyse ohne Zeichnung, eine Platte ohne Bewehrung, ein Pfahl ohne Schicht, ein Wert, den der Kern abweist ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]]). Es wird nicht gebaut, aber wer auf es zeigt, soll hoeren, was ihm fehlt, und nicht, es gebe es nicht.
-- `warnungen: List[str] = field(default_factory=list)`
+- `warnungen: List[Warnung] = field(default_factory=list)` – Was beim Aufbau auffiel, je Eintrag ([[opencivil.projekt.aufbau.kern#Aufbau.warnen|warnen]]).
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x` -- die Richtung steht noch im Schluessel der Platte, damit Wert-IDs in abgelegten Berichten nicht wechseln) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]). `fehlende` rechnet nichts: eine Richtung ohne Bewehrung mit Einwirkungen bekommt so eine Zeile mit Erfuellungsgrad null statt gar keiner.
+
+#### Aufbau.warnen
+
+```python
+def warnen(self, raum: str, text: str) -> None
+```
+
+Ein Hinweis zum Eintrag mit dem Namensraum `raum` ([[opencivil.projekt.aufbau.kern#Warnung|Warnung]]).
 
 #### Aufbau.unfertig
 
 ```python
-def unfertig(self, liste: str, eintrag: Any, wo: str, grund: str) -> None
+def unfertig(self, liste: str, eintrag: Any, wo: str, grund: str, *, raum: str) -> None
 ```
 
 Ein Bauteil oder Material, dem noch etwas fehlt: es rechnet nicht,
@@ -58,8 +82,9 @@ Zustand ist kein Fehler des Projekts (Benutzer, 2026-11-19). Bis
 dahin hielten eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und
 eine halbfertige Zeichnung alles auf. `liste` ist seine Liste im
 Projekt; `grund` ein Satzteil («noch keine Bewehrung») oder ein
-Satz, ohne Punkt. Eine Baufunktion meldet es, indem sie einen
-[[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] wirft ([[opencivil.projekt.aufbau#aufbauen|aufbauen]]).
+Satz, ohne Punkt; `raum` sein Namensraum, «beton.b1». Eine
+Baufunktion meldet es, indem sie einen [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] wirft
+([[opencivil.projekt.aufbau#aufbauen|aufbauen]]).
 
 #### Aufbau.ohne_nachweis
 

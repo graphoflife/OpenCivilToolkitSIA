@@ -338,7 +338,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
 
     def test_fehlende_pflichtfelder_werden_benannt(self):
         """Vorher kam der nackte KeyError bis in die Oberfläche."""
-        for weg in ("kennung", "beton"):
+        for weg in ("kennung", "name"):
             roh = Projekt.beispiel().als_dict()
             del roh["querschnitte"][0][weg]
             with self.assertRaises(ProjektFehler) as ctx:
@@ -753,7 +753,7 @@ class TestNurDieTragrichtungX(unittest.TestCase):
         # Eine Warnung gibt es -- dass ohne Schnittgrössen kein
         # Tragsicherheitsnachweis läuft. Das ist keine Aussage über die
         # Richtung, und genau darum geht es hier nicht.
-        self.assertFalse([w for w in aufbau.warnungen if "Richtung" in w])
+        self.assertFalse([w for w in aufbau.warnungen if "Richtung" in w.text])
 
     def _loesen(self, projekt: Projekt):
         aufbau = projekt.aufbauen()

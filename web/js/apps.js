@@ -15,9 +15,11 @@
  */
 
 import { ARTEN, artVon } from './arten.js';
-import { el, ersetzen, melden } from './dom.js';
+import {
+  el, ersetzen, melden, undListe,
+} from './dom.js';
 import { api } from './api.js';
-import { unfertigHinweis } from './bausteine.js';
+import { sandboxHinweis, unfertigHinweis } from './bausteine.js';
 import { materialAnlegen, materialKopieren } from './materialwahl.js';
 import { materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
@@ -41,7 +43,7 @@ import { situationKarten } from './gb_zeichnung.js';
 import { setzungKarten } from './sz_zeichnung.js';
 import { pfahlKarten } from './pf_zeichnung.js';
 import {
-  ansichtVergessen, ausVorlage, eintragVon, freieKennung, katalog, naechsterName, projektAendern,
+  ansichtVergessen, eintragVon, freieKennung, istSandbox, katalog, naechsterName, projektAendern,
   waehlen, zustand,
 } from './zustand.js';
 
@@ -53,27 +55,36 @@ import {
  * Ein neuer Eintrag nach der Vorlage des Kerns für seine Liste (`katalog.neu`).
  *
  * Gesetzt wird nur, was der Kern nicht wissen kann: die Kennung, der Name
- * und, mit `einrichten`, die Materialien des Projekts -- `braucht` nennt die
- * Arten, ohne die es nicht geht, `fehlt` den Satz dazu. Die Vorlage stand
- * einmal hier, zwanzig Felder der Platte, die von Hand mit den Vorgaben in
- * opencivil/projekt/platte.py gleichgehalten werden mussten; als sich die
- * Vorgaben änderten, brachten neue Platten Nachweise eingeschaltet mit, die
- * überall sonst aus waren. Kopiert, nicht die Vorlage selbst: sonst teilten
- * sich alle neuen Platten dieselben Lagen, und die zweite änderte die erste mit.
+ * und die Materialien des Projekts -- je Feld das erste seiner Art, wie der
+ * Kern sagt (`katalog.erste_materialien`); nach derselben Regel baut er die
+ * Sandbox. `braucht` nennt die Arten, ohne die es nicht geht: die, die der
+ * Eintrag nimmt, oder die, ohne die sich nichts zeichnen lässt. Die Vorlage
+ * stand einmal hier, zwanzig Felder der Platte, die von Hand mit den
+ * Vorgaben in opencivil/projekt/platte.py gleichgehalten werden mussten; als
+ * sich die Vorgaben änderten, brachten neue Platten Nachweise eingeschaltet
+ * mit, die überall sonst aus waren. Kopiert, nicht die Vorlage selbst: sonst
+ * teilten sich alle neuen Platten dieselben Lagen, und die zweite änderte
+ * die erste mit.
  */
-function nachVorlage(a, { braucht = [], fehlt = '', einrichten = () => {} } = {}) {
-  const stoffe = Object.fromEntries(braucht.map((art) => [
-    art, zustand.projekt.materialien.find((m) => m.art === art)]));
-  if (braucht.some((art) => !stoffe[art])) {
-    melden(fehlt, true);
+function nachVorlage(a, braucht = Object.values(katalog('erste_materialien', a.liste))) {
+  const erstes = (art) => zustand.projekt.materialien.find((m) => m.art === art);
+  const fehlen = [...new Set(braucht)].filter((art) => !erstes(art));
+  if (fehlen.length) {
+    melden(`Zuerst ${undListe(fehlen.map((art) => katalog('materialarten', art, 'titel')))} anlegen.`,
+      true);
     return;
   }
-  const vorlage = katalog('neu', a.liste);
   const kennung = freieKennung(a.vorsilbe);
   projektAendern((p) => {
     p[a.liste] = p[a.liste] || [];
-    const neu = { ...structuredClone(vorlage), kennung, name: naechsterName(a.stamm, p[a.liste]) };
-    einrichten(neu, stoffe);
+    const neu = {
+      ...structuredClone(katalog('neu', a.liste)), kennung, name: naechsterName(a.stamm, p[a.liste]),
+    };
+    for (const [pfad, art] of Object.entries(katalog('erste_materialien', a.liste))) {
+      const weg = pfad.split('/');
+      const feld = weg.pop();
+      weg.reduce((ziel, schritt) => ziel[schritt], neu)[feld] = erstes(art)?.kennung ?? '';
+    }
     p[a.liste].push(neu);
   });
   waehlen({ art: a.app, kennung });
@@ -103,18 +114,44 @@ async function loeschenWennFrei(liste, eintrag, satz) {
 /**
  * Eine Kopie gleich hinter dem Original: alles wie dort, nur Kennung und Name
  * neu -- «Decke über EG (Kopie)» (Benutzer, 2026-10-19). Kopiert, nicht
- * verwiesen: sonst änderte die Kopie das Original mit.
+ * verwiesen: sonst änderte die Kopie das Original mit. Die Kopie der Sandbox
+ * ist ein gewöhnlicher Eintrag und heisst wie ein neuer, «Platte 1»
+ * (Benutzer, 2026-11-20).
  */
 function kopieren(a, eintrag) {
   const kennung = freieKennung(a.vorsilbe);
   projektAendern((p) => {
     const liste = p[a.liste];
     const i = liste.findIndex((x) => x.kennung === eintrag.kennung);
-    liste.splice(i + 1, 0, {
-      ...structuredClone(liste[i]), kennung, name: kopieName(liste[i].name, liste),
-    });
+    const name = istSandbox(eintrag.kennung)
+      ? naechsterName(a.stamm, liste) : kopieName(liste[i].name, liste);
+    liste.splice(i + 1, 0, { ...structuredClone(liste[i]), kennung, name });
   });
   waehlen({ art: a.app, kennung });
+}
+
+/**
+ * ↺ an der Sandbox, ohne Rückfrage (Benutzer, 2026-11-20): der Kern baut sie
+ * neu, wie beim Laden der Seite -- Kennung, Name und Platz bleiben. Was sich
+ * die Ansichten zu ihr merkten, geht mit dem alten Inhalt.
+ */
+async function zuruecksetzen(a, sandbox) {
+  const { projekt } = zustand;
+  let eintrag;
+  try {
+    ({ eintrag } = await api.sandboxZuruecksetzen(projekt, a.liste));
+  } catch (fehler) {
+    melden(`Nicht zurückgesetzt: ${fehler.message}`, true);
+    return;
+  }
+  // Inzwischen ein anderes Projekt gezeigt: dessen Einträge bleiben, wie sie sind.
+  if (zustand.projekt !== projekt) return;
+  ansichtVergessen(sandbox.kennung);
+  projektAendern((p) => {
+    const i = p[a.liste].findIndex((x) => x.kennung === sandbox.kennung);
+    if (i >= 0) p[a.liste][i] = eintrag;
+  });
+  melden('Die Sandbox beginnt neu.');
 }
 
 /** «Decke über EG (Kopie)», dann «… (Kopie 2)» -- der erste Name, den die Liste noch nicht hat. */
@@ -148,10 +185,11 @@ function entfernen(liste, eintrag) {
  * Nachweise führt, was die Zusammenfassung statt der Tabelle zeigt
  * (`uebersicht(kennung)`). Fehlt eines davon, meldet sich das beim Laden.
  * Ein Bauteil geht nur weg, wenn kein Balkensystem mehr seinen Querschnitt
- * nimmt.
+ * nimmt. `braucht` sagt, welche Materialien «+» verlangt -- ohne Angabe die,
+ * die ein neuer Eintrag nimmt (`nachVorlage`).
  */
 function bauteil(name, {
-  kurztext, anlegen, editor, karten, uebersicht = null, fenster = null,
+  kurztext, braucht, editor, karten, uebersicht = null, fenster = null,
 }) {
   const a = artVon(name);
   if (!karten) throw new Error(`apps.js: «${name}» hat keine Karten für die Diagramme.`);
@@ -163,12 +201,13 @@ function bauteil(name, {
     vorsilbe: a.vorsilbe, stamm: a.stamm,
     gruppen: (p) => [{
       titel: a.titel, leer: a.leer, eintraege: p[a.liste] || [],
-      plus: { titel: `${a.einzahl} hinzufügen`, tun: () => anlegen(zeile) },
+      plus: { titel: `${a.einzahl} hinzufügen`, tun: () => nachVorlage(zeile, braucht) },
     }],
     name: (e) => e.name,
     kurztext,
     loeschen: (e) => loeschenWennFrei(a.liste, e, `„${e.name}" ist Querschnitt in`),
     kopieren: (e) => kopieren(zeile, e),
+    zuruecksetzen: (e) => zuruecksetzen(zeile, e),
     hinweis: () => a.bezeichnung,
     editor: mitHinweis(a.liste, editor),
     fenster,
@@ -181,10 +220,10 @@ function bauteil(name, {
 /**
  * Die Eingaben eines Eintrags aus ``liste`` -- und darüber, was ihm noch
  * fehlt, dort, wo man es nachträgt (Benutzer, 2026-11-19): einem Material
- * wie einem Bauteil.
+ * wie einem Bauteil. Bei der Sandbox zuoberst, wozu sie da ist.
  */
 function mitHinweis(liste, editor) {
-  return (behaelter, e) => ersetzen(behaelter,
+  return (behaelter, e) => ersetzen(behaelter, sandboxHinweis(e),
     unfertigHinweis(zustand.loesung?.unfertige?.[liste]?.[e.kennung]), ...editor(e));
 }
 
@@ -230,13 +269,6 @@ function umriss(analyse) {
 
 const PLATTE = bauteil('querschnitt', {
   kurztext: (q) => `${q.h}×${q.b} mm`,
-  anlegen: (a) => nachVorlage(a, {
-    braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
-    einrichten: (platte, { beton, betonstahl }) => {
-      platte.beton = beton.kennung;
-      platte.stahl = betonstahl.kennung;
-    },
-  }),
   editor: plattenEditor,
   karten: plattenkarten,
   fenster: plattenFenster,
@@ -250,9 +282,7 @@ const PLATTE = bauteil('querschnitt', {
  */
 const ANALYSE = bauteil('querschnittsanalyse', {
   kurztext: umriss,
-  anlegen: (a) => nachVorlage(a, {
-    braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
-  }),
+  braucht: ['beton', 'betonstahl'],
   editor: analyseEditor,
   karten: (kennung, eintrag, loesung) => [
     ...analyseKarten(kennung), ...spannungskarten(kennung, loesung)],
@@ -261,22 +291,15 @@ const ANALYSE = bauteil('querschnittsanalyse', {
 
 /**
  * Leer, aus dem Kern (Benutzer, 2026-10-19) -- bis auf ein Material: der
- * erste Beton des Projekts, damit ein gezeichneter Stab gleich eines hat.
- * Das 2D- und das 3D-Balkensystem sind dieselbe App, je mit ihrer Liste und
- * ihrem Katalog (bs_teile.js); das Material ist eines ihrer Art.
+ * erste Beton des Projekts, damit ein gezeichneter Stab gleich eines hat
+ * (`MitStaeben.neu` im Kern). Das 2D- und das 3D-Balkensystem sind dieselbe
+ * App, je mit ihrer Liste und ihrem Katalog (bs_teile.js).
  */
 const balkensystem = (art) => bauteil(art, {
   kurztext: (s) => {
     const staebe = s.linien.filter((l) => l.querschnitt).length;
     return `${staebe} ${staebe === 1 ? 'Stab' : 'Stäbe'}`;
   },
-  anlegen: (a) => nachVorlage(a, {
-    braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.',
-    einrichten: (s, { beton }) => {
-      s.stabmaterialien = [ausVorlage(katalog(art, 'klassen', 'material'),
-        { kennung: 'M1', art: 'beton', stoff: beton.kennung })];
-    },
-  }),
   editor: balkensystemEditor,
   karten: systemKarten,
   uebersicht: systemZusammenfassung,
@@ -292,7 +315,7 @@ const SYSTEM3D = balkensystem('balkensystem3d');
  */
 const DECKE = bauteil('decke', {
   kurztext: (d) => `${d.platten.length} ${d.platten.length === 1 ? 'Platte' : 'Platten'}`,
-  anlegen: (a) => nachVorlage(a, { braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.' }),
+  braucht: ['beton'],
   editor: deckeEditor,
   karten: deckenKarten,
   uebersicht: deckenZusammenfassung,
@@ -307,13 +330,6 @@ const DECKE = bauteil('decke', {
 const DURCHSTANZEN = bauteil('durchstanzen', {
   kurztext: (d) => katalog('durchstanzen', 'lagen').find((l) => l.wert === d.lage)
     .kurz[d.form].replace(/\{(\w+)\}/g, (_, k) => d[k]),
-  anlegen: (a) => nachVorlage(a, {
-    braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
-    einrichten: (d, { beton, betonstahl }) => {
-      d.beton = beton.kennung;
-      d.stahl = betonstahl.kennung;
-    },
-  }),
   editor: durchstanzEditor,
   karten: durchstanzKarten,
 });
@@ -321,7 +337,6 @@ const DURCHSTANZEN = bauteil('durchstanzen', {
 /** Ein Fundament mit den Vorgaben des Kerns und einer Kombination -- ohne Material. */
 const GRUNDBRUCH = bauteil('grundbruch', {
   kurztext: (g) => `${g.b}×${g.L} m`,
-  anlegen: (a) => nachVorlage(a),
   editor: grundbruchEditor,
   karten: situationKarten,
 });
@@ -329,7 +344,6 @@ const GRUNDBRUCH = bauteil('grundbruch', {
 /** Ein Fundament ohne Pressung, mit einer Schicht aus dem Kern -- ohne Material. */
 const SETZUNG = bauteil('setzung', {
   kurztext: (s) => `${s.B}×${s.L} m`,
-  anlegen: (a) => nachVorlage(a),
   editor: setzungEditor,
   karten: setzungKarten,
 });
@@ -342,13 +356,6 @@ const SETZUNG = bauteil('setzung', {
  */
 const PFAHL = bauteil('pfahl', {
   kurztext: (t) => `⌀${t.D} mm, ${t.L} m`,
-  anlegen: (a) => nachVorlage(a, {
-    braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
-    einrichten: (t, { beton, betonstahl }) => {
-      t.beton = beton.kennung;
-      t.stahl = betonstahl.kennung;
-    },
-  }),
   editor: pfahlEditor,
   karten: pfahlKarten,
 });
@@ -373,6 +380,7 @@ const SKRIPT = {
   },
   loeschen: (s) => entfernen('skripte', s),
   kopieren: (s) => kopieren(SKRIPT, s),
+  zuruecksetzen: (s) => zuruecksetzen(SKRIPT, s),
   hinweis: () => 'Python',
   editor: skriptZeichnen,
   rechts: { titel: 'Variablen', zeichnen: variablenZeichnen },

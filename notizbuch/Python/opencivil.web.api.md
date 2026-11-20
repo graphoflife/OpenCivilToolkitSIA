@@ -1,5 +1,5 @@
 ---
-erzeugt: accd6e16261c
+erzeugt: df8f2f790702
 art: modul
 tags: [modul]
 ---
@@ -35,10 +35,17 @@ Die Rechenarten mit Beschriftung -- und ob die Kriechzahl bei ihnen wirkt.
 def _vorlage(cls: type) -> Dict[str, Any]
 ```
 
-Wie ein frischer Eintrag dieser Klasse aussieht: ueber `neu`, wo die
-Klasse eines hat -- eine Platte mit ihren Lagen, ein Grundbruch mit
-einer Kombination --, sonst mit ihren Vorgaben. Was keine Vorgabe hat,
-sind Kennung, Name und Verweise: leer, die Oberflaeche setzt sie.
+Wie ein frischer Eintrag dieser Klasse aussieht ([[opencivil.projekt.eintraege#Beschreibung.frisch|Beschreibung.frisch]])
+-- ohne Kennung, Namen und Materialien: die setzt die Oberflaeche.
+
+### _neues_projekt
+
+```python
+def _neues_projekt() -> Dict[str, Any]
+```
+
+Ein neues Projekt der Mappe, wie «+» oben links es anlegt: mit dem ersten
+Beton und Stahl ([[opencivil.projekt.projekt#Projekt.neu|Projekt.neu]]) und mit den Sandboxen.
 
 ### _klassen
 

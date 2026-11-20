@@ -1,5 +1,5 @@
 ---
-erzeugt: 26482428a6e7
+erzeugt: d656054ab319
 art: modul
 tags: [modul]
 ---
@@ -87,7 +87,7 @@ Normsorten, Kennwertvorlagen und Einheiten -- alles, was fest steht.
 def beispiel(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 ```
 
-Das Beispielprojekt, mit dem eine leere Oberflaeche startet.
+Das Beispielprojekt, mit dem eine leere Oberflaeche startet -- mit den Sandboxen.
 
 ### pruefen
 
@@ -98,16 +98,29 @@ def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 Prueft ein Projekt, wie es in einer Datei steht, und gibt es aufgeraeumt
 zurueck ([[opencivil.projekt.mappe#projekt_aus_datei|projekt_aus_datei]]).
 
-### mappe_pruefen
+### mappe_oeffnen
 
 ```python
-def mappe_pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+def mappe_oeffnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]
 ```
 
-Prueft eine Mappe -- die Projekte, die die Oberflaeche im Browser ablegt,
-speichert und oeffnet -- und gibt sie aufgeraeumt zurueck. Eine Datei mit
-einem einzelnen Projekt, wie bis 2026-11-20 gespeichert, kommt als Mappe
-mit diesem einen zurueck ([[opencivil.projekt.mappe#Mappe.aus_dict|aus_dict]]).
+Eine Mappe, wie die Oberflaeche sie zeigt -- die Projekte, die sie im
+Browser ablegt, speichert und oeffnet: geprueft, aufgeraeumt und in jedem
+Projekt mit allen Sandboxen. Mit `frisch` beginnt jede Sandbox neu, wie
+beim Laden der Seite; sonst stehen sie da, wie gespeichert (Benutzer,
+2026-11-20). Eine Datei mit einem einzelnen Projekt, wie bis 2026-11-20
+gespeichert, kommt als Mappe mit diesem einen zurueck
+([[opencivil.projekt.mappe#Mappe.aus_dict|aus_dict]]).
+
+### sandbox_zuruecksetzen
+
+```python
+def sandbox_zuruecksetzen(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+↺ an der Sandbox einer App: `{projekt, liste}` hinein, die frische
+Sandbox hinaus -- mit ihrer Kennung, an ihrem Platz
+([[opencivil.projekt.projekt#Projekt.sandbox_zuruecksetzen|sandbox_zuruecksetzen]]).
 
 ### rechnen
 

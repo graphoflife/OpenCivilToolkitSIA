@@ -7,6 +7,64 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Sandbox je App
+
+Der Benutzer wollte in jeder App einen Eintrag zum schnellen Ausprobieren
+(2026-11-20): zuoberst, leicht golden, «Sandbox» genannt, kopierbar, aber
+nicht zu löschen -- statt × trägt er ↺. Gespeichert wird er mit, nach jedem
+Laden der Seite beginnt er neu. Er steht in jedem Projekt und in jeder App
+ausser den Materialien, Python eingeschlossen.
+
+Die Sandbox ist ein gewöhnlicher Eintrag ihrer Liste; `Projekt.sandboxen`
+sagt je Liste, welcher. So zeichnen, rechnen und zeigen alle Apps sie, ohne
+von ihr zu wissen, und die Regel steht an einer Stelle statt in jeder
+Eintragsklasse. ↺ (`sandbox_zuruecksetzen`) baut sie neu und behält Kennung,
+Namen und Platz: wer auf sie zeigt, zeigt weiter auf sie. Fehlt sie oder
+heisst sie anders, weist `pruefen` die Datei ab -- das geht nur von Hand,
+die Oberfläche bietet beides nicht an. Eine Kopie (⧉) ist ein gewöhnlicher
+Eintrag und heisst wie ein neuer, «Platte 2», nicht «Sandbox (Kopie)».
+
+Neu angelegt wird sie wie mit «+»: `Beschreibung.frisch` baut den Eintrag
+nach seiner Vorlage, und `ERSTE_MATERIALIEN` sagt je Klasse, welches Feld
+das erste Material welcher Art bekommt. Der Katalog gibt der Oberfläche
+dieselbe Tafel (`erste_materialien`); bis dahin hatte jede App in `apps.js`
+ihr eigenes `einrichten`. Das neue Balkensystem bringt sein Material M1, einen
+Beton, darum jetzt aus dem Kern mit; `beton()` in Python füllt es.
+
+Nicht im Bericht, nicht unter «Gesamt» und nicht im Stand oben rechts: was
+dort ausprobiert wird, ist nicht das Projekt. Unter «Aktuelle Seite» steht
+sie wie jeder Eintrag, und die Herleitung eines verfolgten Nachweises zeigt
+alles -- verfolgen lässt sich auch einer der Sandbox. Auch die Zahl auf dem
+Knopf einer App und über ihrer Liste zählt sie nicht, und ihretwegen wird
+kein Zeichen blau; sonst sagte jede App «hier gibt es etwas». Wer eine App
+wählt, bekommt den ersten Eintrag des Projekts, die Sandbox nur, wenn es
+keinen gibt.
+
+Dafür trägt jede Warnung jetzt den Namensraum ihres Eintrags
+(`kern.Warnung`): über der Herleitung stehen nur die des gewählten, unter
+«Gesamt» alle ausser denen der Sandboxen. Bis dahin standen alle über jeder
+Herleitung -- mit der Sandbox auch das «noch nichts gezeichnet» der leeren
+Analyse, in jedem Projekt.
+
+Sie hält nichts fest (`verweise`): sonst liesse sich der einzige Beton nicht
+löschen, weil die Sandbox der Platten ihn nimmt. Zeigt sie danach ins Leere,
+sagt sie es am Ort, mit Namen: «der Querschnitt «Unterzug» nimmt eine
+Querschnittsanalyse, die es nicht mehr gibt – eine andere wählen.» Bis dahin
+nannte der Satz die Kennung. Eine Platte ohne Beton hielt bis dahin das ganze
+Projekt an («'beton' darf nicht leer sein»); jetzt rechnet nur sie nicht.
+
+Den Querschnitt einer Sandbox darf nur eine Sandbox nehmen: sie beginnt
+nach jedem Laden neu, und ein gewöhnliches Balkensystem rechnete dann still
+mit anderem. Die Auswahl bietet sie darum nicht an; die Kopie eines
+Sandbox-Systems, die ihn noch nimmt, rechnet nicht und sagt, warum.
+
+Anfragen: `mappe_oeffnen` ersetzt `mappe_pruefen` und legt fehlende
+Sandboxen an, mit `frisch` beginnen alle neu (Laden der Seite);
+`sandbox_zuruecksetzen` für ↺. Das Beispiel und der Katalog (`neu.projekte`)
+kommen mit Sandboxen, `Projekt.neu()` in Python ohne. Die frischen
+Sandboxen rechnen mit: beim Beispiel kostet die erste Rechnung rund 0.06 s
+mehr.
+
 ## 2026-11-20 · Mehrere Projekte in einer Datei
 
 Der Benutzer wollte mehrere Projekte nebeneinander (2026-11-20). Oben in

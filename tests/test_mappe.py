@@ -84,13 +84,15 @@ class TestNeuesProjekt(unittest.TestCase):
         projekt.pruefen()
 
     def test_die_vorlage_der_oberflaeche(self):
-        """«+» nimmt sie aus dem Katalog und setzt nur den Namen."""
-        self.assertEqual(api.katalog()["neu"]["projekte"], Projekt.neu().als_dict())
+        """«+» nimmt sie aus dem Katalog und setzt nur den Namen -- mit den Sandboxen."""
+        projekt = Projekt.neu()
+        projekt.sandboxen_anlegen()
+        self.assertEqual(api.katalog()["neu"]["projekte"], projekt.als_dict())
 
 
 class TestDienst(unittest.TestCase):
     def test_gibt_die_mappe_aufgeraeumt_zurueck(self):
-        antwort = dienst.bearbeite("mappe_pruefen", {"mappe": Projekt.beispiel().als_dict()})
+        antwort = dienst.bearbeite("mappe_oeffnen", {"mappe": Projekt.beispiel().als_dict()})
         self.assertEqual(antwort.status, 200)
         self.assertEqual([p["name"] for p in antwort.daten["mappe"]["projekte"]],
                          [Projekt.beispiel().name])
@@ -100,7 +102,7 @@ class TestDienst(unittest.TestCase):
         for fremd in ({}, {"foo": 1}, {"einkaufsliste": ["Brot"]}, [1, 2, 3], "text", None,
                       {"projekte": [{}]}):
             with self.subTest(fremd=fremd):
-                self.assertEqual(dienst.bearbeite("mappe_pruefen", {"mappe": fremd}).status, 400)
+                self.assertEqual(dienst.bearbeite("mappe_oeffnen", {"mappe": fremd}).status, 400)
 
 
 if __name__ == "__main__":

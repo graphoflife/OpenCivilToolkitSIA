@@ -15,8 +15,6 @@ erfinden, sonst laufen Bericht und Bildschirm auseinander.
 
 from __future__ import annotations
 
-import dataclasses
-import inspect
 import math
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
@@ -41,7 +39,7 @@ from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt import BAUTEILE, Aufbau, SkriptEintrag
+from opencivil.projekt import BAUTEILE, Aufbau
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
@@ -50,7 +48,7 @@ from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.aufbau.kern import kennwertbereich, materialgrund
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
-from opencivil.projekt.projekt import Projekt
+from opencivil.projekt.projekt import APPLISTEN, Projekt
 from opencivil.projekt.querschnittsanalyse import SCHNITTE, QuerschnittsanalyseEintrag
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.platte import BREITE_Y_MM
@@ -133,19 +131,20 @@ def _rechenarten(arten) -> list:
 
 def _vorlage(cls: type) -> Dict[str, Any]:
     """
-    Wie ein frischer Eintrag dieser Klasse aussieht: ueber ``neu``, wo die
-    Klasse eines hat -- eine Platte mit ihren Lagen, ein Grundbruch mit
-    einer Kombination --, sonst mit ihren Vorgaben. Was keine Vorgabe hat,
-    sind Kennung, Name und Verweise: leer, die Oberflaeche setzt sie.
+    Wie ein frischer Eintrag dieser Klasse aussieht (:meth:`Beschreibung.frisch`)
+    -- ohne Kennung, Namen und Materialien: die setzt die Oberflaeche.
     """
-    neu = getattr(cls, "neu", None)
-    if neu is not None:
-        pflicht = [n for n, p in inspect.signature(neu).parameters.items()
-                   if p.default is inspect.Parameter.empty]
-        return neu(**{n: "" for n in pflicht}).als_dict()
-    return cls(**{f.name: "" for f in dataclasses.fields(cls)
-                  if f.init and f.default is dataclasses.MISSING
-                  and f.default_factory is dataclasses.MISSING}).als_dict()
+    return cls.frisch().als_dict()
+
+
+def _neues_projekt() -> Dict[str, Any]:
+    """
+    Ein neues Projekt der Mappe, wie «+» oben links es anlegt: mit dem ersten
+    Beton und Stahl (:meth:`Projekt.neu`) und mit den Sandboxen.
+    """
+    projekt = Projekt.neu()
+    projekt.sandboxen_anlegen()
+    return projekt.als_dict()
 
 
 def _klassen() -> Dict[str, type]:
@@ -225,10 +224,15 @@ def katalog() -> dict:
         "vorgaben": _vorgaben(),
         # Was ein neuer Eintrag einer Liste des Projekts mitbringt -- je
         # Bauteilart und das Skript der App «Python». Eine neue Art hat ihre
-        # Vorlage damit von selbst. Dazu ein neues Projekt der Mappe, mit
-        # dem ersten Beton und Stahl (:meth:`Projekt.neu`).
-        "neu": {**{art.liste: _vorlage(art.eintrag) for art in BAUTEILE},
-                "skripte": _vorlage(SkriptEintrag), "projekte": _vorlage(Projekt)},
+        # Vorlage damit von selbst. Dazu ein neues Projekt der Mappe
+        # (:func:`_neues_projekt`).
+        "neu": {**{liste: _vorlage(klasse) for liste, (klasse, _) in APPLISTEN.items()},
+                "projekte": _neues_projekt()},
+        # Welche Felder eines neuen Eintrags das erste Material welcher Art
+        # nehmen -- «+» setzt sie, wie die Sandbox im Kern
+        # (:attr:`~opencivil.projekt.eintraege.Beschreibung.ERSTE_MATERIALIEN`).
+        "erste_materialien": {liste: dict(klasse.ERSTE_MATERIALIEN)
+                              for liste, (klasse, _) in APPLISTEN.items()},
         # Die Wahlen einer Durchstanzstelle -- je ein Schalter -- und welche
         # Felder der Nachweis mit jeder Stellung liest.
         "durchstanzen": durchstanzdaten.wahlen(),
@@ -565,7 +569,9 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
                        "erklaerung": k.erklaerung, "id": wert.id}
                       for k, wert in kennzahlen(aufbau, kennung, loesung)]
             for kennung in aufbau.teile}
-        ergebnis["warnungen"] = list(aufbau.warnungen)
+        # Je Hinweis der Namensraum seines Eintrags: die Oberflaeche grenzt
+        # ihn ein wie alles andere (kern.Warnung).
+        ergebnis["warnungen"] = [w._asdict() for w in aufbau.warnungen]
         # Je Bauteil, dem fuer jeden Nachweis noch etwas fehlt, was -- die
         # Zusammenfassung sagt es an seiner Stelle (Benutzer, 2026-11-19).
         ergebnis["ohne_nachweis"] = {k: t.ohne_nachweis for k, t in aufbau.teile.items() if t.ohne_nachweis}

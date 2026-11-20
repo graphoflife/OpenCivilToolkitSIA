@@ -13,7 +13,9 @@
  * zusammen mit dem des Materials.
  */
 
-import { feld, namensfeld, panel, wahlSchalter, zweiSchalter } from './bausteine.js';
+import {
+  bezeichnung, feld, panel, wahlSchalter, zweiSchalter,
+} from './bausteine.js';
 import { auswahl, el, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
@@ -257,9 +259,7 @@ export function plattenEditor(querschnitt) {
       // Eine Karte mit blauer Kante wie die Lagen und die Nachweiskapitel:
       // ohne sie stand die Platte als einzige blosse Feldliste da.
       el('div.unterkapitel', {}, [
-        feld('Bezeichnung', namensfeld({
-          wert: querschnitt.name, setzen: (name) => aendern((q) => { q.name = name; }),
-        })),
+        bezeichnung(querschnitt, aendern),
         feld('Beton', auswahl({
           werte: betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte })),
           gewaehlt: querschnitt.beton,

@@ -33,7 +33,7 @@ export function projekteZeichnen(behaelter, namensfeld) {
   return ersetzen(behaelter, el('div.projektreihe', { role: 'tablist', 'aria-label': 'Projekte' }, [
     ...mappe.projekte.map((p) => reiter(p, p === gezeigt, mehrere)),
     el('button.knopf.knopf-zart.projekt-neu', {
-      type: 'button', text: '+', title: `Neues Projekt – mit ${stoffe}, ohne Bauteile`,
+      type: 'button', text: '+', title: `Neues Projekt – mit ${stoffe} und je App einer Sandbox`,
       on: { click: () => projektNeu(namensfeld) },
     }),
   ]));

@@ -96,8 +96,10 @@ def katalog(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 def beispiel(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
-    """Das Beispielprojekt, mit dem eine leere Oberflaeche startet."""
-    return Projekt.beispiel().als_dict()
+    """Das Beispielprojekt, mit dem eine leere Oberflaeche startet -- mit den Sandboxen."""
+    projekt = Projekt.beispiel()
+    projekt.sandboxen_anlegen()
+    return projekt.als_dict()
 
 
 def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -108,14 +110,30 @@ def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return {"projekt": projekt_aus_datei(rumpf.get("projekt")).als_dict()}
 
 
-def mappe_pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+def mappe_oeffnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
-    Prueft eine Mappe -- die Projekte, die die Oberflaeche im Browser ablegt,
-    speichert und oeffnet -- und gibt sie aufgeraeumt zurueck. Eine Datei mit
-    einem einzelnen Projekt, wie bis 2026-11-20 gespeichert, kommt als Mappe
-    mit diesem einen zurueck (:meth:`~opencivil.projekt.mappe.Mappe.aus_dict`).
+    Eine Mappe, wie die Oberflaeche sie zeigt -- die Projekte, die sie im
+    Browser ablegt, speichert und oeffnet: geprueft, aufgeraeumt und in jedem
+    Projekt mit allen Sandboxen. Mit ``frisch`` beginnt jede Sandbox neu, wie
+    beim Laden der Seite; sonst stehen sie da, wie gespeichert (Benutzer,
+    2026-11-20). Eine Datei mit einem einzelnen Projekt, wie bis 2026-11-20
+    gespeichert, kommt als Mappe mit diesem einen zurueck
+    (:meth:`~opencivil.projekt.mappe.Mappe.aus_dict`).
     """
-    return {"mappe": Mappe.aus_dict(rumpf.get("mappe")).als_dict()}
+    mappe = Mappe.aus_dict(rumpf.get("mappe"))
+    for projekt in mappe.projekte:
+        projekt.sandboxen_anlegen(frisch=bool(rumpf.get("frisch")))
+    return {"mappe": mappe.als_dict()}
+
+
+def sandbox_zuruecksetzen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    ↺ an der Sandbox einer App: ``{projekt, liste}`` hinein, die frische
+    Sandbox hinaus -- mit ihrer Kennung, an ihrem Platz
+    (:meth:`~opencivil.projekt.projekt.Projekt.sandbox_zuruecksetzen`).
+    """
+    projekt = _projekt(rumpf)
+    return {"eintrag": projekt.sandbox_zuruecksetzen(str(rumpf.get("liste") or "")).als_dict()}
 
 
 def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -239,7 +257,8 @@ def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Server legt es zusaetzlich in ``ausgabe/`` ab und versucht die Uebersetzung
     zu PDF -- das ``.tex`` ist auf beiden Wegen dasselbe.
     """
-    projekt = _projekt(rumpf)
+    # Ohne die Sandboxen: sie sind zum Ausprobieren da (Benutzer, 2026-11-20).
+    projekt = _projekt(rumpf).ohne_sandboxen()
     aufbau = projekt.aufbauen()
     gewuenscht = aufbau.berichtsziele()
     loesung = (aufbau.werk.loese(*gewuenscht) if gewuenscht
@@ -636,7 +655,8 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "katalog": katalog,
     "beispiel": beispiel,
     "pruefen": pruefen,
-    "mappe_pruefen": mappe_pruefen,
+    "mappe_oeffnen": mappe_oeffnen,
+    "sandbox_zuruecksetzen": sandbox_zuruecksetzen,
     "verweise": verweise,
     "fallname": fallname,
     "rechnen": rechnen,

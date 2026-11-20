@@ -309,8 +309,10 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
     if bauteil is None:
         unfertig = aufbau.unfertige.get(q.bezug)
         if unfertig is None:
-            raise ProjektFehler(f"der Querschnitt «{q.name}» nimmt die {welche} "
-                                f"'{q.bezug}', die es im Projekt nicht gibt.", wo=wo)
+            # Die Kennung stuende nirgends, wo der Benutzer sie saehe, und den
+            # Namen kennt das Projekt nicht mehr (wie ``kern.materialgrund``).
+            raise ProjektFehler(f"der Querschnitt «{q.name}» nimmt eine {welche}, die es "
+                                f"nicht mehr gibt – eine andere wählen.", wo=wo)
         # Es gibt sie, nur fehlt ihr noch etwas: der Stab rechnet nicht, das
         # Projekt schon.
         return klasse(kennung=q.kennung, name=q.name, herkunft=f"{welche} «{unfertig.name}»",

@@ -19,7 +19,7 @@
  */
 
 import {
-  erklaerung, feld, hakenSchalter, namensfeld, panel, wahlBlock, wahlSchalter,
+  bezeichnung, erklaerung, feld, hakenSchalter, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el, svgEl, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
@@ -133,9 +133,7 @@ function querschnittGruppe(analyse) {
     schluessel: 'analyse/Querschnitt', titel: 'Querschnitt', zusatz: 'y nach rechts, z nach oben, mm',
     breit: true,
   }, [
-    feld('Bezeichnung', namensfeld({
-      wert: analyse.name, setzen: (name) => aendern((a) => { a.name = name; }),
-    })),
+    bezeichnung(analyse, aendern),
     zeichenbereich(analyse, uebersicht),
     el('div.unterkapitel', {}, [
       // Freier Text, der in keine Rechnung eingeht -- wie bei der Platte.

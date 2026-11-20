@@ -24,7 +24,8 @@
 
 import { formelText } from './achsen.js';
 import {
-  erklaerung, feld, klappgruppe, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
+  bezeichnung, erklaerung, feld, klappgruppe, materialliste, namensfeld, panel, wahlBlock,
+  wahlSchalter,
 } from './bausteine.js';
 import {
   knotenlastart, lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart,
@@ -42,8 +43,8 @@ import { rechenwahlZeile } from './nachweise.js';
 import { plattenmaterialien } from './plattenkapitel.js';
 import { werkstoffeVon } from './qa_zeichnung.js';
 import {
-  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, kennwertId, naechsterName,
-  neueKennung, zustand,
+  ausVorlage, eintragAendern, eintragVon, feldangabe, istSandbox, katalog, kennwertId,
+  naechsterName, neueKennung, zustand,
 } from './zustand.js';
 
 // ===========================================================================
@@ -147,9 +148,7 @@ function systemGruppe(system) {
   const aendern = (veraenderer) => eintragAendern(system.kennung, veraenderer);
   return panel({ schluessel: `${art}/System`, titel: 'System', zusatz: t.zusatz, breit: true }, [
     // Der Lastfall der Zeichnung steht in ihrer Leiste, neben «Last».
-    feld('Bezeichnung', namensfeld({
-      wert: system.name, setzen: (name) => aendern((s) => { s.name = name; }),
-    }), erklaerung(t.hilfe.vorzeichen.zeilen, t.hilfe.vorzeichen.formel)),
+    bezeichnung(system, aendern, erklaerung(t.hilfe.vorzeichen.zeilen, t.hilfe.vorzeichen.formel)),
     zeichenbereich(system, uebersicht),
     el('div.unterkapitel', {}, [
       el('details.bs-vorzeichen-huelle', {}, [el('summary', { text: 'Vorzeichen' }), t.vorzeichenbild()]),
@@ -496,9 +495,16 @@ function querschnittFenster(system, kennung) {
       beiAenderung: (w) => aendern((x) => { x.kennwerte = { ...x.kennwerte, [k.kurz]: w }; }),
     }), k.angabe.einheit, k.beschriftung)));
   } else {
-    const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
+    const alle = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
+    // Eine Sandbox nur in der Sandbox: sie beginnt nach jedem Laden der Seite
+    // neu, und ein anderes System rechnete dann still mit anderem. Steht sie
+    // doch da -- in der Kopie einer Sandbox --, zeigt die Liste sie, und der
+    // Kern sagt, was zu tun ist.
+    const liste = alle.filter((x) => !istSandbox(x.kennung) || istSandbox(system.kennung)
+      || x.kennung === q[q.art]);
     // Ohne eine im Projekt sagt es schon die Liste.
-    const leer = liste.length ? '– wählen –' : '– noch keine im Projekt –';
+    const leer = liste.length ? '– wählen –'
+      : alle.length ? '– nur die Sandbox: erst kopieren (⧉) –' : '– noch keine im Projekt –';
     zeilen.push(el('div.bs-qvorlage', {}, [
       feld(artKurz(art, q), auswahl({
         werte: [{ wert: '', beschriftung: leer }, ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],

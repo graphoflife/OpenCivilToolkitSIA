@@ -27,7 +27,9 @@ import { adresse, seiteVorhanden } from './notizbuch.js';
 import { kurveZeichnen } from './diagramm.js';
 import { appVon } from './apps.js';
 import { ARTEN } from './arten.js';
-import { aendern, eintragVon, namensraum, zustand } from './zustand.js';
+import {
+  aendern, eintragVon, inSandbox, namensraum, zustand,
+} from './zustand.js';
 
 // ===========================================================================
 // Bausteine
@@ -180,11 +182,19 @@ function titelZeichnen(block) {
     { text: block.text });
 }
 
-function lueckenPanel(loesung) {
-  if (!loesung.fehlende?.length) return null;
+/**
+ * Was zum Rechnen fehlt. Auf einer Seite alles -- was dort fehlt, kann auch
+ * in einem Baustoff ausserhalb liegen --, in «Gesamt» ohne die Sandboxen.
+ */
+function luecken(loesung, raum) {
+  return (loesung.fehlende || []).filter((f) => raum || imRaum(raum, f.id));
+}
+
+function lueckenPanel(fehlende) {
+  if (!fehlende.length) return null;
   return panel({ schluessel: 'bericht/fehlende', titel: 'Fehlende Eingaben' }, [karte(null, [
     el('p.b-text', { text: 'Es fehlen:' }),
-    ...loesung.fehlende.map((f) => el('div.luecke', {}, [
+    ...fehlende.map((f) => el('div.luecke', {}, [
       el('div', {}, [
         el('b', { text: f.beschreibung }),
         f.einheit ? ` [${f.einheit}]` : '',
@@ -217,11 +227,11 @@ function stapel(inhalt, klasse = '') {
  * bis zum nächsten. Welcher Titel einen eröffnet und zu welchem Bestandteil er
  * gehört, sagt der Kern selbst mit `raum` -- ein Vergleich über Anzeigetexte
  * bräche, sobald jemand eine Überschrift umformuliert, und zwar stumm.
+ * In «Gesamt» (`raum` null) alles bis auf die Abschnitte der Sandboxen.
  */
 function nurAbschnitt(bloecke, raum) {
-  if (!raum) return bloecke;
   const gewaehlt = [];
-  let drin = false;
+  let drin = !raum;
   for (const block of bloecke) {
     if (block.art === 'titel' && block.raum) drin = imRaum(raum, block.raum);
     if (drin) gewaehlt.push(block);
@@ -233,7 +243,8 @@ function nurAbschnitt(bloecke, raum) {
  * Die Herleitung -- ganz, oder nur der eine Nachweis, den das Auge in der
  * Zusammenfassung gewählt hat (`zustand.verfolgung`). Der zeigt alles, was er
  * braucht, auch die Baustoffe ausserhalb der gewählten Platte; darum gilt
- * dann kein Seitenfilter.
+ * dann kein Seitenfilter -- auch keiner gegen die Sandbox: verfolgen lässt
+ * sich ein Nachweis von ihr, wenn sie gewählt ist.
  */
 function herleitung(gesamt) {
   const verfolgung = zustand.verfolgung;
@@ -243,10 +254,10 @@ function herleitung(gesamt) {
   if (!loesung.protokoll?.length) {
     return leerzustand('Noch nichts gerechnet.', 'Oben «Rechnen».');
   }
-  const raum = verfolgung ? null : eingrenzung();
   const leer = !verfolgung && ohneAuswahl();
   if (leer) return leer;
-  const bloecke = nurAbschnitt(loesung.protokoll, raum);
+  const raum = eingrenzung();
+  const bloecke = verfolgung ? loesung.protokoll : nurAbschnitt(loesung.protokoll, raum);
   if (!bloecke.length) {
     return leerzustand('Nichts gerechnet für diesen Bestandteil.');
   }
@@ -262,15 +273,25 @@ function herleitung(gesamt) {
         }),
       ])
       : null,
-    ...(loesung.warnungen || []).map((w) => el('div.hinweis.hinweis-warnung', {}, [
-      el('b', { text: 'Warnung: ' }), w,
+    ...warnungenDer(loesung, raum, verfolgung).map((w) => el('div.hinweis.hinweis-warnung', {}, [
+      el('b', { text: 'Warnung: ' }), w.text,
     ])),
     verfolgung ? kurzform(loesung.kurzform) : null,
     ...abschnitte(bloecke).map((a) => panel({
       schluessel: `bericht/herleitung/${a.raum || a.titel}`, titel: a.titel,
     }, kapitelkarten(a.bloecke))),
-    lueckenPanel(loesung),
+    lueckenPanel(verfolgung ? loesung.fehlende : luecken(loesung, raum)),
   ]);
+}
+
+/**
+ * Die Warnungen über der Herleitung, eingegrenzt wie sie: die des gewählten
+ * Eintrags, unter «Gesamt» alle ausser denen der Sandboxen -- beim
+ * verfolgten Nachweis die seines Eintrags.
+ */
+function warnungenDer(loesung, raum, verfolgung) {
+  return (loesung.warnungen || []).filter((w) => (verfolgung
+    ? imRaum(w.raum, verfolgung.ziel) : imRaum(raum, w.raum)));
 }
 
 /**
@@ -366,7 +387,9 @@ function zusammenfassung(loesung, verfolgen) {
       `Links ${arten.slice(0, -1).join(', ')} oder ${arten.at(-1)} wählen oder oben «Gesamt».`);
   }
   if (!bauteile.length) {
-    return stapel([leerzustand('Kein Bauteil vorhanden.'), lueckenPanel(loesung)]);
+    return stapel([leerzustand('Kein Bauteil vorhanden.',
+      'Die Sandboxen stehen nicht unter «Gesamt», nur unter «Aktuelle Seite».'),
+    lueckenPanel(luecken(loesung, raum))]);
   }
 
   // Je Bauteil ein Panel, wie in den Eingaben: darin die Angaben, die
@@ -379,7 +402,7 @@ function zusammenfassung(loesung, verfolgen) {
     }, unfertig ? unfertigKarten(unfertig)
       : art.nachweise ? nachweiskarten(kennung, tabellen[kennung], loesung, verfolgen)
         : appVon(art.art).uebersicht(kennung))),
-    lueckenPanel(loesung),
+    lueckenPanel(luecken(loesung, raum)),
   ]);
 }
 
@@ -693,9 +716,14 @@ function ohneAuswahl() {
     : null;
 }
 
-/** Gehört etwas mit diesem Namensraum in die Ansicht? */
+/**
+ * Gehört etwas mit diesem Namensraum in die Ansicht? In «Gesamt» alles ausser
+ * den Sandboxen: sie sind zum Ausprobieren da und stehen auch nicht im
+ * Bericht.
+ */
 function imRaum(raum, id) {
-  return !raum || id === raum || id.startsWith(`${raum}.`);
+  if (!raum) return !inSandbox(id);
+  return id === raum || id.startsWith(`${raum}.`);
 }
 
 // ===========================================================================

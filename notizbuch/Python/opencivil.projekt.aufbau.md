@@ -1,5 +1,5 @@
 ---
-erzeugt: 726e1605d2e0
+erzeugt: 8f205bddfdf2
 art: modul
 tags: [modul]
 ---
@@ -98,12 +98,15 @@ das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
 ### _vorab_pruefen
 
 ```python
-def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau) -> None
+def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau, sandboxen: Dict[str, Any]) -> None
 ```
 
 Was ein Bauteil aufhaelt, bevor es gebaut wird: ein Material, das selbst
-nicht rechnet, und ein Wert, den der Kern abweist
-([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]). Ein Verweis auf ein
+nicht rechnet, ein Wert, den der Kern abweist
+([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]), und der Querschnitt
+einer Sandbox (`sandboxen`, je Kennung der Eintrag) in einem Bauteil, das
+selbst keine ist: die Sandbox beginnt nach jedem Laden der Seite neu,
+und das Bauteil rechnete dann still mit anderem. Ein Verweis auf ein
 Material, das es nicht mehr gibt, meldet sich beim Bauen, mit dem, was
 darauf zeigt ([[opencivil.projekt.aufbau.kern#material|material]]).
 

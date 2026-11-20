@@ -5,9 +5,10 @@ VERANTWORTUNG:
 Das :class:`Projekt` haelt Materialien und Bauteile zusammen und ist das, was
 gespeichert, geoeffnet und gerechnet wird. Hier stehen der Zugriff auf die
 Teile, die Methoden fuer das Rechnen ohne Oberflaeche, die Pruefungen ueber
-mehrere Teile hinweg (eindeutige Kennungen und Materialnamen), Speichern und
-Laden. Das Beispiel, mit dem die Oberflaeche startet, und das Pruefprojekt
-«Jeder Nachweis» baut :mod:`opencivil.projekt.beispiele`.
+mehrere Teile hinweg (eindeutige Kennungen und Materialnamen), die Sandbox
+jeder App, Speichern und Laden. Das Beispiel, mit dem die Oberflaeche
+startet, und das Pruefprojekt «Jeder Nachweis» baut
+:mod:`opencivil.projekt.beispiele`.
 
 Gebaut wird in :mod:`opencivil.projekt.aufbau`; :meth:`Projekt.aufbauen`
 reicht nur weiter.
@@ -19,7 +20,7 @@ import copy
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Union
+from typing import Any, Dict, List, Sequence, Tuple, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
@@ -31,7 +32,9 @@ from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
-from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort
+from opencivil.projekt.lesen import (
+    ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort, ort_von,
+)
 from opencivil.projekt.netz import neue_kennung
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.skript import SkriptEintrag
@@ -43,6 +46,20 @@ from opencivil.projekt.aufbau import (
     ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, BAUTEILE, DECKE, DURCHSTANZEN, GRUNDBRUCH, PFAHL,
     PLATTE, SETZUNG, Aufbau, aufbauen,
 )
+
+
+#: Die Listen der Apps ausser den Materialien, je mit der Klasse ihrer
+#: Eintraege und der Vorsilbe ihrer Kennungen: die Bauteilarten
+#: (:data:`~opencivil.projekt.aufbau.BAUTEILE`) und die Skripte der App
+#: «Python». Was «+» in ihnen anlegt, steht im Katalog (``neu``); jede hat
+#: eine Sandbox.
+APPLISTEN: Dict[str, Tuple[type, str]] = {
+    **{art.liste: (art.eintrag, art.vorsilbe) for art in BAUTEILE},
+    "skripte": (SkriptEintrag, "p"),
+}
+
+#: Wie die Sandbox jeder App heisst (Benutzer, 2026-11-20).
+SANDBOX = "Sandbox"
 
 
 # ===========================================================================
@@ -82,6 +99,14 @@ class Projekt(Beschreibung):
 
     skripte: List[SkriptEintrag] = field(default_factory=list)
     """Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet."""
+
+    sandboxen: Dict[str, str] = field(default_factory=dict)
+    """
+    Je Liste einer App (:data:`APPLISTEN`) die Kennung ihrer Sandbox, des
+    Eintrags zum Ausprobieren -- siehe :meth:`sandbox_zuruecksetzen`. Hier
+    und nicht an den Eintraegen: so steht die Regel an einer Stelle, und
+    eine Kopie der Sandbox ist von selbst ein gewoehnlicher Eintrag.
+    """
 
     vergeben: Dict[str, int] = field(default_factory=dict)
     """
@@ -126,6 +151,8 @@ class Projekt(Beschreibung):
         for art in BAUTEILE:
             setattr(kopie, art.liste,
                     [e for e in getattr(kopie, art.liste) if e.kennung == kennung])
+        kopie.sandboxen = {liste: k for liste, k in kopie.sandboxen.items()
+                           if any(e.kennung == k for e in getattr(kopie, liste))}
         return kopie
 
     def bauteil(self, kennung: str) -> Any:
@@ -147,9 +174,14 @@ class Projekt(Beschreibung):
         Was hier steht, darf nicht geloescht werden; die Oberflaeche fragt hier,
         bevor sie loescht (Dienst ``verweise``), statt es in einer eigenen
         Liste nachzubauen.
+
+        Eine Sandbox haelt nichts fest: zeigt sie auf etwas Geloeschtes, sagt
+        sie es selbst, und zurueckgesetzt nimmt sie wieder das erste Material.
+        Sonst liesse sich der einzige Beton nicht loeschen, weil die Sandbox
+        der Platten ihn nimmt.
         """
-        return [e for e in self.bauteile()
-                if kennung in e.materialien() or kennung in e.bezuege()]
+        return [e for e in self.bauteile() if not self.ist_sandbox(e.kennung)
+                and (kennung in e.materialien() or kennung in e.bezuege())]
 
     def eigener_name(self, art: str) -> str:
         """Der erste freie Name eines eigenen Materials: BE1, BE2 ..., S1 ... oder ST1 ..."""
@@ -441,12 +473,72 @@ class Projekt(Beschreibung):
         Alles rechnen, was die Oberflaeche auch rechnet -- ohne sie.
 
         Dieselben Ziele in derselben Reihenfolge (:meth:`Aufbau.alle_ziele`),
-        also derselbe Bericht. Ohne Zwischenspeicher: der lohnt sich erst,
+        also derselbe Bericht -- ohne die Sandboxen, wie dort
+        (:meth:`ohne_sandboxen`). Ohne Zwischenspeicher: der lohnt sich erst,
         wenn man dieselbe Platte hundertmal rechnet.
         """
-        aufbau = self.aufbauen()
+        aufbau = self.ohne_sandboxen().aufbauen()
         return Ergebnis(projekt=self, aufbau=aufbau,
                         loesung=aufbau.werk.loese(*aufbau.alle_ziele()))
+
+    # -- Sandbox ------------------------------------------------------------
+    #
+    # In jeder App ein Eintrag zum Ausprobieren (Benutzer, 2026-11-20): immer
+    # da, er heisst «Sandbox», laesst sich kopieren, aber nicht loeschen, und
+    # beginnt nach jedem Laden der Seite neu. Zum Projekt, wie es im Bericht
+    # steht, gehoert er nicht (:meth:`ohne_sandboxen`). Er haelt kein Material
+    # und kein Bauteil fest (:meth:`verweise`), und auf ihn zeigt nur eine
+    # Sandbox -- sonst rechnete ein Bauteil nach dem Laden der Seite still mit
+    # anderem (:func:`~opencivil.projekt.aufbau.aufbauen`).
+
+    def ist_sandbox(self, kennung: str) -> bool:
+        """Ob dieser Eintrag die Sandbox seiner App ist."""
+        return kennung in self.sandboxen.values()
+
+    def sandbox_zuruecksetzen(self, liste: str) -> Any:
+        """
+        Die Sandbox einer App, frisch: nach der Vorlage ihrer Klasse und mit
+        dem ersten Material jeder Art, das sie nimmt, wie ein neuer Eintrag
+        der Oberflaeche (:meth:`~opencivil.projekt.eintraege.Beschreibung.frisch`).
+        Eine vorhandene wird an ihrem Platz ersetzt und behaelt ihre Kennung
+        -- wer auf sie zeigt, zeigt weiter auf sie. Eine fehlende kommt
+        zuoberst in die Liste.
+        """
+        if liste not in APPLISTEN:
+            raise ProjektFehler(f"Eine Sandbox hat jede App ausser den Materialien – eine Liste "
+                                f"'{liste}' gibt es dafür nicht. Möglich sind: "
+                                f"{', '.join(APPLISTEN)}.")
+        klasse, vorsilbe = APPLISTEN[liste]
+        eintraege = getattr(self, liste)
+        alt = self.sandboxen.get(liste, "")
+        sandbox = klasse.frisch(self.materialien)
+        sandbox.kennung = alt or self.freie_kennung(vorsilbe)
+        sandbox.name = SANDBOX
+        kennungen = [e.kennung for e in eintraege]
+        if alt in kennungen:
+            eintraege[kennungen.index(alt)] = sandbox
+        else:
+            eintraege.insert(0, sandbox)
+        self.sandboxen[liste] = sandbox.kennung
+        return sandbox
+
+    def sandboxen_anlegen(self, *, frisch: bool = False) -> None:
+        """
+        Jede Sandbox, die fehlt -- in einem neuen Projekt, in einer Datei, die
+        noch keine kennt. Mit ``frisch`` beginnt auch jede vorhandene neu: so
+        startet die Seite (Benutzer, 2026-11-20).
+        """
+        for liste in APPLISTEN:
+            if frisch or liste not in self.sandboxen:
+                self.sandbox_zuruecksetzen(liste)
+
+    def ohne_sandboxen(self) -> "Projekt":
+        """Eine Kopie ohne die Sandboxen -- das Projekt, wie es im Bericht steht."""
+        kopie = copy.deepcopy(self)
+        for liste, kennung in self.sandboxen.items():
+            setattr(kopie, liste, [e for e in getattr(kopie, liste) if e.kennung != kennung])
+        kopie.sandboxen = {}
+        return kopie
 
     # -- Pruefung -----------------------------------------------------------
 
@@ -479,6 +571,22 @@ class Projekt(Beschreibung):
                     f"{vergeben[eintrag.kennung]} und {wer} haben dieselbe Kennung "
                     f"'{eintrag.kennung}'. Jeder Eintrag braucht seine eigene.")
             vergeben[eintrag.kennung] = wer
+
+        # Je Sandbox: sie steht in ihrer Liste und heisst so. Geloescht oder
+        # umbenannt wird sie nur in einer Datei von Hand -- die Oberflaeche
+        # bietet beides nicht an.
+        for liste, kennung in self.sandboxen.items():
+            if liste not in APPLISTEN:
+                raise ProjektFehler(f"eine Sandbox hat jede App ausser den Materialien – eine "
+                                    f"Liste '{liste}' hat keine.", wo="Projekt")
+            sandbox = next((e for e in getattr(self, liste) if e.kennung == kennung), None)
+            if sandbox is None:
+                raise ProjektFehler(f"die Sandbox ({APPLISTEN[liste][0].BEZEICHNUNG}) fehlt – eine "
+                                    f"Sandbox lässt sich nicht löschen, nur zurücksetzen.",
+                                    wo="Projekt")
+            if sandbox.name != SANDBOX:
+                raise ProjektFehler(f"die Sandbox heisst «{SANDBOX}», nicht «{sandbox.name}».",
+                                    wo=ort_von(sandbox))
 
         for m in self.materialien:
             m.sorte_pruefen()
@@ -536,7 +644,9 @@ class Projekt(Beschreibung):
         ersten Beton und dem ersten Betonstahl, den ein neues Material
         vorschlaegt (:data:`~opencivil.material.beton.ERSTER_BETON`,
         :data:`~opencivil.material.betonstahl.ERSTER_STAHL`), und ohne
-        Bauteile. So rechnet die erste Platte gleich.
+        Bauteile. So rechnet die erste Platte gleich. Die Sandboxen legt die
+        Oberflaeche dazu an (:meth:`sandboxen_anlegen`); wer in Python
+        rechnet, braucht sie nicht.
         """
         projekt = cls(name=name)
         projekt.beton(ERSTER_BETON)

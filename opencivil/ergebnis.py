@@ -70,7 +70,7 @@ class Ergebnis:
     @property
     def warnungen(self) -> List[str]:
         """Was beim Aufbau aufgefallen ist -- etwa eine Platte ohne Einwirkung."""
-        return list(self.aufbau.warnungen)
+        return [w.text for w in self.aufbau.warnungen]
 
     def urteile_von(self, bauteil: str) -> List[NachweisUrteil]:
         """Die gefuehrten Urteile einer Platte oder Analyse -- nach Name oder Kennung."""

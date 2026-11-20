@@ -278,7 +278,7 @@ class TestNachweis(unittest.TestCase):
         aufbau, _, quer = rechnen(q)
         self.assertIsNone(quer)
         self.assertIn("Pfahl 'P': die Schichten reichen nicht bis unter den Fuss → keine "
-                      "Steifigkeit und kein Widerstand quer.", aufbau.warnungen)
+                      "Steifigkeit und kein Widerstand quer.", [w.text for w in aufbau.warnungen])
 
     def test_regeln(self):
         """η_a,tr höchstens wie gerechnet; mit R_a,k aus dem Versuch prüft quer die Schichten."""

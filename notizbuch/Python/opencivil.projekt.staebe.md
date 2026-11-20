@@ -1,5 +1,5 @@
 ---
-erzeugt: ef420f01ed55
+erzeugt: b44d0d6eee7e
 art: modul
 tags: [modul]
 ---
@@ -230,6 +230,7 @@ und die Arten der Lager stehen in ihr als Klassenattribute.
 - `LAGERFELDER: Tuple[str, ...]` – Die Richtungen eines Lagers, in der Folge der Vorwahlen in [[opencivil.projekt.staebe#MitStaeben|LAGERARTEN]] -- Felder des Lagers wie des Lagers im Rechenkern.
 - `LAGERARTEN: Mapping[str, Tuple[str, ...]]` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 - `LINIENLAGER: Tuple[str, ...]` – Die Richtungen eines Linienlagers -- Felder der Linie wie des Stabs im Rechenkern.
+- `ERSTE_MATERIALIEN = {'stabmaterialien/0/stoff': 'beton'}` – Das Material M1 eines frischen Systems ([[opencivil.projekt.staebe#MitStaeben.neu|neu]]) nimmt den ersten Beton des Projekts -- damit ein gezeichneter Stab gleich eines hat.
 - `NEUE_DIAGRAMME: Tuple[str, ...]` – Was ein frisches System von der GZT zeigt -- dazu die Verschiebung der GZG.
 - `LAUFRICHTUNGEN: Tuple[Tuple[float, ...], ...]` – Wohin eine neue Linie laeuft, wie herum sie auch gezeichnet ist: in die erste dieser Richtungen, auf der sie nicht senkrecht steht. Keine: wie gezeichnet. Die Oberflaeche legt danach Anfang und Ende.
 - `KNOTEN: type`
@@ -261,7 +262,9 @@ Knoten, Linie, Lager und Querschnitt (Benutzer, 2026-10-19), aber mit
 den Lastfaellen Eigengewicht -- es kommt von selbst --, Auflast und
 Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
 1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23). Dazu die
-Diagramme [[opencivil.projekt.staebe#MitStaeben|NEUE_DIAGRAMME]] der GZT und die Verschiebung der GZG.
+Diagramme [[opencivil.projekt.staebe#MitStaeben|NEUE_DIAGRAMME]] der GZT und die Verschiebung der GZG,
+und das Material M1, ein Beton: welcher, sagt
+[[opencivil.projekt.staebe#MitStaeben|ERSTE_MATERIALIEN]].
 
 #### MitStaeben.wo
 
@@ -351,7 +354,9 @@ def beton(self, beton: Any) -> Any
 ```
 
 Das Material des Systems aus einem Beton des Projekts (Eintrag oder
-Kennung) -- das schon da ist, sonst ein neues.
+Kennung) -- das schon da ist, sonst ein neues. Ein Beton, der noch
+keinen gewaehlt hat wie M1 eines frischen Systems ([[opencivil.projekt.staebe#MitStaeben.neu|neu]]),
+bekommt diesen.
 
 #### MitStaeben.baustahl
 

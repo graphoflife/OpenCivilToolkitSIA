@@ -15,9 +15,10 @@ Die Platte, die diese Teile zusammenhaelt, steht in
 from __future__ import annotations
 
 import functools
+import inspect
 import math
-from dataclasses import KW_ONLY, asdict, dataclass, field, fields
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, fields
+from typing import Any, ClassVar, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import (
     GRAD, KN, KN_PRO_M, KNM, M, MM, MM2, PROMILLE, PROZENT, Groesse,
@@ -94,6 +95,14 @@ class Beschreibung:
     (:func:`~opencivil.projekt.lesen.inhalt_pruefen`).
     """
 
+    ERSTE_MATERIALIEN: ClassVar[Mapping[str, str]] = {}
+    """
+    Was ein neuer Eintrag vom Projekt nimmt (:meth:`frisch`): je Feld, als
+    Pfad wie ``stabmaterialien/0/stoff``, die Art des Materials, von der er
+    das erste bekommt. «+» in der Oberflaeche liest es aus dem Katalog,
+    damit die Regel an einer Stelle steht. Ohne eigene keines.
+    """
+
     def __setattr__(self, name: str, wert: Any) -> None:
         # Nur Felder (2026-10-25): eine Zuweisung an einen Namen, den es nicht
         # gibt, legte still ein neues Attribut an -- ein Tippfehler im
@@ -126,6 +135,33 @@ class Beschreibung:
 
     def als_dict(self) -> dict:
         return asdict(self)
+
+    @classmethod
+    def frisch(cls, materialien: Iterable[Any] = ()) -> Any:
+        """
+        Ein frischer Eintrag dieser Klasse, wie die Oberflaeche ihn anlegt:
+        ueber ``neu``, wo die Klasse eines hat -- eine Platte mit ihren
+        Lagen, ein Grundbruch mit einer Kombination --, sonst mit ihren
+        Vorgaben. Aus ``materialien`` bekommt jedes Feld in
+        :attr:`ERSTE_MATERIALIEN` das erste seiner Art. Kennung und Name
+        bleiben leer: sie setzt, wer anlegt.
+        """
+        neu = getattr(cls, "neu", None)
+        if neu is not None:
+            pflicht = [n for n, p in inspect.signature(neu).parameters.items()
+                       if p.default is inspect.Parameter.empty]
+            eintrag = neu(**{n: "" for n in pflicht})
+        else:
+            eintrag = cls(**{f.name: "" for f in fields(cls)
+                             if f.init and f.default is MISSING and f.default_factory is MISSING})
+        vorhanden = list(materialien)
+        for pfad, art in cls.ERSTE_MATERIALIEN.items():
+            *weg, feld = pfad.split("/")
+            ziel = eintrag
+            for schritt in weg:
+                ziel = ziel[int(schritt)] if isinstance(ziel, list) else getattr(ziel, schritt)
+            setattr(ziel, feld, next((m.kennung for m in vorhanden if m.art == art), ""))
+        return eintrag
 
     @classmethod
     def aus_dict(cls, roh: Mapping[str, Any], wo: Optional[str] = None) -> Any:

@@ -96,9 +96,16 @@ class TestBeschreibung(unittest.TestCase):
         """
         Ein neues System hat kein Tragwerk (Benutzer, 2026-10-19), aber
         Eigengewicht, Auflast und Nutzlast und die Kombinationen GZT und GZG
-        (Benutzer, 2026-10-23).
+        (Benutzer, 2026-10-23) -- und das Material M1, ein Beton: welcher,
+        weiss erst das Projekt (``Beschreibung.frisch``), oder ``beton`` sagt
+        es.
         """
         s = BalkensystemEintrag.neu("r1", "Träger")
+        self.assertEqual([(m.kennung, m.art, m.stoff) for m in s.stabmaterialien],
+                         [("M1", "beton", "")])
+        self.assertIs(s.beton("b1"), s.stabmaterialien[0])
+        self.assertEqual((s.beton("b1").stoff, s.beton("b2").kennung), ("b1", "M2"))
+        s.stabmaterialien[1].stoff = ""
         self.assertEqual((s.knoten, s.linien, s.lager, s.knotenlasten, s.querschnitte),
                          ([], [], [], [], []))
         self.assertEqual([(lf.name, lf.eigengewicht) for lf in s.lastfaelle],
@@ -530,8 +537,8 @@ class TestRechnen(unittest.TestCase):
     def test_ein_fremder_verweis_haelt_das_system_an(self):
         p = traeger()
         p.balkensysteme[0].querschnitt_aus("Weg", "platte", "q7")
-        self.assertIn("der Querschnitt «Weg» nimmt die Platte 'q7', die es im Projekt nicht "
-                      "gibt", meldung(p))
+        self.assertIn("der Querschnitt «Weg» nimmt eine Platte, die es nicht mehr gibt – "
+                      "eine andere wählen", meldung(p))
 
     def test_noch_ohne_platte_oder_analyse_ist_eine_meldung(self):
         """
@@ -568,7 +575,7 @@ class TestRechnen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
         self.assertEqual(antwort.status, 200)
         self.assertIn("Platte 'Decke': noch keine Bewehrung → nichts zu rechnen.",
-                      antwort.daten["warnungen"])
+                      [w["text"] for w in antwort.daten["warnungen"]])
         texte = [m["text"] for m in antwort.daten["zeichendaten"]["r1"]["uebersicht"]["meldungen"]]
         self.assertTrue(any("die Platte «Decke» rechnet nicht (noch keine Bewehrung)." in t
                             for t in texte), texte)
@@ -753,9 +760,10 @@ class TestEigengewicht(unittest.TestCase):
         self.assertEqual(self.lagerkraefte(p, "GZG"), [13.5, 13.5])
 
     def test_eigenes_material_mit_seiner_dichte(self):
-        # Ein Stahlstab 100 × 100 mm: 7850 · 10 · 0.01 = 785 N/m.
+        # Ein Stahlstab 100 × 100 mm: 7850 · 10 · 0.01 = 785 N/m. M1 ist der
+        # Beton, den jedes neue System mitbringt.
         p = self.system(eigen={"E": 200000.0, "rho": 7850.0}, b=100.0, h=100.0)
-        self.assertAlmostEqual(p.rechnen().loesung.werte["balkensystem.r1.Q1.M1.g_k"].groesse.si,
+        self.assertAlmostEqual(p.rechnen().loesung.werte["balkensystem.r1.Q1.M2.g_k"].groesse.si,
                                785.0)
 
     def test_eine_linie_ohne_querschnitt_wiegt_nichts(self):

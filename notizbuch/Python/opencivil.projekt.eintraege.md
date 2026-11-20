@@ -1,5 +1,5 @@
 ---
-erzeugt: 648f59a744fe
+erzeugt: 4046b5769d94
 art: modul
 tags: [modul]
 ---
@@ -70,6 +70,8 @@ Was ueber mehrere Felder gilt, steht in [[opencivil.projekt.eintraege#Beschreibu
 dem Rechnen, nach den Bereichen der Felder
 ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
 
+- `ERSTE_MATERIALIEN: ClassVar[Mapping[str, str]] = {}` – Was ein neuer Eintrag vom Projekt nimmt ([[opencivil.projekt.eintraege#Beschreibung.frisch|frisch]]): je Feld, als Pfad wie `stabmaterialien/0/stoff`, die Art des Materials, von der er das erste bekommt. «+» in der Oberflaeche liest es aus dem Katalog, damit die Regel an einer Stelle steht. Ohne eigene keines.
+
 #### Beschreibung.regeln
 
 ```python
@@ -105,6 +107,20 @@ einmal anzuschreiben.
 ```python
 def als_dict(self) -> dict
 ```
+
+#### Beschreibung.frisch
+
+```python
+@classmethod
+def frisch(cls, materialien: Iterable[Any]=()) -> Any
+```
+
+Ein frischer Eintrag dieser Klasse, wie die Oberflaeche ihn anlegt:
+ueber `neu`, wo die Klasse eines hat -- eine Platte mit ihren
+Lagen, ein Grundbruch mit einer Kombination --, sonst mit ihren
+Vorgaben. Aus `materialien` bekommt jedes Feld in
+[[opencivil.projekt.eintraege#Beschreibung|ERSTE_MATERIALIEN]] das erste seiner Art. Kennung und Name
+bleiben leer: sie setzt, wer anlegt.
 
 #### Beschreibung.aus_dict
 

@@ -15,7 +15,7 @@ import {
 import { span } from './mathe.js';
 import { sinnbild } from './sinnbilder.js';
 import {
-  feldangabe, katalog, materialien, panelUmschalten, zustand,
+  feldangabe, istSandbox, katalog, materialien, panelUmschalten, zustand,
 } from './zustand.js';
 
 /**
@@ -83,6 +83,38 @@ export function namensfeld({
     type: 'text', value: wert ?? '', title: titel, disabled: gesperrt,
     on: { change: (e) => nameUebernehmen(e.target, wert ?? '', { pruefen, setzen }) },
   });
+}
+
+/**
+ * Die Bezeichnung eines Eintrags einer App: `aendern` ändert ihn, `hilfe`
+ * steht daneben. Bei der Sandbox gesperrt (`sandboxName`).
+ */
+export function bezeichnung(eintrag, aendern, hilfe) {
+  return feld('Bezeichnung', namensfeld({
+    wert: eintrag.name, setzen: (name) => aendern((x) => { x.name = name; }), ...sandboxName(eintrag),
+  }), hilfe);
+}
+
+/**
+ * Was das Namensfeld der Sandbox anders macht: es ist gesperrt, und sein
+ * Titel sagt warum -- sie heisst immer so (Benutzer, 2026-11-20), und eine
+ * Kopie bekommt einen eigenen Namen.
+ */
+export function sandboxName(eintrag) {
+  return istSandbox(eintrag.kennung)
+    ? { gesperrt: true, titel: 'Die Sandbox heisst immer so – eine Kopie (⧉) bekommt einen eigenen Namen' }
+    : {};
+}
+
+/** Über den Eingaben der Sandbox: wozu sie da ist -- sonst nichts. */
+export function sandboxHinweis(eintrag) {
+  return istSandbox(eintrag.kennung)
+    ? el('div.hinweis.hinweis-sandbox', {}, [
+      el('b', { text: 'Sandbox: ' }),
+      'zum Ausprobieren. Sie steht nicht im Bericht und beginnt nach jedem Laden der Seite neu – '
+        + 'was bleiben soll, kopieren (⧉).',
+    ])
+    : null;
 }
 
 /**

@@ -26,7 +26,7 @@
  */
 
 import {
-  eingabekarten, erklaerung, feld, namensfeld, panel, verhaltenSchalter,
+  bezeichnung, eingabekarten, erklaerung, feld, panel, verhaltenSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
@@ -86,9 +86,7 @@ function situationPanel(g) {
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
   }, [
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', namensfeld({
-        wert: g.name, setzen: (name) => aendern((x) => { x.name = name; }),
-      })),
+      bezeichnung(g, aendern),
     ]),
     // Welche Felder das Verhalten liest, sagt der Kern (Benutzer, 2026-11-19:
     // was nicht gilt, steht nicht da) -- bis dahin hiess φ = 0 undrainiert.

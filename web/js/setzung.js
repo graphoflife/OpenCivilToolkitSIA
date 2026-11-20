@@ -17,7 +17,7 @@
  */
 
 import {
-  eingabekarten, erklaerung, feld, mitBild, namensfeld, panel, vorgabefelder, vorgabetitel,
+  bezeichnung, eingabekarten, erklaerung, feld, mitBild, panel, vorgabefelder, vorgabetitel,
   wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
@@ -57,9 +57,7 @@ function situationPanel(s) {
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
   }, [
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', namensfeld({
-        wert: s.name, setzen: (name) => aendern((x) => { x.name = name; }),
-      })),
+      bezeichnung(s, aendern),
     ]),
     ...eingabekarten('setzung', s, aendern, {
       dazu: {

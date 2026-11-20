@@ -1,5 +1,5 @@
 ---
-erzeugt: c2467bfa518e
+erzeugt: 2f0c6783adfa
 art: modul
 tags: [modul]
 ---
@@ -69,6 +69,7 @@ class DurchstanzEintrag(BauteilEintrag)
 Eine Durchstanzstelle -- siehe Dateikopf.
 
 - `BEZEICHNUNG = 'Durchstanzen'`
+- `ERSTE_MATERIALIEN = {'beton': 'beton', 'stahl': 'betonstahl'}`
 - `kennung: str`
 - `name: str`
 - `plattenart: Plattenart = Plattenart.DECKE` – Decke: Zugbewehrung oben; Bodenplatte: unten, gegen die Bodenpressung.
