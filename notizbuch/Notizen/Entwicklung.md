@@ -7,6 +7,23 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die rechte Tafel wird rötlich, solange sie nicht zur Eingabe passt
+
+Nach einer Änderung stand rechts bis zur neuen Antwort das alte Ergebnis,
+ohne dass man es ihm ansah; scheiterte die Rechnung, blieb es stehen. Der
+Benutzer will die rechte Spalte rötlich, solange sie nicht zur Eingabe
+passt (2026-11-20).
+
+Die Seite merkt sich, zu welcher Eingabe die gezeigte Antwort gehört
+(`geliefert` in `app.js`, der `rechenstand` beim Abschicken). Weicht die
+Eingabe ab, trägt `#tafel-bericht` `ist-ueberholt`: ein hellroter Grund
+(`--schlecht-hell`), erst nach 0.3 s, damit eine schnelle Rechnung nicht
+aufblitzt. Er bleibt, wenn die Rechnung scheitert, und gilt nicht, wo die
+App rechts selbst etwas zeigt (Python). `gerechnet` taugte dafür nicht: es
+gilt schon, wenn die Anfrage abgeht. Im Browser-Fenster der Prüfung lief der
+Übergang nicht, weil es keine Bilder zeichnete (`requestAnimationFrame`
+stand still); ohne Übergang und im Bildschirmfoto stimmt die Farbe.
+
 ## 2026-11-20 · «Kriechzahl φ» heisst überall gleich
 
 Die Kriechzahl stand an vier Stellen dreimal anders da: über dem Feld der

@@ -324,7 +324,13 @@ a.knopf { display: inline-block; text-decoration: none; }
    bleibt der Griff schmal und greifbar, und der Inhalt hat trotzdem Luft. */
 .tafel-links  .tafel-inhalt { padding-right: 20px; }
 .tafel-mitte  .tafel-inhalt { padding-left: 20px; padding-right: 20px; }
-.tafel-rechts .tafel-inhalt { padding-left: 20px; }
+.tafel-rechts .tafel-inhalt { padding-left: 20px; transition: background-color .15s; }
+/* Die Antwort passt nicht mehr zur Eingabe: es wird gerechnet, oder es
+   scheiterte. Leicht rötlich, erst nach 0.3 s -- eine schnelle Rechnung
+   blitzt so nicht auf (Benutzer, 2026-11-20). */
+.tafel-rechts.ist-ueberholt .tafel-inhalt {
+  background-color: var(--schlecht-hell); transition: background-color .2s .3s;
+}
 
 .griff { background: var(--rand); cursor: col-resize; }
 .griff:hover, .griff.ist-aktiv { background: var(--blau); }

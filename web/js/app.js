@@ -31,6 +31,13 @@ const knoten = {};
 let rechenUhr = null;
 /** Womit zuletzt gerechnet wurde -- siehe `rechenstand`. */
 let gerechnet = null;
+/**
+ * Zu welcher Eingabe die gezeigte Antwort gehört. Weicht die Eingabe davon
+ * ab -- es wird gerade gerechnet, oder es scheiterte --, ist die rechte Tafel
+ * rötlich hinterlegt (`ist-ueberholt`, Benutzer, 2026-11-20). `gerechnet`
+ * taugt dafür nicht: es gilt schon, wenn die Anfrage abgeht.
+ */
+let geliefert = null;
 
 /**
  * Ob noch einmal gerechnet werden soll, sobald der laufende Durchgang fertig
@@ -83,7 +90,8 @@ function stand(antwort) {
 async function einDurchgang() {
   zustandsanzeige('rechnet …');
   try {
-    gerechnet = rechenstand();
+    const eingabe = rechenstand();
+    gerechnet = eingabe;
     const antwort = await api.rechnen(zustand.projekt);
     // Der gezeigte Einzelnachweis rechnet mit: sonst stünde in der Herleitung
     // eine Zahl von vor der letzten Eingabe. Aber nur, wenn die Herleitung zu
@@ -93,6 +101,7 @@ async function einDurchgang() {
     const verfolgung = !v ? null
       : zustand.reiter === 'herleitung' ? await teillauf(v) : { ...v, loesung: null };
     // Inzwischen aufgehoben oder ein anderes Auge gewählt: das gilt.
+    geliefert = eingabe;
     aendern({
       loesung: antwort,
       verfolgung: zustand.verfolgung === v ? verfolgung : zustand.verfolgung,
@@ -538,6 +547,12 @@ function allesZeichnen(was) {
     editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis, knoten.fenster);
     if (!nurMitte) rechtsZeichnen();
   });
+  const eingabe = nurMitte ? null : rechenstand();
+  if (!nurMitte) {
+    const eigen = appVon(zustand.auswahl?.art)?.rechts;
+    knoten.tafelBericht.classList.toggle('ist-ueberholt',
+      !eigen && Boolean(zustand.loesung) && eingabe !== geliefert);
+  }
 
   knoten.btnSpeichern.textContent = zustand.ungespeichert ? 'Speichern •' : 'Speichern';
   for (const k of knoten.reiterKnoepfe) {
@@ -549,7 +564,7 @@ function allesZeichnen(was) {
 
   // Geändert, was in die Rechnung eingeht -> neu rechnen. Nicht bei blossem
   // Blättern und nicht nach einer Änderung an einem Skript.
-  if (was === 'projekt' && rechenstand() !== gerechnet) spaeterRechnen();
+  if (was === 'projekt' && eingabe !== gerechnet) spaeterRechnen();
 }
 
 // ===========================================================================
@@ -577,6 +592,7 @@ async function starten() {
     fenster: document.getElementById('fenster'),
     bericht: document.getElementById('bericht'),
     berichtTitel: document.getElementById('bericht-titel'),
+    tafelBericht: document.getElementById('tafel-bericht'),
     tafelRechts: document.querySelector('#tafelwahl [data-tafel="rechts"]'),
     umfang: document.getElementById('umfang'),
     reiter: document.getElementById('reiter'),
