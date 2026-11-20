@@ -54,7 +54,7 @@ from opencivil.nachweis.querkraft import (
     statische_hoehen, zugposten,
 )
 from opencivil.nachweis.rechenwahl import stahlbezuege, staehle
-from opencivil.querschnitt.zugseite import Zugseite
+from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung -- er steht in der
 #: Gleichung selbst.
@@ -103,43 +103,43 @@ class Kurvenbeiwerte:
     """
 
     h: float
-    statische_hoehen: Mapping[bool, float]
+    statische_hoehen: Mapping[Zugseite, float]
     """
-    Je Momentenrichtung (``True``: Zug unten) die statische Hoehe der
-    gezogenen Bewehrung (:func:`~opencivil.nachweis.querkraft.statische_hoehen`).
-    Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
+    Je Zugseite die statische Hoehe der gezogenen Bewehrung
+    (:func:`~opencivil.nachweis.querkraft.statische_hoehen`). Fehlt eine
+    Seite, liegt auf ihr keine Bewehrung.
     """
 
     einlage: float
     """Das groesste Mass der Einlage, Breite oder Hoehe."""
 
     tau_cd: float
-    zugstahl: Mapping[bool, Tuple[float, float]]
+    zugstahl: Mapping[Zugseite, Tuple[float, float]]
     """
-    Je Momentenrichtung (``True``: Zug unten) ``(f_yd, E_s)`` des Stahls der
-    gezogenen Seite -- unten und oben duerfen verschiedene Staehle liegen.
-    Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
+    Je Zugseite ``(f_yd, E_s)`` des Stahls, der dort liegt -- unten und oben
+    duerfen verschiedene Staehle liegen. Fehlt eine Seite, liegt auf ihr
+    keine Bewehrung.
     """
 
     k_g: float
 
-    def hoehen(self, moment_positiv: bool) -> Optional[Tuple[float, float]]:
-        """``(d, d_v)`` fuer diese Momentenrichtung -- ``None`` ohne Zugbewehrung."""
-        d = self.statische_hoehen.get(moment_positiv)
+    def hoehen(self, seite: Zugseite) -> Optional[Tuple[float, float]]:
+        """``(d, d_v)`` fuer diese Zugseite -- ``None`` ohne Zugbewehrung."""
+        d = self.statische_hoehen.get(seite)
         if d is None:
             return None
         return d, wirksame_hoehe(d, self.einlage)
 
-    def widerstand(self, moment_positiv: bool, *, M_Ed: float, N_Ed: float, m_Rd: float,
+    def widerstand(self, seite: Zugseite, *, M_Ed: float, N_Ed: float, m_Rd: float,
                    index: str = "Rd") -> Widerstandspunkt:
         """
-        Der Widerstand der Zugseite ``moment_positiv`` bei diesem Moment und
+        Der Widerstand der Zugseite ``seite`` bei diesem Moment und
         dieser Normalkraft (:func:`widerstand`) -- fuer die Faelle, die Kurve
         und die Kennzahlen der Platte dieselbe Rechnung. Nur fuer eine Seite
         mit Zugbewehrung (:meth:`hoehen`).
         """
-        d, d_v = self.hoehen(moment_positiv)
-        f_yd, E_s = self.zugstahl[moment_positiv]
+        d, d_v = self.hoehen(seite)
+        f_yd, E_s = self.zugstahl[seite]
         return widerstand(M_Ed=M_Ed, N_Ed=N_Ed, h=self.h, d=d, d_v=d_v, tau_cd=self.tau_cd,
                           f_yd=f_yd, E_s=E_s, k_g=self.k_g, m_Rd=m_Rd, index=index)
 
@@ -338,11 +338,9 @@ class BefundOhneBuegel:
 
         :param N_Ed: eingestellte Normalkraft in N, Zug positiv.
         """
-        return {"N_Ed": N_Ed,
-                "aeste": [ast for ast in (self._ast(N_Ed, True),
-                                          self._ast(N_Ed, False)) if ast]}
+        return {"N_Ed": N_Ed, "aeste": [ast for ast in (self._ast(N_Ed, s) for s in UM_Y) if ast]}
 
-    def _ast(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]:
+    def _ast(self, N_Ed: float, seite: Zugseite) -> Optional[dict]:
         """
         Ein Ast der Kurve. ``None``, wenn es ihn nicht gibt.
 
@@ -350,10 +348,10 @@ class BefundOhneBuegel:
         oder die Normalkraft ausserhalb der Resistenzlinie faellt -- in beiden
         Faellen waere jeder gezeichnete Widerstand erfunden.
         """
-        hoehen = self.beiwerte.hoehen(moment_positiv)
+        hoehen = self.beiwerte.hoehen(seite)
         if hoehen is None:
             return None
-        m_Rd = self.mn.moment_bei(N_Ed, positiv=moment_positiv)
+        m_Rd = self.mn.moment_bei(N_Ed, positiv=seite.positiv)
         if not m_Rd or m_Rd <= 0.0:
             return None
 
@@ -368,15 +366,13 @@ class BefundOhneBuegel:
             {bis * i / (KURVENPUNKTE - 1) for i in range(KURVENPUNKTE)}
             | {m_Rd, m_Rd + SPRUNGSCHRITT})
 
-        vz = 1.0 if moment_positiv else -1.0
+        vz = seite.vorzeichen
         punkte = []
         for M_Ed in stellen:
-            p = self.beiwerte.widerstand(moment_positiv, M_Ed=M_Ed, N_Ed=N_Ed, m_Rd=m_Rd,
-                                         index=self.index)
+            p = self.beiwerte.widerstand(seite, M_Ed=M_Ed, N_Ed=N_Ed, m_Rd=m_Rd, index=self.index)
             punkte.append((vz * M_Ed, p.v_Rd, p.plastisch))
 
-        return {"punkte": punkte, "m_Rd": vz * m_Rd, "d": d, "d_v": d_v,
-                "moment_positiv": moment_positiv}
+        return {"punkte": punkte, "m_Rd": vz * m_Rd, "d": d, "d_v": d_v, "seite": seite.value}
 
 
 @dataclass
@@ -424,12 +420,12 @@ class QuerkraftOhneBuegel(Querkraft):
 
     # -- Was Fall und Kennzahl teilen ------------------------------------------
 
-    def zugstahl(self, e: Eingaben, moment_positiv: bool) -> Tuple[Wert, Wert]:
+    def zugstahl(self, e: Eingaben, seite: Zugseite) -> Tuple[Wert, Wert]:
         """
         ``f_yd`` und ``E_s`` des Stahls der gezogenen Seite -- unten und oben
         duerfen verschiedene liegen, eine Seite hat nur einen.
         """
-        stahl = zugposten(self.posten, moment_positiv)[0].lage.stahl
+        stahl = zugposten(self.posten, seite)[0].lage.stahl
         return e[stahl.eingabename("f_yd")], e[stahl.eingabename("E_s")]
 
     def kurvenbeiwerte(self, e: Eingaben, k_g: float) -> Kurvenbeiwerte:
@@ -440,9 +436,9 @@ class QuerkraftOhneBuegel(Querkraft):
         """
         hoehen = statische_hoehen(e, self.posten)
         zugstahl = {}
-        for positiv in hoehen:
-            f_yd, E_s = self.zugstahl(e, positiv)
-            zugstahl[positiv] = (f_yd.groesse.si, E_s.groesse.si)
+        for seite in hoehen:
+            f_yd, E_s = self.zugstahl(e, seite)
+            zugstahl[seite] = (f_yd.groesse.si, E_s.groesse.si)
         return Kurvenbeiwerte(h=e.g("h").si, statische_hoehen=hoehen,
                               einlage=e.g("einlagenhoehe").si, tau_cd=e.g("tau_cd").si,
                               zugstahl=zugstahl, k_g=k_g)
@@ -479,9 +475,9 @@ class QuerkraftOhneBuegel(Querkraft):
         # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und ohne d
         # keinen Querkraftwiderstand. Frueher wurde hier die gedrueckte Seite
         # herangezogen und lieferte eine Zahl, die keine statische Hoehe ist.
-        positiv = M_Ed >= 0
-        erg.zugposten = tuple(zugposten(self.posten, positiv))
-        hoehen = w.hoehen(positiv)
+        seite = Zugseite.aus_moment(M_Ed)
+        erg.zugposten = tuple(zugposten(self.posten, seite))
+        hoehen = w.hoehen(seite)
         if hoehen is None:
             erg.begruendung = _ohne_zugbewehrung(M_Ed)
             return erg
@@ -489,8 +485,7 @@ class QuerkraftOhneBuegel(Querkraft):
 
         # Zug braucht keinen Sonderfall: er macht m_Dd negativ (siehe
         # widerstand). Frueher setzte hier einer v_Rd kurzerhand auf null.
-        punkt = w.widerstand(positiv, M_Ed=M_Ed, N_Ed=N_Ed, m_Rd=m_Rd,
-                             index=self.mn.wahl.index)
+        punkt = w.widerstand(seite, M_Ed=M_Ed, N_Ed=N_Ed, m_Rd=m_Rd, index=self.mn.wahl.index)
         erg.m_Dd = punkt.m_Dd
         erg.eps_v = punkt.eps_v
         erg.k_d = punkt.k_d
@@ -595,7 +590,7 @@ class QuerkraftOhneBuegel(Querkraft):
         idx = self.mn.wahl.index
         m_Rd = werte.moment("m_Rd", f"m_{{{idx}}}(N_{{Ed}})", erg.m_Rd)
         eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
-        f_yd, E_s = self.zugstahl(e, M_Ed >= 0)
+        f_yd, E_s = self.zugstahl(e, Zugseite.aus_moment(M_Ed))
         stahl = {"f_yd": f_yd, "E_s": E_s}
         if erg.eps_v == 0.0:
             p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "

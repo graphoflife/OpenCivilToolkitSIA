@@ -278,7 +278,7 @@ class ModulAusAnalyse:
     def paar(self, M: float, wert: Callable[[str], float],
              wahl: Rechenwahl) -> Tuple[Optional[Paar], str, str]:
         """Das Paar zur Zugseite von ``M``, wie sie heisst -- ohne Paar warum."""
-        seite = Zugseite.UNTEN if M >= 0.0 else Zugseite.OBEN
+        seite = Zugseite.aus_moment(M)
         paar = schnittpaar(self.analyse, seite, wert, wahl)
         grund = "" if paar else f"der Querschnitt hat keine Bewehrung – {OHNE_BEWEHRUNG}"
         return paar, seite.beschriftung, grund

@@ -326,7 +326,7 @@ class QuerkraftMitBuegeln(Querkraft):
         return Ausfuehrung(ergebnis, urteile, befund)
 
     def _einen_fall_buegel(self, fall: Querkraftfall, w: Buegelwerte,
-                           hoehen: Mapping[bool, float]) -> ErgebnisMitBuegeln:
+                           hoehen: Mapping[Zugseite, float]) -> ErgebnisMitBuegeln:
         erg = ErgebnisMitBuegeln(fall=fall)
         M_Ed, N_Ed = fall.M_Ed.si, fall.N_Ed.si
 
@@ -339,8 +339,9 @@ class QuerkraftMitBuegeln(Querkraft):
                 "in mm.")
             return erg
 
-        erg.zugposten = tuple(zugposten(self.posten, M_Ed >= 0))
-        d = hoehen.get(M_Ed >= 0)
+        seite = Zugseite.aus_moment(M_Ed)
+        erg.zugposten = tuple(zugposten(self.posten, seite))
+        d = hoehen.get(seite)
         if d is None:
             erg.begruendung = _ohne_zugbewehrung(M_Ed)
             return erg

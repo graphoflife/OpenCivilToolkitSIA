@@ -82,6 +82,7 @@ from opencivil.querschnitt.fasern import (
 from opencivil.querschnitt.gesetzwahl import REFERENZ_KRIECHEN, wirksamer_modul
 from opencivil.querschnitt.lagenaufbau import schwerpunkt
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
+from opencivil.querschnitt.zugseite import Zugseite
 
 #: Obergrenze der Schritte, mit denen :meth:`Faserloeser._rand` den Rand des
 #: Gleichgewichts sucht; die Suchen nach der Ebene haben ihre eigene
@@ -140,11 +141,11 @@ class Stahllage:
     nummer: int = 0
     """Nur zur Zuordnung in der Mitschrift."""
 
-    von_unten: Optional[bool] = None
+    seite: Optional[Zugseite] = None
     """
-    Ob die Lage zur unteren Seite gehoert -- bei der Platte die 1. und 2.
-    Lage (:attr:`Bewehrungslage.von_unten`). Ohne Angabe laesst sie sich
-    nicht je Seite zusammenfassen (:func:`je_seite`).
+    Die Seite, an der die Lage liegt -- bei der Platte unten die 1. und 2.
+    Lage (:attr:`~opencivil.querschnitt.platte.Bewehrungslage.seite`). Ohne
+    Angabe laesst sie sich nicht je Seite zusammenfassen (:func:`je_seite`).
     """
 
     text: str = ""
@@ -173,10 +174,10 @@ def gemeinsamer_index(teile: Sequence[Stahllage]) -> str:
     return staemme.pop() if len(staemme) == 1 else ""
 
 
-def je_seite(lagen: Sequence[Stahllage]) -> Dict[bool, Stahllage]:
+def je_seite(lagen: Sequence[Stahllage]) -> Dict[Zugseite, Stahllage]:
     """
     Je Seite eine Lage im Schwerpunkt ihrer Flaechen, unter
-    :attr:`Stahllage.von_unten` -- die eine Regel fuer den Loeser in der
+    :attr:`Stahllage.seite` -- die eine Regel fuer den Loeser in der
     Handrechnung (:meth:`~opencivil.nachweis.rechenwahl.Gesetze.lagen`) und die
     Resistenzlinie aus Handrechnung (:func:`~opencivil.nachweis.handrechnung.seiten`).
     So rechnen beide «derselbe Querschnitt», wie
@@ -197,24 +198,24 @@ def je_seite(lagen: Sequence[Stahllage]) -> Dict[bool, Stahllage]:
     und eine leere Seite fiel hier weg, dort stand sie mit ihrer Hoehe. Die
     zusammengefasste Lage des Loesers hatte keinen Namen.
     """
-    ohne = [l.nummer for l in lagen if l.von_unten is None]
+    ohne = [l.nummer for l in lagen if l.seite is None]
     if ohne:
         raise ValueError(
             f"Je Seite zusammenfassen geht nur mit Lagen, die ihre Seite kennen – "
             f"{len(ohne)} kennen sie nicht.")
-    heraus: Dict[bool, Stahllage] = {}
-    for unten in (True, False):
-        teile = tuple(l for l in lagen if l.von_unten is unten and l.a_s > 0.0)
+    heraus: Dict[Zugseite, Stahllage] = {}
+    for seite in Zugseite:
+        teile = tuple(l for l in lagen if l.seite is seite and l.a_s > 0.0)
         if not teile:
             continue
         if any(l.stahl != teile[0].stahl for l in teile):
             raise ValueError(
-                f"Auf der {'unteren' if unten else 'oberen'} Seite liegen verschiedene "
-                f"Stähle – je Seite eine Lage im Schwerpunkt gibt es nur mit einem.")
+                f"{seite.value.capitalize()} liegen verschiedene Stähle – je Seite eine Lage "
+                f"im Schwerpunkt gibt es nur mit einem.")
         a_s, z = schwerpunkt((l.a_s, l.z) for l in teile)
-        heraus[unten] = Stahllage(
+        heraus[seite] = Stahllage(
             a_s=a_s, z=z, stahl=teile[0].stahl, sorte=teile[0].sorte, nummer=teile[0].nummer,
-            von_unten=unten, text=" + ".join(l.text for l in teile),
+            seite=seite, text=" + ".join(l.text for l in teile),
             index=gemeinsamer_index(teile), teile=teile)
     return heraus
 

@@ -18,13 +18,14 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.querschnitt.werkstoffgesetz import (
     BetonUngerissen, Spannungsblock, Stahlgesetz, StahlNurZug,
 )
+from opencivil.querschnitt.zugseite import Zugseite
 
 W = Betonkennwerte(f_c=20e6, E_c=33.6e9, eps_c1d=0.002, eps_c2d=0.0035)
 STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
 
-LAGEN = [Stahllage(a_s=1696e-6, z=0.249, stahl=STAHL, nummer=2, von_unten=True),
-         Stahllage(a_s=754e-6, z=0.243, stahl=STAHL, nummer=2, von_unten=True),
-         Stahllage(a_s=754e-6, z=0.048, stahl=STAHL, nummer=3, von_unten=False)]
+LAGEN = [Stahllage(a_s=1696e-6, z=0.249, stahl=STAHL, nummer=2, seite=Zugseite.UNTEN),
+         Stahllage(a_s=754e-6, z=0.243, stahl=STAHL, nummer=2, seite=Zugseite.UNTEN),
+         Stahllage(a_s=754e-6, z=0.048, stahl=STAHL, nummer=3, seite=Zugseite.OBEN)]
 
 
 class TestRechenarten(unittest.TestCase):
@@ -181,7 +182,7 @@ class TestStahl(unittest.TestCase):
 
     def test_je_seite_nur_mit_bekannter_seite(self):
         """
-        Die Seite sagt die Lage, nicht die Tiefe -- ohne ``von_unten`` ist
+        Die Seite sagt die Lage, nicht die Tiefe -- ohne ``seite`` ist
         es ein Fehler. Bis 2026-11-10 entschied dann die Tiefe gegen h/2,
         die Handrechnung aber nie.
         """
@@ -191,9 +192,9 @@ class TestStahl(unittest.TestCase):
 
     def test_je_seite_mit_namen_und_teilen(self):
         seiten = je_seite(LAGEN)
-        self.assertEqual(list(seiten), [True, False])
-        self.assertEqual(seiten[True].teile, tuple(LAGEN[:2]))
-        self.assertEqual(seiten[False].teile, (LAGEN[2],))
+        self.assertEqual(list(seiten), [Zugseite.UNTEN, Zugseite.OBEN])
+        self.assertEqual(seiten[Zugseite.UNTEN].teile, tuple(LAGEN[:2]))
+        self.assertEqual(seiten[Zugseite.OBEN].teile, (LAGEN[2],))
 
 
 class TestBezuege(unittest.TestCase):

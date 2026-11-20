@@ -247,7 +247,7 @@ class Plattenkennzahlen(Prozedur):
     def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll, seite: Zugseite,
                 d: float, d_v: Optional[float] = None) -> Tuple[Wert, Optional[Wert]]:
         """``d`` der gezogenen Seite und, ohne Buegel, ``d_v`` -- hergeleitet wie im Querkraftnachweis."""
-        return protokoll_hoehen(p, werte, e, zugposten(self.posten, seite.positiv), d, d_v,
+        return protokoll_hoehen(p, werte, e, zugposten(self.posten, seite), d, d_v,
                                 seite=seite, zeichen=seite.zeichen)
 
     def _ohne_buegel(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
@@ -268,13 +268,13 @@ class Plattenkennzahlen(Prozedur):
         beim_widerstand: List[Wert] = []
         for seite in UM_Y:
             hoch = seite.zeichen
-            hoehen = w.hoehen(seite.positiv)
+            hoehen = w.hoehen(seite)
             if hoehen is None:
                 p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein Widerstand dieser Seite.")
                 continue
             d, d_v = self._hoehen(e, werte, p, seite, *hoehen)
             m_Rd = momente[seite]
-            null, voll = (w.widerstand(seite.positiv, M_Ed=m_Ed, N_Ed=0.0, m_Rd=m_Rd)
+            null, voll = (w.widerstand(seite, M_Ed=m_Ed, N_Ed=0.0, m_Rd=m_Rd)
                           for m_Ed in (0.0, m_Rd))
             v_null = werte.wert(f"V_null_{hoch}", rf"V_{{Rd}}^{{{hoch}}}(M_{{Ed}} = 0)",
                                 Groesse.aus_si(null.v_Rd, KN_PRO_M), 1)
@@ -293,7 +293,7 @@ class Plattenkennzahlen(Prozedur):
                      titel=f"Zug {seite}, M_Ed = 0: ε_v = 0, k_d = 1",
                      referenz=f"{REFERENZ_OHNE_BUEGEL}, (36)",
                      name="Querkraftwiderstand ohne Bügel bei M_Ed = 0")
-            f_yd, E_s = self.querkraft.zugstahl(e, seite.positiv)
+            f_yd, E_s = self.querkraft.zugstahl(e, seite)
             eps_v = werte.dehnung(f"eps_v_{hoch}", rf"\varepsilon_v^{{{hoch}}}", voll.eps_v,
                                   stellen=3)
             p.formel(eps_v, r"\frac{@f_yd}{@E_s}", {"f_yd": f_yd, "E_s": E_s},
@@ -325,11 +325,11 @@ class Plattenkennzahlen(Prozedur):
         teile: List[Wert] = []
         for seite in UM_Y:
             hoch = seite.zeichen
-            if seite.positiv not in hoehen:
+            if seite not in hoehen:
                 p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein Widerstand dieser Seite.")
                 continue
-            d, _ = self._hoehen(e, werte, p, seite, hoehen[seite.positiv])
-            suche = w.suche(hoehen[seite.positiv], zugkraft=False)
+            d, _ = self._hoehen(e, werte, p, seite, hoehen[seite])
+            suche = w.suche(hoehen[seite], zugkraft=False)
             seite_wert = werte.wert(f"V_{hoch}", rf"V_{{Rd}}^{{{hoch}}}(\alpha_{{opt}})",
                                     Groesse.aus_si(suche.massgebend.V_Rd, KN_PRO_M), 1)
             protokoll_mit_buegeln(p, werte, seite_wert, suche.massgebend, e=e, s_y=s_y, d=d,

@@ -1,5 +1,5 @@
 ---
-erzeugt: 48f0db27ec3b
+erzeugt: b8b7a2dcf76b
 art: modul
 tags: [modul]
 ---
@@ -104,6 +104,15 @@ def positiv(self) -> bool
 
 Ob ein positives Moment sie zieht: M_y > 0 zieht unten, M_z > 0 links.
 
+#### Zugseite.vorzeichen
+
+```python
+@property
+def vorzeichen(self) -> float
+```
+
+Das Vorzeichen eines Moments, das sie zieht: +1 fuer Zug unten und links, sonst -1.
+
 #### Zugseite.zeichen
 
 ```python
@@ -161,6 +170,7 @@ die waagrechte Nulllinie einer einachsigen Rechnung es braucht.
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
+- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]

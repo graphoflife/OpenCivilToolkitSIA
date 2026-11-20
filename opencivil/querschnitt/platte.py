@@ -189,19 +189,17 @@ class Bewehrungslage:
             raise ValueError(f"Lagennummer {self.nummer} liegt ausserhalb 1..{LAGENZAHL}.")
 
     @property
-    def von_unten(self) -> bool:
-        """Lagen 1 und 2 werden von der Unterkante aus gestapelt."""
-        return self.nummer <= 2
-
-    @property
     def seite(self) -> Zugseite:
-        """Die Seite, an der sie liegt -- und die ein Moment ziehen muss, damit sie traegt."""
-        return Zugseite.UNTEN if self.von_unten else Zugseite.OBEN
+        """
+        Die Seite, an der sie liegt -- und die ein Moment ziehen muss, damit
+        sie traegt: Lagen 1 und 2 unten, von der Unterkante aus gestapelt.
+        """
+        return Zugseite.UNTEN if self.nummer <= 2 else Zugseite.OBEN
 
     @property
     def stapelrang(self) -> int:
         """0 = aussen (direkt auf der Überdeckung), 1 = darüber."""
-        return self.nummer - 1 if self.von_unten else LAGENZAHL - self.nummer
+        return self.nummer - 1 if self.seite is Zugseite.UNTEN else LAGENZAHL - self.nummer
 
     @property
     def vorhanden(self) -> bool:

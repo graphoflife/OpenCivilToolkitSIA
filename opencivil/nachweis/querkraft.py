@@ -49,39 +49,40 @@ from opencivil.querschnitt.lagenaufbau import (
     Postenbezug, lage_aus_posten, protokoll_schwerpunkt, protokoll_statische_hoehe,
 )
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
-from opencivil.querschnitt.zugseite import Zugseite
+from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 
 #: Wo die wirksame Hoehe und ihre Einlage stehen.
 REFERENZ_EINLAGE = "SIA 262:2025, 4.3.3.2.9"
 
 
-def zugposten(posten: Sequence[Postenbezug], moment_positiv: bool) -> List[Postenbezug]:
+def zugposten(posten: Sequence[Postenbezug], seite: Zugseite) -> List[Postenbezug]:
     """
-    Die Posten der gezogenen Seite: bei positivem Moment die unteren, bei
-    negativem die oberen. **Nur sie zaehlen.** Wer alle nimmt, bekommt bei
+    Die Posten der gezogenen Seite -- bei positivem Moment die unteren
+    (:meth:`~opencivil.querschnitt.zugseite.Zugseite.aus_moment`). **Nur sie
+    zaehlen.** Wer alle nimmt, bekommt bei
     einseitiger Bewehrung eine Zahl, die gar keine statische Hoehe ist: eine
     Platte nur mit unterer Bewehrung lieferte fuers negative Moment
     ``h - 261 = 39 mm`` -- den Abstand der Unterkante zur *unteren* Lage.
     """
-    return [q for q in posten if q.lage.von_unten is moment_positiv]
+    return [q for q in posten if q.lage.seite is seite]
 
 
-def statische_hoehen(e: Eingaben, posten: Sequence[Postenbezug]) -> Dict[bool, float]:
+def statische_hoehen(e: Eingaben, posten: Sequence[Postenbezug]) -> Dict[Zugseite, float]:
     """
-    Je Momentenrichtung (``True``: Zug unten) die statische Hoehe der
+    Je Zugseite der Platte, unten und oben, die statische Hoehe der
     gezogenen Bewehrung, in m ab dem gedrueckten Rand -- im Schwerpunkt ihrer
     Posten (:func:`~opencivil.querschnitt.lagenaufbau.lage_aus_posten`). Fuer
     den Nachweis und die Kennzahlen.
 
-    Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung. Dann gibt
-    es kein ``d``, und ohne ``d`` keinen Querkraftwiderstand.
+    Fehlt eine Seite, liegt auf ihr keine Bewehrung. Dann gibt es kein
+    ``d``, und ohne ``d`` keinen Querkraftwiderstand.
     """
-    hoehen: Dict[bool, float] = {}
-    for positiv in (True, False):
-        gezogen = zugposten(posten, positiv)
+    hoehen: Dict[Zugseite, float] = {}
+    for seite in UM_Y:
+        gezogen = zugposten(posten, seite)
         d = lage_aus_posten(e, gezogen)[2] if gezogen else None
         if d is not None:
-            hoehen[positiv] = d
+            hoehen[seite] = d
     return hoehen
 
 

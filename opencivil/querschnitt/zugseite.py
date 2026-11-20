@@ -76,6 +76,11 @@ class Zugseite(Wahl):
         return sum(self.moment) > 0.0
 
     @property
+    def vorzeichen(self) -> float:
+        """Das Vorzeichen eines Moments, das sie zieht: +1 fuer Zug unten und links, sonst -1."""
+        return 1.0 if self.positiv else -1.0
+
+    @property
     def zeichen(self) -> str:
         """Ihr Vorzeichen, wie es an Symbolen steht: M_Rd^+ fuer Zug unten."""
         return "+" if self.positiv else "-"

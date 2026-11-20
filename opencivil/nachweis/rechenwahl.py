@@ -171,7 +171,7 @@ def stahllagen(posten: Sequence[Postenbezug], wahl: Rechenwahl,
                 eps_ud=abs(wert(stahl.id_von("eps_ud"))))
         lagen.append(Stahllage(
             a_s=wert(q.as_def.id), z=wert(q.z_def.id), stahl=gesetze[stahl.id],
-            sorte=kennung_aus(stahl.id), nummer=q.lage.nummer, von_unten=q.lage.von_unten,
+            sorte=kennung_aus(stahl.id), nummer=q.lage.nummer, seite=q.lage.seite,
             text=q.bezeichnung, index=q.index))
     return lagen
 

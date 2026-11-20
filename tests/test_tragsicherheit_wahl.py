@@ -14,6 +14,7 @@ import unittest
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie, Handlinie
 from opencivil.projekt import Projekt, ProjektFehler, RechenwahlEintrag
+from opencivil.querschnitt.zugseite import Zugseite
 from tests.unfertig import meldung
 
 KENNUNG = "q1.x"
@@ -89,7 +90,8 @@ class TestCharakteristisch(unittest.TestCase):
         self.assertIn("m_{Rk}(N_{Ed})", t)
         sv = self.aufbau.feld("sproede")[KENNUNG]
         M = self.loesung.werte[f"{BASIS}.M_Rd_N0_pos"].groesse.si
-        unten = next(e for e in self.loesung.befund(sv).ergebnisse if e.lage.von_unten)
+        unten = next(e for e in self.loesung.befund(sv).ergebnisse
+                     if e.lage.seite is Zugseite.UNTEN)
         self.assertEqual(unten.M_Rd, M)
         self.assertIn("M_Rk(N_Ed = 0)", unten.begruendung)
 

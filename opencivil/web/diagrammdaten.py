@@ -123,7 +123,7 @@ def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict:
             "m_name": f"m_{nachweis.mn.wahl.index}",
             "aeste": [
                 {
-                    "moment_positiv": ast["moment_positiv"],
+                    "seite": ast["seite"],
                     "m_Rd": MV["M"].zahl(ast["m_Rd"]),
                     "punkte": [
                         {"M_Ed": MV["M"].zahl(M), "v_Rd": MV["v"].zahl(v), "plastisch": pl}

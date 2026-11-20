@@ -7,6 +7,33 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Eine Form für «welche Seite zieht»
+
+Welche Seite ein Moment zieht, stand in fünf Formen da (Punkt 3 der
+Durchsicht vom 2026-11-19): als `Zugseite`, als `von_unten` an den Lagen,
+als `moment_positiv` in der Querkraft, als `True` und `False` in
+Wörterbüchern und als Vorzeichen von M_Ed. Jetzt ist es überall die
+`Zugseite`.
+
+- Die Lage der Platte sagt ihre Seite an einer Stelle,
+  `Bewehrungslage.seite`: Lagen 1 und 2 unten. `von_unten` ist weg. Die
+  Stahllage trägt ihre Seite, und `je_seite` fasst nach ihr zusammen.
+- Die Querkraft fragt je Zugseite: `zugposten`, `statische_hoehen`, die
+  Kurvenbeiwerte, der Fall mit Bügeln. «Ein positives Moment zieht unten»
+  steht nur noch in `Zugseite.aus_moment`; vorher auch im Modul der
+  Spannungsanalyse und dreimal als `M_Ed >= 0` in der Querkraft.
+- Ein Ast der M-V-Kurve nennt seine Seite, «unten» oder «oben», statt
+  eines Ja/Nein.
+- `Zugseite.vorzeichen` ersetzt viermal «+1 oder −1» von Hand.
+
+Bewusst geblieben ist `positiv` an der Resistenzlinie (`kante`,
+`moment_bei`): ein Vorzeichen auf einer Achse – auch auf der der
+Normalkraft –, keine Seite.
+
+Warum: Ein Ja/Nein kann «links» nicht sagen. Was auf `je_seite` aufbaut,
+die Handrechnung, hing darum an der Platte. Die Seite als einzige Form ist
+auch die Vorbedingung für Punkt 4, die Platte als `interaktion.Querschnitt`.
+
 ## 2026-11-20 · Die Apps mit Zeichenfenster antworten gleich
 
 Querschnittsanalyse, Balkensystem und Decke hatten dasselbe dreimal

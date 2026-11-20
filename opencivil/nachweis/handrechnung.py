@@ -392,7 +392,7 @@ class Handrechnung:
         x = zug.a_s * zug.f_yd / (BLOCKANTEIL * self.b * self.f_cd)
         M = zug.a_s * zug.f_yd * (d.groesse.si - BLOCKANTEIL * x / 2.0)
 
-        vz, hoch, marke = (1.0 if seite.positiv else -1.0), seite.zeichen, seite.marke
+        vz, hoch, marke = seite.vorzeichen, seite.zeichen, seite.marke
         # Bei negativem Moment traegt die Formel selbst das Minus. Sonst stuende
         # eine Gleichung da, deren rechte Seite nicht ihr eigenes Ergebnis ist.
         minus = "" if seite.positiv else "-"
@@ -463,7 +463,7 @@ class Handrechnung:
         N = -D + zug.a_s * sigma
         M = D * (self.h / 2 - block / 2) + zug.a_s * sigma * (d - self.h / 2)
 
-        vz, hoch, marke = (1.0 if seite.positiv else -1.0), seite.zeichen, seite.marke
+        vz, hoch, marke = seite.vorzeichen, seite.zeichen, seite.marke
         minus = "" if seite.positiv else "-"
 
         w_x = self.werte.laenge(f"xh_{marke}", f"x^{{{hoch}}}", x, "Druckzonenhöhe")
@@ -562,9 +562,9 @@ def seiten(lagen: Sequence[Stahllage], *, saetze: Mapping[str, Werkstoffsatz],
     if not gefunden:
         raise ValueError("Ohne Bewehrung lässt sich nichts von Hand rechnen.")
     gebaut = {
-        unten: Lage(s.a_s, s.z, s.stahl.f_yd, s.stahl.E_s, s.text, index=s.index,
+        seite: Lage(s.a_s, s.z, s.stahl.f_yd, s.stahl.E_s, s.text, index=s.index,
                     stahl_index=stahl_index[s.sorte], teile=s.teile, satz=saetze[s.sorte])
-        for unten, s in gefunden.items()}
+        for seite, s in gefunden.items()}
     eine = next(iter(gebaut.values()))
     leer = Lage(0.0, 0.0, eine.f_yd, eine.E_s, "keine", satz=eine.satz)
-    return gebaut.get(True, leer), gebaut.get(False, leer)
+    return gebaut.get(Zugseite.UNTEN, leer), gebaut.get(Zugseite.OBEN, leer)

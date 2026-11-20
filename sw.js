@@ -111,7 +111,7 @@ const VORRAT = {
     "web/js/pf_zeichnung.js?v=c3bcabe521ec",
     "web/js/pfahl.js?v=930816b6e1e2",
     "web/js/platte.js?v=4cf167228a53",
-    "web/js/platte_bilder.js?v=66ca34b63d7e",
+    "web/js/platte_bilder.js?v=ef1dd33f21d8",
     "web/js/plattenkapitel.js?v=f62212e054df",
     "web/js/projekte.js?v=4cf72047989c",
     "web/js/python.js?v=12e29f4d7bdc",
@@ -127,8 +127,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=04a6b50b3e76",
-    "web/kern/notizbuch.json?v=32ee09c7b96b",
-    "web/kern/quellen.json?v=3e494f7ae8d6"
+    "web/kern/notizbuch.json?v=84572bea0746",
+    "web/kern/quellen.json?v=b301b8f81f9b"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

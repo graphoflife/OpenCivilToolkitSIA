@@ -18,7 +18,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dazu in Chrome prüfen, ob sich die Seite als App installieren lässt;
       verlangt Chrome ein PNG als Zeichen, schreibt ein kleines Skript ohne
       Fremdpakete die Bilder.
-- Danach die Umbauten 3, 4 und 8 der Durchsicht vom 2026-11-19.
+- Danach die Umbauten 4 und 8 der Durchsicht vom 2026-11-19.
 
 ## Offen
 
@@ -427,18 +427,17 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         jetzt im Kern (`opencivil/core/bereich.py`): ein `Mass` für beide
         Arten von Vorlagen samt Achsabstand, die Kennwerte von Hand und
         jedes Feld prüfen mit ihm und geben der Maske dieselbe Angabe.
-- [ ] **3. «Welche Seite zieht» in fünf Formen.** `Zugseite` ist der Typ;
-      daneben `positiv`, `moment_positiv` und `von_unten` als bool in 13
-      Signaturen (`Zugseite.positiv` wird 12-mal gelesen), Lagennummern und
-      Text. «Ein positives Moment zieht unten» steht in
-      `Zugseite.aus_moment` und noch zweimal (`modul.py` 281, versteckt in
-      `querkraft.py` 66). Ein bool kann «links» nicht sagen: darum bleibt,
-      was auf `je_seite` aufbaut (die Handrechnung), der Platte vorbehalten,
-      und die Bewehrungssuche fragt sechsmal selbst nach der Richtung.
-      Umbau: `Zugseite` als einzige Form -- `Bewehrungslage.seite` und
-      `Stahllage.seite` gespeichert, `je_seite` nach Zugseite, die Ränder
-      aus `Zugseite.raender`. Erweitert «Welche Seite x-Bewehrung hat»
-      (2026-10-18) und ist die Vorbedingung für 4.
+- [x] **3. «Welche Seite zieht» in fünf Formen.** Erledigt (2026-11-20):
+      `Zugseite` ist die einzige Form. Die Lage der Platte sagt ihre Seite
+      an einer Stelle (`Bewehrungslage.seite`), die Stahllage trägt sie
+      (`Stahllage.seite`), `je_seite`, `zugposten`, `statische_hoehen` und
+      die Kurvenbeiwerte der Querkraft gehen nach ihr. «Ein positives
+      Moment zieht unten» steht nur in `Zugseite.aus_moment`, das
+      Vorzeichen in `Zugseite.vorzeichen`. Bewusst geblieben: `positiv` an
+      der Resistenzlinie (`kante`, `moment_bei`) ist ein Vorzeichen auf
+      einer Achse, auch der Normalkraft, keine Seite; die Bewehrungssuche
+      fragt nach der Tragrichtung x oder y, nicht nach der Seite. Siehe
+      [[Entwicklung]].
 - [ ] **4. Die Platte rechnet sich als Rechteck ein zweites Mal** --
       der grösste Gewinn, Entscheid des Benutzers. `dehnungsfaecher.grenzen`
       und `interaktion._grenzen` bauen dieselbe Grenzregel (der Dateikopf

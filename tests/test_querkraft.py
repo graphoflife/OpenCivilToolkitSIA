@@ -6,6 +6,7 @@ from opencivil.core.einheiten import EINHEITSLOS, KNM, KN_PRO_M
 from opencivil.nachweis import querkraft_buegel, querkraft_ohne_buegel
 from opencivil.querschnitt import fachwerk
 from opencivil.projekt import Projekt
+from opencivil.querschnitt.zugseite import Zugseite
 
 
 def projekt_mit_querkraft(**abweichungen) -> Projekt:
@@ -322,18 +323,18 @@ class TestQuerkraftkurve(unittest.TestCase):
     def befund(self, **abweichungen):
         return querkraftbefund(projekt_mit_querkraft(**abweichungen))
 
-    def ast(self, kurve, positiv):
-        return next((a for a in kurve["aeste"] if a["moment_positiv"] is positiv), None)
+    def ast(self, kurve, seite):
+        return next((a for a in kurve["aeste"] if a["seite"] == seite), None)
 
     def test_beide_aeste_in_einem_bild(self):
         """Das Beispiel hat Feld und Stütze, also Zug unten und Zug oben."""
         kurve = self.befund().kurve(0.0)
-        self.assertEqual([a["moment_positiv"] for a in kurve["aeste"]], [True, False])
+        self.assertEqual([a["seite"] for a in kurve["aeste"]], ["unten", "oben"])
 
     def test_der_negative_ast_liegt_links(self):
         kurve = self.befund().kurve(0.0)
         for ast in kurve["aeste"]:
-            vz = 1 if ast["moment_positiv"] else -1
+            vz = 1 if ast["seite"] == "unten" else -1
             self.assertTrue(all(M * vz >= 0 for M, _, _ in ast["punkte"]))
             self.assertGreater(ast["m_Rd"] * vz, 0.0)
 
@@ -344,8 +345,8 @@ class TestQuerkraftkurve(unittest.TestCase):
         Seiten.
         """
         kurve = self.befund().kurve(0.0)
-        unten = self.ast(kurve, True)["d"]
-        oben = self.ast(kurve, False)["d"]
+        unten = self.ast(kurve, "unten")["d"]
+        oben = self.ast(kurve, "oben")["d"]
         # Unten ⌀18 bei 249 mm und die Zulage ⌀12 3 mm weiter innen, oben ⌀12.
         self.assertAlmostEqual(unten, 0.249 - 0.003 * 144 / 468, places=9)
         self.assertAlmostEqual(oben, 0.252, places=6)
@@ -358,13 +359,13 @@ class TestQuerkraftkurve(unittest.TestCase):
         """
         from opencivil.nachweis.querkraft_ohne_buegel import KURVENPUNKTE, KURVENZUGABE
 
-        ast = self.ast(self.befund().kurve(0.0), True)
+        ast = self.ast(self.befund().kurve(0.0), "unten")
         self.assertEqual(len(ast["punkte"]), KURVENPUNKTE + 2)
         self.assertAlmostEqual(ast["punkte"][0][0], 0.0)
         self.assertAlmostEqual(ast["punkte"][-1][0], ast["m_Rd"] + KURVENZUGABE)
 
     def test_der_sprung_liegt_genau_auf_m_rd(self):
-        ast = self.ast(self.befund().kurve(0.0), True)
+        ast = self.ast(self.befund().kurve(0.0), "unten")
         letzter_elastisch = [M for M, _, p in ast["punkte"] if not p][-1]
         erster_plastisch = [M for M, _, p in ast["punkte"] if p][0]
         self.assertAlmostEqual(letzter_elastisch, ast["m_Rd"], places=9)
@@ -377,10 +378,10 @@ class TestQuerkraftkurve(unittest.TestCase):
         """
         qk = self.befund()
         erg = qk.ergebnisse[0]                       # Feld: M_Ed = 100, N_Ed = 0
-        ast = self.ast(qk.kurve(erg.fall.N_Ed.si), True)
+        ast = self.ast(qk.kurve(erg.fall.N_Ed.si), "unten")
 
-        d, d_v = qk.beiwerte.hoehen(True)
-        f_yd, E_s = qk.beiwerte.zugstahl[True]
+        d, d_v = qk.beiwerte.hoehen(Zugseite.UNTEN)
+        f_yd, E_s = qk.beiwerte.zugstahl[Zugseite.UNTEN]
         punkt = querkraft_ohne_buegel.widerstand(
             M_Ed=erg.fall.M_Ed.si, N_Ed=erg.fall.N_Ed.si, h=qk.beiwerte.h,
             d=d, d_v=d_v, tau_cd=qk.beiwerte.tau_cd, f_yd=f_yd,
@@ -392,7 +393,7 @@ class TestQuerkraftkurve(unittest.TestCase):
         Über m_Rd fliesst die Bewehrung: eps_v springt auf 1.5·f_yd/E_s und
         bleibt dort. Der Widerstand fällt einmal und läuft dann waagrecht.
         """
-        ast = self.ast(self.befund().kurve(0.0), True)
+        ast = self.ast(self.befund().kurve(0.0), "unten")
         elastisch = [v for _, v, plastisch in ast["punkte"] if not plastisch]
         plastisch = [v for _, v, p in ast["punkte"] if p]
 
@@ -407,10 +408,10 @@ class TestQuerkraftkurve(unittest.TestCase):
         from opencivil.nachweis.querkraft_ohne_buegel import PLASTISCH
 
         qk = self.befund()
-        ast = self.ast(qk.kurve(0.0), True)
-        d, d_v = qk.beiwerte.hoehen(True)
+        ast = self.ast(qk.kurve(0.0), "unten")
+        d, d_v = qk.beiwerte.hoehen(Zugseite.UNTEN)
 
-        f_yd, E_s = qk.beiwerte.zugstahl[True]
+        f_yd, E_s = qk.beiwerte.zugstahl[Zugseite.UNTEN]
         eps_v = PLASTISCH * f_yd / E_s
         k_d = 1.0 / (1.0 + eps_v * d * 1e3 * qk.beiwerte.k_g)
         erwartet = k_d * (qk.beiwerte.tau_cd / 1e6) * d_v * 1e3 * 1e3
@@ -419,15 +420,15 @@ class TestQuerkraftkurve(unittest.TestCase):
         self.assertAlmostEqual(plastisch[0], erwartet, places=6)
 
     def test_ohne_moment_ist_der_widerstand_am_groessten(self):
-        ast = self.ast(self.befund().kurve(0.0), True)
+        ast = self.ast(self.befund().kurve(0.0), "unten")
         werte = [v for _, v, _ in ast["punkte"]]
         self.assertEqual(werte[0], max(werte))
 
     def test_druck_hebt_die_ganze_kurve(self):
         """Eine Normaldruckkraft entlastet über m_Dd und hebt m_Rd."""
         qk = self.befund()
-        ohne = self.ast(qk.kurve(0.0), True)
-        mit = self.ast(qk.kurve(-300e3), True)
+        ohne = self.ast(qk.kurve(0.0), "unten")
+        mit = self.ast(qk.kurve(-300e3), "unten")
         self.assertGreater(mit["m_Rd"], ohne["m_Rd"])
 
     def test_ohne_zugbewehrung_gibt_es_den_ast_nicht(self):
@@ -440,7 +441,7 @@ class TestQuerkraftkurve(unittest.TestCase):
             lage.grund.durchmesser = 0.0
             lage.zulage.durchmesser = 0.0
         kurve = querkraftbefund(nur_unten).kurve(0.0)
-        self.assertEqual([ast["moment_positiv"] for ast in kurve["aeste"]], [True])
+        self.assertEqual([ast["seite"] for ast in kurve["aeste"]], ["unten"])
 
     def test_ausserhalb_der_resistenzlinie_gibt_es_keinen_ast(self):
         kurve = self.befund().kurve(99_000e3)

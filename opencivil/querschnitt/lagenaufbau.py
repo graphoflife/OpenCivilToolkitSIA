@@ -289,14 +289,12 @@ class Lagenaufbau(Prozedur):
         # Huellen je Seite, von aussen nach innen. Jede Lage kommt nur einmal
         # vor, auch wenn sie zwei Posten traegt -- nach Nummer entdoppelt, weil
         # Bewehrungslage als veraenderliche Datenklasse nicht hashbar ist.
-        huelle = {True: e.g("c_nom_unten"), False: e.g("c_nom_oben")}
+        huelle = {Zugseite.UNTEN: e.g("c_nom_unten"), Zugseite.OBEN: e.g("c_nom_oben")}
         lagen_nach_nummer = {q.lage.nummer: q.lage for q in self.posten}
-        raender: Dict[Tuple[bool, int], Groesse] = {}
-        for lage in sorted(lagen_nach_nummer.values(),
-                           key=lambda l: (not l.von_unten, l.stapelrang)):
-            schluessel = (lage.von_unten, lage.stapelrang)
-            raender[schluessel] = huelle[lage.von_unten]
-            huelle[lage.von_unten] = huelle[lage.von_unten] + lage.groesster_durchmesser
+        raender: Dict[Tuple[Zugseite, int], Groesse] = {}
+        for lage in sorted(lagen_nach_nummer.values(), key=lambda l: l.stapelrang):
+            raender[(lage.seite, lage.stapelrang)] = huelle[lage.seite]
+            huelle[lage.seite] = huelle[lage.seite] + lage.groesster_durchmesser
 
         # Der dickste Stab je Lage bestimmt, wo die innere Kante liegt.
         dickster: Dict[int, Groesse] = {}
@@ -316,14 +314,14 @@ class Lagenaufbau(Prozedur):
         kanten: Dict[int, Tuple[float, float]] = {}
         for q in self.posten:
             phi = e.g(q.name("phi"))
-            huellebene = raender[(q.lage.von_unten, q.lage.stapelrang)]
+            huellebene = raender[(q.lage.seite, q.lage.stapelrang)]
             if q.lage.unguenstig:
                 # Innere Kanten fluchten: der dünnere Stab rückt zur Mitte.
                 rand = huellebene + dickster[q.lage.nummer] - phi / 2.0
             else:
                 # Äussere Kanten fluchten, jeder um seinen eigenen Halbmesser.
                 rand = huellebene + phi / 2.0
-            z = h - rand if q.lage.von_unten else rand
+            z = h - rand if q.lage.seite is Zugseite.UNTEN else rand
 
             oben, unten = z.si - phi.si / 2.0, z.si + phi.si / 2.0
             vorher = kanten.get(q.lage.nummer)

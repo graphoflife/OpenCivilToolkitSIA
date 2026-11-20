@@ -212,7 +212,7 @@ class KennzahlenQA(Prozedur):
             punkt = self.analyse.biegung.bei_reiner_biegung(q, seite)
             betrag = 0.0 if punkt is None else self.analyse.biegung.betrag(punkt.M_y, punkt.M_z)
             p.wert(self._belegen(ergebnis, f"M_Rd_{seite.value}",
-                                 betrag if seite.positiv else -betrag),
+                                 seite.vorzeichen * betrag),
                    titel=f"Momentenwiderstand bei N_Ed = 0, {seite.beschriftung}")
             if seite not in self.bewehrt:
                 continue

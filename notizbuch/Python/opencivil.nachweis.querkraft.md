@@ -1,5 +1,5 @@
 ---
-erzeugt: 3da769f462ea
+erzeugt: 3485a173dd9d
 art: modul
 tags: [modul]
 ---
@@ -46,11 +46,12 @@ Richtung -- Grundbewehrung, Zulage, auch mehrere Lagen (SIA 262:2025,
 ### zugposten
 
 ```python
-def zugposten(posten: Sequence[Postenbezug], moment_positiv: bool) -> List[Postenbezug]
+def zugposten(posten: Sequence[Postenbezug], seite: Zugseite) -> List[Postenbezug]
 ```
 
-Die Posten der gezogenen Seite: bei positivem Moment die unteren, bei
-negativem die oberen. **Nur sie zaehlen.** Wer alle nimmt, bekommt bei
+Die Posten der gezogenen Seite -- bei positivem Moment die unteren
+([[opencivil.querschnitt.zugseite#Zugseite.aus_moment|aus_moment]]). **Nur sie
+zaehlen.** Wer alle nimmt, bekommt bei
 einseitiger Bewehrung eine Zahl, die gar keine statische Hoehe ist: eine
 Platte nur mit unterer Bewehrung lieferte fuers negative Moment
 `h - 261 = 39 mm` -- den Abstand der Unterkante zur *unteren* Lage.
@@ -58,16 +59,16 @@ Platte nur mit unterer Bewehrung lieferte fuers negative Moment
 ### statische_hoehen
 
 ```python
-def statische_hoehen(e: Eingaben, posten: Sequence[Postenbezug]) -> Dict[bool, float]
+def statische_hoehen(e: Eingaben, posten: Sequence[Postenbezug]) -> Dict[Zugseite, float]
 ```
 
-Je Momentenrichtung (`True`: Zug unten) die statische Hoehe der
+Je Zugseite der Platte, unten und oben, die statische Hoehe der
 gezogenen Bewehrung, in m ab dem gedrueckten Rand -- im Schwerpunkt ihrer
 Posten ([[opencivil.querschnitt.lagenaufbau#lage_aus_posten|lage_aus_posten]]). Fuer
 den Nachweis und die Kennzahlen.
 
-Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung. Dann gibt
-es kein `d`, und ohne `d` keinen Querkraftwiderstand.
+Fehlt eine Seite, liegt auf ihr keine Bewehrung. Dann gibt es kein
+`d`, und ohne `d` keinen Querkraftwiderstand.
 
 ### _hoch
 

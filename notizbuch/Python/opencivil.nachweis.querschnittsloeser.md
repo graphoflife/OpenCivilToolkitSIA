@@ -1,5 +1,5 @@
 ---
-erzeugt: 20bfb62a6245
+erzeugt: a282b7fbb84d
 art: modul
 tags: [modul]
 ---
@@ -108,7 +108,7 @@ wird sie an einer Stelle,
 - `stahl: Stahlgesetz` – Der Stahl dieser Lage, mit den Festigkeiten des Wertesatzes -- `f_yd` oder `f_yk` im Feld `f_yd`. Jede Lage traegt ihren eigenen: der Editor laesst je Seite einen anderen Stahl waehlen. Bis 2026-10-12 bekam der Loeser einen einzigen, den der ersten Lage, und unten B700B mit oben B500B rechnete die obere Lage mit f_yd = 609 statt 435 N/mm².
 - `sorte: str = ''` – Die Kennung des Stahls (`s1`) -- unter ihr heissen seine Eingaben.
 - `nummer: int = 0` – Nur zur Zuordnung in der Mitschrift.
-- `von_unten: Optional[bool] = None` – Ob die Lage zur unteren Seite gehoert -- bei der Platte die 1. und 2. Lage ([[opencivil.nachweis.querschnittsloeser#Stahllage|Bewehrungslage.von_unten]]). Ohne Angabe laesst sie sich nicht je Seite zusammenfassen ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]).
+- `seite: Optional[Zugseite] = None` – Die Seite, an der die Lage liegt -- bei der Platte unten die 1. und 2. Lage ([[opencivil.querschnitt.platte#Bewehrungslage.seite|seite]]). Ohne Angabe laesst sie sich nicht je Seite zusammenfassen ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]).
 - `text: str = ''` – Wie die Lage in Tabellen heisst -- «2. Lage Grundbewehrung».
 - `index: str = ''` – Ihr Index in den Symbolen -- `1,x,g` ([[opencivil.querschnitt.lagenaufbau#Postenbezug|index]]), die zusammengefasste Lage den ihrer Teile, `1,x` ([[opencivil.nachweis.querschnittsloeser#gemeinsamer_index|gemeinsamer_index]]).
 - `teile: Tuple['Stahllage', ...] = ()` – Woraus sie zusammengefasst ist ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]) -- fuer die Herleitung ihres Schwerpunkts.
@@ -128,11 +128,11 @@ leer; eine erfundene Bezeichnung waere schlimmer als gar keine.
 ### je_seite
 
 ```python
-def je_seite(lagen: Sequence[Stahllage]) -> Dict[bool, Stahllage]
+def je_seite(lagen: Sequence[Stahllage]) -> Dict[Zugseite, Stahllage]
 ```
 
 Je Seite eine Lage im Schwerpunkt ihrer Flaechen, unter
-[[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage.von_unten]] -- die eine Regel fuer den Loeser in der
+[[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage.seite]] -- die eine Regel fuer den Loeser in der
 Handrechnung ([[opencivil.nachweis.rechenwahl#Gesetze.lagen|lagen]]) und die
 Resistenzlinie aus Handrechnung ([[opencivil.nachweis.handrechnung#seiten|seiten]]).
 So rechnen beide «derselbe Querschnitt», wie
@@ -518,6 +518,7 @@ Rechenzeit.
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

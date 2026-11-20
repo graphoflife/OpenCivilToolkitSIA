@@ -1,5 +1,5 @@
 ---
-erzeugt: 2e5fa9d0f920
+erzeugt: c85f8308d728
 art: modul
 tags: [modul]
 ---
@@ -69,27 +69,27 @@ jeder eingestellten Normalkraft und die Kennzahlen der Platte -- ohne dass
 einer, auch nicht die Oberflaeche, die Formel ein zweites Mal enthaelt.
 
 - `h: float`
-- `statische_hoehen: Mapping[bool, float]` – Je Momentenrichtung (`True`: Zug unten) die statische Hoehe der gezogenen Bewehrung ([[opencivil.nachweis.querkraft#statische_hoehen|statische_hoehen]]). Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
+- `statische_hoehen: Mapping[Zugseite, float]` – Je Zugseite die statische Hoehe der gezogenen Bewehrung ([[opencivil.nachweis.querkraft#statische_hoehen|statische_hoehen]]). Fehlt eine Seite, liegt auf ihr keine Bewehrung.
 - `einlage: float` – Das groesste Mass der Einlage, Breite oder Hoehe.
 - `tau_cd: float`
-- `zugstahl: Mapping[bool, Tuple[float, float]]` – Je Momentenrichtung (`True`: Zug unten) `(f_yd, E_s)` des Stahls der gezogenen Seite -- unten und oben duerfen verschiedene Staehle liegen. Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
+- `zugstahl: Mapping[Zugseite, Tuple[float, float]]` – Je Zugseite `(f_yd, E_s)` des Stahls, der dort liegt -- unten und oben duerfen verschiedene Staehle liegen. Fehlt eine Seite, liegt auf ihr keine Bewehrung.
 - `k_g: float`
 
 #### Kurvenbeiwerte.hoehen
 
 ```python
-def hoehen(self, moment_positiv: bool) -> Optional[Tuple[float, float]]
+def hoehen(self, seite: Zugseite) -> Optional[Tuple[float, float]]
 ```
 
-`(d, d_v)` fuer diese Momentenrichtung -- `None` ohne Zugbewehrung.
+`(d, d_v)` fuer diese Zugseite -- `None` ohne Zugbewehrung.
 
 #### Kurvenbeiwerte.widerstand
 
 ```python
-def widerstand(self, moment_positiv: bool, *, M_Ed: float, N_Ed: float, m_Rd: float, index: str='Rd') -> Widerstandspunkt
+def widerstand(self, seite: Zugseite, *, M_Ed: float, N_Ed: float, m_Rd: float, index: str='Rd') -> Widerstandspunkt
 ```
 
-Der Widerstand der Zugseite `moment_positiv` bei diesem Moment und
+Der Widerstand der Zugseite `seite` bei diesem Moment und
 dieser Normalkraft ([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.widerstand|widerstand]]) -- fuer die Faelle, die Kurve
 und die Kennzahlen der Platte dieselbe Rechnung. Nur fuer eine Seite
 mit Zugbewehrung ([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.hoehen|hoehen]]).
@@ -232,7 +232,7 @@ also nicht etwas anderes zeigen als die Punkte, die darauf liegen.
 #### BefundOhneBuegel._ast
 
 ```python
-def _ast(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]
+def _ast(self, N_Ed: float, seite: Zugseite) -> Optional[dict]
 ```
 
 Ein Ast der Kurve. `None`, wenn es ihn nicht gibt.
@@ -270,7 +270,7 @@ Der Querkraftnachweis einer Platte ohne Buegel -- siehe Dateikopf.
 #### QuerkraftOhneBuegel.zugstahl
 
 ```python
-def zugstahl(self, e: Eingaben, moment_positiv: bool) -> Tuple[Wert, Wert]
+def zugstahl(self, e: Eingaben, seite: Zugseite) -> Tuple[Wert, Wert]
 ```
 
 `f_yd` und `E_s` des Stahls der gezogenen Seite -- unten und oben

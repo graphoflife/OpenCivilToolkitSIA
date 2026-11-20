@@ -729,11 +729,12 @@ class TestSortenindex(unittest.TestCase):
         from opencivil.nachweis.handrechnung import seiten
         from opencivil.nachweis.querschnittsloeser import Stahllage
         from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
+        from opencivil.querschnitt.zugseite import Zugseite
 
         stahl = Stahlgesetz(E_s=205e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
-        teile = [Stahllage(a_s=1e-3, z=0.26, stahl=stahl, sorte="s2", von_unten=True,
+        teile = [Stahllage(a_s=1e-3, z=0.26, stahl=stahl, sorte="s2", seite=Zugseite.UNTEN,
                            text="Grund", index="1,x,g"),
-                 Stahllage(a_s=1e-3, z=0.25, stahl=stahl, sorte="s2", von_unten=True,
+                 Stahllage(a_s=1e-3, z=0.25, stahl=stahl, sorte="s2", seite=Zugseite.UNTEN,
                            text="Zulage", index="1,x,z")]
         unten, oben = seiten(teile, saetze={"s2": Werkstoffsatz.BEMESSUNG},
                              stahl_index={"s2": "B500A"})

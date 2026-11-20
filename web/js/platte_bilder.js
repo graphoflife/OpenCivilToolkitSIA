@@ -690,8 +690,8 @@ export function querkraftkurveZeichnen(kurve) {
       stroke: '#1f5fa8', 'stroke-width': 1.4, 'stroke-dasharray': '4 4', opacity: .7,
     }));
     const marke = svgEl('text', {
-      x: x(ast.m_Rd) + (ast.moment_positiv ? -6 : 6), y: feld.oben + 13,
-      'text-anchor': ast.moment_positiv ? 'end' : 'start',
+      x: x(ast.m_Rd) + (ast.seite === 'unten' ? -6 : 6), y: feld.oben + 13,
+      'text-anchor': ast.seite === 'unten' ? 'end' : 'start',
       'font-size': 11, 'font-weight': 600, fill: '#1f5fa8',
     });
     marke.textContent = `${kurve.m_name || 'm_Rd'} = ${ast.m_Rd.toFixed(1)}`;

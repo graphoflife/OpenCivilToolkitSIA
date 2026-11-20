@@ -1,5 +1,5 @@
 ---
-erzeugt: c7f87c932846
+erzeugt: 0fb38abd7846
 art: modul
 tags: [modul]
 ---
@@ -171,15 +171,6 @@ Eine der vier Lagen, bestehend aus Grundbewehrung und Zulage.
 - `zulage: Bewehrungsposten = field(default_factory=Bewehrungsposten)`
 - `unguenstig: bool = True` – Wie Grundbewehrung und Zulage innerhalb der Lage liegen. `False` (guenstig): beide beruehren dieselbe Huellebene und sind je um ihren eigenen Halbmesser eingerueckt -- die **aeusseren** Kanten fluchten. Das ist die guenstigste Anordnung; der duennere Stab bekommt den groessten Hebelarm. `True` (unguenstig, Vorgabe): die **inneren** Kanten fluchten, der duennere Stab wird also zur Plattenmitte hin geschoben. Bei den unteren Lagen heisst das: gleiche Oberkante; bei den oberen: gleiche Unterkante. Massgebend ist je der dickere Stab. Auf der Baustelle laesst sich nicht steuern, welche Kante fluchtet -- deshalb ist das die Vorgabe.
 
-#### Bewehrungslage.von_unten
-
-```python
-@property
-def von_unten(self) -> bool
-```
-
-Lagen 1 und 2 werden von der Unterkante aus gestapelt.
-
 #### Bewehrungslage.seite
 
 ```python
@@ -187,7 +178,8 @@ Lagen 1 und 2 werden von der Unterkante aus gestapelt.
 def seite(self) -> Zugseite
 ```
 
-Die Seite, an der sie liegt -- und die ein Moment ziehen muss, damit sie traegt.
+Die Seite, an der sie liegt -- und die ein Moment ziehen muss, damit
+sie traegt: Lagen 1 und 2 unten, von der Unterkante aus gestapelt.
 
 #### Bewehrungslage.stapelrang
 
