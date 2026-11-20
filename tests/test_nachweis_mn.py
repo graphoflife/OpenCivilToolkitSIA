@@ -76,8 +76,7 @@ class TestResistenzlinie(unittest.TestCase):
         und beides trägt jedes Urteil dieses Nachweises.
         """
         linie = self.befund.linie
-        self.assertEqual([(f"{linie[i].abschnitt} × {linie[j].abschnitt}")
-                          for i, j in kreuzungen([(p.M, p.N) for p in linie])], [])
+        self.assertEqual(list(kreuzungen([(p.M, p.N) for p in linie])), [])
 
     def test_keine_faser_ueberschreitet_die_bruchdehnung(self):
         for p in self.befund.linie:

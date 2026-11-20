@@ -97,7 +97,7 @@ from opencivil.nachweis.mindestbewehrung import (
     protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
 from opencivil.nachweis.querschnittsloeser import (
-    Ebene, Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
+    Ebene, Faserloeser, protokoll_verfahren, protokoll_wirksamer_modul,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.rechenwahl import (
@@ -392,7 +392,7 @@ class Fallergebnis(Fallausgang):
 class _Plattenzustand(Stahlzustand):
     """Dazu der Loeser der Tragrichtung und die Kennwerte des Betons."""
 
-    loeser: Querschnittsloeser
+    loeser: Faserloeser
     w: Betonkennwerte
 
 

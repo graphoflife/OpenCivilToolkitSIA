@@ -24,7 +24,7 @@ schreibt er es auch in die Mitschrift (:func:`verfahren`).
 **Beide Suchen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
 Bruchdehnungen geben die Werkstoffgesetze null zurueck; dort ist nichts mehr
 monoton, und die Suche findet Scheinloesungen. Das Fenster fuer ``eps_m``
-haengt darum von ``chi`` ab -- siehe :meth:`Querschnittsloeser._fenster`.
+haengt darum von ``chi`` ab -- siehe :meth:`Faserloeser._fenster`.
 
 Beide Suchen sind robust: sie bleiben eingegrenzt, kein Startwert kann
 danebenliegen, kein Newton-Schritt kann davonlaufen. Halbiert kosten sie
@@ -57,12 +57,16 @@ Oberkante. Ein positives ``chi`` zieht also unten.
 
 JEDER QUERSCHNITT AUS FASERN:
 Die Suche braucht nur zweierlei: die Fasern mit ihren Kraeften und die
-Dehnungsgrenzen, in denen jede gilt. Das steht in :class:`Faserloeser`. Die
-Platte baut beides aus Hoehe, Breite und Lagen (:class:`Querschnittsloeser`),
-der gezeichnete Querschnitt je Zugseite aus seinen Polygonen
-(:mod:`opencivil.spannungsanalyse.schnitt`). Dort ist ``eps_m`` die Dehnung
-im Schwerpunkt statt auf halber Hoehe; ``oben`` und ``unten`` sagen, wo die
-Raender liegen.
+Dehnungsgrenzen, in denen jede gilt. Das steht in :class:`Faserloeser`.
+Beides kommt aus der Interaktion
+(:class:`~opencivil.querschnitt.interaktion.Querschnitt`), in einer
+Zugrichtung zerlegt: bei der Platte ein Rechteck mit je Lage einem Stab
+(:meth:`~opencivil.nachweis.rechenwahl.Gesetze.loeser`), beim gezeichneten
+Querschnitt seine Polygone (:mod:`opencivil.spannungsanalyse.schnitt`).
+``eps_m`` ist die Dehnung im Bezugspunkt -- bei der Platte auf halber Hoehe,
+beim gezeichneten Querschnitt im Schwerpunkt; ``oben`` und ``unten`` sagen,
+wo die Raender liegen. Bis 2026-11-20 baute die Platte ihre Fasern und
+Grenzen selbst, als Rechteck ein zweites Mal.
 
 EINHEITEN:
 Alles in SI-Basis.
@@ -76,12 +80,10 @@ from typing import Callable, Dict, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
 from opencivil.core.suche import HALBIEREN, Suche, eingrenzen
-from opencivil.querschnitt.fasern import (
-    FASERN, Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
-)
+from opencivil.querschnitt.fasern import FASERN, Dehnungsgrenzen, Faserquerschnitt
 from opencivil.querschnitt.gesetzwahl import REFERENZ_KRIECHEN, wirksamer_modul
 from opencivil.querschnitt.lagenaufbau import schwerpunkt
-from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Obergrenze der Schritte, mit denen :meth:`Faserloeser._rand` den Rand des
@@ -137,6 +139,9 @@ class Stahllage:
 
     sorte: str = ""
     """Die Kennung des Stahls (``s1``) -- unter ihr heissen seine Eingaben."""
+
+    stahlname: str = ""
+    """Der Name des Stahls («B500B») -- so heisst die Grenze seiner Dehnung."""
 
     nummer: int = 0
     """Nur zur Zuordnung in der Mitschrift."""
@@ -214,7 +219,8 @@ def je_seite(lagen: Sequence[Stahllage]) -> Dict[Zugseite, Stahllage]:
                 f"im Schwerpunkt gibt es nur mit einem.")
         a_s, z = schwerpunkt((l.a_s, l.z) for l in teile)
         heraus[seite] = Stahllage(
-            a_s=a_s, z=z, stahl=teile[0].stahl, sorte=teile[0].sorte, nummer=teile[0].nummer,
+            a_s=a_s, z=z, stahl=teile[0].stahl, sorte=teile[0].sorte,
+            stahlname=teile[0].stahlname, nummer=teile[0].nummer,
             seite=seite, text=" + ".join(l.text for l in teile),
             index=gemeinsamer_index(teile), teile=teile)
     return heraus
@@ -363,36 +369,6 @@ def probenschranken(querschnitt: Faserquerschnitt,
     druck = abs(querschnitt.kraefte(gestaucht, 0.0).N)
     arme = [g.arm for g in grenzen.grenzen]
     return PROBE_SCHRANKE * druck, PROBE_SCHRANKE * druck * (max(arme) - min(arme))
-
-
-def plattenfasern(
-    *, h: float, b: float, beton: Gesetz, staebe: Sequence[Tuple[float, float, Gesetz]],
-    fasern: int = FASERN, verdraengt: bool = True,
-) -> Faserquerschnitt:
-    """
-    Die Platte als Fasern: gleich dicke Scheiben ueber die Hoehe, der Arm ab
-    der Mittelebene, dazu je Lage ``(Flaeche, z, Gesetz)`` ein Stab.
-
-    Der Loeser und die genaue Resistenzlinie
-    (:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`) rechnen mit
-    demselben Querschnitt -- darum steht er einmal da. ``verdraengt`` wie bei
-    :class:`Querschnittsloeser`. Jede Faser und jeder Stab kennt seine Dicke:
-    gemittelt wird damit, wo das Gesetz springt
-    (:mod:`opencivil.querschnitt.fasern`). Bis 2026-10-17 sagte das ein
-    Schalter ``gemittelt``, den jeder Aufrufer aus der Rechenart ableitete.
-    """
-    dicke = h / fasern
-    return Faserquerschnitt(
-        gruppen=[Fasergruppe(
-            gesetz=beton,
-            arme=tuple((i + 0.5) * dicke - h / 2.0 for i in range(fasern)),
-            flaechen=dicke * b,
-            dicken=(dicke,) * fasern)],
-        # Netto: der Stahl ersetzt den Beton an seiner Stelle -- ausser
-        # in der Handrechnung, die den Beton durchgehend zaehlt.
-        staebe=[Stab(arm=z - h / 2.0, flaeche=a_s, gesetz=gesetz,
-                     verdraengt=beton if verdraengt else None, dicke=dicke)
-                for a_s, z, gesetz in staebe])
 
 
 def wie_gesucht(suche: Suche) -> str:
@@ -765,64 +741,3 @@ class Faserloeser:
         eps_m = self._eps_zu_normalkraft(gefunden, N_Ed)
         return None if eps_m is None else self._mit_probe(eps_m, gefunden, N_Ed, M_Ed)
 
-
-class Querschnittsloeser(Faserloeser):
-    """
-    Der Querschnitt einer Platte als Faserintegral -- aus Hoehe, Breite und
-    Lagen gebaut, gesucht wird wie bei jedem :class:`Faserloeser`.
-
-    ``beton`` ist ein Werkstoffgesetz ``eps -> sigma`` in SI
-    (:mod:`opencivil.querschnitt.werkstoffgesetz`), ``stahl`` macht aus dem
-    Stahl einer Lage eines -- ohne Angabe das :class:`Stahlgesetz` der Lage
-    selbst, jenseits von ``eps_ud`` null; die Handrechnung gibt ihren Stahl
-    nur auf Zug mit. Damit bleibt der Loeser
-    frei von Annahmen ueber das Werkstoffgesetz: die Spannungsbegrenzung rechnet
-    elastisch mit Kriechen und charakteristischen Festigkeiten, der
-    Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
-    -- siehe :class:`Werkstoffsatz`.
-
-    **Das Suchfenster sind die Grenzen der Gesetze** (``grenzen``): jenseits
-    ihrer Bruchdehnung geben sie null zurueck, die Kraft waere nicht mehr
-    monoton, und dort faende die Suche Scheinloesungen. Welche es sind, sagt
-    :meth:`~opencivil.nachweis.rechenwahl.Gesetze.grenzen` -- die des
-    Dehnungsfaechers, ``eps_ud`` am Stahl statt am Betonrand. Bis 2026-10-18
-    galt ohne Grenzen ein Ersatzfenster an beiden Raendern; gebraucht haben es
-    zuletzt nur noch Tests. Ein Gesetz, das springt (der Spannungsblock), wird
-    ueber jede Faser gemittelt statt in ihrer Mitte gelesen: sonst springt mit
-    ihm die Normalkraft, und keine Ebene trifft sie genau. Ohne ``verdraengt``
-    zaehlt der Beton auch dort, wo der Stahl liegt -- so rechnet die
-    Handrechnung.
-
-    Welche Gesetze zu welcher Wahl gehoeren, sagt
-    :func:`opencivil.nachweis.rechenwahl.gesetze`. ``suche`` wie beim
-    :class:`Faserloeser` -- das Knicken der Platte sucht mit Illinois
-    (Benutzer, 2026-10-15): dort kostete das Halbieren beinahe die ganze
-    Rechenzeit.
-    """
-
-    def __init__(
-        self,
-        *,
-        h: float,
-        b: float,
-        lagen: Sequence[Stahllage],
-        beton: Gesetz,
-        grenzen: Sequence[Dehnungsgrenze],
-        stahl: Optional[Callable[[Stahlgesetz], Stahlgesetz]] = None,
-        fasern: int = FASERN,
-        verdraengt: bool = True,
-        suche: Suche = HALBIEREN,
-    ) -> None:
-        lagen = list(lagen)
-        stahl = stahl or (lambda s: s)
-        querschnitt = plattenfasern(
-            h=h, b=b, beton=beton,
-            staebe=[(l.a_s, l.z, stahl(l.stahl)) for l in lagen],
-            fasern=fasern, verdraengt=verdraengt)
-        super().__init__(
-            querschnitt=querschnitt, grenzen=Dehnungsgrenzen(grenzen),
-            oben=-h / 2.0, unten=h / 2.0, lagen=lagen,
-            beton=lambda arm, eps: beton(eps), suche=suche)
-        self.b = b
-        self.beton = beton
-        self.fasern = fasern

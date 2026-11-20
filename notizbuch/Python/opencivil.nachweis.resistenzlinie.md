@@ -1,5 +1,5 @@
 ---
-erzeugt: 369942ea307f
+erzeugt: 300ae4d5c27b
 art: modul
 tags: [modul]
 ---
@@ -16,13 +16,18 @@ fragen muss, welche er vor sich hat:
 * [[opencivil.nachweis.resistenzlinie#Handlinie|Handlinie]] -- das Polygon der Handrechnung
   ([[opencivil.nachweis.handrechnung]]): wenige Eckpunkte, dazwischen
   geradlinig interpoliert. Jede Zahl laesst sich von Hand nachrechnen.
-* [[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]] -- der Rand des Dehnungsfaechers
-  ([[opencivil.nachweis.dehnungsfaecher]]), mit dem Spannungsblock oder
-  der Parabel, die gedrueckte Bewehrung eingeschlossen. Ihr Polygon dient zum
-  Zeichnen und zum Eingrenzen. Den Widerstand bei einer Normalkraft (oder
-  einem Moment) sucht sie auf dem Faecher selbst, zwischen den beiden Ebenen,
-  die ihn einschliessen -- nicht auf der Sehne dazwischen. So haengt keine
-  Zahl im Bericht an der Schrittweite der Zeichnung.
+* [[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]] -- der Rand des Dehnungsfaechers, mit dem
+  Spannungsblock oder der Parabel, die gedrueckte Bewehrung eingeschlossen:
+  der Faecher der Interaktion
+  ([[opencivil.querschnitt.interaktion#Querschnitt.faecherebenen|faecherebenen]]),
+  fuer Zug unten und Zug oben, an der Platte als Rechteck mit Staeben
+  ([[opencivil.nachweis.rechenwahl#Gesetze.querschnitt|querschnitt]]). Ihr Polygon
+  dient zum Zeichnen und zum Eingrenzen. Den Widerstand bei einer
+  Normalkraft (oder einem Moment) sucht sie auf dem Faecher selbst, zwischen
+  den beiden Ebenen, die ihn einschliessen -- nicht auf der Sehne
+  dazwischen. So haengt keine Zahl im Bericht an der Schrittweite der
+  Zeichnung. Bis 2026-11-20 fuhr sie einen eigenen Faecher ab, mit eigenen
+  Grenzen und Fasern.
 
 
 ## DIE SCHNITTSTELLE
@@ -52,6 +57,20 @@ M > 0   Zug an der Unterseite
 Bezugsachse fuer M ist die halbe Querschnittshoehe.
 
 ## Inhalt
+
+### Linienpunkt
+
+```python
+@dataclass(frozen=True)
+class Linienpunkt
+```
+
+Ein Punkt der [[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]] samt der Dehnungsebene, die ihn erzeugt.
+
+- `N: float` – Normalkraft in N (Zug positiv).
+- `M: float` – Moment in Nm (Zug unten positiv).
+- `eps_oben: float`
+- `eps_unten: float`
 
 ### Treffer
 
@@ -184,12 +203,14 @@ class Ebenenlinie(Widerstandslinie)
 
 Der Rand des Dehnungsfaechers -- genau nachgeschaerft, siehe Dateikopf.
 
-`beton` ist das Gesetz der Wahl
-([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]). Der Stahl kommt je
-Lage mit ihrer [[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage]] -- als [[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], ohne
-Abfall jenseits von `eps_ud`: die unterste Lage liegt im Faecher genau
-auf dieser Grenze, und ein Gesetz, das dort auf null faellt, kippte an
-der Rundung.
+`querschnitt` ist die Platte als Querschnitt der Interaktion
+([[opencivil.nachweis.rechenwahl#Gesetze.querschnitt|querschnitt]]), `lagen`
+ihre Lagen in der Reihenfolge ihrer Staebe. Gerechnet wird in der
+Zugrichtung nach unten: die Ebenen mit Zug oben sind dort die mit
+negativer Kruemmung. Der Stahl faellt jenseits von `eps_ud` erst nach
+einer Rundung auf null
+([[opencivil.querschnitt.werkstoffgesetz#Konstanten|RUNDUNG]]): die unterste
+Lage liegt im Faecher genau auf dieser Grenze.
 
 #### Ebenenlinie.kraefte
 
@@ -299,6 +320,8 @@ Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle.
 
 ## Konstanten
 
+- `SCHRITTE = 80` – Schritte je Abschnitt des Faechers der [[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]]. Die Linie nahe dem reinen Druck laeuft schnell und waere mit weniger sichtbar eckig. Die Zahlen im Bericht haengen nicht daran: die Linie sucht jeden Widerstand zwischen zwei Schritten genau.
+- `SCHRITTE_SUCHE = 20` – Schritte fuer die Bewehrungssuche, die kein Diagramm zeichnet. Ihre Zahlen sind dieselben (auf 1e-9): die Linie sucht jeden Widerstand und jede Spitze zwischen zwei Schritten genau, der Faecher grenzt nur ein. Ein Viertel der Ebenen, ein Viertel der Zeit.
 - `AUF_DER_GRENZE = 1e-12` – Ab welchem Abstand eine Dehnung nicht mehr auf ihrer Grenze liegt. Die gefundene Ebene haelt ihren Drehpunkt bis auf Rundung (1e-18); was naeher als dies an einer Grenze liegt, liegt auf ihr.
 - `GOLDSCHRITTE = 30` – Schritte des Goldenen Schnitts, der eine Spitze der Linie zwischen zwei Ebenen sucht: das Fenster schrumpft auf 1e-6 einer Schrittweite. An der Spitze ist die Linie flach -- der Fehler im Wert ist das Quadrat davon.
 
@@ -310,17 +333,18 @@ Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.gesetzwahl]]
-- [[opencivil.querschnitt.werkstoffgesetz]]
+- [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.web.diagrammdaten]]
 
 ## Formeln aus diesem Modul

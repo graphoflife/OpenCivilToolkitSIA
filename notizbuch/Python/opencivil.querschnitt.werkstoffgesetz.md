@@ -1,5 +1,5 @@
 ---
-erzeugt: 5723b71212c0
+erzeugt: 0f47f5d66acd
 art: modul
 tags: [modul]
 ---
@@ -514,12 +514,10 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 ## Gebraucht von
 
 - [[opencivil.durchstanzen.nachweis]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
-- [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]

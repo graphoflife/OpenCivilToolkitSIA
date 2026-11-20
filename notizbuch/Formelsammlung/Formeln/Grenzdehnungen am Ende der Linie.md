@@ -28,5 +28,5 @@ Beton am gedrückten Rand bis $\varepsilon_{c2d}$, jede Stahllage bis
 $\pm\varepsilon_{ud}$, und, sobald der ganze Querschnitt gedrückt ist, der
 Beton im Punkt C bis $\varepsilon_{c1d}$. Es sind dieselben Grenzen wie im
 Dehnungsfächer der genauen Resistenzlinie (siehe
-[[opencivil.nachweis.dehnungsfaecher]]); die Linie endet darum dort, wo die
+[[opencivil.querschnitt.interaktion]]); die Linie endet darum dort, wo die
 Resistenzlinie liegt.

@@ -1,5 +1,5 @@
 ---
-erzeugt: e2bda7d1c1d8
+erzeugt: 9ce227f116f8
 art: modul
 tags: [modul]
 ---
@@ -107,7 +107,6 @@ Eine Einwirkung -- welche Massstaebe es gibt, prueft ihr Feld.
 - [[opencivil.core.einheiten]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.kennzahlen]]
@@ -116,6 +115,7 @@ Eine Einwirkung -- welche Massstaebe es gibt, prueft ihr Feld.
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
+- [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.verformung]]

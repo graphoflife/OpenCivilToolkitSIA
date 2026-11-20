@@ -35,9 +35,11 @@ Stelle ``(1 - eps_c1d/eps_c2d) · h`` vom gedrueckten Rand hoechstens
 konvexes Vieleck (:class:`~opencivil.querschnitt.fasern.Dehnungsgrenzen`).
 Sein Rand mit ``chi >= 0`` ist der Dehnungsfaecher: vom gleichmaessigen Zug
 ueber die Drehung um den gezogensten Stab, dann um den gedrueckten Rand, dann
-um den C-Punkt, bis zum gleichmaessigen Druck. Bei der Rechteckplatte sind das
-genau die Abschnitte 1a, 1b und 1c aus :mod:`opencivil.nachweis.dehnungsfaecher`;
-hier entstehen sie fuer jede Form, ohne dass ein Abschnitt benannt wird.
+um den C-Punkt, bis zum gleichmaessigen Druck -- fuer jede Form, ohne dass ein
+Abschnitt benannt wird. Auch die Platte rechnet so, als Rechteck mit je Lage
+einem Stab (:meth:`~opencivil.nachweis.rechenwahl.Gesetze.querschnitt`). Bis
+2026-11-20 fuhr sie dieselben drei Abschnitte in einem eigenen Faecher ab,
+mit eigenen Grenzen und eigenen Fasern.
 
 DIE FLAECHE DER WIDERSTAENDE:
 Alle Bruchzustaende zusammen bilden im Raum (N, M_y, M_z) eine geschlossene
@@ -78,8 +80,9 @@ from opencivil.querschnitt.werkstoffgesetz import anteil_punkt_c
 Punkt = Tuple[float, float]
 
 #: Streifen ueber die Tiefe des Querschnitts in Zugrichtung, mindestens. Die
-#: Grenzen fallen zusaetzlich auf jede Ecke. 200 sind dieselbe Feinheit, mit
-#: der die genaue Linie der Platte rechnet.
+#: Grenzen fallen zusaetzlich auf jede Ecke. Mit 200 rechnet auch die genaue
+#: Linie der Platte (:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`);
+#: die Loeser nehmen weniger (:data:`~opencivil.querschnitt.fasern.FASERN`).
 STREIFEN = 200
 
 #: Stuetzstellen je Abschnitt des Faechers fuer die Zeichnung.
@@ -111,7 +114,7 @@ SUCHSCHRITTE = 4
 
 #: Groesste Zugdehnung, wo kein Werkstoff eine nennt -- ein Querschnitt ganz
 #: ohne Bewehrung. Beton traegt keinen Zug; die Grenze legt nur fest, wo der
-#: Faecher beginnt. Derselbe Wert wie der Suchbereich des Plattenloesers.
+#: Faecher beginnt.
 EPS_ZUG_OHNE_GRENZE = 0.045
 
 #: Wann zwei Richtungen des Moments als gleich gelten, im Bogenmass. Ein
@@ -183,6 +186,12 @@ class Bewehrung:
     """Wo seine Dehnungsgrenze ueberwacht wird. Leer: an der Stablage. Ein
     Stueck einer Linie meldet die Linienenden, damit die Grenze am Ende der
     Linie gilt und nicht erst in der Mitte ihres letzten Stuecks."""
+
+    dicke: Optional[float] = None
+    """Ueber welche Tiefe der verdraengte Werkstoff gemittelt wird, wenn sein
+    Gesetz springt. Ohne Angabe ein Quadrat gleicher Flaeche; die Lage einer
+    Platte ist ein Band ueber die ganze Breite, so dick wie ihr Stahl darauf
+    verschmiert."""
 
 
 def linie_als_bewehrung(
@@ -418,11 +427,13 @@ class Querschnitt:
             verdraengt = (self.werkstoffe[s.verdraengt].gesetz
                           if s.verdraengt is not None
                           and self.werkstoffe[s.verdraengt].verdraengbar else None)
-            # Das verdraengte Material als Quadrat gleicher Flaeche: wenn sein
-            # Gesetz springt, wird ueber diese Ausdehnung gemittelt.
+            # Das verdraengte Material als Quadrat gleicher Flaeche, wo der
+            # Stab nichts anderes sagt: wenn sein Gesetz springt, wird ueber
+            # diese Ausdehnung gemittelt.
+            band = s.dicke if s.dicke is not None else math.sqrt(s.flaeche)
             staebe.append(Stab(arm=v, flaeche=s.flaeche,
                                gesetz=self.werkstoffe[s.werkstoff].gesetz,
-                               verdraengt=verdraengt, quer=u, dicke=math.sqrt(s.flaeche)))
+                               verdraengt=verdraengt, quer=u, dicke=band))
             staebe_v.append(v)
 
         grenzen, beton = self._grenzen(v_von, n)
@@ -459,7 +470,10 @@ class Querschnitt:
             art = f"Beton {stoff.name}" if ist_beton else f"Stahl {stoff.name}"
             v_min, v_max = min(vs), max(vs)
             for v in {v_min, v_max}:
-                seite = seiten[0] if v == v_min else seiten[1]
+                # Liegt der Werkstoff an einer einzigen Stelle -- eine Lage
+                # nur unten --, sagt ihre Lage zum Bezugspunkt die Seite.
+                gross = v > v_min if v_min < v_max else v > 0.0
+                seite = seiten[1] if gross else seiten[0]
                 grenzen.append(Dehnungsgrenze(
                     arm=v, eps_min=stoff.eps_min, eps_max=stoff.eps_max,
                     name=f"{art}, Rand {seite}" if ist_beton
@@ -531,7 +545,7 @@ class Querschnitt:
         Mitte zweier Ebenen liegt wieder auf dem Faecher.
         """
         r = self.richtung(psi)
-        ebenen = self._faecherebenen(r, schritte)
+        ebenen = self.faecherebenen(psi, schritte)
         punkte = [r.punkt(*e) for e in ebenen]
         dn = FAECHER_LUECKE * (abs(punkte[0].N - punkte[-1].N) or 1.0)
         dm = FAECHER_SEHNE * (max(p.moment for p in punkte) or 1.0)
@@ -560,7 +574,14 @@ class Querschnitt:
         return (self._dazwischen(r, a, pa, m, pm, dn, dm, tiefe - 1) + [pm]
                 + self._dazwischen(r, m, pm, b, pb, dn, dm, tiefe - 1))
 
-    def _faecherebenen(self, r: Richtung, schritte: int) -> List[Tuple[float, float]]:
+    def faecherebenen(self, psi: float, schritte: int) -> List[Tuple[float, float]]:
+        """
+        Die Ebenen des Faechers als ``(eps_m, chi)``, ohne Verfeinerung: je
+        Abschnitt ``schritte`` gleich weit in der Kruemmung, die Knicke
+        eingeschlossen -- so liegen zwei benachbarte im selben Abschnitt.
+        Die genaue Linie der Platte zeichnet damit und sucht dazwischen.
+        """
+        r = self.richtung(psi)
         chi_max = r.grenzen.kruemmungsgrenze(positiv=True)
         ebenen: List[Tuple[float, float]] = []
         for oben in (True, False):
@@ -622,7 +643,7 @@ class Querschnitt:
 
     def _bei_normalkraft(self, psi: float, N: float) -> Optional[Bruchpunkt]:
         r = self.richtung(psi)
-        ebenen = self._faecherebenen(r, SUCHSCHRITTE)
+        ebenen = self.faecherebenen(psi, SUCHSCHRITTE)
         gerechnet: Dict[int, float] = {}
 
         def n_bei(i: int) -> float:

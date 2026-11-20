@@ -113,17 +113,16 @@ from opencivil.core.latex import Mathe, angabe, als_text, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import ILLINOIS, Suche
 from opencivil.core.wert import Wert, WertDef, kennung_aus
-from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.biegung_normalkraft import Linienquelle
 from opencivil.nachweis.querschnittsloeser import (
-    Faserloeser, Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
+    Faserloeser, protokoll_verfahren, protokoll_wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, betonbezuege, gesetze, lagenbezuege, protokoll_gesetze,
     protokoll_rechenwahl, stahllagen,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
-from opencivil.nachweis.resistenzlinie import Widerstandslinie
+from opencivil.nachweis.resistenzlinie import SCHRITTE, SCHRITTE_SUCHE, Widerstandslinie
 from opencivil.querschnitt.platte import Richtung
 
 #: Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
@@ -291,7 +290,7 @@ class Knickbefund:
     Tragsicherheit -- dasselbe Objekt, einmal gerechnet.
     """
 
-    loeser: Querschnittsloeser
+    loeser: Faserloeser
     ergebnisse: List[Knickergebnis] = field(default_factory=list)
 
 
@@ -666,8 +665,8 @@ class Knickverfahren(Nachweis):
 class Knicken(Knickverfahren):
     """
     Nachweis am verformten System, je Knickfall -- an der Platte, nur in
-    x-Richtung: die Iteration rechnet mit ihrem Querschnittsloeser, der
-    Widerstand kommt aus ihrer Resistenzlinie.
+    x-Richtung: die Iteration rechnet mit ihrem Loeser, der Widerstand kommt
+    aus ihrer Resistenzlinie.
     """
 
     def __init__(
@@ -743,7 +742,7 @@ class Knicken(Knickverfahren):
         return f"M_{{{self.widerstand.index},x}}(N_{{Ed}})"
 
     @staticmethod
-    def stab(loeser: Querschnittsloeser, linie: Widerstandslinie) -> Knickstab:
+    def stab(loeser: Faserloeser, linie: Widerstandslinie) -> Knickstab:
         """
         Die Platte als Stab: ihr Loeser, ihre Resistenzlinie und die statische
         Hoehe der untersten x-Lage. Aus dem Befund wieder zu bauen, wer
@@ -781,8 +780,7 @@ class Knicken(Knickverfahren):
         linie = self.linienquelle.linie(
             e, p, basis=f"{self.id}.widerstand", vorsatz="Widerstand: ",
             wahltitel="Rechenwahl – Widerstand (N_Rd)", wenn_geteilt=self._protokoll_geteilt,
-            schritte=(dehnungsfaecher.SCHRITTE_SUCHE if self.schnell
-                      else dehnungsfaecher.SCHRITTE))
+            schritte=SCHRITTE_SUCHE if self.schnell else SCHRITTE)
         befund = Knickbefund(linie=linie, loeser=loeser)
 
         urteile: List[NachweisUrteil] = []

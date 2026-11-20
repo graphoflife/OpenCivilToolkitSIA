@@ -1,5 +1,5 @@
 ---
-erzeugt: 14f0b7ed9a65
+erzeugt: 9ba9c4b3a119
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,7 @@ nachgewiesen wird darum gegen den Dehnungsfaecher selbst
 nicht die Suche, sondern ihre **Probe**: die gefundene Dehnungsebene, die
 Kraefte jedes Teils mit ihrem Angriffspunkt, und die drei Summen `N`,
 `M_y` und `M_z`. Wer nachrechnen will, rechnet diese Summen -- das geht
-von Hand. Dasselbe Vorgehen wie beim Querschnittsloeser der Platte.
+von Hand. Dasselbe Vorgehen wie beim Loeser der Platte.
 
 
 ## DER MASSSTAB

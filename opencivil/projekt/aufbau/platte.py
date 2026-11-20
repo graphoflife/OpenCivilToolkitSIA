@@ -21,7 +21,7 @@ from opencivil.nachweis.knicken import Knicken
 from opencivil.nachweis.fehlende_bewehrung import Ausgefallen, FehlendeBewehrung
 from opencivil.nachweis.mindestbewehrung import Rissnormalkraft, ZwaengungBiegung
 from opencivil.nachweis.spannungsbegrenzung import Gebrauchsfall, PlattenStellen
-from opencivil.nachweis import dehnungsfaecher
+from opencivil.nachweis.resistenzlinie import SCHRITTE, SCHRITTE_SUCHE
 from opencivil.nachweis.verformung import Vergroesserungsfaktor, Verformung, Verformungsfall
 from opencivil.nachweis.kennzahlen import Plattenkennzahlen
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
@@ -95,7 +95,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
         nachweis = BiegungNormalkraft(
             querschnitt, [_kombination(k) for k in aktiv], richtung,
             wahl=eintrag.tragsicherheit_wahl.wahl(stoffe), mit_vergleich=not schnell,
-            schritte=dehnungsfaecher.SCHRITTE_SUCHE if schnell else dehnungsfaecher.SCHRITTE)
+            schritte=SCHRITTE_SUCHE if schnell else SCHRITTE)
         aufbau.eintragen(teil, "nachweise", kennung_x, nachweis)
 
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, aufbau, teil)

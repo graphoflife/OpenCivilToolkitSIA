@@ -1,5 +1,5 @@
 ---
-erzeugt: 2a79d955a54c
+erzeugt: 57f3014cb2f7
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -85,7 +85,6 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.mcp.zeiger]] – einzelne Felder eines Eintrags aendern, ueber Pfade.
 - [[opencivil.nachweis]] – die Nachweise der Platte und des gezeichneten Querschnitts.
     - [[opencivil.nachweis.biegung_normalkraft]] – Nachweis für Biegung mit Normalkraft.
-    - [[opencivil.nachweis.dehnungsfaecher]] – Die zulaessigen Dehnungsebenen einer Platte.
     - [[opencivil.nachweis.duktilitaet]] – Duktilitaetsnachweis ueber die Druckzonenhoehe.
     - [[opencivil.nachweis.fehlende_bewehrung]] – Nachweise, die mangels Bewehrung entfallen.
     - [[opencivil.nachweis.gebrauchsebene]] – die Dehnungsebene des gezeichneten Querschnitts unter Gebrauchslast.

@@ -1,5 +1,5 @@
 ---
-erzeugt: f8ff7de70afd
+erzeugt: bd06609a2509
 art: modul
 tags: [modul]
 ---
@@ -337,7 +337,7 @@ Kennwerte.
 ### resistenzlinie
 
 ```python
-def resistenzlinie(wahl: Rechenwahl, e: Eingaben, p: Protokoll, *, querschnitt: Plattenquerschnitt, posten, richtung: Richtung, basis: str, schritte: int=dehnungsfaecher.SCHRITTE, fasern: int=dehnungsfaecher.FASERN, vorsatz: str='', ebene: int=2, wahltitel: str='Rechenwahl') -> Widerstandslinie
+def resistenzlinie(wahl: Rechenwahl, e: Eingaben, p: Protokoll, *, querschnitt: Plattenquerschnitt, posten, richtung: Richtung, basis: str, schritte: int=SCHRITTE, vorsatz: str='', ebene: int=2, wahltitel: str='Rechenwahl') -> Widerstandslinie
 ```
 
 Die Resistenzlinie einer Wahl aus den Eingaben von [[opencivil.nachweis.biegung_normalkraft#linienbezuege|linienbezuege]]
@@ -397,7 +397,7 @@ Kapitel ohne Linie.
 #### Linienquelle.linie
 
 ```python
-def linie(self, e: Eingaben, p: Protokoll, *, basis: str, vorsatz: str, wahltitel: str, wenn_geteilt: Callable[[Protokoll], None], schritte: int=dehnungsfaecher.SCHRITTE) -> Widerstandslinie
+def linie(self, e: Eingaben, p: Protokoll, *, basis: str, vorsatz: str, wahltitel: str, wenn_geteilt: Callable[[Protokoll], None], schritte: int=SCHRITTE) -> Widerstandslinie
 ```
 
 Die eigene Linie, hergeleitet eine Ebene unter dem Kapitel
@@ -442,12 +442,12 @@ Ein SI-Wert in der Einheit seiner Achse, mit Einheitenzeichen.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

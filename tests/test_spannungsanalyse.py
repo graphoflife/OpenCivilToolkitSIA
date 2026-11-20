@@ -187,7 +187,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         Grenzen und blieb hier aus.
         """
         bild = sa.aus_dehnungen(self.gerissen, eps_oben=-0.005, eps_unten=0.001)
-        self.assertIn("Beton am oberen Rand bei −5.0 ‰, gilt ab −3.5 ‰", bild.hinweis)
+        self.assertIn("Beton C30/37, Rand oben bei −5.0 ‰, gilt ab −3.5 ‰", bild.hinweis)
 
     def test_der_stahl_zaehlt_an_seiner_lage_nicht_am_rand(self):
         """
@@ -204,13 +204,15 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         self.assertFalse(bild.hinweis)
 
     def test_der_hinweis_nennt_die_lage(self):
+        """Mit dem Namen des Stahls und der Seite, wie beim gezeichneten Querschnitt."""
         bild = sa.aus_dehnungen(self.gerissen, eps_oben=-0.001, eps_unten=0.06)
-        self.assertRegex(bild.hinweis, r"Stahl der \d\. Lage bei 4\d\.\d ‰, gilt bis 45\.0 ‰")
+        self.assertRegex(bild.hinweis,
+                         r"Stahl B500B, äusserste Lage unten bei 4\d\.\d ‰, gilt bis 45\.0 ‰")
 
     def test_auf_der_grenze_kein_hinweis(self):
         """Der Beton oben genau bei −ε_c2d, die unterste Lage genau bei ε_ud: das gilt noch."""
         l = self.gerissen
-        oben = next(g for g in l.grenzen.grenzen if g.name == "Beton am oberen Rand")
+        oben = next(g for g in l.grenzen.grenzen if g.name == "Beton C30/37, Rand oben")
         lage = max((g for g in l.grenzen.grenzen if g.name.startswith("Stahl")),
                    key=lambda g: g.arm)
         chi = (lage.eps_max - oben.eps_min) / (lage.arm - oben.arm)
@@ -235,17 +237,17 @@ class TestMomentenKruemmung(unittest.TestCase):
 
     def test_am_ende_ist_eine_grenzdehnung_erreicht(self):
         """
-        Am Beispiel der Beton am oberen Rand bei −ε_c2d -- und eine Spur mehr
+        Am Beispiel der Beton am Rand oben bei −ε_c2d -- und eine Spur mehr
         Krümmung hat kein Gleichgewicht mehr. Bis 2026-10-09 endete die Linie
         dort, wo die Suche des Lösers aufgab: bei χ = 0.040 statt 0.057 1/m,
         mit −2.7 ‰ am Rand und 234.6 statt 235.4 kNm.
         """
         bruch = self.kurve.bruch
         self.assertAlmostEqual(bruch.eps_oben, -0.0035, delta=1e-7)
-        self.assertIn("Beton am oberen Rand", bruch.massgebend)
+        self.assertIn("Beton C30/37, Rand oben", bruch.massgebend)
         self.assertIn("−3.50 ‰", bruch.massgebend)
         eps_m, chi = ebene_am_ende(self.paar, self.kurve)
-        self.assertAlmostEqual(eps_m - chi * self.paar.gerissen.h / 2, bruch.eps_oben, places=9)
+        self.assertAlmostEqual(eps_m - chi * self.paar.h / 2, bruch.eps_oben, places=9)
         self.assertIsNone(self.paar.gerissen.mitteldehnung(chi * 1.001, 0.0))
         self.assertAlmostEqual(chi, 0.0565, delta=0.0005)
         self.assertAlmostEqual(bruch.kraft / 1e3, 235.4, delta=0.1)
@@ -588,20 +590,20 @@ class TestNormalkraftDehnung(unittest.TestCase):
         = 756.5 kN. Bis 2026-10-09 galt k_t für h/3 wie beim Rissmoment:
         828.6 kN.
         """
-        h, b = self.sym.gerissen.h, self.sym.gerissen.b
+        h, b = self.sym.h, self.sym.b
         self.assertAlmostEqual(self.sym.k_t_zug, 1.0 / (1.0 + 0.5 * h), places=12)
         self.assertAlmostEqual(self.kurve.riss, 2.9e6 / (1.0 + 0.5 * h) * b * h, delta=1e-3)
         self.assertAlmostEqual(self.kurve.riss / 1e3, 756.5, delta=0.1)
 
     def test_das_rissmoment_bleibt_bei_einem_drittel_der_dicke(self):
         """Unter Biegung reisst ein Drittel der Dicke -- dort bleibt k_t für h/3."""
-        h, b = self.sym.gerissen.h, self.sym.gerissen.b
+        h, b = self.sym.h, self.sym.b
         self.assertAlmostEqual(self.sym.M_Riss, 2.9e6 / (1.0 + 0.5 * h / 3.0) * b * h * h / 6.0,
                                delta=1e-3)
 
     def test_das_moment_senkt_die_rissnormalkraft(self):
         """Dieselbe Bedingung wie beim Rissmoment -- das Vorzeichen zählt nicht."""
-        h = self.sym.gerissen.h
+        h = self.sym.h
         for M in (20e3, -20e3):
             with self.subTest(M=M / 1e3):
                 self.assertAlmostEqual(self.sym.rissnormalkraft_bei(M),
@@ -616,7 +618,7 @@ class TestNormalkraftDehnung(unittest.TestCase):
         eps_ud = max(g.eps_max for g in self.sym.gerissen.grenzen.grenzen
                      if g.eps_max != float("inf"))
         self.assertAlmostEqual(bruch.verformung, eps_ud, delta=1e-9)
-        self.assertIn("Stahl der", bruch.massgebend)
+        self.assertIn("Stahl B500B, äusserste Lage", bruch.massgebend)
 
     def test_die_linie_steigt_und_springt_beim_riss(self):
         punkte = self.kurve.punkte
@@ -637,7 +639,7 @@ class TestNormalkraftDehnung(unittest.TestCase):
         """
         paar = loeserpaar()
         kurve = sa.normalkraft_dehnung(paar, M=20e3)
-        self.assertIn("Beton am unteren Rand", kurve.bruch.massgebend)
+        self.assertIn("Beton C30/37, Rand unten", kurve.bruch.massgebend)
         self.assertAlmostEqual(kurve.bruch.kraft / 1e3, 1030.0, delta=1.0)
         self.assertLess(kurve.fliessen.kraft, kurve.bruch.kraft)
 
@@ -658,7 +660,7 @@ class TestAequivalenterModul(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.paar = loeserpaar(kriechzahl=0.0, satz=Werkstoffsatz.CHARAKTERISTISCH)
-        b, h = cls.paar.gerissen.b, cls.paar.gerissen.h
+        b, h = cls.paar.b, cls.paar.h
         cls.b, cls.h = b, h
         cls.biegung = sa.aequivalenter_modul(sa.moment_kruemmung(cls.paar, N=0.0),
                                              I_c=cls.paar.I_c, A_c=cls.paar.A_c,

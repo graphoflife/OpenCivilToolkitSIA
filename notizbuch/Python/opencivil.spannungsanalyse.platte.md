@@ -1,5 +1,5 @@
 ---
-erzeugt: 006db9286ec7
+erzeugt: 48f3b05e8f7e
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,12 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die beiden Querschnittsloeser einer Tragrichtung, gerissen und ungerissen,
-dazu Riss, Bezugsflaeche des Moduls und was die Herleitung nur von der
-Platte weiss ([[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]], ein [[opencivil.spannungsanalyse.linie#Paar|Paar]]).
+Die beiden Loeser einer Tragrichtung, gerissen und ungerissen, dazu Riss,
+Bezugsflaeche des Moduls und was die Herleitung nur von der Platte weiss
+([[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]], ein [[opencivil.spannungsanalyse.linie#Paar|Paar]]).
+Die Loeser sind die jedes Querschnitts: die Platte als Rechteck mit Staeben
+([[opencivil.nachweis.rechenwahl#Gesetze.loeser|loeser]]). Eigen bleibt der
+Riss am Rechteck, in den Groessen der Platte, b und h.
 
 ## Inhalt
 
@@ -22,7 +25,7 @@ Platte weiss ([[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]], ein [
 class Loeserpaar
 ```
 
-Die beiden Querschnittsloeser einer Tragrichtung -- gerissen und nicht.
+Die beiden Loeser einer Tragrichtung -- gerissen und nicht.
 
 Sie unterscheiden sich in genau einem Stueck, dem Betongesetz. Alles
 andere -- Hoehe, Breite, Lagen, Stahlgesetz, Grenzen -- ist dasselbe, und
@@ -30,8 +33,10 @@ das muss es sein: sonst verglichen die beiden Zustaende zwei verschiedene
 Querschnitte. Dazu, was zum Riss und zum Fliessen gehoert, und womit
 gerechnet wird.
 
-- `gerissen: Querschnittsloeser`
-- `ungerissen: Querschnittsloeser`
+- `gerissen: Faserloeser`
+- `ungerissen: Faserloeser`
+- `h: float`
+- `b: float` – Hoehe und Breite des Streifens, m -- die Groessen, in denen der Riss am Rechteck steht.
 - `M_Riss: float` – Das Rissmoment ohne Normalkraft -- mit `k_t` fuer ein Drittel der Dicke.
 - `k_t_zug: float = 1.0`
 - `f_ct_eff_zug: float = 0.0` – Fuer die Rissnormalkraft: `k_t` fuer die ganze Dicke und `k_t·f_ctm`.

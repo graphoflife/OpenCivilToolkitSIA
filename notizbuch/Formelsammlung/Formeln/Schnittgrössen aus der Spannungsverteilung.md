@@ -32,4 +32,4 @@ einer Lage zählt der Stahl statt des Betons.
 
 So entsteht jeder Punkt der Linie aus Dehnungsebenen: Ebene wählen,
 Spannungen bestimmen, integrieren. Wo die Ebenen liegen dürfen, sagt der
-Dehnungsfächer (siehe [[opencivil.nachweis.dehnungsfaecher]]).
+Dehnungsfächer (siehe [[opencivil.querschnitt.interaktion]]).

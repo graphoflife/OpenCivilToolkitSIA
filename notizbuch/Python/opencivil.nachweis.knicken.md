@@ -1,5 +1,5 @@
 ---
-erzeugt: 0c404be626f2
+erzeugt: 8ed4e20939c6
 art: modul
 tags: [modul]
 ---
@@ -233,7 +233,7 @@ anderen Druckkraft herauskaeme, braucht denselben. Steht nach dem Lauf in
 der Loesung, nicht am Nachweis.
 
 - `linie: Widerstandslinie` – Die Linie des Widerstands: die eigene, oder mit derselben Wahl die der Tragsicherheit -- dasselbe Objekt, einmal gerechnet.
-- `loeser: Querschnittsloeser`
+- `loeser: Faserloeser`
 - `ergebnisse: List[Knickergebnis] = field(default_factory=list)`
 
 ### schiefstellung
@@ -369,14 +369,14 @@ class Knicken(Knickverfahren)
 ```
 
 Nachweis am verformten System, je Knickfall -- an der Platte, nur in
-x-Richtung: die Iteration rechnet mit ihrem Querschnittsloeser, der
-Widerstand kommt aus ihrer Resistenzlinie.
+x-Richtung: die Iteration rechnet mit ihrem Loeser, der Widerstand kommt
+aus ihrer Resistenzlinie.
 
 #### Knicken.stab
 
 ```python
 @staticmethod
-def stab(loeser: Querschnittsloeser, linie: Widerstandslinie) -> Knickstab
+def stab(loeser: Faserloeser, linie: Widerstandslinie) -> Knickstab
 ```
 
 Die Platte als Stab: ihr Loeser, ihre Resistenzlinie und die statische
@@ -420,7 +420,6 @@ Mit der Linie der Tragsicherheit: was das Knicken waehlt und woher sein Widersta
 - [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.biegung_normalkraft]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]

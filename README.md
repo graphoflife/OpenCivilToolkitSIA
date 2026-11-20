@@ -281,9 +281,8 @@ Fertig und getestet (1229 Tests):
 | `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug; die Steifigkeit als gebetteter Stab (`steifigkeit`, `bettung`): Federn am Kopf und Verläufe über die Tiefe; der äussere Widerstand quer (`quer`, `erdwiderstand`): Erdwiderstand, Bruchmechanismen und die Bettungskraft |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
-| `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
 | `nachweis/resistenzlinie` | Handlinie und Ebenenlinie hinter einer Schnittstelle: Urteil, Widerstand bei N_Ed, Eckwerte, Probe |
-| `nachweis/rechenwahl` | Kriechzahl, Werte, Rechenart -- die eine Stelle, die daraus Gesetze und Löser baut |
+| `nachweis/rechenwahl` | Kriechzahl, Werte, Rechenart – die eine Stelle, die daraus Gesetze, Löser und den Querschnitt der Platte baut: ein Rechteck mit je Lage einem Stab, wie beim gezeichneten Querschnitt |
 | `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen (am gezeichneten Querschnitt und beim Knicken mit Illinois, von der letzten Ebene aus) |
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |

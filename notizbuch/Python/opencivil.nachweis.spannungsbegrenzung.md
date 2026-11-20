@@ -1,5 +1,5 @@
 ---
-erzeugt: e8b8f3dca142
+erzeugt: cc3043694c32
 art: modul
 tags: [modul]
 ---
@@ -349,7 +349,7 @@ class _Plattenzustand(Stahlzustand)
 
 Dazu der Loeser der Tragrichtung und die Kennwerte des Betons.
 
-- `loeser: Querschnittsloeser`
+- `loeser: Faserloeser`
 - `w: Betonkennwerte`
 
 ### PlattenStellen

@@ -5,7 +5,8 @@ VERANTWORTUNG:
 Was ein Nachweis-Kapitel aus seiner Wahl macht -- der Kriechzahl, dem
 Wertesatz und der Rechenart (:mod:`opencivil.querschnitt.gesetzwahl`): die
 eine Stelle, die daraus die Werkstoffgesetze, die Bewehrungslagen und den
-Querschnittsloeser baut, und welche Rechenarten ein Kapitel anbietet. Die
+Querschnitt der Platte samt Loeser baut, und welche Rechenarten ein Kapitel
+anbietet. Die
 Kapitel der Platte und die Spannung-Dehnung-Analyse fragen hier, keines baut
 seine Gesetze oder Lagen selbst.
 
@@ -44,8 +45,9 @@ N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Sequence
+from typing import Callable, Dict, List, Sequence, Tuple
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import als_text, angabe
@@ -54,14 +56,15 @@ from opencivil.core.suche import HALBIEREN, Suche
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.material.basis import Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, je_seite, protokoll_wirksamer_modul, wirksamer_modul_wert,
+    Faserloeser, Stahllage, je_seite, protokoll_wirksamer_modul, wirksamer_modul_wert,
 )
-from opencivil.nachweis import dehnungsfaecher
 from opencivil.querschnitt.analyse import Querschnittsanalyse
-from opencivil.querschnitt.fasern import Dehnungsgrenze
+from opencivil.querschnitt.fasern import FASERN
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
+from opencivil.querschnitt.interaktion import Bewehrung, Querschnitt, Teil, Werkstoff
 from opencivil.querschnitt.lagenaufbau import Postenbezug
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz, StahlNurZug
+from opencivil.querschnitt.zugseite import Zugseite
 
 
 #: Was die Tragsicherheit anbietet.
@@ -104,11 +107,14 @@ class Betonkennwerte:
     eps_c1d: float
     eps_c2d: float
 
+    name: str = ""
+    """Der Name des Betons («C30/37») -- so heissen die Grenzen seiner Dehnung."""
+
     @classmethod
     def aus_eingaben(cls, e: Eingaben, wahl: Rechenwahl, beton) -> "Betonkennwerte":
         """Aus den Eingaben, die :func:`betonbezuege` fuer ``beton`` anmeldet."""
         return cls(f_c=e.g(wahl.satz(beton).beton).si, E_c=e.g(wahl.modul).si,
-                   eps_c1d=e.g("eps_c1d").si, eps_c2d=e.g("eps_c2d").si)
+                   eps_c1d=e.g("eps_c1d").si, eps_c2d=e.g("eps_c2d").si, name=beton.name)
 
 
 def betonbezuege(satz: Werkstoffsatz, beton, *, modul: str = "E_cm") -> List[Eingabebezug]:
@@ -171,7 +177,8 @@ def stahllagen(posten: Sequence[Postenbezug], wahl: Rechenwahl,
                 eps_ud=abs(wert(stahl.id_von("eps_ud"))))
         lagen.append(Stahllage(
             a_s=wert(q.as_def.id), z=wert(q.z_def.id), stahl=gesetze[stahl.id],
-            sorte=kennung_aus(stahl.id), nummer=q.lage.nummer, seite=q.lage.seite,
+            sorte=kennung_aus(stahl.id), stahlname=stahl.name, nummer=q.lage.nummer,
+            seite=q.lage.seite,
             text=q.bezeichnung, index=q.index))
     return lagen
 
@@ -222,36 +229,59 @@ class Gesetze:
             return list(je_seite(lagen).values())
         return list(lagen)
 
-    def grenzen(self, lagen: Sequence[Stahllage], h: float) -> List[Dehnungsgrenze]:
+    def querschnitt(self, *, h: float, b: float, lagen: Sequence[Stahllage],
+                    streifen: int = FASERN) -> Querschnitt:
         """
-        Wo die Gesetze gelten, als benannte Grenzen der Suche -- die
-        des Dehnungsfaechers (:func:`~opencivil.nachweis.dehnungsfaecher.grenzen`):
-        der Beton an den Raendern bis ``-eps_c2d``, im Punkt C bis
-        ``-eps_c1d``, jede Lage, mit der gerechnet wird, bis ``±eps_ud`` ihres
-        Stahls. Jenseits davon geben die Gesetze null zurueck, und die Suche
-        faende Scheinloesungen.
+        Die Platte als Querschnitt der Interaktion, wie der gezeichnete und der
+        Pfahl (:class:`~opencivil.querschnitt.interaktion.Querschnitt`): ein
+        Rechteck b·h um die halbe Hoehe, darin je Lage, mit der gerechnet wird
+        (:meth:`lagen`), ein Stab in ihrer Tiefe. Der Beton gedrueckt bis
+        ``-eps_c2d`` samt Punkt C, jeder Stahl bis ``±eps_ud``: die Grenzen
+        zieht die Interaktion an beiden Raendern, an den Punkten C und an den
+        aeussersten Lagen jedes Stahls -- benannt nach Beton und Stahl. Eine
+        Lage ist ein Band ueber die ganze Breite: der Beton, den sie
+        verdraengt, so dick wie ihr Stahl ueber b verschmiert.
 
-        Ein Fenster fuer jeden Loeser der Platte -- Stahlspannung, Knicken,
-        Analysen. Bis 2026-10-18 suchten die Stahlspannungen den Beton fest
-        bis 3 ‰ und den Stahl am Betonrand, das Knicken mit ``eps_c2d``, aber
-        den Stahl ebenso am Rand (Benutzer, 2026-10-18).
+        ``streifen`` wie beim gezeichneten Querschnitt: so viele, wie ein
+        Loeser Fasern hat (:data:`~opencivil.querschnitt.fasern.FASERN`), ohne
+        Angabe; die genaue Resistenzlinie nimmt mehr. Bis 2026-11-20 baute
+        die Platte ihre Fasern, Grenzen und Faecher selbst.
         """
-        return dehnungsfaecher.grenzen(
-            h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.nummer}. Lage")
-                for l in self.lagen(lagen)],
-            eps_c1d=self.kennwerte.eps_c1d, eps_c2d=self.kennwerte.eps_c2d)
+        k = self.kennwerte
+        werkstoffe = [Werkstoff(k.name, self.beton, -k.eps_c2d, math.inf,
+                                c_punkt=(k.eps_c1d, k.eps_c2d), verdraengbar=self.verdraengt)]
+        je_stahl: Dict[Tuple[str, Stahlgesetz], int] = {}
+        bewehrung = []
+        for l in self.lagen(lagen):
+            schluessel = (l.sorte, l.stahl)
+            if schluessel not in je_stahl:
+                je_stahl[schluessel] = len(werkstoffe)
+                werkstoffe.append(Werkstoff(l.stahlname, self.stahl(l.stahl),
+                                            -l.stahl.eps_ud, l.stahl.eps_ud))
+            bewehrung.append(Bewehrung(lage=(0.0, h / 2.0 - l.z), flaeche=l.a_s,
+                                       werkstoff=je_stahl[schluessel], verdraengt=0,
+                                       dicke=l.a_s / b))
+        y, z = b / 2.0, h / 2.0
+        rechteck = Teil(((-y, -z), (y, -z), (y, z), (-y, z)), werkstoff=0, eltern=None)
+        return Querschnitt(werkstoffe=werkstoffe, teile=[rechteck], bewehrung=bewehrung,
+                           bezug=(0.0, 0.0), streifen=streifen)
 
     def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage],
-               suche: Suche = HALBIEREN) -> Querschnittsloeser:
+               suche: Suche = HALBIEREN) -> Faserloeser:
         """
-        Der Loeser zu dieser Wahl, im Fenster der Gesetze (:meth:`grenzen`).
-        ``suche`` sagt, wie gesucht wird -- das Knicken nimmt
-        :data:`~opencivil.core.suche.ILLINOIS`.
+        Der Loeser zu dieser Wahl: der Querschnitt (:meth:`querschnitt`) mit
+        Zug unten, im Fenster seiner Grenzen. Ein Fenster fuer jeden Loeser
+        der Platte -- Stahlspannung, Knicken, Analysen. Bis 2026-10-18
+        suchten die Stahlspannungen den Beton fest bis 3 ‰ und den Stahl am
+        Betonrand, das Knicken mit ``eps_c2d``, aber den Stahl ebenso am Rand
+        (Benutzer, 2026-10-18). ``suche`` sagt, wie gesucht wird -- das
+        Knicken nimmt :data:`~opencivil.core.suche.ILLINOIS`.
         """
-        return Querschnittsloeser(
-            h=h, b=b, lagen=self.lagen(lagen), beton=self.beton,
-            stahl=self.stahl, verdraengt=self.verdraengt, suche=suche,
-            grenzen=self.grenzen(lagen, h))
+        r = self.querschnitt(h=h, b=b, lagen=lagen).richtung(Zugseite.UNTEN.psi)
+        oben, unten = r.beton
+        return Faserloeser(querschnitt=r.fasern, grenzen=r.grenzen, oben=oben, unten=unten,
+                           lagen=self.lagen(lagen), beton=lambda arm, eps: self.beton(eps),
+                           suche=suche)
 
 
 def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, stoffe: Sequence, *,

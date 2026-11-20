@@ -2890,7 +2890,7 @@ $$
 M_{Rk} = \sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = 99.6\,\mathrm{kNm}
 $$
 
-Massgebend: Beton am oberen Rand auf der Grenzdehnung.
+Massgebend: Beton C30/37, Rand oben auf der Grenzdehnung.
 
 **Erfüllungsgrad**
 
@@ -2986,7 +2986,7 @@ $$
 M_{Rk} = \sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = 99.6\,\mathrm{kNm}
 $$
 
-Massgebend: Beton am oberen Rand auf der Grenzdehnung.
+Massgebend: Beton C30/37, Rand oben auf der Grenzdehnung.
 
 **Nominelle Dehnung der Zugbewehrung** *(SIA 262:2025, 4.3.3.2.2, (39); 4.3.3.2.6)*
 
@@ -4015,7 +4015,7 @@ $$
 M_{Rd} = \sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = 44.8\,\mathrm{kNm}
 $$
 
-Massgebend: Beton am oberen Rand auf der Grenzdehnung.
+Massgebend: Beton C30/37, Rand oben auf der Grenzdehnung.
 
 **Erfüllungsgrad**
 
@@ -4057,7 +4057,7 @@ $$
 N_{Rd} = \sum F_i = -4649.2\,\mathrm{kN}
 $$
 
-Massgebend: Beton im Punkt C auf der Grenzdehnung.
+Massgebend: Beton C30/37, Punkt C auf der Grenzdehnung.
 
 **Erfüllungsgrad**
 
@@ -4153,7 +4153,7 @@ $$
 M_{Rd} = \sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = 44.8\,\mathrm{kNm}
 $$
 
-Massgebend: Beton am oberen Rand auf der Grenzdehnung.
+Massgebend: Beton C30/37, Rand oben auf der Grenzdehnung.
 
 **Nominelle Dehnung der Zugbewehrung** *(SIA 262:2025, 4.3.3.2.2, (39); 4.3.3.2.6)*
 
@@ -19720,7 +19720,7 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_z = -1.15 mm bei x = 3
 | L6 | b | $0.0$ | $0.0$ | $9.0$ | $0.0$ | $0.0$ | $0.0$ |
 | L7 | a | $-17.8$ | $0.5$ | $41.9$ | $-28.6$ | $-5.9$ | $-3.7$ |
 | L7 | b | $-17.8$ | $0.5$ | $-38.4$ | $-28.6$ | $6.9$ | $0.0$ |
-| L8 | a | $0.0$ | $0.0$ | $20.3$ | $0.0$ | $-20.3$ | $0.0$ |
+| L8 | a | $0.0$ | $0.0$ | $20.3$ | $0.0$ | $-20.2$ | $0.0$ |
 | L8 | b | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
 | L9 | a | $9.0$ | $0.0$ | $11.7$ | $-4.6$ | $-10.6$ | $0.0$ |
 | L9 | b | $-9.0$ | $0.0$ | $-12.1$ | $-4.6$ | $-11.5$ | $0.0$ |
@@ -19800,7 +19800,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L8 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $V_z$ | $0.0\ \mathrm{kN}$ | $2.00$ | $20.3\ \mathrm{kN}$ | $0.00$ |
 | L8 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $M_y$ | $-20.3\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $M_y$ | $-20.2\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
 | L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L8 | $f_z$ | $-0.04\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |

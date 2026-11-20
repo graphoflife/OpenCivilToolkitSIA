@@ -1,5 +1,5 @@
 ---
-erzeugt: 85f1715ed709
+erzeugt: da2bad316fd7
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,8 @@ tags: [modul]
 Was ein Nachweis-Kapitel aus seiner Wahl macht -- der Kriechzahl, dem
 Wertesatz und der Rechenart ([[opencivil.querschnitt.gesetzwahl]]): die
 eine Stelle, die daraus die Werkstoffgesetze, die Bewehrungslagen und den
-Querschnittsloeser baut, und welche Rechenarten ein Kapitel anbietet. Die
+Querschnitt der Platte samt Loeser baut, und welche Rechenarten ein Kapitel
+anbietet. Die
 Kapitel der Platte und die Spannung-Dehnung-Analyse fragen hier, keines baut
 seine Gesetze oder Lagen selbst.
 
@@ -70,6 +71,7 @@ Betons. Den Stahl traegt jede Lage selbst ([[opencivil.nachweis.rechenwahl#stahl
 - `E_c: float` – Der Modul der Wahl, ohne Kriechen: `E_cm`, beim Knicken `E_cd`.
 - `eps_c1d: float`
 - `eps_c2d: float`
+- `name: str = ''` – Der Name des Betons («C30/37») -- so heissen die Grenzen seiner Dehnung.
 
 #### Betonkennwerte.aus_eingaben
 
@@ -153,7 +155,7 @@ Was zu einer Wahl gehoert -- Gesetze, Lagen, und wie die Fasern rechnen.
 
 - `wahl: Rechenwahl`
 - `beton: Gesetz`
-- `kennwerte: Betonkennwerte` – Die Zahlen des Betons -- seine Grenzdehnungen begrenzen die Suche ([[opencivil.nachweis.rechenwahl#Gesetze.grenzen|grenzen]]).
+- `kennwerte: Betonkennwerte` – Die Zahlen des Betons -- seine Grenzdehnungen begrenzen die Suche ([[opencivil.nachweis.rechenwahl#Gesetze|grenzen]]).
 
 #### Gesetze.stahl
 
@@ -180,33 +182,40 @@ def lagen(self, lagen: Sequence[Stahllage]) -> List[Stahllage]
 
 Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]).
 
-#### Gesetze.grenzen
+#### Gesetze.querschnitt
 
 ```python
-def grenzen(self, lagen: Sequence[Stahllage], h: float) -> List[Dehnungsgrenze]
+def querschnitt(self, *, h: float, b: float, lagen: Sequence[Stahllage], streifen: int=FASERN) -> Querschnitt
 ```
 
-Wo die Gesetze gelten, als benannte Grenzen der Suche -- die
-des Dehnungsfaechers ([[opencivil.nachweis.dehnungsfaecher#grenzen|grenzen]]):
-der Beton an den Raendern bis `-eps_c2d`, im Punkt C bis
-`-eps_c1d`, jede Lage, mit der gerechnet wird, bis `±eps_ud` ihres
-Stahls. Jenseits davon geben die Gesetze null zurueck, und die Suche
-faende Scheinloesungen.
+Die Platte als Querschnitt der Interaktion, wie der gezeichnete und der
+Pfahl ([[opencivil.querschnitt.interaktion#Querschnitt|Querschnitt]]): ein
+Rechteck b·h um die halbe Hoehe, darin je Lage, mit der gerechnet wird
+([[opencivil.nachweis.rechenwahl#Gesetze.lagen|lagen]]), ein Stab in ihrer Tiefe. Der Beton gedrueckt bis
+`-eps_c2d` samt Punkt C, jeder Stahl bis `±eps_ud`: die Grenzen
+zieht die Interaktion an beiden Raendern, an den Punkten C und an den
+aeussersten Lagen jedes Stahls -- benannt nach Beton und Stahl. Eine
+Lage ist ein Band ueber die ganze Breite: der Beton, den sie
+verdraengt, so dick wie ihr Stahl ueber b verschmiert.
 
-Ein Fenster fuer jeden Loeser der Platte -- Stahlspannung, Knicken,
-Analysen. Bis 2026-10-18 suchten die Stahlspannungen den Beton fest
-bis 3 ‰ und den Stahl am Betonrand, das Knicken mit `eps_c2d`, aber
-den Stahl ebenso am Rand (Benutzer, 2026-10-18).
+`streifen` wie beim gezeichneten Querschnitt: so viele, wie ein
+Loeser Fasern hat ([[opencivil.querschnitt.fasern#Konstanten|FASERN]]), ohne
+Angabe; die genaue Resistenzlinie nimmt mehr. Bis 2026-11-20 baute
+die Platte ihre Fasern, Grenzen und Faecher selbst.
 
 #### Gesetze.loeser
 
 ```python
-def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], suche: Suche=HALBIEREN) -> Querschnittsloeser
+def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], suche: Suche=HALBIEREN) -> Faserloeser
 ```
 
-Der Loeser zu dieser Wahl, im Fenster der Gesetze ([[opencivil.nachweis.rechenwahl#Gesetze.grenzen|grenzen]]).
-`suche` sagt, wie gesucht wird -- das Knicken nimmt
-[[opencivil.core.suche#Konstanten|ILLINOIS]].
+Der Loeser zu dieser Wahl: der Querschnitt ([[opencivil.nachweis.rechenwahl#Gesetze.querschnitt|querschnitt]]) mit
+Zug unten, im Fenster seiner Grenzen. Ein Fenster fuer jeden Loeser
+der Platte -- Stahlspannung, Knicken, Analysen. Bis 2026-10-18
+suchten die Stahlspannungen den Beton fest bis 3 ‰ und den Stahl am
+Betonrand, das Knicken mit `eps_c2d`, aber den Stahl ebenso am Rand
+(Benutzer, 2026-10-18). `suche` sagt, wie gesucht wird -- das
+Knicken nimmt [[opencivil.core.suche#Konstanten|ILLINOIS]].
 
 ### protokoll_rechenwahl
 
@@ -279,13 +288,14 @@ ersten Lage.
 - [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
+- [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

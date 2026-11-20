@@ -5666,17 +5666,6 @@
       ]
     },
     {
-      "name": "opencivil.nachweis.dehnungsfaecher",
-      "pfad": "Python/opencivil.nachweis.dehnungsfaecher.md",
-      "art": "modul",
-      "kurz": "Die zulaessigen Dehnungsebenen einer Platte.",
-      "stichworte": [
-        "Linienpunkt",
-        "faecher",
-        "grenzen"
-      ]
-    },
-    {
       "name": "opencivil.nachweis.duktilitaet",
       "pfad": "Python/opencivil.nachweis.duktilitaet.md",
       "art": "modul",
@@ -6004,7 +5993,6 @@
         "protokoll_wirksamer_modul",
         "protokoll_verfahren",
         "probenschranken",
-        "plattenfasern",
         "wie_gesucht",
         "verfahren",
         "Faserloeser",
@@ -6020,8 +6008,7 @@
         "Faserloeser._suchen",
         "Faserloeser._rand",
         "Faserloeser._eps_von",
-        "Faserloeser._von_zuletzt",
-        "Querschnittsloeser"
+        "Faserloeser._von_zuletzt"
       ]
     },
     {
@@ -6042,7 +6029,7 @@
         "Gesetze.stahl",
         "Gesetze.verdraengt",
         "Gesetze.lagen",
-        "Gesetze.grenzen",
+        "Gesetze.querschnitt",
         "Gesetze.loeser",
         "protokoll_rechenwahl",
         "protokoll_gesetze",
@@ -6056,6 +6043,7 @@
       "art": "modul",
       "kurz": "die Linie, gegen die der M-N-Nachweis haelt.",
       "stichworte": [
+        "Linienpunkt",
         "Treffer",
         "Widerstandslinie",
         "Widerstandslinie.beschriftung",
@@ -7671,6 +7659,7 @@
         "Querschnitt._knicke",
         "Querschnitt.faecher",
         "Querschnitt._dazwischen",
+        "Querschnitt.faecherebenen",
         "Querschnitt._auf_kette",
         "Querschnitt.reine_normalkraft",
         "Querschnitt.normalkraft_grenzen",

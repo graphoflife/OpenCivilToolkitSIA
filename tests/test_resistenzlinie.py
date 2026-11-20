@@ -13,24 +13,30 @@ import unittest
 from opencivil.core.protokoll import Protokoll
 from opencivil.nachweis import linie as geo
 from opencivil.nachweis.querschnittsloeser import Stahllage
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, betongesetz
+from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
-from opencivil.querschnitt.interaktion import Bewehrung, Querschnitt, Teil, Werkstoff
+from opencivil.querschnitt.interaktion import STREIFEN, Bewehrung, Querschnitt, Teil, Werkstoff
 from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz
+from opencivil.querschnitt.zugseite import Zugseite
 
 H, B = 0.25, 1.0
 F_C, E_CM = 20e6, 32000e6
 EPS_C1D, EPS_C2D = 0.002, 0.0035
+BETON = Betonkennwerte(f_c=F_C, E_c=E_CM, eps_c1d=EPS_C1D, eps_c2d=EPS_C2D, name="C30/37")
 STAHL = Stahlgesetz(E_s=205e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
-LAGEN = [Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, text="1. Lage unten"),
-         Stahllage(a_s=565e-6, z=0.035, stahl=STAHL, text="3. Lage oben")]
+LAGEN = [Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, stahlname="B500B",
+                   seite=Zugseite.UNTEN, text="1. Lage unten"),
+         Stahllage(a_s=565e-6, z=0.035, stahl=STAHL, stahlname="B500B",
+                   seite=Zugseite.OBEN, text="3. Lage oben")]
 
 
 def ebenenlinie(art=Rechenart.PARABEL, *, schritte=80, phi=0.0):
+    """Die Linie, wie die Platte sie baut: ihr Querschnitt mit den Streifen der genauen Linie."""
     wahl = Rechenwahl(kriechzahl=phi, art=art)
-    return Ebenenlinie(
-        wahl, h=H, b=B, lagen=LAGEN, eps_c1d=EPS_C1D, eps_c2d=EPS_C2D, schritte=schritte,
-        beton=betongesetz(wahl, f_c=F_C, E_c=E_CM, eps_c1d=EPS_C1D, eps_c2d=EPS_C2D))
+    g = gesetze(wahl, BETON)
+    return Ebenenlinie(wahl, querschnitt=g.querschnitt(h=H, b=B, lagen=LAGEN, streifen=STREIFEN),
+                       lagen=g.lagen(LAGEN), schritte=schritte)
 
 
 class TestGenau(unittest.TestCase):
@@ -107,10 +113,12 @@ class TestGenau(unittest.TestCase):
         t = self.parabel.kante(geo.MOMENT, 0.0, True)
         erreicht = self.parabel.erreicht(t.eps_oben, t.eps_unten)
         self.assertTrue(erreicht)
-        self.assertTrue(set(erreicht) <= {"Stahl der 1. Lage unten", "Beton am oberen Rand"})
+        self.assertTrue(set(erreicht) <= {"Stahl B500B, äusserste Lage unten",
+                                          "Beton C30/37, Rand oben"})
         # Reiner Druck: alles im Punkt C.
         druck = min(self.parabel.punkte, key=lambda p: p.N)
-        self.assertIn("Beton im Punkt C", self.parabel.erreicht(druck.eps_oben, druck.eps_unten))
+        self.assertIn("Beton C30/37, Punkt C",
+                      self.parabel.erreicht(druck.eps_oben, druck.eps_unten))
 
     def test_herleitung_zeigt_die_probe(self):
         p = Protokoll()
@@ -122,12 +130,22 @@ class TestGenau(unittest.TestCase):
         self.assertIn("Massgebend", text)
 
     def test_mit_hand_nicht_zu_haben(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "mit Block oder Parabel"):
             ebenenlinie(Rechenart.HANDRECHNUNG)
 
 
 class TestBlockWieDieQuerschnittsanalyse(unittest.TestCase):
-    """Der Block der Platte ist derselbe wie der des gezeichneten Querschnitts."""
+    """
+    Der Block der Platte ist derselbe wie der des gezeichneten Querschnitts.
+    Die Platte baut ihren Querschnitt selbst (:meth:`Gesetze.querschnitt`);
+    hier steht er so, wie die Querschnittsanalyse dasselbe Rechteck baut --
+    die Ecke im Ursprung, je Lage ein Stab. Die genaue Linie sucht ihren
+    Widerstand auf dem Fächer nach, die Interaktion nimmt die Ebene bei N:
+    beide müssen dasselbe Moment geben -- bis auf ein Zehntausendstel. So
+    viel macht, über welche Tiefe der Block am Stab gemittelt wird: die
+    Querschnittsanalyse nimmt ein Quadrat gleicher Fläche, die Platte ein
+    Band über die ganze Breite (:attr:`Bewehrung.dicke`).
+    """
 
     def test_momente(self):
         block = Spannungsblock(f_cd=F_C, eps_c2d=EPS_C2D)
@@ -142,7 +160,7 @@ class TestBlockWieDieQuerschnittsanalyse(unittest.TestCase):
         platte = ebenenlinie(Rechenart.BLOCK)
         for N in (-1500e3, -300e3, 0.0, 200e3):
             unten = qa.bei_normalkraft(-math.pi / 2, N)
-            self.assertAlmostEqual(unten.M_y / platte.moment_bei(N, True), 1.0, delta=2e-3,
+            self.assertAlmostEqual(unten.M_y / platte.moment_bei(N, True), 1.0, delta=1e-4,
                                    msg=f"N = {N}")
 
 

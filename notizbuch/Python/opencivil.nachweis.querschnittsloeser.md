@@ -1,5 +1,5 @@
 ---
-erzeugt: a282b7fbb84d
+erzeugt: d3a11c2377dd
 art: modul
 tags: [modul]
 ---
@@ -35,7 +35,7 @@ schreibt er es auch in die Mitschrift ([[opencivil.nachweis.querschnittsloeser#v
 **Beide Suchen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
 Bruchdehnungen geben die Werkstoffgesetze null zurueck; dort ist nichts mehr
 monoton, und die Suche findet Scheinloesungen. Das Fenster fuer `eps_m`
-haengt darum von `chi` ab -- siehe [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser._fenster]].
+haengt darum von `chi` ab -- siehe [[opencivil.nachweis.querschnittsloeser#Faserloeser._fenster|Faserloeser._fenster]].
 
 Beide Suchen sind robust: sie bleiben eingegrenzt, kein Startwert kann
 danebenliegen, kein Newton-Schritt kann davonlaufen. Halbiert kosten sie
@@ -76,12 +76,16 @@ Oberkante. Ein positives `chi` zieht also unten.
 ## JEDER QUERSCHNITT AUS FASERN
 
 Die Suche braucht nur zweierlei: die Fasern mit ihren Kraeften und die
-Dehnungsgrenzen, in denen jede gilt. Das steht in [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]. Die
-Platte baut beides aus Hoehe, Breite und Lagen ([[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]),
-der gezeichnete Querschnitt je Zugseite aus seinen Polygonen
-([[opencivil.spannungsanalyse.schnitt]]). Dort ist `eps_m` die Dehnung
-im Schwerpunkt statt auf halber Hoehe; `oben` und `unten` sagen, wo die
-Raender liegen.
+Dehnungsgrenzen, in denen jede gilt. Das steht in [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
+Beides kommt aus der Interaktion
+([[opencivil.querschnitt.interaktion#Querschnitt|Querschnitt]]), in einer
+Zugrichtung zerlegt: bei der Platte ein Rechteck mit je Lage einem Stab
+([[opencivil.nachweis.rechenwahl#Gesetze.loeser|loeser]]), beim gezeichneten
+Querschnitt seine Polygone ([[opencivil.spannungsanalyse.schnitt]]).
+`eps_m` ist die Dehnung im Bezugspunkt -- bei der Platte auf halber Hoehe,
+beim gezeichneten Querschnitt im Schwerpunkt; `oben` und `unten` sagen,
+wo die Raender liegen. Bis 2026-11-20 baute die Platte ihre Fasern und
+Grenzen selbst, als Rechteck ein zweites Mal.
 
 
 ## EINHEITEN
@@ -107,6 +111,7 @@ wird sie an einer Stelle,
 - `z: float` – Tiefenlage ab Oberkante, in m.
 - `stahl: Stahlgesetz` – Der Stahl dieser Lage, mit den Festigkeiten des Wertesatzes -- `f_yd` oder `f_yk` im Feld `f_yd`. Jede Lage traegt ihren eigenen: der Editor laesst je Seite einen anderen Stahl waehlen. Bis 2026-10-12 bekam der Loeser einen einzigen, den der ersten Lage, und unten B700B mit oben B500B rechnete die obere Lage mit f_yd = 609 statt 435 N/mm².
 - `sorte: str = ''` – Die Kennung des Stahls (`s1`) -- unter ihr heissen seine Eingaben.
+- `stahlname: str = ''` – Der Name des Stahls («B500B») -- so heisst die Grenze seiner Dehnung.
 - `nummer: int = 0` – Nur zur Zuordnung in der Mitschrift.
 - `seite: Optional[Zugseite] = None` – Die Seite, an der die Lage liegt -- bei der Platte unten die 1. und 2. Lage ([[opencivil.querschnitt.platte#Bewehrungslage.seite|seite]]). Ohne Angabe laesst sie sich nicht je Seite zusammenfassen ([[opencivil.nachweis.querschnittsloeser#je_seite|je_seite]]).
 - `text: str = ''` – Wie die Lage in Tabellen heisst -- «2. Lage Grundbewehrung».
@@ -227,23 +232,6 @@ ganzen Querschnitts bei seiner Grenzstauchung, das Moment dazu mal seiner
 Hoehe. Am Querschnitt, nicht an der Einwirkung: wie genau eine Suche
 trifft, haengt an ihm -- eine kleine Last auf einem grossen Querschnitt
 trifft sie nicht genauer.
-
-### plattenfasern
-
-```python
-def plattenfasern(*, h: float, b: float, beton: Gesetz, staebe: Sequence[Tuple[float, float, Gesetz]], fasern: int=FASERN, verdraengt: bool=True) -> Faserquerschnitt
-```
-
-Die Platte als Fasern: gleich dicke Scheiben ueber die Hoehe, der Arm ab
-der Mittelebene, dazu je Lage `(Flaeche, z, Gesetz)` ein Stab.
-
-Der Loeser und die genaue Resistenzlinie
-([[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]]) rechnen mit
-demselben Querschnitt -- darum steht er einmal da. `verdraengt` wie bei
-[[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]. Jede Faser und jeder Stab kennt seine Dicke:
-gemittelt wird damit, wo das Gesetz springt
-([[opencivil.querschnitt.fasern]]). Bis 2026-10-17 sagte das ein
-Schalter `gemittelt`, den jeder Aufrufer aus der Rechenart ableitete.
 
 ### wie_gesucht
 
@@ -463,43 +451,6 @@ Von `chi` aus mit wachsenden Schritten, bis das Moment die Seite
 wechselt -- das Moment waechst mit der Kruemmung --, dann die Suche.
 `None`, wo unterwegs keine Ebene die Normalkraft traegt; die Ebene
 mit ihrer Probe, die auch verfehlt sein kann ([[opencivil.nachweis.querschnittsloeser#Faserloeser._mit_probe|_mit_probe]]).
-
-### Querschnittsloeser
-
-```python
-class Querschnittsloeser(Faserloeser)
-```
-
-Der Querschnitt einer Platte als Faserintegral -- aus Hoehe, Breite und
-Lagen gebaut, gesucht wird wie bei jedem [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
-
-`beton` ist ein Werkstoffgesetz `eps -> sigma` in SI
-([[opencivil.querschnitt.werkstoffgesetz]]), `stahl` macht aus dem
-Stahl einer Lage eines -- ohne Angabe das [[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]] der Lage
-selbst, jenseits von `eps_ud` null; die Handrechnung gibt ihren Stahl
-nur auf Zug mit. Damit bleibt der Loeser
-frei von Annahmen ueber das Werkstoffgesetz: die Spannungsbegrenzung rechnet
-elastisch mit Kriechen und charakteristischen Festigkeiten, der
-Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
--- siehe [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Werkstoffsatz]].
-
-**Das Suchfenster sind die Grenzen der Gesetze** (`grenzen`): jenseits
-ihrer Bruchdehnung geben sie null zurueck, die Kraft waere nicht mehr
-monoton, und dort faende die Suche Scheinloesungen. Welche es sind, sagt
-[[opencivil.nachweis.rechenwahl#Gesetze.grenzen|grenzen]] -- die des
-Dehnungsfaechers, `eps_ud` am Stahl statt am Betonrand. Bis 2026-10-18
-galt ohne Grenzen ein Ersatzfenster an beiden Raendern; gebraucht haben es
-zuletzt nur noch Tests. Ein Gesetz, das springt (der Spannungsblock), wird
-ueber jede Faser gemittelt statt in ihrer Mitte gelesen: sonst springt mit
-ihm die Normalkraft, und keine Ebene trifft sie genau. Ohne `verdraengt`
-zaehlt der Beton auch dort, wo der Stahl liegt -- so rechnet die
-Handrechnung.
-
-Welche Gesetze zu welcher Wahl gehoeren, sagt
-[[opencivil.nachweis.rechenwahl#gesetze|opencivil.nachweis.rechenwahl.gesetze]]. `suche` wie beim
-[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]] -- das Knicken der Platte sucht mit Illinois
-(Benutzer, 2026-10-15): dort kostete das Halbieren beinahe die ganze
-Rechenzeit.
 
 
 ## Konstanten

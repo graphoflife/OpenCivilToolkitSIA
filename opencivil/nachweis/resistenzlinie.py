@@ -9,13 +9,18 @@ fragen muss, welche er vor sich hat:
 * :class:`Handlinie` -- das Polygon der Handrechnung
   (:mod:`opencivil.nachweis.handrechnung`): wenige Eckpunkte, dazwischen
   geradlinig interpoliert. Jede Zahl laesst sich von Hand nachrechnen.
-* :class:`Ebenenlinie` -- der Rand des Dehnungsfaechers
-  (:mod:`opencivil.nachweis.dehnungsfaecher`), mit dem Spannungsblock oder
-  der Parabel, die gedrueckte Bewehrung eingeschlossen. Ihr Polygon dient zum
-  Zeichnen und zum Eingrenzen. Den Widerstand bei einer Normalkraft (oder
-  einem Moment) sucht sie auf dem Faecher selbst, zwischen den beiden Ebenen,
-  die ihn einschliessen -- nicht auf der Sehne dazwischen. So haengt keine
-  Zahl im Bericht an der Schrittweite der Zeichnung.
+* :class:`Ebenenlinie` -- der Rand des Dehnungsfaechers, mit dem
+  Spannungsblock oder der Parabel, die gedrueckte Bewehrung eingeschlossen:
+  der Faecher der Interaktion
+  (:meth:`~opencivil.querschnitt.interaktion.Querschnitt.faecherebenen`),
+  fuer Zug unten und Zug oben, an der Platte als Rechteck mit Staeben
+  (:meth:`~opencivil.nachweis.rechenwahl.Gesetze.querschnitt`). Ihr Polygon
+  dient zum Zeichnen und zum Eingrenzen. Den Widerstand bei einer
+  Normalkraft (oder einem Moment) sucht sie auf dem Faecher selbst, zwischen
+  den beiden Ebenen, die ihn einschliessen -- nicht auf der Sehne
+  dazwischen. So haengt keine Zahl im Bericht an der Schrittweite der
+  Zeichnung. Bis 2026-11-20 fuhr sie einen eigenen Faecher ab, mit eigenen
+  Grenzen und Fasern.
 
 DIE SCHNITTSTELLE:
     innerhalb(N, M)              ob ein Punkt drin liegt
@@ -47,14 +52,24 @@ from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import illinois
 from opencivil.core.wert import Wert
-from opencivil.nachweis import dehnungsfaecher, linie as geo
-from opencivil.nachweis.dehnungsfaecher import Linienpunkt
-from opencivil.nachweis.querschnittsloeser import (
-    Stahllage, plattenfasern, protokoll_wirksamer_modul,
-)
+from opencivil.nachweis import linie as geo
+from opencivil.nachweis.querschnittsloeser import Stahllage, protokoll_wirksamer_modul
 from opencivil.nachweis.rechenwahl import protokoll_gesetze, staehle
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
-from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
+from opencivil.querschnitt.interaktion import Querschnitt
+from opencivil.querschnitt.zugseite import Zugseite
+
+#: Schritte je Abschnitt des Faechers der :class:`Ebenenlinie`. Die Linie nahe
+#: dem reinen Druck laeuft schnell und waere mit weniger sichtbar eckig. Die
+#: Zahlen im Bericht haengen nicht daran: die Linie sucht jeden Widerstand
+#: zwischen zwei Schritten genau.
+SCHRITTE = 80
+
+#: Schritte fuer die Bewehrungssuche, die kein Diagramm zeichnet. Ihre Zahlen
+#: sind dieselben (auf 1e-9): die Linie sucht jeden Widerstand und jede Spitze
+#: zwischen zwei Schritten genau, der Faecher grenzt nur ein. Ein Viertel der
+#: Ebenen, ein Viertel der Zeit.
+SCHRITTE_SUCHE = 20
 
 #: Ab welchem Abstand eine Dehnung nicht mehr auf ihrer Grenze liegt. Die
 #: gefundene Ebene haelt ihren Drehpunkt bis auf Rundung (1e-18); was naeher
@@ -65,6 +80,20 @@ AUF_DER_GRENZE = 1e-12
 #: Ebenen sucht: das Fenster schrumpft auf 1e-6 einer Schrittweite. An der
 #: Spitze ist die Linie flach -- der Fehler im Wert ist das Quadrat davon.
 GOLDSCHRITTE = 30
+
+
+@dataclass(frozen=True)
+class Linienpunkt:
+    """Ein Punkt der :class:`Ebenenlinie` samt der Dehnungsebene, die ihn erzeugt."""
+
+    N: float
+    """Normalkraft in N (Zug positiv)."""
+
+    M: float
+    """Moment in Nm (Zug unten positiv)."""
+
+    eps_oben: float
+    eps_unten: float
 
 
 @dataclass(frozen=True)
@@ -245,44 +274,39 @@ class Ebenenlinie(Widerstandslinie):
     """
     Der Rand des Dehnungsfaechers -- genau nachgeschaerft, siehe Dateikopf.
 
-    ``beton`` ist das Gesetz der Wahl
-    (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`). Der Stahl kommt je
-    Lage mit ihrer :class:`Stahllage` -- als :class:`Stahlgesetz`, ohne
-    Abfall jenseits von ``eps_ud``: die unterste Lage liegt im Faecher genau
-    auf dieser Grenze, und ein Gesetz, das dort auf null faellt, kippte an
-    der Rundung.
+    ``querschnitt`` ist die Platte als Querschnitt der Interaktion
+    (:meth:`~opencivil.nachweis.rechenwahl.Gesetze.querschnitt`), ``lagen``
+    ihre Lagen in der Reihenfolge ihrer Staebe. Gerechnet wird in der
+    Zugrichtung nach unten: die Ebenen mit Zug oben sind dort die mit
+    negativer Kruemmung. Der Stahl faellt jenseits von ``eps_ud`` erst nach
+    einer Rundung auf null
+    (:data:`~opencivil.querschnitt.werkstoffgesetz.RUNDUNG`): die unterste
+    Lage liegt im Faecher genau auf dieser Grenze.
     """
 
-    def __init__(self, wahl: Rechenwahl, *, h: float, b: float,
-                 beton: Callable[[float], float],
-                 lagen: Sequence[Stahllage],
-                 eps_c1d: float, eps_c2d: float,
-                 schritte: int = dehnungsfaecher.SCHRITTE,
-                 fasern: int = dehnungsfaecher.FASERN) -> None:
+    def __init__(self, wahl: Rechenwahl, *, querschnitt: Querschnitt,
+                 lagen: Sequence[Stahllage], schritte: int = SCHRITTE) -> None:
         if wahl.art not in (Rechenart.BLOCK, Rechenart.PARABEL):
             raise ValueError(f"Eine Linie aus Dehnungsebenen gibt es mit Block oder "
                              f"Parabel, nicht mit «{wahl.art.beschriftung}».")
         self.wahl = wahl
-        self.h = h
-        self.beton = beton
         self.lagen = list(lagen)
-        self.fasern = fasern
         self.schritte = schritte
-        self.staehle = [l.stahl for l in self.lagen]
-        self.querschnitt = plattenfasern(
-            h=h, b=b, beton=beton,
-            staebe=[(l.a_s, l.z, stahl) for l, stahl in zip(self.lagen, self.staehle)],
-            fasern=fasern, verdraengt=True)
-        self.grenzen = dehnungsfaecher.grenzen(
-            h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.text}") for l in self.lagen],
-            eps_c1d=eps_c1d, eps_c2d=eps_c2d)
+        self.streifen = querschnitt.streifen
+        r = querschnitt.richtung(Zugseite.UNTEN.psi)
+        self.querschnitt = r.fasern
+        self.grenzen = r.grenzen.grenzen
+        self.oben, unten = r.beton
+        self.h = unten - self.oben
+        self.staehle = [s.gesetz for s in r.fasern.staebe]
+        ebenen = (querschnitt.faecherebenen(Zugseite.UNTEN.psi, schritte)
+                  + [(eps_m, -chi) for eps_m, chi
+                     in reversed(querschnitt.faecherebenen(Zugseite.OBEN.psi, schritte))])
         self.punkte: List[Linienpunkt] = geo.ohne_wiederholungen([
-            Linienpunkt(*self.kraefte(ebene.eps_oben, ebene.eps_unten),
-                        eps_oben=ebene.eps_oben, eps_unten=ebene.eps_unten,
-                        abschnitt=marke)
-            for marke, ebene in dehnungsfaecher.faecher(
-                h, [(l.z, l.stahl.eps_ud) for l in self.lagen], schritte,
-                eps_c1d=eps_c1d, eps_c2d=eps_c2d)])
+            Linienpunkt(*self.kraefte(eps_oben, eps_unten), eps_oben=eps_oben,
+                        eps_unten=eps_unten)
+            for eps_oben, eps_unten in ((eps_m + chi * self.oben, eps_m + chi * unten)
+                                        for eps_m, chi in ebenen)])
         #: Je Achse die groesste Zahl darauf -- der Massstab, an dem die Suche
         #: «genau genug» misst.
         self._massstab = {achse.name: max(abs(achse.von(q)) for q in self.punkte) or 1.0
@@ -291,8 +315,8 @@ class Ebenenlinie(Widerstandslinie):
 
     def kraefte(self, eps_oben: float, eps_unten: float) -> Tuple[float, float]:
         """N und M der Ebene durch ``eps_oben`` und ``eps_unten`` -- um die halbe Hoehe."""
-        k = self.querschnitt.kraefte(0.5 * (eps_oben + eps_unten),
-                                     (eps_unten - eps_oben) / self.h)
+        chi = (eps_unten - eps_oben) / self.h
+        k = self.querschnitt.kraefte(eps_oben - chi * self.oben, chi)
         return k.N, k.M
 
     def kante(self, achse: geo.Achse, fest: float, positiv: bool) -> Optional[Treffer]:
@@ -396,8 +420,8 @@ class Ebenenlinie(Widerstandslinie):
 
     def erreicht(self, eps_oben: float, eps_unten: float) -> List[str]:
         """Welche Grenzen diese Ebene erreicht -- die, die ihren Bruchzustand bestimmen."""
-        eps_m = 0.5 * (eps_oben + eps_unten)
         chi = (eps_unten - eps_oben) / self.h
+        eps_m = eps_oben - chi * self.oben
         namen: List[str] = []
         for grenze in self.grenzen:
             eps = eps_m + chi * grenze.arm
@@ -433,7 +457,7 @@ class Ebenenlinie(Widerstandslinie):
         )
         mittel = ", jede mit ihrer mittleren Spannung" if wahl.art.mit_block else ""
         p.erklaerung(
-            f"Der Beton ist in {self.fasern} Fasern über die Höhe geteilt{mittel}, die "
+            f"Der Beton ist in {self.streifen} Fasern über die Höhe geteilt{mittel}, die "
             f"Bewehrung zählt Lage für Lage, und an ihrer Stelle zählt der Stahl statt "
             f"des Betons – auch die gedrückte Bewehrung wirkt mit. Den Widerstand bei "
             f"einer Einwirkung sucht die Rechnung auf dem Rand selbst, zwischen zwei "
@@ -474,12 +498,11 @@ class Ebenenlinie(Widerstandslinie):
                     titel=titel or (f"Bruchzustand bei {lauf.name}_Ed = {_k(fest)} "
                                     f"{lauf.einheit.beschriftung} – die Dehnungsebene"))
 
-        eps_m = 0.5 * (treffer.eps_oben + treffer.eps_unten)
         chi = (treffer.eps_unten - treffer.eps_oben) / self.h
         N, M = self.kraefte(treffer.eps_oben, treffer.eps_unten)
         stahl = []
         for l, gesetz in zip(self.lagen, self.staehle):
-            eps = eps_m + chi * (l.z - self.h / 2.0)
+            eps = treffer.eps_oben + chi * l.z
             sigma = gesetz.spannung(eps)
             stahl.append((l.text, eps, sigma, l.a_s, sigma * l.a_s, l.z))
         F_c = N - sum(s[4] for s in stahl)

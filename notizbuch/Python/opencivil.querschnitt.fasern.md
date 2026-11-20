@@ -1,5 +1,5 @@
 ---
-erzeugt: 5b07fd910e22
+erzeugt: 803d56353639
 art: modul
 tags: [modul]
 ---
@@ -231,7 +231,6 @@ unterste Lage gegen den oberen Rand, `(eps_ud + eps_c2d) / d`.
 
 ## Gebraucht von
 
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.analyse]]

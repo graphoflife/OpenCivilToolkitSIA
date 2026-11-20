@@ -74,7 +74,8 @@ Gleichgewicht gibt. Dort ist die erste Grenzdehnung erreicht: der Beton am
 gedrueckten Rand bei ``-eps_c2d``, der Stahl einer Lage bei ``eps_ud``, der
 ganz gedrueckte Querschnitt im Punkt C bei ``-eps_c1d``. Dieselben Grenzen
 wie im Dehnungsfaecher der genauen M-N-Linie
-(:mod:`opencivil.nachweis.dehnungsfaecher`). Bis 2026-10-09 endete die M-chi-
+(:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`): beide fragen die
+Interaktion (:mod:`opencivil.querschnitt.interaktion`). Bis 2026-10-09 endete die M-chi-
 Linie stattdessen dort, wo die Suche des Loesers aufgab -- an der Platte des
 Beispiels bei chi = 0.040 1/m statt 0.057 1/m, und ``eps_ud`` galt am
 Betonrand statt am Stahl.

@@ -7,7 +7,7 @@ Geometrie -- von Beton, Stahl und Norm weiss dieser Baustein nichts.
 
 WARUM EIGENSTAENDIG:
 Es gibt zwei Resistenzlinien: die punktweise aus Dehnungsebenen aufgebaute
-(:mod:`opencivil.nachweis.dehnungsfaecher`) und das Polygon aus der
+(:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`) und das Polygon aus der
 Handrechnung (:mod:`opencivil.nachweis.handrechnung`). Beide werden auf genau
 dieselbe Art ausgewertet. Laege die Geometrie bei einer der beiden, muesste die
 andere sie entweder einbinden -- was einen Ring ergaebe -- oder nachbauen. Das

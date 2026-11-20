@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d7aa241a06e
+erzeugt: 6236e54e3dab
 art: modul
 tags: [modul]
 ---
@@ -50,9 +50,11 @@ Stelle `(1 - eps_c1d/eps_c2d) · h` vom gedrueckten Rand hoechstens
 konvexes Vieleck ([[opencivil.querschnitt.fasern#Dehnungsgrenzen|Dehnungsgrenzen]]).
 Sein Rand mit `chi >= 0` ist der Dehnungsfaecher: vom gleichmaessigen Zug
 ueber die Drehung um den gezogensten Stab, dann um den gedrueckten Rand, dann
-um den C-Punkt, bis zum gleichmaessigen Druck. Bei der Rechteckplatte sind das
-genau die Abschnitte 1a, 1b und 1c aus [[opencivil.nachweis.dehnungsfaecher]];
-hier entstehen sie fuer jede Form, ohne dass ein Abschnitt benannt wird.
+um den C-Punkt, bis zum gleichmaessigen Druck -- fuer jede Form, ohne dass ein
+Abschnitt benannt wird. Auch die Platte rechnet so, als Rechteck mit je Lage
+einem Stab ([[opencivil.nachweis.rechenwahl#Gesetze.querschnitt|querschnitt]]). Bis
+2026-11-20 fuhr sie dieselben drei Abschnitte in einem eigenen Faecher ab,
+mit eigenen Grenzen und eigenen Fasern.
 
 
 ## DIE FLAECHE DER WIDERSTAENDE
@@ -130,6 +132,7 @@ Ein Stab -- oder ein Stueck einer verschmierten Stablinie.
 - `werkstoff: int`
 - `verdraengt: Optional[int] = None` – Der Werkstoff, in dem der Stab liegt und den er dort ersetzt.
 - `grenzpunkte: Tuple[Punkt, ...] = ()` – Wo seine Dehnungsgrenze ueberwacht wird. Leer: an der Stablage. Ein Stueck einer Linie meldet die Linienenden, damit die Grenze am Ende der Linie gilt und nicht erst in der Mitte ihres letzten Stuecks.
+- `dicke: Optional[float] = None` – Ueber welche Tiefe der verdraengte Werkstoff gemittelt wird, wenn sein Gesetz springt. Ohne Angabe ein Quadrat gleicher Flaeche; die Lage einer Platte ist ein Band ueber die ganze Breite, so dick wie ihr Stahl darauf verschmiert.
 
 ### linie_als_bewehrung
 
@@ -297,6 +300,17 @@ def _dazwischen(self, r: Richtung, a: Tuple[float, float], pa: Bruchpunkt, b: Tu
 
 Ebenen zwischen zwei Stuetzstellen, durch Halbieren -- bis die Mitte
 auf der Sehne liegt, in N gelesen, und N nicht mehr weit springt.
+
+#### Querschnitt.faecherebenen
+
+```python
+def faecherebenen(self, psi: float, schritte: int) -> List[Tuple[float, float]]
+```
+
+Die Ebenen des Faechers als `(eps_m, chi)`, ohne Verfeinerung: je
+Abschnitt `schritte` gleich weit in der Kruemmung, die Knicke
+eingeschlossen -- so liegen zwei benachbarte im selben Abschnitt.
+Die genaue Linie der Platte zeichnet damit und sucht dazwischen.
 
 #### Querschnitt._auf_kette
 
@@ -471,14 +485,14 @@ die andere Koordinate jeder Stelle.
 
 ## Konstanten
 
-- `STREIFEN = 200` – Streifen ueber die Tiefe des Querschnitts in Zugrichtung, mindestens. Die Grenzen fallen zusaetzlich auf jede Ecke. 200 sind dieselbe Feinheit, mit der die genaue Linie der Platte rechnet.
+- `STREIFEN = 200` – Streifen ueber die Tiefe des Querschnitts in Zugrichtung, mindestens. Die Grenzen fallen zusaetzlich auf jede Ecke. Mit 200 rechnet auch die genaue Linie der Platte ([[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]]); die Loeser nehmen weniger ([[opencivil.querschnitt.fasern#Konstanten|FASERN]]).
 - `SCHRITTE = 24` – Stuetzstellen je Abschnitt des Faechers fuer die Zeichnung.
 - `FAECHER_SEHNE = 0.001` – Wie weit die Linie eines Faechers hoechstens von der Sehne zwischen zwei Stuetzstellen abweichen darf -- als Teil des groessten Moments. Gleichmaessig in der Kruemmung verteilt, liegen die Stuetzstellen dort weit auseinander, wo die Nulllinie den Rand erreicht: N sprang am Unterzug zwischen zwei Stellen von -1762 auf -3267 kN, und die Linie dazwischen war eine Sehne.
 - `FAECHER_LUECKE = 0.05` – Wie weit zwei Stuetzstellen in N hoechstens auseinanderliegen, als Teil der ganzen Spanne -- auch wo die Linie gerade ist, damit ein Ablesen bei einem N zwischen ihnen nicht ueber einen Knick hinweg greift.
 - `FAECHER_TIEFE = 8` – Wie oft eine Luecke im Faecher hoechstens halbiert wird.
 - `FLAECHE_SCHRITTE = 8` – Stuetzstellen je Abschnitt fuer die Flaeche der Widerstaende -- weniger als fuer eine Linie; die Luecken fuellt das Halbieren.
 - `SUCHSCHRITTE = 4` – Stuetzstellen je Abschnitt, um die Stelle `N = N_Ed` einzugrenzen. Wenige genuegen: innerhalb eines Abschnitts aendert sich N glatt, und das Illinois-Verfahren findet die Stelle danach in wenigen Schritten.
-- `EPS_ZUG_OHNE_GRENZE = 0.045` – Groesste Zugdehnung, wo kein Werkstoff eine nennt -- ein Querschnitt ganz ohne Bewehrung. Beton traegt keinen Zug; die Grenze legt nur fest, wo der Faecher beginnt. Derselbe Wert wie der Suchbereich des Plattenloesers.
+- `EPS_ZUG_OHNE_GRENZE = 0.045` – Groesste Zugdehnung, wo kein Werkstoff eine nennt -- ein Querschnitt ganz ohne Bewehrung. Beton traegt keinen Zug; die Grenze legt nur fest, wo der Faecher beginnt.
 - `WINKEL_SCHRANKE = 1e-07` – Wann zwei Richtungen des Moments als gleich gelten, im Bogenmass. Ein Zehnmillionstel verschiebt den Widerstand um weniger, als je gedruckt wird.
 - `LINIENSTUECK = 0.02` – Teile einer verschmierten Stablinie: alle so viele Meter ein Stueck.
 - `FLAECHE_NEIGUNGEN = 72` – Neigungen, mit denen die Flaeche der Widerstaende abgetastet wird -- alle 5°.
@@ -494,9 +508,12 @@ die andere Koordinate jeder Stelle.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.pfahl.innen]]

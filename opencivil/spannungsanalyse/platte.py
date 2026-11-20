@@ -2,9 +2,12 @@
 opencivil/spannungsanalyse/platte.py -- das Paar einer Platte.
 
 VERANTWORTUNG:
-Die beiden Querschnittsloeser einer Tragrichtung, gerissen und ungerissen,
-dazu Riss, Bezugsflaeche des Moduls und was die Herleitung nur von der
-Platte weiss (:class:`Loeserpaar`, ein :class:`~opencivil.spannungsanalyse.linie.Paar`).
+Die beiden Loeser einer Tragrichtung, gerissen und ungerissen, dazu Riss,
+Bezugsflaeche des Moduls und was die Herleitung nur von der Platte weiss
+(:class:`Loeserpaar`, ein :class:`~opencivil.spannungsanalyse.linie.Paar`).
+Die Loeser sind die jedes Querschnitts: die Platte als Rechteck mit Staeben
+(:meth:`~opencivil.nachweis.rechenwahl.Gesetze.loeser`). Eigen bleibt der
+Riss am Rechteck, in den Groessen der Platte, b und h.
 """
 
 from __future__ import annotations
@@ -14,7 +17,7 @@ from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, Tuple
 
 from opencivil.core.einheiten import MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.nachweis.querschnittsloeser import Querschnittsloeser
+from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze, staehle, stahllagen
 from opencivil.nachweis.rissgroessen import (
     beiwert_dicke, protokoll_zugfestigkeit, rissaktive_dicke, rissmoment_rechteck,
@@ -37,7 +40,7 @@ if TYPE_CHECKING:
 @dataclass(frozen=True)
 class Loeserpaar:
     """
-    Die beiden Querschnittsloeser einer Tragrichtung -- gerissen und nicht.
+    Die beiden Loeser einer Tragrichtung -- gerissen und nicht.
 
     Sie unterscheiden sich in genau einem Stueck, dem Betongesetz. Alles
     andere -- Hoehe, Breite, Lagen, Stahlgesetz, Grenzen -- ist dasselbe, und
@@ -46,8 +49,12 @@ class Loeserpaar:
     gerechnet wird.
     """
 
-    gerissen: Querschnittsloeser
-    ungerissen: Querschnittsloeser
+    gerissen: Faserloeser
+    ungerissen: Faserloeser
+    h: float
+    b: float
+    """Hoehe und Breite des Streifens, m -- die Groessen, in denen der Riss am Rechteck steht."""
+
     M_Riss: float
     """Das Rissmoment ohne Normalkraft -- mit ``k_t`` fuer ein Drittel der Dicke."""
 
@@ -98,7 +105,7 @@ class Loeserpaar:
         ganze Dicke (:meth:`rissnormalkraft_bei`); beim selben N und M reissen
         die beiden Linien darum nicht am selben Punkt.
         """
-        return self.M_Riss - N * self.gerissen.h / 6.0
+        return self.M_Riss - N * self.h / 6.0
 
     def rissnormalkraft_bei(self, M: float) -> float:
         """
@@ -114,18 +121,17 @@ class Loeserpaar:
         (``notizbuch/Notizen/TODO.md``). Bis 2026-10-09 galt das ``f_ct,eff``
         des Rissmoments, mit ``t = h/3`` -- am Beispiel 829 statt 757 kN.
         """
-        h, b = self.gerissen.h, self.gerissen.b
-        return self.f_ct_eff_zug * b * h - 6.0 * abs(M) / h
+        return self.f_ct_eff_zug * self.b * self.h - 6.0 * abs(M) / self.h
 
     @property
     def I_c(self) -> float:
         """Der reine Betonquerschnitt fuer den aequivalenten Modul: ``b·h³/12``."""
-        return self.gerissen.b * self.gerissen.h ** 3 / 12.0
+        return self.b * self.h ** 3 / 12.0
 
     @property
     def A_c(self) -> float:
         """Dasselbe fuer die Normalkraft: ``b·h``."""
-        return self.gerissen.b * self.gerissen.h
+        return self.b * self.h
 
     # -- Was die Herleitung nur von der Platte weiss --------------------------
 
@@ -219,7 +225,8 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     }
     h, b = wert(ids["h"]), wert(ids["b"])
     w = Betonkennwerte(f_c=wert(ids["f_c"]), E_c=wert(ids["E_cm"]),
-                       eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
+                       eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]),
+                       name=beton.name)
     # Gesucht wird im Fenster der Gesetze, wie in jedem Loeser der Platte;
     # seine Grenzen tragen ihre Namen, und die Bilder nennen damit, welche
     # massgebend ist.
@@ -230,7 +237,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     f_ctm = wert(ids["f_ctm"])
     k_t_zug = beiwert_dicke(rissaktive_dicke(h=h, zug=True))
     return Loeserpaar(
-        gerissen=gerissen, ungerissen=ungerissen,
+        gerissen=gerissen, ungerissen=ungerissen, h=h, b=b,
         M_Riss=rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm).M_Riss,
         k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
         staehle=tuple(staehle(posten)),

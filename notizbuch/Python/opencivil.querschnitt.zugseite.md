@@ -1,5 +1,5 @@
 ---
-erzeugt: b8b7a2dcf76b
+erzeugt: 495f4e803780
 art: modul
 tags: [modul]
 ---
@@ -171,6 +171,8 @@ die waagrechte Nulllinie einer einachsigen Rechnung es braucht.
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]

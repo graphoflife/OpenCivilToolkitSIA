@@ -56,15 +56,16 @@ from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef
 from opencivil.core.wert import kennung_aus
-from opencivil.nachweis import dehnungsfaecher, linie as geo
-from opencivil.nachweis.dehnungsfaecher import Linienpunkt
+from opencivil.nachweis import linie as geo
 from opencivil.nachweis.handrechnung import Eckpunkt, Handrechnung, seiten
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, betongesetz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.interaktion import STREIFEN
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, betonbezuege, bezuege_vereinen, lagenbezuege, protokoll_rechenwahl, stahllagen,
+    RECHENARTEN, Betonkennwerte, betonbezuege, bezuege_vereinen, gesetze, lagenbezuege,
+    protokoll_rechenwahl, stahllagen,
 )
 from opencivil.nachweis.resistenzlinie import (
-    Ebenenlinie, Handlinie, Treffer, Widerstandslinie,
+    SCHRITTE, Ebenenlinie, Handlinie, Linienpunkt, Treffer, Widerstandslinie,
 )
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 
@@ -274,8 +275,7 @@ class BiegungNormalkraft(Nachweis):
         richtung: Richtung = Richtung.X,
         *,
         wahl: Rechenwahl = Rechenwahl(),
-        schritte: int = dehnungsfaecher.SCHRITTE,
-        fasern: int = dehnungsfaecher.FASERN,
+        schritte: int = SCHRITTE,
         mit_vergleich: bool = True,
     ) -> None:
         # Ohne Kombinationen bleibt der Nachweis ohne Urteil -- die Eckwerte
@@ -299,7 +299,6 @@ class BiegungNormalkraft(Nachweis):
         self.kombinationen = list(kombinationen)
         self.wahl = wahl
         self.schritte = schritte
-        self.fasern = fasern
         self.mit_vergleich = mit_vergleich
         """
         Ob die Vergleichslinie mitgerechnet wird.
@@ -416,7 +415,7 @@ class BiegungNormalkraft(Nachweis):
         """Die Resistenzlinie einer Wahl -- und ihre Herleitung in ``p``."""
         return resistenzlinie(wahl, e, p, querschnitt=self.querschnitt, posten=self.posten,
                               richtung=self.richtung, basis=self.id,
-                              schritte=self.schritte, fasern=self.fasern)
+                              schritte=self.schritte)
 
     def _verglichen(self, auswertung: Auswertung) -> Auswertung:
         """
@@ -672,8 +671,8 @@ def linienbezuege(querschnitt: Plattenquerschnitt, posten, richtung: Richtung,
 def resistenzlinie(
     wahl: Rechenwahl, e: Eingaben, p: Protokoll, *, querschnitt: Plattenquerschnitt,
     posten, richtung: Richtung, basis: str,
-    schritte: int = dehnungsfaecher.SCHRITTE, fasern: int = dehnungsfaecher.FASERN,
-    vorsatz: str = "", ebene: int = 2, wahltitel: str = "Rechenwahl",
+    schritte: int = SCHRITTE, vorsatz: str = "", ebene: int = 2,
+    wahltitel: str = "Rechenwahl",
 ) -> Widerstandslinie:
     """
     Die Resistenzlinie einer Wahl aus den Eingaben von :func:`linienbezuege`
@@ -687,8 +686,6 @@ def resistenzlinie(
     phi = protokoll_rechenwahl(p, wahl, basis, querschnitt.baustoffe, titel=wahltitel)
     beton_satz = wahl.satz(querschnitt.beton)
     h, b = e.g("h").si, e.g("b").si
-    f_c = abs(e.g(beton_satz.beton).si)
-    eps_c1d, eps_c2d = abs(e.g("eps_c1d").si), abs(e.g("eps_c2d").si)
     lagen = stahllagen(posten, wahl, e.si_nach_id())
 
     if hand:
@@ -696,17 +693,18 @@ def resistenzlinie(
             lagen, saetze={kennung_aus(s.id): wahl.satz(s) for s in querschnitt.staehle},
             stahl_index={kennung_aus(s.id): s.symbol_index for s in querschnitt.staehle})
         handrechnung = Handrechnung(
-            h=h, b=b, f_cd=f_c, eps_c2d=eps_c2d, unten=unten, oben=oben, basis=basis,
+            h=h, b=b, f_cd=abs(e.g(beton_satz.beton).si), eps_c2d=abs(e.g("eps_c2d").si),
+            unten=unten, oben=oben, basis=basis,
             beton_index=querschnitt.beton.symbol_index, beton_satz=beton_satz,
             index=wahl.index,
         )
         return Handlinie(wahl, handrechnung.rechnen(p))
 
-    linie = Ebenenlinie(
-        wahl, h=h, b=b, lagen=lagen, eps_c1d=eps_c1d, eps_c2d=eps_c2d,
-        beton=betongesetz(wahl, f_c=f_c, E_c=e.g(wahl.modul).si,
-                          eps_c1d=eps_c1d, eps_c2d=eps_c2d),
-        schritte=schritte, fasern=fasern)
+    # Die genaue Linie mit so vielen Streifen wie der gezeichnete Querschnitt
+    # im Bruchzustand, mehr als ein Loeser hat.
+    g = gesetze(wahl, Betonkennwerte.aus_eingaben(e, wahl, querschnitt.beton))
+    linie = Ebenenlinie(wahl, querschnitt=g.querschnitt(h=h, b=b, lagen=lagen, streifen=STREIFEN),
+                        lagen=g.lagen(lagen), schritte=schritte)
     linie.protokoll_ansatz(p, e, beton=querschnitt.beton, posten=posten, phi=phi, basis=basis)
     return linie
 
@@ -754,7 +752,7 @@ class Linienquelle:
 
     def linie(self, e: Eingaben, p: Protokoll, *, basis: str, vorsatz: str, wahltitel: str,
               wenn_geteilt: Callable[[Protokoll], None],
-              schritte: int = dehnungsfaecher.SCHRITTE) -> Widerstandslinie:
+              schritte: int = SCHRITTE) -> Widerstandslinie:
         """
         Die eigene Linie, hergeleitet eine Ebene unter dem Kapitel
         (:func:`resistenzlinie`) -- oder die der Tragsicherheit, und

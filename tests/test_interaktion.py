@@ -2,10 +2,14 @@
 Bruchzustand gezeichneter Querschnitte -- gerade und schief.
 
 Der wichtigste Prüfstein steht zuerst: ein Rechteck mit zwei Lagen ist eine
-Platte, und dafür gibt es schon eine genaue Linie
-(:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`). Zwei unabhängig
-gebaute Wege müssen dasselbe ergeben. Danach Symmetrie, die Probe jedes Bruchzustands und
-Fälle, die sich von Hand nachrechnen lassen.
+Platte. Die Platte baut es selbst
+(:meth:`~opencivil.nachweis.rechenwahl.Gesetze.querschnitt`) und liest ihren
+Widerstand von ihrer genauen Linie
+(:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`); hier steht es so,
+wie die Querschnittsanalyse es baut, und gesucht wird mit der Interaktion.
+Beides muss dasselbe ergeben. Bis 2026-11-20 rechnete die Platte mit eigenen
+Fasern, und die beiden Wege waren ganz getrennt. Danach Symmetrie, die Probe
+jedes Bruchzustands und Fälle, die sich von Hand nachrechnen lassen.
 """
 
 import math
@@ -13,11 +17,12 @@ import unittest
 
 from opencivil.nachweis import linie
 from opencivil.nachweis.querschnittsloeser import Stahllage
+from opencivil.nachweis.rechenwahl import Betonkennwerte, Gesetze
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.interaktion import (
-    Bewehrung, Querschnitt, Teil, Werkstoff, _bei_n_gelesen, _schnittstellen,
+    STREIFEN, Bewehrung, Querschnitt, Teil, Werkstoff, _bei_n_gelesen, _schnittstellen,
     linie_als_bewehrung,
 )
 from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Spannungsblock, Stahlgesetz
@@ -44,16 +49,22 @@ def querschnitt(teile, staebe, bezug=None):
 
 
 class TestWieDiePlatte(unittest.TestCase):
-    """1000×250 mit zwei Lagen -- gegen die genaue Linie der Platte."""
+    """
+    1000×250 mit zwei Lagen -- gegen die genaue Linie der Platte. Ihr Gesetz
+    ist schon gebaut; aus den Kennwerten des Betons braucht ihr Querschnitt
+    nur die Grenzdehnungen, ``f_c`` und ``E_c`` bleiben offen.
+    """
 
     h, b = 0.25, 1.0
 
     def setUp(self):
-        self.ebenen = Ebenenlinie(
-            Rechenwahl(art=Rechenart.PARABEL), h=self.h, b=self.b, beton=BETON,
-            lagen=[Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, text="unten"),
-                   Stahllage(a_s=565e-6, z=0.035, stahl=STAHL, text="oben")],
-            eps_c1d=BETON.eps_c1d, eps_c2d=BETON.eps_c2d)
+        wahl = Rechenwahl(art=Rechenart.PARABEL)
+        gesetze = Gesetze(wahl=wahl, beton=BETON, kennwerte=Betonkennwerte(
+            f_c=math.nan, E_c=math.nan, eps_c1d=BETON.eps_c1d, eps_c2d=BETON.eps_c2d))
+        lagen = [Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, text="unten"),
+                 Stahllage(a_s=565e-6, z=0.035, stahl=STAHL, text="oben")]
+        self.ebenen = Ebenenlinie(wahl, lagen=lagen, querschnitt=gesetze.querschnitt(
+            h=self.h, b=self.b, lagen=lagen, streifen=STREIFEN))
         self.platte = self.ebenen.punkte
         self.neu = querschnitt(
             [Teil(rechteck(0, 0, self.b, self.h), 0, None)],
@@ -83,13 +94,17 @@ class TestWieDiePlatte(unittest.TestCase):
 
     def test_beide_suchen_genau_treffen_sich(self):
         """
-        Beide suchen auf dem Fächer, nicht auf der Sehne: dann bleibt nur, was
-        die Fasern unterscheidet -- je 200 über die Höhe, aber anders gelegt.
+        Beide suchen auf dem Fächer, nicht auf der Sehne, und beide über
+        dieselben 200 Streifen: es bleibt nur, wie genau jede Suche trifft.
+        Bis 2026-11-20 lagen die Fasern der Platte anders, und es blieb ein
+        Zehntausendstel.
         """
         for N in (-2000e3, -500e3, 0.0, 300e3):
-            platte = self.ebenen.moment_bei(N, positiv=True)
-            neu = self.neu.bei_normalkraft(-math.pi / 2, N)
-            self.assertAlmostEqual(neu.M_y / platte, 1.0, delta=1e-4, msg=f"N = {N}")
+            for psi, positiv in ((-math.pi / 2, True), (math.pi / 2, False)):
+                platte = self.ebenen.moment_bei(N, positiv=positiv)
+                neu = self.neu.bei_normalkraft(psi, N)
+                self.assertAlmostEqual(neu.M_y / platte, 1.0 if positiv else -1.0,
+                                       delta=1e-9, msg=f"N = {N}")
 
     def test_faecher_von_zug_nach_druck(self):
         punkte = self.neu.faecher(-math.pi / 2)
@@ -216,6 +231,20 @@ class TestVonHand(unittest.TestCase):
         a = staebe.bei_normalkraft(-math.pi / 2, 0.0).M_y
         b = linie_.bei_normalkraft(-math.pi / 2, 0.0).M_y
         self.assertAlmostEqual(a / b, 1.0, delta=1e-3)
+
+    def test_eine_lage_nur_unten_heisst_unten(self):
+        """
+        Liegt ein Stahl an einer einzigen Stelle, sagt seine Lage zum
+        Bezugspunkt die Seite -- bei Zug unten wie bei Zug oben. Bis
+        2026-11-20 hiess eine Lage nur unten bei Zug unten «oben».
+        """
+        s = querschnitt([Teil(rechteck(0, 0, 0.3, 0.5), 0, None)],
+                        [Bewehrung((y, 0.05), 314e-6, 1, 0) for y in (0.1, 0.2)])
+        for psi in (-math.pi / 2, math.pi / 2):
+            with self.subTest(psi=psi):
+                namen = {g.name for g in s.richtung(psi).grenzen.grenzen
+                         if g.name.startswith("Stahl")}
+                self.assertEqual(namen, {"Stahl Stahl, äusserste Lage unten"})
 
 
 class TestSpannungsblock(unittest.TestCase):

@@ -4,11 +4,10 @@ import math
 import unittest
 
 from opencivil.core.suche import HALBIEREN, ILLINOIS, Illinois
-from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, probenschranken, verfahren,
-)
+from opencivil.nachweis.querschnittsloeser import Stahllage, probenschranken, verfahren
+from opencivil.nachweis.rechenwahl import Betonkennwerte, Gesetze
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
-from opencivil.querschnitt.fasern import Dehnungsgrenze
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.werkstoffgesetz import (
     BetonElastisch, Betongesetz, Spannungsblock, Stahlgesetz,
 )
@@ -29,21 +28,27 @@ def stahl(*, E_s: float, f_sd: float, eps_ud: float = 0.045) -> Stahlgesetz:
 ELASTISCH = stahl(E_s=200e9, f_sd=1e12)
 
 
-def raender(h: float, *, eps_druck: float = 0.003, eps_zug: float = 0.045):
+def plattenloeser(*, h: float, b: float, lagen, beton, eps_c2d: float = 0.003,
+                  suche=HALBIEREN):
     """
-    Das Fenster dieser Tests: an beiden Raendern dieselben Grenzen -- bis
-    2026-10-18 das Ersatzfenster des Loesers, wenn niemand Grenzen mitgab.
-    Die Platte sucht im Fenster ihrer Gesetze (:meth:`Gesetze.grenzen`).
+    Der Loeser einer Platte, wie sie ihn baut (:meth:`Gesetze.loeser`): ein
+    Rechteck b·h mit dem Gesetz ``beton``, je Lage ein Stab, gesucht im
+    Fenster seiner Grenzen -- der Beton an den Raendern bis ``-eps_c2d``, im
+    Punkt C bis -2 ‰, jeder Stahl bis ``±eps_ud``. Jede Rechenart ausser der
+    Handrechnung baut denselben Querschnitt; ``f_c`` und ``E_c`` braucht nur,
+    wer daraus das Gesetz baut, und das steht hier schon da.
     """
-    return [Dehnungsgrenze(arm=-h / 2.0, eps_min=-eps_druck, eps_max=eps_zug),
-            Dehnungsgrenze(arm=h / 2.0, eps_min=-eps_druck, eps_max=eps_zug)]
+    gesetze = Gesetze(wahl=Rechenwahl(art=Rechenart.PARABEL), beton=beton,
+                      kennwerte=Betonkennwerte(f_c=math.nan, E_c=math.nan,
+                                               eps_c1d=0.002, eps_c2d=eps_c2d))
+    return gesetze.loeser(h=h, b=b, lagen=lagen, suche=suche)
 
 
 def elastischer_loeser(a_s=2450e-6, d=0.2601, phi=2.0, h=0.3, b=1.0):
     """Gerissen, linear elastisch -- der Fall mit geschlossener Lösung."""
-    return Querschnittsloeser(
+    return plattenloeser(
         h=h, b=b, lagen=[Stahllage(a_s=a_s, z=d, stahl=ELASTISCH, nummer=1)],
-        beton=BetonElastisch(E_c=33.62e9 / (1.0 + phi)), grenzen=raender(h))
+        beton=BetonElastisch(E_c=33.62e9 / (1.0 + phi)))
 
 
 class TestGegenDieGeschlosseneLoesung(unittest.TestCase):
@@ -108,11 +113,11 @@ class TestProbe(unittest.TestCase):
         Mit Bewehrung oben und unten trägt der Querschnitt auch reinen Zug --
         die beiden Lagen teilen ihn nach ihrem Hebelarm auf.
         """
-        loeser = Querschnittsloeser(
+        loeser = plattenloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=1200e-6, z=0.26, stahl=ELASTISCH, nummer=1),
                    Stahllage(a_s=1200e-6, z=0.04, stahl=ELASTISCH, nummer=4)],
-            beton=BetonElastisch(E_c=33.62e9 / 3.0), grenzen=raender(0.3))
+            beton=BetonElastisch(E_c=33.62e9 / 3.0))
         for N_Ed, M_Ed in [(200e3, 0.0), (200e3, 10e3), (500e3, -15e3)]:
             with self.subTest(N=N_Ed, M=M_Ed):
                 e = loeser.loese(N_Ed=N_Ed, M_Ed=M_Ed)
@@ -128,11 +133,11 @@ class TestProbe(unittest.TestCase):
         d, d_u = 0.3 - 0.030 - 0.010 - 0.013, 0.030 + 0.010 + 0.013
         a_s = 5 * math.pi * 0.026 ** 2 / 4
         s = stahl(E_s=205e9, f_sd=300e6)
-        loeser = Querschnittsloeser(
+        loeser = plattenloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=a_s, z=d, stahl=s, nummer=1),
                    Stahllage(a_s=a_s, z=d_u, stahl=s, nummer=4)],
-            beton=parabelgesetz(f_cd=28.1e6, E_c=39e9 / 2.0), grenzen=raender(0.3))
+            beton=parabelgesetz(f_cd=28.1e6, E_c=39e9 / 2.0))
 
         e = loeser.loese(N_Ed=-3000e3, M_Ed=150e3)
         self.assertTrue(e.konvergiert)
@@ -160,10 +165,10 @@ class TestGrenzen(unittest.TestCase):
         Kein Ergebnis ist besser als ein erfundenes: wo kein Gleichgewicht
         möglich ist, sagt der Löser das.
         """
-        loeser = Querschnittsloeser(
+        loeser = plattenloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=200e-6, z=0.26, stahl=stahl(E_s=200e9, f_sd=435e6))],
-            beton=parabelgesetz(f_cd=20e6, E_c=33e9), grenzen=raender(0.3))
+            beton=parabelgesetz(f_cd=20e6, E_c=33e9))
         e = loeser.loese(N_Ed=0.0, M_Ed=5000e3)
         self.assertFalse(e.konvergiert)
 
@@ -175,14 +180,14 @@ class TestGrenzen(unittest.TestCase):
         234.9 kNm hiessen «kein Gleichgewicht». Darüber bleibt es dabei.
         """
         s = stahl(E_s=205e9, f_sd=434.78e6, eps_ud=0.045)
-        loeser = Querschnittsloeser(
+        loeser = plattenloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=1696e-6, z=0.249, stahl=s, nummer=1),
                    Stahllage(a_s=754e-6, z=0.246, stahl=s, nummer=2),
                    Stahllage(a_s=754e-6, z=0.048, stahl=s, nummer=4)],
             beton=parabelgesetz(f_cd=20e6, E_c=33.62e9 / 3.0,
                                     eps_c1d=0.002, eps_c2d=0.0035),
-            grenzen=raender(0.3, eps_druck=0.0035))
+            eps_c2d=0.0035)
         e = loeser.loese(N_Ed=0.0, M_Ed=234.9e3)
         self.assertTrue(e.konvergiert)
         self.assertGreater(e.chi, 0.04)
@@ -196,10 +201,10 @@ class TestGrenzen(unittest.TestCase):
         sonst fiele eine Randfaser aus dem gültigen Dehnungsbereich, und dort
         ist nichts mehr monoton.
         """
-        loeser = Querschnittsloeser(
+        loeser = plattenloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=2450e-6, z=0.26, stahl=stahl(E_s=200e9, f_sd=435e6))],
-            beton=parabelgesetz(f_cd=20e6, E_c=33e9), grenzen=raender(0.3))
+            beton=parabelgesetz(f_cd=20e6, E_c=33e9))
         weit = loeser._fenster(0.0)
         eng = loeser._fenster(0.1)
         self.assertGreater(weit[1] - weit[0], eng[1] - eng[0])
@@ -245,11 +250,11 @@ class TestVerfehlteEbene(unittest.TestCase):
 
     def loeser(self, suche=HALBIEREN, beton=None):
         """h = 250 mm, b = 1 m, je 1131 mm² oben und unten."""
-        return Querschnittsloeser(
+        return plattenloeser(
             h=0.25, b=1.0,
             lagen=[Stahllage(a_s=1131e-6, z=0.025, stahl=self.STAHL, nummer=1),
                    Stahllage(a_s=1131e-6, z=0.225, stahl=self.STAHL, nummer=2)],
-            beton=beton or self.BLOCK, grenzen=raender(0.25), suche=suche)
+            beton=beton or self.BLOCK, suche=suche)
 
     def test_viel_druck_und_wenig_moment_ist_verfehlt(self):
         for suche in (HALBIEREN, ILLINOIS, Illinois(auch_bei_sprung=True)):
@@ -279,11 +284,13 @@ class TestVerfehlteEbene(unittest.TestCase):
 
     def test_die_schranken_haengen_am_querschnitt(self):
         """
-        Ein Millionstel der Druckkraft bei der Grenzstauchung -- Beton ohne
-        die Fläche der Stäbe, Stahl an der Fliessgrenze --, das Moment mal h.
+        Ein Millionstel der Druckkraft bei der Grenzstauchung, das Moment mal
+        h. Unter reinem Druck begrenzt der Punkt C: 2 ‰ über den ganzen
+        Querschnitt -- der Block trägt dort f_cd auf der Fläche ohne die
+        Stäbe, der Stahl 200 000 · 2 ‰ = 400 N/mm², noch nicht fliessend.
         """
         loeser = self.loeser()
-        druck = 20e6 * (0.25 - 2 * 1131e-6) + 435e6 * 2 * 1131e-6
+        druck = 20e6 * (0.25 - 2 * 1131e-6) + 400e6 * 2 * 1131e-6
         dN, dM = probenschranken(loeser.querschnitt, loeser.grenzen)
         self.assertAlmostEqual(dN, 1e-6 * druck, delta=1e-9)
         self.assertAlmostEqual(dM, 1e-6 * druck * 0.25, delta=1e-9)
@@ -306,12 +313,12 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
     def platte(beton, **mehr):
         """Die Platte des Beispiels in x (φ = 2, Bemessungswerte) -- siehe TestGrenzen."""
         s = stahl(E_s=205e9, f_sd=434.78e6, eps_ud=0.045)
-        return Querschnittsloeser(
+        return plattenloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=1696e-6, z=0.249, stahl=s, nummer=1),
                    Stahllage(a_s=754e-6, z=0.246, stahl=s, nummer=2),
                    Stahllage(a_s=754e-6, z=0.048, stahl=s, nummer=4)],
-            beton=beton, grenzen=raender(0.3, eps_druck=0.0035), **mehr)
+            beton=beton, eps_c2d=0.0035, **mehr)
 
     def test_dieselben_ebenen_wie_beim_halbieren(self):
         parabel = parabelgesetz(f_cd=20e6, E_c=33.62e9 / 3.0, eps_c1d=0.002,

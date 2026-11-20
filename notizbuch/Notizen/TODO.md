@@ -18,7 +18,7 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dazu in Chrome prüfen, ob sich die Seite als App installieren lässt;
       verlangt Chrome ein PNG als Zeichen, schreibt ein kleines Skript ohne
       Fremdpakete die Bilder.
-- Danach die Umbauten 4 und 8 der Durchsicht vom 2026-11-19.
+- Danach Umbau 8 der Durchsicht vom 2026-11-19.
 
 ## Offen
 
@@ -438,32 +438,38 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       einer Achse, auch der Normalkraft, keine Seite; die Bewehrungssuche
       fragt nach der Tragrichtung x oder y, nicht nach der Seite. Siehe
       [[Entwicklung]].
-- [ ] **4. Die Platte rechnet sich als Rechteck ein zweites Mal** --
-      der grösste Gewinn, Entscheid des Benutzers. `dehnungsfaecher.grenzen`
-      und `interaktion._grenzen` bauen dieselbe Grenzregel (der Dateikopf
-      von `interaktion.py` sagt es selbst), `Loeserpaar` steht neben
-      `Schnittpaar`, das Rissmoment am Rechteck neben dem am
-      Bruttoquerschnitt; `test_schnittanalyse.py` 155–177 prüft nur, dass
-      beide gleich bleiben. Umbau: die Platte baut je Richtung einen
-      `interaktion.Querschnitt` (Rechteck b×h, je Lage ein Stab, einachsig),
-      wie der Pfahl in `pfahl/innen.py`. Es fallen weg `dehnungsfaecher.py`,
-      `Loeserpaar` und die Platten-Teile von `Querschnittsloeser`; es
-      bleiben `Dehnungsebene` und `Faserloeser`, die alle brauchen. Bleibt
-      als Parameter die rissaktive Dicke (t = h im Streifen). Verwandt:
-      - Platte und Analyse schreiben Gemeinsames von Hand ab: den Anfang
-        der Knicknachweise, Thema und Namen der Rissnormalkraft, `dazu` und
-        `_belegen` der Kennzahlen. Umbau: gemeinsame Oberklassen wie
-        `Biegezwang` und `Spannungsbegrenzung` es vormachen.
-      - Das Fachwerk liegt halb in `querschnitt/platte.py`: die
-        Druckfeldregeln (`ALPHA_MIN`, `ALPHA_MAX`, `K_C`, `druckfeldgrenzen`)
-        holen sieben Module dort, die Neigungssuche steht dreimal
-        (`schubwaende.py`, `pfahl/innen_quer.py`, `querkraft_buegel.py`),
-        `Wandwiderstand` ist Feld für Feld `Buegelpunkt`. Umbau:
-        `fachwerk.py` besitzt die Regeln und `guenstigste(…)`.
-      - «Ein Urteil je Teil»: `Lagennachweis` hat die Schleife einmal, die
-        Nachweise je Seite und je Fall bauen sie 13-mal selbst
-        (`begruendung` neunmal deklariert). Umbau: ein `Teilnachweis` mit
-        `teile()`, `begruendung` in `Fallausgang`.
+- [ ] **4. Die Platte rechnet sich als Rechteck ein zweites Mal.** Zum
+      grössten Teil erledigt (2026-11-20).
+      - Erledigt (2026-11-20): die Platte baut ihren Querschnitt als
+        `interaktion.Querschnitt` (`Gesetze.querschnitt`: Rechteck b×h, je
+        Lage ein Stab), ihre Löser und die genaue Linie rechnen damit, und
+        ihre Grenzen heissen wie beim gezeichneten Querschnitt. Weg sind
+        `dehnungsfaecher.py`, `plattenfasern` und `Querschnittsloeser`.
+        Siehe [[Entwicklung]].
+      - Offen: `Loeserpaar` steht weiter neben `Schnittpaar`, das
+        Rissmoment am Rechteck neben dem am Bruttoquerschnitt;
+        `test_schnittanalyse.py` 155–177 prüft nur, dass beide gleich
+        bleiben. Die Löser des Paars kommen jetzt aus demselben Bau, den
+        Riss rechnet es weiter in b und h. Umbau: ein Paar für beide, mit
+        der rissaktiven Dicke als Parameter (t = h im Streifen,
+        t = min(h; b) am gezeichneten Querschnitt). Das ändert die
+        Herleitung der Platte; ihre Zahlen vorher und nachher vergleichen.
+      - Offen, verwandt, je ein eigener Umbau:
+        - Platte und Analyse schreiben Gemeinsames von Hand ab: den Anfang
+          der Knicknachweise, Thema und Namen der Rissnormalkraft, `dazu`
+          und `_belegen` der Kennzahlen. Umbau: gemeinsame Oberklassen wie
+          `Biegezwang` und `Spannungsbegrenzung` es vormachen.
+        - Das Fachwerk liegt halb in `querschnitt/platte.py`: die
+          Druckfeldregeln (`ALPHA_MIN`, `ALPHA_MAX`, `K_C`,
+          `druckfeldgrenzen`) holen sieben Module dort, die Neigungssuche
+          steht dreimal (`schubwaende.py`, `pfahl/innen_quer.py`,
+          `querkraft_buegel.py`), `Wandwiderstand` ist Feld für Feld
+          `Buegelpunkt`. Umbau: `fachwerk.py` besitzt die Regeln und
+          `guenstigste(…)`.
+        - «Ein Urteil je Teil»: `Lagennachweis` hat die Schleife einmal, die
+          Nachweise je Seite und je Fall bauen sie 13-mal selbst
+          (`begruendung` neunmal deklariert). Umbau: ein `Teilnachweis` mit
+          `teile()`, `begruendung` in `Fallausgang`.
 - [x] **5. Nach dem Klick baut jede App mit Zeichenfenster selbst.**
       Erledigt (2026-11-20): `cad_app.js` fragt den Kern, baut die Liste
       unter der Zeichnung und das schwebende Fenster zur Auswahl für alle
@@ -1408,11 +1414,6 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Baustahl: die Wärmedehnzahl** α_T = 10·10⁻⁶/°C (SIA 263:2013,
       3.2.2.2) fehlt -- es gibt keine Temperatur als Einheit, und keine
       Rechnung braucht sie. Kommt mit der ersten, die sie braucht.
-- [ ] **Die genaue Linie der Platte über den neuen Fächer.** Die Platte hat
-      noch ihren eigenen `dehnungsfaecher`; der Fächer der Analyse kann
-      dasselbe für jede Form. Seit beide ihren Widerstand genau suchen, liegen
-      sie unter 0.01 % beisammen (`tests/test_interaktion.py`) -- umstellen
-      ginge, die Fasern legen sie verschieden.
 - [ ] **Kriechzahl φ an den Flächen der Querschnittsanalyse.** Die
       Stahlspannungen und die Zwängung auf Biegung rechnen mit dem φ ihres
       Kapitels, wie bei der Platte -- für jeden Beton dasselbe. Ein φ je
@@ -1453,13 +1454,17 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Norm über die Krümmung an (siehe «Kriechen beim Knicken»).
 - [ ] **Das Ende der Linien** liegt an den Grenzen des Dehnungsfächers:
       Betonrand −ε_c2d (Tabelle 8), Stahllagen ±ε_ud (Tabelle 9), Punkt C
-      −ε_c1d bei `z_C = h·(1 − ε_c1d/ε_c2d)` -- dieselben Grenzen wie in
-      `nachweis/dehnungsfaecher.py`; Punkt C nach Vorgabe (siehe oben).
+      −ε_c1d bei `z_C = h·(1 − ε_c1d/ε_c2d)` -- dieselben Grenzen wie
+      überall, gezogen in `querschnitt/interaktion.py`; Punkt C nach Vorgabe
+      (siehe oben).
 
 ## Erledigt zuletzt
 
-Der Hinweis auf die Hauptachsen kommt weiter ab 5 % von min(I_y; I_z)
-(Benutzer, 2026-11-19: «5 % lassen»; steht jetzt in [[Arbeitsweise]]) ·
+Die genaue Linie der Platte läuft den Fächer der Interaktion ab, über
+dieselben Streifen wie der gezeichnete Querschnitt (Punkt 4 der Durchsicht
+vom 2026-11-19) · der Hinweis auf die Hauptachsen kommt weiter ab 5 % von
+min(I_y; I_z) (Benutzer, 2026-11-19: «5 % lassen»; steht jetzt in
+[[Arbeitsweise]]) ·
 der Schalter «E-Modul» eines Querschnitts schreibt E_cm und E_eq, wie sie
 heissen, statt E_CM und E_EQ ·
 

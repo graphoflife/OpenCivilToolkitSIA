@@ -7,6 +7,48 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Platte rechnet als Rechteck mit Stäben
+
+Die Platte rechnete ihren Querschnitt ein zweites Mal (Punkt 4 der
+Durchsicht vom 2026-11-19): mit eigenen Fasern (`plattenfasern`), eigenem
+Fächer und eigenen Grenzen (`dehnungsfaecher.py`), in einem eigenen Löser
+(`Querschnittsloeser`). Jetzt baut sie einen `interaktion.Querschnitt` wie
+der gezeichnete Querschnitt und der Pfahl: ein Rechteck b·h um die halbe
+Höhe, je Lage ein Stab (`Gesetze.querschnitt`).
+
+- Die Löser nehmen 60 Streifen wie beim gezeichneten Querschnitt
+  (`FASERN`), die genaue Resistenzlinie 200 (`STREIFEN`). Die Linie läuft
+  den Fächer der Interaktion ab, für Zug unten und für Zug oben
+  (`faecherebenen`, dafür jetzt öffentlich).
+- Eine Lage ist ein Band über die ganze Breite: wo das Gesetz springt,
+  wird der Beton, den sie verdrängt, über die Dicke a_s/b gemittelt
+  (`Bewehrung.dicke`). Ohne Angabe bleibt es ein Quadrat gleicher Fläche.
+- Die Grenzen heissen wie beim gezeichneten Querschnitt, mit dem Namen des
+  Baustoffs: «Beton C30/37, Rand oben» statt «Beton am oberen Rand»,
+  «Beton C30/37, Punkt C» statt «Beton im Punkt C», «Stahl B500B,
+  äusserste Lage unten» statt «Stahl der 1. Lage». So steht es im Bericht
+  («Massgebend: …») und in den Hinweisen der Spannungsanalyse.
+- Nebenbei behoben, auch am gezeichneten Querschnitt: lag ein Stahl an
+  einer einzigen Stelle – eine Lage nur unten –, hiess seine Grenze bei
+  Zug unten «oben». Jetzt sagt seine Lage zum Bezugspunkt die Seite.
+
+Die Zahlen bleiben: alle 1518 Werte der beiden Beispielprojekte wie
+vorher, auf 1e-9 genau. Im Bericht kippt eine Rundung: ein Moment des
+Balkensystems liegt genau auf −20.25 kNm, und mit 1e-14 Unterschied im
+Modul E_eq steht dort −20.2 statt −20.3.
+
+Geblieben ist das `Loeserpaar` der Platte neben dem `Schnittpaar` des
+gezeichneten Querschnitts. Seine Löser kommen aus demselben Bau, aber den
+Riss rechnet es weiter am Rechteck in b und h, mit der rissaktiven Dicke
+t = h. Beide zusammenzulegen ändert die Herleitung der Platte; das steht
+in [[TODO]].
+
+Warum: Dieselbe Grenzregel stand zweimal da, in `dehnungsfaecher.grenzen`
+und `interaktion._grenzen`, mit verschiedenen Namen für dieselbe Grenze;
+jede Änderung daran war zweimal zu machen. Der Vergleich zwischen Platte
+und Querschnittsanalyse in `test_interaktion.py` trifft sich jetzt auf
+1e-9 statt auf ein Zehntausendstel.
+
 ## 2026-11-20 · Eine Form für «welche Seite zieht»
 
 Welche Seite ein Moment zieht, stand in fünf Formen da (Punkt 3 der

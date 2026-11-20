@@ -457,7 +457,7 @@ class TestBibliothek(unittest.TestCase):
                          "Im Docstring den Namen voll angeben: :class:`~opencivil.x.Y`.")
 
     def test_eingerueckt_unter_einer_ueberschrift_ist_code(self):
-        seite = self.seiten["opencivil.nachweis.dehnungsfaecher"]
+        seite = self.seiten["opencivil.nachweis.resistenzlinie"]
         self.assertIn("## VORZEICHEN\n\n```\nN > 0   Zug\n", seite)
 
     def test_schwanz_einer_ueberschrift_beginnt_den_absatz(self):

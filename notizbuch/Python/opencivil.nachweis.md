@@ -1,5 +1,5 @@
 ---
-erzeugt: 6db82fdde341
+erzeugt: f77d24074f74
 art: modul
 tags: [modul]
 ---
@@ -10,13 +10,12 @@ tags: [modul]
 Jeder Nachweis ist eine Berechnung im Rechenwerk: er liest Werte, schreibt
 seine Herleitung ins Protokoll und faellt je Fall ein Urteil mit
 Erfuellungsgrad. Dazu die Bausteine, die mehrere teilen: der
-Querschnittsloeser, die Resistenzlinien, der Dehnungsfaecher und die
-Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
+Querschnittsloeser, die Resistenzlinien und die Rechenwahl, mit der jedes
+Kapitel waehlt, womit es rechnet.
 
 ## Module
 
 - [[opencivil.nachweis.biegung_normalkraft]] – Nachweis für Biegung mit Normalkraft.
-- [[opencivil.nachweis.dehnungsfaecher]] – Die zulaessigen Dehnungsebenen einer Platte.
 - [[opencivil.nachweis.duktilitaet]] – Duktilitaetsnachweis ueber die Druckzonenhoehe.
 - [[opencivil.nachweis.fehlende_bewehrung]] – Nachweise, die mangels Bewehrung entfallen.
 - [[opencivil.nachweis.gebrauchsebene]] – die Dehnungsebene des gezeichneten Querschnitts unter Gebrauchslast.
