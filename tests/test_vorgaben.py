@@ -65,6 +65,19 @@ class TestMaskeWieHerleitung(unittest.TestCase):
                 self.assertEqual(maske("grundbruch", g.als_dict()),
                                  herleitung(aufbau.grundbrueche[g.kennung]))
 
+    def test_setzung(self):
+        """Die Schichten zeigt die Maske je in einer Zeile, die Herleitung je in einem Kasten."""
+        p = Projekt(name="Probe")
+        s = p.setzung("F")
+        s.schicht("Lehm", d=2.0, M_E=10.0, M_E_strich=40.0)
+        s.schicht("Kies", d=3.0, M_E=60.0, M_E_strich=180.0)
+        eintrag = s.als_dict()
+        erwartet = maske("setzung", eintrag)
+        for i, schicht in enumerate(eintrag["schichten"], start=1):
+            erwartet += [(f"Schicht {i}: {schicht['name']}", f"{feld}_{i}")
+                         for _, feld in maske("schicht", schicht)]
+        self.assertEqual(erwartet, herleitung(p.aufbauen().setzungen[s.kennung]))
+
 
 if __name__ == "__main__":
     unittest.main()

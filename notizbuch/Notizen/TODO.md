@@ -375,7 +375,10 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Grundbruch (2026-11-20): die Tafel steht in `fundament.VORGABEN`
         (Bausteine `opencivil/core/vorgaben.py`), mit der kurzen Beschriftung
         der Maske neben der Beschreibung; `eingabekarten` baut die Karten,
-        `tests/test_vorgaben.py` vergleicht Maske und Herleitung.
+        `tests/test_vorgaben.py` vergleicht Maske und Herleitung. Erledigt
+        für die Setzung (2026-11-20): `setzung.VORGABEN` und `JE_SCHICHT`,
+        die Schichten je mit ihrer Nummer (`Feld.nummeriert`); auch die
+        Spalten der Schichten kommen aus dem Kern.
       - Bilder tippen Einheiten: `GROESSEN` in `pf_verlauf.js` spiegelt
         `VERLAEUFE` samt Grenzschlüsseln (eine umbenannte Grösse
         verschwindet still), `platte_bilder.js` rund 35 Einheiten, die

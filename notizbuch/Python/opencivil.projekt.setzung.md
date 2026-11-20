@@ -1,5 +1,5 @@
 ---
-erzeugt: 1e032acc6912
+erzeugt: 125e662d50ae
 art: modul
 tags: [modul]
 ---
@@ -97,3 +97,4 @@ Eine Schicht unten anfügen -- Dicke in m, M_E-Werte in MN/m².
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.web.api]]

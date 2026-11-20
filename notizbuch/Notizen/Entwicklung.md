@@ -7,6 +7,22 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Setzung holt ihre Maske aus dem Kern
+
+Wie beim Grundbruch: die Tafel der Vorgaben steht einmal, in
+`opencivil/geotechnik/setzung.py` – `VORGABEN` für Fundament, Pressung und
+Nachweis, `JE_SCHICHT` für die Felder jeder Schicht. Die Herleitung zeigt je
+Schicht einen Kasten mit nummerierten Zeichen (d₁, M_E,1), die Maske je
+Schicht eine Zeile; «#» in der Beschreibung steht für die Schicht
+(`Feld.nummeriert`). Auch die Spalten der Schichtentabelle, ihre Köpfe und
+Schrittweiten kommen jetzt aus dem Kern. Der Schalter starr/schlaff ist keine
+Zahl und bleibt in der Maske, hinter Breite und Länge.
+
+Sichtbar anders sind nur die Titel über den Feldern: die Beschreibung der
+Herleitung mit Hinweis und Normstelle. Über der Spalte M_E etwa
+«M_E-Wert der Schicht, Erstbelastung (Kap. 5.3, 8.5; SIA 267:2013,
+5.3.2.8)» statt «M_E-Wert der Erstbelastung».
+
 ## 2026-11-20 · Der Grundbruch holt seine Maske aus dem Kern
 
 Die Maske des Grundbruchs schrieb die Tafel der Herleitung ab: Gruppen,

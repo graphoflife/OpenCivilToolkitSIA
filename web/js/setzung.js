@@ -9,11 +9,16 @@
  *
  * Gerechnet wird nichts: die Setzung steht rechts in der Zusammenfassung und
  * im Bild der Situation unter «Diagramme». Einheiten und Grenzen kommen aus
- * dem Katalog (`katalog.felder`), wie beim Grundbruch.
+ * dem Katalog (`katalog.felder`), wie beim Grundbruch -- und ebenso die
+ * Karten und die Spalten der Schichten mit Feldern, Zeichen und Hinweisen:
+ * die Gruppen der Herleitung (`katalog.vorgaben`,
+ * opencivil/geotechnik/setzung.py). Bis 2026-11-20 standen sie hier ein
+ * zweites Mal.
  */
 
 import {
-  erklaerung, feld, karte, mitBild, namensfeld, panel, wahlSchalter, zahlzeile,
+  eingabekarten, erklaerung, feld, mitBild, namensfeld, panel, vorgabefelder, vorgabetitel,
+  wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
@@ -47,8 +52,6 @@ const HILFE = {
 
 function situationPanel(s) {
   const aendern = (veraenderer) => eintragAendern(s.kennung, veraenderer);
-  const zahl = (schluessel, text, symbol, mehr = {}) =>
-    zahlzeile('setzung', s, schluessel, text, symbol, { ...mehr, aendern });
   return panel({
     schluessel: 'setzung/Situation', titel: 'Setzung Situation',
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
@@ -58,34 +61,20 @@ function situationPanel(s) {
         wert: s.name, setzen: (name) => aendern((x) => { x.name = name; }),
       })),
     ]),
-    karte('Fundament', [
-      zahl('B', 'Breite', 'B', { schritt: 0.1 }),
-      zahl('L', 'Länge', 'L', { schritt: 0.1 }),
-      feld('Steifigkeit', wahlSchalter({
-        werte: mitBild(katalog('setzung', 'steifigkeiten').map((x) => ({
-          wert: x.wert, beschriftung: x.wert, titel: x.beschriftung,
-        })), 'setzung'),
-        gewaehlt: s.steifigkeit,
-        setzen: (w) => aendern((x) => { x.steifigkeit = w; }),
-        titel: 'Starr: im Punkt K, die mittlere Setzung – schlaff: unter der Mitte, die grösste',
-      }), ''),
-    ]),
-    karte('Pressung in der Sohle', [
-      zahl('q_W', 'Wiederbelastung', 'q_W', {
-        schritt: 5, titel: 'Bis zu der Spannung, die der Boden schon getragen hat',
-      }),
-      zahl('q_E', 'Erstbelastung', 'q_E', {
-        schritt: 5, titel: 'Was darüber hinausgeht und den Boden zum ersten Mal belastet',
-      }),
-    ]),
-    karte('Nachweis', [
-      zahl('s_zul', 'Zulässige Setzung', 's_{zul}', {
-        titel: 'Je Bauwerk festzulegen (SIA 267:2013, 8.5.4.1)',
-      }),
-      zahl('dz', 'Teilschichten höchstens', String.raw`\Delta z_{max}`, {
-        schritt: 0.1, titel: 'Jede Schicht wird in gleich dicke Teilschichten geteilt',
-      }),
-    ]),
+    ...eingabekarten('setzung', s, aendern, {
+      dazu: {
+        Fundament: {
+          nach: [feld('Steifigkeit', wahlSchalter({
+            werte: mitBild(katalog('setzung', 'steifigkeiten').map((x) => ({
+              wert: x.wert, beschriftung: x.wert, titel: x.beschriftung,
+            })), 'setzung'),
+            gewaehlt: s.steifigkeit,
+            setzen: (w) => aendern((x) => { x.steifigkeit = w; }),
+            titel: 'Starr: im Punkt K, die mittlere Setzung – schlaff: unter der Mitte, die grösste',
+          }), '')],
+        },
+      },
+    }),
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [
         el('label', { text: 'Beschreibung' }),
@@ -101,24 +90,16 @@ function situationPanel(s) {
 function schichtZeile(s, i) {
   const schicht = s.schichten[i];
   const aendern = (veraenderer) => eintragAendern(s.kennung, (x) => veraenderer(x.schichten[i]));
-  const zahl = (schluessel, schritt, titel) => zahlfeld({
-    wert: schicht[schluessel], schritt, angabe: feldangabe('schicht', schluessel), titel,
-    beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
-  });
   return fallzeile({
     fall: schicht, aendern, nameTitel: 'Bezeichnung der Schicht',
     vorn: el('span.schicht-nummer', { text: String(i + 1), title: `${i + 1}. Schicht unter der Sohle` }),
-    zahlen: [zahl('d', 0.5, 'Dicke der Schicht'),
-      zahl('M_E', 1, 'M_E-Wert der Erstbelastung'),
-      zahl('M_E_strich', 1, 'M_E-Wert der Wiederbelastung')],
+    zahlen: vorgabefelder('schicht', schicht).map((f) => zahlfeld({
+      wert: schicht[f.feld], schritt: f.schritt, angabe: feldangabe('schicht', f.feld),
+      titel: vorgabetitel(f), beiAenderung: (v) => aendern((x) => { x[f.feld] = v; }),
+    })),
     entfernenTitel: 'Schicht entfernen',
     entfernen: () => eintragAendern(s.kennung, (x) => { x.schichten.splice(i, 1); }),
   });
-}
-
-/** Ein Spaltenkopf aus Formelzeichen und der Einheit des Kerns: «M'_E [MN/m²]». */
-function kopf(schluessel, symbol) {
-  return [symbol, feldangabe('schicht', schluessel).einheit];
 }
 
 function schichtenPanel(s) {
@@ -130,8 +111,10 @@ function schichtenPanel(s) {
     zusatz: erklaerung(HILFE.schichten.zeilen, HILFE.schichten.formel),
   }, [
     el('div.unterkapitel', {}, [
+      // Je Spalte ein Feld der Vorgaben: sein Zeichen und die Einheit des Kerns, «M'_E [MN/m²]».
       s.schichten.length
-        ? fallkopf([kopf('d', 'd'), kopf('M_E', 'M_E'), kopf('M_E_strich', "M'_E")])
+        ? fallkopf(vorgabefelder('schicht', s.schichten[0])
+          .map((f) => [f.zeichen, feldangabe('schicht', f.feld).einheit]))
         : el('div.leer', { text: 'Ohne Schicht keine Setzung.' }),
       ...s.schichten.map((_, i) => schichtZeile(s, i)),
       el('button.knopf-anfuegen', { type: 'button', text: '+ Schicht', on: { click: neu } }),

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8baae650291a
+erzeugt: da611e427799
 art: modul
 tags: [modul]
 ---
@@ -144,3 +144,4 @@ je Wahl, welche Werte sie annehmen kann.
 ## Gebraucht von
 
 - [[opencivil.geotechnik.fundament]]
+- [[opencivil.geotechnik.setzung]]

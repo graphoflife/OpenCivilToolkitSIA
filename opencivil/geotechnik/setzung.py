@@ -54,7 +54,7 @@ import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
-from opencivil.core.berechnung import Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Vorgabe
+from opencivil.core.berechnung import Ausfuehrung, Berechnung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import OHNE_EINWIRKUNG, UNBESCHRAENKT, Nachweis, Vergleich, grad_def
 from opencivil.core.einheiten import KN_PRO_M2, M, MM, MN_PRO_M2, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text, angabe, fest
@@ -62,6 +62,7 @@ from opencivil.core.protokoll import (
     Abschnitt, GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte,
 )
 from opencivil.core.rechenobjekt import Rechenobjekt
+from opencivil.core.vorgaben import SCHICHT, Feld, Gruppe
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef
 
@@ -150,6 +151,41 @@ def einflusslinie(L: float, B: float, x: float, y: float, tiefe: float,
 # Das Fundament
 # ===========================================================================
 
+#: Die Vorgaben der Setzung, je Kasten der Herleitung und Karte der Maske
+#: (:mod:`opencivil.core.vorgaben`).
+VORGABEN = (
+    Gruppe("Fundament", lambda: (
+        Feld("B", "B", M, "Breite des Fundaments", 2, beschriftung="Breite", schritt=0.1),
+        Feld("L", "L", M, "Länge des Fundaments", 2, beschriftung="Länge", schritt=0.1),
+    )),
+    Gruppe("Pressung in der Sohle", lambda: (
+        Feld("q_W", "q_W", KN_PRO_M2, "Pressung aus Wiederbelastung", 1, KAP_WIEDERBELASTUNG,
+             beschriftung="Wiederbelastung", schritt=5,
+             hinweis="bis zu der Spannung, die der Boden schon getragen hat"),
+        Feld("q_E", "q_E", KN_PRO_M2, "Pressung aus Erstbelastung", 1, KAP_WIEDERBELASTUNG,
+             beschriftung="Erstbelastung", schritt=5,
+             hinweis="was darüber hinausgeht und den Boden zum ersten Mal belastet"),
+    )),
+    Gruppe("Nachweis", lambda: (
+        Feld("s_zul", "s_{zul}", MM, "Zulässige Setzung, je Bauwerk festzulegen", 1,
+             "SIA 267:2013, 8.5.4.1; Kap. 8.12", beschriftung="Zulässige Setzung"),
+        Feld("dz", r"\Delta z_{max}", M, "Grösste Dicke einer Teilschicht", 2, "Kap. 8.3",
+             beschriftung="Teilschichten höchstens", schritt=0.1,
+             hinweis="jede Schicht wird in gleich dicke Teilschichten geteilt"),
+    )),
+)
+
+#: Im Gebrauch ohne Partialfaktor (SIA 267:2013, 5.3.2.8): M_E, wie gemessen.
+_MODUL = "Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8"
+
+#: Die Vorgaben jeder Schicht, je mit ihrer Nummer -- in der Herleitung ein
+#: Kasten je Schicht, in der Maske eine Zeile.
+JE_SCHICHT = (Gruppe(SCHICHT, lambda: (
+    Feld("d", "d", M, "Dicke der #", 2, schritt=0.5),
+    Feld("M_E", "M_E", MN_PRO_M2, "M_E-Wert der #, Erstbelastung", 1, _MODUL),
+    Feld("M_E_strich", "M'_E", MN_PRO_M2, "M_E-Wert der #, Wiederbelastung", 1, _MODUL),
+)),)
+
 
 @dataclass(frozen=True)
 class Schicht:
@@ -201,41 +237,19 @@ class Setzungsfundament(Rechenobjekt):
 
     def _aufbauen(self) -> None:
         # Je Gruppe ein Kasten in der Herleitung, je Schicht einer -- wie beim Grundbruch.
-        vorgaben = [
-            ("Fundament", (
-                ("B", "B", M, "Breite des Fundaments", 2, self.B, ""),
-                ("L", "L", M, "Länge des Fundaments", 2, self.L, ""),
-            )),
-            ("Pressung in der Sohle", (
-                ("q_W", "q_W", KN_PRO_M2, "Pressung aus Wiederbelastung", 1, self.q_W,
-                 KAP_WIEDERBELASTUNG),
-                ("q_E", "q_E", KN_PRO_M2, "Pressung aus Erstbelastung", 1, self.q_E,
-                 KAP_WIEDERBELASTUNG),
-            )),
-            ("Nachweis", (
-                ("s_zul", "s_{zul}", MM, "Zulässige Setzung, je Bauwerk festzulegen", 1,
-                 self.s_zul, "SIA 267:2013, 8.5.4.1; Kap. 8.12"),
-                ("dz", r"\Delta z_{max}", M, "Grösste Dicke einer Teilschicht", 2, self.dz,
-                 "Kap. 8.3"),
-            )),
-        ]
-        # Im Gebrauch ohne Partialfaktor (SIA 267:2013, 5.3.2.8): M_E, wie gemessen.
-        modul = "Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8"
+        for gruppe in VORGABEN:
+            for f in gruppe.fuer(self):
+                self._vorgabe(f, gruppe.titel, getattr(self, f.kurz))
         for i, schicht in enumerate(self.schichten, start=1):
-            vorgaben.append((f"Schicht {i}: {schicht.name}", (
-                (f"d_{i}", f"d_{{{i}}}", M, f"Dicke der Schicht {i}", 2, schicht.d, ""),
-                (f"M_E_{i}", f"M_{{E,{i}}}", MN_PRO_M2,
-                 f"M_E-Wert der Schicht {i}, Erstbelastung", 1, schicht.M_E, modul),
-                (f"M_E_strich_{i}", f"M'_{{E,{i}}}", MN_PRO_M2,
-                 f"M_E-Wert der Schicht {i}, Wiederbelastung", 1, schicht.M_E_strich, modul),
-            )))
-        for gruppe, eintraege in vorgaben:
-            for kurz, symbol, einheit, beschreibung, stellen, groesse, referenz in eintraege:
-                d = WertDef(id=f"{self.id}.{kurz}", symbol=symbol, einheit=einheit,
-                            beschreibung=beschreibung, referenz=referenz, stellen=stellen)
-                self.definitionen[kurz] = d
-                self.berechnungen.append(Vorgabe(id=d.id, ausgabe=d, groesse=groesse,
-                                                 abschnitt=self.abschnitt, gruppe=gruppe))
+            for gruppe in JE_SCHICHT:
+                for f in gruppe.fuer(schicht):
+                    self._vorgabe(f.nummeriert(i), f"{SCHICHT} {i}: {schicht.name}",
+                                  getattr(schicht, f.kurz))
+
+    def _vorgabe(self, f: Feld, gruppe: str, groesse: Groesse) -> None:
+        d, vorgabe = f.vorgabe(self.id, self.abschnitt, gruppe, groesse)
+        self.definitionen[f.kurz] = d
+        self.berechnungen.append(vorgabe)
 
 
 # ===========================================================================

@@ -1,5 +1,5 @@
 ---
-erzeugt: 858e0abfa231
+erzeugt: b91f64aec059
 art: modul
 tags: [modul]
 ---
@@ -352,6 +352,9 @@ Die Schichten, wie man sie im Schnitt sieht: Tiefe, M_E-Werte und ihr Beitrag zu
 - `KAP_WIEDERBELASTUNG = 'Kap. 8.5'`
 - `KAP_STEIFIGKEIT = 'Kap. 8.10, Bild 8.15'`
 - `MODUL = MN_PRO_M2.latex` – Die Einheit der M_E-Werte in den Köpfen der Tabellen.
+- `VORGABEN = (Gruppe('Fundament', lambda: (Feld('B', 'B', M, 'Breite des Fundament…` – Die Vorgaben der Setzung, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]).
+- `_MODUL = 'Kap. 5.3, 8.5; SIA 267:2013, 5.3.2.8'` – Im Gebrauch ohne Partialfaktor (SIA 267:2013, 5.3.2.8): M_E, wie gemessen.
+- `JE_SCHICHT = (Gruppe(SCHICHT, lambda: (Feld('d', 'd', M, 'Dicke der #', 2, schritt…` – Die Vorgaben jeder Schicht, je mit ihrer Nummer -- in der Herleitung ein Kasten je Schicht, in der Maske eine Zeile.
 
 ## Braucht
 
@@ -361,6 +364,7 @@ Die Schichten, wie man sie im Schnitt sieht: Tiefe, M_E-Werte und ihr Beitrag zu
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenobjekt]]
+- [[opencivil.core.vorgaben]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 

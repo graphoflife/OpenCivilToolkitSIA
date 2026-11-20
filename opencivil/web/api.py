@@ -66,10 +66,11 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
-from opencivil.geotechnik import fundament
+from opencivil.geotechnik import fundament, setzung
 from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.projekt.grundbruch import GrundbruchEintrag
+from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
 from opencivil.web import balkendaten, diagrammdaten, durchstanzdaten, systemkatalog
@@ -166,7 +167,9 @@ def _vorgaben() -> Dict[str, List[dict]]:
     Beschreibung fuer diese Wahlen kennt.
     """
     return {katalogname(cls): [g.als_dict({n: wahl_von(cls, n) for n in g.nach}) for g in gruppen]
-            for cls, gruppen in ((GrundbruchEintrag, fundament.VORGABEN),)}
+            for cls, gruppen in ((GrundbruchEintrag, fundament.VORGABEN),
+                                 (SetzungEintrag, setzung.VORGABEN),
+                                 (SchichtEintrag, setzung.JE_SCHICHT))}
 
 
 def katalog() -> dict:

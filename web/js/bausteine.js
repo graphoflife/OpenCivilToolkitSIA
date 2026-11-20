@@ -254,8 +254,7 @@ export function eingabekarten(klasse, eintrag, aendern, { gelesen = null, dazu =
     }
   }
   return gruppen.map((g) => {
-    const felder = (g.felder[g.nach.map((n) => eintrag[n]).join('|')] || [])
-      .filter((f) => !gelesen || gelesen.has(f.feld));
+    const felder = felderDer(g, eintrag).filter((f) => !gelesen || gelesen.has(f.feld));
     const { vor = [], nach = [] } = dazu[g.titel] || {};
     const inhalt = [...vor, ...felder.map((f) => vorgabezeile(klasse, eintrag, f, aendern)), ...nach]
       .filter(Boolean);
@@ -263,12 +262,28 @@ export function eingabekarten(klasse, eintrag, aendern, { gelesen = null, dazu =
   }).filter(Boolean);
 }
 
+/** Die Felder einer Gruppe der Vorgaben für einen Eintrag -- nach den Wahlen, die sie nennt. */
+function felderDer(g, eintrag) {
+  return g.felder[g.nach.map((n) => eintrag[n]).join('|')] || [];
+}
+
+/**
+ * Alle Felder der Vorgaben eines Eintrags, über die Gruppen hinweg -- für
+ * eine Maske ohne Karten, etwa eine Zeile je Schicht.
+ */
+export function vorgabefelder(klasse, eintrag) {
+  return katalog('vorgaben', klasse).flatMap((g) => felderDer(g, eintrag));
+}
+
+/** Der Titel über einem Feld der Vorgaben: Beschreibung und Hinweis, dahinter die Normstelle. */
+export function vorgabetitel(f) {
+  return [f.beschreibung, f.hinweis].filter(Boolean).join(' – ') + (f.referenz ? ` (${f.referenz})` : '');
+}
+
 /** Ein Feld der Vorgaben als Zeile -- siehe `eingabekarten`. */
 export function vorgabezeile(klasse, eintrag, f, aendern) {
-  const titel = [f.beschreibung, f.hinweis].filter(Boolean).join(' – ')
-    + (f.referenz ? ` (${f.referenz})` : '');
   return zahlzeile(klasse, eintrag, f.feld, f.beschriftung, f.zeichen, {
-    schritt: f.schritt, titel, aendern,
+    schritt: f.schritt, titel: vorgabetitel(f), aendern,
   });
 }
 
