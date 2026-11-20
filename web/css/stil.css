@@ -792,6 +792,13 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .fallkopf .fall-zahlen > .ist-formel { text-transform: none; letter-spacing: 0; }
 .fallzeile input[type="number"] { padding-block: 3px; }
 .fallzeile .schalter-richtung { justify-self: stretch; }
+/* Die Fälle einer Liste trennt eine feine Linie (Benutzer, 2026-11-20):
+   ein Fall mit Zahlen unter dem Namen -- zwei oder drei Zeilen -- lief
+   sonst in den nächsten über. Dieselbe Linie in jeder Liste, auch zwischen
+   den Lastfällen von Balkensystem und Decke. Der erste Fall unter dem Kopf
+   braucht keine. */
+.fallzeile:not(.fallkopf) + .fallzeile,
+.bs-fall + .bs-fall { border-top: 1px solid var(--rand); padding-top: 5px; }
 
 /* ------------------------------------------------- Kapitel und Fenster -- */
 

@@ -7,6 +7,15 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Eine feine Linie trennt die Fälle einer Liste
+
+Ein Fall mit Zahlen unter dem Namen ist zwei oder drei Zeilen hoch; in einer
+Liste lief einer in den nächsten über, man sah nicht, welche Zahlen zu
+welchem Namen gehören (Benutzer, 2026-11-20). Jetzt trennt eine feine Linie
+(`--rand`) jeden Fall vom vorigen -- eine Regel im Stilblatt für alle
+Listen aus `fallzeile` und für die Lastfälle von Balkensystem und Decke
+(`.bs-fall`). Der erste Fall unter dem Kopf hat keine.
+
 ## 2026-11-20 · Die sechs Lasten eines Lastfalls stehen auf einer Zeile
 
 In der Tragsicherheit der Querschnittsanalyse standen N, M_y, M_z und
