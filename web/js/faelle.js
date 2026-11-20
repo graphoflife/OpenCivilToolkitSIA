@@ -9,7 +9,8 @@
  * Was eine Liste mehr hat, steht an fester Stelle: neben dem Namen (`oben`,
  * die Zugseite beim Knicken) oder in einer Zeile darunter (`unten`, Werte und
  * Rechenart einer Analyse). Stehen mehr Zahlen da als Spalten (`spalten`),
- * brechen sie um.
+ * brechen sie um. Unter der Liste steht der Knopf, der sie verlängert
+ * (`anfuegenKnopf`), und was er anlegt, heisst wie er.
  *
  * Jede Zelle trägt ihre Klasse, und danach setzt das Stilblatt sie. Bis
  * 2026-10-18 stand die Zeile siebenmal da, und das Stilblatt setzte ihre
@@ -21,7 +22,7 @@ import { api } from './api.js';
 import { hakenSchalter, namensfeld } from './bausteine.js';
 import { el } from './dom.js';
 import { span } from './mathe.js';
-import { zustand } from './zustand.js';
+import { naechsterName, zustand } from './zustand.js';
 
 /**
  * Eine Zeile. `fall` ist der Eintrag, `aendern(veraenderer)` ändert ihn im
@@ -97,4 +98,23 @@ export function fallkopf(koepfe, { spalten = koepfe.length, klasse = '' } = {}) 
  */
 export function formelkopf(zeichen, einheit = '') {
   return el('span', {}, [span(zeichen), einheit ? ` [${einheit}]` : '']);
+}
+
+/**
+ * Der Knopf, der eine Liste verlängert: «+ Schicht».
+ *
+ * Steht unter der Liste und nicht in der Überschrift: dort ist die Stelle,
+ * an der die nächste Zeile erscheint, und ein Knopf gehört dorthin, wo seine
+ * Wirkung sichtbar wird. Über die ganze Breite und mit gestricheltem Rand --
+ * man sieht, dass dort noch etwas hinkommt.
+ *
+ * Was er anlegt, heisst wie er, mit der kleinsten freien Nummer: «+ Schicht»
+ * gibt «Schicht 1», dann «Schicht 2» (Benutzer, 2026-11-20 -- bis dahin gab
+ * «+ Einwirkung» eine «Tragsicherheit 1»). `tun` bekommt dafür
+ * `name(liste)`. Nur ein Gebrauchsfall heisst nach seiner Art, «Häufig 1»:
+ * so will es der Benutzer.
+ */
+export function anfuegenKnopf(text, tun) {
+  const name = (liste) => naechsterName(text, liste);
+  return el('button.knopf-anfuegen', { type: 'button', text: `+ ${text}`, on: { click: () => tun(name) } });
 }

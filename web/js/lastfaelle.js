@@ -21,8 +21,8 @@ import { cadZeile } from './cad_palette.js';
 import {
   auswahl, el, melden, zahlfeld,
 } from './dom.js';
+import { anfuegenKnopf } from './faelle.js';
 import { zeilenstand } from './kapitel.js';
-import { anfuegenKnopf } from './nachweise.js';
 import {
   ausVorlage, eintragAendern, eintragVon, mitteAendern, naechsterName, neueKennung,
 } from './zustand.js';

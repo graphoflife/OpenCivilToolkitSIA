@@ -22,15 +22,15 @@ import {
 } from './bausteine.js';
 import { SUCHE } from './bewehrungssuche.js';
 import { el, zahlfeld } from './dom.js';
-import { fallkopf, fallzeile } from './faelle.js';
+import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
 import { fehltHinweis, standOhne, zeilenstand } from './kapitel.js';
 import { xLagen } from './lagen.js';
 import { span } from './mathe.js';
 import {
-  analysenKapitel, anfuegenKnopf, kriechzahlName, nachweisKapitel, rechenwahlZeile,
+  analysenKapitel, kriechzahlName, nachweisKapitel, rechenwahlZeile,
 } from './nachweise.js';
 import { sinnbild } from './sinnbilder.js';
-import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
+import { ausVorlage, eintragAendern, feldangabe, katalog } from './zustand.js';
 
 /**
  * Was hinter den Fragezeichen der Platte steht: Rechenweg, Werte (Bemessung
@@ -255,8 +255,8 @@ function tragsicherheitInhalt(querschnitt) {
     ...(querschnitt.kombinationen.length
       ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
       : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
-    anfuegenKnopf('Einwirkung', () => aendernAn((q) => q.kombinationen.push(
-      ausVorlage('kombination', { name: naechsterName('Tragsicherheit', q.kombinationen) }),
+    anfuegenKnopf('Einwirkung', (name) => aendernAn((q) => q.kombinationen.push(
+      ausVorlage('kombination', { name: name(q.kombinationen) }),
     ))),
     querkraftAngaben(querschnitt),
   ];
@@ -372,8 +372,8 @@ function verformungInhalt(querschnitt) {
     ...(faelle.length
       ? faelle.map((_, i) => verformungsZeile(querschnitt, i))
       : [el('div.leer', { text: 'Noch kein Verformungsfall (nur x).' })]),
-    anfuegenKnopf('Verformungsfall', () => aendern((l) => {
-      l.faelle.push(ausVorlage('verformungsfall', { name: naechsterName('Verformung', l.faelle) }));
+    anfuegenKnopf('Verformungsfall', (name) => aendern((l) => {
+      l.faelle.push(ausVorlage('verformungsfall', { name: name(l.faelle) }));
     })),
   ];
 }

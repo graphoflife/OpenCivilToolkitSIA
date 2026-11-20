@@ -257,7 +257,7 @@ class TestEintrag(unittest.TestCase):
 
     def test_neu_mit_einer_schicht_und_einer_kombination(self):
         t = PfahlEintrag.neu("t1", "Pfahl 1")
-        self.assertEqual([s.name for s in t.schichten], ["Kies"])
+        self.assertEqual([s.name for s in t.schichten], ["Schicht 1"])
         self.assertEqual([(k.name, k.N_Ed) for k in t.kombinationen], [("Kombination 1", 1000.0)])
         self.assertEqual((t.art, t.D, t.L, t.eta_a, t.eta_i), ("bohrpfahl", 900.0, 10.0, 0.7, 0.8))
 
@@ -346,7 +346,7 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
 
     def test_katalog(self):
         k = katalog()
-        self.assertEqual(k["neu"]["pfaehle"]["schichten"][0]["name"], "Kies")
+        self.assertEqual(k["neu"]["pfaehle"]["schichten"][0]["name"], "Schicht 1")
         self.assertEqual(k["felder"]["pfahl"]["D"]["einheit"], "mm")
         self.assertEqual(k["felder"]["pfahlschicht"]["q_s"]["einheit"], "kPa")
         self.assertEqual(k["felder"]["pfahlkombination"]["N_Ed"]["einheit"], "kN")

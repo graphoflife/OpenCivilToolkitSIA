@@ -30,9 +30,9 @@ import {
   panel, verhaltenSchalter, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
-import { fallkopf, fallzeile } from './faelle.js';
+import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
 import {
-  ausVorlage, eintragAendern, feldangabe, katalog, naechsterName,
+  ausVorlage, eintragAendern, feldangabe, katalog,
 } from './zustand.js';
 
 const HILFE = {
@@ -190,9 +190,6 @@ function schichtKarte(t, i) {
 }
 
 function schichtenPanel(t) {
-  const neu = () => eintragAendern(t.kennung, (x) => {
-    x.schichten.push(ausVorlage('pfahlschicht', { name: naechsterName('Schicht', x.schichten) }));
-  });
   return panel({
     schluessel: 'pfahl/Schichten', titel: 'Schichten',
     zusatz: erklaerung(HILFE.schichten.zeilen, HILFE.schichten.formel),
@@ -201,7 +198,9 @@ function schichtenPanel(t) {
     t.schichten.length ? null : el('div.leer', { text: 'Ohne Schicht lässt sich R_a,k nicht rechnen.' }),
     ...t.schichten.map((_, i) => schichtKarte(t, i)),
     el('div.unterkapitel', {}, [
-      el('button.knopf-anfuegen', { type: 'button', text: '+ Schicht', on: { click: neu } }),
+      anfuegenKnopf('Schicht', (name) => eintragAendern(t.kennung, (x) => {
+        x.schichten.push(ausVorlage('pfahlschicht', { name: name(x.schichten) }));
+      })),
     ]),
   ].filter(Boolean));
 }
@@ -231,10 +230,6 @@ function kombinationZeile(t, i) {
 }
 
 function einwirkungenPanel(t) {
-  const neu = () => eintragAendern(t.kennung, (x) => {
-    x.kombinationen.push(ausVorlage('pfahlkombination',
-      { name: naechsterName('Kombination', x.kombinationen) }));
-  });
   return panel({
     schluessel: 'pfahl/Einwirkungen', titel: 'Einwirkungen',
     zusatz: erklaerung(HILFE.einwirkungen.zeilen, HILFE.einwirkungen.formel),
@@ -245,7 +240,9 @@ function einwirkungenPanel(t) {
           feldangabe('pfahlkombination', schluessel).einheit]))
         : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
       ...t.kombinationen.map((_, i) => kombinationZeile(t, i)),
-      el('button.knopf-anfuegen', { type: 'button', text: '+ Kombination', on: { click: neu } }),
+      anfuegenKnopf('Kombination', (name) => eintragAendern(t.kennung, (x) => {
+        x.kombinationen.push(ausVorlage('pfahlkombination', { name: name(x.kombinationen) }));
+      })),
     ]),
   ]);
 }

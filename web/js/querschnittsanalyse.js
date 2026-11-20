@@ -22,7 +22,7 @@ import {
   erklaerung, feld, hakenSchalter, namensfeld, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import { el, svgEl, zahlfeld } from './dom.js';
-import { fallkopf, fallzeile } from './faelle.js';
+import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { span } from './mathe.js';
 import {
@@ -31,7 +31,7 @@ import {
 import { uebersicht } from './qa_uebersicht.js';
 import { geometriefehler, materialienVon, zeichenbereich } from './qa_zeichnung.js';
 import {
-  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog, naechsterName,
+  ausVorlage, eintragAendern, eintragVon, feldangabe, katalog,
 } from './zustand.js';
 
 /**
@@ -282,13 +282,8 @@ function tragsicherheitInhalt(analyse) {
     ...(faelle.length
       ? faelle.map((_, i) => lastfallZeile(analyse, i))
       : [el('div.leer', { text: 'Ohne Lastfall kein Nachweis.' })]),
-    el('button.knopf-anfuegen', {
-      text: '+ Lastfall',
-      on: {
-        click: () => aendern((a) => a.lastfaelle.push(
-          ausVorlage('qalastfall', { name: naechsterName('Tragsicherheit', a.lastfaelle) }))),
-      },
-    }),
+    anfuegenKnopf('Lastfall', (name) => aendern((a) => a.lastfaelle.push(
+      ausVorlage('qalastfall', { name: name(a.lastfaelle) })))),
     schubwandAngaben(analyse),
   ];
 }

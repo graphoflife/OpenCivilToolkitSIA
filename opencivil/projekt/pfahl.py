@@ -152,7 +152,7 @@ class PfahlEintrag(BauteilEintrag):
     def neu(cls, kennung: str, name: str) -> "PfahlEintrag":
         """Ein frischer Pfahl, wie die Oberflaeche ihn anlegt: mit einer Schicht und einer Kombination."""
         return cls(kennung=kennung, name=name,
-                   schichten=[PfahlschichtEintrag(name="Kies")],
+                   schichten=[PfahlschichtEintrag(name="Schicht 1")],
                    kombinationen=[PfahlkombinationEintrag(name="Kombination 1")])
 
     def materialien(self) -> List[str]:

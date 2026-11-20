@@ -354,5 +354,5 @@ class QuerschnittEintrag(Querschnittsangaben):
             # rechnen, die es auf der Baustelle nicht gibt.
             lagen=[lage(durchmesser) for _ in range(LAGENZAHL)],
             querkraftbewehrung=QuerkraftbewehrungEintrag(durchmesser=0.0),
-            kombinationen=[KombinationEintrag(name="Tragsicherheit 1")],
+            kombinationen=[KombinationEintrag(name="Einwirkung 1")],
         )

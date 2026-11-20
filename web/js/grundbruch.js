@@ -29,9 +29,9 @@ import {
   eingabekarten, erklaerung, feld, namensfeld, panel, verhaltenSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
-import { fallkopf, fallzeile } from './faelle.js';
+import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
-import { ausVorlage, eintragAendern, feldangabe, naechsterName, zustand } from './zustand.js';
+import { ausVorlage, eintragAendern, feldangabe, zustand } from './zustand.js';
 
 const HILFE = {
   situation: {
@@ -131,10 +131,6 @@ function kombinationZeile(g, i) {
 }
 
 function einwirkungenPanel(g) {
-  const neu = () => eintragAendern(g.kennung, (x) => {
-    x.kombinationen.push(ausVorlage('grundbruchkombination',
-      { name: naechsterName('Kombination', x.kombinationen) }));
-  });
   return panel({
     schluessel: 'grundbruch/Einwirkungen', titel: 'Einwirkungen',
     zusatz: erklaerung(HILFE.einwirkungen.zeilen, HILFE.einwirkungen.formel),
@@ -145,7 +141,9 @@ function einwirkungenPanel(g) {
           ([zeichen, s]) => [zeichen, feldangabe('grundbruchkombination', s).einheit]))
         : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
       ...g.kombinationen.map((_, i) => kombinationZeile(g, i)),
-      el('button.knopf-anfuegen', { type: 'button', text: '+ Kombination', on: { click: neu } }),
+      anfuegenKnopf('Kombination', (name) => eintragAendern(g.kennung, (x) => {
+        x.kombinationen.push(ausVorlage('grundbruchkombination', { name: name(x.kombinationen) }));
+      })),
     ]),
   ]);
 }

@@ -7,6 +7,23 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Neues heisst wie sein Knopf
+
+«+ Einwirkung» legte eine «Tragsicherheit 1» an, «+ Lastfall» der
+Querschnittsanalyse ebenso, «+ Knicknachweis» ein «Knicken 1», und die
+erste Schicht eines neuen Pfahls hiess «Kies». Der Benutzer will
+generische Namen, die zum Knopf passen (2026-11-20).
+
+Der Knopf `anfuegenKnopf` steht jetzt in `faelle.js`, bei der Zeile der
+Fälle, und benennt, was er anlegt: `tun` bekommt `name(liste)`, «Wort» und
+die kleinste freie Nummer. Setzung, Grundbruch, Pfahl und die
+Querschnittsanalyse bauten ihren Knopf bis dahin selbst; sie nehmen ihn nun
+auch. Neu heissen «Einwirkung 1» (auch die erste einer neuen Platte im
+Kern), «Lastfall 1», «Knicknachweis 1», «Verformungsfall 1» und die erste
+Pfahlschicht «Schicht 1». Wie der Benutzer es will, bleiben die
+Standardfälle (Eigengewicht, Auflast, Nutzlast, GZT, GZG) und die
+Gebrauchsfälle, die nach ihrer Art heissen («Häufig 1»).
+
 ## 2026-11-20 · Die rechte Tafel wird rötlich, solange sie nicht zur Eingabe passt
 
 Nach einer Änderung stand rechts bis zur neuen Antwort das alte Ergebnis,

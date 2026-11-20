@@ -21,8 +21,8 @@ import {
   wahlSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
-import { fallkopf, fallzeile } from './faelle.js';
-import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
+import { anfuegenKnopf, fallkopf, fallzeile } from './faelle.js';
+import { ausVorlage, eintragAendern, feldangabe, katalog } from './zustand.js';
 
 const HILFE = {
   situation: {
@@ -103,9 +103,6 @@ function schichtZeile(s, i) {
 }
 
 function schichtenPanel(s) {
-  const neu = () => eintragAendern(s.kennung, (x) => {
-    x.schichten.push(ausVorlage('schicht', { name: naechsterName('Schicht', x.schichten) }));
-  });
   return panel({
     schluessel: 'setzung/Schichten', titel: 'Schichten',
     zusatz: erklaerung(HILFE.schichten.zeilen, HILFE.schichten.formel),
@@ -117,7 +114,9 @@ function schichtenPanel(s) {
           .map((f) => [f.zeichen, feldangabe('schicht', f.feld).einheit]))
         : el('div.leer', { text: 'Ohne Schicht keine Setzung.' }),
       ...s.schichten.map((_, i) => schichtZeile(s, i)),
-      el('button.knopf-anfuegen', { type: 'button', text: '+ Schicht', on: { click: neu } }),
+      anfuegenKnopf('Schicht', (name) => eintragAendern(s.kennung, (x) => {
+        x.schichten.push(ausVorlage('schicht', { name: name(x.schichten) }));
+      })),
     ]),
   ]);
 }

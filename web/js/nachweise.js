@@ -23,7 +23,9 @@
 
 import { erklaerung, feld, hakenSchalter, mitBild, wahlSchalter } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
-import { fallkopf, fallzeile, formelkopf } from './faelle.js';
+import {
+  anfuegenKnopf, fallkopf, fallzeile, formelkopf,
+} from './faelle.js';
 import {
   eingeschaltet, fehltHinweis, gebrauchsstand, schalter, standOhne, zeilenstand,
 } from './kapitel.js';
@@ -145,18 +147,6 @@ export function analysenKapitel(ort) {
 // ===========================================================================
 
 /**
- * Der Knopf, der eine Liste verlängert.
- *
- * Steht unter der Liste und nicht in der Überschrift: dort ist die Stelle,
- * an der die nächste Zeile erscheint, und ein Knopf gehört dorthin, wo seine
- * Wirkung sichtbar wird. Über die ganze Breite und mit gestricheltem Rand --
- * man sieht, dass dort noch etwas hinkommt.
- */
-export function anfuegenKnopf(text, tun) {
-  return el('button.knopf-anfuegen', { text: `+ ${text}`, on: { click: tun } });
-}
-
-/**
  * Die Zeile eines Nachweises mit *einem* Schalter: Duktilität, sprödes
  * Versagen und die Zeilen der Zwängung. Vorne der Schalter, dann die Marke,
  * die der Ort davor setzt (`ort.marke`: bei der Platte die Tragrichtung x),
@@ -259,10 +249,9 @@ function knickInhalt(eintrag, ort) {
     ...(faelle.length
       ? faelle.map((_, i) => knickZeile(eintrag, ort, i))
       : [el('div.leer', { text: knick.leer })]),
-    anfuegenKnopf('Knicknachweis', () => aendern((q) => {
+    anfuegenKnopf('Knicknachweis', (name) => aendern((q) => {
       q.knickfaelle = q.knickfaelle || [];
-      q.knickfaelle.push(
-        ausVorlage(knick.vorlage, { name: naechsterName('Knicken', q.knickfaelle) }));
+      q.knickfaelle.push(ausVorlage(knick.vorlage, { name: name(q.knickfaelle) }));
     })),
   ];
 }
@@ -449,6 +438,8 @@ function gebrauchsKapitel(eintrag, ort, {
           : eingeschaltet(eintrag[ort.gebrauch.aus]) ? 'Nur die abgeleiteten Fälle.'
             : 'Noch keine eingeschaltete Einwirkung der Tragsicherheit – abgeleitet wird nichts.',
       })]),
+    // Ein neuer Gebrauchsfall heisst nach seiner Art, «Häufig 1», nicht wie
+    // der Knopf (Benutzer, 2026-11-20).
     anfuegenKnopf('Lastfall', () => aendern((l) => {
       l.faelle.push(ausVorlage(ort.gebrauch.vorlage, { name: naechsterName(neu, l.faelle) }));
     })),
@@ -493,10 +484,9 @@ function analyseInhalt(eintrag, art, ort) {
     ...(stellen.length
       ? stellen.map((i) => spannungsZeile(eintrag, i, ort))
       : [el('div.leer', { text: 'Noch kein Diagramm.' })]),
-    anfuegenKnopf('Diagramm', () => eintragAendern(eintrag.kennung, (e) => {
+    anfuegenKnopf('Diagramm', (name) => eintragAendern(eintrag.kennung, (e) => {
       e.spannungsfaelle = e.spannungsfaelle || [];
-      e.spannungsfaelle.push(
-        ausVorlage(ort.vorlage, { name: naechsterName('Diagramm', e.spannungsfaelle), art }));
+      e.spannungsfaelle.push(ausVorlage(ort.vorlage, { name: name(e.spannungsfaelle), art }));
     })),
   ];
 }
