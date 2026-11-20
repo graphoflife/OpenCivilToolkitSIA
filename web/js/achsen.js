@@ -13,9 +13,13 @@
  * (`achsentitel`, `masszahl`): Zeichen, Einheit und Stellen kommen mit den
  * Daten. Bis 2026-11-20 schrieb jedes Bild sie selbst, und die Pfahlskizze
  * sagte kN/m², wo die Maske kPa zeigt.
+ *
+ * Dazu, was mehrere Diagramme gleich zeichnen: den Bemessungspunkt mit
+ * seinem Weg zum Widerstand, die Farbe eines Urteils und die Legende unter
+ * dem Bild (`bemessungspunkt`, `urteilsfarbe`, `legende`).
  */
 
-import { svgEl } from './dom.js';
+import { el, stilfarbe, svgEl } from './dom.js';
 
 export const NR = 'http://www.w3.org/2000/svg';
 
@@ -240,4 +244,104 @@ export function achsenkreuz({
   }
 
   return { svg, daten, x, y, feld };
+}
+
+// ===========================================================================
+// Was mehrere Diagramme gleich zeichnen
+// ===========================================================================
+
+/**
+ * Die Farbe eines Urteils: grün, wenn erfüllt, sonst rot -- dieselbe wie in
+ * den Tabellen (`--gut`, `--schlecht` in stil.css). Bis 2026-11-20 stand das
+ * Paar in den Bildern als eigene Zahl, ein wenig anders als in den Tabellen.
+ */
+export const urteilsfarbe = (erfuellt) => stilfarbe(erfuellt ? 'gut' : 'schlecht');
+
+/**
+ * Ein Bemessungspunkt: die Einwirkung als gefüllter Punkt mit ihrem Namen
+ * daneben, dazu -- wo es ihn gibt -- der Widerstand als hohler Punkt und der
+ * gestrichelte Weg dorthin. Bis 2026-11-20 zeichnete ihn jedes Bild selbst,
+ * viermal mit kleinen Abweichungen in Grösse und Strich.
+ *
+ * @param {SVGElement} daten  die Gruppe, in die gezeichnet wird
+ * @param {object} p
+ * @param {number[]} p.ein           die Einwirkung `[x, y]`, im Bild
+ * @param {number[]} [p.widerstand]  der Widerstand `[x, y]`, im Bild
+ * @param {string} p.farbe           meist die des Urteils (`urteilsfarbe`)
+ * @param {string} p.name            die Beschriftung neben dem Punkt
+ * @param {string} p.titel           was beim Darüberfahren steht
+ * @param {boolean} [p.unten]        die Beschriftung unter statt über dem Punkt
+ * @param {number} [p.deckung]       blass, wo der Punkt nicht zum gezeigten Bild gehört
+ * @returns {SVGElement} der Punkt -- für einen Klick auf ihn
+ */
+export function bemessungspunkt(daten, {
+  ein, widerstand = null, farbe, name, titel, unten = false, deckung = 1,
+}) {
+  if (widerstand) {
+    daten.append(
+      svgEl('line', {
+        x1: ein[0], y1: ein[1], x2: widerstand[0], y2: widerstand[1],
+        stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3', opacity: 0.75 * deckung,
+      }),
+      svgEl('circle', {
+        cx: widerstand[0], cy: widerstand[1], r: 3.5,
+        fill: '#fff', stroke: farbe, 'stroke-width': 1.6, opacity: deckung,
+      }),
+    );
+  }
+  const kreis = svgEl('circle', {
+    cx: ein[0], cy: ein[1], r: 6, fill: farbe, stroke: '#fff', 'stroke-width': 2, opacity: deckung,
+  });
+  const hinweis = svgEl('title');
+  hinweis.textContent = titel;
+  kreis.append(hinweis);
+  daten.append(kreis, text(name, {
+    x: ein[0] + 9, y: ein[1] + (unten ? 16 : -8),
+    'font-size': 11, 'font-weight': 600, fill: farbe, opacity: deckung,
+  }));
+  return kreis;
+}
+
+/**
+ * Die Legende unter einem Diagramm. Ein Eintrag ist ein Paar `[probe, text]`
+ * mit einer Probe aus `strich`, `punkt` oder `flaeche`, ein Text allein oder
+ * schon ein fertiger Knoten; `null` fällt weg. Bis 2026-11-20 baute jedes
+ * Bild sie von Hand, mit Punkten auch für Linien.
+ */
+export function legende(eintraege) {
+  return el('div.mn-legende', {}, eintraege.map((e) => {
+    if (typeof e === 'string') return el('span', { text: e });
+    return Array.isArray(e) ? el('span', {}, e) : e;
+  }));
+}
+
+/** Die beiden Einträge jedes Bilds mit Urteilen. */
+export const urteilslegende = () => [
+  [punkt(urteilsfarbe(true)), 'erfüllt'], [punkt(urteilsfarbe(false)), 'nicht erfüllt'],
+];
+
+/** Ein Strich für die Legende, mit Muster und Breite der Linie im Bild. */
+export function strich(farbe, { muster = null, breite = 2.2 } = {}) {
+  const probe = svgEl('svg', { width: 26, height: 10, viewBox: '0 0 26 10', 'aria-hidden': 'true' });
+  probe.append(svgEl('line', {
+    x1: 1, y1: 5, x2: 25, y2: 5, stroke: farbe, 'stroke-width': breite,
+    'stroke-dasharray': muster,
+  }));
+  return probe;
+}
+
+/** Ein Punkt für die Legende: gefüllt, oder hohl wie ein Widerstand; `deckung` macht ihn blass. */
+export function punkt(farbe, { hohl = false, deckung = 1 } = {}) {
+  const stil = hohl ? { background: '#fff', border: `2px solid ${farbe}`, boxSizing: 'border-box' }
+    : { background: farbe };
+  return el('i', { style: { ...stil, opacity: String(deckung) } });
+}
+
+/** Eine Fläche für die Legende, etwa Druck oder Zug. */
+export function flaeche(farbe) {
+  return el('i', {
+    style: {
+      background: farbe, opacity: 0.35, borderRadius: '2px', border: `1px solid ${farbe}`,
+    },
+  });
 }

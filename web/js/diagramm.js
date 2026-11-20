@@ -11,7 +11,7 @@
  * Es wird nichts nachgerechnet: sämtliche Koordinaten kommen aus der Lösung.
  */
 
-import { achsenkreuz, NR } from './achsen.js';
+import { achsenkreuz, legende, NR, strich } from './achsen.js';
 import { hakenSchalter } from './bausteine.js';
 import { el, svgEl } from './dom.js';
 
@@ -131,14 +131,14 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
     title: gesetz.vereinfacht.beschreibung || '',
   }, [
     hakenSchalter(zeigeVereinfacht, (an) => beiUmschalten?.(an), gesetz.vereinfacht.titel),
-    el('i', { style: { background: GRUEN } }),
+    strich(GRUEN, { breite: 2 }),
     el('span', { text: gesetz.vereinfacht.titel }),
   ]);
 
   return el('div.diagramm-huelle', {}, [
     svg,
-    el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: '#1f6feb' } }), gesetz.titel]),
+    legende([
+      [strich('#1f6feb'), gesetz.titel],
       schalter,
       zeigeVereinfacht && gesetz.vereinfacht.beschreibung
         ? el('span', {

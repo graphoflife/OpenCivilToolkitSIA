@@ -26,7 +26,9 @@
  * Fläche und die Widerstände kommen fertig aus dem Kern.
  */
 
-import { achsenkreuz, NR } from './achsen.js';
+import {
+  achsenkreuz, bemessungspunkt, flaeche, legende, NR, punkt, strich, urteilsfarbe, urteilslegende,
+} from './achsen.js';
 import { api } from './api.js';
 import { karte, wahlSchalter } from './bausteine.js';
 import {
@@ -40,8 +42,6 @@ const RAND = { oben: 22, rechts: 22, unten: 46, links: 74 };
 
 const ZUG = '#b8622a';
 const DRUCK = '#1f5fa8';
-const GUT = '#1a7f45';
-const SCHLECHT = '#b3261e';
 const VIOLETT = '#8b5cf6';
 
 /** Die drei Grössen des Interaktionsdiagramms: Achsentitel, Einheit, Feld im Lastfall. */
@@ -208,13 +208,11 @@ function bruchbild(daten, fall) {
   svg.append(g);
   return el('div.diagramm-huelle', {}, [
     svg,
-    el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: 'rgba(31,95,168,.35)', borderRadius: '2px' } }),
-        `Druckzone, x = ${b.x.toFixed(1)} mm`]),
-      el('span', {}, [el('i', { style: { background: ZUG } }), 'Stab gezogen']),
-      el('span', {}, [el('i', { style: { background: '#fff', border: `1.5px solid ${DRUCK}` } }),
-        'Stab gedrückt']),
-      b.d > 0 ? el('span', { text: `d = ${b.d.toFixed(1)} mm` }) : null,
+    legende([
+      [flaeche(DRUCK), `Druckzone, x = ${b.x.toFixed(1)} mm`],
+      [punkt(ZUG), 'Stab gezogen'],
+      [punkt(DRUCK, { hohl: true }), 'Stab gedrückt'],
+      b.d > 0 ? `d = ${b.d.toFixed(1)} mm` : null,
     ]),
   ]);
 }
@@ -241,10 +239,9 @@ function schubbild(daten, fall) {
       [w.von[0] + n[0], w.von[1] + n[1]], [w.bis[0] + n[0], w.bis[1] + n[1]],
       [w.bis[0] - n[0], w.bis[1] - n[1]], [w.von[0] - n[0], w.von[1] - n[1]],
     ];
-    const gut = w.erfuellt !== false;
+    const farbe = w.erfuellt !== false ? VIOLETT : urteilsfarbe(false);
     g.append(svgEl('path', {
-      d: pfad(bild, ecken), fill: gut ? 'rgba(139,92,246,.14)' : 'rgba(179,38,30,.14)',
-      stroke: gut ? VIOLETT : SCHLECHT, 'stroke-opacity': 0.6,
+      d: pfad(bild, ecken), fill: farbe, 'fill-opacity': 0.14, stroke: farbe, 'stroke-opacity': 0.6,
     }));
   }
   // Pfeillänge: der stärkste Fluss bekommt 70 px, alle anderen im Verhältnis.
@@ -261,7 +258,7 @@ function schubbild(daten, fall) {
     const [x1, y1] = [mx + (richtung[0] * laenge) / 2, my + (richtung[1] * laenge) / 2];
     const winkel = Math.atan2(richtung[1], richtung[0]);
     const spitze = (w) => `${(x1 - 9 * Math.cos(winkel + w)).toFixed(1)},${(y1 - 9 * Math.sin(winkel + w)).toFixed(1)}`;
-    const farbe = w.erfuellt !== false ? '#5b3fb8' : SCHLECHT;
+    const farbe = w.erfuellt !== false ? '#5b3fb8' : urteilsfarbe(false);
     g.append(
       svgEl('line', { x1: x0, y1: y0, x2: x1, y2: y1, stroke: farbe, 'stroke-width': 2.2 }),
       svgEl('polygon', { points: `${x1.toFixed(1)},${y1.toFixed(1)} ${spitze(0.4)} ${spitze(-0.4)}`, fill: farbe }),
@@ -278,11 +275,11 @@ function schubbild(daten, fall) {
   svg.append(g);
   return el('div.diagramm-huelle', {}, [
     svg,
-    el('div.mn-legende', {}, [
-      el('span', { text: 'Pfeile: Schubfluss q in kN/m, in seiner Richtung' }),
+    legende([
+      'Pfeile: Schubfluss q in kN/m, in seiner Richtung',
       // Je Wand ihre ganze Kraft gegen ihren Widerstand, nicht je Meter.
       ...s.waende.map((w) => el('span', {
-        style: { color: w.erfuellt ? 'inherit' : SCHLECHT },
+        style: { color: w.erfuellt ? 'inherit' : 'var(--schlecht)' },
         text: `${w.name}: V_Ed = ${w.V_Ed.toFixed(1)} kN, V_Rd = ${w.V_Rd.toFixed(1)} kN, `
           + `α_eff = ${w.grad_text} (α = ${w.alpha}°)`,
       })),
@@ -392,47 +389,31 @@ function interaktionsbild(kennung, i, faelle, x, y, einachsig) {
   // Die blassen zuerst, damit die kräftigen obenauf liegen.
   for (const f of [...faelle].sort((a, b) => passt(a) - passt(b))) {
     const drin = passt(f);
-    // Ein Fall ohne Einwirkung hat nichts nachzuweisen: grau, mit seinem Satz.
-    const farbe = drin && !f.hinweis ? (f.erfuellt ? GUT : SCHLECHT) : '#8895a8';
-    if (mitWeg(f)) {
-      g.append(svgEl('line', {
-        x1: sx(wert(f, x)), y1: sy(wert(f, y)), x2: sx(f.widerstand[x]), y2: sy(f.widerstand[y]),
-        stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3', opacity: 0.75,
-      }));
-      g.append(svgEl('circle', {
-        cx: sx(f.widerstand[x]), cy: sy(f.widerstand[y]), r: 4,
-        fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
-      }));
-    }
-    const punkt = svgEl('circle', {
-      cx: sx(wert(f, x)), cy: sy(wert(f, y)), r: drin ? 6 : 5,
-      fill: farbe, stroke: '#fff', 'stroke-width': 2, opacity: drin ? 1 : 0.45,
-      style: einachsig ? null : 'cursor: pointer',
+    const kreis = bemessungspunkt(g, {
+      ein: [sx(wert(f, x)), sy(wert(f, y))],
+      widerstand: mitWeg(f) ? [sx(f.widerstand[x]), sy(f.widerstand[y])] : null,
+      // Ein Fall ohne Einwirkung hat nichts nachzuweisen: grau, mit seinem Satz.
+      farbe: drin && !f.hinweis ? urteilsfarbe(f.erfuellt) : '#8895a8',
+      name: f.name,
+      titel: `${f.name}\nN = ${f.N_Ed.toFixed(1)} kN, M_y = ${f.M_y_Ed.toFixed(1)} kNm, `
+        + `M_z = ${f.M_z_Ed.toFixed(1)} kNm\n`
+        + (drin ? f.hinweis || `α_eff = ${f.grad_text} – ${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
+          : `liegt nicht in dieser Ebene (${i.fest} = ${wert(f, i.fest).toFixed(1)})`)
+        + (einachsig ? '' : `\nKlick: Schnitt durch diesen Lastfall (${i.fest} = ${wert(f, i.fest).toFixed(1)})`),
+      deckung: drin ? 1 : 0.45,
     });
-    punkt.addEventListener('click', () => durchLegen(f));
-    const t = svgEl('title');
-    t.textContent = `${f.name}\nN = ${f.N_Ed.toFixed(1)} kN, M_y = ${f.M_y_Ed.toFixed(1)} kNm, `
-      + `M_z = ${f.M_z_Ed.toFixed(1)} kNm\n`
-      + (drin ? f.hinweis || `α_eff = ${f.grad_text} – ${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
-        : `liegt nicht in dieser Ebene (${i.fest} = ${wert(f, i.fest).toFixed(1)})`)
-      + (einachsig ? '' : `\nKlick: Schnitt durch diesen Lastfall (${i.fest} = ${wert(f, i.fest).toFixed(1)})`);
-    punkt.append(t);
-    g.append(punkt);
-    g.append(text(sx(wert(f, x)) + 9, sy(wert(f, y)) - 8, f.name, {
-      'font-weight': 600, fill: farbe, opacity: drin ? 1 : 0.6,
-    }));
+    if (!einachsig) kreis.style.cursor = 'pointer';
+    kreis.addEventListener('click', () => durchLegen(f));
   }
   return el('div.diagramm-huelle', {}, [
     svg,
-    el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: '#1f5fa8' } }),
-        einachsig ? 'Bruchzustände, Nulllinie waagrecht'
-          : `Bruchzustände bei ${i.fest} = ${i.wert} ${GROESSE[i.fest].einheit}`]),
-      el('span', {}, [el('i', { style: { background: GUT } }), 'erfüllt']),
-      el('span', {}, [el('i', { style: { background: SCHLECHT } }), 'nicht erfüllt']),
-      einachsig ? null : el('span', {}, [el('i', { style: { background: '#8895a8', opacity: 0.45 } }),
-        `blass: anderes ${i.fest} – Klick legt den Schnitt durch ihn`]),
-      faelle.some(mitWeg) ? el('span', { text: '– – –  Weg zum Widerstand des Nachweises' }) : null,
+    legende([
+      [strich('#1f5fa8', { breite: 2 }), einachsig ? 'Bruchzustände, Nulllinie waagrecht'
+        : `Bruchzustände bei ${i.fest} = ${i.wert} ${GROESSE[i.fest].einheit}`],
+      ...urteilslegende(),
+      einachsig ? null : [punkt('#8895a8', { deckung: 0.45 }),
+        `blass: anderes ${i.fest} – Klick legt den Schnitt durch ihn`],
+      faelle.some(mitWeg) ? '– – –  Weg zum Widerstand des Nachweises' : null,
     ]),
   ]);
 }

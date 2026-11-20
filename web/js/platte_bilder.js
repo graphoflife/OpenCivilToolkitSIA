@@ -14,7 +14,10 @@
  * Ändert man die Normalkraft einer M-V-Kurve, rechnet der Kern sie neu.
  */
 
-import { achsenkreuz, achsentitel, masszahl, NR, schrittweite } from './achsen.js';
+import {
+  achsenkreuz, achsentitel, bemessungspunkt, legende, masszahl, NR, punkt, schrittweite, strich,
+  urteilsfarbe, urteilslegende,
+} from './achsen.js';
 import { karte } from './bausteine.js';
 import { beschriftungenEntzerren } from './diagramm.js';
 import {
@@ -358,13 +361,13 @@ export function querschnittZeichnen(eintrag, werte) {
     const sY = zahl(eintrag.werte['querkraft.s_y']);
     const reihe = stabstellen(b, sY ? { abstand: sY } : { anzahl: zahl(eintrag.werte['querkraft.n_y']) });
     const versatz = besterVersatz(reihe, gesetzt.map((g) => g.mm), spielraum(b, reihe, phiV / 2));
-    const strich = Math.max(phiV * massstab, 1.2);
+    const buegelbreite = Math.max(phiV * massstab, 1.2);
     const kreise = gesetzt.map((g) => ({ mm: g.mm, r: g.r / massstab }));
     const soll = reihe.map((mm) => mm + versatz);
-    for (const mm of buegelStellen(soll, kreise, (strich / 2 + 1) / massstab, b)) {
+    for (const mm of buegelStellen(soll, kreise, (buegelbreite / 2 + 1) / massstab, b)) {
       buegelSchicht.append(svgEl('line', {
         x1: x(mm), y1: y(oben), x2: x(mm), y2: y(unten),
-        stroke: violett, 'stroke-width': strich,
+        stroke: violett, 'stroke-width': buegelbreite,
       }));
     }
   }
@@ -421,15 +424,14 @@ export function querschnittZeichnen(eintrag, werte) {
 
   return el('div.diagramm-huelle', {}, [
     svg,
-    el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: farbe.x } }), 'x-Richtung (angeschnitten)']),
-      el('span', {}, [el('i', {
-        style: { background: farbe.y, borderRadius: '1px', height: '3px', opacity: '.7' },
-      }), 'y-Richtung (durchgezogen, in der Schnittebene)']),
-      mitBuegeln ? el('span', {}, [el('i', {
+    legende([
+      [punkt(farbe.x), 'x-Richtung (angeschnitten)'],
+      [strich(farbe.y, { breite: 3 }), 'y-Richtung (durchgezogen, in der Schnittebene)'],
+      // Der Bügel steht im Bild senkrecht, und so auch seine Probe.
+      mitBuegeln ? [el('i', {
         style: { background: violett, borderRadius: '1px', width: '3px', height: '12px' },
-      }), 'Querkraftbewehrung (Abstand wie Teilung y)']) : null,
-      el('span', { text: 'blasser = Zulage' }),
+      }), 'Querkraftbewehrung (Abstand wie Teilung y)'] : null,
+      'blasser = Zulage',
     ]),
   ]);
 }
@@ -510,39 +512,17 @@ export function diagrammZeichnen(linie) {
 
   // -- Bemessungspunkte ----------------------------------------------------
   for (const k of linie.kombinationen) {
-    const farbe = k.innerhalb ? '#1a7f45' : '#b3261e';
-
-    if (k.widerstand) {
-      daten.append(svgEl('line', {
-        x1: x(k.M_Ed), y1: y(k.N_Ed), x2: x(k.widerstand.M), y2: y(k.widerstand.N),
-        stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3', opacity: .75,
-      }));
-      daten.append(svgEl('circle', {
-        cx: x(k.widerstand.M), cy: y(k.widerstand.N), r: 3.5,
-        fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
-      }));
-    }
-
-    const punkt = svgEl('circle', {
-      cx: x(k.M_Ed), cy: y(k.N_Ed), r: 6,
-      fill: farbe, stroke: '#fff', 'stroke-width': 2,
+    bemessungspunkt(daten, {
+      ein: [x(k.M_Ed), y(k.N_Ed)],
+      widerstand: k.widerstand ? [x(k.widerstand.M), y(k.widerstand.N)] : null,
+      farbe: urteilsfarbe(k.innerhalb),
+      name: k.name,
+      // Der Grad kommt fertig gesetzt aus dem Kern: gerundet stuende bei
+      // 0.9996 «1.000» neben «NICHT erfüllt».
+      titel: `${k.name}\nM_Ed = ${masszahl(k.M_Ed, gM)}, N_Ed = ${masszahl(k.N_Ed, gN)}`
+        + `\nErfüllungsgrad α_eff = ${k.grad_text} (${k.massstab_text})`
+        + `\n${k.innerhalb ? 'erfüllt' : 'NICHT erfüllt'}`,
     });
-    const titel = svgEl('title');
-    // Der Grad kommt fertig gesetzt aus dem Kern: gerundet stuende bei
-    // 0.9996 «1.000» neben «NICHT erfüllt».
-    titel.textContent =
-      `${k.name}\nM_Ed = ${masszahl(k.M_Ed, gM)}, N_Ed = ${masszahl(k.N_Ed, gN)}`
-      + `\nErfüllungsgrad α_eff = ${k.grad_text} (${k.massstab_text})`
-      + `\n${k.innerhalb ? 'erfüllt' : 'NICHT erfüllt'}`;
-    punkt.append(titel);
-    daten.append(punkt);
-
-    const beschriftung = svgEl('text', {
-      x: x(k.M_Ed) + 9, y: y(k.N_Ed) - 8,
-      'font-size': 11, 'font-weight': 600, fill: farbe,
-    });
-    beschriftung.textContent = k.name;
-    daten.append(beschriftung);
   }
 
   // -- Knicknachweise ------------------------------------------------------
@@ -553,7 +533,7 @@ export function diagrammZeichnen(linie) {
   // Die Strecke 1-2 ist, was Schiefstellung und Verformung dazulegen; die
   // Strecke 2-3, wie weit es bis zum Versagen noch ist.
   for (const k of (linie.knickfaelle || [])) {
-    const farbe = k.erfuellt ? '#1a7f45' : '#b3261e';
+    const farbe = urteilsfarbe(k.erfuellt);
     const eins = [x(k.M_Ed_1), y(k.N_Ed)];
     const zwei = [x(k.M_Ed_II), y(k.N_Ed)];
     const drei = [x(k.M_bei_N_Rd), y(-Math.abs(k.N_Rd))];
@@ -604,18 +584,14 @@ export function diagrammZeichnen(linie) {
 
   return el('div.diagramm-huelle', {}, [
     svg,
-    el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: MASSGEBEND } }),
-        `Resistenzlinie: ${massgebend.beschriftung} (massgebend)`]),
-      vergleich ? el('span', {}, [el('i', {
-        style: { background: VERGLEICH, height: '3px', borderRadius: '1px' },
-      }), `${vergleich.beschriftung} (nur Vergleich)`]) : null,
-      knicklinie ? el('span', {}, [el('i', {
-        style: { background: KNICKLINIE, height: '3px', borderRadius: '1px' },
-      }), `Knicken: ${knicklinie.beschriftung}`]) : null,
-      el('span', {}, [el('i', { style: { background: '#1a7f45' } }), 'erfüllt']),
-      el('span', {}, [el('i', { style: { background: '#b3261e' } }), 'nicht erfüllt']),
-      el('span', { text: '– – –  gemessener Weg zur Linie' }),
+    legende([
+      [strich(MASSGEBEND, { breite: 2 }), `Resistenzlinie: ${massgebend.beschriftung} (massgebend)`],
+      vergleich ? [strich(VERGLEICH, { muster: '6 3', breite: 1.3 }),
+        `${vergleich.beschriftung} (nur Vergleich)`] : null,
+      knicklinie ? [strich(KNICKLINIE, { muster: '2 3', breite: 1.4 }),
+        `Knicken: ${knicklinie.beschriftung}`] : null,
+      ...urteilslegende(),
+      '– – –  gemessener Weg zur Linie',
     ]),
   ]);
 }
@@ -738,43 +714,23 @@ export function querkraftkurveZeichnen(kurve) {
   }
 
   // -- Bemessungspunkte ----------------------------------------------------
+  // Senkrecht von der Einwirkung hinauf zum Widerstand auf der Kurve.
   for (const f of faelle) {
     const gilt = passt(f);
-    const farbe = f.erfuellt ? '#1a7f45' : '#b3261e';
-    const deckung = gilt ? 1 : 0.28;
-
-    // Senkrechte von der Einwirkung hinauf zum Widerstand auf der Kurve.
-    daten.append(svgEl('line', {
-      x1: x(f.M_Ed), y1: y(f.V_Ed), x2: x(f.M_Ed), y2: y(f.v_Rd),
-      stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3',
-      opacity: 0.75 * deckung,
-    }));
-    daten.append(svgEl('circle', {
-      cx: x(f.M_Ed), cy: y(f.v_Rd), r: 3.5,
-      fill: '#fff', stroke: farbe, 'stroke-width': 1.6, opacity: deckung,
-    }));
-
-    const punkt = svgEl('circle', {
-      cx: x(f.M_Ed), cy: y(f.V_Ed), r: 6,
-      fill: farbe, stroke: '#fff', 'stroke-width': 2, opacity: deckung,
+    bemessungspunkt(daten, {
+      ein: [x(f.M_Ed), y(f.V_Ed)],
+      widerstand: [x(f.M_Ed), y(f.v_Rd)],
+      farbe: urteilsfarbe(f.erfuellt),
+      name: f.name,
+      titel: `${f.name}\nM_Ed = ${masszahl(f.M_Ed, gM)}, |V_Ed| = ${masszahl(f.V_Ed, gv)}`
+        + `\nN_Ed = ${masszahl(f.N_Ed, gN)}, v_Rd = ${masszahl(f.v_Rd, gv)}`
+        + `\n${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
+        + (f.begruendung ? `\n${f.begruendung}` : '')
+        + (gilt ? '' : `\nGilt für N_Ed = ${masszahl(f.N_Ed, gN)}, `
+                     + `gezeigt ist ${masszahl(kurve.N_Ed, gN)}.`),
+      unten: true,
+      deckung: gilt ? 1 : 0.28,
     });
-    const titel = svgEl('title');
-    titel.textContent =
-      `${f.name}\nM_Ed = ${masszahl(f.M_Ed, gM)}, |V_Ed| = ${masszahl(f.V_Ed, gv)}`
-      + `\nN_Ed = ${masszahl(f.N_Ed, gN)}, v_Rd = ${masszahl(f.v_Rd, gv)}`
-      + `\n${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
-      + (f.begruendung ? `\n${f.begruendung}` : '')
-      + (gilt ? '' : `\nGilt für N_Ed = ${masszahl(f.N_Ed, gN)}, `
-                   + `gezeigt ist ${masszahl(kurve.N_Ed, gN)}.`);
-    punkt.append(titel);
-    daten.append(punkt);
-
-    const beschriftung = svgEl('text', {
-      x: x(f.M_Ed) + 9, y: y(f.V_Ed) + 16,
-      'font-size': 11, 'font-weight': 600, fill: farbe, opacity: deckung,
-    });
-    beschriftung.textContent = f.name;
-    daten.append(beschriftung);
   }
 
   return svg;
@@ -898,38 +854,19 @@ export function neigungskurveZeichnen(kurve) {
   }
 
   // -- Die Bemessungsfälle --------------------------------------------------
+  // Senkrecht von der Einwirkung hinauf zum Widerstand bei diesem α.
   for (const f of faelle) {
-    const farbe = f.erfuellt ? '#1a7f45' : '#b3261e';
-
-    // Senkrechte von der Einwirkung hinauf zum Widerstand bei diesem α.
-    daten.append(svgEl('line', {
-      x1: x(f.alpha), y1: y(f.V_Ed), x2: x(f.alpha), y2: y(f.V_Rd),
-      stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3', opacity: 0.75,
-    }));
-    daten.append(svgEl('circle', {
-      cx: x(f.alpha), cy: y(f.V_Rd), r: 4,
-      fill: '#fff', stroke: farbe, 'stroke-width': 1.8,
-    }));
-
-    const punkt = svgEl('circle', {
-      cx: x(f.alpha), cy: y(f.V_Ed), r: 6,
-      fill: farbe, stroke: '#fff', 'stroke-width': 2,
+    bemessungspunkt(daten, {
+      ein: [x(f.alpha), y(f.V_Ed)],
+      widerstand: [x(f.alpha), y(f.V_Rd)],
+      farbe: urteilsfarbe(f.erfuellt),
+      name: `${f.name} · V_Ed = ${masszahl(f.V_Ed, gV)}`,
+      titel: `${f.name}\nV_Ed = ${masszahl(f.V_Ed, gV)} bei α = ${masszahl(f.alpha, gAlpha)}`
+        + `\nV_Rd = ${masszahl(f.V_Rd, gV)}`
+        + `\n${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
+        + (f.begruendung ? `\n${f.begruendung}` : ''),
+      unten: true,
     });
-    const titel = svgEl('title');
-    titel.textContent =
-      `${f.name}\nV_Ed = ${masszahl(f.V_Ed, gV)} bei α = ${masszahl(f.alpha, gAlpha)}`
-      + `\nV_Rd = ${masszahl(f.V_Rd, gV)}`
-      + `\n${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
-      + (f.begruendung ? `\n${f.begruendung}` : '');
-    punkt.append(titel);
-    daten.append(punkt);
-
-    const beschriftung = svgEl('text', {
-      x: x(f.alpha) + 9, y: y(f.V_Ed) + 16,
-      'font-size': 11, 'font-weight': 600, fill: farbe,
-    });
-    beschriftung.textContent = `${f.name} · V_Ed = ${f.V_Ed.toFixed(1)}`;
-    daten.append(beschriftung);
   }
 
   return svg;

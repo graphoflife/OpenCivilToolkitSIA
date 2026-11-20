@@ -534,9 +534,10 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Erledigt (2026-11-19): `grundbruch.py`, 996 Zeilen, ist geteilt in
         `fundament.py` mit dem gemeinsamen `Fundamentnachweis`,
         `grundbruch.py` (639 Zeilen), `gleiten.py` und `tragfaehigkeit.py`.
-      - `platte_bilder.js`, 941: der Bemessungspunkt dreimal, das Farbpaar
-        erfüllt/nicht erfüllt viermal, Legenden von Hand. Umbau:
-        `bemessungspunkt` und `legende` neben `achsenkreuz`.
+      - Erledigt (2026-11-20): `platte_bilder.js`, 936 Zeilen – der
+        Bemessungspunkt, das Farbpaar erfüllt/nicht erfüllt und die Legende
+        stehen als `bemessungspunkt`, `urteilsfarbe` und `legende` in
+        `achsen.js`, für alle Bilder; `platte_bilder.js` hat noch 873.
       - Erledigt (2026-11-20): `interaktion.py`, 922 Zeilen – die Fläche
         der Widerstände, die nur ein Bild liest, steht in
         `querschnitt/widerstandsflaeche.py`; `interaktion.py` hat noch 815.

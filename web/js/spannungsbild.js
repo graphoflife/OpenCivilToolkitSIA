@@ -26,7 +26,9 @@
  * Datei setzt Striche.
  */
 
-import { achsenkreuz, formelText, NR, schrittweite } from './achsen.js';
+import {
+  achsenkreuz, flaeche, formelText, legende, NR, punkt, schrittweite, strich,
+} from './achsen.js';
 import { karte } from './bausteine.js';
 import { beschriftungenEntzerren } from './diagramm.js';
 import { el, svgEl } from './dom.js';
@@ -91,41 +93,6 @@ function mitTitel(knoten, text) {
   titel.textContent = text;
   knoten.append(titel);
   return knoten;
-}
-
-// ===========================================================================
-// Die Legende
-// ===========================================================================
-
-/** Ein Strichmuster als kleine Probe für die Legende. */
-function strich(farbe, { muster = null, breite = 2.2 } = {}) {
-  const probe = svgEl('svg', { width: 26, height: 10, viewBox: '0 0 26 10', 'aria-hidden': 'true' });
-  probe.append(svgEl('line', {
-    x1: 1, y1: 5, x2: 25, y2: 5, stroke: farbe, 'stroke-width': breite,
-    'stroke-dasharray': muster,
-  }));
-  return probe;
-}
-
-/** Ein Punkt für die Legende: gefüllt, oder hohl wie die Ecken der Linien. */
-function punkt(farbe, hohl = false) {
-  return el('i', {
-    style: hohl ? { background: '#fff', border: `2px solid ${farbe}`, boxSizing: 'border-box' }
-      : { background: farbe },
-  });
-}
-
-/** Eine Fläche für die Legende: Druck oder Zug. */
-function flaeche(farbe) {
-  return el('i', {
-    style: {
-      background: farbe, opacity: 0.35, borderRadius: '2px', border: `1px solid ${farbe}`,
-    },
-  });
-}
-
-function legende(eintraege) {
-  return el('div.mn-legende', {}, eintraege.map(([probe, text]) => el('span', {}, [probe, text])));
 }
 
 // ===========================================================================
@@ -409,9 +376,9 @@ function linienlegende(K, kennwert) {
     [strich(LINIE), 'Querschnitt: ungerissen bis zum Riss, darüber gerissen (ohne Zugversteifung)'],
     [strich(VERGLEICH, { muster: '6 4', breite: 1.4 }), 'ungerissen (I), bis zum Riss'],
     [strich(VERGLEICH, { muster: '2 3', breite: 1.4 }), 'immer gerissen, ohne f_ct (II)'],
-    [punkt(ZUG, true), 'Riss'],
-    [punkt(STAHL, true), `${K}_y: Fliessbeginn`],
-    [punkt(LINIE, true), `${K}_${kennwert}: Ende der Linie, der Widerstand – wie in der `
+    [punkt(ZUG, { hohl: true }), 'Riss'],
+    [punkt(STAHL, { hohl: true }), `${K}_y: Fliessbeginn`],
+    [punkt(LINIE, { hohl: true }), `${K}_${kennwert}: Ende der Linie, der Widerstand – wie in der `
       + 'Tragsicherheit, wenn sie gleich wählt'],
   ]);
 }

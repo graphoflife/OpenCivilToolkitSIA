@@ -23,10 +23,21 @@ geteilt, nach dem, was zusammengehört.
   `querschnitt/widerstandsflaeche.py`. Ihre Stufen merkt sich das neue
   Modul je Querschnitt, solange es ihn gibt; vorher trug der Querschnitt
   sie selbst. Die Tests der Fläche stehen in `test_widerstandsflaeche.py`.
+- `web/js/platte_bilder.js` (936 Zeilen) zeichnete den Bemessungspunkt
+  dreimal selbst, die Querschnittsanalyse ein viertes Mal, jedes mit
+  eigener Grösse für den Widerstand. Das Grün und Rot der Urteile stand in
+  vier Bildern als eigene Zahl, etwas anders als in den Tabellen. Jetzt
+  stehen `bemessungspunkt`, `urteilsfarbe` und die Legende mit ihren Proben
+  (`strich`, `punkt`, `flaeche`, bisher nur in `spannungsbild.js`) in
+  `achsen.js` (873 Zeilen bleiben). Sichtbar: eine Linie steht in der
+  Legende als Strich mit ihrem Muster statt als Punkt, der Widerstand ist
+  überall gleich gross, und die Punkte haben die Farben der Tabellen.
 
 Warum: Wer die Platte liest, fand ihre Teile in einer anderen Datei, und
 wer die gemeinsamen Teile suchte, las an den Lagen der Platte vorbei. Wer
-den Bruchzustand liest, muss nicht mehr am Bild vorbei.
+den Bruchzustand liest, muss nicht mehr am Bild vorbei. Und ein
+Bemessungspunkt sah in jedem Bild ein wenig anders aus, ohne dass es
+jemand so gewollt hatte.
 
 ## 2026-11-20 · Die Platte rechnet als Rechteck mit Stäben
 
