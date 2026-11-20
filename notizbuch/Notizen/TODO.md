@@ -428,7 +428,8 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       Auswahl einmal und baut `lagefelder`, `meldungszeilen` und die Liste
       aus `[titel, zeilen]`; die Decke (`FELDER`, `feldzeile`) ist die
       Zielform. Gehört zur offenen Grundlage der Apps mit Zeichenfenster.
-- [ ] **6. Still leer statt laut.**
+- [x] **6. Still leer statt laut.** Erledigt (2026-11-20), alle fünf
+      Stellen.
       - Erledigt (2026-11-20): `sinnbild` wirft für einen unbekannten
         Namen; «Ergebnisse» der Decke hat sein Bild, und der Test findet
         auch die Kapitel und die Knöpfe des Zeichenfensters.
@@ -443,7 +444,8 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         neu zeichnen» ist `mitteAendern`.
       - Erledigt (2026-11-20): `nurStriche` wirkt; ohne `plt.grid()` steht
         kein Gitter, nur Striche am Rand, wie bei matplotlib.
-- [ ] **7. Aus der Arbeit vom 2026-11-19.**
+- [x] **7. Aus der Arbeit vom 2026-11-19.** Erledigt (2026-11-20), alle
+      vier Punkte.
       - Erledigt (2026-11-20): die Normalkraft der M-V-Kurve ist ein Feld
         der Platte, `querkraftkurve_normalkraft`, gespeichert mit dem
         Projekt; das Bild liest es über `Bauteil.eintrag`. Weg sind `n_ed`,
@@ -464,9 +466,12 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         alten Zahlen wieder da (Benutzer, 2026-11-19), auch die Wahl E₀ oder
         E_eq: bei einer Form wartet sie, statt dass der Querschnitt nicht
         rechnet.
-      - `tests/test_balkensystem.py` hat 1080 Zeilen -- über der Grenze
-        seit 2026-11-15, am 2026-11-19 weiter gewachsen --, und
-        `test_nachweis_mn.py` 1006. Naht: Ebene und Raum getrennt.
+      - Erledigt (2026-11-20): `tests/test_balkensystem.py` (1146 Zeilen)
+        ist geteilt – Querschnitte und Materialien stehen in
+        `test_balkensystem_querschnitte.py` –, ebenso `test_nachweis_mn.py`
+        (1006): der Plattenquerschnitt steht in `test_plattenquerschnitt.py`.
+        Eine Naht Ebene/Raum gab es in beiden nicht. Den Träger und die
+        Platten der Tests haben `tests/traeger.py` und `tests/platten.py`.
 - [ ] **8. Dateien nahe oder über 1000 Zeilen.**
       - `stil.css`, 2510 Zeilen: nicht je App teilen, sondern nach
         Bausteinen (Grundlage, Bausteine, Bericht, Zeichenfenster, Skizzen,

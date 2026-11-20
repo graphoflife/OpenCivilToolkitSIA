@@ -7,6 +7,16 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Zwei Testdateien geteilt
+
+`tests/test_balkensystem.py` hatte 1146 Zeilen, `tests/test_nachweis_mn.py`
+1006 – über der Grenze, ab der man eine Datei nicht mehr liest, sondern
+durchsucht. Die Querschnitte und Materialien der Balkensysteme stehen jetzt
+in `test_balkensystem_querschnitte.py`, der Plattenquerschnitt in
+`test_plattenquerschnitt.py`; was beide Hälften brauchen, der Träger und
+die Platten der Tests, in `tests/traeger.py` und `tests/platten.py`. Die
+Tests selbst sind dieselben.
+
 ## 2026-11-20 · Jede Art eines Stabquerschnitts hat ihre Felder
 
 Ein Querschnitt im Balkensystem kommt aus einer Vorlage, einem Stahlprofil,
