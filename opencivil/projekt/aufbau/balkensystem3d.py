@@ -23,6 +23,7 @@ from opencivil.projekt.aufbau.balkensystem import (
     Modell, Uebersetzung, stabquerschnitt_von, stabwerk_bauen,
 )
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil
+from opencivil.projekt.balkensystem import Knotenlastart
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag, RaumknotenlastEintrag
 from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.stabwerk3d.modell import Knoten, Knotenlast, Lager, Stab, Stablast, System
@@ -46,7 +47,9 @@ def modell_von(eintrag: Balkensystem3dEintrag) -> Modell:
 def _knotenlast(p: RaumknotenlastEintrag, wert: float) -> Knotenlast:
     """Eine Kraft in ihre Richtung oder ein Moment um sie -- in den Achsen des Systems."""
     vektor = mal(wert, p.richtung.vektor(ACHSEN))
-    return Knotenlast(p.knoten, M=vektor) if p.art == "moment" else Knotenlast(p.knoten, F=vektor)
+    if p.art is Knotenlastart.MOMENT:
+        return Knotenlast(p.knoten, M=vektor)
+    return Knotenlast(p.knoten, F=vektor)
 
 
 def bauen(art: "Bauteilart", eintrag: Balkensystem3dEintrag, aufbau: Aufbau) -> Bauteil:

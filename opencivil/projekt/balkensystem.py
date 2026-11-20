@@ -62,11 +62,12 @@ from opencivil.stabwerk.stabquerschnitt import EBEN
 #: Wie ein Lager oder Linienlager je Richtung haelt.
 HALT = ("frei", "fest", "feder")
 
-#: Die Einheit jeder Last in der Beschreibung, nach ihrer Art -- an einem
-#: Stab oder Knoten. Umgerechnet wird beim Bauen, mit diesen.
+#: Die Einheit jeder Last auf einem Stab in der Beschreibung, nach ihrer
+#: Art; an einem Knoten die derselben Last auf einem Stab
+#: (:attr:`Knotenlastart.einheit`). Umgerechnet wird beim Bauen, mit diesen.
 EINHEIT_DER_LAST = {
     Lastart.LINIENLAST: KN_PRO_M, Lastart.EINZELLAST: KN,
-    Lastart.MOMENT: KNM, Lastart.LINIENMOMENT: KNM_PRO_M, "kraft": KN,
+    Lastart.MOMENT: KNM, Lastart.LINIENMOMENT: KNM_PRO_M,
 }
 
 
@@ -78,11 +79,39 @@ def federfeld(heisst: str, einheit: Einheit) -> Any:
     """
     return bereich(0.0, heisst=heisst, einheit=einheit, ab=0.0)
 
-#: Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede :class:`Lastart`.
-KNOTENLASTEN = ("kraft", "moment")
+
+class Knotenlastart(Wahl):
+    """
+    Was fuer eine Last an einem Knoten liegt: eine Kraft oder ein Moment --
+    was auf einem Stab eine Einzellast oder ein Einzelmoment ist
+    (:attr:`auf_stab`), in deren Einheit. An einem Stab liegt jede
+    :class:`Lastart`. Bis 2026-11-20 war die Art ein Text, und die
+    Oberflaeche las Einheit und Bild von Hand aus ihm: was nicht «kraft»
+    hiess, war im Feld ein Moment, was nicht «moment» hiess, in Liste und
+    Zeichnung eine Kraft.
+    """
+
+    KRAFT = "kraft"
+    MOMENT = "moment"
+
+    @property
+    def beschriftung(self) -> str:
+        return {Knotenlastart.KRAFT: "Kraft", Knotenlastart.MOMENT: "Moment"}[self]
+
+    @property
+    def auf_stab(self) -> Lastart:
+        """Was dieselbe Last auf einem Stab ist -- an einer Stelle, nicht verteilt."""
+        return {Knotenlastart.KRAFT: Lastart.EINZELLAST, Knotenlastart.MOMENT: Lastart.MOMENT}[self]
+
+    @property
+    def einheit(self) -> Einheit:
+        """kN oder kNm: die ihrer Last auf einem Stab (:data:`EINHEIT_DER_LAST`)."""
+        return EINHEIT_DER_LAST[self.auf_stab]
+
 
 #: Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)
+
 
 class Profilachse(Wahl):
     """
@@ -225,10 +254,10 @@ class KnotenlastEintrag(Beschreibung):
     kennung: str = ""
     knoten: str = ""
     lastfall: str = ""
-    art: str = einer_von(KNOTENLASTEN, "kraft")
+    art: Knotenlastart = Knotenlastart.KRAFT
     richtung: Lastrichtung = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT)
     wert: float = bereich(10.0, heisst="Wert")
-    """kN oder kNm, nach der Art; ohne Grenze wie jede Last."""
+    """kN oder kNm, nach der Art (:attr:`Knotenlastart.einheit`); ohne Grenze wie jede Last."""
 
 
 @dataclass

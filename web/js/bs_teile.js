@@ -44,8 +44,14 @@ export function systemliste(art) {
   return ARTEN.find((x) => x.art === art).liste;
 }
 
+/** Die Art einer Last auf einem Stab nach dem Katalog: wie sie heisst, ob verteilt, ob eine Kraft, ihre Einheit. */
 export function lastart(art, wert) {
   return systemkatalog(art, 'lastarten').find((x) => x.wert === wert) || { beschriftung: wert, einheit: '' };
+}
+
+/** Die Art einer Last an einem Knoten -- Kraft oder Moment -- mit denselben Angaben. */
+export function knotenlastart(art, wert) {
+  return systemkatalog(art, 'knotenlastarten').find((x) => x.wert === wert) || { beschriftung: wert, einheit: '' };
 }
 
 /** Eine Richtung einer Last nach dem Katalog -- mit Vektor im System oder der Achse des Stabs. */

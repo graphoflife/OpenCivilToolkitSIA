@@ -27,8 +27,8 @@ import {
   erklaerung, feld, klappgruppe, materialliste, namensfeld, panel, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
-  lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart, systemkatalog,
-  systemliste, undListe,
+  knotenlastart, lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart,
+  systemkatalog, systemliste, undListe,
 } from './bs_teile.js';
 import { texte } from './bs_texte.js';
 import { waehlen, zeichenbereich } from './bs_zeichnung.js';
@@ -123,8 +123,8 @@ function uebersicht(a) {
       return lastzeile(last, `auf ${l.kennung}`, `${la.beschriftung} ${wert} ${la.einheit}${stelle}${richtung(last, la.kraft)}`);
     })),
     ...z.knotenlasten.map((p) => {
-      const kraft = p.art !== 'moment';
-      return lastzeile(p, `an ${p.knoten}`, `${kraft ? 'Kraft' : 'Moment'} ${p.wert} ${kraft ? 'kN' : 'kNm'}${richtung(p, kraft)}`);
+      const la = knotenlastart(art, p.art);
+      return lastzeile(p, `an ${p.knoten}`, `${la.beschriftung} ${p.wert} ${la.einheit}${richtung(p, la.kraft)}`);
     }),
   ];
   // Jede Gruppe klappt auf und zu, zu Beginn zu (Benutzer, 2026-10-24).

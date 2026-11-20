@@ -22,6 +22,7 @@ from opencivil.projekt.balkensystem import EINHEIT_DER_LAST, HALT
 from opencivil.projekt.lesen import katalogname, wahl_von
 from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.stabwerk import profiltabelle
+from opencivil.stabwerk.modell import Lastart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.rechnung import stoffkennwerte
 from opencivil.web.balkendaten import Darstellung
@@ -66,6 +67,12 @@ def _zeichen(feld: str) -> str:
 
 def _hat_feld(cls: type, feld: str) -> bool:
     return any(f.name == feld for f in dataclasses.fields(cls))
+
+
+def _lastart(art: Lastart) -> Dict[str, Any]:
+    """Eine Art einer Last auf einem Stab: wie sie heisst, ob sie verteilt liegt, ob sie eine Kraft ist, ihre Einheit."""
+    return {"wert": art.value, "beschriftung": art.beschriftung, "verteilt": art.verteilt,
+            "kraft": art.kraft, "einheit": EINHEIT_DER_LAST[art].beschriftung}
 
 
 def katalog(eintrag: type, rechnung: type, darstellung: Darstellung) -> Dict[str, Any]:
@@ -136,11 +143,11 @@ def katalog(eintrag: type, rechnung: type, darstellung: Darstellung) -> Dict[str
                               "titel": _DIAGRAMME[wert][1], "feld": _DIAGRAMME[wert][2],
                               "achse": _DIAGRAMME[wert][3]}
                              for wert in wahl_von(eintrag.DIAGRAMM, "groesse")],
-        "lastarten": [
-            {"wert": a.value, "beschriftung": a.beschriftung, "verteilt": a.verteilt,
-             "kraft": a.kraft, "einheit": EINHEIT_DER_LAST[a.value].beschriftung}
-            for a in wahl_von(eintrag.STABLAST, "art")
-        ],
+        "lastarten": [_lastart(a) for a in wahl_von(eintrag.STABLAST, "art")],
+        # An einem Knoten wie dieselbe Last auf einem Stab, mit eigenem Namen.
+        "knotenlastarten": [{**_lastart(a.auf_stab), "wert": a.value, "beschriftung": a.beschriftung,
+                             "auf_stab": a.auf_stab.value}
+                            for a in wahl_von(eintrag.KNOTENLAST, "art")],
         # Je Richtung einer Last: im System mit ihrem Vektor, sonst die
         # Achse des Stabs, in der sie liegt.
         "richtungen": [{"wert": r.value, "beschriftung": r.beschriftung,

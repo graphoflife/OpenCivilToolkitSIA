@@ -1,5 +1,5 @@
 ---
-erzeugt: 0ba8582d3b8b
+erzeugt: bd77eea02aab
 art: modul
 tags: [modul]
 ---
@@ -430,10 +430,10 @@ Eine Last auf einer Linie -- `wert` ist `wert_a`; Felder wie die Klasse der Stab
 #### MitStaeben.knotenlast
 
 ```python
-def knotenlast(self, lastfall: Any, ort: Ort, wert: float=10.0, *, art: str='kraft', **felder: Any) -> Any
+def knotenlast(self, lastfall: Any, ort: Ort, wert: float=10.0, **felder: Any) -> Any
 ```
 
-Eine Last an einem Knoten -- eine Kraft oder ein Moment; Felder wie ihre Klasse.
+Eine Last an einem Knoten -- eine Kraft oder, `art="moment"`, ein Moment; Felder wie ihre Klasse.
 
 #### MitStaeben.teilen
 

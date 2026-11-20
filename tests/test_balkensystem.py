@@ -9,7 +9,9 @@ import json
 import math
 import unittest
 
-from opencivil.projekt import BAUTEILE, BalkensystemEintrag, Projekt, ProjektFehler, StablastEintrag
+from opencivil.projekt import (
+    BAUTEILE, BalkensystemEintrag, KnotenlastEintrag, Projekt, ProjektFehler, StablastEintrag,
+)
 from opencivil.projekt.aufbau.balkensystem import modell_von
 from opencivil.web import api, dienst
 from tests.traeger import traeger
@@ -270,6 +272,35 @@ class TestAchsenVomKern(unittest.TestCase):
         achsen = self.achsen(((0, 0), tuple(rechts)), ((0, 0), tuple(unten)))
         self.assertEqual(achsen["L1"]["z"], [0.0, -1.0])
         self.assertEqual(achsen["L2"]["z"], [-1.0, 0.0])
+
+
+class TestKnotenlastartenVomKern(unittest.TestCase):
+    """
+    Ob eine Last an einem Knoten eine Kraft oder ein Moment ist, und in
+    welcher Einheit, sagt der Katalog wie bei den Lasten auf einem Stab --
+    eben wie im Raum. Bis 2026-11-20 schrieb die Oberfläche beides von Hand,
+    an vier Stellen mit zwei verschiedenen Rückfällen.
+    """
+
+    def test_wie_dieselbe_last_auf_einem_stab(self):
+        k = api.katalog()
+        for art in ("balkensystem", "balkensystem3d"):
+            with self.subTest(art=art):
+                stab = {x["wert"]: x for x in k[art]["lastarten"]}
+                knoten = k[art]["knotenlastarten"]
+                self.assertEqual([(x["wert"], x["beschriftung"], x["einheit"], x["auf_stab"])
+                                  for x in knoten],
+                                 [("kraft", "Kraft", "kN", "einzellast"),
+                                  ("moment", "Moment", "kNm", "moment")])
+                # Bis auf Wert und Namen wie dieselbe Last auf einem Stab.
+                for x in knoten:
+                    gleich = stab[x["auf_stab"]]
+                    self.assertEqual({**x, "wert": gleich["wert"], "beschriftung": gleich["beschriftung"]},
+                                     {**gleich, "auf_stab": gleich["wert"]})
+
+    def test_eine_art_die_es_nicht_gibt(self):
+        with self.assertRaisesRegex(ProjektFehler, "'druck' gibt es als 'art' nicht. Möglich sind: kraft, moment."):
+            KnotenlastEintrag.aus_dict({"art": "druck"})
 
 
 class TestPruefen(unittest.TestCase):

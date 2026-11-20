@@ -1,5 +1,5 @@
 ---
-erzeugt: 8fb01ff10ed9
+erzeugt: 1e74cc9af912
 art: modul
 tags: [modul]
 ---
@@ -317,3 +317,4 @@ gewichteten Lastfaelle. Eben wie raeumlich: eine Last kann `mal`.
 - [[opencivil.stabwerk3d.modell]]
 - [[opencivil.stabwerk3d.rechnung]]
 - [[opencivil.stabwerk3d.stab]]
+- [[opencivil.web.systemkatalog]]

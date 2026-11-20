@@ -520,13 +520,12 @@ class MitStaeben:
         self.linie_von(kennung_von(linie)).lasten.append(eintrag)
         return eintrag
 
-    def knotenlast(self, lastfall: Any, ort: Ort, wert: float = 10.0, *, art: str = "kraft",
-                   **felder: Any) -> Any:
-        """Eine Last an einem Knoten -- eine Kraft oder ein Moment; Felder wie ihre Klasse."""
+    def knotenlast(self, lastfall: Any, ort: Ort, wert: float = 10.0, **felder: Any) -> Any:
+        """Eine Last an einem Knoten -- eine Kraft oder, ``art="moment"``, ein Moment; Felder wie ihre Klasse."""
         eintrag = self.KNOTENLAST.aus_dict({
             "kennung": self._neue_kennung(self.alle_lasten(), "P"),
             "knoten": self._knoten(self.netz(), ort), "lastfall": kennung_von(lastfall),
-            "art": art, "wert": wert, **felder},
+            "wert": wert, **felder},
             f"{self.wo}, knotenlasten")
         self.knotenlasten.append(eintrag)
         return eintrag

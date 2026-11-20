@@ -21,7 +21,7 @@ import {
   VAR, gemeinsam, mitVar, wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
-  lastart, lastVon, materialname, passendeUebersicht, systemkatalog,
+  knotenlastart, lastart, lastVon, materialname, passendeUebersicht, systemkatalog,
 } from './bs_teile.js';
 import { texte } from './bs_texte.js';
 import { zahlText } from './cad_ansicht.js';
@@ -138,8 +138,7 @@ function materialWahl(art, z, bringt, gewaehlt, setzen) {
  * in der Ebene nur eine Kraft, im Raum auch ein Moment: es dreht um sie.
  */
 function lastFelder(a, last, setzen, { aufLinie = true, amKnoten = false } = {}) {
-  const art = amKnoten ? { kraft: last.art === 'kraft', verteilt: false, einheit: last.art === 'kraft' ? 'kN' : 'kNm' }
-    : lastart(a.bs.art, last.art);
+  const art = (amKnoten ? knotenlastart : lastart)(a.bs.art, last.art);
   const alle = systemkatalog(a.bs.art, 'richtungen');
   const knotenrichtungen = systemkatalog(a.bs.art, 'knotenrichtungen');
   const richtungen = amKnoten ? alle.filter((x) => knotenrichtungen.includes(x.wert)) : alle;
@@ -485,7 +484,7 @@ function lastEigenschaften(a, z, kennungen) {
     inhalt.push(el('p.cad-info', { text: da[0].knoten ? `an ${da[0].knoten}` : `auf ${a.adapter.name(a, da[0].linie.kennung)}` }));
   }
   inhalt.push(...meldungszeilen(a, kennungen));
-  const artText = amKnoten ? (da[0].last.art === 'moment' ? 'Moment' : 'Kraft') : lastart(a.bs.art, da[0].last.art).beschriftung;
+  const artText = (amKnoten ? knotenlastart : lastart)(a.bs.art, da[0].last.art).beschriftung;
   return {
     titel: da.length === 1 ? `${a.adapter.name(a, kennungen[0])} · ${artText}` : `${da.length} Lasten`,
     inhalt: inhalt.filter(Boolean),

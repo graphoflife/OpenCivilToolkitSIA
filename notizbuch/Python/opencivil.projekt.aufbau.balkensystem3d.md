@@ -1,5 +1,5 @@
 ---
-erzeugt: b43776db6d5e
+erzeugt: 918758127a68
 art: modul
 tags: [modul]
 ---
@@ -52,6 +52,7 @@ Ein 3D-Balkensystem -- seine Querschnitte aufgeloest wie in der Ebene.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.staebe]]
 - [[opencivil.stabwerk3d.modell]]

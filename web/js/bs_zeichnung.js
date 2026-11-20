@@ -70,8 +70,8 @@ import {
   moment, momentband, raumlagerSymbol, unbestimmtSymbol,
 } from './bs_symbole.js';
 import {
-  lagertext, lastart, lastrichtung, lastVon, passendeUebersicht, raeumlich, systemart,
-  systemkatalog, systemliste,
+  knotenlastart, lagertext, lastart, lastrichtung, lastVon, passendeUebersicht, raeumlich,
+  systemart, systemkatalog, systemliste,
 } from './bs_teile.js';
 import { el, melden, svgEl } from './dom.js';
 import { aktiverLastfall, lastfallFuerNeue, lastfallLeiste } from './lastfaelle.js';
@@ -290,7 +290,7 @@ function lastAnlegen(a, z, erg) {
       const kennung = naechsteLast(z);
       z.knotenlasten.push({
         ...ausVorlage(a.bs.klassen.knotenlast), kennung, knoten, lastfall: lf,
-        art: v.art === 'moment' ? 'moment' : 'kraft',
+        art: systemkatalog(a.bs.art, 'knotenlastarten').find((x) => x.auf_stab === v.art).wert,
         richtung: systemkatalog(a.bs.art, 'knotenrichtungen').includes(v.richtung) ? v.richtung : 'senkrecht',
         wert: v.wert_a,
       });
@@ -620,10 +620,11 @@ function lastenZeichnen(a, z, lf, lagen) {
     if (!q || !vektor) continue;
     const ort = nachBild(a.v, q);
     const klasse = 'bs-last bs-knotenlast';
-    if (p.art === 'moment') {
-      ablegen(p.kennung, moment(a.v, ort, a.bs.raum ? vektor : null, p.wert, wertText(p.wert, 'kNm'), klasse));
+    const art = knotenlastart(a.bs.art, p.art);
+    if (art.kraft) {
+      ablegen(p.kennung, kraft(ort, imBild(a.v, vektor), p.wert, 40, wertText(Math.abs(p.wert), art.einheit), klasse));
     } else {
-      ablegen(p.kennung, kraft(ort, imBild(a.v, vektor), p.wert, 40, wertText(Math.abs(p.wert), 'kN'), klasse));
+      ablegen(p.kennung, moment(a.v, ort, a.bs.raum ? vektor : null, p.wert, wertText(p.wert, art.einheit), klasse));
     }
   }
   a.bs.lastformen = formen;

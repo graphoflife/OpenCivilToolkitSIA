@@ -1,5 +1,5 @@
 ---
-erzeugt: 302ff06cc8a2
+erzeugt: 497e26fdd28e
 art: modul
 tags: [modul]
 ---
@@ -29,6 +29,14 @@ def _zeichen(feld: str) -> str
 
 Wie eine Richtung eines Lagers heisst: `x`, `φ`, `φ_y`.
 
+### _lastart
+
+```python
+def _lastart(art: Lastart) -> Dict[str, Any]
+```
+
+Eine Art einer Last auf einem Stab: wie sie heisst, ob sie verteilt liegt, ob sie eine Kraft ist, ihre Einheit.
+
 ### katalog
 
 ```python
@@ -50,6 +58,7 @@ Klasse, die sie rechnet, `darstellung` wie ihre Ergebnisse gezeigt werden.
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.staebe]]
+- [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.profiltabelle]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]

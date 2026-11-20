@@ -7,6 +7,19 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Kraft oder Moment an einem Knoten sagt der Kern
+
+Ob eine Last an einem Knoten eine Kraft oder ein Moment ist und ob sie in
+kN oder kNm steht, schrieb die Oberfläche an vier Stellen von Hand: im Feld,
+in der Liste, im Titel und in der Zeichnung. Eine Art, die es nicht gibt,
+war im Feld ein Moment, in Liste und Zeichnung eine Kraft.
+
+Jetzt ist die Art eine Wahl im Kern (`Knotenlastart`), mit der Einheit
+derselben Last auf einem Stab: eine Kraft an einem Knoten steht in kN wie
+eine Einzellast, ein Moment in kNm wie ein Einzelmoment. Der Katalog gibt
+die Arten wie die der Stablasten, und alle vier Stellen lesen dort. Am
+Bildschirm ändert sich nichts.
+
 ## 2026-11-20 · Ein Mass prüft sich wie ein Feld
 
 Die Masse der Vorlagen – in der Querschnittsanalyse und bei den

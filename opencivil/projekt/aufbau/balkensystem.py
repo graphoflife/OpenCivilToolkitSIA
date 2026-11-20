@@ -32,7 +32,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence,
 from opencivil.core.einheiten import Groesse
 from opencivil.material.basis import Baustoffart
 from opencivil.projekt.balkensystem import (
-    EINHEIT_DER_LAST, BalkensystemEintrag, Profilachse, StabmaterialEintrag,
+    EINHEIT_DER_LAST, BalkensystemEintrag, Knotenlastart, Profilachse, StabmaterialEintrag,
 )
 from opencivil.projekt.lesen import ProjektFehler, als_groesse
 from opencivil.projekt.staebe import (
@@ -196,7 +196,7 @@ class Uebersetzung:
             if p.lastfall not in self.lasten:
                 self.meldungen.append(ohne_lastfall(p.kennung))
                 continue
-            self.lasten[p.lastfall].append(last_von(p, Groesse(p.wert, EINHEIT_DER_LAST[p.art]).si))
+            self.lasten[p.lastfall].append(last_von(p, Groesse(p.wert, p.art.einheit).si))
 
     def modell(self, system: type, knoten: type, staebe: List[Any], lager: List[Any]) -> Modell:
         """Das Modell, mit den Kombinationen -- ``system`` und ``knoten`` die Klassen des Rechenkerns."""
@@ -226,7 +226,7 @@ def modell_von(eintrag: BalkensystemEintrag) -> Modell:
 
 def _knotenlast(p: Any, wert: float) -> Knotenlast:
     """Ein Moment, eine Kraft waagrecht nach rechts oder senkrecht nach unten."""
-    if p.art == "moment":
+    if p.art is Knotenlastart.MOMENT:
         return Knotenlast(p.knoten, M=wert)
     if p.richtung is Lastrichtung.WAAGRECHT:
         return Knotenlast(p.knoten, Fx=wert)

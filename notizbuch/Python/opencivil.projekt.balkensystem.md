@@ -1,5 +1,5 @@
 ---
-erzeugt: 857888643a62
+erzeugt: e5598959d275
 art: modul
 tags: [modul]
 ---
@@ -66,6 +66,48 @@ def federfeld(heisst: str, einheit: Einheit) -> Any
 Das Feld einer Feder: Lager in kN/m und kNm/rad, Bettung in kN/m je m
 Stab -- nie negativ. Null nimmt das Feld an, frei heisst die Richtung
 damit nicht: eine Feder ohne Steifigkeit meldet das System.
+
+### Knotenlastart
+
+```python
+class Knotenlastart(Wahl)
+```
+
+Was fuer eine Last an einem Knoten liegt: eine Kraft oder ein Moment --
+was auf einem Stab eine Einzellast oder ein Einzelmoment ist
+([[opencivil.projekt.balkensystem#Knotenlastart.auf_stab|auf_stab]]), in deren Einheit. An einem Stab liegt jede
+[[opencivil.stabwerk.modell#Lastart|Lastart]]. Bis 2026-11-20 war die Art ein Text, und die
+Oberflaeche las Einheit und Bild von Hand aus ihm: was nicht «kraft»
+hiess, war im Feld ein Moment, was nicht «moment» hiess, in Liste und
+Zeichnung eine Kraft.
+
+- `KRAFT = 'kraft'`
+- `MOMENT = 'moment'`
+
+#### Knotenlastart.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Knotenlastart.auf_stab
+
+```python
+@property
+def auf_stab(self) -> Lastart
+```
+
+Was dieselbe Last auf einem Stab ist -- an einer Stelle, nicht verteilt.
+
+#### Knotenlastart.einheit
+
+```python
+@property
+def einheit(self) -> Einheit
+```
+
+kN oder kNm: die ihrer Last auf einem Stab ([[opencivil.projekt.balkensystem#Konstanten|EINHEIT_DER_LAST]]).
 
 ### Profilachse
 
@@ -209,9 +251,9 @@ oder ein Moment. Ihre Kennung zaehlt mit denen der Stablasten (`P1`).
 - `kennung: str = ''`
 - `knoten: str = ''`
 - `lastfall: str = ''`
-- `art: str = einer_von(KNOTENLASTEN, 'kraft')`
+- `art: Knotenlastart = Knotenlastart.KRAFT`
 - `richtung: Lastrichtung = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT)`
-- `wert: float = bereich(10.0, heisst='Wert')` – kN oder kNm, nach der Art; ohne Grenze wie jede Last.
+- `wert: float = bereich(10.0, heisst='Wert')` – kN oder kNm, nach der Art ([[opencivil.projekt.balkensystem#Knotenlastart.einheit|Knotenlastart.einheit]]); ohne Grenze wie jede Last.
 
 ### StabmaterialEintrag
 
@@ -321,8 +363,7 @@ Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke
 ## Konstanten
 
 - `HALT = ('frei', 'fest', 'feder')` – Wie ein Lager oder Linienlager je Richtung haelt.
-- `EINHEIT_DER_LAST = {Lastart.LINIENLAST: KN_PRO_M, Lastart.EINZELLAST: KN, Lastart.MOMENT…` – Die Einheit jeder Last in der Beschreibung, nach ihrer Art -- an einem Stab oder Knoten. Umgerechnet wird beim Bauen, mit diesen.
-- `KNOTENLASTEN = ('kraft', 'moment')` – Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede [[opencivil.stabwerk.modell#Lastart|Lastart]].
+- `EINHEIT_DER_LAST = {Lastart.LINIENLAST: KN_PRO_M, Lastart.EINZELLAST: KN, Lastart.MOMENT…` – Die Einheit jeder Last auf einem Stab in der Beschreibung, nach ihrer Art; an einem Knoten die derselben Last auf einem Stab ([[opencivil.projekt.balkensystem#Knotenlastart.einheit|Knotenlastart.einheit]]). Umgerechnet wird beim Bauen, mit diesen.
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `STABMATERIALARTEN = (*(art.value for art in STABKENNWERTE), 'eigen')` – Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24; Baustahl seit 2026-11-15). Betonstahl ist keines: aus ihm ist kein Stab. Welche Arten des Projekts es gibt, sagen die Kennwerte, die ein Stab aus ihnen nimmt.
 - `DIAGRAMMGROESSEN = ('N', 'V', 'M', 'verschiebung', 'verdrehung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse oder der Verdrehung, das verschobene System oder die Lagerkraefte. N, V, M wie im Raum und in der Tabelle der Grenzwerte -- bis 2026-11-19 stand M zuerst.
@@ -345,6 +386,7 @@ Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.beispiele]]
 - [[opencivil.projekt.projekt]]

@@ -379,8 +379,10 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         (`Anzeigegroesse`) kommen mit den Daten.
       - Knotenlasten: Art und Einheit von Hand, mit widersprüchlichen
         Rückfällen (`lastFelder` kNm für alles ausser «kraft», Zeichnung
-        und Liste kN für alles ausser «moment»). Umbau: `knotenlastarten`
-        im Katalog wie die Stablasten.
+        und Liste kN für alles ausser «moment»). Erledigt (2026-11-20): die
+        Art ist eine Wahl im Kern (`Knotenlastart`), mit der Einheit
+        derselben Last auf einem Stab; der Katalog gibt `knotenlastarten`
+        wie die Stablasten, und Feld, Liste, Titel und Zeichnung lesen dort.
       - Dieselbe Grenze hinter dem Feld noch einmal. Erledigt (2026-11-20):
         `streifen.pruefen` (acht Prüfungen, die nie griffen), die Teilungen
         im Dienst der Suche, `katalog.duktilitaet`; eine Liste von Zahlen
