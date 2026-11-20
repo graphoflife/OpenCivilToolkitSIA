@@ -378,7 +378,10 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         `tests/test_vorgaben.py` vergleicht Maske und Herleitung. Erledigt
         für die Setzung (2026-11-20): `setzung.VORGABEN` und `JE_SCHICHT`,
         die Schichten je mit ihrer Nummer (`Feld.nummeriert`); auch die
-        Spalten der Schichten kommen aus dem Kern.
+        Spalten der Schichten kommen aus dem Kern. Erledigt für den Pfahl
+        (2026-11-20): `pfahl.VORGABEN` und `JE_SCHICHT`; der Spitzendruck hat
+        eine eigene Gruppe «Fuss», damit sein Schalter vor ihm steht, und
+        `Pfahlschicht.kurznamen` ist weg. Bleibt das Durchstanzen.
       - Bilder tippen Einheiten: `GROESSEN` in `pf_verlauf.js` spiegelt
         `VERLAEUFE` samt Grenzschlüsseln (eine umbenannte Grösse
         verschwindet still), `platte_bilder.js` rund 35 Einheiten, die

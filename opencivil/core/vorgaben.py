@@ -30,7 +30,9 @@ Die Schichten unter einem Fundament oder an einem Pfahl haben je dieselben
 Felder: eine Gruppe als Vorlage, je Schicht mit ihrer Nummer
 (:meth:`Feld.nummeriert`). «#» in einer Beschreibung steht für die Schicht --
 in der Herleitung «Schicht 2», in der Maske, deren Karte schon so heisst,
-«Schicht».
+«Schicht». Hat eine Schicht mehrere Gruppen, wie am Pfahl, teilen sie sich
+ihren Kasten und ihre Karte: ihre Titel sagen der Maske nur, wo sie einen
+Schalter zwischen die Felder setzt (``eingabezeilen``).
 """
 
 from __future__ import annotations

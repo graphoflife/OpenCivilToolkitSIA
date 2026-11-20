@@ -1,5 +1,5 @@
 ---
-erzeugt: ae195574ebaf
+erzeugt: 9de84f439e2c
 art: modul
 tags: [modul]
 ---
@@ -77,8 +77,9 @@ class Pfahlschicht
 ```
 
 Eine Schicht des Baugrunds, vom Terrain an nach unten gezählt. Welche
-ihrer Zahlen gelten, hängt an Verhalten und Mantel ([[opencivil.pfahl.boden#Pfahlschicht.kurznamen|kurznamen]]);
-die übrigen stehen da und gehen nicht ein.
+ihrer Zahlen gelten, hängt an Verhalten und Mantel
+([[opencivil.pfahl.pfahl#Konstanten|opencivil.pfahl.pfahl.JE_SCHICHT]]); die übrigen stehen da und
+gehen nicht ein.
 
 - `name: str`
 - `d: Groesse` – Die Dicke der Schicht.
@@ -100,15 +101,6 @@ die übrigen stehen da und gehen nicht ein.
 @property
 def drainiert(self) -> bool
 ```
-
-#### Pfahlschicht.kurznamen
-
-```python
-def kurznamen(self) -> Tuple[str, ...]
-```
-
-Die Zahlen, die gelten: Dicke und Raumlast, die Festigkeit, die
-Mantelreibung, der Verformungsmodul.
 
 ### Stueck
 

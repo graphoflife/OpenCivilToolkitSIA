@@ -103,7 +103,7 @@ class AeussererWiderstand(Achsnachweis):
 
     def __init__(self, pfahl: Pfahl, kombinationen: Sequence[Kombination]) -> None:
         gruppen = (("Äusserer Widerstand",) if pfahl.grundlage.aus_versuch else
-                   ("Pfahl", "Grundwasser", "Äusserer Widerstand", "Schicht"))
+                   ("Pfahl", "Grundwasser", "Äusserer Widerstand", "Fuss", "Schicht"))
         super().__init__(pfahl, kombinationen, basis=f"{pfahl.id}.nachweis.aussen",
                          bezuege=[Eingabebezug(n, pfahl.id_von(n))
                                   for n in pfahl.kurznamen(*gruppen)])

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3924d07aa8ff
+erzeugt: 2874e965dc96
 art: modul
 tags: [modul]
 ---
@@ -53,6 +53,7 @@ def erklaerung(self) -> str
 - [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.pfahl.boden]]
+- [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.pfahl]]
 - [[opencivil.web.api]]

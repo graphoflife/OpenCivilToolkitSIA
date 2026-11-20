@@ -7,6 +7,33 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Der Pfahl holt seine Maske aus dem Kern
+
+Der dritte nach Grundbruch und Setzung: die Tafel der Vorgaben steht in
+`opencivil/pfahl/pfahl.py` (`VORGABEN`, `JE_SCHICHT`) statt zweimal – im
+Kern als Tupel, in `pfahl.js` als Karten. Welche Felder gelten, sagen dort
+die Wahlen: Art und Tragglied den Querschnitt, die Grundlage den äusseren
+Widerstand, Verhalten und Mantel die Felder einer Schicht. Die Maske setzt
+nur noch Schalter und Materialien zu ihrer Gruppe. Eine Schicht hat vier
+Gruppen in einer Karte (`eingabezeilen`); deren Titel sagen nur, wo die
+Schalter für Verhalten und Mantel stehen.
+
+Sichtbar anders:
+
+- Die Karten folgen der Herleitung: Pfahl, Grundwasser, Äusserer
+  Widerstand, Fuss, Querschnitt, Querlast – vorher stand der Querschnitt vor
+  dem äusseren Widerstand.
+- Der Fuss hat eine eigene Karte: der Schalter heisst dort «Spitzendruck»
+  (gerechnet, eingegeben, trägt nicht), darunter q_b,k oder das Abscheren.
+  Vorher stand er in der Karte des äusseren Widerstands. In der Herleitung
+  steht q_b,k im Kasten «Fuss» statt «Äusserer Widerstand».
+- Beim Mikropfahl heisst die Karte «Querschnitt» wie in der Herleitung,
+  nicht mehr «Tragglied».
+- Die Wandreibung heisst k_δ wie in der Herleitung, nicht mehr δ/φ'_k.
+- Der Titel über jedem Feld ist die Beschreibung der Herleitung mit Hinweis
+  und Normstelle; beim Umrechnungsfaktor η_a etwa «Umrechnungsfaktor des
+  äusseren Widerstands – höchstens 0.7 (SIA 267:2013, 9.5.2.2.5, (48))».
+
 ## 2026-11-20 · Die Setzung holt ihre Maske aus dem Kern
 
 Wie beim Grundbruch: die Tafel der Vorgaben steht einmal, in

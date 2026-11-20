@@ -247,6 +247,21 @@ export function zahlzeile(art, eintrag, schluessel, beschriftung, symbol, {
  * Gruppe ohne Felder und ohne Teile fällt weg.
  */
 export function eingabekarten(klasse, eintrag, aendern, { gelesen = null, dazu = {} } = {}) {
+  return vorgabeteile(klasse, eintrag, aendern, { gelesen, dazu })
+    .map(({ titel, inhalt }) => (inhalt.length ? karte(titel, inhalt) : null)).filter(Boolean);
+}
+
+/**
+ * Dieselben Teile ohne Karten, eine Zeile nach der anderen -- für einen
+ * Eintrag, der schon seine Karte hat, etwa eine Schicht des Pfahls. Die
+ * Gruppen sagen dann nur, wohin `dazu` seine Teile setzt.
+ */
+export function eingabezeilen(klasse, eintrag, aendern, { dazu = {} } = {}) {
+  return vorgabeteile(klasse, eintrag, aendern, { dazu }).flatMap((g) => g.inhalt);
+}
+
+/** Je Gruppe der Vorgaben ihr Titel und ihre Teile -- siehe `eingabekarten`. */
+function vorgabeteile(klasse, eintrag, aendern, { gelesen = null, dazu = {} }) {
   const gruppen = katalog('vorgaben', klasse);
   for (const titel of Object.keys(dazu)) {
     if (!gruppen.some((g) => g.titel === titel)) {
@@ -256,13 +271,20 @@ export function eingabekarten(klasse, eintrag, aendern, { gelesen = null, dazu =
   return gruppen.map((g) => {
     const felder = felderDer(g, eintrag).filter((f) => !gelesen || gelesen.has(f.feld));
     const { vor = [], nach = [] } = dazu[g.titel] || {};
-    const inhalt = [...vor, ...felder.map((f) => vorgabezeile(klasse, eintrag, f, aendern)), ...nach]
-      .filter(Boolean);
-    return inhalt.length ? karte(g.titel, inhalt) : null;
-  }).filter(Boolean);
+    return {
+      titel: g.titel,
+      inhalt: [...vor, ...felder.map((f) => vorgabezeile(klasse, eintrag, f, aendern)), ...nach]
+        .filter(Boolean),
+    };
+  });
 }
 
-/** Die Felder einer Gruppe der Vorgaben für einen Eintrag -- nach den Wahlen, die sie nennt. */
+/**
+ * Die Felder einer Gruppe der Vorgaben für einen Eintrag -- nach den Wahlen,
+ * die sie nennt. Eine Stellung, die die Wahl nicht kennt, kann nur aus einer
+ * Datei kommen; die Prüfung des Kerns meldet sie am Ort, und die Gruppe
+ * bleibt leer, bis der Schalter eine Stellung hat.
+ */
 function felderDer(g, eintrag) {
   return g.felder[g.nach.map((n) => eintrag[n]).join('|')] || [];
 }
@@ -281,7 +303,7 @@ export function vorgabetitel(f) {
 }
 
 /** Ein Feld der Vorgaben als Zeile -- siehe `eingabekarten`. */
-export function vorgabezeile(klasse, eintrag, f, aendern) {
+function vorgabezeile(klasse, eintrag, f, aendern) {
   return zahlzeile(klasse, eintrag, f.feld, f.beschriftung, f.zeichen, {
     schritt: f.schritt, titel: vorgabetitel(f), aendern,
   });

@@ -71,8 +71,10 @@ from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
+from opencivil.pfahl import pfahl
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
+from opencivil.projekt.pfahl import PfahlEintrag, PfahlschichtEintrag
 from opencivil.web import balkendaten, diagrammdaten, durchstanzdaten, systemkatalog
 from opencivil.web.anzeige import zelle_dict
 from opencivil.web.umschlag import endlich
@@ -169,7 +171,9 @@ def _vorgaben() -> Dict[str, List[dict]]:
     return {katalogname(cls): [g.als_dict({n: wahl_von(cls, n) for n in g.nach}) for g in gruppen]
             for cls, gruppen in ((GrundbruchEintrag, fundament.VORGABEN),
                                  (SetzungEintrag, setzung.VORGABEN),
-                                 (SchichtEintrag, setzung.JE_SCHICHT))}
+                                 (SchichtEintrag, setzung.JE_SCHICHT),
+                                 (PfahlEintrag, pfahl.VORGABEN),
+                                 (PfahlschichtEintrag, pfahl.JE_SCHICHT))}
 
 
 def katalog() -> dict:
@@ -245,8 +249,8 @@ def katalog() -> dict:
         "verhalten": [{"wert": w.value, "beschriftung": w.beschriftung, "titel": w.erklaerung}
                       for w in Verhalten],
         # Die Wahlen eines Pfahls -- je ein Schalter, das Wort auf dem Knopf,
-        # die Erklärung darüber --, bei der Grundlage dazu der Grenzwert von
-        # eta_a und wo er steht.
+        # die Erklärung darüber --, bei der Grundlage dazu, ob R_a,k aus einem
+        # Versuch kommt. Den Grenzwert von eta_a sagt sein Feld (``vorgaben``).
         "pfahl": {
             **{name: [{"wert": w.value, "beschriftung": w.beschriftung, "titel": w.erklaerung}
                       for w in wahl]
@@ -254,8 +258,7 @@ def katalog() -> dict:
                                   ("abscheren", Abscheren), ("tragglieder", Tragglied),
                                   ("mantel", Mantel), ("koepfe", Kopf))},
             "grundlagen": [{"wert": g.value, "beschriftung": g.beschriftung,
-                            "titel": g.erklaerung, "grenze": g.eta_grenze,
-                            "referenz": g.referenz, "versuch": g.aus_versuch}
+                            "titel": g.erklaerung, "versuch": g.aus_versuch}
                            for g in Grundlage],
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.

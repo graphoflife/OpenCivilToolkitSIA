@@ -350,9 +350,14 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
         self.assertEqual(k["felder"]["pfahl"]["D"]["einheit"], "mm")
         self.assertEqual(k["felder"]["pfahlschicht"]["q_s"]["einheit"], "kPa")
         self.assertEqual(k["felder"]["pfahlkombination"]["N_Ed"]["einheit"], "kN")
-        self.assertEqual([(g["wert"], g["grenze"], g["versuch"]) for g in k["pfahl"]["grundlagen"]],
-                         [("berechnung", 0.7, False), ("erfahrung", 0.9, False),
-                          ("dynamisch", 0.9, True), ("statisch", 1.0, True)])
+        # Der Grenzwert von η_a steht im Hinweis über seinem Feld, je Grundlage.
+        aussen = next(g for g in k["vorgaben"]["pfahl"] if g["titel"] == "Äusserer Widerstand")
+        self.assertEqual([(g["wert"], aussen["felder"][g["wert"]][0]["hinweis"], g["versuch"])
+                          for g in k["pfahl"]["grundlagen"]],
+                         [("berechnung", "höchstens 0.7", False),
+                          ("erfahrung", "höchstens 0.9", False),
+                          ("dynamisch", "höchstens 0.9", True),
+                          ("statisch", "höchstens 1.0", True)])
         # Auf dem Knopf ein Wort, die Erklärung darüber.
         # Das Verhalten teilt der Pfahl mit dem Grundbruch (2026-11-19).
         listen = {liste: k["pfahl"][liste]

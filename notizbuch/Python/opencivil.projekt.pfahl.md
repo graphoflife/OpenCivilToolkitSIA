@@ -1,5 +1,5 @@
 ---
-erzeugt: c64c7c3c9f22
+erzeugt: 4710e5d13ae5
 art: modul
 tags: [modul]
 ---
@@ -245,3 +245,4 @@ Das Tragglied muss nach der Abrostung noch Stahl haben und im Verpresskörper li
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.web.api]]

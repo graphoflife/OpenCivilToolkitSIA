@@ -60,8 +60,9 @@ class Mantel(Wahl):
 class Pfahlschicht:
     """
     Eine Schicht des Baugrunds, vom Terrain an nach unten gezählt. Welche
-    ihrer Zahlen gelten, hängt an Verhalten und Mantel (:meth:`kurznamen`);
-    die übrigen stehen da und gehen nicht ein.
+    ihrer Zahlen gelten, hängt an Verhalten und Mantel
+    (:data:`opencivil.pfahl.pfahl.JE_SCHICHT`); die übrigen stehen da und
+    gehen nicht ein.
     """
 
     name: str
@@ -100,18 +101,6 @@ class Pfahlschicht:
     @property
     def drainiert(self) -> bool:
         return self.verhalten is Verhalten.DRAINIERT
-
-    def kurznamen(self) -> Tuple[str, ...]:
-        """
-        Die Zahlen, die gelten: Dicke und Raumlast, die Festigkeit, die
-        Mantelreibung, der Verformungsmodul.
-        """
-        namen = ["d", "gamma", *(("phi_k", "c_k") if self.drainiert else ("s_u",))]
-        if self.mantel is Mantel.EINGEBEN:
-            namen.append("q_s")
-        else:
-            namen += ["K", "delta_faktor"] if self.drainiert else ["alpha"]
-        return (*namen, "E_s")
 
 
 @dataclass(frozen=True)

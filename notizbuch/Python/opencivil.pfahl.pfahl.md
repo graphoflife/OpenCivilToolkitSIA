@@ -1,5 +1,5 @@
 ---
-erzeugt: e1b6e9e30864
+erzeugt: 4fded7764834
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,8 @@ tags: [modul]
 
 Der [[opencivil.pfahl.pfahl#Pfahl|Pfahl]]: Art, Masse und Querschnitt, die Schichten des Baugrunds,
 das Grundwasser und die Beiwerte des Widerstands -- als Vorgaben im
-Rechenwerk, und nur die, die nach den Wahlen gelten ([[opencivil.pfahl.pfahl#Pfahl.kurznamen|Pfahl.kurznamen]]):
+Rechenwerk, und nur die, die nach den Wahlen gelten ([[opencivil.pfahl.pfahl#Konstanten|VORGABEN]],
+[[opencivil.pfahl.pfahl#Konstanten|JE_SCHICHT]]):
 
 * [[opencivil.pfahl.pfahl#Pfahlart|Pfahlart]] -- Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem
   Tragglied aus Stahl ([[opencivil.pfahl.pfahl#Tragglied|Tragglied]]) in einem Verpresskörper;
@@ -267,6 +268,54 @@ Querkraft und das Moment -- das Moment dreht wie die Querkraft, wenn sie
 def kennung(self) -> str
 ```
 
+### _pfahl
+
+```python
+def _pfahl(art: Pfahlart) -> Tuple[Feld, ...]
+```
+
+Die Masse -- was D meint, hängt an der Art (siehe Dateikopf).
+
+### _aussen
+
+```python
+def _aussen(grundlage: Grundlage) -> Tuple[Feld, ...]
+```
+
+η_a mit dem Grenzwert seiner Grundlage -- aus einem Versuch dazu R_a,k selbst.
+
+### _fuss
+
+```python
+def _fuss(grundlage: Grundlage, spitze: Spitze) -> Tuple[Feld, ...]
+```
+
+Der Spitzendruck, wo er eingegeben wird -- aus einem Versuch nie: R_a,k enthält den Fuss.
+
+### _querschnitt
+
+```python
+def _querschnitt(art: Pfahlart, tragglied: Tragglied) -> Tuple[Feld, ...]
+```
+
+Beim Bohrpfahl die Bewehrung, beim Mikropfahl das Tragglied -- dazu η_i.
+
+### _festigkeit
+
+```python
+def _festigkeit(verhalten: Verhalten) -> Tuple[Feld, ...]
+```
+
+Drainiert φ'_k und c'_k, undrainiert s_u,k -- wie beim Grundbruch.
+
+### _mantel
+
+```python
+def _mantel(verhalten: Verhalten, mantel: Mantel) -> Tuple[Feld, ...]
+```
+
+Eingegeben q_s,k selbst, gerechnet die Beiwerte nach dem Verhalten.
+
 ### Pfahl
 
 ```python
@@ -371,23 +420,15 @@ def profil(self, e: Eingaben) -> Profil
 
 Die Schichten und das Wasser als Zahlen, aus den Eingaben eines Nachweises.
 
-#### Pfahl._gruppen
+#### Pfahl._vorgaben
 
 ```python
-def _gruppen(self) -> List[Tuple[str, Tuple[tuple, ...]]]
+def _vorgaben(self) -> Iterator[Tuple[str, str, Feld, Groesse]]
 ```
 
-Je Kasten der Herleitung seine Vorgaben: Kurzname, Symbol, Einheit,
-Beschreibung, Stellen, Grösse, Referenz -- nur, was nach den Wahlen gilt.
-
-#### Pfahl._schichtwert
-
-```python
-@staticmethod
-def _schichtwert(i: int, s: Pfahlschicht, kurz: str) -> tuple
-```
-
-Eine Zahl der Schicht i als Vorgabe; «#» in der Beschreibung steht für die Schicht.
+Je Vorgabe, die nach den Wahlen gilt: ihre Gruppe -- die der Schichten
+zusammen «Schicht» --, ihr Kasten in der Herleitung, ihr Feld und ihre
+Grösse.
 
 #### Pfahl.kurznamen
 
@@ -395,7 +436,7 @@ Eine Zahl der Schicht i als Vorgabe; «#» in der Beschreibung steht für die Sc
 def kurznamen(self, *gruppen: str) -> List[str]
 ```
 
-Die Kurznamen der Vorgaben, die gelten -- aus den genannten Kästen, ohne
+Die Kurznamen der Vorgaben, die gelten -- aus den genannten Gruppen, ohne
 Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 
 
@@ -403,6 +444,10 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 
 - `ETA_I_HOECHSTENS = 0.9` – Wie gross der Umrechnungsfaktor des inneren Widerstands höchstens ist -- nur mit verlässlicher Prüfung der Integrität (SIA 267:2013, 9.5.2.4.9).
 - `ETA_I_REGEL = 0.8` – Ohne diese Prüfung, in der Regel (SIA 267:2013, 9.5.2.4.4, (51)).
+- `_VERSUCH = 'SIA 267:2013, 9.4.4.1.3, 9.4.4.1.6'` – R_a,k aus einem Versuch: der kleinste gemessene Wert.
+- `_ABROSTUNG = Feld('dt', '\\Delta t', MM, 'Abrostung aussen', 1, 'SIA 267:2013, 9.6…`
+- `VORGABEN = (Gruppe('Pfahl', _pfahl, nach=('art',)), Gruppe('Grundwasser', lambda…` – Die Vorgaben des Pfahls, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]) -- je nur, was nach den Wahlen gilt.
+- `JE_SCHICHT = (Gruppe(SCHICHT, lambda: (Feld('d', 'd', M, 'Dicke der #', 2, beschri…` – Die Vorgaben jeder Schicht, je mit ihrer Nummer -- in der Herleitung ein Kasten je Schicht, in der Maske eine Karte. Die Gruppen teilen sich beide; ihre Titel sagen der Maske nur, wo die Schalter für Verhalten und Mantel stehen.
 
 ## Braucht
 
@@ -410,8 +455,10 @@ Angabe aus allen. Die Schichten heissen zusammen «Schicht».
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenobjekt]]
+- [[opencivil.core.vorgaben]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
+- [[opencivil.geotechnik.verhalten]]
 - [[opencivil.material.basis]]
 - [[opencivil.pfahl.boden]]
 - [[opencivil.pfahl.buch]]

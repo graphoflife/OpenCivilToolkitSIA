@@ -1,5 +1,5 @@
 ---
-erzeugt: da611e427799
+erzeugt: 7aa2b87d836e
 art: modul
 tags: [modul]
 ---
@@ -41,7 +41,9 @@ Die Schichten unter einem Fundament oder an einem Pfahl haben je dieselben
 Felder: eine Gruppe als Vorlage, je Schicht mit ihrer Nummer
 ([[opencivil.core.vorgaben#Feld.nummeriert|Feld.nummeriert]]). «#» in einer Beschreibung steht für die Schicht --
 in der Herleitung «Schicht 2», in der Maske, deren Karte schon so heisst,
-«Schicht».
+«Schicht». Hat eine Schicht mehrere Gruppen, wie am Pfahl, teilen sie sich
+ihren Kasten und ihre Karte: ihre Titel sagen der Maske nur, wo sie einen
+Schalter zwischen die Felder setzt (`eingabezeilen`).
 
 ## Inhalt
 
@@ -145,3 +147,4 @@ je Wahl, welche Werte sie annehmen kann.
 
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
+- [[opencivil.pfahl.pfahl]]

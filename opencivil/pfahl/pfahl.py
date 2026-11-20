@@ -4,7 +4,8 @@ opencivil/pfahl/pfahl.py -- ein Einzelpfahl in seinem Baugrund.
 VERANTWORTUNG:
 Der :class:`Pfahl`: Art, Masse und Querschnitt, die Schichten des Baugrunds,
 das Grundwasser und die Beiwerte des Widerstands -- als Vorgaben im
-Rechenwerk, und nur die, die nach den Wahlen gelten (:meth:`Pfahl.kurznamen`):
+Rechenwerk, und nur die, die nach den Wahlen gelten (:data:`VORGABEN`,
+:data:`JE_SCHICHT`):
 
 * :class:`Pfahlart` -- Bohrpfahl aus Stahlbeton oder Mikropfahl mit einem
   Tragglied aus Stahl (:class:`Tragglied`) in einem Verpresskörper;
@@ -38,19 +39,21 @@ SI-Basis.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, Iterator, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Berechnung, Eingaben, Vorgabe
+from opencivil.core.berechnung import Berechnung, Eingaben
 from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KN, KN_PRO_M3, KNM, KPA, M, MM, MN_PRO_M2, Groesse,
 )
 from opencivil.core.protokoll import Abschnitt
 from opencivil.core.rechenobjekt import Rechenobjekt
+from opencivil.core.vorgaben import SCHICHT, Feld, Gruppe
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef, kennung_aus
+from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.material.basis import Baustoff
 from opencivil.pfahl import buch
-from opencivil.pfahl.boden import Pfahlschicht, Profil
+from opencivil.pfahl.boden import Mantel, Pfahlschicht, Profil
 
 #: Wie gross der Umrechnungsfaktor des inneren Widerstands höchstens ist --
 #: nur mit verlässlicher Prüfung der Integrität (SIA 267:2013, 9.5.2.4.9).
@@ -228,6 +231,164 @@ class Kombination:
 
 
 # ===========================================================================
+# Die Vorgaben
+# ===========================================================================
+
+#: R_a,k aus einem Versuch: der kleinste gemessene Wert.
+_VERSUCH = "SIA 267:2013, 9.4.4.1.3, 9.4.4.1.6"
+
+_ABROSTUNG = Feld("dt", r"\Delta t", MM, "Abrostung aussen", 1, "SIA 267:2013, 9.6.1.5.2",
+                  schritt=0.5, hinweis="Zuschlag für die Korrosion statt weiteren Schutzes")
+
+
+def _pfahl(art: Pfahlart) -> Tuple[Feld, ...]:
+    """Die Masse -- was D meint, hängt an der Art (siehe Dateikopf)."""
+    if art is Pfahlart.MIKROPFAHL:
+        D = Feld("D", "D", MM, "Durchmesser des Verpresskörpers", 0,
+                 beschriftung="Verpresskörper", schritt=50,
+                 hinweis="an ihm tragen Mantel und Fuss")
+    else:
+        D = Feld("D", "D", MM, "Durchmesser des Pfahls", 0, "SIA 267:2013, 9.5.2.4.7",
+                 beschriftung="Durchmesser", schritt=50,
+                 hinweis="verrohrt aussen an der Verrohrung, unverrohrt der des Bohrwerkzeugs")
+    return (D,
+            Feld("L", "L", M, "Länge des Pfahls", 2, beschriftung="Länge", schritt=0.5),
+            Feld("t_K", "t_K", M, "Tiefe des Pfahlkopfs unter Terrain", 2,
+                 beschriftung="Tiefe des Kopfs", schritt=0.5,
+                 hinweis="darüber trägt der Boden nur als Auflast"))
+
+
+def _aussen(grundlage: Grundlage) -> Tuple[Feld, ...]:
+    """η_a mit dem Grenzwert seiner Grundlage -- aus einem Versuch dazu R_a,k selbst."""
+    eta = Feld("eta_a", r"\eta_a", EINHEITSLOS, "Umrechnungsfaktor des äusseren Widerstands", 2,
+               grundlage.referenz, beschriftung="Umrechnungsfaktor", schritt=0.05,
+               hinweis=f"höchstens {grundlage.eta_grenze:.1f}")
+    if not grundlage.aus_versuch:
+        return (eta,)
+    return (eta,
+            Feld("R_ak", "R_{a,k}", KN, "Äusserer Widerstand auf Druck, aus dem Versuch", 0,
+                 _VERSUCH, beschriftung="Widerstand auf Druck", schritt=50,
+                 hinweis="der kleinste gemessene Wert"),
+            Feld("R_ak_zug", "R_{a,k,Z}", KN, "Äusserer Widerstand auf Zug, aus dem Versuch", 0,
+                 _VERSUCH, beschriftung="Widerstand auf Zug", schritt=50))
+
+
+def _fuss(grundlage: Grundlage, spitze: Spitze) -> Tuple[Feld, ...]:
+    """Der Spitzendruck, wo er eingegeben wird -- aus einem Versuch nie: R_a,k enthält den Fuss."""
+    if grundlage.aus_versuch or spitze is not Spitze.EINGEBEN:
+        return ()
+    return (Feld("q_b", "q_{b,k}", KPA, "Spitzendruck, charakteristisch", 0,
+                 beschriftung="Spitzendruck", schritt=100),)
+
+
+def _querschnitt(art: Pfahlart, tragglied: Tragglied) -> Tuple[Feld, ...]:
+    """Beim Bohrpfahl die Bewehrung, beim Mikropfahl das Tragglied -- dazu η_i."""
+    if art is Pfahlart.BOHRPFAHL:
+        masse: Tuple[Feld, ...] = (
+            Feld("n", "n", EINHEITSLOS, "Zahl der Längsstäbe", 0, beschriftung="Zahl der Stäbe"),
+            Feld("phi_l", r"\varnothing_l", MM, "Durchmesser der Längsstäbe", 0,
+                 beschriftung="Durchmesser der Stäbe", schritt=2),
+            Feld("c", "c", MM, "Überdeckung der Wendel", 0, schritt=5,
+                 hinweis="mindestens 60 mm verrohrt, 60 mm unverrohrt in Fels oder hartem "
+                         "Boden, 75 mm unverrohrt in weichem Boden (SIA 267:2013, 9.6.3.2.6)"),
+            Feld("phi_w", r"\varnothing_w", MM, "Durchmesser der Wendel", 0, schritt=2),
+            Feld("s_w", "s_w", MM, "Ganghöhe der Wendel", 0, "SIA 267:2013, 9.6.3.2.4",
+                 schritt=10, hinweis="die grösste längs des Pfahls; in der Regel höchstens "
+                                     "0.40 m, am Kopf 0.10 bis 0.15 m"),
+        )
+    elif tragglied is Tragglied.ROHR:
+        masse = (Feld("d_a", "d_a", MM, "Aussendurchmesser des Rohrs", 1,
+                      beschriftung="Aussendurchmesser"),
+                 Feld("t_r", "t", MM, "Wanddicke des Rohrs", 1, beschriftung="Wanddicke",
+                      schritt=0.5),
+                 _ABROSTUNG)
+    else:
+        masse = (Feld("d_a", r"\varnothing", MM, "Durchmesser des Stabs", 1,
+                      beschriftung="Durchmesser"),
+                 _ABROSTUNG)
+    return (*masse,
+            Feld("eta_i", r"\eta_i", EINHEITSLOS, "Umrechnungsfaktor des inneren Widerstands", 2,
+                 "SIA 267:2013, 9.5.2.4.4, (51); 9.5.2.4.9", beschriftung="Umrechnungsfaktor",
+                 schritt=0.05, hinweis=f"in der Regel höchstens {ETA_I_REGEL}, mit verlässlicher "
+                                       f"Prüfung der Integrität bis {ETA_I_HOECHSTENS}"))
+
+
+#: Die Vorgaben des Pfahls, je Kasten der Herleitung und Karte der Maske
+#: (:mod:`opencivil.core.vorgaben`) -- je nur, was nach den Wahlen gilt.
+VORGABEN = (
+    Gruppe("Pfahl", _pfahl, nach=("art",)),
+    Gruppe("Grundwasser", lambda: (
+        Feld("t_w", "t_w", M, "Tiefe des höchsten Grundwasserspiegels unter Terrain", 2,
+             "SIA 267:2013, 4.2.2.3", beschriftung="Tiefe des Grundwassers", schritt=0.5),
+        Feld("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1,
+             beschriftung="Raumlast Wasser", schritt=0.5),
+    )),
+    Gruppe("Äusserer Widerstand", _aussen, nach=("grundlage",)),
+    Gruppe("Fuss", _fuss, nach=("grundlage", "spitze")),
+    Gruppe("Querschnitt", _querschnitt, nach=("art", "tragglied")),
+    Gruppe("Querlast", lambda: (
+        Feld("t_red", "t_{red}", M,
+             "Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst", 2,
+             "SIA 267:2013, 9.5.4.5", beschriftung="Abminderung bis", schritt=0.5),
+        Feld("eta_tr", r"\eta_{a,tr}", EINHEITSLOS,
+             "Umrechnungsfaktor des äusseren Widerstands quer", 2,
+             "SIA 267:2013, 9.5.2.3.2; 9.5.2.2.5, (48)", beschriftung="Umrechnungsfaktor",
+             schritt=0.05, hinweis=f"höchstens {Grundlage.BERECHNUNG.eta_grenze:.1f}: "
+                                   "R_tr,k wird immer gerechnet"),
+    )),
+)
+
+
+def _festigkeit(verhalten: Verhalten) -> Tuple[Feld, ...]:
+    """Drainiert φ'_k und c'_k, undrainiert s_u,k -- wie beim Grundbruch."""
+    if verhalten is Verhalten.UNDRAINIERT:
+        return (Feld("s_u", "s_{u,k}", KPA, "Undrainierte Scherfestigkeit der #, charakteristisch",
+                     1, beschriftung="Scherfestigkeit", schritt=5),)
+    return (Feld("phi_k", r"\varphi'_k", GRAD, "Reibungswinkel der #, charakteristisch", 1,
+                 beschriftung="Reibungswinkel"),
+            Feld("c_k", "c'_k", KPA, "Kohäsion der #, charakteristisch", 1,
+                 beschriftung="Kohäsion", hinweis="zählt am Fuss und im Erdwiderstand quer"))
+
+
+def _mantel(verhalten: Verhalten, mantel: Mantel) -> Tuple[Feld, ...]:
+    """Eingegeben q_s,k selbst, gerechnet die Beiwerte nach dem Verhalten."""
+    if mantel is Mantel.EINGEBEN:
+        return (Feld("q_s", "q_{s,k}", KPA, "Mantelreibung in der #, charakteristisch", 1,
+                     beschriftung="Mantelreibung", schritt=5),)
+    if verhalten is Verhalten.UNDRAINIERT:
+        return (Feld("alpha", r"\alpha", EINHEITSLOS, "Adhäsion in der #, als Teil von s_u,k", 2,
+                     buch.KAP_MANTEL, beschriftung="Adhäsion", schritt=0.05,
+                     hinweis="am Bohrpfahl etwa 0.6 in weichem, 0.9 in steifem Ton"),)
+    return (Feld("K", "K", EINHEITSLOS, "Erddruckbeiwert am Mantel in der #", 2, buch.KAP_MANTEL,
+                 beschriftung="Erddruckbeiwert", schritt=0.05,
+                 hinweis="an einem Bohrpfahl höchstens etwa K₀ = 1 − sin φ'_k"),
+            Feld("delta_faktor", r"k_{\delta}", EINHEITSLOS,
+                 "Reibungswinkel Pfahl–Boden in der #, als Teil von φ'_k", 2, buch.KAP_MANTEL,
+                 beschriftung="Wandreibung", schritt=0.05, hinweis="rau etwa 1"))
+
+
+#: Die Vorgaben jeder Schicht, je mit ihrer Nummer -- in der Herleitung ein
+#: Kasten je Schicht, in der Maske eine Karte. Die Gruppen teilen sich beide;
+#: ihre Titel sagen der Maske nur, wo die Schalter für Verhalten und Mantel
+#: stehen.
+JE_SCHICHT = (
+    Gruppe(SCHICHT, lambda: (
+        Feld("d", "d", M, "Dicke der #", 2, beschriftung="Dicke", schritt=0.5),
+        Feld("gamma", r"\gamma", KN_PRO_M3, "Raumlast der #", 1, beschriftung="Raumlast",
+             schritt=0.5),
+    )),
+    Gruppe("Festigkeit", _festigkeit, nach=("verhalten",)),
+    Gruppe("Mantelreibung", _mantel, nach=("verhalten", "mantel")),
+    Gruppe("Verformung", lambda: (
+        Feld("E_s", "E_{s,k}", MN_PRO_M2, "Verformungsmodul der #, charakteristisch", 0,
+             beschriftung="Verformungsmodul", schritt=5,
+             hinweis="für die Federn: am Mantel 0.42·E, am Fuss 4.5·E (Cassan, Kap. 12.8), "
+                     "quer E/D (SIA 267:2013, (53))"),
+    )),
+)
+
+
+# ===========================================================================
 # Der Pfahl
 # ===========================================================================
 
@@ -341,116 +502,29 @@ class Pfahl(Rechenobjekt):
 
     # -- Die Vorgaben -------------------------------------------------------
 
-    def _gruppen(self) -> List[Tuple[str, Tuple[tuple, ...]]]:
+    def _vorgaben(self) -> Iterator[Tuple[str, str, Feld, Groesse]]:
         """
-        Je Kasten der Herleitung seine Vorgaben: Kurzname, Symbol, Einheit,
-        Beschreibung, Stellen, Grösse, Referenz -- nur, was nach den Wahlen gilt.
+        Je Vorgabe, die nach den Wahlen gilt: ihre Gruppe -- die der Schichten
+        zusammen «Schicht» --, ihr Kasten in der Herleitung, ihr Feld und ihre
+        Grösse.
         """
-        mikro = not self.bohrpfahl
-        pfahl = (
-            ("D", "D", MM,
-             "Durchmesser des Verpresskörpers" if mikro else "Durchmesser des Pfahls", 0, self.D,
-             "" if mikro else "SIA 267:2013, 9.5.2.4.7"),
-            ("L", "L", M, "Länge des Pfahls", 2, self.L, ""),
-            ("t_K", "t_K", M, "Tiefe des Pfahlkopfs unter Terrain", 2, self.t_K, ""),
-        )
-        wasser = (
-            ("t_w", "t_w", M, "Tiefe des höchsten Grundwasserspiegels unter Terrain", 2,
-             self.t_w, "SIA 267:2013, 4.2.2.3"),
-            ("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1, self.gamma_w, ""),
-        )
-        aussen = [("eta_a", r"\eta_a", EINHEITSLOS, "Umrechnungsfaktor des äusseren Widerstands",
-                   2, self.eta_a, self.grundlage.referenz)]
-        if self.grundlage.aus_versuch:
-            aussen += [
-                ("R_ak", "R_{a,k}", KN, "Äusserer Widerstand auf Druck, aus dem Versuch", 0,
-                 self.R_ak, "SIA 267:2013, 9.4.4.1.3, 9.4.4.1.6"),
-                ("R_ak_zug", "R_{a,k,Z}", KN, "Äusserer Widerstand auf Zug, aus dem Versuch", 0,
-                 self.R_ak_zug, "SIA 267:2013, 9.4.4.1.3, 9.4.4.1.6"),
-            ]
-        elif self.spitze is Spitze.EINGEBEN:
-            aussen.append(("q_b", "q_{b,k}", KPA, "Spitzendruck, charakteristisch", 0, self.q_b,
-                           ""))
-        if self.bohrpfahl:
-            querschnitt = (
-                ("n", "n", EINHEITSLOS, "Zahl der Längsstäbe", 0, self.n, ""),
-                ("phi_l", r"\varnothing_l", MM, "Durchmesser der Längsstäbe", 0, self.phi_l, ""),
-                ("c", "c", MM, "Überdeckung der Wendel", 0, self.c, ""),
-                ("phi_w", r"\varnothing_w", MM, "Durchmesser der Wendel", 0, self.phi_w, ""),
-                ("s_w", "s_w", MM, "Ganghöhe der Wendel", 0, self.s_w, "SIA 267:2013, 9.6.3.2.4"),
-            )
-        elif self.tragglied is Tragglied.ROHR:
-            querschnitt = (
-                ("d_a", "d_a", MM, "Aussendurchmesser des Rohrs", 1, self.d_a, ""),
-                ("t_r", "t", MM, "Wanddicke des Rohrs", 1, self.t_r, ""),
-                ("dt", r"\Delta t", MM, "Abrostung aussen", 1, self.dt, "SIA 267:2013, 9.6.1.5.2"),
-            )
-        else:
-            querschnitt = (
-                ("d_a", r"\varnothing", MM, "Durchmesser des Stabs", 1, self.d_a, ""),
-                ("dt", r"\Delta t", MM, "Abrostung aussen", 1, self.dt, "SIA 267:2013, 9.6.1.5.2"),
-            )
-        querschnitt += (("eta_i", r"\eta_i", EINHEITSLOS,
-                         "Umrechnungsfaktor des inneren Widerstands", 2, self.eta_i,
-                         "SIA 267:2013, 9.5.2.4.4, (51); 9.5.2.4.9"),)
-        querlast = (
-            ("t_red", "t_{red}", M,
-             "Tiefe unter Terrain, bis zu der die Bettung quer von null an wächst", 2,
-             self.t_red, "SIA 267:2013, 9.5.4.5"),
-            ("eta_tr", r"\eta_{a,tr}", EINHEITSLOS,
-             "Umrechnungsfaktor des äusseren Widerstands quer", 2, self.eta_tr,
-             "SIA 267:2013, 9.5.2.3.2; 9.5.2.2.5, (48)"),
-        )
-        gruppen = [("Pfahl", pfahl), ("Grundwasser", wasser),
-                   ("Äusserer Widerstand", tuple(aussen)), ("Querschnitt", querschnitt),
-                   ("Querlast", querlast)]
+        for gruppe in VORGABEN:
+            for f in gruppe.fuer(self):
+                yield gruppe.titel, gruppe.titel, f, getattr(self, f.kurz)
         for i, s in enumerate(self.schichten, start=1):
-            gruppen.append((f"Schicht {i}: {s.name}", tuple(
-                self._schichtwert(i, s, kurz) for kurz in s.kurznamen())))
-        return gruppen
-
-    @staticmethod
-    def _schichtwert(i: int, s: Pfahlschicht, kurz: str) -> tuple:
-        """Eine Zahl der Schicht i als Vorgabe; «#» in der Beschreibung steht für die Schicht."""
-        symbol, einheit, beschreibung, stellen, referenz = {
-            "d": (f"d_{{{i}}}", M, "Dicke der #", 2, ""),
-            "gamma": (rf"\gamma_{{{i}}}", KN_PRO_M3, "Raumlast der #", 1, ""),
-            "phi_k": (rf"\varphi'_{{k,{i}}}", GRAD, "Reibungswinkel der #, charakteristisch", 1,
-                      ""),
-            "c_k": (f"c'_{{k,{i}}}", KPA, "Kohäsion der #, charakteristisch", 1, ""),
-            "s_u": (f"s_{{u,k,{i}}}", KPA,
-                    "Undrainierte Scherfestigkeit der #, charakteristisch", 1, ""),
-            "q_s": (f"q_{{s,k,{i}}}", KPA, "Mantelreibung in der #, charakteristisch", 1, ""),
-            "K": (f"K_{{{i}}}", EINHEITSLOS, "Erddruckbeiwert am Mantel in der #", 2,
-                  buch.KAP_MANTEL),
-            "delta_faktor": (rf"k_{{\delta,{i}}}", EINHEITSLOS,
-                             "Reibungswinkel Pfahl–Boden in der #, als Teil von φ'_k", 2,
-                             buch.KAP_MANTEL),
-            "alpha": (rf"\alpha_{{{i}}}", EINHEITSLOS,
-                      "Adhäsion in der #, als Teil von s_u,k", 2, buch.KAP_MANTEL),
-            "E_s": (f"E_{{s,k,{i}}}", MN_PRO_M2, "Verformungsmodul der #, charakteristisch", 0,
-                    ""),
-        }[kurz]
-        return (f"{kurz}_{i}", symbol, einheit, beschreibung.replace("#", f"Schicht {i}"),
-                stellen, getattr(s, kurz), referenz)
+            for gruppe in JE_SCHICHT:
+                for f in gruppe.fuer(s):
+                    yield SCHICHT, f"{SCHICHT} {i}: {s.name}", f.nummeriert(i), getattr(s, f.kurz)
 
     def _aufbauen(self) -> None:
-        for gruppe, eintraege in self._gruppen():
-            for kurz, symbol, einheit, beschreibung, stellen, groesse, referenz in eintraege:
-                d = WertDef(id=f"{self.id}.{kurz}", symbol=symbol, einheit=einheit,
-                            beschreibung=beschreibung, referenz=referenz, stellen=stellen)
-                self.definitionen[kurz] = d
-                self.berechnungen.append(Vorgabe(id=d.id, ausgabe=d, groesse=groesse,
-                                                 abschnitt=self.abschnitt, gruppe=gruppe))
+        for _, kasten, f, groesse in self._vorgaben():
+            d, vorgabe = f.vorgabe(self.id, self.abschnitt, kasten, groesse)
+            self.definitionen[f.kurz] = d
+            self.berechnungen.append(vorgabe)
 
     def kurznamen(self, *gruppen: str) -> List[str]:
         """
-        Die Kurznamen der Vorgaben, die gelten -- aus den genannten Kästen, ohne
+        Die Kurznamen der Vorgaben, die gelten -- aus den genannten Gruppen, ohne
         Angabe aus allen. Die Schichten heissen zusammen «Schicht».
         """
-        heraus = []
-        for gruppe, eintraege in self._gruppen():
-            name = "Schicht" if gruppe.startswith("Schicht ") else gruppe
-            if not gruppen or name in gruppen:
-                heraus += [e[0] for e in eintraege]
-        return heraus
+        return [f.kurz for gruppe, _, f, _ in self._vorgaben() if not gruppen or gruppe in gruppen]

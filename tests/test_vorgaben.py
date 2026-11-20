@@ -5,12 +5,15 @@ Herleitung zeigt sie in ihren Kästen, die Maske in ihren Karten. Bis
 erschien dort nie, und die Zeichen liefen auseinander.
 """
 
+import itertools
 import unittest
 
 from opencivil.core.berechnung import Vorgabe
 from opencivil.core.einheiten import M
 from opencivil.core.vorgaben import Feld, Gruppe, mit_index
 from opencivil.geotechnik.verhalten import Verhalten
+from opencivil.pfahl.boden import Mantel
+from opencivil.pfahl.pfahl import Grundlage, Pfahlart, Spitze, Tragglied
 from opencivil.projekt import Projekt
 from opencivil.web.api import katalog
 
@@ -77,6 +80,26 @@ class TestMaskeWieHerleitung(unittest.TestCase):
             erwartet += [(f"Schicht {i}: {schicht['name']}", f"{feld}_{i}")
                          for _, feld in maske("schicht", schicht)]
         self.assertEqual(erwartet, herleitung(p.aufbauen().setzungen[s.kennung]))
+
+    def test_pfahl(self):
+        """Jede Stellung der Wahlen des Pfahls, darunter je eine Schicht jeder Stellung."""
+        for art, tragglied, grundlage, spitze in itertools.product(
+                Pfahlart, Tragglied, Grundlage, Spitze):
+            with self.subTest(art=art, tragglied=tragglied, grundlage=grundlage, spitze=spitze):
+                p = Projekt(name="Probe")
+                beton = p.beton().kennung if art is Pfahlart.BOHRPFAHL else ""
+                t = p.pfahl("P", stahl=p.stahl().kennung, beton=beton, art=art.value,
+                            tragglied=tragglied.value, grundlage=grundlage.value,
+                            spitze=spitze.value)
+                for verhalten, mantel in itertools.product(Verhalten, Mantel):
+                    t.schicht(f"{verhalten.value}, {mantel.value}", verhalten=verhalten.value,
+                              mantel=mantel.value)
+                eintrag = t.als_dict()
+                erwartet = maske("pfahl", eintrag)
+                for i, schicht in enumerate(eintrag["schichten"], start=1):
+                    erwartet += [(f"Schicht {i}: {schicht['name']}", f"{feld}_{i}")
+                                 for _, feld in maske("pfahlschicht", schicht)]
+                self.assertEqual(erwartet, herleitung(p.aufbauen().pfaehle[t.kennung]))
 
 
 if __name__ == "__main__":

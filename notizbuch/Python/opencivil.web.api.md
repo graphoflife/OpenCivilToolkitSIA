@@ -1,5 +1,5 @@
 ---
-erzeugt: 1350ff3648cc
+erzeugt: 808f4b427caf
 art: modul
 tags: [modul]
 ---
@@ -209,6 +209,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.projekt.pfahl]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.setzung]]
