@@ -501,7 +501,8 @@ function diagrammKarte(kennung, system, zeile) {
   const huelle = el('div.bs-diagramm-huelle', {}, [svg]);
   zeigerEinrichten(huelle, svg, (punkt) => finden(r, daten, e, punkt, zeilen));
   return karte(`${titel} – ${daten.fall}`, [huelle, ...unten], {
-    klasse: eintrag.daten ? '' : 'ist-veraltet', zusatz: raum ? ansichtsschalter(zeile, ansicht.name) : null,
+    bild: svg, klasse: eintrag.daten ? '' : 'ist-veraltet',
+    zusatz: raum ? ansichtsschalter(zeile, ansicht.name) : null,
   });
 }
 

@@ -323,17 +323,19 @@ export function deckenKarten(kennung) {
   if (!daten?.gerechnet) {
     return [karte(null, [...meldungszeilen(daten), leerzustand('Noch nicht gerechnet.')])];
   }
+  const aufteilung = grundrissBild(decke, daten, 'aufteilung');
+  const streifen = grundrissBild(decke, daten, 'streifen');
   return [
     karte('Lastaufteilung', [
       ...meldungszeilen(daten),
-      el('div.gb-bildhuelle', {}, [grundrissBild(decke, daten, 'aufteilung')]), legende(),
-    ], { klasse: 'ist-breit' }),
+      el('div.gb-bildhuelle', {}, [aufteilung]), legende(),
+    ], { bild: aufteilung, klasse: 'ist-breit' }),
     karte('Streifen', [
-      el('div.gb-bildhuelle', {}, [grundrissBild(decke, daten, 'streifen')]),
+      el('div.gb-bildhuelle', {}, [streifen]),
       el('p.karte-hinweis', {
         text: 'Gestrichelt die Stützenbereiche: über sie geben die Streifen ihre Last an die Stützen ab.',
       }),
-    ], { klasse: 'ist-breit' }),
+    ], { bild: streifen, klasse: 'ist-breit' }),
     ...ergebnisKarten(kennung, decke, daten),
   ];
 }

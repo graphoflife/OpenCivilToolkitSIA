@@ -185,8 +185,9 @@ export function pfahlKarten(kennung) {
   const t = eintragVon(kennung);
   if (!t) return [];
   const d = zustand.loesung?.zeichendaten?.[kennung];
+  const bild = situationsbild(t, d);
   return [karte('Situation', [
-    el('div.gb-bildhuelle', {}, [situationsbild(t, d)]),
+    el('div.gb-bildhuelle', {}, [bild]),
     legendeVon(t, d),
-  ], { klasse: 'ist-breit' }), ...verlaufKarten(d)];
+  ], { bild, klasse: 'ist-breit' }), ...verlaufKarten(d)];
 }

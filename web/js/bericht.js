@@ -19,7 +19,7 @@
  * anderes als im Bericht.
  */
 
-import { karte, panel, unfertigHinweis } from './bausteine.js';
+import { bildDer, karte, panel, titelDer, unfertigHinweis } from './bausteine.js';
 import { el, ersetzen, leerzustand, svgEl } from './dom.js';
 import { setzen, span } from './mathe.js';
 import { formelnLeiste, werkzeugleiste } from './kopierleiste.js';
@@ -539,13 +539,15 @@ function diagrammgruppen(loesung) {
   const gruppen = [];
   const gesetzkarten = Object.entries(loesung.werkstoffgesetze || {})
     .filter(([kennung, gesetz]) => imRaum(raum, `${gesetz.art}.${kennung}`))
-    .map(([, gesetz]) => karte(`${gesetz.titel} – ${gesetz.name}`, [
-      gesetz.referenz ? el('p.karte-hinweis', { text: gesetz.referenz }) : null,
-      kurveZeichnen(gesetz, {
+    .map(([, gesetz]) => {
+      const bild = kurveZeichnen(gesetz, {
         zeigeVereinfacht: zustand.zeigeVereinfacht,
         beiUmschalten: (an) => aendern({ zeigeVereinfacht: an }, 'diagramm'),
-      }),
-    ]));
+      });
+      return karte(`${gesetz.titel} – ${gesetz.name}`, [
+        gesetz.referenz ? el('p.karte-hinweis', { text: gesetz.referenz }) : null, bild,
+      ], { bild });
+    });
   if (gesetzkarten.length) {
     gruppen.push({ schluessel: 'werkstoffe', name: 'Werkstoffe', titel: 'Werkstoffgesetze',
       karten: gesetzkarten });
@@ -558,27 +560,23 @@ function diagrammgruppen(loesung) {
   return gruppen;
 }
 
-/** Der Titel einer Karte, wie er in ihrem Kopf steht -- leer, wenn sie keinen hat. */
-function kartentitel(k) {
-  return k.querySelector(':scope > .unterkapitel-kopf > span')?.textContent || '';
-}
-
 /**
  * Die Diagramme, je eines gross (Benutzer, 2026-10-16). Zuoberst eine Leiste,
  * die quer rollt, mit einer kleinen Vorschau je Diagramm -- ein Knopf; der
  * gewählte steht darunter in voller Breite.
  *
- * Ein Diagramm ist jede Karte mit einem Bild. Die übrigen Karten eines
- * Bauteils -- die Wahl des Falls, ein Hinweis -- stehen über dem Diagramm,
- * das gross gezeigt wird, wenn es zu diesem Bauteil gehört. Hat ein Bauteil
- * (noch) kein Bild, bekommt es einen Knopf ohne Vorschau, der seine Hinweise
- * zeigt. Gemerkt wird die Wahl als Gruppe und Titel; fehlt dieser Titel,
+ * Ein Diagramm ist jede Karte, deren Bild gezeichnet ist (`bildDer`). Die
+ * übrigen Karten eines Bauteils -- die Wahl des Falls, ein Hinweis, ein
+ * Bild, das an seiner Stelle sagt, warum es fehlt -- stehen über dem
+ * Diagramm, das gross gezeigt wird, wenn es zu diesem Bauteil gehört. Hat
+ * ein Bauteil (noch) kein Bild, bekommt es einen Knopf ohne Vorschau, der
+ * seine Hinweise zeigt. Gemerkt wird die Wahl als Gruppe und Titel; fehlt dieser Titel,
  * gilt dieselbe Stelle in der Gruppe, sonst das erste Diagramm.
  */
 function diagrammSicht(loesung) {
   const eintraege = [];
   for (const gruppe of diagrammgruppen(loesung)) {
-    const bilder = gruppe.karten.filter((k) => k.querySelector('svg'));
+    const bilder = gruppe.karten.filter((k) => bildDer(k));
     if (!bilder.length) {
       eintraege.push({ gruppe, karte: null, titel: 'ohne Bild', index: 0,
         schluessel: `${gruppe.schluessel}|` });
@@ -586,7 +584,7 @@ function diagrammSicht(loesung) {
     }
     const gesehen = {};
     bilder.forEach((k, index) => {
-      const titel = kartentitel(k);
+      const titel = titelDer(k);
       const n = gesehen[titel] = (gesehen[titel] || 0) + 1;
       eintraege.push({ gruppe, karte: k, titel, index,
         schluessel: `${gruppe.schluessel}|${titel}|${n}` });
@@ -603,7 +601,7 @@ function diagrammSicht(loesung) {
   return stapel([
     vorschauleiste(eintraege, gewaehlt, mitGruppe),
     panel({ schluessel: `bericht/diagramm/${gruppe.schluessel}`, titel: gruppe.titel }, [
-      ...gruppe.karten.filter((k) => !k.querySelector('svg')),
+      ...gruppe.karten.filter((k) => !bildDer(k)),
       gewaehlt.karte,
     ].filter(Boolean)),
   ], 'ist-diagramm');
@@ -636,7 +634,7 @@ function vorschauleiste(eintraege, gewaehlt, mitGruppe) {
 
 /** Ein Knopf der Leiste: die Vorschau -- eine verkleinerte Kopie des Bildes -- und der Titel. */
 function vorschauknopf(e, aktiv, mitGruppe) {
-  const bild = e.karte?.querySelector('svg')?.cloneNode(true);
+  const bild = e.karte ? bildDer(e.karte).cloneNode(true) : null;
   if (bild) {
     bild.removeAttribute('width');
     bild.removeAttribute('height');

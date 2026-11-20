@@ -143,12 +143,39 @@ export function panel({
  * baut ihre Panels aus denselben Karten wie die mittlere (Benutzer,
  * 2026-10-16). Ohne `titel` keine Kopfzeile: eine Karte allein im Panel
  * hätte sonst denselben Titel zweimal. `zusatz` steht rechts im Kopf.
+ *
+ * `bild` sagt, wo eine Karte ihr Diagramm zeigt: das SVG selbst oder was an
+ * seiner Stelle steht -- eine Hülle darum oder ein Leerzustand, der sagt,
+ * warum es (noch) keines gibt. Der Bericht liest es mit `bildDer`.
  */
-export function karte(titel, inhalt, { zusatz = null, klasse = '' } = {}) {
-  return el('div.unterkapitel', { class: klasse }, [
+export function karte(titel, inhalt, { zusatz = null, klasse = '', bild = null } = {}) {
+  const k = el('div.unterkapitel', { class: klasse }, [
     titel ? el('div.unterkapitel-kopf', {}, [el('span', { text: titel }), zusatz]) : null,
     ...inhalt,
   ]);
+  KARTEN.set(k, { titel: titel || '', bild });
+  return k;
+}
+
+/** Titel und Bild jeder Karte, wie `karte` sie bekam -- gehen mit der Karte. */
+const KARTEN = new WeakMap();
+
+/** Der Titel einer Karte aus `karte` -- leer, wenn sie keinen hat. */
+export function titelDer(k) {
+  return KARTEN.get(k).titel;
+}
+
+/**
+ * Das Diagramm einer Karte: das SVG, das sie als `bild` nennt, oder das
+ * erste in dem, was sie nennt. `null`, wenn sie keines nennt oder dort noch
+ * keines steht -- dann ist sie ein Hinweis, kein Diagramm. Bis 2026-11-20
+ * galt jede Karte mit irgendeinem SVG als Diagramm, und das erste wurde die
+ * Vorschau: auch ein Schalter mit Sinnbild im Kopf der Karte.
+ */
+export function bildDer(k) {
+  const bild = KARTEN.get(k)?.bild;
+  if (!bild) return null;
+  return bild.localName === 'svg' ? bild : bild.querySelector('svg');
 }
 
 /**

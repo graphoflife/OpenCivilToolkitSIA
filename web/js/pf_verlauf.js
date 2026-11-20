@@ -125,10 +125,12 @@ function verlaufsbild(z, werte, { titel, stellen, klasse }, grenze) {
  * zum Pfahl zeichnet. Ohne Steifigkeit keine.
  */
 export function verlaufKarten(d) {
-  return (d?.verlaeufe || []).map((v) => karte(`Verläufe – ${v.name}`, [
-    el('div.pf-verlaeufe', {}, GROESSEN
+  return (d?.verlaeufe || []).map((v) => {
+    // Die Verläufe nebeneinander sind ein Bild; die Vorschau zeigt den ersten.
+    const bild = el('div.pf-verlaeufe', {}, GROESSEN
       .filter((g) => v[g.feld] && v[g.feld].some((x) => Math.abs(x) > 1e-9))
-      .map((g) => verlaufsbild(v.z, v[g.feld], g, g.grenze && v[g.grenze]))),
-    legende(d.verlaufslegende || []),
-  ], { klasse: 'ist-breit' }));
+      .map((g) => verlaufsbild(v.z, v[g.feld], g, g.grenze && v[g.grenze])));
+    return karte(`Verläufe – ${v.name}`, [bild, legende(d.verlaufslegende || [])],
+      { bild, klasse: 'ist-breit' });
+  });
 }

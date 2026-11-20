@@ -224,8 +224,9 @@ export function setzungKarten(kennung) {
   const s = eintragVon(kennung);
   if (!s) return [];
   const d = zustand.loesung?.zeichendaten?.[kennung];
+  const bild = situationsbild(s, d);
   return [karte('Situation', [
-    el('div.gb-bildhuelle', {}, [situationsbild(s, d)]),
+    el('div.gb-bildhuelle', {}, [bild]),
     legendeVon(s, d),
-  ], { klasse: 'ist-breit' })];
+  ], { bild, klasse: 'ist-breit' })];
 }

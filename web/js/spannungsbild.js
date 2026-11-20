@@ -601,9 +601,12 @@ function wahlzeile(wahl) {
   ]);
 }
 
-/** Der Inhalt eines Falls: Zahlen und Diagramm -- je nachdem, was er fragt. */
+/**
+ * Der Inhalt eines Falls: Zahlen und Diagramm -- je nachdem, was er fragt.
+ * `teile` steht in der Karte, `bild` ist das Diagramm unter ihnen (`karte`).
+ */
 function inhalt(fall) {
-  if (!fall.moeglich) return [el('p.hinweis', { text: fall.hinweis })];
+  if (!fall.moeglich) return { teile: [el('p.hinweis', { text: fall.hinweis })] };
 
   if (fall.kurve?.groessen.modul) {
     const k = fall.kurve;
@@ -613,7 +616,8 @@ function inhalt(fall) {
     const kraft = (wert) => mitEinheit(wert, 1, Kg.einheit);
     const modul = (m) => (m === null || m === undefined ? '–'
       : `${mitEinheit(m.wert, 0, M.einheit)} = ${m.vielfaches.toFixed(2)}·E_cm`);
-    return [
+    const bild = k.punkte.length ? modulbild(fall) : null;
+    const teile = [
       wahlzeile(fall.wahl),
       zahlenzeile([
         [F.zeichen, mitEinheit(k.fest, 1, F.einheit)],
@@ -626,9 +630,10 @@ function inhalt(fall) {
           ['E_{eq,u}', modul(k.bruch.modul)]] : []),
         ['E_{cm}', mitEinheit(k.E_cm, 0, M.einheit)],
       ]),
-      k.punkte.length ? modulbild(fall) : null,
+      bild,
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
     ];
+    return { teile, bild };
   }
 
   if (fall.kurve) {
@@ -637,7 +642,8 @@ function inhalt(fall) {
     const K = Kg.zeichen;
     const kennwert = fall.wahl?.index || 'Rd';
     const kraft = (wert) => mitEinheit(wert, 1, Kg.einheit);
-    return [
+    const bild = k.punkte.length ? linienbild(fall) : null;
+    const teile = [
       wahlzeile(fall.wahl),
       zahlenzeile([
         [F.zeichen, mitEinheit(k.fest, 1, F.einheit)],
@@ -647,14 +653,16 @@ function inhalt(fall) {
           [mitIndex(V, 'u', true), mitEinheit(k.bruch.verformung, V.stellen, V.einheit)]]
           : []),
       ]),
-      k.punkte.length ? linienbild(fall) : null,
+      bild,
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
     ];
+    return { teile, bild };
   }
 
   const b = fall.bild;
-  if (!b.konvergiert) return [wahlzeile(fall.wahl), el('p.hinweis', { text: b.hinweis })];
-  return [
+  if (!b.konvergiert) return { teile: [wahlzeile(fall.wahl), el('p.hinweis', { text: b.hinweis })] };
+  const bild = verteilungsbild(b, fall.raender);
+  const teile = [
     wahlzeile(fall.wahl),
     zahlenzeile([
       ['N', mitEinheit(b.N, 1, 'kN')],
@@ -663,9 +671,10 @@ function inhalt(fall) {
       ['\\chi', mitEinheit(b.chi, 5, '1/m')],
       ['x', b.nulllinie === null ? '–' : mitEinheit(b.nulllinie, 0, 'mm')],
     ]),
-    verteilungsbild(b, fall.raender),
+    bild,
     b.hinweis ? el('p.hinweis', { text: b.hinweis }) : null,
   ];
+  return { teile, bild };
 }
 
 /** Ein Fall als Karte: Name und Frage im Kopf, darunter Zahlen und Diagramm. */
@@ -673,7 +682,8 @@ export function spannungsfallZeichnen(fall) {
   const titel = fall.moeglich
     ? `${fall.name} – ${fall.titel} (${fall.richtung_text})`
     : `${fall.name} – ${fall.titel}`;
-  return karte(titel, inhalt(fall));
+  const { teile, bild } = inhalt(fall);
+  return karte(titel, teile, { bild });
 }
 
 /** Die Spannung-Dehnung-Analysen eines Bauteils, je eine Karte. */

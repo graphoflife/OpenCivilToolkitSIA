@@ -183,7 +183,7 @@ function feldInhalt(decke, daten, ergebnis, groesse) {
     unter: (v) => zellen(v, ergebnis, groesse, s, zeichen, einheit),
     oben: (v) => extremwerte(v, ergebnis, groesse, einheit),
   });
-  return [el('div.gb-bildhuelle', {}, [bild]), farblegende(s, einheit)];
+  return { teile: [el('div.gb-bildhuelle', {}, [bild]), farblegende(s, einheit)], bild };
 }
 
 /**
@@ -222,20 +222,24 @@ function laengsOrt(decke, zeile) {
 function laengsInhalt({ art, eintrag }, ergebnis, groesse, frisch) {
   const { kennung, von, bis } = eintrag;
   const s = (ergebnis[art.liste] || []).find((x) => x.kennung === kennung);
-  if (!s) return [leerzustand(frisch ? `Dem ${art.wort} ${kennung} fehlt ein Knoten.` : 'Bild wird gerechnet …')];
+  if (!s) {
+    return { teile: [leerzustand(frisch ? `Dem ${art.wort} ${kennung} fehlt ein Knoten.` : 'Bild wird gerechnet …')] };
+  }
   if (!s.stuecke.length) {
-    return [leerzustand(s.L > 0 ? `Der ${art.wort} ${kennung} liegt neben den Platten.`
-      : `Der ${art.wort} ${kennung} hat keine Länge.`, 'Im Fenster seine Enden verschieben.')];
+    return { teile: [leerzustand(s.L > 0 ? `Der ${art.wort} ${kennung} liegt neben den Platten.`
+      : `Der ${art.wort} ${kennung} hat keine Länge.`, 'Im Fenster seine Enden verschieben.')] };
   }
   const zeichen = zeichenVon(groesse);
   const einheit = ergebnis.einheiten[groesse];
-  return [
-    schnittbild(s, groesse, { zeichen, einheit }),
+  const bild = schnittbild(s, groesse, { zeichen, einheit });
+  const teile = [
+    bild,
     el('p.karte-hinweis', {
       text: `Von ${von} nach ${bis}, die Stelle s ab ${von} · ${zeichen} in ${einheit}${art.zusatz(eintrag)}, `
         + 'positive Werte unten.',
     }),
   ];
+  return { teile, bild };
 }
 
 // ===========================================================================
@@ -306,7 +310,7 @@ function lagerInhalt(decke, daten, ergebnis) {
     rand: RAND.lager,
     oben: (v) => linienlager(v, decke, ergebnis),
   });
-  return [
+  const teile = [
     el('div.gb-bildhuelle', {}, [bild]),
     lagertabelle(ergebnis),
     el('p.karte-hinweis', {
@@ -315,6 +319,7 @@ function lagerInhalt(decke, daten, ergebnis) {
         + 'negativ, wo es oben zieht.',
     }),
   ];
+  return { teile, bild };
 }
 
 // ===========================================================================
@@ -326,7 +331,7 @@ function lagerInhalt(decke, daten, ergebnis) {
  * Zeile -- über die ganze Decke, längs ihres Schnitts oder in ihrem
  * Unterzug. M und V hat nur ein Unterzug, die Grössen der Platte nur sie:
  * passt beides nicht zusammen, sagt es die Karte, statt etwas anderes zu
- * zeigen.
+ * zeigen. Jeder Inhalt gibt die Teile der Karte und ihr Bild (`karte`).
  */
 function ergebnisKarte(kennung, decke, daten, zeile) {
   const groesse = katalog('decke', 'diagrammgroessen').find((g) => g.wert === zeile.groesse);
@@ -353,8 +358,8 @@ function ergebnisKarte(kennung, decke, daten, zeile) {
   if (zeile.groesse === 'lager') inhalt = lagerInhalt(decke, daten, ergebnis);
   else if (ort) inhalt = laengsInhalt(ort, ergebnis, zeile.groesse, Boolean(eintrag.daten));
   else inhalt = feldInhalt(decke, daten, ergebnis, zeile.groesse);
-  return karte(`${titel} – ${ergebnis.fall}`, inhalt,
-    { klasse: eintrag.daten ? 'ist-breit' : 'ist-breit ist-veraltet' });
+  return karte(`${titel} – ${ergebnis.fall}`, inhalt.teile,
+    { bild: inhalt.bild, klasse: eintrag.daten ? 'ist-breit' : 'ist-breit ist-veraltet' });
 }
 
 /**

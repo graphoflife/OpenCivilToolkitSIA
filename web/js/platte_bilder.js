@@ -45,9 +45,11 @@ const KNICKLINIE = '#9a5b13';
  */
 export function plattenkarten(kennung, eintrag, loesung) {
   const eigene = Object.values(loesung.linien || {}).filter((linie) => linie.bauteil === kennung);
+  const querschnitt = querschnittZeichnen(eintrag, loesung.werte || {});
   return [
-    karte('Querschnitt', [querschnittZeichnen(eintrag, loesung.werte || {})]),
-    ...eigene.map((linie) => karte('M-N-Interaktionsdiagramm', [diagrammZeichnen(linie)])),
+    karte('Querschnitt', [querschnitt], { bild: querschnitt }),
+    ...eigene.map((linie) => diagrammZeichnen(linie))
+      .map((bild) => karte('M-N-Interaktionsdiagramm', [bild], { bild })),
     ...querkraftkurven(loesung, kennung),
     ...neigungskurven(loesung, kennung),
     ...spannungskarten(kennung, loesung),
@@ -97,22 +99,25 @@ function querkraftkurven(loesung, querschnitt) {
   const alle = Object.entries(loesung.querkraftkurven || {})
     .filter(([, k]) => k.querschnitt === querschnitt);
 
-  return alle.map(([kennung, kurve]) => karte(`Querkraft über Moment – ${kurve.name}`, [
-    querkraftkurveZeichnen(kurve),
-    el('div.kurvenfuss', {}, [
-      el('span.kurvenfuss-name', { text: 'gilt für N_Ed =' }),
-      zahlfeld({
-        wert: kurve.N_Ed, schritt: 50,
-        titel: 'N in kN, Zug positiv. Nur Punkte mit genau diesem N liegen auf der Kurve.',
-        leer: 0,
-        beiAenderung: (v) => normalkraftWaehlen(kennung, v),
-      }),
-      el('span.einheit', { text: 'kN' }),
-      el('span.kurvenhinweis', {
-        text: 'Blass: Punkte mit anderem N.',
-      }),
-    ]),
-  ]));
+  return alle.map(([kennung, kurve]) => {
+    const bild = querkraftkurveZeichnen(kurve);
+    return karte(`Querkraft über Moment – ${kurve.name}`, [
+      bild,
+      el('div.kurvenfuss', {}, [
+        el('span.kurvenfuss-name', { text: 'gilt für N_Ed =' }),
+        zahlfeld({
+          wert: kurve.N_Ed, schritt: 50,
+          titel: 'N in kN, Zug positiv. Nur Punkte mit genau diesem N liegen auf der Kurve.',
+          leer: 0,
+          beiAenderung: (v) => normalkraftWaehlen(kennung, v),
+        }),
+        el('span.einheit', { text: 'kN' }),
+        el('span.kurvenhinweis', {
+          text: 'Blass: Punkte mit anderem N.',
+        }),
+      ]),
+    ], { bild });
+  });
 }
 
 /**
@@ -127,18 +132,21 @@ function neigungskurven(loesung, querschnitt) {
   const alle = Object.entries(loesung.neigungskurven || {})
     .filter(([, k]) => k.querschnitt === querschnitt);
 
-  return alle.map(([, kurve]) => karte(`Querkraft über Neigung – ${kurve.name}`, [
-    neigungskurveZeichnen(kurve),
-    el('div.kurvenfuss', {}, [
-      el('span.kurvenfuss-name', { text: `d = ${kurve.d.toFixed(1)} mm` }),
-      el('span.kurvenhinweis', {
-        text: kurve.zug
-          ? `Normalzug: α_min = ${kurve.alpha_min}° – unter Zug mindestens 40°. `
-            + 'Ausserhalb der Grenzen ist die Kurve blass gezeichnet.'
-          : 'Ausserhalb von α_min und α_max ist die Kurve blass gezeichnet.',
-      }),
-    ]),
-  ]));
+  return alle.map(([, kurve]) => {
+    const bild = neigungskurveZeichnen(kurve);
+    return karte(`Querkraft über Neigung – ${kurve.name}`, [
+      bild,
+      el('div.kurvenfuss', {}, [
+        el('span.kurvenfuss-name', { text: `d = ${kurve.d.toFixed(1)} mm` }),
+        el('span.kurvenhinweis', {
+          text: kurve.zug
+            ? `Normalzug: α_min = ${kurve.alpha_min}° – unter Zug mindestens 40°. `
+              + 'Ausserhalb der Grenzen ist die Kurve blass gezeichnet.'
+            : 'Ausserhalb von α_min und α_max ist die Kurve blass gezeichnet.',
+        }),
+      ]),
+    ], { bild });
+  });
 }
 
 // ===========================================================================

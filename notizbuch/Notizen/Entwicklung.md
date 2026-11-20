@@ -7,6 +7,21 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Ein Diagramm nennt sein Bild
+
+Der Reiter «Diagramme» im Bericht hielt jede Karte mit irgendeinem SVG für
+ein Diagramm und nahm das erste als Vorschau. Ein Schalter mit Sinnbild im
+Kopf einer Karte – die Ansicht des Rahmens im Raum – oder ein Zeichen in
+einer Meldung über dem Bild wäre so zur Vorschau geworden. Jetzt sagt jede
+Karte, die ein Diagramm zeigt, wo ihr Bild steht (`bild`); der Bericht liest
+es dort (`bildDer`) und nirgends sonst – wie den Titel, den die Karte bekam
+(`titelDer`), statt ihn aus ihrem Kopf zu lesen.
+
+Was als Diagramm zählt, ist gleich geblieben: eine Karte, an deren Bildstelle
+ein Bild gezeichnet ist. Ein Leerzustand an dieser Stelle – «Kein
+Bruchzustand.» – macht sie zum Hinweis über den Diagrammen ihres Bauteils,
+wie bisher.
+
 ## 2026-11-20 · Das Urteil steht hinter dem Grad
 
 Wo «⇒ erfüllt» in einer Herleitung steht, entschieden zwei Schalter mit

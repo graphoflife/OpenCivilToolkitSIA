@@ -453,7 +453,7 @@ function interaktionskarte(kennung, daten, veraltet) {
   return karte('Interaktionsdiagramm', [
     schnittsteuerung(kennung, daten.einachsig),
     el('div', { class: veraltet ? 'ist-veraltet' : '' }, [bild]),
-  ]);
+  ], { bild });
 }
 
 // ===========================================================================
@@ -500,8 +500,8 @@ export function analyseKarten(kennung) {
 
   const gewaehlt = daten.faelle.find((f) => f.name === ansicht.gezeigt) || daten.faelle[0];
   const veraltet = !eintrag.daten;
-  const bild = (t, inhalt) => karte(`${t} – ${gewaehlt.name}`, [inhalt],
-    { klasse: veraltet ? 'ist-veraltet' : '' });
+  const bildkarte = (t, bild) => karte(`${t} – ${gewaehlt.name}`, [bild],
+    { bild, klasse: veraltet ? 'ist-veraltet' : '' });
   // Die Wahl des Falls gilt für die Bilder darunter -- über die ganze Breite.
   const kopf = karte('Lastfall', [
     el('div.qa-fallkopf', {}, [
@@ -520,9 +520,9 @@ export function analyseKarten(kennung) {
     // Ohne Bild sagt die Karte, warum -- bis 2026-11-19 fehlte sie still. Den
     // Schubfluss zeigt sie nur, wo der Kern etwas zu sagen hat: ohne
     // Schubwand und ohne Querkraft ist Schub kein Thema.
-    gewaehlt.bruch ? bild('Bruchzustand', bruchbild(daten, gewaehlt))
-      : bild('Bruchzustand', leerzustand(gewaehlt.ohne_bruch || 'Kein Bruchzustand.')),
-    gewaehlt.schub ? bild('Schubfluss', schubbild(daten, gewaehlt))
-      : gewaehlt.ohne_schub ? bild('Schubfluss', leerzustand(gewaehlt.ohne_schub)) : null,
+    gewaehlt.bruch ? bildkarte('Bruchzustand', bruchbild(daten, gewaehlt))
+      : bildkarte('Bruchzustand', leerzustand(gewaehlt.ohne_bruch || 'Kein Bruchzustand.')),
+    gewaehlt.schub ? bildkarte('Schubfluss', schubbild(daten, gewaehlt))
+      : gewaehlt.ohne_schub ? bildkarte('Schubfluss', leerzustand(gewaehlt.ohne_schub)) : null,
   ].filter(Boolean);
 }

@@ -433,9 +433,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Erledigt (2026-11-20): «⇒ erfüllt» steht immer hinter dem Grad;
         der Schalter `mit_urteil` ist weg, «Sprödes Versagen je Richtung»
         hat sein Urteil.
-      - Der Bericht hält jede Karte mit einem SVG für ein Diagramm
-        (`querySelector('svg')`); ein Schalter mit Sinnbild im Kopf einer
-        Karte würde zur Vorschau. Umbau: `karte(titel, inhalt, {bild})`.
+      - Erledigt (2026-11-20): eine Diagrammkarte nennt ihr Bild
+        (`karte(titel, inhalt, {bild})`, gelesen mit `bildDer`); der
+        Bericht sucht kein SVG mehr in der ganzen Karte.
       - Der Anlass einer Änderung ist freier Text und zugleich Modus:
         'zeichnung' und 'fenster' rechnen nicht. Umbau: ob gerechnet wird,
         sagt die Zeile der App; «nur die Mitte neu zeichnen» wird eine

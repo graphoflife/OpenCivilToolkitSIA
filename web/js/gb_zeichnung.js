@@ -274,8 +274,9 @@ export function situationKarten(kennung) {
       aendern({}, 'diagramm');
     },
   }) : null;
+  const bild = situationsbild(g, s, fall);
   return [karte('Situation', [
-    el('div.gb-bildhuelle', {}, [situationsbild(g, s, fall)]),
+    el('div.gb-bildhuelle', {}, [bild]),
     legendeVon(g, s, fall),
-  ], { zusatz: wahl, klasse: 'ist-breit' })];
+  ], { bild, zusatz: wahl, klasse: 'ist-breit' })];
 }
