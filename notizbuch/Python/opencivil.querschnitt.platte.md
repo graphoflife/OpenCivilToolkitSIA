@@ -1,5 +1,5 @@
 ---
-erzeugt: 8066a05cbbcb
+erzeugt: c7f87c932846
 art: modul
 tags: [modul]
 ---
@@ -296,14 +296,6 @@ Querschnitt **eines** Bügelschenkels.
 ```python
 def menge_text(self) -> str
 ```
-
-#### Querkraftbewehrung.grenzen
-
-```python
-def grenzen(self, zugkraft: bool) -> Tuple[int, int]
-```
-
-Die beiden Grenzwinkel in Grad -- siehe [[opencivil.querschnitt.platte#druckfeldgrenzen|druckfeldgrenzen]].
 
 ### druckfeldgrenzen
 

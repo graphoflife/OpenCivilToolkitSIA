@@ -1,5 +1,5 @@
 ---
-erzeugt: fce1728aa1f2
+erzeugt: d16bed8b8832
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -509,7 +509,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Stegbreite des Kreisquerschnitts]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Steifigkeitsmatrix eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]], [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._bewehrung_protokollieren]]
-- [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]], [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]
+- [[Teilung in y aus der Stabzahl]] · [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.protokoll_teilung_y|QuerkraftMitBuegeln.protokoll_teilung_y]]
 - [[Torsionssteifigkeit]] · [[opencivil.stabwerk.rechnung#_modul_mal_kennwert|_modul_mal_kennwert]]
 - [[Torsionsträgheitsmoment aus der Spannungsfunktion]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Torsionsträgheitsmoment eines I-Profils]] · [[opencivil.stabwerk.profilformen]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: f72aeaafd466
+erzeugt: 3da769f462ea
 art: modul
 tags: [modul]
 ---
@@ -165,6 +165,14 @@ def _ansatzbezuege(self) -> List[Eingabebezug]
 ```
 
 Was der Ansatz ausser der Hoehe und den Lagen der Bewehrung liest.
+
+#### Querkraft._fallbezuege
+
+```python
+def _fallbezuege(self) -> List[Eingabebezug]
+```
+
+Was je Fall dazukommt -- ohne Buegel sein Momentenwiderstand.
 
 #### Querkraft._befunde
 

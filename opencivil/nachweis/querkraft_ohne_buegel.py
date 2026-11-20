@@ -96,9 +96,10 @@ class Kurvenbeiwerte:
     """
     Was ausser Moment und Normalkraft in den Widerstand eingeht.
 
-    Alles in SI-Basis. Steht nach dem Lauf am Nachweis bereit, damit sich die
-    Kurve zu jeder eingestellten Normalkraft neu rechnen laesst -- ohne dass
-    die Oberflaeche die Formel ein zweites Mal enthaelt.
+    Alles in SI-Basis. Gebaut von :meth:`QuerkraftOhneBuegel.kurvenbeiwerte`;
+    damit rechnen je Zugseite (:meth:`widerstand`) die Faelle, die Kurve zu
+    jeder eingestellten Normalkraft und die Kennzahlen der Platte -- ohne dass
+    einer, auch nicht die Oberflaeche, die Formel ein zweites Mal enthaelt.
     """
 
     h: float
@@ -128,6 +129,19 @@ class Kurvenbeiwerte:
         if d is None:
             return None
         return d, wirksame_hoehe(d, self.einlage)
+
+    def widerstand(self, moment_positiv: bool, *, M_Ed: float, N_Ed: float, m_Rd: float,
+                   index: str = "Rd") -> Widerstandspunkt:
+        """
+        Der Widerstand der Zugseite ``moment_positiv`` bei diesem Moment und
+        dieser Normalkraft (:func:`widerstand`) -- fuer die Faelle, die Kurve
+        und die Kennzahlen der Platte dieselbe Rechnung. Nur fuer eine Seite
+        mit Zugbewehrung (:meth:`hoehen`).
+        """
+        d, d_v = self.hoehen(moment_positiv)
+        f_yd, E_s = self.zugstahl[moment_positiv]
+        return widerstand(M_Ed=M_Ed, N_Ed=N_Ed, h=self.h, d=d, d_v=d_v, tau_cd=self.tau_cd,
+                          f_yd=f_yd, E_s=E_s, k_g=self.k_g, m_Rd=m_Rd, index=index)
 
 
 def wirksame_hoehe(d: float, einlage: float) -> float:
@@ -344,7 +358,6 @@ class BefundOhneBuegel:
             return None
 
         d, d_v = hoehen
-        f_yd, E_s = self.beiwerte.zugstahl[moment_positiv]
         bis = m_Rd + KURVENZUGABE
 
         # Die fuenfzig Stellen liegen gleichmaessig, treffen ``m_Rd`` aber nur
@@ -358,11 +371,8 @@ class BefundOhneBuegel:
         vz = 1.0 if moment_positiv else -1.0
         punkte = []
         for M_Ed in stellen:
-            p = widerstand(
-                M_Ed=M_Ed, N_Ed=N_Ed, h=self.beiwerte.h, d=d, d_v=d_v,
-                tau_cd=self.beiwerte.tau_cd, f_yd=f_yd,
-                E_s=E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd,
-                index=self.index)
+            p = self.beiwerte.widerstand(moment_positiv, M_Ed=M_Ed, N_Ed=N_Ed, m_Rd=m_Rd,
+                                         index=self.index)
             punkte.append((vz * M_Ed, p.v_Rd, p.plastisch))
 
         return {"punkte": punkte, "m_Rd": vz * m_Rd, "d": d, "d_v": d_v,
@@ -392,45 +402,60 @@ class QuerkraftOhneBuegel(Querkraft):
     def _ansatzbezuege(self) -> List[Eingabebezug]:
         # Die Dehnung eps_v rechnet mit dem Stahl der gezogenen Seite --
         # unten und oben duerfen verschiedene liegen, also je Stahl.
-        bezuege = [
+        return [
             Eingabebezug("D_max", self.querschnitt.id_von("D_max")),
             Eingabebezug("einlagenhoehe", self.querschnitt.id_von("einlagenhoehe")),
             Eingabebezug("f_ck", self.querschnitt.beton.id_von("f_ck")),
             Eingabebezug("tau_cd", self.querschnitt.beton.id_von("tau_cd")),
         ] + stahlbezuege(self.posten, ("f_yd", "E_s"))
+
+    def _fallbezuege(self) -> List[Eingabebezug]:
         # Der Momentenwiderstand bei der wirkenden Normalkraft kommt aus dem
         # M-N-Nachweis -- je Fall einer. Als Eingang statt als mitgegebene Zahl,
         # damit die Abhaengigkeit im Graphen steht und die Rueckverfolgung sie
         # zeigt. Mit Buegeln geht er nicht ein; ihn trotzdem anzufordern
         # haenge eine Interpolation in die Herleitung, die dort nichts erklaert.
-        for f in self.faelle:
-            bezuege.append(Eingabebezug(f"m_Rd_{f.kennung}", self.mn.d_m_rd[f.name].id))
-        return bezuege
+        return [Eingabebezug(f"m_Rd_{f.kennung}", self.mn.d_m_rd[f.name].id)
+                for f in self.faelle]
 
     def _befunde(self) -> List[Befundbezug]:
         # m_Rd(N_Ed) kommt samt Herleitung aus dem M-N-Nachweis.
         return [Befundbezug("mn", self.mn.id)]
 
+    # -- Was Fall und Kennzahl teilen ------------------------------------------
+
+    def zugstahl(self, e: Eingaben, moment_positiv: bool) -> Tuple[Wert, Wert]:
+        """
+        ``f_yd`` und ``E_s`` des Stahls der gezogenen Seite -- unten und oben
+        duerfen verschiedene liegen, eine Seite hat nur einen.
+        """
+        stahl = zugposten(self.posten, moment_positiv)[0].lage.stahl
+        return e[stahl.eingabename("f_yd")], e[stahl.eingabename("E_s")]
+
+    def kurvenbeiwerte(self, e: Eingaben, k_g: float) -> Kurvenbeiwerte:
+        """
+        Die geloesten Eingaenge des Ansatzes, ``k_g`` aus :func:`beiwert_k_g`
+        -- fuer die Faelle, die Kurve und die Kennzahlen der Platte dieselben;
+        auch ``d_v`` entsteht darum an einer Stelle (:meth:`Kurvenbeiwerte.hoehen`).
+        """
+        hoehen = statische_hoehen(e, self.posten)
+        zugstahl = {}
+        for positiv in hoehen:
+            f_yd, E_s = self.zugstahl(e, positiv)
+            zugstahl[positiv] = (f_yd.groesse.si, E_s.groesse.si)
+        return Kurvenbeiwerte(h=e.g("h").si, statische_hoehen=hoehen,
+                              einlage=e.g("einlagenhoehe").si, tau_cd=e.g("tau_cd").si,
+                              zugstahl=zugstahl, k_g=k_g)
+
     # -- Rechnen ------------------------------------------------------------
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         m_rd = {f.name: abs(e.g(f"m_Rd_{f.kennung}").si) for f in self.faelle}
-        hoehen = statische_hoehen(e, self.posten)
-        # Der Stahl der gezogenen Seite; eine Seite hat nur einen.
-        zugstahl = {}
-        for positiv in hoehen:
-            stahl = zugposten(self.posten, positiv)[0].lage.stahl
-            zugstahl[positiv] = (e.g(stahl.eingabename("f_yd")).si,
-                                 e.g(stahl.eingabename("E_s")).si)
 
         self._protokoll_ansatz(p, e)
 
         beiwert = beiwert_k_g(p, self.id, e["D_max"], e["f_ck"])
-        # Fuer die Faelle und fuer die Kurve dieselben -- auch d_v entsteht
-        # darum an einer Stelle (:meth:`Kurvenbeiwerte.hoehen`).
-        beiwerte = Kurvenbeiwerte(h=e.g("h").si, statische_hoehen=hoehen,
-                                  einlage=e.g("einlagenhoehe").si, tau_cd=e.g("tau_cd").si,
-                                  zugstahl=zugstahl, k_g=beiwert.groesse.si)
+        beiwerte = self.kurvenbeiwerte(e, beiwert.groesse.si)
         mn = e.befund("mn")
         befund = BefundOhneBuegel(beiwerte=beiwerte, mn=mn, index=self.mn.wahl.index)
 
@@ -454,20 +479,18 @@ class QuerkraftOhneBuegel(Querkraft):
         # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und ohne d
         # keinen Querkraftwiderstand. Frueher wurde hier die gedrueckte Seite
         # herangezogen und lieferte eine Zahl, die keine statische Hoehe ist.
-        erg.zugposten = tuple(zugposten(self.posten, M_Ed >= 0))
-        hoehen = w.hoehen(M_Ed >= 0)
+        positiv = M_Ed >= 0
+        erg.zugposten = tuple(zugposten(self.posten, positiv))
+        hoehen = w.hoehen(positiv)
         if hoehen is None:
             erg.begruendung = _ohne_zugbewehrung(M_Ed)
             return erg
         erg.d, erg.d_v = hoehen
-        f_yd, E_s = w.zugstahl[M_Ed >= 0]
 
         # Zug braucht keinen Sonderfall: er macht m_Dd negativ (siehe
         # widerstand). Frueher setzte hier einer v_Rd kurzerhand auf null.
-        punkt = widerstand(
-            M_Ed=M_Ed, N_Ed=N_Ed, h=w.h, d=erg.d, d_v=erg.d_v,
-            tau_cd=w.tau_cd, f_yd=f_yd, E_s=E_s, k_g=w.k_g, m_Rd=m_Rd,
-            index=self.mn.wahl.index)
+        punkt = w.widerstand(positiv, M_Ed=M_Ed, N_Ed=N_Ed, m_Rd=m_Rd,
+                             index=self.mn.wahl.index)
         erg.m_Dd = punkt.m_Dd
         erg.eps_v = punkt.eps_v
         erg.k_d = punkt.k_d
@@ -572,8 +595,8 @@ class QuerkraftOhneBuegel(Querkraft):
         idx = self.mn.wahl.index
         m_Rd = werte.moment("m_Rd", f"m_{{{idx}}}(N_{{Ed}})", erg.m_Rd)
         eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
-        zugseite = erg.zugposten[0].lage.stahl
-        stahl = {"f_yd": e[zugseite.eingabename("f_yd")], "E_s": e[zugseite.eingabename("E_s")]}
+        f_yd, E_s = self.zugstahl(e, M_Ed >= 0)
+        stahl = {"f_yd": f_yd, "E_s": E_s}
         if erg.eps_v == 0.0:
             p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "
                    f"≤ m_Dd = {m_Dd.formatiert()} kNm → ungerissen, ε_v = 0.")

@@ -1,5 +1,5 @@
 ---
-erzeugt: 72190507c03e
+erzeugt: 5856e53ca2ba
 art: formel
 tags: [formel]
 ---
@@ -31,8 +31,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]]
-- [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln|QuerkraftMitBuegeln._protokoll_ansatz_buegel]]
+- [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.protokoll_teilung_y|QuerkraftMitBuegeln.protokoll_teilung_y]]
 
 ## Themen
 

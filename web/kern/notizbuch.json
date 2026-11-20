@@ -5391,6 +5391,7 @@
         "Plattenkennzahlen._handrechnung",
         "Plattenkennzahlen._auf_der_linie",
         "Plattenkennzahlen._hoehen",
+        "Plattenkennzahlen._mit_buegeln",
         "Plattenkennzahlen._kleinstes"
       ]
     },
@@ -5558,6 +5559,7 @@
         "Querkraftergebnis",
         "Querkraft",
         "Querkraft._ansatzbezuege",
+        "Querkraft._fallbezuege",
         "Querkraft._befunde",
         "Querkraft._eintragen",
         "Querkraft._einwirkung",
@@ -5574,13 +5576,18 @@
       "stichworte": [
         "buegelwiderstand",
         "Buegelwerte",
+        "Buegelwerte.neigungen",
+        "Buegelwerte.suche",
+        "Neigungssuche",
         "neigungen",
         "buegelteilung_y",
         "protokoll_mit_buegeln",
         "BefundMitBuegeln",
-        "BefundMitBuegeln.neigungsverlauf",
         "ErgebnisMitBuegeln",
         "QuerkraftMitBuegeln",
+        "QuerkraftMitBuegeln.buegelwerte",
+        "QuerkraftMitBuegeln.teilung_y",
+        "QuerkraftMitBuegeln.protokoll_teilung_y",
         "QuerkraftMitBuegeln.pruefe"
       ]
     },
@@ -5592,6 +5599,7 @@
       "stichworte": [
         "Kurvenbeiwerte",
         "Kurvenbeiwerte.hoehen",
+        "Kurvenbeiwerte.widerstand",
         "wirksame_hoehe",
         "Widerstandspunkt",
         "widerstand",
@@ -5603,6 +5611,8 @@
         "BefundOhneBuegel._ast",
         "ErgebnisOhneBuegel",
         "QuerkraftOhneBuegel",
+        "QuerkraftOhneBuegel.zugstahl",
+        "QuerkraftOhneBuegel.kurvenbeiwerte",
         "QuerkraftOhneBuegel.pruefe",
         "QuerkraftOhneBuegel._protokoll_fall"
       ]
@@ -7271,7 +7281,6 @@
         "Querkraftbewehrung.ueber_abstand_y",
         "Querkraftbewehrung.flaeche",
         "Querkraftbewehrung.menge_text",
-        "Querkraftbewehrung.grenzen",
         "druckfeldgrenzen",
         "stapelhoehe",
         "Plattenquerschnitt",

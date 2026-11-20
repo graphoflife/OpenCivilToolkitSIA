@@ -171,7 +171,7 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
         for nummer, ((d, a_min, a_max), gruppe) in enumerate(gruppen.items(), start=1):
             von = min(NEIGUNG_VON, a_min)
             bis = max(NEIGUNG_BIS, a_max)
-            punkte = befund.neigungsverlauf(d, von, bis)
+            punkte = befund.buegelwerte.neigungen(d, von, bis)
             kurven[f"{kennung}.{nummer}"] = {
                 "querschnitt": teil.kennung,
                 "namensraum": teil.raum,

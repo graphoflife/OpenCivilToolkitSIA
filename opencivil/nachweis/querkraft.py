@@ -249,11 +249,17 @@ class Querkraft(Nachweis):
         ]
         for q in self.posten:
             bezuege += q.bezuege("a_s", "z")
+        self.bezuege_ohne_faelle = bezuege + self._ansatzbezuege()
+        """
+        Was der Ansatz liest, ohne was je Fall dazukommt -- die Kennzahlen der
+        Platte lesen dasselbe, unter denselben Namen. Bis 2026-11-20 nahmen sie
+        alle Eingaenge und filterten die Faelle ueber den Namen ``m_Rd_`` weg.
+        """
 
         super().__init__(
             basis,
             ausgaben=list(self.d_ausnutzung.values()) + list(self.d_v_rd.values()),
-            bezuege=bezuege + self._ansatzbezuege(),
+            bezuege=self.bezuege_ohne_faelle + self._fallbezuege(),
             befunde=self._befunde(),
             titel=f"Querkraftnachweis {richtung.beschriftung} – {querschnitt.name}",
             referenz=self.REFERENZ,
@@ -267,6 +273,10 @@ class Querkraft(Nachweis):
     @abstractmethod
     def _ansatzbezuege(self) -> List[Eingabebezug]:
         """Was der Ansatz ausser der Hoehe und den Lagen der Bewehrung liest."""
+
+    def _fallbezuege(self) -> List[Eingabebezug]:
+        """Was je Fall dazukommt -- ohne Buegel sein Momentenwiderstand."""
+        return []
 
     def _befunde(self) -> List[Befundbezug]:
         """Wessen Befund der Ansatz liest -- ohne Buegel den des M-N-Nachweises."""

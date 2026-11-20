@@ -1,5 +1,5 @@
 ---
-erzeugt: b7e035618cb0
+erzeugt: 29eb60a54071
 art: modul
 tags: [modul]
 ---
@@ -43,14 +43,22 @@ Bewehrung den Druckwiderstand 0 statt -5000 kN.
 Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
 zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung (dasselbe
-Muster wie das Knicken). Die Querkraft rechnet und schreibt mit den
-Funktionen ihres Nachweises: [[opencivil.nachweis.querkraft_ohne_buegel#beiwert_k_g|beiwert_k_g]],
-[[opencivil.nachweis.querkraft_ohne_buegel#widerstand|widerstand]],
-[[opencivil.nachweis.querkraft_buegel#neigungen|neigungen]], dazu
+Muster wie das Knicken). Die Querkraft rechnet ihr Nachweis: er liest die
+Eingaenge ([[opencivil.nachweis.querkraft#Querkraft|bezuege_ohne_faelle]]),
+loest sie ([[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel.kurvenbeiwerte|kurvenbeiwerte]],
+[[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.buegelwerte|buegelwerte]])
+und rechnet je Zugseite
+([[opencivil.nachweis.querkraft_ohne_buegel#Kurvenbeiwerte.widerstand|widerstand]],
+[[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]]) -- fuer seine
+Faelle wie fuer die Kennzahlen. Geschrieben wird mit den Funktionen seiner
+Herleitung: [[opencivil.nachweis.querkraft_ohne_buegel#beiwert_k_g|beiwert_k_g]],
 [[opencivil.nachweis.querkraft#protokoll_hoehen|protokoll_hoehen]],
 [[opencivil.nachweis.querkraft_ohne_buegel#protokoll_ohne_buegel|protokoll_ohne_buegel]] und
-[[opencivil.nachweis.querkraft_buegel#protokoll_mit_buegeln|protokoll_mit_buegeln]]. Bis 2026-10-18
-standen ihre Zeilen hier ein zweites Mal.
+[[opencivil.nachweis.querkraft_buegel#protokoll_mit_buegeln|protokoll_mit_buegeln]]. Bis
+2026-10-18 standen ihre Zeilen hier ein zweites Mal, bis 2026-11-20 ihre
+Rechnung: Beiwerte, Stahl und Eingaenge eigens zusammengestellt, fuer die
+Hoehen ein `Kurvenbeiwerte` voller Nullen. Eine neue Buegelgroesse nur im
+Nachweis haette den Widerstand unter der Platte still abweichen lassen.
 
 
 ## WAS DIE GRENZEN BEDEUTEN
@@ -105,11 +113,18 @@ trifft sie (bei einseitiger Bewehrung als Eckpunkt,
 #### Plattenkennzahlen._hoehen
 
 ```python
-def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll, beiwerte: Kurvenbeiwerte, seite: Zugseite, *, wirksam: bool) -> Optional[Tuple[Wert, Optional[Wert]]]
+def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll, seite: Zugseite, d: float, d_v: Optional[float]=None) -> Tuple[Wert, Optional[Wert]]
 ```
 
-`d` der gezogenen Seite und, ohne Buegel (`wirksam`), `d_v` --
-hergeleitet wie im Querkraftnachweis; `None` ohne Zugbewehrung.
+`d` der gezogenen Seite und, ohne Buegel, `d_v` -- hergeleitet wie im Querkraftnachweis.
+
+#### Plattenkennzahlen._mit_buegeln
+
+```python
+def _mit_buegeln(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, ergebnis: Dict[str, Groesse], _momente: Dict[Zugseite, float]) -> None
+```
+
+Mit Buegeln haengt der Widerstand nicht am Moment, nur an der gezogenen Seite.
 
 #### Plattenkennzahlen._kleinstes
 
@@ -139,7 +154,6 @@ Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
 - [[opencivil.nachweis.rechenwahl]]
-- [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]
@@ -155,4 +169,3 @@ Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 - [[Fliessdehnung]] · `Plattenkennzahlen._ohne_buegel`
 - [[Kleinerer Widerstand beider Seiten]] · `Plattenkennzahlen._kleinstes`
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]] · `Plattenkennzahlen._ohne_buegel`
-- [[Teilung in y aus der Stabzahl]] · `Plattenkennzahlen._mit_buegeln`

@@ -324,12 +324,12 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         (57) stand viermal; jetzt `KeRegel` mit `KeNaeherung` und
         `KeExzentrizitaet` in `pruefung.py`, einmal gebaut in `pruefe`.
         `Schnittpruefung.k_e` fragt sie, `herleitung.k_e` schreibt nur.
-      - Kennzahlen der Platte: sie rechnen beide Querkraftansätze selbst
-        zusammen (Beiwerte, Stahl, Eingänge; ein `Kurvenbeiwerte` voller
-        Nullen, der Textfilter `startswith("m_Rd_")`, zwei Abfragen
-        `buegel is None`). Eine neue Bügelgrösse nur im Nachweis liesse den
-        Widerstand unter der Platte still abweichen. Umbau: der Kern von
-        `_einen_fall…` je Zugseite als Methode, die Fall und Kennzahl rufen.
+      - Erledigt (2026-11-20): Kennzahlen der Platte. Der Querkraftnachweis
+        löst seine Eingänge (`kurvenbeiwerte`, `buegelwerte`) und rechnet je
+        Zugseite (`Kurvenbeiwerte.widerstand`, `Buegelwerte.suche`); Fall,
+        Kurve, Bild und Kennzahl rufen dieselbe Rechnung. Die Kennzahlen lesen
+        `bezuege_ohne_faelle` statt alle Eingänge mit einem Filter auf `m_Rd_`
+        und wählen den Ansatz einmal.
       - Decke: `traeger.statik`, `wert` und `extreme` integrieren V und M
         ein zweites Mal neben `stabwerk/verlauf.py`, mit eigener Regel für
         gleiche Extremwerte (Abweichung heute 6·10⁻¹¹). Umbau:

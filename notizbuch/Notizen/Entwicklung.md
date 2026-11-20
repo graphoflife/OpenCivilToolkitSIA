@@ -7,6 +7,24 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Kennzahlen rechnen die Querkraft mit ihrem Nachweis
+
+Unter jeder Platte steht ihr Querkraftwiderstand ohne Einwirkung. Gerechnet
+haben ihn die Kennzahlen selbst: sie lasen die Eingänge des Nachweises,
+stellten Beiwerte und Stahl eigens zusammen, für die Höhen sogar einen Satz
+Beiwerte voller Nullen, und riefen die Formel mit eigener Liste. Eine neue
+Grösse der Bügel, nur im Nachweis eingeführt, hätte den Widerstand unter der
+Platte still abweichen lassen.
+
+Jetzt löst der Nachweis seine Eingänge selbst – ohne Bügel zu
+`Kurvenbeiwerte`, mit Bügeln zu `Buegelwerte` – und rechnet daran je
+Zugseite: `Kurvenbeiwerte.widerstand` und `Buegelwerte.suche`. Fall, Kurve,
+Bild über der Neigung und Kennzahl rufen dieselbe Rechnung. Was die
+Kennzahlen lesen, sagt der Nachweis (`bezuege_ohne_faelle`); bisher nahmen
+sie alle seine Eingänge und filterten die der Fälle über den Namen weg.
+Welcher Ansatz gilt, entscheidet sich einmal. Die Zahlen und der Bericht
+bleiben gleich.
+
 ## 2026-11-20 · `plt.grid` wirkt
 
 Ein Bild aus der App «Python» bekam immer ein Gitter: `zeichnen.js` sagte

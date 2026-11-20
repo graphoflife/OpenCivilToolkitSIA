@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c4429d80513
+erzeugt: 1fe2c2358d8f
 art: modul
 tags: [modul]
 ---
@@ -59,11 +59,14 @@ Hebelarm `0.9 · d`.
 class Buegelwerte
 ```
 
-Was ausser der Neigung und der statischen Hoehe in den Widerstand eingeht.
+Was ausser der Neigung und der statischen Hoehe in den Widerstand eingeht,
+dazu die Grenzen der Neigung.
 
-Alles in SI-Basis. Steht nach dem Lauf am Nachweis bereit, damit sich der
-Verlauf ueber der Neigung zeichnen laesst -- ohne dass die Oberflaeche die
-Formel ein zweites Mal enthaelt. Dasselbe Muster wie
+Alles in SI-Basis, die Neigung in Grad. Gebaut von
+[[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.buegelwerte|QuerkraftMitBuegeln.buegelwerte]]; damit rechnen die Faelle und die
+Kennzahlen der Platte je Zugseite ([[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]]) und das Bild ueber der
+Neigung ([[opencivil.nachweis.querkraft_buegel#Buegelwerte.neigungen|neigungen]]) -- ohne dass einer, auch nicht die
+Oberflaeche, die Formel ein zweites Mal enthaelt. Dasselbe Muster wie
 [[opencivil.nachweis.querkraft_buegel#Buegelwerte|Kurvenbeiwerte]] beim Ansatz ohne Buegel.
 
 - `a_s: float`
@@ -72,6 +75,44 @@ Formel ein zweites Mal enthaelt. Dasselbe Muster wie
 - `f_yd: float`
 - `f_cd: float`
 - `k_c: float`
+- `alpha_min: int`
+- `alpha_max: int` – Die Grenzen der Neigung, wie eingegeben -- bei Normalzug hebt sie [[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]].
+
+#### Buegelwerte.neigungen
+
+```python
+def neigungen(self, d: float, von: int, bis: int) -> List[Buegelpunkt]
+```
+
+Der Widerstand je ganzes Grad von `von` bis `bis` bei der
+statischen Hoehe `d` -- fuer die Suche und fuer das Bild, das auch
+ausserhalb der Grenzen zeichnet, dort blass. Zwei Rechenwege fuer
+dieselbe Kurve liefen auseinander.
+
+#### Buegelwerte.suche
+
+```python
+def suche(self, d: float, *, zugkraft: bool) -> Neigungssuche
+```
+
+Die guenstigste Neigung bei der statischen Hoehe `d`, ganzgradig
+zwischen den Grenzen, die eine Normalzugkraft hebt
+([[opencivil.querschnitt.platte#druckfeldgrenzen|druckfeldgrenzen]]) -- fuer die
+Faelle und die Kennzahlen der Platte dieselbe Suche.
+
+### Neigungssuche
+
+```python
+@dataclass(frozen=True)
+class Neigungssuche
+```
+
+Was [[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|Buegelwerte.suche]] findet.
+
+- `alpha_min: int`
+- `alpha_max: int` – Die verwendeten Grenzen; bei Normalzug angehoben.
+- `punkte: Tuple[Buegelpunkt, ...]` – Der Widerstand je ganzem Grad zwischen den beiden.
+- `massgebend: Buegelpunkt` – Der Punkt mit dem groessten Widerstand.
 
 ### neigungen
 
@@ -113,21 +154,9 @@ die geloesten Eingaenge des Ansatzes. Daraus zeichnet sich der Verlauf
 ueber der Neigung, ohne dass die Oberflaeche die Formel ein zweites Mal
 enthaelt. Steht nach dem Lauf in der Loesung, nicht am Nachweis.
 
-- `buegelwerte: Buegelwerte` – Die geloesten Eingaenge -- fuer [[opencivil.nachweis.querkraft_buegel#BefundMitBuegeln.neigungsverlauf|neigungsverlauf]].
+- `buegelwerte: Buegelwerte` – Die geloesten Eingaenge -- fuer das Bild ueber der Neigung ([[opencivil.nachweis.querkraft_buegel#Buegelwerte.neigungen|Buegelwerte.neigungen]]).
 - `ergebnisse: List['ErgebnisMitBuegeln'] = field(default_factory=list)`
 - `ohne_einwirkung: Optional['ErgebnisMitBuegeln'] = None` – Ohne Lastfall: der Ast ueber der Neigung bei M = 0 und N = 0, damit das Bild auch ohne Fall dasteht. Kein Fall des Nachweises -- ohne Ausgabe, Urteil und Herleitung.
-
-#### BefundMitBuegeln.neigungsverlauf
-
-```python
-def neigungsverlauf(self, d: float, von: int, bis: int) -> List[Buegelpunkt]
-```
-
-Der Widerstand ueber der Neigung -- fuer das Diagramm.
-
-Ueber dieselbe Funktion wie der Nachweis selbst, nur ueber einen
-weiteren Bereich: gezeichnet wird auch ausserhalb der beiden Grenzen,
-dort blass. Zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
 
 ### ErgebnisMitBuegeln
 
@@ -153,6 +182,34 @@ class QuerkraftMitBuegeln(Querkraft)
 Der Querkraftnachweis einer Platte mit Buegeln -- siehe Dateikopf.
 
 - `REFERENZ = REFERENZ`
+
+#### QuerkraftMitBuegeln.buegelwerte
+
+```python
+def buegelwerte(self, e: Eingaben) -> Buegelwerte
+```
+
+Die geloesten Eingaenge des Ansatzes -- fuer die Faelle, das Bild und
+die Kennzahlen der Platte dieselben. Eine Stabzahl in y wird hier eine
+Teilung ([[opencivil.nachweis.querkraft_buegel#buegelteilung_y|buegelteilung_y]]): die Formel kennt nur Teilungen, und
+die Umrechnung steht in der Herleitung ([[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.protokoll_teilung_y|protokoll_teilung_y]]).
+
+#### QuerkraftMitBuegeln.teilung_y
+
+```python
+def teilung_y(self, werte: Zwischenwerte, e: Eingaben, s_y: float) -> Wert
+```
+
+Die Teilung in y als Wert der Herleitung: angegeben, oder aus der
+Stabzahl ueber die Breite (`s_y` der [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.buegelwerte|buegelwerte]]).
+
+#### QuerkraftMitBuegeln.protokoll_teilung_y
+
+```python
+def protokoll_teilung_y(self, p: Protokoll, e: Eingaben, s_y: Wert) -> None
+```
+
+Die Zeile `s_y = b/n`, wenn die Teilung aus der Stabzahl kommt.
 
 #### QuerkraftMitBuegeln.pruefe
 
@@ -197,6 +254,6 @@ nur, was es auch herleitet.
 
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · `QuerkraftMitBuegeln._protokoll_ansatz_buegel`
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · `protokoll_mit_buegeln`
-- [[Teilung in y aus der Stabzahl]] · `QuerkraftMitBuegeln._protokoll_ansatz_buegel`
+- [[Teilung in y aus der Stabzahl]] · `QuerkraftMitBuegeln.protokoll_teilung_y`
 - [[Widerstand der Bügel]] · `protokoll_mit_buegeln`
 - [[Widerstand der Druckdiagonalen]] · `protokoll_mit_buegeln`

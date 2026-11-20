@@ -36,7 +36,7 @@ from opencivil.nachweis.querkraft import (
     statische_hoehen, zugposten,
 )
 from opencivil.querschnitt.fachwerk import Buegelpunkt, beste_neigung, fachwerk
-from opencivil.querschnitt.platte import ALPHA_ZUG, Richtung
+from opencivil.querschnitt.platte import ALPHA_ZUG, Richtung, druckfeldgrenzen
 from opencivil.querschnitt.zugseite import Zugseite
 
 MIT_BUEGELN = "Querkraftwiderstand mit Querkraftbewehrung"
@@ -70,11 +70,14 @@ def buegelwiderstand(
 @dataclass(frozen=True)
 class Buegelwerte:
     """
-    Was ausser der Neigung und der statischen Hoehe in den Widerstand eingeht.
+    Was ausser der Neigung und der statischen Hoehe in den Widerstand eingeht,
+    dazu die Grenzen der Neigung.
 
-    Alles in SI-Basis. Steht nach dem Lauf am Nachweis bereit, damit sich der
-    Verlauf ueber der Neigung zeichnen laesst -- ohne dass die Oberflaeche die
-    Formel ein zweites Mal enthaelt. Dasselbe Muster wie
+    Alles in SI-Basis, die Neigung in Grad. Gebaut von
+    :meth:`QuerkraftMitBuegeln.buegelwerte`; damit rechnen die Faelle und die
+    Kennzahlen der Platte je Zugseite (:meth:`suche`) und das Bild ueber der
+    Neigung (:meth:`neigungen`) -- ohne dass einer, auch nicht die
+    Oberflaeche, die Formel ein zweites Mal enthaelt. Dasselbe Muster wie
     :class:`Kurvenbeiwerte` beim Ansatz ohne Buegel.
     """
 
@@ -84,6 +87,46 @@ class Buegelwerte:
     f_yd: float
     f_cd: float
     k_c: float
+    alpha_min: int
+    alpha_max: int
+    """Die Grenzen der Neigung, wie eingegeben -- bei Normalzug hebt sie :meth:`suche`."""
+
+    def neigungen(self, d: float, von: int, bis: int) -> List[Buegelpunkt]:
+        """
+        Der Widerstand je ganzes Grad von ``von`` bis ``bis`` bei der
+        statischen Hoehe ``d`` -- fuer die Suche und fuer das Bild, das auch
+        ausserhalb der Grenzen zeichnet, dort blass. Zwei Rechenwege fuer
+        dieselbe Kurve liefen auseinander.
+        """
+        return neigungen(alpha_min=von, alpha_max=bis, a_s=self.a_s, s_x=self.s_x,
+                         s_y=self.s_y, d=d, f_yd=self.f_yd, f_cd=self.f_cd, k_c=self.k_c)
+
+    def suche(self, d: float, *, zugkraft: bool) -> Neigungssuche:
+        """
+        Die guenstigste Neigung bei der statischen Hoehe ``d``, ganzgradig
+        zwischen den Grenzen, die eine Normalzugkraft hebt
+        (:func:`~opencivil.querschnitt.platte.druckfeldgrenzen`) -- fuer die
+        Faelle und die Kennzahlen der Platte dieselbe Suche.
+        """
+        von, bis = druckfeldgrenzen(self.alpha_min, self.alpha_max, zugkraft)
+        punkte = tuple(self.neigungen(d, von, bis))
+        return Neigungssuche(alpha_min=von, alpha_max=bis, punkte=punkte,
+                             massgebend=beste_neigung(punkte))
+
+
+@dataclass(frozen=True)
+class Neigungssuche:
+    """Was :meth:`Buegelwerte.suche` findet."""
+
+    alpha_min: int
+    alpha_max: int
+    """Die verwendeten Grenzen; bei Normalzug angehoben."""
+
+    punkte: Tuple[Buegelpunkt, ...]
+    """Der Widerstand je ganzem Grad zwischen den beiden."""
+
+    massgebend: Buegelpunkt
+    """Der Punkt mit dem groessten Widerstand."""
 
 
 def neigungen(
@@ -152,7 +195,7 @@ class BefundMitBuegeln:
     """
 
     buegelwerte: Buegelwerte
-    """Die geloesten Eingaenge -- fuer :meth:`neigungsverlauf`."""
+    """Die geloesten Eingaenge -- fuer das Bild ueber der Neigung (:meth:`Buegelwerte.neigungen`)."""
 
     ergebnisse: List["ErgebnisMitBuegeln"] = field(default_factory=list)
 
@@ -162,20 +205,6 @@ class BefundMitBuegeln:
     Bild auch ohne Fall dasteht. Kein Fall des Nachweises -- ohne Ausgabe,
     Urteil und Herleitung.
     """
-
-    def neigungsverlauf(self, d: float, von: int, bis: int) -> List[Buegelpunkt]:
-        """
-        Der Widerstand ueber der Neigung -- fuer das Diagramm.
-
-        Ueber dieselbe Funktion wie der Nachweis selbst, nur ueber einen
-        weiteren Bereich: gezeichnet wird auch ausserhalb der beiden Grenzen,
-        dort blass. Zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
-        """
-        w = self.buegelwerte
-        return neigungen(
-            alpha_min=von, alpha_max=bis, d=d,
-            a_s=w.a_s, s_x=w.s_x, s_y=w.s_y,
-            f_yd=w.f_yd, f_cd=w.f_cd, k_c=w.k_c)
 
 
 @dataclass
@@ -236,6 +265,35 @@ class QuerkraftMitBuegeln(Querkraft):
             Eingabebezug("a_s_V", self.querschnitt.id_von("querkraft.a_s")),
         ]
 
+    # -- Was Fall und Kennzahl teilen ------------------------------------------
+
+    def buegelwerte(self, e: Eingaben) -> Buegelwerte:
+        """
+        Die geloesten Eingaenge des Ansatzes -- fuer die Faelle, das Bild und
+        die Kennzahlen der Platte dieselben. Eine Stabzahl in y wird hier eine
+        Teilung (:func:`buegelteilung_y`): die Formel kennt nur Teilungen, und
+        die Umrechnung steht in der Herleitung (:meth:`protokoll_teilung_y`).
+        """
+        return Buegelwerte(
+            a_s=e.g("a_s_V").si, s_x=e.g("s_x").si,
+            s_y=buegelteilung_y(self.buegel, e.g("b").si, e.g("menge_y").si),
+            f_yd=e.g("f_yd_V").si, f_cd=e.g("f_cd").si, k_c=e.g("k_c").si,
+            alpha_min=self.buegel.alpha_min, alpha_max=self.buegel.alpha_max)
+
+    def teilung_y(self, werte: Zwischenwerte, e: Eingaben, s_y: float) -> Wert:
+        """
+        Die Teilung in y als Wert der Herleitung: angegeben, oder aus der
+        Stabzahl ueber die Breite (``s_y`` der :meth:`buegelwerte`).
+        """
+        if self.buegel.ueber_abstand_y:
+            return e["menge_y"]
+        return werte.laenge("s_y", "s_{V,y}", s_y)
+
+    def protokoll_teilung_y(self, p: Protokoll, e: Eingaben, s_y: Wert) -> None:
+        """Die Zeile ``s_y = b/n``, wenn die Teilung aus der Stabzahl kommt."""
+        if not self.buegel.ueber_abstand_y:
+            p.formel(s_y, r"\frac{@b}{@n}", {"b": e["b"], "n": e["menge_y"]},
+                     titel="Teilung in y aus der Stabzahl")
 
     # -- Rechnen ------------------------------------------------------------
 
@@ -247,55 +305,35 @@ class QuerkraftMitBuegeln(Querkraft):
         beides zu addieren wäre ein anderes Modell, und dieses Werkzeug rechnet
         nur, was es auch herleitet.
         """
-        b = e.g("b").si
-        a_s = e.g("a_s_V").si
-        s_x = e.g("s_x").si
-        f_yd = e.g("f_yd_V").si
-        f_cd = e.g("f_cd").si
-        k_c = e.g("k_c").si
+        w = self.buegelwerte(e)
         hoehen = statische_hoehen(e, self.posten)
+        befund = BefundMitBuegeln(buegelwerte=w)
 
-        # Die Menge in y: entweder eine Teilung oder eine Stabzahl über die
-        # betrachtete Breite. Aus der Zahl wird hier eine Teilung -- die Formel
-        # kennt nur Teilungen, und die Umrechnung steht in der Herleitung.
-        ueber_teilung = self.buegel.ueber_abstand_y
-        s_y = buegelteilung_y(self.buegel, b, e.g("menge_y").si)
-
-        befund = BefundMitBuegeln(buegelwerte=Buegelwerte(
-            a_s=a_s, s_x=s_x, s_y=s_y, f_yd=f_yd, f_cd=f_cd, k_c=k_c))
-
-        teilung_y = (e["menge_y"] if ueber_teilung else
-                     Zwischenwerte(self.id).laenge("s_y", "s_{V,y}", s_y))
+        teilung_y = self.teilung_y(Zwischenwerte(self.id), e, w.s_y)
         self._protokoll_ansatz_buegel(p, e, teilung_y)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
 
         for fall in self.faelle:
-            erg = self._einen_fall_buegel(
-                fall, hoehen=hoehen, a_s=a_s, s_x=s_x, s_y=s_y,
-                f_yd=f_yd, f_cd=f_cd, k_c=k_c, ueber_teilung=ueber_teilung)
+            erg = self._einen_fall_buegel(fall, w, hoehen)
             befund.ergebnisse.append(erg)
             self._protokoll_fall_buegel(p, e, erg, teilung_y)
             self._eintragen(erg, ergebnis, urteile)
         if not self.faelle:
-            befund.ohne_einwirkung = self._einen_fall_buegel(
-                OHNE_EINWIRKUNG, hoehen=hoehen, a_s=a_s, s_x=s_x, s_y=s_y,
-                f_yd=f_yd, f_cd=f_cd, k_c=k_c, ueber_teilung=ueber_teilung)
+            befund.ohne_einwirkung = self._einen_fall_buegel(OHNE_EINWIRKUNG, w, hoehen)
 
         return Ausfuehrung(ergebnis, urteile, befund)
 
-    def _einen_fall_buegel(
-        self, fall: Querkraftfall, *, hoehen: Mapping[bool, float], a_s: float,
-        s_x: float, s_y: float, f_yd: float, f_cd: float, k_c: float, ueber_teilung: bool,
-    ) -> ErgebnisMitBuegeln:
+    def _einen_fall_buegel(self, fall: Querkraftfall, w: Buegelwerte,
+                           hoehen: Mapping[bool, float]) -> ErgebnisMitBuegeln:
         erg = ErgebnisMitBuegeln(fall=fall)
         M_Ed, N_Ed = fall.M_Ed.si, fall.N_Ed.si
 
         # Eine Stabzahl in y bezieht sich auf die betrachtete Breite. In
         # x-Richtung ergibt das eine Teilung; in y-Richtung liefe die Breite
         # laengs der Traglinie mit und die Formel haette keinen Bezug mehr.
-        if not ueber_teilung and self.richtung is Richtung.Y:
+        if not self.buegel.ueber_abstand_y and self.richtung is Richtung.Y:
             erg.begruendung = (
                 "Bügel in y als Stabzahl → kein Widerstand in y. Für y: Teilung "
                 "in mm.")
@@ -309,12 +347,9 @@ class QuerkraftMitBuegeln(Querkraft):
         erg.d = d
 
         erg.zug_hebt_alpha = N_Ed > 0.0
-        erg.alpha_min, erg.alpha_max = self.buegel.grenzen(erg.zug_hebt_alpha)
-        erg.punkte = tuple(neigungen(
-            alpha_min=erg.alpha_min, alpha_max=erg.alpha_max,
-            a_s=a_s, s_x=s_x, s_y=s_y, d=erg.d,
-            f_yd=f_yd, f_cd=f_cd, k_c=k_c))
-        erg.massgebend = beste_neigung(erg.punkte)
+        suche = w.suche(d, zugkraft=erg.zug_hebt_alpha)
+        erg.alpha_min, erg.alpha_max = suche.alpha_min, suche.alpha_max
+        erg.punkte, erg.massgebend = suche.punkte, suche.massgebend
         erg.v_Rd = erg.massgebend.V_Rd
 
         erg.ausgang = Vergleich(self._einwirkung(fall), self._widerstand(erg))
@@ -354,9 +389,7 @@ class QuerkraftMitBuegeln(Querkraft):
             f"Druckdiagonale auf: α_min ist dann mindestens {ALPHA_ZUG}°, und α_max "
             f"wird notfalls mitgehoben."
         )
-        if not self.buegel.ueber_abstand_y:
-            p.formel(s_y, r"\frac{@b}{@n}", {"b": e["b"], "n": e["menge_y"]},
-                     titel="Teilung in y aus der Stabzahl")
+        self.protokoll_teilung_y(p, e, s_y)
 
     def _protokoll_fall_buegel(
         self, p: Protokoll, e: Eingaben, erg: ErgebnisMitBuegeln, s_y: Wert,

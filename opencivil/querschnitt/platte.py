@@ -307,10 +307,6 @@ class Querkraftbewehrung:
         return (f"⌀{self.durchmesser.formatiert(0)}, "
                 f"x: {self.abstand_x.formatiert(0)} mm, y: {y}")
 
-    def grenzen(self, zugkraft: bool) -> Tuple[int, int]:
-        """Die beiden Grenzwinkel in Grad -- siehe :func:`druckfeldgrenzen`."""
-        return druckfeldgrenzen(self.alpha_min, self.alpha_max, zugkraft)
-
 
 def druckfeldgrenzen(alpha_min: int, alpha_max: int, zugkraft: bool) -> Tuple[int, int]:
     """
