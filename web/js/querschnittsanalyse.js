@@ -299,15 +299,14 @@ function richtungstext(analyse) {
 }
 
 /**
- * Ein Lastfall: Schalter, Name, die Schnittgrössen, Entfernen. Sechs volle
- * Zahlenfelder passen nicht nebeneinander in ein Panel: drei je Zeile, N,
- * M_y, M_z und darunter V_y, V_z, T. Der Kopf trägt nur ihre Symbole; die
- * Einheiten stehen in der Überschrift des Kapitels.
+ * Ein Lastfall: Schalter, Name, die Schnittgrössen, Entfernen. Alle sechs
+ * stehen auf einer Zeile, N bis T; das Fenster ist dafür breit (Benutzer,
+ * 2026-11-20 -- bis dahin drei je Zeile). Reicht der Platz nicht, brechen sie
+ * nach drei um (`ist-lastreihe` im Stilblatt). Der Kopf trägt nur ihre
+ * Symbole; die Einheiten stehen in der Überschrift des Kapitels.
  */
-const JE_ZEILE = 3;
-
 function lastfallKopf(analyse) {
-  return fallkopf(spalten(analyse).map((s) => span(s.symbol)), { spalten: JE_ZEILE });
+  return fallkopf(spalten(analyse).map((s) => span(s.symbol)), { klasse: '.ist-lastreihe' });
 }
 
 function lastfallZeile(analyse, index) {
@@ -321,7 +320,7 @@ function lastfallZeile(analyse, index) {
       wert: fall[s.feld], schritt: s.schritt, titel: s.titel, leer: 0,
       beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
     })),
-    spalten: JE_ZEILE,
+    klasse: '.ist-lastreihe',
     entfernenTitel: 'Lastfall entfernen',
     entfernen: () => eintragAendern(analyse.kennung, (a) => {
       a.lastfaelle.splice(index, 1);
@@ -412,6 +411,7 @@ function vorzeichenbild(einachsig) {
 const TRAGSICHERHEIT = {
   schluessel: 'tragsicherheit',
   name: 'Trag\u00adsicherheit', titel: 'Tragsicherheitsnachweise',
+  breit: true,
   bezug: () => 'N, V in kN · M, T in kNm',
   hilfe: HILFE.tragsicherheit,
   inhalt: tragsicherheitInhalt,

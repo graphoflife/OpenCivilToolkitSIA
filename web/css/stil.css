@@ -866,6 +866,20 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .fenster-zu:hover { background: var(--schlecht); border-color: var(--schlecht); color: #fff; }
 /* Bezugsgrösse für die Umbrüche der Zeilen darin, wie im Panel. */
 .fenster-inhalt { padding: 10px 12px 8px; container-type: inline-size; }
+/* Ein breites Fenster: die Tragsicherheit der Querschnittsanalyse, sechs
+   Lasten auf einer Zeile (Benutzer, 2026-11-20). Solange es offen ist, wird
+   die Mitte so breit wie nötig, samt Platz für die Rollleiste -- aber nur,
+   wenn der rechten Tafel dann noch 300 px bleiben: ganz oder gar nicht.
+   `round(down, Platz, 672px)` ist 0, solange der Platz nicht reicht; dann
+   bleibt die Mitte, wie sie ist, und die Lasten brechen nach drei um. Hat
+   man die Mitte von Hand gezogen, bleibt sie ebenso. */
+.fenster.ist-breit { max-width: 628px; }
+.raster:not([data-mitte="gezogen"]) .tafel-mitte:has(> .fenster-grund > .fenster.ist-breit) {
+  min-width: min(672px, round(down, calc(100vw - var(--breite-links) - 310px), 672px));
+}
+@container (max-width: 599px) {
+  .fallzeile.ist-lastreihe { --felder: 3 !important; }
+}
 .fenster-inhalt > .unterkapitel { margin-top: 12px; }
 
 /* ------------------------------------------------------------ Bericht -- */

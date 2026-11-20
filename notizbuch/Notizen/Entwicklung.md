@@ -7,6 +7,23 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die sechs Lasten eines Lastfalls stehen auf einer Zeile
+
+In der Tragsicherheit der Querschnittsanalyse standen N, M_y, M_z und
+darunter V_y, V_z, T -- drei je Zeile, weil sechs Zahlenfelder nicht in ein
+Panel passen. Der Benutzer will alle sechs auf einer Zeile und das Fenster
+breiter (2026-11-20).
+
+Ein Kapitel kann jetzt `breit` sein. Sein Fenster (`.fenster.ist-breit`) ist
+dann bis 628 px breit, und die mittlere Tafel wird, solange es offen ist,
+672 px breit -- mit Platz für die Rollleiste. Ganz oder gar nicht: blieben
+der rechten Tafel so keine 300 px, bleibt die Mitte, wie sie ist
+(`round(down, …)` im Stilblatt), und die Felder brechen wie bisher nach
+drei um (Containerabfrage unter 600 px). Eine von Hand gezogene Mitte
+bleibt ebenso. Gemessen: bei 1600 px Fensterbreite sechs auf einer Zeile,
+bei 1200 px drei. `fallkopf` nimmt dafür eine `klasse` wie `fallzeile`;
+`JE_ZEILE` fällt weg.
+
 ## 2026-11-20 · «mm | Stk» ist ein Schalter wie alle anderen
 
 Hinter der Teilung einer Lage und der Bügel in y stand die Einheit selbst

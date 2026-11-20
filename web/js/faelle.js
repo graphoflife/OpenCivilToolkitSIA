@@ -9,7 +9,7 @@
  * Was eine Liste mehr hat, steht an fester Stelle: neben dem Namen (`oben`,
  * die Zugseite beim Knicken) oder in einer Zeile darunter (`unten`, Werte und
  * Rechenart einer Analyse). Stehen mehr Zahlen da als Spalten (`spalten`),
- * brechen sie um -- beim Lastfall des gezeichneten Querschnitts drei je Zeile.
+ * brechen sie um.
  *
  * Jede Zelle trägt ihre Klasse, und danach setzt das Stilblatt sie. Bis
  * 2026-10-18 stand die Zeile siebenmal da, und das Stilblatt setzte ihre
@@ -79,10 +79,11 @@ async function nameFrei({ kennung, pfad, index }, name) {
  * als Formelzeichen (ein Knoten) oder als Formelzeichen mit Einheit
  * (`['M_{Ed}', 'kNm']`). Ein Formelzeichen bleibt, wie es ist: gross
  * geschrieben würde aus M_y ein M_Y, aus ε ein E und aus l ein L. Dieselben
- * Spalten wie die Zeilen darunter.
+ * Spalten wie die Zeilen darunter -- und dieselbe `klasse`, wo das Stilblatt
+ * sie umbrechen lässt.
  */
-export function fallkopf(koepfe, { spalten = koepfe.length } = {}) {
-  return el('div.fallzeile.fallkopf', { style: { '--felder': spalten } }, [
+export function fallkopf(koepfe, { spalten = koepfe.length, klasse = '' } = {}) {
+  return el(`div.fallzeile.fallkopf${klasse}`, { style: { '--felder': spalten } }, [
     el('div.fall-zahlen', {}, koepfe.map((kopf) => (typeof kopf === 'string'
       ? el('span', { text: kopf })
       : el('span.ist-formel', {}, [Array.isArray(kopf) ? formelkopf(...kopf) : kopf])))),
