@@ -215,23 +215,6 @@ export function feld(beschriftung, eingabe, einheit, titel) {
 }
 
 /**
- * Eine Zahl eines Eintrags als Feldzeile: Beschriftung mit Formelzeichen,
- * Einheit und Grenzen aus dem Katalog (`katalog.felder[art]`) -- in welcher
- * Einheit der Kern eine Zahl meint, steht an ihrem Feld im Kern und nur dort.
- * `aendern(veraenderer)` ändert den Eintrag im Projekt. Für Grundbruch und
- * Setzung dieselbe.
- */
-export function zahlzeile(art, eintrag, schluessel, beschriftung, symbol, {
-  schritt = 1, titel, aendern,
-}) {
-  const angabe = feldangabe(art, schluessel);
-  return feld([`${beschriftung} `, span(symbol)], zahlfeld({
-    wert: eintrag[schluessel], schritt, angabe, titel,
-    beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
-  }), angabe.einheit || '', titel);
-}
-
-/**
  * Die Karten einer Maske aus den Vorgaben des Kerns (`katalog.vorgaben`,
  * opencivil/core/vorgaben.py): je Gruppe der Herleitung eine Karte mit
  * ihrem Titel, je Feld eine Zeile -- die kurze Beschriftung mit dem
@@ -260,23 +243,55 @@ export function eingabezeilen(klasse, eintrag, aendern, { dazu = {} } = {}) {
   return vorgabeteile(klasse, eintrag, aendern, { dazu }).flatMap((g) => g.inhalt);
 }
 
+/**
+ * Die Gruppen der Vorgaben einzeln, für eine Maske, die sie auf mehrere
+ * Tafeln verteilt, wie das Durchstanzen: `zeilen(titel)` gibt die Zeilen
+ * einer Gruppe, `vollstaendig()` meldet jede, nach der die Maske nicht
+ * fragte -- eine neue Gruppe des Kerns fehlte dort sonst still. `gelesen`
+ * wie bei `eingabekarten`.
+ */
+export function eingabegruppen(klasse, eintrag, aendern, { gelesen = null } = {}) {
+  const gruppen = new Map(katalog('vorgaben', klasse).map((g) => [g.titel, g]));
+  const gefragt = new Set();
+  return {
+    zeilen(titel) {
+      if (!gruppen.has(titel)) throw keineGruppe(klasse, titel);
+      gefragt.add(titel);
+      return gruppenzeilen(klasse, eintrag, gruppen.get(titel), aendern, gelesen);
+    },
+    vollstaendig() {
+      const fehlt = [...gruppen.keys()].filter((titel) => !gefragt.has(titel));
+      if (fehlt.length) {
+        throw new Error(`Die Maske von «${klasse}» zeigt die Vorgaben «${fehlt.join('», «')}» nirgends.`);
+      }
+    },
+  };
+}
+
 /** Je Gruppe der Vorgaben ihr Titel und ihre Teile -- siehe `eingabekarten`. */
 function vorgabeteile(klasse, eintrag, aendern, { gelesen = null, dazu = {} }) {
   const gruppen = katalog('vorgaben', klasse);
   for (const titel of Object.keys(dazu)) {
-    if (!gruppen.some((g) => g.titel === titel)) {
-      throw new Error(`Unter den Vorgaben von «${klasse}» gibt es keine Gruppe «${titel}».`);
-    }
+    if (!gruppen.some((g) => g.titel === titel)) throw keineGruppe(klasse, titel);
   }
   return gruppen.map((g) => {
-    const felder = felderDer(g, eintrag).filter((f) => !gelesen || gelesen.has(f.feld));
     const { vor = [], nach = [] } = dazu[g.titel] || {};
     return {
       titel: g.titel,
-      inhalt: [...vor, ...felder.map((f) => vorgabezeile(klasse, eintrag, f, aendern)), ...nach]
+      inhalt: [...vor, ...gruppenzeilen(klasse, eintrag, g, aendern, gelesen), ...nach]
         .filter(Boolean),
     };
   });
+}
+
+function keineGruppe(klasse, titel) {
+  return new Error(`Unter den Vorgaben von «${klasse}» gibt es keine Gruppe «${titel}».`);
+}
+
+/** Die Zeilen einer Gruppe für einen Eintrag -- mit `gelesen` nur, was der Nachweis liest. */
+function gruppenzeilen(klasse, eintrag, g, aendern, gelesen) {
+  return felderDer(g, eintrag).filter((f) => !gelesen || gelesen.has(f.feld))
+    .map((f) => vorgabezeile(klasse, eintrag, f, aendern));
 }
 
 /**
@@ -302,11 +317,18 @@ export function vorgabetitel(f) {
   return [f.beschreibung, f.hinweis].filter(Boolean).join(' – ') + (f.referenz ? ` (${f.referenz})` : '');
 }
 
-/** Ein Feld der Vorgaben als Zeile -- siehe `eingabekarten`. */
+/**
+ * Ein Feld der Vorgaben als Zeile: die Beschriftung mit dem Zeichen, Einheit
+ * und Grenzen aus dem Katalog (`katalog.felder[klasse]`) -- in welcher
+ * Einheit der Kern eine Zahl meint, steht an ihrem Feld im Kern und nur dort.
+ */
 function vorgabezeile(klasse, eintrag, f, aendern) {
-  return zahlzeile(klasse, eintrag, f.feld, f.beschriftung, f.zeichen, {
-    schritt: f.schritt, titel: vorgabetitel(f), aendern,
-  });
+  const angabe = feldangabe(klasse, f.feld);
+  const titel = vorgabetitel(f);
+  return feld([`${f.beschriftung} `, span(f.zeichen)], zahlfeld({
+    wert: eintrag[f.feld], schritt: f.schritt, angabe, titel,
+    beiAenderung: (v) => aendern((x) => { x[f.feld] = v; }),
+  }), angabe.einheit || '', titel);
 }
 
 /**

@@ -44,6 +44,7 @@ from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import BAUTEILE, Aufbau, SkriptEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
+from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.decke.schnitt import BALKENGROESSEN
 from opencivil.projekt.decke import DIAGRAMMGROESSEN as DECKENGROESSEN
 from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
@@ -71,6 +72,7 @@ from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
+from opencivil.durchstanzen import stelle
 from opencivil.pfahl import pfahl
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
@@ -169,7 +171,8 @@ def _vorgaben() -> Dict[str, List[dict]]:
     Beschreibung fuer diese Wahlen kennt.
     """
     return {katalogname(cls): [g.als_dict({n: wahl_von(cls, n) for n in g.nach}) for g in gruppen]
-            for cls, gruppen in ((GrundbruchEintrag, fundament.VORGABEN),
+            for cls, gruppen in ((DurchstanzEintrag, stelle.VORGABEN),
+                                 (GrundbruchEintrag, fundament.VORGABEN),
                                  (SetzungEintrag, setzung.VORGABEN),
                                  (SchichtEintrag, setzung.JE_SCHICHT),
                                  (PfahlEintrag, pfahl.VORGABEN),

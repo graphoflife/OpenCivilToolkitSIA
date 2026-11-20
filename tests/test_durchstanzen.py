@@ -25,9 +25,7 @@ from opencivil.durchstanzen.pruefung import beiwert_k_e, kreisdurchmesser, spann
 from opencivil.durchstanzen.schnitt import (
     Schatten, Stuetzenflaeche, kandidaten_stuetze, nachweisschnitt, schatten_am_schnitt,
 )
-from opencivil.durchstanzen.stelle import (
-    NACH_DEN_MASSEN, VOR_DEN_MASSEN, KeArt, Naeherungsstufe, eingaben_fuer,
-)
+from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, eingaben_fuer
 from opencivil.querschnitt.geometrie import abstand_strecke_polygon
 from opencivil.projekt import DurchstanzEintrag, Projekt, ProjektFehler
 from opencivil.web import dienst
@@ -599,17 +597,16 @@ class TestWasDieOberflaecheSieht(unittest.TestCase):
     def test_die_maske_liest_dieselben_felder_wie_der_kern(self):
         """
         Die Maske zeigt die Vereinigung dessen, was der Katalog je Wahl nennt;
-        das ist für jede Wahl, was der Nachweis liest -- ohne die festen Felder.
+        das ist für jede Wahl, was der Nachweis liest.
         """
         k = katalog()["durchstanzen"]
-        fest = set(VOR_DEN_MASSEN) | set(NACH_DEN_MASSEN)
         for lage, form, stufe, ke in product(Lage, Stuetzenform, Naeherungsstufe, KeArt):
             eintrag = next(l for l in k["lagen"] if l["wert"] == lage.value)
             ke_eintrag = next(x for x in k["ke"] if x["wert"] == ke.value)
-            maske = (set(eintrag["masse"][form.value]) | set(eintrag["stufen"][stufe.value])
-                     | set(ke_eintrag["eingaben"]))
+            maske = (set(k["fest"]) | set(eintrag["masse"][form.value])
+                     | set(eintrag["stufen"][stufe.value]) | set(ke_eintrag["eingaben"]))
             with self.subTest(lage=lage, form=form, stufe=stufe, ke=ke):
-                self.assertEqual(maske, set(eingaben_fuer(lage.flaeche(form), stufe, ke)) - fest)
+                self.assertEqual(maske, set(eingaben_fuer(lage.flaeche(form), stufe, ke)))
 
     def test_nach_dem_umschalten_sagt_der_schalter_was_zu_pruefen_ist(self):
         """

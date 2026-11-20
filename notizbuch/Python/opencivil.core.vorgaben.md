@@ -1,5 +1,5 @@
 ---
-erzeugt: 7aa2b87d836e
+erzeugt: 70949cf26821
 art: modul
 tags: [modul]
 ---
@@ -145,6 +145,7 @@ je Wahl, welche Werte sie annehmen kann.
 
 ## Gebraucht von
 
+- [[opencivil.durchstanzen.stelle]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.pfahl.pfahl]]

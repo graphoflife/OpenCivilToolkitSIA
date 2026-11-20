@@ -12,9 +12,9 @@ Gezeichnet wird in der Oberflaeche, gerechnet nichts: die Linien kommen aus
 dem Befund des Nachweises (:mod:`opencivil.durchstanzen.nachweis`).
 
 Für den Katalog die Wahlen der Maske (:func:`wahlen`): je Stellung ihre
-Beschriftung, und welche Felder der Nachweis mit ihr liest -- die Masse je
-Lage und Form, die Felder je Näherungsstufe und Lage, die von k_e. Die Maske
-zeigt die Vereinigung, so baut sie die Regel nicht nach
+Beschriftung, und welche Felder der Nachweis mit ihr liest -- die festen, die
+Masse je Lage und Form, die Felder je Näherungsstufe und Lage, die von k_e.
+Die Maske zeigt die Vereinigung, so baut sie die Regel nicht nach
 (:func:`opencivil.durchstanzen.stelle.eingaben_fuer`).
 """
 
@@ -28,7 +28,9 @@ from opencivil.core.rechenwerk import Loesung
 from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
 from opencivil.durchstanzen.nachweis import Durchstanzbefund
 from opencivil.durchstanzen.schnitt import Nachweisschnitt
-from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart, wirksame_stufe
+from opencivil.durchstanzen.stelle import (
+    NACH_DEN_MASSEN, VOR_DEN_MASSEN, KeArt, Naeherungsstufe, Plattenart, wirksame_stufe,
+)
 from opencivil.projekt import Aufbau
 from opencivil.web.anzeige import masszahl, punkte, urteil, zahl, zahlformel, zeile
 
@@ -38,7 +40,8 @@ def wahlen() -> Dict[str, Any]:
     Die Schalter einer Durchstanzstelle mit ihren Stellungen -- und je Lage
     ihre Art: wie die Maske ihre Masse überschreibt, ob sie eine Form hat,
     welche Masse sie je Form liest, was die Liste von ihr zeigt und welche
-    Felder jede Näherungsstufe an ihr liest.
+    Felder jede Näherungsstufe an ihr liest. Dazu, was der Nachweis an jeder
+    Stelle liest (``fest``).
     """
     def stellungen(wahl) -> list:
         return [{"wert": w.value, "beschriftung": w.beschriftung} for w in wahl]
@@ -58,6 +61,7 @@ def wahlen() -> Dict[str, Any]:
     return {
         "plattenarten": [{**s, "umgeschaltet": w.umgeschaltet}
                          for w, s in zip(Plattenart, stellungen(Plattenart))],
+        "fest": [*VOR_DEN_MASSEN, *NACH_DEN_MASSEN],
         "lagen": [lage(l) for l in Lage],
         "formen": stellungen(Stuetzenform),
         "stufen": stellungen(Naeherungsstufe),

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5c94bf3e2f37
+erzeugt: c2467bfa518e
 art: modul
 tags: [modul]
 ---
@@ -157,3 +157,4 @@ Eine Aussparung aus ihren Ecken `[x, y]` in mm.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.web.api]]

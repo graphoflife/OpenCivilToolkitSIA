@@ -9132,7 +9132,7 @@ $$
 D = 450\,\mathrm{mm}
 $$
 
-**Abstand vom Plattenrand in y**
+**Abstand vom unteren Plattenrand**
 
 $$
 a_y = 100\,\mathrm{mm}
@@ -9692,13 +9692,13 @@ $$
 b_y = 300\,\mathrm{mm}
 $$
 
-**Abstand vom Plattenrand in x**
+**Abstand vom linken Plattenrand**
 
 $$
 a_x = 0\,\mathrm{mm}
 $$
 
-**Abstand vom Plattenrand in y**
+**Abstand vom unteren Plattenrand**
 
 $$
 a_y = 0\,\mathrm{mm}
@@ -10054,7 +10054,7 @@ $$
 b_y = 300\,\mathrm{mm}
 $$
 
-**Abstand vom Plattenrand in y**
+**Abstand vom unteren Plattenrand**
 
 $$
 a_y = 0\,\mathrm{mm}
@@ -22143,7 +22143,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Durchmesser der Stütze | $D$ | $450$ | mm | Vorgabe |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Bemessungswert der Auflagerkraft | $V_d$ | $500$ | kN | Vorgabe |
-| Abstand vom Plattenrand in y | $a_y$ | $100$ | mm | Vorgabe |
+| Abstand vom unteren Plattenrand | $a_y$ | $100$ | mm | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
 | Abstand der Verankerung der Durchstanzbewehrung von der Druckseite, unten | $c_v$ | $30$ | mm | Vorgabe |
 | Exzentrizität der Auflagerkraft in x | $e_x$ | $0$ | mm | Vorgabe |
@@ -22163,8 +22163,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Stababstand in y | $s_y$ | $150$ | mm | Vorgabe |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Bemessungswert der Auflagerkraft | $V_d$ | $80$ | kN | Vorgabe |
-| Abstand vom Plattenrand in x | $a_x$ | $0$ | mm | Vorgabe |
-| Abstand vom Plattenrand in y | $a_y$ | $0$ | mm | Vorgabe |
+| Abstand vom linken Plattenrand | $a_x$ | $0$ | mm | Vorgabe |
+| Abstand vom unteren Plattenrand | $a_y$ | $0$ | mm | Vorgabe |
 | Abmessung der Stütze in x | $b_x$ | $300$ | mm | Vorgabe |
 | Abmessung der Stütze in y | $b_y$ | $300$ | mm | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |
@@ -22186,7 +22186,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Stababstand in y | $s_y$ | $150$ | mm | Vorgabe |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Bemessungswert der Auflagerkraft | $V_d$ | $150$ | kN | Vorgabe |
-| Abstand vom Plattenrand in y | $a_y$ | $0$ | mm | Vorgabe |
+| Abstand vom unteren Plattenrand | $a_y$ | $0$ | mm | Vorgabe |
 | Abmessung der Stütze in x | $b_x$ | $300$ | mm | Vorgabe |
 | Abmessung der Stütze in y | $b_y$ | $300$ | mm | Vorgabe |
 | Überdeckung der Zugbewehrung oben | $c_{nom}$ | $30$ | mm | Vorgabe |

@@ -8,7 +8,10 @@ Was einen Durchstanznachweis beschreibt, als Vorgaben im Rechenwerk
 (:class:`Naeherungsstufe`) und wie k_e bestimmt wird (:class:`KeArt`). Was
 Lage und Form der gestützten Fläche heissen, steht in :mod:`.flaeche`.
 Welche Felder der Nachweis liest, sagt :func:`eingaben_fuer` -- dieselben Teile
-bekommt die Maske über den Katalog, damit sie nichts davon nachbaut.
+bekommt die Maske über den Katalog, damit sie nichts davon nachbaut. Die
+Felder selbst, mit Zeichen und Beschreibung, stehen in :data:`VORGABEN`: die
+Herleitung zeigt ihre Gruppen als Kästen, die Maske verteilt sie auf ihre
+Tafeln.
 
 DER STAHL DER ANKER:
 Die Durchstanzbewehrung hat ihren eigenen Stahl, den des Produkts
@@ -34,10 +37,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
-from opencivil.core.berechnung import Berechnung, Vorgabe
+from opencivil.core.berechnung import Berechnung
 from opencivil.core.einheiten import KN, KN_PRO_M2, KNM_PRO_M, M, MM, Groesse
 from opencivil.core.protokoll import Abschnitt
 from opencivil.core.rechenobjekt import Rechenobjekt
+from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import WertDef
 from opencivil.durchstanzen import produkte
@@ -152,6 +156,83 @@ def eingaben_fuer(flaeche: GestuetzteFlaeche, stufe: Naeherungsstufe, ke: KeArt)
                                 *wirksame_stufe(flaeche, stufe).eingaben, *ke.eingaben)))
 
 
+# ===========================================================================
+# Die Vorgaben
+# ===========================================================================
+
+
+def _platte(plattenart: Plattenart) -> Tuple[Feld, ...]:
+    """Was c und c_v meinen, hängt an der Art: bei der Bodenplatte zieht die Unterseite."""
+    return (
+        Feld("h", "h", MM, "Plattendicke", 0, schritt=10),
+        Feld("c", "c_{nom}", MM, f"Überdeckung der Zugbewehrung {plattenart.zugseite}", 0,
+             beschriftung=f"Überdeckung {plattenart.zugseite}", schritt=5),
+        Feld("c_v", "c_v", MM, "Abstand der Verankerung der Durchstanzbewehrung von der "
+             f"Druckseite, {plattenart.druckseite}", 0,
+             beschriftung=f"Ankerköpfe von {plattenart.druckseite}", schritt=5,
+             hinweis="gemessen ab ihrer Oberfläche (SIA 262:2025, Figur 26); über d_v/6 "
+                     "tragen die Anker 30 % weniger (5.5.3.11)"),
+        Feld("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0, beschriftung="Grösstkorn"),
+    )
+
+
+def _einwirkung(plattenart: Plattenart) -> Tuple[Feld, ...]:
+    """Was im Nachweisschnitt abgezogen wird, hängt an der Art (4.3.6.2.6)."""
+    return (
+        Feld("V_d", "V_d", KN, "Bemessungswert der Auflagerkraft", 1,
+             beschriftung="Auflagerkraft", schritt=10),
+        Feld("q_d", "q_d", KN_PRO_M2, f"Flächenlast im Nachweisschnitt: {plattenart.last}", 1,
+             beschriftung=plattenart.last,
+             hinweis="Bemessungswert, abgezogen innerhalb des Nachweisschnitts"),
+    )
+
+
+#: Die Vorgaben des Durchstanzens, je Kasten der Herleitung und Gruppe der
+#: Maske (:mod:`opencivil.core.vorgaben`). Welche davon eine Stelle liest,
+#: sagt :func:`eingaben_fuer`: die Masse ihrer Lage und Form, die Felder ihrer
+#: Näherungsstufe, die Exzentrizität für Stufe 2 oder k_e.
+VORGABEN = (
+    Gruppe("Platte", _platte, nach=("plattenart",)),
+    Gruppe("Biegebewehrung", lambda: (
+        Feld("phi_x", r"\varnothing_x", MM, "Stabdurchmesser in x", 0, schritt=2),
+        Feld("s_x", "s_x", MM, "Stababstand in x", 0, schritt=10),
+        Feld("phi_y", r"\varnothing_y", MM, "Stabdurchmesser in y", 0, schritt=2),
+        Feld("s_y", "s_y", MM, "Stababstand in y", 0, schritt=10),
+    )),
+    Gruppe("Gestützte Fläche", lambda: (
+        Feld("b_x", "b_x", MM, "Abmessung der Stütze in x", 0, beschriftung="Abmessung in x",
+             schritt=10),
+        Feld("b_y", "b_y", MM, "Abmessung der Stütze in y", 0, beschriftung="Abmessung in y",
+             schritt=10),
+        Feld("D", "D", MM, "Durchmesser der Stütze", 0, beschriftung="Durchmesser", schritt=10),
+        Feld("t", "t", MM, "Dicke der Wand", 0, beschriftung="Wanddicke", schritt=10),
+        Feld("a_x", "a_x", MM, "Abstand vom linken Plattenrand", 0,
+             beschriftung="Abstand vom linken Rand", schritt=10),
+        Feld("a_y", "a_y", MM, "Abstand vom unteren Plattenrand", 0,
+             beschriftung="Abstand vom unteren Rand", schritt=10),
+    )),
+    Gruppe("Plattenrotation", lambda: (
+        Feld("r_sx", "r_{sx}", M, "Abstand zum Momentennullpunkt in x", 2,
+             beschriftung="Momentennullpunkt in x", schritt=0.1),
+        Feld("r_sy", "r_{sy}", M, "Abstand zum Momentennullpunkt in y", 2,
+             beschriftung="Momentennullpunkt in y", schritt=0.1),
+        Feld("m_sdx", "m_{sd,x}", KNM_PRO_M, "Mittleres Moment im Stützstreifen, x", 1,
+             beschriftung="Moment im Stützstreifen in x", schritt=5),
+        Feld("m_sdy", "m_{sd,y}", KNM_PRO_M, "Mittleres Moment im Stützstreifen, y", 1,
+             beschriftung="Moment im Stützstreifen in y", schritt=5),
+        Feld("l_x", "l_x", M, "Spannweite in x", 2, schritt=0.1),
+        Feld("l_y", "l_y", M, "Spannweite in y", 2, schritt=0.1),
+    )),
+    Gruppe("Einwirkung", _einwirkung, nach=("plattenart",)),
+    Gruppe("Exzentrizität der Auflagerkraft", lambda: (
+        Feld("e_x", "e_x", MM, "Exzentrizität der Auflagerkraft in x", 0, beschriftung="in x",
+             schritt=10),
+        Feld("e_y", "e_y", MM, "Exzentrizität der Auflagerkraft in y", 0, beschriftung="in y",
+             schritt=10),
+    )),
+)
+
+
 @dataclass
 class Durchstanzstelle(Rechenobjekt):
     """
@@ -248,54 +329,12 @@ class Durchstanzstelle(Rechenobjekt):
         return eingaben_fuer(self.flaeche, self.stufe, self.ke)
 
     def _aufbauen(self) -> None:
+        # Je Gruppe ein Kasten in der Herleitung, mit den Feldern, die der Nachweis liest.
         gelesen = self.eingaben()
-        gruppen = [
-            ("Platte", (
-                ("h", "h", MM, "Plattendicke", 0, self.h),
-                ("c", "c_{nom}", MM, f"Überdeckung der Zugbewehrung {self.plattenart.zugseite}",
-                 0, self.c),
-                ("c_v", "c_v", MM, "Abstand der Verankerung der Durchstanzbewehrung von der "
-                 f"Druckseite, {self.plattenart.druckseite}", 0, self.c_v),
-                ("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0, self.D_max),
-            )),
-            ("Biegebewehrung", (
-                ("phi_x", r"\varnothing_x", MM, "Stabdurchmesser in x", 0, self.phi_x),
-                ("s_x", "s_x", MM, "Stababstand in x", 0, self.s_x),
-                ("phi_y", r"\varnothing_y", MM, "Stabdurchmesser in y", 0, self.phi_y),
-                ("s_y", "s_y", MM, "Stababstand in y", 0, self.s_y),
-            )),
-            ("Gestützte Fläche", (
-                ("b_x", "b_x", MM, "Abmessung der Stütze in x", 0, self.b_x),
-                ("b_y", "b_y", MM, "Abmessung der Stütze in y", 0, self.b_y),
-                ("D", "D", MM, "Durchmesser der Stütze", 0, self.D),
-                ("t", "t", MM, "Dicke der Wand", 0, self.t),
-                ("a_x", "a_x", MM, "Abstand vom Plattenrand in x", 0, self.a_x),
-                ("a_y", "a_y", MM, "Abstand vom Plattenrand in y", 0, self.a_y),
-            )),
-            ("Plattenrotation", (
-                ("r_sx", "r_{sx}", M, "Abstand zum Momentennullpunkt in x", 2, self.r_sx),
-                ("r_sy", "r_{sy}", M, "Abstand zum Momentennullpunkt in y", 2, self.r_sy),
-                ("m_sdx", "m_{sd,x}", KNM_PRO_M, "Mittleres Moment im Stützstreifen, x", 1,
-                 self.m_sdx),
-                ("m_sdy", "m_{sd,y}", KNM_PRO_M, "Mittleres Moment im Stützstreifen, y", 1,
-                 self.m_sdy),
-                ("l_x", "l_x", M, "Spannweite in x", 2, self.l_x),
-                ("l_y", "l_y", M, "Spannweite in y", 2, self.l_y),
-            )),
-            ("Einwirkung", (
-                ("V_d", "V_d", KN, "Bemessungswert der Auflagerkraft", 1, self.V_d),
-                ("q_d", "q_d", KN_PRO_M2, f"Flächenlast im Nachweisschnitt: {self.plattenart.last}",
-                 1, self.q_d),
-                ("e_x", "e_x", MM, "Exzentrizität der Auflagerkraft in x", 0, self.e_x),
-                ("e_y", "e_y", MM, "Exzentrizität der Auflagerkraft in y", 0, self.e_y),
-            )),
-        ]
-        for gruppe, eintraege in gruppen:
-            for kurz, symbol, einheit, beschreibung, stellen, groesse in eintraege:
-                if kurz not in gelesen:
-                    continue
-                d = WertDef(id=f"{self.id}.{kurz}", symbol=symbol, einheit=einheit,
-                            beschreibung=beschreibung, stellen=stellen)
-                self.definitionen[kurz] = d
-                self.berechnungen.append(Vorgabe(id=d.id, ausgabe=d, groesse=groesse,
-                                                 abschnitt=self.abschnitt, gruppe=gruppe))
+        for gruppe in VORGABEN:
+            for f in gruppe.fuer(self):
+                if f.kurz in gelesen:
+                    d, vorgabe = f.vorgabe(self.id, self.abschnitt, gruppe.titel,
+                                           getattr(self, f.kurz))
+                    self.definitionen[f.kurz] = d
+                    self.berechnungen.append(vorgabe)

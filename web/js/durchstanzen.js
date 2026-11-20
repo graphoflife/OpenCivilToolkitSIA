@@ -12,15 +12,19 @@
  *     Einwirkung         V_d, die Flächenlast im Schnitt, k_e
  *
  * Gerechnet wird nichts: Nachweisschnitt, Rotation und Widerstand stehen
- * rechts in der Zusammenfassung, der Grundriss unter «Diagramme». Einheiten
- * und Grenzen kommen aus dem Katalog (`katalog.felder.durchstanz`), die
- * Stellungen der Schalter ebenso (`katalog.durchstanzen`) -- und mit ihnen,
- * welche Felder der Kern je Stellung liest: die Maske zeigt genau die.
+ * rechts in der Zusammenfassung, der Grundriss unter «Diagramme». Die Felder
+ * mit Zeichen und Hinweisen kommen aus dem Kern, je Gruppe der Herleitung
+ * (`katalog.vorgaben`, opencivil/durchstanzen/stelle.py); hier steht nur,
+ * auf welcher Tafel eine Gruppe steht. Einheiten und Grenzen kommen aus dem
+ * Katalog (`katalog.felder.durchstanz`), die Stellungen der Schalter ebenso
+ * (`katalog.durchstanzen`) -- und mit ihnen, welche Felder der Kern je
+ * Stellung liest: die Maske zeigt genau die. Bis 2026-11-20 standen die
+ * Felder hier ein zweites Mal.
  */
 
 import {
-  erklaerung, feld, karte, materialliste, mitBild, namensfeld, panel, wahlBlock, wahlSchalter,
-  zahlzeile as feldzeile,
+  eingabegruppen, erklaerung, feld, karte, materialliste, mitBild, namensfeld, panel, wahlBlock,
+  wahlSchalter,
 } from './bausteine.js';
 import { el } from './dom.js';
 import { zeichenbereich } from './ds_zeichnung.js';
@@ -70,15 +74,8 @@ const HILFE = {
   },
 };
 
-/** Text und Zeichen der Masse; welche gelten, sagt der Katalog je Lage und Form. */
-const MASSE = {
-  b_x: ['Abmessung in x', 'b_x'],
-  b_y: ['Abmessung in y', 'b_y'],
-  D: ['Durchmesser', 'D'],
-  t: ['Wanddicke', 't'],
-  a_x: ['Abstand zum linken Rand', 'a_x'],
-  a_y: ['Abstand zum unteren Rand', 'a_y'],
-};
+/** Die Gruppe der Vorgaben mit der Exzentrizität: eine eigene Karte, wo der Nachweis sie liest. */
+const EXZENTRIZITAET = 'Exzentrizität der Auflagerkraft';
 
 /** Die Lage der Stelle, wie der Katalog sie beschreibt. */
 function lageVon(d) {
@@ -86,14 +83,15 @@ function lageVon(d) {
 }
 
 /**
- * Was der Kern an dieser Stelle liest, soweit es von den Wahlen abhängt: die
- * Masse der Lage in ihrer Form, die Felder der Näherungsstufe an dieser Lage
- * und die von k_e -- je aus dem Katalog.
+ * Was der Kern an dieser Stelle liest: die festen Felder, die Masse der Lage
+ * in ihrer Form, die Felder der Näherungsstufe an dieser Lage und die von
+ * k_e -- je aus dem Katalog.
  */
 function gelesen(d) {
   const lage = lageVon(d);
   const ke = katalog('durchstanzen', 'ke').find((k) => k.wert === d.ke);
-  return new Set([...lage.masse[d.form], ...lage.stufen[d.stufe], ...ke.eingaben]);
+  return new Set([...katalog('durchstanzen', 'fest'), ...lage.masse[d.form],
+    ...lage.stufen[d.stufe], ...ke.eingaben]);
 }
 
 /**
@@ -108,13 +106,6 @@ function aenderer(d) {
     const vorher = x.plattenart;
     veraenderer(x);
     umgeschaltet = x.plattenart !== vorher ? x.kennung : null;
-  });
-}
-
-/** Eine Zahl des Eintrags als Feld: Beschriftung mit Symbol, Einheit aus dem Katalog. */
-function zahlzeile(d, schluessel, text, symbol, { schritt = 1, titel } = {}) {
-  return feldzeile('durchstanz', d, schluessel, text, symbol, {
-    schritt, titel, aendern: aenderer(d),
   });
 }
 
@@ -142,13 +133,8 @@ function materialfeld(d, schluessel, art, text) {
   }), '');
 }
 
-function stellePanel(d) {
+function stellePanel(d, vorgaben) {
   const lage = lageVon(d);
-  const masse = lage.masse[d.form].map((k) => zahlzeile(d, k, MASSE[k][0], MASSE[k][1], { schritt: 10 }));
-  if (lage.hat_form) {
-    masse.unshift(feld('Form', schalter(d, 'form', 'formen', 'Die Form der Stütze im Grundriss',
-      'stuetzenform'), ''));
-  }
   return panel({
     schluessel: 'durchstanzen/Stelle', titel: 'Durchstanzstelle',
     zusatz: erklaerung(HILFE.stelle.zeilen, HILFE.stelle.formel),
@@ -164,7 +150,11 @@ function stellePanel(d) {
       }) : null,
     ]),
     wahlBlock('Lage', schalter(d, 'lage', 'lagen', 'Wo die gestützte Fläche in der Platte liegt', 'lage')),
-    karte(lage.titel, masse),
+    karte(lage.titel, [
+      lage.hat_form ? feld('Form', schalter(d, 'form', 'formen', 'Die Form der Stütze im Grundriss',
+        'stuetzenform'), '') : null,
+      ...vorgaben.zeilen('Gestützte Fläche'),
+    ]),
   ]);
 }
 
@@ -176,42 +166,23 @@ function grundrissPanel(d) {
   }, [zeichenbereich(d)]);
 }
 
-function plattenPanel(d) {
-  const bodenplatte = d.plattenart === 'bodenplatte';
+function plattenPanel(d, vorgaben) {
   return panel({ schluessel: 'durchstanzen/Platte', titel: 'Platte' }, [
     karte('', [
-      zahlzeile(d, 'h', 'Plattendicke', 'h', { schritt: 10 }),
-      zahlzeile(d, 'c', bodenplatte ? 'Überdeckung unten' : 'Überdeckung oben', 'c_{nom}', {
-        schritt: 5, titel: 'Die Überdeckung der Zugbewehrung',
-      }),
-      zahlzeile(d, 'c_v', bodenplatte ? 'Ankerköpfe von oben' : 'Ankerköpfe von unten',
-        'c_v', {
-          schritt: 5,
-          titel: 'Abstand der Verankerung der Durchstanzbewehrung von der Oberfläche der '
-            + 'Druckseite (Figur 26); über d_v/6 tragen die Anker 30 % weniger (5.5.3.11)',
-        }),
-      zahlzeile(d, 'D_max', 'Grösstkorn', 'D_{max}', { schritt: 1 }),
+      ...vorgaben.zeilen('Platte'),
       materialfeld(d, 'beton', 'beton', 'Beton'),
       materialfeld(d, 'stahl', 'betonstahl', 'Betonstahl'),
     ]),
   ]);
 }
 
-function bewehrungPanel(d) {
+function bewehrungPanel(d, vorgaben) {
   return panel({
     schluessel: 'durchstanzen/Bewehrung',
     titel: d.plattenart === 'bodenplatte' ? 'Biegebewehrung unten' : 'Biegebewehrung oben',
     zusatz: erklaerung(HILFE.bewehrung.zeilen, HILFE.bewehrung.formel),
   }, [
-    karte('In x', [
-      zahlzeile(d, 'phi_x', 'Durchmesser', String.raw`\varnothing_x`, { schritt: 2 }),
-      zahlzeile(d, 's_x', 'Abstand', 's_x', { schritt: 10 }),
-    ]),
-    karte('In y', [
-      zahlzeile(d, 'phi_y', 'Durchmesser', String.raw`\varnothing_y`, { schritt: 2 }),
-      zahlzeile(d, 's_y', 'Abstand', 's_y', { schritt: 10 }),
-    ]),
-    karte('', [feld('Aussen liegt', wahlSchalter({
+    karte('', [...vorgaben.zeilen('Biegebewehrung'), feld('Aussen liegt', wahlSchalter({
       werte: [{ wert: 'x', beschriftung: 'x' }, { wert: 'y', beschriftung: 'y' }],
       gewaehlt: d.aussen,
       setzen: (w) => aenderer(d)((x) => { x.aussen = w; }),
@@ -220,47 +191,25 @@ function bewehrungPanel(d) {
   ]);
 }
 
-/** Die Felder der Plattenrotation; welche die Stufe liest, sagt der Katalog. */
-const ROTATION = [
-  ['r_sx', 'Abstand zum Momentennullpunkt in x', 'r_{sx}', 0.1],
-  ['r_sy', 'Abstand zum Momentennullpunkt in y', 'r_{sy}', 0.1],
-  ['m_sdx', 'Moment im Stützstreifen in x', 'm_{sd,x}', 5],
-  ['m_sdy', 'Moment im Stützstreifen in y', 'm_{sd,y}', 5],
-  ['l_x', 'Spannweite in x', 'l_x', 0.1],
-  ['l_y', 'Spannweite in y', 'l_y', 0.1],
-];
-
-function rotationPanel(d) {
-  const felder = gelesen(d);
-  const inhalt = ROTATION.filter(([k]) => felder.has(k))
-    .map(([k, text, symbol, schritt]) => zahlzeile(d, k, text, symbol, { schritt }));
+function rotationPanel(d, vorgaben) {
   return panel({
     schluessel: 'durchstanzen/Rotation', titel: 'Plattenrotation',
     zusatz: erklaerung(HILFE.rotation.zeilen, HILFE.rotation.formel),
   }, [
     wahlBlock('Näherungsstufe', schalter(d, 'stufe', 'stufen', 'SIA 262:2025, 4.3.6.4.2')),
-    karte('', inhalt),
+    karte('', vorgaben.zeilen('Plattenrotation')),
   ]);
 }
 
-function einwirkungPanel(d) {
-  const bodenplatte = d.plattenart === 'bodenplatte';
-  const exzentrisch = gelesen(d).has('e_x');
+function einwirkungPanel(d, vorgaben) {
+  const exzentrizitaet = vorgaben.zeilen(EXZENTRIZITAET);
   return panel({
     schluessel: 'durchstanzen/Einwirkung', titel: 'Einwirkung',
     zusatz: erklaerung(HILFE.einwirkung.zeilen, HILFE.einwirkung.formel),
   }, [
-    karte('', [
-      zahlzeile(d, 'V_d', 'Auflagerkraft', 'V_d', { schritt: 10 }),
-      zahlzeile(d, 'q_d', bodenplatte ? 'Bodenpressung' : 'Eigengewicht und Nutzlast', 'q_d', {
-        schritt: 1, titel: 'Bemessungswert der Flächenlast, abgezogen innerhalb des Nachweisschnitts',
-      }),
-    ]),
+    karte('', vorgaben.zeilen('Einwirkung')),
     wahlBlock('k_e', schalter(d, 'ke', 'ke', 'SIA 262:2025, 4.3.6.2.4 und 4.3.6.2.5')),
-    exzentrisch ? karte('Exzentrizität der Auflagerkraft', [
-      zahlzeile(d, 'e_x', 'in x', 'e_x', { schritt: 10 }),
-      zahlzeile(d, 'e_y', 'in y', 'e_y', { schritt: 10 }),
-    ]) : null,
+    exzentrizitaet.length ? karte(EXZENTRIZITAET, exzentrizitaet) : null,
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [
         el('label', { text: 'Beschreibung' }),
@@ -274,6 +223,10 @@ function einwirkungPanel(d) {
 }
 
 export function durchstanzEditor(d) {
-  return [stellePanel(d), grundrissPanel(d), plattenPanel(d), bewehrungPanel(d), rotationPanel(d),
-    einwirkungPanel(d)];
+  // Je Gruppe der Vorgaben eine Tafel; welche Felder sie zeigt, sagt der Kern.
+  const vorgaben = eingabegruppen('durchstanz', d, aenderer(d), { gelesen: gelesen(d) });
+  const tafeln = [stellePanel(d, vorgaben), grundrissPanel(d), plattenPanel(d, vorgaben),
+    bewehrungPanel(d, vorgaben), rotationPanel(d, vorgaben), einwirkungPanel(d, vorgaben)];
+  vorgaben.vollstaendig();
+  return tafeln;
 }

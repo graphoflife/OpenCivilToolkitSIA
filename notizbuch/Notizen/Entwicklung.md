@@ -7,6 +7,31 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Das Durchstanzen holt seine Maske aus dem Kern
+
+Der letzte der vier: die Tafel steht in `opencivil/durchstanzen/stelle.py`
+(`VORGABEN`), die Maske hatte sie in `MASSE`, `ROTATION` und zwanzig Zeilen
+von Hand. Welche Felder eine Stelle liest, sagt weiter `eingaben_fuer`; der
+Katalog gibt dazu die festen Felder (`fest`), so ist die Menge der Maske
+jetzt genau die des Nachweises. Anders als die andern verteilt das
+Durchstanzen seine Gruppen auf mehrere Tafeln, mit dem Grundriss dazwischen:
+`eingabegruppen` gibt die Zeilen je Gruppe, und eine Gruppe des Kerns, die
+keine Tafel nimmt, meldet sich laut, statt still zu fehlen.
+
+Sichtbar anders:
+
+- Die Biegebewehrung steht in einer Karte: «Stabdurchmesser in x ∅_x»,
+  «Stababstand in x s_x» und so fort, statt der Karten «In x» und «In y».
+- a_x und a_y heissen in der Herleitung «Abstand vom linken» und «vom
+  unteren Plattenrand» statt «vom Plattenrand in x/y», in der Maske «Abstand
+  vom linken/unteren Rand». Vorher hatte a_x drei Namen.
+- Die Exzentrizität hat in der Herleitung einen eigenen Kasten, wie in der
+  Maske ihre eigene Karte.
+- r_s heisst in der Maske kurz «Momentennullpunkt in x»; die lange
+  Beschriftung war abgeschnitten.
+- Die Titel über den Feldern sind die Beschreibung der Herleitung mit
+  Hinweis.
+
 ## 2026-11-20 · Der Pfahl holt seine Maske aus dem Kern
 
 Der dritte nach Grundbruch und Setzung: die Tafel der Vorgaben steht in

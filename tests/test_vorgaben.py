@@ -11,6 +11,8 @@ import unittest
 from opencivil.core.berechnung import Vorgabe
 from opencivil.core.einheiten import M
 from opencivil.core.vorgaben import Feld, Gruppe, mit_index
+from opencivil.durchstanzen.flaeche import Lage, Stuetzenform
+from opencivil.durchstanzen.stelle import KeArt, Naeherungsstufe, Plattenart
 from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import Grundlage, Pfahlart, Spitze, Tragglied
@@ -58,6 +60,23 @@ class TestBausteine(unittest.TestCase):
 
 class TestMaskeWieHerleitung(unittest.TestCase):
     """Die Maske zeigt genau die Vorgaben der Herleitung, in denselben Gruppen und derselben Folge."""
+
+    def test_durchstanzen(self):
+        """
+        Je Stellung der Wahlen, mit dem, was der Nachweis liest: die Maske
+        nimmt es aus dem Katalog, der Test von der Stelle selbst -- dass beides
+        gleich ist, prüft tests/test_durchstanzen.py.
+        """
+        for lage, form, stufe, ke, plattenart in itertools.product(
+                Lage, Stuetzenform, Naeherungsstufe, KeArt, Plattenart):
+            with self.subTest(lage=lage, form=form, stufe=stufe, ke=ke, plattenart=plattenart):
+                p = Projekt(name="Probe")
+                d = p.durchstanzen("S", beton=p.beton().kennung, stahl=p.stahl().kennung,
+                                   lage=lage.value, form=form.value, stufe=stufe.value,
+                                   ke=ke.value, plattenart=plattenart.value)
+                stelle = p.aufbauen().objekte("durchstanzen")[d.kennung]
+                self.assertEqual(maske("durchstanz", d.als_dict(), set(stelle.eingaben())),
+                                 herleitung(stelle))
 
     def test_grundbruch(self):
         for verhalten in Verhalten:

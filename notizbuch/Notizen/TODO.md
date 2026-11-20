@@ -381,7 +381,11 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Spalten der Schichten kommen aus dem Kern. Erledigt für den Pfahl
         (2026-11-20): `pfahl.VORGABEN` und `JE_SCHICHT`; der Spitzendruck hat
         eine eigene Gruppe «Fuss», damit sein Schalter vor ihm steht, und
-        `Pfahlschicht.kurznamen` ist weg. Bleibt das Durchstanzen.
+        `Pfahlschicht.kurznamen` ist weg. Erledigt für das Durchstanzen
+        (2026-11-20): `stelle.VORGABEN`; die Maske verteilt die Gruppen auf
+        ihre Tafeln (`eingabegruppen`) und meldet eine, die keinen Platz hat.
+        `MASSE` und `ROTATION` sind weg, a_x heisst überall «vom linken
+        (Platten)rand». Damit erledigt.
       - Bilder tippen Einheiten: `GROESSEN` in `pf_verlauf.js` spiegelt
         `VERLAEUFE` samt Grenzschlüsseln (eine umbenannte Grösse
         verschwindet still), `platte_bilder.js` rund 35 Einheiten, die
