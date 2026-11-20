@@ -165,10 +165,7 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     else:
         loesung = _stromabwaerts(projekt, aufbau, beschreibung)
     analysen = _analysen(beschreibung, aufbau, loesung)
-    # Die Normalkraft, die unter einer M-V-Kurve gewaehlt ist, rechnet mit --
-    # bis 2026-11-19 sprang sie nach jeder Eingabe auf die Vorgabe zurueck.
-    return {**api.loesung_dict(loesung, aufbau, spannungsanalysen=analysen,
-                               normalkraefte=_normalkraefte(rumpf)),
+    return {**api.loesung_dict(loesung, aufbau, spannungsanalysen=analysen),
             "obergrenzen": api.obergrenzen(projekt)}
 
 
@@ -244,42 +241,6 @@ def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung:
     if teil is None:
         return aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung), ohne_herleitung=True)
     return teil
-
-
-def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
-    """
-    Die M-V-Kurven fuer selbst gewaehlte Normalkraefte.
-
-    Der Querkraftwiderstand haengt ueber ``m_Rd(N_Ed)`` von der Normalkraft ab.
-    Unter jedem Diagramm laesst sich eine einstellen; ``n_ed`` bildet die
-    Kennung der Kurve auf diese Normalkraft in kN ab.
-
-    Eine eigene Anfrage, weil es eine eigene Frage ist -- und weil die
-    Oberflaeche die Formel sonst ein zweites Mal enthalten muesste, um die
-    Kurve selbst zu zeichnen. Gerechnet wird an genau einer Stelle.
-    """
-    aufbau = _projekt(rumpf).aufbauen()
-    loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(), ohne_herleitung=True)
-    return {"querkraftkurven": diagrammdaten.querkraftkurven(
-        aufbau, loesung, _normalkraefte(rumpf))}
-
-
-def _normalkraefte(rumpf: Mapping[str, Any]) -> Dict[str, float]:
-    """Je M-V-Kurve die gewaehlte Normalkraft in kN (``n_ed``) -- leer gelassene fehlen."""
-    gewaehlt = {}
-    for kennung, wert in (rumpf.get("n_ed") or {}).items():
-        if wert is None or wert == "":
-            continue
-        try:
-            gewaehlt[str(kennung)] = float(wert)
-        except (TypeError, ValueError):
-            # Nicht durchreichen: ein roher ValueError kaeme als Absturz beim
-            # Benutzer an. Die Anfrage kommt zwar aus der eigenen Oberflaeche,
-            # aber das ist keine Zusicherung -- sie steht offen im Netz.
-            raise DienstFehler(
-                400, f"Die Normalkraft der Kurve '{kennung}' ist keine Zahl, "
-                     f"sondern {wert!r}.")
-    return gewaehlt
 
 
 def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -697,7 +658,6 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "verweise": verweise,
     "fallname": fallname,
     "rechnen": rechnen,
-    "querkraftkurven": querkraftkurven,
     "bericht": bericht,
     "bewehrung_suchen": bewehrung_suchen,
     "geometrie": geometrie,

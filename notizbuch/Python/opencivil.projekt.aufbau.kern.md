@@ -1,5 +1,5 @@
 ---
-erzeugt: af517962bda8
+erzeugt: e48a30dae4eb
 art: modul
 tags: [modul]
 ---
@@ -354,8 +354,7 @@ class Bauteil
 Ein gebautes Bauteil und was zu ihm gehoert. Wem ein Nachweis gehoert,
 steht hier -- niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 
-- `kennung: str`
-- `name: str`
+- `eintrag: Any` – Der Eintrag des Projekts, aus dem es gebaut ist -- fuer ein Bild, das nach einem seiner Felder fragt, etwa der Normalkraft der M-V-Kurve.
 - `art: 'Bauteilart'`
 - `objekt: Any` – Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem.
 - `nachweise: List[Tuple[str, str, Nachweis]] = field(default_factory=list)` – Feld, Schluessel und Nachweis, angemeldet ueber [[opencivil.projekt.aufbau.kern#Aufbau.eintragen|Aufbau.eintragen]].
@@ -363,6 +362,20 @@ steht hier -- niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 - `kennzahlen: List[Kennzahl] = field(default_factory=list)` – Was es beschreibt, gleich welche Lastfaelle es gibt, in der Folge der Zusammenfassung -- jede so, wie ihr Erzeuger sie nennt.
 - `bezuege: Tuple[str, ...] = ()` – Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt.
 - `ohne_nachweis: str = ''` – Warum es keinen seiner Nachweise fuehrt -- leer, wenn nichts fehlt ([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|Aufbau.ohne_nachweis]]).
+
+#### Bauteil.kennung
+
+```python
+@property
+def kennung(self) -> str
+```
+
+#### Bauteil.name
+
+```python
+@property
+def name(self) -> str
+```
 
 #### Bauteil.raum
 

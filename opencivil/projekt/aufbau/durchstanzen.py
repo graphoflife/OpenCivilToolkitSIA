@@ -67,6 +67,6 @@ def bauen(art: "Bauteilart", eintrag: DurchstanzEintrag, aufbau: Aufbau) -> Baut
         V_d=g("V_d"), q_d=g("q_d"), ke=eintrag.ke, e_x=g("e_x"), e_y=g("e_y"),
         aussparungen=aussparungen(eintrag))
     stelle.ins_rechenwerk(aufbau.werk)
-    teil = Bauteil(eintrag.kennung, eintrag.name, art, stelle)
+    teil = Bauteil(eintrag, art, stelle)
     aufbau.eintragen(teil, "durchstanzen", eintrag.kennung, Durchstanzen(stelle))
     return teil

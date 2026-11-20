@@ -1,5 +1,5 @@
 ---
-erzeugt: 34748a648f2c
+erzeugt: 7e97e333b50f
 art: modul
 tags: [modul]
 ---
@@ -40,6 +40,7 @@ gezeichneten Querschnitt gleich angibt, steht in der Grundlage
 - `d_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)` – Grösstkorndurchmesser in mm.
 - `einlagenhoehe: float = bereich(0.0, heisst='Grösstes Mass der Einlage', einheit=MM, ab=0.0)` – Grösstes Mass einer Einlage in mm, Breite oder Höhe -- der Name ist von früher.
 - `querkraftbewehrung: QuerkraftbewehrungEintrag = field(default_factory=QuerkraftbewehrungEintrag)` – Bügel; ohne Durchmesser heisst: keine.
+- `querkraftkurve_normalkraft: Optional[float] = bereich(None, heisst='Normalkraft der M-V-Kurve', einheit=KN)` – Fuer welche Normalkraft das Bild «Querkraft ueber Moment» gilt, in kN, Zug positiv -- leer: die des ersten Falls. Nur das Bild liest sie, kein Nachweis. Bis 2026-11-20 lebte sie in der Oberflaeche neben dem Projekt und sprang nach dem Neuladen still auf die Vorgabe zurueck.
 - `haeufig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen.
 - `quasistaendig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANT…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `verformung: VerformungEintrag = field(default_factory=VerformungEintrag)` – Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors.

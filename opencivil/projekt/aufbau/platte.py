@@ -59,7 +59,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Opt
     querschnitt.ins_rechenwerk(aufbau.werk)
     # Bewehrungsmass und Distanzhalter stehen als Kennzahlen da, auch bei
     # einer Platte ohne Nachweis -- ihr Lagenaufbau rechnet darum immer.
-    teil = Bauteil(eintrag.kennung, eintrag.name, art, querschnitt,
+    teil = Bauteil(eintrag, art, querschnitt,
                    weitere_ziele=[f"{querschnitt.id}.lagenaufbau"],
                    kennzahlen=list(querschnitt.kennzahlen))
     schnell = aufbau.schnell

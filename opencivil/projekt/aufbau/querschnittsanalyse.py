@@ -62,7 +62,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     except GeometrieFehler as fehler:
         return aufbau.unfertig(art.liste, eintrag, wo, str(fehler).rstrip("."))
     analyse.ins_rechenwerk(aufbau.werk)
-    teil = Bauteil(eintrag.kennung, eintrag.name, art, analyse)
+    teil = Bauteil(eintrag, art, analyse)
 
     # Die Lastfaelle in kN und kNm, wie eingetippt -- gerechnet wird in SI.
     kN, kNm = KN.faktor, KNM.faktor

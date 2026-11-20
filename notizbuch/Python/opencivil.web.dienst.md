@@ -1,5 +1,5 @@
 ---
-erzeugt: 2acf1f8295a7
+erzeugt: ccc07a24dca1
 art: modul
 tags: [modul]
 ---
@@ -175,30 +175,6 @@ Ein Bauteil gerechnet: aus dem Zwischenspeicher, wenn er es zu genau
 dieser Beschreibung noch hat -- nach einer Rechnung ist das der Fall --,
 sonst dieses eine, ohne Herleitung: wer hier fragt, will Werte und
 Bilder, und die Zeichnung fragt nach jeder Eingabe.
-
-### querkraftkurven
-
-```python
-def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]
-```
-
-Die M-V-Kurven fuer selbst gewaehlte Normalkraefte.
-
-Der Querkraftwiderstand haengt ueber `m_Rd(N_Ed)` von der Normalkraft ab.
-Unter jedem Diagramm laesst sich eine einstellen; `n_ed` bildet die
-Kennung der Kurve auf diese Normalkraft in kN ab.
-
-Eine eigene Anfrage, weil es eine eigene Frage ist -- und weil die
-Oberflaeche die Formel sonst ein zweites Mal enthalten muesste, um die
-Kurve selbst zu zeichnen. Gerechnet wird an genau einer Stelle.
-
-### _normalkraefte
-
-```python
-def _normalkraefte(rumpf: Mapping[str, Any]) -> Dict[str, float]
-```
-
-Je M-V-Kurve die gewaehlte Normalkraft in kN (`n_ed`) -- leer gelassene fehlen.
 
 ### bericht
 

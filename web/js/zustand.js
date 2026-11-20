@@ -104,14 +104,6 @@ export const zustand = {
    * Platte.
    */
   zugeklappt: zugeklappteLesen(),
-  /**
-   * Je M-V-Kurve die eingestellte Normalkraft in kN.
-   *
-   * Ansichtssache, kein Teil des Projekts: sie sagt nichts über das
-   * Bauwerk, sondern nur, welchen Schnitt durch die Fläche man gerade
-   * sehen will. Darum hier und nicht in der Projektbeschreibung.
-   */
-  kurvenNormalkraft: {},
 };
 
 /**
@@ -229,7 +221,7 @@ export function projektAendern(veraenderer) {
  */
 export function projektSetzen(projekt, weiteres = {}) {
   ansichten.clear();
-  aendern({ projekt, fassung: zustand.fassung + 1, kurvenNormalkraft: {}, ...weiteres });
+  aendern({ projekt, fassung: zustand.fassung + 1, ...weiteres });
 }
 
 /** Je Kennung, was sich die Ansichten merken -- siehe `ansichtVon`. */

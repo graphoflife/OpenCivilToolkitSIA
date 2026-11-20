@@ -131,9 +131,8 @@ export const api = {
   fallname: (projekt, kennung, pfad, index, name) =>
     ruf('fallname', { projekt, kennung, pfad, index, name }),
   /** Ohne `ziele` alles; mit `ziele` genau diese samt dem, was sie brauchen. */
-  rechnen: (projekt, ziele, n_ed) => ruf('rechnen', { projekt, ziele, n_ed }),
+  rechnen: (projekt, ziele) => ruf('rechnen', { projekt, ziele }),
   /** M-V-Kurven für selbst gewählte Normalkräfte: {Kennung: N_Ed in kN}. */
-  querkraftkurven: (projekt, n_ed) => ruf('querkraftkurven', { projekt, n_ed }),
   /** Sucht die kleinste Bewehrung und gibt das geänderte Projekt zurück. */
   bewehrungSuchen: (projekt, kennung) =>
     ruf('bewehrung_suchen', { projekt, kennung }),

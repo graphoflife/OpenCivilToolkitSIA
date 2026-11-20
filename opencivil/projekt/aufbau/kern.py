@@ -381,8 +381,11 @@ class Bauteil:
     steht hier -- niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
     """
 
-    kennung: str
-    name: str
+    eintrag: Any
+    """
+    Der Eintrag des Projekts, aus dem es gebaut ist -- fuer ein Bild, das
+    nach einem seiner Felder fragt, etwa der Normalkraft der M-V-Kurve.
+    """
     art: "Bauteilart"
     objekt: Any
     """Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem."""
@@ -404,6 +407,14 @@ class Bauteil:
 
     ohne_nachweis: str = ""
     """Warum es keinen seiner Nachweise fuehrt -- leer, wenn nichts fehlt (:meth:`Aufbau.ohne_nachweis`)."""
+
+    @property
+    def kennung(self) -> str:
+        return self.eintrag.kennung
+
+    @property
+    def name(self) -> str:
+        return self.eintrag.name
 
     @property
     def raum(self) -> str:

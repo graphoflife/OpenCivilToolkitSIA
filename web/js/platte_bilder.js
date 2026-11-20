@@ -13,14 +13,13 @@
  */
 
 import { achsenkreuz, NR, schrittweite } from './achsen.js';
-import { api } from './api.js';
 import { karte } from './bausteine.js';
 import { beschriftungenEntzerren } from './diagramm.js';
 import {
-  el, melden, stilfarbe, svgEl, zahlfeld,
+  el, stilfarbe, svgEl, zahlfeld,
 } from './dom.js';
 import { spannungskarten } from './spannungsbild.js';
-import { aendern, zustand } from './zustand.js';
+import { eintragAendern, eintragVon, feldangabe } from './zustand.js';
 
 const BREITE = 720;
 const HOEHE = 520;
@@ -57,64 +56,44 @@ export function plattenkarten(kennung, eintrag, loesung) {
 }
 
 /**
- * Stellt eine Kurve auf eine andere Normalkraft um.
- *
- * Gerechnet wird im Kern, nicht hier: `v_Rd` hängt über `m_Rd(N_Ed)` an der
- * Resistenzlinie, und die Formel steht im Querkraftnachweis. Die Oberfläche
- * fragt nach und zeichnet, was zurückkommt. Jedes weitere Rechnen gibt die
- * gewählte mit (app.js) -- bis 2026-11-19 sprang sie nach jeder Eingabe
- * zurück.
- */
-async function normalkraftWaehlen(kennung, N_Ed) {
-  const gewaehlt = { ...zustand.kurvenNormalkraft, [kennung]: N_Ed };
-  aendern({ kurvenNormalkraft: gewaehlt });
-  try {
-    const antwort = await api.querkraftkurven(zustand.projekt, gewaehlt);
-    // Wer zweimal kurz hintereinander weiterstellt, hat zwei Anfragen
-    // unterwegs -- und die ältere darf die jüngere nicht überholen. Sonst
-    // stünde unter der Kurve die eine Normalkraft und gezeichnet wäre die
-    // andere.
-    if (zustand.kurvenNormalkraft[kennung] !== N_Ed) return;
-    // In die vorhandene Lösung einsetzen statt sie zu ersetzen: alles andere
-    // -- Herleitung, Werte, Urteile -- gilt unverändert weiter.
-    aendern({
-      loesung: { ...zustand.loesung, querkraftkurven: antwort.querkraftkurven },
-    });
-  } catch (fehler) {
-    melden(fehler.message, true);
-  }
-}
-
-/**
  * Die M-V-Kurven einer Platte -- bis zu vier.
  *
  * Je Tragrichtung und Momentenvorzeichen eine, aber nur dort, wo auch ein
  * Querkraftnachweis geführt wurde. Der Kern sagt selbst, welche es gibt; hier
  * wird nichts abgeleitet.
  *
- * Unter jeder Kurve steht die Normalkraft, für die sie gilt. Ändert man sie,
- * rechnet der Kern die Kurve neu -- die Formel bleibt dort, wo sie hingehört.
+ * Unter jeder Kurve steht die Normalkraft, für die sie gilt: ein Feld der
+ * Platte, gespeichert mit dem Projekt. Wer es ändert, ändert das Projekt, und
+ * der Kern rechnet die Kurve neu -- die Formel bleibt dort, wo sie hingehört.
+ * Leer gilt die des ersten Falls; was gilt, sagt der Hinweis des Kerns. Die
+ * Zahl im Feld kommt aus dem Projekt, nicht aus der Antwort des Kerns -- dort
+ * steht nur, womit gerechnet ist. Bis 2026-11-20 hatte die Kurve eine eigene
+ * Anfrage und die Normalkraft lebte neben dem Projekt: nach dem Neuladen
+ * sprang sie still zurück.
  */
 function querkraftkurven(loesung, querschnitt) {
   const alle = Object.entries(loesung.querkraftkurven || {})
     .filter(([, k]) => k.querschnitt === querschnitt);
+  const angabe = feldangabe('querschnitt', 'querkraftkurve_normalkraft');
+  const gewaehlt = eintragVon(querschnitt)?.querkraftkurve_normalkraft ?? null;
 
-  return alle.map(([kennung, kurve]) => {
+  return alle.map(([, kurve]) => {
     const bild = querkraftkurveZeichnen(kurve);
     return karte(`Querkraft über Moment – ${kurve.name}`, [
       bild,
       el('div.kurvenfuss', {}, [
         el('span.kurvenfuss-name', { text: 'gilt für N_Ed =' }),
         zahlfeld({
-          wert: kurve.N_Ed, schritt: 50,
-          titel: 'N in kN, Zug positiv. Nur Punkte mit genau diesem N liegen auf der Kurve.',
-          leer: 0,
-          beiAenderung: (v) => normalkraftWaehlen(kennung, v),
+          wert: gewaehlt, schritt: 50, angabe,
+          leer: null, platzhalter: String(kurve.N_Ed),
+          titel: 'N in kN, Zug positiv; leer: die des ersten Falls. '
+            + 'Nur Punkte mit genau diesem N liegen auf der Kurve.',
+          beiAenderung: (v) => eintragAendern(querschnitt, (q) => {
+            q.querkraftkurve_normalkraft = v;
+          }),
         }),
-        el('span.einheit', { text: 'kN' }),
-        el('span.kurvenhinweis', {
-          text: 'Blass: Punkte mit anderem N.',
-        }),
+        el('span.einheit', { text: angabe.einheit }),
+        el('span.kurvenhinweis', { text: kurve.hinweis }),
       ]),
     ], { bild });
   });

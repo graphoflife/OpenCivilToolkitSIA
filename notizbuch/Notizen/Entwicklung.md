@@ -7,6 +7,20 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Normalkraft der M-V-Kurve gehört zur Platte
+
+Unter dem Bild «Querkraft über Moment» stellt man ein, für welche
+Normalkraft die Kurve gilt. Die Zahl lebte bisher in der Oberfläche neben
+dem Projekt und hatte zwei Wege in den Kern: sie ging bei jedem Rechnen mit,
+und eine eigene Anfrage baute für die Kurve das ganze Projekt neu. Nach dem
+Neuladen galt still wieder die Normalkraft des ersten Falls.
+
+Jetzt ist sie ein Feld der Platte und wird mit dem Projekt gespeichert. Wer
+sie ändert, ändert das Projekt, und es wird gerechnet wie nach jeder
+Eingabe. Leer gilt die des ersten Falls; das Feld zeigt sie blass, und der
+Satz daneben nennt den Fall, aus dem sie kommt. Das Bild findet die Platte über das gebaute Bauteil, das jetzt seinen Eintrag
+kennt (`Bauteil.eintrag`; Kennung und Name kommen von dort).
+
 ## 2026-11-20 · Eine Stelle entscheidet, ob die Linie geteilt wird
 
 Das Knicken und die Kennzahlen brauchen eine Resistenzlinie. Wählen sie wie

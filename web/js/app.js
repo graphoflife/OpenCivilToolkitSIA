@@ -84,8 +84,7 @@ async function einDurchgang() {
   zustandsanzeige('rechnet …');
   try {
     gerechnet = rechenstand();
-    // Mit der Normalkraft, die unter jeder M-V-Kurve gewählt ist.
-    const antwort = await api.rechnen(zustand.projekt, undefined, zustand.kurvenNormalkraft);
+    const antwort = await api.rechnen(zustand.projekt);
     // Der gezeigte Einzelnachweis rechnet mit: sonst stünde in der Herleitung
     // eine Zahl von vor der letzten Eingabe. Aber nur, wenn die Herleitung zu
     // sehen ist -- sonst beim nächsten Blick darauf. Beides kommt in einem

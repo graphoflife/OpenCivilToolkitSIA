@@ -129,4 +129,4 @@ def bauen(art: "Bauteilart", eintrag: DeckeEintrag, aufbau: Aufbau) -> Bauteil:
                           praefix=f"{art.raum}.{eintrag.kennung}", decke=decke, betone=betone,
                           meldungen=meldungen + ohne)
     system.ins_rechenwerk(aufbau.werk)
-    return Bauteil(eintrag.kennung, eintrag.name, art, system, weitere_ziele=system.ziele())
+    return Bauteil(eintrag, art, system, weitere_ziele=system.ziele())

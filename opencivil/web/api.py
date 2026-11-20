@@ -18,7 +18,7 @@ from __future__ import annotations
 import dataclasses
 import inspect
 import math
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from opencivil.bewehrungssuche import DURCHMESSER, Suchmodus
 from opencivil.core.einheiten import MM
@@ -459,13 +459,12 @@ def kurzform_liste(protokoll: Protokoll, ziele: Sequence[str]) -> List[dict]:
 
 
 def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
-                 spannungsanalysen: Optional[dict] = None,
-                 normalkraefte: Optional[Mapping[str, float]] = None) -> dict:
+                 spannungsanalysen: Optional[dict] = None) -> dict:
     """
     Vollstaendige Abbildung eines Rechenlaufs. ``spannungsanalysen`` sind die
     Zeichendaten der Analysen, wo der Aufrufer sie schon hat -- aus dem
     Zwischenspeicher (:func:`opencivil.web.dienst.rechnen`); sonst werden sie
-    hier gerechnet. ``normalkraefte`` je M-V-Kurve die gewaehlte, in kN.
+    hier gerechnet.
     """
     ergebnis: Dict[str, Any] = {
         "werte": {wid: wert_dict(w) for wid, w in loesung.werte.items()},
@@ -525,7 +524,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
     if aufbau is not None:
         ergebnis["linien"] = diagrammdaten.linien(aufbau, loesung)
         ergebnis["werkstoffgesetze"] = diagrammdaten.werkstoffgesetze(aufbau, loesung)
-        ergebnis["querkraftkurven"] = diagrammdaten.querkraftkurven(aufbau, loesung, normalkraefte)
+        ergebnis["querkraftkurven"] = diagrammdaten.querkraftkurven(aufbau, loesung)
         ergebnis["neigungskurven"] = diagrammdaten.neigungskurven(aufbau, loesung)
         ergebnis["spannungsanalysen"] = (
             spannungsanalysen if spannungsanalysen is not None

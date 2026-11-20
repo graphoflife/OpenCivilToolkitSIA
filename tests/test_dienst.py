@@ -43,44 +43,45 @@ class TestDienst(unittest.TestCase):
         self.assertEqual(antwort.status, 400)
         self.assertIn("gibt.es.nicht", antwort.daten["fehler"])
 
-    def mit_querkraft(self):
+    def mit_querkraft(self, normalkraft=None):
         projekt = Projekt.beispiel()
         for k in projekt.querschnitt("q1").kombinationen:
             k.V_Ed = 120.0
+        projekt.querschnitt("q1").querkraftkurve_normalkraft = normalkraft
         return {"projekt": projekt.als_dict()}
 
+    def kurven(self, rumpf):
+        antwort = dienst.bearbeite("rechnen", rumpf)
+        self.assertEqual(antwort.status, 200, antwort.daten.get("fehler"))
+        return antwort.daten["querkraftkurven"]
+
     def test_querkraftkurven_ohne_angabe(self):
-        """Ohne gewählte Normalkraft gilt die des ersten Falls der Richtung."""
-        antwort = dienst.bearbeite("querkraftkurven", self.mit_querkraft())
-        kurven = antwort.daten["querkraftkurven"]
-        self.assertEqual(sorted(kurven), ["q1.x"])
+        """Ohne gewählte Normalkraft gilt die des ersten Falls der Richtung -- und das steht da."""
+        kurven = self.kurven(self.mit_querkraft())
+        self.assertEqual(sorted(kurven), ["q1.x"])   # in y wird nichts geführt
         self.assertEqual(kurven["q1.x"]["N_Ed"], 0.0)
         self.assertEqual(len(kurven["q1.x"]["aeste"]), 2)
+        self.assertIn("Leer: die des ersten Falls", kurven["q1.x"]["hinweis"])
 
-    def test_querkraftkurven_mit_gewaehlter_normalkraft(self):
-        rumpf = {**self.mit_querkraft(), "n_ed": {"q1.x": -300.0}}
-        kurven = dienst.bearbeite("querkraftkurven", rumpf).daten["querkraftkurven"]
-        self.assertEqual(kurven["q1.x"]["N_Ed"], -300.0)
-        self.assertEqual(sorted(kurven), ["q1.x"])   # in y wird nichts geführt
+    def test_die_normalkraft_steht_an_der_platte(self):
+        """
+        Gespeichert mit dem Projekt: bis 2026-11-20 lebte sie neben ihm, und
+        nach dem Neuladen galt still wieder die des ersten Falls.
+        """
+        rumpf = self.mit_querkraft(-300.0)
+        geladen = Projekt.aus_dict(rumpf["projekt"])
+        self.assertEqual(geladen.querschnitt("q1").querkraftkurve_normalkraft, -300.0)
+        kurve = self.kurven({"projekt": geladen.als_dict()})["q1.x"]
+        self.assertEqual(kurve["N_Ed"], -300.0)
+        self.assertEqual(kurve["hinweis"], "Blass: Punkte mit anderem N.")
 
     def test_eine_normalkraft_die_keine_zahl_ist(self):
-        """
-        Kam als roher ValueError mit Status 500 beim Benutzer an. Die Anfrage
-        stammt zwar aus der eigenen Oberfläche, aber das ist keine
-        Zusicherung -- sie steht offen im Netz.
-        """
-        rumpf = {**self.mit_querkraft(), "n_ed": {"q1.x": "viel"}}
-        antwort = dienst.bearbeite("querkraftkurven", rumpf)
+        """Das Projekt weist sie ab, mit Namen und Zahl -- kein Absturz."""
+        rumpf = self.mit_querkraft()
+        rumpf["projekt"]["querschnitte"][0]["querkraftkurve_normalkraft"] = "viel"
+        antwort = dienst.bearbeite("rechnen", rumpf)
         self.assertEqual(antwort.status, 400)
-        self.assertIn("q1.x", antwort.daten["fehler"])
         self.assertIn("viel", antwort.daten["fehler"])
-
-    def test_leere_normalkraft_faellt_auf_die_vorgabe_zurueck(self):
-        for wert in (None, ""):
-            rumpf = {**self.mit_querkraft(), "n_ed": {"q1.x": wert}}
-            antwort = dienst.bearbeite("querkraftkurven", rumpf)
-            self.assertEqual(antwort.status, 200)
-            self.assertEqual(antwort.daten["querkraftkurven"]["q1.x"]["N_Ed"], 0.0)
 
     def test_unbekannte_anfrage(self):
         antwort = dienst.bearbeite("gibtesnicht", {})

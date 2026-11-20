@@ -37,7 +37,7 @@ def bauen(art: "Bauteilart", eintrag: SetzungEintrag, aufbau: Aufbau) -> Bauteil
                    for s in eintrag.schichten],
         praefix=f"{art.raum}.{eintrag.kennung}")
     fundament.ins_rechenwerk(aufbau.werk)
-    teil = Bauteil(eintrag.kennung, eintrag.name, art, fundament)
+    teil = Bauteil(eintrag, art, fundament)
     if eintrag.schichten:
         aufbau.eintragen(teil, "setzung", eintrag.kennung, Setzung(fundament))
     else:

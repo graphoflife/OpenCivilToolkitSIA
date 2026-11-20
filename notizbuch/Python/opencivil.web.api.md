@@ -1,5 +1,5 @@
 ---
-erzeugt: 29c9acde86c9
+erzeugt: 2c12a8199f92
 art: modul
 tags: [modul]
 ---
@@ -92,13 +92,13 @@ Zeilen als Gleichungen, wie die Herleitung sie bekommt.
 ### loesung_dict
 
 ```python
-def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau]=None, *, spannungsanalysen: Optional[dict]=None, normalkraefte: Optional[Mapping[str, float]]=None) -> dict
+def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau]=None, *, spannungsanalysen: Optional[dict]=None) -> dict
 ```
 
 Vollstaendige Abbildung eines Rechenlaufs. `spannungsanalysen` sind die
 Zeichendaten der Analysen, wo der Aufrufer sie schon hat -- aus dem
 Zwischenspeicher ([[opencivil.web.dienst#rechnen|opencivil.web.dienst.rechnen]]); sonst werden sie
-hier gerechnet. `normalkraefte` je M-V-Kurve die gewaehlte, in kN.
+hier gerechnet.
 
 ### zusammenfassungen
 

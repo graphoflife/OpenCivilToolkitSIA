@@ -66,7 +66,7 @@ def bauen(art: "Bauteilart", eintrag: PfahlEintrag, aufbau: Aufbau) -> Optional[
         d_a=g("d_a"), t_r=g("t_r"), dt=g("dt"), kopf=eintrag.kopf, t_red=g("t_red"),
         eta_tr=g("eta_tr"))
     pfahl.ins_rechenwerk(aufbau.werk)
-    teil = Bauteil(eintrag.kennung, eintrag.name, art, pfahl)
+    teil = Bauteil(eintrag, art, pfahl)
     kombinationen = [Kombination(name=k.name, **{n: als_groesse(k, n)
                                                  for n in ("N_Ed", "H_Ed", "M_Ed")})
                      for k in eintrag.kombinationen if k.aktiv]

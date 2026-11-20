@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from typing import Any, List, Optional
 
 from opencivil.bewehrungssuche.laengs import Suchmodus
-from opencivil.core.einheiten import MM
+from opencivil.core.einheiten import KN, MM
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.projekt.eintraege import (
@@ -60,6 +60,15 @@ class QuerschnittEintrag(Querschnittsangaben):
     querkraftbewehrung: QuerkraftbewehrungEintrag = field(
         default_factory=QuerkraftbewehrungEintrag)
     """Bügel; ohne Durchmesser heisst: keine."""
+
+    querkraftkurve_normalkraft: Optional[float] = bereich(
+        None, heisst="Normalkraft der M-V-Kurve", einheit=KN)
+    """
+    Fuer welche Normalkraft das Bild «Querkraft ueber Moment» gilt, in kN,
+    Zug positiv -- leer: die des ersten Falls. Nur das Bild liest sie, kein
+    Nachweis. Bis 2026-11-20 lebte sie in der Oberflaeche neben dem Projekt
+    und sprang nach dem Neuladen still auf die Vorgabe zurueck.
+    """
 
     haeufig: Gebrauchsliste = field(
         default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))

@@ -15,7 +15,7 @@ kNm und mm umgesetzt.
 from __future__ import annotations
 
 import math
-from typing import Any, Callable, Collection, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, Collection, Dict, List, Optional, Sequence, Tuple
 
 from opencivil import spannungsanalyse
 from opencivil.core.wert import grad_als_text
@@ -45,9 +45,7 @@ def linien(aufbau: Aufbau, loesung: Loesung) -> dict:
     }
 
 
-def querkraftkurven(
-    aufbau: Aufbau, loesung: Loesung, gewaehlt: Optional[Mapping[str, float]] = None
-) -> dict:
+def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict:
     """
     Der Querkraftwiderstand ueber dem Moment -- eine Kurve je Tragrichtung.
 
@@ -60,13 +58,13 @@ def querkraftkurven(
     sie, gibt es kein ``d`` -- und ohne ``d`` keinen Widerstand.
 
     ``v_Rd`` haengt ueber ``m_Rd(N_Ed)`` von der Normalkraft ab. Welche gilt,
-    waehlt der Benutzer unter dem Diagramm; ``gewaehlt`` bildet die Kennung auf
-    diese Normalkraft in kN ab. Ohne Angabe gilt die des ersten Falls dieser
-    Richtung -- dann liegen dessen Punkte auf der Kurve.
+    waehlt der Benutzer unter dem Diagramm, und sie steht an der Platte
+    (``querkraftkurve_normalkraft``). Ohne Angabe gilt die des ersten Falls
+    dieser Richtung -- dann liegen dessen Punkte auf der Kurve --, ohne Fall
+    null; was gilt, sagt ``hinweis`` unter dem Feld.
 
     Einheiten wie in den anderen Diagrammen: kNm und kN/m.
     """
-    gewaehlt = gewaehlt or {}
     kurven: Dict[str, Any] = {}
 
     for kennung, nachweis in aufbau.feld("querkraft").items():
@@ -78,11 +76,14 @@ def querkraftkurven(
             continue
         teil = aufbau.bauteil_von(nachweis)
 
-        n_ed = gewaehlt.get(kennung)
-        if n_ed is None:
-            # Die Normalkraft des ersten Falls -- ohne Fall N = 0.
-            n_ed = (befund.ergebnisse[0].fall.N_Ed.in_einheit(KN)
-                    if befund.ergebnisse else 0.0)
+        gewaehlt = teil.eintrag.querkraftkurve_normalkraft
+        erster = befund.ergebnisse[0].fall if befund.ergebnisse else None
+        if gewaehlt is not None:
+            n_ed, woher = gewaehlt, ""
+        elif erster is not None:
+            n_ed, woher = erster.N_Ed.in_einheit(KN), f"Leer: die des ersten Falls, «{erster.name}»."
+        else:
+            n_ed, woher = 0.0, "Leer: ohne Fall N = 0."
         kurve = befund.kurve(si(n_ed, KN))
 
         kurven[kennung] = {
@@ -91,6 +92,8 @@ def querkraftkurven(
             "name": teil.name,
             "richtung": nachweis.richtung.value,
             "N_Ed": n_ed,
+            "hinweis": " ".join(t for t in (
+                woher, "Blass: Punkte mit anderem N." if erster is not None else "") if t),
             # Wie der Momentenwiderstand heisst: m_Rd, oder m_Rk, wenn die
             # Tragsicherheit mit charakteristischen Werten rechnet.
             "m_name": f"m_{nachweis.mn.wahl.index}",

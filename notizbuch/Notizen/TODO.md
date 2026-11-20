@@ -313,7 +313,8 @@ Maske, 5 mit der Querschnittsanalyse in der Durchsicht der Fenster; 3 und
 4 sind der grosse Umbau. Entschieden (Benutzer, 2026-11-19): alles, in der
 empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
 
-- [ ] **1. Zahl und Herleitung aus getrennten Rechnungen.** Wo eine Zahl
+- [x] **1. Zahl und Herleitung aus getrennten Rechnungen.** Erledigt
+      (2026-11-20), alle fünf Stellen. Wo eine Zahl
       stumm gerechnet und daneben für die Herleitung ein zweites Mal
       zusammengestellt wird, kann der Bericht eine Rechnung zeigen, mit der
       nicht gerechnet ist.
@@ -443,14 +444,11 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Erledigt (2026-11-20): `nurStriche` wirkt; ohne `plt.grid()` steht
         kein Gitter, nur Striche am Rand, wie bei matplotlib.
 - [ ] **7. Aus der Arbeit vom 2026-11-19.**
-      - Die Normalkraft der M-V-Kurve hat zwei Wege in den Kern -- `n_ed`
-        bei jedem Rechnen und die eigene Anfrage `querkraftkurven`, die das
-        ganze Projekt neu baut -- und lebt neben dem Projekt
-        (`zustand.kurvenNormalkraft`): nach dem Neuladen springt sie still
-        auf die des ersten Falls zurück. Umbau: ein Feld am Eintrag,
-        gespeichert mit dem Projekt; weg fallen `n_ed`, die Anfrage
-        `querkraftkurven`, `_normalkraefte`, `kurvenNormalkraft` und der
-        Wächter gegen überholte Antworten.
+      - Erledigt (2026-11-20): die Normalkraft der M-V-Kurve ist ein Feld
+        der Platte, `querkraftkurve_normalkraft`, gespeichert mit dem
+        Projekt; das Bild liest es über `Bauteil.eintrag`. Weg sind `n_ed`,
+        die Anfrage `querkraftkurven`, `_normalkraefte`,
+        `kurvenNormalkraft` und der Wächter gegen überholte Antworten.
       - «Unfertig» entsteht auf zwei Wegen: drei Baufunktionen geben
         `aufbau.unfertig(…)` zurück, sonst fängt `aufbauen` einen
         `ProjektFehler`. Darum sind drei von neun Baufunktionen `Optional`,

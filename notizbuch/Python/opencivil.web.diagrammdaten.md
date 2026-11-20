@@ -1,5 +1,5 @@
 ---
-erzeugt: 7bd05d9f797d
+erzeugt: e831fe55fc3e
 art: modul
 tags: [modul]
 ---
@@ -33,7 +33,7 @@ dem Schluessel lesen muss.
 ### querkraftkurven
 
 ```python
-def querkraftkurven(aufbau: Aufbau, loesung: Loesung, gewaehlt: Optional[Mapping[str, float]]=None) -> dict
+def querkraftkurven(aufbau: Aufbau, loesung: Loesung) -> dict
 ```
 
 Der Querkraftwiderstand ueber dem Moment -- eine Kurve je Tragrichtung.
@@ -47,9 +47,10 @@ Einen Ast gibt es nur, wo auf der gezogenen Seite Bewehrung liegt. Fehlt
 sie, gibt es kein `d` -- und ohne `d` keinen Widerstand.
 
 `v_Rd` haengt ueber `m_Rd(N_Ed)` von der Normalkraft ab. Welche gilt,
-waehlt der Benutzer unter dem Diagramm; `gewaehlt` bildet die Kennung auf
-diese Normalkraft in kN ab. Ohne Angabe gilt die des ersten Falls dieser
-Richtung -- dann liegen dessen Punkte auf der Kurve.
+waehlt der Benutzer unter dem Diagramm, und sie steht an der Platte
+(`querkraftkurve_normalkraft`). Ohne Angabe gilt die des ersten Falls
+dieser Richtung -- dann liegen dessen Punkte auf der Kurve --, ohne Fall
+null; was gilt, sagt `hinweis` unter dem Feld.
 
 Einheiten wie in den anderen Diagrammen: kNm und kN/m.
 
