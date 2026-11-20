@@ -19,6 +19,8 @@ const NULLLINIE = '#b8c0cc';
 const TEILUNG = '#5c6773';
 const TITEL = '#1a1f27';
 const RAHMEN = '#8895a8';
+/** Wie weit ein Strich der Teilung ohne Gitter aus dem Rahmen ragt. */
+const STRICH = 4;
 
 /** Sucht einen runden Schrittabstand für die Achsenteilung. */
 export function schrittweite(spanne, zielAnzahl = 8) {
@@ -115,9 +117,10 @@ export function formelText(knoten, inhalt) {
  *   - `bereich: [a, b]` -- a liegt links bzw. unten. Umgekehrt angegeben läuft
  *     die Achse andersherum, etwa die Höhe eines Schnitts nach unten.
  *   - `teilung` -- Gitter mit beschrifteten Strichen: `{ziel, schritt,
- *     format}`. `schritt` fest, sonst ein runder aus `ziel` Strichen; ohne
- *     `format` mit so vielen Nachkommastellen, wie der Schritt verlangt. Ohne
- *     `teilung` kein Gitter.
+ *     format, nurStriche}`. `schritt` fest, sonst ein runder aus `ziel`
+ *     Strichen; ohne `format` mit so vielen Nachkommastellen, wie der Schritt
+ *     verlangt. Mit `nurStriche` keine Linien über das Feld, nur kurze
+ *     Striche am Rand. Ohne `teilung` weder Gitter noch Striche.
  *   - `null` -- die Nulllinie betonen, sofern sie im Bereich liegt
  *   - `titel` -- der Achsentitel
  * @param {object} [o.attribute]  Attribute des svg-Elements
@@ -155,12 +158,17 @@ export function achsenkreuz({
   if (xAchse.teilung || yAchse.teilung) {
     const gitter = svgEl('g');
     const format = (achse) => achse.teilung.format || schriftDerTeilung(achse.bereich, achse.teilung);
+    // Je Strich der Teilung eine Linie über das Feld -- oder, mit
+    // `nurStriche`, ein kurzer Strich aus dem Rahmen. Bis 2026-11-20 las das
+    // hier niemand, und `plt.grid(False)` liess das Gitter stehen.
+    const linie = (achse, ganz, kurz) => svgEl('line', achse.teilung.nurStriche
+      ? { ...kurz, stroke: RAHMEN, 'stroke-width': 1 }
+      : { ...ganz, stroke: GITTER, 'stroke-width': 1 });
     if (xAchse.teilung) {
       for (const v of striche(xAchse.bereich, xAchse.teilung)) {
-        gitter.append(svgEl('line', {
-          x1: x(v), y1: feld.oben, x2: x(v), y2: feld.unten,
-          stroke: GITTER, 'stroke-width': 1,
-        }));
+        gitter.append(linie(xAchse,
+          { x1: x(v), y1: feld.oben, x2: x(v), y2: feld.unten },
+          { x1: x(v), y1: feld.unten, x2: x(v), y2: feld.unten + STRICH }));
         gitter.append(text(format(xAchse)(v), {
           x: x(v), y: feld.unten + schrift.teilung + 5, 'text-anchor': 'middle',
           'font-size': schrift.teilung, fill: TEILUNG,
@@ -169,10 +177,9 @@ export function achsenkreuz({
     }
     if (yAchse.teilung) {
       for (const v of striche(yAchse.bereich, yAchse.teilung)) {
-        gitter.append(svgEl('line', {
-          x1: feld.links, y1: y(v), x2: feld.rechts, y2: y(v),
-          stroke: GITTER, 'stroke-width': 1,
-        }));
+        gitter.append(linie(yAchse,
+          { x1: feld.links, y1: y(v), x2: feld.rechts, y2: y(v) },
+          { x1: feld.links - STRICH, y1: y(v), x2: feld.links, y2: y(v) }));
         gitter.append(text(format(yAchse)(v), {
           x: feld.links - 8, y: y(v) + 4, 'text-anchor': 'end',
           'font-size': schrift.teilung, fill: TEILUNG,

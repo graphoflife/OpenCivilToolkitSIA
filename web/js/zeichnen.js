@@ -117,14 +117,19 @@ export function bildZeichnen(bild) {
   const yb = bereich(alleY, bild.ybereich, { mitNull: balken.length > 0 });
 
   const kategorien = bild.kategorien;
+  // Ohne `plt.grid()` kein Gitter, nur Striche am Rand -- wie bei matplotlib.
+  const nurStriche = !bild.gitter;
   const xTeilung = kategorien
-    ? { schritt: 1, format: (v) => kategorien[Math.round(v)] ?? '' }
-    : { ziel: 7, format: (v) => zahl(v, schrittweite(xb[1] - xb[0], 7)) };
+    ? { schritt: 1, format: (v) => kategorien[Math.round(v)] ?? '', nurStriche }
+    : { ziel: 7, format: (v) => zahl(v, schrittweite(xb[1] - xb[0], 7)), nurStriche };
   const { svg, daten, x, y, feld } = achsenkreuz({
     breite: BREITE, hoehe: HOEHE,
     rand: { oben: bild.titel ? 30 : 14, rechts: 16, unten: bild.xlabel ? 44 : 30, links: bild.ylabel ? 64 : 50 },
-    x: { bereich: xb, teilung: bild.gitter || kategorien ? xTeilung : { ...xTeilung, nurStriche: true }, null: true, titel: bild.xlabel },
-    y: { bereich: yb, teilung: { ziel: 6, format: (v) => zahl(v, schrittweite(yb[1] - yb[0], 6)) }, null: true, titel: bild.ylabel },
+    x: { bereich: xb, teilung: xTeilung, null: true, titel: bild.xlabel },
+    y: {
+      bereich: yb, teilung: { ziel: 6, format: (v) => zahl(v, schrittweite(yb[1] - yb[0], 6)), nurStriche },
+      null: true, titel: bild.ylabel,
+    },
     attribute: { class: 'py-bild-svg', role: 'img', 'aria-label': bild.titel || 'Diagramm' },
     rahmen: true,
   });

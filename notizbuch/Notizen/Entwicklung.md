@@ -7,6 +7,14 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · `plt.grid` wirkt
+
+Ein Bild aus der App «Python» bekam immer ein Gitter: `zeichnen.js` sagte
+dem Achsenkreuz «nur Striche», wenn kein `plt.grid()` gerufen war, aber das
+Achsenkreuz las es nie. Jetzt steht ohne `plt.grid()` kein Gitter über dem
+Feld, nur kurze Striche am Rand, auf beiden Achsen – wie bei matplotlib. Mit
+`plt.grid()` bleibt es, wie es war; die Vorlage eines neuen Skripts ruft es.
+
 ## 2026-11-20 · Wann gerechnet wird, steht an einer Stelle
 
 Jede Änderung trug einen «Anlass», einen freien Text wie 'diagramm' oder

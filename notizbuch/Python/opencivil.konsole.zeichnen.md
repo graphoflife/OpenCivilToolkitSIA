@@ -1,5 +1,5 @@
 ---
-erzeugt: f3448508f3f9
+erzeugt: 69d984e57254
 art: modul
 tags: [modul]
 ---
@@ -171,6 +171,8 @@ Zeigt die Legende -- mit den Namen aus `label=`.
 ```python
 def grid(sichtbar: bool=True, **_kwargs: Any) -> None
 ```
+
+Das Gitter über dem Feld -- ohne es stehen nur Striche am Rand, wie bei matplotlib.
 
 ### xlim
 

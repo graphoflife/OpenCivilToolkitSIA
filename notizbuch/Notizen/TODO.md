@@ -439,8 +439,8 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Erledigt (2026-11-20): kein «Anlass» mehr. Ob gerechnet wird, sagt
         `rechnet: false` in der Zeile der App (die Skripte); «nur die Mitte
         neu zeichnen» ist `mitteAendern`.
-      - `zeichnen.js` übergibt `nurStriche`, `achsen.js` liest es nie:
-        `plt.grid(False)` wirkt nicht.
+      - Erledigt (2026-11-20): `nurStriche` wirkt; ohne `plt.grid()` steht
+        kein Gitter, nur Striche am Rand, wie bei matplotlib.
 - [ ] **7. Aus der Arbeit vom 2026-11-19.**
       - Die Normalkraft der M-V-Kurve hat zwei Wege in den Kern -- `n_ed`
         bei jedem Rechnen und die eigene Anfrage `querkraftkurven`, die das

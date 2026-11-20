@@ -61,7 +61,7 @@
     "opencivil/konsole/dienst.py": "1a68f31af673",
     "opencivil/konsole/pakete.py": "b7e23832585b",
     "opencivil/konsole/sitzung.py": "7166900c5989",
-    "opencivil/konsole/zeichnen.py": "b3ce4ffd6df9",
+    "opencivil/konsole/zeichnen.py": "f59e8d11e7a7",
     "opencivil/material/__init__.py": "2ef8c34ddaa1",
     "opencivil/material/arten.py": "396705132c24",
     "opencivil/material/basis.py": "4867e301cb2c",

@@ -206,6 +206,7 @@ def legend(*_args: Any, **_kwargs: Any) -> None:
 
 
 def grid(sichtbar: bool = True, **_kwargs: Any) -> None:
+    """Das Gitter über dem Feld -- ohne es stehen nur Striche am Rand, wie bei matplotlib."""
     _aktuell.gitter = bool(sichtbar)
 
 
