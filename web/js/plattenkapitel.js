@@ -27,7 +27,7 @@ import { fehltHinweis, standOhne, zeilenstand } from './kapitel.js';
 import { xLagen } from './lagen.js';
 import { span } from './mathe.js';
 import {
-  analysenKapitel, anfuegenKnopf, nachweisKapitel, rechenwahlZeile,
+  analysenKapitel, anfuegenKnopf, kriechzahlName, nachweisKapitel, rechenwahlZeile,
 } from './nachweise.js';
 import { sinnbild } from './sinnbilder.js';
 import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
@@ -359,7 +359,7 @@ function verformungInhalt(querschnitt) {
   const { kriechzahl, faelle } = querschnitt.verformung;
   return [
     faelle.length ? fehltHinweis(ohneX(querschnitt)) : null,
-    feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
+    feld([kriechzahlName('verformung')], zahlfeld({
       wert: kriechzahl, schritt: 0.1, angabe: feldangabe('verformung', 'kriechzahl'),
       titel: 'Kriechzahl φ im Vergrösserungsfaktor ω_w',
       beiAenderung: (v) => aendern((l) => { l.kriechzahl = v; }),

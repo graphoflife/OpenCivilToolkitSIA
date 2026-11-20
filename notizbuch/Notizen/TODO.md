@@ -13,7 +13,7 @@ und in jeder App ausser Materialien; «Öffnen» ersetzt alles oder fügt hinzu;
 offline nach dem ersten Besuch; MCP mit Projektdateien; Erdbeben mit
 Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
-- [ ] Oberfläche: «Kriechzahl φ» überall gleich, φ als Formel; die rechte Spalte
+- [ ] Oberfläche: die rechte Spalte
       rötlich, solange sie nicht zur Eingabe passt; Neues heisst wie sein
       Knopf («Einwirkung 1», «Lastfall 1», «Schicht 1») -- die
       Standardfälle und die Gebrauchsfälle bleiben; ein eigenes Material im

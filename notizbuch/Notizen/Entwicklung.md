@@ -7,6 +7,21 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · «Kriechzahl φ» heisst überall gleich
+
+Die Kriechzahl stand an vier Stellen dreimal anders da: über dem Feld der
+Rechenwahl ein φ allein, bei der Zwängung auf Biegung ein φ in anderer
+Schrift, nur bei der Verformung «Kriechzahl φ». Der Benutzer will überall
+dasselbe und das φ schöner (2026-11-20).
+
+Jetzt steht überall «Kriechzahl φ», wie der Kern das Feld nennt
+(`feldangabe(...).heisst`) -- `kriechzahlName` in `nachweise.js`. Das φ
+setzt `mitFormelzeichen` (`mathe.js`) in die Formelschrift, so gross wie in
+einer gesetzten Formel, und klein, wo ein Spaltenkopf gross schreibt. Die
+Spalte der Kriechzahl in der Rechenwahl ist dafür so breit wie ein
+Zahlenfeld (`--zahlbreite`): «KRIECHZAHL φ» braucht 63 px, vorher hatte
+sie rund 60. `mitKopf` nimmt statt `formel` einen Knoten als Kopf.
+
 ## 2026-11-20 · Eine feine Linie trennt die Fälle einer Liste
 
 Ein Fall mit Zahlen unter dem Namen ist zwei oder drei Zeilen hoch; in einer

@@ -674,6 +674,7 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 /* Ein Formelzeichen mit seinem Feld in einer Zeile: «φ [2.0]». Kursiv aus
    der Formelschrift -- in JetBrains Mono gleichen manche Zeichen anderen. */
 .zeilenfeld { display: inline-flex; align-items: center; gap: 5px; }
+.zeilenfeld-name { font-size: 11.5px; color: var(--schrift-matt); white-space: nowrap; }
 .zeichen { font: italic 14px/1 KaTeX_Math, serif; color: var(--schrift-matt); }
 .duktilitaetszeile .postenname {
   font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
@@ -1315,25 +1316,29 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .ist-ohne-wirkung { opacity: .45; }
 
 /* Die Rechenwahl eines Kapitels: ein kleiner Titel, darunter φ, Werte und
-   Rechenart. φ so breit wie eine kurze Zahl; Werte und Rechenart sind
+   Rechenart. φ so breit wie ein Zahlenfeld -- sein Kopf, «Kriechzahl φ»,
+   braucht den Platz (bis 2026-11-20 stand dort φ allein, und die Spalte
+   war so breit wie eine kurze Zahl). Werte und Rechenart sind
    Schalter und stehen untereinander -- nebeneinander fänden «Bemessung |
    charakteristisch» und vier Rechenarten keinen Platz. Die Rechenart nimmt
    die ganze Breite, unter φ hindurch: mit ihren Bildern braucht sie sie. */
 .rechenwahl {
   display: grid; gap: 1px 6px; align-items: end; margin: 2px 0 8px;
-  grid-template-columns: calc(5ch + var(--pfeilspur) + 10px) minmax(0, 1fr);
+  grid-template-columns: var(--zahlbreite) minmax(0, 1fr);
 }
 .rechenwahl > :nth-child(4) { grid-column: 1 / -1; }
 .rechenwahl-titel {
   grid-column: 1 / -1; font-size: 11px; font-weight: 600; color: var(--schrift-matt);
 }
-.rechenwahl .spaltenkopf:not(.ist-formel) { text-align: left; }
+.rechenwahl .spaltenkopf { text-align: left; }
 /* Der Kopf steht über einem Schalter links, wie seine Stellungen -- über
    einer Zahl rechts. */
 .fall-unten .spaltenkopf { text-align: left; }
-/* Ein Formelzeichen als Kopf: gross geschrieben würde aus φ ein Φ. */
-.spaltenkopf.ist-formel {
-  text-transform: none; font: italic 12px/1 KaTeX_Math, serif;
+/* Ein Formelzeichen in einem Text, etwa «Kriechzahl φ»: in der Formelschrift
+   und so gross wie in einer gesetzten Formel (KaTeX: 1.21em), klein, wo der
+   Kopf gross schreibt -- sonst würde aus φ ein Φ. */
+.formelzeichen {
+  font: italic 1.21em/1 KaTeX_Math, serif; text-transform: none; letter-spacing: 0;
 }
 /* Ein Formelzeichen mit Einheit: das Zeichen gesetzt, die Einheit wie
    geschrieben -- «ε oben» wurde gross geschrieben zu «Ε OBEN». */

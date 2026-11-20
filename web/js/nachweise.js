@@ -27,6 +27,7 @@ import { fallkopf, fallzeile, formelkopf } from './faelle.js';
 import {
   eingeschaltet, fehltHinweis, gebrauchsstand, schalter, standOhne, zeilenstand,
 } from './kapitel.js';
+import { mitFormelzeichen } from './mathe.js';
 import { ausVorlage, eintragAendern, feldangabe, katalog, naechsterName } from './zustand.js';
 
 // ===========================================================================
@@ -341,7 +342,7 @@ function zwangInhalt(eintrag, ort) {
     schalterZeile(eintrag, ort, {
       feld: 'zwaengung_biegung', name: 'Zwängung auf Biegung', was: 'Zwängung',
       zusatz: el('span.zeilenfeld', {}, [
-        el('span.zeichen', { text: 'φ' }),
+        el('span.zeilenfeld-name', {}, [kriechzahlName(ort.klasse, 'zwaengung_biegung_kriechzahl')]),
         zahlfeld({
           wert: eintrag.zwaengung_biegung_kriechzahl ?? 0, schritt: 0.1, leer: 0,
           angabe: feldangabe(ort.klasse, 'zwaengung_biegung_kriechzahl'),
@@ -504,11 +505,22 @@ function analyseInhalt(eintrag, art, ort) {
  * Ein Feld mit seiner Beschriftung darüber -- eine Formel bleibt klein
  * geschrieben, ein Formelzeichen mit Einheit (`['N_{Ed}', 'kN']`) gesetzt.
  */
-export function mitKopf(kopf, eingabe, formel = false) {
-  const zelle = Array.isArray(kopf)
-    ? el('span.spaltenkopf.mit-zeichen', {}, [formelkopf(...kopf)])
-    : el('span.spaltenkopf', { text: kopf, class: formel ? 'ist-formel' : '' });
+export function mitKopf(kopf, eingabe) {
+  let zelle;
+  if (Array.isArray(kopf)) zelle = el('span.spaltenkopf.mit-zeichen', {}, [formelkopf(...kopf)]);
+  else if (kopf instanceof Node) zelle = el('span.spaltenkopf', {}, [kopf]);
+  else zelle = el('span.spaltenkopf', { text: kopf });
   return el('div.mit-kopf', {}, [zelle, eingabe]);
+}
+
+/**
+ * Die Kriechzahl, überall gleich: «Kriechzahl φ», wie der Kern das Feld
+ * nennt, φ in der Formelschrift (Benutzer, 2026-11-20). Bis dahin stand hier
+ * ein φ allein, bei der Zwängung auf Biegung ein φ in anderer Schrift und
+ * nur bei der Verformung das Wort.
+ */
+export function kriechzahlName(klasse, feldname = 'kriechzahl') {
+  return mitFormelzeichen(feldangabe(klasse, feldname).heisst);
 }
 
 /**
@@ -541,13 +553,13 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
   const art = liste.find((a) => a.wert === ziel.rechenart);
   // Im Schalter stehen die kurzen Namen, der lange im Titel der Stellung.
   const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung }));
-  const phi = mitKopf('φ', zahlfeld({
+  const phi = mitKopf(kriechzahlName('rechenwahl'), zahlfeld({
     wert: ziel.kriechzahl ?? 0, schritt: 0.1, leer: 0, angabe: feldangabe('rechenwahl', 'kriechzahl'),
     titel: phiImmer
       ? 'Kriechzahl φ – wirkt auf den ungerissenen Teil, präzise auch auf den gerissenen'
       : 'Kriechzahl φ – wirkt präzise und elastisch',
     beiAenderung: (v) => aendern((x) => { x.kriechzahl = v; }),
-  }), true);
+  }));
   if (art && !art.mit_kriechzahl && !phiImmer) phi.classList.add('ist-ohne-wirkung');
   return [
     phi,

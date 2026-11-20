@@ -50,6 +50,28 @@ export function span(latex, { displayMode = false } = {}) {
 }
 
 /**
+ * Ein Text mit Formelzeichen, wie der Kern ein Feld nennt: «Kriechzahl φ».
+ * Die griechischen Buchstaben stehen in der Formelschrift, wie in jeder
+ * Formel, und bleiben klein, wo ein Kopf gross schreibt -- aus φ würde Φ
+ * (Benutzer, 2026-11-20: «das φ schöner darstellen»).
+ */
+export function mitFormelzeichen(text) {
+  const knoten = document.createElement('span');
+  for (const teil of String(text).split(/([\u0370-\u03ff]+)/u)) {
+    if (!teil) continue;
+    if (!/[\u0370-\u03ff]/u.test(teil)) {
+      knoten.append(teil);
+      continue;
+    }
+    const zeichen = document.createElement('span');
+    zeichen.className = 'formelzeichen';
+    zeichen.textContent = teil;
+    knoten.append(zeichen);
+  }
+  return knoten;
+}
+
+/**
  * Das reine MathML einer Formel, oder null wenn KaTeX es nicht liefert.
  * `abgesetzt` wie eine Gleichung für sich; in einer Tabellenzelle nicht.
  */
