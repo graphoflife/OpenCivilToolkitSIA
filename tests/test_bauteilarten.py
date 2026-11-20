@@ -57,22 +57,34 @@ class TestVertraege(unittest.TestCase):
 
 
 class TestSinnbilder(unittest.TestCase):
-    """Jedes Zeichen, das die Oberflaeche nennt, gibt es in sinnbilder.js -- sonst bliebe der Knopf leer."""
+    """
+    Jedes Zeichen, das die Oberflaeche nennt, gibt es in sinnbilder.js --
+    sonst meldete `sinnbild` einen Fehler, wo der Knopf stehen sollte.
+    """
 
     @classmethod
     def setUpClass(cls):
         quelltext = (JS / "sinnbilder.js").read_text(encoding="utf-8")
         tabelle = quelltext[quelltext.index("const ZEICHEN = {"):]
         tabelle = tabelle[:tabelle.index("\n};\n")]
-        cls.vorhanden = set(re.findall(r"^  '?([a-z_-]+)'?: \{", tabelle, flags=re.M))
+        cls.vorhanden = set(re.findall(r"^  '?([a-z0-9_-]+)'?: \{", tabelle, flags=re.M))
 
     def test_jedes_genannte_zeichen_gibt_es(self):
+        """
+        Genannt als `zeichen: '…'`, als `sinnbild('…')`, als Knopf des
+        Zeichenfensters -- und als Kapitel, das heisst wie sein Zeichen
+        (kapitel.js): die Einträge mit `stand`.
+        """
         vorhanden = self.vorhanden
+        muster = (r"zeichen: '([a-z0-9_-]+)'", r"sinnbild\('([a-z0-9_-]+)'\)",
+                  r"\bknopf\('([a-z0-9_-]+)'",
+                  r"schluessel: '([a-z0-9_]+)'(?:(?!schluessel:)[\s\S])*?\bstand:")
         genannt = {(pfad.name, m.group(1))
                    for pfad in JS.glob("*.js")
-                   for muster in (r"zeichen: '([a-z_-]+)'", r"sinnbild\('([a-z_-]+)'\)")
-                   for m in re.finditer(muster, pfad.read_text(encoding="utf-8"))}
+                   for form in muster
+                   for m in re.finditer(form, pfad.read_text(encoding="utf-8"))}
         self.assertGreater(len(genannt), 10)
+        self.assertIn(("decke.js", "ergebnisse"), genannt)
         for datei, zeichen in sorted(genannt):
             with self.subTest(datei=datei, zeichen=zeichen):
                 self.assertIn(zeichen, vorhanden)

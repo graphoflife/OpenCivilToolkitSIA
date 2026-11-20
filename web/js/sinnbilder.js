@@ -179,6 +179,12 @@ const ZEICHEN = {
     pfade: ['M3.5 3.5h17v17h-17z'],
     strich: ['M9 3.5v17 M15 3.5v17 M3.5 9h17 M3.5 15h17'],
   },
+  // Die Ergebnisse: die Platte, gestrichelt ein Schnitt durch sie und
+  // darüber der Verlauf längs ihm -- wie beim Werkzeug, das ihn zeichnet.
+  ergebnisse: {
+    pfade: ['M3.5 3.5h17v17h-17z', 'M3.5 16C7 5 17 5 20.5 16'],
+    strich: ['M3.5 16h17'],
+  },
 
   // -- Die Werkzeuge des Zeichenfensters -----------------------------------
 
@@ -441,21 +447,26 @@ const ZEICHEN = {
   },
 };
 
-/** Ein Zeichen als SVG -- `name` aus der Liste oben. */
+/**
+ * Ein Zeichen als SVG -- `name` aus der Liste oben. Einen unbekannten Namen
+ * meldet es laut: bis 2026-11-20 stand dann ein leerer Knopf da, und keiner
+ * merkte es (die Kachel «Ergebnisse» der Decke).
+ */
 export function sinnbild(name) {
   const z = ZEICHEN[name];
+  if (!z) throw new Error(`sinnbilder.js: kein Zeichen «${name}».`);
   const svg = svgEl('svg', {
     viewBox: '0 0 24 24', class: 'sinnbild', 'aria-hidden': 'true',
     fill: 'none', stroke: 'currentColor', 'stroke-width': 1.6,
     'stroke-linecap': 'round', 'stroke-linejoin': 'round',
   });
-  for (const d of z?.pfade || []) svg.append(svgEl('path', { d }));
-  for (const d of z?.strich || []) svg.append(svgEl('path', { d, 'stroke-dasharray': '2 2' }));
-  for (const [cx, cy, r] of z?.kreise || []) svg.append(svgEl('circle', { cx, cy, r }));
-  for (const [cx, cy, r] of z?.voll || []) {
+  for (const d of z.pfade || []) svg.append(svgEl('path', { d }));
+  for (const d of z.strich || []) svg.append(svgEl('path', { d, 'stroke-dasharray': '2 2' }));
+  for (const [cx, cy, r] of z.kreise || []) svg.append(svgEl('circle', { cx, cy, r }));
+  for (const [cx, cy, r] of z.voll || []) {
     svg.append(svgEl('circle', { cx, cy, r, fill: 'currentColor', stroke: 'none' }));
   }
-  for (const d of z?.flaechen || []) {
+  for (const d of z.flaechen || []) {
     svg.append(svgEl('path', { d, fill: 'currentColor', 'fill-rule': 'evenodd' }));
   }
   return svg;

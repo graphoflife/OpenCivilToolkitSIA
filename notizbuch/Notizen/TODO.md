@@ -427,10 +427,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       aus `[titel, zeilen]`; die Decke (`FELDER`, `feldzeile`) ist die
       Zielform. Gehört zur offenen Grundlage der Apps mit Zeichenfenster.
 - [ ] **6. Still leer statt laut.**
-      - `sinnbild` zeichnet für einen unbekannten Namen ein leeres Bild:
-        heute sind die Kachel «Ergebnisse» der Decke und ihr Fensterkopf
-        leer, und der Test findet nur zwei Schreibweisen. Umbau: werfen wie
-        `katalog()`.
+      - Erledigt (2026-11-20): `sinnbild` wirft für einen unbekannten
+        Namen; «Ergebnisse» der Decke hat sein Bild, und der Test findet
+        auch die Kapitel und die Knöpfe des Zeichenfensters.
       - Wo «⇒ erfüllt» steht, entscheiden zwei Schalter mit
         entgegengesetzter Vorgabe (`Vergleich.zeile` False,
         `tex.vergleich`/`tex.bedingung` True; 28 Aufrufe setzen ihn). In der

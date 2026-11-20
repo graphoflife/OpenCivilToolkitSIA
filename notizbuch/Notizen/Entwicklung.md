@@ -7,6 +7,17 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Ein fehlendes Bild meldet sich
+
+`sinnbild` zeichnete für einen Namen, den es nicht kennt, ein leeres Bild.
+So standen die Kachel «Ergebnisse» der Decke und der Kopf ihres Fensters
+ohne Bild da, und kein Test merkte es: er suchte die Namen nur in zwei
+Schreibweisen, und ein Kapitel heisst wie sein Bild, ohne es zu nennen.
+Jetzt wirft `sinnbild` wie der Katalog, «Ergebnisse» zeigt die Platte mit
+einem Schnitt und dem Verlauf längs ihm, und der Test findet auch die
+Kapitel und die Knöpfe des Zeichenfensters – und Namen mit Ziffern wie
+`balkensystem3d`.
+
 ## 2026-11-20 · Durchstanzen: k_e nach einer Regel
 
 Ob k_e aus der Näherung (4.3.6.2.5) oder aus (57) kommt, entschied das
