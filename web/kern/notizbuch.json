@@ -4347,6 +4347,22 @@
       ]
     },
     {
+      "name": "opencivil.core.vorgaben",
+      "pfad": "Python/opencivil.core.vorgaben.md",
+      "art": "modul",
+      "kurz": "die Zahlen, die ein Nachweis aus seiner Beschreibung liest.",
+      "stichworte": [
+        "mit_index",
+        "Feld",
+        "Feld.vorgabe",
+        "Feld.nummeriert",
+        "Feld.als_dict",
+        "Gruppe",
+        "Gruppe.fuer",
+        "Gruppe.als_dict"
+      ]
+    },
+    {
       "name": "opencivil.core.wahl",
       "pfad": "Python/opencivil.core.wahl.md",
       "art": "modul",
@@ -5000,6 +5016,7 @@
       "art": "modul",
       "kurz": "ein Flachfundament auf seinem Baugrund.",
       "stichworte": [
+        "_boden",
         "Fundament",
         "Fundament.abschnitt",
         "Kombination",
@@ -8128,6 +8145,7 @@
         "_rechenarten",
         "_vorlage",
         "_klassen",
+        "_vorgaben",
         "katalog",
         "obergrenzen",
         "wert_dict",

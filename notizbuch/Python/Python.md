@@ -1,5 +1,5 @@
 ---
-erzeugt: d9d1c0106957
+erzeugt: ca8250b3b4c8
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -30,6 +30,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.rechenobjekt]] – was ein Bauteil im Rechenwerk ist.
     - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
     - [[opencivil.core.suche]] – wo eine steigende Funktion null wird.
+    - [[opencivil.core.vorgaben]] – die Zahlen, die ein Nachweis aus seiner Beschreibung liest.
     - [[opencivil.core.wahl]] – was ein Wahlfeld annehmen kann.
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
 - [[opencivil.decke]] – Stahlbetondecken nach der Streifenmethode.

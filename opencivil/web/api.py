@@ -66,8 +66,10 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
+from opencivil.geotechnik import fundament
 from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.geotechnik.verhalten import Verhalten
+from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
 from opencivil.web import balkendaten, diagrammdaten, durchstanzdaten, systemkatalog
@@ -156,6 +158,17 @@ def _klassen() -> Dict[str, type]:
     return klassen
 
 
+def _vorgaben() -> Dict[str, List[dict]]:
+    """
+    Je Klasse von Eintraegen, unter ihrem Namen im Katalog, die Gruppen der
+    Vorgaben ihres Nachweises (:mod:`opencivil.core.vorgaben`) -- fuer jede
+    Stellung der Wahlen, nach denen sie sich richten, mit den Werten, die die
+    Beschreibung fuer diese Wahlen kennt.
+    """
+    return {katalogname(cls): [g.als_dict({n: wahl_von(cls, n) for n in g.nach}) for g in gruppen]
+            for cls, gruppen in ((GrundbruchEintrag, fundament.VORGABEN),)}
+
+
 def katalog() -> dict:
     """Alles, was die Oberflaeche zum Aufbau ihrer Auswahlfelder braucht."""
     return {
@@ -195,6 +208,11 @@ def katalog() -> dict:
         # «kombination».
         "felder": {name: feldangaben(cls) for name, cls in _klassen().items()},
         "vorlagen": {name: _vorlage(cls) for name, cls in _klassen().items()},
+        # Was ein Nachweis aus seinem Eintrag liest, in den Gruppen seiner
+        # Herleitung: die Karten seiner Maske, mit Zeichen, Beschriftung und
+        # Hinweis (:func:`_vorgaben`). Bis 2026-11-20 schrieben die Masken
+        # das ab.
+        "vorgaben": _vorgaben(),
         # Was ein neuer Eintrag einer Liste des Projekts mitbringt -- je
         # Bauteilart und das Skript der App «Python». Eine neue Art hat ihre
         # Vorlage damit von selbst.

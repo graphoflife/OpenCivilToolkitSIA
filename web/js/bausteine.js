@@ -232,6 +232,47 @@ export function zahlzeile(art, eintrag, schluessel, beschriftung, symbol, {
 }
 
 /**
+ * Die Karten einer Maske aus den Vorgaben des Kerns (`katalog.vorgaben`,
+ * opencivil/core/vorgaben.py): je Gruppe der Herleitung eine Karte mit
+ * ihrem Titel, je Feld eine Zeile -- die kurze Beschriftung mit dem
+ * Zeichen, darüber im Titel die Beschreibung, der Hinweis und die
+ * Normstelle. Welche Felder eine Gruppe hat, richtet sich nach den Wahlen
+ * des Eintrags, die sie nennt; `gelesen`, wo es eine solche Menge gibt,
+ * lässt nur die Felder stehen, die der Nachweis liest. `klasse` ist der
+ * Name der Klasse im Katalog, `aendern(veraenderer)` schreibt.
+ *
+ * `dazu` setzt Teile der Maske vor oder hinter die Felder einer Gruppe,
+ * unter ihrem Titel: `{ Boden: { vor: [...], nach: [...] } }`. Einen Titel,
+ * den es nicht gibt, meldet es, statt die Teile still zu verlieren. Eine
+ * Gruppe ohne Felder und ohne Teile fällt weg.
+ */
+export function eingabekarten(klasse, eintrag, aendern, { gelesen = null, dazu = {} } = {}) {
+  const gruppen = katalog('vorgaben', klasse);
+  for (const titel of Object.keys(dazu)) {
+    if (!gruppen.some((g) => g.titel === titel)) {
+      throw new Error(`Unter den Vorgaben von «${klasse}» gibt es keine Gruppe «${titel}».`);
+    }
+  }
+  return gruppen.map((g) => {
+    const felder = (g.felder[g.nach.map((n) => eintrag[n]).join('|')] || [])
+      .filter((f) => !gelesen || gelesen.has(f.feld));
+    const { vor = [], nach = [] } = dazu[g.titel] || {};
+    const inhalt = [...vor, ...felder.map((f) => vorgabezeile(klasse, eintrag, f, aendern)), ...nach]
+      .filter(Boolean);
+    return inhalt.length ? karte(g.titel, inhalt) : null;
+  }).filter(Boolean);
+}
+
+/** Ein Feld der Vorgaben als Zeile -- siehe `eingabekarten`. */
+export function vorgabezeile(klasse, eintrag, f, aendern) {
+  const titel = [f.beschreibung, f.hinweis].filter(Boolean).join(' – ')
+    + (f.referenz ? ` (${f.referenz})` : '');
+  return zahlzeile(klasse, eintrag, f.feld, f.beschriftung, f.zeichen, {
+    schritt: f.schritt, titel, aendern,
+  });
+}
+
+/**
  * Eine Einwirkung auf einer Zeile:
  *
  *     [Name] M_Ed [.] N_Ed [.] V_Ed [.] [x|y|beide] [×]

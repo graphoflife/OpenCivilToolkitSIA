@@ -1,5 +1,5 @@
 ---
-erzeugt: 3be30c87226d
+erzeugt: 223ddb0e31b9
 art: modul
 tags: [modul]
 ---
@@ -27,5 +27,6 @@ Berechnung ihre Herleitung schreibt ([[opencivil.core.protokoll]],
 - [[opencivil.core.rechenobjekt]] – was ein Bauteil im Rechenwerk ist.
 - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
 - [[opencivil.core.suche]] – wo eine steigende Funktion null wird.
+- [[opencivil.core.vorgaben]] – die Zahlen, die ein Nachweis aus seiner Beschreibung liest.
 - [[opencivil.core.wahl]] – was ein Wahlfeld annehmen kann.
 - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.

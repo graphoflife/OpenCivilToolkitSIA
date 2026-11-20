@@ -7,6 +7,31 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Der Grundbruch holt seine Maske aus dem Kern
+
+Die Maske des Grundbruchs schrieb die Tafel der Herleitung ab: Gruppen,
+Felder, Zeichen und Hinweise. Ein neues Feld des Kerns wäre dort nie
+erschienen, und die Zeichen liefen schon auseinander.
+
+Jetzt steht die Tafel einmal im Kern (`VORGABEN` in
+`opencivil/geotechnik/fundament.py`, die Bausteine in
+`opencivil/core/vorgaben.py`), mit der kurzen Beschriftung der Maske neben
+der Beschreibung der Herleitung – die Maske schneidet lange Beschriftungen
+ab, samt Zeichen. Die Maske baut ihre Karten daraus (`eingabekarten` in
+`bausteine.js`); ein Test prüft, dass Maske und Herleitung dieselben Felder
+in derselben Folge zeigen. Die Herleitung bleibt, wie sie war.
+
+Wo Kern und Maske verschieden schrieben, gilt jetzt der Kern:
+
+- «Gelände und Grundwasser»: zuerst die Tiefe des Grundwassers t₁, dann die
+  Geländeneigung β – vorher umgekehrt.
+- Sohlreibung: das Zeichen ist k_δ wie in der Herleitung, nicht mehr
+  δ_k/φ_k; das Verhältnis steht im Titel über dem Feld.
+- Der Titel über jedem Feld ist die Beschreibung der Herleitung mit dem
+  Hinweis der Maske und der Normstelle. Beim Grundwasser etwa «Tiefe des
+  höchsten Grundwasserspiegels unter Terrain (SIA 267:2013, 4.2.2.3)» statt
+  «Oberkante Terrain bis zum höchsten möglichen Grundwasserspiegel».
+
 ## 2026-11-20 · Eine Last an einem Knoten hat keine Stelle
 
 Das Fenster einer Last an einem Knoten zeigte das Feld «Stelle» in % der

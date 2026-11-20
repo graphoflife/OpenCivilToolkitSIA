@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e94f1b61059
+erzeugt: 7160558e7e8a
 art: modul
 tags: [modul]
 ---
@@ -49,6 +49,17 @@ def _klassen() -> Dict[str, type]
 Jede Klasse von Eintraegen unter dem Projekt, unter ihrem Namen ohne
 «Eintrag», klein: `grundbruch`, `schicht`, `kombination` -- so
 heissen ihre Feldangaben und ihre Vorlage im Katalog.
+
+### _vorgaben
+
+```python
+def _vorgaben() -> Dict[str, List[dict]]
+```
+
+Je Klasse von Eintraegen, unter ihrem Namen im Katalog, die Gruppen der
+Vorgaben ihres Nachweises ([[opencivil.core.vorgaben]]) -- fuer jede
+Stellung der Wahlen, nach denen sie sich richten, mit den Werten, die die
+Beschreibung fuer diese Wahlen kennt.
 
 ### katalog
 
@@ -180,6 +191,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.core.wert]]
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.schnitt]]
+- [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.setzung]]
 - [[opencivil.geotechnik.verhalten]]
 - [[opencivil.material.arten]]
@@ -195,6 +207,7 @@ Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus Querschnitt u
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]
+- [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]

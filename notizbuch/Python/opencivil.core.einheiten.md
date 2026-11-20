@@ -1,5 +1,5 @@
 ---
-erzeugt: cc510541b719
+erzeugt: 370cd801620d
 art: modul
 tags: [modul]
 ---
@@ -448,6 +448,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.vorgaben]]
 - [[opencivil.core.wert]]
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.herleitung]]

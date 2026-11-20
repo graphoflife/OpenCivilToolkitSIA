@@ -1,5 +1,5 @@
 ---
-erzeugt: c86f6eda4a95
+erzeugt: b6fc1bd6939a
 art: modul
 tags: [modul]
 ---
@@ -38,6 +38,16 @@ Fundament weg abfällt. N steht normal zur Sohle, T in ihrer Richtung.
 Alles in SI-Basis; die Winkel als Groessen in Grad.
 
 ## Inhalt
+
+### _boden
+
+```python
+def _boden(verhalten: Verhalten) -> Tuple[Feld, ...]
+```
+
+Je Verhalten seine Festigkeit; was nicht gilt, steht weder in der
+Herleitung noch in der Maske (Benutzer, 2026-11-19). Das Wasser zählt nur
+drainiert, über γ' -- undrainiert gelten totale Spannungen.
 
 ### Fundament
 
@@ -145,6 +155,8 @@ Zeile wären es acht Angaben -- breiter als die Spalte.
 ## Konstanten
 
 - `KAP_AUFLAST = 'Kap. 9.2.5'` – Die dauernde Auflast neben dem Fundament, Kap. 9.2.5 des Buches.
+- `_TABELLE_1 = 'SIA 267:2013, 5.3.2.2, Tabelle 1'` – Die Teilfaktoren des Bodens und seine Raumlast.
+- `VORGABEN = (Gruppe('Boden', _boden, nach=('verhalten',)), Gruppe('Fundament', la…` – Die Vorgaben des Grundbruchs, je Kasten der Herleitung und Karte der Maske ([[opencivil.core.vorgaben]]). Die Sohlreibung hängt am Reibungswinkel: undrainiert gilt sie nicht.
 - `OHNE_GAMMA_R = 'Grundbruch- und Gleitwiderstand ohne Widerstandsbeiwert, γ_R = 1.0. …` – Was beide Widerstände annehmen -- die Norm teilt sie noch durch gamma_R.
 
 ## Braucht
@@ -155,6 +167,7 @@ Zeile wären es acht Angaben -- breiter als die Spalte.
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenobjekt]]
+- [[opencivil.core.vorgaben]]
 - [[opencivil.core.wert]]
 - [[opencivil.geotechnik.verhalten]]
 
@@ -165,6 +178,7 @@ Zeile wären es acht Angaben -- breiter als die Spalte.
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.web.api]]
 - [[opencivil.web.grundbruchdaten]]
 
 ## Formeln aus diesem Modul

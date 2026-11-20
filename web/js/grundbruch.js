@@ -19,11 +19,14 @@
  * EINHEITEN UND GRENZEN kommen aus dem Katalog (`katalog.felder`): in
  * welcher Einheit der Kern eine Zahl meint, steht an ihrem Feld im Kern und
  * nur dort. Bis 2026-10-18 stand sie auch hier -- wich sie ab, galt eine
- * Zahl still um 10³ anders, als die Maske sagte.
+ * Zahl still um 10³ anders, als die Maske sagte. Die Karten mit ihren
+ * Feldern, Zeichen und Hinweisen sind die Gruppen der Herleitung
+ * (`katalog.vorgaben`, opencivil/geotechnik/fundament.py); bis 2026-11-20
+ * standen sie hier ein zweites Mal.
  */
 
 import {
-  erklaerung, feld, karte, namensfeld, panel, verhaltenSchalter, zahlzeile as feldzeile,
+  eingabekarten, erklaerung, feld, namensfeld, panel, verhaltenSchalter,
 } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
@@ -56,13 +59,6 @@ const HILFE = {
   },
 };
 
-/** Eine Zahl des Eintrags als Feld: Beschriftung mit Symbol, Einheit, Schrittweite. */
-function zahlzeile(g, schluessel, text, symbol, { schritt = 1, titel } = {}) {
-  return feldzeile('grundbruch', g, schluessel, text, symbol, {
-    schritt, titel, aendern: (veraenderer) => eintragAendern(g.kennung, veraenderer),
-  });
-}
-
 /**
  * Die Bemessungswerte des Bodens, wie der Kern sie gerechnet hat -- oder
  * nichts. Ging die letzte Rechnung nicht, gehören sie zur Eingabe davor:
@@ -85,9 +81,6 @@ function bemessungswerte(g) {
 
 function situationPanel(g) {
   const aendern = (veraenderer) => eintragAendern(g.kennung, veraenderer);
-  // Drainiert Reibung und Kohäsion, undrainiert s_u: was nicht gilt, steht
-  // nicht da (Benutzer, 2026-11-19) -- bis dahin hiess φ = 0 undrainiert.
-  const drainiert = g.verhalten === 'drainiert';
   return panel({
     schluessel: 'grundbruch/Situation', titel: 'Grundbruch Situation',
     zusatz: erklaerung(HILFE.situation.zeilen, HILFE.situation.formel),
@@ -97,49 +90,17 @@ function situationPanel(g) {
         wert: g.name, setzen: (name) => aendern((x) => { x.name = name; }),
       })),
     ]),
-    karte('Boden', [
-      feld('Verhalten', verhaltenSchalter(g.verhalten, (w) => aendern((x) => { x.verhalten = w; })), ''),
-      ...(drainiert ? [
-        zahlzeile(g, 'phi_k', 'Reibungswinkel', String.raw`\varphi_k`,
-          { titel: 'Reibungswinkel, charakteristisch' }),
-        zahlzeile(g, 'gamma_phi', 'Partialfaktor', String.raw`\gamma_{\varphi}`,
-          { schritt: 0.05, titel: 'Partialfaktor des Reibungswinkels, SIA 267:2013, 5.3.2.2' }),
-        zahlzeile(g, 'c_k', 'Kohäsion', 'c_k',
-          { titel: 'Kohäsion, charakteristisch – nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)' }),
-        zahlzeile(g, 'gamma_c', 'Partialfaktor', String.raw`\gamma_c`,
-          { schritt: 0.05, titel: 'Partialfaktor der Kohäsion, SIA 267:2013, 5.3.2.2, Tabelle 1' }),
-      ] : [
-        zahlzeile(g, 's_u', 'Scherfestigkeit', 's_{u,k}',
-          { schritt: 5, titel: 'Undrainierte Scherfestigkeit, charakteristisch' }),
-        zahlzeile(g, 'gamma_cu', 'Partialfaktor', String.raw`\gamma_{cu}`,
-          { schritt: 0.05, titel: 'Partialfaktor der undrainierten Scherfestigkeit, SIA 267:2013, 5.3.2.2, Tabelle 1' }),
-      ]),
-      zahlzeile(g, 'gamma', 'Raumlast Boden', String.raw`\gamma`, { schritt: 0.5 }),
-      // Das Wasser zählt nur über γ': undrainiert gelten totale Spannungen.
-      ...(drainiert ? [zahlzeile(g, 'gamma_w', 'Raumlast Wasser', String.raw`\gamma_w`, { schritt: 0.5 })] : []),
-      bemessungswerte(g),
-    ]),
-    karte('Fundament', [
-      zahlzeile(g, 'b', 'Breite', 'b', { schritt: 0.1, titel: 'Die kürzere Seite' }),
-      zahlzeile(g, 'L', 'Länge', 'L', { schritt: 0.1 }),
-      zahlzeile(g, 't', 'Tiefe der Sohle', 't',
-        { schritt: 0.1, titel: 'Oberkante Terrain bis Unterkante Fundament' }),
-      zahlzeile(g, 'alpha', 'Sohlneigung', String.raw`\alpha`,
-        { titel: 'Positiv, wenn die Sohle in Richtung von T ansteigt' }),
-    ]),
-    karte('Gelände und Grundwasser', [
-      zahlzeile(g, 'beta', 'Geländeneigung', String.raw`\beta`,
-        { titel: 'Positiv, wenn das Gelände auf der Seite von T abfällt' }),
-      zahlzeile(g, 't1', 'Grundwasser', 't_1',
-        { schritt: 0.1, titel: 'Oberkante Terrain bis zum höchsten möglichen Grundwasserspiegel' }),
-      zahlzeile(g, 'q_Ed', 'Auflast neben dem Fundament', 'q_{Ed}',
-        { titel: 'Nur eine dauernde, auf beiden Seiten mindestens über L_Gl (Kap. 9.2.5); sie wirkt günstig' }),
-    ]),
-    // Die Sohlreibung hängt am Reibungswinkel: undrainiert gilt sie nicht.
-    ...(drainiert ? [karte('Sohlreibung', [
-      zahlzeile(g, 'delta_faktor', 'Reibung der Sohle', String.raw`\delta_k/\varphi_k`,
-        { schritt: 0.05, titel: '1 bei rauer Sohle mit dem Bruch im Boden, ½ bis ⅔ bei glatter mit dem Bruch in der Fuge; δ_k höchstens 35° (SIA 267:2013, 8.4.1.1)' }),
-    ])] : []),
+    // Welche Felder das Verhalten liest, sagt der Kern (Benutzer, 2026-11-19:
+    // was nicht gilt, steht nicht da) -- bis dahin hiess φ = 0 undrainiert.
+    ...eingabekarten('grundbruch', g, aendern, {
+      dazu: {
+        Boden: {
+          vor: [feld('Verhalten', verhaltenSchalter(g.verhalten,
+            (w) => aendern((x) => { x.verhalten = w; })), '')],
+          nach: [bemessungswerte(g)],
+        },
+      },
+    }),
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [
         el('label', { text: 'Beschreibung' }),

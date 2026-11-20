@@ -1,5 +1,5 @@
 ---
-erzeugt: e94627a440d0
+erzeugt: ccf05a64c325
 art: modul
 tags: [modul]
 ---
@@ -305,6 +305,7 @@ def beschreibung(self) -> str
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenobjekt]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.vorgaben]]
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]

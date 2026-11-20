@@ -1,5 +1,5 @@
 ---
-erzeugt: 09c32e304c8b
+erzeugt: 23ce3ca32967
 art: modul
 tags: [modul]
 ---
@@ -586,6 +586,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.core.kurzform]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.vorgaben]]
 - [[opencivil.decke.herleitung]]
 - [[opencivil.decke.werk]]
 - [[opencivil.durchstanzen.herleitung]]

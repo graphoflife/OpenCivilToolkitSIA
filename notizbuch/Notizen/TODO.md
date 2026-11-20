@@ -371,7 +371,11 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         (Benutzer, 2026-11-19): die Masken holen Felder und Zeichen aus dem
         Kern; das ersetzt «Das Zeichen bleibt in der Maske» vom 2026-10-16.
         Wo Kern und Maske heute verschieden schreiben, bekommt der Benutzer
-        die Liste. Erweitert Punkt 3c vom 2026-11-15.
+        die Liste. Erweitert Punkt 3c vom 2026-11-15. Erledigt für den
+        Grundbruch (2026-11-20): die Tafel steht in `fundament.VORGABEN`
+        (Bausteine `opencivil/core/vorgaben.py`), mit der kurzen Beschriftung
+        der Maske neben der Beschreibung; `eingabekarten` baut die Karten,
+        `tests/test_vorgaben.py` vergleicht Maske und Herleitung.
       - Bilder tippen Einheiten: `GROESSEN` in `pf_verlauf.js` spiegelt
         `VERLAEUFE` samt Grenzschlüsseln (eine umbenannte Grösse
         verschwindet still), `platte_bilder.js` rund 35 Einheiten, die

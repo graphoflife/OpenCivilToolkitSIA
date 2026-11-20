@@ -32,17 +32,89 @@ import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Tuple
 
-from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel, Vorgabe
+from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel
 from opencivil.core.einheiten import EINHEITSLOS, GRAD, KN_PRO_M3, KPA, M, Groesse
 from opencivil.core.latex import als_text, angabe
 from opencivil.core.nachweis import Nachweis, Vergleich, grad_def
 from opencivil.core.protokoll import Abschnitt, GleichungBlock, Protokoll
 from opencivil.core.rechenobjekt import Rechenobjekt
+from opencivil.core.vorgaben import Feld, Gruppe
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.geotechnik.verhalten import Verhalten
 
 #: Die dauernde Auflast neben dem Fundament, Kap. 9.2.5 des Buches.
 KAP_AUFLAST = "Kap. 9.2.5"
+
+#: Die Teilfaktoren des Bodens und seine Raumlast.
+_TABELLE_1 = "SIA 267:2013, 5.3.2.2, Tabelle 1"
+
+
+def _boden(verhalten: Verhalten) -> Tuple[Feld, ...]:
+    """
+    Je Verhalten seine Festigkeit; was nicht gilt, steht weder in der
+    Herleitung noch in der Maske (Benutzer, 2026-11-19). Das Wasser zählt nur
+    drainiert, über γ' -- undrainiert gelten totale Spannungen.
+    """
+    if verhalten is Verhalten.DRAINIERT:
+        festigkeit = (
+            Feld("phi_k", r"\varphi_k", GRAD, "Reibungswinkel, charakteristisch", 1,
+                 beschriftung="Reibungswinkel"),
+            Feld("gamma_phi", r"\gamma_{\varphi}", EINHEITSLOS,
+                 "Partialfaktor des Reibungswinkels", 2, _TABELLE_1,
+                 beschriftung="Partialfaktor", schritt=0.05),
+            Feld("c_k", "c_k", KPA, "Kohäsion, charakteristisch", 1, beschriftung="Kohäsion",
+                 hinweis="nur, wo sie dauerhaft wirkt (SIA 267:2013, 8.5.1.6)"),
+            Feld("gamma_c", r"\gamma_c", EINHEITSLOS, "Partialfaktor der Kohäsion", 2, _TABELLE_1,
+                 beschriftung="Partialfaktor", schritt=0.05),
+        )
+        wasser = (Feld("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1,
+                       beschriftung="Raumlast Wasser", schritt=0.5),)
+    else:
+        festigkeit = (
+            Feld("s_u", "s_{u,k}", KPA, "Undrainierte Scherfestigkeit, charakteristisch", 1,
+                 beschriftung="Scherfestigkeit", schritt=5),
+            Feld("gamma_cu", r"\gamma_{cu}", EINHEITSLOS,
+                 "Partialfaktor der undrainierten Scherfestigkeit", 2, _TABELLE_1,
+                 beschriftung="Partialfaktor", schritt=0.05),
+        )
+        wasser = ()
+    return (*festigkeit,
+            Feld("gamma", r"\gamma", KN_PRO_M3, "Raumlast des Bodens, ohne Partialfaktor", 1,
+                 _TABELLE_1, beschriftung="Raumlast Boden", schritt=0.5),
+            *wasser)
+
+
+#: Die Vorgaben des Grundbruchs, je Kasten der Herleitung und Karte der Maske
+#: (:mod:`opencivil.core.vorgaben`). Die Sohlreibung hängt am Reibungswinkel:
+#: undrainiert gilt sie nicht.
+VORGABEN = (
+    Gruppe("Boden", _boden, nach=("verhalten",)),
+    Gruppe("Fundament", lambda: (
+        Feld("b", "b", M, "Breite des Fundaments", 2, beschriftung="Breite", schritt=0.1,
+             hinweis="die kürzere Seite"),
+        Feld("L", "L", M, "Länge des Fundaments", 2, beschriftung="Länge", schritt=0.1),
+        Feld("t", "t", M, "Tiefe der Sohle unter Terrain", 2, beschriftung="Tiefe der Sohle",
+             schritt=0.1, hinweis="Oberkante Terrain bis Unterkante Fundament"),
+        Feld("alpha", r"\alpha", GRAD, "Neigung der Sohle", 1, beschriftung="Sohlneigung",
+             hinweis="positiv, wenn die Sohle in Richtung von T ansteigt"),
+    )),
+    Gruppe("Gelände und Grundwasser", lambda: (
+        Feld("t1", "t_1", M, "Tiefe des höchsten Grundwasserspiegels unter Terrain", 2,
+             "SIA 267:2013, 4.2.2.3", beschriftung="Grundwasser", schritt=0.1),
+        Feld("beta", r"\beta", GRAD, "Neigung des Geländes", 1, beschriftung="Geländeneigung",
+             hinweis="positiv, wenn das Gelände auf der Seite von T abfällt"),
+        Feld("q_Ed", "q_{Ed}", KPA, "Dauernde Auflast neben dem Fundament", 1, KAP_AUFLAST,
+             beschriftung="Auflast neben dem Fundament",
+             hinweis="auf beiden Seiten mindestens über L_Gl; sie wirkt günstig"),
+    )),
+    Gruppe("Sohlreibung", lambda verhalten: (
+        Feld("delta_faktor", r"k_{\delta}", EINHEITSLOS,
+             "Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ_k/φ_k", 2,
+             "SIA 267:2013, 8.4.1.1", beschriftung="Reibung der Sohle", schritt=0.05,
+             hinweis="1 bei rauer Sohle mit dem Bruch im Boden, ½ bis ⅔ bei glatter mit dem "
+                     "Bruch in der Fuge; δ_k höchstens 35°"),
+    ) if verhalten is Verhalten.DRAINIERT else (), nach=("verhalten",)),
+)
 
 #: Was beide Widerstände annehmen -- die Norm teilt sie noch durch gamma_R.
 OHNE_GAMMA_R = (
@@ -107,53 +179,12 @@ class Fundament(Rechenobjekt):
     def _aufbauen(self) -> None:
         abschnitt = self.abschnitt
         drainiert = self.verhalten is Verhalten.DRAINIERT
-        # Je Verhalten seine Festigkeit; was nicht gilt, steht nicht in der Herleitung.
-        festigkeit = ((
-            ("phi_k", r"\varphi_k", GRAD, "Reibungswinkel, charakteristisch", 1, ""),
-            ("gamma_phi", r"\gamma_{\varphi}", EINHEITSLOS,
-             "Partialfaktor des Reibungswinkels", 2, "SIA 267:2013, 5.3.2.2, Tabelle 1"),
-            ("c_k", "c_k", KPA, "Kohäsion, charakteristisch", 1, ""),
-            ("gamma_c", r"\gamma_c", EINHEITSLOS, "Partialfaktor der Kohäsion", 2,
-             "SIA 267:2013, 5.3.2.2, Tabelle 1"),
-        ) if drainiert else (
-            ("s_u", "s_{u,k}", KPA, "Undrainierte Scherfestigkeit, charakteristisch", 1, ""),
-            ("gamma_cu", r"\gamma_{cu}", EINHEITSLOS, "Partialfaktor der undrainierten "
-             "Scherfestigkeit", 2, "SIA 267:2013, 5.3.2.2, Tabelle 1"),
-        ))
         # Je Gruppe ein Kasten in der Herleitung -- wie die Abmessungen der Platte.
-        vorgaben = (
-            ("Boden", (
-                *festigkeit,
-                ("gamma", r"\gamma", KN_PRO_M3, "Raumlast des Bodens, ohne Partialfaktor", 1,
-                 "SIA 267:2013, 5.3.2.2, Tabelle 1"),
-                *((("gamma_w", r"\gamma_w", KN_PRO_M3, "Raumlast des Wassers", 1, ""),)
-                  if drainiert else ()),      # nur fuer gamma': undrainiert total
-            )),
-            ("Fundament", (
-                ("b", "b", M, "Breite des Fundaments", 2, ""),
-                ("L", "L", M, "Länge des Fundaments", 2, ""),
-                ("t", "t", M, "Tiefe der Sohle unter Terrain", 2, ""),
-                ("alpha", r"\alpha", GRAD, "Neigung der Sohle", 1, ""),
-            )),
-            ("Gelände und Grundwasser", (
-                ("t1", "t_1", M, "Tiefe des höchsten Grundwasserspiegels unter Terrain", 2,
-                 "SIA 267:2013, 4.2.2.3"),
-                ("beta", r"\beta", GRAD, "Neigung des Geländes", 1, ""),
-                ("q_Ed", "q_{Ed}", KPA, "Dauernde Auflast neben dem Fundament", 1, KAP_AUFLAST),
-            )),
-            # Die Sohlreibung hängt am Reibungswinkel: undrainiert gilt sie nicht.
-            ("Sohlreibung", (
-                ("delta_faktor", r"k_{\delta}", EINHEITSLOS,
-                 "Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ_k/φ_k", 2,
-                 "SIA 267:2013, 8.4.1.1"),
-            ) if drainiert else ()),
-        )
-        for gruppe, eintraege in vorgaben:
-            for kurz, symbol, einheit, beschreibung, stellen, referenz in eintraege:
-                d = self._def(kurz, symbol, einheit, beschreibung, stellen, referenz)
-                self.berechnungen.append(Vorgabe(
-                    id=d.id, ausgabe=d, groesse=getattr(self, kurz),
-                    abschnitt=abschnitt, gruppe=gruppe))
+        for gruppe in VORGABEN:
+            for f in gruppe.fuer(self):
+                d, vorgabe = f.vorgabe(self.id, abschnitt, gruppe.titel, getattr(self, f.kurz))
+                self.definitionen[f.kurz] = d
+                self.berechnungen.append(vorgabe)
 
         if not drainiert:
             d_s = self._def("s_u_d", "s_{u,d}", KPA, "Undrainierte Scherfestigkeit, "

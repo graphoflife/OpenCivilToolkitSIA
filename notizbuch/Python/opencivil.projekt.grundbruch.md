@@ -1,5 +1,5 @@
 ---
-erzeugt: 0144cb501bec
+erzeugt: c4c5af466bae
 art: modul
 tags: [modul]
 ---
@@ -127,3 +127,4 @@ Kombinationen soll sich oeffnen und korrigieren lassen.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.projekt]]
+- [[opencivil.web.api]]
