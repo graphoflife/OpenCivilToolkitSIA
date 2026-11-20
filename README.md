@@ -17,8 +17,10 @@ einem Stück, `web/kern/quellen.json`. Keine
 Formel ist in JavaScript nachgebaut — das wäre ein zweiter Rechenweg, der
 irgendwann vom ersten abweicht, und dann wüsste niemand mehr, welcher stimmt.
 
-Der erste Aufruf lädt einmalig ≈13 MB Python-Laufzeit; danach liegt sie im
-Zwischenspeicher des Browsers. Ein Durchgang des Beispielprojekts braucht in
+Der erste Aufruf lädt einmalig ≈13 MB Python-Laufzeit; danach liegt alles im
+Speicher des Browsers, und die Seite geht auch ohne Netz auf. Installieren
+lässt sie sich als App mit eigenem Fenster, in Chrome über das Zeichen am
+rechten Ende der Adresszeile. Ein Durchgang des Beispielprojekts braucht in
 CPython rund 25 ms; im Browser ist es etwa das Anderthalbfache.
 
 ## Auf dem eigenen Rechner
@@ -267,6 +269,7 @@ Fertig und getestet (1229 Tests):
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
 | `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
+| `sw.js`, `web/js/offline.js`, `web/manifest.webmanifest` | die Seite ohne Netz und als App: der Service Worker, wo er angemeldet wird, was ein installiertes Fenster zeigt |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
 | `web/js/kapitel.js`, `fenster.js`, `sinnbilder.js`, `nachweise.js` | die Kapitel der Platte als Knöpfe mit Zeichen, ihre Eingaben in einem Fenster über der Tafel |
 | `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, schwebendes Fenster; im Raum die Ansichten, das Drehen und die Arbeitsebene (`cad_raum.js`) |

@@ -1,0 +1,15 @@
+{
+  "name": "OpenCivilToolkitSIA",
+  "short_name": "OpenCivil",
+  "description": "Tragwerksnachweise nach SIA, gerechnet in Python im Browser",
+  "lang": "de",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#12325c",
+  "theme_color": "#12325c",
+  "icons": [
+    { "src": "favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" }
+  ]
+}

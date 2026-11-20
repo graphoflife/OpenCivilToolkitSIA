@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenCivilToolkitSIA</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <!-- Als App installierbar, mit eigenem Fenster; ohne Netz geht sie über sw.js auf. -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12325c">
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
@@ -15,7 +18,7 @@
       "./js/ablage.js": "./js/ablage.js?v=2cff59319161",
       "./js/achsen.js": "./js/achsen.js?v=a18a53f82e92",
       "./js/api.js": "./js/api.js?v=e90276978a0c",
-      "./js/app.js": "./js/app.js?v=ee95e256176c",
+      "./js/app.js": "./js/app.js?v=4c3c18267cf6",
       "./js/apps.js": "./js/apps.js?v=45ddee282059",
       "./js/arten.js": "./js/arten.js?v=f8ac57ad3003",
       "./js/balkensystem.js": "./js/balkensystem.js?v=95040f5bde38",
@@ -71,6 +74,7 @@
       "./js/nachweise.js": "./js/nachweise.js?v=41504154e283",
       "./js/notizbuch.js": "./js/notizbuch.js?v=18958bac8115",
       "./js/notizbuch_seite.js": "./js/notizbuch_seite.js?v=639209806e79",
+      "./js/offline.js": "./js/offline.js?v=1b6f6c615c08",
       "./js/pf_verlauf.js": "./js/pf_verlauf.js?v=077aa49f7b6c",
       "./js/pf_zeichnung.js": "./js/pf_zeichnung.js?v=c3bcabe521ec",
       "./js/pfahl.js": "./js/pfahl.js?v=930816b6e1e2",
@@ -91,8 +95,8 @@
       "./js/variablen.js": "./js/variablen.js?v=7d43b6f38cd9",
       "./js/zeichnen.js": "./js/zeichnen.js?v=da6e8eec5dc8",
       "./js/zustand.js": "./js/zustand.js?v=a9b3d34ccc90",
-      "./kern/notizbuch.json": "./kern/notizbuch.json?v=e85bdb560100",
-      "./kern/quellen.json": "./kern/quellen.json?v=32def4395476"
+      "./kern/notizbuch.json": "./kern/notizbuch.json?v=1e98db7f58fb",
+      "./kern/quellen.json": "./kern/quellen.json?v=fefeb0909e4d"
     }
   }
   </script>
@@ -118,7 +122,8 @@
   <p id="ladetext">Rechenkern wird gesucht …</p>
   <p class="lade-fussnote">
     Die Berechnung läuft in Python, im Browser. Beim ersten Aufruf lädt dafür
-    einmalig die Python-Laufzeit; danach liegt sie im Zwischenspeicher.
+    einmalig die Python-Laufzeit; danach liegt sie im Speicher des Browsers,
+    und die Seite geht auch ohne Netz auf.
   </p>
 </div>
 

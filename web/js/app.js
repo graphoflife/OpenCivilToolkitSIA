@@ -27,6 +27,7 @@ import { ARTEN } from './arten.js';
 import { editorZeichnen } from './editor.js';
 import { fensterEinrichten } from './fenster.js';
 import { notizbuchEinrichten } from './notizbuch.js';
+import { offlineEinrichten } from './offline.js';
 
 const knoten = {};
 let rechenUhr = null;
@@ -666,6 +667,7 @@ async function starten() {
     // Erst den Kern -- ohne ihn lässt sich nicht einmal die Beschreibung prüfen.
     const kern = await kernBereitstellen(ladeanzeige);
     knoten.kernanzeige.textContent = kern.beschriftung;
+    offlineEinrichten(kern.art === 'pyodide');
 
     const [katalog, abgelegt] = await Promise.all([api.katalog(), mappeHolen()]);
     const { mappe, gewaehlt, gesichert } = abgelegt;

@@ -53,6 +53,35 @@ wie nachher 4.4–4.5 s. Ob die Quellen neben Python kommen oder nach ihm,
 macht dort keinen Unterschied (abwechselnd gemessen); neben ihm spart es auf
 einer langsamen Leitung die Zeit für das Paket.
 
+**Ohne Netz, und schneller beim erneuten Besuch.** Ein Service Worker,
+`sw.js`, legt in einen Speicher des Browsers, was die Seite zum Starten
+braucht, rund 18 MB; danach geht sie auch ohne Netz auf. Er liegt im
+Wurzelverzeichnis und nicht unter `web/`: er gilt nur für Seiten unter
+seinem Ordner, und auch die Wurzel soll ohne Netz aufgehen -- sie ist die
+veröffentlichte Adresse. Was eine Marke trägt, kommt aus dem Speicher, ohne
+zu fragen. Die Ordner unter `web/vendor/` haben je einen Speicher, benannt
+nach einer Marke über ihren Inhalt: eine Veröffentlichung ohne neues Pyodide
+lässt dessen 13 MB liegen. Die Seiten selbst kommen zuerst aus dem Netz und
+nur ohne Netz aus dem Speicher; so bringt eine Veröffentlichung die neuen
+Marken. Was in den Speicher gehört, schreibt die Brücke in `sw.js`
+(`vorrat`); jede Änderung ändert ihn, und der Browser installiert ihn neu.
+numpy und pandas kommen erst hinein, wenn ein Skript sie braucht, eine
+Seite des Notizbuchs, sobald man sie einmal geöffnet hat.
+
+Angemeldet wird er erst, wenn der Kern bereit ist -- sonst holte er beim
+ersten Besuch dieselben 18 MB ein zweites Mal, gleichzeitig mit der Seite --,
+und nur, wo im Browser gerechnet wird: mit `python3 start_ui.py` stünde er
+beim Entwickeln im Weg, und eine Anmeldung von früher meldet die Seite dort
+ab. Aufräumen darf er nur seine eigenen Speicher (`opencivil-…`): auf
+github.io teilen sich alle Seiten eines Kontos einen Ursprung.
+
+Über die nachgeahmte Leitung, beim erneuten Besuch: die erste Rechnung nach
+3.5–4.0 s statt nach 4.5 s, und übers Netz geht nur noch die Seite selbst.
+Auch Python lädt so schneller, 1.6–1.9 s statt 2.5 s. Mit angehaltenem
+Server, von der Wurzel aus: die Seite geht auf und rechnet, erste Rechnung
+nach 3.3 s. Mit `web/manifest.webmanifest` lässt sie sich als App
+installieren, mit eigenem Fenster; als Zeichen dient `favicon.svg`.
+
 **Vorladen der Module: gemessen, nicht eingebaut.** Geplant war
 `<link rel="modulepreload">` für alle Module, damit der Browser sie auf
 einmal holt statt Stufe um Stufe. Seit der Kern sofort startet, wartet aber

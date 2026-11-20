@@ -1,5 +1,5 @@
 ---
-erzeugt: 2876e902fe30
+erzeugt: f7d74064560a
 art: modul
 tags: [modul]
 ---
@@ -71,6 +71,20 @@ Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter `web/vendor/`;
 die aendern sich nur, wenn jemand bewusst eine neue Fassung einlegt.
 
 
+## UND OHNE NETZ
+
+Der Service Worker `sw.js` legt in einen Speicher des Browsers, was die
+Seite zum Starten braucht; danach geht sie auch ohne Netz auf. Er liegt im
+Wurzelverzeichnis, damit er auch die Wurzel abdeckt, die veroeffentlichte
+Adresse. Was in den Speicher gehoert, schreibt die Bruecke in ihn hinein wie
+die Marken in die Seite ([[opencivil.web.bruecke#vorrat|vorrat]]): alles mit Marke, und je Ordner
+unter `web/vendor/` dessen Dateien, mit einer Marke ueber den ganzen
+Ordner ([[opencivil.web.bruecke#fremdmarke|fremdmarke]]). Aendert sich etwas, aendert sich `sw.js`,
+und der Browser installiert ihn neu. Ohne diese Liste muesste er raten, was
+die Seite gleich braucht -- und ohne Netz fehlte, was er beim ersten Besuch
+nicht gesehen hat.
+
+
 ## UND DIE FREMDPAKETE
 
 Im Manifest steht auch, welche Fremdpakete unter `web/vendor/pyodide/`
@@ -95,7 +109,7 @@ Kilobyte sind der bessere Handel.
 
 
 ```
-python3 -m opencivil.web.bruecke    # schreibt web/kern/ und die Marken in web/index.html
+python3 -m opencivil.web.bruecke    # schreibt web/kern/, die Marken in web/index.html und sw.js
 ```
 
 ## Inhalt
@@ -248,10 +262,11 @@ Stilblatt und die Importtafel, jede Adresse mit der Marke ihrer Datei.
 ### _adresse
 
 ```python
-def _adresse(pfad: Path, *, mit_marke: bool=False) -> str
+def _adresse(pfad: Path, *, mit_marke: bool=False, von: Path | None=None) -> str
 ```
 
-Die Adresse einer Datei von der Seite aus, auf Wunsch mit ihrer Marke.
+Die Adresse einer Datei von der Seite aus, auf Wunsch mit ihrer Marke --
+oder mit `von` vom Service Worker aus, ohne `./`.
 
 ### versionsmarken_stimmen
 
@@ -269,13 +284,64 @@ def versionsmarken_schreiben(seite: Path | None=None) -> Path
 
 Ersetzt die Marken in der Seite; alles ausserhalb der beiden Kommentare bleibt.
 
+### vorrat
+
+```python
+def vorrat() -> dict
+```
+
+Was der Service Worker in seinen Speicher legt, damit die Seite auch ohne
+Netz startet -- Pfade von der Wurzel aus:
+
+- `seiten`: [[opencivil.web.bruecke#Konstanten|SEITEN]], die er zuerst aus dem Netz holt;
+- `dateien`: das Stilblatt und alles ueber die Importtafel, mit Marke;
+- `fremd`: je Ordner unter `web/vendor/` seine Marke und seine
+  Dateien -- ohne die Pakete der Konsole (`.whl`): numpy und pandas
+  holt er erst, wenn ein Skript sie braucht.
+
+### fremdmarke
+
+```python
+def fremdmarke(ordner: Path) -> str
+```
+
+Die Marke eines Ordners unter `web/vendor/`: die ersten zwoelf Zeichen
+von SHA-256 ueber Namen und Inhalt jeder Datei darin, ausser den
+Erlaeuterungen. Eine neue Fassung von Pyodide gibt eine neue Marke, also
+einen neuen Speicher; eine Veroeffentlichung, die ihn nicht anruehrt,
+laesst die 13 MB liegen.
+
+### vorrat_marken
+
+```python
+def vorrat_marken() -> str
+```
+
+Was im Service Worker zwischen [[opencivil.web.bruecke#Konstanten|SW_ANFANG]] und [[opencivil.web.bruecke#Konstanten|SW_ENDE]] steht.
+
+### vorrat_stimmt
+
+```python
+def vorrat_stimmt() -> bool
+```
+
+Ob der Vorrat im Service Worker zu den Dateien passt.
+
+### vorrat_schreiben
+
+```python
+def vorrat_schreiben(datei: Path | None=None) -> Path
+```
+
+Ersetzt den Vorrat im Service Worker; alles ausserhalb der beiden Kommentare bleibt.
+
 ### _zerlegen
 
 ```python
-def _zerlegen(seite: Path) -> Tuple[str, str, str]
+def _zerlegen(datei: Path, anfang: str, ende: str) -> Tuple[str, str, str]
 ```
 
-Die Seite in drei Stuecke: bis und mit dem Anfangskommentar, die Marken,
+Die Datei in drei Stuecke: bis und mit dem Anfangskommentar, die Marken,
 ab dem Endkommentar. Fehlt ein Kommentar, bricht es ab -- still nichts zu
 schreiben hiesse, die alten Marken blieben stehen.
 
@@ -291,8 +357,15 @@ schreiben hiesse, die alten Marken blieben stehen.
 - `VERZEICHNIS = WURZEL / 'web' / 'kern' / 'notizbuch.json'`
 - `SEITE = WURZEL / 'web' / 'index.html'`
 - `STILBLATT = WURZEL / 'web' / 'css' / 'stil.css'`
-- `ANFANG = '<!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruec…`
+- `SW = WURZEL / 'sw.js'`
+- `FREMD = WURZEL / 'web' / 'vendor'`
+- `SEITEN = ('./', 'web/', 'web/manifest.webmanifest', 'web/favicon.svg')` – Was der Service Worker zuerst aus dem Netz holt und nur ohne Netz aus seinem Speicher: die Seiten, in denen die Marken stehen, und was keine traegt. Der Rest des Vorrats kommt aus [[opencivil.web.bruecke#vorrat|vorrat]].
+- `ERLAEUTERUNGEN = ('.md', '.txt')` – Was unter `web/vendor/` nur erlaeutert: nicht im Speicher, nicht in der Marke.
+- `_MARKEN = 'Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», …`
+- `ANFANG = f'<!-- {_MARKEN} -->'`
 - `ENDE = '<!-- Ende der Versionsmarken -->'`
+- `SW_ANFANG = f'// {_MARKEN}'`
+- `SW_ENDE = '// Ende der Versionsmarken'`
 - `HINWEIS = "Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- nach …` – Was in der Liste und im Paket obenan steht.
 
 ## Braucht

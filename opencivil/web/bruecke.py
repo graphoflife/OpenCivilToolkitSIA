@@ -55,6 +55,18 @@ So haengt alles an der Seite: wer sie neu laedt, bekommt den Rest im selben
 Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter ``web/vendor/``;
 die aendern sich nur, wenn jemand bewusst eine neue Fassung einlegt.
 
+UND OHNE NETZ:
+Der Service Worker ``sw.js`` legt in einen Speicher des Browsers, was die
+Seite zum Starten braucht; danach geht sie auch ohne Netz auf. Er liegt im
+Wurzelverzeichnis, damit er auch die Wurzel abdeckt, die veroeffentlichte
+Adresse. Was in den Speicher gehoert, schreibt die Bruecke in ihn hinein wie
+die Marken in die Seite (:func:`vorrat`): alles mit Marke, und je Ordner
+unter ``web/vendor/`` dessen Dateien, mit einer Marke ueber den ganzen
+Ordner (:func:`fremdmarke`). Aendert sich etwas, aendert sich ``sw.js``,
+und der Browser installiert ihn neu. Ohne diese Liste muesste er raten, was
+die Seite gleich braucht -- und ohne Netz fehlte, was er beim ersten Besuch
+nicht gesehen hat.
+
 UND DIE FREMDPAKETE:
 Im Manifest steht auch, welche Fremdpakete unter ``web/vendor/pyodide/``
 beiliegen (:func:`mitgelieferte_pakete`): Importname -> Paketname, gelesen aus
@@ -73,12 +85,13 @@ Kilobyte sind der bessere Handel.
 
 AUFRUF::
 
-    python3 -m opencivil.web.bruecke    # schreibt web/kern/ und die Marken in web/index.html
+    python3 -m opencivil.web.bruecke    # schreibt web/kern/, die Marken in web/index.html und sw.js
 """
 
 from __future__ import annotations
 
 import functools
+import hashlib
 import json
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -94,11 +107,24 @@ NOTIZBUCH = WURZEL / "notizbuch"
 VERZEICHNIS = WURZEL / "web" / "kern" / "notizbuch.json"
 SEITE = WURZEL / "web" / "index.html"
 STILBLATT = WURZEL / "web" / "css" / "stil.css"
+SW = WURZEL / "sw.js"
+FREMD = WURZEL / "web" / "vendor"
 
-# Zwischen diesen beiden Kommentaren in der Seite schreibt die Bruecke.
-ANFANG = ("<!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», "
-          "nicht von Hand ändern -->")
+#: Was der Service Worker zuerst aus dem Netz holt und nur ohne Netz aus
+#: seinem Speicher: die Seiten, in denen die Marken stehen, und was keine
+#: traegt. Der Rest des Vorrats kommt aus :func:`vorrat`.
+SEITEN = ("./", "web/", "web/manifest.webmanifest", "web/favicon.svg")
+
+#: Was unter ``web/vendor/`` nur erlaeutert: nicht im Speicher, nicht in der Marke.
+ERLAEUTERUNGEN = (".md", ".txt")
+
+# Zwischen diesen beiden Kommentaren schreibt die Bruecke -- in der Seite
+# und im Service Worker.
+_MARKEN = "Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern"
+ANFANG = f"<!-- {_MARKEN} -->"
 ENDE = "<!-- Ende der Versionsmarken -->"
+SW_ANFANG = f"// {_MARKEN}"
+SW_ENDE = "// Ende der Versionsmarken"
 
 
 def kerndateien() -> List[str]:
@@ -279,41 +305,110 @@ def versionsmarken() -> str:
     return "".join(f"  {zeile}\n" for zeile in zeilen)
 
 
-def _adresse(pfad: Path, *, mit_marke: bool = False) -> str:
-    """Die Adresse einer Datei von der Seite aus, auf Wunsch mit ihrer Marke."""
-    adresse = f"./{pfad.relative_to(SEITE.parent).as_posix()}"
+def _adresse(pfad: Path, *, mit_marke: bool = False, von: Path | None = None) -> str:
+    """
+    Die Adresse einer Datei von der Seite aus, auf Wunsch mit ihrer Marke --
+    oder mit ``von`` vom Service Worker aus, ohne ``./``.
+    """
+    adresse = (pfad.relative_to(von).as_posix() if von is not None
+               else f"./{pfad.relative_to(SEITE.parent).as_posix()}")
     return f"{adresse}?v={marke(pfad)}" if mit_marke else adresse
 
 
 def versionsmarken_stimmen() -> bool:
     """Ob die Marken in der Seite zu den Dateien passen, auf die sie zeigen."""
-    _, block, _ = _zerlegen(SEITE)
+    _, block, _ = _zerlegen(SEITE, ANFANG, ENDE)
     return block == versionsmarken()
 
 
 def versionsmarken_schreiben(seite: Path | None = None) -> Path:
     """Ersetzt die Marken in der Seite; alles ausserhalb der beiden Kommentare bleibt."""
-    seite = Path(seite) if seite is not None else SEITE
-    kopf, _, fuss = _zerlegen(seite)
-    seite.write_text(kopf + versionsmarken() + fuss, encoding="utf-8")
-    return seite
+    return _einsetzen(Path(seite) if seite is not None else SEITE, ANFANG, ENDE,
+                      versionsmarken())
 
 
-def _zerlegen(seite: Path) -> Tuple[str, str, str]:
+def vorrat() -> dict:
     """
-    Die Seite in drei Stuecke: bis und mit dem Anfangskommentar, die Marken,
+    Was der Service Worker in seinen Speicher legt, damit die Seite auch ohne
+    Netz startet -- Pfade von der Wurzel aus:
+
+    - ``seiten``: :data:`SEITEN`, die er zuerst aus dem Netz holt;
+    - ``dateien``: das Stilblatt und alles ueber die Importtafel, mit Marke;
+    - ``fremd``: je Ordner unter ``web/vendor/`` seine Marke und seine
+      Dateien -- ohne die Pakete der Konsole (``.whl``): numpy und pandas
+      holt er erst, wenn ein Skript sie braucht.
+    """
+    return {
+        "seiten": list(SEITEN),
+        "dateien": [_adresse(pfad, mit_marke=True, von=WURZEL)
+                    for pfad in [STILBLATT, *tafeldateien()]],
+        "fremd": {
+            f"{_adresse(ordner, von=WURZEL)}/": {
+                "marke": fremdmarke(ordner),
+                "dateien": [_adresse(datei, von=WURZEL) for datei in _fremddateien(ordner)
+                            if datei.suffix != ".whl"],
+            }
+            for ordner in sorted(p for p in FREMD.iterdir() if p.is_dir())
+        },
+    }
+
+
+def fremdmarke(ordner: Path) -> str:
+    """
+    Die Marke eines Ordners unter ``web/vendor/``: die ersten zwoelf Zeichen
+    von SHA-256 ueber Namen und Inhalt jeder Datei darin, ausser den
+    Erlaeuterungen. Eine neue Fassung von Pyodide gibt eine neue Marke, also
+    einen neuen Speicher; eine Veroeffentlichung, die ihn nicht anruehrt,
+    laesst die 13 MB liegen.
+    """
+    summe = hashlib.sha256()
+    for datei in _fremddateien(ordner):
+        summe.update(datei.relative_to(ordner).as_posix().encode("utf-8") + b"\0")
+        summe.update(datei.read_bytes())
+    return summe.hexdigest()[:12]
+
+
+def _fremddateien(ordner: Path) -> List[Path]:
+    return sorted(p for p in Path(ordner).rglob("*")
+                  if p.is_file() and p.suffix not in ERLAEUTERUNGEN)
+
+
+def vorrat_marken() -> str:
+    """Was im Service Worker zwischen :data:`SW_ANFANG` und :data:`SW_ENDE` steht."""
+    return f"const VORRAT = {json.dumps(vorrat(), indent=2, ensure_ascii=False)};\n"
+
+
+def vorrat_stimmt() -> bool:
+    """Ob der Vorrat im Service Worker zu den Dateien passt."""
+    _, block, _ = _zerlegen(SW, SW_ANFANG, SW_ENDE)
+    return block == vorrat_marken()
+
+
+def vorrat_schreiben(datei: Path | None = None) -> Path:
+    """Ersetzt den Vorrat im Service Worker; alles ausserhalb der beiden Kommentare bleibt."""
+    return _einsetzen(Path(datei) if datei is not None else SW, SW_ANFANG, SW_ENDE,
+                      vorrat_marken())
+
+
+def _einsetzen(datei: Path, anfang: str, ende: str, block: str) -> Path:
+    kopf, _, fuss = _zerlegen(datei, anfang, ende)
+    datei.write_text(kopf + block + fuss, encoding="utf-8")
+    return datei
+
+
+def _zerlegen(datei: Path, anfang: str, ende: str) -> Tuple[str, str, str]:
+    """
+    Die Datei in drei Stuecke: bis und mit dem Anfangskommentar, die Marken,
     ab dem Endkommentar. Fehlt ein Kommentar, bricht es ab -- still nichts zu
     schreiben hiesse, die alten Marken blieben stehen.
     """
-    zeilen = seite.read_text(encoding="utf-8").splitlines(keepends=True)
+    zeilen = datei.read_text(encoding="utf-8").splitlines(keepends=True)
     try:
-        anfang = next(i for i, zeile in enumerate(zeilen) if zeile.strip() == ANFANG)
-        ende = next(i for i, zeile in enumerate(zeilen)
-                    if zeile.strip() == ENDE and i > anfang)
+        von = next(i for i, zeile in enumerate(zeilen) if zeile.strip() == anfang)
+        bis = next(i for i, zeile in enumerate(zeilen) if zeile.strip() == ende and i > von)
     except StopIteration:
-        raise ValueError(f"{seite}: Anfang oder Ende der Versionsmarken fehlt.") from None
-    return ("".join(zeilen[:anfang + 1]), "".join(zeilen[anfang + 1:ende]),
-            "".join(zeilen[ende:]))
+        raise ValueError(f"{datei}: Anfang oder Ende der Versionsmarken fehlt.") from None
+    return "".join(zeilen[:von + 1]), "".join(zeilen[von + 1:bis]), "".join(zeilen[bis:])
 
 
 if __name__ == "__main__":
@@ -334,3 +429,6 @@ if __name__ == "__main__":
     seite = versionsmarken_schreiben()
     print(f"{seite.relative_to(WURZEL)}: Marken für das Stilblatt und "
           f"{len(tafeldateien())} Dateien")
+    sw = vorrat_schreiben()
+    print(f"{sw.relative_to(WURZEL)}: Vorrat aus {len(tafeldateien()) + 1} Dateien mit Marke "
+          f"und den Ordnern unter {FREMD.relative_to(WURZEL)}/")

@@ -8260,6 +8260,11 @@
         "_adresse",
         "versionsmarken_stimmen",
         "versionsmarken_schreiben",
+        "vorrat",
+        "fremdmarke",
+        "vorrat_marken",
+        "vorrat_stimmt",
+        "vorrat_schreiben",
         "_zerlegen"
       ]
     },

@@ -333,6 +333,50 @@ class TestBruecke(unittest.TestCase):
             self.assertEqual(seite.read_text(encoding="utf-8"),
                              kopf + bruecke.versionsmarken() + fuss)
 
+    def test_der_vorrat_ist_auf_dem_stand(self):
+        self.assertTrue(
+            bruecke.vorrat_stimmt(),
+            "Der Vorrat in sw.js passt nicht mehr zu den Dateien. Bitte 'python3 -m "
+            "opencivil.web.bruecke' laufen lassen -- sonst fehlt der Seite ohne Netz, "
+            "was sich geändert hat.")
+
+    def test_der_vorrat_nennt_nur_was_es_gibt(self):
+        """Fehlte eine Datei, scheiterte die Installation -- und die Seite ginge ohne Netz nie auf."""
+        vorrat = bruecke.vorrat()
+        pfade = [*vorrat["seiten"], *vorrat["dateien"],
+                 *(d for ordner in vorrat["fremd"].values() for d in ordner["dateien"])]
+        for pfad in pfade:
+            with self.subTest(pfad=pfad):
+                datei = bruecke.WURZEL / pfad.split("?")[0]
+                self.assertTrue((datei / "index.html" if pfad.endswith("/") else datei).is_file())
+
+    def test_der_vorrat_holt_pyodide_aber_nicht_die_pakete_der_konsole(self):
+        """numpy und pandas kosten 7 MB und kommen erst, wenn ein Skript sie braucht."""
+        pyodide = bruecke.vorrat()["fremd"]["web/vendor/pyodide/"]["dateien"]
+        self.assertIn("web/vendor/pyodide/pyodide.asm.wasm", pyodide)
+        self.assertEqual([d for d in pyodide if d.endswith((".whl", ".md"))], [])
+
+    def test_die_marke_eines_fremden_ordners_haengt_am_inhalt(self):
+        """Eine Erläuterung zählt nicht: ihretwegen holte der Browser die 13 MB nicht neu."""
+        with tempfile.TemporaryDirectory() as ordner:
+            ordner = Path(ordner)
+            (ordner / "a.js").write_bytes(b"1")
+            vorher = bruecke.fremdmarke(ordner)
+            (ordner / "HERKUNFT.md").write_text("woher", encoding="utf-8")
+            self.assertEqual(bruecke.fremdmarke(ordner), vorher)
+            (ordner / "a.js").write_bytes(b"2")
+            self.assertNotEqual(bruecke.fremdmarke(ordner), vorher)
+
+    def test_vorrat_schreiben_laesst_den_rest_des_service_workers(self):
+        kopf = f"/** sw.js */\n{bruecke.SW_ANFANG}\n"
+        fuss = f"{bruecke.SW_ENDE}\nself.addEventListener('fetch', () => {{}});\n"
+        with tempfile.TemporaryDirectory() as ordner:
+            datei = Path(ordner) / "sw.js"
+            datei.write_text(kopf + "alt\n" + fuss, encoding="utf-8")
+            bruecke.vorrat_schreiben(datei)
+            self.assertEqual(datei.read_text(encoding="utf-8"),
+                             kopf + bruecke.vorrat_marken() + fuss)
+
     def test_ohne_kommentare_bricht_das_schreiben_ab(self):
         """Still nichts zu schreiben hiesse: die alten Marken blieben stehen."""
         with tempfile.TemporaryDirectory() as ordner:
