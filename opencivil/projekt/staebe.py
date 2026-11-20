@@ -158,12 +158,17 @@ def aufgezaehlt(namen: Sequence[str]) -> str:
 @dataclass
 class StabquerschnittBasis(Beschreibung):
     """
-    Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, ein
-    Stahlprofil aus der Tabelle (``profil``), mit Kennwerten von Hand in
-    ``masse`` -- ``A`` in mm², Traegheitsmomente in 10⁶ mm⁴; welche, sagt
-    :attr:`KENNWERTE` -- oder aus einer Platte oder Querschnittsanalyse des
-    Projekts (``bezug``). E und G kommen vom Material des Stabs; nimmt der
-    das Material des Querschnitts, sagt ``e_modul``, welches E.
+    Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm (``masse``),
+    ein Stahlprofil aus der Tabelle (``profil``), mit Kennwerten von Hand
+    (``kennwerte``) oder aus einer Platte oder Querschnittsanalyse des
+    Projekts (``platte``, ``analyse``). E und G kommen vom Material des
+    Stabs; nimmt der das Material des Querschnitts, sagt ``e_modul``, welches E.
+
+    Jede Art hat ihre eigenen Felder: wer umschaltet, setzt nur ``art``, und
+    nach dem Zurueckschalten stehen die alten Zahlen wieder da (Benutzer,
+    2026-11-19). Bis dahin teilten sich die Arten ``masse`` und ``bezug``,
+    und die Oberflaeche raeumte beim Umschalten ab, was :meth:`fehler` sonst
+    abwies -- dreimal nachgebessert.
     """
 
     KENNWERTE: ClassVar[Tuple[str, ...]]
@@ -174,6 +179,11 @@ class StabquerschnittBasis(Beschreibung):
     art: Querschnittsart = einer_von(tuple(Querschnittsart), Querschnittsart.VORLAGE)
     vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)
     masse: Dict[str, float] = field(default_factory=dict)
+    """Die Masse der Vorlage in mm -- was fehlt, gilt mit ihrer Vorgabe."""
+
+    kennwerte: Dict[str, float] = field(default_factory=dict)
+    """``A`` in mm², Traegheitsmomente in 10⁶ mm⁴ -- welche, sagt :attr:`KENNWERTE`."""
+
     profil: str = "IPE 300"
     """
     Der Name des Stahlprofils (:mod:`opencivil.stabwerk.profiltabelle`). Kein
@@ -181,13 +191,18 @@ class StabquerschnittBasis(Beschreibung):
     unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
     """
 
-    bezug: str = ""
-    """Die Kennung der Platte oder Querschnittsanalyse -- nur, wenn er aus einer kommt."""
+    platte: str = ""
+    """Die Kennung der Platte, aus der er kommt."""
+
+    analyse: str = ""
+    """Die Kennung der Querschnittsanalyse, aus der er kommt."""
 
     e_modul: str = einer_von(E_MODULE, "e0")
     """
     Welches E ein Stab hat, der das Material dieses Querschnitts nimmt:
-    ``e0`` -- E_cm seines Betons -- oder ``e_eq``, wie ``eq`` sagt.
+    ``e0`` -- E_cm seines Betons -- oder ``e_eq``, wie ``eq`` sagt. Ein
+    Material bringt nur einer aus einer Platte oder Analyse mit; bei einer
+    Form wartet die Wahl, bis er zurueckschaltet.
     """
 
     eq: ModulEintrag = field(default_factory=ModulEintrag)
@@ -197,6 +212,12 @@ class StabquerschnittBasis(Beschreibung):
     def neu(cls) -> "StabquerschnittBasis":
         """Ein frischer Querschnitt, wie die Oberflaeche ihn anlegt: ein Rechteck mit seinen Vorgaben."""
         return cls(masse=qs.RECHTECK.vorgaben())
+
+    @property
+    def bezug(self) -> str:
+        """Die Kennung der Platte oder Analyse, aus der er kommt -- leer bei einer Form."""
+        return {Querschnittsart.PLATTE: self.platte,
+                Querschnittsart.ANALYSE: self.analyse}.get(self.art, "")
 
     def stabvorlage(self) -> qs.Stabvorlage:
         return qs.vorlage(self.vorlage)
@@ -215,9 +236,6 @@ class StabquerschnittBasis(Beschreibung):
         gleich nach dem Umschalten, und die Oberflaeche zeigte weiter die
         Werte der vorherigen Art.
         """
-        if self.e_modul == "e_eq" and not self.art.aus_bauteil:
-            return ("ein E_eq gibt es nur bei einem Querschnitt aus einer Platte oder "
-                    "Querschnittsanalyse – nur sie haben eine Momenten-Krümmungs-Linie.")
         if self.art.aus_bauteil and not self.bezug:
             return f"noch keine {self.art.bauteil} gewählt."
         if self.art is Querschnittsart.VORLAGE:
@@ -228,11 +246,11 @@ class StabquerschnittBasis(Beschreibung):
                         f"Möglich sind: {', '.join(vorlage.vorgaben())}.")
             return vorlage.pruefen(self.masse_mit_vorgaben())
         if self.art is Querschnittsart.KENNWERTE:
-            fremd = [k for k in self.masse if k not in self.KENNWERTE]
+            fremd = [k for k in self.kennwerte if k not in self.KENNWERTE]
             if fremd:
                 return (f"einen Kennwert «{fremd[0]}» gibt es nicht. "
                         f"Möglich sind: {', '.join(self.KENNWERTE)}.")
-            if not all(self.masse.get(k, 0.0) > 0.0 for k in self.KENNWERTE):
+            if not all(self.kennwerte.get(k, 0.0) > 0.0 for k in self.KENNWERTE):
                 return f"{aufgezaehlt(self.KENNWERTE)} müssen grösser als null sein."
         return None
 
@@ -456,7 +474,7 @@ class MitStaeben:
     def querschnitt_mit_kennwerten(self, name: str, **kennwerte: float) -> Any:
         """Ein Querschnitt mit Kennwerten von Hand -- A in mm², Traegheitsmomente in 10⁶ mm⁴."""
         eintrag = self.QUERSCHNITT(kennung=self._neue_kennung(self.querschnitte, "Q"),
-                                   name=name, art="kennwerte", masse=dict(kennwerte))
+                                   name=name, art="kennwerte", kennwerte=dict(kennwerte))
         self.querschnitte.append(eintrag)
         return eintrag
 
@@ -471,8 +489,9 @@ class MitStaeben:
         if art not in ("platte", "analyse"):
             raise ProjektFehler(f"Ein Querschnitt kommt aus einer «platte» oder einer «analyse», "
                                 f"nicht aus «{art}».")
+        # Die Platte steht in «platte», die Analyse in «analyse»: Felder wie ihre Art.
         eintrag = self.QUERSCHNITT(kennung=self._neue_kennung(self.querschnitte, "Q"),
-                                   name=name, art=art, bezug=kennung_von(bezug))
+                                   name=name, art=art, **{art: kennung_von(bezug)})
         if E_eq is not None:
             eintrag.e_modul = "e_eq"
             eintrag.eq = ModulEintrag.aus_dict(dict(E_eq), f"Querschnitt '{name}', E_eq")

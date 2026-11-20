@@ -971,7 +971,7 @@ class TestLeereAnalyse(unittest.TestCase):
 
     def test_ein_system_mit_ihr_als_querschnitt_meldet_es(self):
         d = self.beschreibung()
-        d["balkensysteme"][0]["querschnitte"][0].update(art="analyse", bezug="a9")
+        d["balkensysteme"][0]["querschnitte"][0].update(art="analyse", analyse="a9")
         antwort = dienst.bearbeite("rechnen", {"projekt": d})
         self.assertEqual(antwort.status, 200)
         meldungen = [m["text"] for m in antwort.daten["zeichendaten"]["r1"]["uebersicht"]["meldungen"]]

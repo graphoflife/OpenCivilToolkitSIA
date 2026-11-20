@@ -458,14 +458,12 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         «Querschnitt». Offen bleibt der Ort in den Worten der Maske – «Lage
         2» statt «lagen 2» (offen seit 2026-10-16); das ist jetzt eine
         Übersetzung von `wo`, kein Schnitt im Text.
-      - Der Stabquerschnitt im Balkensystem: `masse` heisst je nach Art
-        Abmessungen oder A und I, `bezug` Platte oder Analyse; das JS räumt
-        beim Umschalten ab, was `fehler()` im Kern ablehnt -- dreimal
-        nachgebessert (2026-10-24, zweimal 2026-11-19). Umbau: je Art ein
-        eigenes Feld (`kennwerte` neben `masse`, ein Bezug je Art);
-        Umschalten ist dann `setzen('art')`. Entschieden (Benutzer,
-        2026-11-19): nach dem Zurückschalten stehen die alten Zahlen wieder
-        da.
+      - Erledigt (2026-11-20): der Stabquerschnitt hat je Art ein eigenes
+        Feld – `masse`, `kennwerte`, `profil`, `platte`, `analyse` –, und
+        umschalten ist `setzen('art')`. Nach dem Zurückschalten stehen die
+        alten Zahlen wieder da (Benutzer, 2026-11-19), auch die Wahl E₀ oder
+        E_eq: bei einer Form wartet sie, statt dass der Querschnitt nicht
+        rechnet.
       - `tests/test_balkensystem.py` hat 1080 Zeilen -- über der Grenze
         seit 2026-11-15, am 2026-11-19 weiter gewachsen --, und
         `test_nachweis_mn.py` 1006. Naht: Ebene und Raum getrennt.

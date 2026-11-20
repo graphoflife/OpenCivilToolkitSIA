@@ -7,6 +7,21 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Jede Art eines Stabquerschnitts hat ihre Felder
+
+Ein Querschnitt im Balkensystem kommt aus einer Vorlage, einem Stahlprofil,
+Kennwerten von Hand, einer Platte oder einer Querschnittsanalyse. Die Arten
+teilten sich zwei Felder: die Masse hiessen je nach Art Abmessungen oder A
+und I, der Bezug Platte oder Analyse. Darum räumte die Oberfläche beim
+Umschalten ab, was der Kern sonst abwies – dreimal nachgebessert, zuletzt
+für die Wahl E₀ oder E_eq. Wer zurückschaltete, fand leere Felder.
+
+Jetzt hat jede Art ihr eigenes Feld, und umschalten setzt nur die Art. Wer
+etwa A = 1000 mm² von Hand eingibt, auf «Vorlage» und wieder zurück
+schaltet, findet die 1000 wieder (Benutzer, 2026-11-19). Ebenso die Wahl
+E_eq: bei einer Vorlage gilt sie nicht und wartet, statt dass der
+Querschnitt nicht rechnet.
+
 ## 2026-11-20 · Ein Fehler trägt Ort und Grund getrennt
 
 Was einem Bauteil noch fehlt, sagt ein Hinweis an seiner Stelle («Nichts zu

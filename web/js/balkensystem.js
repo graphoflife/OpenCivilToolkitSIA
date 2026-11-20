@@ -351,7 +351,8 @@ function herkunftText(art, q) {
   if (q.art === 'profil') return q.achse ? `${q.profil} · um ${q.achse}` : q.profil;
   if (q.art === 'kennwerte') return 'Kennwerte von Hand';
   const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
-  const bezug = liste.find((x) => x.kennung === q.bezug);
+  // Die Platte steht in «platte», die Analyse in «analyse»: Felder wie ihre Art.
+  const bezug = liste.find((x) => x.kennung === q[q.art]);
   return `${artKurz(art, q)} ${bezug ? `«${bezug.name}»` : '– nicht gewählt –'}`;
 }
 
@@ -413,23 +414,12 @@ function querschnittFenster(system, kennung) {
     wahlBlock(`${kennwertnamen(art)} aus`, wahlSchalter({
       werte: systemkatalog(art, 'querschnittsarten').map((x) => ({ wert: x.wert, beschriftung: x.kurz, titel: x.beschriftung })),
       gewaehlt: q.art, titel: `Woher ${kennwertnamen(art)} kommen`,
-      // Die Masse gehören zur Art: eine Vorlage bekommt ihre Vorgaben,
-      // Kennwerte beginnen leer -- bis 2026-10-24 blieben b und h stehen,
-      // und «einen Kennwert «b» gibt es nicht» war die Folge. Ebenso die
-      // gewählte Platte oder Analyse: bis 2026-11-19 blieb eine Analyse als
-      // «Platte» stehen, und das ganze Projekt rechnete nicht mehr.
-      // Ebenso ein E_eq: es gibt es nur aus einer Platte oder Analyse. Blieb
-      // es stehen, rechnete der Querschnitt nicht, und ohne einen Stab
-      // «gemäss Querschnitt» zeigte kein Schalter den Weg zurück (bis
-      // 2026-11-19). Dann gilt wieder das E eines neuen Querschnitts.
-      setzen: (w) => aendern((x) => {
-        x.art = w;
-        x.bezug = '';
-        if (w === 'vorlage') x.masse = vorgabenDer(art, x.vorlage);
-        if (w === 'kennwerte' || w === 'profil') x.masse = {};
-        const passt = systemkatalog(art, 'e_module').some((m) => m.wert === x.e_modul && m.arten.includes(w));
-        if (!passt) x.e_modul = katalog('vorlagen', systemkatalog(art, 'klassen', 'querschnitt')).e_modul;
-      }),
+      // Jede Art hat ihre eigenen Felder: umschalten heisst nur die Art
+      // setzen, und wer zurückschaltet, findet ihre alten Zahlen (Benutzer,
+      // 2026-11-19). Bis dahin teilten sich die Arten Masse und Bezug, und
+      // hier wurde abgeräumt, was der Kern sonst ablehnte -- dreimal
+      // nachgebessert.
+      setzen: setzen('art'),
     })),
   ];
   if (q.art === 'vorlage') {
@@ -484,8 +474,8 @@ function querschnittFenster(system, kennung) {
     );
   } else if (q.art === 'kennwerte') {
     zeilen.push(...systemkatalog(art, 'kennwerte').map((k) => feld(k.kurz, zahlfeld({
-      wert: q.masse?.[k.kurz] ?? 0, schritt: k.kurz === 'A' ? 1000 : 10, min: 0, titel: k.beschriftung,
-      beiAenderung: (w) => aendern((x) => { x.masse = { ...x.masse, [k.kurz]: w }; }),
+      wert: q.kennwerte?.[k.kurz] ?? 0, schritt: k.kurz === 'A' ? 1000 : 10, min: 0, titel: k.beschriftung,
+      beiAenderung: (w) => aendern((x) => { x.kennwerte = { ...x.kennwerte, [k.kurz]: w }; }),
     }), k.einheit, k.beschriftung)));
   } else {
     const liste = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
@@ -494,8 +484,8 @@ function querschnittFenster(system, kennung) {
     zeilen.push(el('div.bs-qvorlage', {}, [
       feld(artKurz(art, q), auswahl({
         werte: [{ wert: '', beschriftung: leer }, ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
-        gewaehlt: q.bezug,
-        beiAenderung: setzen('bezug'),
+        gewaehlt: q[q.art],
+        beiAenderung: setzen(q.art),
       })),
       umrissBild(system, q, 120, 90),
     ]));
@@ -503,11 +493,10 @@ function querschnittFenster(system, kennung) {
   // Welches E ein Stab hat, der das Material dieses Querschnitts nimmt --
   // nur, wenn einer das tut, und nur, wo es mehr als E₀ gibt: E_eq hat nur
   // einer aus einer Platte oder Analyse (Benutzer, 2026-10-24). Welche
-  // Stellungen es gibt, sagt der
-  // Katalog; die gewählte bleibt sichtbar, auch wo sie nicht mehr passt --
-  // die Meldung des Kerns sagt dann warum.
+  // Stellungen es gibt, sagt der Katalog; bei einer Form wartet die Wahl,
+  // bis der Querschnitt zurückschaltet.
   const eigenes = systemkatalog(art, 'material_des_querschnitts');
-  const module = systemkatalog(art, 'e_module').filter((x) => x.arten.includes(q.art) || x.wert === q.e_modul);
+  const module = systemkatalog(art, 'e_module').filter((x) => x.arten.includes(q.art));
   const mitEigenem = system.linien.some((l) => l.querschnitt === q.kennung && l.material === eigenes);
   if (mitEigenem && module.length > 1) {
     zeilen.push(wahlBlock('E-Modul', wahlSchalter({
@@ -521,7 +510,7 @@ function querschnittFenster(system, kennung) {
         + 'nimmt – sonst gilt das E seines Materials.',
     }));
   }
-  if (mitEigenem && q.e_modul === 'e_eq') {
+  if (mitEigenem && module.some((x) => x.wert === 'e_eq') && q.e_modul === 'e_eq') {
     const eq = (veraenderer) => aendern((x) => veraenderer(x.eq));
     const zahl = (name, schritt, titel) => feld(name, zahlfeld({
       wert: q.eq[name], schritt, leer: 0, titel,

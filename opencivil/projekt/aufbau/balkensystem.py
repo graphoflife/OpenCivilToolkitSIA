@@ -280,7 +280,7 @@ def form_von(q: StabquerschnittBasis, wo: str,
         return form if achse is None else replace(
             form, herkunft=f"{q.profil}, {achse.beschriftung}", traegheit=achse.traegheit)
     return VonHand(kennung=q.kennung, name=q.name, herkunft="von Hand",
-                   fehler=q.fehler() or "", masse=dict(q.masse))
+                   fehler=q.fehler() or "", masse=dict(q.kennwerte))
 
 
 def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,

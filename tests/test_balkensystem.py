@@ -534,7 +534,7 @@ class TestRechnen(unittest.TestCase):
         for art, welche in (("platte", "Platte"), ("analyse", "Querschnittsanalyse")):
             with self.subTest(art=art):
                 d = traeger().als_dict()
-                d["balkensysteme"][0]["querschnitte"][0].update(art=art, bezug="")
+                d["balkensysteme"][0]["querschnitte"][0].update(art=art)
                 antwort = dienst.bearbeite("rechnen", {"projekt": d})
                 self.assertEqual(antwort.status, 200)
                 uebersicht = antwort.daten["zeichendaten"]["r1"]["uebersicht"]
@@ -978,6 +978,27 @@ class TestUmrisse(unittest.TestCase):
         self.assertEqual((umrisse["Q4"], umrisse["Q5"]), ([], []))
 
 
+class TestJeArtEigeneFelder(unittest.TestCase):
+    """
+    Jede Art eines Querschnitts hat ihre eigenen Felder: wer umschaltet,
+    setzt nur die Art, und nach dem Zurückschalten stehen die alten Zahlen
+    wieder da (Benutzer, 2026-11-19). Bis dahin teilten sich die Arten Masse
+    und Bezug, und die Oberfläche räumte beim Umschalten ab.
+    """
+
+    def test_umschalten_ist_nur_die_art(self):
+        p = traeger()
+        q = p.balkensysteme[0].querschnitte[0]
+        q.kennwerte = {"A": 1000.0, "I": 10.0}
+        q.platte = p.platte("Decke", h=250).kennung
+        # A in m²: der Streifen 1000 × 250 der Platte, 1000 mm² von Hand, das Rechteck 300 × 600.
+        for art, A in (("platte", 0.25), ("kennwerte", 1e-3), ("vorlage", 0.18), ("platte", 0.25)):
+            with self.subTest(art=art):
+                q.art = art
+                e = p.rechnen()
+                self.assertAlmostEqual(e.wert(f"balkensystem.r1.{q.kennung}.A").groesse.si, A)
+
+
 class TestEeq(unittest.TestCase):
     """
     E_eq aus einer Querschnittsanalyse bei N und M -- an derselben Stelle wie
@@ -1047,12 +1068,18 @@ class TestEeq(unittest.TestCase):
         self.assertIn("kein E_eq", meldungen[0])
         self.assertIn("Biegewiderstand", meldungen[0])
 
-    def test_nur_aus_platte_oder_analyse(self):
-        p = traeger()
-        p.balkensysteme[0].querschnitte[0].e_modul = "e_eq"
-        meldungen = [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
-        self.assertTrue(any("nur bei einem Querschnitt aus einer Platte oder Querschnittsanalyse"
-                            in m for m in meldungen), meldungen)
+    def test_bei_einer_form_wartet_die_wahl(self):
+        """
+        E_eq gibt es nur aus einer Platte oder Analyse. Schaltet der
+        Querschnitt auf eine Form, wartet die Wahl, statt dass er nicht
+        rechnet; zurück bei der Analyse gilt wieder E_eq. Bis 2026-11-20
+        setzte die Oberfläche sie beim Umschalten zurück.
+        """
+        p, q = self.projekt(M=80.0)
+        q.art = "vorlage"
+        self.assertIsNone(q.fehler())
+        q.art = "analyse"
+        self.assertIn("E-Modul, «Unterzug» (E_eq)", str(p.rechnen().bericht()))
 
     def test_herleitung(self):
         p, q = self.projekt(M=80.0)

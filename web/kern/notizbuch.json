@@ -6934,6 +6934,7 @@
         "aufgezaehlt",
         "StabquerschnittBasis",
         "StabquerschnittBasis.neu",
+        "StabquerschnittBasis.bezug",
         "StabquerschnittBasis.stabvorlage",
         "StabquerschnittBasis.masse_mit_vorgaben",
         "StabquerschnittBasis.fehler",

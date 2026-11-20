@@ -1,5 +1,5 @@
 ---
-erzeugt: 76fedbe2a863
+erzeugt: e7900730115d
 art: modul
 tags: [modul]
 ---
@@ -142,22 +142,29 @@ def aufgezaehlt(namen: Sequence[str]) -> str
 class StabquerschnittBasis(Beschreibung)
 ```
 
-Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, ein
-Stahlprofil aus der Tabelle (`profil`), mit Kennwerten von Hand in
-`masse` -- `A` in mm², Traegheitsmomente in 10⁶ mm⁴; welche, sagt
-[[opencivil.projekt.staebe#StabquerschnittBasis|KENNWERTE]] -- oder aus einer Platte oder Querschnittsanalyse des
-Projekts (`bezug`). E und G kommen vom Material des Stabs; nimmt der
-das Material des Querschnitts, sagt `e_modul`, welches E.
+Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm (`masse`),
+ein Stahlprofil aus der Tabelle (`profil`), mit Kennwerten von Hand
+(`kennwerte`) oder aus einer Platte oder Querschnittsanalyse des
+Projekts (`platte`, `analyse`). E und G kommen vom Material des
+Stabs; nimmt der das Material des Querschnitts, sagt `e_modul`, welches E.
+
+Jede Art hat ihre eigenen Felder: wer umschaltet, setzt nur `art`, und
+nach dem Zurueckschalten stehen die alten Zahlen wieder da (Benutzer,
+2026-11-19). Bis dahin teilten sich die Arten `masse` und `bezug`,
+und die Oberflaeche raeumte beim Umschalten ab, was [[opencivil.projekt.staebe#StabquerschnittBasis.fehler|fehler]] sonst
+abwies -- dreimal nachgebessert.
 
 - `KENNWERTE: ClassVar[Tuple[str, ...]]` – Die Kennwerte von Hand, wie die Rechnung sie nimmt.
 - `kennung: str = ''`
 - `name: str = ''`
 - `art: Querschnittsart = einer_von(tuple(Querschnittsart), Querschnittsart.VORLAGE)`
 - `vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)`
-- `masse: Dict[str, float] = field(default_factory=dict)`
+- `masse: Dict[str, float] = field(default_factory=dict)` – Die Masse der Vorlage in mm -- was fehlt, gilt mit ihrer Vorgabe.
+- `kennwerte: Dict[str, float] = field(default_factory=dict)` – `A` in mm², Traegheitsmomente in 10⁶ mm⁴ -- welche, sagt [[opencivil.projekt.staebe#StabquerschnittBasis|KENNWERTE]].
 - `profil: str = 'IPE 300'` – Der Name des Stahlprofils ([[opencivil.stabwerk.profiltabelle]]). Kein Wahlfeld, damit die Meldung nicht alle 666 Profile aufzaehlt: einen unbekannten Namen meldet der Aufbau, wie eine Platte, die es nicht gibt.
-- `bezug: str = ''` – Die Kennung der Platte oder Querschnittsanalyse -- nur, wenn er aus einer kommt.
-- `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt.
+- `platte: str = ''` – Die Kennung der Platte, aus der er kommt.
+- `analyse: str = ''` – Die Kennung der Querschnittsanalyse, aus der er kommt.
+- `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt. Ein Material bringt nur einer aus einer Platte oder Analyse mit; bei einer Form wartet die Wahl, bis er zurueckschaltet.
 - `eq: ModulEintrag = field(default_factory=ModulEintrag)` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
 
 #### StabquerschnittBasis.neu
@@ -168,6 +175,15 @@ def neu(cls) -> 'StabquerschnittBasis'
 ```
 
 Ein frischer Querschnitt, wie die Oberflaeche ihn anlegt: ein Rechteck mit seinen Vorgaben.
+
+#### StabquerschnittBasis.bezug
+
+```python
+@property
+def bezug(self) -> str
+```
+
+Die Kennung der Platte oder Analyse, aus der er kommt -- leer bei einer Form.
 
 #### StabquerschnittBasis.stabvorlage
 
