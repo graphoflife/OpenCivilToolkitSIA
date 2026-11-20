@@ -1,5 +1,5 @@
 ---
-erzeugt: 9c212d712118
+erzeugt: c64100b65260
 art: modul
 tags: [modul]
 ---
@@ -31,7 +31,8 @@ Gutachten des Produkts anstelle der 2 in (70), wie 4.3.6.5.9 es zulässt
 d_v,out reicht von der Zugbewehrung bis zur Verankerung der Anker auf der
 Druckseite: d − c_v (Figur 26). k_e gilt je Schnitt (4.3.6.5.10 verweist
 auf 4.3.6.2.3): die Näherung der gestützten Fläche oder (57) mit der Fläche
-und dem Schwerpunkt des äusseren Schnitts. Bis 2026-11-14 galt aussen das
+und dem Schwerpunkt des äusseren Schnitts -- wie die Regel der Stelle es sagt
+([[opencivil.durchstanzen.pruefung#KeRegel|.pruefung.KeRegel]]). Bis 2026-11-14 galt aussen das
 k_e von innen -- an Rand- und Eckstützen bis 20 % zu günstig. Abgezogen
 wird die Flächenlast innerhalb des äusseren Schnitts (4.3.6.2.6).
 
@@ -133,24 +134,6 @@ Die Durchstanzbewehrung suchen und mit ihr nachweisen -- und wo die erste
 Druckdiagonale an einer Innenstütze bricht, einen Stahlpilz. Zurück kommen
 die Urteile, die Leisten und der Pilz, so weit es sie gibt.
 
-### _k_e
-
-```python
-def _k_e(n: 'Durchstanzen', werte: _Werte, a: Auswertung) -> float
-```
-
-k_e an einem Schnitt um die Anker oder den Pilz: die Näherung gilt für die
-gestützte Fläche (4.3.6.2.5), (57) rechnet mit der Fläche und dem
-Schwerpunkt dieses Schnitts (4.3.6.2.4).
-
-### _k_e_schreiben
-
-```python
-def _k_e_schreiben(n: 'Durchstanzen', p: Protokoll, w: Zwischenwerte, werte: _Werte, a: Auswertung, ix: Index) -> Wert
-```
-
-k_e an einem Schnitt um die Anker oder den Pilz, wie [[opencivil.durchstanzen.mit_bewehrung#_k_e|_k_e]] es rechnet.
-
 ### _verankerung_schreiben
 
 ```python
@@ -213,8 +196,8 @@ hinausreicht und mit dem die Platte ausserhalb hält -- ohne Leisten oder
 mit Leisten um ihn, die alle Nachweise erfüllen.
 
 Ein Pilz, dessen Druckdiagonale nicht einmal mit dem ganzen Umfang um ihn
-hielte -- der Hülle samt dem Bogen d_v/2 rundum, ohne Abzüge, und mit
-k_e = 1, wo (57) gilt --, fällt weg, bevor sein Schnitt gerechnet wird: so
+hielte -- der Hülle samt dem Bogen d_v/2 rundum, ohne Abzüge, und mit dem
+grössten k_e der Regel, 1 nach (57) --, fällt weg, bevor sein Schnitt gerechnet wird: so
 bleibt die Suche schnell.
 
 ### _mit_pilz
@@ -240,7 +223,6 @@ Schritten wie um die Stütze, ohne Leisten oder mit Leisten um ihn.
 - [[opencivil.durchstanzen.produkte]]
 - [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
-- [[opencivil.durchstanzen.stelle]]
 
 ## Gebraucht von
 

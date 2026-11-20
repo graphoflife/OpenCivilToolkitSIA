@@ -253,12 +253,15 @@ class TestDurchstanzbewehrung(unittest.TestCase):
         Schwerpunkt des äusseren Schnitts. Die Resultierende liegt in der
         Stützenachse, im Ursprung; an der Randstütze ist k_e aussen kleiner.
         """
-        befund = rechnen(projekt(lage="rand", ke="exzentrizitaet", a_y=0, b_x=400, b_y=400,
-                                 V_d=400.0))[2]
+        _, loesung, befund, _ = rechnen(projekt(lage="rand", ke="exzentrizitaet", a_y=0, b_x=400,
+                                                b_y=400, V_d=400.0))
         a = befund.leisten.aussen.auswertung
         k_e = beiwert_k_e(math.hypot(*a.schwerpunkt), kreisdurchmesser(a.flaeche))
         self.assertAlmostEqual(befund.leisten.aussen.k_e, k_e)
         self.assertLess(befund.leisten.aussen.k_e, befund.innen.k_e - 0.05)
+        # Die Herleitung zeigt das k_e, mit dem geprüft ist -- innen und aussen.
+        self.assertEqual(ergebnis(loesung, "k_e"), f"{befund.innen.k_e:.3f}")
+        self.assertEqual(ergebnis(loesung, "out_k_e"), f"{befund.leisten.aussen.k_e:.3f}")
 
     def test_hinweis_wo_das_produkt_tabelle_21_ueberschreitet(self):
         """

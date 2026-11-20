@@ -1,5 +1,5 @@
 ---
-erzeugt: 371fc7c1c0fb
+erzeugt: 1d690ee61ae3
 art: modul
 tags: [modul]
 ---
@@ -89,11 +89,13 @@ die der Auswertung, mit der auch die Prüfung rechnet.
 ### k_e
 
 ```python
-def k_e(p: Protokoll, w: Zwischenwerte, a: Auswertung, e_u: Tuple[float, float], *, ix: Index) -> Wert
+def k_e(p: Protokoll, w: Zwischenwerte, s: Schnittpruefung, *, ix: Index, an_der_stuetze: Optional[Wert]=None) -> Wert
 ```
 
-k_e nach (57): b aus der Fläche im Schnitt, e_u von seinem Schwerpunkt
-zur Resultierenden der Auflagerkraft -- je Komponente, in m.
+k_e an diesem Schnitt, wie die Regel der Stelle ihn gibt
+([[opencivil.durchstanzen.pruefung#KeRegel|KeRegel]]). `an_der_stuetze` ist k_e am Schnitt um
+die Stütze -- fehlt es, ist es dieser. Die Näherung steht nur dort und
+gilt an jedem Schnitt; (57) steht an jedem, mit seiner Fläche, b und e_u.
 
 ### wirksam
 

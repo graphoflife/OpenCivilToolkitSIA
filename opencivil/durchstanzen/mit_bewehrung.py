@@ -22,7 +22,8 @@ IM ÄUSSEREN SCHNITT:
 d_v,out reicht von der Zugbewehrung bis zur Verankerung der Anker auf der
 Druckseite: d − c_v (Figur 26). k_e gilt je Schnitt (4.3.6.5.10 verweist
 auf 4.3.6.2.3): die Näherung der gestützten Fläche oder (57) mit der Fläche
-und dem Schwerpunkt des äusseren Schnitts. Bis 2026-11-14 galt aussen das
+und dem Schwerpunkt des äusseren Schnitts -- wie die Regel der Stelle es sagt
+(:class:`.pruefung.KeRegel`). Bis 2026-11-14 galt aussen das
 k_e von innen -- an Rand- und Eckstützen bis 20 % zu günstig. Abgezogen
 wird die Flächenlast innerhalb des äusseren Schnitts (4.3.6.2.6).
 
@@ -58,14 +59,13 @@ from opencivil.durchstanzen.bewehrung import Vorschlag, bemessen
 from opencivil.durchstanzen.herleitung import Index
 from opencivil.durchstanzen.produkte import Stahlpilz
 from opencivil.durchstanzen.pruefung import (
-    C_V_GRENZE, C_V_MINDERUNG, Leistenpruefung, Pilzbefund, Schnittpruefung, beiwert_k_e,
-    druckdiagonale, kreisdurchmesser, minderung, spannung, tabelle_21,
+    C_V_GRENZE, C_V_MINDERUNG, Leistenpruefung, Pilzbefund, Schnittpruefung, druckdiagonale,
+    minderung, spannung, tabelle_21,
 )
 from opencivil.durchstanzen.schnitt import (
-    ECKENBEREICH, Auswertung, Punkt, Schatten, Stueck, Stuetzenflaeche, kandidaten_stuetze,
+    ECKENBEREICH, Punkt, Schatten, Stueck, Stuetzenflaeche, kandidaten_stuetze,
     konvexe_huelle, nachweisschnitt, schatten_am_schnitt,
 )
-from opencivil.durchstanzen.stelle import KeArt
 
 if TYPE_CHECKING:
     from opencivil.durchstanzen.nachweis import Durchstanzen
@@ -196,30 +196,6 @@ def nachweisen(n: "Durchstanzen", e: Eingaben, p: Protokoll, w: Zwischenwerte, g
     return _mit_pilz(n, p, w, werte, *gewaehlt)
 
 
-def _k_e(n: "Durchstanzen", werte: _Werte, a: Auswertung) -> float:
-    """
-    k_e an einem Schnitt um die Anker oder den Pilz: die Näherung gilt für die
-    gestützte Fläche (4.3.6.2.5), (57) rechnet mit der Fläche und dem
-    Schwerpunkt dieses Schnitts (4.3.6.2.4).
-    """
-    if n.stelle.ke is KeArt.NAEHERUNG:
-        return werte.g.k_e.groesse.si
-    e_u = math.hypot(*n.exzentrizitaet(werte.e, a, werte.g.masse))
-    return beiwert_k_e(e_u, kreisdurchmesser(a.flaeche))
-
-
-def _k_e_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte,
-                   a: Auswertung, ix: Index) -> Wert:
-    """k_e an einem Schnitt um die Anker oder den Pilz, wie :func:`_k_e` es rechnet."""
-    if n.stelle.ke is KeArt.NAEHERUNG:
-        p.erklaerung("Die Näherung für k_e gilt für die gestützte Fläche, an jedem ihrer "
-                     "Schnitte (4.3.6.2.5).")
-        return werte.g.k_e
-    p.erklaerung("k_e nach (57) gilt für jeden Schnitt mit seiner eigenen Fläche und dem "
-                 "Schwerpunkt seiner zählenden Teile (4.3.6.2.3, 4.3.6.2.4).")
-    return herleitung.k_e(p, w, a, n.exzentrizitaet(werte.e, a, werte.g.masse), ix=ix)
-
-
 def _verankerung_schreiben(p: Protokoll, c_v: float, d_v: float, eta: float) -> str:
     """
     Ob die Anker auf der Druckseite genügend verankert sind (5.5.3.11) -- und
@@ -268,9 +244,8 @@ def _suchen(n: "Durchstanzen", werte: _Werte, ort: Ort) -> Optional[Leistenpruef
     def pruefen(vorschlag: Vorschlag) -> Leistenpruefung:
         return Leistenpruefung(
             vorschlag, ort.pruefung,
-            Schnittpruefung(vorschlag.aussen, werte.d_v_out.groesse.si,
-                            _k_e(n, werte, vorschlag.aussen.massgebend), e.g("V_d").si,
-                            e.g("q_d").si),
+            Schnittpruefung(vorschlag.aussen, werte.d_v_out.groesse.si, g.innen.regel,
+                            e.g("V_d").si, e.g("q_d").si),
             k_r=g.k_r.groesse.si, tau_cd=g.tau_cd.groesse.si,
             sigma_sd=spannung(werte.E_s.groesse.si, g.psi.groesse.si, werte.f_ctm.groesse.si,
                               werte.f_yd.groesse.si, g.d.groesse.si, vorschlag.typ.durchmesser),
@@ -404,7 +379,7 @@ def _leisten_schreiben(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte:
         ecken_text="Von einer Geraden zwischen zwei äussersten Ankern zählen höchstens "
                    "1.5·d_v,out von jedem Ende (Figur 26).",
         ecken_referenz="SIA 262:2025, 4.3.6.5.10, Figur 26")
-    k_e = _k_e_schreiben(n, p, w, werte, aussen.auswertung, ix)
+    k_e = herleitung.k_e(p, w, aussen, ix=ix, an_der_stuetze=g.k_e)
     u = herleitung.wirksam(p, w, k_e, u_red, ix=ix,
                            titel="Wirksamer Umfang des äusseren Nachweisschnitts")
     V_d_out = herleitung.querkraft(
@@ -450,8 +425,7 @@ def _pilz_pruefen(n: "Durchstanzen", werte: _Werte, pilz: Stahlpilz) -> Pilzbefu
         kandidaten_stuetze(Stuetzenflaeche(umriss), d_v / 2.0, ECKENBEREICH * d_v,
                            s.flaeche.raender(g.masse)),
         d_v=d_v, achse=s.flaeche.achse(g.masse), aussparungen=s.aussparungen)
-    pruefung = Schnittpruefung(schnitt, d_v, _k_e(n, werte, schnitt.massgebend), e.g("V_d").si,
-                               e.g("q_d").si)
+    pruefung = Schnittpruefung(schnitt, d_v, g.innen.regel, e.g("V_d").si, e.g("q_d").si)
     return Pilzbefund(pilz, umriss, pruefung,
                       pruefung.V_Rd_c(g.k_r.groesse.si, g.tau_cd.groesse.si))
 
@@ -479,12 +453,12 @@ def _pilz_suchen(n: "Durchstanzen", werte: _Werte
     mit Leisten um ihn, die alle Nachweise erfüllen.
 
     Ein Pilz, dessen Druckdiagonale nicht einmal mit dem ganzen Umfang um ihn
-    hielte -- der Hülle samt dem Bogen d_v/2 rundum, ohne Abzüge, und mit
-    k_e = 1, wo (57) gilt --, fällt weg, bevor sein Schnitt gerechnet wird: so
+    hielte -- der Hülle samt dem Bogen d_v/2 rundum, ohne Abzüge, und mit dem
+    grössten k_e der Regel, 1 nach (57) --, fällt weg, bevor sein Schnitt gerechnet wird: so
     bleibt die Suche schnell.
     """
     g, e = werte.g, werte.e
-    k_e = g.k_e.groesse.si if n.stelle.ke is KeArt.NAEHERUNG else 1.0
+    k_e = g.innen.regel.hoechstens
     k_r, tau, d = g.k_r.groesse.si, g.tau_cd.groesse.si, g.d.groesse.si
     hoehe = e.g("h").si - produkte.PILZ_OBEN - produkte.PILZ_UNTEN
     weite = max(max(abs(x), abs(y)) for x, y in g.umriss)
@@ -544,7 +518,7 @@ def _mit_pilz(n: "Durchstanzen", p: Protokoll, w: Zwischenwerte, werte: _Werte,
         ecken_text="Die Enden der Stege sind Ecken der gestützten Fläche: von einer Geraden "
                    "zwischen ihnen zählt nur, was höchstens 1.5·d_v von einem Ende entfernt liegt.",
         ecken_referenz="SIA 262:2025, 4.3.6.2.3, Figur 23a")
-    k_e = _k_e_schreiben(n, p, w, werte, a, ix)
+    k_e = herleitung.k_e(p, w, befund.pruefung, ix=ix, an_der_stuetze=g.k_e)
     u = herleitung.wirksam(p, w, k_e, u_red, ix=ix,
                            titel="Wirksamer Umfang des Schnitts um den Stahlpilz")
     V_d = herleitung.querkraft(

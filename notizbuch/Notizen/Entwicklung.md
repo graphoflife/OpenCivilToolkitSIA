@@ -7,6 +7,23 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Durchstanzen: k_e nach einer Regel
+
+Ob k_e aus der Näherung (4.3.6.2.5) oder aus (57) kommt, entschied das
+Durchstanzen an vier Stellen: am Schnitt um die Stütze, stumm und laut an
+den Schnitten um die Anker und den Pilz, und in der raschen Auslese der
+Pilze. Die Eingänge von (57) – b und e_u – stellten die stille Suche und
+die Herleitung je selbst zusammen. Wer eine dritte Art ergänzt und eine
+Stelle vergisst, hätte aussen mit einem anderen k_e gerechnet, als die
+Herleitung zeigt.
+
+Jetzt wird die Regel einmal gebaut, im Nachweis an der Stütze:
+`KeNaeherung` – ein Wert der gestützten Fläche, an jedem ihrer Schnitte –
+oder `KeExzentrizitaet` mit dem Punkt, an dem die Auflagerkraft angreift.
+Jede `Schnittpruefung` hält die Regel und fragt sie nach ihrem k_e; die
+Herleitung schreibt, was sie gibt, und die Auslese der Pilze fragt nach
+dem grössten k_e der Regel. Die Herleitung bleibt Wort für Wort dieselbe.
+
 ## 2026-11-19 · Grundbruch: Zahl und Formel aus derselben Spalte
 
 Die Tragfähigkeitsformel stand in vier Formen: ein Wörterbuch der Werte,

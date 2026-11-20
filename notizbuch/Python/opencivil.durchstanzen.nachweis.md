@@ -1,5 +1,5 @@
 ---
-erzeugt: ab5f80c864fa
+erzeugt: f14cff27ed29
 art: modul
 tags: [modul]
 ---
@@ -158,23 +158,15 @@ k_e. Wo die gestützte Fläche eine Formel für u_0 kennt, steht sie da,
 sonst die Länge in der Platte; die Abzüge schreibt [[opencivil.durchstanzen.herleitung|.herleitung]],
 wie an jedem Schnitt.
 
-#### Durchstanzen.exzentrizitaet
+#### Durchstanzen._resultierende
 
 ```python
-def exzentrizitaet(self, e: Eingaben, a: Auswertung, masse: Masse) -> Tuple[float, float]
+def _resultierende(self, e: Eingaben, masse: Masse) -> Punkt
 ```
 
-e_u: von dem Schwerpunkt der zählenden Teile eines Schnitts zur
-Resultierenden der Auflagerkraft -- je Komponente, in m. Gilt für jeden
-Schnitt: um die Stütze, um die äussersten Anker und um den Pilz.
-
-#### Durchstanzen._k_e
-
-```python
-def _k_e(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung, e_u: Tuple[float, float]) -> Wert
-```
-
-Der Beiwert k_e: aus der Näherung (4.3.6.2.5) oder aus der Exzentrizität (57).
+Wo die Auflagerkraft angreift: in der Stützenachse, verschoben um die
+Exzentrizität e_x, e_y, wo k_e nach (57) sie liest. Von hier misst e_u
+an jedem Schnitt -- um die Stütze, um die äussersten Anker und um den Pilz.
 
 #### Durchstanzen._rotation
 

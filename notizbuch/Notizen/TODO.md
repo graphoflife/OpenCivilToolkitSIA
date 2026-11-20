@@ -320,13 +320,10 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Erledigt (2026-11-19): Grundbruch, die Formel in vier Formen. Jetzt
         `Spalte(N, s, d, g, b)` mit `produkt()` und `vorlage()`; `z`,
         `_produkt` und `Faktoren` sind weg, d_γ ist ein Wert.
-      - Durchstanzen, k_e: die Wahl Näherung oder (57) steht viermal
-        (`mit_bewehrung.py` 205, 214, 487; `nachweis.py` 328), die Eingänge
-        von (57) stellen `_k_e` stumm und `herleitung.k_e` laut je selbst
-        zusammen -- gemeinsam ist nur `beiwert_k_e`. Das kehrt das Muster
-        vom 2026-11-09 für k_e um. Umbau: die k_e-Regel als Typ
-        (`Naeherung`, `Exzentrizitaet`) in `pruefung.py`, einmal gebaut;
-        `Schnittpruefung` hält k_e, die Herleitung schreibt nur.
+      - Erledigt (2026-11-20): Durchstanzen, k_e. Die Wahl Näherung oder
+        (57) stand viermal; jetzt `KeRegel` mit `KeNaeherung` und
+        `KeExzentrizitaet` in `pruefung.py`, einmal gebaut in `pruefe`.
+        `Schnittpruefung.k_e` fragt sie, `herleitung.k_e` schreibt nur.
       - Kennzahlen der Platte: sie rechnen beide Querkraftansätze selbst
         zusammen (Beiwerte, Stahl, Eingänge; ein `Kurvenbeiwerte` voller
         Nullen, der Textfilter `startswith("m_Rd_")`, zwei Abfragen

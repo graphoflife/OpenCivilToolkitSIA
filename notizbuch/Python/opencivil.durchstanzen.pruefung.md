@@ -1,5 +1,5 @@
 ---
-erzeugt: 20ae968faabe
+erzeugt: d13bf83322a2
 art: modul
 tags: [modul]
 ---
@@ -16,6 +16,12 @@ der Bewehrung und dem Stahlpilz fragt ihre Ergebnisse
 ([[opencivil.durchstanzen.herleitung|.herleitung]]). Bis 2026-11-09 stand jede Bedingung zweimal, stumm für
 die Suche und laut für die Herleitung, und der Schnitt um die Stütze, um die
 Leisten und um den Pilz hatte je sein eigenes Werkzeug.
+
+DIE REGEL FÜR k_e ([[opencivil.durchstanzen.pruefung#KeRegel|KeRegel]]):
+Näherung (4.3.6.2.5) oder (57) wird an der Stelle einmal gewählt, und jede
+Schnittprüfung fragt die Regel nach ihrem k_e; die Herleitung schreibt, was
+sie gibt. Bis 2026-11-19 stand die Wahl viermal, und die Eingänge von (57)
+stellten Suche und Herleitung je selbst zusammen.
 
 
 ## DIE GLEICHUNGEN (SIA 262:2025)
@@ -98,6 +104,103 @@ def beiwert_k_e(e_u: float, b: float) -> float
 
 Gleichung (57).
 
+### exzentrizitaet
+
+```python
+def exzentrizitaet(resultierende: Punkt, a: Auswertung) -> Tuple[float, float]
+```
+
+e_u (4.3.6.2.4): vom Schwerpunkt der zählenden Teile eines Schnitts zur
+Resultierenden der Auflagerkraft -- je Komponente, in m.
+
+### KeRegel
+
+```python
+class KeRegel(ABC)
+```
+
+Wie k_e an den Schnitten einer Stelle bestimmt wird: einmal gewählt
+([[opencivil.durchstanzen.nachweis#Durchstanzen.pruefe|.nachweis.Durchstanzen.pruefe]]), gefragt von jeder
+[[opencivil.durchstanzen.pruefung#Schnittpruefung|Schnittpruefung]] -- um die Stütze, um die Anker und um den Pilz.
+
+#### KeRegel.hoechstens
+
+```python
+@property
+@abstractmethod
+def hoechstens(self) -> float
+```
+
+Das grösste k_e, das die Regel an einem Schnitt gibt -- für die rasche Auslese der Pilze.
+
+#### KeRegel.k_e
+
+```python
+@abstractmethod
+def k_e(self, a: Auswertung) -> float
+```
+
+k_e am Schnitt `a`.
+
+### KeNaeherung
+
+```python
+@dataclass(frozen=True)
+class KeNaeherung(KeRegel)
+```
+
+Die Näherung nach 4.3.6.2.5: ein Wert der gestützten Fläche, bestimmt am
+Schnitt um sie ([[opencivil.durchstanzen.flaeche#GestuetzteFlaeche.k_e_naeherung|.flaeche.GestuetzteFlaeche.k_e_naeherung]]), und
+darum derselbe an jedem ihrer Schnitte.
+
+- `wert: float`
+- `titel: str` – Wie die Herleitung die Näherung nennt.
+
+#### KeNaeherung.hoechstens
+
+```python
+@property
+def hoechstens(self) -> float
+```
+
+#### KeNaeherung.k_e
+
+```python
+def k_e(self, a: Auswertung) -> float
+```
+
+### KeExzentrizitaet
+
+```python
+@dataclass(frozen=True)
+class KeExzentrizitaet(KeRegel)
+```
+
+(57) an jedem Schnitt, mit dessen Fläche und dem Schwerpunkt seiner zählenden Teile.
+
+- `resultierende: Punkt` – Wo die Auflagerkraft angreift: in der Stützenachse, verschoben um e_x, e_y.
+
+#### KeExzentrizitaet.hoechstens
+
+```python
+@property
+def hoechstens(self) -> float
+```
+
+Bei e_u = 0.
+
+#### KeExzentrizitaet.e_u
+
+```python
+def e_u(self, a: Auswertung) -> Tuple[float, float]
+```
+
+#### KeExzentrizitaet.k_e
+
+```python
+def k_e(self, a: Auswertung) -> float
+```
+
 ### widerstand
 
 ```python
@@ -136,7 +239,7 @@ und um einen Stahlpilz (4.3.6.6.2, mit seinem d_v).
 
 - `schnitt: Nachweisschnitt`
 - `d_v: float`
-- `k_e: float`
+- `regel: KeRegel`
 - `V_d: float` – Die Auflagerkraft.
 - `q_d: float` – Die Flächenlast, die innerhalb des Schnitts abgezogen wird.
 
@@ -146,6 +249,15 @@ und um einen Stahlpilz (4.3.6.6.2, mit seinem d_v).
 @property
 def auswertung(self) -> Auswertung
 ```
+
+#### Schnittpruefung.k_e
+
+```python
+@property
+def k_e(self) -> float
+```
+
+k_e an diesem Schnitt, nach der Regel der Stelle.
 
 #### Schnittpruefung.u_red
 
@@ -348,6 +460,7 @@ def reicht(self) -> bool
 ## Gebraucht von
 
 - [[opencivil.durchstanzen.bewehrung]]
+- [[opencivil.durchstanzen.flaeche]]
 - [[opencivil.durchstanzen.herleitung]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]

@@ -35,6 +35,7 @@ from typing import ClassVar, Dict, List, Optional, Tuple
 from opencivil.core.berechnung import Eingaben
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert
+from opencivil.durchstanzen.pruefung import KeNaeherung
 from opencivil.durchstanzen.schnitt import (
     ECKENBEREICH, Auswertung, Halbebene, Kandidat, Punkt, Stuetzenflaeche, kandidat_wandecke,
     kandidat_wandende, kandidaten_stuetze,
@@ -250,9 +251,9 @@ class GestuetzteFlaeche(ABC):
         """u_0 als Formel -- oder nichts, dann steht der Schnitt als Länge in der Platte."""
         return None
 
-    def k_e_naeherung(self, a: Auswertung) -> Tuple[float, str]:
-        """Die Näherung für k_e und wie die Herleitung sie nennt."""
-        return self.k_e, f"Näherung für {self.lage.mehrzahl}"
+    def k_e_naeherung(self, a: Auswertung) -> KeNaeherung:
+        """Die Näherung für k_e (4.3.6.2.5), am Schnitt ``a`` um die Fläche."""
+        return KeNaeherung(self.k_e, f"Näherung für {self.lage.mehrzahl}")
 
     def momentengleichung(self, r: Richtung, masse: Masse) -> Momentengleichung:
         """Die Gleichung der Momente im Stützstreifen in ``r`` -- nur, wo :attr:`momente` gilt."""
@@ -312,10 +313,11 @@ class Innenstuetze(Stuetze):
             return self.form.umfang(e, d_v, a.in_der_platte)
         return None
 
-    def k_e_naeherung(self, a: Auswertung) -> Tuple[float, str]:
+    def k_e_naeherung(self, a: Auswertung) -> KeNaeherung:
         """Mit grossen Aussparungen in Stützennähe gilt 0.7 wie am Rand (4.3.6.2.5)."""
         if a.hinter_aussparungen > 1e-6:
-            return 0.7, "Näherung für Innenstützen mit grossen Aussparungen in Stützennähe"
+            return KeNaeherung(0.7, "Näherung für Innenstützen mit grossen Aussparungen in "
+                                    "Stützennähe")
         return super().k_e_naeherung(a)
 
     def momentengleichung(self, r: Richtung, masse: Masse) -> Momentengleichung:

@@ -1,5 +1,5 @@
 ---
-erzeugt: 20cc9764fef6
+erzeugt: 3f33193eb16b
 art: modul
 tags: [modul]
 ---
@@ -285,10 +285,10 @@ u_0 als Formel -- oder nichts, dann steht der Schnitt als Länge in der Platte.
 #### GestuetzteFlaeche.k_e_naeherung
 
 ```python
-def k_e_naeherung(self, a: Auswertung) -> Tuple[float, str]
+def k_e_naeherung(self, a: Auswertung) -> KeNaeherung
 ```
 
-Die Näherung für k_e und wie die Herleitung sie nennt.
+Die Näherung für k_e (4.3.6.2.5), am Schnitt `a` um die Fläche.
 
 #### GestuetzteFlaeche.momentengleichung
 
@@ -378,7 +378,7 @@ Rundum, wo nichts neben Ecken oder hinter Aussparungen abgeht, die Formel der Fo
 #### Innenstuetze.k_e_naeherung
 
 ```python
-def k_e_naeherung(self, a: Auswertung) -> Tuple[float, str]
+def k_e_naeherung(self, a: Auswertung) -> KeNaeherung
 ```
 
 Mit grossen Aussparungen in Stützennähe gilt 0.7 wie am Rand (4.3.6.2.5).
@@ -566,6 +566,7 @@ def umfang(self, e: Eingaben, d_v: Wert, a: Auswertung) -> Optional[Umfangsforme
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
+- [[opencivil.durchstanzen.pruefung]]
 - [[opencivil.durchstanzen.schnitt]]
 - [[opencivil.querschnitt.platte]]
 

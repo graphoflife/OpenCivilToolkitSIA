@@ -56,7 +56,7 @@ from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
     NICHT_FUEHRBAR, OHNE_EINWIRKUNG, UNBESCHRAENKT, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KNM_PRO_M, M2, MM, MM2_PRO_M, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KNM_PRO_M, MM, MM2_PRO_M, Groesse
 from opencivil.core.latex import Mathe, als_text, angabe
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
@@ -64,7 +64,9 @@ from opencivil.durchstanzen import herleitung, mit_bewehrung
 from opencivil.durchstanzen.herleitung import STUETZE
 from opencivil.durchstanzen.flaeche import Mass, Masse, Randbreite
 from opencivil.durchstanzen.mit_bewehrung import Grundlage
-from opencivil.durchstanzen.pruefung import Leistenpruefung, Pilzbefund, Schnittpruefung
+from opencivil.durchstanzen.pruefung import (
+    KeExzentrizitaet, Leistenpruefung, Pilzbefund, Schnittpruefung, exzentrizitaet,
+)
 from opencivil.durchstanzen.schnitt import Auswertung, Punkt, nachweisschnitt
 from opencivil.durchstanzen.stelle import (
     Durchstanzstelle, KeArt, Naeherungsstufe, wirksame_stufe,
@@ -194,16 +196,20 @@ class Durchstanzen(Nachweis):
                                   achse=f.achse(masse), aussparungen=s.aussparungen)
         a = schnitt.massgebend
         u_red = self._nachweisschnitt(e, p, w, a, d_v)
-        e_u = self.exzentrizitaet(e, a, masse)
-        k_e = self._k_e(e, p, w, a, e_u)
-        innen = Schnittpruefung(schnitt, dv, k_e.groesse.si, e.g("V_d").si, e.g("q_d").si)
+        resultierende = self._resultierende(e, masse)
+        regel = (f.k_e_naeherung(a) if s.ke is KeArt.NAEHERUNG
+                 else KeExzentrizitaet(resultierende))
+        innen = Schnittpruefung(schnitt, dv, regel, e.g("V_d").si, e.g("q_d").si)
+        p.titel("Momentenübertragung", ebene=3)
+        k_e = herleitung.k_e(p, w, innen, ix=STUETZE)
         u = herleitung.wirksam(p, w, k_e, u_red, ix=STUETZE,
                                titel="Wirksamer Umfang des Nachweisschnitts")
         p.titel("Bemessungswert der Querkraft", ebene=3)
         V_d = herleitung.querkraft(p, w, e, innen, ix=STUETZE,
                                    titel_last=f"{s.plattenart.last} innerhalb des Nachweisschnitts",
                                    titel="Bemessungswert der Querkraft im Nachweisschnitt")
-        rotationen, psi = self._rotation(e, p, w, d, hoehen, V_d, e_u, masse)
+        rotationen, psi = self._rotation(e, p, w, d, hoehen, V_d,
+                                         exzentrizitaet(resultierende, a), masse)
         k_r = self._k_r(e, p, w, psi, d)
         tau = e[s.beton.eingabename("tau_cd")]
         tau_cd = w.wert("tau_cd", tau.symbol, tau.groesse, 4)
@@ -317,36 +323,15 @@ class Durchstanzen(Nachweis):
                        "einer Ecke entfernt liegt.",
             ecken_referenz="SIA 262:2025, 4.3.6.2.3, Figur 23a")
 
-    def exzentrizitaet(self, e: Eingaben, a: Auswertung, masse: Masse) -> Tuple[float, float]:
+    def _resultierende(self, e: Eingaben, masse: Masse) -> Punkt:
         """
-        e_u: von dem Schwerpunkt der zählenden Teile eines Schnitts zur
-        Resultierenden der Auflagerkraft -- je Komponente, in m. Gilt für jeden
-        Schnitt: um die Stütze, um die äussersten Anker und um den Pilz.
+        Wo die Auflagerkraft angreift: in der Stützenachse, verschoben um die
+        Exzentrizität e_x, e_y, wo k_e nach (57) sie liest. Von hier misst e_u
+        an jedem Schnitt -- um die Stütze, um die äussersten Anker und um den Pilz.
         """
         ax, ay = self.stelle.flaeche.achse(masse)
-        ex = e.g("e_x").si if e.hat("e_x") else 0.0
-        ey = e.g("e_y").si if e.hat("e_y") else 0.0
-        return (ax + ex - a.schwerpunkt[0], ay + ey - a.schwerpunkt[1])
-
-    def _k_e(self, e: Eingaben, p: Protokoll, w: Zwischenwerte, a: Auswertung,
-             e_u: Tuple[float, float]) -> Wert:
-        """Der Beiwert k_e: aus der Näherung (4.3.6.2.5) oder aus der Exzentrizität (57)."""
-        s = self.stelle
-        p.titel("Momentenübertragung", ebene=3)
-        if s.ke is KeArt.NAEHERUNG:
-            k, titel = s.flaeche.k_e_naeherung(a)
-            k_e = w.zahl("k_e", "k_e", k, stellen=2)
-            p.erklaerung(
-                "Die festen Werte für k_e gelten nur für Flachdecken mit regelmässigem "
-                "Stützenraster und ähnlich langen Feldern, deren Stützen biegesteif an die "
-                "Platte anschliessen, aber keine Horizontalkräfte abtragen.")
-            p.wert(k_e, titel=titel, referenz="SIA 262:2025, 4.3.6.2.5")
-            return k_e
-        p.erklaerung(
-            "e_u ist der Abstand zwischen der Resultierenden der Auflagerkraft – in der "
-            "Stützenachse, verschoben um die Exzentrizität e_x, e_y – und dem Schwerpunkt der "
-            "zählenden Teile des Nachweisschnitts.")
-        return herleitung.k_e(p, w, a, e_u, ix=STUETZE)
+        return (ax + (e.g("e_x").si if e.hat("e_x") else 0.0),
+                ay + (e.g("e_y").si if e.hat("e_y") else 0.0))
 
     # -- Plattenrotation ----------------------------------------------------
 

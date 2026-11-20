@@ -1,5 +1,5 @@
 ---
-erzeugt: 1da0b1a85d66
+erzeugt: de3b82a8bfeb
 art: modul
 tags: [modul]
 ---
@@ -280,7 +280,6 @@ Die Kurznamen, die der Nachweis liest -- siehe [[opencivil.durchstanzen.stelle#e
 
 ## Gebraucht von
 
-- [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.durchstanzen]]

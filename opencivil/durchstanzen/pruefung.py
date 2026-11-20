@@ -10,6 +10,12 @@ der Bewehrung und dem Stahlpilz fragt ihre Ergebnisse
 die Suche und laut für die Herleitung, und der Schnitt um die Stütze, um die
 Leisten und um den Pilz hatte je sein eigenes Werkzeug.
 
+DIE REGEL FÜR k_e (:class:`KeRegel`):
+Näherung (4.3.6.2.5) oder (57) wird an der Stelle einmal gewählt, und jede
+Schnittprüfung fragt die Regel nach ihrem k_e; die Herleitung schreibt, was
+sie gibt. Bis 2026-11-19 stand die Wahl viermal, und die Eingänge von (57)
+stellten Suche und Herleitung je selbst zusammen.
+
 DIE GLEICHUNGEN (SIA 262:2025)::
 
     u        = k_e · u_red                                  4.3.6.2.3
@@ -41,6 +47,7 @@ SI-Basis; Kräfte in N.
 from __future__ import annotations
 
 import math
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
@@ -99,6 +106,70 @@ def beiwert_k_e(e_u: float, b: float) -> float:
     return 1.0 / (1.0 + e_u / b)
 
 
+def exzentrizitaet(resultierende: Punkt, a: Auswertung) -> Tuple[float, float]:
+    """
+    e_u (4.3.6.2.4): vom Schwerpunkt der zählenden Teile eines Schnitts zur
+    Resultierenden der Auflagerkraft -- je Komponente, in m.
+    """
+    return (resultierende[0] - a.schwerpunkt[0], resultierende[1] - a.schwerpunkt[1])
+
+
+class KeRegel(ABC):
+    """
+    Wie k_e an den Schnitten einer Stelle bestimmt wird: einmal gewählt
+    (:meth:`.nachweis.Durchstanzen.pruefe`), gefragt von jeder
+    :class:`Schnittpruefung` -- um die Stütze, um die Anker und um den Pilz.
+    """
+
+    @property
+    @abstractmethod
+    def hoechstens(self) -> float:
+        """Das grösste k_e, das die Regel an einem Schnitt gibt -- für die rasche Auslese der Pilze."""
+
+    @abstractmethod
+    def k_e(self, a: Auswertung) -> float:
+        """k_e am Schnitt ``a``."""
+
+
+@dataclass(frozen=True)
+class KeNaeherung(KeRegel):
+    """
+    Die Näherung nach 4.3.6.2.5: ein Wert der gestützten Fläche, bestimmt am
+    Schnitt um sie (:meth:`.flaeche.GestuetzteFlaeche.k_e_naeherung`), und
+    darum derselbe an jedem ihrer Schnitte.
+    """
+
+    wert: float
+    titel: str
+    """Wie die Herleitung die Näherung nennt."""
+
+    @property
+    def hoechstens(self) -> float:
+        return self.wert
+
+    def k_e(self, a: Auswertung) -> float:
+        return self.wert
+
+
+@dataclass(frozen=True)
+class KeExzentrizitaet(KeRegel):
+    """(57) an jedem Schnitt, mit dessen Fläche und dem Schwerpunkt seiner zählenden Teile."""
+
+    resultierende: Punkt
+    """Wo die Auflagerkraft angreift: in der Stützenachse, verschoben um e_x, e_y."""
+
+    @property
+    def hoechstens(self) -> float:
+        """Bei e_u = 0."""
+        return 1.0
+
+    def e_u(self, a: Auswertung) -> Tuple[float, float]:
+        return exzentrizitaet(self.resultierende, a)
+
+    def k_e(self, a: Auswertung) -> float:
+        return beiwert_k_e(math.hypot(*self.e_u(a)), kreisdurchmesser(a.flaeche))
+
+
 def widerstand(k_r: float, tau_cd: float, d_v: float, u: float) -> float:
     """Gleichung (58)."""
     return k_r * tau_cd * d_v * u
@@ -125,7 +196,7 @@ class Schnittpruefung:
 
     schnitt: Nachweisschnitt
     d_v: float
-    k_e: float
+    regel: KeRegel
     V_d: float
     """Die Auflagerkraft."""
 
@@ -135,6 +206,11 @@ class Schnittpruefung:
     @property
     def auswertung(self) -> Auswertung:
         return self.schnitt.massgebend
+
+    @property
+    def k_e(self) -> float:
+        """k_e an diesem Schnitt, nach der Regel der Stelle."""
+        return self.regel.k_e(self.auswertung)
 
     @property
     def u_red(self) -> float:
