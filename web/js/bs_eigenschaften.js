@@ -133,11 +133,16 @@ function materialWahl(art, z, bringt, gewaehlt, setzen) {
  * die Stelle einer einzelnen in % der Linie, und ob eine verteilte je Meter
  * Projektion zählt. `last` ist die Last, die Vorgabe des Werkzeugs oder das
  * Gemeinsame mehrerer Lasten derselben Art (mit VAR, wo sie sich
- * unterscheiden); `setzen(feld, wert)` schreibt; `aufLinie`: liegt sie auf
- * einer Linie (sonst an einem Knoten oder noch nirgends). Eine Richtung hat
- * in der Ebene nur eine Kraft, im Raum auch ein Moment: es dreht um sie.
+ * unterscheiden); `setzen(feld, wert)` schreibt; `ort`: wo sie liegt --
+ * 'linie', 'knoten' oder, als Vorgabe des Werkzeugs, noch nirgends (null).
+ * Eine Stelle hat nur eine Last auf einer Linie: bis 2026-11-20 zeigte
+ * auch eine an einem Knoten das Feld, und eine Zahl darin hielt das System
+ * an. Eine Richtung hat in der Ebene nur eine Kraft, im Raum auch ein
+ * Moment: es dreht um sie.
  */
-function lastFelder(a, last, setzen, { aufLinie = true, amKnoten = false } = {}) {
+function lastFelder(a, last, setzen, ort) {
+  const amKnoten = ort === 'knoten';
+  const aufLinie = ort === 'linie';
   const art = (amKnoten ? knotenlastart : lastart)(a.bs.art, last.art);
   const alle = systemkatalog(a.bs.art, 'richtungen');
   const knotenrichtungen = systemkatalog(a.bs.art, 'knotenrichtungen');
@@ -195,7 +200,7 @@ export function neuEigenschaften(a, werkzeug) {
         gewaehlt: v.art, setzen: (w) => { v.art = w; neu(); }, klasse: '.ist-umbruch',
         titel: 'Verteilt liegt eine Last auf der ganzen Linie; einzeln dort, wo geklickt wird, oder an einem Knoten',
       })),
-      ...lastFelder(a, v, (feld, w) => { v[feld] = w; neu(); }, { aufLinie: false }),
+      ...lastFelder(a, v, (feld, w) => { v[feld] = w; neu(); }, null),
     ];
   }
   return {
@@ -476,7 +481,7 @@ function lastEigenschaften(a, z, kennungen) {
   if (amKnoten !== VAR && art !== VAR) {
     const felder = Object.fromEntries(Object.keys(da[0].last)
       .map((feld) => [feld, gemeinsam(da.map((d) => d.last[feld]))]));
-    inhalt.push(...lastFelder(a, felder, setzen, { amKnoten }));
+    inhalt.push(...lastFelder(a, felder, setzen, amKnoten ? 'knoten' : 'linie'));
   } else {
     inhalt.push(el('p.cad-hinweis-klein', { text: 'Verschiedene Arten – ihre Werte einzeln bearbeiten.' }));
   }

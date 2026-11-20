@@ -7,6 +7,14 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Eine Last an einem Knoten hat keine Stelle
+
+Das Fenster einer Last an einem Knoten zeigte das Feld «Stelle» in % der
+Linie, wie eine Einzellast auf einem Stab. Eine Zahl darin hielt das ganze
+System an: eine Knotenlast hat kein solches Feld. Jetzt fragt das Fenster
+nur bei einer Last auf einer Linie nach der Stelle; wo die Last liegt, sagt
+ein einziger Wert statt zweier Schalter, die sich widersprechen konnten.
+
 ## 2026-11-20 · Kraft oder Moment an einem Knoten sagt der Kern
 
 Ob eine Last an einem Knoten eine Kraft oder ein Moment ist und ob sie in
