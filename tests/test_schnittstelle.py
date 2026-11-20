@@ -207,11 +207,11 @@ class TestStilleNachweise(unittest.TestCase):
 
 
 class TestApiAbbildung(unittest.TestCase):
-    def setUp(self):
-        self.projekt = Projekt.beispiel()
-        self.aufbau = self.projekt.aufbauen()
-        self.ziele = self.aufbau.alle_nachweisziele()
-        self.loesung = self.aufbau.werk.loese(*self.ziele)
+    @classmethod
+    def setUpClass(cls):
+        """Das Beispiel einmal für alle -- gelesen wird es nur."""
+        aufbau = Projekt.beispiel().aufbauen()
+        cls.d = api.loesung_dict(aufbau.werk.loese(*aufbau.alle_nachweisziele()), aufbau)
 
     def test_katalog(self):
         k = api.katalog()
@@ -227,12 +227,8 @@ class TestApiAbbildung(unittest.TestCase):
                          ["S235", "S275", "S355", "S460"])
         self.assertEqual({a["eigene"] for a in k["materialarten"].values()}, {"BE", "S", "ST"})
 
-    def test_alles_ist_json_faehig(self):
-        d = api.loesung_dict(self.loesung, self.aufbau)
-        json.dumps(d)  # wirft, wenn etwas nicht serialisierbar ist
-
     def test_werte_tragen_ihre_herkunft(self):
-        d = api.loesung_dict(self.loesung, self.aufbau)
+        d = self.d
         f_cd = d["werte"]["beton.b1.f_cd"]
         self.assertEqual(f_cd["quelle"], "berechnet")
         # Die Oberfläche bekommt die lesbare Schreibweise -- sie setzt diese
@@ -241,13 +237,13 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertIn("mathrm", f_cd["latex"])
 
     def test_protokoll_enthaelt_gleichungen_und_tabellen(self):
-        d = api.loesung_dict(self.loesung, self.aufbau)
+        d = self.d
         arten = {b["art"] for b in d["protokoll"]}
         self.assertIn("gleichung", arten)
         self.assertIn("tabelle", arten)
 
     def test_linie_wird_mitgeliefert(self):
-        d = api.loesung_dict(self.loesung, self.aufbau)
+        d = self.d
         linie = d["linien"]["q1.x"]
         # Massgebend die Handrechnung mit ihren Eckpunkten, daneben präzise.
         self.assertTrue(linie["massgebend"]["ecken"])
@@ -258,7 +254,7 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertIn("art_text", linie["kombinationen"][0])
 
     def test_zuordnung_verbindet_kennung_und_wert_id(self):
-        d = api.loesung_dict(self.loesung, self.aufbau)
+        d = self.d
         self.assertEqual(
             d["zuordnung"]["materialien"]["b1"]["kennwerte"]["f_cd"], "beton.b1.f_cd")
 

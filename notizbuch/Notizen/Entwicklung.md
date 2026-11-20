@@ -7,6 +7,37 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Tests aufgeräumt
+
+Elf Tests prüften nichts, was nicht schon ein anderer prüft. Der Benutzer
+wollte sie weg und getrennt davon aufgeräumt (2026-11-20). Gelöscht sind:
+
+- fünf mit demselben Fall «ein Feld, das es nicht mehr gibt, wird
+  abgewiesen»: `richtung` am Lastfall, `gleichungen`, das φ an der Platte,
+  die flachen Felder des Knickens, der alte Dickenmodus. Das prüft
+  `test_lesen` an einer Stelle; als Beispiel am ganzen Projekt bleibt
+  `test_vier_lagen_statt_lagen_unten`;
+- zwei, die den Code abschrieben: das «‰» der Promille und die Vorlagen der
+  Listen im Katalog;
+- einer, der nur prüfte, dass zwei geerbte Methoden aufrufbar sind;
+- einer, der gegen ein von Hand geschriebenes `als_dict` wachte – das
+  schreibt heute jede Klasse aus ihren Feldern selbst;
+- einer, der mit `json.dumps` prüfte, ob eine Antwort JSON ist. Das lässt
+  NaN durch; die echte Prüfung steht in `test_dienst` und
+  `test_schnittstelle`;
+- einer, der die Wahlwerte des Pfahlkopfs abschrieb.
+
+Das Aufräumen daneben:
+
+- Neun Dateien riefen `unittest.main()` mitten in der Datei auf. Wer eine
+  davon direkt startete, übersprang still alles danach: die Datei der
+  Querschnittsanalyse lief mit 14 Tests und 3 Fehlern, jetzt laufen alle
+  89. `main()` steht jetzt am Ende jeder Datei.
+- `test_schnittstelle` rechnet das Beispiel einmal für die vier Tests, die
+  es lesen, statt in jedem neu.
+- Die Decke prüfte in zwei Tests, dass Zeichnung und Bilder nur einer Decke
+  gelten; das ist jetzt einer.
+
 ## 2026-11-20 · Erdbeben: das Ersatzkraftverfahren
 
 Eine neue App nach SIA 261:2020, 16.5.2, auf Wunsch des Benutzers

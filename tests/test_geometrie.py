@@ -262,10 +262,6 @@ class TestStablinie(unittest.TestCase):
             geo.stablinie((0, 0), (1000, 0), Linienart.TEILUNG, 0)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestUeberdeckung(unittest.TestCase):
     """
     Die Ueberdeckung, eine Hilfe beim Zeichnen: das gerueckte Polygon und
@@ -354,3 +350,6 @@ class TestUeberdeckung(unittest.TestCase):
         self.assertPunkt(nochmals[0], von, delta=1e-5)
         self.assertPunkt(nochmals[1], bis, delta=1e-5)
 
+
+if __name__ == "__main__":
+    unittest.main()

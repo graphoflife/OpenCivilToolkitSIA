@@ -246,10 +246,14 @@ class TestZeichnung(unittest.TestCase):
         self.assertEqual(zeichnung(zwei_felder()).daten["uebersicht"], bild)
 
     def test_nur_fuer_eine_decke(self):
+        """Die Übersicht wie die Bilder eines Falls."""
         p = zwei_felder()
         p.balkensystem("Träger")
-        antwort = zeichnung(p, "r1")
-        self.assertEqual((antwort.status, antwort.daten["fehler"]), (400, "'r1' ist keine Decke."))
+        for anfrage, antwort in (("zeichnung", zeichnung(p, "r1")),
+                                 ("bilder", bilder(p, "GZT", "r1"))):
+            with self.subTest(anfrage=anfrage):
+                self.assertEqual((antwort.status, antwort.daten["fehler"]),
+                                 (400, "'r1' ist keine Decke."))
 
     def test_ohne_platte_wird_nichts_gerechnet(self):
         """
@@ -396,12 +400,6 @@ class TestBilder(unittest.TestCase):
         self.assertEqual((antwort.status, antwort.daten["fehler"]),
                          (400, "Einen Fall «GZX» gibt es in «Zwei Felder» nicht. "
                                "Gerechnet sind: Eigengewicht, Auflast, Nutzlast, GZT."))
-
-    def test_nur_fuer_eine_decke(self):
-        p = zwei_felder()
-        p.balkensystem("Träger")
-        antwort = bilder(p, "GZT", "r1")
-        self.assertEqual((antwort.status, antwort.daten["fehler"]), (400, "'r1' ist keine Decke."))
 
 
 if __name__ == "__main__":

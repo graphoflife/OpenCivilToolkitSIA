@@ -170,10 +170,6 @@ class TestKnoten(unittest.TestCase):
             QuerschnittsanalyseEintrag.aus_dict(alt)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 # ===========================================================================
 # Aufbau und Nachweise
 # ===========================================================================
@@ -1074,3 +1070,7 @@ class TestVerschmierteStaebe(unittest.TestCase):
         text = str(self.projekt().rechnen().bericht())
         self.assertIn("Verschmierte Stäbe: ⌀ im Abstand s über die Länge L", text)
         self.assertIn(r"\text{verschmiert: } \varnothing 12\ @\ 150\ \text{auf}\ 200", text)
+
+
+if __name__ == "__main__":
+    unittest.main()

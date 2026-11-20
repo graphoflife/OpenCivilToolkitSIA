@@ -5,7 +5,7 @@ import unittest
 
 from opencivil.core.einheiten import (
     CM2, DIMENSIONSLOS, EINHEITSLOS, GRAD, KG_PRO_M3, KN, KNM, KNM_PRO_M, KN_PRO_M,
-    M, MM, MM2, MPA, N, N_PRO_MM2, PROMILLE, PROZENT, SPANNUNG,
+    M, MM, MM2, MPA, N, N_PRO_MM2, PROZENT, SPANNUNG,
     DimensionsFehler, Dimension, Groesse,
     einheit, empirisch, summe,
 )
@@ -224,10 +224,6 @@ class TestPlattenEinheiten(unittest.TestCase):
         self.assertAlmostEqual(gesamt.in_einheit(KNM), 300.0)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestBeschriftung(unittest.TestCase):
     """
     Die lesbare Schreibweise für die Oberfläche.
@@ -247,10 +243,6 @@ class TestBeschriftung(unittest.TestCase):
         self.assertEqual(N_PRO_MM2.name, "N/mm^2")
         self.assertIs(einheit("N/mm^2"), N_PRO_MM2)
 
-    def test_promille_gibt_seine_beschriftung_selbst_an(self):
-        """Aus 'promille' liesse sich '‰' nicht ableiten."""
-        self.assertEqual(PROMILLE.beschriftung, "‰")
-
     def test_einfache_namen_bleiben_wie_sie_sind(self):
         self.assertEqual(MM.beschriftung, "mm")
         self.assertEqual(KNM.beschriftung, "kNm")
@@ -259,3 +251,7 @@ class TestBeschriftung(unittest.TestCase):
     def test_zusammengesetzte_einheiten_erben_die_beschriftung(self):
         self.assertEqual((KN / MM2).beschriftung, "kN/mm²")
         self.assertEqual((MM**2).beschriftung, "mm²")
+
+
+if __name__ == "__main__":
+    unittest.main()

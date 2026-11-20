@@ -17,7 +17,7 @@ from opencivil import bewehrungssuche as suche
 from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte, vorab_pruefen
 from opencivil.bewehrungssuche.laengs import _stahlflaeche, _ueber_grenze
 from opencivil.projekt import (
-    KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt, ProjektFehler,
+    KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
 )
 from opencivil.web import dienst
 
@@ -816,19 +816,6 @@ class TestPlattendicke(unittest.TestCase):
         self.assertGreaterEqual(schlechtester(fertig), 1.0)
 
 
-    def test_ein_alter_dickenmodus_wird_genannt(self):
-        """Die Dicke war einmal ein eigener Modus -- jetzt ein Schalter daneben."""
-        d = platte().als_dict()
-        d["querschnitte"][0]["automatik_modus"] = "dicke_grund_mit"
-        with self.assertRaisesRegex(ProjektFehler,
-                                    "'dicke_grund_mit' gibt es als 'automatik_modus' nicht"):
-            Projekt.aus_dict(d)
-
-
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestNurDiesesBauteil(unittest.TestCase):
     """
     Die Suche rechnet nur die Platte, die sie bewehrt -- kein anderes Bauteil,
@@ -850,3 +837,7 @@ class TestNurDiesesBauteil(unittest.TestCase):
                                          kraefte=True, leeren=False))
         self.assertEqual(bewertung.fehler, "")
         self.assertTrue(math.isfinite(bewertung.rueckstand))
+
+
+if __name__ == "__main__":
+    unittest.main()

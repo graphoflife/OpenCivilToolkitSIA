@@ -69,33 +69,6 @@ class TestVollstaendigeAblage(unittest.TestCase):
     Öffnen, lange nachdem man es hätte merken können.
     """
 
-    def test_kein_feld_faellt_beim_speichern_unter_den_tisch(self):
-        """
-        Jedes Feld der Beschreibungsklassen muss in als_dict() auftauchen.
-
-        Das ist der Wächter gegen den wahrscheinlichsten Fehler: jemand hängt
-        ein Feld an eine dataclass und vergisst als_dict/aus_dict. Ohne diesen
-        Test bliebe das bis zum ersten verlorenen Projekt unbemerkt.
-        """
-        import dataclasses
-
-        beispiele = {
-            MaterialEintrag: MaterialEintrag("b1", "beton", "C30/37", "C30/37"),
-            PostenEintrag: PostenEintrag(durchmesser=16.0, abstand=150.0),
-            LageEintrag: LageEintrag(unguenstig=False),
-            KombinationEintrag: KombinationEintrag("Feld", M_Ed=100.0),
-            QuerkraftbewehrungEintrag: QuerkraftbewehrungEintrag(durchmesser=10.0),
-            GebrauchsfallEintrag: GebrauchsfallEintrag("Gebrauch", M_Ed=70.0),
-            QuerschnittEintrag: QuerschnittEintrag("q1", "Platte", "b1", stahl="s1"),
-        }
-        for klasse, beispiel in beispiele.items():
-            with self.subTest(klasse=klasse.__name__):
-                felder = {f.name for f in dataclasses.fields(klasse)}
-                gespeichert = set(beispiel.als_dict())
-                self.assertEqual(
-                    felder - gespeichert, set(),
-                    f"{klasse.__name__}: diese Felder überleben das Speichern nicht")
-
     def test_ganzes_projekt_ueberlebt_die_datei(self):
         """Zwei Materialien, zwei Platten, nichts auf den Vorgabewerten."""
         projekt = Projekt(
@@ -694,13 +667,6 @@ class TestAltesFormat(unittest.TestCase):
         self.assertIn("Gemeint ist vielleicht 'lagen'", str(fehler.exception))
         self.assertIn("Platte 'Decke über EG'", str(fehler.exception))
 
-    def test_gleichungsblaetter_werden_genannt(self):
-        """Die App gibt es seit 2026-10-15 nicht mehr -- ihre Liste wird nicht still verworfen."""
-        roh = dict(Projekt.beispiel().als_dict(), gleichungen=[])
-        with self.assertRaises(ProjektFehler) as fehler:
-            Projekt.aus_dict(roh)
-        self.assertIn("'gleichungen' gibt es nicht", str(fehler.exception))
-
 
 class TestNurDieTragrichtungX(unittest.TestCase):
     """
@@ -726,20 +692,6 @@ class TestNurDieTragrichtungX(unittest.TestCase):
             with self.subTest(feld=feld):
                 self.assertFalse([s for s in aufbau.feld(feld)
                                   if s.endswith(".y")])
-
-    def test_eine_richtung_am_lastfall_gibt_es_nicht_mehr(self):
-        """
-        Auch nicht ``x``: ein Feld, das nichts mehr bedeutet, wird genannt
-        statt übergangen -- und ein y-Lastfall still in x angesetzt wäre eine
-        Zahl an einem anderen Querschnitt, als der Benutzer gemeint hat.
-        """
-        for klasse in (KombinationEintrag, GebrauchsfallEintrag):
-            for richtung in ("x", "y", "beide"):
-                with self.subTest(klasse=klasse.__name__, richtung=richtung):
-                    with self.assertRaises(ProjektFehler) as fehler:
-                        klasse.aus_dict({"name": "Feld", "M_Ed": 100.0,
-                                         "richtung": richtung})
-                    self.assertIn("'richtung' gibt es nicht", str(fehler.exception))
 
     def test_ohne_kombination_bleibt_es_stumm(self):
         """

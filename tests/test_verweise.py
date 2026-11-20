@@ -9,17 +9,11 @@ scheiterte am Verweis ins Leere.
 
 import unittest
 
-from opencivil.projekt import BAUTEILE, Projekt
+from opencivil.projekt import Projekt
 from opencivil.web import dienst
 
 
 class TestVerweise(unittest.TestCase):
-
-    def test_jede_bauteilart_nennt_materialien_und_bezuege(self):
-        for art in BAUTEILE:
-            with self.subTest(art=art.liste):
-                self.assertTrue(callable(getattr(art.eintrag, "materialien", None)))
-                self.assertTrue(callable(getattr(art.eintrag, "bezuege", None)))
 
     def test_der_stahl_der_platte_zaehlt(self):
         """Er gilt für Lagen und Bügel (Benutzer, 2026-10-24)."""

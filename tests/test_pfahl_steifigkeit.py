@@ -20,7 +20,6 @@ from opencivil.stabwerk import system as kern
 from opencivil.stabwerk.art import EBENE
 from opencivil.stabwerk.modell import FEST, Knoten, Lager, Lastfall, Stab, System, feder
 from opencivil.web import dienst
-from opencivil.web.api import katalog
 
 def cassan(D, L, E_b, E, mit_fuss=True):
     """
@@ -300,10 +299,6 @@ class TestEintrag(unittest.TestCase):
 
 
 class TestWasDieOberflaecheSieht(unittest.TestCase):
-
-    def test_katalog(self):
-        self.assertEqual([k["wert"] for k in katalog()["pfahl"]["koepfe"]],
-                         ["frei", "eingespannt"])
 
     def test_verlaeufe(self):
         p, t = projekt()

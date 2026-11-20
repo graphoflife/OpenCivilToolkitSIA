@@ -218,10 +218,6 @@ class TestVonHand(unittest.TestCase):
         self.assertAlmostEqual(a / b, 1.0, delta=1e-3)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestSpannungsblock(unittest.TestCase):
     """
     Der Block springt bei 0.15·ε_c2d von null auf f_cd. In der Mitte jeder
@@ -350,3 +346,7 @@ class TestFlaecheDerWiderstaende(unittest.TestCase):
     def test_nur_n_m_y_und_m_z(self):
         with self.assertRaises(ValueError):
             self.q.schnitt("V", 0.0)
+
+
+if __name__ == "__main__":
+    unittest.main()

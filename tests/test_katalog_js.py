@@ -103,12 +103,6 @@ class TestKatalogpfade(unittest.TestCase):
                     self.nachschlagen(["felder", klasse])
                     self.nachschlagen(["vorlagen", klasse])
 
-    def test_jede_liste_hat_ihre_vorlage(self):
-        """Ein neuer Eintrag nimmt die Vorlage seiner Liste (`nachVorlage`, apps.js)."""
-        from opencivil.projekt.aufbau import BAUTEILE
-        self.assertEqual(set(self.katalog["neu"]),
-                         {art.liste for art in BAUTEILE} | {"skripte", "projekte"})
-
 
 if __name__ == "__main__":
     unittest.main()

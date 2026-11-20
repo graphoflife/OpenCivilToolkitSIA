@@ -412,10 +412,6 @@ class TestMaterialkennwerte(unittest.TestCase):
         self.assertEqual(KNOTENRICHTUNGEN, (Richtung.SENKRECHT, Richtung.X, Richtung.Y, Richtung.Z))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 def im_projekt():
     """Der Kragarm im Projekt, mit 10 kN am Ende -- wie die Oberflaeche ihn schickt."""
     p = Projekt(name="Raum")
@@ -508,3 +504,7 @@ class TestFuerDieOberflaeche(unittest.TestCase):
             "projekt": d, "kennung": "u1", "aktion": "teilen", "linie": "L1", "punkt": [1.0, 0.5]})
         self.assertEqual(falsch.status, 400)
         self.assertIn("3 Zahlen", falsch.daten["fehler"])
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -420,10 +420,6 @@ class TestUmkehren(unittest.TestCase):
         self.assertEqual([l.als_dict() for l in self.linie.lasten], vorher)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 # ===========================================================================
 # Zum Rechnen
 # ===========================================================================
@@ -776,3 +772,7 @@ class TestEigengewicht(unittest.TestCase):
         p.balkensysteme[0].lastfaelle[1].eigengewicht = True
         meldungen = [m for m in modell_von(p.balkensysteme[0]).meldungen if m.fehler]
         self.assertTrue(any("Eigengewicht" in m.text for m in meldungen))
+
+
+if __name__ == "__main__":
+    unittest.main()

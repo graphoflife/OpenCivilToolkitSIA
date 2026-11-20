@@ -3,7 +3,7 @@
 import unittest
 
 from opencivil.nachweis import knicken as knick_modul
-from opencivil.projekt import KnickEintrag, Projekt, ProjektFehler
+from opencivil.projekt import KnickEintrag, Projekt
 from tests.unfertig import meldung
 
 
@@ -392,8 +392,6 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
     """Was an der Maske eingegeben wird und nicht stimmen kann."""
 
     def fehler(self, **abweichungen) -> str:
-        from opencivil.projekt import ProjektFehler
-
         projekt = Projekt.beispiel()
         for name, wert in abweichungen.items():
             setzen(projekt.querschnitte[0], name, wert)
@@ -447,18 +445,6 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
         q = Projekt.aus_dict(daten).querschnitte[0]
         self.assertEqual((q.haeufig.anteil, q.quasistaendig.anteil), (70.0, 60.0))
         self.assertEqual(q.quasistaendig.faelle, [])
-
-    def test_eine_datei_mit_den_alten_flachen_feldern(self):
-        """
-        Vor der Gebrauchsliste standen die drei Angaben einzeln an der Platte.
-        Eine solche Datei nennt das Feld, das es nicht mehr gibt -- mit dem,
-        das es heute ist.
-        """
-        daten = Projekt.beispiel().als_dict()
-        daten["querschnitte"][0]["haeufige_anteil"] = 75.0
-        with self.assertRaises(ProjektFehler) as fehler:
-            Projekt.aus_dict(daten)
-        self.assertIn("'haeufige_anteil' gibt es nicht", str(fehler.exception))
 
     def test_ohne_lastfaelle_leert_jede_lastfallliste(self):
         """

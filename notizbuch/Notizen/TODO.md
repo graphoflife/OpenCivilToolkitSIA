@@ -18,9 +18,6 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dazu in Chrome prüfen, ob sich die Seite als App installieren lässt;
       verlangt Chrome ein PNG als Zeichen, schreibt ein kleines Skript ohne
       Fremdpakete die Bilder.
-- [ ] Tests: elf triviale löschen (Liste im Plan); `unittest.main()` in
-      neun Dateien ans Ende; `test_schnittstelle` mit `setUpClass`; zwei
-      gleiche Prüfungen in `test_decke_projekt` zusammenlegen.
 - Danach die Umbauten 5, 3, 4 und 8 der Durchsicht vom 2026-11-19.
 
 ## Offen

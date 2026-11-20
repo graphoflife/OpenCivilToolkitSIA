@@ -918,10 +918,6 @@ class TestHinweisReihenfolge(unittest.TestCase):
             1, sum(1 for b in self.bloecke() if isinstance(b, HinweisBlock)))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestStillstellen(unittest.TestCase):
     """
     Welche Fälle nur mitrechnen -- und was passiert, wenn man sich vertippt.
@@ -966,3 +962,7 @@ class TestStillstellen(unittest.TestCase):
             n.stillstellen([1, 2, 3, 4], ["2"])      # String statt Zahl
         self.assertIn("kommen aber nicht vor", str(fehler.exception))
         self.assertIn("'2'", str(fehler.exception))
+
+
+if __name__ == "__main__":
+    unittest.main()

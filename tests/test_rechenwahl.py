@@ -208,10 +208,6 @@ class TestBezuege(unittest.TestCase):
                              [Eingabebezug("E_s", "stahl.s2.E_s")])
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestJederNachweis(unittest.TestCase):
     """
     Im Prüfprojekt «Jeder Nachweis» kommt jede Rechenart und jeder
@@ -244,3 +240,7 @@ class TestJederNachweis(unittest.TestCase):
                          set(VERFORMUNGSARTEN))
         self.assertEqual({k.verformung.saetze.einheitlich for k in aufbau.feld("knicken").values()},
                          set(Werkstoffsatz))
+
+
+if __name__ == "__main__":
+    unittest.main()
