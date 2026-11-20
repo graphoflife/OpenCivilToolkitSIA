@@ -68,7 +68,8 @@ from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import Punktlast
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis
 from opencivil.decke.streifen import Streifen
-from opencivil.decke.traeger import vorderste_extreme, wert
+from opencivil.decke.traeger import wert
+from opencivil.stabwerk.verlauf import vorderste_extreme
 
 #: Der positive Widerstand je Last eins im Lastverteilelement: ``1/(2π) − 1/8``, auf der Folie 0.034.
 POSITIV_JE_LAST = 1.0 / (2.0 * math.pi) - 1.0 / 8.0
@@ -228,8 +229,8 @@ def stellen(ergebnis: Ergebnis, fall: Fallergebnis) -> List[Punkt]:
         for t in streifen.traeger:
             traeger = fall.traeger.get(t.name)
             for stueck in traeger.stuecke if traeger is not None else ():
-                orte = [stueck.a + INNEN, stueck.b - INNEN] if stueck.b - stueck.a > 2.0 * INNEN else []
-                orte += stueck.V.nullstellen(stueck.a, stueck.b) + stueck.p.nullstellen(stueck.a, stueck.b)
+                orte = [stueck.x0 + INNEN, stueck.x1 - INNEN] if stueck.x1 - stueck.x0 > 2.0 * INNEN else []
+                orte += stueck.V.nullstellen(stueck.x0, stueck.x1) + stueck.p_y.nullstellen(stueck.x0, stueck.x1)
                 heraus.extend(streifen.richtung.punkt(t.s0 + s, streifen.mitte) for s in orte)
     return heraus
 

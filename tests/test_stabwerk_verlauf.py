@@ -15,7 +15,7 @@ from opencivil.stabwerk import stab as st
 from opencivil.stabwerk import system as kern
 from opencivil.stabwerk.art import EBENE
 from opencivil.stabwerk.verlauf import (
-    Extrem, Grenzwert, Polynom, ebener_verlauf, grenzwerte, verlaeufe,
+    Extrem, Grenzwert, Polynom, ebener_verlauf, grenzwerte, verlaeufe, vorderste_extreme,
 )
 from opencivil.stabwerk3d import stab as st3
 
@@ -51,6 +51,31 @@ class TestPolynom(unittest.TestCase):
         p = Polynom((-2.0, 0.0, 1.0))                       # x² − 2
         self.assertAlmostEqual(p.nullstellen(0.0, 3.0)[0], math.sqrt(2), places=12)
         self.assertEqual(Polynom((5.0,)).nullstellen(0.0, 1.0), [])
+
+
+class TestGleicheWerte(unittest.TestCase):
+    def test_was_nur_in_der_rundung_abweicht_ist_gleich(self):
+        """Dann gilt die vorderste Stelle, nicht das Rauschen."""
+        werte = [(1.0, 5.0), (2.0, -3.0), (3.0, 5.0 + 1e-12), (4.0, -3.0 - 1e-12)]
+        self.assertEqual(vorderste_extreme(werte), ((2.0, -3.0), (1.0, 5.0)))
+        self.assertEqual(vorderste_extreme([(1.0, 5.0), (3.0, 5.1)])[1], (3.0, 5.1))
+
+    def test_ein_stab_ohne_biegung(self):
+        """
+        Ein schiefer Kragarm, gedrückt längs seiner Achse, biegt sich nirgends:
+        Durchbiegung, Moment und Drehung sind null bis auf das Rauschen der
+        Rechnung. Bis 2026-11-20 lag der grösste Wert, wo das Rauschen am
+        grössten war -- hier die Durchbiegung bei x = 2.10 m.
+        """
+        P = 100e3
+        s = System(knoten=[Knoten("K1", 0, 0), Knoten("K2", 3, 4)],
+                   staebe=[Stab("L1", "K1", "K2", EA=EA, EI=EI)],
+                   lager=[Lager("A1", "K1", x=FEST, z=FEST, phi=FEST)],
+                   lastfaelle=[Lastfall("LF", [Knotenlast("K2", Fx=-0.6 * P, Fz=-0.8 * P)])])
+        v = verlaeufe(rechnen(s).faelle[0])["L1"]
+        for groesse in ("f_z", "M_y", "theta_y"):
+            e = v.extrem(groesse)
+            self.assertEqual((e.kleinst[0], e.groesst[0]), (0.0, 0.0), groesse)
 
 
 class TestEinfeldtraeger(unittest.TestCase):
@@ -233,6 +258,13 @@ class TestGrenzwerte(unittest.TestCase):
         self.assertEqual(g.kleinst, Grenzwert("L2", 3.0, -7.0))
         self.assertEqual(g.groesst, Grenzwert("L1", 1.0, 5.0))      # gleich gross: der erste Stab
         self.assertEqual(g.massgebend, Grenzwert("L2", 3.0, -7.0))
+
+    def test_was_nur_in_der_rundung_abweicht(self):
+        """Gleich bis auf Rundung: der erste Stab -- bei gleichem Betrag der positive."""
+        g = grenzwerte({"L1": Extrem((0.0, -1e-18), (0.0, 1e-18)),
+                        "L2": Extrem((0.0, -3e-18), (0.0, 2e-18))})
+        self.assertEqual((g.kleinst.stab, g.groesst.stab, g.massgebend.stab), ("L1", "L1", "L1"))
+        self.assertEqual(Extrem((1.0, -3.0 - 1e-15), (2.0, 3.0)).massgebend, (2.0, 3.0))
 
 
 class TestGroessteVerschiebung(unittest.TestCase):

@@ -41,8 +41,9 @@ from opencivil.decke.modell import Decke, Linienlager
 from opencivil.decke.streifen import (
     LINIENLAGER, STUETZE, UNTERZUG, Auflager, Streifen, Traeger, Zerlegung, pressung, zerlegen,
 )
-from opencivil.decke.traeger import GLEICH, Einzellast, Streckenlast, Stueck, Teillast, statik, wert
+from opencivil.decke.traeger import GLEICH, Einzellast, Streckenlast, Teillast, statik, wert
 from opencivil.stabwerk.system import Meldung
+from opencivil.stabwerk.verlauf import EbenesIntervall
 
 #: Unter diesem Anteil der Last gilt die Probe als erfüllt.
 PROBE = 1e-6
@@ -64,8 +65,8 @@ class Traegerergebnis:
     """Was auf ihm liegt, ohne seine Lagerkräfte -- in m ab seinem Anfang."""
 
     lagerkraefte: List[Lagerkraft]
-    stuecke: List[Stueck]
-    """Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm)."""
+    stuecke: List[EbenesIntervall]
+    """Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm) -- aus :func:`statik`."""
 
     @property
     def last(self) -> float:

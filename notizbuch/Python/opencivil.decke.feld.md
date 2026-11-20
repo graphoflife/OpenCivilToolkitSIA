@@ -1,5 +1,5 @@
 ---
-erzeugt: 13660811b0b6
+erzeugt: 9272548dfd35
 art: modul
 tags: [modul]
 ---
@@ -296,6 +296,7 @@ Die Einzellasten eines Lastfalls oder einer Kombination, mit ihrem Beiwert.
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]
 - [[opencivil.decke.traeger]]
+- [[opencivil.stabwerk.verlauf]]
 
 ## Gebraucht von
 

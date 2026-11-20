@@ -1,5 +1,5 @@
 ---
-erzeugt: 13f502482055
+erzeugt: 660d24405a9f
 art: modul
 tags: [modul]
 ---
@@ -187,8 +187,8 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]
-- [[opencivil.decke.traeger]]
 - [[opencivil.decke.werk]]
+- [[opencivil.stabwerk.verlauf]]
 
 ## Gebraucht von
 

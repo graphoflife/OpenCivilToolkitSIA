@@ -1,5 +1,5 @@
 ---
-erzeugt: 1e1445635d97
+erzeugt: 60776538745b
 art: modul
 tags: [modul]
 ---
@@ -60,7 +60,7 @@ class Traegerergebnis
 - `traeger: Traeger`
 - `lasten: List[Teillast]` – Was auf ihm liegt, ohne seine Lagerkräfte -- in m ab seinem Anfang.
 - `lagerkraefte: List[Lagerkraft]`
-- `stuecke: List[Stueck]` – Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm).
+- `stuecke: List[EbenesIntervall]` – Querkraft und Moment längs des Trägers, für den ganzen Streifen (N, Nm) -- aus [[opencivil.decke.traeger#statik|statik]].
 
 #### Traegerergebnis.last
 
@@ -288,6 +288,7 @@ Warum ein Träger nicht trägt -- von einem gesagt und von mehreren.
 - [[opencivil.decke.streifen]]
 - [[opencivil.decke.traeger]]
 - [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk.verlauf]]
 
 ## Gebraucht von
 

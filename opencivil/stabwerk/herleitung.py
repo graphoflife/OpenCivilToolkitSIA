@@ -31,7 +31,7 @@ from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import dicht
 from opencivil.stabwerk.modell import Halt, Stablast, System
 from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Ergebnis, Fall
-from opencivil.stabwerk.verlauf import IN_DER_EBENE, grenzwerte, nach_betrag
+from opencivil.stabwerk.verlauf import IN_DER_EBENE, grenzwerte, massgebender
 from opencivil.stabwerk3d import stab as st3
 
 if TYPE_CHECKING:
@@ -314,7 +314,7 @@ def extremwerte(p: Protokoll, verlaeufe,
                Mathe(r"x\ [\mathrm{m}]")], zeilen, titel="Extremwerte")
     zeichen = {feld: z for feld, z, *_ in groessen}
     massgebend = {feld: grenzwerte(extreme[feld]).massgebend for feld in durchbiegungen}
-    feld = max(massgebend, key=lambda f: nach_betrag(massgebend[f].wert))
+    feld, _ = massgebender([(f, g.wert) for f, g in massgebend.items()])
     w = massgebend[feld]
     if abs(w.wert) > 0.0:
         p.text(f"Grösste Durchbiegung gegen die Sehne eines Stabs: {w.stab}, "

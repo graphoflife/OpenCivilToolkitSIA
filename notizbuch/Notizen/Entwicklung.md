@@ -7,6 +7,29 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Die Decke rechnet ihre Träger wie Stäbe
+
+Ein Streifen der Decke ist ein Durchlaufträger. Seine Lagerkräfte kamen
+schon aus den Elementen des Stabwerks, Querkraft und Moment aber integrierte
+die Decke ein zweites Mal selbst, mit eigener Regel für gleiche
+Extremwerte. Jetzt rechnet sie wie ein ebener Stab, starr
+(`ebener_verlauf` mit `EI = ∞`); ihre Stücke sind die des Stabwerks.
+
+Die Regel für gleiche Extremwerte gilt nun auch für die Stäbe: was sich nur
+in der Rundung unterscheidet, ist gleich, und es gilt die vorderste Stelle.
+Bisher lag bei einem Stab, der sich nirgends biegt, der grösste Wert dort,
+wo das Rauschen der Rechnung am grössten war – ein schiefer, längs
+gedrückter Kragarm nannte für seine Durchbiegung «0.00 mm bei x = 2.10 m».
+Jetzt steht dort x = 0. Die grösste Verschiebung wird am Betrag verglichen,
+nicht an seinem Quadrat, damit die Rundung in m zählt.
+
+Über alle Stäbe gilt dieselbe Regel: bei gleichem Wert der erste Stab, beim
+massgebenden Wert bei gleichem Betrag der positive (`massgebender` statt des
+Schlüssels `nach_betrag`). In den Beispielberichten rücken so nur Stellen in
+den Tabellen der Extremwerte nach vorn, kein Wert ändert sich – ein Moment
+von −1.2 kNm über den ganzen Stab stand bei «kleinst x = 0.00, grösst
+x = 4.00», jetzt bei beiden x = 0.00.
+
 ## 2026-11-20 · Die Kennzahlen rechnen die Querkraft mit ihrem Nachweis
 
 Unter jeder Platte steht ihr Querkraftwiderstand ohne Einwirkung. Gerechnet

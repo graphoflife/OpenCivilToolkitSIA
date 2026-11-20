@@ -1,5 +1,5 @@
 ---
-erzeugt: 417a4f5deace
+erzeugt: 8e9d01e82316
 art: modul
 tags: [modul]
 ---
@@ -85,7 +85,9 @@ Ende trifft sie die des Endes (eine Probe in den Tests).
 
 Ein Moment ist dort am groessten, wo `dM/dx = V - m` null wird, oder an
 einer Grenze: einem Stabende, einer Laststelle -- dort auf beiden Seiten.
-Gesucht wird an genau diesen Stellen, nicht im Raster der Bilder. Ueber
+Gesucht wird an genau diesen Stellen, nicht im Raster der Bilder. Was sich
+nur in der Rundung unterscheidet, gilt als gleich, und dann die vorderste
+Stelle ([[opencivil.stabwerk.verlauf#vorderste_extreme|vorderste_extreme]]) -- dieselbe Regel wie in der Decke. Ueber
 alle Staebe eines Falls fasst [[opencivil.stabwerk.verlauf#grenzwerte|grenzwerte]] zusammen: den kleinsten,
 den groessten und den massgebenden Wert, den mit dem groessten Betrag --
 bei gleichem Betrag den positiven. Bericht und Bildschirm zeigen dieselben.
@@ -178,13 +180,37 @@ Ein Stueck eines Stabs ohne Laststelle -- alles darauf Polynome in x ab dem Stab
 - `p_y: Polynom = field(default_factory=lambda: NULL)`
 - `p_z: Polynom = field(default_factory=lambda: NULL)` – Die Querlast samt Bettung in y und z des Stabs.
 
-### nach_betrag
+### _rauschen
 
 ```python
-def nach_betrag(wert: float) -> Tuple[float, float]
+def _rauschen(*werte: float) -> float
 ```
 
-Wonach der massgebende Wert gewaehlt wird: nach dem Betrag, bei gleichem der positive.
+Was zwischen Werten dieser Groesse nur Rundung ist: ein Milliardstel, mindestens 1e-9 in SI-Basis.
+
+### vorderste_extreme
+
+```python
+def vorderste_extreme(werte: Sequence[Tuple[Ort, float]]) -> Tuple[Tuple[Ort, float], Tuple[Ort, float]]
+```
+
+Aus `(Ort, Wert)`, in ihrer Folge: das erste Paar mit dem kleinsten und
+das erste mit dem groessten Wert. Was sich nur in der Rundung
+unterscheidet ([[opencivil.stabwerk.verlauf#_rauschen|_rauschen]]), gilt als gleich: sonst entschiede bei
+gleichen Werten an zwei Orten das Rauschen -- in einem symmetrischen
+Traeger, an einem Stab, der sich nirgends biegt.
+
+### massgebender
+
+```python
+def massgebender(werte: Sequence[Tuple[Ort, float]]) -> Tuple[Ort, float]
+```
+
+Aus `(Ort, Wert)`, in ihrer Folge: das erste Paar mit dem groessten
+Betrag, bei gleichem Betrag das erste positive -- gleich bis auf Rundung
+wie in [[opencivil.stabwerk.verlauf#vorderste_extreme|vorderste_extreme]]. Bis 2026-11-20 war das ein Schluessel
+fuer `max` (`nach_betrag`), und das Rauschen entschied zwischen
+Werten, die nur in der Rundung abwichen.
 
 ### Extrem
 
@@ -205,7 +231,27 @@ Der kleinste und der groesste Wert einer Groesse, je mit Stelle: `(x, Wert)`.
 def massgebend(self) -> Tuple[float, float]
 ```
 
-Der der beiden, der massgebend ist ([[opencivil.stabwerk.verlauf#nach_betrag|nach_betrag]]).
+Der der beiden, der massgebend ist ([[opencivil.stabwerk.verlauf#massgebender|massgebender]]).
+
+### extremwerte
+
+```python
+def extremwerte(teile: Sequence[Any], polynom: Callable[[Any], Polynom]) -> Extrem
+```
+
+Kleinster und groesster Wert eines Polynoms je Stueck `x0` bis `x1`,
+bei gleichen Werten an der vordersten Stelle ([[opencivil.stabwerk.verlauf#vorderste_extreme|vorderste_extreme]])
+-- fuer die Staebe und die Traeger der Decke. Bis 2026-11-20 hatte nur
+die Decke diese Regel, und ein Stab, der sich nirgends biegt, nannte fuer
+seine Durchbiegung 0.00 mm eine Stelle, die vom Rauschen abhing.
+
+### _kandidaten
+
+```python
+def _kandidaten(teile: Sequence[Any], polynom: Callable[[Any], Polynom]) -> List[Tuple[float, float]]
+```
+
+`(x, Wert)` an den Grenzen jedes Stuecks und wo es flach ist -- nach `x` geordnet.
 
 ### Grenzwert
 
@@ -240,8 +286,8 @@ def grenzwerte(extreme: Mapping[str, Extrem]) -> Grenzwerte
 ```
 
 Aus den Extremwerten je Stab die ueber alle: der kleinste, der groesste
-und der massgebende ([[opencivil.stabwerk.verlauf#Extrem.massgebend|Extrem.massgebend]]) -- bei gleichem Wert der
-des ersten Stabs.
+und der massgebende ([[opencivil.stabwerk.verlauf#Extrem.massgebend|Extrem.massgebend]]) -- bei gleichem Wert,
+auch bis auf Rundung, der des ersten Stabs.
 
 ### Stabverlauf
 
@@ -308,15 +354,9 @@ und `f_z`, der Durchbiegung gegen die Sehne.
 def groesste_verschiebung(self) -> Tuple[float, float]
 ```
 
-Wo sich der Stab am weitesten verschiebt, und wie weit, in m -- `(x, Betrag)`.
-
-#### Stabverlauf._extrem
-
-```python
-def _extrem(self, polynom: Callable[[Intervall], Polynom]) -> Extrem
-```
-
-Kleinster und groesster Wert eines Polynoms je Stueck: an den Grenzen und wo es flach ist.
+Wo sich der Stab am weitesten verschiebt, und wie weit, in m -- ``(x,
+Betrag)`. Gesucht am Quadrat `u² + v² + w²``, einem Polynom;
+verglichen am Betrag, damit die Rundung in m zaehlt und nicht in m².
 
 ### verlaeufe
 
@@ -380,6 +420,7 @@ def _schieben(p: Polynom, um: float) -> Polynom
 - `POLYNOME = SCHNITTGROESSEN + ('u', 'v', 'w', 'theta_x', 'theta_y', 'theta_z')` – Was ein Intervall als Polynom traegt, ausser den Lasten.
 - `IN_DER_EBENE = {'N': 'N', 'V': 'V_z', 'M': 'M_y', 'w': 'f_z', 'phi': 'theta_y'}` – In der Ebene heissen die Groessen eines Stabs wie von Hand -- je Zeichen sein Feld im Verlauf: z liegt auf der gestrichelten Faser, y steht senkrecht auf der Ebene.
 - `NULL = Polynom((0.0,))`
+- `Ort = TypeVar('Ort')` – Wo ein Wert liegt: `x` laengs eines Stabs, ein Stab ueber alle, `s` laengs eines Traegers der Decke, ein Punkt ihrer Platte.
 
 ## Braucht
 
@@ -389,6 +430,10 @@ def _schieben(p: Polynom, um: float) -> Polynom
 
 ## Gebraucht von
 
+- [[opencivil.decke.feld]]
+- [[opencivil.decke.herleitung]]
+- [[opencivil.decke.rechnung]]
+- [[opencivil.decke.schnitt]]
 - [[opencivil.decke.traeger]]
 - [[opencivil.pfahl.bettung]]
 - [[opencivil.stabwerk.herleitung]]

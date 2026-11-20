@@ -7,9 +7,8 @@ Gegenuhrzeigersinn; ``M > 0`` zieht unten.
 
 import unittest
 
-from opencivil.decke.traeger import (
-    Balken, Einzellast, Halt, Streckenlast, extreme, statik, vorderste_extreme, wert,
-)
+from opencivil.decke.traeger import Balken, Einzellast, Halt, Streckenlast, statik, wert
+from opencivil.stabwerk.verlauf import extremwerte
 
 q = 10e3
 EI = 1e7
@@ -62,7 +61,7 @@ class TestStatik(unittest.TestCase):
         stuecke = statik(L, [Streckenlast(0.0, L, q, q), Einzellast(0.0, -3.0 * q), Einzellast(L, -3.0 * q)])
         self.assertAlmostEqual(wert(stuecke, "M", 3.0), q * L * L / 8.0)
         self.assertAlmostEqual(wert(stuecke, "V", 0.0), 3.0 * q)
-        (_, kleinst), (s, groesst) = extreme(stuecke, "M")
+        s, groesst = extremwerte(stuecke, lambda t: t.M).groesst
         self.assertAlmostEqual(s, 3.0)
         self.assertAlmostEqual(groesst, q * L * L / 8.0)
 
@@ -85,12 +84,6 @@ class TestStatik(unittest.TestCase):
                          + [Streckenlast(s - 0.5, s + 0.5, -f, -f) for s, f in zip((0.5, 4.5, 8.5), F)])
         self.assertAlmostEqual(wert(flaeche, "M", 4.5), RA * 4.0 - p * 4.5 ** 2 / 2.0 + F[1] * 0.5 ** 2 / 2.0,
                                places=6)
-
-    def test_bei_gleichen_werten_die_vordere_stelle(self):
-        """Was sich nur in der Rundung unterscheidet, ist gleich: dann gilt die erste Stelle, nicht das Rauschen."""
-        werte = [(1.0, 5.0), (2.0, -3.0), (3.0, 5.0 + 1e-12), (4.0, -3.0 - 1e-12)]
-        self.assertEqual(vorderste_extreme(werte), ((2.0, -3.0), (1.0, 5.0)))
-        self.assertEqual(vorderste_extreme([(1.0, 5.0), (3.0, 5.1)])[1], (3.0, 5.1))
 
     def test_ohne_gleichgewicht_wirft(self):
         with self.assertRaises(ArithmeticError):

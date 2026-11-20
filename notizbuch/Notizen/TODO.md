@@ -330,11 +330,12 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Kurve, Bild und Kennzahl rufen dieselbe Rechnung. Die Kennzahlen lesen
         `bezuege_ohne_faelle` statt alle Eingänge mit einem Filter auf `m_Rd_`
         und wählen den Ansatz einmal.
-      - Decke: `traeger.statik`, `wert` und `extreme` integrieren V und M
-        ein zweites Mal neben `stabwerk/verlauf.py`, mit eigener Regel für
-        gleiche Extremwerte (Abweichung heute 6·10⁻¹¹). Umbau:
-        `ebener_verlauf(…, EI=∞)`, und `vorderste_extreme` wird die Regel
-        von `_extrem` -- das erledigt zugleich Punkt 10 vom 2026-11-15.
+      - Erledigt (2026-11-20): Decke. `traeger.statik` rechnet über
+        `ebener_verlauf(…, EI=∞)`, ihre Stücke sind `EbenesIntervall`;
+        `Stueck` und `traeger.extreme` sind weg. `vorderste_extreme` steht
+        in `verlauf.py` und ist die Regel von `extremwerte`, für Stäbe und
+        Decke, ebenso über alle Stäbe (`grenzwerte`, `massgebender` statt
+        `nach_betrag`) – das erledigt Punkt 10 vom 2026-11-15.
       - Knicken und Kennzahlen entscheiden je selbst «eigene Linie oder die
         der Tragsicherheit» (`gleiche_linie`, sechs Verzweigungen);
         `gleiche_linie` vergleicht den Modul nicht. Umbau: eine
@@ -616,7 +617,9 @@ der grosse.
       mehr Ebene und Raum. Umbau, wenn dort ohnehin gearbeitet wird: beide
       Dateien nach `stabwerk/`, `stabwerk3d/` behält Modell, Rechnung und
       Herleitung des 3D-Balkensystems.
-- [ ] **10. Extremwert null an zufälliger Stelle.** Ist die Durchbiegung
+- [x] **10. Extremwert null an zufälliger Stelle.** Erledigt
+      (2026-11-20) mit Punkt 1 vom 2026-11-19: `extremwerte` nimmt bei
+      gleichen Werten die vorderste Stelle. Ist die Durchbiegung
       eines Stabs überall null -- etwa bei einem, der nur Normalkraft trägt --,
       nennt die Tabelle der Extremwerte für 0.00 mm eine Stelle x, die nur
       vom Rundungsrauschen abhängt; seit Punkt 1 an sechs Stellen der

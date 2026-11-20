@@ -47,7 +47,7 @@ from opencivil.decke.geometrie import Punkt
 from opencivil.decke.modell import Decke
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis
 from opencivil.decke.streifen import Streifen, Zerlegung
-from opencivil.decke.traeger import vorderste_extreme
+from opencivil.stabwerk.verlauf import vorderste_extreme
 
 #: In so viele gleiche Schritte teilt der Verlauf einen Schnitt mindestens.
 SCHRITTE = 120
@@ -159,9 +159,9 @@ def unterzug(fall: Fallergebnis, streifen: Streifen) -> Verlauf:
             proben += [(ort(s), Balkenkraefte(0.0, 0.0)) for s in (t.s0, t.s1)]
             continue
         for st in traeger.stuecke:
-            nullen = st.V.nullstellen(st.a, st.b) + st.p.nullstellen(st.a, st.b)
+            nullen = st.V.nullstellen(st.x0, st.x1) + st.p_y.nullstellen(st.x0, st.x1)
             proben += [(ort(t.s0 + s), Balkenkraefte(st.M(s), vz * st.V(s)))
-                       for s in _im_teil(st.a, st.b, L / SCHRITTE, nullen)]
+                       for s in _im_teil(st.x0, st.x1, L / SCHRITTE, nullen)]
     # Gegen die Richtung gesammelt: rückwärts aufsteigend, der Wert links eines Sprungs zuerst.
     if vz < 0.0:
         stuecke.reverse()
@@ -195,9 +195,9 @@ def _stellen(z: Zerlegung, fall: Fallergebnis, a: Punkt, e: Punkt) -> Tuple[List
         for t in streifen.traeger:
             traeger = fall.traeger.get(t.name)
             for stueck in traeger.stuecke if traeger is not None else ():
-                enden += [t.s0 + s for s in (stueck.a, stueck.b)]
-                nullen += [t.s0 + s for s in stueck.V.nullstellen(stueck.a, stueck.b)
-                           + stueck.p.nullstellen(stueck.a, stueck.b)]
+                enden += [t.s0 + s for s in (stueck.x0, stueck.x1)]
+                nullen += [t.s0 + s for s in stueck.V.nullstellen(stueck.x0, stueck.x1)
+                           + stueck.p_y.nullstellen(stueck.x0, stueck.x1)]
         grenzen += [u for u in ((s - sa) / laengs for s in enden) if von <= u <= bis]
         spitzen += [u for u in ((s - sa) / laengs for s in nullen) if von <= u <= bis]
     return grenzen, spitzen

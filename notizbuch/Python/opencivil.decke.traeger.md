@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c4cbd70717c
+erzeugt: 70d4e41787b6
 art: modul
 tags: [modul]
 ---
@@ -18,7 +18,8 @@ gerechnet, in zwei Schritten:
    Lagern und wo die Steifigkeit wechselt. Zwischen den Knoten ist die
    Hermite-Biegelinie die genaue Lösung; die Lagerkräfte stimmen exakt.
 2. **Statik**: mit diesen Lagerkräften laufen Querkraft und Moment vom
-   Anfang des Streifens bis zu seinem Ende. Ein Flächenlager -- ein
+   Anfang des Streifens bis zu seinem Ende, gerechnet wie in einem ebenen
+   Stab des Stabwerks, starr ([[opencivil.decke.traeger#statik|statik]]). Ein Flächenlager -- ein
    versteckter Unterzug, eine Stütze -- drückt dabei nicht in einem Punkt,
    sondern gleichmässig über seine Breite; so steht es in der Vorlesung
    («Flächenlager mit gleichmässiger Pressung», Stahlbeton II, 7.2 Platten,
@@ -160,65 +161,36 @@ Je Lager die Kraft nach oben `F` und das Moment `C` im
 Gegenuhrzeigersinn, die es auf den Träger ausübt -- elastisch, mit
 den Lagern als Punkten.
 
-### Stueck
-
-```python
-@dataclass(frozen=True)
-class Stueck
-```
-
-Ein Stück des Trägers ohne Laststelle: Querkraft, Moment und Last als Polynome in `s`.
-
-- `a: float`
-- `b: float`
-- `V: Polynom`
-- `M: Polynom`
-- `p: Polynom` – Die Last nach unten, samt Pressung der Flächenlager (negativ).
-
 ### statik
 
 ```python
-def statik(L: float, lasten: Sequence[Teillast]) -> List[Stueck]
+def statik(L: float, lasten: Sequence[Teillast]) -> List[EbenesIntervall]
 ```
 
-Querkraft und Moment längs des Trägers, von links: aus allen Kräften
-auf ihn -- Lasten nach unten, Lagerkräfte als Einzellasten oder
-Pressungen nach oben (negativ). Wirft, wenn am Ende etwas übrig bleibt:
-dann stehen die Kräfte nicht im Gleichgewicht.
+Querkraft und Moment längs des Trägers, von links: aus allen Kräften auf
+ihn -- Lasten nach unten, Lagerkräfte als Einzellasten oder Pressungen
+nach oben (negativ). Gerechnet wie ein ebener Stab des Stabwerks, starr
+([[opencivil.stabwerk.verlauf#ebener_verlauf|ebener_verlauf]] mit `EI = ∞`): die
+Biegelinie braucht hier niemand. Bis 2026-11-20 integrierte die Decke
+Querkraft und Moment ein zweites Mal selbst.
+
+Was näher als [[opencivil.decke.traeger#Konstanten|GLEICH]] beieinanderliegt, gilt als eine Stelle --
+der Rand eines Lagers und die Grenze eines Streifens unterscheiden sich
+oft nur in der Rundung. Wirft, wenn am Ende etwas übrig bleibt: dann
+stehen die Kräfte nicht im Gleichgewicht.
 
 ### wert
 
 ```python
-def wert(stuecke: Sequence[Stueck], groesse: str, s: float, links: bool=False) -> float
+def wert(teile: Sequence[EbenesIntervall], groesse: str, s: float, links: bool=False) -> float
 ```
 
 `V` oder `M` an der Stelle `s` -- an einem Sprung rechts davon, mit `links` links davon.
-
-### extreme
-
-```python
-def extreme(stuecke: Sequence[Stueck], groesse: str) -> Tuple[Tuple[float, float], Tuple[float, float]]
-```
-
-`((s, kleinster), (s, grösster))` von `V` oder `M` -- an Grenzen und
-wo die Ableitung null ist; bei gleichen Werten die vordere Stelle.
-
-### vorderste_extreme
-
-```python
-def vorderste_extreme(werte: Sequence[Tuple[Ort, float]]) -> Tuple[Tuple[Ort, float], Tuple[Ort, float]]
-```
-
-Aus `(Ort, Wert)`, in ihrer Folge: das erste Paar mit dem kleinsten und
-das erste mit dem grössten Wert. Was sich nur in der Rundung
-unterscheidet, gilt als gleich -- sonst entschiede bei gleichen Werten an
-zwei Orten, etwa in einem symmetrischen Träger, das Rauschen.
 
 
 ## Konstanten
 
 - `GLEICH = 1e-09` – Was in m als dieselbe Stelle gilt.
-- `Ort = TypeVar('Ort')` – Wo ein Wert liegt: `s` längs eines Trägers, ein Punkt der Platte.
 
 ## Braucht
 
@@ -229,8 +201,6 @@ zwei Orten, etwa in einem symmetrischen Träger, das Rauschen.
 ## Gebraucht von
 
 - [[opencivil.decke.feld]]
-- [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]
-- [[opencivil.decke.schnitt]]
 - [[opencivil.decke.streifen]]

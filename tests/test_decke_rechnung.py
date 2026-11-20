@@ -27,7 +27,8 @@ from opencivil.decke.modell import (
     Stuetze, Unterzug, Zone,
 )
 from opencivil.decke.rechnung import Wandkraft, lagerverlauf, rechnen, spitzen
-from opencivil.decke.traeger import extreme, wert
+from opencivil.decke.traeger import wert
+from opencivil.stabwerk.verlauf import extremwerte
 
 E, WICHTE = 30e9, 25e3
 q = 10e3
@@ -104,7 +105,7 @@ class TestKolloquium4(Rechnung):
         soll = self.RA * 4.0 - p * 4.5 ** 2 / 2.0 + self.RB * 0.5 ** 2 / 2.0
         self.assertAlmostEqual(self.je_meter(self.f, "x1", "M", 4.5), soll, places=3)
         self.assertAlmostEqual(soll / 1e3, -7.3, delta=0.1)
-        (_, _), (_, feld) = extreme(self.f.traeger["x1"].stuecke, "M")
+        _, feld = extremwerte(self.f.traeger["x1"].stuecke, lambda t: t.M).groesst
         feld_soll = (self.RA - p * 0.5) ** 2 / (2.0 * p) + self.MA
         self.assertAlmostEqual(feld / 0.25, feld_soll, places=3)
         self.assertAlmostEqual(feld_soll / 1e3, 6.1, delta=0.15)
@@ -124,7 +125,7 @@ class TestKolloquium4(Rechnung):
         self.assertEqual((wand, sb3), ("Wand", "SB3"))
         self.assertAlmostEqual(C, qC, places=3)
         self.assertAlmostEqual(qC / 1e3, 39.3, delta=0.1)
-        (_, _), (_, M) = extreme(self.f.traeger["y5"].stuecke, "M")
+        _, M = extremwerte(self.f.traeger["y5"].stuecke, lambda t: t.M).groesst
         self.assertAlmostEqual(M / 0.25, A ** 2 / (2.0 * p), places=3)
         self.assertAlmostEqual(M / 0.25 / 1e3, 39.9, delta=0.05)
         self.assertAlmostEqual(self.je_meter(self.f, "y5", "M", 4.5) / 1e3, 13.2, delta=0.05)

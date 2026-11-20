@@ -66,7 +66,9 @@ Ende trifft sie die des Endes (eine Probe in den Tests).
 EXTREMWERTE:
 Ein Moment ist dort am groessten, wo ``dM/dx = V - m`` null wird, oder an
 einer Grenze: einem Stabende, einer Laststelle -- dort auf beiden Seiten.
-Gesucht wird an genau diesen Stellen, nicht im Raster der Bilder. Ueber
+Gesucht wird an genau diesen Stellen, nicht im Raster der Bilder. Was sich
+nur in der Rundung unterscheidet, gilt als gleich, und dann die vorderste
+Stelle (:func:`vorderste_extreme`) -- dieselbe Regel wie in der Decke. Ueber
 alle Staebe eines Falls fasst :func:`grenzwerte` zusammen: den kleinsten,
 den groessten und den massgebenden Wert, den mit dem groessten Betrag --
 bei gleichem Betrag den positiven. Bericht und Bildschirm zeigen dieselben.
@@ -78,7 +80,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Mapping, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Sequence, Tuple, TypeVar
 
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk3d import stab as st3
@@ -222,9 +224,42 @@ class Intervall:
     """Die Querlast samt Bettung in y und z des Stabs."""
 
 
-def nach_betrag(wert: float) -> Tuple[float, float]:
-    """Wonach der massgebende Wert gewaehlt wird: nach dem Betrag, bei gleichem der positive."""
-    return abs(wert), wert
+#: Wo ein Wert liegt: ``x`` laengs eines Stabs, ein Stab ueber alle, ``s``
+#: laengs eines Traegers der Decke, ein Punkt ihrer Platte.
+Ort = TypeVar("Ort")
+
+
+def _rauschen(*werte: float) -> float:
+    """Was zwischen Werten dieser Groesse nur Rundung ist: ein Milliardstel, mindestens 1e-9 in SI-Basis."""
+    return 1e-9 * max(max(abs(w) for w in werte), 1.0)
+
+
+def vorderste_extreme(werte: Sequence[Tuple[Ort, float]]) -> Tuple[Tuple[Ort, float], Tuple[Ort, float]]:
+    """
+    Aus ``(Ort, Wert)``, in ihrer Folge: das erste Paar mit dem kleinsten und
+    das erste mit dem groessten Wert. Was sich nur in der Rundung
+    unterscheidet (:func:`_rauschen`), gilt als gleich: sonst entschiede bei
+    gleichen Werten an zwei Orten das Rauschen -- in einem symmetrischen
+    Traeger, an einem Stab, der sich nirgends biegt.
+    """
+    klein, gross = min(w for _, w in werte), max(w for _, w in werte)
+    rauschen = _rauschen(klein, gross)
+    return (next(w for w in werte if w[1] <= klein + rauschen),
+            next(w for w in werte if w[1] >= gross - rauschen))
+
+
+def massgebender(werte: Sequence[Tuple[Ort, float]]) -> Tuple[Ort, float]:
+    """
+    Aus ``(Ort, Wert)``, in ihrer Folge: das erste Paar mit dem groessten
+    Betrag, bei gleichem Betrag das erste positive -- gleich bis auf Rundung
+    wie in :func:`vorderste_extreme`. Bis 2026-11-20 war das ein Schluessel
+    fuer ``max`` (``nach_betrag``), und das Rauschen entschied zwischen
+    Werten, die nur in der Rundung abwichen.
+    """
+    betrag = max(abs(w) for _, w in werte)
+    rauschen = _rauschen(betrag)
+    groesste = [p for p in werte if abs(p[1]) >= betrag - rauschen]
+    return next((p for p in groesste if p[1] > rauschen), groesste[0])
 
 
 @dataclass(frozen=True)
@@ -236,8 +271,29 @@ class Extrem:
 
     @property
     def massgebend(self) -> Tuple[float, float]:
-        """Der der beiden, der massgebend ist (:func:`nach_betrag`)."""
-        return max((self.kleinst, self.groesst), key=lambda w: nach_betrag(w[1]))
+        """Der der beiden, der massgebend ist (:func:`massgebender`)."""
+        return massgebender((self.kleinst, self.groesst))
+
+
+def extremwerte(teile: Sequence[Any], polynom: Callable[[Any], Polynom]) -> Extrem:
+    """
+    Kleinster und groesster Wert eines Polynoms je Stueck ``x0`` bis ``x1``,
+    bei gleichen Werten an der vordersten Stelle (:func:`vorderste_extreme`)
+    -- fuer die Staebe und die Traeger der Decke. Bis 2026-11-20 hatte nur
+    die Decke diese Regel, und ein Stab, der sich nirgends biegt, nannte fuer
+    seine Durchbiegung 0.00 mm eine Stelle, die vom Rauschen abhing.
+    """
+    return Extrem(*vorderste_extreme(_kandidaten(teile, polynom)))
+
+
+def _kandidaten(teile: Sequence[Any], polynom: Callable[[Any], Polynom]) -> List[Tuple[float, float]]:
+    """``(x, Wert)`` an den Grenzen jedes Stuecks und wo es flach ist -- nach ``x`` geordnet."""
+    werte = []
+    for teil in teile:
+        p = polynom(teil)
+        stellen = [teil.x0, teil.x1] + p.ableitung().nullstellen(teil.x0, teil.x1)
+        werte.extend((x, p(x)) for x in stellen)
+    return sorted(werte, key=lambda w: w[0])
 
 
 @dataclass(frozen=True)
@@ -261,16 +317,16 @@ class Grenzwerte:
 def grenzwerte(extreme: Mapping[str, Extrem]) -> Grenzwerte:
     """
     Aus den Extremwerten je Stab die ueber alle: der kleinste, der groesste
-    und der massgebende (:attr:`Extrem.massgebend`) -- bei gleichem Wert der
-    des ersten Stabs.
+    und der massgebende (:attr:`Extrem.massgebend`) -- bei gleichem Wert,
+    auch bis auf Rundung, der des ersten Stabs.
     """
-    def je_stab(wahl: Callable[[Extrem], Tuple[float, float]]) -> List[Grenzwert]:
-        return [Grenzwert(stab, *wahl(e)) for stab, e in extreme.items()]
+    def je_stab(wahl: Callable[[Extrem], Tuple[float, float]]) -> List[Tuple[Grenzwert, float]]:
+        return [(g, g.wert) for g in (Grenzwert(stab, *wahl(e)) for stab, e in extreme.items())]
 
-    return Grenzwerte(
-        kleinst=min(je_stab(lambda e: e.kleinst), key=lambda g: g.wert),
-        groesst=max(je_stab(lambda e: e.groesst), key=lambda g: g.wert),
-        massgebend=max(je_stab(lambda e: e.massgebend), key=lambda g: nach_betrag(g.wert)))
+    (kleinst, _), _ = vorderste_extreme(je_stab(lambda e: e.kleinst))
+    _, (groesst, _) = vorderste_extreme(je_stab(lambda e: e.groesst))
+    massgebend, _ = massgebender(je_stab(lambda e: e.massgebend))
+    return Grenzwerte(kleinst=kleinst, groesst=groesst, massgebend=massgebend)
 
 
 @dataclass
@@ -340,22 +396,16 @@ class Stabverlauf:
         Schnittgroesse, einer Verschiebung oder Verdrehung oder von ``f_y``
         und ``f_z``, der Durchbiegung gegen die Sehne.
         """
-        return self._extrem(lambda teil: self._polynom(teil, groesse))
+        return extremwerte(self.intervalle, lambda teil: self._polynom(teil, groesse))
 
     def groesste_verschiebung(self) -> Tuple[float, float]:
-        """Wo sich der Stab am weitesten verschiebt, und wie weit, in m -- ``(x, Betrag)``."""
-        x, quadrat = self._extrem(lambda t: t.u * t.u + t.v * t.v + t.w * t.w).groesst
-        return x, math.sqrt(max(quadrat, 0.0))
-
-    def _extrem(self, polynom: Callable[[Intervall], Polynom]) -> Extrem:
-        """Kleinster und groesster Wert eines Polynoms je Stueck: an den Grenzen und wo es flach ist."""
-        werte = []
-        for teil in self.intervalle:
-            p = polynom(teil)
-            stellen = [teil.x0, teil.x1] + p.ableitung().nullstellen(teil.x0, teil.x1)
-            werte.extend((x, p(x)) for x in stellen)
-        return Extrem(kleinst=min(werte, key=lambda w: w[1]),
-                      groesst=max(werte, key=lambda w: w[1]))
+        """
+        Wo sich der Stab am weitesten verschiebt, und wie weit, in m -- ``(x,
+        Betrag)``. Gesucht am Quadrat ``u² + v² + w²``, einem Polynom;
+        verglichen am Betrag, damit die Rundung in m zaehlt und nicht in m².
+        """
+        werte = _kandidaten(self.intervalle, lambda t: t.u * t.u + t.v * t.v + t.w * t.w)
+        return vorderste_extreme([(x, math.sqrt(max(q, 0.0))) for x, q in werte])[1]
 
 
 def verlaeufe(fall) -> Dict[str, Stabverlauf]:

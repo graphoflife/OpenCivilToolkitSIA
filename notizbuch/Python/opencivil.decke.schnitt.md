@@ -1,5 +1,5 @@
 ---
-erzeugt: 8a92c0c38eb2
+erzeugt: 87ec2e71e440
 art: modul
 tags: [modul]
 ---
@@ -199,7 +199,7 @@ Mitte am nächsten ist.
 - [[opencivil.decke.modell]]
 - [[opencivil.decke.rechnung]]
 - [[opencivil.decke.streifen]]
-- [[opencivil.decke.traeger]]
+- [[opencivil.stabwerk.verlauf]]
 
 ## Gebraucht von
 

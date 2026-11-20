@@ -4628,11 +4628,8 @@
         "Balken.knoten_bei",
         "Balken._steifigkeit",
         "Balken.lagerkraefte",
-        "Stueck",
         "statik",
-        "wert",
-        "extreme",
-        "vorderste_extreme"
+        "wert"
       ]
     },
     {
@@ -7948,9 +7945,13 @@
         "Polynom.nullstellen",
         "EbenesIntervall",
         "Intervall",
-        "nach_betrag",
+        "_rauschen",
+        "vorderste_extreme",
+        "massgebender",
         "Extrem",
         "Extrem.massgebend",
+        "extremwerte",
+        "_kandidaten",
         "Grenzwert",
         "Grenzwerte",
         "grenzwerte",
@@ -7961,7 +7962,6 @@
         "Stabverlauf.extremstellen",
         "Stabverlauf.extrem",
         "Stabverlauf.groesste_verschiebung",
-        "Stabverlauf._extrem",
         "verlaeufe",
         "ebener_verlauf",
         "_zusammen",

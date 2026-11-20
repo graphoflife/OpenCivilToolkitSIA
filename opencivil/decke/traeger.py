@@ -11,7 +11,8 @@ gerechnet, in zwei Schritten:
    Lagern und wo die Steifigkeit wechselt. Zwischen den Knoten ist die
    Hermite-Biegelinie die genaue Lösung; die Lagerkräfte stimmen exakt.
 2. **Statik**: mit diesen Lagerkräften laufen Querkraft und Moment vom
-   Anfang des Streifens bis zu seinem Ende. Ein Flächenlager -- ein
+   Anfang des Streifens bis zu seinem Ende, gerechnet wie in einem ebenen
+   Stab des Stabwerks, starr (:func:`statik`). Ein Flächenlager -- ein
    versteckter Unterzug, eine Stütze -- drückt dabei nicht in einem Punkt,
    sondern gleichmässig über seine Breite; so steht es in der Vorlesung
    («Flächenlager mit gleichmässiger Pressung», Stahlbeton II, 7.2 Platten,
@@ -31,18 +32,16 @@ Am Ende eines Trägers sind V und M null -- eine Probe, die
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple, TypeVar, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import Profilmatrix, Zerlegung
-from opencivil.stabwerk.verlauf import NULL, Polynom
+from opencivil.stabwerk.verlauf import EbenesIntervall, ebener_verlauf
 
 #: Was in m als dieselbe Stelle gilt.
 GLEICH = 1e-9
-
-#: Wo ein Wert liegt: ``s`` längs eines Trägers, ein Punkt der Platte.
-Ort = TypeVar("Ort")
 
 
 @dataclass(frozen=True)
@@ -206,102 +205,60 @@ class Balken:
 # ===========================================================================
 
 
-@dataclass(frozen=True)
-class Stueck:
-    """Ein Stück des Trägers ohne Laststelle: Querkraft, Moment und Last als Polynome in ``s``."""
-
-    a: float
-    b: float
-    V: Polynom
-    M: Polynom
-    p: Polynom
-    """Die Last nach unten, samt Pressung der Flächenlager (negativ)."""
-
-
-def statik(L: float, lasten: Sequence[Teillast]) -> List[Stueck]:
+def statik(L: float, lasten: Sequence[Teillast]) -> List[EbenesIntervall]:
     """
-    Querkraft und Moment längs des Trägers, von links: aus allen Kräften
-    auf ihn -- Lasten nach unten, Lagerkräfte als Einzellasten oder
-    Pressungen nach oben (negativ). Wirft, wenn am Ende etwas übrig bleibt:
-    dann stehen die Kräfte nicht im Gleichgewicht.
+    Querkraft und Moment längs des Trägers, von links: aus allen Kräften auf
+    ihn -- Lasten nach unten, Lagerkräfte als Einzellasten oder Pressungen
+    nach oben (negativ). Gerechnet wie ein ebener Stab des Stabwerks, starr
+    (:func:`~opencivil.stabwerk.verlauf.ebener_verlauf` mit ``EI = ∞``): die
+    Biegelinie braucht hier niemand. Bis 2026-11-20 integrierte die Decke
+    Querkraft und Moment ein zweites Mal selbst.
+
+    Was näher als :data:`GLEICH` beieinanderliegt, gilt als eine Stelle --
+    der Rand eines Lagers und die Grenze eines Streifens unterscheiden sich
+    oft nur in der Rundung. Wirft, wenn am Ende etwas übrig bleibt: dann
+    stehen die Kräfte nicht im Gleichgewicht.
     """
-    stellen = [0.0, L]
-    for l in lasten:
-        stellen.extend((l.a, l.b) if isinstance(l, Streckenlast) else (l.a,))
-    raster: List[float] = []
-    for s in sorted(stellen):
-        if not raster or s - raster[-1] > GLEICH:
+    raster = [0.0]
+    for s in sorted(s for l in lasten for s in ((l.a, l.b) if isinstance(l, Streckenlast) else (l.a,))):
+        if s - raster[-1] > GLEICH and L - s > GLEICH:
             raster.append(s)
+    raster.append(L)
 
     def eingerastet(s: float) -> float:
         return min(raster, key=lambda r: abs(r - s))
 
-    punkte: Dict[float, Tuple[float, float]] = {}
-    strecken: List[Streckenlast] = []
+    # In den Achsen eines ebenen Stabs: quer nach oben positiv, Momente im
+    # Gegenuhrzeigersinn -- die Lasten der Decke wirken nach unten.
+    stablasten: List[st.Teillast] = []
     for l in lasten:
         if isinstance(l, Einzellast):
-            s = eingerastet(l.a)
-            P, C = punkte.get(s, (0.0, 0.0))
-            punkte[s] = (P + l.P, C + l.C)
-        else:
-            a, b = eingerastet(l.a), eingerastet(l.b)
-            if b > a:
-                strecken.append(Streckenlast(a, b, l.p_a, l.p_b))
-            elif l.summe:
-                s = a
-                P, C = punkte.get(s, (0.0, 0.0))
-                punkte[s] = (P + l.summe, C)
-    V0 = M0 = 0.0
-    P, C = punkte.get(raster[0], (0.0, 0.0))
-    V0, M0 = V0 - P, M0 - C
-    heraus: List[Stueck] = []
-    for xa, xb in zip(raster, raster[1:]):
-        p = NULL
-        for l in strecken:
-            if l.a <= xa + GLEICH and l.b >= xb - GLEICH:
-                p = p + Polynom.durch(l.a, l.p_a, l.b, l.p_b)
-        V = Polynom((V0,)) - p.stammfunktion(xa)
-        M = Polynom((M0,)) + V.stammfunktion(xa)
-        heraus.append(Stueck(xa, xb, V, M, p))
-        P, C = punkte.get(xb, (0.0, 0.0))
-        V0, M0 = V(xb) - P, M(xb) - C
-    gesamt = sum(abs(l.summe) for l in strecken) + sum(abs(P) for P, _ in punkte.values())
-    if abs(V0) > 1e-6 * max(gesamt, 1.0) or abs(M0) > 1e-6 * max(gesamt * max(L, 1.0), 1.0):
-        raise ArithmeticError(f"Der Träger steht nicht im Gleichgewicht: am Ende V = {V0:.6g} N, "
-                              f"M = {M0:.6g} Nm.")
-    return heraus
+            stablasten.append(st.Punkt(eingerastet(l.a), Py=-l.P, M=l.C))
+            continue
+        a, b = eingerastet(l.a), eingerastet(l.b)
+        if b > a:
+            stablasten.append(st.Strecke(a, b, py_a=-l.p_a, py_b=-l.p_b))
+        elif l.summe:
+            stablasten.append(st.Punkt(a, Py=-l.summe))
+    teile = ebener_verlauf(L=L, x0=0.0, s=(0.0,) * 6, d=(0.0,) * 6, lasten=stablasten,
+                           EI=math.inf, laengs=False)
+
+    # Was am Ende angreift, laesst V und M dort springen -- danach muss
+    # nichts uebrig sein.
+    am_ende = [l for l in stablasten if isinstance(l, st.Punkt) and l.a == L]
+    V = teile[-1].V(L) + sum(l.Py for l in am_ende)
+    M = teile[-1].M(L) - sum(l.M for l in am_ende)
+    gesamt = sum(abs(l.summe) if isinstance(l, Streckenlast) else abs(l.P) for l in lasten)
+    if abs(V) > 1e-6 * max(gesamt, 1.0) or abs(M) > 1e-6 * max(gesamt * max(L, 1.0), 1.0):
+        raise ArithmeticError(f"Der Träger steht nicht im Gleichgewicht: am Ende V = {V:.6g} N, "
+                              f"M = {M:.6g} Nm.")
+    return teile
 
 
-def wert(stuecke: Sequence[Stueck], groesse: str, s: float, links: bool = False) -> float:
+def wert(teile: Sequence[EbenesIntervall], groesse: str, s: float, links: bool = False) -> float:
     """``V`` oder ``M`` an der Stelle ``s`` -- an einem Sprung rechts davon, mit ``links`` links davon."""
-    kandidaten = [t for t in stuecke if t.a - GLEICH <= s <= t.b + GLEICH]
+    kandidaten = [t for t in teile if t.x0 - GLEICH <= s <= t.x1 + GLEICH]
     if not kandidaten:
         return 0.0
     teil = kandidaten[0] if links else kandidaten[-1]
     return getattr(teil, groesse)(s)
-
-
-def extreme(stuecke: Sequence[Stueck], groesse: str) -> Tuple[Tuple[float, float], Tuple[float, float]]:
-    """
-    ``((s, kleinster), (s, grösster))`` von ``V`` oder ``M`` -- an Grenzen und
-    wo die Ableitung null ist; bei gleichen Werten die vordere Stelle.
-    """
-    werte = []
-    for t in stuecke:
-        funktion = getattr(t, groesse)
-        for s in [t.a, t.b] + funktion.ableitung().nullstellen(t.a, t.b):
-            werte.append((s, funktion(s)))
-    return vorderste_extreme(sorted(werte, key=lambda w: w[0]))
-
-
-def vorderste_extreme(werte: Sequence[Tuple[Ort, float]]) -> Tuple[Tuple[Ort, float], Tuple[Ort, float]]:
-    """
-    Aus ``(Ort, Wert)``, in ihrer Folge: das erste Paar mit dem kleinsten und
-    das erste mit dem grössten Wert. Was sich nur in der Rundung
-    unterscheidet, gilt als gleich -- sonst entschiede bei gleichen Werten an
-    zwei Orten, etwa in einem symmetrischen Träger, das Rauschen.
-    """
-    klein, gross = min(w for _, w in werte), max(w for _, w in werte)
-    rauschen = 1e-9 * max(abs(klein), abs(gross), 1.0)
-    return (next(w for w in werte if w[1] <= klein + rauschen),
-            next(w for w in werte if w[1] >= gross - rauschen))

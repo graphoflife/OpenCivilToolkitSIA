@@ -41,7 +41,7 @@ from opencivil.decke import geometrie as geo
 from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Last, Linienlast, Punktlast
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis, lagerverlauf, spitzen
 from opencivil.decke.streifen import Streifen, Traeger, Zerlegung, richtungen_der_platte
-from opencivil.decke.traeger import extreme
+from opencivil.stabwerk.verlauf import extremwerte
 
 if TYPE_CHECKING:
     from opencivil.decke.werk import Deckenbefund, Deckensystem
@@ -326,7 +326,8 @@ def _traeger(p: Protokoll, e: Ergebnis, f: Fallergebnis) -> None:
                 zeilen[-1] = (*zeilen[-1][:2], None)
             continue
         b = streifen.breite
-        (s_klein, m_klein), (s_gross, m_gross) = extreme(r.stuecke, "M")
+        m = extremwerte(r.stuecke, lambda t: t.M)
+        (s_klein, m_klein), (s_gross, m_gross) = m.kleinst, m.groesst
         lager = " · ".join(f"{k.auflager.name} {fest(k.F / b / 1e3, 1)}" for k in r.lagerkraefte)
         werte = (fest(b, 3), fest(t.L, 2), fest(r.last / b / 1e3, 1), lager,
                  *_mit_stelle(m_klein / b, t.s0 + s_klein), *_mit_stelle(m_gross / b, t.s0 + s_gross))

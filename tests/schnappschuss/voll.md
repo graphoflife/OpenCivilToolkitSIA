@@ -16687,22 +16687,22 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $0.0\ \mathrm{kN}$ | $3.79$ | $0.0\ \mathrm{kN}$ | $7.58$ |
+| L1 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L1 | $V$ | $-3.8\ \mathrm{kN}$ | $4.12$ | $36.5\ \mathrm{kN}$ | $8.00$ |
 | L1 | $M$ | $-15.9\ \mathrm{kNm}$ | $5.93$ | $12.9\ \mathrm{kNm}$ | $8.00$ |
 | L1 | $w$ | $-0.59\ \mathrm{mm}$ | $4.97$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L2 | $N$ | $-36.5\ \mathrm{kN}$ | $0.00$ | $-27.1\ \mathrm{kN}$ | $3.00$ |
 | L2 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L2 | $M$ | $12.9\ \mathrm{kNm}$ | $0.00$ | $12.9\ \mathrm{kNm}$ | $3.00$ |
+| L2 | $M$ | $12.9\ \mathrm{kNm}$ | $0.00$ | $12.9\ \mathrm{kNm}$ | $0.00$ |
 | L2 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.34\ \mathrm{mm}$ | $1.50$ |
 | L3 | $N$ | $-12.1\ \mathrm{kN}$ | $0.00$ | $13.9\ \mathrm{kN}$ | $4.47$ |
 | L3 | $V$ | $-27.8\ \mathrm{kN}$ | $4.47$ | $24.2\ \mathrm{kN}$ | $0.00$ |
 | L3 | $M$ | $0.0\ \mathrm{kNm}$ | $4.47$ | $33.1\ \mathrm{kNm}$ | $2.08$ |
-| L3 | $w$ | $0.00\ \mathrm{mm}$ | $4.47$ | $0.22\ \mathrm{mm}$ | $2.19$ |
+| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.22\ \mathrm{mm}$ | $2.19$ |
 | L4 | $N$ | $-33.0\ \mathrm{kN}$ | $5.00$ | $-31.0\ \mathrm{kN}$ | $0.00$ |
 | L4 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L4 | $M$ | $0.0\ \mathrm{kNm}$ | $5.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $w$ | $0.00\ \mathrm{mm}$ | $4.65$ | $0.00\ \mathrm{mm}$ | $1.35$ |
+| L4 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L4 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V$ | $-2.2\ \mathrm{kN}$ | $3.00$ | $1.3\ \mathrm{kN}$ | $0.00$ |
 | L5 | $M$ | $-1.3\ \mathrm{kNm}$ | $3.00$ | $0.7\ \mathrm{kNm}$ | $1.12$ |
@@ -16713,7 +16713,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L6 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L8 | $N$ | $-18.4\ \mathrm{kN}$ | $0.00$ | $-16.5\ \mathrm{kN}$ | $2.00$ |
 | L8 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L8 | $M$ | $-16.5\ \mathrm{kNm}$ | $0.00$ | $-16.5\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $M$ | $-16.5\ \mathrm{kNm}$ | $0.00$ | $-16.5\ \mathrm{kNm}$ | $0.00$ |
 | L8 | $w$ | $-0.27\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V$ | $0.0\ \mathrm{kN}$ | $2.00$ | $16.5\ \mathrm{kN}$ | $0.00$ |
@@ -16775,7 +16775,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $18.0\ \mathrm{kN}$ | $1.68$ | $18.0\ \mathrm{kN}$ | $7.58$ |
+| L1 | $N$ | $18.0\ \mathrm{kN}$ | $0.00$ | $18.0\ \mathrm{kN}$ | $0.00$ |
 | L1 | $V$ | $-5.7\ \mathrm{kN}$ | $6.29$ | $0.3\ \mathrm{kN}$ | $0.33$ |
 | L1 | $M$ | $-19.0\ \mathrm{kNm}$ | $7.97$ | $0.5\ \mathrm{kNm}$ | $1.58$ |
 | L1 | $w$ | $-0.36\ \mathrm{mm}$ | $5.53$ | $0.00\ \mathrm{mm}$ | $0.00$ |
@@ -16789,8 +16789,8 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.13\ \mathrm{mm}$ | $2.00$ |
 | L4 | $N$ | $-11.7\ \mathrm{kN}$ | $0.00$ | $-11.7\ \mathrm{kN}$ | $0.00$ |
 | L4 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L4 | $M$ | $0.0\ \mathrm{kNm}$ | $5.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $w$ | $0.00\ \mathrm{mm}$ | $4.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L4 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L4 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V$ | $1.5\ \mathrm{kN}$ | $0.00$ | $1.5\ \mathrm{kN}$ | $0.00$ |
 | L5 | $M$ | $-1.8\ \mathrm{kNm}$ | $1.50$ | $2.2\ \mathrm{kNm}$ | $1.50$ |
@@ -16866,7 +16866,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 
 | Stab | Grösse | kleinst | $x\ [\mathrm{m}]$ | grösst | $x\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| L1 | $N$ | $27.0\ \mathrm{kN}$ | $0.00$ | $27.0\ \mathrm{kN}$ | $7.58$ |
+| L1 | $N$ | $27.0\ \mathrm{kN}$ | $0.00$ | $27.0\ \mathrm{kN}$ | $0.00$ |
 | L1 | $V$ | $-10.3\ \mathrm{kN}$ | $4.79$ | $49.7\ \mathrm{kN}$ | $8.00$ |
 | L1 | $M$ | $-39.8\ \mathrm{kNm}$ | $6.55$ | $3.6\ \mathrm{kNm}$ | $1.31$ |
 | L1 | $w$ | $-1.34\ \mathrm{mm}$ | $5.17$ | $0.00\ \mathrm{mm}$ | $0.00$ |
@@ -16877,11 +16877,11 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L3 | $N$ | $-16.5\ \mathrm{kN}$ | $0.00$ | $26.6\ \mathrm{kN}$ | $4.47$ |
 | L3 | $V$ | $-53.2\ \mathrm{kN}$ | $4.47$ | $33.1\ \mathrm{kN}$ | $0.00$ |
 | L3 | $M$ | $0.0\ \mathrm{kNm}$ | $4.47$ | $73.4\ \mathrm{kNm}$ | $1.71$ |
-| L3 | $w$ | $0.00\ \mathrm{mm}$ | $4.47$ | $0.49\ \mathrm{mm}$ | $2.12$ |
+| L3 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.49\ \mathrm{mm}$ | $2.12$ |
 | L4 | $N$ | $-62.1\ \mathrm{kN}$ | $5.00$ | $-59.5\ \mathrm{kN}$ | $0.00$ |
 | L4 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L4 | $M$ | $0.0\ \mathrm{kNm}$ | $5.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L4 | $w$ | $0.00\ \mathrm{mm}$ | $3.38$ | $0.00\ \mathrm{mm}$ | $5.00$ |
+| L4 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L4 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L5 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V$ | $-0.7\ \mathrm{kN}$ | $3.00$ | $4.0\ \mathrm{kN}$ | $0.00$ |
 | L5 | $M$ | $-1.7\ \mathrm{kNm}$ | $1.50$ | $4.3\ \mathrm{kNm}$ | $1.50$ |
@@ -16892,7 +16892,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L6 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L8 | $N$ | $-24.8\ \mathrm{kN}$ | $0.00$ | $-22.3\ \mathrm{kN}$ | $2.00$ |
 | L8 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L8 | $M$ | $-22.3\ \mathrm{kNm}$ | $0.00$ | $-22.3\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $M$ | $-22.3\ \mathrm{kNm}$ | $0.00$ | $-22.3\ \mathrm{kNm}$ | $0.00$ |
 | L8 | $w$ | $-0.36\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V$ | $0.0\ \mathrm{kN}$ | $2.00$ | $22.3\ \mathrm{kN}$ | $0.00$ |
@@ -17603,7 +17603,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L4 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L4 | $M_y$ | $-28.5\ \mathrm{kNm}$ | $0.00$ | $28.2\ \mathrm{kNm}$ | $3.52$ |
 | L4 | $M_z$ | $-0.2\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
-| L4 | $f_y$ | $-0.03\ \mathrm{mm}$ | $2.54$ | $0.00\ \mathrm{mm}$ | $6.00$ |
+| L4 | $f_y$ | $-0.03\ \mathrm{mm}$ | $2.54$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L4 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $1.73\ \mathrm{mm}$ | $3.26$ |
 | L5 | $N$ | $-0.3\ \mathrm{kN}$ | $0.00$ | $-0.3\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V_y$ | $-3.3\ \mathrm{kN}$ | $4.00$ | $4.2\ \mathrm{kN}$ | $0.00$ |
@@ -17619,7 +17619,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L6 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $M_y$ | $-2.6\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
 | L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $2.24$ | $0.00\ \mathrm{mm}$ | $1.07$ |
+| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L6 | $f_z$ | $-0.01\ \mathrm{mm}$ | $0.83$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L7 | $N$ | $0.2\ \mathrm{kN}$ | $0.00$ | $0.2\ \mathrm{kN}$ | $0.00$ |
 | L7 | $V_y$ | $0.2\ \mathrm{kN}$ | $0.00$ | $0.2\ \mathrm{kN}$ | $0.00$ |
@@ -17627,23 +17627,23 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L7 | $T$ | $-6.7\ \mathrm{kNm}$ | $0.00$ | $-6.7\ \mathrm{kNm}$ | $0.00$ |
 | L7 | $M_y$ | $-10.4\ \mathrm{kNm}$ | $0.00$ | $45.0\ \mathrm{kNm}$ | $3.67$ |
 | L7 | $M_z$ | $-1.1\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $7.21$ |
-| L7 | $f_y$ | $0.00\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $7.21$ |
+| L7 | $f_y$ | $0.00\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.53\ \mathrm{mm}$ | $3.63$ |
 | L8 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $V_z$ | $0.0\ \mathrm{kN}$ | $2.00$ | $15.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L8 | $M_y$ | $-15.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
-| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $2.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.06$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L8 | $f_z$ | $-0.03\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $3.60$ | $0.0\ \mathrm{kN}$ | $4.00$ |
+| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V_z$ | $-8.8\ \mathrm{kN}$ | $6.00$ | $8.6\ \mathrm{kN}$ | $0.00$ |
-| L9 | $T$ | $-1.7\ \mathrm{kNm}$ | $5.60$ | $-1.7\ \mathrm{kNm}$ | $4.00$ |
+| L9 | $T$ | $-1.7\ \mathrm{kNm}$ | $0.00$ | $-1.7\ \mathrm{kNm}$ | $0.00$ |
 | L9 | $M_y$ | $-8.2\ \mathrm{kNm}$ | $6.00$ | $3.6\ \mathrm{kNm}$ | $2.98$ |
 | L9 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
-| L9 | $f_y$ | $0.00\ \mathrm{mm}$ | $6.00$ | $0.00\ \mathrm{mm}$ | $4.00$ |
+| L9 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $4.00$ |
 | L9 | $f_z$ | $0.00\ \mathrm{mm}$ | $5.96$ | $0.08\ \mathrm{mm}$ | $2.98$ |
 
 Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_z = 1.73 mm bei x = 3.26 m.
@@ -17757,8 +17757,8 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L6 | $V_z$ | $6.0\ \mathrm{kN}$ | $2.24$ | $13.2\ \mathrm{kN}$ | $0.00$ |
 | L6 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $M_y$ | $-21.4\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
-| L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
-| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.08$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L6 | $f_z$ | $-0.11\ \mathrm{mm}$ | $0.91$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L7 | $N$ | $-12.1\ \mathrm{kN}$ | $0.00$ | $-12.1\ \mathrm{kN}$ | $0.00$ |
 | L7 | $V_y$ | $0.2\ \mathrm{kN}$ | $0.00$ | $0.2\ \mathrm{kN}$ | $0.00$ |
@@ -17766,24 +17766,24 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L7 | $T$ | $-13.0\ \mathrm{kNm}$ | $0.00$ | $-13.0\ \mathrm{kNm}$ | $0.00$ |
 | L7 | $M_y$ | $5.4\ \mathrm{kNm}$ | $0.00$ | $10.7\ \mathrm{kNm}$ | $7.21$ |
 | L7 | $M_z$ | $-1.4\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $7.21$ |
-| L7 | $f_y$ | $-0.01\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $7.21$ |
+| L7 | $f_y$ | $-0.01\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.12\ \mathrm{mm}$ | $3.80$ |
 | L8 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $V_z$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $M_y$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
-| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $2.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.57$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L8 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.95$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $M_y$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L9 | $N$ | $-6.0\ \mathrm{kN}$ | $3.00$ | $6.0\ \mathrm{kN}$ | $3.00$ |
-| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $4.00$ | $0.0\ \mathrm{kN}$ | $4.40$ |
+| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V_z$ | $-0.1\ \mathrm{kN}$ | $6.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L9 | $T$ | $-1.5\ \mathrm{kNm}$ | $5.60$ | $-1.5\ \mathrm{kNm}$ | $4.00$ |
+| L9 | $T$ | $-1.5\ \mathrm{kNm}$ | $0.00$ | $-1.5\ \mathrm{kNm}$ | $0.00$ |
 | L9 | $M_y$ | $-0.3\ \mathrm{kNm}$ | $6.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L9 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
 | L9 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $4.00$ |
-| L9 | $f_z$ | $0.00\ \mathrm{mm}$ | $4.38$ | $0.00\ \mathrm{mm}$ | $6.00$ |
+| L9 | $f_z$ | $0.00\ \mathrm{mm}$ | $4.38$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 
 Grösste Durchbiegung gegen die Sehne eines Stabs: L4, f\_z = -1.15 mm bei x = 3.45 m.
 
@@ -17868,14 +17868,14 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L2 | $M_y$ | $-8.0\ \mathrm{kNm}$ | $3.00$ | $-4.6\ \mathrm{kNm}$ | $0.00$ |
 | L2 | $M_z$ | $-11.5\ \mathrm{kNm}$ | $0.00$ | $10.1\ \mathrm{kNm}$ | $3.00$ |
 | L2 | $f_y$ | $-0.12\ \mathrm{mm}$ | $0.73$ | $0.06\ \mathrm{mm}$ | $2.47$ |
-| L2 | $f_z$ | $-0.13\ \mathrm{mm}$ | $1.57$ | $0.00\ \mathrm{mm}$ | $3.00$ |
+| L2 | $f_z$ | $-0.13\ \mathrm{mm}$ | $1.57$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L3 | $N$ | $-83.1\ \mathrm{kN}$ | $0.00$ | $-82.3\ \mathrm{kN}$ | $3.00$ |
 | L3 | $V_y$ | $-0.1\ \mathrm{kN}$ | $0.00$ | $-0.1\ \mathrm{kN}$ | $0.00$ |
 | L3 | $V_z$ | $-0.2\ \mathrm{kN}$ | $0.00$ | $-0.2\ \mathrm{kN}$ | $0.00$ |
 | L3 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L3 | $M_y$ | $-0.7\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L3 | $M_z$ | $-0.3\ \mathrm{kNm}$ | $3.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L3 | $f_y$ | $-0.11\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $3.00$ |
+| L3 | $f_y$ | $-0.11\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L3 | $f_z$ | $-0.25\ \mathrm{mm}$ | $1.73$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L4 | $N$ | $7.9\ \mathrm{kN}$ | $0.00$ | $7.9\ \mathrm{kN}$ | $0.00$ |
 | L4 | $V_y$ | $-0.2\ \mathrm{kN}$ | $0.00$ | $-0.2\ \mathrm{kN}$ | $0.00$ |
@@ -17884,7 +17884,7 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L4 | $M_y$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $10.9\ \mathrm{kNm}$ | $1.54$ |
 | L4 | $M_z$ | $0.0\ \mathrm{kNm}$ | $6.00$ | $1.3\ \mathrm{kNm}$ | $0.00$ |
 | L4 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.16\ \mathrm{mm}$ | $2.54$ |
-| L4 | $f_z$ | $0.00\ \mathrm{mm}$ | $6.00$ | $0.66\ \mathrm{mm}$ | $2.60$ |
+| L4 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.66\ \mathrm{mm}$ | $2.60$ |
 | L5 | $N$ | $9.4\ \mathrm{kN}$ | $0.00$ | $9.4\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V_y$ | $-16.5\ \mathrm{kN}$ | $4.00$ | $11.7\ \mathrm{kN}$ | $0.00$ |
 | L5 | $V_z$ | $-13.7\ \mathrm{kN}$ | $4.00$ | $3.8\ \mathrm{kN}$ | $0.00$ |
@@ -17898,29 +17898,29 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L6 | $V_z$ | $9.0\ \mathrm{kN}$ | $2.24$ | $22.9\ \mathrm{kN}$ | $0.00$ |
 | L6 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $M_y$ | $-35.7\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.24$ |
-| L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $2.24$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $2.24$ | $0.00\ \mathrm{mm}$ | $0.91$ |
-| L6 | $f_z$ | $-0.18\ \mathrm{mm}$ | $0.91$ | $0.00\ \mathrm{mm}$ | $2.24$ |
+| L6 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L6 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L6 | $f_z$ | $-0.18\ \mathrm{mm}$ | $0.91$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L7 | $N$ | $-17.8\ \mathrm{kN}$ | $0.00$ | $-17.8\ \mathrm{kN}$ | $0.00$ |
 | L7 | $V_y$ | $0.5\ \mathrm{kN}$ | $0.00$ | $0.5\ \mathrm{kN}$ | $0.00$ |
 | L7 | $V_z$ | $-38.4\ \mathrm{kN}$ | $7.21$ | $41.9\ \mathrm{kN}$ | $0.00$ |
 | L7 | $T$ | $-28.6\ \mathrm{kNm}$ | $0.00$ | $-28.6\ \mathrm{kNm}$ | $0.00$ |
 | L7 | $M_y$ | $-5.9\ \mathrm{kNm}$ | $0.00$ | $73.0\ \mathrm{kNm}$ | $3.77$ |
 | L7 | $M_z$ | $-3.7\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $7.21$ |
-| L7 | $f_y$ | $-0.02\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $7.21$ |
+| L7 | $f_y$ | $-0.02\ \mathrm{mm}$ | $3.05$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L7 | $f_z$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.89\ \mathrm{mm}$ | $3.66$ |
 | L8 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $V_z$ | $0.0\ \mathrm{kN}$ | $2.00$ | $20.3\ \mathrm{kN}$ | $0.00$ |
 | L8 | $T$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L8 | $M_y$ | $-20.3\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
-| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $2.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $1.07$ | $0.00\ \mathrm{mm}$ | $2.00$ |
+| L8 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L8 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L8 | $f_z$ | $-0.04\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 | L9 | $N$ | $-9.0\ \mathrm{kN}$ | $3.00$ | $9.0\ \mathrm{kN}$ | $3.00$ |
-| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $4.00$ | $0.0\ \mathrm{kN}$ | $4.80$ |
+| L9 | $V_y$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L9 | $V_z$ | $-12.1\ \mathrm{kN}$ | $6.00$ | $11.7\ \mathrm{kN}$ | $0.00$ |
-| L9 | $T$ | $-4.6\ \mathrm{kNm}$ | $5.60$ | $-4.6\ \mathrm{kNm}$ | $4.00$ |
+| L9 | $T$ | $-4.6\ \mathrm{kNm}$ | $0.00$ | $-4.6\ \mathrm{kNm}$ | $0.00$ |
 | L9 | $M_y$ | $-11.5\ \mathrm{kNm}$ | $6.00$ | $4.9\ \mathrm{kNm}$ | $2.96$ |
 | L9 | $M_z$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $6.00$ |
 | L9 | $f_y$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $4.00$ |
