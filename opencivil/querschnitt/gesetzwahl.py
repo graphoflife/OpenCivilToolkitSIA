@@ -234,6 +234,18 @@ class Rechenwahl:
             teile.append(f"φ = {self.kriechzahl:g}")
         return ", ".join(teile + [self.satz.kurz])
 
+    def gleiche_linie(self, andere: "Rechenwahl") -> bool:
+        """
+        Ob ``andere`` dieselbe Resistenzlinie ergibt: dieselbe Rechenart und
+        derselbe Wertesatz, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
+        haengt (:attr:`Rechenart.mit_kriechzahl`). Bis 2026-11-20 eine freie
+        Funktion der M-N-Interaktion, die den Modul nicht verglich: eine
+        Parabel mit ``E_cd`` haette die Linie einer mit ``E_cm`` bekommen.
+        """
+        return (self.art is andere.art and self.satz is andere.satz
+                and (not self.art.mit_kriechzahl
+                     or (self.kriechzahl, self.modul) == (andere.kriechzahl, andere.modul)))
+
 
 #: Die Kriechdehnung ist ``phi`` mal die elastische; zusammen ``(1 + phi)``
 #: mal, und daraus folgt der wirksame Modul.

@@ -8,9 +8,10 @@ mit eigener Herleitung, und im Diagramm steht sie neben der massgebenden.
 """
 
 import unittest
+from dataclasses import replace
 
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
-from opencivil.querschnitt.gesetzwahl import Rechenart
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.projekt import (
     KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl, Projekt, ProjektFehler,
@@ -63,7 +64,7 @@ class TestVorgabe(unittest.TestCase):
 
     def test_der_widerstand_mit_der_vereinfachung(self):
         self.assertIs(self.knicken.widerstand.art, Rechenart.BLOCK)
-        self.assertTrue(self.knicken.eigene_linie)
+        self.assertTrue(self.knicken.linienquelle.eigen)
         self.assertIsInstance(self.loesung.befund(self.knicken).linie, Ebenenlinie)
         self.assertIn(r"x\text{-Vereinfachung}", text(self.loesung))
 
@@ -87,7 +88,7 @@ class TestGeteilteLinie(unittest.TestCase):
             tragsicherheit=RechenwahlEintrag(rechenart="block"))
 
     def test_der_widerstand_ist_die_linie_der_tragsicherheit(self):
-        self.assertFalse(self.knicken.eigene_linie)
+        self.assertFalse(self.knicken.linienquelle.eigen)
         self.assertIs(self.loesung.befund(self.knicken).linie,
                       self.loesung.befund(self.aufbau.feld("nachweise")["q1.x"]).massgebend)
         self.assertIn("Dieselbe Wahl wie die Tragsicherheit", text(self.loesung))
@@ -103,7 +104,7 @@ class TestEigeneLinie(unittest.TestCase):
             widerstand=KnickWiderstandswahl(werkstoffsatz="charakteristisch", rechenart="parabel"))
 
     def test_mit_eigener_herleitung(self):
-        self.assertTrue(self.knicken.eigene_linie)
+        self.assertTrue(self.knicken.linienquelle.eigen)
         self.assertIsInstance(self.loesung.befund(self.knicken).linie, Ebenenlinie)
         t = text(self.loesung)
         self.assertIn("Widerstand: Resistenzlinie aus Dehnungsebenen", t)
@@ -136,15 +137,22 @@ class TestGleicheWahl(unittest.TestCase):
         parabel = RechenwahlEintrag(kriechzahl=1.0, rechenart="parabel")
         _, geteilt, _ = gerechnet(widerstand=KnickWiderstandswahl(kriechzahl=1.0, rechenart="parabel"),
                                   tragsicherheit=parabel)
-        self.assertFalse(geteilt.eigene_linie)
+        self.assertFalse(geteilt.linienquelle.eigen)
         _, anders, _ = gerechnet(widerstand=KnickWiderstandswahl(kriechzahl=2.0, rechenart="parabel"),
                                  tragsicherheit=parabel)
-        self.assertTrue(anders.eigene_linie)
+        self.assertTrue(anders.linienquelle.eigen)
         # Bei der 0.85·x-Vereinfachung wirkt phi nicht: dieselbe Linie.
         block = RechenwahlEintrag(rechenart="block")
         _, gleich, _ = gerechnet(widerstand=KnickWiderstandswahl(kriechzahl=3.0, rechenart="block"),
                                  tragsicherheit=block)
-        self.assertFalse(gleich.eigene_linie)
+        self.assertFalse(gleich.linienquelle.eigen)
+
+    def test_der_modul_zaehlt_wo_ein_gesetz_an_ihm_haengt(self):
+        """Eine Parabel mit E_cd ist eine andere als mit E_cm; dem Spannungsblock ist der Modul gleich."""
+        parabel = Rechenwahl(art=Rechenart.PARABEL)
+        self.assertFalse(parabel.gleiche_linie(replace(parabel, modul="E_cd")))
+        block = Rechenwahl(art=Rechenart.BLOCK)
+        self.assertTrue(block.gleiche_linie(replace(block, modul="E_cd")))
 
 
 class TestVerformung(unittest.TestCase):

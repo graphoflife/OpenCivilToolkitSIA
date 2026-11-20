@@ -576,7 +576,7 @@ def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
         # Waehlt das Knicken fuer seinen Widerstand anders als die
         # Tragsicherheit, liegen seine Punkte auf seiner eigenen Linie.
         "knicklinie": _linienzug(knickbefund.linie if knickbefund is not None
-                                 and knicken.eigene_linie else None),
+                                 and knicken.linienquelle.eigen else None),
         "kombinationen": [
             {
                 "name": a.schnittgroessen.name,

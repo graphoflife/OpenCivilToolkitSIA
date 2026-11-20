@@ -44,9 +44,9 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
+from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
     NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
@@ -61,7 +61,7 @@ from opencivil.nachweis.dehnungsfaecher import Linienpunkt
 from opencivil.nachweis.handrechnung import Eckpunkt, Handrechnung, seiten
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, betonbezuege, lagenbezuege, protokoll_rechenwahl, stahllagen,
+    RECHENARTEN, betonbezuege, bezuege_vereinen, lagenbezuege, protokoll_rechenwahl, stahllagen,
 )
 from opencivil.nachweis.resistenzlinie import (
     Ebenenlinie, Handlinie, Treffer, Widerstandslinie,
@@ -708,13 +708,61 @@ def resistenzlinie(
     return linie
 
 
-def gleiche_linie(a: Rechenwahl, b: Rechenwahl) -> bool:
+@dataclass(frozen=True)
+class Linienquelle:
     """
-    Ob zwei Wahlen dieselbe Resistenzlinie ergeben -- die Kriechzahl zaehlt
-    nur, wo sie wirkt.
+    Woher ein Kapitel neben der Tragsicherheit seine Resistenzlinie nimmt --
+    das Knicken fuer seinen Widerstand, die Kennzahlen fuer ihre Eckwerte.
+    Waehlt es wie die Tragsicherheit (:meth:`Rechenwahl.gleiche_linie`), ist
+    es deren Linie, einmal gerechnet und einmal hergeleitet; sonst baut es
+    seine eigene (:func:`resistenzlinie`). Eingaenge, Befund und Linie
+    folgen derselben Entscheidung. Bis 2026-11-20 trafen beide Kapitel sie
+    je selbst, an sechs Stellen.
     """
-    return (a.art is b.art and a.satz is b.satz
-            and (a.kriechzahl == b.kriechzahl or not a.art.mit_kriechzahl))
+
+    wahl: Rechenwahl
+    """Was das Kapitel waehlt."""
+    mn: "BiegungNormalkraft"
+    """Die Tragsicherheit derselben Richtung."""
+    querschnitt: Plattenquerschnitt
+    posten: Sequence
+    richtung: Richtung
+
+    @property
+    def eigen(self) -> bool:
+        """Ob das Kapitel seine eigene Linie baut."""
+        return not self.wahl.gleiche_linie(self.mn.wahl)
+
+    def bezuege(self, bezuege: List[Eingabebezug]) -> List[Eingabebezug]:
+        """Die Eingaenge des Kapitels -- mit denen der eigenen Linie (:func:`linienbezuege`), wo es eine baut."""
+        if not self.eigen:
+            return bezuege
+        return bezuege_vereinen(bezuege, linienbezuege(self.querschnitt, self.posten, self.richtung,
+                                                       self.wahl.satz))
+
+    @property
+    def befunde(self) -> List[Befundbezug]:
+        """
+        Ohne eigene Linie die der Tragsicherheit, als ihr Befund: so steht die
+        Abhaengigkeit im Graphen, und kein Teillauf (das Auge) rechnet das
+        Kapitel ohne Linie.
+        """
+        return [] if self.eigen else [Befundbezug("mn", self.mn.id)]
+
+    def linie(self, e: Eingaben, p: Protokoll, *, basis: str, vorsatz: str, wahltitel: str,
+              wenn_geteilt: Callable[[Protokoll], None],
+              schritte: int = dehnungsfaecher.SCHRITTE) -> Widerstandslinie:
+        """
+        Die eigene Linie, hergeleitet eine Ebene unter dem Kapitel
+        (:func:`resistenzlinie`) -- oder die der Tragsicherheit, und
+        ``wenn_geteilt`` sagt es an derselben Stelle im Protokoll.
+        """
+        if not self.eigen:
+            wenn_geteilt(p)
+            return e.befund("mn").massgebend
+        return resistenzlinie(self.wahl, e, p, querschnitt=self.querschnitt, posten=self.posten,
+                              richtung=self.richtung, basis=basis, vorsatz=vorsatz, ebene=3,
+                              wahltitel=wahltitel, schritte=schritte)
 
 
 def protokoll_widerstand(

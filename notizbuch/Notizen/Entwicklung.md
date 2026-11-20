@@ -7,6 +7,21 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Eine Stelle entscheidet, ob die Linie geteilt wird
+
+Das Knicken und die Kennzahlen brauchen eine Resistenzlinie. Wählen sie wie
+die Tragsicherheit, nehmen sie deren Linie, sonst bauen sie eine eigene.
+Das entschieden beide je selbst, an sechs Stellen: für die Eingänge, den
+Befund und die Linie. Der Vergleich der Wahlen übersah zudem den
+Elastizitätsmodul – eine Parabel mit E_cd hätte die Linie einer mit E_cm
+bekommen. Heute kommt das nicht vor, weil kein Kapitel den Modul seiner
+Linie anders setzt.
+
+Jetzt entscheidet die `Linienquelle` neben `resistenzlinie`, einmal: sie
+gibt die Eingänge, den Befund und die Linie. Die Gleichheit ist eine Methode
+der Rechenwahl und vergleicht Kriechzahl und Modul, wo ein Gesetz am Modul
+hängt. Zahlen und Bericht bleiben gleich.
+
 ## 2026-11-20 · Die Decke rechnet ihre Träger wie Stäbe
 
 Ein Streifen der Decke ist ein Durchlaufträger. Seine Lagerkräfte kamen

@@ -57,7 +57,7 @@ Womit gerechnet wird, waehlt das Kapitel zweimal (:class:`Rechenwahl`):
   das Moment am verformten System aufnimmt. Vorgabe die
   0.85·x-Vereinfachung mit Bemessungswerten. Waehlt das Kapitel dasselbe wie
   die Tragsicherheit, ist es deren Linie; sonst baut es eine eigene, mit
-  eigener Herleitung.
+  eigener Herleitung (:class:`~opencivil.nachweis.biegung_normalkraft.Linienquelle`).
 
 Die Handrechnung steht bei keiner der beiden zur Wahl
 (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`): beim Knicken zaehlt
@@ -103,7 +103,7 @@ import math
 from dataclasses import dataclass, field, replace
 from typing import Callable, Dict, List, Optional, Sequence
 
-from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
     NICHT_FUEHRBAR, UNBESCHRAENKT, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich,
     grad_def,
@@ -114,14 +114,12 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import ILLINOIS, Suche
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis import dehnungsfaecher
-from opencivil.nachweis.biegung_normalkraft import (
-    gleiche_linie, linienbezuege, resistenzlinie,
-)
+from opencivil.nachweis.biegung_normalkraft import Linienquelle
 from opencivil.nachweis.querschnittsloeser import (
     Faserloeser, Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
-    Betonkennwerte, betonbezuege, bezuege_vereinen, gesetze, lagenbezuege, protokoll_gesetze,
+    Betonkennwerte, betonbezuege, gesetze, lagenbezuege, protokoll_gesetze,
     protokoll_rechenwahl, stahllagen,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
@@ -696,12 +694,9 @@ class Knicken(Knickverfahren):
         self.mn = mn_nachweis
         self.verformung = verformungswahl(verformung)
         self.widerstand = widerstand
-        self.eigene_linie = not gleiche_linie(widerstand, mn_nachweis.wahl)
-        """
-        Ob das Knicken seine eigene Resistenzlinie baut. Mit derselben Wahl
-        wie die Tragsicherheit ist es deren Linie -- einmal gerechnet und
-        einmal hergeleitet.
-        """
+        self.linienquelle = Linienquelle(widerstand, mn_nachweis, querschnitt, self.posten,
+                                         self.richtung)
+        """Woher das Knicken die Resistenzlinie seines Widerstands nimmt."""
         self.schnell = schnell
         """
         Ob die Suche nach N_Rd uebersprungen wird.
@@ -728,27 +723,17 @@ class Knicken(Knickverfahren):
             for f in self.faelle
         }
 
-        bezuege = [
+        bezuege = self.linienquelle.bezuege([
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
         ] + betonbezuege(verformung.satz, querschnitt.beton,
-                         modul=self.verformung.modul) + lagenbezuege(self.posten, verformung.satz)
-        befunde = []
-        if self.eigene_linie:
-            bezuege = bezuege_vereinen(
-                bezuege, linienbezuege(querschnitt, self.posten, self.richtung, widerstand.satz))
-        else:
-            # Das Moment bei N liest die Iteration von der Linie des
-            # M-N-Nachweises -- als dessen Befund, damit die Abhaengigkeit im
-            # Graphen steht. Sonst rechnete ein Teillauf (das Auge) das
-            # Knicken ohne Linie.
-            befunde.append(Befundbezug("mn", mn_nachweis.id))
+                         modul=self.verformung.modul) + lagenbezuege(self.posten, verformung.satz))
 
         super().__init__(
             basis,
             ausgaben=list(self.d_ausnutzung.values()),
             bezuege=bezuege,
-            befunde=befunde,
+            befunde=self.linienquelle.befunde,
             titel=f"Knicknachweis – {querschnitt.name}",
             referenz="SIA 262:2025, 4.3.7",
             abschnitt=querschnitt.abschnitt,
@@ -793,20 +778,12 @@ class Knicken(Knickverfahren):
         # der Tragsicherheit: sonst zahlte die Bewehrungssuche fuer jede Platte
         # mit Knickfall eine ganze genaue Linie, seit die Handrechnung hier
         # nicht mehr zur Wahl steht.
-        linie = (resistenzlinie(
-            self.widerstand, e, p, querschnitt=self.querschnitt, posten=self.posten,
-            richtung=self.richtung, basis=f"{self.id}.widerstand",
-            vorsatz="Widerstand: ", ebene=3, wahltitel="Rechenwahl – Widerstand (N_Rd)",
+        linie = self.linienquelle.linie(
+            e, p, basis=f"{self.id}.widerstand", vorsatz="Widerstand: ",
+            wahltitel="Rechenwahl – Widerstand (N_Rd)", wenn_geteilt=self._protokoll_geteilt,
             schritte=(dehnungsfaecher.SCHRITTE_SUCHE if self.schnell
                       else dehnungsfaecher.SCHRITTE))
-            if self.eigene_linie else e.befund("mn").massgebend)
         befund = Knickbefund(linie=linie, loeser=loeser)
-        if not self.eigene_linie:
-            p.titel("Widerstand", ebene=3)
-            protokoll_rechenwahl(p, self.widerstand, f"{self.id}.widerstand",
-                                 titel="Rechenwahl – Widerstand (N_Rd)")
-            p.text("Dieselbe Wahl wie die Tragsicherheit: der Momentenwiderstand bei "
-                   "der Druckkraft kommt aus deren Resistenzlinie.")
 
         urteile: List[NachweisUrteil] = []
 
@@ -820,6 +797,14 @@ class Knicken(Knickverfahren):
         return Ausfuehrung({}, urteile, befund)
 
     # -- Mitschrift ---------------------------------------------------------
+
+    def _protokoll_geteilt(self, p: Protokoll) -> None:
+        """Mit der Linie der Tragsicherheit: was das Knicken waehlt und woher sein Widerstand kommt."""
+        p.titel("Widerstand", ebene=3)
+        protokoll_rechenwahl(p, self.widerstand, f"{self.id}.widerstand",
+                             titel="Rechenwahl – Widerstand (N_Rd)")
+        p.text("Dieselbe Wahl wie die Tragsicherheit: der Momentenwiderstand bei "
+               "der Druckkraft kommt aus deren Resistenzlinie.")
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, eps_c2d: float,
                           verdraengt: bool, suche: Suche) -> None:

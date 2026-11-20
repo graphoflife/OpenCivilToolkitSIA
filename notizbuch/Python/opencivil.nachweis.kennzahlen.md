@@ -1,5 +1,5 @@
 ---
-erzeugt: 29eb60a54071
+erzeugt: bccae049ab70
 art: modul
 tags: [modul]
 ---
@@ -42,8 +42,10 @@ Bewehrung den Druckwiderstand 0 statt -5000 kN.
 
 Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
-zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung (dasselbe
-Muster wie das Knicken). Die Querkraft rechnet ihr Nachweis: er liest die
+zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung -- das
+entscheidet, wie beim Knicken, die
+[[opencivil.nachweis.biegung_normalkraft#Linienquelle|Linienquelle]]. Die
+Querkraft rechnet ihr Nachweis: er liest die
 Eingaenge ([[opencivil.nachweis.querkraft#Querkraft|bezuege_ohne_faelle]]),
 loest sie ([[opencivil.nachweis.querkraft_ohne_buegel#QuerkraftOhneBuegel.kurvenbeiwerte|kurvenbeiwerte]],
 [[opencivil.nachweis.querkraft_buegel#QuerkraftMitBuegeln.buegelwerte|buegelwerte]])
@@ -153,7 +155,6 @@ Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]
-- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]

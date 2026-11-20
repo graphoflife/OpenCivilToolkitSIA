@@ -31,8 +31,10 @@ Bewehrung den Druckwiderstand 0 statt -5000 kN.
 NICHTS ZWEIMAL:
 Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
-zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung (dasselbe
-Muster wie das Knicken). Die Querkraft rechnet ihr Nachweis: er liest die
+zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung -- das
+entscheidet, wie beim Knicken, die
+:class:`~opencivil.nachweis.biegung_normalkraft.Linienquelle`. Die
+Querkraft rechnet ihr Nachweis: er liest die
 Eingaenge (:attr:`~opencivil.nachweis.querkraft.Querkraft.bezuege_ohne_faelle`),
 loest sie (:meth:`~opencivil.nachweis.querkraft_ohne_buegel.QuerkraftOhneBuegel.kurvenbeiwerte`,
 :meth:`~opencivil.nachweis.querkraft_buegel.QuerkraftMitBuegeln.buegelwerte`)
@@ -62,15 +64,13 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
 
-from opencivil.core.berechnung import BerechnungsFehler, Befundbezug, Eingaben, Prozedur
+from opencivil.core.berechnung import BerechnungsFehler, Eingaben, Prozedur
 from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef
 from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis import linie as geo
-from opencivil.nachweis.biegung_normalkraft import (
-    gleiche_linie, linienbezuege, resistenzlinie,
-)
+from opencivil.nachweis.biegung_normalkraft import Linienquelle
 from opencivil.nachweis.querkraft import protokoll_hoehen, statische_hoehen, zugposten
 from opencivil.nachweis.querkraft_buegel import (
     REFERENZ as REFERENZ_MIT_BUEGELN, protokoll_mit_buegeln,
@@ -78,7 +78,6 @@ from opencivil.nachweis.querkraft_buegel import (
 from opencivil.nachweis.querkraft_ohne_buegel import (
     REFERENZ as REFERENZ_OHNE_BUEGEL, beiwert_k_g, protokoll_ohne_buegel, tau_cd_wert,
 )
-from opencivil.nachweis.rechenwahl import bezuege_vereinen
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
@@ -101,7 +100,8 @@ class Plattenkennzahlen(Prozedur):
         self.mn = mn
         self.querkraft = querkraft
         """Der Querkraftnachweis in x -- mit seiner Rechnung je Zugseite rechnen die Kennzahlen."""
-        self.eigene_linie = not gleiche_linie(mn.wahl, WAHL)
+        self.linienquelle = Linienquelle(WAHL, mn, querschnitt, self.posten, Richtung.X)
+        """Woher die Kennzahlen die Linie ihrer Eckwerte nehmen."""
 
         basis = f"{querschnitt.id}.kennzahlen"
         #: Je Kurzname die Definition -- zum Belegen.
@@ -156,16 +156,13 @@ class Plattenkennzahlen(Prozedur):
                  referenz=REFERENZ_MIT_BUEGELN)
             self._querkraftteil = self._mit_buegeln
 
-        # Was die Querkraft ohne Fall liest, unter den Namen ihres Nachweises.
-        bezuege = querkraft.bezuege_ohne_faelle
-        if self.eigene_linie:
-            bezuege = bezuege_vereinen(
-                bezuege, linienbezuege(querschnitt, self.posten, Richtung.X, WAHL.satz))
         super().__init__(
             basis,
             ausgaben=list(self.d.values()),
-            bezuege=bezuege,
-            befunde=[] if self.eigene_linie else [Befundbezug("mn", mn.id)],
+            # Was die Querkraft ohne Fall liest, unter den Namen ihres
+            # Nachweises -- und was eine eigene Linie liest, wo es eine gibt.
+            bezuege=self.linienquelle.bezuege(querkraft.bezuege_ohne_faelle),
+            befunde=self.linienquelle.befunde,
             titel="Kennzahlen",
             abschnitt=querschnitt.abschnitt,
         )
@@ -196,15 +193,12 @@ class Plattenkennzahlen(Prozedur):
     def _handrechnung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
                       ergebnis: Dict[str, Groesse]) -> Dict[Zugseite, float]:
         """M_Rd und x/d bei N = 0, N_Rd bei M = 0 -- aus der Linie der Handrechnung."""
-        if self.eigene_linie:
-            linie = resistenzlinie(
-                WAHL, e, p, querschnitt=self.querschnitt, posten=self.posten,
-                richtung=Richtung.X, basis=f"{self.id}.hand", vorsatz="Kennzahlen: ",
-                ebene=3, wahltitel="Rechenwahl – Kennzahlen")
-        else:
-            linie = e.befund("mn").massgebend
-            p.text("Die Eckpunkte stammen aus der Handrechnung der Tragsicherheit – "
-                   "sie rechnet ebenso, von Hand mit Bemessungswerten.")
+        linie = self.linienquelle.linie(
+            e, p, basis=f"{self.id}.hand", vorsatz="Kennzahlen: ",
+            wahltitel="Rechenwahl – Kennzahlen",
+            wenn_geteilt=lambda p: p.text(
+                "Die Eckpunkte stammen aus der Handrechnung der Tragsicherheit – "
+                "sie rechnet ebenso, von Hand mit Bemessungswerten."))
 
         p.titel("Biegung und Normalkraft", ebene=3)
         eckpunkt = {q.kennung: q for q in linie.punkte}

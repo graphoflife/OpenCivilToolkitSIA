@@ -336,11 +336,11 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         in `verlauf.py` und ist die Regel von `extremwerte`, für Stäbe und
         Decke, ebenso über alle Stäbe (`grenzwerte`, `massgebender` statt
         `nach_betrag`) – das erledigt Punkt 10 vom 2026-11-15.
-      - Knicken und Kennzahlen entscheiden je selbst «eigene Linie oder die
-        der Tragsicherheit» (`gleiche_linie`, sechs Verzweigungen);
-        `gleiche_linie` vergleicht den Modul nicht. Umbau: eine
-        `Linienquelle` neben `resistenzlinie`, die Gleichheit als Methode
-        der `Rechenwahl`.
+      - Erledigt (2026-11-20): Knicken und Kennzahlen. Ob sie die Linie der
+        Tragsicherheit teilen, entscheidet die `Linienquelle` neben
+        `resistenzlinie`; Eingänge, Befund und Linie folgen ihr. Die
+        Gleichheit ist `Rechenwahl.gleiche_linie` und vergleicht den Modul,
+        wo ein Gesetz an ihm hängt.
 - [ ] **2. Die Beschreibung eines Feldes steht nur halb im Katalog.**
       Wo ein Feld seinen `bereich` hat, ist der Katalog die eine Quelle für
       Einheit, Grenze und Satz. Daneben:

@@ -1,5 +1,5 @@
 ---
-erzeugt: 063a19a081fd
+erzeugt: 305b35195366
 art: modul
 tags: [modul]
 ---
@@ -344,14 +344,64 @@ Die Resistenzlinie einer Wahl aus den Eingaben von [[opencivil.nachweis.biegung_
 rechnet, dann wie sie entsteht. Die Tragsicherheit baut so ihre Linie,
 das Knicken seine, wenn es anders waehlt.
 
-### gleiche_linie
+### Linienquelle
 
 ```python
-def gleiche_linie(a: Rechenwahl, b: Rechenwahl) -> bool
+@dataclass(frozen=True)
+class Linienquelle
 ```
 
-Ob zwei Wahlen dieselbe Resistenzlinie ergeben -- die Kriechzahl zaehlt
-nur, wo sie wirkt.
+Woher ein Kapitel neben der Tragsicherheit seine Resistenzlinie nimmt --
+das Knicken fuer seinen Widerstand, die Kennzahlen fuer ihre Eckwerte.
+Waehlt es wie die Tragsicherheit ([[opencivil.querschnitt.gesetzwahl#Rechenwahl.gleiche_linie|Rechenwahl.gleiche_linie]]), ist
+es deren Linie, einmal gerechnet und einmal hergeleitet; sonst baut es
+seine eigene ([[opencivil.nachweis.biegung_normalkraft#resistenzlinie|resistenzlinie]]). Eingaenge, Befund und Linie
+folgen derselben Entscheidung. Bis 2026-11-20 trafen beide Kapitel sie
+je selbst, an sechs Stellen.
+
+- `wahl: Rechenwahl` – Was das Kapitel waehlt.
+- `mn: 'BiegungNormalkraft'` – Die Tragsicherheit derselben Richtung.
+- `querschnitt: Plattenquerschnitt`
+- `posten: Sequence`
+- `richtung: Richtung`
+
+#### Linienquelle.eigen
+
+```python
+@property
+def eigen(self) -> bool
+```
+
+Ob das Kapitel seine eigene Linie baut.
+
+#### Linienquelle.bezuege
+
+```python
+def bezuege(self, bezuege: List[Eingabebezug]) -> List[Eingabebezug]
+```
+
+Die Eingaenge des Kapitels -- mit denen der eigenen Linie ([[opencivil.nachweis.biegung_normalkraft#linienbezuege|linienbezuege]]), wo es eine baut.
+
+#### Linienquelle.befunde
+
+```python
+@property
+def befunde(self) -> List[Befundbezug]
+```
+
+Ohne eigene Linie die der Tragsicherheit, als ihr Befund: so steht die
+Abhaengigkeit im Graphen, und kein Teillauf (das Auge) rechnet das
+Kapitel ohne Linie.
+
+#### Linienquelle.linie
+
+```python
+def linie(self, e: Eingaben, p: Protokoll, *, basis: str, vorsatz: str, wahltitel: str, wenn_geteilt: Callable[[Protokoll], None], schritte: int=dehnungsfaecher.SCHRITTE) -> Widerstandslinie
+```
+
+Die eigene Linie, hergeleitet eine Ebene unter dem Kapitel
+([[opencivil.nachweis.biegung_normalkraft#resistenzlinie|resistenzlinie]]) -- oder die der Tragsicherheit, und
+`wenn_geteilt` sagt es an derselben Stelle im Protokoll.
 
 ### protokoll_widerstand
 

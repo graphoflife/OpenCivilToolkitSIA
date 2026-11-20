@@ -40,7 +40,7 @@ class TestHandrechnung(unittest.TestCase):
         self.assertAlmostEqual(wert(self.aufbau, self.loesung, "N_Rd_druck"), eck["N_Rd_druck"])
         zug = linie.kante(geo.NORMALKRAFT, 0.0, positiv=True).wert
         self.assertAlmostEqual(wert(self.aufbau, self.loesung, "N_Rd_zug"), zug)
-        self.assertFalse(self.aufbau.kennzahlen["q1"].eigene_linie)
+        self.assertFalse(self.aufbau.kennzahlen["q1"].linienquelle.eigen)
 
     def test_zugwiderstand_bei_null_moment_von_hand(self):
         """Zwischen grösster Zugkraft (N_t, M_t) und M_Rd- bei N = 0 auf M = 0 interpoliert."""
@@ -69,7 +69,7 @@ class TestHandrechnung(unittest.TestCase):
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(rechenart="parabel")
         aufbau, loesung = rechnen(projekt)
-        self.assertTrue(aufbau.kennzahlen["q1"].eigene_linie)
+        self.assertTrue(aufbau.kennzahlen["q1"].linienquelle.eigen)
         for kurz in ("M_Rd_pos", "M_Rd_neg", "N_Rd_zug", "N_Rd_druck", "x_d_pos", "x_d_neg"):
             with self.subTest(kurz=kurz):
                 self.assertAlmostEqual(wert(aufbau, loesung, kurz),

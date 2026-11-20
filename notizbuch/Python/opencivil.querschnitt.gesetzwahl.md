@@ -1,5 +1,5 @@
 ---
-erzeugt: f90381b23ef9
+erzeugt: 8c23f3e2996a
 art: modul
 tags: [modul]
 ---
@@ -294,6 +294,18 @@ def beschriftung(self) -> str
 ```
 
 Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo es wirkt.
+
+#### Rechenwahl.gleiche_linie
+
+```python
+def gleiche_linie(self, andere: 'Rechenwahl') -> bool
+```
+
+Ob `andere` dieselbe Resistenzlinie ergibt: dieselbe Rechenart und
+derselbe Wertesatz, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
+haengt ([[opencivil.querschnitt.gesetzwahl#Rechenart.mit_kriechzahl|Rechenart.mit_kriechzahl]]). Bis 2026-11-20 eine freie
+Funktion der M-N-Interaktion, die den Modul nicht verglich: eine
+Parabel mit `E_cd` haette die Linie einer mit `E_cm` bekommen.
 
 ### wirksamer_modul
 

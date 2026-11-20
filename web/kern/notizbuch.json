@@ -5286,7 +5286,11 @@
         "BiegungNormalkraft._protokoll_naechster",
         "linienbezuege",
         "resistenzlinie",
-        "gleiche_linie",
+        "Linienquelle",
+        "Linienquelle.eigen",
+        "Linienquelle.bezuege",
+        "Linienquelle.befunde",
+        "Linienquelle.linie",
         "protokoll_widerstand",
         "_in"
       ]
@@ -5418,7 +5422,8 @@
         "Knickverfahren._protokoll_grenzkraft",
         "Knicken",
         "Knicken.stab",
-        "Knicken.pruefe"
+        "Knicken.pruefe",
+        "Knicken._protokoll_geteilt"
       ]
     },
     {
@@ -7181,6 +7186,7 @@
         "Rechenwahl.betonkennwerte",
         "Rechenwahl.index",
         "Rechenwahl.beschriftung",
+        "Rechenwahl.gleiche_linie",
         "wirksamer_modul",
         "betongesetz"
       ]

@@ -1,5 +1,5 @@
 ---
-erzeugt: ba17af96cd7a
+erzeugt: 0c404be626f2
 art: modul
 tags: [modul]
 ---
@@ -74,7 +74,7 @@ Womit gerechnet wird, waehlt das Kapitel zweimal ([[opencivil.querschnitt.gesetz
   das Moment am verformten System aufnimmt. Vorgabe die
   0.85·x-Vereinfachung mit Bemessungswerten. Waehlt das Kapitel dasselbe wie
   die Tragsicherheit, ist es deren Linie; sonst baut es eine eigene, mit
-  eigener Herleitung.
+  eigener Herleitung ([[opencivil.nachweis.biegung_normalkraft#Linienquelle|Linienquelle]]).
 
 Die Handrechnung steht bei keiner der beiden zur Wahl
 ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]): beim Knicken zaehlt
@@ -388,6 +388,14 @@ nachrechnen will (`befund.loeser`, `befund.linie`).
 ```python
 def pruefe(self, e: Eingaben, p: Protokoll)
 ```
+
+#### Knicken._protokoll_geteilt
+
+```python
+def _protokoll_geteilt(self, p: Protokoll) -> None
+```
+
+Mit der Linie der Tragsicherheit: was das Knicken waehlt und woher sein Widerstand kommt.
 
 
 ## Konstanten

@@ -184,7 +184,7 @@ class TestJederNachweis(unittest.TestCase):
 
     def test_knicken_mit_geteilter_und_eigener_linie(self):
         aufbau = self.projekt.aufbauen()
-        self.assertEqual({k.eigene_linie for k in aufbau.feld("knicken").values()}, {True, False})
+        self.assertEqual({k.linienquelle.eigen for k in aufbau.feld("knicken").values()}, {True, False})
         # Die Verformung kennt nur eine Rechenart, darum beide Wertesaetze.
         self.assertEqual({k.verformung.art for k in aufbau.feld("knicken").values()},
                          set(VERFORMUNGSARTEN))

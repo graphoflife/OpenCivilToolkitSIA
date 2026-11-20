@@ -1,5 +1,5 @@
 ---
-erzeugt: 6a447588290f
+erzeugt: b3036fb6b49f
 art: modul
 tags: [modul]
 ---
@@ -278,7 +278,6 @@ ersten Lage.
 ## Gebraucht von
 
 - [[opencivil.nachweis.biegung_normalkraft]]
-- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
