@@ -1,5 +1,5 @@
 ---
-erzeugt: 21c1b6e88c1e
+erzeugt: 43d9a1dc6d62
 art: modul
 tags: [modul]
 ---
@@ -304,14 +304,16 @@ def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str
 ```
 
 Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
-und dort beginnt der Ort neu; alles darin nach seinem Feld und seinem
-Namen: «kombinationen 'GZT'». Nur Leerzeichen sind kein Name.
+und dort beginnt der Ort neu; alles darin mit seinem Namen, davor das
+Wort seiner Klasse, wo sie eines hat (`IM_ORT`: «Wand 'W1'» im
+Erdbeben), sonst sein Feld: «kombinationen 'GZT'». Nur Leerzeichen sind
+kein Name.
 
 Ohne Namen heisst ein Element, wie die Maske es nennt: mit dem Wort
-seiner Klasse und seiner Nummer, wo sie eines hat (`IM_ORT`: «Lage 2»,
-«Linie 3» wie in der Zeichnung einer Querschnittsanalyse), sonst mit
-seiner Kennung («A1», wie im Balkensystem), sonst nach Feld und Nummer.
-Bis 2026-11-20 hiess es immer nach Feld und Nummer: «lagen 2», «lager 1».
+seiner Klasse und seiner Nummer (`IM_ORT`: «Lage 2», «Linie 3» wie in
+der Zeichnung einer Querschnittsanalyse), sonst mit seiner Kennung
+(«A1», wie im Balkensystem), sonst nach Feld und Nummer. Bis 2026-11-20
+hiess es immer nach Feld und Nummer: «lagen 2», «lager 1».
 
 ### _benannt
 
@@ -476,6 +478,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
+- [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]
@@ -487,6 +490,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.erdbeben]]
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.mappe]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: f21f4c440d1b
+erzeugt: 56828af21847
 art: formel
 tags: [formel]
 ---
@@ -42,6 +42,7 @@ $$
 - [[Innerer Pfahlwiderstand]]
 - [[Äusserer Pfahlwiderstand quer]]
 - [[Innerer Pfahlwiderstand quer]]
+- [[Erdbeben]]
 - [[Querkraft]]
 - [[Duktilität]]
 - [[Zwängung auf Normalkraft]]

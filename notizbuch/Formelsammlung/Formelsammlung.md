@@ -1,5 +1,5 @@
 ---
-erzeugt: d16bed8b8832
+erzeugt: 1db43b37abbc
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -60,6 +60,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Äusserer Pfahlwiderstand quer]] · 10
 - [[Innerer Pfahlwiderstand quer]] · 12
 
+**Erdbeben**
+
+- [[Erdbeben]] · 14
+
 **Decken**
 
 - [[Streifenmethode]] · 4
@@ -82,6 +86,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Arbeitsgleiche Knotenkräfte]]
 - [[Aufnehmbare Risskraft]] · $N_{s,adm,2,x}$
 - [[Aufnehmbares Moment der Bewehrung]] · $M_{s,adm,2,x}$
+- [[Auslenkung des Dachs]] · $u_x$
 - [[Äusserer Widerstand auf Druck]] · $R_{a,k}$
 - [[Äusserer Widerstand auf Zug]] · $R_{a,k,Z}$
 - [[Bedingung der Duktilität]]
@@ -95,6 +100,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beiwert für die Dicke]] · $k_t$
 - [[Beiwert k_r]] · $k_r$
 - [[Beiwert zur Berücksichtigung der Festigkeitsminderung]] · $\eta_{fc}$
+- [[Bemessungsspektrum (31)]] · $S_{d,x}$
+- [[Bemessungsspektrum (32)]] · $S_{d,x}$
+- [[Bemessungsspektrum (33)]] · $S_{d,y}$
+- [[Bemessungsspektrum (34)]] · $S_{d,y}$
 - [[Bemessungswert der Betondruckfestigkeit]] · $f_{cd}$
 - [[Bemessungswert der Fliessgrenze]] · $f_{yd}$
 - [[Bemessungswert der Fliessgrenze auf Druck]] · $f_{yd}^{-}$
@@ -128,6 +137,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegelinie eines Stabs]]
 - [[Biegelinie eines Stabs im Raum]]
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
+- [[Biegesteifigkeit der Wände]] · $EI_x$
 - [[Biegesteifigkeit des Pfahls]] · $EI$
 - [[Biegesteifigkeit um y]] · $EI_{y}$
 - [[Biegesteifigkeit um z]] · $EI_{z}$
@@ -164,6 +174,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Erdwiderstand je Meter Pfahl]]
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
+- [[Ersatzkraft]] · $F_{d,x}$
+- [[Ersatzkraft eines Geschosses]]
 - [[Erweiterte Tragfähigkeitsformel]]
 - [[Feder am Pfahlfuss]] · $K_b$
 - [[Feder am Pfahlmantel]]
@@ -211,6 +223,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Geländeneigungsfaktor g_c]] · $g_c$
 - [[Geländeneigungsfaktor g_q]] · $g_q$
 - [[Gesamtsetzung]] · $s$
+- [[Gewicht des Gebäudes]] · $\sum W$
+- [[Gewicht eines Geschosses]]
 - [[Gewollte Ausmitte]] · $e_{1d}$
 - [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]]
 - [[Gleichmässiger Druck, ohne Bewehrung]] · $N_{Rd}^{-}$
@@ -218,11 +232,13 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Gleitwiderstand]] · $T_{Rd}$
 - [[Grenzdehnungen am Ende der Linie]]
 - [[Grenze der bezogenen Druckzonenhöhe]] · $\left(x/d\right)_{max}$
+- [[Grenze der Grundschwingzeit]] · $T_{1,max}$
 - [[Grenzwert der Durchbiegung]] · $w_{max}$
 - [[Grösste Dehnung auf halber Höhe]] · $\varepsilon_{m,u}$
 - [[Grösste Dehnung im Schwerpunkt]] · $\varepsilon_{m,u}$
 - [[Grösste Krümmung]] · $\chi_{u}$
 - [[Grundbruchwiderstand]] · $N_{Rd}$
+- [[Grundschwingzeit]] · $T_{1,x}$
 - [[Halbe Querkraft für das Verformungsvermögen]] · $V_d / 2$
 - [[Hebel des Moments am Pfahlkopf]] · $e$
 - [[Hebelarm der inneren Kräfte]] · $z$
@@ -231,6 +247,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Innerer Hebelarm]] · $z$
 - [[Innerer Widerstand des Pfahls]] · $R_{i,d}$
 - [[Iteration der Ausmitte 2. Ordnung]]
+- [[Kippmoment am Fuss]] · $M_{0,x}$
 - [[Kleinerer Widerstand beider Seiten]] · $V_{Rd,max}$
 - [[Kohäsion für örtliches Abscheren]] · $c^{*}$
 - [[Kopplung am Pfahlkopf]] · $K_{HM}$
@@ -397,7 +414,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-129 von 324 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+129 von 337 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

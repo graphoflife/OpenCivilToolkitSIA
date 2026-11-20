@@ -1,5 +1,5 @@
 ---
-erzeugt: 9952b9a8a58a
+erzeugt: 128c1cad03fe
 art: modul
 tags: [modul]
 ---
@@ -54,6 +54,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.core]] – das Geruest, auf dem jede Rechnung steht.
 - [[opencivil.decke]] – Stahlbetondecken nach der Streifenmethode.
 - [[opencivil.durchstanzen]] – der Durchstanznachweis nach SIA 262:2025, 4.3.6.
+- [[opencivil.erdbeben]] – Erdbeben nach SIA 261:2020, Kapitel 16.
 - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».

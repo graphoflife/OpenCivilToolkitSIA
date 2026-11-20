@@ -1,5 +1,5 @@
 ---
-erzeugt: 370cd801620d
+erzeugt: d37633a253ed
 art: modul
 tags: [modul]
 ---
@@ -455,6 +455,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.gleiten]]
 - [[opencivil.geotechnik.grundbruch]]
@@ -498,6 +499,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.erdbeben]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.pfahl]]
@@ -524,6 +526,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.web.deckendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.durchstanzdaten]]
+- [[opencivil.web.erdbebendaten]]
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]

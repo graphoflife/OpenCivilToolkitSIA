@@ -34,6 +34,7 @@ from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Kennzahl, Wert
 from opencivil.durchstanzen import nachweis as durchstanzen
+from opencivil.erdbeben import ersatzkraft
 from opencivil.geotechnik import fundament, grundbruch, setzung
 from opencivil.pfahl import uebersicht as pfahluebersicht
 from opencivil.querschnitt.platte import BREITE_Y_MM, Plattenquerschnitt
@@ -287,6 +288,12 @@ def _pfahlangaben(teil, loesung: Loesung) -> Angaben:
             if aussen is not None or innen is not None else None)
 
 
+def _erdbebenangaben(teil, loesung: Loesung) -> Angaben:
+    befund = _befund(teil, "erdbeben", loesung)
+    return (ersatzkraft.angaben(teil.objekt, loesung.werte),
+            ersatzkraft.kraefte(befund) if befund is not None and befund.richtungen else None)
+
+
 #: Je Bauteilart, nach ihrem Namen, was ueber ihrer Tabelle steht. Ein
 #: Balkensystem hat keine Nachweise und keine Tabelle -- auch das steht hier
 #: (``None``). Dass jede Art hier steht, prueft tests/test_bauteilarten.py;
@@ -302,6 +309,7 @@ ANGABEN: Dict[str, Optional[Callable[[Any, Loesung], Angaben]]] = {
     "grundbruch": _grundbruchangaben,
     "setzung": _setzungsangaben,
     "pfahl": _pfahlangaben,
+    "erdbeben": _erdbebenangaben,
 }
 
 

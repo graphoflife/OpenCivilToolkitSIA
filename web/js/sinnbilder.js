@@ -147,6 +147,12 @@ const ZEICHEN = {
     pfade: ['M10 6h4v15.5h-4z', 'M12 1v3.6 M10.5 3.2l1.5 1.5 1.5-1.5', 'M2.5 8h7.5 M14 8h7.5'],
     strich: ['M2.5 14.5h7.5 M14 14.5h7.5'],
   },
+  // Ein Gebäude mit drei Geschossen, links eine Kraft auf das oberste,
+  // darunter der Boden, der bebt.
+  erdbeben: {
+    pfade: ['M9 4h9v14H9z', 'M9 8.7h9 M9 13.3h9', 'M2.5 6.3h4.5 M5.3 4.6l1.7 1.7-1.7 1.7',
+      'M2.5 18h19', 'M3 21.3l2-1.6 2 1.6 2-1.6 2 1.6 2-1.6 2 1.6 2-1.6 2 1.6'],
+  },
   // Eine Mappe: die Projekte einer Datei.
   projekte: {
     pfade: ['M3 6h6l2 2.5h10V19H3z', 'M3 11h18'],
@@ -394,6 +400,16 @@ const ZEICHEN = {
   'setzung-schlaff': {
     pfade: ['M3 6h18v12H3z'],
     voll: [[12, 12, 1.9]],
+  },
+  // Eine Wand im Grundriss, unten links die Achse x: wie in ihrer
+  // Querschnittsanalyse gezeichnet, y längs x -- oder um 90° gedreht, längs y.
+  'wandlage-0': {
+    pfade: ['M3 21h5 M6.3 19.3l1.7 1.7-1.7 1.7'],
+    flaechen: ['M5 9.5h15v3.5H5z'],
+  },
+  'wandlage-90': {
+    pfade: ['M3 21h5 M6.3 19.3l1.7 1.7-1.7 1.7'],
+    flaechen: ['M12 3h3.5v15H12z'],
   },
   // Grund und Zulage einer Lage im Schnitt: ausgezogen die Seite der Platte,
   // gestrichelt die Kante, an der beide Stäbe bündig liegen. Ungünstig rückt

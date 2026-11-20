@@ -101,6 +101,31 @@ DEVIATIONSMOMENT = Kennwert("I_yz", MIO_MM4, 2, "Deviationsmoment", symbol="I_{y
 #: die 5 % bleiben).
 KOPPLUNG = 0.05
 
+
+def keine_hauptachsen(wer: str, I_y: float, I_z: float, I_yz: float,
+                      was: str = "den Stab") -> Optional[str]:
+    """
+    Der Hinweis, wenn y und z merklich keine Hauptachsen sind
+    (:data:`KOPPLUNG`) -- sonst ``None``. ``wer`` nennt den Querschnitt,
+    «Querschnitt «Q1»», ``was`` kruemmt sich mit; Traegheitsmomente in m⁴.
+    Im Raum fuer jeden Querschnitt eines Stabs
+    (:mod:`opencivil.stabwerk.rechnung`), im Erdbeben fuer jede Wand
+    (:mod:`opencivil.erdbeben.ersatzkraft`) -- derselbe Satz.
+    """
+    kleiner = min(I_y, I_z)
+    if kleiner <= 0.0 or abs(I_yz) <= KOPPLUNG * kleiner:
+        return None
+    anteil = f"{100.0 * abs(I_yz) / kleiner:.0f} %"
+    return (f"{wer}: y und z sind keine Hauptachsen – |I_yz| = {_traegheit(abs(I_yz))} ist "
+            f"{anteil} von min(I_y; I_z) = {_traegheit(kleiner)}. Gerechnet wird ohne I_yz; "
+            f"in Wirklichkeit krümmt ein Moment um die steifere Achse {was} auch um die andere, "
+            f"um {anteil} davon. Verformungen und Schnittgrössen sind darum nur genähert.")
+
+
+def _traegheit(si: float) -> str:
+    """Ein Traegheitsmoment in Worten: «1.06·10⁶ mm⁴»."""
+    return f"{Groesse.aus_si(si, MIO_MM4).formatiert(2)}{MIO_MM4.beschriftung}"
+
 #: Je Kennwert die Wert-ID, die ihn liefert.
 Werte = Dict[str, str]
 

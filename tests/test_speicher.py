@@ -148,7 +148,7 @@ class TestWasUebernommenWird(unittest.TestCase):
         rechnen(beschreibung, frisch=True)
         dienst.SPEICHER.treffer = 0
         rechnen(beschreibung, frisch=False)
-        self.assertEqual(dienst.SPEICHER.treffer, 7)
+        self.assertEqual(dienst.SPEICHER.treffer, 9)
 
     def test_die_geaenderte_platte_wird_neu_gerechnet(self):
         beschreibung = projekt_mit_zwei_platten()
@@ -156,7 +156,7 @@ class TestWasUebernommenWird(unittest.TestCase):
         dienst.SPEICHER.treffer = dienst.SPEICHER.fehlgriffe = 0
         beschreibung["querschnitte"][0]["h"] = 340
         rechnen(beschreibung, frisch=False)
-        self.assertEqual(dienst.SPEICHER.treffer, 6)      # die anderen gelten noch
+        self.assertEqual(dienst.SPEICHER.treffer, 8)      # die anderen gelten noch
         self.assertEqual(dienst.SPEICHER.fehlgriffe, 1)
 
     def test_die_geaenderte_analyse_wird_neu_gerechnet(self):
@@ -165,8 +165,9 @@ class TestWasUebernommenWird(unittest.TestCase):
         dienst.SPEICHER.treffer = dienst.SPEICHER.fehlgriffe = 0
         beschreibung["querschnittsanalysen"][0]["schubwaende"][0]["dicke"] = 120.0
         rechnen(beschreibung, frisch=False)
-        # Platten, Fundament, Setzung und Pfahl gelten noch.
-        self.assertEqual(dienst.SPEICHER.treffer, 5)
+        # Platten, Fundament, Setzung, Pfahl, die Wand des Hauses und das
+        # Haus gelten noch.
+        self.assertEqual(dienst.SPEICHER.treffer, 7)
         # Die Analyse -- und der Rahmen, der ihren Querschnitt nimmt.
         self.assertEqual(dienst.SPEICHER.fehlgriffe, 2)
 
@@ -183,15 +184,15 @@ class TestWasUebernommenWird(unittest.TestCase):
         beschreibung["materialien"][0]["name"] = "C25/30"
         rechnen(beschreibung, frisch=False)
         self.assertEqual(dienst.SPEICHER.treffer, 0)
-        self.assertEqual(dienst.SPEICHER.fehlgriffe, 7)
+        self.assertEqual(dienst.SPEICHER.fehlgriffe, 9)
 
     def test_eine_geloeschte_platte_raeumt_ihren_platz(self):
         beschreibung = projekt_mit_zwei_platten()
         rechnen(beschreibung, frisch=True)
-        self.assertEqual(dienst.SPEICHER.belegt, 7)
+        self.assertEqual(dienst.SPEICHER.belegt, 9)
         beschreibung["querschnitte"].pop()
         rechnen(beschreibung, frisch=False)
-        self.assertEqual(dienst.SPEICHER.belegt, 6)
+        self.assertEqual(dienst.SPEICHER.belegt, 8)
 
     def test_eine_rueckverfolgung_fuellt_den_speicher_nicht(self):
         """

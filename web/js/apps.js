@@ -32,6 +32,7 @@ import { durchstanzEditor } from './durchstanzen.js';
 import { grundbruchEditor } from './grundbruch.js';
 import { setzungEditor } from './setzung.js';
 import { pfahlEditor } from './pfahl.js';
+import { erdbebenEditor } from './erdbeben.js';
 import { skriptZeichnen } from './python.js';
 import { variablenZeichnen } from './variablen.js';
 import { plattenkarten } from './platte_bilder.js';
@@ -42,6 +43,7 @@ import { durchstanzKarten } from './ds_grundriss.js';
 import { situationKarten } from './gb_zeichnung.js';
 import { setzungKarten } from './sz_zeichnung.js';
 import { pfahlKarten } from './pf_zeichnung.js';
+import { erdbebenKarten } from './eb_zeichnung.js';
 import {
   ansichtVergessen, eintragVon, freieKennung, istSandbox, katalog, kopieName, naechsterName,
   projektAendern, waehlen, zustand,
@@ -354,6 +356,18 @@ const PFAHL = bauteil('pfahl', {
 });
 
 /**
+ * Ein Gebäude mit den Vorgaben des Kerns, einem Geschoss ohne Last und einer
+ * Wand ohne Querschnittsanalyse -- ohne Material: das nimmt die Wand aus ihrer
+ * Analyse. Die Liste nennt, wie viele: «4 Geschosse, 2 Wände».
+ */
+const ERDBEBEN = bauteil('erdbeben', {
+  kurztext: (h) => `${h.geschosse.length} ${h.geschosse.length === 1 ? 'Geschoss' : 'Geschosse'}, `
+    + `${h.waende.length} ${h.waende.length === 1 ? 'Wand' : 'Wände'}`,
+  editor: erdbebenEditor,
+  karten: erdbebenKarten,
+});
+
+/**
  * Python: ein Skript je Eintrag, nach der Vorlage des Kerns mit einem
  * Diagramm darin. Rechts stehen statt der Berechnung die Variablen der
  * Sitzung, wie in Spyder (Benutzer, 2026-10-15) -- Umfang und Reiter gelten
@@ -385,7 +399,7 @@ const SKRIPT = {
 /** Die Apps, in der Folge ihrer Knöpfe: das Material, die Bauteilarten wie ARTEN, Python. */
 export const APPS = [
   MATERIAL, PLATTE, ANALYSE, SYSTEM, SYSTEM3D, DECKE, DURCHSTANZEN, GRUNDBRUCH, SETZUNG, PFAHL,
-  SKRIPT,
+  ERDBEBEN, SKRIPT,
 ];
 
 /** Die App, wie die Auswahl sie nennt: 'material', 'skript' oder eine Bauteilart. */

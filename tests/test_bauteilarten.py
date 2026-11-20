@@ -107,6 +107,7 @@ class TestSinnbilder(unittest.TestCase):
             "kopf": k["pfahl"]["koepfe"],
             "tragglied": k["pfahl"]["tragglieder"],
             "setzung": k["setzung"]["steifigkeiten"],
+            "wandlage": k["erdbeben"]["lagen"],
             "linie": k["querschnittsanalyse"]["linienarten"],
             # Grund und Zulage, je in den unteren und den oberen Lagen (platte.js).
             "zulage": [{"wert": f"{seite}-{gunst}"} for seite in ("unten", "oben")

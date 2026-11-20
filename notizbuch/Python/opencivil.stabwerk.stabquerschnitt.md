@@ -1,5 +1,5 @@
 ---
-erzeugt: 9be6bc78a6a1
+erzeugt: 0855aca28c61
 art: modul
 tags: [modul]
 ---
@@ -64,6 +64,27 @@ def bereich(self) -> Bereich
 
 Wo er liegen muss, wenn ihn jemand von Hand angibt -- wie das Feld
 eines Eintrags, mit demselben Satz und derselben Angabe fuer die Maske.
+
+### keine_hauptachsen
+
+```python
+def keine_hauptachsen(wer: str, I_y: float, I_z: float, I_yz: float, was: str='den Stab') -> Optional[str]
+```
+
+Der Hinweis, wenn y und z merklich keine Hauptachsen sind
+([[opencivil.stabwerk.stabquerschnitt#Konstanten|KOPPLUNG]]) -- sonst `None`. `wer` nennt den Querschnitt,
+«Querschnitt «Q1»», `was` kruemmt sich mit; Traegheitsmomente in m⁴.
+Im Raum fuer jeden Querschnitt eines Stabs
+([[opencivil.stabwerk.rechnung]]), im Erdbeben fuer jede Wand
+([[opencivil.erdbeben.ersatzkraft]]) -- derselbe Satz.
+
+### _traegheit
+
+```python
+def _traegheit(si: float) -> str
+```
+
+Ein Traegheitsmoment in Worten: «1.06·10⁶ mm⁴».
 
 ### Stabquerschnitt
 
@@ -285,6 +306,7 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 
 ## Gebraucht von
 
+- [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]

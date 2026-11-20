@@ -1,5 +1,5 @@
 ---
-erzeugt: 74fe5243c524
+erzeugt: 5b97769e29c6
 art: modul
 tags: [modul]
 ---
@@ -138,6 +138,31 @@ die Mantelreibung aus dem geotechnischen Bericht, der Spitzendruck
 eingegeben, quer leicht belastet -- und schon das trägt er nicht: ein
 gezogener Stab hält quer wenig, und am Terrain drückt er den Kies
 stärker, als dieser hält.
+
+### _gebaeude
+
+```python
+def _gebaeude(p: Projekt) -> None
+```
+
+Was das Wohnhaus des Beispiels nie zeigt. Ein Lager mit T_1 von Hand und
+ohne Wand -- die Kraefte je Geschoss bleiben ohne Verteilung --, in
+Zone Z3b auf Baugrund E, Bauwerksklasse III: in x liegt T_1 unter T_B
+(31), in y zwischen T_C und T_D (33) und ueber 4 T_C, (39) geht dort
+nicht auf. Sein Grundriss ist nicht regelmaessig und das Dach schwerer
+als das Erdgeschoss: das Verfahren gilt nicht. Ein schlanker Turm auf
+einer Winkelwand, deren y und z keine Hauptachsen sind -- in y schwingt
+er langsamer als T_D (34) --, duktil bemessen mit q = 3.0: dafuer steht
+der graue Satz zu den Waenden. Und ein Gebaeude, dessen Wand noch keinen
+Querschnitt hat: es rechnet nicht.
+
+### _tragwand
+
+```python
+def _tragwand(kennung: str, name: str, ecken: list, beton: str) -> QuerschnittsanalyseEintrag
+```
+
+Eine Wand fuer das Erdbeben: ein Polygon aus Beton, ohne Lastfall.
 
 ### _erstes
 

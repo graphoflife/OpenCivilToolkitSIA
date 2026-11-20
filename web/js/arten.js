@@ -127,6 +127,18 @@ export const ARTEN = [
     leer: 'kein Pfahl',
     nachweise: true,
   },
+  {
+    art: 'erdbeben',
+    liste: 'erdbeben',
+    vorsilbe: 'h',
+    zeichen: 'erdbeben',
+    knopf: 'Erdbeben',
+    titel: 'Erdbeben',
+    bezeichnung: 'Erdbeben – Ersatzkraftverfahren',
+    einzahl: 'Gebäude',
+    leer: 'kein Gebäude',
+    nachweise: true,
+  },
 ];
 
 /** Die Art, die die Auswahl so nennt -- `undefined` beim Material. */

@@ -1,5 +1,5 @@
 ---
-erzeugt: 683593bb71b2
+erzeugt: ecc15a71a35b
 art: modul
 tags: [modul]
 ---
@@ -383,6 +383,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
+- [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.ergebnis]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.gleiten]]
@@ -409,6 +410,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.pfahl.innen_quer]]
 - [[opencivil.pfahl.quer]]
 - [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.web.erdbebendaten]]
 
 ## Formeln aus diesem Modul
 

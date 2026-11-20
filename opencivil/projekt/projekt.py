@@ -30,6 +30,7 @@ from opencivil.material.betonstahl import ERSTER_STAHL
 from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag, PostenEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
+from opencivil.projekt.erdbeben import ErdbebenEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.pfahl import PfahlEintrag
 from opencivil.projekt.lesen import (
@@ -43,8 +44,8 @@ from opencivil.projekt.setzung import SetzungEintrag
 from opencivil.projekt.durchstanzen import DurchstanzEintrag
 from opencivil.projekt.decke import DeckeEintrag
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, BAUTEILE, DECKE, DURCHSTANZEN, GRUNDBRUCH, PFAHL,
-    PLATTE, SETZUNG, Aufbau, aufbauen,
+    ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, BAUTEILE, DECKE, DURCHSTANZEN, ERDBEBEN, GRUNDBRUCH,
+    PFAHL, PLATTE, SETZUNG, Aufbau, aufbauen,
 )
 
 
@@ -125,6 +126,9 @@ class Projekt(Beschreibung):
 
     pfaehle: List[PfahlEintrag] = field(default_factory=list)
     """Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand."""
+
+    erdbeben: List[ErdbebenEintrag] = field(default_factory=list)
+    """Gebäude im Erdbeben, nach dem Ersatzkraftverfahren -- Geschosse und Tragwände."""
 
     skripte: List[SkriptEintrag] = field(default_factory=list)
     """Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet."""
@@ -490,6 +494,20 @@ class Projekt(Beschreibung):
                         f"Pfahl '{name}'",
                         PfahlEintrag(kennung=self.freie_kennung(PFAHL.vorsilbe), name=name))
         self.pfaehle.append(eintrag)
+        return eintrag
+
+    def gebaeude(self, name: str, **felder: Any) -> ErdbebenEintrag:
+        """
+        Ein Gebaeude fuer das Erdbeben, mit den Vorgaben der Oberflaeche, aber
+        ohne ihr Startgeschoss und ihre Startwand: wer rechnet, gibt sie mit
+        ``geschoss`` und ``wand`` selbst an, die Geschosse von unten. Alles
+        Weitere -- ``zone``, ``baugrund``, ``q_x`` ... -- geht als Stichwort an
+        den Eintrag; Hoehen in m, Lasten in kN, Schwingzeiten in s.
+        """
+        eintrag = lesen(ErdbebenEintrag, felder, f"Erdbeben '{name}'",
+                        ErdbebenEintrag(kennung=self.freie_kennung(ERDBEBEN.vorsilbe),
+                                        name=name))
+        self.erdbeben.append(eintrag)
         return eintrag
 
     def skript(self, name: str, code: str = "") -> SkriptEintrag:

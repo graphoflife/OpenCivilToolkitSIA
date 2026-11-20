@@ -28,14 +28,15 @@ class TestProjektBeschreibung(unittest.TestCase):
         aufbau = Projekt.beispiel().aufbauen()
         self.assertEqual(len(aufbau.baustoffe), 2)
         self.assertEqual(len(aufbau.querschnitte), 1)
-        self.assertEqual(len(aufbau.querschnittsanalysen), 1)
+        self.assertEqual(len(aufbau.querschnittsanalysen), 2)   # Unterzug und Wand des Hauses
         self.assertEqual(sorted(aufbau.feld("nachweise")), ["q1.x"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
         # Gefuehrt werden bei der Platte die 3 M-N-Nachweise und die
         # Verformung im Feld, beim Unterzug Biegung und Querkraft mit Torsion,
         # beim Fundament Grundbruch und Gleiten und seine Setzung, beim Pfahl
-        # äusserer und innerer Widerstand. Die uebrigen rechnen still mit:
+        # äusserer und innerer Widerstand, beim Wohnhaus je Richtung die
+        # Grenze der Grundschwingzeit (39). Die uebrigen rechnen still mit:
         # eingeschaltet hat sie niemand, und ungefragt in der Tabelle staenden
         # sie sonst bei jedem Bauteil.
         laut = [u for u in loesung.urteile if not u.still]
@@ -44,14 +45,16 @@ class TestProjektBeschreibung(unittest.TestCase):
         fundament = [u for u in laut if u.raum.startswith("grundbruch.g1.")]
         setzung = [u for u in laut if u.raum.startswith("setzung.w1.")]
         pfahl = [u for u in laut if u.raum.startswith("pfahl.t1.")]
+        haus = [u for u in laut if u.raum.startswith("erdbeben.h1.")]
         self.assertEqual(sorted(u.art for u in platte), ["M-N", "M-N", "M-N", "w"])
         self.assertEqual(sorted(u.art for u in unterzug), ["M-N", "V+T"])
         self.assertEqual(sorted(u.art for u in fundament), ["GB", "GL"])
         self.assertEqual([u.art for u in setzung], ["s"])
         self.assertEqual(sorted(u.art for u in pfahl),
                          ["M-N", "R_a", "R_i", "R_tr", "V", "q_d"])
+        self.assertEqual(sorted(u.fall for u in haus), ["Richtung x", "Richtung y"])
         self.assertEqual(len(laut), len(platte) + len(unterzug) + len(fundament) + len(setzung)
-                         + len(pfahl))
+                         + len(pfahl) + len(haus))
         self.assertTrue(all(u.erfuellt for u in laut))
         self.assertTrue([u for u in loesung.urteile if u.still])
 
@@ -860,18 +863,21 @@ class TestAusgeschaltetHeisstStill(unittest.TestCase):
         for schalter, (feld, art) in self.SCHALTER.items():
             projekt = Projekt.beispiel()
             setattr(projekt.querschnitt("q1"), schalter, False)
-            self._still(projekt, schalter, feld, art, 2)   # beide x-Lagen
+            self._still(projekt, "q1", schalter, feld, art, 2)   # beide x-Lagen
 
     def test_jeder_schalter_des_gezeichneten_querschnitts(self):
         for schalter, (feld, art, anzahl) in self.QA_SCHALTER.items():
             projekt = Projekt.beispiel()
             setattr(projekt.querschnittsanalyse("a1"), schalter, False)
-            self._still(projekt, schalter, feld, art, anzahl)
+            self._still(projekt, "a1", schalter, feld, art, anzahl)
 
-    def _still(self, projekt, schalter, feld, art, anzahl):
+    def _still(self, projekt, kennung, schalter, feld, art, anzahl):
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        nachweise = aufbau.feld(feld).values()
+        # Nur die des geschalteten Bauteils: die Wand des Hauses im Beispiel
+        # ist ein zweiter gezeichneter Querschnitt mit denselben Nachweisen.
+        nachweise = [n for n in aufbau.feld(feld).values()
+                     if aufbau.bauteil_von(n).kennung == kennung]
         with self.subTest(schalter=schalter, feld=feld):
             self.assertTrue(nachweise and all(n.still for n in nachweise))
             urteile = [u for u in loesung.urteile

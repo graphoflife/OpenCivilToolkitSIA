@@ -64,6 +64,34 @@ export function materialliste({
 }
 
 /**
+ * Die Wahl eines Bauteils des Projekts, auf das ein anderes zeigt -- eine
+ * Platte oder Querschnittsanalyse für den Querschnitt eines Stabs, eine
+ * Analyse für eine Wand: eine Liste, weil ihre Zahl mit dem Projekt wächst.
+ * Eine Sandbox nur in der Sandbox (`inSandbox`): sie beginnt nach jedem
+ * Laden der Seite neu, und ein anderes Bauteil rechnete dann still mit
+ * anderem. Steht sie doch da -- in der Kopie einer Sandbox --, zeigt die
+ * Liste sie, und der Kern sagt, was zu tun ist. Ohne eines im Projekt sagt
+ * es schon die erste Zeile; eines, das es nicht mehr gibt, steht als «–
+ * gelöscht, neu wählen –» da, wie in der Decke.
+ */
+export function bauteilliste({
+  alle, gewaehlt, setzen, titel = '', inSandbox = false,
+}) {
+  const liste = alle.filter((x) => !istSandbox(x.kennung) || inSandbox || x.kennung === gewaehlt);
+  const leer = liste.length ? '– wählen –'
+    : alle.length ? '– nur die Sandbox: erst kopieren (⧉) –' : '– noch keine im Projekt –';
+  const werte = [{ wert: '', beschriftung: leer },
+    ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))];
+  return auswahl({
+    werte: !gewaehlt || alle.some((x) => x.kennung === gewaehlt) ? werte
+      : [{ wert: gewaehlt, beschriftung: '– gelöscht, neu wählen –' }, ...werte],
+    gewaehlt,
+    titel,
+    beiAenderung: setzen,
+  });
+}
+
+/**
  * Das Feld für den Namen eines Eintrags -- eines Bauteils, eines Lastfalls,
  * einer Schicht, eines Materials. Leer nimmt es nicht an: es sagt es und
  * behält den bisherigen (Benutzer, 2026-11-19: die Bedienung erklärt sich
@@ -476,12 +504,13 @@ export function klappgruppe(titel, zeilen, offen, klasse) {
 
 /**
  * Ein Schalter mit vielen oder langen Stellungen unter seiner Beschriftung
- * -- neben ihr fände er keinen Platz, und seine Stellungen brechen um. Ein
- * «div», kein «label»: ein Klick auf den Text löste sonst die erste
- * Stellung aus.
+ * -- neben ihr fände er keinen Platz, und seine Stellungen brechen um --,
+ * ebenso eine Liste mit langer Beschriftung, etwa die Querschnittsanalyse
+ * einer Wand. Ein «div», kein «label»: ein Klick auf den Text löste sonst
+ * die erste Stellung aus.
  */
-export function wahlBlock(beschriftung, schalter) {
-  return el('div.wahlblock', {}, [el('span.wahlblock-titel', { text: beschriftung }), schalter]);
+export function wahlBlock(beschriftung, wahl) {
+  return el('div.wahlblock', {}, [el('span.wahlblock-titel', { text: beschriftung }), wahl]);
 }
 
 /**

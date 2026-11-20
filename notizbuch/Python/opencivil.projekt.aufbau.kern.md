@@ -1,5 +1,5 @@
 ---
-erzeugt: 650a4a20b0e3
+erzeugt: 67e7e91bacbe
 art: modul
 tags: [modul]
 ---
@@ -617,9 +617,11 @@ Feldes; `mehr` fuer die Analyse.
 - [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
+- [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.pfahl]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.web.api]]
+- [[opencivil.web.erdbebendaten]]

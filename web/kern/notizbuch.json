@@ -134,6 +134,12 @@
       "bereich": "Pfähle"
     },
     {
+      "name": "Erdbeben",
+      "pfad": "Formelsammlung/Themen/Erdbeben.md",
+      "art": "thema",
+      "bereich": "Erdbeben"
+    },
+    {
       "name": "Baustahl",
       "pfad": "Formelsammlung/Themen/Baustahl.md",
       "art": "thema",
@@ -341,6 +347,17 @@
       ]
     },
     {
+      "name": "Auslenkung des Dachs",
+      "pfad": "Formelsammlung/Formeln/Auslenkung des Dachs.md",
+      "art": "formel",
+      "zeichen": [
+        "u_x"
+      ],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
       "name": "Äusserer Widerstand auf Druck",
       "pfad": "Formelsammlung/Formeln/Äusserer Widerstand auf Druck.md",
       "art": "formel",
@@ -492,6 +509,50 @@
       ],
       "themen": [
         "Beton"
+      ]
+    },
+    {
+      "name": "Bemessungsspektrum (31)",
+      "pfad": "Formelsammlung/Formeln/Bemessungsspektrum (31).md",
+      "art": "formel",
+      "zeichen": [
+        "S_{d,x}"
+      ],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
+      "name": "Bemessungsspektrum (32)",
+      "pfad": "Formelsammlung/Formeln/Bemessungsspektrum (32).md",
+      "art": "formel",
+      "zeichen": [
+        "S_{d,x}"
+      ],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
+      "name": "Bemessungsspektrum (33)",
+      "pfad": "Formelsammlung/Formeln/Bemessungsspektrum (33).md",
+      "art": "formel",
+      "zeichen": [
+        "S_{d,y}"
+      ],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
+      "name": "Bemessungsspektrum (34)",
+      "pfad": "Formelsammlung/Formeln/Bemessungsspektrum (34).md",
+      "art": "formel",
+      "zeichen": [
+        "S_{d,y}"
+      ],
+      "themen": [
+        "Erdbeben"
       ]
     },
     {
@@ -844,6 +905,17 @@
       ],
       "themen": [
         "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Biegesteifigkeit der Wände",
+      "pfad": "Formelsammlung/Formeln/Biegesteifigkeit der Wände.md",
+      "art": "formel",
+      "zeichen": [
+        "EI_x"
+      ],
+      "themen": [
+        "Erdbeben"
       ]
     },
     {
@@ -1235,6 +1307,7 @@
         "Innerer Pfahlwiderstand",
         "Äusserer Pfahlwiderstand quer",
         "Innerer Pfahlwiderstand quer",
+        "Erdbeben",
         "Querkraft",
         "Duktilität",
         "Zwängung auf Normalkraft",
@@ -1255,6 +1328,26 @@
       "zeichen": [],
       "themen": [
         "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Ersatzkraft",
+      "pfad": "Formelsammlung/Formeln/Ersatzkraft.md",
+      "art": "formel",
+      "zeichen": [
+        "F_{d,x}"
+      ],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
+      "name": "Ersatzkraft eines Geschosses",
+      "pfad": "Formelsammlung/Formeln/Ersatzkraft eines Geschosses.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Erdbeben"
       ]
     },
     {
@@ -1777,6 +1870,26 @@
       ]
     },
     {
+      "name": "Gewicht des Gebäudes",
+      "pfad": "Formelsammlung/Formeln/Gewicht des Gebäudes.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sum W"
+      ],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
+      "name": "Gewicht eines Geschosses",
+      "pfad": "Formelsammlung/Formeln/Gewicht eines Geschosses.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
       "name": "Gewollte Ausmitte",
       "pfad": "Formelsammlung/Formeln/Gewollte Ausmitte.md",
       "art": "formel",
@@ -1850,6 +1963,17 @@
       ]
     },
     {
+      "name": "Grenze der Grundschwingzeit",
+      "pfad": "Formelsammlung/Formeln/Grenze der Grundschwingzeit.md",
+      "art": "formel",
+      "zeichen": [
+        "T_{1,max}"
+      ],
+      "themen": [
+        "Erdbeben"
+      ]
+    },
+    {
       "name": "Grenzwert der Durchbiegung",
       "pfad": "Formelsammlung/Formeln/Grenzwert der Durchbiegung.md",
       "art": "formel",
@@ -1902,6 +2026,17 @@
       ],
       "themen": [
         "Grundbruch"
+      ]
+    },
+    {
+      "name": "Grundschwingzeit",
+      "pfad": "Formelsammlung/Formeln/Grundschwingzeit.md",
+      "art": "formel",
+      "zeichen": [
+        "T_{1,x}"
+      ],
+      "themen": [
+        "Erdbeben"
       ]
     },
     {
@@ -1988,6 +2123,17 @@
       "zeichen": [],
       "themen": [
         "Knicken"
+      ]
+    },
+    {
+      "name": "Kippmoment am Fuss",
+      "pfad": "Formelsammlung/Formeln/Kippmoment am Fuss.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{0,x}"
+      ],
+      "themen": [
+        "Erdbeben"
       ]
     },
     {
@@ -4988,6 +5134,69 @@
       ]
     },
     {
+      "name": "opencivil.erdbeben",
+      "pfad": "Python/opencivil.erdbeben.md",
+      "art": "modul",
+      "kurz": "Erdbeben nach SIA 261:2020, Kapitel 16.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.erdbeben.ersatzkraft",
+      "pfad": "Python/opencivil.erdbeben.ersatzkraft.md",
+      "art": "modul",
+      "kurz": "das Ersatzkraftverfahren nach SIA 261:2020, 16.5.2.",
+      "stichworte": [
+        "duktile_waende",
+        "Erdbebenzone",
+        "Erdbebenzone.a_gd",
+        "Spektrumwerte",
+        "Baugrundklasse",
+        "Baugrundklasse.werte",
+        "Baugrundklasse.erklaerung",
+        "Bauwerksklasse",
+        "Bauwerksklasse.gamma_f",
+        "Bauwerksklasse.erklaerung",
+        "Wandlage",
+        "Wandlage.beschriftung",
+        "Wandlage.erklaerung",
+        "Wandlage.traegheit",
+        "Schwingzeit",
+        "Schwingzeit.beschriftung",
+        "Schwingzeit.erklaerung",
+        "Regelmaessigkeit",
+        "Regelmaessigkeit.als_dict",
+        "Geschoss",
+        "Wandquerschnitt",
+        "Wand",
+        "Gebaeude",
+        "Gebaeude.abschnitt",
+        "Wandanteil",
+        "querkraefte",
+        "Richtungsbefund",
+        "Erdbebenbefund",
+        "Erdbebenbefund.zulaessig",
+        "Erdbebenbefund.ohne_einwirkung",
+        "Ersatzkraft",
+        "Ersatzkraft.pruefe",
+        "_unregelmaessig",
+        "Lauf",
+        "Lauf._standort",
+        "Lauf._gewichte",
+        "Lauf.hauptachsen",
+        "Lauf.duktil",
+        "Lauf.richtung",
+        "Lauf._steifigkeit",
+        "Lauf._schwingzeit",
+        "Lauf._spektrum",
+        "Lauf._kraefte",
+        "Lauf._waende",
+        "Lauf._kippen",
+        "Lauf.zulaessigkeit",
+        "angaben",
+        "kraefte"
+      ]
+    },
+    {
       "name": "opencivil.ergebnis",
       "pfad": "Python/opencivil.ergebnis.md",
       "art": "modul",
@@ -6533,6 +6742,16 @@
       ]
     },
     {
+      "name": "opencivil.projekt.aufbau.erdbeben",
+      "pfad": "Python/opencivil.projekt.aufbau.erdbeben.md",
+      "art": "modul",
+      "kurz": "ein Gebaeude im Erdbeben wird Rechnung.",
+      "stichworte": [
+        "bauen",
+        "wandquerschnitt"
+      ]
+    },
+    {
       "name": "opencivil.projekt.aufbau.faelle",
       "pfad": "Python/opencivil.projekt.aufbau.faelle.md",
       "art": "modul",
@@ -6715,6 +6934,8 @@
         "_grundbrueche",
         "_setzungen",
         "_pfaehle",
+        "_gebaeude",
+        "_tragwand",
         "_erstes",
         "charakteristisch",
         "_alles_einmal",
@@ -6836,6 +7057,21 @@
         "Gebrauchsliste.namensliste",
         "Querschnittsangaben",
         "KombinationEintrag"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.erdbeben",
+      "pfad": "Python/opencivil.projekt.erdbeben.md",
+      "art": "modul",
+      "kurz": "ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.",
+      "stichworte": [
+        "GeschossEintrag",
+        "TragwandEintrag",
+        "ErdbebenEintrag",
+        "ErdbebenEintrag.neu",
+        "ErdbebenEintrag.bezuege",
+        "ErdbebenEintrag.geschoss",
+        "ErdbebenEintrag.wand"
       ]
     },
     {
@@ -7036,6 +7272,7 @@
         "Projekt.grundbruch",
         "Projekt.setzung",
         "Projekt.pfahl",
+        "Projekt.gebaeude",
         "Projekt.skript",
         "Projekt._einziges",
         "Projekt.rechnen",
@@ -8041,7 +8278,6 @@
       "kurz": "das Balkensystem im Rechenwerk.",
       "stichworte": [
         "Materialkennwert",
-        "_traegheit",
         "stoffkennwerte",
         "Steifigkeitsformel",
         "Stabmaterial",
@@ -8104,6 +8340,8 @@
       "stichworte": [
         "Kennwert",
         "Kennwert.bereich",
+        "keine_hauptachsen",
+        "_traegheit",
         "Stabquerschnitt",
         "Stabquerschnitt.bauteil",
         "Stabquerschnitt.modulfrage",
@@ -8506,6 +8744,17 @@
         "_linien",
         "_legende",
         "_kraft"
+      ]
+    },
+    {
+      "name": "opencivil.web.erdbebendaten",
+      "pfad": "Python/opencivil.web.erdbebendaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einem Gebaeude im Erdbeben zeichnet.",
+      "stichworte": [
+        "ansicht",
+        "_richtung",
+        "_legende"
       ]
     },
     {

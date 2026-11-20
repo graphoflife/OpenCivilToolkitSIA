@@ -1,5 +1,5 @@
 ---
-erzeugt: 905a15e7538b
+erzeugt: c84155bee2b7
 art: modul
 tags: [modul]
 ---
@@ -24,7 +24,7 @@ ohne Bewehrung.
 ## DIE BAUTEILARTEN
 
 Platte, Querschnittsanalyse, 2D- und 3D-Balkensystem, Decke, Durchstanzen, Grundbruch,
-Setzung und Pfahl haben je einen Steckbrief
+Setzung, Pfahl und Erdbeben haben je einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch. Gebaut wird je Eintrag ein
@@ -51,7 +51,8 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion `bauen`
 [[opencivil.projekt.aufbau.durchstanzen|durchstanzen]],
 [[opencivil.projekt.aufbau.grundbruch|grundbruch]],
 [[opencivil.projekt.aufbau.setzung|setzung]],
-[[opencivil.projekt.aufbau.pfahl|pfahl]]); was mehr als eine braucht, im
+[[opencivil.projekt.aufbau.pfahl|pfahl]],
+[[opencivil.projekt.aufbau.erdbeben|erdbeben]]); was mehr als eine braucht, im
 Kern ([[opencivil.projekt.aufbau.kern|kern]]): der Aufbau, das Bauteil, die
 Baustoffe, die Stahlspannungen und der Knickfall. Bis 2026-10-17 stand alles
 in einer Datei von ueber tausend Zeilen.
@@ -62,6 +63,7 @@ in einer Datei von ueber tausend Zeilen.
 - [[opencivil.projekt.aufbau.balkensystem3d]] – ein 3D-Balkensystem wird Rechnung.
 - [[opencivil.projekt.aufbau.decke]] – eine Decke wird Rechnung.
 - [[opencivil.projekt.aufbau.durchstanzen]] – eine Durchstanzstelle wird Rechnung.
+- [[opencivil.projekt.aufbau.erdbeben]] – ein Gebaeude im Erdbeben wird Rechnung.
 - [[opencivil.projekt.aufbau.faelle]] – was Balkensystem und Decke an Faellen gleich pruefen.
 - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
 - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
@@ -146,7 +148,8 @@ Oberflaeche, siehe Dateikopf.
 - `SETZUNG = Bauteilart('setzung', 'setzungen', SetzungEintrag, 'w', 'setzung', 'S…` – Die Kennungen w1, w2 ...: «s» tragen schon die Betonstaehle.
 - `DURCHSTANZEN = Bauteilart('durchstanzen', 'durchstanzstellen', DurchstanzEintrag, 'd…`
 - `PFAHL = Bauteilart('pfahl', 'pfaehle', PfahlEintrag, 't', 'pfahl', 'Pfähle', …` – Die Kennungen t1, t2 ...: «p» tragen schon die Skripte.
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; Decke, Durchstanzen, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `ERDBEBEN = Bauteilart('erdbeben', 'erdbeben', ErdbebenEintrag, 'h', 'erdbeben', …` – Die Kennungen h1, h2 ...: «e» tragen schon die Decken -- h wie Haus.
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, BALKENSYSTEM3D, DECKE, DURCHSTANZEN, …` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen, das Erdbeben ebenso; Decke, Durchstanzen, Grundbruch, Setzung und Pfahl lesen nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
@@ -155,6 +158,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
+- [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]
@@ -165,6 +169,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.balkensystem3d]]
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
+- [[opencivil.projekt.erdbeben]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.pfahl]]
@@ -182,6 +187,7 @@ Oberflaeche, siehe Dateikopf.
 - [[opencivil.projekt.aufbau.balkensystem3d]]
 - [[opencivil.projekt.aufbau.decke]]
 - [[opencivil.projekt.aufbau.durchstanzen]]
+- [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.pfahl]]

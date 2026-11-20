@@ -71,6 +71,11 @@ from opencivil.geotechnik.verhalten import Verhalten
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.durchstanzen import stelle
+from opencivil.erdbeben import ersatzkraft
+from opencivil.erdbeben.ersatzkraft import (
+    Baugrundklasse, Bauwerksklasse, Erdbebenzone, Schwingzeit, Wandlage,
+)
+from opencivil.projekt.erdbeben import ErdbebenEintrag, GeschossEintrag, TragwandEintrag
 from opencivil.pfahl import pfahl
 from opencivil.pfahl.boden import Mantel
 from opencivil.pfahl.pfahl import Abscheren, Grundlage, Kopf, Pfahlart, Spitze, Tragglied
@@ -175,7 +180,10 @@ def _vorgaben() -> Dict[str, List[dict]]:
                                  (SetzungEintrag, setzung.VORGABEN),
                                  (SchichtEintrag, setzung.JE_SCHICHT),
                                  (PfahlEintrag, pfahl.VORGABEN),
-                                 (PfahlschichtEintrag, pfahl.JE_SCHICHT))}
+                                 (PfahlschichtEintrag, pfahl.JE_SCHICHT),
+                                 (ErdbebenEintrag, ersatzkraft.VORGABEN),
+                                 (GeschossEintrag, ersatzkraft.JE_GESCHOSS),
+                                 (TragwandEintrag, ersatzkraft.JE_WAND))}
 
 
 def katalog() -> dict:
@@ -272,6 +280,23 @@ def katalog() -> dict:
             "grundlagen": [{"wert": g.value, "beschriftung": g.beschriftung,
                             "titel": g.erklaerung, "versuch": g.aus_versuch}
                            for g in Grundlage],
+        },
+        # Die Wahlen eines Gebaeudes im Erdbeben -- je ein Schalter, das Wort
+        # auf dem Knopf, darueber, was es heisst und gibt --, dazu je
+        # Regelmaessigkeit ihre Kriterien in eigenen Worten.
+        "erdbeben": {
+            "zonen": [{"wert": z.value, "beschriftung": z.value,
+                       "titel": f"Zone {z.value}: a_gd = {z.a_gd:.1f} m/s²"} for z in Erdbebenzone],
+            "baugrund": [{"wert": b.value, "beschriftung": b.value, "titel": b.erklaerung}
+                         for b in Baugrundklasse],
+            "bauwerksklassen": [{"wert": b.value, "beschriftung": b.value,
+                                 "titel": f"{b.erklaerung} – γ_f = {b.gamma_f:.1f}"}
+                                for b in Bauwerksklasse],
+            "schwingzeiten": [{"wert": s.value, "beschriftung": s.beschriftung,
+                               "titel": s.erklaerung} for s in Schwingzeit],
+            "lagen": [{"wert": l.value, "beschriftung": l.beschriftung, "titel": l.erklaerung}
+                      for l in Wandlage],
+            "regelmaessigkeit": [r.als_dict() for r in ersatzkraft.REGELMAESSIG],
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.
         "querschnittsanalyse": {

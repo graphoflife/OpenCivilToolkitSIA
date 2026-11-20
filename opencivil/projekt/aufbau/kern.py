@@ -131,7 +131,7 @@ class Aufbau:
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
                       "qa_spannung", "qa_knicken", "durchstanzen", "grundbruch", "gleiten",
                       "setzung", "pfahl_aussen", "pfahl_innen", "pfahl_quer",
-                      "pfahl_innen_quer")
+                      "pfahl_innen_quer", "erdbeben")
 
     # -- Die Objekte je Bauteilart: Sichten auf die Bauteile --------------
     #

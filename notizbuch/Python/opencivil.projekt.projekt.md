@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b45391ac605
+erzeugt: 0d5e496afb38
 art: modul
 tags: [modul]
 ---
@@ -64,6 +64,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `pfaehle: List[PfahlEintrag] = field(default_factory=list)` – Einzelpfähle: Bohr- und Mikropfähle mit äusserem und innerem Widerstand.
+- `erdbeben: List[ErdbebenEintrag] = field(default_factory=list)` – Gebäude im Erdbeben, nach dem Ersatzkraftverfahren -- Geschosse und Tragwände.
 - `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
 - `sandboxen: Dict[str, str] = field(default_factory=dict)` – Je Liste einer App ([[opencivil.projekt.projekt#Konstanten|APPLISTEN]]) die Kennung ihrer Sandbox, des Eintrags zum Ausprobieren -- siehe [[opencivil.projekt.projekt#Projekt.sandbox_zuruecksetzen|sandbox_zuruecksetzen]]. Hier und nicht an den Eintraegen: so steht die Regel an einer Stelle, und eine Kopie der Sandbox ist von selbst ein gewoehnlicher Eintrag.
 - `vergeben: Dict[str, int] = field(default_factory=dict)` – Je Vorsilbe die hoechste Nummer, die das Projekt je vergeben hat -- an Materialien, Bauteile, Skripte: eine Kennung kommt nie wieder ([[opencivil.projekt.netz#neue_kennung|neue_kennung]]).
@@ -344,6 +345,18 @@ Materialien, der Beton nur beim Bohrpfahl. Alles Weitere -- `art`,
 `D`, `grundlage` ... -- geht als Stichwort an den Eintrag; Masse
 des Querschnitts in mm, Tiefen in m, Spannungen in kPa.
 
+#### Projekt.gebaeude
+
+```python
+def gebaeude(self, name: str, **felder: Any) -> ErdbebenEintrag
+```
+
+Ein Gebaeude fuer das Erdbeben, mit den Vorgaben der Oberflaeche, aber
+ohne ihr Startgeschoss und ihre Startwand: wer rechnet, gibt sie mit
+`geschoss` und `wand` selbst an, die Geschosse von unten. Alles
+Weitere -- `zone`, `baugrund`, `q_x` ... -- geht als Stichwort an
+den Eintrag; Hoehen in m, Lasten in kN, Schwingzeiten in s.
+
 #### Projekt.skript
 
 ```python
@@ -577,6 +590,7 @@ Jeder Nachweis einmal laut -- gebaut in [[opencivil.projekt.beispiele|.beispiele
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.erdbeben]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]

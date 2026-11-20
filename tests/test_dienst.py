@@ -25,9 +25,10 @@ class TestDienst(unittest.TestCase):
         # Biegung und Querkraft mit Torsion des Unterzugs, Grundbruch und
         # Gleiten des Fundaments, seine Setzung, der äussere und innere
         # Widerstand des Pfahls, quer sein äusserer Widerstand, die
-        # Bettungskraft, Biegung und Querkraft im Pfahl; mehr ist im Beispiel
+        # Bettungskraft, Biegung und Querkraft im Pfahl, beim Wohnhaus je
+        # Richtung die Grenze der Grundschwingzeit; mehr ist im Beispiel
         # nicht eingeschaltet.
-        self.assertEqual(len(antwort.daten["urteile"]), 15)
+        self.assertEqual(len(antwort.daten["urteile"]), 17)
         self.assertTrue(antwort.daten["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):

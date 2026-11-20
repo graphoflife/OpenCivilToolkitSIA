@@ -7,6 +7,74 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Erdbeben: das Ersatzkraftverfahren
+
+Eine neue App nach SIA 261:2020, 16.5.2, auf Wunsch des Benutzers
+(2026-11-20): die Kräfte je Geschoss und je Wand, ohne Verbindung ins
+Balkensystem. Je Geschoss G_k, Q_k und ψ₂; jede Wand nimmt ihren
+Querschnitt aus einer Querschnittsanalyse des Projekts, ungerissen mal κ
+-- so hat er es gewählt.
+
+**Das Modell.** Die Wände einer Richtung stehen als ein Kragarm da,
+eingespannt am Fuss; die Gewichte der Geschosse wirken waagrecht auf der
+Höhe ihrer Decke. Daraus die Auslenkung des Dachs u und T₁ = 2·√u (40),
+dann S_d (31) bis (34), F_d (41), die Kräfte je Geschoss (42) und das
+Kippmoment, dasselbe mit q = 1.0 (16.5.1.9). Jede Wand trägt nach ihrem
+Anteil an EI. Bei 0° liegt y der Analyse in x des Gebäudes: eine Kraft in
+x biegt die Wand um z. Die Annahmen, die die Norm nicht regelt, stehen in
+[[TODO]].
+
+**Wann das Verfahren gilt.** Die Norm verlangt (39) in beiden Richtungen.
+Darum ist T₁ ≤ 4·T_C je Richtung ein Urteil mit Erfüllungsgrad, und wer
+verfehlt, nennt im Hinweis jeden Grund, auch die der anderen Richtung.
+Grund- und Aufriss bejaht der Benutzer mit je einem Schalter, die
+Kriterien in eigenen Worten darunter; dass das Gewicht nach oben zunimmt,
+sieht die Rechnung selbst. Erst wo etwas davon fehlt, steht ein eigenes
+Urteil «Regelmässigkeit», rot. Ein erster Entwurf gab jeder Richtung den Grad 0,
+sobald der Grundriss unregelmässig war -- das verbarg, wie weit (39) aufgeht. Die
+Zahlen bleiben in jedem Fall stehen. Die Grenze heisst T_1,max = 4·T_C, wie
+w_max bei der Verformung; mit «4·T_C» als Zeichen stand auf ihrer Seite der
+Formelsammlung «4·T_C = 4·T_C».
+
+**Duktile Wände.** Über q = 2.0 ist das Tragwerk duktil bemessen (SIA
+262:2025, Tabellen 14 und 15), und für schlanke Tragwände gelten eigene
+Bemessungswerte (4.3.9.4): das Moment linear über die Höhe, die Querkraft
+vergrössert (95). Die Rechnung kennt sie nicht und sagt es grau -- sonst
+sähen die Kräfte je Wand nach Bemessung aus. Gefunden beim Nachschlagen
+der Werte für q; dort heisst die Vergrösserung für höhere Eigenformen κ
+(97), wie hier der Anteil der Steifigkeit (siehe [[TODO]]).
+
+**Eine Wand, die nicht rechnet, hält das Gebäude an.** Ohne sie stimmten
+Schwingzeit und Verteilung nicht und sähen doch richtig aus. Was ihr fehlt,
+steht grau an ihr (`wandquerschnitt`, für Rechnung und Bild dieselbe
+Regel): keine Analyse gewählt, eine gelöschte, eine, die nicht rechnet,
+eine mit zwei Betonen -- E_cm gilt nur für einen. Eine Analyse ohne Beton
+gibt es nicht: rechnen kann nur eine mit Polygon, und jedes ist aus Beton.
+Sind y und z keine Hauptachsen, sagt es derselbe Satz wie im Raum
+(`keine_hauptachsen`), je Analyse einmal.
+
+**Die Oberfläche.** Drei Tafeln: das Gebäude mit Standort, q, T₁ und der
+Regelmässigkeit; die Geschosse von unten; die Wände mit Analyse, Lage als
+Bild, n und κ. Unter «Diagramme» je Richtung die Ansicht mit den Kräften
+als Pfeilen und der Querkraft je Geschoss, darunter was jede Wand am Fuss
+trägt. Die Wahl einer Analyse und die eines Querschnitts im Balkensystem
+sind eine Liste (`bauteilliste`); sie sagt jetzt in beiden «– gelöscht,
+neu wählen –», wo der Eintrag fehlt. Meldungen nennen ein Geschoss und eine
+Wand wie die Maske, «Wand 'W1'» statt «waende 'W1'»: das Wort der Klasse
+(`IM_ORT`) gilt jetzt auch für Elemente mit Namen. Ohne Gewicht sagt das
+Bild «Keine Einwirkung → kein Nachweis.» wie jeder Nachweis; es ist nur so
+hoch, wie das Gebäude es braucht -- ein Haus von einem Geschoss steht nicht
+als Turm da --, und über der Tabelle der Wände steht, dass sie je eine der
+n gleichen gilt.
+
+**Beispiele.** Das Beispiel hat ein Wohnhaus auf je zwei Wänden in x und y,
+grün; «Jeder Nachweis» ein Lager mit T₁ von Hand, unregelmässig und oben
+schwerer, einen Turm auf einer Winkelwand, duktil bemessen mit q = 3.0, und
+ein Gebäude ohne Wandquerschnitt -- zusammen jeder Ast des Spektrums und
+jeder graue Satz. Von Hand nachgerechnet
+in `tests/test_erdbeben.py`: vier Geschosse auf zwei Wänden, T₁ = 0.4035 s,
+F_d = 2970.5 kN.
+
 ## 2026-11-20 · Der MCP-Zugang
 
 Der Benutzer wünschte sich, dass eine KI mit dem Werkzeug arbeiten kann,

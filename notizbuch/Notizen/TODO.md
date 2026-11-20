@@ -18,10 +18,6 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dazu in Chrome prüfen, ob sich die Seite als App installieren lässt;
       verlangt Chrome ein PNG als Zeichen, schreibt ein kleines Skript ohne
       Fremdpakete die Bilder.
-- [ ] App «Erdbeben», Ersatzkraftverfahren nach SIA 261:2020, 16.5.2:
-      Geschosse mit G_k, Q_k und ψ₂; Wände aus Querschnittsanalysen mit
-      EI = κ·E_cm·I (κ vorgegeben 0,5); T₁ = 2·√u (40); F_d und F_di (41),
-      (42); Anteile je Wand nach EI; (39) als Urteil.
 - [ ] Tests: elf triviale löschen (Liste im Plan); `unittest.main()` in
       neun Dateien ans Ende; `test_schnittstelle` mit `setUpClass`; zwei
       gleiche Prüfungen in `test_decke_projekt` zusammenlegen.
@@ -901,6 +897,19 @@ Diese Punkte sind **nicht** entschieden. Eingebaut ist je eine Annahme; wo die
 Prüfung vom 2026-11-14 den Bereich schon erreicht hat, steht dabei, was die
 Norm dazu sagt.
 
+- [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`).
+      Jede Wand trägt nach ihrem Anteil an der Biegesteifigkeit; verformt
+      werden die Wände nur durch Biegung, weder durch Schub noch im
+      Fundament; κ = 0.5 als Anteil der ungerissenen Steifigkeit --
+      16.5.5.2 verlangt eine mittlere Steifigkeit bis zum Fliessbeginn;
+      g = 10 m/s² wie beim Eigengewicht. Nicht gerechnet, und das Ergebnis
+      sagt es grau: die Torsion (16.5.2.7), die vertikale Komponente
+      (16.5.4), sekundäre Bauteile (16.7) und, wo q über 2.0 liegt, die
+      Bemessungswerte duktiler Tragwände (SIA 262:2025, 4.3.9.4). Das
+      Zeichen κ heisst in der Querschnittsanalyse die Krümmung, und SIA
+      262:2025 braucht κ für Tragwände im Erdbeben selbst: als Vergrösserung
+      der Querkraft für höhere Eigenformen (4.3.9.4.4, (97)). Vorschlag:
+      umbenennen, etwa in η_EI. Entscheid des Benutzers.
 - [ ] **Pfähle, nach Vorgabe eingebaut** (`opencivil/pfahl/`). Beim
       örtlichen Abscheren gelten η_a und γ_M,a trotzdem, obwohl das Buch
       danach keine weitere Sicherheit vorsieht (Kap. 12.5); X wird dabei mit

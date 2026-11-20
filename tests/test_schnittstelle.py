@@ -347,17 +347,21 @@ class TestAngabengruppen(unittest.TestCase):
     def test_zwei_kaesten_statt_vier_zeilen(self):
         gruppen = self.gruppen()
         # Zwei Kästen der Platte, einer des Unterzugs, vier des Fundaments,
-        # sechs seiner Setzung und acht des Pfahls -- das «Fundament» der
-        # Setzung heisst wie das des Grundbruchs, die dritte Schicht des
-        # Pfahls wie die der Setzung; sie stehen hier je in einer Liste.
+        # sechs seiner Setzung, acht des Pfahls und sieben des Wohnhauses --
+        # das «Fundament» der Setzung heisst wie das des Grundbruchs, die
+        # dritte Schicht des Pfahls wie die der Setzung, der Querschnitt der
+        # Wand des Hauses wie der des Unterzugs; sie stehen hier je in einer
+        # Liste.
         self.assertEqual(sorted(gruppen),
                          ["Abmessungen – Beton C30/37", "Boden", "Bruttoquerschnitt",
-                          "Fundament", "Gelände und Grundwasser", "Grundwasser", "Nachweis",
-                          "Pfahl", "Pressung in der Sohle", "Querlast", "Querschnitt",
-                          "Schicht 1: Auffüllung", "Schicht 1: Kies, sandig",
-                          "Schicht 2: Kies, sandig", "Schicht 2: Silt, tonig",
-                          "Schicht 3: Moräne", "Sohlreibung", "Äusserer Widerstand",
-                          "Überdeckungen"])
+                          "Fundament", "Gelände und Grundwasser", "Geschoss 1: EG",
+                          "Geschoss 2: 1. OG", "Geschoss 3: 2. OG", "Geschoss 4: Dach",
+                          "Grundwasser", "Nachweis", "Pfahl", "Pressung in der Sohle",
+                          "Querlast", "Querschnitt", "Schicht 1: Auffüllung",
+                          "Schicht 1: Kies, sandig", "Schicht 2: Kies, sandig",
+                          "Schicht 2: Silt, tonig", "Schicht 3: Moräne", "Sohlreibung",
+                          "Verhaltensbeiwert", "Wand 1: Wände in x", "Wand 2: Wände in y",
+                          "Äusserer Widerstand", "Überdeckungen"])
         self.assertEqual(gruppen["Fundament"],
                          ["Breite des Fundaments", "Länge des Fundaments",
                           "Tiefe der Sohle unter Terrain", "Neigung der Sohle",
@@ -367,7 +371,10 @@ class TestAngabengruppen(unittest.TestCase):
                           "M_E-Wert der Schicht 2, Wiederbelastung"])
         self.assertEqual(gruppen["Bruttoquerschnitt"],
                          ["Fläche des Bruttoquerschnitts", "Schwerpunkt, y", "Schwerpunkt, z",
-                          "Trägheitsmoment um y", "Trägheitsmoment um z", "Deviationsmoment"])
+                          "Trägheitsmoment um y", "Trägheitsmoment um z", "Deviationsmoment"] * 2)
+        self.assertEqual(gruppen["Geschoss 4: Dach"],
+                         ["Höhe des Geschosses", "Ständige Last des Geschosses",
+                          "Nutzlast des Geschosses", "Beiwert der Nutzlast, quasi-ständig"])
         self.assertEqual(gruppen["Abmessungen – Beton C30/37"],
                          ["Plattendicke", "Betrachtete Breite (x)",
                           "Betrachtete Breite (y)"])
@@ -547,9 +554,8 @@ class TestAngabengruppen(unittest.TestCase):
         self.assertEqual(ids, {
             "querschnitt.q1.h", "querschnitt.q1.b", "querschnitt.q1.b_y",
             "querschnitt.q1.c_nom_unten", "querschnitt.q1.c_nom_oben",
-            "querschnittsanalyse.a1.A", "querschnittsanalyse.a1.y_S",
-            "querschnittsanalyse.a1.z_S", "querschnittsanalyse.a1.I_y",
-            "querschnittsanalyse.a1.I_z", "querschnittsanalyse.a1.I_yz",
+            *(f"querschnittsanalyse.{a}.{n}" for a in ("a1", "a2")
+              for n in ("A", "y_S", "z_S", "I_y", "I_z", "I_yz")),
             *(f"grundbruch.g1.{n}" for n in (
                 "phi_k", "gamma_phi", "c_k", "gamma_c", "gamma", "gamma_w", "b", "L", "t",
                 "alpha", "t1", "beta", "q_Ed", "delta_faktor")),
@@ -562,6 +568,9 @@ class TestAngabengruppen(unittest.TestCase):
               for n in ("d", "gamma", "phi_k", "c_k", "E_s")),
             "pfahl.t1.q_s_1",
             *(f"pfahl.t1.{n}_{i}" for i in (2, 3) for n in ("K", "delta_faktor")),
+            "erdbeben.h1.q_x", "erdbeben.h1.q_y",
+            *(f"erdbeben.h1.{n}_{i}" for i in (1, 2, 3, 4) for n in ("h", "G_k", "Q_k", "psi_2")),
+            *(f"erdbeben.h1.{n}_{i}" for i in (1, 2) for n in ("n", "kappa")),
         })
 
 

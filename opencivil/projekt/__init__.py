@@ -30,6 +30,8 @@ Aufgabe ein Modul::
                    aus Wieder- und Erstbelastung, Schichten mit M_E-Werten
     pfahl.py       ein Einzelpfahl: Art, Masse, Querschnitt, Schichten,
                    Grundwasser, Grundlage des äusseren Widerstands, Kombinationen
+    erdbeben.py    ein Gebaeude im Erdbeben: Standort, Verhaltensbeiwerte,
+                   Geschosse und Tragwaende aus Querschnittsanalysen
     netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
     skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                    gerechnet
@@ -83,6 +85,7 @@ from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.projekt.pfahl import (
     PfahlEintrag, PfahlkombinationEintrag, PfahlschichtEintrag,
 )
+from opencivil.projekt.erdbeben import ErdbebenEintrag, GeschossEintrag, TragwandEintrag
 from opencivil.projekt.durchstanzen import (
     AussparungEintrag, DurchstanzEintrag, GrundrissknotenEintrag,
 )
@@ -114,6 +117,7 @@ __all__ = [
     "GrundbruchEintrag", "GrundbruchkombinationEintrag",
     "SchichtEintrag", "SetzungEintrag",
     "PfahlEintrag", "PfahlkombinationEintrag", "PfahlschichtEintrag",
+    "ErdbebenEintrag", "GeschossEintrag", "TragwandEintrag",
     "AussparungEintrag", "DurchstanzEintrag", "GrundrissknotenEintrag",
     "DeckeEintrag", "DeckendiagrammEintrag", "DeckenknotenEintrag", "DeckenplatteEintrag",
     "DeckenschnittEintrag", "FlaechenlastEintrag",

@@ -496,17 +496,20 @@ class TestBerichtWieBildschirm(unittest.TestCase):
 
     def test_jedes_bauteil_hat_seinen_abschnitt(self):
         # Drei Platten, der Unterzug und das Fundament des Beispiels mit
-        # Grundbruch und Setzung, dazu der Pfahl -- der Rahmen führt keine
-        # Nachweise und hat darum keinen Abschnitt.
-        self.assertEqual(sorted(self.web), ["a1", "g1", "q1", "q2", "q3", "t1", "w1"])
+        # Grundbruch und Setzung, dazu der Pfahl und das Wohnhaus im Erdbeben
+        # -- der Rahmen führt keine Nachweise und hat darum keinen Abschnitt.
+        # Die Wand des Hauses hat keinen Lastfall: ihre Nachweise rechnen
+        # still, ihr Abschnitt sagt nur, dass keiner geführt ist.
+        self.assertEqual(sorted(self.web), ["a1", "g1", "h1", "q1", "q2", "q3", "t1", "w1"])
         titel = {"platte": "Angaben zur Platte", "querschnittsanalyse": "Angaben zum Querschnitt",
                  "grundbruch": "Angaben zum Fundament", "setzung": "Angaben zum Fundament",
-                 "pfahl": "Angaben zum Pfahl"}
+                 "pfahl": "Angaben zum Pfahl", "erdbeben": "Angaben zum Gebäude"}
         for bauteil in self.aufbau.bauteile():
-            if not bauteil.nachweise:
-                continue
             name = bauteil.name
-            self.assertIn(f"{name} {'-' * len(name)} {titel[bauteil.art.name]}", self.text)
+            if bauteil.kennung in self.web:
+                self.assertIn(f"{name} {'-' * len(name)} {titel[bauteil.art.name]}", self.text)
+            elif bauteil.nachweise:
+                self.assertIn(f"{name} {'-' * len(name)} Kein Nachweis geführt.", self.text)
 
     def test_die_zellen_der_tabelle_stehen_im_bericht(self):
         for tabelle in self.web.values():

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4ec53133d849
+erzeugt: c751192fbe8d
 art: modul
 tags: [modul]
 ---
@@ -248,6 +248,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.pfahl.pfahl]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.decke]]
+- [[opencivil.projekt.aufbau.erdbeben]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]

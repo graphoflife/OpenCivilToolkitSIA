@@ -73,12 +73,14 @@ class TestFormelsammlung(unittest.TestCase):
         self.assertEqual(art["Setzung"], "setzung")
         self.assertEqual(art["Durchstanzen"], "durchstanzen")
         self.assertEqual(art["Streifenmethode"], "decke")
+        self.assertEqual(art["Erdbeben"], "erdbeben")
         for name in ("Äusserer Pfahlwiderstand", "Innerer Pfahlwiderstand"):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "pfahl")
         self.assertEqual({t.art for t in self.alle},
                          {"beton", "betonstahl", "baustahl", "querschnitt", "querschnittsanalyse",
-                          "balkensystem", "decke", "durchstanzen", "grundbruch", "setzung", "pfahl"})
+                          "balkensystem", "decke", "durchstanzen", "grundbruch", "setzung", "pfahl",
+                          "erdbeben"})
 
     def test_die_linien_der_analysen_stehen_darin(self):
         """

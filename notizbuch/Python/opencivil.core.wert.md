@@ -1,5 +1,5 @@
 ---
-erzeugt: ccf05a64c325
+erzeugt: 8ec639f5cfc8
 art: modul
 tags: [modul]
 ---
@@ -312,6 +312,7 @@ def beschreibung(self) -> str
 - [[opencivil.durchstanzen.mit_bewehrung]]
 - [[opencivil.durchstanzen.nachweis]]
 - [[opencivil.durchstanzen.stelle]]
+- [[opencivil.erdbeben.ersatzkraft]]
 - [[opencivil.ergebnis]]
 - [[opencivil.geotechnik.fundament]]
 - [[opencivil.geotechnik.gleiten]]

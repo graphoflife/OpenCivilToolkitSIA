@@ -63,7 +63,7 @@ from opencivil.core.berechnung import (
     Ausfuehrung, Befundbezug, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
 from opencivil.core.einheiten import (
-    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MIO_MM4, MN, N_PRO_MM2, Einheit, Groesse,
+    KG_PRO_M3, KN_PRO_M, KNM2, M_PRO_S2, MN, N_PRO_MM2, Einheit, Groesse,
 )
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.rechenobjekt import Rechenobjekt
@@ -72,7 +72,7 @@ from opencivil.material.basis import Baustoff, Baustoffart, mit_index
 from opencivil.stabwerk import herleitung
 from opencivil.stabwerk.modell import Lastart, Lastrichtung, Stablast, System
 from opencivil.stabwerk.stabquerschnitt import (
-    DEVIATIONSMOMENT, EBEN, KOPPLUNG, Kennwert, Stabquerschnitt,
+    DEVIATIONSMOMENT, EBEN, Kennwert, Stabquerschnitt, keine_hauptachsen,
 )
 from opencivil.stabwerk.art import EBENE, Art
 from opencivil.stabwerk.system import Ergebnis, Fall, Meldung, rechnen
@@ -106,11 +106,6 @@ DICHTE = Materialkennwert("rho", r"\rho", KG_PRO_M3, "Dichte",
 #: Fuer die Torsion, nur im Raum: ``G_cm`` des Betons, ``G_a`` des Baustahls.
 SCHUBMODUL = Materialkennwert("G", "G", N_PRO_MM2, "Schubmodul",
                               {Baustoffart.BETON: "G_cm", Baustoffart.BAUSTAHL: "G_a"})
-
-
-def _traegheit(si: float) -> str:
-    """Ein Traegheitsmoment in Worten: «1.06·10⁶ mm⁴»."""
-    return f"{Groesse.aus_si(si, MIO_MM4).formatiert(2)}{MIO_MM4.beschriftung}"
 
 
 def stoffkennwerte(kennwerte: Sequence[Materialkennwert]) -> Dict[Baustoffart, Dict[str, str]]:
@@ -559,7 +554,7 @@ class Stabwerksrechnung(Rechenobjekt):
     def _keine_hauptachsen(self, e: Eingaben) -> List[Meldung]:
         """
         Je Querschnitt mit ``I_yz``, den ein Stab nimmt und dessen y und z
-        merklich keine Hauptachsen sind (:data:`KOPPLUNG`), ein Hinweis --
+        merklich keine Hauptachsen sind (:func:`keine_hauptachsen`), ein Hinweis --
         er haelt die Rechnung nicht auf.
         """
         meldungen = []
@@ -569,19 +564,10 @@ class Stabwerksrechnung(Rechenobjekt):
             staebe = [stab for stab, (quer, _) in self.paare.items() if quer == q.kennung]
             if not staebe:
                 continue
-            I_y, I_z, I_yz = (e.g(f"{k}_{q.kennung}") for k in ("I_y", "I_z", "I_yz"))
-            kleiner = min(I_y.si, I_z.si)
-            if kleiner <= 0.0 or abs(I_yz.si) <= KOPPLUNG * kleiner:
-                continue
-            anteil = f"{100.0 * abs(I_yz.si) / kleiner:.0f} %"
-            meldungen.append(Meldung(
-                f"Querschnitt «{q.name}»: y und z sind keine Hauptachsen – |I_yz| = "
-                f"{_traegheit(abs(I_yz.si))} ist {anteil} von min(I_y; I_z) = "
-                f"{_traegheit(kleiner)}. "
-                f"Gerechnet wird ohne I_yz; in Wirklichkeit krümmt ein Moment um die steifere "
-                f"Achse den Stab auch um die andere, um {anteil} davon. Verformungen und "
-                f"Schnittgrössen sind darum nur genähert.",
-                (q.kennung, *staebe), False))
+            text = keine_hauptachsen(f"Querschnitt «{q.name}»", *(
+                e.g(f"{k}_{q.kennung}").si for k in ("I_y", "I_z", "I_yz")))
+            if text is not None:
+                meldungen.append(Meldung(text, (q.kennung, *staebe), False))
         return meldungen
 
     # -- Je System ----------------------------------------------------------------

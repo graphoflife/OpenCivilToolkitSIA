@@ -24,8 +24,8 @@
 
 import { formelText } from './achsen.js';
 import {
-  bezeichnung, erklaerung, feld, klappgruppe, materialliste, namensfeld, panel, wahlBlock,
-  wahlSchalter,
+  bauteilliste, bezeichnung, erklaerung, feld, klappgruppe, materialliste, namensfeld, panel,
+  wahlBlock, wahlSchalter,
 } from './bausteine.js';
 import {
   knotenlastart, lagertext, lastart, lastrichtung, materialname, passendeUebersicht, systemart,
@@ -496,20 +496,9 @@ function querschnittFenster(system, kennung) {
     }), k.angabe.einheit, k.beschriftung)));
   } else {
     const alle = q.art === 'platte' ? zustand.projekt.querschnitte : (zustand.projekt.querschnittsanalysen || []);
-    // Eine Sandbox nur in der Sandbox: sie beginnt nach jedem Laden der Seite
-    // neu, und ein anderes System rechnete dann still mit anderem. Steht sie
-    // doch da -- in der Kopie einer Sandbox --, zeigt die Liste sie, und der
-    // Kern sagt, was zu tun ist.
-    const liste = alle.filter((x) => !istSandbox(x.kennung) || istSandbox(system.kennung)
-      || x.kennung === q[q.art]);
-    // Ohne eine im Projekt sagt es schon die Liste.
-    const leer = liste.length ? '– wählen –'
-      : alle.length ? '– nur die Sandbox: erst kopieren (⧉) –' : '– noch keine im Projekt –';
     zeilen.push(el('div.bs-qvorlage', {}, [
-      feld(artKurz(art, q), auswahl({
-        werte: [{ wert: '', beschriftung: leer }, ...liste.map((x) => ({ wert: x.kennung, beschriftung: x.name }))],
-        gewaehlt: q[q.art],
-        beiAenderung: setzen(q.art),
+      feld(artKurz(art, q), bauteilliste({
+        alle, gewaehlt: q[q.art], setzen: setzen(q.art), inSandbox: istSandbox(system.kennung),
       })),
       umrissBild(system, q, 120, 90),
     ]));

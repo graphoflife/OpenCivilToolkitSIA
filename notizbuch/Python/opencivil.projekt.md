@@ -1,5 +1,5 @@
 ---
-erzeugt: f27d5a8f0dae
+erzeugt: a4aca5bb88c7
 art: modul
 tags: [modul]
 ---
@@ -40,6 +40,8 @@ setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
                aus Wieder- und Erstbelastung, Schichten mit M_E-Werten
 pfahl.py       ein Einzelpfahl: Art, Masse, Querschnitt, Schichten,
                Grundwasser, Grundlage des äusseren Widerstands, Kombinationen
+erdbeben.py    ein Gebaeude im Erdbeben: Standort, Verhaltensbeiwerte,
+               Geschosse und Tragwaende aus Querschnittsanalysen
 netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
 skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                gerechnet
@@ -81,6 +83,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.decke]] – eine Stahlbetondecke, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.durchstanzen]] – ein Durchstanznachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
+- [[opencivil.projekt.erdbeben]] – ein Gebaeude im Erdbeben, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.faelle]] – Lastfaelle und Kombinationen eines Bauteils.
 - [[opencivil.projekt.fallnamen]] – Die Namen der Faelle eines Bauteils -- je Liste verschieden, auch als Kennung.
 - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
@@ -103,6 +106,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.decke]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.erdbeben]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
@@ -134,6 +138,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]
 - [[opencivil.web.durchstanzdaten]]
+- [[opencivil.web.erdbebendaten]]
 - [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.pfahldaten]]
 - [[opencivil.web.setzungsdaten]]

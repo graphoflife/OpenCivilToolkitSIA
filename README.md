@@ -168,6 +168,19 @@ t.schicht("Ton", d=15.0, gamma=19, verhalten="undrainiert", s_u=80, alpha=0.6, E
 t.kombination("Tragsicherheit", N_Ed=800, H_Ed=100)   # gezogen: N_Ed negativ; M_Ed
 ```
 
+Ein Gebäude im Erdbeben -- Höhen in m, Lasten in kN, die Geschosse von der
+Einspannung an nach oben; jede Wand nimmt ihren Querschnitt aus einer
+Querschnittsanalyse, hier `a2`:
+
+```python
+h = p.gebaeude("Wohnhaus", zone="Z1b", baugrund="C", bauwerksklasse="I",
+               q_x=1.5, q_y=1.5)         # schwingzeit="hand", T1_x=0.4, T1_y=0.5
+h.geschoss("EG", h=3.0, G_k=2500, Q_k=800, psi_2=0.3)
+h.geschoss("Dach", h=3.0, G_k=2000)
+h.wand("Wände in x", "a2", n=2)           # 0°: y der Analyse liegt in x
+h.wand("Wände in y", "a2", n=2, lage="90", kappa=0.5)
+```
+
 Linien- und Dreieckslasten (`wert_b`), Einzellasten, Momente und verteilte
 Momente gehen mit `art=`; Federn, Bettung und feste Linienlager mit den
 Feldern der Linie (`quer`, `k_quer`, `laengs`, `k_laengs`). `r.teilen("L2",
@@ -264,6 +277,7 @@ Fertig und getestet (1229 Tests):
 | `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Träger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`traeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
+| `erdbeben/ersatzkraft` | ein Gebäude im Erdbeben nach dem Ersatzkraftverfahren, SIA 261:2020, 16.5.2: je Richtung T_1 aus der Auslenkung der Wände (40), S_d, F_d und die Kräfte je Geschoss (41), (42), die Anteile der Wände, dasselbe mit q = 1.0; ob das Verfahren gilt, als Urteil |
 | `pfahl/` | ein Einzelpfahl nach SIA 267:2013, Kapitel 9: Bohr- oder Mikropfahl in seinen Schichten, der äussere Widerstand aus Mantel und Fuss oder aus Versuchen, der innere aus dem Querschnitt, je auf Druck und Zug; die Steifigkeit als gebetteter Stab (`steifigkeit`, `bettung`): Federn am Kopf und Verläufe über die Tiefe; der äussere Widerstand quer (`quer`, `erdwiderstand`): Erdwiderstand, Bruchmechanismen und die Bettungskraft |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
@@ -281,7 +295,7 @@ Fertig und getestet (1229 Tests):
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `balkensystem3d`, `grundbruch`, `setzung`, `pfahl`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `balkensystem3d`, `grundbruch`, `setzung`, `pfahl`, `erdbeben`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
 | `web/bruecke.py` | was der Browser lädt: das Verzeichnis und das Paket des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
@@ -292,6 +306,7 @@ Fertig und getestet (1229 Tests):
 | `web/deckendaten.py` | was die Oberfläche von einer Decke zeigt: die Übersicht beim Zeichnen und die Bilder eines Falls |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
+| `web/erdbebendaten.py` | was die Ansicht eines Gebäudes im Erdbeben vom Kern braucht: je Richtung die Kräfte, die Querkräfte und die Anteile der Wände; je Wand, was ihr fehlt |
 | `web/pfahldaten.py` | was die Bilder eines Pfahls vom Kern brauchen: die Mantelreibung je Stück, den Spitzendruck, die Legende, je Kombination die Verläufe über die Tiefe, neben dem Bettungsdruck der Erdwiderstand |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
@@ -313,6 +328,7 @@ Fertig und getestet (1229 Tests):
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
 | `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die die Bilder des Grundbaus teilen |
 | `web/js/pfahl.js`, `pf_zeichnung.js`, `pf_verlauf.js` | die Eingabe eines Pfahls, das Bild seiner Situation und seine Verläufe über die Tiefe |
+| `web/js/erdbeben.js`, `eb_zeichnung.js` | die Eingabe eines Gebäudes im Erdbeben und seine Ansicht je Richtung mit den Kräften |
 | `web/js/python.js`, `konsole.js`, `variablen.js`, `zeichnen.js` | die App «Python»: Code und Konsole, der Faden der Sitzung, die Variablen rechts, die Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
@@ -328,7 +344,7 @@ dieselbe Aufteilung, nur nacheinander.
 Links steht zuoberst der Name des Projekts, darunter je App ein Knopf mit
 Zeichen und Anzahl -- Materialien, Stahlbeton-Platten, Querschnittsanalyse, 2D
 und 3D Balkensysteme, Decken, Durchstanzen, Grundbruch, Setzung, Pfähle,
-Python -- und
+Erdbeben, Python -- und
 unter den Knöpfen die Liste der gewählten App, mit «+» zum Anlegen.
 
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
@@ -667,6 +683,25 @@ Druckdiagonalen und Wendel, deren Ganghöhe s_w im Querschnitt steht
 (4.3.3.4), im Mikropfahl der Stahl mit A_v·f_yd/√3 (SIA 263:2013, 5.1.4.1).
 In den Bildern von Moment und Querkraft steht der Widerstand gestrichelt
 daneben.
+
+**Erdbeben:** ein Gebäude nach dem Ersatzkraftverfahren, SIA 261:2020,
+16.5.2. Oben der Standort -- Erdbebenzone, Baugrundklasse und
+Bauwerksklasse als Schalter --, die Verhaltensbeiwerte q in x und y, woher
+T₁ kommt und ob Grund- und Aufriss regelmässig sind, mit den Kriterien
+darunter. Dann die Geschosse von der Einspannung an nach oben, je mit Höhe,
+G_k, Q_k und ψ₂, und die Wände: je eine Querschnittsanalyse des Projekts mit
+genau einem Beton, ihre Lage im Grundriss (0° oder 90°), die Anzahl gleicher
+Wände und κ, der Anteil der ungerissenen Steifigkeit. Je Richtung stehen die
+Wände als ein Kragarm da; unter den Gewichten, waagrecht auf der Höhe der
+Decken, gibt die Auslenkung des Dachs T₁ = 2·√u (40), daraus S_d, F_d (41)
+und die Kräfte je Geschoss (42), jede Wand trägt nach ihrem Anteil an EI.
+Dasselbe mit q = 1.0 für Abheben und Kippen (16.5.1.9). Ob das Verfahren
+gilt, sagen die Urteile: je Richtung T₁ ≤ 4·T_C (39), dazu -- rot, wo es
+fehlt -- die Regelmässigkeit; nimmt das Gewicht nach oben zu, sieht es die
+Rechnung selbst. Unter «Diagramme» je Richtung die Ansicht mit den Kräften
+als Pfeilen und der Querkraft je Geschoss, darunter was jede Wand am Fuss
+trägt. Nicht gerechnet sind die Torsion, die vertikale Komponente und
+sekundäre Bauteile; das Ergebnis sagt es.
 
 **Python:** die letzte App. Skripte, gespeichert mit dem Projekt; in der
 Mitte der Code und darunter die Konsole, rechts statt der Berechnung die
