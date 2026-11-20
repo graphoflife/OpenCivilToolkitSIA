@@ -64,11 +64,12 @@ from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, GebrauchsfallEintrag,
     Gebrauchsliste, Gebrauchswahl, KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl,
-    KombinationEintrag, LageEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag,
-    QuerkraftbewehrungEintrag, RechenwahlEintrag, SpannungsfallEintrag, VerformungEintrag,
-    VerformungsfallEintrag, abgeleiteter_fallname,
+    KombinationEintrag, MaterialEintrag, RechenwahlEintrag, SpannungsfallEintrag,
+    VerformungEintrag, VerformungsfallEintrag, abgeleiteter_fallname,
 )
-from opencivil.projekt.platte import QuerschnittEintrag
+from opencivil.projekt.platte import (
+    LageEintrag, ObergrenzeEintrag, PostenEintrag, QuerkraftbewehrungEintrag, QuerschnittEintrag,
+)
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag
 from opencivil.projekt.balkensystem import (
     BalkensystemEintrag, KnotenlastEintrag, LagerEintrag, StablastEintrag, StabquerschnittEintrag,

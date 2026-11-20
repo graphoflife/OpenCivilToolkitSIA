@@ -2,34 +2,32 @@
 opencivil/projekt/eintraege.py -- die Teile einer Projektbeschreibung.
 
 VERANTWORTUNG:
-Material, Bewehrungsposten und -lagen, Buegel, Lastfaelle -- jedes als
-Datenklasse, die sich als JSON speichern und wieder einlesen laesst. Gelesen
-und geprueft wird jeder Eintrag ueber seine Felder: was eines annehmen darf,
-steht an ihm (:mod:`opencivil.projekt.lesen`).
+Material, Lastfaelle, Rechenwahlen und was Platte und gezeichneter
+Querschnitt gleich angeben -- jedes als Datenklasse, die sich als JSON
+speichern und wieder einlesen laesst. Gelesen und geprueft wird jeder Eintrag
+ueber seine Felder: was eines annehmen darf, steht an ihm
+(:mod:`opencivil.projekt.lesen`).
 
-Die Platte, die diese Teile zusammenhaelt, steht in
-:mod:`opencivil.projekt.platte`; das ganze Projekt in
-:mod:`opencivil.projekt.projekt`.
+Was nur die Platte hat -- Posten, Lagen, Buegel --, steht bei ihr in
+:mod:`opencivil.projekt.platte`; bis 2026-11-20 stand es hier. Das ganze
+Projekt steht in :mod:`opencivil.projekt.projekt`.
 """
 
 from __future__ import annotations
 
 import functools
 import inspect
-import math
 from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, fields
 from typing import Any, ClassVar, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import (
-    GRAD, KN, KN_PRO_M, KNM, M, MM, MM2, PROMILLE, PROZENT, Groesse,
+    GRAD, KN, KN_PRO_M, KNM, M, MM, PROMILLE, PROZENT,
 )
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import BEIWERT as X_D_BEIWERT, HOECHSTENS as X_D_HOECHSTENS
-from opencivil.querschnitt.platte import (
-    ALPHA_MAX, ALPHA_MIN, K_C, Bewehrungsposten, Querkraftbewehrung, Richtung,
-)
+from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C, Richtung
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import (
     ProjektFehler, als_groesse, bereich, einer_von, je_material, lesen, ort, unbekanntes_feld,
@@ -41,7 +39,6 @@ from opencivil.nachweis.rechenwahl import (
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL
-from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.spannungsanalyse import Analyseart
 
@@ -313,163 +310,6 @@ def x_d_grenze() -> Any:
     """
     return bereich(X_D_BEIWERT, heisst="k der Grenze x/d",
                    ueber=0.0, bis=X_D_HOECHSTENS)
-
-
-# ===========================================================================
-# Bewehrung
-# ===========================================================================
-
-#: Wie ein Posten der Platte seine Menge angibt -- wie eine Stablinie
-#: (:class:`~opencivil.projekt.querschnittsanalyse.StablinieEintrag`), aber
-#: ohne verschmierte Flaeche: als Teilung oder als Stabzahl.
-MENGEN = (Linienart.TEILUNG, Linienart.ANZAHL)
-
-
-@dataclass
-class PostenEintrag(Beschreibung):
-    """
-    Grundbewehrung oder Zulage einer Lage.
-
-    Je Art ein eigenes Feld fuer die Menge, wie bei der Stablinie: wer von der
-    Teilung zur Stabzahl wechselt und zurueck, findet seine Zahl noch vor.
-    Welche gilt, sagt ``art``. Bis 2026-10-18 war genau eine der beiden
-    gesetzt, und beim Umschalten setzte die Oberflaeche die andere mit eigenen
-    Vorgaben (5 Staebe, 150 mm).
-    """
-
-    durchmesser: float = bereich(0.0, heisst="Durchmesser", einheit=MM, ab=0.0)
-    """in mm; 0 bedeutet: nicht vorhanden."""
-
-    abstand: float = bereich(150.0, heisst="Teilung", einheit=MM, ueber=0.0)
-    """
-    Teilung in mm -- bei Art «Teilung». Null weist schon das Feld ab, auch
-    ohne Durchmesser: bis 2026-10-16 hiess eine Teilung von null still «kein
-    Stab», bis 2026-11-20 nahm das Feld sie an, und erst die ganze Platte
-    rechnete nicht.
-    """
-
-    anzahl: float = bereich(5.0, heisst="Stabzahl", ueber=0.0)
-    """Stabzahl auf der Breite b -- bei Art «Anzahl»."""
-
-    art: Linienart = einer_von(MENGEN, Linienart.TEILUNG)
-    """Welche der beiden gilt -- nach den Zahlen, damit ``PostenEintrag(⌀, s)`` bleibt."""
-
-    @property
-    def ueber_abstand(self) -> bool:
-        return self.art is Linienart.TEILUNG
-
-    @property
-    def vorhanden(self) -> bool:
-        """Ob Staebe liegen -- das sagt der Durchmesser; Teilung und Stabzahl sind nie null."""
-        return self.durchmesser > 0
-
-    def als_posten(self) -> Bewehrungsposten:
-        return Bewehrungsposten(
-            durchmesser=als_groesse(self, "durchmesser"),
-            abstand=als_groesse(self, "abstand") if self.ueber_abstand else None,
-            anzahl=None if self.ueber_abstand else self.anzahl,
-        )
-
-    def je_meter(self, b: float = 1000.0) -> float:
-        """
-        Bewehrungsquerschnitt in mm²/m. Ueber die Teilung haengt er an keiner
-        Breite; bei einer Stabzahl liegen die Staebe auf der Breite ``b`` (mm).
-        """
-        return self.als_posten().flaeche(Groesse(b, MM)).in_einheit(MM2) * 1000.0 / b
-
-
-@dataclass
-class LageEintrag(Beschreibung):
-    """Eine der vier Lagen -- ihr Stahl ist der der Platte."""
-
-    IM_ORT = "Lage"
-
-    grund: PostenEintrag = field(default_factory=PostenEintrag)
-    zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))
-
-    unguenstig: bool = True
-    """Ob die inneren Kanten von Grundbewehrung und Zulage fluchten -- siehe
-    :class:`opencivil.querschnitt.platte.Bewehrungslage`."""
-
-    @property
-    def vorhanden(self) -> bool:
-        return self.grund.vorhanden or self.zulage.vorhanden
-
-
-@dataclass
-class ObergrenzeEintrag(Beschreibung):
-    """
-    Die Obergrenze der automatischen Bewehrung: keine Lage bekommt von der
-    Suche mehr Querschnitt als Grund und Zulage hier zusammen.
-
-    Eingegeben wie eine Lage, je als ⌀ @ Teilung -- es zaehlt aber nur die
-    Summe in mm²/m. Wie die Suche sie auf Grund und Zulage verteilt, ist frei:
-    bei ⌀26@150 + ⌀20@150 (5634 mm²/m) darf eine Lage auch ⌀30 + ⌀12 tragen.
-    Beide ohne Durchmesser heisst: keine Obergrenze.
-    """
-
-    grund: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=30.0))
-    zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))
-
-    @property
-    def je_meter(self) -> float:
-        """Die Obergrenze in mm²/m -- unendlich, wenn keine gesetzt ist."""
-        summe = self.grund.je_meter() + self.zulage.je_meter()
-        return summe if summe > 0 else math.inf
-
-
-@dataclass
-class QuerkraftbewehrungEintrag(Beschreibung):
-    """
-    Die Bügel einer Platte -- ein Raster, ein Durchmesser, zwei Teilungen.
-    Ihr Stahl ist der der Platte (Benutzer, 2026-10-24).
-
-    In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
-    stehen; in x nicht. Siehe
-    :class:`opencivil.querschnitt.platte.Querkraftbewehrung`. In y je Art ein
-    eigenes Feld, wie beim :class:`PostenEintrag`; welches gilt, sagt ``art_y``.
-    """
-
-    durchmesser: float = bereich(0.0, heisst="Bügeldurchmesser", einheit=MM, ab=0.0)
-    """in mm; 0 bedeutet: keine Querkraftbewehrung."""
-
-    abstand_x: float = bereich(200.0, heisst="Bügelteilung in x", einheit=MM, ueber=0.0)
-    abstand_y: float = bereich(200.0, heisst="Bügelteilung in y", einheit=MM, ueber=0.0)
-    anzahl_y: float = bereich(5.0, heisst="Bügelzahl in y", ueber=0.0)
-    """
-    Teilungen und Stabzahl weist schon ihr Feld ab, wenn sie nicht ueber
-    null liegen, auch ohne Buegel -- bis 2026-11-20 erst die ganze Platte.
-    """
-
-    art_y: Linienart = einer_von(MENGEN, Linienart.TEILUNG)
-    alpha_min: int = kleinste_neigung()
-    alpha_max: int = groesste_neigung()
-
-    @property
-    def vorhanden(self) -> bool:
-        """
-        Ob Buegel liegen -- das sagt allein der Durchmesser. Eine Teilung von
-        null heisst nicht «keine Buegel»: ihr Feld weist sie ab.
-        """
-        return self.durchmesser > 0
-
-    @property
-    def ueber_teilung_y(self) -> bool:
-        """In y eine Teilung -- sonst eine Stabzahl."""
-        return self.art_y is Linienart.TEILUNG
-
-    def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung:
-        """Die Buegel fuer den Querschnitt."""
-        g = functools.partial(als_groesse, self)
-        return Querkraftbewehrung(
-            durchmesser=g("durchmesser"),
-            stahl=stahl,
-            abstand_x=g("abstand_x"),
-            abstand_y=g("abstand_y") if self.ueber_teilung_y else None,
-            anzahl_y=None if self.ueber_teilung_y else self.anzahl_y,
-            alpha_min=self.alpha_min,
-            alpha_max=self.alpha_max,
-        )
 
 
 @dataclass

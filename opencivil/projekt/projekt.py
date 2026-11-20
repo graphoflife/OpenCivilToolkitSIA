@@ -27,7 +27,7 @@ from opencivil.ergebnis import Ergebnis
 from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.beton import ERSTER_BETON
 from opencivil.material.betonstahl import ERSTER_STAHL
-from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag, PostenEintrag
+from opencivil.projekt.eintraege import Beschreibung, MaterialEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.balkensystem3d import Balkensystem3dEintrag
 from opencivil.projekt.erdbeben import ErdbebenEintrag
@@ -37,7 +37,7 @@ from opencivil.projekt.lesen import (
     ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort, ort_von,
 )
 from opencivil.projekt.netz import neue_kennung
-from opencivil.projekt.platte import QuerschnittEintrag
+from opencivil.projekt.platte import PostenEintrag, QuerschnittEintrag
 from opencivil.projekt.skript import SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.projekt.setzung import SetzungEintrag

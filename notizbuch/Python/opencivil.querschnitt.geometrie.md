@@ -1,5 +1,5 @@
 ---
-erzeugt: 256f9354b0cb
+erzeugt: 4ab8034e06e0
 art: modul
 tags: [modul]
 ---
@@ -541,7 +541,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.projekt.aufbau.durchstanzen]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.beispiele]]
-- [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]

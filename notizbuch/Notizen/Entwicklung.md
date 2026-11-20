@@ -7,6 +7,20 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Grosse Dateien geteilt
+
+Punkt 8 der Durchsicht vom 2026-11-19: Dateien nahe an 1000 Zeilen werden
+geteilt, nach dem, was zusammengehört.
+
+- `projekt/eintraege.py` (910 Zeilen) gab Posten, Lage, die Obergrenze der
+  Bewehrungssuche und die Bügel an `projekt/platte.py` ab: nur die Platte
+  hat sie. Übrig bleibt, was mehrere Bauteile teilen – Material,
+  Lastfälle, Rechenwahlen und die Angaben, die Platte und gezeichneter
+  Querschnitt gleich machen (750 Zeilen).
+
+Warum: Wer die Platte liest, fand ihre Teile in einer anderen Datei, und
+wer die gemeinsamen Teile suchte, las an den Lagen der Platte vorbei.
+
 ## 2026-11-20 · Die Platte rechnet als Rechteck mit Stäben
 
 Die Platte rechnete ihren Querschnitt ein zweites Mal (Punkt 4 der

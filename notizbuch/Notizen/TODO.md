@@ -538,8 +538,10 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         erfüllt/nicht erfüllt viermal, Legenden von Hand. Umbau:
         `bemessungspunkt` und `legende` neben `achsenkreuz`.
       - `interaktion.py`, 901: die Fläche der Widerstände, die nur ein Bild
-        liest, in ein eigenes Modul. `eintraege.py`, 879: Posten, Lage und
-        Bügel, die nur die Platte braucht, nach `projekt/platte.py`.
+        liest, in ein eigenes Modul.
+      - Erledigt (2026-11-20): `eintraege.py`, 910 Zeilen – Posten, Lage,
+        Obergrenze und Bügel, die nur die Platte braucht, stehen in
+        `projekt/platte.py`; `eintraege.py` hat noch 750.
 - [ ] **9. Kleiner.**
       - Drainiert und undrainiert: im Pfahl ein Schalter, zwölfmal
         abgefragt; im Grundbruch heisst φ = 0 undrainiert. Der Erdwiderstand
