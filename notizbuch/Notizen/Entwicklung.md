@@ -17,9 +17,16 @@ geteilt, nach dem, was zusammengehört.
   hat sie. Übrig bleibt, was mehrere Bauteile teilen – Material,
   Lastfälle, Rechenwahlen und die Angaben, die Platte und gezeichneter
   Querschnitt gleich machen (750 Zeilen).
+- `querschnitt/interaktion.py` (922 Zeilen) gab die Fläche der Widerstände
+  ab, den Schnitt durch alle Bruchzustände, den nur das
+  Interaktionsdiagramm der Querschnittsanalyse liest:
+  `querschnitt/widerstandsflaeche.py`. Ihre Stufen merkt sich das neue
+  Modul je Querschnitt, solange es ihn gibt; vorher trug der Querschnitt
+  sie selbst. Die Tests der Fläche stehen in `test_widerstandsflaeche.py`.
 
 Warum: Wer die Platte liest, fand ihre Teile in einer anderen Datei, und
-wer die gemeinsamen Teile suchte, las an den Lagen der Platte vorbei.
+wer die gemeinsamen Teile suchte, las an den Lagen der Platte vorbei. Wer
+den Bruchzustand liest, muss nicht mehr am Bild vorbei.
 
 ## 2026-11-20 · Die Platte rechnet als Rechteck mit Stäben
 

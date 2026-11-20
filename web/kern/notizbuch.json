@@ -7666,14 +7666,10 @@
         "Querschnitt.bei_normalkraft",
         "Querschnitt.neigung_fuer",
         "Querschnitt.in_richtung",
-        "Querschnitt.schnitt",
-        "Querschnitt._flaechenstufen",
         "Querschnitt.anteile",
         "Querschnitt.dehnung",
         "Querschnitt.zugbewehrung",
-        "Querschnitt.druckzone",
-        "_bei_n_gelesen",
-        "_schnittstellen"
+        "Querschnitt.druckzone"
       ]
     },
     {
@@ -7893,6 +7889,18 @@
         "Dehnungsebene.bei",
         "Dehnungsebene.kruemmung",
         "Dehnungsebene.nulllinie"
+      ]
+    },
+    {
+      "name": "opencivil.querschnitt.widerstandsflaeche",
+      "pfad": "Python/opencivil.querschnitt.widerstandsflaeche.md",
+      "art": "modul",
+      "kurz": "die Flaeche aller Bruchzustaende, geschnitten.",
+      "stichworte": [
+        "schnitt",
+        "_flaechenstufen",
+        "_bei_n_gelesen",
+        "_schnittstellen"
       ]
     },
     {

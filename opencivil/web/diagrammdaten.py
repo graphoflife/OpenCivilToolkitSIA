@@ -31,6 +31,7 @@ from opencivil.querschnitt.werkstoffgesetz import (
 from opencivil.nachweis.resistenzlinie import Handlinie
 from opencivil.nachweis.schubwandnachweis import OHNE_SCHUB, Schubbefund, schub_belastet
 from opencivil.projekt import Aufbau
+from opencivil.querschnitt import widerstandsflaeche
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web.anzeige import Anzeigegroesse, si, zahl
 
@@ -728,7 +729,8 @@ def _interaktion(q, einachsig: bool, fest: str, wert: float) -> dict:
         return {"fest": None, "wert": None,
                 "punkte": _als_kn((p.N, p.M_y, p.M_z) for p in _faecherpaar(q, -math.pi / 2.0))}
     return {"fest": fest, "wert": wert,
-            "punkte": _als_kn(q.schnitt(fest, si(wert, KN if fest == "N" else KNM)))}
+            "punkte": _als_kn(widerstandsflaeche.schnitt(
+                q, fest, si(wert, KN if fest == "N" else KNM)))}
 
 
 def _tiefe(eltern: Sequence[Optional[int]], i: int) -> int:

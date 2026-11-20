@@ -1,5 +1,5 @@
 ---
-erzeugt: f4367ce2a07e
+erzeugt: 8aad329dcbc5
 art: modul
 tags: [modul]
 ---
@@ -439,8 +439,8 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.projekt]]
 - [[opencivil.projekt.mappe]]
 - [[opencivil.projekt.staebe]]
-- [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.vorlagen]]
+- [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.deckendaten]]

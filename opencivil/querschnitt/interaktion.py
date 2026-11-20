@@ -44,7 +44,8 @@ mit eigenen Grenzen und eigenen Fasern.
 DIE FLAECHE DER WIDERSTAENDE:
 Alle Bruchzustaende zusammen bilden im Raum (N, M_y, M_z) eine geschlossene
 Flaeche; jeder Faecher ist eine Linie darauf. Ein Interaktionsdiagramm ist ein
-Schnitt durch sie, bei festem N, M_y oder M_z (:meth:`Querschnitt.schnitt`).
+Schnitt durch sie, bei festem N, M_y oder M_z -- das liest nur ein Bild, und
+es steht in :mod:`opencivil.querschnitt.widerstandsflaeche`.
 
 DER WIDERSTAND EINER EINWIRKUNG:
 Bei festem N und fester Richtung des Moments: auf dem Faecher der Neigung ψ
@@ -103,10 +104,6 @@ FAECHER_LUECKE = 0.05
 #: Wie oft eine Luecke im Faecher hoechstens halbiert wird.
 FAECHER_TIEFE = 8
 
-#: Stuetzstellen je Abschnitt fuer die Flaeche der Widerstaende -- weniger als
-#: fuer eine Linie; die Luecken fuellt das Halbieren.
-FLAECHE_SCHRITTE = 8
-
 #: Stuetzstellen je Abschnitt, um die Stelle ``N = N_Ed`` einzugrenzen. Wenige
 #: genuegen: innerhalb eines Abschnitts aendert sich N glatt, und das
 #: Illinois-Verfahren findet die Stelle danach in wenigen Schritten.
@@ -123,16 +120,6 @@ WINKEL_SCHRANKE = 1e-7
 
 #: Teile einer verschmierten Stablinie: alle so viele Meter ein Stueck.
 LINIENSTUECK = 0.02
-
-#: Neigungen, mit denen die Flaeche der Widerstaende abgetastet wird -- alle 5°.
-FLAECHE_NEIGUNGEN = 72
-
-#: Stufen in N, auf denen die Flaeche bei festem Moment geschnitten wird. Zu den
-#: Enden hin dichter, wo sie sich zum reinen Zug und Druck schliesst.
-SCHNITT_STUFEN = 120
-
-#: Wonach geschnitten werden kann.
-GROESSEN = ("N", "M_y", "M_z")
 
 
 # ===========================================================================
@@ -336,7 +323,6 @@ class Querschnitt:
         # Suche noch einmal.
         self._bei_n: Dict[Tuple[float, float], Optional[Bruchpunkt]] = {}
         self._in_richtung: Dict[Tuple[float, float], Optional[Bruchpunkt]] = {}
-        self._stufen: Dict[int, List[Tuple[float, List[Punkt]]]] = {}
 
     # -- Je Neigung ---------------------------------------------------------
 
@@ -745,61 +731,6 @@ class Querschnitt:
             schritt = min(2.0 * schritt, math.radians(45.0))
         return punkt  # nicht eingegrenzt -- kommt bei einem Querschnitt nicht vor
 
-    # -- Die Flaeche der Widerstaende -------------------------------------------
-
-    def schnitt(self, fest: str, wert: float,
-                neigungen: int = FLAECHE_NEIGUNGEN) -> List[Tuple[float, float, float]]:
-        """
-        Die Flaeche aller Bruchzustaende im Raum (N, M_y, M_z), geschnitten bei
-        einem festen Wert von N, M_y oder M_z: ein geschlossener Zug von Punkten
-        ``(N, M_y, M_z)``, auf dem die feste Groesse diesen Wert hat. Leer, wo
-        die Ebene die Flaeche nicht trifft.
-
-        Bei festem N je Neigung der Punkt des Faechers mit diesem N -- dieselbe
-        Suche wie im Nachweis. Bei festem Moment die Faecher aller Neigungen,
-        je auf Stufen in N gelesen; auf jeder Stufe schneidet die Gerade des
-        festen Moments den Umriss in zwei Punkten. Zwischen den Stuetzstellen
-        eines Faechers wird dabei linear gelesen: genau genug fuer ein Bild,
-        nachgewiesen wird damit nichts.
-        """
-        if fest == "N":
-            punkte = [self.bei_normalkraft(2.0 * math.pi * k / neigungen, wert)
-                      for k in range(neigungen)]
-            return [(p.N, p.M_y, p.M_z) for p in punkte if p is not None]
-        if fest not in GROESSEN:
-            raise ValueError(f"Geschnitten wird bei N, M_y oder M_z, nicht bei '{fest}'.")
-        achse = 0 if fest == "M_y" else 1
-        rechts: List[Tuple[float, float]] = []
-        links: List[Tuple[float, float]] = []
-        for N, umriss in self._flaechenstufen(neigungen):
-            andere = _schnittstellen(umriss, achse, wert)
-            if andere:
-                rechts.append((N, max(andere)))
-                links.append((N, min(andere)))
-        zug = rechts + list(reversed(links))
-        if achse == 0:
-            return [(N, wert, m) for N, m in zug]
-        return [(N, m, wert) for N, m in zug]
-
-    def _flaechenstufen(self, neigungen: int) -> List[Tuple[float, List[Punkt]]]:
-        """
-        Je Stufe in N der Umriss ``(M_y, M_z)`` ueber alle Neigungen -- aus den
-        Faechern, einmal je Querschnitt. Die Stufen liegen wie die Knoten von
-        Tschebyschow zwischen reinem Zug und reinem Druck, ohne die Enden: dort
-        zieht sich der Umriss auf einen Punkt zusammen.
-        """
-        if neigungen not in self._stufen:
-            zug, druck = self.normalkraft_grenzen()
-            mitte, halb = (zug + druck) / 2.0, (zug - druck) / 2.0
-            faecher = [self.faecher(2.0 * math.pi * k / neigungen, FLAECHE_SCHRITTE)
-                       for k in range(neigungen)]
-            stufen = []
-            for j in range(SCHNITT_STUFEN):
-                N = mitte + halb * math.cos(math.pi * (j + 0.5) / SCHNITT_STUFEN)
-                stufen.append((N, [_bei_n_gelesen(f, N) for f in faecher]))
-            self._stufen[neigungen] = stufen
-        return self._stufen[neigungen]
-
     # -- Aufschluesselung ---------------------------------------------------
 
     def anteile(self, punkt: Bruchpunkt) -> List[Kraftanteil]:
@@ -882,41 +813,3 @@ class Querschnitt:
         flaeche = sum(s.flaeche for _, s in zug)
         d = sum(v * s.flaeche for v, s in zug) / flaeche - rand if flaeche > 0.0 else 0.0
         return x, d
-
-
-def _bei_n_gelesen(faecher: Sequence[Bruchpunkt], N: float) -> Punkt:
-    """
-    ``(M_y, M_z)`` auf einem Faecher bei diesem N, linear zwischen den beiden
-    Stuetzstellen, zwischen denen N liegt. Vom Zug zum Druck nimmt N ab.
-    """
-    unten, oben = 0, len(faecher) - 1
-    if N >= faecher[unten].N:
-        return faecher[unten].M_y, faecher[unten].M_z
-    if N <= faecher[oben].N:
-        return faecher[oben].M_y, faecher[oben].M_z
-    while oben - unten > 1:
-        mitte = (unten + oben) // 2
-        if faecher[mitte].N >= N:
-            unten = mitte
-        else:
-            oben = mitte
-    a, b = faecher[unten], faecher[oben]
-    t = (a.N - N) / (a.N - b.N) if a.N != b.N else 0.0
-    return a.M_y + t * (b.M_y - a.M_y), a.M_z + t * (b.M_z - a.M_z)
-
-
-def _schnittstellen(umriss: Sequence[Punkt], achse: int, wert: float) -> List[float]:
-    """
-    Wo die Gerade ``Punkt[achse] = wert`` den geschlossenen Umriss kreuzt --
-    die andere Koordinate jeder Stelle.
-    """
-    andere = 1 - achse
-    stellen: List[float] = []
-    for i, a in enumerate(umriss):
-        b = umriss[(i + 1) % len(umriss)]
-        da, db = a[achse] - wert, b[achse] - wert
-        if da == 0.0:
-            stellen.append(a[andere])
-        elif da * db < 0.0:
-            stellen.append(a[andere] + da / (da - db) * (b[andere] - a[andere]))
-    return stellen

@@ -537,8 +537,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - `platte_bilder.js`, 941: der Bemessungspunkt dreimal, das Farbpaar
         erfüllt/nicht erfüllt viermal, Legenden von Hand. Umbau:
         `bemessungspunkt` und `legende` neben `achsenkreuz`.
-      - `interaktion.py`, 901: die Fläche der Widerstände, die nur ein Bild
-        liest, in ein eigenes Modul.
+      - Erledigt (2026-11-20): `interaktion.py`, 922 Zeilen – die Fläche
+        der Widerstände, die nur ein Bild liest, steht in
+        `querschnitt/widerstandsflaeche.py`; `interaktion.py` hat noch 815.
       - Erledigt (2026-11-20): `eintraege.py`, 910 Zeilen – Posten, Lage,
         Obergrenze und Bügel, die nur die Platte braucht, stehen in
         `projekt/platte.py`; `eintraege.py` hat noch 750.

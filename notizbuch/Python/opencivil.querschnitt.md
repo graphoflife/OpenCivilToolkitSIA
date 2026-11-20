@@ -1,5 +1,5 @@
 ---
-erzeugt: 92b4a4727240
+erzeugt: 98927e6a3871
 art: modul
 tags: [modul]
 ---
@@ -30,4 +30,5 @@ schiefer Biegung, Querkraft und Torsion auf Schubwaende.
 - [[opencivil.querschnitt.torsion]] – das Torsionstraegheitsmoment eines gezeichneten Querschnitts.
 - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
 - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
+- [[opencivil.querschnitt.widerstandsflaeche]] – die Flaeche aller Bruchzustaende, geschnitten.
 - [[opencivil.querschnitt.zugseite]] – welche Seite ein Moment zieht.

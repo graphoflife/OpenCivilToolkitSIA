@@ -1,5 +1,5 @@
 ---
-erzeugt: 6236e54e3dab
+erzeugt: 4b335c5f891e
 art: modul
 tags: [modul]
 ---
@@ -61,7 +61,8 @@ mit eigenen Grenzen und eigenen Fasern.
 
 Alle Bruchzustaende zusammen bilden im Raum (N, M_y, M_z) eine geschlossene
 Flaeche; jeder Faecher ist eine Linie darauf. Ein Interaktionsdiagramm ist ein
-Schnitt durch sie, bei festem N, M_y oder M_z ([[opencivil.querschnitt.interaktion#Querschnitt.schnitt|Querschnitt.schnitt]]).
+Schnitt durch sie, bei festem N, M_y oder M_z -- das liest nur ein Bild, und
+es steht in [[opencivil.querschnitt.widerstandsflaeche]].
 
 
 ## DER WIDERSTAND EINER EINWIRKUNG
@@ -384,35 +385,6 @@ Schritten, bis die Abweichung das Vorzeichen wechselt -- dann
 Illinois. `None`, wenn N jenseits der reinen Zug- oder Druckkraft
 liegt.
 
-#### Querschnitt.schnitt
-
-```python
-def schnitt(self, fest: str, wert: float, neigungen: int=FLAECHE_NEIGUNGEN) -> List[Tuple[float, float, float]]
-```
-
-Die Flaeche aller Bruchzustaende im Raum (N, M_y, M_z), geschnitten bei
-einem festen Wert von N, M_y oder M_z: ein geschlossener Zug von Punkten
-`(N, M_y, M_z)`, auf dem die feste Groesse diesen Wert hat. Leer, wo
-die Ebene die Flaeche nicht trifft.
-
-Bei festem N je Neigung der Punkt des Faechers mit diesem N -- dieselbe
-Suche wie im Nachweis. Bei festem Moment die Faecher aller Neigungen,
-je auf Stufen in N gelesen; auf jeder Stufe schneidet die Gerade des
-festen Moments den Umriss in zwei Punkten. Zwischen den Stuetzstellen
-eines Faechers wird dabei linear gelesen: genau genug fuer ein Bild,
-nachgewiesen wird damit nichts.
-
-#### Querschnitt._flaechenstufen
-
-```python
-def _flaechenstufen(self, neigungen: int) -> List[Tuple[float, List[Punkt]]]
-```
-
-Je Stufe in N der Umriss `(M_y, M_z)` ueber alle Neigungen -- aus den
-Faechern, einmal je Querschnitt. Die Stufen liegen wie die Knoten von
-Tschebyschow zwischen reinem Zug und reinem Druck, ohne die Enden: dort
-zieht sich der Umriss auf einen Punkt zusammen.
-
 #### Querschnitt.anteile
 
 ```python
@@ -464,24 +436,6 @@ d reicht bis zum Schwerpunkt der Zugbewehrung ([[opencivil.querschnitt.interakti
 wie das Zeichen d in SIA 262:2025 definiert ist. Ohne Zugbewehrung ist
 d null, ohne Beton beides null.
 
-### _bei_n_gelesen
-
-```python
-def _bei_n_gelesen(faecher: Sequence[Bruchpunkt], N: float) -> Punkt
-```
-
-`(M_y, M_z)` auf einem Faecher bei diesem N, linear zwischen den beiden
-Stuetzstellen, zwischen denen N liegt. Vom Zug zum Druck nimmt N ab.
-
-### _schnittstellen
-
-```python
-def _schnittstellen(umriss: Sequence[Punkt], achse: int, wert: float) -> List[float]
-```
-
-Wo die Gerade `Punkt[achse] = wert` den geschlossenen Umriss kreuzt --
-die andere Koordinate jeder Stelle.
-
 
 ## Konstanten
 
@@ -490,14 +444,10 @@ die andere Koordinate jeder Stelle.
 - `FAECHER_SEHNE = 0.001` – Wie weit die Linie eines Faechers hoechstens von der Sehne zwischen zwei Stuetzstellen abweichen darf -- als Teil des groessten Moments. Gleichmaessig in der Kruemmung verteilt, liegen die Stuetzstellen dort weit auseinander, wo die Nulllinie den Rand erreicht: N sprang am Unterzug zwischen zwei Stellen von -1762 auf -3267 kN, und die Linie dazwischen war eine Sehne.
 - `FAECHER_LUECKE = 0.05` – Wie weit zwei Stuetzstellen in N hoechstens auseinanderliegen, als Teil der ganzen Spanne -- auch wo die Linie gerade ist, damit ein Ablesen bei einem N zwischen ihnen nicht ueber einen Knick hinweg greift.
 - `FAECHER_TIEFE = 8` – Wie oft eine Luecke im Faecher hoechstens halbiert wird.
-- `FLAECHE_SCHRITTE = 8` – Stuetzstellen je Abschnitt fuer die Flaeche der Widerstaende -- weniger als fuer eine Linie; die Luecken fuellt das Halbieren.
 - `SUCHSCHRITTE = 4` – Stuetzstellen je Abschnitt, um die Stelle `N = N_Ed` einzugrenzen. Wenige genuegen: innerhalb eines Abschnitts aendert sich N glatt, und das Illinois-Verfahren findet die Stelle danach in wenigen Schritten.
 - `EPS_ZUG_OHNE_GRENZE = 0.045` – Groesste Zugdehnung, wo kein Werkstoff eine nennt -- ein Querschnitt ganz ohne Bewehrung. Beton traegt keinen Zug; die Grenze legt nur fest, wo der Faecher beginnt.
 - `WINKEL_SCHRANKE = 1e-07` – Wann zwei Richtungen des Moments als gleich gelten, im Bogenmass. Ein Zehnmillionstel verschiebt den Widerstand um weniger, als je gedruckt wird.
 - `LINIENSTUECK = 0.02` – Teile einer verschmierten Stablinie: alle so viele Meter ein Stueck.
-- `FLAECHE_NEIGUNGEN = 72` – Neigungen, mit denen die Flaeche der Widerstaende abgetastet wird -- alle 5°.
-- `SCHNITT_STUFEN = 120` – Stufen in N, auf denen die Flaeche bei festem Moment geschnitten wird. Zu den Enden hin dichter, wo sie sich zum reinen Zug und Druck schliesst.
-- `GROESSEN = ('N', 'M_y', 'M_z')` – Wonach geschnitten werden kann.
 
 ## Braucht
 
@@ -521,5 +471,5 @@ die andere Koordinate jeder Stelle.
 - [[opencivil.pfahl.quer]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.bewehrungselemente]]
+- [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.spannungsanalyse.schnitt]]
-- [[opencivil.web.dienst]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 57f3014cb2f7
+erzeugt: 03c44ee34066
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -183,6 +183,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.querschnitt.torsion]] – das Torsionstraegheitsmoment eines gezeichneten Querschnitts.
     - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
     - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
+    - [[opencivil.querschnitt.widerstandsflaeche]] – die Flaeche aller Bruchzustaende, geschnitten.
     - [[opencivil.querschnitt.zugseite]] – welche Seite ein Moment zieht.
 - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
     - [[opencivil.spannungsanalyse.analysen]] – die Analysen eines Projekts.
