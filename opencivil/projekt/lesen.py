@@ -68,7 +68,35 @@ from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 
 
 class ProjektFehler(Exception):
-    """Die Projektbeschreibung ist in sich nicht stimmig."""
+    """
+    Die Projektbeschreibung ist in sich nicht stimmig. ``grund`` sagt, was
+    nicht stimmt, als Satz mit Punkt; ``wo``, wo -- wie der Eintrag in
+    Meldungen heisst (:func:`ort`), «Platte 'Decke'», tiefer «Pfahl 'P',
+    Schicht 2» --, leer, wo es das ganze Projekt betrifft. Die Meldung ist
+    beides: «Platte 'Decke': noch keine Bewehrung.»
+
+    Bis 2026-11-20 stand der Ort nur im Text, und wer den Grund an seiner
+    Stelle brauchte, schnitt ihn wieder heraus.
+    """
+
+    def __init__(self, grund: str, *, wo: str = "") -> None:
+        super().__init__(f"{wo}: {grund}" if wo else grund)
+        self.grund = grund
+        self.wo = wo
+
+    def grund_bei(self, wo: str) -> str:
+        """
+        Der Fehler, wie er an der Stelle ``wo`` steht, ohne Punkt am Ende:
+        dort nur der Grund, unter ihr mit dem Rest des Orts -- «Schicht 2:
+        …» bei «Pfahl 'P'» --, anderswo die ganze Meldung.
+        """
+        if self.wo == wo:
+            text = self.grund
+        elif self.wo.startswith(f"{wo}, "):
+            text = f"{self.wo[len(wo) + 2:]}: {self.grund}"
+        else:
+            text = str(self)
+        return text.removesuffix(".")
 
 
 # ===========================================================================
@@ -112,8 +140,8 @@ class Bereich:
                 and (self.bis is None or wert <= self.bis)
                 and (self.unter is None or wert < self.unter)):
             return
-        raise ProjektFehler(f"{wo}: {self.heisst} {self.verlangt}, angegeben ist "
-                            f"{self._zahl(wert)}.")
+        raise ProjektFehler(f"{self.heisst} {self.verlangt}, angegeben ist "
+                            f"{self._zahl(wert)}.", wo=wo)
 
     @property
     def verlangt(self) -> str:
@@ -139,8 +167,8 @@ class Bereich:
                     grenze: Optional[float], wo: str) -> None:
         """Haelt auf, was :attr:`bis_feld` verletzt: die Zahl ueber der des anderen Feldes."""
         if wert is not None and grenze is not None and wert > grenze:
-            raise ProjektFehler(f"{wo}: {self.gegen(anderer)[0]}, angegeben sind "
-                                f"{self._zahl(wert)} und {anderer._zahl(grenze)}.")
+            raise ProjektFehler(f"{self.gegen(anderer)[0]}, angegeben sind "
+                                f"{self._zahl(wert)} und {anderer._zahl(grenze)}.", wo=wo)
 
     def _zahl(self, wert: float) -> str:
         """Eine Zahl mit der Einheit des Feldes: «300 mm», «30°», «0.9»."""
@@ -288,8 +316,8 @@ def unbekanntes_feld(wo: str, name: Any, felder: Iterable[str]) -> ProjektFehler
     derselbe Satz.
     """
     aehnlich = difflib.get_close_matches(str(name), list(felder), n=1)
-    return ProjektFehler(f"{wo}: ein Feld '{name}' gibt es nicht."
-                         + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
+    return ProjektFehler(f"ein Feld '{name}' gibt es nicht."
+                         + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""), wo=wo)
 
 
 def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
@@ -307,8 +335,8 @@ def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
         felder_pruefen(roh, wo)
         return roh
     if not isinstance(roh, Mapping):
-        raise ProjektFehler(f"{wo}: hier gehört ein Eintrag mit Feldern hin, "
-                            f"nicht {_zeigen(roh)}.")
+        raise ProjektFehler(f"hier gehört ein Eintrag mit Feldern hin, "
+                            f"nicht {_zeigen(roh)}.", wo=wo)
     felder = {f.name: f for f in dataclasses.fields(cls) if f.init}
     for schluessel in roh:
         if schluessel not in felder:
@@ -320,7 +348,7 @@ def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
         if name in roh:
             werte[name] = _wert_lesen(roh[name], typen[name], wo, name, vorbild)
         elif vorbild is _KEINE:
-            raise ProjektFehler(f"{wo}: das Feld '{name}' fehlt.")
+            raise ProjektFehler(f"das Feld '{name}' fehlt.", wo=wo)
         elif basis is not None:
             werte[name] = copy.deepcopy(vorbild)
     eintrag = cls(**werte)
@@ -344,7 +372,8 @@ def _wert_lesen(roh: Any, typ: Any, wo: str, feld: str, vorbild: Any) -> Any:
         return lesen(innen, roh, f"{wo}, {feld}", basis)
     if art == "liste":
         if not isinstance(roh, list):
-            raise ProjektFehler(f"{wo}: '{feld}' muss eine Liste sein, nicht {_zeigen(roh)}.")
+            raise ProjektFehler(f"'{feld}' muss eine Liste sein, nicht {_zeigen(roh)}.",
+                                wo=wo)
         innere, _ = _art(innen)
         if innere == "eintrag":
             return [lesen(innen, element, _ort_roh(element, innen, wo, feld, i))
@@ -352,8 +381,8 @@ def _wert_lesen(roh: Any, typ: Any, wo: str, feld: str, vorbild: Any) -> Any:
         return [_zahl_lesen(element, innen) for element in roh]
     if art == "zuordnung":
         if not isinstance(roh, Mapping):
-            raise ProjektFehler(f"{wo}: '{feld}' muss eine Zuordnung sein, "
-                                f"nicht {_zeigen(roh)}.")
+            raise ProjektFehler(f"'{feld}' muss eine Zuordnung sein, "
+                                f"nicht {_zeigen(roh)}.", wo=wo)
         return {schluessel: _zahl_lesen(wert, innen) for schluessel, wert in roh.items()}
     return _zahl_lesen(roh, typ)
 
@@ -441,28 +470,29 @@ def _wert_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str, tief: bool
         return
     if art == "eintrag":
         if not isinstance(wert, innen):
-            raise ProjektFehler(f"{wo}: '{f.name}' muss ein {innen.__name__} sein, "
-                                f"nicht {_zeigen(wert)}.")
+            raise ProjektFehler(f"'{f.name}' muss ein {innen.__name__} sein, "
+                                f"nicht {_zeigen(wert)}.", wo=wo)
         if tief:
             felder_pruefen(wert, f"{wo}, {f.name}")
         return
     if art == "liste":
         if not isinstance(wert, list):
-            raise ProjektFehler(f"{wo}: '{f.name}' muss eine Liste sein, nicht {_zeigen(wert)}.")
+            raise ProjektFehler(f"'{f.name}' muss eine Liste sein, nicht {_zeigen(wert)}.",
+                                wo=wo)
         innere, _ = _art(innen)
         for i, element in enumerate(wert):
             if innere != "eintrag":
                 _blatt_pruefen(element, innen, f, wo)
             elif not isinstance(element, innen):
-                raise ProjektFehler(f"{wo}: in '{f.name}' gehört ein {innen.__name__} hin, "
-                                    f"nicht {_zeigen(element)}.")
+                raise ProjektFehler(f"in '{f.name}' gehört ein {innen.__name__} hin, "
+                                    f"nicht {_zeigen(element)}.", wo=wo)
             elif tief:
                 felder_pruefen(element, _ort_von(element, wo, f.name, i))
         return
     if art == "zuordnung":
         if not isinstance(wert, dict) or not all(isinstance(k, str) for k in wert):
-            raise ProjektFehler(f"{wo}: '{f.name}' muss eine Zuordnung sein, "
-                                f"nicht {_zeigen(wert)}.")
+            raise ProjektFehler(f"'{f.name}' muss eine Zuordnung sein, "
+                                f"nicht {_zeigen(wert)}.", wo=wo)
         for schluessel, element in wert.items():
             _blatt_pruefen(element, innen, f, f"{wo}, {f.name} '{schluessel}'")
         return
@@ -474,30 +504,32 @@ def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None:
     if _ist_wahl(typ):
         moeglich = f.metadata.get("wahl") or tuple(typ)
         if not isinstance(wert, typ) or wert not in moeglich:
-            raise ProjektFehler(f"{wo}: {_zeigen(wert)} gibt es als '{f.name}' nicht. "
-                                f"Möglich sind: {', '.join(str(m) for m in moeglich)}.")
+            raise ProjektFehler(f"{_zeigen(wert)} gibt es als '{f.name}' nicht. "
+                                f"Möglich sind: {', '.join(str(m) for m in moeglich)}.", wo=wo)
         return
     if typ is str:
         if not isinstance(wert, str):
-            raise ProjektFehler(f"{wo}: '{f.name}' muss ein Text sein, nicht {_zeigen(wert)}.")
+            raise ProjektFehler(f"'{f.name}' muss ein Text sein, nicht {_zeigen(wert)}.",
+                                wo=wo)
         if not wert and _vorgabe(f) is _KEINE and not _ist_name(f):
-            raise ProjektFehler(f"{wo}: '{f.name}' darf nicht leer sein.")
+            raise ProjektFehler(f"'{f.name}' darf nicht leer sein.", wo=wo)
     elif typ is bool:
         if not isinstance(wert, bool):
-            raise ProjektFehler(f"{wo}: '{f.name}' ist ein Schalter, true oder false – "
-                                f"nicht {_zeigen(wert)}.")
+            raise ProjektFehler(f"'{f.name}' ist ein Schalter, true oder false – "
+                                f"nicht {_zeigen(wert)}.", wo=wo)
     elif typ is int:
         if isinstance(wert, bool) or not isinstance(wert, int):
-            raise ProjektFehler(f"{wo}: '{f.name}' muss eine ganze Zahl sein, "
-                                f"nicht {_zeigen(wert)}.")
+            raise ProjektFehler(f"'{f.name}' muss eine ganze Zahl sein, "
+                                f"nicht {_zeigen(wert)}.", wo=wo)
     elif typ is float:
         if isinstance(wert, bool) or not isinstance(wert, (int, float)) \
                 or not math.isfinite(wert):
-            raise ProjektFehler(f"{wo}: '{f.name}' muss eine Zahl sein, nicht {_zeigen(wert)}.")
+            raise ProjektFehler(f"'{f.name}' muss eine Zahl sein, nicht {_zeigen(wert)}.",
+                                wo=wo)
     moeglich = f.metadata.get("wahl")
     if moeglich is not None and wert not in moeglich:
-        raise ProjektFehler(f"{wo}: {_zeigen(wert)} gibt es als '{f.name}' nicht. "
-                            f"Möglich sind: {', '.join(str(m) for m in moeglich)}.")
+        raise ProjektFehler(f"{_zeigen(wert)} gibt es als '{f.name}' nicht. "
+                            f"Möglich sind: {', '.join(str(m) for m in moeglich)}.", wo=wo)
 
 
 def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
@@ -515,7 +547,7 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
     Leerzeichen sagt «noch kein Name», wie das Namensfeld ihn abweist.
     """
     if any(_ist_name(f) for f in dataclasses.fields(eintrag)) and not eintrag.name.strip():
-        raise ProjektFehler(f"{wo}: noch kein Name.")
+        raise ProjektFehler("noch kein Name.", wo=wo)
     for f in dataclasses.fields(eintrag):
         if f.name in ohne:
             continue

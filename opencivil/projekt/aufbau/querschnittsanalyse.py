@@ -12,11 +12,11 @@ Zeichnung wird kein Bauteil, nur ein Hinweis.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping, Optional
+from typing import TYPE_CHECKING, Mapping
 
 from opencivil.core.einheiten import KN, KNM
 from opencivil.material.basis import Baustoff
-from opencivil.projekt.lesen import ort_von
+from opencivil.projekt.lesen import ProjektFehler, ort_von
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
 from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 
 
 def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
-          aufbau: Aufbau) -> Optional[Bauteil]:
+          aufbau: Aufbau) -> Bauteil:
     """
     Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
 
@@ -54,13 +54,12 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
     stimmt, und der Rest rechnet weiter (:meth:`Aufbau.unfertig`).
     """
-    wo = f"Querschnittsanalyse '{eintrag.name}'"
     if eintrag.leer:
-        return aufbau.unfertig(art.liste, eintrag, wo, "noch nichts gezeichnet")
+        raise ProjektFehler("noch nichts gezeichnet.", wo=ort_von(eintrag))
     try:
         analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     except GeometrieFehler as fehler:
-        return aufbau.unfertig(art.liste, eintrag, wo, str(fehler).rstrip("."))
+        raise ProjektFehler(str(fehler), wo=ort_von(eintrag)) from None
     analyse.ins_rechenwerk(aufbau.werk)
     teil = Bauteil(eintrag, art, analyse)
 

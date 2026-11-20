@@ -162,17 +162,17 @@ class GrundbruchEintrag(BauteilEintrag):
         """
         if self.L < self.b:
             raise ProjektFehler(
-                f"{wo}: b ist die kürzere Seite des Fundaments – die Länge L = {self.L:g} m "
-                f"muss mindestens so gross sein wie die Breite b = {self.b:g} m.")
+                f"b ist die kürzere Seite des Fundaments – die Länge L = {self.L:g} m "
+                f"muss mindestens so gross sein wie die Breite b = {self.b:g} m.", wo=wo)
         # Nur drainiert: undrainiert gibt es kein gamma', und gamma_w ist ausgeblendet.
         if self.verhalten is Verhalten.DRAINIERT and self.gamma <= self.gamma_w:
             raise ProjektFehler(
-                f"{wo}: die Raumlast des Bodens γ = {self.gamma:g} kN/m³ muss grösser sein "
+                f"die Raumlast des Bodens γ = {self.gamma:g} kN/m³ muss grösser sein "
                 f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ – sonst ist γ' nicht "
-                f"positiv.")
+                f"positiv.", wo=wo)
         # Wie beim Pfahl, je Schicht (``PfahlEintrag._festigkeiten``).
         if self.verhalten is Verhalten.DRAINIERT and self.phi_k <= 0.0:
-            raise ProjektFehler(f"{wo}: drainiert braucht φ_k über null; ohne Reibung "
-                                f"undrainiert rechnen, mit s_u,k.")
+            raise ProjektFehler(f"drainiert braucht φ_k über null; ohne Reibung "
+                                f"undrainiert rechnen, mit s_u,k.", wo=wo)
         if self.verhalten is Verhalten.UNDRAINIERT and self.s_u <= 0.0:
-            raise ProjektFehler(f"{wo}: undrainiert braucht s_u,k über null.")
+            raise ProjektFehler("undrainiert braucht s_u,k über null.", wo=wo)

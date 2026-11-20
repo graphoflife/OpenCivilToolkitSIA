@@ -1,5 +1,5 @@
 ---
-erzeugt: 45bb6139dbad
+erzeugt: 14d16bf37741
 art: modul
 tags: [modul]
 ---
@@ -20,7 +20,7 @@ Tragrichtung x ([[opencivil.projekt.aufbau.platte#bauen|bauen]]).
 ### bauen
 
 ```python
-def bauen(art: 'Bauteilart', eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Optional[Bauteil]
+def bauen(art: 'Bauteilart', eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
 Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen --

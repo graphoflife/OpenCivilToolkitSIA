@@ -375,7 +375,8 @@ class DeckeEintrag(MitFaellen, BauteilEintrag):
         """
         p = next((x for x in self.platten if x.kennung == kennung_von(platte)), None)
         if p is None:
-            raise ProjektFehler(f"Decke '{self.name}': eine Platte '{kennung_von(platte)}' gibt es nicht.")
+            raise ProjektFehler(f"eine Platte '{kennung_von(platte)}' gibt es nicht.",
+                                wo=f"Decke '{self.name}'")
         eintrag = lesen(PlattenlastEintrag, {"lastfall": kennung_von(lastfall), "wert": wert},
                         f"Decke '{self.name}': Last auf {p.kennung}", PlattenlastEintrag())
         p.lasten = [q for q in p.lasten if q.lastfall != eintrag.lastfall] + [eintrag]

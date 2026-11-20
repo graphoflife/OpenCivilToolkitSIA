@@ -1,5 +1,5 @@
 ---
-erzeugt: c3c80c18946f
+erzeugt: f0b797c299fc
 art: modul
 tags: [modul]
 ---
@@ -129,7 +129,7 @@ Oberflaeche, siehe Dateikopf.
 - `vorsilbe: str` – Womit ihre Kennungen beginnen: `q` fuer q1, q2 ...
 - `raum: str` – Womit ihre Namensraeume beginnen: `querschnitt` fuer querschnitt.q1.
 - `bereich: str` – Wie ihr Abschnitt in der Formelsammlung heisst.
-- `bauen: Callable[['Bauteilart', Any, Aufbau], Optional[Bauteil]]` – Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk. `None`, wo es nichts zu rechnen gibt: eine Querschnittsanalyse, in der noch nichts gezeichnet ist.
+- `bauen: Callable[['Bauteilart', Any, Aufbau], Bauteil]` – Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk. Wo es nichts zu rechnen gibt, wirft sie einen [[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] mit dem Grund: eine Querschnittsanalyse, in der noch nichts gezeichnet ist. Bis 2026-11-20 gaben drei Baufunktionen dafuer `None` zurueck.
 
 
 ## Konstanten

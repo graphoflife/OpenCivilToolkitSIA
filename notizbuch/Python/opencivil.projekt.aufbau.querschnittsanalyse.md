@@ -1,5 +1,5 @@
 ---
-erzeugt: 98f8d6d49866
+erzeugt: ae03b7c92458
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,7 @@ Zeichnung wird kein Bauteil, nur ein Hinweis.
 ### bauen
 
 ```python
-def bauen(art: 'Bauteilart', eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau) -> Optional[Bauteil]
+def bauen(art: 'Bauteilart', eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
 Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.

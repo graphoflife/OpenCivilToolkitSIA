@@ -127,8 +127,8 @@ class Aufbau:
         dahin hielten eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und
         eine halbfertige Zeichnung alles auf. ``liste`` ist seine Liste im
         Projekt; ``grund`` ein Satzteil («noch keine Bewehrung») oder ein
-        Satz, ohne Punkt. ``None`` zurueck, damit eine Baufunktion damit
-        enden kann.
+        Satz, ohne Punkt. Eine Baufunktion meldet es, indem sie einen
+        :class:`ProjektFehler` wirft (:func:`~opencivil.projekt.aufbau.aufbauen`).
         """
         name = getattr(eintrag, "anzeigename", eintrag.name)
         self.unfertige[eintrag.kennung] = Unfertiges(liste, name, wo, grund)
@@ -267,7 +267,7 @@ class Aufbau:
             return teil
         unfertig = self.unfertige.get(kennung)
         if unfertig is not None:
-            raise ProjektFehler(unfertig.meldung)
+            raise ProjektFehler(f"{unfertig.grund}.", wo=unfertig.wo)
         raise ProjektFehler(f"Ein Bauteil '{kennung}' gibt es im Aufbau nicht.")
 
     def bauteil_von(self, nachweis: Nachweis) -> "Bauteil":
@@ -359,19 +359,6 @@ class Unfertiges:
     def meldung(self) -> str:
         """Für wen nach ihm fragt: «Platte 'Decke': noch keine Bewehrung.»"""
         return f"{self.wo}: {self.grund}."
-
-
-def ohne_ort(fehler: Exception, wo: str) -> str:
-    """
-    Die Meldung eines Fehlers als Grund an seiner Stelle: ohne den Ort, der
-    dort schon steht, und ohne Punkt -- «k_c muss grösser als null sein,
-    angegeben ist 0» statt «Platte 'Decke': k_c muss …», «Schicht 2: …»
-    statt «Pfahl 'P', Schicht 2: …».
-    """
-    text = str(fehler)
-    for vorne in (f"{wo}: ", f"{wo}, "):
-        text = text.removeprefix(vorne)
-    return text.removesuffix(".")
 
 
 @dataclass
@@ -469,8 +456,8 @@ def baustoff_bauen(eintrag: MaterialEintrag, symbol_index: str, wo: str) -> Baus
         for kurzname, zahl in topf.items():
             if kurzname not in roh.definitionen:
                 raise ProjektFehler(
-                    f"{wo}: einen Kennwert '{kurzname}' gibt es nicht "
-                    f"({wie}). Möglich sind: {', '.join(roh.definitionen)}.")
+                    f"einen Kennwert '{kurzname}' gibt es nicht "
+                    f"({wie}). Möglich sind: {', '.join(roh.definitionen)}.", wo=wo)
             kennwertbereich(vorlagen[kurzname]).pruefen(zahl, wo)
     abweichungen = {
         kurzname: Groesse(zahl, roh.definition(kurzname).einheit)
@@ -498,7 +485,7 @@ def material(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wo: str,
     grund = materialgrund(kennung, None if gefunden is None
                           else (gefunden.art.value, gefunden.name), art)
     if grund:
-        raise ProjektFehler(f"{wo}: {feld}: {grund.text}.")
+        raise ProjektFehler(f"{feld}: {grund.text}.", wo=wo)
     return gefunden
 
 

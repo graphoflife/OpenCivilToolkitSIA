@@ -273,8 +273,8 @@ def form_von(q: StabquerschnittBasis, wo: str,
     if q.art is Querschnittsart.PROFIL:
         profil = PROFILE.get(q.profil)
         if profil is None:
-            raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt das Profil "
-                                f"«{q.profil}», das es in der Tabelle nicht gibt.")
+            raise ProjektFehler(f"der Querschnitt «{q.name}» nimmt das Profil "
+                                f"«{q.profil}», das es in der Tabelle nicht gibt.", wo=wo)
         form = NachVorlage(kennung=q.kennung, name=q.name, herkunft=q.profil,
                            fehler=q.fehler() or "", vorlage=profil.form, masse=dict(profil.masse))
         return form if achse is None else replace(
@@ -304,8 +304,8 @@ def stabquerschnitt_von(q: StabquerschnittBasis, aufbau: Aufbau, wo: str,
     if bauteil is None:
         unfertig = aufbau.unfertige.get(q.bezug)
         if unfertig is None:
-            raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt die {welche} "
-                                f"'{q.bezug}', die es im Projekt nicht gibt.")
+            raise ProjektFehler(f"der Querschnitt «{q.name}» nimmt die {welche} "
+                                f"'{q.bezug}', die es im Projekt nicht gibt.", wo=wo)
         # Es gibt sie, nur fehlt ihr noch etwas: der Stab rechnet nicht, das
         # Projekt schon.
         return klasse(kennung=q.kennung, name=q.name, herkunft=f"{welche} «{unfertig.name}»",

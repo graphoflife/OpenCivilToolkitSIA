@@ -270,8 +270,8 @@ class Projekt(Beschreibung):
             for was, werte in ((r, grund), (f"{r}_zulage", zulage)):
                 if len(werte) != 2:
                     raise ProjektFehler(
-                        f"Platte '{name}': je Richtung zwei Durchmesser, unten "
-                        f"und oben – angegeben sind {len(werte)} ({was}).")
+                        f"je Richtung zwei Durchmesser, unten "
+                        f"und oben – angegeben sind {len(werte)} ({was}).", wo=f"Platte '{name}'")
             nummern = [n for n in range(1, LAGENZAHL + 1)
                        if eintrag.richtung_von(n) is richtung]
             for nummer, d, dz in zip(nummern, grund, zulage):

@@ -69,7 +69,7 @@ class TestBeschreibung(unittest.TestCase):
         roh = self.neu().als_dict()
         roh["stablinien"][0]["art"] = "stueckweise"
         with self.assertRaisesRegex(ProjektFehler,
-                                    "Querschnitt 'Balken', stablinien 1: 'stueckweise' "
+                                    "Querschnittsanalyse 'Balken', stablinien 1: 'stueckweise' "
                                     "gibt es als 'art' nicht"):
             QuerschnittsanalyseEintrag.aus_dict(roh)
         roh = self.neu().als_dict()

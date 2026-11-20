@@ -1,5 +1,5 @@
 ---
-erzeugt: e48a30dae4eb
+erzeugt: 37a68e919b31
 art: modul
 tags: [modul]
 ---
@@ -58,8 +58,8 @@ Zustand ist kein Fehler des Projekts (Benutzer, 2026-11-19). Bis
 dahin hielten eine Platte ohne Bewehrung, ein Pfahl ohne Schicht und
 eine halbfertige Zeichnung alles auf. `liste` ist seine Liste im
 Projekt; `grund` ein Satzteil («noch keine Bewehrung») oder ein
-Satz, ohne Punkt. `None` zurueck, damit eine Baufunktion damit
-enden kann.
+Satz, ohne Punkt. Eine Baufunktion meldet es, indem sie einen
+[[opencivil.projekt.lesen#ProjektFehler|ProjektFehler]] wirft ([[opencivil.projekt.aufbau#aufbauen|aufbauen]]).
 
 #### Aufbau.ohne_nachweis
 
@@ -332,17 +332,6 @@ def meldung(self) -> str
 ```
 
 Für wen nach ihm fragt: «Platte 'Decke': noch keine Bewehrung.»
-
-### ohne_ort
-
-```python
-def ohne_ort(fehler: Exception, wo: str) -> str
-```
-
-Die Meldung eines Fehlers als Grund an seiner Stelle: ohne den Ort, der
-dort schon steht, und ohne Punkt -- «k_c muss grösser als null sein,
-angegeben ist 0» statt «Platte 'Decke': k_c muss …», «Schicht 2: …»
-statt «Pfahl 'P', Schicht 2: …».
 
 ### Bauteil
 

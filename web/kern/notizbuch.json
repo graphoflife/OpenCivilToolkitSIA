@@ -6422,7 +6422,6 @@
         "Aufbau.materialziele",
         "Unfertiges",
         "Unfertiges.meldung",
-        "ohne_ort",
         "Bauteil",
         "Bauteil.kennung",
         "Bauteil.name",
@@ -6711,6 +6710,7 @@
       "kurz": "was in einer Projektdatei stehen darf, und wie es gelesen wird.",
       "stichworte": [
         "ProjektFehler",
+        "ProjektFehler.grund_bei",
         "einer_von",
         "Bereich",
         "Bereich.pruefen",
@@ -6778,7 +6778,7 @@
         "PfahlEintrag.boden_unter_dem_fuss",
         "PfahlEintrag.fallnamen",
         "PfahlEintrag.regeln",
-        "PfahlEintrag.fehlender_baugrund",
+        "PfahlEintrag._baugrund",
         "PfahlEintrag._festigkeiten",
         "PfahlEintrag._bewehrung",
         "PfahlEintrag._tragglied"

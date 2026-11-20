@@ -449,14 +449,15 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         Projekt; das Bild liest es über `Bauteil.eintrag`. Weg sind `n_ed`,
         die Anfrage `querkraftkurven`, `_normalkraefte`,
         `kurvenNormalkraft` und der Wächter gegen überholte Antworten.
-      - «Unfertig» entsteht auf zwei Wegen: drei Baufunktionen geben
-        `aufbau.unfertig(…)` zurück, sonst fängt `aufbauen` einen
-        `ProjektFehler`. Darum sind drei von neun Baufunktionen `Optional`,
-        und der Ort heisst je nach Weg anders. Dazu schneidet `ohne_ort` den
-        Ort aus dem Text: 30 von 77 Meldungen tragen ihn als Vorsatz
-        `"{wo}: "`. Umbau: `ProjektFehler(wo, grund)`, die Baufunktionen
-        werfen, `ohne_ort` wird `fehler.grund` -- und der Ort kann in den
-        Worten der Maske stehen (offen seit 2026-10-16).
+      - Erledigt (2026-11-20): «unfertig» entsteht auf einem Weg. Ein
+        `ProjektFehler` trägt Grund und Ort getrennt (`wo=`), jede
+        Baufunktion wirft, auch was nur fehlt, und `aufbauen` nimmt
+        `fehler.grund_bei(wo)`. Weg sind `ohne_ort` und das `Optional` der
+        Baufunktionen; was dem Pfahl an Boden fehlt, steht bei seinen
+        Regeln. Eine Querschnittsanalyse heisst in jeder Meldung so, nie mehr
+        «Querschnitt». Offen bleibt der Ort in den Worten der Maske – «Lage
+        2» statt «lagen 2» (offen seit 2026-10-16); das ist jetzt eine
+        Übersetzung von `wo`, kein Schnitt im Text.
       - Der Stabquerschnitt im Balkensystem: `masse` heisst je nach Art
         Abmessungen oder A und I, `bezug` Platte oder Analyse; das JS räumt
         beim Umschalten ab, was `fehler()` im Kern ablehnt -- dreimal

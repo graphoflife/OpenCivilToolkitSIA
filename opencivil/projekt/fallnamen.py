@@ -83,8 +83,8 @@ class Fallnamen:
             grund = self._grund(name, (*self.vergeben, *self.namen[:i]))
             if grund:
                 raise ProjektFehler(
-                    f"{wo}: {grund}. Die Nachweise legen ihre Ergebnisse unter dem "
-                    f"Fallnamen ab – zwei solche Namen ergäben eine Zeile statt zwei.")
+                    f"{grund}. Die Nachweise legen ihre Ergebnisse unter dem "
+                    f"Fallnamen ab – zwei solche Namen ergäben eine Zeile statt zwei.", wo=wo)
 
     def _grund(self, name: str, andere: Iterable[Benannt]) -> str:
         """«Feld» ist als Verformungsfall schon vergeben -- oder leer."""

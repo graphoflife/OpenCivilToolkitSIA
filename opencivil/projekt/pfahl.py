@@ -194,19 +194,21 @@ class PfahlEintrag(BauteilEintrag):
         Hält auf, was mehrere Felder zusammen unmöglich machen, bevor daraus
         ein Widerstand wird. Wie beim Grundbruch vor dem Rechnen und nicht
         beim Öffnen: eine Datei mit unmöglichen Zahlen soll sich öffnen und
-        korrigieren lassen. Was an Boden noch fehlt, hält nur den Pfahl auf
-        (:meth:`fehlender_baugrund`).
+        korrigieren lassen. Zuletzt, was an Boden noch fehlt
+        (:meth:`_baugrund`). Jede dieser Meldungen hält nur den Pfahl auf,
+        nicht das Projekt (:meth:`~opencivil.projekt.aufbau.kern.Aufbau.unfertig`).
         """
         if self.eta_a > self.grundlage.eta_grenze:
             raise ProjektFehler(
-                f"{wo}: η_a = {self.eta_a:g} liegt über {self.grundlage.eta_grenze:g}, dem "
-                f"Grenzwert für «{self.grundlage.beschriftung}» ({self.grundlage.referenz}).")
+                f"η_a = {self.eta_a:g} liegt über {self.grundlage.eta_grenze:g}, dem "
+                f"Grenzwert für «{self.grundlage.beschriftung}» ({self.grundlage.referenz}).",
+                wo=wo)
         berechnung = Grundlage.BERECHNUNG
         if self.eta_tr > berechnung.eta_grenze:
             raise ProjektFehler(
-                f"{wo}: η_a,tr = {self.eta_tr:g} liegt über {berechnung.eta_grenze:g}, dem "
+                f"η_a,tr = {self.eta_tr:g} liegt über {berechnung.eta_grenze:g}, dem "
                 f"Grenzwert für einen gerechneten Widerstand ({berechnung.referenz}); quer "
-                f"wird er immer gerechnet.")
+                f"wird er immer gerechnet.", wo=wo)
         if not self.grundlage.aus_versuch or any(
                 quer_belastet(k.H_Ed, k.M_Ed, self.kopf) for k in self.kombinationen if k.aktiv):
             # Auch mit R_a,k aus dem Versuch: der Erdwiderstand quer kommt aus den Schichten.
@@ -215,65 +217,67 @@ class PfahlEintrag(BauteilEintrag):
             self._bewehrung(wo)
         else:
             self._tragglied(wo)
+        self._baugrund(wo)
 
-    def fehlender_baugrund(self) -> str:
+    def _baugrund(self, wo: str) -> None:
         """
-        Was einem gerechneten R_a,k an Boden noch fehlt, klein beginnend --
-        leer, wenn nichts. Ein unfertiger Baugrund hält nur diesen Pfahl auf,
-        nicht das Projekt (Benutzer, 2026-11-19; bis dahin war er ein Fehler
-        des ganzen Projekts, :meth:`~opencivil.projekt.aufbau.kern.Aufbau.unfertig`).
-        Mit R_a,k aus einem Versuch fehlt nichts: dann braucht es die
-        Schichten nur quer.
+        Was einem gerechneten R_a,k an Boden noch fehlt. Bis 2026-11-19 hielt
+        es das ganze Projekt auf, bis 2026-11-20 fragte die Baufunktion
+        eigens danach. Mit R_a,k aus einem Versuch fehlt nichts: dann braucht
+        es die Schichten nur quer.
         """
         if self.grundlage.aus_versuch:
-            return ""
+            return
         if not self.schichten:
-            return "noch keine Schicht – eine anlegen oder R_a,k aus einem Versuch eingeben"
+            raise ProjektFehler("noch keine Schicht – eine anlegen oder R_a,k aus einem "
+                                "Versuch eingeben.", wo=wo)
         if not self.boden_unter_dem_fuss:
-            return (f"der Fuss liegt in {self.t_K + self.L:g} m, die Schichten reichen bis "
-                    f"{sum(s.d for s in self.schichten):g} m – unter dem Fuss fehlt noch Boden, "
-                    f"der ihn trägt")
-        return ""
+            raise ProjektFehler(
+                f"der Fuss liegt in {self.t_K + self.L:g} m, die Schichten reichen bis "
+                f"{sum(s.d for s in self.schichten):g} m – unter dem Fuss fehlt noch Boden, "
+                f"der ihn trägt.", wo=wo)
 
     def _festigkeiten(self, wo: str) -> None:
         """Was jede Schicht haben muss, damit ihr Widerstand eine Zahl wird."""
         for i, s in enumerate(self.schichten, start=1):
             if s.gamma <= self.gamma_w:
                 raise ProjektFehler(
-                    f"{wo}, Schicht {i}: die Raumlast γ = {s.gamma:g} kN/m³ muss grösser sein "
+                    f"die Raumlast γ = {s.gamma:g} kN/m³ muss grösser sein "
                     f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ – sonst ist γ' nicht "
-                    f"positiv.")
+                    f"positiv.", wo=f"{wo}, Schicht {i}")
             if s.verhalten is Verhalten.DRAINIERT and s.phi_k <= 0.0:
-                raise ProjektFehler(f"{wo}, Schicht {i}: drainiert braucht φ'_k über null; "
-                                    f"ohne Reibung die Schicht undrainiert rechnen.")
+                raise ProjektFehler(f"drainiert braucht φ'_k über null; "
+                                    f"ohne Reibung die Schicht undrainiert rechnen.",
+                                    wo=f"{wo}, Schicht {i}")
             if s.verhalten is Verhalten.UNDRAINIERT and s.s_u <= 0.0:
-                raise ProjektFehler(f"{wo}, Schicht {i}: undrainiert braucht s_u,k über null.")
+                raise ProjektFehler("undrainiert braucht s_u,k über null.",
+                                    wo=f"{wo}, Schicht {i}")
 
     def _bewehrung(self, wo: str) -> None:
         """Die Längsstäbe müssen im Kreis Platz haben, ohne sich zu berühren."""
         r_s = self.D / 2.0 - self.c - self.phi_w - self.phi_l / 2.0
         if r_s <= 0.0:
             raise ProjektFehler(
-                f"{wo}: die Stäbe haben keinen Platz – D/2 = {self.D / 2.0:g} mm reicht nicht "
-                f"für Überdeckung, Wendel und den halben Stab.")
+                f"die Stäbe haben keinen Platz – D/2 = {self.D / 2.0:g} mm reicht nicht "
+                f"für Überdeckung, Wendel und den halben Stab.", wo=wo)
         if self.n >= 2 and 2.0 * r_s * math.sin(math.pi / self.n) <= self.phi_l:
             raise ProjektFehler(
-                f"{wo}: {self.n} Stäbe ⌀ {self.phi_l:g} berühren sich auf dem Kreis mit "
-                f"r_s = {r_s:g} mm.")
+                f"{self.n} Stäbe ⌀ {self.phi_l:g} berühren sich auf dem Kreis mit "
+                f"r_s = {r_s:g} mm.", wo=wo)
 
     def _tragglied(self, wo: str) -> None:
         """Das Tragglied muss nach der Abrostung noch Stahl haben und im Verpresskörper liegen."""
         if self.d_a >= self.D:
             raise ProjektFehler(
-                f"{wo}: das Tragglied, d_a = {self.d_a:g} mm, muss im Verpresskörper liegen, "
-                f"D = {self.D:g} mm.")
+                f"das Tragglied, d_a = {self.d_a:g} mm, muss im Verpresskörper liegen, "
+                f"D = {self.D:g} mm.", wo=wo)
         if self.tragglied is Tragglied.ROHR:
             if 2.0 * self.t_r >= self.d_a:
-                raise ProjektFehler(f"{wo}: die Wand t = {self.t_r:g} mm ist zu dick für ein Rohr "
-                                    f"mit d_a = {self.d_a:g} mm.")
+                raise ProjektFehler(f"die Wand t = {self.t_r:g} mm ist zu dick für ein Rohr "
+                                    f"mit d_a = {self.d_a:g} mm.", wo=wo)
             if self.dt >= self.t_r:
-                raise ProjektFehler(f"{wo}: die Abrostung Δt = {self.dt:g} mm frisst die ganze "
-                                    f"Wand t = {self.t_r:g} mm.")
+                raise ProjektFehler(f"die Abrostung Δt = {self.dt:g} mm frisst die ganze "
+                                    f"Wand t = {self.t_r:g} mm.", wo=wo)
         elif 2.0 * self.dt >= self.d_a:
-            raise ProjektFehler(f"{wo}: die Abrostung Δt = {self.dt:g} mm frisst den ganzen Stab "
-                                f"⌀ {self.d_a:g} mm.")
+            raise ProjektFehler(f"die Abrostung Δt = {self.dt:g} mm frisst den ganzen Stab "
+                                f"⌀ {self.d_a:g} mm.", wo=wo)

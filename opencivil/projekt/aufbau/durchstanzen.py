@@ -32,17 +32,17 @@ MM = 1e-3
 def aussparungen(eintrag: DurchstanzEintrag) -> List[List[Tuple[float, float]]]:
     """Die Aussparungen als Ecken in m -- geprüft, sonst ein Satz, was nicht stimmt."""
     lage: Dict[str, Tuple[float, float]] = {k.kennung: (k.x * MM, k.y * MM) for k in eintrag.knoten}
-    ergebnis = []
+    wo, ergebnis = ort_von(eintrag), []
     for a in eintrag.aussparungen:
-        wo = f"{ort_von(eintrag)}, Aussparung {a.kennung}"
+        name = f"Aussparung {a.kennung}"
         fehlt = [k for k in a.knoten if k not in lage]
         if fehlt:
-            raise ProjektFehler(f"{wo}: die Knoten {', '.join(fehlt)} gibt es nicht.")
+            raise ProjektFehler(f"{name}: die Knoten {', '.join(fehlt)} gibt es nicht.", wo=wo)
         punkte = [lage[k] for k in a.knoten]
         try:
-            polygon_pruefen(punkte, wo)
+            polygon_pruefen(punkte, name)
         except GeometrieFehler as fehler:
-            raise ProjektFehler(str(fehler)) from None
+            raise ProjektFehler(str(fehler), wo=wo) from None
         ergebnis.append(punkte)
     return ergebnis
 

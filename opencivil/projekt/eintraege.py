@@ -215,17 +215,17 @@ class MaterialEintrag(Beschreibung):
         if self.ist_normsorte:
             if self.abweichungen or self.ueberschreibungen:
                 raise ProjektFehler(
-                    f"{wo}: eine Normsorte darf keine abweichenden Kennwerte haben. "
-                    f"Bitte zuerst zu einem eigenen Material machen.")
+                    f"eine Normsorte darf keine abweichenden Kennwerte haben. "
+                    f"Bitte zuerst zu einem eigenen Material machen.", wo=wo)
             if self.name and self.name != self.sorte:
                 raise ProjektFehler(
-                    f"{wo}: eine unveränderte Normsorte muss '{self.sorte}' heissen.")
+                    f"eine unveränderte Normsorte muss '{self.sorte}' heissen.", wo=wo)
         elif self.anzeigename in MATERIALARTEN[self.art].sorten:
             # Sonst stuende eine abgeaenderte Festigkeit unter einer
             # Normbezeichnung im Bericht.
             raise ProjektFehler(
-                f"{wo}: ein eigenes Material darf nicht wie die Normsorte "
-                f"'{self.anzeigename}' heissen.")
+                f"ein eigenes Material darf nicht wie die Normsorte "
+                f"'{self.anzeigename}' heissen.", wo=wo)
 
 
 # ===========================================================================
@@ -319,11 +319,11 @@ class PostenEintrag(Beschreibung):
         if self.durchmesser == 0.0:
             return
         if self.ueber_abstand and self.abstand <= 0.0:
-            raise ProjektFehler(f"{wo}: die Teilung muss grösser als null sein, "
-                                f"angegeben sind {self.abstand:g} mm.")
+            raise ProjektFehler(f"die Teilung muss grösser als null sein, "
+                                f"angegeben sind {self.abstand:g} mm.", wo=wo)
         if not self.ueber_abstand and self.anzahl <= 0.0:
-            raise ProjektFehler(f"{wo}: ⌀{self.durchmesser:g} braucht eine Stabzahl grösser "
-                                f"als null, angegeben sind {self.anzahl:g}.")
+            raise ProjektFehler(f"⌀{self.durchmesser:g} braucht eine Stabzahl grösser "
+                                f"als null, angegeben sind {self.anzahl:g}.", wo=wo)
 
     def als_posten(self) -> Bewehrungsposten:
         return Bewehrungsposten(
@@ -420,16 +420,16 @@ class QuerkraftbewehrungEintrag(Beschreibung):
             return
         if self.abstand_x <= 0:
             raise ProjektFehler(
-                f"{wo}: die Bügelteilung in x muss grösser als null sein, "
-                f"angegeben ist {self.abstand_x:g} mm.")
+                f"die Bügelteilung in x muss grösser als null sein, "
+                f"angegeben ist {self.abstand_x:g} mm.", wo=wo)
         if self.ueber_teilung_y and self.abstand_y <= 0:
             raise ProjektFehler(
-                f"{wo}: die Bügelteilung in y muss grösser als null sein, "
-                f"angegeben ist {self.abstand_y:g} mm.")
+                f"die Bügelteilung in y muss grösser als null sein, "
+                f"angegeben ist {self.abstand_y:g} mm.", wo=wo)
         if not self.ueber_teilung_y and self.anzahl_y <= 0:
             raise ProjektFehler(
-                f"{wo}: die Bügelzahl in y muss grösser als null sein, "
-                f"angegeben ist {self.anzahl_y:g}.")
+                f"die Bügelzahl in y muss grösser als null sein, "
+                f"angegeben ist {self.anzahl_y:g}.", wo=wo)
 
     def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung:
         """Die Buegel fuer den Querschnitt -- erst nach :meth:`regeln`."""

@@ -49,7 +49,7 @@ in einer Datei von ueber tausend Zeilen.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, Tuple
 
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.projekt.balkensystem import BalkensystemEintrag
@@ -67,7 +67,7 @@ from opencivil.projekt.aufbau import (
     querschnittsanalyse, setzung,
 )
 from opencivil.projekt.aufbau.kern import (
-    Aufbau, Bauteil, baustoff_bauen, ohne_ort, ueberschreibungen_setzen,
+    Aufbau, Bauteil, baustoff_bauen, ueberschreibungen_setzen,
 )
 from opencivil.projekt.lesen import ProjektFehler, inhalt_pruefen, ort_von
 
@@ -117,7 +117,7 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
             inhalt_pruefen(eintrag, wo)
             aufbau.baustoffe[eintrag.kennung] = baustoff_bauen(eintrag, index, wo)
         except ProjektFehler as fehler:
-            aufbau.unfertig("materialien", eintrag, wo, ohne_ort(fehler, wo))
+            aufbau.unfertig("materialien", eintrag, wo, fehler.grund_bei(wo))
 
     # Auch im schnellen Aufbau jedes Bauteil: die Formelsammlung entsteht aus
     # ihm. Die Bewehrungssuche loest nur Nachweisziele, ein System kostet sie
@@ -127,12 +127,9 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
             wo = ort_von(eintrag)
             try:
                 _vorab_pruefen(eintrag, wo, aufbau)
-                teil = art.bauen(art, eintrag, aufbau)
+                aufbau.teile[eintrag.kennung] = art.bauen(art, eintrag, aufbau)
             except ProjektFehler as fehler:
-                aufbau.unfertig(art.liste, eintrag, wo, ohne_ort(fehler, wo))
-                continue
-            if teil is not None:
-                aufbau.teile[eintrag.kennung] = teil
+                aufbau.unfertig(art.liste, eintrag, wo, fehler.grund_bei(wo))
 
     for baustoff in aufbau.baustoffe.values():
         baustoff.ins_rechenwerk(werk)
@@ -156,8 +153,8 @@ def _vorab_pruefen(eintrag: Any, wo: str, aufbau: Aufbau) -> None:
     for kennung in eintrag.materialien():
         stoff = aufbau.unfertige.get(kennung)
         if stoff is not None:
-            raise ProjektFehler(f"{wo}: das Material «{stoff.name}» rechnet nicht – warum, "
-                                f"steht bei ihm.")
+            raise ProjektFehler(f"das Material «{stoff.name}» rechnet nicht – warum, "
+                                f"steht bei ihm.", wo=wo)
     inhalt_pruefen(eintrag, wo)
 
 
@@ -193,11 +190,12 @@ class Bauteilart:
     bereich: str
     """Wie ihr Abschnitt in der Formelsammlung heisst."""
 
-    bauen: Callable[["Bauteilart", Any, Aufbau], Optional[Bauteil]]
+    bauen: Callable[["Bauteilart", Any, Aufbau], Bauteil]
     """
     Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk.
-    ``None``, wo es nichts zu rechnen gibt: eine Querschnittsanalyse, in der
-    noch nichts gezeichnet ist.
+    Wo es nichts zu rechnen gibt, wirft sie einen :class:`ProjektFehler`
+    mit dem Grund: eine Querschnittsanalyse, in der noch nichts gezeichnet
+    ist. Bis 2026-11-20 gaben drei Baufunktionen dafuer ``None`` zurueck.
     """
 
 

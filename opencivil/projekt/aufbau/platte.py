@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
 
 
-def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Optional[Bauteil]:
+def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bauteil:
     """
     Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen --
     ohne jede Bewehrung keiner, nur ein Hinweis (:meth:`Aufbau.unfertig`).
@@ -55,7 +55,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Opt
     """
     querschnitt = _querschnitt(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     if querschnitt is None:
-        return aufbau.unfertig(art.liste, eintrag, f"Platte '{eintrag.name}'", "noch keine Bewehrung")
+        raise ProjektFehler("noch keine Bewehrung.", wo=ort_von(eintrag))
     querschnitt.ins_rechenwerk(aufbau.werk)
     # Bewehrungsmass und Distanzhalter stehen als Kennzahlen da, auch bei
     # einer Platte ohne Nachweis -- ihr Lagenaufbau rechnet darum immer.
@@ -237,8 +237,8 @@ def _querschnitt(
               + stapelhoehe(lagen).in_einheit(MM))
     if stapel > eintrag.h:
         raise ProjektFehler(
-            f"{wo}: Überdeckungen und Lagen ergeben zusammen {stapel:g} mm – mehr als "
-            f"die Dicke h = {eintrag.h:g} mm; die oberen und unteren Lagen kreuzten sich.")
+            f"Überdeckungen und Lagen ergeben zusammen {stapel:g} mm – mehr als "
+            f"die Dicke h = {eintrag.h:g} mm; die oberen und unteren Lagen kreuzten sich.", wo=wo)
 
     buegel = eintrag.querkraftbewehrung
     return Plattenquerschnitt(

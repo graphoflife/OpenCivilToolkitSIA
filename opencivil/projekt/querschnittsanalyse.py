@@ -49,7 +49,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.core.einheiten import MM
-from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
+from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, ort_von
 from opencivil.projekt.netz import Netz, neue_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
@@ -65,8 +65,8 @@ def _punkt(roh: Any, wo: str) -> List[float]:
         y, z = roh
         return [float(y), float(z)]
     except (TypeError, ValueError):
-        raise ProjektFehler(f"{wo}: ein Punkt muss aus zwei Zahlen bestehen, "
-                            f"nicht {roh!r}.") from None
+        raise ProjektFehler(f"ein Punkt muss aus zwei Zahlen bestehen, "
+                            f"nicht {roh!r}.", wo=wo) from None
 
 
 # ===========================================================================
@@ -354,7 +354,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
     (:class:`~opencivil.projekt.eintraege.Querschnittsangaben`).
     """
 
-    BEZEICHNUNG = "Querschnitt"
+    BEZEICHNUNG = "Querschnittsanalyse"
 
     knoten: List[KnotenEintrag] = field(default_factory=list)
     flaechen: List[FlaecheEintrag] = field(default_factory=list)
@@ -516,7 +516,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         """Ein Knoten aus einem Punkt ``[y, z]`` -- oder die Kennung, wenn schon eine dasteht."""
         if isinstance(ort, str):
             return ort
-        y, z = _punkt(ort, f"Querschnitt '{self.name}'")
+        y, z = _punkt(ort, ort_von(self))
         return netz.an(y, z)
 
     def _kennung(self, vorsilbe: str) -> str:
@@ -538,7 +538,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         """Ein einzelner Stab bei ``(y, z)`` -- ``durchmesser``, ``stahl``."""
         eintrag = StabEintrag.aus_dict(
             {"kennung": self._kennung("S"), "knoten": self._knoten(self.netz(), (y, z)),
-             **felder}, f"Querschnitt '{self.name}', staebe")
+             **felder}, f"{ort_von(self)}, staebe")
         self.staebe.append(eintrag)
         return eintrag
 
@@ -547,7 +547,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         netz = self.netz()
         eintrag = StablinieEintrag.aus_dict(
             {"kennung": self._kennung("L"), "von": self._knoten(netz, von),
-             "bis": self._knoten(netz, bis), **felder}, f"Querschnitt '{self.name}', stablinien")
+             "bis": self._knoten(netz, bis), **felder}, f"{ort_von(self)}, stablinien")
         self.stablinien.append(eintrag)
         return eintrag
 
@@ -556,7 +556,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         netz = self.netz()
         eintrag = SchubwandEintrag.aus_dict(
             {"kennung": self._kennung("L"), "von": self._knoten(netz, von),
-             "bis": self._knoten(netz, bis), **felder}, f"Querschnitt '{self.name}', schubwaende")
+             "bis": self._knoten(netz, bis), **felder}, f"{ort_von(self)}, schubwaende")
         self.schubwaende.append(eintrag)
         return eintrag
 
@@ -620,8 +620,8 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         for w in self.werkstoffwahl:
             if w.material in gewaehlt:
                 raise ProjektFehler(
-                    f"{wo}: für das Material '{w.material}' stehen zwei "
-                    f"Werkstoffwahlen – es braucht genau eine.")
+                    f"für das Material '{w.material}' stehen zwei "
+                    f"Werkstoffwahlen – es braucht genau eine.", wo=wo)
             gewaehlt.add(w.material)
 
     def fallnamen(self) -> List[Fallnamen]:
@@ -637,7 +637,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""
         eintrag = QALastfallEintrag.aus_dict({"name": name, **werte},
-                                             f"Querschnitt '{self.name}', lastfaelle")
+                                             f"{ort_von(self)}, lastfaelle")
         self.lastfaelle.append(eintrag)
         return eintrag
 
@@ -648,7 +648,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         eintrag = QAKnickEintrag.aus_dict(
             {"name": name, "N_Ed": N_Ed, "M_Ed_1": M_Ed_1, "laenge": laenge,
              "knicklaenge": laenge if knicklaenge is None else knicklaenge,
-             "richtung": richtung}, f"Querschnitt '{self.name}', knickfaelle")
+             "richtung": richtung}, f"{ort_von(self)}, knickfaelle")
         self.knickfaelle.append(eintrag)
         return eintrag
 
@@ -660,7 +660,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         Gelesen wie aus einer Datei, also mit denselben Pruefungen.
         """
         eintrag = QASpannungsfallEintrag.aus_dict(
-            {"name": name, "art": art, **felder}, f"Querschnitt '{self.name}', spannungsfaelle")
+            {"name": name, "art": art, **felder}, f"{ort_von(self)}, spannungsfaelle")
         self.spannungsfaelle.append(eintrag)
         return eintrag
 

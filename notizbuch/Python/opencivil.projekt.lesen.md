@@ -1,5 +1,5 @@
 ---
-erzeugt: 810905ca556b
+erzeugt: 31126bd4ff07
 art: modul
 tags: [modul]
 ---
@@ -75,7 +75,24 @@ machten daraus wieder das Mitglied.
 class ProjektFehler(Exception)
 ```
 
-Die Projektbeschreibung ist in sich nicht stimmig.
+Die Projektbeschreibung ist in sich nicht stimmig. `grund` sagt, was
+nicht stimmt, als Satz mit Punkt; `wo`, wo -- wie der Eintrag in
+Meldungen heisst ([[opencivil.projekt.lesen#ort|ort]]), «Platte 'Decke'», tiefer «Pfahl 'P',
+Schicht 2» --, leer, wo es das ganze Projekt betrifft. Die Meldung ist
+beides: «Platte 'Decke': noch keine Bewehrung.»
+
+Bis 2026-11-20 stand der Ort nur im Text, und wer den Grund an seiner
+Stelle brauchte, schnitt ihn wieder heraus.
+
+#### ProjektFehler.grund_bei
+
+```python
+def grund_bei(self, wo: str) -> str
+```
+
+Der Fehler, wie er an der Stelle `wo` steht, ohne Punkt am Ende:
+dort nur der Grund, unter ihr mit dem Rest des Orts -- «Schicht 2:
+…» bei «Pfahl 'P'» --, anderswo die ganze Meldung.
 
 ### einer_von
 

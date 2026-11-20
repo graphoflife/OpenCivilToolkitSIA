@@ -1,5 +1,5 @@
 ---
-erzeugt: a967ee653a19
+erzeugt: 5fd2d65b603c
 art: modul
 tags: [modul]
 ---
@@ -18,12 +18,10 @@ Steifigkeit und die beiden quer dazu ([[opencivil.projekt.aufbau.pfahl#bauen|bau
 ### bauen
 
 ```python
-def bauen(art: 'Bauteilart', eintrag: PfahlEintrag, aufbau: Aufbau) -> Optional[Bauteil]
+def bauen(art: 'Bauteilart', eintrag: PfahlEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
-Fehlt dem Pfahl noch Boden ([[opencivil.projekt.pfahl#PfahlEintrag.fehlender_baugrund|PfahlEintrag.fehlender_baugrund]]),
-rechnet er nicht, nur ein Hinweis sagt es ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
-Sonst ein Pfahl und seine beiden Nachweise, sobald eine Kombination
+Ein Pfahl und seine beiden Nachweise, sobald eine Kombination
 eingeschaltet ist -- ohne sie steht er allein da, wie ein Grundbruch
 ohne Kombination. Seine Steifigkeit, gleich ob mit Kombinationen, sobald
 unter dem Fuss Boden ist; sie liest nur die Schichten, auch wenn R_a,k

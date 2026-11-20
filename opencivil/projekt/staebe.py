@@ -338,15 +338,15 @@ class MitStaeben:
         for l in self.linien:
             if l.kennung == kennung:
                 return l
-        raise ProjektFehler(f"{self.wo}: eine Linie «{kennung}» gibt es nicht.")
+        raise ProjektFehler(f"eine Linie «{kennung}» gibt es nicht.", wo=self.wo)
 
     def enden(self, linie: Any) -> Tuple[Punkt, Punkt]:
         """Anfang und Ende einer Linie, in m."""
         netz = self.netz()
         a, b = netz.lage(linie.von), netz.lage(linie.bis)
         if a is None or b is None:
-            raise ProjektFehler(f"{self.wo}: {linie.kennung} verweist auf "
-                                f"einen Knoten, den es nicht gibt.")
+            raise ProjektFehler(f"{linie.kennung} verweist auf "
+                                f"einen Knoten, den es nicht gibt.", wo=self.wo)
         return a, b
 
     def laenge(self, linie: Any) -> float:

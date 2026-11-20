@@ -459,5 +459,28 @@ class TestWahlen(unittest.TestCase):
             felder_pruefen(q, "Platte")
 
 
+class TestOrtUndGrund(unittest.TestCase):
+    """
+    Ein Fehler trägt Ort und Grund getrennt; die Meldung ist beides. Bis
+    2026-11-20 stand der Ort nur im Text, und der Aufbau schnitt ihn wieder
+    heraus, wo der Grund an seiner Stelle stehen sollte.
+    """
+
+    def test_die_meldung_ist_ort_und_grund(self):
+        self.assertEqual(str(ProjektFehler("noch keine Bewehrung.", wo="Platte 'Decke'")),
+                         "Platte 'Decke': noch keine Bewehrung.")
+        self.assertEqual(str(ProjektFehler("Material 'b9' gibt es im Projekt nicht.")),
+                         "Material 'b9' gibt es im Projekt nicht.")
+
+    def test_der_grund_an_seiner_stelle(self):
+        fehler = ProjektFehler("undrainiert braucht s_u,k über null.", wo="Pfahl 'P', Schicht 2")
+        for wo, text in (
+                ("Pfahl 'P', Schicht 2", "undrainiert braucht s_u,k über null"),
+                ("Pfahl 'P'", "Schicht 2: undrainiert braucht s_u,k über null"),
+                ("Pfahl 'Pf'", "Pfahl 'P', Schicht 2: undrainiert braucht s_u,k über null")):
+            with self.subTest(wo=wo):
+                self.assertEqual(fehler.grund_bei(wo), text)
+
+
 if __name__ == "__main__":
     unittest.main()

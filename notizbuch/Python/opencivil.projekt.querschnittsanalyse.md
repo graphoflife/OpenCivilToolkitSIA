@@ -1,5 +1,5 @@
 ---
-erzeugt: fe16d856914f
+erzeugt: 96ab170c809a
 art: modul
 tags: [modul]
 ---
@@ -321,7 +321,7 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 Was er mit der Platte gleich angibt, steht in der Grundlage
 ([[opencivil.projekt.eintraege#Querschnittsangaben|Querschnittsangaben]]).
 
-- `BEZEICHNUNG = 'Querschnitt'`
+- `BEZEICHNUNG = 'Querschnittsanalyse'`
 - `knoten: List[KnotenEintrag] = field(default_factory=list)`
 - `flaechen: List[FlaecheEintrag] = field(default_factory=list)`
 - `staebe: List[StabEintrag] = field(default_factory=list)`

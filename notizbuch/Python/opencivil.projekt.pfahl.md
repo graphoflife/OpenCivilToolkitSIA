@@ -1,5 +1,5 @@
 ---
-erzeugt: ca2dc5b92b7d
+erzeugt: c64c7c3c9f22
 art: modul
 tags: [modul]
 ---
@@ -189,21 +189,20 @@ def regeln(self, wo: str) -> None
 Hält auf, was mehrere Felder zusammen unmöglich machen, bevor daraus
 ein Widerstand wird. Wie beim Grundbruch vor dem Rechnen und nicht
 beim Öffnen: eine Datei mit unmöglichen Zahlen soll sich öffnen und
-korrigieren lassen. Was an Boden noch fehlt, hält nur den Pfahl auf
-([[opencivil.projekt.pfahl#PfahlEintrag.fehlender_baugrund|fehlender_baugrund]]).
+korrigieren lassen. Zuletzt, was an Boden noch fehlt
+([[opencivil.projekt.pfahl#PfahlEintrag._baugrund|_baugrund]]). Jede dieser Meldungen hält nur den Pfahl auf,
+nicht das Projekt ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]]).
 
-#### PfahlEintrag.fehlender_baugrund
+#### PfahlEintrag._baugrund
 
 ```python
-def fehlender_baugrund(self) -> str
+def _baugrund(self, wo: str) -> None
 ```
 
-Was einem gerechneten R_a,k an Boden noch fehlt, klein beginnend --
-leer, wenn nichts. Ein unfertiger Baugrund hält nur diesen Pfahl auf,
-nicht das Projekt (Benutzer, 2026-11-19; bis dahin war er ein Fehler
-des ganzen Projekts, [[opencivil.projekt.aufbau.kern#Aufbau.unfertig|unfertig]]).
-Mit R_a,k aus einem Versuch fehlt nichts: dann braucht es die
-Schichten nur quer.
+Was einem gerechneten R_a,k an Boden noch fehlt. Bis 2026-11-19 hielt
+es das ganze Projekt auf, bis 2026-11-20 fragte die Baufunktion
+eigens danach. Mit R_a,k aus einem Versuch fehlt nichts: dann braucht
+es die Schichten nur quer.
 
 #### PfahlEintrag._festigkeiten
 

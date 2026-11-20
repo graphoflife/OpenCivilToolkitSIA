@@ -318,7 +318,8 @@ class TestBeschreibung(unittest.TestCase):
         p, a = rechteck()
         a.haeufig.lastfall("H", M_y_Ed=1.0)
         a.haeufig.lastfall("H", M_y_Ed=2.0)
-        self.assertIn("Querschnitt 'Balken': «H» ist als häufiger Lastfall schon vergeben",
+        self.assertIn("Querschnittsanalyse 'Balken': «H» ist als häufiger Lastfall schon "
+                      "vergeben",
                       meldung(p))
 
 

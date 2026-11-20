@@ -7,6 +7,24 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Ein Fehler trägt Ort und Grund getrennt
+
+Was einem Bauteil noch fehlt, sagt ein Hinweis an seiner Stelle («Nichts zu
+rechnen: noch keine Bewehrung.»), und der Rest rechnet weiter. Der Hinweis
+entstand auf zwei Wegen: drei Baufunktionen gaben «unfertig» selbst zurück,
+die anderen warfen einen Fehler, den der Aufbau fing. Der Fehler trug den
+Ort nur im Text, «Platte 'Decke': …», und der Aufbau schnitt ihn wieder
+heraus, damit am Ort nur der Grund stand. Je nach Weg hiess der Ort zudem
+anders: eine leere Querschnittsanalyse «Querschnittsanalyse 'A'», eine mit
+einem falschen Wert «Querschnitt 'A'».
+
+Jetzt trägt der Fehler Grund und Ort getrennt, und jede Baufunktion wirft,
+auch was nur fehlt. Am Ort steht der Grund ohne den Ort, tiefer gelegene
+mit dem Rest davor («Schicht 2: …» beim Pfahl). Was dem Pfahl an Boden
+fehlt, prüfen seine Regeln mit den übrigen. Eine Querschnittsanalyse heisst
+in jeder Meldung «Querschnittsanalyse 'A'», wie an der Oberfläche. Sonst
+lauten die Meldungen wie vorher.
+
 ## 2026-11-20 · Die Normalkraft der M-V-Kurve gehört zur Platte
 
 Unter dem Bild «Querkraft über Moment» stellt man ein, für welche

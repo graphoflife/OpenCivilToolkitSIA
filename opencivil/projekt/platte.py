@@ -170,8 +170,8 @@ class QuerschnittEintrag(Querschnittsangaben):
         # hiesse, sie still wegzulassen.
         if len(self.lagen) > LAGENZAHL:
             raise ProjektFehler(
-                f"Platte '{self.name}': {len(self.lagen)} Lagen angegeben, eine "
-                f"Platte hat genau {LAGENZAHL}.")
+                f"{len(self.lagen)} Lagen angegeben, eine "
+                f"Platte hat genau {LAGENZAHL}.", wo=f"Platte '{self.name}'")
         while len(self.lagen) < LAGENZAHL:
             self.lagen.append(LageEintrag())
 
@@ -224,9 +224,9 @@ class QuerschnittEintrag(Querschnittsangaben):
         zusammen = self.ueberdeckung_unten + self.ueberdeckung_oben
         if zusammen >= self.h:
             raise ProjektFehler(
-                f"{wo}: die Überdeckungen ergeben zusammen {zusammen:g} mm "
+                f"die Überdeckungen ergeben zusammen {zusammen:g} mm "
                 f"und lassen in einer {self.h:g} mm dicken Platte keinen Platz für "
-                f"Bewehrung.")
+                f"Bewehrung.", wo=wo)
 
     def fallnamen(self) -> List[Fallnamen]:
         """
