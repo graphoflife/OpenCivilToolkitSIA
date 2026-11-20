@@ -12,31 +12,57 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 Der Benutzer fragte, warum der Start auf GitHub so lange dauert
 (2026-11-20). Gemessen wird jetzt bei jedem Laden: nach der ersten Rechnung
 schreibt die Seite in die Konsole, wann jeder Schritt fertig war, ab dem
-Aufruf der Seite («Start: Oberfläche geladen 0.07 s · Server gesucht 0.09 s
-· Python geladen 1.67 s · …»). Jeder Schritt setzt seine Marke selbst
-(`performance.mark`); der Faden des Kerns schickt die seinen mit «bereit»,
-und `api.js` rechnet sie auf die Uhr der Seite um.
+Aufruf der Seite («Start: Server gesucht 0.06 s · Oberfläche geladen 0.09 s
+· Quellen geholt 0.10 s · Python geladen 2.48 s · …»). Jeder Schritt setzt
+seine Marke selbst (`performance.mark`); der Faden des Kerns schickt die
+seinen mit «bereit», und `api.js` rechnet sie auf die Uhr der Seite um.
+
+**Wie gemessen wird.** Lokal ist alles sofort da, und die Zeiten schwanken
+von einem Laden zum nächsten um bis zu 0.5 s: zwei Fassungen lassen sich nur
+abwechselnd vergleichen, mehrmals. Was das Netz kostet, zeigt ein
+Dateiserver, der eine Leitung nachahmt -- 20 ms Laufzeit, 100 Mbit/s für
+alle Anfragen zusammen, gzip wie GitHub; ein Werkzeug zum Messen, nicht im
+Repo. Er spricht HTTP/1.1, GitHub HTTP/2: dort kosten viele kleine Anfragen
+weniger als hier.
 
 Bis dahin lief alles nacheinander: erst die Oberfläche, dann die Suche nach
-einem Server, dann Python, dann die Quellen, dann das Einlesen. Lokal, mit
-einem Dateiserver ohne Kern wie auf GitHub (`statisch` in
-`.claude/launch.json`), beim erneuten Laden: Oberfläche 0.10 s, Python
-2.12 s, Quellen 2.22 s, eingelesen 3.54 s, erste Rechnung 4.35 s.
+einem Server, dann Python, dann die 214 Dateien des Kerns, dann das
+Einlesen. Beim ersten Besuch, über die nachgeahmte Leitung: Oberfläche
+0.96 s, Python 4.0 s, Quellen 6.3 s, eingelesen 7.7 s, erste Rechnung
+8.5–8.7 s.
 
 **Der Kern startet sofort.** Ein kleines Modul in `index.html` stösst ihn
 an, bevor die Oberfläche geladen ist -- mit `async`, damit es nicht auf sie
 wartet. `kernBereitstellen` startet nur beim ersten Aufruf; wer später
 fragt, bekommt dasselbe Versprechen, und die Anzeige des Ladeschirms
-bekommt nachgereicht, was vorher gemeldet wurde. Im Faden kommen die Quellen,
-während Python lädt. Danach, gleich gemessen: Python 1.7–1.8 s, die Quellen
-sind dann schon da, eingelesen 3.05 s, erste Rechnung 3.9 s. Die
-Oberfläche war ohnehin schneller fertig als Python; auf GitHub, wo jede
-Anfrage länger dauert, zählt der frühere Start mehr.
+bekommt nachgereicht, was vorher gemeldet wurde. Im Faden kommen die
+Quellen, während Python lädt.
 
-Was übrig bleibt, ist Python selbst (gut 1.5 s, davon 0.1 s für die 13 MB)
-und das Einlesen des Kerns (1.3 s): Python übersetzt beim Einbinden jede
-Datei. Vorübersetzt mitliefern ginge nur aus demselben Python wie in
-Pyodide, 3.14; auf dem Rechner läuft 3.12.
+**Ein Paket statt 214 Dateien.** Die Brücke schreibt alle Quellen
+zusätzlich in ein Stück, `web/kern/quellen.json` (3 MB, gepackt 0.8 MB).
+Der Faden holt es mit einer Anfrage und legt jede Datei darin in sein
+Dateisystem, auch das Verzeichnis `dateien.json`: die Konsole liest dort,
+welche Fremdpakete beiliegen. Ein Test wacht darüber, dass das Paket zu den
+Dateien passt (`quellen_stimmen`). Im Diff zeigt Git es nicht
+(`.gitattributes`) -- was sich darin ändert, steht schon im Diff der Quelle.
+
+Danach, beim ersten Besuch: Server gesucht 0.2 s, Quellen 1.3 s, Python
+3.9 s, eingelesen 5.3–5.5 s, erste Rechnung 6.2–6.3 s. Beim erneuten
+Besuch, aus dem Zwischenspeicher des Browsers, ändert sich nichts: vorher
+wie nachher 4.4–4.5 s. Ob die Quellen neben Python kommen oder nach ihm,
+macht dort keinen Unterschied (abwechselnd gemessen); neben ihm spart es auf
+einer langsamen Leitung die Zeit für das Paket.
+
+**Vorladen der Module: gemessen, nicht eingebaut.** Geplant war
+`<link rel="modulepreload">` für alle Module, damit der Browser sie auf
+einmal holt statt Stufe um Stufe. Seit der Kern sofort startet, wartet aber
+nichts mehr auf die Oberfläche: sie ist nach 1 s fertig, der Kern nach 5 s,
+und dazwischen steht der Ladeschirm.
+
+Was übrig bleibt, ist Python selbst (gut 2 s, davon 0.1 s für die 13 MB aus
+dem Zwischenspeicher) und das Einlesen des Kerns (1.2 s): Python übersetzt
+beim Einbinden jede Datei. Vorübersetzt mitliefern ginge nur aus demselben
+Python wie in Pyodide, 3.14; auf dem Rechner läuft 3.12.
 
 ## 2026-11-20 · Sandbox je App
 

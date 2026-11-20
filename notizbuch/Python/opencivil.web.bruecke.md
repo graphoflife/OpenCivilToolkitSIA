@@ -1,5 +1,5 @@
 ---
-erzeugt: cb520ce2294e
+erzeugt: 2876e902fe30
 art: modul
 tags: [modul]
 ---
@@ -10,31 +10,37 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Fuehrt Buch darueber, aus welchen Quelldateien der Rechenkern besteht, und
-schreibt diese Liste nach `web/kern/dateien.json`. Der Faden in
-`web/js/kern_arbeiter.js` liest sie, holt die Dateien uebers Netz und legt
-sie ins Dateisystem von Pyodide -- danach ist `import opencivil` im Browser
+schreibt diese Liste nach `web/kern/dateien.json` -- dazu alle Dateien in
+einem Stueck nach `web/kern/quellen.json`. Der Faden in
+`web/js/kern_arbeiter.js` holt das Paket und legt jede Datei darin ins
+Dateisystem von Pyodide -- danach ist `import opencivil` im Browser
 dasselbe wie auf dem Rechner.
 
 
-## WARUM EINE LISTE UND KEIN ARCHIV
+## EIN PAKET STATT 214 DATEIEN
 
-Ein Archiv waere ein zweites, erzeugtes Abbild des Quellcodes im Repo -- und
-damit etwas, das unbemerkt veralten kann. Die Liste ist reiner Text, im Diff
-lesbar, und [[opencivil.web.bruecke#stimmt_ueberein|stimmt_ueberein]] prueft im Test, dass sie zu den
-tatsaechlich vorhandenen Dateien passt. Veraltet sie, schlaegt der Test an,
-nicht erst die veroeffentlichte Seite.
+Bis 2026-11-20 holte der Browser jede Datei fuer sich, nach der Liste. Auf
+GitHub Pages kostet jede Anfrage ihre Zeit, und ein paar hundert laufen
+nicht alle zugleich; jetzt ist es eine. Das Paket ist ein zweites, erzeugtes
+Abbild des Quellcodes im Repo -- und damit etwas, das unbemerkt veralten
+kann: [[opencivil.web.bruecke#quellen_stimmen|quellen_stimmen]] prueft im Test, dass es zu den vorhandenen
+Dateien passt. Veraltet es, schlaegt der Test an, nicht erst die
+veroeffentlichte Seite. Es ist Text und kein Archiv, JSON von Pfad zu
+Inhalt: Git speichert davon nur, was sich aendert, und GitHub komprimiert
+es beim Senden. Im Diff zeigt Git es nicht (`.gitattributes`) -- was sich
+darin aendert, steht schon im Diff der Quelle.
 
 
 ## JE DATEI EINE MARKE
 
-Neben jedem Pfad steht eine Marke, die ersten zwoelf Zeichen von SHA-256 ueber
-den Inhalt. Der Browser holt die Datei als `...py?v=Marke`: eine geaenderte
-Datei hat damit eine neue Adresse, und aus dem Zwischenspeicher kommt keine
-alte Fassung mehr, waehrend die uebrigen schon neu sind. Ein schlichter
-statischer Server ohne Cache-Angabe laesst den Browser nach Gefuehl
-zwischenspeichern -- so kam einmal `blatt.py` nach einer Aenderung noch alt.
-Das Manifest aendert sich darum mit jeder Aenderung am Kern; der Test merkt,
-wenn das Neuschreiben vergessen ging.
+Neben jedem Pfad steht in der Liste seine Marke, die ersten zwoelf Zeichen
+von SHA-256 ueber den Inhalt: ihr Diff zeigt, welche Kerndatei sich
+aenderte, und der Test merkt, wenn das Neuschreiben vergessen ging. Das
+Paket hat seine eigene Marke, in der Importtafel der Seite (unten): ein
+geaenderter Kern hat damit eine neue Adresse, und aus dem Zwischenspeicher
+kommt kein alter mehr. Ein schlichter statischer Server ohne Cache-Angabe
+laesst den Browser nach Gefuehl zwischenspeichern -- so kam einmal
+`blatt.py` nach einer Aenderung noch alt.
 
 
 ## UND DAS NOTIZBUCH
@@ -57,8 +63,8 @@ erst, wenn die Bruecke sie ins Verzeichnis geschrieben hat.
 Dasselbe traf die Module der Oberflaeche: nach einer Aenderung kam einmal ein
 altes `nachweise.js` zum neuen Kern. Darum schreibt die Bruecke in
 `web/index.html` eine Importtafel (`<script type="importmap">`): je Modul
-unter `web/js/` und je Verzeichnis unter `web/kern/` die Adresse mit
-Marke, dazu das Stilblatt mit Marke. Die Module selbst bleiben, wie sie sind
+unter `web/js/`, fuer das Paket und fuer das Verzeichnis des Notizbuchs
+die Adresse mit Marke, dazu das Stilblatt mit Marke. Die Module selbst bleiben, wie sie sind
 -- `import './dom.js'` fuehrt ueber die Tafel auf `./dom.js?v=Marke`.
 So haengt alles an der Seite: wer sie neu laedt, bekommt den Rest im selben
 Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter `web/vendor/`;
@@ -72,7 +78,9 @@ beiliegen ([[opencivil.web.bruecke#mitgelieferte_pakete|mitgelieferte_pakete]]):
 den Dateien, die dort liegen, und aus `pyodide-lock.json`. Die App «Python»
 laedt nur diese ([[opencivil.konsole.pakete]]). Eine zweite, von Hand
 gefuehrte Liste gibt es nicht: was `werkzeug/pyodide_holen.py` hinlegt,
-steht nach dem naechsten Lauf der Bruecke im Manifest.
+steht nach dem naechsten Lauf der Bruecke im Manifest. Darum liegt das
+Manifest auch im Paket, an seinem Platz neben `opencivil/`: die Konsole
+liest es im Browser wie auf dem Rechner.
 
 
 ## WARUM ALLE DATEIEN UND NICHT NUR DIE GEBRAUCHTEN
@@ -119,6 +127,16 @@ Manifest nach einem Auschecken mit CRLF nicht mehr.
 def manifest() -> dict
 ```
 
+### quellen
+
+```python
+def quellen() -> dict
+```
+
+Das Paket fuer den Browser: Pfad -> Inhalt, fuer jede Datei von
+[[opencivil.web.bruecke#kerndateien|kerndateien]] und fuer das Manifest -- was der Faden ins
+Dateisystem von Pyodide legt, so wie es im Repo liegt.
+
 ### mitgelieferte_pakete
 
 ```python
@@ -150,6 +168,22 @@ Ob das abgelegte Manifest den vorhandenen Dateien entspricht -- samt Marken.
 ```python
 def schreiben(pfad: Path | None=None) -> Path
 ```
+
+### quellen_stimmen
+
+```python
+def quellen_stimmen() -> bool
+```
+
+Ob das abgelegte Paket den vorhandenen Dateien entspricht, Zeichen fuer Zeichen.
+
+### quellen_schreiben
+
+```python
+def quellen_schreiben(pfad: Path | None=None) -> Path
+```
+
+Schreibt das Paket -- nach dem Manifest, das darin liegt.
 
 ### notizbuch_seiten
 
@@ -199,8 +233,8 @@ Ob Seiten und Verzeichnis dem entsprechen, was der Code heute ergibt.
 def tafeldateien() -> List[Path]
 ```
 
-Was ueber die Importtafel der Seite geht: jedes Modul der Oberflaeche und
-die Verzeichnisse unter `web/kern/`.
+Was ueber die Importtafel der Seite geht: jedes Modul der Oberflaeche, das
+Paket des Kerns und das Verzeichnis des Notizbuchs.
 
 ### versionsmarken
 
@@ -251,6 +285,7 @@ schreiben hiesse, die alten Marken blieben stehen.
 - `WURZEL = Path(__file__).resolve().parents[2]`
 - `PAKET = WURZEL / 'opencivil'`
 - `MANIFEST = WURZEL / 'web' / 'kern' / 'dateien.json'`
+- `QUELLEN = WURZEL / 'web' / 'kern' / 'quellen.json'`
 - `PYODIDE = WURZEL / 'web' / 'vendor' / 'pyodide'`
 - `NOTIZBUCH = WURZEL / 'notizbuch'`
 - `VERZEICHNIS = WURZEL / 'web' / 'kern' / 'notizbuch.json'`
@@ -258,6 +293,7 @@ schreiben hiesse, die alten Marken blieben stehen.
 - `STILBLATT = WURZEL / 'web' / 'css' / 'stil.css'`
 - `ANFANG = '<!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruec…`
 - `ENDE = '<!-- Ende der Versionsmarken -->'`
+- `HINWEIS = "Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- nach …` – Was in der Liste und im Paket obenan steht.
 
 ## Braucht
 

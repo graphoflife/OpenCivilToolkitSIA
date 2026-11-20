@@ -1,5 +1,5 @@
 ---
-erzeugt: 77108ef3ca82
+erzeugt: 2e60ebeeedba
 art: modul
 tags: [modul]
 ---
@@ -119,7 +119,7 @@ def starten(port: int=8080, adresse: str='127.0.0.1') -> None
 
 - `WURZEL = Path(__file__).resolve().parents[2]`
 - `AUSGABE_ORDNER = WURZEL / 'ausgabe'`
-- `OEFFENTLICH = ('web', 'opencivil', 'notizbuch')` – Was aus dem Projektverzeichnis ins Netz darf. `opencivil` muss dabei sein: die Bruecke im Browser laedt von dort die Quelldateien des Rechenkerns; `notizbuch` zeigt die Oberflaeche unter «Formelsammlung».
+- `OEFFENTLICH = ('web', 'opencivil', 'notizbuch')` – Was aus dem Projektverzeichnis ins Netz darf. `opencivil` muss dabei sein: das Notizbuch verweist je Modul auf seinen Quelltext; `notizbuch` zeigt die Oberflaeche unter «Dokumentation».
 - `OEFFENTLICHE_DATEIEN = ('index.html', 'favicon.ico')` – Einzelne Dateien im Wurzelverzeichnis, die ebenfalls ausgeliefert werden.
 
 ## Braucht

@@ -53,8 +53,8 @@ WURZEL = Path(__file__).resolve().parents[2]
 AUSGABE_ORDNER = WURZEL / "ausgabe"
 
 #: Was aus dem Projektverzeichnis ins Netz darf. ``opencivil`` muss dabei sein:
-#: die Bruecke im Browser laedt von dort die Quelldateien des Rechenkerns;
-#: ``notizbuch`` zeigt die Oberflaeche unter «Formelsammlung».
+#: das Notizbuch verweist je Modul auf seinen Quelltext; ``notizbuch`` zeigt
+#: die Oberflaeche unter «Dokumentation».
 OEFFENTLICH = ("web", "opencivil", "notizbuch")
 
 #: Einzelne Dateien im Wurzelverzeichnis, die ebenfalls ausgeliefert werden.

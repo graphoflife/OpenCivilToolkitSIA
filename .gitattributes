@@ -1,0 +1,3 @@
+# Das Paket der Kernquellen für den Browser (opencivil/web/bruecke.py): erzeugt,
+# und was sich darin ändert, steht schon im Diff der Quelle.
+web/kern/quellen.json -diff linguist-generated

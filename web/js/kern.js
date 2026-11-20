@@ -45,11 +45,11 @@ export class KernFehler extends Error {
  */
 export function kernStarten(fortschritt = () => {}, { modul = 'opencivil.web.dienst' } = {}) {
   // Beide Adressen kommen über die Importtafel in index.html, also mit
-  // Versionsmarke. Im Faden gilt die Tafel nicht; die Adresse des
-  // Kernverzeichnisses bekommt er darum mit der ersten Nachricht.
+  // Versionsmarke. Im Faden gilt die Tafel nicht; die Adresse der
+  // Kernquellen bekommt er darum mit der ersten Nachricht.
   const arbeiter = new Worker(import.meta.resolve('./kern_arbeiter.js'), { type: 'module' });
   arbeiter.postMessage({
-    art: 'start', verzeichnis: import.meta.resolve('../kern/dateien.json'), modul,
+    art: 'start', quellen: import.meta.resolve('../kern/quellen.json'), modul,
   });
   /** Nummer der Anfrage -> ihr Versprechen, bis die Antwort da ist. */
   const offen = new Map();

@@ -3,27 +3,33 @@ opencivil/web/bruecke.py -- Welche Dateien der Browser laden muss.
 
 VERANTWORTUNG:
 Fuehrt Buch darueber, aus welchen Quelldateien der Rechenkern besteht, und
-schreibt diese Liste nach ``web/kern/dateien.json``. Der Faden in
-``web/js/kern_arbeiter.js`` liest sie, holt die Dateien uebers Netz und legt
-sie ins Dateisystem von Pyodide -- danach ist ``import opencivil`` im Browser
+schreibt diese Liste nach ``web/kern/dateien.json`` -- dazu alle Dateien in
+einem Stueck nach ``web/kern/quellen.json``. Der Faden in
+``web/js/kern_arbeiter.js`` holt das Paket und legt jede Datei darin ins
+Dateisystem von Pyodide -- danach ist ``import opencivil`` im Browser
 dasselbe wie auf dem Rechner.
 
-WARUM EINE LISTE UND KEIN ARCHIV:
-Ein Archiv waere ein zweites, erzeugtes Abbild des Quellcodes im Repo -- und
-damit etwas, das unbemerkt veralten kann. Die Liste ist reiner Text, im Diff
-lesbar, und :func:`stimmt_ueberein` prueft im Test, dass sie zu den
-tatsaechlich vorhandenen Dateien passt. Veraltet sie, schlaegt der Test an,
-nicht erst die veroeffentlichte Seite.
+EIN PAKET STATT 214 DATEIEN:
+Bis 2026-11-20 holte der Browser jede Datei fuer sich, nach der Liste. Auf
+GitHub Pages kostet jede Anfrage ihre Zeit, und ein paar hundert laufen
+nicht alle zugleich; jetzt ist es eine. Das Paket ist ein zweites, erzeugtes
+Abbild des Quellcodes im Repo -- und damit etwas, das unbemerkt veralten
+kann: :func:`quellen_stimmen` prueft im Test, dass es zu den vorhandenen
+Dateien passt. Veraltet es, schlaegt der Test an, nicht erst die
+veroeffentlichte Seite. Es ist Text und kein Archiv, JSON von Pfad zu
+Inhalt: Git speichert davon nur, was sich aendert, und GitHub komprimiert
+es beim Senden. Im Diff zeigt Git es nicht (``.gitattributes``) -- was sich
+darin aendert, steht schon im Diff der Quelle.
 
 JE DATEI EINE MARKE:
-Neben jedem Pfad steht eine Marke, die ersten zwoelf Zeichen von SHA-256 ueber
-den Inhalt. Der Browser holt die Datei als ``...py?v=Marke``: eine geaenderte
-Datei hat damit eine neue Adresse, und aus dem Zwischenspeicher kommt keine
-alte Fassung mehr, waehrend die uebrigen schon neu sind. Ein schlichter
-statischer Server ohne Cache-Angabe laesst den Browser nach Gefuehl
-zwischenspeichern -- so kam einmal ``blatt.py`` nach einer Aenderung noch alt.
-Das Manifest aendert sich darum mit jeder Aenderung am Kern; der Test merkt,
-wenn das Neuschreiben vergessen ging.
+Neben jedem Pfad steht in der Liste seine Marke, die ersten zwoelf Zeichen
+von SHA-256 ueber den Inhalt: ihr Diff zeigt, welche Kerndatei sich
+aenderte, und der Test merkt, wenn das Neuschreiben vergessen ging. Das
+Paket hat seine eigene Marke, in der Importtafel der Seite (unten): ein
+geaenderter Kern hat damit eine neue Adresse, und aus dem Zwischenspeicher
+kommt kein alter mehr. Ein schlichter statischer Server ohne Cache-Angabe
+laesst den Browser nach Gefuehl zwischenspeichern -- so kam einmal
+``blatt.py`` nach einer Aenderung noch alt.
 
 UND DAS NOTIZBUCH:
 Die ganze Formelsammlung (:func:`opencivil.bericht.formelsammlung.laeufe`)
@@ -42,8 +48,8 @@ MARKEN AUCH FUER DIE OBERFLAECHE:
 Dasselbe traf die Module der Oberflaeche: nach einer Aenderung kam einmal ein
 altes ``nachweise.js`` zum neuen Kern. Darum schreibt die Bruecke in
 ``web/index.html`` eine Importtafel (``<script type="importmap">``): je Modul
-unter ``web/js/`` und je Verzeichnis unter ``web/kern/`` die Adresse mit
-Marke, dazu das Stilblatt mit Marke. Die Module selbst bleiben, wie sie sind
+unter ``web/js/``, fuer das Paket und fuer das Verzeichnis des Notizbuchs
+die Adresse mit Marke, dazu das Stilblatt mit Marke. Die Module selbst bleiben, wie sie sind
 -- ``import './dom.js'`` fuehrt ueber die Tafel auf ``./dom.js?v=Marke``.
 So haengt alles an der Seite: wer sie neu laedt, bekommt den Rest im selben
 Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter ``web/vendor/``;
@@ -55,7 +61,9 @@ beiliegen (:func:`mitgelieferte_pakete`): Importname -> Paketname, gelesen aus
 den Dateien, die dort liegen, und aus ``pyodide-lock.json``. Die App «Python»
 laedt nur diese (:mod:`opencivil.konsole.pakete`). Eine zweite, von Hand
 gefuehrte Liste gibt es nicht: was ``werkzeug/pyodide_holen.py`` hinlegt,
-steht nach dem naechsten Lauf der Bruecke im Manifest.
+steht nach dem naechsten Lauf der Bruecke im Manifest. Darum liegt das
+Manifest auch im Paket, an seinem Platz neben ``opencivil/``: die Konsole
+liest es im Browser wie auf dem Rechner.
 
 WARUM ALLE DATEIEN UND NICHT NUR DIE GEBRAUCHTEN:
 Man koennte die Liste auf das beschraenken, was :mod:`opencivil.web.dienst`
@@ -80,6 +88,7 @@ from opencivil.notizbuch import erzeugen, tresor
 WURZEL = Path(__file__).resolve().parents[2]
 PAKET = WURZEL / "opencivil"
 MANIFEST = WURZEL / "web" / "kern" / "dateien.json"
+QUELLEN = WURZEL / "web" / "kern" / "quellen.json"
 PYODIDE = WURZEL / "web" / "vendor" / "pyodide"
 NOTIZBUCH = WURZEL / "notizbuch"
 VERZEICHNIS = WURZEL / "web" / "kern" / "notizbuch.json"
@@ -115,16 +124,25 @@ def marke(pfad: Path) -> str:
     return tresor.pruefsumme(pfad.read_text(encoding="utf-8"))
 
 
+#: Was in der Liste und im Paket obenan steht.
+HINWEIS = ("Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- "
+           "nach jeder Änderung unter opencivil/ 'python3 -m "
+           "opencivil.web.bruecke' laufen lassen.")
+
+
 def manifest() -> dict:
-    return {
-        "hinweis": (
-            "Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- "
-            "nach jeder Änderung unter opencivil/ 'python3 -m "
-            "opencivil.web.bruecke' laufen lassen."
-        ),
-        "dateien": _mit_marken(),
-        "pakete": mitgelieferte_pakete(),
-    }
+    return {"hinweis": HINWEIS, "dateien": _mit_marken(), "pakete": mitgelieferte_pakete()}
+
+
+def quellen() -> dict:
+    """
+    Das Paket fuer den Browser: Pfad -> Inhalt, fuer jede Datei von
+    :func:`kerndateien` und fuer das Manifest -- was der Faden ins
+    Dateisystem von Pyodide legt, so wie es im Repo liegt.
+    """
+    namen = [*kerndateien(), MANIFEST.relative_to(WURZEL).as_posix()]
+    return {"hinweis": HINWEIS,
+            "dateien": {name: (WURZEL / name).read_text(encoding="utf-8") for name in namen}}
 
 
 def mitgelieferte_pakete() -> Dict[str, str]:
@@ -164,6 +182,19 @@ def stimmt_ueberein() -> bool:
 
 def schreiben(pfad: Path | None = None) -> Path:
     return _json_schreiben(Path(pfad) if pfad is not None else MANIFEST, manifest())
+
+
+def quellen_stimmen() -> bool:
+    """Ob das abgelegte Paket den vorhandenen Dateien entspricht, Zeichen fuer Zeichen."""
+    try:
+        return json.loads(QUELLEN.read_text(encoding="utf-8")) == quellen()
+    except (OSError, json.JSONDecodeError):
+        return False
+
+
+def quellen_schreiben(pfad: Path | None = None) -> Path:
+    """Schreibt das Paket -- nach dem Manifest, das darin liegt."""
+    return _json_schreiben(Path(pfad) if pfad is not None else QUELLEN, quellen())
 
 
 @functools.lru_cache(maxsize=1)
@@ -226,10 +257,10 @@ def _json_schreiben(ziel: Path, daten: dict) -> Path:
 
 def tafeldateien() -> List[Path]:
     """
-    Was ueber die Importtafel der Seite geht: jedes Modul der Oberflaeche und
-    die Verzeichnisse unter ``web/kern/``.
+    Was ueber die Importtafel der Seite geht: jedes Modul der Oberflaeche, das
+    Paket des Kerns und das Verzeichnis des Notizbuchs.
     """
-    return sorted([*(SEITE.parent / "js").glob("*.js"), MANIFEST, VERZEICHNIS])
+    return sorted([*(SEITE.parent / "js").glob("*.js"), QUELLEN, VERZEICHNIS])
 
 
 def versionsmarken() -> str:
@@ -288,6 +319,9 @@ def _zerlegen(seite: Path) -> Tuple[str, str, str]:
 if __name__ == "__main__":
     geschrieben = schreiben()
     print(f"{geschrieben.relative_to(WURZEL)}: {len(kerndateien())} Dateien")
+    # Nach dem Manifest: es liegt im Paket.
+    paket = quellen_schreiben()
+    print(f"{paket.relative_to(WURZEL)}: {paket.stat().st_size / 1e6:.2f} MB")
     plan = notizbuch_schreiben()
     print(f"{NOTIZBUCH.relative_to(WURZEL)}/: {len(plan.schreiben)} geschrieben, "
           f"{len(plan.unveraendert)} unverändert, {len(plan.loeschen)} gelöscht"

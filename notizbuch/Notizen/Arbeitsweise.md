@@ -40,8 +40,9 @@ Kopie der Datei mit der Endung `.mjs`.
   liefert direkt vom Branch aus dem Wurzelverzeichnis, ohne Actions-Bau; nach
   dem Push dauert es etwa 20 s.
 - Dort rechnet Python in Pyodide: die Seite lädt die `.py`-Dateien aus
-  `opencivil/`. Darum wird `opencivil/` mit ausgeliefert, und `.nojekyll` bleibt
-  liegen – ohne die Datei machte GitHub aus jeder `.md` eine HTML-Seite.
+  `opencivil/` in einem Stück, `web/kern/quellen.json`, das die Brücke
+  schreibt. `.nojekyll` bleibt liegen – ohne die Datei machte GitHub aus jeder
+  `.md` eine HTML-Seite.
 - Keine Rechenlogik in JavaScript, nie: beide Wege, Server und Pyodide, rufen
   `opencivil/web/dienst.py` auf.
 - Pyodide liegt im Repo statt auf einem CDN, Pages baut vom Branch statt über

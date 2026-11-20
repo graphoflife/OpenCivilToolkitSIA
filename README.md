@@ -12,7 +12,8 @@ auseinanderlaufen.
 **<https://graphoflife.github.io/OpenCivilToolkitSIA/>**
 
 Dort rechnet **Python**, nicht JavaScript: die Seite startet Pyodide und lädt
-genau die `.py`-Dateien aus `opencivil/`, die auf dem Rechner auch laufen. Keine
+genau die `.py`-Dateien aus `opencivil/`, die auf dem Rechner auch laufen – in
+einem Stück, `web/kern/quellen.json`. Keine
 Formel ist in JavaScript nachgebaut — das wäre ein zweiter Rechenweg, der
 irgendwann vom ersten abweicht, und dann wüsste niemand mehr, welcher stimmt.
 
@@ -253,7 +254,7 @@ Fertig und getestet (1229 Tests):
 | `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `balkensystem3d`, `grundbruch`, `setzung`, `pfahl`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
-| `web/bruecke.py` | was der Browser lädt: das Verzeichnis des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
+| `web/bruecke.py` | was der Browser lädt: das Verzeichnis und das Paket des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
 | `web/api.py` | Lösung, Mitschrift und Zusammenfassung als JSON |
 | `web/diagrammdaten.py` | die Punktfolgen der Diagramme als JSON |
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt, eben oder im Raum: Übersicht und Verläufe |

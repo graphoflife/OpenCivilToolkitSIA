@@ -220,9 +220,10 @@ class TestServerHuelle(unittest.TestCase):
 
     def test_der_kern_ist_ueber_das_netz_erreichbar(self):
         """
-        Die Brücke im Browser lädt den Rechenkern als ``.py``-Dateien nach.
-        Läge ``opencivil/`` nicht im ausgelieferten Baum, bliebe die Seite
-        stumm -- lokal wie auf GitHub Pages.
+        Das Notizbuch verweist je Modul auf seinen Quelltext
+        (``../../opencivil/…``). Läge ``opencivil/`` nicht im ausgelieferten
+        Baum, führte jeder dieser Verweise ins Leere -- lokal wie auf GitHub
+        Pages. Gerechnet wird im Browser mit dem Paket (``quellen.json``).
         """
         self.assertIn("opencivil", server.OEFFENTLICH)
         for datei in bruecke.kerndateien():
@@ -243,6 +244,22 @@ class TestBruecke(unittest.TestCase):
             "web/kern/dateien.json passt nicht mehr zu den Dateien unter "
             "opencivil/. Bitte 'python3 -m opencivil.web.bruecke' laufen lassen -- "
             "sonst lädt die Seite einen veralteten Kern.")
+
+    def test_das_paket_ist_auf_dem_stand_der_quellen(self):
+        self.assertTrue(
+            bruecke.quellen_stimmen(),
+            "web/kern/quellen.json passt nicht mehr zu den Dateien unter "
+            "opencivil/. Bitte 'python3 -m opencivil.web.bruecke' laufen lassen -- "
+            "sonst rechnet die Seite mit einem veralteten Kern.")
+
+    def test_das_paket_bringt_jede_kerndatei_und_das_manifest(self):
+        """
+        Was im Paket steht, legt der Faden in sein Dateisystem, so wie es im
+        Repo liegt -- das Manifest auch: die Konsole liest darin, welche
+        Fremdpakete beiliegen.
+        """
+        self.assertEqual(list(bruecke.quellen()["dateien"]),
+                         [*bruecke.kerndateien(), "web/kern/dateien.json"])
 
     def test_notizbuch_ist_auf_dem_stand(self):
         self.assertTrue(
@@ -285,10 +302,12 @@ class TestBruecke(unittest.TestCase):
 
     def test_schreiben_ist_wiederholbar(self):
         """Zweimal geschrieben ergibt zeichengleich dasselbe -- sonst rauscht das Diff."""
-        with tempfile.TemporaryDirectory() as ordner:
-            a = bruecke.schreiben(Path(ordner) / "a.json").read_text(encoding="utf-8")
-            b = bruecke.schreiben(Path(ordner) / "b.json").read_text(encoding="utf-8")
-        self.assertEqual(a, b)
+        for schreiben in (bruecke.schreiben, bruecke.quellen_schreiben):
+            with self.subTest(schreiben=schreiben.__name__), \
+                    tempfile.TemporaryDirectory() as ordner:
+                a = schreiben(Path(ordner) / "a.json").read_text(encoding="utf-8")
+                b = schreiben(Path(ordner) / "b.json").read_text(encoding="utf-8")
+                self.assertEqual(a, b)
 
     def test_versionsmarken_sind_auf_dem_stand(self):
         self.assertTrue(
@@ -300,7 +319,7 @@ class TestBruecke(unittest.TestCase):
     def test_die_tafel_kennt_module_und_verzeichnisse(self):
         tafel = [p.relative_to(bruecke.WURZEL).as_posix() for p in bruecke.tafeldateien()]
         for datei in ("web/js/app.js", "web/js/kern_arbeiter.js",
-                      "web/kern/dateien.json", "web/kern/notizbuch.json"):
+                      "web/kern/quellen.json", "web/kern/notizbuch.json"):
             with self.subTest(datei=datei):
                 self.assertIn(datei, tafel)
 

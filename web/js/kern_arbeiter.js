@@ -15,8 +15,8 @@
  * Nachweisen braucht bis zu einer halben Minute. Hier rechnet Python, und die
  * Oberfläche bleibt bedienbar: der Laufbalken läuft, die Seite scrollt.
  *
- * Nachrichten vom Hauptfaden: zuerst `start` mit der Adresse des
- * Kernverzeichnisses und dem Dienst, dann je Anfrage eine. Nachrichten an den
+ * Nachrichten vom Hauptfaden: zuerst `start` mit der Adresse der Kernquellen
+ * und dem Dienst, dann je Anfrage eine. Nachrichten an den
  * Hauptfaden: `fortschritt` (für den Ladeschirm), `bereit` oder `gescheitert`
  * (einmal, nach dem Start), `antwort` (je Anfrage).
  *
@@ -26,9 +26,6 @@
 
 /** Verzeichnis, in das die Quelldateien im Dateisystem von Pyodide wandern. */
 const EINHAENGEPUNKT = '/kern';
-
-/** Das Projektverzeichnis, von dieser Datei aus gesehen (web/js/ -> ../../). */
-const WURZEL = new URL('../../', import.meta.url);
 
 const PYODIDE = new URL('../vendor/pyodide/', import.meta.url);
 
@@ -46,51 +43,35 @@ function startfehler(meldung, spur = '') {
 }
 
 /**
- * Holt die Quelldateien des Kerns: `[[Pfad, Inhalt], …]`, samt dem
- * Verzeichnis selbst.
+ * Holt die Quelldateien des Kerns, alle in einem Stück: `[[Pfad, Inhalt], …]`.
  *
- * Die Liste kommt aus `web/kern/dateien.json` und wird von
- * `opencivil/web/bruecke.py` geschrieben; ein Test wacht darüber, dass sie zu
- * den vorhandenen Dateien passt. Deshalb steht hier keine einzige
- * Dateiliste -- veraltete Abschriften wären genau die Art Fehler, die man erst
- * auf der veröffentlichten Seite bemerkt.
+ * Das Paket, `web/kern/quellen.json`, schreibt `opencivil/web/bruecke.py`;
+ * ein Test wacht darüber, dass es zu den vorhandenen Dateien passt. Deshalb
+ * steht hier keine einzige Dateiliste -- veraltete Abschriften wären genau die
+ * Art Fehler, die man erst auf der veröffentlichten Seite bemerkt. Darin liegt
+ * auch das Verzeichnis `web/kern/dateien.json`: die Konsole liest dort,
+ * welche Fremdpakete beiliegen.
  *
- * VERSIONSMARKEN:
- * Jede Datei steht dort mit einer Marke (Prüfsumme ihres Inhalts) und wird als
- * `…py?v=Marke` geholt. Eine geänderte Datei hat so eine neue Adresse: der
- * Browser kann keine alte Fassung aus dem Zwischenspeicher nehmen, während die
- * übrigen schon neu sind.
+ * Bis 2026-11-20 kam jede Datei für sich, nach dem Verzeichnis. Auf GitHub
+ * kostet jede Anfrage ihre Zeit, und 214 laufen nicht alle zugleich.
  *
- * Das Verzeichnis selbst hat seine Marke in der Importtafel von index.html,
- * wie jedes Modul der Oberfläche. Es ist damit genau so alt wie die Seite, die
- * es liest. An jedem Speicher vorbei geholt, träfe nach einer Veröffentlichung
- * eine noch gespeicherte alte Seite auf den neuen Kern.
+ * VERSIONSMARKE:
+ * Das Paket hat seine Marke in der Importtafel von index.html, wie jedes Modul
+ * der Oberfläche. Es ist damit genau so alt wie die Seite, die es liest. An
+ * jedem Speicher vorbei geholt, träfe nach einer Veröffentlichung eine noch
+ * gespeicherte alte Seite auf den neuen Kern.
  *
- * @param {string} verzeichnis  Adresse von `web/kern/dateien.json`, mit Marke
+ * @param {string} adresse  Adresse von `web/kern/quellen.json`, mit Marke
  */
-async function quellenHolen(verzeichnis) {
-  const antwort = await fetch(verzeichnis);
+async function quellenHolen(adresse) {
+  const antwort = await fetch(adresse);
   if (!antwort.ok) {
     throw startfehler(
-      `Kernverzeichnis fehlt (${antwort.status}) → «python3 -m opencivil.web.bruecke».`);
+      `Kernquellen fehlen (${antwort.status}) → «python3 -m opencivil.web.bruecke».`);
   }
-  const verzeichnisText = await antwort.text();
-  const { dateien } = JSON.parse(verzeichnisText);
-  const eintraege = Object.entries(dateien || {});
-  if (!eintraege.length) throw startfehler('Kernverzeichnis leer.');
-
-  // Erst alle holen, dann alle schreiben: die Anfragen laufen so nebeneinander
-  // statt hintereinander, was bei gut fünfzig Dateien deutlich ausmacht.
-  const geladen = await Promise.all(eintraege.map(async ([name, marke]) => {
-    const datei = await fetch(new URL(`${name}?v=${marke}`, WURZEL));
-    if (!datei.ok) throw startfehler(`Kerndatei nicht erreichbar: ${name} (${datei.status})`);
-    return [name, await datei.text()];
-  }));
-
-  // Das Verzeichnis selbst liegt daneben, wo es auch auf dem Rechner liegt:
-  // die Konsole liest darin, welche Fremdpakete beiliegen.
-  geladen.push(['web/kern/dateien.json', verzeichnisText]);
-  return geladen;
+  const dateien = Object.entries((await antwort.json()).dateien || {});
+  if (!dateien.length) throw startfehler('Kernquellen leer.');
+  return dateien;
 }
 
 /** Legt die Quelldateien ins Dateisystem von Pyodide, unter `EINHAENGEPUNKT`. */
@@ -107,11 +88,11 @@ function quellenEinhaengen(pyodide, dateien) {
  * es geht. Die Quellen kommen nebenher, während Python lädt: erst zum
  * Einhängen braucht es Python.
  */
-async function starten(verzeichnis, modul) {
+async function starten(adresse, modul) {
   melden({ art: 'fortschritt', text: 'Python wird geladen …' });
   // Wann jeder Schritt fertig war -- die Seite schreibt es in die Konsole.
   const zeiten = {};
-  const quellen = quellenHolen(verzeichnis).then((dateien) => {
+  const quellen = quellenHolen(adresse).then((dateien) => {
     zeiten['Quellen geholt'] = jetzt();
     return dateien;
   });
@@ -165,7 +146,7 @@ if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
 let dienstBereit;
 
 /**
- * Die erste Nachricht startet: `{art: 'start', verzeichnis, modul}`. Jede
+ * Die erste Nachricht startet: `{art: 'start', quellen, modul}`. Jede
  * weitere ist eine Anfrage: `{nr, name, rumpf}`, der Rumpf schon als JSON.
  * Hinein und heraus geht JSON -- genau wie über HTTP; so bekommt die
  * Oberfläche auf beiden Wegen dieselben Daten, bis aufs Zeichen. Der Reihe
@@ -174,7 +155,7 @@ let dienstBereit;
  */
 self.onmessage = async ({ data }) => {
   if (data.art === 'start') {
-    dienstBereit = starten(data.verzeichnis, data.modul).catch((fehler) => {
+    dienstBereit = starten(data.quellen, data.modul).catch((fehler) => {
       melden({ art: 'gescheitert', meldung: fehler.message, spur: fehler.spur || '' });
       return null;
     });
