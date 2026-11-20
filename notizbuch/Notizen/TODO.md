@@ -18,7 +18,6 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Dazu in Chrome prüfen, ob sich die Seite als App installieren lässt;
       verlangt Chrome ein PNG als Zeichen, schreibt ein kleines Skript ohne
       Fremdpakete die Bilder.
-- Danach Umbau 8 der Durchsicht vom 2026-11-19.
 
 ## Offen
 
@@ -522,7 +521,10 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         (1006): der Plattenquerschnitt steht in `test_plattenquerschnitt.py`.
         Eine Naht Ebene/Raum gab es in beiden nicht. Den Träger und die
         Platten der Tests haben `tests/traeger.py` und `tests/platten.py`.
-- [ ] **8. Dateien nahe oder über 1000 Zeilen.**
+- [x] **8. Dateien nahe oder über 1000 Zeilen.** Erledigt (2026-11-20).
+      - Erledigt (2026-11-20): `tests/test_querschnittsanalyse.py`, 1076
+        Zeilen – die Vorlagen, die leere Analyse und die verschmierten
+        Stäbe stehen in `test_qa_vorlagen.py`; 819 Zeilen bleiben.
       - Erledigt (2026-11-20): `stil.css`, 2597 Zeilen, steht in neun
         Blättern unter `web/css/`, nach Bausteinen statt je App (Grundlage,
         Seite, Eingaben, Berechnung, schmale Geräte, Zeichenfenster,
@@ -884,8 +886,9 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
 - [ ] **Dateien über 1000 Zeilen**, je entlang einer Naht, die schon da ist:
       `cad_fenster.js` (Bedienung, Rückgängig, Punkteingabe auslagern; die
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
-      `stil.css` -- geteilt am 2026-11-20, nach Bausteinen statt je App.
-      cad_fenster.js 1138 -- geteilt am 2026-11-15, jetzt 902. `querkraft.py` und `querschnitt/platte.py` sind
+      `stil.css` -- geteilt am 2026-11-20, nach Bausteinen statt je App;
+      `cad_fenster.js` 1138 -- geteilt am 2026-11-15, jetzt 902.
+      `querkraft.py` und `querschnitt/platte.py` sind
       geteilt (2026-10-25); die Regel für d_v steht in Kurve und Nachweis
       ohne Bügel noch je einmal.
       `nachweise.js`, `spannungsanalyse.py` und `aufbau.py` sind geteilt,

@@ -47,6 +47,9 @@ geteilt, nach dem, was zusammengehört.
   Querschnitten, in der Suche und in der Konsole). Sichtbar ist nur, dass
   eine leere Liste unter der Zeichnung 4 px mehr Luft hat und die bei den
   Lastfällen etwas weniger.
+- `tests/test_querschnittsanalyse.py` (1076 Zeilen) gab die Tests der
+  Vorlagen, der leeren Analyse und der verschmierten Stäbe an
+  `test_qa_vorlagen.py` ab (819 Zeilen bleiben, 89 Tests wie vorher).
 
 Warum: Wer die Platte liest, fand ihre Teile in einer anderen Datei, und
 wer die gemeinsamen Teile suchte, las an den Lagen der Platte vorbei. Wer
