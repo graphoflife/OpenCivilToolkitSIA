@@ -13,9 +13,11 @@ und in jeder App ausser Materialien; «Öffnen» ersetzt alles oder fügt hinzu;
 offline nach dem ersten Besuch; MCP mit Projektdateien; Erdbeben mit
 Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
-- [ ] Schneller Start und offline: den Kern sofort starten, die Quellen
-      als ein Paket, `modulepreload`, Service Worker und Manifest. Vorher
-      und nachher messen.
+- [ ] Startzeiten auf GitHub Pages messen, sobald die Commits vom
+      2026-11-20 veröffentlicht sind: erster und erneuter Besuch, ohne Netz.
+      Dazu in Chrome prüfen, ob sich die Seite als App installieren lässt;
+      verlangt Chrome ein PNG als Zeichen, schreibt ein kleines Skript ohne
+      Fremdpakete die Bilder.
 - [ ] MCP-Server `python3 -m opencivil.mcp`, nur Standardbibliothek, über
       `dienst.bearbeite`; ohne Ausführen von Skripten.
 - [ ] App «Erdbeben», Ersatzkraftverfahren nach SIA 261:2020, 16.5.2:

@@ -8449,6 +8449,18 @@
       ]
     },
     {
+      "name": "opencivil.web.uebersetzt",
+      "pfad": "Python/opencivil.web.uebersetzt.md",
+      "art": "modul",
+      "kurz": "das Uebersetzte fuer den naechsten Start.",
+      "stichworte": [
+        "einsetzen",
+        "packen",
+        "_am_inhalt_geprueft",
+        "_zeit_und_groesse"
+      ]
+    },
+    {
       "name": "opencivil.web.umschlag",
       "pfad": "Python/opencivil.web.umschlag.md",
       "art": "modul",

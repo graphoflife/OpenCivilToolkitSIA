@@ -31,7 +31,8 @@
  * diese Datei, und der Browser installiert sie neu: sie legt nach, was
  * fehlt, und räumt weg, was nicht mehr dazugehört. Nur ihre eigenen Speicher
  * (`opencivil-…`): auf github.io teilen sich alle Seiten eines Kontos einen
- * Ursprung, und damit die Speicher.
+ * Ursprung, und damit die Speicher. Einen davon füllt der Faden des Kerns
+ * selbst, mit dem, was Python übersetzt hat (`web/js/kern_arbeiter.js`).
  */
 
 // Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern
@@ -91,7 +92,7 @@ const VORRAT = {
     "web/js/grundbruch.js?v=959a960e9947",
     "web/js/kapitel.js?v=5943ba037490",
     "web/js/kern.js?v=68a4e9aaa723",
-    "web/js/kern_arbeiter.js?v=b20e0b4bc943",
+    "web/js/kern_arbeiter.js?v=ee8603262c6b",
     "web/js/konsole.js?v=25434f6b739d",
     "web/js/kopierleiste.js?v=2af7c8ead463",
     "web/js/lagen.js?v=d1de89b1b40b",
@@ -124,8 +125,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=a9b3d34ccc90",
-    "web/kern/notizbuch.json?v=1e98db7f58fb",
-    "web/kern/quellen.json?v=fefeb0909e4d"
+    "web/kern/notizbuch.json?v=cee8ba5fec82",
+    "web/kern/quellen.json?v=1d5c2defce99"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {
@@ -183,6 +184,9 @@ const SPEICHER = {
   dateien: `${VORSILBE}dateien`,
   seiten: `${VORSILBE}seiten`,
   notizbuch: `${VORSILBE}notizbuch`,
+  // Den füllt der Faden des Kerns; hier steht er, damit ihn das Aufräumen
+  // stehen lässt.
+  uebersetzt: `${VORSILBE}uebersetzt`,
 };
 
 const adresse = (pfad) => new URL(pfad, BASIS).href;

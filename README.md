@@ -18,7 +18,8 @@ Formel ist in JavaScript nachgebaut — das wäre ein zweiter Rechenweg, der
 irgendwann vom ersten abweicht, und dann wüsste niemand mehr, welcher stimmt.
 
 Der erste Aufruf lädt einmalig ≈13 MB Python-Laufzeit; danach liegt alles im
-Speicher des Browsers, und die Seite geht auch ohne Netz auf. Installieren
+Speicher des Browsers, auch was Python vom Kern übersetzt hat, und die Seite
+geht auch ohne Netz auf. Installieren
 lässt sie sich als App mit eigenem Fenster, in Chrome über das Zeichen am
 rechten Ende der Adresszeile. Ein Durchgang des Beispielprojekts braucht in
 CPython rund 25 ms; im Browser ist es etwa das Anderthalbfache.
@@ -268,6 +269,7 @@ Fertig und getestet (1229 Tests):
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
+| `web/uebersetzt.py` | was Python im Browser vom Kern übersetzt hat, für den nächsten Start: in einem Stück, am Inhalt der Quellen geprüft |
 | `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
 | `sw.js`, `web/js/offline.js`, `web/manifest.webmanifest` | die Seite ohne Netz und als App: der Service Worker, wo er angemeldet wird, was ein installiertes Fenster zeigt |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |

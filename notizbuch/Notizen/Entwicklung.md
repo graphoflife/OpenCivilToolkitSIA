@@ -86,12 +86,31 @@ installieren, mit eigenem Fenster; als Zeichen dient `favicon.svg`.
 `<link rel="modulepreload">` für alle Module, damit der Browser sie auf
 einmal holt statt Stufe um Stufe. Seit der Kern sofort startet, wartet aber
 nichts mehr auf die Oberfläche: sie ist nach 1 s fertig, der Kern nach 5 s,
-und dazwischen steht der Ladeschirm.
+und dazwischen steht der Ladeschirm. Auch mit dem lokalen Server, wo die
+Oberfläche auf dem Weg liegt, brachte es nichts: «Oberfläche geladen» nach
+0.60–0.62 s mit, 0.62–0.63 s ohne. Die Suche nach dem Server kam damit
+sogar später, hinter den 80 Anfragen (0.6 statt 0.16 s).
 
-Was übrig bleibt, ist Python selbst (gut 2 s, davon 0.1 s für die 13 MB aus
-dem Zwischenspeicher) und das Einlesen des Kerns (1.2 s): Python übersetzt
-beim Einbinden jede Datei. Vorübersetzt mitliefern ginge nur aus demselben
-Python wie in Pyodide, 3.14; auf dem Rechner läuft 3.12.
+**Übersetzt vom letzten Besuch.** Das Einlesen des Kerns war danach der
+grösste Brocken nach Python selbst: beim Einbinden übersetzt Python jede
+Datei. Vorübersetzt mitliefern ginge nur aus demselben Python wie in
+Pyodide, 3.14; auf dem Rechner läuft 3.12. Also übersetzt Pyodide selbst
+und merkt es sich: der Faden lässt Python die `.pyc`-Dateien schreiben,
+packt sie 3 s nach dem Start in ein Stück (4.2 MB) und legt es in einen
+eigenen Speicher des Browsers, `opencivil-uebersetzt`, je Dienst eines --
+Kern und Konsole binden Verschiedenes ein. Beim nächsten Besuch kommen sie
+vor dem Einbinden an ihren Ort (`opencivil/web/uebersetzt.py`); neu
+abgelegt wird nur, was sich geändert hat.
+
+Python prüft jedes `.pyc` dabei am Inhalt seiner Quelle (hash-basiert, PEP
+552), nicht wie sonst an Zeit und Grösse. Der erste Versuch setzte allen
+Quellen eine feste Zeit; nach einer geänderten Ziffer -- gleich gross --
+wäre still der alte Code gelaufen. Ein Test zeigt genau diesen Fall
+(`test_uebersetzt`). Über die nachgeahmte Leitung, abwechselnd gemessen:
+eingelesen in 0.68–0.71 s statt 1.41–1.47 s, die erste Rechnung nach
+3.2 s statt 3.9–4.0 s.
+
+Was übrig bleibt, ist Python selbst: 1.6–1.8 s, auch aus dem Speicher.
 
 ## 2026-11-20 · Sandbox je App
 

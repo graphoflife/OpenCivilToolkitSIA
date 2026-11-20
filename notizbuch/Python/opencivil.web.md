@@ -1,5 +1,5 @@
 ---
-erzeugt: b09631f17d24
+erzeugt: 3f347888339e
 art: modul
 tags: [modul]
 ---
@@ -28,5 +28,6 @@ Browser laedt, samt dem Notizbuch.
 - [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.
 - [[opencivil.web.speicher]] – was vom letzten Lauf noch gilt.
 - [[opencivil.web.systemkatalog]] – was die Oberflaeche an einem Balkensystem waehlen laesst.
+- [[opencivil.web.uebersetzt]] – das Uebersetzte fuer den naechsten Start.
 - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.
 - [[opencivil.web.zeichendaten]] – was die Oberflaeche je Bauteil zeichnet, nach seiner Art.

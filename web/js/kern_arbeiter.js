@@ -15,6 +15,15 @@
  * Nachweisen braucht bis zu einer halben Minute. Hier rechnet Python, und die
  * Oberfläche bleibt bedienbar: der Laufbalken läuft, die Seite scrollt.
  *
+ * ÜBERSETZT VOM LETZTEN BESUCH:
+ * Beim Einbinden übersetzt Python jede Quelldatei, und das ist rund die
+ * Hälfte des Einlesens. Einige Sekunden nach dem Start legt der Faden das
+ * Übersetzte in einen Speicher des Browsers; beim nächsten Besuch kommt es
+ * vor dem Einbinden wieder an seinen Ort, und Python prüft jedes Stück am
+ * Inhalt seiner Quelle (`opencivil/web/uebersetzt.py` sagt, wie und warum).
+ * Gibt es keinen Speicher oder geht dabei etwas schief, startet der Kern wie
+ * ohne, nur langsamer.
+ *
  * Nachrichten vom Hauptfaden: zuerst `start` mit der Adresse der Kernquellen
  * und dem Dienst, dann je Anfrage eine. Nachrichten an den
  * Hauptfaden: `fortschritt` (für den Ladeschirm), `bereit` oder `gescheitert`
@@ -28,6 +37,18 @@
 const EINHAENGEPUNKT = '/kern';
 
 const PYODIDE = new URL('../vendor/pyodide/', import.meta.url);
+
+/**
+ * Der Speicher des Browsers für das Übersetzte, darin je Dienst ein Stück.
+ * `sw.js` kennt den Namen, damit sein Aufräumen den Speicher stehen lässt.
+ */
+const UEBERSETZT = 'opencivil-uebersetzt';
+
+/** Das Stück im Dateisystem von Pyodide, auf dem Weg aus dem Speicher und hinein. */
+const STUECK = '/tmp/uebersetzt';
+
+/** So lange nach dem Start wird das Übersetzte abgelegt: nicht auf dessen Weg. */
+const ABLEGEN_NACH_MS = 3000;
 
 const melden = (nachricht) => self.postMessage(nachricht);
 
@@ -84,6 +105,36 @@ function quellenEinhaengen(pyodide, dateien) {
 }
 
 /**
+ * Setzt das Übersetzte vom letzten Besuch an seinen Ort, bevor Python den
+ * Kern einbindet, und gibt zurück, wie viele Dateien es waren. Ohne Speicher
+ * -- `caches` gibt es nur über https und auf dem eigenen Rechner -- oder ohne
+ * Stück: keine, und Python übersetzt wie sonst.
+ */
+async function uebersetztesEinsetzen(pyodide, schluessel) {
+  if (!self.caches) return 0;
+  try {
+    const gespeichert = await (await caches.open(UEBERSETZT)).match(schluessel);
+    if (!gespeichert) return 0;
+    pyodide.FS.writeFile(STUECK, new Uint8Array(await gespeichert.arrayBuffer()));
+    return pyodide.pyimport('opencivil.web.uebersetzt').einsetzen(STUECK, EINHAENGEPUNKT);
+  } catch (ursache) {
+    console.warn('Das Übersetzte vom letzten Besuch ist nicht lesbar; Python übersetzt neu.', ursache);
+    return 0;
+  }
+}
+
+/** Packt das Übersetzte und legt es ab -- nur, wenn sich etwas geändert hat. */
+async function uebersetztesAblegen(pyodide, schluessel) {
+  if (!self.caches) return;
+  try {
+    if (!pyodide.pyimport('opencivil.web.uebersetzt').packen(STUECK, EINHAENGEPUNKT)) return;
+    await (await caches.open(UEBERSETZT)).put(schluessel, new Response(pyodide.FS.readFile(STUECK)));
+  } catch (ursache) {
+    console.warn('Das Übersetzte ist nicht abgelegt; der nächste Start übersetzt neu.', ursache);
+  }
+}
+
+/**
  * Python laden, den Kern einhängen, den Dienst einbinden -- und melden, dass
  * es geht. Die Quellen kommen nebenher, während Python lädt: erst zum
  * Einhängen braucht es Python.
@@ -122,11 +173,17 @@ async function starten(adresse, modul) {
   const dateien = await quellen;
   quellenEinhaengen(pyodide, dateien);
 
+  // Python soll das Übersetzte schreiben: es kommt in den Speicher (oben).
   pyodide.runPython(`
 import sys
 if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
     sys.path.insert(0, ${JSON.stringify(EINHAENGEPUNKT)})
+sys.dont_write_bytecode = False
 `);
+  // Nur ein Name im Speicher, keine Datei auf dem Server.
+  const schluessel = new URL(`../kern/uebersetzt/${modul}`, import.meta.url).href;
+  const uebersetzt = await uebersetztesEinsetzen(pyodide, schluessel);
+  if (uebersetzt) zeiten['Übersetztes eingesetzt'] = jetzt();
 
   let dienst;
   try {
@@ -136,8 +193,10 @@ if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
   }
 
   zeiten['Kern eingelesen'] = jetzt();
+  setTimeout(() => uebersetztesAblegen(pyodide, schluessel), ABLEGEN_NACH_MS);
   const fassung = pyodide.runPython('import sys; sys.version.split()[0]');
-  console.info(`${modul} bereit: Python ${fassung} über Pyodide, ${dateien.length} Dateien.`);
+  const davon = uebersetzt ? `, ${uebersetzt} übersetzt vom letzten Besuch` : '';
+  console.info(`${modul} bereit: Python ${fassung} über Pyodide, ${dateien.length} Dateien${davon}.`);
   melden({ art: 'bereit', fassung, zeiten });
   return dienst;
 }

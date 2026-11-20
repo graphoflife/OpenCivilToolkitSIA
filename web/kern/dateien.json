@@ -213,6 +213,7 @@
     "opencivil/web/setzungsdaten.py": "c8e0b5502a35",
     "opencivil/web/speicher.py": "e467b9546019",
     "opencivil/web/systemkatalog.py": "b802b5c95e3b",
+    "opencivil/web/uebersetzt.py": "24187cc05d8c",
     "opencivil/web/umschlag.py": "b6ba95862f54",
     "opencivil/web/zeichendaten.py": "5122f8172798"
   },
