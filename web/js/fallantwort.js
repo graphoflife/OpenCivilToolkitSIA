@@ -36,11 +36,11 @@ function anfordern(kennung, eintrag, fragen, verzug = 500) {
     fragen(eintrag.fall).then((antwort) => {
       if (!gilt()) return;
       eintrag.daten = antwort;
-      aendern({}, 'diagramm');
+      aendern();
     }).catch((fehler) => {
       if (!gilt()) return;
       eintrag.fehler = fehler.message;
-      aendern({}, 'diagramm');
+      aendern();
     });
   }, verzug);
 }

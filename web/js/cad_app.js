@@ -25,7 +25,7 @@ import {
 import { cadZeile } from './cad_palette.js';
 import { el, svgEl, zahlfeld } from './dom.js';
 import {
-  aendern, beimVergessen, eintragAendern, eintragVon, zustand,
+  beimVergessen, eintragAendern, eintragVon, mitteAendern, zustand,
 } from './zustand.js';
 
 /**
@@ -45,7 +45,7 @@ export function cadApp(praefix, teile, einrichten = () => {}) {
         gilt: () => zustand.projekt === projekt,
         zeichnung: () => eintragVon(kennung),
         schreiben: (veraenderer) => eintragAendern(kennung, veraenderer),
-        tafelNeu: () => aendern({}, 'zeichnung'),
+        tafelNeu: () => mitteAendern(),
         gezeichnet: listeMarkieren,
         ...teile(kennung),
       };

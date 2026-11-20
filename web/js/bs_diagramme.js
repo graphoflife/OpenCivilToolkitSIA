@@ -446,7 +446,7 @@ function ansichtsschalter(zeile, gewaehlt) {
   return wahlSchalter({
     werte: ANSICHTEN.map((x) => ({ wert: x.name, beschriftung: x.text, titel: x.titel })),
     gewaehlt, titel: 'Aus welcher Richtung das Diagramm das System zeigt',
-    setzen: (name) => { ansichten.set(zeile, name); aendern({}, 'diagramm'); },
+    setzen: (name) => { ansichten.set(zeile, name); aendern(); },
     klasse: '.bs-d-ansicht',
   });
 }

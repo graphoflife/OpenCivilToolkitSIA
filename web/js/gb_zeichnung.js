@@ -271,7 +271,7 @@ export function situationKarten(kennung) {
     titel: 'Deren Kräfte zeigt das Bild',
     beiAenderung: (w) => {
       ansicht.gezeigt = w;
-      aendern({}, 'diagramm');
+      aendern();
     },
   }) : null;
   const bild = situationsbild(g, s, fall);

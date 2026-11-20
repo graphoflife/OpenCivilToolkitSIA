@@ -214,7 +214,7 @@ function automatikLeiste(querschnitt) {
  */
 async function bewehrungErmitteln(kennung) {
   laufendeSuche.add(kennung);
-  aendern({}, 'bewehrungssuche-start');
+  aendern();
   try {
     const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
     // Übernommen wird, was gefunden ist -- auch Bügel allein: geht die
@@ -241,6 +241,6 @@ async function bewehrungErmitteln(kennung) {
     // Zuletzt und immer. Hing das Neuzeichnen am Zweig, blieb der Knopf auf
     // «sucht …» stehen, und man musste ein zweites Mal drücken.
     laufendeSuche.delete(kennung);
-    aendern({}, 'bewehrungssuche-ende');
+    aendern();
   }
 }

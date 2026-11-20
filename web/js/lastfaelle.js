@@ -24,7 +24,7 @@ import {
 import { zeilenstand } from './kapitel.js';
 import { anfuegenKnopf } from './nachweise.js';
 import {
-  aendern, ausVorlage, eintragAendern, eintragVon, naechsterName, neueKennung,
+  ausVorlage, eintragAendern, eintragVon, mitteAendern, naechsterName, neueKennung,
 } from './zustand.js';
 
 const lastenText = (n) => `${n} ${n === 1 ? 'Last' : 'Lasten'}`;
@@ -162,7 +162,7 @@ export function aktiverLastfall(ansicht) {
 export function lastfallWaehlen(a, ansicht, lastfall) {
   ansicht.lastfall = lastfall;
   a.neuZeichnen();
-  aendern({}, 'zeichnung');
+  mitteAendern();
 }
 
 /** Der Lastfall für eine neue Last -- ohne einen sagt eine Meldung, wo er zu wählen ist. */

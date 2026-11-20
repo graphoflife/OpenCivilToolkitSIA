@@ -258,7 +258,7 @@ function herleitung(gesamt) {
         el('span', { text: ` · ${loesung.reihenfolge.length} Rechenschritte` }),
         el('button.knopf.knopf-klein', {
           text: 'ganze Herleitung',
-          on: { click: () => aendern({ verfolgung: null }, 'verfolgung') },
+          on: { click: () => aendern({ verfolgung: null }) },
         }),
       ])
       : null,
@@ -542,7 +542,7 @@ function diagrammgruppen(loesung) {
     .map(([, gesetz]) => {
       const bild = kurveZeichnen(gesetz, {
         zeigeVereinfacht: zustand.zeigeVereinfacht,
-        beiUmschalten: (an) => aendern({ zeigeVereinfacht: an }, 'diagramm'),
+        beiUmschalten: (an) => aendern({ zeigeVereinfacht: an }),
       });
       return karte(`${gesetz.titel} – ${gesetz.name}`, [
         gesetz.referenz ? el('p.karte-hinweis', { text: gesetz.referenz }) : null, bild,
@@ -649,7 +649,7 @@ function vorschauknopf(e, aktiv, mitGruppe) {
     on: {
       click: () => aendern({
         diagrammWahl: { schluessel: e.schluessel, gruppe: e.gruppe.schluessel, index: e.index },
-      }, 'diagramm'),
+      }),
     },
   }, [
     el('span.vorschau-bild', {}, [bild || el('span.vorschau-leer', { text: '…' })]),

@@ -98,11 +98,11 @@ function anfordern(kennung, eintrag, verzug = 600) {
     api.analysediagramme(zustand.projekt, kennung, eintrag.schnitt).then((antwort) => {
       if (ansichtVon(kennung).diagramme !== eintrag) return;
       eintrag.daten = antwort.diagramme;
-      aendern({}, 'diagramm');
+      aendern();
     }).catch((fehler) => {
       if (ansichtVon(kennung).diagramme !== eintrag) return;
       eintrag.fehler = fehler.message;
-      aendern({}, 'diagramm');
+      aendern();
     });
   }, verzug);
 }
@@ -305,7 +305,7 @@ function achsenwahl(kennung, achse) {
       const andere = achse === 'x' ? 'y' : 'x';
       if (wahl[andere] === neu) wahl[andere] = wahl[achse];
       wahl[achse] = neu;
-      aendern({}, 'diagramm');
+      aendern();
     },
   });
 }
@@ -329,7 +329,7 @@ function schnittsteuerung(kennung, einachsig) {
       zahlfeld({
         wert: wahl.werte[fest], schritt: GROESSE[fest].schritt, leer: 0,
         titel: `Fester Wert von ${fest} in ${GROESSE[fest].einheit}; die Fläche wird dort geschnitten`,
-        beiAenderung: (v) => { wahl.werte[fest] = v; aendern({}, 'diagramm'); },
+        beiAenderung: (v) => { wahl.werte[fest] = v; aendern(); },
       }),
       ` ${GROESSE[fest].einheit}`,
     ]),
@@ -366,7 +366,7 @@ function interaktionsbild(kennung, i, faelle, x, y, einachsig) {
   const durchLegen = (f) => {
     if (einachsig) return;
     wahlVon(kennung).werte[i.fest] = wert(f, i.fest);
-    aendern({}, 'diagramm');
+    aendern();
   };
   const alleX = [...punkte.map((q) => q[0]), ...faelle.map((f) => wert(f, x))];
   const alleY = [...punkte.map((q) => q[1]), ...faelle.map((f) => wert(f, y))];
@@ -462,7 +462,7 @@ function fallwahl(kennung, faelle, name) {
   if (faelle.length < 2) return null;
   return el('span.schalter.qa-fallwahl', { title: 'Lastfall wählen' }, faelle.map((f) => el('button.schalter-halb', {
     type: 'button', text: f.name, class: f.name === name ? 'ist-an' : '',
-    on: { click: () => { ansichtVon(kennung).gezeigt = f.name; aendern({}, 'diagramm'); } },
+    on: { click: () => { ansichtVon(kennung).gezeigt = f.name; aendern(); } },
   })));
 }
 

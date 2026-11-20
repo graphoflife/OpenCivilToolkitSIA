@@ -2,8 +2,9 @@
  * zustand.js -- Der Zustand der Oberfläche an einer Stelle.
  *
  * Enthält die Projektbeschreibung, das letzte Rechenergebnis und die Auswahl.
- * Wer etwas ändert, ruft `aendern()`; wer darauf reagieren will, meldet sich
- * mit `horchen()` an. Mehr Mechanik braucht es hier nicht.
+ * Wer etwas ändert, ruft `aendern()`, `mitteAendern()` oder, für die
+ * Eingaben, `projektAendern()`; wer darauf reagieren will, meldet sich mit
+ * `horchen()` an. Mehr Mechanik braucht es hier nicht.
  *
  * Die Projektbeschreibung ist die einzige Wahrheit über die Eingaben; alles
  * Gerechnete kommt ausschliesslich aus `loesung` und wird nie in der Oberfläche
@@ -121,7 +122,7 @@ export const zustand = {
 export function appWaehlen(app, eintraege) {
   const kennungen = eintraege.map((e) => e.kennung);
   const kennung = kennungen.includes(zustand.zuletzt[app]) ? zustand.zuletzt[app] : kennungen[0];
-  aendern({ app, fenster: null, auswahl: kennung ? { art: app, kennung } : null }, 'auswahl');
+  aendern({ app, fenster: null, auswahl: kennung ? { art: app, kennung } : null });
 }
 
 /** Die App, deren Liste links steht. */
@@ -155,9 +156,10 @@ export function panelUmschalten(schluessel) {
  */
 export function waehlen(auswahl) {
   if (auswahl) zustand.zuletzt[auswahl.art] = auswahl.kennung;
-  aendern({ auswahl, fenster: null, ...(auswahl ? { app: auswahl.art } : {}) }, 'auswahl');
+  aendern({ auswahl, fenster: null, ...(auswahl ? { app: auswahl.art } : {}) });
 }
 
+/** Meldet `rueckruf` an: er erfährt 'alles', 'mitte' oder 'projekt' -- siehe `aendern`. */
 export function horchen(rueckruf) {
   zuhoerer.add(rueckruf);
   return () => zuhoerer.delete(rueckruf);
@@ -177,26 +179,47 @@ export function ablageEinrichten(rueckruf) {
 }
 
 /**
- * Ändert den Zustand und benachrichtigt alle Zuhörer.
- * @param {Object} teil    zu übernehmende Felder
- * @param {string} anlass  kurze Kennzeichnung, damit Ansichten selektiv neu bauen können
+ * Ändert den Zustand und zeichnet alles neu; gerechnet wird nicht. Ohne
+ * `teil` zeichnet es bloss neu, etwa wenn eine Antwort des Kerns da ist.
+ *
+ * Wer horcht (`horchen`), erfährt, was neu ist: 'alles', 'mitte'
+ * (`mitteAendern`) oder 'projekt' (`projektAendern`). Bis 2026-11-20 gab
+ * jeder Aufruf einen «Anlass» mit, einen freien Text; von rund sechzehn
+ * wirkten drei -- zwei zeichneten nur die Mitte, einer rechnete.
  */
-export function aendern(teil, anlass = 'allgemein') {
+export function aendern(teil = {}) {
   Object.assign(zustand, teil);
-  for (const rueckruf of zuhoerer) rueckruf(anlass);
+  weitersagen('alles');
 }
 
 /**
- * Ändert die Projektbeschreibung.
+ * Ändert, was nur die mittlere Tafel zeigt -- ein Fenster auf oder zu, eine
+ * Wahl im Zeichenfenster -- und zeichnet nur sie neu. Baum und Bericht sähen
+ * danach aus wie vorher, und die Herleitung neu zu setzen kostet mit jeder
+ * Formel mehr.
+ */
+export function mitteAendern(teil = {}) {
+  Object.assign(zustand, teil);
+  weitersagen('mitte');
+}
+
+function weitersagen(was) {
+  for (const rueckruf of zuhoerer) rueckruf(was);
+}
+
+/**
+ * Ändert die Projektbeschreibung. Danach wird gerechnet, wenn sich geändert
+ * hat, was in die Rechnung eingeht (app.js, `rechenstand`).
  *
  * Der einzige Weg, auf dem sich Eingaben ändern -- deshalb steht hier auch das
  * Ablegen im Browser. `ungespeichert` heisst: seit der letzten Datei auf der
  * Platte hat sich etwas getan. Im Browser liegt es da längst.
  */
-export function projektAendern(veraenderer, anlass = 'projekt') {
+export function projektAendern(veraenderer) {
   veraenderer(zustand.projekt);
   ablegen(zustand.projekt);
-  aendern({ ungespeichert: true, fassung: zustand.fassung + 1 }, anlass);
+  Object.assign(zustand, { ungespeichert: true, fassung: zustand.fassung + 1 });
+  weitersagen('projekt');
 }
 
 /**
@@ -206,7 +229,7 @@ export function projektAendern(veraenderer, anlass = 'projekt') {
  */
 export function projektSetzen(projekt, weiteres = {}) {
   ansichten.clear();
-  aendern({ projekt, fassung: zustand.fassung + 1, kurvenNormalkraft: {}, ...weiteres }, 'start');
+  aendern({ projekt, fassung: zustand.fassung + 1, kurvenNormalkraft: {}, ...weiteres });
 }
 
 /** Je Kennung, was sich die Ansichten merken -- siehe `ansichtVon`. */
@@ -258,9 +281,9 @@ export function eintragVon(kennung) {
  * Speichern erst nach dem Löschen kommt, geschieht nichts: weder abgelegt
  * noch gerechnet.
  */
-export function eintragAendern(kennung, veraenderer, anlass = 'projekt') {
+export function eintragAendern(kennung, veraenderer) {
   const eintrag = eintragVon(kennung);
-  if (eintrag) projektAendern(() => veraenderer(eintrag), anlass);
+  if (eintrag) projektAendern(() => veraenderer(eintrag));
 }
 
 // -- Zugriffshilfen ---------------------------------------------------------

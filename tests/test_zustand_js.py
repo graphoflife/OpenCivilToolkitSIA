@@ -2,8 +2,9 @@
 Der Zustand der Oberflaeche (``web/js/zustand.js``): ein Eintrag wird ueber
 seine Kennung gefunden und geaendert, gleich in welcher Liste er steht -- und
 gibt es ihn nicht mehr, geschieht nichts. Jede Aenderung zaehlt die Fassung
-des Projekts, ein neues Projekt leert, was sich die Ansichten merkten, und
-der Katalog nennt einen fehlenden Schluessel mit seinem Pfad.
+des Projekts, wer horcht, erfaehrt, ob alles, nur die Mitte oder das Projekt
+neu ist, ein neues Projekt leert, was sich die Ansichten merkten, und der
+Katalog nennt einen fehlenden Schluessel mit seinem Pfad.
 
 Das Modul wird node als ``data:``-Adresse gegeben, wie in
 ``test_arten_js.py``. Ohne node wird uebersprungen.
@@ -22,9 +23,9 @@ NODE = shutil.which("node")
 PROGRAMM = r"""
 const z = await import('data:text/javascript;base64,%s');
 const abgelegt = [];
-const anlaesse = [];
+const gemeldet = [];
 z.ablageEinrichten((p) => abgelegt.push(JSON.stringify(p)));
-z.horchen((anlass) => anlaesse.push(anlass));
+z.horchen((was) => gemeldet.push(was));
 z.zustand.projekt = {
   name: 'Probe',
   materialien: [{ kennung: 'b1', name: 'C30/37' }],
@@ -34,9 +35,13 @@ const ergebnis = {
   gefunden: [z.eintragVon('b1')?.name, z.eintragVon('d1')?.V_d, z.eintragVon('x9')],
 };
 z.eintragAendern('d1', (d) => { d.V_d = 500; });
-ergebnis.geaendert = [z.zustand.projekt.durchstanzstellen[0].V_d, abgelegt.length, [...anlaesse]];
+ergebnis.geaendert = [z.zustand.projekt.durchstanzstellen[0].V_d, abgelegt.length, [...gemeldet]];
 z.eintragAendern('x9', () => { throw new Error('nie gerufen'); });
-ergebnis.ohne = [abgelegt.length, anlaesse.length];
+ergebnis.ohne = [abgelegt.length, gemeldet.length];
+z.aendern({ reiter: 'diagramm' });
+z.mitteAendern({ fenster: 'f1' });
+z.aendern();
+ergebnis.wege = [gemeldet.slice(1), z.zustand.reiter, z.zustand.fenster, abgelegt.length];
 
 const f0 = z.zustand.fassung;
 z.eintragAendern('d1', (d) => { d.V_d = 600; });
@@ -72,6 +77,14 @@ class TestEintraegeUeberIhreKennung(unittest.TestCase):
 
     def test_geaendert_abgelegt_und_gemeldet(self):
         self.assertEqual(self.ergebnis["geaendert"], [500, 1, ["projekt"]])
+
+    def test_drei_wege(self):
+        """
+        Alles neu, nur die Mitte neu -- beides ohne Ablegen und Rechnen --
+        und das Projekt geaendert (oben). Bis 2026-11-20 gab jeder Aufruf
+        einen freien «Anlass» mit, und drei davon wirkten.
+        """
+        self.assertEqual(self.ergebnis["wege"], [["alles", "mitte", "alles"], "diagramm", "f1", 1])
 
     def test_ohne_eintrag_geschieht_nichts(self):
         """Weder abgelegt noch gerechnet -- etwa ein verzögertes Speichern nach dem Löschen."""

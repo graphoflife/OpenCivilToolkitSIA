@@ -67,7 +67,7 @@ export function plattenkarten(kennung, eintrag, loesung) {
  */
 async function normalkraftWaehlen(kennung, N_Ed) {
   const gewaehlt = { ...zustand.kurvenNormalkraft, [kennung]: N_Ed };
-  aendern({ kurvenNormalkraft: gewaehlt }, 'kurve');
+  aendern({ kurvenNormalkraft: gewaehlt });
   try {
     const antwort = await api.querkraftkurven(zustand.projekt, gewaehlt);
     // Wer zweimal kurz hintereinander weiterstellt, hat zwei Anfragen
@@ -79,7 +79,7 @@ async function normalkraftWaehlen(kennung, N_Ed) {
     // -- Herleitung, Werte, Urteile -- gilt unverändert weiter.
     aendern({
       loesung: { ...zustand.loesung, querkraftkurven: antwort.querkraftkurven },
-    }, 'kurve');
+    });
   } catch (fehler) {
     melden(fehler.message, true);
   }

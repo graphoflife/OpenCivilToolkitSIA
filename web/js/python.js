@@ -32,8 +32,7 @@ function codeSpeichern(kennung, code) {
   clearTimeout(speichernNach);
   speichernNach = null;
   if (eintragVon(kennung)?.code === code) return;
-  // Als «skript»: das rechnet nichts neu, ein Skript geht in keine Rechnung.
-  eintragAendern(kennung, (s) => { s.code = code; }, 'skript');
+  eintragAendern(kennung, (s) => { s.code = code; });
 }
 
 function laufen(kennung) {
@@ -183,7 +182,7 @@ function aufbauen(skript) {
   const nummern = el('div.py-nummern', { 'aria-hidden': 'true' });
   const name = namensfeld({
     wert: skript.name, titel: 'Name des Skripts',
-    setzen: (neu) => eintragAendern(kennung, (s) => { s.name = neu; }, 'skript'),
+    setzen: (neu) => eintragAendern(kennung, (s) => { s.name = neu; }),
   });
   const ausfuehrenKnopf = el('button.knopf.knopf-haupt', {
     type: 'button', text: '▶ Ausführen', title: 'Das ganze Skript ausführen (Strg+Enter)',

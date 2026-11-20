@@ -49,7 +49,7 @@ import {
   el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import {
-  aendern, ausVorlage, eintragVon, feldangabe, katalog, materialien, zustand,
+  ausVorlage, eintragVon, feldangabe, katalog, materialien, mitteAendern, zustand,
 } from './zustand.js';
 
 /**
@@ -321,7 +321,7 @@ function geometrieHolen(a) {
  */
 function fensterNachfuehren(a) {
   listeZeichnen(a);
-  if (zustand.fenster && zustand.auswahl?.kennung === a.qa.kennung) aendern({}, 'fenster');
+  if (zustand.fenster && zustand.auswahl?.kennung === a.qa.kennung) mitteAendern();
 }
 
 /** Warum die Antwort zur jetzigen Zeichnung ausbleibt -- leer, solange nichts schiefging. */

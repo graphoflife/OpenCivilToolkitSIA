@@ -436,10 +436,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
       - Erledigt (2026-11-20): eine Diagrammkarte nennt ihr Bild
         (`karte(titel, inhalt, {bild})`, gelesen mit `bildDer`); der
         Bericht sucht kein SVG mehr in der ganzen Karte.
-      - Der Anlass einer Änderung ist freier Text und zugleich Modus:
-        'zeichnung' und 'fenster' rechnen nicht. Umbau: ob gerechnet wird,
-        sagt die Zeile der App; «nur die Mitte neu zeichnen» wird eine
-        eigene Funktion.
+      - Erledigt (2026-11-20): kein «Anlass» mehr. Ob gerechnet wird, sagt
+        `rechnet: false` in der Zeile der App (die Skripte); «nur die Mitte
+        neu zeichnen» ist `mitteAendern`.
       - `zeichnen.js` übergibt `nurStriche`, `achsen.js` liest es nie:
         `plt.grid(False)` wirkt nicht.
 - [ ] **7. Aus der Arbeit vom 2026-11-19.**

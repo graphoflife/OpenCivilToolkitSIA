@@ -21,7 +21,7 @@ import { el, inhaltMarkieren, melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { konsoleVerbinden } from './konsole.js';
-import { appVon } from './apps.js';
+import { APPS, appVon } from './apps.js';
 import { ARTEN } from './arten.js';
 import { editorZeichnen } from './editor.js';
 import { fensterEinrichten } from './fenster.js';
@@ -29,6 +29,8 @@ import { notizbuchEinrichten } from './notizbuch.js';
 
 const knoten = {};
 let rechenUhr = null;
+/** Womit zuletzt gerechnet wurde -- siehe `rechenstand`. */
+let gerechnet = null;
 
 /**
  * Ob noch einmal gerechnet werden soll, sobald der laufende Durchgang fertig
@@ -81,6 +83,7 @@ function stand(antwort) {
 async function einDurchgang() {
   zustandsanzeige('rechnet …');
   try {
+    gerechnet = rechenstand();
     // Mit der Normalkraft, die unter jeder M-V-Kurve gewählt ist.
     const antwort = await api.rechnen(zustand.projekt, undefined, zustand.kurvenNormalkraft);
     // Der gezeigte Einzelnachweis rechnet mit: sonst stünde in der Herleitung
@@ -95,13 +98,13 @@ async function einDurchgang() {
       loesung: antwort,
       verfolgung: zustand.verfolgung === v ? verfolgung : zustand.verfolgung,
       rechenfehler: null,
-    }, 'loesung');
+    });
 
     zustandsanzeige(...stand(antwort));
   } catch (fehler) {
     zustandsanzeige('Fehler', 'ist-fehler');
     melden(fehler.message, true);
-    aendern({ rechenfehler: fehler.message }, 'rechenfehler');
+    aendern({ rechenfehler: fehler.message });
     if (fehler instanceof KernFehler && fehler.spur) console.error(fehler.spur);
   }
 }
@@ -127,7 +130,7 @@ async function rechnen() {
   }
 
   try {
-    aendern({ rechnetGerade: true }, 'rechnen-start');
+    aendern({ rechnetGerade: true });
     knoten.btnRechnen.disabled = true;
 
     do {
@@ -136,7 +139,7 @@ async function rechnen() {
     } while (nachgereicht);
   } finally {
     nachgereicht = false;
-    aendern({ rechnetGerade: false }, 'rechnen-ende');
+    aendern({ rechnetGerade: false });
     knoten.btnRechnen.disabled = false;
   }
 }
@@ -158,7 +161,25 @@ async function teillauf({ ziel, name }) {
 async function verfolgen(ziel, name) {
   const neu = await teillauf({ ziel, name });
   // Inzwischen aufgehoben oder ein anderes Auge gewählt: dann nicht.
-  if (zustand.verfolgung?.ziel === ziel) aendern({ verfolgung: neu }, 'verfolgung');
+  if (zustand.verfolgung?.ziel === ziel) aendern({ verfolgung: neu });
+}
+
+/**
+ * Was in die Rechnung eingeht, als Text: das Projekt ohne das, was den Apps
+ * gehört, deren Zeile `rechnet: false` sagt -- den Skripten: ihre Liste und
+ * ihre vergebenen Kennungen (`neueKennung`, zustand.js). Ist er nach einer
+ * Änderung, wie er beim letzten Rechnen war (`gerechnet`), wird nicht neu
+ * gerechnet. Bis 2026-11-20 sagte das jeder Aufruf selbst, mit einem
+ * «Anlass»: Kopieren und Löschen eines Skripts rechneten neu, Anlegen,
+ * Umbenennen und der Code nicht.
+ */
+function rechenstand() {
+  const ohne = APPS.filter((a) => a.rechnet === false);
+  const { vergeben = {}, ...projekt } = zustand.projekt;
+  return JSON.stringify([
+    Object.entries(projekt).filter(([liste]) => !ohne.some((a) => a.liste === liste)),
+    Object.entries(vergeben).filter(([vorsilbe]) => !ohne.some((a) => a.vorsilbe === vorsilbe)),
+  ]);
 }
 
 /** Rechnet verzögert -- damit Tippen nicht jede Taste zu einem Nachweis macht. */
@@ -182,7 +203,7 @@ function spaeterRechnen() {
 function speichern() {
   try {
     const name = alsDateiSichern(zustand.projekt);
-    aendern({ ungespeichert: false }, 'gespeichert');
+    aendern({ ungespeichert: false });
     melden(`${name} gespeichert.`);
   } catch (fehler) {
     melden(fehler.message, true);
@@ -455,14 +476,6 @@ function ohneSprung(zeichnen) {
 }
 
 /**
- * Anlässe, die nur die mittlere Tafel betreffen: eine Auswahl im
- * Zeichenfenster, eine Antwort des Kerns zur Zeichnung. Baum und Bericht
- * sähen danach aus wie vorher -- und die Herleitung neu zu setzen kostet
- * mit jeder Formel mehr.
- */
-const NUR_MITTE = new Set(['zeichnung', 'fenster']);
-
-/**
  * Die rechte Tafel: die Berechnung -- oder was die App des Gewählten selbst
  * rechts zeigt (apps.js, `rechts`): bei Python die Variablen der Sitzung,
  * wie in Spyder (Benutzer, 2026-10-15). Dann gelten Umfang und Reiter nicht.
@@ -480,7 +493,7 @@ function rechtsZeichnen() {
       verfolgen: (ziel, name) => {
         // Reiter und Platzhalter in einem Zug: sonst zeichnete der Wechsel
         // erst die ganze Herleitung, die der Teillauf gleich ersetzt.
-        aendern({ reiter: 'herleitung', verfolgung: { ziel, name, loesung: null } }, 'verfolgung');
+        aendern({ reiter: 'herleitung', verfolgung: { ziel, name, loesung: null } });
         verfolgen(ziel, name);
       },
     });
@@ -511,15 +524,16 @@ function geretteterStand(eintrag) {
       on: {
         click: () => {
           geretteteVerwerfen(eintrag);
-          aendern({ gerettet: gerettete() }, 'gerettet');
+          aendern({ gerettet: gerettete() });
         },
       },
     }),
   ]);
 }
 
-function allesZeichnen(anlass) {
-  const nurMitte = NUR_MITTE.has(anlass);
+/** Zeichnet neu, was `was` sagt (`aendern`, zustand.js) -- und rechnet, wo es nötig ist. */
+function allesZeichnen(was) {
+  const nurMitte = was === 'mitte';
   ohneSprung(() => {
     if (!nurMitte) baumZeichnen(knoten.apps, knoten.baum);
     editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis, knoten.fenster);
@@ -534,9 +548,9 @@ function allesZeichnen(anlass) {
     k.classList.toggle('ist-an', k.dataset.umfang === zustand.umfang);
   }
 
-  // Eingaben geändert -> neu rechnen. Nicht bei blossem Blättern und nicht,
-  // während schon gerechnet wird.
-  if (anlass === 'projekt') spaeterRechnen();
+  // Geändert, was in die Rechnung eingeht -> neu rechnen. Nicht bei blossem
+  // Blättern und nicht nach einer Änderung an einem Skript.
+  if (was === 'projekt' && rechenstand() !== gerechnet) spaeterRechnen();
 }
 
 // ===========================================================================
@@ -583,12 +597,12 @@ async function starten() {
   knoten.btnOeffnen.addEventListener('click', oeffnen);
 
   knoten.projektname.addEventListener('change', (e) => {
-    projektAendern((p) => { p.name = e.target.value; }, 'name');
+    projektAendern((p) => { p.name = e.target.value; });
   });
 
   for (const k of knoten.reiterKnoepfe) {
     k.addEventListener('click', () => {
-      aendern({ reiter: k.dataset.reiter }, 'reiter');
+      aendern({ reiter: k.dataset.reiter });
       // Der Einzelnachweis rechnet erst nach, wenn die Herleitung zu sehen ist.
       const v = zustand.verfolgung;
       if (k.dataset.reiter === 'herleitung' && v && !v.loesung) verfolgen(v.ziel, v.name);
@@ -596,7 +610,7 @@ async function starten() {
   }
   // Ein Klick irgendwo auf den Schalter schaltet um, wie bei jedem mit zwei Stellungen.
   knoten.umfang.addEventListener('click', () => aendern(
-    { umfang: zustand.umfang === 'seite' ? 'gesamt' : 'seite' }, 'umfang'));
+    { umfang: zustand.umfang === 'seite' ? 'gesamt' : 'seite' }));
 
   griffeEinrichten();
   tafelwahlEinrichten();
@@ -606,7 +620,7 @@ async function starten() {
   ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);
   // Die Konsole meldet, wenn ein Lauf etwas ergab -- gerechnet wird dabei nichts.
-  konsoleVerbinden(() => aendern({}, 'konsole'));
+  konsoleVerbinden(() => aendern());
   // Vor dem Kern: das Notizbuch braucht ihn nicht, und eine Adresse
   // #notizbuch/… soll auch dann aufgehen, wenn Pyodide noch lädt.
   notizbuchEinrichten({

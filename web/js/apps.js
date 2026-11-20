@@ -5,8 +5,9 @@
  * (ARTEN, arten.js) und Python. Was Baum, Editor und rechte Tafel von ihr
  * wissen müssen, steht in ihrer Zeile: ihre Liste im Projekt und die Gruppen
  * unter dem Knopf, wie ein Eintrag heisst und was rechts in ihm steht, wie er
- * entsteht und wie er weggeht, sein Editor, sein Fenster und was er rechts
- * zeigt. Die gemeinsamen Abläufe schlagen nur noch hier nach.
+ * entsteht und wie er weggeht, sein Editor, sein Fenster, was er rechts
+ * zeigt und ob er in die Rechnung eingeht (`rechnet`). Die gemeinsamen
+ * Abläufe schlagen nur noch hier nach.
  *
  * Bis 2026-10-18 liefen Material und Python als Sonderwege durch baum.js,
  * editor.js, zustand.js und app.js, und was eine Bauteilart im Baum und im
@@ -60,9 +61,7 @@ import {
  * überall sonst aus waren. Kopiert, nicht die Vorlage selbst: sonst teilten
  * sich alle neuen Platten dieselben Lagen, und die zweite änderte die erste mit.
  */
-function nachVorlage(a, {
-  braucht = [], fehlt = '', einrichten = () => {}, anlass,
-} = {}) {
+function nachVorlage(a, { braucht = [], fehlt = '', einrichten = () => {} } = {}) {
   const stoffe = Object.fromEntries(braucht.map((art) => [
     art, zustand.projekt.materialien.find((m) => m.art === art)]));
   if (braucht.some((art) => !stoffe[art])) {
@@ -76,7 +75,7 @@ function nachVorlage(a, {
     const neu = { ...structuredClone(vorlage), kennung, name: naechsterName(a.stamm, p[a.liste]) };
     einrichten(neu, stoffe);
     p[a.liste].push(neu);
-  }, anlass);
+  });
   waehlen({ art: a.app, kennung });
 }
 
@@ -365,7 +364,7 @@ const SKRIPT = {
   vorsilbe: 'p', stamm: 'Skript',
   gruppen: (p) => [{
     titel: 'Python-Skripte', leer: 'kein Skript', eintraege: p.skripte || [],
-    plus: { titel: 'Skript hinzufügen', tun: () => nachVorlage(SKRIPT, { anlass: 'skript' }) },
+    plus: { titel: 'Skript hinzufügen', tun: () => nachVorlage(SKRIPT) },
   }],
   name: (s) => s.name,
   kurztext: (s) => {
@@ -377,6 +376,9 @@ const SKRIPT = {
   hinweis: () => 'Python',
   editor: skriptZeichnen,
   rechts: { titel: 'Variablen', zeichnen: variablenZeichnen },
+  // Ein Skript geht in keine Rechnung ein: es zu ändern, anzulegen, zu
+  // kopieren oder zu löschen rechnet nicht neu (app.js, `rechenstand`).
+  rechnet: false,
 };
 
 /** Die Apps, in der Folge ihrer Knöpfe: das Material, die Bauteilarten wie ARTEN, Python. */

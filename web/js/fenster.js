@@ -18,7 +18,7 @@
 
 import { el, ersetzen } from './dom.js';
 import { sinnbild } from './sinnbilder.js';
-import { aendern, zustand } from './zustand.js';
+import { mitteAendern, zustand } from './zustand.js';
 
 /** Der Grund, auf dem das Fenster liegt -- gesetzt von `fensterEinrichten`. */
 let grundKnoten = null;
@@ -28,12 +28,12 @@ let grundKnoten = null;
  * Eingaben und nicht in die Tafel darunter.
  */
 export function fensterOeffnen(schluessel) {
-  aendern({ fenster: schluessel }, 'fenster');
+  mitteAendern({ fenster: schluessel });
   grundKnoten?.querySelector('.fenster')?.focus({ preventScroll: true });
 }
 
 export function fensterSchliessen() {
-  if (zustand.fenster) aendern({ fenster: null }, 'fenster');
+  if (zustand.fenster) mitteAendern({ fenster: null });
 }
 
 /** Einmal beim Start: Escape und ein Klick auf den Grund schliessen. */

@@ -7,6 +7,24 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Wann gerechnet wird, steht an einer Stelle
+
+Jede Änderung trug einen «Anlass», einen freien Text wie 'diagramm' oder
+'skript'. Gewirkt haben davon drei: zwei zeichneten nur die Mitte neu, einer
+rechnete. So rechneten Kopieren und Löschen eines Skripts neu, Anlegen,
+Umbenennen und eine Änderung am Code nicht – und ein Zeichenfenster, das
+einer Eingabe den sprechenden Anlass 'zeichnung' mitgegeben hätte, hätte
+nichts gerechnet und rechts alte Zahlen stehen lassen.
+
+Jetzt gibt es drei Wege: `aendern` zeichnet alles neu, `mitteAendern` nur
+die Mitte, `projektAendern` ändert die Eingaben. Danach rechnet die Seite,
+wenn sich geändert hat, was in die Rechnung eingeht: das Projekt ohne das,
+was den Apps gehört, deren Zeile `rechnet: false` sagt – den Skripten, ihrer
+Liste und ihren vergebenen Kennungen.
+
+Für den Benutzer: ein neuer Name des Projekts rechnet jetzt neu; eine
+Änderung an einem Skript rechnet nie neu, auch Kopieren und Löschen nicht.
+
 ## 2026-11-20 · Ein Diagramm nennt sein Bild
 
 Der Reiter «Diagramme» im Bericht hielt jede Karte mit irgendeinem SVG für
