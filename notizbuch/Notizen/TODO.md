@@ -13,10 +13,8 @@ und in jeder App ausser Materialien; «Öffnen» ersetzt alles oder fügt hinzu;
 offline nach dem ersten Besuch; MCP mit Projektdateien; Erdbeben mit
 Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 
-- [ ] Oberfläche: ein eigenes Material im
-      Balkensystem beginnt mit den Werten des ersten Betons (C25/30); die
-      Meldungen der Decke je Fall zusammengefasst; die Rechenwerte in allen
-      Modulen je Material wie in der Querschnittsanalyse.
+- [ ] Oberfläche: die Meldungen der Decke je Fall zusammengefasst; die
+      Rechenwerte in allen Modulen je Material wie in der Querschnittsanalyse.
 - [ ] Mehrere Projekte: oben eine Reihe; «Speichern» schreibt alle in eine
       Datei; «Öffnen» fragt «alles ersetzen | hinzufügen».
 - [ ] Sandbox: je Projekt und App zuoberst, golden, ↺ statt ×, beim Laden

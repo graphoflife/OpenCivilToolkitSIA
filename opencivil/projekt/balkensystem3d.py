@@ -45,7 +45,8 @@ from typing import List
 
 from opencivil.core.einheiten import GRAD, KN_PRO_M, KN_PRO_M2, KNM_PRO_RAD, M, N_PRO_MM2
 from opencivil.projekt.balkensystem import (
-    HALT, KnotenlastEintrag, StablastEintrag, StabmaterialEintrag, StatikdiagrammEintrag, federfeld,
+    EIGENES_MATERIAL, HALT, KnotenlastEintrag, StablastEintrag, StabmaterialEintrag, StatikdiagrammEintrag,
+    federfeld,
 )
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen
@@ -165,8 +166,8 @@ class RaumknotenlastEintrag(KnotenlastEintrag):
 class RaummaterialEintrag(StabmaterialEintrag):
     """Ein Material der Staebe -- wie in der Ebene, ein eigenes dazu mit seinem Schubmodul."""
 
-    G: float = bereich(80000.0, heisst="Schubmodul G", einheit=N_PRO_MM2, ueber=0.0)
-    """N/mm² -- nur bei ``eigen``."""
+    G: float = bereich(EIGENES_MATERIAL["G"], heisst="Schubmodul G", einheit=N_PRO_MM2, ueber=0.0)
+    """N/mm² -- nur bei ``eigen``; zu Beginn G_cm des ersten Betons (:data:`EIGENES_MATERIAL`)."""
 
 
 @dataclass

@@ -9,6 +9,8 @@ das damit über tausend Zeilen hatte.
 import unittest
 
 from opencivil.projekt import BalkensystemEintrag, Projekt, QuerschnittsanalyseEintrag
+from opencivil.projekt.balkensystem import StabmaterialEintrag
+from opencivil.projekt.balkensystem3d import RaummaterialEintrag
 from opencivil.projekt.staebe import MATERIAL_DES_QUERSCHNITTS
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
@@ -17,6 +19,7 @@ from opencivil.spannungsanalyse.modul import aequivalenter_modul
 from opencivil.spannungsanalyse.platte import loeserpaar
 from opencivil.spannungsanalyse.schnitt import schnittpaar
 from opencivil.web import dienst
+from opencivil.web.api import katalog
 from tests.traeger import traeger
 from tests.unfertig import meldung
 
@@ -61,6 +64,13 @@ class TestMaterialien(unittest.TestCase):
                                delta=1e-6)
         self.assertAlmostEqual(e.wert("balkensystem.r1.Q2.M1.g_k").groesse.si, 250.0)
         self.assertAlmostEqual(e.wert("balkensystem.r1.Q2.M2.g_k").groesse.si, 785.0)
+
+    def test_eigenes_material_beginnt_mit_dem_ersten_beton(self):
+        """C25/30: E_cm = 10 000 · ∛33 = 32 075 N/mm², G_cm = E_cm / 2.4 = 13 365 N/mm², ρ_sb = 2500 kg/m³."""
+        eben, raum = StabmaterialEintrag(art="eigen"), RaummaterialEintrag(art="eigen")
+        self.assertEqual((eben.E, eben.rho), (32075.0, 2500.0))
+        self.assertEqual((raum.E, raum.rho, raum.G), (32075.0, 2500.0, 13365.0))
+        self.assertEqual(katalog()["vorlagen"]["raummaterial"]["G"], 13365.0)
 
     def test_baukasten_und_herleitung(self):
         s = BalkensystemEintrag(kennung="r1", name="T")

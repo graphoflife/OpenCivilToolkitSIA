@@ -1,5 +1,5 @@
 ---
-erzeugt: e07cb5574782
+erzeugt: 230281ae8772
 art: modul
 tags: [modul]
 ---
@@ -156,7 +156,7 @@ class RaummaterialEintrag(StabmaterialEintrag)
 
 Ein Material der Staebe -- wie in der Ebene, ein eigenes dazu mit seinem Schubmodul.
 
-- `G: float = bereich(80000.0, heisst='Schubmodul G', einheit=N_PRO_MM2, ueber=0.0)` – N/mm² -- nur bei `eigen`.
+- `G: float = bereich(EIGENES_MATERIAL['G'], heisst='Schubmodul G', einheit=N_PRO_M…` – N/mm² -- nur bei `eigen`; zu Beginn G_cm des ersten Betons ([[opencivil.projekt.balkensystem#Konstanten|EIGENES_MATERIAL]]).
 
 ### RaumquerschnittEintrag
 

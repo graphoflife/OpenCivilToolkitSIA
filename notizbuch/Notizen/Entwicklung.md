@@ -7,6 +7,20 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-20 · Ein eigenes Material beginnt mit den Werten des ersten Betons
+
+Ein eigenes Material im Balkensystem begann mit den Werten eines
+Baustahls: E = 200 000 N/mm², ρ = 7850 kg/m³, im Raum G = 80 000 N/mm² --
+als Zahlen im Code. Der Benutzer will die Werte eines Betons (2026-11-20).
+
+Jetzt beginnt es mit denen des ersten Betons eines Projekts
+(`ERSTER_BETON`, C25/30), aus seiner Vorlage gerechnet
+(`beton.sortenwerte`) und gerundet wie im Bericht: E = E_cm = 32 075 N/mm²,
+ρ = ρ_sb = 2500 kg/m³, G = G_cm = 13 365 N/mm². Welcher Kennwert des Betons
+zu E, ρ und G gehört, sagen dieselben `Materialkennwert`e, mit denen ein
+Stab aus Beton rechnet (`E_MODUL`, `DICHTE`, `SCHUBMODUL`);
+`EIGENES_MATERIAL` in `projekt/balkensystem.py` hält die Zahlen.
+
 ## 2026-11-20 · Neues heisst wie sein Knopf
 
 «+ Einwirkung» legte eine «Tragsicherheit 1» an, «+ Lastfall» der

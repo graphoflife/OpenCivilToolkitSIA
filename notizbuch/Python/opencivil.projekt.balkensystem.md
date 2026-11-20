@@ -1,5 +1,5 @@
 ---
-erzeugt: e5598959d275
+erzeugt: dc94f745b546
 art: modul
 tags: [modul]
 ---
@@ -271,8 +271,8 @@ mit `E` und `rho` von Hand.
 - `art: str = einer_von(STABMATERIALARTEN, 'beton')`
 - `stoff: str = ''` – Die Kennung des Betons oder Baustahls im Projekt (`b1`, `st1`) -- nicht bei `eigen`.
 - `name: str = ''` – Wie ein eigenes heisst; ein Beton oder Baustahl heisst wie im Projekt.
-- `E: float = bereich(200000.0, heisst='E-Modul E', einheit=N_PRO_MM2, ueber=0.0)` – N/mm² -- nur bei `eigen`.
-- `rho: float = bereich(7850.0, heisst='Dichte ρ', einheit=KG_PRO_M3, ab=0.0)` – kg/m³, fuer das Eigengewicht -- nur bei `eigen`.
+- `E: float = bereich(EIGENES_MATERIAL['E'], heisst='E-Modul E', einheit=N_PRO_MM2,…` – N/mm² -- nur bei `eigen`; zu Beginn E_cm des ersten Betons ([[opencivil.projekt.balkensystem#Konstanten|EIGENES_MATERIAL]]).
+- `rho: float = bereich(EIGENES_MATERIAL['rho'], heisst='Dichte ρ', einheit=KG_PRO_M3…` – kg/m³, fuer das Eigengewicht -- nur bei `eigen`; zu Beginn die des Stahlbetons.
 
 ### StabquerschnittEintrag
 
@@ -363,6 +363,7 @@ Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke
 ## Konstanten
 
 - `HALT = ('frei', 'fest', 'feder')` – Wie ein Lager oder Linienlager je Richtung haelt.
+- `EIGENES_MATERIAL = {k.kurzname: wert for k, wert in zip((E_MODUL, DICHTE, SCHUBMODUL), s…` – Womit ein eigenes Material anfaengt: mit den Werten des ersten Betons eines Projekts ([[opencivil.material.beton#Konstanten|ERSTER_BETON]], C25/30), aus seiner Vorlage gerechnet -- E = E_cm, ρ = ρ_sb, im Raum G = G_cm -- und gerundet wie im Bericht (Benutzer, 2026-11-20; bis dahin die Werte eines Baustahls, E = 200 000 N/mm² und ρ = 7850 kg/m³).
 - `EINHEIT_DER_LAST = {Lastart.LINIENLAST: KN_PRO_M, Lastart.EINZELLAST: KN, Lastart.MOMENT…` – Die Einheit jeder Last auf einem Stab in der Beschreibung, nach ihrer Art; an einem Knoten die derselben Last auf einem Stab ([[opencivil.projekt.balkensystem#Knotenlastart.einheit|Knotenlastart.einheit]]). Umgerechnet wird beim Bauen, mit diesen.
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `STABMATERIALARTEN = (*(art.value for art in STABKENNWERTE), 'eigen')` – Was ein Material des Systems ist: ein Beton oder Baustahl des Projekts -- E und Dichte von ihm, nicht zu aendern -- oder ein eigenes mit E und Dichte von Hand (Benutzer, 2026-10-24; Baustahl seit 2026-11-15). Betonstahl ist keines: aus ihm ist kein Stab. Welche Arten des Projekts es gibt, sagen die Kennwerte, die ein Stab aus ihnen nimmt.
@@ -373,6 +374,8 @@ Ein Stahlprofil aus der Tabelle, «HEB 300» -- gebogen um `achse`, y die starke
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.wahl]]
+- [[opencivil.material.basis]]
+- [[opencivil.material.beton]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]
 - [[opencivil.projekt.lesen]]

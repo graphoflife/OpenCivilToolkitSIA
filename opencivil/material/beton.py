@@ -27,11 +27,12 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Mapping, Optional
+from typing import Dict, List, Mapping, Optional, Sequence
 
 from opencivil.core.einheiten import (
-    EINHEITSLOS, KG_PRO_M3, MPA, N_PRO_MM2, PROMILLE, Groesse, empirisch,
+    EINHEITSLOS, KG_PRO_M3, N_PRO_MM2, PROMILLE, Groesse, empirisch,
 )
+from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage, erzeuge
 
 # ===========================================================================
@@ -338,6 +339,22 @@ def beton(
         praefix=praefix,
         symbol_index=symbol_index,
     )
+
+
+def sortenwerte(sorte: str, kurznamen: Sequence[str]) -> Dict[str, float]:
+    """
+    Kennwerte einer Sorte als Zahlen, aus ihrer Vorlage gerechnet: in der
+    Einheit der Vorlage und so gerundet, wie der Bericht sie zeigt
+    (``stellen``) -- ``{"E_cm": 32075.0}`` bei C25/30. Fuer Vorgaben, die mit
+    den Werten einer Sorte anfangen: das eigene Material eines
+    Balkensystems.
+    """
+    werk = Rechenwerk()
+    stoff = beton(sorte).ins_rechenwerk(werk)
+    loesung = werk.loese(*(stoff.id_von(k) for k in kurznamen), ohne_herleitung=True)
+    vorlagen = {v.kurzname: v for v in BETON_VORLAGEN}
+    return {k: round(loesung.groesse(stoff.id_von(k)).in_einheit(vorlagen[k].einheit), vorlagen[k].stellen)
+            for k in kurznamen}
 
 
 def beton_frei(

@@ -51,16 +51,28 @@ from opencivil.core.einheiten import (
     Einheit,
 )
 from opencivil.core.wahl import Wahl
+from opencivil.material.basis import Baustoffart
+from opencivil.material.beton import ERSTER_BETON, sortenwerte
 from opencivil.projekt.eintraege import BauteilEintrag, Beschreibung
 from opencivil.projekt.faelle import LastfallEintrag, LastkombinationEintrag, MitFaellen
 from opencivil.projekt.lesen import bereich, einer_von
 from opencivil.projekt.staebe import MitStaeben, StabquerschnittBasis
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
-from opencivil.stabwerk.rechnung import STABKENNWERTE
+from opencivil.stabwerk.rechnung import DICHTE, E_MODUL, SCHUBMODUL, STABKENNWERTE
 from opencivil.stabwerk.stabquerschnitt import EBEN
 
 #: Wie ein Lager oder Linienlager je Richtung haelt.
 HALT = ("frei", "fest", "feder")
+
+#: Womit ein eigenes Material anfaengt: mit den Werten des ersten Betons
+#: eines Projekts (:data:`~opencivil.material.beton.ERSTER_BETON`, C25/30),
+#: aus seiner Vorlage gerechnet -- E = E_cm, ρ = ρ_sb, im Raum G = G_cm --
+#: und gerundet wie im Bericht (Benutzer, 2026-11-20; bis dahin die Werte
+#: eines Baustahls, E = 200 000 N/mm² und ρ = 7850 kg/m³).
+EIGENES_MATERIAL = {
+    k.kurzname: wert for k, wert in zip((E_MODUL, DICHTE, SCHUBMODUL), sortenwerte(
+        ERSTER_BETON, [k.je_stoff[Baustoffart.BETON] for k in (E_MODUL, DICHTE, SCHUBMODUL)]).values())
+}
 
 #: Die Einheit jeder Last auf einem Stab in der Beschreibung, nach ihrer
 #: Art; an einem Knoten die derselben Last auf einem Stab
@@ -277,11 +289,11 @@ class StabmaterialEintrag(Beschreibung):
     name: str = ""
     """Wie ein eigenes heisst; ein Beton oder Baustahl heisst wie im Projekt."""
 
-    E: float = bereich(200000.0, heisst="E-Modul E", einheit=N_PRO_MM2, ueber=0.0)
-    """N/mm² -- nur bei ``eigen``."""
+    E: float = bereich(EIGENES_MATERIAL["E"], heisst="E-Modul E", einheit=N_PRO_MM2, ueber=0.0)
+    """N/mm² -- nur bei ``eigen``; zu Beginn E_cm des ersten Betons (:data:`EIGENES_MATERIAL`)."""
 
-    rho: float = bereich(7850.0, heisst="Dichte ρ", einheit=KG_PRO_M3, ab=0.0)
-    """kg/m³, fuer das Eigengewicht -- nur bei ``eigen``."""
+    rho: float = bereich(EIGENES_MATERIAL["rho"], heisst="Dichte ρ", einheit=KG_PRO_M3, ab=0.0)
+    """kg/m³, fuer das Eigengewicht -- nur bei ``eigen``; zu Beginn die des Stahlbetons."""
 
 
 @dataclass

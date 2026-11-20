@@ -1,5 +1,5 @@
 ---
-erzeugt: aca05aad0305
+erzeugt: 1ee432c849ee
 art: modul
 tags: [modul]
 ---
@@ -85,6 +85,18 @@ im Modell vorkommen sollen.
 :param abweichungen: Zahlenwerte, die von der Sortentabelle abweichen --
 fuer selbst definierte Materialien.
 
+### sortenwerte
+
+```python
+def sortenwerte(sorte: str, kurznamen: Sequence[str]) -> Dict[str, float]
+```
+
+Kennwerte einer Sorte als Zahlen, aus ihrer Vorlage gerechnet: in der
+Einheit der Vorlage und so gerundet, wie der Bericht sie zeigt
+(`stellen`) -- `{"E_cm": 32075.0}` bei C25/30. Fuer Vorgaben, die mit
+den Werten einer Sorte anfangen: das eigene Material eines
+Balkensystems.
+
 ### beton_frei
 
 ```python
@@ -106,11 +118,13 @@ werden, um Normvorgaben zu ersetzen.
 ## Braucht
 
 - [[opencivil.core.einheiten]]
+- [[opencivil.core.rechenwerk]]
 - [[opencivil.material.basis]]
 
 ## Gebraucht von
 
 - [[opencivil.material.arten]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul

@@ -1,5 +1,5 @@
 ---
-erzeugt: aa61d5075bab
+erzeugt: 03ae317f83ca
 art: modul
 tags: [modul]
 ---
@@ -456,6 +456,7 @@ def abschliessen(self) -> Loesung
 - [[opencivil.bericht.markdown]]
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.ergebnis]]
+- [[opencivil.material.beton]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.spannungsanalyse.analysen]]
