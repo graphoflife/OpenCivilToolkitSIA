@@ -6,7 +6,7 @@ Zwei Nachweise, die wie bei der Platte dem Querschnitt gehoeren und keinem
 Lastfall: Duktilitaet (``x/d``) und sproedes Versagen (``M_Rd >= M_Riss``).
 Wo die Platte je Lage fragt, fragt der gezeichnete Querschnitt je Richtung:
 Zug unten, oben, links, rechts -- einachsig nur unten und oben. In der
-Zusammenfassung steht die unguenstigere.
+Zusammenfassung steht die unguenstigere (:class:`Richtungsnachweis`).
 
 Gerechnet wird bei reiner Biegung, ``N = 0``, mit dem Bruchzustand aus
 :mod:`opencivil.querschnitt.interaktion`. Eine Richtung ohne Bewehrung auf
@@ -24,10 +24,10 @@ dasselbe Rissmoment gegen ihre Bewehrung.
 
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Callable, Dict, Optional
 
 from opencivil.core.berechnung import Ausfuehrung, Eingaben
-from opencivil.core.nachweis import NICHT_FUEHRBAR, Nachweis, NachweisUrteil, Vergleich, grad_def
+from opencivil.core.nachweis import NICHT_FUEHRBAR, Fallausgang, Teilnachweis, Vergleich, grad_def
 from opencivil.core.latex import als_text, angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef, kennung_aus
@@ -39,6 +39,7 @@ from opencivil.nachweis.rissgroessen import (
 )
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.zugseite import Zugseite
 
 
 # ===========================================================================
@@ -60,7 +61,38 @@ def grade_je_seite(basis: str, symbol: str, beschreibung: str, referenz: str,
             for name in namen}
 
 
-class DuktilitaetQA(Nachweis):
+class Richtungsnachweis(Teilnachweis):
+    """
+    Ein Nachweis des gezeichneten Querschnitts mit einem Urteil je Zugseite:
+    die Seiten sind Teile derselben Frage. Je Seite ein Titel; wo auf ihrer
+    gezogenen Seite des Schwerpunkts kein Stab liegt, steht ein Satz und kein
+    Urteil (:meth:`je_seite`). Bis 2026-11-21 schrieben Duktilitaet,
+    sproedes Versagen und Zwaengung auf Biegung das je selbst.
+    """
+
+    TEILE_EINER_FRAGE = True
+    analyse: Querschnittsanalyse
+
+    def je_seite(self, p: Protokoll,
+                 eine_seite: Callable[[Zugseite], Optional[Fallausgang]]) -> Ausfuehrung:
+        """
+        Je Zugseite der Analyse ihr Titel und ihr Nachweis; ``eine_seite``
+        gibt ``None``, wo die gezogene Seite keine Bewehrung hat.
+        """
+        def ein_teil(seite: Zugseite) -> Optional[Fallausgang]:
+            p.titel(seite.beschriftung, ebene=3)
+            erg = eine_seite(seite)
+            if erg is None:
+                p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
+            return erg
+
+        return self.je_teil(p, self.analyse.zugseiten, ein_teil)
+
+    def teilname(self, seite: Zugseite) -> str:
+        return seite.beschriftung
+
+
+class DuktilitaetQA(Richtungsnachweis):
     """``x/d <= k * 435 N/mm^2 / f_yd`` bei reiner Biegung, je Richtung."""
 
     THEMA = "Duktilität je Richtung"
@@ -92,25 +124,22 @@ class DuktilitaetQA(Nachweis):
         duktilitaet.protokoll_bedingung(p, self.beiwert)
         f_ck = max((self.analyse.kennwert(e, s, "f_ck") for s in self.analyse.baustoffe
                     if s.art is Baustoffart.BETON), default=0.0)
-        urteile: List[NachweisUrteil] = []
-        for seite in self.analyse.zugseiten:
+
+        def eine_seite(seite: Zugseite) -> Optional[Fallausgang]:
             name = seite.beschriftung
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             d_grad = self.d_ausnutzung[name]
             punkt = self.analyse.biegung.bei_reiner_biegung(q, seite)
             x, d = q.druckzone(punkt)
-            p.titel(name, ebene=3)
             if d <= 0.0:
-                p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
-                continue
+                return None
             # Die Werkstoffe der Interaktion stehen in der Reihenfolge der Baustoffe.
             staehle = [self.analyse.baustoffe[w]
                        for w in sorted({s.werkstoff for _, s in q.zugbewehrung(punkt)})]
             grund = duktilitaet.hindernis(staehle, f_ck)
             if grund:
                 p.text(grund)
-                urteile.append(self.urteil(d_grad, name, NICHT_FUEHRBAR, grund))
-                continue
+                return Fallausgang(ausgang=NICHT_FUEHRBAR, begruendung=grund)
             stahl = max(staehle, key=lambda s: self.analyse.kennwert(e, s, "f_yd"))
             grenze = duktilitaet.grenze(self.beiwert, self.analyse.kennwert(e, stahl, "f_yd"))
             g = werte.zahl("grenze", r"\left(x/d\right)_{max}", grenze)
@@ -124,13 +153,13 @@ class DuktilitaetQA(Nachweis):
                      titel="Bezogene Druckzonenhöhe bei reiner Biegung",
                      nachsatz=vergleich(r"\le", angabe(g), v.erfuellt))
             v.zeile(p, d_grad)
-            urteile.append(self.urteil(d_grad, name, v,
-                                       f"x/d = {verhaeltnis:.3f} gegen {grenze:.3f}."))
-        self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung({}, self.teilurteile(urteile))
+            return Fallausgang(ausgang=v,
+                               begruendung=f"x/d = {verhaeltnis:.3f} gegen {grenze:.3f}.")
+
+        return self.je_seite(p, eine_seite)
 
 
-class SproedesVersagenQA(Nachweis):
+class SproedesVersagenQA(Richtungsnachweis):
     """``M_Rd(N = 0) >= M_Riss`` je Richtung."""
 
     THEMA = "Sprödes Versagen je Richtung"
@@ -162,17 +191,15 @@ class SproedesVersagenQA(Nachweis):
                  name="Bedingung gegen sprödes Versagen")
 
         brutto = bruttoquerschnitt(self.analyse, e.si_nach_id())
-        urteile: List[NachweisUrteil] = []
-        for seite in self.analyse.zugseiten:
+
+        def eine_seite(seite: Zugseite) -> Optional[Fallausgang]:
             name, (M_y, M_z) = seite.beschriftung, seite.moment
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             d_grad = self.d_ausnutzung[name]
-            p.titel(name, ebene=3)
             punkt = self.analyse.biegung.bei_reiner_biegung(q, seite)
             _, d = q.druckzone(punkt)
             if d <= 0.0:
-                p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
-                continue
+                return None
 
             riss = rissmoment(brutto, M_y, M_z)
             M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, brutto, riss, M_y, M_z,
@@ -182,6 +209,6 @@ class SproedesVersagenQA(Nachweis):
             p.wert(M_Rd, titel="Biegewiderstand bei N = 0 in dieser Richtung")
             v = Vergleich(M_Riss, M_Rd)
             v.zeile(p, d_grad)
-            urteile.append(self.urteil(d_grad, name, v, "M_Rd bei N = 0 gegen das Rissmoment."))
-        self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung({}, self.teilurteile(urteile))
+            return Fallausgang(ausgang=v, begruendung="M_Rd bei N = 0 gegen das Rissmoment.")
+
+        return self.je_seite(p, eine_seite)

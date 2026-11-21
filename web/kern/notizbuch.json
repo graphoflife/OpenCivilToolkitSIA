@@ -6091,6 +6091,9 @@
       "kurz": "Duktilitaet und sproedes Versagen des gezeichneten Querschnitts.",
       "stichworte": [
         "grade_je_seite",
+        "Richtungsnachweis",
+        "Richtungsnachweis.je_seite",
+        "Richtungsnachweis.teilname",
         "DuktilitaetQA",
         "DuktilitaetQA.pruefe",
         "SproedesVersagenQA",

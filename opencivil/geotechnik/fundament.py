@@ -35,7 +35,7 @@ from typing import Dict, List, Sequence, Tuple
 from opencivil.core.berechnung import Berechnung, Eingabebezug, Formel
 from opencivil.core.einheiten import EINHEITSLOS, GRAD, KN_PRO_M3, KPA, M, Groesse
 from opencivil.core.latex import als_text, angabe
-from opencivil.core.nachweis import Nachweis, Vergleich, grad_def
+from opencivil.core.nachweis import Teilnachweis, Vergleich, grad_def
 from opencivil.core.protokoll import Abschnitt, GleichungBlock, Protokoll
 from opencivil.core.rechenobjekt import Rechenobjekt
 from opencivil.core.vorgaben import Feld, Gruppe
@@ -254,7 +254,7 @@ class Kombination:
 # ===========================================================================
 
 
-class Fundamentnachweis(Nachweis):
+class Fundamentnachweis(Teilnachweis):
     """
     Was Grundbruch und Gleiten gemeinsam haben: je Kombination einen
     Erfüllungsgrad, die Eingänge aus dem Fundament -- je Verhalten andere --,

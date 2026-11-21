@@ -475,10 +475,18 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
           Suche `guenstigste(…)`; die Bügel der Platte, die Schubwände und
           die Wendel des Pfahls rufen sie. `Wandwiderstand` ist weg, eine
           Wand gibt einen `Buegelpunkt`. Siehe [[Entwicklung]].
-        - «Ein Urteil je Teil»: `Lagennachweis` hat die Schleife einmal, die
-          Nachweise je Seite und je Fall bauen sie 13-mal selbst
-          (`begruendung` neunmal deklariert). Umbau: ein `Teilnachweis` mit
-          `teile()`, `begruendung` in `Fallausgang`.
+        - Erledigt (2026-11-21): ein Urteil je Teil. `Fallausgang` führt
+          Ausgang und Begründung; `Teilnachweis.je_teil` hat die Schleife
+          einmal – für die Lagen der Platte, die Seiten des gezeichneten
+          Querschnitts (`Richtungsnachweis`), die Fälle von Knicken,
+          Spannungsbegrenzung, Verformung und Querkraft und die
+          Kombinationen des Fundaments. Eigene Schleifen behalten mit
+          Absicht: die Biegung mit Normalkraft (ihr Befund sammelt
+          Auswertungen und je Fall M_Rd), die schiefe Biegung und die
+          Schubwand (auch ein übersprungener Fall gibt Werte aus), der
+          Pfahl quer und innen quer und das Erdbeben (mehrere Urteile je
+          Fall) und die fehlende Bewehrung (sie rechnet nichts, jedes
+          Urteil hat seine eigene Art). Siehe [[Entwicklung]].
 - [x] **5. Nach dem Klick baut jede App mit Zeichenfenster selbst.**
       Erledigt (2026-11-20): `cad_app.js` fragt den Kern, baut die Liste
       unter der Zeichnung und das schwebende Fenster zur Auswahl für alle

@@ -7,8 +7,9 @@ Platte fuer sich ansehen -- Duktilitaet, sproedes Versagen, Zwaengung auf
 Biegung und auf Normalkraft. Hier steht einmal, was sie teilen: welche
 Lagen und ihre Posten, je Lage ein Erfuellungsgrad mit derselben Kennung,
 demselben Zeichen und derselben Benennung, die Bezuege auf Posten und
-Staehle, die Schleife ueber die Lagen mit Befund und Urteil und die
-Begruendung einer Lage ohne Stahl. Was je Nachweis anders ist, geben seine
+Staehle, die Lagen als Teile derselben Frage mit Befund
+(:class:`~opencivil.core.nachweis.Teilnachweis`) und die Begruendung einer
+Lage ohne Stahl. Was je Nachweis anders ist, geben seine
 Methoden: was alle Lagen brauchen (:meth:`Lagennachweis.ansatz`), die eine
 Lage (:meth:`~Lagennachweis.eine_lage`) und ihre Herleitung
 (:meth:`~Lagennachweis.protokoll_lage`).

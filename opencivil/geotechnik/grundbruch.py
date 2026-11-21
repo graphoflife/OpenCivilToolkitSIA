@@ -186,8 +186,7 @@ class Grundbruch(Fundamentnachweis):
             befund = self._undrainiert(e, p)
         else:
             befund = self._drainiert(e, p)
-        return Ausfuehrung({}, [self.urteil(self.d_ausnutzung[r.kombination.name],
-                                            r.kombination.name, r.ausgang, r.begruendung)
+        return Ausfuehrung({}, [self.urteil_des_teils(r.kombination, r)
                                 for r in befund.ergebnisse], befund)
 
     # -- Drainiert ----------------------------------------------------------

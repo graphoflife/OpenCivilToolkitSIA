@@ -72,7 +72,7 @@ from dataclasses import dataclass, replace
 from typing import Dict, List, Optional, Sequence, Tuple, Type
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
-from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, NachweisUrteil, Vergleich, grad_def
+from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, Fallausgang, Vergleich, grad_def
 from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import Mathe, angabe, bedingung, fest, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -88,7 +88,7 @@ from opencivil.nachweis.mindestbewehrung import (
 )
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
-from opencivil.nachweis.richtungsnachweise import grade_je_seite
+from opencivil.nachweis.richtungsnachweise import Richtungsnachweis, grade_je_seite
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.rissgroessen import (
@@ -109,6 +109,7 @@ from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Querschnitt
 from opencivil.querschnitt.randzone import flaechen_am_rand
+from opencivil.querschnitt.zugseite import Zugseite
 
 #: Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der
 #: erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.
@@ -399,7 +400,7 @@ class RissnormalkraftQA(Normalzwang):
 # ===========================================================================
 
 
-class ZwaengungBiegungQA(Biegezwang):
+class ZwaengungBiegungQA(Biegezwang, Richtungsnachweis):
     """
     Je Richtung das Rissmoment gegen das Moment, bei dem der erste gezogene
     Stab sein ``sigma_s,adm`` erreicht.
@@ -430,17 +431,15 @@ class ZwaengungBiegungQA(Biegezwang):
         p.erklaerung(verfahren_der_ebene(q, self.analyse.biegung))
 
         brutto = bruttoquerschnitt(a, e.si_nach_id())
-        urteile: List[NachweisUrteil] = []
-        for seite in self.analyse.zugseiten:
+
+        def eine_seite(seite: Zugseite) -> Optional[Fallausgang]:
             name, (M_y, M_z) = seite.beschriftung, seite.moment
             d_grad = self.d_ausnutzung[name]
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
-            p.titel(name, ebene=3)
             riss = rissmoment(brutto, M_y, M_z)
             gefunden = self._an_der_grenze(q, staebe, grenzen, M_y, M_z, riss.M_Riss)
             if gefunden is None:
-                p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
-                continue
+                return None
             M_s_adm_si, ebene, stab = gefunden
             M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z,
                                           referenz=self.REFERENZ)
@@ -455,14 +454,13 @@ class ZwaengungBiegungQA(Biegezwang):
             p.gleichung(bedingung(angabe(M_s_adm), r"\ge", angabe(M_Riss), v.erfuellt),
                         titel=self.THEMA)
             v.zeile(p, d_grad)
-            urteile.append(self.urteil(
-                d_grad, name, v,
+            return Fallausgang(ausgang=v, begruendung=(
                 f"{staebe[stab].element.name} erreicht σ_s,adm = "
                 f"{gruppe.sigma / 1e6:.0f} N/mm² bei M_s,adm = "
                 f"{M_s_adm_si / 1e3:.1f} kNm {'≥' if v.erfuellt else '<'} "
                 f"M_Riss = {riss.M_Riss / 1e3:.1f} kNm."))
-        self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung({}, self.teilurteile(urteile))
+
+        return self.je_seite(p, eine_seite)
 
     def _an_der_grenze(self, q: Querschnitt, staebe: Sequence[Stabangabe], grenzen: Grenzen,
                        M_y: float, M_z: float, M_start: float

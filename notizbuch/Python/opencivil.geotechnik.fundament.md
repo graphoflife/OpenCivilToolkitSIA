@@ -1,5 +1,5 @@
 ---
-erzeugt: b6fc1bd6939a
+erzeugt: 0d01c3081c5a
 art: modul
 tags: [modul]
 ---
@@ -118,7 +118,7 @@ def kennung(self) -> str
 ### Fundamentnachweis
 
 ```python
-class Fundamentnachweis(Nachweis)
+class Fundamentnachweis(Teilnachweis)
 ```
 
 Was Grundbruch und Gleiten gemeinsam haben: je Kombination einen

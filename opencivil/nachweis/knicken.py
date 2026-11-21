@@ -532,8 +532,8 @@ class Knickverfahren(Teilnachweis):
         return self.je_teil(p, self.faelle, ein_teil, befund=befund)
 
     def urteil_des_teils(self, fall: Knickfall, erg: Knickergebnis) -> NachweisUrteil:
-        return self.urteil(self.grad_des_teils(fall), fall.name, erg.ausgang, erg.begruendung,
-                           hinweis=erg.hinweis)
+        return self.urteil(self.grad_des_teils(fall), self.teilname(fall), erg.ausgang,
+                           erg.begruendung, hinweis=erg.hinweis)
 
     def _n_ed(self, erg: Knickergebnis) -> Wert:
         """

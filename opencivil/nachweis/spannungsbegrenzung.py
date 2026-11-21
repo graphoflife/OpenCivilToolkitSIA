@@ -652,8 +652,8 @@ class Spannungsbegrenzung(Teilnachweis):
         return self.je_teil(p, self.faelle, ein_teil, befund=Fallbefund())
 
     def urteil_des_teils(self, fall, erg: Fallergebnis) -> NachweisUrteil:
-        return self.urteil(self.grad_des_teils(fall), fall.name, erg.ausgang, erg.begruendung,
-                           art=self.grenze.art, still=self.leise(fall.name))
+        return self.urteil(self.grad_des_teils(fall), self.teilname(fall), erg.ausgang,
+                           erg.begruendung, art=self.grenze.art, still=self.leise(fall.name))
 
     def _einen_fall(self, zustand: Stahlzustand, grenzen: Grenzen, fall) -> Fallergebnis:
         erg = Fallergebnis(fall=fall)

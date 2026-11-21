@@ -1,5 +1,5 @@
 ---
-erzeugt: 80eaf2ef8138
+erzeugt: 20c988a817da
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Zwei Nachweise, die wie bei der Platte dem Querschnitt gehoeren und keinem
 Lastfall: Duktilitaet (`x/d`) und sproedes Versagen (`M_Rd >= M_Riss`).
 Wo die Platte je Lage fragt, fragt der gezeichnete Querschnitt je Richtung:
 Zug unten, oben, links, rechts -- einachsig nur unten und oben. In der
-Zusammenfassung steht die unguenstigere.
+Zusammenfassung steht die unguenstigere ([[opencivil.nachweis.richtungsnachweise#Richtungsnachweis|Richtungsnachweis]]).
 
 Gerechnet wird bei reiner Biegung, `N = 0`, mit dem Bruchzustand aus
 [[opencivil.querschnitt.interaktion]]. Eine Richtung ohne Bewehrung auf
@@ -42,10 +42,40 @@ Je Zugseite der Analyse ein Erfuellungsgrad -- Kennung, Zeichen und Text
 nach einem Muster fuer alle Nachweise des gezeichneten Querschnitts, die
 je Seite urteilen: `alpha_{eff,<symbol>,<Seite>}`.
 
+### Richtungsnachweis
+
+```python
+class Richtungsnachweis(Teilnachweis)
+```
+
+Ein Nachweis des gezeichneten Querschnitts mit einem Urteil je Zugseite:
+die Seiten sind Teile derselben Frage. Je Seite ein Titel; wo auf ihrer
+gezogenen Seite des Schwerpunkts kein Stab liegt, steht ein Satz und kein
+Urteil ([[opencivil.nachweis.richtungsnachweise#Richtungsnachweis.je_seite|je_seite]]). Bis 2026-11-21 schrieben Duktilitaet,
+sproedes Versagen und Zwaengung auf Biegung das je selbst.
+
+- `TEILE_EINER_FRAGE = True`
+- `analyse: Querschnittsanalyse`
+
+#### Richtungsnachweis.je_seite
+
+```python
+def je_seite(self, p: Protokoll, eine_seite: Callable[[Zugseite], Optional[Fallausgang]]) -> Ausfuehrung
+```
+
+Je Zugseite der Analyse ihr Titel und ihr Nachweis; `eine_seite`
+gibt `None`, wo die gezogene Seite keine Bewehrung hat.
+
+#### Richtungsnachweis.teilname
+
+```python
+def teilname(self, seite: Zugseite) -> str
+```
+
 ### DuktilitaetQA
 
 ```python
-class DuktilitaetQA(Nachweis)
+class DuktilitaetQA(Richtungsnachweis)
 ```
 
 `x/d <= k * 435 N/mm^2 / f_yd` bei reiner Biegung, je Richtung.
@@ -63,7 +93,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 ### SproedesVersagenQA
 
 ```python
-class SproedesVersagenQA(Nachweis)
+class SproedesVersagenQA(Richtungsnachweis)
 ```
 
 `M_Rd(N = 0) >= M_Riss` je Richtung.
@@ -91,6 +121,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

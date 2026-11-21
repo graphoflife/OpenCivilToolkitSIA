@@ -1,5 +1,5 @@
 ---
-erzeugt: 7dc684c35057
+erzeugt: db20bd10b6f0
 art: modul
 tags: [modul]
 ---
@@ -14,8 +14,9 @@ Platte fuer sich ansehen -- Duktilitaet, sproedes Versagen, Zwaengung auf
 Biegung und auf Normalkraft. Hier steht einmal, was sie teilen: welche
 Lagen und ihre Posten, je Lage ein Erfuellungsgrad mit derselben Kennung,
 demselben Zeichen und derselben Benennung, die Bezuege auf Posten und
-Staehle, die Schleife ueber die Lagen mit Befund und Urteil und die
-Begruendung einer Lage ohne Stahl. Was je Nachweis anders ist, geben seine
+Staehle, die Lagen als Teile derselben Frage mit Befund
+([[opencivil.core.nachweis#Teilnachweis|Teilnachweis]]) und die Begruendung einer
+Lage ohne Stahl. Was je Nachweis anders ist, geben seine
 Methoden: was alle Lagen brauchen ([[opencivil.nachweis.lagennachweis#Lagennachweis.ansatz|Lagennachweis.ansatz]]), die eine
 Lage ([[opencivil.nachweis.lagennachweis#Lagennachweis.eine_lage|eine_lage]]) und ihre Herleitung
 ([[opencivil.nachweis.lagennachweis#Lagennachweis.protokoll_lage|protokoll_lage]]).

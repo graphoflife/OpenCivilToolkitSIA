@@ -26,6 +26,16 @@ Ein Umbau ohne neue Zahl, vom Benutzer gewählt (2026-11-21):
   aus Ausgang und Begründung. Jetzt tut das `Teilnachweis.je_teil`; ein
   Nachweis sagt nur, wie er einen Teil rechnet, und wo nötig, wie der Teil
   heisst, welcher Grad ihn trägt und was er sonst ausgibt.
+- **Je Seite des gezeichneten Querschnitts dasselbe.** Duktilität,
+  sprödes Versagen und Zwängung auf Biegung schrieben je Seite den
+  Titel, auf einer Seite ohne Bewehrung den Satz «Keine Bewehrung auf der
+  gezogenen Seite → kein Nachweis.» und am Ende die massgebende Seite –
+  dreimal von Hand. Das tut jetzt `Richtungsnachweis`; ebenso führt das
+  Gleiten seine Kombinationen über `je_teil`, und der Grundbruch baut
+  seine Urteile wie alle anderen.
+- Eigene Schleifen behalten mit Absicht: Biegung mit Normalkraft, schiefe
+  Biegung, Schubwand, Pfahl quer und innen quer, Erdbeben und fehlende
+  Bewehrung – warum, steht in [[TODO]].
 
 ## 2026-11-21 · Platte und Querschnittsanalyse teilen, was gleich ist
 

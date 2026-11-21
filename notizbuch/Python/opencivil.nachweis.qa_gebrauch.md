@@ -1,5 +1,5 @@
 ---
-erzeugt: fa828c8cec78
+erzeugt: e94f33eaeb71
 art: modul
 tags: [modul]
 ---
@@ -231,7 +231,7 @@ Rissaktive Dicke, wirksame Zugfestigkeit je Beton und die Risskraft.
 ### ZwaengungBiegungQA
 
 ```python
-class ZwaengungBiegungQA(Biegezwang)
+class ZwaengungBiegungQA(Biegezwang, Richtungsnachweis)
 ```
 
 Je Richtung das Rissmoment gegen das Moment, bei dem der erste gezogene
@@ -291,6 +291,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.randzone]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

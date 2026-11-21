@@ -16,14 +16,14 @@ Alles in SI-Basis; die Winkel als Groessen in Grad.
 from __future__ import annotations
 
 import math
-from typing import List, Optional
+from typing import Optional
 
 from opencivil.core.berechnung import Ausfuehrung, Eingaben
 from opencivil.core.einheiten import GRAD, Groesse
-from opencivil.core.nachweis import NachweisUrteil
+from opencivil.core.nachweis import Fallausgang
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
-from opencivil.geotechnik.fundament import Fundamentnachweis
+from opencivil.geotechnik.fundament import Fundamentnachweis, Kombination
 from opencivil.geotechnik.verhalten import Verhalten
 
 #: Wie gross der Sohlreibungswinkel delta_k höchstens ist, in Grad -- SIA 267:2013, 8.4.1.1.
@@ -54,16 +54,17 @@ class Gleiten(Fundamentnachweis):
         )
         delta = (self._sohlreibung(e, p)
                  if self.fundament.verhalten is Verhalten.DRAINIERT else None)
-        urteile: List[NachweisUrteil] = []
-        for k in self.kombinationen:
+
+        def ein_teil(k: Kombination) -> Fallausgang:
             zw = Zwischenwerte(f"{self.id}.{k.kennung}")
             p.titel(f"Gleiten – {k.name}", ebene=3)
             N = zw.kraft("N_Ed", "N_{Ed}", k.N_Ed.si, "Einwirkung normal zur Sohle")
             T = zw.kraft("T_Ed", "T_{Ed}", k.T_Ed.si, "Einwirkung")
             T_Rd = self._widerstand(e, p, zw, N, delta)
             v, satz = self.vergleichen(p, k, T, T_Rd, ("T_Ed", "T_Rd"))
-            urteile.append(self.urteil(self.d_ausnutzung[k.name], k.name, v, satz))
-        return Ausfuehrung({}, urteile)
+            return Fallausgang(ausgang=v, begruendung=satz)
+
+        return self.je_teil(p, self.kombinationen, ein_teil)
 
     def _sohlreibung(self, e: Eingaben, p: Protokoll) -> Wert:
         """delta_k nach SIA 267:2013, 8.4.1.1, und daraus der Bemessungswert delta_d."""
