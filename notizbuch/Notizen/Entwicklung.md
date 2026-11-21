@@ -7,6 +7,16 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · Was nur fehlt, steht auch als Hinweis grau
+
+Vom Benutzer gewählt (2026-11-21), nach der Prüfung im Browser gefunden.
+Ein leerer Eintrag zeigte über der Eingabe und rechts in der
+Zusammenfassung «Nichts zu rechnen: noch nichts gezeichnet.» gelb
+hinterlegt, wie eine Warnung; ebenso stand «Noch keine Einwirkung – so
+rechnet kein Fall.» über den Fällen. Beides sagt nur, was fehlt, und steht
+jetzt grau, wie die Meldungen der Zeichenfenster, denen nur etwas fehlt
+(`unfertigHinweis`, `fehltHinweis`). Gelb bleiben Fehler und Warnungen.
+
 ## 2026-11-21 · Ein Urteil je Teil
 
 Ein Umbau ohne neue Zahl, vom Benutzer gewählt (2026-11-21):

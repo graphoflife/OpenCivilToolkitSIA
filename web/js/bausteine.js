@@ -249,11 +249,12 @@ export function bildDer(k) {
  * der Zusammenfassung. `unfertig` ist sein Eintrag in `loesung.unfertige`
  * (Name und Grund) oder nichts -- dann auch kein Hinweis. Ein unfertiger
  * Zustand ist kein Fehler des Projekts (Benutzer, 2026-11-19): er sagt, was
- * fehlt, und der Rest rechnet weiter.
+ * fehlt, und der Rest rechnet weiter. Darum steht er grau wie jede Meldung,
+ * der nur etwas fehlt; bis 2026-11-21 stand er gelb wie eine Warnung.
  */
 export function unfertigHinweis(unfertig) {
   return unfertig
-    ? el('div.hinweis.hinweis-warnung', {}, [el('b', { text: 'Nichts zu rechnen: ' }), `${unfertig.grund}.`])
+    ? el('div.hinweis', {}, [el('b', { text: 'Nichts zu rechnen: ' }), `${unfertig.grund}.`])
     : null;
 }
 

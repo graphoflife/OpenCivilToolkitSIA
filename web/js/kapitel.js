@@ -56,9 +56,9 @@ export function standOhne(stand, fehlt) {
   return stand.an && fehlt ? { an: false, text: fehlt } : stand;
 }
 
-/** Dasselbe im Fenster, über den Fällen -- oder nichts. */
+/** Dasselbe im Fenster, über den Fällen, grau wie alles, was nur fehlt -- oder nichts. */
 export function fehltHinweis(fehlt) {
-  return fehlt ? el('p.hinweis.hinweis-warnung', { text: `Noch ${fehlt} – so rechnet kein Fall.` }) : null;
+  return fehlt ? el('p.hinweis', { text: `Noch ${fehlt} – so rechnet kein Fall.` }) : null;
 }
 
 /**
