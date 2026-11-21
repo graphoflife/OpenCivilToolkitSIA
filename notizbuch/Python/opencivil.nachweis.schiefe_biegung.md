@@ -1,5 +1,5 @@
 ---
-erzeugt: 9ba9c4b3a119
+erzeugt: 5be4723f7a6c
 art: modul
 tags: [modul]
 ---
@@ -59,7 +59,6 @@ Was ein Lastfall ergab -- fuer die Diagramme nach dem Lauf.
 - `M_y: float`
 - `M_z: float` – Die Einwirkung, wie nachgewiesen -- mit Laengszugkraft, wo zugeschaltet.
 - `punkt: Optional[Bruchpunkt]`
-- `ausgang: Ausgang`
 - `ohne_bruch: str = ''` – Warum es keinen Bruchzustand gibt, wo es keinen gibt -- das Diagramm zeigt den Satz an seiner Stelle. Bis 2026-11-19 fehlte dort die Karte ohne ein Wort.
 
 ### Bruchbefund

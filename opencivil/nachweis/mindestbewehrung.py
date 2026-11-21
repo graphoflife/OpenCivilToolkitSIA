@@ -49,7 +49,7 @@ from dataclasses import dataclass
 from typing import Optional, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
-from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, Vergleich
+from opencivil.core.nachweis import Fallausgang, Nachweis, Vergleich
 from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -201,8 +201,6 @@ class Lagenergebnis(Fallausgang):
 
     sigma_s_adm: float = 0.0
     N_s_adm: float = 0.0
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    begruendung: str = ""
 
 
 class Normalzwang(Nachweis):
@@ -376,7 +374,11 @@ class Rissnormalkraft(Normalzwang, Lagennachweis):
 
 @dataclass
 class Momentlagenergebnis(Fallausgang):
-    """Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat."""
+    """
+    Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat. Sein
+    Ausgang: M_s,adm gegen M_Riss -- nicht fuehrbar ohne Bewehrung in der
+    Lage.
+    """
 
     lage: Bewehrungslage
     a_s: float = 0.0
@@ -396,11 +398,6 @@ class Momentlagenergebnis(Fallausgang):
     x: float = 0.0
     hebelarm: float = 0.0
     M_s_adm: float = 0.0
-
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    """M_s,adm gegen M_Riss -- nicht fuehrbar ohne Bewehrung in der Lage."""
-
-    begruendung: str = ""
 
 
 class Biegezwang(Nachweis):

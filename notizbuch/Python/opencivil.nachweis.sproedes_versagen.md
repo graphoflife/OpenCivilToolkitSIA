@@ -1,5 +1,5 @@
 ---
-erzeugt: e19012cb2d14
+erzeugt: 258160dbc6f7
 art: modul
 tags: [modul]
 ---
@@ -57,8 +57,6 @@ Was der Nachweis fuer eine Lage gefunden hat: M_Rd gegen M_Riss.
 
 - `lage: Bewehrungslage`
 - `M_Rd: float = 0.0` – Biegewiderstand bei N_Ed = 0 auf der Seite dieser Lage, in Nm (Betrag).
-- `ausgang: Ausgang = NICHT_FUEHRBAR`
-- `begruendung: str = ''`
 
 ### SproedesVersagen
 

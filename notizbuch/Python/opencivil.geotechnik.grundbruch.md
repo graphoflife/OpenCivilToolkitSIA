@@ -1,5 +1,5 @@
 ---
-erzeugt: b1f8fe7dbb7b
+erzeugt: 7b5f1acd1e25
 art: modul
 tags: [modul]
 ---
@@ -135,8 +135,6 @@ Was der Grundbruch bei einer Kombination ergibt.
 - `i: Dict[str, Optional[float]] = field(default_factory=dict)` – Die Lastneigungsfaktoren je Spalte -- `None`, wo es keinen gibt.
 - `sigma_f: float = 0.0`
 - `N_Rd: float = 0.0`
-- `ausgang: Ausgang = NICHT_FUEHRBAR`
-- `begruendung: str = ''`
 
 ### Grundbruchbefund
 

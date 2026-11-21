@@ -38,7 +38,7 @@ from dataclasses import dataclass
 from typing import Sequence, Tuple
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
-from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, Fallausgang, Vergleich
+from opencivil.core.nachweis import Fallausgang, Vergleich
 from opencivil.core.latex import angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
@@ -56,9 +56,6 @@ class Lagenergebnis(Fallausgang):
     lage: Bewehrungslage
     M_Rd: float = 0.0
     """Biegewiderstand bei N_Ed = 0 auf der Seite dieser Lage, in Nm (Betrag)."""
-
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    begruendung: str = ""
 
 
 class SproedesVersagen(Lagennachweis):

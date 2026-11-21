@@ -59,7 +59,7 @@ from dataclasses import dataclass
 from typing import Dict, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
-from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, Fallausgang, Vergleich
+from opencivil.core.nachweis import Fallausgang, Vergleich
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -142,7 +142,7 @@ def protokoll_grenze(p: Protokoll, werte: Zwischenwerte, grenzwert: Wert, *,
 
 @dataclass
 class Lagenergebnis(Fallausgang):
-    """Was der Nachweis fuer eine Lage gefunden hat."""
+    """Was der Nachweis fuer eine Lage gefunden hat; sein Ausgang: x/d gegen (x/d)_max."""
 
     lage: Bewehrungslage
     a_s: float = 0.0
@@ -163,11 +163,6 @@ class Lagenergebnis(Fallausgang):
     verhaeltnis: float = 0.0
     grenze: float = 0.0
     """(x/d)_max der Lage -- sie haengt an ihrem Stahl."""
-
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    """x/d gegen (x/d)_max."""
-
-    begruendung: str = ""
 
 
 def druckzonenhoehe(*, a_s: float, f_yd: float, b: float, f_cd: float) -> float:

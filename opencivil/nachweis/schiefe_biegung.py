@@ -37,8 +37,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
-    OHNE_EINWIRKUNG, UNBESCHRAENKT, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich,
-    grad_def,
+    OHNE_EINWIRKUNG, UNBESCHRAENKT, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import KN, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
@@ -64,7 +63,6 @@ class Fallergebnis(Fallausgang):
     """Die Einwirkung, wie nachgewiesen -- mit Laengszugkraft, wo zugeschaltet."""
 
     punkt: Optional[Bruchpunkt]
-    ausgang: Ausgang
 
     ohne_bruch: str = ""
     """
@@ -217,14 +215,15 @@ class SchiefeBiegung(Nachweis):
                 # Druck -- bis 2026-11-19 fehlte der Fall dort still.
                 p.text(OHNE_EINWIRKUNG)
                 return (self.urteil(d_grad, fall.name, UNBESCHRAENKT, OHNE_EINWIRKUNG),
-                        Fallergebnis(fall, N, M_y, M_z, None, UNBESCHRAENKT, OHNE_EINWIRKUNG))
+                        Fallergebnis(fall, N, M_y, M_z, None, ausgang=UNBESCHRAENKT,
+                                     ohne_bruch=OHNE_EINWIRKUNG))
             grenze = zug if N > 0 else druck
             v = Vergleich(N_Ed, werte.kraft("N_Rd", "N_{Rd}^{+}" if N > 0 else "N_{Rd}^{-}",
                                             grenze))
             v.zeile(p, d_grad)
             return (self.urteil(d_grad, fall.name, v,
                                 "Reine Normalkraft: gegen die gleichmässige Dehnung."),
-                    Fallergebnis(fall, N, M_y, M_z, None, v, OHNE_MOMENT))
+                    Fallergebnis(fall, N, M_y, M_z, None, ausgang=v, ohne_bruch=OHNE_MOMENT))
 
         M_Ed = werte.moment("M_Ed", "M_{Ed}", moment)
 
@@ -237,7 +236,7 @@ class SchiefeBiegung(Nachweis):
             v.zeile(p, d_grad)
             return (self.urteil(d_grad, fall.name, v,
                                 "N_Ed jenseits der reinen Normalkraft-Tragfähigkeit."),
-                    Fallergebnis(fall, N, M_y, M_z, None, v, JENSEITS))
+                    Fallergebnis(fall, N, M_y, M_z, None, ausgang=v, ohne_bruch=JENSEITS))
 
         # -- Der Bruchzustand -------------------------------------------------
         punkt = biegung.bruchpunkt(q, N, M_y, M_z)
@@ -261,7 +260,7 @@ class SchiefeBiegung(Nachweis):
         v.zeile(p, d_grad)
         return (self.urteil(d_grad, fall.name, v,
                             f"Bei N_Ed = {N / 1e3:.1f} kN, in der Richtung des Moments."),
-                Fallergebnis(fall, N, M_y, M_z, punkt, v))
+                Fallergebnis(fall, N, M_y, M_z, punkt, ausgang=v))
 
     # -- Mitschrift ----------------------------------------------------------------
 

@@ -159,14 +159,20 @@ OHNE_EINWIRKUNG = "Keine Einwirkung → kein Nachweis."
 Ausgang = Union[Vergleich, KeinVergleich]
 
 
+@dataclass(kw_only=True)
 class Fallausgang:
     """
-    Was ein Fallergebnis aus seinem Ausgang liest -- fuer Herleitung,
-    Diagramme und Urteil dieselben Zahlen. Wer erbt, fuehrt das Feld
-    ``ausgang`` mit der Vorgabe :data:`NICHT_FUEHRBAR`.
+    Wie ein Fall ausging und warum -- und was ein Fallergebnis daraus liest,
+    fuer Herleitung, Diagramme und Urteil dieselben Zahlen. Die Erben fuehren
+    ihre eigenen Felder davor; diese beiden setzt man mit Namen. Bis
+    2026-11-21 fuehrte jeder Erbe sie selbst, zehnmal gleich.
     """
 
-    ausgang: Ausgang
+    ausgang: Ausgang = NICHT_FUEHRBAR
+    """Was gegeneinander steht -- nicht fuehrbar, bis der Fall etwas findet."""
+
+    begruendung: str = ""
+    """Der Satz zum Urteil."""
 
     @property
     def machbar(self) -> bool:

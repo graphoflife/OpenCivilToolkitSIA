@@ -84,8 +84,7 @@ from typing import Dict, List, Optional, Protocol, Sequence, Tuple, Type
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, Ausgang, Fallausgang, Fallbefund, Nachweis, NachweisUrteil, Vergleich,
-    grad_def,
+    Fallausgang, Fallbefund, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import KN, KNM, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung, vergleich
@@ -329,7 +328,14 @@ class Stahlspannungsort(ABC):
 
 @dataclass
 class Fallergebnis(Fallausgang):
-    """Was der Nachweis fuer einen Lastfall gefunden hat."""
+    """
+    Was der Nachweis fuer einen Lastfall gefunden hat. Sein Ausgang stellt
+    Spannungen gegeneinander, solange der Stahl elastisch bleibt; fliesst
+    er, Dehnungen -- sonst stuende ``f_yk`` neben ``f_yk`` und daneben
+    «nicht erfuellt», richtig gerechnet und doch nicht zu lesen. Entschieden
+    wird das einmal, in :meth:`Spannungsbegrenzung._vergleich`. Nicht
+    fuehrbar ohne Bewehrung und ohne Gleichgewichtslage.
+    """
 
     fall: object
     """Bei der Platte ein :class:`Gebrauchsfall`, am gezeichneten Querschnitt ein Lastfall."""
@@ -363,19 +369,8 @@ class Fallergebnis(Fallausgang):
     """
 
     konvergiert: bool = True
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    """
-    Was gegeneinander steht: Spannungen, solange der Stahl elastisch bleibt.
-    Fliesst er, Dehnungen -- sonst stuende ``f_yk`` neben ``f_yk`` und
-    daneben «nicht erfuellt», richtig gerechnet und doch nicht zu lesen.
-    Entschieden wird das einmal, in :meth:`Spannungsbegrenzung._vergleich`.
-    Nicht fuehrbar ohne Bewehrung und ohne Gleichgewichtslage.
-    """
-
     satz: str = ""
     """Der Vergleich als Satz, fuer die Begruendung."""
-
-    begruendung: str = ""
 
     @property
     def fliesst(self) -> bool:

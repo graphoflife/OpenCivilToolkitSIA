@@ -38,9 +38,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Befundbezug, Eingabebezug, Eingaben
-from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, NachweisUrteil, grad_def,
-)
+from opencivil.core.nachweis import Fallausgang, Nachweis, NachweisUrteil, grad_def
 from opencivil.core.einheiten import KN, KN_PRO_M, KNM, MM, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -159,6 +157,8 @@ class Querkraftergebnis(Fallausgang):
     Was ein Fall ergibt, in beiden Ansaetzen -- ihre eigenen Zwischenwerte
     tragen :class:`~opencivil.nachweis.querkraft_ohne_buegel.ErgebnisOhneBuegel`
     und :class:`~opencivil.nachweis.querkraft_buegel.ErgebnisMitBuegeln`.
+    Sein Ausgang: |V_Ed| gegen v_Rd -- nicht fuehrbar, wo sich kein
+    Widerstand bestimmen liess.
     """
 
     fall: Querkraftfall
@@ -168,11 +168,6 @@ class Querkraftergebnis(Fallausgang):
     d: float = 0.0
     v_Rd: float = 0.0
     """in N/m."""
-
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    """|V_Ed| gegen v_Rd -- nicht fuehrbar, wo sich kein Widerstand bestimmen liess."""
-
-    begruendung: str = ""
 
 
 class Querkraft(Nachweis):

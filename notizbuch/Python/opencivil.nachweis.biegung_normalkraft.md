@@ -1,5 +1,5 @@
 ---
-erzeugt: bd06609a2509
+erzeugt: ff82ec493c0a
 art: modul
 tags: [modul]
 ---
@@ -127,12 +127,13 @@ nicht von Momenten.
 class Auswertung(Fallausgang)
 ```
 
-Ergebnis der Prüfung einer Kombination.
+Ergebnis der Prüfung einer Kombination. Sein Ausgang: Einwirkung gegen
+Widerstand im gewaehlten Massstab -- nicht fuehrbar ohne Schnitt mit der
+Linie. Das Urteil sagt [[opencivil.nachweis.biegung_normalkraft#Auswertung|innerhalb]].
 
 - `schnittgroessen: Schnittgroessen`
 - `innerhalb: bool` – Ob die Einwirkung innerhalb der massgebenden Linie liegt -- das Urteil.
 - `widerstand: Optional[Tuple[float, float]]` – Der massgebende Punkt auf der Linie als (N, M) in N bzw. Nm.
-- `begruendung: str = ''`
 - `achse: geo.Achse = geo.MOMENT` – Auf welcher Achse verglichen wird. Haengt vom Massstab ab.
 - `ed: float = 0.0` – Einwirkung in der verglichenen Groesse, in SI (N bzw. Nm).
 - `rd: float = 0.0` – Widerstand in derselben Groesse, in SI.
@@ -140,7 +141,6 @@ Ergebnis der Prüfung einer Kombination.
 - `treffer: Optional[Treffer] = None` – Wo auf der Linie der Widerstand liegt -- zwischen welchen Stuetzpunkten, bei der Ebenenlinie auch auf welcher Ebene. Fuer die Mitschrift, damit dort nicht bloss das Ergebnis steht.
 - `linie: Optional[Widerstandslinie] = None` – Die Linie, die ihn geliefert hat -- sie schreibt, wie.
 - `normierung: Optional[Normierung] = None` – Nur beim kuerzesten Abstand: dort ist der Grad kein Verhaeltnis von Momenten, sondern von Laengen im normierten Diagramm.
-- `ausgang: Ausgang = NICHT_FUEHRBAR` – Einwirkung gegen Widerstand im gewaehlten Massstab -- nicht fuehrbar ohne Schnitt mit der Linie. Das Urteil sagt [[opencivil.nachweis.biegung_normalkraft#Auswertung|innerhalb]].
 
 ### MNBefund
 

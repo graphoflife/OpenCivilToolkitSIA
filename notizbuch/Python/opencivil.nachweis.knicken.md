@@ -1,5 +1,5 @@
 ---
-erzeugt: 64c147648672
+erzeugt: c0bfe70153af
 art: modul
 tags: [modul]
 ---
@@ -198,7 +198,8 @@ Was bei einer Probekraft herauskommt.
 class Knickergebnis(Fallausgang)
 ```
 
-Alle Zwischenwerte eines Knickfalls.
+Alle Zwischenwerte eines Knickfalls. Sein Ausgang: \|N_Ed\| gegen N_Rd --
+ohne Druck gibt es nichts zu begrenzen.
 
 - `fall: Knickfall`
 - `alpha_i: float = 0.0`
@@ -216,8 +217,6 @@ Alle Zwischenwerte eines Knickfalls.
 - `N_Rd: float = 0.0` – Groesste Druckkraft mit Gleichgewicht, als Betrag in N.
 - `M_bei_N_Rd: float = 0.0` – Das Moment am verformten System bei `N_Rd`, in Nm. Dort liegt der Stab an seiner Grenze, also ist es zugleich sein Momentenwiderstand bei dieser Normalkraft -- der Punkt sitzt damit auf der Interaktionslinie. Im M-N-Diagramm ist das der Widerstandspunkt des Knicknachweises.
 - `schritte: List[Durchlauf] = field(default_factory=list)` – Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile.
-- `ausgang: Ausgang = NICHT_FUEHRBAR` – \|N_Ed\| gegen N_Rd -- ohne Druck gibt es nichts zu begrenzen.
-- `begruendung: str = ''`
 - `hinweis: str = ''`
 
 ### Knickbefund

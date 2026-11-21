@@ -1,5 +1,5 @@
 ---
-erzeugt: 3485a173dd9d
+erzeugt: 2ca2dec45acc
 art: modul
 tags: [modul]
 ---
@@ -134,13 +134,13 @@ class Querkraftergebnis(Fallausgang)
 Was ein Fall ergibt, in beiden Ansaetzen -- ihre eigenen Zwischenwerte
 tragen [[opencivil.nachweis.querkraft_ohne_buegel#ErgebnisOhneBuegel|ErgebnisOhneBuegel]]
 und [[opencivil.nachweis.querkraft_buegel#ErgebnisMitBuegeln|ErgebnisMitBuegeln]].
+Sein Ausgang: \|V_Ed\| gegen v_Rd -- nicht fuehrbar, wo sich kein
+Widerstand bestimmen liess.
 
 - `fall: Querkraftfall`
 - `zugposten: Tuple[Postenbezug, ...] = ()` – Die Posten der gezogenen Seite -- aus ihrem Schwerpunkt kommt `d`; leer ohne Zugbewehrung.
 - `d: float = 0.0`
 - `v_Rd: float = 0.0` – in N/m.
-- `ausgang: Ausgang = NICHT_FUEHRBAR` – \|V_Ed\| gegen v_Rd -- nicht fuehrbar, wo sich kein Widerstand bestimmen liess.
-- `begruendung: str = ''`
 
 ### Querkraft
 

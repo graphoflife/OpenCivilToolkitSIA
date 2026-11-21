@@ -47,9 +47,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
-from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
-)
+from opencivil.core.nachweis import Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def
 from opencivil.core.einheiten import KN, KNM, Groesse
 from opencivil.core.latex import als_text, angabe
 from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
@@ -140,7 +138,11 @@ class Normierung:
 
 @dataclass
 class Auswertung(Fallausgang):
-    """Ergebnis der Prüfung einer Kombination."""
+    """
+    Ergebnis der Prüfung einer Kombination. Sein Ausgang: Einwirkung gegen
+    Widerstand im gewaehlten Massstab -- nicht fuehrbar ohne Schnitt mit der
+    Linie. Das Urteil sagt :attr:`innerhalb`.
+    """
 
     schnittgroessen: Schnittgroessen
     innerhalb: bool
@@ -148,8 +150,6 @@ class Auswertung(Fallausgang):
 
     widerstand: Optional[Tuple[float, float]]
     """Der massgebende Punkt auf der Linie als (N, M) in N bzw. Nm."""
-
-    begruendung: str = ""
 
     achse: geo.Achse = geo.MOMENT
     """Auf welcher Achse verglichen wird. Haengt vom Massstab ab."""
@@ -174,10 +174,6 @@ class Auswertung(Fallausgang):
     normierung: Optional[Normierung] = None
     """Nur beim kuerzesten Abstand: dort ist der Grad kein Verhaeltnis von
     Momenten, sondern von Laengen im normierten Diagramm."""
-
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    """Einwirkung gegen Widerstand im gewaehlten Massstab -- nicht fuehrbar
-    ohne Schnitt mit der Linie. Das Urteil sagt :attr:`innerhalb`."""
 
 
 #: Welche Achse ein Massstab sucht. Die einzige Stelle, an der die beiden
@@ -505,7 +501,7 @@ class BiegungNormalkraft(Nachweis):
         if not gueltig:
             return Auswertung(
                 kombination, innerhalb, None,
-                "Kein Schnitt mit der Resistenzlinie → Einwirkung ausserhalb.",
+                begruendung="Kein Schnitt mit der Resistenzlinie → Einwirkung ausserhalb.",
                 massstab=(Erfuellungsart.NORMALKRAFT_KONSTANT
                           if art is Erfuellungsart.AUTOMATISCH else art))
         return min(gueltig, key=lambda g: g.erfuellungsgrad)
@@ -558,8 +554,9 @@ class BiegungNormalkraft(Nachweis):
         rand = max(laenge + abstand if innerhalb else laenge - abstand, 0.0)
         return self._verglichen(Auswertung(
             kombination, innerhalb, stelle,
-            f"Kürzester Abstand (normiert) a = {abstand:.3f}; nächster Punkt "
-            f"N = {_in(stelle[0], geo.NORMALKRAFT)}, M = {_in(stelle[1], geo.MOMENT)}.",
+            begruendung=(f"Kürzester Abstand (normiert) a = {abstand:.3f}; nächster Punkt "
+                         f"N = {_in(stelle[0], geo.NORMALKRAFT)}, "
+                         f"M = {_in(stelle[1], geo.MOMENT)}."),
             achse=geo.MOMENT, ed=M_Ed, rd=stelle[1],
             massstab=Erfuellungsart.NAECHSTER_PUNKT,
             normierung=Normierung(N_ref, M_ref, laenge, abstand, rand)))

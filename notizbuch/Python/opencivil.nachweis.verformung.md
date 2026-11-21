@@ -1,5 +1,5 @@
 ---
-erzeugt: 46cfd8188e63
+erzeugt: 4e81b593b87d
 art: modul
 tags: [modul]
 ---
@@ -91,8 +91,6 @@ class Fallergebnis(Fallausgang)
 Was ein Fall ergibt -- fuer Urteil und Herleitung: w_eff gegen w_max.
 
 - `fall: Verformungsfall`
-- `ausgang: Ausgang = NICHT_FUEHRBAR`
-- `begruendung: str = ''`
 
 ### Vergroesserungsfaktor
 

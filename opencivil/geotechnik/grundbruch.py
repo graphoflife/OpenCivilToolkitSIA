@@ -55,7 +55,7 @@ from typing import Dict, List, Optional, Tuple
 from opencivil.core.berechnung import Ausfuehrung, Eingaben
 from opencivil.core.einheiten import GRAD, KPA, M, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text, angabe, bedingung
-from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, Fallausgang
+from opencivil.core.nachweis import Fallausgang
 from opencivil.core.protokoll import Protokoll, TabellenBlock, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.geotechnik.fundament import OHNE_GAMMA_R, Fundamentnachweis, Kombination
@@ -140,8 +140,6 @@ class Fallergebnis(Fallausgang):
 
     sigma_f: float = 0.0
     N_Rd: float = 0.0
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    begruendung: str = ""
 
 
 @dataclass

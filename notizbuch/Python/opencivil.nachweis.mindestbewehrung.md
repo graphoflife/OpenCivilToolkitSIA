@@ -1,5 +1,5 @@
 ---
-erzeugt: 9154110e87d2
+erzeugt: efd6fab220b0
 art: modul
 tags: [modul]
 ---
@@ -143,8 +143,6 @@ Was der Nachweis fuer eine Lage gefunden hat: N_s,adm gegen N_Riss.
 - `durchmesser: float = 0.0` – Der groesste Stabdurchmesser der Lage, in m -- er bestimmt die Rissbreite.
 - `sigma_s_adm: float = 0.0`
 - `N_s_adm: float = 0.0`
-- `ausgang: Ausgang = NICHT_FUEHRBAR`
-- `begruendung: str = ''`
 
 ### Normalzwang
 
@@ -231,7 +229,9 @@ def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis, ansatz: 
 class Momentlagenergebnis(Fallausgang)
 ```
 
-Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat.
+Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat. Sein
+Ausgang: M_s,adm gegen M_Riss -- nicht fuehrbar ohne Bewehrung in der
+Lage.
 
 - `lage: Bewehrungslage`
 - `a_s: float = 0.0`
@@ -244,8 +244,6 @@ Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat.
 - `x: float = 0.0`
 - `hebelarm: float = 0.0`
 - `M_s_adm: float = 0.0`
-- `ausgang: Ausgang = NICHT_FUEHRBAR` – M_s,adm gegen M_Riss -- nicht fuehrbar ohne Bewehrung in der Lage.
-- `begruendung: str = ''`
 
 ### Biegezwang
 

@@ -50,9 +50,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, Prozedur
-from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
-)
+from opencivil.core.nachweis import Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -105,8 +103,6 @@ class Fallergebnis(Fallausgang):
     """Was ein Fall ergibt -- fuer Urteil und Herleitung: w_eff gegen w_max."""
 
     fall: Verformungsfall
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    begruendung: str = ""
 
 
 class Vergroesserungsfaktor(Prozedur):

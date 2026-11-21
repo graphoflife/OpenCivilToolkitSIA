@@ -1,5 +1,5 @@
 ---
-erzeugt: cc3043694c32
+erzeugt: ffb2dcb40271
 art: modul
 tags: [modul]
 ---
@@ -314,7 +314,12 @@ Die gefundene Ebene, ihre Probe und was der Ort dazu sagt.
 class Fallergebnis(Fallausgang)
 ```
 
-Was der Nachweis fuer einen Lastfall gefunden hat.
+Was der Nachweis fuer einen Lastfall gefunden hat. Sein Ausgang stellt
+Spannungen gegeneinander, solange der Stahl elastisch bleibt; fliesst
+er, Dehnungen -- sonst stuende `f_yk` neben `f_yk` und daneben
+«nicht erfuellt», richtig gerechnet und doch nicht zu lesen. Entschieden
+wird das einmal, in [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._vergleich|Spannungsbegrenzung._vergleich]]. Nicht
+fuehrbar ohne Bewehrung und ohne Gleichgewichtslage.
 
 - `fall: object` – Bei der Platte ein [[opencivil.nachweis.spannungsbegrenzung#Gebrauchsfall|Gebrauchsfall]], am gezeichneten Querschnitt ein Lastfall.
 - `ebene: Optional[Stahlebene] = None` – Die Ebene, die der Ort fand -- fehlt nur ohne Bewehrung.
@@ -327,9 +332,7 @@ Was der Nachweis fuer einen Lastfall gefunden hat.
 - `eps_y: float = 0.0` – Die Fliessdehnung `f_s / E_s`.
 - `stahl: Optional[Baustoff] = None` – Der Stahl der massgebenden Stelle -- seine Grenze, sein `E_s` und seine Fliessdehnung gelten. Mit verschiedenen Staehlen ist massgebend die gezogene Stelle mit dem kleinsten Erfuellungsgrad, nicht die am staerksten gedehnte.
 - `konvergiert: bool = True`
-- `ausgang: Ausgang = NICHT_FUEHRBAR` – Was gegeneinander steht: Spannungen, solange der Stahl elastisch bleibt. Fliesst er, Dehnungen -- sonst stuende `f_yk` neben `f_yk` und daneben «nicht erfuellt», richtig gerechnet und doch nicht zu lesen. Entschieden wird das einmal, in [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._vergleich|Spannungsbegrenzung._vergleich]]. Nicht fuehrbar ohne Bewehrung und ohne Gleichgewichtslage.
 - `satz: str = ''` – Der Vergleich als Satz, fuer die Begruendung.
-- `begruendung: str = ''`
 
 #### Fallergebnis.fliesst
 

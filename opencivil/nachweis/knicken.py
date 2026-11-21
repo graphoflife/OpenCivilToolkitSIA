@@ -105,8 +105,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, UNBESCHRAENKT, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich,
-    grad_def,
+    UNBESCHRAENKT, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung
@@ -235,7 +234,10 @@ class Gleichgewicht:
 
 @dataclass
 class Knickergebnis(Fallausgang):
-    """Alle Zwischenwerte eines Knickfalls."""
+    """
+    Alle Zwischenwerte eines Knickfalls. Sein Ausgang: |N_Ed| gegen N_Rd --
+    ohne Druck gibt es nichts zu begrenzen.
+    """
 
     fall: Knickfall
     alpha_i: float = 0.0
@@ -272,10 +274,6 @@ class Knickergebnis(Fallausgang):
     schritte: List[Durchlauf] = field(default_factory=list)
     """Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile."""
 
-    ausgang: Ausgang = NICHT_FUEHRBAR
-    """|N_Ed| gegen N_Rd -- ohne Druck gibt es nichts zu begrenzen."""
-
-    begruendung: str = ""
     hinweis: str = ""
 
 

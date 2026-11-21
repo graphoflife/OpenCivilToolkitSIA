@@ -7,6 +7,19 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · Ein Urteil je Teil
+
+Ein Umbau ohne neue Zahl, vom Benutzer gewählt (2026-11-21):
+
+- **Ausgang und Begründung eines Falls stehen einmal da.** Zehn
+  Fallergebnisse (je Lage, je Fall, je Kombination) führten je ein Feld
+  `ausgang` mit der Vorgabe «nicht führbar» und ein Feld `begruendung`.
+  Jetzt führt sie `Fallausgang` selbst, als Datenklasse, deren beide
+  Felder man mit Namen setzt; was ein Ausgang je Nachweis gegeneinander
+  stellt, steht im Kopf seiner Klasse. Die schiefe Biegung gab den
+  Ausgang, die Biegung mit Normalkraft die Begründung nach der Stelle
+  mit; jetzt beide mit Namen.
+
 ## 2026-11-21 · Platte und Querschnittsanalyse teilen, was gleich ist
 
 Ein Umbau ohne neue Zahl, vom Benutzer gewählt (2026-11-21). Was die

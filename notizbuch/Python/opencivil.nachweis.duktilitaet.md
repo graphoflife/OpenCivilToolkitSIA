@@ -1,5 +1,5 @@
 ---
-erzeugt: 62412c5edd72
+erzeugt: e8290a8ea3ec
 art: modul
 tags: [modul]
 ---
@@ -112,7 +112,7 @@ Die Grenze, hergeleitet -- fuer Platte und gezeichneten Querschnitt dieselbe Zei
 class Lagenergebnis(Fallausgang)
 ```
 
-Was der Nachweis fuer eine Lage gefunden hat.
+Was der Nachweis fuer eine Lage gefunden hat; sein Ausgang: x/d gegen (x/d)_max.
 
 - `lage: Bewehrungslage`
 - `a_s: float = 0.0` – Summe der Bewehrungsquerschnitte dieser Lage, in m^2.
@@ -122,8 +122,6 @@ Was der Nachweis fuer eine Lage gefunden hat.
 - `x: float = 0.0` – Druckzonenhoehe bei M_Ed = 0, in m.
 - `verhaeltnis: float = 0.0`
 - `grenze: float = 0.0` – (x/d)_max der Lage -- sie haengt an ihrem Stahl.
-- `ausgang: Ausgang = NICHT_FUEHRBAR` – x/d gegen (x/d)_max.
-- `begruendung: str = ''`
 
 ### druckzonenhoehe
 
