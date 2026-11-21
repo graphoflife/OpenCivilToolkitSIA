@@ -1,5 +1,5 @@
 ---
-erzeugt: 91e6a45eb26f
+erzeugt: 980dac40f1b9
 art: modul
 tags: [modul]
 ---
@@ -78,6 +78,20 @@ rot hinterlegt und traegt seine Begruendung im Tooltip -- auf Papier
 gibt es beides nicht. Darum steht jeder unter der Tabelle mit seiner
 Begruendung, sofern ihn nicht schon ein gebuendelter Hinweis erklaert.
 
+### _ohne_aussage
+
+```python
+def _ohne_aussage(wert: Wert) -> bool
+```
+
+Ein unbeschraenkter Erfuellungsgrad: nichts wirkt ein, oder sein Fall kam
+in dieser Rechnung nicht vor -- eine Seite ohne Bewehrung, die
+Regelmaessigkeit eines regelmaessigen Gebaeudes. Was er sagt, steht bei
+den Nachweisen in Worten («Keine Einwirkung → kein Nachweis.»), oder er
+traegt gar kein Urteil ([[opencivil.core.nachweis#Nachweis.rechne|rechne]]).
+In der Werteliste stuende nur «∞» -- bis 2026-11-21 etwa «Erfuellungsgrad
+Regelmaessigkeit ∞» beim regelmaessigen Gebaeude.
+
 
 ## Braucht
 
@@ -86,6 +100,7 @@ Begruendung, sofern ihn nicht schon ein gebuendelter Hinweis erklaert.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.wert]]
 - [[opencivil.projekt]]
 
 ## Gebraucht von

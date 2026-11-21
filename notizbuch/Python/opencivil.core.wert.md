@@ -1,5 +1,5 @@
 ---
-erzeugt: 8ec639f5cfc8
+erzeugt: b2972101fd1a
 art: modul
 tags: [modul]
 ---
@@ -295,6 +295,7 @@ def beschreibung(self) -> str
 
 ## Gebraucht von
 
+- [[opencivil.bericht.gliederung]]
 - [[opencivil.bericht.konsole]]
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.berechnung]]

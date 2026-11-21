@@ -22,6 +22,16 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
 ## Offen
 
 
+- [ ] **Ein Fehler der Zeichnung steht zweimal da.** Liegt ein Stab der
+      Querschnittsanalyse nicht ganz im Beton, steht über der Zeichnung
+      «Nichts zu rechnen: Linie 3, 1. Stab … liegt nicht ganz im Beton.»
+      und an der Zeichnung dieselbe Meldung, rot, ein Klick wählt den Stab.
+      Ebenso ein Material, das es nicht mehr gibt. Empfehlung: der Kern
+      kennzeichnet einen Grund, den die Zeichnung selbst prüft (`bauen` der
+      Analyse, nicht `_vorab_pruefen`), und der Hinweis darüber schweigt
+      dann. Anders als bei der leeren Zeichnung (2026-11-21, [[Entwicklung]])
+      weiss nur der Kern, woher ein Grund kommt: ein Material, das selbst
+      nicht rechnet, zeigt die Zeichnung nicht.
 - [ ] Kurzform hinter dem Auge: weitere Nachweise kennzeichnen. Heute die
       Platte -- Biegung bei N = 0, Querkraft mit und ohne Bügel -- und seit
       2026-11-18 die Querkraft im Bohrpfahl (Wendel, Druckdiagonalen, das

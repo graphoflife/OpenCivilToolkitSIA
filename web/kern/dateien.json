@@ -4,7 +4,7 @@
     "opencivil/__init__.py": "3a7ac9ccd756",
     "opencivil/bericht/__init__.py": "63184939c73f",
     "opencivil/bericht/formelsammlung.py": "87ffa63278dc",
-    "opencivil/bericht/gliederung.py": "0b7d761715fb",
+    "opencivil/bericht/gliederung.py": "bd6443df4eb1",
     "opencivil/bericht/konsole.py": "9d6da78c4248",
     "opencivil/bericht/latex_dokument.py": "f90e20c77b01",
     "opencivil/bericht/markdown.py": "6e27cdea306e",

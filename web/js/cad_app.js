@@ -271,15 +271,24 @@ export function listenzeilen(a) {
 }
 
 /**
+ * Ob in der Zeichnung noch gar nichts steht, auch kein Knoten. Dann sagt es
+ * die Liste darunter, samt den Werkzeugen (`listengruppen`) -- und kein
+ * Hinweis über dem Editor sagt es noch einmal (`mitHinweis` in apps.js).
+ */
+export function nichtsGezeichnet(z) {
+  return !z?.knoten.length;
+}
+
+/**
  * Die Liste der Teile: je Art eine Gruppe aus `[titel, zeilen]`, die auf-
  * und zuklappt -- zu Beginn zu, und das merkt sich das Fenster (Benutzer,
- * 2026-10-24). Ist noch nichts gezeichnet, auch kein Knoten, sagt sie,
+ * 2026-10-24). Ist noch nichts gezeichnet (`nichtsGezeichnet`), sagt sie,
  * womit man beginnt: die Werkzeuge mit ihren Tasten.
  */
 export function listengruppen(a, gruppen) {
   const da = gruppen.filter(([, zeilen]) => zeilen.length);
   if (da.length) return da.map(([titel, zeilen]) => klappgruppe(titel, zeilen, a.adapter.aufgeklappt, 'cad-elemente'));
-  if (a.adapter.zeichnung()?.knoten.length) return [];
+  if (!nichtsGezeichnet(a.adapter.zeichnung())) return [];
   const werkzeuge = a.einstellung.werkzeuge.map((w) => `${w.text} ${w.taste.toUpperCase()}`).join(', ');
   return [el('p.leer-zeile', {
     text: `Noch nichts gezeichnet: ${werkzeuge}${a.adapter.vorlageOeffnen ? ' – oder eine Vorlage T' : ''}.`,

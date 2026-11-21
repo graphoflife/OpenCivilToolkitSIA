@@ -7,6 +7,34 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · Nichts doppelt, kein ∞ in der Werteliste
+
+Zwei Stellen aus der Durchsicht, die der Benutzer weghaben wollte
+(2026-11-21):
+
+- **Eine leere Querschnittsanalyse sagte zweimal, dass nichts gezeichnet
+  ist**: über der Zeichnung «Nichts zu rechnen: noch nichts gezeichnet.»,
+  unter ihr «Noch nichts gezeichnet: Polygon P, Bewehrung B, … – oder eine
+  Vorlage T.». Jetzt steht nur der Satz unter der Zeichnung; er sagt auch,
+  womit man beginnt. Der Hinweis darüber schweigt, solange die Zeichnung
+  ganz leer ist: `leer` eines Bauteils in `apps.js`, für die Analyse
+  `nichtsGezeichnet` aus `cad_app.js` -- dieselbe Regel, nach der der Satz
+  unter der Zeichnung steht. Steht schon ein Hilfspunkt da, fehlt der Satz
+  darunter, und der Hinweis sagt es wieder. Rechts in der Zusammenfassung
+  bleibt «Nichts zu rechnen: noch nichts gezeichnet.».
+- **Ein unbeschränkter Erfüllungsgrad stand als «∞» in der Werteliste des
+  Berichts**, beim regelmässigen Gebäude «Erfüllungsgrad Regelmässigkeit
+  ∞»: ein Grad, den kein Urteil trägt, weil sein Fall nicht vorkam --
+  `Nachweis.rechne` setzt ihn auf ∞, damit weitergerechnet werden kann. Im
+  vollen Bericht waren es 31 Zeilen, etwa beim Durchstanzen ohne
+  Bewehrung. Die Werteliste lässt jeden Erfüllungsgrad ∞ weg
+  (`_ohne_aussage` in `bericht/gliederung.py`): was er sagt, steht bei den
+  Nachweisen in Worten («Keine Einwirkung → kein Nachweis.»).
+
+Nicht geändert: die Tabellen der Schubwände in der Herleitung zeigen
+V_Rd/V_1 = ∞ für eine Wand, die in einer Richtung nichts trägt. Dort ist ∞
+eine Zahl der Rechnung, kein Urteil.
+
 ## 2026-11-21 · Eine Meldung nennt ein Feld wie die Maske
 
 Eine Meldung nannte ihren Ort zum Teil mit den Feldern der Datei: «Platte

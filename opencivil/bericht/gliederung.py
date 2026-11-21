@@ -25,6 +25,7 @@ EIGENSTAENDIG NUTZBAR::
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Optional
 
 from opencivil.bericht.formelsammlung import anfuegen as formelsammlung_anfuegen
@@ -36,6 +37,7 @@ from opencivil.bericht.zusammenfassung import (
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
+from opencivil.core.wert import Wert
 
 if TYPE_CHECKING:
     from opencivil.projekt import Aufbau
@@ -134,10 +136,25 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
         p.warnung(warnung)
 
 
+def _ohne_aussage(wert: Wert) -> bool:
+    """
+    Ein unbeschraenkter Erfuellungsgrad: nichts wirkt ein, oder sein Fall kam
+    in dieser Rechnung nicht vor -- eine Seite ohne Bewehrung, die
+    Regelmaessigkeit eines regelmaessigen Gebaeudes. Was er sagt, steht bei
+    den Nachweisen in Worten («Keine Einwirkung → kein Nachweis.»), oder er
+    traegt gar kein Urteil (:meth:`~opencivil.core.nachweis.Nachweis.rechne`).
+    In der Werteliste stuende nur «∞» -- bis 2026-11-21 etwa «Erfuellungsgrad
+    Regelmaessigkeit ∞» beim regelmaessigen Gebaeude.
+    """
+    return wert.definition.erfuellungsgrad and math.isinf(wert.groesse.si)
+
+
 def _werte(p: Protokoll, loesung: Loesung) -> None:
     zeilen = []
     for wert_id in sorted(loesung.werte):
         wert = loesung.werte[wert_id]
+        if _ohne_aussage(wert):
+            continue
         einheit = (wert.einheit.beschriftung
                    if wert.einheit.name not in ("", "-") else "")
         zeilen.append([wert.beschreibung or wert_id, Mathe(wert.symbol),

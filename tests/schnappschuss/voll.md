@@ -24254,11 +24254,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $2.51$ |  | berechnet |
-| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $\infty$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |
 | Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast | $q_d$ | $0$ | kN/m² | Vorgabe |
@@ -24274,11 +24270,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Mittleres Moment im Stützstreifen, x | $m_{sd,x}$ | $40$ | kNm/m | Vorgabe |
 | Mittleres Moment im Stützstreifen, y | $m_{sd,y}$ | $60$ | kNm/m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $2.68$ |  | berechnet |
-| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $\infty$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |
 | Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast | $q_d$ | $0$ | kN/m² | Vorgabe |
@@ -24314,11 +24306,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.41$ |  | berechnet |
-| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $\infty$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |
 | Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast | $q_d$ | $0$ | kN/m² | Vorgabe |
@@ -24332,11 +24320,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Plattendicke | $h$ | $280$ | mm | Vorgabe |
 | Spannweite in x | $l_x$ | $7$ | m | Vorgabe |
 | Spannweite in y | $l_y$ | $7$ | m | Vorgabe |
-| Erfüllungsgrad ausserhalb der Durchstanzbewehrung oder des Stahlpilzes | $\alpha_{eff,DS,out}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad erste Betondruckdiagonale | $\alpha_{eff,DS,max}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad der Durchstanzbewehrung | $\alpha_{eff,DS,s}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Durchstanzen ohne Durchstanzbewehrung | $\alpha_{eff,DS}$ | $0.37$ |  | berechnet |
-| Erfüllungsgrad Verformungsvermögen | $\alpha_{eff,DS,v}$ | $\infty$ |  | berechnet |
 | Stabdurchmesser in x | $\varnothing_x$ | $16$ | mm | Vorgabe |
 | Stabdurchmesser in y | $\varnothing_y$ | $16$ | mm | Vorgabe |
 | Flächenlast im Nachweisschnitt: Eigengewicht und Nutzlast | $q_d$ | $0$ | kN/m² | Vorgabe |
@@ -24384,7 +24368,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Höhe des Geschosses | $h_{7}$ | $3$ | m | Vorgabe |
 | Höhe des Geschosses | $h_{8}$ | $3$ | m | Vorgabe |
 | Anzahl gleicher Wände | $n_{1}$ | $1$ |  | Vorgabe |
-| Erfüllungsgrad Regelmässigkeit | $\alpha_{eff,R}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Ersatzkraftverfahren in x | $\alpha_{eff,x}$ | $1.74$ |  | berechnet |
 | Erfüllungsgrad Ersatzkraftverfahren in y | $\alpha_{eff,y}$ | $0.73$ |  | berechnet |
 | Beiwert der Nutzlast, quasi-ständig | $\psi_{2,1}$ | $0.3$ |  | Vorgabe |
@@ -24946,7 +24929,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $1.17$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $1.17$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $2.58$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Schräg (60 %) | $\alpha_{eff,\sigma,w,x,\text{Schräg (60 \%)}}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $1.87$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $2.21$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $2.11$ |  | berechnet |
@@ -25091,7 +25073,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Biegung und Normalkraft – Zug | $\alpha_{eff,\text{Zug}}$ | $2.36$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $2.44$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer | $\alpha_{eff,\sigma,w,\text{Dauer}}$ | $16.04$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite – Druck (60 %) | $\alpha_{eff,\sigma,w,\text{Druck (60 \%)}}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite – Zug (60 %) | $\alpha_{eff,\sigma,w,\text{Zug (60 \%)}}$ | $3.93$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $5.37$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $5.37$ |  | berechnet |
@@ -25114,21 +25095,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Druckwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{-}$ | $-28750$ | kN | berechnet |
 | Zugwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{+}$ | $0$ | kN | berechnet |
 | Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $0$ | kg/m³ | berechnet |
-| Erfüllungsgrad Duktilität – Zug links | $\alpha_{eff,x/d,\text{Zug links}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad Duktilität – Zug oben | $\alpha_{eff,x/d,\text{Zug oben}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad Duktilität – Zug rechts | $\alpha_{eff,x/d,\text{Zug rechts}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad Duktilität – Zug unten | $\alpha_{eff,x/d,\text{Zug unten}}$ | $\infty$ |  | berechnet |
 | Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-28750$ | kN | berechnet |
 | Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $0$ | kN | berechnet |
 | Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $0.00$ |  | berechnet |
-| Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad sprödes Versagen – Zug rechts | $\alpha_{eff,Riss,\text{Zug rechts}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $\infty$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $\infty$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $1429.3$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $429.3$ | mm | berechnet |
 | Breite des Fundaments | $B$ | $8$ | m | Vorgabe |

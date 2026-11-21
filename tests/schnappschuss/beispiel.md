@@ -5147,7 +5147,6 @@ Alle geführten Nachweise sind erfüllt.
 | Höhe des Geschosses | $h_{4}$ | $3$ | m | Vorgabe |
 | Anzahl gleicher Wände | $n_{1}$ | $2$ |  | Vorgabe |
 | Anzahl gleicher Wände | $n_{2}$ | $2$ |  | Vorgabe |
-| Erfüllungsgrad Regelmässigkeit | $\alpha_{eff,R}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad Ersatzkraftverfahren in x | $\alpha_{eff,x}$ | $4.50$ |  | berechnet |
 | Erfüllungsgrad Ersatzkraftverfahren in y | $\alpha_{eff,y}$ | $4.50$ |  | berechnet |
 | Beiwert der Nutzlast, quasi-ständig | $\psi_{2,1}$ | $0.3$ |  | Vorgabe |

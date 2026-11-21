@@ -20,6 +20,7 @@ import {
 } from './dom.js';
 import { api } from './api.js';
 import { sandboxHinweis, unfertigHinweis } from './bausteine.js';
+import { nichtsGezeichnet } from './cad_app.js';
 import { materialAnlegen, materialKopieren } from './materialwahl.js';
 import { materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
@@ -181,10 +182,11 @@ function entfernen(liste, eintrag) {
  * (`uebersicht(kennung)`). Fehlt eines davon, meldet sich das beim Laden.
  * Ein Bauteil geht nur weg, wenn kein Balkensystem mehr seinen Querschnitt
  * nimmt. `braucht` sagt, welche Materialien «+» verlangt -- ohne Angabe die,
- * die ein neuer Eintrag nimmt (`nachVorlage`).
+ * die ein neuer Eintrag nimmt (`nachVorlage`). `leer(e)` sagt, ob sein
+ * Editor selbst zeigt, dass noch nichts da ist (`mitHinweis`).
  */
 function bauteil(name, {
-  kurztext, braucht, editor, karten, uebersicht = null, fenster = null,
+  kurztext, braucht, editor, karten, uebersicht = null, fenster = null, leer,
 }) {
   const a = artVon(name);
   if (!karten) throw new Error(`apps.js: «${name}» hat keine Karten für die Diagramme.`);
@@ -204,7 +206,7 @@ function bauteil(name, {
     kopieren: (e) => kopieren(zeile, e),
     zuruecksetzen: (e) => zuruecksetzen(zeile, e),
     hinweis: () => a.bezeichnung,
-    editor: mitHinweis(a.liste, editor),
+    editor: mitHinweis(a.liste, editor, leer),
     fenster,
     karten,
     uebersicht,
@@ -215,11 +217,15 @@ function bauteil(name, {
 /**
  * Die Eingaben eines Eintrags aus ``liste`` -- und darüber, was ihm noch
  * fehlt, dort, wo man es nachträgt (Benutzer, 2026-11-19): einem Material
- * wie einem Bauteil. Bei der Sandbox zuoberst, wozu sie da ist.
+ * wie einem Bauteil. Bei der Sandbox zuoberst, wozu sie da ist. Zeigt der
+ * Editor selbst, dass noch nichts da ist (`leer`), schweigt der Hinweis:
+ * bis 2026-11-21 stand über einer leeren Zeichnung «Nichts zu rechnen: noch
+ * nichts gezeichnet.» und unter ihr «Noch nichts gezeichnet: Polygon P, …».
  */
-function mitHinweis(liste, editor) {
+function mitHinweis(liste, editor, leer = () => false) {
   return (behaelter, e) => ersetzen(behaelter, sandboxHinweis(e),
-    unfertigHinweis(zustand.loesung?.unfertige?.[liste]?.[e.kennung]), ...editor(e));
+    leer(e) ? null : unfertigHinweis(zustand.loesung?.unfertige?.[liste]?.[e.kennung]),
+    ...editor(e));
 }
 
 /**
@@ -279,6 +285,7 @@ const ANALYSE = bauteil('querschnittsanalyse', {
   kurztext: umriss,
   braucht: ['beton', 'betonstahl'],
   editor: analyseEditor,
+  leer: nichtsGezeichnet,
   karten: (kennung, eintrag, loesung) => [
     ...analyseKarten(kennung), ...spannungskarten(kennung, loesung)],
   fenster: analyseFenster,
