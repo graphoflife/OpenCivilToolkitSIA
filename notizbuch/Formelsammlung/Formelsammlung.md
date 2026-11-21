@@ -1,5 +1,5 @@
 ---
-erzeugt: 1db43b37abbc
+erzeugt: 2431f12b7427
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -457,7 +457,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fläche eines Kreises]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
-- [[Fläche eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_flaeche|Loeserpaar.herleitung_flaeche]], [[opencivil.stabwerk.querschnitte]]
+- [[Fläche eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bruttoquerschnitt|Loeserpaar.herleitung_bruttoquerschnitt]], [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
 - [[Fläche eines U-Profils mit geneigten Flanschen]] · [[opencivil.stabwerk.profilformen]]
@@ -472,7 +472,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines Kreisrings]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Kreisrings um z]] · [[opencivil.stabwerk.querschnitte#_wie_um_y|_wie_um_y]]
 - [[Flächenträgheitsmoment eines Rechteckrohrs]] · [[opencivil.stabwerk.querschnitte]]
-- [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_traegheit|Loeserpaar.herleitung_traegheit]], [[opencivil.stabwerk.querschnitte]]
+- [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bruttoquerschnitt|Loeserpaar.herleitung_bruttoquerschnitt]], [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Rechtecks um z]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
@@ -509,15 +509,15 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt der Wendel]] · [[opencivil.pfahl.innen_quer#InnererQuerwiderstand._fachwerk|InnererQuerwiderstand._fachwerk]]
 - [[Radius des Bewehrungskreises]] · [[opencivil.pfahl.innen#InnererWiderstand|InnererWiderstand._bohrpfahl]]
 - [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.fundament|_gamma_auftrieb]]
-- [[Rissmoment bei der Normalkraft]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
-- [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]], [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[Rissmoment bei der Normalkraft]] · [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissmoment|Bruttoriss._herleitung_rissmoment]]
+- [[Rissnormalkraft beim Moment]] · [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissnormalkraft|Bruttoriss._herleitung_rissnormalkraft]]
 - [[Schnittgrössen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Schnittgrössen längs eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Schwerpunkt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]], [[opencivil.querschnitt.lagenaufbau#protokoll_schwerpunkt|protokoll_schwerpunkt]]
 - [[Schwerpunkt eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Schwerpunkt eines U-Profils mit geneigten Flanschen]] · [[opencivil.stabwerk.profilformen]]
 - [[Schwerpunkt eines U-Profils mit parallelen Flanschen]] · [[opencivil.stabwerk.profilformen]]
-- [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissnormalkraft|Bruttoriss._herleitung_rissnormalkraft]]
 - [[Spannung im ungerissenen Querschnitt]] · [[opencivil.nachweis.rissgroessen#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
 - [[Spannungsfunktion von Prandtl]] · [[opencivil.querschnitt.analyse#Querschnittsanalyse.torsion_protokollieren|Querschnittsanalyse.torsion_protokollieren]]
 - [[Statische Höhe]] · [[opencivil.querschnitt.lagenaufbau#protokoll_statische_hoehe|protokoll_statische_hoehe]]
@@ -541,7 +541,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand bei festgehaltenem N_Ed]] · [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
 - [[Widerstand im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Widerstand in der Richtung der Einwirkung]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._ein_fall]]
-- [[Widerstandsmoment zum gezogenen Rand]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[Widerstandsmoment zum gezogenen Rand]] · [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_riss|Bruttoriss.herleitung_riss]]
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · [[opencivil.nachweis.rissgroessen#protokoll_widerstandsmoment|protokoll_widerstandsmoment]]
 - [[Zerlegung eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Zulässige Dehnung]] · [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]

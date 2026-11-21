@@ -1,5 +1,5 @@
 ---
-erzeugt: edef6479f020
+erzeugt: 02440178bef8
 art: modul
 tags: [modul]
 ---
@@ -363,6 +363,7 @@ def beschreibung(self) -> str
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.riss]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]

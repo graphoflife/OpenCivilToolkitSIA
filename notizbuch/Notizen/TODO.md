@@ -455,14 +455,23 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         ihre Grenzen heissen wie beim gezeichneten Querschnitt. Weg sind
         `dehnungsfaecher.py`, `plattenfasern` und `Querschnittsloeser`.
         Siehe [[Entwicklung]].
-      - Offen: `Loeserpaar` steht weiter neben `Schnittpaar`, das
-        Rissmoment am Rechteck neben dem am Bruttoquerschnitt;
-        `test_schnittanalyse.py` 155–177 prüft nur, dass beide gleich
-        bleiben. Die Löser des Paars kommen jetzt aus demselben Bau, den
-        Riss rechnet es weiter in b und h. Umbau: ein Paar für beide, mit
-        der rissaktiven Dicke als Parameter (t = h im Streifen,
-        t = min(h; b) am gezeichneten Querschnitt). Das ändert die
-        Herleitung der Platte; ihre Zahlen vorher und nachher vergleichen.
+      - Erledigt (2026-11-21): der Riss der Spannung-Dehnung-Analyse an
+        einer Stelle (`spannungsanalyse/riss.py`, `Bruttoriss`), vom
+        Benutzer gewählt. Die Platte reisst am Rechteck b×h als
+        Bruttoquerschnitt, wie der gezeichnete Querschnitt:
+        `M_Riss(N) = (f_ct,eff − N/A)·W` statt `M_Riss − N·h/6`; unter Zug
+        t = h, am gezeichneten Querschnitt t = min(h; b). Dieselben Zahlen
+        (vorher und nachher verglichen), nur die Herleitung der Platte ist
+        neu; die des gezeichneten Querschnitts steht Wort für Wort wie
+        vorher. Siehe [[Entwicklung]].
+      - Offen: die Nachweise der Platte (sprödes Versagen, Zwängung auf
+        Biegung) rechnen ihr Rissmoment weiter mit `rissmoment_rechteck`,
+        die des gezeichneten Querschnitts am Bruttoquerschnitt – dieselben
+        Zahlen, zwei Herleitungen. Und es bleiben zwei Paare,
+        `Loeserpaar` und `Schnittpaar`: sie unterscheiden sich noch in der
+        Tiefe (bei der Platte ein Wert, beim gezeichneten Querschnitt aus
+        der Zeichnung), in der Dehnung am Ende und darin, dass die
+        Nulllinie der Platte nie kippt.
       - Offen, verwandt, je ein eigener Umbau:
         - Erledigt (2026-11-21): Platte und Analyse teilen, was gleich ist
           -- den Anfang der Knicknachweise (`Knickverfahren.__init__`),
@@ -1289,7 +1298,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       (`spannungsanalyse/schnitt.py`): unter reiner Biegung kippt die
       Nulllinie, bis kein Moment um die andere Achse bleibt, «einachsig»
       bleibt sie parallel zur Achse (Benutzer, 2026-10-17). Der Riss am
-      ungerissenen Bruttoquerschnitt (`nachweis/rissgroessen.py`):
+      ungerissenen Bruttoquerschnitt (`nachweis/rissgroessen.py`, für die
+      Analyse in `spannungsanalyse/riss.py`, seit 2026-11-21 auch für die
+      Platte):
       `M_Riss(N) = (f_ct,eff − N/A)·W` mit W zur Ecke, die unter reiner
       Biegung zuerst reisst, und `N_Riss(M) = (f_ct,eff,t − σ_M)·A` an der
       Ecke, an der das am wenigsten Zug braucht; `k_t` für ein Drittel der

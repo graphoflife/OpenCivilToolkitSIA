@@ -1,5 +1,5 @@
 ---
-erzeugt: 8f7d29a404b2
+erzeugt: d1730583211a
 art: modul
 tags: [modul]
 ---
@@ -513,7 +513,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
-- [[opencivil.spannungsanalyse.schnitt]]
+- [[opencivil.spannungsanalyse.riss]]
 - [[opencivil.stabwerk.profilformen]]
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.stabwerk.rechnung]]

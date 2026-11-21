@@ -1,5 +1,5 @@
 ---
-erzeugt: d3a11c2377dd
+erzeugt: ee6346af49c5
 art: modul
 tags: [modul]
 ---
@@ -484,6 +484,7 @@ mit ihrer Probe, die auch verfehlt sein kann ([[opencivil.nachweis.querschnittsl
 - [[opencivil.spannungsanalyse.bild]]
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.riss]]
 - [[opencivil.spannungsanalyse.schnitt]]
 
 ## Formeln aus diesem Modul

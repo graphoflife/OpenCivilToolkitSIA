@@ -1,5 +1,5 @@
 ---
-erzeugt: 10ff3434fe09
+erzeugt: b39b51511419
 art: formel
 tags: [formel]
 ---
@@ -31,10 +31,12 @@ $$
 
 - [[Biegesteifigkeit]]
 - [[Biegesteifigkeit um y]]
+- [[Rissnormalkraft beim Moment]]
+- [[Widerstandsmoment zum gezogenen Rand]]
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_traegheit|Loeserpaar.herleitung_traegheit]]
+- [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bruttoquerschnitt|Loeserpaar.herleitung_bruttoquerschnitt]]
 - [[opencivil.stabwerk.querschnitte]]
 
 ## Themen

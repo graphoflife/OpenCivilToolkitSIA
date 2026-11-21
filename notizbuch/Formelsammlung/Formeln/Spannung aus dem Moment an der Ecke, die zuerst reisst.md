@@ -1,5 +1,5 @@
 ---
-erzeugt: fdaaef85992c
+erzeugt: 319a0ae94bd0
 art: formel
 tags: [formel]
 ---
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissnormalkraft|Bruttoriss._herleitung_rissnormalkraft]]
 
 ## Themen
 

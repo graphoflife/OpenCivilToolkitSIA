@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import math
 import re
-from typing import TYPE_CHECKING, Callable, List, Mapping, Optional, Tuple
+from typing import TYPE_CHECKING, List, Mapping, Optional, Tuple
 
 from opencivil.core.einheiten import GRAD, Groesse
 from opencivil.core.latex import Mathe
@@ -51,11 +51,11 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
     links heisst die Randdehnung bei z = 0 «rechts», nicht «oben».
 
     ``paar`` ist das Loeserpaar einer Platte oder eines gezeichneten
-    Querschnitts. Was nur die Art des Bauteils weiss -- die Tiefe, der Riss,
-    die Dehnung am Ende, der reine Betonquerschnitt --, schreibt es selbst
-    (``tiefe``, ``herleitung_riss``, ``herleitung_dehnung_am_ende``,
-    ``herleitung_traegheit`` und ``herleitung_flaeche``); der Rest ist
-    derselbe Text.
+    Querschnitts. Den Riss und den reinen Betonquerschnitt schreiben beide
+    gleich (:class:`~opencivil.spannungsanalyse.riss.Bruttoriss`); was nur
+    die Art des Bauteils weiss -- die Tiefe und die Dehnung am Ende --,
+    schreibt es selbst (``tiefe``, ``herleitung_dehnung_am_ende``). Der Rest
+    ist derselbe Text.
     """
     ab = len(p.bloecke)
     w = Zwischenwerte(f"{raum}.analyse.{re.sub(r'[^0-9A-Za-z]+', '_', fall.name)}")
@@ -112,7 +112,7 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
                "gewählt. Ein Widerstand heisst darum weder Rd noch Rk, sondern schlicht R.")
 
     h = paar.tiefe(w, ein)
-    paar.herleitung_riss(p, w, linie, ein, h)
+    A, I = paar.herleitung_riss(p, w, linie, ein, h)
 
     p.erklaerung(
         "Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die "
@@ -172,17 +172,17 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
             paar.herleitung_dehnung_am_ende(p, w, b, oben, unten, tiefe)
         p.text(f"Massgebend: {b.massgebend}.")
     if modul is not None:
-        _herleitung_modul(p, w, modul, paar, ein, h)
+        _herleitung_modul(p, w, modul, paar, A, I)
     p.herkunft_stempeln(THEMA, ab=ab)
 
 
 def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, paar: Paar,
-                      ein: Callable[[str], "Wert"], h: "Wert") -> None:
+                      A: "Wert", I: "Wert") -> None:
     """
     Der aequivalente Modul: der reine Betonquerschnitt, die Formel und der
     Modul an den Ecken der Linie -- jede Zeile mit Kraft und Verformung, also
-    von Hand nachzurechnen. Den reinen Betonquerschnitt schreibt das Paar
-    hin, wie die Art des Bauteils ihn kennt.
+    von Hand nachzurechnen. Der reine Betonquerschnitt ist der
+    Bruttoquerschnitt des Risses, mit seinem ``A`` und ``I``.
     """
     p.erklaerung(
         "Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt "
@@ -192,7 +192,7 @@ def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, paar: P
         "verformt, kann ein solcher Querschnitt nicht abbilden. Ist sie null, ist es "
         "genau M = E·I·χ bzw. N = E·A·ε.")
     if modul.art.ueber_moment:
-        paar.herleitung_traegheit(p, w, ein, h)
+        paar.herleitung_traegheit(p, w, I)
         p.ansatz(r"E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}",
                  titel="Äquivalenter E-Modul über dem Moment")
         p.wert(w.kruemmung("chi_0", r"\chi_0", modul.null),
@@ -200,7 +200,7 @@ def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, paar: P
         kopf = [Mathe(r"M\ [\mathrm{kNm}]"), Mathe(r"\chi - \chi_0\ [\mathrm{m}^{-1}]")]
         verformung = lambda v: f"{v - modul.null:.5f}"
     else:
-        paar.herleitung_flaeche(p, w, ein, h)
+        paar.herleitung_flaeche(p, w, A)
         p.ansatz(r"E_{eq} = \frac{N}{A_c \cdot \left(\varepsilon_m - \varepsilon_0\right)}",
                  titel="Äquivalenter E-Modul über der Normalkraft")
         p.wert(w.dehnung("eps_0", r"\varepsilon_0", modul.null, stellen=4),

@@ -7,6 +7,32 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · Die Platte reisst wie der gezeichnete Querschnitt
+
+Vom Benutzer gewählt (2026-11-21): eine Rechnung für beide. Die
+Spannung-Dehnung-Analyse der Platte rechnete ihren Riss selbst, in b und h,
+die des gezeichneten Querschnitts am Bruttoquerschnitt – dieselben Zahlen,
+zwei Rechnungen und zwei Herleitungen. Jetzt steht der Riss einmal da
+(`spannungsanalyse/riss.py`, `Bruttoriss`), und die Platte gibt ihm ihr
+Rechteck b×h als Bruttoquerschnitt (`bruttoquerschnitt_rechteck`).
+
+- **Vorher** stand in der Herleitung der Platte
+  `M_Riss(N) = M_Riss − N·h/6 = 41.4 kNm − (−200 kN)·0.3 m/6 = 51.4 kNm`, und
+  `M_Riss` selbst stand ohne Herleitung da.
+- **Nachher** schreibt sie, was auch der gezeichnete Querschnitt schreibt:
+  `A = b·h`, `I = b·h³/12`, `W = I/v_z`, `k_t` und `f_ct,eff`, dann
+  `M_Riss(N) = (f_ct,eff − N/A)·W` – am Beispiel wieder 51.4 kNm. Unter Zug
+  `N_Riss(M) = (f_ct,eff − M·v/I)·A` statt `f_ct,eff·b·h − 6·|M|/h`.
+- Was nur die Platte weiss, sagt sie selbst: A und I kommen aus b und h,
+  und unter Zug reisst ihre ganze Dicke, t = h – ihr Streifen b ist keine
+  Abmessung der Platte. Am gezeichneten Querschnitt bleibt t = min(h; b).
+- Der reine Betonquerschnitt des äquivalenten Moduls verweist bei beiden
+  auf den Bruttoquerschnitt (`I_c = I`, `A_c = A`); sonst stünden b·h³/12
+  und b·h zweimal in derselben Herleitung.
+
+Die Zahlen sind dieselben, bis auf die letzte Rechenstelle; die Herleitung
+des gezeichneten Querschnitts steht Wort für Wort wie vorher.
+
 ## 2026-11-21 · Was nur fehlt, steht auch als Hinweis grau
 
 Vom Benutzer gewählt (2026-11-21), nach der Prüfung im Browser gefunden.

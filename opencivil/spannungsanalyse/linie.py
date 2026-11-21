@@ -211,9 +211,11 @@ class Zustaende(NamedTuple):
 class Paar(Protocol):
     """
     Die beiden Loeser eines Querschnitts, gerissen und ungerissen, und was die
-    Fragen und ihre Herleitung sonst von ihm wissen muessen. Was nur die Art
-    des Bauteils weiss -- die Tiefe, den Riss, die Dehnung am Ende, den reinen
-    Betonquerschnitt --, schreibt das Paar selbst in die Herleitung.
+    Fragen und ihre Herleitung sonst von ihm wissen muessen. Den Riss und den
+    reinen Betonquerschnitt rechnen und schreiben beide Paare gleich
+    (:class:`~opencivil.spannungsanalyse.riss.Bruttoriss`); was nur die Art
+    des Bauteils weiss -- die Tiefe, die Dehnung am Ende --, schreibt das Paar
+    selbst in die Herleitung.
     """
 
     gerissen: Faserloeser
@@ -255,17 +257,15 @@ class Paar(Protocol):
     def tiefe(self, w: "Zwischenwerte", ein: Callable[[str], "Wert"]) -> "Wert": ...
 
     def herleitung_riss(self, p: "Protokoll", w: "Zwischenwerte", linie: "Linie",
-                        ein: Callable[[str], "Wert"], h: "Wert") -> None: ...
+                        ein: Callable[[str], "Wert"], h: "Wert") -> Tuple["Wert", "Wert"]: ...
 
     def herleitung_dehnung_am_ende(self, p: "Protokoll", w: "Zwischenwerte",
                                    bruch: "Grenzzustand", oben: "Wert", unten: "Wert",
                                    h: "Wert") -> None: ...
 
-    def herleitung_traegheit(self, p: "Protokoll", w: "Zwischenwerte",
-                             ein: Callable[[str], "Wert"], h: "Wert") -> "Wert": ...
+    def herleitung_traegheit(self, p: "Protokoll", w: "Zwischenwerte", I: "Wert") -> "Wert": ...
 
-    def herleitung_flaeche(self, p: "Protokoll", w: "Zwischenwerte",
-                           ein: Callable[[str], "Wert"], h: "Wert") -> "Wert": ...
+    def herleitung_flaeche(self, p: "Protokoll", w: "Zwischenwerte", A: "Wert") -> "Wert": ...
 
 
 # ===========================================================================

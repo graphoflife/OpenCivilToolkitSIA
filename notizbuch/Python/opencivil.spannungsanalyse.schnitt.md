@@ -1,5 +1,5 @@
 ---
-erzeugt: 3e7e170e1b59
+erzeugt: d14f879d31be
 art: modul
 tags: [modul]
 ---
@@ -54,22 +54,10 @@ zwei Zehntelpromille aendert.
 
 ## DER RISS
 
-Am ungerissenen Bruttoquerschnitt, ohne Stahl, wie beim sproeden Versagen
-([[opencivil.nachweis.rissgroessen]]):
-
-```python
-M_Riss(N) = (f_ct,eff - N/A) · W        W zur Ecke, die unter reiner Biegung zuerst reisst
-N_Riss(M) = (f_ct,eff,t - σ_M) · A      σ_M aus M, an der Ecke, die zuerst reisst
-```
-
-Unter reiner Biegung mit dem Deviationsmoment `I_yz`, «einachsig» mit
-`W = I/v`. `f_ct,eff` mit `k_t` fuer ein Drittel der Tiefe, unter Zug
-fuer die rissaktive Dicke `min(h; b)` -- die Regeln der Platte,
-uebertragen; der Beton der Ecke gibt `f_ctm`. Nach Vorgabe: SIA 262:2025
-laesst den Querschnitt reissen, wenn der Beton `f_ctm` oder eine Fraktile
-erreicht, ohne `k_t` (4.2.1.14), und rechnet ihn ungerissen mit dem Stahl
-(4.1.4.1.4) -- Entscheid des Benutzers offen (`notizbuch/Notizen/TODO.md`).
-Bei der Platte ist `W/A = h/6` -- dieselbe Formel.
+Am ungerissenen Bruttoquerschnitt, ohne Stahl, wie bei der Platte -- eine
+Rechnung fuer beide ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]).
+`A` und `I` kommen aus der Analyse; unter Zug reisst die kleinere
+Abmessung `min(h; b)`, die Regel der Platte, uebertragen.
 
 
 ## DER AEQUIVALENTE MODUL
@@ -263,13 +251,13 @@ eine Schranke fuer jede Stelle einer Linie.
 
 ```python
 @dataclass(frozen=True)
-class Schnittpaar
+class Schnittpaar(Bruttoriss)
 ```
 
 Die beiden Loeser eines gezeichneten Querschnitts in einer Zugrichtung --
 gerissen und ungerissen, wie das [[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]]
 der Platte --, dazu beide Zustaende in jeder anderen Richtung, fuer die
-kippende Nulllinie. Dazu der Riss am Bruttoquerschnitt und was die
+kippende Nulllinie. Dazu der Bruttoquerschnitt fuer den Riss und was die
 Herleitung braucht.
 
 - `gerissen: Faserloeser`
@@ -279,25 +267,16 @@ Herleitung braucht.
 - `querschnitt: Querschnitt` – Der gerissene Querschnitt im Bruchzustand -- derselbe, aus dem `gerissen` stammt.
 - `zerlegungen: Tuple[_Zerlegung, _Zerlegung]` – Gerissen und ungerissen, in jeder Richtung -- fuer die kippende Nulllinie.
 - `A: float` – Flaeche des Bruttoquerschnitts, m².
-- `I: float` – Traegheitsmoment um die Achse der Biegung, m⁴.
 - `brutto: Bruttoquerschnitt`
 - `riss: Rissmoment` – Das Rissmoment unter reiner Biegung, ohne Normalkraft -- und die Ecke, die zuerst reisst.
-- `k_t_zug: float` – Fuer die Rissnormalkraft: `k_t` fuer die rissaktive Dicke unter Zug, die kleinere Abmessung `min(h; b)` (Benutzer, 2026-10-17). Bis dahin die ganze Tiefe in Zugrichtung, auch wo der Querschnitt quer dazu schmaler ist.
 - `breite: float` – Die Ausdehnung des Betons quer zur Zugrichtung, m.
-- `t_zug: float` – Die rissaktive Dicke unter Zug, `min(h; b)`, m.
+- `t_zug: float` – Die rissaktive Dicke unter Zug, m: die kleinere Abmessung `min(h; b)` (Benutzer, 2026-10-17). Bis dahin die ganze Tiefe in Zugrichtung, auch wo der Querschnitt quer dazu schmaler ist.
 - `E_cm: float` – Der Modul des Betons der Ecke, die zuerst reisst -- Massstab des aequivalenten Moduls.
 - `staehle: Tuple[Baustoff, ...] = ()`
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung: der Beton der Ecke, die zuerst reisst, und A, I -- dazu die Zugfestigkeit jedes Betons unter ihrer eigenen ID, denn welche Ecke unter Zug zuerst reisst, haengt am Moment.
+- `ZUR_ANDEREN_ACHSE = 'Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt …`
+- `DICKE_UNTER_ZUG = 'die kleinere Abmessung des Betons'`
 - `bezugsort = 'im Schwerpunkt'` – Wo die Mitteldehnung gilt -- dort greift N an.
-
-#### Schnittpaar.einachsig
-
-```python
-@property
-def einachsig(self) -> bool
-```
-
-Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt zu kippen -- wie die Analyse.
 
 #### Schnittpaar.ebenen
 
@@ -307,65 +286,6 @@ def ebenen(self) -> Zustaende
 
 Die Ebenen beider Zustaende: kippend, «einachsig» mit fester Nulllinie.
 
-#### Schnittpaar.W
-
-```python
-@property
-def W(self) -> float
-```
-
-Das Widerstandsmoment zur Ecke, die unter reiner Biegung zuerst reisst, m³.
-
-#### Schnittpaar.M_Riss
-
-```python
-@property
-def M_Riss(self) -> float
-```
-
-Das Rissmoment ohne Normalkraft.
-
-#### Schnittpaar.rissmoment_bei
-
-```python
-def rissmoment_bei(self, N: float) -> float
-```
-
-`M_Riss(N) = (f_ct,eff - N/A)·W` -- Druck hebt es, Zug senkt es.
-
-#### Schnittpaar.rissnormalkraft
-
-```python
-def rissnormalkraft(self, M: float) -> Rissnormalkraft
-```
-
-Die Rissnormalkraft beim Moment `M` -- an der Ecke, die zuerst reisst.
-
-#### Schnittpaar.rissnormalkraft_bei
-
-```python
-def rissnormalkraft_bei(self, M: float) -> float
-```
-
-`N_Riss(M) = (f_ct,eff,t - σ_M)·A` -- ein Moment senkt sie, gleich in welche Richtung.
-
-#### Schnittpaar.I_c
-
-```python
-@property
-def I_c(self) -> float
-```
-
-Der reine Betonquerschnitt fuer den aequivalenten Modul: `I` -- kippt
-die Nulllinie, `I - I_yz²/I_quer`, siehe Dateikopf.
-
-#### Schnittpaar.A_c
-
-```python
-@property
-def A_c(self) -> float
-```
-
 #### Schnittpaar.tiefe
 
 ```python
@@ -374,13 +294,21 @@ def tiefe(self, w: Zwischenwerte, ein: Callable[[str], 'Wert']) -> 'Wert'
 
 Die Ausdehnung des Betons in Zugrichtung -- aus der Zeichnung, kein Wert des Rechenwerks.
 
-#### Schnittpaar.herleitung_riss
+#### Schnittpaar.herleitung_bruttoquerschnitt
 
 ```python
-def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: Linie, ein: Callable[[str], 'Wert'], h: 'Wert') -> None
+def herleitung_bruttoquerschnitt(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> Tuple['Wert', 'Wert']
 ```
 
-Der Riss am Bruttoquerschnitt: Widerstandsmoment, Zugfestigkeit, Risskraft.
+`A` und `I` sind Ergebnisse der Analyse -- dort hergeleitet.
+
+#### Schnittpaar.herleitung_dicke_unter_zug
+
+```python
+def herleitung_dicke_unter_zug(self, p: Protokoll, w: Zwischenwerte, h: 'Wert') -> 'Wert'
+```
+
+Die kleinere Abmessung des Betons, `min(h; b)`.
 
 #### Schnittpaar.herleitung_dehnung_am_ende
 
@@ -389,22 +317,6 @@ def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: Gren
 ```
 
 Die Dehnung im Schwerpunkt am Ende -- dort greift N an; `h` senkrecht zur Nulllinie.
-
-#### Schnittpaar.herleitung_flaeche
-
-```python
-def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
-```
-
-Der reine Betonquerschnitt des Moduls ueber der Normalkraft: der Bruttoquerschnitt.
-
-#### Schnittpaar.herleitung_traegheit
-
-```python
-def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
-```
-
-Der reine Betonquerschnitt des Moduls ueber dem Moment: der Bruttoquerschnitt.
 
 ### schnittpaar
 
@@ -424,7 +336,6 @@ aus einer Loesung.
 
 ## Braucht
 
-- [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
@@ -440,6 +351,7 @@ aus einer Loesung.
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.riss]]
 
 ## Gebraucht von
 
@@ -450,8 +362,4 @@ aus einer Loesung.
 ## Formeln aus diesem Modul
 
 - [[Grösste Dehnung im Schwerpunkt]] · `Schnittpaar.herleitung_dehnung_am_ende`
-- [[Rissaktive Dicke des gezeichneten Querschnitts]] · `Schnittpaar.herleitung_riss`
-- [[Rissmoment bei der Normalkraft]] · `Schnittpaar.herleitung_riss`
-- [[Rissnormalkraft beim Moment]] · `Schnittpaar.herleitung_riss`
-- [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · `Schnittpaar.herleitung_riss`
-- [[Widerstandsmoment zum gezogenen Rand]] · `Schnittpaar.herleitung_riss`
+- [[Rissaktive Dicke des gezeichneten Querschnitts]] · `Schnittpaar.herleitung_dicke_unter_zug`

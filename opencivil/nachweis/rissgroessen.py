@@ -15,10 +15,11 @@ gezeichneten Querschnitts wie fuer ihre Spannung-Dehnung-Analysen:
   (:func:`rissmoment`). Mit dem Deviationsmoment ``I_yz`` kippt die
   Nulllinie; «einachsig» bleibt sie parallel zur Achse der Biegung, und es
   gilt ``W = I/v``. Bei der Platte, einem Rechteck, ist es beide Male
-  ``b·h²/6`` (:func:`rissmoment_rechteck`);
+  ``b·h²/6`` (:func:`rissmoment_rechteck`, :func:`bruttoquerschnitt_rechteck`);
 * **die Rissnormalkraft bei einem Moment**: die Zugkraft, bei der
   ``f_ct,eff`` zum ersten Mal irgendwo erreicht wird (:func:`rissnormalkraft`)
-  -- fuer die Analyse des gezeichneten Querschnitts.
+  -- fuer die Spannung-Dehnung-Analysen, der Platte wie des gezeichneten
+  Querschnitts (:mod:`opencivil.spannungsanalyse.riss`).
 
 So hat es der Benutzer am 2026-10-17 entschieden. Bis dahin standen die
 Rissgroessen viermal da -- im sproeden Versagen, in den Richtungsnachweisen
@@ -48,7 +49,7 @@ from opencivil.core.einheiten import M, MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.querschnitt.analyse import Querschnittsanalyse
-from opencivil.querschnitt.biegung import SCHIEF, Biegung
+from opencivil.querschnitt.biegung import EINACHSIG, SCHIEF, Biegung
 
 #: Teiler der Hoehe in Biegerichtung im Beiwert: unter Biegung zaehlt bei
 #: Platten und Rechtecken ein Drittel der Hoehe, unter Zug die kleinste
@@ -162,7 +163,7 @@ def protokoll_rissmoment_rechteck(
 
 
 # ===========================================================================
-# Der gezeichnete Querschnitt
+# Der Bruttoquerschnitt -- gezeichnet oder das Rechteck der Platte
 # ===========================================================================
 
 
@@ -234,6 +235,19 @@ def bruttoquerschnitt(analyse: Querschnittsanalyse,
                          f_ctm=abs(wert(stoff.id_von("f_ctm"))))
                     for p, stoff in analyse.beton_ecken),
         biegung=analyse.biegung)
+
+
+def bruttoquerschnitt_rechteck(*, h: float, b: float, stoff: Any,
+                               f_ctm: float) -> Bruttoquerschnitt:
+    """
+    Der Bruttoquerschnitt der Platte: das Rechteck ``b × h`` aus ihrem Beton,
+    um seinen Schwerpunkt, einachsig -- fuer ihre Spannung-Dehnung-Analyse.
+    Alles in SI.
+    """
+    ecken = tuple(Ecke(y=y, z=z, punkt=(y * 1e3, z * 1e3), stoff=stoff, f_ctm=f_ctm)
+                  for y in (-b / 2.0, b / 2.0) for z in (-h / 2.0, h / 2.0))
+    return Bruttoquerschnitt(I_y=b * h ** 3 / 12.0, I_z=h * b ** 3 / 12.0, I_yz=0.0,
+                             ecken=ecken, biegung=EINACHSIG)
 
 
 @dataclass(frozen=True)

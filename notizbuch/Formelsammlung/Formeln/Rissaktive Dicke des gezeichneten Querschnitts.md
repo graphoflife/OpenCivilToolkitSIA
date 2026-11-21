@@ -1,5 +1,5 @@
 ---
-erzeugt: 7087d659134e
+erzeugt: 95c7f171f263
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.4.2.3.7", "SIA 262:2025, 4.4.1.3"]
@@ -55,7 +55,7 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA._risskraft|RissnormalkraftQA._risskraft]]
-- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_dicke_unter_zug|Schnittpaar.herleitung_dicke_unter_zug]]
 
 ## Themen
 

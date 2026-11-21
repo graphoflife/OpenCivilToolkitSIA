@@ -2,12 +2,13 @@
 opencivil/spannungsanalyse/platte.py -- das Paar einer Platte.
 
 VERANTWORTUNG:
-Die beiden Loeser einer Tragrichtung, gerissen und ungerissen, dazu Riss,
-Bezugsflaeche des Moduls und was die Herleitung nur von der Platte weiss
-(:class:`Loeserpaar`, ein :class:`~opencivil.spannungsanalyse.linie.Paar`).
-Die Loeser sind die jedes Querschnitts: die Platte als Rechteck mit Staeben
-(:meth:`~opencivil.nachweis.rechenwahl.Gesetze.loeser`). Eigen bleibt der
-Riss am Rechteck, in den Groessen der Platte, b und h.
+Die beiden Loeser einer Tragrichtung, gerissen und ungerissen, und was die
+Herleitung nur von der Platte weiss (:class:`Loeserpaar`, ein
+:class:`~opencivil.spannungsanalyse.linie.Paar`). Die Loeser sind die jedes
+Querschnitts: die Platte als Rechteck mit Staeben
+(:meth:`~opencivil.nachweis.rechenwahl.Gesetze.loeser`). Den Riss rechnet
+sie wie der gezeichnete Querschnitt, am Bruttoquerschnitt -- dem Rechteck
+``b × h`` (:class:`~opencivil.spannungsanalyse.riss.Bruttoriss`).
 """
 
 from __future__ import annotations
@@ -20,13 +21,15 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze, staehle, stahllagen
 from opencivil.nachweis.rissgroessen import (
-    beiwert_dicke, protokoll_zugfestigkeit, rissaktive_dicke, rissmoment_rechteck,
+    Bruttoquerschnitt, Rissmoment, bruttoquerschnitt_rechteck, rissaktive_dicke, rissmoment,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.platte import Richtung
+from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.linie import (
-    SUCHE_DER_ANALYSEN, FesteNulllinie, Grenzzustand, Linie, Zustaende,
+    SUCHE_DER_ANALYSEN, FesteNulllinie, Grenzzustand, Zustaende,
 )
+from opencivil.spannungsanalyse.riss import Bruttoriss
 
 if TYPE_CHECKING:
     from opencivil.core.wert import Wert
@@ -38,7 +41,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(frozen=True)
-class Loeserpaar:
+class Loeserpaar(Bruttoriss):
     """
     Die beiden Loeser einer Tragrichtung -- gerissen und nicht.
 
@@ -53,14 +56,13 @@ class Loeserpaar:
     ungerissen: Faserloeser
     h: float
     b: float
-    """Hoehe und Breite des Streifens, m -- die Groessen, in denen der Riss am Rechteck steht."""
+    """Hoehe und Breite des Streifens, m."""
 
-    M_Riss: float
-    """Das Rissmoment ohne Normalkraft -- mit ``k_t`` fuer ein Drittel der Dicke."""
+    brutto: Bruttoquerschnitt
+    """Das Rechteck ``b × h`` ohne Stahl -- an ihm reisst die Platte."""
 
-    k_t_zug: float = 1.0
-    f_ct_eff_zug: float = 0.0
-    """Fuer die Rissnormalkraft: ``k_t`` fuer die ganze Dicke und ``k_t·f_ctm``."""
+    riss: Rissmoment
+    """Das Rissmoment unter reiner Biegung, ohne Normalkraft."""
 
     staehle: Tuple[Any, ...] = ()
     """
@@ -78,60 +80,24 @@ class Loeserpaar:
     E_cm: float = 0.0
     """Der Modul des Betons -- daran misst sich der aequivalente Modul."""
 
+    #: Ein positives Moment zieht unten.
+    seite = Zugseite.UNTEN
+
+    DICKE_UNTER_ZUG = "die Dicke der Platte"
+
     def ebenen(self) -> Zustaende:
         """Die Ebenen der Platte: ein Rechteck, die Nulllinie bleibt parallel zur Achse."""
         return Zustaende(FesteNulllinie(self.gerissen), FesteNulllinie(self.ungerissen))
 
-    def rissmoment_bei(self, N: float) -> float:
-        """
-        Das Rissmoment bei der Normalkraft ``N`` (Zug positiv), in Nm.
-
-        Am Bruttoquerschnitt reisst der Rand, wenn ``N/A + M/W = f_ct,eff``.
-        Mit ``A = b·h`` und ``W = b·h²/6`` -- denselben Werten, mit denen
-        :func:`~opencivil.nachweis.rissgroessen.rissmoment_rechteck` das
-        Rissmoment ohne Normalkraft rechnet -- ist das
-        ``M_Riss(N) = M_Riss(0) - N·h/6``. Druck hebt es, Zug senkt es.
-
-        Nach Vorgabe: der Bruttoquerschnitt ohne Stahl, wie beim spröden
-        Versagen. Der ungerissene Zustand daneben rechnet mit Stahl und
-        Kriechzahl und ist darum steifer; beim Rissmoment steht sein Rand
-        etwas unter ``f_ct,eff``. SIA 262:2025 laesst den Querschnitt reissen,
-        wenn der Beton ``f_ctm`` oder eine Fraktile erreicht, ohne ``k_t``
-        (4.2.1.14), und rechnet ihn ungerissen mit dem Stahl (4.1.4.1.4) --
-        Entscheid des Benutzers offen (``notizbuch/Notizen/TODO.md``).
-
-        ``f_ct,eff`` mit ``k_t`` fuer ein Drittel der Dicke, auch unter Zug:
-        Biegung bleibt bei ``h/3``, nach Vorgabe. Die Rissnormalkraft nimmt die
-        ganze Dicke (:meth:`rissnormalkraft_bei`); beim selben N und M reissen
-        die beiden Linien darum nicht am selben Punkt.
-        """
-        return self.M_Riss - N * self.h / 6.0
-
-    def rissnormalkraft_bei(self, M: float) -> float:
-        """
-        Die Zugkraft, bei der der Querschnitt mit dem Moment ``M`` reisst, in N.
-
-        Am Bruttoquerschnitt reisst der Rand, wenn ``N/A + |M|/W = f_ct,eff``,
-        also ``N_Riss(M) = f_ct,eff·b·h - 6·|M|/h``. Das Vorzeichen des
-        Moments zaehlt nicht -- der Querschnitt ist oben wie unten derselbe.
-
-        ``f_ct,eff`` mit ``k_t = 1/(1 + 0.5·t)`` fuer die ganze Dicke,
-        ``t = h``: unter Zug reisst der ganze Querschnitt, nicht ein Drittel
-        wie unter Biegung. Nach Vorgabe, wie beim Rissmoment
-        (``notizbuch/Notizen/TODO.md``). Bis 2026-10-09 galt das ``f_ct,eff``
-        des Rissmoments, mit ``t = h/3`` -- am Beispiel 829 statt 757 kN.
-        """
-        return self.f_ct_eff_zug * self.b * self.h - 6.0 * abs(M) / self.h
-
     @property
-    def I_c(self) -> float:
-        """Der reine Betonquerschnitt fuer den aequivalenten Modul: ``b·h³/12``."""
-        return self.b * self.h ** 3 / 12.0
-
-    @property
-    def A_c(self) -> float:
-        """Dasselbe fuer die Normalkraft: ``b·h``."""
+    def A(self) -> float:
+        """Die Flaeche des Rechtecks, ``b·h``."""
         return self.b * self.h
+
+    @property
+    def t_zug(self) -> float:
+        """Die rissaktive Dicke unter Zug: die ganze Dicke der Platte."""
+        return rissaktive_dicke(h=self.h, zug=True)
 
     # -- Was die Herleitung nur von der Platte weiss --------------------------
 
@@ -142,35 +108,28 @@ class Loeserpaar:
         """Die Dicke, ueber die die Linie laeuft -- ein Wert der Platte."""
         return ein("h")
 
-    def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: Linie,
-                        ein: Callable[[str], "Wert"], h: "Wert") -> None:
-        """Wo die Linie reisst: das Rissmoment bei N, oder die Rissnormalkraft bei M."""
-        if linie.art.ueber_moment:
-            p.erklaerung(
-                "Am Bruttoquerschnitt reisst der Rand, wenn N/A + M/W = f_ct,eff. Mit "
-                "A = b·h und W = b·h²/6 hebt Druck das Rissmoment, Zug senkt es. Beim "
-                "Rissmoment springt die Krümmung bei demselben Moment vom ungerissenen "
-                "auf den gerissenen Wert.")
-            p.formel(w.moment("M_Riss_N", "M_{Riss}(N)", linie.riss),
-                     r"@M_Riss - @N \cdot \frac{@h}{6}",
-                     {"M_Riss": w.moment("M_Riss", "M_{Riss}", self.M_Riss),
-                      "N": w.kraft("N", "N", linie.fest), "h": h},
-                     titel="Rissmoment bei der Normalkraft")
-            return
-        p.erklaerung(
-            "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M "
-            "reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Unter Zug "
-            "reisst die ganze Dicke, darum gilt k_t für t = h und nicht für h/3 wie "
-            "beim Rissmoment. Bei N_Riss springt die Dehnung bei derselben Kraft vom "
-            "ungerissenen auf den gerissenen Wert.")
-        f_ct_eff = protokoll_zugfestigkeit(
-            p, w, k_t=self.k_t_zug, f_ct_eff=self.f_ct_eff_zug, h=h,
-            f_ctm=ein("f_ctm"), teiler=1)
-        p.formel(w.kraft("N_Riss_M", "N_{Riss}(M)", linie.riss),
-                 r"@f_ct_eff \cdot @b \cdot @h - \frac{6 \cdot \left|@M\right|}{@h}",
-                 {"f_ct_eff": f_ct_eff, "b": ein("b"), "h": h,
-                  "M": w.moment("M", "M", linie.fest)},
-                 titel="Rissnormalkraft beim Moment")
+    def herleitung_bruttoquerschnitt(self, p: Protokoll, w: Zwischenwerte,
+                                     ein: Callable[[str], "Wert"],
+                                     h: "Wert") -> Tuple["Wert", "Wert"]:
+        """Das Rechteck ``b × h`` des Streifens, ohne Stahl: ``A`` und ``I`` aus b und h."""
+        A = w.flaeche("A", "A", self.A, "Fläche des Bruttoquerschnitts")
+        p.formel(A, r"@b \cdot @h", {"b": ein("b"), "h": h},
+                 titel="Bruttoquerschnitt: Fläche", name="Fläche eines Rechtecks")
+        I = w.wert("I", "I", Groesse.aus_si(self.I, MIO_MM4), stellen=1)
+        p.formel(I, r"\frac{@b \cdot \left(@h\right)^{3}}{12}", {"b": ein("b"), "h": h},
+                 titel="Bruttoquerschnitt: Trägheitsmoment",
+                 name="Flächenträgheitsmoment eines Rechtecks")
+        return A, I
+
+    def herleitung_dicke_unter_zug(self, p: Protokoll, w: Zwischenwerte, h: "Wert") -> "Wert":
+        """
+        Unter Zug reisst die ganze Dicke, ``t = h``: der Streifen ``b`` ist keine
+        Abmessung der Platte (:func:`~opencivil.nachweis.rissgroessen.rissaktive_dicke`).
+        Ein Satz statt einer Formel -- ``t`` steht fuer ``h``, wie bisher.
+        """
+        p.erklaerung("Der Streifen b ist keine Abmessung der Platte: in ihrer Ebene ist "
+                     "sie unbegrenzt. Darum ist t = h.")
+        return h
 
     def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: "Grenzzustand",
                                    oben: "Wert", unten: "Wert", h: "Wert") -> None:
@@ -179,24 +138,6 @@ class Loeserpaar:
                  r"\frac{@eps_oben + @eps_unten}{2}",
                  {"eps_oben": oben, "eps_unten": unten},
                  titel="Grösste Dehnung auf halber Höhe")
-
-    def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte,
-                             ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
-        """Der reine Betonquerschnitt des Moduls ueber dem Moment -- ein Rechteck b·h."""
-        bezug = w.wert("I_c", "I_c", Groesse.aus_si(self.I_c, MIO_MM4), stellen=1)
-        p.formel(bezug, r"\frac{@b \cdot \left(@h\right)^{3}}{12}",
-                 {"b": ein("b"), "h": h},
-                 titel="Reiner Betonquerschnitt: Flächenmoment",
-                 name="Flächenträgheitsmoment eines Rechtecks")
-        return bezug
-
-    def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte,
-                           ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
-        """Der reine Betonquerschnitt des Moduls ueber der Normalkraft -- ein Rechteck b·h."""
-        bezug = w.flaeche("A_c", "A_c", self.A_c)
-        p.formel(bezug, r"@b \cdot @h", {"b": ein("b"), "h": h},
-                 titel="Reiner Betonquerschnitt: Fläche", name="Fläche eines Rechtecks")
-        return bezug
 
 
 def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
@@ -217,11 +158,14 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         return None
     lagen = stahllagen(posten, wahl, wert)
     beton = querschnitt.beton
+    # Die Zugfestigkeit unter ihrer eigenen ID, wie beim gezeichneten
+    # Querschnitt: die Herleitung des Risses liest sie vom Beton der Ecke.
+    f_ctm_id = beton.id_von("f_ctm")
     ids = {
         "h": querschnitt.id_von("h"), "b": querschnitt.id_breite(richtung),
         "E_cm": beton.id_von("E_cm"), "f_c": beton.id_von(wahl.satz(beton).beton),
         "eps_c1d": beton.id_von("eps_c1d"), "eps_c2d": beton.id_von("eps_c2d"),
-        "f_ctm": beton.id_von("f_ctm"),
+        f_ctm_id: f_ctm_id,
     }
     h, b = wert(ids["h"]), wert(ids["b"])
     w = Betonkennwerte(f_c=wert(ids["f_c"]), E_c=wert(ids["E_cm"]),
@@ -234,11 +178,9 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
     ungerissen = gesetze(wahl, w, ungerissen=True).loeser(
         h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN)
-    f_ctm = wert(ids["f_ctm"])
-    k_t_zug = beiwert_dicke(rissaktive_dicke(h=h, zug=True))
+    brutto = bruttoquerschnitt_rechteck(h=h, b=b, stoff=beton, f_ctm=wert(f_ctm_id))
     return Loeserpaar(
         gerissen=gerissen, ungerissen=ungerissen, h=h, b=b,
-        M_Riss=rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm).M_Riss,
-        k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
+        brutto=brutto, riss=rissmoment(brutto, *Loeserpaar.seite.moment),
         staehle=tuple(staehle(posten)),
         wahl=wahl, ids=ids, E_cm=w.E_c)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 65d6919f0813
+erzeugt: 158861c14bae
 art: modul
 tags: [modul]
 ---
@@ -29,22 +29,22 @@ nennt die Raender bei z = 0 und z = h, wie die Analyse sie nennt
 links heisst die Randdehnung bei z = 0 «rechts», nicht «oben».
 
 `paar` ist das Loeserpaar einer Platte oder eines gezeichneten
-Querschnitts. Was nur die Art des Bauteils weiss -- die Tiefe, der Riss,
-die Dehnung am Ende, der reine Betonquerschnitt --, schreibt es selbst
-(`tiefe`, `herleitung_riss`, `herleitung_dehnung_am_ende`,
-`herleitung_traegheit` und `herleitung_flaeche`); der Rest ist
-derselbe Text.
+Querschnitts. Den Riss und den reinen Betonquerschnitt schreiben beide
+gleich ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]); was nur
+die Art des Bauteils weiss -- die Tiefe und die Dehnung am Ende --,
+schreibt es selbst (`tiefe`, `herleitung_dehnung_am_ende`). Der Rest
+ist derselbe Text.
 
 ### _herleitung_modul
 
 ```python
-def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, paar: Paar, ein: Callable[[str], 'Wert'], h: 'Wert') -> None
+def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, paar: Paar, A: 'Wert', I: 'Wert') -> None
 ```
 
 Der aequivalente Modul: der reine Betonquerschnitt, die Formel und der
 Modul an den Ecken der Linie -- jede Zeile mit Kraft und Verformung, also
-von Hand nachzurechnen. Den reinen Betonquerschnitt schreibt das Paar
-hin, wie die Art des Bauteils ihn kennt.
+von Hand nachzurechnen. Der reine Betonquerschnitt ist der
+Bruttoquerschnitt des Risses, mit seinem `A` und `I`.
 
 
 ## Konstanten

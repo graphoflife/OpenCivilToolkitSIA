@@ -41,20 +41,10 @@ Tragsicherheit dauerte sie dreimal so lang -- fuer ein M_Rd, das sich um
 zwei Zehntelpromille aendert.
 
 DER RISS:
-Am ungerissenen Bruttoquerschnitt, ohne Stahl, wie beim sproeden Versagen
-(:mod:`opencivil.nachweis.rissgroessen`)::
-
-    M_Riss(N) = (f_ct,eff - N/A) · W        W zur Ecke, die unter reiner Biegung zuerst reisst
-    N_Riss(M) = (f_ct,eff,t - σ_M) · A      σ_M aus M, an der Ecke, die zuerst reisst
-
-Unter reiner Biegung mit dem Deviationsmoment ``I_yz``, «einachsig» mit
-``W = I/v``. ``f_ct,eff`` mit ``k_t`` fuer ein Drittel der Tiefe, unter Zug
-fuer die rissaktive Dicke ``min(h; b)`` -- die Regeln der Platte,
-uebertragen; der Beton der Ecke gibt ``f_ctm``. Nach Vorgabe: SIA 262:2025
-laesst den Querschnitt reissen, wenn der Beton ``f_ctm`` oder eine Fraktile
-erreicht, ohne ``k_t`` (4.2.1.14), und rechnet ihn ungerissen mit dem Stahl
-(4.1.4.1.4) -- Entscheid des Benutzers offen (``notizbuch/Notizen/TODO.md``).
-Bei der Platte ist ``W/A = h/6`` -- dieselbe Formel.
+Am ungerissenen Bruttoquerschnitt, ohne Stahl, wie bei der Platte -- eine
+Rechnung fuer beide (:class:`~opencivil.spannungsanalyse.riss.Bruttoriss`).
+``A`` und ``I`` kommen aus der Analyse; unter Zug reisst die kleinere
+Abmessung ``min(h; b)``, die Regel der Platte, uebertragen.
 
 DER AEQUIVALENTE MODUL:
 Bezogen auf den Bruttoquerschnitt: ``I`` um die Achse der Biegung bzw.
@@ -75,7 +65,6 @@ import math
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
-from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import Illinois, Suche
 from opencivil.material.basis import Baustoff
@@ -84,10 +73,7 @@ from opencivil.nachweis.querschnittsloeser import (
     Faserloeser, Stahllage, probenschranken,
 )
 from opencivil.nachweis.rissgroessen import (
-    MOMENTENTEILER, Bruttoquerschnitt, Rissmoment, Rissnormalkraft, beiwert_dicke,
-    bruttoquerschnitt, protokoll_ecke, protokoll_spannung_ungerissen,
-    protokoll_widerstandsmoment, protokoll_zugfestigkeit, rissaktive_dicke, rissmoment,
-    rissnormalkraft,
+    Bruttoquerschnitt, Rissmoment, bruttoquerschnitt, rissaktive_dicke, rissmoment,
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.bewehrungselemente import Bewehrungselement
@@ -97,8 +83,9 @@ from opencivil.querschnitt.interaktion import Querschnitt
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.linie import (
-    SUCHE_DER_ANALYSEN, Dehnungsebene, FesteNulllinie, Grenzzustand, Linie, Zustaende,
+    SUCHE_DER_ANALYSEN, Dehnungsebene, FesteNulllinie, Grenzzustand, Zustaende,
 )
+from opencivil.spannungsanalyse.riss import Bruttoriss
 
 if TYPE_CHECKING:
     from opencivil.core.wert import Wert
@@ -372,12 +359,12 @@ def _massstab(ebene: Dehnungsebene) -> float:
 
 
 @dataclass(frozen=True)
-class Schnittpaar:
+class Schnittpaar(Bruttoriss):
     """
     Die beiden Loeser eines gezeichneten Querschnitts in einer Zugrichtung --
     gerissen und ungerissen, wie das :class:`~opencivil.spannungsanalyse.Loeserpaar`
     der Platte --, dazu beide Zustaende in jeder anderen Richtung, fuer die
-    kippende Nulllinie. Dazu der Riss am Bruttoquerschnitt und was die
+    kippende Nulllinie. Dazu der Bruttoquerschnitt fuer den Riss und was die
     Herleitung braucht.
     """
 
@@ -395,25 +382,19 @@ class Schnittpaar:
     A: float
     """Flaeche des Bruttoquerschnitts, m²."""
 
-    I: float
-    """Traegheitsmoment um die Achse der Biegung, m⁴."""
-
     brutto: Bruttoquerschnitt
     riss: Rissmoment
     """Das Rissmoment unter reiner Biegung, ohne Normalkraft -- und die Ecke, die zuerst reisst."""
-
-    k_t_zug: float
-    """
-    Fuer die Rissnormalkraft: ``k_t`` fuer die rissaktive Dicke unter Zug,
-    die kleinere Abmessung ``min(h; b)`` (Benutzer, 2026-10-17). Bis dahin die
-    ganze Tiefe in Zugrichtung, auch wo der Querschnitt quer dazu schmaler ist.
-    """
 
     breite: float
     """Die Ausdehnung des Betons quer zur Zugrichtung, m."""
 
     t_zug: float
-    """Die rissaktive Dicke unter Zug, ``min(h; b)``, m."""
+    """
+    Die rissaktive Dicke unter Zug, m: die kleinere Abmessung ``min(h; b)``
+    (Benutzer, 2026-10-17). Bis dahin die ganze Tiefe in Zugrichtung, auch wo
+    der Querschnitt quer dazu schmaler ist.
+    """
 
     E_cm: float
     """Der Modul des Betons der Ecke, die zuerst reisst -- Massstab des aequivalenten Moduls."""
@@ -426,10 +407,9 @@ class Schnittpaar:
     ihrer eigenen ID, denn welche Ecke unter Zug zuerst reisst, haengt am Moment.
     """
 
-    @property
-    def einachsig(self) -> bool:
-        """Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt zu kippen -- wie die Analyse."""
-        return self.brutto.biegung.einachsig
+    ZUR_ANDEREN_ACHSE = ("Das Moment um die andere Achse, das ein unsymmetrischer "
+                         "Querschnitt dabei weckt, zählt nicht. ")
+    DICKE_UNTER_ZUG = "die kleinere Abmessung des Betons"
 
     def ebenen(self) -> Zustaende:
         """Die Ebenen beider Zustaende: kippend, «einachsig» mit fester Nulllinie."""
@@ -437,45 +417,6 @@ class Schnittpaar:
             return Zustaende(FesteNulllinie(self.gerissen), FesteNulllinie(self.ungerissen))
         gerissen, ungerissen = (KippendeNulllinie(z, self.seite) for z in self.zerlegungen)
         return Zustaende(gerissen, ungerissen)
-
-    @property
-    def W(self) -> float:
-        """Das Widerstandsmoment zur Ecke, die unter reiner Biegung zuerst reisst, m³."""
-        return self.riss.W
-
-    @property
-    def M_Riss(self) -> float:
-        """Das Rissmoment ohne Normalkraft."""
-        return self.riss.M_Riss
-
-    def rissmoment_bei(self, N: float) -> float:
-        """``M_Riss(N) = (f_ct,eff - N/A)·W`` -- Druck hebt es, Zug senkt es."""
-        return self.M_Riss - N * self.W / self.A
-
-    def rissnormalkraft(self, M: float) -> Rissnormalkraft:
-        """Die Rissnormalkraft beim Moment ``M`` -- an der Ecke, die zuerst reisst."""
-        M_y, M_z = self.seite.moment
-        return rissnormalkraft(self.brutto, M * M_y, M * M_z,
-                               k_t=self.k_t_zug, A=self.A)
-
-    def rissnormalkraft_bei(self, M: float) -> float:
-        """``N_Riss(M) = (f_ct,eff,t - σ_M)·A`` -- ein Moment senkt sie, gleich in welche Richtung."""
-        return self.rissnormalkraft(M).N_Riss
-
-    @property
-    def I_c(self) -> float:
-        """
-        Der reine Betonquerschnitt fuer den aequivalenten Modul: ``I`` -- kippt
-        die Nulllinie, ``I - I_yz²/I_quer``, siehe Dateikopf.
-        """
-        if self.einachsig:
-            return self.I
-        b = self.brutto
-        return self.I - b.I_yz ** 2 / (b.I_z if self.seite.um_y else b.I_y)
-
-    @property
-    def A_c(self) -> float:
-        return self.A
 
     # -- Was die Herleitung nur vom gezeichneten Querschnitt weiss -----------
 
@@ -486,88 +427,21 @@ class Schnittpaar:
         """Die Ausdehnung des Betons in Zugrichtung -- aus der Zeichnung, kein Wert des Rechenwerks."""
         return w.laenge("h", "h", self.gerissen.h, "Ausdehnung des Betons in Zugrichtung")
 
-    def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: Linie,
-                        ein: Callable[[str], "Wert"], h: "Wert") -> None:
-        """Der Riss am Bruttoquerschnitt: Widerstandsmoment, Zugfestigkeit, Risskraft."""
-        A, I = ein("A"), ein("I")
-        if self.einachsig:
-            oben, unten = self.seite.raender
-            v = w.laenge("v_z", "v_z", self.gerissen.unten,
-                          "Abstand des gezogenen Rands vom Schwerpunkt")
-            p.erklaerung(
-                f"Die Nulllinie bleibt parallel zur Achse der Biegung: gezogen wird der "
-                f"Rand {unten}, gedrückt der Rand {oben}. Das Moment um die andere Achse, "
-                f"das ein unsymmetrischer Querschnitt dabei weckt, zählt nicht. Am "
-                f"Bruttoquerschnitt reisst der gezogene Rand, wenn N/A + M/W = f_ct,eff; "
-                f"W gehört zu diesem Rand, v_z ist sein Abstand vom Schwerpunkt.")
-            W = w.wert("W", "W", Groesse.aus_si(self.W, MIO_MM3), stellen=2)
-            p.formel(W, r"\frac{@I}{@v}", {"I": I, "v": v},
-                     titel="Widerstandsmoment zum gezogenen Rand")
-        else:
-            p.erklaerung(
-                "Unter reiner Biegung kippt die Nulllinie, bis kein Moment um die andere "
-                "Achse bleibt. Am ungerissenen Bruttoquerschnitt hängt die Spannung dann "
-                "auch vom Deviationsmoment I_yz ab, und es reisst die Ecke zuerst, die ihre "
-                "Zugfestigkeit zuerst erreicht – bei einem unsymmetrischen Querschnitt eine "
-                "Ecke, nicht der ganze Rand.")
-            protokoll_spannung_ungerissen(p, self.brutto.biegung)
-        if linie.art.ueber_moment:
-            ecke = self.riss.ecke
-            if not self.einachsig:
-                protokoll_ecke(p, ecke)
-                W = protokoll_widerstandsmoment(p, w, self.brutto, ecke, self.W,
-                                                *self.seite.moment)
-            f_ct_eff = protokoll_zugfestigkeit(
-                p, w, k_t=self.riss.k_t, f_ct_eff=self.riss.f_ct_eff, h=h,
-                f_ctm=ein(ecke.stoff.id_von("f_ctm")), teiler=MOMENTENTEILER,
-                titel="Beiwert für die Tiefe in Biegerichtung")
-            p.formel(w.moment("M_Riss_N", "M_{Riss}(N)", linie.riss),
-                     r"\left(@f - \frac{@N}{@A}\right) \cdot @W",
-                     {"f": f_ct_eff, "N": w.kraft("N", "N", linie.fest), "A": A, "W": W},
-                     titel="Rissmoment bei der Normalkraft")
-            return
-        p.erklaerung(
-            "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug gilt "
-            "k_t für die rissaktive Dicke t, die kleinere Abmessung des Betons – "
-            "nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen "
-            "Rand: dann gilt dessen Abstand.")
+    def herleitung_bruttoquerschnitt(self, p: Protokoll, w: Zwischenwerte,
+                                     ein: Callable[[str], "Wert"],
+                                     h: "Wert") -> Tuple["Wert", "Wert"]:
+        """``A`` und ``I`` sind Ergebnisse der Analyse -- dort hergeleitet."""
+        return ein("A"), ein("I")
+
+    def herleitung_dicke_unter_zug(self, p: Protokoll, w: Zwischenwerte, h: "Wert") -> "Wert":
+        """Die kleinere Abmessung des Betons, ``min(h; b)``."""
         t = w.laenge("t", "t", self.t_zug)
         p.formel(t, r"\min\left[@h;\ @b\right]",
                  {"h": h, "b": w.laenge("b", "b", self.breite,
                                          "Ausdehnung des Betons quer zur Zugrichtung")},
                  titel="Rissaktive Dicke unter Zug: die kleinere Abmessung",
                  name="Rissaktive Dicke des gezeichneten Querschnitts")
-        M = linie.fest
-        zug = self.rissnormalkraft(M)
-        f_ct_eff = protokoll_zugfestigkeit(
-            p, w, k_t=self.k_t_zug, f_ct_eff=zug.f_ct_eff, h=t,
-            f_ctm=ein(zug.ecke.stoff.id_von("f_ctm")), teiler=1,
-            titel="Beiwert für die rissaktive Dicke")
-        N_Riss = w.kraft("N_Riss_M", "N_{Riss}(M)", linie.riss)
-        M_wert = w.moment("M", "M", M)
-        if self.einachsig:
-            rand = v if M >= 0.0 else w.laenge(
-                "v_d", "v_d", self.gerissen.oben,
-                "Abstand des gedrückten Rands vom Schwerpunkt, negativ")
-            p.formel(N_Riss, r"\left(@f - \frac{@M \cdot @v}{@I}\right) \cdot @A",
-                     {"f": f_ct_eff, "M": M_wert, "v": rand, "I": I, "A": A},
-                     titel="Rissnormalkraft beim Moment")
-            return
-        sigma = w.spannung("sigma_M", r"\sigma_M", zug.sigma_M, "aus dem Moment allein", stellen=2)
-        if M != 0.0 and zug.sigma_M > 0.0:
-            # Das Moment zieht die Ecke: σ_M = |M|/W, mit W in der Richtung,
-            # in die es zieht.
-            M_y, M_z = self.seite.moment
-            protokoll_ecke(p, zug.ecke)
-            W = protokoll_widerstandsmoment(
-                p, w, self.brutto, zug.ecke, abs(M) / zug.sigma_M,
-                *((M_y, M_z) if M > 0.0 else (-M_y, -M_z)))
-            p.formel(sigma, r"\frac{\left|@M\right|}{@W}", {"M": M_wert, "W": W},
-                     titel="Spannung aus dem Moment an der Ecke, die zuerst reisst")
-        else:
-            p.wert(sigma, titel="Spannung aus dem Moment an der Ecke, die zuerst reisst")
-        p.formel(N_Riss, r"\left(@f - @sigma\right) \cdot @A",
-                 {"f": f_ct_eff, "sigma": sigma, "A": A}, titel="Rissnormalkraft beim Moment")
+        return t
 
     def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: Grenzzustand,
                                    oben: "Wert", unten: "Wert", h: "Wert") -> None:
@@ -579,38 +453,6 @@ class Schnittpaar:
                                 "Abstand des oberen Rands vom Schwerpunkt"),
                   "h": h},
                  titel="Grösste Dehnung im Schwerpunkt")
-
-    def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte,
-                           ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
-        """Der reine Betonquerschnitt des Moduls ueber der Normalkraft: der Bruttoquerschnitt."""
-        bezug = w.flaeche("A_c", "A_c", self.A)
-        p.erklaerung("Der reine Betonquerschnitt ist der Bruttoquerschnitt: A_c = A.")
-        p.wert(bezug, titel="Reiner Betonquerschnitt")
-        return bezug
-
-    def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte,
-                             ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
-        """Der reine Betonquerschnitt des Moduls ueber dem Moment: der Bruttoquerschnitt."""
-        bezug = w.wert("I_c", "I_c", Groesse.aus_si(self.I_c, MIO_MM4), stellen=1)
-        if self.einachsig:
-            p.erklaerung(f"Der reine Betonquerschnitt ist der Bruttoquerschnitt, um die "
-                         f"Achse der Biegung: I_c = {ein('I').symbol.replace('_', '')}.")
-            p.wert(bezug, titel="Reiner Betonquerschnitt")
-            return bezug
-        b = self.brutto
-        quer = w.wert("I_quer", "I_z" if self.seite.um_y else "I_y",
-                      Groesse.aus_si(b.I_z if self.seite.um_y else b.I_y, MIO_MM4), stellen=1)
-        p.erklaerung(
-            "Der reine Betonquerschnitt ist der Bruttoquerschnitt. Unter reiner Biegung "
-            "kippt auch seine Nulllinie, und senkrecht zur Achse der Biegung krümmt er "
-            "sich darum stärker, als I allein sagt: wie ein Querschnitt mit I_c. Sonst "
-            "zeigte ein ungerissener unsymmetrischer Querschnitt schon seiner Form wegen "
-            "einen kleineren Modul.")
-        p.formel(bezug, r"@I - \frac{@Iyz^{2}}{@quer}",
-                 {"I": ein("I"), "Iyz": w.wert("Iyz", "I_{yz}", Groesse.aus_si(b.I_yz, MIO_MM4), 1),
-                  "quer": quer},
-                 titel="Reiner Betonquerschnitt, Nulllinie gekippt")
-        return bezug
 
 
 def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[str], float],
@@ -635,10 +477,9 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     brutto = bruttoquerschnitt(analyse, wert)
     riss = rissmoment(brutto, *seite.moment)
     stoff = riss.ecke.stoff
-    I_id = analyse.id_von("I_y" if seite.um_y else "I_z")
     ids = {"E_cm": stoff.id_von("E_cm"), "f_c": stoff.id_von(wahl.satz(stoff).beton),
            "eps_c1d": stoff.id_von("eps_c1d"), "eps_c2d": stoff.id_von("eps_c2d"),
-           "f_ctm": stoff.id_von("f_ctm"), "A": analyse.id_von("A"), "I": I_id,
+           "A": analyse.id_von("A"), "I": analyse.id_von("I_y" if seite.um_y else "I_z"),
            **{s.id_von("f_ctm"): s.id_von("f_ctm") for _, s in analyse.beton_ecken}}
     quer = [p[0 if seite.um_y else 1] for p, _ in analyse.beton_ecken]
     breite = (max(quer) - min(quer)) * 1e-3
@@ -647,6 +488,5 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     return Schnittpaar(
         gerissen=gerissen.loeser, ungerissen=ungerissen.loeser, seite=seite, wahl=wahl,
         querschnitt=q, zerlegungen=tuple(zerlegungen),
-        A=wert(ids["A"]), I=wert(I_id), brutto=brutto, riss=riss,
-        k_t_zug=beiwert_dicke(t_zug), breite=breite, t_zug=t_zug,
+        A=wert(ids["A"]), brutto=brutto, riss=riss, breite=breite, t_zug=t_zug,
         E_cm=abs(wert(ids["E_cm"])), staehle=stahlstoffe, ids=ids)

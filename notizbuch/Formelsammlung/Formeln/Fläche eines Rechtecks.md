@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c310289fae5
+erzeugt: a0d76643eb4b
 art: formel
 tags: [formel]
 ---
@@ -31,10 +31,12 @@ $$
 
 - [[Dehnsteifigkeit]]
 - [[Eigengewicht eines Stabs]]
+- [[Rissmoment bei der Normalkraft]]
+- [[Rissnormalkraft beim Moment]]
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_flaeche|Loeserpaar.herleitung_flaeche]]
+- [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bruttoquerschnitt|Loeserpaar.herleitung_bruttoquerschnitt]]
 - [[opencivil.stabwerk.querschnitte]]
 
 ## Themen

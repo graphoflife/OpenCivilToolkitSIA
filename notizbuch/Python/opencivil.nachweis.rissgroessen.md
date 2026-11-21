@@ -1,5 +1,5 @@
 ---
-erzeugt: c59f888975b0
+erzeugt: 25bb34a4a35d
 art: modul
 tags: [modul]
 ---
@@ -22,10 +22,11 @@ gezeichneten Querschnitts wie fuer ihre Spannung-Dehnung-Analysen:
   ([[opencivil.nachweis.rissgroessen#rissmoment|rissmoment]]). Mit dem Deviationsmoment `I_yz` kippt die
   Nulllinie; «einachsig» bleibt sie parallel zur Achse der Biegung, und es
   gilt `W = I/v`. Bei der Platte, einem Rechteck, ist es beide Male
-  `b·h²/6` ([[opencivil.nachweis.rissgroessen#rissmoment_rechteck|rissmoment_rechteck]]);
+  `b·h²/6` ([[opencivil.nachweis.rissgroessen#rissmoment_rechteck|rissmoment_rechteck]], [[opencivil.nachweis.rissgroessen#bruttoquerschnitt_rechteck|bruttoquerschnitt_rechteck]]);
 * **die Rissnormalkraft bei einem Moment**: die Zugkraft, bei der
   `f_ct,eff` zum ersten Mal irgendwo erreicht wird ([[opencivil.nachweis.rissgroessen#rissnormalkraft|rissnormalkraft]])
-  -- fuer die Analyse des gezeichneten Querschnitts.
+  -- fuer die Spannung-Dehnung-Analysen, der Platte wie des gezeichneten
+  Querschnitts ([[opencivil.spannungsanalyse.riss]]).
 
 So hat es der Benutzer am 2026-10-17 entschieden. Bis dahin standen die
 Rissgroessen viermal da -- im sproeden Versagen, in den Richtungsnachweisen
@@ -194,6 +195,16 @@ zu einer Wert-ID die Zahl in SI -- aus den Eingaben eines Nachweises mit
 [[opencivil.nachweis.rissgroessen#rissbezuege|rissbezuege]] ([[opencivil.core.berechnung#Eingaben.si_nach_id|si_nach_id]])
 oder aus einer Loesung.
 
+### bruttoquerschnitt_rechteck
+
+```python
+def bruttoquerschnitt_rechteck(*, h: float, b: float, stoff: Any, f_ctm: float) -> Bruttoquerschnitt
+```
+
+Der Bruttoquerschnitt der Platte: das Rechteck `b × h` aus ihrem Beton,
+um seinen Schwerpunkt, einachsig -- fuer ihre Spannung-Dehnung-Analyse.
+Alles in SI.
+
 ### Rissmoment
 
 ```python
@@ -313,6 +324,7 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.riss]]
 - [[opencivil.spannungsanalyse.schnitt]]
 
 ## Formeln aus diesem Modul

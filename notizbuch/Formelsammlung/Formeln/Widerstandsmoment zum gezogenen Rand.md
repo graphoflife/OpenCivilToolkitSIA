@@ -1,5 +1,5 @@
 ---
-erzeugt: cf2e336d4150
+erzeugt: 24435bb46399
 art: formel
 tags: [formel]
 ---
@@ -7,14 +7,14 @@ tags: [formel]
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
 $$
-W = \frac{I_y}{v_z}
+W = \frac{I}{v_z}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $I_y$ | Trägheitsmoment um y | ·10⁶ mm⁴ | Zwischenwert |
+| $I$ | – | ·10⁶ mm⁴ | [[Flächenträgheitsmoment eines Rechtecks]] |
 | $v_z$ | Abstand des gezogenen Rands vom Schwerpunkt | mm | Zwischenwert |
 
 ## Beispiel
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-W = \frac{I_y}{v_z} = \frac{2133.3\,\cdot 10^{6}\,\mathrm{mm}^{4}}{200\,\mathrm{mm}} = 10.67\,\cdot 10^{6}\,\mathrm{mm}^{3}
+W = \frac{I}{v_z} = \frac{2250\,\cdot 10^{6}\,\mathrm{mm}^{4}}{150\,\mathrm{mm}} = 15\,\cdot 10^{6}\,\mathrm{mm}^{3}
 $$
 
 ## Gebraucht von
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_riss|Bruttoriss.herleitung_riss]]
 
 ## Themen
 

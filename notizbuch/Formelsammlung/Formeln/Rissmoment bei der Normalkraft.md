@@ -1,18 +1,10 @@
 ---
-erzeugt: e88924496f81
+erzeugt: 5556c39c7c69
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
-
-*In der Herleitung: «Rissmoment bei der Normalkraft»*
-
-$$
-M_{Riss}(N) = M_{Riss} - N \cdot \frac{h}{6}
-$$
-
-*In der Herleitung: «Rissmoment bei der Normalkraft»*
 
 $$
 M_{Riss}(N) = \left(f_{ct,eff} - \frac{N}{A}\right) \cdot W
@@ -22,35 +14,26 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $M_{Riss}$ | – | kNm | Zwischenwert |
-| $N$ | – | kN | Zwischenwert |
-| $h$ | Plattendicke | mm | Vorgabe |
 | $f_{ct,eff}$ | – | N/mm² | [[Wirksame Zugfestigkeit]] |
-| $A$ | Fläche des Bruttoquerschnitts | mm² | Zwischenwert |
-| $W$ | – | ·10⁶ mm³ | [[Widerstandsmoment zum gezogensten Betonpunkt]], [[Widerstandsmoment zum gezogenen Rand]] |
+| $N$ | – | kN | Zwischenwert |
+| $A$ | Fläche des Bruttoquerschnitts | mm² | [[Fläche eines Rechtecks]], Zwischenwert |
+| $W$ | – | ·10⁶ mm³ | [[Widerstandsmoment zum gezogenen Rand]], [[Widerstandsmoment zum gezogensten Betonpunkt]] |
 
 ## Beispiel
 
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-M_{Riss}(N) = M_{Riss} - N \cdot \frac{h}{6} = 41.4\,\mathrm{kNm} - \left(-300\,\mathrm{kN}\right) \cdot \frac{300\,\mathrm{mm}}{6} = 56.4\,\mathrm{kNm}
-$$
-
-Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
-
-$$
 \begin{aligned}
   M_{Riss}(N) &= \left(f_{ct,eff} - \frac{N}{A}\right) \cdot W \\
-  &= \left(2.56\,\mathrm{N}/\mathrm{mm}^{2} - \frac{-500\,\mathrm{kN}}{330000\,\mathrm{mm}^{2}}\right) \cdot 56.19\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
-  &= 228.9\,\mathrm{kNm}
+  &= \left(2.76\,\mathrm{N}/\mathrm{mm}^{2} - \frac{-300\,\mathrm{kN}}{300000\,\mathrm{mm}^{2}}\right) \cdot 15\,\cdot 10^{6}\,\mathrm{mm}^{3} \\
+  &= 56.4\,\mathrm{kNm}
 \end{aligned}
 $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]]
-- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissmoment|Bruttoriss._herleitung_rissmoment]]
 
 ## Themen
 

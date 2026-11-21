@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c2a163bf284
+erzeugt: a5ceaa844134
 art: formel
 tags: [formel]
 ---
@@ -9,7 +9,7 @@ tags: [formel]
 *In der Herleitung: «Rissnormalkraft beim Moment»*
 
 $$
-N_{Riss}(M) = f_{ct,eff} \cdot b \cdot h - \frac{6 \cdot \left|M\right|}{h}
+N_{Riss}(M) = \left(f_{ct,eff} - \frac{M \cdot v_z}{I}\right) \cdot A
 $$
 
 *In der Herleitung: «Rissnormalkraft beim Moment»*
@@ -23,11 +23,11 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $f_{ct,eff}$ | – | N/mm² | [[Wirksame Zugfestigkeit]] |
-| $b$ | Betrachtete Breite (x) | mm | Vorgabe |
-| $h$ | Plattendicke | mm | Vorgabe |
 | $M$ | – | kNm | Zwischenwert |
+| $v_z$ | Abstand des gezogenen Rands vom Schwerpunkt | mm | Zwischenwert |
+| $I$ | – | ·10⁶ mm⁴ | [[Flächenträgheitsmoment eines Rechtecks]] |
+| $A$ | Fläche des Bruttoquerschnitts | mm² | [[Fläche eines Rechtecks]], Zwischenwert |
 | $\sigma_M$ | aus dem Moment allein | N/mm² | [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] |
-| $A$ | Fläche des Bruttoquerschnitts | mm² | Zwischenwert |
 
 ## Beispiel
 
@@ -35,8 +35,8 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
 \begin{aligned}
-  N_{Riss}(M) &= f_{ct,eff} \cdot b \cdot h - \frac{6 \cdot \left|M\right|}{h} \\
-  &= 2.52\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} - \frac{6 \cdot \left|30\,\mathrm{kNm}\right|}{300\,\mathrm{mm}} \\
+  N_{Riss}(M) &= \left(f_{ct,eff} - \frac{M \cdot v_z}{I}\right) \cdot A \\
+  &= \left(2.52\,\mathrm{N}/\mathrm{mm}^{2} - \frac{30\,\mathrm{kNm} \cdot 150\,\mathrm{mm}}{2250\,\cdot 10^{6}\,\mathrm{mm}^{4}}\right) \cdot 300000\,\mathrm{mm}^{2} \\
   &= 156.5\,\mathrm{kN}
 \end{aligned}
 $$
@@ -53,8 +53,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]]
-- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
+- [[opencivil.spannungsanalyse.riss#Bruttoriss._herleitung_rissnormalkraft|Bruttoriss._herleitung_rissnormalkraft]]
 
 ## Themen
 

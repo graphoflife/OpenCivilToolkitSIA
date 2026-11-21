@@ -1,5 +1,5 @@
 ---
-erzeugt: 48f3b05e8f7e
+erzeugt: 224e7d3ca769
 art: modul
 tags: [modul]
 ---
@@ -9,12 +9,13 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die beiden Loeser einer Tragrichtung, gerissen und ungerissen, dazu Riss,
-Bezugsflaeche des Moduls und was die Herleitung nur von der Platte weiss
-([[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]], ein [[opencivil.spannungsanalyse.linie#Paar|Paar]]).
-Die Loeser sind die jedes Querschnitts: die Platte als Rechteck mit Staeben
-([[opencivil.nachweis.rechenwahl#Gesetze.loeser|loeser]]). Eigen bleibt der
-Riss am Rechteck, in den Groessen der Platte, b und h.
+Die beiden Loeser einer Tragrichtung, gerissen und ungerissen, und was die
+Herleitung nur von der Platte weiss ([[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]], ein
+[[opencivil.spannungsanalyse.linie#Paar|Paar]]). Die Loeser sind die jedes
+Querschnitts: die Platte als Rechteck mit Staeben
+([[opencivil.nachweis.rechenwahl#Gesetze.loeser|loeser]]). Den Riss rechnet
+sie wie der gezeichnete Querschnitt, am Bruttoquerschnitt -- dem Rechteck
+`b × h` ([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]).
 
 ## Inhalt
 
@@ -22,7 +23,7 @@ Riss am Rechteck, in den Groessen der Platte, b und h.
 
 ```python
 @dataclass(frozen=True)
-class Loeserpaar
+class Loeserpaar(Bruttoriss)
 ```
 
 Die beiden Loeser einer Tragrichtung -- gerissen und nicht.
@@ -36,14 +37,15 @@ gerechnet wird.
 - `gerissen: Faserloeser`
 - `ungerissen: Faserloeser`
 - `h: float`
-- `b: float` – Hoehe und Breite des Streifens, m -- die Groessen, in denen der Riss am Rechteck steht.
-- `M_Riss: float` – Das Rissmoment ohne Normalkraft -- mit `k_t` fuer ein Drittel der Dicke.
-- `k_t_zug: float = 1.0`
-- `f_ct_eff_zug: float = 0.0` – Fuer die Rissnormalkraft: `k_t` fuer die ganze Dicke und `k_t·f_ctm`.
+- `b: float` – Hoehe und Breite des Streifens, m.
+- `brutto: Bruttoquerschnitt` – Das Rechteck `b × h` ohne Stahl -- an ihm reisst die Platte.
+- `riss: Rissmoment` – Das Rissmoment unter reiner Biegung, ohne Normalkraft.
 - `staehle: Tuple[Any, ...] = ()` – Die Staehle der Lagen, jeder einmal -- fuer die Fliessdehnung in der Herleitung. Fliessen beginnt, wo die erste Lage die Fliessdehnung ihres eigenen Stahls erreicht ([[opencivil.spannungsanalyse.platte#Loeserpaar|Stahlgesetz.eps_yd]] der Lage).
 - `wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
 - `E_cm: float = 0.0` – Der Modul des Betons -- daran misst sich der aequivalente Modul.
+- `seite = Zugseite.UNTEN` – Ein positives Moment zieht unten.
+- `DICKE_UNTER_ZUG = 'die Dicke der Platte'`
 - `bezugsort = 'auf halber Höhe'` – Wo die Mitteldehnung gilt -- dort greift N an.
 
 #### Loeserpaar.ebenen
@@ -54,68 +56,23 @@ def ebenen(self) -> Zustaende
 
 Die Ebenen der Platte: ein Rechteck, die Nulllinie bleibt parallel zur Achse.
 
-#### Loeserpaar.rissmoment_bei
-
-```python
-def rissmoment_bei(self, N: float) -> float
-```
-
-Das Rissmoment bei der Normalkraft `N` (Zug positiv), in Nm.
-
-Am Bruttoquerschnitt reisst der Rand, wenn `N/A + M/W = f_ct,eff`.
-Mit `A = b·h` und `W = b·h²/6` -- denselben Werten, mit denen
-[[opencivil.nachweis.rissgroessen#rissmoment_rechteck|rissmoment_rechteck]] das
-Rissmoment ohne Normalkraft rechnet -- ist das
-`M_Riss(N) = M_Riss(0) - N·h/6`. Druck hebt es, Zug senkt es.
-
-Nach Vorgabe: der Bruttoquerschnitt ohne Stahl, wie beim spröden
-Versagen. Der ungerissene Zustand daneben rechnet mit Stahl und
-Kriechzahl und ist darum steifer; beim Rissmoment steht sein Rand
-etwas unter `f_ct,eff`. SIA 262:2025 laesst den Querschnitt reissen,
-wenn der Beton `f_ctm` oder eine Fraktile erreicht, ohne `k_t`
-(4.2.1.14), und rechnet ihn ungerissen mit dem Stahl (4.1.4.1.4) --
-Entscheid des Benutzers offen (`notizbuch/Notizen/TODO.md`).
-
-`f_ct,eff` mit `k_t` fuer ein Drittel der Dicke, auch unter Zug:
-Biegung bleibt bei `h/3`, nach Vorgabe. Die Rissnormalkraft nimmt die
-ganze Dicke ([[opencivil.spannungsanalyse.platte#Loeserpaar.rissnormalkraft_bei|rissnormalkraft_bei]]); beim selben N und M reissen
-die beiden Linien darum nicht am selben Punkt.
-
-#### Loeserpaar.rissnormalkraft_bei
-
-```python
-def rissnormalkraft_bei(self, M: float) -> float
-```
-
-Die Zugkraft, bei der der Querschnitt mit dem Moment `M` reisst, in N.
-
-Am Bruttoquerschnitt reisst der Rand, wenn `N/A + |M|/W = f_ct,eff`,
-also `N_Riss(M) = f_ct,eff·b·h - 6·|M|/h`. Das Vorzeichen des
-Moments zaehlt nicht -- der Querschnitt ist oben wie unten derselbe.
-
-`f_ct,eff` mit `k_t = 1/(1 + 0.5·t)` fuer die ganze Dicke,
-`t = h`: unter Zug reisst der ganze Querschnitt, nicht ein Drittel
-wie unter Biegung. Nach Vorgabe, wie beim Rissmoment
-(`notizbuch/Notizen/TODO.md`). Bis 2026-10-09 galt das `f_ct,eff`
-des Rissmoments, mit `t = h/3` -- am Beispiel 829 statt 757 kN.
-
-#### Loeserpaar.I_c
+#### Loeserpaar.A
 
 ```python
 @property
-def I_c(self) -> float
+def A(self) -> float
 ```
 
-Der reine Betonquerschnitt fuer den aequivalenten Modul: `b·h³/12`.
+Die Flaeche des Rechtecks, `b·h`.
 
-#### Loeserpaar.A_c
+#### Loeserpaar.t_zug
 
 ```python
 @property
-def A_c(self) -> float
+def t_zug(self) -> float
 ```
 
-Dasselbe fuer die Normalkraft: `b·h`.
+Die rissaktive Dicke unter Zug: die ganze Dicke der Platte.
 
 #### Loeserpaar.tiefe
 
@@ -125,13 +82,23 @@ def tiefe(self, w: Zwischenwerte, ein: Callable[[str], 'Wert']) -> 'Wert'
 
 Die Dicke, ueber die die Linie laeuft -- ein Wert der Platte.
 
-#### Loeserpaar.herleitung_riss
+#### Loeserpaar.herleitung_bruttoquerschnitt
 
 ```python
-def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: Linie, ein: Callable[[str], 'Wert'], h: 'Wert') -> None
+def herleitung_bruttoquerschnitt(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> Tuple['Wert', 'Wert']
 ```
 
-Wo die Linie reisst: das Rissmoment bei N, oder die Rissnormalkraft bei M.
+Das Rechteck `b × h` des Streifens, ohne Stahl: `A` und `I` aus b und h.
+
+#### Loeserpaar.herleitung_dicke_unter_zug
+
+```python
+def herleitung_dicke_unter_zug(self, p: Protokoll, w: Zwischenwerte, h: 'Wert') -> 'Wert'
+```
+
+Unter Zug reisst die ganze Dicke, `t = h`: der Streifen `b` ist keine
+Abmessung der Platte ([[opencivil.nachweis.rissgroessen#rissaktive_dicke|rissaktive_dicke]]).
+Ein Satz statt einer Formel -- `t` steht fuer `h`, wie bisher.
 
 #### Loeserpaar.herleitung_dehnung_am_ende
 
@@ -140,22 +107,6 @@ def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: 'Gre
 ```
 
 Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe.
-
-#### Loeserpaar.herleitung_traegheit
-
-```python
-def herleitung_traegheit(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
-```
-
-Der reine Betonquerschnitt des Moduls ueber dem Moment -- ein Rechteck b·h.
-
-#### Loeserpaar.herleitung_flaeche
-
-```python
-def herleitung_flaeche(self, p: Protokoll, w: Zwischenwerte, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
-```
-
-Der reine Betonquerschnitt des Moduls ueber der Normalkraft -- ein Rechteck b·h.
 
 ### loeserpaar
 
@@ -184,7 +135,9 @@ nach -- er pruefte seine Kopie statt der echten.
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.riss]]
 
 ## Gebraucht von
 
@@ -194,8 +147,6 @@ nach -- er pruefte seine Kopie statt der echten.
 
 ## Formeln aus diesem Modul
 
-- [[Fläche eines Rechtecks]] · `Loeserpaar.herleitung_flaeche`
-- [[Flächenträgheitsmoment eines Rechtecks]] · `Loeserpaar.herleitung_traegheit`
+- [[Fläche eines Rechtecks]] · `Loeserpaar.herleitung_bruttoquerschnitt`
+- [[Flächenträgheitsmoment eines Rechtecks]] · `Loeserpaar.herleitung_bruttoquerschnitt`
 - [[Grösste Dehnung auf halber Höhe]] · `Loeserpaar.herleitung_dehnung_am_ende`
-- [[Rissmoment bei der Normalkraft]] · `Loeserpaar.herleitung_riss`
-- [[Rissnormalkraft beim Moment]] · `Loeserpaar.herleitung_riss`

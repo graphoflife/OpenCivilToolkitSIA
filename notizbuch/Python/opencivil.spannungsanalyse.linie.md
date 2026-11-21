@@ -1,5 +1,5 @@
 ---
-erzeugt: fc1396e906cf
+erzeugt: b4d8c5809ace
 art: modul
 tags: [modul]
 ---
@@ -210,9 +210,11 @@ class Paar(Protocol)
 ```
 
 Die beiden Loeser eines Querschnitts, gerissen und ungerissen, und was die
-Fragen und ihre Herleitung sonst von ihm wissen muessen. Was nur die Art
-des Bauteils weiss -- die Tiefe, den Riss, die Dehnung am Ende, den reinen
-Betonquerschnitt --, schreibt das Paar selbst in die Herleitung.
+Fragen und ihre Herleitung sonst von ihm wissen muessen. Den Riss und den
+reinen Betonquerschnitt rechnen und schreiben beide Paare gleich
+([[opencivil.spannungsanalyse.riss#Bruttoriss|Bruttoriss]]); was nur die Art
+des Bauteils weiss -- die Tiefe, die Dehnung am Ende --, schreibt das Paar
+selbst in die Herleitung.
 
 - `gerissen: Faserloeser`
 - `ungerissen: Faserloeser` – Die beiden Loeser in der Richtung des Paars -- fuer das Bild aus Randdehnungen.
@@ -267,7 +269,7 @@ def tiefe(self, w: 'Zwischenwerte', ein: Callable[[str], 'Wert']) -> 'Wert'
 #### Paar.herleitung_riss
 
 ```python
-def herleitung_riss(self, p: 'Protokoll', w: 'Zwischenwerte', linie: 'Linie', ein: Callable[[str], 'Wert'], h: 'Wert') -> None
+def herleitung_riss(self, p: 'Protokoll', w: 'Zwischenwerte', linie: 'Linie', ein: Callable[[str], 'Wert'], h: 'Wert') -> Tuple['Wert', 'Wert']
 ```
 
 #### Paar.herleitung_dehnung_am_ende
@@ -279,13 +281,13 @@ def herleitung_dehnung_am_ende(self, p: 'Protokoll', w: 'Zwischenwerte', bruch: 
 #### Paar.herleitung_traegheit
 
 ```python
-def herleitung_traegheit(self, p: 'Protokoll', w: 'Zwischenwerte', ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+def herleitung_traegheit(self, p: 'Protokoll', w: 'Zwischenwerte', I: 'Wert') -> 'Wert'
 ```
 
 #### Paar.herleitung_flaeche
 
 ```python
-def herleitung_flaeche(self, p: 'Protokoll', w: 'Zwischenwerte', ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+def herleitung_flaeche(self, p: 'Protokoll', w: 'Zwischenwerte', A: 'Wert') -> 'Wert'
 ```
 
 ### Linienpunkt
@@ -458,4 +460,5 @@ auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.riss]]
 - [[opencivil.spannungsanalyse.schnitt]]

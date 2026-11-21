@@ -14,7 +14,7 @@ import dataclasses
 import unittest
 
 from opencivil import spannungsanalyse as sa
-from opencivil.core.protokoll import GleichungBlock, Protokoll, TitelBlock
+from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock, TitelBlock
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.projekt import (
     Projekt, ProjektFehler, RechenwahlEintrag, SpannungsfallEintrag,
@@ -340,20 +340,25 @@ class TestMomentenKruemmung(unittest.TestCase):
         self.assertAlmostEqual(sa.moment_kruemmung(self.paar, N=-200e3).riss - self.paar.M_Riss,
                                200e3 * self.paar.gerissen.h / 6.0, places=6)
 
+    def mit_rissmoment(self, M_Riss):
+        """Dasselbe Paar mit einem anderen Rissmoment ohne Normalkraft."""
+        return dataclasses.replace(self.paar, riss=dataclasses.replace(self.paar.riss,
+                                                                       M_Riss=M_Riss))
+
     def test_reisst_schon_die_normalkraft_ist_alles_gerissen(self):
         """
         Am Beispiel erst ab gut 828 kN Zug, und schon ab rund 840 kN gibt es
         gar keine Gleichgewichtslage mehr -- zu eng für einen Test über N.
         Darum hier das Rissmoment direkt.
         """
-        kurve = sa.moment_kruemmung(dataclasses.replace(self.paar, M_Riss=-1e3), N=0.0)
+        kurve = sa.moment_kruemmung(self.mit_rissmoment(-1e3), N=0.0)
         self.assertTrue(kurve.punkte)
         self.assertTrue(all(p.gerissen for p in kurve.punkte))
         self.assertIsNone(kurve.sprung)
         self.assertIn("gerissen", kurve.hinweis)
 
     def test_liegt_das_rissmoment_ueber_m_rd_bleibt_alles_ungerissen(self):
-        zu_hoch = dataclasses.replace(self.paar, M_Riss=10 * self.kurve.bruch.kraft)
+        zu_hoch = self.mit_rissmoment(10 * self.kurve.bruch.kraft)
         kurve = sa.moment_kruemmung(zu_hoch, N=0.0)
         self.assertTrue(kurve.punkte)
         self.assertFalse(any(p.gerissen for p in kurve.punkte))
@@ -601,6 +606,18 @@ class TestNormalkraftDehnung(unittest.TestCase):
         self.assertAlmostEqual(self.sym.M_Riss, 2.9e6 / (1.0 + 0.5 * h / 3.0) * b * h * h / 6.0,
                                delta=1e-3)
 
+    def test_der_streifen_ist_keine_abmessung(self):
+        """
+        Unter Zug reisst die Platte über ihre Dicke, auch in einem Streifen,
+        der schmaler ist als sie dick: t = h = 300 mm, nicht min(h; b) = 200 mm
+        wie beim gezeichneten Querschnitt.
+        """
+        schmal = loeserpaar(platte("Schmal", b=200, x=[18, 18], y=[12, 12]))
+        self.assertAlmostEqual(schmal.b, 0.2, places=12)
+        self.assertEqual(schmal.t_zug, schmal.h)
+        self.assertAlmostEqual(schmal.rissnormalkraft_bei(0.0),
+                               2.9e6 / (1.0 + 0.5 * 0.3) * 0.2 * 0.3, delta=1e-3)
+
     def test_das_moment_senkt_die_rissnormalkraft(self):
         """Dieselbe Bedingung wie beim Rissmoment -- das Vorzeichen zählt nicht."""
         h = self.sym.h
@@ -765,7 +782,13 @@ class TestAequivalenterModul(unittest.TestCase):
         latex = " ".join(b.latex for b in p.bloecke if isinstance(b, GleichungBlock))
         self.assertIn(r"E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}", latex)
         self.assertIn(r"E_{eq} = \frac{N}{A_c", latex)
-        self.assertIn(r"I_c = \frac{b \cdot \left(h\right)^{3}}{12}", latex)
+        # Der reine Betonquerschnitt ist der Bruttoquerschnitt des Risses:
+        # dort stehen A und I, hier nur noch der Verweis (2026-11-21).
+        self.assertIn(r"I = \frac{b \cdot \left(h\right)^{3}}{12}", latex)
+        self.assertIn(r"A = b \cdot h", latex)
+        erklaerungen = [b.text for b in p.bloecke if isinstance(b, TextBlock)]
+        self.assertIn("Der reine Betonquerschnitt ist der Bruttoquerschnitt: A_c = A.",
+                      erklaerungen)
 
 
 class TestHerleitung(unittest.TestCase):
@@ -783,6 +806,13 @@ class TestHerleitung(unittest.TestCase):
         latex = " ".join(b.latex for b in p.bloecke if isinstance(b, GleichungBlock))
         self.assertIn(r"\chi_{u}", latex)
         self.assertIn(r"N_{Riss}(M)", latex)
+        # Den Riss schreibt die Platte wie der gezeichnete Querschnitt, am
+        # Rechteck b·h (2026-11-21); unter Zug reisst ihre ganze Dicke: k_t
+        # gilt für h, und ein Satz sagt warum.
+        self.assertIn(r"\left(f_{ct,eff} - \frac{N}{A}\right) \cdot W", latex)
+        self.assertIn(r"k_t = \frac{1}{1 + 0.5 \cdot h}", latex)
+        erklaerungen = " ".join(b.text for b in p.bloecke if isinstance(b, TextBlock))
+        self.assertIn("Darum ist t = h.", erklaerungen)
         self.assertTrue(all(b.thema == sa.THEMA for b in p.bloecke
                             if not isinstance(b, TitelBlock)))
 
