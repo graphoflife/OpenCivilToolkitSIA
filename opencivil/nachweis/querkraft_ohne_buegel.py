@@ -41,10 +41,10 @@ in Millimeter ein, ``f_ck`` in N/mm^2. ``k_g`` laeuft deshalb ueber
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Mapping, Optional, Tuple
+from typing import List, Mapping, Optional, Tuple
 
-from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
-from opencivil.core.nachweis import NachweisUrteil, Vergleich
+from opencivil.core.berechnung import Befundbezug, Eingabebezug, Eingaben
+from opencivil.core.nachweis import Vergleich
 from opencivil.core.einheiten import EINHEITSLOS, KNM, MM, N_PRO_MM2, Groesse, empirisch
 from opencivil.core.protokoll import Kurz, Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
@@ -455,16 +455,12 @@ class QuerkraftOhneBuegel(Querkraft):
         mn = e.befund("mn")
         befund = BefundOhneBuegel(beiwerte=beiwerte, mn=mn, index=self.mn.wahl.index)
 
-        ergebnis: Dict[str, Groesse] = {}
-        urteile: List[NachweisUrteil] = []
-
-        for fall in self.faelle:
+        def ein_teil(fall: Querkraftfall) -> ErgebnisOhneBuegel:
             erg = self._einen_fall(fall, beiwerte, m_rd[fall.name])
-            befund.ergebnisse.append(erg)
             self._protokoll_fall(p, e, erg, beiwert, mn)
-            self._eintragen(erg, ergebnis, urteile)
+            return erg
 
-        return Ausfuehrung(ergebnis, urteile, befund)
+        return self.je_teil(p, self.faelle, ein_teil, befund=befund)
 
     def _einen_fall(self, fall: Querkraftfall, w: Kurvenbeiwerte,
                     m_Rd: float) -> ErgebnisOhneBuegel:

@@ -105,7 +105,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
-    UNBESCHRAENKT, Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
+    UNBESCHRAENKT, Fallausgang, NachweisUrteil, Teilnachweis, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung
@@ -320,7 +320,7 @@ class Knickstab:
     """Die statische Hoehe in m, fuer die Mindestausmitte."""
 
 
-class Knickverfahren(Nachweis):
+class Knickverfahren(Teilnachweis):
     """
     Nachweis am verformten System, je Knickfall -- das Verfahren, ohne zu
     sagen, woher der Stab kommt (:class:`Knickstab`).
@@ -521,9 +521,19 @@ class Knickverfahren(Nachweis):
                 oben = mitte
         return unten
 
-    def _urteil(self, erg: Knickergebnis) -> NachweisUrteil:
-        return self.urteil(self.d_ausnutzung[erg.fall.name], erg.fall.name, erg.ausgang,
-                           erg.begruendung, hinweis=erg.hinweis)
+    def _faelle(self, p: Protokoll, stab: Callable[[Knickfall], Knickstab], *,
+                befund: Optional[Knickbefund] = None) -> Ausfuehrung:
+        """Je Fall der Nachweis am Stab, den ``stab`` fuer ihn gibt -- samt Herleitung."""
+        def ein_teil(fall: Knickfall) -> Knickergebnis:
+            erg = self._einen_fall(stab(fall), fall)
+            self._protokoll_fall(p, erg)
+            return erg
+
+        return self.je_teil(p, self.faelle, ein_teil, befund=befund)
+
+    def urteil_des_teils(self, fall: Knickfall, erg: Knickergebnis) -> NachweisUrteil:
+        return self.urteil(self.grad_des_teils(fall), fall.name, erg.ausgang, erg.begruendung,
+                           hinweis=erg.hinweis)
 
     def _n_ed(self, erg: Knickergebnis) -> Wert:
         """
@@ -782,18 +792,8 @@ class Knicken(Knickverfahren):
             e, p, basis=f"{self.id}.widerstand", vorsatz="Widerstand: ",
             wahltitel="Rechenwahl – Widerstand (N_Rd)", wenn_geteilt=self._protokoll_geteilt,
             schritte=SCHRITTE_SUCHE if self.schnell else SCHRITTE)
-        befund = Knickbefund(linie=linie, loeser=loeser)
-
-        urteile: List[NachweisUrteil] = []
-
         stab = self.stab(loeser, linie)
-        for fall in self.faelle:
-            erg = self._einen_fall(stab, fall)
-            befund.ergebnisse.append(erg)
-            self._protokoll_fall(p, erg)
-            urteile.append(self._urteil(erg))
-
-        return Ausfuehrung({}, urteile, befund)
+        return self._faelle(p, lambda _: stab, befund=Knickbefund(linie=linie, loeser=loeser))
 
     # -- Mitschrift ---------------------------------------------------------
 

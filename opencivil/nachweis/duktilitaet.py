@@ -275,7 +275,7 @@ class Duktilitaet(Lagennachweis):
             f"{erg.verhaeltnis:.3f} {'≤' if v.erfuellt else '>'} {erg.grenze:.3f}.")
         return erg
 
-    def ausgaben_der_lage(self, erg: Lagenergebnis) -> Dict[str, Groesse]:
+    def ausgaben_des_teils(self, erg: Lagenergebnis) -> Dict[str, Groesse]:
         return {self.d_verhaeltnis[erg.lage.nummer].id: Groesse(erg.verhaeltnis, EINHEITSLOS)}
 
     def _grenze(self, nummer: int, zahl: float) -> Wert:

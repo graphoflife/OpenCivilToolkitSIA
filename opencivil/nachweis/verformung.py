@@ -50,7 +50,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, Prozedur
-from opencivil.core.nachweis import Fallausgang, Nachweis, NachweisUrteil, Vergleich, grad_def
+from opencivil.core.nachweis import Fallausgang, Teilnachweis, Vergleich, grad_def
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -227,7 +227,7 @@ class Vergroesserungsfaktor(Prozedur):
         return gehalte
 
 
-class Verformung(Nachweis):
+class Verformung(Teilnachweis):
     """
     Die Durchbiegung je Verformungsfall, in x -- mit dem
     Vergroesserungsfaktor der Seite, die der Fall zieht
@@ -269,12 +269,8 @@ class Verformung(Nachweis):
     def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         self._protokoll_ansatz(p)
         omega = {seite: e[f"omega_{seite}"] for seite in self.seiten}
-        urteile: List[NachweisUrteil] = []
-        for fall in self.faelle:
-            erg = self._einen_fall(p, fall, omega.get(fall.zugseite))
-            urteile.append(self.urteil(self.d_ausnutzung[fall.name], fall.name, erg.ausgang,
-                                       erg.begruendung))
-        return Ausfuehrung({}, urteile)
+        return self.je_teil(p, self.faelle,
+                            lambda fall: self._einen_fall(p, fall, omega.get(fall.zugseite)))
 
     def _einen_fall(self, p: Protokoll, fall: Verformungsfall,
                     omega: Optional[Wert]) -> Fallergebnis:

@@ -21,7 +21,7 @@ from __future__ import annotations
 import math
 from abc import abstractmethod
 from dataclasses import dataclass, field, replace
-from typing import Any, Iterable, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 from opencivil.core import latex as tex
 from opencivil.core.berechnung import Ausfuehrung, Berechnung, BerechnungsFehler, Eingaben
@@ -532,3 +532,72 @@ class Nachweis(Berechnung):
     # zaehlte die stillen Urteile mit -- also das Gegenteil von dem, was
     # `Loesung.alle_nachweise_erfuellt` sagt. Zwei gleichnamige Antworten auf
     # dieselbe Frage, von denen die unbenutzte die falsche war.
+
+
+class Teilnachweis(Nachweis):
+    """
+    Ein Nachweis mit einem Urteil je Teil -- je Lage, je Fall, je Seite.
+
+    Die Schleife steht hier einmal (:meth:`je_teil`): je Teil sein Ergebnis
+    samt Herleitung, im Befund in der Folge der Urteile, seine Ausgaben
+    (:meth:`ausgaben_des_teils`) und sein Urteil aus Ausgang und Begruendung
+    (:meth:`urteil_des_teils`, :class:`Fallausgang`). Was vor der Schleife
+    fuer alle Teile gilt, rechnet :meth:`pruefe` selbst und gibt es dem Teil
+    mit. Bis 2026-11-21 baute jeder Nachweis die Schleife selbst, mit kleinen
+    Abweichungen: der eine fuehrte den Befund mit, der andere nicht.
+
+    Ohne eigene Angabe hat jeder Teil einen Namen (``name``) und seinen
+    Erfuellungsgrad in ``d_ausnutzung`` unter diesem Namen.
+    """
+
+    TEILE_EINER_FRAGE: bool = False
+    """
+    Ob die Urteile Teile derselben Frage sind -- die Lagen einer Platte, die
+    Seiten eines gezeichneten Querschnitts, nicht die Lastfaelle. Dann sagt
+    die Herleitung, welcher Teil massgebend ist, und die Zusammenfassung
+    zeigt nur ihn (:meth:`~Nachweis.teilurteile`).
+    """
+
+    d_ausnutzung: Dict[Any, WertDef]
+
+    def je_teil(self, p: Protokoll, teile: Iterable[Any],
+                ein_teil: Callable[[Any], Optional[Fallausgang]], *, befund: Any = None,
+                ausgaben: Optional[Dict[str, Groesse]] = None) -> Ausfuehrung:
+        """
+        Die Schleife ueber die Teile. ``ein_teil`` rechnet einen und schreibt
+        seine Herleitung; ``None`` heisst: kein Urteil fuer ihn, etwa fuer eine
+        Seite ohne Bewehrung. ``befund`` fuehrt die Ergebnisse in
+        ``ergebnisse``; ``ausgaben`` bringt mit, was vor der Schleife
+        gerechnet ist.
+        """
+        ausgaben = {} if ausgaben is None else ausgaben
+        urteile: List[NachweisUrteil] = []
+        for teil in teile:
+            erg = ein_teil(teil)
+            if erg is None:
+                continue
+            if befund is not None:
+                befund.ergebnisse.append(erg)
+            ausgaben.update(self.ausgaben_des_teils(erg))
+            urteile.append(self.urteil_des_teils(teil, erg))
+        if self.TEILE_EINER_FRAGE:
+            self.protokoll_massgebend(p, urteile)
+            urteile = self.teilurteile(urteile)
+        return Ausfuehrung(ausgaben, urteile, befund)
+
+    def teilname(self, teil: Any) -> str:
+        """Wie ein Teil im Urteil heisst -- ohne eigene Angabe sein ``name``."""
+        return teil.name
+
+    def grad_des_teils(self, teil: Any) -> WertDef:
+        """Der Erfuellungsgrad, der sein Urteil traegt."""
+        return self.d_ausnutzung[self.teilname(teil)]
+
+    def ausgaben_des_teils(self, erg: Any) -> Mapping[str, Groesse]:
+        """Was ein Teil ausser seinem Grad ausgibt -- meist nichts."""
+        return {}
+
+    def urteil_des_teils(self, teil: Any, erg: Fallausgang) -> NachweisUrteil:
+        """Das Urteil eines Teils: sein Grad, sein Name, Ausgang und Begruendung."""
+        return self.urteil(self.grad_des_teils(teil), self.teilname(teil), erg.ausgang,
+                           erg.begruendung)

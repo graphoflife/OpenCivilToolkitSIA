@@ -1,5 +1,5 @@
 ---
-erzeugt: c0bfe70153af
+erzeugt: 2167024c055a
 art: modul
 tags: [modul]
 ---
@@ -259,7 +259,7 @@ Was das Verfahren vom Stab wissen muss -- siehe Dateikopf.
 ### Knickverfahren
 
 ```python
-class Knickverfahren(Nachweis)
+class Knickverfahren(Teilnachweis)
 ```
 
 Nachweis am verformten System, je Knickfall -- das Verfahren, ohne zu
@@ -303,6 +303,20 @@ Die groesste getragene Druckkraft, durch Halbieren.
 Bei `N = 0` traegt der Stab immer: mit der Last verschwindet auch
 das Moment, denn `e_1d` ist fest. Das ist die untere Schranke, die
 das Halbieren braucht -- sie muss nicht gesucht werden.
+
+#### Knickverfahren._faelle
+
+```python
+def _faelle(self, p: Protokoll, stab: Callable[[Knickfall], Knickstab], *, befund: Optional[Knickbefund]=None) -> Ausfuehrung
+```
+
+Je Fall der Nachweis am Stab, den `stab` fuer ihn gibt -- samt Herleitung.
+
+#### Knickverfahren.urteil_des_teils
+
+```python
+def urteil_des_teils(self, fall: Knickfall, erg: Knickergebnis) -> NachweisUrteil
+```
 
 #### Knickverfahren._n_ed
 

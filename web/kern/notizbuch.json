@@ -4357,7 +4357,13 @@
         "Nachweis.teilurteile",
         "Nachweis.stillstellen",
         "Nachweis.pruefe",
-        "Nachweis.rechne"
+        "Nachweis.rechne",
+        "Teilnachweis",
+        "Teilnachweis.je_teil",
+        "Teilnachweis.teilname",
+        "Teilnachweis.grad_des_teils",
+        "Teilnachweis.ausgaben_des_teils",
+        "Teilnachweis.urteil_des_teils"
       ]
     },
     {
@@ -5684,7 +5690,7 @@
         "Duktilitaet",
         "Duktilitaet.ansatz",
         "Duktilitaet.eine_lage",
-        "Duktilitaet.ausgaben_der_lage",
+        "Duktilitaet.ausgaben_des_teils",
         "Duktilitaet._grenze",
         "Duktilitaet.protokoll_lage"
       ]
@@ -5778,6 +5784,8 @@
         "Knickverfahren._m_rd_symbol",
         "Knickverfahren._gleichgewicht",
         "Knickverfahren._grenzkraft",
+        "Knickverfahren._faelle",
+        "Knickverfahren.urteil_des_teils",
         "Knickverfahren._n_ed",
         "Knickverfahren._n_rd",
         "Knickverfahren._protokoll_verfahren",
@@ -5799,10 +5807,11 @@
         "Lagennachweis.lagen_waehlen",
         "Lagennachweis.ohne_bewehrung",
         "Lagennachweis.pruefe",
+        "Lagennachweis.teilname",
+        "Lagennachweis.grad_des_teils",
         "Lagennachweis.ansatz",
         "Lagennachweis.eine_lage",
-        "Lagennachweis.protokoll_lage",
-        "Lagennachweis.ausgaben_der_lage"
+        "Lagennachweis.protokoll_lage"
       ]
     },
     {
@@ -5927,7 +5936,7 @@
         "Querkraft._ansatzbezuege",
         "Querkraft._fallbezuege",
         "Querkraft._befunde",
-        "Querkraft._eintragen",
+        "Querkraft.ausgaben_des_teils",
         "Querkraft._einwirkung",
         "Querkraft._widerstand",
         "Querkraft._widerstandssymbol",
@@ -6207,6 +6216,7 @@
         "Spannungsbegrenzung.thema",
         "Spannungsbegrenzung.langname",
         "Spannungsbegrenzung.pruefe",
+        "Spannungsbegrenzung.urteil_des_teils",
         "Spannungsbegrenzung._vergleich",
         "Spannungsbegrenzung._satz",
         "Spannungsbegrenzung._protokoll_ansatz",

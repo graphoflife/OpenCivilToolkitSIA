@@ -82,9 +82,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Protocol, Sequence, Tuple, Type
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
+from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
-    Fallausgang, Fallbefund, Nachweis, NachweisUrteil, Vergleich, grad_def,
+    Fallausgang, Fallbefund, NachweisUrteil, Teilnachweis, Vergleich, grad_def,
 )
 from opencivil.core.einheiten import KN, KNM, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung, vergleich
@@ -576,7 +576,7 @@ class PlattenStellen(Stahlspannungsort):
 # ===========================================================================
 
 
-class Spannungsbegrenzung(Nachweis):
+class Spannungsbegrenzung(Teilnachweis):
     """
     Stahlspannung unter Gebrauchslast gegen eine Grenze -- an der Platte je
     Tragrichtung, am gezeichneten Querschnitt; wo, sagt ``ort``.
@@ -642,19 +642,18 @@ class Spannungsbegrenzung(Nachweis):
         zustand = self.ort.zustand(e, self.wahl)
         grenzen = self._protokoll_ansatz(p, e, zustand)
 
-        ergebnis: Dict[str, Groesse] = {}
-        urteile: List[NachweisUrteil] = []
-        befund = Fallbefund()
-        for fall in self.faelle:
-            # Ausgeschaltete Lastfaelle rechnen mit und schweigen dabei.
-            leise = self.leise(fall.name)
+        def ein_teil(fall) -> Fallergebnis:
             erg = self._einen_fall(zustand, grenzen, fall)
-            befund.ergebnisse.append(erg)
-            if not leise:
+            # Ausgeschaltete Lastfaelle rechnen mit und schweigen dabei.
+            if not self.leise(fall.name):
                 self._protokoll_fall(p, e, zustand, grenzen, erg)
-            urteile.append(self.urteil(self.d_ausnutzung[fall.name], fall.name, erg.ausgang,
-                                       erg.begruendung, art=self.grenze.art, still=leise))
-        return Ausfuehrung({}, urteile, befund)
+            return erg
+
+        return self.je_teil(p, self.faelle, ein_teil, befund=Fallbefund())
+
+    def urteil_des_teils(self, fall, erg: Fallergebnis) -> NachweisUrteil:
+        return self.urteil(self.grad_des_teils(fall), fall.name, erg.ausgang, erg.begruendung,
+                           art=self.grenze.art, still=self.leise(fall.name))
 
     def _einen_fall(self, zustand: Stahlzustand, grenzen: Grenzen, fall) -> Fallergebnis:
         erg = Fallergebnis(fall=fall)

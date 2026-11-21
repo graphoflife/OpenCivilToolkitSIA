@@ -24,10 +24,10 @@ des Ansatzes ohne Buegel geht nicht zusaetzlich ein.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import List, Mapping, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
-from opencivil.core.nachweis import NachweisUrteil, Vergleich
+from opencivil.core.berechnung import Eingabebezug, Eingaben
+from opencivil.core.nachweis import Vergleich
 from opencivil.core.einheiten import GRAD, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.protokoll import Kurz, Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
@@ -292,18 +292,15 @@ class QuerkraftMitBuegeln(Querkraft):
         teilung_y = self.teilung_y(Zwischenwerte(self.id), e, w.s_y)
         self._protokoll_ansatz_buegel(p, e, teilung_y)
 
-        ergebnis: Dict[str, Groesse] = {}
-        urteile: List[NachweisUrteil] = []
-
-        for fall in self.faelle:
-            erg = self._einen_fall_buegel(fall, w, hoehen)
-            befund.ergebnisse.append(erg)
-            self._protokoll_fall_buegel(p, e, erg, teilung_y)
-            self._eintragen(erg, ergebnis, urteile)
         if not self.faelle:
             befund.ohne_einwirkung = self._einen_fall_buegel(OHNE_EINWIRKUNG, w, hoehen)
 
-        return Ausfuehrung(ergebnis, urteile, befund)
+        def ein_teil(fall: Querkraftfall) -> ErgebnisMitBuegeln:
+            erg = self._einen_fall_buegel(fall, w, hoehen)
+            self._protokoll_fall_buegel(p, e, erg, teilung_y)
+            return erg
+
+        return self.je_teil(p, self.faelle, ein_teil, befund=befund)
 
     def _einen_fall_buegel(self, fall: Querkraftfall, w: Buegelwerte,
                            hoehen: Mapping[Zugseite, float]) -> ErgebnisMitBuegeln:

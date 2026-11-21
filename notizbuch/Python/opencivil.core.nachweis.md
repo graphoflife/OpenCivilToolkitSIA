@@ -1,5 +1,5 @@
 ---
-erzeugt: ae3d7aa3eee8
+erzeugt: 9b9df6cda695
 art: modul
 tags: [modul]
 ---
@@ -363,6 +363,72 @@ und dem Befund
 def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
+### Teilnachweis
+
+```python
+class Teilnachweis(Nachweis)
+```
+
+Ein Nachweis mit einem Urteil je Teil -- je Lage, je Fall, je Seite.
+
+Die Schleife steht hier einmal ([[opencivil.core.nachweis#Teilnachweis.je_teil|je_teil]]): je Teil sein Ergebnis
+samt Herleitung, im Befund in der Folge der Urteile, seine Ausgaben
+([[opencivil.core.nachweis#Teilnachweis.ausgaben_des_teils|ausgaben_des_teils]]) und sein Urteil aus Ausgang und Begruendung
+([[opencivil.core.nachweis#Teilnachweis.urteil_des_teils|urteil_des_teils]], [[opencivil.core.nachweis#Fallausgang|Fallausgang]]). Was vor der Schleife
+fuer alle Teile gilt, rechnet [[opencivil.core.nachweis#Nachweis.pruefe|pruefe]] selbst und gibt es dem Teil
+mit. Bis 2026-11-21 baute jeder Nachweis die Schleife selbst, mit kleinen
+Abweichungen: der eine fuehrte den Befund mit, der andere nicht.
+
+Ohne eigene Angabe hat jeder Teil einen Namen (`name`) und seinen
+Erfuellungsgrad in `d_ausnutzung` unter diesem Namen.
+
+- `TEILE_EINER_FRAGE: bool = False` – Ob die Urteile Teile derselben Frage sind -- die Lagen einer Platte, die Seiten eines gezeichneten Querschnitts, nicht die Lastfaelle. Dann sagt die Herleitung, welcher Teil massgebend ist, und die Zusammenfassung zeigt nur ihn ([[opencivil.core.nachweis#Nachweis.teilurteile|teilurteile]]).
+- `d_ausnutzung: Dict[Any, WertDef]`
+
+#### Teilnachweis.je_teil
+
+```python
+def je_teil(self, p: Protokoll, teile: Iterable[Any], ein_teil: Callable[[Any], Optional[Fallausgang]], *, befund: Any=None, ausgaben: Optional[Dict[str, Groesse]]=None) -> Ausfuehrung
+```
+
+Die Schleife ueber die Teile. `ein_teil` rechnet einen und schreibt
+seine Herleitung; `None` heisst: kein Urteil fuer ihn, etwa fuer eine
+Seite ohne Bewehrung. `befund` fuehrt die Ergebnisse in
+`ergebnisse`; `ausgaben` bringt mit, was vor der Schleife
+gerechnet ist.
+
+#### Teilnachweis.teilname
+
+```python
+def teilname(self, teil: Any) -> str
+```
+
+Wie ein Teil im Urteil heisst -- ohne eigene Angabe sein `name`.
+
+#### Teilnachweis.grad_des_teils
+
+```python
+def grad_des_teils(self, teil: Any) -> WertDef
+```
+
+Der Erfuellungsgrad, der sein Urteil traegt.
+
+#### Teilnachweis.ausgaben_des_teils
+
+```python
+def ausgaben_des_teils(self, erg: Any) -> Mapping[str, Groesse]
+```
+
+Was ein Teil ausser seinem Grad ausgibt -- meist nichts.
+
+#### Teilnachweis.urteil_des_teils
+
+```python
+def urteil_des_teils(self, teil: Any, erg: Fallausgang) -> NachweisUrteil
+```
+
+Das Urteil eines Teils: sein Grad, sein Name, Ausgang und Begruendung.
+
 
 ## Konstanten
 
@@ -399,7 +465,6 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
-- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]

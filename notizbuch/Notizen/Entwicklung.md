@@ -19,6 +19,13 @@ Ein Umbau ohne neue Zahl, vom Benutzer gewählt (2026-11-21):
   stellt, steht im Kopf seiner Klasse. Die schiefe Biegung gab den
   Ausgang, die Biegung mit Normalkraft die Begründung nach der Stelle
   mit; jetzt beide mit Namen.
+- **Die Schleife über die Teile steht einmal da.** Lagennachweise, beide
+  Knicknachweise, Spannungsbegrenzung, Verformung und beide
+  Querkraftnachweise schrieben je dieselbe Schleife: je Teil rechnen und
+  herleiten, das Ergebnis in den Befund, die Ausgaben sammeln, das Urteil
+  aus Ausgang und Begründung. Jetzt tut das `Teilnachweis.je_teil`; ein
+  Nachweis sagt nur, wie er einen Teil rechnet, und wo nötig, wie der Teil
+  heisst, welcher Grad ihn trägt und was er sonst ausgibt.
 
 ## 2026-11-21 · Platte und Querschnittsanalyse teilen, was gleich ist
 

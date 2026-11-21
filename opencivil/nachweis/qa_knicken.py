@@ -38,10 +38,9 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, Optional, Sequence
 
-from opencivil.core.berechnung import Ausfuehrung, Eingaben
-from opencivil.core.nachweis import NachweisUrteil
+from opencivil.core.berechnung import Eingaben
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.suche import ILLINOIS
 from opencivil.nachweis.knicken import (
@@ -106,14 +105,13 @@ class KnickenQA(Knickverfahren):
         self._protokoll_ansatz(p, e)
 
         staebe: Dict[Zugseite, Knickstab] = {}
-        urteile: List[NachweisUrteil] = []
-        for fall in self.faelle:
+
+        def stab(fall: QAKnickfall) -> Knickstab:
             if fall.richtung not in staebe:
                 staebe[fall.richtung] = knickstab(q_verformung, q_widerstand, fall.richtung)
-            erg = self._einen_fall(staebe[fall.richtung], fall)
-            self._protokoll_fall(p, erg)
-            urteile.append(self._urteil(erg))
-        return Ausfuehrung({}, urteile)
+            return staebe[fall.richtung]
+
+        return self._faelle(p, stab)
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         self._protokoll_verfahren(p)

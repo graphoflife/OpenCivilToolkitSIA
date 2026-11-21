@@ -1,5 +1,5 @@
 ---
-erzeugt: ffb2dcb40271
+erzeugt: af91c6d73a0d
 art: modul
 tags: [modul]
 ---
@@ -477,7 +477,7 @@ def protokoll_ebene(self, p: Protokoll, werte: Zwischenwerte, zustand: Stahlzust
 ### Spannungsbegrenzung
 
 ```python
-class Spannungsbegrenzung(Nachweis)
+class Spannungsbegrenzung(Teilnachweis)
 ```
 
 Stahlspannung unter Gebrauchslast gegen eine Grenze -- an der Platte je
@@ -506,6 +506,12 @@ def langname(self) -> str
 
 ```python
 def pruefe(self, e: Eingaben, p: Protokoll)
+```
+
+#### Spannungsbegrenzung.urteil_des_teils
+
+```python
+def urteil_des_teils(self, fall, erg: Fallergebnis) -> NachweisUrteil
 ```
 
 #### Spannungsbegrenzung._vergleich

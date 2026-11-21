@@ -35,10 +35,10 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Befundbezug, Eingabebezug, Eingaben
-from opencivil.core.nachweis import Fallausgang, Nachweis, NachweisUrteil, grad_def
+from opencivil.core.nachweis import Fallausgang, Teilnachweis, grad_def
 from opencivil.core.einheiten import KN, KN_PRO_M, KNM, MM, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -170,7 +170,7 @@ class Querkraftergebnis(Fallausgang):
     """in N/m."""
 
 
-class Querkraft(Nachweis):
+class Querkraft(Teilnachweis):
     """
     Der Querkraftnachweis einer Platte in einer Tragrichtung -- was beide
     Ansaetze teilen. Welcher gilt, entscheidet allein, ob die Platte Buegel
@@ -278,21 +278,14 @@ class Querkraft(Nachweis):
         """Wessen Befund der Ansatz liest -- ohne Buegel den des M-N-Nachweises."""
         return []
 
-    def _eintragen(
-        self, erg: Querkraftergebnis, ergebnis: Dict[str, Groesse],
-        urteile: List[NachweisUrteil],
-    ) -> None:
+    def ausgaben_des_teils(self, erg: Querkraftergebnis) -> Mapping[str, Groesse]:
         """
-        Ausgaben und Urteil eines Falls -- fuer beide Ansaetze dieselben.
-
-        Was ein Querkraftnachweis herausgibt, haengt nicht davon ab, wie der
-        Widerstand zustande kam. Zweimal geschrieben liefen die beiden Faelle
-        frueher oder spaeter auseinander.
+        Was ein Fall ausser seinem Grad ausgibt, ``v_Rd`` -- fuer beide
+        Ansaetze dasselbe. Was ein Querkraftnachweis herausgibt, haengt nicht
+        davon ab, wie der Widerstand zustande kam; zweimal geschrieben liefen
+        die beiden frueher oder spaeter auseinander.
         """
-        fall = erg.fall
-        ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
-        urteile.append(self.urteil(self.d_ausnutzung[fall.name], fall.name, erg.ausgang,
-                                   erg.begruendung))
+        return {self.d_v_rd[erg.fall.name].id: Groesse.aus_si(erg.v_Rd, KN_PRO_M)}
 
     def _einwirkung(self, fall: Querkraftfall) -> Wert:
         """

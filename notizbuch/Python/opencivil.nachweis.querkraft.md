@@ -1,5 +1,5 @@
 ---
-erzeugt: 2ca2dec45acc
+erzeugt: 14cbeffc8e9e
 art: modul
 tags: [modul]
 ---
@@ -145,7 +145,7 @@ Widerstand bestimmen liess.
 ### Querkraft
 
 ```python
-class Querkraft(Nachweis)
+class Querkraft(Teilnachweis)
 ```
 
 Der Querkraftnachweis einer Platte in einer Tragrichtung -- was beide
@@ -183,17 +183,16 @@ def _befunde(self) -> List[Befundbezug]
 
 Wessen Befund der Ansatz liest -- ohne Buegel den des M-N-Nachweises.
 
-#### Querkraft._eintragen
+#### Querkraft.ausgaben_des_teils
 
 ```python
-def _eintragen(self, erg: Querkraftergebnis, ergebnis: Dict[str, Groesse], urteile: List[NachweisUrteil]) -> None
+def ausgaben_des_teils(self, erg: Querkraftergebnis) -> Mapping[str, Groesse]
 ```
 
-Ausgaben und Urteil eines Falls -- fuer beide Ansaetze dieselben.
-
-Was ein Querkraftnachweis herausgibt, haengt nicht davon ab, wie der
-Widerstand zustande kam. Zweimal geschrieben liefen die beiden Faelle
-frueher oder spaeter auseinander.
+Was ein Fall ausser seinem Grad ausgibt, `v_Rd` -- fuer beide
+Ansaetze dasselbe. Was ein Querkraftnachweis herausgibt, haengt nicht
+davon ab, wie der Widerstand zustande kam; zweimal geschrieben liefen
+die beiden frueher oder spaeter auseinander.
 
 #### Querkraft._einwirkung
 

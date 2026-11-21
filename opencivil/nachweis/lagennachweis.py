@@ -28,17 +28,16 @@ trug ``ohne_bewehrung`` mit, und in drei der vier lief dieser Zweig nie.
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
-from opencivil.core.einheiten import Groesse
-from opencivil.core.nachweis import Fallbefund, Nachweis, NachweisUrteil, grad_def
+from opencivil.core.nachweis import Fallbefund, Teilnachweis, grad_def
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.querschnitt.platte import Bewehrungslage, Richtung
 
 
-class Lagennachweis(Nachweis):
+class Lagennachweis(Teilnachweis):
     """Ein Nachweis je Platte, ein Urteil je Lage -- siehe Dateikopf."""
 
     KUERZEL: str = ""
@@ -51,6 +50,8 @@ class Lagennachweis(Nachweis):
 
     NUR_MIT_STAHL: bool = True
     """Ob er nur Lagen mit Stahl bekommt -- siehe Dateikopf."""
+
+    TEILE_EINER_FRAGE = True
 
     def __init__(self, querschnitt, lagen: Sequence[Bewehrungslage], *, basis: str,
                  titel: str, bezuege: Sequence[Eingabebezug],
@@ -109,18 +110,19 @@ class Lagennachweis(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         ansatz = self.ansatz(e, p)
-        ausgaben: Dict[str, Groesse] = {}
-        urteile: List[NachweisUrteil] = []
-        befund = Fallbefund()
-        for lage in self.lagen:
+
+        def ein_teil(lage: Bewehrungslage) -> Any:
             erg = self.eine_lage(e, lage, ansatz)
-            befund.ergebnisse.append(erg)
             self.protokoll_lage(p, e, erg, ansatz)
-            ausgaben.update(self.ausgaben_der_lage(erg))
-            urteile.append(self.urteil(self.d_ausnutzung[lage.nummer], f"{lage.nummer}. Lage",
-                                       erg.ausgang, erg.begruendung))
-        self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ausgaben, self.teilurteile(urteile), befund)
+            return erg
+
+        return self.je_teil(p, self.lagen, ein_teil, befund=Fallbefund())
+
+    def teilname(self, lage: Bewehrungslage) -> str:
+        return f"{lage.nummer}. Lage"
+
+    def grad_des_teils(self, lage: Bewehrungslage) -> WertDef:
+        return self.d_ausnutzung[lage.nummer]
 
     @abstractmethod
     def ansatz(self, e: Eingaben, p: Protokoll) -> Any:
@@ -133,7 +135,3 @@ class Lagennachweis(Nachweis):
     @abstractmethod
     def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Any, ansatz: Any) -> None:
         """Die Herleitung einer Lage."""
-
-    def ausgaben_der_lage(self, erg: Any) -> Mapping[str, Groesse]:
-        """Was eine Lage ausser ihrem Grad ausgibt -- meist nichts."""
-        return {}

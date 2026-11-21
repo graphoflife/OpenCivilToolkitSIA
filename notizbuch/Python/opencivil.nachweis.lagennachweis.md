@@ -1,5 +1,5 @@
 ---
-erzeugt: 6ab6bff5b69a
+erzeugt: 7dc684c35057
 art: modul
 tags: [modul]
 ---
@@ -38,7 +38,7 @@ trug `ohne_bewehrung` mit, und in drei der vier lief dieser Zweig nie.
 ### Lagennachweis
 
 ```python
-class Lagennachweis(Nachweis)
+class Lagennachweis(Teilnachweis)
 ```
 
 Ein Nachweis je Platte, ein Urteil je Lage -- siehe Dateikopf.
@@ -47,6 +47,7 @@ Ein Nachweis je Platte, ein Urteil je Lage -- siehe Dateikopf.
 - `BENENNUNG: str = ''` – Im Text des Grads: «Erfüllungsgrad Duktilität – 2. Lage» -- «Duktilität».
 - `REFERENZ: str = ''`
 - `NUR_MIT_STAHL: bool = True` – Ob er nur Lagen mit Stahl bekommt -- siehe Dateikopf.
+- `TEILE_EINER_FRAGE = True`
 
 #### Lagennachweis.lagen_waehlen
 
@@ -70,6 +71,18 @@ Die Begruendung einer Lage ohne Stahl.
 
 ```python
 def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
+```
+
+#### Lagennachweis.teilname
+
+```python
+def teilname(self, lage: Bewehrungslage) -> str
+```
+
+#### Lagennachweis.grad_des_teils
+
+```python
+def grad_des_teils(self, lage: Bewehrungslage) -> WertDef
 ```
 
 #### Lagennachweis.ansatz
@@ -99,19 +112,10 @@ def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Any, ansatz: Any) -> No
 
 Die Herleitung einer Lage.
 
-#### Lagennachweis.ausgaben_der_lage
-
-```python
-def ausgaben_der_lage(self, erg: Any) -> Mapping[str, Groesse]
-```
-
-Was eine Lage ausser ihrem Grad ausgibt -- meist nichts.
-
 
 ## Braucht
 
 - [[opencivil.core.berechnung]]
-- [[opencivil.core.einheiten]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]

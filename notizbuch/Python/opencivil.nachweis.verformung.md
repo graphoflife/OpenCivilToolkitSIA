@@ -1,5 +1,5 @@
 ---
-erzeugt: 4e81b593b87d
+erzeugt: 03f90388ba79
 art: modul
 tags: [modul]
 ---
@@ -127,7 +127,7 @@ d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
 ### Verformung
 
 ```python
-class Verformung(Nachweis)
+class Verformung(Teilnachweis)
 ```
 
 Die Durchbiegung je Verformungsfall, in x -- mit dem

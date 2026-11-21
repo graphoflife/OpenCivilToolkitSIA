@@ -1,5 +1,5 @@
 ---
-erzeugt: e8290a8ea3ec
+erzeugt: 36c47b9dc2f5
 art: modul
 tags: [modul]
 ---
@@ -172,10 +172,10 @@ f_cd -- und die Herleitung des Ansatzes.
 def eine_lage(self, e: Eingaben, lage: Bewehrungslage, ansatz: float) -> Lagenergebnis
 ```
 
-#### Duktilitaet.ausgaben_der_lage
+#### Duktilitaet.ausgaben_des_teils
 
 ```python
-def ausgaben_der_lage(self, erg: Lagenergebnis) -> Dict[str, Groesse]
+def ausgaben_des_teils(self, erg: Lagenergebnis) -> Dict[str, Groesse]
 ```
 
 #### Duktilitaet._grenze
