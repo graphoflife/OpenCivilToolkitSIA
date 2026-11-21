@@ -211,14 +211,14 @@ class TestDatei(unittest.TestCase):
         daten["querschnitte"][0]["tragsicherheit_wahl"] = {"rechenart": "elastisch"}
         with self.assertRaises(ProjektFehler) as fehler:
             Projekt.aus_dict(daten).pruefen()
-        self.assertIn("tragsicherheit_wahl: 'elastisch' gibt es als 'rechenart' nicht",
+        self.assertIn("Tragsicherheit, Rechenwahl: 'elastisch' gibt es als 'rechenart' nicht",
                       str(fehler.exception))
 
     def test_negatives_phi(self):
         """Die Datei öffnet sich; die Platte rechnet nicht und sagt warum."""
         daten = Projekt.beispiel().als_dict()
         daten["querschnitte"][0]["tragsicherheit_wahl"] = {"kriechzahl": -1}
-        self.assertIn("tragsicherheit_wahl: Kriechzahl φ kann nicht negativ sein, angegeben "
+        self.assertIn("Tragsicherheit, Rechenwahl: Kriechzahl φ kann nicht negativ sein, angegeben "
                       "ist -1.", meldung(Projekt.aus_dict(daten)))
 
 

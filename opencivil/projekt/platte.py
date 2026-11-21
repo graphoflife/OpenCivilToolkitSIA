@@ -35,7 +35,7 @@ from opencivil.projekt.eintraege import (
     spannungsfallnamen,
 )
 from opencivil.projekt.fallnamen import Fallnamen
-from opencivil.projekt.lesen import ProjektFehler, als_groesse, bereich, einer_von
+from opencivil.projekt.lesen import ProjektFehler, als_groesse, bereich, einer_von, teil
 
 
 # ===========================================================================
@@ -107,8 +107,8 @@ class LageEintrag(Beschreibung):
 
     IM_ORT = "Lage"
 
-    grund: PostenEintrag = field(default_factory=PostenEintrag)
-    zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))
+    grund: PostenEintrag = teil(PostenEintrag, heisst="Grund")
+    zulage: PostenEintrag = teil(lambda: PostenEintrag(durchmesser=0.0), heisst="Zulage")
 
     unguenstig: bool = True
     """Ob die inneren Kanten von Grundbewehrung und Zulage fluchten -- siehe
@@ -131,8 +131,8 @@ class ObergrenzeEintrag(Beschreibung):
     Beide ohne Durchmesser heisst: keine Obergrenze.
     """
 
-    grund: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=30.0))
-    zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))
+    grund: PostenEintrag = teil(lambda: PostenEintrag(durchmesser=30.0), heisst="Grund")
+    zulage: PostenEintrag = teil(lambda: PostenEintrag(durchmesser=0.0), heisst="Zulage")
 
     @property
     def je_meter(self) -> float:
@@ -233,8 +233,8 @@ class QuerschnittEintrag(Querschnittsangaben):
     einlagenhoehe: float = bereich(0.0, heisst="Grösstes Mass der Einlage", einheit=MM, ab=0.0)
     """Grösstes Mass einer Einlage in mm, Breite oder Höhe -- der Name ist von früher."""
 
-    querkraftbewehrung: QuerkraftbewehrungEintrag = field(
-        default_factory=QuerkraftbewehrungEintrag)
+    querkraftbewehrung: QuerkraftbewehrungEintrag = teil(QuerkraftbewehrungEintrag,
+                                                         heisst="Bügel")
     """Bügel; ohne Durchmesser heisst: keine."""
 
     querkraftkurve_normalkraft: Optional[float] = bereich(
@@ -246,15 +246,15 @@ class QuerschnittEintrag(Querschnittsangaben):
     und sprang nach dem Neuladen still auf die Vorgabe zurueck.
     """
 
-    haeufig: Gebrauchsliste = field(
-        default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))
+    haeufig: Gebrauchsliste = teil(lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL),
+                                   heisst="Fliessen häufig")
     """Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen."""
 
-    quasistaendig: Gebrauchsliste = field(
-        default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANTEIL))
+    quasistaendig: Gebrauchsliste = teil(lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANTEIL),
+                                         heisst="Stahlspannung quasi-ständig")
     """Die quasi-staendigen Lastfaelle -- fuer die Rissbreite."""
 
-    verformung: VerformungEintrag = field(default_factory=VerformungEintrag)
+    verformung: VerformungEintrag = teil(VerformungEintrag, heisst="Verformung")
     """Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors."""
 
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
@@ -302,7 +302,8 @@ class QuerschnittEintrag(Querschnittsangaben):
     Null heisst: kein Mindestdurchmesser, eine Lage darf auch leer bleiben.
     """
 
-    automatik_grenze: ObergrenzeEintrag = field(default_factory=ObergrenzeEintrag)
+    automatik_grenze: ObergrenzeEintrag = teil(ObergrenzeEintrag,
+                                               heisst="Bewehrung suchen, Obergrenze")
     """
     Mehr Querschnitt bekommt keine x-Lage von der Suche -- in allen Modi,
     auch beim Optimieren der Plattendicke. Vorgabe ⌀30@150, 4712 mm²/m.
@@ -335,7 +336,8 @@ class QuerschnittEintrag(Querschnittsangaben):
 
     kombinationen: List[KombinationEintrag] = field(default_factory=list)
 
-    tragsicherheit_wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag)
+    tragsicherheit_wahl: RechenwahlEintrag = teil(RechenwahlEintrag,
+                                                  heisst="Tragsicherheit, Rechenwahl")
     """
     Womit die Tragsicherheit rechnet -- Vorgabe die Handrechnung mit
     Bemessungswerten. Die Querkraft und das sproede Versagen lesen ihren

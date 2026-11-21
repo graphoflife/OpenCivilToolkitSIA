@@ -281,6 +281,8 @@ class StabmaterialEintrag(Beschreibung):
     mit ``E`` und ``rho`` von Hand.
     """
 
+    IM_ORT = "Material"
+
     kennung: str = ""
     art: str = einer_von(STABMATERIALARTEN, "beton")
     stoff: str = ""
@@ -313,6 +315,8 @@ class StatikdiagrammEintrag(Beschreibung):
     es von ihm zeigt. Gerechnet wird damit nichts -- das System rechnet jeden
     Fall; die Liste sagt nur, welche Diagramme rechts stehen.
     """
+
+    IM_ORT = "Diagramm"
 
     fall: str = ""
     """Die Kennung eines Lastfalls (``LF1``) oder einer Kombination (``LK1``)."""

@@ -1,5 +1,5 @@
 ---
-erzeugt: f8c94bac2c5e
+erzeugt: 535c22485814
 art: modul
 tags: [modul]
 ---
@@ -79,6 +79,7 @@ class PlattenlastEintrag(Beschreibung)
 
 Eine Flaechenlast auf der ganzen Platte, an der sie steht, in einem Lastfall.
 
+- `IM_ORT = 'Last'`
 - `lastfall: str = ''`
 - `wert: float = bereich(2.0, heisst='q', einheit=KN_PRO_M2)`
 
@@ -247,6 +248,7 @@ und V über seine ganze Breite. Gerechnet wird damit nichts
 -- die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
 rechts stehen.
 
+- `IM_ORT = 'Diagramm'`
 - `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
 - `groesse: str = einer_von(DIAGRAMMGROESSEN, 'm_x')`
 - `schnitt: str = ''` – Wo das Bild schneidet: die Kennung eines Schnitts (`SN1`) oder eines Unterzugs (`U1`) -- leer: die ganze Platte. Die Lagerkräfte zeigen immer die ganze; M und V gibt es nur in einem Unterzug, die Grössen der Platte nur ausserhalb. Der Name blieb, als der Unterzug dazukam: ein neuer machte heute gespeicherte Stände unlesbar.

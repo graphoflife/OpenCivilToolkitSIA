@@ -90,8 +90,8 @@ class TestAnlegen(unittest.TestCase):
         for wahl in (RechenwahlEintrag(rechenart="blok"), {"rechenart": "blok"}):
             with self.subTest(wahl=wahl), self.assertRaises(ProjektFehler) as fehler:
                 einfach().platte("P", tragsicherheit_wahl=wahl)
-            self.assertIn("Platte 'P', tragsicherheit_wahl: 'blok' gibt es als 'rechenart' "
-                          "nicht", str(fehler.exception))
+            self.assertIn("Platte 'P', Tragsicherheit, Rechenwahl: 'blok' gibt es als "
+                          "'rechenart' nicht", str(fehler.exception))
 
     def test_ein_vertipptes_feld_wird_gemeldet(self):
         with self.assertRaises(ProjektFehler) as fehler:

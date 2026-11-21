@@ -41,7 +41,9 @@ from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.material.basis import Baustoff
 from opencivil.projekt.eintraege import Beschreibung, JeMaterial
 from opencivil.projekt.faelle import kennung_von
-from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, je_material
+from opencivil.projekt.lesen import (
+    ProjektFehler, bereich, einer_von, element_ort, je_material, teil,
+)
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt.netz import Netz, neue_kennung
 from opencivil.stabwerk import profiltabelle
@@ -173,6 +175,8 @@ class StabquerschnittBasis(Beschreibung):
     abwies -- dreimal nachgebessert.
     """
 
+    IM_ORT = "Querschnitt"
+
     KENNWERTE: ClassVar[Tuple[Kennwert, ...]]
     """Die Kennwerte von Hand, wie die Rechnung sie nimmt -- mit ihrer Grenze."""
 
@@ -207,7 +211,7 @@ class StabquerschnittBasis(Beschreibung):
     Form wartet die Wahl, bis er zurueckschaltet.
     """
 
-    eq: ModulEintrag = field(default_factory=ModulEintrag)
+    eq: ModulEintrag = teil(ModulEintrag, heisst="E_eq")
     """Wie das E_eq entsteht -- es gilt nur bei ``e_modul = "e_eq"``."""
 
     @classmethod
@@ -397,6 +401,15 @@ class MitStaeben:
     def _neue_kennung(self, liste: Sequence[Any], vorsilbe: str) -> str:
         return neue_kennung(self, vorsilbe, (e.kennung for e in liste))
 
+    def _gelesen(self, cls: type, roh: Dict[str, Any], liste: str, neben: Sequence[Any]) -> Any:
+        """
+        Ein neues Element der Liste ``liste`` aus ``roh``, gelesen wie aus der
+        Datei -- und gemeldet, wie die Datei es nennte: «L3», «Material
+        'Beton'» (:func:`~opencivil.projekt.lesen.element_ort`). ``neben`` sind
+        die Elemente, zu denen es kommt.
+        """
+        return cls.aus_dict(roh, element_ort(roh, cls, self.wo, liste, len(neben)))
+
     def linie(self, von: Ort, bis: Ort, *, querschnitt: Any = None, material: Any = None,
               **felder: Any) -> Any:
         """
@@ -406,12 +419,12 @@ class MitStaeben:
         Klasse der Linien.
         """
         netz = self.netz()
-        eintrag = self.LINIE.aus_dict({
+        eintrag = self._gelesen(self.LINIE, {
             "kennung": self._neue_kennung(self.linien, "L"),
             "von": self._knoten(netz, von), "bis": self._knoten(netz, bis),
             "querschnitt": kennung_von(querschnitt) if querschnitt is not None else "",
             "material": kennung_von(material) if material is not None else "", **felder},
-            f"{self.wo}, linien")
+            "linien", self.linien)
         self.linien.append(eintrag)
         return eintrag
 
@@ -420,11 +433,11 @@ class MitStaeben:
         if art not in self.LAGERARTEN:
             raise ProjektFehler(f"Eine Lagerart «{art}» gibt es nicht. Möglich sind: "
                                 f"{', '.join(self.LAGERARTEN)}.")
-        eintrag = self.LAGER.aus_dict({
+        eintrag = self._gelesen(self.LAGER, {
             "kennung": self._neue_kennung(self.lager, "A"),
             "knoten": self._knoten(self.netz(), ort),
             **dict(zip(self.LAGERFELDER, self.LAGERARTEN[art])), **felder},
-            f"{self.wo}, lager")
+            "lager", self.lager)
         self.lager.append(eintrag)
         return eintrag
 
@@ -456,9 +469,9 @@ class MitStaeben:
 
     def eigenes_material(self, name: str, **werte: float) -> Any:
         """Ein eigenes Material des Systems -- E in N/mm², die Dichte in kg/m³, Felder wie seine Klasse."""
-        eintrag = self.MATERIAL.aus_dict({
+        eintrag = self._gelesen(self.MATERIAL, {
             "kennung": self._neue_kennung(self.stabmaterialien, "M"), "art": "eigen",
-            "name": name, **werte}, f"{self.wo}, stabmaterialien")
+            "name": name, **werte}, "stabmaterialien", self.stabmaterialien)
         self.stabmaterialien.append(eintrag)
         return eintrag
 
@@ -480,9 +493,9 @@ class MitStaeben:
             profiltabelle.profil(profil)
         except KeyError as fehler:
             raise ProjektFehler(fehler.args[0]) from None
-        eintrag = self.QUERSCHNITT.aus_dict({
+        eintrag = self._gelesen(self.QUERSCHNITT, {
             "kennung": self._neue_kennung(self.querschnitte, "Q"), "name": name,
-            "art": "profil", "profil": profil, **felder}, f"{self.wo}, querschnitte")
+            "art": "profil", "profil": profil, **felder}, "querschnitte", self.querschnitte)
         self.querschnitte.append(eintrag)
         return eintrag
 
@@ -519,28 +532,29 @@ class MitStaeben:
 
     def diagramm(self, fall: Any, groesse: str) -> Any:
         """Ein Diagramm der Statik-Analyse -- ``fall`` ein Lastfall oder eine Kombination."""
-        eintrag = self.DIAGRAMM.aus_dict({"fall": kennung_von(fall), "groesse": groesse},
-                                         f"{self.wo}, diagramme")
+        eintrag = self._gelesen(self.DIAGRAMM, {"fall": kennung_von(fall), "groesse": groesse},
+                                "diagramme", self.diagramme)
         self.diagramme.append(eintrag)
         return eintrag
 
     def stablast(self, lastfall: Any, linie: Any, art: Lastart = Lastart.LINIENLAST,
                  wert: float = 10.0, **felder: Any) -> Any:
         """Eine Last auf einer Linie -- ``wert`` ist ``wert_a``; Felder wie die Klasse der Stablasten."""
-        eintrag = self.STABLAST.aus_dict({"kennung": self._neue_kennung(self.alle_lasten(), "P"),
-                                          "lastfall": kennung_von(lastfall), "art": art,
-                                          "wert_a": wert, **felder},
-                                         f"{self.wo}, lasten")
-        self.linie_von(kennung_von(linie)).lasten.append(eintrag)
+        ziel = self.linie_von(kennung_von(linie))
+        eintrag = self._gelesen(self.STABLAST, {
+            "kennung": self._neue_kennung(self.alle_lasten(), "P"),
+            "lastfall": kennung_von(lastfall), "art": art, "wert_a": wert, **felder},
+            "lasten", ziel.lasten)
+        ziel.lasten.append(eintrag)
         return eintrag
 
     def knotenlast(self, lastfall: Any, ort: Ort, wert: float = 10.0, **felder: Any) -> Any:
         """Eine Last an einem Knoten -- eine Kraft oder, ``art="moment"``, ein Moment; Felder wie ihre Klasse."""
-        eintrag = self.KNOTENLAST.aus_dict({
+        eintrag = self._gelesen(self.KNOTENLAST, {
             "kennung": self._neue_kennung(self.alle_lasten(), "P"),
             "knoten": self._knoten(self.netz(), ort), "lastfall": kennung_von(lastfall),
             "wert": wert, **felder},
-            f"{self.wo}, knotenlasten")
+            "knotenlasten", self.knotenlasten)
         self.knotenlasten.append(eintrag)
         return eintrag
 

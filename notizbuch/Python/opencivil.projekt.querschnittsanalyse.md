@@ -1,5 +1,5 @@
 ---
-erzeugt: 6a927a6a0d99
+erzeugt: c4f683d3e34a
 art: modul
 tags: [modul]
 ---
@@ -182,6 +182,7 @@ class QALastfallEintrag(Beschreibung)
 
 Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
 
+- `IM_ORT = 'Lastfall'`
 - `name: str`
 - `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)`
 - `M_y_Ed: float = bereich(0.0, heisst='Moment M_y,Ed', einheit=KNM)`
@@ -202,6 +203,7 @@ Ein Lastfall unter Gebrauchslast -- wie ein Lastfall der Tragsicherheit,
 ohne Querkraft und Torsion: begrenzt wird die Stahlspannung, und dafuer
 zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
 
+- `IM_ORT = 'Lastfall'`
 - `name: str`
 - `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)`
 - `M_y_Ed: float = bereich(0.0, heisst='Moment M_y,Ed', einheit=KNM)`
@@ -234,7 +236,7 @@ Handrechnung gibt es hier nicht.
 - `FALL = QAGebrauchsfallEintrag`
 - `BAUTEIL = 'Querschnitt'`
 - `faelle: List[QAGebrauchsfallEintrag] = field(default_factory=list)`
-- `wahl: QAGebrauchswahl = field(default_factory=QAGebrauchswahl)`
+- `wahl: QAGebrauchswahl = teil(QAGebrauchswahl, heisst='Rechenwahl')`
 
 ### QAKnickEintrag
 
@@ -315,8 +317,8 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `alpha_min: int = kleinste_neigung()`
 - `alpha_max: int = groesste_neigung()` – Die Grenzen der Druckfeldneigung in den Schubwaenden -- wie bei den Buegeln der Platte.
 - `laengszugkraft: bool = False` – Ob die Laengszugkraft aus Querkraft und Torsion in den M-N-Nachweis eingeht: das Druckfeld jeder Schubwand braucht in Laengsrichtung Zug.
-- `quasistaendig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_A…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
-- `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
+- `quasistaendig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_ANTEIL), heisst='S…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
+- `haeufig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL), heisst='Fliesse…` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 

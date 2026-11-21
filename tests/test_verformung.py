@@ -255,7 +255,7 @@ class TestBeschreibung(unittest.TestCase):
                 projekt = beispiel(("Feld", 3.5, 6.0, "unten"))
                 setattr(projekt.querschnitte[0].verformung.faelle[0], feld, wert)
                 wieder = Projekt.aus_dict(projekt.als_dict())
-                self.assertIn(f"verformung, faelle 'Feld': {satz}", meldung(wieder))
+                self.assertIn(f"Verformung, Verformungsfall 'Feld': {satz}", meldung(wieder))
 
     def test_was_es_nicht_gibt_meldet_sich(self):
         """
@@ -274,7 +274,7 @@ class TestBeschreibung(unittest.TestCase):
                  "«Feld-A» ist als Verformungsfall schon vergeben, als «Feld A» – die "
                  "beiden unterscheiden sich nur in Satz- oder Leerzeichen."),
                 (lambda v: setattr(v, "kriechzahl", -0.5),
-                 "verformung: Kriechzahl φ kann nicht negativ sein, angegeben ist -0.5.")):
+                 "Verformung: Kriechzahl φ kann nicht negativ sein, angegeben ist -0.5.")):
             with self.subTest(satz=satz):
                 projekt = beispiel(("Feld", 3.5, 6.0, "unten"))
                 aendern(projekt.querschnitte[0].verformung)
@@ -283,7 +283,7 @@ class TestBeschreibung(unittest.TestCase):
     def test_eine_negative_kriechzahl_in_der_datei(self):
         roh = Projekt.beispiel().als_dict()
         roh["querschnitte"][0]["verformung"]["kriechzahl"] = -1.0
-        self.assertIn("verformung: Kriechzahl φ kann nicht negativ sein, angegeben ist -1.",
+        self.assertIn("Verformung: Kriechzahl φ kann nicht negativ sein, angegeben ist -1.",
                       meldung(Projekt.aus_dict(roh)))
 
 

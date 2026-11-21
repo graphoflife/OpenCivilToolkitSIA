@@ -1,5 +1,5 @@
 ---
-erzeugt: 0a50a03da84c
+erzeugt: 82772011785d
 art: modul
 tags: [modul]
 ---
@@ -36,6 +36,7 @@ class LastfallEintrag(Beschreibung)
 
 Ein Lastfall: eine Kennung, auf die die Lasten zeigen, und ein Name.
 
+- `IM_ORT = 'Lastfall'`
 - `kennung: str = ''`
 - `name: str = ''`
 - `eigengewicht: bool = False` – Ob der Lastfall das Eigengewicht bekommt -- von selbst, aus Dichte und Querschnitt (Benutzer, 2026-10-23). Ein Bauteil hat einen davon.
@@ -49,6 +50,7 @@ class LastkombinationEintrag(Beschreibung)
 
 Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand.
 
+- `IM_ORT = 'Kombination'`
 - `kennung: str = ''`
 - `name: str = ''`
 - `faktoren: Dict[str, float] = field(default_factory=dict)`

@@ -1,5 +1,5 @@
 ---
-erzeugt: 108530005928
+erzeugt: 8e8b84bbf594
 art: modul
 tags: [modul]
 ---
@@ -39,6 +39,7 @@ class SchichtEintrag(Beschreibung)
 
 Eine Schicht des Baugrunds, von der Sohle an nach unten: Dicke und M_E-Werte.
 
+- `IM_ORT = 'Schicht'`
 - `name: str`
 - `d: float = bereich(2.0, heisst='Dicke d', einheit=M, ueber=0.0)` – Dicke der Schicht in m.
 - `M_E: float = bereich(20.0, heisst='M_E', einheit=MN_PRO_M2, ueber=0.0)` – M_E-Wert der Erstbelastung in MN/m².

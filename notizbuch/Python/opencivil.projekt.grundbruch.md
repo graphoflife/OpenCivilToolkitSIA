@@ -1,5 +1,5 @@
 ---
-erzeugt: e3f2859d05f4
+erzeugt: b9f7e276f73d
 art: modul
 tags: [modul]
 ---
@@ -38,6 +38,7 @@ class GrundbruchkombinationEintrag(Beschreibung)
 
 Eine Einwirkung auf das Fundament: N normal zur Sohle, T in ihrer Richtung, in kN.
 
+- `IM_ORT = 'Kombination'`
 - `name: str`
 - `N_Ed: float = bereich(1000.0, heisst='Druckkraft N_Ed', einheit=KN, ueber=0.0)`
 - `T_Ed: float = bereich(200.0, heisst='T_Ed, in Richtung von Bild 9.2.15,', einheit=K…`

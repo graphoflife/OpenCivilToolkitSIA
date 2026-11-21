@@ -83,6 +83,8 @@ class DeckenknotenEintrag(Beschreibung):
 class PlattenlastEintrag(Beschreibung):
     """Eine Flaechenlast auf der ganzen Platte, an der sie steht, in einem Lastfall."""
 
+    IM_ORT = "Last"
+
     lastfall: str = ""
     wert: float = bereich(2.0, heisst="q", einheit=KN_PRO_M2)
 
@@ -230,6 +232,8 @@ class DeckendiagrammEintrag(Beschreibung):
     -- die Decke rechnet jeden Fall; die Liste sagt nur, welche Bilder
     rechts stehen.
     """
+
+    IM_ORT = "Diagramm"
 
     fall: str = ""
     """Die Kennung eines Lastfalls (``LF1``) oder einer Kombination (``LK1``)."""

@@ -507,8 +507,9 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         «Querschnitt». Der Ort in den Worten der Maske, offen seit
         2026-10-16, ist erledigt (2026-11-20): ein Element ohne Namen heisst
         mit dem Wort seiner Klasse und seiner Nummer (`IM_ORT`: «Lage 2»,
-        «Linie 3»), sonst mit seiner Kennung («A1»). Feldnamen bleiben, wie
-        sie sind: «Lage 2, grund».
+        «Linie 3»), sonst mit seiner Kennung («A1»). Seit 2026-11-21 auch
+        jedes Feld und jede Liste: «Lage 2, Grund» statt «Lage 2, grund»,
+        «Kombination 'K'» statt «kombinationen 'K'», siehe [[Entwicklung]].
       - Erledigt (2026-11-20): der Stabquerschnitt hat je Art ein eigenes
         Feld – `masse`, `kennwerte`, `profil`, `platte`, `analyse` –, und
         umschalten ist `setzen('art')`. Nach dem Zurückschalten stehen die

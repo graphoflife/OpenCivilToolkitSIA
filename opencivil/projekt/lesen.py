@@ -121,6 +121,22 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any = dataclasses.MISSING) -> An
     return dataclasses.field(default=vorgabe, metadata={"wahl": tuple(moeglich)})
 
 
+def teil(fabrik: Callable[[], Any], *, heisst: str) -> Any:
+    """
+    Ein Feld, das einen ganzen Eintrag haelt -- die Grundbewehrung einer Lage,
+    die Rechenwahl der Tragsicherheit --, mit dem Wort, unter dem es in
+    Meldungen steht: wie die Maske es nennt, «Lage 2, Grund», nicht wie die
+    Datei, «Lage 2, grund» (Benutzer, 2026-11-21). Ein Element einer Liste
+    nennt seine Klasse (``IM_ORT``, :func:`_ort`).
+    """
+    return dataclasses.field(default_factory=fabrik, metadata={"heisst": heisst})
+
+
+def _im_ort(f: dataclasses.Field) -> str:
+    """Wie das Feld ``f`` als Teil eines Orts heisst -- sein Wort (:func:`teil`), sonst sein Name."""
+    return f.metadata.get("heisst", f.name)
+
+
 def je_material(vorgabe: Any, moeglich: Optional[Iterable[Any]] = None) -> Any:
     """
     Ein Feld, das je Material eine Wahl haelt, unter der Kennung des
@@ -330,7 +346,7 @@ def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
     for name, f in felder.items():
         vorbild = getattr(basis, name) if basis is not None else _vorgabe(f)
         if name in roh:
-            werte[name] = _wert_lesen(roh[name], typen[name], wo, name, vorbild)
+            werte[name] = _wert_lesen(roh[name], typen[name], wo, f, vorbild)
         elif vorbild is _KEINE:
             raise ProjektFehler(f"das Feld '{name}' fehlt.", wo=wo)
         elif basis is not None:
@@ -340,7 +356,7 @@ def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
     return eintrag
 
 
-def _wert_lesen(roh: Any, typ: Any, wo: str, feld: str, vorbild: Any) -> Any:
+def _wert_lesen(roh: Any, typ: Any, wo: str, f: dataclasses.Field, vorbild: Any) -> Any:
     """
     Ein Feld aus der Datei. Eintraege und Listen von Eintraegen werden
     gelesen; Zahlen bleiben, was sie sind -- nur eine ganze Zahl aus JSON wird
@@ -350,22 +366,22 @@ def _wert_lesen(roh: Any, typ: Any, wo: str, feld: str, vorbild: Any) -> Any:
     """
     art, innen = _art(typ)
     if art == "optional":
-        return None if roh is None else _wert_lesen(roh, innen, wo, feld, vorbild)
+        return None if roh is None else _wert_lesen(roh, innen, wo, f, vorbild)
     if art == "eintrag":
         basis = vorbild if isinstance(vorbild, innen) else None
-        return lesen(innen, roh, f"{wo}, {feld}", basis)
+        return lesen(innen, roh, f"{wo}, {_im_ort(f)}", basis)
     if art == "liste":
         if not isinstance(roh, list):
-            raise ProjektFehler(f"'{feld}' muss eine Liste sein, nicht {_zeigen(roh)}.",
+            raise ProjektFehler(f"'{f.name}' muss eine Liste sein, nicht {_zeigen(roh)}.",
                                 wo=wo)
         innere, _ = _art(innen)
         if innere == "eintrag":
-            return [lesen(innen, element, _ort_roh(element, innen, wo, feld, i))
+            return [lesen(innen, element, element_ort(element, innen, wo, f.name, i))
                     for i, element in enumerate(roh)]
         return [_zahl_lesen(element, innen) for element in roh]
     if art == "zuordnung":
         if not isinstance(roh, Mapping):
-            raise ProjektFehler(f"'{feld}' muss eine Zuordnung sein, "
+            raise ProjektFehler(f"'{f.name}' muss eine Zuordnung sein, "
                                 f"nicht {_zeigen(roh)}.", wo=wo)
         return {schluessel: _zahl_lesen(wert, innen) for schluessel, wert in roh.items()}
     return _zahl_lesen(roh, typ)
@@ -400,8 +416,13 @@ def ort_von(eintrag: Any) -> str:
     return ort(type(eintrag), {"name": name, "kennung": eintrag.kennung})
 
 
-def _ort_roh(element: Any, cls: type, wo: str, feld: str, i: int) -> str:
-    """Wie ein Listenelement in Meldungen heisst -- aus der Datei, vor dem Lesen."""
+def element_ort(element: Any, cls: type, wo: str, feld: str, i: int) -> str:
+    """
+    Wie das Element ``i`` der Liste ``feld`` in Meldungen heisst -- aus der
+    Datei, vor dem Lesen. Auch fuer ein neues, das Python anlegt
+    (``MitStaeben._gelesen``): bis 2026-11-21 hiess es dort nach seiner
+    Liste, «linien».
+    """
     if not isinstance(element, Mapping):
         return _ort(cls, None, None, wo, feld, i)
     return _ort(cls, element.get("name"), element.get("kennung"), wo, feld, i)
@@ -411,9 +432,10 @@ def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str:
     """
     Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
     und dort beginnt der Ort neu; alles darin mit seinem Namen, davor das
-    Wort seiner Klasse, wo sie eines hat (``IM_ORT``: «Wand 'W1'» im
-    Erdbeben), sonst sein Feld: «kombinationen 'GZT'». Nur Leerzeichen sind
-    kein Name.
+    Wort seiner Klasse (``IM_ORT``: «Wand 'W1'» im Erdbeben, «Kombination
+    'GZT'»). Bis 2026-11-21 stand ohne Wort das Feld der Datei davor,
+    «kombinationen 'GZT'»; ein Test wacht, dass jede Klasse eines hat. Nur
+    Leerzeichen sind kein Name.
 
     Ohne Namen heisst ein Element, wie die Maske es nennt: mit dem Wort
     seiner Klasse und seiner Nummer (``IM_ORT``: «Lage 2», «Linie 3» wie in
@@ -469,7 +491,7 @@ def _wert_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str, tief: bool
             raise ProjektFehler(f"'{f.name}' muss ein {innen.__name__} sein, "
                                 f"nicht {_zeigen(wert)}.", wo=wo)
         if tief:
-            felder_pruefen(wert, f"{wo}, {f.name}")
+            felder_pruefen(wert, f"{wo}, {_im_ort(f)}")
         return
     if art == "liste":
         if not isinstance(wert, list):
@@ -557,7 +579,7 @@ def inhalt_pruefen(eintrag: Any, wo: str, ohne: Iterable[str] = ()) -> None:
         for i, teil in enumerate(teile):
             if dataclasses.is_dataclass(teil):
                 inhalt_pruefen(teil, _ort_von(teil, wo, f.name, i) if teile is wert
-                               else f"{wo}, {f.name}")
+                               else f"{wo}, {_im_ort(f)}")
             elif bereich_ is not None and teil is not None:
                 anhalten(bereich_.grund(teil), wo)
         if bereich_ is not None and bereich_.bis_feld is not None:
@@ -580,7 +602,7 @@ def _ist_name(f: dataclasses.Field) -> bool:
 
 
 def _ort_von(element: Any, wo: str, feld: str, i: int) -> str:
-    """Wie ein gebautes Listenelement in Meldungen heisst -- wie :func:`_ort_roh` vor dem Lesen."""
+    """Wie ein gebautes Listenelement in Meldungen heisst -- wie :func:`element_ort` vor dem Lesen."""
     return _ort(type(element), getattr(element, "name", None),
                 getattr(element, "kennung", None), wo, feld, i)
 

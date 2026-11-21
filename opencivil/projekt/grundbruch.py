@@ -37,6 +37,8 @@ from opencivil.projekt.lesen import ProjektFehler, bereich
 class GrundbruchkombinationEintrag(Beschreibung):
     """Eine Einwirkung auf das Fundament: N normal zur Sohle, T in ihrer Richtung, in kN."""
 
+    IM_ORT = "Kombination"
+
     name: str
     N_Ed: float = bereich(1000.0, heisst="Druckkraft N_Ed", einheit=KN, ueber=0.0)
     T_Ed: float = bereich(200.0, heisst="T_Ed, in Richtung von Bild 9.2.15,", einheit=KN,

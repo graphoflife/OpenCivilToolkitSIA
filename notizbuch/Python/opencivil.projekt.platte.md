@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a15ba325bd2
+erzeugt: 18214265ebce
 art: modul
 tags: [modul]
 ---
@@ -82,8 +82,8 @@ class LageEintrag(Beschreibung)
 Eine der vier Lagen -- ihr Stahl ist der der Platte.
 
 - `IM_ORT = 'Lage'`
-- `grund: PostenEintrag = field(default_factory=PostenEintrag)`
-- `zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))`
+- `grund: PostenEintrag = teil(PostenEintrag, heisst='Grund')`
+- `zulage: PostenEintrag = teil(lambda: PostenEintrag(durchmesser=0.0), heisst='Zulage')`
 - `unguenstig: bool = True` – Ob die inneren Kanten von Grundbewehrung und Zulage fluchten -- siehe [[opencivil.querschnitt.platte#Bewehrungslage|opencivil.querschnitt.platte.Bewehrungslage]].
 
 #### LageEintrag.vorhanden
@@ -108,8 +108,8 @@ Summe in mm²/m. Wie die Suche sie auf Grund und Zulage verteilt, ist frei:
 bei ⌀26@150 + ⌀20@150 (5634 mm²/m) darf eine Lage auch ⌀30 + ⌀12 tragen.
 Beide ohne Durchmesser heisst: keine Obergrenze.
 
-- `grund: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=30.0))`
-- `zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))`
+- `grund: PostenEintrag = teil(lambda: PostenEintrag(durchmesser=30.0), heisst='Grund')`
+- `zulage: PostenEintrag = teil(lambda: PostenEintrag(durchmesser=0.0), heisst='Zulage')`
 
 #### ObergrenzeEintrag.je_meter
 
@@ -192,11 +192,11 @@ gezeichneten Querschnitt gleich angibt, steht in der Grundlage
 - `ueberdeckung_oben: float = bereich(30.0, heisst='Überdeckung oben', einheit=MM, ab=0.0)`
 - `d_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)` – Grösstkorndurchmesser in mm.
 - `einlagenhoehe: float = bereich(0.0, heisst='Grösstes Mass der Einlage', einheit=MM, ab=0.0)` – Grösstes Mass einer Einlage in mm, Breite oder Höhe -- der Name ist von früher.
-- `querkraftbewehrung: QuerkraftbewehrungEintrag = field(default_factory=QuerkraftbewehrungEintrag)` – Bügel; ohne Durchmesser heisst: keine.
+- `querkraftbewehrung: QuerkraftbewehrungEintrag = teil(QuerkraftbewehrungEintrag, heisst='Bügel')` – Bügel; ohne Durchmesser heisst: keine.
 - `querkraftkurve_normalkraft: Optional[float] = bereich(None, heisst='Normalkraft der M-V-Kurve', einheit=KN)` – Fuer welche Normalkraft das Bild «Querkraft ueber Moment» gilt, in kN, Zug positiv -- leer: die des ersten Falls. Nur das Bild liest sie, kein Nachweis. Bis 2026-11-20 lebte sie in der Oberflaeche neben dem Projekt und sprang nach dem Neuladen still auf die Vorgabe zurueck.
-- `haeufig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen.
-- `quasistaendig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANT…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
-- `verformung: VerformungEintrag = field(default_factory=VerformungEintrag)` – Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors.
+- `haeufig: Gebrauchsliste = teil(lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL), heisst='Fliessen …` – Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen.
+- `quasistaendig: Gebrauchsliste = teil(lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANTEIL), heisst='Sta…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
+- `verformung: VerformungEintrag = teil(VerformungEintrag, heisst='Verformung')` – Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors.
 - `knickfaelle: List[KnickEintrag] = field(default_factory=list)` – Knicknachweise; leer heisst: keiner.
 - `spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)` – Auswertungen am Querschnitt -- Bilder, keine Nachweise.
 - `automatik_modus: Suchmodus = Suchmodus.GRUND_OHNE_ZULAGE_MIT` – Wonach das Bewehrungswerkzeug sucht -- siehe `bewehrungssuche.Suchmodus`.
@@ -204,7 +204,7 @@ gezeichneten Querschnitt gleich angibt, steht in der Grundlage
 - `automatik_y_wie_x: bool = False` – Ob die y-Grundbewehrung jeder Seite der x-Grundbewehrung dieser Seite folgt -- gleicher Durchmesser, gleiche Teilung. Ein Netz, wie es verlegt wird. Die Suche rechnet schon waehrend des Suchens damit: liegt y aussen, kostet ihr Durchmesser x die statische Hoehe.
 - `automatik_teilungen: List[float] = bereich(heisst='Teilung', einheit=MM, ueber=0.0, fabrik=lambda: [150.…` – Teilungen, die es versucht. Grundbewehrung und Zulage teilen sich eine. Jede ueber null -- das Feld der Oberflaeche liest die Grenze von hier. Vorgabe ist die eine uebliche. Wer mehrere angibt, bekommt die mit der kleinsten Stahlflaeche -- das kostet aber je Teilung einen ganzen Suchlauf, und meistens steht die Teilung ohnehin fest.
 - `automatik_mindestdurchmesser: float = bereich(10.0, heisst='Mindestdurchmesser', einheit=MM, ab=0.0)` – Duennster Stab, den die Suche einbaut -- in mm. Die Grundbewehrung jeder Lage hat ihn mindestens, in x wie in y; die Zulage darf fehlen. Null heisst: kein Mindestdurchmesser, eine Lage darf auch leer bleiben.
-- `automatik_grenze: ObergrenzeEintrag = field(default_factory=ObergrenzeEintrag)` – Mehr Querschnitt bekommt keine x-Lage von der Suche -- in allen Modi, auch beim Optimieren der Plattendicke. Vorgabe ⌀30@150, 4712 mm²/m.
+- `automatik_grenze: ObergrenzeEintrag = teil(ObergrenzeEintrag, heisst='Bewehrung suchen, Obergrenze')` – Mehr Querschnitt bekommt keine x-Lage von der Suche -- in allen Modi, auch beim Optimieren der Plattendicke. Vorgabe ⌀30@150, 4712 mm²/m.
 - `automatik_mindestdicke: float = bereich(150.0, heisst='Mindestdicke', einheit=MM, ueber=0.0)` – Duenner sucht die Dickenoptimierung keine Platte -- in mm.
 - `automatik_querkraft: bool = False` – Ob auch die Buegel gesucht werden.
 - `automatik_querkraft_teilungen: List[float] = bereich(heisst='Bügelteilung', einheit=MM, ueber=0.0, fabrik=lambda: …`
@@ -212,7 +212,7 @@ gezeichneten Querschnitt gleich angibt, steht in der Grundlage
 - `richtung_lage1: Richtung = Richtung.Y` – Richtung der 1. Lage; die 2. bekommt die Gegenrichtung. Vorgabe y, damit x auf der 2. und 3. Lage liegt -- innen. Das ist der unguenstigere Fall und der haeufigere: die Tragrichtung liegt selten zu unterst, weil die Querrichtung darunter durchlaeuft. Wer es anders verlegt, stellt es um.
 - `richtung_lage4: Richtung = Richtung.Y` – Richtung der 4. Lage; die 3. bekommt die Gegenrichtung.
 - `kombinationen: List[KombinationEintrag] = field(default_factory=list)`
-- `tragsicherheit_wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag)` – Womit die Tragsicherheit rechnet -- Vorgabe die Handrechnung mit Bemessungswerten. Die Querkraft und das sproede Versagen lesen ihren Momentenwiderstand aus derselben Linie.
+- `tragsicherheit_wahl: RechenwahlEintrag = teil(RechenwahlEintrag, heisst='Tragsicherheit, Rechenwahl')` – Womit die Tragsicherheit rechnet -- Vorgabe die Handrechnung mit Bemessungswerten. Die Querkraft und das sproede Versagen lesen ihren Momentenwiderstand aus derselben Linie.
 
 #### QuerschnittEintrag.richtung_von
 

@@ -49,7 +49,9 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.core.einheiten import KN, KNM, MM, MM2
-from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von, je_material, ort_von
+from opencivil.projekt.lesen import (
+    ProjektFehler, bereich, einer_von, je_material, ort_von, teil,
+)
 from opencivil.projekt.netz import Netz, neue_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
@@ -219,6 +221,8 @@ class HilfslinieEintrag(Beschreibung):
 class QALastfallEintrag(Beschreibung):
     """Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben."""
 
+    IM_ORT = "Lastfall"
+
     name: str
     N_Ed: float = bereich(0.0, heisst="Normalkraft N_Ed", einheit=KN)
     M_y_Ed: float = bereich(0.0, heisst="Moment M_y,Ed", einheit=KNM)
@@ -236,6 +240,8 @@ class QAGebrauchsfallEintrag(Beschreibung):
     ohne Querkraft und Torsion: begrenzt wird die Stahlspannung, und dafuer
     zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
     """
+
+    IM_ORT = "Lastfall"
 
     name: str
     N_Ed: float = bereich(0.0, heisst="Normalkraft N_Ed", einheit=KN)
@@ -264,7 +270,7 @@ class QAGebrauchsliste(Gebrauchsliste):
     BAUTEIL = "Querschnitt"
 
     faelle: List[QAGebrauchsfallEintrag] = field(default_factory=list)
-    wahl: QAGebrauchswahl = field(default_factory=QAGebrauchswahl)
+    wahl: QAGebrauchswahl = teil(QAGebrauchswahl, heisst="Rechenwahl")
 
 
 @dataclass
@@ -388,12 +394,12 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     eingeht: das Druckfeld jeder Schubwand braucht in Laengsrichtung Zug.
     """
 
-    quasistaendig: QAGebrauchsliste = field(
-        default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_ANTEIL))
+    quasistaendig: QAGebrauchsliste = teil(
+        lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_ANTEIL), heisst="Stahlspannung quasi-ständig")
     """Die quasi-staendigen Lastfaelle -- fuer die Rissbreite."""
 
-    haeufig: QAGebrauchsliste = field(
-        default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))
+    haeufig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL),
+                                     heisst="Fliessen häufig")
     """Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung."""
 
     knickfaelle: List[QAKnickEintrag] = field(default_factory=list)

@@ -526,7 +526,7 @@ class TestEintrag(unittest.TestCase):
             p = Projekt(name="Probe")
             p.grundbruch("F").kombination("K", N_Ed=N, T_Ed=T)
             with self.subTest(N=N, T=T):
-                self.assertIn(f"kombinationen 'K': {satz}", meldung(p))
+                self.assertIn(f"Kombination 'K': {satz}", meldung(p))
 
     def test_ein_bereich_nennt_seine_einheit(self):
         """Der Bereich steht am Feld, mit der Einheit, in der das Feld zählt."""

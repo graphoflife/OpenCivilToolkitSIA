@@ -1,5 +1,5 @@
 ---
-erzeugt: 43d9a1dc6d62
+erzeugt: 7769352e9192
 art: modul
 tags: [modul]
 ---
@@ -112,6 +112,26 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any=dataclasses.MISSING) -> Any
 ```
 
 Ein Feld, das nur einen dieser Werte annimmt -- die Pruefung kennt sie von hier.
+
+### teil
+
+```python
+def teil(fabrik: Callable[[], Any], *, heisst: str) -> Any
+```
+
+Ein Feld, das einen ganzen Eintrag haelt -- die Grundbewehrung einer Lage,
+die Rechenwahl der Tragsicherheit --, mit dem Wort, unter dem es in
+Meldungen steht: wie die Maske es nennt, «Lage 2, Grund», nicht wie die
+Datei, «Lage 2, grund» (Benutzer, 2026-11-21). Ein Element einer Liste
+nennt seine Klasse (`IM_ORT`, [[opencivil.projekt.lesen#_ort|_ort]]).
+
+### _im_ort
+
+```python
+def _im_ort(f: dataclasses.Field) -> str
+```
+
+Wie das Feld `f` als Teil eines Orts heisst -- sein Wort ([[opencivil.projekt.lesen#teil|teil]]), sonst sein Name.
 
 ### je_material
 
@@ -254,7 +274,7 @@ Stichwort der Fassade: er bleibt, wie er ist, und wird ganz geprueft.
 ### _wert_lesen
 
 ```python
-def _wert_lesen(roh: Any, typ: Any, wo: str, feld: str, vorbild: Any) -> Any
+def _wert_lesen(roh: Any, typ: Any, wo: str, f: dataclasses.Field, vorbild: Any) -> Any
 ```
 
 Ein Feld aus der Datei. Eintraege und Listen von Eintraegen werden
@@ -289,13 +309,16 @@ def ort_von(eintrag: Any) -> str
 [[opencivil.projekt.lesen#ort|ort]] eines gelesenen Eintrags -- ein Material heisst nach seiner
 Anzeige, ohne eigenen Namen nach der Sorte.
 
-### _ort_roh
+### element_ort
 
 ```python
-def _ort_roh(element: Any, cls: type, wo: str, feld: str, i: int) -> str
+def element_ort(element: Any, cls: type, wo: str, feld: str, i: int) -> str
 ```
 
-Wie ein Listenelement in Meldungen heisst -- aus der Datei, vor dem Lesen.
+Wie das Element `i` der Liste `feld` in Meldungen heisst -- aus der
+Datei, vor dem Lesen. Auch fuer ein neues, das Python anlegt
+(`MitStaeben._gelesen`): bis 2026-11-21 hiess es dort nach seiner
+Liste, «linien».
 
 ### _ort
 
@@ -305,9 +328,10 @@ def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str
 
 Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
 und dort beginnt der Ort neu; alles darin mit seinem Namen, davor das
-Wort seiner Klasse, wo sie eines hat (`IM_ORT`: «Wand 'W1'» im
-Erdbeben), sonst sein Feld: «kombinationen 'GZT'». Nur Leerzeichen sind
-kein Name.
+Wort seiner Klasse (`IM_ORT`: «Wand 'W1'» im Erdbeben, «Kombination
+'GZT'»). Bis 2026-11-21 stand ohne Wort das Feld der Datei davor,
+«kombinationen 'GZT'»; ein Test wacht, dass jede Klasse eines hat. Nur
+Leerzeichen sind kein Name.
 
 Ohne Namen heisst ein Element, wie die Maske es nennt: mit dem Wort
 seiner Klasse und seiner Nummer (`IM_ORT`: «Lage 2», «Linie 3» wie in
@@ -377,7 +401,7 @@ nur seine Platte oder Analyse rechnet nicht).
 def _ort_von(element: Any, wo: str, feld: str, i: int) -> str
 ```
 
-Wie ein gebautes Listenelement in Meldungen heisst -- wie [[opencivil.projekt.lesen#_ort_roh|_ort_roh]] vor dem Lesen.
+Wie ein gebautes Listenelement in Meldungen heisst -- wie [[opencivil.projekt.lesen#element_ort|element_ort]] vor dem Lesen.
 
 ### _typen
 

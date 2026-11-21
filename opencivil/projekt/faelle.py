@@ -29,6 +29,8 @@ def kennung_von(eintrag: Any) -> str:
 class LastfallEintrag(Beschreibung):
     """Ein Lastfall: eine Kennung, auf die die Lasten zeigen, und ein Name."""
 
+    IM_ORT = "Lastfall"
+
     kennung: str = ""
     name: str = ""
     eigengewicht: bool = False
@@ -41,6 +43,8 @@ class LastfallEintrag(Beschreibung):
 @dataclass
 class LastkombinationEintrag(Beschreibung):
     """Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand."""
+
+    IM_ORT = "Kombination"
 
     kennung: str = ""
     name: str = ""

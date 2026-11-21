@@ -30,8 +30,8 @@ from opencivil.nachweis.duktilitaet import BEIWERT as X_D_BEIWERT, HOECHSTENS as
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C, Richtung
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import (
-    ProjektFehler, als_groesse, bereich, einer_von, je_material, lesen, ort, unbekanntes_feld,
-    vorgabe_je_material, wahl_aus_text,
+    ProjektFehler, als_groesse, bereich, einer_von, je_material, lesen, ort, teil,
+    unbekanntes_feld, vorgabe_je_material, wahl_aus_text,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.rechenwahl import (
@@ -321,6 +321,8 @@ class KnickEintrag(Beschreibung):
     in y waere die Breite der Platte die Laenge.
     """
 
+    IM_ORT = "Knicknachweis"
+
     name: str
     N_Ed: float = bereich(0.0, heisst="Normalkraft N_Ed", einheit=KN)
     """Druck negativ."""
@@ -350,6 +352,8 @@ class VerformungsfallEintrag(Beschreibung):
 
     Wie ein Knickfall nur in x-Richtung.
     """
+
+    IM_ORT = "Verformungsfall"
 
     name: str
     w: float = bereich(0.0, heisst="Durchbiegung w", einheit=MM, ab=0.0)
@@ -446,6 +450,8 @@ class SpannungsfallEintrag(Beschreibung, JeMaterial):
     (:class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`).
     """
 
+    IM_ORT = "Diagramm"
+
     name: str
     art: Analyseart = Analyseart.SCHNITTGROESSEN
     """Was gefragt wird -- siehe :class:`~opencivil.spannungsanalyse.Analyseart`."""
@@ -500,6 +506,8 @@ class GebrauchsfallEintrag(Beschreibung):
     Stahlspannung, und dafuer zaehlen Moment und Normalkraft. Ob der Fall
     haeufig oder quasi-staendig ist, sagt die Liste, in der er steht.
     """
+
+    IM_ORT = "Lastfall"
 
     name: str
     M_Ed: float = bereich(0.0, heisst="Moment M_Ed", einheit=KNM)
@@ -607,7 +615,7 @@ class Gebrauchsliste(Beschreibung):
     faelle: List[GebrauchsfallEintrag] = field(default_factory=list)
     """Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer."""
 
-    wahl: Gebrauchswahl = field(default_factory=Gebrauchswahl)
+    wahl: Gebrauchswahl = teil(Gebrauchswahl, heisst="Rechenwahl")
     """Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch."""
 
     def lastfall(self, name: str, **werte: float):
@@ -706,14 +714,16 @@ class Querschnittsangaben(BauteilEintrag):
     lesen sich ohne Umweg.
     """
 
-    knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)
+    knicken_wahl_verformung: KnickVerformungswahl = teil(
+        KnickVerformungswahl, heisst="Knicken, Verformung (e_2d)")
     """
     Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne
     Vereinfachung (:data:`~opencivil.nachweis.rechenwahl.VERFORMUNGSARTEN`),
     Vorgabe Bemessungswerte.
     """
 
-    knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)
+    knicken_wahl_widerstand: KnickWiderstandswahl = teil(
+        KnickWiderstandswahl, heisst="Knicken, Widerstand (N_Rd)")
     """
     Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die
     0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die
@@ -737,6 +747,8 @@ class Querschnittsangaben(BauteilEintrag):
 @dataclass
 class KombinationEintrag(Beschreibung):
     """Eine zu pruefende Schnittgroessenkombination."""
+
+    IM_ORT = "Einwirkung"
 
     name: str
     M_Ed: float = bereich(0.0, heisst="Moment M_Ed", einheit=KNM)

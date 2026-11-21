@@ -48,6 +48,8 @@ from opencivil.projekt.lesen import ProjektFehler, bereich, lesen
 class PfahlschichtEintrag(Beschreibung):
     """Eine Schicht des Baugrunds, vom Terrain an nach unten -- siehe :class:`~opencivil.pfahl.boden.Pfahlschicht`."""
 
+    IM_ORT = "Schicht"
+
     name: str
     d: float = bereich(20.0, heisst="Dicke d", einheit=M, ueber=0.0)
     gamma: float = bereich(20.0, heisst="Raumlast γ", einheit=KN_PRO_M3, ueber=0.0)
@@ -80,6 +82,8 @@ class PfahlkombinationEintrag(Beschreibung):
     die Querkraft in kN und das Moment in kNm -- siehe
     :class:`~opencivil.pfahl.pfahl.Kombination`.
     """
+
+    IM_ORT = "Kombination"
 
     name: str
     N_Ed: float = bereich(1000.0, heisst="Normalkraft N_Ed, Druck positiv", einheit=KN)

@@ -37,6 +37,8 @@ from opencivil.projekt.lesen import bereich
 class SchichtEintrag(Beschreibung):
     """Eine Schicht des Baugrunds, von der Sohle an nach unten: Dicke und M_E-Werte."""
 
+    IM_ORT = "Schicht"
+
     name: str
     d: float = bereich(2.0, heisst="Dicke d", einheit=M, ueber=0.0)
     """Dicke der Schicht in m."""

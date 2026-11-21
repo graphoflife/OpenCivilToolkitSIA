@@ -1,5 +1,5 @@
 ---
-erzeugt: b44d0d6eee7e
+erzeugt: ef2de885e68b
 art: modul
 tags: [modul]
 ---
@@ -155,6 +155,7 @@ nach dem Zurueckschalten stehen die alten Zahlen wieder da (Benutzer,
 und die Oberflaeche raeumte beim Umschalten ab, was [[opencivil.projekt.staebe#StabquerschnittBasis.fehler|fehler]] sonst
 abwies -- dreimal nachgebessert.
 
+- `IM_ORT = 'Querschnitt'`
 - `KENNWERTE: ClassVar[Tuple[Kennwert, ...]]` – Die Kennwerte von Hand, wie die Rechnung sie nimmt -- mit ihrer Grenze.
 - `kennung: str = ''`
 - `name: str = ''`
@@ -166,7 +167,7 @@ abwies -- dreimal nachgebessert.
 - `platte: str = ''` – Die Kennung der Platte, aus der er kommt.
 - `analyse: str = ''` – Die Kennung der Querschnittsanalyse, aus der er kommt.
 - `e_modul: str = einer_von(E_MODULE, 'e0')` – Welches E ein Stab hat, der das Material dieses Querschnitts nimmt: `e0` -- E_cm seines Betons -- oder `e_eq`, wie `eq` sagt. Ein Material bringt nur einer aus einer Platte oder Analyse mit; bei einer Form wartet die Wahl, bis er zurueckschaltet.
-- `eq: ModulEintrag = field(default_factory=ModulEintrag)` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
+- `eq: ModulEintrag = teil(ModulEintrag, heisst='E_eq')` – Wie das E_eq entsteht -- es gilt nur bei `e_modul = "e_eq"`.
 
 #### StabquerschnittBasis.neu
 
@@ -327,6 +328,17 @@ Wo ein Punkt auf einer Linie liegt, in m ab ihrem Anfang -- auf die Linie gelote
 ```python
 def netz(self) -> Netz
 ```
+
+#### MitStaeben._gelesen
+
+```python
+def _gelesen(self, cls: type, roh: Dict[str, Any], liste: str, neben: Sequence[Any]) -> Any
+```
+
+Ein neues Element der Liste `liste` aus `roh`, gelesen wie aus der
+Datei -- und gemeldet, wie die Datei es nennte: «L3», «Material
+'Beton'» ([[opencivil.projekt.lesen#element_ort|element_ort]]). `neben` sind
+die Elemente, zu denen es kommt.
 
 #### MitStaeben.linie
 

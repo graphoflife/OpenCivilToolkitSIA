@@ -67,7 +67,7 @@ class TestStreng(unittest.TestCase):
         roh["querschnitte"][0]["querkraftbewehrung"]["alpha_min"] = 35.7
         text = meldung(roh)
         self.assertIn("'alpha_min' muss eine ganze Zahl sein, nicht 35.7", text)
-        self.assertIn("querkraftbewehrung", text)
+        self.assertIn("Bügel: 'alpha_min'", text)
 
     def test_eine_ganze_gleitkommazahl_ist_eine_ganze_zahl(self):
         roh = platte_roh()
@@ -95,16 +95,16 @@ class TestStreng(unittest.TestCase):
         Aus einer bearbeiteten Datei liess er bis 2026-11-19 das ganze Projekt
         nicht mehr öffnen (Benutzer: nur seine Platte oder Analyse).
         """
-        for liste, feld, name in (("querschnitte", "kombinationen", ""),
-                                  ("querschnitte", "kombinationen", "  "),
-                                  ("setzungen", "schichten", "")):
+        for liste, feld, wort, name in (("querschnitte", "kombinationen", "Einwirkung", ""),
+                                        ("querschnitte", "kombinationen", "Einwirkung", "  "),
+                                        ("setzungen", "schichten", "Schicht", "")):
             with self.subTest(liste=liste, name=name):
                 roh = Projekt.beispiel().als_dict()
                 roh[liste][0][feld][0]["name"] = name
                 aufbau = Projekt.aus_dict(roh).aufbauen()
                 kennung = roh[liste][0]["kennung"]
                 self.assertEqual(list(aufbau.unfertige), [kennung])
-                self.assertEqual(aufbau.unfertige[kennung].grund, f"{feld} 1: noch kein Name")
+                self.assertEqual(aufbau.unfertige[kennung].grund, f"{wort} 1: noch kein Name")
 
     def test_null_nur_wo_leer_etwas_heisst(self):
         """
@@ -127,8 +127,8 @@ class TestStreng(unittest.TestCase):
         projekt = Projekt.aus_dict(roh)
         projekt.pruefen()
         text = unfertig.meldung(projekt)
-        self.assertIn("tragsicherheit_wahl: Kriechzahl φ kann nicht negativ sein, angegeben "
-                      "ist -1.", text)
+        self.assertIn("Tragsicherheit, Rechenwahl: Kriechzahl φ kann nicht negativ sein, "
+                      "angegeben ist -1.", text)
 
     def test_mehr_als_vier_lagen(self):
         roh = platte_roh()
@@ -282,7 +282,7 @@ class TestInhaltVorDemRechnen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": roh})
         self.assertEqual(antwort.status, 200)
         self.assertEqual(antwort.daten["unfertige"]["querschnitte"]["q1"]["grund"],
-                         "haeufig: Anteil aus der Tragsicherheit muss grösser als null und "
+                         "Fliessen häufig: Anteil aus der Tragsicherheit muss grösser als null und "
                          "höchstens 100 % sein, angegeben ist 0 %")
 
     def test_was_ein_bereich_verlangt(self):
@@ -298,6 +298,38 @@ class TestInhaltVorDemRechnen(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(bereich.grund(wert - 1 if wert > 0 else wert + 1), "")
                 self.assertEqual(bereich.grund(wert), text)
+
+
+class TestOrtWieDieMaske(unittest.TestCase):
+    """
+    Eine Meldung nennt ihren Ort, wie die Maske ihn nennt -- «Lage 2, Grund»,
+    «Kombination 'K'» --, nicht wie die Datei: «Lage 2, grund», «kombinationen
+    'K'» (Benutzer, 2026-11-21).
+    """
+
+    def test_jeder_teil_eines_eintrags_hat_ein_wort(self):
+        """
+        Ein Eintrag im Eintrag trägt sein Wort (`teil`), ein Element einer
+        Liste das seiner Klasse (`IM_ORT`, ein Bauteil `BEZEICHNUNG`) oder,
+        ohne Namen, seine Kennung, wie die Zeichnung es nennt. Ohne stünde
+        still das Feld der Datei in der Meldung.
+        """
+        ohne = []
+        for klasse in eintragsklassen(Projekt):
+            typen = typing.get_type_hints(klasse)
+            for f in dataclasses.fields(klasse):
+                typ = typen[f.name]
+                if typing.get_origin(typ) is typing.Union:
+                    typ = next(a for a in typing.get_args(typ) if a is not type(None))
+                if dataclasses.is_dataclass(typ) and "heisst" not in f.metadata:
+                    ohne.append(f"{klasse.__name__}.{f.name}")
+                if typing.get_origin(typ) is list and dataclasses.is_dataclass(typing.get_args(typ)[0]):
+                    element = typing.get_args(typ)[0]
+                    felder = {x.name for x in dataclasses.fields(element)}
+                    wort = getattr(element, "IM_ORT", None) or getattr(element, "BEZEICHNUNG", None)
+                    if not wort and ("name" in felder or "kennung" not in felder):
+                        ohne.append(f"{klasse.__name__}.{f.name}")
+        self.assertEqual(ohne, [])
 
 
 class TestJedesZahlfeld(unittest.TestCase):
@@ -340,7 +372,7 @@ class TestNichtsStill(unittest.TestCase):
         """
         p = Projekt.beispiel()
         p.querschnitt("q1").lagen[1].grund.abstand = 0.0
-        self.assertIn("Lage 2, grund: Teilung muss grösser als null sein, angegeben ist 0 mm.",
+        self.assertIn("Lage 2, Grund: Teilung muss grösser als null sein, angegeben ist 0 mm.",
                       self.fehler(p))
         grund = p.querschnitt("q1").lagen[1].grund
         grund.abstand, grund.art, grund.anzahl = 150.0, "anzahl", 0.0
@@ -350,7 +382,7 @@ class TestNichtsStill(unittest.TestCase):
         """Sie rechnete und hiess «erfüllt»."""
         p = Projekt.beispiel()
         p.querschnitt("q1").knickfall("Wand", N_Ed=-500.0, laenge=0.0)
-        self.assertIn("knickfaelle 'Wand': Höhe des Druckglieds muss grösser als null sein, "
+        self.assertIn("Knicknachweis 'Wand': Höhe des Druckglieds muss grösser als null sein, "
                       "angegeben ist 0 m.", self.fehler(p))
 
     def test_die_grenzen_der_buegel_gelten_auch_ohne_buegel(self):
@@ -359,10 +391,10 @@ class TestNichtsStill(unittest.TestCase):
                 (lambda q: setattr(q, "k_c", 0.0),
                  "Platte 'Decke über EG': k_c muss grösser als null sein, angegeben ist 0."),
                 (lambda q: setattr(q.querkraftbewehrung, "alpha_max", 90),
-                 "querkraftbewehrung: α_max muss mindestens 1° und höchstens 89° sein, "
+                 "Bügel: α_max muss mindestens 1° und höchstens 89° sein, "
                  "angegeben ist 90°."),
                 (lambda q: setattr(q.querkraftbewehrung, "durchmesser", -10.0),
-                 "querkraftbewehrung: Bügeldurchmesser kann nicht negativ sein")):
+                 "Bügel: Bügeldurchmesser kann nicht negativ sein")):
             with self.subTest(text=text):
                 p = Projekt.beispiel()
                 q = p.querschnitt("q1")
@@ -375,7 +407,7 @@ class TestNichtsStill(unittest.TestCase):
         p = Projekt.beispiel()
         buegel = p.querschnitt("q1").querkraftbewehrung
         buegel.alpha_min, buegel.alpha_max = 50, 40
-        self.assertIn("querkraftbewehrung: α_min darf nicht grösser sein als α_max, "
+        self.assertIn("Bügel: α_min darf nicht grösser sein als α_max, "
                       "angegeben sind 50° und 40°.", self.fehler(p))
         buegel.alpha_min = 40
         with self.assertRaisesRegex(AssertionError, "Alles rechnet"):

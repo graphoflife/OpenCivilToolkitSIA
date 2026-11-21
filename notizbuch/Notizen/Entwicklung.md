@@ -7,6 +7,35 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · Eine Meldung nennt ein Feld wie die Maske
+
+Eine Meldung nannte ihren Ort zum Teil mit den Feldern der Datei: «Platte
+'Decke', Lage 2, grund: Teilung muss grösser als null sein»,
+«querkraftbewehrung: α_max …», «Grundbruch 'F', kombinationen 'K': …». Der
+Benutzer will die Wörter des Fensters (2026-11-21). Jetzt heisst es «Lage
+2, Grund», «Bügel: α_max …», «Kombination 'K'».
+
+- Ein Eintrag im Eintrag trägt sein Wort am Feld, `teil(…, heisst=…)` in
+  `projekt/lesen.py`: «Grund», «Zulage», «Bügel», «Tragsicherheit,
+  Rechenwahl», «Knicken, Verformung (e_2d)», «Fliessen häufig»,
+  «Stahlspannung quasi-ständig», «Bewehrung suchen, Obergrenze», «E_eq» --
+  die Wörter der Kapitel und Zeilen der Maske.
+- Ein Element einer Liste nennt das Wort seiner Klasse (`IM_ORT`), wie
+  schon Lage, Wand und Geschoss: «Einwirkung 'GZT'», «Knicknachweis
+  'Wand'», «Schicht 'Kies'», «Diagramm 2». Ein Element der Zeichnung ohne
+  Namen bleibt bei seiner Kennung, «L3», wie sie im Bild steht.
+- Die Python-Schnittstelle des Balkensystems baute den Ort eines neuen
+  Elements von Hand aus seiner Liste, «linien»; jetzt nach derselben Regel
+  wie das Lesen (`element_ort`).
+- Ein Test wacht, dass jeder Teil eines Eintrags ein Wort hat: ohne stünde
+  still wieder das Feld der Datei in der Meldung.
+
+Geblieben ist das Feld der Datei, wo eine Meldung die Form der Datei
+betrifft -- «'alpha_min' muss eine ganze Zahl sein», «ein Feld 'hh' gibt es
+nicht»: sie richtet sich an wer die Datei oder das Skript schreibt, und der
+braucht den Namen, den er tippt. Die Wörter der Knöpfe («+ Schicht») stehen
+weiter in der Oberfläche.
+
 ## 2026-11-21 · Eine Lastnummer kommt nie wieder
 
 Eine neue Last im Balkensystem nahm in der Zeichnung die grösste

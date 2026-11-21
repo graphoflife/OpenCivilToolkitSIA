@@ -1,5 +1,5 @@
 ---
-erzeugt: c1387a7d39df
+erzeugt: 76a5df11fddf
 art: modul
 tags: [modul]
 ---
@@ -267,6 +267,7 @@ des Projekts (`stoff`) -- E und Dichte von ihm, siehe
 [[opencivil.stabwerk.rechnung#Konstanten|STABKENNWERTE]] -- oder ein eigenes
 mit `E` und `rho` von Hand.
 
+- `IM_ORT = 'Material'`
 - `kennung: str = ''`
 - `art: str = einer_von(STABMATERIALARTEN, 'beton')`
 - `stoff: str = ''` – Die Kennung des Betons oder Baustahls im Projekt (`b1`, `st1`) -- nicht bei `eigen`.
@@ -297,6 +298,7 @@ Ein Diagramm der Statik-Analyse (Benutzer, 2026-10-23): ein Fall und was
 es von ihm zeigt. Gerechnet wird damit nichts -- das System rechnet jeden
 Fall; die Liste sagt nur, welche Diagramme rechts stehen.
 
+- `IM_ORT = 'Diagramm'`
 - `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
 - `groesse: str = einer_von(DIAGRAMMGROESSEN, 'M')`
 

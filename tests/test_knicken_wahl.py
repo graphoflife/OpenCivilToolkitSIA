@@ -217,7 +217,7 @@ class TestDatei(unittest.TestCase):
         return antwort.daten["fehler"]
 
     def test_elastisch_gibt_es_beim_knicken_nicht(self):
-        self.assertIn("knicken_wahl_verformung: 'elastisch' gibt es als 'rechenart' nicht",
+        self.assertIn("Knicken, Verformung (e_2d): 'elastisch' gibt es als 'rechenart' nicht",
                       self.oeffnen(knicken_wahl_verformung={"rechenart": "elastisch"}))
 
     def test_die_handrechnung_einer_alten_datei_wird_genannt(self):
@@ -225,10 +225,11 @@ class TestDatei(unittest.TestCase):
         Bis 2026-10-12 gab es sie beim Knicken. Eine alte Datei, die sie noch
         wählt, wird nicht mehr umgedeutet -- sie nennt die Wahl.
         """
-        for feld in ("knicken_wahl_verformung", "knicken_wahl_widerstand"):
+        for feld, wort in (("knicken_wahl_verformung", "Knicken, Verformung (e_2d)"),
+                           ("knicken_wahl_widerstand", "Knicken, Widerstand (N_Rd)")):
             with self.subTest(feld=feld):
                 text = self.oeffnen(**{feld: {"rechenart": "handrechnung"}})
-                self.assertIn(f"{feld}: 'handrechnung' gibt es als 'rechenart' nicht", text)
+                self.assertIn(f"{wort}: 'handrechnung' gibt es als 'rechenart' nicht", text)
 
     def test_der_block_gibt_es_in_der_verformung_nicht(self):
         self.assertIn("'block' gibt es als 'rechenart' nicht", self.oeffnen(

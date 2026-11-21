@@ -1,5 +1,5 @@
 ---
-erzeugt: 61941207efb2
+erzeugt: 3d4bff54e35d
 art: modul
 tags: [modul]
 ---
@@ -279,6 +279,7 @@ Ein Knicknachweis: Druckkraft, Moment 1. Ordnung, Laenge, Knicklaenge.
 Nur in x-Richtung -- eine Knicklaenge gehoert zu einer Tragrichtung, und
 in y waere die Breite der Platte die Laenge.
 
+- `IM_ORT = 'Knicknachweis'`
 - `name: str`
 - `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)` – Druck negativ.
 - `M_Ed_1: float = bereich(0.0, heisst='Moment 1. Ordnung M_Ed,1', einheit=KNM)`
@@ -298,6 +299,7 @@ ermittelt, ihre Spannweite und die Seite, die er zieht.
 
 Wie ein Knickfall nur in x-Richtung.
 
+- `IM_ORT = 'Verformungsfall'`
 - `name: str`
 - `w: float = bereich(0.0, heisst='Durchbiegung w', einheit=MM, ab=0.0)` – Durchbiegung in mm, mit E_cm ermittelt -- ein Betrag.
 - `laenge: float = bereich(5.0, heisst='Spannweite L', einheit=M, ueber=0.0)` – Spannweite L in m -- der Grenzwert ist L/350.
@@ -389,6 +391,7 @@ Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, je
 Material den Wertesatz ([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]]) und die Rechenart
 ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]).
 
+- `IM_ORT = 'Diagramm'`
 - `name: str`
 - `art: Analyseart = Analyseart.SCHNITTGROESSEN` – Was gefragt wird -- siehe [[opencivil.spannungsanalyse.art#Analyseart|Analyseart]].
 - `richtung: Richtung = Richtung.X` – Welche Bewehrung zaehlt. Hier keine Wahl `beide`: ein Bild zeigt einen Querschnitt, und der liegt in einer Richtung.
@@ -432,6 +435,7 @@ Wie [[opencivil.projekt.eintraege#KombinationEintrag|KombinationEintrag]], aber 
 Stahlspannung, und dafuer zaehlen Moment und Normalkraft. Ob der Fall
 haeufig oder quasi-staendig ist, sagt die Liste, in der er steht.
 
+- `IM_ORT = 'Lastfall'`
 - `name: str`
 - `M_Ed: float = bereich(0.0, heisst='Moment M_Ed', einheit=KNM)`
 - `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)`
@@ -533,7 +537,7 @@ Bauteil gelesen wird ([[opencivil.projekt.eintraege#Gebrauchsliste|BAUTEIL]]).
 - `anteil: float = bereich(heisst='Anteil aus der Tragsicherheit', einheit=PROZENT, uebe…` – Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %. Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer aufgeht und nichts sagt. Ueber hundert waere keine Gebrauchslast mehr. Gemeldet statt begrenzt: wer 700 statt 70 tippt, soll es erfahren und nicht mit 100 weiterrechnen.
 - `aus_tragsicherheit: bool = False` – Ob die abgeleiteten Faelle *gefuehrt* werden. Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Der Anteil ist eine bequeme Abschaetzung und keine Norm, darum stehen die Faelle nur auf Verlangen in der Tabelle.
 - `faelle: List[GebrauchsfallEintrag] = field(default_factory=list)` – Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer.
-- `wahl: Gebrauchswahl = field(default_factory=Gebrauchswahl)` – Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch.
+- `wahl: Gebrauchswahl = teil(Gebrauchswahl, heisst='Rechenwahl')` – Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch.
 
 #### Gebrauchsliste.lastfall
 
@@ -588,8 +592,8 @@ Geometrie ohne Vorgabe dahinter folgen -- der Beton der Platte.
 - `sproede: bool = False` – Ob der Nachweis gegen sproedes Versagen gefuehrt wird.
 - `duktilitaet: bool = False` – Ob der Duktilitaetsnachweis gefuehrt wird. Ein Schalter fuer das Bauteil und nicht einer je Lage. An der Platte werden beide x-Lagen gerechnet -- die obere traegt das Stuetz-, die untere das Feldmoment --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die beantwortet die schlechtere Lage.
 - `x_d_max: float = x_d_grenze()` – Der Beiwert k der Grenze `x/d <= k * 435 N/mm^2 / f_yd` im Duktilitaetsnachweis. Bis 2026-11-14 war er selbst die Grenze; bei B500 sind beide gleich, darum heisst das Feld weiter so, und alte Dateien lesen sich ohne Umweg.
-- `knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte.
-- `knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
+- `knicken_wahl_verformung: KnickVerformungswahl = teil(KnickVerformungswahl, heisst='Knicken, Verformung (e_2d)')` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte.
+- `knicken_wahl_widerstand: KnickWiderstandswahl = teil(KnickWiderstandswahl, heisst='Knicken, Widerstand (N_Rd)')` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
 - `k_c: float = druckfeld()` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
 - `beschreibung: str = ''` – Freier Text zum Bauteil -- was sonst nirgends hinpasst. Wo es liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist. Geht in keine Rechnung ein und steht in keinem Nachweis; er wird gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es ihn: ohne ein solches Feld landen solche Saetze im Namen.
 
@@ -602,6 +606,7 @@ class KombinationEintrag(Beschreibung)
 
 Eine zu pruefende Schnittgroessenkombination.
 
+- `IM_ORT = 'Einwirkung'`
 - `name: str`
 - `M_Ed: float = bereich(0.0, heisst='Moment M_Ed', einheit=KNM)`
 - `N_Ed: float = bereich(0.0, heisst='Normalkraft N_Ed', einheit=KN)`
