@@ -5938,10 +5938,9 @@
       "stichworte": [
         "buegelwiderstand",
         "Buegelwerte",
+        "Buegelwerte.punkt",
         "Buegelwerte.neigungen",
         "Buegelwerte.suche",
-        "Neigungssuche",
-        "neigungen",
         "buegelteilung_y",
         "protokoll_mit_buegeln",
         "BefundMitBuegeln",
@@ -7524,7 +7523,10 @@
         "Buegelpunkt",
         "Buegelpunkt.V_Rd",
         "fachwerk",
-        "beste_neigung"
+        "beste_neigung",
+        "druckfeldgrenzen",
+        "Neigungssuche",
+        "guenstigste"
       ]
     },
     {
@@ -7729,7 +7731,6 @@
         "Querkraftbewehrung.ueber_abstand_y",
         "Querkraftbewehrung.flaeche",
         "Querkraftbewehrung.menge_text",
-        "druckfeldgrenzen",
         "stapelhoehe",
         "Plattenquerschnitt",
         "Plattenquerschnitt.id_breite",
@@ -7791,8 +7792,6 @@
         "_bredt",
         "wandkraefte",
         "schwaechste",
-        "Wandwiderstand",
-        "Wandwiderstand.V_Rd",
         "widerstand",
         "Laengszug",
         "laengszug"

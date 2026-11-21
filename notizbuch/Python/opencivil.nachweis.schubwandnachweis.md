@@ -1,5 +1,5 @@
 ---
-erzeugt: bdcfaae4226f
+erzeugt: 5f875566f9b5
 art: modul
 tags: [modul]
 ---
@@ -55,7 +55,7 @@ war er belastet, sagt `ohne` warum.
 
 - `modell: sw.Zellenmodell`
 - `verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)`
-- `widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)`
+- `widerstaende: Dict[str, List[Buegelpunkt]] = field(default_factory=dict)`
 - `vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)` – Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand.
 - `ohne: Dict[str, str] = field(default_factory=dict)` – Je belasteter Lastfall ohne Verteilung der Grund -- es gibt keine Wand, oder die Waende tragen nicht. Derselbe Satz wie im Urteil.
 
@@ -98,7 +98,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.wert]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.biegung]]
-- [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.schubwaende]]
 
 ## Gebraucht von

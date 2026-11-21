@@ -35,8 +35,10 @@ from opencivil.nachweis.querkraft import (
     Querkraft, Querkraftergebnis, Querkraftfall, _hoch, _ohne_zugbewehrung, protokoll_hoehen,
     statische_hoehen, zugposten,
 )
-from opencivil.querschnitt.fachwerk import Buegelpunkt, beste_neigung, fachwerk
-from opencivil.querschnitt.platte import ALPHA_ZUG, Richtung, druckfeldgrenzen
+from opencivil.querschnitt.fachwerk import (
+    ALPHA_ZUG, Buegelpunkt, Neigungssuche, fachwerk, guenstigste,
+)
+from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 
 MIT_BUEGELN = "Querkraftwiderstand mit Querkraftbewehrung"
@@ -91,50 +93,28 @@ class Buegelwerte:
     alpha_max: int
     """Die Grenzen der Neigung, wie eingegeben -- bei Normalzug hebt sie :meth:`suche`."""
 
+    def punkt(self, d: float, alpha: int) -> Buegelpunkt:
+        """Der Widerstand bei der Neigung ``alpha`` in Grad und der statischen Hoehe ``d``."""
+        return buegelwiderstand(alpha=alpha, a_s=self.a_s, s_x=self.s_x, s_y=self.s_y, d=d,
+                                f_yd=self.f_yd, f_cd=self.f_cd, k_c=self.k_c)
+
     def neigungen(self, d: float, von: int, bis: int) -> List[Buegelpunkt]:
         """
         Der Widerstand je ganzes Grad von ``von`` bis ``bis`` bei der
-        statischen Hoehe ``d`` -- fuer die Suche und fuer das Bild, das auch
-        ausserhalb der Grenzen zeichnet, dort blass. Zwei Rechenwege fuer
-        dieselbe Kurve liefen auseinander.
+        statischen Hoehe ``d`` -- fuer das Bild, das auch ausserhalb der
+        Grenzen zeichnet, dort blass. Jeder Punkt kommt aus :meth:`punkt`, wie
+        bei der Suche: zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
         """
-        return neigungen(alpha_min=von, alpha_max=bis, a_s=self.a_s, s_x=self.s_x,
-                         s_y=self.s_y, d=d, f_yd=self.f_yd, f_cd=self.f_cd, k_c=self.k_c)
+        return [self.punkt(d, alpha) for alpha in range(von, bis + 1)]
 
     def suche(self, d: float, *, zugkraft: bool) -> Neigungssuche:
         """
-        Die guenstigste Neigung bei der statischen Hoehe ``d``, ganzgradig
-        zwischen den Grenzen, die eine Normalzugkraft hebt
-        (:func:`~opencivil.querschnitt.platte.druckfeldgrenzen`) -- fuer die
+        Die guenstigste Neigung bei der statischen Hoehe ``d``
+        (:func:`~opencivil.querschnitt.fachwerk.guenstigste`) -- fuer die
         Faelle und die Kennzahlen der Platte dieselbe Suche.
         """
-        von, bis = druckfeldgrenzen(self.alpha_min, self.alpha_max, zugkraft)
-        punkte = tuple(self.neigungen(d, von, bis))
-        return Neigungssuche(alpha_min=von, alpha_max=bis, punkte=punkte,
-                             massgebend=beste_neigung(punkte))
-
-
-@dataclass(frozen=True)
-class Neigungssuche:
-    """Was :meth:`Buegelwerte.suche` findet."""
-
-    alpha_min: int
-    alpha_max: int
-    """Die verwendeten Grenzen; bei Normalzug angehoben."""
-
-    punkte: Tuple[Buegelpunkt, ...]
-    """Der Widerstand je ganzem Grad zwischen den beiden."""
-
-    massgebend: Buegelpunkt
-    """Der Punkt mit dem groessten Widerstand."""
-
-
-def neigungen(
-    *, alpha_min: int, alpha_max: int, **werte: float
-) -> List[Buegelpunkt]:
-    """Je ganzes Grad im Bereich ein Punkt, einschliesslich der Grenzen."""
-    return [buegelwiderstand(alpha=a, **werte)
-            for a in range(alpha_min, alpha_max + 1)]
+        return guenstigste(lambda alpha: self.punkt(d, alpha), alpha_min=self.alpha_min,
+                           alpha_max=self.alpha_max, zugkraft=zugkraft)
 
 
 def buegelteilung_y(buegel, b: float, menge_y: float) -> float:

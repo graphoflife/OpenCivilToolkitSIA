@@ -52,6 +52,9 @@ from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Kennzahl, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 from opencivil.material.betonstahl import STAHLDICHTE
+from opencivil.querschnitt.fachwerk import (
+    ALPHA_MAX, ALPHA_MIN, K_C, REFERENZ_ALPHA_MAX, REFERENZ_ALPHA_MIN, REFERENZ_K_C,
+)
 from opencivil.querschnitt.lagenaufbau import (
     REFERENZ_NENNDURCHMESSER, Lagenaufbau, Postenbezug,
 )
@@ -227,31 +230,11 @@ class Bewehrungslage:
         return f"{self.nummer},{self.richtung.value}"
 
 
-#: Vorgabe fuer die Neigung der Druckdiagonalen, in Grad: 30° ist im
-#: Normalfall die untere Grenze (SIA 262:2025, 4.3.3.3.3), 45° die obere der
-#: Norm (4.3.3.3.2, Gl. (42)).
-ALPHA_MIN = 30
-ALPHA_MAX = 45
-
-#: Bei einer Normalzugkraft steilt sich die Druckdiagonale auf. Beide Grenzen
-#: werden dann auf mindestens diesen Wert gehoben (SIA 262:2025, 4.3.3.3.3).
-ALPHA_ZUG = 40
-
-#: Vorgabe fuer den Abminderungsbeiwert der Betondruckfestigkeit in der
-#: Druckdiagonalen: der Wert fuer Stege, deren Druckfeld die Bewehrung schief
-#: kreuzt (SIA 262:2025, 4.2.1.7).
-K_C = 0.55
-
-#: Wo die Grenzen der Neigung und k_c stehen -- fuer die Platte und die
-#: Querschnittsanalyse.
-REFERENZ_ALPHA_MIN = "SIA 262:2025, 4.3.3.3.3"
-REFERENZ_ALPHA_MAX = "SIA 262:2025, 4.3.3.3.2, (42)"
-REFERENZ_K_C = "SIA 262:2025, 4.2.1.7"
-
 #: Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die
 #: Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe 30 mm ist
 #: keiner davon -- die Klasse kennt nur der Ingenieur.
 REFERENZ_UEBERDECKUNG = "SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18"
+
 
 @dataclass
 class Querkraftbewehrung:
@@ -304,22 +287,6 @@ class Querkraftbewehrung:
              else f"{self.anzahl_y:g} Stk")
         return (f"⌀{self.durchmesser.formatiert(0)}, "
                 f"x: {self.abstand_x.formatiert(0)} mm, y: {y}")
-
-
-def druckfeldgrenzen(alpha_min: int, alpha_max: int, zugkraft: bool) -> Tuple[int, int]:
-    """
-    Die beiden Grenzwinkel der Druckdiagonalen in Grad, angepasst an das
-    Vorzeichen von ``N_Ed`` -- fuer die Buegel der Platte wie fuer die
-    Schubwaende der Querschnittsanalyse.
-
-    Bei Normalzug steilt sich die Druckdiagonale auf: ``alpha_min`` ist dann
-    mindestens 40°, und ``alpha_max`` wird notfalls mitgehoben, damit der
-    Bereich nicht leer wird (SIA 262:2025, 4.3.3.3.3). Bis 2026-11-14 wurde
-    ``alpha_min`` auf genau 40° gesetzt -- auch von 42° herunter.
-    """
-    if not zugkraft:
-        return alpha_min, alpha_max
-    return max(alpha_min, ALPHA_ZUG), max(alpha_max, ALPHA_ZUG)
 
 
 # ===========================================================================

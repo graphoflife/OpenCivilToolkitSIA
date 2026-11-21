@@ -46,7 +46,7 @@ from opencivil.querschnitt.bewehrungselemente import Bewehrungselement, aus_lini
 from opencivil.querschnitt.biegung import SCHIEF, Biegung
 from opencivil.querschnitt.geometrie import GeometrieFehler, Linienart, Punkt
 from opencivil.querschnitt.interaktion import Bewehrung, Querschnitt, Teil, Werkstoff
-from opencivil.querschnitt.platte import REFERENZ_ALPHA_MAX, REFERENZ_ALPHA_MIN, REFERENZ_K_C
+from opencivil.querschnitt.fachwerk import REFERENZ_ALPHA_MAX, REFERENZ_ALPHA_MIN, REFERENZ_K_C
 from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN

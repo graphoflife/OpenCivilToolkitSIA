@@ -7,6 +7,26 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · Das Fachwerk an einer Stelle
+
+Ein Umbau ohne neue Zahl, vom Benutzer gewählt (2026-11-21):
+
+- Die Regeln der Druckdiagonalen standen in `querschnitt/platte.py`: die
+  Grenzen der Neigung (30° und 45°), ihre Hebung auf 40° bei Normalzug
+  (`druckfeldgrenzen`) und `k_c` = 0.55. Sieben Module holten sie dort,
+  auch der Pfahl, der mit der Platte nichts zu tun hat. Und die Suche nach
+  der günstigsten Neigung stand dreimal da: bei den Bügeln der Platte, bei
+  den Schubwänden und bei der Wendel des Pfahls, jedes Mal dieselben vier
+  Zeilen.
+- Jetzt besitzt `querschnitt/fachwerk.py` beides: die Regeln und
+  `guenstigste(punkt, alpha_min=, alpha_max=, zugkraft=)`. Jeder Nutzer
+  gibt nur noch sein Fachwerk bei einer Neigung (`punkt`) -- die Bügel je
+  Laufmeter, die Wand mit ihrer Länge als Hebelarm, die Wendel mit 70 %.
+- `Wandwiderstand` war Feld für Feld ein `Buegelpunkt` und ist weg; eine
+  Wand gibt den `Buegelpunkt` ihrer günstigsten Neigung.
+- Die Bügel der Platte haben `Buegelwerte.punkt`; die Kurve fürs Bild
+  (`neigungen`) und die Suche rechnen jeden Punkt damit.
+
 ## 2026-11-21 · m_Rd mit Einheit, die Zahl der Tests
 
 - Die M-V-Kurve der Platte schrieb an ihre senkrechte Linie «m_Rd = 235.9»,

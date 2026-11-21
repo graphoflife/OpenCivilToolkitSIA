@@ -1,5 +1,5 @@
 ---
-erzeugt: b08f25f5eaac
+erzeugt: f1700a23a7aa
 art: modul
 tags: [modul]
 ---
@@ -333,36 +333,18 @@ Die Wand mit dem kleinsten Grad. Bei Gleichstand -- bis auf die letzten
 Stellen der Rechnung, etwa alle Waende einer Zelle unter Torsion -- die
 erste, damit nicht Rundung entscheidet, welche Wand massgebend heisst.
 
-### Wandwiderstand
-
-```python
-@dataclass(frozen=True)
-class Wandwiderstand
-```
-
-Was eine Wand ueber ihre ganze Laenge aufnimmt, bei der guenstigsten Neigung.
-
-- `alpha: int`
-- `V_Rd_s: float` – Buegel, in N.
-- `V_Rd_c: float` – Druckdiagonale, in N.
-
-#### Wandwiderstand.V_Rd
-
-```python
-@property
-def V_Rd(self) -> float
-```
-
 ### widerstand
 
 ```python
-def widerstand(w: Wand, *, alpha_min: int, alpha_max: int, zugkraft: bool) -> Wandwiderstand
+def widerstand(w: Wand, *, alpha_min: int, alpha_max: int, zugkraft: bool) -> Buegelpunkt
 ```
 
-Der Widerstand einer Wand: das Fachwerk mit ihrer Laenge als Hebelarm,
-ganzgradig ueber α, massgebend das groesste `min(V_Rd,s; V_Rd,c)`
-([[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_WAND]]). Bei Normalzug gelten die gehobenen Grenzen der
-Platte ([[opencivil.querschnitt.platte#druckfeldgrenzen|druckfeldgrenzen]]).
+Was eine Wand ueber ihre ganze Laenge aufnimmt, in N: das Fachwerk mit
+ihrer Laenge als Hebelarm, bei der guenstigsten Neigung
+([[opencivil.querschnitt.fachwerk#guenstigste|guenstigste]], [[opencivil.querschnitt.schubwaende#Konstanten|REFERENZ_WAND]])
+-- bei Normalzug zwischen den gehobenen Grenzen, wie bei der Platte. Bis
+2026-11-21 kam das als `Wandwiderstand`, Feld fuer Feld ein
+[[opencivil.querschnitt.fachwerk#Buegelpunkt|Buegelpunkt]].
 
 ### Laengszug
 
@@ -410,7 +392,6 @@ die Mitten nicht im Schwerpunkt, gibt das auch Momente:
 ## Braucht
 
 - [[opencivil.querschnitt.fachwerk]]
-- [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von
 

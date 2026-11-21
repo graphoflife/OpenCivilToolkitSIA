@@ -66,12 +66,11 @@ from opencivil.pfahl.innen import WAHL, Innenbefund, biegewiderstand, querschnit
 from opencivil.pfahl.pfahl import Kombination, Pfahl
 from opencivil.pfahl.steifigkeit import Steifigkeitsbefund, Verlauf
 from opencivil.querschnitt.analyse import KENNWERTE, werkstoff
-from opencivil.querschnitt.fachwerk import beste_neigung, fachwerk
-from opencivil.querschnitt.interaktion import Querschnitt
-from opencivil.querschnitt.platte import (
-    ALPHA_MAX, ALPHA_MIN, K_C, REFERENZ_ALPHA_MAX, REFERENZ_ALPHA_MIN, REFERENZ_K_C,
-    druckfeldgrenzen,
+from opencivil.querschnitt.fachwerk import (
+    ALPHA_MAX, ALPHA_MIN, K_C, REFERENZ_ALPHA_MAX, REFERENZ_ALPHA_MIN, REFERENZ_K_C, fachwerk,
+    guenstigste,
 )
+from opencivil.querschnitt.interaktion import Querschnitt
 
 #: An so vielen Normalkräften wird M_Rd gerechnet, dazwischen linear gelesen.
 STUETZSTELLEN = 7
@@ -286,11 +285,11 @@ class InnererQuerwiderstand(Nachweis):
         V_Rd -- aus den Werten ``w`` des Fachwerks.
         """
         si = {name: x.groesse.si for name, x in w.items()}
-        von, bis = druckfeldgrenzen(ALPHA_MIN, ALPHA_MAX, zug)
-        punkt = beste_neigung([fachwerk(alpha=a, a_sw_s=WENDEL * si["A"] / si["s"], z=si["z"],
-                                        b_w=si["b_w"], f_yd=si["f_yd"], f_cd=si["f_cd"],
-                                        k_c=si["k_c"])
-                               for a in range(von, bis + 1)])
+        suche = guenstigste(lambda alpha: fachwerk(
+            alpha=alpha, a_sw_s=WENDEL * si["A"] / si["s"], z=si["z"], b_w=si["b_w"],
+            f_yd=si["f_yd"], f_cd=si["f_cd"], k_c=si["k_c"]),
+            alpha_min=ALPHA_MIN, alpha_max=ALPHA_MAX, zugkraft=zug)
+        punkt, von, bis = suche.massgebend, suche.alpha_min, suche.alpha_max
         wo = (", unter Zug" if zug else ", unter Druck") if beide else ""
         n, i = ("_zug", ",Z") if zug else ("", "")
         alpha = werte.wert(f"alpha{n}", rf"\alpha{'_Z' if zug else ''}",

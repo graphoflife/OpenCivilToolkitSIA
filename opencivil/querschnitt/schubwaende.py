@@ -85,8 +85,7 @@ import math
 from dataclasses import dataclass, replace
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.querschnitt.fachwerk import beste_neigung, fachwerk
-from opencivil.querschnitt.platte import druckfeldgrenzen
+from opencivil.querschnitt.fachwerk import Buegelpunkt, fachwerk, guenstigste
 
 Punkt = Tuple[float, float]
 
@@ -574,36 +573,20 @@ def schwaechste(grade: Sequence[float]) -> int:
     return next(i for i, g in enumerate(grade) if g <= kleinster * (1.0 + 1e-9))
 
 
-@dataclass(frozen=True)
-class Wandwiderstand:
-    """Was eine Wand ueber ihre ganze Laenge aufnimmt, bei der guenstigsten Neigung."""
-
-    alpha: int
-    V_Rd_s: float
-    """Buegel, in N."""
-
-    V_Rd_c: float
-    """Druckdiagonale, in N."""
-
-    @property
-    def V_Rd(self) -> float:
-        return min(self.V_Rd_s, self.V_Rd_c)
-
-
 def widerstand(w: Wand, *, alpha_min: int, alpha_max: int,
-               zugkraft: bool) -> Wandwiderstand:
+               zugkraft: bool) -> Buegelpunkt:
     """
-    Der Widerstand einer Wand: das Fachwerk mit ihrer Laenge als Hebelarm,
-    ganzgradig ueber α, massgebend das groesste ``min(V_Rd,s; V_Rd,c)``
-    (:data:`REFERENZ_WAND`). Bei Normalzug gelten die gehobenen Grenzen der
-    Platte (:func:`~opencivil.querschnitt.platte.druckfeldgrenzen`).
+    Was eine Wand ueber ihre ganze Laenge aufnimmt, in N: das Fachwerk mit
+    ihrer Laenge als Hebelarm, bei der guenstigsten Neigung
+    (:func:`~opencivil.querschnitt.fachwerk.guenstigste`, :data:`REFERENZ_WAND`)
+    -- bei Normalzug zwischen den gehobenen Grenzen, wie bei der Platte. Bis
+    2026-11-21 kam das als ``Wandwiderstand``, Feld fuer Feld ein
+    :class:`~opencivil.querschnitt.fachwerk.Buegelpunkt`.
     """
-    von, bis = druckfeldgrenzen(alpha_min, alpha_max, zugkraft)
-    punkte = [fachwerk(alpha=a, a_sw_s=w.a_sw_s, z=w.laenge, b_w=w.b_w,
-                       f_yd=w.f_yd, f_cd=w.f_cd, k_c=w.k_c)
-              for a in range(von, bis + 1)]
-    beste = beste_neigung(punkte)
-    return Wandwiderstand(alpha=beste.alpha, V_Rd_s=beste.V_Rd_s, V_Rd_c=beste.V_Rd_c)
+    return guenstigste(lambda alpha: fachwerk(alpha=alpha, a_sw_s=w.a_sw_s, z=w.laenge,
+                                              b_w=w.b_w, f_yd=w.f_yd, f_cd=w.f_cd,
+                                              k_c=w.k_c),
+                       alpha_min=alpha_min, alpha_max=alpha_max, zugkraft=zugkraft).massgebend
 
 
 @dataclass(frozen=True)

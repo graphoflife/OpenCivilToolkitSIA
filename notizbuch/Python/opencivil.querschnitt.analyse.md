@@ -1,5 +1,5 @@
 ---
-erzeugt: 5f4727fcf797
+erzeugt: 326ea94c121b
 art: modul
 tags: [modul]
 ---
@@ -443,11 +443,11 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.material.basis]]
 - [[opencivil.querschnitt.bewehrungselemente]]
 - [[opencivil.querschnitt.biegung]]
+- [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
-- [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.querschnitt.torsion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]

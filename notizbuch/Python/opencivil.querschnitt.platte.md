@@ -1,5 +1,5 @@
 ---
-erzeugt: 0fb38abd7846
+erzeugt: 4e3b1d5c95ce
 art: modul
 tags: [modul]
 ---
@@ -289,21 +289,6 @@ Querschnitt **eines** Bügelschenkels.
 def menge_text(self) -> str
 ```
 
-### druckfeldgrenzen
-
-```python
-def druckfeldgrenzen(alpha_min: int, alpha_max: int, zugkraft: bool) -> Tuple[int, int]
-```
-
-Die beiden Grenzwinkel der Druckdiagonalen in Grad, angepasst an das
-Vorzeichen von `N_Ed` -- fuer die Buegel der Platte wie fuer die
-Schubwaende der Querschnittsanalyse.
-
-Bei Normalzug steilt sich die Druckdiagonale auf: `alpha_min` ist dann
-mindestens 40°, und `alpha_max` wird notfalls mitgehoben, damit der
-Bereich nicht leer wird (SIA 262:2025, 4.3.3.3.3). Bis 2026-11-14 wurde
-`alpha_min` auf genau 40° gesetzt -- auch von 42° herunter.
-
 ### stapelhoehe
 
 ```python
@@ -437,13 +422,6 @@ Rechnung sehen statt nur die Zahl.
 
 - `LAGENZAHL = 4` – Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je eine Haupt- und eine Querlage, mehr braucht es nicht, weniger waere ein Sonderfall mit leeren Lagen.
 - `BREITE_Y_MM = 1000.0` – Breite, auf die sich eine y-Lage bezieht: in y wird immer je Laufmeter gerechnet, `b` ist der Streifen in x.
-- `ALPHA_MIN = 30` – Vorgabe fuer die Neigung der Druckdiagonalen, in Grad: 30° ist im Normalfall die untere Grenze (SIA 262:2025, 4.3.3.3.3), 45° die obere der Norm (4.3.3.3.2, Gl. (42)).
-- `ALPHA_MAX = 45`
-- `ALPHA_ZUG = 40` – Bei einer Normalzugkraft steilt sich die Druckdiagonale auf. Beide Grenzen werden dann auf mindestens diesen Wert gehoben (SIA 262:2025, 4.3.3.3.3).
-- `K_C = 0.55` – Vorgabe fuer den Abminderungsbeiwert der Betondruckfestigkeit in der Druckdiagonalen: der Wert fuer Stege, deren Druckfeld die Bewehrung schief kreuzt (SIA 262:2025, 4.2.1.7).
-- `REFERENZ_ALPHA_MIN = 'SIA 262:2025, 4.3.3.3.3'` – Wo die Grenzen der Neigung und k_c stehen -- fuer die Platte und die Querschnittsanalyse.
-- `REFERENZ_ALPHA_MAX = 'SIA 262:2025, 4.3.3.3.2, (42)'`
-- `REFERENZ_K_C = 'SIA 262:2025, 4.2.1.7'`
 - `REFERENZ_UEBERDECKUNG = 'SIA 262:2025, 5.2.2.1; 5.2.2.4, Tabelle 18'` – Was die Ueberdeckung c_nom ist und welche sie mindestens sein muss: die Werte je Expositionsklasse stehen in Tabelle 18. Die Vorgabe 30 mm ist keiner davon -- die Klasse kennt nur der Ingenieur.
 - `UEBERDECKUNGEN = 'Überdeckungen'` – Die beiden Kaesten, in denen die Plattenangaben zusammenstehen. Der erste traegt die Betonsorte im Namen: sie ist keine gerechnete Groesse und hat darum keine eigene Kette, an der sie haengen koennte -- als Aufschrift des Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
 
@@ -457,6 +435,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.betonstahl]]
+- [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.lagenaufbau]]
 - [[opencivil.querschnitt.zugseite]]
 
@@ -477,20 +456,16 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
-- [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.verformung]]
-- [[opencivil.pfahl.innen_quer]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.durchstanzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
-- [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.lagenaufbau]]
-- [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.web.api]]

@@ -543,11 +543,22 @@ class TestBuegelformeln(unittest.TestCase):
     def test_gesucht_wird_das_groesste_kleinere(self):
         """
         Der Widerstand ist das Kleinere von beiden; gesucht ist dessen
-        Höchstwert. Von Hand: das Maximum über alle ganzen Grade.
+        Höchstwert. Von Hand: das Maximum über alle ganzen Grade, beide
+        Grenzen eingeschlossen.
         """
-        punkte = querkraft_buegel.neigungen(alpha_min=25, alpha_max=60, **self.werte)
-        beste = fachwerk.beste_neigung(punkte)
-        self.assertAlmostEqual(beste.V_Rd, max(q.V_Rd for q in punkte))
+        suche = fachwerk.guenstigste(
+            lambda a: querkraft_buegel.buegelwiderstand(alpha=a, **self.werte),
+            alpha_min=25, alpha_max=60, zugkraft=False)
+        self.assertEqual([q.alpha for q in suche.punkte], list(range(25, 61)))
+        self.assertAlmostEqual(suche.massgebend.V_Rd, max(q.V_Rd for q in suche.punkte))
+
+    def test_normalzug_hebt_die_grenzen(self):
+        """Unter Zug sucht die Platte erst ab 40°, auch die obere Grenze steigt mit."""
+        suche = fachwerk.guenstigste(
+            lambda a: querkraft_buegel.buegelwiderstand(alpha=a, **self.werte),
+            alpha_min=30, alpha_max=35, zugkraft=True)
+        self.assertEqual((suche.alpha_min, suche.alpha_max), (40, 40))
+        self.assertEqual([q.alpha for q in suche.punkte], [40])
 
     def test_bei_gleichstand_gilt_die_steilere_neigung(self):
         """Sie beansprucht die Druckdiagonale weniger."""

@@ -468,13 +468,12 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
           der Knicknachweise, Thema und Namen der Rissnormalkraft, `dazu`
           und `_belegen` der Kennzahlen. Umbau: gemeinsame Oberklassen wie
           `Biegezwang` und `Spannungsbegrenzung` es vormachen.
-        - Das Fachwerk liegt halb in `querschnitt/platte.py`: die
-          Druckfeldregeln (`ALPHA_MIN`, `ALPHA_MAX`, `K_C`,
-          `druckfeldgrenzen`) holen sieben Module dort, die Neigungssuche
-          steht dreimal (`schubwaende.py`, `pfahl/innen_quer.py`,
-          `querkraft_buegel.py`), `Wandwiderstand` ist Feld für Feld
-          `Buegelpunkt`. Umbau: `fachwerk.py` besitzt die Regeln und
-          `guenstigste(…)`.
+        - Erledigt (2026-11-21): das Fachwerk an einer Stelle.
+          `fachwerk.py` besitzt die Druckfeldregeln (`ALPHA_MIN`,
+          `ALPHA_MAX`, `ALPHA_ZUG`, `K_C`, `druckfeldgrenzen`) und die
+          Suche `guenstigste(…)`; die Bügel der Platte, die Schubwände und
+          die Wendel des Pfahls rufen sie. `Wandwiderstand` ist weg, eine
+          Wand gibt einen `Buegelpunkt`. Siehe [[Entwicklung]].
         - «Ein Urteil je Teil»: `Lagennachweis` hat die Schleife einmal, die
           Nachweise je Seite und je Fall bauen sie 13-mal selbst
           (`begruendung` neunmal deklariert). Umbau: ein `Teilnachweis` mit

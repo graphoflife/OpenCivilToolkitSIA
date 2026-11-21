@@ -51,6 +51,7 @@ from opencivil.material.betonstahl import STAHLDICHTE
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.biegung import Biegung
+from opencivil.querschnitt.fachwerk import Buegelpunkt
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Woher die Widerstaende stammen -- ihre Erklaerung unter dem Querschnitt.
@@ -256,7 +257,7 @@ class KennzahlenQA(Prozedur):
 
     def _eine_last(self, p: Protokoll, ergebnis: Dict[str, Groesse], kurz: str, symbol: str,
                    einheit, beschriftung: str, modell: sw.Zellenmodell, v: sw.Verteilung,
-                   widerstaende: Sequence[sw.Wandwiderstand]) -> None:
+                   widerstaende: Sequence[Buegelpunkt]) -> None:
         # Gezeigt je Einheit der Anzeige: V₁ in kN je kN (je kNm).
         anzeige = einheit.faktor
         waende = modell.waende

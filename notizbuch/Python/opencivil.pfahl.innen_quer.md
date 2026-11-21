@@ -1,5 +1,5 @@
 ---
-erzeugt: 974ae9f366f9
+erzeugt: fa2f43a54f21
 art: modul
 tags: [modul]
 ---
@@ -235,7 +235,6 @@ In jeder Tiefe \|V\| gegen V_Rd -- massgebend die knappste.
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.interaktion]]
-- [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von
 

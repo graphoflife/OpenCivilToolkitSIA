@@ -1,5 +1,5 @@
 ---
-erzeugt: 3d4bff54e35d
+erzeugt: 93f9079ac3c9
 art: modul
 tags: [modul]
 ---
@@ -632,6 +632,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.fallnamen]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]

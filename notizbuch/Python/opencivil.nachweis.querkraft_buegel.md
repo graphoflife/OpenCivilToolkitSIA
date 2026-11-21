@@ -1,5 +1,5 @@
 ---
-erzeugt: 1fe2c2358d8f
+erzeugt: 2b53719e210b
 art: modul
 tags: [modul]
 ---
@@ -78,6 +78,14 @@ Oberflaeche, die Formel ein zweites Mal enthaelt. Dasselbe Muster wie
 - `alpha_min: int`
 - `alpha_max: int` – Die Grenzen der Neigung, wie eingegeben -- bei Normalzug hebt sie [[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|suche]].
 
+#### Buegelwerte.punkt
+
+```python
+def punkt(self, d: float, alpha: int) -> Buegelpunkt
+```
+
+Der Widerstand bei der Neigung `alpha` in Grad und der statischen Hoehe `d`.
+
 #### Buegelwerte.neigungen
 
 ```python
@@ -85,9 +93,9 @@ def neigungen(self, d: float, von: int, bis: int) -> List[Buegelpunkt]
 ```
 
 Der Widerstand je ganzes Grad von `von` bis `bis` bei der
-statischen Hoehe `d` -- fuer die Suche und fuer das Bild, das auch
-ausserhalb der Grenzen zeichnet, dort blass. Zwei Rechenwege fuer
-dieselbe Kurve liefen auseinander.
+statischen Hoehe `d` -- fuer das Bild, das auch ausserhalb der
+Grenzen zeichnet, dort blass. Jeder Punkt kommt aus [[opencivil.nachweis.querkraft_buegel#Buegelwerte.punkt|punkt]], wie
+bei der Suche: zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
 
 #### Buegelwerte.suche
 
@@ -95,32 +103,9 @@ dieselbe Kurve liefen auseinander.
 def suche(self, d: float, *, zugkraft: bool) -> Neigungssuche
 ```
 
-Die guenstigste Neigung bei der statischen Hoehe `d`, ganzgradig
-zwischen den Grenzen, die eine Normalzugkraft hebt
-([[opencivil.querschnitt.platte#druckfeldgrenzen|druckfeldgrenzen]]) -- fuer die
+Die guenstigste Neigung bei der statischen Hoehe `d`
+([[opencivil.querschnitt.fachwerk#guenstigste|guenstigste]]) -- fuer die
 Faelle und die Kennzahlen der Platte dieselbe Suche.
-
-### Neigungssuche
-
-```python
-@dataclass(frozen=True)
-class Neigungssuche
-```
-
-Was [[opencivil.nachweis.querkraft_buegel#Buegelwerte.suche|Buegelwerte.suche]] findet.
-
-- `alpha_min: int`
-- `alpha_max: int` – Die verwendeten Grenzen; bei Normalzug angehoben.
-- `punkte: Tuple[Buegelpunkt, ...]` – Der Widerstand je ganzem Grad zwischen den beiden.
-- `massgebend: Buegelpunkt` – Der Punkt mit dem groessten Widerstand.
-
-### neigungen
-
-```python
-def neigungen(*, alpha_min: int, alpha_max: int, **werte: float) -> List[Buegelpunkt]
-```
-
-Je ganzes Grad im Bereich ein Punkt, einschliesslich der Grenzen.
 
 ### buegelteilung_y
 

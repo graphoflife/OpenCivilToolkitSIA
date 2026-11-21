@@ -34,7 +34,7 @@ from opencivil.core.wert import WertDef, grad_als_text
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.biegung import Biegung
-from opencivil.querschnitt.platte import ALPHA_ZUG
+from opencivil.querschnitt.fachwerk import ALPHA_ZUG, Buegelpunkt
 
 
 def schub_belastet(biegung: Biegung, fall: Lastfall) -> bool:
@@ -63,7 +63,7 @@ class Schubbefund:
 
     modell: sw.Zellenmodell
     verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)
-    widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)
+    widerstaende: Dict[str, List[Buegelpunkt]] = field(default_factory=dict)
     vergleiche: Dict[str, List[Vergleich]] = field(default_factory=dict)
     """Je Wand ihre Kraft gegen ihren Widerstand, beide fuer die ganze Wand."""
     ohne: Dict[str, str] = field(default_factory=dict)
@@ -194,7 +194,7 @@ class Schubwandnachweis(Nachweis):
         zugkraft = fall.N > 0.0
         zeilen = []
         neigungen: List[int] = []
-        widerstaende: List[sw.Wandwiderstand] = []
+        widerstaende: List[Buegelpunkt] = []
         vergleiche: List[Vergleich] = []
         befund.widerstaende[fall.name] = widerstaende
         befund.vergleiche[fall.name] = vergleiche

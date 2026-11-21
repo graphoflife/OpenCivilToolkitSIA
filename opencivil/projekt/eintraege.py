@@ -27,7 +27,8 @@ from opencivil.material.arten import MATERIALARTEN
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import BEIWERT as X_D_BEIWERT, HOECHSTENS as X_D_HOECHSTENS
-from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C, Richtung
+from opencivil.querschnitt.fachwerk import ALPHA_MAX, ALPHA_MIN, K_C
+from opencivil.querschnitt.platte import Richtung
 from opencivil.projekt.fallnamen import Fallnamen
 from opencivil.projekt.lesen import (
     ProjektFehler, als_groesse, bereich, einer_von, je_material, lesen, ort, teil,

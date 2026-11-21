@@ -9,7 +9,7 @@ import unittest
 
 from opencivil.bericht.zusammenfassung import kennzahlen
 from opencivil.nachweis import linie as geo
-from opencivil.nachweis.querkraft_buegel import neigungen
+from opencivil.nachweis.querkraft_buegel import buegelwiderstand
 from opencivil.querschnitt.fachwerk import beste_neigung
 from opencivil.projekt import Projekt, RechenwahlEintrag
 from opencivil.web import dienst
@@ -113,9 +113,9 @@ class TestQuerkraft(unittest.TestCase):
         f_cd = loesung.werte["beton.b1.f_cd"].groesse.si
         a_s = math.pi * 0.010 ** 2 / 4
         erwartet = min(
-            beste_neigung(neigungen(alpha_min=b.alpha_min, alpha_max=b.alpha_max,
-                                    a_s=a_s, s_x=0.2, s_y=0.2,
-                                    d=d, f_yd=f_yd, f_cd=f_cd, k_c=0.55)).V_Rd
+            beste_neigung([buegelwiderstand(alpha=a, a_s=a_s, s_x=0.2, s_y=0.2, d=d,
+                                            f_yd=f_yd, f_cd=f_cd, k_c=0.55)
+                           for a in range(b.alpha_min, b.alpha_max + 1)]).V_Rd
             for d in (D_UNTEN, 0.252))
         self.assertAlmostEqual(wert(aufbau, loesung, "V_Rd_buegel"), erwartet, places=6)
 
