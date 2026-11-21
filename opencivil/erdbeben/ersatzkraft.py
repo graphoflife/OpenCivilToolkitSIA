@@ -15,7 +15,7 @@ beiden Richtungen.
 DAS VERFAHREN, je Richtung::
 
     W_i  = G_k,i + psi_2,i * Q_k,i                    Gewicht des Geschosses i
-    EI   = Summe n * kappa * E_cm * I                 die Waende dieser Richtung
+    EI   = Summe n * eta_EI * E_cm * I                die Waende dieser Richtung
     u    = Summe W_i * z_i^2 * (3 H - z_i) / (6 EI)   Kopf des Kragarms unter den W_i
     T_1  = 2 * sqrt(u)                                (40), u in m, T_1 in s
     S_d  = (31) bis (34)
@@ -35,8 +35,11 @@ I_z, eine in y mit I_y. Bei 90 Grad ist es umgekehrt (:meth:`Wandlage.traegheit`
 NACH VORGABE, NICHT NACHGESCHLAGEN (auch in TODO):
 - die Verteilung auf die Waende nach ihrer Biegesteifigkeit;
 - nur die Biegung der Waende verformt, weder Schub noch Fundament;
-- kappa = 0.5 als Anteil der ungerissenen Steifigkeit -- verlangt ist nur
-  eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.5.2);
+- eta_EI = 0.5 als Anteil der ungerissenen Steifigkeit -- verlangt ist nur
+  eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.5.2). Nicht kappa:
+  das ist in der Querschnittsanalyse die Kruemmung und in SIA 262:2025 die
+  Vergroesserung der Querkraft fuer hoehere Eigenformen (97) (Benutzer,
+  2026-11-21);
 - g = 10 m/s^2 wie beim Eigengewicht
   (:data:`~opencivil.stabwerk.rechnung.ERDBESCHLEUNIGUNG`).
 
@@ -329,7 +332,7 @@ JE_GESCHOSS = (Gruppe(GESCHOSS, lambda: (
 #: Die Vorgaben jeder Wand, je mit ihrer Nummer in der Liste.
 JE_WAND = (Gruppe(WAND, lambda: (
     Feld("n", "n", EINHEITSLOS, "Anzahl gleicher Wände", 0, schritt=1),
-    Feld("kappa", r"\kappa", EINHEITSLOS, "Anteil der ungerissenen Biegesteifigkeit", 2,
+    Feld("eta_EI", r"\eta_{EI}", EINHEITSLOS, "Anteil der ungerissenen Biegesteifigkeit", 2,
          ZIFFER_STEIFIGKEIT, schritt=0.05,
          hinweis="0.5 nach Vorgabe – verlangt ist eine mittlere Steifigkeit bis zum "
                  "Fliessbeginn"),
@@ -376,7 +379,7 @@ class Wand:
     name: str
     lage: Wandlage
     n: Groesse
-    kappa: Groesse
+    eta_EI: Groesse
     querschnitt: Wandquerschnitt
 
 
@@ -733,21 +736,21 @@ class Lauf:
         for w in waende:
             k, traegheit = w.nummer, w.lage.traegheit(r)
             I, E_cm = e.g(f"{traegheit}_{k}").si, e.g(f"E_cm_{k}").si
-            n, kappa = e.g(f"n_{k}").si, e.g(f"kappa_{k}").si
-            je_wand[k] = kappa * E_cm * I
+            n, eta = e.g(f"n_{k}").si, e.g(f"eta_EI_{k}").si
+            je_wand[k] = eta * E_cm * I
             zeilen.append([f"{k}: {w.name}", w.querschnitt.analyse, w.lage.beschriftung,
                            Mathe(f"{traegheit} = {fest(I, 4)}"), Mathe(fest(E_cm / 1e6, 0)),
-                           Mathe(fest(kappa, 2)), Mathe(fest(n, 0)),
+                           Mathe(fest(eta, 2)), Mathe(fest(n, 0)),
                            Mathe(fest(n * je_wand[k] / 1e6, 0))])
         p.tabelle(
             kopf=[WAND, "Querschnittsanalyse", "Lage", Mathe(r"I\ [\mathrm{m}^4]"),
-                  Mathe(r"E_{cm}\ [\mathrm{N/mm^2}]"), Mathe(r"\kappa"), Mathe("n"),
-                  Mathe(r"n \cdot \kappa \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]")],
+                  Mathe(r"E_{cm}\ [\mathrm{N/mm^2}]"), Mathe(r"\eta_{EI}"), Mathe("n"),
+                  Mathe(r"n \cdot \eta_{EI} \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]")],
             zeilen=zeilen, titel=f"Biegesteifigkeit der Wände in {r}", ausrichtung="lllrrrrr")
         EI = self.werte.wert(f"EI_{r}", f"EI_{r}", Groesse.aus_si(
             sum(e.g(f"n_{w.nummer}").si * je_wand[w.nummer] for w in waende), MNM2), 0,
             f"Biegesteifigkeit der Wände in {r}")
-        p.formel(EI, r"\sum n \cdot \kappa \cdot E_{cm} \cdot I", {},
+        p.formel(EI, r"\sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I", {},
                  titel=f"Biegesteifigkeit der Wände in {r}",
                  referenz=f"{ZIFFER_STEIFIGKEIT}; {NACH_VORGABE}",
                  name="Biegesteifigkeit der Wände")

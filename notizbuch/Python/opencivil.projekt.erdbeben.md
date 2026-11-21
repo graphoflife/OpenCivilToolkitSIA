@@ -1,5 +1,5 @@
 ---
-erzeugt: 2e8ed7d7e6f4
+erzeugt: feee3580f44a
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,7 @@ Bauwerksklasse I, q = 1.5 -- der kleinste Wert fuer Stahlbeton ohne
 Duktilitaet (SIA 262:2025, Tabelle 14) --, Grund- und Aufriss regelmaessig,
 ein Geschoss von 3 m ohne Last und eine Wand ohne Querschnittsanalyse. Ohne
 Last rechnet ein neues Gebaeude nichts, wie ein neuer Lastfall. psi_2 = 0.3
-gilt fuer Wohn- und Bueroflaechen (SIA 260:2013, Anhang A, Tabelle 2), kappa
+gilt fuer Wohn- und Bueroflaechen (SIA 260:2013, Anhang A, Tabelle 2), eta_EI
 = 0.5 ist nach Vorgabe, nicht nachgeschlagen.
 
 ## Inhalt
@@ -59,7 +59,7 @@ ungerissenen Steifigkeit gilt.
 - `analyse: str = ''` – Die Kennung der Querschnittsanalyse -- leer, solange keine gewaehlt ist.
 - `lage: Wandlage = Wandlage.NULL` – 0 Grad: y der Analyse liegt in x des Gebaeudes; 90 Grad: in y.
 - `n: int = bereich(1, heisst='Anzahl n', ab=1)` – Wie viele gleiche Waende es gibt.
-- `kappa: float = bereich(0.5, heisst='κ', ueber=0.0, bis=1.0)` – Der Anteil der ungerissenen Biegesteifigkeit, der gilt.
+- `eta_EI: float = bereich(0.5, heisst='η_EI', ueber=0.0, bis=1.0)` – Der Anteil der ungerissenen Biegesteifigkeit, der gilt.
 
 ### ErdbebenEintrag
 
@@ -116,7 +116,7 @@ Ein Geschoss oben anfuegen -- h in m, Lasten in kN.
 #### ErdbebenEintrag.wand
 
 ```python
-def wand(self, name: str, analyse: str, *, lage: Union[Wandlage, str]=Wandlage.NULL, n: int=1, kappa: float=0.5) -> TragwandEintrag
+def wand(self, name: str, analyse: str, *, lage: Union[Wandlage, str]=Wandlage.NULL, n: int=1, eta_EI: float=0.5) -> TragwandEintrag
 ```
 
 Eine Wand anfuegen -- `analyse` ist die Kennung einer

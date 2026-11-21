@@ -39,7 +39,7 @@ def haus(**felder):
     """
     Das Haus von Hand: Zone Z2, Baugrund C, BWK I, q = 1.5 und C25/30. Drei
     Geschosse mit G_k = 3000 kN und Q_k = 1000 kN bei ψ₂ = 0.3, das Dach mit
-    2500 kN, je 3 m hoch -- auf zwei gleichen Wänden in x, κ = 0.5.
+    2500 kN, je 3 m hoch -- auf zwei gleichen Wänden in x, η_EI = 0.5.
     """
     p = Projekt(name="Probe")
     p.beton("C25/30")
@@ -358,8 +358,8 @@ class TestEingaben(unittest.TestCase):
                 ({}, {"h": 0.0}, {}, "Geschoss 'EG': Höhe h muss grösser als null sein"),
                 ({}, {"G_k": -1.0}, {}, "Geschoss 'EG': Ständige Last G_k kann nicht negativ sein"),
                 ({}, {"psi_2": 1.5}, {}, "ψ₂ muss mindestens null und höchstens 1 sein"),
-                ({}, {}, {"kappa": 0.0}, "Wand 'W1': κ muss grösser als null und höchstens 1 "
-                                         "sein"),
+                ({}, {}, {"eta_EI": 0.0}, "Wand 'W1': η_EI muss grösser als null und "
+                                          "höchstens 1 sein"),
                 ({}, {}, {"n": 0}, "Wand 'W1': Anzahl n muss mindestens 1 sein")):
             with self.subTest(satz=satz):
                 p = Projekt(name="Probe")

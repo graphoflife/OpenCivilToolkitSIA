@@ -566,7 +566,7 @@ class TestAngabengruppen(unittest.TestCase):
             *(f"pfahl.t1.{n}_{i}" for i in (2, 3) for n in ("K", "delta_faktor")),
             "erdbeben.h1.q_x", "erdbeben.h1.q_y",
             *(f"erdbeben.h1.{n}_{i}" for i in (1, 2, 3, 4) for n in ("h", "G_k", "Q_k", "psi_2")),
-            *(f"erdbeben.h1.{n}_{i}" for i in (1, 2) for n in ("n", "kappa")),
+            *(f"erdbeben.h1.{n}_{i}" for i in (1, 2) for n in ("n", "eta_EI")),
         })
 
 

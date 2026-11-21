@@ -3021,7 +3021,7 @@ $$
 **Anteil der ungerissenen Biegesteifigkeit** *(SIA 261:2020, 16.5.5.2)*
 
 $$
-\kappa_{1} = 0.5
+\eta_{EI,1} = 0.5
 $$
 
 **Anzahl gleicher Wände**
@@ -3033,7 +3033,7 @@ $$
 **Anteil der ungerissenen Biegesteifigkeit** *(SIA 261:2020, 16.5.5.2)*
 
 $$
-\kappa_{2} = 0.5
+\eta_{EI,2} = 0.5
 $$
 
 ### Ersatzkraftverfahren
@@ -3111,7 +3111,7 @@ $$
 
 **Biegesteifigkeit der Wände in x**
 
-| Wand | Querschnittsanalyse | Lage | $I\ [\mathrm{m}^4]$ | $E_{cm}\ [\mathrm{N/mm^2}]$ | $\kappa$ | $n$ | $n \cdot \kappa \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]$ |
+| Wand | Querschnittsanalyse | Lage | $I\ [\mathrm{m}^4]$ | $E_{cm}\ [\mathrm{N/mm^2}]$ | $\eta_{EI}$ | $n$ | $n \cdot \eta_{EI} \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
 | 1: Wände in x | Tragwand 5000 × 250 | 0° | $I_z = 2.6042$ | $33620$ | $0.50$ | $2$ | $87551$ |
 | 2: Wände in y | Tragwand 5000 × 250 | 90° | $I_y = 0.0065$ | $33620$ | $0.50$ | $2$ | $219$ |
@@ -3119,7 +3119,7 @@ $$
 **Biegesteifigkeit der Wände in x** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-EI_x = \sum n \cdot \kappa \cdot E_{cm} \cdot I = 87770\,\mathrm{MNm}^{2}
+EI_x = \sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I = 87770\,\mathrm{MNm}^{2}
 $$
 
 **Auslenkung des Dachs, die Gewichte waagrecht in x auf den Kragarm** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
@@ -3198,7 +3198,7 @@ $$
 
 **Biegesteifigkeit der Wände in y**
 
-| Wand | Querschnittsanalyse | Lage | $I\ [\mathrm{m}^4]$ | $E_{cm}\ [\mathrm{N/mm^2}]$ | $\kappa$ | $n$ | $n \cdot \kappa \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]$ |
+| Wand | Querschnittsanalyse | Lage | $I\ [\mathrm{m}^4]$ | $E_{cm}\ [\mathrm{N/mm^2}]$ | $\eta_{EI}$ | $n$ | $n \cdot \eta_{EI} \cdot E_{cm} \cdot I\ [\mathrm{MNm^2}]$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
 | 1: Wände in x | Tragwand 5000 × 250 | 0° | $I_y = 0.0065$ | $33620$ | $0.50$ | $2$ | $219$ |
 | 2: Wände in y | Tragwand 5000 × 250 | 90° | $I_z = 2.6042$ | $33620$ | $0.50$ | $2$ | $87551$ |
@@ -3206,7 +3206,7 @@ $$
 **Biegesteifigkeit der Wände in y** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-EI_y = \sum n \cdot \kappa \cdot E_{cm} \cdot I = 87770\,\mathrm{MNm}^{2}
+EI_y = \sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I = 87770\,\mathrm{MNm}^{2}
 $$
 
 **Auslenkung des Dachs, die Gewichte waagrecht in y auf den Kragarm** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
@@ -4686,7 +4686,7 @@ $$
 **Biegesteifigkeit der Wände in x** *(SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen)*
 
 $$
-EI_x = \sum n \cdot \kappa \cdot E_{cm} \cdot I
+EI_x = \sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I
 $$
 
 **Auslenkung des Dachs, die Gewichte waagrecht in x auf den Kragarm** *(SIA 261:2020, 16.5.2.3, (40); nach Vorgabe, nicht nachgeschlagen)*
@@ -5139,12 +5139,12 @@ Alle geführten Nachweise sind erfüllt.
 | Nutzlast des Geschosses | $Q_{k,2}$ | $800$ | kN | Vorgabe |
 | Nutzlast des Geschosses | $Q_{k,3}$ | $800$ | kN | Vorgabe |
 | Nutzlast des Geschosses | $Q_{k,4}$ | $0$ | kN | Vorgabe |
+| Anteil der ungerissenen Biegesteifigkeit | $\eta_{EI,1}$ | $0.5$ |  | Vorgabe |
+| Anteil der ungerissenen Biegesteifigkeit | $\eta_{EI,2}$ | $0.5$ |  | Vorgabe |
 | Höhe des Geschosses | $h_{1}$ | $3$ | m | Vorgabe |
 | Höhe des Geschosses | $h_{2}$ | $3$ | m | Vorgabe |
 | Höhe des Geschosses | $h_{3}$ | $3$ | m | Vorgabe |
 | Höhe des Geschosses | $h_{4}$ | $3$ | m | Vorgabe |
-| Anteil der ungerissenen Biegesteifigkeit | $\kappa_{1}$ | $0.5$ |  | Vorgabe |
-| Anteil der ungerissenen Biegesteifigkeit | $\kappa_{2}$ | $0.5$ |  | Vorgabe |
 | Anzahl gleicher Wände | $n_{1}$ | $2$ |  | Vorgabe |
 | Anzahl gleicher Wände | $n_{2}$ | $2$ |  | Vorgabe |
 | Erfüllungsgrad Regelmässigkeit | $\alpha_{eff,R}$ | $\infty$ |  | berechnet |

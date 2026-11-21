@@ -1,5 +1,5 @@
 ---
-erzeugt: 505d73db3cd5
+erzeugt: 1e02adf5a15c
 art: formel
 tags: [formel]
 normstelle: "SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen"
@@ -10,7 +10,7 @@ normstelle: "SIA 261:2020, 16.5.5.2; nach Vorgabe, nicht nachgeschlagen"
 *In der Herleitung: «Biegesteifigkeit der Wände in x»*
 
 $$
-EI_x = \sum n \cdot \kappa \cdot E_{cm} \cdot I
+EI_x = \sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I
 $$
 
 ## Beispiel
@@ -18,7 +18,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-EI_x = \sum n \cdot \kappa \cdot E_{cm} \cdot I = 87770\,\mathrm{MNm}^{2}
+EI_x = \sum n \cdot \eta_{EI} \cdot E_{cm} \cdot I = 87770\,\mathrm{MNm}^{2}
 $$
 
 ## Gebraucht von
@@ -50,5 +50,5 @@ ihrer Längsrichtung fast alles und quer kaum etwas.
 
 Die Norm verlangt eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.1.1,
 16.5.5.2), nicht die des ungerissenen Querschnitts. Wie viel davon bleibt,
-sagt $\kappa$; der Startwert 0.5 ist nach Vorgabe, nicht nachgeschlagen,
+sagt $\eta_{EI}$; der Startwert 0.5 ist nach Vorgabe, nicht nachgeschlagen,
 ebenso, dass nur die Biegung zählt -- Schub und Torsion der Wände nicht.

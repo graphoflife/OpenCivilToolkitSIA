@@ -495,7 +495,7 @@ def _gebaeude(p: Projekt) -> None:
     turm = p.gebaeude("Turm", zone="Z2", baugrund="D", q_x=3.0, q_y=3.0)
     for i in range(1, 9):
         turm.geschoss(f"{i}. OG", h=3.0, G_k=600.0, Q_k=200.0)
-    turm.wand("Kern", winkel.kennung, kappa=0.4)
+    turm.wand("Kern", winkel.kennung, eta_EI=0.4)
     ohne = p.gebaeude("Wand ohne Querschnitt")
     ohne.geschoss("EG", h=3.0, G_k=1000.0)
     ohne.wand("Wand 1", "")

@@ -47,5 +47,5 @@ $q$ über 2.0 liegt, die Bemessungswerte duktiler Tragwände nach SIA
 262:2025, 4.3.9.4.
 
 Nach Vorgabe, nicht nachgeschlagen: die Verteilung auf die Wände nach ihrer
-Biegesteifigkeit, nur Biegung, der Anteil $\kappa = 0.5$ der ungerissenen
+Biegesteifigkeit, nur Biegung, der Anteil $\eta_{EI} = 0.5$ der ungerissenen
 Steifigkeit und $g = 10\,\mathrm{m/s^2}$ wie beim Eigengewicht.

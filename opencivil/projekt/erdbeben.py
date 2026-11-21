@@ -15,7 +15,7 @@ Bauwerksklasse I, q = 1.5 -- der kleinste Wert fuer Stahlbeton ohne
 Duktilitaet (SIA 262:2025, Tabelle 14) --, Grund- und Aufriss regelmaessig,
 ein Geschoss von 3 m ohne Last und eine Wand ohne Querschnittsanalyse. Ohne
 Last rechnet ein neues Gebaeude nichts, wie ein neuer Lastfall. psi_2 = 0.3
-gilt fuer Wohn- und Bueroflaechen (SIA 260:2013, Anhang A, Tabelle 2), kappa
+gilt fuer Wohn- und Bueroflaechen (SIA 260:2013, Anhang A, Tabelle 2), eta_EI
 = 0.5 ist nach Vorgabe, nicht nachgeschlagen.
 """
 
@@ -72,7 +72,7 @@ class TragwandEintrag(Beschreibung):
     n: int = bereich(1, heisst="Anzahl n", ab=1)
     """Wie viele gleiche Waende es gibt."""
 
-    kappa: float = bereich(0.5, heisst="κ", ueber=0.0, bis=1.0)
+    eta_EI: float = bereich(0.5, heisst="η_EI", ueber=0.0, bis=1.0)
     """Der Anteil der ungerissenen Biegesteifigkeit, der gilt."""
 
 
@@ -132,12 +132,12 @@ class ErdbebenEintrag(BauteilEintrag):
         return eintrag
 
     def wand(self, name: str, analyse: str, *, lage: Union[Wandlage, str] = Wandlage.NULL,
-             n: int = 1, kappa: float = 0.5) -> TragwandEintrag:
+             n: int = 1, eta_EI: float = 0.5) -> TragwandEintrag:
         """
         Eine Wand anfuegen -- ``analyse`` ist die Kennung einer
         Querschnittsanalyse, ``lage`` ein Wort wie in der Datei: ``"0"``
         oder ``"90"``.
         """
-        eintrag = TragwandEintrag(name=name, analyse=analyse, lage=lage, n=n, kappa=kappa)
+        eintrag = TragwandEintrag(name=name, analyse=analyse, lage=lage, n=n, eta_EI=eta_EI)
         self.waende.append(eintrag)
         return eintrag

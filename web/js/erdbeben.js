@@ -8,7 +8,7 @@
  *                         Beschreibung
  *     Geschosse           von unten nach oben: Höhe, G_k, Q_k und ψ₂
  *     Wände               je eine oder mehrere gleiche: Querschnittsanalyse,
- *                         Lage im Grundriss, Anzahl und κ
+ *                         Lage im Grundriss, Anzahl und η_EI
  *
  * Gerechnet wird nichts: die Kräfte stehen rechts in der Zusammenfassung und
  * im Bild unter «Diagramme». Felder, Zeichen, Einheiten und Grenzen kommen
@@ -55,10 +55,10 @@ const HILFE = {
     zeilen: [
       ['Querschnitt', 'aus einer Querschnittsanalyse des Projekts: I_y, I_z und E_cm ihres Betons'],
       ['Lage', '0°: y der Analyse liegt in x des Gebäudes, 90°: in y'],
-      ['κ', 'der Anteil der ungerissenen Biegesteifigkeit, der gilt'],
+      ['η_EI', 'der Anteil der ungerissenen Biegesteifigkeit, der gilt'],
       ['Verteilung', 'jede Wand trägt nach ihrem Anteil an EI – nach Vorgabe, nicht nachgeschlagen'],
     ],
-    formel: 'EI = n·κ·E_cm·I',
+    formel: 'EI = n·η_EI·E_cm·I',
   },
 };
 

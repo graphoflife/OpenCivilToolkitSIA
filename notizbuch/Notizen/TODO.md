@@ -909,16 +909,15 @@ Norm dazu sagt.
 - [ ] **Erdbeben, nach Vorgabe eingebaut** (`opencivil/erdbeben/ersatzkraft.py`).
       Jede Wand trägt nach ihrem Anteil an der Biegesteifigkeit; verformt
       werden die Wände nur durch Biegung, weder durch Schub noch im
-      Fundament; κ = 0.5 als Anteil der ungerissenen Steifigkeit --
+      Fundament; η_EI = 0.5 als Anteil der ungerissenen Steifigkeit --
       16.5.5.2 verlangt eine mittlere Steifigkeit bis zum Fliessbeginn;
       g = 10 m/s² wie beim Eigengewicht. Nicht gerechnet, und das Ergebnis
       sagt es grau: die Torsion (16.5.2.7), die vertikale Komponente
       (16.5.4), sekundäre Bauteile (16.7) und, wo q über 2.0 liegt, die
-      Bemessungswerte duktiler Tragwände (SIA 262:2025, 4.3.9.4). Das
-      Zeichen κ heisst in der Querschnittsanalyse die Krümmung, und SIA
-      262:2025 braucht κ für Tragwände im Erdbeben selbst: als Vergrösserung
-      der Querkraft für höhere Eigenformen (4.3.9.4.4, (97)). Vorschlag:
-      umbenennen, etwa in η_EI. Entscheid des Benutzers.
+      Bemessungswerte duktiler Tragwände (SIA 262:2025, 4.3.9.4).
+      Entschieden (Benutzer, 2026-11-21): der Anteil heisst η_EI, nicht κ --
+      κ ist in der Querschnittsanalyse die Krümmung und in SIA 262:2025 die
+      Vergrösserung der Querkraft für höhere Eigenformen (4.3.9.4.4, (97)).
 - [ ] **Pfähle, nach Vorgabe eingebaut** (`opencivil/pfahl/`). Beim
       örtlichen Abscheren gelten η_a und γ_M,a trotzdem, obwohl das Buch
       danach keine weitere Sicherheit vorsieht (Kap. 12.5); X wird dabei mit

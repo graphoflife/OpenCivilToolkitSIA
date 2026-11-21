@@ -93,7 +93,7 @@ const VORRAT = {
     "web/js/durchstanzen.js?v=10bb84202adb",
     "web/js/eb_zeichnung.js?v=f3972b138b6e",
     "web/js/editor.js?v=97f3abad7a0d",
-    "web/js/erdbeben.js?v=d83b4f1b07f3",
+    "web/js/erdbeben.js?v=1e908f9fc87c",
     "web/js/faelle.js?v=ba9d53707ce9",
     "web/js/fallantwort.js?v=cab91f08ea3e",
     "web/js/fenster.js?v=6e4ffffaa66c",
@@ -136,7 +136,7 @@ const VORRAT = {
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=04a6b50b3e76",
     "web/kern/notizbuch.json?v=36443b3ff750",
-    "web/kern/quellen.json?v=c921d07fe37b"
+    "web/kern/quellen.json?v=222a1ac941cf"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

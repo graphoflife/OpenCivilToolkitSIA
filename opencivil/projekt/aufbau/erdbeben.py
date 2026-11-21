@@ -45,7 +45,7 @@ def bauen(art: "Bauteilart", eintrag: ErdbebenEintrag, aufbau: Aufbau) -> Bautei
             fehlt.setdefault(q.text, []).append(w.name)
         else:
             waende.append(Wand(nummer=nummer, name=w.name, lage=w.lage, n=als_groesse(w, "n"),
-                               kappa=als_groesse(w, "kappa"), querschnitt=q))
+                               eta_EI=als_groesse(w, "eta_EI"), querschnitt=q))
     gruende = [f"{text} («{'», «'.join(namen)}»)" for text, namen in fehlt.items()]
     gebaeude = Gebaeude(
         name=eintrag.name, zone=eintrag.zone, baugrund=eintrag.baugrund,

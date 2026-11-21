@@ -7,6 +7,17 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · η_EI statt κ
+
+Der Anteil der ungerissenen Steifigkeit einer Tragwand hiess κ. Dasselbe
+Zeichen ist in der Querschnittsanalyse die Krümmung, und SIA 262:2025 nennt
+so die Vergrösserung der Querkraft duktiler Tragwände für höhere
+Eigenformen (4.3.9.4.4, (97)) -- wer beides liest, hätte zwei κ vor sich.
+Der Benutzer hat η_EI gewählt (2026-11-21): in der Maske, der Herleitung
+(«EI = Σ n·η_EI·E_cm·I»), der Datei (`eta_EI`) und in Python
+(`h.wand(…, eta_EI=0.5)`). Die Zahlen bleiben; eine Datei mit `kappa` weist
+der Kern laut ab, wie jedes Feld, das es nicht gibt.
+
 ## 2026-11-20 · Grosse Dateien geteilt
 
 Punkt 8 der Durchsicht vom 2026-11-19: Dateien nahe an 1000 Zeilen werden

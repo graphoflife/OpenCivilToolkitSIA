@@ -1,5 +1,5 @@
 ---
-erzeugt: e9635a082792
+erzeugt: 8361b16ac951
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,7 @@ DAS VERFAHREN, je Richtung:
 
 ```
 W_i  = G_k,i + psi_2,i * Q_k,i                    Gewicht des Geschosses i
-EI   = Summe n * kappa * E_cm * I                 die Waende dieser Richtung
+EI   = Summe n * eta_EI * E_cm * I                die Waende dieser Richtung
 u    = Summe W_i * z_i^2 * (3 H - z_i) / (6 EI)   Kopf des Kragarms unter den W_i
 T_1  = 2 * sqrt(u)                                (40), u in m, T_1 in s
 S_d  = (31) bis (34)
@@ -48,8 +48,11 @@ I_z, eine in y mit I_y. Bei 90 Grad ist es umgekehrt ([[opencivil.erdbeben.ersat
 
 - die Verteilung auf die Waende nach ihrer Biegesteifigkeit;
 - nur die Biegung der Waende verformt, weder Schub noch Fundament;
-- kappa = 0.5 als Anteil der ungerissenen Steifigkeit -- verlangt ist nur
-  eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.5.2);
+- eta_EI = 0.5 als Anteil der ungerissenen Steifigkeit -- verlangt ist nur
+  eine mittlere Steifigkeit bis zum Fliessbeginn (16.5.5.2). Nicht kappa:
+  das ist in der Querschnittsanalyse die Kruemmung und in SIA 262:2025 die
+  Vergroesserung der Querkraft fuer hoehere Eigenformen (97) (Benutzer,
+  2026-11-21);
 - g = 10 m/s^2 wie beim Eigengewicht
   ([[opencivil.stabwerk.rechnung#Konstanten|ERDBESCHLEUNIGUNG]]).
 
@@ -297,7 +300,7 @@ Eine oder mehrere gleiche Tragwaende -- `nummer` ist ihr Platz in der Liste, ab 
 - `name: str`
 - `lage: Wandlage`
 - `n: Groesse`
-- `kappa: Groesse`
+- `eta_EI: Groesse`
 - `querschnitt: Wandquerschnitt`
 
 ### Gebaeude

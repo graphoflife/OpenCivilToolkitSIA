@@ -178,7 +178,7 @@ h = p.gebaeude("Wohnhaus", zone="Z1b", baugrund="C", bauwerksklasse="I",
 h.geschoss("EG", h=3.0, G_k=2500, Q_k=800, psi_2=0.3)
 h.geschoss("Dach", h=3.0, G_k=2000)
 h.wand("Wände in x", "a2", n=2)           # 0°: y der Analyse liegt in x
-h.wand("Wände in y", "a2", n=2, lage="90", kappa=0.5)
+h.wand("Wände in y", "a2", n=2, lage="90", eta_EI=0.5)
 ```
 
 Linien- und Dreieckslasten (`wert_b`), Einzellasten, Momente und verteilte
@@ -690,7 +690,7 @@ T₁ kommt und ob Grund- und Aufriss regelmässig sind, mit den Kriterien
 darunter. Dann die Geschosse von der Einspannung an nach oben, je mit Höhe,
 G_k, Q_k und ψ₂, und die Wände: je eine Querschnittsanalyse des Projekts mit
 genau einem Beton, ihre Lage im Grundriss (0° oder 90°), die Anzahl gleicher
-Wände und κ, der Anteil der ungerissenen Steifigkeit. Je Richtung stehen die
+Wände und η_EI, der Anteil der ungerissenen Steifigkeit. Je Richtung stehen die
 Wände als ein Kragarm da; unter den Gewichten, waagrecht auf der Höhe der
 Decken, gibt die Auslenkung des Dachs T₁ = 2·√u (40), daraus S_d, F_d (41)
 und die Kräfte je Geschoss (42), jede Wand trägt nach ihrem Anteil an EI.
