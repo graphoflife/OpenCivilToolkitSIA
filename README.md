@@ -248,7 +248,7 @@ Hand steht, bleibt dabei erhalten.
 
 ## Stand
 
-Fertig und getestet (1229 Tests):
+Fertig und getestet (am 2026-11-21: 2145 Tests):
 
 | Baustein | Inhalt |
 |---|---|

@@ -7,6 +7,14 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · m_Rd mit Einheit, die Zahl der Tests
+
+- Die M-V-Kurve der Platte schrieb an ihre senkrechte Linie «m_Rd = 235.9»,
+  ohne Einheit. Jetzt «m_Rd = 235.9 kNm»: mit Einheit und Stellen, die der
+  Kern der Achse gibt (`masszahl`), wie die Marken daneben.
+- Im README stand «Fertig und getestet (1229 Tests)». Es sind 2145; die
+  Zahl steht jetzt mit ihrem Datum da, weil sie weiter wächst.
+
 ## 2026-11-21 · Nichts doppelt, kein ∞ in der Werteliste
 
 Zwei Stellen aus der Durchsicht, die der Benutzer weghaben wollte

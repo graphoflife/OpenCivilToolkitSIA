@@ -670,7 +670,7 @@ export function querkraftkurveZeichnen(kurve) {
       'text-anchor': ast.seite === 'unten' ? 'end' : 'start',
       'font-size': 11, 'font-weight': 600, fill: '#1f5fa8',
     });
-    marke.textContent = `${kurve.m_name || 'm_Rd'} = ${ast.m_Rd.toFixed(1)}`;
+    marke.textContent = `${kurve.m_name || 'm_Rd'} = ${masszahl(ast.m_Rd, gM)}`;
     daten.append(marke);
 
     // Zwei Züge: bis m_Rd durchgezogen, darüber gestrichelt.
