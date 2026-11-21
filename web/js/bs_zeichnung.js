@@ -74,7 +74,7 @@ import {
 } from './bs_teile.js';
 import { el, melden, svgEl } from './dom.js';
 import { aktiverLastfall, lastfallFuerNeue, lastfallLeiste } from './lastfaelle.js';
-import { ausVorlage, eintragVon, zustand } from './zustand.js';
+import { ausVorlage, eintragVon, neueKennung, zustand } from './zustand.js';
 
 /**
  * Die Arten des Systems. Gewählt werden Linien und Knoten: ein Lager gehört
@@ -252,10 +252,15 @@ function alleLasten(z) {
   return [...z.linien.flatMap((l) => l.lasten), ...z.knotenlasten];
 }
 
-/** Die nächste Kennung einer Last: die grösste plus eins, wie im Kern -- Stab- und Knotenlasten zählen zusammen. */
+/**
+ * Die Kennung einer neuen Last: über jeder, die das System je vergeben hat
+ * -- eine Kennung kommt nie wieder, wie bei Knoten und Linien und wie im
+ * Kern (`neue_kennung`). Stab- und Knotenlasten zählen zusammen. Bis
+ * 2026-11-21 nahm sie die grösste vorhandene plus eins: nach dem Löschen
+ * von P5 hiess die nächste wieder P5.
+ */
 function naechsteLast(z) {
-  const nummern = alleLasten(z).map((x) => Number(String(x.kennung).replace(/^P/, '')) || 0);
-  return `P${Math.max(0, ...nummern) + 1}`;
+  return neueKennung(z, 'P', alleLasten(z));
 }
 
 /**

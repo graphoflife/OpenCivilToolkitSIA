@@ -7,6 +7,17 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · Eine Lastnummer kommt nie wieder
+
+Eine neue Last im Balkensystem nahm in der Zeichnung die grösste
+vorhandene Nummer plus eins: wer P5 als letzte löschte, bekam mit der
+nächsten wieder ein P5 -- und eine Meldung oder Auswahl, die noch auf die
+alte zeigte, traf die neue. Knoten, Linien und der Kern zählten schon nach
+der Regel «eine Kennung kommt nie wieder» (Benutzer, 2026-11-19), nur die
+Lasten in `bs_zeichnung.js` nicht; ihr Kommentar behauptete «wie im Kern».
+Jetzt nimmt `naechsteLast` dieselbe `neueKennung` wie Knoten und Linien.
+Gefunden bei der Durchsicht vom 2026-11-20.
+
 ## 2026-11-21 · η_EI statt κ
 
 Der Anteil der ungerissenen Steifigkeit einer Tragwand hiess κ. Dasselbe
