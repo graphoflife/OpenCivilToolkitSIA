@@ -1,5 +1,5 @@
 ---
-erzeugt: 8ed4e20939c6
+erzeugt: 64c147648672
 art: modul
 tags: [modul]
 ---
@@ -271,8 +271,6 @@ der Querschnitt das Moment zweiter Ordnung aufnimmt.
 
 - `THEMA = 'Knicken'`
 - `ART = 'K'`
-- `widerstand: Rechenwahl`
-- `schnell: bool = False`
 
 #### Knickverfahren._m_rd_symbol
 
@@ -400,6 +398,7 @@ Mit der Linie der Tragsicherheit: was das Knicken waehlt und woher sein Widersta
 
 ## Konstanten
 
+- `REFERENZ = 'SIA 262:2025, 4.3.7'` – Wo der Nachweis am verformten System steht -- fuer ihn als Ganzes und fuer den Erfuellungsgrad jedes Falls.
 - `VERFORMUNG = Rechenwahl(art=Rechenart.PARABEL)` – Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
 - `WIDERSTAND = Rechenwahl(art=Rechenart.BLOCK)`
 - `DURCHLAEUFE = 40` – Groesste Zahl an Durchlaeufen der Ausmitten-Iteration.

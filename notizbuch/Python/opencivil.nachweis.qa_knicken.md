@@ -1,5 +1,5 @@
 ---
-erzeugt: c34fbd2f5939
+erzeugt: 219551086a57
 art: modul
 tags: [modul]
 ---
@@ -86,7 +86,6 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 ## Braucht
 
 - [[opencivil.core.berechnung]]
-- [[opencivil.core.latex]]
 - [[opencivil.core.nachweis]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.suche]]

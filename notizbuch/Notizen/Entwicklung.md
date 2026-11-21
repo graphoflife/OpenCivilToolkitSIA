@@ -7,6 +7,19 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-21 · Platte und Querschnittsanalyse teilen, was gleich ist
+
+Ein Umbau ohne neue Zahl, vom Benutzer gewählt (2026-11-21). Was die
+Platte und der gezeichnete Querschnitt gleich tun, schrieb jeder von Hand
+ab; jetzt steht es einmal da:
+
+- **Der Anfang der Knicknachweise.** Beide prüften, dass es Fälle gibt,
+  liessen die Verformung mit E_cd rechnen und legten je Fall einen
+  Erfüllungsgrad «Knicken – Fall» an, mit Titel und Normstelle. Das tut
+  jetzt `Knickverfahren.__init__`; die Platte gibt nur noch ihre
+  Bezüge und ihre Resistenzlinie dazu, der gezeichnete Querschnitt seine
+  Bezüge. Die Normstelle 4.3.7 steht einmal (`knicken.REFERENZ`).
+
 ## 2026-11-21 · Das Fachwerk an einer Stelle
 
 Ein Umbau ohne neue Zahl, vom Benutzer gewählt (2026-11-21):

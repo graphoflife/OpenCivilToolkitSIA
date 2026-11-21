@@ -103,7 +103,7 @@ import math
 from dataclasses import dataclass, field, replace
 from typing import Callable, Dict, List, Optional, Sequence
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
+from opencivil.core.berechnung import Ausfuehrung, Befundbezug, Eingabebezug, Eingaben
 from opencivil.core.nachweis import (
     NICHT_FUEHRBAR, UNBESCHRAENKT, Ausgang, Fallausgang, Nachweis, NachweisUrteil, Vergleich,
     grad_def,
@@ -124,6 +124,10 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import SCHRITTE, SCHRITTE_SUCHE, Widerstandslinie
 from opencivil.querschnitt.platte import Richtung
+
+#: Wo der Nachweis am verformten System steht -- fuer ihn als Ganzes und
+#: fuer den Erfuellungsgrad jedes Falls.
+REFERENZ = "SIA 262:2025, 4.3.7"
 
 #: Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
 VERFORMUNG = Rechenwahl(art=Rechenart.PARABEL)
@@ -329,8 +333,45 @@ class Knickverfahren(Nachweis):
 
     THEMA = "Knicken"
     ART = "K"
-    widerstand: Rechenwahl
-    schnell: bool = False
+
+    def __init__(self, bauteil, faelle: Sequence[Knickfall], *, verformung: Rechenwahl,
+                 widerstand: Rechenwahl, schnell: bool, bezuege: Sequence[Eingabebezug],
+                 befunde: Sequence[Befundbezug] = ()) -> None:
+        """
+        Was jeder Knicknachweis beim Anlegen tut, an der Platte wie am
+        gezeichneten Querschnitt -- ``bauteil`` gibt Kennung, Name und
+        Abschnitt: die Faelle pruefen, die Verformung mit ``E_cd`` rechnen
+        lassen (:func:`verformungswahl`) und je Fall einen Erfuellungsgrad
+        anlegen. Bis 2026-11-21 schrieb jeder der beiden das selbst ab.
+        """
+        if not faelle:
+            raise ValueError("Der Knicknachweis braucht mindestens einen Fall.")
+        self.faelle = list(faelle)
+        self.verformung = verformungswahl(verformung)
+        self.widerstand = widerstand
+        self.schnell = schnell
+        """
+        Ob die Suche nach N_Rd uebersprungen wird.
+
+        Sie kostet rund fuenfzehn vollstaendige Ausmitten-Iterationen und ist
+        damit das Teuerste im ganzen Werkzeug. Fuer das *Urteil* ist sie
+        entbehrlich: ``N_Rd >= |N_Ed|`` gilt genau dann, wenn der Querschnitt
+        bei ``N_Ed`` das Moment zweiter Ordnung aufnimmt -- erfuellt oder
+        nicht kommt also gleich heraus. Nur die Zahl daneben ist eine andere,
+        naemlich das Verhaeltnis der Momente statt der Kraefte.
+
+        Eingeschaltet wird das vom Bewehrungswerkzeug, das hunderte Male
+        rechnet und nur wissen muss, ob es aufgeht.
+        """
+        basis = f"{bauteil.id}.nachweis.knicken"
+        self.d_ausnutzung: Dict[str, WertDef] = {
+            f.name: grad_def(f"{basis}.{f.kennung}.erfuellungsgrad",
+                             rf"\alpha_{{eff,K,{als_text(f.name)}}}",
+                             f"Erfüllungsgrad Knicken – {f.name}", REFERENZ)
+            for f in self.faelle}
+        super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()), bezuege=bezuege,
+                         befunde=befunde, titel=f"Knicknachweis – {bauteil.name}",
+                         referenz=REFERENZ, abschnitt=bauteil.abschnitt)
 
     # -- Was das Bauteil sagt -----------------------------------------------
 
@@ -679,8 +720,6 @@ class Knicken(Knickverfahren):
         widerstand: Rechenwahl = WIDERSTAND,
         schnell: bool = False,
     ) -> None:
-        if not faelle:
-            raise ValueError("Der Knicknachweis braucht mindestens einen Fall.")
         self.posten = querschnitt.posten_in_richtung(Richtung.X)
         if not self.posten:
             raise ValueError(
@@ -689,54 +728,18 @@ class Knicken(Knickverfahren):
 
         self.querschnitt = querschnitt
         self.richtung = Richtung.X
-        self.faelle = list(faelle)
         self.mn = mn_nachweis
-        self.verformung = verformungswahl(verformung)
-        self.widerstand = widerstand
         self.linienquelle = Linienquelle(widerstand, mn_nachweis, querschnitt, self.posten,
                                          self.richtung)
         """Woher das Knicken die Resistenzlinie seines Widerstands nimmt."""
-        self.schnell = schnell
-        """
-        Ob die Suche nach N_Rd uebersprungen wird.
-
-        Sie kostet rund fuenfzehn vollstaendige Ausmitten-Iterationen und ist
-        damit das Teuerste im ganzen Werkzeug. Fuer das *Urteil* ist sie
-        entbehrlich: ``N_Rd >= |N_Ed|`` gilt genau dann, wenn der Querschnitt
-        bei ``N_Ed`` das Moment zweiter Ordnung aufnimmt -- erfuellt oder
-        nicht kommt also gleich heraus. Nur die Zahl daneben ist eine andere,
-        naemlich das Verhaeltnis der Momente statt der Kraefte.
-
-        Eingeschaltet wird das vom Bewehrungswerkzeug, das hunderte Male
-        rechnet und nur wissen muss, ob es aufgeht.
-        """
-
-        basis = f"{querschnitt.id}.nachweis.knicken"
-        self.d_ausnutzung: Dict[str, WertDef] = {
-            f.name: grad_def(
-                f"{basis}.{f.kennung}.erfuellungsgrad",
-                rf"\alpha_{{eff,K,{als_text(f.name)}}}",
-                f"Erfüllungsgrad Knicken – {f.name}",
-                "SIA 262:2025, 4.3.7",
-            )
-            for f in self.faelle
-        }
-
         bezuege = self.linienquelle.bezuege([
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
         ] + betonbezuege(verformung.satz(querschnitt.beton), querschnitt.beton,
-                         modul=self.verformung.modul) + lagenbezuege(self.posten, verformung))
-
-        super().__init__(
-            basis,
-            ausgaben=list(self.d_ausnutzung.values()),
-            bezuege=bezuege,
-            befunde=self.linienquelle.befunde,
-            titel=f"Knicknachweis – {querschnitt.name}",
-            referenz="SIA 262:2025, 4.3.7",
-            abschnitt=querschnitt.abschnitt,
-        )
+                         modul=verformungswahl(verformung).modul)
+            + lagenbezuege(self.posten, verformung))
+        super().__init__(querschnitt, faelle, verformung=verformung, widerstand=widerstand,
+                         schnell=schnell, bezuege=bezuege, befunde=self.linienquelle.befunde)
 
     def _m_rd_symbol(self, erg: "Knickergebnis") -> str:
         return f"M_{{{self.widerstand.index},x}}(N_{{Ed}})"

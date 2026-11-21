@@ -41,13 +41,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import Ausfuehrung, Eingaben
-from opencivil.core.nachweis import NachweisUrteil, grad_def
-from opencivil.core.latex import als_text
+from opencivil.core.nachweis import NachweisUrteil
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.suche import ILLINOIS
 from opencivil.nachweis.knicken import (
     VERFORMUNG, VERFORMUNG_NACH_WAHL, WIDERSTAND, Knickfall, Knickstab, Knickverfahren,
-    verformungswahl,
 )
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
@@ -94,23 +92,9 @@ class KnickenQA(Knickverfahren):
                  verformung: Rechenwahl = VERFORMUNG,
                  widerstand: Rechenwahl = WIDERSTAND, schnell: bool = False) -> None:
         """``schnell`` wie bei der Platte: ohne die Suche nach N_Rd, dasselbe Urteil."""
-        if not faelle:
-            raise ValueError("Der Knicknachweis braucht mindestens einen Fall.")
         self.analyse = analyse
-        self.faelle = list(faelle)
-        self.verformung = verformungswahl(verformung)
-        self.widerstand = widerstand
-        self.schnell = schnell
-        basis = f"{analyse.id}.nachweis.knicken"
-        self.d_ausnutzung = {
-            f.name: grad_def(f"{basis}.{f.kennung}.erfuellungsgrad",
-                             rf"\alpha_{{eff,K,{als_text(f.name)}}}",
-                             f"Erfüllungsgrad Knicken – {f.name}", "SIA 262:2025, 4.3.7")
-            for f in self.faelle}
-        super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
-                         bezuege=analyse.grundbezuege(),
-                         titel=f"Knicknachweis – {analyse.name}",
-                         referenz="SIA 262:2025, 4.3.7", abschnitt=analyse.abschnitt)
+        super().__init__(analyse, faelle, verformung=verformung, widerstand=widerstand,
+                         schnell=schnell, bezuege=analyse.grundbezuege())
 
     def _falltitel(self, fall: QAKnickfall) -> str:
         return f"Knicken – {fall.name}, {fall.richtung.beschriftung}"
