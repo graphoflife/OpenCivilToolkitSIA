@@ -42,11 +42,10 @@ from __future__ import annotations
 import math
 from typing import Dict, List, Sequence
 
-from opencivil.core.berechnung import Eingabebezug, Eingaben, Prozedur
+from opencivil.core.berechnung import Eingabebezug, Eingaben, Kennzahlprozedur
 from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, KN, KNM, Groesse
 from opencivil.core.latex import Mathe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Kennzahl, Wert, WertDef
 from opencivil.material.betonstahl import STAHLDICHTE
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Querschnittsanalyse
@@ -105,7 +104,7 @@ def _einheit(last: str, biegung: Biegung) -> Dict[str, float]:
     return {**einheit, "V_y": biegung.querkraft_y(einheit["V_y"])}
 
 
-class KennzahlenQA(Prozedur):
+class KennzahlenQA(Kennzahlprozedur):
     """Die Kennzahlen eines gezeichneten Querschnitts -- siehe Dateikopf."""
 
     THEMA = "Kennzahlen"
@@ -113,18 +112,7 @@ class KennzahlenQA(Prozedur):
     def __init__(self, analyse: Querschnittsanalyse) -> None:
         self.analyse = analyse
         basis = f"{analyse.id}.kennzahlen"
-        #: Je Kurzname die Definition -- zum Belegen.
-        self.d: Dict[str, WertDef] = {}
-        #: Dieselben, wie sie unter dem Querschnitt stehen, in dieser Folge.
-        self.kennzahlen: List[Kennzahl] = []
-
-        def dazu(kurz: str, symbol: str, einheit, beschreibung: str, beschriftung: str,
-                 erklaerung: str, *, stellen: int = 1, referenz: str = "") -> None:
-            definition = WertDef(id=f"{basis}.{kurz}", symbol=symbol, einheit=einheit,
-                                 beschreibung=beschreibung, referenz=referenz, stellen=stellen)
-            self.d[kurz] = definition
-            self.kennzahlen.append(Kennzahl(definition, beschriftung, erklaerung))
-
+        dazu = self.anlegen(basis)
         dazu("bewehrungsmass", r"\mu_s", KG_PRO_M3, "Bewehrungsmass je Kubikmeter Beton",
              "Bewehrungsmass",
              f"Stahldichte {STAHLDICHTE:g} kg/m³ – Längsbewehrung, ohne Bügel", stellen=0)
@@ -157,8 +145,8 @@ class KennzahlenQA(Prozedur):
 
         bezuege = (list(analyse.grundbezuege()) + analyse.schubbezuege()
                    + [Eingabebezug(k, analyse.id_von(k)) for k in ("A", "A_s")])
-        super().__init__(basis, ausgaben=list(self.d.values()), bezuege=bezuege,
-                         titel=f"Kennzahlen – {analyse.name}", abschnitt=analyse.abschnitt)
+        super().__init__(basis, bezuege=bezuege, titel=f"Kennzahlen – {analyse.name}",
+                         abschnitt=analyse.abschnitt)
 
     def _bewehrt(self, seite: Zugseite) -> bool:
         """
@@ -189,12 +177,6 @@ class KennzahlenQA(Prozedur):
         if self.getragen:
             self._schub(e, p, ergebnis)
         return ergebnis
-
-    def _belegen(self, ergebnis: Dict[str, Groesse], kurz: str, si: float) -> Wert:
-        definition = self.d[kurz]
-        wert = definition.belegen(Groesse.aus_si(si, definition.einheit))
-        ergebnis[definition.id] = wert.groesse
-        return wert
 
     def _bewehrungsmass(self, e: Eingaben, p: Protokoll, ergebnis: Dict[str, Groesse]) -> None:
         # Stahlvolumen je Betonvolumen: A_s * L * rho / (A * L) -- die Laenge

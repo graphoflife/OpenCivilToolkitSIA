@@ -25,6 +25,14 @@ ab; jetzt steht es einmal da:
   Jetzt teilen beide `Normalzwang`, wie bei der Biegung schon
   `Biegezwang`; der hat dazu sein Kürzel «ZB» bekommen, das der
   gezeichnete Querschnitt ebenfalls abschrieb.
+- **Das Anlegen und Belegen der Kennzahlen.** Die Platte, der gezeichnete
+  Querschnitt und der Pfahl (seine Federn) führten je zwei Listen, ein
+  `dazu` und ein `_belegen`, Zeile für Zeile gleich. Jetzt erben alle drei
+  von `Kennzahlprozedur` (`core/berechnung.py`): `anlegen(basis)` gibt das
+  `dazu`, `_belegen` steht dort, und die Ausgaben sind genau die
+  angelegten Kennzahlen. Die Platte nennt ihre Erklärung «Handrechnung mit
+  Bemessungswerten» jetzt bei jeder Kennzahl selbst, statt sie als
+  stille Vorgabe im `dazu` zu tragen.
 
 ## 2026-11-21 · Das Fachwerk an einer Stelle
 

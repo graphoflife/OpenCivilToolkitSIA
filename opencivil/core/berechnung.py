@@ -37,12 +37,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, replace
 from typing import (
-    TYPE_CHECKING, Any, Callable, Dict, Iterator, Mapping, Optional, Sequence, Tuple, Union,
+    TYPE_CHECKING, Any, Callable, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple,
+    Union,
 )
 
-from opencivil.core.einheiten import EmpirischesErgebnis, Groesse
+from opencivil.core.einheiten import Einheit, EmpirischesErgebnis, Groesse
 from opencivil.core.protokoll import Abschnitt, Protokoll, codestelle_aus
-from opencivil.core.wert import Quelle, Wert, WertDef
+from opencivil.core.wert import Kennzahl, Quelle, Wert, WertDef
 
 if TYPE_CHECKING:
     from opencivil.core.nachweis import NachweisUrteil
@@ -592,3 +593,52 @@ class Prozedur(Berechnung):
                 p.formel(...)
                 return {...}
     """
+
+
+class Kennzahlprozedur(Prozedur):
+    """
+    Eine Prozedur, die Kennzahlen eines Bauteils rechnet: Werte, die es
+    beschreiben, gleich welche Lastfaelle es gibt -- die Widerstaende der
+    Platte und des gezeichneten Querschnitts, die Federn eines Pfahls.
+
+    Jede legt ihre Kennzahlen an, bevor sie ``super().__init__`` ruft
+    (:meth:`anlegen`); ihre Ausgaben sind genau diese, in dieser Folge.
+    Beim Rechnen belegt sie jede mit :meth:`_belegen`. Bis 2026-11-21
+    schrieb jede der drei beides selbst, Zeile fuer Zeile gleich.
+    """
+
+    d: Dict[str, WertDef]
+    """Je Kurzname die Definition -- zum Belegen."""
+
+    kennzahlen: List[Kennzahl]
+    """Dieselben, wie sie unter dem Bauteil stehen, in dieser Folge."""
+
+    def __init__(self, id: str, **angaben: Any) -> None:
+        super().__init__(id, ausgaben=list(self.d.values()), **angaben)
+
+    def anlegen(self, basis: str) -> Callable[..., None]:
+        """
+        Beginnt die Kennzahlen unter ``basis`` und gibt zurueck, womit eine
+        dazukommt: ``dazu(kurz, symbol, einheit, beschreibung, beschriftung,
+        erklaerung, *, stellen=1, referenz="")``. Ihre Kennung ist
+        ``{basis}.{kurz}``; Beschriftung und Erklaerung stehen unter dem
+        Bauteil.
+        """
+        self.d, self.kennzahlen = {}, []
+
+        def dazu(kurz: str, symbol: str, einheit: Einheit, beschreibung: str,
+                 beschriftung: str, erklaerung: str, *, stellen: int = 1,
+                 referenz: str = "") -> None:
+            definition = WertDef(id=f"{basis}.{kurz}", symbol=symbol, einheit=einheit,
+                                 beschreibung=beschreibung, referenz=referenz, stellen=stellen)
+            self.d[kurz] = definition
+            self.kennzahlen.append(Kennzahl(definition, beschriftung, erklaerung))
+
+        return dazu
+
+    def _belegen(self, ergebnis: Dict[str, Groesse], kurz: str, si: float) -> Wert:
+        """Die Kennzahl ``kurz`` mit dem Wert ``si`` in SI-Basis -- auch in ``ergebnis``."""
+        definition = self.d[kurz]
+        wert = definition.belegen(Groesse.aus_si(si, definition.einheit))
+        ergebnis[definition.id] = wert.groesse
+        return wert

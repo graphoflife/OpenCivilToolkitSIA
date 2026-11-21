@@ -1,5 +1,5 @@
 ---
-erzeugt: afa085b272d9
+erzeugt: d5f82b43bd79
 art: modul
 tags: [modul]
 ---
@@ -183,7 +183,7 @@ Der Wert mit dem grössten Betrag und seine Tiefe.
 ### Pfahlsteifigkeit
 
 ```python
-class Pfahlsteifigkeit(Prozedur)
+class Pfahlsteifigkeit(Kennzahlprozedur)
 ```
 
 Siehe Dateikopf.

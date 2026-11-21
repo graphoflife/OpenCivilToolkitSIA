@@ -1,5 +1,5 @@
 ---
-erzeugt: f645934108bb
+erzeugt: 63e90b0226e7
 art: modul
 tags: [modul]
 ---
@@ -392,6 +392,44 @@ class Nulllinienlage(Prozedur):
         p.formel(...)
         return {...}
 ```
+
+### Kennzahlprozedur
+
+```python
+class Kennzahlprozedur(Prozedur)
+```
+
+Eine Prozedur, die Kennzahlen eines Bauteils rechnet: Werte, die es
+beschreiben, gleich welche Lastfaelle es gibt -- die Widerstaende der
+Platte und des gezeichneten Querschnitts, die Federn eines Pfahls.
+
+Jede legt ihre Kennzahlen an, bevor sie `super().__init__` ruft
+([[opencivil.core.berechnung#Kennzahlprozedur.anlegen|anlegen]]); ihre Ausgaben sind genau diese, in dieser Folge.
+Beim Rechnen belegt sie jede mit [[opencivil.core.berechnung#Kennzahlprozedur._belegen|_belegen]]. Bis 2026-11-21
+schrieb jede der drei beides selbst, Zeile fuer Zeile gleich.
+
+- `d: Dict[str, WertDef]` – Je Kurzname die Definition -- zum Belegen.
+- `kennzahlen: List[Kennzahl]` – Dieselben, wie sie unter dem Bauteil stehen, in dieser Folge.
+
+#### Kennzahlprozedur.anlegen
+
+```python
+def anlegen(self, basis: str) -> Callable[..., None]
+```
+
+Beginnt die Kennzahlen unter `basis` und gibt zurueck, womit eine
+dazukommt: ``dazu(kurz, symbol, einheit, beschreibung, beschriftung,
+erklaerung, *, stellen=1, referenz="")``. Ihre Kennung ist
+`{basis}.{kurz}`; Beschriftung und Erklaerung stehen unter dem
+Bauteil.
+
+#### Kennzahlprozedur._belegen
+
+```python
+def _belegen(self, ergebnis: Dict[str, Groesse], kurz: str, si: float) -> Wert
+```
+
+Die Kennzahl `kurz` mit dem Wert `si` in SI-Basis -- auch in `ergebnis`.
 
 
 ## Konstanten

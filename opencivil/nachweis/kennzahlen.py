@@ -64,10 +64,10 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
 
-from opencivil.core.berechnung import BerechnungsFehler, Eingaben, Prozedur
+from opencivil.core.berechnung import BerechnungsFehler, Eingaben, Kennzahlprozedur
 from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Kennzahl, Wert, WertDef
+from opencivil.core.wert import Wert
 from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis import linie as geo
 from opencivil.nachweis.biegung_normalkraft import Linienquelle
@@ -89,7 +89,7 @@ WAHL = Rechenwahl()
 HAND = "Handrechnung mit Bemessungswerten"
 
 
-class Plattenkennzahlen(Prozedur):
+class Plattenkennzahlen(Kennzahlprozedur):
     """Die Kennzahlen einer Platte in x -- siehe Dateikopf."""
 
     THEMA = "Kennzahlen"
@@ -104,34 +104,22 @@ class Plattenkennzahlen(Prozedur):
         """Woher die Kennzahlen die Linie ihrer Eckwerte nehmen."""
 
         basis = f"{querschnitt.id}.kennzahlen"
-        #: Je Kurzname die Definition -- zum Belegen.
-        self.d: Dict[str, WertDef] = {}
-        #: Dieselben, wie sie unter der Platte stehen, in dieser Folge.
-        self.kennzahlen: List[Kennzahl] = []
-
-        def dazu(kurz: str, symbol: str, einheit, beschreibung: str, beschriftung: str,
-                 erklaerung: str = HAND, *, stellen: int = 1, referenz: str = "") -> None:
-            definition = WertDef(id=f"{basis}.{kurz}", symbol=symbol, einheit=einheit,
-                                 beschreibung=beschreibung, referenz=referenz,
-                                 stellen=stellen)
-            self.d[kurz] = definition
-            self.kennzahlen.append(Kennzahl(definition, beschriftung, erklaerung))
-
+        dazu = self.anlegen(basis)
         dazu("M_Rd_pos", r"M_{Rd}^{+}(N_{Ed} = 0)", KNM,
-             "Momentenwiderstand bei N_Ed = 0, Zug unten", "Momentenwiderstand, Zug unten")
+             "Momentenwiderstand bei N_Ed = 0, Zug unten", "Momentenwiderstand, Zug unten", HAND)
         dazu("M_Rd_neg", r"M_{Rd}^{-}(N_{Ed} = 0)", KNM,
-             "Momentenwiderstand bei N_Ed = 0, Zug oben", "Momentenwiderstand, Zug oben")
+             "Momentenwiderstand bei N_Ed = 0, Zug oben", "Momentenwiderstand, Zug oben", HAND)
         dazu("N_Rd_zug", r"N_{Rd}^{+}(M_{Ed} = 0)", KN,
-             "Zugwiderstand bei M_Ed = 0", "Zugwiderstand")
+             "Zugwiderstand bei M_Ed = 0", "Zugwiderstand", HAND)
         dazu("N_Rd_druck", r"N_{Rd}^{-}(M_{Ed} = 0)", KN,
-             "Druckwiderstand bei M_Ed = 0", "Druckwiderstand")
+             "Druckwiderstand bei M_Ed = 0", "Druckwiderstand", HAND)
         # Ein x/d nur, wo Zug auf Bewehrung trifft: ohne sie gibt es kein d.
         gezogen = {q.lage.seite for q in self.posten}
         for seite in UM_Y:
             if seite in gezogen:
                 dazu(f"x_d_{seite.marke}", rf"\left(x/d\right)^{{{seite.zeichen}}}",
                      EINHEITSLOS, f"Bezogene Druckzonenhöhe bei N_Ed = 0, Zug {seite}",
-                     f"Bezogene Druckzonenhöhe, Zug {seite}", stellen=3)
+                     f"Bezogene Druckzonenhöhe, Zug {seite}", HAND, stellen=3)
         # Welcher Ansatz gilt, entscheidet sich hier, einmal: er bestimmt die
         # Kennzahlen der Querkraft und ihre Rechnung.
         if querkraft.buegel is None:
@@ -158,7 +146,6 @@ class Plattenkennzahlen(Prozedur):
 
         super().__init__(
             basis,
-            ausgaben=list(self.d.values()),
             # Was die Querkraft ohne Fall liest, unter den Namen ihres
             # Nachweises -- und was eine eigene Linie liest, wo es eine gibt.
             bezuege=self.linienquelle.bezuege(querkraft.bezuege_ohne_faelle),
@@ -183,12 +170,6 @@ class Plattenkennzahlen(Prozedur):
         momente = self._handrechnung(e, p, werte, ergebnis)
         self._querkraftteil(e, p, werte, ergebnis, momente)
         return ergebnis
-
-    def _belegen(self, ergebnis: Dict[str, Groesse], kurz: str, si: float) -> Wert:
-        definition = self.d[kurz]
-        wert = definition.belegen(Groesse.aus_si(si, definition.einheit))
-        ergebnis[definition.id] = wert.groesse
-        return wert
 
     def _handrechnung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
                       ergebnis: Dict[str, Groesse]) -> Dict[Zugseite, float]:

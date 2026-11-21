@@ -464,10 +464,11 @@ empfohlenen Reihenfolge, 3 und 4 nach den kleinen.
         t = min(h; b) am gezeichneten Querschnitt). Das ändert die
         Herleitung der Platte; ihre Zahlen vorher und nachher vergleichen.
       - Offen, verwandt, je ein eigener Umbau:
-        - Platte und Analyse schreiben Gemeinsames von Hand ab: den Anfang
-          der Knicknachweise, Thema und Namen der Rissnormalkraft, `dazu`
-          und `_belegen` der Kennzahlen. Umbau: gemeinsame Oberklassen wie
-          `Biegezwang` und `Spannungsbegrenzung` es vormachen.
+        - Erledigt (2026-11-21): Platte und Analyse teilen, was gleich ist
+          -- den Anfang der Knicknachweise (`Knickverfahren.__init__`),
+          Thema und Namen der Rissnormalkraft (`Normalzwang`), Anlegen und
+          Belegen der Kennzahlen (`Kennzahlprozedur`, auch für den Pfahl).
+          Siehe [[Entwicklung]].
         - Erledigt (2026-11-21): das Fachwerk an einer Stelle.
           `fachwerk.py` besitzt die Druckfeldregeln (`ALPHA_MIN`,
           `ALPHA_MAX`, `ALPHA_ZUG`, `K_C`, `druckfeldgrenzen`) und die

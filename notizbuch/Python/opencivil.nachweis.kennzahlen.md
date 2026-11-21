@@ -1,5 +1,5 @@
 ---
-erzeugt: bccae049ab70
+erzeugt: 204e5b1ca41f
 art: modul
 tags: [modul]
 ---
@@ -77,7 +77,7 @@ der Widerstand liegt unter `V_Rd,min`.
 ### Plattenkennzahlen
 
 ```python
-class Plattenkennzahlen(Prozedur)
+class Plattenkennzahlen(Kennzahlprozedur)
 ```
 
 Die Kennzahlen einer Platte in x -- siehe Dateikopf.

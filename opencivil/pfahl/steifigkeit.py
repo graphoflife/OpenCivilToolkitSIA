@@ -54,11 +54,11 @@ import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, Prozedur
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, Kennzahlprozedur
 from opencivil.core.einheiten import M, MM, MN, MN_PRO_M, MNM, MNM2, MNM_PRO_RAD, Groesse
 from opencivil.core.latex import Mathe, Zelle, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Kennzahl, Wert, WertDef
+from opencivil.core.wert import Wert
 from opencivil.pfahl import bettung, buch
 from opencivil.pfahl.bettung import Strecke
 from opencivil.pfahl.boden import Mantel
@@ -187,7 +187,7 @@ def _extrem(z: Sequence[float], werte: Sequence[float]) -> Tuple[float, float]:
     return werte[i], z[i]
 
 
-class Pfahlsteifigkeit(Prozedur):
+class Pfahlsteifigkeit(Kennzahlprozedur):
     """Siehe Dateikopf."""
 
     THEMA = "Pfahlsteifigkeit"
@@ -201,15 +201,9 @@ class Pfahlsteifigkeit(Prozedur):
         self.pfahl = pfahl
         self.kombinationen = list(kombinationen)
         basis = self.kennung(pfahl)
-        #: Je Kurzname die Definition einer Feder -- zum Belegen.
-        self.d: Dict[str, WertDef] = {}
-        #: Dieselben, wie sie unter dem Pfahl stehen.
-        self.kennzahlen: List[Kennzahl] = []
+        dazu = self.anlegen(basis)
         for kurz, symbol, einheit, stellen, beschriftung, erklaerung in FEDERN:
-            definition = WertDef(id=f"{basis}.{kurz}", symbol=symbol, einheit=einheit,
-                                 beschreibung=beschriftung, stellen=stellen)
-            self.d[kurz] = definition
-            self.kennzahlen.append(Kennzahl(definition, beschriftung, erklaerung))
+            dazu(kurz, symbol, einheit, beschriftung, beschriftung, erklaerung, stellen=stellen)
         self.stoff = pfahl.beton if pfahl.bohrpfahl else pfahl.stahl
         self.modul = "E_cm" if pfahl.bohrpfahl else "E_s"
         namen = ["D", "L", "t_K", "t_red"]
@@ -217,7 +211,7 @@ class Pfahlsteifigkeit(Prozedur):
             namen += ["d_a", "dt"] + (["t_r"] if pfahl.tragglied is Tragglied.ROHR else [])
         for i, s in enumerate(pfahl.schichten, start=1):
             namen += [f"d_{i}", f"E_s_{i}"] + ([f"q_s_{i}"] if s.mantel is Mantel.EINGEBEN else [])
-        super().__init__(basis, ausgaben=list(self.d.values()),
+        super().__init__(basis,
                          bezuege=[Eingabebezug(n, pfahl.id_von(n)) for n in namen]
                          + [self.stoff.bezug(self.modul)],
                          titel=f"Steifigkeit – {pfahl.name}", abschnitt=pfahl.abschnitt)
@@ -255,12 +249,6 @@ class Pfahlsteifigkeit(Prozedur):
         if self.kombinationen:
             self._kombinationen(p, grund, EA.groesse.si, EI.groesse.si, schritt, befund)
         return Ausfuehrung(ergebnis, (), befund)
-
-    def _belegen(self, ergebnis: Dict[str, Groesse], kurz: str, si: float) -> Wert:
-        definition = self.d[kurz]
-        wert = definition.belegen(Groesse.aus_si(si, definition.einheit))
-        ergebnis[definition.id] = wert.groesse
-        return wert
 
     # -- Querschnitt ------------------------------------------------------------
 

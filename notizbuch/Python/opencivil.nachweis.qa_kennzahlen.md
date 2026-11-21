@@ -1,5 +1,5 @@
 ---
-erzeugt: d1676134e531
+erzeugt: 2188d60ec238
 art: modul
 tags: [modul]
 ---
@@ -80,7 +80,7 @@ so, wie sie wirkt: einachsig ist `V_y` null.
 ### KennzahlenQA
 
 ```python
-class KennzahlenQA(Prozedur)
+class KennzahlenQA(Kennzahlprozedur)
 ```
 
 Die Kennzahlen eines gezeichneten Querschnitts -- siehe Dateikopf.
@@ -115,7 +115,6 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
-- [[opencivil.core.wert]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.biegung]]
