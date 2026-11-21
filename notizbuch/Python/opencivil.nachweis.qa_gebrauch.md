@@ -1,5 +1,5 @@
 ---
-erzeugt: b20940e668f8
+erzeugt: fa828c8cec78
 art: modul
 tags: [modul]
 ---
@@ -209,14 +209,10 @@ Bauteils ([[opencivil.querschnitt.randzone#flaechen_am_rand|flaechen_am_rand]]).
 ### RissnormalkraftQA
 
 ```python
-class RissnormalkraftQA(Nachweis)
+class RissnormalkraftQA(Normalzwang)
 ```
 
 Der ganze Querschnitt reisst: seine Risskraft gegen alle Staebe zusammen.
-
-- `THEMA = 'Zwängung auf Normalkraft'`
-- `LANGNAME = 'Risse: Zwängung Normalkraft'`
-- `ART = 'N_Riss'`
 
 #### RissnormalkraftQA.pruefe
 

@@ -72,9 +72,7 @@ from dataclasses import dataclass, replace
 from typing import Dict, List, Optional, Sequence, Tuple, Type
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben
-from opencivil.core.nachweis import (
-    NICHT_FUEHRBAR, Ausgang, Nachweis, NachweisUrteil, Vergleich, grad_def,
-)
+from opencivil.core.nachweis import NICHT_FUEHRBAR, Ausgang, NachweisUrteil, Vergleich, grad_def
 from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import Mathe, angabe, bedingung, fest, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -85,8 +83,8 @@ from opencivil.nachweis.gebrauchsebene import (
     Gebrauchsebene, gebrauchsebene, protokoll_ebene, verfahren_der_ebene,
 )
 from opencivil.nachweis.mindestbewehrung import (
-    EINLEITUNG_NORMALKRAFT, REFERENZ_DICKE, REFERENZ_RANDZONE, REFERENZ_RISSBREITE,
-    REFERENZ_TABELLE, Biegezwang,
+    REFERENZ_DICKE, REFERENZ_RANDZONE, REFERENZ_RISSBREITE, REFERENZ_TABELLE, Biegezwang,
+    Normalzwang,
 )
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
@@ -288,12 +286,8 @@ def betonflaechen(analyse: Querschnittsanalyse,
     return [(stoff, A) for stoff, A in flaechen.values() if A > 0.0]
 
 
-class RissnormalkraftQA(Nachweis):
+class RissnormalkraftQA(Normalzwang):
     """Der ganze Querschnitt reisst: seine Risskraft gegen alle Staebe zusammen."""
-
-    THEMA = "Zwängung auf Normalkraft"
-    LANGNAME = "Risse: Zwängung Normalkraft"
-    ART = "N_Riss"
 
     def __init__(self, analyse: Querschnittsanalyse, *, anforderung: Rissanforderung,
                  begrenzt: bool) -> None:
@@ -301,18 +295,18 @@ class RissnormalkraftQA(Nachweis):
         self.anforderung = anforderung
         self.begrenzt = begrenzt
         basis = f"{analyse.id}.nachweis.rissnormalkraft"
-        self.d_grad = grad_def(f"{basis}.erfuellungsgrad", r"\alpha_{eff,NR}",
-                               "Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt",
-                               REFERENZ_RISSBREITE)
+        self.d_grad = grad_def(f"{basis}.erfuellungsgrad", rf"\alpha_{{eff,{self.KUERZEL}}}",
+                               f"Erfüllungsgrad {self.BENENNUNG} – ganzer Querschnitt",
+                               self.REFERENZ)
         super().__init__(basis, ausgaben=[self.d_grad], bezuege=analyse.grundbezuege(),
                          titel=f"{self.THEMA} – {analyse.name}",
-                         referenz=REFERENZ_RISSBREITE, abschnitt=analyse.abschnitt)
+                         referenz=self.REFERENZ, abschnitt=analyse.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         a = self.analyse
         werte = Zwischenwerte(self.id)
         p.titel(self.THEMA)
-        p.erklaerung(EINLEITUNG_NORMALKRAFT)
+        p.erklaerung(self.EINLEITUNG)
         p.erklaerung(
             "Am gezeichneten Querschnitt reisst der ganze Beton, und alle Stäbe teilen "
             "sich seine Risskraft, jeder bis zu seiner zulässigen Spannung. Die "
@@ -417,8 +411,9 @@ class ZwaengungBiegungQA(Biegezwang):
         self.anforderung = anforderung
         self.wahl = replace(VORGABE, kriechzahl=kriechzahl)
         basis = f"{analyse.id}.nachweis.zwang_biegung"
-        self.d_ausnutzung = grade_je_seite(basis, "ZB", f"Erfüllungsgrad {self.THEMA}",
-                                           self.REFERENZ, analyse)
+        self.d_ausnutzung = grade_je_seite(basis, self.KUERZEL,
+                                           f"Erfüllungsgrad {self.BENENNUNG}", self.REFERENZ,
+                                           analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
                          titel=f"{self.THEMA} – {analyse.name}",

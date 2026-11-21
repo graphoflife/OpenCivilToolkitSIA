@@ -80,17 +80,6 @@ REFERENZ_WURZELFORMEL = "SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17"
 REFERENZ_DICKE = "SIA 262:2025, 4.4.1.3"
 REFERENZ_RANDZONE = "SIA 262:2025, 4.4.2.3.7"
 
-#: Der erste Satz der Zwaengung auf Normalkraft -- an der Platte wie am
-#: gezeichneten Querschnitt.
-EINLEITUNG_NORMALKRAFT = (
-    "Eine aufgezwungene oder behinderte Verkürzung zieht den Querschnitt, bis "
-    "er reisst. Die Kraft, die der Beton dabei abgibt, muss die Bewehrung "
-    "übernehmen – ohne über die zulässige Stahlspannung zu kommen; so bleiben "
-    "die Risse fein. Nicht zu verwechseln mit dem Nachweis gegen sprödes "
-    "Versagen: dort steht der Widerstand gegen die Rissbeanspruchung."
-)
-
-
 @dataclass(frozen=True)
 class Rissgroessen:
     """Was allein von der Platte abhaengt, nicht von der einzelnen Lage."""
@@ -216,7 +205,39 @@ class Lagenergebnis(Fallausgang):
     begruendung: str = ""
 
 
-class Rissnormalkraft(Lagennachweis):
+class Normalzwang(Nachweis):
+    """
+    Was die Zwaengung auf Normalkraft an der Platte (:class:`Rissnormalkraft`)
+    und am gezeichneten Querschnitt
+    (:class:`~opencivil.nachweis.qa_gebrauch.RissnormalkraftQA`) teilt: Name,
+    Thema, Kuerzel, Normstelle und den ersten Satz der Herleitung -- wie
+    :class:`Biegezwang` bei der Biegung. Bis 2026-11-21 schrieb der
+    gezeichnete Querschnitt sie ab.
+
+    Gerechnet wird verschieden: die Platte je Lage mit der Risskraft der
+    gezogenen Haelfte, der gezeichnete Querschnitt mit allen Staeben gegen
+    die Risskraft des ganzen Betons.
+    """
+
+    THEMA = "Zwängung auf Normalkraft"
+    LANGNAME = "Risse: Zwängung Normalkraft"
+    REFERENZ = REFERENZ_RISSBREITE
+    ART = "N_Riss"
+    #: Im Zeichen des Erfuellungsgrads, und wie er heisst.
+    KUERZEL = "NR"
+    BENENNUNG = "Rissnormalkraft"
+
+    #: Der erste Satz der Herleitung.
+    EINLEITUNG = (
+        "Eine aufgezwungene oder behinderte Verkürzung zieht den Querschnitt, bis "
+        "er reisst. Die Kraft, die der Beton dabei abgibt, muss die Bewehrung "
+        "übernehmen – ohne über die zulässige Stahlspannung zu kommen; so bleiben "
+        "die Risse fein. Nicht zu verwechseln mit dem Nachweis gegen sprödes "
+        "Versagen: dort steht der Widerstand gegen die Rissbeanspruchung."
+    )
+
+
+class Rissnormalkraft(Normalzwang, Lagennachweis):
     """
     Zwängung auf Normalkraft: die Rissbreite bei Zwang, beim Erreichen von
     ``f_ct,eff`` (:class:`~.lagennachweis.Lagennachweis`).
@@ -228,12 +249,6 @@ class Rissnormalkraft(Lagennachweis):
     Frage gestempelt (siehe ``Nachweis.teilurteile``).
     """
 
-    THEMA = "Zwängung auf Normalkraft"
-    ART = "N_Riss"
-    LANGNAME = "Risse: Zwängung Normalkraft"
-    KUERZEL = "NR"
-    BENENNUNG = "Rissnormalkraft"
-    REFERENZ = REFERENZ_RISSBREITE
     # Genau zwei Lagen je Richtung -- auch die leeren, denn gerade sie
     # fallen durch und sollen es sichtbar tun.
     NUR_MIT_STAHL = False
@@ -312,7 +327,7 @@ class Rissnormalkraft(Lagennachweis):
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, g: Rissgroessen) -> None:
         werte = Zwischenwerte(self.id)
         p.titel(f"{self.THEMA} – {self.richtung.beschriftung}")
-        p.erklaerung(EINLEITUNG_NORMALKRAFT)
+        p.erklaerung(self.EINLEITUNG)
 
         h_eff = werte.laenge("h_eff", "h_{eff}", g.h_eff)
         if self.begrenzt:
@@ -334,7 +349,7 @@ class Rissnormalkraft(Lagennachweis):
     def protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis,
                        ansatz: Rissgroessen) -> None:
         nummer = erg.lage.nummer
-        p.titel(f"Rissnormalkraft – {nummer}. Lage {self.richtung.value}", ebene=3)
+        p.titel(f"{self.BENENNUNG} – {nummer}. Lage {self.richtung.value}", ebene=3)
 
         if not erg.machbar:
             p.text(erg.begruendung)
@@ -393,7 +408,7 @@ class Biegezwang(Nachweis):
     Was die Zwaengung auf Biegung an der Platte (:class:`ZwaengungBiegung`)
     und am gezeichneten Querschnitt
     (:class:`~opencivil.nachweis.qa_gebrauch.ZwaengungBiegungQA`) teilt: Name,
-    Thema, Normstelle und den ersten Satz der Herleitung.
+    Thema, Kuerzel, Normstelle und den ersten Satz der Herleitung.
 
     Mehr teilen sie nicht. Die Platte rechnet je Lage von Hand, mit dem
     Hebelarm ``d - x/3``; der gezeichnete Querschnitt sucht je Zugseite das
@@ -406,6 +421,9 @@ class Biegezwang(Nachweis):
     LANGNAME = "Risse: Zwängung Biegung"
     REFERENZ = REFERENZ_RISSBREITE
     ART = "ZB"
+    #: Im Zeichen des Erfuellungsgrads, und wie er heisst.
+    KUERZEL = "ZB"
+    BENENNUNG = THEMA
 
     #: Der erste Satz der Herleitung.
     EINLEITUNG = (
@@ -430,9 +448,6 @@ class ZwaengungBiegung(Biegezwang, Lagennachweis):
     Spannungen sind Gebrauchsspannungen, also elastisch. Eine plastische
     Druckzone gibt es in diesem Augenblick nicht.
     """
-
-    KUERZEL = "ZB"
-    BENENNUNG = Biegezwang.THEMA
 
     def __init__(
         self,

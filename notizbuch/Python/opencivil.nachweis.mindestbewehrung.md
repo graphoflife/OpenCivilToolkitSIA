@@ -1,5 +1,5 @@
 ---
-erzeugt: 41e87d72edf9
+erzeugt: 9154110e87d2
 art: modul
 tags: [modul]
 ---
@@ -146,10 +146,35 @@ Was der Nachweis fuer eine Lage gefunden hat: N_s,adm gegen N_Riss.
 - `ausgang: Ausgang = NICHT_FUEHRBAR`
 - `begruendung: str = ''`
 
+### Normalzwang
+
+```python
+class Normalzwang(Nachweis)
+```
+
+Was die Zwaengung auf Normalkraft an der Platte ([[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft]])
+und am gezeichneten Querschnitt
+([[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA|RissnormalkraftQA]]) teilt: Name,
+Thema, Kuerzel, Normstelle und den ersten Satz der Herleitung -- wie
+[[opencivil.nachweis.mindestbewehrung#Biegezwang|Biegezwang]] bei der Biegung. Bis 2026-11-21 schrieb der
+gezeichnete Querschnitt sie ab.
+
+Gerechnet wird verschieden: die Platte je Lage mit der Risskraft der
+gezogenen Haelfte, der gezeichnete Querschnitt mit allen Staeben gegen
+die Risskraft des ganzen Betons.
+
+- `THEMA = 'Zwängung auf Normalkraft'`
+- `LANGNAME = 'Risse: Zwängung Normalkraft'`
+- `REFERENZ = REFERENZ_RISSBREITE`
+- `ART = 'N_Riss'`
+- `KUERZEL = 'NR'` – Im Zeichen des Erfuellungsgrads, und wie er heisst.
+- `BENENNUNG = 'Rissnormalkraft'`
+- `EINLEITUNG = 'Eine aufgezwungene oder behinderte Verkürzung zieht den Querschnitt,…` – Der erste Satz der Herleitung.
+
 ### Rissnormalkraft
 
 ```python
-class Rissnormalkraft(Lagennachweis)
+class Rissnormalkraft(Normalzwang, Lagennachweis)
 ```
 
 Zwängung auf Normalkraft: die Rissbreite bei Zwang, beim Erreichen von
@@ -161,12 +186,6 @@ beansprucht den Querschnitt über die ganze Höhe. In der Zusammenfassung
 steht die ungünstigere der beiden; die Urteile sind als Teile derselben
 Frage gestempelt (siehe `Nachweis.teilurteile`).
 
-- `THEMA = 'Zwängung auf Normalkraft'`
-- `ART = 'N_Riss'`
-- `LANGNAME = 'Risse: Zwängung Normalkraft'`
-- `KUERZEL = 'NR'`
-- `BENENNUNG = 'Rissnormalkraft'`
-- `REFERENZ = REFERENZ_RISSBREITE`
 - `NUR_MIT_STAHL = False`
 
 #### Rissnormalkraft.ansatz
@@ -237,7 +256,7 @@ class Biegezwang(Nachweis)
 Was die Zwaengung auf Biegung an der Platte ([[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung]])
 und am gezeichneten Querschnitt
 ([[opencivil.nachweis.qa_gebrauch#ZwaengungBiegungQA|ZwaengungBiegungQA]]) teilt: Name,
-Thema, Normstelle und den ersten Satz der Herleitung.
+Thema, Kuerzel, Normstelle und den ersten Satz der Herleitung.
 
 Mehr teilen sie nicht. Die Platte rechnet je Lage von Hand, mit dem
 Hebelarm `d - x/3`; der gezeichnete Querschnitt sucht je Zugseite das
@@ -249,6 +268,8 @@ fast nur weitergereicht (Benutzer, 2026-10-17).
 - `LANGNAME = 'Risse: Zwängung Biegung'`
 - `REFERENZ = REFERENZ_RISSBREITE`
 - `ART = 'ZB'`
+- `KUERZEL = 'ZB'` – Im Zeichen des Erfuellungsgrads, und wie er heisst.
+- `BENENNUNG = THEMA`
 - `EINLEITUNG = 'Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das die…` – Der erste Satz der Herleitung.
 
 ### ZwaengungBiegung
@@ -267,9 +288,6 @@ Der aufnehmbare Moment wird am **gerissenen** Querschnitt bestimmt --
 unmittelbar nach dem Riss ist der Querschnitt genau dort, und die
 Spannungen sind Gebrauchsspannungen, also elastisch. Eine plastische
 Druckzone gibt es in diesem Augenblick nicht.
-
-- `KUERZEL = 'ZB'`
-- `BENENNUNG = Biegezwang.THEMA`
 
 #### ZwaengungBiegung.ansatz
 
@@ -320,7 +338,6 @@ Lagen einen Stahl traegt.
 - `REFERENZ_WURZELFORMEL = 'SIA 262:2025, 4.4.2.3.4, (102); Tabelle 17'`
 - `REFERENZ_DICKE = 'SIA 262:2025, 4.4.1.3'` – Die rissaktive Dicke unter Zug, ohne und mit der Begrenzung massiger Bauteile.
 - `REFERENZ_RANDZONE = 'SIA 262:2025, 4.4.2.3.7'`
-- `EINLEITUNG_NORMALKRAFT = 'Eine aufgezwungene oder behinderte Verkürzung zieht den Querschnitt,…` – Der erste Satz der Zwaengung auf Normalkraft -- an der Platte wie am gezeichneten Querschnitt.
 
 ## Braucht
 

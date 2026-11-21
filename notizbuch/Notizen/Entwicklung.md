@@ -19,6 +19,12 @@ ab; jetzt steht es einmal da:
   jetzt `Knickverfahren.__init__`; die Platte gibt nur noch ihre
   Bezüge und ihre Resistenzlinie dazu, der gezeichnete Querschnitt seine
   Bezüge. Die Normstelle 4.3.7 steht einmal (`knicken.REFERENZ`).
+- **Thema und Namen der Zwängung auf Normalkraft.** Der gezeichnete
+  Querschnitt schrieb Thema, Langnamen, Art, das Kürzel «NR», den Namen
+  «Rissnormalkraft» und den ersten Satz der Herleitung von der Platte ab.
+  Jetzt teilen beide `Normalzwang`, wie bei der Biegung schon
+  `Biegezwang`; der hat dazu sein Kürzel «ZB» bekommen, das der
+  gezeichnete Querschnitt ebenfalls abschrieb.
 
 ## 2026-11-21 · Das Fachwerk an einer Stelle
 
