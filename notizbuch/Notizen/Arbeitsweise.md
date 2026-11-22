@@ -17,6 +17,12 @@ technisches Beiwerk darf englisch bleiben (`Groesse`, `Nachweis` neben
   einer Sitzung. Die Commits sind das Rückfallnetz des Benutzers; grosse
   Sammel-Commits nehmen es ihm. Nicht vorher fragen – das ist bewilligt.
 - Danach Push nach `origin/main`. Ein Push veröffentlicht die Seite.
+- Beim Push meldet sich Git mit dem Zugang an, den es in `~/.git-credentials`
+  hält (seit 2026-11-22). Das Programm `gh` ist ein Snap und startet in der
+  Claude-App nicht, weder in der Shell noch im Terminal der App; die Meldung
+  «snap-confine …» beim Push ist darum harmlos. Scheitert der Push an der
+  Anmeldung, pusht der Benutzer in einem normalen Terminal: das legt den
+  Zugang neu ab.
 - Kern und Oberfläche im selben Commit, damit die Seite nie halb steht.
 - Commit-Meldungen deutsch, wie die bisherige Geschichte.
 
