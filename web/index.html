@@ -12,10 +12,10 @@
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
   <link rel="stylesheet" href="./css/10-grundlage.css?v=db6a0e46496a">
-  <link rel="stylesheet" href="./css/20-seite.css?v=f4bc09e7c470">
-  <link rel="stylesheet" href="./css/30-eingaben.css?v=bf3c5c1c4c64">
+  <link rel="stylesheet" href="./css/20-seite.css?v=19d8f278cf18">
+  <link rel="stylesheet" href="./css/30-eingaben.css?v=9d39b10aa13c">
   <link rel="stylesheet" href="./css/40-bericht.css?v=c59f9e849747">
-  <link rel="stylesheet" href="./css/50-schmal.css?v=7dd2e94f221d">
+  <link rel="stylesheet" href="./css/50-schmal.css?v=231ea1be6ff4">
   <link rel="stylesheet" href="./css/60-zeichenfenster.css?v=5dc76e64b43f">
   <link rel="stylesheet" href="./css/70-notizbuch.css?v=5714743196a8">
   <link rel="stylesheet" href="./css/80-skizzen.css?v=09325f7bf052">
@@ -23,10 +23,10 @@
   <script type="importmap">
   {
     "imports": {
-      "./js/ablage.js": "./js/ablage.js?v=2cff59319161",
+      "./js/ablage.js": "./js/ablage.js?v=84cbb1c2e67e",
       "./js/achsen.js": "./js/achsen.js?v=aced8f358043",
       "./js/api.js": "./js/api.js?v=e90276978a0c",
-      "./js/app.js": "./js/app.js?v=4c3c18267cf6",
+      "./js/app.js": "./js/app.js?v=301f39bc9b07",
       "./js/apps.js": "./js/apps.js?v=06a4420eab6c",
       "./js/arten.js": "./js/arten.js?v=901a5bbbd1ab",
       "./js/balkensystem.js": "./js/balkensystem.js?v=a69906b3f5ca",
@@ -63,6 +63,7 @@
       "./js/durchstanzen.js": "./js/durchstanzen.js?v=10bb84202adb",
       "./js/eb_zeichnung.js": "./js/eb_zeichnung.js?v=f3972b138b6e",
       "./js/editor.js": "./js/editor.js?v=97f3abad7a0d",
+      "./js/einstellungen.js": "./js/einstellungen.js?v=780d2d359a44",
       "./js/erdbeben.js": "./js/erdbeben.js?v=1e908f9fc87c",
       "./js/faelle.js": "./js/faelle.js?v=ba9d53707ce9",
       "./js/fallantwort.js": "./js/fallantwort.js?v=cab91f08ea3e",
@@ -99,7 +100,7 @@
       "./js/qa_zeichnung.js": "./js/qa_zeichnung.js?v=ec26f8b1f6cf",
       "./js/querschnittsanalyse.js": "./js/querschnittsanalyse.js?v=34e2b87d1c6e",
       "./js/setzung.js": "./js/setzung.js?v=40745af6b5b4",
-      "./js/sinnbilder.js": "./js/sinnbilder.js?v=425908683a4d",
+      "./js/sinnbilder.js": "./js/sinnbilder.js?v=f825710216d5",
       "./js/spannungsbild.js": "./js/spannungsbild.js?v=90450a9a0b05",
       "./js/sz_zeichnung.js": "./js/sz_zeichnung.js?v=8ce828560c47",
       "./js/variablen.js": "./js/variablen.js?v=7d43b6f38cd9",
@@ -158,6 +159,9 @@
   </div>
 
   <div id="zustandsanzeige" class="zustandsanzeige" role="status" aria-live="polite"></div>
+  <!-- Das Zahnrad: was selten gebraucht wird, etwa alles zurücksetzen (einstellungen.js). -->
+  <button id="btn-einstellungen" class="knopf kopf-einstellungen" type="button"
+          title="Einstellungen – etwa alles im Browser zurücksetzen" aria-label="Einstellungen"></button>
 </header>
 
 <main class="raster" id="raster">

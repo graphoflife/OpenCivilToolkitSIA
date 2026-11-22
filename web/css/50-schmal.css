@@ -73,13 +73,16 @@
   .kopfleiste { flex-wrap: wrap; align-content: center; padding: 6px 10px; gap: 8px; }
   .kopfleiste .marke { font-size: 15px; }
   .kopf-knoepfe { margin-left: auto; }
-  .zustandsanzeige { min-width: 0; }
+  /* Die Anzeige rückt ans Ende: so steht das Zahnrad in der Zeile der
+     Knöpfe, ganz rechts. Unter der Anzeige machte es die Leiste höher, als
+     sie ist, und schob die Marke oben hinaus. */
+  .zustandsanzeige { min-width: 0; order: 1; }
 
   /* Fingerziele. 15 px sind mit der Maus genau, mit dem Daumen geraten --
      was man antippen soll, ist hier mindestens 34 px hoch. Gilt für alles,
      was tippbar ist, damit nicht der nächste Knopf wieder zu klein anfängt. */
   .weg, .knopf-zart, .reiter-knopf, .erklaerung-zeichen,
-  .baum-eintrag > button, .fenster-zu, .projekt-knopf, .projekt-weg {
+  .baum-eintrag > button, .fenster-zu, .projekt-knopf, .projekt-weg, .kopf-einstellungen {
     min-height: 34px; min-width: 34px;
   }
   /* Die Halbschalter stehen paarweise in engen Zeilen -- ihnen genügt die

@@ -7,6 +7,32 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-22 · Das Zahnrad: alles zurücksetzen
+
+Vom Benutzer gewünscht (2026-11-22): ein Knopf, der alles zurücksetzt –
+nicht offen in der Kopfleiste, sondern hinter einem Zahnrad oben rechts.
+Gewählt hat er «alles im Browser».
+
+- Das Zahnrad öffnet das Fenster «Einstellungen» (`einstellungen.js`). Es
+  sagt, was weggeht, mit den Namen der Projekte und der Zahl aufbewahrter
+  Stände; daneben stehen «Alle Projekte speichern» – dieselbe Funktion wie
+  «Speichern» – und «Alles zurücksetzen …», das noch einmal nachfragt.
+- Weg geht jeder Schlüssel der Seite im Browser (`opencivil.…`): die
+  Projekte mit ihren Sandboxen, aufbewahrte Stände, die Lage der Werkzeuge
+  im Zeichenfenster und zugeklappte Bereiche. Danach lädt die Seite neu und
+  beginnt mit dem Beispiel, wie beim ersten Besuch (`allesZuruecksetzen`).
+  Bis dahin legt sie nichts mehr ab, sonst brächte die nächste Änderung den
+  alten Stand zurück.
+- Was die Seite für den Betrieb ohne Netz geladen hat, bleibt: es ist das
+  Programm, nicht die Arbeit.
+- Dass jeder Schlüssel die Vorsilbe trägt, prüft `test_ablage_js.py`; ein
+  Schlüssel ohne sie überlebte das Zurücksetzen still.
+- Das Fenster braucht den Kern nicht. Es geht auch auf, wenn der Kern nicht
+  startet – gerade dann kann ein Neubeginn helfen.
+- Auf dem Telefon steht das Zahnrad ganz rechts in der Zeile der Knöpfe.
+  Unter der Anzeige machte es die Kopfleiste höher, als sie ist, und schob
+  den Namen oben hinaus.
+
 ## 2026-11-21 · Die Platte reisst wie der gezeichnete Querschnitt
 
 Vom Benutzer gewählt (2026-11-21): eine Rechnung für beide. Die

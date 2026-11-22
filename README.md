@@ -203,6 +203,12 @@ Wahl, die es nicht gibt -- jedes wird mit seinem Ort genannt, etwa «Platte
 'Decke', lagen 2, grund: 'abstand' muss eine Zahl sein». Was fehlt, bekommt
 die Vorgabe. Dateien aus älteren Fassungen werden nicht mehr umgerechnet.
 
+Das Zahnrad oben rechts öffnet die Einstellungen. Dort setzt *Alles
+zurücksetzen* nach einer Rückfrage alles zurück, was die Seite im Browser
+abgelegt hat – die Projekte, aufbewahrte Stände und die Einstellungen der
+Oberfläche –, und die Seite beginnt wie beim ersten Besuch mit dem Beispiel.
+Was sie für den Betrieb ohne Netz geladen hat, bleibt.
+
 ## Für eine KI: der MCP-Zugang
 
 Eine KI – Claude Code oder ein anderes Programm, das das Model Context

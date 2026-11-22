@@ -25,6 +25,7 @@ import { konsoleVerbinden } from './konsole.js';
 import { APPS, appVon } from './apps.js';
 import { ARTEN } from './arten.js';
 import { editorZeichnen } from './editor.js';
+import { einstellungenEinrichten } from './einstellungen.js';
 import { fensterEinrichten } from './fenster.js';
 import { notizbuchEinrichten } from './notizbuch.js';
 import { offlineEinrichten } from './offline.js';
@@ -662,6 +663,8 @@ async function starten() {
       document.getElementById('tafel-dokumentation')],
     ansicht: document.getElementById('notizbuch'),
   });
+  // Ebenso vor dem Kern: startet er nicht, kann ein Neubeginn helfen.
+  einstellungenEinrichten(document.getElementById('btn-einstellungen'), { speichern });
 
   try {
     // Erst den Kern -- ohne ihn lässt sich nicht einmal die Beschreibung prüfen.

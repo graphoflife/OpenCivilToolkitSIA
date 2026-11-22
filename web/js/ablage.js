@@ -65,7 +65,7 @@ const nichtAufbewahrt = [];
  * gesichert -- und das wäre schlicht gelogen.
  */
 export function imBrowserAblegen(mappe, gewaehlt, gesichert) {
-  if (nichtAufbewahrt.length) return false;
+  if (zurueckgesetzt || nichtAufbewahrt.length) return false;
   try {
     localStorage.setItem(SCHLUESSEL, JSON.stringify(
       { fassung: 1, gesichert, gewaehlt, mappe }));
@@ -113,6 +113,48 @@ export function ausDemBrowser() {
     return { roh, fehler: `Kein lesbares JSON (${fehler.message}).` };
   }
 }
+
+// ===========================================================================
+// Zurücksetzen
+// ===========================================================================
+
+/**
+ * Was die Seite im Browser ablegt, liegt unter Schlüsseln mit dieser
+ * Vorsilbe: die Mappe, die aufbewahrten Stände, die Lage der Werkzeuge im
+ * Zeichenfenster, zugeklappte Bereiche. `allesZuruecksetzen` nimmt alle weg,
+ * die so beginnen -- ein Schlüssel ohne sie überlebte es still; darüber
+ * wacht test_ablage_js.py.
+ */
+const VORSILBE = 'opencivil.';
+
+/** Gesetzt, sobald zurückgesetzt ist: bis zum Neuladen legt die Seite nichts mehr ab. */
+let zurueckgesetzt = false;
+
+/**
+ * Nimmt alles weg, was die Seite im Browser abgelegt hat, und lädt sie neu:
+ * sie beginnt wie beim ersten Besuch, mit dem Beispiel (das Zahnrad,
+ * einstellungen.js). Bis dahin legt sie nichts mehr ab -- sonst brächte die
+ * nächste Änderung den alten Stand zurück. Den Vorrat für den Betrieb ohne
+ * Netz (sw.js) lässt es stehen: er ist das Programm, nicht die Arbeit.
+ */
+export function allesZuruecksetzen() {
+  zurueckgesetzt = true;
+  nichtAufbewahrt.length = 0;
+  try {
+    for (const schluessel of Object.keys(localStorage)) {
+      if (schluessel.startsWith(VORSILBE)) localStorage.removeItem(schluessel);
+    }
+  } catch (fehler) {
+    console.warn('Die Ablage im Browser liess sich nicht ganz leeren:', fehler);
+  }
+  // Ohne die Adresse dahinter: auch ein offenes Notizbuch beginnt neu.
+  if (location.hash) location.replace(location.pathname + location.search);
+  else location.reload();
+}
+
+// ===========================================================================
+// Was sich nicht öffnen liess
+// ===========================================================================
 
 /** Die aufbewahrten Stände im Browser -- leer, wenn es keine gibt. */
 function aufbewahrte() {
