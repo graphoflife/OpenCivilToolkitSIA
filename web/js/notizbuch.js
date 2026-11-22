@@ -49,8 +49,10 @@ const HERKUNFT = {
 };
 
 /**
- * @param knoepfe  was das Notizbuch öffnet und schliesst: der Knopf in der
- *   Kopfleiste und, auf dem Telefon, die vierte Wahl unten
+ * @param knoepfe  was das Notizbuch öffnet und schliesst: die Knöpfe in der
+ *   Kopfleiste und, auf dem Telefon, die vierte Wahl unten. Ein Knopf mit
+ *   `data-seite` öffnet diese Seite statt des Anfangs -- «KI-Agenten» die
+ *   Anleitung dazu.
  * @param ansicht  der leere Platz dafür, `<section id="notizbuch">`
  */
 export function notizbuchEinrichten({ knoepfe, ansicht }) {
@@ -79,8 +81,8 @@ export function notizbuchEinrichten({ knoepfe, ansicht }) {
 
   for (const knopf of knoepfe) {
     knopf.addEventListener('click', () => {
-      if (offen) schliessen();
-      else location.hash = 'notizbuch';
+      if (zeigtSeinZiel(knopf, gewuenscht())) schliessen();
+      else location.hash = knopf.dataset.seite ? adresse(knopf.dataset.seite) : 'notizbuch';
     });
   }
   // Wer auf dem Telefon unten eine Tafel wählt, will sie sehen.
@@ -100,7 +102,12 @@ export function notizbuchEinrichten({ knoepfe, ansicht }) {
  * steht der Link da, und die Seite sagt, wenn sie fehlt.
  */
 export function seiteVorhanden(name) {
-  return bekannt === null || bekannt.has(name.normalize('NFC').toLowerCase());
+  return bekannt === null || bekannt.has(schluessel(name));
+}
+
+/** Wie ein Seitenname verglichen wird: in NFC, gross wie klein. */
+function schluessel(name) {
+  return name.normalize('NFC').toLowerCase();
 }
 
 // ---------------------------------------------------------------------------
@@ -125,8 +132,23 @@ export function adresse(name, abschnitt = null) {
   return `#notizbuch/${encodeURIComponent(name)}${abschnitt ? `#${encodeURIComponent(abschnitt)}` : ''}`;
 }
 
+/**
+ * Ob ein Knopf zeigt, was er öffnet: «Dokumentation» das Notizbuch, ein
+ * Knopf mit `data-seite` diese Seite. Dann steht er gedrückt, und ein Klick
+ * schliesst das Notizbuch.
+ */
+function zeigtSeinZiel(knopf, ziel) {
+  const seite = knopf.dataset.seite;
+  return Boolean(ziel) && (!seite || schluessel(seite) === schluessel(ziel.name));
+}
+
 async function folgen() {
   const ziel = gewuenscht();
+  for (const knopf of knoten.knoepfe) {
+    const ja = zeigtSeinZiel(knopf, ziel);
+    knopf.setAttribute('aria-pressed', String(ja));
+    knopf.classList.toggle('ist-aktiv', ja);
+  }
   if (!ziel) {
     zeigen(false);
     return;
@@ -145,10 +167,6 @@ function zeigen(ja) {
   if (offen === ja) return;
   offen = ja;
   knoten.ansicht.hidden = !ja;
-  for (const knopf of knoten.knoepfe) {
-    knopf.setAttribute('aria-pressed', String(ja));
-    knopf.classList.toggle('ist-aktiv', ja);
-  }
   if (ja) {
     document.body.dataset.notizbuch = '';
     knoten.ansicht.focus({ preventScroll: true });
@@ -188,7 +206,7 @@ function verzeichnisLaden() {
       return r.json();
     })
     .then((v) => {
-      v.nachName = new Map(v.seiten.map((s) => [s.name.normalize('NFC').toLowerCase(), s]));
+      v.nachName = new Map(v.seiten.map((s) => [schluessel(s.name), s]));
       v.nachPfad = new Map(v.seiten.map((s) => [s.pfad, s]));
       bekannt = new Set(v.nachName.keys());
       baumZeichnen(v);
@@ -222,7 +240,7 @@ function textLaden(seite) {
 
 async function seiteZeigen(name, abschnitt) {
   const v = await verzeichnisLaden();
-  const seite = v.nachName.get(name.normalize('NFC').toLowerCase());
+  const seite = v.nachName.get(schluessel(name));
   baumMarkieren(seite);
   knoten.ansicht.classList.remove('nb-leiste-offen');
   if (!seite) {
@@ -262,7 +280,7 @@ function hilfeFuer(seite, v) {
   };
   return {
     wiki(ziel, abschnitt) {
-      const treffer = ziel ? v.nachName.get(ziel.normalize('NFC').toLowerCase())
+      const treffer = ziel ? v.nachName.get(schluessel(ziel))
         ?? v.nachPfad.get(`${ziel}.md`) : seite;
       return treffer ? { vorhanden: true, href: adresse(treffer.name, abschnitt) }
         : { vorhanden: false };

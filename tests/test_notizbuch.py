@@ -383,6 +383,20 @@ class TestDasNotizbuchImRepo(unittest.TestCase):
         for pfad in self.dateien:
             self.assertEqual(unicodedata.normalize("NFC", pfad), pfad)
 
+    def test_jeder_knopf_findet_seine_seite(self):
+        """
+        Ein Knopf der Kopfleiste mit ``data-seite`` -- «KI-Agenten» -- oeffnet
+        diese Seite. Hiesse sie anders, saehe man nur «Diese Seite gibt es im
+        Notizbuch nicht».
+        """
+        html = (bruecke.WURZEL / "web" / "index.html").read_text(encoding="utf-8")
+        seiten = re.findall(r'data-seite="([^"]+)"', html)
+        self.assertIn("KI-Agenten", seiten)
+        namen = {vergleichsname(PurePosixPath(p).stem) for p in self.dateien}
+        for seite in seiten:
+            with self.subTest(seite=seite):
+                self.assertIn(vergleichsname(seite), namen)
+
     def test_github_liefert_die_dateien_roh(self):
         """Ohne .nojekyll machte GitHub Pages aus jeder .md eine HTML-Seite."""
         self.assertTrue((bruecke.WURZEL / ".nojekyll").is_file())

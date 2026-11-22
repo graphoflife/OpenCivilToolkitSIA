@@ -23,7 +23,10 @@
 body[data-notizbuch] .ladeschirm { display: none; }
 body:has(> .ladeschirm) .notizbuch { top: 0; }
 
-.kopfleiste #btn-dokumentation.ist-aktiv { background: #fff; border-color: #fff; color: var(--blau-leiste); }
+/* Gedrückt, solange das Notizbuch offen ist -- «KI-Agenten» auf seiner Seite. */
+.kopfleiste :is(#btn-dokumentation, #btn-ki).ist-aktiv {
+  background: #fff; border-color: #fff; color: var(--blau-leiste);
+}
 
 .nb-leiste {
   display: flex; flex-direction: column; min-height: 0;
@@ -116,8 +119,10 @@ details.nb-callout > summary { cursor: pointer; }
 
 @media (max-width: 900px) {
   /* Die Kopfleiste ist voll: das Notizbuch ist unten die vierte Wahl, und es
-     lässt die Wahl frei. Solange es offen ist, gilt keine der drei Tafeln. */
-  #btn-dokumentation { display: none; }
+     lässt die Wahl frei. Solange es offen ist, gilt keine der drei Tafeln.
+     Die Anleitung «KI-Agenten» steht dort im Inhalt -- eine KI braucht
+     ohnehin einen Rechner mit Python. */
+  #btn-dokumentation, #btn-ki { display: none; }
   .notizbuch { grid-template-columns: minmax(0, 1fr); bottom: var(--wahlhoehe); }
   body[data-notizbuch] .tafelwahl [data-tafel].ist-aktiv {
     background: transparent; color: var(--schrift-matt); border-color: transparent; font-weight: 400;

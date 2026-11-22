@@ -660,7 +660,7 @@ async function starten() {
   // #notizbuch/… soll auch dann aufgehen, wenn Pyodide noch lädt.
   notizbuchEinrichten({
     knoepfe: [document.getElementById('btn-dokumentation'),
-      document.getElementById('tafel-dokumentation')],
+      document.getElementById('btn-ki'), document.getElementById('tafel-dokumentation')],
     ansicht: document.getElementById('notizbuch'),
   });
   // Ebenso vor dem Kern: startet er nicht, kann ein Neubeginn helfen.

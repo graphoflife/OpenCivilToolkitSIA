@@ -9,6 +9,11 @@
       "art": "notiz"
     },
     {
+      "name": "KI-Agenten",
+      "pfad": "Anleitungen/KI-Agenten.md",
+      "art": "notiz"
+    },
+    {
       "name": "Formelsammlung",
       "pfad": "Formelsammlung/Formelsammlung.md",
       "art": "verzeichnis"

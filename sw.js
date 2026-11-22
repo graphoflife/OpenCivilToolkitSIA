@@ -50,13 +50,13 @@ const VORRAT = {
     "web/css/40-bericht.css?v=c59f9e849747",
     "web/css/50-schmal.css?v=231ea1be6ff4",
     "web/css/60-zeichenfenster.css?v=5dc76e64b43f",
-    "web/css/70-notizbuch.css?v=5714743196a8",
+    "web/css/70-notizbuch.css?v=5c29ff90c1e1",
     "web/css/80-skizzen.css?v=09325f7bf052",
     "web/css/90-python.css?v=bec24d055c16",
     "web/js/ablage.js?v=84cbb1c2e67e",
     "web/js/achsen.js?v=aced8f358043",
     "web/js/api.js?v=e90276978a0c",
-    "web/js/app.js?v=301f39bc9b07",
+    "web/js/app.js?v=0a8046287bab",
     "web/js/apps.js?v=06a4420eab6c",
     "web/js/arten.js?v=901a5bbbd1ab",
     "web/js/balkensystem.js?v=a69906b3f5ca",
@@ -113,7 +113,7 @@ const VORRAT = {
     "web/js/materialwahl.js?v=e65fae366d80",
     "web/js/mathe.js?v=f218656b8dbb",
     "web/js/nachweise.js?v=41504154e283",
-    "web/js/notizbuch.js?v=90792350d729",
+    "web/js/notizbuch.js?v=5079698154ff",
     "web/js/notizbuch_seite.js?v=639209806e79",
     "web/js/offline.js?v=1b6f6c615c08",
     "web/js/pf_verlauf.js?v=077aa49f7b6c",
@@ -136,8 +136,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=04a6b50b3e76",
-    "web/kern/notizbuch.json?v=1b1a74be40e1",
-    "web/kern/quellen.json?v=82d087f7b99c"
+    "web/kern/notizbuch.json?v=d7a27adf7355",
+    "web/kern/quellen.json?v=9c8188414553"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

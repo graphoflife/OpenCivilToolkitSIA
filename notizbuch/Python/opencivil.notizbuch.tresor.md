@@ -1,5 +1,5 @@
 ---
-erzeugt: c821fbe92eff
+erzeugt: a51297bde14b
 art: modul
 tags: [modul]
 ---
@@ -210,7 +210,7 @@ Was ausser Seiten im Tresor liegt -- Bilder, die eine Seite einbettet.
 ## Konstanten
 
 - `LINIE = '<!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->'` – Die Linie zwischen erzeugtem und eigenem Teil -- in Obsidian und auf der Seite unsichtbar, im Quelltext unuebersehbar.
-- `ORDNER = ('', 'Formelsammlung', 'Formelsammlung/Themen', 'Formelsammlung/Forme…` – Die Ordner in der Reihenfolge, in der das Verzeichnis sie fuehrt.
+- `ORDNER = ('', 'Anleitungen', 'Formelsammlung', 'Formelsammlung/Themen', 'Forme…` – Die Ordner in der Reihenfolge, in der das Verzeichnis sie fuehrt.
 - `_VERBORGEN = re.compile('(^|/)\\.')` – Was im Tresor kein Inhalt ist: die Arbeitsdateien von Obsidian.
 
 ## Braucht

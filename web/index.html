@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="./css/40-bericht.css?v=c59f9e849747">
   <link rel="stylesheet" href="./css/50-schmal.css?v=231ea1be6ff4">
   <link rel="stylesheet" href="./css/60-zeichenfenster.css?v=5dc76e64b43f">
-  <link rel="stylesheet" href="./css/70-notizbuch.css?v=5714743196a8">
+  <link rel="stylesheet" href="./css/70-notizbuch.css?v=5c29ff90c1e1">
   <link rel="stylesheet" href="./css/80-skizzen.css?v=09325f7bf052">
   <link rel="stylesheet" href="./css/90-python.css?v=bec24d055c16">
   <script type="importmap">
@@ -26,7 +26,7 @@
       "./js/ablage.js": "./js/ablage.js?v=84cbb1c2e67e",
       "./js/achsen.js": "./js/achsen.js?v=aced8f358043",
       "./js/api.js": "./js/api.js?v=e90276978a0c",
-      "./js/app.js": "./js/app.js?v=301f39bc9b07",
+      "./js/app.js": "./js/app.js?v=0a8046287bab",
       "./js/apps.js": "./js/apps.js?v=06a4420eab6c",
       "./js/arten.js": "./js/arten.js?v=901a5bbbd1ab",
       "./js/balkensystem.js": "./js/balkensystem.js?v=a69906b3f5ca",
@@ -83,7 +83,7 @@
       "./js/materialwahl.js": "./js/materialwahl.js?v=e65fae366d80",
       "./js/mathe.js": "./js/mathe.js?v=f218656b8dbb",
       "./js/nachweise.js": "./js/nachweise.js?v=41504154e283",
-      "./js/notizbuch.js": "./js/notizbuch.js?v=90792350d729",
+      "./js/notizbuch.js": "./js/notizbuch.js?v=5079698154ff",
       "./js/notizbuch_seite.js": "./js/notizbuch_seite.js?v=639209806e79",
       "./js/offline.js": "./js/offline.js?v=1b6f6c615c08",
       "./js/pf_verlauf.js": "./js/pf_verlauf.js?v=077aa49f7b6c",
@@ -106,8 +106,8 @@
       "./js/variablen.js": "./js/variablen.js?v=7d43b6f38cd9",
       "./js/zeichnen.js": "./js/zeichnen.js?v=da6e8eec5dc8",
       "./js/zustand.js": "./js/zustand.js?v=04a6b50b3e76",
-      "./kern/notizbuch.json": "./kern/notizbuch.json?v=1b1a74be40e1",
-      "./kern/quellen.json": "./kern/quellen.json?v=82d087f7b99c"
+      "./kern/notizbuch.json": "./kern/notizbuch.json?v=d7a27adf7355",
+      "./kern/quellen.json": "./kern/quellen.json?v=9c8188414553"
     }
   }
   </script>
@@ -148,6 +148,11 @@
     <button id="btn-dokumentation" class="knopf" aria-pressed="false"
             title="Formelsammlung, Python-Doku und Notizen – das Notizbuch">
       Dokumentation
+    </button>
+    <!-- Öffnet im Notizbuch die Seite, die data-seite nennt (notizbuch.js). -->
+    <button id="btn-ki" class="knopf" aria-pressed="false" data-seite="KI-Agenten"
+            title="Schritt für Schritt: eine KI über MCP mit dem Werkzeug arbeiten lassen">
+      KI-Agenten
     </button>
     <button id="btn-speichern" class="knopf"
             title="Alle Projekte als .json-Datei herunterladen (im Browser liegen sie ohnehin)">

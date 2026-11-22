@@ -57,8 +57,8 @@ from opencivil.notizbuch.namen import sortierschluessel, vergleichsname
 LINIE = "<!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->"
 
 #: Die Ordner in der Reihenfolge, in der das Verzeichnis sie fuehrt.
-ORDNER = ("", "Formelsammlung", "Formelsammlung/Themen", "Formelsammlung/Formeln",
-          "Python", "Notizen")
+ORDNER = ("", "Anleitungen", "Formelsammlung", "Formelsammlung/Themen",
+          "Formelsammlung/Formeln", "Python", "Notizen")
 
 #: Was im Tresor kein Inhalt ist: die Arbeitsdateien von Obsidian.
 _VERBORGEN = re.compile(r"(^|/)\.")

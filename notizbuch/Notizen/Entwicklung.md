@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-22 · Die Anleitung «KI-Agenten»
+
+Vom Benutzer gewünscht (2026-11-22): eine Anleitung Schritt für Schritt, wie
+man eine KI mit dem Werkzeug arbeiten lässt, und oben neben «Dokumentation»
+ein Knopf dazu. Gewählt hat er eine Seite im Notizbuch, für Claude Code, die
+Claude-App und andere MCP-Programme, und den Namen «KI-Agenten».
+
+- Die Seite ist `Anleitungen/KI-Agenten.md`, eine Notiz von Hand. Der neue
+  Ordner steht im Inhalt gleich nach dem Anfang (`ORDNER` in `tresor.py`).
+- Sie beginnt mit dem Weg der Daten: KI und Seite teilen keinen Speicher,
+  die Projektdatei trägt die Projekte hin und her – «Speichern», die KI
+  arbeitet, «Öffnen». Ohne diesen Satz wartete man in der Seite auf
+  Änderungen, die nie von selbst kommen.
+- Die Probe in Schritt 2 schickt eine einzige Nachricht, `ping`: von Hand
+  gestartet, wartet der Server sonst still, und das sieht aus wie ein Fehler.
+- Für die Claude-App stehen der volle Pfad von Python und `PYTHONPATH` im
+  Eintrag: die App startet den Server in einem Ordner, den man nicht kennt,
+  und findet nicht unbedingt das Python des Terminals.
+- Der Knopf trägt den Namen seiner Seite (`data-seite` in `index.html`); das
+  Notizbuch öffnet sie und stellt den Knopf gedrückt, solange sie offen ist
+  (`zeigtSeinZiel`). Ein Test prüft, dass es die Seite gibt.
+- Auf dem Telefon fehlt der Knopf wie «Dokumentation»: die Anleitung steht im
+  Inhalt, und eine KI braucht ohnehin einen Rechner mit Python.
+
 ## 2026-11-22 · Das Zahnrad: alles zurücksetzen
 
 Vom Benutzer gewünscht (2026-11-22): ein Knopf, der alles zurücksetzt –

@@ -236,6 +236,10 @@ nichts, und seine Meldung kommt unverändert zurück. Eine Datei, die es schon
 gibt, überschreibt der Zugang nur auf Wunsch, und ungespeicherte Änderungen
 verwirft er nicht still. Python-Skripte der App «Python» führt er nicht aus.
 
+Schritt für Schritt – für Claude Code, die Claude-App und andere Programme –
+steht es im Notizbuch, [Anleitungen/KI-Agenten](notizbuch/Anleitungen/KI-Agenten.md).
+Auf der Seite öffnet es der Knopf «KI-Agenten» oben.
+
 ## Notizbuch und Obsidian
 
 Wie gerechnet wird, wie die Bibliothek gebaut ist und was beim Bauen gelernt

@@ -5,6 +5,10 @@ Obsidian liest ihn als Tresor, und GitHub zeigt die Dateien als Text.
 
 ## Was wo steht
 
+- **Anleitungen**
+  - [[KI-Agenten]] – Schritt für Schritt: eine KI über MCP mit dem Werkzeug
+    arbeiten lassen, in Claude Code, der Claude-App oder einem anderen
+    Programm.
 - [[Formelsammlung]] – jede Formel des Werkzeugs als eigene Seite: die Formel,
   ihre Normstelle, die Grössen mit Links, ein Zahlenbeispiel, die Stelle im
   Code und die Theorie. Dazu je Thema eine Seite.
