@@ -1,5 +1,5 @@
 ---
-erzeugt: 44d20ac10f42
+erzeugt: 491cee166d87
 art: modul
 tags: [modul]
 ---
@@ -34,14 +34,17 @@ Nachweisen.
   Bewehrung wirkt mit und verdraengt den Beton an ihrer Stelle.
 * **Praezise ohne Vereinfachung** -- die Parabel-Rechteck-Beziehung, ihr
   Anstieg mit dem wirksamen Modul `E_cm/(1+phi)`, `k_sigma` nie unter 1.
-* **elastisch** -- nur fuer die Stahlspannungen: der Beton linear mit
-  `E_cm/(1+phi)`, hoechstens `f_c`. So rechneten sie bis 2026-10-09 fest.
 
 Die Namen hat der Benutzer am 2026-10-12 gewaehlt; vorher hiessen sie
-«Handrechnung Block 0.85·x», «Block 0.85·x genau» und «Parabel».
+«Handrechnung Block 0.85·x», «Block 0.85·x genau» und «Parabel». Bis
+2026-11-25 gab es fuer die Stahlspannungen dazu «elastisch»: der Beton linear
+mit `E_cm/(1+phi)`, hoechstens `f_c`. Der Benutzer hat es gestrichen: im
+Gebrauch ist die Parabel beinahe eine Gerade, und die Stahlspannung lag um
+etwa ein Prozent neben der praezisen -- bei phi = 2 etwa 344 statt
+340 N/mm².
 
-Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
-haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
+Die Kriechzahl wirkt nur bei praezise: an den anderen Gesetzen haengt kein
+Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
 ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]), und wie ein Widerstand heisst -- `R_d` oder
 `R_k`.
 
@@ -208,7 +211,6 @@ Wie der Querschnitt gerechnet wird -- siehe Dateikopf.
 - `HANDRECHNUNG = 'handrechnung'`
 - `BLOCK = 'block'`
 - `PARABEL = 'parabel'`
-- `ELASTISCH = 'elastisch'`
 
 #### Rechenart.beschriftung
 

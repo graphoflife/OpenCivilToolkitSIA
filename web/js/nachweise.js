@@ -55,8 +55,8 @@ import {
 export function nachweisKapitel(ort) {
   // Die beiden Stahlspannungen sind dieselbe Rechnung mit anderer Grenze.
   const stahlspannung = [
-    ['Werte', 'je Material nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
-    ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), präzise und elastisch'],
+    ['Werte', 'je Material nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), präzise'],
+    ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), nur präzise'],
   ];
   return [
     {
@@ -591,8 +591,8 @@ export function werkstoffzeilen(ziel, aendern, {
  * die Felder `kriechzahl`, `rechenart` und `werkstoffsaetze`, `aendern`
  * ändert es im Projekt; `werkstoffe` sagt, welche Materialien das Bauteil
  * hat und zu welcher Klasse des Kerns die Wahl gehört (`werkstoffzeilen`).
- * `arten` sagt, welche Rechenarten gelten: `rechenarten`, bei den
- * Stahlspannungen `spannungsarten`, beim Knicken und in den Analysen
+ * `arten` sagt, welche Rechenarten gelten: `rechenarten`, beim Knicken,
+ * in den Analysen und bei den Stahlspannungen des gezeichneten Querschnitts
  * `faserarten` (ohne Handrechnung), bei der Verformung des Knickens
  * `verformungsarten` (nur präzise). Wirkt φ bei der gewählten Art
  * nicht, steht das Feld blass da -- es bleibt aber stehen, damit die Zahl
@@ -607,7 +607,7 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
     wert: ziel.kriechzahl ?? 0, schritt: 0.1, leer: 0, angabe: feldangabe('rechenwahl', 'kriechzahl'),
     titel: phiImmer
       ? 'Kriechzahl φ – wirkt auf den ungerissenen Teil, präzise auch auf den gerissenen'
-      : 'Kriechzahl φ – wirkt präzise und elastisch',
+      : 'Kriechzahl φ – wirkt nur präzise',
     beiAenderung: (v) => aendern((x) => { x.kriechzahl = v; }),
   }));
   if (art && !art.mit_kriechzahl && !phiImmer) phi.classList.add('ist-ohne-wirkung');

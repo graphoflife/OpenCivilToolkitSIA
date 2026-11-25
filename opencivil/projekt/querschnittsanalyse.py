@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
-from opencivil.nachweis.rechenwahl import FASERSPANNUNGSARTEN
+from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.zugseite import Zugseite
@@ -252,9 +252,9 @@ class QAGebrauchsfallEintrag(Beschreibung):
 
 @dataclass
 class QAGebrauchswahl(Gebrauchswahl):
-    """Die Stahlspannungen am gezeichneten Querschnitt: ueber die Fasern oder elastisch -- ohne Handrechnung."""
+    """Die Stahlspannungen am gezeichneten Querschnitt: nur ueber die Fasern, ohne Handrechnung."""
 
-    rechenart: Rechenart = einer_von(FASERSPANNUNGSARTEN, Rechenart.ELASTISCH)
+    rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)
 
 
 @dataclass

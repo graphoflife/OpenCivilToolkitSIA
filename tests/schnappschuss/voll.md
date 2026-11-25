@@ -922,13 +922,13 @@ Massgebend: 3. Lage (kleinster Erfüllungsgrad).
 **Rechenwahl**
 
 $$
-\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Wirksamer Elastizitätsmodul** *(SIA 262:2025, 3.1.2.6.1, (12))*
 
 $$
-E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Dickster Stab der Tragrichtung**
@@ -949,16 +949,22 @@ $$
 
 #### Welche Werte angesetzt werden
 
-**Werkstoffgesetze im Gebrauchszustand: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
+**Werkstoffgesetze im Gebrauchszustand: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{11207\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
 
 $$
-E_{c,eff} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
@@ -994,7 +1000,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.2725\,\text{‰} \qquad \chi = 0.00607\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.3058\,\text{‰} \qquad \chi = 0.0056\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -1006,13 +1012,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{s,x} = 172\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.18 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{172\,\mathrm{N}/\mathrm{mm}^{2}} = 2.21 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Feld mit Druck (60 %)
@@ -1026,7 +1032,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.1006\,\text{‰} \qquad \chi = 0.00432\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.1303\,\text{‰} \qquad \chi = 0.00387\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -1038,13 +1044,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 106\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{s,x} = 103\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{106\,\mathrm{N}/\mathrm{mm}^{2}} = 3.60 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{103\,\mathrm{N}/\mathrm{mm}^{2}} = 3.71 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Stütze (60 %)
@@ -1058,7 +1064,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.4864\,\text{‰} \qquad \chi = -0.00565\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.4922\,\text{‰} \qquad \chi = -0.0054\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -1070,13 +1076,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 212\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{s,x} = 209\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{212\,\mathrm{N}/\mathrm{mm}^{2}} = 1.79 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{209\,\mathrm{N}/\mathrm{mm}^{2}} = 1.83 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Dauerlast
@@ -1090,7 +1096,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.212\,\text{‰} \qquad \chi = 0.00472\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.2378\,\text{‰} \qquad \chi = 0.00435\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -1102,13 +1108,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 136\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{s,x} = 134\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{136\,\mathrm{N}/\mathrm{mm}^{2}} = 2.80 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{134\,\mathrm{N}/\mathrm{mm}^{2}} = 2.85 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Stahlspannung unter häufiger Einwirkung – x-Richtung
@@ -1116,13 +1122,13 @@ $$
 **Rechenwahl**
 
 $$
-\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Wirksamer Elastizitätsmodul** *(SIA 262:2025, 3.1.2.6.1, (12))*
 
 $$
-E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Zulässige Stahlspannung** *(SIA 262:2025, Tabelle 17)*
@@ -1133,16 +1139,22 @@ $$
 
 #### Welche Werte angesetzt werden
 
-**Werkstoffgesetze im Gebrauchszustand: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
+**Werkstoffgesetze im Gebrauchszustand: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{11207\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
 
 $$
-E_{c,eff} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
@@ -1176,7 +1188,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.318\,\text{‰} \qquad \chi = 0.00709\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.3567\,\text{‰} \qquad \chi = 0.00653\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -1188,13 +1200,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 204\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{s,x} = 201\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Feld (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{204\,\mathrm{N}/\mathrm{mm}^{2}} = 1.74 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,x,\text{Feld (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{201\,\mathrm{N}/\mathrm{mm}^{2}} = 1.77 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Häufiger Lastfall – Feld mit Druck (70 %)
@@ -1208,7 +1220,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.1174\,\text{‰} \qquad \chi = 0.00504\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.1521\,\text{‰} \qquad \chi = 0.00452\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -1220,13 +1232,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{s,x} = 120\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{123\,\mathrm{N}/\mathrm{mm}^{2}} = 2.88 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{120\,\mathrm{N}/\mathrm{mm}^{2}} = 2.96 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Häufiger Lastfall – Stütze (70 %)
@@ -1240,7 +1252,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.5674\,\text{‰} \qquad \chi = -0.00659\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.5742\,\text{‰} \qquad \chi = -0.0063\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -1252,13 +1264,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{s,x} = 243\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Stütze (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{248\,\mathrm{N}/\mathrm{mm}^{2}} = 1.43 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,x,\text{Stütze (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{243\,\mathrm{N}/\mathrm{mm}^{2}} = 1.46 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Häufiger Lastfall – Gebrauch
@@ -1272,7 +1284,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.2725\,\text{‰} \qquad \chi = 0.00607\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.3058\,\text{‰} \qquad \chi = 0.0056\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -1284,13 +1296,13 @@ $$
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_{s,x} = 172\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,x,\text{Gebrauch}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.03 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,x,\text{Gebrauch}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{172\,\mathrm{N}/\mathrm{mm}^{2}} = 2.06 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Vergrösserungsfaktor der Durchbiegung
@@ -2389,13 +2401,13 @@ $$
 **Rechenwahl**
 
 $$
-\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Wirksamer Elastizitätsmodul** *(SIA 262:2025, 3.1.2.6.1, (12))*
 
 $$
-E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
@@ -2406,16 +2418,22 @@ $$
 
 #### Welche Werte angesetzt werden
 
-**Werkstoffgesetze im Gebrauchszustand: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
+**Werkstoffgesetze im Gebrauchszustand: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{11207\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
 
 $$
-E_{c,eff} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
@@ -2449,7 +2467,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 2.3198\,\text{‰} \qquad \chi = 0.03612\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 1.722\,\text{‰} \qquad \chi = 0.02686\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -2463,19 +2481,19 @@ Stahl fliesst (σ\_s = 500 N/mm²) → Vergleich über die Dehnung.
 **Grösste Zugdehnung in der Bewehrung**
 
 $$
-\varepsilon_y = \frac{f_{yk}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰}
+\varepsilon_y = \frac{f_{yk}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 3.47\,\text{‰}
 $$
 
 **Zulässige Dehnung**
 
 $$
-\varepsilon_{s,adm} = \frac{\sigma_{s,adm}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰}
+\varepsilon_{s,adm} = \frac{\sigma_{s,adm}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 3.47\,\text{‰}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\varepsilon_{s,adm}}{\varepsilon_{s,x}} = \frac{2.5\,\text{‰}}{4.67\,\text{‰}} = 0.54 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\varepsilon_{s,adm}}{\varepsilon_{s,x}} = \frac{2.5\,\text{‰}}{3.47\,\text{‰}} = 0.72 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
 ### Vergrösserungsfaktor der Durchbiegung
@@ -5883,13 +5901,13 @@ $$
 **Rechenwahl**
 
 $$
-\varphi = 0 \qquad \text{C30/37: Bemessungswerte}\ f_{cd},\ \text{B500B: charakteristisch}\ f_{yk} \qquad \text{elastisch}
+\varphi = 0 \qquad \text{C30/37: Bemessungswerte}\ f_{cd},\ \text{B500B: charakteristisch}\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Wirksamer Elastizitätsmodul** *(SIA 262:2025, 3.1.2.6.1, (12))*
 
 $$
-E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 5.95
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, Tabelle 17)*
@@ -5900,16 +5918,22 @@ $$
 
 #### Welche Werte angesetzt werden
 
-**Werkstoffgesetze im Gebrauchszustand: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
+**Werkstoffgesetze im Gebrauchszustand: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{cd}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
 
 $$
-E_{c,eff} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
@@ -5943,7 +5967,7 @@ $$
 **Gefundene Dehnungsebene**
 
 $$
-\varepsilon_m = 0.4506\,\text{‰} \qquad \chi = 0.00524\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+\varepsilon_m = 0.4535\,\text{‰} \qquad \chi = 0.0052\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -7283,7 +7307,7 @@ $$
 **Rechenwahl**
 
 $$
-\varphi = 1 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+\varphi = 1 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Wirksamer Elastizitätsmodul C30/37** *(SIA 262:2025, 3.1.2.6.1, (12))*
@@ -7292,16 +7316,22 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1} = 16810\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Werkstoffgesetze im gerissenen Zustand, C30/37: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
+**Werkstoffgesetze im gerissenen Zustand, C30/37: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{16810\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1.4
+$$
+
+**Werkstoffgesetze im gerissenen Zustand, C30/37: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Werkstoffgesetze im gerissenen Zustand, C30/37: Werte des Betons**
 
 $$
-E_{c,eff} = 16810\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 $$
 
 **Werkstoffgesetze im gerissenen Zustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
@@ -7423,19 +7453,19 @@ $$
 **Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
 
 $$
-M_{s,adm} = 280.2\,\mathrm{kNm}
+M_{s,adm} = 283.3\,\mathrm{kNm}
 $$
 
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = -89.1^\circ \qquad \varepsilon_0 = 0.7958\,\text{‰} \qquad \kappa = 0.00479\,\mathrm{m}^{-1}
+\psi = -89.2^\circ \qquad \varepsilon_0 = 0.8246\,\text{‰} \qquad \kappa = 0.00468\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
 
 $$
-N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 280.2\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 283.3\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
 $$
 
 **An der Grenze: Linie 1 (y = 750 mm, z = 50 mm)**
@@ -7447,13 +7477,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = 280.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm}
+M_{s,adm} = 283.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug unten}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{280.2\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 2.40 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,ZB,\text{Zug unten}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{283.3\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 2.43 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug oben
@@ -7491,19 +7521,19 @@ $$
 **Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
 
 $$
-M_{s,adm} = 156.6\,\mathrm{kNm}
+M_{s,adm} = 158.4\,\mathrm{kNm}
 $$
 
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = 88.7^\circ \qquad \varepsilon_0 = 1.0333\,\text{‰} \qquad \kappa = 0.0051\,\mathrm{m}^{-1}
+\psi = 88.7^\circ \qquad \varepsilon_0 = 1.0532\,\text{‰} \qquad \kappa = 0.00502\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
 
 $$
-N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = -156.6\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = -158.4\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 0\,\mathrm{kNm} \;\checkmark
 $$
 
 **An der Grenze: Linie 2 (y = 604 mm, z = 550 mm)**
@@ -7515,13 +7545,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = 156.6\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm}
+M_{s,adm} = 158.4\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 116.7\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{156.6\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.34 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,ZB,\text{Zug oben}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{158.4\,\mathrm{kNm}}{116.7\,\mathrm{kNm}} = 1.36 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug links
@@ -7559,19 +7589,19 @@ $$
 **Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
 
 $$
-M_{s,adm} = 273.3\,\mathrm{kNm}
+M_{s,adm} = 277.2\,\mathrm{kNm}
 $$
 
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = 172.5^\circ \qquad \varepsilon_0 = 0.7871\,\text{‰} \qquad \kappa = 0.00329\,\mathrm{m}^{-1}
+\psi = 172.7^\circ \qquad \varepsilon_0 = 0.8116\,\text{‰} \qquad \kappa = 0.00323\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
 
 $$
-N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 273.3\,\mathrm{kNm} \;\checkmark
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = 277.2\,\mathrm{kNm} \;\checkmark
 $$
 
 **An der Grenze: Linie 3 (y = 40 mm, z = 441 mm)**
@@ -7583,13 +7613,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = 273.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm}
+M_{s,adm} = 277.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug links}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{273.3\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.90 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,ZB,\text{Zug links}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{277.2\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.93 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Zug rechts
@@ -7627,19 +7657,19 @@ $$
 **Moment, bei dem der erste gezogene Stab σ\_s,adm erreicht**
 
 $$
-M_{s,adm} = 208.2\,\mathrm{kNm}
+M_{s,adm} = 211\,\mathrm{kNm}
 $$
 
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = 8.4^\circ \qquad \varepsilon_0 = 0.7486\,\text{‰} \qquad \kappa = 0.00297\,\mathrm{m}^{-1}
+\psi = 8.1^\circ \qquad \varepsilon_0 = 0.7671\,\text{‰} \qquad \kappa = 0.00292\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
 
 $$
-N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = -208.2\,\mathrm{kNm} \;\checkmark
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{y,int} = 0\,\mathrm{kNm} \;\checkmark \qquad M_{z,int} = -211\,\mathrm{kNm} \;\checkmark
 $$
 
 **An der Grenze: Stab 1 (y = 760 mm, z = 300 mm)**
@@ -7651,13 +7681,13 @@ $$
 **Zwängung auf Biegung**
 
 $$
-M_{s,adm} = 208.2\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm}
+M_{s,adm} = 211\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 143.8\,\mathrm{kNm}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,\text{Zug rechts}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{208.2\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.45 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,ZB,\text{Zug rechts}} = \frac{M_{s,adm}}{M_{Riss}} = \frac{211\,\mathrm{kNm}}{143.8\,\mathrm{kNm}} = 1.47 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 Massgebend: Zug oben (kleinster Erfüllungsgrad).
@@ -7667,7 +7697,7 @@ Massgebend: Zug oben (kleinster Erfüllungsgrad).
 **Rechenwahl**
 
 $$
-\varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+\varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Linie 3: verschmiert, als Stäbe mit 150 mm Teilung**
@@ -7744,16 +7774,22 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand, C30/37: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand, C30/37: Werte des Betons**
 
 $$
-E_{c,eff} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
@@ -7789,7 +7825,7 @@ $$
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = -89.3^\circ \qquad \varepsilon_0 = 0.5474\,\text{‰} \qquad \kappa = 0.00275\,\mathrm{m}^{-1}
+\psi = -89.2^\circ \qquad \varepsilon_0 = 0.5535\,\text{‰} \qquad \kappa = 0.00271\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -7802,8 +7838,8 @@ $$
 
 | Element | $\varepsilon_s\ [‰]$ | $\sigma_s\ [\mathrm{N/mm^2}]$ | $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ |
 | :--- | ---: | ---: | ---: |
-| Stab 1 | $0.560$ | $112$ | $361$ |
-| Linie 1 | $1.248$ | $250$ | $404$ |
+| Stab 1 | $0.566$ | $113$ | $361$ |
+| Linie 1 | $1.243$ | $249$ | $404$ |
 | Linie 3 | $0.922$ | $184$ | $404$ |
 | Linie 4 | $0.924$ | $185$ | $500$ |
 
@@ -7812,13 +7848,13 @@ Massgebend: Linie 1 (y = 750 mm, z = 50 mm).
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 250\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_s = 249\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{250\,\mathrm{N}/\mathrm{mm}^{2}} = 1.62 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,w,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{249\,\mathrm{N}/\mathrm{mm}^{2}} = 1.62 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Schief (60 %)
@@ -7832,7 +7868,7 @@ $$
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = -110.9^\circ \qquad \varepsilon_0 = -0.0702\,\text{‰} \qquad \kappa = 0.00041\,\mathrm{m}^{-1}
+\psi = -111.2^\circ \qquad \varepsilon_0 = -0.0595\,\text{‰} \qquad \kappa = 0.00036\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -7845,7 +7881,7 @@ $$
 
 | Element | $\varepsilon_s\ [‰]$ | $\sigma_s\ [\mathrm{N/mm^2}]$ | $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ |
 | :--- | ---: | ---: | ---: |
-| Linie 1 | $0.076$ | $15$ | $404$ |
+| Linie 1 | $0.071$ | $14$ | $404$ |
 | Linie 3 | $0.036$ | $7$ | $404$ |
 | Linie 4 | $0.026$ | $5$ | $500$ |
 
@@ -7854,13 +7890,13 @@ Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 15\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_s = 14\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,\text{Schief (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{15\,\mathrm{N}/\mathrm{mm}^{2}} = 26.55 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,w,\text{Schief (60 \%)}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{14\,\mathrm{N}/\mathrm{mm}^{2}} = 28.29 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Quasi-ständiger Lastfall – Dauer
@@ -7874,7 +7910,7 @@ $$
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = -102.5^\circ \qquad \varepsilon_0 = 0.1237\,\text{‰} \qquad \kappa = 0.00098\,\mathrm{m}^{-1}
+\psi = -102.2^\circ \qquad \varepsilon_0 = 0.1277\,\text{‰} \qquad \kappa = 0.00094\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -7887,23 +7923,23 @@ $$
 
 | Element | $\varepsilon_s\ [‰]$ | $\sigma_s\ [\mathrm{N/mm^2}]$ | $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ |
 | :--- | ---: | ---: | ---: |
-| Stab 1 | $0.047$ | $9$ | $361$ |
-| Linie 1 | $0.439$ | $88$ | $404$ |
-| Linie 3 | $0.336$ | $67$ | $404$ |
-| Linie 4 | $0.321$ | $64$ | $500$ |
+| Stab 1 | $0.056$ | $11$ | $361$ |
+| Linie 1 | $0.427$ | $85$ | $404$ |
+| Linie 3 | $0.328$ | $66$ | $404$ |
+| Linie 4 | $0.314$ | $63$ | $500$ |
 
 Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 88\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_s = 85\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{88\,\mathrm{N}/\mathrm{mm}^{2}} = 4.60 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm,2}}{\sigma_s} = \frac{404\,\mathrm{N}/\mathrm{mm}^{2}}{85\,\mathrm{N}/\mathrm{mm}^{2}} = 4.73 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Stahlspannung unter häufiger Einwirkung
@@ -7911,7 +7947,7 @@ $$
 **Rechenwahl**
 
 $$
-\varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+\varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Zulässige Stahlspannung** *(SIA 262:2025, Tabelle 17)*
@@ -7928,16 +7964,22 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand, C30/37: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Beiwert der Parabel** *(SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe)*
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand, C30/37: Werte des Betons**
 
 $$
-E_{c,eff} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.2, Figur 16; 4.2.2.5)*
@@ -7971,7 +8013,7 @@ $$
 **Gefundene Dehnungsebene: Zugrichtung, Dehnung im Schwerpunkt, Krümmung**
 
 $$
-\psi = -102.5^\circ \qquad \varepsilon_0 = 0.2061\,\text{‰} \qquad \kappa = 0.00164\,\mathrm{m}^{-1}
+\psi = -102.5^\circ \qquad \varepsilon_0 = 0.213\,\text{‰} \qquad \kappa = 0.0016\,\mathrm{m}^{-1}
 $$
 
 **Probe: die Ebene erzeugt die Einwirkung**
@@ -7984,23 +8026,23 @@ $$
 
 | Element | $\varepsilon_s\ [‰]$ | $\sigma_s\ [\mathrm{N/mm^2}]$ | $\sigma_{s,adm}\ [\mathrm{N/mm^2}]$ |
 | :--- | ---: | ---: | ---: |
-| Stab 1 | $0.078$ | $16$ | $355$ |
-| Linie 1 | $0.731$ | $146$ | $355$ |
-| Linie 3 | $0.559$ | $112$ | $355$ |
-| Linie 4 | $0.534$ | $107$ | $355$ |
+| Stab 1 | $0.088$ | $18$ | $355$ |
+| Linie 1 | $0.724$ | $145$ | $355$ |
+| Linie 3 | $0.557$ | $111$ | $355$ |
+| Linie 4 | $0.533$ | $107$ | $355$ |
 
 Massgebend: Linie 1 (y = 50 mm, z = 50 mm).
 
 **Grösste Zugspannung in der Bewehrung**
 
 $$
-\sigma_s = 146\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_s = 145\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,\sigma,\text{Häufig schief}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{146\,\mathrm{N}/\mathrm{mm}^{2}} = 2.43 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,\sigma,\text{Häufig schief}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{145\,\mathrm{N}/\mathrm{mm}^{2}} = 2.45 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Kennzahlen
@@ -20906,7 +20948,7 @@ Das Kriechen weicht den Beton auf: E\_c,eff = E\_cm/(1+φ), und die Wertigkeit i
 
 Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grössten an der gedrückten Kante. Ihre Resultierende liegt deshalb bei x/3 von dieser Kante.
 
-Am gezeichneten Querschnitt je Richtung: dasselbe Rissmoment wie beim spröden Versagen, gehalten gegen das Moment, bei dem der erste gezogene Stab seine zulässige Spannung erreicht. Das Rissmoment gehört dem ungerissenen Bruttoquerschnitt, das Moment der Bewehrung dem gerissenen – elastisch, ohne Normalkraft, mit der Kriechzahl dieses Nachweises; die gedrückte Bewehrung wirkt mit.
+Am gezeichneten Querschnitt je Richtung: dasselbe Rissmoment wie beim spröden Versagen, gehalten gegen das Moment, bei dem der erste gezogene Stab seine zulässige Spannung erreicht. Das Rissmoment gehört dem ungerissenen Bruttoquerschnitt, das Moment der Bewehrung dem gerissenen – präzise, ohne Normalkraft, mit der Kriechzahl dieses Nachweises; die gedrückte Bewehrung wirkt mit.
 
 Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durchmesser und dem f\_ctm des Betons, in dem er liegt; massgebend ist der Stab mit dem kleinsten Erfüllungsgrad.
 
@@ -20986,12 +21028,6 @@ Drittens die Grenze: dieselbe wie bei der Zwängung, mit f\_yk und bei erhöhter
 
 Einachsig bleibt die Nulllinie waagrecht, und M\_z zählt nicht – wie in der Tragsicherheit.
 
-**Werkstoffgesetze im Gebrauchszustand: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
-
-$$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
-$$
-
 **Dehnungsebene und innere Kräfte** *(SIA 262:2025, 4.3.2.3)*
 
 $$
@@ -21028,10 +21064,10 @@ $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 < \varepsilon_s \le \varepsilon_{ud} \\[1ex] 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen}) \\[1ex] 0 & \varepsilon_s > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Beton, linear ohne Zug** *(SIA 262:2025, 4.1.4.1.4)*
+**Werkstoffgesetze im Gebrauchszustand: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{cd}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 ### Stahlspannung gegen Fliessen
@@ -21124,12 +21160,6 @@ $$
 
 $$
 e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}\right)
-$$
-
-**Werkstoffgesetze der Verformung: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.5, Figur 12; 4.2.1.6, (27))*
-
-$$
-\sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Schiefstellung** *(SIA 262:2025, 4.1.3.2.3, (17))*
@@ -22899,14 +22929,14 @@ $$
 | Risse: Zwängung Normalkraft | 3. Lage | $N_{s,adm,3,x} = 351.6\,\mathrm{kN}$ | $N_{Riss} = 378.3\,\mathrm{kN}$ | $0.93$ |
 | Sprödes Versagen | 3. Lage | $M_{Rd,x}(N_{Ed} = 0)_{3} = 79.9\,\mathrm{kNm}$ | $M_{Riss} = 41.4\,\mathrm{kNm}$ | $1.93$ |
 | Risse: Zwängung Biegung | 3. Lage | $M_{s,adm,3,x} = 80.4\,\mathrm{kNm}$ | $M_{Riss} = 41.4\,\mathrm{kNm}$ | $1.94$ |
-| Risse: Quasi-ständige Lastfälle | Feld (60 %) | $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.18$ |
-| Risse: Quasi-ständige Lastfälle | Feld mit Druck (60 %) | $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 106\,\mathrm{N}/\mathrm{mm}^{2}$ | $3.60$ |
-| Risse: Quasi-ständige Lastfälle | Stütze (60 %) | $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 212\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.79$ |
-| Risse: Quasi-ständige Lastfälle | Dauerlast | $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 136\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.80$ |
-| Risse: Häufige Lastfälle | Feld (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 204\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.74$ |
-| Risse: Häufige Lastfälle | Feld mit Druck (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.88$ |
-| Risse: Häufige Lastfälle | Stütze (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.43$ |
-| Risse: Häufige Lastfälle | Gebrauch | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.03$ |
+| Risse: Quasi-ständige Lastfälle | Feld (60 %) | $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 172\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.21$ |
+| Risse: Quasi-ständige Lastfälle | Feld mit Druck (60 %) | $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 103\,\mathrm{N}/\mathrm{mm}^{2}$ | $3.71$ |
+| Risse: Quasi-ständige Lastfälle | Stütze (60 %) | $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 209\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.83$ |
+| Risse: Quasi-ständige Lastfälle | Dauerlast | $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 134\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.85$ |
+| Risse: Häufige Lastfälle | Feld (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 201\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.77$ |
+| Risse: Häufige Lastfälle | Feld mit Druck (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 120\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.96$ |
+| Risse: Häufige Lastfälle | Stütze (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 243\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.46$ |
+| Risse: Häufige Lastfälle | Gebrauch | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 172\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.06$ |
 | Verformung | Feld | $w_{max} = 17.1\,\mathrm{mm}$ | $w_{eff} = 12.0\,\mathrm{mm}$ | $1.43$ |
 | Verformung | Kragarm | $w_{max} = 7.1\,\mathrm{mm}$ | $w_{eff} = 6.0\,\mathrm{mm}$ | $1.18$ |
 | Knicken | Wand | $N_{Rd,K} = 4462.9\,\mathrm{kN}$ | $N_{Ed} = 800.0\,\mathrm{kN}$ | $5.58$ |
@@ -22954,12 +22984,12 @@ $$
 | Biegung und Normalkraft | Rand | $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 18.1\,\mathrm{kNm}$ | $M_{Ed,x} = 10.0\,\mathrm{kNm}$ | $1.81$ |
 | Querkraft | Feld | $V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 83.2\,\mathrm{kN}/\mathrm{m}$ | $V_{Ed,x} = 40.0\,\mathrm{kN}/\mathrm{m}$ | $2.08$ |
 | Querkraft | Rand | $V_{Rd,x}(M_{Ed} = 10\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 110.7\,\mathrm{kN}/\mathrm{m}$ | $V_{Ed,x} = 30.0\,\mathrm{kN}/\mathrm{m}$ | $3.69$ |
-| Risse: Quasi-ständige Lastfälle | Dauerlast | $\varepsilon_{s,adm} = 2.50\,\text{‰}$ | $\varepsilon_{s,x} = 4.67\,\text{‰}$ | $0.54$ |
+| Risse: Quasi-ständige Lastfälle | Dauerlast | $\varepsilon_{s,adm} = 2.50\,\text{‰}$ | $\varepsilon_{s,x} = 3.47\,\text{‰}$ | $0.72$ |
 | Verformung | Feld | $w_{max} = 14.3\,\mathrm{mm}$ | $w_{eff} = 16.8\,\mathrm{mm}$ | $0.85$ |
 
 > **Warnung:** Biegung und Normalkraft – Feld: nicht erfüllt. M\_Rd = 18.1 kNm bei N\_Ed = 0 kN.
 
-> **Warnung:** Risse: Quasi-ständige Lastfälle – Dauerlast: nicht erfüllt. ε\_m = 2.3198 ‰, χ = 0.03612 1/m. Stahl fliesst (ε\_s = 4.67 ‰ \> ε\_y = 2.50 ‰): ε\_s \> ε\_s,adm = 2.50 ‰.
+> **Warnung:** Risse: Quasi-ständige Lastfälle – Dauerlast: nicht erfüllt. ε\_m = 1.7220 ‰, χ = 0.02686 1/m. Stahl fliesst (ε\_s = 3.47 ‰ \> ε\_y = 2.50 ‰): ε\_s \> ε\_s,adm = 2.50 ‰.
 
 > **Warnung:** Verformung – Feld: nicht erfüllt. w\_eff = ω\_w · w = 8.42 · 2 mm = 16.8 mm \> w\_max = L/350 = 14.3 mm.
 
@@ -23225,11 +23255,11 @@ $$
 | Duktilität | Zug links | $\left(x/d\right)_{max} = 0.350$ | $x/d = 0.168$ | $2.09$ |
 | Sprödes Versagen | Zug oben | $M_{Rd} = 207.6\,\mathrm{kNm}$ | $M_{Riss} = 116.7\,\mathrm{kNm}$ | $1.78$ |
 | Risse: Zwängung Normalkraft | ganzer Querschnitt | $N_{s,adm} = 1032.4\,\mathrm{kN}$ | $N_{Riss} = 765.6\,\mathrm{kN}$ | $1.35$ |
-| Risse: Zwängung Biegung | Zug oben | $M_{s,adm} = 156.6\,\mathrm{kNm}$ | $M_{Riss} = 116.7\,\mathrm{kNm}$ | $1.34$ |
-| Risse: Quasi-ständige Lastfälle | Feld (60 %) | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 250\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.62$ |
-| Risse: Quasi-ständige Lastfälle | Schief (60 %) | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 15\,\mathrm{N}/\mathrm{mm}^{2}$ | $26.55$ |
-| Risse: Quasi-ständige Lastfälle | Dauer | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 88\,\mathrm{N}/\mathrm{mm}^{2}$ | $4.60$ |
-| Risse: Häufige Lastfälle | Häufig schief | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 146\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.43$ |
+| Risse: Zwängung Biegung | Zug oben | $M_{s,adm} = 158.4\,\mathrm{kNm}$ | $M_{Riss} = 116.7\,\mathrm{kNm}$ | $1.36$ |
+| Risse: Quasi-ständige Lastfälle | Feld (60 %) | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 249\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.62$ |
+| Risse: Quasi-ständige Lastfälle | Schief (60 %) | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 14\,\mathrm{N}/\mathrm{mm}^{2}$ | $28.29$ |
+| Risse: Quasi-ständige Lastfälle | Dauer | $\sigma_{s,adm,2} = 404\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 85\,\mathrm{N}/\mathrm{mm}^{2}$ | $4.73$ |
+| Risse: Häufige Lastfälle | Häufig schief | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 145\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.45$ |
 
 > **Warnung:** Biegung und Normalkraft – Feld: nicht erfüllt. Bei N\_Ed = 664.0 kN, in der Richtung des Moments.
 
@@ -24654,14 +24684,14 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Querkraftwiderstand x-Richtung – Stütze | $V_{Rd,x}$ | $214.6$ | kN/m | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $2.47$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $0.93$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld (70 %) | $\alpha_{eff,\sigma,x,\text{Feld (70 \%)}}$ | $1.74$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld mit Druck (70 %) | $\alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}}$ | $2.88$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Gebrauch | $\alpha_{eff,\sigma,x,\text{Gebrauch}}$ | $2.03$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Stütze (70 %) | $\alpha_{eff,\sigma,x,\text{Stütze (70 \%)}}$ | $1.43$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast | $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ | $2.80$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $2.18$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}$ | $3.60$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 %) | $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ | $1.79$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld (70 %) | $\alpha_{eff,\sigma,x,\text{Feld (70 \%)}}$ | $1.77$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld mit Druck (70 %) | $\alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}}$ | $2.96$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Gebrauch | $\alpha_{eff,\sigma,x,\text{Gebrauch}}$ | $2.06$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Stütze (70 %) | $\alpha_{eff,\sigma,x,\text{Stütze (70 \%)}}$ | $1.46$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast | $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ | $2.85$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $2.21$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}$ | $3.71$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 %) | $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ | $1.83$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $5.69$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $1.93$ |  | berechnet |
 | Erfüllungsgrad Verformung – Feld | $\alpha_{eff,w,\text{Feld}}$ | $1.43$ |  | berechnet |
@@ -24729,9 +24759,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Querkraftwiderstand x-Richtung – Rand | $V_{Rd,x}$ | $110.7$ | kN/m | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 1. Lage x | $\alpha_{eff,NR,1,x}$ | $0.99$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 4. Lage x | $\alpha_{eff,NR,4,x}$ | $0.99$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast | $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ | $0.54$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast | $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ | $0.72$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $0.00$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Rand (60 %) | $\alpha_{eff,\sigma,w,x,\text{Rand (60 \%)}}$ | $3.23$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Rand (60 %) | $\alpha_{eff,\sigma,w,x,\text{Rand (60 \%)}}$ | $3.28$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 1. Lage x | $\alpha_{eff,SV,1,x}$ | $1.94$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 4. Lage x | $\alpha_{eff,SV,4,x}$ | $1.94$ |  | berechnet |
 | Erfüllungsgrad Verformung – Feld | $\alpha_{eff,w,\text{Feld}}$ | $0.85$ |  | berechnet |
@@ -24928,7 +24958,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Querkraftwiderstand x-Richtung – Feld | $V_{Rd,x}$ | $142.9$ | kN/m | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $1.17$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $1.17$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $2.58$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $2.59$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $1.87$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $2.21$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $2.11$ |  | berechnet |
@@ -25025,11 +25055,11 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Biegung und Normalkraft – Schief | $\alpha_{eff,\text{Schief}}$ | $2.33$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $1.35$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung gegen Fliessen – Feld (70 %) | $\alpha_{eff,\sigma,\text{Feld (70 \%)}}$ | $1.22$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung gegen Fliessen – Häufig schief | $\alpha_{eff,\sigma,\text{Häufig schief}}$ | $2.43$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung gegen Fliessen – Schief (70 %) | $\alpha_{eff,\sigma,\text{Schief (70 \%)}}$ | $19.99$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer | $\alpha_{eff,\sigma,w,\text{Dauer}}$ | $4.60$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen – Häufig schief | $\alpha_{eff,\sigma,\text{Häufig schief}}$ | $2.45$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen – Schief (70 %) | $\alpha_{eff,\sigma,\text{Schief (70 \%)}}$ | $20.79$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Dauer | $\alpha_{eff,\sigma,w,\text{Dauer}}$ | $4.73$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %) | $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ | $1.62$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite – Schief (60 %) | $\alpha_{eff,\sigma,w,\text{Schief (60 \%)}}$ | $26.55$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Schief (60 %) | $\alpha_{eff,\sigma,w,\text{Schief (60 \%)}}$ | $28.29$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $2.93$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $1.78$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug rechts | $\alpha_{eff,Riss,\text{Zug rechts}}$ | $2.53$ |  | berechnet |
@@ -25042,10 +25072,10 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Moment der Längszugkraft um z – Schief | $\Delta M_z$ | $0$ | kNm | berechnet |
 | Längszugkraft aus Querkraft und Torsion – Schief | $\Delta N$ | $173.2$ | kN | berechnet |
 | Erfüllungsgrad Querkraft und Torsion – Schief | $\alpha_{eff,V,\text{Schief}}$ | $5.13$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $1.90$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $1.34$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $1.45$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $2.40$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $1.93$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $1.36$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $1.47$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $2.43$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $400$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $300$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $160000$ | mm² | berechnet |
@@ -25076,8 +25106,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Stahlspannung aus Rissbreite – Zug (60 %) | $\alpha_{eff,\sigma,w,\text{Zug (60 \%)}}$ | $3.93$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $5.37$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $5.37$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $5.20$ |  | berechnet |
-| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $5.20$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $5.23$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $5.23$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $200$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $200$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $1437500$ | mm² | berechnet |

@@ -98,8 +98,7 @@ class TestSinnbilder(unittest.TestCase):
         k = katalog()
         rechenwahl = k["rechenwahl"]
         familien = {
-            "rechenart": [*rechenwahl["rechenarten"], *rechenwahl["spannungsarten"],
-                          *rechenwahl["faserarten"], *rechenwahl["faserspannungsarten"],
+            "rechenart": [*rechenwahl["rechenarten"], *rechenwahl["faserarten"],
                           *rechenwahl["verformungsarten"],
                           *k["querschnittsanalyse"]["betongesetze"]],
             "lage": k["durchstanzen"]["lagen"],

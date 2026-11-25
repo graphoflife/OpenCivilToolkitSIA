@@ -1,5 +1,5 @@
 ---
-erzeugt: c4f683d3e34a
+erzeugt: 2bae495187b3
 art: modul
 tags: [modul]
 ---
@@ -217,9 +217,9 @@ zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
 class QAGebrauchswahl(Gebrauchswahl)
 ```
 
-Die Stahlspannungen am gezeichneten Querschnitt: ueber die Fasern oder elastisch -- ohne Handrechnung.
+Die Stahlspannungen am gezeichneten Querschnitt: nur ueber die Fasern, ohne Handrechnung.
 
-- `rechenart: Rechenart = einer_von(FASERSPANNUNGSARTEN, Rechenart.ELASTISCH)`
+- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)`
 
 ### QAGebrauchsliste
 

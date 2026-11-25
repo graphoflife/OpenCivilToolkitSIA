@@ -42,10 +42,12 @@ haelt -- am gezeichneten Querschnitt mit gedrehter Nulllinie
 (:mod:`opencivil.nachweis.gebrauchsebene`). Der Beton nimmt keinen Zug auf.
 Womit gerechnet wird, waehlt das Kapitel
 (:class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`): die Kriechzahl, den
-Wertesatz und die Rechenart. Die Vorgabe ist, wie bis 2026-10-09 fest:
-**elastisch** -- der Beton im Druck linear mit dem wirksamen Modul
-``E_cm/(1+phi)`` -- mit den **charakteristischen** Festigkeiten: der Stahl
-fliesst bei ``f_yk``, der Beton traegt hoechstens ``f_ck``.
+Wertesatz und die Rechenart. Die Vorgabe ist **praezise** -- die Parabel
+mit dem wirksamen Modul ``E_cm/(1+phi)`` -- mit den **charakteristischen**
+Festigkeiten: der Stahl fliesst bei ``f_yk``, der Beton traegt hoechstens
+``f_ck``. Bis 2026-11-25 war es «elastisch», der Beton linear mit demselben
+Modul; der Benutzer hat diese Rechenart gestrichen
+(:mod:`opencivil.querschnitt.gesetzwahl`).
 
 Die gedrueckte Bewehrung wirkt mit, wie im Querschnitt -- nur in der
 Rechenart «Handrechnung» nicht. Gemessen wird an der am staerksten
@@ -107,16 +109,15 @@ from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.spannungsgrenzen import (
     Grenzen, Spannungsgrenze, Stahlzustand, Stelle, je_stahl, nach_stahl,
 )
-from opencivil.nachweis.zustand2 import wertigkeit
 from opencivil.querschnitt.platte import Richtung
 
 #: Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt:
-#: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt,
+#: praezise, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt,
 #: was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte
 #: (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege
 #: f_cm hoeher als f_ck -- f_ck liegt sicher (``notizbuch/Notizen/TODO.md``).
 VORGABE = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH),
-                     art=Rechenart.ELASTISCH)
+                     art=Rechenart.PARABEL)
 
 
 @dataclass(frozen=True)
@@ -511,32 +512,9 @@ class PlattenStellen(Stahlspannungsort):
 
     def protokoll_vor_den_grenzen(self, p: Protokoll, e: Eingaben, zustand: _Plattenzustand,
                                   wahl: Rechenwahl, phi: Wert, basis: str) -> None:
-        if not wahl.art.mit_kriechzahl:
-            return
-        nachsatz = ""
-        if wahl.art is Rechenart.ELASTISCH:
-            nachsatz = self._wertigkeiten(zustand, wahl, basis)
-        protokoll_wirksamer_modul(p, e["E_cm"], phi, basis,
-                                  titel="Wirksamer Elastizitätsmodul", nachsatz=nachsatz)
-
-    def _wertigkeiten(self, zustand: _Plattenzustand, wahl: Rechenwahl, basis: str) -> str:
-        """
-        ``n = E_s / E_c,eff`` hinter dem wirksamen Modul -- einmal, solange
-        alle Staehle denselben Modul haben, sonst je Stahl.
-        """
-        moduln = {l.sorte: l.stahl.E_s for l in zustand.loeser.lagen}
-        nach_sorte = {kennung_aus(s.id): s for s in self.staehle}
-        if len(set(moduln.values())) == 1:
-            paare = [("n", "n", next(iter(moduln.values())))]
-        else:
-            paare = [(*je_stahl("n", "n", nach_sorte[sorte], self.staehle), E_s)
-                     for sorte, E_s in moduln.items()]
-        werte = Zwischenwerte(basis)
-        angaben = []
-        for name, symbol, E_s in paare:
-            n = wertigkeit(E_s=E_s, E_cm=zustand.w.E_c, phi=wahl.kriechzahl)
-            angaben.append(rf"\qquad {angabe(werte.zahl(name, symbol, n, stellen=2))}")
-        return "".join(angaben)
+        if wahl.art.mit_kriechzahl:
+            protokoll_wirksamer_modul(p, e["E_cm"], phi, basis,
+                                      titel="Wirksamer Elastizitätsmodul")
 
     def protokoll_gesetze(self, p: Protokoll, e: Eingaben, zustand: Stahlzustand,
                           wahl: Rechenwahl, basis: str) -> None:

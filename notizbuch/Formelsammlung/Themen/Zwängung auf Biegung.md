@@ -1,10 +1,10 @@
 ---
-erzeugt: e9959bb00047
+erzeugt: a8c3e85dd3d9
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 22 Formeln, in der Folge, in der gerechnet wird.
+> 23 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -16,7 +16,7 @@ Das Kriechen weicht den Beton auf: E\_c,eff = E\_cm/(1+φ), und die Wertigkeit i
 
 Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grössten an der gedrückten Kante. Ihre Resultierende liegt deshalb bei x/3 von dieser Kante.
 
-Am gezeichneten Querschnitt je Richtung: dasselbe Rissmoment wie beim spröden Versagen, gehalten gegen das Moment, bei dem der erste gezogene Stab seine zulässige Spannung erreicht. Das Rissmoment gehört dem ungerissenen Bruttoquerschnitt, das Moment der Bewehrung dem gerissenen – elastisch, ohne Normalkraft, mit der Kriechzahl dieses Nachweises; die gedrückte Bewehrung wirkt mit.
+Am gezeichneten Querschnitt je Richtung: dasselbe Rissmoment wie beim spröden Versagen, gehalten gegen das Moment, bei dem der erste gezogene Stab seine zulässige Spannung erreicht. Das Rissmoment gehört dem ungerissenen Bruttoquerschnitt, das Moment der Bewehrung dem gerissenen – präzise, ohne Normalkraft, mit der Kriechzahl dieses Nachweises; die gedrückte Bewehrung wirkt mit.
 
 Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durchmesser und dem f\_ctm des Betons, in dem er liegt; massgebend ist der Stab mit dem kleinsten Erfüllungsgrad.
 
@@ -41,11 +41,12 @@ Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zu
 15. [[Moment der Bewehrung bei zulässiger Stahlspannung]]
 16. [[Spannung im ungerissenen Querschnitt]]
 17. [[Wirksamer Elastizitätsmodul]]
-18. [[Beton linear, ohne Zug]]
-19. [[Bilineare Beziehung des Betonstahls]]
-20. [[Fiktiver Durchmesser einer verschmierten Linie]]
-21. [[Dehnungsebene und innere Kräfte]]
-22. [[Widerstandsmoment zum gezogensten Betonpunkt]]
+18. [[Beiwert der Parabel]]
+19. [[Parabel-Rechteck-Beziehung des Betons]]
+20. [[Bilineare Beziehung des Betonstahls]]
+21. [[Fiktiver Durchmesser einer verschmierten Linie]]
+22. [[Dehnungsebene und innere Kräfte]]
+23. [[Widerstandsmoment zum gezogensten Betonpunkt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

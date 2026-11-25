@@ -25,14 +25,17 @@ DIE RECHENARTEN:
   Bewehrung wirkt mit und verdraengt den Beton an ihrer Stelle.
 * **Praezise ohne Vereinfachung** -- die Parabel-Rechteck-Beziehung, ihr
   Anstieg mit dem wirksamen Modul ``E_cm/(1+phi)``, ``k_sigma`` nie unter 1.
-* **elastisch** -- nur fuer die Stahlspannungen: der Beton linear mit
-  ``E_cm/(1+phi)``, hoechstens ``f_c``. So rechneten sie bis 2026-10-09 fest.
 
 Die Namen hat der Benutzer am 2026-10-12 gewaehlt; vorher hiessen sie
-«Handrechnung Block 0.85·x», «Block 0.85·x genau» und «Parabel».
+«Handrechnung Block 0.85·x», «Block 0.85·x genau» und «Parabel». Bis
+2026-11-25 gab es fuer die Stahlspannungen dazu «elastisch»: der Beton linear
+mit ``E_cm/(1+phi)``, hoechstens ``f_c``. Der Benutzer hat es gestrichen: im
+Gebrauch ist die Parabel beinahe eine Gerade, und die Stahlspannung lag um
+etwa ein Prozent neben der praezisen -- bei phi = 2 etwa 344 statt
+340 N/mm².
 
-Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
-haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
+Die Kriechzahl wirkt nur bei praezise: an den anderen Gesetzen haengt kein
+Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
 (:class:`Werkstoffsatz`), und wie ein Widerstand heisst -- ``R_d`` oder
 ``R_k``.
 
@@ -53,7 +56,7 @@ from typing import Dict, FrozenSet, Mapping, Optional, Tuple
 
 from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, BetonElastisch, Betongesetz, BetonUngerissen, Gesetz, Spannungsblock,
+    BLOCKANTEIL, Betongesetz, BetonUngerissen, Gesetz, Spannungsblock,
 )
 
 
@@ -156,7 +159,6 @@ class Rechenart(Wahl):
     HANDRECHNUNG = "handrechnung"
     BLOCK = "block"
     PARABEL = "parabel"
-    ELASTISCH = "elastisch"
 
     @property
     def beschriftung(self) -> str:
@@ -164,7 +166,6 @@ class Rechenart(Wahl):
             Rechenart.HANDRECHNUNG: "Handrechnung",
             Rechenart.BLOCK: f"{BLOCKANTEIL}·x-Vereinfachung",
             Rechenart.PARABEL: "Präzise ohne Vereinfachung",
-            Rechenart.ELASTISCH: "elastisch",
         }[self]
 
     @property
@@ -174,7 +175,6 @@ class Rechenart(Wahl):
             Rechenart.HANDRECHNUNG: "Hand",
             Rechenart.BLOCK: f"{BLOCKANTEIL}·x",
             Rechenart.PARABEL: "präzise",
-            Rechenart.ELASTISCH: "elastisch",
         }[self]
 
     @property
@@ -184,13 +184,12 @@ class Rechenart(Wahl):
             Rechenart.HANDRECHNUNG: r"\text{Handrechnung}",
             Rechenart.BLOCK: rf"{BLOCKANTEIL} \cdot x\text{{-Vereinfachung}}",
             Rechenart.PARABEL: r"\text{Präzise ohne Vereinfachung}",
-            Rechenart.ELASTISCH: r"\text{elastisch}",
         }[self]
 
     @property
     def mit_kriechzahl(self) -> bool:
         """Ob ``phi`` etwas aendert -- nur, wo ein Gesetz am Modul haengt."""
-        return self in (Rechenart.PARABEL, Rechenart.ELASTISCH)
+        return self is Rechenart.PARABEL
 
     @property
     def mit_block(self) -> bool:
@@ -362,8 +361,6 @@ def betongesetz(wahl: Rechenwahl, *, f_c: float, E_c: float, eps_c1d: float,
     """
     if ungerissen:
         return BetonUngerissen(E_c=wirksamer_modul(E_c, wahl.kriechzahl))
-    if wahl.art is Rechenart.ELASTISCH:
-        return BetonElastisch(E_c=wirksamer_modul(E_c, wahl.kriechzahl), f_c=f_c)
     if wahl.art is Rechenart.PARABEL:
         return Betongesetz.mit_modul(f_c=f_c, E_c=wirksamer_modul(E_c, wahl.kriechzahl),
                                      eps_c1d=eps_c1d, eps_c2d=eps_c2d)

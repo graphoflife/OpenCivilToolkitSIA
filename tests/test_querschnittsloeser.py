@@ -2,6 +2,7 @@
 
 import math
 import unittest
+from dataclasses import dataclass
 
 from opencivil.core.suche import HALBIEREN, ILLINOIS, Illinois
 from opencivil.nachweis.querschnittsloeser import Stahllage, probenschranken, verfahren
@@ -9,7 +10,7 @@ from opencivil.nachweis.rechenwahl import Betonkennwerte, Gesetze
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.werkstoffgesetz import (
-    BetonElastisch, Betongesetz, Spannungsblock, Stahlgesetz,
+    Betongesetz, Gesetz, Spannungsblock, Stahlgesetz,
 )
 
 
@@ -26,6 +27,21 @@ def stahl(*, E_s: float, f_sd: float, eps_ud: float = 0.045) -> Stahlgesetz:
 
 #: Ein Stahl, der nie fliesst -- fuer die Faelle mit geschlossener Loesung.
 ELASTISCH = stahl(E_s=200e9, f_sd=1e12)
+
+
+@dataclass(frozen=True)
+class BetonOhneZug(Gesetz):
+    """
+    Beton ohne Zug, im Druck unbegrenzt linear -- nur fuer diese Tests: bei
+    reiner Biegung im Zustand II hat der Querschnitt damit eine geschlossene
+    Loesung. Bis 2026-11-25 rechnete so die Rechenart «elastisch» des Kerns.
+    """
+
+    E_c: float
+
+    def __post_init__(self) -> None:
+        E_c = self.E_c
+        object.__setattr__(self, "funktion", lambda eps: E_c * eps if eps < 0.0 else 0.0)
 
 
 def plattenloeser(*, h: float, b: float, lagen, beton, eps_c2d: float = 0.003,
@@ -48,7 +64,7 @@ def elastischer_loeser(a_s=2450e-6, d=0.2601, phi=2.0, h=0.3, b=1.0):
     """Gerissen, linear elastisch -- der Fall mit geschlossener Lösung."""
     return plattenloeser(
         h=h, b=b, lagen=[Stahllage(a_s=a_s, z=d, stahl=ELASTISCH, nummer=1)],
-        beton=BetonElastisch(E_c=33.62e9 / (1.0 + phi)))
+        beton=BetonOhneZug(E_c=33.62e9 / (1.0 + phi)))
 
 
 class TestGegenDieGeschlosseneLoesung(unittest.TestCase):
@@ -117,7 +133,7 @@ class TestProbe(unittest.TestCase):
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=1200e-6, z=0.26, stahl=ELASTISCH, nummer=1),
                    Stahllage(a_s=1200e-6, z=0.04, stahl=ELASTISCH, nummer=4)],
-            beton=BetonElastisch(E_c=33.62e9 / 3.0))
+            beton=BetonOhneZug(E_c=33.62e9 / 3.0))
         for N_Ed, M_Ed in [(200e3, 0.0), (200e3, 10e3), (500e3, -15e3)]:
             with self.subTest(N=N_Ed, M=M_Ed):
                 e = loeser.loese(N_Ed=N_Ed, M_Ed=M_Ed)

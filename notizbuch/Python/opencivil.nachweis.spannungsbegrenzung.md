@@ -1,5 +1,5 @@
 ---
-erzeugt: af91c6d73a0d
+erzeugt: 1dcc9dfa4d73
 art: modul
 tags: [modul]
 ---
@@ -55,10 +55,12 @@ haelt -- am gezeichneten Querschnitt mit gedrehter Nulllinie
 ([[opencivil.nachweis.gebrauchsebene]]). Der Beton nimmt keinen Zug auf.
 Womit gerechnet wird, waehlt das Kapitel
 ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]): die Kriechzahl, den
-Wertesatz und die Rechenart. Die Vorgabe ist, wie bis 2026-10-09 fest:
-**elastisch** -- der Beton im Druck linear mit dem wirksamen Modul
-`E_cm/(1+phi)` -- mit den **charakteristischen** Festigkeiten: der Stahl
-fliesst bei `f_yk`, der Beton traegt hoechstens `f_ck`.
+Wertesatz und die Rechenart. Die Vorgabe ist **praezise** -- die Parabel
+mit dem wirksamen Modul `E_cm/(1+phi)` -- mit den **charakteristischen**
+Festigkeiten: der Stahl fliesst bei `f_yk`, der Beton traegt hoechstens
+`f_ck`. Bis 2026-11-25 war es «elastisch», der Beton linear mit demselben
+Modul; der Benutzer hat diese Rechenart gestrichen
+([[opencivil.querschnitt.gesetzwahl]]).
 
 Die gedrueckte Bewehrung wirkt mit, wie im Querschnitt -- nur in der
 Rechenart «Handrechnung» nicht. Gemessen wird an der am staerksten
@@ -441,15 +443,6 @@ def dehnungsgrenze(self, basis: str, werte: Zwischenwerte, erg: Fallergebnis) ->
 def protokoll_vor_den_grenzen(self, p: Protokoll, e: Eingaben, zustand: _Plattenzustand, wahl: Rechenwahl, phi: Wert, basis: str) -> None
 ```
 
-#### PlattenStellen._wertigkeiten
-
-```python
-def _wertigkeiten(self, zustand: _Plattenzustand, wahl: Rechenwahl, basis: str) -> str
-```
-
-`n = E_s / E_c,eff` hinter dem wirksamen Modul -- einmal, solange
-alle Staehle denselben Modul haben, sonst je Stahl.
-
 #### PlattenStellen.protokoll_gesetze
 
 ```python
@@ -555,7 +548,7 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 
 ## Konstanten
 
-- `VORGABE = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), a…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege f_cm hoeher als f_ck -- f_ck liegt sicher (`notizbuch/Notizen/TODO.md`).
+- `VORGABE = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), a…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: praezise, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf. Die Norm verlangt Mittelwerte (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege f_cm hoeher als f_ck -- f_ck liegt sicher (`notizbuch/Notizen/TODO.md`).
 - `VERGLEICH_BEIM_FLIESSEN = 'Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, währe…` – Was verglichen wird, wenn die Bewehrung fliesst -- siehe Dateikopf.
 
 ## Braucht
@@ -573,7 +566,6 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
-- [[opencivil.nachweis.zustand2]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 

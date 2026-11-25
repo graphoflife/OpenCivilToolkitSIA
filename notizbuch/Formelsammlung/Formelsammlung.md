@@ -1,5 +1,5 @@
 ---
-erzeugt: 2431f12b7427
+erzeugt: 3648c2812edd
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -23,9 +23,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Duktilität]] · 9
 - [[Zwängung auf Normalkraft]] · 13
 - [[Sprödes Versagen]] · 4
-- [[Zwängung auf Biegung]] · 22
-- [[Stahlspannung aus Rissbreite]] · 14
-- [[Stahlspannung gegen Fliessen]] · 8
+- [[Zwängung auf Biegung]] · 23
+- [[Stahlspannung aus Rissbreite]] · 13
+- [[Stahlspannung gegen Fliessen]] · 7
 - [[Knicken]] · 14
 - [[Spannung-Dehnung-Analyse]] · 23
 
@@ -117,7 +117,6 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
 - [[Bemessungswert des Sohlreibungswinkels]] · $\delta_d$
 - [[Bemessungswert des Verformungsmoduls]]
-- [[Beton linear, ohne Zug]]
 - [[Beton ungerissen, in Druck und Zug]]
 - [[Betonstahl nur auf Zug]]
 - [[Bettung eines Stabs]]
@@ -414,7 +413,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-129 von 337 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
+129 von 336 Formeln haben im Code keine Normstelle – meist Geometrie oder Mechanik ohne Normbezug, oder eine Festlegung nach Vorgabe. Wo eine Norm oder das Buch die Formel regelt, wird die Stelle dort nachgeschlagen und im Code eingetragen, an der genannten Stelle – von dort kommt sie in Bericht und Notizbuch.
 
 - [[Achsen eines Stabs im Raum]] · [[opencivil.stabwerk3d.herleitung|_ansaetze]]
 - [[Äquivalenter E-Modul eines Stabs]] · [[opencivil.spannungsanalyse.modul#ModulProzedur|ModulProzedur._schreiben]]

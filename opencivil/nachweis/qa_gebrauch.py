@@ -46,14 +46,15 @@ ZWAENGUNG AUF BIEGUNG:
 Je Richtung wie das sproede Versagen: dasselbe Rissmoment
 (:func:`~opencivil.nachweis.rissgroessen.rissmoment`), gehalten gegen
 das Moment, bei dem der erste gezogene Stab sein ``sigma_s,adm`` erreicht --
-am gerissenen Querschnitt, elastisch, ohne Normalkraft, mit eigenem φ
-(Benutzer, 2026-10-15). Die Platte rechnet dasselbe von Hand, mit dem
+am gerissenen Querschnitt, praezise, ohne Normalkraft, mit eigenem φ
+(Benutzer, 2026-10-15; bis 2026-11-25 elastisch). Die Platte rechnet dasselbe von Hand, mit dem
 Hebelarm ``d - x/3`` und ohne die gedrueckte Bewehrung; hier wirkt sie mit.
 
 DIE NORM:
 Beide Zwaengungen begrenzen die Rissbreite beim Erreichen von ``f_ct,eff``
-(SIA 262:2025, 4.4.2.3.4, Tabelle 17, Zeile 2); gerechnet wird gerissen und
-elastisch, ohne Zug im Beton (4.1.4.1.4). ``t`` ist nach 4.4.1.3 die
+(SIA 262:2025, 4.4.2.3.4, Tabelle 17, Zeile 2); gerechnet wird gerissen,
+ohne Zug im Beton (4.1.4.1.4), und praezise mit der Parabel -- bis
+2026-11-25 linear, «elastisch». ``t`` ist nach 4.4.1.3 die
 kleinste Abmessung des Zuggurts, bei Rechtecken unter Biegung ``h/3``.
 
 NACH VORGABE, IN SIA 262:2025 NICHT GEFUNDEN:
@@ -528,7 +529,7 @@ class ZwaengungBiegungQA(Biegezwang, Richtungsnachweis):
             "spröden Versagen, gehalten gegen das Moment, bei dem der erste gezogene "
             "Stab seine zulässige Spannung erreicht. Das Rissmoment gehört dem "
             "ungerissenen Bruttoquerschnitt, das Moment der Bewehrung dem gerissenen – "
-            "elastisch, ohne Normalkraft, mit der Kriechzahl dieses Nachweises; die "
+            "präzise, ohne Normalkraft, mit der Kriechzahl dieses Nachweises; die "
             "gedrückte Bewehrung wirkt mit.")
         p.ansatz(r"\max_i \frac{\sigma_{s,i}(M_{s,adm})}{\sigma_{s,adm,i}} = 1"
                  r"\qquad M_{s,adm} \ge M_{Riss}",

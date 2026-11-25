@@ -311,13 +311,15 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
         Bei normaler Anforderung ist die Grenze f_yk, und dort liegt auch das
         Fliessplateau. Wer an der Spannung misst, bekäme 500 gegen 500 --
         erfüllt, mit 1.00. Gemessen wird darum an der Dehnung, und die wächst
-        auf dem Plateau weiter.
+        auf dem Plateau weiter. Mit der Parabel fliesst der Stahl ab etwa
+        261 kNm; bis 2026-11-25 rechnete der Beton hier linear und liess ihn
+        etwas früher fliessen.
         """
         from opencivil.core.einheiten import PROMILLE
         from opencivil.projekt import GebrauchsfallEintrag
 
         nachweis = self.nachweis(self.projekt(
-            "normal", GebrauchsfallEintrag("fliesst", M_Ed=262.0)))
+            "normal", GebrauchsfallEintrag("fliesst", M_Ed=266.0)))
         erg = nachweis.ergebnisse[-1]
         urteil = nachweis.urteile[-1]
         self.assertTrue(erg.konvergiert)
@@ -336,7 +338,7 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
 
         nachweis = self.nachweis(self.projekt(
             "normal", *(GebrauchsfallEintrag(f"M{m}", M_Ed=float(m))
-                        for m in (258, 262, 266, 270))))
+                        for m in (262, 266, 270, 275))))
         grade = [e.erfuellungsgrad for e in nachweis.ergebnisse[-4:]]
         self.assertEqual(grade, sorted(grade, reverse=True))
         self.assertTrue(all(e.fliesst for e in nachweis.ergebnisse[-4:]))
@@ -344,7 +346,7 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
     def test_die_mitschrift_nennt_das_fliessen(self):
         from opencivil.projekt import GebrauchsfallEintrag
 
-        projekt = self.projekt("normal", GebrauchsfallEintrag("fliesst", M_Ed=262.0))
+        projekt = self.projekt("normal", GebrauchsfallEintrag("fliesst", M_Ed=266.0))
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         text = " ".join(

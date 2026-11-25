@@ -1,10 +1,10 @@
 ---
-erzeugt: 11fafec64941
+erzeugt: e7be818cb654
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 14 Formeln, in der Folge, in der gerechnet wird.
+> 13 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -48,18 +48,17 @@ Einachsig bleibt die Nulllinie waagrecht, und M\_z zählt nicht – wie in der T
 
 1. [[Wirksamer Elastizitätsmodul]]
 2. [[Zulässige Stahlspannung (Rissbreite w_nom)]]
-3. [[Beton linear, ohne Zug]]
-4. [[Bilineare Beziehung des Betonstahls]]
-5. [[Dehnungsebene und innere Kräfte]]
-6. [[Erfüllungsgrad]]
-7. [[Zulässige Stahlspannung (normale Anforderung)]]
-8. [[Fliessdehnung]]
-9. [[Zulässige Dehnung]]
-10. [[Spannungsblock des Betons]]
-11. [[Betonstahl nur auf Zug]]
-12. [[Fiktiver Durchmesser einer verschmierten Linie]]
-13. [[Beiwert der Parabel]]
-14. [[Parabel-Rechteck-Beziehung des Betons]]
+3. [[Beiwert der Parabel]]
+4. [[Parabel-Rechteck-Beziehung des Betons]]
+5. [[Bilineare Beziehung des Betonstahls]]
+6. [[Dehnungsebene und innere Kräfte]]
+7. [[Erfüllungsgrad]]
+8. [[Zulässige Stahlspannung (normale Anforderung)]]
+9. [[Fliessdehnung]]
+10. [[Zulässige Dehnung]]
+11. [[Spannungsblock des Betons]]
+12. [[Betonstahl nur auf Zug]]
+13. [[Fiktiver Durchmesser einer verschmierten Linie]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: fd9705517ab6
+erzeugt: 6c3ed128ff0e
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.1.2.6.1, (12)"
@@ -23,7 +23,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ## Im Code

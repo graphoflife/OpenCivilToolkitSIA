@@ -460,10 +460,11 @@
       "themen": [
         "Schiefe Biegung",
         "Innerer Pfahlwiderstand",
+        "Stahlspannung aus Rissbreite",
+        "Stahlspannung gegen Fliessen",
         "Knicken",
         "Biegung und Normalkraft",
-        "Stahlspannung gegen Fliessen",
-        "Stahlspannung aus Rissbreite",
+        "Zwängung auf Biegung",
         "Spannung-Dehnung-Analyse"
       ]
     },
@@ -700,17 +701,6 @@
       "zeichen": [],
       "themen": [
         "Pfahlsteifigkeit"
-      ]
-    },
-    {
-      "name": "Beton linear, ohne Zug",
-      "pfad": "Formelsammlung/Formeln/Beton linear, ohne Zug.md",
-      "art": "formel",
-      "zeichen": [],
-      "themen": [
-        "Stahlspannung aus Rissbreite",
-        "Stahlspannung gegen Fliessen",
-        "Zwängung auf Biegung"
       ]
     },
     {
@@ -2628,10 +2618,11 @@
       "themen": [
         "Schiefe Biegung",
         "Innerer Pfahlwiderstand",
+        "Stahlspannung aus Rissbreite",
+        "Stahlspannung gegen Fliessen",
         "Knicken",
         "Biegung und Normalkraft",
-        "Stahlspannung gegen Fliessen",
-        "Stahlspannung aus Rissbreite",
+        "Zwängung auf Biegung",
         "Spannung-Dehnung-Analyse"
       ]
     },
@@ -6216,7 +6207,6 @@
         "PlattenStellen.begruendung",
         "PlattenStellen.dehnungsgrenze",
         "PlattenStellen.protokoll_vor_den_grenzen",
-        "PlattenStellen._wertigkeiten",
         "PlattenStellen.protokoll_gesetze",
         "PlattenStellen.protokoll_verfahren",
         "PlattenStellen.protokoll_einwirkung",
@@ -7904,9 +7894,6 @@
         "StahlNurZug.formel",
         "StahlNurZug.latex",
         "_stahlfunktion",
-        "BetonElastisch",
-        "BetonElastisch.formel",
-        "BetonElastisch.latex",
         "BetonUngerissen",
         "BetonUngerissen.formel",
         "BetonUngerissen.latex",

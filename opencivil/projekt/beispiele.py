@@ -179,7 +179,7 @@ def jeder_nachweis() -> Projekt:
     decke.verformungsfall("Feld", w=3.0, laenge=6.0)
     decke.verformungsfall("Kragarm", w=0.8, laenge=2.5, zugseite="oben")
     # Die Kapitel der Decke rechnen mit φ = 2, wie bis 2026-10-09 die
-    # Platte -- so bleiben ihre Zahlen im Bericht dieselben.
+    # Platte.
     decke.zwaengung_biegung_kriechzahl = 2.0
     decke.haeufig.wahl.kriechzahl = decke.quasistaendig.wahl.kriechzahl = 2.0
     decke.knicken_wahl_verformung.kriechzahl = 2.0

@@ -74,7 +74,7 @@ const HILFE = {
     zeilen: [
       ['Normalkraft', 'der ganze Querschnitt reisst: Σ A_c·k_t·f_ctm, t = kleinere Abmessung; gegen alle Stäbe'],
       ['500 mm', 'nur massige Bauteile: Beton bis 250 mm vom Rand, k_t für 500 mm (SIA 262:2025, 4.4.2.3.7)'],
-      ['Biegung', 'je Richtung M_Riss wie beim spröden Versagen, gegen das Moment, bei dem der erste gezogene Stab σ_s,adm erreicht – gerissen, elastisch, eigenes φ'],
+      ['Biegung', 'je Richtung M_Riss wie beim spröden Versagen, gegen das Moment, bei dem der erste gezogene Stab σ_s,adm erreicht – gerissen, präzise, eigenes φ'],
       ['σ_s,adm', 'je Stab nach Tab. 17 mit seinem ⌀; verschmiert: fiktiver ⌀ bei 150 mm Teilung'],
     ],
     formel: 'Σ A_s·σ_s,adm ≥ N_Riss    M_s,adm ≥ M_Riss',
@@ -436,7 +436,7 @@ const ORT = {
     // Woraus «aus der Tragsicherheit» ableitet: die Lastfälle der Analyse.
     aus: 'lastfaelle',
     vorlage: 'qagebrauchsfall',
-    arten: 'faserspannungsarten',
+    arten: 'faserarten',
     spalten: (a) => spalten(a).filter((s) => ['N_Ed', 'M_y_Ed', 'M_z_Ed'].includes(s.feld))
       .map((s) => ({
         feld: s.feld, kopf: [s.symbol, s.feld === 'N_Ed' ? 'kN' : 'kNm'],

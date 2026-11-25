@@ -1,5 +1,5 @@
 ---
-erzeugt: ec79d7a60fea
+erzeugt: 92cf326b5a2b
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.6, (27); Untergrenze 1 nach Vorgabe"
@@ -36,10 +36,11 @@ $$
 
 - [[Schiefe Biegung]]
 - [[Innerer Pfahlwiderstand]]
+- [[Stahlspannung aus Rissbreite]]
+- [[Stahlspannung gegen Fliessen]]
 - [[Knicken]]
 - [[Biegung und Normalkraft]]
-- [[Stahlspannung gegen Fliessen]]
-- [[Stahlspannung aus Rissbreite]]
+- [[Zwängung auf Biegung]]
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

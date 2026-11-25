@@ -1,10 +1,10 @@
 ---
-erzeugt: 7dc8683f39d1
+erzeugt: 057790df8329
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 8 Formeln, in der Folge, in der gerechnet wird.
+> 7 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -18,12 +18,11 @@ Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben R
 
 1. [[Wirksamer Elastizitätsmodul]]
 2. [[Zulässige Stahlspannung]]
-3. [[Beton linear, ohne Zug]]
-4. [[Bilineare Beziehung des Betonstahls]]
-5. [[Dehnungsebene und innere Kräfte]]
-6. [[Erfüllungsgrad]]
-7. [[Beiwert der Parabel]]
-8. [[Parabel-Rechteck-Beziehung des Betons]]
+3. [[Beiwert der Parabel]]
+4. [[Parabel-Rechteck-Beziehung des Betons]]
+5. [[Bilineare Beziehung des Betonstahls]]
+6. [[Dehnungsebene und innere Kräfte]]
+7. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 93f9079ac3c9
+erzeugt: 7e3d8319cfb6
 art: modul
 tags: [modul]
 ---
@@ -478,10 +478,10 @@ Was der Kern daraus rechnet, an einem Bauteil aus diesen Baustoffen ([[opencivil
 class Gebrauchswahl(RechenwahlEintrag)
 ```
 
-Die Stahlspannungen: elastisch, mit charakteristischen Werten -- dazu die Rechenarten der Tragsicherheit.
+Die Stahlspannungen: praezise, mit charakteristischen Werten -- die Rechenarten der Tragsicherheit.
 
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.CHARAKTERISTISCH)`
-- `rechenart: Rechenart = einer_von(SPANNUNGSARTEN, Rechenart.ELASTISCH)`
+- `rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.PARABEL)`
 
 ### KnickVerformungswahl
 
@@ -537,7 +537,7 @@ Bauteil gelesen wird ([[opencivil.projekt.eintraege#Gebrauchsliste|BAUTEIL]]).
 - `anteil: float = bereich(heisst='Anteil aus der Tragsicherheit', einheit=PROZENT, uebe…` – Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %. Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer aufgeht und nichts sagt. Ueber hundert waere keine Gebrauchslast mehr. Gemeldet statt begrenzt: wer 700 statt 70 tippt, soll es erfahren und nicht mit 100 weiterrechnen.
 - `aus_tragsicherheit: bool = False` – Ob die abgeleiteten Faelle *gefuehrt* werden. Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Der Anteil ist eine bequeme Abschaetzung und keine Norm, darum stehen die Faelle nur auf Verlangen in der Tabelle.
 - `faelle: List[GebrauchsfallEintrag] = field(default_factory=list)` – Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer.
-- `wahl: Gebrauchswahl = teil(Gebrauchswahl, heisst='Rechenwahl')` – Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch.
+- `wahl: Gebrauchswahl = teil(Gebrauchswahl, heisst='Rechenwahl')` – Womit die Stahlspannung gerechnet wird -- Vorgabe praezise, charakteristisch.
 
 #### Gebrauchsliste.lastfall
 

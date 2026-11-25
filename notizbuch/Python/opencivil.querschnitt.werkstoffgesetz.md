@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f47f5d66acd
+erzeugt: e5dd1062d81f
 art: modul
 tags: [modul]
 ---
@@ -13,10 +13,11 @@ Jedes Werkstoffgesetz ist ein Objekt, das rechnet und sich selbst als Formel
 schreibt -- dieselben Werte, dieselben Aeste. Beton: die
 Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.5 mit Figur 12, 4.2.1.6,
 [[opencivil.querschnitt.werkstoffgesetz#Betongesetz|Betongesetz]]), der Spannungsblock 0.85·x (4.2.1.5,
-[[opencivil.querschnitt.werkstoffgesetz#Spannungsblock|Spannungsblock]]), linear ohne Zug ([[opencivil.querschnitt.werkstoffgesetz#BetonElastisch|BetonElastisch]]) und
-ungerissen ([[opencivil.querschnitt.werkstoffgesetz#BetonUngerissen|BetonUngerissen]], beide 4.1.4.1.4). Betonstahl:
-bilinear, auf Zug und Druck getrennt begrenzt ([[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]],
-4.2.2.2 mit Figur 16), oder nur auf Zug.
+[[opencivil.querschnitt.werkstoffgesetz#Spannungsblock|Spannungsblock]]) und ungerissen linear ([[opencivil.querschnitt.werkstoffgesetz#BetonUngerissen|BetonUngerissen]],
+4.1.4.1.4). Bis 2026-11-25 gab es dazu den Beton linear ohne Zug, fuer die
+gestrichene Rechenart «elastisch» ([[opencivil.querschnitt.gesetzwahl]]).
+Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
+([[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], 4.2.2.2 mit Figur 16), oder nur auf Zug.
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -362,47 +363,6 @@ Die Funktion des Stahls, je Fall eine eigene: in der Schleife entscheidet
 sie nichts, was schon beim Bauen feststeht. Sind beide Plateaus gleich --
 bei den Normsorten --, rechnet sie mit dem Betrag.
 
-### BetonElastisch
-
-```python
-@dataclass(frozen=True)
-class BetonElastisch(Gesetz)
-```
-
-Beton ohne Zugfestigkeit, im Druck linear bis `f_c`, dann waagrecht --
-fuer den gerissenen Gebrauchszustand. Linear und ohne Zug nach
-SIA 262:2025, 4.1.4.1.4; die Grenze bei `f_c` ist eine Vorgabe.
-
-`E_c` ist bereits der wirksame Modul, `E_cm/(1+phi)`, falls Kriechen
-zaehlt; `f_c` die Festigkeit aus dem Werkstoffsatz, im Gebrauchszustand
-`f_ck`. Linear und nicht als Parabel: im Gebrauchszustand liegt die
-Betonspannung weit unter der Festigkeit, und dort ist die Parabel eine
-Gerade. Die Grenze steht trotzdem da, damit eine Druckzone, die doch
-einmal so weit kommt, nicht mehr aufnimmt, als der Beton hergibt. Ohne
-`f_c` bleibt das Gesetz unbegrenzt linear -- fuer Rechnungen, die mit
-Festigkeiten nichts zu tun haben.
-
-- `NAME = 'Beton linear, ohne Zug'`
-- `WORT = 'Beton, linear ohne Zug'`
-- `REFERENZ = 'SIA 262:2025, 4.1.4.1.4'`
-- `ROLLEN = ('E_c', 'f_c')`
-- `E_c: float`
-- `f_c: float = math.inf`
-
-#### BetonElastisch.formel
-
-```python
-def formel(self, werte: Werte) -> str
-```
-
-#### BetonElastisch.latex
-
-```python
-def latex(self, E: str='E_{c,eff}', f: str='f_{ck}') -> str
-```
-
-Als Formel -- `E` der Modul, `f` die Festigkeit, bei der es waagrecht wird.
-
 ### BetonUngerissen
 
 ```python
@@ -531,7 +491,6 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 ## Formeln aus diesem Modul
 
 - [[Beiwert der Parabel]] · `Betongesetz.protokoll`
-- [[Beton linear, ohne Zug]] · `Gesetz.protokoll`
 - [[Beton ungerissen, in Druck und Zug]] · `Gesetz.protokoll`
 - [[Betonstahl nur auf Zug]] · `Gesetz.protokoll`
 - [[Bilineare Beziehung des Betonstahls]] · `Gesetz.protokoll`

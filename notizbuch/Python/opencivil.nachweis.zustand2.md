@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e3a99e6508e
+erzeugt: 68ed45d1708e
 art: modul
 tags: [modul]
 ---
@@ -96,4 +96,3 @@ unberuecksichtigt.
 ## Gebraucht von
 
 - [[opencivil.nachweis.mindestbewehrung]]
-- [[opencivil.nachweis.spannungsbegrenzung]]

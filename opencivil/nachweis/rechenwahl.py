@@ -32,8 +32,9 @@ Spannung-Dehnung-Analysen wird die Normalkraft genau gerechnet, Ebene fuer
 Ebene -- dort waere die Handrechnung nur der Spannungsblock mit
 weggelassener Druckbewehrung, also eine schlechtere 0.85·x-Vereinfachung
 (:data:`FASERARTEN`). Der gezeichnete Querschnitt rechnet immer ueber die
-Fasern: seine Stahlspannungen bieten darum die Fasern und «elastisch» an,
-ohne Handrechnung (:data:`FASERSPANNUNGSARTEN`).
+Fasern: auch seine Stahlspannungen bieten darum keine Handrechnung an. Bis
+2026-11-25 boten die Stahlspannungen dazu «elastisch» an
+(:mod:`opencivil.querschnitt.gesetzwahl`).
 
 Die Verformung beim Knicken rechnet nur praezise (:data:`VERFORMUNGSARTEN`,
 Benutzer, 2026-10-15). Mit dem Spannungsblock hat das Moment ueber der
@@ -70,16 +71,9 @@ from opencivil.querschnitt.zugseite import Zugseite
 #: Was die Tragsicherheit anbietet.
 RECHENARTEN = (Rechenart.HANDRECHNUNG, Rechenart.BLOCK, Rechenart.PARABEL)
 
-#: Die Stahlspannungen zusaetzlich elastisch.
-SPANNUNGSARTEN = RECHENARTEN + (Rechenart.ELASTISCH,)
-
 #: Was das Knicken und die Spannung-Dehnung-Analysen anbieten: nur, was ueber
 #: die Fasern rechnet -- siehe «Wer was anbietet» oben.
 FASERARTEN = (Rechenart.BLOCK, Rechenart.PARABEL)
-
-#: Die Stahlspannungen des gezeichneten Querschnitts: ueber die Fasern, dazu
-#: elastisch -- eine Handrechnung gibt es dort nicht.
-FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)
 
 #: Was die Verformung beim Knicken anbietet: nur praezise -- siehe «Wer was
 #: anbietet» oben.

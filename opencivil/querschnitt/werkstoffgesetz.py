@@ -6,10 +6,11 @@ Jedes Werkstoffgesetz ist ein Objekt, das rechnet und sich selbst als Formel
 schreibt -- dieselben Werte, dieselben Aeste. Beton: die
 Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.5 mit Figur 12, 4.2.1.6,
 :class:`Betongesetz`), der Spannungsblock 0.85·x (4.2.1.5,
-:class:`Spannungsblock`), linear ohne Zug (:class:`BetonElastisch`) und
-ungerissen (:class:`BetonUngerissen`, beide 4.1.4.1.4). Betonstahl:
-bilinear, auf Zug und Druck getrennt begrenzt (:class:`Stahlgesetz`,
-4.2.2.2 mit Figur 16), oder nur auf Zug.
+:class:`Spannungsblock`) und ungerissen linear (:class:`BetonUngerissen`,
+4.1.4.1.4). Bis 2026-11-25 gab es dazu den Beton linear ohne Zug, fuer die
+gestrichene Rechenart «elastisch» (:mod:`opencivil.querschnitt.gesetzwahl`).
+Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt
+(:class:`Stahlgesetz`, 4.2.2.2 mit Figur 16), oder nur auf Zug.
 
 Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
@@ -456,57 +457,6 @@ def _stahlfunktion(E_s: float, f: float, f_druck: float, eps_ud: float) -> Funkt
             return min(eps * E_s, f)
         return -min(-eps * E_s, f_druck)
     return sigma_getrennt
-
-
-@dataclass(frozen=True)
-class BetonElastisch(Gesetz):
-    """
-    Beton ohne Zugfestigkeit, im Druck linear bis ``f_c``, dann waagrecht --
-    fuer den gerissenen Gebrauchszustand. Linear und ohne Zug nach
-    SIA 262:2025, 4.1.4.1.4; die Grenze bei ``f_c`` ist eine Vorgabe.
-
-    ``E_c`` ist bereits der wirksame Modul, ``E_cm/(1+phi)``, falls Kriechen
-    zaehlt; ``f_c`` die Festigkeit aus dem Werkstoffsatz, im Gebrauchszustand
-    ``f_ck``. Linear und nicht als Parabel: im Gebrauchszustand liegt die
-    Betonspannung weit unter der Festigkeit, und dort ist die Parabel eine
-    Gerade. Die Grenze steht trotzdem da, damit eine Druckzone, die doch
-    einmal so weit kommt, nicht mehr aufnimmt, als der Beton hergibt. Ohne
-    ``f_c`` bleibt das Gesetz unbegrenzt linear -- fuer Rechnungen, die mit
-    Festigkeiten nichts zu tun haben.
-    """
-
-    NAME = "Beton linear, ohne Zug"
-    WORT = "Beton, linear ohne Zug"
-    REFERENZ = "SIA 262:2025, 4.1.4.1.4"
-    ROLLEN = ("E_c", "f_c")
-
-    E_c: float
-    f_c: float = math.inf
-
-    def __post_init__(self) -> None:
-        E_c, grenze = self.E_c, -self.f_c
-
-        # Ein Vergleich und nicht max(): das Gesetz laeuft je Nachweisfall
-        # rund siebzigtausend Mal, und der Funktionsaufruf kostete doppelt so
-        # viel wie die Rechnung selbst.
-        def sigma(eps: float) -> float:
-            if eps > 0.0:
-                return 0.0
-            s = E_c * eps
-            return s if s > grenze else grenze
-        _gebaut(self, sigma)
-
-    def formel(self, werte: Werte) -> str:
-        return self.latex(E=werte["E_c"].symbol, f=werte["f_c"].symbol)
-
-    def latex(self, E: str = "E_{c,eff}", f: str = "f_{ck}") -> str:
-        """Als Formel -- ``E`` der Modul, ``f`` die Festigkeit, bei der es waagrecht wird."""
-        return (
-            r"\sigma_c(\varepsilon_c) = \begin{cases}"
-            rf" \max\left({E} \cdot \varepsilon_c;\ -{f}\right) & \varepsilon_c \le 0 \\[1ex]"
-            r" 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen})"
-            r" \end{cases}"
-        )
 
 
 @dataclass(frozen=True)

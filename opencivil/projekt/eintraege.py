@@ -36,7 +36,7 @@ from opencivil.projekt.lesen import (
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.rechenwahl import (
-    FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
+    FASERARTEN, RECHENARTEN, VERFORMUNGSARTEN,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL
@@ -544,10 +544,10 @@ class RechenwahlEintrag(Beschreibung, JeMaterial):
 
 @dataclass
 class Gebrauchswahl(RechenwahlEintrag):
-    """Die Stahlspannungen: elastisch, mit charakteristischen Werten -- dazu die Rechenarten der Tragsicherheit."""
+    """Die Stahlspannungen: praezise, mit charakteristischen Werten -- die Rechenarten der Tragsicherheit."""
 
     werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.CHARAKTERISTISCH)
-    rechenart: Rechenart = einer_von(SPANNUNGSARTEN, Rechenart.ELASTISCH)
+    rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.PARABEL)
 
 
 @dataclass
@@ -617,7 +617,7 @@ class Gebrauchsliste(Beschreibung):
     """Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer."""
 
     wahl: Gebrauchswahl = teil(Gebrauchswahl, heisst="Rechenwahl")
-    """Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch."""
+    """Womit die Stahlspannung gerechnet wird -- Vorgabe praezise, charakteristisch."""
 
     def lastfall(self, name: str, **werte: float):
         """Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv."""

@@ -29,9 +29,10 @@ Eine aufgezwungene Krümmung reisst den Querschnitt auf der gezogenen Seite,
 und der Beton gibt sein Rissmoment ab. Die Bewehrung muss es übernehmen,
 ohne über ihre zulässige Spannung zu kommen. Gesucht ist darum das Moment,
 bei dem im gerissenen Querschnitt der erste gezogene Stab seine Grenze
-erreicht – elastisch, ohne Normalkraft, mit dem wirksamen Modul
-$E_{cm}/(1+\varphi)$ und mit der gedrückten Bewehrung. Solange alles linear
-bleibt, wachsen die Spannungen mit dem Moment, und es folgt aus einem
-Dreisatz. Die Platte rechnet es von Hand, $\sigma_{s,adm} \cdot A_s \cdot
+erreicht – präzise mit der Parabel, ohne Normalkraft, mit dem wirksamen
+Modul $E_{cm}/(1+\varphi)$ und mit der gedrückten Bewehrung. Unter
+Gebrauchslast ist die Parabel beinahe eine Gerade: die Spannungen wachsen
+fast im Verhältnis zum Moment, ein Dreisatz trifft die Grenze beinahe, und
+eine Suche macht den Rest. Bis 2026-11-25 rechnete es linear, «elastisch». Die Platte rechnet es von Hand, $\sigma_{s,adm} \cdot A_s \cdot
 (d - x/3)$, ohne die gedrückte Bewehrung; an einem Rechteck mit Stäben nur
 unten treffen sich beide.

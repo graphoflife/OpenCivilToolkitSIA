@@ -13,7 +13,7 @@ from opencivil.core.berechnung import Eingabebezug
 from opencivil.nachweis.querschnittsloeser import Stahllage, je_seite
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, bezuege_vereinen, gesetze,
+    FASERARTEN, RECHENARTEN, VERFORMUNGSARTEN, Betonkennwerte, bezuege_vereinen, gesetze,
 )
 from opencivil.querschnitt.werkstoffgesetz import (
     BetonUngerissen, Spannungsblock, Stahlgesetz, StahlNurZug,
@@ -31,7 +31,9 @@ LAGEN = [Stahllage(a_s=1696e-6, z=0.249, stahl=STAHL, nummer=2, seite=Zugseite.U
 class TestRechenarten(unittest.TestCase):
     def test_die_listen(self):
         self.assertEqual([a.value for a in RECHENARTEN], ["handrechnung", "block", "parabel"])
-        self.assertEqual(SPANNUNGSARTEN[-1], Rechenart.ELASTISCH)
+        self.assertEqual([a.value for a in FASERARTEN], ["block", "parabel"])
+        # «elastisch» gibt es seit 2026-11-25 nicht mehr (Benutzer).
+        self.assertEqual([a.value for a in Rechenart], ["handrechnung", "block", "parabel"])
         self.assertEqual(Rechenwahl().index, "Rd")
         self.assertEqual(Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH)).index,
                          "Rk")
@@ -105,11 +107,10 @@ class TestWertesaetze(unittest.TestCase):
                          "Dehnungsebene – präzise rechnen.")
         # Ohne Sprung gibt es die Ebene; verfehlt die Suche sie trotzdem, steht
         # kein Rat da, der nicht hilft.
-        for art in (Rechenart.PARABEL, Rechenart.ELASTISCH):
-            self.assertNotIn("präzise rechnen", art.ohne_ebene)
+        self.assertNotIn("präzise rechnen", Rechenart.PARABEL.ohne_ebene)
 
-    def test_nur_parabel_und_elastisch_haengen_an_der_kriechzahl(self):
-        for art in SPANNUNGSARTEN:
+    def test_nur_praezise_haengt_an_der_kriechzahl(self):
+        for art in RECHENARTEN:
             with self.subTest(art=art.value):
                 weich = gesetze(Rechenwahl(2.0, art=art), W).beton(-0.0005)
                 steif = gesetze(Rechenwahl(0.0, art=art), W).beton(-0.0005)
@@ -137,13 +138,10 @@ class TestGesetze(unittest.TestCase):
         self.assertTrue(g.verdraengt)
         self.assertEqual(g.lagen(LAGEN), LAGEN)
 
-    def test_parabel_und_elastisch(self):
+    def test_parabel(self):
         parabel = gesetze(Rechenwahl(art=Rechenart.PARABEL), W)
         self.assertIsNone(parabel.beton.mittel)
         self.assertAlmostEqual(parabel.beton(-0.002) / 1e6, -20.0)
-        elastisch = gesetze(Rechenwahl(2.0, art=Rechenart.ELASTISCH), W)
-        self.assertAlmostEqual(elastisch.beton(-0.0003), -33.6e9 / 3 * 0.0003)
-        self.assertEqual(elastisch.beton(-0.01), -20e6)
 
     def test_der_ungerissene_zustand_ersetzt_nur_den_beton(self):
         wahl = Rechenwahl(2.0, art=Rechenart.HANDRECHNUNG)
@@ -231,7 +229,7 @@ class TestJederNachweis(unittest.TestCase):
     def test_stahlspannung_jede_rechenart(self):
         arten = {liste.wahl.rechenart for q in self.projekt.querschnitte
                  for liste in (q.haeufig, q.quasistaendig) if liste.faelle}
-        self.assertEqual(arten, set(SPANNUNGSARTEN))
+        self.assertEqual(arten, set(RECHENARTEN))
 
     def test_knicken_mit_geteilter_und_eigener_linie(self):
         aufbau = self.projekt.aufbauen()

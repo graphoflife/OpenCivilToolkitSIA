@@ -142,7 +142,11 @@ class TestVerfehlteEbene(unittest.TestCase):
 
 class TestDieEbene(unittest.TestCase):
     def test_einachsig_ist_der_gerissene_querschnitt(self):
-        """Stäbe nur unten, reine Biegung: σ_s = M / (A_s · (d − x/3)), wie bei der Platte."""
+        """
+        Stäbe nur unten, reine Biegung: σ_s = M / (A_s · (d − x/3)), wie bei
+        der Platte -- auf ein halbes Prozent: der Querschnitt rechnet die
+        Parabel, die Formel eine Gerade. Bis 2026-11-25 rechneten beide linear.
+        """
         p, _ = rechteck()
         q = querschnitt(p)
         M = 60e3
@@ -151,7 +155,7 @@ class TestDieEbene(unittest.TestCase):
         riss = gerissen(n=E_S / E_CM, a_s=a_s, b=0.3, d=0.45)
         self.assertTrue(ebene.konvergiert)
         for sigma in ebene.sigma_s:
-            self.assertAlmostEqual(sigma / (M / (a_s * riss.z)), 1.0, delta=5e-4)
+            self.assertAlmostEqual(sigma / (M / (a_s * riss.z)), 1.0, delta=5e-3)
 
     def test_schief_symmetrisch_steht_die_nulllinie_quer_zum_moment(self):
         """Quadrat, gleich bewehrt, M_y = M_z: die Zugrichtung ist die Diagonale."""
@@ -268,7 +272,11 @@ class TestRissnormalkraft(unittest.TestCase):
 
 class TestZwaengungBiegung(unittest.TestCase):
     def test_das_moment_an_der_grenze(self):
-        """Stäbe nur unten: M_s,adm = σ_s,adm · A_s · (d − x/3), gegen dasselbe M_Riss."""
+        """
+        Stäbe nur unten: M_s,adm = σ_s,adm · A_s · (d − x/3), gegen dasselbe
+        M_Riss -- auf ein halbes Prozent, siehe
+        :meth:`TestDieEbene.test_einachsig_ist_der_gerissene_querschnitt`.
+        """
         p, _ = rechteck(zwaengung_biegung=True, einachsig=True)
         aufbau, loesung = rechnen(p)
         unten, *rest = urteile(loesung, aufbau.feld("qa_zwaengung_biegung")["a1"])
@@ -276,7 +284,7 @@ class TestZwaengungBiegung(unittest.TestCase):
         riss = gerissen(n=E_S / E_CM, a_s=a_s, b=0.3, d=0.45)
         self.assertEqual(unten.fall, "Zug unten")
         self.assertAlmostEqual(unten.widerstand.groesse.si / (F_YK * a_s * riss.z), 1.0,
-                               delta=5e-4)
+                               delta=5e-3)
         sproede = next(u for u in urteile(loesung, aufbau.feld("qa_sproede")["a1"])
                        if u.fall == "Zug unten")
         self.assertEqual(unten.einwirkung.groesse.si, sproede.einwirkung.groesse.si)

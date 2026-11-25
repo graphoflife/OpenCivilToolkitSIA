@@ -1149,8 +1149,8 @@ Norm dazu sagt.
       Spannungsblock, gedrückter Stahl weggelassen, je Seite eine Lage im
       Schwerpunkt, der Beton auch dort gezählt, wo der Stahl liegt. Nach
       Vorgabe: den Block lässt SIA 262:2025, 4.2.1.5 für den Bruch zu,
-      Spannungen im Gebrauch rechnet 4.1.4.1.4 linear elastisch -- dort ist
-      er ein Modell, keine Normregel. Das Druckplateau `f_y,druck` des Stahls
+      Spannungen rechnet 4.1.4.1.4 ungerissen linear elastisch und gerissen
+      ohne Zug im Beton -- dort ist er ein Modell, keine Normregel. Das Druckplateau `f_y,druck` des Stahls
       im Löser deckt 4.2.2.2: Figur 16 gilt für Zug und Druck.
 - [ ] **Rechnet die Tragsicherheit charakteristisch,** nehmen drei
       Nachweise charakteristische Werte, wo die Norm Bemessungswerte meint:
@@ -1317,8 +1317,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       für 500 mm (SIA 262:2025, 4.4.2.3.7) -- seit 2026-11-14, vorher
       begrenzte der Schalter nur `t`. Die Zwängung auf Biegung je Richtung
       mit dem Rissmoment des spröden Versagens gegen das Moment, bei dem der
-      erste gezogene Stab `σ_s,adm` erreicht -- gerissen und elastisch wie in
-      4.1.4.1.4; ohne N, mit eigenem φ und mit der gedrückten Bewehrung (die
+      erste gezogene Stab `σ_s,adm` erreicht -- gerissen, ohne Zug im Beton
+      wie in 4.1.4.1.4, präzise mit der Parabel (bis 2026-11-25 linear);
+      ohne N, mit eigenem φ und mit der gedrückten Bewehrung (die
       Platte lässt sie weg), dazu sagt die Norm nichts. `σ_s,adm` je Stab mit
       seinem Durchmesser und dem `f_ctm` seines Betons, wie (102) es will;
       eine verschmierte Linie mit einem fiktiven Durchmesser (siehe «Welcher

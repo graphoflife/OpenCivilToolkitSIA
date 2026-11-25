@@ -7,6 +7,39 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-25 · Die Rechenart «elastisch» ist gestrichen
+
+Vom Benutzer gewünscht (2026-11-25): Er fragte, worin sich «elastisch» und
+«präzise» unterscheiden, in Wirklichkeit gebe es doch keinen Unterschied –
+und wählte, «elastisch» zu entfernen.
+
+- «elastisch» rechnete den Beton linear mit E_cm/(1+φ), ohne Zug und
+  höchstens f_c; «präzise» rechnet die Parabel mit demselben Modul. Unter
+  Gebrauchslast ist die Parabel beinahe eine Gerade. An einer Platte 250 mm,
+  Ø12/150, C30/37 mit M = 50 kNm gab elastisch σ_s = 330.5 N/mm², präzise
+  330.4; mit φ = 2 waren es 344 und 340. Nulllinie und Betonspannung lagen
+  weiter auseinander, bis etwa 12 %; dort ist die Parabel die genauere.
+- Übrig bleiben Handrechnung, 0.85·x und präzise. Die Stahlspannungen der
+  Platte und des gezeichneten Querschnitts rechnen neu als Vorgabe präzise,
+  ebenso die Zwängung auf Biegung des gezeichneten Querschnitts, die bisher
+  fest elastisch rechnete. SIA 262:2025, 4.1.4.1.4 verlangt für den
+  gerissenen Zustand nur, dass der Beton im Riss keinen Zug überträgt; das
+  gilt mit der Parabel ebenso. Weil die Parabel bei null mit 1.25·E_c,eff
+  ansteigt, ist sie dort steifer als die Gerade: der Stahl im Testfall
+  «Fliessen» fliesst erst ab etwa 261 kNm statt schon bei 258, und zwei Tests
+  gegen die geschlossene Formel d − x/3 treffen nur noch auf ein halbes
+  Prozent.
+- Die Listen `SPANNUNGSARTEN` und `FASERSPANNUNGSARTEN` gleichen damit
+  `RECHENARTEN` und `FASERARTEN` und sind weg, im Kern wie im Katalog der
+  Oberfläche. Das Gesetz `BetonElastisch` ist als `BetonOhneZug` in
+  `test_querschnittsloeser.py` gezogen: dort prüft es den Löser gegen die
+  geschlossene Lösung des Zustands II, die es nur linear gibt.
+- Die Formelseite «Beton linear, ohne Zug» fällt weg; was ihre Theorie
+  sagte, steht in kurzen Worten bei der Parabel-Rechteck-Beziehung.
+- Gespeicherte Stände tragen die Rechenart der Stahlspannungen mit, auch
+  die Vorgabe. Einer mit «elastisch» öffnet sich nicht mehr; die Seite
+  bewahrt ihn auf (Prototyp, Benutzer, 2026-10-11).
+
 ## 2026-11-22 · Die Anleitung «KI-Agenten»
 
 Vom Benutzer gewünscht (2026-11-22): eine Anleitung Schritt für Schritt, wie

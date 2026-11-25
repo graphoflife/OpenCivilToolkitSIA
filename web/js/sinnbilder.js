@@ -327,10 +327,6 @@ const ZEICHEN = {
   'rechenart-parabel': {
     pfade: [ACHSEN, 'M4 20Q8.67 8 13.33 8H18'],
   },
-  // Gerade bis f_c, dann waagrecht -- ohne Ende.
-  'rechenart-elastisch': {
-    pfade: [ACHSEN, 'M4 20L15 6.5H20'],
-  },
   // Die Handrechnung: eine Hand, die eine Formel hält. Sie rechnet mit dem
   // Block, aber in geschlossenen Formeln.
   'rechenart-handrechnung': {
