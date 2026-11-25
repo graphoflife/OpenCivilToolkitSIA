@@ -30,7 +30,7 @@ def gerechnet(rechenart="handrechnung", werkstoffsatz="bemessung", kriechzahl=0.
     projekt = Projekt.beispiel()
     q = projekt.querschnitte[0]
     q.tragsicherheit_wahl = RechenwahlEintrag(
-        kriechzahl=kriechzahl, rechenart=rechenart,
+        kriechzahl=kriechzahl, rechenarten={q.beton: rechenart},
         werkstoffsaetze=je_material or {k: werkstoffsatz for k in q.materialien()})
     # Eine Querkraft, damit ihr Nachweis laut rechnet und m_R herleitet.
     q.kombinationen[1].V_Ed = 120.0
@@ -194,7 +194,8 @@ class TestDatei(unittest.TestCase):
     def test_hin_und_zurueck(self):
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(
-            kriechzahl=1.5, werkstoffsaetze={"b1": "charakteristisch"}, rechenart="parabel")
+            kriechzahl=1.5, werkstoffsaetze={"b1": "charakteristisch"},
+            rechenarten={"b1": "parabel"})
         kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
         self.assertEqual(kopie.querschnitte[0].tragsicherheit_wahl,
                          projekt.querschnitte[0].tragsicherheit_wahl)
@@ -208,11 +209,11 @@ class TestDatei(unittest.TestCase):
 
     def test_elastisch_gibt_es_hier_nicht(self):
         daten = Projekt.beispiel().als_dict()
-        daten["querschnitte"][0]["tragsicherheit_wahl"] = {"rechenart": "elastisch"}
+        daten["querschnitte"][0]["tragsicherheit_wahl"] = {"rechenarten": {"b1": "elastisch"}}
         with self.assertRaises(ProjektFehler) as fehler:
             Projekt.aus_dict(daten).pruefen()
-        self.assertIn("Tragsicherheit, Rechenwahl: 'elastisch' gibt es als 'rechenart' nicht",
-                      str(fehler.exception))
+        self.assertIn("Tragsicherheit, Rechenwahl, rechenarten 'b1': 'elastisch' gibt es als "
+                      "'rechenarten' nicht", str(fehler.exception))
 
     def test_negatives_phi(self):
         """Die Datei öffnet sich; die Platte rechnet nicht und sagt warum."""

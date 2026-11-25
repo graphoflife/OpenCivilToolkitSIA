@@ -1,5 +1,5 @@
 ---
-erzeugt: b4d8c5809ace
+erzeugt: 87d8a3c1ec04
 art: modul
 tags: [modul]
 ---
@@ -219,6 +219,8 @@ selbst in die Herleitung.
 - `gerissen: Faserloeser`
 - `ungerissen: Faserloeser` – Die beiden Loeser in der Richtung des Paars -- fuer das Bild aus Randdehnungen.
 - `wahl: Rechenwahl` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
+- `art: Rechenart` – Die Rechenart des Betons, dessen Gesetze die Herleitung zeigt -- bei mehreren Betonen die der Ecke, die zuerst reisst.
+- `betone: Tuple[Any, ...]` – Die Betone des Querschnitts, jeder einmal -- fuer die Rechenart je Beton in Worten.
 - `ids: Mapping[str, str]` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
 - `staehle: Tuple[Any, ...]` – Die Staehle der Bewehrung, jeder einmal -- fuer die Fliessdehnung.
 - `E_cm: float` – Der Modul des Betons -- daran misst sich der aequivalente Modul.

@@ -77,21 +77,22 @@ class TestAnlegen(unittest.TestCase):
 
     def test_ein_teil_als_seine_felder(self):
         """Wie in einer Datei: was fehlt, bleibt, wie es die Vorlage hat."""
-        q = einfach().platte("P", tragsicherheit_wahl={"rechenart": "parabel"})
-        self.assertIs(q.tragsicherheit_wahl.rechenart, Rechenart.PARABEL)
+        q = einfach().platte("P", tragsicherheit_wahl={"rechenarten": {"b1": "parabel"}})
+        self.assertEqual(q.tragsicherheit_wahl.rechenarten, {"b1": Rechenart.PARABEL})
         self.assertEqual(q.tragsicherheit_wahl.werkstoffsaetze, {})
 
     def test_ein_teil_als_eintrag(self):
-        wahl = RechenwahlEintrag(rechenart="parabel")
+        wahl = RechenwahlEintrag(rechenarten={"b1": "parabel"})
         self.assertIs(einfach().platte("P", tragsicherheit_wahl=wahl).tragsicherheit_wahl, wahl)
 
     def test_ein_falscher_wert_in_einem_teil_an_der_zeile(self):
         """Als Eintrag ebenso wie als Felder -- nicht erst beim Rechnen."""
-        for wahl in (RechenwahlEintrag(rechenart="blok"), {"rechenart": "blok"}):
+        for wahl in (RechenwahlEintrag(rechenarten={"b1": "blok"}),
+                     {"rechenarten": {"b1": "blok"}}):
             with self.subTest(wahl=wahl), self.assertRaises(ProjektFehler) as fehler:
                 einfach().platte("P", tragsicherheit_wahl=wahl)
-            self.assertIn("Platte 'P', Tragsicherheit, Rechenwahl: 'blok' gibt es als "
-                          "'rechenart' nicht", str(fehler.exception))
+            self.assertIn("Platte 'P', Tragsicherheit, Rechenwahl, rechenarten 'b1': 'blok' gibt es "
+                          "als 'rechenarten' nicht", str(fehler.exception))
 
     def test_ein_vertipptes_feld_wird_gemeldet(self):
         with self.assertRaises(ProjektFehler) as fehler:

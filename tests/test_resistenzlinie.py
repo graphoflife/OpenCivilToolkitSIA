@@ -14,7 +14,7 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.nachweis import linie as geo
 from opencivil.nachweis.querschnittsloeser import Stahllage
 from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenarten, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.querschnitt.interaktion import STREIFEN, Bewehrung, Querschnitt, Teil, Werkstoff
 from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz
@@ -33,7 +33,7 @@ LAGEN = [Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, stahlname="B500B",
 
 def ebenenlinie(art=Rechenart.PARABEL, *, schritte=80, phi=0.0):
     """Die Linie, wie die Platte sie baut: ihr Querschnitt mit den Streifen der genauen Linie."""
-    wahl = Rechenwahl(kriechzahl=phi, art=art)
+    wahl = Rechenwahl(kriechzahl=phi, arten=Rechenarten.alle(art))
     g = gesetze(wahl, BETON)
     return Ebenenlinie(wahl, querschnitt=g.querschnitt(h=H, b=B, lagen=LAGEN, streifen=STREIFEN),
                        lagen=g.lagen(LAGEN), schritte=schritte)

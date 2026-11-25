@@ -444,17 +444,17 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
    Spannungsblock. Es bleibt stehen, damit seine Zahl nicht verloren geht. */
 .ist-ohne-wirkung { opacity: .45; }
 
-/* Die Rechenwahl eines Kapitels: ein kleiner Titel, darunter φ, die
-   Rechenart und die Werte je Material. φ so breit wie ein Zahlenfeld --
-   sein Kopf, «Kriechzahl φ», braucht den Platz (bis 2026-11-20 stand dort φ
-   allein, und die Spalte war so breit wie eine kurze Zahl). Die Rechenart
-   nimmt die ganze Breite, unter φ hindurch: mit ihren Bildern braucht sie
-   sie; die Werte je Material ebenso, eine Zeile je Material. */
+/* Die Rechenwahl eines Kapitels: ein kleiner Titel, darunter φ und je
+   Material die Werte, beim Beton mit seiner Rechenart. φ so breit wie ein
+   Zahlenfeld -- sein Kopf, «Kriechzahl φ», braucht den Platz (bis
+   2026-11-20 stand dort φ allein, und die Spalte war so breit wie eine
+   kurze Zahl). Die Werte je Material nehmen die ganze Breite, unter φ
+   hindurch: mit den Bildern der Rechenarten brauchen sie sie. */
 .rechenwahl {
   display: grid; gap: 1px 6px; align-items: end; margin: 2px 0 8px;
   grid-template-columns: var(--zahlbreite) minmax(0, 1fr);
 }
-.rechenwahl > .ist-rechenart, .rechenwahl > .werkstoffzeilen { grid-column: 1 / -1; }
+.rechenwahl > .werkstoffzeilen { grid-column: 1 / -1; }
 .rechenwahl-titel {
   grid-column: 1 / -1; font-size: 11px; font-weight: 600; color: var(--schrift-matt);
 }

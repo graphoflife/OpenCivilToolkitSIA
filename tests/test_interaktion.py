@@ -18,7 +18,7 @@ import unittest
 from opencivil.nachweis import linie
 from opencivil.nachweis.querschnittsloeser import Stahllage
 from opencivil.nachweis.rechenwahl import Betonkennwerte, Gesetze
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenarten, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.interaktion import (
@@ -57,7 +57,7 @@ class TestWieDiePlatte(unittest.TestCase):
     h, b = 0.25, 1.0
 
     def setUp(self):
-        wahl = Rechenwahl(art=Rechenart.PARABEL)
+        wahl = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))
         gesetze = Gesetze(wahl=wahl, beton=BETON, kennwerte=Betonkennwerte(
             f_c=math.nan, E_c=math.nan, eps_c1d=BETON.eps_c1d, eps_c2d=BETON.eps_c2d))
         lagen = [Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, text="unten"),

@@ -35,9 +35,9 @@ der Platte (:meth:`QuerschnittEintrag.regeln`).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.querschnitt.geometrie import VERSCHMIERT, Linienart
 from opencivil.querschnitt import vorlagen
@@ -254,7 +254,7 @@ class QAGebrauchsfallEintrag(Beschreibung):
 class QAGebrauchswahl(Gebrauchswahl):
     """Die Stahlspannungen am gezeichneten Querschnitt: nur ueber die Fasern, ohne Handrechnung."""
 
-    rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)
+    rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)
 
 
 @dataclass
@@ -366,13 +366,16 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
     rechnen am selben Querschnitt.
     """
 
-    betongesetze: Dict[str, Rechenart] = je_material(
-        Rechenart.PARABEL, (Rechenart.PARABEL, Rechenart.BLOCK))
+    rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)
     """
-    Je Beton das Gesetz der Tragsicherheit: die Parabel-Rechteck-Beziehung
-    oder der vereinfachte Spannungsblock 0.85·x -- die Parabel zuerst, sie
-    ist die Vorgabe.
+    Je Beton die Rechenart der Tragsicherheit: praezise mit der
+    Parabel-Rechteck-Beziehung oder mit dem vereinfachten Spannungsblock
+    0.85·x. Bis 2026-11-25 hiess das Feld ``betongesetze``, als einziges
+    je Beton.
     """
+
+    #: Die Tragsicherheit rechnet ohne Kriechen (:meth:`JeMaterial.wahl`).
+    kriechzahl: ClassVar[float] = 0.0
 
     lastfaelle: List[QALastfallEintrag] = field(default_factory=list)
 
@@ -407,16 +410,6 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
 
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
-
-    def rechenwahl(self, stoffe: Mapping[str, Any]) -> Dict[str, Rechenwahl]:
-        """
-        Fuer die Rechnung je Baustoff seine Wahl im Bruchzustand, ohne
-        Kriechen: die Wertesaetze aller ``stoffe`` -- nach ihrer Kennung im
-        Projekt -- und beim Beton sein Gesetz.
-        """
-        saetze = self.wertesaetze(stoffe)
-        return {b.id: Rechenwahl(saetze=saetze, art=self.von("betongesetze", kennung))
-                for kennung, b in stoffe.items()}
 
     def materialien(self) -> List[str]:
         """

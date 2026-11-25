@@ -23,7 +23,7 @@ from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze, staehle, stah
 from opencivil.nachweis.rissgroessen import (
     Bruttoquerschnitt, Rissmoment, bruttoquerschnitt_rechteck, rissaktive_dicke, rissmoment,
 )
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenarten, Rechenwahl
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.linie import (
@@ -71,7 +71,7 @@ class Loeserpaar(Bruttoriss):
     eigenen Stahls erreicht (:attr:`Stahlgesetz.eps_yd` der Lage).
     """
 
-    wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)
+    wahl: Rechenwahl = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))
     """Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart."""
 
     ids: Mapping[str, str] = field(default_factory=dict)
@@ -141,7 +141,8 @@ class Loeserpaar(Bruttoriss):
 
 
 def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
-               wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)) -> Optional[Loeserpaar]:
+               wahl: Rechenwahl = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL)),
+               ) -> Optional[Loeserpaar]:
     """
     Das Loeserpaar einer Platte in einer Richtung -- ``None`` ohne Bewehrung.
 

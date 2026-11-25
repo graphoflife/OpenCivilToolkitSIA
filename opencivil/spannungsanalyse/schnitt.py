@@ -30,9 +30,9 @@ Rand gegenueber der Zugseite, «unten» der auf ihr: bei Zug links ist oben
 der rechte Rand. Kippt die Nulllinie, gelten oben und unten senkrecht zu ihr.
 
 WOMIT GERECHNET WIRD:
-Je Analyse eine Rechenwahl wie bei der Platte -- Kriechzahl, Rechenart und
-je Werkstoff sein Wertesatz; die Rechenart gilt fuer jeden Beton des
-Querschnitts. Die Wahl der Tragsicherheit gilt hier nicht. Staebe in derselben Tiefe,
+Je Analyse eine Rechenwahl wie bei der Platte -- Kriechzahl, je Werkstoff
+sein Wertesatz und je Beton seine Rechenart. Die Wahl der Tragsicherheit
+gilt hier nicht. Staebe in derselben Tiefe,
 aus demselben Stahl, werden zu einer Lage: sie haben dieselbe Dehnung.
 Zerlegt wird in so viele Streifen wie die Platte in Fasern
 (:data:`~opencivil.querschnitt.fasern.FASERN`), dazu die Grenzen an jeder

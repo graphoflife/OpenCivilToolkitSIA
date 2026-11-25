@@ -336,8 +336,8 @@ class Projekt(Beschreibung):
         ``duktilitaet`` ... -- geht als Stichwort an den Eintrag; ein
         unbekanntes Stichwort wird gemeldet, statt still zu verschwinden.
         Gelesen wird es wie aus einer Datei: ein Teil darf als Eintrag kommen
-        oder als seine Felder, ``tragsicherheit_wahl={"rechenart": "parabel"}``
-        aendert nur die Rechenart.
+        oder als seine Felder, ``tragsicherheit_wahl={"kriechzahl": 1.0}``
+        aendert nur die Kriechzahl.
 
         Gebaut wird ueber :meth:`QuerschnittEintrag.neu`, dieselbe Vorlage wie
         in der Oberflaeche, nur ohne deren Startlast: wer rechnet, gibt seine

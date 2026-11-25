@@ -16,7 +16,9 @@ import unittest
 from opencivil.nachweis.gebrauchsebene import gebrauchsebene
 from opencivil.nachweis.mindestbewehrung import zulaessige_stahlspannung
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
+from opencivil.querschnitt.gesetzwahl import (
+    Rechenart, Rechenarten, Rechenwahl, Werkstoffsatz, Wertesaetze,
+)
 from opencivil.nachweis.spannungsbegrenzung import VORGABE
 from opencivil.nachweis.zustand2 import gerissen
 from opencivil.projekt import Projekt, ProjektFehler, QAGebrauchswahl
@@ -103,7 +105,8 @@ class TestVerfehlteEbene(unittest.TestCase):
     das, statt eine verfehlte Ebene abzuhaken.
     """
 
-    BLOCK = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), art=Rechenart.BLOCK)
+    BLOCK = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH),
+                       arten=Rechenarten.alle(Rechenart.BLOCK))
 
     def stuetze(self):
         """400 × 400, je drei ⌀16 oben und unten."""
@@ -130,7 +133,7 @@ class TestVerfehlteEbene(unittest.TestCase):
 
     def test_der_nachweis_sagt_es(self):
         p, a = self.stuetze()
-        a.quasistaendig.wahl = QAGebrauchswahl(rechenart="block")
+        a.quasistaendig.wahl = QAGebrauchswahl(rechenarten={"b1": "block"})
         a.quasistaendig.lastfall("Wenig Moment", N_Ed=-600.0, M_y_Ed=10.0)
         aufbau, loesung = rechnen(p)
         urteil = urteil_zu(loesung, aufbau.feld("qa_spannung_riss")["a1"], "Wenig Moment")
@@ -307,7 +310,7 @@ class TestBeschreibung(unittest.TestCase):
     def test_hin_und_zurueck(self):
         p, a = rechteck(rissanforderung="hoch", zwaengung=True, zwaengung_biegung_kriechzahl=1.5)
         a.haeufig.lastfall("H", N_Ed=-10.0, M_y_Ed=20.0, M_z_Ed=5.0)
-        a.quasistaendig.wahl.rechenart = "parabel"
+        a.quasistaendig.wahl.rechenarten = {"b1": "block"}
         zurueck = QuerschnittsanalyseEintrag.aus_dict(a.als_dict())
         self.assertEqual(zurueck, a)
         self.assertEqual(zurueck.haeufig.faelle,
@@ -316,9 +319,9 @@ class TestBeschreibung(unittest.TestCase):
     def test_keine_handrechnung(self):
         """Der gezeichnete Querschnitt rechnet über die Fasern -- die Handrechnung gibt es nicht."""
         p, a = rechteck()
-        self.assertNotIn(Rechenart.HANDRECHNUNG, wahl_von(QAGebrauchswahl, "rechenart"))
+        self.assertNotIn(Rechenart.HANDRECHNUNG, wahl_von(QAGebrauchswahl, "rechenarten"))
         roh = a.als_dict()
-        roh["quasistaendig"]["wahl"]["rechenart"] = "quatsch"
+        roh["quasistaendig"]["wahl"]["rechenarten"] = {"b1": "handrechnung"}
         with self.assertRaises(ProjektFehler):
             QuerschnittsanalyseEintrag.aus_dict(roh)
 

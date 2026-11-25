@@ -1,5 +1,5 @@
 ---
-erzeugt: 491cee166d87
+erzeugt: 44593bb58725
 art: modul
 tags: [modul]
 ---
@@ -267,70 +267,83 @@ Was statt der Probe dasteht, wenn die Suche ihre Ebene verfehlt
 mit dem Spannungsblock bei viel Druck und wenig Moment. Mit der
 Parabel gibt es die Ebene dort.
 
+### JeBaustoff
+
+```python
+@dataclass(frozen=True)
+class JeBaustoff
+```
+
+Je Baustoff eines Bauteils eine Wahl: der Wertesatz ([[opencivil.querschnitt.gesetzwahl#Wertesaetze|Wertesaetze]])
+oder beim Beton die Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenarten|Rechenarten]]). `je_baustoff`
+nennt die Baustoffe mit ihrer Wahl, nach Baustoff-ID geordnet; ein anderer
+rechnet mit `vorgabe` -- so auch jeder, wo ein Kapitel eine Wahl fuer
+alle festlegt ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.alle|alle]]).
+Unveraenderlich und vergleichbar: eine Wahl ist Schluessel von
+Zwischenspeichern, und zwei gleiche Wahlen teilen sich eine Linie. Darum
+wird eine Wahl fuer alle immer zu [[opencivil.querschnitt.gesetzwahl#JeBaustoff.alle|alle]] ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.je|je]]) -- sonst
+rechneten die Kennzahlen, die mit Bemessungswerten fest waehlen, ihre
+eigene Linie neben der gleichen der Tragsicherheit.
+
+- `vorgabe: Any`
+- `je_baustoff: Tuple[Tuple[str, Any], ...] = ()`
+
+#### JeBaustoff.alle
+
+```python
+@classmethod
+def alle(cls, wahl)
+```
+
+Jeder Baustoff mit derselben Wahl.
+
+#### JeBaustoff.je
+
+```python
+@classmethod
+def je(cls, wahlen: Mapping[str, Any], vorgabe: Any=None)
+```
+
+Aus Baustoff-ID und Wahl -- je Baustoff des Bauteils eine. Haben alle
+dieselbe, ist es [[opencivil.querschnitt.gesetzwahl#JeBaustoff.alle|alle]] mit ihr; ohne Baustoff die `vorgabe`,
+ohne Angabe die der Klasse.
+
+#### JeBaustoff.von
+
+```python
+def von(self, stoff)
+```
+
+Die Wahl eines Baustoffs ([[opencivil.material.basis#Baustoff|id]]).
+
+#### JeBaustoff.gewaehlt
+
+```python
+@property
+def gewaehlt(self) -> FrozenSet
+```
+
+Die Wahlen, mit denen gerechnet wird.
+
+#### JeBaustoff.einheitlich
+
+```python
+@property
+def einheitlich(self)
+```
+
+Die Wahl, wenn alle Baustoffe dieselbe haben -- sonst `None`.
+
 ### Wertesaetze
 
 ```python
 @dataclass(frozen=True)
-class Wertesaetze
+class Wertesaetze(JeBaustoff)
 ```
 
-Je Baustoff sein Wertesatz ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]). `je_baustoff`
-nennt die Baustoffe eines Bauteils mit ihrem Satz, nach Baustoff-ID
-geordnet; ein anderer Baustoff rechnet mit `vorgabe` -- so auch jeder,
-wo ein Kapitel einen Satz fuer alle festlegt ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.alle|alle]]).
-Unveraenderlich und vergleichbar: eine Wahl ist Schluessel von
-Zwischenspeichern, und zwei gleiche Wahlen teilen sich eine Linie. Darum
-wird ein Satz fuer alle immer zu [[opencivil.querschnitt.gesetzwahl#Wertesaetze.alle|alle]] ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.je|je]]) -- sonst
-rechneten die Kennzahlen, die mit Bemessungswerten fest waehlen, ihre
-eigene Linie neben der gleichen der Tragsicherheit.
+Je Baustoff sein Wertesatz ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]).
 
 - `vorgabe: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
-- `je_baustoff: Tuple[Tuple[str, Werkstoffsatz], ...] = ()`
-
-#### Wertesaetze.alle
-
-```python
-@classmethod
-def alle(cls, satz: Werkstoffsatz) -> 'Wertesaetze'
-```
-
-Jeder Baustoff mit demselben Satz.
-
-#### Wertesaetze.je
-
-```python
-@classmethod
-def je(cls, saetze: Mapping[str, Werkstoffsatz], vorgabe: Werkstoffsatz=Werkstoffsatz.BEMESSUNG) -> 'Wertesaetze'
-```
-
-Aus Baustoff-ID und Satz -- je Baustoff des Bauteils einer. Haben alle
-denselben, ist es [[opencivil.querschnitt.gesetzwahl#Wertesaetze.alle|alle]] mit ihm.
-
-#### Wertesaetze.von
-
-```python
-def von(self, stoff) -> Werkstoffsatz
-```
-
-Der Satz eines Baustoffs ([[opencivil.material.basis#Baustoff|id]]).
-
-#### Wertesaetze.gewaehlt
-
-```python
-@property
-def gewaehlt(self) -> FrozenSet[Werkstoffsatz]
-```
-
-Die Saetze, mit denen gerechnet wird.
-
-#### Wertesaetze.einheitlich
-
-```python
-@property
-def einheitlich(self) -> Optional[Werkstoffsatz]
-```
-
-Der Satz, wenn alle Baustoffe denselben haben -- sonst `None`.
 
 #### Wertesaetze.index
 
@@ -370,6 +383,49 @@ def beschriftung(self) -> str
 
 Ueber einem Bild: «Bemessungswerte», «charakteristisch» -- oder «gemischte Werte».
 
+### Rechenarten
+
+```python
+@dataclass(frozen=True)
+class Rechenarten(JeBaustoff)
+```
+
+Je Beton seine Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]) -- ein Stahl hat keine,
+er rechnet in jeder Art mit seinem Gesetz. Wo ein Kapitel mehrere Betone
+rechnet, fragt es hier, ob einer von ihnen am Modul haengt oder als
+Block rechnet.
+
+- `vorgabe: Rechenart = Rechenart.HANDRECHNUNG`
+
+#### Rechenarten.mit_kriechzahl
+
+```python
+@property
+def mit_kriechzahl(self) -> bool
+```
+
+Ob `phi` bei einem der Betone etwas aendert ([[opencivil.querschnitt.gesetzwahl#Rechenart.mit_kriechzahl|Rechenart.mit_kriechzahl]]).
+
+#### Rechenarten.mit_block
+
+```python
+@property
+def mit_block(self) -> bool
+```
+
+Ob einer der Betone als Spannungsblock rechnet ([[opencivil.querschnitt.gesetzwahl#Rechenart.mit_block|Rechenart.mit_block]]).
+
+#### Rechenarten.ohne_ebene
+
+```python
+@property
+def ohne_ebene(self) -> str
+```
+
+Was dasteht, wenn die Suche ihre Ebene verfehlt
+([[opencivil.querschnitt.gesetzwahl#Rechenart.ohne_ebene|Rechenart.ohne_ebene]]): rechnet ein Beton als Block, der Rat,
+praezise zu rechnen.
+
 ### Rechenwahl
 
 ```python
@@ -377,11 +433,15 @@ Ueber einem Bild: «Bemessungswerte», «charakteristisch» -- oder «gemischte 
 class Rechenwahl
 ```
 
-Was ein Kapitel waehlt: Kriechzahl, Wertesatz je Baustoff, Rechenart.
+Was ein Kapitel waehlt: Kriechzahl, je Baustoff den Wertesatz und je
+Beton die Rechenart. Die Rechenart je Beton seit 2026-11-25 (Benutzer:
+unter dem Beton, in jedem Modul); bis dahin galt in einem Kapitel eine
+fuer alle Betone, und nur die Tragsicherheit der Querschnittsanalyse
+waehlte je Beton -- mit einer eigenen Wahl fuer jeden Baustoff.
 
 - `kriechzahl: float = 0.0`
 - `saetze: Wertesaetze = Wertesaetze()`
-- `art: Rechenart = Rechenart.HANDRECHNUNG`
+- `arten: Rechenarten = Rechenarten()`
 - `modul: str = 'E_cm'` – Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: `E_cm`, bei der Verformung des Knickens `E_cd` (SIA 262:2025, 4.2.1.17). Keine Wahl des Benutzers -- das Kapitel setzt ihn.
 
 #### Rechenwahl.satz
@@ -390,7 +450,27 @@ Was ein Kapitel waehlt: Kriechzahl, Wertesatz je Baustoff, Rechenart.
 def satz(self, stoff) -> Werkstoffsatz
 ```
 
-Der Wertesatz eines Baustoffs ([[opencivil.querschnitt.gesetzwahl#Wertesaetze.von|Wertesaetze.von]]).
+Der Wertesatz eines Baustoffs ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.von|JeBaustoff.von]]).
+
+#### Rechenwahl.art_von
+
+```python
+def art_von(self, beton) -> Rechenart
+```
+
+Die Rechenart eines Betons ([[opencivil.querschnitt.gesetzwahl#JeBaustoff.von|JeBaustoff.von]]).
+
+#### Rechenwahl.art
+
+```python
+@property
+def art(self) -> Rechenart
+```
+
+Die Rechenart, wo alle Betone dieselbe haben -- in einem Bauteil mit
+einem Beton immer, in der Platte etwa. Rechnen mehrere Betone
+verschieden, gibt es die eine nicht: dann fragt man je Beton
+([[opencivil.querschnitt.gesetzwahl#Rechenwahl.art_von|art_von]]), und hier zu fragen ist ein Fehler im Programm.
 
 #### Rechenwahl.betonkennwerte
 
@@ -412,11 +492,12 @@ def index(self) -> str
 #### Rechenwahl.beschriftung
 
 ```python
-@property
-def beschriftung(self) -> str
+def beschriftung(self, betone: Sequence=()) -> str
 ```
 
-Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo es wirkt.
+Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi
+nur, wo es wirkt. Rechnen die `betone` verschieden, steht jede Art
+mit dem Namen ihres Betons da ([[opencivil.querschnitt.gesetzwahl#arten_text|arten_text]]).
 
 #### Rechenwahl.gleiche_linie
 
@@ -424,11 +505,21 @@ Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo
 def gleiche_linie(self, andere: 'Rechenwahl') -> bool
 ```
 
-Ob `andere` dieselbe Resistenzlinie ergibt: dieselbe Rechenart und
+Ob `andere` dieselbe Resistenzlinie ergibt: dieselben Rechenarten und
 dieselben Wertesaetze, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
-haengt ([[opencivil.querschnitt.gesetzwahl#Rechenart.mit_kriechzahl|Rechenart.mit_kriechzahl]]). Bis 2026-11-20 eine freie
+haengt ([[opencivil.querschnitt.gesetzwahl#Rechenarten.mit_kriechzahl|Rechenarten.mit_kriechzahl]]). Bis 2026-11-20 eine freie
 Funktion der M-N-Interaktion, die den Modul nicht verglich: eine
 Parabel mit `E_cd` haette die Linie einer mit `E_cm` bekommen.
+
+### arten_text
+
+```python
+def arten_text(wahl: Rechenwahl, betone: Sequence=()) -> str
+```
+
+Die Rechenarten einer Wahl in Worten: eine fuer alle ihr Name, «Präzise
+ohne Vereinfachung»; sonst je Beton aus `betone` mit seinem Namen,
+«C30/37 präzise, C50/60 0.85·x».
 
 ### wirksamer_modul
 
@@ -441,16 +532,17 @@ def wirksamer_modul(E_c: float, phi: float) -> float
 ### betongesetz
 
 ```python
-def betongesetz(wahl: Rechenwahl, *, f_c: float, E_c: float, eps_c1d: float, eps_c2d: float, ungerissen: bool=False) -> Gesetz
+def betongesetz(wahl: Rechenwahl, art: Rechenart, *, f_c: float, E_c: float, eps_c1d: float, eps_c2d: float, ungerissen: bool=False) -> Gesetz
 ```
 
-Der Beton einer Wahl -- im gerissenen Zustand je Rechenart, `ungerissen`
-linear in Druck und Zug mit dem wirksamen Modul. Die eine Stelle fuer
-beide: der Loeser der Platte, die genaue Resistenzlinie und der
-gezeichnete Querschnitt bekommen ihren Beton hier. Bis 2026-10-17 gab die
-Platte ihrem Loeser den ungerissenen Beton als eigenes Gesetz mit, und der
-gezeichnete Querschnitt baute ihn hinter einem Schalter selbst. `E_c`
-ist der Modul der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohne Kriechen.
+Ein Beton einer Wahl -- im gerissenen Zustand nach seiner Rechenart
+`art` ([[opencivil.querschnitt.gesetzwahl#Rechenwahl.art_von|Rechenwahl.art_von]]), `ungerissen` linear in Druck und
+Zug mit dem wirksamen Modul. Die eine Stelle fuer beide: der Loeser der
+Platte, die genaue Resistenzlinie und der gezeichnete Querschnitt
+bekommen ihren Beton hier. Bis 2026-10-17 gab die Platte ihrem Loeser den
+ungerissenen Beton als eigenes Gesetz mit, und der gezeichnete
+Querschnitt baute ihn hinter einem Schalter selbst. `E_c` ist der Modul
+der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl.modul]]), ohne Kriechen.
 
 
 ## Konstanten
@@ -488,5 +580,7 @@ ist der Modul der Wahl ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.riss]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]
+- [[opencivil.web.diagrammdaten]]

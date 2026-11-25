@@ -32,6 +32,7 @@ from opencivil.nachweis.resistenzlinie import Handlinie
 from opencivil.nachweis.schubwandnachweis import OHNE_SCHUB, Schubbefund, schub_belastet
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt import widerstandsflaeche
+from opencivil.querschnitt.gesetzwahl import arten_text
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web.anzeige import Anzeigegroesse, si, zahl
 
@@ -276,7 +277,7 @@ def _analyse_dict(analyse) -> dict:
     # darum heisst: Rd, Rk oder gemischt R sagt der Kern, nicht die Oberflaeche.
     wahl = paar.wahl
     kopf["wahl"] = {"phi": wahl.kriechzahl, "werte": wahl.saetze.beschriftung,
-                    "rechenart": wahl.art.value, "index": wahl.index}
+                    "rechenart": arten_text(wahl, paar.betone), "index": wahl.index}
     if isinstance(analyse.kurve, spannungsanalyse.Modullinie):
         return {**kopf, "moeglich": True, "kurve": _modul_dict(analyse.kurve)}
     if analyse.kurve is not None:

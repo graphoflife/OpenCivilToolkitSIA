@@ -120,7 +120,7 @@ from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, betonbezuege, gesetze, lagenbezuege, protokoll_gesetze,
     protokoll_rechenwahl, stahllagen,
 )
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenarten, Rechenwahl
 from opencivil.nachweis.resistenzlinie import SCHRITTE, SCHRITTE_SUCHE, Widerstandslinie
 from opencivil.querschnitt.platte import Richtung
 
@@ -129,8 +129,8 @@ from opencivil.querschnitt.platte import Richtung
 REFERENZ = "SIA 262:2025, 4.3.7"
 
 #: Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
-VERFORMUNG = Rechenwahl(art=Rechenart.PARABEL)
-WIDERSTAND = Rechenwahl(art=Rechenart.BLOCK)
+VERFORMUNG = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))
+WIDERSTAND = Rechenwahl(arten=Rechenarten.alle(Rechenart.BLOCK))
 
 #: Groesste Zahl an Durchlaeufen der Ausmitten-Iteration.
 DURCHLAEUFE = 40
@@ -813,7 +813,7 @@ class Knicken(Knickverfahren):
         beton = self.querschnitt.beton
         phi = protokoll_rechenwahl(p, wahl, basis, self.querschnitt.baustoffe,
                                    titel="Rechenwahl – Verformung (e_2d)")
-        if wahl.art.mit_kriechzahl:
+        if wahl.arten.mit_kriechzahl:
             protokoll_wirksamer_modul(p, e[wahl.modul], phi, basis,
                                       titel="Steifigkeit des Betons",
                                       nachsatz=rf"\qquad {angabe(e[wahl.satz(beton).beton])}")

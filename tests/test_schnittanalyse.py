@@ -19,7 +19,7 @@ import unittest
 from opencivil import spannungsanalyse as sa
 from opencivil.core.protokoll import Protokoll
 from opencivil.nachweis.rissgroessen import bruttoquerschnitt, rissmoment
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenarten, Rechenwahl
 from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.projekt.querschnittsanalyse import (
     QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
@@ -35,7 +35,8 @@ def rechnen(projekt):
     return aufbau, aufbau.werk.loese(*aufbau.alle_nachweisziele())
 
 
-def paar_von(projekt, kennung, seite, wahl=Rechenwahl(art=Rechenart.PARABEL)):
+def paar_von(projekt, kennung, seite,
+             wahl=Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))):
     aufbau, loesung = rechnen(projekt)
     return schnittpaar(aufbau.querschnittsanalysen[kennung], seite,
                        lambda kid: loesung.werte[kid].groesse.si, wahl)
@@ -89,7 +90,7 @@ class TestBildUndDehnungen(unittest.TestCase):
                             (Zugseite.OBEN, 0.0, 40e3)):
             paar = paar_von(p, "a1", seite)
             g = paar.gerissen
-            hin = sa.aus_schnittgroessen(paar.ebenen().gerissen, N=N, M=M, art=paar.wahl.art)
+            hin = sa.aus_schnittgroessen(paar.ebenen().gerissen, N=N, M=M, arten=paar.wahl.arten)
             with self.subTest(seite=seite.value):
                 self.assertTrue(hin.konvergiert)
                 zurueck = sa.aus_dehnungen(g, eps_oben=hin.eps_m + hin.chi * g.oben,
@@ -246,7 +247,7 @@ class TestKippendeNulllinie(unittest.TestCase):
 
     def test_das_bild_nennt_die_neigung(self):
         bild = sa.aus_schnittgroessen(self.unten.ebenen().gerissen, N=0.0, M=150e3,
-                                      art=self.unten.wahl.art)
+                                      arten=self.unten.wahl.arten)
         self.assertTrue(bild.konvergiert)
         self.assertAlmostEqual(bild.M, 150e3, delta=50.0)
         self.assertLess(bild.neigung, math.radians(-30.0))
@@ -271,7 +272,7 @@ class TestBeschreibung(unittest.TestCase):
     def test_hin_und_zurueck_als_datei(self):
         a = QuerschnittsanalyseEintrag(kennung="a1", name="A")
         a.spannungsfall("Links", art="moment_kruemmung", N_Ed=-50.0, richtung="links",
-                        kriechzahl=1.5, rechenart="block")
+                        kriechzahl=1.5, rechenarten={"b1": "block"})
         wieder = QuerschnittsanalyseEintrag.aus_dict(a.als_dict())
         self.assertEqual(wieder.spannungsfaelle, a.spannungsfaelle)
         self.assertIsInstance(wieder.spannungsfaelle[0], QASpannungsfallEintrag)
@@ -338,6 +339,60 @@ class TestDurchDenDienst(unittest.TestCase):
         bild, = p.rechnen().analysen()["a1"]
         self.assertTrue(bild.bild.konvergiert)
         self.assertAlmostEqual(bild.bild.M, 100e3, delta=50.0)
+
+
+class TestZweiBetoneZweiRechenarten(unittest.TestCase):
+    """
+    Jeder Beton mit seiner Rechenart (Benutzer, 2026-11-25): ein Steg aus
+    C30/37 mit der 0.85·x-Vereinfachung, darauf eine Platte aus C50/60,
+    präzise. Bis dahin galt das nur in der Tragsicherheit; jede Analyse und
+    jeder Nachweis rechnete alle Betone mit derselben Art.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        p = Projekt(name="Zwei Betone")
+        p.beton("C30/37")
+        p.beton("C50/60")
+        p.stahl("B500B")
+        a = QuerschnittsanalyseEintrag(kennung="a1", name="Plattenbalken",
+                                       rechenarten={"b1": "block", "b2": "parabel"})
+        a.polygon([[0, 0], [300, 0], [300, 500], [0, 500]], material="b1")
+        a.polygon([[-300, 500], [600, 500], [600, 650], [-300, 650]], material="b2")
+        a.stablinie([50, 50], [250, 50], art="anzahl", anzahl=3, durchmesser=20, stahl="s1")
+        a.lastfall("Feld", M_y_Ed=250.0)
+        a.spannungsfall("Biegung", art="moment_kruemmung", kriechzahl=2.0,
+                        rechenarten={"b1": "block", "b2": "parabel"})
+        p.querschnittsanalysen.append(a)
+        cls.projekt = p
+        cls.aufbau, cls.loesung = rechnen(p)
+
+    def test_jeder_beton_rechnet_mit_seinem_gesetz(self):
+        from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Spannungsblock
+        analyse = self.aufbau.querschnittsanalysen["a1"]
+        stoffe = self.aufbau.baustoffe
+        self.assertIs(analyse.wahl.art_von(stoffe["b1"]), Rechenart.BLOCK)
+        self.assertIs(analyse.wahl.art_von(stoffe["b2"]), Rechenart.PARABEL)
+        wert = lambda kid: self.loesung.werte[kid].groesse.si
+        werkstoffe, index = analyse.werkstoffe(wert, analyse.wahl)
+        self.assertIsInstance(werkstoffe[index(stoffe["b1"])].gesetz, Spannungsblock)
+        self.assertIsInstance(werkstoffe[index(stoffe["b2"])].gesetz, Betongesetz)
+        self.assertNotIsInstance(werkstoffe[index(stoffe["b2"])].gesetz, Spannungsblock)
+
+    def test_das_bild_nennt_beide(self):
+        fall, = dienst.rechnen({"projekt": self.projekt.als_dict()})["spannungsanalysen"]["a1"]
+        self.assertEqual(fall["wahl"]["rechenart"], "C30/37 0.85·x, C50/60 präzise")
+
+    def test_die_herleitung_sagt_es(self):
+        protokoll = Protokoll()
+        sa.analysen(self.aufbau, self.loesung, protokoll)
+        text = " ".join(getattr(b, "text", "") for b in protokoll.alle_bloecke())
+        self.assertIn("Die Betone rechnen je mit ihrer Rechenart", text)
+
+    def test_einer_als_block_macht_die_linie_weicher(self):
+        """Rechnet einer der Betone als Block, sagt es die Linie -- auch neben einem präzisen."""
+        linie, = self.projekt.rechnen().analysen()["a1"]
+        self.assertIn("0.85·x-Vereinfachung trägt der Beton", linie.kurve.hinweis)
 
 
 if __name__ == "__main__":

@@ -47,12 +47,12 @@ from opencivil.core.wert import Wert
 from opencivil.pfahl.achse import Achsnachweis
 from opencivil.pfahl.pfahl import ETA_I_REGEL, Kombination, Pfahl, Tragglied
 from opencivil.querschnitt.analyse import KENNWERTE, gesetz_protokollieren, werkstoff
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenarten, Rechenwahl
 from opencivil.querschnitt.interaktion import Bewehrung, Querschnitt, Teil, Werkstoff
 from opencivil.querschnitt.vorlagen import KREISECKEN, kreispunkte
 
 #: Womit der Querschnitt rechnet: Bemessungswerte, der Beton als Parabel.
-WAHL = Rechenwahl(art=Rechenart.PARABEL)
+WAHL = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))
 
 Punkt = Tuple[float, float]
 

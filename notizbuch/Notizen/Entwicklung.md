@@ -7,6 +7,50 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-25 · Die Rechenart je Beton, in jedem Modul
+
+Vom Benutzer gewünscht (2026-11-25): Die Rechenart soll überall unter dem
+Schalter «Bemessung | charakteristisch» des Betons stehen, wie schon in der
+Tragsicherheit der Querschnittsanalyse. Das ersetzt den Entscheid vom
+2026-11-20, die Rechenart bleibe je Modul.
+
+- Vorher standen bei «Stahlspannung quasi-ständig» die Kriechzahl, eine
+  Rechenart für das ganze Modul und darunter die Werte je Material. Nachher
+  stehen dort die Kriechzahl, «C30/37 [Bemessung | charakteristisch]» und
+  darunter «[Hand | 0.85·x | präzise]», dann «B500B [Bemessung |
+  charakteristisch]». Bei mehreren Betonen hat jeder seine Art.
+- Im Kern hält `Rechenwahl` die Arten wie die Wertesätze: `Rechenarten`
+  führt je Beton seine Art, auf derselben Grundlage `JeBaustoff` wie
+  `Wertesaetze`. Haben alle Betone dieselbe Art, ist es dieselbe Wahl wie
+  eine für alle; zwei gleiche Wahlen teilen sich also weiter eine Linie.
+  `Rechenwahl.art` gibt es nur, wo alle Betone gleich rechnen, etwa in der
+  Platte mit ihrem einen Beton. Wer mehrere Betone rechnet, fragt
+  `art_von(beton)` oder `arten.mit_kriechzahl` und `arten.mit_block`.
+- Damit fällt die Sonderform der Querschnittsanalyse weg:
+  - ihre Wahl je Baustoff, ein Wörterbuch aus `Rechenwahl`;
+  - das Feld `betongesetze`;
+  - der Rückruf `wahl(stoff)` in `Querschnittsanalyse.werkstoffe`.
+
+  Die Analyse hat jetzt eine Wahl wie jedes Kapitel.
+- Im Projekt heisst das Feld überall `rechenarten`. Es hält je Kennung
+  eines Betons seine Art, wie `werkstoffsaetze` je Material; ein Stahl hat
+  keine. Welche Arten ein Kapitel anbietet, steht weiter am Feld. Der
+  Katalog schickt sie mit (`felder`, `wahl`), und die Oberfläche zeigt nur
+  diese Stellungen. Gibt es nur eine Art, wie bei der Verformung beim
+  Knicken, steht kein Schalter. Im Katalog bleibt nur `rechenarten`;
+  `faserarten`, `verformungsarten` und `betongesetze` sind weg.
+- Über dem Bild einer Spannung-Dehnung-Analyse steht die Art in Worten,
+  bei verschiedenen Arten je Beton: «C30/37 0.85·x, C50/60 präzise». Die
+  Herleitung zeigt das Gesetz des Betons, der zuerst reisst, und sagt,
+  dass die anderen mit ihrer eigenen Art rechnen. Das Feld φ steht blass,
+  wenn φ bei keinem der gewählten Betone wirkt.
+- Keine Zahl ändert sich, der Bericht des Beispiels bleibt gleich. Ein
+  gespeicherter Stand mit `rechenart` oder `betongesetze` öffnet sich nicht
+  mehr und nennt das Feld; die Seite bewahrt ihn auf (Prototyp, Benutzer,
+  2026-10-11).
+- Neue Tests prüfen zwei Betone mit verschiedenen Arten: im Kern und an
+  einem Plattenbalken aus C30/37 und C50/60.
+
 ## 2026-11-25 · Die Rechenart «elastisch» ist gestrichen
 
 Vom Benutzer gewünscht (2026-11-25): Er fragte, worin sich «elastisch» und
@@ -839,7 +883,8 @@ Zeichen für Zeichen gleich. «Jeder Nachweis» hat dafür eine Platte
 Die Rechenart bleibt je Modul. Nur die Tragsicherheit der Analyse wählt das
 Gesetz je Beton, wie bisher: eine Platte hat ohnehin einen Beton, und im
 Gebrauch und beim Knicken gehören Handrechnung und elastisch zum ganzen
-Querschnitt, nicht zu einem Baustoff.
+Querschnitt, nicht zu einem Baustoff. (Ersetzt am 2026-11-25: die Rechenart
+steht jetzt in jedem Modul je Beton, siehe dort.)
 
 In der Oberfläche baut `werkstoffzeilen` (nachweise.js) die Zeilen für
 alle Module: Name, Schalter «Bemessung | charakteristisch», in der

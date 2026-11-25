@@ -196,7 +196,6 @@ export const PLATTE = {
     // Woraus «aus der Tragsicherheit» ableitet: die Einwirkungen der Platte.
     aus: 'kombinationen',
     vorlage: 'gebrauchsfall',
-    arten: 'rechenarten',
     spalten: () => [
       {
         feld: 'M_Ed', kopf: ['M_{Ed}', 'kNm'], schritt: 10,

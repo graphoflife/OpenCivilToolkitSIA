@@ -1,5 +1,5 @@
 ---
-erzeugt: 2bae495187b3
+erzeugt: 8607f5d96315
 art: modul
 tags: [modul]
 ---
@@ -219,7 +219,7 @@ class QAGebrauchswahl(Gebrauchswahl)
 
 Die Stahlspannungen am gezeichneten Querschnitt: nur ueber die Fasern, ohne Handrechnung.
 
-- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)`
+- `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)`
 
 ### QAGebrauchsliste
 
@@ -311,7 +311,8 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `schubwaende: List[SchubwandEintrag] = field(default_factory=list)`
 - `hilfslinien: List[HilfslinieEintrag] = field(default_factory=list)`
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)` – Je Material die Werte der Tragsicherheit: Bemessungs- oder charakteristische -- das legt fest, wo die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`). Duktilitaet und sproedes Versagen rechnen am selben Querschnitt.
-- `betongesetze: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, (Rechenart.PARABEL, Rechenart.BLOCK))` – Je Beton das Gesetz der Tragsicherheit: die Parabel-Rechteck-Beziehung oder der vereinfachte Spannungsblock 0.85·x -- die Parabel zuerst, sie ist die Vorgabe.
+- `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)` – Je Beton die Rechenart der Tragsicherheit: praezise mit der Parabel-Rechteck-Beziehung oder mit dem vereinfachten Spannungsblock 0.85·x. Bis 2026-11-25 hiess das Feld `betongesetze`, als einziges je Beton.
+- `kriechzahl: ClassVar[float] = 0.0` – Die Tragsicherheit rechnet ohne Kriechen ([[opencivil.projekt.eintraege#JeMaterial.wahl|JeMaterial.wahl]]).
 - `lastfaelle: List[QALastfallEintrag] = field(default_factory=list)`
 - `einachsig: bool = False` – Nur Biegung um y: die Nulllinie bleibt waagrecht, M_z und V_y zaehlen nicht, und Duktilitaet und sproedes Versagen gibt es nur in y. Torsion bleibt. Bei einem unsymmetrischen Querschnitt ist das eine Naeherung -- dasselbe, was die Platte immer tut.
 - `alpha_min: int = kleinste_neigung()`
@@ -321,16 +322,6 @@ Was er mit der Platte gleich angibt, steht in der Grundlage
 - `haeufig: QAGebrauchsliste = teil(lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL), heisst='Fliesse…` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
-
-#### QuerschnittsanalyseEintrag.rechenwahl
-
-```python
-def rechenwahl(self, stoffe: Mapping[str, Any]) -> Dict[str, Rechenwahl]
-```
-
-Fuer die Rechnung je Baustoff seine Wahl im Bruchzustand, ohne
-Kriechen: die Wertesaetze aller `stoffe` -- nach ihrer Kennung im
-Projekt -- und beim Beton sein Gesetz.
 
 #### QuerschnittsanalyseEintrag.materialien
 

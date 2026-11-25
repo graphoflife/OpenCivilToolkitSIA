@@ -1,5 +1,5 @@
 ---
-erzeugt: 7769352e9192
+erzeugt: 78c8ece145a7
 art: modul
 tags: [modul]
 ---
@@ -196,7 +196,9 @@ sagt: `bis_feld` bei α_min, `ab_feld` bei α_max. Die Zahl des anderen
 Feldes kennt erst die Maske.
 
 Haelt ein Feld je Material eine Wahl ([[opencivil.projekt.lesen#je_material|je_material]]), steht dort,
-was ein Material ohne eigene waehlt: `vorgabe`.
+was ein Material ohne eigene waehlt: `vorgabe` -- und ist die Wahl
+begrenzt, was sie annehmen kann, in ihrer Folge: `wahl`. Danach
+stellt die Maske die Rechenart je Beton, mit ihren Stellungen.
 
 Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
 des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,

@@ -1,5 +1,5 @@
 ---
-erzeugt: 2841decef3e8
+erzeugt: 8ab3ab4fa347
 art: modul
 tags: [modul]
 ---
@@ -87,7 +87,7 @@ Dehnungen und Spannungen zu einer gegebenen Ebene -- ohne jede Suche.
 ### aus_schnittgroessen
 
 ```python
-def aus_schnittgroessen(suche: Ebenensuche, *, N: float, M: float, art: Rechenart) -> Querschnittsbild
+def aus_schnittgroessen(suche: Ebenensuche, *, N: float, M: float, arten: Rechenarten) -> Querschnittsbild
 ```
 
 Die Dehnungsebene zu `N` und `M`, samt allem, was darauf steht --
@@ -95,8 +95,8 @@ gefunden von der Ebenensuche des gerissenen Zustands.
 
 Gesucht wird mit demselben Verfahren wie in den Nachweisen. Findet sich
 keine Ebene, kommt das Bild leer zurueck und sagt warum -- geraten wird
-nicht. Verfehlt die Suche ihre Ebene, sagt es die Rechenart `art`
-([[opencivil.querschnitt.gesetzwahl#Rechenart.ohne_ebene|Rechenart.ohne_ebene]]).
+nicht. Verfehlt die Suche ihre Ebene, sagt es die Wahl der Rechenarten
+([[opencivil.querschnitt.gesetzwahl#Rechenarten.ohne_ebene|ohne_ebene]]).
 
 ### aus_dehnungen
 

@@ -155,7 +155,7 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
               for w in elemente.waende]
     # Jeder Baustoff bekommt seine Wahl, auch wer keine eigene hat: so steht
     # die Vorgabe nur an der Beschreibung.
-    wahl = eintrag.rechenwahl({k: baustoffe[k] for k in eintrag.materialien() if k in baustoffe})
+    wahl = eintrag.wahl({k: baustoffe[k] for k in eintrag.materialien() if k in baustoffe})
     return Querschnittsanalyse(
         name=eintrag.name, praefix=praefix,
         flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,

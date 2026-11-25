@@ -56,7 +56,7 @@ from opencivil.core.wert import Wert, WertDef
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import linie as geo
 from opencivil.nachweis.handrechnung import Eckpunkt, Handrechnung, seiten
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenarten, Rechenwahl
 from opencivil.querschnitt.interaktion import STREIFEN
 from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, Betonkennwerte, betonbezuege, bezuege_vereinen, gesetze, lagenbezuege,
@@ -380,7 +380,8 @@ class BiegungNormalkraft(Nachweis):
             art = (Rechenart.PARABEL if wahl.art is Rechenart.HANDRECHNUNG
                    else Rechenart.HANDRECHNUNG)
             befund.vergleich = self._linie(
-                Rechenwahl(kriechzahl=wahl.kriechzahl, saetze=wahl.saetze, art=art),
+                Rechenwahl(kriechzahl=wahl.kriechzahl, saetze=wahl.saetze,
+                           arten=Rechenarten.alle(art)),
                 e, StillesProtokoll())
 
         linie = befund.massgebend

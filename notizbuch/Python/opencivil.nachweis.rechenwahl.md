@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d6d0445d00a
+erzeugt: f74b52e809c9
 art: modul
 tags: [modul]
 ---
@@ -226,8 +226,8 @@ def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, stoffe: Seq
 
 Womit das Kapitel rechnet, in einer Zeile: phi (nur wo es wirkt), Werte,
 Rechenart. Rechnen alle `stoffe` mit demselben Wertesatz, steht er
-einmal da, sonst je Baustoff mit seinem Namen. Zurueck kommt phi als
-Wert -- fuer die Formeln danach.
+einmal da, sonst je Baustoff mit seinem Namen -- ebenso die Rechenart je
+Beton. Zurueck kommt phi als Wert -- fuer die Formeln danach.
 
 ### protokoll_gesetze
 
@@ -267,7 +267,9 @@ def gesetze(wahl: Rechenwahl, w: Betonkennwerte, *, ungerissen: bool=False) -> G
 ```
 
 Die Gesetze zu einer Wahl, `ungerissen` mit dem ungerissenen Beton
-([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]). Der Stahl kommt
+([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]) -- fuer ein
+Bauteil mit einem Beton, der Platte: seine Rechenart ist die der Wahl
+([[opencivil.querschnitt.gesetzwahl#Rechenwahl.art|art]]). Der Stahl kommt
 je Lage dazu, samt seinem `eps_ud` -- bis 2026-10-12 rechneten die
 Stahlspannungen fest mit 4.5 %, das Knicken und die Analysen mit dem der
 ersten Lage.

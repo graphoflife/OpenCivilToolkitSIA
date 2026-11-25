@@ -8,10 +8,13 @@ und die Altdatei, die vor dem Umbau festgehalten wurde.
 """
 
 import unittest
+from types import SimpleNamespace
 
 from opencivil.core.berechnung import Eingabebezug
 from opencivil.nachweis.querschnittsloeser import Stahllage, je_seite
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
+from opencivil.querschnitt.gesetzwahl import (
+    Rechenart, Rechenarten, Rechenwahl, Werkstoffsatz, Wertesaetze, arten_text,
+)
 from opencivil.nachweis.rechenwahl import (
     FASERARTEN, RECHENARTEN, VERFORMUNGSARTEN, Betonkennwerte, bezuege_vereinen, gesetze,
 )
@@ -47,7 +50,7 @@ class TestRechenarten(unittest.TestCase):
         from opencivil.projekt import Projekt, RechenwahlEintrag
         stoffe = Projekt.beispiel().aufbauen().baustoffe
         eintrag = RechenwahlEintrag(kriechzahl=1.5, werkstoffsaetze={"b1": "charakteristisch"},
-                                    rechenart="parabel")
+                                    rechenarten={"b1": "parabel"})
         wahl = eintrag.wahl(stoffe)
         self.assertEqual((wahl.kriechzahl, wahl.art), (1.5, Rechenart.PARABEL))
         self.assertIs(wahl.satz(stoffe["b1"]), Werkstoffsatz.CHARAKTERISTISCH)
@@ -57,7 +60,8 @@ class TestRechenarten(unittest.TestCase):
         # ein Kapitel seine eigene Linie neben der gleichen eines anderen.
         eintrag.werkstoffsaetze = {"b1": "charakteristisch", "s1": "charakteristisch"}
         self.assertEqual(eintrag.wahl(stoffe), Rechenwahl(
-            1.5, Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH), Rechenart.PARABEL))
+            1.5, Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH),
+            Rechenarten.alle(Rechenart.PARABEL)))
 
 
 class TestWertesaetze(unittest.TestCase):
@@ -94,7 +98,7 @@ class TestWertesaetze(unittest.TestCase):
         # Die Reihenfolge der Eingabe zählt nicht: dieselbe Wahl, ein Schlüssel.
         self.assertEqual(gemischt, Wertesaetze.je({"B500B": Werkstoffsatz.BEMESSUNG,
                                                    "C30/37": Werkstoffsatz.CHARAKTERISTISCH}))
-        self.assertEqual(Rechenwahl(saetze=gemischt).beschriftung,
+        self.assertEqual(Rechenwahl(saetze=gemischt).beschriftung(),
                          "Handrechnung, gemischt")
 
     def test_ohne_ebene_nennt_die_wahl(self):
@@ -112,14 +116,63 @@ class TestWertesaetze(unittest.TestCase):
     def test_nur_praezise_haengt_an_der_kriechzahl(self):
         for art in RECHENARTEN:
             with self.subTest(art=art.value):
-                weich = gesetze(Rechenwahl(2.0, art=art), W).beton(-0.0005)
-                steif = gesetze(Rechenwahl(0.0, art=art), W).beton(-0.0005)
+                weich = gesetze(Rechenwahl(2.0, arten=Rechenarten.alle(art)), W).beton(-0.0005)
+                steif = gesetze(Rechenwahl(0.0, arten=Rechenarten.alle(art)), W).beton(-0.0005)
                 self.assertEqual(weich != steif, art.mit_kriechzahl)
+
+
+class TestRechenartJeBeton(unittest.TestCase):
+    """
+    Je Beton seine Rechenart (Benutzer, 2026-11-25), wie je Material sein
+    Wertesatz. Ein Stahl hat keine: er rechnet in jeder Art mit seinem Gesetz.
+    """
+
+    C30 = SimpleNamespace(id="b1", name="C30/37")
+    C50 = SimpleNamespace(id="b2", name="C50/60")
+
+    def test_alle_gleich_ist_eine_fuer_alle(self):
+        """Sonst rechneten zwei gleiche Wahlen zwei Linien."""
+        arten = Rechenarten.je({"b1": Rechenart.BLOCK, "b2": Rechenart.BLOCK})
+        self.assertEqual(arten, Rechenarten.alle(Rechenart.BLOCK))
+        self.assertIs(Rechenwahl(arten=arten).art, Rechenart.BLOCK)
+        self.assertEqual(Rechenarten.je({}), Rechenarten.alle(Rechenart.HANDRECHNUNG))
+
+    def test_verschieden(self):
+        wahl = Rechenwahl(kriechzahl=2.0, arten=Rechenarten.je(
+            {"b1": Rechenart.BLOCK, "b2": Rechenart.PARABEL}))
+        self.assertIs(wahl.art_von(self.C30), Rechenart.BLOCK)
+        self.assertIs(wahl.art_von(self.C50), Rechenart.PARABEL)
+        self.assertIsNone(wahl.arten.einheitlich)
+        with self.assertRaises(ValueError):
+            wahl.art
+        # Einer haengt am Modul, einer rechnet als Block -- und wo die Ebene
+        # fehlt, hilft es, praezise zu rechnen.
+        self.assertTrue(wahl.arten.mit_kriechzahl)
+        self.assertTrue(wahl.arten.mit_block)
+        self.assertEqual(wahl.arten.ohne_ebene, Rechenart.BLOCK.ohne_ebene)
+        betone = (self.C30, self.C50)
+        self.assertEqual(arten_text(wahl, betone), "C30/37 0.85·x, C50/60 präzise")
+        self.assertEqual(wahl.beschriftung(betone),
+                         "C30/37 0.85·x, C50/60 präzise, φ = 2, Bemessung")
+
+    def test_eine_linie_je_wahl_aller_betone(self):
+        block = Rechenwahl(arten=Rechenarten.je({"b1": Rechenart.BLOCK, "b2": Rechenart.PARABEL}))
+        anders = Rechenwahl(arten=Rechenarten.je({"b1": Rechenart.PARABEL, "b2": Rechenart.BLOCK}))
+        self.assertFalse(block.gleiche_linie(anders))
+        self.assertTrue(block.gleiche_linie(Rechenwahl(arten=Rechenarten.je(
+            {"b2": Rechenart.PARABEL, "b1": Rechenart.BLOCK}))))
+
+    def test_aus_den_feldern_nur_die_betone(self):
+        """Die Wahl eines Stahls in ``rechenarten`` zaehlt nicht -- er hat keine."""
+        from opencivil.projekt import Projekt, RechenwahlEintrag
+        stoffe = Projekt.beispiel().aufbauen().baustoffe
+        wahl = RechenwahlEintrag(rechenarten={"b1": "block", "s1": "parabel"}).wahl(stoffe)
+        self.assertEqual(wahl.arten, Rechenarten.alle(Rechenart.BLOCK))
 
 
 class TestGesetze(unittest.TestCase):
     def test_handrechnung_block_stahl_nur_auf_zug_je_seite_eine_lage(self):
-        g = gesetze(Rechenwahl(art=Rechenart.HANDRECHNUNG), W)
+        g = gesetze(Rechenwahl(arten=Rechenarten.alle(Rechenart.HANDRECHNUNG)), W)
         self.assertIsInstance(g.beton, Spannungsblock)
         self.assertEqual(g.stahl(STAHL)(-0.01), 0.0)
         self.assertAlmostEqual(g.stahl(STAHL)(0.01), 435e6)
@@ -131,7 +184,7 @@ class TestGesetze(unittest.TestCase):
         self.assertAlmostEqual(lagen[0].z, (1696 * 0.249 + 754 * 0.243) / 2450)
 
     def test_block_genau_mit_druckstahl(self):
-        g = gesetze(Rechenwahl(art=Rechenart.BLOCK), W)
+        g = gesetze(Rechenwahl(arten=Rechenarten.alle(Rechenart.BLOCK)), W)
         self.assertIsInstance(g.beton, Spannungsblock)
         self.assertAlmostEqual(g.stahl(STAHL)(-0.01), -435e6)
         self.assertIsNotNone(g.beton.mittel, "der Block springt: über jede Faser gemittelt")
@@ -139,12 +192,12 @@ class TestGesetze(unittest.TestCase):
         self.assertEqual(g.lagen(LAGEN), LAGEN)
 
     def test_parabel(self):
-        parabel = gesetze(Rechenwahl(art=Rechenart.PARABEL), W)
+        parabel = gesetze(Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL)), W)
         self.assertIsNone(parabel.beton.mittel)
         self.assertAlmostEqual(parabel.beton(-0.002) / 1e6, -20.0)
 
     def test_der_ungerissene_zustand_ersetzt_nur_den_beton(self):
-        wahl = Rechenwahl(2.0, art=Rechenart.HANDRECHNUNG)
+        wahl = Rechenwahl(2.0, arten=Rechenarten.alle(Rechenart.HANDRECHNUNG))
         g = gesetze(wahl, W, ungerissen=True)
         self.assertEqual(g.beton, BetonUngerissen(E_c=33.6e9 / 3))
         loeser = g.loeser(h=0.3, b=1.0, lagen=LAGEN)
@@ -227,7 +280,7 @@ class TestJederNachweis(unittest.TestCase):
         self.assertEqual({w.saetze.einheitlich for w in wahlen}, {*Werkstoffsatz, None})
 
     def test_stahlspannung_jede_rechenart(self):
-        arten = {liste.wahl.rechenart for q in self.projekt.querschnitte
+        arten = {liste.wahl.von("rechenarten", q.beton) for q in self.projekt.querschnitte
                  for liste in (q.haeufig, q.quasistaendig) if liste.faelle}
         self.assertEqual(arten, set(RECHENARTEN))
 

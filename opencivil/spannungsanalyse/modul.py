@@ -383,10 +383,11 @@ class ModulProzedur(Prozedur):
         paar, seite, grund = self.frage.quelle.paar(M, e.si_nach_id(), self.frage.wahl)
         befund = (Modulbefund(None, grund) if paar is None
                   else Modulbefund(*modul_bei(paar, N=N, M=abs(M))))
-        self._schreiben(p, seite, befund)
+        self._schreiben(p, seite, befund, paar.betone if paar is not None else ())
         return Ausfuehrung({}, befund=befund)
 
-    def _schreiben(self, p: Protokoll, seite: str, befund: Modulbefund) -> None:
+    def _schreiben(self, p: Protokoll, seite: str, befund: Modulbefund,
+                   betone: Tuple[Any, ...]) -> None:
         p.erklaerung(
             "Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, "
             "ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich "
@@ -394,7 +395,7 @@ class ModulProzedur(Prozedur):
             "M–E_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, "
             "darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA "
             "und EI jedes Stabs mit diesem Querschnitt und seinem Material.")
-        p.text(f"{self.frage.quelle.text}, {seite}, {self.frage.wahl.beschriftung}.")
+        p.text(f"{self.frage.quelle.text}, {seite}, {self.frage.wahl.beschriftung(betone)}.")
         s = befund.stelle
         if s is None:
             p.text(f"Kein E_eq: {befund.grund}")

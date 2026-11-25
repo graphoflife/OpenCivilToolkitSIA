@@ -67,7 +67,8 @@ class TestHandrechnung(unittest.TestCase):
     def test_mit_anderer_rechenwahl_eine_eigene_handrechnung(self):
         """Präzise in der Tragsicherheit -- die Kennzahlen bleiben die der Handrechnung."""
         projekt = Projekt.beispiel()
-        projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(rechenart="parabel")
+        projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(
+            rechenarten={"b1": "parabel"})
         aufbau, loesung = rechnen(projekt)
         self.assertTrue(aufbau.kennzahlen["q1"].linienquelle.eigen)
         for kurz in ("M_Rd_pos", "M_Rd_neg", "N_Rd_zug", "N_Rd_druck", "x_d_pos", "x_d_neg"):

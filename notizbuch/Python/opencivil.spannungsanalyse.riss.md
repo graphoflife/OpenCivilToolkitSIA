@@ -1,5 +1,5 @@
 ---
-erzeugt: 11488c0a608f
+erzeugt: 974571889f1c
 art: modul
 tags: [modul]
 ---
@@ -66,9 +66,10 @@ Querschnitt.
 
 Das Paar gibt den Bruttoquerschnitt (`brutto`) mit seinem Rissmoment
 unter reiner Biegung (`riss`), seine Flaeche `A`, die rissaktive
-Dicke unter Zug (`t_zug`), die Zugseite (`seite`) und den gerissenen
-Loeser (`gerissen`) -- und zwei Stuecke Herleitung, die nur es kennt:
-[[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_bruttoquerschnitt|herleitung_bruttoquerschnitt]] und [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_dicke_unter_zug|herleitung_dicke_unter_zug]].
+Dicke unter Zug (`t_zug`), die Zugseite (`seite`), den gerissenen
+Loeser (`gerissen`) und seine Wahl (`wahl`) -- und zwei Stuecke
+Herleitung, die nur es kennt: [[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_bruttoquerschnitt|herleitung_bruttoquerschnitt]] und
+[[opencivil.spannungsanalyse.riss#Bruttoriss.herleitung_dicke_unter_zug|herleitung_dicke_unter_zug]].
 
 - `brutto: Bruttoquerschnitt`
 - `riss: Rissmoment`
@@ -76,8 +77,28 @@ Loeser (`gerissen`) -- und zwei Stuecke Herleitung, die nur es kennt:
 - `t_zug: float`
 - `seite: Zugseite`
 - `gerissen: Faserloeser`
+- `wahl: Rechenwahl`
 - `ZUR_ANDEREN_ACHSE = ''` – Was die Erklaerung der festen Nulllinie ueber das Moment um die andere Achse sagt -- beim gezeichneten Querschnitt ist «einachsig» eine Wahl; an der Platte, einem Rechteck, entsteht keines.
 - `DICKE_UNTER_ZUG = ''` – Welche Dicke unter Zug reisst, in Worten.
+
+#### Bruttoriss.art
+
+```python
+@property
+def art(self) -> Rechenart
+```
+
+Die Rechenart des Betons der Ecke, die zuerst reisst: seine Kennwerte
+und sein Gesetz zeigt die Herleitung. Die Platte hat nur ihn.
+
+#### Bruttoriss.betone
+
+```python
+@property
+def betone(self) -> Tuple[Any, ...]
+```
+
+Die Betone des Querschnitts, jeder einmal -- aus den Ecken des Bruttoquerschnitts.
 
 #### Bruttoriss.einachsig
 
@@ -234,6 +255,7 @@ Der reine Betonquerschnitt des Moduls ueber der Normalkraft: der Bruttoquerschni
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rissgroessen]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse.linie]]
 

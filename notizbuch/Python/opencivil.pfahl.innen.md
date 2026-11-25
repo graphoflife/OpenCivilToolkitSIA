@@ -1,5 +1,5 @@
 ---
-erzeugt: e8f25aca8899
+erzeugt: b743f10c4e33
 art: modul
 tags: [modul]
 ---
@@ -153,7 +153,7 @@ R_i,d = η_i · R_mat,d (50).
 
 ## Konstanten
 
-- `WAHL = Rechenwahl(art=Rechenart.PARABEL)` – Womit der Querschnitt rechnet: Bemessungswerte, der Beton als Parabel.
+- `WAHL = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))` – Womit der Querschnitt rechnet: Bemessungswerte, der Beton als Parabel.
 
 ## Braucht
 

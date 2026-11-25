@@ -120,7 +120,7 @@ class Widerstandslinie:
 
     @property
     def beschriftung(self) -> str:
-        return self.wahl.beschriftung
+        return self.wahl.beschriftung()
 
     def innerhalb(self, N: float, M: float) -> bool:
         raise NotImplementedError

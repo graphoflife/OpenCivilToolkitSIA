@@ -191,7 +191,7 @@ def jeder_nachweis() -> Projekt:
                         kriechzahl=2.0)
     decke.spannungsfall("Zug mit Moment", art="normalkraft_dehnung", M_Ed=30,
                         kriechzahl=1.0, werkstoffsaetze=charakteristisch(decke),
-                        rechenart="block")
+                        rechenarten={decke.beton: Rechenart.BLOCK})
     # Der äquivalente E-Modul, einmal über dem Moment und einmal über der
     # Normalkraft bei festem Moment -- dort zählt er ab dem Zustand ohne N.
     decke.spannungsfall("Biegesteifigkeit", art="moment_emodul",
@@ -224,26 +224,29 @@ def jeder_nachweis() -> Projekt:
                      rissanforderung="erhoeht", sproede=True)
     genau.tragsicherheit_wahl = RechenwahlEintrag(
         kriechzahl=1.0, werkstoffsaetze=charakteristisch(genau),
-        rechenart=Rechenart.PARABEL)
+        rechenarten={genau.beton: Rechenart.PARABEL})
     genau.einwirkung("Feld", M_Ed=60, N_Ed=-200, V_Ed=50)
     genau.quasistaendig.lastfall("Dauerlast", M_Ed=30)
-    genau.quasistaendig.wahl = Gebrauchswahl(kriechzahl=1.0, rechenart=Rechenart.BLOCK)
+    genau.quasistaendig.wahl = Gebrauchswahl(kriechzahl=1.0,
+                                             rechenarten={genau.beton: Rechenart.BLOCK})
     genau.haeufig.lastfall("Gebrauch", M_Ed=45)
-    genau.haeufig.wahl = Gebrauchswahl(kriechzahl=2.0, rechenart=Rechenart.PARABEL)
+    genau.haeufig.wahl = Gebrauchswahl(kriechzahl=2.0)
     genau.knickfall("Stütze", N_Ed=-600, M_Ed_1=10, laenge=3.0)
     genau.knicken_wahl_verformung = KnickVerformungswahl(
         werkstoffsaetze=charakteristisch(genau))
-    genau.knicken_wahl_widerstand = KnickWiderstandswahl(rechenart=Rechenart.PARABEL)
+    genau.knicken_wahl_widerstand = KnickWiderstandswahl(
+        rechenarten={genau.beton: Rechenart.PARABEL})
 
     # Die Platte «Block» haelt die Tragsicherheit mit der 0.85·x-Vereinfachung,
     # einmal bei festem Moment -- dort zeigt die Probe die Normalkraft --,
     # rechnet die Stahlspannung von Hand und knickt gegen dieselbe Linie.
     block = p.platte("Block", h=220, x=[10, 10], y=[8, 8])
-    block.tragsicherheit_wahl = RechenwahlEintrag(rechenart=Rechenart.BLOCK)
+    block.tragsicherheit_wahl = RechenwahlEintrag(rechenarten={block.beton: Rechenart.BLOCK})
     block.einwirkung("Feld", M_Ed=25, V_Ed=30)
     block.einwirkung("Rand", M_Ed=-15, N_Ed=-100).art = "M_konstant"
     block.quasistaendig.lastfall("Dauerlast", M_Ed=12)
-    block.quasistaendig.wahl = Gebrauchswahl(rechenart=Rechenart.HANDRECHNUNG)
+    block.quasistaendig.wahl = Gebrauchswahl(
+        rechenarten={block.beton: Rechenart.HANDRECHNUNG})
     block.knickfall("Wand", N_Ed=-400, M_Ed_1=5, laenge=2.5)
     block.knicken_wahl_widerstand = KnickWiderstandswahl()
 
@@ -654,7 +657,7 @@ def _raumrahmen(p: Projekt, decke: QuerschnittEintrag,
 def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     a = QuerschnittsanalyseEintrag(
         kennung=kennung, name="Kastenträger",
-        betongesetze={"b1": "block"},
+        rechenarten={"b1": "block"},
         laengszugkraft=True, duktilitaet=True, sproede=True,
         rissanforderung="erhoeht", zwaengung=True, zwaengung_begrenzt=True,
         zwaengung_biegung=True, zwaengung_biegung_kriechzahl=1.0)
@@ -680,7 +683,7 @@ def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:
     a.spannungsfall("Seitlich", art="moment_kruemmung", N_Ed=-500.0, richtung="links",
                     kriechzahl=1.0)
     a.spannungsfall("Zugsteifigkeit", art="normalkraft_emodul", M_Ed=-50.0,
-                    werkstoffsaetze=charakteristisch(a), rechenart="block")
+                    werkstoffsaetze=charakteristisch(a), rechenarten={"b1": "block"})
     # Die Stahlspannungen: quasi-ständig aus der Tragsicherheit und ein
     # eigener Fall, häufig ein schiefer -- die Nulllinie dreht.
     a.quasistaendig.aus_tragsicherheit = True
@@ -703,8 +706,8 @@ def _stuetze(kennung: str) -> QuerschnittsanalyseEintrag:
                     richtung="oben")
     a.spannungsfall("Biegesteifigkeit", art="moment_emodul", N_Ed=-800.0,
                     richtung="oben", werkstoffsaetze=charakteristisch(a))
-    # Quasi-ständig mit der Parabel: σ_s,adm ist bei normaler Anforderung f_yk.
-    a.quasistaendig.wahl.rechenart = "parabel"
+    # Quasi-ständig präzise, wie vorgegeben: σ_s,adm ist bei normaler
+    # Anforderung f_yk.
     a.quasistaendig.lastfall("Dauer", N_Ed=-600.0, M_y_Ed=80.0)
     # Knicken unten und seitlich, die Verformung mit Kriechen.
     a.knicken_wahl_verformung.kriechzahl = 1.5

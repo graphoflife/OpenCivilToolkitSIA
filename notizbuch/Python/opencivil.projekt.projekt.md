@@ -1,5 +1,5 @@
 ---
-erzeugt: 0d5e496afb38
+erzeugt: 49409a6d8f22
 art: modul
 tags: [modul]
 ---
@@ -240,8 +240,8 @@ einen hat. Alles Weitere -- `b`, `rissanforderung`,
 `duktilitaet` ... -- geht als Stichwort an den Eintrag; ein
 unbekanntes Stichwort wird gemeldet, statt still zu verschwinden.
 Gelesen wird es wie aus einer Datei: ein Teil darf als Eintrag kommen
-oder als seine Felder, `tragsicherheit_wahl={"rechenart": "parabel"}`
-aendert nur die Rechenart.
+oder als seine Felder, `tragsicherheit_wahl={"kriechzahl": 1.0}`
+aendert nur die Kriechzahl.
 
 Gebaut wird ueber [[opencivil.projekt.platte#QuerschnittEintrag.neu|QuerschnittEintrag.neu]], dieselbe Vorlage wie
 in der Oberflaeche, nur ohne deren Startlast: wer rechnet, gibt seine

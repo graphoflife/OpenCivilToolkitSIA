@@ -154,16 +154,15 @@ function querschnittGruppe(analyse) {
 
 /**
  * Womit die Tragsicherheit rechnet: je Material im Querschnitt seine Werte,
- * beim Beton dazu sein Gesetz -- dieselben Zeilen wie die Rechenwahl jedes
- * Moduls (`werkstoffzeilen`), ohne Kriechzahl und ohne Rechenart: die
- * Rechenart ist hier das Gesetz je Beton. Duktilität und sprödes Versagen
- * rechnen am selben Querschnitt.
+ * beim Beton dazu seine Rechenart -- dieselben Zeilen wie die Rechenwahl
+ * jedes Moduls (`werkstoffzeilen`), ohne Kriechzahl: der Bruch rechnet ohne
+ * Kriechen. Duktilität und sprödes Versagen rechnen am selben Querschnitt.
  */
 function rechenwahl(analyse) {
   return el('div.rechenwahl', {}, [
     el('span.rechenwahl-titel', { text: 'Rechenwahl' }),
     werkstoffzeilen(analyse, (veraenderer) => eintragAendern(analyse.kennung, veraenderer), {
-      ...werkstoffeVon(analyse.kennung), klasse: 'querschnittsanalyse', mitGesetz: true,
+      ...werkstoffeVon(analyse.kennung), klasse: 'querschnittsanalyse',
     }),
   ]);
 }
@@ -436,7 +435,6 @@ const ORT = {
     // Woraus «aus der Tragsicherheit» ableitet: die Lastfälle der Analyse.
     aus: 'lastfaelle',
     vorlage: 'qagebrauchsfall',
-    arten: 'faserarten',
     spalten: (a) => spalten(a).filter((s) => ['N_Ed', 'M_y_Ed', 'M_z_Ed'].includes(s.feld))
       .map((s) => ({
         feld: s.feld, kopf: [s.symbol, s.feld === 'N_Ed' ? 'kN' : 'kNm'],

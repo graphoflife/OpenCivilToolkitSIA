@@ -72,7 +72,7 @@ def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *
     baut, fuer den gezeichneten Querschnitt und den Pfahl. ``wert`` liefert
     zu einer Wert-ID die Zahl in SI.
 
-    Beton: das Gesetz der Wahl, gebaut wie bei der Platte
+    Beton: das Gesetz seiner Rechenart, gebaut wie bei der Platte
     (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`), der Beiwert der
     Parabel also aus ``E_cm/(1+phi)`` -- oder, ``ungerissen``, linear in
     Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
@@ -89,7 +89,7 @@ def werkstoff(stoff: Baustoff, wert: Callable[[str], float], wahl: Rechenwahl, *
     satz = wahl.satz(stoff)
     if stoff.art is Baustoffart.BETON:
         eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
-        gesetz = betongesetz(wahl, f_c=w(satz.beton), E_c=w(wahl.modul),
+        gesetz = betongesetz(wahl, wahl.art_von(stoff), f_c=w(satz.beton), E_c=w(wahl.modul),
                              eps_c1d=eps_c1d, eps_c2d=eps_c2d, ungerissen=ungerissen)
         return Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
                          c_punkt=(eps_c1d, eps_c2d), verdraengbar=True)
@@ -397,7 +397,7 @@ class Querschnittsanalyse(Rechenobjekt):
         linien: Sequence[Mapping],
         waende: Sequence[Mapping],
         alpha_min: int, alpha_max: int, k_c: float,
-        wahl: Mapping[str, Rechenwahl], biegung: Biegung = SCHIEF,
+        wahl: Rechenwahl, biegung: Biegung = SCHIEF,
     ) -> None:
         """
         ``staebe``, ``linien`` und ``waende`` wie bei :class:`Zeichnung`, je
@@ -414,10 +414,12 @@ class Querschnittsanalyse(Rechenobjekt):
         Bruttoquerschnitt traegt es weiter
         (:func:`~opencivil.nachweis.rissgroessen.bruttoquerschnitt`).
         """
-        self.wahl = dict(wahl)
+        self.wahl = wahl
         """
-        Je Baustoff-ID seine Wahl im Bruchzustand: die Wertesaetze aller
-        Baustoffe und beim Beton seine Rechenart -- ohne Kriechen.
+        Die Wahl im Bruchzustand: je Baustoff sein Wertesatz, je Beton seine
+        Rechenart -- ohne Kriechen. Bis 2026-11-25 hielt die Analyse je
+        Baustoff eine eigene Wahl; die Rechenart je Beton kennt seither jede
+        Wahl.
         """
         self.flaechen = tuple(flaechen)
         self.definitionen: Dict[str, WertDef] = {}
@@ -675,10 +677,6 @@ class Querschnittsanalyse(Rechenobjekt):
 
     # -- Fuer die Nachweise: Werkstoffe ---------------------------------------------
 
-    def rechenwahl(self, stoff: Baustoff) -> Rechenwahl:
-        """Womit dieser Baustoff rechnet -- der Aufbau gibt jedem seine Wahl mit."""
-        return self.wahl[stoff.id]
-
     def werkstoffbezuege(self) -> List[Eingabebezug]:
         """Die Kennwerte jedes Baustoffs der Analyse, als Eingaben der Nachweise."""
         return [stoff.bezug(k) for stoff in self.baustoffe for k in KENNWERTE[stoff.art]]
@@ -686,19 +684,19 @@ class Querschnittsanalyse(Rechenobjekt):
     def kennwert(self, e: Eingaben, stoff: Baustoff, kennwert: str) -> float:
         return e.g(stoff.eingabename(kennwert)).si
 
-    def werkstoffe(self, wert: Callable[[str], float],
-                   wahl: Callable[[Baustoff], Rechenwahl], *, ungerissen: bool = False,
+    def werkstoffe(self, wert: Callable[[str], float], wahl: Rechenwahl, *,
+                   ungerissen: bool = False,
                    ) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]:
         """
         Die Werkstoffe des Querschnitts, je Baustoff einer (:func:`werkstoff`).
-        ``wert`` liefert zu einer Wert-ID die Zahl in SI; ``wahl`` je Baustoff
-        seine Rechenwahl: im Bruchzustand die des Baustoffs
-        (:meth:`rechenwahl`), fuer Spannungen und Knicken die des Kapitels.
+        ``wert`` liefert zu einer Wert-ID die Zahl in SI; ``wahl`` ist die
+        Rechenwahl: im Bruchzustand die der Analyse (:attr:`wahl`), fuer
+        Spannungen und Knicken die des Kapitels.
         """
         liste: List[Werkstoff] = []
         index: Dict[str, int] = {}
         for stoff in self.baustoffe:
-            liste.append(werkstoff(stoff, wert, wahl(stoff), ungerissen=ungerissen))
+            liste.append(werkstoff(stoff, wert, wahl, ungerissen=ungerissen))
             index[stoff.id] = len(liste) - 1
         return liste, (lambda stoff: index[stoff.id])
 
@@ -706,13 +704,13 @@ class Querschnittsanalyse(Rechenobjekt):
                     ungerissen: bool = False,
                     ) -> Tuple[Querschnitt, List[Bewehrungselement], Dict[int, Stahlgesetz]]:
         """
-        Der Querschnitt mit den Gesetzen einer Rechenwahl, fuer jeden Werkstoff
-        dieselbe -- dazu je Bewehrung ihr Element und je Stahl sein Gesetz,
+        Der Querschnitt mit den Gesetzen einer Rechenwahl -- dazu je
+        Bewehrung ihr Element und je Stahl sein Gesetz,
         nach dem Index des Werkstoffs. ``wert`` liefert zu einer Wert-ID die
         Zahl in SI. Zerlegt in so viele Streifen, wie die Platte Fasern hat
         (:data:`~opencivil.querschnitt.fasern.FASERN`).
         """
-        werkstoffe, index = self.werkstoffe(wert, lambda stoff: wahl, ungerissen=ungerissen)
+        werkstoffe, index = self.werkstoffe(wert, wahl, ungerissen=ungerissen)
         teile, bewehrung, herkunft = self.geometrie(index)
         q = Querschnitt(werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung,
                         bezug=(wert(self.id_von("y_S")), wert(self.id_von("z_S"))),
@@ -726,10 +724,10 @@ class Querschnittsanalyse(Rechenobjekt):
         jedes schreibt sich selbst, mit den Werten darin. Ohne Kriechen: die
         Parabel haengt hier an ``E_cm``.
         """
-        werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.rechenwahl)
+        werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.wahl)
         for stoff in self.baustoffe:
             gesetz_protokollieren(p, e, stoff, werkstoffe[index(stoff)].gesetz,
-                                  self.rechenwahl(stoff), basis)
+                                  self.wahl, basis)
 
     def grundbezuege(self) -> List[Eingabebezug]:
         """Was jeder Nachweis der Analyse liest: den Schwerpunkt und die Werkstoffe."""
@@ -747,7 +745,7 @@ class Querschnittsanalyse(Rechenobjekt):
         # Querschnitt und mit ihm alles, was er schon gesucht hat.
         schluessel = tuple(e.g(b.name).si for b in self.grundbezuege())
         if schluessel not in self._interaktionen:
-            werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.rechenwahl)
+            werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.wahl)
             teile, bewehrung, herkunft = self.geometrie(index)
             self._interaktionen[schluessel] = (Querschnitt(
                 werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung,
@@ -800,10 +798,10 @@ class Querschnittsanalyse(Rechenobjekt):
         def f_yd(w: Wandangabe) -> float:
             if w.stahl is None:
                 return 0.0
-            return abs(self.kennwert(e, w.stahl, self.rechenwahl(w.stahl).satz(w.stahl).stahl))
+            return abs(self.kennwert(e, w.stahl, self.wahl.satz(w.stahl).stahl))
 
         def f_cd(w: Wandangabe) -> float:
-            return abs(self.kennwert(e, w.beton, self.rechenwahl(w.beton).satz(w.beton).beton))
+            return abs(self.kennwert(e, w.beton, self.wahl.satz(w.beton).beton))
 
         return self.schubwaende(f_yd=f_yd, f_cd=f_cd, k_c=e.g("k_c").si)
 

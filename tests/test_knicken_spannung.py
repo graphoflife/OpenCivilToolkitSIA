@@ -184,7 +184,7 @@ class TestVerfehlteEbene(unittest.TestCase):
         wand.einwirkung("Feld", M_Ed=20, V_Ed=10)
         wand.quasistaendig.lastfall("Wenig Moment", M_Ed=14.5, N_Ed=-600)
         wand.quasistaendig.lastfall("Mehr Moment", M_Ed=80, N_Ed=-600)
-        wand.quasistaendig.wahl = Gebrauchswahl(rechenart=rechenart)
+        wand.quasistaendig.wahl = Gebrauchswahl(rechenarten={wand.beton: rechenart})
         aufbau, loesung = rechnen(projekt)
         return Gelaufen(aufbau.feld("spannung_riss")["q1.x"], loesung)
 

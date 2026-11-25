@@ -55,7 +55,9 @@ from opencivil.pfahl.innen import Innenbefund, biegewiderstand, querschnitt
 from opencivil.pfahl.pfahl import Kombination, Kopf, Pfahl
 from opencivil.pfahl.steifigkeit import Steifigkeitsbefund, Verlauf
 from opencivil.querschnitt.analyse import KENNWERTE, werkstoff
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
+from opencivil.querschnitt.gesetzwahl import (
+    Rechenart, Rechenarten, Rechenwahl, Werkstoffsatz, Wertesaetze,
+)
 from opencivil.querschnitt.interaktion import Querschnitt
 
 #: Der Widerstandsbeiwert quer zur Achse -- der kleinste, den die Norm zulässt.
@@ -63,7 +65,7 @@ GAMMA_M_QUER = 1.4
 GAMMA_M_QUER_REFERENZ = "SIA 267:2013, 9.5.2.3.1, (49)"
 
 #: Womit der Pfahl im Bruch biegt: charakteristische Werte, der Beton als Parabel.
-WAHL_BRUCH = Rechenwahl(art=Rechenart.PARABEL,
+WAHL_BRUCH = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL),
                         saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH))
 
 

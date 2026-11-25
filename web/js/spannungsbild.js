@@ -33,7 +33,6 @@ import { karte } from './bausteine.js';
 import { beschriftungenEntzerren } from './diagramm.js';
 import { el, svgEl } from './dom.js';
 import { span } from './mathe.js';
-import { katalog } from './zustand.js';
 
 /** Dieselbe Grösse und derselbe Rand wie das M-N-Interaktionsdiagramm. */
 const BREITE = 720;
@@ -559,11 +558,9 @@ function zahlenzeile(eintraege) {
 /** Womit gerechnet wurde: Kriechzahl, Werte (wie der Kern sie nennt), Rechenart. */
 function wahlzeile(wahl) {
   if (!wahl) return null;
-  const wahlen = katalog('rechenwahl');
-  const name = (liste, wert) => (liste || []).find((e) => e.wert === wert)?.beschriftung ?? wert;
   return el('div.sd-wahl-text', {}, [
     span('\\varphi'),
-    ` = ${wahl.phi.toFixed(2)} · ${wahl.werte} · ${name(wahlen.rechenarten, wahl.rechenart)}`,
+    ` = ${wahl.phi.toFixed(2)} · ${wahl.werte} · ${wahl.rechenart}`,
   ]);
 }
 

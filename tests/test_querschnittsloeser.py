@@ -8,7 +8,7 @@ from opencivil.core.suche import HALBIEREN, ILLINOIS, Illinois
 from opencivil.nachweis.querschnittsloeser import Stahllage, probenschranken, verfahren
 from opencivil.nachweis.rechenwahl import Betonkennwerte, Gesetze
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenarten, Rechenwahl
 from opencivil.querschnitt.werkstoffgesetz import (
     Betongesetz, Gesetz, Spannungsblock, Stahlgesetz,
 )
@@ -54,7 +54,7 @@ def plattenloeser(*, h: float, b: float, lagen, beton, eps_c2d: float = 0.003,
     Handrechnung baut denselben Querschnitt; ``f_c`` und ``E_c`` braucht nur,
     wer daraus das Gesetz baut, und das steht hier schon da.
     """
-    gesetze = Gesetze(wahl=Rechenwahl(art=Rechenart.PARABEL), beton=beton,
+    gesetze = Gesetze(wahl=Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL)), beton=beton,
                       kennwerte=Betonkennwerte(f_c=math.nan, E_c=math.nan,
                                                eps_c1d=0.002, eps_c2d=eps_c2d))
     return gesetze.loeser(h=h, b=b, lagen=lagen, suche=suche)

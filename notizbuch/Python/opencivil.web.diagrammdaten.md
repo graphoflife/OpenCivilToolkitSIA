@@ -1,5 +1,5 @@
 ---
-erzeugt: e23278b5d299
+erzeugt: 8faef6642032
 art: modul
 tags: [modul]
 ---
@@ -369,6 +369,7 @@ warum, sagt [[opencivil.web.diagrammdaten#_ohne_schub|_ohne_schub]].
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.widerstandsflaeche]]

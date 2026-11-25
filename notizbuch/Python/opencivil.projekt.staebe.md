@@ -1,5 +1,5 @@
 ---
-erzeugt: ef2de885e68b
+erzeugt: ecd940931c2e
 art: modul
 tags: [modul]
 ---
@@ -112,21 +112,14 @@ auf der gestrichelten Faser des Stabs, im Raum an der Seite +z, wo M_y
 zieht; bei einer Platte immer in x-Richtung, und `M` zieht unten
 (Benutzer, 2026-10-24). Gerechnet wie eine Momenten-Kruemmungs-Linie
 ihrer Spannung-Dehnung-Analyse, mit Kriechzahl, Werten je Material und
-Rechenart wie dort (Benutzer, 2026-10-23, je Material 2026-11-20).
+Rechenart je Beton wie dort (Benutzer, 2026-10-23, je Material
+2026-11-20, je Beton 2026-11-25).
 
 - `N: float = bereich(0.0, heisst='N für E_eq', einheit=KN)`
 - `M: float = bereich(0.0, heisst='M für E_eq', einheit=KNM)`
 - `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)`
-- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)`
-
-#### ModulEintrag.wahl
-
-```python
-def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl
-```
-
-Womit das E_eq gerechnet wird, an der Platte oder Analyse aus diesen Baustoffen.
+- `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)`
 
 ### aufgezaehlt
 
@@ -498,7 +491,6 @@ Ob eine Last ihr Vorzeichen wechselt, wenn ihre Linie umgekehrt wird.
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.wahl]]
-- [[opencivil.material.basis]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.faelle]]

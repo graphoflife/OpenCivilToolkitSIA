@@ -110,14 +110,14 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     sproede=True, zwaengung_biegung=True, duktilitaet=True, x_d_max=0.42,
                     zwaengung_biegung_kriechzahl=1.2,
                     tragsicherheit_wahl=RechenwahlEintrag(
-                        kriechzahl=1.5, rechenart="parabel",
+                        kriechzahl=1.5, rechenarten={"b1": "parabel"},
                         werkstoffsaetze={"b1": "charakteristisch", "s2": "bemessung"}),
                     knicken_wahl_verformung=KnickVerformungswahl(
                         kriechzahl=2.5, werkstoffsaetze={"b1": "charakteristisch"},
-                        rechenart="parabel"),
+                        rechenarten={"b1": "parabel"}),
                     knicken_wahl_widerstand=KnickWiderstandswahl(
                         kriechzahl=0.5, werkstoffsaetze={"s2": "charakteristisch"},
-                        rechenart="parabel"),
+                        rechenarten={"b1": "parabel"}),
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
                         durchmesser=10.0, abstand_x=250.0,
                         art_y="anzahl", anzahl_y=4.0,

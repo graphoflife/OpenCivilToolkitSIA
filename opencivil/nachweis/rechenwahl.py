@@ -283,8 +283,8 @@ def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, stoffe: Seq
     """
     Womit das Kapitel rechnet, in einer Zeile: phi (nur wo es wirkt), Werte,
     Rechenart. Rechnen alle ``stoffe`` mit demselben Wertesatz, steht er
-    einmal da, sonst je Baustoff mit seinem Namen. Zurueck kommt phi als
-    Wert -- fuer die Formeln danach.
+    einmal da, sonst je Baustoff mit seinem Namen -- ebenso die Rechenart je
+    Beton. Zurueck kommt phi als Wert -- fuer die Formeln danach.
     """
     phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
     satz = wahl.saetze.einheitlich
@@ -295,7 +295,11 @@ def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, stoffe: Seq
             rf"{als_text(f'{s.name}: {wahl.satz(s).beschriftung}')}\ "
             rf"{wahl.satz(s).beton_zeichen if s.art is Baustoffart.BETON else wahl.satz(s).stahl_zeichen}"
             for s in stoffe)
-    teile = ([angabe(phi)] if wahl.art.mit_kriechzahl else []) + [werte, wahl.art.latex]
+    art = wahl.arten.einheitlich
+    arten = (art.latex if art is not None else r",\ ".join(
+        als_text(f"{s.name}: {wahl.art_von(s).beschriftung}")
+        for s in stoffe if s.art is Baustoffart.BETON))
+    teile = ([angabe(phi)] if wahl.arten.mit_kriechzahl else []) + [werte, arten]
     p.gleichung(r" \qquad ".join(teile), titel=titel)
     return phi
 
@@ -347,13 +351,13 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
     gezeichneten Querschnitts.
     """
     phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
-    werkstoffe, index = analyse.werkstoffe(e.si_nach_id(), lambda stoff: wahl)
+    werkstoffe, index = analyse.werkstoffe(e.si_nach_id(), wahl)
     for stoff in analyse.baustoffe:
         unter = f"{basis}.{kennung_aus(stoff.id)}"
         if stoff.art is Baustoffart.BETON:
             werte = {rolle: e[stoff.eingabename(name)]
                      for rolle, name in wahl.betonkennwerte(stoff).items()}
-            if wahl.art.mit_kriechzahl:
+            if wahl.art_von(stoff).mit_kriechzahl:
                 protokoll_wirksamer_modul(p, werte["E_c"], phi, unter,
                                           titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
             werte["E_c"] = wirksamer_modul_wert(werte["E_c"], wahl.kriechzahl, unter)
@@ -367,12 +371,14 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
 def gesetze(wahl: Rechenwahl, w: Betonkennwerte, *, ungerissen: bool = False) -> Gesetze:
     """
     Die Gesetze zu einer Wahl, ``ungerissen`` mit dem ungerissenen Beton
-    (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`). Der Stahl kommt
+    (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`) -- fuer ein
+    Bauteil mit einem Beton, der Platte: seine Rechenart ist die der Wahl
+    (:attr:`~opencivil.querschnitt.gesetzwahl.Rechenwahl.art`). Der Stahl kommt
     je Lage dazu, samt seinem ``eps_ud`` -- bis 2026-10-12 rechneten die
     Stahlspannungen fest mit 4.5 %, das Knicken und die Analysen mit dem der
     ersten Lage.
     """
-    return Gesetze(wahl=wahl, beton=betongesetz(wahl, f_c=w.f_c, E_c=w.E_c,
+    return Gesetze(wahl=wahl, beton=betongesetz(wahl, wahl.art, f_c=w.f_c, E_c=w.E_c,
                                                 eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d,
                                                 ungerissen=ungerissen),
                    kennwerte=w)

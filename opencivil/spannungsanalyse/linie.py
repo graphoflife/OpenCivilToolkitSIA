@@ -33,7 +33,7 @@ from typing import (
 from opencivil.core.suche import ILLINOIS_VON_VORN
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
-from opencivil.querschnitt.gesetzwahl import Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.spannungsanalyse.art import Analyseart
 
 if TYPE_CHECKING:
@@ -224,6 +224,15 @@ class Paar(Protocol):
 
     wahl: Rechenwahl
     """Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart."""
+
+    art: Rechenart
+    """
+    Die Rechenart des Betons, dessen Gesetze die Herleitung zeigt -- bei
+    mehreren Betonen die der Ecke, die zuerst reisst.
+    """
+
+    betone: Tuple[Any, ...]
+    """Die Betone des Querschnitts, jeder einmal -- fuer die Rechenart je Beton in Worten."""
 
     ids: Mapping[str, str]
     """Kurzname -> Wert-ID der Eingaben, fuer die Herleitung."""
@@ -482,7 +491,7 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
             kraft=kraft, verformung=verformung, gerissen=True,
             verformung_I=weg.verformung_I(kraft) if kraft <= riss else None,
             verformung_II=verformung))
-    if paar.wahl.art.mit_block:
+    if paar.wahl.arten.mit_block:
         linie.hinweisen(
             f"Mit der {BLOCKANTEIL}·x-Vereinfachung trägt der Beton unter "
             f"{1.0 - BLOCKANTEIL:.2f}·ε_c2d nichts: über dem Riss ist die Linie "

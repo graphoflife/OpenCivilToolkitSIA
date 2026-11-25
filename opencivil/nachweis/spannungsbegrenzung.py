@@ -100,7 +100,9 @@ from opencivil.nachweis.mindestbewehrung import (
 from opencivil.nachweis.querschnittsloeser import (
     Ebene, Faserloeser, protokoll_verfahren, protokoll_wirksamer_modul,
 )
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
+from opencivil.querschnitt.gesetzwahl import (
+    Rechenart, Rechenarten, Rechenwahl, Werkstoffsatz, Wertesaetze,
+)
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, betonbezuege, bezuege_vereinen, gesetze, lagenbezuege, protokoll_gesetze,
     protokoll_rechenwahl, staehle, stahlbezuege, stahllagen,
@@ -117,7 +119,7 @@ from opencivil.querschnitt.platte import Richtung
 #: (SIA 262:2025, 4.4.1.2): beim Stahl gibt es nur f_yk, beim Beton laege
 #: f_cm hoeher als f_ck -- f_ck liegt sicher (``notizbuch/Notizen/TODO.md``).
 VORGABE = Rechenwahl(saetze=Wertesaetze.alle(Werkstoffsatz.CHARAKTERISTISCH),
-                     art=Rechenart.PARABEL)
+                     arten=Rechenarten.alle(Rechenart.PARABEL))
 
 
 @dataclass(frozen=True)
@@ -190,7 +192,7 @@ def protokoll_festlegungen(p: Protokoll, wahl: Rechenwahl) -> None:
             "mit f_yd hat sein Plateau dort: eine Stahlspannung darüber gibt es "
             "bei ihm nicht, und eine Grenze darüber kann nicht überschritten werden."
         )
-    if wahl.art.mit_block:
+    if wahl.arten.mit_block:
         p.erklaerung(
             "Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε_c2d "
             "nichts. Unter Gebrauchslast liegt die Druckresultierende damit "
@@ -512,7 +514,7 @@ class PlattenStellen(Stahlspannungsort):
 
     def protokoll_vor_den_grenzen(self, p: Protokoll, e: Eingaben, zustand: _Plattenzustand,
                                   wahl: Rechenwahl, phi: Wert, basis: str) -> None:
-        if wahl.art.mit_kriechzahl:
+        if wahl.arten.mit_kriechzahl:
             protokoll_wirksamer_modul(p, e["E_cm"], phi, basis,
                                       titel="Wirksamer Elastizitätsmodul")
 
@@ -660,7 +662,7 @@ class Spannungsbegrenzung(Teilnachweis):
         erg.konvergiert = ebene.konvergiert
         if not ebene.konvergiert:
             erg.begruendung = (
-                self.wahl.art.ohne_ebene if ebene.verfehlt else self.ort.keine_ebene(fall))
+                self.wahl.arten.ohne_ebene if ebene.verfehlt else self.ort.keine_ebene(fall))
             return erg
 
         erg.ausgang = self._vergleich(erg, grenzen)

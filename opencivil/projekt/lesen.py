@@ -202,7 +202,9 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     Feldes kennt erst die Maske.
 
     Haelt ein Feld je Material eine Wahl (:func:`je_material`), steht dort,
-    was ein Material ohne eigene waehlt: ``vorgabe``.
+    was ein Material ohne eigene waehlt: ``vorgabe`` -- und ist die Wahl
+    begrenzt, was sie annehmen kann, in ihrer Folge: ``wahl``. Danach
+    stellt die Maske die Rechenart je Beton, mit ihren Stellungen.
 
     Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
     des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
@@ -218,6 +220,8 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
             angabe["ganz"] = True
         if "je_material" in f.metadata:
             angabe["vorgabe"] = f.metadata["je_material"]
+            if "wahl" in f.metadata:
+                angabe["wahl"] = [m.value for m in f.metadata["wahl"]]
         if angabe:
             angaben[f.name] = angabe
     for name, b in bereiche.items():

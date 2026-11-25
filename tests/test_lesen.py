@@ -145,7 +145,7 @@ class TestVorgaben(unittest.TestCase):
         roh = platte_roh(knicken_wahl_verformung={"kriechzahl": 1.5})
         wahl = Projekt.aus_dict(roh).querschnitt("q1").knicken_wahl_verformung
         self.assertEqual(wahl, KnickVerformungswahl(kriechzahl=1.5))
-        self.assertIs(wahl.rechenart, Rechenart.PARABEL)
+        self.assertIs(wahl.von("rechenarten", "b1"), Rechenart.PARABEL)
 
     def test_eine_teilweise_gebrauchsliste_behaelt_ihren_anteil(self):
         roh = platte_roh(quasistaendig={"aus_tragsicherheit": True})
@@ -463,9 +463,9 @@ class TestNichtsStill(unittest.TestCase):
                 ProjektFehler, "werkstoffsaetze 'b1': 'mittel' gibt es als 'werkstoffsaetze' nicht"):
             p.pruefen()
         a.werkstoffsaetze = {}
-        a.betongesetze = {"b1": "handrechnung"}
-        with self.assertRaisesRegex(ProjektFehler, "'handrechnung' gibt es als 'betongesetze' "
-                                                   "nicht. Möglich sind: parabel, block"):
+        a.rechenarten = {"b1": "handrechnung"}
+        with self.assertRaisesRegex(ProjektFehler, "'handrechnung' gibt es als 'rechenarten' "
+                                                   "nicht. Möglich sind: block, parabel"):
             p.pruefen()
 
     def test_zwei_lastfaelle_mit_derselben_kennung_im_rahmen(self):

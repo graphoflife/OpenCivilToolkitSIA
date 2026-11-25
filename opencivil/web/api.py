@@ -49,7 +49,7 @@ from opencivil.projekt.decke import VORSILBEN as DECKENVORSILBEN
 from opencivil.projekt.aufbau.kern import kennwertbereich, materialgrund
 from opencivil.projekt.lesen import eintragsklassen, feldangaben, katalogname, wahl_von
 from opencivil.projekt.projekt import APPLISTEN, Projekt
-from opencivil.projekt.querschnittsanalyse import SCHNITTE, QuerschnittsanalyseEintrag
+from opencivil.projekt.querschnittsanalyse import SCHNITTE
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.platte import BREITE_Y_MM
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
@@ -59,9 +59,7 @@ from opencivil.querschnitt.geometrie import (
 )
 from opencivil.querschnitt.vorlagen import RANDABSTAND, VORLAGEN
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import (
-    FASERARTEN, RECHENARTEN, VERFORMUNGSARTEN,
-)
+from opencivil.nachweis.rechenwahl import RECHENARTEN
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk.rechnung import Balkensystem
 from opencivil.stabwerk3d.rechnung import Balkensystem3d
@@ -99,12 +97,6 @@ _VERSCHMIERUNGEN = {
     "flaeche": ("Stahlfläche", "Die Stahlfläche der ganzen Linie, von Hand"),
     "staebe": ("⌀ und Teilung", "Stäbe ⌀ im Abstand s über die Länge L, verschmiert: L/s · π⌀²/4"),
 }
-#: Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche
-#: es gibt, steht am Feld der Betongesetze je Beton.
-_BETONGESETZE = [
-    {"wert": a.value, "beschriftung": a.beschriftung, "kurz": a.kurz}
-    for a in wahl_von(QuerschnittsanalyseEintrag, "betongesetze")
-]
 #: Wie die Aufteilungen einer Decke heissen: kurz im Schalter, lang in seinem
 #: Titel. Die Regel dahinter steht in :mod:`opencivil.decke.aufteilung`.
 #: Wie die Ergebnisbilder einer Decke heissen: kurz im Schalter, lang ueber
@@ -311,7 +303,6 @@ def katalog() -> dict:
             "verschmierungen": [{"wert": wert, "beschriftung": _VERSCHMIERUNGEN[wert][0],
                                  "titel": _VERSCHMIERUNGEN[wert][1]} for wert in VERSCHMIERT],
             "werkstoffsaetze": _WERKSTOFFSAETZE,
-            "betongesetze": _BETONGESETZE,
             "schnitte": list(SCHNITTE),
             # Die Seiten, die ein positives Moment einer Analyse zieht -- und
             # wie dann ihre Raender heissen: der gedrueckte, der gezogene.
@@ -346,15 +337,13 @@ def katalog() -> dict:
             # Laufmeter, nicht auf b -- fuer den Kopf des Fensters.
             "breite_y": BREITE_Y_MM,
         },
-        # Was ein Nachweis-Kapitel und eine Analyse waehlen: Wertesatz und
-        # Rechenart -- das Knicken, die Analysen und die Stahlspannungen des
-        # gezeichneten Querschnitts ohne Handrechnung, die Verformung beim
-        # Knicken nur praezise.
+        # Was ein Nachweis-Kapitel und eine Analyse waehlen: je Material den
+        # Wertesatz, je Beton die Rechenart. Welche Arten ein Kapitel
+        # anbietet, sagt sein Feld (`felder`, `wahl`); hier stehen sie alle
+        # mit Namen und Bild.
         "rechenwahl": {
             "werkstoffsaetze": _WERKSTOFFSAETZE,
             "rechenarten": _rechenarten(RECHENARTEN),
-            "faserarten": _rechenarten(FASERARTEN),
-            "verformungsarten": _rechenarten(VERFORMUNGSARTEN),
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei

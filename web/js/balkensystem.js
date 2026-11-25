@@ -508,7 +508,7 @@ function querschnittFenster(system, kennung) {
         ? 'Moment, bei dem E_eq gilt – bei einer Platte in x-Richtung mit Zug unten, nicht negativ'
         : 'Moment, bei dem E_eq gilt – positiv zieht es unten, an der gestrichelten Faser'),
       rechenwahlZeile('Rechenwerte wie in der Analyse', q.eq, eq, {
-        arten: 'faserarten', phiImmer: true, werkstoffe: { ...werkstoffeDerQuelle(q), klasse: 'modul' },
+        phiImmer: true, werkstoffe: { ...werkstoffeDerQuelle(q), klasse: 'modul' },
       }),
     );
   }

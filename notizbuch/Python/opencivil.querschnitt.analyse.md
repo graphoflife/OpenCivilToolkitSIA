@@ -1,5 +1,5 @@
 ---
-erzeugt: 326ea94c121b
+erzeugt: c498c974a500
 art: modul
 tags: [modul]
 ---
@@ -46,7 +46,7 @@ Ein Baustoff als Werkstoff der Interaktion -- die eine Stelle, die ihn
 baut, fuer den gezeichneten Querschnitt und den Pfahl. `wert` liefert
 zu einer Wert-ID die Zahl in SI.
 
-Beton: das Gesetz der Wahl, gebaut wie bei der Platte
+Beton: das Gesetz seiner Rechenart, gebaut wie bei der Platte
 ([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), der Beiwert der
 Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
 Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
@@ -300,14 +300,6 @@ def angaben(self) -> Tuple[GleichungBlock, TabellenBlock]
 
 Was ueber der Nachweistabelle steht: Werkstoffe, Flaeche, Schwerpunkt; die Bewehrung.
 
-#### Querschnittsanalyse.rechenwahl
-
-```python
-def rechenwahl(self, stoff: Baustoff) -> Rechenwahl
-```
-
-Womit dieser Baustoff rechnet -- der Aufbau gibt jedem seine Wahl mit.
-
 #### Querschnittsanalyse.werkstoffbezuege
 
 ```python
@@ -325,13 +317,13 @@ def kennwert(self, e: Eingaben, stoff: Baustoff, kennwert: str) -> float
 #### Querschnittsanalyse.werkstoffe
 
 ```python
-def werkstoffe(self, wert: Callable[[str], float], wahl: Callable[[Baustoff], Rechenwahl], *, ungerissen: bool=False) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]
+def werkstoffe(self, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]
 ```
 
 Die Werkstoffe des Querschnitts, je Baustoff einer ([[opencivil.querschnitt.analyse#werkstoff|werkstoff]]).
-`wert` liefert zu einer Wert-ID die Zahl in SI; `wahl` je Baustoff
-seine Rechenwahl: im Bruchzustand die des Baustoffs
-([[opencivil.querschnitt.analyse#Querschnittsanalyse.rechenwahl|rechenwahl]]), fuer Spannungen und Knicken die des Kapitels.
+`wert` liefert zu einer Wert-ID die Zahl in SI; `wahl` ist die
+Rechenwahl: im Bruchzustand die der Analyse ([[opencivil.querschnitt.analyse#Querschnittsanalyse|wahl]]), fuer
+Spannungen und Knicken die des Kapitels.
 
 #### Querschnittsanalyse.querschnitt
 
@@ -339,8 +331,8 @@ seine Rechenwahl: im Bruchzustand die des Baustoffs
 def querschnitt(self, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[Querschnitt, List[Bewehrungselement], Dict[int, Stahlgesetz]]
 ```
 
-Der Querschnitt mit den Gesetzen einer Rechenwahl, fuer jeden Werkstoff
-dieselbe -- dazu je Bewehrung ihr Element und je Stahl sein Gesetz,
+Der Querschnitt mit den Gesetzen einer Rechenwahl -- dazu je
+Bewehrung ihr Element und je Stahl sein Gesetz,
 nach dem Index des Werkstoffs. `wert` liefert zu einer Wert-ID die
 Zahl in SI. Zerlegt in so viele Streifen, wie die Platte Fasern hat
 ([[opencivil.querschnitt.fasern#Konstanten|FASERN]]).

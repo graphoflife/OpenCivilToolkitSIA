@@ -15,13 +15,19 @@ import unittest
 
 from opencivil import spannungsanalyse as sa
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock, TitelBlock
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
+from opencivil.querschnitt.gesetzwahl import (
+    Rechenart, Rechenarten, Rechenwahl, Werkstoffsatz, Wertesaetze,
+)
 from opencivil.projekt import (
     Projekt, ProjektFehler, RechenwahlEintrag, SpannungsfallEintrag,
 )
 from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web import dienst
+
+
+#: Jeder Beton praezise -- die Wahl, mit der die Bilder hier suchen.
+PRAEZISE = Rechenarten.alle(Rechenart.PARABEL)
 
 
 def rechnen(projekt=None):
@@ -45,7 +51,8 @@ def loeserpaar(projekt=None, *, kriechzahl=2.0, satz=Werkstoffsatz.BEMESSUNG,
     aufbau, loesung = rechnen(projekt)
     return sa.loeserpaar(aufbau.querschnitte["q1"], Richtung.X,
                          lambda kid: loesung.werte[kid].groesse.si,
-                         wahl=Rechenwahl(kriechzahl, Wertesaetze.alle(satz), art))
+                         wahl=Rechenwahl(kriechzahl, Wertesaetze.alle(satz),
+                                         Rechenarten.alle(art)))
 
 
 def platte(name, **felder):
@@ -77,13 +84,13 @@ class TestVerfehlteEbene(unittest.TestCase):
 
     def test_das_bild_sagt_es(self):
         bild = sa.aus_schnittgroessen(self.paar.ebenen().gerissen, N=-1500e3, M=10e3,
-                                      art=self.paar.wahl.art)
+                                      arten=self.paar.wahl.arten)
         self.assertFalse(bild.konvergiert)
         self.assertEqual(bild.hinweis, Rechenart.BLOCK.ohne_ebene)
 
     def test_mit_mehr_moment_gibt_es_das_bild(self):
         bild = sa.aus_schnittgroessen(self.paar.ebenen().gerissen, N=-1500e3, M=200e3,
-                                      art=self.paar.wahl.art)
+                                      arten=self.paar.wahl.arten)
         self.assertTrue(bild.konvergiert)
         self.assertAlmostEqual(bild.N, -1500e3, delta=1.0)
 
@@ -102,7 +109,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
     def test_die_ebene_erzeugt_die_eingegebenen_schnittgroessen(self):
         """Die Probe -- dieselbe, die auch in den Herleitungen steht."""
         for N, M in ((0.0, 150e3), (-500e3, 120e3), (200e3, 60e3), (0.0, -60e3)):
-            bild = sa.aus_schnittgroessen(self.suche, N=N, M=M, art=Rechenart.PARABEL)
+            bild = sa.aus_schnittgroessen(self.suche, N=N, M=M, arten=PRAEZISE)
             with self.subTest(N=N / 1e3, M=M / 1e3):
                 self.assertTrue(bild.konvergiert)
                 self.assertAlmostEqual(bild.N, N, delta=max(500.0, abs(N) * 1e-4))
@@ -113,7 +120,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         Aus N und M eine Ebene, aus deren Randdehnungen wieder N und M. Das
         ist die Zusage, die die beiden Richtungen überhaupt verbindet.
         """
-        hin = sa.aus_schnittgroessen(self.suche, N=-300e3, M=140e3, art=Rechenart.PARABEL)
+        hin = sa.aus_schnittgroessen(self.suche, N=-300e3, M=140e3, arten=PRAEZISE)
         zurueck = sa.aus_dehnungen(
             self.gerissen,
             eps_oben=hin.beton[0].eps, eps_unten=hin.beton[-1].eps)
@@ -127,7 +134,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         z = 0 ist die Oberkante -- dieselbe Achse wie im Lagenaufbau. Wäre sie
         gedreht, stünde das Bild kopf und passte nicht zum Nachweis daneben.
         """
-        bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=150e3, art=Rechenart.PARABEL)
+        bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=150e3, arten=PRAEZISE)
         oben, unten = bild.beton[0], bild.beton[-1]
         self.assertEqual(oben.z, 0.0)
         self.assertGreater(unten.z, oben.z)
@@ -140,13 +147,13 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         self.assertGreater(erste.sigma, 0.0)
 
     def test_der_beton_traegt_keinen_zug(self):
-        bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=150e3, art=Rechenart.PARABEL)
+        bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=150e3, arten=PRAEZISE)
         gezogen = [f for f in bild.beton if f.eps > 0]
         self.assertTrue(gezogen)
         self.assertTrue(all(f.sigma == 0.0 for f in gezogen))
 
     def test_die_nulllinie_liegt_zwischen_den_raendern(self):
-        bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=150e3, art=Rechenart.PARABEL)
+        bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=150e3, arten=PRAEZISE)
         self.assertIsNotNone(bild.nulllinie)
         self.assertGreater(bild.nulllinie, 0.0)
         self.assertLess(bild.nulllinie, self.gerissen.h)
@@ -172,7 +179,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         self.assertGreater(abs(unten.kraft), abs(oben.kraft))
 
     def test_eine_unmoegliche_kombination_sagt_das(self):
-        bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=5000e3, art=Rechenart.PARABEL)
+        bild = sa.aus_schnittgroessen(self.suche, N=0.0, M=5000e3, arten=PRAEZISE)
         self.assertFalse(bild.konvergiert)
         self.assertIn("Gleichgewichtslage", bild.hinweis)
 
@@ -330,7 +337,7 @@ class TestMomentenKruemmung(unittest.TestCase):
         def randspannung(N):
             bild = sa.aus_schnittgroessen(self.paar.ebenen().ungerissen, N=N,
                                           M=self.paar.rissmoment_bei(N),
-                                          art=self.paar.wahl.art)
+                                          arten=self.paar.wahl.arten)
             return bild.beton[-1].sigma
         ohne = randspannung(0.0)
         for N in (-200e3, 100e3):
@@ -388,7 +395,7 @@ class TestGegenDieHandrechnung(unittest.TestCase):
         eckwert = aufbau.feld("nachweise")["q1.x"].d_eckwerte["M_Rd_N0_pos"]
         paar = sa.loeserpaar(aufbau.querschnitte["q1"], Richtung.X,
                              lambda kid: loesung.werte[kid].groesse.si,
-                             wahl=Rechenwahl(art=art))
+                             wahl=Rechenwahl(arten=Rechenarten.alle(art)))
         return (sa.moment_kruemmung(paar, N=0.0).bruch.kraft,
                 loesung.werte[eckwert.id].groesse.si)
 
@@ -410,7 +417,8 @@ class TestGegenDieHandrechnung(unittest.TestCase):
         """
         def m_rd_negativ(rechenart):
             projekt = Projekt.beispiel()
-            projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(rechenart=rechenart)
+            projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(
+                rechenarten={"b1": rechenart})
             aufbau, loesung = rechnen(projekt)
             eckwert = aufbau.feld("nachweise")["q1.x"].d_eckwerte["M_Rd_N0_neg"]
             return -loesung.werte[eckwert.id].groesse.si / 1e3
@@ -424,8 +432,8 @@ class TestGegenDieHandrechnung(unittest.TestCase):
         rechnet N Ebene fuer Ebene genau. Eine Datei, die sie noch waehlt,
         nennt die Wahl -- umgedeutet wird sie nicht mehr.
         """
-        with self.assertRaisesRegex(ProjektFehler, "'handrechnung' gibt es als 'rechenart' nicht"):
-            SpannungsfallEintrag.aus_dict({"name": "x", "rechenart": "handrechnung"})
+        with self.assertRaisesRegex(ProjektFehler, "'handrechnung' gibt es als 'rechenarten' nicht"):
+            SpannungsfallEintrag.aus_dict({"name": "x", "rechenarten": {"b1": "handrechnung"}})
 
 
 class TestEndeIstTragwiderstand(unittest.TestCase):
@@ -452,7 +460,7 @@ class TestEndeIstTragwiderstand(unittest.TestCase):
                 for satz in ("bemessung", "charakteristisch"):
                     q = projekt.platte(f"{art} {phi} {satz}", h=300, x=[18, 12],
                                        x_zulage=[12, 0], y=[12, 12])
-                    wahl = dict(kriechzahl=phi, rechenart=art,
+                    wahl = dict(kriechzahl=phi, rechenarten={q.beton: art},
                                 werkstoffsaetze={kennung: satz for kennung in q.materialien()})
                     q.tragsicherheit_wahl = RechenwahlEintrag(**wahl)
                     q.einwirkung("Druck", M_Ed=50.0, N_Ed=-300.0)
@@ -518,7 +526,7 @@ class TestWahl(unittest.TestCase):
         projekt.querschnitte[0].spannungsfall("neu", art="moment_kruemmung")
         analyse = projekt.rechnen().analysen()["q1"][0]
         self.assertEqual(analyse.paar.wahl, Rechenwahl(
-            0.0, Wertesaetze.alle(Werkstoffsatz.BEMESSUNG), Rechenart.PARABEL))
+            0.0, Wertesaetze.alle(Werkstoffsatz.BEMESSUNG), PRAEZISE))
 
     def test_die_kriechzahl_der_analyse_gilt(self):
         """Ohne Kriechen ist der Beton steifer, und die Linie krümmt sich weniger."""
@@ -542,7 +550,7 @@ class TestWahl(unittest.TestCase):
         60 kNm gab es keine Gleichgewichtslage. Bis 2026-10-09.
         """
         k = loeserpaar(satz=Werkstoffsatz.CHARAKTERISTISCH)
-        bild = sa.aus_schnittgroessen(k.ebenen().gerissen, N=0.0, M=60e3, art=k.wahl.art)
+        bild = sa.aus_schnittgroessen(k.ebenen().gerissen, N=0.0, M=60e3, arten=k.wahl.arten)
         self.assertTrue(bild.konvergiert)
         self.assertAlmostEqual(max(s.sigma for s in bild.stahl) / 1e6, 114.7, delta=0.1)
 
@@ -555,16 +563,16 @@ class TestWahl(unittest.TestCase):
         ]
         faelle = Projekt.aus_dict(roh).querschnitte[0].spannungsfaelle
         self.assertEqual([f.kriechzahl for f in faelle], [0.0, 0.5])
-        self.assertEqual([f.rechenart for f in faelle], ["parabel", "parabel"])
+        self.assertEqual([f.von("rechenarten", "b1") for f in faelle], ["parabel", "parabel"])
 
     def test_was_es_nicht_gibt_meldet_sich(self):
         for feld, wert in (("art", "kreis"), ("werkstoffsaetze", {"b1": "mittel"}),
-                           ("rechenart", "dreieck"), ("betongesetz", "dreieck")):
+                           ("rechenarten", {"b1": "dreieck"}), ("rechenart", "parabel")):
             with self.subTest(feld=feld):
                 with self.assertRaises(ProjektFehler):
                     SpannungsfallEintrag.aus_dict({"name": "x", feld: wert})
         with self.assertRaises(ProjektFehler):
-            Projekt.beispiel().querschnitte[0].spannungsfall("x", rechenart="dreieck")
+            Projekt.beispiel().querschnitte[0].spannungsfall("x", rechenarten={"b1": "dreieck"})
 
     def test_eine_negative_kriechzahl_meldet_sich_vor_dem_rechnen(self):
         """Lesen geht -- die Form stimmt; der Bereich zählt vor dem Rechnen."""
@@ -830,7 +838,7 @@ class TestUeberDenDienst(unittest.TestCase):
                                  eps_oben=-1.5, eps_unten=3.0),
             SpannungsfallEintrag(name="C", art="moment_kruemmung", N_Ed=-200.0),
             SpannungsfallEintrag(name="D", art="normalkraft_dehnung", M_Ed=20.0,
-                                 kriechzahl=1.0, rechenart="block"))
+                                 kriechzahl=1.0, rechenarten={"b1": "block"}))
         self.assertEqual(antwort.status, 200)
         faelle = antwort.daten["spannungsanalysen"]["q1"]
         self.assertEqual([f["name"] for f in faelle], ["A", "B", "C", "D"])
@@ -848,7 +856,8 @@ class TestUeberDenDienst(unittest.TestCase):
         self.assertLess(kurve["fliessen"]["kraft"], kurve["bruch"]["kraft"])
         self.assertIn("massgebend", kurve["bruch"])
         self.assertEqual(faelle[2]["wahl"], {"phi": 0.0, "werte": "Bemessungswerte",
-                                             "rechenart": "parabel", "index": "Rd"})
+                                             "rechenart": "Präzise ohne Vereinfachung",
+                                             "index": "Rd"})
         # Die N-ε-Linie in kN und Promille: N_Riss(20 kNm) mit k_t für die
         # ganze Dicke, 2.9/1.15 N/mm² · 1000 · 300 mm² − 6·20/0.3 = 356.5 kN.
         kurve = faelle[3]["kurve"]
@@ -856,7 +865,7 @@ class TestUeberDenDienst(unittest.TestCase):
                                delta=0.1)
         self.assertGreater(kurve["bruch"]["verformung"], 1.0)
         self.assertEqual(faelle[3]["wahl"]["phi"], 1.0)
-        self.assertEqual(faelle[3]["wahl"]["rechenart"], "block")
+        self.assertEqual(faelle[3]["wahl"]["rechenart"], "0.85·x-Vereinfachung")
 
     def test_ein_ausgeschalteter_fall_wird_nicht_gerechnet(self):
         antwort = self.antwort(

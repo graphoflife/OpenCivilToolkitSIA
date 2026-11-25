@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e3d8319cfb6
+erzeugt: ae902a960953
 art: modul
 tags: [modul]
 ---
@@ -348,14 +348,16 @@ eigenen Fall zu erkennen. `70.0` wird zu «70 %», `62.5` zu «62.5 %».
 class JeMaterial
 ```
 
-Was die Werte je Material waehlt (Benutzer, 2026-11-20): im Feld
-`werkstoffsaetze` ([[opencivil.projekt.lesen#je_material|je_material]]) je
-Kennung eines Materials sein Wertesatz. Ein Material ohne eigene Wahl
-rechnet mit der Vorgabe des Feldes -- die Stahlspannungen
-charakteristisch, alles andere mit Bemessungswerten. Fuer die Rechnung
-wird daraus je Baustoff des Bauteils sein Satz ([[opencivil.projekt.eintraege#JeMaterial.wertesaetze|wertesaetze]]).
-Bis dahin waehlte nur die Querschnittsanalyse je Material, jedes andere
-Kapitel einen Satz fuer alle.
+Was je Material waehlt ([[opencivil.projekt.lesen#je_material|je_material]]):
+im Feld `werkstoffsaetze` je Kennung eines Materials sein Wertesatz
+(Benutzer, 2026-11-20), im Feld `rechenarten` je Beton seine
+Rechenart (Benutzer, 2026-11-25). Ein Material ohne eigene Wahl rechnet
+mit der Vorgabe des Feldes -- die Stahlspannungen etwa charakteristisch
+und praezise. Fuer die Rechnung wird daraus die Wahl an einem Bauteil
+([[opencivil.projekt.eintraege#JeMaterial.wahl|wahl]]), mit der `kriechzahl` des Eintrags. Bis 2026-11-20
+waehlte nur die Querschnittsanalyse je Material, jedes andere Kapitel
+einen Wertesatz fuer alle; bis 2026-11-25 galt ausser in ihrer
+Tragsicherheit eine Rechenart fuer alle Betone.
 
 #### JeMaterial.von
 
@@ -365,13 +367,15 @@ def von(self, feld: str, material: str) -> Any
 
 Die Wahl eines Materials in diesem Feld -- die Vorgabe des Feldes, wenn es keine eigene hat.
 
-#### JeMaterial.wertesaetze
+#### JeMaterial.wahl
 
 ```python
-def wertesaetze(self, stoffe: Mapping[str, Baustoff]) -> Wertesaetze
+def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl
 ```
 
-Je Baustoff eines Bauteils -- `stoffe` nach ihrer Kennung im Projekt -- sein Wertesatz.
+Womit an einem Bauteil aus diesen Baustoffen gerechnet wird --
+`stoffe` nach ihrer Kennung im Projekt: je Baustoff sein Wertesatz,
+je Beton seine Rechenart; ein Stahl hat keine.
 
 ### SpannungsfallEintrag
 
@@ -388,8 +392,8 @@ der einen oder der anderen Seite -- aus Schnittgroessen, aus Dehnungen,
 als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
 
 Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, je
-Material den Wertesatz ([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]]) und die Rechenart
-([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]).
+Material den Wertesatz und je Beton die Rechenart ([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]],
+[[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]).
 
 - `IM_ORT = 'Diagramm'`
 - `name: str`
@@ -401,16 +405,8 @@ Material den Wertesatz ([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]]) u
 - `eps_unten: float = bereich(2.0, heisst='ε unten', einheit=PROMILLE)` – Die Randdehnungen.
 - `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl φ dieser Analyse.
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)` – Je Material `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
-- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)` – `block` oder `parabel` -- siehe [[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
+- `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, FASERARTEN)` – Je Beton `block` oder `parabel` -- siehe [[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
 - `aktiv: bool = True`
-
-#### SpannungsfallEintrag.wahl
-
-```python
-def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl
-```
-
-Womit die Analyse an einem Bauteil aus diesen Baustoffen rechnet ([[opencivil.projekt.eintraege#JeMaterial.wertesaetze|JeMaterial.wertesaetze]]).
 
 ### spannungsfallnamen
 
@@ -449,7 +445,7 @@ class RechenwahlEintrag(Beschreibung, JeMaterial)
 ```
 
 Womit ein Nachweis-Kapitel rechnet: Kriechzahl, je Material der
-Wertesatz ([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]]), Rechenart -- siehe
+Wertesatz und je Beton die Rechenart ([[opencivil.projekt.eintraege#JeMaterial|JeMaterial]]) -- siehe
 [[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]. So steht sie in
 der Tragsicherheit.
 
@@ -461,15 +457,7 @@ Die Kriechzahl des Vergroesserungsfaktors gehoert dem Verformungsnachweis
 
 - `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.BEMESSUNG)`
-- `rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.HANDRECHNUNG)`
-
-#### RechenwahlEintrag.wahl
-
-```python
-def wahl(self, stoffe: Mapping[str, Baustoff]) -> Rechenwahl
-```
-
-Was der Kern daraus rechnet, an einem Bauteil aus diesen Baustoffen ([[opencivil.projekt.eintraege#JeMaterial.wertesaetze|JeMaterial.wertesaetze]]).
+- `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.HANDRECHNUNG, RECHENARTEN)`
 
 ### Gebrauchswahl
 
@@ -481,7 +469,7 @@ class Gebrauchswahl(RechenwahlEintrag)
 Die Stahlspannungen: praezise, mit charakteristischen Werten -- die Rechenarten der Tragsicherheit.
 
 - `werkstoffsaetze: Dict[str, Werkstoffsatz] = je_material(Werkstoffsatz.CHARAKTERISTISCH)`
-- `rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.PARABEL)`
+- `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, RECHENARTEN)`
 
 ### KnickVerformungswahl
 
@@ -492,7 +480,7 @@ class KnickVerformungswahl(RechenwahlEintrag)
 
 Die Ausmitte e_2d beim Knicken: nur praezise ohne Vereinfachung.
 
-- `rechenart: Rechenart = einer_von(VERFORMUNGSARTEN, Rechenart.PARABEL)`
+- `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.PARABEL, VERFORMUNGSARTEN)`
 
 ### KnickWiderstandswahl
 
@@ -505,7 +493,7 @@ Der Widerstand beim Knicken: ueber die Fasern, vorgegeben die
 0.85·x-Vereinfachung. Bis 2026-10-12 war es die Handrechnung, die es
 dort nicht mehr gibt; die Vereinfachung kommt ihr am naechsten.
 
-- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.BLOCK)`
+- `rechenarten: Dict[str, Rechenart] = je_material(Rechenart.BLOCK, FASERARTEN)`
 
 ### Gebrauchsliste
 
@@ -529,7 +517,7 @@ das Feld der Platte, in dem sie steht; die Liste selbst weiss es nicht.
 Der gezeichnete Querschnitt hat dieselbe Liste mit anderen Faellen
 ([[opencivil.projekt.querschnittsanalyse#QAGebrauchsliste|QAGebrauchsliste]]): was
 darin steht ([[opencivil.projekt.eintraege#Gebrauchsliste|FALL]]), welche Rechenarten sie anbietet (der Typ
-ihres Feldes [[opencivil.projekt.eintraege#Gebrauchsliste|wahl]]) und wie ihr Bauteil heisst, wo ein Fall ohne
+ihres Feldes [[opencivil.projekt.eintraege#JeMaterial.wahl|wahl]]) und wie ihr Bauteil heisst, wo ein Fall ohne
 Bauteil gelesen wird ([[opencivil.projekt.eintraege#Gebrauchsliste|BAUTEIL]]).
 
 - `FALL = GebrauchsfallEintrag`

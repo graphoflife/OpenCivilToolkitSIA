@@ -42,7 +42,7 @@ SI-Basis wie im ganzen Querschnittsmodul.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Optional, Tuple
 
 from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -52,6 +52,7 @@ from opencivil.nachweis.rissgroessen import (
     protokoll_ecke, protokoll_spannung_ungerissen, protokoll_widerstandsmoment,
     protokoll_zugfestigkeit, rissnormalkraft,
 )
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.zugseite import Zugseite
 
 if TYPE_CHECKING:
@@ -67,9 +68,10 @@ class Bruttoriss:
 
     Das Paar gibt den Bruttoquerschnitt (``brutto``) mit seinem Rissmoment
     unter reiner Biegung (``riss``), seine Flaeche ``A``, die rissaktive
-    Dicke unter Zug (``t_zug``), die Zugseite (``seite``) und den gerissenen
-    Loeser (``gerissen``) -- und zwei Stuecke Herleitung, die nur es kennt:
-    :meth:`herleitung_bruttoquerschnitt` und :meth:`herleitung_dicke_unter_zug`.
+    Dicke unter Zug (``t_zug``), die Zugseite (``seite``), den gerissenen
+    Loeser (``gerissen``) und seine Wahl (``wahl``) -- und zwei Stuecke
+    Herleitung, die nur es kennt: :meth:`herleitung_bruttoquerschnitt` und
+    :meth:`herleitung_dicke_unter_zug`.
     """
 
     brutto: Bruttoquerschnitt
@@ -78,6 +80,7 @@ class Bruttoriss:
     t_zug: float
     seite: Zugseite
     gerissen: Faserloeser
+    wahl: Rechenwahl
 
     #: Was die Erklaerung der festen Nulllinie ueber das Moment um die andere
     #: Achse sagt -- beim gezeichneten Querschnitt ist «einachsig» eine Wahl;
@@ -88,6 +91,19 @@ class Bruttoriss:
     DICKE_UNTER_ZUG = ""
 
     # -- Die Rechnung ------------------------------------------------------------
+
+    @property
+    def art(self) -> Rechenart:
+        """
+        Die Rechenart des Betons der Ecke, die zuerst reisst: seine Kennwerte
+        und sein Gesetz zeigt die Herleitung. Die Platte hat nur ihn.
+        """
+        return self.wahl.art_von(self.riss.ecke.stoff)
+
+    @property
+    def betone(self) -> Tuple[Any, ...]:
+        """Die Betone des Querschnitts, jeder einmal -- aus den Ecken des Bruttoquerschnitts."""
+        return tuple({e.stoff.id: e.stoff for e in self.brutto.ecken}.values())
 
     @property
     def einachsig(self) -> bool:

@@ -55,9 +55,9 @@ class TestBeschreibung(unittest.TestCase):
         a = self.neu()
         self.assertEqual(a.materialien(), ["b1", "s1"])
         # Ohne eigene Wahl die Vorgabe: Bemessungswerte und die Parabel.
-        self.assertEqual((a.werkstoffsaetze, a.betongesetze), ({}, {}))
+        self.assertEqual((a.werkstoffsaetze, a.rechenarten), ({}, {}))
         self.assertEqual(a.von("werkstoffsaetze", "b1"), "bemessung")
-        self.assertEqual(a.von("betongesetze", "b1"), "parabel")
+        self.assertEqual(a.von("rechenarten", "b1"), "parabel")
 
     def test_doppelte_lastfaelle(self):
         a = self.neu()
@@ -176,7 +176,9 @@ class TestKnoten(unittest.TestCase):
 
 import math
 
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, Wertesaetze
+from opencivil.querschnitt.gesetzwahl import (
+    Rechenart, Rechenarten, Rechenwahl, Werkstoffsatz, Wertesaetze,
+)
 from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze
 from opencivil.web import dienst
 
@@ -315,7 +317,7 @@ class TestBiegung(unittest.TestCase):
 
     def test_spannungsblock_nahe_der_parabel(self):
         def grad(gesetz):
-            p = projekt(betongesetze={"b1": gesetz})
+            p = projekt(rechenarten={"b1": gesetz})
             p.querschnittsanalysen[0].lastfall("Feld", N_Ed=-800.0, M_y_Ed=150.0)
             return urteile(p.rechnen(), "M-N")["Feld"].erfuellungsgrad.si
         self.assertAlmostEqual(grad("block") / grad("parabel"), 1.0, delta=0.05)
@@ -333,16 +335,17 @@ class TestGesetzeWieDiePlatte(unittest.TestCase):
             for art in (Rechenart.PARABEL, Rechenart.BLOCK):
                 with self.subTest(satz=satz.value, art=art.value):
                     p = projekt(werkstoffsaetze={"b1": satz.value},
-                                betongesetze={"b1": art.value})
+                                rechenarten={"b1": art.value})
                     aufbau = p.aufbauen()
                     analyse = aufbau.querschnittsanalysen["a1"]
                     loesung = aufbau.werk.loese(
                         *(b.wert_id for b in analyse.werkstoffbezuege()))
                     wert = lambda kid: loesung.werte[kid].groesse.si
-                    werkstoffe, index = analyse.werkstoffe(wert, analyse.rechenwahl)
+                    werkstoffe, index = analyse.werkstoffe(wert, analyse.wahl)
                     stoff = aufbau.baustoffe["b1"]
                     w = lambda k: abs(wert(stoff.id_von(k)))
-                    platte = gesetze(Rechenwahl(saetze=Wertesaetze.alle(satz), art=art), Betonkennwerte(
+                    platte = gesetze(Rechenwahl(saetze=Wertesaetze.alle(satz),
+                                                arten=Rechenarten.alle(art)), Betonkennwerte(
                         f_c=w(satz.beton), E_c=w("E_cm"), eps_c1d=w("eps_c1d"),
                         eps_c2d=w("eps_c2d"))).beton
                     self.assertEqual(werkstoffe[index(stoff)].gesetz, platte)

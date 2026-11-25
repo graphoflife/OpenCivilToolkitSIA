@@ -96,7 +96,7 @@ def auswerten(fall, art: Analyseart, paar: Paar) -> Tuple[
         linie = normalkraft_dehnung(paar, M=si["M_Ed"])
     else:
         return aus_schnittgroessen(paar.ebenen().gerissen, N=si["N_Ed"],
-                                   M=si["M_Ed"], art=paar.wahl.art), None
+                                   M=si["M_Ed"], arten=paar.wahl.arten), None
     if art.modul:
         return None, aequivalenter_modul(linie, I_c=paar.I_c, A_c=paar.A_c, E_cm=paar.E_cm)
     return None, linie

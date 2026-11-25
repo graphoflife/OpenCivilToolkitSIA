@@ -16,7 +16,7 @@ from typing import Dict, List, Optional
 
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.querschnitt.fasern import Dehnungsgrenze
-from opencivil.querschnitt.gesetzwahl import Rechenart
+from opencivil.querschnitt.gesetzwahl import Rechenarten
 from opencivil.querschnitt.werkstoffgesetz import RUNDUNG
 from opencivil.spannungsanalyse.linie import Dehnungsebene, Ebenensuche
 
@@ -135,21 +135,21 @@ def _bild(ebene: Dehnungsebene) -> Querschnittsbild:
 
 
 def aus_schnittgroessen(suche: Ebenensuche, *, N: float, M: float,
-                        art: Rechenart) -> Querschnittsbild:
+                        arten: Rechenarten) -> Querschnittsbild:
     """
     Die Dehnungsebene zu ``N`` und ``M``, samt allem, was darauf steht --
     gefunden von der Ebenensuche des gerissenen Zustands.
 
     Gesucht wird mit demselben Verfahren wie in den Nachweisen. Findet sich
     keine Ebene, kommt das Bild leer zurueck und sagt warum -- geraten wird
-    nicht. Verfehlt die Suche ihre Ebene, sagt es die Rechenart ``art``
-    (:attr:`Rechenart.ohne_ebene`).
+    nicht. Verfehlt die Suche ihre Ebene, sagt es die Wahl der Rechenarten
+    (:attr:`~opencivil.querschnitt.gesetzwahl.Rechenarten.ohne_ebene`).
     """
     ebene = suche.zu_kraeften(N, M)
     if ebene is None or ebene.verfehlt:
         return Querschnittsbild(
             eps_m=0.0, chi=0.0, N=N, M=M, konvergiert=False,
-            hinweis=(art.ohne_ebene if ebene is not None else
+            hinweis=(arten.ohne_ebene if ebene is not None else
                      "Zu dieser Kombination gibt es keine Gleichgewichtslage: "
                      "der Querschnitt nimmt sie nicht auf."))
     return _bild(ebene)

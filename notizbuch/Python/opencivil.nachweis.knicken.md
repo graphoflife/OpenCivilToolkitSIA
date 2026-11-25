@@ -1,5 +1,5 @@
 ---
-erzeugt: 2167024c055a
+erzeugt: 07b9e492be3c
 art: modul
 tags: [modul]
 ---
@@ -412,8 +412,8 @@ Mit der Linie der Tragsicherheit: was das Knicken waehlt und woher sein Widersta
 ## Konstanten
 
 - `REFERENZ = 'SIA 262:2025, 4.3.7'` – Wo der Nachweis am verformten System steht -- fuer ihn als Ganzes und fuer den Erfuellungsgrad jedes Falls.
-- `VERFORMUNG = Rechenwahl(art=Rechenart.PARABEL)` – Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
-- `WIDERSTAND = Rechenwahl(art=Rechenart.BLOCK)`
+- `VERFORMUNG = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))` – Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
+- `WIDERSTAND = Rechenwahl(arten=Rechenarten.alle(Rechenart.BLOCK))`
 - `DURCHLAEUFE = 40` – Groesste Zahl an Durchlaeufen der Ausmitten-Iteration.
 - `SCHRANKE = 0.0001` – Wann die Iteration als eingelaufen gilt -- Aenderung des Moments.
 - `HALBIERUNGEN = 14` – Durchlaeufe der Halbierung, die N_Rd sucht. Das Fenster ist so breit wie die getragene Kraft selbst; 14 Schritte bringen es auf deren Sechzehntausendstel, bei 2000 kN also auf ein Zehntel Kilonewton. Jeder weitere Schritt kostet eine vollstaendige Ausmitten-Iteration und aendert nichts mehr an der Zahl, die in der Tabelle steht.

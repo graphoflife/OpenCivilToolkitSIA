@@ -52,7 +52,7 @@ schlicht ``R`` (nach Vorgabe, nicht nachgeschlagen).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, FrozenSet, Mapping, Optional, Tuple
+from typing import Any, Dict, FrozenSet, Mapping, Sequence, Tuple
 
 from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.werkstoffgesetz import (
@@ -211,55 +211,65 @@ class Rechenart(Wahl):
 
 
 @dataclass(frozen=True)
-class Wertesaetze:
+class JeBaustoff:
     """
-    Je Baustoff sein Wertesatz (:class:`Werkstoffsatz`). ``je_baustoff``
-    nennt die Baustoffe eines Bauteils mit ihrem Satz, nach Baustoff-ID
-    geordnet; ein anderer Baustoff rechnet mit ``vorgabe`` -- so auch jeder,
-    wo ein Kapitel einen Satz fuer alle festlegt (:meth:`alle`).
+    Je Baustoff eines Bauteils eine Wahl: der Wertesatz (:class:`Wertesaetze`)
+    oder beim Beton die Rechenart (:class:`Rechenarten`). ``je_baustoff``
+    nennt die Baustoffe mit ihrer Wahl, nach Baustoff-ID geordnet; ein anderer
+    rechnet mit ``vorgabe`` -- so auch jeder, wo ein Kapitel eine Wahl fuer
+    alle festlegt (:meth:`alle`).
     Unveraenderlich und vergleichbar: eine Wahl ist Schluessel von
     Zwischenspeichern, und zwei gleiche Wahlen teilen sich eine Linie. Darum
-    wird ein Satz fuer alle immer zu :meth:`alle` (:meth:`je`) -- sonst
+    wird eine Wahl fuer alle immer zu :meth:`alle` (:meth:`je`) -- sonst
     rechneten die Kennzahlen, die mit Bemessungswerten fest waehlen, ihre
     eigene Linie neben der gleichen der Tragsicherheit.
     """
 
-    vorgabe: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
-    je_baustoff: Tuple[Tuple[str, Werkstoffsatz], ...] = ()
+    vorgabe: Any
+    je_baustoff: Tuple[Tuple[str, Any], ...] = ()
 
     @classmethod
-    def alle(cls, satz: Werkstoffsatz) -> "Wertesaetze":
-        """Jeder Baustoff mit demselben Satz."""
-        return cls(vorgabe=satz)
+    def alle(cls, wahl):
+        """Jeder Baustoff mit derselben Wahl."""
+        return cls(vorgabe=wahl)
 
     @classmethod
-    def je(cls, saetze: Mapping[str, Werkstoffsatz],
-           vorgabe: Werkstoffsatz = Werkstoffsatz.BEMESSUNG) -> "Wertesaetze":
+    def je(cls, wahlen: Mapping[str, Any], vorgabe: Any = None):
         """
-        Aus Baustoff-ID und Satz -- je Baustoff des Bauteils einer. Haben alle
-        denselben, ist es :meth:`alle` mit ihm.
+        Aus Baustoff-ID und Wahl -- je Baustoff des Bauteils eine. Haben alle
+        dieselbe, ist es :meth:`alle` mit ihr; ohne Baustoff die ``vorgabe``,
+        ohne Angabe die der Klasse.
         """
-        verschieden = set(saetze.values())
+        if vorgabe is None:
+            vorgabe = cls().vorgabe
+        verschieden = set(wahlen.values())
         if len(verschieden) <= 1:
             return cls.alle(next(iter(verschieden), vorgabe))
-        return cls(vorgabe, tuple(sorted(saetze.items())))
+        return cls(vorgabe, tuple(sorted(wahlen.items())))
 
-    def von(self, stoff) -> Werkstoffsatz:
-        """Der Satz eines Baustoffs (:attr:`~opencivil.material.basis.Baustoff.id`)."""
-        for kennung, satz in self.je_baustoff:
+    def von(self, stoff):
+        """Die Wahl eines Baustoffs (:attr:`~opencivil.material.basis.Baustoff.id`)."""
+        for kennung, wahl in self.je_baustoff:
             if kennung == stoff.id:
-                return satz
+                return wahl
         return self.vorgabe
 
     @property
-    def gewaehlt(self) -> FrozenSet[Werkstoffsatz]:
-        """Die Saetze, mit denen gerechnet wird."""
-        return frozenset(s for _, s in self.je_baustoff) or frozenset((self.vorgabe,))
+    def gewaehlt(self) -> FrozenSet:
+        """Die Wahlen, mit denen gerechnet wird."""
+        return frozenset(w for _, w in self.je_baustoff) or frozenset((self.vorgabe,))
 
     @property
-    def einheitlich(self) -> Optional[Werkstoffsatz]:
-        """Der Satz, wenn alle Baustoffe denselben haben -- sonst ``None``."""
+    def einheitlich(self):
+        """Die Wahl, wenn alle Baustoffe dieselbe haben -- sonst ``None``."""
         return next(iter(self.gewaehlt)) if len(self.gewaehlt) == 1 else None
+
+
+@dataclass(frozen=True)
+class Wertesaetze(JeBaustoff):
+    """Je Baustoff sein Wertesatz (:class:`Werkstoffsatz`)."""
+
+    vorgabe: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
 
     @property
     def index(self) -> str:
@@ -291,12 +301,50 @@ class Wertesaetze:
 
 
 @dataclass(frozen=True)
+class Rechenarten(JeBaustoff):
+    """
+    Je Beton seine Rechenart (:class:`Rechenart`) -- ein Stahl hat keine,
+    er rechnet in jeder Art mit seinem Gesetz. Wo ein Kapitel mehrere Betone
+    rechnet, fragt es hier, ob einer von ihnen am Modul haengt oder als
+    Block rechnet.
+    """
+
+    vorgabe: Rechenart = Rechenart.HANDRECHNUNG
+
+    @property
+    def mit_kriechzahl(self) -> bool:
+        """Ob ``phi`` bei einem der Betone etwas aendert (:attr:`Rechenart.mit_kriechzahl`)."""
+        return any(a.mit_kriechzahl for a in self.gewaehlt)
+
+    @property
+    def mit_block(self) -> bool:
+        """Ob einer der Betone als Spannungsblock rechnet (:attr:`Rechenart.mit_block`)."""
+        return any(a.mit_block for a in self.gewaehlt)
+
+    @property
+    def ohne_ebene(self) -> str:
+        """
+        Was dasteht, wenn die Suche ihre Ebene verfehlt
+        (:attr:`Rechenart.ohne_ebene`): rechnet ein Beton als Block, der Rat,
+        praezise zu rechnen.
+        """
+        block = [a for a in Rechenart if a in self.gewaehlt and a.mit_block]
+        return (block[0] if block else Rechenart.PARABEL).ohne_ebene
+
+
+@dataclass(frozen=True)
 class Rechenwahl:
-    """Was ein Kapitel waehlt: Kriechzahl, Wertesatz je Baustoff, Rechenart."""
+    """
+    Was ein Kapitel waehlt: Kriechzahl, je Baustoff den Wertesatz und je
+    Beton die Rechenart. Die Rechenart je Beton seit 2026-11-25 (Benutzer:
+    unter dem Beton, in jedem Modul); bis dahin galt in einem Kapitel eine
+    fuer alle Betone, und nur die Tragsicherheit der Querschnittsanalyse
+    waehlte je Beton -- mit einer eigenen Wahl fuer jeden Baustoff.
+    """
 
     kriechzahl: float = 0.0
     saetze: Wertesaetze = Wertesaetze()
-    art: Rechenart = Rechenart.HANDRECHNUNG
+    arten: Rechenarten = Rechenarten()
     modul: str = "E_cm"
     """
     Der Kurzname des Elastizitaetsmoduls, an dem der Beton haengt: ``E_cm``,
@@ -305,8 +353,25 @@ class Rechenwahl:
     """
 
     def satz(self, stoff) -> Werkstoffsatz:
-        """Der Wertesatz eines Baustoffs (:meth:`Wertesaetze.von`)."""
+        """Der Wertesatz eines Baustoffs (:meth:`JeBaustoff.von`)."""
         return self.saetze.von(stoff)
+
+    def art_von(self, beton) -> Rechenart:
+        """Die Rechenart eines Betons (:meth:`JeBaustoff.von`)."""
+        return self.arten.von(beton)
+
+    @property
+    def art(self) -> Rechenart:
+        """
+        Die Rechenart, wo alle Betone dieselbe haben -- in einem Bauteil mit
+        einem Beton immer, in der Platte etwa. Rechnen mehrere Betone
+        verschieden, gibt es die eine nicht: dann fragt man je Beton
+        (:meth:`art_von`), und hier zu fragen ist ein Fehler im Programm.
+        """
+        art = self.arten.einheitlich
+        if art is None:
+            raise ValueError("Die Betone rechnen verschieden – die Rechenart je Beton erfragen.")
+        return art
 
     def betonkennwerte(self, beton) -> Dict[str, str]:
         """Die Kennwerte des Betongesetzes (:attr:`Werkstoffsatz.betonkennwerte`) dieses Betons, mit dem Modul der Wahl."""
@@ -317,25 +382,40 @@ class Rechenwahl:
         """``Rd``, ``Rk`` oder gemischt ``R`` -- wie ein Widerstand dieser Wahl heisst (:attr:`Wertesaetze.index`)."""
         return self.saetze.index
 
-    @property
-    def beschriftung(self) -> str:
-        """Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo es wirkt."""
-        teile = [self.art.beschriftung]
-        if self.art.mit_kriechzahl:
+    def beschriftung(self, betone: Sequence = ()) -> str:
+        """
+        Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi
+        nur, wo es wirkt. Rechnen die ``betone`` verschieden, steht jede Art
+        mit dem Namen ihres Betons da (:func:`arten_text`).
+        """
+        teile = [arten_text(self, betone)]
+        if self.arten.mit_kriechzahl:
             teile.append(f"φ = {self.kriechzahl:g}")
         return ", ".join(teile + [self.saetze.kurz])
 
     def gleiche_linie(self, andere: "Rechenwahl") -> bool:
         """
-        Ob ``andere`` dieselbe Resistenzlinie ergibt: dieselbe Rechenart und
+        Ob ``andere`` dieselbe Resistenzlinie ergibt: dieselben Rechenarten und
         dieselben Wertesaetze, dazu Kriechzahl und Modul, wo ein Gesetz am Modul
-        haengt (:attr:`Rechenart.mit_kriechzahl`). Bis 2026-11-20 eine freie
+        haengt (:attr:`Rechenarten.mit_kriechzahl`). Bis 2026-11-20 eine freie
         Funktion der M-N-Interaktion, die den Modul nicht verglich: eine
         Parabel mit ``E_cd`` haette die Linie einer mit ``E_cm`` bekommen.
         """
-        return (self.art is andere.art and self.saetze == andere.saetze
-                and (not self.art.mit_kriechzahl
+        return (self.arten == andere.arten and self.saetze == andere.saetze
+                and (not self.arten.mit_kriechzahl
                      or (self.kriechzahl, self.modul) == (andere.kriechzahl, andere.modul)))
+
+
+def arten_text(wahl: Rechenwahl, betone: Sequence = ()) -> str:
+    """
+    Die Rechenarten einer Wahl in Worten: eine fuer alle ihr Name, «Präzise
+    ohne Vereinfachung»; sonst je Beton aus ``betone`` mit seinem Namen,
+    «C30/37 präzise, C50/60 0.85·x».
+    """
+    art = wahl.arten.einheitlich
+    if art is not None:
+        return art.beschriftung
+    return ", ".join(f"{b.name} {wahl.art_von(b).kurz}" for b in betone)
 
 
 #: Die Kriechdehnung ist ``phi`` mal die elastische; zusammen ``(1 + phi)``
@@ -348,20 +428,21 @@ def wirksamer_modul(E_c: float, phi: float) -> float:
     return E_c / (1.0 + phi)
 
 
-def betongesetz(wahl: Rechenwahl, *, f_c: float, E_c: float, eps_c1d: float,
-                 eps_c2d: float, ungerissen: bool = False) -> Gesetz:
+def betongesetz(wahl: Rechenwahl, art: Rechenart, *, f_c: float, E_c: float,
+                 eps_c1d: float, eps_c2d: float, ungerissen: bool = False) -> Gesetz:
     """
-    Der Beton einer Wahl -- im gerissenen Zustand je Rechenart, ``ungerissen``
-    linear in Druck und Zug mit dem wirksamen Modul. Die eine Stelle fuer
-    beide: der Loeser der Platte, die genaue Resistenzlinie und der
-    gezeichnete Querschnitt bekommen ihren Beton hier. Bis 2026-10-17 gab die
-    Platte ihrem Loeser den ungerissenen Beton als eigenes Gesetz mit, und der
-    gezeichnete Querschnitt baute ihn hinter einem Schalter selbst. ``E_c``
-    ist der Modul der Wahl (:attr:`Rechenwahl.modul`), ohne Kriechen.
+    Ein Beton einer Wahl -- im gerissenen Zustand nach seiner Rechenart
+    ``art`` (:meth:`Rechenwahl.art_von`), ``ungerissen`` linear in Druck und
+    Zug mit dem wirksamen Modul. Die eine Stelle fuer beide: der Loeser der
+    Platte, die genaue Resistenzlinie und der gezeichnete Querschnitt
+    bekommen ihren Beton hier. Bis 2026-10-17 gab die Platte ihrem Loeser den
+    ungerissenen Beton als eigenes Gesetz mit, und der gezeichnete
+    Querschnitt baute ihn hinter einem Schalter selbst. ``E_c`` ist der Modul
+    der Wahl (:attr:`Rechenwahl.modul`), ohne Kriechen.
     """
     if ungerissen:
         return BetonUngerissen(E_c=wirksamer_modul(E_c, wahl.kriechzahl))
-    if wahl.art is Rechenart.PARABEL:
+    if art is Rechenart.PARABEL:
         return Betongesetz.mit_modul(f_c=f_c, E_c=wirksamer_modul(E_c, wahl.kriechzahl),
                                      eps_c1d=eps_c1d, eps_c2d=eps_c2d)
     return Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)

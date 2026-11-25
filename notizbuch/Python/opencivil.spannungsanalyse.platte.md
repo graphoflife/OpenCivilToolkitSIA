@@ -1,5 +1,5 @@
 ---
-erzeugt: 224e7d3ca769
+erzeugt: 2d4e1442cab6
 art: modul
 tags: [modul]
 ---
@@ -41,7 +41,7 @@ gerechnet wird.
 - `brutto: Bruttoquerschnitt` – Das Rechteck `b × h` ohne Stahl -- an ihm reisst die Platte.
 - `riss: Rissmoment` – Das Rissmoment unter reiner Biegung, ohne Normalkraft.
 - `staehle: Tuple[Any, ...] = ()` – Die Staehle der Lagen, jeder einmal -- fuer die Fliessdehnung in der Herleitung. Fliessen beginnt, wo die erste Lage die Fliessdehnung ihres eigenen Stahls erreicht ([[opencivil.spannungsanalyse.platte#Loeserpaar|Stahlgesetz.eps_yd]] der Lage).
-- `wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
+- `wahl: Rechenwahl = Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
 - `E_cm: float = 0.0` – Der Modul des Betons -- daran misst sich der aequivalente Modul.
 - `seite = Zugseite.UNTEN` – Ein positives Moment zieht unten.
@@ -111,7 +111,7 @@ Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe.
 ### loeserpaar
 
 ```python
-def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float], wahl: Rechenwahl=Rechenwahl(art=Rechenart.PARABEL)) -> Optional[Loeserpaar]
+def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float], wahl: Rechenwahl=Rechenwahl(arten=Rechenarten.alle(Rechenart.PARABEL))) -> Optional[Loeserpaar]
 ```
 
 Das Loeserpaar einer Platte in einer Richtung -- `None` ohne Bewehrung.
