@@ -216,7 +216,7 @@
     "opencivil/web/balkendaten.py": "e79ed47f1397",
     "opencivil/web/bruecke.py": "9f787b297de7",
     "opencivil/web/deckendaten.py": "ac101a106c77",
-    "opencivil/web/diagrammdaten.py": "e96ee4a28899",
+    "opencivil/web/diagrammdaten.py": "81e2993cbb8f",
     "opencivil/web/dienst.py": "90a53aba90cc",
     "opencivil/web/durchstanzdaten.py": "98b5a2ec575f",
     "opencivil/web/erdbebendaten.py": "b3ffae80877a",

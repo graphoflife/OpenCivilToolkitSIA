@@ -1,5 +1,5 @@
 ---
-erzeugt: 8faef6642032
+erzeugt: 0458780c4f2a
 art: modul
 tags: [modul]
 ---
@@ -294,7 +294,10 @@ Wie oft ein Polygon in einem anderen liegt -- Eltern werden zuerst gezeichnet.
 def _zeichnung(bauteil) -> dict
 ```
 
-Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon aufgeloest.
+Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon
+aufgeloest. Je Polygon die Art seines Baustoffs (`material`, ohne eine
+Aussparung) und dessen Name, je Stab und Linie Name und Stahl: daraus
+das Bild «Querschnitt» seine Farben und seine Legende.
 
 ### _halbebene
 

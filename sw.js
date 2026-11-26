@@ -124,7 +124,7 @@ const VORRAT = {
     "web/js/plattenkapitel.js?v=fed707010dce",
     "web/js/projekte.js?v=4cf72047989c",
     "web/js/python.js?v=e36b207b3ea6",
-    "web/js/qa_diagramme.js?v=0ab6cf606cb4",
+    "web/js/qa_diagramme.js?v=bd6ba76516de",
     "web/js/qa_uebersicht.js?v=4754b00bc7eb",
     "web/js/qa_vorlagen.js?v=3c2ad6420088",
     "web/js/qa_zeichnung.js?v=ec26f8b1f6cf",
@@ -137,7 +137,7 @@ const VORRAT = {
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=04a6b50b3e76",
     "web/kern/notizbuch.json?v=3aacb9be6f8d",
-    "web/kern/quellen.json?v=7a20161b29dc"
+    "web/kern/quellen.json?v=a6402a2b316e"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

@@ -626,6 +626,26 @@ class TestDiagramme(unittest.TestCase):
         self.assertEqual(len(self.fall["schub"]["waende"]), 4)
         self.assertEqual(z["schwerpunkt"], [150.0, 300.0])
 
+    def test_das_bild_des_querschnitts_kennt_seine_baustoffe(self):
+        """Je Polygon die Art und der Name seines Baustoffs, je Stab der Stahl -- für Farben und Legende."""
+        z = self.d["zeichnung"]
+        p = z["polygone"][0]
+        self.assertEqual((p["material"], p["stoff"], p["name"]), ("beton", "C30/37", "Polygon 1"))
+        self.assertEqual({s["stahl"] for s in z["staebe"]}, {"B500B"})
+        self.assertTrue(all(s["name"] for s in z["staebe"]))
+
+    def test_den_querschnitt_gibt_es_auch_ohne_lastfall(self):
+        """Ohne Lastfall kein Fall, aber das Bild des Querschnitts -- es braucht keinen Nachweis."""
+        d = Projekt.beispiel().als_dict()
+        a1, = [q for q in d["querschnittsanalysen"] if q["kennung"] == "a1"]
+        a1["lastfaelle"] = []
+        antwort = dienst.bearbeite("analysediagramme", {"projekt": d, "kennung": "a1"})
+        self.assertEqual(antwort.status, 200)
+        diagramme = antwort.daten["diagramme"]
+        self.assertEqual(diagramme["faelle"], [])
+        self.assertEqual(len(diagramme["zeichnung"]["polygone"]), 1)
+        self.assertEqual(diagramme["zeichnung"]["schwerpunkt"], [150.0, 300.0])
+
     def test_der_widerstand_des_nachweises(self):
         """Je Lastfall der Bruchzustand, gegen den gemessen wurde -- alle drei Grössen."""
         w = self.fall["widerstand"]

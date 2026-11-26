@@ -743,15 +743,24 @@ def _tiefe(eltern: Sequence[Optional[int]], i: int) -> int:
 
 
 def _zeichnung(bauteil) -> dict:
-    """Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon aufgeloest."""
+    """
+    Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon
+    aufgeloest. Je Polygon die Art seines Baustoffs (``material``, ohne eine
+    Aussparung) und dessen Name, je Stab und Linie Name und Stahl: daraus
+    das Bild «Querschnitt» seine Farben und seine Legende.
+    """
     return {
         "polygone": [
-            {"punkte": [list(p) for p in f.punkte], "material": f.stoff is not None,
+            {"punkte": [list(p) for p in f.punkte], "name": f.name,
+             "material": f.stoff.art.value if f.stoff is not None else None,
+             "stoff": f.stoff.name if f.stoff is not None else None,
              "tiefe": _tiefe(bauteil.eltern, i)}
             for i, f in enumerate(bauteil.flaechen)],
-        "staebe": [{"y": p[0], "z": p[1], "d": g.durchmesser}
+        "staebe": [{"y": p[0], "z": p[1], "d": g.durchmesser, "name": g.name,
+                    "stahl": g.stahl.name}
                    for g in bauteil.bewehrungselemente for p in g.punkte],
-        "flaechenlinien": [{"von": list(g.von), "bis": list(g.bis)}
+        "flaechenlinien": [{"von": list(g.von), "bis": list(g.bis), "name": g.name,
+                            "stahl": g.stahl.name}
                            for g in bauteil.bewehrungselemente if g.verschmiert],
         "schwerpunkt": [bauteil.brutto.y_S, bauteil.brutto.z_S],
     }

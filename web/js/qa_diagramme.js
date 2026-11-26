@@ -1,7 +1,11 @@
 /**
  * qa_diagramme.js -- die Diagramme einer Querschnittsanalyse.
  *
- * Oben das Interaktionsdiagramm -- das einzige: die Fläche aller
+ * Zuerst der Querschnitt, wie gezeichnet, auch ohne Lastfall: Flächen in
+ * der Farbe ihres Baustoffs, Stäbe, Aussenmasse und der Schwerpunkt mit
+ * den Achsen y und z -- in den Stilen des Zeichenfensters.
+ *
+ * Dann das Interaktionsdiagramm -- das einzige: die Fläche aller
  * Bruchzustände im Raum (N, M_y, M_z), geschnitten bei einem festen Wert
  * einer Grösse. Welche zwei auf den Achsen stehen, wird gewählt; die dritte
  * bekommt ihren Wert im Zahlenfeld. Lastfälle in dieser Ebene stehen
@@ -31,6 +35,8 @@ import {
 } from './achsen.js';
 import { api } from './api.js';
 import { karte, wahlSchalter } from './bausteine.js';
+import { zahlText } from './cad_ansicht.js';
+import { mitTitel } from './cad_app.js';
 import {
   el, leerzustand, svgEl, zahlfeld,
 } from './dom.js';
@@ -149,13 +155,139 @@ function polygoneZeichnen(gruppe, zeichnung, bild) {
   }
 }
 
+/** Der Schwerpunkt S -- wie im Zeichenfenster (qa_zeichnung.js), in allen Bildern gleich. */
 function schwerpunktZeichnen(gruppe, zeichnung, bild) {
   const [x, y] = bild(zeichnung.schwerpunkt);
-  gruppe.append(
-    svgEl('circle', { cx: x, cy: y, r: 5, fill: '#fff', stroke: '#16202c', 'stroke-width': 1.1 }),
-    svgEl('path', { d: `M${x - 8} ${y} H${x + 8} M${x} ${y - 8} V${y + 8}`, stroke: '#16202c' }),
-    text(x + 8, y - 6, 'S', { 'font-weight': 700, fill: '#16202c' }),
+  const s = svgEl('g', { class: 'cad-schwerpunkt' });
+  s.append(
+    svgEl('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: 6 }),
+    svgEl('path', { d: `M${(x - 9).toFixed(1)} ${y.toFixed(1)} H${(x + 9).toFixed(1)} `
+      + `M${x.toFixed(1)} ${(y - 9).toFixed(1)} V${(y + 9).toFixed(1)}` }),
+    text(x + 9, y - 7, 'S', { class: 'cad-schwerpunkttext', fill: null, 'font-size': null }),
   );
+  gruppe.append(s);
+}
+
+/** So hoch steht ein Querschnitt höchstens im Bild, in px -- ein flacher bekommt weniger. */
+const QS_HOEHE = 420;
+/** Platz um den Schnitt, in px: links und unten für die Masse, oben und rechts für z und y. */
+const QS_RAND = { oben: 28, rechts: 34, unten: 48, links: 52 };
+
+/** Eine Probe für die Legende im Stil des Zeichenfensters: Fläche, Stab oder Linie. */
+function probe(klasse, form = 'flaeche') {
+  const svg = svgEl('svg', {
+    width: 18, height: 12, viewBox: '0 0 18 12', 'aria-hidden': 'true', class: 'qs-probe',
+  });
+  svg.append({
+    flaeche: () => svgEl('rect', { x: 1, y: 1, width: 16, height: 10, class: klasse }),
+    stab: () => svgEl('circle', { cx: 9, cy: 6, r: 4, class: klasse }),
+    linie: () => svgEl('path', { d: 'M2 6 H16', class: klasse }),
+  }[form]());
+  return svg;
+}
+
+/** Namen ohne Doppel, in der Folge ihres ersten Auftretens. */
+const einmal = (namen) => [...new Set(namen)];
+
+/** Die Aussenmasse dessen, was Material hat: unten die Breite, links die Höhe -- wie im Zeichenfenster. */
+function aussenmasse(gruppe, zeichnung, bild) {
+  const ecken = zeichnung.polygone.filter((p) => p.material).flatMap((p) => p.punkte);
+  if (!ecken.length) return;
+  const ys = ecken.map((p) => p[0]);
+  const zs = ecken.map((p) => p[1]);
+  const [y0, y1, z0, z1] = [Math.min(...ys), Math.max(...ys), Math.min(...zs), Math.max(...zs)];
+  const [xl, hu] = bild([y0, z0]);
+  const [xr, ho] = bild([y1, z1]);
+  const unten = hu + 24;
+  const links = xl - 24;
+  const breite = text((xl + xr) / 2, unten - 5, zahlText(y1 - y0),
+    { class: 'cad-masstext', 'text-anchor': 'middle', fill: null, 'font-size': null });
+  const hoehe = text(links - 5, (hu + ho) / 2, zahlText(z1 - z0), {
+    class: 'cad-masstext', 'text-anchor': 'middle', fill: null, 'font-size': null,
+    transform: `rotate(-90 ${(links - 5).toFixed(1)} ${((hu + ho) / 2).toFixed(1)})`,
+  });
+  gruppe.append(
+    svgEl('path', {
+      d: `M${xl.toFixed(1)} ${unten.toFixed(1)} H${xr.toFixed(1)} `
+        + `M${xl.toFixed(1)} ${(unten - 5).toFixed(1)} v10 M${xr.toFixed(1)} ${(unten - 5).toFixed(1)} v10 `
+        + `M${links.toFixed(1)} ${ho.toFixed(1)} V${hu.toFixed(1)} `
+        + `M${(links - 5).toFixed(1)} ${ho.toFixed(1)} h10 M${(links - 5).toFixed(1)} ${hu.toFixed(1)} h10`,
+      class: 'cad-mass',
+    }),
+    breite, hoehe,
+  );
+}
+
+/**
+ * Der Querschnitt, wie gezeichnet -- auch ohne Lastfall: die Flächen in der
+ * Farbe ihres Baustoffs, Aussparungen gestrichelt, Stäbe und verschmierte
+ * Linien, unten und links die Aussenmasse dessen, was Material hat, und der
+ * Schwerpunkt S mit den Achsen y und z, um die die Momente drehen. Die
+ * Masse in mm.
+ */
+function querschnittbild(z) {
+  const R = QS_RAND;
+  const ecken = z.polygone.flatMap((p) => p.punkte);
+  const ys = ecken.map((p) => p[0]);
+  const zs = ecken.map((p) => p[1]);
+  const [y0, y1, z0, z1] = [Math.min(...ys), Math.max(...ys), Math.min(...zs), Math.max(...zs)];
+  const m = Math.min((BREITE - R.links - R.rechts) / ((y1 - y0) || 1),
+    (QS_HOEHE - R.oben - R.unten) / ((z1 - z0) || 1));
+  const hoehe = Math.round(R.oben + R.unten + m * (z1 - z0));
+  const ox = R.links + (BREITE - R.links - R.rechts - m * (y1 - y0)) / 2 - m * y0;
+  const oy = R.oben + m * z1;
+  const bild = ([y, w]) => [ox + m * y, oy - m * w];
+  const svg = svgEl('svg', {
+    viewBox: `0 0 ${BREITE} ${hoehe}`, class: 'qs', xmlns: NR, role: 'img', 'aria-label': 'Querschnitt',
+  });
+  const g = svgEl('g');
+  for (const p of [...z.polygone].sort((a, b) => a.tiefe - b.tiefe)) {
+    g.append(mitTitel(svgEl('path', {
+      d: pfad(bild, p.punkte), class: p.material ? `cad-${p.material}` : 'cad-loch',
+    }), [`${p.name}: ${p.stoff || 'Aussparung'}`]));
+  }
+  // Die Achsen durch den Schwerpunkt, etwas über den Schnitt hinaus.
+  const [sx, sy] = bild(z.schwerpunkt);
+  const [xl, hu] = bild([y0, z0]);
+  const [xr, ho] = bild([y1, z1]);
+  g.append(
+    svgEl('path', {
+      d: `M${(xl - 12).toFixed(1)} ${sy.toFixed(1)} H${(xr + 14).toFixed(1)} `
+        + `M${sx.toFixed(1)} ${(hu + 12).toFixed(1)} V${(ho - 14).toFixed(1)}`,
+      class: 'cad-achse',
+    }),
+    text(xr + 18, sy + 4, 'y', { class: 'cad-achstext', fill: null, 'font-size': null }),
+    text(sx + 5, ho - 16, 'z', { class: 'cad-achstext', fill: null, 'font-size': null }),
+  );
+  for (const l of z.flaechenlinien) {
+    g.append(mitTitel(svgEl('path', { d: pfad(bild, [l.von, l.bis], false), class: 'cad-linie-flaeche' }),
+      [`${l.name}: ${l.stahl}, verschmiert`]));
+  }
+  for (const s of z.staebe) {
+    const [x, y] = bild([s.y, s.z]);
+    g.append(mitTitel(svgEl('circle', {
+      cx: x.toFixed(1), cy: y.toFixed(1), r: Math.max(2.4, (m * s.d) / 2).toFixed(1), class: 'cad-stab',
+    }), [`${s.name}: ⌀${s.d} ${s.stahl}`]));
+  }
+  aussenmasse(g, z, bild);
+  schwerpunktZeichnen(g, z, bild);
+  svg.append(g);
+  const [yS, zS] = z.schwerpunkt;
+  const flaechen = z.polygone.filter((p) => p.material);
+  return el('div.diagramm-huelle', {}, [
+    svg,
+    legende([
+      ...einmal(flaechen.map((p) => `${p.material}|${p.stoff}`)).map((schluessel) => {
+        const [art, stoff] = schluessel.split('|');
+        return [probe(`cad-${art}`), stoff];
+      }),
+      z.polygone.some((p) => !p.material) ? [probe('cad-loch'), 'Aussparung'] : null,
+      ...einmal(z.staebe.map((s) => s.stahl)).map((stahl) => [probe('cad-stab', 'stab'), `Stäbe ${stahl}`]),
+      ...einmal(z.flaechenlinien.map((l) => l.stahl))
+        .map((stahl) => [probe('cad-linie-flaeche', 'linie'), `verschmiert ${stahl}`]),
+      `S: y = ${zahlText(yS)} mm, z = ${zahlText(zS)} mm · Masse in mm`,
+    ]),
+  ]);
 }
 
 /**
@@ -474,13 +606,16 @@ export function analyseKarten(kennung) {
     return [karte(null, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })])];
   }
   if (!daten) return [karte(null, [leerzustand('Diagramme werden gerechnet …')])];
-  const interaktion = interaktionskarte(kennung, daten, !eintrag.daten);
+  const veraltet = !eintrag.daten;
+  const umriss = querschnittbild(daten.zeichnung);
+  const querschnitt = karte('Querschnitt', [umriss],
+    { bild: umriss.querySelector('svg'), klasse: veraltet ? 'ist-veraltet' : '' });
+  const interaktion = interaktionskarte(kennung, daten, veraltet);
   if (!daten.faelle.length) {
-    return [interaktion, karte('Lastfall', [leerzustand('Kein Lastfall.')])];
+    return [querschnitt, interaktion, karte('Lastfall', [leerzustand('Kein Lastfall.')])];
   }
 
   const gewaehlt = daten.faelle.find((f) => f.name === ansicht.gezeigt) || daten.faelle[0];
-  const veraltet = !eintrag.daten;
   const bildkarte = (t, bild) => karte(`${t} – ${gewaehlt.name}`, [bild],
     { bild, klasse: veraltet ? 'ist-veraltet' : '' });
   // Die Wahl des Falls gilt für die Bilder darunter -- über die ganze Breite.
@@ -496,6 +631,7 @@ export function analyseKarten(kennung) {
     ]),
   ], { klasse: 'ist-breit' });
   return [
+    querschnitt,
     interaktion,
     kopf,
     // Ohne Bild sagt die Karte, warum -- bis 2026-11-19 fehlte sie still. Den

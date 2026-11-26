@@ -7,6 +7,28 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Querschnittsanalyse: Bild «Querschnitt» zuerst unter den Diagrammen
+
+Vom Benutzer gewünscht (2026-11-25).
+
+- Vorher zeigte der Reiter «Diagramme» einer Querschnittsanalyse zuerst
+  das Interaktionsdiagramm; den Querschnitt sah man nur im Zeichenfenster.
+  Nachher ist «Querschnitt» das erste Bild, wie bei der Platte, und steht
+  auch ohne Lastfall da: die Flächen in der Farbe ihres Baustoffs,
+  Aussparungen gestrichelt, die Stäbe und verschmierten Linien, unten und
+  links die Aussenmasse dessen, was Material hat, und der Schwerpunkt S
+  mit den Achsen y und z, um die die Momente drehen. Die Legende nennt die
+  Betone, den Stahl der Stäbe und die Lage von S, im Beispiel «S: y =
+  150 mm, z = 300 mm».
+- Dieselben Stile wie im Zeichenfenster (`cad-beton`, `cad-stab`,
+  `cad-mass`, `cad-schwerpunkt`): beide sehen gleich aus. Auch
+  Bruchzustand und Schubfluss zeichnen S jetzt so.
+- Der Kern schickt dazu je Polygon die Art und den Namen seines Baustoffs,
+  je Stab und verschmierte Linie Namen und Stahl
+  (`diagrammdaten._zeichnung`). Eine Fläche aus Holz oder Baustahl
+  (Schritt 11) bekommt ihre Farbe dann über die Klasse `cad-<art>`;
+  Profile und Spannglieder kommen mit den Schritten 9 und 11 ins Bild.
+
 ## 2026-11-26 · Kacheln für Durchstanzen, Grundbruch, Setzung, Pfähle und Erdbeben
 
 Vom Benutzer gewünscht (2026-11-25).
