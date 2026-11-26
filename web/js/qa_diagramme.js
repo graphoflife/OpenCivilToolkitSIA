@@ -633,7 +633,7 @@ export function analyseKarten(kennung) {
   const umriss = querschnittbild(daten.zeichnung);
   const querschnitt = karte('Querschnitt', [umriss],
     { bild: umriss.querySelector('svg'), klasse: veraltet ? 'ist-veraltet' : '' });
-  if (daten.ohne_nachweis) return [querschnitt, karte(null, [leerzustand(daten.ohne_nachweis)])];
+  if (daten.ohne_diagramm) return [querschnitt, karte(null, [leerzustand(daten.ohne_diagramm)])];
   const interaktion = interaktionskarte(kennung, daten, veraltet);
   if (!daten.faelle.length) {
     return [querschnitt, interaktion, karte('Lastfall', [leerzustand('Kein Lastfall.')])];

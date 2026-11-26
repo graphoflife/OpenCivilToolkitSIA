@@ -1,5 +1,5 @@
 ---
-erzeugt: bf72bd669353
+erzeugt: ed470e1e50a3
 art: modul
 tags: [modul]
 ---
@@ -42,6 +42,16 @@ nach Vorgabe, nicht nachgeschlagen: gewalzte sind dafuer zu gedrungen.
 `z` ist die Richtung, in der das ungedrehte Profil steht -- beim I und U
 die des Stegs, beim Rechteckrohr die von `h`. Um 90° oder 270° gedreht,
 traegt es dasselbe in `y`.
+
+
+## WO DIE QUERKRAFT STEHT ([[opencivil.stahlbau.schub#streifen|streifen]])
+
+Die Bleche parallel zu ihr: beim I und U in Stegrichtung der Steg zwischen
+den Flanschen, `h_w = h - 2 t_f` wie in (43); quer dazu die Flansche
+ganz, `2 b t_f` wie ihre Schubflaeche; beim Rechteckrohr die beiden Waende
+in ihrer Richtung, je `h - 3 t` wie in 5.1.5.3. Das Rundrohr hat keine
+solchen Bleche: dort steht die Schubflaeche gleichmaessig ueber den Ring
+verteilt, `A_v/A` von jedem Teil (nach Vorgabe, nicht nachgeschlagen).
 
 ## Inhalt
 
@@ -109,6 +119,33 @@ def widerstand(lage: Profillage, flaeche: float, richtung: str, *, f_y: float, t
 Der Querkraftwiderstand eines Profils in `richtung` («y» oder «z») --
 `flaeche` ist seine Flaeche `A` in mm², wie gezeichnet. Siehe Dateikopf.
 
+### rund
+
+```python
+def rund(lage: Profillage) -> bool
+```
+
+Ob das Profil in jeder Richtung gleich traegt -- das Rundrohr.
+
+### _parallel
+
+```python
+def _parallel(von: Punkt, bis: Punkt, richtung: str) -> bool
+```
+
+Ob die Strecke von `von` nach `bis` in `richtung` laeuft, «y» oder «z».
+
+### streifen
+
+```python
+def streifen(lage: Profillage, richtung: str) -> List[Tuple[str, float, Tuple[Punkt, ...]]]
+```
+
+Wo die Querkraft in `richtung` im Profil steht -- siehe Dateikopf: je
+Streifen der Name seines Blechs, sein Anteil und sein Umriss in der
+Zeichnung. Beim Rundrohr der Ring mit `A_v/A`: der Umriss aussen mit
+diesem Anteil, das Loch mit dem negativen.
+
 
 ## Konstanten
 
@@ -121,9 +158,13 @@ Der Querkraftwiderstand eines Profils in `richtung` («y» oder «z») --
 
 ## Braucht
 
+- [[opencivil.querschnitt.geometrie]]
+- [[opencivil.stahlprofile.bleche]]
 - [[opencivil.stahlprofile.lage]]
 - [[opencivil.stahlprofile.tabelle]]
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.stahlbau.widerstand]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3ec37255526b
+erzeugt: 5c9d951f6d0f
 art: modul
 tags: [modul]
 ---
@@ -330,7 +330,9 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.lagennachweis]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]

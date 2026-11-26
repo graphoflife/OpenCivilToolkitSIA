@@ -1,5 +1,5 @@
 ---
-erzeugt: fb61a0d6df7f
+erzeugt: 03cb4bcffaa4
 art: modul
 tags: [modul]
 ---
@@ -47,11 +47,12 @@ fehlt: ein geloeschter Stahl ist zu ersetzen, kein Widerspruch. Sind die
 Materialien zusammen keine Bauweise ([[opencivil.querschnitt.bauweise#bauweise|bauweise]]), sagt es eine
 Meldung ohne Element, grau.
 
-`ohne_nachweise` ist der Satz, warum ein Querschnitt dieser Bauweise
-keinen Nachweis hat -- leer beim Stahlbeton und ohne Bauweise --,
-`ohne_analysen` derselbe fuer die Spannung-Dehnung-Analysen, leer
-ausser im Verbund. Danach zeigt die Analyse ihre Kacheln
-([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]], [[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+`bauweise` ist die Bauweise ([[opencivil.querschnitt.bauweise#Bauweise|Bauweise]]),
+leer ohne. `ohne_nachweise` ist der Satz, warum ein Querschnitt dieser
+Bauweise keinen Nachweis hat -- leer beim Stahlbeton, beim Stahl und ohne
+Bauweise --, `ohne_analysen` derselbe fuer die
+Spannung-Dehnung-Analysen, leer ausser im Verbund. Danach zeigt die
+Analyse ihre Kacheln ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]], [[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 
 `gueltig` heisst: die Zeichnung rechnet. Eine Spannung ueber der
 Grenze der Norm steht rot am Glied, haelt die Rechnung aber nicht an --

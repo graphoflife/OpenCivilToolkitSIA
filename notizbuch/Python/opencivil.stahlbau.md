@@ -1,5 +1,5 @@
 ---
-erzeugt: 85cbbbb00a9c
+erzeugt: 510d3c224844
 art: modul
 tags: [modul]
 ---
@@ -17,3 +17,4 @@ Querkraftwiderstand je Profil.
 - [[opencivil.stahlbau.klasse]] – die Querschnittsklasse nach SIA 263:2013.
 - [[opencivil.stahlbau.querschnitt]] – ein gezeichneter Querschnitt aus Baustahl.
 - [[opencivil.stahlbau.schub]] – der Querkraftwiderstand eines Stahlprofils nach SIA 263:2013.
+- [[opencivil.stahlbau.widerstand]] – was ein Stahlquerschnitt in einem Lastfall aufnimmt.

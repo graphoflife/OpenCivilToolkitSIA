@@ -274,16 +274,18 @@ def jeder_nachweis() -> Projekt:
     gemischt.spannungsfall("Gemischt", art="moment_kruemmung",
                            werkstoffsaetze={gemischt.beton: Werkstoffsatz.CHARAKTERISTISCH})
 
-    # Drei gezeichnete Querschnitte. Ein Kastenträger mit Aussparung,
+    # Vier gezeichnete Querschnitte. Ein Kastenträger mit Aussparung,
     # Bewehrung in allen drei Arten, vier Schubwänden als Zelle, Torsion,
     # schiefer Biegung und Längszugkraft, gerechnet mit dem
     # Spannungsblock, dazu jeder Gebrauchsnachweis bei erhöhter
     # Anforderung; eine Stütze, einachsig, mit charakteristischen Werten,
     # normaler Anforderung und Knicken -- so steht jede Wahl einmal da.
-    # Dazu ein Träger mit Spanngliedern, je eines in jedem Gesetz.
+    # Dazu ein Träger mit Spanngliedern, je eines in jedem Gesetz, und
+    # einer aus Stahl.
     p.querschnittsanalysen.append(_kastentraeger(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_stuetze(p.freie_kennung("a")))
     p.querschnittsanalysen.append(_spannbeton(p.freie_kennung("a")))
+    p.querschnittsanalysen.append(_stahltraeger(p.freie_kennung("a")))
 
     # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
     # sich nicht rechnen lässt -- dazu ein Rahmen im Raum. Dazu jede Lage
@@ -754,4 +756,21 @@ def _spannbeton(kennung: str) -> QuerschnittsanalyseEintrag:
     a.lastfall("Auflager", M_y_Ed=150.0, V_z_Ed=450.0)
     a.quasistaendig.lastfall("Dauer", M_y_Ed=550.0)
     a.spannungsfall("Biegung", art="moment_kruemmung")
+    return a
+
+
+def _stahltraeger(kennung: str) -> QuerschnittsanalyseEintrag:
+    """
+    Ein IPE 600 aus S355, zweiachsig, jede Klasse einmal (SIA 263:2013):
+    im Feld plastisch, schief, mit einer Querkraft über der Hälfte von V_Rd,
+    die dem Steg nimmt, und mit Torsion, die nur ein Hinweis ist; mit mehr
+    Druck nach (54), mit noch mehr am wirksamen Querschnitt nach (60), und
+    reiner Druck nach (55).
+    """
+    a = QuerschnittsanalyseEintrag(kennung=kennung, name="Stahlträger")
+    a.profil(0, 0, "IPE 600", stahl="st1")
+    a.lastfall("Feld", N_Ed=-1000.0, M_y_Ed=300.0, M_z_Ed=20.0, V_z_Ed=900.0, T_Ed=2.0)
+    a.lastfall("Druck mit Biegung", N_Ed=-3000.0, M_y_Ed=100.0)
+    a.lastfall("Beulen", N_Ed=-4000.0, M_y_Ed=50.0)
+    a.lastfall("Druck", N_Ed=-4000.0)
     return a

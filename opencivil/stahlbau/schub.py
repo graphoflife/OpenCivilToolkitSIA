@@ -29,15 +29,25 @@ RICHTUNG:
 ``z`` ist die Richtung, in der das ungedrehte Profil steht -- beim I und U
 die des Stegs, beim Rechteckrohr die von ``h``. Um 90° oder 270° gedreht,
 traegt es dasselbe in ``y``.
+
+WO DIE QUERKRAFT STEHT (:func:`streifen`):
+Die Bleche parallel zu ihr: beim I und U in Stegrichtung der Steg zwischen
+den Flanschen, ``h_w = h - 2 t_f`` wie in (43); quer dazu die Flansche
+ganz, ``2 b t_f`` wie ihre Schubflaeche; beim Rechteckrohr die beiden Waende
+in ihrer Richtung, je ``h - 3 t`` wie in 5.1.5.3. Das Rundrohr hat keine
+solchen Bleche: dort steht die Schubflaeche gleichmaessig ueber den Ring
+verteilt, ``A_v/A`` von jedem Teil (nach Vorgabe, nicht nachgeschlagen).
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
+from opencivil.querschnitt import geometrie as geo
 from opencivil.stahlprofile import tabelle
+from opencivil.stahlprofile.bleche import Punkt, bleche
 from opencivil.stahlprofile.lage import Profillage
 
 REFERENZ_SCHUB = "SIA 263:2013, 5.1.4.1, (41)"
@@ -137,3 +147,44 @@ def widerstand(lage: Profillage, flaeche: float, richtung: str, *, f_y: float, t
         flaeche - 2.0 * b * t_f + (t_w + r) * t_f, tau_y,
         rf"{flaeche:.0f} - 2 \cdot {b:g} \cdot {t_f:g} + ({t_w:g} + {r:g}) \cdot {t_f:g}",
         NACH_VORGABE, steg=pruefung)
+
+
+def rund(lage: Profillage) -> bool:
+    """Ob das Profil in jeder Richtung gleich traegt -- das Rundrohr."""
+    return tabelle.profil(lage.name).form.schluessel == "rundrohr"
+
+
+def _parallel(von: Punkt, bis: Punkt, richtung: str) -> bool:
+    """Ob die Strecke von ``von`` nach ``bis`` in ``richtung`` laeuft, «y» oder «z»."""
+    dy, dz = abs(bis[0] - von[0]), abs(bis[1] - von[1])
+    return dz > dy if richtung == "z" else dy > dz
+
+
+def streifen(lage: Profillage, richtung: str) -> List[Tuple[str, float, Tuple[Punkt, ...]]]:
+    """
+    Wo die Querkraft in ``richtung`` im Profil steht -- siehe Dateikopf: je
+    Streifen der Name seines Blechs, sein Anteil und sein Umriss in der
+    Zeichnung. Beim Rundrohr der Ring mit ``A_v/A``: der Umriss aussen mit
+    diesem Anteil, das Loch mit dem negativen.
+    """
+    profil = tabelle.profil(lage.name)
+    masse, form = profil.masse, profil.form.schluessel
+    if form == "rundrohr":
+        aussen, loch = lage.umrisse
+        D, t = masse["D"], masse["t"]
+        anteil = 2.0 * t * (D - t) / (geo.flaechenwerte(aussen).A - geo.flaechenwerte(loch).A)
+        return [("Wand", anteil, tuple(aussen)), ("Wand", -anteil, tuple(loch))]
+    teile = []
+    for blech in bleche(lage):
+        if not _parallel(blech.von, blech.bis, richtung):
+            continue
+        rolle = blech.name.split()[0]
+        if rolle == "Steg":
+            von, bis = masse["t_f"] / 2.0, blech.b - masse["t_f"] / 2.0
+        elif rolle == "Flansch":
+            # Beim U reicht der Flansch vom Ruecken aus, nicht von der Mitte des Stegs.
+            von, bis = (0.0 if form == "i_profil" else -masse["t_w"] / 2.0), blech.b
+        else:
+            von, bis = blech.vor, blech.vor + blech.c
+        teile.append((blech.name, 1.0, blech.streifen(von, bis)))
+    return teile

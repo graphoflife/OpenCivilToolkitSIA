@@ -70,7 +70,7 @@ import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.suche import illinois
+from opencivil.core.suche import illinois, winkel_suchen
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Gesetz,
@@ -731,13 +731,9 @@ class Querschnitt:
         von ``(M_y, M_z)`` zeigt.
 
         Die Richtung φ des Moments nimmt ab, wenn die Zugrichtung ψ zunimmt --
-        bei Symmetrie ist ``φ = -90° - ψ``. Bei einem L laeuft das in Stufen:
-        ueber weite Bereiche von ψ kaum eine Aenderung, dann ein Sprung. Ein
-        Sekantenverfahren verliert dort die Spur. Darum: von der Neigung aus,
-        die bei Symmetrie gaelte, in die richtige Richtung mit wachsenden
-        Schritten, bis die Abweichung das Vorzeichen wechselt -- dann
-        Illinois. ``None``, wenn N jenseits der reinen Zug- oder Druckkraft
-        liegt.
+        bei Symmetrie ist ``φ = -90° - ψ``. Gesucht wird von der Neigung aus,
+        die bei Symmetrie gaelte (:func:`~opencivil.core.suche.winkel_suchen`).
+        ``None``, wenn N jenseits der reinen Zug- oder Druckkraft liegt.
         """
         ziel = math.atan2(M_z, M_y)
         schluessel = (N, round(ziel, 12))
@@ -756,26 +752,7 @@ class Querschnitt:
 
         if self.bei_normalkraft(0.0, N) is None:
             return None
-        a = self.neigung_fuer(M_y, M_z)
-        fa, punkt = abweichung(a)
-        if abs(fa) <= WINKEL_SCHRANKE:
-            return punkt
-        # φ zu gross heisst: ψ vergroessern.
-        richtung = 1.0 if fa > 0 else -1.0
-        schritt = math.radians(5.0)
-        gegangen = 0.0
-        while gegangen < 2.0 * math.pi:
-            b = a + richtung * schritt
-            fb, punkt = abweichung(b)
-            if abs(fb) <= WINKEL_SCHRANKE:
-                return punkt
-            if (fb > 0) != (fa > 0) and abs(fb - fa) < math.pi:
-                return illinois(abweichung, a, fa, b, fb,
-                                schranke_x=1e-12, schranke_f=WINKEL_SCHRANKE)
-            gegangen += schritt
-            a, fa = b, fb
-            schritt = min(2.0 * schritt, math.radians(45.0))
-        return punkt  # nicht eingegrenzt -- kommt bei einem Querschnitt nicht vor
+        return winkel_suchen(abweichung, self.neigung_fuer(M_y, M_z), schranke=WINKEL_SCHRANKE)
 
     # -- Aufschluesselung ---------------------------------------------------
 

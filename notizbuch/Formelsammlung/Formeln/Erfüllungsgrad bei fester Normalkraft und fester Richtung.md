@@ -1,5 +1,5 @@
 ---
-erzeugt: 4b69bee9c970
+erzeugt: 1991bc2b6f74
 art: formel
 tags: [formel]
 ---
@@ -12,11 +12,13 @@ $$
 
 ## Im Code
 
+- [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._ansatz]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 
 ## Themen
 
 - [[Schiefe Biegung]]
+- [[Stahlquerschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

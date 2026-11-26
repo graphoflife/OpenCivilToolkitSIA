@@ -16,7 +16,8 @@ Verhaeltnis der elastischen Spannungen an den Raendern, Druck positiv: 1 bei
 gleichmaessigem Druck, -1 bei Biegung um die Mitte. Beim einseitig
 gestuetzten Blech zaehlt dazu, welcher Rand staerker gedrueckt ist: der
 freie (Tabelle 5b, mittlere Zeilen, ``k₁``) oder der gehaltene (untere,
-``k₂``). Gedrueckt ist ganz, was ``α = 1`` und ``ψ = 1`` hat: dafuer nennt
+``k₂``) -- plastisch und elastisch je fuer sich, denn die beiden Nulllinien
+muessen nicht parallel liegen. Gedrueckt ist ganz, was ``α = 1`` und ``ψ = 1`` hat: dafuer nennt
 Tabelle 5b eigene Grenzen, 14 ε statt 21 ε √k₁ = 13.8 ε.
 
 AUSSERHALB DER BEREICHE -- nach Vorgabe, nicht nachgeschlagen:
@@ -82,12 +83,14 @@ def k_2(psi: float) -> float:
     return 0.578 / (0.34 + psi) if psi >= 0.0 else 1.7 - 5.0 * psi + 17.1 * psi * psi
 
 
-def grenzen(halterung: Halterung, eps: float, alpha: float, psi: Optional[float],
-            frei_gedrueckt: bool = False) -> Grenzen:
+def grenzen(halterung: Halterung, eps: float, alpha: float, psi: Optional[float], *,
+            frei_pl: bool = False, frei_el: bool = False) -> Grenzen:
     """
     Die Grenzen eines Blechs -- siehe Dateikopf. ``alpha`` null heisst
     plastisch nicht gedrueckt, ``psi`` ``None`` elastisch nicht gedrueckt:
     dort gilt keine Grenze der Klassen 1 und 2, hier keine der Klasse 3.
+    ``frei_pl`` und ``frei_el``: ob der freie Rand plastisch und elastisch
+    der staerker gedrueckte ist.
     """
     if halterung is Halterung.ROHR:
         e2 = eps * eps
@@ -106,14 +109,14 @@ def grenzen(halterung: Halterung, eps: float, alpha: float, psi: Optional[float]
         else:
             elastisch = 62.0 * eps * (1.0 - psi) * math.sqrt(-psi)
         return Grenzen((*plastisch, elastisch))
-    hoch = 1.0 if frei_gedrueckt else 1.5
+    hoch = 1.0 if frei_pl else 1.5
     plastisch = (OHNE, OHNE) if alpha <= 0.0 else (9.0 * eps / alpha ** hoch, 10.0 * eps / alpha ** hoch)
     if psi is None:
         elastisch = OHNE
     elif psi >= 1.0:
         elastisch = 14.0 * eps
     else:
-        elastisch = 21.0 * eps * math.sqrt(k_1(psi) if frei_gedrueckt else k_2(psi))
+        elastisch = 21.0 * eps * math.sqrt(k_1(psi) if frei_el else k_2(psi))
     return Grenzen((*plastisch, elastisch))
 
 

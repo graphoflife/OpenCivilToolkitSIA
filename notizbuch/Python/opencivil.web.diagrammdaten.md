@@ -1,5 +1,5 @@
 ---
-erzeugt: 1db862ab0a29
+erzeugt: 0f0d3a1b999e
 art: modul
 tags: [modul]
 ---
@@ -203,9 +203,10 @@ demselben Querschnitt.
 Die Einwirkung steht so da, wie nachgewiesen: mit der Laengszugkraft aus
 Querkraft und Torsion, wo sie zugeschaltet ist.
 
-Ein Querschnitt ohne Nachweise -- aus Holz etwa -- hat weder die Flaeche
-noch Lastfaelle; `ohne_nachweis` sagt in einem Satz, warum. Beim
-Stahlbeton ist er leer.
+Ein Querschnitt ohne Interaktionsdiagramm -- aus Holz oder Stahl -- hat
+weder die Flaeche noch Lastfaelle; `ohne_diagramm` sagt in einem Satz,
+warum ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_diagramm|ohne_diagramm]]).
+Beim Stahlbeton ist er leer.
 
 ### _als_kn
 
@@ -332,6 +333,7 @@ von `V_z` tragen, in kN -- ohne sie `None`.
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt]]
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.spannungsanalyse]]

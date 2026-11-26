@@ -1,5 +1,5 @@
 ---
-erzeugt: 56828af21847
+erzeugt: a5324a908224
 art: formel
 tags: [formel]
 ---
@@ -53,6 +53,7 @@ $$
 - [[Knicken]]
 - [[Duktilität je Richtung]]
 - [[Sprödes Versagen je Richtung]]
+- [[Stahlquerschnitt]]
 - [[Durchstanzen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

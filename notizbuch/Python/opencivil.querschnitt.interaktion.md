@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c1568b027d0
+erzeugt: 60ab72f2749d
 art: modul
 tags: [modul]
 ---
@@ -383,13 +383,9 @@ Der Bruchzustand bei dieser Normalkraft, dessen Moment in die Richtung
 von `(M_y, M_z)` zeigt.
 
 Die Richtung φ des Moments nimmt ab, wenn die Zugrichtung ψ zunimmt --
-bei Symmetrie ist `φ = -90° - ψ`. Bei einem L laeuft das in Stufen:
-ueber weite Bereiche von ψ kaum eine Aenderung, dann ein Sprung. Ein
-Sekantenverfahren verliert dort die Spur. Darum: von der Neigung aus,
-die bei Symmetrie gaelte, in die richtige Richtung mit wachsenden
-Schritten, bis die Abweichung das Vorzeichen wechselt -- dann
-Illinois. `None`, wenn N jenseits der reinen Zug- oder Druckkraft
-liegt.
+bei Symmetrie ist `φ = -90° - ψ`. Gesucht wird von der Neigung aus,
+die bei Symmetrie gaelte ([[opencivil.core.suche#winkel_suchen|winkel_suchen]]).
+`None`, wenn N jenseits der reinen Zug- oder Druckkraft liegt.
 
 #### Querschnitt.anteile
 
@@ -480,3 +476,4 @@ d null, ohne Beton beides null.
 - [[opencivil.querschnitt.spannglieder]]
 - [[opencivil.querschnitt.widerstandsflaeche]]
 - [[opencivil.spannungsanalyse.schnitt]]
+- [[opencivil.stahlbau.widerstand]]

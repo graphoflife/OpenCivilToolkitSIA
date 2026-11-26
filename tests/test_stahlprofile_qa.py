@@ -148,10 +148,7 @@ class TestAnalyse(unittest.TestCase):
             with self.subTest(groesse=groesse):
                 ist = e.wert(f"querschnittsanalyse.{a.kennung}.{groesse}").groesse.si
                 self.assertAlmostEqual(ist / soll, 1.0, delta=GRENZE)
-        self.assertEqual(e.aufbau.teile[a.kennung].ohne_nachweis,
-                         "die Lastfälle eines Stahlquerschnitts weist das Werkzeug nach SIA "
-                         "263:2013 noch nicht nach – seine Klassen und Widerstände stehen unter "
-                         "den Kennzahlen")
+        self.assertEqual(e.aufbau.teile[a.kennung].ohne_nachweis, "")
 
     def test_um_90_grad_tauschen_I_y_und_I_z(self):
         p = projekt()

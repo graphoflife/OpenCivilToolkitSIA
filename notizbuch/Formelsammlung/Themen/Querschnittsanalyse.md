@@ -1,5 +1,5 @@
 ---
-erzeugt: 0a34b72e639c
+erzeugt: d0c12db78a46
 art: thema
 tags: [thema]
 ---
@@ -11,6 +11,8 @@ tags: [thema]
 Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort – eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach oben; alle Masse in Millimetern.
 
 Die Zugkraft im Spannstahl zählt zum Widerstand des Querschnitts; die Lastfälle stehen darum ohne Vorspannung da. Mit Verbund dehnt sich ein Glied mit dem Beton an seiner Stelle und trägt dazu seine Vordehnung: bei der Dehnung null des Querschnitts schon σ\_p∞. Ohne Verbund wirkt die Kraft nach allen Verlusten, ohne Zuwachs. Schlaff angesetzt – wenn die Vorspannung schon als Einwirkung in den Lastfällen steht – trägt ein Glied nur, was über σ\_p∞ hinausgeht.
+
+Ein Stahlprofil zählt mit seinem Umriss: die Ausrundungen als Vieleck, ein Rohr mit seinem Loch als Aussparung. Fläche und Trägheitsmomente weichen so höchstens ein halbes Prozent von den Kennwerten ab, mit denen das Balkensystem dasselbe Profil rechnet.
 
 Für ein beliebiges Polygon gibt es keine Formel für I\_T. Gerechnet wird mit der Spannungsfunktion φ von Prandtl, auf einem Gitter: seine Linien laufen durch jede waagrechte und lotrechte Kante, je Zelle gibt es einen Wert, und eine schräge Kante wird zwischen zwei Zellmitten genau geschnitten. Am Rand eines Hohlraums ist φ fest, und hinaus fliesst so viel, wie der Hohlraum Fläche hat. Der Fehler fällt mit dem Quadrat der Zellgrösse; ein zweites Gitter, jede Zelle halbiert, hebt ihn heraus.
 

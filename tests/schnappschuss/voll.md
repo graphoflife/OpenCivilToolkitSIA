@@ -1,6 +1,6 @@
 # Voll
 
-890 Berechnungen ausgeführt, 1301 Werte bestimmt.
+900 Berechnungen ausgeführt, 1335 Werte bestimmt.
 
 ## Herleitung
 
@@ -8162,6 +8162,8 @@ $$
 T_{Rd} = 230.7\,\mathrm{kNm}
 $$
 
+### Torsionsträgheitsmoment
+
 > **Annahme:** I\_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht nachgeschlagen).
 
 **Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k**
@@ -10806,6 +10808,687 @@ $$
 
 $$
 N_{Rd}^{-} = -28750\,\mathrm{kN}
+$$
+
+### Querschnittsanalyse: Stahlträger
+
+**Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
+
+$$
+A = \frac{1}{2} \sum_i c_i \qquad y_S = \frac{1}{6A} \sum_i (y_i + y_{i+1})\, c_i \qquad z_S = \frac{1}{6A} \sum_i (z_i + z_{i+1})\, c_i \qquad c_i = y_i\, z_{i+1} - y_{i+1}\, z_i
+$$
+
+**Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt**
+
+$$
+I_y = \frac{1}{12} \sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\, c_i - A\, z_S^2\qquad I_z = \frac{1}{12} \sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\, c_i - A\, y_S^2
+$$
+
+**Polygone des Querschnitts**
+
+| Polygon | Material | liegt in | Ecken | $\pm A\ [\mathrm{mm}^2]$ | $y_S\ [\mathrm{mm}]$ | $z_S\ [\mathrm{mm}]$ |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: |
+| Profil 1 (IPE 600) | S355 | – | $60$ | $15604$ | $0.0$ | $0.0$ |
+
+**Fläche des Bruttoquerschnitts**
+
+$$
+A = 15604\,\mathrm{mm}^{2}
+$$
+
+**Schwerpunkt, y**
+
+$$
+y_S = 0\,\mathrm{mm}
+$$
+
+**Schwerpunkt, z**
+
+$$
+z_S = 0\,\mathrm{mm}
+$$
+
+**Trägheitsmoment um y**
+
+$$
+I_y = 921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Trägheitsmoment um z**
+
+$$
+I_z = 33.9\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+**Deviationsmoment**
+
+$$
+I_{yz} = 0\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+Keine Bewehrung gezeichnet.
+
+**Stahlfläche der Bewehrung**
+
+$$
+A_{s,tot} = 0\,\mathrm{mm}^{2}
+$$
+
+### Kennzahlen
+
+> **Annahme:** Den Nettoquerschnitt nach (39) prüft das Werkzeug nicht: gerechnet wird der gezeichnete Querschnitt nach (38) – nach Vorgabe, nicht nachgeschlagen.
+
+#### Teile
+
+> **Annahme:** Ein Profil rechnet ganz mit der Fliessgrenze seines dicksten Blechs, eine frei gezeichnete Fläche mit der ihrer kleinsten Breite – nach Vorgabe, nicht nachgeschlagen.
+
+**Beiwert der Grenzschlankheiten, f\_y in N/mm²** *(SIA 263:2013, Tabelle 5b)*
+
+$$
+\varepsilon = \sqrt{\frac{235}{f_y}}
+$$
+
+**Teile aus Baustahl**
+
+| Teil | Baustahl | $t\ [\mathrm{mm}]$ | $f_y\ [\mathrm{N}/\mathrm{mm}^2]$ | $\tau_y\ [\mathrm{N}/\mathrm{mm}^2]$ | $\varepsilon$ | $A\ [\mathrm{mm}^2]$ |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1 (IPE 600) | S355 | $19.0$ | $355$ | $205$ | $0.814$ | $15604$ |
+
+#### Normalkraft
+
+**Zugwiderstand, am gezeichneten Querschnitt** *(SIA 263:2013, 5.1.2.1, (38))*
+
+$$
+N_{Rd}^{+} = \frac{f_y \cdot A}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15604\,\mathrm{mm}^{2}}{1.05} = 5275.5\,\mathrm{kN}
+$$
+
+**Bleche bei Druck**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $1.00$ | $1.00$ | $26.8 / 30.9 / 34.2$ | $4$ |
+
+**Querschnittsklasse – massgebend Profil 1: Steg** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK}^{-} = 4
+$$
+
+**Mitwirkende Breite, b zwischen den theoretischen Scheibenschnittlinien** *(SIA 263:2013, 4.5.3.2, (11); 4.5.3.3)*
+
+$$
+\bar{\lambda}_p = \frac{b/t}{28.4\, \varepsilon \sqrt{k}} \qquad \rho = \frac{0.9}{\bar{\lambda}_p} \le 1 \qquad b_{eff} = \rho\, b_c
+$$
+
+**Mitwirkende Breiten in Klasse 4**
+
+| Blech | $b\ [\mathrm{mm}]$ | $\psi$ | $k$ | $\bar{\lambda}_p$ | $\rho$ | $b_c\ [\mathrm{mm}]$ | $b_{eff}\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Steg | $581.0$ | $1.00$ | $4.000$ | $1.048$ | $0.859$ | $581.0$ | $499.1$ |
+
+> **Annahme:** Der wirksame Querschnitt entsteht in einem Schritt aus den Spannungen des Bruttoquerschnitts; je Blech fällt ein Streifen der gedrückten Zone weg, beim einseitig gehaltenen am freien Ende – nach Vorgabe, nicht nachgeschlagen.
+
+**Druckwiderstand in Klasse 4, am wirksamen Querschnitt** *(SIA 263:2013, 5.3.2, (55); 4.5.3)*
+
+$$
+N_{Rd}^{-} = -\frac{f_y \cdot A_{eff}}{\gamma_{M1}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14621\,\mathrm{mm}^{2}}{1.05} = -4943.2\,\mathrm{kN}
+$$
+
+#### Biegung, Zug unten
+
+**Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt**
+
+$$
+z_{pl} = 0\,\mathrm{mm}
+$$
+
+**Bleche bei Biegung, Zug unten**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, links | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $0.50$ | $-1.00$ | $58.6 / 67.5 / 100.9$ | $1$ |
+
+**Querschnittsklasse** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK}_{y}^{+} = 1
+$$
+
+**Plastischer Widerstand in Klasse 1** *(SIA 263:2013, 5.1.3, (40))*
+
+$$
+M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = 1188\,\mathrm{kNm}
+$$
+
+#### Biegung, Zug oben
+
+**Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt**
+
+$$
+z_{pl} = 0\,\mathrm{mm}
+$$
+
+**Bleche bei Biegung, Zug oben**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Flansch unten, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $0.50$ | $-1.00$ | $58.6 / 67.5 / 100.9$ | $1$ |
+
+**Querschnittsklasse** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK}_{y}^{-} = 1
+$$
+
+**Plastischer Widerstand in Klasse 1** *(SIA 263:2013, 5.1.3, (40))*
+
+$$
+M_{y,Rd}^{-} = -\frac{f_y \cdot W_{pl}}{\gamma_{M1}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3513.8\,\mathrm{cm}^{3}}{1.05} = -1188\,\mathrm{kNm}
+$$
+
+#### Biegung, Zug links
+
+**Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt**
+
+$$
+y_{pl} = 0\,\mathrm{mm}
+$$
+
+**Bleche bei Biegung, Zug links**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b, freier Rand gedrückt | $80.0/19.0 = 4.2$ | $1.00$ | $0.27$ | $7.3 / 8.1 / 12.3$ | $1$ |
+| Profil 1: Flansch unten, links | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b, freier Rand gedrückt | $80.0/19.0 = 4.2$ | $1.00$ | $0.27$ | $7.3 / 8.1 / 12.3$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+
+**Querschnittsklasse** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK}_{z}^{+} = 1
+$$
+
+**Plastischer Widerstand in Klasse 1** *(SIA 263:2013, 5.1.3, (40))*
+
+$$
+M_{z,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = 164.2\,\mathrm{kNm}
+$$
+
+#### Biegung, Zug rechts
+
+**Plastische Nulllinie bei N = 0: so viel Kraft gezogen wie gedrückt**
+
+$$
+y_{pl} = 0\,\mathrm{mm}
+$$
+
+**Bleche bei Biegung, Zug rechts**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b, freier Rand gedrückt | $80.0/19.0 = 4.2$ | $1.00$ | $0.27$ | $7.3 / 8.1 / 12.3$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Flansch unten, links | 5b, freier Rand gedrückt | $80.0/19.0 = 4.2$ | $1.00$ | $0.27$ | $7.3 / 8.1 / 12.3$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+
+**Querschnittsklasse** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK}_{z}^{-} = 1
+$$
+
+**Plastischer Widerstand in Klasse 1** *(SIA 263:2013, 5.1.3, (40))*
+
+$$
+M_{z,Rd}^{-} = -\frac{f_y \cdot W_{pl}}{\gamma_{M1}} = -\frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 485.7\,\mathrm{cm}^{3}}{1.05} = -164.2\,\mathrm{kNm}
+$$
+
+#### Querkraft
+
+**Querkraftwiderstand** *(SIA 263:2013, 5.1.4.1, (41))*
+
+$$
+V_{Rd} = \frac{\tau_y\, A_v}{\gamma_{M1}}
+$$
+
+**Beim I und beim U beult der Steg nicht, solange** *(SIA 263:2013, 5.1.4.2, (42))*
+
+$$
+\frac{h - t_f}{t_w} \le \sqrt{\frac{4 E}{f_y}}
+$$
+
+**Schubbeulen des Blechs, ohne Quersteifen** *(SIA 263:2013, 4.5.4.1, (13); Figur 8)*
+
+$$
+V_{Rd} = \frac{0.9 \sqrt{\tau_{cr}\, \tau_y}\, b\, t}{\gamma_{M1}} \le \frac{\tau_y\, b\, t}{\gamma_{M1}} \qquad \tau_{cr} = k_\tau\, 0.9\, E \left(\frac{t}{b}\right)^2 \qquad k_\tau = 5.34
+$$
+
+**Querkraft in z: je Profil**
+
+| Profil | $A_v\ \text{oder}\ b\, t$ | $[\mathrm{mm}^2]$ | $\text{Beulen}$ | $\tau\ [\mathrm{N}/\mathrm{mm}^2]$ | Stelle | $V_{Rd}\ [\mathrm{kN}]$ |
+| :--- | :--- | ---: | ---: | ---: | :--- | ---: |
+| Profil 1 (IPE 600) | $15604 - 2 \cdot 220 \cdot 19 + (12 + 2 \cdot 24) \cdot 19$ | $8384$ | $48.4 \le 48.6$ | $205$ | SIA 263:2013, 5.1.4.1, (41a) | $1636.8$ |
+
+**Querkraftwiderstand in z, alle Profile zusammen** *(SIA 263:2013, 5.1.4.1, (41))*
+
+$$
+V_{z,Rd} = 1636.8\,\mathrm{kN}
+$$
+
+**Querkraft in y: je Profil**
+
+| Profil | $A_v\ \text{oder}\ b\, t$ | $[\mathrm{mm}^2]$ | $\text{Beulen}$ | $\tau\ [\mathrm{N}/\mathrm{mm}^2]$ | Stelle | $V_{Rd}\ [\mathrm{kN}]$ |
+| :--- | :--- | ---: | ---: | ---: | :--- | ---: |
+| Profil 1 (IPE 600) | $2 \cdot 220 \cdot 19$ | $8360$ | $–$ | $205$ | nach Vorgabe, nicht nachgeschlagen | $1632.2$ |
+
+**Querkraftwiderstand in y, alle Profile zusammen** *(SIA 263:2013, 5.1.4.1, (41))*
+
+$$
+V_{y,Rd} = 1632.2\,\mathrm{kN}
+$$
+
+### Biegung und Normalkraft
+
+> **Annahme:** Die Klasse je Lastfall aus diesen beiden Zuständen – nach Vorgabe, nicht nachgeschlagen: die Norm sagt nicht, bei welcher Laststufe α und ψ gelten.
+
+**Erfüllungsgrad bei fester Normalkraft und fester Richtung**
+
+$$
+\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+$$
+
+**Klasse 3, (54): elastisch, bis die erste Faser fliesst – mit e, wo der Schwerpunkt neben dem Bezugspunkt liegt** *(SIA 263:2013, 5.2.6, (54); 5.2.2; 5.2.3, (52))*
+
+$$
+\frac{|N_{Ed}|}{N_{Rd}} + \frac{|\lambda M_{y,Ed} + e_z N_{Ed}|}{M_{y,Rd}} + \frac{|\lambda M_{z,Ed} + e_y N_{Ed}|}{M_{z,Rd}} \le 1
+$$
+
+**Klasse 4, (60) als Widerstände: am wirksamen Querschnitt, e vom Schwerpunkt seiner Fläche bei Druck** *(SIA 263:2013, 5.3.5, (60); 4.5.3)*
+
+$$
+\frac{|N_{Ed}|}{N_{Rd}} + \frac{|\lambda M_{y,Ed} + e_z N_{Ed}|}{M_{y,Rd}} + \frac{|\lambda M_{z,Ed} + e_y N_{Ed}|}{M_{z,Rd}} \le 1
+$$
+
+#### Feld
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $-1000.0$ | kN |
+| M\_y,Ed | $300.0$ | kNm |
+| M\_z,Ed | $20.0$ | kNm |
+| V\_z,Ed | $900.0$ | kN |
+| V\_y,Ed | $0.0$ | kN |
+| T\_Ed | $2.0$ | kNm |
+
+> **Hinweis:** Torsion weist das Werkzeug beim Stahlquerschnitt nicht nach: SIA 263 nennt in 5.1 bis 5.3 keinen Torsionswiderstand des Querschnitts (nach Vorgabe, nicht nachgeschlagen).
+
+**Querkraft in z über der Hälfte von V\_Rd: was die Bleche, in denen sie steht, für Normalkraft und Biegung verlieren** *(SIA 263:2013, 5.1.5.1, (43); 5.1.7; 5.2.7; 5.3.6.1)*
+
+$$
+\rho_{z} = \left(\frac{V_{z,Ed}}{V_{z,Rd}}\right)^2 = \left(\frac{900\,\mathrm{kN}}{1636.8\,\mathrm{kN}}\right)^2 = 0.302
+$$
+
+Gemindert: Profil 1: Steg. Ein Teil eines Blechs zählt mit 1 − ρ; in den Tabellen steht, was die Querkraft nimmt, mit negativer Kraft.
+
+> **Annahme:** Dieselbe Minderung für jedes Profil und jede Richtung, auch für die Normalkraft, und in den Klassen 3 und 4 statt der Vergleichsspannung – nach Vorgabe, nicht nachgeschlagen.
+
+**Bleche im Lastfall**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b | $80.0/19.0 = 4.2$ | $0.95$ | $0.64$ | $7.9 / 8.8 / 13.1$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b, freier Rand gedrückt | $80.0/19.0 = 4.2$ | $1.00$ | $0.78$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, links | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $–$ | $– / – / –$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b, freier Rand gedrückt | $80.0/19.0 = 4.2$ | $0.60$ | $-3.08$ | $12.2 / 13.5 / 23.1$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $0.65$ | $-0.31$ | $43.4 / 49.9 / 60.1$ | $1$ |
+
+**Querschnittsklasse** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 1
+$$
+
+Nulllinie: Zugrichtung n = (-0.961; -0.278), -163.9° gegen die y-Achse; gezogen ist, wo n\_y y + n\_z z \> 21.2 mm.
+
+**Kräfte im plastischen Zustand – je Teil und Zone, mit f\_y je Baustahl**
+
+| Teil | Zone | $F\ [\mathrm{kN}]$ | $y\ [\mathrm{mm}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Profil 1 (IPE 600) | Zug | $2044.1$ | $-14.4$ | $-237.3$ |
+| Profil 1 (IPE 600) | Druck | $-3231.4$ | $9.1$ | $150.1$ |
+| Profil 1 (IPE 600), Steg, Querkraft in z | Zug | $-251.0$ | $-0.2$ | $-178.3$ |
+| Profil 1 (IPE 600), Steg, Querkraft in z | Druck | $438.4$ | $0.1$ | $102.1$ |
+
+**Probe: Normalkraft**
+
+$$
+N_{Rd} = \sum F_i = -1000\,\mathrm{kN}
+$$
+
+**Probe: Moment um y**
+
+$$
+M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 880.5\,\mathrm{kNm}
+$$
+
+**Probe: Moment um z**
+
+$$
+M_{z,Rd} = -\sum F_i \cdot (y_i - y_S) = 58.7\,\mathrm{kNm}
+$$
+
+**Widerstand in der Richtung der Einwirkung** *(SIA 263:2013, 5.1.1.2; 5.1.8)*
+
+$$
+M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}} = \sqrt{\left(880.5\,\mathrm{kNm}\right)^{2} + \left(58.7\,\mathrm{kNm}\right)^{2}} = 882.5\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{882.5\,\mathrm{kNm}}{300.7\,\mathrm{kNm}} = 2.93 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Druck mit Biegung
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $-3000.0$ | kN |
+| M\_y,Ed | $100.0$ | kNm |
+| M\_z,Ed | $0.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+| V\_y,Ed | $0.0$ | kN |
+
+**Bleche im Lastfall**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, links | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $1.00$ | $– / – / 11.4$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b | $80.0/19.0 = 4.2$ | $0.00$ | $1.00$ | $– / – / 11.4$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $1.00$ | $0.21$ | $26.8 / 30.9 / 46.2$ | $3$ |
+
+**Querschnittsklasse – massgebend Profil 1: Steg** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 3
+$$
+
+**Wie weit das Moment wachsen darf** *(SIA 263:2013, 5.2.6, (54); 5.2.2; 5.2.3, (52))*
+
+$$
+\frac{3000.0}{5275.5} + \frac{|\lambda \cdot 100.0|}{1038.2} = 1 \quad\Rightarrow\quad \lambda = 4.478
+$$
+
+**Widerstand in der Richtung der Einwirkung**
+
+$$
+M_{Rd} = \lambda \cdot M_{Ed} = 4.478 \cdot 100\,\mathrm{kNm} = 447.8\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Druck mit Biegung}} = \frac{M_{Rd}}{M_{Ed}} = \frac{447.8\,\mathrm{kNm}}{100\,\mathrm{kNm}} = 4.48 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Beulen
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $-4000.0$ | kN |
+| M\_y,Ed | $50.0$ | kNm |
+| M\_z,Ed | $0.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+| V\_y,Ed | $0.0$ | kN |
+
+**Bleche im Lastfall**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $1.00$ | $0.57$ | $26.8 / 30.9 / 39.8$ | $4$ |
+
+**Querschnittsklasse – massgebend Profil 1: Steg** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 4
+$$
+
+**Mitwirkende Breite, b zwischen den theoretischen Scheibenschnittlinien** *(SIA 263:2013, 4.5.3.2, (11); 4.5.3.3)*
+
+$$
+\bar{\lambda}_p = \frac{b/t}{28.4\, \varepsilon \sqrt{k}} \qquad \rho = \frac{0.9}{\bar{\lambda}_p} \le 1 \qquad b_{eff} = \rho\, b_c
+$$
+
+**Mitwirkende Breiten bei Druck**
+
+| Blech | $b\ [\mathrm{mm}]$ | $\psi$ | $k$ | $\bar{\lambda}_p$ | $\rho$ | $b_c\ [\mathrm{mm}]$ | $b_{eff}\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Steg | $581.0$ | $1.00$ | $4.000$ | $1.048$ | $0.859$ | $581.0$ | $499.1$ |
+
+> **Annahme:** Der wirksame Querschnitt entsteht in einem Schritt aus den Spannungen des Bruttoquerschnitts; je Blech fällt ein Streifen der gedrückten Zone weg, beim einseitig gehaltenen am freien Ende – nach Vorgabe, nicht nachgeschlagen.
+
+**Wirksame Fläche bei Druck** *(SIA 263:2013, 5.3.2, (55))*
+
+$$
+A_{eff} = 14621\,\mathrm{mm}^{2}
+$$
+
+**Wirksames Widerstandsmoment, Zug unten**
+
+$$
+W_{eff} = \frac{I_{eff}}{z} = \frac{921.2\,\cdot 10^{6}\,\mathrm{mm}^{4}}{300\,\mathrm{mm}} = 3070.7\,\mathrm{cm}^{3}
+$$
+
+**Widerstand, Zug unten** *(SIA 263:2013, 5.3.5, (60); 4.5.3)*
+
+$$
+M_{y,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3070.7\,\mathrm{cm}^{3}}{1.05} = 1038.2\,\mathrm{kNm}
+$$
+
+**Wie weit das Moment wachsen darf** *(SIA 263:2013, 5.3.5, (60); 4.5.3)*
+
+$$
+\frac{4000.0}{4943.2} + \frac{|\lambda \cdot 50.0|}{1038.2} = 1 \quad\Rightarrow\quad \lambda = 3.962
+$$
+
+**Widerstand in der Richtung der Einwirkung**
+
+$$
+M_{Rd} = \lambda \cdot M_{Ed} = 3.962 \cdot 50\,\mathrm{kNm} = 198.1\,\mathrm{kNm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Beulen}} = \frac{M_{Rd}}{M_{Ed}} = \frac{198.1\,\mathrm{kNm}}{50\,\mathrm{kNm}} = 3.96 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Druck
+
+**Einwirkung**
+
+| Einwirkung | Wert |  |
+| :--- | ---: | :--- |
+| N\_Ed | $-4000.0$ | kN |
+| M\_y,Ed | $0.0$ | kNm |
+| M\_z,Ed | $0.0$ | kNm |
+| V\_z,Ed | $0.0$ | kN |
+| V\_y,Ed | $0.0$ | kN |
+
+**Bleche im Lastfall**
+
+| Blech | Tabelle | $c/t$ | $\alpha$ | $\psi$ | $\text{Grenzen}\ 1 / 2 / 3$ | Klasse |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Flansch oben, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch oben, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, links | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Flansch unten, rechts | 5b | $80.0/19.0 = 4.2$ | $1.00$ | $1.00$ | $7.3 / 8.1 / 11.4$ | $1$ |
+| Profil 1: Steg | 5a | $514.0/12.0 = 42.8$ | $1.00$ | $1.00$ | $26.8 / 30.9 / 34.2$ | $4$ |
+
+**Querschnittsklasse – massgebend Profil 1: Steg** *(SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b)*
+
+$$
+\mathrm{QK} = 4
+$$
+
+**Mitwirkende Breite, b zwischen den theoretischen Scheibenschnittlinien** *(SIA 263:2013, 4.5.3.2, (11); 4.5.3.3)*
+
+$$
+\bar{\lambda}_p = \frac{b/t}{28.4\, \varepsilon \sqrt{k}} \qquad \rho = \frac{0.9}{\bar{\lambda}_p} \le 1 \qquad b_{eff} = \rho\, b_c
+$$
+
+**Mitwirkende Breiten bei Druck**
+
+| Blech | $b\ [\mathrm{mm}]$ | $\psi$ | $k$ | $\bar{\lambda}_p$ | $\rho$ | $b_c\ [\mathrm{mm}]$ | $b_{eff}\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Profil 1: Steg | $581.0$ | $1.00$ | $4.000$ | $1.048$ | $0.859$ | $581.0$ | $499.1$ |
+
+> **Annahme:** Der wirksame Querschnitt entsteht in einem Schritt aus den Spannungen des Bruttoquerschnitts; je Blech fällt ein Streifen der gedrückten Zone weg, beim einseitig gehaltenen am freien Ende – nach Vorgabe, nicht nachgeschlagen.
+
+**Druckwiderstand am wirksamen Querschnitt** *(SIA 263:2013, 5.3.2, (55))*
+
+$$
+N_{Rd}^{-} = -4943.2\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\text{Druck}} = \frac{N_{Rd}^{-}}{N_{Ed}} = \frac{-4943.2\,\mathrm{kN}}{-4000\,\mathrm{kN}} = 1.24 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Querkraft
+
+#### Feld
+
+**Querkraft in z**
+
+$$
+V_{z,Ed} = 900\,\mathrm{kN} \quad \le \quad V_{z,Rd} = 1636.8\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{V,\text{Feld}} = \frac{V_{z,Rd}}{V_{z,Ed}} = \frac{1636.8\,\mathrm{kN}}{900\,\mathrm{kN}} = 1.82 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Druck mit Biegung
+
+Keine Einwirkung → kein Nachweis.
+
+#### Beulen
+
+Keine Einwirkung → kein Nachweis.
+
+#### Druck
+
+Keine Einwirkung → kein Nachweis.
+
+### Torsionsträgheitsmoment
+
+> **Annahme:** I\_T nach St. Venant am Bruttoquerschnitt, ungerissen und ohne Bewehrung, numerisch aus der Spannungsfunktion von Prandtl (nach Vorgabe, nicht nachgeschlagen).
+
+**Spannungsfunktion von Prandtl; am Rand des Hohlraums k ist φ = φ\_k**
+
+$$
+\nabla^2 \phi = -2 \qquad \phi = 0 \ \text{am Rand} \qquad \oint_k \frac{\partial \phi}{\partial n}\, ds = -2\, A_k
+$$
+
+**Torsionsträgheitsmoment aus der Spannungsfunktion**
+
+$$
+I_T = 2 \int_A \phi\, dA + 2 \sum_k \phi_k\, A_k
+$$
+
+**Die beiden Gitter**
+
+| Gitter | Zellen | mit Material | $A_k\ [\mathrm{mm}^2]$ | $I_T\ [10^6\,\mathrm{mm}^4]$ |
+| :--- | ---: | ---: | ---: | ---: |
+| grob | $104 \times 248$ | $3616$ | – | $1.7$ |
+| fein | $208 \times 496$ | $14460$ | – | $1.7$ |
+
+**Torsionsträgheitsmoment, nach Richardson aus beiden Gittern**
+
+$$
+I_T = \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} = \frac{4 \cdot 1.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - 1.7\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} = 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
+$$
+
+### Baustahl: S355
+
+**Streckgrenze** *(SIA 263:2013, 3.2.2.3, Tabelle 1)*
+
+$$
+f_y = 355\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Streckgrenze für 40 mm \< t ≤ 100 mm** *(SIA 263:2013, 3.2.2.3, Tabelle 1)*
+
+$$
+f_y^{t>40} = 335\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Fliessschubspannung** *(SIA 263:2013, 3.2.2.3, Tabelle 1)*
+
+$$
+\tau_y = 205\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Fliessschubspannung für 40 mm \< t ≤ 100 mm** *(SIA 263:2013, 3.2.2.3, Tabelle 1)*
+
+$$
+\tau_y^{t>40} = 193\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise** *(SIA 263:2013, 4.1.3)*
+
+$$
+\gamma_{M1} = 1.05
+$$
+
+**Elastizitätsmodul des Baustahls** *(SIA 263:2013, 3.2.2.1)*
+
+$$
+E_a = 210000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Dichte des Baustahls** *(SIA 263:2013, 3.2.2.1)*
+
+$$
+\rho_a = 7850\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+**Schubmodul des Baustahls** *(SIA 263:2013, 3.2.2.1)*
+
+$$
+G_a = 81000\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ### Durchstanzen: Innenstütze
@@ -20721,26 +21404,6 @@ Grösste Durchbiegung gegen die Sehne eines Stabs: L1, w = -1.34 mm bei x = 5.17
 | $\sum F_z$ | $-333.751$ | $333.751$ | $0.000$ | kN |
 | $\sum M_0$ | $-2953.057$ | $2953.057$ | $0.000$ | kNm |
 
-### Baustahl: S355
-
-**Elastizitätsmodul des Baustahls** *(SIA 263:2013, 3.2.2.1)*
-
-$$
-E_a = 210000\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Dichte des Baustahls** *(SIA 263:2013, 3.2.2.1)*
-
-$$
-\rho_a = 7850\,\mathrm{kg}/\mathrm{m}^{3}
-$$
-
-**Schubmodul des Baustahls** *(SIA 263:2013, 3.2.2.1)*
-
-$$
-G_a = 81000\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
 ### Balkensystem: Beweglich
 
 **Querschnittsfläche, «Rechteck» (Rechteck)**
@@ -23097,6 +23760,8 @@ Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein P
 
 Die Zugkraft im Spannstahl zählt zum Widerstand des Querschnitts; die Lastfälle stehen darum ohne Vorspannung da. Mit Verbund dehnt sich ein Glied mit dem Beton an seiner Stelle und trägt dazu seine Vordehnung: bei der Dehnung null des Querschnitts schon σ\_p∞. Ohne Verbund wirkt die Kraft nach allen Verlusten, ohne Zuwachs. Schlaff angesetzt – wenn die Vorspannung schon als Einwirkung in den Lastfällen steht – trägt ein Glied nur, was über σ\_p∞ hinausgeht.
 
+Ein Stahlprofil zählt mit seinem Umriss: die Ausrundungen als Vieleck, ein Rohr mit seinem Loch als Aussparung. Fläche und Trägheitsmomente weichen so höchstens ein halbes Prozent von den Kennwerten ab, mit denen das Balkensystem dasselbe Profil rechnet.
+
 Für ein beliebiges Polygon gibt es keine Formel für I\_T. Gerechnet wird mit der Spannungsfunktion φ von Prandtl, auf einem Gitter: seine Linien laufen durch jede waagrechte und lotrechte Kante, je Zelle gibt es einen Wert, und eine schräge Kante wird zwischen zwei Zellmitten genau geschnitten. Am Rand eines Hohlraums ist φ fest, und hinaus fliesst so viel, wie der Hohlraum Fläche hat. Der Fehler fällt mit dem Quadrat der Zellgrösse; ein zweites Gitter, jede Zelle halbiert, hebt ihn heraus.
 
 **Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
@@ -23445,6 +24110,142 @@ $$
 
 $$
 M_{Riss} = \left(f_{ct,eff} - \sigma_p\right) \cdot W
+$$
+
+### Kennzahlen
+
+Was der Stahlquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Querschnittsklasse bei Druck und bei Biegung, die Widerstände des Querschnitts gegen Zug, Druck und Biegung und, mit Profilen, gegen Querkraft. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
+
+Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines dicksten Blechs, eine frei gezeichnete Fläche mit der ihrer kleinsten Breite. Über 40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie endet.
+
+Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
+
+Was die Platte in x aufnimmt, ohne Bezug auf eine Einwirkung: die Eckwerte der Handrechnung mit Bemessungswerten und der Querkraftwiderstand ohne Normalkraft. Wo eine Seite massgebend ist, gilt das Kleinere beider Seiten.
+
+Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α\_max die Neigung mit dem grössten Widerstand. Ohne Normalkraft bleiben die Grenzen, wie sie eingegeben sind.
+
+Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die Dehnung null ist. Solange die Bewehrung elastisch bleibt, ist er am kleinsten bei M\_Ed = M\_Rd, wo sie zu fliessen beginnt und die Dehnung f\_yd/E\_s erreicht; darf sie plastisch werden, gilt 1.5·f\_yd/E\_s, und er liegt tiefer. Je Seite gilt ihre statische Höhe.
+
+Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass, die Widerstände bei N = 0 und bei reiner Normalkraft, die bezogene Druckzonenhöhe und, mit Schubwänden, der Widerstand gegen Querkraft und Torsion je allein. Gerechnet wird mit der Rechenwahl der Tragsicherheit.
+
+Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand V\_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V\_Rd/V₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
+
+**Beiwert der Grenzschlankheiten, f\_y in N/mm²** *(SIA 263:2013, Tabelle 5b)*
+
+$$
+\varepsilon = \sqrt{\frac{235}{f_y}}
+$$
+
+**Zugwiderstand, am gezeichneten Querschnitt** *(SIA 263:2013, 5.1.2.1, (38))*
+
+$$
+N_{Rd}^{+} = \frac{f_y \cdot A}{\gamma_{M1}}
+$$
+
+**Mitwirkende Breite, b zwischen den theoretischen Scheibenschnittlinien** *(SIA 263:2013, 4.5.3.2, (11); 4.5.3.3)*
+
+$$
+\bar{\lambda}_p = \frac{b/t}{28.4\, \varepsilon \sqrt{k}} \qquad \rho = \frac{0.9}{\bar{\lambda}_p} \le 1 \qquad b_{eff} = \rho\, b_c
+$$
+
+**Plastischer Widerstand in Klasse 1** *(SIA 263:2013, 5.1.3, (40))*
+
+$$
+M_{y,Rd}^{+} = \frac{f_y \cdot W_{pl}}{\gamma_{M1}}
+$$
+
+**Querkraftwiderstand** *(SIA 263:2013, 5.1.4.1, (41))*
+
+$$
+V_{Rd} = \frac{\tau_y\, A_v}{\gamma_{M1}}
+$$
+
+**Beim I und beim U beult der Steg nicht, solange** *(SIA 263:2013, 5.1.4.2, (42))*
+
+$$
+\frac{h - t_f}{t_w} \le \sqrt{\frac{4 E}{f_y}}
+$$
+
+**Schubbeulen des Blechs, ohne Quersteifen** *(SIA 263:2013, 4.5.4.1, (13); Figur 8)*
+
+$$
+V_{Rd} = \frac{0.9 \sqrt{\tau_{cr}\, \tau_y}\, b\, t}{\gamma_{M1}} \le \frac{\tau_y\, b\, t}{\gamma_{M1}} \qquad \tau_{cr} = k_\tau\, 0.9\, E \left(\frac{t}{b}\right)^2 \qquad k_\tau = 5.34
+$$
+
+**Zugwiderstand bei M\_Ed = 0**
+
+$$
+N_{Rd}^{+}(M_{Ed} = 0) = N_1 + \frac{M_{Ed} - M_1}{M_2 - M_1} \cdot \left(N_2 - N_1\right)
+$$
+
+**Druckwiderstand bei M\_Ed = 0**
+
+$$
+N_{Rd}^{-}(M_{Ed} = 0) = N_{Rd}^{-}
+$$
+
+**Querkraftwiderstand mit Bügeln, das Kleinere beider Seiten** *(SIA 262:2025, 4.3.3.4.2; 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
+
+$$
+V_{Rd}(\alpha_{opt}) = \min\left[V_{Rd}^{+}(\alpha_{opt});\ V_{Rd}^{-}(\alpha_{opt})\right]
+$$
+
+**Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1** *(SIA 262:2025, 4.3.3.2.1, (35), (36))*
+
+$$
+V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+}
+$$
+
+**Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn** *(SIA 262:2025, 4.3.3.2.2, (38))*
+
+$$
+\varepsilon_v^{+} = \frac{f_{yd}}{E_s}
+$$
+
+**Bewehrungsmass je Kubikmeter Beton, ohne Bügel**
+
+$$
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A}
+$$
+
+### Stahlquerschnitt
+
+Je Lastfall zuerst die Klasse: jedes Blech jedes Profils, plastisch an der Nulllinie, an der der Querschnitt bei N\_Ed versagt, elastisch an den Spannungen, bei denen (54) gerade aufgeht. Dann der Widerstand nach der Klasse – plastisch, elastisch nach (54) oder am wirksamen Querschnitt nach (60). Die Normalkraft bleibt, das Moment wächst in seiner Richtung, bis der Widerstand erreicht ist.
+
+Plastisch, Klasse 1 oder 2: jeder Teil ganz gezogen oder ganz gedrückt, getrennt an einer geraden Nulllinie – ein Spannungszustand im Gleichgewicht, der nirgends f\_y überschreitet. Gesucht ist die Nulllinie mit N = N\_Ed, deren Moment in die Richtung der Einwirkung zeigt; nachgewiesen wird ihre Probe.
+
+Klasse 4: (60) am wirksamen Querschnitt – A\_eff und die Verschiebung e\_N seines Schwerpunkts bei reinem Druck, W\_eff bei reiner Biegung zur Seite, die das Moment zieht. Bei Zug zählt der ganze Querschnitt.
+
+Je Richtung die Querkraft gegen den Widerstand der Profile aus den Kennzahlen. In einem Querschnitt aus Rundrohren zählt die Resultierende: ein Rundrohr trägt in jeder Richtung gleich.
+
+**Klasse 3, (54): elastisch, bis die erste Faser fliesst – mit e, wo der Schwerpunkt neben dem Bezugspunkt liegt** *(SIA 263:2013, 5.2.6, (54); 5.2.2; 5.2.3, (52))*
+
+$$
+\frac{|N_{Ed}|}{N_{Rd}} + \frac{|\lambda M_{y,Ed} + e_z N_{Ed}|}{M_{y,Rd}} + \frac{|\lambda M_{z,Ed} + e_y N_{Ed}|}{M_{z,Rd}} \le 1
+$$
+
+**Querkraft in z über der Hälfte von V\_Rd: was die Bleche, in denen sie steht, für Normalkraft und Biegung verlieren** *(SIA 263:2013, 5.1.5.1, (43); 5.1.7; 5.2.7; 5.3.6.1)*
+
+$$
+\rho_{z} = \left(\frac{V_{z,Ed}}{V_{z,Rd}}\right)^2
+$$
+
+**Widerstand in der Richtung der Einwirkung**
+
+$$
+M_{Rd} = \lambda \cdot M_{Ed}
+$$
+
+**Wirksames Widerstandsmoment, Zug unten**
+
+$$
+W_{eff} = \frac{I_{eff}}{z}
+$$
+
+**Widerstand, Zug unten** *(SIA 263:2013, 5.3.5, (60); 4.5.3)*
+
+$$
+M_{y,Rd}^{+} = \frac{f_y \cdot W_{eff}}{\gamma_{M1}}
 $$
 
 ### Durchstanzen
@@ -24551,54 +25352,6 @@ $$
 S_{d,y} = \max\left(2.5 \cdot \gamma_f \cdot \frac{a_{gd}}{g} \cdot S \cdot \frac{T_C \cdot T_D}{T_{1,y}^2 \cdot q_y};\ 0.1 \cdot \gamma_f \cdot \frac{a_{gd}}{g}\right)
 $$
 
-### Kennzahlen
-
-Was die Platte in x aufnimmt, ohne Bezug auf eine Einwirkung: die Eckwerte der Handrechnung mit Bemessungswerten und der Querkraftwiderstand ohne Normalkraft. Wo eine Seite massgebend ist, gilt das Kleinere beider Seiten.
-
-Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α\_max die Neigung mit dem grössten Widerstand. Ohne Normalkraft bleiben die Grenzen, wie sie eingegeben sind.
-
-Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die Dehnung null ist. Solange die Bewehrung elastisch bleibt, ist er am kleinsten bei M\_Ed = M\_Rd, wo sie zu fliessen beginnt und die Dehnung f\_yd/E\_s erreicht; darf sie plastisch werden, gilt 1.5·f\_yd/E\_s, und er liegt tiefer. Je Seite gilt ihre statische Höhe.
-
-Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass, die Widerstände bei N = 0 und bei reiner Normalkraft, die bezogene Druckzonenhöhe und, mit Schubwänden, der Widerstand gegen Querkraft und Torsion je allein. Gerechnet wird mit der Rechenwahl der Tragsicherheit.
-
-Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand V\_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V\_Rd/V₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
-
-**Zugwiderstand bei M\_Ed = 0**
-
-$$
-N_{Rd}^{+}(M_{Ed} = 0) = N_1 + \frac{M_{Ed} - M_1}{M_2 - M_1} \cdot \left(N_2 - N_1\right)
-$$
-
-**Druckwiderstand bei M\_Ed = 0**
-
-$$
-N_{Rd}^{-}(M_{Ed} = 0) = N_{Rd}^{-}
-$$
-
-**Querkraftwiderstand mit Bügeln, das Kleinere beider Seiten** *(SIA 262:2025, 4.3.3.4.2; 4.3.3.4.3, (45); 4.3.3.4.6, (47))*
-
-$$
-V_{Rd}(\alpha_{opt}) = \min\left[V_{Rd}^{+}(\alpha_{opt});\ V_{Rd}^{-}(\alpha_{opt})\right]
-$$
-
-**Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1** *(SIA 262:2025, 4.3.3.2.1, (35), (36))*
-
-$$
-V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+}
-$$
-
-**Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn** *(SIA 262:2025, 4.3.3.2.2, (38))*
-
-$$
-\varepsilon_v^{+} = \frac{f_{yd}}{E_s}
-$$
-
-**Bewehrungsmass je Kubikmeter Beton, ohne Bügel**
-
-$$
-\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A}
-$$
-
 ### Stabquerschnitte
 
 Der äquivalente E-Modul eines Stabs: der Modul, den ein reiner, ungerissener Betonquerschnitt bräuchte, um sich unter dem Moment gleich stark zu krümmen wie der bewehrte. An derselben Stelle wie die Linie M–E\_eq der Spannung-Dehnung-Analyse: ungerissen bis zum Rissmoment, darüber gerissen, gezählt ab der Krümmung ohne Moment. Er gilt für EA und EI jedes Stabs mit diesem Querschnitt und seinem Material.
@@ -25444,6 +26197,45 @@ $$
 | Querkraftwiderstand in y | $V_{y,Rd}$ | $236.6\,\mathrm{kN}$ |
 | Torsionswiderstand | $T_{Rd}$ | $165.6\,\mathrm{kNm}$ |
 
+### Stahlträger
+
+**Angaben zum Querschnitt**
+
+$$
+\text{S355} \qquad A = 15604\,\mathrm{mm}^2 \qquad y_S = 0.0\,\mathrm{mm} \qquad z_S = 0.0\,\mathrm{mm}
+$$
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Biegung und Normalkraft | Feld | $M_{Rd} = 882.5\,\mathrm{kNm}$ | $M_{Ed} = 300.7\,\mathrm{kNm}$ | $2.93$ |
+| Biegung und Normalkraft | Druck mit Biegung | $M_{Rd} = 447.8\,\mathrm{kNm}$ | $M_{Ed} = 100.0\,\mathrm{kNm}$ | $4.48$ |
+| Biegung und Normalkraft | Beulen | $M_{Rd} = 198.1\,\mathrm{kNm}$ | $M_{Ed} = 50.0\,\mathrm{kNm}$ | $3.96$ |
+| Biegung und Normalkraft | Druck | $N_{Rd}^{-} = -4943.2\,\mathrm{kN}$ | $N_{Ed} = -4000.0\,\mathrm{kN}$ | $1.24$ |
+| Querkraft | Feld | $V_{z,Rd} = 1636.8\,\mathrm{kN}$ | $V_{z,Ed} = 900.0\,\mathrm{kN}$ | $1.82$ |
+| Querkraft | Druck mit Biegung | – | – | $\infty$ |
+| Querkraft | Beulen | – | – | $\infty$ |
+| Querkraft | Druck | – | – | $\infty$ |
+
+> **Hinweis:** Querkraft – Druck mit Biegung, Querkraft – Beulen, Querkraft – Druck: Keine Einwirkung → kein Nachweis.
+
+**Kennzahlen**
+
+| Kennzahl | Zeichen | Wert |
+| :--- | :--- | ---: |
+| Querschnittsklasse, Druck | $\mathrm{QK}^{-}$ | $4$ |
+| Querschnittsklasse, Zug unten | $\mathrm{QK}_{y}^{+}$ | $1$ |
+| Querschnittsklasse, Zug oben | $\mathrm{QK}_{y}^{-}$ | $1$ |
+| Querschnittsklasse, Zug links | $\mathrm{QK}_{z}^{+}$ | $1$ |
+| Querschnittsklasse, Zug rechts | $\mathrm{QK}_{z}^{-}$ | $1$ |
+| Zugwiderstand | $N_{Rd}^{+}$ | $5275.5\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{Rd}^{-}$ | $-4943.2\,\mathrm{kN}$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}$ | $1188\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}$ | $-1188\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug links | $M_{z,Rd}^{+}$ | $164.2\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug rechts | $M_{z,Rd}^{-}$ | $-164.2\,\mathrm{kNm}$ |
+| Querkraftwiderstand in z | $V_{z,Rd}$ | $1636.8\,\mathrm{kN}$ |
+| Querkraftwiderstand in y | $V_{y,Rd}$ | $1632.2\,\mathrm{kN}$ |
+
 ### Winkelwand
 
 Kein Nachweis geführt.
@@ -26072,6 +26864,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 
 > **Warnung:** Platte 'Ohne x': ohne x-Bewehrung kein Verformungsnachweis.
 
+> **Warnung:** Querschnittsanalyse 'Stahlträger', Feld: Torsion weist das Werkzeug beim Stahlquerschnitt nicht nach: SIA 263 nennt in 5.1 bis 5.3 keinen Torsionswiderstand des Querschnitts (nach Vorgabe, nicht nachgeschlagen).
+
 > **Warnung:** Setzung 'Ohne Schicht': noch keine Schicht – unter «Schichten» eine anlegen → kein Nachweis.
 
 > **Warnung:** Pfahl 'Mikropfahl, Versuch': die Schichten reichen nicht bis unter den Fuss → keine Steifigkeit.
@@ -26307,7 +27101,12 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erdbeschleunigung | $g$ | $10$ | m/s² | Vorgabe |
 | Elastizitätsmodul des Baustahls | $E_a$ | $210000$ | N/mm² | Vorgabe |
 | Schubmodul des Baustahls | $G_a$ | $81000$ | N/mm² | Vorgabe |
+| Streckgrenze | $f_y$ | $355$ | N/mm² | Vorgabe |
+| Streckgrenze für 40 mm \< t ≤ 100 mm | $f_y^{t>40}$ | $335$ | N/mm² | Vorgabe |
+| Widerstandsbeiwert für Festigkeits- und Stabilitätsnachweise | $\gamma_{M1}$ | $1.05$ |  | Vorgabe |
 | Dichte des Baustahls | $\rho_a$ | $7850$ | kg/m³ | Vorgabe |
+| Fliessschubspannung | $\tau_y$ | $205$ | N/mm² | Vorgabe |
+| Fliessschubspannung für 40 mm \< t ≤ 100 mm | $\tau_y^{t>40}$ | $193$ | N/mm² | Vorgabe |
 | Bemessungswert des Elastizitätsmoduls | $E_{cd}$ | $28016$ | N/mm² | berechnet |
 | Mittelwert des Elastizitätsmoduls | $E_{cm}$ | $33620$ | N/mm² | berechnet |
 | Mittelwert des Schubmoduls | $G_{cm}$ | $14008$ | N/mm² | berechnet |
@@ -27294,6 +28093,32 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $2.11$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $200$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $400$ | mm | berechnet |
+| Fläche des Bruttoquerschnitts | $A$ | $15604$ | mm² | berechnet |
+| Stahlfläche der Bewehrung | $A_{s,tot}$ | $0$ | mm² | berechnet |
+| Torsionsträgheitsmoment nach St. Venant | $I_T$ | $1.6$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um y | $I_y$ | $921.2$ | ·10⁶ mm⁴ | berechnet |
+| Deviationsmoment | $I_{yz}$ | $0$ | ·10⁶ mm⁴ | berechnet |
+| Trägheitsmoment um z | $I_z$ | $33.9$ | ·10⁶ mm⁴ | berechnet |
+| Momentenwiderstand bei N = 0, Zug links | $M_{z,Rd}^{+}$ | $164.2$ | kNm | berechnet |
+| Momentenwiderstand bei N = 0, Zug oben | $M_{y,Rd}^{-}$ | $-1188$ | kNm | berechnet |
+| Momentenwiderstand bei N = 0, Zug rechts | $M_{z,Rd}^{-}$ | $-164.2$ | kNm | berechnet |
+| Momentenwiderstand bei N = 0, Zug unten | $M_{y,Rd}^{+}$ | $1188$ | kNm | berechnet |
+| Druckwiderstand des Querschnitts, ohne Knicken | $N_{Rd}^{-}$ | $-4943.2$ | kN | berechnet |
+| Zugwiderstand des Querschnitts | $N_{Rd}^{+}$ | $5275.5$ | kN | berechnet |
+| Querkraftwiderstand in y, allein | $V_{y,Rd}$ | $1632.2$ | kN | berechnet |
+| Querkraftwiderstand in z, allein | $V_{z,Rd}$ | $1636.8$ | kN | berechnet |
+| Querschnittsklasse bei Druck | $\mathrm{QK}^{-}$ | $4$ |  | berechnet |
+| Querschnittsklasse bei Biegung, Zug links | $\mathrm{QK}_{z}^{+}$ | $1$ |  | berechnet |
+| Querschnittsklasse bei Biegung, Zug oben | $\mathrm{QK}_{y}^{-}$ | $1$ |  | berechnet |
+| Querschnittsklasse bei Biegung, Zug rechts | $\mathrm{QK}_{z}^{-}$ | $1$ |  | berechnet |
+| Querschnittsklasse bei Biegung, Zug unten | $\mathrm{QK}_{y}^{+}$ | $1$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Beulen | $\alpha_{eff,\text{Beulen}}$ | $3.96$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Druck | $\alpha_{eff,\text{Druck}}$ | $1.24$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Druck mit Biegung | $\alpha_{eff,\text{Druck mit Biegung}}$ | $4.48$ |  | berechnet |
+| Erfüllungsgrad Biegung und Normalkraft – Feld | $\alpha_{eff,\text{Feld}}$ | $2.93$ |  | berechnet |
+| Erfüllungsgrad Querkraft – Feld | $\alpha_{V,\text{Feld}}$ | $1.82$ |  | berechnet |
+| Schwerpunkt, y | $y_S$ | $0$ | mm | berechnet |
+| Schwerpunkt, z | $z_S$ | $0$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $1437500$ | mm² | berechnet |
 | Stahlfläche der Bewehrung | $A_{s,tot}$ | $0$ | mm² | berechnet |
 | Trägheitsmoment um y | $I_y$ | $421209.8$ | ·10⁶ mm⁴ | berechnet |

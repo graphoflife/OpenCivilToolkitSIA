@@ -1,10 +1,10 @@
 ---
-erzeugt: ba7413f0930b
+erzeugt: 109475d7d5a7
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 28 Formeln, in der Folge, in der gerechnet wird.
+> 35 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -17,6 +17,12 @@ Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass,
 Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand V\_Rd, auf die je Einheitslast die Kraft V₁ fällt, trägt V\_Rd/V₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
 
 Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α\_max die Neigung mit dem grössten Widerstand. Ohne Normalkraft bleiben die Grenzen, wie sie eingegeben sind.
+
+Was der Stahlquerschnitt aufnimmt, ohne Bezug auf einen Lastfall: die Querschnittsklasse bei Druck und bei Biegung, die Widerstände des Querschnitts gegen Zug, Druck und Biegung und, mit Profilen, gegen Querkraft. Knicken und Kippen gehören dem Stab und sind hier nicht dabei.
+
+Jedes Teil rechnet mit der Fliessgrenze seiner Dicke: ein Profil mit der seines dicksten Blechs, eine frei gezeichnete Fläche mit der ihrer kleinsten Breite. Über 40 mm gilt die rechte Spalte der Tabelle 1, auch über 100 mm, wo sie endet.
+
+Je Profil allein, ohne Normalkraft und Biegung: kein Blech ist gedrückt, der Querschnitt rechnet plastisch. Beim I und beim U prüft (42), ob der Steg beulen kann; tut er es, trägt er nach (13). Die Wände eines Rechteckrohrs tragen je nach (13). Zusammen tragen die Profile die Summe; frei gezeichnete Flächen tragen nichts.
 
 ## Formeln
 
@@ -48,6 +54,13 @@ Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α
 26. [[Stahlspannung, höchstens die Fliessgrenze]]
 27. [[Kräftegleichgewicht]]
 28. [[Momentengleichgewicht um die halbe Höhe]]
+29. [[Beiwert ε der Grenzschlankheiten]]
+30. [[Normalkraftwiderstand eines Stahlquerschnitts]]
+31. [[Mitwirkende Breite eines Blechs]]
+32. [[Plastischer Biegewiderstand eines Stahlquerschnitts]]
+33. [[Querkraftwiderstand eines Stahlprofils]]
+34. [[Steg ohne Schubbeulen]]
+35. [[Schubbeulen des Blechs, ohne Quersteifen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -72,3 +85,12 @@ Einwirkung:
 
 Gerechnet wird mit denselben Formeln wie in den Nachweisen; nur die
 Einwirkung fehlt.
+
+Beim Stahlquerschnitt der Querschnittsanalyse sind es die Widerstände je
+Schnittgrösse allein, dazu die Klasse jedes Blechs: der
+[[Normalkraftwiderstand eines Stahlquerschnitts|Normalkraftwiderstand]] im
+Zug und im Druck, der Biegewiderstand je Seite – plastisch in den Klassen 1
+und 2 ([[Plastischer Biegewiderstand eines Stahlquerschnitts|f_y W_pl]]),
+sonst [[Biegewiderstand bis zum ersten Fliessen|bis zum ersten Fliessen]] –
+und je Richtung der
+[[Querkraftwiderstand eines Stahlprofils|Querkraftwiderstand]] der Profile.

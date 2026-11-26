@@ -1,5 +1,5 @@
 ---
-erzeugt: f397958e2312
+erzeugt: 8a6772af4842
 art: modul
 tags: [modul]
 ---
@@ -235,6 +235,18 @@ Vorspannung allein weckt. Am Auflager trägt das erste Glied, um 5°
 geneigt, die Querkraft mit; das zweite, um -4° geneigt und neben dem
 Schwerpunkt, wirkt ihr entgegen und dreht den Kasten der Schubwände; das
 schlaffe zählt seine Neigung nicht.
+
+### _stahltraeger
+
+```python
+def _stahltraeger(kennung: str) -> QuerschnittsanalyseEintrag
+```
+
+Ein IPE 600 aus S355, zweiachsig, jede Klasse einmal (SIA 263:2013):
+im Feld plastisch, schief, mit einer Querkraft über der Hälfte von V_Rd,
+die dem Steg nimmt, und mit Torsion, die nur ein Hinweis ist; mit mehr
+Druck nach (54), mit noch mehr am wirksamen Querschnitt nach (60), und
+reiner Druck nach (55).
 
 
 ## Braucht

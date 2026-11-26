@@ -129,21 +129,24 @@ class TestFelder(unittest.TestCase):
 
 
 class TestAnalyse(unittest.TestCase):
-    """Holz und Stahl rechnen ihre Querschnittswerte, aber noch keinen Nachweis."""
+    """
+    Holz und Stahl rechnen ihre Querschnittswerte; Holz noch keinen Nachweis,
+    Stahl seinen Lastfall -- ohne Querkraft nur Biegung und Normalkraft.
+    """
 
-    def test_holz_und_stahl_ohne_nachweis(self):
+    def test_holz_ohne_nachweis_stahl_mit(self):
         p = projekt()
         holz = analyse(p, "Holz", (RECHTECK, "h1"))
         stahl = analyse(p, "Stahl", (RECHTECK, "st1"))
         e = p.rechnen()
-        for a, text in (
-                (holz, "einen Holzquerschnitt weist das Werkzeug nach SIA 265:2012 noch nicht nach"),
-                (stahl, "die Lastfälle eines Stahlquerschnitts weist das Werkzeug nach SIA 263:2013 "
-                        "noch nicht nach – seine Klassen und Widerstände stehen unter den "
-                        "Kennzahlen")):
+        for a, text, felder in (
+                (holz, "einen Holzquerschnitt weist das Werkzeug nach SIA 265:2012 noch nicht nach",
+                 []),
+                (stahl, "", ["qa_stahl"])):
             with self.subTest(a=a.name):
                 teil = e.aufbau.teile[a.kennung]
-                self.assertEqual((teil.ohne_nachweis, teil.nachweise), (text, []))
+                self.assertEqual((teil.ohne_nachweis, [f for f, _, _ in teil.nachweise]),
+                                 (text, felder))
                 self.assertAlmostEqual(e.wert(f"querschnittsanalyse.{a.kennung}.A").groesse.si, A)
                 self.assertAlmostEqual(e.wert(f"querschnittsanalyse.{a.kennung}.I_y").groesse.si,
                                        I_Y, delta=1e-12)
@@ -155,6 +158,7 @@ class TestAnalyse(unittest.TestCase):
         """Statt Interaktionsdiagramm und Lastfaellen der Satz -- das Bild des Querschnitts bleibt."""
         p = projekt()
         holz = analyse(p, "Holz", (RECHTECK, "h1"))
+        stahl = analyse(p, "Stahl", (RECHTECK, "st1"))
         beton = analyse(p, "Stahlbeton", (RECHTECK, "b1"), staebe=[(100, 50)])
         d = p.als_dict()
 
@@ -163,12 +167,17 @@ class TestAnalyse(unittest.TestCase):
             return antwort.daten["diagramme"]
 
         h = diagramme(holz)
-        self.assertEqual(h["ohne_nachweis"], "Kein Interaktionsdiagramm: einen Holzquerschnitt "
+        self.assertEqual(h["ohne_diagramm"], "Kein Interaktionsdiagramm: einen Holzquerschnitt "
                                              "weist das Werkzeug nach SIA 265:2012 noch nicht nach.")
         self.assertEqual((h["interaktion"], h["faelle"]), (None, []))
         self.assertEqual([f["material"] for f in h["zeichnung"]["polygone"]], ["holz"])
+        s = diagramme(stahl)
+        self.assertEqual(s["ohne_diagramm"], "Kein Interaktionsdiagramm: für einen "
+                                             "Stahlquerschnitt zeichnet das Werkzeug noch keines. "
+                                             "Seine Lastfälle weist es trotzdem nach.")
+        self.assertEqual((s["interaktion"], s["faelle"]), (None, []))
         b = diagramme(beton)
-        self.assertEqual(b["ohne_nachweis"], "")
+        self.assertEqual(b["ohne_diagramm"], "")
         self.assertIsNotNone(b["interaktion"])
 
     def test_verbund_ohne_nachweis(self):

@@ -286,11 +286,9 @@ class TestKennzahlen(unittest.TestCase):
                             aufbau=aufbau)
         self.assertIn("Polygon 1", text)
 
-    def test_der_satz_ohne_nachweise(self):
-        satz = ohne_nachweise(Bauweise.STAHL)
-        self.assertIn("SIA 263:2013", satz)
-        self.assertIn("Kennzahlen", satz)
-        self.assertNotIn("--", satz)
+    def test_kein_satz_ohne_nachweise(self):
+        """Seit 2026-11-26 weist der Stahl seine Lastfaelle nach."""
+        self.assertEqual(ohne_nachweise(Bauweise.STAHL), "")
 
 
 if __name__ == "__main__":

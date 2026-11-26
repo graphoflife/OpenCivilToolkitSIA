@@ -1,5 +1,5 @@
 ---
-erzeugt: 649ee5467082
+erzeugt: 43c5ff50e8bb
 art: modul
 tags: [modul]
 ---
@@ -13,8 +13,9 @@ Aus einem [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|Que
 die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]] und ihre
 Nachweise: Biegung und Normalkraft, Querkraft und Torsion, Duktilitaet,
 sproedes Versagen, die Zwaengungen, die Stahlspannungen und das Knicken
-([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]) -- dazu die Kennzahlen. Eine leere oder fehlerhafte
-Zeichnung wird kein Bauteil, nur ein Hinweis.
+([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]) -- dazu die Kennzahlen. Ein Querschnitt aus Stahl hat seine
+eigenen ([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]). Eine leere oder fehlerhafte Zeichnung wird kein
+Bauteil, nur ein Hinweis.
 
 ## Inhalt
 
@@ -34,13 +35,13 @@ Stahlspannungen, sobald es Lastfaelle gibt
 ([[opencivil.projekt.aufbau.kern#spannungsnachweise|spannungsnachweise]]), und das
 Knicken, sobald ein Fall eingeschaltet ist.
 
-Das alles beim Stahlbeton. Ein Querschnitt aus Stahl, Holz oder im
-Verbund ([[opencivil.querschnitt.bauweise|bauweise]]) rechnet bisher nur seine
-Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, der aus Stahl dazu
-seine Kennzahlen nach SIA 263 ([[opencivil.nachweis.qa_stahl_kennzahlen|qa_stahl_kennzahlen]]);
-seine Zusammenfassung sagt, dass die Nachweise der Lastfaelle fehlen
-([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]). Seine Spannung-Dehnung-Analysen rechnet er
-trotzdem, ausser im Verbund ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+Das alles beim Stahlbeton. Ein Querschnitt aus Stahl rechnet nach SIA 263
+([[opencivil.projekt.aufbau.querschnittsanalyse#_stahl|_stahl]]). Einer aus Holz oder im Verbund
+([[opencivil.querschnitt.bauweise|bauweise]]) rechnet bisher nur seine Werte
+-- Flaeche, Schwerpunkt, Traegheitsmomente --; seine Zusammenfassung
+sagt, dass die Nachweise fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]). Seine
+Spannung-Dehnung-Analysen rechnet er trotzdem, ausser im Verbund
+([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -48,6 +49,26 @@ ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
 2026-10-19). Ebenso eine Zeichnung, die sich noch nicht rechnen laesst,
 etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
 stimmt, und der Rest rechnet weiter ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
+
+### _lastfaelle
+
+```python
+def _lastfaelle(eintrag: QuerschnittsanalyseEintrag) -> List[Lastfall]
+```
+
+Die eingeschalteten Lastfaelle in SI, aus der Einheit ihrer Felder: N, M_y ... aus N_Ed, M_y_Ed ...
+
+### _stahl
+
+```python
+def _stahl(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, teil: Bauteil, aufbau: Aufbau) -> Bauteil
+```
+
+Ein Querschnitt aus Stahl nach SIA 263 ([[opencivil.nachweis.qa_stahl|qa_stahl]]):
+je Lastfall Biegung und Normalkraft, Querkraft, sobald einer sie hat --
+beide lesen den Widerstand gegen Querkraft aus den Kennzahlen. Torsion
+weist er nicht nach; ein Lastfall mit `T_Ed` sagt es. Die Kennzahlen
+stehen in der Herleitung vor den Nachweisen, die aus ihnen lesen.
 
 ### _kennzahlen
 
@@ -64,9 +85,21 @@ def ohne_nachweise(bauweise: Bauweise) -> str
 ```
 
 Warum ein Querschnitt dieser Bauweise keinen Nachweis hat -- leer beim
-Stahlbeton. Ein Satzteil ohne Punkt, fuer die Zusammenfassung
+Stahlbeton und beim Stahl (seit 2026-11-26). Ein Satzteil ohne Punkt,
+fuer die Zusammenfassung
 ([[opencivil.projekt.aufbau.kern#Aufbau.ohne_nachweis|ohne_nachweis]]) und fuer die
 Zeichnung ([[opencivil.web.zeichengeometrie#geometrie|geometrie]]).
+
+### ohne_diagramm
+
+```python
+def ohne_diagramm(bauweise: Bauweise) -> str
+```
+
+Warum ein Querschnitt dieser Bauweise kein Interaktionsdiagramm hat --
+leer beim Stahlbeton, dem einzigen mit einer Widerstandsflaeche. Ein
+Satz mit Punkt, fuer die Diagramme
+([[opencivil.web.diagrammdaten|analyse_diagramme]]).
 
 ### ohne_analysen
 
@@ -128,6 +161,7 @@ Staeben gibt.
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]
@@ -146,4 +180,5 @@ Staeben gibt.
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.zeichengeometrie]]

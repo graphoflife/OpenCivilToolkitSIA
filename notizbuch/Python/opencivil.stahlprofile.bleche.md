@@ -1,5 +1,5 @@
 ---
-erzeugt: 43e1d758d1eb
+erzeugt: 8706107ff973
 art: modul
 tags: [modul]
 ---
@@ -173,5 +173,7 @@ Die Bleche des Profils, wo es in der Zeichnung liegt -- siehe Dateikopf.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.stahlbau.klasse]]
 - [[opencivil.stahlbau.querschnitt]]
+- [[opencivil.stahlbau.schub]]

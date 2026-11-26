@@ -1,5 +1,5 @@
 ---
-erzeugt: ed902a0a6085
+erzeugt: 0ed4c95a734f
 art: formel
 tags: [formel]
 ---
@@ -20,13 +20,19 @@ $$
 M_{y,Rd} = -\sum F_i \cdot (z_i - z_S) = 211.8\,\mathrm{kNm}
 $$
 
+## Gebraucht von
+
+- [[Widerstand in der Richtung der Einwirkung]]
+
 ## Im Code
 
+- [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 
 ## Themen
 
 - [[Schiefe Biegung]]
+- [[Stahlquerschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

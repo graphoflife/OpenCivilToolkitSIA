@@ -1,5 +1,5 @@
 ---
-erzeugt: ed1b46d98b00
+erzeugt: 6abd81a569a2
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,8 @@ Knicken und Kippen gehoeren dem Stab: hier stehen die Widerstaende des
 Querschnitts. Die Rechnung selbst steht in [[opencivil.stahlbau]]; hier
 nur, was sie in die Herleitung schreibt. Mit mehreren Staehlen oder Dicken
 rechnet jede Gruppe mit ihrer Fliessgrenze; eine Tabelle zeigt sie, statt
-einer Formel.
+einer Formel. Mit Bemessungswerten oder charakteristischen, wie die
+Tragsicherheit waehlt ([[opencivil.nachweis.qa_stahl_werte]]).
 
 
 ## WAS FEHLT -- GRAU IN DER HERLEITUNG
@@ -47,14 +48,6 @@ einer Formel.
   ([[opencivil.stabwerk.stabquerschnitt#keine_hauptachsen|keine_hauptachsen]]).
 
 ## Inhalt
-
-### _normale
-
-```python
-def _normale(seite: Zugseite) -> Tuple[float, float]
-```
-
-Die Richtung zur gezogenen Seite -- genau 0 oder ±1.
 
 ### _ohne_klammern
 
@@ -88,26 +81,10 @@ Die Kennzahlen eines Stahlquerschnitts -- siehe Dateikopf.
 def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 ```
 
-#### KennzahlenStahlQA._wert
-
-```python
-def _wert(self, e: Eingaben, g: int, kurz: str) -> Wert
-```
-
-Ein Kennwert der Gruppe `g`, in ihrer Dicke -- `gamma_M1` und `E_a` in jeder.
-
-#### KennzahlenStahlQA._zahl
-
-```python
-def _zahl(self, e: Eingaben, g: int, kurz: str) -> float
-```
-
-Derselbe als Zahl, Spannungen in N/mm².
-
 #### KennzahlenStahlQA._summe
 
 ```python
-def _summe(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, ergebnis: Dict[str, Groesse], kurz: str, groessen: Sequence[float], symbol: str, *, vorzeichen: float=1.0, titel: str, referenz: str) -> None
+def _summe(self, p: Protokoll, sw: Stahlwerte, werte: Zwischenwerte, ergebnis: Dict[str, Groesse], kurz: str, groessen: Sequence[float], symbol: str, *, vorzeichen: float=1.0, titel: str, referenz: str) -> None
 ```
 
 `Σ f_y X/γ_M1` -- `groessen` je Gruppe `X`: Flaechen in mm²,
@@ -117,24 +94,15 @@ einer Gruppe als Formel, sonst als Tabelle.
 #### KennzahlenStahlQA._klasse
 
 ```python
-def _klasse(self, p: Protokoll, ergebnis: Dict[str, Groesse], kurz: str, zustaende: Sequence[Blechzustand], freie: Sequence, titel: str) -> int
+def _klasse(self, p: Protokoll, ergebnis: Dict[str, Groesse], kurz: str, zustaende: Sequence[Blechzustand], freie: Sequence[Teil], titel: str) -> int
 ```
 
 Die Klasse je Blech, als Tabelle -- und die des Querschnitts: die unguenstigste.
 
-#### KennzahlenStahlQA._wirksam
-
-```python
-def _wirksam(self, p: Protokoll, e: Eingaben, zustaende: Sequence[Blechzustand], n: Optional[Tuple[float, float]], v_el: float=0.0) -> Optional[List[Wirksam]]
-```
-
-Die mitwirkenden Breiten der Bleche in Klasse 4 -- `None` mit einem
-Rundrohr darunter (siehe Dateikopf).
-
 #### KennzahlenStahlQA._elastisch
 
 ```python
-def _elastisch(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, ergebnis: Dict[str, Groesse], kurz: str, el: Elastisch, I: Wert, seite: Zugseite, symbol: str, titel: str, referenz: str) -> None
+def _elastisch(self, p: Protokoll, sw: Stahlwerte, werte: Zwischenwerte, ergebnis: Dict[str, Groesse], kurz: str, el: Elastisch, I: Wert, seite: Zugseite, symbol: str, titel: str, referenz: str) -> None
 ```
 
 Bis die erste Faser fliesst: je Gruppe `W = I/z` bis zu ihrer
@@ -143,15 +111,13 @@ weitesten Faser, massgebend das kleinste `f_y W/γ_M1`.
 
 ## Konstanten
 
-- `KENNWERTE = ('f_y', 'f_y_dick', 'tau_y', 'tau_y_dick', 'gamma_M1', 'E_a')` – Was die Kennzahlen je Baustahl lesen.
 - `REFERENZ_38 = 'SIA 263:2013, 5.1.2.1, (38)'`
 - `REFERENZ_40 = 'SIA 263:2013, 5.1.3, (40)'`
 - `REFERENZ_52 = 'SIA 263:2013, 5.2.3, (52)'`
 - `REFERENZ_55 = 'SIA 263:2013, 5.3.2, (55); 4.5.3'`
 - `REFERENZ_56 = 'SIA 263:2013, 5.3.3, (56); 4.5.3'`
 - `REFERENZ_KLASSE = 'SIA 263:2013, 4.3.1.3; Tabellen 5a und 5b'`
-- `ROHR_KLASSE_4 = 'Ein Rundrohr der Klasse 4 rechnet das Werkzeug nicht – SIA 263 nennt…` – Warum ein Rundrohr der Klasse 4 nichts traegt -- siehe Dateikopf.
-- `_SPANNUNG = Mathe('f_y\\ [\\mathrm{N}/\\mathrm{mm}^2]')`
+- `_BEDEUTUNG = {'A': 'Fläche aus Baustahl', 'A_{eff}': 'Wirksame Fläche', 'W_{pl}': …` – Was die Querschnittswerte bedeuten, nach ihrem Symbol.
 
 ## Braucht
 
@@ -160,6 +126,7 @@ weitesten Faser, massgebend das kleinste `f_y W/γ_M1`.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.stabwerk.stabquerschnitt]]
@@ -170,4 +137,14 @@ weitesten Faser, massgebend das kleinste `f_y W/γ_M1`.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
+
+## Formeln aus diesem Modul
+
+- [[Beiwert ε der Grenzschlankheiten]] · `KennzahlenStahlQA._teile`
+- [[Normalkraftwiderstand eines Stahlquerschnitts]] · `KennzahlenStahlQA._summe`
+- [[Plastischer Biegewiderstand eines Stahlquerschnitts]] · `KennzahlenStahlQA._summe`
+- [[Querkraftwiderstand eines Stahlprofils]] · `KennzahlenStahlQA._schub`
+- [[Schubbeulen des Blechs, ohne Quersteifen]] · `KennzahlenStahlQA._schub`
+- [[Steg ohne Schubbeulen]] · `KennzahlenStahlQA._schub`

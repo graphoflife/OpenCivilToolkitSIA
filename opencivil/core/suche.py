@@ -3,8 +3,9 @@ opencivil/core/suche.py -- wo eine steigende Funktion null wird.
 
 VERANTWORTUNG:
 Die Verfahren, mit denen das Werkzeug eine Nullstelle sucht, an einer
-Stelle: :class:`Halbieren`, :class:`Illinois` mit :func:`illinois` und
-:func:`eingrenzen`. Gesucht wird ueberall dasselbe -- eine Stelle zwischen
+Stelle: :class:`Halbieren`, :class:`Illinois` mit :func:`illinois`,
+:func:`eingrenzen` und fuer die Neigung einer Nulllinie
+:func:`winkel_suchen`. Gesucht wird ueberall dasselbe -- eine Stelle zwischen
 zwei Grenzen, an der eine Funktion das Vorzeichen wechselt: die Dehnung, bei
 der die Normalkraft stimmt, die Kruemmung zum Moment, der Bruchzustand bei
 einer Normalkraft, die Neigung der Nulllinie. Bis 2026-10-17 stand Illinois
@@ -198,6 +199,44 @@ def illinois(f: Callable[[float], Tuple[float, Optional[B]]], a: float, fa: floa
             break
         a, fa, b, fb = _weiter(a, fa, b, fb, c, fc)
     return None if beste is None else beste[1]
+
+
+def winkel_suchen(f: Callable[[float], Tuple[float, Optional[B]]], a: float, *,
+                  schranke: float) -> Optional[B]:
+    """
+    Der Winkel, bei dem ``f`` null wird -- ``f`` gibt wie bei :func:`illinois`
+    ``(Abweichung, Beigabe)`` und faellt, wo der Winkel waechst; zurueck
+    kommt die Beigabe. So sucht die Nulllinie eines Querschnitts die Neigung,
+    bei der sein Moment in die Richtung der Einwirkung zeigt: im Beton
+    (:meth:`~opencivil.querschnitt.interaktion.Querschnitt.in_richtung`) wie
+    im Stahl (:mod:`opencivil.stahlbau.widerstand`).
+
+    Bei einem L laeuft die Abweichung in Stufen: ueber weite Bereiche kaum
+    eine Aenderung, dann ein Sprung. Ein Sekantenverfahren verliert dort die
+    Spur. Darum: von ``a`` aus in die richtige Richtung mit wachsenden
+    Schritten -- 5°, doppelt so weit, hoechstens 45° --, bis die Abweichung
+    das Vorzeichen wechselt, dann Illinois. Ein Wechsel ueber einen halben
+    Kreis ist der Sprung von +180° auf -180° und zaehlt nicht. Fertig, sobald
+    die Abweichung unter ``schranke`` liegt.
+    """
+    fa, beigabe = f(a)
+    if abs(fa) <= schranke:
+        return beigabe
+    # Eine zu grosse Abweichung heisst: den Winkel vergroessern.
+    richtung = 1.0 if fa > 0 else -1.0
+    schritt = math.radians(5.0)
+    gegangen = 0.0
+    while gegangen < 2.0 * math.pi:
+        b = a + richtung * schritt
+        fb, beigabe = f(b)
+        if abs(fb) <= schranke:
+            return beigabe
+        if (fb > 0) != (fa > 0) and abs(fb - fa) < math.pi:
+            return illinois(f, a, fa, b, fb, schranke_x=1e-12, schranke_f=schranke)
+        gegangen += schritt
+        a, fa = b, fb
+        schritt = min(2.0 * schritt, math.radians(45.0))
+    return beigabe  # nicht eingegrenzt -- kommt bei einem Querschnitt nicht vor
 
 
 def _sekante(a: float, fa: float, b: float, fb: float) -> float:

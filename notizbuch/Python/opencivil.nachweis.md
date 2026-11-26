@@ -1,5 +1,5 @@
 ---
-erzeugt: 5c9df7e8aacf
+erzeugt: 7e36bcaae2e5
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,9 @@ Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
 - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
 - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
+- [[opencivil.nachweis.qa_stahl]] – die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.
 - [[opencivil.nachweis.qa_stahl_kennzahlen]] – was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.
+- [[opencivil.nachweis.qa_stahl_werte]] – was Kennzahlen und Nachweise eines Stahlquerschnitts teilen.
 - [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
 - [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.
 - [[opencivil.nachweis.querkraft_ohne_buegel]] – Querkraft ohne Querkraftbewehrung.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 79c6015e5630
+erzeugt: 912fe37cc539
 art: formel
 tags: [formel]
 ---
@@ -22,11 +22,13 @@ $$
 
 ## Im Code
 
+- [[opencivil.nachweis.qa_stahl#StahlBiegungQA|StahlBiegungQA._plastisch]]
 - [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 
 ## Themen
 
 - [[Schiefe Biegung]]
+- [[Stahlquerschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

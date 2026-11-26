@@ -268,6 +268,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `core/latex` | Platzhalter-Einsetzung, `Formelzeile`, Tabellen aus Text- und Formelzellen, Fallunterscheidung |
 | `core/protokoll` | Mitschrift als Datenstruktur, `Zwischenwerte` für Vorlagen, ein Durchlauf mit einer Tafel je Darstellung, `StillesProtokoll` |
 | `core/rechenwerk` | Rückwärtsauflösung, Variantenwahl, fehlende Eingaben, Zyklen |
+| `core/suche` | Nullstellen: Halbieren, Illinois, Eingrenzen mit wachsenden Schritten, die Neigung der Nulllinie (`winkel_suchen`) – im Beton wie im Stahl |
 | `material/` | Beton und Betonstahl nach SIA 262:2025, Baustahl nach SIA 263:2013 |
 | `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze (dazu der Spannungsblock als Gesetz) |
 | `querschnitt/geometrie` | Polygone, Verschachtelung, Stablinien, Prüfungen der Zeichnung |
@@ -282,7 +283,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `stabwerk/verlauf` | N, V, M und Biegelinie längs der Stäbe als Polynome, mit Extremwerten |
 | `stabwerk/querschnitte` | die Querschnitte der Stäbe nach Vorlage, mit ihren Formeln |
 | `stahlprofile/` | die Stahlprofile, für Balkensystem und Querschnittsanalyse: je Form (I, U, Rechteck- und Rundrohr) die Masse und die Formeln für A, I_y, I_z und I_T (`formen`), welche Grössen es gibt (`tabelle`), und wie ein Profil im gezeichneten Querschnitt liegt – sein Umriss aus Mitte, Drehung und Spiegeln (`lage`); seine Bleche für die Querschnittsklasse, mit Breite, Dicke und Halterung (`bleche`) |
-| `stahlbau/` | ein Querschnitt aus Baustahl nach SIA 263:2013: die Grenzen der Querschnittsklasse, Beulwerte und mitwirkende Breite (`klasse`), der Querkraftwiderstand je Profil mit dem Schubbeulen (`schub`), der gezeichnete Querschnitt nach Stahl und Dicke, plastisch, elastisch und wirksam (`querschnitt`) |
+| `stahlbau/` | ein Querschnitt aus Baustahl nach SIA 263:2013: die Grenzen der Querschnittsklasse, Beulwerte und mitwirkende Breite (`klasse`), der Querkraftwiderstand je Profil mit dem Schubbeulen (`schub`), der gezeichnete Querschnitt nach Stahl und Dicke, plastisch, elastisch und wirksam (`querschnitt`), der Widerstand je Lastfall: die Klasse im Lastfall, plastisch, nach (54) oder (60), mit dem, was eine grosse Querkraft den Blechen nimmt (`widerstand`) |
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `stabwerk3d/` | das Balkensystem im Raum: Vektoren (`raum`), die Beschreibung in SI (`modell`), der Stab als drei ebene (`stab`), das System mit sechs Unbekannten je Knoten (`system`), die Verläufe (`verlauf`), im Rechenwerk (`rechnung`) und wie es seine Rechnung aufschreibt (`herleitung`) |
 | `decke/` | eine Decke nach der Streifenmethode: die Beschreibung in SI (`modell`), die Streifen und ihre Träger (`streifen`), wie die Last auf die Richtungen und Streifen geht (`aufteilung`, `lasten`), jeder Streifen als Durchlaufträger (`traeger`), Fall für Fall von unten nach oben (`rechnung`), die Schnittkräfte der Platte an einer Stelle und wo Bilder und Bericht hinsehen (`feld`), im Rechenwerk (`werk`) und wie sie ihre Rechnung aufschreibt (`herleitung`) |
@@ -302,6 +303,7 @@ Fertig und getestet (am 2026-11-21: 2145 Tests):
 | `nachweis/verformung` | die Durchbiegung der Platte: ω_w · w gegen L/350; der Vergrösserungsfaktor ω_w (Zug unten) und ω_w' (Zug oben) gehört der Platte und rechnet immer |
 | `nachweis/kennzahlen` | was eine Platte ohne Einwirkung aufnimmt: M_Rd± bei N = 0, N_Rd± bei M = 0 und x/d aus der Handrechnung, V_Rd,max und V_Rd,min ohne Bügel, V_Rd(α_opt) mit Bügeln |
 | `nachweis/qa_stahl_kennzahlen` | was ein gezeichneter Stahlquerschnitt ohne Einwirkung aufnimmt: die Querschnittsklasse bei Druck und je Zugseite, N_Rd± und M_Rd je Zugseite nach der Klasse, V_Rd je Richtung |
+| `nachweis/qa_stahl`, `qa_stahl_werte` | seine Lastfälle: Biegung und Normalkraft nach der Klasse im Lastfall, Querkraft je Richtung, Torsion als grauer Hinweis; was Kennzahlen und Nachweise teilen – die Kennwerte je Baustahl, die Tabellen der Klassen und der mitwirkenden Breiten |
 | `konsole/` | die App «Python»: die Sitzung (`sitzung`), Diagramme ohne matplotlib (`zeichnen`), welche Fremdpakete beiliegen (`pakete`), der Dienst ihres Fadens (`dienst`) |
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |

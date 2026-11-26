@@ -1,5 +1,5 @@
 ---
-erzeugt: f4f0e38f6046
+erzeugt: 5cacb58d0f2f
 art: modul
 tags: [modul]
 ---
@@ -10,8 +10,9 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Die Verfahren, mit denen das Werkzeug eine Nullstelle sucht, an einer
-Stelle: [[opencivil.core.suche#Halbieren|Halbieren]], [[opencivil.core.suche#Illinois|Illinois]] mit [[opencivil.core.suche#illinois|illinois]] und
-[[opencivil.core.suche#eingrenzen|eingrenzen]]. Gesucht wird ueberall dasselbe -- eine Stelle zwischen
+Stelle: [[opencivil.core.suche#Halbieren|Halbieren]], [[opencivil.core.suche#Illinois|Illinois]] mit [[opencivil.core.suche#illinois|illinois]],
+[[opencivil.core.suche#eingrenzen|eingrenzen]] und fuer die Neigung einer Nulllinie
+[[opencivil.core.suche#winkel_suchen|winkel_suchen]]. Gesucht wird ueberall dasselbe -- eine Stelle zwischen
 zwei Grenzen, an der eine Funktion das Vorzeichen wechselt: die Dehnung, bei
 der die Normalkraft stimmt, die Kruemmung zum Moment, der Bruchzustand bei
 einer Normalkraft, die Neigung der Nulllinie. Bis 2026-10-17 stand Illinois
@@ -144,6 +145,27 @@ ihn laesst sich nicht weiter eingrenzen. Bis 2026-10-17 rechnete sie mit
 Nulllinie eines L, wo zwischen zwei Neigungen mit Gleichgewicht eine ohne
 liegen kann.
 
+### winkel_suchen
+
+```python
+def winkel_suchen(f: Callable[[float], Tuple[float, Optional[B]]], a: float, *, schranke: float) -> Optional[B]
+```
+
+Der Winkel, bei dem `f` null wird -- `f` gibt wie bei [[opencivil.core.suche#illinois|illinois]]
+`(Abweichung, Beigabe)` und faellt, wo der Winkel waechst; zurueck
+kommt die Beigabe. So sucht die Nulllinie eines Querschnitts die Neigung,
+bei der sein Moment in die Richtung der Einwirkung zeigt: im Beton
+([[opencivil.querschnitt.interaktion#Querschnitt.in_richtung|in_richtung]]) wie
+im Stahl ([[opencivil.stahlbau.widerstand]]).
+
+Bei einem L laeuft die Abweichung in Stufen: ueber weite Bereiche kaum
+eine Aenderung, dann ein Sprung. Ein Sekantenverfahren verliert dort die
+Spur. Darum: von `a` aus in die richtige Richtung mit wachsenden
+Schritten -- 5°, doppelt so weit, hoechstens 45° --, bis die Abweichung
+das Vorzeichen wechselt, dann Illinois. Ein Wechsel ueber einen halben
+Kreis ist der Sprung von +180° auf -180° und zaehlt nicht. Fertig, sobald
+die Abweichung unter `schranke` liegt.
+
 ### _sekante
 
 ```python
@@ -201,3 +223,5 @@ gefundenen Ebene: dort ist das Fenster in wenigen Schritten eng.
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.schnitt]]
+- [[opencivil.stahlbau.querschnitt]]
+- [[opencivil.stahlbau.widerstand]]

@@ -45,6 +45,12 @@
  * nicht: Wählen ist der Grundzustand, Esc führt dorthin zurück. Alles Weitere
  * steht neben der Auswahl oder im schwebenden Fenster.
  *
+ * ALLES ZEIGEN:
+ * Was ins Bild gehört, sagt der Adapter (`umriss`). Kennt er einen Teil
+ * davon erst aus der Antwort des Kerns -- die Masse eines Profils --, sagt er
+ * es (`umrissVollstaendig`): dann passt das Fenster nach der Antwort noch
+ * einmal ein, wenn bis dahin niemand die Ansicht bewegt hat.
+ *
  * EIN BLEIBENDES FENSTER:
  * Die Tafel wird nach jeder Änderung neu gebaut, das Fenster nicht -- es
  * entsteht einmal je Zeichnung und wird jedes Mal wieder eingehängt. Ein
@@ -178,6 +184,7 @@ function neu(adapter) {
     stand: null,
     vollbild: false,
     einpassen: false,
+    nachfassen: null,    // die Ansicht nach «Alles zeigen», solange dem Umriss noch etwas fehlt
     letzterKlick: null,
     anker: null,         // der zuletzt angeklickte Knoten: dort beginnt der Vektor beim Verschieben
     knoten: null,
@@ -345,7 +352,13 @@ function allesZeigen(a) {
     frei = massstab(seitlich) >= massstab(quer) ? seitlich : quer;
   }
   einpassen(a.v, umriss, { frei });
+  a.nachfassen = a.adapter.umrissVollstaendig?.(a) === false ? ansichtStand(a.v) : null;
   zeichnen(a);
+}
+
+/** Wo die Ansicht steht -- um zu sehen, ob sie seit «Alles zeigen» bewegt wurde. */
+function ansichtStand(v) {
+  return JSON.stringify([v.massstab, v.ursprung, v.basis]);
 }
 
 /** Die Knoten: klein, damit sie die Zeichnung nicht zudecken -- aber treffbar. */
@@ -372,6 +385,14 @@ function zeichnen(a) {
   }
   knoepfeZeichnen(a);
   if (!a.v.massstab || !a.v.breite) return;
+  if (a.nachfassen && a.adapter.umrissVollstaendig(a)) {
+    const unbewegt = a.nachfassen === ansichtStand(a.v);
+    a.nachfassen = null;
+    if (unbewegt) {
+      allesZeigen(a);
+      return;
+    }
+  }
   const app = svgEl('g');
   a.adapter.zeichnen(a, app);
   a.teile.modell.replaceChildren(
@@ -785,6 +806,7 @@ function groesseMessen(a) {
   if (a.v.massstab && a.v.breite) {
     // Die Mitte bleibt, wo sie war.
     a.v.ursprung = [a.v.ursprung[0] + (b - a.v.breite) / 2, a.v.ursprung[1] + (h - a.v.hoehe) / 2];
+    if (a.nachfassen) a.nachfassen = ansichtStand(a.v);
   }
   a.v.breite = b;
   a.v.hoehe = h;

@@ -75,7 +75,7 @@ const VORRAT = {
     "web/js/cad_auswahl.js?v=d401a3dedc12",
     "web/js/cad_befehle.js?v=8d7eec7ec58e",
     "web/js/cad_eingabe.js?v=9d6c86ab188b",
-    "web/js/cad_fenster.js?v=380134243493",
+    "web/js/cad_fenster.js?v=75f76c16ffc2",
     "web/js/cad_modell.js?v=50d977829c8e",
     "web/js/cad_palette.js?v=093d67d4548d",
     "web/js/cad_raum.js?v=2ef16c41d520",
@@ -128,13 +128,13 @@ const VORRAT = {
     "web/js/profilwahl.js?v=659f3d82c08d",
     "web/js/projekte.js?v=4cf72047989c",
     "web/js/python.js?v=e36b207b3ea6",
-    "web/js/qa_diagramme.js?v=30fad33036f2",
+    "web/js/qa_diagramme.js?v=a2188b51b5aa",
     "web/js/qa_profile.js?v=01270e9df874",
     "web/js/qa_spannglied.js?v=85e13c8d90f9",
     "web/js/qa_uebersicht.js?v=73ae3989fa1b",
     "web/js/qa_vorlagen.js?v=d617741b20c0",
-    "web/js/qa_zeichnung.js?v=2029e78a217d",
-    "web/js/querschnittsanalyse.js?v=3f3965fa5468",
+    "web/js/qa_zeichnung.js?v=4ddb54774256",
+    "web/js/querschnittsanalyse.js?v=af1c874e1159",
     "web/js/setzung.js?v=21db1c68db33",
     "web/js/sinnbilder.js?v=e84dba595fd8",
     "web/js/spannungsbild.js?v=5bf6ce4eb080",
@@ -142,8 +142,8 @@ const VORRAT = {
     "web/js/variablen.js?v=7d43b6f38cd9",
     "web/js/zeichnen.js?v=da6e8eec5dc8",
     "web/js/zustand.js?v=3385a39c0f84",
-    "web/kern/notizbuch.json?v=b486d3f0771f",
-    "web/kern/quellen.json?v=51311718893a"
+    "web/kern/notizbuch.json?v=c6ac7d1c3009",
+    "web/kern/quellen.json?v=3201a6327559"
   ],
   "fremd": {
     "web/vendor/jetbrains-mono/": {

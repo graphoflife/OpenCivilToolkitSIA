@@ -1371,6 +1371,36 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
       Vorschlag: so lassen. Entscheid des Benutzers.
 
+- [ ] **Stahlquerschnitt je Lastfall, nach Vorgabe eingebaut**
+      (`opencivil/stahlbau/widerstand.py`, `opencivil/nachweis/qa_stahl.py`,
+      seit 2026-11-26). Jede Annahme steht auch in der Herleitung.
+      - Die Klasse im Lastfall: α an der plastischen Nulllinie bei N_Ed, ψ
+        an den elastischen Spannungen, bei denen (54) gerade aufgeht. Ein
+        ROR 323.9 x 5 mit N = +500 kN und M = 30 kNm ist so in Klasse 4 und
+        nicht nachweisbar, obwohl es unter der Einwirkung ganz gezogen ist:
+        im Versagen ist ein Teil gedrückt.
+      - Klasse 1 und 2 genau plastisch (5.1.1.2, 5.1.8) statt nach (44) wie
+        die Excel-Dateien: beim HEB 300 aus S355 12 bis 16 % mehr.
+      - Querkraft über 0.5 V_Rd: die Bleche, in denen sie steht, tragen mit
+        1 − (V_Ed/V_Rd)² – für jedes Profil und jede Richtung, auch für die
+        Normalkraft, und in den Klassen 3 und 4 statt der
+        Vergleichsspannung. Zwei Richtungen im selben Blech zählen
+        zusammen, höchstens bis zum ganzen Blech. Beim Rundrohr der ganze
+        Ring mit A_v/A.
+      - Im Rundrohr die Resultierende √(V_y² + V_z²), wie in den
+        Excel-Dateien.
+      - (54) und (60) mit e·N, wo der Schwerpunkt neben dem Bezugspunkt
+        liegt; bei Zug zählt in (60) der ganze Querschnitt. Mit mehreren
+        Baustählen zählt je Glied der, der zuerst fliesst.
+      - Mit charakteristischen Werten heissen die Widerstände weiter «Rd»,
+        wie beim Stahlbeton der Querschnittsanalyse.
+      - Torsion nicht nachgewiesen: SIA 263 nennt in 5.1 bis 5.3 keinen
+        Torsionswiderstand des Querschnitts. Ein grauer Hinweis nennt den
+        Lastfall.
+      - Für Stahl kein Interaktionsdiagramm.
+
+      Vorschlag: so lassen. Entscheid des Benutzers.
+
 - [ ] **Der Bezug des äquivalenten Moduls ohne Beton**
       (`opencivil/spannungsanalyse/rissfrei.py`, seit 2026-11-26). Hat ein
       Querschnitt aus Holz oder Baustahl zwei Sorten derselben Art, misst

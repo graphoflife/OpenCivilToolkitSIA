@@ -8,16 +8,22 @@ ohne Rechenwerk und ohne Herleitung, in mm und N/mm²:
 
 * die Teile, nach Baustahl und Dicke in Gruppen -- je Gruppe eine
   Fliessgrenze (:class:`Gruppe`);
-* je Beanspruchung -- Druck oder Biegung zu einer Seite -- den Zustand jedes
-  Blechs, plastisch ``α`` und elastisch ``ψ``, und daraus seine Klasse
+* je Beanspruchung -- Druck, Biegung zu einer Seite oder ein Lastfall -- den
+  Zustand jedes Blechs, plastisch ``α`` und elastisch ``ψ``, je an einer
+  Nulllinie (:class:`Linie`), und daraus seine Klasse
   (:mod:`opencivil.stahlbau.klasse`);
-* die plastische Nulllinie und das plastische Moment, die elastischen Werte
-  und den wirksamen Querschnitt der Klasse 4.
+* die plastische Nulllinie bei einer Normalkraft und die Kraefte, die ihre
+  Spannungsbloecke tragen, die elastischen Werte und den wirksamen
+  Querschnitt der Klasse 4.
+
+Was ein Lastfall daraus macht, steht in :mod:`opencivil.stahlbau.widerstand`.
 
 DIE TEILE:
 Ein Polygon zaehlt in seiner Gruppe mit +1 und in der seines Elternteils mit
 -1: so nimmt eine Aussparung den Stahl darum weg, und ein Polygon aus anderem
-Stahl ersetzt ihn dort. Die Dicke eines Profils ist die seines dicksten
+Stahl ersetzt ihn dort. Mit einem Gewicht dazwischen faellt ein Teil eines
+Blechs nur anteilig weg: so mindert die Querkraft den Steg
+(:meth:`Stahlquerschnitt.mit`). Die Dicke eines Profils ist die seines dicksten
 Blechs, die einer frei gezeichneten Flaeche ihre kleinste Breite -- die ihrer
 konvexen Huelle. Nach Vorgabe, nicht nachgeschlagen: das ganze Profil
 rechnet so mit der Fliessgrenze seines dicksten Blechs, und eine freie
@@ -49,14 +55,18 @@ rechnet das Werkzeug es nicht.
 
 from __future__ import annotations
 
+import copy
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from functools import cached_property
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
+from opencivil.core.suche import illinois
 from opencivil.material.basis import Baustoff
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Flaechenteil
 from opencivil.querschnitt.geometrie import Punkt
+from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlbau import klasse as kl
 from opencivil.stahlprofile.bleche import Blech, Halterung, bleche
 
@@ -66,8 +76,32 @@ DICK_AB = 40.0
 #: Wie nah an einer Nulllinie ein Punkt auf ihr liegt, in mm.
 TOLERANZ = 1e-3
 
-#: Eine Richtung, zur gezogenen Seite hin -- ``None`` bei gleichmaessigem Druck.
-Normale = Optional[Tuple[float, float]]
+
+@dataclass(frozen=True)
+class Linie:
+    """
+    Eine Nulllinie ``n·p = v``, in mm: gezogen, wo ``n·p > v``, gedrueckt, wo
+    ``n·p < v`` -- ``n`` zeigt zur gezogenen Seite. Mit ``n = (0, 0)`` liegt
+    sie ausserhalb des Querschnitts: dann ist alles gedrueckt
+    (:data:`DRUCK`) oder alles gezogen (:data:`ZUG`).
+    """
+
+    n: Tuple[float, float]
+    v: float
+
+    def d(self, p: Punkt) -> float:
+        """Wie weit ``p`` auf der gezogenen Seite liegt -- negativ, wo es gedrueckt ist."""
+        return self.n[0] * p[0] + self.n[1] * p[1] - self.v
+
+
+#: Gleichmaessiger Druck und gleichmaessiger Zug -- ohne Nulllinie im Querschnitt.
+DRUCK = Linie((0.0, 0.0), 1.0)
+ZUG = Linie((0.0, 0.0), -1.0)
+
+
+def normale(seite: Zugseite) -> Tuple[float, float]:
+    """Die Richtung zur gezogenen Seite -- genau 0 oder ±1."""
+    return float(round(math.cos(seite.psi))), float(round(math.sin(seite.psi)))
 
 
 @dataclass(frozen=True)
@@ -106,11 +140,21 @@ class Teil:
 
 @dataclass(frozen=True)
 class Stueck:
-    """Ein Polygon mit Vorzeichen in einer Gruppe -- siehe Dateikopf."""
+    """
+    Ein Polygon mit Gewicht in einer Gruppe -- siehe Dateikopf. ``teil`` ist
+    der Index des Teils, zu dem es zaehlt -- bei einer Aussparung der des
+    Teils darum --, ``was`` sagt, wofuer ein Streifen weggenommen ist.
+    """
 
     gruppe: int
-    vorzeichen: float
+    gewicht: float
     punkte: Tuple[Punkt, ...]
+    teil: int
+    was: str = ""
+
+    @cached_property
+    def werte(self) -> geo.Flaechenwerte:
+        return geo.flaechenwerte(self.punkte)
 
 
 @dataclass(frozen=True)
@@ -130,6 +174,8 @@ class Blechzustand:
     frei: bool
     grenzen: kl.Grenzen
     klasse: int
+    frei_plastisch: bool = False
+    """Ob der freie Rand plastisch der staerker gedrueckte ist -- fuer die Grenzen mit ``α``."""
 
     @property
     def name(self) -> str:
@@ -162,6 +208,7 @@ class Wirksam:
 class Elastisch:
     """Ein Querschnitt elastisch, quer zu einer Richtung ``n``: in mm und mm⁴."""
 
+    n: Tuple[float, float]
     v: float
     """``n·S`` -- wo die Nulllinie bei ``N = 0`` liegt, durch den Schwerpunkt ``S``."""
 
@@ -172,12 +219,30 @@ class Elastisch:
 
     schwerpunkt: Punkt
 
+    @property
+    def linie(self) -> Linie:
+        """Die Nulllinie bei ``N = 0``, durch den Schwerpunkt."""
+        return Linie(self.n, self.v)
+
     def moment(self, f: Sequence[float]) -> Tuple[float, int]:
         """
         Das Moment, bei dem die erste Faser die Spannung ihrer Gruppe erreicht,
         in N·mm, und die Gruppe, in der sie liegt: ``min f_g I/z_g``.
         """
         return min((f[g] * self.I / z, g) for g, z in enumerate(self.abstaende) if z > 0.0)
+
+
+@dataclass(frozen=True)
+class Block:
+    """Die Kraft einer Zone eines Teils an einer plastischen Nulllinie, in N, und wo sie angreift, in mm."""
+
+    teil: int
+    was: str
+    zone: str
+    """«Zug» oder «Druck»."""
+
+    F: float
+    punkt: Punkt
 
 
 def kleinste_breite(punkte: Sequence[Punkt]) -> float:
@@ -244,9 +309,11 @@ class Stahlquerschnitt:
         self.teile: List[Teil] = []
         self.stuecke: List[Stueck] = []
         gruppe_von: Dict[int, int] = {}
+        teil_von: Dict[int, int] = {}
         for i, f in enumerate(flaechen):
             if f.stoff is None:
                 continue
+            teil_von[i] = len(self.teile)
             platten = tuple(bleche(f.profil)) if f.profil is not None else ()
             dicke = max(b.t for b in platten) if platten else kleinste_breite(f.punkte)
             gruppe = Gruppe(f.stoff, dicke > DICK_AB)
@@ -263,9 +330,19 @@ class Stahlquerschnitt:
             if eigene == fremde:
                 continue
             if eigene is not None:
-                self.stuecke.append(Stueck(eigene, 1.0, tuple(f.punkte)))
+                self.stuecke.append(Stueck(eigene, 1.0, tuple(f.punkte), teil_von[i]))
             if fremde is not None:
-                self.stuecke.append(Stueck(fremde, -1.0, tuple(f.punkte)))
+                self.stuecke.append(Stueck(fremde, -1.0, tuple(f.punkte), teil_von[eltern[i]]))
+
+    def mit(self, zusatz: Sequence[Stueck]) -> "Stahlquerschnitt":
+        """
+        Derselbe Querschnitt mit weiteren Stuecken: ein Streifen mit negativem
+        Gewicht nimmt so viel Stahl weg -- ein Blech der Klasse 4 ganz, die
+        Querkraft anteilig. Teile und Bleche bleiben, wie gezeichnet.
+        """
+        neu = copy.copy(self)
+        neu.stuecke = [*self.stuecke, *zusatz]
+        return neu
 
     # -- Was gezeichnet ist -------------------------------------------------------
 
@@ -282,26 +359,82 @@ class Stahlquerschnitt:
         """Je Gruppe ihre Flaeche in mm²."""
         summe = [0.0] * len(self.gruppen)
         for s in self.stuecke:
-            summe[s.gruppe] += s.vorzeichen * geo.flaechenwerte(s.punkte).A
+            summe[s.gruppe] += s.gewicht * s.werte.A
         return summe
+
+    def werte(self) -> geo.Flaechenwerte:
+        """Flaeche, Schwerpunkt und Traegheitsmomente des Stahls -- alle Staehle haben dasselbe ``E``."""
+        return geo.summe([(s.gewicht, s.werte) for s in self.stuecke])
 
     # -- Plastisch -----------------------------------------------------------------
 
-    def nulllinie(self, n: Tuple[float, float], f: Sequence[float]) -> float:
+    def zugkraft(self, f: Sequence[float]) -> float:
+        """Was der Querschnitt ganz gezogen traegt, in N -- ganz gedrueckt dasselbe mit Minus."""
+        return sum(s.gewicht * f[s.gruppe] * s.werte.A for s in self.stuecke)
+
+    def kraefte(self, linie: Linie, f: Sequence[float],
+                bezug: Punkt) -> Tuple[float, float, float]:
         """
-        Die plastische Nulllinie ``n·p = v`` bei ``N = 0``: so viel Kraft
-        gezogen wie gedrueckt, je Gruppe mit ``f``. Halbiert, bis sie auf
-        1e-9 mm genau liegt.
+        Was die Spannungsbloecke an der Nulllinie tragen -- je Gruppe ``f``
+        gezogen und ``-f`` gedrueckt --, als ``(N, M_y, M_z)`` in N und N·mm um
+        ``bezug``: ``M_y = -∫σ (z - z_b) dA`` zieht unten, ``M_z = -∫σ (y - y_b) dA``
+        links.
         """
-        ziel = 0.5 * sum(fg * a for fg, a in zip(f, self.flaechen()))
+        N = s_y = s_z = 0.0
+        for s in self.stuecke:
+            a, y, z = geo.jenseits(s.punkte, linie.n, linie.v)
+            w = s.werte
+            k = s.gewicht * f[s.gruppe]
+            N += k * (2.0 * a - w.A)
+            s_y += k * (2.0 * y - w.A * w.y_S)
+            s_z += k * (2.0 * z - w.A * w.z_S)
+        return N, -(s_z - bezug[1] * N), -(s_y - bezug[0] * N)
+
+    def bloecke(self, linie: Linie, f: Sequence[float]) -> List["Block"]:
+        """
+        Je Teil -- und je weggenommenem Streifen -- die Kraft seiner gezogenen
+        und seiner gedrueckten Zone an der Nulllinie, mit Angriffspunkt: die
+        Probe zu :meth:`kraefte`, Teil fuer Teil.
+        """
+        summen: Dict[Tuple[int, str], List[float]] = {}
+        for s in self.stuecke:
+            a, y, z = geo.jenseits(s.punkte, linie.n, linie.v)
+            w = s.werte
+            k = s.gewicht * f[s.gruppe]
+            summe = summen.setdefault((s.teil, s.was), [0.0] * 6)
+            for i, x in enumerate((a, y, z, w.A - a, w.A * w.y_S - y, w.A * w.z_S - z)):
+                summe[i] += (k if i < 3 else -k) * x
+        bloecke = []
+        for (teil, was), (F_z, y_z, z_z, F_d, y_d, z_d) in summen.items():
+            for zone, F, y, z in (("Zug", F_z, y_z, z_z), ("Druck", F_d, y_d, z_d)):
+                if abs(F) > 1e-9:
+                    bloecke.append(Block(teil, was, zone, F, (y / F, z / F)))
+        return bloecke
+
+    def nulllinie(self, n: Tuple[float, float], f: Sequence[float],
+                  N: float = 0.0) -> Optional[float]:
+        """
+        Die plastische Nulllinie ``n·p = v`` bei der Normalkraft ``N`` in N:
+        so viel mehr Kraft gezogen als gedrueckt -- je Gruppe mit ``f``.
+        ``None``, wo ``N`` jenseits der reinen Zug- oder Druckkraft liegt.
+        Gesucht mit Illinois, bis sie auf 1e-9 mm genau liegt.
+        """
         werte = [_auf(n, p) for s in self.stuecke for p in s.punkte]
         unten, oben = min(werte), max(werte)
-        while oben - unten > 1e-9:
-            mitte = 0.5 * (unten + oben)
-            gezogen = sum(f[s.gruppe] * s.vorzeichen * geo.jenseits(s.punkte, n, mitte)[0]
-                          for s in self.stuecke)
-            unten, oben = (mitte, oben) if gezogen > ziel else (unten, mitte)
-        return 0.5 * (unten + oben)
+        zug = self.zugkraft(f)
+        fa, fb = zug - N, -zug - N
+        if fa < 0.0 or fb > 0.0:
+            return None
+        if fa == 0.0 or fb == 0.0:
+            return unten if fa == 0.0 else oben
+
+        def abweichung(v: float) -> Tuple[float, float]:
+            gezogen = sum(s.gewicht * f[s.gruppe] * (2.0 * geo.jenseits(s.punkte, n, v)[0]
+                                                    - s.werte.A) for s in self.stuecke)
+            return gezogen - N, v
+
+        return illinois(abweichung, unten, fa, oben, fb, schranke_x=1e-9,
+                        schranke_f=1e-12 * zug)
 
     def plastisch(self, n: Tuple[float, float], v: float) -> List[float]:
         """
@@ -310,90 +443,82 @@ class Stahlquerschnitt:
         """
         summe = [0.0] * len(self.gruppen)
         for s in self.stuecke:
-            w = geo.flaechenwerte(s.punkte)
+            w = s.werte
             a, sy, sz = geo.jenseits(s.punkte, n, v)
             jenseits = n[0] * sy + n[1] * sz - v * a
             ganz = w.A * (_auf(n, (w.y_S, w.z_S)) - v)
-            summe[s.gruppe] += s.vorzeichen * (2.0 * jenseits - ganz)
+            summe[s.gruppe] += s.gewicht * (2.0 * jenseits - ganz)
         return summe
 
     # -- Elastisch -----------------------------------------------------------------
 
-    def elastisch(self, n: Tuple[float, float],
-                  abzug: Sequence[Tuple[int, Tuple[Punkt, ...]]] = ()) -> Elastisch:
-        """
-        Der Querschnitt elastisch, ohne die Streifen in ``abzug`` (je Gruppe
-        und Umriss) -- alle Staehle haben dasselbe ``E``.
-        """
-        teile = [(s.vorzeichen, geo.flaechenwerte(s.punkte)) for s in self.stuecke]
-        teile += [(-1.0, geo.flaechenwerte(punkte)) for _, punkte in abzug]
-        w = geo.summe(teile)
+    def elastisch(self, n: Tuple[float, float]) -> Elastisch:
+        """Der Querschnitt elastisch, quer zu ``n`` -- alle Staehle haben dasselbe ``E``."""
+        w = self.werte()
         v = _auf(n, (w.y_S, w.z_S))
         abstaende = [0.0] * len(self.gruppen)
-        for s in self.stuecke:
-            if s.vorzeichen > 0.0:
-                weiteste = max(abs(_auf(n, p) - v) for p in s.punkte)
-                abstaende[s.gruppe] = max(abstaende[s.gruppe], weiteste)
+        for t in self.teile:
+            weiteste = max(abs(_auf(n, p) - v) for p in t.flaeche.punkte)
+            abstaende[t.gruppe] = max(abstaende[t.gruppe], weiteste)
         I = n[0] * n[0] * w.I_z + n[1] * n[1] * w.I_y + 2.0 * n[0] * n[1] * w.I_yz
-        return Elastisch(v=v, I=I, A=w.A, abstaende=tuple(abstaende), schwerpunkt=(w.y_S, w.z_S))
+        return Elastisch(n=n, v=v, I=I, A=w.A, abstaende=tuple(abstaende),
+                         schwerpunkt=(w.y_S, w.z_S))
 
     # -- Klassen -------------------------------------------------------------------
 
-    def zustaende(self, n: Normale, eps: Sequence[float], v_pl: float = 0.0,
-                  v_el: float = 0.0) -> List[Blechzustand]:
+    def zustaende(self, pl: Linie, el: Linie, eps: Sequence[float]) -> List[Blechzustand]:
         """
-        Jedes Blech jedes Profils unter Druck (``n`` ``None``) oder unter
-        Biegung mit den Nulllinien ``v_pl`` und ``v_el`` -- mit ``ε`` je Gruppe.
+        Jedes Blech jedes Profils, plastisch an der Nulllinie ``pl``,
+        elastisch an ``el`` -- mit ``ε`` je Gruppe.
         """
         zustaende = []
         for teil in self.profile:
             for blech in teil.bleche:
-                alpha, psi, frei = self._zustand(blech, n, v_pl, v_el)
-                grenzen = kl.grenzen(blech.halterung, eps[teil.gruppe], alpha, psi, frei)
+                alpha, frei_pl = _plastisch_gedrueckt(blech, pl)
+                psi, frei = _elastisch_gedrueckt(blech, el)
+                grenzen = kl.grenzen(blech.halterung, eps[teil.gruppe], alpha, psi,
+                                     frei_pl=frei_pl, frei_el=frei)
                 zustaende.append(Blechzustand(teil, blech, alpha, psi, frei, grenzen,
-                                              grenzen.klasse(blech.c / blech.t)))
+                                              grenzen.klasse(blech.c / blech.t),
+                                              frei_plastisch=frei_pl))
         return zustaende
 
-    @staticmethod
-    def _zustand(blech: Blech, n: Normale, v_pl: float,
-                 v_el: float) -> Tuple[float, Optional[float], bool]:
-        if n is None:
-            return 1.0, 1.0, False
-        if blech.halterung is Halterung.ROHR:
-            # Ein Rohr ist gedrueckt, sobald ein Teil von ihm auf der
-            # gedrueckten Seite liegt; seine Grenze haengt an nichts sonst.
-            innen = _auf(n, blech.von) - blech.c / 2.0
-            return (1.0 if _null(innen - v_pl) < 0.0 else 0.0,
-                    1.0 if _null(innen - v_el) < 0.0 else None, False)
-        a, b = blech.lichte_enden
-        frei = blech.halterung is Halterung.EINSEITIG and \
-            _auf(n, blech.bis) < _auf(n, blech.von) - TOLERANZ
-        return (anteil(_auf(n, a) - v_pl, _auf(n, b) - v_pl),
-                verhaeltnis(_auf(n, a) - v_el, _auf(n, b) - v_el), frei)
-
-    def freie_gedrueckt(self, n: Normale, v_pl: float = 0.0,
-                        v_el: float = 0.0) -> List[Teil]:
+    def freie_gedrueckt(self, pl: Linie, el: Linie) -> List[Teil]:
         """Die freien Flaechen, die plastisch oder elastisch gedrueckt sind -- siehe Dateikopf."""
-        if n is None:
-            return self.freie
-        grenze = max(v_pl, v_el) - TOLERANZ
-        return [t for t in self.freie if min(_auf(n, p) for p in t.flaeche.punkte) < grenze]
+        return [t for t in self.freie
+                if min(min(pl.d(p), el.d(p)) for p in t.flaeche.punkte) < -TOLERANZ]
 
     # -- Klasse 4 ------------------------------------------------------------------
 
-    def wirksam(self, zustand: Blechzustand, n: Normale, eps: float,
-                v_el: float = 0.0) -> Wirksam:
+    def wirksamer(self, zustaende: Sequence[Blechzustand], el: Linie, eps: Sequence[float],
+                  rest: Callable[[Blechzustand], float] = lambda zustand: 1.0
+                  ) -> Optional[Tuple[List[Wirksam], "Stahlquerschnitt"]]:
+        """
+        Der wirksame Querschnitt zu diesen Zustaenden (4.5.3): die
+        mitwirkenden Breiten der Bleche in Klasse 4 und der Querschnitt ohne
+        ihre Streifen -- ``None`` mit einem Rundrohr darunter (siehe
+        Dateikopf). ``rest`` sagt je Blech, wie viel von ihm noch zaehlt: hat
+        die Querkraft schon einen Teil genommen, nimmt sein Streifen nur den
+        Rest.
+        """
+        vierte = [z for z in zustaende if z.klasse == 4]
+        if any(z.blech.halterung is Halterung.ROHR for z in vierte):
+            return None
+        breiten = [self.wirksam(z, el, eps[z.teil.gruppe]) for z in vierte]
+        return breiten, self.mit([
+            Stueck(w.zustand.teil.gruppe, -rest(w.zustand), w.streifen,
+                   self.teile.index(w.zustand.teil), f"{w.zustand.blech.name}, wirksame Breite")
+            for w in breiten if w.streifen])
+
+    def wirksam(self, zustand: Blechzustand, el: Linie, eps: float) -> Wirksam:
         """
         Die mitwirkende Breite eines Blechs der Klasse 4 -- kein Rundrohr --,
-        ueber seine theoretische Breite ``b``, mit ``ψ`` ueber dieselbe. Siehe
-        Dateikopf.
+        ueber seine theoretische Breite ``b``, mit ``ψ`` ueber dieselbe, an der
+        elastischen Nulllinie ``el``. Siehe Dateikopf.
         """
         blech = zustand.blech
         b = blech.b
-        if n is None:
-            d_0 = d_1 = -1.0
-        else:
-            d_0, d_1 = _null(_auf(n, blech.von) - v_el), _null(_auf(n, blech.bis) - v_el)
+        d_0, d_1 = _null(el.d(blech.von)), _null(el.d(blech.bis))
         psi = verhaeltnis(d_0, d_1)
         if psi is None:
             raise ValueError(f"{zustand.name} ist nicht gedrückt.")
@@ -416,3 +541,34 @@ class Stahlquerschnitt:
         else:
             streifen = blech.streifen(von + b_eff / 2.0, bis - b_eff / 2.0)
         return Wirksam(zustand, psi, k, lambda_p, rho, bis - von, streifen)
+
+
+def _frei(blech: Blech, linie: Linie) -> bool:
+    """Ob der freie Rand eines einseitig gehaltenen Blechs an dieser Nulllinie der staerker gedrueckte ist."""
+    return blech.halterung is Halterung.EINSEITIG and \
+        linie.d(blech.bis) < linie.d(blech.von) - TOLERANZ
+
+
+def _rohr_innen(blech: Blech, linie: Linie) -> float:
+    """Wie weit der gedrueckteste Punkt eines Rundrohrs auf der gezogenen Seite liegt."""
+    return linie.d(blech.von) - math.hypot(*linie.n) * blech.c / 2.0
+
+
+def _plastisch_gedrueckt(blech: Blech, linie: Linie) -> Tuple[float, bool]:
+    """
+    ``α`` an der plastischen Nulllinie und ob der freie Rand gedrueckt ist. Ein
+    Rundrohr ist gedrueckt, sobald ein Teil von ihm auf der gedrueckten Seite
+    liegt; seine Grenze haengt an nichts sonst.
+    """
+    if blech.halterung is Halterung.ROHR:
+        return (1.0 if _null(_rohr_innen(blech, linie)) < 0.0 else 0.0), False
+    a, b = blech.lichte_enden
+    return anteil(linie.d(a), linie.d(b)), _frei(blech, linie)
+
+
+def _elastisch_gedrueckt(blech: Blech, linie: Linie) -> Tuple[Optional[float], bool]:
+    """``ψ`` an der elastischen Nulllinie -- ``None``, wo nichts gedrueckt ist -- und ob der freie Rand es ist."""
+    if blech.halterung is Halterung.ROHR:
+        return (1.0 if _null(_rohr_innen(blech, linie)) < 0.0 else None), False
+    a, b = blech.lichte_enden
+    return verhaeltnis(linie.d(a), linie.d(b)), _frei(blech, linie)

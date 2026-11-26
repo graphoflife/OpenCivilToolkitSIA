@@ -1,5 +1,5 @@
 ---
-erzeugt: 47fba6e3de2b
+erzeugt: f7b44d0388fb
 art: modul
 tags: [modul]
 ---
@@ -15,18 +15,24 @@ ohne Rechenwerk und ohne Herleitung, in mm und N/mm²:
 
 * die Teile, nach Baustahl und Dicke in Gruppen -- je Gruppe eine
   Fliessgrenze ([[opencivil.stahlbau.querschnitt#Gruppe|Gruppe]]);
-* je Beanspruchung -- Druck oder Biegung zu einer Seite -- den Zustand jedes
-  Blechs, plastisch `α` und elastisch `ψ`, und daraus seine Klasse
+* je Beanspruchung -- Druck, Biegung zu einer Seite oder ein Lastfall -- den
+  Zustand jedes Blechs, plastisch `α` und elastisch `ψ`, je an einer
+  Nulllinie ([[opencivil.stahlbau.querschnitt#Linie|Linie]]), und daraus seine Klasse
   ([[opencivil.stahlbau.klasse]]);
-* die plastische Nulllinie und das plastische Moment, die elastischen Werte
-  und den wirksamen Querschnitt der Klasse 4.
+* die plastische Nulllinie bei einer Normalkraft und die Kraefte, die ihre
+  Spannungsbloecke tragen, die elastischen Werte und den wirksamen
+  Querschnitt der Klasse 4.
+
+Was ein Lastfall daraus macht, steht in [[opencivil.stahlbau.widerstand]].
 
 
 ## DIE TEILE
 
 Ein Polygon zaehlt in seiner Gruppe mit +1 und in der seines Elternteils mit
 -1: so nimmt eine Aussparung den Stahl darum weg, und ein Polygon aus anderem
-Stahl ersetzt ihn dort. Die Dicke eines Profils ist die seines dicksten
+Stahl ersetzt ihn dort. Mit einem Gewicht dazwischen faellt ein Teil eines
+Blechs nur anteilig weg: so mindert die Querkraft den Steg
+([[opencivil.stahlbau.querschnitt#Stahlquerschnitt.mit|Stahlquerschnitt.mit]]). Die Dicke eines Profils ist die seines dicksten
 Blechs, die einer frei gezeichneten Flaeche ihre kleinste Breite -- die ihrer
 konvexen Huelle. Nach Vorgabe, nicht nachgeschlagen: das ganze Profil
 rechnet so mit der Fliessgrenze seines dicksten Blechs, und eine freie
@@ -63,6 +69,37 @@ nachgeschlagen). Ein Rundrohr hat keine mitwirkende Breite: in Klasse 4
 rechnet das Werkzeug es nicht.
 
 ## Inhalt
+
+### Linie
+
+```python
+@dataclass(frozen=True)
+class Linie
+```
+
+Eine Nulllinie `n·p = v`, in mm: gezogen, wo `n·p > v`, gedrueckt, wo
+`n·p < v` -- `n` zeigt zur gezogenen Seite. Mit `n = (0, 0)` liegt
+sie ausserhalb des Querschnitts: dann ist alles gedrueckt
+([[opencivil.stahlbau.querschnitt#Konstanten|DRUCK]]) oder alles gezogen ([[opencivil.stahlbau.querschnitt#Konstanten|ZUG]]).
+
+- `n: Tuple[float, float]`
+- `v: float`
+
+#### Linie.d
+
+```python
+def d(self, p: Punkt) -> float
+```
+
+Wie weit `p` auf der gezogenen Seite liegt -- negativ, wo es gedrueckt ist.
+
+### normale
+
+```python
+def normale(seite: Zugseite) -> Tuple[float, float]
+```
+
+Die Richtung zur gezogenen Seite -- genau 0 oder ±1.
 
 ### Gruppe
 
@@ -120,11 +157,22 @@ def name(self) -> str
 class Stueck
 ```
 
-Ein Polygon mit Vorzeichen in einer Gruppe -- siehe Dateikopf.
+Ein Polygon mit Gewicht in einer Gruppe -- siehe Dateikopf. `teil` ist
+der Index des Teils, zu dem es zaehlt -- bei einer Aussparung der des
+Teils darum --, `was` sagt, wofuer ein Streifen weggenommen ist.
 
 - `gruppe: int`
-- `vorzeichen: float`
+- `gewicht: float`
 - `punkte: Tuple[Punkt, ...]`
+- `teil: int`
+- `was: str = ''`
+
+#### Stueck.werte
+
+```python
+@cached_property
+def werte(self) -> geo.Flaechenwerte
+```
 
 ### Blechzustand
 
@@ -146,6 +194,7 @@ staerker gedrueckte ist.
 - `frei: bool`
 - `grenzen: kl.Grenzen`
 - `klasse: int`
+- `frei_plastisch: bool = False` – Ob der freie Rand plastisch der staerker gedrueckte ist -- fuer die Grenzen mit `α`.
 
 #### Blechzustand.name
 
@@ -194,11 +243,21 @@ class Elastisch
 
 Ein Querschnitt elastisch, quer zu einer Richtung `n`: in mm und mm⁴.
 
+- `n: Tuple[float, float]`
 - `v: float` – `n·S` -- wo die Nulllinie bei `N = 0` liegt, durch den Schwerpunkt `S`.
 - `I: float`
 - `A: float`
 - `abstaende: Tuple[float, ...]` – Je Gruppe der weiteste Punkt ihres Stahls von der Nulllinie -- 0 ohne Stahl.
 - `schwerpunkt: Punkt`
+
+#### Elastisch.linie
+
+```python
+@property
+def linie(self) -> Linie
+```
+
+Die Nulllinie bei `N = 0`, durch den Schwerpunkt.
 
 #### Elastisch.moment
 
@@ -208,6 +267,21 @@ def moment(self, f: Sequence[float]) -> Tuple[float, int]
 
 Das Moment, bei dem die erste Faser die Spannung ihrer Gruppe erreicht,
 in N·mm, und die Gruppe, in der sie liegt: `min f_g I/z_g`.
+
+### Block
+
+```python
+@dataclass(frozen=True)
+class Block
+```
+
+Die Kraft einer Zone eines Teils an einer plastischen Nulllinie, in N, und wo sie angreift, in mm.
+
+- `teil: int`
+- `was: str`
+- `zone: str` – «Zug» oder «Druck».
+- `F: float`
+- `punkt: Punkt`
 
 ### kleinste_breite
 
@@ -257,6 +331,16 @@ class Stahlquerschnitt
 
 Die Polygone einer Querschnittsanalyse aus Baustahl -- siehe Dateikopf.
 
+#### Stahlquerschnitt.mit
+
+```python
+def mit(self, zusatz: Sequence[Stueck]) -> 'Stahlquerschnitt'
+```
+
+Derselbe Querschnitt mit weiteren Stuecken: ein Streifen mit negativem
+Gewicht nimmt so viel Stahl weg -- ein Blech der Klasse 4 ganz, die
+Querkraft anteilig. Teile und Bleche bleiben, wie gezeichnet.
+
 #### Stahlquerschnitt.profile
 
 ```python
@@ -281,15 +365,53 @@ def flaechen(self) -> List[float]
 
 Je Gruppe ihre Flaeche in mm².
 
+#### Stahlquerschnitt.werte
+
+```python
+def werte(self) -> geo.Flaechenwerte
+```
+
+Flaeche, Schwerpunkt und Traegheitsmomente des Stahls -- alle Staehle haben dasselbe `E`.
+
+#### Stahlquerschnitt.zugkraft
+
+```python
+def zugkraft(self, f: Sequence[float]) -> float
+```
+
+Was der Querschnitt ganz gezogen traegt, in N -- ganz gedrueckt dasselbe mit Minus.
+
+#### Stahlquerschnitt.kraefte
+
+```python
+def kraefte(self, linie: Linie, f: Sequence[float], bezug: Punkt) -> Tuple[float, float, float]
+```
+
+Was die Spannungsbloecke an der Nulllinie tragen -- je Gruppe `f`
+gezogen und `-f` gedrueckt --, als `(N, M_y, M_z)` in N und N·mm um
+`bezug`: `M_y = -∫σ (z - z_b) dA` zieht unten, `M_z = -∫σ (y - y_b) dA`
+links.
+
+#### Stahlquerschnitt.bloecke
+
+```python
+def bloecke(self, linie: Linie, f: Sequence[float]) -> List['Block']
+```
+
+Je Teil -- und je weggenommenem Streifen -- die Kraft seiner gezogenen
+und seiner gedrueckten Zone an der Nulllinie, mit Angriffspunkt: die
+Probe zu [[opencivil.stahlbau.querschnitt#Stahlquerschnitt.kraefte|kraefte]], Teil fuer Teil.
+
 #### Stahlquerschnitt.nulllinie
 
 ```python
-def nulllinie(self, n: Tuple[float, float], f: Sequence[float]) -> float
+def nulllinie(self, n: Tuple[float, float], f: Sequence[float], N: float=0.0) -> Optional[float]
 ```
 
-Die plastische Nulllinie `n·p = v` bei `N = 0`: so viel Kraft
-gezogen wie gedrueckt, je Gruppe mit `f`. Halbiert, bis sie auf
-1e-9 mm genau liegt.
+Die plastische Nulllinie `n·p = v` bei der Normalkraft `N` in N:
+so viel mehr Kraft gezogen als gedrueckt -- je Gruppe mit `f`.
+`None`, wo `N` jenseits der reinen Zug- oder Druckkraft liegt.
+Gesucht mit Illinois, bis sie auf 1e-9 mm genau liegt.
 
 #### Stahlquerschnitt.plastisch
 
@@ -303,54 +425,106 @@ Widerstandsmoment um die Nulllinie `v`.
 #### Stahlquerschnitt.elastisch
 
 ```python
-def elastisch(self, n: Tuple[float, float], abzug: Sequence[Tuple[int, Tuple[Punkt, ...]]]=()) -> Elastisch
+def elastisch(self, n: Tuple[float, float]) -> Elastisch
 ```
 
-Der Querschnitt elastisch, ohne die Streifen in `abzug` (je Gruppe
-und Umriss) -- alle Staehle haben dasselbe `E`.
+Der Querschnitt elastisch, quer zu `n` -- alle Staehle haben dasselbe `E`.
 
 #### Stahlquerschnitt.zustaende
 
 ```python
-def zustaende(self, n: Normale, eps: Sequence[float], v_pl: float=0.0, v_el: float=0.0) -> List[Blechzustand]
+def zustaende(self, pl: Linie, el: Linie, eps: Sequence[float]) -> List[Blechzustand]
 ```
 
-Jedes Blech jedes Profils unter Druck (`n` `None`) oder unter
-Biegung mit den Nulllinien `v_pl` und `v_el` -- mit `ε` je Gruppe.
+Jedes Blech jedes Profils, plastisch an der Nulllinie `pl`,
+elastisch an `el` -- mit `ε` je Gruppe.
 
 #### Stahlquerschnitt.freie_gedrueckt
 
 ```python
-def freie_gedrueckt(self, n: Normale, v_pl: float=0.0, v_el: float=0.0) -> List[Teil]
+def freie_gedrueckt(self, pl: Linie, el: Linie) -> List[Teil]
 ```
 
 Die freien Flaechen, die plastisch oder elastisch gedrueckt sind -- siehe Dateikopf.
 
+#### Stahlquerschnitt.wirksamer
+
+```python
+def wirksamer(self, zustaende: Sequence[Blechzustand], el: Linie, eps: Sequence[float], rest: Callable[[Blechzustand], float]=lambda zustand: 1.0) -> Optional[Tuple[List[Wirksam], 'Stahlquerschnitt']]
+```
+
+Der wirksame Querschnitt zu diesen Zustaenden (4.5.3): die
+mitwirkenden Breiten der Bleche in Klasse 4 und der Querschnitt ohne
+ihre Streifen -- `None` mit einem Rundrohr darunter (siehe
+Dateikopf). `rest` sagt je Blech, wie viel von ihm noch zaehlt: hat
+die Querkraft schon einen Teil genommen, nimmt sein Streifen nur den
+Rest.
+
 #### Stahlquerschnitt.wirksam
 
 ```python
-def wirksam(self, zustand: Blechzustand, n: Normale, eps: float, v_el: float=0.0) -> Wirksam
+def wirksam(self, zustand: Blechzustand, el: Linie, eps: float) -> Wirksam
 ```
 
 Die mitwirkende Breite eines Blechs der Klasse 4 -- kein Rundrohr --,
-ueber seine theoretische Breite `b`, mit `ψ` ueber dieselbe. Siehe
-Dateikopf.
+ueber seine theoretische Breite `b`, mit `ψ` ueber dieselbe, an der
+elastischen Nulllinie `el`. Siehe Dateikopf.
+
+### _frei
+
+```python
+def _frei(blech: Blech, linie: Linie) -> bool
+```
+
+Ob der freie Rand eines einseitig gehaltenen Blechs an dieser Nulllinie der staerker gedrueckte ist.
+
+### _rohr_innen
+
+```python
+def _rohr_innen(blech: Blech, linie: Linie) -> float
+```
+
+Wie weit der gedrueckteste Punkt eines Rundrohrs auf der gezogenen Seite liegt.
+
+### _plastisch_gedrueckt
+
+```python
+def _plastisch_gedrueckt(blech: Blech, linie: Linie) -> Tuple[float, bool]
+```
+
+`α` an der plastischen Nulllinie und ob der freie Rand gedrueckt ist. Ein
+Rundrohr ist gedrueckt, sobald ein Teil von ihm auf der gedrueckten Seite
+liegt; seine Grenze haengt an nichts sonst.
+
+### _elastisch_gedrueckt
+
+```python
+def _elastisch_gedrueckt(blech: Blech, linie: Linie) -> Tuple[Optional[float], bool]
+```
+
+`ψ` an der elastischen Nulllinie -- `None`, wo nichts gedrueckt ist -- und ob der freie Rand es ist.
 
 
 ## Konstanten
 
 - `DICK_AB = 40.0` – Ab welcher Dicke die rechte Spalte von Tabelle 1 gilt, in mm.
 - `TOLERANZ = 0.001` – Wie nah an einer Nulllinie ein Punkt auf ihr liegt, in mm.
-- `Normale = Optional[Tuple[float, float]]` – Eine Richtung, zur gezogenen Seite hin -- `None` bei gleichmaessigem Druck.
+- `DRUCK = Linie((0.0, 0.0), 1.0)` – Gleichmaessiger Druck und gleichmaessiger Zug -- ohne Nulllinie im Querschnitt.
+- `ZUG = Linie((0.0, 0.0), -1.0)`
 
 ## Braucht
 
+- [[opencivil.core.suche]]
 - [[opencivil.material.basis]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.zugseite]]
 - [[opencivil.stahlbau.klasse]]
 - [[opencivil.stahlprofile.bleche]]
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_werte]]
+- [[opencivil.stahlbau.widerstand]]

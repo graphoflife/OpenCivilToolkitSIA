@@ -223,6 +223,12 @@
       "bereich": "Querschnittsanalyse"
     },
     {
+      "name": "Stahlquerschnitt",
+      "pfad": "Formelsammlung/Themen/Stahlquerschnitt.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
       "name": "Streifenmethode",
       "pfad": "Formelsammlung/Themen/Streifenmethode.md",
       "art": "thema",
@@ -527,6 +533,15 @@
       ],
       "themen": [
         "Beton"
+      ]
+    },
+    {
+      "name": "Beiwert ε der Grenzschlankheiten",
+      "pfad": "Formelsammlung/Formeln/Beiwert ε der Grenzschlankheiten.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Kennzahlen"
       ]
     },
     {
@@ -972,6 +987,17 @@
       ]
     },
     {
+      "name": "Biegewiderstand bis zum ersten Fliessen",
+      "pfad": "Formelsammlung/Formeln/Biegewiderstand bis zum ersten Fliessen.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{y,Rd}^{+}"
+      ],
+      "themen": [
+        "Stahlquerschnitt"
+      ]
+    },
+    {
       "name": "Biegewiderstand im Stützstreifen",
       "pfad": "Formelsammlung/Formeln/Biegewiderstand im Stützstreifen.md",
       "art": "formel",
@@ -1349,6 +1375,7 @@
         "Knicken",
         "Duktilität je Richtung",
         "Sprödes Versagen je Richtung",
+        "Stahlquerschnitt",
         "Durchstanzen"
       ]
     },
@@ -1358,7 +1385,8 @@
       "art": "formel",
       "zeichen": [],
       "themen": [
-        "Schiefe Biegung"
+        "Schiefe Biegung",
+        "Stahlquerschnitt"
       ]
     },
     {
@@ -2434,6 +2462,15 @@
       ]
     },
     {
+      "name": "Lineares Zusammenwirken im Stahlquerschnitt",
+      "pfad": "Formelsammlung/Formeln/Lineares Zusammenwirken im Stahlquerschnitt.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Stahlquerschnitt"
+      ]
+    },
+    {
       "name": "Linearisierte Fliessbedingung",
       "pfad": "Formelsammlung/Formeln/Linearisierte Fliessbedingung.md",
       "art": "formel",
@@ -2516,6 +2553,17 @@
       ]
     },
     {
+      "name": "Minderung durch grosse Querkraft",
+      "pfad": "Formelsammlung/Formeln/Minderung durch grosse Querkraft.md",
+      "art": "formel",
+      "zeichen": [
+        "\\rho_{z}"
+      ],
+      "themen": [
+        "Stahlquerschnitt"
+      ]
+    },
+    {
       "name": "Mittelwert der Zylinderdruckfestigkeit",
       "pfad": "Formelsammlung/Formeln/Mittelwert der Zylinderdruckfestigkeit.md",
       "art": "formel",
@@ -2569,6 +2617,16 @@
       ],
       "themen": [
         "Durchstanzen"
+      ]
+    },
+    {
+      "name": "Mitwirkende Breite eines Blechs",
+      "pfad": "Formelsammlung/Formeln/Mitwirkende Breite eines Blechs.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Kennzahlen",
+        "Stahlquerschnitt"
       ]
     },
     {
@@ -2709,6 +2767,17 @@
       ]
     },
     {
+      "name": "Normalkraftwiderstand eines Stahlquerschnitts",
+      "pfad": "Formelsammlung/Formeln/Normalkraftwiderstand eines Stahlquerschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Rd}^{+}"
+      ],
+      "themen": [
+        "Kennzahlen"
+      ]
+    },
+    {
       "name": "Nulllinie auf halber Höhe",
       "pfad": "Formelsammlung/Formeln/Nulllinie auf halber Höhe.md",
       "art": "formel",
@@ -2745,6 +2814,17 @@
         "Biegung und Normalkraft",
         "Zwängung auf Biegung",
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Plastischer Biegewiderstand eines Stahlquerschnitts",
+      "pfad": "Formelsammlung/Formeln/Plastischer Biegewiderstand eines Stahlquerschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{y,Rd}^{+}"
+      ],
+      "themen": [
+        "Kennzahlen"
       ]
     },
     {
@@ -2786,7 +2866,8 @@
         "M_{y,Rd}"
       ],
       "themen": [
-        "Schiefe Biegung"
+        "Schiefe Biegung",
+        "Stahlquerschnitt"
       ]
     },
     {
@@ -2797,7 +2878,8 @@
         "M_{z,Rd}"
       ],
       "themen": [
-        "Schiefe Biegung"
+        "Schiefe Biegung",
+        "Stahlquerschnitt"
       ]
     },
     {
@@ -2808,7 +2890,8 @@
         "N_{Rd}"
       ],
       "themen": [
-        "Schiefe Biegung"
+        "Schiefe Biegung",
+        "Stahlquerschnitt"
       ]
     },
     {
@@ -2911,6 +2994,15 @@
       ],
       "themen": [
         "Innerer Pfahlwiderstand quer"
+      ]
+    },
+    {
+      "name": "Querkraftwiderstand eines Stahlprofils",
+      "pfad": "Formelsammlung/Formeln/Querkraftwiderstand eines Stahlprofils.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Kennzahlen"
       ]
     },
     {
@@ -3185,6 +3277,15 @@
       "zeichen": [],
       "themen": [
         "Streifenmethode"
+      ]
+    },
+    {
+      "name": "Schubbeulen des Blechs, ohne Quersteifen",
+      "pfad": "Formelsammlung/Formeln/Schubbeulen des Blechs, ohne Quersteifen.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Kennzahlen"
       ]
     },
     {
@@ -3506,6 +3607,15 @@
       ],
       "themen": [
         "Holz"
+      ]
+    },
+    {
+      "name": "Steg ohne Schubbeulen",
+      "pfad": "Formelsammlung/Formeln/Steg ohne Schubbeulen.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Kennzahlen"
       ]
     },
     {
@@ -3946,7 +4056,19 @@
         "M_{Rd}"
       ],
       "themen": [
-        "Schiefe Biegung"
+        "Schiefe Biegung",
+        "Stahlquerschnitt"
+      ]
+    },
+    {
+      "name": "Widerstandsmoment bis zur weitesten Faser",
+      "pfad": "Formelsammlung/Formeln/Widerstandsmoment bis zur weitesten Faser.md",
+      "art": "formel",
+      "zeichen": [
+        "W_{eff}"
+      ],
+      "themen": [
+        "Stahlquerschnitt"
       ]
     },
     {
@@ -4743,6 +4865,7 @@
         "Illinois",
         "Illinois.finde",
         "illinois",
+        "winkel_suchen",
         "_sekante",
         "_weiter",
         "eingrenzen"
@@ -6307,22 +6430,59 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.qa_stahl",
+      "pfad": "Python/opencivil.nachweis.qa_stahl.md",
+      "art": "modul",
+      "kurz": "die Lastfaelle eines Stahlquerschnitts nach SIA 263:2013.",
+      "stichworte": [
+        "_bezuege",
+        "_querkraefte",
+        "_einwirkung",
+        "StahlBiegungQA",
+        "StahlBiegungQA.pruefe",
+        "StahlBiegungQA._rechnen",
+        "StahlBiegungQA._querkraft",
+        "StahlBiegungQA._wirksam",
+        "StahlBiegungQA._seiten",
+        "StahlBiegungQA._linear",
+        "_glied",
+        "StahlQuerkraftQA",
+        "StahlQuerkraftQA.pruefe"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.qa_stahl_kennzahlen",
       "pfad": "Python/opencivil.nachweis.qa_stahl_kennzahlen.md",
       "art": "modul",
       "kurz": "was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.",
       "stichworte": [
-        "_normale",
         "_ohne_klammern",
         "_achse",
         "KennzahlenStahlQA",
         "KennzahlenStahlQA.rechne",
-        "KennzahlenStahlQA._wert",
-        "KennzahlenStahlQA._zahl",
         "KennzahlenStahlQA._summe",
         "KennzahlenStahlQA._klasse",
-        "KennzahlenStahlQA._wirksam",
         "KennzahlenStahlQA._elastisch"
+      ]
+    },
+    {
+      "name": "opencivil.nachweis.qa_stahl_werte",
+      "pfad": "Python/opencivil.nachweis.qa_stahl_werte.md",
+      "art": "modul",
+      "kurz": "was Kennzahlen und Nachweise eines Stahlquerschnitts teilen.",
+      "stichworte": [
+        "stoffbezuege",
+        "Stahlwerte",
+        "Stahlwerte.wert",
+        "Stahlwerte.zahl",
+        "Stahlwerte.gamma",
+        "Stahlwerte.f",
+        "Stahlwerte.eps",
+        "Stahlwerte.mit_gamma",
+        "Stahlwerte.formel",
+        "Stahlwerte.bruch",
+        "klassen",
+        "breiten"
       ]
     },
     {
@@ -7292,8 +7452,11 @@
       "kurz": "ein gezeichneter Querschnitt wird Rechnung.",
       "stichworte": [
         "bauen",
+        "_lastfaelle",
+        "_stahl",
         "_kennzahlen",
         "ohne_nachweise",
+        "ohne_diagramm",
         "ohne_analysen",
         "_in_si",
         "_analyse",
@@ -7380,7 +7543,8 @@
         "_alles_einmal",
         "_beweglich",
         "_raumrahmen",
-        "_spannbeton"
+        "_spannbeton",
+        "_stahltraeger"
       ]
     },
     {
@@ -9173,34 +9337,50 @@
       "art": "modul",
       "kurz": "ein gezeichneter Querschnitt aus Baustahl.",
       "stichworte": [
+        "Linie",
+        "Linie.d",
+        "normale",
         "Gruppe",
         "Gruppe.name",
         "Gruppe.kennwert",
         "Teil",
         "Teil.name",
         "Stueck",
+        "Stueck.werte",
         "Blechzustand",
         "Blechzustand.name",
         "Blechzustand.schlankheit",
         "Wirksam",
         "Wirksam.b_eff",
         "Elastisch",
+        "Elastisch.linie",
         "Elastisch.moment",
+        "Block",
         "kleinste_breite",
         "_huelle",
         "_null",
         "anteil",
         "verhaeltnis",
         "Stahlquerschnitt",
+        "Stahlquerschnitt.mit",
         "Stahlquerschnitt.profile",
         "Stahlquerschnitt.freie",
         "Stahlquerschnitt.flaechen",
+        "Stahlquerschnitt.werte",
+        "Stahlquerschnitt.zugkraft",
+        "Stahlquerschnitt.kraefte",
+        "Stahlquerschnitt.bloecke",
         "Stahlquerschnitt.nulllinie",
         "Stahlquerschnitt.plastisch",
         "Stahlquerschnitt.elastisch",
         "Stahlquerschnitt.zustaende",
         "Stahlquerschnitt.freie_gedrueckt",
-        "Stahlquerschnitt.wirksam"
+        "Stahlquerschnitt.wirksamer",
+        "Stahlquerschnitt.wirksam",
+        "_frei",
+        "_rohr_innen",
+        "_plastisch_gedrueckt",
+        "_elastisch_gedrueckt"
       ]
     },
     {
@@ -9214,7 +9394,48 @@
         "Schubbeulen",
         "tau_beulen",
         "kritisch",
-        "widerstand"
+        "widerstand",
+        "rund",
+        "_parallel",
+        "streifen"
+      ]
+    },
+    {
+      "name": "opencivil.stahlbau.widerstand",
+      "pfad": "Python/opencivil.stahlbau.widerstand.md",
+      "art": "modul",
+      "kurz": "was ein Stahlquerschnitt in einem Lastfall aufnimmt.",
+      "stichworte": [
+        "Querkraft",
+        "Querkraft.symbol",
+        "Querkraft.name",
+        "Querkraft.gewicht",
+        "querkraefte",
+        "Abgemindert",
+        "Abgemindert.rest",
+        "abmindern",
+        "Plastisch",
+        "plastisch",
+        "Glied",
+        "Glied.widerstand",
+        "Glied.anteil",
+        "nutzung",
+        "skala",
+        "Widerstaende",
+        "Widerstaende.mitte",
+        "Widerstaende.glieder",
+        "Widerstaende.n",
+        "elastische",
+        "Gebogen",
+        "Wirksame",
+        "wirksame",
+        "spannungslinie",
+        "Fall",
+        "Fall.ohne_moment",
+        "Fall.rohr_klasse_4",
+        "Fall.n",
+        "rechnen",
+        "_fall"
       ]
     },
     {

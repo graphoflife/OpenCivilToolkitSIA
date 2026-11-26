@@ -1,5 +1,5 @@
 ---
-erzeugt: ec862a9a9db9
+erzeugt: 5eb6e4e446e2
 art: formel
 tags: [formel]
 ---
@@ -22,11 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-\begin{aligned}
-  I_T &= \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} \\
-  &= \frac{4 \cdot 27523.2\,\cdot 10^{6}\,\mathrm{mm}^{4} - 27660.5\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} \\
-  &= 27477.5\,\cdot 10^{6}\,\mathrm{mm}^{4}
-\end{aligned}
+I_T = \frac{4 \cdot I_{T,fein} - I_{T,grob}}{3} = \frac{4 \cdot 1.7\,\cdot 10^{6}\,\mathrm{mm}^{4} - 1.7\,\cdot 10^{6}\,\mathrm{mm}^{4}}{3} = 1.6\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
 ## Im Code

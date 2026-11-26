@@ -1,5 +1,5 @@
 ---
-erzeugt: 4fbe08bb55df
+erzeugt: 6e3eb9f25b4f
 art: modul
 tags: [modul]
 ---
@@ -324,15 +324,19 @@ def aufbau_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]
 def torsion_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]
 ```
 
-`I_T` nach St. Venant, numerisch -- mit den beiden Gittern, aus denen es kommt.
+`I_T` nach St. Venant, numerisch -- mit den beiden Gittern, aus denen
+es kommt. Unter eigener Ueberschrift: gerechnet wird es, wenn es einer
+braucht, oft nach den Nachweisen.
 
 #### Querschnittsanalyse.angaben
 
 ```python
-def angaben(self) -> Tuple[GleichungBlock, TabellenBlock]
+def angaben(self) -> Tuple[GleichungBlock, Optional[TabellenBlock]]
 ```
 
-Was ueber der Nachweistabelle steht: Werkstoffe, Flaeche, Schwerpunkt; die Bewehrung.
+Was ueber der Nachweistabelle steht: die Werkstoffe der Flaechen,
+Flaeche, Schwerpunkt; die Bewehrung -- ohne Stab, Spannglied und Wand,
+etwa beim Stahl, keine Tabelle.
 
 #### Querschnittsanalyse.werkstoffbezuege
 
@@ -510,6 +514,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.qa_stahl]]
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]

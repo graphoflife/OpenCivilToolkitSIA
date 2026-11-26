@@ -30,7 +30,7 @@ import {
 } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import {
-  ohneAnalysenVon, ohneNachweiseVon, werkstoffeVon, zeichenbereich,
+  bauweiseVon, ohneAnalysenVon, ohneNachweiseVon, werkstoffeVon, zeichenbereich,
 } from './qa_zeichnung.js';
 import {
   ausVorlage, eintragAendern, feldangabe, katalog,
@@ -48,6 +48,16 @@ const HILFE = {
       ['M-N', 'Dehnungsebene über Fasern; schief: die Nulllinie dreht, bis M_Rd in Richtung M_Ed zeigt'],
       ['V+T', 'elastisch auf die Schubwände verteilt (Federn b_w·l), Zellen nach Bredt; je Wand Fachwerk'],
       ['Werte', 'je Material nach Wahl, oben in diesem Fenster'],
+    ],
+    formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
+  },
+  tragsicherheitStahl: {
+    zeilen: [
+      ['Klasse', 'je Blech jedes Profils aus c/t, im Lastfall; frei gezeichnet und gedrückt höchstens 3'],
+      ['M-N', 'Klasse 1 und 2 plastisch, die Nulllinie dreht, bis M_Rd in Richtung M_Ed zeigt; 3 elastisch (54); 4 am wirksamen Querschnitt (60)'],
+      ['V', 'je Richtung gegen V_Rd der Profile; über der Hälfte von V_Rd tragen die Bleche, in denen sie steht, für M-N nur noch 1 − (V/V_Rd)²'],
+      ['T', 'nicht nachgewiesen – SIA 263 nennt keinen Torsionswiderstand des Querschnitts'],
+      ['Werte', 'je Baustahl nach Wahl, oben in diesem Fenster'],
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
   },
@@ -204,10 +214,10 @@ function schubwandAngaben(analyse) {
 }
 
 /**
- * Tragsicherheit: womit gerechnet wird, die Lastfälle und was Querkraft und
- * Torsion brauchen.
+ * Tragsicherheit: womit gerechnet wird und die Lastfälle -- beim Stahlbeton
+ * dazu, was Querkraft und Torsion brauchen (`schubwandAngaben`).
  */
-function tragsicherheitInhalt(analyse) {
+function lastfallAngaben(analyse) {
   const aendern = (veraenderer) => eintragAendern(analyse.kennung, veraenderer);
   const faelle = analyse.lastfaelle;
   return [
@@ -236,7 +246,6 @@ function tragsicherheitInhalt(analyse) {
       : [el('div.leer', { text: 'Ohne Lastfall kein Nachweis.' })]),
     anfuegenKnopf('Lastfall', (name) => aendern((a) => a.lastfaelle.push(
       ausVorlage('qalastfall', { name: name(a.lastfaelle) })))),
-    schubwandAngaben(analyse),
   ];
 }
 
@@ -361,8 +370,16 @@ const TRAGSICHERHEIT = {
   breit: true,
   bezug: () => 'N, V in kN · M, T in kNm',
   hilfe: HILFE.tragsicherheit,
-  inhalt: tragsicherheitInhalt,
+  inhalt: (analyse) => [...lastfallAngaben(analyse), schubwandAngaben(analyse)],
   stand: (a) => zeilenstand(a.lastfaelle, 'Lastfall', 'Lastfälle', 'kein Lastfall'),
+};
+
+/**
+ * Dieselbe Kachel für einen Querschnitt aus Stahl, nach SIA 263: ohne
+ * Schubwände -- die Querkraft tragen die Profile.
+ */
+const TRAGSICHERHEIT_STAHL = {
+  ...TRAGSICHERHEIT, hilfe: HILFE.tragsicherheitStahl, inhalt: lastfallAngaben,
 };
 
 /** Die Zugseiten einer Analyse aus dem Katalog -- und wie dann ihre Ränder heissen. */
@@ -440,18 +457,19 @@ const ORT = {
 };
 
 /**
- * Die Kacheln der Analyse. Die Nachweise sind die des Stahlbetons: ein
- * Querschnitt aus Holz, Stahl oder im Verbund hat noch keine, statt ihrer
- * steht grau, warum (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat
- * jeder ausser dem Verbund (`ohneAnalysenVon`). Was in den Kacheln
- * eingestellt ist, bleibt.
+ * Die Kacheln der Analyse. Die Nachweise sind die des Stahlbetons, beim
+ * Stahl nur die Tragsicherheit nach SIA 263 (`bauweiseVon`). Ein Querschnitt
+ * aus Holz oder im Verbund hat noch keine, statt ihrer steht grau, warum
+ * (`ohneNachweiseVon`). Die Spannung-Dehnung-Analysen hat jeder ausser dem
+ * Verbund (`ohneAnalysenVon`). Was in den Kacheln eingestellt ist, bleibt.
  */
 function kapitel(analyse) {
   const gruppe = (titel, ohne, kacheln) => (ohne ? { titel, hinweis: ohne, kapitel: [] }
     : { titel, kapitel: kacheln() });
   return [
     gruppe('Nachweise', ohneNachweiseVon(analyse.kennung),
-      () => [TRAGSICHERHEIT, ...nachweisKapitel(ORT)]),
+      () => (bauweiseVon(analyse.kennung) === 'stahl' ? [TRAGSICHERHEIT_STAHL]
+        : [TRAGSICHERHEIT, ...nachweisKapitel(ORT)])),
     gruppe('Spannung-Dehnung-Analysen', ohneAnalysenVon(analyse.kennung),
       () => analysenKapitel(ORT)),
   ];

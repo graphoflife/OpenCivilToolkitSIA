@@ -190,22 +190,27 @@ export function werkstoffeVon(kennung) {
 }
 
 /**
- * Was der Kern zuletzt über die Bauweise sagte: ein Satz der letzten Antwort,
- * auch einer älteren -- sonst sprängen die Kacheln bei jeder Änderung um,
- * bis die neue da ist.
+ * Was der Kern zuletzt über die Bauweise sagte: eine Angabe der letzten
+ * Antwort, auch einer älteren -- sonst sprängen die Kacheln bei jeder
+ * Änderung um, bis die neue da ist.
  */
-function bauweisensatz(kennung, schluessel) {
+function bauweisenangabe(kennung, schluessel) {
   const a = fensterVon(kennung);
   return (frischeAntwort(a) || a.adapter.kern.antwort)?.[schluessel] || '';
 }
 
+/** Die Bauweise des Querschnitts: «stahlbeton», «stahl», «verbund», «holz» -- leer ohne. */
+export function bauweiseVon(kennung) {
+  return bauweisenangabe(kennung, 'bauweise');
+}
+
 /**
- * Warum der Querschnitt keinen Nachweis hat -- er ist aus Holz, Stahl oder
- * im Verbund: «Einen Holzquerschnitt weist das Werkzeug …». Leer beim
- * Stahlbeton.
+ * Warum der Querschnitt keinen Nachweis hat -- er ist aus Holz oder im
+ * Verbund: «Einen Holzquerschnitt weist das Werkzeug …». Leer beim
+ * Stahlbeton und beim Stahl.
  */
 export function ohneNachweiseVon(kennung) {
-  return bauweisensatz(kennung, 'ohne_nachweise');
+  return bauweisenangabe(kennung, 'ohne_nachweise');
 }
 
 /**
@@ -213,7 +218,7 @@ export function ohneNachweiseVon(kennung) {
  * «Einen Verbundquerschnitt rechnen …». Leer bei allen anderen.
  */
 export function ohneAnalysenVon(kennung) {
-  return bauweisensatz(kennung, 'ohne_analysen');
+  return bauweisenangabe(kennung, 'ohne_analysen');
 }
 
 // ===========================================================================
@@ -300,14 +305,16 @@ function adapter(kennung) {
     },
     punktUmriss: (a, art, e) => (art === PROFIL ? profilUmriss(a, e) : null),
     umriss: (a) => umriss(a, eintragVon(kennung)),
+    // Die Masse eines Profils kennt nur der Kern: bis zu seiner Antwort fehlt es im Umriss.
+    umrissVollstaendig: (a) => (eintragVon(kennung)?.profile || []).every((e) => profilUmriss(a, e)),
     fragen: () => api.geometrie(zustand.projekt, kennung),
     nehmen: (a, antwort) => {
       a.qa.namen = new Map([antwort.polygone, antwort.profile, antwort.staebe, antwort.spannglieder,
         antwort.linien, antwort.waende, antwort.hilfslinien].flatMap((liste) => (liste || []).map((x) => [x.kennung, x.element])));
-      // Aus Holz statt Beton: die Analyse zeigt andere Kacheln (`ohneNachweiseVon`,
-      // `ohneAnalysenVon`).
+      // Aus Holz oder Stahl statt Beton: die Analyse zeigt andere Kacheln
+      // (`bauweiseVon`, `ohneNachweiseVon`, `ohneAnalysenVon`).
       const vorher = a.adapter.kern.antwort;
-      a.qa.andereKacheln = ['ohne_nachweise', 'ohne_analysen']
+      a.qa.andereKacheln = ['bauweise', 'ohne_nachweise', 'ohne_analysen']
         .some((s) => antwort[s] !== (vorher?.[s] ?? ''));
       return antwort;
     },

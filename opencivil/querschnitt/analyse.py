@@ -661,9 +661,14 @@ class Querschnittsanalyse(Rechenobjekt):
         return {self.d_brutto[k].id: g for k, g in werte.items()}
 
     def torsion_protokollieren(self, p: Protokoll) -> Dict[str, Groesse]:
-        """``I_T`` nach St. Venant, numerisch -- mit den beiden Gittern, aus denen es kommt."""
+        """
+        ``I_T`` nach St. Venant, numerisch -- mit den beiden Gittern, aus denen
+        es kommt. Unter eigener Ueberschrift: gerechnet wird es, wenn es einer
+        braucht, oft nach den Nachweisen.
+        """
         z = self.zeichnung
         t = torsion(z.punkte, z.traegt, z.eltern)
+        p.titel("Torsionsträgheitsmoment")
         p.erklaerung(
             "Für ein beliebiges Polygon gibt es keine Formel für I_T. Gerechnet wird mit der "
             "Spannungsfunktion φ von Prandtl, auf einem Gitter: seine Linien laufen durch jede "
@@ -739,11 +744,15 @@ class Querschnittsanalyse(Rechenobjekt):
 
     # -- Fuer die Zusammenfassung -------------------------------------------------
 
-    def angaben(self) -> Tuple[GleichungBlock, TabellenBlock]:
-        """Was ueber der Nachweistabelle steht: Werkstoffe, Flaeche, Schwerpunkt; die Bewehrung."""
-        betone = sorted({f.stoff.name for f in self.flaechen if f.stoff is not None})
+    def angaben(self) -> Tuple[GleichungBlock, Optional[TabellenBlock]]:
+        """
+        Was ueber der Nachweistabelle steht: die Werkstoffe der Flaechen,
+        Flaeche, Schwerpunkt; die Bewehrung -- ohne Stab, Spannglied und Wand,
+        etwa beim Stahl, keine Tabelle.
+        """
+        stoffe = sorted({f.stoff.name for f in self.flaechen if f.stoff is not None})
         b = self.brutto
-        latex = (rf"{als_text(', '.join(betone))} \qquad A = {b.A:.0f}\,\mathrm{{mm}}^2"
+        latex = (rf"{als_text(', '.join(stoffe))} \qquad A = {b.A:.0f}\,\mathrm{{mm}}^2"
                  rf" \qquad y_S = {b.y_S:.1f}\,\mathrm{{mm}} \qquad z_S = {b.z_S:.1f}\,\mathrm{{mm}}")
         kopf = GleichungBlock(latex=latex, titel="Angaben zum Querschnitt")
         zeilen = [[g.name, g.kurzmenge, g.stahl.name]
@@ -755,7 +764,7 @@ class Querschnittsanalyse(Rechenobjekt):
                 w.stahl.name if w.stahl is not None else "–"])
         tabelle = TabellenBlock(kopf=["Element", "Bewehrung", "Stahl"], zeilen=zeilen,
                                 titel="Bewehrung und Schubwände", ausrichtung="lll")
-        return kopf, tabelle
+        return kopf, tabelle if zeilen else None
 
     # -- Fuer die Nachweise: Werkstoffe ---------------------------------------------
 

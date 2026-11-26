@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e21c92fa779
+erzeugt: 108ed713e76f
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,8 @@ Verhaeltnis der elastischen Spannungen an den Raendern, Druck positiv: 1 bei
 gleichmaessigem Druck, -1 bei Biegung um die Mitte. Beim einseitig
 gestuetzten Blech zaehlt dazu, welcher Rand staerker gedrueckt ist: der
 freie (Tabelle 5b, mittlere Zeilen, `k₁`) oder der gehaltene (untere,
-`k₂`). Gedrueckt ist ganz, was `α = 1` und `ψ = 1` hat: dafuer nennt
+`k₂`) -- plastisch und elastisch je fuer sich, denn die beiden Nulllinien
+muessen nicht parallel liegen. Gedrueckt ist ganz, was `α = 1` und `ψ = 1` hat: dafuer nennt
 Tabelle 5b eigene Grenzen, 14 ε statt 21 ε √k₁ = 13.8 ε.
 
 
@@ -94,12 +95,14 @@ Beulwert, wenn der gehaltene Rand gedrueckt ist (Tabelle 5b) -- siehe Dateikopf 
 ### grenzen
 
 ```python
-def grenzen(halterung: Halterung, eps: float, alpha: float, psi: Optional[float], frei_gedrueckt: bool=False) -> Grenzen
+def grenzen(halterung: Halterung, eps: float, alpha: float, psi: Optional[float], *, frei_pl: bool=False, frei_el: bool=False) -> Grenzen
 ```
 
 Die Grenzen eines Blechs -- siehe Dateikopf. `alpha` null heisst
 plastisch nicht gedrueckt, `psi` `None` elastisch nicht gedrueckt:
 dort gilt keine Grenze der Klassen 1 und 2, hier keine der Klasse 3.
+`frei_pl` und `frei_el`: ob der freie Rand plastisch und elastisch
+der staerker gedrueckte ist.
 
 ### beulwert
 
@@ -153,4 +156,5 @@ hoechstens 1 -- siehe Dateikopf.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_stahl_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_werte]]
 - [[opencivil.stahlbau.querschnitt]]

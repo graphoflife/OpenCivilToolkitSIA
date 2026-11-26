@@ -7,6 +7,84 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Tragsicherheit des Stahlquerschnitts je Lastfall
+
+Aus dem Plan vom 2026-11-25, Schritt 12b: N, M_y, M_z, V_y, V_z und T eines
+Lastfalls am gezeichneten Stahlquerschnitt, nach SIA 263:2013, 5.1 bis 5.3.
+
+**Vorher und nachher.** Vorher rechnete ein HEB 300 aus S355 mit dem
+Lastfall N_Ed = −1000 kN, M_y = 200 kNm, M_z = 50 kNm, V_z = 600 kN nur
+seine Kennzahlen, und die Zusammenfassung sagte, dass das Werkzeug die
+Lastfälle noch nicht nachweist. Nachher stehen je Lastfall zwei Nachweise
+da: Biegung und Normalkraft mit α = 2.32 – M_Rd = 477.7 gegen
+M_Ed = 206.2 kNm, der Steg wegen der Querkraft um ρ = 0.42 gemindert –
+und Querkraft mit α = 1.55, 600 gegen 927.2 kN.
+
+**Die Klasse im Lastfall.** Die Kennzahlen kennen die Klasse bei reinem
+Druck und reiner Biegung; ein Lastfall liegt dazwischen. Gezählt werden die
+Bleche im Zustand, in dem der Querschnitt versagt: α an der plastischen
+Nulllinie bei N_Ed, ψ an den elastischen Spannungen, bei denen (54) gerade
+aufgeht. Ein IPE 600 ist so bei N = −1000 kN mit M = 300 kNm in Klasse 2
+(der Steg mit α = 0.74), bei N = −3000 kN mit M = 100 kNm in Klasse 3, bei
+reinem Druck von 4000 kN in Klasse 4. Welche Laststufe gilt, sagt die Norm
+nicht – nach Vorgabe, in [[TODO]].
+
+**Nach der Klasse der Widerstand** (`stahlbau/widerstand.py`). Die
+Normalkraft bleibt, das Moment wächst in seiner Richtung, bis es nicht mehr
+geht – wie beim Stahlbeton.
+- Klasse 1 und 2: genau plastisch, jeder Teil ganz gezogen oder ganz
+  gedrückt an einer geraden Nulllinie (5.1.1.2, 5.1.8). Die Nulllinie dreht,
+  bis das Moment in die Richtung der Einwirkung zeigt; die Suche dafür
+  stand in der Interaktion des Stahlbetons und steht jetzt für beide in
+  `core/suche.py` (`winkel_suchen`). Die Herleitung zeigt die Probe: je Teil
+  und Zone die Kraft mit ihrem Angriffspunkt, die Summen N, M_y und M_z.
+  Die Excel-Dateien des Benutzers rechnen mit (44), das auf der sicheren
+  Seite liegt: beim HEB 300 bei N = −1000 kN 506.7 statt 565.6 kNm, bei
+  −3000 kN 256.0 statt 296.1 kNm – das Werkzeug gibt 12 bis 16 % mehr.
+- Klasse 3: (54) als Widerstand, λ auf das Moment, bis die Summe 1 ist.
+- Klasse 4: (60) ebenso, mit A_eff und der Verschiebung e_N seines
+  Schwerpunkts bei Druck und W_eff zur Seite, die das Moment zieht.
+- Trägt schon die Normalkraft allein nicht, sagt α, um welchen Faktor sie
+  kleiner sein müsste.
+
+**Querkraft.** Je Richtung V_Ed gegen V_Rd der Kennzahlen; in einem
+Querschnitt aus Rundrohren die Resultierende, wie in den Excel-Dateien.
+Über der Hälfte von V_Rd tragen die Bleche, in denen die Querkraft steht,
+für Normalkraft und Biegung nur noch 1 − (V_Ed/V_Rd)². Beim HEB 300 mit
+V_z = 700 kN ist das genau die Minderung von (43): 36.4 kNm. In den
+Tabellen der Herleitung steht der weggenommene Teil als eigene Zeile mit
+negativer Kraft.
+
+**Was fehlt, steht grau:** Torsion – SIA 263 nennt in 5.1 bis 5.3 keinen
+Torsionswiderstand des Querschnitts –, Querkraft ohne Profil, ein Rundrohr
+der Klasse 4 und das Interaktionsdiagramm. Knicken und Kippen kommen mit
+Schritt 12c und 12d.
+
+**Die Oberfläche.** Ein Stahlquerschnitt zeigt unter «Nachweise» nur die
+Kachel «Tragsicherheit», ohne die Schubwände des Betons; welche Bauweise
+er hat, sagt der Kern mit der Zeichnung. Die Werte je Baustahl
+[Bemessung | charakteristisch] stehen wie beim Beton oben im Fenster.
+
+**Daneben.** Was Kennzahlen und Nachweise des Stahls teilen – die Kennwerte
+je Baustahl, die Tabellen der Klassen und der mitwirkenden Breiten – steht
+einmal, in `nachweis/qa_stahl_werte.py`. Die Herleitung von I_T hat ihre
+eigene Überschrift; vorher stand sie unter dem Nachweis, der zuletzt
+gerechnet wurde. Die Formelsammlung hat zwölf neue Seiten zum Stahl, mit
+Theorie; was Kennzahlen und Nachweis gleich rechnen, steht auf einer Seite,
+gleich in welcher Klasse.
+
+**Die Zeichnung.** Ein Querschnitt nur aus Profilen öffnete stark
+vergrössert auf seinem Schwerpunkt: die Masse eines Profils kennt nur der
+Kern, und «Alles zeigen» lief vor seiner Antwort, mit einem einzigen
+Knoten. Jetzt passt das Fenster nach der Antwort noch einmal ein, wenn bis
+dahin niemand die Ansicht bewegt hat (`umrissVollstaendig`).
+
+**Gegen die Hand** (`tests/test_stahl_tragsicherheit.py`): der Steg in der
+plastischen Nulllinie (das Moment verliert N²/(4 t_w f)), die Minderung
+durch Querkraft, (54) am HEA 300, (55) und (60) am IPE 600, die
+Resultierende im Rundrohr, einachsig, charakteristisch und das freie Blech
+unter dem HEB 300 – je auf vier Stellen.
+
 ## 2026-11-26 · Kennzahlen des Stahlquerschnitts nach SIA 263
 
 Aus dem Plan vom 2026-11-25, Schritt 12a: die Querschnittsklasse je Blech
