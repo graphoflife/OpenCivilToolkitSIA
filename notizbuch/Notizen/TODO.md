@@ -30,6 +30,16 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       Ecke unten links. Bestätigen oder einen anderen Punkt nennen, etwa den
       Schwerpunkt oder die Mitte des Stegs.
 
+- [ ] **Stahlquerschnitt: das Rechteckrohr als Kasten – bitte prüfen**
+      (Schritt 12a, 2026-11-26; `opencivil/stahlbau/klasse.py`). Für
+      Kastenträger sei ρ = 0.9/λ_p zu ungenau, sagt SIA 263:2013, 4.5.3.4,
+      und verweist auf Gleichung (70) in 5.6.4.3, die dort für den
+      Druckflansch steht. Eingebaut: (70) für jede Wand jedes
+      Rechteckrohrs. Beispiel RRK 200 × 200 × 5 aus S355 unter Druck:
+      λ_p = 0.844; mit 0.9/λ_p bliebe ρ = 1, mit (70) ist ρ = 0.876, und
+      N_Rd sinkt von 1296.6 auf 1133.1 kN. Bestätigen oder sagen, ob (70)
+      nur für die Flansche grosser Kastenträger gelten soll.
+
 - [ ] **Balkensystem: «Biegung um y – stark | um z – schwach» auch beim
       Rundrohr** (gesehen am 2026-11-26). Beim ROR und beim quadratischen
       RRK sind beide Achsen gleich; der Schalter ändert dort nichts.
@@ -1326,6 +1336,41 @@ Norm dazu sagt.
 
 Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
+- [ ] **Stahlquerschnitt, nach Vorgabe eingebaut** (`opencivil/stahlbau/`,
+      `opencivil/nachweis/qa_stahl_kennzahlen.py`, seit 2026-11-26). Jede
+      Annahme steht auch in der Herleitung.
+      - Die Dicke, nach der Tabelle 1 die Fliessgrenze wählt: ein Profil
+        rechnet ganz mit der seines dicksten Blechs, eine frei gezeichnete
+        Fläche mit ihrer kleinsten Breite. Über 100 mm gilt weiter die
+        rechte Spalte, wo die Tabelle endet.
+      - Die Schubflächen: (41a) gilt für das I in Stegrichtung; für die
+        anderen verweist 5.1.4.1 auf SN EN 1993-1-1, die nicht vorliegt.
+        Eingebaut wie in den Excel-Dateien des Benutzers: das U in
+        Stegrichtung A − 2 b t_f + (t_w + r) t_f, I und U quer dazu
+        2 b t_f, das Rundrohr 2 t (D − t), das Rechteckrohr je Wand nach
+        (13) mit b = h − t.
+      - Das Schubbeulen mit k_τ = 5.34, dem langen Feld ohne Quersteifen;
+        Flansche und Rundrohre beulen nicht.
+      - Beulwerte ausserhalb ihrer Formeln: unter ψ = −3 (k₁ und (70)),
+        −1 (k₂) und −1.2 (beidseitig gestützt) gilt der Wert am Rand. Für
+        die mitwirkende Breite eines einseitig gestützten Blechs k₁ oder
+        k₂ der Tabelle 5b statt der drei Werte der Tabelle 9 (auf 1 %
+        gleich).
+      - Der wirksame Querschnitt in einem Schritt, aus den Spannungen des
+        Bruttoquerschnitts. Beim einseitig gestützten Blech fällt der
+        Streifen am freien Ende weg, auch unter einem Gefälle der
+        Spannung; Tabelle 10 zeigt nur den gleichmässigen Druck.
+      - Das UNP mit t_f in der Mitte des geneigten Flanschs und r_1 als
+        Ausrundung.
+      - Ein Rundrohr der Klasse 4 trägt nichts: SIA 263 nennt dafür keine
+        mitwirkende Breite.
+      - Den Nettoquerschnitt nach (39) prüft das Werkzeug nicht.
+      - y und z gelten als Hauptachsen, wie im Balkensystem.
+      - Frei gezeichnete Flächen: höchstens Klasse 3, ihr Beulen nicht
+        geprüft, und sie tragen keine Querkraft.
+
+      Vorschlag: so lassen. Entscheid des Benutzers.
+
 - [ ] **Der Bezug des äquivalenten Moduls ohne Beton**
       (`opencivil/spannungsanalyse/rissfrei.py`, seit 2026-11-26). Hat ein
       Querschnitt aus Holz oder Baustahl zwei Sorten derselben Art, misst
@@ -1579,11 +1624,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 - [ ] **Stahlprofile, was fehlt:** L, INP, T, HEAA und die warmgefertigten
       Rechteckrohre (RRW) -- die Tabelle des Benutzers hat sie nicht, und
-      eine andere Quelle braucht seine Erlaubnis. Dazu für die Nachweise nach
-      SIA 263: W_el, W_pl, A_v, I_w; die Tabelle hat Formeln dafür. Für die
-      Querschnittsklasse liefert jede Form ihre Bleche -- Flansch und Steg
-      mit c, t und ihrer Halterung -- erst mit Schritt 12, wenn ein Nachweis
-      sie braucht (Plan vom 2026-11-25; in Schritt 11c nicht gebaut).
+      eine andere Quelle braucht seine Erlaubnis. Für das Kippen fehlt noch
+      I_w (Schritt 12d); W_el, W_pl und A_v rechnet seit 2026-11-26 die
+      Querschnittsanalyse am Umriss, die Bleche für die Querschnittsklasse
+      liefert jede Form (`stahlprofile/bleche.py`).
 
 - [ ] **Holz, mit den Nachweisen nach SIA 265:** die Feuchteklasse (η_w,
       Tabelle 4) und «stossartig» (η_t = 1.4, 2.2.6); der höhere Querdruck
@@ -1613,7 +1657,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Baustahl und die Stahlprofile der Tabelle gibt es seit 2026-11-26,
       mit ihren Querschnittswerten und ihren Spannung-Dehnung-Analysen, aber
       ohne Nachweis (Plan vom 2026-11-25: die Nachweise nach SIA 263, 265
-      und 264 in den Schritten 12 bis 14). Der Verbund bekommt seine
+      und 264 in den Schritten 12 bis 14). Der Stahl hat seit 2026-11-26
+      seine Kennzahlen -- Klassen und Widerstände --, die Lastfälle noch
+      nicht (Schritt 12b). Der Verbund bekommt seine
       Analysen mit Schritt 14: sein Riss braucht den ideellen Querschnitt.
       Ein E_eq im Balkensystem gibt es bis dahin nur beim Stahlbeton. Dazu
       weitere Nachweise (Wände ohne Bügel).

@@ -103,14 +103,18 @@ KOPPLUNG = 0.05
 
 
 def keine_hauptachsen(wer: str, I_y: float, I_z: float, I_yz: float,
-                      was: str = "den Stab") -> Optional[str]:
+                      was: str = "den Stab",
+                      folge: str = "Verformungen und Schnittgrössen sind darum nur genähert.",
+                      ) -> Optional[str]:
     """
     Der Hinweis, wenn y und z merklich keine Hauptachsen sind
     (:data:`KOPPLUNG`) -- sonst ``None``. ``wer`` nennt den Querschnitt,
-    «Querschnitt «Q1»», ``was`` kruemmt sich mit; Traegheitsmomente in m⁴.
-    Im Raum fuer jeden Querschnitt eines Stabs
-    (:mod:`opencivil.stabwerk.rechnung`), im Erdbeben fuer jede Wand
-    (:mod:`opencivil.erdbeben.ersatzkraft`) -- derselbe Satz.
+    «Querschnitt «Q1»», ``was`` kruemmt sich mit, ``folge`` sagt, was darum
+    nur genaehert ist; Traegheitsmomente in m⁴. Im Raum fuer jeden
+    Querschnitt eines Stabs (:mod:`opencivil.stabwerk.rechnung`), im Erdbeben
+    fuer jede Wand (:mod:`opencivil.erdbeben.ersatzkraft`), in den Kennzahlen
+    eines Stahlquerschnitts (:mod:`opencivil.nachweis.qa_stahl_kennzahlen`)
+    -- derselbe Satz.
     """
     kleiner = min(I_y, I_z)
     if kleiner <= 0.0 or abs(I_yz) <= KOPPLUNG * kleiner:
@@ -119,7 +123,7 @@ def keine_hauptachsen(wer: str, I_y: float, I_z: float, I_yz: float,
     return (f"{wer}: y und z sind keine Hauptachsen – |I_yz| = {_traegheit(abs(I_yz))} ist "
             f"{anteil} von min(I_y; I_z) = {_traegheit(kleiner)}. Gerechnet wird ohne I_yz; "
             f"in Wirklichkeit krümmt ein Moment um die steifere Achse {was} auch um die andere, "
-            f"um {anteil} davon. Verformungen und Schnittgrössen sind darum nur genähert.")
+            f"um {anteil} davon. {folge}")
 
 
 def _traegheit(si: float) -> str:

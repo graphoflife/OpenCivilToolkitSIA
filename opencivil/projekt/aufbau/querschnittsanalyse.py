@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, Mapping
 
+from opencivil.core.berechnung import Kennzahlprozedur
 from opencivil.material.basis import Baustoff
 from opencivil.material.spannstahl import erzeugnis
 from opencivil.projekt.lesen import ProjektFehler, als_groesse, ort_von, stoffe_des_felds
@@ -23,6 +24,7 @@ from opencivil.projekt.querschnittsanalyse import (
 from opencivil.projekt.spannglieder import SpanngliedEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
 from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
+from opencivil.nachweis.qa_stahl_kennzahlen import KennzahlenStahlQA
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
@@ -56,10 +58,11 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
 
     Das alles beim Stahlbeton. Ein Querschnitt aus Stahl, Holz oder im
     Verbund (:mod:`~opencivil.querschnitt.bauweise`) rechnet bisher nur seine
-    Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, und seine
-    Zusammenfassung sagt, dass die Nachweise fehlen (:func:`ohne_nachweise`).
-    Seine Spannung-Dehnung-Analysen rechnet er trotzdem, ausser im Verbund
-    (:func:`ohne_analysen`).
+    Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, der aus Stahl dazu
+    seine Kennzahlen nach SIA 263 (:mod:`~opencivil.nachweis.qa_stahl_kennzahlen`);
+    seine Zusammenfassung sagt, dass die Nachweise der Lastfaelle fehlen
+    (:func:`ohne_nachweise`). Seine Spannung-Dehnung-Analysen rechnet er
+    trotzdem, ausser im Verbund (:func:`ohne_analysen`).
 
     Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
     es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -82,6 +85,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
         # zeigt sie, ein Stab im Balkensystem nimmt sie --, die Nachweise
         # bisher nur der Stahlbeton.
         teil.weitere_ziele += [d.id for d in (*analyse.d_brutto.values(), analyse.d_torsion)]
+        if analyse.bauweise is Bauweise.STAHL:
+            _kennzahlen(KennzahlenStahlQA(analyse), teil, aufbau)
         aufbau.ohne_nachweis(teil, ort_von(eintrag), fehlt)
         if not ohne_analysen(analyse.bauweise):
             spannungsfaelle(eintrag, stoffe_von(aufbau, analyse.baustoffe), aufbau)
@@ -132,13 +137,16 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
 
     # Was der Querschnitt aufnimmt, ohne Einwirkung -- immer, wie bei der
     # Platte (Benutzer, 2026-10-23). Am Ende, nach seinen Nachweisen.
-    kennzahlen = KennzahlenQA(analyse)
+    _kennzahlen(KennzahlenQA(analyse), teil, aufbau)
+    spannungsfaelle(eintrag, stoffe, aufbau)
+    return teil
+
+
+def _kennzahlen(kennzahlen: Kennzahlprozedur, teil: Bauteil, aufbau: Aufbau) -> None:
+    """Die Kennzahlen ins Rechenwerk und unter das Bauteil."""
     aufbau.werk.registriere(kennzahlen)
     teil.weitere_ziele.append(kennzahlen.id)
     teil.kennzahlen += kennzahlen.kennzahlen
-
-    spannungsfaelle(eintrag, stoffe, aufbau)
-    return teil
 
 
 def ohne_nachweise(bauweise: Bauweise) -> str:
@@ -150,6 +158,10 @@ def ohne_nachweise(bauweise: Bauweise) -> str:
     """
     if bauweise is Bauweise.STAHLBETON:
         return ""
+    if bauweise is Bauweise.STAHL:
+        return (f"die Lastfälle eines {bauweise.querschnitt}s weist das Werkzeug nach "
+                f"{bauweise.norm} noch nicht nach – seine Klassen und Widerstände stehen unter "
+                f"den Kennzahlen")
     return (f"einen {bauweise.querschnitt} weist das Werkzeug nach {bauweise.norm} noch "
             f"nicht nach")
 
@@ -197,7 +209,7 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     flaechen = [Flaechenteil(name=f["name"], kennung=f["kennung"], punkte=f["punkte"],
                              stoff=(None if f["aussparung"] else
                                     material(baustoffe, f["material"], f["stoffe"], wo, f["name"])),
-                             herkunft=f["herkunft"])
+                             profil=f["profil"])
                 for f in elemente.flaechen]
     staebe = [{**s, "stahl": stoff(s, "stahl", StabEintrag)} for s in elemente.staebe]
     linien = [{**l, "stahl": stoff(l, "stahl", StablinieEintrag)} for l in elemente.linien]

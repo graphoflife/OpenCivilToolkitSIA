@@ -1,5 +1,5 @@
 ---
-erzeugt: aa7b85d6267e
+erzeugt: 1707478dbca3
 art: modul
 tags: [modul]
 ---
@@ -56,3 +56,4 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.spannungsanalyse.art]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk3d.modell]]
+- [[opencivil.stahlprofile.bleche]]

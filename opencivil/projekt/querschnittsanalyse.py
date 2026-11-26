@@ -350,8 +350,8 @@ class Elemente:
     """
     Je Stahlprofil die Felder der Beschreibung, ``lage`` als Punkt -- die
     Mitte --, dazu ``umrisse`` in der Zeichnung (der erste aussen, dann die
-    Loecher) und ``beschreibung``: «HEB 300, um 90° gedreht»
-    (:mod:`opencivil.stahlprofile.lage`).
+    Loecher), ``beschreibung``: «HEB 300, um 90° gedreht», und all das in
+    einem: ``profillage`` (:class:`~opencivil.stahlprofile.lage.Profillage`).
     """
 
     fehler: List[dict] = field(default_factory=list)
@@ -366,21 +366,22 @@ class Elemente:
         ``kennung`` (beim Profil auch die des Lochs), ``punkte``,
         ``aussparung``, ``material``, ``stoffe`` -- die Arten von Material,
         die das Element nimmt --, ``ueberdeckung`` (beim Profil null) und
-        ``herkunft``: beim Profil, was es ist. Ein Polygon ohne Material ist
-        eine Aussparung, ein Profil ohne Baustahl nicht: ihm fehlt die Wahl.
-        Die Rechnung kennt nur Flaechen; ein Profil ist eine wie jede.
+        ``profil``: beim Umriss eines Profils seine Lage, sonst ``None``. Ein
+        Polygon ohne Material ist eine Aussparung, ein Profil ohne Baustahl
+        nicht: ihm fehlt die Wahl. Gerechnet wird mit Flaechen; ein Profil ist
+        eine wie jede, nur kennt der Stahlbau aus seiner Lage seine Bleche.
         """
         flaeche, profil = (stoffe_des_felds(FlaecheEintrag, "material"),
                            stoffe_des_felds(ProfilEintrag, "stahl"))
-        teile = [{**f, "aussparung": not f["material"], "stoffe": flaeche, "herkunft": ""}
+        teile = [{**f, "aussparung": not f["material"], "stoffe": flaeche, "profil": None}
                  for f in self.polygone]
         for p in self.profile:
             aussen, *loecher = p["umrisse"]
             teil = {"kennung": p["kennung"], "stoffe": profil, "ueberdeckung": 0.0}
             teile.append({**teil, "name": p["name"], "punkte": tuple(aussen), "aussparung": False,
-                          "material": p["stahl"], "herkunft": p["beschreibung"]})
+                          "material": p["stahl"], "profil": p["profillage"]})
             teile += [{**teil, "name": f"{p['name']}, innen", "punkte": tuple(loch),
-                       "aussparung": True, "material": "", "herkunft": ""} for loch in loecher]
+                       "aussparung": True, "material": "", "profil": None} for loch in loecher]
         return teile
 
 
@@ -541,8 +542,9 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             ort = orte(name, p.kennung, p.knoten)
             if ort is None:
                 continue
+            liegt = profillage.Profillage(p.profil, ort[0], p.drehung, p.gespiegelt)
             try:
-                umrisse = profillage.umrisse(p.profil, ort[0], p.drehung, p.gespiegelt)
+                umrisse = liegt.umrisse
             except KeyError:
                 fehler.append({"text": f"{name}: das Profil «{p.profil}» gibt es in der "
                                        f"Tabelle nicht.", "elemente": [p.kennung or name]})
@@ -550,7 +552,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben, JeMaterial):
             profile.append(benannt(
                 name, p.kennung, lage=ort[0], profil=p.profil, stahl=p.stahl,
                 drehung=p.drehung, gespiegelt=p.gespiegelt, umrisse=umrisse,
-                beschreibung=profillage.beschreibung(p.profil, p.drehung, p.gespiegelt)))
+                beschreibung=liegt.beschreibung, profillage=liegt))
         for i, s in enumerate(self.staebe, start=1):
             name = f"{s.IM_ORT} {i}"
             ort = orte(name, s.kennung, s.knoten)

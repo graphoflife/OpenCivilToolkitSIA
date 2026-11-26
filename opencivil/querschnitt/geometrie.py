@@ -325,6 +325,40 @@ def schnitt_mit_gerade(
     return [(schnitte[i], schnitte[i + 1]) for i in range(0, len(schnitte) - 1, 2)]
 
 
+def jenseits(punkte: Sequence[Punkt], normale: Tuple[float, float],
+             v: float) -> Tuple[float, float, float]:
+    """
+    Der Teil des Polygons mit ``n·p ≥ v``: seine Flaeche und ihre statischen
+    Momente um den Ursprung, ``(A, ∫y dA, ∫z dA)`` -- null, wo nichts davon
+    liegt. So teilt die plastische Nulllinie eines Stahlquerschnitts
+    (:mod:`opencivil.stahlbau.querschnitt`) jedes Polygon in Zug und Druck.
+
+    Abgeschnitten wird Kante fuer Kante an der Geraden (Sutherland-Hodgman).
+    Das gilt auch fuer ein Polygon, das nicht konvex ist: zerfaellt der Teil
+    in Stuecke, verbinden sie Kanten auf der Geraden, die hin und zurueck
+    laufen und sich in den Summen aufheben.
+    """
+    n_y, n_z = normale
+    teil: List[Punkt] = []
+    for a, b in _kanten(punkte):
+        va = n_y * a[0] + n_z * a[1] - v
+        vb = n_y * b[0] + n_z * b[1] - v
+        if va >= 0.0:
+            teil.append(a)
+        if (va >= 0.0) != (vb >= 0.0):
+            anteil = va / (va - vb)
+            teil.append((a[0] + anteil * (b[0] - a[0]), a[1] + anteil * (b[1] - a[1])))
+    A = s_z = s_y = 0.0
+    for (y1, z1), (y2, z2) in _kanten(teil):
+        c = y1 * z2 - y2 * z1
+        A += c
+        s_z += (y1 + y2) * c
+        s_y += (z1 + z2) * c
+    # Wie bei flaechenwerte: das Vorzeichen der Flaeche sagt den Umlaufsinn.
+    vorzeichen = 1.0 if flaeche(punkte) > 0.0 else -1.0
+    return vorzeichen * A / 2.0, vorzeichen * s_z / 6.0, vorzeichen * s_y / 6.0
+
+
 # ===========================================================================
 # Wie Polygone zueinander liegen
 # ===========================================================================

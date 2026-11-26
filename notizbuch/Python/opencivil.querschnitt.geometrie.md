@@ -1,5 +1,5 @@
 ---
-erzeugt: d8d6dda92c92
+erzeugt: 0c17bedee81f
 art: modul
 tags: [modul]
 ---
@@ -227,6 +227,22 @@ des Polygons auf dieser Hoehe.
 Gedacht fuer Geraden, die keine Ecke treffen -- die Fasern legen ihre
 Mitten zwischen die Ecken. Trifft eine trotzdem eine Ecke, zaehlt die
 halb offene Regel aus [[opencivil.querschnitt.geometrie#lage|lage]] sie genau einmal.
+
+### jenseits
+
+```python
+def jenseits(punkte: Sequence[Punkt], normale: Tuple[float, float], v: float) -> Tuple[float, float, float]
+```
+
+Der Teil des Polygons mit `n·p ≥ v`: seine Flaeche und ihre statischen
+Momente um den Ursprung, `(A, ∫y dA, ∫z dA)` -- null, wo nichts davon
+liegt. So teilt die plastische Nulllinie eines Stahlquerschnitts
+([[opencivil.stahlbau.querschnitt]]) jedes Polygon in Zug und Druck.
+
+Abgeschnitten wird Kante fuer Kante an der Geraden (Sutherland-Hodgman).
+Das gilt auch fuer ein Polygon, das nicht konvex ist: zerfaellt der Teil
+in Stuecke, verbinden sie Kanten auf der Geraden, die hin und zurueck
+laufen und sich in den Summen aufheben.
 
 ### Beziehung
 
@@ -548,5 +564,6 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.randzone]]
 - [[opencivil.querschnitt.torsion]]
+- [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.web.api]]
 - [[opencivil.web.zeichengeometrie]]

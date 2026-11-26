@@ -1,5 +1,5 @@
 ---
-erzeugt: bb76d5ec8594
+erzeugt: 07f7e6461f23
 art: modul
 tags: [modul]
 ---
@@ -270,6 +270,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.stabquerschnitt]]
+- [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.web.api]]
 - [[opencivil.web.werkstoffkurven]]
 - [[opencivil.web.zeichengeometrie]]

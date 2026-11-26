@@ -1,5 +1,5 @@
 ---
-erzeugt: b892981030da
+erzeugt: c60c81dba8b8
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -102,6 +102,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
     - [[opencivil.nachweis.qa_kennzahlen]] – was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.
     - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
+    - [[opencivil.nachweis.qa_stahl_kennzahlen]] – was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.
     - [[opencivil.nachweis.querkraft]] – Querkraftnachweis, was beide Ansaetze teilen.
     - [[opencivil.nachweis.querkraft_buegel]] – Querkraft mit Querkraftbewehrung.
     - [[opencivil.nachweis.querkraft_ohne_buegel]] – Querkraft ohne Querkraftbewehrung.
@@ -222,7 +223,12 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk3d.raum]] – Vektoren, Richtungen und Strecken im Raum.
     - [[opencivil.stabwerk3d.rechnung]] – das 3D-Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk3d.stab]] – der raeumliche Stab: drei ebene in einem.
+- [[opencivil.stahlbau]] – Stahlquerschnitte nach SIA 263:2013.
+    - [[opencivil.stahlbau.klasse]] – die Querschnittsklasse nach SIA 263:2013.
+    - [[opencivil.stahlbau.querschnitt]] – ein gezeichneter Querschnitt aus Baustahl.
+    - [[opencivil.stahlbau.schub]] – der Querkraftwiderstand eines Stahlprofils nach SIA 263:2013.
 - [[opencivil.stahlprofile]] – die Stahlprofile: ihre Formen, welche es gibt, wie eines im Querschnitt liegt.
+    - [[opencivil.stahlprofile.bleche]] – die Bleche eines Stahlprofils, fuer seine Querschnittsklasse.
     - [[opencivil.stahlprofile.formen]] – die Formen der Stahlprofile, mit ihren Formeln.
     - [[opencivil.stahlprofile.lage]] – ein Stahlprofil im gezeichneten Querschnitt.
     - [[opencivil.stahlprofile.tabelle]] – welche Stahlprofile es gibt, mit ihren Massen.

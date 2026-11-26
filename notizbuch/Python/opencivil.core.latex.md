@@ -1,5 +1,5 @@
 ---
-erzeugt: fad7a4dcfaa5
+erzeugt: 981410386a84
 art: modul
 tags: [modul]
 ---
@@ -487,6 +487,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]

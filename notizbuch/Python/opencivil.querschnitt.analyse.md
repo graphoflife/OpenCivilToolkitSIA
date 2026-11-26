@@ -1,5 +1,5 @@
 ---
-erzeugt: 126a7f64d0fc
+erzeugt: 4fbe08bb55df
 art: modul
 tags: [modul]
 ---
@@ -118,7 +118,16 @@ Ein Polygon der Zeichnung -- Ecken in mm, ohne Material eine Aussparung.
 - `kennung: str`
 - `punkte: Tuple[Punkt, ...]`
 - `stoff: Optional[Baustoff]`
-- `herkunft: str = ''` – Was es ist, wenn mehr als ein Polygon: beim Stahlprofil «HEB 300» -- so steht es im Bericht.
+- `profil: Optional[Profillage] = None` – Beim Umriss eines Stahlprofils seine Lage -- daraus kennt der Stahlbau seine Bleche.
+
+#### Flaechenteil.herkunft
+
+```python
+@property
+def herkunft(self) -> str
+```
+
+Was es ist, wenn mehr als ein Polygon: beim Stahlprofil «HEB 300» -- so steht es im Bericht.
 
 ### Wandangabe
 
@@ -501,6 +510,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.rissgroessen]]
@@ -514,6 +524,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.spannungsanalyse.rissfrei]]
 - [[opencivil.spannungsanalyse.schnitt]]
+- [[opencivil.stahlbau.querschnitt]]
 - [[opencivil.web.zeichengeometrie]]
 
 ## Formeln aus diesem Modul

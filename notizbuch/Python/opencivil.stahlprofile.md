@@ -1,5 +1,5 @@
 ---
-erzeugt: 36afb094404d
+erzeugt: a36d87d8eaf2
 art: modul
 tags: [modul]
 ---
@@ -21,6 +21,7 @@ ihrem Umriss -- darum stehen sie in keinem der beiden Pakete (seit
 
 ## Module
 
+- [[opencivil.stahlprofile.bleche]] – die Bleche eines Stahlprofils, fuer seine Querschnittsklasse.
 - [[opencivil.stahlprofile.formen]] – die Formen der Stahlprofile, mit ihren Formeln.
 - [[opencivil.stahlprofile.lage]] – ein Stahlprofil im gezeichneten Querschnitt.
 - [[opencivil.stahlprofile.tabelle]] – welche Stahlprofile es gibt, mit ihren Massen.

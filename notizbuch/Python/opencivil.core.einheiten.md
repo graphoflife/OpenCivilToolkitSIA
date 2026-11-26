@@ -1,5 +1,5 @@
 ---
-erzeugt: e227ece71480
+erzeugt: 7e9f57d4776b
 art: modul
 tags: [modul]
 ---
@@ -403,6 +403,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `MIO_MM3 = Einheit('10^6 mm^3', LAENGE ** 3, 0.001, latex='\\cdot 10^{6}\\,\\mat…` – Widerstandsmoment in Millionen mm^3 -- aus demselben Grund wie darunter.
 - `MIO_MM4 = Einheit('10^6 mm^4', LAENGE ** 4, 1e-06, latex='\\cdot 10^{6}\\,\\mat…` – Flaechenmoment zweiten Grades in Millionen mm^4. Bei Betonquerschnitten stuende in mm^4 eine zehnstellige Zahl; so heisst es «5400 · 10⁶ mm⁴».
 - `CM4 = Einheit('cm^4', LAENGE ** 4, 1e-08)` – Dasselbe in cm⁴ -- so stehen die Stahlprofile in ihren Tabellen.
+- `CM3 = Einheit('cm^3', LAENGE ** 3, 1e-06)` – Ein Widerstandsmoment in cm³, wie in denselben Tabellen.
 - `N = Einheit('N', KRAFT, 1.0)`
 - `KN = Einheit('kN', KRAFT, 1000.0)`
 - `MN = Einheit('MN', KRAFT, 1000000.0)`
@@ -475,6 +476,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
+- [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querkraft_buegel]]
 - [[opencivil.nachweis.querkraft_ohne_buegel]]

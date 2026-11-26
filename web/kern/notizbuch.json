@@ -6307,6 +6307,25 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.qa_stahl_kennzahlen",
+      "pfad": "Python/opencivil.nachweis.qa_stahl_kennzahlen.md",
+      "art": "modul",
+      "kurz": "was ein gezeichneter Stahlquerschnitt aufnimmt, ohne Einwirkung.",
+      "stichworte": [
+        "_normale",
+        "_ohne_klammern",
+        "_achse",
+        "KennzahlenStahlQA",
+        "KennzahlenStahlQA.rechne",
+        "KennzahlenStahlQA._wert",
+        "KennzahlenStahlQA._zahl",
+        "KennzahlenStahlQA._summe",
+        "KennzahlenStahlQA._klasse",
+        "KennzahlenStahlQA._wirksam",
+        "KennzahlenStahlQA._elastisch"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.querkraft",
       "pfad": "Python/opencivil.nachweis.querkraft.md",
       "art": "modul",
@@ -7273,6 +7292,7 @@
       "kurz": "ein gezeichneter Querschnitt wird Rechnung.",
       "stichworte": [
         "bauen",
+        "_kennzahlen",
         "ohne_nachweise",
         "ohne_analysen",
         "_in_si",
@@ -7875,6 +7895,7 @@
         "Lastfall",
         "Lastfall.kennung",
         "Flaechenteil",
+        "Flaechenteil.herkunft",
         "Wandangabe",
         "Wandangabe.laenge",
         "Wandangabe.a_sw_s",
@@ -8043,6 +8064,7 @@
         "selbstschnitt",
         "polygon_pruefen",
         "schnitt_mit_gerade",
+        "jenseits",
         "Beziehung",
         "_ganz_in",
         "beziehung",
@@ -9121,11 +9143,105 @@
       ]
     },
     {
+      "name": "opencivil.stahlbau",
+      "pfad": "Python/opencivil.stahlbau.md",
+      "art": "modul",
+      "kurz": "Stahlquerschnitte nach SIA 263:2013.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.stahlbau.klasse",
+      "pfad": "Python/opencivil.stahlbau.klasse.md",
+      "art": "modul",
+      "kurz": "die Querschnittsklasse nach SIA 263:2013.",
+      "stichworte": [
+        "epsilon",
+        "Grenzen",
+        "Grenzen.klasse",
+        "k_1",
+        "k_2",
+        "grenzen",
+        "beulwert",
+        "plattenschlankheit",
+        "abminderung",
+        "abminderung_kasten"
+      ]
+    },
+    {
+      "name": "opencivil.stahlbau.querschnitt",
+      "pfad": "Python/opencivil.stahlbau.querschnitt.md",
+      "art": "modul",
+      "kurz": "ein gezeichneter Querschnitt aus Baustahl.",
+      "stichworte": [
+        "Gruppe",
+        "Gruppe.name",
+        "Gruppe.kennwert",
+        "Teil",
+        "Teil.name",
+        "Stueck",
+        "Blechzustand",
+        "Blechzustand.name",
+        "Blechzustand.schlankheit",
+        "Wirksam",
+        "Wirksam.b_eff",
+        "Elastisch",
+        "Elastisch.moment",
+        "kleinste_breite",
+        "_huelle",
+        "_null",
+        "anteil",
+        "verhaeltnis",
+        "Stahlquerschnitt",
+        "Stahlquerschnitt.profile",
+        "Stahlquerschnitt.freie",
+        "Stahlquerschnitt.flaechen",
+        "Stahlquerschnitt.nulllinie",
+        "Stahlquerschnitt.plastisch",
+        "Stahlquerschnitt.elastisch",
+        "Stahlquerschnitt.zustaende",
+        "Stahlquerschnitt.freie_gedrueckt",
+        "Stahlquerschnitt.wirksam"
+      ]
+    },
+    {
+      "name": "opencivil.stahlbau.schub",
+      "pfad": "Python/opencivil.stahlbau.schub.md",
+      "art": "modul",
+      "kurz": "der Querkraftwiderstand eines Stahlprofils nach SIA 263:2013.",
+      "stichworte": [
+        "Schubwiderstand",
+        "Schubwiderstand.V_Rd",
+        "Schubbeulen",
+        "tau_beulen",
+        "kritisch",
+        "widerstand"
+      ]
+    },
+    {
       "name": "opencivil.stahlprofile",
       "pfad": "Python/opencivil.stahlprofile.md",
       "art": "modul",
       "kurz": "die Stahlprofile: ihre Formen, welche es gibt, wie eines im Querschnitt liegt.",
       "stichworte": []
+    },
+    {
+      "name": "opencivil.stahlprofile.bleche",
+      "pfad": "Python/opencivil.stahlprofile.bleche.md",
+      "art": "modul",
+      "kurz": "die Bleche eines Stahlprofils, fuer seine Querschnittsklasse.",
+      "stichworte": [
+        "Halterung",
+        "Halterung.tabelle",
+        "Blech",
+        "Blech.b",
+        "Blech.punkt",
+        "Blech.lichte_enden",
+        "Blech.streifen",
+        "_u",
+        "_steg",
+        "_rrk",
+        "bleche"
+      ]
     },
     {
       "name": "opencivil.stahlprofile.formen",
@@ -9148,11 +9264,15 @@
       "kurz": "ein Stahlprofil im gezeichneten Querschnitt.",
       "stichworte": [
         "_lokal",
-        "umrisse",
+        "_mitte_lokal",
+        "Profillage",
+        "Profillage.setzen",
+        "Profillage.richtung",
+        "Profillage.umrisse",
+        "Profillage.beschreibung",
         "_gleich",
         "drehbar",
         "spiegelbar",
-        "beschreibung",
         "fangpunkte",
         "skizze"
       ]

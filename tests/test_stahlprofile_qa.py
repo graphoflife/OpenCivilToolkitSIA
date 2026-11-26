@@ -71,7 +71,7 @@ class TestUmriss(unittest.TestCase):
     def test_jedes_profil_wie_im_balkensystem(self):
         """Der Umriss gegen die Formeln seiner Form -- dieselben, mit denen das Balkensystem rechnet."""
         for name, p in PROFILE.items():
-            w, k = werte(lage.umrisse(name)), p.form.kennwerte(p.masse)
+            w, k = werte(lage.Profillage(name).umrisse), p.form.kennwerte(p.masse)
             for groesse, ist in (("A", w.A), ("I_y", w.I_y), ("I_z", w.I_z)):
                 with self.subTest(profil=name, groesse=groesse):
                     soll = k[groesse].si * (1e6 if groesse == "A" else 1e12)
@@ -80,7 +80,7 @@ class TestUmriss(unittest.TestCase):
     def test_und_die_tabelle_auf_ein_prozent(self):
         """Beim UNP hat die Tabelle des Benutzers nur getippte Werte mit drei Stellen: bis 0.9 %."""
         for name, (A, I_y, I_z, _, _) in WERTE.items():
-            w = werte(lage.umrisse(name))
+            w = werte(lage.Profillage(name).umrisse)
             for groesse, ist, soll in (("A", w.A, A * CM2_IN_MM2), ("I_y", w.I_y, I_y * CM4_IN_MM4),
                                        ("I_z", w.I_z, I_z * CM4_IN_MM4)):
                 with self.subTest(profil=name, groesse=groesse):
@@ -89,21 +89,21 @@ class TestUmriss(unittest.TestCase):
     def test_die_mitte_ist_die_des_rahmens(self):
         """Beim U liegt der Schwerpunkt neben der Mitte, zum Ruecken hin -- links."""
         for name in ("HEB 300", "UPE 200", "ROR 219.1 x 8"):
-            aussen = lage.umrisse(name, mitte=(100.0, 50.0))[0]
+            aussen = lage.Profillage(name, mitte=(100.0, 50.0)).umrisse[0]
             ys, zs = [p[0] for p in aussen], [p[1] for p in aussen]
             with self.subTest(profil=name):
                 self.assertAlmostEqual((min(ys) + max(ys)) / 2, 100.0)
                 self.assertAlmostEqual((min(zs) + max(zs)) / 2, 50.0)
-        self.assertLess(werte(lage.umrisse("UPE 200")).y_S, -10.0)
+        self.assertLess(werte(lage.Profillage("UPE 200").umrisse).y_S, -10.0)
 
     def test_erst_gespiegelt_dann_gedreht(self):
         """Gespiegelt ist der Ruecken des U rechts; um 90° gedreht unten -- es ist nach oben offen."""
-        self.assertGreater(werte(lage.umrisse("UPE 200", gespiegelt=True)).y_S, 10.0)
-        w = werte(lage.umrisse("UPE 200", drehung=90))
+        self.assertGreater(werte(lage.Profillage("UPE 200", gespiegelt=True).umrisse).y_S, 10.0)
+        w = werte(lage.Profillage("UPE 200", drehung=90).umrisse)
         self.assertLess(w.z_S, -10.0)
         self.assertAlmostEqual(w.y_S, 0.0, places=6)
         # Gespiegelt und um 90° gedreht: der Ruecken oben.
-        self.assertGreater(werte(lage.umrisse("UPE 200", drehung=90, gespiegelt=True)).z_S, 10.0)
+        self.assertGreater(werte(lage.Profillage("UPE 200", drehung=90, gespiegelt=True).umrisse).z_S, 10.0)
 
     def test_drehbar_und_spiegelbar(self):
         """Ein Rundrohr und ein quadratisches Rohr dreht nichts, gespiegelt aendert sich nur das U."""
@@ -114,13 +114,16 @@ class TestUmriss(unittest.TestCase):
                          {n for n in PROFILE if n.startswith(("UPE", "UNP"))})
 
     def test_beschreibung_nennt_nur_was_aendert(self):
-        self.assertEqual(lage.beschreibung("UPE 200", 90, True), "UPE 200, gespiegelt, um 90° gedreht")
-        self.assertEqual(lage.beschreibung("HEB 300", 180, True), "HEB 300, um 180° gedreht")
-        self.assertEqual(lage.beschreibung("HEB 300", 0, True), "HEB 300")
-        self.assertEqual(lage.beschreibung("ROR 219.1 x 8", 90, False), "ROR 219.1 x 8")
+        for (name, drehung, gespiegelt), erwartet in (
+                (("UPE 200", 90, True), "UPE 200, gespiegelt, um 90° gedreht"),
+                (("HEB 300", 180, True), "HEB 300, um 180° gedreht"),
+                (("HEB 300", 0, True), "HEB 300"),
+                (("ROR 219.1 x 8", 90, False), "ROR 219.1 x 8")):
+            self.assertEqual(lage.Profillage(name, drehung=drehung, gespiegelt=gespiegelt)
+                             .beschreibung, erwartet)
 
     def test_fangpunkte_am_rahmen(self):
-        fang = lage.fangpunkte(lage.umrisse("HEB 300"))
+        fang = lage.fangpunkte(lage.Profillage("HEB 300").umrisse)
         self.assertEqual(len(fang), 8)
         self.assertIn((0.0, 150.0), fang)     # die Mitte des Obergurts
         self.assertIn((-150.0, -150.0), fang)
@@ -146,7 +149,9 @@ class TestAnalyse(unittest.TestCase):
                 ist = e.wert(f"querschnittsanalyse.{a.kennung}.{groesse}").groesse.si
                 self.assertAlmostEqual(ist / soll, 1.0, delta=GRENZE)
         self.assertEqual(e.aufbau.teile[a.kennung].ohne_nachweis,
-                         "einen Stahlquerschnitt weist das Werkzeug nach SIA 263:2013 noch nicht nach")
+                         "die Lastfälle eines Stahlquerschnitts weist das Werkzeug nach SIA "
+                         "263:2013 noch nicht nach – seine Klassen und Widerstände stehen unter "
+                         "den Kennzahlen")
 
     def test_um_90_grad_tauschen_I_y_und_I_z(self):
         p = projekt()

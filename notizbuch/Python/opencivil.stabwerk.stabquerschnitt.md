@@ -1,5 +1,5 @@
 ---
-erzeugt: f9cca44b7f24
+erzeugt: be4fa98519cb
 art: modul
 tags: [modul]
 ---
@@ -68,15 +68,17 @@ eines Eintrags, mit demselben Satz und derselben Angabe fuer die Maske.
 ### keine_hauptachsen
 
 ```python
-def keine_hauptachsen(wer: str, I_y: float, I_z: float, I_yz: float, was: str='den Stab') -> Optional[str]
+def keine_hauptachsen(wer: str, I_y: float, I_z: float, I_yz: float, was: str='den Stab', folge: str='Verformungen und Schnittgrössen sind darum nur genähert.') -> Optional[str]
 ```
 
 Der Hinweis, wenn y und z merklich keine Hauptachsen sind
 ([[opencivil.stabwerk.stabquerschnitt#Konstanten|KOPPLUNG]]) -- sonst `None`. `wer` nennt den Querschnitt,
-«Querschnitt «Q1»», `was` kruemmt sich mit; Traegheitsmomente in m⁴.
-Im Raum fuer jeden Querschnitt eines Stabs
-([[opencivil.stabwerk.rechnung]]), im Erdbeben fuer jede Wand
-([[opencivil.erdbeben.ersatzkraft]]) -- derselbe Satz.
+«Querschnitt «Q1»», `was` kruemmt sich mit, `folge` sagt, was darum
+nur genaehert ist; Traegheitsmomente in m⁴. Im Raum fuer jeden
+Querschnitt eines Stabs ([[opencivil.stabwerk.rechnung]]), im Erdbeben
+fuer jede Wand ([[opencivil.erdbeben.ersatzkraft]]), in den Kennzahlen
+eines Stahlquerschnitts ([[opencivil.nachweis.qa_stahl_kennzahlen]])
+-- derselbe Satz.
 
 ### _traegheit
 
@@ -307,6 +309,7 @@ So viele Nachkommastellen, wie ein Mass hat -- 8.75 bleibt 8.75, bis drei.
 ## Gebraucht von
 
 - [[opencivil.erdbeben.ersatzkraft]]
+- [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.balkensystem3d]]

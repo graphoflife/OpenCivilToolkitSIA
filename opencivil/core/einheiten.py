@@ -310,6 +310,9 @@ MIO_MM4 = Einheit("10^6 mm^4", LAENGE**4, 1e-6,
 #: Dasselbe in cm⁴ -- so stehen die Stahlprofile in ihren Tabellen.
 CM4 = Einheit("cm^4", LAENGE**4, 1e-8)
 
+#: Ein Widerstandsmoment in cm³, wie in denselben Tabellen.
+CM3 = Einheit("cm^3", LAENGE**3, 1e-6)
+
 # Kraft
 N = Einheit("N", KRAFT, 1.0)
 KN = Einheit("kN", KRAFT, 1e3)
@@ -381,7 +384,7 @@ EINHEITEN: Dict[str, Einheit] = {
     for e in (
         EINHEITSLOS, PROZENT, PROMILLE,
         M, DM, CM, MM, KM,
-        M2, CM2, MM2, M3, CM4,
+        M2, CM2, MM2, M3, CM3, CM4,
         N, KN, MN,
         PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2, MN_PRO_M2,
         NM, KNM, MNM,

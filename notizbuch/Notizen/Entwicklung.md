@@ -7,6 +7,50 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Kennzahlen des Stahlquerschnitts nach SIA 263
+
+Aus dem Plan vom 2026-11-25, Schritt 12a: die Querschnittsklasse je Blech
+und was der Querschnitt danach trägt.
+
+**Vorher und nachher.** Vorher rechnete ein HEB 300 aus S355 in der
+Querschnittsanalyse nur A, I_y und I_z, und die Zusammenfassung sagte,
+dass das Werkzeug einen Stahlquerschnitt noch nicht nachweist. Nachher
+stehen unter den Kennzahlen: Querschnittsklasse 1 bei Druck und je
+Zugseite, N_Rd = ±5042 kN, M_y,Rd = 632.1 kNm, M_z,Rd = 294.2 kNm,
+V_z,Rd = 927.2 kN und V_y,Rd = 2225.7 kN – jede mit dem Auge auf ihre
+Herleitung. Die Lastfälle weist er noch nicht nach (Schritt 12b).
+
+**Die Klasse je Blech, aus der Zeichnung.** Jede Form nennt ihre Bleche
+(`stahlprofile/bleche.py`): Flansche und Steg, die vier Wände des
+Rechteckrohrs, das Rundrohr als Ganzes – mit c und t für die Schlankheit
+und der theoretischen Breite für die mitwirkende. Der Querschnitt
+(`stahlbau/querschnitt.py`) legt je Beanspruchung die Nulllinie, plastisch
+und elastisch, und liest an den Enden von c ab, welcher Teil eines Blechs
+gedrückt ist: daraus α und ψ und die Grenzen der Tabellen 5a und 5b
+(`stahlbau/klasse.py`). Massgebend ist das ungünstigste gedrückte Blech;
+die Herleitung zeigt alle in einer Tabelle. So gilt auch ein gedrehtes
+oder gespiegeltes Profil, und ein Profil neben einem anderen.
+
+**Nach der Klasse der Widerstand.** Klasse 1 und 2 rechnen plastisch, mit
+W_pl am Umriss; Klasse 3 elastisch bis zur weitesten Faser; Klasse 4 mit
+dem wirksamen Querschnitt: je Blech fällt ein Streifen der gedrückten Zone
+weg, wie Tabelle 10 ihn legt. Ein IPE 600 aus S355 ist bei Druck in
+Klasse 4 – sein Steg hat c/t = 42.8 > 34.2 –, behält 499 von 581 mm und
+trägt 4943 statt 5276 kN. Mehrere Stähle oder Dicken rechnen je mit ihrer
+Fliessgrenze; die Herleitung zeigt sie in einer Tabelle statt einer
+Formel.
+
+**Was die Norm nicht regelt** (alles «nach Vorgabe» in [[TODO]]): die
+Dicke, nach der Tabelle 1 wählt; die Schubflächen ausser (41a), wie in
+den Excel-Dateien des Benutzers; das Rechteckrohr als Kasten mit (70);
+ein Rundrohr der Klasse 4 ohne Widerstand; frei gezeichnete Flächen
+höchstens in Klasse 3 und ohne Querkraft.
+
+**Gegen die Excel-Datei des Benutzers**, HEB 800 aus S235: N_Rd 7481
+gegen 7479 kN, M_Rd 2289.9 gegen 2289 kNm, A_v 16 183 gegen 16 175 mm².
+V_Rd 2080.7 gegen etwa 2090 kN: die Datei rechnet τ_y = 235/√3 = 135.68,
+das Werkzeug 135 N/mm² aus Tabelle 1.
+
 ## 2026-11-26 · Stahlprofile in der Querschnittsanalyse
 
 Aus dem Plan vom 2026-11-25, Schritt 11c. Der Benutzer: ein Stahlprofil

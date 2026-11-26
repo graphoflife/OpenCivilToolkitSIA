@@ -1,5 +1,5 @@
 ---
-erzeugt: 4e5a71c6dd37
+erzeugt: c14f892db74e
 art: modul
 tags: [modul]
 ---
@@ -293,7 +293,7 @@ Elemente danach heissen weiter so wie vorher.
 - `waende: List[dict]` – Je Schubwand die Felder der Beschreibung, `von` und `bis` als Punkte.
 - `spannglieder: List[dict] = field(default_factory=list)` – Je Spannglied die Felder der Beschreibung, `lage` als Punkt.
 - `hilfslinien: List[dict] = field(default_factory=list)` – Je Hilfslinie `von` und `bis` -- gerechnet wird mit ihnen nichts.
-- `profile: List[dict] = field(default_factory=list)` – Je Stahlprofil die Felder der Beschreibung, `lage` als Punkt -- die Mitte --, dazu `umrisse` in der Zeichnung (der erste aussen, dann die Loecher) und `beschreibung`: «HEB 300, um 90° gedreht» ([[opencivil.stahlprofile.lage]]).
+- `profile: List[dict] = field(default_factory=list)` – Je Stahlprofil die Felder der Beschreibung, `lage` als Punkt -- die Mitte --, dazu `umrisse` in der Zeichnung (der erste aussen, dann die Loecher), `beschreibung`: «HEB 300, um 90° gedreht», und all das in einem: `profillage` ([[opencivil.stahlprofile.lage#Profillage|Profillage]]).
 - `fehler: List[dict] = field(default_factory=list)` – Was sich nicht aufloesen liess: `text` und `elemente` (Kennungen), wie eine Meldung.
 
 #### Elemente.flaechen
@@ -309,9 +309,10 @@ Loecher als Aussparungen, «Profil 1, innen». Je Flaeche `name`,
 `kennung` (beim Profil auch die des Lochs), `punkte`,
 `aussparung`, `material`, `stoffe` -- die Arten von Material,
 die das Element nimmt --, `ueberdeckung` (beim Profil null) und
-`herkunft`: beim Profil, was es ist. Ein Polygon ohne Material ist
-eine Aussparung, ein Profil ohne Baustahl nicht: ihm fehlt die Wahl.
-Die Rechnung kennt nur Flaechen; ein Profil ist eine wie jede.
+`profil`: beim Umriss eines Profils seine Lage, sonst `None`. Ein
+Polygon ohne Material ist eine Aussparung, ein Profil ohne Baustahl
+nicht: ihm fehlt die Wahl. Gerechnet wird mit Flaechen; ein Profil ist
+eine wie jede, nur kennt der Stahlbau aus seiner Lage seine Bleche.
 
 ### QuerschnittsanalyseEintrag
 

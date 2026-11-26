@@ -2,12 +2,13 @@
 opencivil/stahlprofile/lage.py -- ein Stahlprofil im gezeichneten Querschnitt.
 
 VERANTWORTUNG:
-Wo ein Profil der Tabelle in einer Querschnittsanalyse liegt: seine Umrisse
-in der Zeichnung, aus seiner Mitte, seiner Drehung und ob es gespiegelt ist
-(:func:`umrisse`); ob Drehen oder Spiegeln es ueberhaupt aendert
-(:func:`drehbar`, :func:`spiegelbar`); wie es in Bericht und Meldungen heisst
-(:func:`beschreibung`); woran der Zeiger faengt (:func:`fangpunkte`); und
-seine Skizze fuer das Fenster der Vorlagen (:func:`skizze`).
+Wo ein Profil der Tabelle in einer Querschnittsanalyse liegt
+(:class:`Profillage`): aus seiner Mitte, seiner Drehung und ob es gespiegelt
+ist, seine Umrisse in der Zeichnung und wie es in Bericht und Meldungen
+heisst; ob Drehen oder Spiegeln es ueberhaupt aendert (:func:`drehbar`,
+:func:`spiegelbar`); woran der Zeiger faengt (:func:`fangpunkte`); und seine
+Skizze fuer das Fenster der Vorlagen (:func:`skizze`). Wohin seine Bleche
+kommen, rechnet dieselbe Lage (:mod:`~opencivil.stahlprofile.bleche`).
 
 DIE MITTE:
 Die Mitte des umschreibenden Rechtecks, in mm -- nicht der Schwerpunkt, der
@@ -31,6 +32,7 @@ jeder gezeichneten Flaeche. Wie genau es die Tabelle trifft, steht bei
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from functools import lru_cache
 from typing import List, Sequence, Tuple
 
@@ -62,6 +64,10 @@ DREHUNGEN: Tuple[int, ...] = (0, 90, 180, 270)
 #: cos und sin je Drehung -- genau, ohne Rundungsrest der Winkelfunktionen.
 _DREHUNG = {0: (1, 0), 90: (0, 1), 180: (-1, 0), 270: (0, -1)}
 
+#: Die vier Richtungen der Zeichnung, als Einheitsvektor -- so heisst ein
+#: Blech nach seiner Lage, auch am gedrehten Profil (:meth:`Profillage.richtung`).
+_RICHTUNGEN = {"oben": (0, 1), "unten": (0, -1), "links": (-1, 0), "rechts": (1, 0)}
+
 #: Auf so viele Stellen nach dem Komma in mm liegen die Ecken -- wie beim
 #: Einsetzen einer Vorlage, damit die Summe keinen Rundungsrest behaelt.
 _STELLEN = 6
@@ -80,25 +86,61 @@ def _lokal(name: str) -> Tuple[Tuple[Punkt, ...], ...]:
     return tuple(tuple(teil) for teil in profil.form.umriss(profil.masse))
 
 
-def umrisse(name: str, mitte: Punkt = (0.0, 0.0), drehung: int = 0,
-            gespiegelt: bool = False) -> List[List[Punkt]]:
-    """
-    Die Umrisse des Profils ``name`` in der Zeichnung, in mm: der erste
-    aussen, die weiteren Loecher -- beim Rohr eines. Siehe Dateikopf. Einen
-    Namen, den die Tabelle nicht kennt, sagt ein ``KeyError``
-    (:func:`~opencivil.stahlprofile.tabelle.profil`).
-    """
-    lokal = _lokal(name)
-    y0, z0, y1, z1 = _rahmen(lokal[0])
-    my, mz = (y0 + y1) / 2, (z0 + z1) / 2
-    c, s = _DREHUNG[drehung]
-    spiegel = -1 if gespiegelt else 1
+@lru_cache(maxsize=None)
+def _mitte_lokal(name: str) -> Punkt:
+    """Die Mitte des umschreibenden Rechtecks, wie die Form das Profil zeichnet."""
+    y0, z0, y1, z1 = _rahmen(_lokal(name)[0])
+    return (y0 + y1) / 2, (z0 + z1) / 2
 
-    def setzen(p: Punkt) -> Punkt:
-        y, z = spiegel * (p[0] - my), p[1] - mz
-        return (round(mitte[0] + c * y - s * z, _STELLEN), round(mitte[1] + s * y + c * z, _STELLEN))
 
-    return [[setzen(p) for p in teil] for teil in lokal]
+@dataclass(frozen=True)
+class Profillage:
+    """
+    Ein Profil der Tabelle, wie es im Querschnitt liegt: sein Name, seine
+    Mitte in mm, seine Drehung und ob es gespiegelt ist -- siehe Dateikopf.
+    Einen Namen, den die Tabelle nicht kennt, sagt ein ``KeyError``, sobald
+    etwas gerechnet wird (:func:`~opencivil.stahlprofile.tabelle.profil`).
+    """
+
+    name: str
+    mitte: Punkt = (0.0, 0.0)
+    drehung: int = 0
+    gespiegelt: bool = False
+
+    def setzen(self, p: Punkt) -> Punkt:
+        """Ein Punkt, wie die Form das Profil zeichnet, an seiner Stelle in der Zeichnung."""
+        my, mz = _mitte_lokal(self.name)
+        c, s = _DREHUNG[self.drehung]
+        y, z = (-1 if self.gespiegelt else 1) * (p[0] - my), p[1] - mz
+        return (round(self.mitte[0] + c * y - s * z, _STELLEN),
+                round(self.mitte[1] + s * y + c * z, _STELLEN))
+
+    def richtung(self, wort: str) -> str:
+        """Wohin «oben», «unten», «links» oder «rechts» der Form in der Zeichnung zeigt."""
+        y, z = _RICHTUNGEN[wort]
+        y = -y if self.gespiegelt else y
+        c, s = _DREHUNG[self.drehung]
+        gedreht = (c * y - s * z, s * y + c * z)
+        return next(k for k, v in _RICHTUNGEN.items() if v == gedreht)
+
+    @property
+    def umrisse(self) -> List[List[Punkt]]:
+        """Die Umrisse in der Zeichnung, in mm: der erste aussen, die weiteren Loecher -- beim Rohr eines."""
+        return [[self.setzen(p) for p in teil] for teil in _lokal(self.name)]
+
+    @property
+    def beschreibung(self) -> str:
+        """
+        Was das Profil ist, fuer Bericht und Liste: «UPE 200, gespiegelt, um
+        90° gedreht» -- nur, was etwas aendert: ein gespiegeltes I heisst wie
+        jedes.
+        """
+        teile = [self.name]
+        if self.gespiegelt and spiegelbar(self.name):
+            teile.append("gespiegelt")
+        if self.drehung and drehbar(self.name):
+            teile.append(f"um {self.drehung}° gedreht")
+        return ", ".join(teile)
 
 
 def _gleich(a: Sequence[Sequence[Punkt]], b: Sequence[Sequence[Punkt]]) -> bool:
@@ -112,26 +154,13 @@ def _gleich(a: Sequence[Sequence[Punkt]], b: Sequence[Sequence[Punkt]]) -> bool:
 @lru_cache(maxsize=None)
 def drehbar(name: str) -> bool:
     """Ob eine Drehung um 90 Grad das Profil aendert -- beim Rundrohr nicht, beim quadratischen Rohr auch nicht."""
-    return not _gleich(umrisse(name), umrisse(name, drehung=90))
+    return not _gleich(Profillage(name).umrisse, Profillage(name, drehung=90).umrisse)
 
 
 @lru_cache(maxsize=None)
 def spiegelbar(name: str) -> bool:
     """Ob das Spiegeln das Profil aendert -- nur, wenn es zur senkrechten Achse nicht symmetrisch ist, wie das U."""
-    return not _gleich(umrisse(name), umrisse(name, gespiegelt=True))
-
-
-def beschreibung(name: str, drehung: int, gespiegelt: bool) -> str:
-    """
-    Was das Profil ist, fuer Bericht und Liste: «UPE 200, gespiegelt, um 90°
-    gedreht» -- nur, was etwas aendert: ein gespiegeltes I heisst wie jedes.
-    """
-    teile = [name]
-    if gespiegelt and spiegelbar(name):
-        teile.append("gespiegelt")
-    if drehung and drehbar(name):
-        teile.append(f"um {drehung}° gedreht")
-    return ", ".join(teile)
+    return not _gleich(Profillage(name).umrisse, Profillage(name, gespiegelt=True).umrisse)
 
 
 def fangpunkte(teile: Sequence[Sequence[Punkt]]) -> List[Punkt]:
@@ -152,7 +181,7 @@ def skizze(name: str, drehung: int = 0, gespiegelt: bool = False) -> Teile:
     kommt an den Einsetzpunkt -- und die zwei Masse, die es von aussen hat,
     Breite unten, Hoehe links, nach der Drehung. Beim Rundrohr nur ``D``.
     """
-    teile = umrisse(name, drehung=drehung, gespiegelt=gespiegelt)
+    teile = Profillage(name, drehung=drehung, gespiegelt=gespiegelt).umrisse
     y0, z0, y1, z1 = _rahmen(teile[0])
     m = tabelle.profil(name).masse
     if "D" in m:

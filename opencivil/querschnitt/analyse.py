@@ -59,6 +59,7 @@ from opencivil.querschnitt.torsion import torsion
 from opencivil.querschnitt.werkstoffgesetz import Baustahlgesetz, Gesetz, Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.stahlprofile import lage as profillage
+from opencivil.stahlprofile.lage import Profillage
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
 #: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus ``E_cm``
@@ -167,8 +168,13 @@ class Flaechenteil:
     kennung: str
     punkte: Tuple[Punkt, ...]
     stoff: Optional[Baustoff]
-    herkunft: str = ""
-    """Was es ist, wenn mehr als ein Polygon: beim Stahlprofil «HEB 300» -- so steht es im Bericht."""
+    profil: Optional[Profillage] = None
+    """Beim Umriss eines Stahlprofils seine Lage -- daraus kennt der Stahlbau seine Bleche."""
+
+    @property
+    def herkunft(self) -> str:
+        """Was es ist, wenn mehr als ein Polygon: beim Stahlprofil «HEB 300» -- so steht es im Bericht."""
+        return self.profil.beschreibung if self.profil is not None else ""
 
 
 @dataclass(frozen=True)

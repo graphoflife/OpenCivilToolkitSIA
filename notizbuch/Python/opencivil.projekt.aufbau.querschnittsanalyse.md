@@ -1,5 +1,5 @@
 ---
-erzeugt: 4d2a89d32a63
+erzeugt: 649ee5467082
 art: modul
 tags: [modul]
 ---
@@ -36,10 +36,11 @@ Knicken, sobald ein Fall eingeschaltet ist.
 
 Das alles beim Stahlbeton. Ein Querschnitt aus Stahl, Holz oder im
 Verbund ([[opencivil.querschnitt.bauweise|bauweise]]) rechnet bisher nur seine
-Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, und seine
-Zusammenfassung sagt, dass die Nachweise fehlen ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]).
-Seine Spannung-Dehnung-Analysen rechnet er trotzdem, ausser im Verbund
-([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
+Werte -- Flaeche, Schwerpunkt, Traegheitsmomente --, der aus Stahl dazu
+seine Kennzahlen nach SIA 263 ([[opencivil.nachweis.qa_stahl_kennzahlen|qa_stahl_kennzahlen]]);
+seine Zusammenfassung sagt, dass die Nachweise der Lastfaelle fehlen
+([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_nachweise|ohne_nachweise]]). Seine Spannung-Dehnung-Analysen rechnet er
+trotzdem, ausser im Verbund ([[opencivil.projekt.aufbau.querschnittsanalyse#ohne_analysen|ohne_analysen]]).
 
 Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
 es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
@@ -47,6 +48,14 @@ ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
 2026-10-19). Ebenso eine Zeichnung, die sich noch nicht rechnen laesst,
 etwa Bewehrung ohne Polygon darum: die Zeichnung sagt, was nicht
 stimmt, und der Rest rechnet weiter ([[opencivil.projekt.aufbau.kern#Aufbau.unfertig|Aufbau.unfertig]]).
+
+### _kennzahlen
+
+```python
+def _kennzahlen(kennzahlen: Kennzahlprozedur, teil: Bauteil, aufbau: Aufbau) -> None
+```
+
+Die Kennzahlen ins Rechenwerk und unter das Bauteil.
 
 ### ohne_nachweise
 
@@ -113,11 +122,13 @@ Staeben gibt.
 
 ## Braucht
 
+- [[opencivil.core.berechnung]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.spannstahl]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.qa_stahl_kennzahlen]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]

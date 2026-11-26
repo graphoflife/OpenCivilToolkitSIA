@@ -138,8 +138,9 @@ class TestAnalyse(unittest.TestCase):
         e = p.rechnen()
         for a, text in (
                 (holz, "einen Holzquerschnitt weist das Werkzeug nach SIA 265:2012 noch nicht nach"),
-                (stahl, "einen Stahlquerschnitt weist das Werkzeug nach SIA 263:2013 noch nicht "
-                        "nach")):
+                (stahl, "die Lastfälle eines Stahlquerschnitts weist das Werkzeug nach SIA 263:2013 "
+                        "noch nicht nach – seine Klassen und Widerstände stehen unter den "
+                        "Kennzahlen")):
             with self.subTest(a=a.name):
                 teil = e.aufbau.teile[a.kennung]
                 self.assertEqual((teil.ohne_nachweis, teil.nachweise), (text, []))
