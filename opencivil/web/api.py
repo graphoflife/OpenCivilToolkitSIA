@@ -110,8 +110,8 @@ _DECKENGROESSEN = {
     "M": ("M", "Moment M"), "V": ("V", "Querkraft V"),
 }
 _AUFTEILUNGEN = {
-    Aufteilung.AUTOMATISCH: ("automatisch", "Je Stelle nach ihren Lagern: zum nahen Rand, sonst in "
-                                            "die kürzere Spannweite (Folie 31)"),
+    Aufteilung.AUTOMATISCH: ("automatisch", "Je Stelle nach ihren Lagern: zum nahen Rand, sonst mehr "
+                                            "in die kürzere Spannweite (Folie 31)"),
     Aufteilung.FEST: ("fest", "Überall derselbe Anteil in Richtung 1 – ausser in den Zonen"),
 }
 

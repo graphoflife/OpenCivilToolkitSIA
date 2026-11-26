@@ -7,6 +7,30 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
+## 2026-11-26 · Decke: die Mitte eines Felds teilt fliessend
+
+Vom Benutzer entschieden (2026-11-25), der erste Teil des Lastabtrags von
+selbst.
+
+- Vorher ging die Mitte eines Felds ganz in die kürzere Spannweite, und
+  nur wenn beide innerhalb 1 % gleich lang waren, je zur Hälfte. Ein Feld
+  5 × 5.04 m teilte also halb-halb, eines 5 × 5.06 m alles in die 5 m:
+  ein Sprung um die halbe Last für 2 cm. Nachher teilt sie geradlinig, je
+  zur Hälfte bei gleichen Spannweiten, ganz in die kürzere ab dem
+  Verhältnis 1.5: 5 × 5.04 m gibt 50.8 % in die 5 m, 5 × 5.06 m 51.2 %,
+  4 × 5 m 75 %.
+- Am Rand bleibt alles wie auf Folie 31: näher als ein Viertel der
+  kürzeren Spannweite an einem Lager geht die Last zu ihm, in den Ecken je
+  zur Hälfte. Folie 31 selbst (8 × 4 m, Verhältnis 2) gibt dieselben
+  Momente wie vorher.
+- Die Regel steht in `aufteilung.in_der_mitte`, das Verhältnis als
+  `GANZ_AB`; die Herleitung schreibt sie als Gleichung mit derselben Zahl.
+  `GLEICHE_SPANNWEITE` fällt weg.
+- In der Beispieldecke «Jede Wahl» spannt die Mitte von P1 6 m in x und
+  7 m in y: dort gehen jetzt 2/3 in x statt alles, und die eingespannte
+  Wand L2 trägt im Eigengewicht 59.2 statt 61.8 kN/m. Kolloquium 4 teilt
+  fest und bleibt gleich.
+
 ## 2026-11-26 · Erdbeben: Bild «Wände, Querkraft und Moment»
 
 Vom Benutzer gewünscht (2026-11-25): je Geschoss der Kern, dazu V und M

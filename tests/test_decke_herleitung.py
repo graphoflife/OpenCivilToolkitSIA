@@ -159,11 +159,12 @@ class TestJedeWahl(unittest.TestCase):
         """
         L5 hält nur die Drehung: er trägt nichts, aber 102.6 kNm/m mit Zug
         unten -- so viel, wie y7 an ihm hat. Am eingespannten Rand L2 zieht
-        es oben.
+        es oben. Die Mitte von P1 spannt 6 m in x und 7 m in y: 2/3 der Last
+        gehen dort in x, nicht mehr alles.
         """
         lager = {z[0]: z[1:] for z in tabelle(self.loesung, "Eigengewicht", "Lagerkräfte")}
         self.assertEqual(lager["L5 · Linienlager"], ["0.0", "0.0", "102.6"])
-        self.assertEqual(lager["L2 · Linienlager"], ["61.8", "20.6", "-24.8"])
+        self.assertEqual(lager["L2 · Linienlager"], ["59.2", "19.5", "-22.9"])
         self.assertEqual(lager["S1 · Stütze"], ["6.9", "–", "–"])
 
 

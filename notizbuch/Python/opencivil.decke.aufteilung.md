@@ -1,5 +1,5 @@
 ---
-erzeugt: df79b83c6532
+erzeugt: 3cb614c6742b
 art: modul
 tags: [modul]
 ---
@@ -32,14 +32,19 @@ die Last darauf.
    * Liegt die Zelle in einer Richtung höchstens `b/4` vor einem Lager,
      geht die Last in diese Richtung -- liegt sie in beiden so nahe, je zur
      Hälfte (die Ecken der Folie 31).
-   * Sonst geht sie in die Richtung mit dem kürzeren Feld, bei gleichen
-     Feldern je zur Hälfte.
+   * Sonst geht sie mehr in die Richtung mit dem kürzeren Feld: bei
+     gleichen Feldern je zur Hälfte, ab dem Verhältnis [[opencivil.decke.aufteilung#Konstanten|GANZ_AB]] der
+     Spannweiten ganz, dazwischen geradlinig ([[opencivil.decke.aufteilung#in_der_mitte|in_der_mitte]];
+     Benutzer, 2026-11-25). So springt der Anteil nicht, wenn eine
+     Spannweite um ein Weniges wächst: 5 × 5.04 m und 5 × 5.06 m teilen
+     fast gleich.
 
 ```
-Für die einfach gelagerte Rechteckplatte der Folie 31 ergibt das genau
-deren Aufteilung. Für andere Platten ist es eine Verallgemeinerung --
-nach Vorgabe. Die Norm schreibt keine vor: nach der statischen Methode
-gilt jede, die im Gleichgewicht ist (SIA 262:2025, 4.1.4.2.2).
+Für die einfach gelagerte Rechteckplatte der Folie 31 -- Verhältnis 2
+-- ergibt das genau deren Aufteilung. Für andere Platten ist es eine
+Verallgemeinerung -- nach Vorgabe. Die Norm schreibt keine vor: nach der
+statischen Methode gilt jede, die im Gleichgewicht ist (SIA 262:2025,
+4.1.4.2.2).
 ```
 
 
@@ -120,6 +125,17 @@ def _anteil_bei(zerlegung: Zerlegung, p: Punkt, a: Tuple[Streifen, Richtung], b:
 
 Der Anteil in Richtung 1 an der Stelle `p` -- `None`, wenn keine Richtung trägt.
 
+### in_der_mitte
+
+```python
+def in_der_mitte(spannweite_1: float, spannweite_2: float) -> float
+```
+
+Der Anteil in Richtung 1 fern der Lager: je zur Hälfte bei gleichen
+Spannweiten, geradlinig mehr in die kürzere, ganz in sie ab dem
+Verhältnis [[opencivil.decke.aufteilung#Konstanten|GANZ_AB]]. Ohne Feld -- unendlich -- in beiden
+Richtungen je zur Hälfte.
+
 ### lage
 
 ```python
@@ -134,7 +150,7 @@ Feldstreifen.
 ## Konstanten
 
 - `UEBERSTAND = 1.0` – So viel länger als die Gruppe reicht ein Anteil, der einen ganzen Streifen deckt, in m.
-- `GLEICHE_SPANNWEITE = 0.01` – Zwei Spannweiten, die weniger als so viel auseinanderliegen, gelten als gleich.
+- `GANZ_AB = 1.5` – Ab diesem Verhältnis der Spannweiten geht die Mitte eines Felds ganz in die kürzere Richtung.
 
 ## Braucht
 
@@ -145,5 +161,6 @@ Feldstreifen.
 
 ## Gebraucht von
 
+- [[opencivil.decke.herleitung]]
 - [[opencivil.decke.lasten]]
 - [[opencivil.decke.rechnung]]

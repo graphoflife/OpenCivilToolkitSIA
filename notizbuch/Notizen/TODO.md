@@ -56,8 +56,10 @@ Kräften je Geschoss und Wand, ohne Verbindung ins Balkensystem.
       und «senkrecht», nicht Platte und Stütze. Erst Esc, dann die Taste.
 - [ ] Decken, nach Vorgabe (`opencivil/decke/`): die automatische
       Aufteilung, wo Folie 31 nichts sagt (die Spannweite eines Kragarms
-      zählt doppelt, gleich lange Spannweiten innerhalb 1 % je zur Hälfte,
-      entschieden wird im Schwerpunkt jeder Zelle); die Grösse des
+      zählt doppelt, entschieden wird im Schwerpunkt jeder Zelle; die Mitte
+      eines Felds teilt geradlinig bis ganz in die kürzere Spannweite ab
+      dem Verhältnis 1.5 -- so gewählt vom Benutzer am 2026-11-25, statt
+      «innerhalb 1 % je zur Hälfte, sonst ganz»); die Grösse des
       Stützenbereichs, wenn sie fehlt (ein Quadrat, so breit wie die Stütze
       oder der breiteste Unterzug über ihr -- Folie 39 lässt sie offen);
       Streifen in zwei Richtungen, die nicht rechtwinklig aufeinander stehen;

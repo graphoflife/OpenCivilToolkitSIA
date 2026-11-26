@@ -20101,7 +20101,13 @@ Kombination «GZT»: 1.35 · «Eigengewicht» + 1.35 · «Auflast» + 1.5 · «N
 
 Je Richtung sind die Streifen höchstens 0.50 m breit; geteilt wird an jeder Ecke einer Platte, jedem Rand eines Unterzugs und Stützenbereichs und jedem Ende eines Linienlagers.
 
-Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, sonst in die kürzere Spannweite; nahe zweier Ränder und bei gleicher Spannweite je zur Hälfte. Ein Kragarm zählt doppelt (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).
+Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der kürzeren Spannweite an einem Lager liegt, nahe zweier Ränder je zur Hälfte. Sonst geht sie mehr in die kürzere Spannweite: bei gleichen je zur Hälfte, ab dem Verhältnis 1.5 ganz, dazwischen geradlinig. Ein Kragarm zählt doppelt (nach Vorgabe; die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).
+
+**Fern der Lager, in die kürzere Spannweite**
+
+$$
+\alpha_{\mathrm{kurz}} = \min\left(1;\ \frac{1}{2} + \frac{1}{2} \cdot \frac{l_{\mathrm{lang}} / l_{\mathrm{kurz}} - 1}{1.5 - 1}\right)
+$$
 
 **Zonen – sie gehen der Aufteilung vor**
 
@@ -20161,17 +20167,17 @@ $$
 | Träger | $b\ [\mathrm{m}]$ | $L\ [\mathrm{m}]$ | $Q/b\ [\mathrm{kN/m}]$ | Lager [kN/m] | $m_{\min}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ | $s\ [\mathrm{m}]$ |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | x1.1 … x3.1 | $0.500$ | $6.00$ | $15.3$ | L3 8.4 · L2 6.9 | $-7.7$ | $6.00$ | $6.5$ | $1.53$ |
-| x4.1 … x8 | $0.500$ | $6.00$ | $33.0$ | L3 12.4 · L2 20.6 | $-24.8$ | $6.00$ | $13.9$ | $2.25$ |
+| x4.1 … x8 | $0.500$ | $6.00$ | $31.2$ | L3 11.6 · L2 19.5 | $-22.9$ | $6.00$ | $12.3$ | $2.17$ |
 | x15 | $0.400$ | $6.00$ | $26.3$ | L3 9.0 · S1 17.3 | $0.0$ | – | $16.1$ | $3.53$ |
 | x1.2 | $0.500$ | $4.17$ | $5.0$ | L9 2.5 · L7 2.5 | $0.0$ | – | $1.3$ | $10.17$ |
 | x2.2 | $0.500$ | $4.17$ | $5.0$ | L9 2.5 · L7 2.5 | $0.0$ | – | $1.3$ | $10.33$ |
-| x3.2 | $0.500$ | $4.17$ | $10.0$ | L9 5.0 · L7 5.0 | $0.0$ | – | $2.5$ | $10.50$ |
-| x4.2 | $0.500$ | $4.17$ | $10.0$ | L9 5.0 · L7 5.0 | $0.0$ | – | $2.5$ | $10.67$ |
+| x3.2 | $0.500$ | $4.17$ | $12.4$ | L9 6.2 · L7 6.2 | $0.0$ | – | $4.3$ | $11.42$ |
+| x4.2 | $0.500$ | $4.17$ | $12.4$ | L9 6.2 · L7 6.2 | $0.0$ | – | $4.3$ | $11.58$ |
 | x5.2 | $0.500$ | $4.17$ | $5.0$ | L9 2.5 · L7 2.5 | $0.0$ | – | $1.3$ | $10.83$ |
 | x6.2 | $0.500$ | $4.17$ | $5.0$ | L9 2.5 · L7 2.5 | $0.0$ | – | $1.3$ | $11.00$ |
 | y1 … y3 | $0.500$ | $7.00$ | $19.6$ | L1 4.5 · L4 15.1 | $0.0$ | – | $19.3$ | $4.64$ |
 | y4 | $0.500$ | $7.00$ | $21.0$ | L1 4.5 · L4 16.5 | $0.0$ | – | $19.4$ | $4.64$ |
-| y5 … y6 | $0.500$ | $7.00$ | $29.3$ | L1 11.9 · L4 17.4 | $0.0$ | – | $21.6$ | $4.52$ |
+| y5 … y6 | $0.500$ | $7.00$ | $33.8$ | L1 14.6 · L4 19.2 | $0.0$ | – | $26.3$ | $4.26$ |
 | y7 | $0.480$ | $7.00$ | $26.4$ | L1 26.5 · L5 0.0 | $0.0$ | – | $102.6$ | $6.60$ |
 | y8 | $0.480$ | $7.00$ | $26.5$ | L1 26.5 · L5 0.0 | $0.0$ | – | $102.6$ | $6.60$ |
 | y9 | $0.480$ | $7.00$ | $26.4$ | L1 26.4 · L5 0.0 | $0.0$ | – | $102.6$ | $6.60$ |
@@ -20179,10 +20185,10 @@ $$
 | y12 … y13 | $0.300$ | $7.00$ | $22.3$ | L1 22.3 · L5 0.0 | $0.0$ | – | $99.6$ | $6.60$ |
 | 71.57° 1 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $4.06$ |
 | 71.57° 2 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $4.22$ |
-| 71.57° 3 | $0.474$ | $3.32$ | $15.8$ | L6 7.9 · L8 7.9 | $0.0$ | – | $6.2$ | $4.82$ |
-| 71.57° 4 | $0.474$ | $3.32$ | $15.8$ | L6 7.9 · L8 7.9 | $0.0$ | – | $6.2$ | $4.98$ |
-| 71.57° 5 | $0.474$ | $3.32$ | $15.8$ | L6 7.9 · L8 7.9 | $0.0$ | – | $6.2$ | $5.14$ |
-| 71.57° 6 | $0.474$ | $3.32$ | $15.8$ | L6 7.9 · L8 7.9 | $0.0$ | – | $6.2$ | $5.30$ |
+| 71.57° 3 | $0.474$ | $3.32$ | $14.6$ | L6 7.3 · L8 7.3 | $0.0$ | – | $5.4$ | $4.82$ |
+| 71.57° 4 | $0.474$ | $3.32$ | $14.6$ | L6 7.3 · L8 7.3 | $0.0$ | – | $5.4$ | $4.98$ |
+| 71.57° 5 | $0.474$ | $3.32$ | $14.6$ | L6 7.3 · L8 7.3 | $0.0$ | – | $5.4$ | $5.14$ |
+| 71.57° 6 | $0.474$ | $3.32$ | $14.6$ | L6 7.3 · L8 7.3 | $0.0$ | – | $5.4$ | $5.30$ |
 | 71.57° 7 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $5.01$ |
 | 71.57° 8 | $0.474$ | $3.32$ | $5.3$ | L6 2.6 · L8 2.6 | $0.0$ | – | $1.4$ | $5.17$ |
 
@@ -20193,15 +20199,15 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ |
 | ---: | ---: | ---: | ---: |
 | S1 · Stütze | $6.9$ | – | – |
-| L1 · Linienlager | $93.7$ | $26.5$ | – |
-| L2 · Linienlager | $61.8$ | $20.6$ | $-24.8$ |
-| L3 · Linienlager | $47.2$ | $12.4$ | – |
-| L4 · Linienlager | $48.3$ | $17.4$ | – |
+| L1 · Linienlager | $96.5$ | $26.5$ | – |
+| L2 · Linienlager | $59.2$ | $19.5$ | $-22.9$ |
+| L3 · Linienlager | $45.3$ | $11.6$ | – |
+| L4 · Linienlager | $50.1$ | $19.2$ | – |
 | L5 · Linienlager | $0.0$ | $0.0$ | $102.6$ |
-| L6 · Linienlager | $20.0$ | $7.5$ | – |
-| L7 · Linienlager | $10.0$ | $4.7$ | – |
-| L8 · Linienlager | $20.0$ | $7.5$ | – |
-| L9 · Linienlager | $10.0$ | $4.7$ | – |
+| L6 · Linienlager | $18.8$ | $6.9$ | – |
+| L7 · Linienlager | $11.2$ | $5.9$ | – |
+| L8 · Linienlager | $18.8$ | $6.9$ | – |
+| L9 · Linienlager | $11.2$ | $5.9$ | – |
 
 Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
@@ -20209,12 +20215,12 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 
 | Grösse | kleinst | Ort | grösst | Ort |
 | ---: | ---: | ---: | ---: | ---: |
-| $m_x$ | $-24.7\ \mathrm{kNm/m}$ | (6.00, 1.75) | $16.1\ \mathrm{kNm/m}$ | (3.53, 6.80) |
+| $m_x$ | $-22.9\ \mathrm{kNm/m}$ | (6.00, 1.75) | $16.1\ \mathrm{kNm/m}$ | (3.53, 6.80) |
 | $m_y$ | $0.0\ \mathrm{kNm/m}$ | – | $102.6\ \mathrm{kNm/m}$ | (3.24, 6.80) |
-| $m_{xy}$ | $0.0\ \mathrm{kNm/m}$ | – | $1.9\ \mathrm{kNm/m}$ | (10.75, 1.50) |
-| $v_x$ | $-20.6\ \mathrm{kN/m}$ | (6.00, 1.75) | $12.4\ \mathrm{kN/m}$ | (0.00, 1.75) |
-| $v_y$ | $-17.4\ \mathrm{kN/m}$ | (2.25, 7.00) | $26.4\ \mathrm{kN/m}$ | (3.24, 0.00) |
-| $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $27.5\ \mathrm{kN/m}$ | (6.00, 1.75) |
+| $m_{xy}$ | $0.0\ \mathrm{kNm/m}$ | – | $1.6\ \mathrm{kNm/m}$ | (10.75, 1.50) |
+| $v_x$ | $-19.5\ \mathrm{kN/m}$ | (6.00, 1.75) | $11.6\ \mathrm{kN/m}$ | (0.00, 1.75) |
+| $v_y$ | $-19.2\ \mathrm{kN/m}$ | (2.25, 7.00) | $26.4\ \mathrm{kN/m}$ | (3.24, 0.00) |
+| $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $26.7\ \mathrm{kN/m}$ | (6.00, 1.75) |
 
 Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
 
@@ -20224,7 +20230,7 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | ---: | ---: | ---: | ---: |
 | $m_{xu}$ | unten, in x | $16.1\ \mathrm{kNm/m}$ | (3.53, 6.80) |
 | $m_{yu}$ | unten, in y | $102.6\ \mathrm{kNm/m}$ | (3.24, 6.80) |
-| $m'_{xu}$ | oben, in x | $24.7\ \mathrm{kNm/m}$ | (6.00, 1.75) |
+| $m'_{xu}$ | oben, in x | $22.9\ \mathrm{kNm/m}$ | (6.00, 1.75) |
 | $m'_{yu}$ | oben, in y | $0.0\ \mathrm{kNm/m}$ | – |
 
 **Lastverteilelemente: was der Bereich zusätzlich braucht**
@@ -20302,13 +20308,13 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | x3.1 | $0.500$ | $6.00$ | $1.4$ | L3 0.1 · L2 1.3 | $-1.3$ | $6.00$ | $0.4$ | $4.48$ |
 | x4.1 … x6.1 | $0.500$ | $6.00$ | $10.0$ | L3 1.6 · L2 8.4 | $-10.6$ | $6.00$ | $5.0$ | $3.31$ |
-| x4.2 | $0.500$ | $4.17$ | $12.5$ | L9 2.5 · L7 10.0 | $0.0$ | – | $7.5$ | $12.67$ |
+| x4.2 | $0.500$ | $4.17$ | $16.6$ | L9 3.8 · L7 12.8 | $0.0$ | – | $10.2$ | $12.53$ |
 | x5.2 | $0.500$ | $4.17$ | $3.8$ | L9 0.8 · L7 2.9 | $0.0$ | – | $2.5$ | $12.80$ |
 | y7 … y9 | $0.480$ | $7.00$ | $2.5$ | L1 2.5 · L5 0.0 | $0.0$ | – | $3.1$ | $1.50$ |
 | y10 | $0.480$ | $7.00$ | $1.2$ | L1 1.2 · L5 0.0 | $0.0$ | – | $1.6$ | $1.50$ |
 | y11 | $0.480$ | $7.00$ | $0.2$ | L1 0.2 · L5 0.0 | $0.0$ | – | $0.3$ | $1.50$ |
-| 71.57° 5 | $0.474$ | $3.32$ | $10.5$ | L6 2.8 · L8 7.8 | $0.0$ | – | $5.6$ | $5.73$ |
-| 71.57° 6 | $0.474$ | $3.32$ | $31.6$ | L6 10.5 · L8 21.1 | $0.0$ | – | $18.5$ | $5.65$ |
+| 71.57° 5 | $0.474$ | $3.32$ | $9.9$ | L6 2.6 · L8 7.4 | $0.0$ | – | $5.2$ | $5.77$ |
+| 71.57° 6 | $0.474$ | $3.32$ | $27.9$ | L6 9.0 · L8 18.9 | $0.0$ | – | $16.0$ | $5.69$ |
 | 71.57° 7 | $0.474$ | $3.32$ | $4.0$ | L6 1.1 · L8 2.9 | $0.0$ | – | $2.3$ | $6.06$ |
 
 Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s misst längs der Richtung φ des Trägers, s = x · cos φ + y · sin φ: in x ist s = x, in y ist s = y. Nebeneinander liegende Träger, die dasselbe tragen, stehen in einer Zeile.
@@ -20323,10 +20329,10 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | L3 · Linienlager | $2.4$ | $1.6$ | – |
 | L4 · Linienlager | $0.0$ | $0.0$ | – |
 | L5 · Linienlager | $0.0$ | $0.0$ | $3.1$ |
-| L6 · Linienlager | $6.8$ | $10.0$ | – |
-| L7 · Linienlager | $6.5$ | $9.5$ | – |
-| L8 · Linienlager | $15.0$ | $20.0$ | – |
-| L9 · Linienlager | $1.7$ | $2.4$ | – |
+| L6 · Linienlager | $6.0$ | $8.5$ | – |
+| L7 · Linienlager | $7.9$ | $12.1$ | – |
+| L8 · Linienlager | $13.8$ | $17.9$ | – |
+| L9 · Linienlager | $2.3$ | $3.6$ | – |
 
 Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
@@ -20334,12 +20340,12 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 
 | Grösse | kleinst | Ort | grösst | Ort |
 | ---: | ---: | ---: | ---: | ---: |
-| $m_x$ | $-10.6\ \mathrm{kNm/m}$ | (6.00, 1.75) | $9.1\ \mathrm{kNm/m}$ | (12.50, 1.75) |
-| $m_y$ | $0.0\ \mathrm{kNm/m}$ | – | $16.6\ \mathrm{kNm/m}$ | (12.36, 1.83) |
-| $m_{xy}$ | $0.0\ \mathrm{kNm/m}$ | – | $5.5\ \mathrm{kNm/m}$ | (12.36, 1.83) |
-| $v_x$ | $-10.0\ \mathrm{kN/m}$ | (13.33, 1.75) | $5.1\ \mathrm{kN/m}$ | (12.27, 1.57) |
-| $v_y$ | $-20.0\ \mathrm{kN/m}$ | (12.67, 2.75) | $10.0\ \mathrm{kN/m}$ | (11.83, 0.25) |
-| $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $21.1\ \mathrm{kN/m}$ | (12.67, 2.75) |
+| $m_x$ | $-10.6\ \mathrm{kNm/m}$ | (6.00, 1.75) | $11.8\ \mathrm{kNm/m}$ | (12.53, 1.75) |
+| $m_y$ | $0.0\ \mathrm{kNm/m}$ | – | $14.4\ \mathrm{kNm/m}$ | (12.37, 1.87) |
+| $m_{xy}$ | $0.0\ \mathrm{kNm/m}$ | – | $4.8\ \mathrm{kNm/m}$ | (12.37, 1.87) |
+| $v_x$ | $-12.8\ \mathrm{kN/m}$ | (13.33, 1.75) | $4.6\ \mathrm{kN/m}$ | (11.77, 1.57) |
+| $v_y$ | $-17.9\ \mathrm{kN/m}$ | (12.67, 2.75) | $8.5\ \mathrm{kN/m}$ | (11.83, 0.25) |
+| $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $18.9\ \mathrm{kN/m}$ | (12.67, 2.75) |
 
 Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
 
@@ -20347,8 +20353,8 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 
 | Widerstand | Seite | erforderlich | Ort |
 | ---: | ---: | ---: | ---: |
-| $m_{xu}$ | unten, in x | $14.6\ \mathrm{kNm/m}$ | (12.50, 1.75) |
-| $m_{yu}$ | unten, in y | $22.2\ \mathrm{kNm/m}$ | (12.36, 1.83) |
+| $m_{xu}$ | unten, in x | $16.6\ \mathrm{kNm/m}$ | (12.53, 1.75) |
+| $m_{yu}$ | unten, in y | $19.1\ \mathrm{kNm/m}$ | (12.37, 1.87) |
 | $m'_{xu}$ | oben, in x | $10.6\ \mathrm{kNm/m}$ | (6.00, 1.75) |
 | $m'_{yu}$ | oben, in y | $0.0\ \mathrm{kNm/m}$ | – |
 
@@ -20366,29 +20372,29 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | x1.1 … x2.1 | $0.500$ | $6.00$ | $20.6$ | L3 11.4 · L2 9.3 | $-10.4$ | $6.00$ | $8.7$ | $1.53$ |
 | x3.1 | $0.500$ | $6.00$ | $22.7$ | L3 11.5 · L2 11.2 | $-12.3$ | $6.00$ | $8.9$ | $1.55$ |
-| x4.1 … x6.1 | $0.500$ | $6.00$ | $59.6$ | L3 19.1 · L2 40.5 | $-49.2$ | $6.00$ | $24.5$ | $2.57$ |
-| x7 … x8 | $0.500$ | $6.00$ | $44.6$ | L3 16.7 · L2 27.8 | $-33.4$ | $6.00$ | $18.8$ | $2.25$ |
+| x4.1 … x6.1 | $0.500$ | $6.00$ | $57.1$ | L3 18.0 · L2 39.0 | $-46.7$ | $6.00$ | $22.3$ | $2.65$ |
+| x7 … x8 | $0.500$ | $6.00$ | $42.1$ | L3 15.7 · L2 26.4 | $-30.9$ | $6.00$ | $16.6$ | $2.17$ |
 | x15 | $0.400$ | $6.00$ | $43.0$ | L3 14.7 · S1 28.3 | $0.0$ | – | $26.4$ | $3.53$ |
 | x1.2 | $0.500$ | $4.17$ | $6.8$ | L9 3.4 · L7 3.4 | $0.0$ | – | $1.7$ | $10.17$ |
 | x2.2 | $0.500$ | $4.17$ | $6.8$ | L9 3.4 · L7 3.4 | $0.0$ | – | $1.7$ | $10.33$ |
-| x3.2 | $0.500$ | $4.17$ | $13.5$ | L9 6.7 · L7 6.7 | $0.0$ | – | $3.4$ | $10.50$ |
-| x4.2 | $0.500$ | $4.17$ | $32.3$ | L9 10.5 · L7 21.8 | $0.0$ | – | $14.6$ | $12.65$ |
+| x3.2 | $0.500$ | $4.17$ | $16.7$ | L9 8.3 · L7 8.3 | $0.0$ | – | $5.8$ | $11.42$ |
+| x4.2 | $0.500$ | $4.17$ | $41.6$ | L9 14.1 · L7 27.5 | $0.0$ | – | $20.5$ | $12.42$ |
 | x5.2 | $0.500$ | $4.17$ | $12.4$ | L9 4.6 · L7 7.8 | $0.0$ | – | $5.4$ | $12.79$ |
 | x6.2 | $0.500$ | $4.17$ | $6.8$ | L9 3.4 · L7 3.4 | $0.0$ | – | $1.7$ | $11.00$ |
 | y1 … y2 | $0.500$ | $7.00$ | $32.1$ | L1 7.3 · L4 24.8 | $0.0$ | – | $31.6$ | $4.64$ |
 | y3 | $0.500$ | $7.00$ | $42.9$ | L1 8.1 · L4 34.8 | $0.0$ | – | $35.2$ | $4.70$ |
 | y4 | $0.500$ | $7.00$ | $45.2$ | L1 8.1 · L4 37.1 | $0.0$ | – | $35.5$ | $4.71$ |
-| y5 … y6 | $0.500$ | $7.00$ | $56.4$ | L1 18.1 · L4 38.3 | $0.0$ | – | $38.3$ | $4.61$ |
+| y5 … y6 | $0.500$ | $7.00$ | $62.5$ | L1 21.8 · L4 40.7 | $0.0$ | – | $44.4$ | $4.39$ |
 | y7 … y9 | $0.480$ | $7.00$ | $55.5$ | L1 55.5 · L5 0.0 | $0.0$ | – | $241.4$ | $6.60$ |
 | y10 | $0.480$ | $7.00$ | $48.1$ | L1 48.1 · L5 0.0 | $0.0$ | – | $234.8$ | $6.60$ |
 | y11 | $0.480$ | $7.00$ | $37.5$ | L1 37.5 · L5 0.0 | $0.0$ | – | $174.4$ | $6.60$ |
 | y12 … y13 | $0.300$ | $7.00$ | $35.4$ | L1 35.4 · L5 0.0 | $0.0$ | – | $162.3$ | $6.60$ |
 | 71.57° 1 | $0.474$ | $3.32$ | $7.1$ | L6 3.6 · L8 3.6 | $0.0$ | – | $1.9$ | $4.06$ |
 | 71.57° 2 | $0.474$ | $3.32$ | $7.1$ | L6 3.6 · L8 3.6 | $0.0$ | – | $1.9$ | $4.22$ |
-| 71.57° 3 | $0.474$ | $3.32$ | $21.3$ | L6 10.7 · L8 10.7 | $0.0$ | – | $8.4$ | $4.82$ |
-| 71.57° 4 | $0.474$ | $3.32$ | $21.3$ | L6 10.7 · L8 10.7 | $0.0$ | – | $8.4$ | $4.98$ |
-| 71.57° 5 | $0.474$ | $3.32$ | $37.2$ | L6 14.8 · L8 22.3 | $0.0$ | – | $16.0$ | $5.53$ |
-| 71.57° 6 | $0.474$ | $3.32$ | $68.8$ | L6 26.5 · L8 42.3 | $0.0$ | – | $35.8$ | $5.60$ |
+| 71.57° 3 | $0.474$ | $3.32$ | $19.7$ | L6 9.8 · L8 9.8 | $0.0$ | – | $7.3$ | $4.82$ |
+| 71.57° 4 | $0.474$ | $3.32$ | $19.7$ | L6 9.8 · L8 9.8 | $0.0$ | – | $7.3$ | $4.98$ |
+| 71.57° 5 | $0.474$ | $3.32$ | $34.6$ | L6 13.7 · L8 20.9 | $0.0$ | – | $14.4$ | $5.58$ |
+| 71.57° 6 | $0.474$ | $3.32$ | $61.5$ | L6 23.3 · L8 38.2 | $0.0$ | – | $30.9$ | $5.64$ |
 | 71.57° 7 | $0.474$ | $3.32$ | $13.0$ | L6 5.2 · L8 7.9 | $0.0$ | – | $5.3$ | $6.05$ |
 | 71.57° 8 | $0.474$ | $3.32$ | $7.1$ | L6 3.6 · L8 3.6 | $0.0$ | – | $1.9$ | $5.17$ |
 
@@ -20399,15 +20405,15 @@ Q ist die Last auf dem Träger, mit dem, was tiefere Träger in ihn geben. s mis
 | Lager | $F\ [\mathrm{kN}]$ | $r_{\max}\ [\mathrm{kN/m}]$ | $m_{\max}\ [\mathrm{kNm/m}]$ |
 | ---: | ---: | ---: | ---: |
 | S1 · Stütze | $11.3$ | – | – |
-| L1 · Linienlager | $175.8$ | $55.5$ | – |
-| L2 · Linienlager | $103.4$ | $40.5$ | $-49.2$ |
-| L3 · Linienlager | $68.3$ | $19.1$ | – |
-| L4 · Linienlager | $99.1$ | $38.3$ | – |
+| L1 · Linienlager | $179.6$ | $55.5$ | – |
+| L2 · Linienlager | $99.8$ | $39.0$ | $-46.7$ |
+| L3 · Linienlager | $65.8$ | $18.0$ | – |
+| L4 · Linienlager | $101.5$ | $40.7$ | – |
 | L5 · Linienlager | $0.0$ | $0.0$ | $241.4$ |
-| L6 · Linienlager | $37.2$ | $25.1$ | – |
-| L7 · Linienlager | $23.2$ | $20.7$ | – |
-| L8 · Linienlager | $49.6$ | $40.1$ | – |
-| L9 · Linienlager | $16.0$ | $9.9$ | – |
+| L6 · Linienlager | $34.4$ | $22.1$ | – |
+| L7 · Linienlager | $26.9$ | $26.1$ | – |
+| L8 · Linienlager | $46.2$ | $36.2$ | – |
+| L9 · Linienlager | $18.6$ | $13.3$ | – |
 
 Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das Stück ab, über das er geht; wo zwei dasselbe Stück tragen, zählen beide. r\_max ist der Wert mit dem grössten Betrag. Ebenso m\_max, das Moment, das ein eingespanntes Lager hält, mit dem Vorzeichen der Platte: negativ, wo es oben zieht. Liegt Platte zu beiden Seiten, hält es nur den Unterschied ihrer Momente; dann gilt das Vorzeichen der Seite, die stärker zieht.
 
@@ -20415,11 +20421,11 @@ Längs eines Linienlagers gibt jeder Träger seine Kraft gleichmässig über das
 
 | Grösse | kleinst | Ort | grösst | Ort |
 | ---: | ---: | ---: | ---: | ---: |
-| $m_x$ | $-49.2\ \mathrm{kNm/m}$ | (6.00, 1.75) | $26.4\ \mathrm{kNm/m}$ | (3.53, 6.80) |
+| $m_x$ | $-46.7\ \mathrm{kNm/m}$ | (6.00, 1.75) | $26.4\ \mathrm{kNm/m}$ | (3.53, 6.80) |
 | $m_y$ | $0.0\ \mathrm{kNm/m}$ | – | $241.4\ \mathrm{kNm/m}$ | (3.24, 6.80) |
-| $m_{xy}$ | $0.0\ \mathrm{kNm/m}$ | – | $10.7\ \mathrm{kNm/m}$ | (12.35, 1.79) |
-| $v_x$ | $-40.5\ \mathrm{kN/m}$ | (6.00, 1.75) | $19.1\ \mathrm{kN/m}$ | (0.00, 1.75) |
-| $v_y$ | $-40.0\ \mathrm{kN/m}$ | (12.75, 3.00) | $55.5\ \mathrm{kN/m}$ | (3.24, 0.00) |
+| $m_{xy}$ | $0.0\ \mathrm{kNm/m}$ | – | $9.3\ \mathrm{kNm/m}$ | (12.36, 1.82) |
+| $v_x$ | $-39.0\ \mathrm{kN/m}$ | (6.00, 1.75) | $18.0\ \mathrm{kN/m}$ | (0.00, 1.75) |
+| $v_y$ | $-40.7\ \mathrm{kN/m}$ | (2.25, 7.00) | $55.5\ \mathrm{kN/m}$ | (3.24, 0.00) |
 | $v_0$ | $0.0\ \mathrm{kN/m}$ | – | $55.6\ \mathrm{kN/m}$ | (3.24, 0.00) |
 
 Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein Träger springt oder Querkraft oder Last null werden. Momente positiv mit Zug unten.
@@ -20428,9 +20434,9 @@ Gesucht am Schwerpunkt jeder Zelle der Bilder und an den Stellen, an denen ein T
 
 | Widerstand | Seite | erforderlich | Ort |
 | ---: | ---: | ---: | ---: |
-| $m_{xu}$ | unten, in x | $28.6\ \mathrm{kNm/m}$ | (12.50, 1.75) |
+| $m_{xu}$ | unten, in x | $32.8\ \mathrm{kNm/m}$ | (12.36, 1.82) |
 | $m_{yu}$ | unten, in y | $241.4\ \mathrm{kNm/m}$ | (3.24, 6.80) |
-| $m'_{xu}$ | oben, in x | $49.2\ \mathrm{kNm/m}$ | (6.00, 1.75) |
+| $m'_{xu}$ | oben, in x | $46.7\ \mathrm{kNm/m}$ | (6.00, 1.75) |
 | $m'_{yu}$ | oben, in y | $0.0\ \mathrm{kNm/m}$ | – |
 
 **Lastverteilelemente: was der Bereich zusätzlich braucht**

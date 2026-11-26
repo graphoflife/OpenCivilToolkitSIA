@@ -38,6 +38,7 @@ from opencivil.core.latex import Mathe, fest
 from opencivil.core.protokoll import Protokoll
 from opencivil.decke import feld
 from opencivil.decke import geometrie as geo
+from opencivil.decke.aufteilung import GANZ_AB
 from opencivil.decke.modell import Aufteilung, Decke, Flaechenlast, Last, Linienlast, Punktlast
 from opencivil.decke.rechnung import Ergebnis, Fallergebnis, lagerverlauf, spitzen
 from opencivil.decke.streifen import Streifen, Traeger, Zerlegung, richtungen_der_platte
@@ -60,9 +61,14 @@ ANNAHME = (
 AUTOMATISCH = (
     "Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstreifen trägt die Richtung, "
     "die Lager hat. Tragen beide, geht die Last zum nahen Rand, wenn sie näher als ein Viertel der "
-    "kürzeren Spannweite an einem Lager liegt, sonst in die kürzere Spannweite; nahe zweier "
-    "Ränder und bei gleicher Spannweite je zur Hälfte. Ein Kragarm zählt doppelt (nach Vorgabe; "
+    "kürzeren Spannweite an einem Lager liegt, nahe zweier Ränder je zur Hälfte. Sonst geht sie "
+    "mehr in die kürzere Spannweite: bei gleichen je zur Hälfte, ab dem Verhältnis "
+    f"{fest(GANZ_AB, 1)} ganz, dazwischen geradlinig. Ein Kragarm zählt doppelt (nach Vorgabe; "
     "die Norm lässt jede Aufteilung zu, die im Gleichgewicht ist, SIA 262:2025, 4.1.4.2.2).")
+
+#: Der Anteil in die kürzere Spannweite fern der Lager (:func:`~opencivil.decke.aufteilung.in_der_mitte`).
+MITTE = (r"\alpha_{\mathrm{kurz}} = \min\left(1;\ \frac{1}{2} + \frac{1}{2} \cdot "
+         r"\frac{l_{\mathrm{lang}} / l_{\mathrm{kurz}} - 1}{" + fest(GANZ_AB, 1) + r" - 1}\right)")
 
 
 #: Vom Streifen zur Platte -- die Transformation der Folie 14, rückwärts gelesen (:mod:`~opencivil.decke.feld`).
@@ -239,6 +245,7 @@ def _aufteilung(p: Protokoll, decke: Decke) -> None:
                f"{fest((1.0 - decke.anteil) * 100.0, 0)} % in Richtung 2.")
     else:
         p.text(AUTOMATISCH)
+        p.gleichung(MITTE, titel="Fern der Lager, in die kürzere Spannweite")
     if decke.zonen:
         p.tabelle(["Zone", Mathe(r"A\ [\mathrm{m}^{2}]"), "in Richtung 1", "in Richtung 2"],
                   [[zone.name, Mathe(fest(abs(geo.flaeche(list(zone.ecken))), 2)),

@@ -1,5 +1,5 @@
 ---
-erzeugt: 16e3298ca28d
+erzeugt: d3033bf1d622
 art: modul
 tags: [modul]
 ---
@@ -169,7 +169,8 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 ## Konstanten
 
 - `ANNAHME = 'Streifenmethode (Stahlbeton II, 7.2 Platten, Folien 27 bis 39): jede…` – Was die Streifenmethode annimmt.
-- `AUTOMATISCH = 'Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstre…` – Die automatische Aufteilung in Worten -- die Regel steht in [[opencivil.decke.aufteilung|aufteilung]].
+- `AUTOMATISCH = f'Automatisch, nach Folie 31 verallgemeinert: je Zelle zweier Feldstr…` – Die automatische Aufteilung in Worten -- die Regel steht in [[opencivil.decke.aufteilung|aufteilung]].
+- `MITTE = '\\alpha_{\\mathrm{kurz}} = \\min\\left(1;\\ \\frac{1}{2} + \\frac{1}…` – Der Anteil in die kürzere Spannweite fern der Lager ([[opencivil.decke.aufteilung#in_der_mitte|in_der_mitte]]).
 - `STREIFEN_IN_XY = '\\begin{aligned} & m = \\frac{M}{b} \\qquad m_x = m \\cdot \\cos^2\\…` – Vom Streifen zur Platte -- die Transformation der Folie 14, rückwärts gelesen ([[opencivil.decke.feld|feld]]).
 - `FLAECHENLAGER = 'p_{\\mathrm{Lager}} = \\frac{R}{l}'` – Ein Flächenlager drückt gleichmässig über seine Breite (Folie 33).
 - `FLIESSBEDINGUNG = "\\begin{aligned} & m_{xu} \\ge m_x + |m_{xy}| \\qquad m_{yu} \\ge m_…` – Die linearisierte Fliessbedingung, `k = k' = 1` ([[opencivil.decke.feld#widerstaende|widerstaende]]).
@@ -182,6 +183,7 @@ Je Stütze und Einzellast, was ihr Bereich zusätzlich braucht.
 
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.decke.aufteilung]]
 - [[opencivil.decke.feld]]
 - [[opencivil.decke.geometrie]]
 - [[opencivil.decke.modell]]
